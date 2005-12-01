@@ -293,12 +293,10 @@ ServerWindow::Show()
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n", Title()));
 
-	if (fQuitting || !fWindowLayer->IsHidden())
+	if (fQuitting || !fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
 
-	// TODO: that check is just there for offscreen-windows - this should be made better
-	if (fWindowLayer->GetRootLayer() != NULL)
-		fDesktop->ShowWindow(fWindowLayer);
+	fDesktop->ShowWindow(fWindowLayer);
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -312,15 +310,13 @@ ServerWindow::Hide()
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Hide\n", Title()));
 
-	if (fWindowLayer->IsHidden())
+	if (fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
-	// TODO: that check is just there for offscreen-windows - this should be made better
-	if (fWindowLayer->GetRootLayer() != NULL)
-		fDesktop->HideWindow(fWindowLayer);
+	fDesktop->HideWindow(fWindowLayer);
 }
 
 
@@ -1323,19 +1319,18 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
 
+			status_t status = B_ERROR;
 			int32 look;
-			if (link.Read<int32>(&look) != B_OK) {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
-				break;
+			if (link.Read<int32>(&look) == B_OK) {
+				// test if look is valid
+				status = WindowLayer::IsValidLook((window_look)look)
+					? B_OK : B_BAD_VALUE;
 			}
 
-			// TODO: filter out invalid looks
-
-			if (!fWindowLayer->IsOffscreenWindow())
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
 				fDesktop->SetWindowLook(fWindowLayer, (window_look)look);
 
-			fLink.StartMessage(B_OK);
+			fLink.StartMessage(status);
 			fLink.Flush();
 			break;
 		}
@@ -1346,18 +1341,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			status_t status = B_ERROR;
 			int32 feel;
 			if (link.Read<int32>(&feel) == B_OK) {
-				// test if "feel" is valid
-				status = (feel == B_NORMAL_WINDOW_FEEL
-						|| feel == B_MODAL_SUBSET_WINDOW_FEEL
-						|| feel == B_MODAL_APP_WINDOW_FEEL
-						|| feel == B_MODAL_ALL_WINDOW_FEEL
-						|| feel == B_FLOATING_SUBSET_WINDOW_FEEL
-						|| feel == B_FLOATING_APP_WINDOW_FEEL
-						|| feel == B_FLOATING_ALL_WINDOW_FEEL
-						|| feel == kDesktopWindowFeel
-						|| feel == kMenuWindowFeel
-						|| feel == kWindowScreenFeel)
-					? B_BAD_VALUE : B_OK;
+				// test if feel is valid
+				status = WindowLayer::IsValidFeel((window_feel)feel)
+					? B_OK : B_BAD_VALUE;
 			}
 
 			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
@@ -1365,25 +1351,26 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			fLink.StartMessage(status);
 			fLink.Flush();
+			break;
 		}
 		case AS_SET_FLAGS:
 		{
 			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
 
+			status_t status = B_ERROR;
 			uint32 flags;
-			if (link.Read<uint32>(&flags) != B_OK) {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
-				break;
+			if (link.Read<uint32>(&flags) == B_OK) {
+				// test if flags are valid
+				status = (flags & ~WindowLayer::ValidWindowFlags()) != 0
+					? B_OK : B_BAD_VALUE;
 			}
 
-			// TODO: filter out invalid flags
-
-			if (!fWindowLayer->IsOffscreenWindow())
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
 				fDesktop->SetWindowFlags(fWindowLayer, flags);
 
-			fLink.StartMessage(B_OK);
+			fLink.StartMessage(status);
 			fLink.Flush();
+			break;
 		}
 #if 0
 		case AS_SET_ALIGNMENT:

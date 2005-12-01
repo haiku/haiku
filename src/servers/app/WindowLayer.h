@@ -119,6 +119,10 @@ class WindowLayer : public Layer {
 	inline	Layer*				TopLayer() const
 									{ return fTopLayer; }
 
+	static bool					IsValidLook(window_look look);
+	static bool					IsValidFeel(window_feel feel);
+	static uint32				ValidWindowFlags();
+
  protected:
 	virtual void				_AllRedraw(const BRegion& invalid);
 

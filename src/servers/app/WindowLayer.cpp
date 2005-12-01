@@ -89,6 +89,13 @@ WindowLayer::WindowLayer(const BRect &frame,
 	  fMinHeight(1.0),
 	  fMaxHeight(32768.0)
 {
+	// make sure our arguments are valid 
+	if (!IsValidLook(fLook))
+		fLook = B_TITLED_WINDOW_LOOK;
+	if (!IsValidFeel(fFeel))
+		fFeel = B_NORMAL_WINDOW_FEEL;
+	fFlags &= ValidWindowFlags();
+
 	// unlike BViews, windows start off as hidden
 	fHidden = true;
 	fWindow = window;
@@ -851,5 +858,55 @@ WindowLayer::SetTopLayer(Layer* layer)
 		AddChild(fTopLayer, Window());
 		fTopLayer->SetAsTopLayer(true);
 	}
+}
+
+
+/*static*/
+bool
+WindowLayer::IsValidLook(window_look look)
+{
+	return look == B_TITLED_WINDOW_LOOK
+		|| look == B_DOCUMENT_WINDOW_LOOK
+		|| look == B_MODAL_WINDOW_LOOK
+		|| look == B_FLOATING_WINDOW_LOOK
+		|| look == B_BORDERED_WINDOW_LOOK
+		|| look == B_NO_BORDER_WINDOW_LOOK
+		|| look == kDesktopWindowLook
+		|| look == kLeftTitledWindowLook;
+}
+
+
+/*static*/
+bool
+WindowLayer::IsValidFeel(window_feel feel)
+{
+	return feel == B_NORMAL_WINDOW_FEEL
+		|| feel == B_MODAL_SUBSET_WINDOW_FEEL
+		|| feel == B_MODAL_APP_WINDOW_FEEL
+		|| feel == B_MODAL_ALL_WINDOW_FEEL
+		|| feel == B_FLOATING_SUBSET_WINDOW_FEEL
+		|| feel == B_FLOATING_APP_WINDOW_FEEL
+		|| feel == B_FLOATING_ALL_WINDOW_FEEL
+		|| feel == kDesktopWindowFeel
+		|| feel == kMenuWindowFeel
+		|| feel == kWindowScreenFeel;
+}
+
+
+/*static*/
+uint32
+WindowLayer::ValidWindowFlags()
+{
+	return B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
+		| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
+		| B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE
+		| B_AVOID_FRONT | B_AVOID_FOCUS
+		| B_WILL_ACCEPT_FIRST_CLICK | B_OUTLINE_RESIZE
+		| B_NO_WORKSPACE_ACTIVATION
+		| B_NOT_ANCHORED_ON_ACTIVATE
+		| B_ASYNCHRONOUS_CONTROLS
+		| B_QUIT_ON_WINDOW_CLOSE
+		| kWorkspacesWindowFlag
+		| kWindowScreenFlag;
 }
 
