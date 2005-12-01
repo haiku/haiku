@@ -3,6 +3,7 @@
 #define CLIENT_LOOPER_H
 
 #include <Looper.h>
+#include <MessageRunner.h>
 
 class WindowLayer;
 
@@ -36,7 +37,6 @@ class ClientLooper : public BLooper {
 			int32					fViewCount;
 
 			BMessageRunner*			fTicker;
-
 
 			void					_DrawAnimatedLayer(int32 token);
 
