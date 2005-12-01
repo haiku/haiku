@@ -11,6 +11,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <String.h>
 #include <Window.h>
 
 #include <stdio.h>
