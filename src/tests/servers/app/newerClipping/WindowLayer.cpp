@@ -331,7 +331,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 	// from executing this at the same time as the window
 	// is doing something else here!
 
-	if (!view || (dx == 0 && dy == 0))
+	if (!view || view == fTopLayer || (dx == 0 && dy == 0))
 		return;
 
 	if (fDesktop && fDesktop->ReadLockClipping()) {
