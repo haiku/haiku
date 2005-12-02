@@ -548,6 +548,11 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 	}
 	if (fIsResizing) {
 		BPoint delta = where - fLastMousePosition;
+		if (WindowFlags() & B_NOT_V_RESIZABLE)
+			delta.y = 0;
+		if (WindowFlags() & B_NOT_H_RESIZABLE)
+			delta.x = 0;
+
 		Window()->Desktop()->ResizeWindowBy(this, delta.x, delta.y);
 	}
 	if (fIsSlidingTab) {
@@ -706,6 +711,10 @@ WindowLayer::SetFeel(window_feel feel)
 {
 	fFeel = feel;
 
+	// having modal windows with B_AVOID_FRONT or B_AVOID_FOCUS doesn't
+	// make that much sense, so we filter those flags out on demand
+	fWindowFlags &= ~ValidWindowFlags(fFeel);
+
 	// TODO: this shouldn't be necessary, but we'll see :)
 
 	// floating and modal windows must appear in every workspace where
@@ -732,7 +741,7 @@ WindowLayer::SetFeel(window_feel feel)
 void
 WindowLayer::SetWindowFlags(uint32 flags, BRegion* updateRegion)
 {
-	fWindowFlags = flags;
+	fWindowFlags = flags & ~ValidWindowFlags(fFeel);
 
 	if (fDecorator == NULL)
 		return;
@@ -742,6 +751,20 @@ WindowLayer::SetWindowFlags(uint32 flags, BRegion* updateRegion)
 
 	// TODO: we might need to resize the window!
 	//fDecorator->GetSizeLimits(&fMinWidth, &fMinHeight, &fMaxWidth, &fMaxHeight);
+}
+
+
+bool
+WindowLayer::IsModal() const
+{
+	return IsModalFeel(fFeel);
+}
+
+
+bool
+WindowLayer::IsFloating() const
+{
+	return IsFloatingFeel(fFeel);
 }
 
 
@@ -894,6 +917,26 @@ WindowLayer::IsValidFeel(window_feel feel)
 
 
 /*static*/
+bool
+WindowLayer::IsModalFeel(window_feel feel)
+{
+	return feel == B_MODAL_SUBSET_WINDOW_FEEL
+		|| feel == B_MODAL_APP_WINDOW_FEEL
+		|| feel == B_MODAL_ALL_WINDOW_FEEL;
+}
+
+
+/*static*/
+bool
+WindowLayer::IsFloatingFeel(window_feel feel)
+{
+	return feel == B_FLOATING_SUBSET_WINDOW_FEEL
+		|| feel == B_FLOATING_APP_WINDOW_FEEL
+		|| feel == B_FLOATING_ALL_WINDOW_FEEL;
+}
+
+
+/*static*/
 uint32
 WindowLayer::ValidWindowFlags()
 {
@@ -908,5 +951,17 @@ WindowLayer::ValidWindowFlags()
 		| B_QUIT_ON_WINDOW_CLOSE
 		| kWorkspacesWindowFlag
 		| kWindowScreenFlag;
+}
+
+
+/*static*/
+uint32
+WindowLayer::ValidWindowFlags(window_feel feel)
+{
+	uint32 flags = ValidWindowFlags();
+	if (IsModalFeel(feel))
+		return flags & ~(B_AVOID_FOCUS | B_AVOID_FRONT);
+
+	return flags;
 }
 

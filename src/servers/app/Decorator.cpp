@@ -104,6 +104,14 @@ Decorator::SetDriver(DrawingEngine *driver)
 void
 Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 {
+	// we're nice to our subclasses - we make sure B_NOT_{H|V|}_RESIZABLE are in sync
+	// (it's only a semantical simplification, not a necessity)
+	if ((flags & (B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE))
+			== (B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE))
+		flags |= B_NOT_RESIZABLE;
+	if (flags & B_NOT_RESIZABLE)
+		flags |= B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE;
+
 	fFlags = flags;
 }
 

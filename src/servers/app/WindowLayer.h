@@ -12,7 +12,6 @@
 
 #include "Decorator.h"
 #include "Layer.h"
-#include "SubWindowList.h"
 
 #include <Rect.h>
 #include <String.h>
@@ -111,7 +110,8 @@ class WindowLayer : public Layer {
 
 			void				HighlightDecorator(bool active);
 
-			SubWindowList		fSubWindowList;
+			bool				IsModal() const;
+			bool				IsFloating() const;
 
 			void				RequestClientRedraw(const BRegion& invalid);
 
@@ -121,7 +121,11 @@ class WindowLayer : public Layer {
 
 	static bool					IsValidLook(window_look look);
 	static bool					IsValidFeel(window_feel feel);
+	static bool					IsModalFeel(window_feel feel);
+	static bool					IsFloatingFeel(window_feel feel);
+
 	static uint32				ValidWindowFlags();
+	static uint32				ValidWindowFlags(window_feel feel);
 
  protected:
 	virtual void				_AllRedraw(const BRegion& invalid);
