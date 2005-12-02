@@ -21,6 +21,7 @@
 
 
 const uint32 kMsgUpdateLook = 'uplk';
+const uint32 kMsgUpdateFeel = 'upfe';
 const uint32 kMsgUpdateFlags = 'upfl';
 
 const uint32 kMsgAddWindow = 'adwn';
@@ -40,7 +41,7 @@ class Window : public BWindow {
 
 	private:
 		BMessage* AddWindowMessage(window_look look, window_feel feel);
-		const char* TitleForFeel(window_feel feel);
+		BString TitleForFeel(window_feel feel);
 		void _UpdateFlagsMenuLabel();
 
 		BMenuField*	fFlagsField;
@@ -48,7 +49,7 @@ class Window : public BWindow {
 
 
 Window::Window(BRect frame, window_look look, window_feel feel)
-	: BWindow(frame, NULL, look, feel,
+	: BWindow(frame, TitleForFeel(feel).String(), look, feel,
 			B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect rect(Bounds());
@@ -56,12 +57,10 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
-	BString title = "Look&Feel - ";
-	title += TitleForFeel(feel);
-	SetTitle(title.String());
-
 	if (!IsModal() && !IsFloating())
 		gNormalWindowCount++;
+
+	float labelWidth = view->StringWidth("Flags:") + 5.f;
 
 	BPopUpMenu* menu = new BPopUpMenu("looks");
 	const struct { const char* name; int32 look; } looks[] = {
@@ -82,7 +81,33 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	rect.InsetBy(10, 10);
 	BMenuField* menuField = new BMenuField(rect, "look", "Look:", menu);
 	menuField->ResizeToPreferred();
-	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 5.0f);
+	menuField->SetDivider(labelWidth);
+	view->AddChild(menuField);
+
+	menu = new BPopUpMenu("feels");
+	const struct { const char* name; int32 feel; } feels[] = {
+		{"Normal", B_NORMAL_WINDOW_FEEL},
+		{"Modal Subset", B_MODAL_SUBSET_WINDOW_FEEL},
+		{"App Modal", B_MODAL_APP_WINDOW_FEEL},
+		{"All Modal", B_MODAL_ALL_WINDOW_FEEL},
+		{"Floating Subset", B_FLOATING_SUBSET_WINDOW_FEEL},
+		{"App Floating", B_FLOATING_APP_WINDOW_FEEL},
+		{"All Floating", B_FLOATING_ALL_WINDOW_FEEL},
+	};
+	for (uint32 i = 0; i < sizeof(feels) / sizeof(feels[0]); i++) {
+		BMessage* message = new BMessage(kMsgUpdateFeel);
+		message->AddInt32("feel", feels[i].feel);
+		BMenuItem* item = new BMenuItem(feels[i].name, message);
+		if (feels[i].feel == (int32)Feel())
+			item->SetMarked(true);
+
+		menu->AddItem(item);
+	}
+
+	rect.OffsetBy(0, menuField->Bounds().Height() + 10);
+	menuField = new BMenuField(rect, "feel", "Feel:", menu);
+	menuField->ResizeToPreferred();
+	menuField->SetDivider(labelWidth);
 	view->AddChild(menuField);
 
 	menu = new BPopUpMenu("none", false, false);
@@ -107,7 +132,7 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	rect.OffsetBy(0, menuField->Bounds().Height() + 10);
 	fFlagsField = new BMenuField(rect, "flags", "Flags:", menu);
 	fFlagsField->ResizeToPreferred();
-	fFlagsField->SetDivider(fFlagsField->StringWidth(fFlagsField->Label()) + 5.0f);
+	fFlagsField->SetDivider(labelWidth);
 	view->AddChild(fFlagsField);
 
 	// normal
@@ -203,6 +228,23 @@ Window::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgUpdateFeel:
+		{
+			int32 feel;
+			if (message->FindInt32("feel", &feel) != B_OK)
+				break;
+
+			if (!IsModal() && !IsFloating())
+				gNormalWindowCount--;
+
+			SetFeel((window_feel)feel);
+			SetTitle(TitleForFeel((window_feel)feel).String());
+
+			if (!IsModal() && !IsFloating())
+				gNormalWindowCount++;
+			break;
+		}
+
 		case kMsgUpdateFlags:
 		{
 			uint32 flag;
@@ -289,29 +331,38 @@ Window::AddWindowMessage(window_look look, window_feel feel)
 }
 
 
-const char*
+BString
 Window::TitleForFeel(window_feel feel)
 {
+	BString title = "Look&Feel - ";
+
 	switch (feel) {
 		case B_NORMAL_WINDOW_FEEL:
-			return "Normal";
+			title += "Normal";
+			break;
 
 		case B_MODAL_SUBSET_WINDOW_FEEL:
-			return "Modal Subset";
+			title += "Modal Subset";
+			break;
 		case B_MODAL_APP_WINDOW_FEEL:
-			return "Application Modal";
+			title += "Application Modal";
+			break;
 		case B_MODAL_ALL_WINDOW_FEEL:
-			return "All Modal";
+			title += "All Modal";
+			break;
 
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			return "Floating Subset";
+			title += "Floating Subset";
+			break;
 		case B_FLOATING_APP_WINDOW_FEEL:
-			return "Application Floating";
+			title += "Application Floating";
+			break;
 		case B_FLOATING_ALL_WINDOW_FEEL:
-			return "All Floating";
+			title += "All Floating";
+			break;
 	}
 
-	return NULL;
+	return title;
 }
 
 
