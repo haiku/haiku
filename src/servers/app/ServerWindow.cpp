@@ -1273,45 +1273,43 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_ADD_TO_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_ADD_TO_SUBSET\n", Title()));
-			WindowLayer *windowLayer;
-			int32 mainToken;
-			team_id	teamID;
+			status_t status = B_ERROR;
 
-			link.Read<int32>(&mainToken);
-			link.Read(&teamID, sizeof(team_id));
-
-			windowLayer = NULL; //fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
-			if (windowLayer) {
-				fLink.StartMessage(B_OK);
-				fLink.Flush();
-
-				//fDesktop->AddWindowLayerToSubset(fWindowLayer, windowLayer);
-			} else {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK) {
+				WindowLayer* windowLayer = fDesktop->FindWindowLayerByClientToken(
+					token, App()->ClientTeam());
+				if (windowLayer == NULL
+					|| windowLayer->Feel() != B_NORMAL_WINDOW_FEEL) {
+					status = B_BAD_VALUE;
+				} else {
+					status = fWindowLayer->AddToSubset(windowLayer)
+						? B_OK : B_NO_MEMORY;
+				}
 			}
+
+			fLink.StartMessage(status);
+			fLink.Flush();
 			break;
 		}
-		case AS_REM_FROM_SUBSET:
+		case AS_REMOVE_FROM_SUBSET:
 		{
 			STRACE(("ServerWindow %s: Message AS_REM_FROM_SUBSET\n", Title()));
-			WindowLayer *windowLayer;
-			int32 mainToken;
-			team_id teamID;
+			status_t status = B_ERROR;
 
-			link.Read<int32>(&mainToken);
-			link.Read(&teamID, sizeof(team_id));
-			
-			windowLayer = NULL; //fDesktop->FindWindowLayerByClientToken(mainToken, teamID);
-			if (windowLayer) {
-				fLink.StartMessage(B_OK);
-				fLink.Flush();
-
-				//fDesktop->RemoveWindowLayerFromSubset(fWindowLayer, windowLayer);
-			} else {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK) {
+				WindowLayer* windowLayer = fDesktop->FindWindowLayerByClientToken(
+					token, App()->ClientTeam());
+				if (windowLayer != NULL) {
+					fWindowLayer->RemoveFromSubset(windowLayer);
+					status = B_OK;
+				} else
+					status = B_BAD_VALUE;
 			}
+
+			fLink.StartMessage(status);
+			fLink.Flush();
 			break;
 		}
 

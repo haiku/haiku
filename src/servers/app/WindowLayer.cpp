@@ -812,7 +812,6 @@ WindowLayer::Frontmost(WindowLayer* first)
 }
 
 
-
 bool
 WindowLayer::AddToSubset(WindowLayer* window)
 {

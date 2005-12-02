@@ -1541,14 +1541,11 @@ BWindow::AddToSubset(BWindow *window)
 			&& fFeel != B_FLOATING_SUBSET_WINDOW_FEEL))
 		return B_BAD_VALUE;
 
-	team_id team = Team();
-
 	Lock();
-	fLink->StartMessage(AS_ADD_TO_SUBSET);
-	fLink->Attach<int32>(_get_object_token_(window));
-	fLink->Attach<team_id>(team);
 
 	status_t status = B_ERROR;
+	fLink->StartMessage(AS_ADD_TO_SUBSET);
+	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->FlushWithReply(status);
 
 	Unlock();
@@ -1565,15 +1562,13 @@ BWindow::RemoveFromSubset(BWindow *window)
 			&& fFeel != B_FLOATING_SUBSET_WINDOW_FEEL))
 		return B_BAD_VALUE;
 
-	team_id team = Team();
-
 	Lock();
-	fLink->StartMessage(AS_REM_FROM_SUBSET);
-	fLink->Attach<int32>(_get_object_token_(window));
-	fLink->Attach<team_id>(team);
 
 	status_t status = B_ERROR;
+	fLink->StartMessage(AS_REMOVE_FROM_SUBSET);
+	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->FlushWithReply(status);
+
 	Unlock();
 
 	return status;
