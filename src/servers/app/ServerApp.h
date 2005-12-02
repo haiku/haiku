@@ -64,6 +64,7 @@ class ServerApp : public MessageLooper {
 		const char *Signature() const { return fSignature.String(); }
 
 		void RemoveWindow(ServerWindow* window);
+		bool OnWorkspace(int32 index);
 
 		int32 CountBitmaps() const;
 		ServerBitmap *FindBitmap(int32 token) const;
@@ -81,6 +82,8 @@ class ServerApp : public MessageLooper {
 		virtual void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
 		virtual void _MessageLooper();
 		virtual void _GetLooperName(char* name, size_t size);
+		status_t _CreateWindow(int32 code, BPrivate::LinkReceiver& link,
+					port_id& clientReplyPort);
 
 		port_id	fMessagePort;
 		port_id	fClientReplyPort;	

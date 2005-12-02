@@ -669,6 +669,38 @@ WindowLayer::UpdateScreen()
 }
 
 
+/*!
+	\brief Returns wether or not the window is visible on the specified
+		workspace.
+
+	A modal or floating window may be visible on all workscreens one
+	of its subset windows are visible.
+*/
+bool
+WindowLayer::OnWorkspace(int32 index) const
+{
+	if ((fWorkspaces & (1UL << index)) != 0
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL
+		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
+		return true;
+
+	if (fFeel == B_MODAL_APP_WINDOW_FEEL
+		|| fFeel == B_FLOATING_APP_WINDOW_FEEL)
+		return Window()->App()->OnWorkspace(index);
+
+	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
+		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
+		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
+			WindowLayer* window = fSubsets.ItemAt(i);
+			if (window->OnWorkspace(index))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
 bool
 WindowLayer::SupportsFront()
 {

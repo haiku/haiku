@@ -79,17 +79,11 @@ using std::nothrow;
 static const uint32 kMsgAppQuit = 'appQ';
 
 
-/*!
-	\brief Constructor
-	\param sendport port ID for the BApplication which will receive the ServerApp's messages
-	\param rcvport port by which the ServerApp will receive messages from its BApplication.
-	\param fSignature NULL-terminated string which contains the BApplication's
-	MIME fSignature.
-*/
 ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
-	port_id clientLooperPort, team_id clientTeam, int32 clientToken,
-	const char* signature)
+		port_id clientLooperPort, team_id clientTeam,
+		int32 clientToken, const char* signature)
 	: MessageLooper("application"),
+
 	fMessagePort(-1),
 	fClientReplyPort(clientReplyPort),
 	fDesktop(desktop),
@@ -138,8 +132,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 }
 
 
-//! Does all necessary teardown for application
-ServerApp::~ServerApp(void)
+ServerApp::~ServerApp()
 {
 	STRACE(("*ServerApp %s:~ServerApp()\n", Signature()));
 
@@ -419,89 +412,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fDesktop->EventDispatcher().SetTo(gInputManager->GetStream());
 			break;
 		}
+
 		case AS_CREATE_WINDOW:
 		case AS_CREATE_OFFSCREEN_WINDOW:
 		{
-			// Create a ServerWindow/OffscreenServerWindow
-
-			// Attached data:
-			// 1) int32 bitmap token (only for AS_CREATE_OFFSCREEN_WINDOW)
-			// 2) BRect window frame
-			// 3) uint32 window look
-			// 4) uint32 window feel
-			// 5) uint32 window flags
-			// 6) uint32 workspace index
-			// 7) int32 BHandler token of the window
-			// 8) port_id window's reply port
-			// 9) port_id window's looper port
-			// 10) const char * title
-
-			BRect frame;
-			int32 bitmapToken;
-			uint32 look;
-			uint32 feel;
-			uint32 flags;
-			uint32 workspaces;
-			int32 token = B_NULL_TOKEN;
-			port_id	clientReplyPort = -1;
-			port_id looperPort = -1;
-			char *title = NULL;
-
-			if (code == AS_CREATE_OFFSCREEN_WINDOW)
-				link.Read<int32>(&bitmapToken);
-			
-			link.Read<BRect>(&frame);
-			link.Read<uint32>(&look);
-			link.Read<uint32>(&feel);
-			link.Read<uint32>(&flags);
-			link.Read<uint32>(&workspaces);
-			link.Read<int32>(&token);
-			link.Read<port_id>(&clientReplyPort);
-			link.Read<port_id>(&looperPort);
-			if (link.ReadString(&title) != B_OK)
-				break;
-
-			if (!frame.IsValid()) {
-				// make sure we pass a valid rectangle to ServerWindow
-				frame.right = frame.left + 1;
-				frame.bottom = frame.top + 1;
-			}
-
-			status_t status = B_ERROR;
-			ServerWindow *window = NULL;
-
-			if (code == AS_CREATE_OFFSCREEN_WINDOW) {
-				ServerBitmap* bitmap = FindBitmap(bitmapToken);
-
-				if (bitmap != NULL) {
-					window = new OffscreenServerWindow(title, this, clientReplyPort,
-						looperPort, token, bitmap);
-				}
-			} else {
-				window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
-				STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
-					fSignature(), title, frame.left, frame.top,
-					frame.right, frame.bottom));
-			}
-
-			free(title);
-
-			// NOTE: the reply to the client is handled in ServerWindow::Run()
-			if (window != NULL) {
-				status = window->Init(frame, (window_look)look, (window_feel)feel,
-					flags, workspaces);
-				if (status == B_OK && !window->Run())
-					status = B_ERROR;
-
-				// add the window to the list
-				if (status == B_OK && fWindowListLock.Lock()) {
-					status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
-					fWindowListLock.Unlock();
-				}
-
-				if (status < B_OK)
-					delete window;
-			}
+			port_id clientReplyPort = -1;
+			status_t status = _CreateWindow(code, link, clientReplyPort);
 
 			// if sucessful, ServerWindow::Run() will already have replied
 			if (status < B_OK) {
@@ -2406,12 +2322,121 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 }
 
 
+status_t
+ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
+	port_id& clientReplyPort)
+{
+	// Attached data:
+	// 1) int32 bitmap token (only for AS_CREATE_OFFSCREEN_WINDOW)
+	// 2) BRect window frame
+	// 3) uint32 window look
+	// 4) uint32 window feel
+	// 5) uint32 window flags
+	// 6) uint32 workspace index
+	// 7) int32 BHandler token of the window
+	// 8) port_id window's reply port
+	// 9) port_id window's looper port
+	// 10) const char * title
+
+	BRect frame;
+	int32 bitmapToken;
+	uint32 look;
+	uint32 feel;
+	uint32 flags;
+	uint32 workspaces;
+	int32 token;
+	port_id looperPort;
+	char* title;
+
+	if (code == AS_CREATE_OFFSCREEN_WINDOW)
+		link.Read<int32>(&bitmapToken);
+
+	link.Read<BRect>(&frame);
+	link.Read<uint32>(&look);
+	link.Read<uint32>(&feel);
+	link.Read<uint32>(&flags);
+	link.Read<uint32>(&workspaces);
+	link.Read<int32>(&token);
+	link.Read<port_id>(&clientReplyPort);
+	link.Read<port_id>(&looperPort);
+	if (link.ReadString(&title) != B_OK)
+		return B_ERROR;
+
+	if (!frame.IsValid()) {
+		// make sure we pass a valid rectangle to ServerWindow
+		frame.right = frame.left + 1;
+		frame.bottom = frame.top + 1;
+	}
+
+	status_t status = B_ERROR;
+	ServerWindow *window = NULL;
+
+	if (code == AS_CREATE_OFFSCREEN_WINDOW) {
+		ServerBitmap* bitmap = FindBitmap(bitmapToken);
+
+		if (bitmap != NULL) {
+			window = new OffscreenServerWindow(title, this, clientReplyPort,
+				looperPort, token, bitmap);
+		}
+	} else {
+		window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
+		STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
+			fSignature(), title, frame.left, frame.top,
+			frame.right, frame.bottom));
+	}
+
+	free(title);
+
+	// NOTE: the reply to the client is handled in ServerWindow::Run()
+	if (window != NULL) {
+		status = window->Init(frame, (window_look)look, (window_feel)feel,
+			flags, workspaces);
+		if (status == B_OK && !window->Run())
+			status = B_ERROR;
+
+		// add the window to the list
+		if (status == B_OK && fWindowListLock.Lock()) {
+			status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
+			fWindowListLock.Unlock();
+		}
+
+		if (status < B_OK)
+			delete window;
+	}
+
+	return status;
+}
+
+
 void
 ServerApp::RemoveWindow(ServerWindow* window)
 {
 	BAutolock locker(fWindowListLock);
 
 	fWindowList.RemoveItem(window);
+}
+
+
+bool
+ServerApp::OnWorkspace(int32 index)
+{
+	BAutolock locker(fWindowListLock);
+
+	// we could cache this, but then we'd have to recompute the cached
+	// value everytime a window has closed or changed workspaces
+
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* window = fWindowList.ItemAt(i);
+		const WindowLayer* layer = window->GetWindowLayer();
+
+		// only normal windows count
+
+		if (layer->Feel() == B_NORMAL_WINDOW_FEEL
+			&& layer->OnWorkspace(index))
+			return true;
+	}
+
+	return false;
 }
 
 

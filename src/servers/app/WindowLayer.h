@@ -101,8 +101,7 @@ class WindowLayer : public Layer {
 			uint32				Workspaces() const { return fWorkspaces; }
 			void				SetWorkspaces(uint32 workspaces)
 									{ fWorkspaces = workspaces; }
-			bool				OnWorkspace(int32 index) const
-									{ return (fWorkspaces & (1UL << index)) != 0; }
+			bool				OnWorkspace(int32 index) const;
 
 			bool				SupportsFront();
 
