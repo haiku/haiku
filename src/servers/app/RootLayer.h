@@ -54,8 +54,8 @@ class RootLayer : public Layer {
 		virtual	void		ScrollBy(float x, float y)
 								{ /* not allowed */ }
 
-		void				HideWindowLayer(WindowLayer* windowLayer);
-		void				ShowWindowLayer(WindowLayer* windowLayer, bool toFront = true);
+		void				HideWindow(WindowLayer* window);
+		void				ShowWindow(WindowLayer* window, bool toFront = true);
 
 		void				MoveWindowBy(WindowLayer* window, float x, float y);
 		void				ResizeWindowBy(WindowLayer* window, float x, float y);
@@ -100,8 +100,8 @@ class RootLayer : public Layer {
 
 		thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
 
-		void				AddWindowLayer(WindowLayer* windowLayer);
-		void				RemoveWindowLayer(WindowLayer* windowLayer);
+		void				AddWindow(WindowLayer* window);
+		void				RemoveWindow(WindowLayer* window);
 
 	private:
 		bool				_SetFocus(WindowLayer* focus, BRegion& update);

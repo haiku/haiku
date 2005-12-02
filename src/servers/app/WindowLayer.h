@@ -5,6 +5,7 @@
  * Author:  DarkWyrm <bpmagic@columbus.rr.com>
  *			Adi Oanca <adioanca@gmail.com>
  *			Stephan Aßmus <superstippi@gmx.de>
+ *			Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef WINDOW_LAYER_H
 #define WINDOW_LAYER_H
@@ -13,6 +14,7 @@
 #include "Decorator.h"
 #include "Layer.h"
 
+#include <ObjectList.h>
 #include <Rect.h>
 #include <String.h>
 
@@ -113,6 +115,12 @@ class WindowLayer : public Layer {
 			bool				IsModal() const;
 			bool				IsFloating() const;
 
+			WindowLayer*		Frontmost(WindowLayer* first = NULL);
+
+			bool				AddToSubset(WindowLayer* window);
+			void				RemoveFromSubset(WindowLayer* window);
+			bool				HasInSubset(WindowLayer* window);
+
 			void				RequestClientRedraw(const BRegion& invalid);
 
 			void				SetTopLayer(Layer* layer);
@@ -152,6 +160,8 @@ class WindowLayer : public Layer {
 			BPoint				fResizingClickOffset;
 
 			bool				fIsFocus;
+
+			BObjectList<WindowLayer> fSubsets;
 
 			bool				fIsClosing;
 			bool				fIsMinimizing;

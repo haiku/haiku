@@ -626,7 +626,7 @@ Desktop::ShowWindow(WindowLayer* window)
 		return;
 	}
 
-	fRootLayer->ShowWindowLayer(window);
+	fRootLayer->ShowWindow(window);
 
 	// If the mouse cursor is directly over the newly visible window,
 	// we'll send a fake mouse moved message to the window, so that
@@ -659,7 +659,7 @@ Desktop::HideWindow(WindowLayer* window)
 		return;
 	}
 
-	fRootLayer->HideWindowLayer(window);
+	fRootLayer->HideWindow(window);
 }
 
 
@@ -692,7 +692,7 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 			// window is on this workspace, is it anymore?
 			if (!workspaces_on_workspace(i, newWorkspaces)) {
 				if (i == CurrentWorkspace())
-					RootLayer()->RemoveWindowLayer(window);
+					RootLayer()->RemoveWindow(window);
 				else
 					fWorkspaces[i].RemoveWindow(window);
 			}
@@ -700,7 +700,7 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 			// window was not on this workspace, is it now?
 			if (workspaces_on_workspace(i, newWorkspaces)) {
 				if (i == CurrentWorkspace())
-					RootLayer()->AddWindowLayer(window);
+					RootLayer()->AddWindow(window);
 				else
 					fWorkspaces[i].AddWindow(window);
 			}

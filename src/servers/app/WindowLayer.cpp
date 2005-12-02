@@ -5,6 +5,7 @@
  * Author:  DarkWyrm <bpmagic@columbus.rr.com>
  *			Adi Oanca <adioanca@gmail.com>
  *			Stephan Aßmus <superstippi@gmx.de>
+ *			Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -714,27 +715,6 @@ WindowLayer::SetFeel(window_feel feel)
 	// having modal windows with B_AVOID_FRONT or B_AVOID_FOCUS doesn't
 	// make that much sense, so we filter those flags out on demand
 	fWindowFlags &= ~ValidWindowFlags(fFeel);
-
-	// TODO: this shouldn't be necessary, but we'll see :)
-
-	// floating and modal windows must appear in every workspace where
-	// their main window is present. Thus their fWorkspaces will be set to
-	// '0x0' and they will be made visible when needed.
-	switch (fFeel) {
-		case B_MODAL_APP_WINDOW_FEEL:
-			break;
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		case B_FLOATING_APP_WINDOW_FEEL:
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			fWorkspaces = 0x0UL;
-			break;
-		case B_MODAL_ALL_WINDOW_FEEL:
-		case B_FLOATING_ALL_WINDOW_FEEL:
-			fWorkspaces = 0xffffffffUL;
-			break;
-		case B_NORMAL_WINDOW_FEEL:
-			break;
-	}
 }
 
 
@@ -765,6 +745,72 @@ bool
 WindowLayer::IsFloating() const
 {
 	return IsFloatingFeel(fFeel);
+}
+
+
+/*!
+	\brief Returns the windows that's in front of the frontmost position
+		this window can get.
+		Returns NULL is this window can be the frontmost window.
+*/
+WindowLayer*
+WindowLayer::Frontmost(WindowLayer* first)
+{
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL)
+		return NULL;
+
+	if (first == NULL)
+		first = (WindowLayer*)NextLayer();
+
+	for (WindowLayer* window = first; window != NULL;
+			window = (WindowLayer*)window->NextLayer()) {
+		if (window->IsHidden())
+			continue;
+
+		// no one can be in front of a floating all window
+		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+			return window;
+
+		if (fFeel == B_NORMAL_WINDOW_FEEL
+			&& window->HasInSubset(this))
+			return window;
+	}
+
+	return NULL;
+}
+
+
+
+bool
+WindowLayer::AddToSubset(WindowLayer* window)
+{
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
+		return true;
+
+	return fSubsets.AddItem(window);
+}
+
+
+void
+WindowLayer::RemoveFromSubset(WindowLayer* window)
+{
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
+		return;
+
+	fSubsets.RemoveItem(window);
+}
+
+
+bool
+WindowLayer::HasInSubset(WindowLayer* window)
+{
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
+		return true;
+
+	return fSubsets.HasItem(window);
 }
 
 

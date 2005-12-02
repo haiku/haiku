@@ -205,29 +205,73 @@ RootLayer::SetFocus(WindowLayer* focus)
 }
 
 
+/*!
+	\brief Tries to move the specified window to the front of the screen.
+
+	If there are any modal windows on this screen, it might not actually
+	become the frontmost window, though, as modal windows stay in front
+	of their subset.
+*/
 void
-RootLayer::_SetFront(WindowLayer* windowLayer, BRegion& update)
+RootLayer::_SetFront(WindowLayer* window, BRegion& update)
 {
-	if (windowLayer == NULL) {
+	if (window == NULL) {
 		fBack = NULL;
 		fFront = NULL;
 		return;
 	}
 
-	if (!windowLayer->SupportsFront() && fFront != NULL)
+	if (!window->SupportsFront() && fFront != NULL)
 		return;
 
-	BRegion previous = windowLayer->FullVisible();
+	BRegion previous = window->FullVisible();
+	WindowLayer* frontmost = window->Frontmost();
 
-	_RemoveChildFromList(windowLayer);
-	_AddChildToList(windowLayer);
+	_RemoveChildFromList(window);
 
-	windowLayer->GetOnScreenRegion(update);
+	if (frontmost != NULL && frontmost->IsModal()) {
+		// all modal windows follow their subsets to the front
+		// (ie. they are staying in front of them, but they are
+		// not supposed to change their order because of that)
+
+		WindowLayer* nextModal;
+		for (WindowLayer* modal = frontmost; modal != NULL ; modal = nextModal) {
+			nextModal = (WindowLayer*)modal->NextLayer();
+
+			if (nextModal == frontmost) {
+				// since we're adding the modal windows to the end of the list
+				// we're traversing, we must stop when we've reached the initial
+				// starting point again
+				nextModal = NULL;
+			} else if (nextModal != NULL
+				&& (!nextModal->IsModal() || !nextModal->HasInSubset(window)))
+				nextModal = NULL;
+
+			previous.Include(&modal->FullVisible());
+			WindowLayer* modalFrontmost = modal->Frontmost();
+
+			_RemoveChildFromList(modal);
+			_AddChildToList(modal, modalFrontmost);
+
+			BRegion modalRegion;
+			modal->GetOnScreenRegion(modalRegion);
+				// TODO: this is not what we want, we'd want the new visible region
+			update.Include(&modalRegion);
+		}
+	}
+
+	_AddChildToList(window, frontmost);
+
+	BRegion windowRegion;
+	window->GetOnScreenRegion(windowRegion);
+		// TODO: this is not what we want, we'd want the new visible region
+
+	update.Include(&windowRegion);
 	update.Exclude(&previous);
 
-	fFront = windowLayer;
+	_UpdateFront();
 
-	if (windowLayer == fBack || fBack == NULL)
+	if (window == fBack || fBack == NULL)
 		_UpdateBack();
 }
 
@@ -280,19 +324,20 @@ RootLayer::_UpdateFronts()
 
 
 void
-RootLayer::ActivateWindow(WindowLayer* windowLayer)
+RootLayer::ActivateWindow(WindowLayer* window)
 {
 	BAutolock _(fAllRegionsLock);
 
 	BRegion changed;
-	_SetFront(windowLayer, changed);
+	_SetFront(window, changed);
 
 	// TODO: if this window has any floating windows, add them here
 
 	MarkForRebuild(changed);
 	TriggerRebuild();
 
-	_SetFocus(windowLayer, changed);
+	_SetFocus(Front(), changed);
+
 	_WindowsChanged(changed);
 	MarkForRedraw(changed);
 	TriggerRedraw();
@@ -336,32 +381,32 @@ RootLayer::SendBehindWindow(WindowLayer* windowLayer, WindowLayer* behindOf)
 
 
 void
-RootLayer::AddWindowLayer(WindowLayer* windowLayer)
+RootLayer::AddWindow(WindowLayer* window)
 {
-	STRACE(("AddWindowLayer(%p \"%s\")\n", windowLayer, windowLayer->Name()));
+	STRACE(("AddWindowLayer(%p \"%s\")\n", window, window->Name()));
 
-	if (windowLayer->SupportsFront())
-		_AddChildToList(windowLayer);
+	if (window->SupportsFront())
+		_AddChildToList(window, window->Frontmost((WindowLayer*)FirstChild()));
 	else
-		_AddChildToList(windowLayer, Back());
+		_AddChildToList(window, Back());
 
-	windowLayer->SetRootLayer(this);
+	window->SetRootLayer(this);
 
-	if (!windowLayer->IsHidden())
-		ActivateWindow(windowLayer);
+	if (!window->IsHidden())
+		ActivateWindow(window);
 }
 
 
 void
-RootLayer::RemoveWindowLayer(WindowLayer* windowLayer)
+RootLayer::RemoveWindow(WindowLayer* window)
 {
-	if (!windowLayer->IsHidden())
-		HideWindowLayer(windowLayer);
+	if (!window->IsHidden())
+		HideWindow(window);
 
-	_RemoveChildFromList(windowLayer);
+	_RemoveChildFromList(window);
 
-	LayerRemoved(windowLayer);
-	windowLayer->SetRootLayer(NULL);
+	LayerRemoved(window);
+	window->SetRootLayer(NULL);
 }
 
 
@@ -467,15 +512,15 @@ RootLayer::SetWorkspace(int32 index, Workspace::Private& previousWorkspace,
 
 
 void
-RootLayer::HideWindowLayer(WindowLayer* windowLayer)
+RootLayer::HideWindow(WindowLayer* window)
 {
 	BAutolock _(fAllRegionsLock);
 
-	BRegion changed = windowLayer->FullVisible();
-	windowLayer->Hide();
+	BRegion changed = window->FullVisible();
+	window->Hide();
 	_UpdateFronts();
 
-	if (dynamic_cast<WorkspacesLayer*>(windowLayer->TopLayer()) != NULL)
+	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
 		fWorkspacesLayer = NULL;
 
 	// TODO: if this window has any floating windows, remove them here
@@ -483,7 +528,7 @@ RootLayer::HideWindowLayer(WindowLayer* windowLayer)
 	MarkForRebuild(changed);
 	TriggerRebuild();
 
-	if (windowLayer == Focus())
+	if (window == Focus())
 		_SetFocus(Front(), changed);
 	_WindowsChanged(changed);
 
@@ -493,34 +538,34 @@ RootLayer::HideWindowLayer(WindowLayer* windowLayer)
 
 
 void
-RootLayer::ShowWindowLayer(WindowLayer* windowLayer, bool toFront)
+RootLayer::ShowWindow(WindowLayer* window, bool toFront)
 {
-	STRACE(("ShowWindowLayer(%p)\n", windowLayer));
+	STRACE(("ShowWindowLayer(%p)\n", window));
 
-	if (!windowLayer->IsHidden())
+	if (!window->IsHidden())
 		return;
 
 	BAutolock _(fAllRegionsLock);
 
-	windowLayer->Show();
-	BRegion changed = windowLayer->FullVisible();
+	window->Show();
+	BRegion changed = window->FullVisible();
 
 	if (toFront)
-		_SetFront(windowLayer, changed);
+		_SetFront(window, changed);
 	else
 		_UpdateFront();
 
 	// TODO: if this window has any floating windows, remove them here
 
 	// TODO: support FFM
-	if (Front() == windowLayer || Focus() == NULL)
-		_SetFocus(windowLayer, changed);
+	if (Front() == window || Focus() == NULL)
+		_SetFocus(window, changed);
 	_WindowsChanged(changed);
 	MarkForRedraw(changed);
 	TriggerRedraw();
 
-	if (dynamic_cast<WorkspacesLayer*>(windowLayer->TopLayer()) != NULL)
-		fWorkspacesLayer = windowLayer->TopLayer();
+	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
+		fWorkspacesLayer = window->TopLayer();
 }
 
 
