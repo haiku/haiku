@@ -78,9 +78,6 @@ WindowLayer::WindowLayer(BRect frame, const char* name,
 // destructor
 WindowLayer::~WindowLayer()
 {
-	fClient->Lock();
-	fClient->Quit();
-
 	delete fTopLayer;
 }
 
@@ -154,6 +151,21 @@ WindowLayer::MessageReceived(BMessage* message)
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+// QuitRequested
+bool
+WindowLayer::QuitRequested()
+{
+	if (fDesktop && fDesktop->LockClipping()) {
+		fDesktop->WindowDied(this);
+
+		fClient->Lock();
+		fClient->Quit();
+
+		fDesktop->UnlockClipping();
+	}
+	return true;
 }
 
 // SetClipping

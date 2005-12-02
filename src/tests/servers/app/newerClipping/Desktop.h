@@ -28,6 +28,8 @@ enum {
 	MSG_DRAW			= 'draw',
 
 	MSG_MARK_CLEAN		= 'mcln',
+
+	MSG_QUIT			= 'quit',
 };
 
 class Desktop : public BLooper {
@@ -92,6 +94,8 @@ class Desktop : public BLooper {
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }
+
+			void				WindowDied(WindowLayer* window);
 
 private:
 			void				_RebuildClippingForAllWindows(BRegion* stillAvailableOnScreen);

@@ -59,6 +59,7 @@ class WindowLayer : public BLooper {
 	virtual							~WindowLayer();
 
 	virtual	void					MessageReceived(BMessage* message);
+	virtual	bool					QuitRequested();
 
 	inline	BRect					Frame() const
 										{ return fFrame; }

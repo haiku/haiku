@@ -23,11 +23,14 @@ class Window : public BWindow {
 						Window(const char* title);
 	virtual				~Window();
 
+	virtual	bool		QuitRequested();
+
 			void		AddWindow(BRect frame, const char* name);
 			void		Test();
  private:
 			DrawView*	fView;
 			Desktop*	fDesktop;
+			bool		fQuit;
 };
 
 // constructor
@@ -50,14 +53,14 @@ App::ReadyToRun()
 // constructor
 Window::Window(const char* title)
 	: BWindow(BRect(50, 50, 800, 650), title,
-			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_QUIT_ON_WINDOW_CLOSE | B_ASYNCHRONOUS_CONTROLS)
+			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = new DrawView(Bounds());
 	fDesktop = new Desktop(fView);
 	fDesktop->Run();
 	AddChild(fView);
 	fView->MakeFocus(true);
+	fQuit = false;
 }
 
 // destructor
@@ -65,6 +68,18 @@ Window::~Window()
 {
 	fDesktop->Lock();
 	fDesktop->Quit();
+}
+
+// QuitRequested
+bool
+Window::QuitRequested()
+{
+	if (!fQuit) {
+		fDesktop->PostMessage(MSG_QUIT);
+		fQuit = true;
+		return false;
+	}
+	return true;
 }
 
 // AddWindow

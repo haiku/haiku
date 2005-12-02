@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include <Bitmap.h>
+#include <Application.h>
 #include <Message.h>
 #include <MessageQueue.h>
 #include <Messenger.h>
@@ -43,12 +43,6 @@ Desktop::Desktop(DrawView* drawView)
 // destructor
 Desktop::~Desktop()
 {
-	int32 count = CountWindows();
-	for (int32 i = count - 1; i >= 0; i--) {
-		WindowLayer* window = WindowAtFast(i);
-		window->Lock();
-		window->Quit();
-	}
 }
 
 // Draw
@@ -240,6 +234,15 @@ Desktop::MessageReceived(BMessage* message)
 				AddWindow(window);
 			break;
 		}
+
+		case MSG_QUIT:
+			if (LockClipping()) {
+				int32 count = CountWindows();
+				for (int32 i = 0; i < count; i++)
+					WindowAtFast(i)->PostMessage(B_QUIT_REQUESTED);
+				UnlockClipping();
+			}
+			break;
 
 		default:
 			BLooper::MessageReceived(message);
@@ -601,6 +604,17 @@ Desktop::MarkDirty(BRegion* region)
 
 		UnlockClipping();
 	}
+}
+
+// WindowDied
+void
+Desktop::WindowDied(WindowLayer* window)
+{
+	// thread is expected expected to have the
+	// write lock!
+	fWindows.RemoveItem(window);
+	if (fWindows.CountItems() == 0)
+		be_app->PostMessage(B_QUIT_REQUESTED);
 }
 
 // #pragma mark -
