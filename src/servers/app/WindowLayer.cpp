@@ -820,6 +820,10 @@ WindowLayer::AddToSubset(WindowLayer* window)
 		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
 		return true;
 
+	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
+		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
+		return window->Window()->App() == Window()->App();
+
 	return fSubsets.AddItem(window);
 }
 
@@ -828,7 +832,9 @@ void
 WindowLayer::RemoveFromSubset(WindowLayer* window)
 {
 	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
-		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL
+		|| fFeel == B_FLOATING_APP_WINDOW_FEEL
+		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
 		return;
 
 	fSubsets.RemoveItem(window);
@@ -841,6 +847,10 @@ WindowLayer::HasInSubset(WindowLayer* window)
 	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
 		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
 		return true;
+
+	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
+		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
+		return window->Window()->App() == Window()->App();
 
 	return fSubsets.HasItem(window);
 }
