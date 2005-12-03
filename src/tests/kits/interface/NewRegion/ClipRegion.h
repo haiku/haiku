@@ -62,6 +62,7 @@ private:
 	
 	void _IntersectWithComplex(const ClipRegion &region);
 	void _IntersectWith(const clipping_rect &rect);
+	void _IncludeNoIntersection(const ClipRegion &region);
 	void _IncludeComplex(const ClipRegion &region);
 	void _ExcludeComplex(const ClipRegion &region);
 	
@@ -70,6 +71,14 @@ private:
 	void _RecalculateBounds(const clipping_rect &newRect);
 	
 	int32 _FindSmallestBottom(const int32 &top, const int32 &startIndex) const;
+	int32 _ExtractStripRects(const int32 &top, const int32 &bottom,
+				clipping_rect *rects, int32 *inOutIndex) const;
+	
+	void _MergeAndInclude(clipping_rect *rects, const int32 &count);
+
+	void _Coalesce();
+	bool _CoalesceVertical();
+	bool _CoalesceHorizontal();
 
 	void _Invalidate();
 	bool _Resize(const int32 &newSize, const bool &keepOld = true);

@@ -229,13 +229,15 @@ ClipRegion::Include(const ClipRegion &region)
 		
 	else if (fBound.top > region.fBound.bottom)
 		_Append(region, true);
-	/*	
-	else if (regionA->bound.left > regionB->bound.right)
-		OrRegionNoX(*regionB, *regionA, dest);
 		
-	else if (regionB->bound.left > regionA->bound.right)
-		OrRegionNoX(*regionA, *regionB, dest);
-	*/	
+	else if (fBound.left > region.fBound.right) {
+		ClipRegion dest(region);		
+		dest._IncludeNoIntersection(*this);
+		_Adopt(dest);
+
+	} else if (region.fBound.left > fBound.right)
+		_IncludeNoIntersection(region);
+		
 	else if (region.fCount == 1)
 		Include(region.fBound);
 		
@@ -297,9 +299,9 @@ ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 			
 	for (int32 f = 0; f < fCount; f++) {
 		for (int32 s = 0; s < region.fCount; s++) {
-			clipping_rect testRect = sect_rect(fData[f], region.fData[s]);
-			if (valid_rect(testRect))
-				dest._AddRect(testRect);
+			clipping_rect intersection = sect_rect(fData[f], region.fData[s]);
+			if (valid_rect(intersection))
+				dest._AddRect(intersection);
 		}
 	}
 	
@@ -336,9 +338,68 @@ ClipRegion::_IntersectWith(const clipping_rect &rect)
 
 
 void
+ClipRegion::_IncludeNoIntersection(const ClipRegion &region)
+{
+	ASSERT(fCount != 0 || region.fCount != 0);
+	ASSERT(!rects_intersect(region.fBound, fBound));
+
+	int32 first = 0, second = 0;
+	
+	ClipRegion dest;
+	// Add the rects in the right order, so that
+	// they are kept sorted by their top coordinate
+	while (first < fCount && second < region.fCount) {
+		if (fData[first].top < region.fData[second].top)
+			dest._AddRect(fData[first++]);
+		else
+			dest._AddRect(region.fData[second++]);
+	} 		
+	
+	if (first == fCount) {
+		while (second < region.fCount)
+			dest._AddRect(region.fData[second++]);
+
+	} else if (second == region.fCount) {
+		while (first < fCount)
+			dest._AddRect(fData[first++]);
+	}
+	
+	_Adopt(dest);
+
+	ASSERT(first == fCount && second == region.fCount);
+}
+
+
+void
 ClipRegion::_IncludeComplex(const ClipRegion &region)
 {
-	
+	int32 bottom = min_c(fBound.top, region.fBound.top) - 1;
+	int32 a = 0, b = 0;
+	ClipRegion dest;
+	while (true) {
+		int32 top = bottom + 1;
+		bottom = region._FindSmallestBottom(_FindSmallestBottom(top, a), b);
+		
+		if (bottom == kMaxVerticalExtent)
+			break;
+		
+		clipping_rect rects[kMaxPoints];
+		rects[0].top = top;
+		rects[0].bottom = bottom;		
+
+		int32 rectsCount = _ExtractStripRects(top, bottom, rects, &a)
+				+ region._ExtractStripRects(top, bottom,
+					 (clipping_rect *)(rects + rectsCount * sizeof(clipping_rect)), &b); 
+		
+		if (rectsCount > 0) {
+			//if (rectsCount > 1)
+			//	SortTrans(lefts, rights, foundCount);
+			dest._MergeAndInclude(rects, rectsCount);
+		}
+	}
+
+	_Adopt(dest);
+	//CleanupRegion()
 }
 
 
@@ -397,7 +458,7 @@ ClipRegion::_AddRect(const clipping_rect &rect)
 		// existing rectangles, if it's adiacent.
 		// We just check it against the last rectangle, since
 		// we are keeping them sorted by their "top" coordinates.
-		int32 last = fCount - 1;
+		const int32 last = fCount - 1;
 		if (rect.left == fData[last].left && rect.right == fData[last].right
 				&& rect.top == fData[last].bottom + 1) {
 		 
@@ -420,11 +481,10 @@ ClipRegion::_AddRect(const clipping_rect &rect)
 	
 	// We weren't lucky.... just add the rect as a new one
 	if (addRect) {
-		if (fDataSize <= fCount)
-			_Resize(fCount + 16);
+		if (fDataSize <= fCount && !_Resize(fCount + 16))
+			return;
 			
 		fData[fCount] = rect;
-		
 		fCount++;
 	}
 	
@@ -435,8 +495,7 @@ ClipRegion::_AddRect(const clipping_rect &rect)
 void
 ClipRegion::_RecalculateBounds(const clipping_rect &rect)
 {
-	if (fCount <= 0)
-		return;
+	ASSERT(fCount > 0);
 		
 	if (rect.top < fBound.top)
 		fBound.top = rect.top;
@@ -462,6 +521,32 @@ ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &startIndex) const
 	}
 	
 	return bottom;
+}
+
+
+int32
+ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_rect *rects, int32 *inOutIndex) const
+{
+	int32 currentIndex = *inOutIndex;
+	*inOutIndex = -1;
+
+	int32 foundCount = 0;
+	// Store left and right points to the appropriate array
+	for (int32 x = currentIndex; x < fCount; x++) {
+		// Look if this rect can be used next time we are called, 
+		// thus correctly maintaining the "index" parameters.
+		if (fData[x].bottom >= top && *inOutIndex == -1)
+			*inOutIndex = x;
+		
+		if (fData[x].top <= top && fData[x].bottom >= bottom) {
+			rects[foundCount].left = fData[x].left;
+			rects[foundCount].right = fData[x].right;
+			foundCount++;	
+		} else if (fData[x].top > bottom)
+			break;	
+	}
+	
+	return foundCount;
 }
 
 
@@ -497,6 +582,99 @@ ClipRegion::_Append(const clipping_rect *rects, const int32 &count, const bool &
 
 
 void
+ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
+{
+	// rects share the top and bottom coordinates,
+	// so we can get those from the first one and ignore the others
+	clipping_rect rect;
+	rect.top = rects[0].top;
+	rect.bottom = rects[0].bottom;
+	
+	// Check if a rect intersects with the next one.
+	// If so, merge the two rects, if not, just add the rect.
+	int32 current = 0;
+	while (current < count) {
+		int32 next = current + 1;
+		
+		rect.left = rects[current].left;
+		rect.right = rects[current].right;
+		
+		while (next < count && rect.right >= rects[next].left) {
+			if (rect.right < rects[next].right)
+				rect.right = rects[next].right;
+			next++;
+		}
+		
+		_AddRect(rect);		
+		current = next;	
+	}
+}
+
+
+inline void
+ClipRegion::_Coalesce()
+{
+	while (_CoalesceVertical() || _CoalesceHorizontal())
+		;
+}
+
+
+bool
+ClipRegion::_CoalesceVertical()
+{
+	int32 oldCount = fCount;
+	
+	clipping_rect testRect = { 1, 1, -1, -1 };	
+	int32 newCount = -1;
+	
+	// First, try coalescing rects vertically	
+	for (int32 x = 0; x < fCount; x++) {
+		clipping_rect &rect = fData[x];
+					
+		if (rect.left == testRect.left && rect.right == testRect.right
+				&& rect.top == testRect.bottom + 1)
+			fData[newCount].bottom = rect.bottom;
+		else {
+			newCount++;
+			fData[newCount] = fData[x];			
+		}
+		testRect = fData[newCount];
+	}
+	
+	fCount = newCount + 1;
+	
+	return fCount == oldCount;
+}
+
+
+bool
+ClipRegion::_CoalesceHorizontal()
+{
+	int32 oldCount = fCount;
+	
+	clipping_rect testRect = { 1, 1, -1, -1 };	
+	int32 newCount = -1;
+
+	for (int32 x = 0; x < fCount; x++) {
+		clipping_rect &rect = fData[x];
+		
+		if (rect.top == testRect.top && rect.bottom == testRect.bottom
+					&& rect.left == testRect.right + 1)	
+			fData[newCount].right = rect.right;					
+		else {
+			newCount++;
+			fData[newCount] = rect;
+		}
+		testRect = fData[newCount];			
+	}
+
+	fCount = newCount + 1;
+
+	return fCount == oldCount;
+}
+
+
+void
 ClipRegion::_Invalidate()
 {
 	fCount = 0;
@@ -518,7 +696,7 @@ ClipRegion::_Resize(const int32 &newSize, const bool &keepOld)
 	
 	if (fData == NULL)
 		return false;
-	
+
 	fDataSize = newSize;
 	
 	return true;
