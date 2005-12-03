@@ -3,7 +3,9 @@
 
 #include "Region.h" // for clipping_rect
 
-class ServerLink;
+namespace BPrivate {
+	class ServerLink;
+};
 
 class ClipRegion {
 public:
@@ -48,8 +50,8 @@ public:
 	
 	ClipRegion &operator=(const ClipRegion &region);
 	
-	status_t ReadFromLink(ServerLink &link);
-	status_t WriteToLink(ServerLink &link);
+	status_t ReadFromLink(BPrivate::ServerLink &link);
+	status_t WriteToLink(BPrivate::ServerLink &link);
 	
 private:
 	int32	fCount;

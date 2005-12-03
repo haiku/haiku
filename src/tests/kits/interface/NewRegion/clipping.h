@@ -126,6 +126,14 @@ point_in(const clipping_rect &rect, const BPoint &pt)
 }
 
 
+static inline bool
+rect_contains(const clipping_rect &rect, const clipping_rect &testRect)
+{
+	return rect.top <= testRect.top && rect.bottom >= testRect.bottom
+			&& rect.left <= testRect.left && rect.right >= testRect.right;
+}
+
+
 // Checks if the rect is valid
 static inline bool
 valid_rect(const clipping_rect &rect)

@@ -3,6 +3,7 @@
 
 #include "clipping.h"
 #include "ClipRegion.h"
+//#include <ServerLink.h>
 
 #include <Debug.h>
 
@@ -196,10 +197,7 @@ ClipRegion::Include(const clipping_rect &rect)
 {
 	// The easy case first: if the rectangle completely contains
 	// ourself, the union is the rectangle itself.
-	if (rect.top <= fBound.top 
-			&& rect.bottom >= fBound.bottom
-			&& rect.left <= fBound.left
-			&& rect.right >= fBound.right)
+	if (rect_contains(fBound, rect))
 		Set(rect);
 	else {
 		const ClipRegion region(rect);
@@ -290,6 +288,25 @@ ClipRegion::operator=(const ClipRegion &region)
 	return *this;
 }
 
+#if 0
+status_t
+ClipRegion::ReadFromLink(BPrivate::ServerLink &link)
+{
+	link.Read(&fCount, sizeof(fCount));
+	link.Read(&fBound, sizeof(fBound));
+	_Resize(fCount + 1);
+	return link.Read(fData, fCount * sizeof(clipping_rect));
+}
+
+
+status_t
+ClipRegion::WriteToLink(BPrivate::ServerLink &link)
+{
+	link.Attach(&fCount, sizeof(fCount));
+	link.Attach(&fBound, sizeof(fBound));
+	return link.Attach(fData, fCount * sizeof(clipping_rect));
+}
+#endif
 
 // private methods	
 void
@@ -321,8 +338,7 @@ ClipRegion::_IntersectWith(const clipping_rect &rect)
 	// with the passed rect, so we check if the rect completely contains
 	// the region.
 	// If it's the case, the intersection is exactly the region itself.
-	if (rect.top <= fBound.top && rect.bottom >= fBound.bottom
-			&& rect.left <= fBound.left && rect.right >= fBound.right)
+	if (rect_contains(rect, fBound))
 		return;
 	
 	// Otherwise, we add the intersections of the region's rects
@@ -388,8 +404,7 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 		rects[0].bottom = bottom;		
 
 		int32 rectsCount = _ExtractStripRects(top, bottom, rects, &a)
-				+ region._ExtractStripRects(top, bottom,
-					 (clipping_rect *)(rects + rectsCount * sizeof(clipping_rect)), &b); 
+				+ region._ExtractStripRects(top, bottom, &rects[rectsCount], &b); 
 		
 		if (rectsCount > 0) {
 			//if (rectsCount > 1)
@@ -398,8 +413,9 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 		}
 	}
 
+	dest._Coalesce();
 	_Adopt(dest);
-	//CleanupRegion()
+	
 }
 
 
@@ -614,8 +630,10 @@ ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
 inline void
 ClipRegion::_Coalesce()
 {
-	while (_CoalesceVertical() || _CoalesceHorizontal())
-		;
+	if (fCount > 1) {
+		while (_CoalesceVertical() || _CoalesceHorizontal())
+			;
+	}
 }
 
 
@@ -643,7 +661,7 @@ ClipRegion::_CoalesceVertical()
 	
 	fCount = newCount + 1;
 	
-	return fCount == oldCount;
+	return fCount < oldCount;
 }
 
 
@@ -670,7 +688,7 @@ ClipRegion::_CoalesceHorizontal()
 
 	fCount = newCount + 1;
 
-	return fCount == oldCount;
+	return fCount < oldCount;
 }
 
 
