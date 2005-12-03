@@ -244,10 +244,7 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	if (region == NULL)
 		return B_BAD_VALUE;
 
-	if (IsLocked())
-		return B_ERROR;
-	
-	if (!LockDirect())
+	if (IsLocked() || !LockDirect())
 		return B_ERROR;
 	
 	if (in_direct_connect) {
@@ -274,15 +271,11 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	region->set_size(buffer_desc->clip_list_count);
 	region->count = buffer_desc->clip_list_count;		
 	region->bound = buffer_desc->clip_bounds;
-	
-	// adjust bounds by the given origin point 
-	offset_rect(region->bound, -originX, -originY);
-	
-	for (uint32 c = 0; c < buffer_desc->clip_list_count; c++) {
+	for (uint32 c = 0; c < buffer_desc->clip_list_count; c++)
 		region->data[c] = buffer_desc->clip_list[c];
-		offset_rect(region->data[c], -originX, -originY);
-	}
-		
+
+	// adjust bounds by the given origin point 
+	region->OffsetBy(-originX, -originY);		
 #endif
 
 	UnlockDirect();
