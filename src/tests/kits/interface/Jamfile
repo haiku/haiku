@@ -119,3 +119,5 @@ SEARCH on [ FGristFiles
 SubInclude HAIKU_TOP src tests kits interface bprintjob ;
 SubInclude HAIKU_TOP src tests kits interface bfont ;
 SubInclude HAIKU_TOP src tests kits interface picture ;
+SubInclude HAIKU_TOP src tests kits interface NewRegion ;
+
