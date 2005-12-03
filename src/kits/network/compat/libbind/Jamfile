@@ -182,23 +182,7 @@ MergeObject <compatlibbind>resolv.o :
 	res_update.c
 ;
 
-Depends libbind.so :
-	<compatlibbind>dst.o
-	<compatlibbind>inet.o
-	<compatlibbind>irs.o
-	<compatlibbind>isc.o # (not used)
-	<compatlibbind>nameser.o
-	<compatlibbind>resolv.o
-;
-
 SharedLibrary libbind.so :
-	<compatlibbind>dst.o
-	<compatlibbind>inet.o
-	<compatlibbind>irs.o
-	<compatlibbind>isc.o # (not used)
-	<compatlibbind>nameser.o
-	<compatlibbind>resolv.o
-	
 	# functions from our libroot
 	# ToDo: these can be removed for the Haiku build
 	pthread_mutex.c
@@ -215,6 +199,13 @@ SharedLibrary libbind.so :
 ;
 
 LinkAgainst libbind.so :
+	<compatlibbind>dst.o
+	<compatlibbind>inet.o
+	<compatlibbind>irs.o
+	<compatlibbind>isc.o # (not used)
+	<compatlibbind>nameser.o
+	<compatlibbind>resolv.o
+	
 	libsocket.so
 	libnet.so # for gethostname()
 	be
