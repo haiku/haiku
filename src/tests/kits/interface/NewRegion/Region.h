@@ -66,6 +66,7 @@ clipping_rect	RectAtInt(int32 index);
 /*----- Private or reserved -----------------------------------------*/
 private:
 		ClipRegion *fRegion;
+		char padding[24];
 };
 
 #endif /* _REGION_H */
