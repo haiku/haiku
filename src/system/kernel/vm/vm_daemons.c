@@ -217,8 +217,8 @@ vm_daemon_init()
 	free_memory_high_water = vm_page_num_pages() / 4;
 
 	// create a kernel thread to select pages for pageout
-	thread = spawn_kernel_thread(&page_daemon, "page daemon", B_FIRST_REAL_TIME_PRIORITY, NULL);
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	//thread = spawn_kernel_thread(&page_daemon, "page daemon", B_FIRST_REAL_TIME_PRIORITY, NULL);
+	//send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
 }
