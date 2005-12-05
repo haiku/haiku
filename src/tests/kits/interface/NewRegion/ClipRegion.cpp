@@ -7,7 +7,9 @@
 
 #include <Debug.h>
 
-const static int32 kMaxPoints = 1024;
+using namespace std;
+
+const static int32 kMaxPoints = 512;
 const static int32 kMaxVerticalExtent = 0x10000000;
 const static int32 kMaxPositive = 0x7ffffffd;
 const static int32 kMaxNegative = 0x80000003;
@@ -308,7 +310,21 @@ ClipRegion::WriteToLink(BPrivate::ServerLink &link)
 }
 #endif
 
-// private methods	
+// private methods
+static int
+leftComparator(const void *a, const void *b)
+{
+	return ((clipping_rect *)(a))->left > ((clipping_rect *)(b))->left;
+}
+
+
+static int
+topComparator(const void *a, const void *b)
+{
+	return ((clipping_rect *)(a))->top > ((clipping_rect *)(b))->top;
+}
+
+
 void
 ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 {
@@ -323,8 +339,8 @@ ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 	}
 	
 	if (dest.fCount > 1)
-		dest._SortRects();
-	
+		qsort(dest.fData, sizeof(clipping_rect), dest.fCount, topComparator);
+
 	_Adopt(dest);
 }
 
@@ -386,6 +402,7 @@ ClipRegion::_IncludeNoIntersection(const ClipRegion &region)
 }
 
 
+
 void
 ClipRegion::_IncludeComplex(const ClipRegion &region)
 {
@@ -407,8 +424,8 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 				+ region._ExtractStripRects(top, bottom, &rects[rectsCount], &b); 
 		
 		if (rectsCount > 0) {
-			//if (rectsCount > 1)
-			//	SortTrans(lefts, rights, foundCount);
+			if (rectsCount > 1)
+				qsort(rects, sizeof(clipping_rect), rectsCount, leftComparator);
 			dest._MergeAndInclude(rects, rectsCount);
 		}
 	}
@@ -422,39 +439,41 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 void
 ClipRegion::_ExcludeComplex(const ClipRegion &region)
 {
-}
-
-
-// Helper method to swap two rects
-static inline void
-SwapRects(clipping_rect &rect, clipping_rect &anotherRect)
-{
-	clipping_rect tmpRect = rect;
-	rect = anotherRect;
-	anotherRect = tmpRect;
-}
-
-
-void
-ClipRegion::_SortRects()
-{
-	bool again;
-			
-	if (fCount == 2) {
-		if (fData[0].top > fData[1].top)
-			SwapRects(fData[0], fData[1]);
+/*
+	int32 bottom = min_c(fBound.top, region.fBound.top) - 1;
+	int32 a = 0, b = 0;
+	ClipRegion dest;
+	while (true) {
+		int32 top = bottom + 1;
+		bottom = region._FindSmallestBottom(_FindSmallestBottom(top, a), b);
 		
-	} else if (fCount > 2) {
-		do {
-			again = false;
-			for (int32 c = 1; c < fCount; c++) {
-				if (fData[c - 1].top > fData[c].top) {
-					SwapRects(fData[c - 1], fData[c]);
-					again = true;
-				}
-			}
-		} while (again); 
+		if (bottom == kMaxVerticalExtent)
+			break;
+		
+		clipping_rect rectsA[kMaxPoints];
+		rectsA[0].top = top;
+		rectsA[0].bottom = bottom;		
+		
+		clipping_rect rectsB[kMaxPoints];
+		rectsB[0].top = top;
+		rectsB[0].bottom = bottom;	
+		
+		int32 foundA = _ExtractStripRects(top, bottom, rectsA, &a);
+		int32 foundB = region._ExtractStripRects(top, bottom, rectsB, &b); 
+		
+		if (foundA > 1)
+			qsort(rectsA, sizeof(clipping_rect), foundA, leftComparator);
+		
+		if (foundB > 1)
+			qsort(rectsB, sizeof(clipping_rect), foundB, leftComparator);
+		
+		// TODO: Do the actual exclusion
+		
 	}
+
+	dest._Coalesce();
+	_Adopt(dest);
+*/
 }
 
 
@@ -562,6 +581,9 @@ ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_r
 			break;	
 	}
 	
+	if (*inOutIndex == -1)
+		*inOutIndex = currentIndex;
+
 	return foundCount;
 }
 

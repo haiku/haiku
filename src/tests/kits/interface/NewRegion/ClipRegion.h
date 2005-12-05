@@ -7,6 +7,7 @@ namespace BPrivate {
 	class ServerLink;
 };
 
+
 class ClipRegion {
 public:
 	ClipRegion();
@@ -68,7 +69,6 @@ private:
 	void _IncludeComplex(const ClipRegion &region);
 	void _ExcludeComplex(const ClipRegion &region);
 	
-	void _SortRects();
 	void _AddRect(const clipping_rect &rect);
 	void _RecalculateBounds(const clipping_rect &newRect);
 	
