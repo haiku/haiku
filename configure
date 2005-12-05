@@ -164,6 +164,9 @@ cd $currentDir
 #
 platform=`uname`
 haikuGCCVersion=
+haikuGCCMachine=i586-pc-beos
+	# TODO: Should be specifiable via parameters, when configure builds the
+	# cross tools.
 haikuStaticLibStdCxx=
 haikuSharedLibStdCxx=
 haikuStaticLibSupCxx=
@@ -202,6 +205,7 @@ while [ $# \> 0 ] ; do
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
 		--build-cross-tools-gcc4) assertparam "$1" $#; buildCrossTools=$2;
 						buildCrossToolsScript="${buildCrossToolsScript}_gcc4";
+						haikuGCCMachine=i586-pc-haiku;
 						shift 2;;
 		--help | -h)	usage; exit 0;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
@@ -250,7 +254,7 @@ mkdir -p $buildOutputDir || exit 1
 if [ -n "$buildCrossTools" ]; then
 	"$buildCrossToolsScript" "$sourceDir" "$buildCrossTools" \
 		$outputDir || exit 1
-	crossToolsPrefix=$outputDir/cross-tools/bin/i586-pc-beos-
+	crossToolsPrefix=$outputDir/cross-tools/bin/${haikuGCCMachine}-
 fi
 
 # cross tools

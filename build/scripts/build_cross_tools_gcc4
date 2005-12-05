@@ -72,13 +72,13 @@ rm -rf $installDir $objDir
 
 mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
-mkdir -p $installDir/lib/gcc/i586-pc-beos/$gccVersion
+mkdir -p $installDir/lib/gcc/i586-pc-haiku/$gccVersion
 
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
-	--prefix=$installDir --target=i586-pc-beos --disable-nls \
-	--enable-shared=yes || exit 1
+	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
+	--disable-shared || exit 1
 $make || exit 1
 $make install || exit 1
 
@@ -108,7 +108,7 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 # configure gcc
 cd $gccObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
-	--target=i586-pc-beos --disable-nls --enable-shared=yes \
+	--target=i586-pc-haiku --disable-nls --disable-shared \
 	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
 	--with-libs=$tmpLibDir || exit 1
 
@@ -128,7 +128,7 @@ $make install || {
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-sysIncludeDir=$installDir/i586-pc-beos/sys-include
+sysIncludeDir=$installDir/i586-pc-haiku/sys-include
 rm -rf $sysIncludeDir/be $sysIncludeDir/posix
 
 # remove the objects dir
