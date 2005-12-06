@@ -552,6 +552,10 @@ private:
 			BShelf*			shelf() const;
 			void			set_shelf(BShelf* shelf);
 
+			void			_MoveTo(int32 x, int32 y);
+			void			_ResizeBy(int32 deltaWidth, int32 deltaHeight);
+			void			_ParentResizedBy(int32 x, int32 y);
+
 			void			_Activate(bool state);
 			void			_Attach();
 			void			_Detach();

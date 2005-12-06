@@ -551,6 +551,9 @@ BRect
 BView::Bounds() const
 {
 	// do we need to update our bounds?
+
+// TODO: why should our frame be out of sync ever?
+/*
 	if (!fState->IsValid(B_VIEW_FRAME_BIT) && fOwner) {
 		check_lock();
 
@@ -558,13 +561,13 @@ BView::Bounds() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<BPoint>(const_cast<BPoint *>(&fParentOffset));
 			fOwner->fLink->Read<BRect>(const_cast<BRect *>(&fBounds));
 			fState->valid_flags |= B_VIEW_FRAME_BIT;
 		}
 	}
-
+*/
 	return fBounds;
 }
 
@@ -3463,45 +3466,45 @@ BView::MoveTo(float x, float y)
 		fState->valid_flags |= B_VIEW_FRAME_BIT;
 	}
 
-	fParentOffset.Set(x, y);
+	_MoveTo(x, y);
 }
 
 
 void
 BView::ResizeBy(float deltaWidth, float deltaHeight)
 {
-	ResizeTo(fBounds.right + deltaWidth, fBounds.bottom + deltaHeight);
+	// NOTE: I think this check makes sense, but I didn't
+	// test what R5 does.
+	if (fBounds.right + deltaWidth < 0)
+		deltaWidth = -fBounds.right;
+	if (fBounds.bottom + deltaHeight < 0)
+		deltaHeight = -fBounds.bottom;
+
+	if (deltaWidth == 0 && deltaHeight == 0)
+		return;
+
+	// BeBook says we should do this. And it makes sense.
+	deltaWidth = roundf(deltaWidth);
+	deltaHeight = roundf(deltaHeight);
+
+	if (fOwner) {
+		check_lock();
+		fOwner->fLink->StartMessage(AS_LAYER_RESIZE_TO);
+
+		fOwner->fLink->Attach<float>(fBounds.right + deltaWidth);
+		fOwner->fLink->Attach<float>(fBounds.bottom + deltaHeight);
+
+		fState->valid_flags |= B_VIEW_FRAME_BIT;
+	}
+
+	_ResizeBy(deltaWidth, deltaHeight);
 }
 
 
 void
 BView::ResizeTo(float width, float height)
 {
-	// NOTE: I think this check makes sense, but I didn't
-	// test what R5 does.
-	if (width < 0.0)
-		width = 0.0;
-	if (height < 0.0)
-		height = 0.0;
-	
-	if (width == fBounds.Width() && height == fBounds.Height())
-		return;
-
-	// BeBook says we should do this. And it makes sense.
-	width = floorf(width + 0.5);
-	height = floorf(height + 0.5);
-
-	if (fOwner) {
-		check_lock();
-		fOwner->fLink->StartMessage(AS_LAYER_RESIZE_TO);
-		fOwner->fLink->Attach<float>(width);
-		fOwner->fLink->Attach<float>(height);
-
-		fState->valid_flags |= B_VIEW_FRAME_BIT;
-	}
-
-	fBounds.right = fBounds.left + width;
-	fBounds.bottom = fBounds.top + height;
+	ResizeBy(width - fBounds.Width(), height - fBounds.Height());
 }
 
 
@@ -3961,6 +3964,103 @@ BView::_CreateSelf()
 
 	fOwner->fLink->Flush();
 	return true;
+}
+
+
+/*!
+	Sets the new view position.
+	It doesn't contact the server, though - the only case where this
+	is called outside of MoveTo() is as reaction of moving a view
+	in the server (a.k.a. B_WINDOW_RESIZED).
+	It also calls the BView's FrameMoved() hook.
+*/
+void
+BView::_MoveTo(int32 x, int32 y)
+{
+	fParentOffset.Set(x, y);
+
+	if (Window() != NULL && fFlags & B_FRAME_EVENTS) {
+		// TODO: CurrentMessage() is not what it used to be!
+		FrameMoved(BPoint(x, y));
+	}
+}
+
+
+/*!
+	Computes the actual new frame size and recalculates the size of
+	the children as well.
+	It doesn't contact the server, though - the only case where this
+	is called outside of ResizeBy() is as reaction of resizing a view
+	in the server (a.k.a. B_WINDOW_RESIZED).
+	It also calls the BView's FrameResized() hook.
+*/
+void
+BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
+{
+	fBounds.right += deltaWidth;
+	fBounds.bottom += deltaHeight;
+
+	if (Window() == NULL) {
+		// we're not supposed to exercise the resizing code in case
+		// we haven't been attached to a window yet
+		return;
+	}
+
+	// layout the children
+	for (BView* child = fFirstChild; child; child = child->fNextSibling)
+		child->_ParentResizedBy(deltaWidth, deltaHeight);
+
+	if (fFlags & B_FRAME_EVENTS) {
+		// TODO: CurrentMessage() is not what it used to be!
+		FrameResized(fBounds.right, fBounds.bottom);
+	}
+}
+
+
+/*!
+	Relayouts the view according to its resizing mode.
+*/
+void
+BView::_ParentResizedBy(int32 x, int32 y)
+{
+	uint32 resizingMode = fFlags & _RESIZE_MASK_;
+	BRect newFrame = Frame();
+
+	// follow with left side
+	if ((resizingMode & 0x0F00U) == _VIEW_RIGHT_ << 8)
+		newFrame.left += x;
+	else if ((resizingMode & 0x0F00U) == _VIEW_CENTER_ << 8)
+		newFrame.left += x / 2;
+
+	// follow with right side
+	if ((resizingMode & 0x000FU) == _VIEW_RIGHT_)
+		newFrame.right += x;
+	else if ((resizingMode & 0x000FU) == _VIEW_CENTER_)
+		newFrame.right += x / 2;
+
+	// follow with top side
+	if ((resizingMode & 0xF000U) == _VIEW_BOTTOM_ << 12)
+		newFrame.top += y;
+	else if ((resizingMode & 0xF000U) == _VIEW_CENTER_ << 12)
+		newFrame.top += y / 2;
+
+	// follow with bottom side
+	if ((resizingMode & 0x00F0U) == _VIEW_BOTTOM_ << 4)
+		newFrame.bottom += y;
+	else if ((resizingMode & 0x00F0U) == _VIEW_CENTER_ << 4)
+		newFrame.bottom += y / 2;
+
+	if (newFrame.LeftTop() != fParentOffset) {
+		// move view
+		_MoveTo(roundf(newFrame.left), roundf(newFrame.top));
+	}
+
+	if (newFrame != Frame()) {
+		// resize view
+		int32 widthDiff = (int32)(newFrame.Width() - fBounds.Width());
+		int32 heightDiff = (int32)(newFrame.Height() - fBounds.Height());
+		_ResizeBy(widthDiff, heightDiff);
+	}
 }
 
 

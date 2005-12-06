@@ -737,6 +737,12 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				fFrame.right = fFrame.left + width;
 				fFrame.bottom = fFrame.top + height;
 
+				// Resize views according to their resize modes - this
+				// saves us some server communication, as the server
+				// does the same with our views on its side.
+				fTopView->_ResizeBy(width - fTopView->Bounds().Width(),
+					height - fTopView->Bounds().Height());
+
 				FrameResized(width, height);
 			}
 			break;
@@ -1116,7 +1122,7 @@ BWindow::Zoom()
 	*/
 
 	if (Frame().Width() == fMaxZoomWidth && Frame().Height() == fMaxZoomHeight) {
-		BPoint position( Frame().left, Frame().top);
+		BPoint position(Frame().left, Frame().top);
 		Zoom(position, fMaxZoomWidth, fMaxZoomHeight);
 		return;
 	}
