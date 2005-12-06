@@ -1042,8 +1042,9 @@ BListView::WindowActivated(bool state)
 {
 	BView::WindowActivated(state);
 
-	if (IsFocus())
-		Draw(Bounds());
+	if (IsFocus()) {
+		Invalidate();
+	}
 }
 
 // MouseUp

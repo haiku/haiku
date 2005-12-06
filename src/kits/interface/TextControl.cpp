@@ -554,9 +554,14 @@ void
 BTextControl::WindowActivated(bool active)
 {
 	if (fText->IsFocus()) {
-		BRect rect(fText->Frame());
-		rect.InsetBy(-1.0, -1.0);
+		// invalidate to remove/show focus indication
+		BRect rect = Bounds();
+		rect.left = fDivider;
 		Invalidate(rect);
+
+		// help out embedded text view which doesn't
+		// get notified of this
+		fText->Invalidate();
 	}
 }
 

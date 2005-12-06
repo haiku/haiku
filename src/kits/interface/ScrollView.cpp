@@ -226,7 +226,7 @@ BScrollView::Draw(BRect updateRect)
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeRect(bounds.InsetByCopy(1, 1));
 
-	if (fHighlighted) {
+	if (fHighlighted && Window()->IsActive()) {
 		SetHighColor(ui_color(B_NAVIGATION_BASE_COLOR));
 		StrokeRect(bounds);
 	} else {
@@ -565,6 +565,9 @@ BScrollView::ModifyFlags(int32 flags, border_style border)
 void
 BScrollView::WindowActivated(bool active)
 {
+	if (fHighlighted)
+		Invalidate();
+
 	BView::WindowActivated(active);
 }
 
