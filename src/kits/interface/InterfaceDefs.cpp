@@ -777,7 +777,7 @@ load_menu_settings(menu_info &into)
 	be_plain_font->GetFamilyAndStyle(&into.f_family, &into.f_style);
 	into.background_color = ui_color(B_MENU_BACKGROUND_COLOR);
 	into.separator = 0;
-	into.click_to_open = false;
+	into.click_to_open = true;
 	into.triggers_always_shown = false;
 
 	return B_OK;

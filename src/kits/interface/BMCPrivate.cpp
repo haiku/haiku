@@ -174,32 +174,30 @@ void _BMCMenuBar_::AttachedToWindow()
 //------------------------------------------------------------------------------
 void _BMCMenuBar_::Draw(BRect updateRect)
 {
-	// TODO: The commented code locks up the
-	// window thread.
 	// draw the right and bottom line here in a darker tint
-	BRegion oldClipping;
-	GetClippingRegion(&oldClipping);
-
 	BRect bounds(Bounds());
 	bounds.right -= 2.0;
 	bounds.bottom -= 1.0;
-	bounds = bounds & updateRect;
+
+	// prevent the original BMenuBar's Draw from
+	// drawing in those parts
 	BRegion clipping(bounds);
 	ConstrainClippingRegion(&clipping);
 
 	BMenuBar::Draw(updateRect);
 
+	ConstrainClippingRegion(NULL);
+
 	bounds.right += 2.0;
 	bounds.bottom += 1.0;
-	ConstrainClippingRegion(&oldClipping);
-//BRect bounds(Bounds());
+
 	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
 	StrokeLine(BPoint(bounds.left, bounds.bottom),
 			   BPoint(bounds.right, bounds.bottom));
 	StrokeLine(BPoint(bounds.right, bounds.bottom - 1),
 			   BPoint(bounds.right, bounds.top));
 	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-	StrokeLine(BPoint(bounds.right - 1, bounds.bottom - 2),
+	StrokeLine(BPoint(bounds.right - 1, bounds.bottom - 1),
 			   BPoint(bounds.right - 1, bounds.top + 1));
 }
 //------------------------------------------------------------------------------

@@ -948,7 +948,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 							}
 						}
 					} else {
-						fprintf(stderr, "***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+						fprintf(stderr, "B_VIEW_RESIZED ***PANIC: BW: Can't find view with ID: %ld !***\n", token);
 					}
 				}
 			}
