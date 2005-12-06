@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps deskbar ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
@@ -33,19 +35,10 @@ Application Deskbar :
 	WindowMenuItem.cpp
 	ResourceSet.cpp
 	Switcher.cpp
+	: be tracker
 	;
 
-if $(TARGET_PLATFORM) = haiku {
-	# link for Haiku
-
-	LinkAgainst Deskbar :
-		libbe.so libtracker.so
-	;
-
-} else {
-	# link against build platform libs
-
-	LinkAgainst Deskbar :
-		be tracker
-	;
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Deskbar
+		: tests!apps ;
 }
