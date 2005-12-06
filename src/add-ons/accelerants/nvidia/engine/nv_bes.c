@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-6/2005 */
+/* Written by Rudolf Cornelissen 05/2002-12/2005 */
 
 #define MODULE_BIT 0x00000200
 
@@ -735,9 +735,11 @@ status_t nv_configure_bes
 		BESW(NV04_CTRL_V, 0x00000001);
 		/* enable horizontal filtering (no effect?) */
 		BESW(NV04_CTRL_H, 0x00000111);
-
-		/* enable BES (b0), enable colorkeying (b4), format yuy2 (b8: 0 = ccir) */
-		BESW(NV04_GENCTRL, 0x00000111);
+		/* enable BES (b0), set colorkeying (b4), format yuy2 (b8: 0 = ccir) */
+		if (ow->flags & B_OVERLAY_COLOR_KEY)
+			BESW(NV04_GENCTRL, 0x00000111);
+		else
+			BESW(NV04_GENCTRL, 0x00000101);
 		/* select buffer 1 as active (b16) */
 		BESW(NV04_SU_STATE, 0x00010000);
 
@@ -786,10 +788,13 @@ status_t nv_configure_bes
 		//fixme if needed: width must be even officially...
 		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
 		/* setup source pitch including slopspace (in bytes),
-		 * b16: select YUY2 (0 = YV12), b20: use colorkey, b24: no iturbt_709 (do iturbt_601) */
+		 * b16: select YUY2 (0 = YV12), b20: set colorkeying, b24: no iturbt_709 (do iturbt_601) */
 		/* Note:
 		 * source pitch granularity = 32 pixels on GeForce cards!! */
-		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
+		if (ow->flags & B_OVERLAY_COLOR_KEY)
+			BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
+		else
+			BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (0 << 20) | (0 << 24)));
 		/* setup output window position */
 		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
