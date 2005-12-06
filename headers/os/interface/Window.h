@@ -285,6 +285,7 @@ private:
 			bool		IsFilePanel() const;
 
 			void		_CreateTopView();
+			void		_AdoptResize();
 			void		_SetFocus(BView *focusView, bool notifyIputServer = false);
 
 			Shortcut*	_FindShortcut(uint32 key, uint32 modifiers);

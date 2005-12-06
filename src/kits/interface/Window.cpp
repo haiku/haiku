@@ -737,12 +737,7 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				fFrame.right = fFrame.left + width;
 				fFrame.bottom = fFrame.top + height;
 
-				// Resize views according to their resize modes - this
-				// saves us some server communication, as the server
-				// does the same with our views on its side.
-				fTopView->_ResizeBy(width - fTopView->Bounds().Width(),
-					height - fTopView->Bounds().Height());
-
+				_AdoptResize();
 				FrameResized(width, height);
 			}
 			break;
@@ -1062,6 +1057,10 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 			fLink->Read<float>(&fMaxWidth);
 			fLink->Read<float>(&fMinHeight);
 			fLink->Read<float>(&fMaxHeight);
+
+			_AdoptResize();
+				// TODO: the same has to be done for SetLook() (that can alter
+				//		the size limits, and hence, the size of the window
 		}
 		Unlock();
 	}
@@ -1622,6 +1621,9 @@ BWindow::SetLook(window_look look)
 	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
 		fLook = look;
 
+	// TODO: this could have changed the window size, and thus, we
+	//	need to get it from the server (and call _AdoptResize()).
+
 	return status;
 }
 
@@ -1849,6 +1851,7 @@ BWindow::ResizeBy(float dx, float dy)
 		fLink->Flush();
 
 		fFrame.SetRightBottom(fFrame.RightBottom() + BPoint(dx, dy));
+		_AdoptResize();
 	}
 	Unlock();
 }
@@ -2368,6 +2371,28 @@ BWindow::_CreateTopView()
   	fTopView->_CreateSelf();
 
 	STRACE(("BuildTopView ended\n"));
+}
+
+
+/*!
+	Resizes the top view to match the window size. This will also
+	adapt the size of all its child views as needed.
+	This method has to be called whenever the frame of the window
+	changes.
+*/
+void
+BWindow::_AdoptResize()
+{
+	// Resize views according to their resize modes - this
+	// saves us some server communication, as the server
+	// does the same with our views on its side.
+
+	int32 deltaWidth = fFrame.Width() - fTopView->Bounds().Width();
+	int32 deltaHeight = fFrame.Height() - fTopView->Bounds().Height();
+	if (deltaWidth == 0 && deltaHeight == 0)
+		return;
+
+	fTopView->_ResizeBy(deltaWidth, deltaHeight);
 }
 
 
