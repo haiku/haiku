@@ -1,5 +1,5 @@
 /* G200-G550 Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-11/2004 */
+/* Written by Rudolf Cornelissen 05/2002-12/2005 */
 
 #define MODULE_BIT 0x00000200
 
@@ -755,8 +755,11 @@ status_t gx00_configure_bes
 	DXIW(COLMSK0GREEN, ow->green.mask);
 	DXIW(COLMSK0BLUE, ow->blue.mask);
 
-	/* enable colorkeying */
-	DXIW(KEYOPMODE,0x01);
+	/* setup colorkeying */
+	if (ow->flags & B_OVERLAY_COLOR_KEY)
+		DXIW(KEYOPMODE,0x01);
+	else
+		DXIW(KEYOPMODE,0x00);
 
 
 	/*************************

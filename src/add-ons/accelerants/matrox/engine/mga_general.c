@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.26 running.\n"));
+	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.27 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
