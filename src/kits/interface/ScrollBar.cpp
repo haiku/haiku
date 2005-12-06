@@ -467,7 +467,7 @@ BScrollBar::MouseDown(BPoint where)
 		Invalidate(fPrivateData->fThumbFrame);
 		return;
 	}
-printf("check\n");
+
 	// hit test for arrows or empty area
 	float scrollValue = 0.0;
 	fPrivateData->fButtonDown = _ButtonFor(where);
