@@ -141,7 +141,7 @@ BAlert::BAlert(const char *title, const char *text, const char *button1,
 	const char *button2, const char *button3, button_width width,
 	alert_type type)
 	: BWindow(DEFAULT_RECT, title, B_MODAL_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE)
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	InitObject(text, button1, button2, button3, width, B_EVEN_SPACING, type);
 }
@@ -151,7 +151,7 @@ BAlert::BAlert(const char *title, const char *text, const char *button1,
 	const char *button2, const char *button3, button_width width,
 	button_spacing spacing, alert_type type)
 	: BWindow(DEFAULT_RECT, title, B_MODAL_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE)
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	InitObject(text, button1, button2, button3, width, spacing, type);
 }
