@@ -57,7 +57,7 @@ resource mini_icon
 	$"FFFF00000E0F0F0F0000000E0F0FFFFF"
 };
 
-resource app_signature "application/x-vnd.Haiku-FNPL";
+resource app_signature "application/x-vnd.Haiku-Fonts";
 
 resource app_version
 {
