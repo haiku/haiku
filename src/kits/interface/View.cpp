@@ -4100,6 +4100,7 @@ BView::_Detach()
 	AllDetached();
 }
 
+#include <stdio.h>
 
 void
 BView::_Draw(BRect updateRect)
@@ -4110,19 +4111,24 @@ BView::_Draw(BRect updateRect)
 	check_lock();
 
 	if (Flags() & B_WILL_DRAW) {
-		// TODO: make states robust
-		PushState();
-		Draw(updateRect);
-		PopState();
+		// find out if we should draw at all
+		// TODO: can we optimize this some more? Should the app_server
+		// really send _UPDATE_ requests for all dirty views separately?
+		BRegion updateRegion(updateRect);
+		for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
+			updateRegion.Exclude(child->Frame());
+			if (updateRegion.CountRects() == 0)
+				break;
+		}
+		if (updateRegion.CountRects() > 0) {
+			// TODO: make states robust
+			PushState();
+			Draw(updateRect);
+			PopState();
+		}
 	} else {
-		// The code below is certainly not correct, because
-		// it redoes what the app_server already did
-		// Find out what happens on R5 if a view has ViewColor() = 
+		// TODO: Find out what happens on R5 if a view has ViewColor() = 
 		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
-/*		rgb_color c = aView->HighColor();
-		aView->SetHighColor(aView->ViewColor());
-		aView->FillRect(aView->Bounds(), B_SOLID_HIGH);
-		aView->SetHighColor(c);*/
 	}
 
 	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
@@ -4138,6 +4144,10 @@ BView::_Draw(BRect updateRect)
 	}
 
 	if (Flags() & B_WILL_DRAW) {
+		// TODO: Since we have hard clipping in the app_server,
+		// a view can never draw "on top of it's child views" as
+		// the BeBook describes.
+		// (TODO: Test if this is really possible in BeOS.)
 		PushState();
 		DrawAfterChildren(updateRect);
 		PopState();
