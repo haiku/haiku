@@ -28,11 +28,13 @@ options:
                               They will be compiled and placed in the output
                               directory under "cross-tools". The HAIKU_* tools
                               variables will be set accordingly.
-  --build-cross-tools-gcc4 <build tools dir>
+  --build-cross-tools-gcc4 <arch> <build tools dir>
                               Like "--build-cross-tools" just that gcc 4 will
                               be used for cross-compilation. Note, that the
                               resulting Haiku installation built with gcc 4
                               will not be binary compatible with BeOS R5.
+                              <arch> specifies the target architecture, either
+                              "x86" or "ppc".
   --target=TARGET             Select build target platform. [default=${target}]
                               valid targets=r5,bone,dano,haiku
   --include-gpl-addons        Include GPL licensed add-ons.
@@ -61,8 +63,20 @@ EOF
 #
 assertparam()
 {
-	if [ $2 \< 2 ]; then
+	if [ $2 -lt 2 ]; then
 		echo $0: \`$1\': Parameter expected.
+		exit 1
+	fi
+}
+
+# assertparams
+#
+# Checks whether at least a certain number of parameters is left.
+#
+assertparams()
+{
+	if [ $3 -le $2 ]; then
+		echo $0: \`$1\': Not enough parameters.
 		exit 1
 	fi
 }
@@ -165,8 +179,6 @@ cd $currentDir
 platform=`uname`
 haikuGCCVersion=
 haikuGCCMachine=i586-pc-beos
-	# TODO: Should be specifiable via parameters, when configure builds the
-	# cross tools.
 haikuStaticLibStdCxx=
 haikuSharedLibStdCxx=
 haikuStaticLibSupCxx=
@@ -180,6 +192,7 @@ target=haiku
 crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
+buildCrossToolsMachine=
 
 set_default_value HAIKU_AR			ar
 set_default_value HAIKU_CC			gcc
@@ -195,7 +208,7 @@ set_default_value HAIKU_UNARFLAGS	x
 
 # parse parameters
 #
-while [ $# \> 0 ] ; do
+while [ $# -gt 0 ] ; do
 	case "$1" in
 		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
 		--floppy)		assertparam "$1" $#; floppy=$2; shift 2;;
@@ -203,10 +216,16 @@ while [ $# \> 0 ] ; do
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--cross-tools-prefix) assertparam "$1" $#; crossToolsPrefix=$2; shift 2;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
-		--build-cross-tools-gcc4) assertparam "$1" $#; buildCrossTools=$2;
+		--build-cross-tools-gcc4) assertparams "$1" 2 $#; buildCrossTools=$3;
 						buildCrossToolsScript="${buildCrossToolsScript}_gcc4";
-						haikuGCCMachine=i586-pc-haiku;
-						shift 2;;
+						case "$2" in
+							x86)	haikuGCCMachine=i586-pc-haiku;;
+							ppc)	haikuGCCMachine=powerpc-apple-haiku;;
+							*)		echo "Unsupported target architecture: $2"
+									exit 1;;
+						esac
+						buildCrossToolsMachine=$haikuGCCMachine
+						shift 3;;
 		--help | -h)	usage; exit 0;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
@@ -252,8 +271,8 @@ mkdir -p $buildOutputDir || exit 1
 
 # build cross tools from sources
 if [ -n "$buildCrossTools" ]; then
-	"$buildCrossToolsScript" "$sourceDir" "$buildCrossTools" \
-		$outputDir || exit 1
+	"$buildCrossToolsScript" $buildCrossToolsMachine "$sourceDir" \
+		"$buildCrossTools" $outputDir || exit 1
 	crossToolsPrefix=$outputDir/cross-tools/bin/${haikuGCCMachine}-
 fi
 

@@ -1,20 +1,21 @@
-# parameters <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
+# parameters <machine> <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
 
 # get and check the parameters
-if [ $# \< 2 ]; then
-	echo Usage: $0 '<haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
+if [ $# -lt 3 ]; then
+	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
 	exit 1
 fi
 
-haikuSourceDir=$1
-buildToolsDir=$2
+haikuMachine=$1
+haikuSourceDir=$2
+buildToolsDir=$3
 
 if [ $(uname) = "FreeBSD" ]; then make="gmake"; else make="make"; fi
 
-if [ $# \< 3 ]; then
+if [ $# -lt 4 ]; then
 	haikuOutputDir=$haikuSourceDir/generated
 else
-	haikuOutputDir=$3
+	haikuOutputDir=$4
 fi
 
 if [ ! -d $haikuSourceDir ]; then
@@ -72,12 +73,13 @@ rm -rf $installDir $objDir
 
 mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
-mkdir -p $installDir/lib/gcc/i586-pc-haiku/$gccVersion
+mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
+
 
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
-	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
+	--prefix=$installDir --target=$haikuMachine --disable-nls \
 	--disable-shared || exit 1
 $make || exit 1
 $make install || exit 1
@@ -108,7 +110,7 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 # configure gcc
 cd $gccObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure --prefix=$installDir \
-	--target=i586-pc-haiku --disable-nls --disable-shared \
+	--target=$haikuMachine --disable-nls --disable-shared \
 	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
 	--with-libs=$tmpLibDir || exit 1
 
@@ -128,7 +130,7 @@ $make install || {
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-sysIncludeDir=$installDir/i586-pc-haiku/sys-include
+sysIncludeDir=$installDir/$haikuMachine/sys-include
 rm -rf $sysIncludeDir/be $sysIncludeDir/posix
 
 # remove the objects dir
