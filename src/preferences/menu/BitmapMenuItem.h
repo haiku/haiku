@@ -1,27 +1,22 @@
 #ifndef _MBitmapMenuItem_h
 #define _MBitmapMenuItem_h
 
-// System Headers
-#include <Bitmap.h>
 #include <MenuItem.h>
-#ifndef _TRANSLATION_UTILS_H
-#include <TranslationUtils.h>
-#endif
 #include <String.h>
 
+class BBitmap;
 
 // MBitmapMenuItem class declaration
-class BitmapMenuItem : public BMenuItem
-{
+class BitmapMenuItem : public BMenuItem {
 public:
-					BitmapMenuItem(const char* name, BMessage* message, BBitmap* bmp,
-								   char shortcut = 0, uint32 modifiers = 0);
-virtual void		DrawContent(void);
+				BitmapMenuItem(const char* name, BMessage* message, BBitmap* bmp,
+							   char shortcut = 0, uint32 modifiers = 0);
+				~BitmapMenuItem();
+	virtual void		DrawContent();
 	
 private:
-	BBitmap 			*fBmp;
-	BString				fName;
-	BBitmap				*fCheckBmp;
+	BBitmap 		*fBitmap;
+	BString			fName;
 };
 
 #endif // _MBitmapMenuItem_h

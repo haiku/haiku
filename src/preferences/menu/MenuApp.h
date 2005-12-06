@@ -48,7 +48,6 @@
 	class MenuBar : public BMenuBar {
 		public:
 						MenuBar();
-		virtual 		~MenuBar();
 				void	set_menu();
 				void	build_menu();
 		virtual void	Update();
@@ -59,12 +58,12 @@
 		menu_info 		info;
 		
 		//bitmaps
-		BBitmap			*fCtlBmp;
+		/*BBitmap			*fCtlBmp;
 		BBitmap			*fAltBmp;
 		BBitmap			*fSep0Bmp;
 		BBitmap			*fSep1Bmp;
 		BBitmap			*fSep2Bmp;
-		
+		*/
 		//seperator submenu
 		BMenu			*separatorStyleMenu;
 		BMenuItem		*separatorStyleZero;
