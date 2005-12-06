@@ -57,13 +57,6 @@
 		BRect			rect;
 		menu_info 		info;
 		
-		//bitmaps
-		/*BBitmap			*fCtlBmp;
-		BBitmap			*fAltBmp;
-		BBitmap			*fSep0Bmp;
-		BBitmap			*fSep1Bmp;
-		BBitmap			*fSep2Bmp;
-		*/
 		//seperator submenu
 		BMenu			*separatorStyleMenu;
 		BMenuItem		*separatorStyleZero;

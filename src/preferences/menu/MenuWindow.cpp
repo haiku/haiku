@@ -3,8 +3,6 @@
 	#include <string.h>
 	#include <Roster.h>
 	
-	int ans;
-	
 	MenuWindow::MenuWindow()
 		: BWindow(rect, "Menu", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 	{
