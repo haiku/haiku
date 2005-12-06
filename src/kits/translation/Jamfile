@@ -25,3 +25,8 @@ Package haiku-translationkit-cvs :
 Package haiku-translationkit-cvs :
 	libtranslation.so :
 	boot home config lib ;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR) : libtranslation.so
+		: tests!apps ;
+}
