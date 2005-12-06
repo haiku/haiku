@@ -2174,7 +2174,7 @@ BBitmap::get_server_token() const
 */
 void
 BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
-					int32 bytesPerRow, screen_id screenID)
+	int32 bytesPerRow, screen_id screenID)
 {
 //printf("BBitmap::InitObject(bounds: BRect(%.1f, %.1f, %.1f, %.1f), format: %ld, flags: %ld, bpr: %ld\n",
 //	   bounds.left, bounds.top, bounds.right, bounds.bottom, colorSpace, flags, bytesPerRow);
@@ -2230,7 +2230,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		} else {
 			// Ask the server (via our owning application) to create a bitmap.
 			BPrivate::AppServerLink link;
-	
+
 			// Attach Data: 
 			// 1) BRect bounds
 			// 2) color_space space
@@ -2243,53 +2243,47 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			link.Attach<int32>((int32)flags);
 			link.Attach<int32>(bytesPerRow);
 			link.Attach<int32>(screenID.id);
-			
+
 			// Reply Code: SERVER_TRUE
 			// Reply Data:
 			//	1) int32 server token
 			//	2) area_id id of the area in which the bitmap data resides
 			//	3) int32 area pointer offset used to calculate fBasePtr
-			
+
 			// alternatively, if something went wrong
 			// Reply Code: SERVER_FALSE
 			// Reply Data:
 			//		None
-			int32 code = SERVER_FALSE;
-			error = link.FlushWithReply(code);
+			error = B_ERROR;
+			if (link.FlushWithReply(error) == B_OK && error == B_OK) {
+				// server side success
+				// Get token
+				link.Read<int32>(&fServerToken);
 
-			if (error >= B_OK) {
-				// *communication* with server successful
-				if (code == SERVER_TRUE) {
-					// server side success
-					// Get token
-					area_id bmparea;
-					int32 areaoffset;
-					
-					link.Read<int32>(&fServerToken);
-					link.Read<area_id>(&bmparea);
-					link.Read<int32>(&areaoffset);
-					
-					// Get the area in which the data resides
-					fArea = clone_area("shared bitmap area",
-									   (void**)&fBasePtr,
-									   B_ANY_ADDRESS,
-									   B_READ_AREA | B_WRITE_AREA,
-									   bmparea);
-					
+				area_id area;
+				int32 areaOffset;
+				link.Read<area_id>(&area);
+				link.Read<int32>(&areaOffset);
+
+				// Get the area in which the data resides
+				fArea = clone_area("shared bitmap area",
+								   (void**)&fBasePtr,
+								   B_ANY_ADDRESS,
+								   B_READ_AREA | B_WRITE_AREA,
+								   area);
+				if (fArea >= B_OK) {
 					// Jump to the location in the area
-					fBasePtr = (int8*)fBasePtr + areaoffset;
-		
+					fBasePtr = (int8*)fBasePtr + areaOffset;
+	
 					fSize = size;
 					fColorSpace = colorSpace;
 					fBounds = bounds;
 					fBytesPerRow = bytesPerRow;
 					fFlags = flags;
-				} else {
-					// server side error, we assume:
-					error = B_NO_MEMORY;
-				}
+				} else
+					error = fArea;
 			}
-			// NOTE: not "else" to handle B_NO_MEMORY on server side!
+
 			if (error < B_OK) {
 				fBasePtr = NULL;
 				fServerToken = -1;
@@ -2302,7 +2296,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		fToken = -1;
 		fOrigArea = -1;
 	}
-	
+
 	fInitError = error;
 	// TODO: on success, handle clearing to white if the flags say so. Needs to be
 	// dependent on color space.
@@ -2318,47 +2312,39 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	}
 }
 
-// CleanUp
-/*!	\brief Cleans up any memory allocated by the bitmap or
-		   informs the server to do so.
+
+/*!
+	\brief Cleans up any memory allocated by the bitmap and
+		informs the server to do so as well (if needed).
 */
 void
 BBitmap::CleanUp()
 {
-	if (fBasePtr) {
-		if (fFlags & B_BITMAP_NO_SERVER_LINK) {
-			free(fBasePtr);
-		} else {
-			BPrivate::AppServerLink link;
-			// AS_DELETE_BITMAP:
-			// Attached Data: 
-			//	1) int32 server token
-			
-			// Reply Code: SERVER_TRUE if successful, 
-			//			   SERVER_FALSE if the buffer was already deleted
-			// Reply Data: none
-//			status_t freestat;
-			int32 code = SERVER_FALSE;
-			link.StartMessage(AS_DELETE_BITMAP);
-			link.Attach<int32>(fServerToken);
-			link.FlushWithReply(code);
-			if (code == SERVER_FALSE) {
-				// TODO: Find out if "SERVER_FALSE if the buffer
-				// was already deleted" is true. If not, maybe we
-				// need to take additional action.
-			}
-			fArea = -1;
-			fServerToken = -1;
-		}
-		fBasePtr = NULL;
+	if (fBasePtr == NULL)
+		return;
+
+	if (fFlags & B_BITMAP_NO_SERVER_LINK) {
+		free(fBasePtr);
+	} else {
+		BPrivate::AppServerLink link;
+		// AS_DELETE_BITMAP:
+		// Attached Data: 
+		//	1) int32 server token
+		link.StartMessage(AS_DELETE_BITMAP);
+		link.Attach<int32>(fServerToken);
+		link.Flush();
+
+		delete_area(fArea);
+		fArea = -1;
+		fServerToken = -1;
 	}
+	fBasePtr = NULL;
 }
 
-// AssertPtr
-/*!	\brief ???
-*/
+
 void
 BBitmap::AssertPtr()
 {
+	// TODO: what's this supposed to do?
 }
 
