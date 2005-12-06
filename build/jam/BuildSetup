@@ -61,11 +61,11 @@ HAIKU_DEFINES = __HAIKU__ ;
 
 # analyze the gcc machine spec to determine HAIKU_CPU
 switch $(HAIKU_GCC_MACHINE) {
-	case i386-* : HAIKU_CPU = x86 ;
-	case i486-* : HAIKU_CPU = x86 ;
-	case i586-* : HAIKU_CPU = x86 ;
-	case i686-* : HAIKU_CPU = x86 ;
-	# TODO: PPC?
+	case i386-*		: HAIKU_CPU = x86 ;
+	case i486-*		: HAIKU_CPU = x86 ;
+	case i586-*		: HAIKU_CPU = x86 ;
+	case i686-*		: HAIKU_CPU = x86 ;
+	case powerpc-*	: HAIKU_CPU = ppc ;
 	case * : Exit "Unsupported gcc target machine:" $(HAIKU_GCC_MACHINE) ;
 }
 
