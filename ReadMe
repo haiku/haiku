@@ -1,5 +1,5 @@
 Setting Up
---------
+----------
 
 The build system uses Jam/MR (http://www.perforce.com/jam/jam.html).
 A BeOS executable of Jam 2.5 is available at:
@@ -16,63 +16,109 @@ To build Haiku you also need Oliver Tappe's GCC 2.95.3. You can get it at BeBits
 
 Older versions of GCC 2.95.3 will likely not work.
 
+If you intend to build Haiku from a supported build platform other than BeOS,
+e.g. GNU/Linux, you need to build a jam executable yourself (don't use the
+one coming with your distribution). cd into the "src/tools/jam" subdirectory
+of the Haiku tree and type "make" (or "gmake"). The generated jam executable
+will be found in a platform specific subdirectory, e.g. "bin.linuxx86/".
+The easiest way to use it, is to copy it to a place in your PATH. Furthermore
+you need to build the tools for cross compilation (binutils and gcc). Fear not,
+the configure script will help you with that one; see below.
+
 
 Configuring
---------
+-----------
+
+Under BeOS:
 
 Open a Terminal and change to your Haiku trunk folder. To configure the build you
 can run configure like this:
 
   $ ./configure --target=TARGET
 
-Where "TARGET" is the target platform for the build. Valid targets are "r5", "bone",
-"dano" and "haiku". If you omit the target it defaults to "haiku". To configure for ZETA
-use the "dano" target.
+Where "TARGET" is the target platform for the build. Valid targets are "r5",
+"bone", "dano" and "haiku". If you omit the target it defaults to "haiku". To
+configure for ZETA use the "dano" target.
 
-The configure script generates a file named "BuildConfig" in the "build" directory.
-As long as configure is not modified (!), there is no need to call it again. That is for
-re-building you only need to invoke Jam or makehdimage (see below).
+The configure script generates a file named "BuildConfig" in the "build"
+directory. As long as configure is not modified (!), there is no need to call it
+again. That is for re-building you only need to invoke jam (see below).
 If you don't update the source tree very frequently, you may want to execute
 configure after each update just to be on the safe side.
+
+
+Under Linux or another supported build platform:
+
+You don't need to supply the "--target" option to configure, since the only
+supported target is the default "haiku" anyway. But you have to tell, what
+cross compilation tools to use. The tools installed in the system won't work
+for compiling Haiku itself (they will be used for building some build tools,
+though). The easiest way is to instruct configure to build those tools from the
+sources. Supposing you have checked out the buildutils module from the Haiku
+SVN repository alongside the Haiku source tree, you can do that via:
+
+  $ ./configure --build-cross-tools ../buildtools
+
+One of the last output lines should tell you that the tools have been built
+successfully.
+
+Note, that the old gcc 2.95.3 will be used for building Haiku, required for
+binary compatibility with BeOS R5. If you're not interested in binary
+compatibility (or want to build for the PowerPC architecture), you can instead
+use:
+
+  $ ./configure --build-cross-tools-gcc4 <arch> ../buildtools
+
+Replace "<arch>" with either "x86" or "ppc", depending on which of the two
+architectures you want to build for.
+[At the moment (2005-12-06) the build for PowerPC, or at least the resulting
+Haiku does not work.]
+
 
 
 Building
 --------
 
-The preferred method to build Haiku (currently only possible on a BeOS machine)
-is this:
+Haiku can be built in either of two ways, as disk image file (e.g. for use with
+emulators) or as installation in a directory.
 
-  $ makehdimage /Haiku
+Image File:
 
-Where "/Haiku" is the mounted BFS partition where you want to install Haiku on.
-This can be any BFS partition with enough space available. Use DriveSetup to initialize
-a partition to BFS.
-If the parameter is omitted, makehdimage currently creates a 60 MB Haiku image in
-this directory that you can use for Bochs, Qemu and other emulators to boot.
+  $ jam -q haiku-image
 
-To build the whole source tree for your selected target platform (to use the apps,
-drivers, add-ons, etc.) you can simply invoke Jam:
+Generates an image file named "haiku.image" in your output directory (usually
+"generated/"). This method works for all supported build platforms.
 
-  $ jam
 
-Or to build only a specific app/driver/etc. include it as an argument:
+Directory Installation:
+
+  $ HAIKU_INSTALL_DIR=/Haiku jam -q install-haiku
+
+Installs all Haiku components into the directory "/Haiku". If that directory
+is the root of a mounted BFS partition, you'll have a Haiku partition afterwards.
+To create a partition in the first place use DriveSetup and initialize it to BFS.
+
+Note, that installing Haiku in a directory only works as expected under BeOS.
+
+
+Building Components:
+
+If you don't want to build the complete Haiku, but only a certain app/driver/etc.
+you can specify it as argument to jam, e.g.:
 
   $ jam Pulse
-
-NOTE: If you have checked out the latest SVN revision, it is not unlikely that
-some parts of the tree won't build.
 
 
 Running
 -------
 
 Generally there are two ways of running Haiku. On real hardware using a partition
-and on emulated hardware using an emulator like Bochs.
+and on emulated hardware using an emulator like Bochs or QEmu.
 
 1. On Real Hardware
 
-If you have installed Haiku to it's own partition you can include this partition in
-your bootmanager and try to boot Haiku like any other OS you have installed.
+If you have installed Haiku to it's own partition you can include this partition
+in your bootmanager and try to boot Haiku like any other OS you have installed.
 To include a new partition in the BeOS bootmanager run this in a Terminal:
 
   $ bootman
@@ -81,9 +127,10 @@ And follow the steps of the installer.
 
 2. On Emulated Hardware
 
-For emulated hardware you should build a "haiku.image" using makehdimage without
-arguments. How to setup this image depends on your emulater. A tutorial for Bochs
-on BeOS is below.
+For emulated hardware you should build disk image (see above). How to setup this
+image depends on your emulater. A tutorial for Bochs on BeOS is below. If you
+use QEmu, you can usually just provide the path to the image as command line
+argument to the "qemu" executable.
 
 
 Bochs
@@ -95,8 +142,8 @@ Version 2.2 of Bochs for BeOS (BeBochs) can be downloaded from BeBits:
 
 The package installs to: /boot/apps/BeBochs2.2
 
-You have to set up a configuration for Bochs. You should edit the ".bochsrc" to include
-the following:
+You have to set up a configuration for Bochs. You should edit the ".bochsrc" to
+include the following:
 
 ata0-master: type=disk, path="/path/to/haiku.image", cylinders=122, heads=16, spt=63
 boot: disk
@@ -107,9 +154,9 @@ Now you can start Bochs:
   $ ./bochs
 
 Answer with RETURN and with some patience you will see Haiku booting.
-If booting into the graphical evironment fails you can try to hit "space" at the very
-beginning of the boot process. The Haiku bootloader should then come up and you can
-select some safe mode options.
+If booting into the graphical evironment fails you can try to hit "space" at the
+very beginning of the boot process. The Haiku bootloader should then come up and
+you can select some safe mode options.
 
 
 Docbook documentation
