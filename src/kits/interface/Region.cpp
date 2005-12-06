@@ -38,7 +38,6 @@
 //	Anyway, we can change that behaviour if we want, but BeOS's BRegion seems to behave exactly
 //	like this.
 
-
 #include <cstdlib>
 #include <cstring>
 
@@ -294,6 +293,9 @@ BRegion::PrintToStream() const
 void
 BRegion::OffsetBy(int32 dh, int32 dv)
 {
+	if (dh == 0 && dv == 0)
+		return;
+
 	if (count > 0) {
 		for (long c = 0; c < count; c++)
 			offset_rect(data[c], dh, dv);
