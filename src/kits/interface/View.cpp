@@ -4080,7 +4080,7 @@ BView::_Attach()
 	fAttached = true;
 
 	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
-		// we need to check for fAttachCalled as new views could have been
+		// we need to check for fAttached as new views could have been
 		// added in AttachedToWindow() - and those are already attached
 		if (!child->fAttached)
 			child->_Attach();
