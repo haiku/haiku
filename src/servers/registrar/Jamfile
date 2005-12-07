@@ -4,6 +4,7 @@ UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+UseArchHeaders $(TARGET_ARCH) ;
 
 Server registrar
  	:

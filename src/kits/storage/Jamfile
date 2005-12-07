@@ -4,6 +4,7 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders shared app kernel storage ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UseArchHeaders $(TARGET_ARCH) ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;

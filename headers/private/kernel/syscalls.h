@@ -6,8 +6,9 @@
 #define _KERNEL_SYSCALLS_H
 
 
-#include <OS.h>
+#include <arch_config.h>
 #include <image.h>
+#include <OS.h>
 #include <storage/DiskDeviceDefs.h>
 
 #include <signal.h>

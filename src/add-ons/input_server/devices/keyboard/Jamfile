@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
+UseArchHeaders $(TARGET_ARCH) ;
 
 Addon <input>keyboard : input_server/devices : 
 	KeyboardInputDevice.cpp

@@ -6,7 +6,6 @@
 
 #include <SupportDefs.h>
 
-#include <arch_config.h>
 #include <syscalls.h>
 
 

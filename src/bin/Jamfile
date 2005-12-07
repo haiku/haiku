@@ -6,6 +6,7 @@ UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
+UseArchHeaders $(TARGET_ARCH) ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
 # standard commands that don't need any additional library
