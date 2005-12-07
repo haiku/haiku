@@ -3274,13 +3274,10 @@ BView::AddChild(BView *child, BView *before)
 	}
 
 	if (!_AddChildToList(child, before))
-		debugger("AddChild failed - cannot find 'before' view.");	
+		debugger("AddChild failed!");	
 
 	if (fOwner) {
 		check_lock();
-
- 		STRACE(("BView(%s)::AddChild(child='%s' before='%s')... contacting app_server\n",
- 			Name(), child ? child->Name() : "NULL", before ? before->Name() : "NULL"));
 
 		child->_SetOwner(fOwner);
 		child->_CreateSelf();
@@ -3766,6 +3763,7 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 	fHorScroller = NULL;
 
 	f_is_printing = false;
+	fAttached = false;
 
 	fState = new BPrivate::ViewState;
 
@@ -4079,9 +4077,13 @@ void
 BView::_Attach()
 {
 	AttachedToWindow();
+	fAttached = true;
 
 	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
-		child->_Attach();
+		// we need to check for fAttachCalled as new views could have been
+		// added in AttachedToWindow() - and those are already attached
+		if (!child->fAttached)
+			child->_Attach();
 	}
 
 	AllAttached();
@@ -4092,6 +4094,7 @@ void
 BView::_Detach()
 {
 	DetachedFromWindow();
+	fAttached = false;
 
 	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
 		child->_Detach();

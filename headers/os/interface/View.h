@@ -591,7 +591,7 @@ private:
 			BScrollBar*		fVerScroller;
 			BScrollBar*		fHorScroller;
 			bool			f_is_printing;
-			bool			_unused_bool0;
+			bool			fAttached;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
 			BPrivate::ViewState*	fState;
