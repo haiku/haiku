@@ -5,6 +5,7 @@ SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
 	$(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdio-common ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;

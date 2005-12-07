@@ -1,13 +1,73 @@
-SubDir HAIKU_TOP src system libroot posix arch ppc ;
+SubDir HAIKU_TOP src system libroot posix glibc arch ppc ;
 
-MergeObject posix_arch_$(TARGET_ARCH).o :
-	s_ceilf.c
-	s_floorf.c
-	s_fpclassify.c
-	s_fpclassifyf.c
-	s_fpclassifyl.c
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+if $(OPTIM) = -O0 {
+	OPTIM = -O ;
+}
+
+# don't compile with debugging
+DEBUG = 0 ;
+
+SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
+
+local genericSources =
+	cmp.c dbl2mpn.c divrem.c mpn2dbl.c mul.c mul_n.c
+	s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 
+	w_atan2.c w_atan2f.c w_atan2l.c w_fmod.c w_fmodl.c w_fmodf.c
 ;
 
-SEARCH on [ FGristFiles
-        s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c
-        ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
+	add_n.S
+	addmul_1.S
+#	e_acos.S
+#	e_atan2.S
+#	e_atan2f.S
+#	e_atan2l.c
+#	e_fmod.S
+#	e_fmodf.S
+#	e_fmodl.c
+	ldbl2mpn.c
+	mul_1.S
+	lshift.S
+	rshift.S
+#	s_ceil.S
+	s_ceilf.c
+#	s_ceill.S
+#	s_copysign.S
+#	s_copysignf.S
+#	s_copysignl.S
+#	s_fdim.S
+#	s_fdimf.S
+#	s_fdiml.S
+#	s_fabs.S
+#	s_fabsf.S
+#	s_fabsl.S
+#	s_finite.S
+#	s_finitef.S
+#	s_finitel.S
+#	s_floor.S
+	s_floorf.c
+#	s_floorl.S
+#	s_logb.S
+#	s_logbf.S
+#	s_logbl.c
+#	s_rint.S
+#	s_rintf.S
+#	s_rintl.c
+#	s_scalbn.S
+#	s_scalbnf.S
+#	s_scalbnl.S
+	sub_n.S
+	submul_1.S
+
+	$(genericSources)
+;
+
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch ] ;

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch x86 ;
 
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
@@ -15,12 +16,15 @@ DEBUG = 0 ;
 
 SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 
+local genericSources =
+	cmp.c dbl2mpn.c divrem.c mpn2dbl.c mul.c mul_n.c
+	s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 
+	w_atan2.c w_atan2f.c w_atan2l.c w_fmod.c w_fmodl.c w_fmodf.c
+;
+
 MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	add_n.S
 	addmul_1.S
-	cmp.c
-	dbl2mpn.c
-	divrem.c
 	e_acos.S
 	e_atan2.S
 	e_atan2f.S
@@ -29,10 +33,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	e_fmodf.S
 	e_fmodl.c
 	ldbl2mpn.c
-	mpn2dbl.c
-	mul.c
 	mul_1.S
-	mul_n.c
 	lshift.S
 	rshift.S
 	s_ceil.S
@@ -53,15 +54,9 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	s_floor.S
 	s_floorf.S
 	s_floorl.S
-	s_fpclassify.c
-	s_fpclassifyf.c
-	s_fpclassifyl.c
 	s_logb.S
 	s_logbf.S
 	s_logbl.c
-	s_modf.c
-	s_modff.c
-	s_modfl.c
 	s_rint.S
 	s_rintf.S
 	s_rintl.c
@@ -70,15 +65,9 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	s_scalbnl.S
 	sub_n.S
 	submul_1.S
-	w_atan2.c
-	w_atan2f.c
-	w_atan2l.c
-	w_fmod.c
-	w_fmodf.c
-	w_fmodl.c
+
+	$(genericSources)
 ;
 
-SEARCH on [ FGristFiles
-	cmp.c divrem.c mul.c mul_n.c dbl2mpn.c mpn2dbl.c s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c s_modf.c s_modff.c s_modfl.c 
-	w_atan2.c w_atan2f.c w_atan2l.c w_fmod.c w_fmodl.c w_fmodf.c
-        ] = [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch ] ;
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch ] ;
