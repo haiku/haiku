@@ -2244,16 +2244,11 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			link.Attach<int32>(bytesPerRow);
 			link.Attach<int32>(screenID.id);
 
-			// Reply Code: SERVER_TRUE
 			// Reply Data:
 			//	1) int32 server token
 			//	2) area_id id of the area in which the bitmap data resides
 			//	3) int32 area pointer offset used to calculate fBasePtr
 
-			// alternatively, if something went wrong
-			// Reply Code: SERVER_FALSE
-			// Reply Data:
-			//		None
 			error = B_ERROR;
 			if (link.FlushWithReply(error) == B_OK && error == B_OK) {
 				// server side success
@@ -2266,6 +2261,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				link.Read<int32>(&areaOffset);
 
 				// Get the area in which the data resides
+// TODO: the actual cloning doesn't have to happen before someone calls Bits()
+//		that would make bitmap creation a lot cheaper and faster...
 				fArea = clone_area("shared bitmap area",
 								   (void**)&fBasePtr,
 								   B_ANY_ADDRESS,
@@ -2274,7 +2271,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				if (fArea >= B_OK) {
 					// Jump to the location in the area
 					fBasePtr = (int8*)fBasePtr + areaOffset;
-	
+
 					fSize = size;
 					fColorSpace = colorSpace;
 					fBounds = bounds;
