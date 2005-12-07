@@ -70,4 +70,4 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 ;
 
 SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch ] ;
+	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;
