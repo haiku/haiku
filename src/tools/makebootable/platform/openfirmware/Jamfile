@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tools makebootable platform openfirmware ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin makebootable platform
+	openfirmware ] ;
+
+#USES_BE_API on <build>makebootable = true ;
+
+# write the stage 1 boot loader into the makebootable resources
+#AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
+
+#BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBBE) ;
+BuildPlatformMain <build>makebootable : makebootable.cpp ;
