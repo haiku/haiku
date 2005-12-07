@@ -114,7 +114,7 @@
  */
 
 #if defined(__i386__) || defined(__ia64__) || defined(__alpha__) || \
-    defined(__sparc64__) || defined(__powerpc__)
+    defined(__sparc64__) || defined(__powerpc__) || defined(__POWERPC__)
 #	include <sys/types.h>
 #	if BYTE_ORDER == BIG_ENDIAN
 #		define IEEE_BIG_ENDIAN
@@ -197,7 +197,7 @@ extern "C" {
 
 #if defined(IEEE_LITTLE_ENDIAN) + defined(IEEE_BIG_ENDIAN) + defined(VAX) + \
     defined(IBM) != 1
-Only one of IEEE_LITTLE_ENDIAN, IEEE_BIG_ENDIAN, VAX, or IBM should be defined.
+#error Only one of IEEE_LITTLE_ENDIAN, IEEE_BIG_ENDIAN, VAX, or IBM should be defined.
 #endif
 
 union doubleasulongs {
