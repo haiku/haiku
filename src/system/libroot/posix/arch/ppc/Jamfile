@@ -1,1 +1,9 @@
 SubDir HAIKU_TOP src system libroot posix arch ppc ;
+
+# TODO: Implement!
+MergeObject posix_arch_$(TARGET_ARCH).o :
+	setjmp.S
+#	setjmp_save_sigs.c
+#	sigsetjmp.S
+#	siglongjmp.S
+;
