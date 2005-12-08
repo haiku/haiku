@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-11/2005.
+	Rudolf Cornelissen 10/2002-12/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -78,6 +78,7 @@ enum {
 #define NV_ROP5_SOLID					0x00000000 /* 2D */
 #define NV_IMAGE_BLACK_RECTANGLE		0x00000001 /* 2D/3D */
 #define NV_IMAGE_PATTERN				0x00000002 /* 2D */
+#define NV_SCALED_IMAGE_FROM_MEMORY		0x00000003 /* 2D */
 #define NV4_SURFACE						0x00000010 /* 2D */
 #define NV10_CONTEXT_SURFACES_2D		0x00000010 /* 2D */
 #define NV_IMAGE_BLIT					0x00000011 /* 2D */
