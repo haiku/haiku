@@ -4090,6 +4090,17 @@ BView::_Attach()
 	AttachedToWindow();
 	fAttached = true;
 
+	// after giving the view a chance to do this itself,
+	// check for the B_PULSE_NEEDED flag and make sure the
+	// window set's up the pulse messaging
+	if (fOwner) {
+		if (fFlags & B_PULSE_NEEDED) {
+			check_lock_no_pick();
+			if (!fOwner->fPulseEnabled)
+				fOwner->SetPulseRate(500000);
+		}
+	}
+
 	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
 		// we need to check for fAttached as new views could have been
 		// added in AttachedToWindow() - and those are already attached
