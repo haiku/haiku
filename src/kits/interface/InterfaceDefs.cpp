@@ -297,7 +297,7 @@ get_click_speed(bigtime_t *speed)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt64("speed", speed) != B_OK)
-		return B_ERROR;
+		*speed = 250000;
 	
 	return B_OK;
 }
@@ -373,7 +373,7 @@ get_key_repeat_rate(int32 *rate)
 	
 	if (reply.FindInt32("rate", rate) != B_OK)
 		return B_ERROR;
-	
+
 	return B_OK;
 }
 
@@ -397,7 +397,7 @@ get_key_repeat_delay(bigtime_t *delay)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt64("delay", delay) != B_OK)
-		return B_ERROR;
+		*delay = 40000;
 	
 	return B_OK;
 }
