@@ -41,7 +41,7 @@ BEOS_ADD_ONS_ACCELERANTS = radeon.accelerant nv.accelerant mga.accelerant
 	nm.accelerant vesa.accelerant
 ;
 BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
-	JPEGTranslator GIFTranslator
+	JPEGTranslator GIFTranslator BMPTranslator
 ;
 BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
 	multi_audio.media_addon
