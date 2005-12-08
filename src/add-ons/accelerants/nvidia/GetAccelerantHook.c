@@ -123,7 +123,7 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		/* not (yet) used by the app_server:
 		 * so just for application use (BWindowScreen) */
 //		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
-//		CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
+//		CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT);
 	}
 
 	/* Return a null pointer for any feature we don't understand. */

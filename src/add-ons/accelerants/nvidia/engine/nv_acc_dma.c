@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-11/2005.
+   Rudolf Cornelissen 8/2003-12/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -1759,6 +1759,68 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 
 	/* tell 3D add-ons that they should reload their rendering states and surfaces */
 	si->engine.threeD.reload = 0xffffffff;
+}
+
+/* scaled and filtered screen to screen blit - i.e. video playback without overlay */
+//fixme: setup command #0x77 handle and define, pgm in FIFO in 'nv_acc_init_dma'...
+//fixme: add 0x77 in nv_acc_assert_fifo_dma..
+//fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count)
+{
+	uint32 cmd_depth;
+
+	/*** init acc engine for scaled filtered blit function ***/
+	/* Set pixel width */
+	switch(si->dm.space)
+	{
+	case B_RGB15_LITTLE:
+		cmd_depth = 0x00000002;
+		break;
+	case B_RGB16_LITTLE:
+		cmd_depth = 0x00000007;
+		break;
+	case B_RGB32_LITTLE:
+	case B_RGBA32_LITTLE:
+		cmd_depth = 0x00000004;
+		break;
+	/* fixme sometime:
+	 * we could do the spaces below if this function would be modified to be able
+	 * to use a source outside of the desktop, i.e. using offscreen bitmaps... */
+	case B_YCbCr422:
+		cmd_depth = 0x00000005;
+		break;
+	case B_YUV422:
+		cmd_depth = 0x00000006;
+		break;
+	default:
+		/* note: this function does not support src or dest in the B_CMAP8 space! */
+		//fixme: the NV10 version of this cmd supports B_CMAP8 src though... (checkout)
+		LOG(8,("ACC_DMA: scaled_filtered_blit, invalid bit depth\n"));
+		return;
+	}
+
+	/* TNT1 has fixed operation mode 'SRCcopy' while the rest can be programmed: */
+	if (si->ps.card_type != NV04)
+	{
+		/* wait for room in fifo for cmds if needed. */
+		if (nv_acc_fifofree_dma(3) != B_OK) return;
+		/* now setup source bitmap colorspace */
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 2);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+		/* now setup operation mode to SRCcopy */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000003; /* SetOperation */
+	}
+	else
+	{
+		/* wait for room in fifo for cmd if needed. */
+		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		/* now setup source bitmap colorspace */
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+		/* TNT1 has fixed operation mode SRCcopy */
+	}
+
+	//fixme: implement actual blit..
 }
 
 /* rectangle fill - i.e. workspace and window background color */
