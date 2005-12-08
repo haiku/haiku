@@ -4021,7 +4021,7 @@ BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
 
 	if (fFlags & B_FRAME_EVENTS) {
 		// TODO: CurrentMessage() is not what it used to be!
-		FrameResized(fBounds.right, fBounds.bottom);
+		FrameResized(fBounds.Width(), fBounds.Height());
 	}
 }
 
