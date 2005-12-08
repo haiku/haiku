@@ -82,28 +82,22 @@ WindowList::AddWindow(WindowLayer* window, WindowLayer* before)
 void
 WindowList::RemoveWindow(WindowLayer* window)
 {
-// TODO: Axel, the same window can be removed in the same list
-// more than once, would that be a bug?
 	window_anchor& windowAnchor = window->Anchor(fIndex);
 
 	if (fFirstWindow == window) {
 		// it's the first child
 		fFirstWindow = windowAnchor.next;
 	} else {
-		// it must have a previous sibling if it was not
-		// previously removed from this list
-		if (windowAnchor.previous)
-			windowAnchor.previous->Anchor(fIndex).next = windowAnchor.next;
+		// it must have a previous sibling, then
+		windowAnchor.previous->Anchor(fIndex).next = windowAnchor.next;
 	}
 
 	if (fLastWindow == window) {
 		// it's the last child
 		fLastWindow = windowAnchor.previous;
 	} else {
-		// it must have a next sibling if it was not
-		// previously removed from this list
-		if (windowAnchor.next)
-			windowAnchor.next->Anchor(fIndex).previous = windowAnchor.previous;
+		// then it must have a next sibling
+		windowAnchor.next->Anchor(fIndex).previous = windowAnchor.previous;
 	}
 
 	windowAnchor.previous = NULL;

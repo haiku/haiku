@@ -931,8 +931,15 @@ Desktop::ShowWindow(WindowLayer* window)
 	WriteLockWindows();
 
 	window->SetHidden(false);
-	_ShowWindow(window, true);
-	ActivateWindow(window);
+
+	if (window->OnWorkspace(fCurrentWorkspace)) {
+		_ShowWindow(window, true);
+		ActivateWindow(window);
+	} else {
+		// then we don't need to send the fake mouse event either
+		WriteUnlockWindows();
+		return;
+	}
 
 	WriteUnlockWindows();
 
@@ -971,11 +978,13 @@ Desktop::HideWindow(WindowLayer* window)
 
 	window->SetHidden(true);
 
-	_HideWindow(window);
-	_UpdateFronts();
+	if (window->OnWorkspace(fCurrentWorkspace)) {
+		_HideWindow(window);
+		_UpdateFronts();
 
-	if (FocusWindow() == window)
-		SetFocusWindow(FrontWindow());
+		if (FocusWindow() == window)
+			SetFocusWindow(FrontWindow());
+	}
 
 	WriteUnlockWindows();
 }
