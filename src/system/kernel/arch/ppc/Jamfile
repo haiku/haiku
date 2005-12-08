@@ -4,7 +4,7 @@ KernelStaticLibrary libppc :
 	arch_atomic.c
 	arch_cpu.c
 	arch_cpu_asm.S
-	arch_dbg_console.c
+	arch_debug_console.c
 	arch_debug.c
 	arch_elf.c
 	arch_exceptions.S
