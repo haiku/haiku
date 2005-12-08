@@ -2,6 +2,9 @@ SubDir HAIKU_TOP src tests servers registrar ;
 
 SetSubDirSupportedPlatforms libbe_test ;
 
+UseArchHeaders $(TARGET_ARCH) ;
+
+
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
 	: be
