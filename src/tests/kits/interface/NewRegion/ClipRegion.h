@@ -72,7 +72,8 @@ private:
 	void _AddRect(const clipping_rect &rect);
 	void _RecalculateBounds(const clipping_rect &newRect);
 	
-	int32 _FindSmallestBottom(const int32 &top, const int32 &startIndex) const;
+	int32 _FindSmallestBottom(const int32 &top, const int32 &oldBottom,
+								const int32 &startIndex) const;
 	int32 _ExtractStripRects(const int32 &top, const int32 &bottom,
 				clipping_rect *rects, int32 *inOutIndex) const;
 	

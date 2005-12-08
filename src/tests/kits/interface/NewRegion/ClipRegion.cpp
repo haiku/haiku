@@ -137,6 +137,9 @@ ClipRegion::Contains(const BPoint &pt) const
 void
 ClipRegion::OffsetBy(const int32 &dh, const int32 &dv)
 {
+	if (dh == 0 && dv == 0)
+		return;
+		
 	if (fCount > 0) {
 		for (int32 c = 0; c < fCount; c++)
 			offset_rect(fData[c], dh, dv);
@@ -314,14 +317,14 @@ ClipRegion::WriteToLink(BPrivate::ServerLink &link)
 static int
 leftComparator(const void *a, const void *b)
 {
-	return ((clipping_rect *)(a))->left > ((clipping_rect *)(b))->left;
+	return ((clipping_rect *)(a))->left - ((clipping_rect *)(b))->left;
 }
 
 
 static int
 topComparator(const void *a, const void *b)
 {
-	return ((clipping_rect *)(a))->top > ((clipping_rect *)(b))->top;
+	return ((clipping_rect *)(a))->top - ((clipping_rect *)(b))->top;
 }
 
 
@@ -339,7 +342,7 @@ ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 	}
 	
 	if (dest.fCount > 1)
-		qsort(dest.fData, sizeof(clipping_rect), dest.fCount, topComparator);
+		qsort(dest.fData, dest.fCount, sizeof(clipping_rect), topComparator);
 
 	_Adopt(dest);
 }
@@ -411,26 +414,33 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 	ClipRegion dest;
 	while (true) {
 		int32 top = bottom + 1;
-		bottom = region._FindSmallestBottom(_FindSmallestBottom(top, a), b);
+		bottom = kMaxVerticalExtent;
+		bottom = _FindSmallestBottom(top, bottom, a);
+		bottom = region._FindSmallestBottom(top, bottom, b);
 		
 		if (bottom == kMaxVerticalExtent)
 			break;
 		
 		clipping_rect rects[kMaxPoints];
-		rects[0].top = top;
-		rects[0].bottom = bottom;		
-
-		int32 rectsCount = _ExtractStripRects(top, bottom, rects, &a)
-				+ region._ExtractStripRects(top, bottom, &rects[rectsCount], &b); 
-		
+	
+		int32 rectsCount = _ExtractStripRects(top, bottom, rects, &a);
+		rectsCount += region._ExtractStripRects(top, bottom, &rects[rectsCount], &b); 
+			
 		if (rectsCount > 0) {
 			if (rectsCount > 1)
-				qsort(rects, sizeof(clipping_rect), rectsCount, leftComparator);
+				qsort(&rects, rectsCount, sizeof(clipping_rect), leftComparator);
+			
 			dest._MergeAndInclude(rects, rectsCount);
 		}
 	}
 
+	// TODO: For some reason, I had to add those two qsort calls.
+	// They wasn't needed in the old implementation, so I obviously
+	// introduced a bug somewhere. Fix the bug and then remove those calls
+	qsort(dest.fData, dest.fCount, sizeof(clipping_rect), leftComparator);		
 	dest._Coalesce();
+	qsort(dest.fData, dest.fCount, sizeof(clipping_rect), topComparator);
+	
 	_Adopt(dest);
 	
 }
@@ -462,10 +472,10 @@ ClipRegion::_ExcludeComplex(const ClipRegion &region)
 		int32 foundB = region._ExtractStripRects(top, bottom, rectsB, &b); 
 		
 		if (foundA > 1)
-			qsort(rectsA, sizeof(clipping_rect), foundA, leftComparator);
+			qsort(rectsA, foundA, sizeof(clipping_rect), leftComparator);
 		
 		if (foundB > 1)
-			qsort(rectsB, sizeof(clipping_rect), foundB, leftComparator);
+			qsort(rectsB, foundB, sizeof(clipping_rect), leftComparator);
 		
 		// TODO: Do the actual exclusion
 		
@@ -544,9 +554,9 @@ ClipRegion::_RecalculateBounds(const clipping_rect &rect)
 
 
 int32
-ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &startIndex) const
+ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &oldBottom, const int32 &startIndex) const
 {
-	int32 bottom = kMaxVerticalExtent;
+	int32 bottom = oldBottom;
 	for (int32 i = startIndex; i < fCount; i++) {
 		const int32 n = fData[i].top - 1;
 		if (n >= top && n < bottom)
@@ -564,7 +574,7 @@ ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_r
 {
 	int32 currentIndex = *inOutIndex;
 	*inOutIndex = -1;
-
+	
 	int32 foundCount = 0;
 	// Store left and right points to the appropriate array
 	for (int32 x = currentIndex; x < fCount; x++) {
@@ -576,6 +586,12 @@ ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_r
 		if (fData[x].top <= top && fData[x].bottom >= bottom) {
 			rects[foundCount].left = fData[x].left;
 			rects[foundCount].right = fData[x].right;
+			
+			// TODO: top and bottom are the same for every rect,
+			// maybe we could extract only the left and right coordinates,
+			// as we did in the old implementation
+			rects[foundCount].top = top;
+			rects[foundCount].bottom = bottom;
 			foundCount++;	
 		} else if (fData[x].top > bottom)
 			break;	
@@ -583,7 +599,7 @@ ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_r
 	
 	if (*inOutIndex == -1)
 		*inOutIndex = currentIndex;
-
+	
 	return foundCount;
 }
 
@@ -643,6 +659,7 @@ ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
 			next++;
 		}
 		
+		//to_BRect(rect).PrintToStream();
 		_AddRect(rect);		
 		current = next;	
 	}
@@ -703,9 +720,9 @@ ClipRegion::_CoalesceHorizontal()
 			fData[newCount].right = rect.right;					
 		else {
 			newCount++;
-			fData[newCount] = rect;
-		}
-		testRect = fData[newCount];			
+			fData[newCount] = rect;	
+		}		
+		testRect = fData[newCount];
 	}
 
 	fCount = newCount + 1;
