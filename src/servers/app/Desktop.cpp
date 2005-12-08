@@ -579,7 +579,28 @@ Desktop::SetWorkspace(int32 index)
 	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace)
 		return;
 
+	WriteLockWindows();
+
 	int32 previousIndex = fCurrentWorkspace;
+
+	if (fMouseEventWindow != NULL) {
+		// the window currently being dragged will follow us to this workspace
+		// if it's not already on it
+		if (!fMouseEventWindow->OnWorkspace(index)) {
+			fWorkspaces[index].Windows().AddWindow(fMouseEventWindow);
+			fMouseEventWindow->SetWorkspaces((fMouseEventWindow->Workspaces()
+					| workspace_to_workspaces(index))
+				& ~workspace_to_workspaces(previousIndex));
+			fWorkspaces[previousIndex].Windows().RemoveWindow(fMouseEventWindow);
+		} else {
+			// make sure it's frontmost
+			fWorkspaces[index].Windows().RemoveWindow(fMouseEventWindow);
+			fWorkspaces[index].Windows().AddWindow(fMouseEventWindow,
+				fMouseEventWindow->Frontmost(fWorkspaces[index].Windows().FirstWindow(), index));
+		}
+
+		fMouseEventWindow->Anchor(index).position = fMouseEventWindow->Frame().LeftTop();
+	}
 
 	// build region of windows that are no longer visible in the new workspace
 
@@ -640,7 +661,7 @@ Desktop::SetWorkspace(int32 index)
 
 	for (WindowLayer* window = _CurrentWindows().FirstWindow(); window != NULL;
 			window = window->NextWindow(index)) {
-		if (window->OnWorkspace(previousIndex)) {
+		if (window->OnWorkspace(previousIndex) || window == fMouseEventWindow) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
 		}
@@ -652,7 +673,9 @@ Desktop::SetWorkspace(int32 index)
 	SetFocusWindow(FrontWindow());
 
 	MarkDirty(dirty);
+
 	//_WindowsChanged();
+	WriteUnlockWindows();
 }
 
 
@@ -1117,8 +1140,9 @@ void
 Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 	uint32 newWorkspaces)
 {
-	// apply changes to the workspaces' window list
-	// (and RootLayer, for the current workspace)
+	// apply changes to the workspaces' window lists
+
+	WriteLockWindows();
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		if (workspaces_on_workspace(i, oldWorkspaces)) {
@@ -1145,6 +1169,8 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 			}
 		}
 	}
+
+	WriteUnlockWindows();
 }
 
 
@@ -1152,12 +1178,14 @@ void
 Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 {
 	BAutolock _(this);
-	
+
 	if (workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
+	WriteLockWindows();
 	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
 	window->SetWorkspaces(workspaces);
+	WriteUnlockWindows();
 }
 
 
