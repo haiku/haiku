@@ -47,8 +47,11 @@
 #endif
 
 #include <math.h>
+#include <new>
 #include <stdio.h>
 
+
+using std::nothrow;
 
 //#define DEBUG_BVIEW
 #ifdef DEBUG_BVIEW
@@ -1261,17 +1264,21 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 #endif
 
 	int32 bufferSize = message->FlattenedSize();
-	char *buffer = new char[bufferSize];
-	message->Flatten(buffer, bufferSize);
-
-	fOwner->fLink->StartMessage(AS_LAYER_DRAG_RECT);
-	fOwner->fLink->Attach<BRect>(dragRect);
-	fOwner->fLink->Attach<BPoint>(offset);	
-	fOwner->fLink->Attach<int32>(bufferSize);
-	fOwner->fLink->Attach(buffer, bufferSize);
-	fOwner->fLink->Flush();
-
-	delete [] buffer;
+	char* buffer = new (nothrow) char[bufferSize];
+	if (buffer) {
+		message->Flatten(buffer, bufferSize);
+	
+		fOwner->fLink->StartMessage(AS_LAYER_DRAG_RECT);
+		fOwner->fLink->Attach<BRect>(dragRect);
+		fOwner->fLink->Attach<BPoint>(offset);	
+		fOwner->fLink->Attach<int32>(bufferSize);
+		fOwner->fLink->Attach(buffer, bufferSize);
+		fOwner->fLink->Flush();
+	
+		delete [] buffer;
+	} else {
+		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
+	}
 }
 
 
@@ -1318,17 +1325,21 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 #endif
 
 	int32 bufferSize = message->FlattenedSize();
-	char *buffer = new char[bufferSize];
-	message->Flatten(buffer, bufferSize);
-
-	fOwner->fLink->StartMessage(AS_LAYER_DRAG_IMAGE);
-	fOwner->fLink->Attach<int32>(image->get_server_token());
-	fOwner->fLink->Attach<int32>((int32)dragMode);
-	fOwner->fLink->Attach<BPoint>(offset);
-	fOwner->fLink->Attach<int32>(bufferSize);
-	fOwner->fLink->Attach(buffer, bufferSize);
-
-	delete [] buffer;
+	char* buffer = new (nothrow) char[bufferSize];
+	if (buffer) {
+		message->Flatten(buffer, bufferSize);
+	
+		fOwner->fLink->StartMessage(AS_LAYER_DRAG_IMAGE);
+		fOwner->fLink->Attach<int32>(image->get_server_token());
+		fOwner->fLink->Attach<int32>((int32)dragMode);
+		fOwner->fLink->Attach<BPoint>(offset);
+		fOwner->fLink->Attach<int32>(bufferSize);
+		fOwner->fLink->Attach(buffer, bufferSize);
+	
+		delete [] buffer;
+	} else {
+		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
+	}
 
 	// TODO: in app_server the bitmap refCount must be incremented
 	// WRITE this into specs!!!!
@@ -4146,7 +4157,7 @@ BView::_Draw(BRect updateRect)
 		child->_Draw(rect);
 	}
 
-	if (Flags() & B_WILL_DRAW) {
+	if (Flags() & B_DRAW_ON_CHILDREN) {
 		// TODO: Since we have hard clipping in the app_server,
 		// a view can never draw "on top of it's child views" as
 		// the BeBook describes.

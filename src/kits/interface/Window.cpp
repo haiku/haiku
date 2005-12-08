@@ -868,11 +868,21 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindPoint("be:view_where", &where);
 			msg->FindInt32("buttons", (int32 *)&buttons);
 			msg->FindInt32("be:transit", (int32 *)&transit);
+			BMessage* dragMessage = NULL;
+			if (msg->HasMessage("be:drag_message")) {
+				dragMessage = new BMessage();
+				if (msg->FindMessage("be:drag_message", dragMessage) != B_OK) {
+					delete dragMessage;
+					dragMessage = NULL;
+				}
+			}
 
 			if (BView *view = dynamic_cast<BView *>(target))
-				view->MouseMoved(where, transit, NULL);
+				view->MouseMoved(where, transit, dragMessage);
 			else
 				target->MessageReceived(msg);
+
+			delete dragMessage;
 			break;
 		}
 
@@ -974,6 +984,20 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				MoveTo(origin);
 			else
 				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+			break;
+		}
+		case _MESSAGE_DROPPED_:
+		{
+			if (fLastMouseMovedView)
+				target = fLastMouseMovedView;
+
+			uint32 originalWhat;
+			if (msg->FindInt32("_original_what", (int32*)&originalWhat) == B_OK) {
+				msg->what = originalWhat;
+				msg->RemoveName("_original_what");
+			}
+
+			BLooper::DispatchMessage(msg, target); 
 			break;
 		}
 
@@ -2387,8 +2411,8 @@ BWindow::_AdoptResize()
 	// saves us some server communication, as the server
 	// does the same with our views on its side.
 
-	int32 deltaWidth = fFrame.Width() - fTopView->Bounds().Width();
-	int32 deltaHeight = fFrame.Height() - fTopView->Bounds().Height();
+	int32 deltaWidth = (int32)(fFrame.Width() - fTopView->Bounds().Width());
+	int32 deltaHeight = (int32)(fFrame.Height() - fTopView->Bounds().Height());
 	if (deltaWidth == 0 && deltaHeight == 0)
 		return;
 
