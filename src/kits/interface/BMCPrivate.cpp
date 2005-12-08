@@ -203,7 +203,24 @@ void _BMCMenuBar_::Draw(BRect updateRect)
 //------------------------------------------------------------------------------
 void _BMCMenuBar_::FrameResized(float width, float height)
 {
-	// TODO:
+	// we need to take care of resizing and cleaning up
+	// the parent menu field
+	BMenuField* menuField = dynamic_cast<BMenuField*>(Parent());
+	if (menuField) {
+		float diff = Frame().right - menuField->Bounds().right;
+		if (diff > 0 && Window()) {
+			// clean up the dirty right top corner of
+			// the menu field when enlarging
+			BRect dirty(menuField->Bounds());
+			dirty.left = dirty.right - 2;
+			dirty.bottom = Frame().top - 1;
+			menuField->Invalidate(dirty);
+		}
+		// we have been shrinked or enlarged and need to take
+		// of the size of the parent menu field as well
+		// NOTE: no worries about follow mode, we follow left and top
+		menuField->ResizeBy(diff + 1, 0.0);
+	}
 	BMenuBar::FrameResized(width, height);
 }
 //------------------------------------------------------------------------------
