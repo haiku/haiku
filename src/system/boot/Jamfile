@@ -24,6 +24,11 @@ local librootFunctions =
 	strtol.o
 ;
 
+local platformObjects = ;
+if $(TARGET_ARCH) = x86 {
+	platformObjects += <src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o ;
+}
+
 KernelLd boot_loader :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_loader.a
@@ -40,8 +45,8 @@ KernelLd boot_loader :
 	# kernel)
 	$(librootFunctions:G=src!system!kernel!lib)
 
-	# other kernel objects
-	<src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o
+	# platform specific objects
+	$(platformObjects)
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader.ld 
 	: -Bstatic
