@@ -18,8 +18,6 @@
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "InputManager.h"
-#include "Layer.h"
-#include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerScreen.h"
@@ -145,12 +143,11 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 
 	bigtime_t now = system_time();
 
-	::RootLayer* rootLayer = fDesktop->RootLayer();
-	rootLayer->Lock();
+	fDesktop->ReadLockWindows();
 
 	EventTarget* focus = NULL;
-	if (rootLayer->Focus() != NULL)
-		focus = &rootLayer->Focus()->Window()->EventTarget();
+	if (fDesktop->FocusWindow() != NULL)
+		focus = &fDesktop->FocusWindow()->EventTarget();
 
 	// TODO: this is a try to not steal focus from the current window
 	//	in case you enter some text and a window pops up you haven't
@@ -168,7 +165,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		fLastFocus = focus;
 	}	
 
-	rootLayer->Unlock();
+	fDesktop->ReadUnlockWindows();
 
 	// we always allow to switch focus after the enter key has pressed
 	if (key == B_ENTER)
@@ -197,13 +194,11 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 	if (message->FindPoint("where", &where) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	::RootLayer* rootLayer = fDesktop->RootLayer();
+	fDesktop->WriteLockWindows();
 
-	rootLayer->Lock();
-
-	WindowLayer* window = rootLayer->MouseEventWindow();
+	WindowLayer* window = fDesktop->MouseEventWindow();
 	if (window == NULL)
-		window = rootLayer->WindowAt(where);
+		window = fDesktop->WindowAt(where);
 
 	if (window != NULL) {
 		// dispatch event in the window layers
@@ -211,25 +206,25 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 			case B_MOUSE_DOWN:
 				window->MouseDown(message, where, _viewToken);
 				break;
-	
+
 			case B_MOUSE_UP:
 				window->MouseUp(message, where, _viewToken);
-				rootLayer->SetMouseEventWindow(NULL);
+				fDesktop->SetMouseEventWindow(NULL);
 				break;
-	
+
 			case B_MOUSE_MOVED:
 				window->MouseMoved(message, where, _viewToken);
 				break;
 		}
 
 		if (*_viewToken != B_NULL_TOKEN)
-			*_target = &window->Window()->EventTarget();
+			*_target = &window->EventTarget();
 		else
 			*_target = NULL;
 	} else
 		*_target = NULL;
 
-	rootLayer->Unlock();
+	fDesktop->WriteUnlockWindows();
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -257,16 +252,21 @@ workspaces_on_workspace(int32 index, uint32 workspaces)
 
 Desktop::Desktop(uid_t userID)
 	: MessageLooper("desktop"),
+
 	fUserID(userID),
 	fSettings(new DesktopSettings::Private()),
-	fAppListLock("application list"),
+	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
-	fWindowLayerList(64),
+	fAllWindows(kAllWindowList),
 	fActiveScreen(NULL),
-	fCursorManager()
+	fWindowLock("window lock")
 {
 	char name[B_OS_NAME_LENGTH];
 	Desktop::_GetLooperName(name, sizeof(name));
+
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		fWorkspaces[i].Windows().SetIndex(i);
+	}
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
@@ -279,11 +279,6 @@ Desktop::Desktop(uid_t userID)
 
 Desktop::~Desktop()
 {
-	// root layer only knows the visible WindowLayers, so we delete them all over here
-	for (int32 i = 0; WindowLayer *border = (WindowLayer *)fWindowLayerList.ItemAt(i); i++)
-		delete border;
-
-	delete fRootLayer;
 	delete fSettings;
 
 	delete_port(fMessagePort);
@@ -298,11 +293,6 @@ Desktop::Init()
 
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
-
-	// TODO: add user identity to the name
-	char name[32];
-	sprintf(name, "RootLayer %d", 1);
-	fRootLayer = new ::RootLayer(name, this, GetDrawingEngine());
 
 #if TEST_MODE
 	gInputManager->AddStream(new InputServerStream);
@@ -321,6 +311,14 @@ Desktop::Init()
 	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
 		fVirtualScreen.Frame().Height() / 2);
 	fVirtualScreen.HWInterface()->SetCursorVisible(true);
+
+	// draw the background
+
+	fScreenRegion = fVirtualScreen.Frame();
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
 }
 
 
@@ -336,11 +334,11 @@ Desktop::_PrepareQuit()
 {
 	// let's kill all remaining applications
 
-	fAppListLock.Lock();
+	fApplicationsLock.Lock();
 
-	int32 count = fAppList.CountItems();
+	int32 count = fApplications.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		ServerApp *app = (ServerApp*)fAppList.ItemAt(i);
+		ServerApp *app = fApplications.ItemAt(i);
 		team_id clientTeam = app->ClientTeam();
 
 		app->Quit();
@@ -351,7 +349,7 @@ Desktop::_PrepareQuit()
 	if (count > 0)
 		acquire_sem_etc(fShutdownSemaphore, fShutdownCount, B_RELATIVE_TIMEOUT, 250000);
 
-	fAppListLock.Unlock();
+	fApplicationsLock.Unlock();
 }
 
 
@@ -389,9 +387,9 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (app->InitCheck() == B_OK
 				&& app->Run()) {
 				// add the new ServerApp to the known list of ServerApps
-				fAppListLock.Lock();
-				fAppList.AddItem(app);
-				fAppListLock.Unlock();
+				fApplicationsLock.Lock();
+				fApplications.AddItem(app);
+				fApplicationsLock.Unlock();
 			} else {
 				delete app;
 
@@ -419,24 +417,24 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<thread_id>(&thread) < B_OK)
 				break;
 
-			fAppListLock.Lock();
+			fApplicationsLock.Lock();
 
 			// Run through the list of apps and nuke the proper one
 
-			int32 count = fAppList.CountItems();
+			int32 count = fApplications.CountItems();
 			ServerApp *removeApp = NULL;
 
 			for (int32 i = 0; i < count; i++) {
-				ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
+				ServerApp *app = fApplications.ItemAt(i);
 
 				if (app != NULL && app->Thread() == thread) {
-					fAppList.RemoveItem(i);
+					fApplications.RemoveItemAt(i);
 					removeApp = app;
 					break;
 				}
 			}
 
-			fAppListLock.Unlock();
+			fApplicationsLock.Unlock();
 
 			if (removeApp != NULL)
 				removeApp->Quit(fShutdownSemaphore);
@@ -486,10 +484,10 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
 
-			fAppListLock.Lock();
+			fApplicationsLock.Lock();
 			fShutdownSemaphore = create_sem(0, "desktop shutdown");
-			fShutdownCount = fAppList.CountItems();
-			fAppListLock.Unlock();
+			fShutdownCount = fApplications.CountItems();
+			fApplicationsLock.Unlock();
 
 			fQuitting = true;
 			BroadcastToAllApps(AS_QUIT_APP);
@@ -526,15 +524,14 @@ Desktop::_ActivateApp(team_id team)
 	status_t status = B_BAD_TEAM_ID;
 
 	// search for an unhidden window to give focus to
-	int32 windowCount = WindowList().CountItems();
-	for (int32 i = 0; i < windowCount; ++i) {
-		// is this layer in fact a WindowLayer?
-		WindowLayer *windowLayer = WindowList().ItemAt(i);
 
-		// if winBorder is valid and not hidden, then we've found our target
-		if (windowLayer != NULL && !windowLayer->IsHidden()
-			&& windowLayer->App()->ClientTeam() == team) {
-			fRootLayer->ActivateWindow(windowLayer);
+	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		// if window is a normal window of the team, and not hidden, 
+		// we've found our target
+		if (!window->IsHidden() && window->IsNormal()
+			&& window->ServerWindow()->ClientTeam() == team) {
+			ActivateWindow(window);
 			return B_OK;
 		}
 	}
@@ -552,13 +549,24 @@ Desktop::_ActivateApp(team_id team)
 void
 Desktop::BroadcastToAllApps(int32 code)
 {
-	BAutolock locker(fAppListLock);
+	BAutolock locker(fApplicationsLock);
 
-	for (int32 i = 0; i < fAppList.CountItems(); i++) {
-		ServerApp *app = (ServerApp *)fAppList.ItemAt(i);
-
-		app->PostMessage(code);
+	for (int32 i = 0; i < fApplications.CountItems(); i++) {
+		fApplications.ItemAt(i)->PostMessage(code);
 	}
+}
+
+
+void
+Desktop::UpdateWorkspaces()
+{
+	// TODO: maybe this should be replaced by a SetWorkspacesCount() method
+
+/*	if (fWorkspacesLayer == NULL)
+		return;
+
+	_WindowsChanged();
+*/
 }
 
 
@@ -572,31 +580,119 @@ Desktop::SetWorkspace(int32 index)
 		return;
 
 	int32 previousIndex = fCurrentWorkspace;
+
+	// build region of windows that are no longer visible in the new workspace
+
+	BRegion dirty;
+	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+			window != NULL; window = window->NextWindow(previousIndex)) {
+		window->Anchor(previousIndex).position = window->Frame().LeftTop();
+
+		if (window->OnWorkspace(index))
+			continue;
+
+		if (!window->IsHidden()) {
+			// this window will no longer be visible
+			dirty.Include(&window->VisibleRegion());
+		}
+
+		window->SetCurrentWorkspace(-1);			
+	}
+
 	fCurrentWorkspace = index;
 
-	fRootLayer->SetWorkspace(index, fWorkspaces[previousIndex],
-		fWorkspaces[index]);
+	// show windows, and include them in the changed region - but only
+	// those that were not visible before (or whose position changed)
+
+	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+			window != NULL; window = window->NextWindow(index)) {
+		BPoint position = window->Anchor(index).position;
+
+		window->SetCurrentWorkspace(index);
+
+		if (window->IsHidden())
+			continue;
+
+		if (position == kInvalidWindowPosition) {
+			// if you enter a workspace for the first time, the position
+			// of the window in the previous workspace is adopted
+			position = window->Frame().LeftTop();
+				// TODO: make sure the window is still on-screen if it
+				//	was before!
+		}
+
+		if (!window->OnWorkspace(previousIndex)) {
+			// this window was not visible before
+			continue;
+		}
+
+		if (window->Frame().LeftTop() != position) {
+			// the window was visible before, but its on-screen location changed
+			BPoint offset = position - window->Frame().LeftTop();
+			MoveWindowBy(window, offset.x, offset.y);
+				// TODO: be a bit smarter than this...
+		}
+	}
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
+
+	for (WindowLayer* window = _CurrentWindows().FirstWindow(); window != NULL;
+			window = window->NextWindow(index)) {
+		if (window->OnWorkspace(previousIndex)) {
+			// this window was visible before, and is already handled in the above loop
+			continue;
+		}
+
+		dirty.Include(&window->VisibleRegion());
+	}
+
+	_UpdateFronts();
+	SetFocusWindow(FrontWindow());
+
+	MarkDirty(dirty);
+	//_WindowsChanged();
 }
 
 
 void
 Desktop::ScreenChanged(Screen* screen)
 {
+	// TODO: confirm that everywhere this is used,
+	// the Window WriteLock is held
+
+// TODO: can this be removed? I would think it can.
+// In fact, this lock should nowhere be used anymore, no?
+//	BAutolock locker(this);
+
+	// the entire screen is dirty, because we're actually
+	// operating on an all new buffer in memory
+	BRegion dirty(screen->Frame());
+	// update our cached screen region
+	fScreenRegion.Set(screen->Frame());
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+
+	fBackgroundRegion.MakeEmpty();
+		// makes sure that the complete background is redrawn
+	_SetBackground(background);
+
+	// figure out dirty region
+	dirty.Exclude(&background);
+	_TriggerWindowRedrawing(dirty);
+
+	// send B_SCREEN_CHANGED to windows on that screen
 	BMessage update(B_SCREEN_CHANGED);
 	update.AddInt64("when", real_time_clock_usecs());
 	update.AddRect("frame", screen->Frame());
 	update.AddInt32("mode", screen->ColorSpace());
 
-	BAutolock locker(this);
-
-	// send B_SCREEN_CHANGED to windows on that screen
 	// TODO: currently ignores the screen argument!
-
-	for (int32 i = fWindowLayerList.CountItems(); i-- > 0;) {
-		WindowLayer* layer = fWindowLayerList.ItemAt(i);
-		ServerWindow* window = layer->Window();
-
-		window->SendMessageToClient(&update);
+	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		window->ServerWindow()->SendMessageToClient(&update);
 	}
 }
 
@@ -604,29 +700,241 @@ Desktop::ScreenChanged(Screen* screen)
 //	#pragma mark - Methods for WindowLayer manipulation
 
 
-void
-Desktop::ActivateWindow(WindowLayer* windowLayer)
+WindowList&
+Desktop::_CurrentWindows()
 {
-	fRootLayer->ActivateWindow(windowLayer);
+	return fWorkspaces[fCurrentWorkspace].Windows();
+}
+
+
+/*! Search the visible windows for a valid back window
+	(only normal windows can be back windows)
+*/
+void
+Desktop::_UpdateBack()
+{
+	fBack = NULL;
+
+	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || !window->SupportsFront())
+			continue;
+
+		fBack = window;
+		break;
+	}
+}
+
+
+/*! Search the visible windows for a valid front window
+	(only normal windows can be front windows)
+*/
+void
+Desktop::_UpdateFront()
+{
+	// TODO: for now, just choose the top window
+	fFront = NULL;
+
+	for (WindowLayer* window = _CurrentWindows().LastWindow();
+			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || !window->SupportsFront())
+			continue;
+
+		fFront = window;
+		break;
+	}
 }
 
 
 void
-Desktop::SendBehindWindow(WindowLayer* windowLayer, WindowLayer* front)
+Desktop::_UpdateFronts()
 {
-	fRootLayer->SendBehindWindow(windowLayer, front);
+	_UpdateBack();
+	_UpdateFront();
+}
+
+
+
+void
+Desktop::SetFocusWindow(WindowLayer* focus)
+{
+	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
+	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0)
+		return;
+
+	if (WriteLockWindows()) {
+		// make sure no window is chosen that doesn't want focus
+		while (focus != NULL && (focus->Flags() & B_AVOID_FOCUS) != 0) {
+			focus = focus->PreviousWindow(fCurrentWorkspace);
+		}
+
+		if (fFocus != NULL)
+			fFocus->SetFocus(false);
+
+		fFocus = focus;
+
+		if (focus != NULL)
+			focus->SetFocus(true);
+
+		WriteUnlockWindows();
+	}
+}
+
+
+void
+Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
+	bool wereVisible)
+{
+	// we don't need to redraw what is currently
+	// visible of the window
+	BRegion clean;
+
+	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(list)) {
+		if (wereVisible)
+			clean.Include(&window->VisibleRegion());
+
+		_CurrentWindows().AddWindow(window,
+			window->Frontmost(_CurrentWindows().FirstWindow(),
+				fCurrentWorkspace));
+	}
+
+	BRegion dummy;
+	_RebuildClippingForAllWindows(dummy);
+
+	// redraw what became visible of the window(s)
+
+	BRegion dirty;
+	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(list)) {
+		dirty.Include(&window->VisibleRegion());
+	}
+
+	dirty.Exclude(&clean);
+	MarkDirty(dirty);
+
+	_UpdateFront();
+
+	if (windows.FirstWindow() == fBack || fBack == NULL)
+		_UpdateBack();
+
+	SetFocusWindow(FrontWindow());
+}
+
+
+/*!
+	\brief Tries to move the specified window to the front of the screen,
+		and make it the focus window.
+
+	If there are any modal windows on this screen, it might not actually
+	become the frontmost window, though, as modal windows stay in front
+	of their subset.
+*/
+void
+Desktop::ActivateWindow(WindowLayer* window)
+{
+//	printf("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>");
+
+	if (window == NULL) {
+		fBack = NULL;
+		fFront = NULL;
+		return;
+	}
+	if (window == FrontWindow())
+		return;
+
+	// TODO: take care about floating windows
+
+	if (!WriteLockWindows())
+		return;
+
+	// we don't need to redraw what is currently
+	// visible of the window
+	BRegion clean(window->VisibleRegion());
+	WindowList windows(kWorkingList);
+
+	WindowLayer* frontmost = window->Frontmost();
+
+	_CurrentWindows().RemoveWindow(window);
+	windows.AddWindow(window);
+
+	if (frontmost != NULL && frontmost->IsModal()) {
+		// all modal windows follow their subsets to the front
+		// (ie. they are staying in front of them, but they are
+		// not supposed to change their order because of that)
+
+		WindowLayer* nextModal;
+		for (WindowLayer* modal = frontmost; modal != NULL; modal = nextModal) {
+			// get the next modal window
+			nextModal = modal->NextWindow(fCurrentWorkspace);
+			while (nextModal != NULL && !nextModal->IsModal()) {
+				nextModal = nextModal->NextWindow(fCurrentWorkspace);
+			}
+			if (nextModal != NULL && !nextModal->HasInSubset(window))
+				nextModal = NULL;
+
+			_CurrentWindows().RemoveWindow(modal);
+			windows.AddWindow(modal);
+		}
+	}
+
+	_BringWindowsToFront(windows, kWorkingList, true);
+	WriteUnlockWindows();
+}
+
+
+void
+Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
+{
+	if (window == BackWindow() || !WriteLockWindows())
+		return;
+
+	// Is this a valid behindOf window?
+	if (behindOf != NULL && window->HasInSubset(behindOf))
+		behindOf = NULL;
+
+	// what is currently visible of the window
+	// might be dirty after the window is send to back
+	BRegion dirty(window->VisibleRegion());
+
+	// detach window and re-attach at desired position
+	WindowLayer* backmost = window->Backmost(behindOf);
+
+	_CurrentWindows().RemoveWindow(window);
+	_CurrentWindows().AddWindow(window, backmost
+		? backmost->NextWindow(fCurrentWorkspace) : BackWindow());
+
+	BRegion dummy;
+	_RebuildClippingForAllWindows(dummy);
+
+	// mark everything dirty that is no longer visible
+	BRegion clean(window->VisibleRegion());
+	dirty.Exclude(&clean);
+	MarkDirty(dirty);
+
+	// TODO: if this window has any floating windows, remove them here
+
+	_UpdateFronts();
+	SetFocusWindow(FrontWindow());
+	//_WindowsChanged();
+
+	WriteUnlockWindows();
 }
 
 
 void
 Desktop::ShowWindow(WindowLayer* window)
 {
-	if (!window->IsHidden() || window->Parent() == NULL) {
-		window->Show(false);
+	if (!window->IsHidden())
 		return;
-	}
 
-	fRootLayer->ShowWindow(window);
+	WriteLockWindows();
+
+	window->SetHidden(false);
+	_ShowWindow(window, true);
+	ActivateWindow(window);
+
+	WriteUnlockWindows();
 
 	// If the mouse cursor is directly over the newly visible window,
 	// we'll send a fake mouse moved message to the window, so that
@@ -638,42 +946,158 @@ Desktop::ShowWindow(WindowLayer* window)
 
 	int32 viewToken = B_NULL_TOKEN;
 
-	fRootLayer->Lock();
-	if (fRootLayer->WindowAt(where) == window) {
-		Layer* layer = window->LayerAt(where);
-		if (layer != NULL && layer != window)
-			viewToken = layer->ViewToken();
+	WriteLockWindows();
+
+	if (WindowAt(where) == window) {
+		ViewLayer* view = window->ViewAt(where);
+		if (view != NULL)
+			viewToken = view->Token();
 	}
-	fRootLayer->Unlock();
+	WriteUnlockWindows();
 
 	if (viewToken != B_NULL_TOKEN)
-		EventDispatcher().SendFakeMouseMoved(window->Window()->EventTarget(), viewToken);
+		EventDispatcher().SendFakeMouseMoved(window->EventTarget(), viewToken);
 }
 
 
 void
 Desktop::HideWindow(WindowLayer* window)
 {
-	if (window->IsHidden() || window->Parent() == NULL) {
-		window->Hide(false);
+	if (window->IsHidden())
 		return;
-	}
 
-	fRootLayer->HideWindow(window);
+	if (!WriteLockWindows())
+		return;
+
+	window->SetHidden(true);
+
+	_HideWindow(window);
+	_UpdateFronts();
+
+	if (FocusWindow() == window)
+		SetFocusWindow(FrontWindow());
+
+	WriteUnlockWindows();
+}
+
+
+/*!
+	Shows the window on the screen - it does this independently of the
+	WindowLayer::IsHidden() state.
+*/
+void
+Desktop::_ShowWindow(WindowLayer* window, bool affectsOtherWindows)
+{
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+	_SetBackground(background);
+
+	BRegion dirty(window->VisibleRegion());
+
+	if (!affectsOtherWindows) {
+		// everything that is now visible in the
+		// window needs a redraw, but other windows
+		// are not affected, we can call ProcessDirtyRegion()
+		// of the window, and don't have to use MarkDirty()
+		window->ProcessDirtyRegion(dirty);
+	} else
+		MarkDirty(dirty);
+}
+
+
+/*!
+	Hides the window from the screen - it does this independently of the
+	WindowLayer::IsHidden() state.
+*/
+void
+Desktop::_HideWindow(WindowLayer* window)
+{
+	// after rebuilding the clipping,
+	// this window will not have a visible
+	// region anymore, so we need to remember
+	// it now
+	// (actually that's not true, since
+	// hidden windows are excluded from the
+	// clipping calculation, but anyways)
+	BRegion dirty(window->VisibleRegion());
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+	_SetBackground(background);
+
+	MarkDirty(dirty);
 }
 
 
 void
 Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 {
-	fRootLayer->MoveWindowBy(window, x, y);
+	if (!WriteLockWindows())
+		return;
+
+	// the dirty region starts with the visible area of the window being moved
+	BRegion newDirtyRegion(window->VisibleRegion());
+
+	window->MoveBy(x, y);
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+
+	// construct the region that is possible to be blitted
+	// to move the contents of the window
+	BRegion copyRegion(window->VisibleRegion());
+	copyRegion.OffsetBy(-x, -y);
+	copyRegion.IntersectWith(&newDirtyRegion);
+
+	// include the the new visible region of the window being
+	// moved into the dirty region (for now)
+	newDirtyRegion.Include(&window->VisibleRegion());
+
+	if (GetDrawingEngine()->Lock()) {
+		GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
+
+		// in the dirty region, exclude the parts that we
+		// could move by blitting
+		copyRegion.OffsetBy(x, y);
+		newDirtyRegion.Exclude(&copyRegion);
+
+		GetDrawingEngine()->Unlock();
+	}
+
+	MarkDirty(newDirtyRegion);
+	_SetBackground(background);
+
+	//_WindowsChanged(changed);
+
+	WriteUnlockWindows();
 }
 
 
 void
 Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 {
-	fRootLayer->ResizeWindowBy(window, x, y);
+	if (!WriteLockWindows())
+		return;
+
+	BRegion newDirtyRegion;
+	BRegion previouslyOccupiedRegion(window->VisibleRegion());
+	
+	window->ResizeBy(x, y, &newDirtyRegion);
+
+	BRegion background;
+	_RebuildClippingForAllWindows(background);
+
+	previouslyOccupiedRegion.Exclude(&window->VisibleRegion());
+
+	newDirtyRegion.IntersectWith(&window->VisibleRegion());
+	newDirtyRegion.Include(&previouslyOccupiedRegion);
+
+	MarkDirty(newDirtyRegion);
+	_SetBackground(background);
+
+	//_WindowsChanged(changed);
+
+	WriteUnlockWindows();
 }
 
 
@@ -691,18 +1115,24 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 		if (workspaces_on_workspace(i, oldWorkspaces)) {
 			// window is on this workspace, is it anymore?
 			if (!workspaces_on_workspace(i, newWorkspaces)) {
+				fWorkspaces[i].Windows().RemoveWindow(window);
+				window->SetCurrentWorkspace(-1);
+
 				if (i == CurrentWorkspace())
-					RootLayer()->RemoveWindow(window);
-				else
-					fWorkspaces[i].RemoveWindow(window);
+					_HideWindow(window);
 			}
 		} else {
 			// window was not on this workspace, is it now?
 			if (workspaces_on_workspace(i, newWorkspaces)) {
-				if (i == CurrentWorkspace())
-					RootLayer()->AddWindow(window);
-				else
-					fWorkspaces[i].AddWindow(window);
+				fWorkspaces[i].Windows().AddWindow(window);
+				window->SetCurrentWorkspace(fCurrentWorkspace);
+
+				if (i == CurrentWorkspace()) {
+					// this only affects other windows if this windows has floating or
+					// modal windows that need to be shown as well
+					// TODO: take care of this
+					_ShowWindow(window, FrontWindow() == window);
+				}
 			}
 		}
 	}
@@ -727,12 +1157,7 @@ Desktop::AddWindow(WindowLayer *window)
 {
 	BAutolock _(this);
 
-	if (fWindowLayerList.HasItem(window)) {
-		debugger("AddWindowLayer: WindowLayer already in Desktop list\n");
-		return;
-	}
-
-	fWindowLayerList.AddItem(window);
+	fAllWindows.AddWindow(window);
 
 	if (window->Workspaces() == B_CURRENT_WORKSPACE)
 		window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
@@ -746,34 +1171,98 @@ Desktop::RemoveWindow(WindowLayer *window)
 {
 	BAutolock _(this);
 
-	fWindowLayerList.RemoveItem(window);
+	fAllWindows.RemoveWindow(window);
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
 
 	// make sure this window won't get any events anymore
 
-	if (window->Window() != NULL)
-		EventDispatcher().RemoveTarget(window->Window()->EventTarget());
+	EventDispatcher().RemoveTarget(window->EventTarget());
 }
 
 
 void
-Desktop::SetWindowLook(WindowLayer *window, window_look look)
+Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
 {
-	fRootLayer->SetWindowLook(window, look);
+	if (window->Look() == newLook)
+		return;
+
+	if (!WriteLockWindows())
+		return;
+
+	BRegion dirty;
+	window->SetLook(newLook, &dirty);
+		// TODO: test what happens when the window
+		// finds out it needs to resize itself...
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
+
+	_TriggerWindowRedrawing(dirty);
+
+	//_WindowsChanged();
+
+	WriteUnlockWindows();
 }
 
 
 void
-Desktop::SetWindowFeel(WindowLayer *window, window_feel feel)
+Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 {
-	fRootLayer->SetWindowFeel(window, feel);
+	if (window->Feel() == newFeel)
+		return;
+
+	BAutolock _(this);
+
+	window->SetFeel(newFeel);
+
+	// TODO: implement window feels!
 }
 
 
 void
-Desktop::SetWindowFlags(WindowLayer *window, uint32 flags)
+Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 {
-	fRootLayer->SetWindowFlags(window, flags);
+	if (window->Flags() == newFlags)
+		return;
+
+	if (!WriteLockWindows())
+		return;
+
+	BRegion dirty;
+	window->SetFlags(newFlags, &dirty);
+		// TODO: test what happens when the window
+		// finds out it needs to resize itself...
+
+	BRegion stillAvailableOnScreen;
+	_RebuildClippingForAllWindows(stillAvailableOnScreen);
+	_SetBackground(stillAvailableOnScreen);
+
+	_TriggerWindowRedrawing(dirty);
+
+	//_WindowsChanged();
+
+	WriteUnlockWindows();
+}
+
+
+WindowLayer*
+Desktop::WindowAt(BPoint where)
+{
+	for (WindowLayer* window = _CurrentWindows().LastWindow(); window;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (window->VisibleRegion().Contains(where))
+			return window;
+	}
+
+	return NULL;
+}
+
+
+void
+Desktop::SetMouseEventWindow(WindowLayer* window)
+{
+	fMouseEventWindow = window;
 }
 
 
@@ -782,24 +1271,14 @@ Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 {
 	BAutolock locker(this);
 
-	WindowLayer *wb;
-	for (int32 i = 0; (wb = (WindowLayer *)fWindowLayerList.ItemAt(i)); i++) {
-		if (wb->Window()->ClientToken() == token
-			&& wb->Window()->ClientTeam() == teamID)
-			return wb;
+	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->ServerWindow()->ClientToken() == token
+			&& window->ServerWindow()->ClientTeam() == teamID)
+			return window;
 	}
 
 	return NULL;
-}
-
-
-const BObjectList<WindowLayer> &
-Desktop::WindowList() const
-{
-	if (!IsLocked())
-		debugger("You must lock before getting registered windows list\n");
-
-	return fWindowLayerList;
 }
 
 
@@ -811,28 +1290,24 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	// compute the number of windows
 
 	int32 count = 0;
-	if (team >= B_OK) {
-		for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
-			WindowLayer* layer = fWindowLayerList.ItemAt(i);
 
-			if (layer->Window()->ClientTeam() == team)
-				count++;
-		}
-	} else
-		count = fWindowLayerList.CountItems();
+	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (team < B_OK || window->ServerWindow()->ClientTeam() == team)
+			count++;
+	}
 
 	// write list
 
 	sender.StartMessage(B_OK);
 	sender.Attach<int32>(count);
 
-	for (int32 i = 0; i < fWindowLayerList.CountItems(); i++) {
-		WindowLayer* layer = fWindowLayerList.ItemAt(i);
-
-		if (team >= B_OK && layer->Window()->ClientTeam() != team)
+	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (team >= B_OK && window->ServerWindow()->ClientTeam() != team)
 			continue;
 
-		sender.Attach<int32>(layer->Window()->ServerToken());
+		sender.Attach<int32>(window->ServerWindow()->ServerToken());
 	}
 
 	sender.Flush();
@@ -845,7 +1320,7 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 	BAutolock locker(this);
 	BAutolock tokenLocker(BPrivate::gDefaultTokens);
 
-	ServerWindow* window;
+	::ServerWindow* window;
 	if (BPrivate::gDefaultTokens.GetToken(serverToken,
 			B_SERVER_TOKEN, (void**)&window) != B_OK) {
 		sender.StartMessage(B_ENTRY_NOT_FOUND);
@@ -868,3 +1343,77 @@ Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 	sender.Flush();
 }
 
+
+void
+Desktop::MarkDirty(BRegion& region)
+{
+	if (region.CountRects() == 0)
+		return;
+
+	if (WriteLockWindows()) {
+		// send redraw messages to all windows intersecting the dirty region
+		_TriggerWindowRedrawing(region);
+
+		WriteUnlockWindows();
+	}
+}
+
+
+void
+Desktop::_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen)
+{
+	// the available region on screen starts with the entire screen area
+	// each window on the screen will take a portion from that area
+
+	// figure out what the entire screen area is
+	stillAvailableOnScreen = fScreenRegion;
+
+	// set clipping of each window
+	for (WindowLayer* window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (!window->IsHidden()) {
+			window->SetClipping(&stillAvailableOnScreen);
+			// that windows region is not available on screen anymore
+			stillAvailableOnScreen.Exclude(&window->VisibleRegion());
+		}
+	}
+}
+
+
+void
+Desktop::_TriggerWindowRedrawing(BRegion& newDirtyRegion)
+{
+	// send redraw messages to all windows intersecting the dirty region
+	for (WindowLayer* window = _CurrentWindows().LastWindow(); window != NULL;
+			window = window->PreviousWindow(fCurrentWorkspace)) {
+		if (!window->IsHidden()
+			&& newDirtyRegion.Intersects(window->VisibleRegion().Frame()))
+			window->ProcessDirtyRegion(newDirtyRegion);
+	}
+}
+
+
+void
+Desktop::_SetBackground(BRegion& background)
+{
+	// NOTE: the drawing operation is caried out
+	// in the clipping region rebuild, but it is
+	// ok actually, because it also avoids trails on
+	// moving windows
+
+	// remember the region not covered by any windows
+	// and redraw the dirty background 
+	BRegion dirtyBackground(background);
+	dirtyBackground.Exclude(&fBackgroundRegion);
+	dirtyBackground.IntersectWith(&background);
+	fBackgroundRegion = background;
+	if (dirtyBackground.Frame().IsValid()) {
+		if (GetDrawingEngine()->Lock()) {
+			GetDrawingEngine()->ConstrainClippingRegion(NULL);
+			GetDrawingEngine()->FillRegion(dirtyBackground,
+				fWorkspaces[fCurrentWorkspace].Color());
+
+			GetDrawingEngine()->Unlock();
+		}
+	}
+}

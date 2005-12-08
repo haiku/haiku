@@ -19,7 +19,7 @@ class OffscreenWindowLayer : public WindowLayer {
  public:
 								OffscreenWindowLayer(ServerBitmap* bitmap,
 												   const char* name,
-												   ServerWindow* window);
+												   ::ServerWindow* window);
 	virtual						~OffscreenWindowLayer();
 	
 	virtual	void				Draw(const BRect &r);

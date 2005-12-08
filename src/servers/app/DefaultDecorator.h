@@ -35,8 +35,8 @@ public:
 	virtual	void			Draw(BRect r);
 	virtual	void			Draw();
 
-	virtual	void			GetSizeLimits(float* minWidth, float* minHeight,
-										  float* maxWidth, float* maxHeight) const;
+	virtual	void			GetSizeLimits(int32* minWidth, int32* minHeight,
+										  int32* maxWidth, int32* maxHeight) const;
 
 	virtual	void			GetFootprint(BRegion *region);
 

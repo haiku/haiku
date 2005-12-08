@@ -19,7 +19,7 @@
 
 
 OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
-		const char* name, ServerWindow* window)
+		const char* name, ::ServerWindow* window)
 	: WindowLayer(bitmap->Bounds(), name,
 			B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			0, 0, window, new DrawingEngine()),
@@ -29,6 +29,12 @@ OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
 	GetDrawingEngine()->SetHWInterface(fHWInterface);
 	GetDrawingEngine()->Initialize();
 	GetDrawingEngine()->Update();
+
+	fVisibleRegion.Set(fFrame);
+	fVisibleContentRegion.Set(fFrame);
+	fVisibleContentRegionValid = true;
+	fContentRegion.Set(fFrame);
+	fContentRegionValid = true;
 }
 
 

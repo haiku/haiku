@@ -64,7 +64,7 @@ class ServerApp : public MessageLooper {
 		const char *Signature() const { return fSignature.String(); }
 
 		void RemoveWindow(ServerWindow* window);
-		bool OnWorkspace(int32 index);
+		bool OnWorkspace(int32 index) const;
 
 		int32 CountBitmaps() const;
 		ServerBitmap *FindBitmap(int32 token) const;
@@ -98,7 +98,7 @@ class ServerApp : public MessageLooper {
 		BString fSignature;
 		team_id fClientTeam;
 
-		BLocker fWindowListLock;
+		mutable BLocker fWindowListLock;
 		BObjectList<ServerWindow> fWindowList;
 		BPrivate::BTokenSpace fViewTokens;
 

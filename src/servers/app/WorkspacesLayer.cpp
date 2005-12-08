@@ -8,20 +8,21 @@
  */
 
 
-#include <ColorSet.h>
-#include <WindowPrivate.h>
+#include "WorkspacesLayer.h"
 
 #include "AppServer.h"
+#include "Desktop.h"
 #include "DrawingEngine.h"
-#include "RootLayer.h"
 #include "WindowLayer.h"
 #include "Workspace.h"
 
-#include "WorkspacesLayer.h"
+#include <ColorSet.h>
+#include <WindowPrivate.h>
+
 
 WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
-	int32 token, uint32 resizeMode, uint32 flags, DrawingEngine* driver)
-	: Layer(frame, name, token, resizeMode, flags, driver)
+	int32 token, uint32 resizeMode, uint32 flags)
+	: ViewLayer(frame, name, token, resizeMode, flags)
 {
 	fDrawState->SetLowColor(RGBColor(255, 255, 255));
 	fDrawState->SetHighColor(RGBColor(0, 0, 0));
@@ -98,7 +99,7 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 
 
 void
-WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
+WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspaceFrame,
 	const BRect& screenFrame, WindowLayer* window, BPoint windowPosition,
 	BRegion& backgroundRegion, bool active)
 {
@@ -108,12 +109,12 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	BPoint offset = window->Frame().LeftTop() - windowPosition;
 	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 		windowPosition);
-	BRect tabFrame = window->GetDecorator()->TabRect();
+	BRect tabFrame = window->Decorator()->TabRect();
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);
 
 	// ToDo: let decorator do this!
-	RGBColor yellow = window->GetDecorator()->GetColors().window_tab;
+	RGBColor yellow = window->Decorator()->Colors().window_tab;
 	RGBColor gray(180, 180, 180);
 	RGBColor white(255, 255, 255);
 
@@ -134,12 +135,12 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 	backgroundRegion.Exclude(tabFrame);
 	backgroundRegion.Exclude(frame);
 
-	GetDrawingEngine()->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
+	drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
-	GetDrawingEngine()->StrokeRect(frame, gray);
+	drawingEngine->StrokeRect(frame, gray);
 
 	frame.InsetBy(1, 1);
-	GetDrawingEngine()->FillRect(frame, white);
+	drawingEngine->FillRect(frame, white);
 
 	// draw title
 
@@ -170,7 +171,7 @@ WorkspacesLayer::_DrawWindow(const BRect& workspaceFrame,
 
 
 void
-WorkspacesLayer::_DrawWorkspace(int32 index)
+WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine, int32 index)
 {
 	BRect rect = _WorkspaceAt(index);
 
@@ -179,7 +180,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 	if (active) {
 		// draw active frame
 		RGBColor black(0, 0, 0);
-		GetDrawingEngine()->StrokeRect(rect, black);
+		drawingEngine->StrokeRect(rect, black);
 	}
 
 	rect.InsetBy(1, 1);
@@ -190,7 +191,7 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	// draw windows
 
-	BRegion backgroundRegion = VisibleRegion();
+	BRegion backgroundRegion = fLocalClipping;
 
 	// ToDo: would be nice to get the real update region here
 
@@ -203,23 +204,23 @@ WorkspacesLayer::_DrawWorkspace(int32 index)
 
 	BRegion workspaceRegion(rect);
 	backgroundRegion.IntersectWith(&workspaceRegion);
-	GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
+	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 
 	WindowLayer* window;
 	BPoint leftTop;
 	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
-		_DrawWindow(rect, screenFrame, window, leftTop,
-			backgroundRegion, active);
+		_DrawWindow(drawingEngine, rect, screenFrame, window,
+			leftTop, backgroundRegion, active);
 	}
 
 	// draw background
 
-	GetDrawingEngine()->ConstrainClippingRegion(&backgroundRegion);
-	GetDrawingEngine()->FillRect(rect, color);
+	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
+	drawingEngine->FillRect(rect, color);
 
 	// TODO: ConstrainClippingRegion() should accept a const parameter !!
-	BRegion cRegion(VisibleRegion());
-	GetDrawingEngine()->ConstrainClippingRegion(&cRegion);
+	BRegion cRegion(fLocalClipping);
+	drawingEngine->ConstrainClippingRegion(&cRegion);
 }
 
 
@@ -231,7 +232,8 @@ WorkspacesLayer::_DarkenColor(RGBColor& color) const
 
 
 void
-WorkspacesLayer::Draw(const BRect& updateRect)
+WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
+	BRegion* windowContentClipping, bool deep)
 {
 	int32 columns, rows;
 	_GetGrid(columns, rows);
@@ -241,9 +243,9 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 	// make sure the grid around the active workspace is not drawn
 	// to reduce flicker
 	BRect activeRect = _WorkspaceAt(Window()->Desktop()->CurrentWorkspace());
-	BRegion gridRegion(VisibleRegion());
+	BRegion gridRegion(fLocalClipping);
 	gridRegion.Exclude(activeRect);
-	GetDrawingEngine()->ConstrainClippingRegion(&gridRegion);
+	drawingEngine->ConstrainClippingRegion(&gridRegion);
 
 	BRect frame = Frame();
 	BPoint pt(0,0);
@@ -252,33 +254,33 @@ WorkspacesLayer::Draw(const BRect& updateRect)
 
 	// horizontal lines
 
-	GetDrawingEngine()->StrokeLine(BPoint(frame.left, frame.top),
+	drawingEngine->StrokeLine(BPoint(frame.left, frame.top),
 		BPoint(frame.right, frame.top), ViewColor());
 
 	for (int32 row = 0; row < rows; row++) {
 		BRect rect = _WorkspaceAt(row * columns);
-		GetDrawingEngine()->StrokeLine(BPoint(frame.left, rect.bottom),
+		drawingEngine->StrokeLine(BPoint(frame.left, rect.bottom),
 			BPoint(frame.right, rect.bottom), ViewColor());
 	}
 
 	// vertical lines
 
-	GetDrawingEngine()->StrokeLine(BPoint(frame.left, frame.top),
+	drawingEngine->StrokeLine(BPoint(frame.left, frame.top),
 		BPoint(frame.left, frame.bottom), ViewColor());
 
 	for (int32 column = 0; column < columns; column++) {
 		BRect rect = _WorkspaceAt(column);
-		GetDrawingEngine()->StrokeLine(BPoint(rect.right, frame.top),
+		drawingEngine->StrokeLine(BPoint(rect.right, frame.top),
 			BPoint(rect.right, frame.bottom), ViewColor());
 	}
 
-	BRegion cRegion(VisibleRegion());
-	GetDrawingEngine()->ConstrainClippingRegion(&cRegion);
+	BRegion cRegion(fLocalClipping);
+	drawingEngine->ConstrainClippingRegion(&cRegion);
 
 	// draw workspaces
 
 	for (int32 i = rows * columns; i-- > 0;) {
-		_DrawWorkspace(i);
+		_DrawWorkspace(drawingEngine, i);
 	}
 }
 
@@ -298,7 +300,7 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 	}
 
-	Layer::MouseDown(message, where, _viewToken);
+	//ViewLayer::MouseDown(message, where, _viewToken);
 }
 
 

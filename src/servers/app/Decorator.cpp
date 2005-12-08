@@ -288,8 +288,8 @@ Decorator::GetZoom()
 
 // GetSizeLimits
 void
-Decorator::GetSizeLimits(float* minWidth, float* minHeight,
-						 float* maxWidth, float* maxHeight) const
+Decorator::GetSizeLimits(int32* minWidth, int32* minHeight,
+						 int32* maxWidth, int32* maxHeight) const
 {
 }
 

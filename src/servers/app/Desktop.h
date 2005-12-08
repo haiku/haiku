@@ -18,30 +18,36 @@
 #include "VirtualScreen.h"
 #include "DesktopSettings.h"
 #include "MessageLooper.h"
+#include "WindowList.h"
 #include "Workspace.h"
 #include "WorkspacePrivate.h"
 
+#include <ObjectList.h>
+
+#include <Autolock.h>
 #include <InterfaceDefs.h>
 #include <List.h>
-#include <Locker.h>
 #include <Menu.h>
-#include <Autolock.h>
-#include <ObjectList.h>
+#include <Region.h>
 #include <Window.h>
 
+#define USE_MULTI_LOCKER 0
+
+#if USE_MULTI_LOCKER
+#  include "MultiLocker.h"
+#else
+#  include <Locker.h>
+#endif
 
 class BMessage;
 
 class DrawingEngine;
 class HWInterface;
-class Layer;
-class RootLayer;
-class WindowLayer;
+class ServerApp;
 
 namespace BPrivate {
 	class LinkSender;
 };
-
 
 class Desktop : public MessageLooper, public ScreenOwner {
 	public:
@@ -63,7 +69,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fActiveScreen; }
 		Screen*					ActiveScreen() const
 									{ return fActiveScreen; }
-		::RootLayer*			RootLayer() const { return fRootLayer; }
+
 		CursorManager&			GetCursorManager() { return fCursorManager; }
 
 		void					ScreenChanged(Screen* screen);
@@ -85,11 +91,13 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fCurrentWorkspace; }
 		Workspace::Private&		WorkspaceAt(int32 index)
 									{ return fWorkspaces[index]; }
+		void					UpdateWorkspaces();
 
 		// WindowLayer methods
 
 		void					ActivateWindow(WindowLayer* window);
-		void					SendBehindWindow(WindowLayer* window, WindowLayer* front);
+		void					SendWindowBehind(WindowLayer* window,
+									WindowLayer* behindOf = NULL);
 
 		void					ShowWindow(WindowLayer* window);
 		void					HideWindow(WindowLayer* window);
@@ -107,11 +115,38 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetWindowFeel(WindowLayer* window, window_feel feel);
 		void					SetWindowFlags(WindowLayer* window, uint32 flags);
 
+		WindowLayer*			FocusWindow() const { return fFocus; }
+		WindowLayer*			FrontWindow() const { return fFront; }
+		WindowLayer*			BackWindow() const { return fBack; }
+
+		WindowLayer*			WindowAt(BPoint where);
+
+		WindowLayer*			MouseEventWindow() const { return fMouseEventWindow; }
+		void					SetMouseEventWindow(WindowLayer* window);
+
+		void					SetFocusWindow(WindowLayer* window);
+
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
 		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
 
-		// get list of registed windows
-		const BObjectList<WindowLayer>& WindowList() const;
+#if USE_MULTI_LOCKER
+		bool					ReadLockWindows() { return fWindowLock.ReadLock(); }
+		void					ReadUnlockWindows() { fWindowLock.ReadUnlock(); }
+
+		bool					WriteLockWindows() { return fWindowLock.WriteLock(); }
+		void					WriteUnlockWindows() { fWindowLock.WriteUnlock(); }
+#else // USE_MULTI_LOCKER
+		bool					ReadLockWindows() { return fWindowLock.Lock(); }
+		void					ReadUnlockWindows() { fWindowLock.Unlock(); }
+
+		bool					WriteLockWindows() { return fWindowLock.Lock(); }
+		void					WriteUnlockWindows() { fWindowLock.Unlock(); }
+#endif // USE_MULTI_LOCKER
+
+		void					MarkDirty(BRegion& region);
+
+		BRegion&				BackgroundRegion()
+									{ return fBackgroundRegion; }
 
 		void					WriteWindowList(team_id team,
 									BPrivate::LinkSender& sender);
@@ -119,13 +154,30 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkSender& sender);
 
 	private:
+		void					_ShowWindow(WindowLayer* window,
+									bool affectsOtherWindows = true);
+		void					_HideWindow(WindowLayer* window);
+
 		void					_ChangeWindowWorkspaces(WindowLayer* window,
 									uint32 oldWorkspaces, uint32 newWorkspaces);
+		void					_BringWindowsToFront(WindowList& windows,
+									int32 list, bool wereVisible);
  		status_t				_ActivateApp(team_id team);
+
+		void					_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen);
+		void					_TriggerWindowRedrawing(BRegion& newDirtyRegion);
+		void					_SetBackground(BRegion& background);
+
+		void					_UpdateBack();
+		void					_UpdateFront();
+		void					_UpdateFronts();
+
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
 		void					_DispatchMessage(int32 code,
 									BPrivate::LinkReceiver &link);
+
+		WindowList&				_CurrentWindows();
 
 	private:
 		friend class DesktopSettings;
@@ -137,8 +189,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		::EventDispatcher		fEventDispatcher;
 		port_id					fInputPort;
 
-		BLocker					fAppListLock;
-		BList					fAppList;
+		BLocker					fApplicationsLock;
+		BObjectList<ServerApp>	fApplications;
 
 		sem_id					fShutdownSemaphore;
 		int32					fShutdownCount;
@@ -146,12 +198,28 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		::Workspace::Private	fWorkspaces[32];
 		int32					fCurrentWorkspace;
 
-		BObjectList<WindowLayer> fWindowLayerList;
+		WindowList				fAllWindows;
 
 		::RootLayer*			fRootLayer;
 		Screen*					fActiveScreen;
 
 		CursorManager			fCursorManager;
+
+#if USE_MULTI_LOCKER
+		MultiLocker				fWindowLock;
+#else
+		BLocker					fWindowLock;
+#endif
+
+		BRegion					fBackgroundRegion;
+		BRegion					fScreenRegion;
+
+		bool					fFocusFollowsMouse;
+
+		WindowLayer*			fMouseEventWindow;
+		WindowLayer*			fFocus;
+		WindowLayer*			fFront;
+		WindowLayer*			fBack;
 };
 
 #endif	// DESKTOP_H

@@ -38,6 +38,7 @@
 #include "CursorManager.h"
 #include "CursorSet.h"
 #include "Desktop.h"
+#include "DebugInfoManager.h"
 #include "DecorManager.h"
 #include "DrawingEngine.h"
 #include "EventStream.h"
@@ -46,7 +47,6 @@
 #include "InputManager.h"
 #include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
-#include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
@@ -93,7 +93,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fAppCursor(NULL),
 	fCursorHidden(false),
 	fIsActive(false),
-	fSharedMem("shared memory")
+	fSharedMem("shared memory", 32768)
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
@@ -231,7 +231,7 @@ ServerApp::Run()
 		return false;
 
 	// Let's tell the client how to talk with us
-	fLink.StartMessage(SERVER_TRUE);
+	fLink.StartMessage(B_OK);
 	fLink.Attach<int32>(fMessagePort);
 	fLink.Flush();
 
@@ -531,7 +531,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			void *sharedmem = fSharedMem.GetBuffer(memsize);
 
 			if (memsize < 1 || sharedmem == NULL) {
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 				break;
 			}
@@ -540,7 +540,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			area_info info;
 
 			if (owningArea == B_ERROR || get_area_info(owningArea, &info) < B_OK) {
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 				break;
 			}
@@ -548,7 +548,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 areaoffset = (addr_t)sharedmem - (addr_t)info.address;
 			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<area_id>(owningArea);
 			fLink.Attach<int32>(areaoffset);
 			fLink.Flush();
@@ -582,13 +582,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Received decorator update notification\n", Signature()));
 
-			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+			// TODO: implement or remove AS_UPDATE_DECORATOR
+/*			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 				ServerWindow *window = fWindowList.ItemAt(i);
 				window->Lock();
 				const_cast<WindowLayer *>(window->GetWindowLayer())->UpdateDecorator();
 				window->Unlock();
 			}
-			break;
+*/			break;
 		}
 		case AS_SET_DECORATOR:
 		{
@@ -606,14 +607,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_COUNT_DECORATORS:
 		{
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(gDecorManager.CountDecorators());
 			fLink.Flush();
 			break;
 		}
 		case AS_GET_DECORATOR:
 		{
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(gDecorManager.GetDecorator());
 			fLink.Flush();
 			break;
@@ -624,14 +625,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&index);
 
 			BString str(gDecorManager.GetDecoratorName(index));
-			if (str.CountChars() > 0)
-			{
-				fLink.StartMessage(SERVER_TRUE);
+			if (str.CountChars() > 0) {
+				fLink.StartMessage(B_OK);
 				fLink.AttachString(str.String());
-			}
-			else
-				fLink.StartMessage(SERVER_FALSE);
-			
+			} else
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 		}
@@ -659,16 +658,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Received BBitmap creation request\n", Signature()));
 			// Allocate a bitmap for an application
-			
+
 			// Attached Data:
 			// 1) BRect bounds
 			// 2) color_space space
 			// 3) int32 bitmap_flags
 			// 4) int32 bytes_per_row
 			// 5) int32 screen_id::id
-			// 6) port_id reply port
 			
-			// Reply Code: SERVER_TRUE
 			// Reply Data:
 			//	1) int32 server token
 			//	2) area_id id of the area in which the bitmap data resides
@@ -694,13 +691,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						Signature(), frame.Width(), frame.Height()));
 
 			if (bitmap && fBitmapList.AddItem((void*)bitmap)) {
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<area_id>(bitmap->Area());
 				fLink.Attach<int32>(bitmap->AreaOffset());
 			} else {
-				// alternatively, if something went wrong, we reply with SERVER_FALSE
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_NO_MEMORY);
 			}
 
 			fLink.Flush();
@@ -713,10 +709,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Attached Data:
 			// 1) int32 token
-			// 2) int32 reply port
-
-			// Reply Code: SERVER_TRUE if successful, 
-			//				SERVER_FALSE if the buffer was already deleted or was not found
 			int32 id;
 			link.Read<int32>(&id);
 
@@ -725,11 +717,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), id));
 
 				gBitmapManager->DeleteBitmap(bitmap);
-				fLink.StartMessage(SERVER_TRUE);
-			} else
-				fLink.StartMessage(SERVER_FALSE);
-
-			fLink.Flush();	
+			}
 			break;
 		}
 #if 0
@@ -787,7 +775,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				if (fDesktop->CurrentWorkspace() >= newCount)
 					fDesktop->SetWorkspace(newCount - 1);
 				else
-					fDesktop->RootLayer()->UpdateWorkspaces();
+					fDesktop->UpdateWorkspaces();
 			}
 			break;
 		}
@@ -838,7 +826,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
 			STRACE(("ServerApp %s: Received IsCursorHidden request\n", Signature()));
-			fLink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
+			fLink.StartMessage(fCursorHidden ? B_OK : B_ERROR);
 			fLink.Flush();
 			break;
 		}
@@ -886,7 +874,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (sync) {
 				// the application is expecting a reply, but plans to do literally nothing
 				// with the data, so we'll just reuse the cursor token variable
-				fLink.StartMessage(SERVER_TRUE);
+				fLink.StartMessage(B_OK);
 				fLink.Flush();
 			}
 			break;
@@ -914,7 +902,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fDesktop->GetCursorManager().AddCursor(fAppCursor);
 
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(fAppCursor->ID());
 			fLink.Flush();
 			break;
@@ -940,7 +928,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			DesktopSettings settings(fDesktop);
 			settings.GetScrollBarInfo(info);
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<scroll_bar_info>(info);
 			fLink.Flush();
 			break;
@@ -956,7 +944,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				settings.SetScrollBarInfo(info);
 			}
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Flush();
 			break;
 		}
@@ -1006,7 +994,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
 			DesktopSettings settings(fDesktop);
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<mode_mouse>(settings.MouseMode());
 			fLink.Flush();
 			break;
@@ -1018,7 +1006,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// using a ColorSet object
 			gGUIColorSet.Lock();
 			
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<ColorSet>(gGUIColorSet);
 			fLink.Flush();
 			
@@ -1051,7 +1039,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			color = gGUIColorSet.AttributeToColor(whichColor);
 			gGUIColorSet.Unlock();
 
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<rgb_color>(color.GetColor32());
 			fLink.Flush();
 			break;
@@ -1838,14 +1826,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				// TODO implement for real
 				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, string_escapement, mode, delta)) {
-					fLink.StartMessage(SERVER_TRUE);
+					fLink.StartMessage(B_OK);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;
 				}
 			}
 
 			if (!success)
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
 			break;
@@ -1912,7 +1900,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				// TODO implement for real
 				if (font.GetBoundingBoxesForStrings(stringArray, lengthArray, numStrings, rectArray, mode, deltaArray)) {
-					fLink.StartMessage(SERVER_TRUE);
+					fLink.StartMessage(B_OK);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;
 				}
@@ -1922,7 +1910,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				free(stringArray[i]);
 
 			if (!success)
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
 			break;
@@ -2036,18 +2024,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			bool makedefault = false;
 			link.Read<bool>(&makedefault);
 
-			RootLayer* rootLayer = fDesktop->RootLayer();
-			rootLayer->Lock();
-			status_t status = fDesktop->ScreenAt(0)->SetMode(mode);
-			if (status == B_OK) {
-				BRect bounds = rootLayer->Bounds();
-				rootLayer->ResizeBy(mode.virtual_width - 1 - bounds.Width(),
-					mode.virtual_height - 1 - bounds.Height());
-
-				gInputManager->UpdateScreenBounds(rootLayer->Bounds());
-				fDesktop->ScreenChanged(fDesktop->ScreenAt(0));
+			status_t status = B_ERROR;
+			if (fDesktop->WriteLockWindows()) {
+				status = fDesktop->ScreenAt(0)->SetMode(mode);
+				if (status == B_OK) {
+					gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
+					fDesktop->ScreenChanged(fDesktop->ScreenAt(0));
+				}
+				fDesktop->WriteUnlockWindows();
 			}
-			rootLayer->Unlock();
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -2313,7 +2298,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 			} else
 				puts("message doesn't need a reply!");
@@ -2418,7 +2403,7 @@ ServerApp::RemoveWindow(ServerWindow* window)
 
 
 bool
-ServerApp::OnWorkspace(int32 index)
+ServerApp::OnWorkspace(int32 index) const
 {
 	BAutolock locker(fWindowListLock);
 

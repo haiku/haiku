@@ -184,13 +184,13 @@ DefaultDecorator::MoveBy(BPoint pt)
 void
 DefaultDecorator::ResizeBy(float x, float y)
 {
-	ResizeBy(BPoint(x,y));
+	ResizeBy(BPoint(x, y));
 }
 
 void
 DefaultDecorator::ResizeBy(BPoint pt)
 {
-	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n",pt.x,pt.y));
+	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", pt.x, pt.y));
 	// Move all internal rectangles the appropriate amount
 	_frame.right		+= pt.x;
 	_frame.bottom		+= pt.y;
@@ -250,13 +250,13 @@ DefaultDecorator::Draw()
 
 // GetSizeLimits
 void
-DefaultDecorator::GetSizeLimits(float* minWidth, float* minHeight,
-								float* maxWidth, float* maxHeight) const
+DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
+								int32* maxWidth, int32* maxHeight) const
 {
 	if (_tabrect.IsValid())
-		*minWidth = max_c(*minWidth, fMinTabWidth - 2 * fBorderWidth);
+		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabWidth - 2 * fBorderWidth));
 	if (_resizerect.IsValid())
-		*minHeight = max_c(*minHeight, _resizerect.Height() - fBorderWidth);
+		*minHeight = (int32)roundf(max_c(*minHeight, _resizerect.Height() - fBorderWidth));
 }
 
 // GetFootprint
@@ -309,7 +309,7 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 
 	if (!(fFlags & B_NOT_ZOOMABLE) && _zoomrect.Contains(pt))
 		return DEC_ZOOM;
-	
+
 	if (fLook == B_DOCUMENT_WINDOW_LOOK && _resizerect.Contains(pt))
 		return DEC_RESIZE;
 
@@ -466,7 +466,7 @@ DefaultDecorator::_DoLayout()
 
 	// calculate resize rect
 	_resizerect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
-					fBottomBorder.right - 3, fBottomBorder.bottom - 3);
+					fBottomBorder.right, fBottomBorder.bottom);
 }
 
 // _DrawFrame
@@ -559,17 +559,15 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 	// Draw the resize thumb if we're supposed to
 	if (!(fFlags & B_NOT_RESIZABLE)) {
-
 		r = _resizerect;
 
 		switch (fLook){
 			case B_DOCUMENT_WINDOW_LOOK: {
-
-				// Explicitly locking the driver is normally unnecessary. However, we need to do
-				// this because we are rapidly drawing a series of calls which would not necessarily
-				// draw correctly if we didn't do so.
-				float	x = r.right;
-				float	y = r.bottom;
+				// Explicitly locking the driver is normally unnecessary. However, we 
+				// need to do this because we are rapidly drawing a series of calls
+				// which would not necessarily draw correctly if we didn't do so.
+				float x = r.right - 3;
+				float y = r.bottom - 3;
 				_driver->Lock();
 				_driver->FillRect(BRect(x-13, y-13, x, y), fFrameColors[2]);
 				_driver->StrokeLine(BPoint(x-15, y-15), BPoint(x-15, y-2), fFrameColors[0]);
@@ -600,7 +598,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 									fFrameColors[0]);
 				break;
 			}
-			
+
 			default: {
 				// don't draw resize corner
 				break;
@@ -715,7 +713,7 @@ DefaultDecorator::_SetFocus()
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 	
-	if (GetFocus()) {
+	if (IsFocus()) {
 		fButtonHighColor.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
 		fButtonLowColor.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->window_tab_text;

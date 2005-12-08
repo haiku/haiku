@@ -31,7 +31,6 @@ Server app_server :
 	FontManager.cpp
 	HashTable.cpp
 	InputManager.cpp
-	Layer.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
@@ -40,7 +39,6 @@ Server app_server :
 	PicturePlayer.cpp
 	RAMLinkMsgReader.cpp
 	RGBColor.cpp
-	RootLayer.cpp
 	ScreenManager.cpp
 	ServerApp.cpp
 	ServerBitmap.cpp
@@ -49,10 +47,11 @@ Server app_server :
 	ServerPicture.cpp
 	ServerScreen.cpp
 	ServerWindow.cpp
-	SubWindowList.cpp
 	SystemPalette.cpp
+	ViewLayer.cpp
 	VirtualScreen.cpp
 	WindowLayer.cpp
+	WindowList.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
 

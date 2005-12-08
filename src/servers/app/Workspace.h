@@ -35,7 +35,6 @@ class Workspace {
 	private:
 		Workspace::Private& fWorkspace;
 		Desktop&	fDesktop;
-		int32		fIndex;
 		WindowLayer* fCurrent;
 		bool		fCurrentWorkspace;
 };

@@ -80,16 +80,15 @@ class Decorator {
 			bool				GetMinimize();
 			bool				GetZoom();
 
-	virtual	void				GetSizeLimits(float* minWidth, float* minHeight,
-											  float* maxWidth, float* maxHeight) const;
+	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
+									int32* maxWidth, int32* maxHeight) const;
 
-
-			void				SetFocus(bool is_active);
-			bool				GetFocus()
+			void				SetFocus(bool focussed);
+			bool				IsFocus()
 									{ return fIsFocused; };
-			ColorSet			GetColors()
+			ColorSet			Colors()
 									{ return (_colors) ? *_colors : ColorSet(); }
-	
+
 	virtual	void				GetFootprint(BRegion *region);
 
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,

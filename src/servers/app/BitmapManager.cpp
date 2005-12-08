@@ -32,7 +32,7 @@ using std::nothrow;
 BitmapManager *gBitmapManager = NULL;
 
 //! Number of bytes to allocate to each area used for bitmap storage
-#define BITMAP_AREA_SIZE	B_PAGE_SIZE * 2
+#define BITMAP_AREA_SIZE	B_PAGE_SIZE * 16
 
 
 //! Sets up stuff to be ready to allocate space for bitmaps

@@ -38,7 +38,7 @@ class Decorator;
 class WindowLayer;
 class Workspace;
 class RootLayer;
-class Layer;
+class ViewLayer;
 class ServerPicture;
 struct dw_data;
 struct window_info;
@@ -97,7 +97,8 @@ public:
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
 			
-			void				HandleDirectConnection(int bufferState = -1, int driverState = -1);
+			void				HandleDirectConnection(int bufferState = -1,
+									int driverState = -1);
 
 	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
@@ -106,19 +107,27 @@ public:
 
 private:
 			// methods for retrieving and creating a tree strcture of Layers.
-			Layer*				CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent);
-			void				SetLayerState(Layer *layer, BPrivate::LinkReceiver &link);
-			void				SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link);
+			ViewLayer*			CreateLayerTree(BPrivate::LinkReceiver &link,
+									ViewLayer **_parent);
+			void				SetLayerState(ViewLayer *layer,
+									BPrivate::LinkReceiver &link);
+			void				SetLayerFontState(ViewLayer *layer,
+									BPrivate::LinkReceiver &link);
 
 			// message handling methods.
 			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
-			void				_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link);
+			void				_DispatchViewMessage(int32 code,
+									BPrivate::LinkReceiver &link);
+			void				_DispatchViewDrawingMessage(int32 code,
+									BPrivate::LinkReceiver &link);
 			void				_MessageLooper();
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);
 
 			status_t			_EnableDirectWindowMode();
-			
+
+			void				_SetCurrentLayer(ViewLayer* view);
+
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 												BRegion &,
@@ -146,7 +155,9 @@ private:
 			int32				fServerToken;
 			int32				fClientToken;
 
-			Layer*				fCurrentLayer;
+			ViewLayer*			fCurrentLayer;
+			BRegion				fCurrentDrawingRegion;
+			bool				fCurrentDrawingRegionValid;
 			
 			dw_data*			fDirectWindowData;
 };

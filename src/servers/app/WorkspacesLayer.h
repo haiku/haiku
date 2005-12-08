@@ -9,18 +9,21 @@
 #define WORKSPACES_LAYER_H
 
 
-#include "Layer.h"
+#include "ViewLayer.h"
 
 class WindowLayer;
 
 
-class WorkspacesLayer : public Layer {
+class WorkspacesLayer : public ViewLayer {
 	public:
 		WorkspacesLayer(BRect frame, const char* name, int32 token,
-			uint32 resize, uint32 flags, DrawingEngine* driver);
+			uint32 resize, uint32 flags);
 		virtual ~WorkspacesLayer();
 
-		virtual	void Draw(const BRect& updateRect);
+		virtual	void Draw(DrawingEngine* drawingEngine,
+						BRegion* effectiveClipping,
+						BRegion* windowContentClipping,
+						bool deep = false);
 		virtual void MouseDown(BMessage* message, BPoint where, int32* _viewToken);
 
 	private:
@@ -30,11 +33,11 @@ class WorkspacesLayer : public Layer {
 					const BRect& screenFrame, const BRect& windowFrame,
 					BPoint windowPosition);
 
-		void _DrawWindow(const BRect& workspaceFrame,
+		void _DrawWindow(DrawingEngine* drawingEngine, const BRect& workspaceFrame,
 					const BRect& screenFrame, WindowLayer* window,
 					BPoint windowPosition, BRegion& backgroundRegion,
 					bool active);
-		void _DrawWorkspace(int32 index);
+		void _DrawWorkspace(DrawingEngine* drawingEngine, int32 index);
 
 		void _DarkenColor(RGBColor& color) const;
 };

@@ -10,14 +10,12 @@
 
 
 #include "RGBColor.h"
+#include "WindowList.h"
 #include "Workspace.h"
 
+#include <Accelerant.h>
 #include <ObjectList.h>
 #include <String.h>
-
-
-class RootLayer;
-class WindowLayer;
 
 
 struct display_info {
@@ -26,22 +24,14 @@ struct display_info {
 	display_mode	mode;
 };
 
-struct window_layer_info {
-	BPoint			position;
-	WindowLayer*	window;
-};
-
 class Workspace::Private {
 	public:
 		Private();
 		~Private();
 
-		bool				AddWindow(WindowLayer* window, BPoint* point = NULL);
-		void				RemoveWindow(WindowLayer* window);
-		void				RemoveWindowAt(int32 index);
+		int32				Index() const { return fWindows.Index(); }
 
-		int32				CountWindows() const { return fWindows.CountItems(); }
-		window_layer_info*	WindowAt(int32 index) const { return fWindows.ItemAt(index); }
+		WindowList&			Windows() { return fWindows; }
 
 		// displays
 
@@ -61,7 +51,7 @@ class Workspace::Private {
 	private:
 		void				_SetDefaults();
 
-		BObjectList<window_layer_info> fWindows;
+		WindowList			fWindows;
 		WindowLayer*		fFront;
 		WindowLayer*		fFocus;
 
@@ -69,7 +59,5 @@ class Workspace::Private {
 
 		RGBColor			fColor;
 };
-
-extern const BPoint kInvalidWindowPosition;
 
 #endif	/* WORKSPACE_PRIVATE_H */

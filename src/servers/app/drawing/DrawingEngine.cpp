@@ -120,16 +120,16 @@ DrawingEngine::Update()
 	}
 }
 
-// SetHWInterface
+
 void
 DrawingEngine::SetHWInterface(HWInterface* interface)
 {
 	fGraphicsCard = interface;
 }
 
-// ConstrainClippingRegion
+
 void
-DrawingEngine::ConstrainClippingRegion(BRegion *region)
+DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 {
 	if (Lock()) {
 		if (!region) {
@@ -377,7 +377,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 
 // CopyRegionList
 //
-// * used to move windows arround on screen
+// * used to move windows around on screen
 // TODO: Since the regions are passed to CopyRegion() one by one,
 // the case of different regions overlapping each other at source
 // and/or dest locations is not handled.
@@ -395,7 +395,6 @@ DrawingEngine::CopyRegionList(BList* list, BList* pList,
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
 	if (WriteLock()) {
-
 		for (int32 i = 0; i < rCount; i++) {
 			BRegion* region = (BRegion*)list->ItemAt(i);
 			BPoint* offset = (BPoint*)pList->ItemAt(i);
@@ -583,7 +582,6 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 		make_rect_valid(r);
 		BRect clipped = fPainter->ClipRect(r);
 		if (clipped.IsValid()) {
-
 			fGraphicsCard->HideSoftwareCursor(clipped);
 	
 			fPainter->StrokeRect(r, color.GetColor32());
@@ -671,13 +669,12 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 		r = fPainter->ClipRect(r);
 		if (r.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(r);
-	
+
 			bool doInSoftware = true;
 			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
-				(d->GetDrawingMode() == B_OP_COPY ||
-				 d->GetDrawingMode() == B_OP_OVER)) {
-	
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
+				&& (d->GetDrawingMode() == B_OP_COPY
+					|| d->GetDrawingMode() == B_OP_OVER)) {
 				if (d->GetPattern() == B_SOLID_HIGH) {
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
@@ -691,13 +688,12 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 				}
 			}
 			if (doInSoftware) {
-	
 				fPainter->SetDrawState(d);
 				fPainter->FillRect(r);
-		
+
 				fGraphicsCard->Invalidate(r);
 			}
-	
+
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
@@ -715,16 +711,16 @@ DrawingEngine::StrokeRegion(BRegion& r, const DrawState *d)
 		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
-	
+
 			fPainter->SetDrawState(d);
-	
+
 			BRect touched = fPainter->StrokeRect(r.RectAt(0));
-	
+
 			int32 count = r.CountRects();
 			for (int32 i = 1; i < count; i++) {
 				touched = touched | fPainter->StrokeRect(r.RectAt(i));
 			}
-	
+
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -744,13 +740,12 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 		BRect clipped = fPainter->ClipRect(r.Frame());
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
-	
+
 			bool doInSoftware = true;
 			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
-				(d->GetDrawingMode() == B_OP_COPY ||
-				 d->GetDrawingMode() == B_OP_OVER)) {
-	
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
+				&& (d->GetDrawingMode() == B_OP_COPY
+					|| d->GetDrawingMode() == B_OP_OVER)) {
 				if (d->GetPattern() == B_SOLID_HIGH) {
 					fGraphicsCard->FillRegion(r, d->HighColor());
 					doInSoftware = false;
@@ -759,20 +754,20 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 					doInSoftware = false;
 				}
 			}
+
 			if (doInSoftware) {
-	
 				fPainter->SetDrawState(d);
-		
+
 				BRect touched = fPainter->FillRect(r.RectAt(0));
-		
+
 				int32 count = r.CountRects();
 				for (int32 i = 1; i < count; i++) {
 					touched = touched | fPainter->FillRect(r.RectAt(i));
 				}
-		
+
 				fGraphicsCard->Invalidate(touched);
 			}
-	
+
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
@@ -780,58 +775,96 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 	}
 }
 
-// DrawRoundRect
+
+// FillRegion
 void
-DrawingEngine::DrawRoundRect(BRect r, const float &xrad,
-							 const float &yrad, const DrawState *d,
-							 bool filled)
+DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 {
-	if (Lock()) {
-		// NOTE: the stroke does not extend past "r" in R5,
-		// though I consider this unexpected behaviour.
-		make_rect_valid(r);
-		BRect clipped = fPainter->ClipRect(r);
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	if (WriteLock()) {
+		BRect clipped = fPainter->ClipRect(r.Frame());
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
-								   : fPainter->StrokeRoundRect(r, xrad, yrad);
-	
-			fGraphicsCard->Invalidate(touched);
+
+			bool doInSoftware = true;
+			// try hardware optimized version first
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+				fGraphicsCard->FillRegion(r, color);
+				doInSoftware = false;
+			}
+
+			if (doInSoftware) {
+
+				int32 count = r.CountRects();
+				for (int32 i = 0; i < count; i++) {
+					fPainter->FillRect(r.RectAt(i), color.GetColor32());
+				}
+				BRect touched = r.Frame();
+
+				fGraphicsCard->Invalidate(touched);
+			}
+
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		Unlock();
+		WriteUnlock();
 	}
 }
 
-// DrawShape
+
 void
-DrawingEngine::DrawShape(const BRect& bounds, const int32& opCount,
-						 const uint32* opList, const int32& ptCount,
-						 const BPoint* ptList, const DrawState* d,
-						 bool filled)
+DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
+	const DrawState* d, bool filled)
 {
-	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
+	if (!Lock())
+		return;
+
+	// NOTE: the stroke does not extend past "r" in R5,
+	// though I consider this unexpected behaviour.
+	make_rect_valid(r);
+	BRect clipped = fPainter->ClipRect(r);
+	if (clipped.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawState(d);
-		BRect touched = fPainter->DrawShape(opCount, opList,
-											ptCount, ptList,
-											filled);
+		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
+							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
-
-		Unlock();
 	}
+
+	Unlock();
 }
 
-// DrawTriangle
+
+void
+DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
+	const uint32* opList, int32 ptCount, const BPoint* ptList,
+	const DrawState* d, bool filled)
+{
+	if (!Lock())
+		return;
+
+	fGraphicsCard->HideSoftwareCursor();
+
+	fPainter->SetDrawState(d);
+	BRect touched = fPainter->DrawShape(opCount, opList,
+										ptCount, ptList,
+										filled);
+
+	fGraphicsCard->Invalidate(touched);
+	fGraphicsCard->ShowSoftwareCursor();
+
+	Unlock();
+}
+
+
 void
 DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
-							const DrawState* d, bool filled)
+	const DrawState* d, bool filled)
 {
 	if (Lock()) {
 		BRect clipped(bounds);
@@ -840,13 +873,13 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(clipped);
-	
+
 			fPainter->SetDrawState(d);
 			if (filled)
 				fPainter->FillTriangle(pts[0], pts[1], pts[2]);
 			else
 				fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
-	
+
 			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -892,9 +925,9 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 		touched = fPainter->ClipRect(touched);
 		if (touched.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(touched);
-	
+
 			touched = fPainter->StrokeLine(start, end, context);
-	
+
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -905,13 +938,12 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 
 // StrokeLineArray
 void
-DrawingEngine::StrokeLineArray(const int32 &numlines,
-							   const LineArrayData *linedata,
-							   const DrawState *d)
+DrawingEngine::StrokeLineArray(int32 numLines,
+	const LineArrayData *linedata, const DrawState *d)
 {
-	if(!d || !linedata || numlines <= 0)
+	if (!d || !linedata || numLines <= 0)
 		return;
-	
+
 	if (Lock()) {
 		// figure out bounding box for line array
 		const LineArrayData *data = (const LineArrayData *)&(linedata[0]);
@@ -919,7 +951,8 @@ DrawingEngine::StrokeLineArray(const int32 &numlines,
 					  min_c(data->pt1.y, data->pt2.y),
 					  max_c(data->pt1.x, data->pt2.x),
 					  max_c(data->pt1.y, data->pt2.y));
-		for (int32 i = 1; i < numlines; i++) {
+
+		for (int32 i = 1; i < numLines; i++) {
 			data = (const LineArrayData *)&(linedata[i]);
 			BRect box(min_c(data->pt1.x, data->pt2.x),
 					  min_c(data->pt1.y, data->pt2.y),
@@ -931,20 +964,20 @@ DrawingEngine::StrokeLineArray(const int32 &numlines,
 		touched = fPainter->ClipRect(touched);
 		if (touched.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(touched);
-	
+
 			DrawState context;
 			context.SetDrawingMode(B_OP_COPY);
-			
+
 			data = (const LineArrayData *)&(linedata[0]);
 			context.SetHighColor(data->color);
 			fPainter->StrokeLine(data->pt1, data->pt2, &context);
-			
-			for (int32 i = 1; i < numlines; i++) {
+
+			for (int32 i = 1; i < numLines; i++) {
 				data = (const LineArrayData *)&(linedata[i]);
 				context.SetHighColor(data->color);
 				fPainter->StrokeLine(data->pt1, data->pt2, &context);
 			}
-			
+
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -1007,11 +1040,11 @@ DrawingEngine::DrawString(const char* string, int32 length,
 		if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 			fGraphicsCard->HideSoftwareCursor(b);
-	
+
 //now = system_time();
 			BRect touched = fPainter->DrawString(string, length, pt, delta);
 //printf("drawing string: %lld µs\n", system_time() - now);
-	
+
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
@@ -1119,22 +1152,20 @@ DrawingEngine::DumpToBitmap()
 	return NULL;
 }
 
-// _CopyRect
+
 BRect
 DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 {
 	BRect dst;
 	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
 	if (buffer) {
-
 		BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
 
 		dst = src;
 		dst.OffsetBy(xOffset, yOffset);
 
 		if (clip.Intersects(src) && clip.Intersects(dst)) {
-
-			uint32 bpr = buffer->BytesPerRow();
+			uint32 bytesPerRow = buffer->BytesPerRow();
 			uint8* bits = (uint8*)buffer->Bits();
 
 			// clip source rect
@@ -1146,12 +1177,12 @@ DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 			src = src & dst;
 
 			// calc offset in buffer
-			bits += (int32)src.left * 4 + (int32)src.top * bpr;
+			bits += (int32)src.left * 4 + (int32)src.top * bytesPerRow;
 
 			uint32 width = src.IntegerWidth() + 1;
 			uint32 height = src.IntegerHeight() + 1;
 
-			_CopyRect(bits, width, height, bpr, xOffset, yOffset);
+			_CopyRect(bits, width, height, bytesPerRow, xOffset, yOffset);
 
 			// offset dest again, because it is return value
 			dst.OffsetBy(xOffset, yOffset);
@@ -1160,10 +1191,10 @@ DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 	return dst;
 }
 
-// _CopyRect
+
 void
 DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
-								uint32 bpr, int32 xOffset, int32 yOffset) const
+	uint32 bytesPerRow, int32 xOffset, int32 yOffset) const
 {
 	int32 xIncrement;
 	int32 yIncrement;
@@ -1179,14 +1210,14 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 
 	if (yOffset > 0) {
 		// copy from bottom to top
-		yIncrement = -bpr;
-		src += (height - 1) * bpr;
+		yIncrement = -bytesPerRow;
+		src += (height - 1) * bytesPerRow;
 	} else {
 		// copy from top to bottom
-		yIncrement = bpr;
+		yIncrement = bytesPerRow;
 	}
 
-	uint8* dst = src + yOffset * bpr + xOffset * 4;
+	uint8* dst = src + yOffset * bytesPerRow + xOffset * 4;
 
 	for (uint32 y = 0; y < height; y++) {
 		uint32* srcHandle = (uint32*)src;

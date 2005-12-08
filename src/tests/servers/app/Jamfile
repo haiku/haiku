@@ -77,7 +77,6 @@ Server haiku_app_server :
 	# Misc. Sources
 	Decorator.cpp
 	DebugInfoManager.cpp
-	SubWindowList.cpp
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
 	MessageLooper.cpp
@@ -108,13 +107,13 @@ Server haiku_app_server :
 	VirtualScreen.cpp
 	BitmapHWInterface.cpp
 	DefaultDecorator.cpp
-	Layer.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindowLayer.cpp
-	RootLayer.cpp
 	ServerPicture.cpp
 	ServerScreen.cpp
+	ViewLayer.cpp
 	WindowLayer.cpp
+	WindowList.cpp
 	Workspace.cpp
 	WorkspacesLayer.cpp
 

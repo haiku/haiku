@@ -10,6 +10,7 @@
 
 
 #include <Locker.h>
+#include <Message.h>
 #include <MessageFilter.h>
 #include <Messenger.h>
 #include <ObjectList.h>
@@ -83,6 +84,12 @@ class EventDispatcher : public BLocker {
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
 
+		void SetDragMessage(BMessage& message);
+			// the message should be delivered on the next
+			// "mouse up".
+			// if the mouse is not pressed, it should
+			// be delivered to the "current" target right away.
+
 	private:
 		status_t _Run();
 		void _Unset();
@@ -100,6 +107,8 @@ class EventDispatcher : public BLocker {
 		bool _AddListener(EventTarget& target, int32 token,
 				uint32 eventMask, uint32 options, bool temporary);
 		void _RemoveTemporaryListeners();
+
+		void _DeliverDragMessage();
 
 		void _EventLoop();
 		void _CursorLoop();
@@ -123,6 +132,9 @@ class EventDispatcher : public BLocker {
 
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;
+
+		BMessage		fDragMessage;
+		bool			fDraggingMessage;
 
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;

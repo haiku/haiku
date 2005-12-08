@@ -12,98 +12,135 @@
 
 
 #include "Decorator.h"
-#include "Layer.h"
+#include "ViewLayer.h"
+#include "ServerWindow.h"
+#include "WindowList.h"
 
 #include <ObjectList.h>
-#include <Rect.h>
+#include <Region.h>
 #include <String.h>
 
 
-class ServerWindow;
+class ClientLooper;
 class Decorator;
-class DrawingEngine;
 class Desktop;
+class DrawingEngine;
+class EventDispatcher;
+class WindowLayer;
 
-class WindowLayer : public Layer {
+// TODO: move this into a proper place
+#define AS_REDRAW 'rdrw'
+
+
+class WindowLayer {
  public:
-								WindowLayer(const BRect &frame,
-									const char *name, window_look look,
-									window_feel feel, uint32 flags,
-									uint32 workspaces, ServerWindow *window,
-									DrawingEngine *driver);
+								WindowLayer(const BRect& frame,
+											const char *name, window_look look,
+											window_feel feel, uint32 flags,
+											uint32 workspaces,
+											::ServerWindow* window,
+											DrawingEngine* drawingEngine);
 	virtual						~WindowLayer();
 
-	virtual	void				Draw(const BRect &r);
+			BRect				Frame() const { return fFrame; }
+			const char*			Title() const { return fTitle.String(); }
 
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				ResizeBy(float x, float y);
-	virtual	void				ScrollBy(float x, float y)
-									{ /* not allowed */ }
+			window_anchor&		Anchor(int32 index);
+			WindowLayer*		NextWindow(int32 index);
+			WindowLayer*		PreviousWindow(int32 index);
 
-	virtual	void				SetName(const char* name);
+			::Desktop*			Desktop() const { return fDesktop; }
+			::Decorator*		Decorator() const { return fDecorator; }
+			::ServerWindow*		ServerWindow() const { return fWindow; }
+			::EventTarget&		EventTarget() const { return fWindow->EventTarget(); }
 
-	virtual	bool				IsOffscreenWindow() const
-									{ return false; }
+			// for convenience, handles window not attached to Desktop
+			bool				ReadLockWindows();
+			void				ReadUnlockWindows();
 
-	virtual	void				GetOnScreenRegion(BRegion& region);
+			// setting and getting the "hard" clipping, you need to have
+			// WriteLock()ed the clipping!
+			void				SetClipping(BRegion* stillAvailableOnScreen);
+			// you need to have ReadLock()ed the clipping!
+	inline	BRegion&			VisibleRegion() { return fVisibleRegion; }
+			BRegion&			VisibleContentRegion();
 
-			void				UpdateStart();
-			void				UpdateEnd();
-	inline	bool				InUpdate() const
-									{ return fInUpdate; }
-	inline	const BRegion&		RegionToBeUpdated() const
-									{ return fInUpdateRegion; }
-	inline	const BRegion&		CulmulatedUpdateRegion() const
-									{ return fCumulativeRegion; }
+			// TODO: not protected by a lock, but noone should need this anyways
+			// make private? when used inside WindowLayer, it has the ReadLock()
+			void				GetFullRegion(BRegion* region);
+			void				GetBorderRegion(BRegion* region);
+			void				GetContentRegion(BRegion* region);
+
+			void				MoveBy(int32 x, int32 y);
+			void				ResizeBy(int32 x, int32 y, BRegion* dirtyRegion);
+
+			void				ScrollViewBy(ViewLayer* view, int32 dx, int32 dy);
+
+			void				SetTopLayer(ViewLayer* topLayer);
+
+			ViewLayer*			ViewAt(const BPoint& where);
+
+	virtual	bool				IsOffscreenWindow() const { return false; }
+
+			void				GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region);
+			bool				DrawingRegionChanged(ViewLayer* layer) const;
+
+			// generic version, used by the Desktop
+			void				ProcessDirtyRegion(BRegion& regionOnScreen);
+			void				RedrawDirtyRegion();
+
+			// can be used from inside classes that don't
+			// need to know about Desktop (first version uses Desktop)
+			void				MarkDirty(BRegion& regionOnScreen);
+			// this version does not use the Desktop
+			void				MarkContentDirty(BRegion& regionOnScreen);
+			// shortcut for invalidating just one view
+			void				InvalidateView(ViewLayer* view, BRegion& layerRegion);
+
 			void				EnableUpdateRequests();
-	inline	void				DisableUpdateRequests()
-									{ fUpdateRequestsEnabled = false; }
+			void				DisableUpdateRequests();
 
-			void				SetSizeLimits(float minWidth,
-											  float maxWidth,
-											  float minHeight,
-											  float maxHeight);
+			void				BeginUpdate();
+			void				EndUpdate();
 
-			void				GetSizeLimits(float* minWidth,
-											  float* maxWidth,
-											  float* minHeight,
-											  float* maxHeight) const;
+			bool				NeedsUpdate() const
+									{ return fUpdateRequested; }
 
-	virtual	void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
-	virtual	void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
-	virtual	void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken);
+			DrawingEngine*		GetDrawingEngine() const
+									{ return fDrawingEngine; }
 
-//			click_type			ActionFor(const BMessage *msg)
-//									{ return _ActionFor(evt); }
+			void				CopyContents(BRegion* region,
+											 int32 xOffset, int32 yOffset);
 
-	virtual	void				WorkspaceActivated(int32 index, bool active);
-	virtual	void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
-	virtual	void				Activated(bool active);
+			void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
+			void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
+			void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken);
 
-			void				UpdateColors();
-			void				UpdateDecorator();
-			void				UpdateFont();
-			void				UpdateScreen();
+			// some hooks to inform the client window
+			// TODO: move this to ServerWindow maybe?
+			void				WorkspaceActivated(int32 index, bool active);
+			void				WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
+			void				Activated(bool active);
 
+			// changing some properties
+			void				SetTitle(const char* name);
+
+			void				SetFocus(bool focus);
 			bool				IsFocus() const { return fIsFocus; }
-			void				SetFocus(bool focus) { fIsFocus = focus; }
 
-	inline	Decorator*			GetDecorator() const { return fDecorator; }
+			void				SetHidden(bool hidden);
+	inline	bool				IsHidden() const { return fHidden; }
 
-			window_look			Look() const { return fLook; }
-			window_feel			Feel() const { return fFeel; }
-			uint32				WindowFlags() const { return fWindowFlags; }
+			void				SetCurrentWorkspace(int32 index)
+									{ fCurrentWorkspace = index; }
+			bool				IsVisible() const;
 
-			void				SetLook(window_look look, BRegion* updateRegion);
-			void				SetFeel(window_feel feel);
-			void				SetWindowFlags(uint32 flags, BRegion* updateRegion);
+			// TODO: make this int32 stuff
+			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
+									int32 minHeight, int32 maxHeight);
 
-			uint32				Workspaces() const { return fWorkspaces; }
-			void				SetWorkspaces(uint32 workspaces)
-									{ fWorkspaces = workspaces; }
-			bool				OnWorkspace(int32 index) const;
-
-			bool				SupportsFront();
+			void				GetSizeLimits(int32* minWidth, int32* maxWidth,
+									int32* minHeight, int32* maxHeight) const;
 
 								// 0.0 -> left .... 1.0 -> right
 			void				SetTabLocation(float location);
@@ -111,20 +148,33 @@ class WindowLayer : public Layer {
 
 			void				HighlightDecorator(bool active);
 
+			void				SetLook(window_look look, BRegion* updateRegion);
+			void				SetFeel(window_feel feel);
+			void				SetFlags(uint32 flags, BRegion* updateRegion);
+
+			window_look			Look() const { return fLook; }
+			window_feel			Feel() const { return fFeel; }
+			uint32				Flags() const { return fFlags; }
+
+			// window manager stuff
+			uint32				Workspaces() const { return fWorkspaces; }
+			void				SetWorkspaces(uint32 workspaces)
+									{ fWorkspaces = workspaces; }
+			bool				OnWorkspace(int32 index) const;
+
+			bool				SupportsFront();
+
 			bool				IsModal() const;
 			bool				IsFloating() const;
+			bool				IsNormal() const;
 
-			WindowLayer*		Frontmost(WindowLayer* first = NULL);
+			WindowLayer*		Frontmost(WindowLayer* first = NULL, int32 workspace = -1);
+			WindowLayer*		Backmost(WindowLayer* first = NULL, int32 workspace = -1);
 
 			bool				AddToSubset(WindowLayer* window);
 			void				RemoveFromSubset(WindowLayer* window);
 			bool				HasInSubset(WindowLayer* window);
-
-			void				RequestClientRedraw(const BRegion& invalid);
-
-			void				SetTopLayer(Layer* layer);
-	inline	Layer*				TopLayer() const
-									{ return fTopLayer; }
+			bool				SameSubset(WindowLayer* window);
 
 	static bool					IsValidLook(window_look look);
 	static bool					IsValidFeel(window_feel feel);
@@ -135,33 +185,58 @@ class WindowLayer : public Layer {
 	static uint32				ValidWindowFlags(window_feel feel);
 
  protected:
-	virtual void				_AllRedraw(const BRegion& invalid);
+ 	friend class Desktop;
+ 		// TODO: for now (list management)
 
- private:
-			void				set_decorator_region(BRect frame);
-	virtual	void				_ReserveRegions(BRegion &reg);
+			void				_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
+												   int32 xOffset, int32 yOffset);
 
-	friend class RootLayer;
+			// different types of drawing
+			void				_TriggerContentRedraw();
+			void				_DrawBorder();
 
-			click_type			_ActionFor(const BMessage *msg) const;
+			// handling update sessions
+			void				_MarkContentDirty(BRegion* contentDirtyRegion);
+			void				_SendUpdateMessage();
 
-			Decorator*			fDecorator;
-			Layer*				fTopLayer;
+			void				_UpdateContentRegion();
 
-			BRegion				fCumulativeRegion;
-			BRegion				fInUpdateRegion;
+			click_type			_ActionFor(const BMessage* msg) const;
 
-			BRegion				fDecRegion;
-			bool				fRebuildDecRegion;
+			void				_ObeySizeLimits();
 
-			int32				fMouseButtons;
-			BPoint				fLastMousePosition;
-			BPoint				fResizingClickOffset;
+			BString				fTitle;	
+			// TODO: no fp rects anywhere
+			BRect				fFrame;
 
-			bool				fIsFocus;
+			window_anchor		fAnchor[kWorkingList + 1];
+				// one for each desktop, and one working anchor
+
+			// the visible region is only recalculated from the
+			// Desktop thread, when using it, Desktop::ReadLockClipping()
+			// has to be called
+	
+			BRegion				fVisibleRegion;
+			BRegion				fVisibleContentRegion;
+			bool				fVisibleContentRegionValid;
+			// our part of the "global" dirty region
+			// it is calculated from the desktop thread,
+			// but we can write to it when we read locked
+			// the clipping, since it is local and the desktop
+			// thread is blocked
+			BRegion				fDirtyRegion;
+
+			// caching local regions
+			BRegion				fBorderRegion;
+			bool				fBorderRegionValid;
+			BRegion				fContentRegion;
+			bool				fContentRegionValid;
+			BRegion				fEffectiveDrawingRegion;
+			bool				fEffectiveDrawingRegionValid;
 
 			BObjectList<WindowLayer> fSubsets;
 
+// TODO: remove those some day (let the decorator handle that stuff)
 			bool				fIsClosing;
 			bool				fIsMinimizing;
 			bool				fIsZooming;
@@ -169,21 +244,72 @@ class WindowLayer : public Layer {
 			bool				fIsSlidingTab;
 			bool				fIsDragging;
 
-			bool				fBringToFrontOnRelease;
+//			bool				fBringToFrontOnRelease;
 
-			bool				fUpdateRequestsEnabled;
+			::Decorator*		fDecorator;
+			ViewLayer*			fTopLayer;
+			::ServerWindow*		fWindow;
+			DrawingEngine*		fDrawingEngine;
+			::Desktop*			fDesktop;
+
+			BPoint				fLastMousePosition;
+//			BPoint				fResizingClickOffset;
+
+			// The synchronization, which client drawing commands
+			// belong to the redraw of which dirty region is handled
+			// through an UpdateSession. When the client has
+			// been informed that it should redraw stuff, then
+			// this is the current update session. All new
+			// redraw requests from the Desktop will go
+			// into the pending update session.
+	class UpdateSession {
+	 public:
+									UpdateSession();
+		virtual						~UpdateSession();
+	
+				void				Include(BRegion* additionalDirty);
+				void				Exclude(BRegion* dirtyInNextSession);
+	
+		inline	BRegion&			DirtyRegion()
+										{ return fDirtyRegion; }
+	
+				void				MoveBy(int32 x, int32 y);
+	
+				void				SetUsed(bool used);
+		inline	bool				IsUsed() const
+										{ return fInUse; }
+	
+				UpdateSession&		operator=(const UpdateSession& other);
+	
+	 private:
+				BRegion				fDirtyRegion;
+				bool				fInUse;
+	};
+
+			BRegion				fDecoratorRegion;
+
+			UpdateSession		fCurrentUpdateSession;
+			UpdateSession		fPendingUpdateSession;
+			// these two flags are supposed to ensure a sane
+			// and consistent update session
+			bool				fUpdateRequested;
 			bool				fInUpdate;
-			bool				fRequestSent;
+
+			bool				fHidden;
+			bool				fIsFocus;
 
 			window_look			fLook;
 			window_feel			fFeel;
-			uint32				fWindowFlags;
+			uint32				fFlags;
 			uint32				fWorkspaces;
+			int32				fCurrentWorkspace;
 
-			float				fMinWidth;
-			float				fMaxWidth;
-			float				fMinHeight;
-			float				fMaxHeight;
+			int32				fMinWidth;
+			int32				fMaxWidth;
+			int32				fMinHeight;
+			int32				fMaxHeight;
+
+	mutable	bool				fReadLocked;
 };
 
-#endif	// WINDOW_LAYER_H
+#endif // WINDOW_LAYER_H

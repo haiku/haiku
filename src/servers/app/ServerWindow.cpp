@@ -43,10 +43,8 @@
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
-#include "Layer.h"
 #include "RAMLinkMsgReader.h"
 #include "RenderingBuffer.h"
-#include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
@@ -140,13 +138,21 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
 	fWindowLayer(NULL),
+
 	fClientTeam(app->ClientTeam()),
+
 	fMessagePort(-1),
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
+
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
+
 	fClientToken(clientToken),
+
 	fCurrentLayer(NULL),
+	fCurrentDrawingRegion(),
+	fCurrentDrawingRegionValid(false),
+
 	fDirectWindowData(NULL)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n", title));
@@ -236,14 +242,14 @@ ServerWindow::Run()
 	fLink.StartMessage(B_OK);
 	fLink.Attach<port_id>(fMessagePort);
 
-	float minWidth, maxWidth, minHeight, maxHeight;
+	int32 minWidth, maxWidth, minHeight, maxHeight;
 	fWindowLayer->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
 	fLink.Attach<BRect>(fWindowLayer->Frame());
-	fLink.Attach<float>(minWidth);
-	fLink.Attach<float>(maxWidth);
-	fLink.Attach<float>(minHeight);
-	fLink.Attach<float>(maxHeight);
+	fLink.Attach<float>((float)minWidth);
+	fLink.Attach<float>((float)maxWidth);
+	fLink.Attach<float>((float)minHeight);
+	fLink.Attach<float>((float)maxHeight);
 	fLink.Flush();
 
 	return true;
@@ -282,7 +288,7 @@ ServerWindow::ReplaceDecorator()
 		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
 
 	STRACE(("ServerWindow %s: Replace Decorator\n", fTitle));
-	fWindowLayer->UpdateDecorator();
+	//fWindowLayer->UpdateDecorator();
 }
 
 
@@ -296,7 +302,11 @@ ServerWindow::Show()
 	if (fQuitting || !fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
 
+// TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
+// instead of doing it from this thread.
+fDesktop->ReadUnlockWindows();
 	fDesktop->ShowWindow(fWindowLayer);
+fDesktop->ReadLockWindows();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -316,7 +326,11 @@ ServerWindow::Hide()
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
+// TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
+// instead of doing it from this thread.
+fDesktop->ReadUnlockWindows();
 	fDesktop->HideWindow(fWindowLayer);
+fDesktop->ReadLockWindows();
 }
 
 
@@ -344,7 +358,7 @@ ServerWindow::SetTitle(const char* newTitle)
 	}
 
 	if (fWindowLayer != NULL)
-		fWindowLayer->SetName(newTitle);
+		fWindowLayer->SetTitle(newTitle);
 }
 
 
@@ -413,7 +427,7 @@ ServerWindow::GetInfo(window_info& info)
 
 	info.layer = 0; // ToDo: what is this???
 	info.feel = fWindowLayer->Feel();
-	info.flags = fWindowLayer->WindowFlags();
+	info.flags = fWindowLayer->Flags();
 	info.window_left = (int)floor(fWindowLayer->Frame().left);
 	info.window_top = (int)floor(fWindowLayer->Frame().top);
 	info.window_right = (int)floor(fWindowLayer->Frame().right);
@@ -428,8 +442,8 @@ ServerWindow::GetInfo(window_info& info)
 	\brief Sets the font state for a layer
 	\param layer The layer to set the font
 */
-inline void
-ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
+void
+ServerWindow::SetLayerFontState(ViewLayer *layer, BPrivate::LinkReceiver &link)
 {
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
 			fTitle, layer->Name()));
@@ -439,20 +453,21 @@ ServerWindow::SetLayerFontState(Layer *layer, BPrivate::LinkReceiver &link)
 }
 
 
-inline void
-ServerWindow::SetLayerState(Layer *layer, BPrivate::LinkReceiver &link)
+void
+ServerWindow::SetLayerState(ViewLayer *layer, BPrivate::LinkReceiver &link)
 {
 	STRACE(("ServerWindow %s: SetLayerState for layer %s\n", Title(),
 			 layer->Name()));
 	// NOTE: no need to check for a lock. This is a private method.
 
 	layer->CurrentState()->ReadFromLink(link);
-	// TODO: Rebuild clipping here!
+	// TODO: When is this used?!?
+	layer->RebuildClipping(true);
 }
 
 
-Layer*
-ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
+ViewLayer*
+ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -464,7 +479,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	uint32 flags;
 	bool hidden;
 	int32 parentToken;
-	char *name = NULL;
+	char* name = NULL;
 	rgb_color viewColor;
 
 	link.Read<int32>(&token);
@@ -481,46 +496,37 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, Layer **_parent)
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n",
 		fTitle, name, token));
 
-	Layer *newLayer;
+	ViewLayer* newLayer;
 
 	if (link.Code() == AS_LAYER_CREATE_ROOT
-		&& (fWindowLayer->WindowFlags() & kWorkspacesWindowFlag) != 0) {
+		&& (fWindowLayer->Flags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
 		newLayer = new (nothrow) WorkspacesLayer(frame, name, token, resizeMask,
-			flags, fWindowLayer->GetDrawingEngine());
+			flags);
 	} else {
-		newLayer = new (nothrow) Layer(frame, name, token, resizeMask, flags,
-			fWindowLayer->GetDrawingEngine());
+		newLayer = new (nothrow) ViewLayer(frame, name, token, resizeMask, flags);
 	}
+
+	free(name);
 
 	if (newLayer == NULL)
 		return NULL;
 
-	free(name);
-
 	// there is no way of setting this, other than manually :-)
 	newLayer->SetViewColor(viewColor);
-	newLayer->fHidden = hidden;
-	newLayer->fEventMask = eventMask;
-	newLayer->fEventOptions = eventOptions;
+	newLayer->SetHidden(hidden);
+	newLayer->SetEventMask(eventMask, eventOptions);
 
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
 	settings.GetDefaultPlainFont(font);
 	newLayer->CurrentState()->SetFont(font);
 
-// TODO: rework the clipping stuff to remove RootLayer dependency and then
-// remove this hack:
-if (fWindowLayer->IsOffscreenWindow()) {
-	newLayer->fVisible.Set(newLayer->fFrame);
-	newLayer->fDrawingRegion.Set(newLayer->fFrame);
-}
-
 	if (_parent) {
-		Layer *parent;
+		ViewLayer *parent;
 		if (App()->ViewTokens().GetToken(parentToken, B_HANDLER_TOKEN,
 				(void**)&parent) != B_OK
-			|| parent->Window() != this) {
+			|| parent->Window()->ServerWindow() != this) {
 			CRITICAL("View token not found!\n");
 			parent = NULL;
 		}
@@ -532,728 +538,101 @@ if (fWindowLayer->IsOffscreenWindow()) {
 }
 
 
+/*!
+	Dispatches all window messages, and those view messages that
+	don't need a valid fCurrentLayer (ie. layer creation).
+*/
 void
 ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	// TODO: when creating a Layer, check for yet non-existing Layer::InitCheck()
-	// and take appropriate actions, then checking for fCurrentLayer->fLayerData
-	// is unnecessary
-	if ((fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) &&
-		code != AS_LAYER_CREATE_ROOT && code != AS_LAYER_CREATE) {
-
-		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - B_OK);
-		return;
-	}
-
-	RootLayer *rootLayer = fWindowLayer->GetRootLayer();
-	// NOTE: is NULL when fWindowLayer is offscreen!
-	if (rootLayer) {
-#ifdef PROFILE_MESSAGE_LOOP
-		bigtime_t start = system_time();
-#endif
-		rootLayer->Lock();
-#ifdef PROFILE_MESSAGE_LOOP
-		bigtime_t diff = system_time() - start;
-		if (diff > 10000)
-			printf("ServerWindow %s: root lock acquisition took %Ld usecs\n", Title(), diff);
-#endif
-	}
-
 	switch (code) {
-		//--------- BView Messages -----------------
-		case AS_LAYER_SCROLL:
+		case AS_SHOW_WINDOW:
+			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
+			Show();
+			break;
+
+		case AS_HIDE_WINDOW:
+			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
+			Hide();
+			break;
+
+		case AS_ACTIVATE_WINDOW:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			float dh;
-			float dv;
+			DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			bool activate = true;
 
-			link.Read<float>(&dh);
-			link.Read<float>(&dv);
-			fCurrentLayer->ScrollBy(dh, dv);
+			link.Read<bool>(&activate);
 
+			if (activate)
+				fDesktop->ActivateWindow(fWindowLayer);
+			else
+				fDesktop->SendWindowBehind(fWindowLayer, NULL);
 			break;
 		}
-		case AS_LAYER_COPY_BITS:
+		case AS_SEND_BEHIND:
 		{
-			BRect src;
-			BRect dst;
-
-			link.Read<BRect>(&src);
-			link.Read<BRect>(&dst);
-
-			// TODO: confirm that in R5 this call is affected by origin and scale
-//	fCurrentLayer->ConvertToScreenForDrawing(&src);
-//	fCurrentLayer->ConvertToScreenForDrawing(&dst);
-			fCurrentLayer->ConvertToScreen(&src);
-			fCurrentLayer->ConvertToScreen(&dst);
-		
-			int32 xOffset = (int32)(dst.left - src.left);
-			int32 yOffset = (int32)(dst.top - src.top);
-
-			fCurrentLayer->CopyBits(src, dst, xOffset, yOffset);
-			break;
-		}
-		case AS_SET_CURRENT_LAYER:
-		{
+			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
 			int32 token;
-			
-			link.Read<int32>(&token);
-
-			Layer *current;
-			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
-					(void**)&current) != B_OK
-				|| current->Window() != this) {
-				// ToDo: if this happens, we probably want to kill the app and clean up
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle, token));
-				current = NULL;
-			} else {
-				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
-				fCurrentLayer = current;
-			}
-			break;
-		}
-
-		case AS_LAYER_CREATE_ROOT:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle));
-
-			// Start receiving top_view data -- pass NULL as the parent view.
-			// This should be the *only* place where this happens.
-			if (fCurrentLayer != NULL)
-				break;
-
-			fWindowLayer->SetTopLayer(CreateLayerTree(link, NULL));
-			fCurrentLayer = fWindowLayer->TopLayer();
-			break;
-		}
-
-		case AS_LAYER_CREATE:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-
-			Layer* parent = NULL;
-			Layer* newLayer = CreateLayerTree(link, &parent);
-			if (parent != NULL)
-				parent->AddChild(newLayer, this);
-
-			if (rootLayer && !newLayer->IsHidden() && parent) {
-				BRegion invalidRegion;
-				newLayer->GetOnScreenRegion(invalidRegion);
-				parent->MarkForRebuild(invalidRegion);
-				parent->TriggerRebuild();
-				if (newLayer->VisibleRegion().Frame().IsValid()) {
-					rootLayer->MarkForRedraw(newLayer->VisibleRegion());
-					rootLayer->TriggerRedraw();
-				}
-			}
-			break;
-		}
-		case AS_LAYER_DELETE:
-		{
-			// Received when a view is detached from a window. This is definitely
-			// the less taxing operation - we call PruneTree() on the removed
-			// layer, detach the layer itself, delete it, and invalidate the
-			// area assuming that the view was visible when removed
-
-			Layer *parent = fCurrentLayer->fParent;
-
-			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
-				fCurrentLayer, parent));
-
-			if (!fCurrentLayer->IsHidden() && parent && rootLayer
-				&& fCurrentLayer->FullVisible().Frame().IsValid()) {
-				parent->MarkForRebuild(fCurrentLayer->FullVisible());
-				rootLayer->MarkForRedraw(fCurrentLayer->FullVisible());
-			}
-
-			// here we remove current layer from list.
-			fCurrentLayer->RemoveSelf();
-
-			if (parent)
-				parent->TriggerRebuild();			
-
-			if (rootLayer) {
-				rootLayer->LayerRemoved(fCurrentLayer);
-				if (!fCurrentLayer->IsHidden())
-					rootLayer->TriggerRedraw();
-			}
-
-			if (fCurrentLayer->EventMask() != 0) {
-				fDesktop->EventDispatcher().RemoveListener(EventTarget(),
-					fCurrentLayer->ViewToken());
-			}
-
-			#ifdef DEBUG_SERVERWINDOW
-			parent->PrintTree();
-			#endif
-
-			delete fCurrentLayer;
-			// TODO: It is necessary to do this, but I find it very obscure.
-			fCurrentLayer = parent;
-			break;
-		}
-		case AS_LAYER_SET_STATE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			SetLayerState(fCurrentLayer, link);
-			// TODO: should this be moved into SetLayerState?
-			// If it _always_ needs to be done afterwards, then yes!
-			break;
-		}
-		case AS_LAYER_SET_FONT_STATE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-			SetLayerFontState(fCurrentLayer, link);
-			break;
-		}
-		case AS_LAYER_GET_STATE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
-
-			fLink.StartMessage(B_OK);
-
-			// attach state data
-			fCurrentLayer->CurrentState()->WriteToLink(fLink.Sender());
-			fLink.Flush();
-			break;
-		}
-		case AS_LAYER_SET_EVENT_MASK:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
-			rootLayer->Unlock();
-				// we don't want RootLayer to be locked while we play with the events
-
-			uint32 eventMask, options;
-
-			link.Read<uint32>(&eventMask);
-			if (link.Read<uint32>(&options) == B_OK) {
-				fCurrentLayer->SetEventMask(eventMask, options);
-
-				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddListener(EventTarget(),
-						fCurrentLayer->ViewToken(), eventMask, options);
-				} else {
-					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
-						fCurrentLayer->ViewToken());
-				}
-			}
-
-			rootLayer->Lock();
-			break;
-		}
-		case AS_LAYER_SET_MOUSE_EVENT_MASK:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fTitle, fCurrentLayer->Name()));			
-			rootLayer->Unlock();
-				// we don't want RootLayer to be locked while we play with the events
-
-			uint32 eventMask, options;
-
-			link.Read<uint32>(&eventMask);
-			if (link.Read<uint32>(&options) == B_OK) {
-				if (eventMask != 0 || options != 0) {
-					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
-						fCurrentLayer->ViewToken(), eventMask, options);
-				} else {
-					fDesktop->EventDispatcher().RemoveTemporaryListener(EventTarget(),
-						fCurrentLayer->ViewToken());
-				}
-			}
-
-			// TODO: support B_LOCK_WINDOW_FOCUS option in RootLayer
-			rootLayer->Lock();
-			break;
-		}
-		case AS_LAYER_MOVE_TO:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVE_TO: Layer name: %s\n",
-				fTitle, fCurrentLayer->Name()));
-
-			float x, y;
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-
-			float offsetX = x - fCurrentLayer->fFrame.left;
-			float offsetY = y - fCurrentLayer->fFrame.top;
-
-			fCurrentLayer->MoveBy(offsetX, offsetY);
-			break;
-		}
-		case AS_LAYER_RESIZE_TO:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_TO: Layer name: %s\n",
-				fTitle, fCurrentLayer->Name()));
-
-			float newWidth, newHeight;
-			link.Read<float>(&newWidth);
-			link.Read<float>(&newHeight);
-			
-			// TODO: If fCurrentLayer is a window, check for minimum size allowed.
-			// Need WindowLayer::GetSizeLimits
-			float deltaWidth = newWidth - fCurrentLayer->fFrame.Width();
-			float deltaHeight = newHeight - fCurrentLayer->fFrame.Height();
-
-			fCurrentLayer->ResizeBy(deltaWidth, deltaHeight);
-			break;
-		}
-		case AS_LAYER_GET_COORD:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			// our offset in the parent -> will be originX and originY in BView
-			fLink.Attach<float>(fCurrentLayer->fFrame.left);
-			fLink.Attach<float>(fCurrentLayer->fFrame.top);
-			fLink.Attach<BRect>(fCurrentLayer->Bounds());
-			fLink.Flush();
-			break;
-		}
-		case AS_LAYER_SET_ORIGIN:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			float x, y;
-			
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-			
-			fCurrentLayer->SetDrawingOrigin(BPoint(x, y));
-			break;
-		}
-		case AS_LAYER_GET_ORIGIN:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			// TODO: rename this where it is used in the BView code!
-			// (it wants to know scrolling offset, not drawing origin)
-			fLink.Attach<BPoint>(fCurrentLayer->ScrollingOffset());
-			fLink.Flush();
-			break;
-		}
-		case AS_LAYER_RESIZE_MODE:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			link.Read<uint32>(&(fCurrentLayer->fResizeMode));
-			break;
-		}
-		case AS_LAYER_CURSOR:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
-			int32 token;
+			team_id teamID;
+			status_t status;
 
 			link.Read<int32>(&token);
+			link.Read<team_id>(&teamID);
 
-			// TODO: implement; I think each Layer should have a member pointing
-			// to this requested cursor.
-			
-			break;
-		}
-		case AS_LAYER_SET_FLAGS:
-		{
-			uint32 flags;
-			link.Read<uint32>(&flags);
-			fCurrentLayer->SetFlags(flags);
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			break;
-		}
-		case AS_LAYER_HIDE:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fCurrentLayer->Hide();
-			break;
-		}
-		case AS_LAYER_SHOW:
-		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fCurrentLayer->Show();
-			break;
-		}
-		case AS_LAYER_SET_LINE_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			int8 lineCap, lineJoin;
-			float miterLimit;
+			WindowLayer *behindOf;
+			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
+				fDesktop->SendWindowBehind(fWindowLayer, behindOf);
+				status = B_OK;
+			} else
+				status = B_NAME_NOT_FOUND;
 
-			// TODO: Look into locking scheme relating to Layers and modifying redraw-related members
-
-			link.Read<int8>(&lineCap);
-			link.Read<int8>(&lineJoin);
-			link.Read<float>(&miterLimit);
-			
-			fCurrentLayer->CurrentState()->SetLineCapMode((cap_mode)lineCap);
-			fCurrentLayer->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
-			fCurrentLayer->CurrentState()->SetMiterLimit(miterLimit);
-		
-			break;
-		}
-		case AS_LAYER_GET_LINE_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineCapMode()));
-			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineJoinMode()));
-			fLink.Attach<float>(fCurrentLayer->CurrentState()->MiterLimit());
-			fLink.Flush();
-		
-			break;
-		}
-		case AS_LAYER_PUSH_STATE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			fCurrentLayer->PushState();
-
-			break;
-		}
-		case AS_LAYER_POP_STATE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			fCurrentLayer->PopState();
-
-			break;
-		}
-		case AS_LAYER_SET_SCALE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			float scale;
-			link.Read<float>(&scale);
-
-			fCurrentLayer->SetScale(scale);
-			break;
-		}
-		case AS_LAYER_GET_SCALE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n", Title(), fCurrentLayer->Name()));		
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<float>(fCurrentLayer->CurrentState()->Scale());
+			fLink.StartMessage(status);
 			fLink.Flush();
 			break;
 		}
-		case AS_LAYER_SET_PEN_LOC:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			float x, y;
 
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-
-			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
-			break;
-		}
-		case AS_LAYER_GET_PEN_LOC:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			fLink.Attach<BPoint>(fCurrentLayer->CurrentState()->PenLocation());
-			fLink.Flush();
-		
-			break;
-		}
-		case AS_LAYER_SET_PEN_SIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			float penSize;
-			link.Read<float>(&penSize);
-			fCurrentLayer->CurrentState()->SetPenSize(penSize);
-		
-			break;
-		}
-		case AS_LAYER_GET_PEN_SIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			fLink.Attach<float>(fCurrentLayer->CurrentState()->PenSize());
-			fLink.Flush();
-		
-			break;
-		}
-		case AS_LAYER_SET_VIEW_COLOR:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			rgb_color c;
-			
-			link.Read(&c, sizeof(rgb_color));
-
-			fCurrentLayer->SetViewColor(RGBColor(c));
-
-			if (rootLayer && !fCurrentLayer->IsHidden()) {
-				rootLayer->MarkForRedraw(fCurrentLayer->VisibleRegion());
-				rootLayer->TriggerRedraw();
-			}
-			break;
-		}
-
-		case AS_LAYER_GET_HIGH_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_HIGH_COLOR: Layer: %s\n",
-				Title(), fCurrentLayer->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->HighColor().GetColor32());
-			fLink.Flush();
+		case B_QUIT_REQUESTED:
+			STRACE(("ServerWindow %s received quit request\n", Title()));
+			NotifyQuitRequested();
 			break;
 
-		case AS_LAYER_GET_LOW_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LOW_COLOR: Layer: %s\n",
-				Title(), fCurrentLayer->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->LowColor().GetColor32());
-			fLink.Flush();
-			break;
-
-		case AS_LAYER_GET_VIEW_COLOR:
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_VIEW_COLOR: Layer: %s\n",
-				Title(), fCurrentLayer->Name()));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor().GetColor32());
-			fLink.Flush();
-			break;
-
-		case AS_LAYER_SET_BLEND_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			int8 srcAlpha, alphaFunc;
-			
-			link.Read<int8>(&srcAlpha);
-			link.Read<int8>(&alphaFunc);
-			
-			fCurrentLayer->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
-											(alpha_function)alphaFunc);
-
-			break;
-		}
-		case AS_LAYER_GET_BLEND_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaSrcMode()));
-			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaFncMode()));
-			fLink.Flush();
-
-			break;
-		}
-		case AS_LAYER_SET_DRAW_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			int8 drawingMode;
-			
-			link.Read<int8>(&drawingMode);
-			
-			fCurrentLayer->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
-			
-			break;
-		}
-		case AS_LAYER_GET_DRAW_MODE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->GetDrawingMode()));
-			fLink.Flush();
-		
-			break;
-		}
-		case AS_LAYER_PRINT_ALIASING:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			bool fontAliasing;
-			link.Read<bool>(&fontAliasing);
-			fCurrentLayer->CurrentState()->SetForceFontAliasing(fontAliasing);
-			
-			break;
-		}
-		case AS_LAYER_CLIP_TO_PICTURE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n", Title(), fCurrentLayer->Name()));
-		// TODO: you are not allowed to use Layer regions here!!!
-		// If there is no other way, then first lock RootLayer object first.
-			
-			int32 pictureToken;
-			BPoint where;
-			bool inverse = false;
-			
-			link.Read<int32>(&pictureToken);
-			link.Read<BPoint>(&where);
-			link.Read<bool>(&inverse);
-							
-			// search for a picture with the specified token.
-			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
-			// TODO: Increase that picture's reference count.(~ allocate a picture)
-			if (picture == NULL)
-				break;
-			
-			BRegion region;
-			// TODO: I think we also need the BView's token
-			// I think PictureToRegion would fit better into the Layer class (?)
-			if (PictureToRegion(picture, region, inverse, where) < B_OK)
-				break;
-
-			fCurrentLayer->CurrentState()->SetClippingRegion(region);
-
-			if (rootLayer && !(fCurrentLayer->IsHidden()) && !fWindowLayer->InUpdate()) {
-				BRegion invalidRegion;
-				fCurrentLayer->GetOnScreenRegion(invalidRegion);
-
-				// TODO: this is broken! a smaller area may be invalidated!
-
-				fCurrentLayer->fParent->MarkForRebuild(invalidRegion);
-				fCurrentLayer->fParent->TriggerRebuild();
-				rootLayer->MarkForRedraw(invalidRegion);
-				rootLayer->TriggerRedraw();
-			}
-				
-			break;
-		}
-		
-		case AS_LAYER_GET_CLIP_REGION:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			// if this Layer is hidden, it is clear that its visible region is void.
-			if (fCurrentLayer->IsHidden()) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(0L);
-				fLink.Flush();
-			} else {
-				BRegion drawingRegion = fCurrentLayer->DrawingRegion();
-				int32 rectCount = drawingRegion.CountRects();
-
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(rectCount);
-
-				for (int32 i = 0; i < rectCount; i++) {
-					BRect converted(drawingRegion.RectAt(i));
-					fCurrentLayer->ConvertFromScreen(&converted);
-					fLink.Attach<BRect>(converted);
-				}
-
-				fLink.Flush();
-			}
-
-			break;
-		}
-		case AS_LAYER_SET_CLIP_REGION:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			int32 rectCount;
-			link.Read<int32>(&rectCount);
-
-			BRegion region;
-			for (int32 i = 0; i < rectCount; i++) {
-				BRect r;
-				link.Read<BRect>(&r);
-				region.Include(r);
-			}
-			fCurrentLayer->SetUserClipping(region);
-
-			break;
-		}
-		case AS_LAYER_INVAL_RECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			// NOTE: looks like this call is NOT affected by origin and scale on R5
-			// so this implementation is "correct"
-			BRect invalRect;
-			
-			link.Read<BRect>(&invalRect);
-
-			if (rootLayer && !fCurrentLayer->IsHidden()) {
-				BRect converted(invalRect.LeftTop(), invalRect.RightBottom());
-
-				fCurrentLayer->ConvertToScreen(&converted);
-
-				BRegion invalidRegion(converted);
-				invalidRegion.IntersectWith(&fCurrentLayer->VisibleRegion());
-				rootLayer->MarkForRedraw(invalidRegion);
-				rootLayer->TriggerRedraw();
-			}
-			break;
-		}
-		case AS_LAYER_INVAL_REGION:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n", Title(), fCurrentLayer->Name()));
-			
-			// NOTE: looks like this call is NOT affected by origin and scale on R5
-			// so this implementation is "correct"
-			BRegion invalidReg;
-			int32 noOfRects;
-			BRect rect;
-			
-			link.Read<int32>(&noOfRects);
-			
-			for (int i = 0; i < noOfRects; i++) {
-				link.Read<BRect>(&rect);
-				invalidReg.Include(rect);
-			}
-
-			if (rootLayer && !fCurrentLayer->IsHidden()) {
-				fCurrentLayer->ConvertToScreen(&invalidReg);
-
-				rootLayer->MarkForRedraw(invalidReg);
-				rootLayer->TriggerRedraw();
-			}
-			break;
-		}
-		case AS_BEGIN_UPDATE:
-		{
-			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
-			fWindowLayer->UpdateStart();
-			break;
-		}
-		case AS_END_UPDATE:
-		{
-			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
-			fWindowLayer->UpdateEnd();
-			break;
-		}
-
-		// ********** END: BView Messages ***********
-		
-		// ********* BWindow Messages ***********
-		case AS_LAYER_DELETE_ROOT:
-		{
-			// Received when a window deletes its internal top view
-			
-			// TODO: Implement AS_LAYER_DELETE_ROOT
-			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
-			break;
-		}
 		case AS_BEGIN_TRANSACTION:
 		{
 			STRACE(("ServerWindow %s: Message AS_BEGIN_TRANSACTION unimplemented\n",
 				Title()));
 			// TODO: we could probably do a bit more here...
-			fWindowLayer->DisableUpdateRequests();
+// TODO: AS_BEGIN_TRANSACTION
+			//fWindowLayer->DisableUpdateRequests();
 			break;
 		}
 		case AS_END_TRANSACTION:
 		{
 			STRACE(("ServerWindow %s: Message AS_END_TRANSACTION unimplemented\n",
 				Title()));
-			fWindowLayer->EnableUpdateRequests();
+// TODO: AS_END_TRANSACTION
+			//fWindowLayer->EnableUpdateRequests();
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
 				Title()));
-			fWindowLayer->EnableUpdateRequests();
+// TODO: AS_ENABLE_UPDATES
+			//fWindowLayer->EnableUpdateRequests();
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES unimplemented\n",
 				Title()));
-			fWindowLayer->DisableUpdateRequests();
+// TODO: AS_DISABLE_UPDATES
+			//fWindowLayer->DisableUpdateRequests();
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
 			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
-			if (fWindowLayer->CulmulatedUpdateRegion().Frame().IsValid())
+			if (fWindowLayer->NeedsUpdate())
 				fLink.StartMessage(B_OK);
 			else
 				fLink.StartMessage(B_ERROR);
@@ -1433,89 +812,766 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// 3) float minimum height
 			// 4) float maximum height
 
-			float minWidth;
-			float maxWidth;
-			float minHeight;
-			float maxHeight;
-
-			link.Read<float>(&minWidth);
-			link.Read<float>(&maxWidth);
-			link.Read<float>(&minHeight);
-			link.Read<float>(&maxHeight);
-
+			// TODO: for now, move the client to int32 as well!
+			int32 minWidth, maxWidth, minHeight, maxHeight;
+			float value;
+			link.Read<float>(&value);	minWidth = (int32)value;
+			link.Read<float>(&value);	maxWidth = (int32)value;
+			link.Read<float>(&value);	minHeight = (int32)value;
+			link.Read<float>(&value);	maxHeight = (int32)value;
+/*
+			link.Read<int32>(&minWidth);
+			link.Read<int32>(&maxWidth);
+			link.Read<int32>(&minHeight);
+			link.Read<int32>(&maxHeight);
+*/
 			// TODO: setting size limits can change the window size, and therefore,
 			//	it should be done by the Desktop class as well.
-			fWindowLayer->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+			fWindowLayer->SetSizeLimits(minWidth, maxWidth,
+				minHeight, maxHeight);
 
 			// and now, sync the client to the limits that we were able to enforce
-			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth,
+				&minHeight, &maxHeight);
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<BRect>(fWindowLayer->Frame());
-			fLink.Attach<float>(minWidth);
-			fLink.Attach<float>(maxWidth);
-			fLink.Attach<float>(minHeight);
-			fLink.Attach<float>(maxHeight);
+			fLink.Attach<float>((float)minWidth);
+			fLink.Attach<float>((float)maxWidth);
+			fLink.Attach<float>((float)minHeight);
+			fLink.Attach<float>((float)maxHeight);
 
 			fLink.Flush();
 			break;
 		}
-		// Some BView drawing messages, but which don't need clipping
-		case AS_LAYER_SET_HIGH_COLOR:
+
+		case AS_REDRAW:
+			// command issued by Desktop only (via WindowLayer::ProcessDirtyRegion())
+			DTRACE(("ServerWindow %s: AS_REDRAW\n", Title()));
+			fWindowLayer->RedrawDirtyRegion();
+			break;
+
+		case AS_BEGIN_UPDATE:
+			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
+			fWindowLayer->BeginUpdate();
+			break;
+
+		case AS_END_UPDATE:
+			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
+			fWindowLayer->EndUpdate();
+			break;
+
+		case AS_LAYER_DELETE_ROOT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
+			// Received when a window deletes its internal top view
+			
+			// TODO: Implement AS_LAYER_DELETE_ROOT
+			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
+			break;
+		}
+
+		case AS_GET_MOUSE:
+		{
+fDesktop->ReadUnlockWindows();
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
+
+			// Returns
+			// 1) BPoint mouse location
+			// 2) int32 button state
+
+			BPoint where;
+			int32 buttons;
+			fDesktop->EventDispatcher().GetMouse(where, buttons);
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<BPoint>(where);
+			fLink.Attach<int32>(buttons);
+			fLink.Flush();
+fDesktop->ReadLockWindows();
+			break;
+		}
+
+		case AS_SET_CURRENT_LAYER:
+		{
+			int32 token;
+			link.Read<int32>(&token);
+
+			ViewLayer *current;
+			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
+					(void**)&current) != B_OK
+				|| current->Window()->ServerWindow() != this) {
+				// ToDo: if this happens, we probably want to kill the app and clean up
+				fprintf(stderr, "ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle, token);
+				current = NULL;
+			} else {
+				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
+				_SetCurrentLayer(current);
+			}
+			break;
+		}
+
+		case AS_LAYER_CREATE_ROOT:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle));
+
+			// Start receiving top_view data -- pass NULL as the parent view.
+			// This should be the *only* place where this happens.
+			if (fCurrentLayer != NULL) {
+				fprintf(stderr, "ServerWindow %s: Message AS_LAYER_CREATE_ROOT: fCurrentLayer already set!!\n", fTitle);
+				break;
+			}
+
+			_SetCurrentLayer(CreateLayerTree(link, NULL));
+			fWindowLayer->SetTopLayer(fCurrentLayer);
+			break;
+		}
+
+		case AS_LAYER_CREATE:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+
+			ViewLayer* parent = NULL;
+			ViewLayer* newLayer = CreateLayerTree(link, &parent);
+			if (parent != NULL && newLayer != NULL)
+				parent->AddChild(newLayer);
+			else
+				fprintf(stderr, "ServerWindow %s: Message AS_LAYER_CREATE: parent or newLayer NULL!!\n", fTitle);
+			break;
+		}
+
+		default:
+			// TODO: when creating a ViewLayer, check for yet non-existing ViewLayer::InitCheck()
+			// and take appropriate actions, then checking for fCurrentLayer->fLayerData
+			// is unnecessary
+			if (fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) {
+				printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - B_OK);
+				return;
+			}
+
+			_DispatchViewMessage(code, link);
+			break;
+	}
+}
+
+
+/*!
+	Dispatches all view messages that need a valid fCurrentLayer.
+*/
+void
+ServerWindow::_DispatchViewMessage(int32 code,
+	BPrivate::LinkReceiver &link)
+{
+	switch (code) {
+		case AS_LAYER_SCROLL:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+			float dh;
+			float dv;
+
+			link.Read<float>(&dh);
+			link.Read<float>(&dv);
+			fWindowLayer->ScrollViewBy(fCurrentLayer, dh, dv);
+			break;
+		}
+		case AS_LAYER_COPY_BITS:
+		{
+			BRect src;
+			BRect dst;
+
+			link.Read<BRect>(&src);
+			link.Read<BRect>(&dst);
+
+			BRegion contentRegion;
+			// TODO: avoid copy operation maybe?
+			fWindowLayer->GetContentRegion(&contentRegion);
+			fCurrentLayer->CopyBits(src, dst, contentRegion);
+			break;
+		}
+		case AS_LAYER_DELETE:
+		{
+			// Received when a view is detached from a window. This is definitely
+			// the less taxing operation - we call PruneTree() on the removed
+			// layer, detach the layer itself, delete it, and invalidate the
+			// area assuming that the view was visible when removed
+			ViewLayer *parent = fCurrentLayer->Parent();
+
+			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
+				fCurrentLayer, parent));
+
+			if (parent != NULL)
+				parent->RemoveChild(fCurrentLayer);
+
+			if (fCurrentLayer->EventMask() != 0) {
+				fDesktop->EventDispatcher().RemoveListener(EventTarget(),
+					fCurrentLayer->Token());
+			}
+
+			delete fCurrentLayer;
+			// TODO: It is necessary to do this, but I find it very obscure.
+			fCurrentLayer = parent;
+			break;
+		}
+		case AS_LAYER_SET_STATE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+			SetLayerState(fCurrentLayer, link);
+			break;
+		}
+		case AS_LAYER_SET_FONT_STATE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+			SetLayerFontState(fCurrentLayer, link);
+			break;
+		}
+		case AS_LAYER_GET_STATE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+
+			fLink.StartMessage(B_OK);
+
+			// attach state data
+			fCurrentLayer->CurrentState()->WriteToLink(fLink.Sender());
+			fLink.Flush();
+			break;
+		}
+		case AS_LAYER_SET_EVENT_MASK:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));			
+			uint32 eventMask, options;
+
+			link.Read<uint32>(&eventMask);
+			if (link.Read<uint32>(&options) == B_OK) {
+				fDesktop->ReadUnlockWindows();
+				fCurrentLayer->SetEventMask(eventMask, options);
+
+				if (eventMask != 0 || options != 0) {
+					fDesktop->EventDispatcher().AddListener(EventTarget(),
+						fCurrentLayer->Token(), eventMask, options);
+				} else {
+					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
+						fCurrentLayer->Token());
+				}
+				fDesktop->ReadLockWindows();
+			}
+			break;
+		}
+		case AS_LAYER_SET_MOUSE_EVENT_MASK:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));			
+			uint32 eventMask, options;
+
+			link.Read<uint32>(&eventMask);
+			if (link.Read<uint32>(&options) == B_OK) {
+				fDesktop->ReadUnlockWindows();
+				if (eventMask != 0 || options != 0) {
+					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
+						fCurrentLayer->Token(), eventMask, options);
+				} else {
+					fDesktop->EventDispatcher().RemoveTemporaryListener(EventTarget(),
+						fCurrentLayer->Token());
+				}
+				fDesktop->ReadLockWindows();
+			}
+
+			// TODO: support B_LOCK_WINDOW_FOCUS option in Desktop
+			break;
+		}
+		case AS_LAYER_MOVE_TO:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVE_TO: ViewLayer name: %s\n",
+				fTitle, fCurrentLayer->Name()));
+
+			float x, y;
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+
+			float offsetX = x - fCurrentLayer->Frame().left;
+			float offsetY = y - fCurrentLayer->Frame().top;
+
+			if (fDesktop->ReadLockWindows()) {
+				BRegion dirty;
+				fCurrentLayer->MoveBy(offsetX, offsetY, &dirty);
+
+				// TODO: think about how to avoid this hack:
+				// the parent clipping needs to be updated, it is not
+				// done in ResizeBy() since it would need to avoid
+				// too much computations when children are resized because
+				// follow modes
+				if (ViewLayer* parent = fCurrentLayer->Parent())
+					parent->RebuildClipping(false);
+
+				fWindowLayer->MarkContentDirty(dirty);
+				fDesktop->ReadUnlockWindows();
+			}
+			break;
+		}
+		case AS_LAYER_RESIZE_TO:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_TO: ViewLayer name: %s\n",
+				fTitle, fCurrentLayer->Name()));
+
+			float newWidth, newHeight;
+			link.Read<float>(&newWidth);
+			link.Read<float>(&newHeight);
+			
+			float deltaWidth = newWidth - fCurrentLayer->Frame().Width();
+			float deltaHeight = newHeight - fCurrentLayer->Frame().Height();
+
+			if (fDesktop->ReadLockWindows()) {
+				BRegion dirty;
+				fCurrentLayer->ResizeBy(deltaWidth, deltaHeight, &dirty);
+
+				// TODO: see above
+				if (ViewLayer* parent = fCurrentLayer->Parent())
+					parent->RebuildClipping(false);
+
+				fWindowLayer->MarkContentDirty(dirty);
+				fDesktop->ReadUnlockWindows();
+			}
+			break;
+		}
+		case AS_LAYER_GET_COORD:
+		{
+			fDesktop->ReadLockWindows();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			// our offset in the parent -> will be originX and originY in BView
+			fLink.Attach<float>(fCurrentLayer->Frame().left);
+			fLink.Attach<float>(fCurrentLayer->Frame().top);
+			fLink.Attach<BRect>(fCurrentLayer->Bounds());
+			fLink.Flush();
+
+			fDesktop->ReadUnlockWindows();
+			break;
+		}
+		case AS_LAYER_SET_ORIGIN:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+
+			float x, y;
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+			
+			fCurrentLayer->SetDrawingOrigin(BPoint(x, y));
+			break;
+		}
+		case AS_LAYER_GET_ORIGIN:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			// TODO: rename this where it is used in the BView code!
+			// (it wants to know scrolling offset, not drawing origin)
+			fLink.Attach<BPoint>(fCurrentLayer->ScrollingOffset());
+			fLink.Flush();
+			break;
+		}
+		case AS_LAYER_RESIZE_MODE:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: ViewLayer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			uint32 resizeMode;
+			if (link.Read<uint32>(&resizeMode) == B_OK)
+				fCurrentLayer->SetResizeMode(resizeMode);
+			break;
+		}
+		case AS_LAYER_CURSOR:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
+			int32 token;
+
+			link.Read<int32>(&token);
+
+			// TODO: implement; I think each ViewLayer should have a member pointing
+			// to this requested cursor.
+			
+			break;
+		}
+		case AS_LAYER_SET_FLAGS:
+		{
+			uint32 flags;
+			link.Read<uint32>(&flags);
+			fCurrentLayer->SetFlags(flags);
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			break;
+		}
+		case AS_LAYER_HIDE:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+// TODO: test
+			fCurrentLayer->SetHidden(true);
+			break;
+		}
+		case AS_LAYER_SHOW:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+// TODO: test
+			fCurrentLayer->SetHidden(false);
+			break;
+		}
+		case AS_LAYER_SET_LINE_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			int8 lineCap, lineJoin;
+			float miterLimit;
+
+			link.Read<int8>(&lineCap);
+			link.Read<int8>(&lineJoin);
+			link.Read<float>(&miterLimit);
+			
+			fCurrentLayer->CurrentState()->SetLineCapMode((cap_mode)lineCap);
+			fCurrentLayer->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
+			fCurrentLayer->CurrentState()->SetMiterLimit(miterLimit);
+		
+			break;
+		}
+		case AS_LAYER_GET_LINE_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineCapMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->LineJoinMode()));
+			fLink.Attach<float>(fCurrentLayer->CurrentState()->MiterLimit());
+			fLink.Flush();
+		
+			break;
+		}
+		case AS_LAYER_PUSH_STATE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			fCurrentLayer->PushState();
+
+			break;
+		}
+		case AS_LAYER_POP_STATE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			fCurrentLayer->PopState();
+
+			break;
+		}
+		case AS_LAYER_SET_SCALE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			float scale;
+			link.Read<float>(&scale);
+
+			fCurrentLayer->SetScale(scale);
+			break;
+		}
+		case AS_LAYER_GET_SCALE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));		
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<float>(fCurrentLayer->CurrentState()->Scale());
+			fLink.Flush();
+			break;
+		}
+		case AS_LAYER_SET_PEN_LOC:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			float x, y;
+
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+
+			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
+			break;
+		}
+		case AS_LAYER_GET_PEN_LOC:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			fLink.Attach<BPoint>(fCurrentLayer->CurrentState()->PenLocation());
+			fLink.Flush();
+		
+			break;
+		}
+		case AS_LAYER_SET_PEN_SIZE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			float penSize;
+			link.Read<float>(&penSize);
+			fCurrentLayer->CurrentState()->SetPenSize(penSize);
+		
+			break;
+		}
+		case AS_LAYER_GET_PEN_SIZE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			fLink.Attach<float>(fCurrentLayer->CurrentState()->PenSize());
+			fLink.Flush();
+		
+			break;
+		}
+		case AS_LAYER_SET_VIEW_COLOR:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
+
+			fCurrentLayer->SetViewColor(RGBColor(c));
+			break;
+		}
+
+		case AS_LAYER_GET_HIGH_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_HIGH_COLOR: ViewLayer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->HighColor().GetColor32());
+			fLink.Flush();
+			break;
+
+		case AS_LAYER_GET_LOW_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LOW_COLOR: ViewLayer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->LowColor().GetColor32());
+			fLink.Flush();
+			break;
+
+		case AS_LAYER_GET_VIEW_COLOR:
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_VIEW_COLOR: ViewLayer: %s\n",
+				Title(), fCurrentLayer->Name()));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor().GetColor32());
+			fLink.Flush();
+			break;
+
+		case AS_LAYER_SET_BLEND_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			int8 srcAlpha, alphaFunc;
+			
+			link.Read<int8>(&srcAlpha);
+			link.Read<int8>(&alphaFunc);
+			
+			fCurrentLayer->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
+											(alpha_function)alphaFunc);
+
+			break;
+		}
+		case AS_LAYER_GET_BLEND_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaSrcMode()));
+			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->AlphaFncMode()));
+			fLink.Flush();
+
+			break;
+		}
+		case AS_LAYER_SET_DRAW_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			int8 drawingMode;
+			
+			link.Read<int8>(&drawingMode);
+			
+			fCurrentLayer->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
+			
+			break;
+		}
+		case AS_LAYER_GET_DRAW_MODE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int8>((int8)(fCurrentLayer->CurrentState()->GetDrawingMode()));
+			fLink.Flush();
+		
+			break;
+		}
+		case AS_LAYER_PRINT_ALIASING:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			bool fontAliasing;
+			link.Read<bool>(&fontAliasing);
+			fCurrentLayer->CurrentState()->SetForceFontAliasing(fontAliasing);
+			
+			break;
+		}
+		case AS_LAYER_CLIP_TO_PICTURE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+		// TODO: you are not allowed to use ViewLayer regions here!!!
+		// If there is no other way, then first lock RootLayer object first.
+			
+			int32 pictureToken;
+			BPoint where;
+			bool inverse = false;
+			
+			link.Read<int32>(&pictureToken);
+			link.Read<BPoint>(&where);
+			link.Read<bool>(&inverse);
+							
+			// search for a picture with the specified token.
+			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
+			// TODO: Increase that picture's reference count.(~ allocate a picture)
+			if (picture == NULL)
+				break;
+			
+			BRegion region;
+			// TODO: I think we also need the BView's token
+			// I think PictureToRegion would fit better into the ViewLayer class (?)
+			if (PictureToRegion(picture, region, inverse, where) < B_OK)
+				break;
+
+			fCurrentLayer->CurrentState()->SetClippingRegion(region);
+
+// TODO: reenable AS_LAYER_CLIP_TO_PICTURE
+#if 0
+			if (rootLayer && !(fCurrentLayer->IsHidden()) && !fWindowLayer->InUpdate()) {
+				BRegion invalidRegion;
+				fCurrentLayer->GetOnScreenRegion(invalidRegion);
+
+				// TODO: this is broken! a smaller area may be invalidated!
+
+				fCurrentLayer->fParent->MarkForRebuild(invalidRegion);
+				fCurrentLayer->fParent->TriggerRebuild();
+				rootLayer->MarkForRedraw(invalidRegion);
+				rootLayer->TriggerRedraw();
+			}
+#endif
+			break;
+		}
+
+		case AS_LAYER_GET_CLIP_REGION:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			// if this ViewLayer is hidden, it is clear that its visible region is void.
+			if (fCurrentLayer->IsHidden()) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(0L);
+				fLink.Flush();
+			} else {
+				BRegion drawingRegion = fCurrentLayer->LocalClipping();
+				int32 rectCount = drawingRegion.CountRects();
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(rectCount);
+
+				for (int32 i = 0; i < rectCount; i++) {
+					fLink.Attach<BRect>(drawingRegion.RectAt(i));
+				}
+
+				fLink.Flush();
+			}
+
+			break;
+		}
+		case AS_LAYER_SET_CLIP_REGION:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			int32 rectCount;
+			link.Read<int32>(&rectCount);
+
+			BRegion region;
+			for (int32 i = 0; i < rectCount; i++) {
+				BRect r;
+				link.Read<BRect>(&r);
+				region.Include(r);
+			}
+			fCurrentLayer->SetUserClipping(region);
+			break;
+		}
+
+		case AS_LAYER_INVAL_RECT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			// NOTE: looks like this call is NOT affected by origin and scale on R5
+			// so this implementation is "correct"
+			BRect invalidRect;
+			if (link.Read<BRect>(&invalidRect) == B_OK) {
+				BRegion dirty(invalidRect);
+				fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+			}
+			break;
+		}
+		case AS_LAYER_INVAL_REGION:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+			
+			// NOTE: looks like this call is NOT affected by origin and scale on R5
+			// so this implementation is "correct"
+			BRegion dirty;
+			int32 rectCount;
+			BRect rect;
+			
+			link.Read<int32>(&rectCount);
+			
+			for (int i = 0; i < rectCount; i++) {
+				link.Read<BRect>(&rect);
+				dirty.Include(rect);
+			}
+
+			fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+			break;
+		}
+
+		case AS_LAYER_SET_HIGH_COLOR:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+
+			rgb_color c;
+			link.Read(&c, sizeof(rgb_color));
 			
 			fCurrentLayer->CurrentState()->SetHighColor(RGBColor(c));
-
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n", Title(), fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+
 			rgb_color c;
-			
 			link.Read(&c, sizeof(rgb_color));
-			
+
 			fCurrentLayer->CurrentState()->SetLowColor(RGBColor(c));
-			
 			break;
 		}
 		case AS_LAYER_SET_PATTERN:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: ViewLayer: %s\n", fTitle, fCurrentLayer->Name()));
+
 			pattern pat;
-			
 			link.Read(&pat, sizeof(pattern));
-			
+
 			fCurrentLayer->CurrentState()->SetPattern(Pattern(pat));
-			
 			break;
 		}	
 		case AS_MOVEPENTO:
 		{
 			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n", Title()));
-			
+
 			float x,y;
-			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
+
 			if (fCurrentLayer && fCurrentLayer->CurrentState())
 				fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
-			
 			break;
 		}
 		case AS_SETPENSIZE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n", Title()));
+
 			float size;
-			
 			link.Read<float>(&size);
+
 			if (fCurrentLayer && fCurrentLayer->CurrentState())
 				fCurrentLayer->CurrentState()->SetPenSize(size);
-			
 			break;
 		}
 		case AS_SET_FONT:
@@ -1576,37 +1632,55 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_LAYER_DRAG_IMAGE:
 		{
-			// TODO: Implement AS_LAYER_DRAG_IMAGE
-			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n", Title()));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n", Title()));
+			// TODO: flesh out AS_LAYER_DRAG_IMAGE
+			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE\n", Title()));
+
+			int32 bitmapToken;
+			drawing_mode dragMode;
+			BPoint offset;
+			int32 bufferSize;
+			
+			link.Read<int32>(&bitmapToken);
+			link.Read<int32>((int32*)&dragMode);
+			link.Read<BPoint>(&offset);
+			link.Read<int32>(&bufferSize);
+
+			if (bufferSize > 0) {
+				char* buffer = new (nothrow) char[bufferSize];
+				BMessage dragMessage;
+				if (link.Read(buffer, bufferSize) == B_OK
+					&& dragMessage.Unflatten(buffer) == B_OK) {
+//						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+						fDesktop->EventDispatcher().SetDragMessage(dragMessage/*, bitmap*/);
+				}
+				delete[] buffer;
+			}
+
 			break;
 		}
 		case AS_LAYER_DRAG_RECT:
 		{
-			// TODO: Implement AS_LAYER_DRAG_RECT
-			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n", Title()));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n", Title()));
-			break;
-		}
-		case AS_GET_MOUSE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
+			// TODO: flesh out AS_LAYER_DRAG_RECT
+			STRACE(("ServerWindow %s: Message AS_DRAG_RECT\n", Title()));
 
-			// Returns
-			// 1) BPoint mouse location
-			// 2) int32 button state
-			rootLayer->Unlock();
+			BRect dragRect;
+			BPoint offset;
+			int32 bufferSize;
+			
+			link.Read<BRect>(&dragRect);
+			link.Read<BPoint>(&offset);
+			link.Read<int32>(&bufferSize);
 
-			BPoint where;
-			int32 buttons;
-			fDesktop->EventDispatcher().GetMouse(where, buttons);
+			if (bufferSize > 0) {
+				char* buffer = new (nothrow) char[bufferSize];
+				BMessage dragMessage;
+				if (link.Read(buffer, bufferSize) == B_OK
+					&& dragMessage.Unflatten(buffer) == B_OK) {
+						fDesktop->EventDispatcher().SetDragMessage(dragMessage/*, dragRect*/);
+				}
+				delete[] buffer;
+			}
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<BPoint>(where);
-			fLink.Attach<int32>(buttons);
-			fLink.Flush();
-
-			rootLayer->Lock();
 			break;
 		}
 
@@ -1615,7 +1689,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			// TODO: Use token or get rid of it.
 			int32 serverToken;
 			link.Read<int32>(&serverToken);
-			
+
 			if (_EnableDirectWindowMode() == B_OK) {
 				fLink.StartMessage(B_OK);
 				struct dw_sync_data syncData = { 
@@ -1623,50 +1697,60 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					fDirectWindowData->direct_sem,
 					fDirectWindowData->direct_sem_ack
 				};
-				
+
 				fLink.Attach(&syncData, sizeof(syncData));
-				 
 			} else
 				fLink.StartMessage(B_ERROR);
-			
+
 			fLink.Flush();
-			
 			break;
 		}
-		
+
 		default:
-			_DispatchGraphicsMessage(code, link);
+			if (fDesktop->ReadLockWindows()) {
+				_DispatchViewDrawingMessage(code, link);
+				fDesktop->ReadUnlockWindows();
+			}
 			break;
 	}
-
-	if (rootLayer)
-		rootLayer->Unlock();
 }
 
-// -------------------- Graphics messages ----------------------------------
 
+/*!
+	Dispatches all view drawing messages.
+	The desktop clipping must be read locked when entering this method.
+	Requires a valid fCurrentLayer.
+*/
 void
-ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
+ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &link)
 {
-	// NOTE: fCurrentLayer and fCurrentLayer->fLayerData cannot be NULL,
-	// _DispatchGraphicsMessage() is called from _DispatchMessage() which
-	// checks both these conditions
-	BRegion rreg(fCurrentLayer->DrawingRegion());
-
-	if (fWindowLayer->InUpdate())
-		rreg.IntersectWith(&fWindowLayer->RegionToBeUpdated());
-
-	DrawingEngine* driver = fWindowLayer->GetDrawingEngine();
-	if (!driver) {
-		// ?!?
-		DTRACE(("ServerWindow %s: no display driver!!\n", Title()));
+	if (!fCurrentLayer->IsVisible() || !fWindowLayer->IsVisible()) {
+		if (link.NeedsReply()) {
+			printf("ServerWindow::DispatchViewDrawingMessage() got message %ld that needs a reply!\n", code);
+			// the client is now blocking and waiting for a reply!
+			fLink.StartMessage(B_ERROR);
+			fLink.Flush();
+		}
 		return;
 	}
 
-	driver->ConstrainClippingRegion(&rreg);
-//	rgb_color  rrr = fCurrentLayer->CurrentState()->viewcolor.GetColor32();
-//	RGBColor c(rand()%255,rand()%255,rand()%255);
-//	driver->FillRect(BRect(0,0,639,479), c);
+	DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
+	if (!drawingEngine) {
+		// ?!?
+		DTRACE(("ServerWindow %s: no drawing engine!!\n", Title()));
+		return;
+	}
+
+	if (!fCurrentDrawingRegionValid || fWindowLayer->DrawingRegionChanged(fCurrentLayer)) {
+		fWindowLayer->GetEffectiveDrawingRegion(fCurrentLayer, fCurrentDrawingRegion);
+		fCurrentDrawingRegionValid = true;
+	}
+
+	// prevent other ServerWindows from messing with the drawing engine
+	// as long as each uses the same instance... TODO: remove the locking
+	// when each has its own
+	drawingEngine->Lock();
+	drawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
 
 	switch (code) {
 		case AS_STROKE_LINE:
@@ -1685,7 +1769,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint penPos = p2;
 			fCurrentLayer->ConvertToScreenForDrawing(&p1);
 			fCurrentLayer->ConvertToScreenForDrawing(&p2);
-			driver->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
+			drawingEngine->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
 			
 			// We update the pen here because many DrawingEngine calls which do not update the
 			// pen position actually call StrokeLine
@@ -1704,7 +1788,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&rect);
 			
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->InvertRect(rect);
+			drawingEngine->InvertRect(rect);
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1717,27 +1801,26 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&right);
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
-			
-			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->StrokeRect(rect, fCurrentLayer->CurrentState());
 
+			fCurrentLayer->ConvertToScreenForDrawing(&rect);
+			drawingEngine->StrokeRect(rect, fCurrentLayer->CurrentState());
 			break;
 		}
 		case AS_FILL_RECT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n", Title()));
-			
+
 			BRect rect;
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->FillRect(rect, fCurrentLayer->CurrentState());
+			drawingEngine->FillRect(rect, fCurrentLayer->CurrentState());
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_AT_POINT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_AT_POINT: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BPoint point;
 			link.Read<int32>(&bitmapToken);
@@ -1749,7 +1832,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 				BRect dst = src.OffsetToCopy(point);
 				fCurrentLayer->ConvertToScreenForDrawing(&dst);
 
-				driver->DrawBitmap(bitmap, src, dst, fCurrentLayer->CurrentState());
+				drawingEngine->DrawBitmap(bitmap, src, dst, fCurrentLayer->CurrentState());
 			}
 
 			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
@@ -1761,7 +1844,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_IN_RECT: Layer name: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_IN_RECT: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 
@@ -1773,7 +1856,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (bitmap) {
 				fCurrentLayer->ConvertToScreenForDrawing(&dstRect);
 
-				driver->DrawBitmap(bitmap, srcRect, dstRect, fCurrentLayer->CurrentState());
+				drawingEngine->DrawBitmap(bitmap, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
 
 			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
@@ -1783,52 +1866,49 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_FILL_ARC:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ARC\n", Title()));
-			
+
 			float angle, span;
 			BRect r;
-			
+
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&r);
-			driver->DrawArc(r, angle, span, fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
-
+			drawingEngine->DrawArc(r, angle, span, fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
 			break;
 		}
 		case AS_STROKE_BEZIER:
 		case AS_FILL_BEZIER:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_BEZIER\n", Title()));
-			
+
 			BPoint pts[4];
 			for (int32 i = 0; i < 4; i++) {
 				link.Read<BPoint>(&(pts[i]));
 				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
 			}
-				
-			driver->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
 
+			drawingEngine->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
 		case AS_FILL_ELLIPSE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ELLIPSE\n", Title()));
-			
+
 			BRect rect;
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->DrawEllipse(rect, fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
-
+			drawingEngine->DrawEllipse(rect, fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
 		case AS_FILL_ROUNDRECT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_ROUNDRECT\n", Title()));
-			
+
 			BRect rect;
 			float xrad,yrad;
 			link.Read<BRect>(&rect);
@@ -1836,8 +1916,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<float>(&yrad);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->DrawRoundRect(rect, xrad, yrad, fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
-
+			drawingEngine->DrawRoundRect(rect, xrad, yrad, fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -1856,8 +1935,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			driver->DrawTriangle(pts, rect, fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
-
+			drawingEngine->DrawTriangle(pts, rect, fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
 			break;
 		}
 		case AS_STROKE_POLYGON:
@@ -1876,28 +1954,25 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			BPoint* pointList = new(nothrow) BPoint[pointCount];
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
-
 				for (int32 i = 0; i < pointCount; i++)
 					fCurrentLayer->ConvertToScreenForDrawing(&pointList[i]);
-	
-				driver->DrawPolygon(pointList, pointCount, polyFrame,
-									fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
-									isClosed && pointCount > 2);
-	
+
+				drawingEngine->DrawPolygon(pointList, pointCount, polyFrame,
+					fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
+					isClosed && pointCount > 2);
 			}
 			delete[] pointList;
-
 			break;
 		}
 		case AS_STROKE_SHAPE:
 		case AS_FILL_SHAPE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_SHAPE\n", Title()));
-			
+
 			BRect shapeFrame;
 			int32 opCount;
 			int32 ptCount;
-			
+
 			link.Read<BRect>(&shapeFrame);
 			link.Read<int32>(&opCount);
 			link.Read<int32>(&ptCount);
@@ -1909,20 +1984,19 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 
 				for (int32 i = 0; i < ptCount; i++)
 					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
-	
-				driver->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
-								  fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
+
+				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
+					fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
 			}
 
 			delete[] opList;
 			delete[] ptList;
-
 			break;
 		}
 		case AS_FILL_REGION:
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n", Title()));
-			
+
 			int32 count;
 			link.Read<int32>(&count);
 
@@ -1941,31 +2015,30 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			fCurrentLayer->ConvertToScreenForDrawing(&region);
-			driver->FillRegion(region, fCurrentLayer->CurrentState());
+			drawingEngine->FillRegion(region, fCurrentLayer->CurrentState());
 
 			delete[] rects;
 
 			// TODO: create support for clipping_rect usage for faster BRegion display.
-			// Tweaks to DrawingEngine are necessary along with conversion routines in Layer
+			// Tweaks to DrawingEngine are necessary along with conversion routines in ViewLayer
 			break;
 		}
 		case AS_STROKE_LINEARRAY:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n", Title()));
-			
+
 			// Attached Data:
 			// 1) int32 Number of lines in the array
 			// 2) array of struct _array_data_ objects, as defined in ViewAux.h
-			
-			int32 linecount;
-			
-			link.Read<int32>(&linecount);
-			if (linecount > 0) {
-				LineArrayData linedata[linecount];
-				LineArrayData* index;
 
-				for (int32 i = 0; i < linecount; i++) {
-					index = &linedata[i];
+			int32 lineCount;
+
+			link.Read<int32>(&lineCount);
+			if (lineCount > 0) {
+				LineArrayData lineData[lineCount];
+
+				for (int32 i = 0; i < lineCount; i++) {
+					LineArrayData* index = &lineData[i];
 
 					link.Read<float>(&(index->pt1.x));
 					link.Read<float>(&(index->pt1.y));
@@ -1976,7 +2049,8 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 					fCurrentLayer->ConvertToScreenForDrawing(&index->pt1);
 					fCurrentLayer->ConvertToScreenForDrawing(&index->pt2);
 				}
-				driver->StrokeLineArray(linecount, linedata, fCurrentLayer->CurrentState());
+				drawingEngine->StrokeLineArray(lineCount, lineData,
+					fCurrentLayer->CurrentState());
 			}
 			break;
 		}
@@ -1987,18 +2061,19 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			int32 length;
 			BPoint location;
 			escapement_delta delta;
-			
+
 			link.Read<int32>(&length);
 			link.Read<BPoint>(&location);
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
-			
+
 			fCurrentLayer->ConvertToScreenForDrawing(&location);
-			BPoint penLocation = driver->DrawString(string, length, location,
-													fCurrentLayer->CurrentState(), &delta);
+			BPoint penLocation = drawingEngine->DrawString(string, length, location,
+				fCurrentLayer->CurrentState(), &delta);
+
 			fCurrentLayer->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
-			
+
 			free(string);
 			break;
 		}
@@ -2024,7 +2099,7 @@ ServerWindow::_DispatchGraphicsMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 	}
 
-	driver->ConstrainClippingRegion(NULL);
+	drawingEngine->Unlock();
 }
 
 
@@ -2066,88 +2141,20 @@ ServerWindow::_MessageLooper()
 			printf("ServerWindow %s: lock acquisition took %Ld usecs\n", Title(), diff);
 #endif
 
-		switch (code) {
-			case AS_DELETE_WINDOW:
-			case kMsgQuitLooper:
-				// this means the client has been killed
-				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
-					Title()));
+		if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
+			// this means the client has been killed
+			STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
+				Title()));
 
-				quitLoop = true;
+			quitLoop = true;
 
-				// ToDo: what's this?
-				//RootLayer *rootLayer = fWindowLayer->GetRootLayer();
-
-				// we are preparing to delete a ServerWindow, RootLayer should be aware
-				// of that and stop for a moment.
-				// also we must wait a bit for the associated WindowLayer to become hidden
-				//while(1) {
-				//	rootLayer->Lock();
-				//	if (IsHidden())
-				//		break;
-				//	else
-				//		rootLayer->Unlock();
-				//}
-
-				// ServerWindow's destructor takes care of pulling this object off the desktop.
-				if (!fWindowLayer->IsHidden())
-					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
-				break;
-
-			// TODO: these are here temporarily, as they don't lock the root layer
-			case AS_SHOW_WINDOW:
-				STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
-				Show();
-				break;
-
-			case AS_HIDE_WINDOW:
-				STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));		
-				Hide();
-				break;
-
-			case AS_ACTIVATE_WINDOW:
-			{
-				DTRACE(("ServerWindow %s: Message AS_ACTIVATE_WINDOW: Layer: %s\n", Title(), fCurrentLayer->Name()));
-				bool activate = true;
-	
-				receiver.Read<bool>(&activate);
-	
-				if (activate)
-					fDesktop->ActivateWindow(fWindowLayer);
-				else
-					fDesktop->SendBehindWindow(fWindowLayer, NULL);
-				break;
-			}
-			case AS_SEND_BEHIND:
-			{
-				STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
-				int32 token;
-				team_id teamID;
-				status_t status;
-		
-				receiver.Read<int32>(&token);
-				receiver.Read<team_id>(&teamID);
-		
-				WindowLayer *behindOf;
-				if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
-					fDesktop->SendBehindWindow(fWindowLayer, behindOf);
-					status = B_OK;
-				} else
-					status = B_NAME_NOT_FOUND;
-		
-				fLink.StartMessage(status);
-				fLink.Flush();
-				break;
-			}
-
-			case B_QUIT_REQUESTED:
-				STRACE(("ServerWindow %s received quit request\n", Title()));
-				NotifyQuitRequested();
-				break;
-
-			default:
-				_DispatchMessage(code, receiver);
-				break;
+			// ServerWindow's destructor takes care of pulling this object off the desktop.
+			if (!fWindowLayer->IsHidden())
+				CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
+		} else {
+			fDesktop->ReadLockWindows();
+			_DispatchMessage(code, receiver);
+			fDesktop->ReadUnlockWindows();
 		}
 
 #ifdef PROFILE_MESSAGE_LOOP
@@ -2267,10 +2274,12 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 
 		// TODO: Is there a simpler way to obtain this result ?
 		// We just want the region INSIDE the window, border excluded.
-		BRegion clipRegion = const_cast<BRegion &>(layer->FullVisible());
+		BRegion clipRegion;
+// TODO: fix HandleDirectConnection()
+/*		 = const_cast<BRegion &>(layer->FullVisible());
 		BRegion exclude = const_cast<BRegion &>(layer->VisibleRegion());
 		clipRegion.Exclude(&exclude);
-
+*/
 		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(),
 			kMaxClipRectsCount);
 		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
@@ -2298,6 +2307,16 @@ ServerWindow::HandleDirectConnection(int bufferState, int driverState)
 		// Deleting this member should make it crash.
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
+	}
+}
+
+
+void
+ServerWindow::_SetCurrentLayer(ViewLayer* layer)
+{
+	if (fCurrentLayer != layer) {
+		fCurrentLayer = layer;
+		fCurrentDrawingRegionValid = false;
 	}
 }
 

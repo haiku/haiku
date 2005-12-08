@@ -15,7 +15,6 @@
 #include <TokenSpace.h>
 
 #include <Autolock.h>
-#include <MessageFilter.h>
 #include <View.h>
 
 #include <new>
@@ -470,7 +469,14 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 	moved.AddPoint("screen_where", fLastCursorPosition);
 	moved.AddInt32("buttons", fLastButtons);
 	moved.AddInt32("_view_token", viewToken);
-	
+
+	if (fDraggingMessage) {
+/*		moved.AddInt32("_msg_data", );
+		moved.AddInt32("_msg_base_", );
+		moved.AddInt32("_msg_what_", fDragMessage->what);*/
+		moved.AddMessage("be:drag_message", &fDragMessage);
+	}
+
 	_SendMessage(target.Messenger(), &moved, kMouseTransitImportance);
 }
 
@@ -494,6 +500,18 @@ EventDispatcher::SetHWInterface(HWInterface* interface)
 	fHWInterface = interface;
 }
 
+
+void
+EventDispatcher::SetDragMessage(BMessage& message)
+{
+	printf("EventDispatcher::SetDragMessage()\n");
+
+	BAutolock _(*this);
+
+	fDragMessage = message;
+
+	fDraggingMessage = true;
+}
 
 //	#pragma mark - Message methods
 
@@ -575,6 +593,28 @@ EventDispatcher::_UnsetFeedFocus(BMessage* message)
 }
 
 
+void
+EventDispatcher::_DeliverDragMessage()
+{
+	printf("EventDispatcher::_DeliverDragMessage()\n");
+
+	if (fDraggingMessage && fPreviousMouseTarget) {
+		fDragMessage.RemoveName("_original_what");
+		fDragMessage.AddInt32("_original_what", fDragMessage.what);
+		fDragMessage.what = _MESSAGE_DROPPED_;
+
+//		fDragMessage.AddBool("dropped", true);
+printf("  sending message to previous mouse target\n");
+		_SendMessage(fPreviousMouseTarget->Messenger(), 
+			&fDragMessage, 100.0);
+	}
+
+	fDragMessage.MakeEmpty();
+	fDragMessage.what = 0;
+	fDraggingMessage = false;
+}
+
+
 //	#pragma mark - Event loops
 
 
@@ -603,6 +643,13 @@ EventDispatcher::_EventLoop()
 				BPoint where;
 				if (event->FindPoint("where", &where) == B_OK)
 					fLastCursorPosition = where;
+
+				if (fDraggingMessage) {
+/*					event->AddInt32("_msg_data", );
+					event->AddInt32("_msg_base_", );
+					event->AddInt32("_msg_what_", fDragMessage->what);*/
+					event->AddMessage("be:drag_message", &fDragMessage);
+				}
 
 				if (!HasCursorThread()) {
 					// there is no cursor thread, we need to move the cursor ourselves
@@ -717,7 +764,7 @@ EventDispatcher::_EventLoop()
 				_UnsetFeedFocus(event);
 			}
 			if (pointerEvent) {
-				// this is added in the RootLayer mouse processing
+				// this is added in the Desktop mouse processing
 				// but it's only intended for the focus view
 				event->RemoveName("_view_token");
 			}
@@ -744,6 +791,8 @@ EventDispatcher::_EventLoop()
 			if (event->what == B_MOUSE_UP) {
 				fSuspendFocus = false;
 				_RemoveTemporaryListeners();
+				if (fDraggingMessage)
+					_DeliverDragMessage();
 			}
 		}
 
