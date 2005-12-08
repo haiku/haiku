@@ -1056,12 +1056,20 @@ BMenu::_show(bool selectFirstItem)
 void
 BMenu::_hide()
 {
-	if (fCachedMenuWindow != NULL) {
-		fCachedMenuWindow->Lock();
-		fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
-		fCachedMenuWindow->Quit();
-		fCachedMenuWindow = NULL;
+	if (!LockLooper())
+		return;
+	if (fCachedMenuWindow == NULL) {
+		// Huh? What did happen here? - we're trying to be on the safe side
+		UnlockLooper();
+		return;
 	}
+
+	fCachedMenuWindow->Hide();
+	fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
+		// we don't want to be deleted when the window is removed
+
+	fCachedMenuWindow->Quit();
+	fCachedMenuWindow = NULL;
 }
 
 
