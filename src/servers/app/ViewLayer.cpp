@@ -746,7 +746,6 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 void
 ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 {
-printf("ViewLayer(%s)::CopyBits()\n", Name());
 	if (!fVisible || !fWindow)
 		return;
 

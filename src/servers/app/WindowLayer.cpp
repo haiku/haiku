@@ -502,7 +502,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 		BRegion dirty;
 		view->ScrollBy(dx, dy, &dirty);
 
-		_MarkContentDirty(&dirty);
+		MarkContentDirty(dirty);
 
 		fDesktop->ReadUnlockWindows();
 	}
@@ -531,10 +531,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				// the part which we can copy is not dirty
 				newDirty.Exclude(region);
 		
-				if (fDrawingEngine->Lock()) {
-					fDrawingEngine->CopyRegion(region, xOffset, yOffset);
-					fDrawingEngine->Unlock();
-				}
+				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
 
 				// move along the already dirty regions that are common
 				// with the region that we could copy
@@ -845,6 +842,24 @@ WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
 				break;
 		}
 
+		// redraw decoratpr
+		BRegion visibleBorder;
+		GetBorderRegion(&visibleBorder);
+		visibleBorder.IntersectWith(&VisibleRegion());
+
+		fDrawingEngine->Lock();
+		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+
+		if (fIsZooming) {
+			fDecorator->SetZoom(true);
+		} else if (fIsClosing) {
+			fDecorator->SetClose(true);
+		} else if (fIsMinimizing) {
+			fDecorator->SetMinimize(true);
+		}
+
+		fDrawingEngine->Unlock();
+
 		// based on what the Decorator returned, properly place this window.
 		if (action == DEC_MOVETOBACK) {
 			fDesktop->SendWindowBehind(this);
@@ -884,11 +899,23 @@ WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
 	bool invalidate = false;
 	if (fDecorator) {
 		click_type action = _ActionFor(msg);
-// TODO: present behavior is not fine!
-//		Decorator's Set*() methods _actualy draw_! on screen, not
-//		 taking into account if that region is visible or not!
-//		Decorator redraw code should follow the same path as Layer's
-//		 one!
+
+		// redraw decoratpr
+		BRegion visibleBorder;
+		GetBorderRegion(&visibleBorder);
+		visibleBorder.IntersectWith(&VisibleRegion());
+
+		fDrawingEngine->Lock();
+		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+
+		if (fIsZooming) {
+			fDecorator->SetZoom(true);
+		} else if (fIsClosing) {
+			fDecorator->SetClose(true);
+		} else if (fIsMinimizing) {
+			fDecorator->SetMinimize(true);
+		}
+
 		if (fIsZooming) {
 			fIsZooming	= false;
 			fDecorator->SetZoom(false);
@@ -913,6 +940,8 @@ WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
 				fWindow->NotifyMinimize(true);
 			}
 		}
+
+		fDrawingEngine->Unlock();
 	}
 	fIsDragging = false;
 	fIsResizing = false;
@@ -927,11 +956,14 @@ void
 WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 {
 	if (fDecorator) {
-// TODO: present behavior is not fine!
-//		Decorator's Set*() methods _actualy draw_! on screen, not
-//		 taking into account if that region is visible or not!
-//		Decorator redraw code should follow the same path as Layer's
-//		 one!
+
+		BRegion visibleBorder;
+		GetBorderRegion(&visibleBorder);
+		visibleBorder.IntersectWith(&VisibleRegion());
+
+		fDrawingEngine->Lock();
+		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+
 		if (fIsZooming) {
 			fDecorator->SetZoom(_ActionFor(msg) == DEC_ZOOM);
 		} else if (fIsClosing) {
@@ -939,13 +971,15 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 		} else if (fIsMinimizing) {
 			fDecorator->SetMinimize(_ActionFor(msg) == DEC_MINIMIZE);
 		}
+
+		fDrawingEngine->Unlock();
 	}
 
-	if (fIsDragging) {
+	if (fIsDragging && !(Flags() & B_NOT_MOVABLE)) {
 		BPoint delta = where - fLastMousePosition;
 		fDesktop->MoveWindowBy(this, delta.x, delta.y);
 	}
-	if (fIsResizing) {
+	if (fIsResizing && !(Flags() & B_NOT_RESIZABLE)) {
 		BPoint delta = where - fLastMousePosition;
 		if (Flags() & B_NOT_V_RESIZABLE)
 			delta.y = 0;
@@ -1013,25 +1047,19 @@ WindowLayer::Activated(bool active)
 
 
 void
-WindowLayer::SetTitle(const char* name)
+WindowLayer::SetTitle(const char* name, BRegion& dirty)
 {
 	// rebuild the clipping for the title area
 	// and redraw it.
 
 	fTitle = name;
 
-/* TODO: SetTitle
 	if (fDecorator) {
-		// TODO: need locking here too
-		BRegion updateRegion;
-		fDecorator->SetTitle(name, &updateRegion);
+		fDecorator->SetTitle(name, &dirty);
 
-		if (fVisible && fDesktop & fDesktop->WriteLockWindows()) {
-			// ....
-			fDesktop->WriteUnlockWindows();
-		}
+		fBorderRegionValid = false;
+			// the border very likely changed
 	}
-*/
 }
 
 

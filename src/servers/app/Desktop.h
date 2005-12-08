@@ -114,6 +114,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetWindowLook(WindowLayer* window, window_look look);
 		void					SetWindowFeel(WindowLayer* window, window_feel feel);
 		void					SetWindowFlags(WindowLayer* window, uint32 flags);
+		void					SetWindowTitle(WindowLayer* window, const char* title);
 
 		WindowLayer*			FocusWindow() const { return fFocus; }
 		WindowLayer*			FrontWindow() const { return fFront; }

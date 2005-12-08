@@ -123,7 +123,7 @@ class WindowLayer {
 			void				Activated(bool active);
 
 			// changing some properties
-			void				SetTitle(const char* name);
+			void				SetTitle(const char* name, BRegion& dirty);
 
 			void				SetFocus(bool focus);
 			bool				IsFocus() const { return fIsFocus; }

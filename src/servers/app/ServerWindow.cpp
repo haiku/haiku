@@ -358,7 +358,7 @@ ServerWindow::SetTitle(const char* newTitle)
 	}
 
 	if (fWindowLayer != NULL)
-		fWindowLayer->SetTitle(newTitle);
+		fDesktop->SetWindowTitle(fWindowLayer, newTitle);
 }
 
 

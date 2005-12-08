@@ -1209,6 +1209,7 @@ Desktop::RemoveWindow(WindowLayer *window)
 	BAutolock _(this);
 
 	fAllWindows.RemoveWindow(window);
+//	_CurrentWindows().RemoveWindow(window);
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
 
 	// make sure this window won't get any events anymore
@@ -1283,9 +1284,32 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 }
 
 
+void
+Desktop::SetWindowTitle(WindowLayer *window, const char* title)
+{
+	if (!WriteLockWindows())
+		return;
+
+	BRegion dirty;
+	window->SetTitle(title, dirty);
+
+	if (window->IsVisible() && dirty.CountRects() > 0) {
+		BRegion stillAvailableOnScreen;
+		_RebuildClippingForAllWindows(stillAvailableOnScreen);
+		_SetBackground(stillAvailableOnScreen);
+	
+		_TriggerWindowRedrawing(dirty);
+	}
+
+	WriteUnlockWindows();
+}
+
+
 WindowLayer*
 Desktop::WindowAt(BPoint where)
 {
+// TODO: BAutolock locker(this); ?!?
+
 	for (WindowLayer* window = _CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->VisibleRegion().Contains(where))
