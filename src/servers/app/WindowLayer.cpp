@@ -288,7 +288,7 @@ WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 	fVisibleContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	// TODO: Window()->HandleDirectConnection(B_DIRECT_STOP);
+	// TODO: Window()->HandleDirectConnection(B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
 }
 
 // GetFullRegion
