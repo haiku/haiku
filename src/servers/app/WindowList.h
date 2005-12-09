@@ -42,6 +42,8 @@ enum window_lists {
 	kAllWindowList = 32,
 	kSubsetList,
 	kWorkingList,
+
+	kListCount
 };
 
 struct window_anchor {

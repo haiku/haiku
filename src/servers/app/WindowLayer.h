@@ -205,13 +205,13 @@ class WindowLayer {
 			click_type			_ActionFor(const BMessage* msg) const;
 
 			void				_ObeySizeLimits();
+			void				_PropagatePosition();
 
 			BString				fTitle;	
 			// TODO: no fp rects anywhere
 			BRect				fFrame;
 
-			window_anchor		fAnchor[kWorkingList + 1];
-				// one for each desktop, and one working anchor
+			window_anchor		fAnchor[kListCount];
 
 			// the visible region is only recalculated from the
 			// Desktop thread, when using it, Desktop::ReadLockClipping()
@@ -301,6 +301,7 @@ class WindowLayer {
 
 			window_look			fLook;
 			window_feel			fFeel;
+			uint32				fOriginalFlags;
 			uint32				fFlags;
 			uint32				fWorkspaces;
 			int32				fCurrentWorkspace;

@@ -109,7 +109,6 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 
 	fLook(look),
 	fFeel(feel),
-	fFlags(flags),
 	fWorkspaces(workspaces),
 	fCurrentWorkspace(-1),
 
@@ -125,7 +124,8 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 		fLook = B_TITLED_WINDOW_LOOK;
 	if (!IsValidFeel(fFeel))
 		fFeel = B_NORMAL_WINDOW_FEEL;
-	fFlags &= ValidWindowFlags();
+
+	SetFlags(flags, NULL);
 
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
 		fDecorator = gDecorManager.AllocateDecorator(fDesktop, frame, name, fLook, fFlags);
@@ -372,6 +372,18 @@ WindowLayer::VisibleContentRegion()
 
 
 void
+WindowLayer::_PropagatePosition()
+{
+	if ((fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) == 0)
+		return;
+
+	for (int32 i = 0; i < kListCount; i++) {
+		Anchor(i).position = fFrame.LeftTop();
+	}
+}
+
+
+void
 WindowLayer::MoveBy(int32 x, int32 y)
 {
 	// this function is only called from the desktop thread
@@ -382,13 +394,7 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	fWindow->HandleDirectConnection(B_DIRECT_STOP);
 
 	fFrame.OffsetBy(x, y);
-
-	// propagate position if asked for
-	if (fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) {
-		for (int32 i = 0; i <= kWorkingList; i++) {
-			Anchor(i).position = fFrame.LeftTop();
-		}
-	}
+	_PropagatePosition();
 
 	fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
 
@@ -1222,17 +1228,26 @@ WindowLayer::SetFeel(window_feel feel)
 
 	// having modal windows with B_AVOID_FRONT or B_AVOID_FOCUS doesn't
 	// make that much sense, so we filter those flags out on demand
-	fFlags &= ~ValidWindowFlags(fFeel);
+	fFlags = fOriginalFlags;
+	fFlags &= ValidWindowFlags(fFeel);
 
-	if (!IsNormal())
+	if (!IsNormal()) {
 		fFlags |= B_SAME_POSITION_IN_ALL_WORKSPACES;
+		_PropagatePosition();
+	}
 }
 
 
 void
 WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
 {
-	fFlags = flags & ~ValidWindowFlags(fFeel);
+	fOriginalFlags = flags;
+	fFlags = flags & ValidWindowFlags(fFeel);
+	if (!IsNormal())
+		fFlags |= B_SAME_POSITION_IN_ALL_WORKSPACES;
+
+	if ((fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) != 0)
+		_PropagatePosition();
 
 	if (fDecorator == NULL)
 		return;
@@ -1540,6 +1555,7 @@ WindowLayer::ValidWindowFlags()
 		| B_NOT_ANCHORED_ON_ACTIVATE
 		| B_ASYNCHRONOUS_CONTROLS
 		| B_QUIT_ON_WINDOW_CLOSE
+		| B_SAME_POSITION_IN_ALL_WORKSPACES
 		| kWorkspacesWindowFlag
 		| kWindowScreenFlag;
 }
