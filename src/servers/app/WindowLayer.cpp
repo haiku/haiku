@@ -26,7 +26,7 @@
 
 #include <Debug.h>
 #include <DirectWindow.h>
-#include <View.h>	// for mouse button defines
+#include <View.h>
 
 #include <new>
 #include <stdio.h>
@@ -63,7 +63,7 @@
 
 using std::nothrow;
 
-// constructor
+
 WindowLayer::WindowLayer(const BRect& frame, const char *name,
 						 window_look look, window_feel feel,
 						 uint32 flags, uint32 workspaces,
@@ -156,102 +156,14 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
 }
 
-// destructor
+
 WindowLayer::~WindowLayer()
 {
 	delete fTopLayer;
 	delete fDecorator;
 }
-/*
-// MessageReceived
-void
-WindowLayer::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case MSG_REDRAW: {
-			// there is only one MSG_REDRAW in the queue at anytime
-			if (fDesktop->ReadLockWindows()) {
 
-				_DrawBorder();
-				_TriggerContentRedraw();
 
-				// reset the dirty region, since
-				// we're fully clean. If the desktop
-				// thread wanted to mark something
-				// dirty in the mean time, it was
-				// blocking on the global region lock to
-				// get write access, since we held the
-				// read lock for the whole time.
-				fDirtyRegion.MakeEmpty();
-
-				fDesktop->ReadUnlockWindows();
-			} else {
-//printf("%s MSG_REDRAW -> pending redraws\n", Name());
-			}
-			break;
-		}
-		case MSG_BEGIN_UPDATE:
-			_BeginUpdate();
-			break;
-		case MSG_END_UPDATE:
-			_EndUpdate();
-			break;
-		case MSG_DRAWING_COMMAND: {
-			int32 token;
-			if (message->FindInt32("token", &token) >= B_OK)
-				_DrawClient(token);
-			break;
-		}
-		case MSG_DRAW_POLYGON: {
-			int32 token;
-			BPoint polygon[4];
-			if (message->FindInt32("token", &token) >= B_OK &&
-				message->FindPoint("point", 0, &polygon[0]) >= B_OK &&
-				message->FindPoint("point", 1, &polygon[1]) >= B_OK &&
-				message->FindPoint("point", 2, &polygon[2]) >= B_OK &&
-				message->FindPoint("point", 3, &polygon[3]) >= B_OK) {
-
-				_DrawClientPolygon(token, polygon);
-			}
-			break;
-			
-		}
-
-		case MSG_INVALIDATE_VIEW: {
-			int32 token;
-			if (message->FindInt32("token", &token) >= B_OK)
-				InvalidateView(token);
-			break;
-		}
-
-		case MSG_SHOW:
-			if (IsHidden()) {
-				fDesktop->ShowWindow(this);
-			}
-			break;
-		default:
-			BLooper::MessageReceived(message);
-			break;
-	}
-}
-
-// QuitRequested
-bool
-WindowLayer::QuitRequested()
-{
-	if (fDesktop && fDesktop->WriteLockWindows()) {
-		fDesktop->WindowDied(this);
-
-		fClient->Lock();
-		fClient->Quit();
-
-		fDesktop->WriteUnlockWindows();
-	}
-	return true;
-}
-*/
-
-// ReadLockWindows
 bool
 WindowLayer::ReadLockWindows()
 {
@@ -263,7 +175,7 @@ WindowLayer::ReadLockWindows()
 	return fReadLocked;
 }
 
-// ReadUnlockWindows
+
 void
 WindowLayer::ReadUnlockWindows()
 {
@@ -667,6 +579,7 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 	region.IntersectWith(&layer->ScreenClipping(&fContentRegion));
 }
 
+
 bool
 WindowLayer::DrawingRegionChanged(ViewLayer* layer) const
 {
@@ -882,14 +795,14 @@ WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
 		}
 	} else {
 		if (ViewLayer* view = ViewAt(where)) {
-//printf("clicked: %s\n", view->Name());
-//view->PrintToStream();
 			// clicking a simple ViewLayer
 			if (!IsFocus()) {
 				DesktopSettings desktopSettings(fDesktop);
 
-				// not in FFM mode?
-				if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
+				// Activate window in case it doesn't accept first click, and
+				// we're not in FFM mode
+				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
+					&& desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 					fDesktop->ActivateWindow(this);
 
 				// eat the click if we don't accept first click
@@ -899,8 +812,6 @@ WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
 				// always fill out view token if we already have focus
 				*_viewToken = view->Token();
 			}
-		} else {
-//printf("clicked: nowhere\n");
 		}
 	}
 }
@@ -1263,6 +1174,7 @@ WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
 		_ObeySizeLimits();
 	}
 }
+
 
 /*!
 	\brief Returns wether or not the window is visible on the specified

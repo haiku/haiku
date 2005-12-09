@@ -245,8 +245,6 @@ class WindowLayer {
 			bool				fIsSlidingTab;
 			bool				fIsDragging;
 
-//			bool				fBringToFrontOnRelease;
-
 			::Decorator*		fDecorator;
 			ViewLayer*			fTopLayer;
 			::ServerWindow*		fWindow;
@@ -254,7 +252,6 @@ class WindowLayer {
 			::Desktop*			fDesktop;
 
 			BPoint				fLastMousePosition;
-//			BPoint				fResizingClickOffset;
 
 			// The synchronization, which client drawing commands
 			// belong to the redraw of which dirty region is handled
