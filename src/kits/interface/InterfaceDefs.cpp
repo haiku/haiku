@@ -297,7 +297,7 @@ get_click_speed(bigtime_t *speed)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt64("speed", speed) != B_OK)
-		*speed = 250000;
+		*speed = 500000;
 	
 	return B_OK;
 }
@@ -322,7 +322,7 @@ get_mouse_speed(int32 *speed)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt32("speed", speed) != B_OK)
-		return B_ERROR;
+		*speed = 65536;
 	
 	return B_OK;
 }
@@ -347,7 +347,7 @@ get_mouse_acceleration(int32 *speed)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt32("speed", speed) != B_OK)
-		return B_ERROR;
+		*speed = 65536;
 	
 	return B_OK;
 }
@@ -372,7 +372,7 @@ get_key_repeat_rate(int32 *rate)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt32("rate", rate) != B_OK)
-		return B_ERROR;
+		*rate = 250000;
 
 	return B_OK;
 }
@@ -397,7 +397,7 @@ get_key_repeat_delay(bigtime_t *delay)
 	_control_input_server_(&command, &reply);
 	
 	if (reply.FindInt64("delay", delay) != B_OK)
-		*delay = 40000;
+		*delay = 200;
 	
 	return B_OK;
 }
