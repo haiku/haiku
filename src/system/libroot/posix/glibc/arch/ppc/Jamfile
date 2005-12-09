@@ -19,10 +19,12 @@ SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 # Note: There is no *l() support yet. Our compiler says sizeof(long double) = 8,
 # while there are only 96 and 128 bit implementation in glibc.
 local genericSources =
-	cmp.c dbl2mpn.c divrem.c mpn2dbl.c mul.c mul_n.c
+	cmp.c dbl2mpn.c divrem.c mpa.c mpatan.c mpatan2.c mpn2dbl.c mpsqrt.c
+	mul.c mul_n.c
 	e_acos.c e_acosf.c # e_acosl.c
 	e_atan2.c e_atan2f.c # e_atan2l.c
 	e_fmod.c e_fmodf.c # e_fmodl.c
+	s_atan.c s_atanf.c # s_atanl.c
 	s_ceil.c s_ceilf.c # s_ceill.c
 	s_finite.c s_finitef.c # s_finitel.c
 	s_floor.c s_floorf.c # s_floorl.c
@@ -30,12 +32,15 @@ local genericSources =
 	s_logb.c s_logbf.c # s_logbl.c
 	s_modf.c s_modff.c s_modfl.c
 	s_scalbn.c s_scalbnf.c # s_scalbnl.c
-	w_atan2.c w_atan2f.c w_atan2l.c
-	w_fmod.c w_fmodl.c w_fmodf.c
+	w_atan2.c w_atan2f.c # w_atan2l.c
+	w_fmod.c w_fmodf.c # w_fmodl.c
 ;
 MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 	add_n.S
 	addmul_1.S
+	e_sqrtf.c
+	fraiseexcpt.c
+	ftestexcept.c
 	ldbl2mpn.c
 	mul_1.S
 	lshift.S
@@ -54,6 +59,9 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
 #	s_rintl.c
 	sub_n.S
 	submul_1.S
+	t_sqrt.c
+	w_sqrt.c
+	w_sqrtf.c
 
 	$(genericSources)
 ;
