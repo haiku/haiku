@@ -119,9 +119,13 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 		{"Not Vertically Resizable", B_NOT_V_RESIZABLE},
 		{"Outline Resize", B_OUTLINE_RESIZE},
 		{"Accept First Click", B_WILL_ACCEPT_FIRST_CLICK},
-		{"Not Anchored On Activate", B_NOT_ANCHORED_ON_ACTIVATE}
+		{"Not Anchored On Activate", B_NOT_ANCHORED_ON_ACTIVATE},
+		{"Avoid Front", B_AVOID_FRONT},
+#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+		{"Same Position In All Workspaces", B_SAME_POSITION_IN_ALL_WORKSPACES},
+#endif
 	};
-	for (uint32 i = 0; i < sizeof(looks) / sizeof(looks[0]); i++) {
+	for (uint32 i = 0; i < sizeof(flags) / sizeof(flags[0]); i++) {
 		BMessage* message = new BMessage(kMsgUpdateFlags);
 		message->AddInt32("flag", flags[i].flag);
 		BMenuItem* item = new BMenuItem(flags[i].name, message);
