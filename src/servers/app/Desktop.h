@@ -44,6 +44,7 @@ class BMessage;
 class DrawingEngine;
 class HWInterface;
 class ServerApp;
+class WorkspacesLayer;
 
 namespace BPrivate {
 	class LinkSender;
@@ -182,6 +183,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					_UpdateFronts(bool updateFloating = true);
 		bool					_WindowHasModal(WindowLayer* window);
 
+		void					_WindowChanged(WindowLayer* window);
+
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
 		void					_DispatchMessage(int32 code,
@@ -211,8 +214,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
+		WorkspacesLayer*		fWorkspacesLayer;
 
-		::RootLayer*			fRootLayer;
 		Screen*					fActiveScreen;
 
 		CursorManager			fCursorManager;

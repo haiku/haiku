@@ -24,6 +24,7 @@
 #include "ServerWindow.h"
 #include "WindowLayer.h"
 #include "Workspace.h"
+#include "WorkspacesLayer.h"
 
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
@@ -259,6 +260,7 @@ Desktop::Desktop(uid_t userID)
 	fShutdownSemaphore(-1),
 	fAllWindows(kAllWindowList),
 	fSubsetWindows(kSubsetList),
+	fWorkspacesLayer(NULL),
 	fActiveScreen(NULL),
 	fWindowLock("window lock")
 {
@@ -563,11 +565,7 @@ Desktop::UpdateWorkspaces()
 {
 	// TODO: maybe this should be replaced by a SetWorkspacesCount() method
 
-/*	if (fWorkspacesLayer == NULL)
-		return;
-
-	_WindowsChanged();
-*/
+	_WindowChanged(NULL);
 }
 
 
@@ -679,6 +677,8 @@ Desktop::SetWorkspace(int32 index)
 	// window if still visible
 	if (!_Windows(index).HasWindow(FocusWindow()) || !FocusWindow()->IsFloating())
 		SetFocusWindow(FrontWindow());
+
+	_WindowChanged(NULL);
 
 	MarkDirty(dirty);
 
@@ -868,6 +868,16 @@ Desktop::_WindowHasModal(WindowLayer* window)
 
 
 void
+Desktop::_WindowChanged(WindowLayer* window)
+{
+	if (fWorkspacesLayer == NULL)
+		return;
+
+	fWorkspacesLayer->WindowChanged(window);
+}
+
+
+void
 Desktop::SetFocusWindow(WindowLayer* focus)
 {
 	if (!WriteLockWindows())
@@ -929,6 +939,8 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 		_CurrentWindows().AddWindow(window,
 			window->Frontmost(_CurrentWindows().FirstWindow(),
 				fCurrentWorkspace));
+
+		_WindowChanged(window);
 	}
 
 	BRegion dummy;
@@ -1081,6 +1093,9 @@ Desktop::ShowWindow(WindowLayer* window)
 		return;
 	}
 
+	if (WorkspacesLayer* layer = dynamic_cast<WorkspacesLayer*>(window->TopLayer()))
+		fWorkspacesLayer = layer;
+
 	WriteUnlockWindows();
 
 	// If the mouse cursor is directly over the newly visible window,
@@ -1127,6 +1142,9 @@ Desktop::HideWindow(WindowLayer* window)
 			SetFocusWindow(FrontWindow());
 	}
 
+	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
+		fWorkspacesLayer = NULL;
+
 	WriteUnlockWindows();
 }
 
@@ -1141,6 +1159,7 @@ Desktop::_ShowWindow(WindowLayer* window, bool affectsOtherWindows)
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 	_SetBackground(background);
+	_WindowChanged(window);
 
 	BRegion dirty(window->VisibleRegion());
 
@@ -1174,6 +1193,7 @@ Desktop::_HideWindow(WindowLayer* window)
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 	_SetBackground(background);
+	_WindowChanged(window);
 
 	MarkDirty(dirty);
 }
@@ -1216,8 +1236,7 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 
 	MarkDirty(newDirtyRegion);
 	_SetBackground(background);
-
-	//_WindowsChanged(changed);
+	_WindowChanged(window);
 
 	WriteUnlockWindows();
 }
@@ -1244,8 +1263,7 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 
 	MarkDirty(newDirtyRegion);
 	_SetBackground(background);
-
-	//_WindowsChanged(changed);
+	_WindowChanged(window);
 
 	WriteUnlockWindows();
 }
@@ -1428,10 +1446,9 @@ Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
+	_WindowChanged(window);
 
 	_TriggerWindowRedrawing(dirty);
-
-	//_WindowsChanged();
 
 	WriteUnlockWindows();
 }
@@ -1513,10 +1530,10 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
+	_WindowChanged(window);
 
 	_TriggerWindowRedrawing(dirty);
 
-	//_WindowsChanged();
 
 	WriteUnlockWindows();
 }

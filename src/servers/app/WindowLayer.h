@@ -77,6 +77,9 @@ class WindowLayer {
 			void				ScrollViewBy(ViewLayer* view, int32 dx, int32 dy);
 
 			void				SetTopLayer(ViewLayer* topLayer);
+			ViewLayer*			TopLayer() const { return fTopLayer; }
+				// TODO: only used for WorkspacesLayer, can go away if we do
+				//	this differently one day
 
 			ViewLayer*			ViewAt(const BPoint& where);
 
