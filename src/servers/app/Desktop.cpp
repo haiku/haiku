@@ -1476,6 +1476,9 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	}
 
 	_UpdateFronts();
+
+	if (window == FocusWindow() && !window->IsVisible())
+		SetFocusWindow(FrontWindow());
 }
 
 
