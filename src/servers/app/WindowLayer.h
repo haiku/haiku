@@ -160,7 +160,7 @@ class WindowLayer {
 			uint32				Workspaces() const { return fWorkspaces; }
 			void				SetWorkspaces(uint32 workspaces)
 									{ fWorkspaces = workspaces; }
-			bool				OnWorkspace(int32 index) const;
+			bool				InWorkspace(int32 index) const;
 
 			bool				SupportsFront();
 
@@ -175,6 +175,7 @@ class WindowLayer {
 			void				RemoveFromSubset(WindowLayer* window);
 			bool				HasInSubset(WindowLayer* window);
 			bool				SameSubset(WindowLayer* window);
+			uint32				SubsetWorkspaces() const;
 
 	static bool					IsValidLook(window_look look);
 	static bool					IsValidFeel(window_feel feel);

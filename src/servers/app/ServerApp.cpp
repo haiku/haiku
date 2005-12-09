@@ -2403,8 +2403,34 @@ ServerApp::RemoveWindow(ServerWindow* window)
 
 
 bool
-ServerApp::OnWorkspace(int32 index) const
+ServerApp::InWorkspace(int32 index) const
 {
+	BAutolock locker(fWindowListLock);
+
+	// we could cache this, but then we'd have to recompute the cached
+	// value everytime a window has closed or changed workspaces
+
+	// TODO: support initial application workspace!
+
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* window = fWindowList.ItemAt(i);
+		const WindowLayer* layer = window->GetWindowLayer();
+
+		// only normal and unhidden windows count
+
+		if (layer->IsNormal() && !layer->IsHidden() && layer->InWorkspace(index))
+			return true;
+	}
+
+	return false;
+}
+
+
+uint32
+ServerApp::Workspaces() const
+{
+	uint32 workspaces = 0;
+
 	BAutolock locker(fWindowListLock);
 
 	// we could cache this, but then we'd have to recompute the cached
@@ -2414,14 +2440,14 @@ ServerApp::OnWorkspace(int32 index) const
 		ServerWindow* window = fWindowList.ItemAt(i);
 		const WindowLayer* layer = window->GetWindowLayer();
 
-		// only normal windows count
+		// only normal and unhidden windows count
 
-		if (layer->Feel() == B_NORMAL_WINDOW_FEEL
-			&& layer->OnWorkspace(index))
-			return true;
+		if (layer->IsNormal() && !layer->IsHidden())
+			workspaces |= layer->Workspaces();
 	}
 
-	return false;
+	// TODO: add initial application workspace!
+	return workspaces;
 }
 
 

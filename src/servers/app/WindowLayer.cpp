@@ -383,6 +383,13 @@ WindowLayer::MoveBy(int32 x, int32 y)
 
 	fFrame.OffsetBy(x, y);
 
+	// propagate position if asked for
+	if (fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) {
+		for (int32 i = 0; i <= kWorkingList; i++) {
+			Anchor(i).position = fFrame.LeftTop();
+		}
+	}
+
 	fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
 
 	// take along the dirty region which have not
@@ -1216,6 +1223,9 @@ WindowLayer::SetFeel(window_feel feel)
 	// having modal windows with B_AVOID_FRONT or B_AVOID_FOCUS doesn't
 	// make that much sense, so we filter those flags out on demand
 	fFlags &= ~ValidWindowFlags(fFeel);
+
+	if (!IsNormal())
+		fFlags |= B_SAME_POSITION_IN_ALL_WORKSPACES;
 }
 
 
@@ -1247,22 +1257,24 @@ WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
 	of its subset windows is visible there.
 */
 bool
-WindowLayer::OnWorkspace(int32 index) const
+WindowLayer::InWorkspace(int32 index) const
 {
-	if ((fWorkspaces & (1UL << index)) != 0
-		|| fFeel == B_MODAL_ALL_WINDOW_FEEL
+	if (IsNormal())
+		return (fWorkspaces & (1UL << index)) != 0;
+
+	if (fFeel == B_MODAL_ALL_WINDOW_FEEL
 		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
 		return true;
 
 	if (fFeel == B_MODAL_APP_WINDOW_FEEL
 		|| fFeel == B_FLOATING_APP_WINDOW_FEEL)
-		return ServerWindow()->App()->OnWorkspace(index);
+		return ServerWindow()->App()->InWorkspace(index);
 
 	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
 		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
 			WindowLayer* window = fSubsets.ItemAt(i);
-			if (window->OnWorkspace(index))
+			if (window->InWorkspace(index))
 				return true;
 		}
 	}
@@ -1429,6 +1441,34 @@ WindowLayer::SameSubset(WindowLayer* window)
 	}
 
 	return false;
+}
+
+
+uint32
+WindowLayer::SubsetWorkspaces() const
+{
+	if (fFeel == B_MODAL_ALL_WINDOW_FEEL
+		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
+		return B_ALL_WORKSPACES;
+
+	if (fFeel == B_MODAL_APP_WINDOW_FEEL
+		|| fFeel == B_FLOATING_APP_WINDOW_FEEL)
+		return ServerWindow()->App()->Workspaces();
+
+	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
+		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
+		uint32 workspaces = 0;
+		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
+			WindowLayer* window = fSubsets.ItemAt(i);
+
+			if (!window->IsHidden())
+				workspaces |= window->Workspaces();
+		}
+
+		return workspaces;
+	}
+
+	return 0;
 }
 
 

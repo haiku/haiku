@@ -662,7 +662,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					|| windowLayer->Feel() != B_NORMAL_WINDOW_FEEL) {
 					status = B_BAD_VALUE;
 				} else {
-					status = fWindowLayer->AddToSubset(windowLayer)
+					status = fDesktop->AddWindowToSubset(fWindowLayer, windowLayer)
 						? B_OK : B_NO_MEMORY;
 				}
 			}
@@ -681,7 +681,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				WindowLayer* windowLayer = fDesktop->FindWindowLayerByClientToken(
 					token, App()->ClientTeam());
 				if (windowLayer != NULL) {
-					fWindowLayer->RemoveFromSubset(windowLayer);
+					fDesktop->RemoveWindowFromSubset(fWindowLayer, windowLayer);
 					status = B_OK;
 				} else
 					status = B_BAD_VALUE;

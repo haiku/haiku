@@ -30,6 +30,8 @@ class WindowList {
 		void AddWindow(WindowLayer* window, WindowLayer* before = NULL);
 		void RemoveWindow(WindowLayer* window);
 
+		bool HasWindow(WindowLayer* window) const;
+
 	private:
 		int32			fIndex;
 		WindowLayer*	fFirstWindow;
@@ -38,7 +40,7 @@ class WindowList {
 
 enum window_lists {
 	kAllWindowList = 32,
-	kFloatingList,
+	kSubsetList,
 	kWorkingList,
 };
 

@@ -258,6 +258,7 @@ Desktop::Desktop(uid_t userID)
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
 	fAllWindows(kAllWindowList),
+	fSubsetWindows(kSubsetList),
 	fActiveScreen(NULL),
 	fWindowLock("window lock")
 {
@@ -265,7 +266,7 @@ Desktop::Desktop(uid_t userID)
 	Desktop::_GetLooperName(name, sizeof(name));
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		fWorkspaces[i].Windows().SetIndex(i);
+		_Windows(i).SetIndex(i);
 	}
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
@@ -584,19 +585,19 @@ Desktop::SetWorkspace(int32 index)
 	int32 previousIndex = fCurrentWorkspace;
 
 	if (fMouseEventWindow != NULL) {
-		// the window currently being dragged will follow us to this workspace
-		// if it's not already on it
-		if (!fMouseEventWindow->OnWorkspace(index)) {
-			fWorkspaces[index].Windows().AddWindow(fMouseEventWindow);
-			fMouseEventWindow->SetWorkspaces((fMouseEventWindow->Workspaces()
-					| workspace_to_workspaces(index))
-				& ~workspace_to_workspaces(previousIndex));
-			fWorkspaces[previousIndex].Windows().RemoveWindow(fMouseEventWindow);
+		if (!fMouseEventWindow->InWorkspace(index)) {
+			// the window currently being dragged will follow us to this workspace
+			// if it's not already on it
+			if (fMouseEventWindow->IsNormal()) {
+				// but only normal windows are following
+				_Windows(index).AddWindow(fMouseEventWindow);
+				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
+			}
 		} else {
 			// make sure it's frontmost
-			fWorkspaces[index].Windows().RemoveWindow(fMouseEventWindow);
-			fWorkspaces[index].Windows().AddWindow(fMouseEventWindow,
-				fMouseEventWindow->Frontmost(fWorkspaces[index].Windows().FirstWindow(), index));
+			_Windows(index).RemoveWindow(fMouseEventWindow);
+			_Windows(index).AddWindow(fMouseEventWindow,
+				fMouseEventWindow->Frontmost(_Windows(index).FirstWindow(), index));
 		}
 
 		fMouseEventWindow->Anchor(index).position = fMouseEventWindow->Frame().LeftTop();
@@ -605,11 +606,13 @@ Desktop::SetWorkspace(int32 index)
 	// build region of windows that are no longer visible in the new workspace
 
 	BRegion dirty;
+
 	for (WindowLayer* window = _CurrentWindows().FirstWindow();
 			window != NULL; window = window->NextWindow(previousIndex)) {
+		// store current position in Workspace anchor
 		window->Anchor(previousIndex).position = window->Frame().LeftTop();
 
-		if (window->OnWorkspace(index))
+		if (window->InWorkspace(index))
 			continue;
 
 		if (!window->IsHidden()) {
@@ -617,7 +620,7 @@ Desktop::SetWorkspace(int32 index)
 			dirty.Include(&window->VisibleRegion());
 		}
 
-		window->SetCurrentWorkspace(-1);			
+		window->SetCurrentWorkspace(-1);
 	}
 
 	fCurrentWorkspace = index;
@@ -625,7 +628,7 @@ Desktop::SetWorkspace(int32 index)
 	// show windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
 
-	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+	for (WindowLayer* window = _Windows(index).FirstWindow();
 			window != NULL; window = window->NextWindow(index)) {
 		BPoint position = window->Anchor(index).position;
 
@@ -642,7 +645,7 @@ Desktop::SetWorkspace(int32 index)
 				//	was before!
 		}
 
-		if (!window->OnWorkspace(previousIndex)) {
+		if (!window->InWorkspace(previousIndex)) {
 			// this window was not visible before
 			continue;
 		}
@@ -659,9 +662,9 @@ Desktop::SetWorkspace(int32 index)
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
 
-	for (WindowLayer* window = _CurrentWindows().FirstWindow(); window != NULL;
+	for (WindowLayer* window = _Windows(index).FirstWindow(); window != NULL;
 			window = window->NextWindow(index)) {
-		if (window->OnWorkspace(previousIndex) || window == fMouseEventWindow) {
+		if (window->InWorkspace(previousIndex) || window == fMouseEventWindow) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
 		}
@@ -669,7 +672,9 @@ Desktop::SetWorkspace(int32 index)
 		dirty.Include(&window->VisibleRegion());
 	}
 
-	_UpdateFronts();
+	_UpdateFronts(false);
+	_UpdateFloating(previousIndex, index);
+
 	SetFocusWindow(FrontWindow());
 
 	MarkDirty(dirty);
@@ -730,7 +735,62 @@ Desktop::_CurrentWindows()
 }
 
 
-/*! Search the visible windows for a valid back window
+WindowList&
+Desktop::_Windows(int32 index)
+{
+	return fWorkspaces[index].Windows();
+}
+
+
+void
+Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
+{
+	if (fFront == NULL)
+		return;
+
+	if (previousWorkspace == -1)
+		previousWorkspace = fCurrentWorkspace;
+	if (nextWorkspace == -1)
+		nextWorkspace = previousWorkspace;
+
+	for (WindowLayer* floating = fSubsetWindows.FirstWindow(); floating != NULL;
+			floating = floating->NextWindow(kSubsetList)) {
+		// we only care about app/subset floating windows
+		if (floating->Feel() != B_FLOATING_SUBSET_WINDOW_FEEL
+			&& floating->Feel() != B_FLOATING_APP_WINDOW_FEEL)
+			continue;
+
+		if (fFront->IsNormal() && floating->HasInSubset(fFront)) {
+			// is now visible
+			if (_Windows(previousWorkspace).HasWindow(floating)
+				&& previousWorkspace != nextWorkspace) {
+				// but no longer on the previous workspace
+				_Windows(previousWorkspace).RemoveWindow(floating);
+				floating->SetCurrentWorkspace(-1);
+			}
+			if (!_Windows(nextWorkspace).HasWindow(floating)) {
+				// but wasn't before
+				_Windows(nextWorkspace).AddWindow(floating,
+					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(), nextWorkspace));
+				floating->SetCurrentWorkspace(nextWorkspace);
+				_ShowWindow(floating);
+
+				// TODO:
+				// put the floating last in the floating window list to preserve
+				// the on screen window order
+			}
+		} else if (_Windows(previousWorkspace).HasWindow(floating)) {
+			// was visible, but is no longer
+			_Windows(previousWorkspace).RemoveWindow(floating);
+			floating->SetCurrentWorkspace(-1);
+			_HideWindow(floating);
+		}
+	}
+}
+
+
+/*!
+	Search the visible windows for a valid back window
 	(only normal windows can be back windows)
 */
 void
@@ -749,58 +809,96 @@ Desktop::_UpdateBack()
 }
 
 
-/*! Search the visible windows for a valid front window
-	(only normal windows can be front windows)
+/*!
+	Search the visible windows for a valid front window
+	(only normal and modal windows can be front windows)
+
+	The only place where you don't want to update floating windows is
+	during a workspace change - because then you'll call _UpdateFloating()
+	yourself.
 */
 void
-Desktop::_UpdateFront()
+Desktop::_UpdateFront(bool updateFloating)
 {
-	// TODO: for now, just choose the top window
 	fFront = NULL;
 
 	for (WindowLayer* window = _CurrentWindows().LastWindow();
 			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (window->IsHidden() || !window->SupportsFront())
+		if (window->IsHidden() || window->IsFloating() || !window->SupportsFront())
 			continue;
 
 		fFront = window;
 		break;
 	}
+
+	if (updateFloating)
+		_UpdateFloating();
 }
 
 
 void
-Desktop::_UpdateFronts()
+Desktop::_UpdateFronts(bool updateFloating)
 {
 	_UpdateBack();
-	_UpdateFront();
+	_UpdateFront(updateFloating);
 }
 
+
+bool
+Desktop::_WindowHasModal(WindowLayer* window)
+{
+	if (window == NULL || window->IsFloating())
+		return false;
+
+	for (WindowLayer* modal = fSubsetWindows.FirstWindow(); modal != NULL;
+			modal = modal->NextWindow(kSubsetList)) {
+		// only visible modal windows count
+		if (!modal->IsModal() || modal->IsHidden())
+			continue;
+
+		if (modal->HasInSubset(window))
+			return true;
+	}
+
+	return false;
+}
 
 
 void
 Desktop::SetFocusWindow(WindowLayer* focus)
 {
-	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
-	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0)
+	if (!WriteLockWindows())
 		return;
 
-	if (WriteLockWindows()) {
-		// make sure no window is chosen that doesn't want focus
-		while (focus != NULL && (focus->Flags() & B_AVOID_FOCUS) != 0) {
-			focus = focus->PreviousWindow(fCurrentWorkspace);
-		}
+	bool hasModal = _WindowHasModal(focus);
 
-		if (fFocus != NULL)
-			fFocus->SetFocus(false);
+	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
 
-		fFocus = focus;
-
-		if (focus != NULL)
-			focus->SetFocus(true);
-
+	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
+		&& !hasModal) {
+		// the window that is supposed to get focus already has focus
 		WriteUnlockWindows();
+		return;
 	}
+
+	if (focus == NULL || hasModal)
+		focus = FrontWindow();
+
+	// make sure no window is chosen that doesn't want focus or cannot have it
+	while (focus != NULL
+		&& ((focus->Flags() & B_AVOID_FOCUS) != 0 || _WindowHasModal(focus))) {
+		focus = focus->PreviousWindow(fCurrentWorkspace);
+	}
+
+	if (fFocus != NULL)
+		fFocus->SetFocus(false);
+
+	fFocus = focus;
+
+	if (focus != NULL)
+		focus->SetFocus(true);
+
+	WriteUnlockWindows();
 }
 
 
@@ -840,8 +938,6 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 
 	if (windows.FirstWindow() == fBack || fBack == NULL)
 		_UpdateBack();
-
-	SetFocusWindow(FrontWindow());
 }
 
 
@@ -863,13 +959,20 @@ Desktop::ActivateWindow(WindowLayer* window)
 		fFront = NULL;
 		return;
 	}
-	if (window == FrontWindow())
-		return;
 
+	// TODO: support B_NO_WORKSPACE_ACTIVATION
+	// TODO: support B_NOT_ANCHORED_ON_ACTIVATE
 	// TODO: take care about floating windows
 
 	if (!WriteLockWindows())
 		return;
+
+	if (window == FrontWindow()) {
+		SetFocusWindow(window);
+
+		WriteUnlockWindows();
+		return;
+	}
 
 	// we don't need to redraw what is currently
 	// visible of the window
@@ -902,6 +1005,8 @@ Desktop::ActivateWindow(WindowLayer* window)
 	}
 
 	_BringWindowsToFront(windows, kWorkingList, true);
+	SetFocusWindow(window);
+
 	WriteUnlockWindows();
 }
 
@@ -955,8 +1060,9 @@ Desktop::ShowWindow(WindowLayer* window)
 
 	window->SetHidden(false);
 
-	if (window->OnWorkspace(fCurrentWorkspace)) {
+	if (window->InWorkspace(fCurrentWorkspace)) {
 		_ShowWindow(window, true);
+		_UpdateSubsetWorkspaces(window);
 		ActivateWindow(window);
 	} else {
 		// then we don't need to send the fake mouse event either
@@ -1001,7 +1107,8 @@ Desktop::HideWindow(WindowLayer* window)
 
 	window->SetHidden(true);
 
-	if (window->OnWorkspace(fCurrentWorkspace)) {
+	if (window->InWorkspace(fCurrentWorkspace)) {
+		_UpdateSubsetWorkspaces(window);
 		_HideWindow(window);
 		_UpdateFronts();
 
@@ -1134,6 +1241,41 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 
 
 /*!
+	Updates the workspaces of all subset windows with regard to the
+	specifed window.
+*/
+void
+Desktop::_UpdateSubsetWorkspaces(WindowLayer* window)
+{
+	// if the window is hidden, the subset windows are up-to-date already
+	if (!window->IsNormal() || window->IsHidden())
+		return;
+
+	for (WindowLayer* subset = fSubsetWindows.FirstWindow(); subset != NULL;
+			subset = subset->NextWindow(kSubsetList)) {
+		if (subset->Feel() == B_MODAL_ALL_WINDOW_FEEL
+			|| subset->Feel() == B_FLOATING_ALL_WINDOW_FEEL) {
+			// These windows are always visible on all workspaces,
+			// no need to update them.
+			continue;
+		}
+
+		if (subset->IsFloating()) {
+			// Floating windows are inserted and removed to the current
+			// workspace as the need arises - they are not handled here
+			// but in _UpdateFront()
+			continue;
+		}
+
+		if (subset->HasInSubset(window)) {
+			// adopt the workspace change
+			SetWindowWorkspaces(subset, subset->SubsetWorkspaces());
+		}
+	}
+}
+
+
+/*!
 	\brief Adds or removes the window to or from the workspaces it's on.
 */
 void
@@ -1148,27 +1290,39 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 		if (workspaces_on_workspace(i, oldWorkspaces)) {
 			// window is on this workspace, is it anymore?
 			if (!workspaces_on_workspace(i, newWorkspaces)) {
-				fWorkspaces[i].Windows().RemoveWindow(window);
-				window->SetCurrentWorkspace(-1);
+				_Windows(i).RemoveWindow(window);
 
-				if (i == CurrentWorkspace())
-					_HideWindow(window);
+				if (i == CurrentWorkspace()) {
+					// remove its appearance from the current workspace
+					window->SetCurrentWorkspace(-1);
+
+					if (!window->IsHidden())
+						_HideWindow(window);
+				}
 			}
 		} else {
 			// window was not on this workspace, is it now?
 			if (workspaces_on_workspace(i, newWorkspaces)) {
-				fWorkspaces[i].Windows().AddWindow(window);
-				window->SetCurrentWorkspace(fCurrentWorkspace);
+				_Windows(i).AddWindow(window,
+					window->Frontmost(_Windows(i).FirstWindow(), i));
 
 				if (i == CurrentWorkspace()) {
-					// this only affects other windows if this windows has floating or
-					// modal windows that need to be shown as well
-					// TODO: take care of this
-					_ShowWindow(window, FrontWindow() == window);
+					// make the window visible in current workspace
+					window->SetCurrentWorkspace(fCurrentWorkspace);
+
+					if (!window->IsHidden()) {
+						// this only affects other windows if this windows has floating or
+						// modal windows that need to be shown as well
+						// TODO: take care of this
+						_ShowWindow(window, FrontWindow() == window);
+					}
 				}
 			}
 		}
 	}
+
+	// take care about modals and floating windows
+	_UpdateSubsetWorkspaces(window);
 
 	WriteUnlockWindows();
 }
@@ -1179,13 +1333,10 @@ Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 {
 	BAutolock _(this);
 
-	if (workspaces == B_CURRENT_WORKSPACE)
+	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
-	WriteLockWindows();
 	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
-	window->SetWorkspaces(workspaces);
-	WriteUnlockWindows();
 }
 
 
@@ -1195,9 +1346,16 @@ Desktop::AddWindow(WindowLayer *window)
 	BAutolock _(this);
 
 	fAllWindows.AddWindow(window);
+	if (!window->IsNormal())
+		fSubsetWindows.AddWindow(window);
 
-	if (window->Workspaces() == B_CURRENT_WORKSPACE)
-		window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
+	if (window->IsNormal()) {
+		if (window->Workspaces() == B_CURRENT_WORKSPACE)
+			window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
+	} else {
+		// subset windows are visible on all workspaces their subset is on
+		window->SetWorkspaces(window->SubsetWorkspaces());
+	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
 }
@@ -1209,12 +1367,33 @@ Desktop::RemoveWindow(WindowLayer *window)
 	BAutolock _(this);
 
 	fAllWindows.RemoveWindow(window);
-//	_CurrentWindows().RemoveWindow(window);
+	if (!window->IsNormal())
+		fSubsetWindows.RemoveWindow(window);
+
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
 
 	// make sure this window won't get any events anymore
 
 	EventDispatcher().RemoveTarget(window->EventTarget());
+}
+
+
+bool
+Desktop::AddWindowToSubset(WindowLayer* subset, WindowLayer* window)
+{
+	if (!subset->AddToSubset(window))
+		return false;
+
+	_ChangeWindowWorkspaces(subset, subset->Workspaces(), subset->SubsetWorkspaces());
+	return true;
+}
+
+
+void
+Desktop::RemoveWindowFromSubset(WindowLayer* subset, WindowLayer* window)
+{
+	subset->RemoveFromSubset(window);
+	_ChangeWindowWorkspaces(subset, subset->Workspaces(), subset->SubsetWorkspaces());
 }
 
 
@@ -1252,9 +1431,26 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 
 	BAutolock _(this);
 
+	bool wasNormal = window->IsNormal();
+
 	window->SetFeel(newFeel);
 
-	// TODO: implement window feels!
+	// move the window out of or into the subset window list as needed
+	if (window->IsNormal() && !wasNormal)
+		fSubsetWindows.RemoveWindow(window);
+	else if (!window->IsNormal() && wasNormal)
+		fSubsetWindows.AddWindow(window);
+
+	// A normal window that was once a floating or modal window will
+	// adopt the window's current workspaces
+
+	if (!window->IsNormal())
+		_ChangeWindowWorkspaces(window, window->Workspaces(), window->SubsetWorkspaces());
+
+	// TODO: make sure the window has the correct position in the window list
+	//	(ie. all floating windows have to be on the top, ...)
+
+	_UpdateFronts();
 }
 
 

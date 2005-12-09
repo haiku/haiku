@@ -64,7 +64,8 @@ class ServerApp : public MessageLooper {
 		const char *Signature() const { return fSignature.String(); }
 
 		void RemoveWindow(ServerWindow* window);
-		bool OnWorkspace(int32 index) const;
+		bool InWorkspace(int32 index) const;
+		uint32 Workspaces() const;
 
 		int32 CountBitmaps() const;
 		ServerBitmap *FindBitmap(int32 token) const;

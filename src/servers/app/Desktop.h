@@ -111,6 +111,11 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					AddWindow(WindowLayer* window);
 		void					RemoveWindow(WindowLayer* window);
 
+		bool					AddWindowToSubset(WindowLayer* subset,
+									WindowLayer* window);
+		void					RemoveWindowFromSubset(WindowLayer* subset,
+									WindowLayer* window);
+
 		void					SetWindowLook(WindowLayer* window, window_look look);
 		void					SetWindowFeel(WindowLayer* window, window_feel feel);
 		void					SetWindowFlags(WindowLayer* window, uint32 flags);
@@ -159,6 +164,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									bool affectsOtherWindows = true);
 		void					_HideWindow(WindowLayer* window);
 
+		void					_UpdateSubsetWorkspaces(WindowLayer* window);
 		void					_ChangeWindowWorkspaces(WindowLayer* window,
 									uint32 oldWorkspaces, uint32 newWorkspaces);
 		void					_BringWindowsToFront(WindowList& windows,
@@ -169,9 +175,12 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					_TriggerWindowRedrawing(BRegion& newDirtyRegion);
 		void					_SetBackground(BRegion& background);
 
+		void					_UpdateFloating(int32 previousWorkspace = -1,
+									int32 nextWorkspace = -1);
 		void					_UpdateBack();
-		void					_UpdateFront();
-		void					_UpdateFronts();
+		void					_UpdateFront(bool updateFloating = true);
+		void					_UpdateFronts(bool updateFloating = true);
+		bool					_WindowHasModal(WindowLayer* window);
 
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
@@ -179,6 +188,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									BPrivate::LinkReceiver &link);
 
 		WindowList&				_CurrentWindows();
+		WindowList&				_Windows(int32 index);
 
 	private:
 		friend class DesktopSettings;
@@ -200,6 +210,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		int32					fCurrentWorkspace;
 
 		WindowList				fAllWindows;
+		WindowList				fSubsetWindows;
 
 		::RootLayer*			fRootLayer;
 		Screen*					fActiveScreen;

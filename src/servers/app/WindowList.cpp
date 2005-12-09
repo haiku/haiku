@@ -7,6 +7,7 @@
  */
 
 
+#include "DesktopSettings.h"
 #include "WindowLayer.h"
 
 
@@ -76,6 +77,9 @@ WindowList::AddWindow(WindowLayer* window, WindowLayer* before)
 		windowAnchor.next = NULL;
 		fLastWindow = window;
 	}
+
+	if (fIndex < kMaxWorkspaces)
+		window->SetWorkspaces(window->Workspaces() | (1UL << fIndex));
 }
 
 
@@ -100,7 +104,23 @@ WindowList::RemoveWindow(WindowLayer* window)
 		windowAnchor.next->Anchor(fIndex).previous = windowAnchor.previous;
 	}
 
+	if (fIndex < kMaxWorkspaces)
+		window->SetWorkspaces(window->Workspaces() & ~(1UL << fIndex));
+
 	windowAnchor.previous = NULL;
 	windowAnchor.next = NULL;
+}
+
+
+bool
+WindowList::HasWindow(WindowLayer* window) const
+{
+	if (window == NULL)
+		return false;
+
+	return window->Anchor(fIndex).next != NULL
+		|| window->Anchor(fIndex).previous != NULL
+		|| fFirstWindow == window
+		|| fLastWindow == window;
 }
 
