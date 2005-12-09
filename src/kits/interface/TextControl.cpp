@@ -277,9 +277,7 @@ BTextControl::Draw(BRect updateRect)
 	BRegion updateRegion(updateRect);
 		// why is there no IntersectWith(BRect &) version?
 	region.IntersectWith(&updateRegion);
-	for (int32 i = region.CountRects(); i-- > 0;) {
-		FillRect(region.RectAt(i));
-	}
+	FillRegion(&region);
 
 	if (Label()) {
 		font_height fontHeight;
