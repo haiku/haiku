@@ -286,7 +286,7 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 
 void
-WorkspacesLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
+WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 {
 	int32 columns, rows;
 	_GetGrid(columns, rows);

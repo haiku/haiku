@@ -24,7 +24,7 @@ class WorkspacesLayer : public ViewLayer {
 						BRegion* effectiveClipping,
 						BRegion* windowContentClipping,
 						bool deep = false);
-		virtual void MouseDown(BMessage* message, BPoint where, int32* _viewToken);
+		virtual void MouseDown(BMessage* message, BPoint where);
 
 		void WindowChanged(WindowLayer* window);
 

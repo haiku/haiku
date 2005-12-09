@@ -21,6 +21,7 @@
 #include "ServerApp.h"
 #include "ServerWindow.h"
 #include "Workspace.h"
+#include "WorkspacesLayer.h"
 
 #include <WindowPrivate.h>
 
@@ -706,7 +707,7 @@ WindowLayer::EnableUpdateRequests()
 
 
 void
-WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
+WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 {
 	// TODO: move into Decorator
 	if (!fBorderRegionValid)
@@ -719,7 +720,7 @@ WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
 		click_type action = DEC_DRAG;
 
 		if (fDecorator)
-			action = _ActionFor(msg);
+			action = _ActionFor(message);
 
 		// deactivate border buttons on first click (select)
 		if (!IsFocus() && action != DEC_MOVETOBACK
@@ -806,12 +807,17 @@ WindowLayer::MouseDown(BMessage* msg, BPoint where, int32* _viewToken)
 					fDesktop->ActivateWindow(this);
 
 				// eat the click if we don't accept first click
-				if ((Flags() & (B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS)) != 0)
-					*_viewToken = view->Token();
-			} else {
-				// always fill out view token if we already have focus
-				*_viewToken = view->Token();
+				if ((Flags() & (B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS)) == 0)
+					return;
 			}
+
+			// fill out view token for the view under the mouse
+			*_viewToken = view->Token();
+
+			// TODO: that's not really a clean solution - maybe move that
+			//	functionality back into the ViewLayer class
+			if (WorkspacesLayer* layer = dynamic_cast<WorkspacesLayer*>(view))
+				layer->MouseDown(message, where);
 		}
 	}
 }
