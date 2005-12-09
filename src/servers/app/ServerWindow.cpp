@@ -713,7 +713,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FEEL:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n", Title()));
 
 			status_t status = B_ERROR;
 			int32 feel;
@@ -732,7 +732,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_FLAGS:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_LOOK\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_SET_FLAGS\n", Title()));
 
 			status_t status = B_ERROR;
 			uint32 flags;

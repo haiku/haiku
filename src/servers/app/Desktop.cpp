@@ -1457,9 +1457,9 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 		WindowLayer* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
 		if (frontmost == NULL)
 			continue;
-		
+
 		// check if the frontmost window is really in front of it
-		
+
 		WindowLayer* next = window->NextWindow(i);
 		while (next != NULL) {
 			if (next == frontmost)
