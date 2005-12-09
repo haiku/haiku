@@ -186,16 +186,24 @@ SettingsView::Draw(BRect updateFrame)
 	SetDrawingMode(B_OP_OVER);
 
 	// Draw the icons
-	if (updateFrame.Intersects(	// i have to add 10 pixels width and height, so weird
-		BRect(333, 16, 354 + fDoubleClickBitmap->Bounds().Width(),
-			165 + fAccelerationBitmap->Bounds().Height()))) {
-		if (fDoubleClickBitmap != NULL)
-			DrawBitmapAsync(fDoubleClickBitmap, BPoint(344, 16));
-		if (fSpeedBitmap != NULL)
-			DrawBitmapAsync(fSpeedBitmap, BPoint(333, 90));
-		if (fAccelerationBitmap != NULL)
-			DrawBitmapAsync(fAccelerationBitmap, BPoint(333, 155));
-	}
+	BPoint doubleClickBmpPoint(344, 16);
+	if (fDoubleClickBitmap != NULL 
+		&& updateFrame.Intersects(BRect(doubleClickBmpPoint,
+			doubleClickBmpPoint + fDoubleClickBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fDoubleClickBitmap, doubleClickBmpPoint);
+
+	BPoint speedBmpPoint(333, 90);
+	if (fSpeedBitmap != NULL 
+		&& updateFrame.Intersects(BRect(speedBmpPoint,
+			speedBmpPoint + fSpeedBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fSpeedBitmap, speedBmpPoint);
+	
+	BPoint accelerationBmpPoint(333, 155);
+	if (fAccelerationBitmap != NULL 
+		&& updateFrame.Intersects(BRect(accelerationBmpPoint,
+			accelerationBmpPoint + fAccelerationBitmap->Bounds().RightBottom())))
+		DrawBitmapAsync(fAccelerationBitmap, accelerationBmpPoint);
+	
 
 	SetDrawingMode(B_OP_COPY);
 }
