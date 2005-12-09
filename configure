@@ -97,7 +97,9 @@ standard_gcc_settings()
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
 	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
 	HAIKU_GCC_HEADERS_DIR=${gccdir}/include
-	HAIKU_GCC_LIBGCC_OBJECTS=`ar t ${HAIKU_GCC_LIBGCC}`
+	HAIKU_GCC_LIBGCC_OBJECTS=`$HAIKU_AR t ${HAIKU_GCC_LIBGCC} | grep -v eabi.o`
+		# Note: We filter out eabi.o. It's present in gcc's libgcc for PPC and
+		# neither needed nor wanted.
 
 	# for gcc 4 we use the libstdc++ and libsupc++ that come with the compiler
 	case $haikuGCCVersion in
