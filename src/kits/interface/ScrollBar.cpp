@@ -237,57 +237,8 @@ BScrollBar::AttachedToWindow()
 	// R5's SB contacts the server if fValue!=0. I *think* we don't need to do anything here...
 }
 
-// SetValue
-void
-BScrollBar::SetValue(float value)
-{
-	if (value > fMax)
-		value = fMax;
-	if (value < fMin)
-		value = fMin;
-
-	if (fValue != value) {
-		fValue = value;
-		ValueChanged(fValue);
-	}
-}
-
-// Value
-float
-BScrollBar::Value() const
-{
-	return fValue;
-}
-
-// SetProportion
-void
-BScrollBar::SetProportion(float value)
-{
-	if (value < 0.0)
-		value = 0.0;
-	if (value > 1.0)
-		value = 1.0;
-
-	if (value != fProportion) {
-		fProportion = value;
-
-		_UpdateThumbFrame();
-	}
-}
-
-// Proportion
-float
-BScrollBar::Proportion() const
-{
-	return fProportion;
-}
-
-// ValueChanged
-void
-BScrollBar::ValueChanged(float newValue)
-{
 /*
-	From the BeBook:
+	From the BeBook (on ValueChanged()):
 	
 Responds to a notification that the value of the scroll bar has changed to 
 newValue. For a horizontal scroll bar, this function interprets newValue 
@@ -316,6 +267,33 @@ if the target has been set by name, but the name doesn't correspond to
 an actual BView within the scroll bar's window. 
 
 */
+
+// SetValue
+void
+BScrollBar::SetValue(float value)
+{
+	ValueChanged(value);
+}
+
+// Value
+float
+BScrollBar::Value() const
+{
+	return fValue;
+}
+
+// ValueChanged
+void
+BScrollBar::ValueChanged(float newValue)
+{
+	if (newValue > fMax)
+		newValue = fMax;
+	if (newValue < fMin)
+		newValue = fMin;
+
+	if (newValue == fValue)
+		return;
+
 	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
@@ -328,27 +306,59 @@ an actual BView within the scroll bar's window.
 			fTarget->ScrollTo(newValue, targetBounds.top);
 		}
 	}
+
+	fValue = newValue;
+
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
+}
+
+// SetProportion
+void
+BScrollBar::SetProportion(float value)
+{
+/*	if (value < 0.0)
+		value = 0.0;
+	if (value > 1.0)
+		value = 1.0;*/
+
+	if (value != fProportion) {
+		bool oldEnabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
+
+		fProportion = value;
+
+		bool newEnabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
+		
+		_UpdateThumbFrame();
+
+		if (oldEnabled != newEnabled)
+			Invalidate();
+	}
+}
+
+// Proportion
+float
+BScrollBar::Proportion() const
+{
+	return fProportion;
 }
 
 // SetRange
 void
 BScrollBar::SetRange(float min, float max)
 {
+	if (fMin == min && fMax == max)
+		return;
+
 	fMin = min;
 	fMax = max;
-	
-	if (fValue > fMax)
-		fValue = fMax;
-	else if (fValue < fMin)
-		fValue = fMin;
-	
-	Invalidate();
-	
-	// Just a sort-of hack for now. ValueChanged is called, but with
-	// what value??
-	ValueChanged(fValue);
+
+	if (fValue < fMin || fValue > fMax)
+		ValueChanged(fValue);
+	else {
+		_UpdateThumbFrame();
+		Invalidate();
+	}
 }
 
 // GetRange
@@ -534,7 +544,7 @@ BScrollBar::MouseUp(BPoint pt)
 void
 BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
-	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0)
+	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0 || fProportion < 0.0)
 		return;
 
 	if (fPrivateData->fButtonDown != NOARROW) {
@@ -589,7 +599,7 @@ BScrollBar::Draw(BRect updateRect)
 	StrokeRect(bounds);
 	bounds.InsetBy(1.0, 1.0);
 
-	bool enabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0;
+	bool enabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
 
 	rgb_color light, light1, dark, dark1, dark2, dark4;
 	if (enabled) {
@@ -822,7 +832,7 @@ BScrollBar::Draw(BRect updateRect)
 
 		// TODO: Add the other thumb styles - dots and lines
 	} else {
-		if (fMin >= fMax || fProportion >= 1.0) {
+		if (fMin >= fMax || fProportion >= 1.0 || fProportion < 0.0) {
 			// we cannot scroll at all
 			_DrawDisabledBackground(thumbBG, light, dark, dark1);
 		} else {
@@ -1016,7 +1026,7 @@ BScrollBar::_UpdateThumbFrame()
 
 	float thumbSize = minSize;
 	float proportion = fProportion;
-	if (fMin == fMax)
+	if (fMin == fMax || proportion > 1.0 || proportion < 0.0)
 		proportion = 1.0;
 	if (fPrivateData->fScrollBarInfo.proportional)
 		thumbSize += (maxSize - minSize) * proportion;
