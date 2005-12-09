@@ -675,7 +675,10 @@ Desktop::SetWorkspace(int32 index)
 	_UpdateFronts(false);
 	_UpdateFloating(previousIndex, index);
 
-	SetFocusWindow(FrontWindow());
+	// Set new focus to the front window, but keep focus to a floating
+	// window if still visible
+	if (!_Windows(index).HasWindow(FocusWindow()) || !FocusWindow()->IsFloating())
+		SetFocusWindow(FrontWindow());
 
 	MarkDirty(dirty);
 
@@ -881,12 +884,20 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 		return;
 	}
 
-	if (focus == NULL || hasModal)
+	if (focus == NULL || hasModal) {
 		focus = FrontWindow();
+		if (focus == NULL) {
+			// there might be no front window in case of only a single
+			// window with B_FLOATING_ALL_WINDOW_FEEL
+			focus = _CurrentWindows().LastWindow();
+		}
+	}
 
 	// make sure no window is chosen that doesn't want focus or cannot have it
 	while (focus != NULL
-		&& ((focus->Flags() & B_AVOID_FOCUS) != 0 || _WindowHasModal(focus))) {
+		&& ((focus->Flags() & B_AVOID_FOCUS) != 0
+			|| _WindowHasModal(focus)
+			|| focus->IsHidden())) {
 		focus = focus->PreviousWindow(fCurrentWorkspace);
 	}
 
@@ -1365,6 +1376,9 @@ void
 Desktop::RemoveWindow(WindowLayer *window)
 {
 	BAutolock _(this);
+
+	if (!window->IsHidden())
+		HideWindow(window);
 
 	fAllWindows.RemoveWindow(window);
 	if (!window->IsNormal())
