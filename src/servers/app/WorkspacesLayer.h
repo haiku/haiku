@@ -26,6 +26,8 @@ class WorkspacesLayer : public ViewLayer {
 						bool deep = false);
 		virtual void MouseDown(BMessage* message, BPoint where, int32* _viewToken);
 
+		void WindowChanged(WindowLayer* window);
+
 	private:
 		void _GetGrid(int32& columns, int32& rows);
 		BRect _WorkspaceAt(int32 i);

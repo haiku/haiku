@@ -64,15 +64,14 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 
 	BRect rect(column * width, row * height, (column + 1) * width, (row + 1) * height);
 
+	rect.OffsetBy(Frame().LeftTop());
+
 	// make sure there is no gap anywhere
 	if (column == columns - 1)
 		rect.right = Frame().right;
 	if (row == rows - 1)
 		rect.bottom = Frame().bottom;
 
-	BPoint pt(0,0);
-	ConvertToScreen(&pt);
-	rect.OffsetBy(pt);
 	return rect;
 }
 
@@ -103,7 +102,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	const BRect& screenFrame, WindowLayer* window, BPoint windowPosition,
 	BRegion& backgroundRegion, bool active)
 {
-	if (window->Feel() == kDesktopWindowFeel)
+	if (window->Feel() == kDesktopWindowFeel || window->IsHidden())
 		return;
 
 	BPoint offset = window->Frame().LeftTop() - windowPosition;
@@ -304,4 +303,12 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	//ViewLayer::MouseDown(message, where, _viewToken);
 }
 
+
+void
+WorkspacesLayer::WindowChanged(WindowLayer* window)
+{
+	// TODO: be smarter about this!
+	BRegion region(Frame());
+	Window()->MarkContentDirty(region);
+}
 
