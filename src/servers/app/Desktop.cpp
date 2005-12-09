@@ -241,7 +241,7 @@ workspace_to_workspaces(int32 index)
 
 
 static inline bool
-workspaces_on_workspace(int32 index, uint32 workspaces)
+workspace_in_workspaces(int32 index, uint32 workspaces)
 {
 	return (workspaces & (1UL << index)) != 0;
 }
@@ -1287,9 +1287,9 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 	WriteLockWindows();
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		if (workspaces_on_workspace(i, oldWorkspaces)) {
+		if (workspace_in_workspaces(i, oldWorkspaces)) {
 			// window is on this workspace, is it anymore?
-			if (!workspaces_on_workspace(i, newWorkspaces)) {
+			if (!workspace_in_workspaces(i, newWorkspaces)) {
 				_Windows(i).RemoveWindow(window);
 
 				if (i == CurrentWorkspace()) {
@@ -1302,7 +1302,7 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 			}
 		} else {
 			// window was not on this workspace, is it now?
-			if (workspaces_on_workspace(i, newWorkspaces)) {
+			if (workspace_in_workspaces(i, newWorkspaces)) {
 				_Windows(i).AddWindow(window,
 					window->Frontmost(_Windows(i).FirstWindow(), i));
 
@@ -1447,8 +1447,33 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	if (!window->IsNormal())
 		_ChangeWindowWorkspaces(window, window->Workspaces(), window->SubsetWorkspaces());
 
-	// TODO: make sure the window has the correct position in the window list
+	// make sure the window has the correct position in the window lists
 	//	(ie. all floating windows have to be on the top, ...)
+
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		if (!workspace_in_workspaces(i, window->Workspaces()))
+			continue;
+
+		WindowLayer* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
+		if (frontmost == NULL)
+			continue;
+		
+		// check if the frontmost window is really in front of it
+		
+		WindowLayer* next = window->NextWindow(i);
+		while (next != NULL) {
+			if (next == frontmost)
+				break;
+
+			next = next->NextWindow(i);
+		}
+
+		if (next == NULL) {
+			// need to reinsert window behind its frontmost window
+			_Windows(i).RemoveWindow(window);
+			_Windows(i).AddWindow(window, frontmost);
+		}
+	}
 
 	_UpdateFronts();
 }
