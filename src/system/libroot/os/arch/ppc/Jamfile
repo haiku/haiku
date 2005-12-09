@@ -8,5 +8,6 @@ MergeObject os_arch_$(TARGET_ARCH).o :
 #	systeminfo.c
 	system_time.S
 	thread.c
+	time.c
 	tls.c
 ;
