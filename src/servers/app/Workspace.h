@@ -14,7 +14,6 @@
 
 class Desktop;
 class RGBColor;
-class RootLayer;
 class WindowLayer;
 
 

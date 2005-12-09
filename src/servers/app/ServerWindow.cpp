@@ -1404,7 +1404,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 		// TODO: you are not allowed to use ViewLayer regions here!!!
-		// If there is no other way, then first lock RootLayer object first.
 			
 			int32 pictureToken;
 			BPoint where;

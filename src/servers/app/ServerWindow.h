@@ -37,7 +37,6 @@ class ServerApp;
 class Decorator;
 class WindowLayer;
 class Workspace;
-class RootLayer;
 class ViewLayer;
 class ServerPicture;
 struct dw_data;

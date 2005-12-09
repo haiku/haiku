@@ -13,38 +13,14 @@
 
 #include "BitmapManager.h"
 #include "ColorSet.h"
-#include "CursorManager.h"
-#include "DecorManager.h"
-#include "DefaultDecorator.h"
 #include "Desktop.h"
 #include "FontManager.h"
-#include "HWInterface.h"
 #include "InputManager.h"
-//#include "Layer.h"
-#include "RGBColor.h"
-#include "RegistrarDefs.h"
-//#include "RootLayer.h"
 #include "ScreenManager.h"
-#include "ServerApp.h"
-#include "ServerConfig.h"
-#include "ServerCursor.h"
 #include "ServerProtocol.h"
-#include "ServerWindow.h"
 #include "SystemPalette.h"
 
-#include <Accelerant.h>
-#include <AppDefs.h>
-#include <Autolock.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <Message.h>
-#include <Path.h>
 #include <PortLink.h>
-#include <RosterPrivate.h>
-#include <StopWatch.h>
-
-#include <unistd.h>
 
 
 //#define DEBUG_SERVER
