@@ -1,16 +1,16 @@
 SubDir HAIKU_TOP src system libroot posix math ;
 
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
-#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
-#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include ] ;
-#SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include arch $(TARGET_ARCH) ] ;
 SubDirCcFlags -Dnational ;
+
+# TODO: We should probably drop this completely and use the glibc math support,
+# instead of the current mix.
 
 MergeObject posix_math.o :
 	acosh.c
 	asincos.c
 	asinh.c
-	atan.c
+#	atan.c
 	atanh.c
 	cabs.c
 	cbrt.c
