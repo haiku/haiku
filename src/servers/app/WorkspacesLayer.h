@@ -37,7 +37,8 @@ class WorkspacesLayer : public ViewLayer {
 					const BRect& screenFrame, WindowLayer* window,
 					BPoint windowPosition, BRegion& backgroundRegion,
 					bool active);
-		void _DrawWorkspace(DrawingEngine* drawingEngine, int32 index);
+		void _DrawWorkspace(DrawingEngine* drawingEngine, BRegion& redraw,
+					int32 index);
 
 		void _DarkenColor(RGBColor& color) const;
 };

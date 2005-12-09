@@ -171,7 +171,8 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 
 
 void
-WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine, int32 index)
+WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
+	BRegion& redraw, int32 index)
 {
 	BRect rect = _WorkspaceAt(index);
 
@@ -191,7 +192,7 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine, int32 index)
 
 	// draw windows
 
-	BRegion backgroundRegion = fLocalClipping;
+	BRegion backgroundRegion = redraw;
 
 	// ToDo: would be nice to get the real update region here
 
@@ -218,9 +219,7 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine, int32 index)
 	drawingEngine->ConstrainClippingRegion(&backgroundRegion);
 	drawingEngine->FillRect(rect, color);
 
-	// TODO: ConstrainClippingRegion() should accept a const parameter !!
-	BRegion cRegion(fLocalClipping);
-	drawingEngine->ConstrainClippingRegion(&cRegion);
+	drawingEngine->ConstrainClippingRegion(&redraw);
 }
 
 
@@ -235,6 +234,11 @@ void
 WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
+	// we can only draw within our own area
+	BRegion redraw(ScreenClipping(windowContentClipping));
+	// add the current clipping
+	redraw.IntersectWith(effectiveClipping);
+
 	int32 columns, rows;
 	_GetGrid(columns, rows);
 
@@ -243,14 +247,12 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	// make sure the grid around the active workspace is not drawn
 	// to reduce flicker
 	BRect activeRect = _WorkspaceAt(Window()->Desktop()->CurrentWorkspace());
-	BRegion gridRegion(fLocalClipping);
+	BRegion gridRegion(redraw);
 	gridRegion.Exclude(activeRect);
 	drawingEngine->ConstrainClippingRegion(&gridRegion);
 
 	BRect frame = Frame();
-	BPoint pt(0,0);
-	ConvertToScreen(&pt);
-	frame.OffsetBy(pt);
+		// top ViewLayer frame is in screen coordinates
 
 	// horizontal lines
 
@@ -274,13 +276,12 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			BPoint(rect.right, frame.bottom), ViewColor());
 	}
 
-	BRegion cRegion(fLocalClipping);
-	drawingEngine->ConstrainClippingRegion(&cRegion);
+	drawingEngine->ConstrainClippingRegion(&redraw);
 
 	// draw workspaces
 
 	for (int32 i = rows * columns; i-- > 0;) {
-		_DrawWorkspace(drawingEngine, i);
+		_DrawWorkspace(drawingEngine, redraw, i);
 	}
 }
 
