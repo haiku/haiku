@@ -5,8 +5,9 @@
 #ifndef _BITS_LIBC_LOCK_H
 #define _BITS_LIBC_LOCK_H 1
 
-#include <OS.h>
 #include <Errors.h>
+#include <OS.h>
+#include <SupportDefs.h>
 
 
 /* Helper definitions and prototypes.  */
@@ -15,23 +16,12 @@
 
 extern char	_single_threaded;
 
-#ifdef __INTEL__
-
-// ToDo: this does not belong here!
-
 static inline int
 __compare_and_swap (volatile int32 *p, int oldval, int newval)
 {
-  char ret;
-  long int readval;
-
-  __asm__ __volatile__ ("lock; cmpxchgl %3, %1; sete %0"
-			: "=q" (ret), "=m" (*p), "=a" (readval)
-			: "r" (newval), "m" (*p), "a" (oldval));
-  return ret;
+	int32 readval = atomic_test_and_set(p, newval, oldval);
+	return (readval == oldval ? 1 : 0);
 }
-
-#endif
 
 
 /* Mutex type.  */
