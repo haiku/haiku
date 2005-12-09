@@ -10,7 +10,7 @@ MergeObject posix_math.o :
 	acosh.c
 	asincos.c
 	asinh.c
-#	atan.c
+	atan.c
 	atanh.c
 	cabs.c
 	cbrt.c
