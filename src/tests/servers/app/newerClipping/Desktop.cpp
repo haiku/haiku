@@ -8,12 +8,13 @@
 #include <Window.h>
 
 #include "DrawingEngine.h"
+#include "DrawView.h"
 #include "WindowLayer.h"
 
 #include "Desktop.h"
 
 // constructor
-Desktop::Desktop(DrawView* drawView)
+Desktop::Desktop(DrawView* drawView, DrawingEngine* engine)
 	: BLooper("desktop", B_URGENT_DISPLAY_PRIORITY),
 	  fTracking(false),
 	  fLastMousePos(-1.0, -1.0),
@@ -25,8 +26,12 @@ Desktop::Desktop(DrawView* drawView)
 	  fClippingLock("clipping lock"),
 	  fBackgroundRegion(),
 
+	  fMasterClipping(),
+	  fXOffset(0),
+	  fYOffset(0),
+
 	  fDrawView(drawView),
-	  fDrawingEngine(fDrawView->GetDrawingEngine()),
+	  fDrawingEngine(engine),
 
 	  fWindows(64),
 
@@ -43,36 +48,6 @@ Desktop::Desktop(DrawView* drawView)
 // destructor
 Desktop::~Desktop()
 {
-}
-
-// Draw
-void
-Desktop::Draw(BRect updateRect)
-{
-#if !RUN_WITH_FRAME_BUFFER
-	// since parts of the view might have been exposed,
-	// we need a clipping rebuild
-	if (LockClipping()) {
-		BRegion background;
-		_RebuildClippingForAllWindows(&background);
-		_SetBackground(&background);
-
-		UnlockClipping();
-	}
-#endif
-
-	if (fDrawingEngine->Lock()) {
-		fDrawingEngine->SetHighColor(51, 102, 152);
-		fDrawingEngine->FillRegion(&fBackgroundRegion);
-		fDrawingEngine->Unlock();
-	}
-	
-#if !RUN_WITH_FRAME_BUFFER
-	// trigger redrawing windows
-	BRegion update(updateRect);
-	update.Exclude(&fBackgroundRegion);
-	MarkDirty(&update);
-#endif
 }
 
 // MouseDown
@@ -103,19 +78,7 @@ Desktop::MouseDown(BPoint where, uint32 buttons, int32 clicks)
 
 		fIs2ndButton = true;
 	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
-#if RUN_WITH_FRAME_BUFFER
-		if (fDrawingEngine->Lock()) {
-			BRegion region(fDrawingEngine->Bounds());
-			fDrawingEngine->Unlock();
-
-			MarkDirty(&region);
-			region = fBackgroundRegion;
-			fBackgroundRegion.MakeEmpty();
-			_SetBackground(&region);
-		}
-#else
-		fDrawingEngine->MarkDirty();
-#endif
+		fDrawView->Invalidate();
 	}
 }
 
@@ -163,23 +126,7 @@ Desktop::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 			}
 		}
 	} else if (fIs2ndButton) {
-		if (fDrawingEngine->Lock()) {
-			fDrawingEngine->SetHighColor(0, 0, 0);
-			fDrawingEngine->StrokeLine(fLastMousePos, where);
-
-			BRect dirty(fLastMousePos, where);
-			if (dirty.left > dirty.right) {
-				dirty.left = where.x;
-				dirty.right = fLastMousePos.x;
-			} 
-			if (dirty.top > dirty.bottom) {
-				dirty.top = where.y;
-				dirty.bottom = fLastMousePos.y;
-			} 
-			fDrawingEngine->MarkDirty(dirty);
-
-			fDrawingEngine->Unlock();
-		}
+		fDrawingEngine->StrokeLine(fLastMousePos, where, (rgb_color){ 0, 0, 0, 255 });
 		fLastMousePos = where;
 	}
 }
@@ -197,6 +144,9 @@ Desktop::MessageReceived(BMessage* message)
 				message->FindInt32("buttons", (int32*)&buttons) >= B_OK &&
 				message->FindInt32("clicks", &clicks) >= B_OK) {
 
+				where.x += fXOffset;
+				where.y += fYOffset;
+
 				MouseDown(where, buttons, clicks);
 			}
 			break;
@@ -204,6 +154,9 @@ Desktop::MessageReceived(BMessage* message)
 		case B_MOUSE_UP: {
 			BPoint where;
 			if (message->FindPoint("where", &where) >= B_OK) {
+
+				where.x += fXOffset;
+				where.y += fYOffset;
 
 				MouseUp(where);
 			}
@@ -215,18 +168,15 @@ Desktop::MessageReceived(BMessage* message)
 				uint32 transit;
 				if (message->FindPoint("where", &where) >= B_OK &&
 					message->FindInt32("be:transit", (int32*)&transit) >= B_OK) {
+
+					where.x += fXOffset;
+					where.y += fYOffset;
 	
 					MouseMoved(where, transit, NULL);
 				}
 			}
 			break;
 		}
-		case MSG_DRAW: {
-			BRect area;
-			if (message->FindRect("area", &area) >= B_OK)
-				Draw(area);
-		}
-
 
 		case MSG_ADD_WINDOW: {
 			WindowLayer* window;
@@ -247,6 +197,37 @@ Desktop::MessageReceived(BMessage* message)
 		default:
 			BLooper::MessageReceived(message);
 	}
+}
+
+// #pragma mark -
+
+// SetMasterClipping
+void
+Desktop::SetMasterClipping(BRegion* clipping)
+{
+	BRegion update = *clipping;
+	update.Exclude(&fMasterClipping);
+
+	fMasterClipping = *clipping;
+	// since parts of the view might have been exposed,
+	// we need a clipping rebuild
+	BRegion background;
+	_RebuildClippingForAllWindows(&background);
+	_SetBackground(&background);
+
+	fDrawingEngine->FillRegion(&fBackgroundRegion, (rgb_color){ 51, 102, 152, 255 });
+	
+	// trigger redrawing windows
+	update.Exclude(&fBackgroundRegion);
+	MarkDirty(&update);
+}
+
+// SetOffset
+void
+Desktop::SetOffset(int32 x, int32 y)
+{
+	fXOffset = x;
+	fYOffset = y;
 }
 
 // #pragma mark -
@@ -387,17 +368,10 @@ Desktop::MoveWindowBy(WindowLayer* window, int32 x, int32 y)
 		// moved into the dirty region (for now)
 		newDirtyRegion.Include(&window->VisibleRegion());
 
-		if (fDrawingEngine->Lock()) {
-			fDrawingEngine->CopyRegion(&copyRegion, x, y);
-	
-			// in the dirty region, exclude the parts that we
-			// could move by blitting
-			copyRegion.OffsetBy(x, y);
-			newDirtyRegion.Exclude(&copyRegion);
-			fDrawingEngine->MarkDirty(&copyRegion);
-	
-			fDrawingEngine->Unlock();
-		}
+		fDrawingEngine->CopyRegion(&copyRegion, x, y);
+
+		copyRegion.OffsetBy(x, y);
+		newDirtyRegion.Exclude(&copyRegion);
 
 		MarkDirty(&newDirtyRegion);
 		_SetBackground(&background);
@@ -456,6 +430,8 @@ Desktop::HideWindow(WindowLayer* window)
 void
 Desktop::SetWindowHidden(WindowLayer* window, bool hidden)
 {
+	// TODO: if in ffm mode, make sure to switch focus
+	// if appropriate
 	if (LockClipping()) {
 
 		if (window->IsHidden() != hidden) {
@@ -627,14 +603,7 @@ Desktop::_RebuildClippingForAllWindows(BRegion* stillAvailableOnScreen)
 	// each window on the screen will take a portion from that area
 
 	// figure out what the entire screen area is
-	if (!fDrawView->Window())
-		stillAvailableOnScreen->Set(fDrawView->Bounds());
-	else {
-		if (fDrawView->Window()->Lock()) {
-			fDrawView->GetClippingRegion(stillAvailableOnScreen);
-			fDrawView->Window()->Unlock();
-		}
-	}
+	*stillAvailableOnScreen = fMasterClipping;
 
 	// set clipping of each window
 	int32 count = CountWindows();
@@ -677,12 +646,6 @@ Desktop::_SetBackground(BRegion* background)
 	dirtyBackground.IntersectWith(background);
 	fBackgroundRegion = *background;
 	if (dirtyBackground.Frame().IsValid()) {
-		if (fDrawingEngine->Lock()) {
-			fDrawingEngine->SetHighColor(51, 102, 152);
-			fDrawingEngine->FillRegion(&dirtyBackground);
-			fDrawingEngine->MarkDirty(&dirtyBackground);
-	
-			fDrawingEngine->Unlock();
-		}
+		fDrawingEngine->FillRegion(&dirtyBackground, (rgb_color){ 51, 102, 152, 255 });
 	}
 }

@@ -192,7 +192,7 @@ WindowLayer::GetFullRegion(BRegion* region) const
 					  fFrame.right + 4, fFrame.bottom + 4));
 	// add the title tab
 	region->Include(BRect(fFrame.left - 4, fFrame.top - 20,
-						  (fFrame.left + fFrame.right) / 2, fFrame.top - 5));
+						  ceilf((fFrame.left + fFrame.right) / 2), fFrame.top - 5));
 }
 
 // GetBorderRegion
@@ -201,7 +201,7 @@ WindowLayer::GetBorderRegion(BRegion* region)
 {
 	if (!fBorderRegionValid) {
 		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 20,
-							  	(fFrame.left + fFrame.right) / 2, fFrame.top - 5));
+							  	ceilf((fFrame.left + fFrame.right) / 2), fFrame.top - 5));
 		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top - 4,
 									fFrame.right + 4, fFrame.top - 1));
 		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top,
@@ -212,21 +212,6 @@ WindowLayer::GetBorderRegion(BRegion* region)
 									fFrame.right - 11, fFrame.bottom + 4));
 		fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
 									fFrame.right + 4, fFrame.bottom + 4));
-/*		// TODO: speed up by avoiding "Exclude()"
-		// start from the frame, extend to include decorator border
-		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 4,
-						  fFrame.right + 4, fFrame.bottom + 4));
-	
-		fBorderRegion.Exclude(fFrame);
-	
-		// add the title tab
-		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top - 20,
-							  (fFrame.left + fFrame.right) / 2, fFrame.top - 5));
-	
-		// resize handle
-		// if (B_DOCUMENT_WINDOW_LOOK)
-			fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
-								  fFrame.right, fFrame.bottom));*/
 		fBorderRegionValid = true;
 	}
 
@@ -680,25 +665,22 @@ WindowLayer::_DrawClientPolygon(int32 token, BPoint polygon[4])
 						&fContentRegion, false);
 #endif
 
+			layer->ConvertToTop(&polygon[0]);
+			layer->ConvertToTop(&polygon[1]);
+			layer->ConvertToTop(&polygon[2]);
+			layer->ConvertToTop(&polygon[3]);
+
 			if (fDrawingEngine->Lock()) {
 
-				fDrawingEngine->PushState();
-				fDrawingEngine->ConstrainClippingRegion(&effectiveClipping);
-				fDrawingEngine->SetPenSize(3);
-//				fDrawingEngine->SetDrawingMode(B_OP_BLEND);
-				layer->ConvertToTop(&polygon[0]);
-				layer->ConvertToTop(&polygon[1]);
-				layer->ConvertToTop(&polygon[2]);
-				layer->ConvertToTop(&polygon[3]);
-				fDrawingEngine->BeginLineArray(4);
-					fDrawingEngine->AddLine(polygon[0], polygon[1], layer->ViewColor());
-					fDrawingEngine->AddLine(polygon[1], polygon[2], layer->ViewColor());
-					fDrawingEngine->AddLine(polygon[2], polygon[3], layer->ViewColor());
-					fDrawingEngine->AddLine(polygon[3], polygon[0], layer->ViewColor());
-				fDrawingEngine->EndLineArray();
+				fDrawingEngine->ConstrainClipping(&effectiveClipping);
 
-				fDrawingEngine->PopState();
-				fDrawingEngine->MarkDirty(&effectiveClipping);
+//				fDrawingEngine->SetPenSize(3);
+//				fDrawingEngine->SetDrawingMode(B_OP_BLEND);
+				fDrawingEngine->StrokeLine(polygon[0], polygon[1], layer->ViewColor());
+				fDrawingEngine->StrokeLine(polygon[1], polygon[2], layer->ViewColor());
+				fDrawingEngine->StrokeLine(polygon[2], polygon[3], layer->ViewColor());
+				fDrawingEngine->StrokeLine(polygon[3], polygon[0], layer->ViewColor());
+
 				fDrawingEngine->Unlock();
 			}
 		}
@@ -728,57 +710,59 @@ WindowLayer::_DrawBorder()
 	dirtyBorderRegion.IntersectWith(&fDirtyRegion);
 
 	if (dirtyBorderRegion.CountRects() > 0) {
+
+		rgb_color lowColor;
+		rgb_color highColor;
+		if (fFocus) {
+			lowColor = (rgb_color){ 255, 203, 0, 255 };
+			highColor = (rgb_color){ 0, 0, 0, 255 };
+		} else {
+			lowColor = (rgb_color){ 216, 216, 216, 0 };
+			highColor = (rgb_color){ 30, 30, 30, 255 };
+		}
+
+		fDrawingEngine->FillRegion(&dirtyBorderRegion, lowColor);
+
+		rgb_color light = tint_color(lowColor, B_LIGHTEN_2_TINT);
+		rgb_color shadow = tint_color(lowColor, B_DARKEN_2_TINT);
+
 		if (fDrawingEngine->Lock()) {
 
-			fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
+			fDrawingEngine->ConstrainClipping(&dirtyBorderRegion);
 
-			if (fFocus) {
-				fDrawingEngine->SetLowColor(255, 203, 0, 255);
-				fDrawingEngine->SetHighColor(0, 0, 0, 255);
-			} else {
-				fDrawingEngine->SetLowColor(216, 216, 216, 0);
-				fDrawingEngine->SetHighColor(30, 30, 30, 255);
-			}
-			rgb_color light = tint_color(fDrawingEngine->LowColor(), B_LIGHTEN_2_TINT);
-			rgb_color shadow = tint_color(fDrawingEngine->LowColor(), B_DARKEN_2_TINT);
-
-			fDrawingEngine->FillRect(dirtyBorderRegion.Frame(), B_SOLID_LOW);
-
-			fDrawingEngine->DrawString(Name(), BPoint(fFrame.left, fFrame.top - 5));
+			fDrawingEngine->DrawString(Name(), BPoint(fFrame.left, fFrame.top - 5), highColor);
 
 			BRect frame(fFrame);
-			fDrawingEngine->BeginLineArray(12);
 			frame.InsetBy(-1, -1);
-			fDrawingEngine->AddLine(BPoint(frame.left, frame.bottom),
-									BPoint(frame.left, frame.top), shadow);
-			fDrawingEngine->AddLine(BPoint(frame.left + 1, frame.top),
-									BPoint(frame.right, frame.top), shadow);
-			fDrawingEngine->AddLine(BPoint(frame.right, frame.top + 1),
-									BPoint(frame.right, frame.bottom - 11), light);
-			fDrawingEngine->AddLine(BPoint(frame.right - 1, frame.bottom - 11),
-									BPoint(frame.right - 11, frame.bottom - 11), light);
-			fDrawingEngine->AddLine(BPoint(frame.right - 11, frame.bottom - 10),
-									BPoint(frame.right - 11, frame.bottom), light);
-			fDrawingEngine->AddLine(BPoint(frame.right - 12, frame.bottom),
-									BPoint(frame.left + 1, frame.bottom), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.left, frame.bottom),
+									   BPoint(frame.left, frame.top), shadow);
+			fDrawingEngine->StrokeLine(BPoint(frame.left + 1, frame.top),
+									   BPoint(frame.right, frame.top), shadow);
+			fDrawingEngine->StrokeLine(BPoint(frame.right, frame.top + 1),
+									   BPoint(frame.right, frame.bottom - 11), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.right - 1, frame.bottom - 11),
+									   BPoint(frame.right - 11, frame.bottom - 11), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.right - 11, frame.bottom - 10),
+									   BPoint(frame.right - 11, frame.bottom), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.right - 12, frame.bottom),
+									   BPoint(frame.left + 1, frame.bottom), light);
 
 			frame.InsetBy(-3, -3);
-			fDrawingEngine->AddLine(BPoint(frame.left, frame.bottom),
-									BPoint(frame.left, frame.top - 16), light);
-			fDrawingEngine->AddLine(BPoint(frame.left + 1, frame.top - 16),
-									BPoint((frame.left + frame.right) / 2, frame.top - 16), light);
-			fDrawingEngine->AddLine(BPoint((frame.left + frame.right) / 2, frame.top - 15),
-									BPoint((frame.left + frame.right) / 2, frame.top), shadow);
-			fDrawingEngine->AddLine(BPoint((frame.left + frame.right) / 2 + 1, frame.top),
-									BPoint(frame.left + frame.right, frame.top), light);
-			fDrawingEngine->AddLine(BPoint(frame.right, frame.top + 1),
-									BPoint(frame.right, frame.bottom), shadow);
-			fDrawingEngine->AddLine(BPoint(frame.right, frame.bottom),
-									BPoint(frame.left + 1, frame.bottom), shadow);
-			fDrawingEngine->EndLineArray();
+			int32 tabRight = ceilf((fFrame.left + fFrame.right) / 2);
+			fDrawingEngine->StrokeLine(BPoint(frame.left, frame.bottom),
+									   BPoint(frame.left, frame.top - 16), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.left + 1, frame.top - 16),
+									   BPoint(tabRight, frame.top - 16), light);
+			fDrawingEngine->StrokeLine(BPoint(tabRight, frame.top - 15),
+									   BPoint(tabRight, frame.top), shadow);
+			fDrawingEngine->StrokeLine(BPoint(tabRight + 1, frame.top),
+									   BPoint(frame.right, frame.top), light);
+			fDrawingEngine->StrokeLine(BPoint(frame.right, frame.top + 1),
+									   BPoint(frame.right, frame.bottom), shadow);
+			fDrawingEngine->StrokeLine(BPoint(frame.right, frame.bottom),
+									   BPoint(frame.left + 1, frame.bottom), shadow);
 
-			fDrawingEngine->ConstrainClippingRegion(NULL);
-			fDrawingEngine->MarkDirty(&dirtyBorderRegion);
+			fDrawingEngine->ConstrainClipping(NULL);
 			fDrawingEngine->Unlock();
 		}
 	}

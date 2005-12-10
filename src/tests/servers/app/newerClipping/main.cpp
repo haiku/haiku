@@ -1,13 +1,16 @@
 
 #include <Application.h>
-#include <Window.h>
+#include <DirectWindow.h>
 #include <View.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "AccelerantHWInterface.h"
 #include "Desktop.h"
+#include "DirectWindowBuffer.h"
 #include "DrawingEngine.h"
+#include "DrawView.h"
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
@@ -18,19 +21,25 @@ class App : public BApplication {
 	virtual void		ReadyToRun();
 };
 
-class Window : public BWindow {
+class Window : public BDirectWindow {
  public:
-						Window(const char* title);
-	virtual				~Window();
+								Window(const char* title);
+	virtual						~Window();
 
-	virtual	bool		QuitRequested();
+	virtual	bool				QuitRequested();
 
-			void		AddWindow(BRect frame, const char* name);
-			void		Test();
+	virtual void				DirectConnected(direct_buffer_info* info);
+
+			void				AddWindow(BRect frame, const char* name);
+			void				Test();
  private:
-			DrawView*	fView;
-			Desktop*	fDesktop;
-			bool		fQuit;
+		DrawView*				fView;
+		Desktop*				fDesktop;
+		bool					fQuit;
+		DirectWindowBuffer		fBuffer;
+		AccelerantHWInterface	fInterface;
+		DrawingEngine			fEngine;
+
 };
 
 // constructor
@@ -52,15 +61,20 @@ App::ReadyToRun()
 
 // constructor
 Window::Window(const char* title)
-	: BWindow(BRect(50, 50, 800, 650), title,
-			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS)
+	: BDirectWindow(BRect(50, 50, 800, 650), title,
+					B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS),
+	  fQuit(false),
+	  fBuffer(),
+	  fInterface(),
+	  fEngine(&fInterface, &fBuffer)
 {
+	fInterface.Initialize();
 	fView = new DrawView(Bounds());
-	fDesktop = new Desktop(fView);
-	fDesktop->Run();
 	AddChild(fView);
 	fView->MakeFocus(true);
-	fQuit = false;
+
+	fDesktop = new Desktop(fView, &fEngine);
+	fDesktop->Run();
 }
 
 // destructor
@@ -80,6 +94,34 @@ Window::QuitRequested()
 		return false;
 	}
 	return true;
+}
+
+// DirectConnected
+void
+Window::DirectConnected(direct_buffer_info* info)
+{
+	// TODO: for some reason, this deadlocks
+	// on B_DIRECT_STOP... be aware
+	fDesktop->LockClipping();
+
+	fEngine.Lock();
+	
+	switch(info->buffer_state & B_DIRECT_MODE_MASK) {
+		case B_DIRECT_START:
+		case B_DIRECT_MODIFY:
+			fBuffer.SetTo(info);
+			fDesktop->SetOffset(info->window_bounds.left, info->window_bounds.top);
+			break;
+		case B_DIRECT_STOP:
+			fBuffer.SetTo(NULL);
+			break;
+	}
+
+	fDesktop->SetMasterClipping(&fBuffer.WindowClipping());
+
+	fEngine.Unlock();
+
+	fDesktop->UnlockClipping();
 }
 
 // AddWindow

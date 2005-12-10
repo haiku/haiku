@@ -7,8 +7,6 @@
 #include <View.h>
 #include <Window.h>
 
-#include "DrawingEngine.h"
-
 #define SHOW_GLOBAL_DIRTY_REGION 0
 #define SHOW_WINDOW_CONTENT_DIRTY_REGION 0
 
@@ -20,6 +18,8 @@
 #  include <Locker.h>
 #endif
 
+class DrawingEngine;
+class DrawView;
 class WindowLayer;
 class ViewLayer;
 
@@ -34,12 +34,11 @@ enum {
 
 class Desktop : public BLooper {
  public:
-								Desktop(DrawView* drawView);
+								Desktop(DrawView* drawView,
+										DrawingEngine* engine);
 	virtual						~Desktop();
 
 			// functions for the DrawView
-			void				Draw(BRect updateRect);
-
 			void				MouseDown(BPoint where, uint32 buttons,
 										  int32 clicks); 
 			void				MouseUp(BPoint where); 
@@ -47,6 +46,9 @@ class Desktop : public BLooper {
 										   const BMessage* dragMessage);
 
 	virtual	void				MessageReceived(BMessage* message);
+
+			void				SetMasterClipping(BRegion* clipping);
+			void				SetOffset(int32 x, int32 y);
 
 			bool				AddWindow(WindowLayer* window);
 			bool				RemoveWindow(WindowLayer* window);
@@ -116,6 +118,10 @@ private:
 			BLocker				fClippingLock;
 #endif
 			BRegion				fBackgroundRegion;
+
+			BRegion				fMasterClipping;
+			int32				fXOffset;
+			int32				fYOffset;
 
 			DrawView*			fDrawView;
 			DrawingEngine*		fDrawingEngine;

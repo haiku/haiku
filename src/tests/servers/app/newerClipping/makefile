@@ -32,11 +32,14 @@ TYPE= APP
 #	in folder names do not work well with this makefile.
 SRCS= ClientLooper.cpp \
 	  Desktop.cpp \
-	  DrawingEngine.cpp \
 	  main.cpp \
 	  MultiLocker.cpp \
 	  ViewLayer.cpp \
 	  WindowLayer.cpp \
+	  drawing/AccelerantHWInterface.cpp \
+	  drawing/DirectWindowBuffer.cpp \
+	  drawing/DrawingEngine.cpp \
+	  drawing/DrawView.cpp \
 #	  trace.c
 
 #	specify the resource files to use
@@ -58,7 +61,7 @@ RSRCS=
 #		naming scheme you need to specify the path to the library
 #		and it's name
 #		library: my_lib.a entry: my_lib.a or path/my_lib.a
-LIBS= be
+LIBS= be game
 
 #	specify additional paths to directories following the standard
 #	libXXX.so or libXXX.a naming scheme.  You can specify full paths

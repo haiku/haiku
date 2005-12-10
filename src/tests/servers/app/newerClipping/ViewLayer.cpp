@@ -618,14 +618,8 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	// add the current clipping
 	redraw.IntersectWith(effectiveClipping);
 
-	if (drawingEngine->Lock()) {
-		// fill visible region with white
-		drawingEngine->SetHighColor(255, 255, 255);
-		drawingEngine->FillRegion(&redraw);
-
-		drawingEngine->MarkDirty(&redraw);
-		drawingEngine->Unlock();
-	}
+	// fill visible region with white
+	drawingEngine->FillRegion(&redraw, (rgb_color){ 255, 255, 255, 255 });
 
 	// let children draw
 	if (deep) {
@@ -644,28 +638,22 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 void
 ViewLayer::ClientDraw(DrawingEngine* drawingEngine, BRegion* effectiveClipping)
 {
+	BRect b(Bounds());
+	b.OffsetTo(0.0, 0.0);
+	ConvertToTop(&b);
+
 	if (drawingEngine->Lock()) {
+		drawingEngine->ConstrainClipping(effectiveClipping);
 
 		// draw a frame with the view color
-		BRect b(Bounds());
-		b.OffsetTo(0.0, 0.0);
-		ConvertToTop(&b);
-		drawingEngine->PushState();
-		drawingEngine->ConstrainClippingRegion(effectiveClipping);
-
-		drawingEngine->SetHighColor(fViewColor);
-//		drawingEngine->SetDrawingMode(B_OP_BLEND);
-		drawingEngine->StrokeRect(b);
+		drawingEngine->StrokeRect(b, fViewColor);
 		b.InsetBy(1, 1);
-		drawingEngine->StrokeRect(b);
+		drawingEngine->StrokeRect(b, fViewColor);
 		b.InsetBy(1, 1);
-		drawingEngine->StrokeRect(b);
+		drawingEngine->StrokeRect(b, fViewColor);
 		b.InsetBy(1, 1);
-		drawingEngine->StrokeLine(b.LeftTop(), b.RightBottom());
+		drawingEngine->StrokeLine(b.LeftTop(), b.RightBottom(), fViewColor);
 
-		drawingEngine->PopState();
-
-		drawingEngine->MarkDirty(effectiveClipping);
 		drawingEngine->Unlock();
 	}
 }
