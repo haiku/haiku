@@ -1,11 +1,16 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch ppc ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+	$(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+SubDirHdrs $(HAIKU_TOP) src system libroot posix glibc arch generic ;
+
 
 if $(OPTIM) = -O0 {
 	OPTIM = -O ;
@@ -19,51 +24,115 @@ SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 # Note: There is no *l() support yet. Our compiler says sizeof(long double) = 8,
 # while there are only 96 and 128 bit implementation in glibc.
 local genericSources =
-	cmp.c dbl2mpn.c divrem.c mpa.c mpatan.c mpatan2.c mpn2dbl.c mpsqrt.c
+	branred.c
+	cmp.c dbl2mpn.c divrem.c
+	doasin.c dosincos.c
+	halfulp.c
+	mpa.c mpatan.c mpatan2.c mpexp.c mplog.c mpn2dbl.c mpsqrt.c mptan.c
 	mul.c mul_n.c
+	sincos32.c
+	slowexp.c
+	slowpow.c
+
 	e_acos.c e_acosf.c # e_acosl.c
+	e_acosh.c e_acoshf.c # e_acoshl.c
+	e_asin.c e_asinf.c # e_asinl.c
 	e_atan2.c e_atan2f.c # e_atan2l.c
+	e_atanh.c e_atanhf.c # e_atanhl.c
+	e_cosh.c e_coshf.c # e_coshl.c
+	e_exp.c e_expf.c
 	e_fmod.c e_fmodf.c # e_fmodl.c
+	e_gamma_r.c e_gammaf_r.c
+	e_hypot.c e_hypotf.c # e_hypotl.c
+	e_j0.c e_j0f.c
+	e_j1.c e_j1f.c
+	e_jn.c e_jnf.c
+	e_lgamma_r.c e_lgammaf_r.c
+	e_log.c e_logf.c
+	e_log10.c e_log10f.c
+	e_pow.c e_powf.c # e_powl.c
+	e_rem_pio2f.c
+	e_remainder.c e_remainderf.c # e_remainderl.c
+	e_scalb.c e_scalbf.c # e_scalbl.c
+	e_sinh.c e_sinhf.c # e_sinhl.c
+	k_cos.c k_cosf.c
+	k_sin.c k_sinf.c
+	k_rem_pio2.c k_rem_pio2f.c # k_rem_pio2l.c
+	k_tan.c k_tanf.c
+	s_asinh.c s_asinhf.c # s_asinhl.c
 	s_atan.c s_atanf.c # s_atanl.c
+	s_cbrt.c s_cbrtf.c # s_cbrtl.c
 	s_ceil.c s_ceilf.c # s_ceill.c
+	s_cos.c s_cosf.c
+	s_erf.c s_erff.c # s_erfl.c
+	s_expm1f.c s_expm1.c
 	s_finite.c s_finitef.c # s_finitel.c
 	s_floor.c s_floorf.c # s_floorl.c
-	s_fpclassify.c s_fpclassifyf.c s_fpclassifyl.c
+	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
+	s_frexp.c s_frexpf.c # s_frexpl.c
+	s_isinf.c s_isinff.c # s_isinfl.c
+	s_ldexp.c s_ldexpf.c # s_ldexpl.c
+	s_log1p.c s_log1pf.c
 	s_logb.c s_logbf.c # s_logbl.c
-	s_modf.c s_modff.c s_modfl.c
+	s_modf.c s_modff.c # s_modfl.c
+	s_nan.c s_nanf.c # s_nanl.c
+	s_round.c s_roundf.c # s_roundl.c
 	s_scalbn.c s_scalbnf.c # s_scalbnl.c
+	s_signbit.c s_signbitf.c # s_signbitl.c
+	s_signgam.c
+	s_sin.c s_sinf.c # s_sinl.c
+	s_sincos.c s_sincosf.c
+	s_tan.c s_tanf.c
+	s_tanh.c s_tanhf.c
+	t_exp.c
+	w_acos.c w_acosf.c # w_acosl.c
+	w_acosh.c w_acoshf.c # w_acoshl.c
 	w_atan2.c w_atan2f.c # w_atan2l.c
+	w_atanh.c w_atanhf.c # w_atanhl.c
+	w_cosh.c w_coshf.c # w_coshl.c
+	w_drem.c w_dremf.c # w_dreml.c
+	w_exp.c w_expf.c # w_expl.c
 	w_fmod.c w_fmodf.c # w_fmodl.c
+	w_j0.c w_j0f.c
+	w_j1.c w_j1f.c
+	w_jn.c w_jnf.c
+	w_lgamma.c w_lgammaf.c
+	w_lgamma_r.c w_lgammaf_r.c 
+	w_log.c w_logf.c # w_logl.c
+	w_log10.c w_log10f.c # w_log10l.c
+	w_pow.c w_powf.c # w_powl.c
+	w_remainder.c w_remainderf.c # w_remainderl.c
+	w_scalb.c w_scalbf.c # w_scalbl.c
+	w_sinh.c w_sinhf.c # w_sinhl.c
 ;
-MergeObject posix_gnu_arch_$(TARGET_ARCH).o :
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+	$(genericSources)
+;
+
+MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 	add_n.S
 	addmul_1.S
-	e_sqrtf.c
-	fraiseexcpt.c
-	ftestexcept.c
+	feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
 	ldbl2mpn.c
+	lshift.S rshift.S
 	mul_1.S
-	lshift.S
-	rshift.S
-	s_copysign.S
-	s_copysignf.S
-#	s_copysignl.S
-	s_fdim.c
-	s_fdimf.c
-#	s_fdiml.S
-	s_fabs.S
-	s_fabsf.S
-#	s_fabsl.S
-	s_rint.c
-	s_rintf.c
-#	s_rintl.c
 	sub_n.S
 	submul_1.S
-	t_sqrt.c
-	w_sqrt.c
-	w_sqrtf.c
 
-	$(genericSources)
+	e_sqrt.c e_sqrtf.c # e_sqrtl.c
+	s_copysign.S s_copysignf.S # s_copysignl.S
+	s_fdim.c s_fdimf.c # s_fdiml.S
+	s_fabs.S s_fabsf.S # s_fabsl.S
+	s_isnan.c s_isnanf.S
+	s_rint.c s_rintf.c # s_rintl.c
+	t_sqrt.c
+	w_sqrt.c w_sqrtf.c # w_sqrtl.c
+;
+	
+MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
+	posix_gnu_arch_$(TARGET_ARCH)_generic.o
+	posix_gnu_arch_$(TARGET_ARCH)_other.o
 ;
 
 SEARCH on [ FGristFiles $(genericSources) ]

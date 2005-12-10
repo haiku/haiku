@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src system libroot posix math arch ppc ;
-
-MergeObject posix_math_arch_$(TARGET_ARCH).o :
-	fabs.c
-	frexp.c
-	isinf.c
-	ldexp.c
-;

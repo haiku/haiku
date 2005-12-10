@@ -194,6 +194,14 @@
 /* Mach/i386 specific: define if the `i386_set_gdt' RPC is available.  */
 #undef	HAVE_I386_SET_GDT
 
+/* bonefish: Currently our PPC gcc doesn't support 128 bit long double.
+   It's 64 bit instead. I tried to change that, but apparently there's no
+   support for TI mode emulation for PPC. So we define NO_LONG_DOUBLE for
+   the time being, which creates aliases of the double math functions to
+   the respective long double functions. */
+#define NO_LONG_DOUBLE 1
+#define __NO_LONG_DOUBLE_MATH 1
+
 /*
  */
 

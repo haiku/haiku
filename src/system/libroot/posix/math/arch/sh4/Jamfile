@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src system libroot posix math arch sh4 ;
-
-KernelStaticLibrary libmsh4 : fabs.S frexp.c isinf.c ldexp.c ;

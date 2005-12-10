@@ -13,5 +13,3 @@ ENTRY(__ieee754_atan2)
 	fpatan
 	ret
 END (__ieee754_atan2)
-
-weak_alias (__ieee754_atan2, atan2) 

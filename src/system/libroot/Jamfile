@@ -16,8 +16,6 @@ local librootObjects =
 	posix_locale.o
 	posix_main.o
 	posix_malloc.o
-	posix_math.o
-	posix_math_arch_$(TARGET_ARCH).o
 	posix_pthread.o
 	posix_signal.o
 	posix_stdio.o
