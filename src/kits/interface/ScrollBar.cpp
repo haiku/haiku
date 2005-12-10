@@ -317,6 +317,9 @@ BScrollBar::ValueChanged(float newValue)
 void
 BScrollBar::SetProportion(float value)
 {
+	// NOTE: The Tracker depends on the broken
+	// behaviour to allow a proportion less than
+	// 0 or greater than 1
 /*	if (value < 0.0)
 		value = 0.0;
 	if (value > 1.0)
