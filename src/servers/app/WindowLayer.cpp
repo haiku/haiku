@@ -462,11 +462,25 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				// move along the already dirty regions that are common
 				// with the region that we could copy
 				_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
-				if (fCurrentUpdateSession.IsUsed())
-					_ShiftPartOfRegion(&fCurrentUpdateSession.DirtyRegion(), region, xOffset, yOffset);
 				if (fPendingUpdateSession.IsUsed())
 					_ShiftPartOfRegion(&fPendingUpdateSession.DirtyRegion(), region, xOffset, yOffset);
-		
+
+				if (fCurrentUpdateSession.IsUsed()) {
+					// if there are parts in the current update session
+					// that intersect with the copied region, we cannot
+					// simply shift them as with the other dirty regions
+					// - we cannot change the update rect already told to the
+					// client, that's why we transfer those parts to the
+					// new dirty region instead
+					BRegion common(*region);
+					// see if there is a common part at all
+					common.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
+					if (common.CountRects() > 0) {
+						// cut the common part from the region
+						fCurrentUpdateSession.DirtyRegion().Exclude(&common);
+						newDirty.Include(&common);
+					}
+				}
 			}
 		}
 		// what is left visible from the original region
@@ -1520,7 +1534,7 @@ WindowLayer::_TriggerContentRedraw()
 
 	if (dirtyContentRegion.CountRects() > 0) {
 		// send UPDATE message to the client
-		_MarkContentDirty(&dirtyContentRegion);
+		_TransferToUpdateSession(&dirtyContentRegion);
 
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
@@ -1574,7 +1588,7 @@ WindowLayer::_DrawBorder()
 	the clipping lock held
 */
 void
-WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
+WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 {
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
@@ -1606,7 +1620,7 @@ WindowLayer::_MarkContentDirty(BRegion* contentDirtyRegion)
 // sent the update message!!!
 	} else {
 		if (!fCurrentUpdateSession.IsUsed())
-			fprintf(stderr, "WindowLayer(%s)::_MarkContentDirty() - pending region changed before BeginUpdate()!\n", Title());
+			fprintf(stderr, "WindowLayer(%s)::_TransferToUpdateSession() - pending region changed before BeginUpdate()!\n", Title());
 	}
 }
 

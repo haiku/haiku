@@ -200,7 +200,7 @@ class WindowLayer {
 			void				_DrawBorder();
 
 			// handling update sessions
-			void				_MarkContentDirty(BRegion* contentDirtyRegion);
+			void				_TransferToUpdateSession(BRegion* contentDirtyRegion);
 			void				_SendUpdateMessage();
 
 			void				_UpdateContentRegion();
