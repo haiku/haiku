@@ -60,8 +60,9 @@ enum {
 	CRC_KEY			= 0x1789feb3
 };
 
+
 StarWindow::StarWindow(BRect frame, const char *name)
-: BDirectWindow(frame, name, B_TITLED_WINDOW, 0)
+	: BDirectWindow(frame, name, B_TITLED_WINDOW, 0)
 {
 	uint32			i;
 	int32			x, y, dx, dy, cnt, square;
@@ -75,8 +76,7 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	star_list = (star*)malloc(sizeof(star)*star_count_max);
 
 	// initialise the default state of the star array
-	for (i=0; i<star_count_max; i++) {
-	
+	for (i = 0; i < star_count_max; i++) {
 		// peek a random vector. This is certainly not the nicest way
 		// to do it (the probability and the angle are linked), but that's
 		// simple and doesn't require any trigonometry.
@@ -84,12 +84,12 @@ StarWindow::StarWindow(BRect frame, const char *name)
 			dx = (crc_alea&0xffff) - 0x8000;		
 			CrcStep();
 			CrcStep();
-				
+
 			dy = (crc_alea&0xffff) - 0x8000;			
 			CrcStep();
 			CrcStep();
 		} while ((dx == 0) && (dy == 0));
-		
+
 		// enforce a minimal length by doubling the vector as many times
 		// as needed.
 		square = dx*dx+dy*dy;
@@ -178,17 +178,23 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	SetSizeLimits(40.0, 2000.0, 40.0, 2000.0);
 	
 	// If the graphic card/graphic driver we use doesn't support directwindow
-	// in window mode, then we need to switch to fullscreen immediatly, or
+	// in window mode, then we need to switch to fullscreen immediately, or
 	// the user won't see anything, as long as it doesn't used the undocumented
 	// shortcut. That would be bad behavior...
 	if (!BDirectWindow::SupportsWindowMode()) {
 		bool		sSwapped;
 		char		*buf;
 		BAlert		*quit_alert;
-		key_map		*map;
-		
+
+		key_map *map;
 		get_key_map(&map, &buf);
-		sSwapped = (map->left_control_key==0x5d) && (map->left_command_key==0x5c);
+		
+		if (map != NULL) {
+			sSwapped = (map->left_control_key == 0x5d)
+				&& (map->left_command_key == 0x5c);
+		} else
+			sSwapped = false;
+
 		free(map);
 		free(buf);
 		quit_alert = new BAlert("QuitAlert", sSwapped ?
@@ -205,10 +211,9 @@ StarWindow::StarWindow(BRect frame, const char *name)
 	}
 }
 
+
 StarWindow::~StarWindow()
 {
-	long		result;
-
 	// force the drawing_thread to quit. This is the easiest way to deal
 	// with potential closing problem. When it's not practical, we
 	// recommand to use Hide() and Sync() to force the disconnection of
@@ -217,6 +222,8 @@ StarWindow::~StarWindow()
 	// window destructor and kill your drawing thread...
 	kill_my_thread = true;
 	delete_sem(drawing_lock);
+
+	status_t result;
 	wait_for_thread(my_thread, &result);
 	
 	// Free window resources. As they're used by the drawing thread, we
@@ -224,36 +231,42 @@ StarWindow::~StarWindow()
 	free(star_list);
 }
 
-bool StarWindow::QuitRequested()
+
+bool
+StarWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(TRUE);
+	return true;
 }
 
-void StarWindow::MessageReceived(BMessage *message)
-{
-	int8		key_code;
 
-	switch(message->what) {
-	// Switch between full-screen mode and windowed mode.
-	case 'full' :
-		SetFullScreen(!IsFullScreen());
-		break;
-	case B_KEY_DOWN :
-		if (!IsFullScreen())
+void
+StarWindow::MessageReceived(BMessage *message)
+{
+	int8 key_code;
+
+	switch (message->what) {
+		// Switch between full-screen mode and windowed mode.
+		case 'full':
+			SetFullScreen(!IsFullScreen());
 			break;
-		if (message->FindInt8("byte", &key_code) != B_OK)
+		case B_KEY_DOWN:
+			if (!IsFullScreen())
+				break;
+			if (message->FindInt8("byte", &key_code) != B_OK)
+				break;
+			if (key_code == B_ESCAPE)
+				PostMessage(B_QUIT_REQUESTED);
 			break;
-		if (key_code == B_ESCAPE)
-			PostMessage(B_QUIT_REQUESTED);
-		break;
-	default :
-		BDirectWindow::MessageReceived(message);
-		break;
+		default:
+			BDirectWindow::MessageReceived(message);
+			break;
 	}
 }
 
-void StarWindow::CrcStep()
+
+void
+StarWindow::CrcStep()
 {
 	// basic crc pseudo-random generator
 	crc_alea <<= 1;
@@ -261,29 +274,32 @@ void StarWindow::CrcStep()
 		crc_alea ^= CRC_KEY;
 }
 
-void StarWindow::DirectConnected(direct_buffer_info *info)
+
+void
+StarWindow::DirectConnected(direct_buffer_info *info)
 {
 	// you need to use that mask to read the buffer state.
 	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
-	// start a direct screen connection.
-	case B_DIRECT_START :
-		SwitchContext(info);	// update the direct screen infos.
-		release_sem(drawing_lock);	// unblock the animation thread.
-		break;
-	// stop a direct screen connection.
-	case B_DIRECT_STOP :
-		acquire_sem(drawing_lock);	// block the animation thread.
-		break;
-	// modify the state of a direct screen connection.
-	case B_DIRECT_MODIFY :
-		acquire_sem(drawing_lock);	// block the animation thread.
-		SwitchContext(info);	// update the direct screen infos.
-		release_sem(drawing_lock);	// unblock the animation thread.
-		break;
-	default :
-		break;
+		// start a direct screen connection.
+		case B_DIRECT_START:
+			SwitchContext(info);	// update the direct screen infos.
+			release_sem(drawing_lock);	// unblock the animation thread.
+			break;
+		// stop a direct screen connection.
+		case B_DIRECT_STOP:
+			acquire_sem(drawing_lock);	// block the animation thread.
+			break;
+		// modify the state of a direct screen connection.
+		case B_DIRECT_MODIFY:
+			acquire_sem(drawing_lock);	// block the animation thread.
+			SwitchContext(info);	// update the direct screen infos.
+			release_sem(drawing_lock);	// unblock the animation thread.
+			break;
+		default:
+			break;
 	}
 }
+
 
 // This function update the internal graphic context of the StarWindow
 // object to reflect the infos send through the DirectConnected API.
@@ -292,7 +308,8 @@ void StarWindow::DirectConnected(direct_buffer_info *info)
 // in DirectConnected, it's a bad idea to do any heavy drawing (long)
 // operation. But as we only update the stars (the background will be
 // updated a little later by the view system), it's not a big deal.
-void StarWindow::SwitchContext(direct_buffer_info *info)
+void
+StarWindow::SwitchContext(direct_buffer_info *info)
 {
 	star			*s;
 	int32			x, y, deltax, deltay;
@@ -490,9 +507,11 @@ void StarWindow::SwitchContext(direct_buffer_info *info)
 	cy_old = cy - info->window_bounds.top;
 }
 
+
 // This is the thread doing the star animation itself. It would be easy to
 // adapt to do any other sort of pixel animation.
-long StarWindow::StarAnimation(void *data)
+long
+StarWindow::StarAnimation(void *data)
 {
 	star			*s;
 	int32			x, y;

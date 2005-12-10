@@ -1,7 +1,15 @@
 SubDir HAIKU_TOP src tests kits game direct_window_test ;
 
-SimpleTest direct_window_test
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+SimpleTest DirectWindowStars
 	: Stars.cpp StarWindow.cpp
-	: game be root
+	: game be
 ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : DirectWindowStars
+		: tests!apps ;
+}
 
