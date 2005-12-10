@@ -17,6 +17,7 @@
 
 // ToDo: -disable_cpu_sn option is not yet implemented
 // ToDo: most of this file should go into an architecture dependent source file
+#ifdef __INTEL__
 
 struct cache_description {
 	uint8		code;
@@ -115,6 +116,8 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 	}
 }
 
+#endif	// __INTEL__
+
 
 static void
 print_TLB(uint32 reg, const char *pages)
@@ -178,6 +181,8 @@ print_level1_cache(uint32 reg, const char *name)
 }
 
 
+#ifdef __INTEL__
+
 static void
 print_cache_descriptors(int32 cpu)
 {
@@ -204,6 +209,8 @@ print_transmeta_features(uint32 features)
 	if (features & (1 << 16))
 		printf("\t\tFCMOV\n");
 }
+
+#endif	// __INTEL__
 
 
 static void
@@ -321,6 +328,8 @@ print_features(uint32 features)
 }
 
 
+#ifdef __INTEL__
+
 static void
 print_processor_signature(cpuid_info *info, const char *prefix)
 {
@@ -333,6 +342,8 @@ print_processor_signature(cpuid_info *info, const char *prefix)
 		info->eax_1.features);
 }
 
+#endif	// __INTEL__
+
 
 static void
 dump_platform(system_info *info)
@@ -343,6 +354,8 @@ dump_platform(system_info *info)
 		info->platform_type == B_BEBOX_PLATFORM    ? "BeBox" : "unknown");
 }
 
+
+#ifdef __INTEL__
 
 static void
 dump_cpu(system_info *info, int32 cpu)
@@ -474,6 +487,8 @@ dump_cpu(system_info *info, int32 cpu)
 	putchar('\n');
 }
 
+#endif	// __INTEL__
+
 
 static void
 dump_cpus(system_info *info)
@@ -492,8 +507,10 @@ dump_cpus(system_info *info)
 		info->cpu_clock_speed / 1000000,
 		info->id[0], info->id[1]);
 
+#ifdef __INTEL__
 	for (cpu = 0; cpu < info->cpu_count; cpu++)
 		dump_cpu(info, cpu);
+#endif	// __INTEL__
 }
 
 
