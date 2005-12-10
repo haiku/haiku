@@ -144,7 +144,8 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 
 	bigtime_t now = system_time();
 
-	fDesktop->ReadLockWindows();
+	if (!fDesktop->ReadLockWindows())
+		return B_DISPATCH_MESSAGE;
 
 	EventTarget* focus = NULL;
 	if (fDesktop->FocusWindow() != NULL)
@@ -195,7 +196,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 	if (message->FindPoint("where", &where) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	fDesktop->WriteLockWindows();
+	if (!fDesktop->WriteLockWindows())
+		return B_DISPATCH_MESSAGE;
 
 	WindowLayer* window = fDesktop->MouseEventWindow();
 	if (window == NULL)
@@ -572,13 +574,13 @@ Desktop::UpdateWorkspaces()
 void
 Desktop::SetWorkspace(int32 index)
 {
-	BAutolock _(this);
+	WriteLockWindows();
 	DesktopSettings settings(this);
 
-	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace)
+	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace) {
+		WriteUnlockWindows();
 		return;
-
-	WriteLockWindows();
+	}
 
 	int32 previousIndex = fCurrentWorkspace;
 
@@ -679,10 +681,8 @@ Desktop::SetWorkspace(int32 index)
 		SetFocusWindow(FrontWindow());
 
 	_WindowChanged(NULL);
-
 	MarkDirty(dirty);
 
-	//_WindowsChanged();
 	WriteUnlockWindows();
 }
 
@@ -692,10 +692,6 @@ Desktop::ScreenChanged(Screen* screen)
 {
 	// TODO: confirm that everywhere this is used,
 	// the Window WriteLock is held
-
-// TODO: can this be removed? I would think it can.
-// In fact, this lock should nowhere be used anymore, no?
-//	BAutolock locker(this);
 
 	// the entire screen is dirty, because we're actually
 	// operating on an all new buffer in memory
@@ -1360,19 +1356,20 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 void
 Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 {
-	BAutolock _(this);
+	WriteLockWindows();
 
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
+	WriteUnlockWindows();
 }
 
 
 void
 Desktop::AddWindow(WindowLayer *window)
 {
-	BAutolock _(this);
+	WriteLockWindows();
 
 	fAllWindows.AddWindow(window);
 	if (!window->IsNormal())
@@ -1387,13 +1384,14 @@ Desktop::AddWindow(WindowLayer *window)
 	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
+	WriteUnlockWindows();
 }
 
 
 void
 Desktop::RemoveWindow(WindowLayer *window)
 {
-	BAutolock _(this);
+	WriteLockWindows();
 
 	if (!window->IsHidden())
 		HideWindow(window);
@@ -1403,6 +1401,7 @@ Desktop::RemoveWindow(WindowLayer *window)
 		fSubsetWindows.RemoveWindow(window);
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
+	WriteUnlockWindows();
 
 	// make sure this window won't get any events anymore
 
@@ -1460,7 +1459,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	if (window->Feel() == newFeel)
 		return;
 
-	BAutolock _(this);
+	WriteLockWindows();
 
 	bool wasNormal = window->IsNormal();
 
@@ -1510,6 +1509,8 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 
 	if (window == FocusWindow() && !window->IsVisible())
 		SetFocusWindow(FrontWindow());
+
+	WriteUnlockWindows();
 }
 
 
@@ -1560,11 +1561,13 @@ Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 }
 
 
+/*!
+	Returns the window under the mouse cursor.
+	You need to have the window write lock acquired when calling this method.
+*/
 WindowLayer*
 Desktop::WindowAt(BPoint where)
 {
-// TODO: BAutolock locker(this); ?!?
-
 	for (WindowLayer* window = _CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->VisibleRegion().Contains(where))
@@ -1585,15 +1588,18 @@ Desktop::SetMouseEventWindow(WindowLayer* window)
 WindowLayer *
 Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 {
-	BAutolock locker(this);
+	ReadLockWindows();
 
 	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientToken() == token
-			&& window->ServerWindow()->ClientTeam() == teamID)
+			&& window->ServerWindow()->ClientTeam() == teamID) {
+			ReadUnlockWindows();
 			return window;
+		}
 	}
 
+	ReadUnlockWindows();
 	return NULL;
 }
 
@@ -1601,7 +1607,7 @@ Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 void
 Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 {
-	BAutolock locker(this);
+	BAutolock locker(fWindowLock);
 
 	// compute the number of windows
 
@@ -1633,7 +1639,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 void
 Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 {
-	BAutolock locker(this);
+	BAutolock locker(fWindowLock);
 	BAutolock tokenLocker(BPrivate::gDefaultTokens);
 
 	::ServerWindow* window;

@@ -72,14 +72,14 @@ Workspace::Workspace(Desktop& desktop, int32 index)
 	fDesktop(desktop),
 	fCurrentWorkspace(index == desktop.CurrentWorkspace())
 {
-	fDesktop.Lock();
+	fDesktop.ReadLockWindows();
 	RewindWindows();
 }
 
 
 Workspace::~Workspace()
 {
-	fDesktop.Unlock();
+	fDesktop.ReadUnlockWindows();
 }
 
 
