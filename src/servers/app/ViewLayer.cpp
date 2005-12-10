@@ -22,6 +22,9 @@
 
 #include <stdio.h>
 
+#include <new>
+
+using std::nothrow;
 
 ViewLayer::ViewLayer(BRect frame, const char* name,
 		int32 token, uint32 resizeMode, uint32 flags)
