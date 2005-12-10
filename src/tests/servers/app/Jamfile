@@ -25,9 +25,12 @@ SubDirC++Flags $(defines) ;
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
 SharedLibrary libhwinterface.so :
-	BBitmapBuffer.cpp
+#	BBitmapBuffer.cpp
+	DWindowBuffer.cpp
 	HWInterface.cpp
 	MultiLocker.cpp
+	RGBColor.cpp
+	SystemPalette.cpp
 
 	: libhaikuappserver.so be
 ;
@@ -40,10 +43,10 @@ LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
 LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
 
 SharedLibrary libhwinterfaceimpl.so :
-	fake_input_server.cpp
-	ViewHWInterface.cpp
+#	ViewHWInterface.cpp
+	DWindowHWInterface.cpp
 
-	: be libhwinterface.so
+	: be game libhwinterface.so
 ;
 
 SharedLibrary libhaikuappserver.so :
@@ -68,7 +71,7 @@ SharedLibrary libhaikuappserver.so :
 
 	# libraries
 	:
-	be libtextencoding.so libfreetype.so
+	be game libtextencoding.so libfreetype.so
 ;
 
 AddResources haiku_app_server : app_server.rdef ;
@@ -120,7 +123,7 @@ Server haiku_app_server :
 	# libraries
 	:
 	z libpng.so libhaikuappserver.so
-	libpainter.a be 
+	libpainter.a be game
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
 ;
