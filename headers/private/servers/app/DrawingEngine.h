@@ -69,9 +69,6 @@ public:
 			void			CopyRegion(/*const*/ BRegion* region,
 								int32 xOffset, int32 yOffset);
 
-			void			CopyRegionList(BList* list, BList* pList,
-								int32 rCount, BRegion* clipReg);
-
 			void			InvertRect(BRect r);
 
 			void			DrawBitmap(ServerBitmap *bitmap,

@@ -265,7 +265,9 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
 	if (WriteLock()) {
-		fGraphicsCard->HideSoftwareCursor(region->Frame());
+		BRect frame = region->Frame();
+		frame = frame | frame.OffsetByCopy(xOffset, yOffset);
+		fGraphicsCard->HideSoftwareCursor(frame);
 
 		int32 count = region->CountRects();
 
@@ -370,36 +372,6 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 		delete[] sortedRectList;
 
 		fGraphicsCard->ShowSoftwareCursor();
-
-		WriteUnlock();
-	}
-}
-
-// CopyRegionList
-//
-// * used to move windows around on screen
-// TODO: Since the regions are passed to CopyRegion() one by one,
-// the case of different regions overlapping each other at source
-// and/or dest locations is not handled.
-// We also don't handle the case where multiple regions should have
-// been combined into one larger region (with effectively the same
-// rects), so that the sorting would compare them all at once. If
-// this turns out to be a problem, we can easily rewrite the function
-// here. In any case, to copy overlapping regions in app_server doesn't
-// make much sense to me.
-void
-DrawingEngine::CopyRegionList(BList* list, BList* pList,
-							  int32 rCount, BRegion* clipReg)
-{
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	if (WriteLock()) {
-		for (int32 i = 0; i < rCount; i++) {
-			BRegion* region = (BRegion*)list->ItemAt(i);
-			BPoint* offset = (BPoint*)pList->ItemAt(i);
-			CopyRegion(region, (int32)offset->x, (int32)offset->y);
-		}
 
 		WriteUnlock();
 	}
