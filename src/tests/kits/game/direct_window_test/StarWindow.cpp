@@ -282,7 +282,7 @@ StarWindow::DirectConnected(direct_buffer_info *info)
 	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
 		// start a direct screen connection.
 		case B_DIRECT_START:
-			SwitchContext(info);	// update the direct screen infos.
+			SwitchContext(info);		// update the direct screen infos.
 			release_sem(drawing_lock);	// unblock the animation thread.
 			break;
 		// stop a direct screen connection.
@@ -292,9 +292,10 @@ StarWindow::DirectConnected(direct_buffer_info *info)
 		// modify the state of a direct screen connection.
 		case B_DIRECT_MODIFY:
 			acquire_sem(drawing_lock);	// block the animation thread.
-			SwitchContext(info);	// update the direct screen infos.
+			SwitchContext(info);		// update the direct screen infos.
 			release_sem(drawing_lock);	// unblock the animation thread.
 			break;
+
 		default:
 			break;
 	}
@@ -525,14 +526,15 @@ StarWindow::StarAnimation(void *data)
 	
 	// loop, frame after frame, until asked to quit.
 	while (!w->kill_my_thread) {
-	
 		// we want a frame to take at least 16 ms.
 		time = system_time()+16000;
 		
 		// get the right to do direct screen access.
-		acquire_sem(w->drawing_lock);
-		if (w->kill_my_thread) break;
-		
+		while (acquire_sem(w->drawing_lock) == B_INTERRUPTED)
+			;
+		if (w->kill_my_thread)
+			break;
+
 		// go through the array of star, for all currently used star.
 		s = w->star_list;
 		for (i=0; i<w->star_count; i++) {
