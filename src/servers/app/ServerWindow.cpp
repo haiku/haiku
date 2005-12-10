@@ -1486,10 +1486,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			break;
 		}
 
-		case AS_LAYER_INVAL_RECT:
+		case AS_LAYER_INVALIDATE_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
-			
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVALIDATE_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+
 			// NOTE: looks like this call is NOT affected by origin and scale on R5
 			// so this implementation is "correct"
 			BRect invalidRect;
@@ -1499,18 +1499,18 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			}
 			break;
 		}
-		case AS_LAYER_INVAL_REGION:
+		case AS_LAYER_INVALIDATE_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
-			
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVALIDATE_RECT: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
+
 			// NOTE: looks like this call is NOT affected by origin and scale on R5
 			// so this implementation is "correct"
 			BRegion dirty;
 			int32 rectCount;
 			BRect rect;
-			
+
 			link.Read<int32>(&rectCount);
-			
+
 			for (int i = 0; i < rectCount; i++) {
 				link.Read<BRect>(&rect);
 				dirty.Include(rect);

@@ -3214,7 +3214,7 @@ BView::Invalidate(BRect invalRect)
 
 	check_lock();
 
-	fOwner->fLink->StartMessage(AS_LAYER_INVAL_RECT);
+	fOwner->fLink->StartMessage(AS_LAYER_INVALIDATE_RECT);
 	fOwner->fLink->Attach<BRect>(invalRect);
 	fOwner->fLink->Flush();
 }
@@ -3231,7 +3231,7 @@ BView::Invalidate(const BRegion *invalRegion)
 	int32 count = 0;
 	count = const_cast<BRegion*>(invalRegion)->CountRects();
 
-	fOwner->fLink->StartMessage(AS_LAYER_INVAL_REGION);
+	fOwner->fLink->StartMessage(AS_LAYER_INVALIDATE_REGION);
 	fOwner->fLink->Attach<int32>(count);
 
 	for (int32 i = 0; i < count; i++)
