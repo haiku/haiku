@@ -77,9 +77,9 @@ run_app_thread(void* cookie)
 class DView : public BView {
  public:
 								DView(BRect bounds);
-	virtual						~DView() {}
+	virtual						~DView();
 
-	virtual	void				AttachedToWindow();
+//	virtual	void				AttachedToWindow();
 
 								// DView
 			void				ForwardMessage(BMessage* message = NULL);
@@ -92,9 +92,9 @@ class DWindow : public BDirectWindow {
  public:
 								DWindow(BRect frame,
 										DWindowBuffer* buffer);
-	virtual						~DWindow() {}
+	virtual						~DWindow();
 
-	virtual	void				MessageReceived(BMessage* message);
+//	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 	virtual	void				DirectConnected(direct_buffer_info* info);
@@ -128,6 +128,11 @@ DView::DView(BRect bounds)
 #ifdef ENABLE_INPUT_SERVER_EMULATION
 	AddFilter(new DirectMessageFilter(this));
 #endif
+}
+
+
+DView::~DView()
+{
 }
 
 
@@ -213,6 +218,11 @@ DWindow::DWindow(BRect frame, DWindowBuffer* buffer)
 	AddChild(view);
 	view->MakeFocus();
 		// make it receive key events
+}
+
+
+DWindow::~DWindow()
+{
 }
 
 

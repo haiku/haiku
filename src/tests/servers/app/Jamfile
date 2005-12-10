@@ -25,7 +25,7 @@ SubDirC++Flags $(defines) ;
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
 SharedLibrary libhwinterface.so :
-#	BBitmapBuffer.cpp
+	BBitmapBuffer.cpp
 	DWindowBuffer.cpp
 	HWInterface.cpp
 	MultiLocker.cpp
@@ -43,7 +43,7 @@ LINKFLAGS on libhwinterfaceimpl.so ?= $(LINKFLAGS) ;
 LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
 
 SharedLibrary libhwinterfaceimpl.so :
-#	ViewHWInterface.cpp
+	ViewHWInterface.cpp
 	DWindowHWInterface.cpp
 
 	: be game libhwinterface.so
