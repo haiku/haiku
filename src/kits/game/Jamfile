@@ -1,44 +1,41 @@
 SubDir HAIKU_TOP src kits game ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders input ;
 
 SubDirSysHdrs $(SUBDIR) ;
 
-if ! $(HAIKU_COMPATIBLE) {
-	if $(DANO_COMPATIBLE) {
-		SubDirC++Flags -DCOMPILE_FOR_DANO ;
-	} else {
-		SubDirC++Flags -DCOMPILE_FOR_R5 ;
-	}
-}
 
+if $(TARGET_PLATFORM) = haiku {
 
-SharedLibrary libgame.so :
-	# Public Game Kit
-	DirectWindow.cpp
-	WindowScreen.cpp
-	GameSound.cpp
-	SimpleGameSound.cpp
-	FileGameSound.cpp
-	PushGameSound.cpp
-	StreamingGameSound.cpp
-
-	# Internal Functionality
-	GameProducer.cpp
-	GameSoundBuffer.cpp
-	GameSoundDevice.cpp
-	GSUtility.cpp
-;
-
-
-if $(HAIKU_COMPATIBLE) {
-	LinkAgainst libgame.so :
-		libbe.so libmedia.so
+	SharedLibrary libgame.so :
+		# Public Game Kit
+		DirectWindow.cpp
+		WindowScreen.cpp
+		GameSound.cpp
+		SimpleGameSound.cpp
+		FileGameSound.cpp
+		PushGameSound.cpp
+		StreamingGameSound.cpp
+	
+		# Internal Functionality
+		GameProducer.cpp
+		GameSoundBuffer.cpp
+		GameSoundDevice.cpp
+		GSUtility.cpp
+		: be media
 	;
-} else {
-	LinkAgainst libgame.so :
-		be libmedia.so
+} else if $(TARGET_PLATFORM) = libbe_test {
+
+	SharedLibrary libgame.so :
+		DirectWindow.cpp
+		WindowScreen.cpp
+		: be
 	;
+
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR) : libgame.so
+		: tests!apps ;
 }

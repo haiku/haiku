@@ -7,9 +7,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-#ifdef COMPILE_FOR_R5
-#include "/boot/develop/headers/be/interface/Window.h"
-#endif
 
 #include <Application.h>
 #include <Screen.h>
@@ -23,10 +20,6 @@
 #include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
 #include <WindowPrivate.h>
 
-
-#ifdef COMPILE_FOR_R5
-#include <R5_AppServerLink.h>
-#endif
 
 // WindowScreen commands
 #define WS_MOVE_DISPLAY			0x00000108
@@ -278,7 +271,9 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 }
 
 
-// BWindowScreen public API
+//	#pragma mark - public API calls
+
+
 void
 set_mouse_position(int32 x, int32 y)
 {
@@ -290,27 +285,32 @@ set_mouse_position(int32 x, int32 y)
 }
 
 
-BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, bool debug_enable)
-	:
-	BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
-		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+//	#pragma mark -
+
+
+BWindowScreen::BWindowScreen(const char *title, uint32 space,
+	status_t *error, bool debug_enable)
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
+			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
 	uint32 attributes = 0;
 	if (debug_enable)
 		attributes |= B_ENABLE_DEBUGGER;
-	
+
 	status_t status = InitData(space, attributes);	
 	if (error)
 		*error = status;
 }
 
 
-BWindowScreen::BWindowScreen(const char *title, uint32 space, uint32 attributes, status_t *error)
-	:
-	BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
-		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+BWindowScreen::BWindowScreen(const char *title, uint32 space,
+	uint32 attributes, status_t *error)
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
+			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
@@ -454,7 +454,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 				colorList[x] = list[x];
 		
 			// Tell the app_server about our changes
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 			_BAppServerLink_ link;
 			link.fSession->swrite_l(WS_SET_PALETTE);
 			link.fSession->swrite_l(screen_index);
@@ -517,7 +517,7 @@ BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
 	status_t status = B_ERROR;
 
-#ifdef COMPILE_FOR_R5	
+#ifdef HAIKU_TARGET_PLATFORM_BEOS	
 	_BAppServerLink_ link;	
 	link.fSession->swrite_l(WS_DISPLAY_UTILS);
 	link.fSession->swrite_l(screen_index);
@@ -697,7 +697,7 @@ BWindowScreen::SetFullscreen(int32 enable)
 {
 	int32 retval = -1;
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	int32 result = -1;
 
 	a_session->swrite_l(WS_SET_FULLSCREEN);
@@ -802,7 +802,7 @@ BWindowScreen::SetActiveState(int32 state)
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
 			if (activate_state) {
-#ifdef COMPILE_FOR_R5				
+#ifdef HAIKU_TARGET_PLATFORM_BEOS				
 				const color_map *colorMap = system_colors();
 				_BAppServerLink_ link;
 
@@ -838,7 +838,7 @@ BWindowScreen::SetLockState(int32 state)
 
 	status_t status = B_ERROR;
 
-#ifdef COMPILE_FOR_R5	
+#ifdef HAIKU_TARGET_PLATFORM_BEOS	
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_SET_LOCK_STATE);
 	link.fSession->swrite_l(screen_index);
@@ -931,7 +931,7 @@ BWindowScreen::GetCardInfo()
 	
 	frame_buffer_config config;
 	
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_FRAMEBUFFER);
 	link.fSession->swrite_l(id.id);
@@ -1025,7 +1025,7 @@ status_t
 BWindowScreen::InitClone()
 {
 	CALLED();
-#ifndef COMPILE_FOR_R5
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	// TODO: Too much stuff to change, I'll just
 	return B_ERROR;
 	// for now
@@ -1101,8 +1101,8 @@ status_t
 BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
 	status_t result = B_ERROR;
-	
-#ifdef COMPILE_FOR_R5
+
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_SET_DISPLAY_MODE); // check display_mode valid command
 	link.fSession->swrite_l(screen_index);

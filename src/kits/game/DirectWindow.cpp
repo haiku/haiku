@@ -7,35 +7,30 @@
  * Distributed under the terms of the MIT License.
  */
 
-#ifdef COMPILE_FOR_R5
-#include "/boot/develop/headers/be/interface/Window.h"
-#endif
 
 #include <DirectWindow.h>
 #include <clipping.h>
 
-#ifdef COMPILE_FOR_R5
-#include <R5_AppServerLink.h>
-#include <R5_Session.h>
-#define DW_GET_SYNC_DATA		0x880
-#define DW_SET_FULLSCREEN		0x881
-#define DW_SUPPORTS_WINDOW_MODE 0xF2C
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
+#	include <R5_AppServerLink.h>
+#	include <R5_Session.h>
+#	define DW_GET_SYNC_DATA		0x880
+#	define DW_SET_FULLSCREEN		0x881
+#	define DW_SUPPORTS_WINDOW_MODE 0xF2C
+#else
+#	include <AppServerLink.h>
+#	include <ServerProtocol.h>
 #endif
 
-// Compiling for DANO/Zeta is broken as it doesn't have BRegion::set_size()
-#ifdef COMPILE_FOR_DANO
-		#warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
+// Compiling for Dano/Zeta is broken as it doesn't have BRegion::set_size()
+#ifdef HAIKU_TARGET_PLATFORM_DANO
+#	warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
 #endif
 
-#ifdef __HAIKU__
-#include <AppServerLink.h>
-#include <ServerProtocol.h>
-#endif
 
 // TODO: We'll want to move this to a private header,
 // accessible by the app server.
-struct dw_sync_data
-{
+struct dw_sync_data {
 	area_id area;
 	sem_id disableSem;
 	sem_id disableSemAck;
@@ -53,15 +48,17 @@ enum dw_status_bits {
 };
 
 
-BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace)
-	:BWindow(frame, title, type, flags, workspace)
+BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
+	uint32 flags, uint32 workspace)
+	: BWindow(frame, title, type, flags, workspace)
 {
 	InitData();
 }
 
 
-BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace)
-	:BWindow(frame, title, look, feel, flags, workspace)
+BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look,
+	window_feel feel, uint32 flags, uint32 workspace)
+	: BWindow(frame, title, look, feel, flags, workspace)
 {
 	InitData();
 }
@@ -195,7 +192,7 @@ BDirectWindow::Hide()
 
 BHandler *
 BDirectWindow::ResolveSpecifier(BMessage *msg, int32 index,
-				BMessage *specifier, int32 form, const char *property)
+	BMessage *specifier, int32 form, const char *property)
 {
 	return inherited::ResolveSpecifier(msg, index, specifier, form, property);
 }
@@ -227,14 +224,15 @@ BDirectWindow::ConvertToMessage(void *raw, int32 code)
 {
 	return inherited::ConvertToMessage(raw, code);
 }
-// end of BWindow API
 
 
-// BDirectWindow specific API
+//	#pragma mark - BDirectWindow specific API
+
+
 void
 BDirectWindow::DirectConnected(direct_buffer_info *info)
 {
-	//implemented in subclasses
+	// implemented in subclasses
 }
 
 
@@ -263,7 +261,7 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 		originY = (int32)origin->y;
 	}
 
-#ifndef COMPILE_FOR_DANO
+#ifndef HAIKU_TARGET_PLATFORM_DANO
 	// Since we are friend of BRegion, we can access its private members.
 	// Otherwise, we would need to call BRegion::Include(clipping_rect)
 	// for every clipping_rect in our clip_list, and that would be much
@@ -290,8 +288,7 @@ BDirectWindow::SetFullScreen(bool enable)
 {
 	status_t status = B_ERROR;
 	if (Lock()) {
-
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 		a_session->swrite_l(DW_SET_FULLSCREEN);
 		a_session->swrite_l(server_token);
 		a_session->swrite_l((int32)enable);
@@ -301,13 +298,11 @@ BDirectWindow::SetFullScreen(bool enable)
 		a_session->sread(sizeof(status_t), &fullScreen);	
 		a_session->sread(sizeof(status_t), &status);
 		full_screen_enable = enable;
-#endif
-#ifdef __HAIKU__
-
+#else
 		fLink->StartMessage(AS_DW_SET_FULLSCREEN);
 		fLink->Attach<int32>(server_token); // useless ?
 		fLink->Attach<bool>(enable);
-		
+
 		int32 code;
 		if (fLink->FlushWithReply(code) == B_OK
 			&& code == SERVER_TRUE) {
@@ -332,7 +327,7 @@ BDirectWindow::IsFullScreen() const
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	int32 result = 0;
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(DW_SUPPORTS_WINDOW_MODE);
@@ -340,9 +335,7 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 	link.fSession->sync();
 	link.fSession->sread(sizeof(result), &result);
 	return result & true;
-#endif
-
-#ifdef __HAIKU__
+#else
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_DW_SUPPORTS_WINDOW_MODE);
 	link.Attach<screen_id>(id);
@@ -459,7 +452,7 @@ BDirectWindow::InitData()
 	struct dw_sync_data sync_data;
 	status_t status = B_ERROR;
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	a_session->swrite_l(DW_GET_SYNC_DATA);
 	a_session->swrite_l(server_token);
 		
@@ -467,15 +460,13 @@ BDirectWindow::InitData()
 		
 	a_session->sread(sizeof(sync_data), &sync_data);
 	a_session->sread(sizeof(status), &status);
-#endif	
-	
-#ifdef __HAIKU__
+#else
 	fLink->StartMessage(AS_DW_GET_SYNC_DATA);
 	fLink->Attach<int32>(server_token);
-	
+
 	int32 reply;
 	if (fLink->FlushWithReply(reply) == B_OK
-		&& reply == SERVER_TRUE) {
+		&& reply == B_OK) {
 		fLink->Read<dw_sync_data>(&sync_data);
 		status = B_OK;
 	}
