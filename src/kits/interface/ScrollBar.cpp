@@ -272,6 +272,14 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
+	if (value == fValue)
+		return;
+
+	if (value > fMax)
+		value = fMax;
+	if (value < fMin)
+		value = fMin;
+
 	ValueChanged(value);
 }
 
@@ -286,14 +294,6 @@ BScrollBar::Value() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
-	if (newValue > fMax)
-		newValue = fMax;
-	if (newValue < fMin)
-		newValue = fMin;
-
-	if (newValue == fValue)
-		return;
-
 	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
