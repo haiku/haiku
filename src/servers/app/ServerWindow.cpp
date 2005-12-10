@@ -1683,12 +1683,17 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			break;
 		}
 
-		case AS_DW_GET_SYNC_DATA:
-		{
-			// TODO: Use token or get rid of it.
-			int32 serverToken;
-			link.Read<int32>(&serverToken);
+		// BDirectWindow communication
 
+		case AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE:
+			// TODO: How to determine this?
+			fLink.StartMessage(B_OK);
+			fLink.Attach<bool>(true);
+			fLink.Flush();
+			break;
+
+		case AS_DIRECT_WINDOW_GET_SYNC_DATA:
+		{
 			if (_EnableDirectWindowMode() == B_OK) {
 				fLink.StartMessage(B_OK);
 				struct dw_sync_data syncData = { 
@@ -2224,19 +2229,21 @@ ServerWindow::MakeWindowLayer(BRect frame, const char* name,
 status_t
 ServerWindow::_EnableDirectWindowMode()
 {
-	if (fDirectWindowData != NULL)
-		return B_ERROR; // already in direct window mode
-	
+	if (fDirectWindowData != NULL) {
+		// already in direct window mode
+		return B_ERROR;
+	}
+
 	fDirectWindowData = new (nothrow) dw_data;
 	if (fDirectWindowData == NULL)
 		return B_NO_MEMORY;
-		
+
 	if (!fDirectWindowData->IsValid()) {
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
 		return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 

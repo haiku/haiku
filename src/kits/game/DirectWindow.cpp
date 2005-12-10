@@ -299,16 +299,14 @@ BDirectWindow::SetFullScreen(bool enable)
 		a_session->sread(sizeof(status_t), &status);
 		full_screen_enable = enable;
 #else
-		fLink->StartMessage(AS_DW_SET_FULLSCREEN);
+		fLink->StartMessage(AS_DIRECT_WINDOW_SET_FULLSCREEN);
 		fLink->Attach<int32>(server_token); // useless ?
 		fLink->Attach<bool>(enable);
 
-		int32 code;
-		if (fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
-			status = B_OK;
+		status_t status = B_ERROR;
+		if (fLink->FlushWithReply(status) == B_OK
+			&& status == B_OK)
 			full_screen_enable = enable;
-		}
 #endif
 		Unlock();
 		
@@ -337,11 +335,12 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 	return result & true;
 #else
 	BPrivate::AppServerLink link;
-	link.StartMessage(AS_DW_SUPPORTS_WINDOW_MODE);
+	link.StartMessage(AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE);
 	link.Attach<screen_id>(id);
+
 	int32 reply;
 	if (link.FlushWithReply(reply) == B_OK
-		&& reply == SERVER_TRUE)
+		&& reply == B_OK)
 		return true;
 #endif
 
@@ -461,7 +460,7 @@ BDirectWindow::InitData()
 	a_session->sread(sizeof(sync_data), &sync_data);
 	a_session->sread(sizeof(status), &status);
 #else
-	fLink->StartMessage(AS_DW_GET_SYNC_DATA);
+	fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
 	fLink->Attach<int32>(server_token);
 
 	int32 reply;
