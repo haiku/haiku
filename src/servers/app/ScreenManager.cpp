@@ -31,6 +31,7 @@ using std::nothrow;
 #	include "AccelerantHWInterface.h"
 #else
 #	include "ViewHWInterface.h"
+#	include "DWindowHWInterface.h"
 #endif
 
 
@@ -144,7 +145,8 @@ ScreenManager::_ScanDrivers()
 #if USE_ACCELERANT
 		  interface = new AccelerantHWInterface();
 #else
-		  interface = new ViewHWInterface();
+		  interface = new DWindowHWInterface();
+//		  interface = new ViewHWInterface();
 #endif
 
 		_AddHWInterface(interface);

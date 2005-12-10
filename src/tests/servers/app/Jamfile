@@ -46,7 +46,7 @@ SharedLibrary libhwinterfaceimpl.so :
 	ViewHWInterface.cpp
 	DWindowHWInterface.cpp
 
-	: be game libhwinterface.so
+	: be libhwinterface.so
 ;
 
 SharedLibrary libhaikuappserver.so :
@@ -71,7 +71,7 @@ SharedLibrary libhaikuappserver.so :
 
 	# libraries
 	:
-	be game libtextencoding.so libfreetype.so
+	be libtextencoding.so libfreetype.so
 ;
 
 AddResources haiku_app_server : app_server.rdef ;
@@ -123,7 +123,7 @@ Server haiku_app_server :
 	# libraries
 	:
 	z libpng.so libhaikuappserver.so
-	libpainter.a be game
+	libpainter.a be
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
 ;

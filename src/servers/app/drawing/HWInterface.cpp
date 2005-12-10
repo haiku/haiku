@@ -589,7 +589,7 @@ printf("nothing to copy\n");
 			break;
 		}
 		default:
-			fprintf(stderr, "ViewHWInterface::CopyBackToFront() - unsupported front buffer format!\n");
+			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front buffer format!\n");
 			break;
 	}
 }

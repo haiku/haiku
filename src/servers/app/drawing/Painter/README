@@ -6,10 +6,6 @@ Painter is a class implementing the BView drawing functions with the Anti-Grain 
 
 Status:
 
-1) Most of the drawing modes are unimplemented.
-
-I want to work out the effects of the drawing_mode together with the source_alpha and alpha_func. Currently, Painter supports B_OP_COPY, B_OP_OVER and B_OP_INVERT with patterns. It is kind of ignorant towards the orginal app_servers treatment of alpha in the high and low color. I think it acts for the most part as if the BView was SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE), especially for drawing bitmaps, which will of course be fixed, but should be no obstacle in integrating Painter right now.
-
 2) Only 32 bit frame buffers are support yet.
 
 Most of the work in supporting other color spaces is only in the drawing_mode classes. It makes no sense to start work on these before I have even nailed the details once on the 32 bit case.
@@ -20,11 +16,7 @@ There is some work involved when trying to make this fast. The conversion should
 
 4) Most of the BView behaviour for DrawString() is missing.
 
-Putting the current pen at the position of the virtual next char is now handled, but I have to figure out the escapment_delta stuff.
-
-5) Font handling is somewhat weird.
-
-There is a FontManager class that is supposed to be an interface between font family/style names and font files on disk loadable by Freetype. There is a TextRenderer interface class and AGGTextRenderer implementation that can be used to get the job done, but this is of course very open for discussion. I didn't really look at what was already available in the Haiku repository, but just took from WonderBrush what I already had. The biggest problem when testing Painter on R5 is the sometimes slightly different naming of font families in Freetype and R5. Sometimes, FontManager is not able to match up the correct file for the given family and style. For the "default" "Swiss911 BT", it works. If the be_plain_font can not be "loaded" by FontManager, it might look like font rendering is not working at all, you might have to tweak this, or maybe hardcode a font that works. Of course, on a "true Haiku system", once such a thing exists, this problem will be non-existent. Fonts will just be named as Freetype suggests, and everything will match up fine.
+Putting the current pen at the position of the virtual next char is now handled, but I have to figure out the escapment_delta stuff. Glyph spacing modes need to be supported.
 
 6) The framework is still developing.
 
@@ -32,6 +24,4 @@ I'm still working on many ends of Painter and I might refactor things. The basic
 
 7) Article
 
-I have written a Newsletter article, that explains the concepts of AGG, how Painter is therefor designed and how it can be improved with the knowledge of AGG inner workings. I don't know when this article will appear, but email me if you're interested in the current version.
-
-
+I have written a Newsletter article, that explains the concepts of AGG, how Painter is therefor designed and how it can be improved with the knowledge of AGG inner workings.

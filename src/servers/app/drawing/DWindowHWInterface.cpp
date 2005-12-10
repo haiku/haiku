@@ -79,8 +79,6 @@ class DView : public BView {
 								DView(BRect bounds);
 	virtual						~DView();
 
-//	virtual	void				AttachedToWindow();
-
 								// DView
 			void				ForwardMessage(BMessage* message = NULL);
 
@@ -88,19 +86,22 @@ private:
 			port_id				fInputPort;
 };
 
-class DWindow : public BDirectWindow {
+class DWindow : public BWindow {
  public:
 								DWindow(BRect frame,
+										DWindowHWInterface* interface,
 										DWindowBuffer* buffer);
 	virtual						~DWindow();
 
-//	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
-	virtual	void				DirectConnected(direct_buffer_info* info);
+//	virtual	void				DirectConnected(direct_buffer_info* info);
 
- private:	
-			DWindowBuffer*		fBuffer;
+	virtual	void				FrameMoved(BPoint newOffset);
+
+ private:
+	DWindowHWInterface*			fHWInterface;
+	DWindowBuffer*				fBuffer;
 };
 
 class DirectMessageFilter : public BMessageFilter {
@@ -119,6 +120,7 @@ class DirectMessageFilter : public BMessageFilter {
 DView::DView(BRect bounds)
 	: BView(bounds, "graphics card view", B_FOLLOW_ALL, 0)
 {
+	SetViewColor(B_TRANSPARENT_COLOR);
 #ifndef INPUTSERVER_TEST_MODE
 	fInputPort = create_port(200, SERVER_INPUT_PORT);
 #else
@@ -209,9 +211,10 @@ DirectMessageFilter::Filter(BMessage *message, BHandler **target)
 //	#pragma mark -
 
 
-DWindow::DWindow(BRect frame, DWindowBuffer* buffer)
-	: BDirectWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
-					B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+DWindow::DWindow(BRect frame, DWindowHWInterface* interface, DWindowBuffer* buffer)
+	: BWindow(frame, "Haiku App Server", B_TITLED_WINDOW_LOOK,
+			  B_FLOATING_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	  fHWInterface(interface),
 	  fBuffer(buffer)
 {
 	DView* view = new DView(Bounds());
@@ -242,7 +245,7 @@ DWindow::QuitRequested()
 	// we don't quit on ourself, we let us be Quit()!
 	return false;
 }
-
+/*
 // DirectConnected
 void
 DWindow::DirectConnected(direct_buffer_info* info)
@@ -268,6 +271,14 @@ DWindow::DirectConnected(direct_buffer_info* info)
 //
 //	fDesktop->UnlockClipping();
 }
+*/
+
+// FrameMoved
+void
+DWindow::FrameMoved(BPoint newOffset)
+{
+	fHWInterface->SetOffset((int32)newOffset.x, (int32)newOffset.y);
+}
 
 //	#pragma mark -
 
@@ -276,6 +287,9 @@ DWindowHWInterface::DWindowHWInterface()
 	: HWInterface(),
 	  fFrontBuffer(new DWindowBuffer()),
 	  fWindow(NULL),
+
+	  fXOffset(50),
+	  fYOffset(50),
 
 	  fCardFD(-1),
 	  fAccelerantImage(-1),
@@ -304,8 +318,8 @@ DWindowHWInterface::DWindowHWInterface()
 	  fAccMoveCursor(NULL),
 	  fAccShowCursor(NULL)
 {
-	fDisplayMode.virtual_width = 640;
-	fDisplayMode.virtual_height = 480;
+	fDisplayMode.virtual_width = 800;
+	fDisplayMode.virtual_height = 600;
 	fDisplayMode.space = B_RGBA32;
 
 	memset(&fSyncToken, 0, sizeof(sync_token));
@@ -511,6 +525,8 @@ sprintf((char*)cloneInfoData, "graphics/%s", fCardNameInDevFS.String());
 
 		unload_add_on(fAccelerantImage);
 		return B_ERROR;
+	} else {
+		_UpdateFrameBufferConfig();
 	}
 
 	return B_OK;
@@ -555,10 +571,29 @@ fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT,
 	return B_OK;
 }
 
+// _UpdateFrameBufferConfig
+status_t
+DWindowHWInterface::_UpdateFrameBufferConfig()
+{
+	frame_buffer_config config;
+	if (fAccGetFrameBufferConfig(&config) != B_OK) {
+		STRACE(("unable to get frame buffer config\n"));
+		return B_ERROR;
+	}
+
+	fFrontBuffer->SetTo(&config, fXOffset, fYOffset,
+						fDisplayMode.virtual_width, 
+						fDisplayMode.virtual_height,
+						(color_space)fDisplayMode.space);
+	return B_OK;
+}
+
+
 // Shutdown
 status_t
 DWindowHWInterface::Shutdown()
 {
+printf("DWindowHWInterface::Shutdown()\n");
 	if (fAccelerantHook) {
 		uninit_accelerant UninitAccelerant = (uninit_accelerant)fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
 		if (UninitAccelerant)
@@ -633,8 +668,8 @@ DWindowHWInterface::SetMode(const display_mode &mode)
 
 		if (ret < B_OK)
 			return ret;
-		
-		fWindow = new DWindow(frame.OffsetToCopy(BPoint(50.0, 50.0)), fFrontBuffer);
+
+		fWindow = new DWindow(frame.OffsetByCopy(fXOffset, fYOffset), this, fFrontBuffer);
 
 		// fire up the window thread but don't show it on screen yet
 		fWindow->Hide();
@@ -646,10 +681,6 @@ DWindowHWInterface::SetMode(const display_mode &mode)
 		// so that the view does not accidentally draw a freed bitmap
 
 		if (ret >= B_OK) {
-			// clear out buffers, alpha is 255 this way
-			// TODO: maybe this should handle different color spaces in different ways
-//			memset(fFrontBuffer->Bits(), 255, fFrontBuffer->BitsLength());
-	
 			// change the window size and update the bitmap used for drawing
 			fWindow->ResizeTo(frame.Width(), frame.Height());
 		}
@@ -662,6 +693,9 @@ DWindowHWInterface::SetMode(const display_mode &mode)
 	} else {
 		ret = B_ERROR;
 	}
+
+	_UpdateFrameBufferConfig();
+
 	return ret;
 }
 
@@ -722,8 +756,8 @@ DWindowHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 		{1280, 1024}, {1400, 1050}, {1600, 1200}
 	};
 	uint32 resolutionCount = sizeof(resolutions) / sizeof(resolutions[0]);
-	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
-	uint32 count = resolutionCount * 4;
+//	const uint32 colors[] = {B_CMAP8, B_RGB15, B_RGB16, B_RGB32};
+	uint32 count = resolutionCount/* * 4*/;
 
 	display_mode *modes = new(nothrow) display_mode[count];
 	if (modes == NULL)
@@ -734,31 +768,29 @@ DWindowHWInterface::GetModeList(display_mode **_modes, uint32 *_count)
 
 	int32 index = 0;
 	for (uint32 i = 0; i < resolutionCount; i++) {
-		for (uint32 c = 0; c < 4; c++) {
-			modes[index].virtual_width = resolutions[i].width;
-			modes[index].virtual_height = resolutions[i].height;
-			modes[index].space = colors[c];
+		modes[index].virtual_width = resolutions[i].width;
+		modes[index].virtual_height = resolutions[i].height;
+		modes[index].space = B_RGB32;
 
-			modes[index].h_display_start = 0;
-			modes[index].v_display_start = 0;
-			modes[index].timing.h_display = resolutions[i].width;
-			modes[index].timing.v_display = resolutions[i].height;
-			modes[index].timing.h_total = 22000;
-			modes[index].timing.v_total = 22000;
-			modes[index].timing.pixel_clock = ((uint32)modes[index].timing.h_total
-				* modes[index].timing.v_total * 60) / 1000;
-			modes[index].flags = B_PARALLEL_ACCESS;
+		modes[index].h_display_start = 0;
+		modes[index].v_display_start = 0;
+		modes[index].timing.h_display = resolutions[i].width;
+		modes[index].timing.v_display = resolutions[i].height;
+		modes[index].timing.h_total = 22000;
+		modes[index].timing.v_total = 22000;
+		modes[index].timing.pixel_clock = ((uint32)modes[index].timing.h_total
+			* modes[index].timing.v_total * 60) / 1000;
+		modes[index].flags = B_PARALLEL_ACCESS;
 
-			index++;
-		}
+		index++;
 	}
 #else
 	// support only a single mode, useful
 	// for testing a specific mode
 	display_mode *modes = new(nothrow) display_mode[1];
-	modes[0].virtual_width = 640;
-	modes[0].virtual_height = 480;
-	modes[0].space = B_CMAP8;
+	modes[0].virtual_width = 800;
+	modes[0].virtual_height = 600;
+	modes[0].space = B_BRGB32;
 
 	*_modes = modes;
 	*_count = 1;
@@ -860,11 +892,11 @@ DWindowHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 			// convert the rects
 			blit_params* params = new blit_params[count];
 			for (uint32 i = 0; i < count; i++) {
-				params[i].src_left = (uint16)sortedRectList[i].left;
-				params[i].src_top = (uint16)sortedRectList[i].top;
+				params[i].src_left = (uint16)sortedRectList[i].left + fXOffset;
+				params[i].src_top = (uint16)sortedRectList[i].top + fYOffset;
 
-				params[i].dest_left = (uint16)sortedRectList[i].left + xOffset;
-				params[i].dest_top = (uint16)sortedRectList[i].top + yOffset;
+				params[i].dest_left = (uint16)sortedRectList[i].left + xOffset + fXOffset;
+				params[i].dest_top = (uint16)sortedRectList[i].top + yOffset + fYOffset;
 
 				// NOTE: width and height are expressed as distance, not pixel count!
 				params[i].width = (uint16)(sortedRectList[i].right - sortedRectList[i].left);
@@ -958,7 +990,7 @@ DWindowHWInterface::FrontBuffer() const
 RenderingBuffer*
 DWindowHWInterface::BackBuffer() const
 {
-	return NULL;
+	return fFrontBuffer;
 }
 
 // IsDoubleBuffered
@@ -975,6 +1007,23 @@ DWindowHWInterface::Invalidate(const BRect& frame)
 	return HWInterface::Invalidate(frame);
 }
 
+// SetOffset
+void
+DWindowHWInterface::SetOffset(int32 left, int32 top)
+{
+	if (!WriteLock())
+		return;
+
+	fXOffset = left;
+	fYOffset = top;
+
+	_UpdateFrameBufferConfig();
+
+	// TODO: someone would have to call DrawingEngine::Update() now!
+
+	WriteUnlock();
+}
+
 // _RegionToRectParams
 void
 DWindowHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
@@ -986,10 +1035,10 @@ DWindowHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
 
 	for (uint32 i = 0; i < *count; i++) {
 		clipping_rect r = region->RectAtInt(i);
-		(*params)[i].left = (uint16)r.left;
-		(*params)[i].top = (uint16)r.top;
-		(*params)[i].right = (uint16)r.right;
-		(*params)[i].bottom = (uint16)r.bottom;
+		(*params)[i].left = (uint16)(r.left + fXOffset);
+		(*params)[i].top = (uint16)(r.top + fYOffset);
+		(*params)[i].right = (uint16)(r.right + fXOffset);
+		(*params)[i].bottom = (uint16)(r.bottom + fYOffset);
 	}
 }
 

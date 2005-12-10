@@ -565,6 +565,7 @@ namespace agg
             }
 
             update_transform();
+//            update_char_size();
         }
         return ret;
     }

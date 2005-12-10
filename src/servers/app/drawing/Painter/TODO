@@ -2,31 +2,17 @@ Test:
 
 * "composite" alpha blending modes
 
-* BShape conversion and rendering
-
-* Bezier curve rendering
-
-* other color spaces (currently uses BBitmap::ImportBits(),
-	which is only available on Haiku)
-
 
 
 Implement:
 
 * "escapment_delta" text rendering
 
-* font shearing
-
 (* handling of other BBitmap colorspaces)
 
 
 
 Improve:
-
-* make special case versions of some functions:
-
-- horizontal/vertical lines
-- horizonzal text rendering, using scanline cache
 
 * make special verions of DrawingModes for B_SOLID_* patterns
 

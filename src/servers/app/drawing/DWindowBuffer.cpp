@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include <Accelerant.h>
 #include <DirectWindow.h>
 
 #include "DWindowBuffer.h"
@@ -69,7 +70,6 @@ DWindowBuffer::Height() const
 void
 DWindowBuffer::SetTo(direct_buffer_info* info)
 {
-printf("DWindowBuffer::SetTo(%p)\n", info);
 	fWindowClipping.MakeEmpty();
 
 	if (info) {
@@ -86,9 +86,8 @@ printf("DWindowBuffer::SetTo(%p)\n", info);
 		fFormat = info->pixel_format;
 		fWidth = info->window_bounds.right - info->window_bounds.left + 1;
 		fHeight = info->window_bounds.bottom - info->window_bounds.top + 1;
-printf("  width: %ld, height: %ld\n", fWidth, fHeight);
-// offset bits to left top corner of window
-fBits += xOffset * 4 + yOffset * fBytesPerRow;
+		// offset bits to left top corner of window
+		fBits += xOffset * 4 + yOffset * fBytesPerRow;
 	} else {
 		fBits = NULL;
 		fWidth = 0;
@@ -98,3 +97,17 @@ fBits += xOffset * 4 + yOffset * fBytesPerRow;
 	}
 }
 
+// SetTo
+void
+DWindowBuffer::SetTo(frame_buffer_config* config,
+					 uint32 x, uint32 y,
+					 uint32 width, uint32 height,
+					 color_space format)
+{
+	fBits = (uint8*)config->frame_buffer;
+	fBytesPerRow = config->bytes_per_row;
+	fBits += x * 4 + y * fBytesPerRow;
+	fWidth = width;
+	fHeight = height;
+	fFormat = format;
+}

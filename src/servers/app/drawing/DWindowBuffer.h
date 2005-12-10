@@ -4,6 +4,7 @@
 #include "RenderingBuffer.h"
 
 struct direct_buffer_info;
+struct frame_buffer_config;
 
 class DWindowBuffer : public RenderingBuffer {
  public:
@@ -19,6 +20,11 @@ class DWindowBuffer : public RenderingBuffer {
 	virtual	uint32				Height() const;
 	
 			void				SetTo(direct_buffer_info* info);
+
+			void				SetTo(frame_buffer_config* config,
+									  uint32 x, uint32 y,
+									  uint32 width, uint32 height,
+									  color_space format);
 
 			BRegion&			WindowClipping()
 									{ return fWindowClipping; }

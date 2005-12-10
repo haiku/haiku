@@ -69,17 +69,23 @@ class DWindowHWInterface : public HWInterface {
 
 	virtual	status_t			Invalidate(const BRect& frame);
 
+								// DWindowHWInterface
+			void				SetOffset(int32 left, int32 top);
+
  private:
 			DWindowBuffer*		fFrontBuffer;
 
 			DWindow*			fWindow;
 
 			display_mode		fDisplayMode;
+			int32				fXOffset;
+			int32				fYOffset;
 
 			// accelerant stuff
 			int					_OpenGraphicsDevice(int deviceNumber);
 			status_t			_OpenAccelerant(int device);
 			status_t			_SetupDefaultHooks();
+			status_t			_UpdateFrameBufferConfig();
 
 			void				_RegionToRectParams(/*const*/ BRegion* region,
 													fill_rect_params** params,
@@ -114,6 +120,8 @@ class DWindowHWInterface : public HWInterface {
 		set_cursor_shape		fAccSetCursorShape;
 		move_cursor				fAccMoveCursor;
 		show_cursor				fAccShowCursor;					
+
+		frame_buffer_config		fFrameBufferConfig;
 
 		BString					fCardNameInDevFS;
 };
