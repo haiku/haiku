@@ -9,7 +9,9 @@
 
 
 #include <DirectWindow.h>
+
 #include <clipping.h>
+#include <DirectWindowPrivate.h>
 
 #ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <R5_AppServerLink.h>
@@ -26,15 +28,6 @@
 #ifdef HAIKU_TARGET_PLATFORM_DANO
 #	warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
 #endif
-
-
-// TODO: We'll want to move this to a private header,
-// accessible by the app server.
-struct dw_sync_data {
-	area_id area;
-	sem_id disableSem;
-	sem_id disableSemAck;
-};
 
 
 // We don't need this kind of locking, since the directDeamonFunc 
@@ -447,35 +440,34 @@ BDirectWindow::InitData()
 
 	if (!Lock())
 		return;
-			
-	struct dw_sync_data sync_data;
+
+	struct direct_window_sync_data syncData;
 	status_t status = B_ERROR;
 
 #ifdef HAIKU_TARGET_PLATFORM_BEOS
 	a_session->swrite_l(DW_GET_SYNC_DATA);
 	a_session->swrite_l(server_token);
-		
+
 	Flush();
-		
-	a_session->sread(sizeof(sync_data), &sync_data);
+
+	a_session->sread(sizeof(syncData), &syncData);
 	a_session->sread(sizeof(status), &status);
 #else
 	fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
-	fLink->Attach<int32>(server_token);
 
 	int32 reply;
 	if (fLink->FlushWithReply(reply) == B_OK
 		&& reply == B_OK) {
-		fLink->Read<dw_sync_data>(&sync_data);
+		fLink->Read<direct_window_sync_data>(&syncData);
 		status = B_OK;
 	}
 #endif
-	
+
 	Unlock();
-		
+
 	if (status < B_OK)
 		return;
-		
+
 #if DW_NEEDS_LOCKING	
 	direct_lock = 0;
 	direct_lock_count = 0;
@@ -485,20 +477,20 @@ BDirectWindow::InitData()
 	if (direct_sem > 0)
 		dw_init_status |= DW_STATUS_SEM_CREATED;
 #endif		
- 		
-	source_clipping_area = sync_data.area;
-	disable_sem = sync_data.disableSem;
-	disable_sem_ack = sync_data.disableSemAck;
-		
+
+	source_clipping_area = syncData.area;
+	disable_sem = syncData.disable_sem;
+	disable_sem_ack = syncData.disable_sem_ack;
+
 	cloned_clipping_area = clone_area("Clone direct area", (void**)&buffer_desc,
 		B_ANY_ADDRESS, B_READ_AREA, source_clipping_area);		
-	
+
 	if (cloned_clipping_area > 0) {			
 		dw_init_status |= DW_STATUS_AREA_CLONED;
-				
+
 		direct_deamon_id = spawn_thread(DirectDeamonFunc, "direct deamon",
 				B_DISPLAY_PRIORITY, this);
-			
+
 		if (direct_deamon_id > 0) {
 			deamon_killer = false;
 			if (resume_thread(direct_deamon_id) == B_OK)

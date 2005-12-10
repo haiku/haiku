@@ -35,6 +35,7 @@
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
 
+#include <DirectWindowPrivate.h>
 #include <MessagePrivate.h>
 
 #include "AppServer.h"
@@ -116,14 +117,6 @@ struct dw_data {
 		return (direct_area >= 0) && (direct_sem >= 0)
 			&& (direct_sem_ack >= 0) && (direct_info != NULL);
 	}
-};
-
-
-// TODO: Copied from DirectWindow.cpp: Move to a common header
-struct dw_sync_data {
-	area_id area;
-	sem_id disableSem;
-	sem_id disableSemAck;
 };
 
 
@@ -1696,7 +1689,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			if (_EnableDirectWindowMode() == B_OK) {
 				fLink.StartMessage(B_OK);
-				struct dw_sync_data syncData = { 
+				struct direct_window_sync_data syncData = { 
 					fDirectWindowData->direct_area,
 					fDirectWindowData->direct_sem,
 					fDirectWindowData->direct_sem_ack
