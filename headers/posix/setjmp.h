@@ -5,12 +5,17 @@
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
-
 #include <signal.h>
 
+// include architecture specific definitions
+#ifdef __INTEL__
+	#include <arch/x86/arch_setjmp.h>
+#elif __POWERPC__
+	#include <arch/ppc/arch_setjmp.h>
+#endif
 
-typedef struct __jmp_buf {
-	int			regs[6];	/* saved registers, stack & program pointer */
+typedef struct __jmp_buf_tag {
+	__jmp_buf	regs;		/* saved registers, stack & program pointer */
 	int			mask_was_saved;
 	sigset_t	saved_mask;
 } jmp_buf[1];

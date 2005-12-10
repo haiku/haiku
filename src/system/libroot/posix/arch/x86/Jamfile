@@ -1,8 +1,18 @@
 SubDir HAIKU_TOP src system libroot posix arch x86 ;
 
+# TODO: siglongjmp.S should use __longjmp_return to restore the signal mask.
+local genericSources =
+	setjmp_save_sigs.c
+#	longjmp_return.c
+;
+
 MergeObject posix_arch_$(TARGET_ARCH).o :
 	setjmp.S
-	setjmp_save_sigs.c
 	sigsetjmp.S
 	siglongjmp.S
+
+	$(genericSources)
 ;
+
+SEARCH on [ FGristFiles $(genericSources) ]
+	= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
