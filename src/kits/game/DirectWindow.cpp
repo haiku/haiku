@@ -295,7 +295,6 @@ BDirectWindow::SetFullScreen(bool enable)
 		fLink->StartMessage(AS_DIRECT_WINDOW_SET_FULLSCREEN);
 		fLink->Attach<bool>(enable);
 
-		status_t status = B_ERROR;
 		if (fLink->FlushWithReply(status) == B_OK
 			&& status == B_OK)
 			full_screen_enable = enable;
