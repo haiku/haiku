@@ -45,8 +45,9 @@ All rights reserved.
 // 	low level FS calls.
 
 #include <ctype.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
+#include <unistd.h>
 
 #include <Alert.h>
 #include <Application.h>
