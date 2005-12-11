@@ -810,7 +810,7 @@ sound_error::sound_error(const char *str)
 
 
 const char *
-sound_error::what() const
+sound_error::what() const throw ()
 {
 	return m_str_const;
 }
