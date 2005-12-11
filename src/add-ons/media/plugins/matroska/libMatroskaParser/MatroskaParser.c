@@ -2514,7 +2514,7 @@ int	      mkv_ReadData(MatroskaFile *mf,ulonglong FilePos,
   rd = mf->cache->read(mf->cache,FilePos,Buffer,Count);
   if (rd<0) {
     const char	*ce = mf->cache->geterror(mf->cache);
-    vsnprintf(mf->errmsg,sizeof(mf->errmsg),"I/O Error: %s",(va_list)&ce);
+    snprintf(mf->errmsg,sizeof(mf->errmsg),"I/O Error: %s",ce);
     return -1;
   }
   return rd;
