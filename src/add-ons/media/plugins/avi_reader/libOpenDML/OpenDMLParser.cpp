@@ -36,6 +36,11 @@
 
 #define ERROR(a...) fprintf(stderr, a)
 
+#if B_HOST_IS_BENDIAN
+	#define DO_SWAP_INT32(x)	x = B_SWAP_INT32(x)
+	#define DO_SWAP_INT16(x)	x = B_SWAP_INT16(x)
+#endif
+
 struct movie_chunk
 {
 	movie_chunk *	next;
@@ -382,16 +387,16 @@ OpenDMLParser::ParseChunk_avih(uint64 start, uint32 size)
 	}
 	
 	#if B_HOST_IS_BENDIAN
-		B_SWAP_INT32(&fAviMainHeader.micro_sec_per_frame);
-		B_SWAP_INT32(&fAviMainHeader.max_bytes_per_sec);
-		B_SWAP_INT32(&fAviMainHeader.padding_granularity);
-		B_SWAP_INT32(&fAviMainHeader.flags);
-		B_SWAP_INT32(&fAviMainHeader.total_frames);
-		B_SWAP_INT32(&fAviMainHeader.initial_frames);
-		B_SWAP_INT32(&fAviMainHeader.streams);
-		B_SWAP_INT32(&fAviMainHeader.suggested_buffer_size);
-		B_SWAP_INT32(&fAviMainHeader.width);
-		B_SWAP_INT32(&fAviMainHeader.height);
+		DO_SWAP_INT32(fAviMainHeader.micro_sec_per_frame);
+		DO_SWAP_INT32(fAviMainHeader.max_bytes_per_sec);
+		DO_SWAP_INT32(fAviMainHeader.padding_granularity);
+		DO_SWAP_INT32(fAviMainHeader.flags);
+		DO_SWAP_INT32(fAviMainHeader.total_frames);
+		DO_SWAP_INT32(fAviMainHeader.initial_frames);
+		DO_SWAP_INT32(fAviMainHeader.streams);
+		DO_SWAP_INT32(fAviMainHeader.suggested_buffer_size);
+		DO_SWAP_INT32(fAviMainHeader.width);
+		DO_SWAP_INT32(fAviMainHeader.height);
 	#endif
 
 	fAviMainHeaderValid = true;
@@ -439,23 +444,23 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 	}
 
 	#if B_HOST_IS_BENDIAN
-		B_SWAP_INT32(&fCurrentStream->stream_header.fourcc_type);
-		B_SWAP_INT32(&fCurrentStream->stream_header.fourcc_handler);
-		B_SWAP_INT32(&fCurrentStream->stream_header.flags);
-		B_SWAP_INT16(&fCurrentStream->stream_header.priority);
-		B_SWAP_INT16(&fCurrentStream->stream_header.language);
-		B_SWAP_INT32(&fCurrentStream->stream_header.initial_frames);
-		B_SWAP_INT32(&fCurrentStream->stream_header.scale);
-		B_SWAP_INT32(&fCurrentStream->stream_header.rate);
-		B_SWAP_INT32(&fCurrentStream->stream_header.start);
-		B_SWAP_INT32(&fCurrentStream->stream_header.length);
-		B_SWAP_INT32(&fCurrentStream->stream_header.suggested_buffer_size);
-		B_SWAP_INT32(&fCurrentStream->stream_header.quality);
-		B_SWAP_INT32(&fCurrentStream->stream_header.sample_size);
-		B_SWAP_INT16(&fCurrentStream->stream_header.rect_left);
-		B_SWAP_INT16(&fCurrentStream->stream_header.rect_top);
-		B_SWAP_INT16(&fCurrentStream->stream_header.rect_right);
-		B_SWAP_INT16(&fCurrentStream->stream_header.rect_bottom);
+		DO_SWAP_INT32(fCurrentStream->stream_header.fourcc_type);
+		DO_SWAP_INT32(fCurrentStream->stream_header.fourcc_handler);
+		DO_SWAP_INT32(fCurrentStream->stream_header.flags);
+		DO_SWAP_INT16(fCurrentStream->stream_header.priority);
+		DO_SWAP_INT16(fCurrentStream->stream_header.language);
+		DO_SWAP_INT32(fCurrentStream->stream_header.initial_frames);
+		DO_SWAP_INT32(fCurrentStream->stream_header.scale);
+		DO_SWAP_INT32(fCurrentStream->stream_header.rate);
+		DO_SWAP_INT32(fCurrentStream->stream_header.start);
+		DO_SWAP_INT32(fCurrentStream->stream_header.length);
+		DO_SWAP_INT32(fCurrentStream->stream_header.suggested_buffer_size);
+		DO_SWAP_INT32(fCurrentStream->stream_header.quality);
+		DO_SWAP_INT32(fCurrentStream->stream_header.sample_size);
+		DO_SWAP_INT16(fCurrentStream->stream_header.rect_left);
+		DO_SWAP_INT16(fCurrentStream->stream_header.rect_top);
+		DO_SWAP_INT16(fCurrentStream->stream_header.rect_right);
+		DO_SWAP_INT16(fCurrentStream->stream_header.rect_bottom);
 	#endif
 
 	fCurrentStream->stream_header_valid = true;
@@ -521,13 +526,13 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		}
 		
 		#if B_HOST_IS_BENDIAN
-			B_SWAP_INT16(&fCurrentStream->audio_format->format_tag);
-			B_SWAP_INT16(&fCurrentStream->audio_format->channels);
-			B_SWAP_INT32(&fCurrentStream->audio_format->frames_per_sec);
-			B_SWAP_INT32(&fCurrentStream->audio_format->avg_bytes_per_sec);
-			B_SWAP_INT32(&fCurrentStream->audio_format->block_align);
-			B_SWAP_INT32(&fCurrentStream->audio_format->bits_per_sample);
-			B_SWAP_INT32(&fCurrentStream->audio_format->extra_size);
+			DO_SWAP_INT16(fCurrentStream->audio_format->format_tag);
+			DO_SWAP_INT16(fCurrentStream->audio_format->channels);
+			DO_SWAP_INT32(fCurrentStream->audio_format->frames_per_sec);
+			DO_SWAP_INT32(fCurrentStream->audio_format->avg_bytes_per_sec);
+			DO_SWAP_INT32(fCurrentStream->audio_format->block_align);
+			DO_SWAP_INT32(fCurrentStream->audio_format->bits_per_sample);
+			DO_SWAP_INT32(fCurrentStream->audio_format->extra_size);
 		#endif
 
 		TRACE("audio_format:\n");
@@ -561,17 +566,17 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		}
 		
 		#if B_HOST_IS_BENDIAN
-			B_SWAP_INT32(&fCurrentStream->video_format.size);
-			B_SWAP_INT32(&fCurrentStream->video_format.width);
-			B_SWAP_INT32(&fCurrentStream->video_format.height);
-			B_SWAP_INT16(&fCurrentStream->video_format.planes);
-			B_SWAP_INT16(&fCurrentStream->video_format.bit_count);
-			B_SWAP_INT32(&fCurrentStream->video_format.compression);
-			B_SWAP_INT32(&fCurrentStream->video_format.image_size);
-			B_SWAP_INT32(&fCurrentStream->video_format.x_pels_per_meter);
-			B_SWAP_INT32(&fCurrentStream->video_format.y_pels_per_meter);
-			B_SWAP_INT32(&fCurrentStream->video_format.clr_used);
-			B_SWAP_INT32(&fCurrentStream->video_format.clr_important);
+			DO_SWAP_INT32(fCurrentStream->video_format.size);
+			DO_SWAP_INT32(fCurrentStream->video_format.width);
+			DO_SWAP_INT32(fCurrentStream->video_format.height);
+			DO_SWAP_INT16(fCurrentStream->video_format.planes);
+			DO_SWAP_INT16(fCurrentStream->video_format.bit_count);
+			DO_SWAP_INT32(fCurrentStream->video_format.compression);
+			DO_SWAP_INT32(fCurrentStream->video_format.image_size);
+			DO_SWAP_INT32(fCurrentStream->video_format.x_pels_per_meter);
+			DO_SWAP_INT32(fCurrentStream->video_format.y_pels_per_meter);
+			DO_SWAP_INT32(fCurrentStream->video_format.clr_used);
+			DO_SWAP_INT32(fCurrentStream->video_format.clr_important);
 		#endif
 
 		fCurrentStream->video_format_valid = true;
@@ -634,7 +639,7 @@ OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 	}
 	
 	#if B_HOST_IS_BENDIAN
-		B_SWAP_INT32(&fOdmlExtendedHeader.total_frames);
+		DO_SWAP_INT32(fOdmlExtendedHeader.total_frames);
 	#endif
 
 	fOdmlExtendedHeaderValid = true;
