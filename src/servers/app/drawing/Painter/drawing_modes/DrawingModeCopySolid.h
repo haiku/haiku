@@ -9,7 +9,7 @@
 #ifndef DRAWING_MODE_COPY_SOLID_H
 #define DRAWING_MODE_COPY_SOLID_H
 
-#include "DrawingModeCopySolid.h"
+#include "DrawingModeCopy.h"
 
 template<class Order>
 class DrawingModeCopySolid : public DrawingMode {
