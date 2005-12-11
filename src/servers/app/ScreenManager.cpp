@@ -21,13 +21,7 @@
 using std::nothrow;
 
 
-#ifdef __HAIKU__
-#	define USE_ACCELERANT 1
-#else
-#	define USE_ACCELERANT 0
-#endif
-
-#if USE_ACCELERANT
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #	include "AccelerantHWInterface.h"
 #else
 #	include "ViewHWInterface.h"
@@ -142,11 +136,12 @@ ScreenManager::_ScanDrivers()
 	bool initDrivers = true;
 	while (initDrivers) {
 
-#if USE_ACCELERANT
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 		  interface = new AccelerantHWInterface();
-#else
+#elif defined(USE_DIRECT_WINDOW_TEST_MODE)
 		  interface = new DWindowHWInterface();
-//		  interface = new ViewHWInterface();
+#else
+		  interface = new ViewHWInterface();
 #endif
 
 		_AddHWInterface(interface);

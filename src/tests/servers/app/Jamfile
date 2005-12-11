@@ -18,6 +18,7 @@ UseFreeTypeHeaders ;
 
 # This overrides the definitions in private/servers/app/ServerConfig.h
 local defines = [ FDefines TEST_MODE=1 ] ;
+	# USE_DIRECT_WINDOW_TEST_MODE=1
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
