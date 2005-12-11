@@ -719,9 +719,11 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 				&& (d->GetDrawingMode() == B_OP_COPY
 					|| d->GetDrawingMode() == B_OP_OVER)) {
 				if (d->GetPattern() == B_SOLID_HIGH) {
+					r.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(r, d->HighColor());
 					doInSoftware = false;
 				} else if (d->GetPattern() == B_SOLID_LOW) {
+					r.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(r, d->LowColor());
 					doInSoftware = false;
 				}
@@ -755,6 +757,10 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
+	// NOTE: this is used for internal app_server use and the
+	// region is expected to already be intersected with the
+	// current clipping... it would matter only if we can
+	// use hardware acceleration
 	if (WriteLock()) {
 		BRect clipped = fPainter->ClipRect(r.Frame());
 		if (clipped.IsValid()) {
