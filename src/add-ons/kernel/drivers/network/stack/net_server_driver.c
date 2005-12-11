@@ -26,7 +26,6 @@
 
 // Private includes
 #include <net_stack_driver.h>
-// #include <PPPControl.h>		// for NET_STACK_CONTROL_NET_MODULE PPP support...
 #include <userland_ipc.h>
 #include <sys/sockio.h>
 
