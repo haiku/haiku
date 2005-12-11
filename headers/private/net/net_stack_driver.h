@@ -18,12 +18,18 @@ enum {
 	// Paranoia mode: be far away of B_DEVICE_OP_CODES_END opcodes!!!
 	// You never know what another device driver ioctl() will do
 	// if think our NET_STACK_* is in fact his DO_RISKY_BUSINESS opcode, or whatever...
- 	NET_IOCTL_BASE = 0xbe230000,			
+ 	NET_IOCTL_BASE = 0xbe230000,
 	NET_STACK_IOCTL_BASE = NET_IOCTL_BASE + 0x200
 };
 
 enum {
+	// ops not acting on an existing socket
 	NET_STACK_SOCKET = NET_STACK_IOCTL_BASE,	// socket_args *
+	NET_STACK_GET_COOKIE,                       // void ** 
+	NET_STACK_CONTROL_NET_MODULE,				// control_net_module_args *
+	NET_STACK_SYSCTL,							// sysctl_args *
+	
+	// ops acting on an existing socket
 	NET_STACK_BIND,								// sockaddr_args *
 	NET_STACK_RECVFROM,							// struct msghdr *
 	NET_STACK_RECV,								// transfer_args *
@@ -37,19 +43,13 @@ enum {
 	NET_STACK_SETSOCKOPT,						// sockopt_args *
 	NET_STACK_GETSOCKNAME,						// sockaddr_args *
 	NET_STACK_GETPEERNAME,						// sockaddr_args *
-	NET_STACK_SOCKETPAIR,							// 
-
-	NET_STACK_SYSCTL,							// sysctl_args *
+	NET_STACK_SOCKETPAIR,						// socketpair_args *
+	
+	// TODO: remove R5 select() emulation
 	NET_STACK_SELECT,							// select_args *
 	NET_STACK_DESELECT,							// select_args *
-
-	NET_STACK_GET_COOKIE,                       // void ** 
-
-	NET_STACK_STOP,
 	
 	NET_STACK_NOTIFY_SOCKET_EVENT,				// notify_socket_event_args * (userland stack only)
-	
-	NET_STACK_CONTROL_NET_MODULE,
 	
 	NET_STACK_IOCTL_MAX
 };
