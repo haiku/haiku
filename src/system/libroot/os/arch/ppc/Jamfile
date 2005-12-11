@@ -5,6 +5,8 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 MergeObject os_arch_$(TARGET_ARCH).o :
 	atomic.S
 	byteorder.S
+	compatibility.c	# only here until the places where those functions are used
+					# are fixed
 #	systeminfo.c
 	system_time.S
 	thread.c
