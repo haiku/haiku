@@ -1569,16 +1569,7 @@ NodeCacheEntry::Hash() const
 uint32 
 NodeCacheEntry::Hash(const node_ref *node)
 {
-	struct hasher {
-		uint32 int1;
-		uint32 int2;
-		uint32 int3;
-	} *tmp;
-	
-	STATIC_ASSERT(sizeof(hasher) == sizeof(node_ref));
-	
-	tmp = (hasher *)node;
-	return tmp->int1 ^ tmp->int2 ^ tmp->int3;
+	return node->device ^ ((uint32 *)&node->node)[0] ^ ((uint32 *)&node->node)[1];
 }
 
 

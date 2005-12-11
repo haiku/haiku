@@ -37,8 +37,8 @@ All rights reserved.
 #ifndef __OPEN_HASH_TABLE__
 #define __OPEN_HASH_TABLE__
 
-#include <malloc.h>
-#include <new.h>
+#include <new>
+#include <stdlib.h>
 
 namespace BPrivate {
 
@@ -259,7 +259,7 @@ OpenHashElementArray<Element>::OpenHashElementArray(int32 initialSize)
 {
 	fData = (Element *)calloc((size_t)initialSize , sizeof(Element));
 	if (!fData)
-		throw bad_alloc();
+		throw std::bad_alloc();
 }
 
 
@@ -337,7 +337,7 @@ OpenHashElementArray<Element>::Add()
 		int32 newSize = fSize + kGrowChunk;
 		Element *newData = (Element *)calloc((size_t)newSize , sizeof(Element));
 		if (!newData)
-			throw bad_alloc();
+			throw std::bad_alloc();
 		memcpy(newData, fData, fSize * sizeof(Element));
 		free(fData);
 		fData = newData;

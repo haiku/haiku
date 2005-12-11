@@ -90,6 +90,10 @@ All rights reserved.
 #include "WidgetAttributeText.h"
 
 
+using std::min;
+using std::max;
+
+
 const float kDoubleClickTresh = 6;
 const float kCountViewWidth = 62;
 
