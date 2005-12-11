@@ -47,5 +47,9 @@ KernelStaticLibrary libkernelppp.a :
 	: -fno-pic
 ;
 
-SEARCH on [ FGristFiles kernel_cpp.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles Locker.cpp ] = [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles Locker.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
+SEARCH on [ FGristFiles atomic.S ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;
