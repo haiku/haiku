@@ -3,5 +3,12 @@
 
 #ifndef __CSTDDEF__
 #define __CSTDDEF__
+
 #include <stddef.h>
+
+namespace std {
+	using ::ptrdiff_t;
+	using ::size_t;
+}
+
 #endif
