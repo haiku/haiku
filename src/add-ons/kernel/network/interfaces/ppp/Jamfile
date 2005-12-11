@@ -8,7 +8,6 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers cpp ] : true ;
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
