@@ -55,6 +55,7 @@
 #include "dl_list.h"
 
 #include <KernelExport.h>
+#include <SupportDefs.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -109,21 +110,6 @@ int fast_log_buffer_size = /*512*/ 16*1024;
 
 
 device_manager_info *pnp;
-
-
-static int32
-atomic_exchange(vint32 *value, int32 newValue)
-{
-	int32 oldValue;
-	
-	__asm__ __volatile__ (
-		"xchg %0,%1"
-		: "=r" (oldValue), "=m" (*value)
-		: "0" (newValue), "1" (*value)
-	);
-	
-	return oldValue;
-}
 
 
 /**	convert event code to text
@@ -214,7 +200,7 @@ fast_log_flush_buffer(void)
 	memset(fast_log_buffer + new_start, 0, fast_log_buffer_size);
 
 	// swap buffers
-	size = atomic_exchange(&fast_log_buffer_offset_alloc, new_offset_alloc);
+	size = atomic_set((vint32*)&fast_log_buffer_offset_alloc, new_offset_alloc);
 
 	// get rid of bit 31 flag
 	size &= ~(1 << 31);
