@@ -293,7 +293,6 @@ BDirectWindow::SetFullScreen(bool enable)
 		full_screen_enable = enable;
 #else
 		fLink->StartMessage(AS_DIRECT_WINDOW_SET_FULLSCREEN);
-		fLink->Attach<int32>(server_token); // useless ?
 		fLink->Attach<bool>(enable);
 
 		status_t status = B_ERROR;
@@ -315,6 +314,7 @@ BDirectWindow::IsFullScreen() const
 }
 
 
+/*static*/
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
@@ -341,7 +341,9 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 }
 
 
-// Private methods
+//	#pragma mark - Private methods
+
+
 int32
 BDirectWindow::DirectDeamonFunc(void *arg)
 {
@@ -350,28 +352,34 @@ BDirectWindow::DirectDeamonFunc(void *arg)
 	while (!object->deamon_killer) {
 		// This sem is released by the app_server when our
 		// clipping region changes, or when our window is moved,
-		// resized, etc. etc.		
-		while (acquire_sem(object->disable_sem) == B_INTERRUPTED)
-			;	
-		
+		// resized, etc. etc.
+		status_t status;
+		do {
+			status = acquire_sem(object->disable_sem);
+		} while (status == B_INTERRUPTED);
+
+		if (status < B_OK)
+			return -1;
+
 		if (object->LockDirect()) {
 			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
 				object->connection_enable = true;
-				
+
 			object->in_direct_connect = true;
 			object->DirectConnected(object->buffer_desc);	
 			object->in_direct_connect = false;
-			
+
 			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
 				object->connection_enable = false;
-						
+
 			object->UnlockDirect();	
 		}
-		
+
 		// The app_server then waits (with a timeout) on this sem.
 		// If we aren't quick enough to release this sem, our app
 		// will be terminated by the app_server
-		release_sem(object->disable_sem_ack);
+		if (release_sem(object->disable_sem_ack) != B_OK)
+			return -1;
 	}
 
 	return 0;
