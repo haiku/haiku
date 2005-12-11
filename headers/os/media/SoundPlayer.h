@@ -18,7 +18,7 @@ class sound_error : public std::exception {
 	const char * m_str_const;
 public:
 	sound_error(const char * str);
-	const char * what() const;
+	const char * what() const throw ();
 };
 
 class BSoundPlayer {
