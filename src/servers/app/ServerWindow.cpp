@@ -83,41 +83,64 @@ using std::nothrow;
 static struct profile { int32 count; bigtime_t time; } sMessageProfile[AS_LAST_CODE];
 #endif
 
-struct dw_data {
-	sem_id direct_sem;
-	sem_id direct_sem_ack;
-	area_id direct_area;
-	direct_buffer_info *direct_info;
-	
-	dw_data() :
-		direct_sem(-1),
-		direct_sem_ack(-1),
-		direct_area(-1),
-		direct_info(NULL)
-	{
-		direct_area = create_area("direct area", (void **)&direct_info,
-							B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
-	
-		direct_sem = create_sem(1, "direct sem");
-		direct_sem_ack = create_sem(1, "direct sem ack");
-	}
-	
-	~dw_data()
-	{
-		if (direct_area >= 0)
-			delete_area(direct_area);
-		if (direct_sem >= 0)
-			delete_sem(direct_sem);
-		if (direct_sem_ack >= 0)
-			delete_sem(direct_sem_ack);
-	}
-	
-	bool IsValid() const 
-	{
-		return (direct_area >= 0) && (direct_sem >= 0)
-			&& (direct_sem_ack >= 0) && (direct_info != NULL);
-	}
+
+struct direct_window_data {
+	direct_window_data();
+	~direct_window_data();
+
+	status_t InitCheck() const;
+
+	sem_id	sem;
+	sem_id	sem_ack;
+	area_id	area;
+	bool	started;
+	direct_buffer_info *buffer_info;
 };
+
+
+direct_window_data::direct_window_data()
+	:
+	sem(-1),
+	sem_ack(-1),
+	area(-1),
+	started(false),
+	buffer_info(NULL)
+{
+	area = create_area("direct area", (void **)&buffer_info,
+		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_WRITE);
+
+	sem = create_sem(0, "direct sem");
+	sem_ack = create_sem(0, "direct sem ack");
+}
+
+
+direct_window_data::~direct_window_data()
+{
+	// this should make the client die in case it's still running
+	buffer_info->bits = NULL;
+	buffer_info->bytes_per_row = 0;
+
+	delete_area(area);
+	delete_sem(sem);
+	delete_sem(sem_ack);
+}
+
+
+status_t
+direct_window_data::InitCheck() const 
+{
+	if (area < B_OK)
+		return area;
+	if (sem < B_OK)
+		return sem;
+	if (sem_ack < B_OK)
+		return sem_ack;
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
 
 
 /*!
@@ -883,6 +906,29 @@ fDesktop->ReadUnlockWindows();
 fDesktop->ReadLockWindows();
 			break;
 		}
+
+		// BDirectWindow communication
+
+		case AS_DIRECT_WINDOW_GET_SYNC_DATA:
+		{
+			status_t status = _EnableDirectWindowMode();
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
+				struct direct_window_sync_data syncData = { 
+					fDirectWindowData->area,
+					fDirectWindowData->sem,
+					fDirectWindowData->sem_ack
+				};
+
+				fLink.Attach(&syncData, sizeof(syncData));
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
+		// View creation and destruction (don't need a valid fCurrentLayer)
 
 		case AS_SET_CURRENT_LAYER:
 		{
@@ -1676,33 +1722,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			break;
 		}
 
-		// BDirectWindow communication
-
-		case AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE:
-			// TODO: How to determine this?
-			fLink.StartMessage(B_OK);
-			fLink.Attach<bool>(true);
-			fLink.Flush();
-			break;
-
-		case AS_DIRECT_WINDOW_GET_SYNC_DATA:
-		{
-			if (_EnableDirectWindowMode() == B_OK) {
-				fLink.StartMessage(B_OK);
-				struct direct_window_sync_data syncData = { 
-					fDirectWindowData->direct_area,
-					fDirectWindowData->direct_sem,
-					fDirectWindowData->direct_sem_ack
-				};
-
-				fLink.Attach(&syncData, sizeof(syncData));
-			} else
-				fLink.StartMessage(B_ERROR);
-
-			fLink.Flush();
-			break;
-		}
-
 		default:
 			if (fDesktop->ReadLockWindows()) {
 				_DispatchViewDrawingMessage(code, link);
@@ -2227,14 +2246,16 @@ ServerWindow::_EnableDirectWindowMode()
 		return B_ERROR;
 	}
 
-	fDirectWindowData = new (nothrow) dw_data;
+	fDirectWindowData = new (nothrow) direct_window_data;
 	if (fDirectWindowData == NULL)
 		return B_NO_MEMORY;
 
-	if (!fDirectWindowData->IsValid()) {
+	status_t status = fDirectWindowData->InitCheck();
+	if (status < B_OK) {
 		delete fDirectWindowData;
 		fDirectWindowData = NULL;
-		return B_ERROR;
+
+		return status;
 	}
 
 	return B_OK;
@@ -2242,62 +2263,65 @@ ServerWindow::_EnableDirectWindowMode()
 
 
 void
-ServerWindow::HandleDirectConnection(int bufferState, int driverState)
+ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 {
-	if (fDirectWindowData == NULL)
+	STRACE(("HandleDirectConnection(bufferState = %ld, driverState = %ld)\n",
+		bufferState, driverState));
+
+	if (fDirectWindowData == NULL
+		|| (!fDirectWindowData->started
+			&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START))
 		return;
-	
+printf("bufferState = %ld\n", bufferState);
+	fDirectWindowData->started = true;
+
 	if (bufferState != -1)
-		fDirectWindowData->direct_info->buffer_state = (direct_buffer_state)bufferState;
-	
+		fDirectWindowData->buffer_info->buffer_state = (direct_buffer_state)bufferState;
+
 	if (driverState != -1)
-		fDirectWindowData->direct_info->driver_state = (direct_driver_state)driverState;
-	
+		fDirectWindowData->buffer_info->driver_state = (direct_driver_state)driverState;
+
 	if ((bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_STOP) {
 		// TODO: Locking ?
 		RenderingBuffer *buffer = fDesktop->HWInterface()->FrontBuffer();
-		fDirectWindowData->direct_info->bits = buffer->Bits();
-		fDirectWindowData->direct_info->pci_bits = NULL; // TODO	
-		fDirectWindowData->direct_info->bytes_per_row = buffer->BytesPerRow();
-		fDirectWindowData->direct_info->bits_per_pixel = buffer->BytesPerRow() / buffer->Width() * 8;
-		fDirectWindowData->direct_info->pixel_format = buffer->ColorSpace();
-		fDirectWindowData->direct_info->layout = B_BUFFER_NONINTERLEAVED;
-		fDirectWindowData->direct_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
-		
+		fDirectWindowData->buffer_info->bits = buffer->Bits();
+		fDirectWindowData->buffer_info->pci_bits = NULL; // TODO	
+		fDirectWindowData->buffer_info->bytes_per_row = buffer->BytesPerRow();
+		fDirectWindowData->buffer_info->bits_per_pixel = buffer->BytesPerRow() / buffer->Width() * 8;
+		fDirectWindowData->buffer_info->pixel_format = buffer->ColorSpace();
+		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
+		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
+
 		WindowLayer *layer = const_cast<WindowLayer *>(GetWindowLayer());
-		fDirectWindowData->direct_info->window_bounds = to_clipping_rect(layer->Frame());
+		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(layer->Frame());
 
 		// TODO: Review this
 		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info))
 			/ sizeof(clipping_rect);
 
-		// TODO: Is there a simpler way to obtain this result ?
-		// We just want the region INSIDE the window, border excluded.
-		BRegion clipRegion;
-// TODO: fix HandleDirectConnection()
-/*		 = const_cast<BRegion &>(layer->FullVisible());
-		BRegion exclude = const_cast<BRegion &>(layer->VisibleRegion());
-		clipRegion.Exclude(&exclude);
-*/
-		fDirectWindowData->direct_info->clip_list_count = min_c(clipRegion.CountRects(),
-			kMaxClipRectsCount);
-		fDirectWindowData->direct_info->clip_bounds = clipRegion.FrameInt();
+		// We just want the region inside the window, border excluded.
+		BRegion clipRegion = fWindowLayer->VisibleContentRegion();
+		clipRegion.PrintToStream();
 
-		for (uint32 i = 0; i < fDirectWindowData->direct_info->clip_list_count; i++)
-			fDirectWindowData->direct_info->clip_list[i] = clipRegion.RectAtInt(i);
+		fDirectWindowData->buffer_info->clip_list_count = min_c(clipRegion.CountRects(),
+			kMaxClipRectsCount);
+		fDirectWindowData->buffer_info->clip_bounds = clipRegion.FrameInt();
+
+		for (uint32 i = 0; i < fDirectWindowData->buffer_info->clip_list_count; i++)
+			fDirectWindowData->buffer_info->clip_list[i] = clipRegion.RectAtInt(i);
 	}
 
 	// Releasing this sem causes the client to call BDirectWindow::DirectConnected()
-	release_sem(fDirectWindowData->direct_sem);
+	release_sem(fDirectWindowData->sem);
 
-	// TODO: Waiting half a second in this thread is not a problem,
-	// but since we are called from the RootLayer's thread too, very bad things could happen.
+	// TODO: Waiting half a second in the ServerWindow thread is not a problem,
+	// but since we are called from the Desktop's thread too, very bad things could happen.
 	// Find some way to call this method only within ServerWindow's thread (messaging ?)
 	status_t status;
 	do {
 		// TODO: The timeout is 3000000 usecs (3 seconds) on beos.
 		// Test, but I think half a second is enough.
-		status = acquire_sem_etc(fDirectWindowData->direct_sem_ack, 1, B_TIMEOUT, 500000);
+		status = acquire_sem_etc(fDirectWindowData->sem_ack, 1, B_TIMEOUT, 500000);
 	} while (status == B_INTERRUPTED);
 
 	if (status < B_OK) {

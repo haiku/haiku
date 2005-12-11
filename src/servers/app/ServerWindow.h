@@ -39,7 +39,7 @@ class WindowLayer;
 class Workspace;
 class ViewLayer;
 class ServerPicture;
-struct dw_data;
+struct direct_window_data;
 struct window_info;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -96,8 +96,8 @@ public:
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
 			
-			void				HandleDirectConnection(int bufferState = -1,
-									int driverState = -1);
+			void				HandleDirectConnection(int32 bufferState = -1,
+									int32 driverState = -1);
 
 	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
@@ -158,7 +158,7 @@ private:
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
 			
-			dw_data*			fDirectWindowData;
+			direct_window_data*	fDirectWindowData;
 };
 
 #endif	// SERVER_WINDOW_H

@@ -430,18 +430,36 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 
 		case AS_GET_WINDOW_LIST:
+		{
 			team_id team;
 			link.Read<team_id>(&team);
 
 			fDesktop->WriteWindowList(team, fLink.Sender());
 			break;
+		}
 
 		case AS_GET_WINDOW_INFO:
+		{
 			int32 serverToken;
 			link.Read<int32>(&serverToken);
 
 			fDesktop->WriteWindowInfo(serverToken, fLink.Sender());
 			break;
+		}
+
+		case AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE:
+		{
+			// TODO: How to determine this?
+			screen_id id;
+			if (link.Read<screen_id>(&id) == B_OK) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<bool>(true);
+			} else
+				fLink.StartMessage(B_BAD_VALUE);
+
+			fLink.Flush();
+			break;
+		}
 
 		case AS_UPDATE_COLORS:
 		{

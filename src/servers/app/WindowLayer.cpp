@@ -187,7 +187,7 @@ WindowLayer::ReadUnlockWindows()
 	}
 }
 
-// SetClipping
+
 void
 WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 {
@@ -201,10 +201,11 @@ WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 	fVisibleContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	// TODO: Window()->HandleDirectConnection(B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
+	// TODO: review this!
+	fWindow->HandleDirectConnection(B_DIRECT_MODIFY | B_CLIPPING_MODIFIED);
 }
 
-// GetFullRegion
+
 void
 WindowLayer::GetFullRegion(BRegion* region)
 {
