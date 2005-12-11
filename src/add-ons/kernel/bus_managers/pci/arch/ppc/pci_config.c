@@ -1,5 +1,7 @@
 #include "pci_priv.h"
 
+int	gMaxBusDevices;
+
 status_t
 pci_config_init()
 {
