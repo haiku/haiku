@@ -384,6 +384,12 @@ rule FStandardHeaders
 	}
 
 	# The compiler dependent headers.
+	# TODO: Actually these directory should be listed before the posix and cpp
+	# directories, since the headers found here are supposed to override some of
+	# the headers in the latter directories. Unfortunately some of our headers
+	# are a bit messy (e.g. stddef.h) and using the compiler headers causes
+	# trouble when using different compilers (gcc 2 vs. gcc 4) and different
+	# host platforms (BeOS vs. Linux).
 	headers += $(HAIKU_GCC_HEADERS_DIR) ;
 
 	return $(headers) ;
