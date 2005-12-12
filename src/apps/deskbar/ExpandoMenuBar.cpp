@@ -69,7 +69,7 @@ BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
 TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 	bool vertical, bool drawLabel)
-	:	BMenuBar(frame, name, B_FOLLOW_NONE,
+	: BMenuBar(frame, name, B_FOLLOW_NONE,
 			vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW, vertical),
 	fVertical(vertical),
 	fOverflow(false),
@@ -136,8 +136,8 @@ TExpandoMenuBar::AttachedToWindow()
 		BarTeamInfo *barInfo = (BarTeamInfo *)teamList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
 			&& strcasecmp(barInfo->sig, kDeskbarSignature) != 0) {
-			if ((settings->trackerAlwaysFirst)
-				&& (strcmp(barInfo->sig, kTrackerSignature)) == 0) {
+			if (settings->trackerAlwaysFirst
+				&& !strcmp(barInfo->sig, kTrackerSignature)) {
 				AddItem(new TTeamMenuItem(barInfo->teams, barInfo->icon, 
 					barInfo->name, barInfo->sig, width, height,
 					fDrawLabel, fVertical), fFirstApp);
@@ -206,9 +206,9 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 			BBitmap *icon = NULL;
 			message->FindPointer("icon", (void **)&icon);
 
-			const char *sig;
-			if (message->FindString("sig", &sig) == B_OK
-				&&strcasecmp(sig, kDeskbarSignature) == 0) {
+			const char *signature;
+			if (message->FindString("sig", &signature) == B_OK
+				&&strcasecmp(signature, kDeskbarSignature) == 0) {
 				delete teams;
 				delete icon;
 				break;
@@ -225,7 +225,7 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 			const char *name = NULL;
 			message->FindString("name", &name);
 
-			AddTeam(teams, icon, strdup(name), strdup(sig));
+			AddTeam(teams, icon, strdup(name), strdup(signature));
 			break;
 		}
 
@@ -472,31 +472,31 @@ TExpandoMenuBar::ItemAtPoint(BPoint point)
 
 
 void
-TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *sig)
+TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature)
 {
 	float itemWidth = fVertical ? Frame().Width() : kMinimumWindowWidth;
 	float itemHeight = -1.0f;
 
 	desk_settings *settings = ((TBarApp *)be_app)->Settings();
-	TTeamMenuItem *item = new TTeamMenuItem(team, icon, name, sig, itemWidth,
+	TTeamMenuItem *item = new TTeamMenuItem(team, icon, name, signature, itemWidth,
 		itemHeight, fDrawLabel, fVertical);
 
-	if (settings->trackerAlwaysFirst && !strcmp( sig, kTrackerSignature)) {
+	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature)) {
 		AddItem(item, fFirstApp);
 	} else if (settings->sortRunningApps) {
+		TTeamMenuItem *teamItem = dynamic_cast<TTeamMenuItem *>(ItemAt(fFirstApp));
 		int32 firstApp = fFirstApp;
 
 		// if Tracker should always be the first item, we need to skip it
 		// when sorting in the current item
-		if ((settings->trackerAlwaysFirst)
-			&& (strcmp(static_cast<TTeamMenuItem *>(ItemAt(fFirstApp))->Signature(),
-					kTrackerSignature) == 0)) {
+		if (settings->trackerAlwaysFirst && teamItem != NULL
+			&& !strcmp(teamItem->Signature(), kTrackerSignature)) {
 			firstApp++;
 		}
 
 		int32 count = CountItems(), i;
 		for (i = firstApp; i < count; i++) {
-			TTeamMenuItem *teamItem = dynamic_cast<TTeamMenuItem *>(ItemAt(i));
+			teamItem = dynamic_cast<TTeamMenuItem *>(ItemAt(i));
 			if (teamItem != NULL && strcasecmp(teamItem->Name(), name) > 0) {
 				AddItem(item, i);
 				break;
@@ -521,13 +521,13 @@ TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *sig)
 
 
 void
-TExpandoMenuBar::AddTeam(team_id team, const char *sig)
+TExpandoMenuBar::AddTeam(team_id team, const char *signature)
 {
 	int32 count = CountItems();
 	for (int32 i = fFirstApp; i < count; i++) {
 		// Only add to team menu items
 		if (TTeamMenuItem *item = dynamic_cast<TTeamMenuItem *>(ItemAt(i))) {
-			if (strcasecmp(item->Signature(), sig) == 0) {
+			if (strcasecmp(item->Signature(), signature) == 0) {
 				if (!(item->Teams()->HasItem((void *)team)))
 					item->Teams()->AddItem((void *)team);
 
