@@ -624,7 +624,7 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 		// Until the message is processed in the window
 		// thread, the desktop thread can add parts to
 		// the region as it likes.
-		ServerWindow()->PostMessage(AS_REDRAW);
+		ServerWindow()->RequestRedraw();
 	}
 
 	// this is executed from the desktop thread

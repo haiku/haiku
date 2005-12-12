@@ -351,6 +351,18 @@ fDesktop->LockSingleWindow();
 
 
 void
+ServerWindow::RequestRedraw()
+{
+	PostMessage(AS_REDRAW, 0);
+		// we don't care if this fails - it's only a notification, and if
+		// it fails, there are obviously enough messages in the queue
+		// already
+
+	atomic_add(&fRedrawRequested, 1);
+}
+
+
+void
 ServerWindow::SetTitle(const char* newTitle)
 {
 	char* oldTitle = fTitle;
@@ -862,9 +874,8 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 
 		case AS_REDRAW:
-			// command issued by Desktop only (via WindowLayer::ProcessDirtyRegion())
-			DTRACE(("ServerWindow %s: AS_REDRAW\n", Title()));
-			fWindowLayer->RedrawDirtyRegion();
+			// Nothing to do here - the redraws are actually handled by looking
+			// at the fRedrawRequested member variable in _MessageLooper().
 			break;
 
 		case AS_BEGIN_UPDATE:
@@ -2169,6 +2180,10 @@ ServerWindow::_MessageLooper()
 				CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 		} else {
 			fDesktop->LockSingleWindow();
+
+			if (atomic_and(&fRedrawRequested, 0) != 0)
+				fWindowLayer->RedrawDirtyRegion();
+
 			_DispatchMessage(code, receiver);
 			fDesktop->UnlockSingleWindow();
 		}

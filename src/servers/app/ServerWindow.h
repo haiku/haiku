@@ -102,6 +102,8 @@ public:
 	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
 
+			void				RequestRedraw();
+
 			void				GetInfo(window_info& info);
 
 private:
@@ -150,6 +152,7 @@ private:
 			::EventTarget		fEventTarget;
 
 			BMessage			fClientViewsWithInvalidCoords;
+			int32				fRedrawRequested;
 
 			int32				fServerToken;
 			int32				fClientToken;
