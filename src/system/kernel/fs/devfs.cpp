@@ -14,6 +14,7 @@
 #include <pnp_devfs.h>
 #include <NodeMonitor.h>
 
+#include <boot_device.h>
 #include <kdevice_manager.h>
 #include <KPath.h>
 #include <vfs.h>
@@ -135,9 +136,6 @@ static status_t publish_device(struct devfs *fs, const char *path,
 					device_node_info *deviceNode, pnp_devfs_driver_info *info,
 					driver_entry *driver, device_hooks *ops);
 
-
-// The boot device, if already present
-extern dev_t gBootDevice;
 
 /* the one and only allowed devfs instance */
 static struct devfs *sDeviceFileSystem = NULL;

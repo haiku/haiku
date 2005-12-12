@@ -11,17 +11,18 @@
  */
 
 
+#include <boot_device.h>
+#include <elf.h>
 #include <kmodule.h>
 #include <lock.h>
-#include <elf.h>
-#include <vfs.h>
 #include <util/khash.h>
+#include <vfs.h>
 #include <boot/elf.h>
 
-#include <sys/stat.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
 
 
 //#define TRACE_MODULE
@@ -159,8 +160,6 @@ static const char * const sModulePaths[] = {
  */
 static hash_table *sModuleImagesHash;
 static hash_table *sModulesHash;
-
-extern dev_t gBootDevice;
 
 
 /** calculates hash for a module using its name */

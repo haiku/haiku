@@ -15,14 +15,16 @@
 
 #include "device_manager_private.h"
 
-#include <KernelExport.h>
-#include <image.h>
+#include <boot_device.h>
 #include <elf.h>
 #include <kmodule.h>
 #include <fs/KPath.h>
 #include <fs/devfs.h>
 #include <util/Stack.h>
 #include <util/kernel_cpp.h>
+
+#include <image.h>
+#include <KernelExport.h>
 
 #include <stdlib.h>
 #include <dirent.h>
@@ -70,8 +72,6 @@ static const char *kModulePaths[] = {
 	NULL
 };
 
-extern dev_t gBootDevice;
-	// from fs/vfs.cpp
 
 class DirectoryIterator {
 	public:
