@@ -404,6 +404,10 @@ sem_timeout(timer *data)
 		// this thread was not waiting on this semaphore
 		panic("sem_timeout: thid %ld was trying to wait on sem %ld which doesn't exist!\n",
 			args->blocked_thread, args->blocked_sem_id);
+
+		RELEASE_SEM_LOCK(sSems[slot]);
+		restore_interrupts(state);
+		return B_HANDLED_INTERRUPT;
 	}
 
 	clear_thread_queue(&wakeupQueue);
