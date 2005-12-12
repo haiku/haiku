@@ -162,26 +162,11 @@ ServerApp::~ServerApp()
 		if (MessageLooper::WaitForQuit(deathSemaphore, 3000000) != B_OK) {
 			// This really shouldn't happen, as it shows we're buggy
 #if __HAIKU__
-			syslog(LOG_ERR, "ServerApp %s needs to kill some server windows!\n",
+			syslog(LOG_ERR, "ServerApp %s: ServerWindow doesn't respond!\n",
 				Signature());
 #else
-			printf("ServerApp %s needs to kill some server windows!\n",
-				Signature());
+			debugger("ServerWindow doesn't respond!\n");
 #endif
-
-			// there still seem to be some windows left - kill them!
-			fWindowListLock.Lock();
-
-			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-				ServerWindow* window = fWindowList.ItemAt(i);
-				printf("kill window \"%s\"\n", window->Title());
-
-				kill_thread(window->Thread());
-				window->Hide();
-				delete window;
-			}
-
-			fWindowListLock.Unlock();
 		}
 		fWindowListLock.Lock();
 	}
