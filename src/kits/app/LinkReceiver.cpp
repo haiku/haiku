@@ -102,6 +102,13 @@ LinkReceiver::GetNextMessage(int32 &code, bigtime_t timeout)
 
 
 bool
+LinkReceiver::HasMessages() const
+{
+	return port_count(fReceivePort) > 0;
+}
+
+
+bool
 LinkReceiver::NeedsReply() const
 {
 	if (fReplySize == 0)

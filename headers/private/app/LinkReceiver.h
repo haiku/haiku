@@ -27,6 +27,7 @@ class LinkReceiver {
 		port_id	Port(void) { return fReceivePort; }
 
 		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		bool HasMessages() const;
 		bool NeedsReply() const;
 		int32 Code() const;
 
