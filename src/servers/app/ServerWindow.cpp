@@ -2168,39 +2168,69 @@ ServerWindow::_MessageLooper()
 			printf("ServerWindow %s: lock acquisition took %Ld usecs\n", Title(), diff);
 #endif
 
-		if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
-			// this means the client has been killed
-			STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
-				Title()));
+		int32 messagesProcessed = 0;
+		bool lockedDesktop = false;
 
-			quitLoop = true;
+		while (true) {
+			if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
+				// this means the client has been killed
+				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
+					Title()));
 
-			// ServerWindow's destructor takes care of pulling this object off the desktop.
-			if (!fWindowLayer->IsHidden())
-				CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
-		} else {
-			fDesktop->LockSingleWindow();
+				if (lockedDesktop)
+					fDesktop->UnlockSingleWindow();
+
+				quitLoop = true;
+
+				// ServerWindow's destructor takes care of pulling this object off the desktop.
+				if (!fWindowLayer->IsHidden())
+					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
+				
+				break;
+			}
+
+			if (!lockedDesktop) {
+				// only lock it once
+				fDesktop->LockSingleWindow();
+				lockedDesktop = true;
+			}
 
 			if (atomic_and(&fRedrawRequested, 0) != 0)
 				fWindowLayer->RedrawDirtyRegion();
 
 			_DispatchMessage(code, receiver);
-			fDesktop->UnlockSingleWindow();
-		}
 
 #ifdef PROFILE_MESSAGE_LOOP
-		if (code >= 0 && code < AS_LAST_CODE) {
-			diff = system_time() - start;
-			atomic_add(&sMessageProfile[code].count, 1);
+			if (code >= 0 && code < AS_LAST_CODE) {
+				diff = system_time() - start;
+				atomic_add(&sMessageProfile[code].count, 1);
 #ifdef __HAIKU__
-			atomic_add64(&sMessageProfile[code].time, diff);
+				atomic_add64(&sMessageProfile[code].time, diff);
 #else
-			sMessageProfile[code].time += diff;
+				sMessageProfile[code].time += diff;
 #endif
-			if (diff > 10000)
-				printf("ServerWindow %s: message %ld took %Ld usecs\n", Title(), code, diff);
+				if (diff > 10000)
+					printf("ServerWindow %s: message %ld took %Ld usecs\n", Title(), code, diff);
+			}
+#endif
+
+			// only process up to 70 waiting messages at once (we have the Desktop locked)
+			if (!receiver.HasMessages() || ++messagesProcessed > 70) {
+				fDesktop->UnlockSingleWindow();
+				break;
+			}
+
+			status_t status = receiver.GetNextMessage(code);
+			if (status < B_OK) {
+				// that shouldn't happen, it's our port
+				printf("Someone deleted our message port!\n");
+				fDesktop->UnlockSingleWindow();
+
+				// try to let our client die happily
+				NotifyQuitRequested();
+				break;
+			}
 		}
-#endif
 
 		Unlock();
 	}
