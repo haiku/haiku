@@ -45,6 +45,17 @@ x86_get_main_tss(void)
 
 
 static void
+load_tss(void *data, int cpu)
+{
+	short seg = ((TSS_BASE_SEGMENT + cpu) << 3) | DPL_KERNEL;
+	asm("movw  %0, %%ax;"
+		"ltr %%ax;" : : "r" (seg) : "eax");
+
+	sIsTSSLoaded[cpu] = true;
+}
+
+
+static void
 init_double_fault(int cpuNum)
 {
 	/* set up the double fault tss */
@@ -158,15 +169,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 		// initialize TSS
 		init_double_fault(i);
 	}
-	
-	/* TODO: Axel - call on all CPUs */
-	{
-		short seg = ((TSS_BASE_SEGMENT + 0) << 3) | DPL_KERNEL;
-		asm("movw  %0, %%ax;"
-			"ltr %%ax;" : : "r" (seg) : "eax");
-		sIsTSSLoaded[0] = true;
-	}
-	
+
+	call_all_cpus(&load_tss, NULL);
+
 	x86_set_task_gate(8, DOUBLE_FAULT_TSS_BASE_SEGMENT << 3);
 
 	// setup TLS descriptors (one for every CPU)
@@ -175,7 +180,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
-	
+
 	return B_OK;
 }
 
