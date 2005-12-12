@@ -104,7 +104,8 @@ LinkReceiver::GetNextMessage(int32 &code, bigtime_t timeout)
 bool
 LinkReceiver::HasMessages() const
 {
-	return port_count(fReceivePort) > 0;
+	return fDataSize - (fRecvStart + fReplySize) > 0
+		|| port_count(fReceivePort) > 0;
 }
 
 
