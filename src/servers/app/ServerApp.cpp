@@ -432,20 +432,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE:
-		{
-			// TODO: How to determine this?
-			screen_id id;
-			if (link.Read<screen_id>(&id) == B_OK) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<bool>(true);
-			} else
-				fLink.StartMessage(B_BAD_VALUE);
-
-			fLink.Flush();
-			break;
-		}
-
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 

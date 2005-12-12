@@ -9,6 +9,7 @@
 
 
 #include <DirectWindow.h>
+#include <Screen.h>
 
 #include <clipping.h>
 #include <DirectWindowPrivate.h>
@@ -17,8 +18,8 @@
 #	include <R5_AppServerLink.h>
 #	include <R5_Session.h>
 #	define DW_GET_SYNC_DATA		0x880
-#	define DW_SET_FULLSCREEN		0x881
-#	define DW_SUPPORTS_WINDOW_MODE 0xF2C
+#	define DW_SET_FULLSCREEN	0x881
+#	define DW_GET_SCREEN_FLAGS	0xF2C
 #else
 #	include <AppServerLink.h>
 #	include <ServerProtocol.h>
@@ -318,22 +319,18 @@ bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
 #ifdef HAIKU_TARGET_PLATFORM_BEOS
-	int32 result = 0;
+	int32 flags = 0;
 	_BAppServerLink_ link;
-	link.fSession->swrite_l(DW_SUPPORTS_WINDOW_MODE);
+	link.fSession->swrite_l(DW_GET_SCREEN_FLAGS);
 	link.fSession->swrite_l(id.id);
 	link.fSession->sync();
-	link.fSession->sread(sizeof(result), &result);
-	return result & true;
+	link.fSession->sread(sizeof(flags), &flags);
+	return flags & B_PARALLEL_ACCESS;
 #else
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_DIRECT_WINDOW_SUPPORTS_WINDOW_MODE);
-	link.Attach<screen_id>(id);
-
-	int32 reply;
-	if (link.FlushWithReply(reply) == B_OK
-		&& reply == B_OK)
-		return true;
+	display_mode mode;
+	status_t status = BScreen(id).GetMode(&mode);
+	if (status == B_OK)
+		return mode.flags & B_PARALLEL_ACCESS;
 #endif
 
 	return false;
