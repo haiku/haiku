@@ -75,6 +75,10 @@ AddFilesToHaikuImage beos system add-ons kernel generic
 	: block_io fast_log ide_adapter locked_pool scsi_periph ;
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel ;
 
+if $(TARGET_ARCH) = x86 {
+	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
+}
+
 # drivers
 AddDriversToHaikuImage				: console dprintf keyboard null random
 									  <driver>tty zero ;
