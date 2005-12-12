@@ -9,12 +9,21 @@
 #define _KERNEL_ARCH_x86_CPU_H
 
 
-#include <SupportDefs.h>
+#include <module.h>
 #include <arch/x86/descriptors.h>
 
 
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_APIC_BASE	0x1b
+
+
+typedef struct x86_cpu_module_info {
+	module_info	info;
+	uint32		(*count_mtrrs)(void);
+	status_t	(*set_mtrr)(uint32 index, addr_t base, addr_t length, uint32 type);
+	status_t	(*unset_mtrr)(uint32 index);
+} x86_cpu_module_info;
+
 
 struct tss {
 	uint16 prev_task;
@@ -78,9 +87,12 @@ void i386_frstor(const void *fpu_state);
 void i386_fxrstor(const void *fpu_state);
 void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
-uint64 x86_read_msr(uint32 register);
-void x86_write_msr(uint32 register, uint64 value);
+uint64 x86_read_msr(uint32 registerNumber);
+void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_set_task_gate(int32 n, int32 segment);
+uint32 x86_count_mtrrs(void);
+status_t x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type);
+status_t x86_unset_mtrr(uint32 index);
 struct tss *x86_get_main_tss(void);
 
 #define read_ebp(value) \

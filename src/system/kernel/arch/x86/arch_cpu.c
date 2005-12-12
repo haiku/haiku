@@ -7,11 +7,13 @@
  */
 
 
-#include <arch/cpu.h>
-#include <vm.h>
+#include <boot_device.h>
 #include <smp.h>
-#include <arch/x86/selector.h>
 #include <tls.h>
+#include <vm.h>
+
+#include <arch/cpu.h>
+#include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 
 #include "interrupts.h"
@@ -34,6 +36,8 @@ segment_descriptor *gGDT = NULL;
 //static struct tss sDoubleFaultTSS;
 static uint32 sDoubleFaultStack[10240];
 
+static x86_cpu_module_info *sCpuModule;
+
 
 struct tss *
 x86_get_main_tss(void)
@@ -41,6 +45,80 @@ x86_get_main_tss(void)
 	int cpuNum = smp_get_current_cpu();
 	
 	return sTSS[cpuNum];
+}
+
+
+static x86_cpu_module_info *
+load_cpu_module(void)
+{
+	if (sCpuModule != NULL)
+		return sCpuModule;
+
+	// find model specific CPU module
+
+	if (gBootDevice > 0) {
+		void *cookie = open_module_list("cpu");
+
+		while (true) {
+			char name[B_FILE_NAME_LENGTH];
+			size_t nameLength = sizeof(name);
+
+			if (read_next_module_name(cookie, name, &nameLength) != B_OK
+				|| get_module(name, (module_info **)&sCpuModule) == B_OK)
+				break;
+		}
+
+		close_module_list(cookie);
+	} else {
+		// we're in early boot mode, let's use get_loaded_module
+
+		uint32 cookie = 0;
+
+		while (true) {
+			char name[B_FILE_NAME_LENGTH];
+			size_t nameLength = sizeof(name);
+
+			if (get_next_loaded_module_name(&cookie, name, &nameLength) != B_OK)
+				break;
+			if (strncmp(name, "cpu", 3))
+				continue;
+
+			if (get_module(name, (module_info **)&sCpuModule) == B_OK)
+				break;
+		}
+	}
+
+	return sCpuModule;	
+}
+
+
+uint32
+x86_count_mtrrs(void)
+{
+	if (load_cpu_module() == NULL)
+		return 0;
+
+	return sCpuModule->count_mtrrs();
+}
+
+
+status_t
+x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
+{
+	if (load_cpu_module() == NULL)
+		return B_UNSUPPORTED;
+
+	return sCpuModule->set_mtrr(index, base, length, type);
+}
+
+
+status_t
+x86_unset_mtrr(uint32 index)
+{
+	if (load_cpu_module() == NULL)
+		return B_UNSUPPORTED;
+
+	return sCpuModule->unset_mtrr(index);
 }
 
 

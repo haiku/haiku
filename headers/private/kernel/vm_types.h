@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -11,6 +11,7 @@
 
 #include <kernel.h>
 #include <sys/uio.h>
+#include <arch/vm_types.h>
 #include <arch/vm_translation_map.h>
 
 
@@ -84,6 +85,7 @@ typedef struct vm_area {
 	uint32				protection;
 	uint32				wiring;
 	int32				ref_count;
+	struct arch_vm_memory_type memory_type;
 
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;

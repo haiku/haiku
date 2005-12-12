@@ -19,18 +19,14 @@
 typedef union cpu_ent {
 	struct {
 		int cpu_num;
-		
+
 		// thread.c: used to force a reschedule at quantum expiration time
 		int preempted;
 		timer quantum_timer;
 	} info;
-	// ToDo: align manually on CPU cache lines if possible
-	uint32 align[16];
-} cpu_ent;
+} cpu_ent __attribute__((aligned(64)));
 
-/**
- * Defined in core/cpu.c
- */
+
 extern cpu_ent cpu[MAX_BOOT_CPUS];
 
 

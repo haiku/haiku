@@ -172,6 +172,7 @@ _vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring
 	area->cache_next = area->cache_prev = NULL;
 	area->hash_next = NULL;
 
+	arch_vm_init_area(area);
 	return area;
 }
 
@@ -484,10 +485,11 @@ insert_area(vm_address_space *addressSpace, void **_address,
 
 	status = find_and_insert_area_slot(&addressSpace->virtual_map, searchBase, size,
 				searchEnd, addressSpec, area);
-	if (status == B_OK)
+	if (status == B_OK) {
 		// ToDo: do we have to do anything about B_ANY_KERNEL_ADDRESS
 		//		vs. B_ANY_KERNEL_BLOCK_ADDRESS here?
 		*_address = (void *)area->base;
+	}
 
 	return status;
 }
@@ -804,7 +806,8 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	}
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, address, 0, size, addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
+	err = map_backing_store(aspace, store, address, 0, size, addressSpec, wiring,
+		protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
 	if (err < 0) {
 		vm_put_aspace(aspace);
@@ -975,8 +978,16 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	status = map_backing_store(aspace, store, _address, 0, size, addressSpec, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
+	status = map_backing_store(aspace, store, _address, 0, size,
+		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
+
+	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
+		// set requested memory type
+		status = arch_vm_set_memory_type(area, addressSpec & B_MTR_MASK);
+		if (status < B_OK)
+			vm_put_area(area);
+	}
 
 	if (status >= B_OK) {
 		// make sure our area is mapped in completely
@@ -1321,6 +1332,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 
 	aspace = area->aspace;
 
+	arch_vm_unset_memory_type(area);
 	remove_area_from_virtual_map(aspace, area, aspaceLocked);
 
 	vm_cache_remove_area(area->cache_ref, area);
