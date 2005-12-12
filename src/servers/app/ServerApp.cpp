@@ -2043,13 +2043,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&makedefault);
 
 			status_t status = B_ERROR;
-			if (fDesktop->WriteLockWindows()) {
+			if (fDesktop->LockAllWindows()) {
 				status = fDesktop->ScreenAt(0)->SetMode(mode);
 				if (status == B_OK) {
 					gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
 					fDesktop->ScreenChanged(fDesktop->ScreenAt(0));
 				}
-				fDesktop->WriteUnlockWindows();
+				fDesktop->UnlockAllWindows();
 			}
 
 			fLink.StartMessage(status);

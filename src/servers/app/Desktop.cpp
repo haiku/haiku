@@ -144,7 +144,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 
 	bigtime_t now = system_time();
 
-	if (!fDesktop->ReadLockWindows())
+	if (!fDesktop->LockSingleWindow())
 		return B_DISPATCH_MESSAGE;
 
 	EventTarget* focus = NULL;
@@ -167,7 +167,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		fLastFocus = focus;
 	}	
 
-	fDesktop->ReadUnlockWindows();
+	fDesktop->UnlockSingleWindow();
 
 	// we always allow to switch focus after the enter key has pressed
 	if (key == B_ENTER)
@@ -196,7 +196,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 	if (message->FindPoint("where", &where) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	if (!fDesktop->WriteLockWindows())
+	if (!fDesktop->LockAllWindows())
 		return B_DISPATCH_MESSAGE;
 
 	WindowLayer* window = fDesktop->MouseEventWindow();
@@ -227,7 +227,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 	} else
 		*_target = NULL;
 
-	fDesktop->WriteUnlockWindows();
+	fDesktop->UnlockAllWindows();
 
 	return B_DISPATCH_MESSAGE;
 }
@@ -574,11 +574,11 @@ Desktop::UpdateWorkspaces()
 void
 Desktop::SetWorkspace(int32 index)
 {
-	WriteLockWindows();
+	LockAllWindows();
 	DesktopSettings settings(this);
 
 	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace) {
-		WriteUnlockWindows();
+		UnlockAllWindows();
 		return;
 	}
 
@@ -683,7 +683,7 @@ Desktop::SetWorkspace(int32 index)
 	_WindowChanged(NULL);
 	MarkDirty(dirty);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -876,7 +876,7 @@ Desktop::_WindowChanged(WindowLayer* window)
 void
 Desktop::SetFocusWindow(WindowLayer* focus)
 {
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	bool hasModal = _WindowHasModal(focus);
@@ -886,7 +886,7 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
 		&& !hasModal) {
 		// the window that is supposed to get focus already has focus
-		WriteUnlockWindows();
+		UnlockAllWindows();
 		return;
 	}
 
@@ -915,7 +915,7 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 	if (focus != NULL)
 		focus->SetFocus(true);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -983,13 +983,13 @@ Desktop::ActivateWindow(WindowLayer* window)
 	// TODO: support B_NOT_ANCHORED_ON_ACTIVATE
 	// TODO: take care about floating windows
 
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	if (window == FrontWindow()) {
 		SetFocusWindow(window);
 
-		WriteUnlockWindows();
+		UnlockAllWindows();
 		return;
 	}
 
@@ -1026,14 +1026,14 @@ Desktop::ActivateWindow(WindowLayer* window)
 	_BringWindowsToFront(windows, kWorkingList, true);
 	SetFocusWindow(window);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 {
-	if (window == BackWindow() || !WriteLockWindows())
+	if (window == BackWindow() || !LockAllWindows())
 		return;
 
 	// Is this a valid behindOf window?
@@ -1065,7 +1065,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	SetFocusWindow(FrontWindow());
 	//_WindowsChanged();
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1075,7 +1075,7 @@ Desktop::ShowWindow(WindowLayer* window)
 	if (!window->IsHidden())
 		return;
 
-	WriteLockWindows();
+	LockAllWindows();
 
 	window->SetHidden(false);
 
@@ -1085,14 +1085,14 @@ Desktop::ShowWindow(WindowLayer* window)
 		ActivateWindow(window);
 	} else {
 		// then we don't need to send the fake mouse event either
-		WriteUnlockWindows();
+		UnlockAllWindows();
 		return;
 	}
 
 	if (WorkspacesLayer* layer = dynamic_cast<WorkspacesLayer*>(window->TopLayer()))
 		fWorkspacesLayer = layer;
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 
 	// If the mouse cursor is directly over the newly visible window,
 	// we'll send a fake mouse moved message to the window, so that
@@ -1104,14 +1104,14 @@ Desktop::ShowWindow(WindowLayer* window)
 
 	int32 viewToken = B_NULL_TOKEN;
 
-	WriteLockWindows();
+	LockAllWindows();
 
 	if (WindowAt(where) == window) {
 		ViewLayer* view = window->ViewAt(where);
 		if (view != NULL)
 			viewToken = view->Token();
 	}
-	WriteUnlockWindows();
+	UnlockAllWindows();
 
 	if (viewToken != B_NULL_TOKEN)
 		EventDispatcher().SendFakeMouseMoved(window->EventTarget(), viewToken);
@@ -1124,7 +1124,7 @@ Desktop::HideWindow(WindowLayer* window)
 	if (window->IsHidden())
 		return;
 
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	window->SetHidden(true);
@@ -1141,7 +1141,7 @@ Desktop::HideWindow(WindowLayer* window)
 	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
 		fWorkspacesLayer = NULL;
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1198,7 +1198,7 @@ Desktop::_HideWindow(WindowLayer* window)
 void
 Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 {
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	// the dirty region starts with the visible area of the window being moved
@@ -1234,14 +1234,14 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 	_SetBackground(background);
 	_WindowChanged(window);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 {
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	BRegion newDirtyRegion;
@@ -1261,7 +1261,7 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	_SetBackground(background);
 	_WindowChanged(window);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1309,7 +1309,7 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 {
 	// apply changes to the workspaces' window lists
 
-	WriteLockWindows();
+	LockAllWindows();
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		if (workspace_in_workspaces(i, oldWorkspaces)) {
@@ -1349,27 +1349,27 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 	// take care about modals and floating windows
 	_UpdateSubsetWorkspaces(window);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 {
-	WriteLockWindows();
+	LockAllWindows();
 
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::AddWindow(WindowLayer *window)
 {
-	WriteLockWindows();
+	LockAllWindows();
 
 	fAllWindows.AddWindow(window);
 	if (!window->IsNormal())
@@ -1384,14 +1384,14 @@ Desktop::AddWindow(WindowLayer *window)
 	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::RemoveWindow(WindowLayer *window)
 {
-	WriteLockWindows();
+	LockAllWindows();
 
 	if (!window->IsHidden())
 		HideWindow(window);
@@ -1401,7 +1401,7 @@ Desktop::RemoveWindow(WindowLayer *window)
 		fSubsetWindows.RemoveWindow(window);
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
-	WriteUnlockWindows();
+	UnlockAllWindows();
 
 	// make sure this window won't get any events anymore
 
@@ -1434,7 +1434,7 @@ Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
 	if (window->Look() == newLook)
 		return;
 
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	BRegion dirty;
@@ -1449,7 +1449,7 @@ Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
 
 	_TriggerWindowRedrawing(dirty);
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1459,7 +1459,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	if (window->Feel() == newFeel)
 		return;
 
-	WriteLockWindows();
+	LockAllWindows();
 
 	bool wasNormal = window->IsNormal();
 
@@ -1510,7 +1510,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	if (window == FocusWindow() && !window->IsVisible())
 		SetFocusWindow(FrontWindow());
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1520,7 +1520,7 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 	if (window->Flags() == newFlags)
 		return;
 
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	BRegion dirty;
@@ -1536,14 +1536,14 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 	_TriggerWindowRedrawing(dirty);
 
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
 void
 Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 {
-	if (!WriteLockWindows())
+	if (!LockAllWindows())
 		return;
 
 	BRegion dirty;
@@ -1557,7 +1557,7 @@ Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 		_TriggerWindowRedrawing(dirty);
 	}
 
-	WriteUnlockWindows();
+	UnlockAllWindows();
 }
 
 
@@ -1588,18 +1588,18 @@ Desktop::SetMouseEventWindow(WindowLayer* window)
 WindowLayer *
 Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 {
-	ReadLockWindows();
+	LockSingleWindow();
 
 	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientToken() == token
 			&& window->ServerWindow()->ClientTeam() == teamID) {
-			ReadUnlockWindows();
+			UnlockSingleWindow();
 			return window;
 		}
 	}
 
-	ReadUnlockWindows();
+	UnlockSingleWindow();
 	return NULL;
 }
 
@@ -1672,11 +1672,11 @@ Desktop::MarkDirty(BRegion& region)
 	if (region.CountRects() == 0)
 		return;
 
-	if (WriteLockWindows()) {
+	if (LockAllWindows()) {
 		// send redraw messages to all windows intersecting the dirty region
 		_TriggerWindowRedrawing(region);
 
-		WriteUnlockWindows();
+		UnlockAllWindows();
 	}
 }
 

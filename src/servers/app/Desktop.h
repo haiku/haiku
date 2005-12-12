@@ -137,17 +137,17 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
 
 #if USE_MULTI_LOCKER
-		bool					ReadLockWindows() { return fWindowLock.ReadLock(); }
-		void					ReadUnlockWindows() { fWindowLock.ReadUnlock(); }
+		bool					LockSingleWindow() { return fWindowLock.ReadLock(); }
+		void					UnlockSingleWindow() { fWindowLock.ReadUnlock(); }
 
-		bool					WriteLockWindows() { return fWindowLock.WriteLock(); }
-		void					WriteUnlockWindows() { fWindowLock.WriteUnlock(); }
+		bool					LockAllWindows() { return fWindowLock.WriteLock(); }
+		void					UnlockAllWindows() { fWindowLock.WriteUnlock(); }
 #else // USE_MULTI_LOCKER
-		bool					ReadLockWindows() { return fWindowLock.Lock(); }
-		void					ReadUnlockWindows() { fWindowLock.Unlock(); }
+		bool					LockSingleWindow() { return fWindowLock.Lock(); }
+		void					UnlockSingleWindow() { fWindowLock.Unlock(); }
 
-		bool					WriteLockWindows() { return fWindowLock.Lock(); }
-		void					WriteUnlockWindows() { fWindowLock.Unlock(); }
+		bool					LockAllWindows() { return fWindowLock.Lock(); }
+		void					UnlockAllWindows() { fWindowLock.Unlock(); }
 #endif // USE_MULTI_LOCKER
 
 		void					MarkDirty(BRegion& region);

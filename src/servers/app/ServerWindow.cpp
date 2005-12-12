@@ -320,9 +320,9 @@ ServerWindow::Show()
 
 // TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
 // instead of doing it from this thread.
-fDesktop->ReadUnlockWindows();
+fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindowLayer);
-fDesktop->ReadLockWindows();
+fDesktop->LockSingleWindow();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -344,9 +344,9 @@ ServerWindow::Hide()
 
 // TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
 // instead of doing it from this thread.
-fDesktop->ReadUnlockWindows();
+fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindowLayer);
-fDesktop->ReadLockWindows();
+fDesktop->LockSingleWindow();
 }
 
 
@@ -888,7 +888,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_GET_MOUSE:
 		{
-fDesktop->ReadUnlockWindows();
+fDesktop->UnlockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
 
 			// Returns
@@ -903,7 +903,7 @@ fDesktop->ReadUnlockWindows();
 			fLink.Attach<BPoint>(where);
 			fLink.Attach<int32>(buttons);
 			fLink.Flush();
-fDesktop->ReadLockWindows();
+fDesktop->LockSingleWindow();
 			break;
 		}
 
@@ -1080,7 +1080,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
-				fDesktop->ReadUnlockWindows();
+				fDesktop->UnlockSingleWindow();
 				fCurrentLayer->SetEventMask(eventMask, options);
 
 				if (eventMask != 0 || options != 0) {
@@ -1090,7 +1090,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
 						fCurrentLayer->Token());
 				}
-				fDesktop->ReadLockWindows();
+				fDesktop->LockSingleWindow();
 			}
 			break;
 		}
@@ -1101,7 +1101,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
-				fDesktop->ReadUnlockWindows();
+				fDesktop->UnlockSingleWindow();
 				if (eventMask != 0 || options != 0) {
 					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
 						fCurrentLayer->Token(), eventMask, options);
@@ -1109,7 +1109,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					fDesktop->EventDispatcher().RemoveTemporaryListener(EventTarget(),
 						fCurrentLayer->Token());
 				}
-				fDesktop->ReadLockWindows();
+				fDesktop->LockSingleWindow();
 			}
 
 			// TODO: support B_LOCK_WINDOW_FOCUS option in Desktop
@@ -1127,7 +1127,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			float offsetX = x - fCurrentLayer->Frame().left;
 			float offsetY = y - fCurrentLayer->Frame().top;
 
-			if (fDesktop->ReadLockWindows()) {
+			if (fDesktop->LockSingleWindow()) {
 				BRegion dirty;
 				fCurrentLayer->MoveBy(offsetX, offsetY, &dirty);
 
@@ -1140,7 +1140,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					parent->RebuildClipping(false);
 
 				fWindowLayer->MarkContentDirty(dirty);
-				fDesktop->ReadUnlockWindows();
+				fDesktop->UnlockSingleWindow();
 			}
 			break;
 		}
@@ -1156,7 +1156,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			float deltaWidth = newWidth - fCurrentLayer->Frame().Width();
 			float deltaHeight = newHeight - fCurrentLayer->Frame().Height();
 
-			if (fDesktop->ReadLockWindows()) {
+			if (fDesktop->LockSingleWindow()) {
 				BRegion dirty;
 				fCurrentLayer->ResizeBy(deltaWidth, deltaHeight, &dirty);
 
@@ -1165,13 +1165,13 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					parent->RebuildClipping(false);
 
 				fWindowLayer->MarkContentDirty(dirty);
-				fDesktop->ReadUnlockWindows();
+				fDesktop->UnlockSingleWindow();
 			}
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			fDesktop->ReadLockWindows();
+			fDesktop->LockSingleWindow();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
@@ -1181,7 +1181,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fLink.Attach<BRect>(fCurrentLayer->Bounds());
 			fLink.Flush();
 
-			fDesktop->ReadUnlockWindows();
+			fDesktop->UnlockSingleWindow();
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -1723,9 +1723,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 
 		default:
-			if (fDesktop->ReadLockWindows()) {
+			if (fDesktop->LockSingleWindow()) {
 				_DispatchViewDrawingMessage(code, link);
-				fDesktop->ReadUnlockWindows();
+				fDesktop->UnlockSingleWindow();
 			}
 			break;
 	}
@@ -2168,9 +2168,9 @@ ServerWindow::_MessageLooper()
 			if (!fWindowLayer->IsHidden())
 				CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 		} else {
-			fDesktop->ReadLockWindows();
+			fDesktop->LockSingleWindow();
 			_DispatchMessage(code, receiver);
-			fDesktop->ReadUnlockWindows();
+			fDesktop->UnlockSingleWindow();
 		}
 
 #ifdef PROFILE_MESSAGE_LOOP
@@ -2272,7 +2272,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		|| (!fDirectWindowData->started
 			&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START))
 		return;
-printf("bufferState = %ld\n", bufferState);
+
 	fDirectWindowData->started = true;
 
 	if (bufferState != -1)

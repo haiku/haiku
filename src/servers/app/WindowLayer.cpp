@@ -60,7 +60,7 @@
 // the update session, which tells us the cause of the update
 #define DELAYED_BACKGROUND_CLEARING 0
 
-// IMPORTANT: nested ReadLockWindows()s are not supported (by MultiLocker)
+// IMPORTANT: nested LockSingleWindow()s are not supported (by MultiLocker)
 
 using std::nothrow;
 
@@ -169,7 +169,7 @@ bool
 WindowLayer::ReadLockWindows()
 {
 	if (fDesktop)
-		fReadLocked = fDesktop->ReadLockWindows();
+		fReadLocked = fDesktop->LockSingleWindow();
 	else
 		fReadLocked = true;
 
@@ -182,7 +182,7 @@ WindowLayer::ReadUnlockWindows()
 {
 	if (fReadLocked) {
 		if (fDesktop)
-			fDesktop->ReadUnlockWindows();
+			fDesktop->UnlockSingleWindow();
 		fReadLocked = false;
 	}
 }
@@ -425,13 +425,13 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 	if (!view || view == fTopLayer || (dx == 0 && dy == 0))
 		return;
 
-	if (fDesktop && fDesktop->ReadLockWindows()) {
+	if (fDesktop && fDesktop->LockSingleWindow()) {
 		BRegion dirty;
 		view->ScrollBy(dx, dy, &dirty);
 
 		MarkContentDirty(dirty);
 
-		fDesktop->ReadUnlockWindows();
+		fDesktop->UnlockSingleWindow();
 	}
 }
 
@@ -440,7 +440,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 void
 WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 {
-	if (!fHidden && fDesktop && fDesktop->ReadLockWindows()) {
+	if (!fHidden && fDesktop && fDesktop->LockSingleWindow()) {
 		BRegion newDirty(*region);
 
 		// clip the region to the visible contents at the
@@ -496,7 +496,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 		if (newDirty.CountRects() > 0)
 			ProcessDirtyRegion(newDirty);
 
-		fDesktop->ReadUnlockWindows();
+		fDesktop->UnlockSingleWindow();
 	}
 }
 
@@ -635,7 +635,7 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 void
 WindowLayer::RedrawDirtyRegion()
 {
-	if (!fDesktop || !fDesktop->ReadLockWindows())
+	if (!fDesktop || !fDesktop->LockSingleWindow())
 		return;
 
 	if (IsVisible()) {
@@ -652,7 +652,7 @@ WindowLayer::RedrawDirtyRegion()
 	// read lock for the whole time.
 	fDirtyRegion.MakeEmpty();
 
-	fDesktop->ReadUnlockWindows();
+	fDesktop->UnlockSingleWindow();
 }
 
 
@@ -675,11 +675,11 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 	// since this won't affect other windows, read locking
 	// is sufficient. If there was no dirty region before,
 	// an update message is triggered
-	if (!fHidden && fDesktop && fDesktop->ReadLockWindows()) {
+	if (!fHidden && fDesktop && fDesktop->LockSingleWindow()) {
 		regionOnScreen.IntersectWith(&VisibleContentRegion());
 		ProcessDirtyRegion(regionOnScreen);
 
-		fDesktop->ReadUnlockWindows();
+		fDesktop->UnlockSingleWindow();
 	}
 }
 
@@ -687,9 +687,9 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 void
 WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 {
-	if (layer && !fHidden && fDesktop && fDesktop->ReadLockWindows()) {
+	if (layer && !fHidden && fDesktop && fDesktop->LockSingleWindow()) {
 		if (!layer->IsVisible()) {
-			fDesktop->ReadUnlockWindows();
+			fDesktop->UnlockSingleWindow();
 			return;
 		}
 		if (!fContentRegionValid)
@@ -702,7 +702,7 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 		// properly cleared in _TriggerContentRedraw()
 		MarkContentDirty(layerRegion);
 
-		fDesktop->ReadUnlockWindows();
+		fDesktop->UnlockSingleWindow();
 	}
 }
 
@@ -1653,7 +1653,7 @@ WindowLayer::BeginUpdate()
 	// on the global clipping lock so that the internal
 	// dirty regions are not messed with from the Desktop thread
 	// and ServerWindow thread at the same time.
-	if (!fDesktop->ReadLockWindows())
+	if (!fDesktop->LockSingleWindow())
 		return;
 
 	if (fUpdateRequested && fCurrentUpdateSession.IsUsed()) {
@@ -1664,7 +1664,7 @@ WindowLayer::BeginUpdate()
 		fEffectiveDrawingRegionValid = false;
 	}
 
-	fDesktop->ReadUnlockWindows();
+	fDesktop->UnlockSingleWindow();
 }
 
 
@@ -1672,7 +1672,7 @@ void
 WindowLayer::EndUpdate()
 {
 	// NOTE: see comment in _BeginUpdate()
-	if (!fDesktop->ReadLockWindows())
+	if (!fDesktop->LockSingleWindow())
 		return;
 
 	if (fInUpdate) {
@@ -1688,7 +1688,7 @@ WindowLayer::EndUpdate()
 		fUpdateRequested = false;
 	}
 
-	fDesktop->ReadUnlockWindows();
+	fDesktop->UnlockSingleWindow();
 }
 
 
