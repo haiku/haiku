@@ -514,6 +514,8 @@ init_hardware(void)
 			|| info.device_id == INTEL_82801DB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801EB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801FB_AC97_DEVICE_ID
+			|| info.device_id == INTEL_82801GB_AC97_DEVICE_ID
+			|| info.device_id == INTEL_6300ESB_AC97_DEVICE_ID
 			))
 		|| (info.vendor_id == SIS_VENDOR_ID &&
 			(info.device_id == SIS_SI7012_AC97_DEVICE_ID
@@ -580,7 +582,9 @@ auich_setup(auich_dev * card)
 	card->config.type = 0;
 	if ((card->info.device_id == INTEL_82801DB_AC97_DEVICE_ID)
 		|| (card->info.device_id == INTEL_82801EB_AC97_DEVICE_ID)
-		|| (card->info.device_id == INTEL_82801FB_AC97_DEVICE_ID))
+		|| (card->info.device_id == INTEL_82801FB_AC97_DEVICE_ID)
+		|| (card->info.device_id == INTEL_82801GB_AC97_DEVICE_ID)
+		|| (card->info.device_id == INTEL_6300ESB_AC97_DEVICE_ID))
 		card->config.type |= TYPE_ICH4;
 	if (card->info.device_id == SIS_SI7012_AC97_DEVICE_ID)
 		card->config.type |= TYPE_SIS7012;
@@ -719,6 +723,8 @@ init_driver(void)
 			|| info.device_id == INTEL_82801DB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801EB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801FB_AC97_DEVICE_ID
+			|| info.device_id == INTEL_82801GB_AC97_DEVICE_ID
+			|| info.device_id == INTEL_6300ESB_AC97_DEVICE_ID
 			))
 		|| (info.vendor_id == SIS_VENDOR_ID &&
 			(info.device_id == SIS_SI7012_AC97_DEVICE_ID
