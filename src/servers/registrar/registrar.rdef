@@ -3,43 +3,27 @@
 **
 */
 
-/* BEOS:APP_SIG :
-   application:/x-vnd.obos.app-name
-   */
-
 resource app_signature "application/x-vnd.haiku-registrar";
 
-/* BEOS:APP_FLAGS :
-   00000000 = 							   SINGLE LAUNCH
-   00000001 = 							   MULTIPLE LAUNCH
-   00000002 = 							   EXCLUSIVE LAUNCH
-   00000004 = 			  BACKGROUND APP + SINGLE LAUNCH
-   00000005 = 			  BACKGROUND APP + MULTIPLE LAUNCH
-   00000006 = 			  BACKGROUND APP + EXCLUSIVE LAUNCH
-   00000008 = ARGV_ONLY + 				   SINGLE LAUNCH
-   00000009 = ARGV_ONLY + 				   MULTIPLE LAUNCH
-   0000000A = ARGV_ONLY + 				   EXCLUSIVE LAUNCH
-   0000000C = ARGV_ONLY + BACKGROUND APP + SINGLE LAUNCH
-   0000000D = ARGV_ONLY + BACKGROUND APP + MULTIPLE LAUNCH
-   0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
-   */
-
-resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
+	/* the registrar's application flags are actually
+	 * ignored.
+	 * The actually used flags are set in TRoster::Init().
+	 */
 
 resource app_version {
-
 	major  = 1, 
 	middle = 0,
 	minor  = 0,
-	
+
 	/* 0 = development	1 = alpha			2 = beta
 	   3 = gamma		4 = golden master	5 = final */
 	variety = 1,
-	
+
 	internal = 0,
-	
+
 	short_info = "registrar",
-	long_info = "OpenBeOS - registrar"
+	long_info = "registrar, Copyright 2005, Haiku Inc."
 };
 
 resource large_icon array {
