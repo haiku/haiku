@@ -82,11 +82,11 @@ MessageLooper::Quit()
 	\param code ID code of the message to post
 */
 status_t
-MessageLooper::PostMessage(int32 code)
+MessageLooper::PostMessage(int32 code, bigtime_t timeout)
 {
 	BPrivate::LinkSender link(MessagePort());
 	link.StartMessage(code);
-	return link.Flush();
+	return link.Flush(timeout);
 }
 
 
