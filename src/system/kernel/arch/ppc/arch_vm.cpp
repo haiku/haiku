@@ -112,3 +112,24 @@ arch_vm_supports_protection(uint32 protection)
 	return true;
 }
 
+
+void
+arch_vm_init_area(vm_area *area)
+{
+}
+
+
+void
+arch_vm_unset_memory_type(vm_area *area)
+{
+}
+
+
+status_t
+arch_vm_set_memory_type(vm_area *area, uint32 type)
+{
+	if (type == 0)
+		return B_OK;
+
+	return B_ERROR;
+}
