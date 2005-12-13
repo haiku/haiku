@@ -124,46 +124,49 @@ struct tss *x86_get_main_tss(void);
 #define invalidate_TLB(va) \
 	__asm__("invlpg (%0)" : : "r" (va))
 
+#define wbinvd() \
+	__asm__("wbinvd")
+
 #define out8(value,port) \
-__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
+	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
 
 #define out16(value,port) \
-__asm__ ("outw %%ax,%%dx" : : "a" (value), "d" (port))
+	__asm__ ("outw %%ax,%%dx" : : "a" (value), "d" (port))
 
 #define out32(value,port) \
-__asm__ ("outl %%eax,%%dx" : : "a" (value), "d" (port))
+	__asm__ ("outl %%eax,%%dx" : : "a" (value), "d" (port))
 
 #define in8(port) ({ \
-uint8 _v; \
-__asm__ volatile ("inb %%dx,%%al" : "=a" (_v) : "d" (port)); \
-_v; \
+	uint8 _v; \
+	__asm__ volatile ("inb %%dx,%%al" : "=a" (_v) : "d" (port)); \
+	_v; \
 })
 
 #define in16(port) ({ \
-uint16 _v; \
-__asm__ volatile ("inw %%dx,%%ax":"=a" (_v) : "d" (port)); \
-_v; \
+	uint16 _v; \
+	__asm__ volatile ("inw %%dx,%%ax":"=a" (_v) : "d" (port)); \
+	_v; \
 })
 
 #define in32(port) ({ \
-uint32 _v; \
-__asm__ volatile ("inl %%dx,%%eax":"=a" (_v) : "d" (port)); \
-_v; \
+	uint32 _v; \
+	__asm__ volatile ("inl %%dx,%%eax":"=a" (_v) : "d" (port)); \
+	_v; \
 })
 
 #define out8_p(value,port) \
-__asm__ ("outb %%al,%%dx\n" \
+	__asm__ ("outb %%al,%%dx\n" \
 		"\tjmp 1f\n" \
 		"1:\tjmp 1f\n" \
 		"1:" : : "a" (value), "d" (port))
 
 #define in8_p(port) ({ \
-uint8 _v; \
-__asm__ volatile ("inb %%dx,%%al\n" \
-	"\tjmp 1f\n" \
-	"1:\tjmp 1f\n" \
-	"1:" : "=a" (_v) : "d" (port)); \
-_v; \
+	uint8 _v; \
+	__asm__ volatile ("inb %%dx,%%al\n" \
+		"\tjmp 1f\n" \
+		"1:\tjmp 1f\n" \
+		"1:" : "=a" (_v) : "d" (port)); \
+	_v; \
 })
 
 extern segment_descriptor *gGDT;
