@@ -67,6 +67,8 @@ area_id vm_clone_area(aspace_id aid, const char *name, void **address,
 status_t vm_delete_area(aspace_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
 
+status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
+
 status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
 status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags);
 status_t vm_put_physical_page(addr_t vaddr);

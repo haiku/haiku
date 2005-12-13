@@ -439,6 +439,13 @@ debug_init_post_vm(kernel_args *args)
 }
 
 
+status_t
+debug_init_post_modules(struct kernel_args *args)
+{
+	return frame_buffer_console_init_post_modules(args);
+}
+
+
 //	#pragma mark - public API
 
 

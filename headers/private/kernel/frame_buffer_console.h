@@ -28,6 +28,7 @@ extern "C" {
 
 bool frame_buffer_console_available(void);
 status_t frame_buffer_console_init(struct kernel_args *args);
+status_t frame_buffer_console_init_post_modules(struct kernel_args *args);
 
 status_t _user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
 			int32 depth, int32 bytesPerRow);

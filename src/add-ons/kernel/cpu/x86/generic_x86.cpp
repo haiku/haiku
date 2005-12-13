@@ -12,9 +12,9 @@
 #include "via.h"
 
 
-module_info *gModules[] = {
+module_info *modules[] = {
 	(module_info *)&gIntelModule,
-	(module_info *)&gAMDModule,
-	(module_info *)&gVIAModule,
+//	(module_info *)&gAMDModule,
+//	(module_info *)&gVIAModule,
 	NULL
 };

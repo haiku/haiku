@@ -7,6 +7,7 @@
 #include <kernel.h>
 #include <lock.h>
 #include <boot_item.h>
+#include <vm.h>
 #include <fs/devfs.h>
 #include <boot/kernel_args.h>
 
@@ -110,7 +111,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 			+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
 		uint8 *color = get_palette_entry(foreground_color(attr));
 		uint8 *backgroundColor = get_palette_entry(background_color(attr));
-	
+
 		for (y = 0; y < CHAR_HEIGHT; y++) {
 			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
 			for (x = 0; x < CHAR_WIDTH; x++) {
@@ -122,7 +123,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 				}
 				bits >>= 1;
 			}
-	
+
 			base += sConsole.bytes_per_row;
 		}
 	} else {
@@ -423,6 +424,19 @@ frame_buffer_console_init(kernel_args *args)
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo, sizeof(frame_buffer_boot_info));
 
 	return B_OK;
+}
+
+
+status_t
+frame_buffer_console_init_post_modules(kernel_args *args)
+{
+	if (sConsole.frame_buffer == NULL)
+		return B_OK;
+
+	// try to set frame buffer memory to write combined
+
+	return vm_set_area_memory_type(sConsole.area,
+		args->frame_buffer.physical_buffer.start, B_MTR_WC);
 }
 
 

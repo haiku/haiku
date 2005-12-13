@@ -14,14 +14,23 @@
 
 
 // MSR registers (possibly Intel specific)
-#define IA32_MSR_APIC_BASE	0x1b
+#define IA32_MSR_APIC_BASE				0x1b
+
+#define IA32_MSR_MTRR_CAPABILITIES		0xfe
+#define IA32_MSR_MTRR_DEFAULT_TYPE		0x2ff
+#define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
+#define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
 
 typedef struct x86_cpu_module_info {
 	module_info	info;
 	uint32		(*count_mtrrs)(void);
-	status_t	(*set_mtrr)(uint32 index, addr_t base, addr_t length, uint32 type);
-	status_t	(*unset_mtrr)(uint32 index);
+	status_t	(*enable_mtrrs)(void);
+	void		(*disable_mtrrs)(void);
+
+	void		(*set_mtrr)(uint32 index, addr_t base, addr_t length, uint32 type);
+	status_t	(*get_mtrr)(uint32 index, addr_t *_base, addr_t *_length,
+					uint32 *_type);
 } x86_cpu_module_info;
 
 
@@ -91,8 +100,10 @@ uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_set_task_gate(int32 n, int32 segment);
 uint32 x86_count_mtrrs(void);
+status_t x86_enable_mtrrs(void);
+status_t x86_disable_mtrrs(void);
 status_t x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type);
-status_t x86_unset_mtrr(uint32 index);
+status_t x86_get_mtrr(uint32 index, addr_t *_base, addr_t *_length, uint32 *_type);
 struct tss *x86_get_main_tss(void);
 
 #define read_ebp(value) \

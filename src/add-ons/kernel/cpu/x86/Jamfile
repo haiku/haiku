@@ -5,6 +5,6 @@ UsePrivateHeaders kernel ;
 KernelAddon generic_x86 : kernel cpu :
 	generic_x86.cpp
 	intel.cpp
-	amd.cpp
-	via.cpp
+#	amd.cpp
+#	via.cpp
 	;

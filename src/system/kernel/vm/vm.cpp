@@ -935,20 +935,22 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 
 
 area_id
-vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
-	uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr)
+vm_map_physical_memory(aspace_id areaID, const char *name, void **_address,
+	uint32 addressSpec, addr_t size, uint32 protection,
+	addr_t physicalAddress)
 {
 	vm_area *area;
 	vm_cache *cache;
-	vm_cache_ref *cache_ref;
+	vm_cache_ref *cacheRef;
 	vm_store *store;
-	addr_t map_offset;
+	addr_t mapOffset;
 	status_t status;
-	vm_address_space *aspace = vm_get_aspace_by_id(aid);
+	vm_address_space *aspace = vm_get_aspace_by_id(areaID);
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %ld,"
 		" size = %lu, protection = %ld, phys = %p)\n",
-		aid, name, _address, addressSpec, size, protection, (void *)phys_addr));
+		areaID, name, _address, addressSpec, size, protection,
+		(void *)physicalAddress));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -958,33 +960,36 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 
 	// if the physical address is somewhat inside a page,
 	// move the actual area down to align on a page boundary
-	map_offset = phys_addr % B_PAGE_SIZE;
-	size += map_offset;
-	phys_addr -= map_offset;
+	mapOffset = physicalAddress % B_PAGE_SIZE;
+	size += mapOffset;
+	physicalAddress -= mapOffset;
 
 	size = PAGE_ALIGN(size);
 
 	// create an device store object
-	store = vm_store_create_device(phys_addr);
+	// TODO: panic???
+	store = vm_store_create_device(physicalAddress);
 	if (store == NULL)
 		panic("vm_map_physical_memory: vm_store_create_device returned NULL");
 	cache = vm_cache_create(store);
 	if (cache == NULL)
 		panic("vm_map_physical_memory: vm_cache_create returned NULL");
-	cache_ref = vm_cache_ref_create(cache);
-	if (cache_ref == NULL)
+	cacheRef = vm_cache_ref_create(cache);
+	if (cacheRef == NULL)
 		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
+
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
 
-	vm_cache_acquire_ref(cache_ref, true);
+	vm_cache_acquire_ref(cacheRef, true);
 	status = map_backing_store(aspace, store, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
-	vm_cache_release_ref(cache_ref);
+	vm_cache_release_ref(cacheRef);
 
 	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
 		// set requested memory type
-		status = arch_vm_set_memory_type(area, addressSpec & B_MTR_MASK);
+		status = arch_vm_set_memory_type(area, physicalAddress,
+			addressSpec & B_MTR_MASK);
 		if (status < B_OK)
 			vm_put_area(area);
 	}
@@ -1003,7 +1008,7 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 
 	// modify the pointer returned to be offset back into the new area
 	// the same way the physical address in was offset
-	*_address = (void *)((addr_t)*_address + map_offset);
+	*_address = (void *)((addr_t)*_address + mapOffset);
 
 	return area->id;
 }
@@ -2746,6 +2751,25 @@ vm_try_reserve_memory(size_t amount)
 		status = B_NO_MEMORY;
 
 	benaphore_unlock(&sAvailableMemoryLock);
+	return status;
+}
+
+
+status_t
+vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
+{
+	vm_area *area = vm_get_area(id);
+	if (area == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = arch_vm_set_memory_type(area, physicalBase, type);
+	if (status < B_OK)
+		goto out;
+
+	arch_cpu_invalidate_TLB_range(area->base, area->size);
+
+out:
+	vm_put_area(area);
 	return status;
 }
 

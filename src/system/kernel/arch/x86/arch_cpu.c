@@ -103,22 +103,44 @@ x86_count_mtrrs(void)
 
 
 status_t
-x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
+x86_enable_mtrrs(void)
 {
 	if (load_cpu_module() == NULL)
-		return B_UNSUPPORTED;
+		return B_NOT_SUPPORTED;
 
-	return sCpuModule->set_mtrr(index, base, length, type);
+	return sCpuModule->enable_mtrrs();
 }
 
 
 status_t
-x86_unset_mtrr(uint32 index)
+x86_disable_mtrrs(void)
 {
 	if (load_cpu_module() == NULL)
-		return B_UNSUPPORTED;
+		return B_NOT_SUPPORTED;
 
-	return sCpuModule->unset_mtrr(index);
+	sCpuModule->disable_mtrrs();
+	return B_OK;
+}
+
+
+status_t
+x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
+{
+	if (load_cpu_module() == NULL)
+		return B_NOT_SUPPORTED;
+
+	sCpuModule->set_mtrr(index, base, length, type);
+	return B_OK;
+}
+
+
+status_t
+x86_get_mtrr(uint32 index, addr_t *_base, addr_t *_length, uint32 *_type)
+{
+	if (load_cpu_module() == NULL)
+		return B_NOT_SUPPORTED;
+
+	return sCpuModule->get_mtrr(index, _base, _length, _type);
 }
 
 

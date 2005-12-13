@@ -24,7 +24,7 @@ void arch_vm_aspace_swap(vm_address_space *aspace);
 bool arch_vm_supports_protection(uint32 protection);
 void arch_vm_init_area(vm_area *area);
 
-status_t arch_vm_set_memory_type(vm_area *area, uint32 type);
+status_t arch_vm_set_memory_type(vm_area *area, addr_t physicalBase, uint32 type);
 void arch_vm_unset_memory_type(vm_area *area);
 
 #ifdef __cplusplus

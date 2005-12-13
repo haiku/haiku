@@ -30,26 +30,27 @@
 #endif
 
 
-static uint32 *sMTRRBitmap;
+struct set_mtrr_parameter {
+	int32	index;
+	addr_t	base;
+	addr_t	length;
+	uint8	type;
+};
+
+
+static uint32 sMTRRBitmap;
 static int32 sMTRRCount;
 static spinlock sMTRRLock;
 
 
 static status_t
-init_mtrr_bitmap(void)
+init_mtrr(void)
 {
-	if (sMTRRBitmap != NULL)
-		return B_OK;
-
 	sMTRRCount = x86_count_mtrrs();
 	if (sMTRRCount == 0)
-		return B_UNSUPPORTED;
+		return B_NOT_SUPPORTED;
 
-	sMTRRBitmap = malloc(sMTRRCount / 8);
-	if (sMTRRBitmap == NULL)
-		return B_NO_MEMORY;
-
-	memset(sMTRRBitmap, 0, sMTRRCount / 8);
+	sMTRRBitmap = 0;
 	return B_OK;
 }
 
@@ -57,28 +58,22 @@ init_mtrr_bitmap(void)
 static int32
 allocate_mtrr(void)
 {
-	int32 count = sMTRRCount / 32;
-	int32 i, j;
+	int32 index;
 
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sMTRRLock);
 
-	for (i = 0; i < count; i++) {
-		if (sMTRRBitmap[i] == 0xffffffff)
+	// find free bit
+
+	for (index = 0; index < 32; index++) {
+		if (sMTRRBitmap & (1UL << index))
 			continue;
 
-		// find free bit
+		sMTRRBitmap |= 1UL << index;
 
-		for (j = 0; j < 32; j++) {
-			if (sMTRRBitmap[i] & (1UL << j))
-				continue;
-
-			sMTRRBitmap[i] |= 1UL << j;
-
-			release_spinlock(&sMTRRLock);
-			restore_interrupts(state);
-			return i * 32 + j;
-		}
+		release_spinlock(&sMTRRLock);
+		restore_interrupts(state);
+		return index;
 	}
 
 	release_spinlock(&sMTRRLock);
@@ -91,17 +86,36 @@ allocate_mtrr(void)
 static void
 free_mtrr(int32 index)
 {
-	int32 i = index / 32;
-	int32 j = index - i * 32;
-
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sMTRRLock);
 
-	sMTRRBitmap[i] &= ~(1UL << j);
+	sMTRRBitmap &= ~(1UL << index);
 
 	release_spinlock(&sMTRRLock);
 	restore_interrupts(state);
 }
+
+
+static void
+unset_mtrr(void *_index, int cpu)
+{
+	int32 index = (int32)_index;
+
+	x86_set_mtrr(index, 0, 0, 0);
+}
+
+
+static void
+set_mtrr(void *_parameter, int cpu)
+{
+	struct set_mtrr_parameter *parameter = (struct set_mtrr_parameter *)_parameter;
+
+	x86_set_mtrr(parameter->index, parameter->base, parameter->length,
+		parameter->type);
+}
+
+
+//	#pragma mark -
 
 
 status_t
@@ -182,58 +196,58 @@ arch_vm_unset_memory_type(vm_area *area)
 	if (area->memory_type.type == 0)
 		return;
 
-	x86_unset_mtrr(area->memory_type.index);
+	call_all_cpus(&unset_mtrr, (void *)(int32)area->memory_type.index);
 	free_mtrr(area->memory_type.index);
 }
 
 
 status_t
-arch_vm_set_memory_type(vm_area *area, uint32 type)
+arch_vm_set_memory_type(vm_area *area, addr_t physicalBase, uint32 type)
 {
-	status_t status;
-	int32 index;
+	struct set_mtrr_parameter parameter;
 
 	if (type == 0)
 		return B_OK;
 
 	switch (type) {
 		case B_MTR_UC:	// uncacheable
-			type = 0;
+			parameter.type = 0;
 			break;
 		case B_MTR_WC:	// write combining
-			type = 1;
+			parameter.type = 1;
 			break;
 		case B_MTR_WT:	// write through
-			type = 4;
+			parameter.type = 4;
 			break;
 		case B_MTR_WP:	// write protected
-			type = 5;
+			parameter.type = 5;
 			break;
 		case B_MTR_WB:	// write back
-			type = 6;
+			parameter.type = 6;
 			break;
 
 		default:
 			return B_BAD_VALUE;
 	}
 
-	if (sMTRRBitmap == NULL) {
-		status = init_mtrr_bitmap();
+	if (sMTRRCount == 0) {
+		status_t status = init_mtrr();
 		if (status < B_OK)
 			return status;
 	}
 
-	index = allocate_mtrr();
-	if (index < 0)
+	parameter.index = allocate_mtrr();
+	if (parameter.index < 0)
 		return B_ERROR;
 
-	status = x86_set_mtrr(index, area->base, area->size, type);
-	if (status != B_OK) {
-		area->memory_type.type = (uint16)type;
-		area->memory_type.index = (uint16)index;
-	} else
-		free_mtrr(index);
+	parameter.base = physicalBase;
+	parameter.length = area->size;
 
-	dprintf("memory type: %u, index: %ld\n", area->memory_type.type, index);
-	return status;
+	call_all_cpus(&set_mtrr, &parameter);
+
+	area->memory_type.type = parameter.type;
+	area->memory_type.index = (uint16)parameter.index;
+
+	dprintf("memory type: %u, index: %ld\n", area->memory_type.type, parameter.index);
+	return B_OK;
 }

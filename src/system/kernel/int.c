@@ -225,6 +225,22 @@ int_io_interrupt_handler(int vector)
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler *io;
 
+#if 0
+{
+	static int low[2];
+	static int high[2];
+	static int counter;
+	int32 cpu = smp_get_current_cpu();
+
+	if (vector > 0xf0 - 32)
+		high[cpu]++;
+	else
+		low[cpu]++;
+	dprintf("got vector %d at CPU %ld\n", vector, cpu);
+	//if ((counter++ % 10) == 0)
+		dprintf("ints: %d/%d (high: %d/%d)\n", low[0], low[1], high[0], high[1]);
+}
+#endif
 	acquire_spinlock(&io_vectors[vector].vector_lock);
 
 	// The list can be empty at this place

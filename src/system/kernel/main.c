@@ -215,27 +215,8 @@ main2(void *unused)
 	TRACE(("Mount boot file system\n"));
 	vfs_mount_boot_file_system(&sKernelArgs);
 
-	//module_test();
-#if 0
-		// XXX remove
-		vfs_test();
-#endif
-#if 0
-		// XXX remove
-		thread_test();
-#endif
-#if 0
-		vm_test();
-#endif
-#if 0
-	panic("debugger_test\n");
-#endif
-#if 0
-	cbuf_test();
-#endif
-#if 0
-	port_test();
-#endif
+	debug_init_post_modules(&sKernelArgs);
+
 	// start the init process
 	{
 		const char *shellArgs[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript", NULL};
