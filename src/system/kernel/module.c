@@ -1072,6 +1072,11 @@ open_module_list(const char *prefix)
 
 	TRACE(("open_module_list(prefix = %s)\n", prefix));
 
+	if (sModulesHash == NULL) {
+		dprintf("open_module_list() called too early!\n");
+		return NULL;
+	}
+
 	iterator = (module_iterator *)malloc(sizeof(module_iterator));
 	if (!iterator)
 		return NULL;
@@ -1190,6 +1195,11 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	hash_iterator *iterator = (hash_iterator *)*_cookie;
 	struct module *module;
 	status_t status;
+
+	if (sModulesHash == NULL) {
+		dprintf("get_next_loaded_module_name() called too early!\n");
+		return NULL;
+	}
 
 	//TRACE(("get_next_loaded_module_name(\"%s\")\n", buffer));
 
