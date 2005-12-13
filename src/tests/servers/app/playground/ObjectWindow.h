@@ -7,6 +7,7 @@
 
 class BButton;
 class BCheckBox;
+class BListView;
 class BMenuField;
 class BTextControl;
 class BSlider;
@@ -43,6 +44,8 @@ class ObjectWindow : public BWindow {
 
 	BCheckBox*			fFillCB;
 	BSlider*			fPenSizeS;
+
+	BListView*			fObjectLV;
 };
 
 #endif // OBJECT_WINDOW_H

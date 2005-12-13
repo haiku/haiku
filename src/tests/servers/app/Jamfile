@@ -131,8 +131,9 @@ Server haiku_app_server :
 
 # install in the test dir
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
-	: libpng.so libhaikuappserver.so libbe_haiku.so libhwinterface.so
-	  libhwinterfaceimpl.so libfreetype.so libtextencoding.so
+	: libpng.so libhaikuappserver.so libbe_haiku.so libbeadapter.so
+	  libhwinterface.so libhwinterfaceimpl.so libfreetype.so
+	  libtextencoding.so
 	: tests!apps ;
 
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_app_server

@@ -5,9 +5,12 @@
 
 #include <Application.h>
 #include <Alert.h>
+#include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <ListItem.h>
+#include <ListView.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -18,6 +21,7 @@
 #include <Slider.h>
 #include <String.h>
 #include <RadioButton.h>
+#include <TabView.h>
 #include <TextControl.h>
 #include <TextView.h>
 
@@ -43,8 +47,10 @@ enum {
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
-	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+//	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 //	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 //			  B_ASYNCHRONOUS_CONTROLS)
 //	: BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -69,7 +75,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	b = Bounds();
 	b.top = menuBar->Bounds().bottom + 1;
-	b.right = ceilf((b.left + b.right) / 3.0);
+	b.right = ceilf((b.left + b.right) / 2.0);
 	BBox* bg = new BBox(b, "bg box", B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW, B_PLAIN_BORDER);
 
 	AddChild(bg);
@@ -89,10 +95,12 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_VERTICAL)) {
 		scrollBar->SetRange(0.0, fObjectView->Bounds().Height());
 		scrollBar->SetProportion(0.5);
+//		scrollBar->SetRange(0.0, 0.0);
 	}
 	if (BScrollBar* scrollBar = fObjectView->ScrollBar(B_HORIZONTAL)) {
 		scrollBar->SetRange(0.0, fObjectView->Bounds().Width());
 		scrollBar->SetProportion(0.5);
+//		scrollBar->SetRange(0.0, 0.0);
 	}
 	AddChild(scrollView);
 
@@ -109,10 +117,12 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.top += 10.0;
 	b.bottom = b.top + 25.0;
 	b.InsetBy(5.0, 5.0);
+	b.right = b.left + b.Width() / 2.0 - 3.0;
 
 	// new button
 	fNewB = new BButton(b, "new button", "New Object", new BMessage(MSG_NEW_OBJECT));
 	controlGroup->AddChild(fNewB);
+	SetDefaultButton(fNewB);
 
 	// clear button
 	b.OffsetBy(0, fNewB->Bounds().Height() + 5.0);
@@ -194,7 +204,9 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	message = new BMessage(MSG_SET_DRAWING_MODE);
 	message->AddInt32("mode", B_OP_ALPHA);
-	popupMenu->AddItem(new BMenuItem("Alpha", message));
+	BMenuItem* item = new BMenuItem("Alpha", message);
+	item->SetMarked(true);
+	popupMenu->AddItem(item);
 
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode",
@@ -228,9 +240,6 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 								new BMessage(MSG_SET_COLOR));
 	controlGroup->AddChild(fAlphaTC);
 
-// TODO: while this block of code works in the Haiku app_server running under R5,
-// it crashes pretty badly under Haiku. I have no idea why this happens, because
-// I was doing the same thing before at other places.
 	// divide text controls the same
 	float mWidth = fDrawingModeMF->StringWidth(fDrawingModeMF->Label());
 	float rWidth = fRedTC->StringWidth(fRedTC->Label());
@@ -263,12 +272,28 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 
 	controlGroup->AddChild(fPenSizeS);
 
+	// list view with objects
+	b = controlGroup->Bounds();
+	b.top += 10.0;
+	b.InsetBy(9.0, 7.0);
+	b.left = b.left + b.Width() / 2.0 + 6.0;
+	b.right = b.right - B_V_SCROLL_BAR_WIDTH;
+b.bottom = fDrawingModeMF->Frame().top - 5.0;
+
+	fObjectLV = new BListView(b, "object list", B_MULTIPLE_SELECTION_LIST);
+
+	// wrap a scroll view around the list view
+	scrollView = new BScrollView("list scroller", fObjectLV,
+								 B_FOLLOW_NONE, 0, false, true,
+								 B_FANCY_BORDER);
+	controlGroup->AddChild(scrollView);
+
 	// enforce some size limits
 	float minWidth = controlGroup->Frame().Width() + 30.0;
 	float minHeight = fPenSizeS->Frame().bottom +
 					  menuBar->Bounds().Height() + 15.0;
 	float maxWidth = minWidth * 4.0;
-	float maxHeight = minHeight;
+	float maxHeight = minHeight + 100;
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	ResizeTo(max_c(frame.Width(), minWidth), max_c(frame.Height(), minHeight));
@@ -318,9 +343,21 @@ ObjectWindow::MessageReceived(BMessage* message)
 			fObjectView->SetStateColor(_GetColor());
 			_UpdateColorControls();
 			break;
-		case MSG_OBJECT_COUNT_CHANGED:
-			fClearB->SetEnabled(fObjectView->CountObjects() > 0);
+		case MSG_OBJECT_COUNT_CHANGED: {
+			int32 count = fObjectView->CountObjects();
+//printf("MSG_OBJECT_COUNT_CHANGED: %ld\n", count);
+			fClearB->SetEnabled(count > 0);
+			int32 listCount = fObjectLV->CountItems();
+			int32 diff = count - listCount;
+			if (diff >= 0) {
+				for (int32 i = 0; i < diff; i++)
+					fObjectLV->AddItem(new BStringItem("Object"));
+			} else {
+				for (int32 i = listCount - 1; i >= count; i--)
+					delete fObjectLV->RemoveItem(i);
+			}
 			break;
+		}
 		case MSG_NEW_OBJECT:
 			fObjectView->SetState(NULL);
 			break;

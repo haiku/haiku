@@ -2,7 +2,10 @@
 
 #include <stdio.h>
 
+#include <Bitmap.h>
 #include <Message.h>
+#include <Region.h>
+#include <Shape.h>
 #include <String.h>
 #include <Window.h>
 
@@ -22,6 +25,7 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	  fFill(false),
 	  fPenSize(10.0),
 	  fScrolling(false),
+	  fInitiatingDrag(false),
 	  fLastMousePos(0.0, 0.0)
 {
 
@@ -73,16 +77,32 @@ ObjectView::Draw(BRect updateRect)
 
 	DrawString(message, p);
 
-	message = "to draw an object!";
-	width = StringWidth(message);
+	message = "to draw an ";
+	width = StringWidth("to draw an object");
 	p.x = r.Width() / 2.0 - width / 2.0;
 	p.y += 25;
 
 	DrawString(message, p);
 
-	SetDrawingMode(B_OP_ALPHA);
+//	SetOrigin(BPoint(50.0, 50.0));
+//	SetScale(0.5);
+
+	DrawChar('o');
+	DrawChar('b');
+	DrawChar('j');
+	DrawChar('e');
+	DrawChar('c');
+	DrawChar('t');
+	DrawChar('!');
+
+
+//	SetHighColor(0, 0, 0);
+//	StrokeLine(BPoint(-50, -50), BPoint(0.0, 0.0));
+
+
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
+
 }
 
 // MouseDown
@@ -93,12 +113,13 @@ ObjectView::MouseDown(BPoint where)
 	int32 clicks;
 	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	Window()->CurrentMessage()->FindInt32("clicks", &clicks);
-printf("ObjectView::MouseDown() - clicks: %ld\n", clicks);
+//printf("ObjectView::MouseDown() - clicks: %ld\n", clicks);
 	fScrolling = buttons & B_SECONDARY_MOUSE_BUTTON;
+	fInitiatingDrag = !fScrolling && (buttons & B_TERTIARY_MOUSE_BUTTON);
 
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 
-	if (fScrolling) {
+	if (fScrolling  || fInitiatingDrag) {
 		fLastMousePos = where;
 	} else {
 		if (!fState)
@@ -131,10 +152,28 @@ void
 ObjectView::MouseMoved(BPoint where, uint32 transit,
 					   const BMessage* dragMessage)
 {
+
+if (dragMessage) {
+//printf("ObjectView::MouseMoved(BPoint(%.1f, %.1f)) - DRAG MESSAGE\n", where.x, where.y);
+//Window()->CurrentMessage()->PrintToStream();
+} else {
+//printf("ObjectView::MouseMoved(BPoint(%.1f, %.1f))\n", where.x, where.y);
+}
+
 	if (fScrolling) {
 		BPoint offset = fLastMousePos - where;
 		ScrollBy(offset.x, offset.y);
 		fLastMousePos = where + offset;
+	} else if (fInitiatingDrag) {
+		BPoint offset = fLastMousePos - where;
+		if (sqrtf(offset.x * offset.x + offset.y * offset.y) > 5.0) {
+			BMessage dragMessage('drag');
+			BBitmap* dragBitmap = new BBitmap(BRect(0, 0, 20, 20), B_RGBA32);
+			memset(dragBitmap->Bits(), 128, dragBitmap->BitsLength());
+			
+			DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA, B_ORIGIN, this);
+			fInitiatingDrag = false;
+		}
 	} else {
 		if (fState && fState->IsTracking()) {
 			BRect before = fState->Bounds();
@@ -145,6 +184,20 @@ ObjectView::MouseMoved(BPoint where, uint32 transit,
 			BRect invalid(before | after);
 			Invalidate(invalid);
 		}
+	}
+}
+
+// MessageReceived
+void
+ObjectView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case 'drag':
+			printf("ObjectView::MessageReceived() - received drag message\n");
+			break;
+		default:
+			BView::MessageReceived(message);
+			break;
 	}
 }
 

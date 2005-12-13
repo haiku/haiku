@@ -27,6 +27,8 @@ class ObjectView : public BView {
 	virtual	void			MouseMoved(BPoint where, uint32 transit,
 								   const BMessage* dragMessage);
 
+	virtual	void			MessageReceived(BMessage* message);
+
 							// ObjectView
 			void			SetState(State* state);
 
@@ -66,6 +68,7 @@ class ObjectView : public BView {
 			float			fPenSize;
 
 			bool			fScrolling;
+			bool			fInitiatingDrag;
 			BPoint			fLastMousePos;
 };
 

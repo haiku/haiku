@@ -10,8 +10,15 @@ fi
 
 sleep 1s
 
+#if test -f ../../../../../generated/tests/apps/MiniTerminal; then
+#	../../../../../generated/tests/apps/MiniTerminal &
+#else
+#	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
+#fi
+
 if test -f ../../../../../generated/tests/apps/Playground; then
-	../../../../../generated/tests/apps//Playground
+	../../../../../generated/tests/apps/Playground
 else
 	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
 fi
+

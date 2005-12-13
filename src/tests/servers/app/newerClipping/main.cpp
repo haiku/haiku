@@ -56,7 +56,7 @@ App::ReadyToRun()
 	Window* win = new Window("clipping");
 	win->Show();
 
-	win->Test();
+//	win->Test();
 }
 
 // constructor
@@ -88,13 +88,203 @@ Window::~Window()
 bool
 Window::QuitRequested()
 {
-	if (!fQuit) {
+/*	if (!fQuit) {
 		fDesktop->PostMessage(MSG_QUIT);
 		fQuit = true;
 		return false;
-	}
+	}*/
+be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
+
+// #pragma mark -
+
+void
+fill_line_8(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b)
+{
+	for (int32 i = 0; i < pixels; i++) {
+		*buffer++ = b;
+		*buffer++ = g;
+		*buffer++ = r;
+		*buffer++ = 255;
+	}
+}
+
+void
+fill_line_32(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b)
+{
+	uint32 pixel;
+	uint32* handle = (uint32*)buffer;
+	for (int32 i = 0; i < pixels; i++) {
+		pixel = 0xff000000 | (r << 16) | (g << 8) | (b);
+		*handle++ = pixel;
+	}
+}
+
+void
+fill_line_64(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b)
+{
+	uint64 pixel;
+	uint64* handle = (uint64*)buffer;
+	pixels /= 2;
+	for (int32 i = 0; i < pixels; i++) {
+		pixel = 0xff000000 | (r << 16) | (g << 8) | (b);
+		pixel = pixel << 32;
+		pixel |= 0xff000000 | (r << 16) | (g << 8) | (b);
+		*handle++ = pixel;
+	}
+}
+
+void
+test1(uint8* buffer, uint32 bpr)
+{
+	uint8* handle = buffer;
+
+/*	bigtime_t start8 = system_time();
+	for (int32 x = 0; x < 1000; x++) {
+		handle = buffer;
+		for (int32 i = 0; i < 64; i++) {
+			fill_line_8(handle, 512, 255, 0, 255);
+			handle += bpr;
+		}
+	}
+
+	bigtime_t start32 = system_time();
+	for (int32 x = 0; x < 1000; x++) {
+		handle = buffer;
+		for (int32 i = 0; i < 64; i++) {
+			fill_line_32(handle, 512, 255, 0, 255);
+			handle += bpr;
+		}
+	}
+
+	bigtime_t start64 = system_time();
+	for (int32 x = 0; x < 1000; x++) {*/
+		handle = buffer;
+		for (int32 i = 0; i < 640; i++) {
+			fill_line_64(handle, 512, 0, 255, 255);
+			handle += bpr;
+		}
+/*	}
+
+
+	bigtime_t finish = system_time();
+	printf("8:  %lld\n", start32 - start8);
+	printf("32: %lld\n", start64 - start32);
+	printf("64: %lld\n", finish - start64);*/
+}
+	
+// #pragma mark -
+
+void
+blend_line_8(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	for (int32 i = 0; i < pixels; i++) {
+		buffer[0] = ((b - buffer[0]) * a + (buffer[0] << 8)) >> 8;
+		buffer[1] = ((g - buffer[1]) * a + (buffer[1] << 8)) >> 8;
+		buffer[2] = ((r - buffer[2]) * a + (buffer[2] << 8)) >> 8;;
+		buffer[3] = a;
+		buffer += 4;
+	}
+}
+
+union pixel {
+	uint32	data32;
+	uint8	data8[4];
+};
+
+void
+blend_line_32(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	pixel p;
+	pixels /= 2;
+	for (int32 i = 0; i < pixels; i++) {
+		p.data32 = *(uint32*)buffer;
+
+		p.data8[0] = ((b - p.data8[0]) * a + (p.data8[0] << 8)) >> 8;
+		p.data8[1] = ((g - p.data8[1]) * a + (p.data8[1] << 8)) >> 8;
+		p.data8[2] = ((r - p.data8[2]) * a + (p.data8[2] << 8)) >> 8;
+		p.data8[3] = 255;
+		*((uint32*)buffer) = p.data32;
+		buffer += 4;
+
+		p.data32 = *(uint32*)buffer;
+
+		p.data8[0] = ((b - p.data8[0]) * a + (p.data8[0] << 8)) >> 8;
+		p.data8[1] = ((g - p.data8[1]) * a + (p.data8[1] << 8)) >> 8;
+		p.data8[2] = ((r - p.data8[2]) * a + (p.data8[2] << 8)) >> 8;
+		p.data8[3] = 255;
+		*((uint32*)buffer) = p.data32;
+		buffer += 4;
+	}
+}
+
+union pixel2 {
+	uint64	data64;
+	uint8	data8[8];
+};
+
+void
+blend_line_64(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	pixel2 p;
+	pixels /= 2;
+	for (int32 i = 0; i < pixels; i++) {
+		p.data64 = *(uint64*)buffer;
+
+		p.data8[0] = ((b - p.data8[0]) * a + (p.data8[0] << 8)) >> 8;
+		p.data8[1] = ((g - p.data8[1]) * a + (p.data8[1] << 8)) >> 8;
+		p.data8[2] = ((r - p.data8[2]) * a + (p.data8[2] << 8)) >> 8;
+		p.data8[3] = a;
+
+		p.data8[4] = ((b - p.data8[4]) * a + (p.data8[4] << 8)) >> 8;
+		p.data8[5] = ((g - p.data8[5]) * a + (p.data8[5] << 8)) >> 8;
+		p.data8[6] = ((r - p.data8[6]) * a + (p.data8[6] << 8)) >> 8;
+		p.data8[7] = a;
+
+		*((uint64*)buffer) = p.data64;
+		buffer += 8;
+	}
+}
+void
+test2(uint8* buffer, uint32 bpr)
+{
+	uint8* handle = buffer;
+
+/*	bigtime_t start8 = system_time();
+//	for (int32 x = 0; x < 10; x++) {
+		handle = buffer;
+		for (int32 i = 0; i < 64; i++) {
+			blend_line_8(handle, 512, 255, 0, 0, 20);
+			handle += bpr;
+		}
+//	}
+
+	bigtime_t start32 = system_time();
+//	for (int32 x = 0; x < 10; x++) {
+		handle = buffer;
+		for (int32 i = 0; i < 64; i++) {
+			blend_line_32(handle, 512, 255, 0, 0, 20);
+			handle += bpr;
+		}
+//	}
+
+	bigtime_t start64 = system_time();*/
+//	for (int32 x = 0; x < 10; x++) {
+		handle = buffer;
+		for (int32 i = 0; i < 640; i++) {
+			blend_line_64(handle, 512, 255, 0, 0, 200);
+			handle += bpr;
+		}
+//	}
+
+/*	bigtime_t finish = system_time();
+	printf("8:  %lld\n", start32 - start8);
+	printf("32: %lld\n", start64 - start32);
+	printf("64: %lld\n", finish - start64);*/
+}
+	
+// #pragma mark -
 
 // DirectConnected
 void
@@ -102,26 +292,27 @@ Window::DirectConnected(direct_buffer_info* info)
 {
 	// TODO: for some reason, this deadlocks
 	// on B_DIRECT_STOP... be aware
-	fDesktop->LockClipping();
+//	fDesktop->LockClipping();
 
-	fEngine.Lock();
+//	fEngine.Lock();
 	
 	switch(info->buffer_state & B_DIRECT_MODE_MASK) {
 		case B_DIRECT_START:
 		case B_DIRECT_MODIFY:
 			fBuffer.SetTo(info);
 			fDesktop->SetOffset(info->window_bounds.left, info->window_bounds.top);
+			test1((uint8*)info->bits, info->bytes_per_row);
 			break;
 		case B_DIRECT_STOP:
 			fBuffer.SetTo(NULL);
 			break;
 	}
 
-	fDesktop->SetMasterClipping(&fBuffer.WindowClipping());
+//	fDesktop->SetMasterClipping(&fBuffer.WindowClipping());
 
-	fEngine.Unlock();
+//	fEngine.Unlock();
 
-	fDesktop->UnlockClipping();
+//	fDesktop->UnlockClipping();
 }
 
 // AddWindow
