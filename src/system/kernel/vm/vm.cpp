@@ -136,7 +136,8 @@ _vm_create_reserved_region_struct(vm_virtual_map *map, uint32 flags)
 
 
 static vm_area *
-_vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring, uint32 protection)
+_vm_create_area_struct(vm_address_space *aspace, const char *name,
+	uint32 wiring, uint32 protection)
 {
 	vm_area *area = NULL;
 
@@ -161,6 +162,7 @@ _vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring
 	area->size = 0;
 	area->protection = protection;
 	area->wiring = wiring;
+	area->memory_type = 0;
 	area->ref_count = 1;
 
 	area->cache_ref = NULL;
@@ -172,7 +174,6 @@ _vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring
 	area->cache_next = area->cache_prev = NULL;
 	area->hash_next = NULL;
 
-	arch_vm_init_area(area);
 	return area;
 }
 
@@ -1846,7 +1847,8 @@ _dump_area(vm_area *area)
 	kprintf("base: 0x%lx\n", area->base);
 	kprintf("size: 0x%lx\n", area->size);
 	kprintf("protection: 0x%lx\n", area->protection);
-	kprintf("wiring: 0x%lx\n", area->wiring);
+	kprintf("wiring: 0x%x\n", area->wiring);
+	kprintf("memory_type: 0x%x\n", area->memory_type);
 	kprintf("ref_count: %ld\n", area->ref_count);
 	kprintf("cache_ref: %p\n", area->cache_ref);
 	kprintf("cache_offset: 0x%Lx\n", area->cache_offset);
@@ -1899,7 +1901,7 @@ dump_area_list(int argc, char **argv)
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-		kprintf("%p %5lx  %p\t%p\t%ld\t%ld\t%s\n", area, area->id, (void *)area->base,
+		kprintf("%p %5lx  %p\t%p\t%ld\t%d\t%s\n", area, area->id, (void *)area->base,
 			(void *)area->size, area->protection, area->wiring, area->name);
 	}
 	hash_close(sAreaHash, &iter, false);
@@ -2288,6 +2290,13 @@ vm_init_post_thread(kernel_args *args)
 	vm_low_memory_init();
 
 	return heap_init_post_thread(args);
+}
+
+
+status_t
+vm_init_post_modules(kernel_args *args)
+{
+	return arch_vm_init_post_modules(args);
 }
 
 
@@ -2763,12 +2772,7 @@ vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
 		return B_BAD_VALUE;
 
 	status_t status = arch_vm_set_memory_type(area, physicalBase, type);
-	if (status < B_OK)
-		goto out;
 
-	arch_cpu_invalidate_TLB_range(area->base, area->size);
-
-out:
 	vm_put_area(area);
 	return status;
 }

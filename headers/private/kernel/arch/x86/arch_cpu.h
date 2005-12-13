@@ -21,16 +21,21 @@
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
+// Memory type ranges
+#define IA32_MTR_UNCACHED			0
+#define IA32_MTR_WRITE_COMBINED		1
+#define IA32_MTR_WRITE_THROUGH		4
+#define IA32_MTR_WRITE_PROTECTED	5
+#define IA32_MTR_WRITE_BACK			6
 
 typedef struct x86_cpu_module_info {
 	module_info	info;
 	uint32		(*count_mtrrs)(void);
-	status_t	(*enable_mtrrs)(void);
-	void		(*disable_mtrrs)(void);
+	void		(*init_mtrrs)(void);
 
-	void		(*set_mtrr)(uint32 index, addr_t base, addr_t length, uint32 type);
-	status_t	(*get_mtrr)(uint32 index, addr_t *_base, addr_t *_length,
-					uint32 *_type);
+	void		(*set_mtrr)(uint32 index, uint64 base, uint64 length, uint8 type);
+	status_t	(*get_mtrr)(uint32 index, uint64 *_base, uint64 *_length,
+					uint8 *_type);
 } x86_cpu_module_info;
 
 
@@ -96,18 +101,16 @@ void i386_frstor(const void *fpu_state);
 void i386_fxrstor(const void *fpu_state);
 void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
+uint32 x86_read_ebp();
+uint32 x86_read_cr0();
+void x86_write_cr0(uint32 value);
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_set_task_gate(int32 n, int32 segment);
 uint32 x86_count_mtrrs(void);
-status_t x86_enable_mtrrs(void);
-status_t x86_disable_mtrrs(void);
-status_t x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type);
-status_t x86_get_mtrr(uint32 index, addr_t *_base, addr_t *_length, uint32 *_type);
+void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
+status_t x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type);
 struct tss *x86_get_main_tss(void);
-
-#define read_ebp(value) \
-	__asm__("movl	%%ebp,%0" : "=r" (value))
 
 #define read_cr3(value) \
 	__asm__("movl	%%cr3,%0" : "=r" (value))

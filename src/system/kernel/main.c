@@ -215,6 +215,9 @@ main2(void *unused)
 	TRACE(("Mount boot file system\n"));
 	vfs_mount_boot_file_system(&sKernelArgs);
 
+	// CPU specific modules may now be available
+	cpu_init_post_modules(&sKernelArgs);
+	vm_init_post_modules(&sKernelArgs);
 	debug_init_post_modules(&sKernelArgs);
 
 	// start the init process

@@ -430,13 +430,14 @@ frame_buffer_console_init(kernel_args *args)
 status_t
 frame_buffer_console_init_post_modules(kernel_args *args)
 {
-	if (sConsole.frame_buffer == NULL)
+	// TODO: enable MTRR in VESA mode!
+//	if (sConsole.frame_buffer == NULL)
 		return B_OK;
 
 	// try to set frame buffer memory to write combined
 
-	return vm_set_area_memory_type(sConsole.area,
-		args->frame_buffer.physical_buffer.start, B_MTR_WC);
+//	return vm_set_area_memory_type(sConsole.area,
+//		args->frame_buffer.physical_buffer.start, B_MTR_WC);
 }
 
 

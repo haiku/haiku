@@ -20,9 +20,9 @@ extern "C" {
 status_t arch_vm_init(struct kernel_args *args);
 status_t arch_vm_init_post_area(struct kernel_args *args);
 status_t arch_vm_init_end(struct kernel_args *args);
+status_t arch_vm_init_post_modules(kernel_args *args);
 void arch_vm_aspace_swap(vm_address_space *aspace);
 bool arch_vm_supports_protection(uint32 protection);
-void arch_vm_init_area(vm_area *area);
 
 status_t arch_vm_set_memory_type(vm_area *area, addr_t physicalBase, uint32 type);
 void arch_vm_unset_memory_type(vm_area *area);

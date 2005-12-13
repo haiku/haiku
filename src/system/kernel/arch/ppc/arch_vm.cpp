@@ -100,6 +100,13 @@ arch_vm_init_end(kernel_args *args)
 }
 
 
+status_t
+arch_vm_init_post_modules(kernel_args *args)
+{
+	return B_OK;
+}
+
+
 void 
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
@@ -110,12 +117,6 @@ bool
 arch_vm_supports_protection(uint32 protection)
 {
 	return true;
-}
-
-
-void
-arch_vm_init_area(vm_area *area)
-{
 }
 
 

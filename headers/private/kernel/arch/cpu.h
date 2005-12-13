@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -22,6 +22,7 @@ extern "C" {
 status_t arch_cpu_preboot_init(kernel_args *args);
 status_t arch_cpu_init(kernel_args *args);
 status_t arch_cpu_init_post_vm(kernel_args *args);
+status_t arch_cpu_init_post_modules(kernel_args *args);
 status_t arch_cpu_shutdown(bool reboot);
 
 void arch_cpu_invalidate_TLB_range(addr_t start, addr_t end);

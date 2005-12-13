@@ -61,6 +61,22 @@ FUNCTION(i386_fxsave_swap):
 	fxrstor	(%eax)
 	ret
 
+/* uint32 x86_read_ebp(); */
+FUNCTION(x86_read_ebp):
+	movl	%ebp, %eax
+	ret
+
+/* uint32 x86_read_cr0(); */
+FUNCTION(x86_read_cr0):
+	movl	%cr0, %eax
+	ret
+
+/* void x86_write_cr0(uint32 value); */
+FUNCTION(x86_write_cr0):
+	movl	4(%esp), %eax
+	movl	%eax, %cr0
+	ret
+
 /* uint64 x86_read_msr(uint32 register); */
 FUNCTION(x86_read_msr):
 	movl	4(%esp), %ecx
@@ -70,8 +86,8 @@ FUNCTION(x86_read_msr):
 /* void x86_write_msr(uint32 register, uint64 value); */
 FUNCTION(x86_write_msr):
 	movl	4(%esp), %ecx
-	movl	8(%esp), %edx
-	movl	12(%esp), %eax
+	movl	8(%esp), %eax
+	movl	12(%esp), %edx
 	wrmsr
 	ret
 

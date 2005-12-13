@@ -14,10 +14,20 @@
 #include <arch_cpu.h>
 
 
+//#define TRACE_MTRR
+#ifdef TRACE_MTRR
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 #define IA32_MTRR_FEATURE				(1UL << 12)
 #define IA32_MTRR_ENABLE				(1UL << 11)
 #define IA32_MTRR_ENABLE_FIXED			(1UL << 10)
 #define IA32_MTRR_VALID_RANGE			(1UL << 11)
+
+#define	MTRR_MASK	(0xffffffff & (B_PAGE_SIZE - 1))
 
 struct mtrr_capabilities {
 	mtrr_capabilities(uint64 value) { *(uint64 *)this = value; }
@@ -30,6 +40,9 @@ struct mtrr_capabilities {
 };
 
 
+static uint64 sPhysicalMask = 0;
+
+
 static uint32
 intel_count_mtrrs(void)
 {
@@ -39,63 +52,76 @@ intel_count_mtrrs(void)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
+	TRACE(("cpu has %ld variable range MTRs.\n", capabilities.variable_ranges));
 	return capabilities.variable_ranges;
 }
 
 
-static status_t
-intel_enable_mtrrs(void)
+static void
+intel_init_mtrrs(void)
 {
-	cpuid_info cpuInfo;
-	if (get_cpuid(&cpuInfo, 1, 0) != B_OK
-		|| (cpuInfo.eax_1.features & IA32_MTRR_FEATURE) == 0)
-		return B_NOT_SUPPORTED;
+	// disable and clear all MTRRs
+	// (we leave the fixed MTRRs as is)
+	// TODO: check if the fixed MTRRs are set on all CPUs identically?
+
+	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
+		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~IA32_MTRR_ENABLE);
+
+	for (uint32 i = intel_count_mtrrs(); i-- > 0;) {
+		if (x86_read_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + i * 2) & IA32_MTRR_VALID_RANGE)
+			x86_write_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + i * 2, 0);
+	}
+
+	// but turn on variable MTRR functionality
 
 	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
 		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) | IA32_MTRR_ENABLE);
-
-	return B_OK;
 }
 
 
 static void
-intel_disable_mtrrs(void)
+intel_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
-	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
-		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~IA32_MTRR_ENABLE);
-}
+	index *= 2;
+		// there are two registers per slot
 
+	uint64 mask = length - 1;
+	mask = ~mask & sPhysicalMask;
 
-static void
-intel_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
-{
-	if (base != 0 && length != 0) {
-		// enable MTRR
+	TRACE(("MTRR %ld: new mask %Lx)\n", index, mask));
+	TRACE(("  mask test base: %Lx)\n", mask & base));
+	TRACE(("  mask test middle: %Lx)\n", mask & (base + length / 2)));
+	TRACE(("  mask test end: %Lx)\n", mask & (base + length)));
+
+	// First, disable MTRR
+
+	x86_write_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + index, 0);
+
+	if (base != 0 || mask != 0 || type != 0) {
+		// then fill in the new values, and enable it again
 
 		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index,
 			(base & ~(B_PAGE_SIZE - 1)) | type);
 		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + index,
-			(length & ~(B_PAGE_SIZE - 1)) | IA32_MTRR_VALID_RANGE);
+			mask | IA32_MTRR_VALID_RANGE);
 	} else {
-		// disable MTRR
-
-		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + index, 0);
+		// reset base as well
 		x86_write_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index, 0);
 	}
 }
 
 
 static status_t
-intel_get_mtrr(uint32 index, addr_t *_base, addr_t *_length, uint32 *_type)
+intel_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 {
-	uint64 base = x86_read_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index);
-	uint64 mask = x86_read_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + index);
-
+	uint64 mask = x86_read_msr(IA32_MSR_MTRR_PHYSICAL_MASK_0 + index * 2);
 	if ((mask & IA32_MTRR_VALID_RANGE) == 0)
 		return B_ERROR;
 
+	uint64 base = x86_read_msr(IA32_MSR_MTRR_PHYSICAL_BASE_0 + index * 2);
+
 	*_base = base & ~(B_PAGE_SIZE - 1);
-	*_length = mask & ~(B_PAGE_SIZE - 1);
+	*_length = (~mask & sPhysicalMask) + 1;
 	*_type = base & 0xff;
 
 	return B_OK;
@@ -110,27 +136,43 @@ intel_init(void)
 		return B_ERROR;
 
 	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86
-		|| (info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
+		&& (info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
 		return B_ERROR;
 
 	if (x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & IA32_MTRR_ENABLE)
-		dprintf("MTRR enabled\n");
+		TRACE(("MTRR enabled\n"));
 	else
-		dprintf("MTRR disabled\n");
+		TRACE(("MTRR disabled\n"));
 
 	for (uint32 i = 0; i < intel_count_mtrrs(); i++) {
-		addr_t base;
-		addr_t length;
-		uint32 type;
+		uint64 base;
+		uint64 length;
+		uint8 type;
 		if (intel_get_mtrr(i, &base, &length, &type) == B_OK)
-			dprintf("  %ld: %p, %p, %ld\n", i, (void *)base, (void *)length, type);
+			TRACE(("  %ld: 0x%Lx, 0x%Lx, %u\n", i, base, length, type));
 		else
-			dprintf("  %ld: empty\n", i);
+			TRACE(("  %ld: empty\n", i));
 	}
 
-// don't open it just now	
-	return B_ERROR;
-//	return B_OK;
+	// TODO: dump fixed ranges as well
+
+	// get number of physical address bits
+
+	uint32 bits = 36;
+
+	cpuid_info cpuInfo;
+	if (get_cpuid(&cpuInfo, 0x80000000, 0) == B_OK
+		&& cpuInfo.eax_0.max_eax & 0xff >= 8) {
+		get_cpuid(&cpuInfo, 0x80000008, 0);
+		bits = cpuInfo.regs.eax & 0xff;
+	}
+
+	sPhysicalMask = ((1ULL << bits) - 1) & ~(B_PAGE_SIZE - 1);
+
+	TRACE(("CPU has %ld physical address bits, physical mask is %016Lx\n",
+		bits, sPhysicalMask));
+
+	return B_OK;
 }
 
 
@@ -163,8 +205,7 @@ x86_cpu_module_info gIntelModule = {
 	},
 
 	intel_count_mtrrs,
-	intel_enable_mtrrs,
-	intel_disable_mtrrs,
+	intel_init_mtrrs,
 
 	intel_set_mtrr,
 	intel_get_mtrr,

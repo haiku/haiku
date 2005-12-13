@@ -22,6 +22,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+#define CR0_CACHE_DISABLE		(1UL << 30)
+#define CR0_NOT_WRITE_THROUGH	(1UL << 29)
+
+struct set_mtrr_parameter {
+	int32	index;
+	uint64	base;
+	uint64	length;
+	uint8	type;
+};
+
+
 extern void reboot(void);
 	// from arch_x86.S
 
@@ -29,6 +41,7 @@ static struct tss **sTSS;
 //static struct tss **sDoubleFaultTSS;
 struct tss **sDoubleFaultTSS;
 static int *sIsTSSLoaded;
+static int32 sWaitAllCPUs;
 
 segment_descriptor *gGDT = NULL;
 
@@ -48,98 +61,103 @@ x86_get_main_tss(void)
 }
 
 
-static x86_cpu_module_info *
-load_cpu_module(void)
+/**	Disable CPU caches, and invalidate them. */
+
+static void
+disable_caches()
 {
-	if (sCpuModule != NULL)
-		return sCpuModule;
+	x86_write_cr0((x86_read_cr0() | CR0_CACHE_DISABLE) & ~CR0_NOT_WRITE_THROUGH);
+	wbinvd();
+	arch_cpu_global_TLB_invalidate();
+}
 
-	// find model specific CPU module
 
-	if (gBootDevice > 0) {
-		void *cookie = open_module_list("cpu");
+/**	Invalidate CPU caches, and enable them. */
 
-		while (true) {
-			char name[B_FILE_NAME_LENGTH];
-			size_t nameLength = sizeof(name);
+static void
+enable_caches()
+{
+	wbinvd();
+	arch_cpu_global_TLB_invalidate();
+	x86_write_cr0(x86_read_cr0() & ~(CR0_CACHE_DISABLE | CR0_NOT_WRITE_THROUGH));
+}
 
-			if (read_next_module_name(cookie, name, &nameLength) != B_OK
-				|| get_module(name, (module_info **)&sCpuModule) == B_OK)
-				break;
-		}
 
-		close_module_list(cookie);
-	} else {
-		// we're in early boot mode, let's use get_loaded_module
+static void
+set_mtrr(void *_parameter, int cpu)
+{
+	struct set_mtrr_parameter *parameter = (struct set_mtrr_parameter *)_parameter;
 
-		uint32 cookie = 0;
+	// wait until all CPUs have arrived here
+	atomic_add(&sWaitAllCPUs, 1);
+	while (sWaitAllCPUs != smp_get_num_cpus())
+		;
 
-		while (true) {
-			char name[B_FILE_NAME_LENGTH];
-			size_t nameLength = sizeof(name);
+	disable_caches();
 
-			if (get_next_loaded_module_name(&cookie, name, &nameLength) != B_OK)
-				break;
-			if (strncmp(name, "cpu", 3))
-				continue;
+	sCpuModule->set_mtrr(parameter->index, parameter->base, parameter->length,
+		parameter->type);
 
-			if (get_module(name, (module_info **)&sCpuModule) == B_OK)
-				break;
-		}
-	}
+	enable_caches();
 
-	return sCpuModule;	
+	// wait until all CPUs have arrived here
+	atomic_add(&sWaitAllCPUs, -1);
+	while (sWaitAllCPUs != 0)
+		;
+}
+
+
+static void
+init_mtrrs(void *_unused, int cpu)
+{
+	// wait until all CPUs have arrived here
+	atomic_add(&sWaitAllCPUs, 1);
+	while (sWaitAllCPUs != smp_get_num_cpus())
+		;
+
+	disable_caches();
+
+	sCpuModule->init_mtrrs();
+
+	enable_caches();
+
+	// wait until all CPUs have arrived here
+	atomic_add(&sWaitAllCPUs, -1);
+	while (sWaitAllCPUs != 0)
+		;
 }
 
 
 uint32
 x86_count_mtrrs(void)
 {
-	if (load_cpu_module() == NULL)
+	if (sCpuModule == NULL)
 		return 0;
 
 	return sCpuModule->count_mtrrs();
 }
 
 
-status_t
-x86_enable_mtrrs(void)
+void
+x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
-	if (load_cpu_module() == NULL)
-		return B_NOT_SUPPORTED;
+	cpu_status state;
 
-	return sCpuModule->enable_mtrrs();
+	struct set_mtrr_parameter parameter;
+	parameter.index = index;
+	parameter.base = base;
+	parameter.length = length;
+	parameter.type = type;
+
+	call_all_cpus(&set_mtrr, &parameter);
 }
 
 
 status_t
-x86_disable_mtrrs(void)
+x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 {
-	if (load_cpu_module() == NULL)
-		return B_NOT_SUPPORTED;
-
-	sCpuModule->disable_mtrrs();
-	return B_OK;
-}
-
-
-status_t
-x86_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
-{
-	if (load_cpu_module() == NULL)
-		return B_NOT_SUPPORTED;
-
-	sCpuModule->set_mtrr(index, base, length, type);
-	return B_OK;
-}
-
-
-status_t
-x86_get_mtrr(uint32 index, addr_t *_base, addr_t *_length, uint32 *_type)
-{
-	if (load_cpu_module() == NULL)
-		return B_NOT_SUPPORTED;
-
+	// the MTRRs are identical on all CPUs, so it doesn't matter
+	// on which CPU this runs
 	return sCpuModule->get_mtrr(index, _base, _length, _type);
 }
 
@@ -280,6 +298,34 @@ arch_cpu_init_post_vm(kernel_args *args)
 		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
+
+	return B_OK;
+}
+
+
+status_t
+arch_cpu_init_post_modules(kernel_args *args)
+{
+	// initialize CPU module
+
+	void *cookie = open_module_list("cpu");
+
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+
+		if (read_next_module_name(cookie, name, &nameLength) != B_OK
+			|| get_module(name, (module_info **)&sCpuModule) == B_OK)
+			break;
+	}
+
+	close_module_list(cookie);
+
+	if (sCpuModule == NULL)
+		return B_OK;
+
+	// initialize MTRRs
+	call_all_cpus(&init_mtrrs, NULL);
 
 	return B_OK;
 }

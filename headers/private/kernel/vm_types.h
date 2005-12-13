@@ -83,9 +83,9 @@ typedef struct vm_area {
 	addr_t				base;
 	addr_t				size;
 	uint32				protection;
-	uint32				wiring;
+	uint16				wiring;
+	uint16				memory_type;
 	int32				ref_count;
-	struct arch_vm_memory_type memory_type;
 
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;
@@ -167,6 +167,8 @@ enum {
 	PHYSICAL_PAGE_NO_WAIT = 0,
 	PHYSICAL_PAGE_CAN_WAIT,
 };
+
+#define MEMORY_TYPE_SHIFT		28
 
 // additional protection flags
 // Note: the VM probably won't support all combinations - it will try

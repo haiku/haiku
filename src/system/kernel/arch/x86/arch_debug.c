@@ -116,7 +116,7 @@ stack_trace(int argc, char **argv)
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();
-		read_ebp(ebp);
+		ebp = x86_read_ebp();
 	} else {
 		thread_id id = strtoul(argv[1], NULL, 0);
 		thread = thread_get_thread_struct_locked(id);
@@ -234,8 +234,7 @@ arch_debug_get_caller(void)
 	// It looks like you would get the wrong stack frame here, but
 	// since read_ebp() is an assembler inline macro, GCC seems to 
 	// be smart enough to save its original value.
-	struct stack_frame *frame;
-	read_ebp(frame);
+	struct stack_frame *frame = (struct stack_frame *)x86_read_ebp();
 
 	return (void *)frame->return_address;
 }

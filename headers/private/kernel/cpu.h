@@ -37,6 +37,7 @@ extern "C" {
 status_t cpu_preboot_init(struct kernel_args *args);
 status_t cpu_init(struct kernel_args *args);
 status_t cpu_init_post_vm(struct kernel_args *args);
+status_t cpu_init_post_modules(struct kernel_args *args);
 
 cpu_ent *get_cpu_struct(void);
 extern inline cpu_ent *get_cpu_struct(void) { return &cpu[smp_get_current_cpu()]; }

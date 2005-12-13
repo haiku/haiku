@@ -43,6 +43,13 @@ cpu_init_post_vm(kernel_args *args)
 
 
 status_t
+cpu_init_post_modules(kernel_args *args)
+{
+	return arch_cpu_init_post_modules(args);
+}
+
+
+status_t
 cpu_preboot_init(kernel_args *args)
 {
 	return arch_cpu_preboot_init(args);

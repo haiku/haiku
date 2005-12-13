@@ -24,6 +24,7 @@ extern "C" {
 status_t vm_init(kernel_args *args);
 status_t vm_init_post_sem(struct kernel_args *args);
 status_t vm_init_post_thread(struct kernel_args *args);
+status_t vm_init_post_modules(struct kernel_args *args);
 status_t vm_aspace_init(void);
 status_t vm_aspace_init_post_sem(void);
 void vm_free_kernel_args(kernel_args *args);

@@ -8,6 +8,7 @@
 
 
 #include <KernelExport.h>
+#include <smp.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
@@ -30,29 +31,12 @@
 #endif
 
 
-struct set_mtrr_parameter {
-	int32	index;
-	addr_t	base;
-	addr_t	length;
-	uint8	type;
-};
+#define kMaxMemoryTypeRegisters 32
 
-
-static uint32 sMTRRBitmap;
-static int32 sMTRRCount;
-static spinlock sMTRRLock;
-
-
-static status_t
-init_mtrr(void)
-{
-	sMTRRCount = x86_count_mtrrs();
-	if (sMTRRCount == 0)
-		return B_NOT_SUPPORTED;
-
-	sMTRRBitmap = 0;
-	return B_OK;
-}
+static uint32 sMemoryTypeBitmap;
+static int32 sMemoryTypeIDs[kMaxMemoryTypeRegisters];
+static int32 sMemoryTypeRegisterCount;
+static spinlock sMemoryTypeLock;
 
 
 static int32
@@ -61,22 +45,22 @@ allocate_mtrr(void)
 	int32 index;
 
 	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMTRRLock);
+	acquire_spinlock(&sMemoryTypeLock);
 
 	// find free bit
 
-	for (index = 0; index < 32; index++) {
-		if (sMTRRBitmap & (1UL << index))
+	for (index = 0; index < sMemoryTypeRegisterCount; index++) {
+		if (sMemoryTypeBitmap & (1UL << index))
 			continue;
 
-		sMTRRBitmap |= 1UL << index;
+		sMemoryTypeBitmap |= 1UL << index;
 
-		release_spinlock(&sMTRRLock);
+		release_spinlock(&sMemoryTypeLock);
 		restore_interrupts(state);
 		return index;
 	}
 
-	release_spinlock(&sMTRRLock);
+	release_spinlock(&sMemoryTypeLock);
 	restore_interrupts(state);
 
 	return -1;
@@ -87,31 +71,82 @@ static void
 free_mtrr(int32 index)
 {
 	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMTRRLock);
+	acquire_spinlock(&sMemoryTypeLock);
 
-	sMTRRBitmap &= ~(1UL << index);
+	sMemoryTypeBitmap &= ~(1UL << index);
 
-	release_spinlock(&sMTRRLock);
+	release_spinlock(&sMemoryTypeLock);
 	restore_interrupts(state);
 }
 
 
-static void
-unset_mtrr(void *_index, int cpu)
+static uint64
+nearest_power(addr_t value)
 {
-	int32 index = (int32)_index;
+	uint64 power = 1UL << 12;
+		// 12 bits is the smallest supported alignment/length
 
-	x86_set_mtrr(index, 0, 0, 0);
+	while (value > power)
+		power <<= 1;
+
+	return power;
 }
 
 
-static void
-set_mtrr(void *_parameter, int cpu)
+static status_t
+set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 {
-	struct set_mtrr_parameter *parameter = (struct set_mtrr_parameter *)_parameter;
+	int32 index;
 
-	x86_set_mtrr(parameter->index, parameter->base, parameter->length,
-		parameter->type);
+	if (type == 0)
+		return B_OK;
+
+	switch (type) {
+		case B_MTR_UC:
+			type = IA32_MTR_UNCACHED;
+			break;
+		case B_MTR_WC:
+			type = IA32_MTR_WRITE_COMBINED;
+			break;
+		case B_MTR_WT:
+			type = IA32_MTR_WRITE_THROUGH;
+			break;
+		case B_MTR_WP:
+			type = IA32_MTR_WRITE_PROTECTED;
+			break;
+		case B_MTR_WB:
+			type = IA32_MTR_WRITE_BACK;
+			break;
+
+		default:
+			return B_BAD_VALUE;
+	}
+
+	if (sMemoryTypeRegisterCount == 0)
+		return B_NOT_SUPPORTED;
+
+	// length must be a power of 2; just round it up to the next value
+	length = nearest_power(length);
+	if (length + base <= base) {
+		// 4GB overflow
+		return B_BAD_VALUE;
+	}
+
+	// base must be aligned to the length
+	if (base & (length - 1))
+		return B_BAD_VALUE;
+
+	index = allocate_mtrr();
+	if (index < 0)
+		return B_ERROR;
+
+	TRACE(("allocate MTRR slot %ld, base = %Lx, length = %Lx\n", index,
+		base, length));
+
+	sMemoryTypeIDs[index] = id;
+	x86_set_mtrr(index, base, length, type);
+
+	return B_OK;
 }
 
 
@@ -161,6 +196,39 @@ arch_vm_init_end(kernel_args *args)
 }
 
 
+status_t
+arch_vm_init_post_modules(kernel_args *args)
+{
+	void *cookie;
+	int32 i;
+
+	// the x86 CPU modules are now accessible
+
+	sMemoryTypeRegisterCount = x86_count_mtrrs();
+	if (sMemoryTypeRegisterCount == 0)
+		return B_OK;
+
+	// not very likely, but play safe here
+	if (sMemoryTypeRegisterCount > kMaxMemoryTypeRegisters)
+		sMemoryTypeRegisterCount = kMaxMemoryTypeRegisters;
+
+	// init memory type ID table
+
+	for (i = 0; i < sMemoryTypeRegisterCount; i++) {
+		sMemoryTypeIDs[i] = -1;
+	}
+
+	// set the physical memory ranges to write-back mode
+
+	for (i = 0; i < args->num_physical_memory_ranges; i++) {
+		set_memory_type(-1, args->physical_memory_range[i].start,
+			args->physical_memory_range[i].size, B_MTR_WB);
+	}
+
+	return B_OK;
+}
+
+
 void
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
@@ -184,70 +252,30 @@ arch_vm_supports_protection(uint32 protection)
 
 
 void
-arch_vm_init_area(vm_area *area)
+arch_vm_unset_memory_type(struct vm_area *area)
 {
-	area->memory_type.type = 0;
-}
+	int32 index;
 
-
-void
-arch_vm_unset_memory_type(vm_area *area)
-{
-	if (area->memory_type.type == 0)
+	if (area->memory_type == 0)
 		return;
 
-	call_all_cpus(&unset_mtrr, (void *)(int32)area->memory_type.index);
-	free_mtrr(area->memory_type.index);
+	// find index for area ID
+
+	for (index = 0; index < sMemoryTypeRegisterCount; index++) {
+		if (sMemoryTypeIDs[index] == area->id) {
+			x86_set_mtrr(index, 0, 0, 0);
+
+			sMemoryTypeIDs[index] = -1;
+			free_mtrr(index);
+			break;
+		}
+	}
 }
 
 
 status_t
-arch_vm_set_memory_type(vm_area *area, addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase, uint32 type)
 {
-	struct set_mtrr_parameter parameter;
-
-	if (type == 0)
-		return B_OK;
-
-	switch (type) {
-		case B_MTR_UC:	// uncacheable
-			parameter.type = 0;
-			break;
-		case B_MTR_WC:	// write combining
-			parameter.type = 1;
-			break;
-		case B_MTR_WT:	// write through
-			parameter.type = 4;
-			break;
-		case B_MTR_WP:	// write protected
-			parameter.type = 5;
-			break;
-		case B_MTR_WB:	// write back
-			parameter.type = 6;
-			break;
-
-		default:
-			return B_BAD_VALUE;
-	}
-
-	if (sMTRRCount == 0) {
-		status_t status = init_mtrr();
-		if (status < B_OK)
-			return status;
-	}
-
-	parameter.index = allocate_mtrr();
-	if (parameter.index < 0)
-		return B_ERROR;
-
-	parameter.base = physicalBase;
-	parameter.length = area->size;
-
-	call_all_cpus(&set_mtrr, &parameter);
-
-	area->memory_type.type = parameter.type;
-	area->memory_type.index = (uint16)parameter.index;
-
-	dprintf("memory type: %u, index: %ld\n", area->memory_type.type, parameter.index);
-	return B_OK;
+	area->memory_type = type >> MEMORY_TYPE_SHIFT;
+	return set_memory_type(area->id, physicalBase, area->size, type);
 }
