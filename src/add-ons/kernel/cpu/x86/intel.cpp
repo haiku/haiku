@@ -139,19 +139,21 @@ intel_init(void)
 		&& (info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
 		return B_ERROR;
 
-	if (x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & IA32_MTRR_ENABLE)
+	if (x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & IA32_MTRR_ENABLE) {
 		TRACE(("MTRR enabled\n"));
-	else
+	} else {
 		TRACE(("MTRR disabled\n"));
+	}
 
 	for (uint32 i = 0; i < intel_count_mtrrs(); i++) {
 		uint64 base;
 		uint64 length;
 		uint8 type;
-		if (intel_get_mtrr(i, &base, &length, &type) == B_OK)
+		if (intel_get_mtrr(i, &base, &length, &type) == B_OK) {
 			TRACE(("  %ld: 0x%Lx, 0x%Lx, %u\n", i, base, length, type));
-		else
+		} else {
 			TRACE(("  %ld: empty\n", i));
+		}
 	}
 
 	// TODO: dump fixed ranges as well
