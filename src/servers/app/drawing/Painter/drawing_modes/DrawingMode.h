@@ -17,6 +17,11 @@
 
 class PatternHandler;
 
+union pixel32 {
+	uint32	data32;
+	uint8	data8[4];
+};
+
 // BLEND
 //
 // This macro assumes source alpha in range 0..255 and

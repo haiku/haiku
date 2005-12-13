@@ -22,6 +22,7 @@
 #include "DrawingModeMax.h"
 #include "DrawingModeMin.h"
 #include "DrawingModeOver.h"
+#include "DrawingModeOverSolid.h"
 #include "DrawingModeSelect.h"
 #include "DrawingModeSubtract.h"
 
@@ -30,6 +31,7 @@
 // constructor
 DrawingModeFactory::DrawingModeFactory()
 	: fDrawingModeBGRA32Over(new DrawingModeBGRA32Over()),
+	  fDrawingModeBGRA32OverSolid(new DrawingModeBGRA32OverSolid()),
 	  fDrawingModeBGRA32Erase(new DrawingModeBGRA32Erase()),
 	  fDrawingModeBGRA32Invert(new DrawingModeBGRA32Invert()),
 	  fDrawingModeBGRA32Select(new DrawingModeBGRA32Select()),
@@ -51,6 +53,7 @@ DrawingModeFactory::DrawingModeFactory()
 DrawingModeFactory::~DrawingModeFactory()
 {
 	delete fDrawingModeBGRA32Over;
+	delete fDrawingModeBGRA32OverSolid;
 	delete fDrawingModeBGRA32Erase;
 	delete fDrawingModeBGRA32Invert;
 	delete fDrawingModeBGRA32Select;
@@ -78,7 +81,10 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// these drawing modes discard source pixels
 		// which have the current low color
 		case B_OP_OVER:
-			return fDrawingModeBGRA32Over;
+			if (solid)
+				return fDrawingModeBGRA32OverSolid;
+			else
+				return fDrawingModeBGRA32Over;
 			break;
 		case B_OP_ERASE:
 			return fDrawingModeBGRA32Erase;

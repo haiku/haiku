@@ -25,6 +25,7 @@ class DrawingModeFactory {
 											   bool solid = false);
  private:
 			DrawingMode*		fDrawingModeBGRA32Over;
+			DrawingMode*		fDrawingModeBGRA32OverSolid;
 			DrawingMode*		fDrawingModeBGRA32Erase;
 			DrawingMode*		fDrawingModeBGRA32Invert;
 			DrawingMode*		fDrawingModeBGRA32Select;

@@ -6,37 +6,16 @@
  *
  */
 
-#ifndef DRAWING_MODE_OVER_H
-#define DRAWING_MODE_OVER_H
+#ifndef DRAWING_MODE_OVER_SOLID_H
+#define DRAWING_MODE_OVER_SOLID_H
 
-#include "DrawingMode.h"
-
-// BLEND_OVER
-#define BLEND_OVER(d, s1, s2, s3, a) \
-{ \
-	pixel32 _p; \
-	_p.data32 = *(uint32*)d; \
-	d[0] = 	(((((s3) - _p.data8[0]) * (a)) + (_p.data8[0] << 8)) >> 8); \
-	d[1] = 	(((((s2) - _p.data8[1]) * (a)) + (_p.data8[1] << 8)) >> 8); \
-	d[2] = 	(((((s1) - _p.data8[2]) * (a)) + (_p.data8[2] << 8)) >> 8); \
-	d[3] = 255; \
-}
-
-// ASSIGN_OVER
-#define ASSIGN_OVER(d1, d2, d3, da, s1, s2, s3) \
-{ \
-	(d1) = (s1); \
-	(d2) = (s2); \
-	(d3) = (s3); \
-	(da) = 255; \
-}
-
+#include "DrawingModeOver.h"
 
 template<class Order>
-class DrawingModeOver : public DrawingMode {
+class DrawingModeOverSolid : public DrawingMode {
  public:
 	// constructor
-	DrawingModeOver()
+	DrawingModeOverSolid()
 		: DrawingMode()
 	{
 	}
@@ -44,15 +23,15 @@ class DrawingModeOver : public DrawingMode {
 	// blend_pixel
 	virtual	void blend_pixel(int x, int y, const color_type& c, uint8 cover)
 	{
-		if (fPatternHandler->IsHighColor(x, y)) {
-			uint8* p = fBuffer->row(y) + (x << 2);
-			rgb_color color = fPatternHandler->HighColor().GetColor32();
-			if (cover == 255) {
-				ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-							color.red, color.green, color.blue);
-			} else {
-				BLEND_OVER(p, color.red, color.green, color.blue, cover);
-			}
+		if (fPatternHandler->IsSolidLow())
+			return;
+
+		uint8* p = fBuffer->row(y) + (x << 2);
+		if (cover == 255) {
+			ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+						c.r, c.g, c.b);
+		} else {
+			BLEND_OVER(p, c.r, c.g, c.b, cover);
 		}
 	}
 
@@ -60,28 +39,26 @@ class DrawingModeOver : public DrawingMode {
 	virtual	void blend_hline(int x, int y, unsigned len, 
 							 const color_type& c, uint8 cover)
 	{
+		if (fPatternHandler->IsSolidLow())
+			return;
+
 		if(cover == 255) {
-			rgb_color color = fPatternHandler->HighColor().GetColor32();
 			uint32 v;
 			uint8* p8 = (uint8*)&v;
-			p8[Order::R] = (uint8)color.red;
-			p8[Order::G] = (uint8)color.green;
-			p8[Order::B] = (uint8)color.blue;
+			p8[Order::R] = (uint8)c.r;
+			p8[Order::G] = (uint8)c.g;
+			p8[Order::B] = (uint8)c.b;
 			p8[Order::A] = 255;
 			uint32* p32 = (uint32*)(fBuffer->row(y)) + x;
 			do {
-				if (fPatternHandler->IsHighColor(x, y))
-					*p32 = v;
+				*p32 = v;
 				p32++;
 				x++;
 			} while(--len);
 		} else {
 			uint8* p = fBuffer->row(y) + (x << 2);
-			rgb_color color = fPatternHandler->HighColor().GetColor32();
 			do {
-				if (fPatternHandler->IsHighColor(x, y)) {
-					BLEND_OVER(p, color.red, color.green, color.blue, cover);
-				}
+				BLEND_OVER(p, c.r, c.g, c.b, cover);
 				x++;
 				p += 4;
 			} while(--len);
@@ -99,17 +76,17 @@ printf("DrawingModeOver::blend_vline()\n");
 	virtual	void blend_solid_hspan(int x, int y, unsigned len, 
 								   const color_type& c, const uint8* covers)
 	{
+		if (fPatternHandler->IsSolidLow())
+			return;
+
 		uint8* p = fBuffer->row(y) + (x << 2);
-		rgb_color color = fPatternHandler->HighColor().GetColor32();
 		do {
-			if (fPatternHandler->IsHighColor(x, y)) {
-				if (*covers) {
-					if (*covers == 255) {
-						ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-									color.red, color.green, color.blue);
-					} else {
-						BLEND_OVER(p, color.red, color.green, color.blue, *covers);
-					}
+			if (*covers) {
+				if (*covers == 255) {
+					ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								c.r, c.g, c.b);
+				} else {
+					BLEND_OVER(p, c.r, c.g, c.b, *covers);
 				}
 			}
 			covers++;
@@ -124,17 +101,17 @@ printf("DrawingModeOver::blend_vline()\n");
 	virtual	void blend_solid_vspan(int x, int y, unsigned len, 
 								   const color_type& c, const uint8* covers)
 	{
+		if (fPatternHandler->IsSolidLow())
+			return;
+
 		uint8* p = fBuffer->row(y) + (x << 2);
-		rgb_color color = fPatternHandler->HighColor().GetColor32();
 		do {
-			if (fPatternHandler->IsHighColor(x, y)) {
-				if (*covers) {
-					if (*covers == 255) {
-						ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-									color.red, color.green, color.blue);
-					} else {
-						BLEND_OVER(p, color.red, color.green, color.blue, *covers);
-					}
+			if (*covers) {
+				if (*covers == 255) {
+					ASSIGN_OVER(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								c.r, c.g, c.b);
+				} else {
+					BLEND_OVER(p, c.r, c.g, c.b, *covers);
 				}
 			}
 			covers++;
@@ -201,10 +178,10 @@ printf("DrawingModeOver::blend_color_vspan()\n");
 
 };
 
-typedef DrawingModeOver<agg::order_rgba32> DrawingModeRGBA32Over;
-typedef DrawingModeOver<agg::order_argb32> DrawingModeARGB32Over;
-typedef DrawingModeOver<agg::order_abgr32> DrawingModeABGR32Over;
-typedef DrawingModeOver<agg::order_bgra32> DrawingModeBGRA32Over;
+typedef DrawingModeOverSolid<agg::order_rgba32> DrawingModeRGBA32OverSolid;
+typedef DrawingModeOverSolid<agg::order_argb32> DrawingModeARGB32OverSolid;
+typedef DrawingModeOverSolid<agg::order_abgr32> DrawingModeABGR32OverSolid;
+typedef DrawingModeOverSolid<agg::order_bgra32> DrawingModeBGRA32OverSolid;
 
 #endif // DRAWING_MODE_OVER_H
 
