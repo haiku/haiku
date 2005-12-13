@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin ifconfig ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -9,10 +9,6 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders net ;
-
-if ! $(BONE_COMPATIBLE) {
-	SubDirCcFlags -DBUILDING_R5_LIBNET -Dclose=closesocket ;
-}
 
 BinCommand ifconfig :
 	ifconfig.c

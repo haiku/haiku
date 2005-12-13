@@ -2,7 +2,10 @@ SubDir HAIKU_TOP src kits network compat libnetapi ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if ( $(TARGET_PLATFORM) != haiku ) {
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
+
+if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 		# We need the public network headers also when not compiling for Haiku.
 		# Unfortunately we get more than we want, namely all POSIX headers.
@@ -10,10 +13,8 @@ if ( $(TARGET_PLATFORM) != haiku ) {
 		# Needed for <net/*.h> and maybe other stuff.
 }
 
-UsePrivateHeaders net ;
-
 {
-	if ( $(TARGET_PLATFORM) = r5 ) {
+	if $(TARGET_PLATFORM) = r5 {
 		defines = [ FDefines BUILDING_R5_LIBNET ] ;
 		SubDirCcFlags $(defines) ;
 		SubDirC++Flags $(defines) ;

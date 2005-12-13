@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin arp ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -9,10 +9,6 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders net ;
-
-if ! $(BONE_COMPATIBLE) {
-	SubDirCcFlags -DBUILDING_R5_LIBNET ;
-}
 
 BinCommand arp :
 	arp.c
@@ -23,14 +19,7 @@ HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: arp ;
 
-# TODO: The build of arp is broken for target r5. The Haiku headers are used,
-# but we link against libnet.so. Linking fails due to missing symbol __h_errno.
-# However I doubt that this can work anyway, since the headers are simply
-# not compatible with the R5 implementation, or is BUILDING_R5_LIBNET
-# sufficient to make them so?
-if $(TARGET_PLATFORM) != r5 {
 Package haiku-networkingkit-cvs :
 	arp :
 #	boot home config bin ;
 	boot home Desktop haiku-networkingkit ;
-}

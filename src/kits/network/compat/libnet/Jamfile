@@ -4,8 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
 UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 
-if ( $(TARGET_PLATFORM) != haiku ) {
+if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 		# We need the public network headers also when not compiling for Haiku.
 		# Unfortunately we get more than we want, namely all POSIX headers.
@@ -21,12 +22,12 @@ if ( $(TARGET_PLATFORM) != haiku ) {
 	# BONE versions of the inet_* functions are prefixed with __ in <arpa/inet.h> and
 	# implemented in libbind.so as are ours.
 	local defines ;
-	if ( $(TARGET_PLATFORM) = r5 ) {
+	if $(TARGET_PLATFORM) = r5 {
 		defines += BUILDING_R5_LIBNET ;
-	} else if ( $(TARGET_PLATFORM) = bone ) {
+	} else if $(TARGET_PLATFORM) = bone {
 		defines += BONE_VERSION ;
 		defines += BUILDING_R5_LIBNET ;
-	} else if ( $(TARGET_PLATFORM) = haiku ) {
+	} else if $(TARGET_PLATFORM) = haiku {
 		defines += BUILDING_R5_LIBNET ;
 	}
 	defines = [ FDefines $(defines) ] ;
@@ -36,7 +37,7 @@ if ( $(TARGET_PLATFORM) != haiku ) {
 
 #Depends libnet.so : install_network_etc_files ;
 
-if ( $(TARGET_PLATFORM) = r5 ) {
+if $(TARGET_PLATFORM) = r5 {
 	PLATFORM_SOURCES =
 		select.c 
 		poll.c

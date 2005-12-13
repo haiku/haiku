@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin ppp_up ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;

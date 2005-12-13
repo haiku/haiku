@@ -2,8 +2,9 @@ SubDir HAIKU_TOP src kits network compat libbind ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders net ;
 UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 SubDirSysHdrs $(SUBDIR) ;
 
 if ( $(TARGET_PLATFORM) != haiku ) {
