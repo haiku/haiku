@@ -217,8 +217,6 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 						 fCursorAreaBackup->right,
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
-//printf("HideSoftwareCursor(BRect(%.1f, %.1f, %.1f, %.1f))\n", area.left, area.top, area.right, area.bottom);
-//backupArea.PrintToStream();
 			_RestoreCursorArea();
 		}
 	}
@@ -228,7 +226,6 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 void
 HWInterface::HideSoftwareCursor()
 {
-//printf("HideSoftwareCursor()\n");
 	_RestoreCursorArea();
 }
 
@@ -237,7 +234,6 @@ void
 HWInterface::ShowSoftwareCursor()
 {
 	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden) {
-//printf("ShowSoftwareCursor()\n");
 		_DrawCursor(_CursorFrame());
 	}
 }
@@ -294,7 +290,6 @@ HWInterface::_DrawCursor(BRect area) const
 		uint8* dst = buffer;
 
 		if (fCursorAreaBackup && fCursorAreaBackup->buffer) {
-//printf("backup: BRect(%ld, %ld, %ld, %ld)\n", left, top, right, bottom);
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
 			fCursorAreaBackup->left = left;
@@ -303,6 +298,7 @@ HWInterface::_DrawCursor(BRect area) const
 			fCursorAreaBackup->bottom = bottom;
 			uint8* bup = fCursorAreaBackup->buffer;
 			uint32 bupBPR = fCursorAreaBackup->bpr;
+
 			// blending and backup of drawing buffer
 			for (int32 y = top; y <= bottom; y++) {
 				uint8* s = src;
@@ -310,18 +306,12 @@ HWInterface::_DrawCursor(BRect area) const
 				uint8* d = dst;
 				uint8* b = bup;
 				for (int32 x = left; x <= right; x++) {
+					*(uint32*)b = *(uint32*)s;
 					// assumes backbuffer alpha = 255
-					// TODO: it appears alpha in cursor is upside down
-					uint8 a = 255 - c[3];
-					b[0] = s[0];
-					b[1] = s[1];
-					b[2] = s[2];
-					// TODO: unnecessary?
-					b[3] = 255;
-					d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
-					d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
-					d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
-					d[3] = 255;
+					uint8 a = c[3];
+					d[0] = (((c[0] - b[0]) * a) + (b[0] << 8)) >> 8;
+					d[1] = (((c[1] - b[1]) * a) + (b[1] << 8)) >> 8;
+					d[2] = (((c[2] - b[2]) * a) + (b[2] << 8)) >> 8;
 					s += 4;
 					c += 4;
 					d += 4;
@@ -340,12 +330,10 @@ HWInterface::_DrawCursor(BRect area) const
 				uint8* d = dst;
 				for (int32 x = left; x <= right; x++) {
 					// assumes backbuffer alpha = 255
-					// TODO: it appears alpha in cursor is upside down
-					uint8 a = 255 - c[3];
-					d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
-					d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
-					d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
-					d[3] = 255;
+					uint8 a = c[3];
+					d[0] = (((c[0] - s[0]) * a) + (s[0] << 8)) >> 8;
+					d[1] = (((c[1] - s[1]) * a) + (s[1] << 8)) >> 8;
+					d[2] = (((c[2] - s[2]) * a) + (s[2] << 8)) >> 8;
 					s += 4;
 					c += 4;
 					d += 4;
@@ -614,7 +602,6 @@ void
 HWInterface::_RestoreCursorArea() const
 {
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
-//printf("restore\n");
 		_CopyToFront(fCursorAreaBackup->buffer,
 					 fCursorAreaBackup->bpr,
 					 fCursorAreaBackup->left,
