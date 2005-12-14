@@ -68,6 +68,15 @@ typedef struct driver_operations {
 int register_driver(struct driver_operations *ops);
 void unregister_driver(struct driver_operations *ops);
 
+#ifdef __BEOS__
+#define CB_ENABLER_MODULE_NAME	"bus_managers/cb_enabler/v1"
+typedef struct cb_enabler_module_info {
+    bus_manager_info	binfo;
+    int (*register_driver)(struct driver_operations *ops);
+    void (*unregister_driver)(struct driver_operations *ops);
+} cb_enabler_module_info;
+#endif /* __BEOS__ */
+
 #endif /* __KERNEL__ */
 
 #endif /* _LINUX_DRIVER_OPS_H */

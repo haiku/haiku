@@ -436,6 +436,30 @@ extern int CardServices(int func, void *a1, void *a2, void *a3);
 extern int CardServices(int func, ...);
 #endif
 
+#ifdef __BEOS__ 
+#define SS_MODULE_NAME(s)	("busses/pcmcia/" s "/v1")
+#define MTD_MODULE_NAME(s)	("busses/pcmcia/" s "/v1")
+#define CS_CLIENT_MODULE_NAME	"bus_managers/pcmcia_cs/client/v1"
+typedef struct cs_client_module_info {
+    bus_manager_info	binfo;
+    int (*_CardServices)(int, ...);
+    int (*_MTDHelperEntry)(int, ...);
+ //   void (*_add_timer)(struct timer_list *);
+ //   void (*_del_timer)(struct timer_list *);
+} cs_client_module_info;
+#define CS_SOCKET_MODULE_NAME "bus_managers/pcmcia_cs/socket/v1"
+typedef struct cs_socket_module_info {
+    bus_manager_info	binfo;
+    int (*_register_ss_entry)(int, ss_entry_t);
+    void (*_unregister_ss_entry)(ss_entry_t);
+ //   void (*_add_timer)(struct timer_list *);
+ //   void (*_del_timer)(struct timer_list *);
+    int (*register_resource)(int, u_long, u_long);
+    int (*release_resource)(int, u_long, u_long);
+    int (*check_resource)(int, u_long, u_long);
+} cs_socket_module_info;
+#endif
+
 #endif /* __KERNEL__ */
 
 #endif /* _LINUX_CS_H */

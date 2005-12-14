@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons kernel drivers bus pcmcia ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+        UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
+                # We need the public pcmcia headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public posix headers also when not compiling for Haiku.
+}
+
+KernelAddon ds : kernel drivers bus pcmcia :
+	ds.c
+	;
+
