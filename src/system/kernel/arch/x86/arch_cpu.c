@@ -348,6 +348,21 @@ i386_set_tss_and_kstack(addr_t kstack)
 
 
 void
+arch_cpu_global_TLB_invalidate(void)
+{
+	uint32 flags = x86_read_cr4();
+
+	if (flags & IA32_CR4_GLOBAL_PAGES) {
+		// disable and reenable the global pages to flush all TLBs regardless
+		// of the global page bit
+		x86_write_cr4(flags & ~IA32_CR4_GLOBAL_PAGES);
+		x86_write_cr4(flags | IA32_CR4_GLOBAL_PAGES);
+	} else
+		arch_cpu_user_TLB_invalidate();
+}
+
+
+void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;

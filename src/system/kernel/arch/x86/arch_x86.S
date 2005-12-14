@@ -15,8 +15,8 @@
 
 .text
 
-/* void arch_cpu_global_TLB_invalidate(); */
-FUNCTION(arch_cpu_global_TLB_invalidate):
+/* void arch_cpu_user_TLB_invalidate(); */
+FUNCTION(arch_cpu_user_TLB_invalidate):
 	movl	%cr3,%eax
 	movl	%eax,%cr3
 	ret
@@ -75,6 +75,17 @@ FUNCTION(x86_read_cr0):
 FUNCTION(x86_write_cr0):
 	movl	4(%esp), %eax
 	movl	%eax, %cr0
+	ret
+
+/* uint32 x86_read_cr4(); */
+FUNCTION(x86_read_cr4):
+	movl	%cr4, %eax
+	ret
+
+/* void x86_write_cr4(uint32 value); */
+FUNCTION(x86_write_cr4):
+	movl	4(%esp), %eax
+	movl	%eax, %cr4
 	ret
 
 /* uint64 x86_read_msr(uint32 register); */

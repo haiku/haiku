@@ -21,6 +21,9 @@
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
+// cr4 flags
+#define IA32_CR4_GLOBAL_PAGES		(1UL << 7)
+
 // Memory type ranges
 #define IA32_MTR_UNCACHED			0
 #define IA32_MTR_WRITE_COMBINED		1
@@ -104,6 +107,8 @@ void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
 uint32 x86_read_ebp();
 uint32 x86_read_cr0();
 void x86_write_cr0(uint32 value);
+uint32 x86_read_cr4();
+void x86_write_cr4(uint32 value);
 uint64 x86_read_msr(uint32 registerNumber);
 void x86_write_msr(uint32 registerNumber, uint64 value);
 void x86_set_task_gate(int32 n, int32 segment);

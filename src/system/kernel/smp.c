@@ -358,13 +358,16 @@ process_pending_ici(int32 currentCPU)
 	TRACE(("  cpu %d message = %d\n", curr_cpu, msg->message));
 
 	switch (msg->message) {
-		case SMP_MSG_INVL_PAGE_RANGE:
+		case SMP_MSG_INVALIDATE_PAGE_RANGE:
 			arch_cpu_invalidate_TLB_range((addr_t)msg->data, (addr_t)msg->data2);
 			break;
-		case SMP_MSG_INVL_PAGE_LIST:
+		case SMP_MSG_INVALIDATE_PAGE_LIST:
 			arch_cpu_invalidate_TLB_list((addr_t *)msg->data, (int)msg->data2);
 			break;
-		case SMP_MSG_GLOBAL_INVL_PAGE:
+		case SMP_MSG_USER_INVALIDATE_PAGES:
+			arch_cpu_user_TLB_invalidate();
+			break;
+		case SMP_MSG_GLOBAL_INVALIDATE_PAGES:
 			arch_cpu_global_TLB_invalidate();
 			break;
 		case SMP_MSG_RESCHEDULE:
@@ -571,7 +574,8 @@ smp_wake_up_non_boot_cpus()
 
 	// invalidate all of the other processors' TLB caches
 	arch_cpu_global_TLB_invalidate();
-	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVL_PAGE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0, NULL,
+		SMP_MSG_FLAG_SYNC);
 
 	// start the other processors
 	smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_ASYNC);

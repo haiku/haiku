@@ -13,6 +13,7 @@
 #include <smp.h>
 #include <util/queue.h>
 #include <memheap.h>
+#include <arch_system_info.h>
 #include <arch/vm_translation_map.h>
 
 #include <string.h>
@@ -24,6 +25,8 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+#define IA32_GLOBAL_PAGE_FEATURE	(1UL << 13)
 
 // 256 MB of iospace
 #define IOSPACE_SIZE (256*1024*1024)
@@ -89,8 +92,8 @@ typedef struct vm_translation_map_arch_info {
 
 static page_table_entry *page_hole = NULL;
 static page_directory_entry *page_hole_pgdir = NULL;
-static page_directory_entry *kernel_pgdir_phys = NULL;
-static page_directory_entry *kernel_pgdir_virt = NULL;
+static page_directory_entry *sKernelPhysicalPageDirectory = NULL;
+static page_directory_entry *sKernelVirtualPageDirectory = NULL;
 
 static vm_translation_map *tmap_list;
 static spinlock tmap_list_lock;
@@ -107,6 +110,7 @@ static spinlock tmap_list_lock;
 #define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, B_PAGE_SIZE * 1024)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
+#define IS_KERNEL_MAP(map)		(map->arch_data->pgdir_phys == sKernelPhysicalPageDirectory)
 
 static status_t early_query(addr_t va, addr_t *out_physical);
 static status_t get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags);
@@ -300,7 +304,7 @@ put_pgtable_in_pgdir(page_directory_entry *entry,
 
 static void
 put_page_table_entry_in_pgtable(page_table_entry *entry,
-	addr_t physicalAddress, uint32 attributes)
+	addr_t physicalAddress, uint32 attributes, bool globalPage)
 {
 	page_table_entry page;
 	init_page_table_entry(&page);
@@ -316,6 +320,9 @@ put_page_table_entry_in_pgtable(page_table_entry *entry,
 	else
 		page.rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
 	page.present = 1;
+
+	if (globalPage)
+		page.global = 1;
 
 	// put it in the page table
 	update_page_table_entry(entry, &page);
@@ -363,7 +370,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 			| (attributes & B_USER_PROTECTION ? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
 
 		// update any other page directories, if it maps kernel space
-		if (index >= FIRST_KERNEL_PGDIR_ENT && index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
+		if (index >= FIRST_KERNEL_PGDIR_ENT
+			&& index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
 			_update_all_pgdirs(index, pd[index]);
 
 		map->map_count++;
@@ -376,7 +384,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
-	put_page_table_entry_in_pgtable(&pt[index], pa, attributes);
+	put_page_table_entry_in_pgtable(&pt[index], pa, attributes,
+		IS_KERNEL_MAP(map));
 
 	put_physical_page_tmap((addr_t)pt);
 
@@ -593,24 +602,40 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 static void
 flush_tmap(vm_translation_map *map)
 {
-	int state;
+	cpu_status state;
 
 	if (map->arch_data->num_invalidate_pages <= 0)
 		return;
 
 	state = disable_interrupts();
+
 	if (map->arch_data->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
-		TRACE(("flush_tmap: %d pages to invalidate, doing global invalidation\n", map->arch_data->num_invalidate_pages));
-		arch_cpu_global_TLB_invalidate();
-		smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVL_PAGE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+		TRACE(("flush_tmap: %d pages to invalidate, invalidate all\n",
+			map->arch_data->num_invalidate_pages));
+
+		if (IS_KERNEL_MAP(map)) {
+			arch_cpu_global_TLB_invalidate();
+			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0, NULL,
+				SMP_MSG_FLAG_SYNC);
+		} else {
+			arch_cpu_user_TLB_invalidate();
+			smp_send_broadcast_ici(SMP_MSG_USER_INVALIDATE_PAGES, 0, 0, 0, NULL,
+				SMP_MSG_FLAG_SYNC);
+		}
 	} else {
-		TRACE(("flush_tmap: %d pages to invalidate, doing local invalidation\n", map->arch_data->num_invalidate_pages));
-		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate, map->arch_data->num_invalidate_pages);
-		smp_send_broadcast_ici(SMP_MSG_INVL_PAGE_LIST, (unsigned long)map->arch_data->pages_to_invalidate,
-			map->arch_data->num_invalidate_pages, 0, NULL, SMP_MSG_FLAG_SYNC);
+		TRACE(("flush_tmap: %d pages to invalidate, invalidate list\n",
+			map->arch_data->num_invalidate_pages));
+
+		arch_cpu_invalidate_TLB_list(map->arch_data->pages_to_invalidate,
+			map->arch_data->num_invalidate_pages);
+		smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
+			(uint32)map->arch_data->pages_to_invalidate,
+			map->arch_data->num_invalidate_pages, 0, NULL,
+			SMP_MSG_FLAG_SYNC);
 	}
 	map->arch_data->num_invalidate_pages = 0;
+
 	restore_interrupts(state);
 }
 
@@ -636,11 +661,13 @@ map_iospace_chunk(addr_t va, addr_t pa)
 		pt[i].user = 0;
 		pt[i].rw = 1;
 		pt[i].present = 1;
+		pt[i].global = 1;
 	}
 
 	state = disable_interrupts();
 	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE));
-	smp_send_broadcast_ici(SMP_MSG_INVL_PAGE_RANGE, va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
+	smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_RANGE,
+		va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
 		NULL, SMP_MSG_FLAG_SYNC);
 	restore_interrupts(state);
 
@@ -808,16 +835,18 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 			recursive_lock_destroy(&map->lock);
 			return B_NO_MEMORY;
 		}
-		vm_get_page_mapping(vm_get_kernel_aspace_id(), (addr_t)map->arch_data->pgdir_virt, (addr_t *)&map->arch_data->pgdir_phys);
+		vm_get_page_mapping(vm_get_kernel_aspace_id(),
+			(addr_t)map->arch_data->pgdir_virt, (addr_t *)&map->arch_data->pgdir_phys);
 	} else {
 		// kernel
 		// we already know the kernel pgdir mapping
-		map->arch_data->pgdir_virt = kernel_pgdir_virt;
-		map->arch_data->pgdir_phys = kernel_pgdir_phys;
+		map->arch_data->pgdir_virt = sKernelVirtualPageDirectory;
+		map->arch_data->pgdir_phys = sKernelPhysicalPageDirectory;
 	}
 
 	// zero out the bottom portion of the new pgdir
-	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0, NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
+	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
+		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
 
 	// insert this new map into the map list
 	{
@@ -825,7 +854,8 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 		acquire_spinlock(&tmap_list_lock);
 
 		// copy the top portion of the pgdir from the current one
-		memcpy(map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT, kernel_pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
+		memcpy(map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
+			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
 			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
 
 		map->next = tmap_list;
@@ -852,6 +882,8 @@ arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
 status_t
 arch_vm_translation_map_init(kernel_args *args)
 {
+	cpuid_info info;
+
 	TRACE(("vm_translation_map_init: entry\n"));
 
 	// page hole set up in stage2
@@ -861,8 +893,8 @@ arch_vm_translation_map_init(kernel_args *args)
 	// clear out the bottom 2 GB, unmap everything
 	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
-	kernel_pgdir_phys = (page_directory_entry *)args->arch_args.phys_pgdir;
-	kernel_pgdir_virt = (page_directory_entry *)args->arch_args.vir_pgdir;
+	sKernelPhysicalPageDirectory = (page_directory_entry *)args->arch_args.phys_pgdir;
+	sKernelVirtualPageDirectory = (page_directory_entry *)args->arch_args.vir_pgdir;
 
 	tmap_list_lock = 0;
 	tmap_list = NULL;
@@ -907,6 +939,13 @@ arch_vm_translation_map_init(kernel_args *args)
 		}
 	}
 
+	// enable global page feature if available
+	get_current_cpuid(&info, 1);
+	if (info.eax_1.features & IA32_GLOBAL_PAGE_FEATURE) {
+		// this prevents kernel pages from being flushed from TLB on context-switch
+		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
+	}
+
 	TRACE(("vm_translation_map_init: done\n"));
 
 	return B_OK;
@@ -933,11 +972,11 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
 	// unmap the page hole hack we were using before
-	kernel_pgdir_virt[1023].present = 0;
+	sKernelVirtualPageDirectory[1023].present = 0;
 	page_hole_pgdir = NULL;
 	page_hole = NULL;
 
-	temp = (void *)kernel_pgdir_virt;
+	temp = (void *)sKernelVirtualPageDirectory;
 	create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
@@ -1000,8 +1039,10 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 		// zero it out in it's new mapping
 		memset((unsigned int *)((unsigned int)page_hole + (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
 	}
+
 	// now, fill in the pentry
-	put_page_table_entry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes);
+	put_page_table_entry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes,
+		IS_KERNEL_ADDRESS(va));
 
 	arch_cpu_invalidate_TLB_range(va, va);
 
