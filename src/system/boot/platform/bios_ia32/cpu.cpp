@@ -16,6 +16,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
+#include <arch_system_info.h>
 
 #include <string.h>
 
@@ -33,6 +34,9 @@ extern "C" uint64 rdtsc();
 uint32 gTimeConversionFactor;
 
 #define TIMER_CLKNUM_HZ (14318180/12)
+
+#define CPUID_EFLAGS	(1UL << 21)
+#define RDTSC_FEATURE	(1UL << 4)
 
 
 static void
@@ -213,7 +217,23 @@ not_so_quick_sample:
 static status_t
 check_cpu_features()
 {
-	// ToDo: for now
+	// check the eflags register to see if the cpuid instruction exists
+	if ((get_eflags() & CPUID_EFLAGS) == 0) {
+		// it's not set yet, but maybe we can set it manually
+		set_eflags(get_eflags() | CPUID_EFLAGS);
+		if ((get_eflags() & CPUID_EFLAGS) == 0)
+			return B_ERROR;
+	}
+
+	cpuid_info info;
+	if (get_current_cpuid(&info, 1) != B_OK)
+		return B_ERROR;
+
+	if ((info.eax_1.features & RDTSC_FEATURE) == 0) {
+		// we currently require RDTSC
+		return B_ERROR;
+	}
+
 	return B_OK;
 }
 
