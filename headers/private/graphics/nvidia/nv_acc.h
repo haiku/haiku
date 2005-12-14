@@ -187,7 +187,7 @@ typedef struct {
 	} Rectangle[0x10];			/* command can handle upto 16 rectangles */
 } cmd_nv_render_solid_rectangle;/* nv1_render_solid_rectangle is identical */
 
-//fixme: complete or remove (this 2D cmd is not used currently)
+//fixme: (setup in progress for DMA) complete or remove (this cmd is not used currently)
 typedef struct {
 } cmd_nv1_image_from_cpu;		/* 'pixmap': used in XFree 4.2.0, but not beyond.
 								 * (Used for the 2D 'ImageWriteScanline' and
@@ -262,25 +262,7 @@ typedef struct {
 	uint32 SetOffsetZeta;		/* b0-31 is Z-buffer (zeta buffer) offset */
 } cmd_nv4_context_surfaces_argb_zs; /* nv10_context_surfaces_argb_zs is identical */
 
-//fixme: let's loose this one if possible as we don't support NV3 anyway ...
-//		 (checkout if we can re-setup 2D surfaces (after using 3D) without this command)
-typedef struct {
-	uint32 reserved00[0x0004];
-	uint16 FifoFree;			/* little endian (FIFO internal register) */
-	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x000b];
-	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
-	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
-	uint32 reserved02[0x00b0];	/* fixme? there's more here that's not used apparantly */
-	uint32 Pitch;				/* b0-15 is buffer pitch */
-	uint32 SetOffset;			/* b0-22 is buffer offset (so just 1st 8Mb adressable!) */
-} cmd_nv3_surface_x;			/* x = 0, 1, 2 or 3: selects buffer to be setup;
-								 * 0,1 is 2D surfaces, 2,3 is 3D surfaces */
-
-//fixme: fill these out...
-typedef struct {
-} cmd_nv_render_d3d0_triangle_zeta;
-
+//fixme: fill this out...
 typedef struct {
 } cmd_nv4_dx6_multi_texture_triangle;/* nv10_dx6_multi_texture_triangle is identical? */
 
@@ -313,6 +295,8 @@ typedef struct {
 #define NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP			0x0400
 #define NV4_SURFACE_FORMAT							0x0300
 #define NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT	0x0300
+#define NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG		0x0308
+#define NV_SCALED_IMAGE_FROM_MEMORY_SIZE			0x0400
 
 
 /************************
