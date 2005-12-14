@@ -135,8 +135,12 @@ class PatternHandler {
 
 			bool				IsHighColor(const BPoint& pt) const;
 	inline	bool				IsHighColor(int x, int y) const;
+	inline	bool				IsSolidHigh() const
+									{ return fPattern == B_SOLID_HIGH; }
+	inline	bool				IsSolidLow() const
+									{ return fPattern == B_SOLID_LOW; }
 	inline	bool				IsSolid() const
-									{ return fPattern == B_SOLID_HIGH || fPattern == B_SOLID_LOW; }
+									{ return IsSolidHigh() || IsSolidLow(); }
 
 			const pattern*		GetR5Pattern(void) const
 									{ return (const pattern*)fPattern.GetInt8(); }
