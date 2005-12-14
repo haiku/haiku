@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-11/2005
+	Rudolf Cornelissen 10/2002-12/2005
 */
 
 #define MODULE_BIT 0x08000000
@@ -212,6 +212,12 @@ status_t check_acc_capability(uint32 feature)
 		break;
 	case B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT:
 		msg = "B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT";
+		/* this function is only defined for DMA acceleration */
+		if (!si->settings.dma_acc)
+		{
+			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
+			return B_ERROR;
+		}
 		break;
 	default:
 		msg = "UNKNOWN";

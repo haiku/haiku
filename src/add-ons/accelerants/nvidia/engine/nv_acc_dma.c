@@ -1767,6 +1767,8 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 //fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count)
 {
+	uint32 i = 0;
+	uint16 subcnt;
 	uint32 cmd_depth;
 
 	/*** init acc engine for scaled filtered blit function ***/
@@ -1820,7 +1822,64 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		/* TNT1 has fixed operation mode SRCcopy */
 	}
 
-	//fixme: implement actual blit..
+	/* now setup fill color (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */
+
+	/*** do each blit ***/
+	/* Note:
+	 * blit-copy direction is determined inside nvidia hardware: no setup needed */
+	while (count)
+	{
+		/* break up the list in sublists to minimize calls, while making sure long
+		 * lists still get executed without trouble */
+		subcnt = 16;
+		if (count < 16) subcnt = count;
+		count -= subcnt;
+
+		/* wait for room in fifo for blit cmd if needed. */
+		if (nv_acc_fifofree_dma(12 * subcnt) != B_OK) return;
+
+		while (subcnt--)
+		{
+			/* now setup blit (writing 12 32bit words) */
+			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG, 6);
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				(((list[i].src_top) << 16) | (list[i].src_left)); /* SourceOrg */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SourceHeightWidth */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				((((list[i].dest_height) + 1) << 16) | ((list[i].dest_width) + 1)); /* DestHeightWidth */
+			//fixme: setup:
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				0; /* DeltaDuDx (in 12.20 format) */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				0; /* Delta_Dv_Dy (in 12.20 format) */
+
+			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SIZE, 4);
+			//fixme: checkout:
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SizeHeightWidth */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				si->fbc.bytes_per_row; /* Pitch */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* Offset */
+			//fixme: setup:
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				0; /* PointUV (U in 12.4 format, V in 4.12 format) */
+
+			i++;
+		}
+
+		/* tell the engine to fetch the commands in the DMA buffer that where not
+		 * executed before. */
+		nv_start_dma();
+	}
+
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
 }
 
 /* rectangle fill - i.e. workspace and window background color */
