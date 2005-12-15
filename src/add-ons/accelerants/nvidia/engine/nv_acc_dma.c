@@ -16,7 +16,8 @@
  * - we have to issue a 3D drawing command before overlay is activated to prevent
  *   the acceleration engine to crash;
  * - we have to forego FIFO assignment switching: switching while we use overlay
- *   crashes the acceleration engine as well.
+ *   crashes the acceleration engine as well. (broken since adding
+ *   NV_SCALED_IMAGE_FROM_MEMORY...)
  *
  * Hopefully we can find the _real_ solution for this one day... */
 #define RIVA_STATE3D_05(t0, t1, t2, bb, cc) \
@@ -270,6 +271,9 @@ status_t nv_acc_init_dma()
 
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 		ACCW(HT_VALUE_12, 0x00101146); /* instance $1146, engine = acc engine, CHID = $00 */
+
+		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
+		ACCW(HT_VALUE_13, 0x0010114e); /* instance $114e, engine = acc engine, CHID = $00 */
 	}
 	else
 	{
@@ -295,7 +299,7 @@ status_t nv_acc_init_dma()
 		ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_06, (0x80000000 | NV1_RENDER_SOLID_LIN)); /* 32bit handle (not used) */
-		ACCW(HT_VALUE_06, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_06, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
 		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
@@ -306,6 +310,9 @@ status_t nv_acc_init_dma()
 
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 		ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
+
+		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
+		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
@@ -369,13 +376,20 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX3_A, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
 		ACCW(PR_CTX0_B, 0x00000000); /* extra */
 		ACCW(PR_CTX1_B, 0x00000000); /* extra */
+		/* setup set '7' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
+		ACCW(PR_CTX0_C, 0x02080077); /* NVclass $077, nv10+: little endian */
+		ACCW(PR_CTX1_C, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_C, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_C, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
+		ACCW(PR_CTX0_D, 0x00000000); /* extra */
+		ACCW(PR_CTX1_D, 0x00000000); /* extra */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
-		ACCW(PR_CTX0_C, 0x00003002); /* DMA page table present and of linear type;
+		ACCW(PR_CTX0_E, 0x00003002); /* DMA page table present and of linear type;
 									  * DMA class is $002 (b0-11);
 									  * DMA target node is NVM (non-volatile memory?)
 									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_C, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
-		ACCW(PR_CTX2_C, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
+		ACCW(PR_CTX1_E, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+		ACCW(PR_CTX2_E, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located at end of cardRAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
@@ -477,29 +491,35 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
 		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		/* setup set '9' for cmd NV1_RENDER_SOLID_LIN (not used) */
-		ACCW(PR_CTX0_9, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
+		/* setup set '9' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
+		ACCW(PR_CTX0_9, 0x01018077); /* NVclass $077, patchcfg SRC_COPY,
 									  * context surface0 valid, nv10+: little endian */
 		ACCW(PR_CTX1_9, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
+		/* setup set 'A' for cmd NV1_RENDER_SOLID_LIN (not used) */
+		ACCW(PR_CTX0_A, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
+									  * context surface0 valid, nv10+: little endian */
+		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
 		if (si->engine.agp_mode)
 		{
 			/* DMA page table present and of linear type;
 			 * DMA class is $002 (b0-11);
 			 * DMA target node is AGP */
-			ACCW(PR_CTX0_A, 0x00033002);
+			ACCW(PR_CTX0_B, 0x00033002);
 		}
 		else
 		{
 			/* DMA page table present and of linear type;
 			 * DMA class is $002 (b0-11);
 			 * DMA target node is PCI */
-			ACCW(PR_CTX0_A, 0x00023002);
+			ACCW(PR_CTX0_B, 0x00023002);
 		}
-		ACCW(PR_CTX1_A, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
-		ACCW(PR_CTX2_A, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
+		ACCW(PR_CTX1_B, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
+		ACCW(PR_CTX2_B, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located in main system RAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
@@ -969,9 +989,9 @@ status_t nv_acc_init_dma()
 	 * This define tells the engine where the DMA cmd buffer is and what it's size is.
 	 * Inside that cmd buffer you'll find the actual issued engine commands. */
 	if (si->ps.card_arch >= NV40A)
-		ACCW(PF_CACH1_DMAI, 0x0000114e);
+		ACCW(PF_CACH1_DMAI, 0x00001150);
 	else
-		ACCW(PF_CACH1_DMAI, 0x0000114c);
+		ACCW(PF_CACH1_DMAI, 0x0000114d);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
@@ -1634,6 +1654,9 @@ static void nv_acc_set_ch_dma(uint16 ch, uint32 handle)
 	si->engine.dma.free -= 2;
 }
 
+//fixme:
+//adding NV_SCALED_IMAGE_FROM_MEMORY here forces fifo channel assignment switching
+//when 3D is also used: the 3D/overlay compatibility tweak is now broken again...
 void nv_acc_assert_fifo_dma(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
@@ -1643,7 +1666,8 @@ void nv_acc_assert_fifo_dma(void)
 		!si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN] ||
 		!si->engine.fifo.ch_ptr[NV4_SURFACE] ||
 		!si->engine.fifo.ch_ptr[NV_IMAGE_BLIT] ||
-		!si->engine.fifo.ch_ptr[NV4_GDI_RECTANGLE_TEXT])
+		!si->engine.fifo.ch_ptr[NV4_GDI_RECTANGLE_TEXT] ||
+		!si->engine.fifo.ch_ptr[NV_SCALED_IMAGE_FROM_MEMORY])
 	{
 		uint16 cnt;
 
@@ -1654,6 +1678,7 @@ void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[3]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[4]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[5]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[6]] = 0;
 
 		/* set new object handles */
 		si->engine.fifo.handle[0] = NV_ROP5_SOLID;
@@ -1662,6 +1687,7 @@ void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.handle[3] = NV4_SURFACE;
 		si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 		si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
+		si->engine.fifo.handle[6] = NV_SCALED_IMAGE_FROM_MEMORY;
 
 		/* set handle's pointers to their assigned FIFO channels */
 		/* note:
@@ -1673,7 +1699,7 @@ void nv_acc_assert_fifo_dma(void)
 		}
 
 		/* wait for room in fifo for new FIFO assigment cmds if needed. */
-		if (nv_acc_fifofree_dma(12) != B_OK) return;
+		if (nv_acc_fifofree_dma(14) != B_OK) return;
 
 		/* program new FIFO assignments */
 		/* Raster OPeration: */
@@ -1688,6 +1714,8 @@ void nv_acc_assert_fifo_dma(void)
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
 		/* Bitmap: */
 		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
+		/* Scaled and fitered Blit: */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
 
 		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 		nv_start_dma();
@@ -1762,8 +1790,7 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 }
 
 /* scaled and filtered screen to screen blit - i.e. video playback without overlay */
-//fixme: setup command #0x77 handle and define, pgm in FIFO in 'nv_acc_init_dma'...
-//fixme: add 0x77 in nv_acc_assert_fifo_dma..
+/* note: source and destination may not overlap. */
 //fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count)
 {
@@ -1826,8 +1853,6 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */
 
 	/*** do each blit ***/
-	/* Note:
-	 * blit-copy direction is determined inside nvidia hardware: no setup needed */
 	while (count)
 	{
 		/* break up the list in sublists to minimize calls, while making sure long
