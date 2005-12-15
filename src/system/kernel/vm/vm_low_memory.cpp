@@ -16,9 +16,12 @@
 
 static const bigtime_t kLowMemoryInterval = 2000000;	// 2 secs
 
+// page limits
 static const size_t kNoteLimit = 1024;
 static const size_t kWarnLimit = 256;
 static const size_t kCriticalLimit = 32;
+
+static int32 sLowMemoryState = B_NO_LOW_MEMORY;
 
 
 struct low_memory_handler : public DoublyLinkedListLinkImpl<low_memory_handler> {
@@ -49,23 +52,33 @@ call_handlers(int32 level)
 
 
 static int32
+compute_state(void)
+{
+	uint32 freePages = vm_page_num_free_pages();
+	if (freePages >= kNoteLimit)
+		return B_NO_LOW_MEMORY;
+
+	// specify low memory level
+	if (freePages < kCriticalLimit)
+		return B_LOW_MEMORY_CRITICAL;
+	else if (freePages < kWarnLimit)
+		return B_LOW_MEMORY_WARNING;
+
+	return B_LOW_MEMORY_NOTE;
+}
+
+
+static int32
 low_memory(void *)
 {
 	while (true) {
 		snooze(kLowMemoryInterval);
 
-		uint32 freePages = vm_page_num_free_pages();
-		if (freePages >= kNoteLimit)
+		sLowMemoryState = compute_state();
+		if (sLowMemoryState < B_LOW_MEMORY_NOTE)
 			continue;
 
-		// specify low memory level
-		int32 level = B_LOW_MEMORY_NOTE;
-		if (freePages < kCriticalLimit)
-			level = B_LOW_MEMORY_CRITICAL;
-		else if (freePages < kWarnLimit)
-			level = B_LOW_MEMORY_WARNING;
-
-		call_handlers(level);
+		call_handlers(sLowMemoryState);
 	}
 	return 0;
 }
@@ -77,6 +90,13 @@ vm_low_memory(size_t requirements)
 	// ToDo: compute level with requirements in mind
 
 	call_handlers(B_LOW_MEMORY_NOTE);
+}
+
+
+int32
+vm_low_memory_state(void)
+{
+	return sLowMemoryState;
 }
 
 

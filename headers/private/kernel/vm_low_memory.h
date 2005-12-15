@@ -11,6 +11,7 @@
 
 /* warning levels for low memory handlers */
 enum {
+	B_NO_LOW_MEMORY = 0,
 	B_LOW_MEMORY_NOTE,
 	B_LOW_MEMORY_WARNING,
 	B_LOW_MEMORY_CRITICAL,
@@ -23,6 +24,7 @@ extern "C" {
 #endif
 
 status_t vm_low_memory_init(void);
+int32 vm_low_memory_state(void);
 void vm_low_memory(size_t requirements);
 
 // these calls might get public some day
