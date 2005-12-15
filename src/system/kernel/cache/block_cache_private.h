@@ -31,7 +31,7 @@ typedef DoublyLinkedListLink<cached_block> block_link;
 struct cached_block {
 	cached_block	*next;			// next in hash
 	cached_block	*transaction_next;
-	block_link		previous_transaction_link;
+	block_link		link;
 	cached_block	*chunk_next;
 	block_chunk		*chunk;
 	off_t			block_number;
@@ -42,10 +42,10 @@ struct cached_block {
 	void			*compare;
 #endif
 	int32			ref_count;
-	int32			lock;
 	bool			busy : 1;
 	bool			is_writing : 1;
 	bool			is_dirty : 1;
+	bool			unused : 1;
 	bool			unmapped : 1;
 	cache_transaction *transaction;
 	cache_transaction *previous_transaction;
@@ -56,7 +56,7 @@ struct cached_block {
 
 typedef DoublyLinkedList<cached_block,
 	DoublyLinkedListMemberGetLink<cached_block,
-		&cached_block::previous_transaction_link> > block_list;
+		&cached_block::link> > block_list;
 
 struct block_chunk {
 	cached_block	*blocks;
@@ -72,7 +72,8 @@ struct block_range {
 	vm_page			*pages[kNumBlockRangePages];
 	block_chunk		chunks[0];
 
-	static status_t NewBlockRange(block_cache *cache, block_range **_range);
+	static status_t New(block_cache *cache, block_range **_range);
+	static void Delete(block_cache *cache, block_range *range);
 
 	status_t Allocate(block_cache *cache, cached_block *block);
 	void Free(block_cache *cache, cached_block *block);
@@ -83,6 +84,8 @@ struct block_range {
 	uint32 BlockIndex(block_cache *cache, void *address);
 	uint32 ChunkIndex(block_cache *cache, void *address);
 	block_chunk *Chunk(block_cache *cache, void *address);
+
+	bool Unused(const block_cache *cache) const;
 
 	static int Compare(void *_blockRange, const void *_address);
 	static uint32 Hash(void *_blockRange, const void *_address, uint32 range);
@@ -107,6 +110,7 @@ struct block_cache {
 	uint32		range_mask;
 	uint32		chunk_mask;
 	block_list	unmapped_blocks;
+	block_list	unused_blocks;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize);
 	~block_cache();
@@ -115,6 +119,7 @@ struct block_cache {
 
 	block_range *GetFreeRange();
 	block_range *GetRange(void *address);
+	void RemoveUnusedBlocks(int32 count = LONG_MAX);
 	void FreeBlock(cached_block *block);
 	cached_block *NewBlock(off_t blockNumber);
 	void Free(void *address);

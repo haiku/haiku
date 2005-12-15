@@ -182,7 +182,7 @@ block_range::Hash(void *_blockRange, const void *_address, uint32 range)
 
 /* static */
 status_t
-block_range::NewBlockRange(block_cache *cache, block_range **_range)
+block_range::New(block_cache *cache, block_range **_range)
 {
 	addr_t address = sBlockAddressPool.Get();
 	if (address == NULL)
@@ -205,6 +205,37 @@ block_range::NewBlockRange(block_cache *cache, block_range **_range)
 
 	*_range = range;
 	return B_OK;
+}
+
+
+/*static*/
+void
+block_range::Delete(block_cache *cache, block_range *range)
+{
+	// unmap the memory
+
+	vm_address_space *addressSpace = vm_get_kernel_aspace();
+	vm_translation_map *map = &addressSpace->translation_map;
+
+	map->ops->lock(map);
+	map->ops->unmap(map, range->base, range->base + kBlockRangeSize - 1);
+	map->ops->unlock(map);
+
+	vm_put_aspace(addressSpace);
+
+	sBlockAddressPool.Put(range->base);
+
+	// free pages
+
+	uint32 numPages = kBlockRangeSize / B_PAGE_SIZE;
+	for (uint32 i = 0; i < numPages; i++) {
+		if (range->pages[i] == NULL)
+			continue;
+
+		vm_page_set_state(range->pages[i], PAGE_STATE_FREE);
+	}
+
+	free(range);
 }
 
 
@@ -387,6 +418,21 @@ block_range::Free(block_cache *cache, void *address)
 	chunks[chunk].used_mask &= ~(1UL << BlockIndex(cache, address));
 
 	TRACE(("Free: used masks: chunk = %x, range = %lx\n", chunks[chunk].used_mask, used_mask));
+}
+
+
+bool
+block_range::Unused(const block_cache *cache) const
+{
+	if (used_mask != 0)
+		return false;
+
+	for (int32 chunk = cache->chunks_per_range; chunk-- > 0;) {
+		if (chunks[chunk].used_mask != 0)
+			return false;
+	}
+
+	return true;
 }
 
 

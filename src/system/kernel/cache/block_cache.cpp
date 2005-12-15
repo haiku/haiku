@@ -11,6 +11,7 @@
 
 #include <block_cache.h>
 #include <lock.h>
+#include <vm_low_memory.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
@@ -208,7 +209,7 @@ block_cache::GetFreeRange()
 
 	// we need to allocate a new range
 	block_range *range;
-	if (block_range::NewBlockRange(this, &range) != B_OK) {
+	if (block_range::New(this, &range) != B_OK) {
 		// ToDo: free up space in existing ranges
 		// We may also need to free ranges from other caches to get a free one
 		// (if not, an active volume might have stolen all free ranges already)
@@ -236,6 +237,9 @@ block_cache::Free(void *address)
 	block_range *range = GetRange(address);
 	ASSERT(range != NULL);
 	range->Free(this, address);
+
+	if (range->Unused(this))
+		block_range::Delete(this, range);
 }
 
 
@@ -263,6 +267,9 @@ block_cache::FreeBlock(cached_block *block)
 	Free(block->compare);
 #endif
 
+	if (range->Unused(this))
+		block_range::Delete(this, range);
+
 	free(block);
 }
 
@@ -283,12 +290,13 @@ block_cache::NewBlock(off_t blockNumber)
 	range->Allocate(this, block);
 
 	block->block_number = blockNumber;
-	block->lock = 0;
+	block->ref_count = 0;
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
 	block->original = NULL;
 	block->parent_data = NULL;
 	block->is_dirty = false;
+	block->unused = false;
 #ifdef DEBUG_CHANGED
 	block->compare = NULL;
 #endif
@@ -296,6 +304,23 @@ block_cache::NewBlock(off_t blockNumber)
 	hash_insert(hash, block);
 
 	return block;
+}
+
+
+void
+block_cache::RemoveUnusedBlocks(int32 count)
+{
+	while (count-- >= 0) {
+		cached_block *block = unused_blocks.First();
+		if (block == NULL)
+			break;
+
+		// remove block from lists
+		unused_blocks.Remove(block);
+		hash_remove(hash, block);
+
+		FreeBlock(block);
+	}
 }
 
 
@@ -357,9 +382,34 @@ put_cached_block(block_cache *cache, cached_block *block)
 	}
 #endif
 
-	if (--block->lock == 0)
-		;
+	if (--block->ref_count == 0
+		&& block->transaction == NULL
+		&& block->previous_transaction == NULL) {
+		// put this block in the list of unused blocks
+		block->unused = true;
+		cache->unused_blocks.Add(block);
 //		block->data = cache->allocator->Release(block->data);
+	}
+
+	// free some blocks according to the low memory state
+	// (if there is enough memory left, we don't free any)
+
+	int32 free = 1;
+	switch (vm_low_memory_state()) {
+		case B_NO_LOW_MEMORY:
+			return;
+		case B_LOW_MEMORY_NOTE:
+			free = 1;
+			break;
+		case B_LOW_MEMORY_WARNING:
+			free = 5;
+			break;
+		case B_LOW_MEMORY_CRITICAL:
+			free = 20;
+			break;
+	}
+
+	cache->RemoveUnusedBlocks(free);
 }
 
 
@@ -387,7 +437,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 		allocated = true;
 	} else {
 /*
-		if (block->lock == 0 && block->data != NULL) {
+		if (block->ref_count == 0 && block->data != NULL) {
 			// see if the old block can be resurrected
 			block->data = cache->allocator->Acquire(block->data);
 		}
@@ -412,7 +462,13 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 		}
 	}
 
-	block->lock++;
+	if (block->unused) {
+		TRACE(("remove block %Ld from unused\n", blockNumber));
+		block->unused = false;
+		cache->unused_blocks.Remove(block);
+	}
+
+	block->ref_count++;
 	return block;
 }
 
