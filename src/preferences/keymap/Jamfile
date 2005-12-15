@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences keymap ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders interface ;
 
 Preference Keymap :
@@ -8,6 +10,6 @@ Preference Keymap :
 	KeymapListItem.cpp
 	Keymap.cpp
 	KeymapTextView.cpp
-	: libbe.so libtracker.so 
+	: be tracker
 	: Keymap.rdef
 	;

@@ -18,6 +18,7 @@
 
 #include <Control.h>
 #include <FilePanel.h>
+#include <ListView.h>
 #include <Window.h>
 #include <MenuBar.h>
 #include "KeymapTextView.h"
