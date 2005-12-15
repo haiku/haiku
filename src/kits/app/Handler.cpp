@@ -329,7 +329,7 @@ BHandler::MessageReceived(BMessage *message)
 		}
 	} else if (message->what != B_MESSAGE_NOT_UNDERSTOOD
 		&& (message->WasDropped() || message->HasSpecifiers())) {
-		printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
+		printf("BHandler %s: MessageReceived() couldn't understand the message:\n", Name());
 		message->PrintToStream();
 		message->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 	}
