@@ -590,8 +590,14 @@ Desktop::SetWorkspace(int32 index)
 			// if it's not already on it
 			if (fMouseEventWindow->IsNormal()) {
 				// but only normal windows are following
+				uint32 oldWorkspaces = fMouseEventWindow->Workspaces();
+
 				_Windows(index).AddWindow(fMouseEventWindow);
 				_Windows(previousIndex).RemoveWindow(fMouseEventWindow);
+
+				// send B_WORKSPACES_CHANGED message
+				fMouseEventWindow->WorkspacesChanged(oldWorkspaces,
+					fMouseEventWindow->Workspaces());
 			}
 		} else {
 			// make sure it's frontmost
@@ -611,6 +617,8 @@ Desktop::SetWorkspace(int32 index)
 			window != NULL; window = window->NextWindow(previousIndex)) {
 		// store current position in Workspace anchor
 		window->Anchor(previousIndex).position = window->Frame().LeftTop();
+
+		window->WorkspaceActivated(previousIndex, false);
 
 		if (window->InWorkspace(index))
 			continue;
@@ -664,6 +672,9 @@ Desktop::SetWorkspace(int32 index)
 
 	for (WindowLayer* window = _Windows(index).FirstWindow(); window != NULL;
 			window = window->NextWindow(index)) {
+		// send B_WORKSPACE_ACTIVATED message
+		window->WorkspaceActivated(index, true);
+
 		if (window->InWorkspace(previousIndex) || window == fMouseEventWindow) {
 			// this window was visible before, and is already handled in the above loop
 			continue;
@@ -1361,6 +1372,7 @@ Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
+	window->WorkspacesChanged(window->Workspaces(), workspaces);
 	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
 	UnlockAllWindows();
 }
