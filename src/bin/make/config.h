@@ -45,7 +45,7 @@
 /* #undef HAVE_BROKEN_RESTART */
 
 /* Define to 1 if you have the `bsd_signal' function. */
-#define HAVE_BSD_SIGNAL 1
+/* #undef HAVE_BSD_SIGNAL */
 
 /* Define if you have the clock_gettime function. */
 /* #undef HAVE_CLOCK_GETTIME */

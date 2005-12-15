@@ -1,10 +1,13 @@
 SubDir HAIKU_TOP src bin make ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
-SubDirHdrs [ FDirName $(SUBDIR) glob ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) glob ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
