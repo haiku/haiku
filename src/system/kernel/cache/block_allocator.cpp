@@ -23,6 +23,42 @@
 #endif
 
 
+/**	The BlockAddressPool class manages a block of virtual memory address
+ *	ranges.
+ *	The actual block of kBlockAddressSize bytes, currently 128 MB (as defined
+ *	in block_cache_private.h) is divided into kBlockRangeSize or 64 kB
+ *	ranges.
+ *	You can ask for a free range, and when you're done, you return it into
+ *	the pool. You usually only do that when the block cache owning the
+ *	ranges is deleted, or if memory becomes tight, a new volume is mounted
+ *	or whatever.
+ *
+ *	The block_range class on the other side manages each range. Only allocated
+ *	ranges have a block_range object.
+ *	In the block cache, the ranges are put into a hash table - they are
+ *	accessed within that hash by address. That way, a cached_block allocated
+ *	in one range doesn't need to know its range.
+ *
+ *	If you actually need physical memory, you must allocate it using the
+ *	block_range Allocate() methods.
+ *
+ *	The block_range is further divided into block_chunks. A block_chunk is
+ *	a multiple of the page size - for block sizes below the page size, it's
+ *	just one page. Pages for the block range are actually allocated and
+ *	mapped per chunk, and not for the whole range.
+ *
+ *	The block_range only exists to avoid fragmentation of the virtual memory
+ *	region reserved for the block cache, since all allocations have the same
+ *	size there can't be any fragmentation at all.
+ *
+ *	NOTE: This code is a bit complicated, and maybe a slab allocator would have been
+ *	the better choice. What this allows for (and what would not be easily possible
+ *	with a slab allocator) is to keep blocks in physical memory, but don't
+ *	have them mapped. This, of course, would only be important if you have
+ *	more memory than address space available - which sounds like a good idea
+ *	now, but with 64-bit address spaces it looks a bit different :-)
+ */
+
 class BlockAddressPool {
 	public:
 		BlockAddressPool();
@@ -310,7 +346,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 		if (used_mask == cache->range_mask) {
 			// range is full, remove it from the free list
 
-			// usually, the first entry will be us, but we don't count on it
+			// usually, the first entry will be ourself, but we don't count on it
 			block_range *last = NULL, *range = cache->free_ranges;
 			while (range != NULL && range != this) {
 				last = range;
