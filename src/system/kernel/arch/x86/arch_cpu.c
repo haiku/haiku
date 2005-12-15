@@ -469,14 +469,7 @@ arch_cpu_shutdown(bool _reboot)
 void
 arch_cpu_idle(void)
 {
-	switch (smp_get_num_cpus()) {
-		case 0:
-			panic("You need at least 1 CPU to run Haiku\n");
-		case 1:
-			asm("hlt");
-		default:
-			break;
-	}
+	asm("hlt");
 }
 
 
