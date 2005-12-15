@@ -64,30 +64,42 @@ actions KernelLd
 rule KernelAddon
 {
 	# KernelAddon <name> : <relpath> : <sources> : <static-libraries> ;	
-
+	#
+# TODO: <relpath> no longer needed!
+	local target = $(1) ;
 	local sources = $(3) ;
+	local libs = $(4) ;
 
-	# platform supported?
-	on $(1) {
+	local kernel ;
+	local beginGlue ;
+	local endGlue ;
+	on $(target) {
+		# platform supported?
 		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
 			return ;
 		}
+
+		# determine which kernel and glue code to link against
+		if $(PLATFORM) = haiku {
+			kernel = <nogrist>kernel.so ;
+			beginGlue = $(HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE) ;
+			endGlue = $(HAIKU_KERNEL_ADDON_END_GLUE_CODE) ;
+		} else {
+			kernel = /boot/develop/lib/x86/_KERNEL_ ;
+		}
 	}
 
-	# When building for Haiku, we link against kernel.so, otherwise
-	# against the system kernel.
-	local kernel ;
-	if [ on $(1) return $(PLATFORM) ] = haiku {
-		kernel = <nogrist>kernel.so ;
-	} else {
-		kernel = /boot/develop/lib/x86/_KERNEL_ ;
-	}
+	# add glue code
+	LINK_BEGIN_GLUE on $(target) = $(beginGlue) ;
+	LINK_END_GLUE on $(target) = $(endGlue) ;
+	Depends $(target) : $(beginGlue) $(endGlue) ;
 
+	# compile and link
 	SetupKernel $(sources) : -fno-pic ;
-
-	Addon $(1) : $(2) : $(sources) ;
-	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
-	LinkAgainst $(1) : $(4) $(kernel) ;
+	local linkFlags = -nostdlib -Xlinker -soname=\"$(target)\" ;
+	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
+	Main $(target) : $(sources) ;
+	LinkAgainst $(target) : $(libs) $(kernel) ;
 }
 
 rule KernelMergeObject
