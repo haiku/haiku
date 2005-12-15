@@ -2,8 +2,8 @@ SubDir HAIKU_TOP src bin bc lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) h ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) h ] ;
 
 StaticLibrary libbc.a : 
 	getopt.c getopt1.c vfprintf.c number.c
