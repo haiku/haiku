@@ -1805,7 +1805,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	if (si->ps.card_type != NV04)
 	{
 		/* wait for room in fifo for cmds if needed. */
-		if (nv_acc_fifofree_dma(3) != B_OK) return;
+		if (nv_acc_fifofree_dma(5) != B_OK) return;
 		/* now setup source bitmap colorspace */
 		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 2);
 		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
@@ -1815,13 +1815,12 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	else
 	{
 		/* wait for room in fifo for cmd if needed. */
-		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		if (nv_acc_fifofree_dma(4) != B_OK) return;
 		/* now setup source bitmap colorspace */
 		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 1);
 		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 		/* TNT1 has fixed operation mode SRCcopy */
 	}
-
 	/* now setup fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */
