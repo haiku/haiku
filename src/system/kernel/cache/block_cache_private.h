@@ -33,7 +33,6 @@ struct cached_block {
 	cached_block	*transaction_next;
 	block_link		link;
 	cached_block	*chunk_next;
-	block_chunk		*chunk;
 	off_t			block_number;
 	void			*data;
 	void			*original;

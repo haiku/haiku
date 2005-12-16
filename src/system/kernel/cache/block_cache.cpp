@@ -275,20 +275,20 @@ block_cache::FreeBlock(cached_block *block)
 	if (range->Unused(this))
 		block_range::Delete(this, range);
 
-	free(block);
+	delete block;
 }
 
 
 cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
-	cached_block *block = (cached_block *)malloc(sizeof(cached_block));
+	cached_block *block = new cached_block;
 	if (block == NULL)
 		return NULL;
 
 	block_range *range = GetFreeRange();
 	if (range == NULL) {
-		free(block);
+		delete block;
 		return NULL;
 	}
 
@@ -322,8 +322,6 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 	for (cached_block *block = unused_blocks.First(); block != NULL; block = next) {
 		next = block->next;
 
-		if (block == NULL)
-			break;
 		if (maxAccessed < block->accessed)
 			continue;
 
@@ -1038,6 +1036,8 @@ block_cache_delete(void *_cache, bool allowWrites)
 
 	if (allowWrites)
 		block_cache_sync(cache);
+
+	BenaphoreLocker locker(&cache->lock);
 
 	// free all blocks
 
