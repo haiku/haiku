@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src bin sharutils lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary libsharutils.a : 
 #	alloca.c
