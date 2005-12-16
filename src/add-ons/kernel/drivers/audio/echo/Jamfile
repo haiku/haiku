@@ -3,4 +3,4 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio echo ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo gals ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo 24 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo 3g ;
-#SubInclude HAIKU_TOP src add-ons kernel drivers audio echo indigo ; # Indigo are CardBus based
+SubInclude HAIKU_TOP src add-ons kernel drivers audio echo indigo ; # Indigo are CardBus based

@@ -59,7 +59,7 @@ void log_create()
 {
 #if DEBUG > 0
 	int fd = open(logfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	const char *text = DRIVER_NAME ", " VERSION "\n";
+	const char *text = DRIVER_NAME ", " ECHO_VERSION "\n";
 	loglock = create_sem(1,"logfile sem");
 	write(fd,text,strlen(text));
 	close(fd);

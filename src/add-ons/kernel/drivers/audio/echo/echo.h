@@ -24,7 +24,11 @@
 #ifndef _ECHO_H_
 #define _ECHO_H_
 
+#ifdef CARDBUS
+#include <pcmcia/cb_enabler.h>
+#else
 #include <PCI.h>
+#endif
 #include "OsSupportBeOS.h"
 #include "CEchoGals.h"
 #include "multi_audio.h"
@@ -118,11 +122,22 @@ typedef struct _echo_dev {
 	multi_dev	multi;		
 #ifdef MIDI_SUPPORT
 	midi_dev 	midi;
-#endif	
+#endif
+#ifdef CARDBUS
+	bool				plugged;					// Device plugged
+	bool				opened;						// Device opened
+	int32				index;
+	LIST_ENTRY(_echo_dev)	next;
+#endif
 } echo_dev;
 
 extern int32 num_cards;
+#ifdef CARDBUS
+LIST_HEAD(_echodevs, _echo_dev);
+extern struct _echodevs	devices;
+#else
 extern echo_dev cards[NUM_CARDS];
+#endif
 
 #ifdef __cplusplus
 extern "C" {

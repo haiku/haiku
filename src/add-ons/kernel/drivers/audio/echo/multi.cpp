@@ -757,6 +757,14 @@ static status_t
 echo_multi_control(void *cookie, uint32 op, void *data, size_t length)
 {
 	echo_dev *card = (echo_dev *)cookie;
+	
+#ifdef CARDBUS
+	// Check
+	if (card->plugged == false) {
+		LOG(("device %s unplugged\n", card->name));
+		return B_ERROR;
+	}
+#endif
 
     switch (op) {
 		case B_MULTI_GET_DESCRIPTION: 
@@ -850,24 +858,45 @@ static status_t
 echo_open(const char *name, uint32 flags, void** cookie)
 {
 	echo_dev *card = NULL;
-	int ix, i, first_record_channel;
+	int i, first_record_channel;
 	echo_stream *stream = NULL;
 	
 	LOG(("echo_open()\n"));
 	
+#ifdef CARDBUS
+	LIST_FOREACH(card, &devices, next) {
+		if (!strcmp(card->name, name)) {
+			break;
+		}
+	}
+#else
 	for (i=0; i<num_cards; i++) {
 		if (!strcmp(cards[i].name, name)) {
 			card = &cards[i];
 		}
 	}
+#endif
 	
 	if(card == NULL) {
 		LOG(("open() card not found %s\n", name));
-		for (ix=0; ix<num_cards; ix++) {
-			LOG(("open() card available %s\n", cards[ix].name)); 
+#ifdef CARDBUS
+		LIST_FOREACH(card, &devices, next) {
+			LOG(("open() card available %s\n", card->name));
 		}
+#else
+		for (int ix=0; ix<num_cards; ix++) {
+			LOG(("open() card available %s\n", cards[ix].name));
+		}
+#endif
 		return B_ERROR;
 	}
+
+#ifdef CARDBUS
+	if (card->plugged == false) {
+		LOG(("device %s unplugged\n", name));
+		return B_ERROR;
+	}
+#endif
 		
 	LOG(("open() got card\n"));
 	
@@ -878,6 +907,9 @@ echo_open(const char *name, uint32 flags, void** cookie)
 			
 	*cookie = card;
 	card->multi.card = card;
+#ifdef CARDBUS
+	card->opened = true;
+#endif
 		
 	LOG(("creating play streams\n"));
 	
@@ -912,8 +944,11 @@ echo_open(const char *name, uint32 flags, void** cookie)
 static status_t
 echo_close(void* cookie)
 {
-	//echo_dev *card = cookie;
 	LOG(("close()\n"));
+#ifdef CARDBUS
+	echo_dev *card = (echo_dev *) cookie;
+	card->opened = false;
+#endif
 		
 	return B_OK;
 }

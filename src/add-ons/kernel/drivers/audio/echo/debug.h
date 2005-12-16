@@ -43,7 +43,7 @@
 #ifdef ECHO3G_FAMILY
 #define DRIVER_NAME "echo3g"
 #endif
-#define VERSION		"0.0"
+#define ECHO_VERSION		"0.0"
 
 /*
  * PRINT() executes dprintf if DEBUG = 0 (disabled), or expands to LOG() when DEBUG > 0

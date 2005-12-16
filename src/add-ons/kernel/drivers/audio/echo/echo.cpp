@@ -44,12 +44,36 @@
 #include "debug.h"
 #include "util.h"
 
+#ifdef CARDBUS
+static cb_enabler_module_info	*cbemi;
+struct _echodevs				devices;
+static char						*names[NUM_CARDS];
+int32 							num_names = 0;
+static uint32					device_index = 0;
+static sem_id					device_lock = 0;
+
+static const cb_device_descriptor	descriptors[] = {
+	{VENDOR_ID, DEVICE_ID_56301, 0xff, 0xff, 0xff}
+};
+
+#define COUNT_DESCRIPTOR			1
+
+status_t cardbus_device_added(pci_info *info, void **cookie);
+void cardbus_device_removed(void *cookie);
+
+static cb_notify_hooks	cardbus_hooks = {
+	cardbus_device_added, 		// Add entry point
+	cardbus_device_removed 		// Remove entry point
+};
+
+#else // CARDBUS
 static char pci_name[] = B_PCI_MODULE_NAME;
 static pci_module_info	*pci;
 int32 num_cards;
 echo_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
+#endif // CARDBUS
 
 extern device_hooks multi_hooks;
 #ifdef MIDI_SUPPORT
@@ -424,6 +448,9 @@ echo_dump_caps(echo_dev *card)
 status_t 
 init_hardware(void)
 {
+#ifdef CARDBUS
+	return B_OK;
+#else
 	int ix=0;
 	pci_info info;
 	status_t err = ENODEV;
@@ -477,12 +504,36 @@ init_hardware(void)
 	}
 
 	return err;
+#endif
 }
 
 
 status_t
 init_driver(void)
 {
+#ifdef CARDBUS
+	// Get card services client module
+	if (get_module(CB_ENABLER_MODULE_NAME, (module_info **)&cbemi) != B_OK) {
+		dprintf(DRIVER_NAME ": cardbus enabler module error\n");
+		goto cb_error;
+	}
+	// Create the devices lock
+	device_lock = create_sem(1, DRIVER_NAME " device");
+	if (device_lock < B_OK) {
+		dprintf(DRIVER_NAME ": create device semaphore error 0x%.8x\n", device_lock);
+		put_module(CB_ENABLER_MODULE_NAME);	
+		goto cb_error;
+	}
+    // Register driver
+    cbemi->register_driver(DRIVER_NAME, descriptors, COUNT_DESCRIPTOR);
+    cbemi->install_notify(DRIVER_NAME, &cardbus_hooks);
+    LIST_INIT(&(devices));
+    return B_OK;
+    
+cb_error:
+	put_module(B_PCI_MODULE_NAME);
+	return B_ERROR;
+#else
 	int ix=0;
 	
 	pci_info info;
@@ -548,14 +599,15 @@ init_driver(void)
 	}
 	
 	return B_OK;
+#endif
 }
 
 
+#ifndef CARDBUS
 static void
 make_device_names(
 	echo_dev * card)
 {
-
 #ifdef MIDI_SUPPORT
 	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
@@ -565,6 +617,79 @@ make_device_names(
 
 	names[num_names] = NULL;
 }
+#else
+
+status_t 
+cardbus_device_added(pci_info *info, void **cookie) {
+	echo_dev 			* card, *dev;
+	uint32				index;
+	char				buffer[32];
+
+	LOG(("cardbus_device_added at %.2d:%.2d:%.2d\n", info->bus, info->device, info->function));
+	// Allocate cookie
+	if (!(*cookie = card = (echo_dev *)malloc(sizeof(echo_dev)))) {
+		return B_NO_MEMORY;
+	}
+	// Clear cookie
+	memset(card, 0, sizeof(echo_dev));
+	// Initialize cookie
+	card->info = *info;
+	card->plugged = true;
+	card->index = 0;
+	
+	LIST_FOREACH(dev, &devices, next) {
+		if (dev->index == card->index) {
+			card->index++;
+			dev = LIST_FIRST(&devices);
+		}
+	}
+	
+	// Format device name
+	sprintf(card->name, "audio/multi/" DRIVER_NAME "/%ld", card->index);
+	// Lock the devices
+	acquire_sem(device_lock);
+	LIST_INSERT_HEAD((&devices), card, next);
+	// Unlock the devices
+	release_sem(device_lock);
+	
+	echo_setup(card);
+	return B_OK;
+}
+
+
+// cardbus_device_removed - handle cardbus device removal.
+// status : OK
+void 
+cardbus_device_removed(void *cookie)
+{
+	echo_dev		*card = (echo_dev *) cookie;
+	
+	LOG((": cardbus_device_removed\n"));
+	// Check
+	if (card == NULL) {
+		LOG((": null device 0x%.8x\n", card));
+		return;
+	}
+	
+	echo_shutdown(card);
+	
+	// Lock the devices
+	acquire_sem(device_lock);
+	// Finalize
+	card->plugged = false;
+	// Check if the device is opened
+	if (card->opened) {
+		LOG(("device 0x%.8x %s still in use\n", card, card->name));
+	} else {
+		LOG(("free device 0x%.8x %s\n", card, card->name));
+		LIST_REMOVE(card, next);
+		free(card);
+	}
+	// Unlock the devices
+	release_sem(device_lock);
+}
+
+#endif
 
 
 static status_t
@@ -575,14 +700,16 @@ echo_setup(echo_dev * card)
 	char *name;
 	
 	PRINT(("echo_setup(%p)\n", card));
-	
+
+#ifndef CARDBUS
 	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, 
 		PCI_latency, 1, 0xc0 );
 	
 	make_device_names(card);
-	
+#endif
 	card->bmbar = card->info.u.h0.base_registers[0];
 	card->irq = card->info.u.h0.interrupt_line;
+
 
 	card->pOSS = new COsSupport(card->info.device_id, card->info.revision);
 	if(card->pOSS == NULL)
@@ -614,7 +741,7 @@ echo_setup(echo_dev * card)
 			break;
 		case LAYLA24:
 			card->pEG = new CLayla24(card->pOSS);
-			name = "Echo Gina24";
+			name = "Echo Layla24";
 			break;
 		case MONA:
 			card->pEG = new CMona(card->pOSS);
@@ -628,15 +755,15 @@ echo_setup(echo_dev * card)
 #ifdef INDIGO_FAMILY
 		case INDIGO:
 			card->pEG = new CIndigo(card->pOSS);
-			name = "Echo Mia";
+			name = "Echo Indigo";
 			break;
 		case INDIGO_IO:
 			card->pEG = new CIndigoIO(card->pOSS);
-			name = "Echo Mia";
+			name = "Echo IndigoIO";
 			break;
 		case INDIGO_DJ:
 			card->pEG = new CIndigoDJ(card->pOSS);
-			name = "Echo Mia";
+			name = "Echo IndigoDJ";
 			break;
 #endif
 #ifdef ECHO3G_FAMILY
@@ -662,11 +789,13 @@ echo_setup(echo_dev * card)
 	}
 	LOG(("mapping of bmbar: area %#x, phys %#x, log %#x\n", card->area_bmbar, card->bmbar, card->log_bmbar));
 
+#ifndef CARDBUS
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
 	(*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2, cmd | PCI_command_io);
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
+#endif
 
 	card->pEG->AssignResources(card->log_bmbar, name);
 
@@ -734,28 +863,54 @@ echo_shutdown(echo_dev *card)
 void
 uninit_driver(void)
 {
+	PRINT(("uninit_driver()\n"));
+		
+#ifdef CARDBUS
+	echo_dev			*dev;
+	
+	LIST_FOREACH(dev, &devices, next) {
+		echo_shutdown(dev);
+	}
+	put_module(CB_ENABLER_MODULE_NAME);
+#else
 	int ix, cnt = num_cards;
 	num_cards = 0;
-
-	PRINT(("uninit_driver()\n"));
-	
 	for (ix=0; ix<cnt; ix++) {
 		echo_shutdown(&cards[ix]);
 	}
+	
 	memset(&cards, 0, sizeof(cards));
 	put_module(pci_name);
+#endif
 }
 
 
 const char **
 publish_devices(void)
 {
+#ifdef CARDBUS
+	echo_dev			*dev;
+	int			ix = 0;
+
+	// Lock the devices
+	acquire_sem(device_lock);
+	// Loop
+	LIST_FOREACH(dev, &devices, next) {
+		if (dev->plugged == true) {
+			names[ix] = dev->name;
+			ix++;
+		}
+	}
+	names[ix] = NULL;
+	release_sem(device_lock);
+#else
 	int ix = 0;
 	PRINT(("publish_devices()\n"));
 
 	for (ix=0; names[ix]; ix++) {
 		PRINT(("publish %s\n", names[ix]));
 	}
+#endif
 	return (const char **)names;
 }
 
@@ -763,6 +918,15 @@ publish_devices(void)
 device_hooks *
 find_device(const char * name)
 {
+	echo_dev *dev;
+#ifdef CARDBUS
+	LIST_FOREACH(dev, &devices, next) {
+		if (!strcmp(dev->name, name)) {
+			return &multi_hooks;
+		}
+	}
+
+#else
 	int ix;
 
 	PRINT(("find_device(%s)\n", name));
@@ -777,6 +941,7 @@ find_device(const char * name)
 			return &multi_hooks;
 		}
 	}
+#endif
 	PRINT(("find_device(%s) failed\n", name));
 	return NULL;
 }

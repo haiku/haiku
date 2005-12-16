@@ -2,6 +2,11 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio echo indigo ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
+	# We need the public pcmcia headers also when not compiling for Haiku.
+}
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
@@ -10,8 +15,8 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 # set some additional defines
-SubDirCcFlags -DECHO_BEOS -DINDIGO_FAMILY ;
-SubDirC++Flags -DECHO_BEOS -DINDIGO_FAMILY -fno-rtti -DAUTO_DUCK_ALLOCATE ;
+SubDirCcFlags -DECHO_BEOS -DINDIGO_FAMILY -DCARDBUS ;
+SubDirC++Flags -DECHO_BEOS -DINDIGO_FAMILY -fno-rtti -DAUTO_DUCK_ALLOCATE -DCARDBUS ;
 
 local echo_files =
 	CChannelMask.cpp

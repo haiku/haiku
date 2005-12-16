@@ -2,6 +2,11 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio echo gals ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
+	# We need the public pcmcia headers also when not compiling for Haiku.
+}
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
