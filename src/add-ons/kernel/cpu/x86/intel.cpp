@@ -22,12 +22,10 @@
 #endif
 
 
-#define IA32_MTRR_FEATURE				(1UL << 12)
 #define IA32_MTRR_ENABLE				(1UL << 11)
 #define IA32_MTRR_ENABLE_FIXED			(1UL << 10)
 #define IA32_MTRR_VALID_RANGE			(1UL << 11)
 
-#define	MTRR_MASK	(0xffffffff & (B_PAGE_SIZE - 1))
 
 struct mtrr_capabilities {
 	mtrr_capabilities(uint64 value) { *(uint64 *)this = value; }
@@ -48,7 +46,7 @@ intel_count_mtrrs(void)
 {
 	cpuid_info cpuInfo;
 	if (get_cpuid(&cpuInfo, 1, 0) != B_OK
-		|| (cpuInfo.eax_1.features & IA32_MTRR_FEATURE) == 0)
+		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
