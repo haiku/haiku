@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src bin tar lib ;
 
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
 # set some additional defines
 {
