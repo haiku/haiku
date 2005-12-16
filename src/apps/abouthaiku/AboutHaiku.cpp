@@ -196,7 +196,7 @@ AboutView::AboutView(const BRect &rect)
 
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(systemInfo.cpu_type) 
-		<< " " << get_cpu_model_string(systemInfo.cpu_type);
+		<< " " << get_cpu_model_string(&systemInfo);
 
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;

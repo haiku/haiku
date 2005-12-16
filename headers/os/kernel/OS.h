@@ -477,8 +477,10 @@ typedef enum cpu_types {
 	B_CPU_IDT_WINCHIP_C6				= 0x1354,
 	B_CPU_IDT_WINCHIP_2					= 0x1358,
 	B_CPU_IDT_WINCHIP_3,
-	B_CPU_VIA_EDEN						= 0x1367,
-	B_CPU_VIA_EDEN_EZRA_T				= 0x1368,
+	B_CPU_VIA_C3_SAMUEL					= 0x1366,
+	B_CPU_VIA_C3_SAMUEL_2				= 0x1367,
+	B_CPU_VIA_C3_EZRA_T					= 0x1368,
+	B_CPU_VIA_C3_NEHEMIAH				= 0x1369,
 
 	/* Transmeta */
 	B_CPU_TRANSMETA_x86					= 0x1600,

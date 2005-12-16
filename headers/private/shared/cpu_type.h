@@ -16,8 +16,9 @@ extern "C" {
 #endif
 
 const char *get_cpu_vendor_string(enum cpu_types type);
-const char *get_cpu_model_string(enum cpu_types type);
-void get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t modelSize);
+const char *get_cpu_model_string(system_info *info);
+void get_cpu_type(char *vendorBuffer, size_t vendorSize,
+		char *modelBuffer, size_t modelSize);
 int32 get_rounded_cpu_speed(void);
 
 #ifdef __cplusplus
@@ -59,10 +60,10 @@ get_cpu_vendor_string(enum cpu_types type)
 
 
 const char *
-get_cpu_model_string(enum cpu_types type)
+get_cpu_model_string(system_info *info)
 {
 	// Determine CPU type
-	switch (type) {
+	switch (info->cpu_type) {
 #if __POWERPC__
 		case B_CPU_PPC_603:
 			return "603";
@@ -156,9 +157,20 @@ get_cpu_model_string(enum cpu_types type)
 			return "WinChip C6";
 		case B_CPU_IDT_WINCHIP_2:
 			return "WinChip 2";
-		case B_CPU_VIA_EDEN:
-		case B_CPU_VIA_EDEN_EZRA_T:
-			return "Eden";
+		case B_CPU_VIA_C3_SAMUEL:
+			return "C3 Samuel";
+		case B_CPU_VIA_C3_SAMUEL_2:
+			// stepping identified the model
+			if ((info->cpu_revision & 0xf) < 8)
+				return "C3 Eden/Samuel 2";
+			return "C3 Ezra";
+		case B_CPU_VIA_C3_EZRA_T:
+			return "C3 Ezra-T";
+		case B_CPU_VIA_C3_NEHEMIAH:
+			// stepping identified the model
+			if ((info->cpu_revision & 0xf) < 8)
+				return "C3 Nehemiah";
+			return "C3 Eden-N";
 
 		/* Cyrix/VIA */
 		case B_CPU_CYRIX_GXm:
@@ -193,7 +205,7 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t mo
 	if (vendor == NULL)
 		vendor = "Unknown";
 
-	model = get_cpu_model_string(info.cpu_type);
+	model = get_cpu_model_string(&info);
 	if (model == NULL)
 		model = "Unknown";
 
@@ -212,14 +224,14 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer, size_t mo
 int32
 get_rounded_cpu_speed(void)
 {
-	system_info sys_info;
+	system_info info;
 
 	int target, frac, delta;
 	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
 	uint x;
 
-	get_system_info(&sys_info);
-	target = sys_info.cpu_clock_speed / 1000000;
+	get_system_info(&info);
+	target = info.cpu_clock_speed / 1000000;
 	frac = target % 100;
 	delta = -frac;
 

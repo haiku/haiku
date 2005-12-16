@@ -494,7 +494,7 @@ static void
 dump_cpus(system_info *info)
 {
 	const char *vendor = get_cpu_vendor_string(info->cpu_type);
-	const char *model = get_cpu_model_string(info->cpu_type);
+	const char *model = get_cpu_model_string(info);
 	int32 cpu;
 
 	if (model == NULL && vendor == NULL)
