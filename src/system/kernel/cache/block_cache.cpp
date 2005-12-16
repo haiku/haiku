@@ -316,7 +316,7 @@ block_cache::NewBlock(off_t blockNumber)
 void
 block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 {
-	dprintf("block_cache: remove up to %ld unused blocks\n", count);
+	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
 	cached_block *next = NULL;
 	for (cached_block *block = unused_blocks.First(); block != NULL; block = next) {
@@ -327,8 +327,8 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 		if (maxAccessed < block->accessed)
 			continue;
 
-		dprintf("  remove block %Ld, accessed %ld times\n",
-			block->block_number, block->accessed);
+		TRACE(("  remove block %Ld, accessed %ld times\n",
+			block->block_number, block->accessed));
 
 		// this can only happen if no transactions are used
 		if (block->is_dirty)
@@ -352,7 +352,7 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 	block_cache *cache = (block_cache *)data;
 	BenaphoreLocker locker(&cache->lock);
 
-	dprintf("block_cache: low memory handler called with level %ld\n", level);
+	TRACE(("block_cache: low memory handler called with level %ld\n", level));
 
 	// free some blocks according to the low memory state
 	// (if there is enough memory left, we don't free any)
