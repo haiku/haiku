@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin patch ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+
 SubDirCcFlags -DHAVE_CONFIG_H -Ded_PROGRAM='\"ed\"' -w ;
 
 BinCommand patch :
