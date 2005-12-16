@@ -2753,6 +2753,8 @@ vm_try_reserve_memory(size_t amount)
 	status_t status;
 	benaphore_lock(&sAvailableMemoryLock);
 
+	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
+
 	if (sAvailableMemory > amount) {
 		sAvailableMemory -= amount;
 		status = B_OK;

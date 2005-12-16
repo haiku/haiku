@@ -175,11 +175,15 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
 	chunks_per_range = kBlockRangeSize / chunk_size;
 	range_mask = (1UL << chunks_per_range) - 1;
 	chunk_mask = (1UL << (chunk_size / blockSize)) - 1;
+
+	register_low_memory_handler(&block_cache::LowMemoryHandler, this, 0);
 }
 
 
 block_cache::~block_cache()
 {
+	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
+
 	benaphore_destroy(&lock);
 
 	hash_uninit(ranges_hash);
@@ -291,6 +295,7 @@ block_cache::NewBlock(off_t blockNumber)
 
 	block->block_number = blockNumber;
 	block->ref_count = 0;
+	block->accessed = 0;
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
 	block->original = NULL;
@@ -308,20 +313,69 @@ block_cache::NewBlock(off_t blockNumber)
 
 
 void
-block_cache::RemoveUnusedBlocks(int32 count)
+block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 {
-	while (count-- >= 0) {
-		cached_block *block = unused_blocks.First();
+	dprintf("block_cache: remove up to %ld unused blocks\n", count);
+
+	cached_block *next = NULL;
+	for (cached_block *block = unused_blocks.First(); block != NULL; block = next) {
+		next = block->next;
+
 		if (block == NULL)
 			break;
+		if (maxAccessed < block->accessed)
+			continue;
+
+		dprintf("  remove block %Ld, accessed %ld times\n",
+			block->block_number, block->accessed);
 
 		// remove block from lists
 		unused_blocks.Remove(block);
 		hash_remove(hash, block);
 
 		FreeBlock(block);
+
+		if (--count <= 0)
+			break;
 	}
 }
+
+
+void
+block_cache::LowMemoryHandler(void *data, int32 level)
+{
+	block_cache *cache = (block_cache *)data;
+	BenaphoreLocker locker(&cache->lock);
+
+	dprintf("block_cache: low memory handler called with level %ld\n", level);
+
+	// free some blocks according to the low memory state
+	// (if there is enough memory left, we don't free any)
+
+	int32 free = 1;
+	int32 accessed = 1;
+	switch (vm_low_memory_state()) {
+		case B_NO_LOW_MEMORY:
+			return;
+		case B_LOW_MEMORY_NOTE:
+			free = 10;
+			accessed = 2;
+			break;
+		case B_LOW_MEMORY_WARNING:
+			free = 50;
+			accessed = 10;
+			break;
+		case B_LOW_MEMORY_CRITICAL:
+			free = LONG_MAX;
+			accessed = LONG_MAX;
+			break;
+	}
+
+	cache->RemoveUnusedBlocks(accessed, free);
+}
+
+
+//	#pragma mark -
 
 
 #ifdef DEBUG_CHANGED
@@ -409,7 +463,7 @@ put_cached_block(block_cache *cache, cached_block *block)
 			break;
 	}
 
-	cache->RemoveUnusedBlocks(free);
+	cache->RemoveUnusedBlocks(LONG_MAX, free);
 }
 
 
@@ -469,6 +523,8 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 	}
 
 	block->ref_count++;
+	block->accessed++;
+
 	return block;
 }
 

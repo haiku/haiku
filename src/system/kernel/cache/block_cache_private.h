@@ -42,6 +42,7 @@ struct cached_block {
 	void			*compare;
 #endif
 	int32			ref_count;
+	int32			accessed;
 	bool			busy : 1;
 	bool			is_writing : 1;
 	bool			is_dirty : 1;
@@ -89,8 +90,6 @@ struct block_range {
 
 	static int Compare(void *_blockRange, const void *_address);
 	static uint32 Hash(void *_blockRange, const void *_address, uint32 range);
-
-	//bool HasFreeBlocks() const { return (1L << num_chunks) - 1 != used_mask; }
 };
 
 struct block_cache {
@@ -119,11 +118,13 @@ struct block_cache {
 
 	block_range *GetFreeRange();
 	block_range *GetRange(void *address);
-	void RemoveUnusedBlocks(int32 count = LONG_MAX);
+	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX, int32 count = LONG_MAX);
 	void FreeBlock(cached_block *block);
 	cached_block *NewBlock(off_t blockNumber);
 	void Free(void *address);
 	void *Allocate();
+
+	static void LowMemoryHandler(void *data, int32 level);
 };
 
 

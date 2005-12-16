@@ -212,6 +212,8 @@ block_range::New(block_cache *cache, block_range **_range)
 void
 block_range::Delete(block_cache *cache, block_range *range)
 {
+	TRACE(("delete block range %p, base = %p!\n", range, (void *)range->base));
+
 	// unmap the memory
 
 	vm_address_space *addressSpace = vm_get_kernel_aspace();
