@@ -7,7 +7,7 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 SubDirSysHdrs $(SUBDIR) ;
 
-if ( $(TARGET_PLATFORM) != haiku ) {
+if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 		# We need the public network headers also when not compiling for Haiku.
 		# Unfortunately we get more than we want, namely all POSIX headers.
@@ -193,6 +193,7 @@ SharedLibrary libbind.so :
 	# private functions
 	arc4random.c
 	ethers.c
+	gettimeofday.c
 	linkaddr.c
 	pthread_emu.c
 	res_resultcodes.c

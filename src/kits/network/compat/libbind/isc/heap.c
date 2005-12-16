@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1997,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -159,15 +159,24 @@ heap_insert(heap_context ctx, void *elt) {
 int
 heap_delete(heap_context ctx, int i) {
 	void *elt;
+	int less;
 
 	if (ctx == NULL || i < 1 || i > ctx->heap_size) {
 		errno = EINVAL;
 		return (-1);
 	}
 
-	elt = ctx->heap[ctx->heap_size];
-	if (--ctx->heap_size > 0)
-		sink_down(ctx, i, elt);
+	if (i == ctx->heap_size) {
+		ctx->heap_size--;
+	} else {
+		elt = ctx->heap[ctx->heap_size--];
+		less = ctx->higher_priority(elt, ctx->heap[i]);
+		ctx->heap[i] = elt;
+		if (less)
+			float_up(ctx, i, ctx->heap[i]);
+		else
+			sink_down(ctx, i, ctx->heap[i]);
+	}
 
 	return (0);
 }

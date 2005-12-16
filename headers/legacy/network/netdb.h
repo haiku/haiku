@@ -1,8 +1,4 @@
 /*
-	Modified for [Open]BeOS
-*/
-
-/*
  * ++Copyright++ 1980, 1983, 1988, 1993
  * -
  * Copyright (c) 1980, 1983, 1988, 1993
@@ -92,19 +88,10 @@
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
  *	$Id$
  */
- 
-/* Modified for OpenBeOS
-*/
 
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <stdio.h>
-
-
-/*
 #include <sys/param.h>
 #include <sys/types.h>
 #if (!defined(BSD)) || (BSD < 199306)
@@ -114,12 +101,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
-*/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 #ifndef _PATH_HEQUIV
 #define _PATH_HEQUIV	"/etc/hosts.equiv"
@@ -137,8 +118,18 @@ extern "C" {
 #define	_PATH_SERVICES	"/etc/services"
 #endif
 
-extern int * __h_errno (void);
+#if (__GLIBC__ > 2 || __GLIBC__ == 2 &&  __GLIBC_MINOR__ >= 3)
+#define __h_errno __h_errno_location
+#endif
+__BEGIN_DECLS
+extern int * __h_errno __P((void));
+__END_DECLS
+#if defined(_REENTRANT) || \
+    (__GLIBC__ > 2 || __GLIBC__ == 2 &&  __GLIBC_MINOR__ >= 3)
 #define	h_errno (*__h_errno())
+#else
+extern int h_errno;
+#endif
 
 /*
  * Structures returned by network data base library.  All addresses are
@@ -183,9 +174,21 @@ struct	addrinfo {
 	int		ai_family;	/* PF_xxx */
 	int		ai_socktype;	/* SOCK_xxx */
 	int		ai_protocol;	/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+#if defined(sun) && defined(_SOCKLEN_T)
+#ifdef __sparc9
+	int		_ai_pad;
+#endif
+	socklen_t	ai_addrlen;
+#else
 	size_t		ai_addrlen;	/* length of ai_addr */
+#endif
+#ifdef __linux
+	struct sockaddr	*ai_addr; 	/* binary address */
+	char		*ai_canonname;	/* canonical name for hostname */
+#else
 	char		*ai_canonname;	/* canonical name for hostname */
 	struct sockaddr	*ai_addr; 	/* binary address */
+#endif
 	struct addrinfo	*ai_next; 	/* next structure in linked list */
 };
 
@@ -259,6 +262,7 @@ struct	addrinfo {
 #define SCOPE_DELIMITER	'%'
 
 
+#ifdef _REENTRANT
 #if defined (__hpux) || defined(__osf__) || defined(_AIX)
 #define	_MAXALIASES	35
 #define	_MAXLINELEN	1024
@@ -348,9 +352,8 @@ struct	servent_data {
 #endif
 };
 #endif
-
-#define __P(a) a
-
+#endif
+__BEGIN_DECLS
 void		endhostent __P((void));
 void		endnetent __P((void));
 void		endprotoent __P((void));
@@ -387,48 +390,163 @@ const char	*gai_strerror __P((int));
 struct hostent  *getipnodebyname __P((const char *, int, int, int *));
 struct hostent	*getipnodebyaddr __P((const void *, size_t, int, int *));
 void		freehostent __P((struct hostent *));
+#ifdef __GLIBC__
+int		getnetgrent __P((/* const */ char **, /* const */ char **,
+				 /* const */ char **));
+void		setnetgrent __P((const char *));
+void		endnetgrent __P((void));
+int		innetgr __P((const char *, const char *, const char *,
+			     const char *));
+#endif
 
+#ifdef _REENTRANT
+#if defined(__hpux) || defined(__osf__) || defined(_AIX)
+int		gethostbyaddr_r __P((const char *, int, int, struct hostent *,
+					struct hostent_data *));
+int		gethostbyname_r __P((const char *, struct hostent *, 
+					struct hostent_data *));
+int		gethostent_r __P((struct hostent *, struct hostent_data *));
+#if defined(_AIX)
+void		sethostent_r __P((int, struct hostent_data *));
+#else
+int		sethostent_r __P((int, struct hostent_data *));
+#endif 
+#if defined(__hpux)
+int		endhostent_r __P((struct hostent_data *));
+#else
+void		endhostent_r __P((struct hostent_data *));
+#endif
 
+#if defined(__hpux) || defined(__osf__)
+int		getnetbyaddr_r __P((int, int,
+				struct netent *, struct netent_data *));
+#else
+int		getnetbyaddr_r __P((long, int,
+				struct netent *, struct netent_data *));
+#endif
+int		getnetbyname_r __P((const char *,
+				struct netent *, struct netent_data *));
+int		getnetent_r __P((struct netent *, struct netent_data *));
+int		setnetent_r __P((int, struct netent_data *));
+#ifdef __hpux
+int		endnetent_r __P((struct netent_data *buffer));
+#else
+void		endnetent_r __P((struct netent_data *buffer));
+#endif
+
+int		getprotobyname_r __P((const char *,
+				struct protoent *, struct protoent_data *));
+int		getprotobynumber_r __P((int,
+				struct protoent *, struct protoent_data *));
+int		getprotoent_r __P((struct protoent *, struct protoent_data *));
+int		setprotoent_r __P((int, struct protoent_data *));
+#ifdef __hpux
+int		endprotoent_r __P((struct protoent_data *));
+#else
+void		endprotoent_r __P((struct protoent_data *));
+#endif
+
+int		getservbyname_r __P((const char *, const char *,
+				struct servent *, struct servent_data *));
+int		getservbyport_r __P((int, const char *,
+				struct servent *, struct servent_data *));
+int		getservent_r __P((struct servent *, struct servent_data *));
+int		setservent_r __P((int, struct servent_data *));
+#ifdef __hpux
+int		endservent_r __P((struct servent_data *));
+#else
+void		endservent_r __P((struct servent_data *));
+#endif
+#else
+ /* defined(sun) || defined(bsdi) */
+#ifdef __GLIBC__
+int gethostbyaddr_r __P((const char *, int, int, struct hostent *,
+		         char *, size_t, struct hostent **, int *));
+int gethostbyname_r __P((const char *, struct hostent *,
+		        char *, size_t, struct hostent **, int *));
+int gethostent_r __P((struct hostent *, char *, size_t,
+			 struct hostent **, int *));
+#else
 struct hostent	*gethostbyaddr_r __P((const char *, int, int, struct hostent *,
 					char *, int, int *));
 struct hostent	*gethostbyname_r __P((const char *, struct hostent *,
 					char *, int, int *));
 struct hostent	*gethostent_r __P((struct hostent *, char *, int, int *));
+#endif
 void		sethostent_r __P((int));
 void		endhostent_r __P((void));
 
+#ifdef __GLIBC__
+int getnetbyname_r __P((const char *, struct netent *,
+			char *, size_t, struct netent **, int*));
+int getnetbyaddr_r __P((unsigned long int, int, struct netent *,
+			char *, size_t, struct netent **, int*));
+int getnetent_r __P((struct netent *, char *, size_t, struct netent **, int*));
+#else
 struct netent	*getnetbyname_r __P((const char *, struct netent *,
 					char *, int));
 struct netent	*getnetbyaddr_r __P((long, int, struct netent *,
 					char *, int));
 struct netent	*getnetent_r __P((struct netent *, char *, int));
+#endif
 void		setnetent_r __P((int));
 void		endnetent_r __P((void));
 
+#ifdef __GLIBC__
+int getprotobyname_r __P((const char *, struct protoent *, char *,
+			  size_t, struct protoent **));
+int getprotobynumber_r __P((int, struct protoent *, char *, size_t,
+			    struct protoent **));
+int getprotoent_r __P((struct protoent *, char *, size_t, struct protoent **));
+#else
 struct protoent	*getprotobyname_r __P((const char *,
 				struct protoent *, char *, int));
 struct protoent	*getprotobynumber_r __P((int,
 				struct protoent *, char *, int));
 struct protoent	*getprotoent_r __P((struct protoent *, char *, int));
+#endif
 void		setprotoent_r __P((int));
 void		endprotoent_r __P((void));
 
+#ifdef __GLIBC__
+int getservbyname_r __P((const char *name, const char *,
+			 struct servent *, char *, size_t, struct servent **));
+int getservbyport_r __P((int port, const char *,
+			 struct servent *, char *, size_t, struct servent **));
+int getservent_r __P((struct servent *, char *, size_t, struct servent **));
+#else
 struct servent	*getservbyname_r __P((const char *name, const char *,
 					struct servent *, char *, int));
 struct servent	*getservbyport_r __P((int port, const char *,
 					struct servent *, char *, int));
 struct servent	*getservent_r __P((struct servent *, char *, int));
+#endif
 void		setservent_r __P((int));
 void		endservent_r __P((void));
 
-
-/* BeOS specific, because of lack of UNIX passwd functions */
-int getusername(char *username, unsigned userlen);
-int getpassword(char *password, unsigned passlen);
-
-
-#ifdef __cplusplus
-}
+#ifdef __GLIBC__
+int		getnetgrent_r __P((char **, char **, char **, char *, size_t));
 #endif
+#ifdef _AIX
+int		setnetgrent_r __P((char *, void **));
+#endif
+
+#endif
+#endif
+__END_DECLS
+
+/* This is nec'y to make this include file properly replace the sun version. */
+#ifdef sun
+#ifdef __GNU_LIBRARY__
+#include <rpc/netdb.h>
+#else
+struct rpcent {
+	char	*r_name;	/* name of server for this rpc program */
+	char	**r_aliases;	/* alias list */
+	int	r_number;	/* rpc program number */
+};
+struct rpcent	*getrpcbyname(), *getrpcbynumber(), *getrpcent();
+#endif /* __GNU_LIBRARY__ */
+#endif /* sun */
 
 #endif /* !_NETDB_H_ */

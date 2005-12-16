@@ -32,20 +32,20 @@
  */
 
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* from gethostnamadr.c	8.1 (Berkeley) 6/4/93 */
@@ -386,7 +386,7 @@ ho_byaddr(struct irs_ho *this, const void *addr, int len, int af)
 		q2->qtype = T_PTR;
 		q2->answer = q2->qbuf.buf;
 		q2->anslen = sizeof(q2->qbuf);
-		if ((pvt->res->options & RES_NO_NIBBLE2) != 0)
+		if ((pvt->res->options & RES_NO_NIBBLE2) != 0U)
 			q2->action = RESTGT_IGNORE;
 		else
 			q2->action = RESTGT_AFTERFAILURE;
@@ -414,38 +414,44 @@ ho_byaddr(struct irs_ho *this, const void *addr, int len, int af)
 		break;
 	case AF_INET6:
 		if (q->action != RESTGT_IGNORE) {
+			const char *nibsuff = res_get_nibblesuffix(pvt->res);
 			qp = q->qname;
 			for (n = IN6ADDRSZ - 1; n >= 0; n--) {
 				i = SPRINTF((qp, "%x.%x.",
 					       uaddr[n] & 0xf,
 					       (uaddr[n] >> 4) & 0xf));
-				if (i < 0)
+				if (i != 4)
 					abort();
 				qp += i;
 			}
-#ifdef HAVE_STRLCAT
-			strlcat(q->qname, res_get_nibblesuffix(pvt->res),
-			    sizeof(q->qname));
-#else
-			strcpy(qp, res_get_nibblesuffix(pvt->res));
-#endif
+			if (strlen(q->qname) + strlen(nibsuff) + 1 >
+			    sizeof q->qname) {
+				errno = ENAMETOOLONG;
+				RES_SET_H_ERRNO(pvt->res, NETDB_INTERNAL);
+				hp = NULL;
+				goto cleanup;
+			}
+			strcpy(qp, nibsuff);	/* (checked) */
 		}
 		if (q2->action != RESTGT_IGNORE) {
+			const char *nibsuff2 = res_get_nibblesuffix2(pvt->res);
 			qp = q2->qname;
 			for (n = IN6ADDRSZ - 1; n >= 0; n--) {
 				i = SPRINTF((qp, "%x.%x.",
 					       uaddr[n] & 0xf,
 					       (uaddr[n] >> 4) & 0xf));
-				if (i < 0)
+				if (i != 4)
 					abort();
 				qp += i;
 			}
-#ifdef HAVE_STRLCAT
-			strlcat(q->qname, res_get_nibblesuffix2(pvt->res),
-			    sizeof(q->qname));
-#else
-			strcpy(qp, res_get_nibblesuffix2(pvt->res));
-#endif
+			if (strlen(q2->qname) + strlen(nibsuff2) + 1 >
+			    sizeof q2->qname) {
+				errno = ENAMETOOLONG;
+				RES_SET_H_ERRNO(pvt->res, NETDB_INTERNAL);
+				hp = NULL;
+				goto cleanup;
+			}
+			strcpy(qp, nibsuff2);	/* (checked) */
 		}
 		break;
 	default:
@@ -820,11 +826,7 @@ gethostans(struct irs_ho *this,
 				had_error++;
 				continue;
 			}
-#ifdef HAVE_STRLCPY
-			strlcpy(bp, tbuf, ep - bp);
-#else
-			strcpy(bp, tbuf);
-#endif
+			strcpy(bp, tbuf);	/* (checked) */
 			pvt->host.h_name = bp;
 			hname = bp;
 			bp += n;
@@ -838,7 +840,7 @@ gethostans(struct irs_ho *this,
 			}
 			cp += n;
 #ifdef RES_USE_DNAME
-			if ((pvt->res->options & RES_USE_DNAME) != 0)
+			if ((pvt->res->options & RES_USE_DNAME) != 0U)
 #endif
 			{
 				/*
@@ -856,11 +858,7 @@ gethostans(struct irs_ho *this,
 				had_error++;
 				continue;
 			}
-#ifdef HAVE_STRLCPY
-			strlcpy(bp, tbuf, ep - bp);
-#else
-			strcpy(bp, tbuf);
-#endif
+			strcpy(bp, tbuf);	/* (checked) */
 			tname = bp;
 			bp += n;
 			continue;
@@ -996,11 +994,7 @@ gethostans(struct irs_ho *this,
 				n = strlen(qname) + 1;	/* for the \0 */
 				if (n > (ep - bp) || n >= MAXHOSTNAMELEN)
 					goto no_recovery;
-#ifdef HAVE_STRLCPY
-				strlcpy(bp, qname, ep - bp);
-#else
-				strcpy(bp, qname);
-#endif
+				strcpy(bp, qname);	/* (checked) */
 				pvt->host.h_name = bp;
 				bp += n;
 			}
@@ -1149,7 +1143,7 @@ init(struct irs_ho *this) {
 	
 	if (!pvt->res && !ho_res_get(this))
 		return (-1);
-	if (((pvt->res->options & RES_INIT) == 0) &&
+	if (((pvt->res->options & RES_INIT) == 0U) &&
 	    res_ninit(pvt->res) == -1)
 		return (-1);
 	return (0);

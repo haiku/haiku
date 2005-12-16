@@ -1,7 +1,8 @@
-BIND 9.2.3 ported to Haiku
+BIND 9.3.1
+ported to Haiku
 
-This file contains important information for developers who want to port BIND to Haiku.
-I created config.h, port_before.h, and port_after.h with the BIND configure script and fixed some mistakes that the script made.
+This file contains important information for developers who want to update this BIND port.
+I created config.h, port_before.h, and port_after.h with "configure --enable-threads --disable-ipv6" on a BONE-compatible system and fixed some mistakes that the script made. All changes to these three files are marked with a comment containing the keyword CHANGED.
 
 Our private folder are:
 	headers (some headers are not defined in Haiku)
@@ -10,15 +11,12 @@ Our private folder are:
 Porting issues:
 	BIND wants to include sys/un.h and utmp.h. We do not have these, so I put empty headers into the private headers folder.
 	
-	strsep() is not defined although we #define NEED_STRSEP in port_after.h. I put it in our private src folder.
-	
-	Haiku defines pselect(), we turn on NEEDS_PSELECT in port_after.h only if we compile for BeOS.
+	Added a hacky workaround when building for non-Haiku targets: select.h (in legacy headers) only declares pselect() for Haiku.
 
 Added sources for compatibility:
 	src/res_resultcodes.c: BONE's host command wants _res_resultcodes to be defined
 
 Changes made to the sources and headers:
-	netdb.h and resolv.h: simplified by removing unneeded checks for other platforms
+	nameser_compat.h: added check for __HAIKU__ and __BEOS__ to not redefine endianness
 	
-	irs/gai_strerror and irs/irs_data.c: Changed the initialization of the mutex lock and rewrote TLS to use BeOS functions
-		because we do not have full pthread support.
+	irs/gai_strerror and irs/irs_data.c: Changed the initialization of the mutex lock and rewrote two functions to use BeOS-native TLS.

@@ -1,4 +1,4 @@
-static const char rcsid[] = "$Header: /tmp/bonefish/open-beos/current/src/kits/network/libbind/dst/support.c,v 1.1 2004/04/15 16:03:28 wkornew Exp $";
+static const char rcsid[] = "$Header: /proj/cvs/prod/bind9/lib/bind/dst/support.c,v 1.2.2.1 2001/11/02 22:25:29 gson Exp $";
 
 
 /*
@@ -21,8 +21,8 @@ static const char rcsid[] = "$Header: /tmp/bonefish/open-beos/current/src/kits/n
 #include "port_before.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <memory.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>

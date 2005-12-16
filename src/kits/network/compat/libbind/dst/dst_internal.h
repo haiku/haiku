@@ -73,7 +73,7 @@ typedef struct dst_key {
 #ifndef SAFE_FREE
 #define SAFE_FREE(a) \
 do{if(a != NULL){memset(a,0, sizeof(*a)); free(a); a=NULL;}} while (0)
-#define SAFE_FREE2(a,s) if (a != NULL && s > 0){memset(a,0, s);free(a); a=NULL;}
+#define SAFE_FREE2(a,s) if (a != NULL && (long)s > 0){memset(a,0, s);free(a); a=NULL;}
 #endif
 
 typedef struct dst_func {

@@ -10,29 +10,29 @@
 /* #undef POSIX_GETGRGID_R */
 /* #undef POSIX_GETGRNAM_R */
 
-/* #undef NEED_SETGROUPENT */
-/* #undef NEED_GETGROUPLIST */
+#define NEED_SETGROUPENT 1
+#define NEED_GETGROUPLIST 1
 
 /* define if prototype for getgrnam_r() is required */
-/* #undef NEED_GETGRNAM_R */
-/* #undef NEED_GETGRGID_R */
-/* #undef NEED_GETGRENT_R */
-/* #undef NEED_SETGRENT_R */
-/* #undef NEED_ENDGRENT_R */
+#define NEED_GETGRNAM_R 1
+#define NEED_GETGRGID_R 1
+#define NEED_GETGRENT_R 1
+#define NEED_SETGRENT_R 1
+#define NEED_ENDGRENT_R 1
 
-/* #undef NEED_INNETGR_R */
+#define NEED_INNETGR_R 1
 /* #undef NEED_SETNETGRENT_R */
-/* #undef NEED_ENDNETGRENT_R */
+#define NEED_ENDNETGRENT_R 1
 
-/* #undef NEED_GETPWNAM_R */
-/* #undef NEED_GETPWUID_R */
-/* #undef NEED_SETPWENT_R */
-/* #undef NEED_SETPASSENT_R */
-/* #undef NEED_SETPWENT_R */
-/* #undef NEED_GETPWENT_R */
-/* #undef NEED_ENDPWENT_R */
+#define NEED_GETPWNAM_R 1
+#define NEED_GETPWUID_R 1
+#define NEED_SETPWENT_R 1
+#define NEED_SETPASSENT_R 1
+#define NEED_SETPWENT_R 1
+#define NEED_GETPWENT_R 1
+#define NEED_ENDPWENT_R 1
 
-/* #undef NEED_SETPASSENT */
+#define NEED_SETPASSENT 1
 
 /* #undef HAS_PW_CLASS */
 
@@ -43,4 +43,12 @@ struct __sFILE;
 extern __inline int __sputaux(int _c, struct __sFILE *_p);
 #endif
 /* #undef BROKEN_IN6ADDR_INIT_MACROS */
-#define HAVE_STRLCAT 1
+/* #undef HAVE_STRLCAT */
+/* Shut up warnings about missing braces */
+/* #undef SHUTUP_MUTEX_INITIALIZER */
+#ifdef SHUTUP_MUTEX_INITIALIZER
+#define LIBBIND_MUTEX_INITIALIZER { PTHREAD_MUTEX_INITIALIZER }
+#else
+#define LIBBIND_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#endif
+

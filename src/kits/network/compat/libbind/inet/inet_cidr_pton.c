@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1998,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -98,7 +98,7 @@ inet_cidr_pton_ipv4(const char *src, u_char *dst, int *pbits, int ipv6) {
 			if (tmp > 255)
 				goto enoent;
 		} while ((ch = *src++) != '\0' && isascii(ch) && isdigit(ch));
-		if (size-- == 0)
+		if (size-- == 0U)
 			goto emsgsize;
 		*dst++ = (u_char) tmp;
 		if (ch == '\0' || ch == '/')
@@ -133,7 +133,7 @@ inet_cidr_pton_ipv4(const char *src, u_char *dst, int *pbits, int ipv6) {
 		goto enoent;
 
 	/* Extend address to four octets. */
-	while (size-- > 0)
+	while (size-- > 0U)
 		*dst++ = 0;
 
 	*pbits = bits;
@@ -251,7 +251,7 @@ inet_cidr_pton_ipv6(const char *src, u_char *dst, int *pbits) {
 	return (-1);
 }
 
-int
+static int
 getbits(const char *src, int ipv6) {
 	int bits = 0;
 	char *cp, ch;

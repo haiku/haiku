@@ -3,20 +3,20 @@ static const char rcsid[] = "$Id$";
 #endif
 
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -92,19 +92,14 @@ hesiod_init(void **context) {
 		/*
 		 * Use compiled in defaults.
 		 */
-		ctx->LHS = malloc(strlen(DEF_LHS)+1);
-		ctx->RHS = malloc(strlen(DEF_RHS)+1);
-		if (ctx->LHS == 0 || ctx->RHS == 0) {
+		ctx->LHS = malloc(strlen(DEF_LHS) + 1);
+		ctx->RHS = malloc(strlen(DEF_RHS) + 1);
+		if (ctx->LHS == NULL || ctx->RHS == NULL) {
 			errno = ENOMEM;
 			goto cleanup;
 		}
-#ifdef HAVE_STRLCPY
-		strlcpy(ctx->LHS, DEF_LHS, strlen(DEF_LHS) + 1);
-		strlcpy(ctx->RHS, DEF_RHS, strlen(DEF_RHS) + 1);
-#else
-		strcpy(ctx->LHS, DEF_LHS);
-		strcpy(ctx->RHS, DEF_RHS);
-#endif
+		strcpy(ctx->LHS, DEF_LHS);	/* (checked) */
+		strcpy(ctx->RHS, DEF_RHS);	/* (checked) */
 #else
 		goto cleanup;
 #endif
@@ -123,22 +118,10 @@ hesiod_init(void **context) {
 			goto cleanup;
 		}
 		if (cp[0] == '.') {
-#ifdef HAVE_STRLCPY
-			strlcpy(ctx->RHS, cp, RHSlen);
-#else
-			strcpy(ctx->RHS, cp);
-#endif
+			strcpy(ctx->RHS, cp);	/* (checked) */
 		} else {
-#ifdef HAVE_STRLCPY
-			strlcpy(ctx->RHS, ".", RHSlen);
-#else
-			strcpy(ctx->RHS, ".");
-#endif
-#ifdef HAVE_STRLCAT
-			strlcat(ctx->RHS, cp, RHSlen);
-#else
-			strcat(ctx->RHS, cp);
-#endif
+			strcpy(ctx->RHS, ".");	/* (checked) */
+			strcat(ctx->RHS, cp);	/* (checked) */
 		}
 	}
 
@@ -516,7 +499,7 @@ init(struct hesiod_p *ctx) {
 	if (!ctx->res && !__hesiod_res_get(ctx))
 		return (-1);
 
-	if (((ctx->res->options & RES_INIT) == 0) &&
+	if (((ctx->res->options & RES_INIT) == 0U) &&
 	    (res_ninit(ctx->res) == -1))
 		return (-1);
 

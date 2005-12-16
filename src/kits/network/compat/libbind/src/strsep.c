@@ -1,4 +1,9 @@
-/*-
+#if defined(LIBC_SCCS) && !defined(lint)
+static const char sccsid[] = "strsep.c	8.1 (Berkeley) 6/4/93";
+static const char rcsid[] = "$Id$";
+#endif /* LIBC_SCCS and not lint */
+
+/*
  * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,7 +15,11 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -28,9 +37,14 @@
  */
 
 #include "port_before.h"
+#include <sys/cdefs.h>
 #include <string.h>
 #include <stdio.h>
 #include "port_after.h"
+
+#ifndef NEED_STRSEP
+int __strsep_unneeded__;
+#else
 
 /*
  * Get next token from string *stringp, where tokens are possibly-empty
@@ -43,10 +57,8 @@
  *
  * If *stringp is NULL, strsep returns NULL.
  */
-#ifdef NEED_STRSEP
-char*
-strsep(char **stringp, const char *delim)
-{
+char *
+strsep(char **stringp, const char *delim) {
 	char *s;
 	const char *spanp;
 	int c, sc;
@@ -70,4 +82,5 @@ strsep(char **stringp, const char *delim)
 	}
 	/* NOTREACHED */
 }
-#endif // NEED_STRSEP
+
+#endif /*NEED_STRSEP*/

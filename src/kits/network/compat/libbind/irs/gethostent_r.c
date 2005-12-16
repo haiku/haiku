@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1998-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -47,7 +47,7 @@ gethostbyname_r(const char *name,  struct hostent *hptr, HOST_R_ARGS) {
 	HOST_R_ERRNO;
 
 #ifdef HOST_R_SETANSWER
-	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) == 0)
+	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) != 0)
 		*answerp = NULL;
 	else
 		*answerp = hptr;
@@ -72,7 +72,7 @@ gethostbyaddr_r(const char *addr, int len, int type,
 	HOST_R_ERRNO;
 
 #ifdef HOST_R_SETANSWER
-	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) == 0)
+	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) != 0)
 		*answerp = NULL;
 	else
 		*answerp = hptr;
@@ -102,7 +102,7 @@ gethostent_r(struct hostent *hptr, HOST_R_ARGS) {
 	HOST_R_ERRNO;
 
 #ifdef HOST_R_SETANSWER
-	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) == 0)
+	if (he == NULL || (n = copy_hostent(he, hptr, HOST_R_COPY)) != 0)
 		*answerp = NULL;
 	else
 		*answerp = hptr;
@@ -214,8 +214,8 @@ copy_hostent(struct hostent *he, struct hostent *hptr, HOST_R_COPY_ARGS) {
 
 	/* copy up to first 35 addresses */
 	i = 0;
-	cp = hdptr->hostaddr;
-	eob = hdptr->hostaddr + sizeof(hdptr->hostaddr);
+	cp = hdptr->hostbuf;
+	eob = hdptr->hostbuf + sizeof(hdptr->hostbuf);
 	hptr->h_addr_list = hdptr->h_addr_ptrs;
 	while (he->h_addr_list[i] && i < (_MAXADDRS)) {
 		if (n < (eob - cp)) {
@@ -230,8 +230,6 @@ copy_hostent(struct hostent *he, struct hostent *hptr, HOST_R_COPY_ARGS) {
 	hptr->h_addr_list[i] = NULL;
 
 	/* copy official name */
-	cp = hdptr->hostbuf;
-	eob = hdptr->hostbuf + sizeof(hdptr->hostbuf);
 	if ((n = strlen(he->h_name) + 1) < (eob - cp)) {
 		strcpy(cp, he->h_name);
 		hptr->h_name = cp;

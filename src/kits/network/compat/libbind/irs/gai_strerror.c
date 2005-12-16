@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 2001 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include <port_before.h>
@@ -52,6 +52,9 @@ gai_strerror(int ecode) {
 #ifndef DO_PTHREADS
 	static char buf[EAI_BUFSIZE];
 #else	/* DO_PTHREADS */
+#ifndef LIBBIND_MUTEX_INITIALIZER
+#define LIBBIND_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#endif
 	static pthread_mutex_t lock;
 	static pthread_key_t key;
 	static int once = 0;
@@ -63,10 +66,9 @@ gai_strerror(int ecode) {
 
 #ifdef DO_PTHREADS
         if (!once) {
-				// Haiku compatibility: this is a function call, thus it must be
-				// initialized here and not at when allocating 'lock'
-				lock = PTHREAD_MUTEX_INITIALIZER;
-                
+        		/* XXX: Haiku has non-constant mutex initializer! Must init here. */
+        		lock = LIBBIND_MUTEX_INITIALIZER;
+        		
                 pthread_mutex_lock(&lock);
                 if (!once++)
                         key = tls_allocate();

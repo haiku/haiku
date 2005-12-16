@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(LINT) && !defined(CODECENTER)
@@ -187,7 +187,7 @@ gethostent_p(struct net_data *net_data) {
 		return (NULL);
 	while ((hp = (*ho->next)(ho)) != NULL &&
 	       hp->h_addrtype == AF_INET6 &&
-	       (net_data->res->options & RES_USE_INET6) == 0)
+	       (net_data->res->options & RES_USE_INET6) == 0U)
 		continue;
 	net_data->ho_last = hp;
 	return (net_data->ho_last);
@@ -356,13 +356,13 @@ getipnodebyaddr(const void *src, size_t len, int af, int *error_num) {
 		
 	switch (af) {
 	case AF_INET:
-		if (len != INADDRSZ) {
+		if (len != (size_t)INADDRSZ) {
 			*error_num = NO_RECOVERY;
 			return (NULL);
 		}
 		break;
 	case AF_INET6:
-		if (len != IN6ADDRSZ) {
+		if (len != (size_t)IN6ADDRSZ) {
 			*error_num = NO_RECOVERY;
 			return (NULL);
 		}
@@ -1007,7 +1007,7 @@ fakeaddr(const char *name, int af, struct net_data *net_data) {
 	}
 	strncpy(pvt->name, name, NS_MAXDNAME);
 	pvt->name[NS_MAXDNAME] = '\0';
-	if (af == AF_INET && (net_data->res->options & RES_USE_INET6) != 0) {
+	if (af == AF_INET && (net_data->res->options & RES_USE_INET6) != 0U) {
 		map_v4v6_address(pvt->addr, pvt->addr);
 		af = AF_INET6;
 	}

@@ -19,11 +19,11 @@ struct timezone;        /* silence warning */
 
 #undef BSD_COMP
 
-// Haiku pthread support
+// CHANGED: pthread emulation
 #define DO_PTHREADS 1
 #include <pthread_emu.h>
 
-#define GETGROUPLIST_ARGS const char *name, int basegid, int *groups, int *ngroups
+#define GETGROUPLIST_ARGS const char *name, gid_t basegid, gid_t *groups, int *ngroups
 #define GETNETBYADDR_ADDR_T long
 #define SETPWENT_VOID 1
 #define SETGRENT_VOID 1
@@ -43,12 +43,12 @@ struct timezone;        /* silence warning */
 #undef NETENT_DATA
 
 #define GROUP_R_RETURN struct group *
-
-
-
-
+#define GROUP_R_SET_RETURN void
+#undef GROUP_R_SET_RESULT /*empty*/
+#define GROUP_R_END_RETURN void
+#define GROUP_R_END_RESULT(x) /*empty*/
 #define GROUP_R_ARGS char *buf, int buflen
-
+#define GROUP_R_ENT_ARGS void
 #define GROUP_R_OK gptr
 #define GROUP_R_BAD NULL
 
@@ -71,13 +71,13 @@ struct timezone;        /* silence warning */
 #define NGR_R_BAD (0)
 #define NGR_R_COPY buf, buflen
 #define NGR_R_COPY_ARGS NGR_R_ARGS
-#define NGR_R_END_RESULT(x)  return (x)
-#define NGR_R_END_RETURN int
-#define NGR_R_ENT_ARGS NGR_R_ARGS
+#define NGR_R_END_RESULT(x)  /*empty*/
+#define NGR_R_END_RETURN void
+#undef NGR_R_ENT_ARGS /*empty*/
 #define NGR_R_OK 1
 #define NGR_R_RETURN int
-#define NGR_R_SET_RESULT NGR_R_OK
-#define NGR_R_SET_RETURN int
+#undef NGR_R_SET_RESULT /*empty*/
+#define NGR_R_SET_RETURN void
 
 
 #define PROTO_R_ARGS char *buf, int buflen
@@ -86,7 +86,7 @@ struct timezone;        /* silence warning */
 #define PROTO_R_COPY_ARGS PROTO_R_ARGS
 #define PROTO_R_END_RESULT(x) /*empty*/
 #define PROTO_R_END_RETURN void
-#undef PROTO_R_ENT_ARGS
+#undef PROTO_R_ENT_ARGS /*empty*/
 #define PROTO_R_OK pptr
 #undef PROTO_R_SETANSWER
 #define PROTO_R_RETURN struct protoent *
@@ -97,13 +97,13 @@ struct timezone;        /* silence warning */
 #define PASS_R_BAD NULL
 #define PASS_R_COPY buf, buflen
 #define PASS_R_COPY_ARGS PASS_R_ARGS
-
-
-
+#define PASS_R_END_RESULT(x) /*empty*/
+#define PASS_R_END_RETURN void
+#undef PASS_R_ENT_ARGS
 #define PASS_R_OK pwptr
 #define PASS_R_RETURN struct passwd *
-
-
+#undef PASS_R_SET_RESULT /*empty*/
+#define PASS_R_SET_RETURN void
 
 #define SERV_R_ARGS char *buf, int buflen
 #define SERV_R_BAD NULL

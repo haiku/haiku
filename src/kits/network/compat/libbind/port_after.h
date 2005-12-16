@@ -9,37 +9,38 @@
 #include <sys/bitypes.h>
 #endif
 
-// Haiku does not have these error codes
+// CHANGED: Haiku does not have these error codes
 #define ETOOMANYREFS B_ERROR
 
-// Haiku fd_set has 'bits' instead of 'fds_bits'
+// CHANGED: Haiku fd_set has 'bits' instead of 'fds_bits'
 #define fds_bits bits
 
-// Haiku does have pselect, turn this on only when we're not compiling Haiku
+// CHANGED: Haiku does have pselect, turn on when not compiling for Haiku
 #ifndef __HAIKU__
-#define NEED_PSELECT 1
-#define pselect isc__pselect
+#define NEED_PSELECT
 #endif
 
-// Haiku has problems with datagram sockets
-// #define CANNOT_CONNECT_DGRAM 1
+// CHANGED: we don't want the daemon
+#undef NEED_DAEMON
+
+// CHANGED
+#define HAVE_SOCKADDR_STORAGE 1
 
 #define HAVE_SA_LEN 1
 #undef HAVE_MINIMUM_IFREQ
-#undef NEED_DAEMON
 #define NEED_STRSEP 1
 #undef NEED_STRERROR
 #undef HAS_INET6_STRUCTS
 #define HAVE_SIN6_SCOPE_ID 1
 #undef NEED_IN6ADDR_ANY
 
-#define HAVE_SOCKADDR_STORAGE 1
 #undef NEED_GETTIMEOFDAY
 #undef HAVE_STRNDUP
 #undef USE_FIONBIO_IOCTL
 #undef USE_SYSERROR_LIST
 #undef INNETGR_ARGS
 #undef SETNETGRENT_ARGS
+#undef USE_IFNAMELINKID
 
 /* XXX sunos and cygwin needs O_NDELAY */
 #define PORT_NONBLOCK O_NONBLOCK
@@ -97,6 +98,19 @@ struct sockaddr_in6 {
 #ifdef BROKEN_IN6ADDR_INIT_MACROS
 #undef IN6ADDR_ANY_INIT
 #undef IN6ADDR_LOOPBACK_INIT
+#endif
+
+#ifdef _AIX
+#ifndef IN6ADDR_ANY_INIT
+#define IN6ADDR_ANY_INIT {{{ 0, 0, 0, 0 }}}
+#endif
+#ifndef IN6ADDR_LOOPBACK_INIT
+#if BYTE_ORDER == BIG_ENDIAN
+#define IN6ADDR_LOOPBACK_INIT {{{ 0, 0, 0, 1 }}}
+#else
+#define IN6ADDR_LOOPBACK_INIT {{{0, 0, 0, 0x01000000}}}
+#endif
+#endif
 #endif
 
 #ifndef IN6ADDR_ANY_INIT
@@ -372,6 +386,7 @@ void endpwent_r(void);
 int setpassent(int stayopen);
 #endif
 
+#define gettimeofday isc__gettimeofday
 #ifdef NEED_GETTIMEOFDAY
 int isc__gettimeofday(struct timeval *tvp, struct _TIMEZONE *tzp);
 #else

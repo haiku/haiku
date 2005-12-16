@@ -101,9 +101,9 @@
 			switch (sc) \
 				{ \
 			case 0: l =((unsigned long)(*((c)++))); \
-				if (--len == 0) break; \
+				if (--len == 0U) break; \
 			case 1: l|=((unsigned long)(*((c)++)))<< 8; \
-				if (--len == 0) break; \
+				if (--len == 0U) break; \
 			case 2: l|=((unsigned long)(*((c)++)))<<16; \
 				} \
 			}

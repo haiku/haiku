@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if !defined(LINT) && !defined(CODECENTER)
@@ -175,7 +175,7 @@ gen_res_get(struct irs_acc *this) {
 		gen_res_set(this, res, free);
 	}
 
-	if (((irs->res->options & RES_INIT) == 0) && res_ninit(irs->res) < 0)
+	if (((irs->res->options & RES_INIT) == 0U) && res_ninit(irs->res) < 0)
 		return (NULL);
 
 	return (irs->res);
@@ -391,8 +391,10 @@ init_map_rules(struct gen_p *irs, const char *conf_file) {
 		default_map_rules(irs);
 		return;
 	}
-	(void) sprintf(pattern, "%%%ds %%%ds %%%ds\n",
-		       sizeof mapname, sizeof accname, sizeof options);
+	(void) sprintf(pattern, "%%%lus %%%lus %%%lus\n",
+		       (unsigned long)sizeof mapname,
+		       (unsigned long)sizeof accname,
+		       (unsigned long)sizeof options);
 	while (fgets(line, sizeof line, conf)) {
 		enum irs_map_id map;
 		enum irs_acc_id acc;

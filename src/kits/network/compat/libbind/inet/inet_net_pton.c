@@ -1,18 +1,18 @@
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
@@ -59,7 +59,7 @@ static const char rcsid[] = "$Id$";
  *	Paul Vixie (ISC), June 1996
  */
 static int
-inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
+inet_net_pton_ipv4(const char *src, u_char *dst, size_t size) {
 	static const char xdigits[] = "0123456789abcdef";
 	static const char digits[] = "0123456789";
 	int n, ch, tmp = 0, dirty, bits;
@@ -70,7 +70,7 @@ inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
 	    && isascii((unsigned char)(src[1]))
 	    && isxdigit((unsigned char)(src[1]))) {
 		/* Hexadecimal: Eat nybble string. */
-		if (size <= 0)
+		if (size <= 0U)
 			goto emsgsize;
 		dirty = 0;
 		src++;	/* skip x or X. */
@@ -84,14 +84,14 @@ inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
 			else
 				tmp = (tmp << 4) | n;
 			if (++dirty == 2) {
-				if (size-- <= 0)
+				if (size-- <= 0U)
 					goto emsgsize;
 				*dst++ = (u_char) tmp;
 				dirty = 0;
 			}
 		}
 		if (dirty) {  /* Odd trailing nybble? */
-			if (size-- <= 0)
+			if (size-- <= 0U)
 				goto emsgsize;
 			*dst++ = (u_char) (tmp << 4);
 		}
@@ -108,7 +108,7 @@ inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
 					goto enoent;
 			} while ((ch = *src++) != '\0' &&
 				 isascii(ch) && isdigit(ch));
-			if (size-- <= 0)
+			if (size-- <= 0U)
 				goto emsgsize;
 			*dst++ = (u_char) tmp;
 			if (ch == '\0' || ch == '/')
@@ -152,7 +152,7 @@ inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
 		if (*odst >= 240)	/* Class E */
 			bits = 32;
 		else if (*odst >= 224)	/* Class D */
-			bits = 4;
+			bits = 8;
 		else if (*odst >= 192)	/* Class C */
 			bits = 24;
 		else if (*odst >= 128)	/* Class B */
@@ -160,12 +160,18 @@ inet_net_pton_ipv4( const char *src, u_char *dst, size_t size) {
 		else			/* Class A */
 			bits = 8;
 		/* If imputed mask is narrower than specified octets, widen. */
-		if (bits >= 8 && bits < ((dst - odst) * 8))
+		if (bits < ((dst - odst) * 8))
 			bits = (dst - odst) * 8;
+		/*
+		 * If there are no additional bits specified for a class D
+		 * address adjust bits to 4.
+		 */
+		if (bits == 8 && *odst == 224)
+			bits = 4;
 	}
 	/* Extend network to cover the actual mask. */
 	while (bits > ((dst - odst) * 8)) {
-		if (size-- <= 0)
+		if (size-- <= 0U)
 			goto emsgsize;
 		*dst++ = '\0';
 	}
