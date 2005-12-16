@@ -8,26 +8,15 @@
 
 
 #include "amd.h"
+#include "generic_x86.h"
+
+#include <OS.h>
 
 
-static uint32
-amd_count_mtrrs(void)
+static void
+amd_init_mtrrs(void)
 {
-	return 0;
-}
-
-
-static status_t
-amd_set_mtrr(uint32 index, addr_t base, addr_t length, uint32 type)
-{
-	return B_OK;
-}
-
-
-static status_t
-amd_unset_mtrr(uint32 index)
-{
-	return B_OK;
+	generic_init_mtrrs(generic_count_mtrrs());
 }
 
 
@@ -41,13 +30,9 @@ amd_init(void)
 	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
 		return B_ERROR;
 
-	return B_OK;
-}
+	generic_mtrr_compute_physical_mask();
+	generic_dump_mtrrs(generic_count_mtrrs());
 
-
-static status_t
-amd_uninit(void)
-{
 	return B_OK;
 }
 
@@ -59,7 +44,7 @@ amd_stdops(int32 op, ...)
 		case B_MODULE_INIT:
 			return amd_init();
 		case B_MODULE_UNINIT:
-			return amd_uninit();
+			return B_OK;
 	}
 
 	return B_ERROR;
@@ -73,7 +58,9 @@ x86_cpu_module_info gAMDModule = {
 		amd_stdops,
 	},
 
-	amd_count_mtrrs,
-	amd_set_mtrr,
-	amd_unset_mtrr,
+	generic_count_mtrrs,
+	amd_init_mtrrs,
+
+	generic_set_mtrr,
+	generic_get_mtrr,
 };
