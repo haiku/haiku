@@ -14,7 +14,16 @@
 #include <util/AutoLock.h>
 
 
-static const bigtime_t kLowMemoryInterval = 2000000;	// 2 secs
+//#define TRACE_LOW_MEMORY
+#ifdef TRACE_LOW_MEMORY
+#	define TRACE(x)	dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+// TODO: the priority is currently ignored, and probably can be removed
+
+static const bigtime_t kLowMemoryInterval = 3000000;	// 3 secs
 
 // page limits
 static const size_t kNoteLimit = 1024;
@@ -75,6 +84,10 @@ low_memory(void *)
 		snooze(kLowMemoryInterval);
 
 		sLowMemoryState = compute_state();
+
+		TRACE(("vm_low_memory: state = %ld, %ld free pages\n",
+			sLowMemoryState, vm_page_num_free_pages()));
+
 		if (sLowMemoryState < B_LOW_MEMORY_NOTE)
 			continue;
 
@@ -126,8 +139,10 @@ vm_low_memory_init(void)
 status_t
 unregister_low_memory_handler(low_memory_func function, void *data)
 {
-	MutexLocker locker(&sLowMemoryMutex);
+	TRACE(("unregister_low_memory_handler(function = %p, data = %p)\n",
+		function, data));
 
+	MutexLocker locker(&sLowMemoryMutex);
 	HandlerList::Iterator iterator = sLowMemoryHandlers.GetIterator();
 
 	while (iterator.HasNext()) {
@@ -147,6 +162,9 @@ unregister_low_memory_handler(low_memory_func function, void *data)
 status_t
 register_low_memory_handler(low_memory_func function, void *data, int32 priority)
 {
+	TRACE(("register_low_memory_handler(function = %p, data = %p)\n",
+		function, data));
+
 	low_memory_handler *handler = (low_memory_handler *)malloc(sizeof(low_memory_handler));
 	if (handler == NULL)
 		return B_NO_MEMORY;

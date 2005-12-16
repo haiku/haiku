@@ -46,10 +46,10 @@
 
 //#define TRACE_VFS
 #ifdef TRACE_VFS
-#	define PRINT(x) dprintf x
+#	define TRACE(x) dprintf x
 #	define FUNCTION(x) dprintf x
 #else
-#	define PRINT(x) ;
+#	define TRACE(x) ;
 #	define FUNCTION(x) ;
 #endif
 
@@ -704,7 +704,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 	oldRefCount = atomic_add(&vnode->ref_count, -1);
 
-	PRINT(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
+	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 
 	if (oldRefCount == 1) {
 		bool freeNode = false;
@@ -750,7 +750,7 @@ static void
 inc_vnode_ref_count(struct vnode *vnode)
 {
 	atomic_add(&vnode->ref_count, 1);
-	PRINT(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
+	TRACE(("inc_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 }
 
 
@@ -810,7 +810,7 @@ restart:
 		goto restart;
 	}
 
-	PRINT(("get_vnode: tried to lookup vnode, got %p\n", vnode));
+	TRACE(("get_vnode: tried to lookup vnode, got %p\n", vnode));
 
 	status_t status;
 
@@ -844,7 +844,7 @@ restart:
 
 	mutex_unlock(&sVnodeMutex);
 
-	PRINT(("get_vnode: returning %p\n", vnode));
+	TRACE(("get_vnode: returning %p\n", vnode));
 
 	*_vnode = vnode;
 	return B_OK;
@@ -881,7 +881,7 @@ put_vnode(struct vnode *vnode)
 static void
 vnode_low_memory_handler(void */*data*/, int32 level)
 {
-	PRINT(("vnode_low_memory_handler(level = %ld)\n", level));
+	TRACE(("vnode_low_memory_handler(level = %ld)\n", level));
 
 	int32 count = 1;
 	switch (level) {
@@ -906,7 +906,7 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 			mutex_unlock(&sVnodeMutex);
 			break;
 		}
-		PRINT(("  free vnode %ld:%Ld (%p)\n", vnode->device, vnode->id, vnode));
+		TRACE(("  free vnode %ld:%Ld (%p)\n", vnode->device, vnode->id, vnode));
 
 		vnode->busy = true;
 		sUnusedVnodes--;
@@ -1389,7 +1389,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode_id vnodeID;
 		char *nextPath;
 
-		PRINT(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
+		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
 
 		// done?
 		if (path[0] == '\0')
@@ -1454,7 +1454,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			size_t bufferSize;
 			char *buffer;
 
-			PRINT(("traverse link\n"));
+			TRACE(("traverse link\n"));
 
 			// it's not exactly nice style using goto in this way, but hey, it works :-/
 			if (count + 1 > MAX_SYM_LINKS) {
@@ -1830,7 +1830,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 	if (path[insert] == '\0')
 		path[--insert] = '/';
 
-	PRINT(("  path is: %s\n", path + insert));
+	TRACE(("  path is: %s\n", path + insert));
 
 	// copy the path to the output buffer
 	length = sizeof(path) - insert;
@@ -2316,7 +2316,7 @@ new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 		vnode->unpublished = true;
 	}
 
-	PRINT(("returns: %s\n", strerror(status)));
+	TRACE(("returns: %s\n", strerror(status)));
 
 	mutex_unlock(&sVnodeMutex);
 	return status;
@@ -2344,7 +2344,7 @@ publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 	} else
 		status = B_BAD_VALUE;
 
-	PRINT(("returns: %s\n", strerror(status)));
+	TRACE(("returns: %s\n", strerror(status)));
 
 	mutex_unlock(&sVnodeMutex);
 	return status;
@@ -2489,7 +2489,7 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 	status_t status;
 	char buffer[B_PATH_NAME_LENGTH + 1];
 
-	PRINT(("vfs_get_vnode_from_path: entry. path = '%s', kernel %d\n", path, kernel));
+	TRACE(("vfs_get_vnode_from_path: entry. path = '%s', kernel %d\n", path, kernel));
 
 	strlcpy(buffer, path, sizeof(buffer));
 
@@ -2557,7 +2557,7 @@ vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void 
 	struct vnode *vnode;
 	status_t status;
 
-	PRINT(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n", mountID, path, kernel));
+	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n", mountID, path, kernel));
 
 	strlcpy(buffer, path, sizeof(buffer));
 	status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
@@ -2647,7 +2647,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 
 			return B_OK;
 		} else {
-			PRINT(("vfs_get_module_path(): something is strange here: %d...\n", type));
+			TRACE(("vfs_get_module_path(): something is strange here: %d...\n", type));
 			status = B_ERROR;
 			goto err;
 		}
@@ -2693,7 +2693,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	if (!path || !buffer || bufferSize < 1)
 		return B_BAD_VALUE;
 
-	PRINT(("vfs_normalize_path(`%s')\n", path));
+	TRACE(("vfs_normalize_path(`%s')\n", path));
 
 	// copy the supplied path to the stack, so it can be modified
 	char mutablePath[B_PATH_NAME_LENGTH + 1];
@@ -2705,7 +2705,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	char leaf[B_FILE_NAME_LENGTH];
 	status_t error = path_to_dir_vnode(mutablePath, &dirNode, leaf, kernel);
 	if (error != B_OK) {
-		PRINT(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
+		TRACE(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
 		return error;
 	}
 
@@ -2715,7 +2715,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	if (isDir)
 		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL, NULL);
 	if (error != B_OK) {
-		PRINT(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
+		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
 		return error;
 	}
 
@@ -2723,7 +2723,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	error = dir_vnode_to_path(dirNode, buffer, bufferSize);
 	put_vnode(dirNode);
 	if (error < B_OK) {
-		PRINT(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
+		TRACE(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
 		return error;
 	}
 
@@ -2737,7 +2737,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 		}
 	}
 
-	PRINT(("vfs_normalize_path() -> `%s'\n", buffer));
+	TRACE(("vfs_normalize_path() -> `%s'\n", buffer));
 	return B_OK;
 }
 
@@ -4878,7 +4878,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		}
 
 		if (!partition) {
-			PRINT(("fs_mount(): Partition `%s' not found.\n",
+			TRACE(("fs_mount(): Partition `%s' not found.\n",
 				normalizedDevice.Path()));
 			return B_ENTRY_NOT_FOUND;
 		}
@@ -4893,7 +4893,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	if (partition) {
 		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
 		if (!diskDevice) {
-			PRINT(("fs_mount(): Failed to lock disk device!\n"));
+			TRACE(("fs_mount(): Failed to lock disk device!\n"));
 			return B_ERROR;
 		}
 	}
@@ -4902,7 +4902,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	if (partition) {
 		// make sure, that the partition is not busy
 		if (partition->IsBusy() || partition->IsDescendantBusy()) {
-			PRINT(("fs_mount(): Partition is busy.\n"));
+			TRACE(("fs_mount(): Partition is busy.\n"));
 			return B_BUSY;
 		}
 
@@ -4910,13 +4910,13 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		if (!fsName) {
 			KDiskSystem *diskSystem = partition->DiskSystem();
 			if (!diskSystem) {
-				PRINT(("fs_mount(): No FS name was given, and the DDM didn't "
+				TRACE(("fs_mount(): No FS name was given, and the DDM didn't "
 					"recognize it.\n"));
 				return B_BAD_VALUE;
 			}
 
 			if (!diskSystem->IsFileSystem()) {
-				PRINT(("fs_mount(): No FS name was given, and the DDM found a "
+				TRACE(("fs_mount(): No FS name was given, and the DDM found a "
 					"partitioning system.\n"));
 				return B_BAD_VALUE;
 			}
@@ -5102,7 +5102,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	if (partition) {
 		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
 		if (!diskDevice) {
-			PRINT(("fs_unmount(): Failed to lock disk device!\n"));
+			TRACE(("fs_unmount(): Failed to lock disk device!\n"));
 			return B_ERROR;
 		}
 	}
@@ -5111,7 +5111,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	// make sure, that the partition is not busy
 	if (partition) {
 		if (partition->IsBusy() || partition->IsDescendantBusy()) {
-			PRINT(("fs_unmount(): Partition is busy.\n"));
+			TRACE(("fs_unmount(): Partition is busy.\n"));
 			return B_BUSY;
 		}
 	}
@@ -5974,7 +5974,7 @@ _kern_remove_index(dev_t device, const char *name)
 status_t
 _kern_getcwd(char *buffer, size_t size)
 {
-	PRINT(("_kern_getcwd: buf %p, %ld\n", buffer, size));
+	TRACE(("_kern_getcwd: buf %p, %ld\n", buffer, size));
 
 	// Call vfs to get current working directory
 	return get_cwd(buffer, size, true);
@@ -6838,7 +6838,7 @@ _user_getcwd(char *userBuffer, size_t size)
 	char buffer[B_PATH_NAME_LENGTH];
 	status_t status;
 
-	PRINT(("user_getcwd: buf %p, %ld\n", userBuffer, size));
+	TRACE(("user_getcwd: buf %p, %ld\n", userBuffer, size));
 
 	if (!IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
@@ -6863,7 +6863,7 @@ _user_setcwd(int fd, const char *userPath)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	PRINT(("user_setcwd: path = %p\n", userPath));
+	TRACE(("user_setcwd: path = %p\n", userPath));
 
 	if (userPath != NULL) {
 		if (!IS_USER_ADDRESS(userPath)

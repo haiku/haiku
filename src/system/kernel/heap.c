@@ -345,7 +345,7 @@ heap_init(addr_t heapBase)
 
 
 status_t
-heap_init_post_sem(kernel_args *ka)
+heap_init_post_sem(kernel_args *args)
 {
 	if (mutex_init(&heap_lock, "heap_mutex") < 0)
 		panic("error creating heap mutex\n");
@@ -358,7 +358,7 @@ heap_init_post_sem(kernel_args *ka)
 
 
 status_t
-heap_init_post_thread(kernel_args *ka)
+heap_init_post_thread(kernel_args *args)
 {
 #if USE_CHECKING_WALL
 	register_kernel_daemon(check_wall_daemon, NULL, WALL_CHECK_FREQUENCY);

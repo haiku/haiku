@@ -1436,7 +1436,7 @@ unload_kernel_add_on(image_id id)
 
 
 status_t
-elf_init(kernel_args *ka)
+elf_init(kernel_args *args)
 {
 	struct preloaded_image *image;
 
@@ -1451,11 +1451,11 @@ elf_init(kernel_args *ka)
 
 	// Build a image structure for the kernel, which has already been loaded.
 	// The preloaded_images were already prepared by the VM.
-	if (insert_preloaded_image(&ka->kernel_image, true) < B_OK)
+	if (insert_preloaded_image(&args->kernel_image, true) < B_OK)
 		panic("could not create kernel image.\n");
 
 	// Build image structures for all preloaded images.
-	for (image = ka->preloaded_images; image != NULL; image = image->next) {
+	for (image = args->preloaded_images; image != NULL; image = image->next) {
 		insert_preloaded_image(image, false);
 	}
 

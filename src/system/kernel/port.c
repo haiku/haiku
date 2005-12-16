@@ -80,7 +80,7 @@ static spinlock sPortSpinlock = 0;
 
 
 status_t
-port_init(kernel_args *ka)
+port_init(kernel_args *args)
 {
 	int i;
 	int size = sizeof(struct port_entry) * sMaxPorts;

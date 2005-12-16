@@ -113,7 +113,7 @@ lookup_transaction(block_cache *cache, int32 id)
 }
 
 
-//	#pragma mark - private block_cache
+//	#pragma mark - cached_block
 
 
 /* static */
@@ -142,7 +142,7 @@ cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - block_cache
 
 
 block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
@@ -672,7 +672,7 @@ block_cache_init(void)
 }
 
 
-//	#pragma mark - public transaction
+//	#pragma mark - public transaction API
 
 
 extern "C" int32
@@ -1032,7 +1032,7 @@ cache_blocks_in_sub_transaction(void *_cache, int32 id)
 }
 
 
-//	#pragma mark - public block cache
+//	#pragma mark - public block cache API
 //	public interface
 
 
