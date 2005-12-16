@@ -54,7 +54,8 @@ struct cache_transaction {
 	bool			has_sub_transaction;
 };
 
-static status_t write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true);
+static status_t write_cached_block(block_cache *cache, cached_block *block,
+	bool deleteTransaction = true);
 
 
 //	#pragma mark - private transaction
@@ -328,6 +329,10 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 
 		dprintf("  remove block %Ld, accessed %ld times\n",
 			block->block_number, block->accessed);
+
+		// this can only happen if no transactions are used
+		if (block->is_dirty)
+			write_cached_block(this, block, false);
 
 		// remove block from lists
 		unused_blocks.Remove(block);
