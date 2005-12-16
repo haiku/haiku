@@ -14,21 +14,23 @@
 #include <fs_interface.h>
 #include <fs_volume.h>
 
+#include <block_cache.h>
+#include <fd.h>
+#include <file_cache.h>
+#include <khash.h>
+#include <KPath.h>
+#include <lock.h>
+#include <syscalls.h>
+#include <vfs.h>
+#include <vm.h>
+#include <vm_cache.h>
+#include <vm_low_memory.h>
+
+#include <boot/kernel_args.h>
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
 #include <disk_device_manager/KDiskSystem.h>
-#include <KPath.h>
-#include <syscalls.h>
-#include <boot/kernel_args.h>
-#include <vfs.h>
-#include <vm.h>
-#include <vm_cache.h>
-#include <file_cache.h>
-#include <block_cache.h>
-#include <khash.h>
-#include <lock.h>
-#include <fd.h>
 #include <fs/node_monitor.h>
 #include <util/kernel_cpp.h>
 
@@ -714,7 +716,8 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 			freeNode = true;
 		} else {
 			list_add_item(&sUnusedVnodeList, vnode);
-			if (++sUnusedVnodes > kMaxUnusedVnodes) {
+			if (++sUnusedVnodes > kMaxUnusedVnodes
+				&& vm_low_memory_state() != B_NO_LOW_MEMORY) {
 				// there are too many unused vnodes so we free the oldest one
 				// ToDo: evaluate this mechanism
 				vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
@@ -875,14 +878,57 @@ put_vnode(struct vnode *vnode)
 }
 
 
+static void
+vnode_low_memory_handler(void */*data*/, int32 level)
+{
+	PRINT(("vnode_low_memory_handler(level = %ld)\n", level));
+
+	int32 count = 1;
+	switch (level) {
+		case B_NO_LOW_MEMORY:
+			return;
+		case B_LOW_MEMORY_NOTE:
+			count = sUnusedVnodes / 100;
+			break;
+		case B_LOW_MEMORY_WARNING:
+			count = sUnusedVnodes / 10;
+			break;
+		case B_LOW_MEMORY_CRITICAL:
+			count = sUnusedVnodes;
+			break;
+	}
+
+	for (int32 i = 0; i < count; i++) {
+		mutex_lock(&sVnodeMutex);
+
+		struct vnode *vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
+		if (vnode == NULL) {
+			mutex_unlock(&sVnodeMutex);
+			break;
+		}
+		PRINT(("  free vnode %ld:%Ld (%p)\n", vnode->device, vnode->id, vnode));
+
+		vnode->busy = true;
+		sUnusedVnodes--;
+
+		mutex_unlock(&sVnodeMutex);
+
+		free_vnode(vnode, false);
+	}
+}
+
+
 static status_t
 create_advisory_locking(struct vnode *vnode)
 {
-	status_t status;
+	if (vnode == NULL)
+		return B_FILE_ERROR;
 
 	struct advisory_locking *locking = (struct advisory_locking *)malloc(sizeof(struct advisory_locking));
 	if (locking == NULL)
 		return B_NO_MEMORY;
+
+	status_t status;
 
 	locking->wait_sem = create_sem(0, "advisory lock");
 	if (locking->wait_sem < B_OK) {
@@ -1849,7 +1895,7 @@ get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 	if (descriptor == NULL)
 		return NULL;
 
-	if (descriptor->u.vnode == NULL) {
+	if (fd_vnode(descriptor) == NULL) {
 		put_fd(descriptor);
 		return NULL;
 	}
@@ -1872,7 +1918,7 @@ get_vnode_from_fd(int fd, bool kernel)
 	if (descriptor == NULL)
 		return NULL;
 
-	vnode = descriptor->u.vnode;
+	vnode = fd_vnode(descriptor);
 	if (vnode != NULL)
 		inc_vnode_ref_count(vnode);
 
@@ -1938,6 +1984,7 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 	descriptor->cookie = cookie;
 
 	switch (type) {
+		// vnode types
 		case FDTYPE_FILE:
 			descriptor->ops = &sFileOps;
 			break;
@@ -1950,12 +1997,15 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 		case FDTYPE_ATTR_DIR:
 			descriptor->ops = &sAttributeDirectoryOps;
 			break;
+
+		// mount types
 		case FDTYPE_INDEX_DIR:
 			descriptor->ops = &sIndexDirectoryOps;
 			break;
 		case FDTYPE_QUERY:
 			descriptor->ops = &sQueryOps;
 			break;
+
 		default:
 			panic("get_new_fd() called with unknown type %d\n", type);
 			break;
@@ -2235,8 +2285,7 @@ dump_io_context(int argc, char **argv)
 #endif	// ADD_DEBUGGER_COMMANDS
 
 
-//	#pragma mark -
-//	Public VFS API
+//	#pragma mark - public VFS API
 
 
 extern "C" status_t
@@ -2384,7 +2433,7 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - private VFS API
 //	Functions the VFS exports for other parts of the kernel
 
 
@@ -3106,6 +3155,8 @@ vfs_init(kernel_args *args)
 	add_debugger_command("mounts", &dump_mounts, "list all fs_mounts");
 	add_debugger_command("io_context", &dump_io_context, "info about the I/O context");
 #endif
+
+	register_low_memory_handler(&vnode_low_memory_handler, NULL, 0);
 
 	return file_cache_init();
 }

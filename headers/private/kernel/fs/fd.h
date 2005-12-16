@@ -73,6 +73,7 @@ extern void put_fd(struct file_descriptor *descriptor);
 extern status_t select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel);
 extern status_t deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel);
 extern bool fd_is_valid(int fd, bool kernel);
+extern struct vnode *fd_vnode(struct file_descriptor *descriptor);
 
 extern bool fd_close_on_exec(struct io_context *context, int fd);
 extern void fd_set_close_on_exec(struct io_context *context, int fd, bool closeFD);

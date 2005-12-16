@@ -128,8 +128,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		generic_syscall_init();
 		TRACE(("init cbuf\n"));
 		cbuf_init();
-		TRACE(("init VFS\n"));
-		vfs_init(&sKernelArgs);
 		TRACE(("init teams\n"));
 		team_init(&sKernelArgs);
 		TRACE(("init threads\n"));
@@ -145,6 +143,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		elf_init(&sKernelArgs);
 		TRACE(("init scheduler\n"));
 		scheduler_init();
+		TRACE(("init VFS\n"));
+		vfs_init(&sKernelArgs);
 
 		// start a thread to finish initializing the rest of the system
 		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);

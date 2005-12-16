@@ -355,6 +355,21 @@ fd_is_valid(int fd, bool kernel)
 }
 
 
+struct vnode *
+fd_vnode(struct file_descriptor *descriptor)
+{
+	switch (descriptor->type) {
+		case FDTYPE_FILE:
+		case FDTYPE_DIR:
+		case FDTYPE_ATTR_DIR:
+		case FDTYPE_ATTR:
+			return descriptor->u.vnode;
+	}
+
+	return NULL;
+}
+
+
 static status_t
 common_close(int fd, bool kernel)
 {
