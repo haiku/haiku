@@ -77,25 +77,24 @@ typedef union ds_ioctl_arg_t {
     cisdump_t		cisdump;
 } ds_ioctl_arg_t;
 
-#ifndef __HAIKU__
+
+/* ioctl macros */
+#undef IOC_IN
+#undef IOC_OUT
 #undef _IOC
-#undef IOCPARM_LEN
 #undef _IOR
 #undef _IOW
 #undef _IOWR
-#undef IOC_IN
-#undef IOC_OUT
-#undef IOC_INOUT
-#define IOC_IN	1
-#define IOC_OUT	2
-#define IOC_INOUT (IOC_IN|IOC_OUT)
-#define _IOC(inout, group, num, len) \
-        (inout | ((len & IOCPARM_MASK)<<2) | ((group) << 24) | (num<<16))
-#define IOCPARM_LEN(x)   (((x) >> 2) & IOCPARM_MASK)
-#define _IOR(g,n,t)       _IOC(2,  (g), (n), sizeof(t))
-#define _IOW(g,n,t)       _IOC(1 ,  (g), (n), sizeof(t))
-#define _IOWR(g,n,t)      _IOC(3,  (g), (n), sizeof(t))
-#endif
+#undef _IO
+#define IOC_IN			1
+#define IOC_OUT			2
+#define IOCSIZE_MASK		0xfffc
+#define IOCSIZE_SHIFT		2
+#define _IOC(dir,tag,num,sz)	(((tag)<<24)|((num)<<16)|((sz)<<2)|(dir))
+#define _IO(tag,num)		_IOC(0,tag,num,0)
+#define _IOW(tag,num,type)	_IOC(1,tag,num,sizeof(type))
+#define _IOR(tag,num,type)	_IOC(2,tag,num,sizeof(type))
+#define _IOWR(tag,num,type)	_IOC(3,tag,num,sizeof(type))
 
 #define DS_GET_CARD_SERVICES_INFO	_IOR ('d', 1, servinfo_t)
 #define DS_ADJUST_RESOURCE_INFO		_IOWR('d', 2, adjust_t)

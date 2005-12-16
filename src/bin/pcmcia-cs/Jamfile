@@ -1,5 +1,16 @@
 SubDir HAIKU_TOP src bin pcmcia-cs ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+        UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
+                # We need the public pcmcia headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os support ] : true ;
+                # We need Errors.h also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+                # We need errno.h also when not compiling for Haiku.
+}
+
 StdBinCommands 
 	cardctl.c
 	dump_cis.c
