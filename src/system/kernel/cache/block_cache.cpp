@@ -350,6 +350,13 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 	block_cache *cache = (block_cache *)data;
 	BenaphoreLocker locker(&cache->lock);
 
+	if (!locker.IsLocked()) {
+		// If our block_cache were deleted, it could be that we had
+		// been called before that deletion went through, therefore,
+		// acquiring its lock might fail.
+		return;
+	}
+
 	TRACE(("block_cache: low memory handler called with level %ld\n", level));
 
 	// free some blocks according to the low memory state
