@@ -6,7 +6,7 @@
 #define ICO_TRANSLATOR_H
 
 
-#include <BaseTranslator.h>
+#include "BaseTranslator.h"
 
 #include <Translator.h>
 #include <TranslatorFormats.h>

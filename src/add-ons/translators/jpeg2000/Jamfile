@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons translators jpeg2000 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirSysHdrs [ FDirName $(SUBDIR) libjasper ] ;
+
 # Exclude unwanted formats
 CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 	-DEXCLUDE_PNM_SUPPORT

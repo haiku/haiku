@@ -7,7 +7,7 @@
 #include "ICOTranslator.h"
 #include "ICO.h"
 
-#include <TranslatorWindow.h>
+#include "TranslatorWindow.h"
 #include <Application.h>
 /*
 #include <TranslatorRoster.h>
