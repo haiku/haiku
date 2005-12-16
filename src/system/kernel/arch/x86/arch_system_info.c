@@ -93,7 +93,7 @@ arch_system_info_init(struct kernel_args *args)
 		else if (!strncmp(cpuInfo.eax_0.vendor_id, "RiseRiseRise", 12))
 			base = B_CPU_RISE_x86;
 		else if (!strncmp(cpuInfo.eax_0.vendor_id, "CentaurHauls", 12))
-			base = B_CPU_IDT_x86;
+			base = B_CPU_VIA_IDT_x86;
 		else if (!strncmp(cpuInfo.eax_0.vendor_id, "NexGenDriven", 12))
 			// ToDo: add NexGen CPU types
 			base = B_CPU_x86;

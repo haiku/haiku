@@ -106,7 +106,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 			type = IA32_MTR_UNCACHED;
 			break;
 		case B_MTR_WC:
-			type = IA32_MTR_WRITE_COMBINED;
+			type = IA32_MTR_WRITE_COMBINING;
 			break;
 		case B_MTR_WT:
 			type = IA32_MTR_WRITE_THROUGH;

@@ -26,8 +26,6 @@
 #	define TRACE(x) ;
 #endif
 
-#define IA32_GLOBAL_PAGE_FEATURE	(1UL << 13)
-
 // 256 MB of iospace
 #define IOSPACE_SIZE (256*1024*1024)
 // put it 256 MB into kernel space
@@ -941,7 +939,7 @@ arch_vm_translation_map_init(kernel_args *args)
 
 	// enable global page feature if available
 	get_current_cpuid(&info, 1);
-	if (info.eax_1.features & IA32_GLOBAL_PAGE_FEATURE) {
+	if (info.eax_1.features & IA32_FEATURE_GLOBAL_PAGES) {
 		// this prevents kernel pages from being flushed from TLB on context-switch
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
 	}

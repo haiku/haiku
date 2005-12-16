@@ -21,12 +21,17 @@
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
 
+// cpuid eax 1 features
+#define IA32_FEATURE_MTRR			(1UL << 12)
+#define IA32_FEATURE_GLOBAL_PAGES	(1UL << 13)
+
+
 // cr4 flags
 #define IA32_CR4_GLOBAL_PAGES		(1UL << 7)
 
 // Memory type ranges
 #define IA32_MTR_UNCACHED			0
-#define IA32_MTR_WRITE_COMBINED		1
+#define IA32_MTR_WRITE_COMBINING	1
 #define IA32_MTR_WRITE_THROUGH		4
 #define IA32_MTR_WRITE_PROTECTED	5
 #define IA32_MTR_WRITE_BACK			6
