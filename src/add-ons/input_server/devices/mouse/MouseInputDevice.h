@@ -32,6 +32,7 @@
 #include <List.h>
 #include <stdio.h>
 
+struct mouse_device;
 class MouseInputDevice : public BInputServerDevice {
 public:
 	MouseInputDevice();
@@ -52,7 +53,8 @@ private:
 	status_t AddDevice(const char *path);
 	status_t RemoveDevice(const char *path);
 	
-	static int32 DeviceWatcher(void *arg);
+	int32 DeviceWatcher(mouse_device *device);
+	static int32 ThreadFunction(void *arg);
 			
 	BList fDevices;
 #ifdef DEBUG

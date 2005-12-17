@@ -53,8 +53,6 @@ FILE *MouseInputDevice::sLogFile = NULL;
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
-static MouseInputDevice *sSingletonMouseDevice = NULL;
-
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char *kMouseDevicesDirectory = "/dev/input/mouse";
 
@@ -74,6 +72,12 @@ struct mouse_device {
 };
 
 
+struct watcher_params {
+	MouseInputDevice *object;
+	mouse_device *device;
+};
+
+
 // forward declarations
 static char *get_short_name(const char *longName);
 
@@ -87,10 +91,7 @@ instantiate_input_device()
 
 
 MouseInputDevice::MouseInputDevice()
-{
-	ASSERT(sSingletonMouseDevice == NULL);
-	sSingletonMouseDevice = this;
-			
+{		
 #if DEBUG
 	sLogFile = fopen("/var/log/mouse_device_log.log", "a");
 #endif
@@ -187,9 +188,11 @@ MouseInputDevice::Start(const char *name, void *cookie)
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", name);
 	
+
+	const watcher_params params = { this, device };
 	device->active = true;
-	device->device_watcher = spawn_thread(DeviceWatcher, threadName,
-		kMouseThreadPriority, device);
+	device->device_watcher = spawn_thread(ThreadFunction, threadName,
+		kMouseThreadPriority, (void *)&params);
 	
 	if (device->device_watcher < B_OK) {
 		LOG_ERR("%s: can't spawn watching thread: %s\n",
@@ -330,10 +333,16 @@ MouseInputDevice::RemoveDevice(const char *path)
 
 
 int32
-MouseInputDevice::DeviceWatcher(void *arg)
+MouseInputDevice::ThreadFunction(void  *arg)
 {
-	mouse_device *dev = (mouse_device *)arg;
-	
+	watcher_params *params = (watcher_params *)arg;
+	return params->object->DeviceWatcher(params->device);
+}
+
+
+int32
+MouseInputDevice::DeviceWatcher(mouse_device *dev)
+{
 	mouse_movement movements;
 	uint32 buttons_state = 0;
 	BMessage *message = NULL;
@@ -363,7 +372,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 				message->AddInt32("x", xdelta);
 				message->AddInt32("y", ydelta);
 					
-				sSingletonMouseDevice->EnqueueMessage(message);
+				EnqueueMessage(message);
 			}
 		}
 		
@@ -381,7 +390,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 			message->AddInt32("buttons", movements.buttons);						
 			message->AddInt32("x", xdelta);
 			message->AddInt32("y", ydelta);
-			sSingletonMouseDevice->EnqueueMessage(message);
+			EnqueueMessage(message);
 			buttons_state = movements.buttons;
 		}
 				
@@ -392,7 +401,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 				message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta);
 				message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta);
 				
-				sSingletonMouseDevice->EnqueueMessage(message);
+				EnqueueMessage(message);
 			}	
 		}
 		
@@ -401,25 +410,6 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	return 0;
 }
 
-
-// mouse_device
-mouse_device::mouse_device(const char *driver_path) 
-{
-	fd = -1;
-	device_watcher = -1;
-	active = false;
-	strcpy(path, driver_path);
-	device_ref.name = get_short_name(path);
-	device_ref.type = B_POINTING_DEVICE;
-	device_ref.cookie = this;
-};
-
-
-mouse_device::~mouse_device()
-{
-	free(device_ref.name);
-}
-	
 
 void
 MouseInputDevice::RecursiveScan(const char *directory)
@@ -447,6 +437,26 @@ MouseInputDevice::RecursiveScan(const char *directory)
 	}
 }
 
+
+// mouse_device
+mouse_device::mouse_device(const char *driver_path)
+	:
+	fd(-1),
+	device_watcher(-1),
+	active(false)
+{
+	strcpy(path, driver_path);
+	device_ref.name = get_short_name(path);
+	device_ref.type = B_POINTING_DEVICE;
+	device_ref.cookie = this;
+};
+
+
+mouse_device::~mouse_device()
+{
+	free(device_ref.name);
+}
+	
 
 static char *
 get_short_name(const char *longName)
