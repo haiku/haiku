@@ -4,9 +4,11 @@ ported to Haiku
 This file contains important information for developers who want to update this BIND port.
 I created config.h, port_before.h, and port_after.h with "configure --enable-threads --disable-ipv6" on a BONE-compatible system and fixed some mistakes that the script made. All changes to these three files are marked with a comment containing the keyword CHANGED.
 
-Our private folder are:
+Added folders and files:
 	headers (some headers are not defined in Haiku)
 	src (functions that are not part of Haiku, e.g.: strsep)
+	
+	All BIND headers were moved to legacy/network (public) and private/net (private) in the system-wide headers folder.
 
 Porting issues:
 	BIND wants to include sys/un.h and utmp.h. We do not have these, so I put empty headers into the private headers folder.
@@ -19,4 +21,6 @@ Added sources for compatibility:
 Changes made to the sources and headers:
 	nameser_compat.h: added check for __HAIKU__ and __BEOS__ to not redefine endianness
 	
-	irs/gai_strerror and irs/irs_data.c: Changed the initialization of the mutex lock and rewrote two functions to use BeOS-native TLS.
+	arpa/inet.h, netdb.h, resolv.h: added check for __cplusplus, removed check for _REENTRANT (we are always reentrant)
+	
+	irs/gai_strerror.c, irs/irs_data.c: Changed the initialization of the mutex lock and switched to BeOS-native TLS in gai_strerror() and net_data_init().

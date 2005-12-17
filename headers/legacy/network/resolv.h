@@ -67,6 +67,10 @@
 #include <stdio.h>
 #include <arpa/nameser.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
  * It can change every day so the right thing to do with it is use it
@@ -285,16 +289,10 @@ union res_sockaddr_union {
 /*			0x00010000	*/
 
 /* Things involving an internal (static) resolver context. */
-#ifdef _REENTRANT
 __BEGIN_DECLS
 extern struct __res_state *__res_state(void);
 __END_DECLS
 #define _res (*__res_state())
-#else
-#ifndef __BIND_NOSTATIC
-extern struct __res_state _res;
-#endif
-#endif
 
 #ifndef __BIND_NOSTATIC
 #define fp_nquery		__fp_nquery
@@ -497,5 +495,9 @@ void		res_setservers __P((res_state,
 int		res_getservers __P((res_state,
 				    union res_sockaddr_union *, int));
 __END_DECLS
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_RESOLV_H_ */

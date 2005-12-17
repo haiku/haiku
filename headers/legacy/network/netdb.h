@@ -102,6 +102,10 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _PATH_HEQUIV
 #define _PATH_HEQUIV	"/etc/hosts.equiv"
 #endif
@@ -124,12 +128,7 @@
 __BEGIN_DECLS
 extern int * __h_errno __P((void));
 __END_DECLS
-#if defined(_REENTRANT) || \
-    (__GLIBC__ > 2 || __GLIBC__ == 2 &&  __GLIBC_MINOR__ >= 3)
 #define	h_errno (*__h_errno())
-#else
-extern int h_errno;
-#endif
 
 /*
  * Structures returned by network data base library.  All addresses are
@@ -262,7 +261,6 @@ struct	addrinfo {
 #define SCOPE_DELIMITER	'%'
 
 
-#ifdef _REENTRANT
 #if defined (__hpux) || defined(__osf__) || defined(_AIX)
 #define	_MAXALIASES	35
 #define	_MAXLINELEN	1024
@@ -352,7 +350,7 @@ struct	servent_data {
 #endif
 };
 #endif
-#endif
+
 __BEGIN_DECLS
 void		endhostent __P((void));
 void		endnetent __P((void));
@@ -399,7 +397,6 @@ int		innetgr __P((const char *, const char *, const char *,
 			     const char *));
 #endif
 
-#ifdef _REENTRANT
 #if defined(__hpux) || defined(__osf__) || defined(_AIX)
 int		gethostbyaddr_r __P((const char *, int, int, struct hostent *,
 					struct hostent_data *));
@@ -532,6 +529,9 @@ int		setnetgrent_r __P((char *, void **));
 #endif
 
 #endif
+
+#ifdef __cplusplus
+}
 #endif
 __END_DECLS
 

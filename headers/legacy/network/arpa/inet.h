@@ -88,6 +88,10 @@
 #define	inet_nsap_addr		__inet_nsap_addr
 #define	inet_nsap_ntoa		__inet_nsap_ntoa
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 __BEGIN_DECLS
 unsigned long	 inet_addr __P((const char *));
 int		 inet_aton __P((const char *, struct in_addr *));
@@ -106,6 +110,10 @@ const char	*inet_ntop __P((int, const void *, char *, size_t));
 u_int		 inet_nsap_addr __P((const char *, u_char *, int));
 char		*inet_nsap_ntoa __P((int, const u_char *, char *));
 __END_DECLS
+
+#ifdef __cplusplus
+}
+#endif
 
 #if defined(__hpux) && defined(_XOPEN_SOURCE_EXTENDED)
 /*
