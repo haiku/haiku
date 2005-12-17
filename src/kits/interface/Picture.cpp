@@ -59,11 +59,7 @@ BPicture::BPicture()
 	extent(NULL),
 	usurped(NULL)
 {
-	extent = new _BPictureExtent_;
-	extent->fNewData = NULL;
-	extent->fNewSize = 0;
-	extent->fOldData = NULL;
-	extent->fOldSize = 0;
+	init_data();
 }
 
 
