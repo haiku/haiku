@@ -255,19 +255,17 @@ BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	bool aborted = false;
-
 	if (AddDynamicItem(B_INITIAL_ADD)) {
 		do {
 			if (!OkToProceed(NULL)) {
 				AddDynamicItem(B_ABORT);
-				aborted = true;
+				fAttachAborted = true;
 				break;
 			}
 		} while (AddDynamicItem(B_PROCESSING));
 	}
 
-	if (!aborted)
+	if (!fAttachAborted)
 		InvalidateLayout();
 }
 
@@ -756,9 +754,8 @@ BMenu::InvalidateLayout()
 
 
 BHandler *
-BMenu::ResolveSpecifier(BMessage *msg, int32 index,
-								  BMessage *specifier, int32 form,
-								  const char *property)
+BMenu::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+						int32 form, const char *property)
 {
 	BPropertyInfo propInfo(sPropList);
 	BHandler *target = NULL;
@@ -812,8 +809,8 @@ BMenu::GetSupportedSuites(BMessage *data)
 	if (err < B_OK)
 		return err;
 	
-	BPropertyInfo prop_info(sPropList);
-	err = data->AddFlat("messages", &prop_info);
+	BPropertyInfo propertyInfo(sPropList);
+	err = data->AddFlat("messages", &propertyInfo);
 
 	if (err < B_OK)
 		return err;
@@ -974,12 +971,9 @@ BMenu::AddDynamicItem(add_state s)
 void
 BMenu::DrawBackground(BRect update)
 {
-	BRect rect = Bounds() & update;
 	rgb_color oldColor = HighColor();
-	
 	SetHighColor(sMenuInfo.background_color);
-	FillRect(rect, B_SOLID_HIGH);
-	
+	FillRect(Bounds() & update, B_SOLID_HIGH);
 	SetHighColor(oldColor);
 }
 
@@ -1096,12 +1090,8 @@ BMenu::_track(int *action, long start)
 		if (item != NULL) {
 			if (item != fSelected)
 				SelectItem(item);
-		} else if (fSelected != NULL) {
-			BPoint screenLocation = location;
-			ConvertToScreen(&screenLocation);
-			if (!OverSubmenu(fSelected, screenLocation))
+		} else if (fSelected != NULL && !OverSubmenu(fSelected, ConvertToScreen(location)))
 				SelectItem(NULL);
-		}
 				
 		if (fSelected != NULL && fSelected->Submenu() != NULL) {
 			UnlockLooper();
@@ -1290,7 +1280,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.right = frame.right;
 
-			frame.right = (float)ceil(frame.right);
+			frame.right = ceilf(frame.right);
 			frame.bottom--;
 			break;
 		}
@@ -1300,7 +1290,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			font_height fh;
 			GetFontHeight(&fh);
 			frame = BRect(0.0f, 0.0f, 0.0f,	
-				(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);	
+				ceilf(fh.ascent) + ceilf(fh.descent) + fPad.top + fPad.bottom);	
 
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
 				item = ItemAt(i);
@@ -1319,7 +1309,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;			
 
-			frame.right = (float)ceil(frame.right) + 8.0f;
+			frame.right = ceilf(frame.right) + 8.0f;
 			break;
 		}
 
@@ -1382,7 +1372,7 @@ BMenu::ScreenLocation()
 	BMenu *superMenu = Supermenu();
 	BMenuItem *superItem = Superitem();
 
-	if (superMenu == NULL && superItem == NULL) {
+	if (superMenu == NULL || superItem == NULL) {
 		debugger("BMenu can't determine where to draw."
 			"Override BMenu::ScreenLocation() to determine location.");
 	}
@@ -1562,7 +1552,7 @@ BMenu::CacheFontInfo()
 	GetFontHeight(&fh);
 	fAscent = fh.ascent;
 	fDescent = fh.descent;
-	fFontHeight = (float)ceil(fh.ascent + fh.descent + fh.leading);
+	fFontHeight = ceilf(fh.ascent + fh.descent + fh.leading);
 }
 
 
