@@ -1,11 +1,13 @@
 SubDir HAIKU_TOP src apps midiplayer ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
 	SynthBridge.cpp
-	: libbe.so libmidi.so libmidi2.so
+	: be midi midi2
 	: MidiPlayer.rdef
 ;
 
