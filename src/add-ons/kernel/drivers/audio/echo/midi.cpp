@@ -108,6 +108,8 @@ midi_control(
 	void * data,
 	size_t len)
 {
+	LOG(("midi_control()\n"));
+	
 	return B_ERROR;
 }
 
@@ -124,6 +126,8 @@ midi_read(
 	DWORD			midiData;
 	LONGLONG 		timestamp;
 	
+	LOG(("midi_read()\n"));
+	
 	if (acquire_sem(card->midi.midi_ready_sem) != B_OK)
 		return B_ERROR;
 	
@@ -131,6 +135,8 @@ midi_read(
 	if (err == ECHOSTATUS_OK) {
 		*nread = 1;
 		*(PDWORD)ptr = midiData;
+		LOG(("midi_read() : 0x%lx\n", midiData));
+		return B_OK;
 	}
 	return B_ERROR;
 }
@@ -145,6 +151,8 @@ midi_write(
 {
 	echo_dev *card = (echo_dev *) cookie;
 	ECHOSTATUS 		err;
+	
+	LOG(("midi_write()\n"));
 	
 	err = card->pEG->WriteMidi(*nwritten, (PBYTE)ptr, nwritten);
 	return (err != ECHOSTATUS_OK) ? B_ERROR : B_OK;

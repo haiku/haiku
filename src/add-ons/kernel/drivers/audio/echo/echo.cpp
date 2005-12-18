@@ -409,7 +409,7 @@ int32 echo_int(void *arg)
 
 #ifdef MIDI_SUPPORT
 	if (midiReceived)
-		release_sem(card->midi.midi_ready_sem);
+		release_sem_etc(card->midi.midi_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 #endif
 
 	LIST_FOREACH(stream, &card->streams, next) {
