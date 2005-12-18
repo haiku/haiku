@@ -51,25 +51,28 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer, size
 		size_t length = 0;
 
 		for (; length < bufferSize; length++) {
-			if (string[length] == '\r')
+			if (string[length] == '\r' && length + 1 < bufferSize) {
 				length += 2;
-			else if (string[length] == '\n')
+			} else if (string[length] == '\n') {
+				newLine = true;
 				break;
+			}
 		}
 
 		if (length > bufferSize)
 			length = bufferSize;
 
-		of_write(fHandle, string, length);
+		if (length > 0) {
+			of_write(fHandle, string, length);
+			string += length;
+			bufferSize -= length;
+		}
 
 		if (newLine) {
 			of_write(fHandle, "\r\n", 2);
 			string++;
 			bufferSize--;
 		}
-
-		string += length;
-		bufferSize -= length;
 	}
 
 	return string - (char *)buffer;
