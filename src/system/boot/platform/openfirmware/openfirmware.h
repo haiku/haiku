@@ -65,6 +65,7 @@ extern void *of_claim(void *virtualAddress, int size, int align);
 
 /* misc functions */
 extern int of_call_method(const char *method, int numArgs, int numReturns, ...);
+extern int of_interpret(const char *command, int numArgs, int numReturns, ...);
 extern int of_test(const char *service);
 extern int of_milliseconds(void);
 extern void of_exit(void);
