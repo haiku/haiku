@@ -16,11 +16,22 @@ const static int32 kMaxNegative = 0x80000003;
 const static int32 kInitialDataSize = 8;
 
 
+class DebugHelper {
+public:
+	DebugHelper() { printf("Entering...\n"); }
+	~DebugHelper() { printf("Exiting...\n"); }
+};
+
+
+#define DEBUG_ENTER_FUNCTION ;//printf("%s\n", __PRETTY_FUNCTION__); DebugHelper helper;
+
+
 ClipRegion::ClipRegion()
 	:
 	fDataSize(0),
 	fData(NULL)	
 {
+	DEBUG_ENTER_FUNCTION
 	_Resize(kInitialDataSize);
 	_Invalidate();
 }
@@ -31,6 +42,7 @@ ClipRegion::ClipRegion(const ClipRegion &region)
 	fDataSize(0),
 	fData(NULL)	
 {
+	DEBUG_ENTER_FUNCTION
 	*this = region;
 }
 
@@ -40,6 +52,7 @@ ClipRegion::ClipRegion(const clipping_rect &rect)
 	fDataSize(0),
 	fData(NULL)	
 {
+	DEBUG_ENTER_FUNCTION
 	Set(rect);
 }
 
@@ -49,6 +62,7 @@ ClipRegion::ClipRegion(const BRect &rect)
 	fDataSize(0),
 	fData(NULL)	
 {
+	DEBUG_ENTER_FUNCTION
 	Set(rect);
 }
 
@@ -58,12 +72,14 @@ ClipRegion::ClipRegion(const clipping_rect *rects, const int32 &count)
 	fDataSize(0),
 	fData(NULL)	
 {
+	DEBUG_ENTER_FUNCTION
 	Set(rects, count);
 }
 
 
 ClipRegion::~ClipRegion()
 {
+	DEBUG_ENTER_FUNCTION
 	free(fData);
 }
 
@@ -71,6 +87,7 @@ ClipRegion::~ClipRegion()
 void
 ClipRegion::Set(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	if (!valid_rect(rect) || (fDataSize <= 1 && !_Resize(kInitialDataSize)))
 		_Invalidate();
 	else {
@@ -83,6 +100,7 @@ ClipRegion::Set(const clipping_rect &rect)
 void
 ClipRegion::Set(const BRect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	Set(to_clipping_rect(rect));
 }
 
@@ -90,6 +108,7 @@ ClipRegion::Set(const BRect &rect)
 void
 ClipRegion::Set(const clipping_rect *rects, const int32 &count)
 {
+	DEBUG_ENTER_FUNCTION
 	_Invalidate();
 	_Append(rects, count);
 }
@@ -98,6 +117,7 @@ ClipRegion::Set(const clipping_rect *rects, const int32 &count)
 bool
 ClipRegion::Intersects(const clipping_rect &rect) const
 {
+	DEBUG_ENTER_FUNCTION
 	if (!rects_intersect(rect, fBound))
 		return false;
 
@@ -113,6 +133,7 @@ ClipRegion::Intersects(const clipping_rect &rect) const
 bool
 ClipRegion::Intersects(const BRect &rect) const
 {
+	DEBUG_ENTER_FUNCTION
 	return Intersects(to_clipping_rect(rect));
 }
 
@@ -120,6 +141,7 @@ ClipRegion::Intersects(const BRect &rect) const
 bool
 ClipRegion::Contains(const BPoint &pt) const
 {
+	DEBUG_ENTER_FUNCTION
 	// If the point doesn't lie within the region's bounds,
 	// don't even try it against the region's rects.
 	if (!point_in(fBound, pt))
@@ -137,6 +159,7 @@ ClipRegion::Contains(const BPoint &pt) const
 void
 ClipRegion::OffsetBy(const int32 &dh, const int32 &dv)
 {
+	DEBUG_ENTER_FUNCTION
 	if (dh == 0 && dv == 0)
 		return;
 		
@@ -152,6 +175,7 @@ ClipRegion::OffsetBy(const int32 &dh, const int32 &dv)
 void
 ClipRegion::OffsetBy(const BPoint &point)
 {
+	DEBUG_ENTER_FUNCTION
 	return OffsetBy((int32)point.x, (int32)point.y);
 }
 
@@ -159,6 +183,7 @@ ClipRegion::OffsetBy(const BPoint &point)
 void
 ClipRegion::IntersectWith(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	if (!rects_intersect(rect, fBound))
 		_Invalidate();
 	else
@@ -169,6 +194,7 @@ ClipRegion::IntersectWith(const clipping_rect &rect)
 void
 ClipRegion::IntersectWith(const BRect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	IntersectWith(to_clipping_rect(rect));
 }
 
@@ -176,6 +202,7 @@ ClipRegion::IntersectWith(const BRect &rect)
 void
 ClipRegion::IntersectWith(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	clipping_rect intersection = sect_rect(fBound, region.fBound);
 	
 	if (fCount == 0 || region.fCount == 0 || !valid_rect(intersection))
@@ -200,6 +227,7 @@ ClipRegion::IntersectWith(const ClipRegion &region)
 void
 ClipRegion::Include(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	// The easy case first: if the rectangle completely contains
 	// ourself, the union is the rectangle itself.
 	if (rect_contains(fBound, rect))
@@ -214,6 +242,7 @@ ClipRegion::Include(const clipping_rect &rect)
 void
 ClipRegion::Include(const BRect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	Include(to_clipping_rect(rect));
 }
 
@@ -221,6 +250,7 @@ ClipRegion::Include(const BRect &rect)
 void
 ClipRegion::Include(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	if (region.fCount == 0)
 		return;
 	
@@ -245,7 +275,7 @@ ClipRegion::Include(const ClipRegion &region)
 		Include(region.fBound);
 		
 	else if (fCount == 1) {
-		ClipRegion dest = region;
+		ClipRegion dest(region);
 		dest.Include(fBound);
 		_Adopt(dest);
 	} else 
@@ -256,6 +286,7 @@ ClipRegion::Include(const ClipRegion &region)
 void
 ClipRegion::Exclude(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	const ClipRegion region(rect);
 	Exclude(region);
 }
@@ -264,6 +295,7 @@ ClipRegion::Exclude(const clipping_rect &rect)
 void
 ClipRegion::Exclude(const BRect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	const ClipRegion region(rect);
 	Exclude(region);
 }
@@ -272,6 +304,7 @@ ClipRegion::Exclude(const BRect &rect)
 void
 ClipRegion::Exclude(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	if (fCount == 0 || region.fCount == 0 || !rects_intersect(fBound, region.fBound))
 		return;
 
@@ -279,9 +312,21 @@ ClipRegion::Exclude(const ClipRegion &region)
 }
 	
 
+void
+ClipRegion::GetRects(clipping_rect **rects, int32 *count)
+{
+	if (fCount > 0) {	
+		*rects = new clipping_rect[fCount];
+		memcpy(*rects, fData, fCount);		
+	}
+	*count = fCount;
+}
+
+
 ClipRegion &
 ClipRegion::operator=(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	const int32 size = region.fDataSize > 0 ? region.fDataSize : kInitialDataSize;
 	if (_Resize(size, false)) {
 		fBound = region.fBound;
@@ -331,6 +376,7 @@ topComparator(const void *a, const void *b)
 void
 ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	ClipRegion dest;
 			
 	for (int32 f = 0; f < fCount; f++) {
@@ -351,6 +397,7 @@ ClipRegion::_IntersectWithComplex(const ClipRegion &region)
 void
 ClipRegion::_IntersectWith(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	ASSERT(rects_intersect(rect, fBound));
 	
 	// The easy case first: We already know that the region intersects,
@@ -375,6 +422,7 @@ ClipRegion::_IntersectWith(const clipping_rect &rect)
 void
 ClipRegion::_IncludeNoIntersection(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	ASSERT(fCount != 0 || region.fCount != 0);
 	ASSERT(!rects_intersect(region.fBound, fBound));
 
@@ -409,6 +457,7 @@ ClipRegion::_IncludeNoIntersection(const ClipRegion &region)
 void
 ClipRegion::_IncludeComplex(const ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	int32 bottom = min_c(fBound.top, region.fBound.top) - 1;
 	int32 a = 0, b = 0;
 	ClipRegion dest;
@@ -434,12 +483,7 @@ ClipRegion::_IncludeComplex(const ClipRegion &region)
 		}
 	}
 
-	// TODO: For some reason, I had to add those two qsort calls.
-	// They wasn't needed in the old implementation, so I obviously
-	// introduced a bug somewhere. Fix the bug and then remove those calls
-	qsort(dest.fData, dest.fCount, sizeof(clipping_rect), leftComparator);		
 	dest._Coalesce();
-	qsort(dest.fData, dest.fCount, sizeof(clipping_rect), topComparator);
 	
 	_Adopt(dest);
 	
@@ -490,6 +534,7 @@ ClipRegion::_ExcludeComplex(const ClipRegion &region)
 void
 ClipRegion::_AddRect(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	ASSERT(fCount >= 0);
 	ASSERT(fDataSize >= 0);
 	ASSERT(valid_rect(rect));
@@ -540,6 +585,7 @@ ClipRegion::_AddRect(const clipping_rect &rect)
 void
 ClipRegion::_RecalculateBounds(const clipping_rect &rect)
 {
+	DEBUG_ENTER_FUNCTION
 	ASSERT(fCount > 0);
 		
 	if (rect.top < fBound.top)
@@ -556,6 +602,7 @@ ClipRegion::_RecalculateBounds(const clipping_rect &rect)
 int32
 ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &oldBottom, const int32 &startIndex) const
 {
+	DEBUG_ENTER_FUNCTION
 	int32 bottom = oldBottom;
 	for (int32 i = startIndex; i < fCount; i++) {
 		const int32 n = fData[i].top - 1;
@@ -572,6 +619,7 @@ ClipRegion::_FindSmallestBottom(const int32 &top, const int32 &oldBottom, const 
 int32
 ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_rect *rects, int32 *inOutIndex) const
 {
+	DEBUG_ENTER_FUNCTION
 	int32 currentIndex = *inOutIndex;
 	*inOutIndex = -1;
 	
@@ -607,6 +655,7 @@ ClipRegion::_ExtractStripRects(const int32 &top, const int32 &bottom, clipping_r
 void
 ClipRegion::_Append(const ClipRegion &region, const bool &aboveThis)
 {
+	DEBUG_ENTER_FUNCTION
 	if (aboveThis) {
 		ClipRegion dest = region;
 		for (int32 c = 0; c < fCount; c++)
@@ -622,6 +671,7 @@ ClipRegion::_Append(const ClipRegion &region, const bool &aboveThis)
 void
 ClipRegion::_Append(const clipping_rect *rects, const int32 &count, const bool &aboveThis)
 {
+	DEBUG_ENTER_FUNCTION
 	if (aboveThis) {
 		ClipRegion dest;
 		dest.Set(rects, count);
@@ -638,6 +688,7 @@ ClipRegion::_Append(const clipping_rect *rects, const int32 &count, const bool &
 void
 ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
 {
+	DEBUG_ENTER_FUNCTION
 	// rects share the top and bottom coordinates,
 	// so we can get those from the first one and ignore the others
 	clipping_rect rect;
@@ -659,7 +710,6 @@ ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
 			next++;
 		}
 		
-		//to_BRect(rect).PrintToStream();
 		_AddRect(rect);		
 		current = next;	
 	}
@@ -669,6 +719,7 @@ ClipRegion::_MergeAndInclude(clipping_rect *rects, const int32 &count)
 inline void
 ClipRegion::_Coalesce()
 {
+	DEBUG_ENTER_FUNCTION
 	if (fCount > 1) {
 		while (_CoalesceVertical() || _CoalesceHorizontal())
 			;
@@ -679,14 +730,15 @@ ClipRegion::_Coalesce()
 bool
 ClipRegion::_CoalesceVertical()
 {
-	int32 oldCount = fCount;
+	DEBUG_ENTER_FUNCTION
+	const int32 oldCount = fCount;
 	
 	clipping_rect testRect = { 1, 1, -1, -1 };	
 	int32 newCount = -1;
 	
 	// First, try coalescing rects vertically	
 	for (int32 x = 0; x < fCount; x++) {
-		clipping_rect &rect = fData[x];
+		const clipping_rect &rect = fData[x];
 					
 		if (rect.left == testRect.left && rect.right == testRect.right
 				&& rect.top == testRect.bottom + 1)
@@ -707,13 +759,14 @@ ClipRegion::_CoalesceVertical()
 bool
 ClipRegion::_CoalesceHorizontal()
 {
-	int32 oldCount = fCount;
+	DEBUG_ENTER_FUNCTION
+	const int32 oldCount = fCount;
 	
 	clipping_rect testRect = { 1, 1, -1, -1 };	
 	int32 newCount = -1;
 
 	for (int32 x = 0; x < fCount; x++) {
-		clipping_rect &rect = fData[x];
+		const clipping_rect &rect = fData[x];
 		
 		if (rect.top == testRect.top && rect.bottom == testRect.bottom
 					&& rect.left == testRect.right + 1)	
@@ -734,6 +787,7 @@ ClipRegion::_CoalesceHorizontal()
 void
 ClipRegion::_Invalidate()
 {
+	DEBUG_ENTER_FUNCTION
 	fCount = 0;
 	fBound.left = kMaxPositive;
 	fBound.top = kMaxPositive;
@@ -745,6 +799,7 @@ ClipRegion::_Invalidate()
 bool
 ClipRegion::_Resize(const int32 &newSize, const bool &keepOld)
 {
+	DEBUG_ENTER_FUNCTION
 	if (!keepOld) {
 		free(fData);
 		fData = (clipping_rect *)malloc(newSize * sizeof(clipping_rect));		
@@ -763,6 +818,7 @@ ClipRegion::_Resize(const int32 &newSize, const bool &keepOld)
 void
 ClipRegion::_Adopt(ClipRegion &region)
 {
+	DEBUG_ENTER_FUNCTION
 	free(fData);
 	fData = region.fData;
 	fDataSize = region.fDataSize;

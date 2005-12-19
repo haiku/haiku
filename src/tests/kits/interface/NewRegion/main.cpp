@@ -9,8 +9,8 @@ int main()
 	
 	BRegion other(BRect(15, 15, 50, 19));
 	other.IntersectWith(&region);
-	if (region.Intersects(other.Frame()))
-		printf("Okay!\n");
+	//if (region.Intersects(other.Frame()))
+	//	printf("Okay!\n");
 		
 	
 	BRegion c;
@@ -18,7 +18,8 @@ int main()
 
 	other.Include(&c);
 	region.Include(&c);
-
+	
 	region.PrintToStream();
+	other.PrintToStream();
 }
 

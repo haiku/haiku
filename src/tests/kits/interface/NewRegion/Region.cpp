@@ -251,7 +251,7 @@ BRegion::OffsetBy(int32 dh, int32 dv)
 void
 BRegion::MakeEmpty()
 {
-	clipping_rect invalid = { 0, 0, -1, -1 };
+	const clipping_rect invalid = { 0, 0, -1, -1 };
 	Set(invalid);
 }
 

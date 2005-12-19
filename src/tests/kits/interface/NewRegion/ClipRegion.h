@@ -16,7 +16,7 @@ public:
 	ClipRegion(const clipping_rect &rect);
 	ClipRegion(const BRect &rect);
 	ClipRegion(const clipping_rect *rects, const int32 &count);
-	
+
 	~ClipRegion();
 	
 	clipping_rect Frame() const { return fBound; }
@@ -49,6 +49,8 @@ public:
 	void IntersectWith(const BRect &rect);
 	void IntersectWith(const ClipRegion &region);
 	
+	void GetRects(clipping_rect **rects, int32 *count);
+
 	ClipRegion &operator=(const ClipRegion &region);
 	
 	status_t ReadFromLink(BPrivate::ServerLink &link);
