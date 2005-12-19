@@ -24,8 +24,14 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	smp_trampoline.S
 	support.S
 	video.cpp
+	
+	# generic
+	text_menu.cpp
 	: -fno-pic
-	;
+;
+
+SEARCH on [ FGristFiles text_menu.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.

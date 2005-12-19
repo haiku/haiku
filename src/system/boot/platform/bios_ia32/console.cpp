@@ -5,6 +5,7 @@
 
 
 #include "console.h"
+#include "keyboard.h"
 
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
@@ -138,6 +139,33 @@ console_set_color(int32 foreground, int32 background)
 }
 
 
+int
+console_wait_for_key(void)
+{
+	union key key = wait_for_key();
+
+	if (key.code.ascii == 0) {
+		switch (key.code.bios) {
+			case BIOS_KEY_UP:
+				return TEXT_CONSOLE_KEY_UP;
+			case BIOS_KEY_DOWN:
+				return TEXT_CONSOLE_KEY_DOWN;
+			case BIOS_KEY_PAGE_UP:
+				return TEXT_CONSOLE_KEY_PAGE_UP;
+			case BIOS_KEY_PAGE_DOWN:
+				return TEXT_CONSOLE_KEY_PAGE_DOWN;
+			case BIOS_KEY_HOME:
+				return TEXT_CONSOLE_KEY_HOME;
+			case BIOS_KEY_END:
+				return TEXT_CONSOLE_KEY_END;
+			default:
+				return 0;
+		}
+	} else
+		return key.code.ascii;
+}
+
+
 status_t
 console_init(void)
 {
@@ -151,5 +179,4 @@ console_init(void)
 
 	return B_OK;
 }
-
 
