@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <SupportDefs.h>
@@ -59,9 +59,6 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer, size
 			}
 		}
 
-		if (length > bufferSize)
-			length = bufferSize;
-
 		if (length > 0) {
 			of_write(fHandle, string, length);
 			string += length;
@@ -69,6 +66,8 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer, size
 		}
 
 		if (newLine) {
+			// this code replaces a single '\n' with '\r\n', so it
+			// bumps the string/bufferSize only a single character
 			of_write(fHandle, "\r\n", 2);
 			string++;
 			bufferSize--;
