@@ -272,10 +272,72 @@ FontManager::SaveRecentFontMappings()
 }
 
 
+void
+FontManager::_AddDefaultMapping(const char* family, const char* style,
+	const char* path)
+{
+	font_mapping* mapping = new (nothrow) font_mapping;
+	if (mapping == NULL)
+		return;
+
+	mapping->family = family;
+	mapping->style = style;
+	BEntry entry(path);
+
+	if (entry.GetRef(&mapping->ref) != B_OK
+		|| !entry.Exists()
+		|| !fMappings.AddItem(mapping))
+		delete mapping;
+}
+
+
 bool
 FontManager::_LoadRecentFontMappings()
 {
+	// default known mappings
+	// TODO: load them for real, and use these as a fallback
+
+	_AddDefaultMapping("Bitstream Vera Sans", "Roman", 
+		"/boot/beos/etc/fonts/ttfonts/Vera.ttf");
+	_AddDefaultMapping("Bitstream Vera Sans", "Bold", 
+		"/boot/beos/etc/fonts/ttfonts/VeraBd.ttf");
+	_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman", 
+		"/boot/beos/etc/fonts/ttfonts/VeraMono.ttf");
+
 	return false;
+}
+
+
+status_t
+FontManager::_AddMappedFont(const char* familyName, const char* styleName)
+{
+	for (int32 i = 0; i < fMappings.CountItems(); i++) {
+		font_mapping* mapping = fMappings.ItemAt(i);
+
+		if (mapping->family == familyName) {
+			if (styleName != NULL && mapping->style != styleName)
+				continue;
+
+			BEntry entry(&mapping->ref);
+			if (entry.InitCheck() != B_OK)
+				continue;
+
+			// find parent directory
+
+			node_ref nodeRef;
+			nodeRef.device = mapping->ref.device;
+			nodeRef.node = mapping->ref.directory;
+			font_directory* directory = _FindDirectory(nodeRef);
+			if (directory == NULL) {
+				// unknown directory, maybe this is a user font
+				continue;
+			}
+
+			return _AddFont(*directory, entry);
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -381,13 +443,19 @@ void
 FontManager::_AddSystemPaths()
 {
 	BPath path;
-	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path, true) == B_OK)
+	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path, true) == B_OK) {
 		_AddPath(path.Path());
+		if (path.Append("ttfonts") == B_OK)
+			_AddPath(path.Path());
+	}
 
 	// We don't scan these in test mode to help shave off some startup time
 #if !TEST_MODE
-	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK)
+	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK) {
 		_AddPath(path.Path());
+		if (path.Append("ttfonts") == B_OK)
+			_AddPath(path.Path());
+	}
 #endif
 }
 
@@ -755,29 +823,8 @@ FontManager::GetFamily(const char* name)
 		return family;
 
 	// try font mappings before failing
-	for (int32 i = 0; i < fMappings.CountItems(); i++) {
-		font_mapping* mapping = fMappings.ItemAt(i);
-
-		if (mapping->family == name) {
-			BEntry entry(&mapping->ref);
-			if (entry.InitCheck() != B_OK)
-				continue;
-
-			// find parent directory
-			
-			node_ref nodeRef;
-			nodeRef.device = mapping->ref.device;
-			nodeRef.node = mapping->ref.directory;
-			font_directory* directory = _FindDirectory(nodeRef);
-			if (directory == NULL) {
-				// unknown directory, maybe this is a user font
-				continue;
-			}
-
-			if (_AddFont(*directory, entry) == B_OK)
-				return _FindFamily(name);
-		}
-	}
+	if (_AddMappedFont(name) == B_OK)
+		return _FindFamily(name);
 
 	_ScanFonts();
 	return _FindFamily(name);
@@ -837,8 +884,15 @@ FontManager::GetStyle(const char* familyName, const char* styleName, uint16 fami
 
 	// find style
 
-	if (styleName != NULL && styleName[0])
-		return family->GetStyle(styleName);
+	if (styleName != NULL && styleName[0]) {
+		FontStyle* fontStyle = family->GetStyle(styleName);
+		if (fontStyle != NULL)
+			return fontStyle;
+
+		// before we fail, we try the mappings for a match
+		if (_AddMappedFont(family->Name(), styleName) == B_OK)
+			return family->GetStyle(styleName);
+	}
 
 	if (styleID != 0xffff)
 		return family->GetStyleByID(styleID);

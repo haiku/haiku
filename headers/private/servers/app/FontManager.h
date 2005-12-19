@@ -69,9 +69,11 @@ class FontManager : public BLooper {
 		struct font_directory;
 		struct font_mapping;
 
+		void _AddDefaultMapping(const char* family, const char* style, const char* path);
 		bool _LoadRecentFontMappings();
-		FontStyle* _GetDefaultStyle(const char *familyName, const char *styleName,
-						const char *fallbackFamily, const char *fallbackStyle,
+		status_t _AddMappedFont(const char* family, const char* style = NULL);
+		FontStyle* _GetDefaultStyle(const char* familyName, const char* styleName,
+						const char* fallbackFamily, const char* fallbackStyle,
 						uint16 fallbackFace);
 		status_t _SetDefaultFonts();
 		void _AddSystemPaths();
