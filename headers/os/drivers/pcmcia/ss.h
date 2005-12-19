@@ -1,5 +1,5 @@
 /*
- * ss.h 1.23 1999/07/20 16:08:01
+ * ss.h 1.31 2001/08/24 12:16:13
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -12,8 +12,19 @@
  * limitations under the License. 
  *
  * The initial developer of the original code is David A. Hinds
- * <dhinds@hyper.stanford.edu>.  Portions created by David A. Hinds
- * are Copyright (C) 1998 David A. Hinds.  All Rights Reserved.
+ * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
+ * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
+ *
+ * Alternatively, the contents of this file may be used under the
+ * terms of the GNU General Public License version 2 (the "GPL"), in
+ * which case the provisions of the GPL are applicable instead of the
+ * above.  If you wish to allow the use of your version of this file
+ * only under the terms of the GPL and not to allow others to use
+ * your version of this file under the MPL, indicate your decision by
+ * deleting the provisions above and replace them with the notice and
+ * other provisions required by the GPL.  If you do not delete the
+ * provisions above, a recipient may use your version of this file
+ * under either the MPL or the GPL.
  */
 
 #ifndef _LINUX_SS_H
@@ -40,6 +51,7 @@ typedef struct ss_callback_t {
 #define SS_CARDBUS	0x0800
 #define SS_3VCARD	0x1000
 #define SS_XVCARD	0x2000
+#define SS_PENDING	0x4000
 
 /* for InquireSocket */
 typedef struct socket_cap_t {
@@ -56,6 +68,7 @@ typedef struct socket_cap_t {
 #define SS_CAP_PAGE_REGS	0x0001
 #define SS_CAP_VIRTUAL_BUS	0x0002
 #define SS_CAP_MEM_ALIGN	0x0004
+#define SS_CAP_STATIC_MAP	0x0008
 #define SS_CAP_PCCARD		0x4000
 #define SS_CAP_CARDBUS		0x8000
 
@@ -74,6 +87,7 @@ typedef struct socket_state_t {
 #define SS_DMA_MODE	0x0080
 #define SS_SPKR_ENA	0x0100
 #define SS_OUTPUT_ENA	0x0200
+#define SS_ZVCARD	0x0400
 
 /* Flags for I/O port and memory windows */
 #define MAP_ACTIVE	0x01

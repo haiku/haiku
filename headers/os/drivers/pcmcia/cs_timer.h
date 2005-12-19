@@ -1,5 +1,5 @@
 /*
- * driver_ops.h 1.17 2001/10/04 03:15:22
+ * cs_timer.h
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -27,47 +27,16 @@
  * under either the MPL or the GPL.
  */
 
-#ifndef _LINUX_DRIVER_OPS_H
-#define _LINUX_DRIVER_OPS_H
+#define HZ		1000000
+#define jiffies		(system_time())
+#define RUN_AT(t)	(system_time()+(t))
 
-#ifndef DEV_NAME_LEN
-#define DEV_NAME_LEN	32
-#endif
+typedef struct timer_list {
+    struct timer_list *next, *prev;
+    bigtime_t expires;
+    u_long data;
+    void (*function)(u_long data);
+} timer_list;
 
-#ifdef __KERNEL__
-
-typedef struct dev_node_t {
-    char		dev_name[DEV_NAME_LEN];
-    u_short		major, minor;
-    struct dev_node_t	*next;
-} dev_node_t;
-
-typedef struct dev_locator_t {
-    enum { LOC_ISA, LOC_PCI } bus;
-    union {
-	struct {
-	    u_short	io_base_1, io_base_2;
-	    u_long	mem_base;
-	    u_char	irq, dma;
-	} isa;
-	struct {
-	    u_char	bus;
-	    u_char	devfn;
-	} pci;
-    } b;
-} dev_locator_t;
-
-typedef struct driver_operations {
-    char		*name;
-    dev_node_t		*(*attach) (dev_locator_t *loc);
-    void		(*suspend) (dev_node_t *dev);
-    void		(*resume) (dev_node_t *dev);
-    void		(*detach) (dev_node_t *dev);
-} driver_operations;
-
-int register_driver(struct driver_operations *ops);
-void unregister_driver(struct driver_operations *ops);
-
-#endif /* __KERNEL__ */
-
-#endif /* _LINUX_DRIVER_OPS_H */
+void my_add_timer(struct timer_list *t);
+void my_del_timer(struct timer_list *t);

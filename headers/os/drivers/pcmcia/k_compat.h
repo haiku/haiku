@@ -26,8 +26,16 @@
 #include <ByteOrder.h>
 #include <SupportDefs.h>
 #include <config_manager.h>
+#include <stdio.h>
+#include <string.h>
+
+#define u32 uint32
+#define u16 uint16
+#define u8 uint8
 
 #define __KERNEL__
+#define __init
+#define __exit
 
 /* IO port access */
 #define inb(p)			(isa->read_io_8)(p)
@@ -65,7 +73,7 @@
 
 /* Virtual memory mapping: this is somewhat inelegant, but lets us
    use drop-in replacements for the Linux equivalents */
-#define PAGE_SIZE		(0x1000)
+// #define PAGE_SIZE		(0x1000)
 static inline void *ioremap(u_long base, u_long size)
 {
     char tag[B_OS_NAME_LENGTH];
@@ -128,11 +136,11 @@ void free(void *);
 #define pcibios_read_config_dword(b,df,o,v) \
 	((*(v) = pci->read_pci_config(b,(df)>>3,((df)&7),o,4)),0)
 #define pcibios_write_config_byte(b,df,o,v) \
-	pci->write_pci_config(b,(df)>>3,((df)&7),o,1,v)
+	(pci->write_pci_config(b,(df)>>3,((df)&7),o,1,v),0)
 #define pcibios_write_config_word(b,df,o,v) \
-	pci->write_pci_config(b,(df)>>3,((df)&7),o,2,v)
+	(pci->write_pci_config(b,(df)>>3,((df)&7),o,2,v),0)
 #define pcibios_write_config_dword(b,df,o,v) \
-	pci->write_pci_config(b,(df)>>3,((df)&7),o,4,v)
+	(pci->write_pci_config(b,(df)>>3,((df)&7),o,4,v),0)
 #define PCI_VENDOR_ID		PCI_vendor_id
 #define PCI_DEVICE_ID		PCI_device_id
 #define PCI_COMMAND		PCI_command
@@ -172,11 +180,15 @@ void free(void *);
     do { release_spinlock(l); restore_interrupts(f); } while (0)
 
 /* Interrupt handling */
-#define REQUEST_IRQ(i,h,f,n,d)	install_io_interrupt_handler(i,h,d,0)
-#define FREE_IRQ(i,h,d)		remove_io_interrupt(i,h)
-#define IRQ(i,d,r)		(d)
+#define request_irq(i,h,f,n,d)	install_io_interrupt_handler(i,h,d,0)
+#define free_irq(i,h)	remove_io_interrupt(i,h)
+//#define REQUEST_IRQ(i,h,f,n,d)	install_io_interrupt_handler(i,h,d,0)
+//#define FREE_IRQ(i,h,d)		remove_io_interrupt(i,h)
+//#define IRQ(i,d,r)		(d)
+#define IRQ
 #define DEV_ID			dev_id
 #define NR_IRQS			16
+#define SA_SHIRQ		1
 
 #define init_waitqueue(w)	memset((w), 0, sizeof(*w))
 #define init_waitqueue_head(w) memset((w), 0, sizeof(*w))
@@ -204,6 +216,9 @@ typedef long long k_time_t;
 #define del_timer my_del_timer
 
 /* Module handling stuff */
+#define MODULE_AUTHOR(x)
+#define MODULE_DESCRIPTION(x)
+#define MODULE_LICENSE(x)
 #define MODULE_PARM(a,b)	extern int __dummy_decl
 #define MOD_INC_USE_COUNT
 #define MOD_DEC_USE_COUNT
