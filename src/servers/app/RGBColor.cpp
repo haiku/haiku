@@ -234,26 +234,29 @@ void RGBColor::SetColor(const rgb_color &color)
 	\brief Set the object to specified color
 	\param col color to copy
 */
-void RGBColor::SetColor(const RGBColor &col)
+void
+RGBColor::SetColor(const RGBColor &col)
 {
-	color32=col.color32;
-	color16=col.color16;
-	color8=col.color8;
-	update8=col.update8;
-	update16=col.update16;
+	color32 = col.color32;
+	color16 = col.color16;
+	color8 = col.color8;
+	update8 = col.update8;
+	update16 = col.update16;
 }
 
 /*!
 	\brief Set the object to specified color
 	\param col color to copy
 */
-const RGBColor & RGBColor::operator=(const RGBColor &col)
+const RGBColor&
+RGBColor::operator=(const RGBColor &col)
 {
-	color32=col.color32;
-	color16=col.color16;
-	color8=col.color8;
-	update8=col.update8;
-	update16=col.update16;
+	color32 = col.color32;
+	color16 = col.color16;
+	color8 = col.color8;
+	update8 = col.update8;
+	update16 = col.update16;
+
 	return *this;
 }
 
@@ -261,10 +264,11 @@ const RGBColor & RGBColor::operator=(const RGBColor &col)
 	\brief Set the object to specified color
 	\param col color to copy
 */
-const RGBColor & RGBColor::operator=(const rgb_color &col)
+const RGBColor&
+RGBColor::operator=(const rgb_color &col)
 {
-	color32=col;
-	update8=update16=true;
+	color32 = col;
+	update8 = update16 = true;
 
 	return *this;
 }
