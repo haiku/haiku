@@ -95,12 +95,14 @@ typedef struct codec_table_tag
 
 void default_init(device_config *);
 void ad1886_init(device_config *);
+void ad198x_init(device_config *);
 
 void default_amp_enable(device_config *, bool);
 void cs4299_amp_enable(device_config *, bool);
 
 codec_ops default_ops = { default_init, default_amp_enable };
 codec_ops ad1886_ops = { ad1886_init, default_amp_enable };
+codec_ops ad198x_ops = { ad198x_init, default_amp_enable };
 codec_ops cs4299_ops = { default_init, cs4299_amp_enable };
 
 codec_table codecs[] = 
@@ -148,8 +150,11 @@ codec_table codecs[] =
 	{ 0x41445361, 0xffffffff, &ad1886_ops,  "Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445362, 0xffffffff, &default_ops, "Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445363, 0xffffffff, &default_ops, "Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445368, 0xffffffff, &ad198x_ops,	"Analog Devices AD1888 SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445370, 0xffffffff, &ad198x_ops, 	"Analog Devices AD1980 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445371, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445372, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445375, 0xffffffff, &ad198x_ops,	"Analog Devices AD1985 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x414c4320, 0xfffffff0, &default_ops, "Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
 	{ 0x414c4730, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC101" },
 #if 0
@@ -244,10 +249,20 @@ void default_init(device_config *config)
 	LOG(("default_init\n"));
 }
 
-void ad1886_init(device_config *config)
+
+void 
+ad1886_init(device_config *config)
 {
 	LOG(("ad1886_init\n"));
 	auvia_codec_write(config, 0x72, 0x0010);
+}
+
+
+void
+ad198x_init(device_config *config)
+{
+	LOG(("ad198x_init\n"));
+	auvia_codec_write(config, 0x76, auvia_codec_read(config, 0x76) | 0x420);
 }
 
 void default_amp_enable(device_config *config, bool yesno)
