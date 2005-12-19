@@ -991,7 +991,7 @@ fDesktop->LockSingleWindow();
 
 		default:
 			// TODO: when creating a ViewLayer, check for yet non-existing ViewLayer::InitCheck()
-			// and take appropriate actions, then checking for fCurrentLayer->fLayerData
+			// and take appropriate actions, then checking for fCurrentLayer->CurrentState()
 			// is unnecessary
 			if (fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) {
 				printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - B_OK);
@@ -1058,7 +1058,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			delete fCurrentLayer;
 			// TODO: It is necessary to do this, but I find it very obscure.
-			fCurrentLayer = parent;
+			_SetCurrentLayer(parent);
 			break;
 		}
 		case AS_LAYER_SET_STATE:
@@ -1608,8 +1608,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
+			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
 			break;
 		}
 		case AS_SETPENSIZE:
@@ -1619,8 +1618,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			float size;
 			link.Read<float>(&size);
 
-			if (fCurrentLayer && fCurrentLayer->CurrentState())
-				fCurrentLayer->CurrentState()->SetPenSize(size);
+			fCurrentLayer->CurrentState()->SetPenSize(size);
 			break;
 		}
 		case AS_SET_FONT:
@@ -2084,7 +2082,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_DRAW_STRING:
 		{
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n", Title()));
-			char *string;
+			char* string;
 			int32 length;
 			BPoint location;
 			escapement_delta delta;
