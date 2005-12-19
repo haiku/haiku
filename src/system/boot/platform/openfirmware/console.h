@@ -5,22 +5,13 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-
-#include <boot/vfs.h>
-#include <boot/stdio.h>
-
-#include "Handle.h"
-
+#include <boot/platform/generic/text_console.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern status_t console_init(void);
-
-extern status_t set_cursor_pos(FILE *, int x, int y);
-extern status_t set_foreground_color(FILE *, int c);
-extern status_t set_background_color(FILE *, int c);
 
 #ifdef __cplusplus
 }

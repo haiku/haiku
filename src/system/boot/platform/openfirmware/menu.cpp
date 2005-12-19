@@ -6,6 +6,7 @@
 
 #include <boot/platform.h>
 #include <boot/menu.h>
+#include <boot/platform/generic/text_menu.h>
 
 
 void
@@ -27,16 +28,13 @@ platform_add_menus(Menu *menu)
 void
 platform_update_menu_item(Menu *menu, MenuItem *item)
 {
-	if (menu->IsHidden())
-		return;
-
-	// ToDo: implement me!
+	platform_generic_update_text_menu_item(menu, item);
 }
 
 
 void
 platform_run_menu(Menu *menu)
 {
-	// ToDo: implement me!
+	platform_generic_run_text_menu(menu);
 }
 

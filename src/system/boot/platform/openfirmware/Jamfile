@@ -3,21 +3,24 @@ SubDir HAIKU_TOP src system boot platform openfirmware ;
 SubDirC++Flags -fno-rtti ;
 
 KernelMergeObject boot_platform_openfirmware.o :
-	<$(SOURCE_GRIST)>start.c
-	<$(SOURCE_GRIST)>openfirmware.c
-	<$(SOURCE_GRIST)>debug.c
-	<$(SOURCE_GRIST)>mmu.cpp
-	<$(SOURCE_GRIST)>Handle.cpp
-	<$(SOURCE_GRIST)>devices.cpp
-	<$(SOURCE_GRIST)>console.cpp
-	<$(SOURCE_GRIST)>heap.cpp
-	<$(SOURCE_GRIST)>video.cpp
-	<$(SOURCE_GRIST)>menu.cpp
+	console.cpp
+	debug.c
+	devices.cpp
+	Handle.cpp
+	heap.cpp
+	menu.cpp
+	mmu.cpp
+	openfirmware.c
+	start.c
+	video.cpp
+
+	# generic
+	text_menu.cpp
 	:
 	: boot_platform_openfirmware_$(TARGET_ARCH).a
-	;
+;
 
-SEARCH on [ FGristFiles crt0.S ]
-    = [ FDirName $(HAIKU_TOP) src system boot arch $(TARGET_ARCH) ] ;
+SEARCH on [ FGristFiles text_menu.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
 
 SubInclude HAIKU_TOP src system boot platform openfirmware arch ;
