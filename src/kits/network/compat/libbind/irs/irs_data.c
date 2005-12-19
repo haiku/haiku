@@ -52,8 +52,7 @@ extern int h_errno;
 extern struct __res_state _res;
 
 #ifdef	DO_PTHREADS
-static pthread_key_t	key;
-static int		once = 0;
+pthread_key_t	gIRSInitKey;
 #else
 static struct net_data	*net_data;
 #endif
@@ -124,31 +123,21 @@ net_data_init(const char *conf_file) {
 #ifndef LIBBIND_MUTEX_INITIALIZER
 #define LIBBIND_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
 #endif
-	static pthread_mutex_t keylock;
 	struct net_data *net_data;
-
-	if (!once) {
-        /* XXX: Haiku has non-constant mutex initializer! Must init here. */
-   	    keylock = LIBBIND_MUTEX_INITIALIZER;
-        
-		pthread_mutex_lock(&keylock);
-		if (!once++)
-			key = tls_allocate();
-		pthread_mutex_unlock(&keylock);
-	}
-	net_data = tls_get(key);
+	
+	net_data = tls_get(gIRSInitKey);
 #endif
-
+	
 	if (net_data == NULL) {
 		net_data = net_data_create(conf_file);
 		if (net_data == NULL)
 			return (NULL);
 #ifdef	DO_PTHREADS
 		on_exit_thread(net_data_destroy, net_data);
-		tls_set(key, net_data);
+		tls_set(gIRSInitKey, net_data);
 #endif
 	}
-
+	
 	return (net_data);
 }
 

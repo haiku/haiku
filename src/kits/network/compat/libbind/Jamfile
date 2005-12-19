@@ -20,7 +20,6 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 # our libroot contains functions that are missing in BeOS (e.g.: strlcat)
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix pthread ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 # private sources for this port
@@ -73,24 +72,18 @@ MergeObject <compatlibbind>inet.o :
 
 MergeObject <compatlibbind>irs.o :
 	dns.c
-	dns_gr.c
 	dns_ho.c
 	dns_nw.c
 	dns_pr.c
-	dns_pw.c
 	dns_sv.c
 	gai_strerror.c
 	gen.c
-	gen_gr.c
 	gen_ho.c
 	gen_ng.c
 	gen_nw.c
 	gen_pr.c
-	gen_pw.c
 	gen_sv.c
 	getaddrinfo.c
-	getgrent.c
-	getgrent_r.c
 	gethostent.c
 	gethostent_r.c
 	getnameinfo.c
@@ -100,37 +93,24 @@ MergeObject <compatlibbind>irs.o :
 	getnetgrent_r.c
 	getprotoent.c
 	getprotoent_r.c
-	getpwent.c
-	getpwent_r.c
 	getservent.c
 	getservent_r.c
 	hesiod.c
 	irp.c
-	irp_gr.c
 	irp_ho.c
 	irp_ng.c
 	irp_nw.c
 	irp_pr.c
-	irp_pw.c
 	irp_sv.c
 	irpmarshall.c
 	irs_data.c
 	lcl.c
-	lcl_gr.c
 	lcl_ho.c
 	lcl_ng.c
 	lcl_nw.c
 	lcl_pr.c
-	lcl_pw.c
 	lcl_sv.c
 	nis.c
-	nis_gr.c
-	nis_ho.c
-	nis_ng.c
-	nis_nw.c
-	nis_pr.c
-	nis_pw.c
-	nis_sv.c
 	nul_ng.c
 	util.c
 ;
@@ -185,9 +165,7 @@ MergeObject <compatlibbind>resolv.o :
 
 SharedLibrary libbind.so :
 	# functions from our libroot
-	# ToDo: these can be removed for the Haiku build
-	pthread_mutex.c
-	pthread_mutexattr.c
+	# TODO: these can be removed for the Haiku build
 	strlcat.c
 	
 	# private functions
@@ -195,9 +173,11 @@ SharedLibrary libbind.so :
 	ethers.c
 	gettimeofday.c
 	linkaddr.c
-	pthread_emu.c
 	res_resultcodes.c
 	strsep.c
+	
+	# UGLY HACK
+	TLSInit.cpp
 ;
 
 LinkAgainst libbind.so :

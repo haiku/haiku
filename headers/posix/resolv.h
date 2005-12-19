@@ -32,20 +32,20 @@
  */
 
 /*
+ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (c) 1996-1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
- * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
- * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
- * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
- * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
- * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /*
@@ -57,15 +57,15 @@
 #define	_RESOLV_H_
 
 #include <sys/param.h>
-#if (!defined(BSD)) || (BSD < 199306)
-# include <sys/bitypes.h>
-#else
-# include <sys/types.h>
-#endif
+#include <sys/bitypes.h>
 #include <sys/cdefs.h>
 #include <sys/socket.h>
 #include <stdio.h>
 #include <arpa/nameser.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
@@ -115,13 +115,21 @@ __END_DECLS
 typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
 	res_sendhookact;
 
-typedef res_sendhookact (*res_send_qhook)__P((struct sockaddr * const *,
-					      const u_char **, int *,
-					      u_char *, int, int *));
+#ifndef __PMT
+#if defined(__STDC__) || defined(__cplusplus)
+#define __PMT(args) args
+#else
+#define __PMT(args) ()
+#endif
+#endif
 
-typedef res_sendhookact (*res_send_rhook)__P((const struct sockaddr *,
-					      const u_char *, int, u_char *,
-					      int, int *));
+typedef res_sendhookact (*res_send_qhook)__PMT((struct sockaddr * const *,
+						const u_char **, int *,
+						u_char *, int, int *));
+
+typedef res_sendhookact (*res_send_rhook)__PMT((const struct sockaddr *,
+						const u_char *, int, u_char *,
+						int, int *));
 
 struct res_sym {
 	int		number;	   /* Identifying number, like T_MX */
@@ -150,11 +158,7 @@ struct __res_state_ext;
 struct __res_state {
 	int	retrans;	 	/* retransmission time interval */
 	int	retry;			/* number of times to retransmit */
-#ifdef sun
-	u_int	options;		/* option flags - see below. */
-#else
 	u_long	options;		/* option flags - see below. */
-#endif
 	int	nscount;		/* number of name servers */
 	struct sockaddr_in
 		nsaddr_list[MAXNS];	/* address of name server */
@@ -162,11 +166,7 @@ struct __res_state {
 	u_short	id;			/* current message id */
 	char	*dnsrch[MAXDNSRCH+1];	/* components of domain to search */
 	char	defdname[256];		/* default domain (deprecated) */
-#ifdef sun
-	u_int	pfcode;			/* RES_PRF_ flags - see below. */
-#else
 	u_long	pfcode;			/* RES_PRF_ flags - see below. */
-#endif
 	unsigned ndots:4;		/* threshold for initial abs. query */
 	unsigned nsort:4;		/* number of elements in sort_list[] */
 	char	unused[3];
@@ -246,12 +246,14 @@ union res_sockaddr_union {
 #define	RES_BLAST	0x00020000	/* blast all recursive servers */
 #define RES_NOTLDQUERY	0x00100000	/* don't unqualified name as a tld */
 #define RES_USE_DNSSEC	0x00200000	/* use DNSSEC using OK bit in OPT */
+/* #define RES_DEBUG2	0x00400000 */	/* nslookup internal */
 /* KAME extensions: use higher bit to avoid conflict with ISC use */
 #define RES_USE_DNAME	0x10000000	/* use DNAME */
 #define RES_USE_EDNS0	0x40000000	/* use EDNS0 if configured */
 #define RES_NO_NIBBLE2	0x80000000	/* disable alternate nibble lookup */
 
-#define RES_DEFAULT	(RES_RECURSE | RES_DEFNAMES | RES_DNSRCH)
+#define RES_DEFAULT	(RES_RECURSE | RES_DEFNAMES | \
+			 RES_DNSRCH | RES_NO_NIBBLE2)
 
 /*
  * Resolver "pfcode" values.  Used by dig.
@@ -315,7 +317,6 @@ int		res_sendsigned __P((const u_char *, int, ns_tsig_key *,
 __END_DECLS
 #endif
 
-#if !defined(SHARED_LIBBIND) || defined(LIB)
 /*
  * If libbind is a shared object (well, DLL anyway)
  * these externs break the linker when resolv.h is 
@@ -328,7 +329,6 @@ extern const struct res_sym __p_cert_syms[];
 extern const struct res_sym __p_class_syms[];
 extern const struct res_sym __p_type_syms[];
 extern const struct res_sym __p_rcode_syms[];
-#endif /* SHARED_LIBBIND */
 
 #define b64_ntop		__b64_ntop
 #define b64_pton		__b64_pton
@@ -409,10 +409,6 @@ const char *	loc_ntoa __P((const u_char *, char *));
 int		dn_skipname __P((const u_char *, const u_char *));
 void		putlong __P((u_int32_t, u_char *));
 void		putshort __P((u_int16_t, u_char *));
-#ifndef __ultrix__
-u_int16_t	_getshort __P((const u_char *));
-u_int32_t	_getlong __P((const u_char *));
-#endif
 const char *	p_class __P((int));
 const char *	p_time __P((u_int32_t));
 const char *	p_type __P((int));
@@ -481,5 +477,9 @@ void		res_setservers __P((res_state,
 int		res_getservers __P((res_state,
 				    union res_sockaddr_union *, int));
 __END_DECLS
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_RESOLV_H_ */

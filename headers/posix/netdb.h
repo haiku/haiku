@@ -1,8 +1,4 @@
 /*
-	Modified for [Open]BeOS
-*/
-
-/*
  * ++Copyright++ 1980, 1983, 1988, 1993
  * -
  * Copyright (c) 1980, 1983, 1988, 1993
@@ -92,34 +88,20 @@
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
  *	$Id$
  */
- 
-/* Modified for OpenBeOS
-*/
 
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <stdio.h>
-
-
-/*
 #include <sys/param.h>
-#include <sys/types.h>
-#if (!defined(BSD)) || (BSD < 199306)
-# include <sys/bitypes.h>
-#endif
+#include <sys/bitypes.h>
 #include <sys/cdefs.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
-*/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 #ifndef _PATH_HEQUIV
 #define _PATH_HEQUIV	"/etc/hosts.equiv"
@@ -137,7 +119,9 @@ extern "C" {
 #define	_PATH_SERVICES	"/etc/services"
 #endif
 
-extern int * __h_errno (void);
+__BEGIN_DECLS
+extern int * __h_errno __P((void));
+__END_DECLS
 #define	h_errno (*__h_errno())
 
 /*
@@ -259,98 +243,7 @@ struct	addrinfo {
 #define SCOPE_DELIMITER	'%'
 
 
-#if defined (__hpux) || defined(__osf__) || defined(_AIX)
-#define	_MAXALIASES	35
-#define	_MAXLINELEN	1024
-#define	_MAXADDRS	35
-#define	_HOSTBUFSIZE	(BUFSIZ + 1)
-
-struct hostent_data {
-	struct in_addr	host_addr;
-	char		*h_addr_ptrs[_MAXADDRS + 1];
-	char		hostaddr[_MAXADDRS];
-	char		hostbuf[_HOSTBUFSIZE];
-	char		*host_aliases[_MAXALIASES];
-	char		*host_addrs[2];
-	FILE		*hostf;
-#ifdef __osf__
-	int		svc_gethostflag;
-	int		svc_gethostbind;
-#endif
-#ifdef __hpux
-	short		_nsw_src;
-	short		_flags;
-	char		*current;
-	int		currentlen;
-#endif
-};
-
-struct  netent_data {
-	FILE	*net_fp;
-#ifdef __osf__
-	char	line[_MAXLINELEN];
-#endif
-#ifdef __hpux
-	char	line[_MAXLINELEN+1];
-#endif
-	char	*net_aliases[_MAXALIASES];
-#ifdef __osf__
-	int	_net_stayopen;
-	int	svc_getnetflag;
-#endif
-#ifdef __hpux
-	short	_nsw_src;
-	short	_flags;
-	char	*current;
-	int	currentlen;
-#endif
-};
-
-struct	protoent_data {
-	FILE	*proto_fp;
-#ifdef __osf__
-	char	line[1024];
-#endif
-#ifdef __hpux
-	char	line[_MAXLINELEN+1];
-#endif
-	char	*proto_aliases[_MAXALIASES];
-#ifdef __osf__
-	int	_proto_stayopen;
-	int	svc_getprotoflag;
-#endif
-#ifdef __hpux
-	short	_nsw_src;
-	short	_flags;
-	char	*current;
-	int	currentlen;
-#endif
-};
-
-struct	servent_data {
-	FILE	*serv_fp;
-#ifdef __osf__
-	char	line[_MAXLINELEN];
-#endif
-#ifdef __hpux
-	char	line[_MAXLINELEN+1];
-#endif
-	char	*serv_aliases[_MAXALIASES];
-#ifdef __osf__
-	int	_serv_stayopen;
-	int	svc_getservflag;
-#endif
-#ifdef __hpux
-	short	_nsw_src;
-	short	_flags;
-	char	*current;
-	int	currentlen;
-#endif
-};
-#endif
-
-#define __P(a) a
-
+__BEGIN_DECLS
 void		endhostent __P((void));
 void		endnetent __P((void));
 void		endprotoent __P((void));
@@ -388,7 +281,6 @@ struct hostent  *getipnodebyname __P((const char *, int, int, int *));
 struct hostent	*getipnodebyaddr __P((const void *, size_t, int, int *));
 void		freehostent __P((struct hostent *));
 
-
 struct hostent	*gethostbyaddr_r __P((const char *, int, int, struct hostent *,
 					char *, int, int *));
 struct hostent	*gethostbyname_r __P((const char *, struct hostent *,
@@ -420,12 +312,7 @@ struct servent	*getservbyport_r __P((int port, const char *,
 struct servent	*getservent_r __P((struct servent *, char *, int));
 void		setservent_r __P((int));
 void		endservent_r __P((void));
-
-
-/* BeOS specific, because of lack of UNIX passwd functions */
-int getusername(char *username, unsigned userlen);
-int getpassword(char *password, unsigned passlen);
-
+__END_DECLS
 
 #ifdef __cplusplus
 }

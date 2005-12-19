@@ -58,12 +58,12 @@
 #define BIND_4_COMPAT
 
 #include <sys/param.h>
-#if (!defined(BSD)) || (BSD < 199306)
-# include <sys/bitypes.h>
-#else
-# include <sys/types.h>
-#endif
+#include <sys/bitypes.h>
 #include <sys/cdefs.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
@@ -568,6 +568,10 @@ int		ns_subdomain __P((const char *, const char *));
 int		ns_makecanon __P((const char *, char *, size_t));
 int		ns_samename __P((const char *, const char *));
 __END_DECLS
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef BIND_4_COMPAT
 #include <arpa/nameser_compat.h>

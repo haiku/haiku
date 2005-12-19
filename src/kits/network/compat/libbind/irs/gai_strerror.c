@@ -47,6 +47,10 @@ static const int gai_nerr = (sizeof(gai_errlist)/sizeof(*gai_errlist));
 
 #define EAI_BUFSIZE 128
 
+#ifdef DO_PTHREADS
+pthread_key_t gGaiStrerrorKey;
+#endif
+
 const char *
 gai_strerror(int ecode) {
 #ifndef DO_PTHREADS
@@ -55,33 +59,20 @@ gai_strerror(int ecode) {
 #ifndef LIBBIND_MUTEX_INITIALIZER
 #define LIBBIND_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
 #endif
-	static pthread_mutex_t lock;
-	static pthread_key_t key;
-	static int once = 0;
 	char *buf;
 #endif
-
+	
 	if (ecode >= 0 && ecode < (gai_nerr - 1))
 		return (gai_errlist[ecode]);
 
 #ifdef DO_PTHREADS
-        if (!once) {
-        		/* XXX: Haiku has non-constant mutex initializer! Must init here. */
-        		lock = LIBBIND_MUTEX_INITIALIZER;
-        		
-                pthread_mutex_lock(&lock);
-                if (!once++)
-                        key = tls_allocate();
-                pthread_mutex_unlock(&lock);
-        }
-
-	buf = tls_get(key);
+        buf = tls_get(gGaiStrerrorKey);
         if (buf == NULL) {
 		buf = malloc(EAI_BUFSIZE);
                 if (buf == NULL)
                         return ("unknown error");
                 on_exit_thread(free, buf);
-                tls_set(key, buf);
+                tls_set(gGaiStrerrorKey, buf);
         }
 #endif
 	/* 
