@@ -56,7 +56,7 @@ main(stage2_args *args)
 		if (mount_file_systems(args) < B_OK) {
 			// That's unfortunate, but we still give the user the possibility
 			// to insert a CD-ROM or just rescan the available devices
-			puts("Could not locate any supported boot devices!");
+			puts("Could not locate any supported boot devices!\n");
 		}
 
 		// ToDo: check if there is only one bootable volume!
