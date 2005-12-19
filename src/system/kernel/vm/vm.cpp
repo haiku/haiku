@@ -832,7 +832,8 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	switch (wiring) {
 		case B_NO_LOCK:
 		case B_LAZY_LOCK:
-			break; // do nothing
+			// do nothing - the pages are mapped in as needed
+			break;
 
 		case B_FULL_LOCK:
 		{
@@ -893,6 +894,8 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 
 		case B_CONTIGUOUS:
 		{
+			// We have already allocated our continuous pages run, so we can now just
+			// map them in the address space
 			addr_t physicalAddress = page->ppn * B_PAGE_SIZE;
 			addr_t virtualAddress;
 			off_t offset = 0;
@@ -1337,6 +1340,8 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 		return false;
 
 	aspace = area->aspace;
+
+	vm_cache_write_modified(area->cache_ref);
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_virtual_map(aspace, area, aspaceLocked);

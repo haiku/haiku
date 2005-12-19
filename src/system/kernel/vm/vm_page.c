@@ -163,52 +163,63 @@ vm_page_write_modified(vm_cache *cache)
 	// ToDo: join adjacent pages into one vec list
 
 	for (; page; page = page->cache_next) {
-		status_t status;
 		bool gotPage = false;
+		status_t status;
+		vm_area *area;
 
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&page_lock);
-
-		// ToDo: if this is a memory mapped page, the PAGE_MODIFIED bit might
-		//	not yet have been propagated to the page state!
 
 		if (page->state == PAGE_STATE_MODIFIED) {
 			remove_page_from_queue(&page_modified_queue, page);
 			page->state = PAGE_STATE_BUSY;
 			gotPage = true;
-
-			// ToDo: just setting PAGE_STAGE_BUSY is not enough, we would also
-			//	need to remove all mappings of this page - else, you could still
-			//	write to this page.
 		}
 
 		release_spinlock(&page_lock);
 		restore_interrupts(state);
 
+		// We may have a modified page - however, while we're writing it back, the page
+		// is still mapped. In order not to lose any changes to the page, we mark it clean
+		// before actually writing it back; if writing the page fails for some reason, we
+		// just keep it in the modified page list, but that should happen only rarely.
+
+		// If the page is changed after we cleared the dirty flag, but before we had
+		// the chance to write it back, then we'll write it again later - that will
+		// probably not happen that often, though.
+
+		for (area = page->cache->ref->areas; area; area = area->cache_next) {
+			if (page->offset >= area->cache_offset
+				&& page->offset < area->cache_offset + area->size) {
+				vm_translation_map *map = &area->aspace->translation_map;
+				map->ops->lock(map);
+
+				if (!gotPage) {
+					// Check if the PAGE_MODIFIED bit hasn't been propagated yet
+					addr_t physicalAddress;
+					uint32 flags;
+					map->ops->query(map, page->offset - area->cache_offset + area->base,
+						&physicalAddress, &flags);
+					if (flags & PAGE_MODIFIED)
+						gotPage = true;
+				}
+				if (gotPage) {
+					// clear the modified flag
+					map->ops->clear_flags(map, page->offset - area->cache_offset
+						+ area->base, PAGE_MODIFIED);
+				}
+				map->ops->unlock(map);
+			}
+		}
+
 		if (!gotPage)
 			continue;
-
-		// got modified page, let's write it back
 
 		mutex_unlock(&cache->ref->lock);
 		status = write_page(page);
 		mutex_lock(&cache->ref->lock);
 
 		if (status == B_OK) {
-			vm_area *area;
-
-			// It's written back now, so we can clear the modified flag in all mappings
-			for (area = page->cache->ref->areas; area; area = area->cache_next) {
-				if (page->offset >= area->cache_offset
-					&& page->offset < area->cache_offset + area->size) {
-					vm_translation_map *map = &area->aspace->translation_map;
-					map->ops->lock(map);
-					map->ops->clear_flags(map, page->offset - area->cache_offset + area->base,
-						PAGE_MODIFIED);
-					map->ops->unlock(map);
-				}
-			}
-
 			// put it into the active queue
 
 			state = disable_interrupts();
@@ -223,6 +234,9 @@ vm_page_write_modified(vm_cache *cache)
 
 			release_spinlock(&page_lock);
 			restore_interrupts(state);
+		} else {
+			// We don't have to put the PAGE_MODIFIED bit back, as it's still
+			// in the modified pages list.
 		}
 	}
 

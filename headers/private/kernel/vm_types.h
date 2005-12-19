@@ -91,11 +91,11 @@ typedef struct vm_area {
 	off_t				cache_offset;
 
 	struct vm_address_space *aspace;
-	struct vm_area	*aspace_next;
+	struct vm_area		*aspace_next;
 	struct vm_virtual_map *map;
-	struct vm_area	*cache_next;
-	struct vm_area	*cache_prev;
-	struct vm_area	*hash_next;
+	struct vm_area		*cache_next;
+	struct vm_area		*cache_prev;
+	struct vm_area		*hash_next;
 } vm_area;
 
 // virtual map (1 per address space)
