@@ -16,7 +16,6 @@
 #include <ServerFont.h>
 
 #include "defines.h"
-#include "forwarding_pixfmt.h"
 
 #include "RGBColor.h"
 
@@ -24,7 +23,6 @@ class AGGTextRenderer;
 class BBitmap;
 class BRegion;
 class DrawState;
-class DrawingModeFactory;
 class PatternHandler;
 class RenderingBuffer;
 class ServerBitmap;
@@ -301,7 +299,6 @@ class Painter {
 	join_mode					fLineJoinMode;
 	float						fMiterLimit;
 
-	DrawingModeFactory*			fDrawingModeFactory;
 	PatternHandler*				fPatternHandler;
 
 	ServerFont					fFont;

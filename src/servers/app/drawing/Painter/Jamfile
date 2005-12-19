@@ -17,7 +17,7 @@ StaticLibrary libpainter.a :
 	Transformable.cpp
 
 	# drawing_modes
-	DrawingModeFactory.cpp
+	PixelFormat.cpp
 
 	# font_support
 	# is contained within libagg.a,

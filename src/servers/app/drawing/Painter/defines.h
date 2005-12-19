@@ -24,13 +24,11 @@
 
 #include "agg_renderer_region.h"
 
-//#include "_for_reference_.h"
-#include "forwarding_pixfmt.h"
+#include "PixelFormat.h"
 
 #define ALIASED_DRAWING 0
 
-//	typedef agg::pixfmt_bgra32									pixfmt;
-	typedef forwarding_pixel_format<agg::order_bgra32>			pixfmt;
+	typedef PixelFormat											pixfmt;
 	typedef agg::renderer_region<pixfmt>						renderer_base;
 
 #if ALIASED_DRAWING

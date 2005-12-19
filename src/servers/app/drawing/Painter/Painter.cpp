@@ -30,7 +30,6 @@
 
 #include "AGGTextRenderer.h"
 #include "DrawingMode.h"
-#include "DrawingModeFactory.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
 #include "ServerBitmap.h"
@@ -84,7 +83,6 @@ Painter::Painter()
 	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
-	  fDrawingModeFactory(new DrawingModeFactory()),
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer())
 {
@@ -103,7 +101,6 @@ Painter::~Painter()
 	_MakeEmpty();
 
 	delete fClippingRegion;
-	delete fDrawingModeFactory;
 	delete fPatternHandler;
 	delete fTextRenderer;
 }
@@ -127,10 +124,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 						buffer->BytesPerRow());
 
 		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
-		fPixelFormat->set_drawing_mode(fDrawingModeFactory->DrawingModeFor(fDrawingMode,
-																		   fAlphaSrcMode,
-																		   fAlphaFncMode,
-																		   false));
+		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
 		// attach our clipping region to the renderer, it keeps a pointer
@@ -1176,29 +1170,14 @@ Painter::_UpdateDrawingMode()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
 	if (fPixelFormat) {
-		DrawingMode* mode = NULL;
-		pattern p = *fPatternHandler->GetR5Pattern();
-		if (p == B_SOLID_HIGH) {
+		if (fPatternHandler->IsSolidHigh()) {
 // TODO: fix me! is already set in SetHighColor()
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
-													   fAlphaSrcMode,
-													   fAlphaFncMode,
-													   true);
-		} else if (p == B_SOLID_LOW) {
+		} else if (fPatternHandler->IsSolidLow()) {
 // TODO: fix me! is already set in SetLowColor()
 			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
-			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
-													   fAlphaSrcMode,
-													   fAlphaFncMode,
-													   true);
-		} else {
-			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
-													   fAlphaSrcMode,
-													   fAlphaFncMode,
-													   false);
 		}
-		fPixelFormat->set_drawing_mode(mode);
+		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 	}
 		
 }
@@ -1381,11 +1360,7 @@ Painter::_DrawBitmap32(const agg::rendering_buffer& srcBuffer,
 {
 typedef agg::span_allocator<agg::rgba8> span_alloc_type;
 
-// pipeline for non-scaled bitmaps
-//typedef agg::span_generator<agg::rgba8, span_alloc_type> span_gen_type;
-//typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_type;
-
-// pipeline for scaled bitmaps
+// AGG pipeline
 typedef agg::span_interpolator_linear<> interpolator_type;
 typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
 										 interpolator_type> scaled_span_gen_type;
@@ -1398,13 +1373,17 @@ typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_im
 		// compensate for the lefttop offset the actualBitmapRect might have
 // NOTE: I have no clue why enabling the next call gives a wrong result!
 // According to the BeBook, bitmapRect is supposed to be in native
-// bitmap space!
+// bitmap space! Disabling this call makes it look like the bitmap bounds are
+// assumed to have a left/top coord of 0,0 at all times. This is simply not true.
 //		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
 		actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
 
 		// calculate the scaling
 		double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
 		double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
+
+		if (xScale == 0.0 || yScale == 0.0)
+			return;
 
 		// constrain rect to passed bitmap bounds
 		// and transfer the changes to the viewRect
@@ -1446,33 +1425,28 @@ typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_im
 		agg::rasterizer_scanline_aa<> pf;
 		agg::scanline_u8 sl;
 
+		// clip to the current clipping region's frame
+		viewRect = viewRect & fClippingRegion->Frame();
+		// convert to pixel coords (versus pixel indices)
+		viewRect.right++;
+		viewRect.bottom++;
+
 		// path encloses image
 		agg::path_storage path;
 		path.move_to(viewRect.left, viewRect.top);
-		path.line_to(viewRect.right + 1, viewRect.top);
-		path.line_to(viewRect.right + 1, viewRect.bottom + 1);
-		path.line_to(viewRect.left, viewRect.bottom + 1);
+		path.line_to(viewRect.right, viewRect.top);
+		path.line_to(viewRect.right, viewRect.bottom);
+		path.line_to(viewRect.left, viewRect.bottom);
 		path.close_polygon();
 
 		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
 
 		pf.add_path(tr);
 
-//		if (xScale != 1.0 || yScale != 1.0) {
-//printf("scaled\n");
-			scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
-			scaled_image_renderer_type ri(*fBaseRenderer, sg);
+		scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
+		scaled_image_renderer_type ri(*fBaseRenderer, sg);
 
-			agg::render_scanlines(pf, sl, ri);
-/*		} else {
-// TODO: Does not even compile, find out how to construct a pipeline without
-// scaling
-printf("non scaled scaled\n");
-			span_gen_type sg(sa);
-			image_renderer_type ri(*fBaseRenderer, sg);
-
-			agg::render_scanlines(pf, sl, ri);
-		}*/
+		agg::render_scanlines(pf, sl, ri);
 	}
 }
 
