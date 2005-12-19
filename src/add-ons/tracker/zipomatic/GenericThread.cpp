@@ -1,7 +1,7 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
-#include <GenericThread.h>
+#include "GenericThread.h"
 
 GenericThread::GenericThread(const char * a_thread_name, int32 a_priority, BMessage * a_message)	
 	:

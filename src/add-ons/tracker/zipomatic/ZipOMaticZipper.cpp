@@ -9,9 +9,9 @@
 
 #include <Path.h>
 
-#include <ZipOMaticZipper.h>
-#include <ZipOMaticWindow.h>
-#include <ZipOMaticMisc.h>
+#include "ZipOMaticZipper.h"
+#include "ZipOMaticWindow.h"
+#include "ZipOMaticMisc.h"
 
 #include <signal.h>
 #include <unistd.h>

@@ -13,8 +13,8 @@
 #include <Path.h>
 #include <File.h>
 
-#include <ZipOMaticMisc.h>
-#include <ZipOMaticSettings.h>
+#include "ZipOMaticMisc.h"
+#include "ZipOMaticSettings.h"
 
 ZippoSettings::ZippoSettings()
 :	BMessage		 	(),

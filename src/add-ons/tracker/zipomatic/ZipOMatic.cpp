@@ -5,9 +5,9 @@
 #include <Roster.h>
 #include <Debug.h>
 
-#include <ZipOMatic.h>
-#include <ZipOMaticMisc.h>
-#include <ZipOMaticWindow.h>
+#include "ZipOMatic.h"
+#include "ZipOMaticMisc.h"
+#include "ZipOMaticWindow.h"
 
 extern "C" void 
 process_refs(entry_ref dir_ref, BMessage * msg, void *)

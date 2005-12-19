@@ -15,12 +15,12 @@
 #include <Path.h>
 #include <File.h>
 
-#include <ZipOMatic.h>
-#include <ZipOMaticActivity.h>
-#include <ZipOMaticMisc.h>
-#include <ZipOMaticView.h>
-#include <ZipOMaticWindow.h>
-#include <ZipOMaticZipper.h>
+#include "ZipOMatic.h"
+#include "ZipOMaticActivity.h"
+#include "ZipOMaticMisc.h"
+#include "ZipOMaticView.h"
+#include "ZipOMaticWindow.h"
+#include "ZipOMaticZipper.h"
 
 ZippoWindow::ZippoWindow(BMessage * a_message)
 : BWindow(BRect(200,200,430,310), "Zip-O-Matic", B_TITLED_WINDOW, B_NOT_V_RESIZABLE), // | B_NOT_ZOOMABLE),

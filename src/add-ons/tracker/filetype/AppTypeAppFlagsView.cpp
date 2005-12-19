@@ -1,4 +1,4 @@
-#include <AppTypeAppFlagsView.h>
+#include "AppTypeAppFlagsView.h"
 
 AppTypeAppFlagsView::AppTypeAppFlagsView(BRect viewFrame)
 	: BView(viewFrame, "AppTypeAppFlagsView", B_FOLLOW_ALL,

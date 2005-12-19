@@ -1,8 +1,8 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
-#include <ZipOMaticActivity.h>
-#include <ZipOMaticView.h>
+#include "ZipOMaticActivity.h"
+#include "ZipOMaticView.h"
 
 ZippoView::ZippoView (BRect a_rect)
 :	BBox (a_rect, "zipomatic_view", B_FOLLOW_ALL, 

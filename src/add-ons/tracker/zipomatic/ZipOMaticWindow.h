@@ -7,7 +7,7 @@
 #include <Menu.h>
 #include <MenuItem.h>
 
-#include <ZipOMaticSettings.h>
+#include "ZipOMaticSettings.h"
 class ZippoView;
 class ZipperThread;
 

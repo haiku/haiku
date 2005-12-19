@@ -1,4 +1,4 @@
-#include <AppTypeSupportedTypesView.h>
+#include "AppTypeSupportedTypesView.h"
 #include <SupportDefs.h>
 
 AppTypeSupportedTypesView::AppTypeSupportedTypesView(BRect viewFrame)

@@ -8,7 +8,7 @@
 #include <OS.h> 
 #include <FindDirectory.h> 
 
-#include <GenericThread.h>
+#include "GenericThread.h"
 #include <stdlib.h>
 
 extern const char * ZipperThreadName;

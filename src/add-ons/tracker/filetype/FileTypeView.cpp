@@ -2,7 +2,7 @@
 #include <Message.h>
 #include <Mime.h>
 #include <Window.h>
-#include <FileTypeView.h>
+#include "FileTypeView.h"
 
 FileTypeView::FileTypeView(BRect viewFrame)
 	: BBox(viewFrame, "FileTypeView", B_FOLLOW_ALL,

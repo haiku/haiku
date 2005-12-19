@@ -7,9 +7,9 @@
 #include <String.h>
 #include <unistd.h>
 
-#include <FileTypeApp.h>
-#include <AppTypeView.h>
-#include <AppTypeWindow.h>
+#include "FileTypeApp.h"
+#include "AppTypeView.h"
+#include "AppTypeWindow.h"
 
 AppTypeWindow::AppTypeWindow(const BEntry * entry)
 	: BWindow(BRect(100,100,400,520),"Application Type",B_TITLED_WINDOW,

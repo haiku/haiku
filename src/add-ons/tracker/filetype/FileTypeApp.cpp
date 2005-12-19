@@ -4,10 +4,10 @@
 #include <Roster.h>
 #include <stdio.h>
 
-#include <AppTypeWindow.h>
-#include <FileTypeApp.h>
-#include <FileTypeConstants.h>
-#include <FileTypeWindow.h>
+#include "AppTypeWindow.h"
+#include "FileTypeApp.h"
+#include "FileTypeConstants.h"
+#include "FileTypeWindow.h"
 
 FileTypeApp * file_type_app = 0;
 

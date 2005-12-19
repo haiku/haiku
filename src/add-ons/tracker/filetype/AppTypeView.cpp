@@ -1,7 +1,7 @@
-#include <AppTypeView.h>
-#include <AppTypeAppFlagsView.h>
-#include <AppTypeSupportedTypesView.h>
-#include <AppTypeVersionInfoView.h>
+#include "AppTypeView.h"
+#include "AppTypeAppFlagsView.h"
+#include "AppTypeSupportedTypesView.h"
+#include "AppTypeVersionInfoView.h"
 
 AppTypeView::AppTypeView(BRect viewFrame)
 	: BBox(viewFrame, "AppTypeView", B_FOLLOW_ALL,

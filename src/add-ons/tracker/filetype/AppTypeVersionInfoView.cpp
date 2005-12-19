@@ -1,4 +1,4 @@
-#include <AppTypeVersionInfoView.h>
+#include "AppTypeVersionInfoView.h"
 #include <SupportDefs.h>
 
 #include <stdio.h>

@@ -5,9 +5,9 @@
 #include <Node.h>
 #include <NodeInfo.h>
 
-#include <FileTypeApp.h>
-#include <FileTypeView.h>
-#include <FileTypeWindow.h>
+#include "FileTypeApp.h"
+#include "FileTypeView.h"
+#include "FileTypeWindow.h"
 
 FileTypeWindow::FileTypeWindow(const BList * entryList)
 	: BWindow(BRect(100,100,380,300),"File Type",B_TITLED_WINDOW,

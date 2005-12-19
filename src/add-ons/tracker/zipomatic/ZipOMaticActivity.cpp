@@ -1,7 +1,7 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
-#include <ZipOMaticActivity.h>
+#include "ZipOMaticActivity.h"
 
 Activity::Activity (BRect a_rect, const char * a_name, uint32 a_resizing_mode, uint32 a_flags)
 :	BBox 				(a_rect, a_name, a_resizing_mode, a_flags),
