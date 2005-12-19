@@ -23,7 +23,7 @@
 #include <ISA.h>
 #include <PCI.h>
 #include <Drivers.h>
-#include <byteorder.h>
+#include <ByteOrder.h>
 #include <SupportDefs.h>
 #include <config_manager.h>
 
