@@ -79,6 +79,7 @@ class FontManager : public BLooper {
 		void _AddSystemPaths();
 		font_directory* _FindDirectory(node_ref& nodeRef);
 		void _RemoveDirectory(font_directory* directory);
+		status_t _CreateDirectories(const char* path);
 		status_t _AddPath(const char* path);
 		status_t _AddPath(BEntry& entry, font_directory** _newDirectory = NULL);
 

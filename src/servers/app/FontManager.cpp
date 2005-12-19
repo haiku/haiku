@@ -29,11 +29,11 @@
 
 using std::nothrow;
 
-//#define TRACE_WATCHING
-#ifdef TRACE_WATCHING
-#	define WTRACE(x) printf x
+//#define TRACE_FONT_MANAGER
+#ifdef TRACE_FONT_MANAGER
+#	define FTRACE(x) printf x
 #else
-#	define WTRACE(x) ;
+#	define FTRACE(x) ;
 #endif
 
 
@@ -220,9 +220,9 @@ FontManager::MessageReceived(BMessage* message)
 									fromDirectory->styles.RemoveItem(style, false);
 									directory->styles.AddItem(style);
 								}
-								WTRACE(("font moved"));
+								FTRACE(("font moved"));
 							} else {
-								WTRACE(("font added: %s\n", name));
+								FTRACE(("font added: %s\n", name));
 								_AddFont(*directory, entry);
 							}
 						}
@@ -276,7 +276,7 @@ void
 FontManager::_AddDefaultMapping(const char* family, const char* style,
 	const char* path)
 {
-	font_mapping* mapping = new (nothrow) font_mapping;
+	font_mapping* mapping = new (std::nothrow) font_mapping;
 	if (mapping == NULL)
 		return;
 
@@ -311,6 +311,9 @@ FontManager::_LoadRecentFontMappings()
 status_t
 FontManager::_AddMappedFont(const char* familyName, const char* styleName)
 {
+	FTRACE(("_AddMappedFont(family = \"%s\", style = \"%s\")\n",
+		familyName, styleName));
+
 	for (int32 i = 0; i < fMappings.CountItems(); i++) {
 		font_mapping* mapping = fMappings.ItemAt(i);
 
@@ -329,8 +332,13 @@ FontManager::_AddMappedFont(const char* familyName, const char* styleName)
 			nodeRef.node = mapping->ref.directory;
 			font_directory* directory = _FindDirectory(nodeRef);
 			if (directory == NULL) {
-				// unknown directory, maybe this is a user font
-				continue;
+				// unknown directory, maybe this is a user font - try
+				// to create the missing directory
+				BPath path(&entry);
+				if (path.GetParent(&path) != B_OK
+					|| _CreateDirectories(path.Path()) != B_OK
+					|| (directory = _FindDirectory(nodeRef)) == NULL)
+					continue;
 			}
 
 			return _AddFont(*directory, entry);
@@ -350,7 +358,7 @@ FontManager::_AddMappedFont(const char* familyName, const char* styleName)
 void
 FontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 {
-	WTRACE(("font removed: %s\n", style->Name()));
+	FTRACE(("font removed: %s\n", style->Name()));
 
 	directory.styles.RemoveItem(style);
 	directory.revision++;
@@ -416,21 +424,21 @@ FontManager::_SetDefaultFonts()
 	if (style == NULL)
 		return B_ERROR;
 
-	fDefaultPlainFont = new (nothrow) ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
+	fDefaultPlainFont = new (std::nothrow) ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
 	if (fDefaultPlainFont == NULL)
 		return B_NO_MEMORY;
 
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
 		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
 
-	fDefaultBoldFont = new (nothrow) ServerFont(*style, DEFAULT_BOLD_FONT_SIZE);
+	fDefaultBoldFont = new (std::nothrow) ServerFont(*style, DEFAULT_BOLD_FONT_SIZE);
 	if (fDefaultBoldFont == NULL)
 		return B_NO_MEMORY;
 
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
 		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
-	fDefaultFixedFont = new (nothrow) ServerFont(*style, DEFAULT_FIXED_FONT_SIZE);
+	fDefaultFixedFont = new (std::nothrow) ServerFont(*style, DEFAULT_FIXED_FONT_SIZE);
 	if (fDefaultFixedFont == NULL)
 		return B_NO_MEMORY;
 
@@ -443,19 +451,13 @@ void
 FontManager::_AddSystemPaths()
 {
 	BPath path;
-	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path, true) == B_OK) {
+	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path, true) == B_OK)
 		_AddPath(path.Path());
-		if (path.Append("ttfonts") == B_OK)
-			_AddPath(path.Path());
-	}
 
 	// We don't scan these in test mode to help shave off some startup time
 #if !TEST_MODE
-	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK) {
+	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK)
 		_AddPath(path.Path());
-		if (path.Append("ttfonts") == B_OK)
-			_AddPath(path.Path());
-	}
 #endif
 }
 
@@ -518,7 +520,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	}
 
 	if (family == NULL) {
-		family = new (nothrow) FontFamily(face->family_name, fNextID++);
+		family = new (std::nothrow) FontFamily(face->family_name, fNextID++);
 		if (family == NULL
 			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
 			delete family;
@@ -527,7 +529,7 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 		}
 	}
 
-	WTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
+	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
 
 	// the FontStyle takes over ownership of the FT_Face object
     FontStyle *style = new FontStyle(nodeRef, path.Path(), face);
@@ -561,7 +563,7 @@ FontManager::_FindDirectory(node_ref& nodeRef)
 void
 FontManager::_RemoveDirectory(font_directory* directory)
 {
-	WTRACE(("FontManager: Remove directory (%Ld)!\n", directory->directory.node));
+	FTRACE(("FontManager: Remove directory (%Ld)!\n", directory->directory.node));
 
 	fDirectories.RemoveItem(directory, false);
 
@@ -602,7 +604,7 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 
 	// it's a new one, so let's add it
 
-	directory = new (nothrow) font_directory;
+	directory = new (std::nothrow) font_directory;
 	if (directory == NULL)
 		return B_NO_MEMORY;
 
@@ -626,7 +628,7 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 			// TODO: should go into syslog()
 	} else {
 		BPath path(&entry);
-		WTRACE(("FontManager: now watching: %s\n", path.Path()));
+		FTRACE(("FontManager: now watching: %s\n", path.Path()));
 	}
 
 	fDirectories.AddItem(directory);
@@ -636,6 +638,59 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 
 	fScanned = false;
 	return B_OK;
+}
+
+
+/*!
+	\brief Creates all unknown font_directories of the specified path - but
+		only if one of its parent directories is already known.
+
+	This method is used to create the font_directories for font_mappings.
+	It recursively walks upwards in the directory hierarchy until it finds
+	a known font_directory (or hits the root directory, in which case it
+	bails out).
+*/
+status_t
+FontManager::_CreateDirectories(const char* path)
+{
+	FTRACE(("_CreateDirectories(path = %s)\n", path));
+
+	if (!strcmp(path, "/")) {
+		// we walked our way up to the root
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	BEntry entry;
+	status_t status = entry.SetTo(path);
+	if (status != B_OK)
+		return status;
+
+	node_ref nodeRef;
+	status = entry.GetNodeRef(&nodeRef);
+	if (status != B_OK)
+		return status;
+
+	// check if we are already know this directory
+
+	font_directory* directory = _FindDirectory(nodeRef);
+	if (directory != NULL)
+		return B_OK;
+
+	// We don't know this one yet - keep walking the path upwards
+	// and try to find a match.
+
+	BPath parent(path);
+	status = parent.GetParent(&parent);
+	if (status != B_OK)
+		return status;
+
+	status = _CreateDirectories(parent.Path());
+	if (status != B_OK)
+		return status;
+
+	// We have our match, create sub directory
+
+	return _AddPath(path);
 }
 
 
