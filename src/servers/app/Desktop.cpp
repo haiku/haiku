@@ -1230,16 +1230,12 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 	// moved into the dirty region (for now)
 	newDirtyRegion.Include(&window->VisibleRegion());
 
-	if (GetDrawingEngine()->Lock()) {
-		GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
+	GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
 
-		// in the dirty region, exclude the parts that we
-		// could move by blitting
-		copyRegion.OffsetBy(x, y);
-		newDirtyRegion.Exclude(&copyRegion);
-
-		GetDrawingEngine()->Unlock();
-	}
+	// in the dirty region, exclude the parts that we
+	// could move by blitting
+	copyRegion.OffsetBy(x, y);
+	newDirtyRegion.Exclude(&copyRegion);
 
 	MarkDirty(newDirtyRegion);
 	_SetBackground(background);
