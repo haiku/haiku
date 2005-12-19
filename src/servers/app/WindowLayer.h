@@ -196,7 +196,7 @@ class WindowLayer {
 												   int32 xOffset, int32 yOffset);
 
 			// different types of drawing
-			void				_TriggerContentRedraw();
+			void				_TriggerContentRedraw(BRegion& dirty);
 			void				_DrawBorder();
 
 			// handling update sessions

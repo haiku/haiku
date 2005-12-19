@@ -401,6 +401,9 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	if (fTopLayer != NULL)
 		fTopLayer->ResizeBy(x, y, dirtyRegion);
 
+//if (dirtyRegion)
+//fDrawingEngine->FillRegion(*dirtyRegion, RGBColor(0, 255, 255, 255));
+
 	// send a message to the client informing about the changed size
 	BRect frame(Frame());
 	BMessage msg(B_WINDOW_RESIZED);
@@ -429,7 +432,10 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 		BRegion dirty;
 		view->ScrollBy(dx, dy, &dirty);
 
-		MarkContentDirty(dirty);
+//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 255, 255));
+//snooze(2000);
+
+		_TriggerContentRedraw(dirty);
 
 		fDesktop->UnlockSingleWindow();
 	}
@@ -578,6 +584,7 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
 		} else {
 			// not in update, the view can draw everywhere
+//printf("WindowLayer(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), layer->Name());
 		}
 
 		fEffectiveDrawingRegionValid = true;
@@ -640,7 +647,11 @@ WindowLayer::RedrawDirtyRegion()
 
 	if (IsVisible()) {
 		_DrawBorder();
-		_TriggerContentRedraw();
+
+		BRegion dirtyContentRegion(VisibleContentRegion());
+		dirtyContentRegion.IntersectWith(&fDirtyRegion);
+
+		_TriggerContentRedraw(dirtyContentRegion);
 	}
 
 	// reset the dirty region, since
@@ -677,7 +688,7 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 	// an update message is triggered
 	if (!fHidden && fDesktop && fDesktop->LockSingleWindow()) {
 		regionOnScreen.IntersectWith(&VisibleContentRegion());
-		ProcessDirtyRegion(regionOnScreen);
+		_TriggerContentRedraw(regionOnScreen);
 
 		fDesktop->UnlockSingleWindow();
 	}
@@ -696,11 +707,15 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 			_UpdateContentRegion();
 
 		layer->ConvertToScreen(&layerRegion);
-		layerRegion.IntersectWith(&layer->ScreenClipping(&fContentRegion));
-		// TODO: would be nice if this didn't fire off a REDRAW message,
-		// but currently, it is cleaner to do it, so that backgrounds are
-		// properly cleared in _TriggerContentRedraw()
-		MarkContentDirty(layerRegion);
+		layerRegion.IntersectWith(&fVisibleRegion);
+		if (layerRegion.CountRects() > 0) {
+			layerRegion.IntersectWith(&layer->ScreenClipping(&fContentRegion));
+
+//fDrawingEngine->FillRegion(layerRegion, RGBColor(255, 255, 0, 255));
+//snooze(2000);
+
+			_TriggerContentRedraw(layerRegion);
+		}
 
 		fDesktop->UnlockSingleWindow();
 	}
@@ -1528,11 +1543,8 @@ WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 
 
 void
-WindowLayer::_TriggerContentRedraw()
+WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 {
-	BRegion dirtyContentRegion(VisibleContentRegion());
-	dirtyContentRegion.IntersectWith(&fDirtyRegion);
-
 	if (dirtyContentRegion.CountRects() > 0) {
 		// send UPDATE message to the client
 		_TransferToUpdateSession(&dirtyContentRegion);
@@ -1634,6 +1646,7 @@ WindowLayer::_SendUpdateMessage()
 	updateRect.OffsetBy(-fFrame.left, -fFrame.top);
 	message.AddRect("_rect", updateRect);
 	ServerWindow()->SendMessageToClient(&message);
+
 	fUpdateRequested = true;
 
 	// TODO: the toggling between the update sessions is too
