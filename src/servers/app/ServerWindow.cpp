@@ -880,12 +880,22 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_BEGIN_UPDATE:
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
+// NOTE: when line below is turned on, the behaviour starts to
+// be very much like on R5, but if the client crashes in
+// one of it's BView's Draw() functions, AS_END_UPDATE is
+// never received and the app_server is toast! Maybe R5
+// does something like this, but if the write lock cannot
+// be optained within a certain amount of time, it crashes
+// whoever holds the read lock on purpose.
+
+//fDesktop->LockSingleWindow();
 			fWindowLayer->BeginUpdate();
 			break;
 
 		case AS_END_UPDATE:
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
 			fWindowLayer->EndUpdate();
+//fDesktop->UnlockSingleWindow();
 			break;
 
 		case AS_LAYER_DELETE_ROOT:
@@ -1771,6 +1781,15 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		fCurrentDrawingRegionValid = true;
 	}
 
+	if (fCurrentDrawingRegion.CountRects() <= 0) {
+		if (link.NeedsReply()) {
+			// the client is now blocking and waiting for a reply!
+			fLink.StartMessage(B_ERROR);
+			fLink.Flush();
+		}
+		return;
+	}
+
 	// prevent other ServerWindows from messing with the drawing engine
 	// as long as each uses the same instance... TODO: remove the locking
 	// when each has its own
@@ -2330,7 +2349,31 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		fDirectWindowData->buffer_info->bits = buffer->Bits();
 		fDirectWindowData->buffer_info->pci_bits = NULL; // TODO	
 		fDirectWindowData->buffer_info->bytes_per_row = buffer->BytesPerRow();
-		fDirectWindowData->buffer_info->bits_per_pixel = buffer->BytesPerRow() / buffer->Width() * 8;
+		switch (buffer->ColorSpace()) {
+			case B_RGB32:
+			case B_RGBA32:
+			case B_RGB32_BIG:
+			case B_RGBA32_BIG:
+				fDirectWindowData->buffer_info->bits_per_pixel = 32;
+				break;
+			case B_RGB24:
+			case B_RGB24_BIG:
+				fDirectWindowData->buffer_info->bits_per_pixel = 24;
+				break;
+			case B_RGB16:
+			case B_RGB16_BIG:
+			case B_RGB15:
+			case B_RGB15_BIG:
+				fDirectWindowData->buffer_info->bits_per_pixel = 16;
+				break;
+			case B_CMAP8:
+				fDirectWindowData->buffer_info->bits_per_pixel = 8;
+				break;
+			default:
+				fprintf(stderr, "unkown colorspace in HandleDirectConnection()!\n");
+				fDirectWindowData->buffer_info->bits_per_pixel = 0;
+				break;
+		}
 		fDirectWindowData->buffer_info->pixel_format = buffer->ColorSpace();
 		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
 		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
@@ -2344,7 +2387,6 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 
 		// We just want the region inside the window, border excluded.
 		BRegion clipRegion = fWindowLayer->VisibleContentRegion();
-		clipRegion.PrintToStream();
 
 		fDirectWindowData->buffer_info->clip_list_count = min_c(clipRegion.CountRects(),
 			kMaxClipRectsCount);
@@ -2383,6 +2425,28 @@ ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 	if (fCurrentLayer != layer) {
 		fCurrentLayer = layer;
 		fCurrentDrawingRegionValid = false;
+#if 0
+#if DELAYED_BACKGROUND_CLEARING
+fWindowLayer->ReadLockWindows();
+		if (fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
+			DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
+			if (drawingEngine->Lock()) {
+		
+				fWindowLayer->GetEffectiveDrawingRegion(fCurrentLayer, fCurrentDrawingRegion);
+				fCurrentDrawingRegionValid = true;
+				BRegion dirty(fCurrentDrawingRegion);
+
+				BRegion content;
+				fWindowLayer->GetContentRegion(&content);
+
+				fCurrentLayer->Draw(drawingEngine, &dirty, &content, false);
+	
+				drawingEngine->Unlock();
+			}
+		}
+fWindowLayer->ReadUnlockWindows();
+#endif
+#endif // 0
 	}
 }
 
