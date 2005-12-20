@@ -1792,6 +1792,7 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 /* scaled and filtered screen to screen blit - i.e. video playback without overlay */
 /* note: source and destination may not overlap. */
 //fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
+//fixme: test 15-bit depth for correct space (conversion)...
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count)
 {
 	uint32 i = 0;
@@ -1891,10 +1892,14 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 				(((list[i].src_height + 1) << 20) / (list[i].dest_height + 1)); /* VerInvScale (in 12.20 format) */
 
 			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE, 4);
-			/* setup source size including needed slopspace */
-			//fixme: checkout constraints and update code...
+			/* setup horizontal and vertical source (fetching) ends.
+			 * note:
+			 * horizontal granularity is 2 pixels, vertical granularity is 1 pixel.
+			 * look at Matrox or Neomagic bes engines code for usage example. */
+			//fixme: tested 16-bit depth, verify other depths...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				(((list[i].src_height + 1) << 16) | (list[i].src_width + 1)); /* SourceHeightWidth */
+				(((list[i].src_height + 1 + 1) << 16) |
+				 (((list[i].src_width + 1) + 0x0001) & ~0x0001)); /* SourceHeightWidth */
 			/* setup source pitch (b0-15). Set 'format origin center' (b16-17) and
 			 * select 'format interpolator foh (bilinear filtering)' (b24). */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
@@ -1903,9 +1908,10 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((uint32)((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer)) +
 				(list[i].src_top * si->fbc.bytes_per_row) +	(list[i].src_left * bpp); /* Offset */
-			/* Setup source start: first (sub)pixel contributing to output picture */
-			/* Note:
-			 * clipping is not asked for. Look at bes engine code for useage example. */
+			/* setup source start: first (sub)pixel contributing to output picture */
+			/* note:
+			 * clipping is not asked for.
+			 * look at nVidia NV10+ bes engine code for useage example. */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				0; /* SourceRef (b0-15 = hor, b16-31 = ver: both in 12.4 format) */
 
