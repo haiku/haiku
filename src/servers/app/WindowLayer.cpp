@@ -49,17 +49,6 @@
 #	define STRACE_CLICK(x) ;
 #endif
 
-// if the background clearing is delayed until
-// the client draws the view, we have less flickering
-// when contents have to be redrawn because of resizing
-// a window or because the client invalidates parts.
-// when redrawing something that has been exposed from underneath
-// other windows, the other window will be seen longer at
-// its previous position though if the exposed parts are not
-// cleared right away. maybe there ought to be a flag in
-// the update session, which tells us the cause of the update
-#define DELAYED_BACKGROUND_CLEARING 0
-
 // IMPORTANT: nested LockSingleWindow()s are not supported (by MultiLocker)
 
 using std::nothrow;
@@ -435,6 +424,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 //fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 255, 255));
 //snooze(2000);
 
+		dirty.IntersectWith(&VisibleContentRegion());
 		_TriggerContentRedraw(dirty);
 
 		fDesktop->UnlockSingleWindow();
@@ -707,12 +697,12 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 			_UpdateContentRegion();
 
 		layer->ConvertToScreen(&layerRegion);
-		layerRegion.IntersectWith(&fVisibleRegion);
+		layerRegion.IntersectWith(&VisibleContentRegion());
 		if (layerRegion.CountRects() > 0) {
 			layerRegion.IntersectWith(&layer->ScreenClipping(&fContentRegion));
 
-//fDrawingEngine->FillRegion(layerRegion, RGBColor(255, 255, 0, 255));
-//snooze(2000);
+//fDrawingEngine->FillRegion(layerRegion, RGBColor(0, 255, 0, 255));
+//snooze(10000);
 
 			_TriggerContentRedraw(layerRegion);
 		}
@@ -935,24 +925,35 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 		fDrawingEngine->Unlock();
 	}
 
-	if (fIsDragging && !(Flags() & B_NOT_MOVABLE)) {
-		BPoint delta = where - fLastMousePosition;
-		fDesktop->MoveWindowBy(this, delta.x, delta.y);
+	BPoint delta = where - fLastMousePosition;
+	// moving
+	if (fIsDragging) {
+		if (!(Flags() & B_NOT_MOVABLE))
+			fDesktop->MoveWindowBy(this, delta.x, delta.y);
+		else
+			delta = BPoint(0, 0);
 	}
-	if (fIsResizing && !(Flags() & B_NOT_RESIZABLE)) {
-		BPoint delta = where - fLastMousePosition;
-		if (Flags() & B_NOT_V_RESIZABLE)
-			delta.y = 0;
-		if (Flags() & B_NOT_H_RESIZABLE)
-			delta.x = 0;
-
-		fDesktop->ResizeWindowBy(this, delta.x, delta.y);
+	// resizing
+	if (fIsResizing) {
+		if (!(Flags() & B_NOT_RESIZABLE)) {
+			if (Flags() & B_NOT_V_RESIZABLE)
+				delta.y = 0;
+			if (Flags() & B_NOT_H_RESIZABLE)
+				delta.x = 0;
+	
+			fDesktop->ResizeWindowBy(this, delta.x, delta.y);
+		} else
+			delta = BPoint(0, 0);
 	}
+	// sliding tab
 	if (fIsSlidingTab) {
 		// TODO: implement
 	}
 
-	fLastMousePosition = where;
+	// NOTE: fLastMousePosition is currently only
+	// used for window moving/resizing/sliding the tab
+	// ther
+	fLastMousePosition += delta;
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
@@ -1546,23 +1547,24 @@ void
 WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 {
 	if (dirtyContentRegion.CountRects() > 0) {
-		// send UPDATE message to the client
+		// put this into the pending dirty region
+		// to eventually trigger a client redraw
 		_TransferToUpdateSession(&dirtyContentRegion);
 
+#if DELAYED_BACKGROUND_CLEARING
+		if (!fTopLayer->IsBackgroundDirty())
+			fTopLayer->MarkBackgroundDirty();
+#else
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
 		if (fDrawingEngine->Lock()) {
 			fDrawingEngine->ConstrainClippingRegion(&dirtyContentRegion);
-#if DELAYED_BACKGROUND_CLEARING
-			fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
-							&fContentRegion, false);
-#else
 			fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
 							&fContentRegion, true);
-#endif
 			fDrawingEngine->Unlock();
 		}
+#endif
 	}
 }
 
@@ -1606,6 +1608,9 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
+//fDrawingEngine->FillRegion(*contentDirtyRegion, RGBColor(255, 255, 0, 255));
+//snooze(10000);
+
 	// add to pending
 	fPendingUpdateSession.SetUsed(true);
 	fPendingUpdateSession.Include(contentDirtyRegion);
@@ -1616,24 +1621,19 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// this could be done smarter (clip layers from pending
 	// that have not yet been redrawn in the current update
 	// session)
+#if !DELAYED_BACKGROUND_CLEARING
 	if (fCurrentUpdateSession.IsUsed()) {
 		fCurrentUpdateSession.Exclude(contentDirtyRegion);
 		fEffectiveDrawingRegionValid = false;
 	}
+#endif
 
 	if (!fUpdateRequested) {
 		// send this to client
 		_SendUpdateMessage();
-		// as long as we have not received
-		// the "begin update" command, the
-		// pending session does not become the
-		// current
-// TODO: problem: since we sent the update regions frame,
-// we should not add to the pending session after we
-// sent the update message!!!
-	} else {
-		if (!fCurrentUpdateSession.IsUsed())
-			fprintf(stderr, "WindowLayer(%s)::_TransferToUpdateSession() - pending region changed before BeginUpdate()!\n", Title());
+		// the pending region is now the current,
+		// though the update does not start until
+		// we received BEGIN_UPDATE from the client
 	}
 }
 
@@ -1675,6 +1675,28 @@ WindowLayer::BeginUpdate()
 		// session enforced
 		fInUpdate = true;
 		fEffectiveDrawingRegionValid = false;
+
+#if DELAYED_BACKGROUND_CLEARING
+		// TODO: each view could be drawn individually
+		// right before carrying out the first drawing
+		// command from the client during an update
+		// (ViewLayer::IsBackgroundDirty() can be used
+		// for this)
+		if (fDrawingEngine->Lock()) {
+			if (!fContentRegionValid)
+				_UpdateContentRegion();
+	
+			BRegion dirty(fCurrentUpdateSession.DirtyRegion());
+			dirty.IntersectWith(&VisibleContentRegion());
+
+			fTopLayer->Draw(fDrawingEngine, &dirty,
+							&fContentRegion, true);
+
+			fDrawingEngine->Unlock();
+		}
+#endif		
+	} else {
+		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");
 	}
 
 	fDesktop->UnlockSingleWindow();

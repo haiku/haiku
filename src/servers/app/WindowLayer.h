@@ -32,6 +32,18 @@ class WindowLayer;
 #define AS_REDRAW 'rdrw'
 
 
+// if the background clearing is delayed until
+// the client draws the view, we have less flickering
+// when contents have to be redrawn because of resizing
+// a window or because the client invalidates parts.
+// when redrawing something that has been exposed from underneath
+// other windows, the other window will be seen longer at
+// its previous position though if the exposed parts are not
+// cleared right away. maybe there ought to be a flag in
+// the update session, which tells us the cause of the update
+#define DELAYED_BACKGROUND_CLEARING 0
+
+
 class WindowLayer {
  public:
 								WindowLayer(const BRect& frame,
@@ -105,6 +117,8 @@ class WindowLayer {
 
 			void				BeginUpdate();
 			void				EndUpdate();
+			bool				InUpdate() const
+									{ return fInUpdate; }
 
 			bool				NeedsUpdate() const
 									{ return fUpdateRequested; }
