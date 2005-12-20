@@ -732,8 +732,38 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_WINDOW_RESIZED:
 		{
 			int32 width, height;
+//			if (msg->FindInt32("width", &width) == B_OK
+//				&& msg->FindInt32("height", &height) == B_OK) {
+//				fFrame.right = fFrame.left + width;
+//				fFrame.bottom = fFrame.top + height;
+//
+//				_AdoptResize();
+//				FrameResized(width, height);
+//			}
 			if (msg->FindInt32("width", &width) == B_OK
 				&& msg->FindInt32("height", &height) == B_OK) {
+
+				// combine with pending resize notifications
+				BMessage* pendingMessage;
+				while ((pendingMessage = MessageQueue()->FindMessage(B_WINDOW_RESIZED, 0))) {
+					if (pendingMessage != msg) {
+						int32 nextWidth;
+						if (pendingMessage->FindInt32("width", &nextWidth) == B_OK)
+							width = nextWidth;
+	
+						int32 nextHeight;
+						if (pendingMessage->FindInt32("height", &nextHeight) == B_OK) 
+							height = nextHeight;
+	
+						MessageQueue()->RemoveMessage(pendingMessage);
+						// TODO: the BeBook says that MessageQueue::RemoveMessage() deletes the message!
+						delete pendingMessage;
+						// this deletes the first *additional* message
+						// fCurrentMessage is safe
+					} else {
+						MessageQueue()->RemoveMessage(pendingMessage);
+					}
+				}
 				fFrame.right = fFrame.left + width;
 				fFrame.bottom = fFrame.top + height;
 
@@ -897,14 +927,39 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case _UPDATE_:
 		{
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
-			BRect updateRect;
-			int32 token;
-			msg->FindRect("_rect", &updateRect);
-			msg->FindInt32("_token", &token);
-			// TODO: why is "_token" ignored?
+//			BRect updateRect;
+//			int32 token;
+//			msg->FindRect("_rect", &updateRect);
+//			msg->FindInt32("_token", &token);
+//			// TODO: why is "_token" ignored?
+//
+//			fLink->StartMessage(AS_BEGIN_UPDATE);
+//			fTopView->_Draw(updateRect);
+//			fLink->StartMessage(AS_END_UPDATE);
+//			fLink->Flush();
+
+			BRect total;
+			msg->FindRect("_rect", &total);
+
+			// combine with pending update requests
+			BRect next;
+			BMessage* pendingMessage;
+			while ((pendingMessage = MessageQueue()->FindMessage(_UPDATE_, 0))) {
+				if (pendingMessage != msg) {
+					pendingMessage->FindRect("_rect", &next);
+					total = total | next;
+					MessageQueue()->RemoveMessage(pendingMessage);
+					// TODO: the BeBook says that MessageQueue::RemoveMessage() deletes the message!
+					// this deletes the first *additional* message
+					// fCurrentMessage is safe
+					delete pendingMessage;
+				} else {
+					MessageQueue()->RemoveMessage(pendingMessage);
+				}
+			}
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
-			fTopView->_Draw(updateRect);
+			fTopView->_Draw(total);
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
 			break;
