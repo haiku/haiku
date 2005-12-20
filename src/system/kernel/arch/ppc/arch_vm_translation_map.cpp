@@ -491,7 +491,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 	// create a region to cover the iospace
 	void *temp = (void *)IOSPACE_BASE;
-	vm_create_null_area(vm_get_kernel_aspace_id(), "iospace", &temp,
+	vm_create_null_area(vm_kernel_address_space_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
 	return 0;

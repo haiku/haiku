@@ -93,11 +93,11 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
 
     // switch the asids if we need to
-	if (t_to->team->aspace != NULL) {
+	if (t_to->team->address_space != NULL) {
 		// the target thread has is user space
 		if (t_from->team != t_to->team) {
 			// switching to a new address space
-			ppc_translation_map_change_asid(&t_to->team->aspace->translation_map);
+			ppc_translation_map_change_asid(&t_to->team->address_space->translation_map);
 		}
 	}
 
