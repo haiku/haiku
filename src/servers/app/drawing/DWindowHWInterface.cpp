@@ -213,7 +213,7 @@ DirectMessageFilter::Filter(BMessage *message, BHandler **target)
 
 DWindow::DWindow(BRect frame, DWindowHWInterface* interface, DWindowBuffer* buffer)
 	: BWindow(frame, "Haiku App Server", B_TITLED_WINDOW_LOOK,
-			  B_FLOATING_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+			  B_FLOATING_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_MOVABLE),
 	  fHWInterface(interface),
 	  fBuffer(buffer)
 {
