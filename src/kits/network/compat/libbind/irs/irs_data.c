@@ -34,7 +34,7 @@ static const char rcsid[] = "$Id$";
 #include <isc/memcluster.h>
 
 #ifdef DO_PTHREADS
-#include <pthread.h>
+#include <TLS.h>
 #endif
 
 #include <irs.h>
@@ -52,7 +52,7 @@ extern int h_errno;
 extern struct __res_state _res;
 
 #ifdef	DO_PTHREADS
-pthread_key_t	gIRSInitKey;
+int32 gIRSInitKey;
 #else
 static struct net_data	*net_data;
 #endif

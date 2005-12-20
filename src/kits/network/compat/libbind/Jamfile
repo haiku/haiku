@@ -2,10 +2,14 @@ SubDir HAIKU_TOP src kits network compat libbind ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+LIBNETWORK_DNS_DIR = $(HAIKU_TOP) src kits network libnetwork dns ;
+
 UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
 SubDirSysHdrs $(SUBDIR) ;
+UseHeaders [ FDirName $(LIBNETWORK_DNS_DIR) headers ] : true ;
+SubDirSysHdrs $(LIBNETWORK_DNS_DIR) ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -24,14 +28,15 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
 # private sources for this port
 SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) src ] ;
 
 # BIND sources
-SEARCH_SOURCE += [ FDirName $(SUBDIR) dst ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) inet ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) irs ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) isc ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) nameser ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) dst ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) inet ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) irs ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) isc ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) nameser ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) resolv ] ;
 
 {
 	# Default libs include BeOS R5 libnet.so, something we don't want here!
@@ -43,7 +48,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 }
-	
+
 
 MergeObject <compatlibbind>dst.o :
 	dst_api.c

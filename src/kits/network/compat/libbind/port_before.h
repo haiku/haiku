@@ -21,7 +21,6 @@ struct timezone;        /* silence warning */
 
 // CHANGED: pthread emulation
 #define DO_PTHREADS 1
-#include <pthread_emu.h>
 
 #define GETGROUPLIST_ARGS const char *name, gid_t basegid, gid_t *groups, int *ngroups
 #define GETNETBYADDR_ADDR_T long

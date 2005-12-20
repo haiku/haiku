@@ -20,7 +20,7 @@
 #include <port_after.h>
 
 #ifdef DO_PTHREADS
-#include <pthread.h>
+#include <TLS.h>
 #include <stdlib.h>
 #endif
 
@@ -48,7 +48,7 @@ static const int gai_nerr = (sizeof(gai_errlist)/sizeof(*gai_errlist));
 #define EAI_BUFSIZE 128
 
 #ifdef DO_PTHREADS
-pthread_key_t gGaiStrerrorKey;
+int32 gGaiStrerrorKey;
 #endif
 
 const char *

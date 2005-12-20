@@ -1,8 +1,9 @@
-#include <pthread_emu.h>
+#include <TLS.h>
+#include <OS.h>
 
 // XXX: this is an ugly hack because we don't support mutexes
-extern pthread_key_t gIRSInitKey;
-extern pthread_key_t gGaiStrerrorKey;
+extern int32 gIRSInitKey;
+extern int32 gGaiStrerrorKey;
 
 class TLSInit {
 	public:
