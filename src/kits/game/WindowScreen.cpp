@@ -10,6 +10,7 @@
 
 #include <Application.h>
 #include <Screen.h>
+#include <String.h>
 #include <WindowScreen.h>
 
 #include <stdlib.h>
@@ -21,6 +22,7 @@
 #include <WindowPrivate.h>
 
 
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 // WindowScreen commands
 #define WS_MOVE_DISPLAY			0x00000108
 #define WS_SET_FULLSCREEN 		0x00000881
@@ -32,6 +34,14 @@
 #define WS_SET_DISPLAY_MODE 	0x00000efd
 #define WS_SET_PALETTE			0x00000f27
 
+#else
+
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
+
+using BPrivate::AppServerLink;
+
+#endif
 
 #if TRACE_WINDOWSCREEN
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
@@ -231,18 +241,18 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 			*out_space = B_RGB32;
 			*width = 1600; *height = 1200;
 			break;
-    	case B_8_BIT_1152x900:
-    		*out_space = B_CMAP8;
-    		*width = 1152; *height = 900;
-    		break;
-    	case B_16_BIT_1152x900:
-    		*out_space = B_RGB16;
-    		*width = 1152; *height = 900;
-    		break;
-    	case B_32_BIT_1152x900:
-    		*out_space = B_RGB32;
-    		*width = 1152; *height = 900;
-    		break;
+    		case B_8_BIT_1152x900:
+    			*out_space = B_CMAP8;
+    			*width = 1152; *height = 900;
+    			break;
+    		case B_16_BIT_1152x900:
+    			*out_space = B_RGB16;
+    			*width = 1152; *height = 900;
+    			break;
+    		case B_32_BIT_1152x900:
+    			*out_space = B_RGB32;
+    			*width = 1152; *height = 900;
+    			break;
 		case B_15_BIT_640x480:
 			*out_space = B_RGB15;
 			*width = 640; *height = 480;
@@ -263,10 +273,10 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 			*out_space = B_RGB15;
 			*width = 1600; *height = 1200;
 			break;
-    	case B_15_BIT_1152x900:
-    		*out_space = B_RGB15;
-    		*width = 1152; *height = 900;
-    		break;
+    		case B_15_BIT_1152x900:
+    			*out_space = B_RGB15;
+    			*width = 1152; *height = 900;
+    			break;
 	}
 }
 
@@ -745,14 +755,14 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	space0 = 0;
 	
 	SetWorkspaces(B_CURRENT_WORKSPACE);
-	
 	SetFullscreen(1);
+
 	work_state = 1;
 	debug_workspace = 0;
-	const color_map *map = screen.ColorMap();
-	memcpy(colorList, map->color_list, 256);
+	memcpy(colorList, screen.ColorMap()->color_list, 256);
 	
 	GetCardInfo();
+
 	activate_sem = create_sem(0, "WindowScreen start lock");
 	activate_state = 0;
 		
@@ -940,6 +950,13 @@ BWindowScreen::GetCardInfo()
 	link.fSession->sread(sizeof(result), &result);
 	if (result == B_OK)
 		link.fSession->sread(sizeof(frame_buffer_config), &config);
+#else
+	AppServerLink link;
+	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
+	link.Attach<screen_id>(id);
+	if (link.FlushWithReply(result) == B_OK && result == B_OK)
+		link.Read<frame_buffer_config>(&config);
+	
 #endif
 	
 	if (result == B_OK) {
@@ -1026,51 +1043,75 @@ BWindowScreen::InitClone()
 {
 	CALLED();
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-	// TODO: Too much stuff to change, I'll just
-	return B_ERROR;
-	// for now
+	AppServerLink link;
+	link.StartMessage(AS_GET_ACCELERANT_NAME);
+	link.Attach<int32>(screen_index);
+	
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) < B_OK || status < B_OK)
+		return status;
+
+	BString accelerantName;
+	link.ReadString(accelerantName);
+	addon_image = load_add_on(accelerantName.String()); 
+	if (addon_image < B_OK)
+		return addon_image;
+
+	
+	status = get_image_symbol(addon_image, "get_accelerant_hook", B_SYMBOL_TYPE_ANY, (void **)&m_gah);
+	if (status < B_OK) {
+		unload_add_on(addon_image);
+		addon_image = -1;
+		return status;
+	}
+	
+	clone_accelerant clone = (clone_accelerant)m_gah(B_CLONE_ACCELERANT, 0);
+	if (!clone) {
+		unload_add_on(addon_image);
+		addon_image = -1;
+		return status;
+	}
+
+	status = B_ERROR;
+	link.StartMessage(AS_GET_DRIVER_NAME);
+	link.Attach<int32>(screen_index);
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		BString driverName;
+		link.ReadString(driverName);
+		status = clone((void *)driverName.String());
+	}
+	
+	if (status < B_OK) {
+		unload_add_on(addon_image);
+		addon_image = -1;
+	}
+	
+	return status;	
+	
 #else
-	// TODO: Using BScreen::GetDeviceInfo() could do the job, I think,
-	// but it always returns B_ERROR on my system (Rudolf's Nvidia driver)
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_ACCELERANT_NAME);
 	link.fSession->swrite_l(screen_index);
 	link.fSession->sync();
 	
-	int32 result;
-	link.fSession->sread(sizeof(result), &result);
-	if (result != B_OK)
-		return result;
+	status_t status;
+	link.fSession->sread(sizeof(status), &status);
+	if (status != B_OK)
+		return status;
 	
-	link.fSession->sread(sizeof(result), &result); // read length of accelerant's name
+	int32 length;
+	link.fSession->sread(sizeof(length), &length); // read length of accelerant's name
 	
-	char *addonName = (char *)malloc((result + 1) * sizeof (char));
-	link.fSession->sread(result, addonName); // read the accelerant's name
-	addonName[result] = '\0';
-	
-	link.fSession->swrite_l(WS_GET_DRIVER_NAME); // get driver's name without the /dev/
-	link.fSession->swrite_l(screen_index);
-	link.fSession->sync();
-	
-	link.fSession->sread(sizeof(result), &result);
-	if (result != B_OK)
-		return result;
-	
-	link.fSession->sread(sizeof(result), &result);
-	// result now contains the length of the buffer needed for the drivers path name
-	
-	char *path = (char *)malloc((result + 1) * sizeof(char));
-	link.fSession->sread(result, path);
-	path[result] = '\0';
-	// path now contains the driver's name
+	char *addonName = new char[length + 1];
+	link.fSession->sread(length, addonName); // read the accelerant's name
+	addonName[length] = '\0';
 	
 	// load the accelerant
 	addon_image = load_add_on(addonName); 
-	
-	free(addonName);
+	delete[] addonName;
 	
 	if (addon_image < 0)
-		return B_ERROR;
+		return addon_image;
 	
 	// now get the symbol for GetAccelerantHook m_gah
 	if (get_image_symbol(addon_image, "get_accelerant_hook",
@@ -1082,10 +1123,26 @@ BWindowScreen::InitClone()
 	
 	if (!clone)
 		return B_ERROR;
+
+	link.fSession->swrite_l(WS_GET_DRIVER_NAME); // get driver's name without the /dev/
+	link.fSession->swrite_l(screen_index);
+	link.fSession->sync();
+	
+	link.fSession->sread(sizeof(status), &status);
+	if (status != B_OK)
+		return status;
+	
+	link.fSession->sread(sizeof(length), &length);
+	// result now contains the length of the buffer needed for the drivers path name
+	
+	char *path = new char[length + 1];
+	link.fSession->sread(length, path);
+	path[length] = '\0';
+	// path now contains the driver's name
 	
 	// test if the driver supports cloning of the accelerant, using the path we got earlier
 	result = clone((void *)path);
-	free(path);
+	delete[] path;
 	
 	if (result != 0) {
 		unload_add_on(addon_image);
