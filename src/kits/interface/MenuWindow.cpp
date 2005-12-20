@@ -36,28 +36,10 @@ const window_feel kMenuWindowFeel = (window_feel)1025;
 // This draws the frame around the BMenu
 class BMenuFrame : public BView {
 public:
-	BMenuFrame() :
-		BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-	{
-	};
+	BMenuFrame() ;
 	
-	virtual void AttachedToWindow()
-	{
-		BView::AttachedToWindow();
-		ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
-	};
-	
-	virtual void Draw(BRect updateRect)
-	{
-		BRect bounds(Bounds());
-		
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(bounds.right, bounds.top),
-					BPoint(bounds.right, bounds.bottom - 1));
-		StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
-					BPoint(bounds.right, bounds.bottom));
-	};
-	
+	virtual void AttachedToWindow();
+	virtual void Draw(BRect updateRect);
 };
 
 
@@ -78,4 +60,33 @@ BMenuWindow::BMenuWindow(const char *name)
 
 BMenuWindow::~BMenuWindow()
 {
+}
+
+
+// BMenuFrame
+BMenuFrame::BMenuFrame()
+	:
+	BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+{
+}
+	
+
+void
+BMenuFrame::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
+}
+	
+
+void
+BMenuFrame::Draw(BRect updateRect)
+{
+	BRect bounds(Bounds());
+	
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	StrokeLine(BPoint(bounds.right, bounds.top),
+				BPoint(bounds.right, bounds.bottom - 1));
+	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
+				BPoint(bounds.right, bounds.bottom));
 }
