@@ -61,7 +61,8 @@ class Painter {
 			const BRegion*		ClippingRegion() const
 									{ return fClippingRegion; }
 
-			void				SetDrawState(const DrawState* data);
+			void				SetDrawState(const DrawState* data,
+											 bool updateFont = false);
 
 								// object settings
 			void				SetHighColor(const rgb_color& color);
@@ -74,9 +75,6 @@ class Painter {
 									{ SetLowColor(color.GetColor32()); }
 
 			void				SetPenSize(float size);
-			void				SetDrawingMode(drawing_mode mode);
-			void				SetBlendingMode(source_alpha alphaSrcMode,
-												alpha_function alphaFncMode);
 			void				SetPattern(const pattern& p);
 
 			void				SetPenLocation(const BPoint& location);
@@ -175,26 +173,21 @@ class Painter {
 												float span) const;
 
 								// strings
-			BRect				DrawChar(		char aChar);
-
-			BRect				DrawChar(		char aChar,
-												BPoint baseLine);
-
-			BRect				DrawString(		const char* utf8String,
-												uint32 length,
-												const escapement_delta* delta = NULL);
-
 			BRect				DrawString(		const char* utf8String,
 												uint32 length,
 												BPoint baseLine,
 												const escapement_delta* delta = NULL);
 
-			BRect				DrawString(		const char* utf8String,
-												const escapement_delta* delta = NULL);
+			BRect				BoundingBox(	const char* utf8String,
+												uint32 length,
+												const BPoint& baseLine,
+												BPoint* penLocation,
+												const escapement_delta* delta = NULL) const;
 
-			BRect				DrawString(		const char* utf8String,
-												BPoint baseLine,
-												const escapement_delta* delta = NULL);
+			float				StringWidth(	const char* utf8String,
+												uint32 length,
+												const DrawState* context);
+
 
 								// bitmaps
 			BRect				DrawBitmap(		const ServerBitmap* bitmap,
@@ -205,15 +198,6 @@ class Painter {
 			BRect				FillRegion(		const BRegion* region) const;
 
 			BRect				InvertRect(		const BRect& r) const;
-
-			BRect				BoundingBox(	const char* utf8String,
-												uint32 length,
-												const BPoint& baseLine,
-												BPoint* penLocation,
-												const escapement_delta* delta = NULL) const;
-
-			float				StringWidth(	const char* utf8String,
-												uint32 length) const;
 
 	inline	BRect				ClipRect(const BRect& rect) const
 									{ return _Clipped(rect); }

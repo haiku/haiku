@@ -99,7 +99,8 @@ public:
 			void			FillRect(BRect r, const DrawState *d);
 
 			// for debugging purposes?
-			void			StrokeRegion(BRegion &r, const DrawState *d);
+//			void			StrokeRegion(BRegion &r, const DrawState *d);
+
 			void			FillRegion(BRegion &r, const DrawState *d);
 			void			FillRegion(BRegion &r, const RGBColor& color);
 

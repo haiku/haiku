@@ -168,7 +168,7 @@ Painter::DetachFromBuffer()
 
 // SetDrawState
 void
-Painter::SetDrawState(const DrawState* data)
+Painter::SetDrawState(const DrawState* data, bool updateFont)
 {
 	// NOTE: The custom clipping in "data" is ignored, because it has already been
 	// taken into account elsewhere
@@ -177,7 +177,10 @@ Painter::SetDrawState(const DrawState* data)
 	// but for now...
 	SetPenSize(data->PenSize());
 	SetPenLocation(data->PenLocation());
-	SetFont(data->Font());
+
+	if (updateFont)
+		SetFont(data->Font());
+
 	fTextRenderer->SetAntialiasing(!(data->ForceFontAliasing() || data->Font().Flags() & B_DISABLE_ANTIALIASING));
 
 	fSubpixelPrecise = data->SubPixelPrecise();
@@ -246,28 +249,6 @@ Painter::SetPenSize(float size)
 	}
 }
 
-// SetDrawingMode
-void
-Painter::SetDrawingMode(drawing_mode mode)
-{
-	if (fDrawingMode != mode) {
-		fDrawingMode = mode;
-		_UpdateDrawingMode();
-	}
-}
-
-// SetBlendingMode
-void
-Painter::SetBlendingMode(source_alpha alphaSrcMode, alpha_function alphaFncMode)
-{
-	if (fAlphaSrcMode != alphaSrcMode || fAlphaFncMode != alphaFncMode) {
-		fAlphaSrcMode = alphaSrcMode;
-		fAlphaFncMode = alphaFncMode;
-		if (fDrawingMode == B_OP_ALPHA)
-			_UpdateDrawingMode();
-	}
-}
-
 // SetPattern
 void
 Painter::SetPattern(const pattern& p)
@@ -299,15 +280,6 @@ Painter::SetFont(const ServerFont& font)
 BRect
 Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 {
-	// this happens independent of wether we actually draw something
-	context->SetPenLocation(b);
-	// NOTE: penlocation should be converted to the local
-	// coordinate of the view for which we draw here, after
-	// we have been used. Updating it could also be done somewhere
-	// else in the app_server code, but DrawString() needs to
-	// do this as well, and it is probably hard to calculate
-	// the correct location outside of AGGTextRenderer...
-
 	CHECK_CLIPPING
 
 	// "false" means not to do the pixel center offset,
@@ -331,11 +303,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 		return touched;
 	}
 
-//	SetHighColor(context->highcolor.GetColor32());
-//	SetLowColor(context->lowcolor.GetColor32());
-//	SetDrawingMode(context->draw_mode);
-//	SetBlendingMode(context->alphaSrcMode, context->alphaFncMode);
-//	fPatternHandler->SetPattern(context->patt);
 	SetDrawState(context);
 
 	// first, try an optimized version
@@ -912,34 +879,6 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 // #pragma mark -
 
-// DrawChar
-BRect
-Painter::DrawChar(char aChar)
-{
-	// TODO: to be moved elsewhere
-	return DrawChar(aChar, fPenLocation);
-}
-
-// DrawChar
-BRect
-Painter::DrawChar(char aChar, BPoint baseLine)
-{
-	// TODO: to be moved elsewhere
-	char wrapper[2];
-	wrapper[0] = aChar;
-	wrapper[1] = 0;
-	return DrawString(wrapper, 1, baseLine);
-}
-
-// DrawString
-BRect
-Painter::DrawString(const char* utf8String, uint32 length,
-					const escapement_delta* delta)
-{
-	// TODO: to be moved elsewhere
-	return DrawString(utf8String, length, fPenLocation, delta);
-}
-
 // DrawString
 BRect
 Painter::DrawString(const char* utf8String, uint32 length,
@@ -965,21 +904,27 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	return _Clipped(bounds);
 }
 
-// DrawString
+// BoundingBox
 BRect
-Painter::DrawString(const char* utf8String, const escapement_delta* delta)
+Painter::BoundingBox(const char* utf8String, uint32 length,
+					 const BPoint& baseLine, BPoint* penLocation,
+					 const escapement_delta* delta) const
 {
-	// TODO: to be moved elsewhere
-	return DrawString(utf8String, strlen(utf8String), fPenLocation, delta);
+	static BRect dummy;
+	return fTextRenderer->RenderString(utf8String,
+									   length,
+									   fFontRendererSolid,
+									   fFontRendererBin,
+									   baseLine, dummy, true, penLocation,
+									   delta);
 }
 
-// DrawString
-BRect
-Painter::DrawString(const char* utf8String, BPoint baseLine,
-					const escapement_delta* delta)
+// StringWidth
+float
+Painter::StringWidth(const char* utf8String, uint32 length, const DrawState* context)
 {
-	// TODO: to be moved elsewhere
-	return DrawString(utf8String, strlen(utf8String), baseLine, delta);
+	SetFont(context->Font());
+	return fTextRenderer->StringWidth(utf8String, length);
 }
 
 // #pragma mark -
@@ -1041,28 +986,6 @@ Painter::InvertRect(const BRect& r) const
 		_InvertRect32(region.RectAt(i));
 	}
 	return _Clipped(r);
-}
-
-// BoundingBox
-BRect
-Painter::BoundingBox(const char* utf8String, uint32 length,
-					 const BPoint& baseLine, BPoint* penLocation,
-					 const escapement_delta* delta) const
-{
-	static BRect dummy;
-	return fTextRenderer->RenderString(utf8String,
-									   length,
-									   fFontRendererSolid,
-									   fFontRendererBin,
-									   baseLine, dummy, true, penLocation,
-									   delta);
-}
-
-// StringWidth
-float
-Painter::StringWidth(const char* utf8String, uint32 length) const
-{
-	return fTextRenderer->StringWidth(utf8String, length);
 }
 
 // #pragma mark -
