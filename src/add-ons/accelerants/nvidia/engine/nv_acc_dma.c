@@ -554,7 +554,7 @@ status_t nv_acc_init_dma()
 				ACCW(PR_CTX1_6, 0x00000302); /* format is X24Y8, LSB mono */
 			else
 				ACCW(PR_CTX1_6, 0x00000000); /* format is invalid */
-			ACCW(PR_CTX1_9, 0x00000302); /* format is X24Y8, LSB mono */
+			ACCW(PR_CTX1_A, 0x00000302); /* format is X24Y8, LSB mono */
 			break;
 		case B_RGB15_LITTLE:
 			/* acc engine */
@@ -568,7 +568,7 @@ status_t nv_acc_init_dma()
 			ACCW(STRD_FMT, 0x09080808);
 			/* PRAMIN */
 			ACCW(PR_CTX1_6, 0x00000902); /* format is X17RGB15, LSB mono */
-			ACCW(PR_CTX1_9, 0x00000902); /* format is X17RGB15, LSB mono */
+			ACCW(PR_CTX1_A, 0x00000902); /* format is X17RGB15, LSB mono */
 			break;
 		case B_RGB16_LITTLE:
 			/* acc engine */
@@ -585,7 +585,7 @@ status_t nv_acc_init_dma()
 				ACCW(STRD_FMT, 0x000b0b0c);
 			/* PRAMIN */
 			ACCW(PR_CTX1_6, 0x00000c02); /* format is X16RGB16, LSB mono */
-			ACCW(PR_CTX1_9, 0x00000c02); /* format is X16RGB16, LSB mono */
+			ACCW(PR_CTX1_A, 0x00000c02); /* format is X16RGB16, LSB mono */
 			break;
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE:
@@ -600,7 +600,7 @@ status_t nv_acc_init_dma()
 			ACCW(STRD_FMT, 0x0e0d0d0d);
 			/* PRAMIN */
 			ACCW(PR_CTX1_6, 0x00000e02); /* format is X8RGB24, LSB mono */
-			ACCW(PR_CTX1_9, 0x00000e02); /* format is X8RGB24, LSB mono */
+			ACCW(PR_CTX1_A, 0x00000e02); /* format is X8RGB24, LSB mono */
 			break;
 		default:
 			LOG(8,("ACC: init, invalid bit depth\n"));
@@ -1797,6 +1797,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	uint32 i = 0;
 	uint16 subcnt;
 	uint32 cmd_depth;
+	uint8 bpp;
 
 	/*** init acc engine for scaled filtered blit function ***/
 	/* Set pixel width */
@@ -1804,22 +1805,27 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 	{
 	case B_RGB15_LITTLE:
 		cmd_depth = 0x00000002;
+		bpp = 2;
 		break;
 	case B_RGB16_LITTLE:
 		cmd_depth = 0x00000007;
+		bpp = 2;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
 		cmd_depth = 0x00000004;
+		bpp = 4;
 		break;
 	/* fixme sometime:
 	 * we could do the spaces below if this function would be modified to be able
 	 * to use a source outside of the desktop, i.e. using offscreen bitmaps... */
 	case B_YCbCr422:
 		cmd_depth = 0x00000005;
+		bpp = 2;
 		break;
 	case B_YUV422:
 		cmd_depth = 0x00000006;
+		bpp = 2;
 		break;
 	default:
 		/* note: this function does not support src or dest in the B_CMAP8 space! */
@@ -1868,17 +1874,13 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		{
 			/* now setup blit (writing 12 32bit words) */
 			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG, 6);
-			//fixme?
-			//it is yet unclear why SourceHeightWidth is specified twice.
-			//The second one corresponds to the use in the bes, the first one
-			//seems to specify clipping ('one rect' bes 'colorkeying') info.
-			//If this is true then the current setup is correct.
-			//(the 'client' using this acceleration cmd should do clipping for us!)
-			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				(((list[i].src_top) << 16) | (list[i].src_left)); /* SourceOrg */
+			/* setup source clipping ref for blit (not used) (b0-15 = left, b16-31 = top) */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* SourceOrg */
+			/* setup source size for blit */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SourceHeightWidth */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			/* setup destination location and size for blit */
 				(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((((list[i].dest_height) + 1) << 16) | ((list[i].dest_width) + 1)); /* DestHeightWidth */
@@ -1890,6 +1892,8 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 				((list[i].src_height << 20) / list[i].dest_height); /* VerInvScale (in 12.20 format) */
 
 			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE, 4);
+			/* setup source size including needed slopspace */
+			//fixme: checkout constraints and update code...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SourceHeightWidth */
 			/* setup source pitch (b0-15). Set 'format origin center' (b16-17) and
@@ -1898,7 +1902,8 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 				(si->fbc.bytes_per_row | (1 << 16) | (1 << 24)); /* SourcePitch */
 			/* setup source surface location */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* Offset */
+				((uint32)((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer)) +
+				(list[i].src_top * si->fbc.bytes_per_row) +	(list[i].src_left * bpp); /* Offset */
 			/* Setup source start: first (sub)pixel contributing to output picture */
 			/* Note:
 			 * clipping is not asked for. Look at bes engine code for useage example. */
