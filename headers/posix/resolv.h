@@ -63,10 +63,6 @@
 #include <stdio.h>
 #include <arpa/nameser.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
  * It can change every day so the right thing to do with it is use it
@@ -477,9 +473,5 @@ void		res_setservers __P((res_state,
 int		res_getservers __P((res_state,
 				    union res_sockaddr_union *, int));
 __END_DECLS
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* !_RESOLV_H_ */

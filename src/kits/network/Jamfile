@@ -5,3 +5,4 @@ Package haiku-networkingkit-cvs :
 ;
 
 SubInclude HAIKU_TOP src kits network compat ;
+SubInclude HAIKU_TOP src kits network libnetwork ;

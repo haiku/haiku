@@ -67,10 +67,6 @@
 #include <sys/bitypes.h>
 #include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define	inet_addr		__inet_addr
 #define	inet_aton		__inet_aton
 #define	inet_lnaof		__inet_lnaof
@@ -106,9 +102,5 @@ const char	*inet_ntop __P((int, const void *, char *, size_t));
 u_int		 inet_nsap_addr __P((const char *, u_char *, int));
 char		*inet_nsap_ntoa __P((int, const u_char *, char *));
 __END_DECLS
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* !_INET_H_ */

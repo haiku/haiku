@@ -99,10 +99,6 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef _PATH_HEQUIV
 #define _PATH_HEQUIV	"/etc/hosts.equiv"
 #endif
@@ -313,9 +309,5 @@ struct servent	*getservent_r __P((struct servent *, char *, int));
 void		setservent_r __P((int));
 void		endservent_r __P((void));
 __END_DECLS
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* !_NETDB_H_ */

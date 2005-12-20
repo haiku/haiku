@@ -4,6 +4,10 @@ ported to Haiku
 This file contains important information for developers who want to update this BIND port.
 I created config.h, port_before.h, and port_after.h with "configure --enable-threads --disable-ipv6" on a BONE-compatible system and fixed some mistakes that the script made. All changes to these three files are marked with a comment containing the keyword CHANGED.
 
+TODO:
+	add support for IPv6
+	improve pthread support to fix TLS/mutex hack
+
 Added folders and files:
 	headers (some headers are not defined in Haiku)
 	src (functions that are not part of Haiku, e.g.: strsep)
@@ -44,6 +48,6 @@ Added sources for compatibility:
 Changes made to the sources and headers:
 	nameser_compat.h: added check for __HAIKU__ and __BEOS__ to not redefine endianness
 	
-	arpa/inet.h, netdb.h, resolv.h, nameser.h, nameser_compat.h: added check for __cplusplus, removed check for _REENTRANT (we are always reentrant), removed all checks for other operating systems
+	arpa/inet.h, netdb.h, resolv.h, nameser.h, nameser_compat.h: removed check for _REENTRANT (we are always reentrant), removed all checks for other operating systems
 	
 	irs/gai_strerror.c, irs/irs_data.c: Switched to BeOS-native TLS in gai_strerror() and net_data_init() using a very ugly hack (see src/TLSInit.cpp). We need full mutex support!
