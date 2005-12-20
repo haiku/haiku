@@ -14,7 +14,7 @@
 #include <timer.h>
 #include <user_debugger.h>
 #include <util/list.h>
-#include <arch/thread_struct.h>
+#include <arch/thread_types.h>
 
 
 extern spinlock thread_spinlock;

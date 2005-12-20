@@ -5,8 +5,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_ARCH_x86_THREAD_STRUCT_H
-#define _KERNEL_ARCH_x86_THREAD_STRUCT_H
+#ifndef _KERNEL_ARCH_x86_THREAD_TYPES_H
+#define _KERNEL_ARCH_x86_THREAD_TYPES_H
 
 
 #include <arch_cpu.h>
@@ -47,4 +47,4 @@ struct arch_fork_arg {
 	struct iframe	iframe;
 };
 
-#endif	/* _KERNEL_ARCH_x86_THREAD_STRUCT_H */
+#endif	/* _KERNEL_ARCH_x86_THREAD_TYPES_H */
