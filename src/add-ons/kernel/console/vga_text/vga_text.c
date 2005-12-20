@@ -44,8 +44,9 @@ text_init(void)
 
 	/* we always succeede, so init our stuff */
 	dprintf("console/text: mapping vid mem\n");
-	vm_map_physical_memory(vm_get_kernel_aspace_id(), "vid_mem", (void *)&gOrigin, B_ANY_KERNEL_ADDRESS,
-		SCREEN_END - SCREEN_START, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, SCREEN_START);
+	vm_map_physical_memory(vm_kernel_address_space_id(), "vid_mem", (void *)&gOrigin,
+		B_ANY_KERNEL_ADDRESS, SCREEN_END - SCREEN_START,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, SCREEN_START);
 	dprintf("console/text: mapped vid mem to virtual address %p\n", gOrigin);
 
 	/* pre-touch all of the memory so that we dont fault while deep inside the kernel and displaying something */
