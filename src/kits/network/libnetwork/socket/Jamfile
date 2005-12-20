@@ -1,0 +1,33 @@
+SubDir HAIKU_TOP src kits network compat libsocket ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+{
+	# Default libs include BeOS R5 libnet.so, something we don't want here!
+	LINKFLAGS on libsocket.so = [ on libsocket.so return $(LINKFLAGS) ] -nodefaultlibs ;
+}
+
+SharedLibrary libsocket.so : 
+	socket.c
+	: root
+;
+
+# Installation -- in the test directory for the time being
+HaikuInstallRelSymLink install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
+	: libsocket.so
+	: installed-networking-test ;
+
+Package haiku-networkingkit-cvs :
+	libsocket.so :
+#	boot home config lib ;
+	boot home Desktop haiku-networkingkit lib ;

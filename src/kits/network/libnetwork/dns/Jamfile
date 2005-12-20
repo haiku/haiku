@@ -1,0 +1,211 @@
+SubDir HAIKU_TOP src kits network compat libbind ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+LIBNETWORK_DNS_DIR = $(HAIKU_TOP) src kits network libnetwork dns ;
+
+UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers legacy network ] : true ;
+SubDirSysHdrs $(SUBDIR) ;
+UseHeaders [ FDirName $(LIBNETWORK_DNS_DIR) headers ] : true ;
+SubDirSysHdrs $(LIBNETWORK_DNS_DIR) ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for <support/Errors.h> and maybe other stuff.
+
+	# Remove _NO_INLINE_ASM from the defines. Otherwise we get
+	# references to tls_get/set() etc. that don't exist under BeOS.
+	TARGET_DEFINES = [ FFilter $(TARGET_DEFINES) : _NO_INLINE_ASM ] ;
+}
+
+# our libroot contains functions that are missing in BeOS (e.g.: strlcat)
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+
+# private sources for this port
+SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) src ] ;
+
+# BIND sources
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) dst ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) inet ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) irs ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) isc ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) nameser ] ;
+SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) resolv ] ;
+
+{
+	# Default libs include BeOS R5 libnet.so, something we don't want here!
+	LINKFLAGS on libbind.so = [ on libbind.so return $(LINKFLAGS) ] -nodefaultlibs ;
+ 
+	# we want to have the xxx_r functions, too
+	local defines = _REENTRANT=1 NO_SOCKADDR_UN=1 ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+
+MergeObject <compatlibbind>dst.o :
+	dst_api.c
+	hmac_link.c
+	md5_dgst.c
+	support.c
+;
+
+MergeObject <compatlibbind>inet.o :
+	inet_addr.c
+	inet_cidr_ntop.c
+	inet_cidr_pton.c
+	inet_data.c
+	inet_lnaof.c
+	inet_makeaddr.c
+	inet_net_ntop.c
+	inet_net_pton.c
+	inet_neta.c
+	inet_netof.c
+	inet_network.c
+	inet_ntoa.c
+	inet_ntop.c
+	inet_pton.c
+	nsap_addr.c
+;
+
+MergeObject <compatlibbind>irs.o :
+	dns.c
+	dns_ho.c
+	dns_nw.c
+	dns_pr.c
+	dns_sv.c
+	gai_strerror.c
+	gen.c
+	gen_ho.c
+	gen_ng.c
+	gen_nw.c
+	gen_pr.c
+	gen_sv.c
+	getaddrinfo.c
+	gethostent.c
+	gethostent_r.c
+	getnameinfo.c
+	getnetent.c
+	getnetent_r.c
+	getnetgrent.c
+	getnetgrent_r.c
+	getprotoent.c
+	getprotoent_r.c
+	getservent.c
+	getservent_r.c
+	hesiod.c
+	irp.c
+	irp_ho.c
+	irp_ng.c
+	irp_nw.c
+	irp_pr.c
+	irp_sv.c
+	irpmarshall.c
+	irs_data.c
+	lcl.c
+	lcl_ho.c
+	lcl_ng.c
+	lcl_nw.c
+	lcl_pr.c
+	lcl_sv.c
+	nis.c
+	nul_ng.c
+	util.c
+;
+
+MergeObject <compatlibbind>isc.o :
+	assertions.c
+	base64.c
+	bitncmp.c
+	ctl_clnt.c
+	ctl_p.c
+	ctl_srvr.c
+	ev_connects.c
+	ev_files.c
+	ev_streams.c
+	ev_timers.c
+	ev_waits.c
+	eventlib.c
+	heap.c
+	hex.c
+	logging.c
+	memcluster.c
+	movefile.c
+	tree.c
+;
+
+MergeObject <compatlibbind>nameser.o :
+	ns_date.c
+	ns_name.c
+	ns_netint.c
+	ns_parse.c
+	ns_print.c
+	ns_samedomain.c
+	ns_sign.c
+	ns_ttl.c
+	ns_verify.c
+;
+
+MergeObject <compatlibbind>resolv.o :
+	herror.c
+	res_comp.c
+	res_data.c
+	res_debug.c
+	res_findzonecut.c
+	res_init.c
+	res_mkquery.c
+	res_mkupdate.c
+	res_query.c
+	res_send.c
+	res_sendsigned.c
+	res_update.c
+;
+
+SharedLibrary libbind.so :
+	# functions from our libroot
+	# TODO: these can be removed for the Haiku build
+	strlcat.c
+	
+	# private functions
+	arc4random.c
+	ethers.c
+	gettimeofday.c
+	linkaddr.c
+	res_resultcodes.c
+	strsep.c
+	
+	# UGLY HACK
+	TLSInit.cpp
+;
+
+LinkAgainst libbind.so :
+	<compatlibbind>dst.o
+	<compatlibbind>inet.o
+	<compatlibbind>irs.o
+	<compatlibbind>isc.o # (not used)
+	<compatlibbind>nameser.o
+	<compatlibbind>resolv.o
+	
+	libsocket.so
+	libnet.so # for gethostname()
+	be
+	root
+;
+
+# Installation -- in the test directory for the time being
+HaikuInstallRelSymLink install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
+	: libbind.so
+	: installed-networking-test ;
+
+Package haiku-networkingkit-cvs :
+	libbind.so :
+#	boot home config lib ;
+	boot home Desktop haiku-networkingkit lib ;

@@ -1,0 +1,49 @@
+BIND 9.3.1
+ported to Haiku
+
+This file contains important information for developers who want to update this BIND port.
+I created config.h, port_before.h, and port_after.h with "configure --enable-threads --disable-ipv6" on a BONE-compatible system and fixed some mistakes that the script made. All changes to these three files are marked with a comment containing the keyword CHANGED.
+
+Added folders and files:
+	headers (some headers are not defined in Haiku)
+	src (functions that are not part of Haiku, e.g.: strsep)
+	
+	All BIND headers were moved to legacy/network (public) and private/net (private) in the system-wide headers folder.
+
+Removed files:
+	irs/
+		dns_gr.c
+		dns_pw.c
+		gen_gr.c
+		gen_pw.c
+		getgrent.c
+		getgrent_r.c
+		getpwent.c
+		getpwent_r.c
+		irp_gr.c
+		irp_pw.c
+		lcl_gr.c
+		lcl_pw.c
+		nis_gr.c
+		nis_ho.c
+		nis_ng.c
+		nis_nw.c
+		nis_pr.c
+		nis_pw.c
+		nis_sv.c
+
+
+Porting issues:
+	BIND wants to include sys/un.h and utmp.h. We do not have these, so I put empty headers into the private headers folder.
+	
+	Added a hacky workaround when building for non-Haiku targets: select.h (in legacy headers) only declares pselect() for Haiku.
+
+Added sources for compatibility:
+	src/res_resultcodes.c: BONE's host command wants _res_resultcodes to be defined
+
+Changes made to the sources and headers:
+	nameser_compat.h: added check for __HAIKU__ and __BEOS__ to not redefine endianness
+	
+	arpa/inet.h, netdb.h, resolv.h, nameser.h, nameser_compat.h: added check for __cplusplus, removed check for _REENTRANT (we are always reentrant), removed all checks for other operating systems
+	
+	irs/gai_strerror.c, irs/irs_data.c: Switched to BeOS-native TLS in gai_strerror() and net_data_init() using a very ugly hack (see src/TLSInit.cpp). We need full mutex support!
