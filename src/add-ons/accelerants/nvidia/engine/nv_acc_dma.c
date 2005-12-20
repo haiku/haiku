@@ -1874,28 +1874,27 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		{
 			/* now setup blit (writing 12 32bit words) */
 			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG, 6);
-			/* setup source clipping ref for blit (not used) (b0-15 = left, b16-31 = top) */
+			/* setup dest clipping ref for blit (not used) (b0-15 = left, b16-31 = top) */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* SourceOrg */
-			/* setup source size for blit */
+			/* setup dest clipping size for blit */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SourceHeightWidth */
+				(((list[i].dest_height + 1) << 16) | (list[i].dest_width + 1)); /* SourceHeightWidth */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 			/* setup destination location and size for blit */
 				(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((((list[i].dest_height) + 1) << 16) | ((list[i].dest_width) + 1)); /* DestHeightWidth */
+				(((list[i].dest_height + 1) << 16) | (list[i].dest_width + 1)); /* DestHeightWidth */
 			//fixme: findout scaling limits... (although the current cmd interface doesn't support them.)
-			//fixme: checkout dest bitmap borders for 'faults': correct scaling if needed...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((list[i].src_width << 20) / list[i].dest_width); /* HorInvScale (in 12.20 format) */
+				(((list[i].src_width + 1) << 20) / (list[i].dest_width + 1)); /* HorInvScale (in 12.20 format) */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((list[i].src_height << 20) / list[i].dest_height); /* VerInvScale (in 12.20 format) */
+				(((list[i].src_height + 1) << 20) / (list[i].dest_height + 1)); /* VerInvScale (in 12.20 format) */
 
 			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE, 4);
 			/* setup source size including needed slopspace */
 			//fixme: checkout constraints and update code...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				((((list[i].src_height) + 1) << 16) | ((list[i].src_width) + 1)); /* SourceHeightWidth */
+				(((list[i].src_height + 1) << 16) | (list[i].src_width + 1)); /* SourceHeightWidth */
 			/* setup source pitch (b0-15). Set 'format origin center' (b16-17) and
 			 * select 'format interpolator foh (bilinear filtering)' (b24). */
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
