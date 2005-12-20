@@ -836,9 +836,11 @@ BListView::Invoke(BMessage *message)
 	if (fListType == B_SINGLE_SELECTION_LIST)
 		clone.AddInt32("index", fFirstSelected);
 	else {
-		for (int32 i = fFirstSelected; i <= fLastSelected; i++) {
-			if (ItemAt(i)->IsSelected())
-				clone.AddInt32("index", i);
+		if (fFirstSelected >= 0) {
+			for (int32 i = fFirstSelected; i <= fLastSelected; i++) {
+				if (ItemAt(i)->IsSelected())
+					clone.AddInt32("index", i);
+			}
 		}
 	}
 
