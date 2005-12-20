@@ -1,10 +1,10 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #include <kernel.h>
 #include <vm.h>
@@ -28,7 +28,7 @@ vm_test(void)
 		area_id region;
 		addr_t region_addr;
 
-		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", (void **)&region_addr,
+		region = vm_create_anonymous_area(vm_kernel_address_space_id(), "test_region", (void **)&region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region < 0)
 			panic("vm_test 1: failed to create test region\n");
@@ -37,7 +37,7 @@ vm_test(void)
 		memset((void *)region_addr, 0, B_PAGE_SIZE * 16);
 
 		dprintf("memsetted the region\n");
-		if (vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
+		if (vm_delete_area(vm_kernel_address_space_id(), region) < 0)
 			panic("vm_test 1: error deleting test region\n");
 		dprintf("deleted the region\n");
 	}
@@ -50,7 +50,7 @@ vm_test(void)
 		char *ptr;
 		int i;
 
-		region = vm_map_physical_memory(vm_get_kernel_aspace_id(), "test_physical_region", (void **)&ptr,
+		region = vm_map_physical_memory(vm_kernel_address_space_id(), "test_physical_region", (void **)&ptr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0xb8000);
 		if (region < 0)
 			panic("vm_test 2: failed to create test region\n");
@@ -63,7 +63,7 @@ vm_test(void)
 		for(i=0; i<64; i++) {
 			ptr[i] = 'a';
 		}
-		if (vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
+		if (vm_delete_area(vm_kernel_address_space_id(), region) < 0)
 			panic("vm_test 2: error deleting test region\n");
 		dprintf("deleted the region\n");
 	}
@@ -74,12 +74,12 @@ vm_test(void)
 		addr_t va, pa;
 		addr_t va2;
 
-		vm_get_page_mapping(vm_get_kernel_aspace_id(), 0x80000000, &pa);
+		vm_get_page_mapping(vm_kernel_address_space_id(), 0x80000000, &pa);
 		vm_get_physical_page(pa, &va, PHYSICAL_PAGE_CAN_WAIT);
 		dprintf("pa 0x%lx va 0x%lx\n", pa, va);
 		dprintf("%d\n", memcmp((void *)0x80000000, (void *)va, B_PAGE_SIZE));
 
-		vm_get_page_mapping(vm_get_kernel_aspace_id(), 0x80001000, &pa);
+		vm_get_page_mapping(vm_kernel_address_space_id(), 0x80001000, &pa);
 		vm_get_physical_page(pa, &va2, PHYSICAL_PAGE_CAN_WAIT);
 		dprintf("pa 0x%lx va 0x%lx\n", pa, va2);
 		dprintf("%d\n", memcmp((void *)0x80001000, (void *)va2, B_PAGE_SIZE));
@@ -87,7 +87,7 @@ vm_test(void)
 		vm_put_physical_page(va);
 		vm_put_physical_page(va2);
 
-		vm_get_page_mapping(vm_get_kernel_aspace_id(), 0x80000000, &pa);
+		vm_get_page_mapping(vm_kernel_address_space_id(), 0x80000000, &pa);
 		vm_get_physical_page(pa, &va, PHYSICAL_PAGE_CAN_WAIT);
 		dprintf("pa 0x%lx va 0x%lx\n", pa, va);
 		dprintf("%d\n", memcmp((void *)0x80000000, (void *)va, B_PAGE_SIZE));
@@ -108,7 +108,7 @@ vm_test(void)
 			panic("vm_test 4: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
 
-		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "vid_mem2",
+		region2 = vm_clone_area(vm_kernel_address_space_id(), "vid_mem2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region2 < 0)
 			panic("vm_test 4: error cloning region 'vid_mem'\n");
@@ -120,7 +120,7 @@ vm_test(void)
 			panic("vm_test 4: regions are not identical\n");
 		else
 			dprintf("vm_test 4: comparison ok\n");
-		if (vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
+		if (vm_delete_area(vm_kernel_address_space_id(), region2) < 0)
 			panic("vm_test 4: error deleting cloned region\n");
 	}
 #endif
@@ -137,7 +137,7 @@ vm_test(void)
 			panic("vm_test 5: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
 
-		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "vid_mem3",
+		region2 = vm_clone_area(vm_kernel_address_space_id(), "vid_mem3",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA);
 		if (region2 < 0)
 			panic("vm_test 5: error cloning region 'vid_mem'\n");
@@ -150,7 +150,7 @@ vm_test(void)
 		else
 			dprintf("vm_test 5: comparison ok\n");
 
-		if (vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
+		if (vm_delete_area(vm_kernel_address_space_id(), region2) < 0)
 			panic("vm_test 5: error deleting cloned region\n");
 	}
 #endif
@@ -162,7 +162,7 @@ vm_test(void)
 		void *ptr;
 		int rc;
 
-		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", &region_addr,
+		region = vm_create_anonymous_area(vm_kernel_address_space_id(), "test_region", &region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region < 0)
 			panic("vm_test 6: error creating test region\n");
@@ -172,7 +172,7 @@ vm_test(void)
 
 		dprintf("memsetted the region\n");
 
-		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "test_region2",
+		region2 = vm_clone_area(vm_kernel_address_space_id(), "test_region2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 6: error cloning test region\n");
@@ -184,10 +184,10 @@ vm_test(void)
 		else
 			dprintf("vm_test 6: comparison ok\n");
 
-		if(vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
+		if(vm_delete_area(vm_kernel_address_space_id(), region) < 0)
 			panic("vm_test 6: error deleting test region\n");
 
-		if(vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
+		if(vm_delete_area(vm_kernel_address_space_id(), region2) < 0)
 			panic("vm_test 6: error deleting cloned region\n");
 	}
 #endif
@@ -201,18 +201,18 @@ vm_test(void)
 
 		fd = _kern_open("/boot/beos/system/kernel_" OBOS_ARCH, 0);
 
-		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
+		rid = vm_map_file(vm_kernel_address_space_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
 			B_PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
-		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
+		rid2 = vm_map_file(vm_kernel_address_space_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
 			B_PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
 		dprintf("diff %d\n", memcmp(ptr, ptr2, B_PAGE_SIZE));
 
 		dprintf("removing regions\n");
 
-		vm_delete_area(vm_get_kernel_aspace_id(), rid);
-		vm_delete_area(vm_get_kernel_aspace_id(), rid2);
+		vm_delete_area(vm_kernel_address_space_id(), rid);
+		vm_delete_area(vm_kernel_address_space_id(), rid2);
 
 		dprintf("regions deleted\n");
 
@@ -231,7 +231,7 @@ vm_test(void)
 
 		dprintf("vm_test 8: creating test region...\n");
 
-		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", &region_addr,
+		region = vm_create_anonymous_area(vm_kernel_address_space_id(), "test_region", &region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region < 0)
 			panic("vm_test 8: error creating test region\n");
@@ -243,7 +243,7 @@ vm_test(void)
 
 		dprintf("vm_test 8: cloning test region with PRIVATE_MAP\n");
 
-		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "test_region2",
+		region2 = vm_clone_area(vm_kernel_address_space_id(), "test_region2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 8: error cloning test region\n");
@@ -296,10 +296,10 @@ vm_test(void)
 		else
 			panic("vm_test 8: comparison shows not private mapping\n");
 
-		if(vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
+		if(vm_delete_area(vm_kernel_address_space_id(), region) < 0)
 			panic("vm_test 8: error deleting test region\n");
 
-		if(vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
+		if(vm_delete_area(vm_kernel_address_space_id(), region2) < 0)
 			panic("vm_test 8: error deleting cloned region\n");
 	}
 #endif
@@ -312,10 +312,10 @@ vm_test(void)
 
 		dprintf("vm_test 9: mapping /boot/kernel twice\n");
 
-		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
+		rid = vm_map_file(vm_kernel_address_space_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
 			B_PAGE_SIZE*4, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
-		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
+		rid2 = vm_map_file(vm_kernel_address_space_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
 			B_PAGE_SIZE*4, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_PRIVATE_MAP, "/boot/kernel", 0);
 
 		err = memcmp(ptr, ptr2, B_PAGE_SIZE);
@@ -348,8 +348,8 @@ vm_test(void)
 
 		dprintf("vm_test 9: removing regions\n");
 
-		vm_delete_area(vm_get_kernel_aspace_id(), rid);
-		vm_delete_area(vm_get_kernel_aspace_id(), rid2);
+		vm_delete_area(vm_kernel_address_space_id(), rid);
+		vm_delete_area(vm_kernel_address_space_id(), rid2);
 
 		dprintf("vm_test 9: regions deleted\n");
 
@@ -371,7 +371,7 @@ vm_test(void)
 		ta[2048] = 0xabcd;
 		ta[3072] = 0xefef;
 		
-		b = vm_copy_area(vm_get_kernel_aspace_id(), "copy of source", &address, B_ANY_KERNEL_ADDRESS,
+		b = vm_copy_area(vm_kernel_address_space_id(), "copy of source", &address, B_ANY_KERNEL_ADDRESS,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, a);
 		tb = (uint32 *)address;
 		if (tb[0] != 0x1234 || tb[1024] != 0x5678 || tb[2048] != 0xabcd || tb[3072] != 0xefef)
@@ -387,8 +387,8 @@ vm_test(void)
 
 		dprintf("vm_test 10: remove areas\n");
 
-		vm_delete_area(vm_get_kernel_aspace_id(), a);
-		vm_delete_area(vm_get_kernel_aspace_id(), b);
+		vm_delete_area(vm_kernel_address_space_id(), a);
+		vm_delete_area(vm_kernel_address_space_id(), b);
 	}
 	dprintf("vm_test 10: passed\n");
 #endif
@@ -417,7 +417,7 @@ vm_test(void)
 
 		dprintf("vm_test 11: remove areas\n");
 
-		vm_delete_area(vm_get_kernel_aspace_id(), a);
+		vm_delete_area(vm_kernel_address_space_id(), a);
 	}
 	dprintf("vm_test 11: passed\n");
 #endif

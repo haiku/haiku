@@ -833,7 +833,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 			recursive_lock_destroy(&map->lock);
 			return B_NO_MEMORY;
 		}
-		vm_get_page_mapping(vm_get_kernel_aspace_id(),
+		vm_get_page_mapping(vm_kernel_address_space_id(),
 			(addr_t)map->arch_data->pgdir_virt, (addr_t *)&map->arch_data->pgdir_phys);
 	} else {
 		// kernel
@@ -995,7 +995,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 	TRACE(("vm_translation_map_init_post_area: creating iospace\n"));
 	temp = (void *)IOSPACE_BASE;
-	vm_create_null_area(vm_get_kernel_aspace_id(), "iospace", &temp,
+	vm_create_null_area(vm_kernel_address_space_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
 	TRACE(("vm_translation_map_init_post_area: done\n"));

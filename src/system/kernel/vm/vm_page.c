@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -191,7 +191,7 @@ vm_page_write_modified(vm_cache *cache)
 		for (area = page->cache->ref->areas; area; area = area->cache_next) {
 			if (page->offset >= area->cache_offset
 				&& page->offset < area->cache_offset + area->size) {
-				vm_translation_map *map = &area->aspace->translation_map;
+				vm_translation_map *map = &area->address_space->translation_map;
 				map->ops->lock(map);
 
 				if (!gotPage) {

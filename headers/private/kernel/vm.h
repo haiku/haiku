@@ -25,22 +25,23 @@ status_t vm_init(kernel_args *args);
 status_t vm_init_post_sem(struct kernel_args *args);
 status_t vm_init_post_thread(struct kernel_args *args);
 status_t vm_init_post_modules(struct kernel_args *args);
-status_t vm_aspace_init(void);
-status_t vm_aspace_init_post_sem(void);
+status_t vm_address_space_init(void);
+status_t vm_address_space_init_post_sem(void);
 void vm_free_kernel_args(kernel_args *args);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 
-void vm_delete_aspace(vm_address_space *aspace);
-status_t vm_create_aspace(const char *name, team_id id, addr_t base, addr_t size,
+void vm_delete_address_space(vm_address_space *aspace);
+status_t vm_create_address_space(team_id id, addr_t base, addr_t size,
 			bool kernel, vm_address_space **_aspace);
 status_t vm_delete_areas(struct vm_address_space *aspace);
-vm_address_space *vm_get_kernel_aspace(void);
-aspace_id vm_get_kernel_aspace_id(void);
-vm_address_space *vm_get_current_user_aspace(void);
-aspace_id vm_get_current_user_aspace_id(void);
-vm_address_space *vm_get_aspace_by_id(aspace_id aid);
-void vm_put_aspace(vm_address_space *aspace);
-#define vm_aspace_swap(aspace) arch_vm_aspace_swap(aspace)
+vm_address_space *vm_get_kernel_address_space(void);
+vm_address_space *vm_kernel_address_space(void);
+team_id vm_kernel_address_space_id(void);
+vm_address_space *vm_get_current_user_address_space(void);
+team_id vm_current_user_address_space_id(void);
+vm_address_space *vm_get_address_space_by_id(team_id aid);
+void vm_put_address_space(vm_address_space *aspace);
+#define vm_swap_address_space(aspace) arch_vm_aspace_swap(aspace)
 
 // private kernel only extension (should be moved somewhere else):
 struct team;
@@ -48,29 +49,29 @@ area_id create_area_etc(struct team *team, const char *name, void **address,
 			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection);
 status_t delete_area_etc(struct team *team, area_id area);
 
-status_t vm_unreserve_address_range(aspace_id aid, void *address, addr_t size);
-status_t vm_reserve_address_range(aspace_id aid, void **_address, 
+status_t vm_unreserve_address_range(team_id aid, void *address, addr_t size);
+status_t vm_reserve_address_range(team_id aid, void **_address, 
 			uint32 addressSpec, addr_t size, uint32 flags);
-area_id vm_create_anonymous_area(aspace_id aid, const char *name, void **address, 
+area_id vm_create_anonymous_area(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection);
-area_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, 
+area_id vm_map_physical_memory(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
-area_id vm_map_file(aspace_id aid, const char *name, void **address, 
+area_id vm_map_file(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping, 
 			const char *path, off_t offset);
-area_id vm_create_null_area(aspace_id aid, const char *name, void **address, 
+area_id vm_create_null_area(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, addr_t size);
-area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, 
+area_id vm_copy_area(team_id addressSpaceID, const char *name, void **_address, 
 			uint32 addressSpec, uint32 protection, area_id sourceID);
-area_id vm_clone_area(aspace_id aid, const char *name, void **address, 
+area_id vm_clone_area(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, uint32 protection, uint32 mapping, 
 			area_id sourceArea);
-status_t vm_delete_area(aspace_id aid, area_id id);
+status_t vm_delete_area(team_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
 
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 
-status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
+status_t vm_get_page_mapping(team_id aid, addr_t vaddr, addr_t *paddr);
 status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags);
 status_t vm_put_physical_page(addr_t vaddr);
 

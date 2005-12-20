@@ -105,9 +105,8 @@ _dump_team_info(struct team *team)
 	kprintf("state:       %d\n", team->state);
 	kprintf("pending_signals: 0x%x\n", team->pending_signals);
 	kprintf("io_context:  %p\n", team->io_context);
-	if (team->aspace)
-		kprintf("aspace:      %p (id = 0x%lx)\n", team->aspace, team->aspace->id);
-	kprintf("kaspace:     %p\n", team->kaspace);
+	if (team->address_space)
+		kprintf("address_space: %p (id = 0x%lx)\n", team->address_space, team->address_space->id);
 	kprintf("main_thread: %p\n", team->main_thread);
 	kprintf("thread_list: %p\n", team->thread_list);
 }
@@ -661,8 +660,7 @@ team_get_address_space(team_id id, vm_address_space **_addressSpace)
 	if (id == 1) {
 		// we're the kernel team, so we don't have to go through all
 		// the hassle (locking and hash lookup)
-		atomic_add(&kernel_team->kaspace->ref_count, 1);
-		*_addressSpace = kernel_team->kaspace;
+		*_addressSpace = vm_get_kernel_address_space();
 		return B_OK;
 	}
 
@@ -671,8 +669,8 @@ team_get_address_space(team_id id, vm_address_space **_addressSpace)
 
 	team = team_get_team_struct_locked(id);
 	if (team != NULL) {
-		atomic_add(&team->aspace->ref_count, 1);
-		*_addressSpace = team->aspace;
+		atomic_add(&team->address_space->ref_count, 1);
+		*_addressSpace = team->address_space;
 		status = B_OK;
 	} else
 		status = B_BAD_VALUE;
@@ -696,9 +694,7 @@ create_team_struct(const char *name, bool kernel)
 	strlcpy(team->name, name, B_OS_NAME_LENGTH);
 	team->num_threads = 0;
 	team->io_context = NULL;
-	team->aspace = NULL;
-	team->kaspace = vm_get_kernel_aspace();
-	vm_put_aspace(team->kaspace);
+	team->address_space = NULL;
 	team->thread_list = NULL;
 	team->main_thread = NULL;
 	team->loading_info = NULL;
@@ -885,7 +881,7 @@ team_delete_team(struct team *team)
 
 	// free team resources
 
-	vm_delete_aspace(team->aspace);
+	vm_delete_address_space(team->address_space);
 	delete_owned_ports(teamID);
 	sem_delete_owned_sems(teamID);
 	remove_images(team);
@@ -1149,7 +1145,8 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const 
 	}
 
 	// create an address space for this team
-	status = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
+	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
+		&team->address_space);
 	if (status < B_OK)
 		goto err3;
 
@@ -1211,7 +1208,7 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const 
 	return thread;
 
 err4:
-	vm_put_aspace(team->aspace);
+	vm_put_address_space(team->address_space);
 err3:
 	vfs_free_io_context(team->io_context);
 err2:
@@ -1306,7 +1303,7 @@ exec_team(const char *path, int32 argCount, char * const *args,
 
 	user_debug_prepare_for_exec();
 
-	vm_delete_areas(team->aspace);
+	vm_delete_areas(team->address_space);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
@@ -1422,7 +1419,8 @@ fork_team(void)
 	}
 
 	// create an address space for this team
-	status = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
+	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
+		&team->address_space);
 	if (status < B_OK)
 		goto err3;
 
@@ -1433,7 +1431,7 @@ fork_team(void)
 	cookie = 0;
 	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
 		void *address;
-		area_id area = vm_copy_area(team->aspace->id, info.name, &address, B_CLONE_ADDRESS,
+		area_id area = vm_copy_area(team->address_space->id, info.name, &address, B_CLONE_ADDRESS,
 							info.protection, info.area);
 		if (area < B_OK) {
 			status = area;
@@ -1469,7 +1467,7 @@ fork_team(void)
 	return threadID;
 
 err4:
-	vm_delete_aspace(team->aspace);
+	vm_delete_address_space(team->address_space);
 err3:
 	vfs_free_io_context(team->io_context);
 err2:

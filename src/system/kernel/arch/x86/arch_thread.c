@@ -115,23 +115,23 @@ i386_get_user_iframe(void)
 inline void *
 x86_next_page_directory(struct thread *from, struct thread *to)
 {
-	if (from->team->aspace != NULL && to->team->aspace != NULL) {
-		// they are both uspace threads
+	if (from->team->address_space != NULL && to->team->address_space != NULL) {
+		// they are both user space threads
 		if (from->team == to->team) {
 			// dont change the pgdir, same address space
 			return NULL;
 		}
 		// switching to a new address space
-		return i386_translation_map_get_pgdir(&to->team->aspace->translation_map);
-	} else if (from->team->aspace == NULL && to->team->aspace == NULL) {
-		// they must both be kspace threads
+		return i386_translation_map_get_pgdir(&to->team->address_space->translation_map);
+	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
+		// they must both be kernel space threads
 		return NULL;
-	} else if (to->team->aspace == NULL) {
-		// the one we're switching to is kspace
-		return i386_translation_map_get_pgdir(&to->team->kaspace->translation_map);
+	} else if (to->team->address_space == NULL) {
+		// the one we're switching to is kernel space
+		return i386_translation_map_get_pgdir(&vm_kernel_address_space()->translation_map);
 	}
 	
-	return i386_translation_map_get_pgdir(&to->team->aspace->translation_map);
+	return i386_translation_map_get_pgdir(&to->team->address_space->translation_map);
 }
 
 
@@ -257,7 +257,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 
 	dprintf("arch_thread_context_switch: cpu %d 0x%x -> 0x%x, aspace 0x%x -> 0x%x, old stack = 0x%x:0x%x, stack = 0x%x:0x%x\n",
 		smp_get_current_cpu(), t_from->id, t_to->id,
-		t_from->team->aspace, t_to->team->aspace,
+		t_from->team->address_space, t_to->team->address_space,
 		t_from->arch_info.current_stack.ss, t_from->arch_info.current_stack.esp,
 		t_to->arch_info.current_stack.ss, t_to->arch_info.current_stack.esp);
 #endif
@@ -279,7 +279,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 
 	// reinit debugging; necessary, if the thread was preempted after
 	// initializing debugging before returning to userland
-	if (to->team->aspace != NULL)
+	if (to->team->address_space != NULL)
 		i386_reinit_user_debug_after_context_switch(to);
 
 	i386_fsave_swap(from->arch_info.fpu_state, to->arch_info.fpu_state);

@@ -37,17 +37,17 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 
 //	dprintf("scan_pages called on aspace 0x%x, id 0x%x, free_target %d\n", aspace, aspace->id, free_target);
 
-	acquire_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0, 0);
+	acquire_sem_etc(aspace->sem, READ_COUNT, 0, 0);
 
-	firstArea = aspace->virtual_map.areas;
+	firstArea = aspace->areas;
 	while (firstArea && (firstArea->base + (firstArea->size - 1)) < aspace->scan_va)
-		firstArea = firstArea->aspace_next;
+		firstArea = firstArea->address_space_next;
 
 	if (!firstArea)
-		firstArea = aspace->virtual_map.areas;
+		firstArea = aspace->areas;
 
 	if (!firstArea) {
-		release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
+		release_sem_etc(aspace->sem, READ_COUNT, 0);
 		return;
 	}
 
@@ -55,7 +55,7 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 	for (;;) {
 		// ignore reserved ranges
 		while (area != NULL && area->id == RESERVED_AREA_ID)
-			area = area->aspace_next;
+			area = area->address_space_next;
 		if (area == NULL)
 			break;
 
@@ -120,7 +120,7 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 		}
 		mutex_unlock(&area->cache_ref->lock);
 		// move to the next area, wrapping around and stopping if we get back to the first area
-		area = area->aspace_next ? area->aspace_next : aspace->virtual_map.areas;
+		area = area->address_space_next ? area->address_space_next : aspace->areas;
 		if (area == firstArea)
 			break;
 
@@ -128,8 +128,8 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 			break;
 	}
 
-	aspace->scan_va = area ? (firstArea->base + firstArea->size) : aspace->virtual_map.base;
-	release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
+	aspace->scan_va = area ? (firstArea->base + firstArea->size) : aspace->base;
+	release_sem_etc(aspace->sem, READ_COUNT, 0);
 
 //	dprintf("exiting scan_pages\n");
 }
@@ -199,7 +199,7 @@ page_daemon(void *unused)
 			// otherwise the iterator becomes out of date.
 			old_aspace = aspace;
 			aspace = vm_aspace_walk_next(&i);
-			vm_put_aspace(old_aspace);
+			vm_put_address_space(old_aspace);
 		}
 	}
 }

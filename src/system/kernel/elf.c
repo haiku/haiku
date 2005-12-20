@@ -1008,7 +1008,7 @@ symbol_found:
 
 
 status_t
-elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
+elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
@@ -1018,7 +1018,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 	int i;
 	ssize_t len;
 
-	TRACE(("elf_load: entry path '%s', team %p\n", path, p));
+	TRACE(("elf_load: entry path '%s', team %p\n", path, team));
 
 	fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
@@ -1095,7 +1095,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 
 			sprintf(regionName, "%s_seg%drw", baseName, i);
 
-			id = vm_map_file(p->aspace->id, regionName,
+			id = vm_map_file(team->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
 				fileUpperBound,
@@ -1128,7 +1128,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				sprintf(regionName, "%s_bss%d", baseName, i);
 
 				regionAddress += fileUpperBound;
-				id = create_area_etc(p, regionName, (void **)&regionAddress,
+				id = create_area_etc(team, regionName, (void **)&regionAddress,
 					B_EXACT_ADDRESS, bss_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
@@ -1142,7 +1142,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			 */
 			sprintf(regionName, "%s_seg%dro", baseName, i);
 
-			id = vm_map_file(p->aspace->id, regionName,
+			id = vm_map_file(team->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
@@ -1279,7 +1279,7 @@ load_kernel_add_on(const char *path)
 	}
 
 	// reserve that space and allocate the areas from that one
-	if (vm_reserve_address_range(vm_get_kernel_aspace_id(), &reservedAddress,
+	if (vm_reserve_address_range(vm_kernel_address_space_id(), &reservedAddress,
 			B_ANY_KERNEL_ADDRESS, reservedSize, 0) < B_OK)
 		goto error3;
 
@@ -1394,7 +1394,7 @@ error5:
 	delete_area(image->data_region.id);
 	delete_area(image->text_region.id);
 error4:
-	vm_unreserve_address_range(vm_get_kernel_aspace_id(), reservedAddress, reservedSize);
+	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress, reservedSize);
 error3:
 	free(pheaders);
 error2:

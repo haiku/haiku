@@ -918,7 +918,7 @@ thread_exit(void)
 	cancel_timer(&thread->alarm);
 
 	// delete the user stack area first, we won't need it anymore
-	if (team->aspace != NULL && thread->user_stack_area >= 0) {
+	if (team->address_space != NULL && thread->user_stack_area >= 0) {
 		area_id area = thread->user_stack_area;
 		thread->user_stack_area = -1;
 		delete_area_etc(team, area);
@@ -977,7 +977,7 @@ thread_exit(void)
 		}
 		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
-		vm_aspace_swap(team_get_kernel_team()->kaspace);
+		vm_swap_address_space(vm_kernel_address_space());
 		restore_interrupts(state);
 
 		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", thread->id));

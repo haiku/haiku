@@ -92,8 +92,8 @@ BlockAddressPool::BlockAddressPool()
 
 	fBase = 0xa0000000;
 		// directly after the I/O space area
-	fArea = vm_create_null_area(vm_get_kernel_aspace_id(), "block cache", (void **)&fBase,
-		B_BASE_ADDRESS, kBlockAddressSize);
+	fArea = vm_create_null_area(vm_kernel_address_space_id(), "block cache",
+		(void **)&fBase, B_BASE_ADDRESS, kBlockAddressSize);
 
 	fFirstFree = fBase;
 	fNextFree = -1;
@@ -216,14 +216,12 @@ block_range::Delete(block_cache *cache, block_range *range)
 
 	// unmap the memory
 
-	vm_address_space *addressSpace = vm_get_kernel_aspace();
+	vm_address_space *addressSpace = vm_kernel_address_space();
 	vm_translation_map *map = &addressSpace->translation_map;
 
 	map->ops->lock(map);
 	map->ops->unmap(map, range->base, range->base + kBlockRangeSize - 1);
 	map->ops->unlock(map);
-
-	vm_put_aspace(addressSpace);
 
 	sBlockAddressPool.Put(range->base);
 
@@ -355,7 +353,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 
 		// map the memory
 
-		vm_address_space *addressSpace = vm_get_kernel_aspace();
+		vm_address_space *addressSpace = vm_kernel_address_space();
 		vm_translation_map *map = &addressSpace->translation_map;
 		map->ops->lock(map);
 
@@ -366,7 +364,6 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 		}
 
 		map->ops->unlock(map);
-		vm_put_aspace(addressSpace);
 
 		chunks[chunk].mapped = true;
 	}

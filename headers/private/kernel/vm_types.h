@@ -15,8 +15,6 @@
 #include <arch/vm_translation_map.h>
 
 
-typedef int32 aspace_id;
-
 // vm page
 typedef struct vm_page {
 	struct vm_page		*queue_prev;
@@ -90,24 +88,12 @@ typedef struct vm_area {
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;
 
-	struct vm_address_space *aspace;
-	struct vm_area		*aspace_next;
-	struct vm_virtual_map *map;
+	struct vm_address_space *address_space;
+	struct vm_area		*address_space_next;
 	struct vm_area		*cache_next;
 	struct vm_area		*cache_prev;
 	struct vm_area		*hash_next;
 } vm_area;
-
-// virtual map (1 per address space)
-typedef struct vm_virtual_map {
-	vm_area				*areas;
-	vm_area				*area_hint;
-	int					change_count;
-	sem_id				sem;
-	struct vm_address_space *aspace;
-	addr_t				base;
-	addr_t				size;
-} vm_virtual_map;
 
 enum {
 	VM_ASPACE_STATE_NORMAL = 0,
@@ -116,13 +102,17 @@ enum {
 
 // address space
 typedef struct vm_address_space {
-	vm_virtual_map		virtual_map;
+	vm_area				*areas;
+	vm_area				*area_hint;
+	sem_id				sem;
+	addr_t				base;
+	addr_t				size;
+	int32				change_count;
 	vm_translation_map	translation_map;
-	char				*name;
-	aspace_id			id;
+	team_id				id;
 	int32				ref_count;
 	int32				fault_count;
-	int					state;
+	int32				state;
 	addr_t				scan_va;
 	addr_t				working_set_size;
 	addr_t				max_working_set;

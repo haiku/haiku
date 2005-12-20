@@ -111,8 +111,7 @@ struct team {
 		bigtime_t	kernel_time;
 		bigtime_t	user_time;
 	} dead_children;
-	struct vm_address_space *aspace;
-	struct vm_address_space *kaspace;
+	struct vm_address_space *address_space;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
 	struct team_loading_info *loading_info;
