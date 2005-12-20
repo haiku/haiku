@@ -1,0 +1,267 @@
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+ *
+ * A class implementing the AGG "pixel format" interface which maintains
+ * a PatternHandler and pointers to blending functions implementing the
+ * different BeOS "drawing_modes".
+ *
+ */
+
+#include "PixelFormat.h"
+
+#include <stdio.h>
+
+#include "DrawingModeAdd.h"
+#include "DrawingModeAlphaCC.h"
+#include "DrawingModeAlphaCO.h"
+#include "DrawingModeAlphaPC.h"
+#include "DrawingModeAlphaPO.h"
+#include "DrawingModeBlend.h"
+#include "DrawingModeCopy.h"
+#include "DrawingModeCopySolid.h"
+#include "DrawingModeErase.h"
+#include "DrawingModeInvert.h"
+#include "DrawingModeMin.h"
+#include "DrawingModeMax.h"
+#include "DrawingModeOver.h"
+#include "DrawingModeOverSolid.h"
+#include "DrawingModeSelect.h"
+#include "DrawingModeSubtract.h"
+
+#include "PatternHandler.h"
+
+// blend_pixel_empty
+void
+blend_pixel_empty(int x, int y, const color_type& c, uint8 cover,
+				  agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_pixel_empty()\n");
+}
+
+// blend_hline_empty
+void
+blend_hline_empty(int x, int y, unsigned len,
+				  const color_type& c, uint8 cover,
+				  agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_hline_empty()\n");
+}
+
+// blend_vline_empty
+void
+blend_vline_empty(int x, int y, unsigned len,
+				  const color_type& c, uint8 cover,
+				  agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_vline_empty()\n");
+}
+
+// blend_solid_hspan_empty
+void
+blend_solid_hspan_empty(int x, int y, unsigned len,
+						const color_type& c, const uint8* covers,
+						agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_solid_hspan_empty()\n");
+}
+
+// blend_solid_vspan_empty
+void
+blend_solid_vspan_empty(int x, int y,
+						unsigned len, const color_type& c,
+						const uint8* covers,
+						agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_solid_vspan_empty()\n");
+}
+
+// blend_color_hspan_empty
+void
+blend_color_hspan_empty(int x, int y, unsigned len,
+						const color_type* colors,
+						const uint8* covers, uint8 cover,
+						agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_color_hspan_empty()\n");
+}
+
+// blend_color_vspan_empty
+void
+blend_color_vspan_empty(int x, int y, unsigned len,
+						const color_type* colors,
+						const uint8* covers, uint8 cover,
+						agg_buffer* buffer, const PatternHandler* pattern)
+{
+	printf("blend_color_vspan_empty()\n");
+}
+
+// #pragma mark -
+
+// constructor
+PixelFormat::PixelFormat(agg::rendering_buffer& rb,
+						 const PatternHandler* handler)
+	: fBuffer(&rb),
+	  fPatternHandler(handler),
+
+	  fBlendPixel(blend_pixel_empty),
+	  fBlendHLine(blend_hline_empty),
+	  fBlendVLine(blend_vline_empty),
+	  fBlendSolidHSpan(blend_solid_hspan_empty),
+	  fBlendSolidVSpan(blend_solid_vspan_empty),
+	  fBlendColorHSpan(blend_color_hspan_empty),
+	  fBlendColorVSpan(blend_color_vspan_empty)
+{
+}
+
+// destructor
+PixelFormat::~PixelFormat()
+{
+}
+
+// SetDrawingMode
+void
+PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
+							alpha_function alphaFncMode)
+{
+	switch (mode) {
+		// these drawing modes discard source pixels
+		// which have the current low color
+		case B_OP_OVER:
+			if (fPatternHandler->IsSolid()) {
+				fBlendPixel = blend_pixel_over;
+				fBlendHLine = blend_hline_over;
+				fBlendSolidHSpan = blend_solid_hspan_over;
+				fBlendSolidVSpan = blend_solid_vspan_over;
+				fBlendColorHSpan = blend_color_hspan_over;
+			} else {
+				fBlendPixel = blend_pixel_over_solid;
+				fBlendHLine = blend_hline_over_solid;
+				fBlendSolidHSpan = blend_solid_hspan_over_solid;
+				fBlendSolidVSpan = blend_solid_vspan_over_solid;
+				fBlendColorHSpan = blend_color_hspan_over_solid;
+			}
+			break;
+		case B_OP_ERASE:
+			fBlendPixel = blend_pixel_erase;
+			fBlendHLine = blend_hline_erase;
+			fBlendSolidHSpan = blend_solid_hspan_erase;
+			fBlendSolidVSpan = blend_solid_vspan_erase;
+			fBlendColorHSpan = blend_color_hspan_erase;
+			break;
+		case B_OP_INVERT:
+			fBlendPixel = blend_pixel_invert;
+			fBlendHLine = blend_hline_invert;
+			fBlendSolidHSpan = blend_solid_hspan_invert;
+			fBlendSolidVSpan = blend_solid_vspan_invert;
+			fBlendColorHSpan = blend_color_hspan_invert;
+			break;
+		case B_OP_SELECT:
+			fBlendPixel = blend_pixel_select;
+			fBlendHLine = blend_hline_select;
+			fBlendSolidHSpan = blend_solid_hspan_select;
+			fBlendSolidVSpan = blend_solid_vspan_select;
+			fBlendColorHSpan = blend_color_hspan_select;
+			break;
+
+		// in these drawing modes, the current high
+		// and low color are treated equally
+		case B_OP_COPY:
+			if (fPatternHandler->IsSolid()) {
+				fBlendPixel = blend_pixel_copy_solid;
+				fBlendHLine = blend_hline_copy_solid;
+				fBlendSolidHSpan = blend_solid_hspan_copy_solid;
+				fBlendSolidVSpan = blend_solid_vspan_copy_solid;
+				fBlendColorHSpan = blend_color_hspan_copy_solid;
+			} else {
+				fBlendPixel = blend_pixel_copy;
+				fBlendHLine = blend_hline_copy;
+				fBlendSolidHSpan = blend_solid_hspan_copy;
+				fBlendSolidVSpan = blend_solid_vspan_copy;
+				fBlendColorHSpan = blend_color_hspan_copy;
+			}
+			break;
+		case B_OP_ADD:
+			fBlendPixel = blend_pixel_add;
+			fBlendHLine = blend_hline_add;
+			fBlendSolidHSpan = blend_solid_hspan_add;
+			fBlendSolidVSpan = blend_solid_vspan_add;
+			fBlendColorHSpan = blend_color_hspan_add;
+			break;
+		case B_OP_SUBTRACT:
+			fBlendPixel = blend_pixel_subtract;
+			fBlendHLine = blend_hline_subtract;
+			fBlendSolidHSpan = blend_solid_hspan_subtract;
+			fBlendSolidVSpan = blend_solid_vspan_subtract;
+			fBlendColorHSpan = blend_color_hspan_subtract;
+			break;
+		case B_OP_BLEND:
+			fBlendPixel = blend_pixel_blend;
+			fBlendHLine = blend_hline_blend;
+			fBlendSolidHSpan = blend_solid_hspan_blend;
+			fBlendSolidVSpan = blend_solid_vspan_blend;
+			fBlendColorHSpan = blend_color_hspan_blend;
+			break;
+		case B_OP_MIN:
+			fBlendPixel = blend_pixel_min;
+			fBlendHLine = blend_hline_min;
+			fBlendSolidHSpan = blend_solid_hspan_min;
+			fBlendSolidVSpan = blend_solid_vspan_min;
+			fBlendColorHSpan = blend_color_hspan_min;
+			break;
+		case B_OP_MAX:
+			fBlendPixel = blend_pixel_max;
+			fBlendHLine = blend_hline_max;
+			fBlendSolidHSpan = blend_solid_hspan_max;
+			fBlendSolidVSpan = blend_solid_vspan_max;
+			fBlendColorHSpan = blend_color_hspan_max;
+			break;
+
+		// this drawing mode is the only one considering
+		// alpha at all. In B_CONSTANT_ALPHA, the alpha
+		// value from the current high color is used for
+		// all computations. In B_PIXEL_ALPHA, the alpha
+		// is considered at every source pixel.
+		// To simplify the implementation, four separate
+		// DrawingMode classes are used to cover the
+		// four possible combinations of alpha enabled drawing.
+		case B_OP_ALPHA:
+			if (alphaSrcMode == B_CONSTANT_ALPHA) {
+				if (alphaFncMode == B_ALPHA_OVERLAY) {
+					fBlendPixel = blend_pixel_alpha_co;
+					fBlendHLine = blend_hline_alpha_co;
+					fBlendSolidHSpan = blend_solid_hspan_alpha_co;
+					fBlendSolidVSpan = blend_solid_vspan_alpha_co;
+					fBlendColorHSpan = blend_color_hspan_alpha_co;
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
+					fBlendPixel = blend_pixel_alpha_cc;
+					fBlendHLine = blend_hline_alpha_cc;
+					fBlendSolidHSpan = blend_solid_hspan_alpha_cc;
+					fBlendSolidVSpan = blend_solid_vspan_alpha_cc;
+					fBlendColorHSpan = blend_color_hspan_alpha_cc;
+				}
+			} else if (alphaSrcMode == B_PIXEL_ALPHA){
+				if (alphaFncMode == B_ALPHA_OVERLAY) {
+					fBlendPixel = blend_pixel_alpha_po;
+					fBlendHLine = blend_hline_alpha_po;
+					fBlendSolidHSpan = blend_solid_hspan_alpha_po;
+					fBlendSolidVSpan = blend_solid_vspan_alpha_po;
+					fBlendColorHSpan = blend_color_hspan_alpha_po;
+				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
+					fBlendPixel = blend_pixel_alpha_pc;
+					fBlendHLine = blend_hline_alpha_pc;
+					fBlendSolidHSpan = blend_solid_hspan_alpha_pc;
+					fBlendSolidVSpan = blend_solid_vspan_alpha_pc;
+					fBlendColorHSpan = blend_color_hspan_alpha_pc;
+				}
+			}
+			break;
+
+		default:
+fprintf(stderr, "PixelFormat::SetDrawingMode() - drawing_mode not implemented\n");
+//			return fDrawingModeBGRA32Copy;
+			break;
+	}
+}
