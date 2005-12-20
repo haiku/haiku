@@ -12,6 +12,7 @@
 #include <elf.h>
 #include <vfs.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <thread.h>
 #include <team.h>
 #include <debug.h>

@@ -6,10 +6,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <kernel.h>
+
 #include <vm.h>
-#include <debug.h>
-#include <arch/cpu.h>
+#include <vm_address_space.h>
 
 #include <KernelExport.h>
 

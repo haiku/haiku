@@ -9,7 +9,8 @@
 #include <KernelExport.h>
 
 #include <util/AutoLock.h>
-#include <vm.h>
+//#include <vm.h>
+#include <vm_address_space.h>
 #include <vm_page.h>
 
 #include <string.h>

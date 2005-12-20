@@ -11,7 +11,7 @@
 #include <Drivers.h>
 #include <ISA.h>
 
-#include <vm.h>
+#include <vm_address_space.h>
 #include <console.h>
 
 #include <string.h>

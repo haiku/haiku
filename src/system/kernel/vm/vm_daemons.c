@@ -7,15 +7,14 @@
  */
 
 
-#include <kernel.h>
-#include <thread.h>
-#include <debug.h>
 #include <OS.h>
-#include <arch/cpu.h>
+
+#include <thread.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
+#include <vm_address_space.h>
 
 
 bool trimming_cycle;
@@ -153,8 +152,8 @@ page_daemon(void *unused)
 		snooze(PAGE_DAEMON_INTERVAL);
 
 		// scan through all of the address spaces
-		vm_aspace_walk_start(&i);
-		aspace = vm_aspace_walk_next(&i);
+		vm_address_space_walk_start(&i);
+		aspace = vm_address_space_walk_next(&i);
 		while (aspace) {
 			mapped_size = aspace->translation_map.ops->get_mapped_size(&aspace->translation_map);
 
@@ -198,7 +197,7 @@ page_daemon(void *unused)
 			// must hold a ref to the old aspace while we grab the next one,
 			// otherwise the iterator becomes out of date.
 			old_aspace = aspace;
-			aspace = vm_aspace_walk_next(&i);
+			aspace = vm_address_space_walk_next(&i);
 			vm_put_address_space(old_aspace);
 		}
 	}

@@ -11,6 +11,7 @@
 #include <KernelExport.h>
 
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
@@ -2738,7 +2739,7 @@ vm_area_lookup(vm_address_space *addressSpace, addr_t address)
 
 
 status_t
-vm_get_physical_page(addr_t paddr, addr_t *_vaddr, int flags)
+vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
 {
 	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
 }

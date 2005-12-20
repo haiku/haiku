@@ -14,7 +14,7 @@
 #include <kernel.h>
 #include <debug.h>
 #include <int.h>
-#include <vm.h>
+#include <vm_address_space.h>
 #include <tls.h>
 
 #include <string.h>

@@ -10,19 +10,20 @@
 
 #include <OS.h>
 
-#include <thread.h>
-#include <team.h>
-#include <int.h>
-#include <smp.h>
 #include <cpu.h>
-#include <arch/vm.h>
+#include <int.h>
 #include <kimage.h>
-#include <ksignal.h>
 #include <kscheduler.h>
+#include <ksignal.h>
+#include <smp.h>
 #include <syscalls.h>
+#include <team.h>
+#include <thread.h>
 #include <tls.h>
-#include <vfs.h>
 #include <user_runtime.h>
+#include <vfs.h>
+#include <vm_address_space.h>
+
 #include <boot/kernel_args.h>
 #include <util/khash.h>
 

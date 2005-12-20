@@ -10,23 +10,24 @@
 
 #include <OS.h>
 
-#include <team.h>
+#include <defines.h>
+#include <elf.h>
+#include <file_cache.h>
 #include <int.h>
-#include <util/khash.h>
-#include <port.h>
-#include <sem.h>
-#include <user_runtime.h>
+#include <kernel.h>
 #include <kimage.h>
 #include <kscheduler.h>
-#include <elf.h>
-#include <syscalls.h>
+#include <port.h>
+#include <sem.h>
 #include <syscall_process_info.h>
+#include <syscalls.h>
+#include <team.h>
 #include <tls.h>
-#include <defines.h>
-#include <kernel.h>
-#include <vm.h>
+#include <user_runtime.h>
 #include <vfs.h>
-#include <file_cache.h>
+#include <vm.h>
+#include <vm_address_space.h>
+#include <util/khash.h>
 
 #include <sys/wait.h>
 #include <string.h>

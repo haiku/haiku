@@ -7,7 +7,7 @@
  */
 
 
-#include <vm.h>
+#include <vm_address_space.h>
 #include <vm_page.h>
 #include <vm_priv.h>
 #include <smp.h>

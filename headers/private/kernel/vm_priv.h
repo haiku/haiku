@@ -50,8 +50,8 @@ status_t vm_try_reserve_memory(size_t bytes);
 status_t vm_daemon_init(void);
 
 // used by the page daemon to walk the list of address spaces
-int vm_aspace_walk_start(struct hash_iterator *i);
-vm_address_space *vm_aspace_walk_next(struct hash_iterator *i);
+void vm_address_space_walk_start(struct hash_iterator *i);
+vm_address_space *vm_address_space_walk_next(struct hash_iterator *i);
 
 // allocates memory from the kernel_args structure
 addr_t vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock);

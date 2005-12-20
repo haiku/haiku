@@ -7,36 +7,17 @@
  */
 
 
-#include <OS.h>
+//#include <OS.h>
 #include <KernelExport.h>
 
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_priv.h>
-#include <vm_page.h>
-#include <vm_cache.h>
-#include <vm_store_anonymous_noswap.h>
-#include <vm_store_device.h>
-#include <vm_store_null.h>
-#include <file_cache.h>
-#include <memheap.h>
-#include <debug.h>
-#include <console.h>
-#include <int.h>
-#include <smp.h>
-#include <lock.h>
 #include <thread.h>
-#include <team.h>
+#include <util/khash.h>
 
-#include <boot/stage2.h>
-#include <boot/elf.h>
-
-#include <arch/cpu.h>
-#include <arch/vm.h>
-
-#include <string.h>
-#include <ctype.h>
 #include <stdlib.h>
-#include <stdio.h>
+
 
 //#define TRACE_VM
 #ifdef TRACE_VM
@@ -328,21 +309,20 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 }
 
 
-int
-vm_aspace_walk_start(struct hash_iterator *i)
+void
+vm_address_space_walk_start(struct hash_iterator *iterator)
 {
-	hash_open(aspace_table, i);
-	return 0;
+	hash_open(aspace_table, iterator);
 }
 
 
 vm_address_space *
-vm_aspace_walk_next(struct hash_iterator *i)
+vm_address_space_walk_next(struct hash_iterator *iterator)
 {
 	vm_address_space *aspace;
 
 	acquire_sem_etc(aspace_hash_sem, READ_COUNT, 0, 0);
-	aspace = hash_next(aspace_table, i);
+	aspace = hash_next(aspace_table, iterator);
 	if (aspace)
 		atomic_add(&aspace->ref_count, 1);
 	release_sem_etc(aspace_hash_sem, READ_COUNT, 0);
