@@ -44,6 +44,7 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 	// ViewLayers start visible by default
 	fHidden(false),
 	fVisible(true),
+	fBackgroundDirty(true),
 
 	fEventMask(0),
 	fEventOptions(0),
@@ -845,11 +846,13 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 		drawingEngine->FillRegion(redraw, fViewColor);
 	}
 
+	fBackgroundDirty = false;
+
 	// let children draw
 	if (deep) {
 		// before passing the clipping on to children, exclude our
 		// own region from the available clipping
-		effectiveClipping->Exclude(&ScreenClipping(windowContentClipping));
+		effectiveClipping->Exclude(&fScreenClipping);
 
 		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 			child->Draw(drawingEngine, effectiveClipping,
@@ -905,6 +908,15 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 	fVisible = parentVisible && !fHidden;
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->UpdateVisibleDeep(fVisible);
+}
+
+// MarkBackgroundDirty
+void
+ViewLayer::MarkBackgroundDirty()
+{
+	fBackgroundDirty = true;
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+		child->MarkBackgroundDirty();
 }
 
 // PrintToStream

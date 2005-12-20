@@ -160,6 +160,10 @@ class ViewLayer {
 			// according to the parents visibility
 			void			UpdateVisibleDeep(bool parentVisible);
 
+			void			MarkBackgroundDirty();
+			bool			IsBackgroundDirty() const
+								{ return fBackgroundDirty; }
+
 			// clipping
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping(BRegion* windowContentClipping,
@@ -189,6 +193,7 @@ class ViewLayer {
 			uint32			fFlags;
 			bool			fHidden;
 			bool			fVisible;
+			bool			fBackgroundDirty;
 
 			uint32			fEventMask;
 			uint32			fEventOptions;
