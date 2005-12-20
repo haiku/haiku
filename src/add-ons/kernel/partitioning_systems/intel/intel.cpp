@@ -561,7 +561,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 	}
 
 	// things seem to be in order
-	return 0.5;
+	return 0.95;
 }
 
 // ep_scan_partition
