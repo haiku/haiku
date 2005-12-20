@@ -1225,6 +1225,7 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 	BRegion copyRegion(window->VisibleRegion());
 	copyRegion.OffsetBy(-x, -y);
 	copyRegion.IntersectWith(&newDirtyRegion);
+		// newDirtyRegion == the windows old visible region
 
 	// include the the new visible region of the window being
 	// moved into the dirty region (for now)
@@ -1251,7 +1252,11 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	if (!LockAllWindows())
 		return;
 
+	// the dirty region for the inside of the window is
+	// constructed by the window itself in ResizeBy()
 	BRegion newDirtyRegion;
+	// track the dirty region outside the window in case
+	// it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
 	
 	window->ResizeBy(x, y, &newDirtyRegion);
@@ -1259,9 +1264,13 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 
+	// we just care for the region outside the window
 	previouslyOccupiedRegion.Exclude(&window->VisibleRegion());
 
+	// make sure the window cannot mark stuff dirty outside
+	// its visible region...
 	newDirtyRegion.IntersectWith(&window->VisibleRegion());
+	// ...because we do this outself
 	newDirtyRegion.Include(&previouslyOccupiedRegion);
 
 	MarkDirty(newDirtyRegion);
