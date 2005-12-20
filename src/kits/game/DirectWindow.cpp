@@ -12,23 +12,9 @@
 #include <Screen.h>
 
 #include <clipping.h>
+#include <AppServerLink.h>
 #include <DirectWindowPrivate.h>
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-#	include <R5_AppServerLink.h>
-#	include <R5_Session.h>
-#	define DW_GET_SYNC_DATA		0x880
-#	define DW_SET_FULLSCREEN	0x881
-#	define DW_GET_SCREEN_FLAGS	0xF2C
-#else
-#	include <AppServerLink.h>
-#	include <ServerProtocol.h>
-#endif
-
-// Compiling for Dano/Zeta is broken as it doesn't have BRegion::set_size()
-#ifdef HAIKU_TARGET_PLATFORM_DANO
-#	warning "##### Building BDirectWindow for TARGET_PLATFORM=dano (DANO/Zeta) is broken #####"
-#endif
+#include <ServerProtocol.h>
 
 
 // We don't need this kind of locking, since the directDeamonFunc 
@@ -282,26 +268,13 @@ BDirectWindow::SetFullScreen(bool enable)
 {
 	status_t status = B_ERROR;
 	if (Lock()) {
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-		a_session->swrite_l(DW_SET_FULLSCREEN);
-		a_session->swrite_l(server_token);
-		a_session->swrite_l((int32)enable);
-		Flush();
-
-		status_t fullScreen;
-		a_session->sread(sizeof(status_t), &fullScreen);	
-		a_session->sread(sizeof(status_t), &status);
-		full_screen_enable = enable;
-#else
 		fLink->StartMessage(AS_DIRECT_WINDOW_SET_FULLSCREEN);
 		fLink->Attach<bool>(enable);
 
 		if (fLink->FlushWithReply(status) == B_OK
 			&& status == B_OK)
 			full_screen_enable = enable;
-#endif
 		Unlock();
-		
 	}
 	return status;
 }
@@ -318,20 +291,10 @@ BDirectWindow::IsFullScreen() const
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	int32 flags = 0;
-	_BAppServerLink_ link;
-	link.fSession->swrite_l(DW_GET_SCREEN_FLAGS);
-	link.fSession->swrite_l(id.id);
-	link.fSession->sync();
-	link.fSession->sread(sizeof(flags), &flags);
-	return flags & B_PARALLEL_ACCESS;
-#else
 	display_mode mode;
 	status_t status = BScreen(id).GetMode(&mode);
 	if (status == B_OK)
 		return mode.flags & B_PARALLEL_ACCESS;
-#endif
 
 	return false;
 }
@@ -446,26 +409,14 @@ BDirectWindow::InitData()
 		return;
 
 	struct direct_window_sync_data syncData;
-	status_t status = B_ERROR;
-
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	a_session->swrite_l(DW_GET_SYNC_DATA);
-	a_session->swrite_l(server_token);
-
-	Flush();
-
-	a_session->sread(sizeof(syncData), &syncData);
-	a_session->sread(sizeof(status), &status);
-#else
+	
 	fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
 
-	int32 reply;
-	if (fLink->FlushWithReply(reply) == B_OK
-		&& reply == B_OK) {
+	status_t status = B_ERROR;
+	if (fLink->FlushWithReply(status) == B_OK
+		&& status == B_OK) {
 		fLink->Read<direct_window_sync_data>(&syncData);
-		status = B_OK;
 	}
-#endif
 
 	Unlock();
 

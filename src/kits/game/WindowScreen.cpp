@@ -22,26 +22,11 @@
 #include <WindowPrivate.h>
 
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-// WindowScreen commands
-#define WS_MOVE_DISPLAY			0x00000108
-#define WS_SET_FULLSCREEN 		0x00000881
-#define WS_GET_FRAMEBUFFER 		0x00000eed
-#define WS_GET_ACCELERANT_NAME 	0x00000ef4
-#define WS_GET_DRIVER_NAME 		0x00000ef5
-#define WS_DISPLAY_UTILS		0x00000ef9
-#define WS_SET_LOCK_STATE		0x00000efb
-#define WS_SET_DISPLAY_MODE 	0x00000efd
-#define WS_SET_PALETTE			0x00000f27
-
-#else
-
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
 
 using BPrivate::AppServerLink;
 
-#endif
 
 #if TRACE_WINDOWSCREEN
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
@@ -463,16 +448,8 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 			for (int32 x = first_index; x <= last_index; x++)
 				colorList[x] = list[x];
 		
-			// Tell the app_server about our changes
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-			_BAppServerLink_ link;
-			link.fSession->swrite_l(WS_SET_PALETTE);
-			link.fSession->swrite_l(screen_index);
-			link.fSession->swrite_l(first_index);
-			link.fSession->swrite_l(last_index);
-			link.fSession->swrite(colorCount * sizeof(rgb_color), colorList);
-			link.fSession->sync();
-#endif		
+			// TODO: Tell the app_server about our changes
+
 			screen.WaitForRetrace();
 		}
 	
@@ -527,16 +504,7 @@ BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
 	status_t status = B_ERROR;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS	
-	_BAppServerLink_ link;	
-	link.fSession->swrite_l(WS_DISPLAY_UTILS);
-	link.fSession->swrite_l(screen_index);
-	link.fSession->swrite_l(WS_MOVE_DISPLAY);
-	link.fSession->swrite(sizeof(int16), (int16*)&x);
-	link.fSession->swrite(sizeof(int16), (int16*)&y);
-	link.fSession->sync();	
-	link.fSession->sread(sizeof(status), &status);
-#endif
+	// TODO: Ask app server to move the frame buffer area
 
 	if (status == B_OK) {		
 		format_info.display_x = x;
@@ -707,16 +675,7 @@ BWindowScreen::SetFullscreen(int32 enable)
 {
 	int32 retval = -1;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	int32 result = -1;
-
-	a_session->swrite_l(WS_SET_FULLSCREEN);
-	a_session->swrite_l(server_token);
-	a_session->swrite_l(enable);
-	a_session->sync();
-	a_session->sread(sizeof(result), &result);
-	a_session->sread(sizeof(retval), &retval);
-#endif
+	// TODO: Set fullscreen
 	
 	return retval;
 }
@@ -812,17 +771,7 @@ BWindowScreen::SetActiveState(int32 state)
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
 			if (activate_state) {
-#ifdef HAIKU_TARGET_PLATFORM_BEOS				
-				const color_map *colorMap = system_colors();
-				_BAppServerLink_ link;
-
-				link.fSession->swrite_l(WS_SET_PALETTE);
-				link.fSession->swrite_l(screen_index);
-				link.fSession->swrite_l(0);
-				link.fSession->swrite_l(255);
-				link.fSession->swrite(256 * sizeof(rgb_color), const_cast<rgb_color *>(colorMap->color_list));
-				link.fSession->sync();
-#endif
+				// TODO: Set palette
 			}
 		}
 	}
@@ -848,15 +797,7 @@ BWindowScreen::SetLockState(int32 state)
 
 	status_t status = B_ERROR;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS	
-	_BAppServerLink_ link;
-	link.fSession->swrite_l(WS_SET_LOCK_STATE);
-	link.fSession->swrite_l(screen_index);
-	link.fSession->swrite_l(state);
-	link.fSession->swrite_l(server_token);
-	link.fSession->sync();
-	link.fSession->sread(sizeof(status), &status);
-#endif
+	// TODO: Set lock state (whatever it means)
 	
 	if (status == B_OK) {
 		lock_state = state;
@@ -941,23 +882,11 @@ BWindowScreen::GetCardInfo()
 	
 	frame_buffer_config config;
 	
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	_BAppServerLink_ link;
-	link.fSession->swrite_l(WS_GET_FRAMEBUFFER);
-	link.fSession->swrite_l(id.id);
-	link.fSession->swrite_l(server_token);
-	link.fSession->sync();
-	link.fSession->sread(sizeof(result), &result);
-	if (result == B_OK)
-		link.fSession->sread(sizeof(frame_buffer_config), &config);
-#else
 	AppServerLink link;
 	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
 	link.Attach<screen_id>(id);
 	if (link.FlushWithReply(result) == B_OK && result == B_OK)
 		link.Read<frame_buffer_config>(&config);
-	
-#endif
 	
 	if (result == B_OK) {
 		card_info.id = id.id;
@@ -966,8 +895,6 @@ BWindowScreen::GetCardInfo()
 	}
 	
 	memcpy(&card_info_global, &card_info, sizeof(graphics_card_info));
-	
-	CALLED();
 }
 
 
@@ -1042,7 +969,6 @@ status_t
 BWindowScreen::InitClone()
 {
 	CALLED();
-#ifndef HAIKU_TARGET_PLATFORM_BEOS
 	AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_NAME);
 	link.Attach<int32>(screen_index);
@@ -1086,71 +1012,7 @@ BWindowScreen::InitClone()
 		addon_image = -1;
 	}
 	
-	return status;	
-	
-#else
-	_BAppServerLink_ link;
-	link.fSession->swrite_l(WS_GET_ACCELERANT_NAME);
-	link.fSession->swrite_l(screen_index);
-	link.fSession->sync();
-	
-	status_t status;
-	link.fSession->sread(sizeof(status), &status);
-	if (status != B_OK)
-		return status;
-	
-	int32 length;
-	link.fSession->sread(sizeof(length), &length); // read length of accelerant's name
-	
-	char *addonName = new char[length + 1];
-	link.fSession->sread(length, addonName); // read the accelerant's name
-	addonName[length] = '\0';
-	
-	// load the accelerant
-	addon_image = load_add_on(addonName); 
-	delete[] addonName;
-	
-	if (addon_image < 0)
-		return addon_image;
-	
-	// now get the symbol for GetAccelerantHook m_gah
-	if (get_image_symbol(addon_image, "get_accelerant_hook",
-						B_SYMBOL_TYPE_ANY, (void **)&m_gah) < 0)
-		return B_ERROR;
-	
-	// now use m_gah to get a pointer to the accelerant's clone accelerant
-	clone_accelerant clone = (clone_accelerant)m_gah(B_CLONE_ACCELERANT, 0);
-	
-	if (!clone)
-		return B_ERROR;
-
-	link.fSession->swrite_l(WS_GET_DRIVER_NAME); // get driver's name without the /dev/
-	link.fSession->swrite_l(screen_index);
-	link.fSession->sync();
-	
-	link.fSession->sread(sizeof(status), &status);
-	if (status != B_OK)
-		return status;
-	
-	link.fSession->sread(sizeof(length), &length);
-	// result now contains the length of the buffer needed for the drivers path name
-	
-	char *path = new char[length + 1];
-	link.fSession->sread(length, path);
-	path[length] = '\0';
-	// path now contains the driver's name
-	
-	// test if the driver supports cloning of the accelerant, using the path we got earlier
-	result = clone((void *)path);
-	delete[] path;
-	
-	if (result != 0) {
-		unload_add_on(addon_image);
-		addon_image = -1;
-	}
-	
-	return result;
-#endif
+	return status;
 }
 
 
@@ -1159,14 +1021,7 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
 	status_t result = B_ERROR;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	_BAppServerLink_ link;
-	link.fSession->swrite_l(WS_SET_DISPLAY_MODE); // check display_mode valid command
-	link.fSession->swrite_l(screen_index);
-	link.fSession->swrite(sizeof(display_mode), (void *)dmode);
-	link.fSession->sync();
-	link.fSession->sread(sizeof(result), &result);
-#endif
+	// TODO: Assert display mode: negotiation with app server
 
 	// if the result is B_OK, we copy the dmode to new_space
 	if (result == B_OK) { 
