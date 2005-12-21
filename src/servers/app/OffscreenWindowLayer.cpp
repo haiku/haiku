@@ -49,24 +49,3 @@ OffscreenWindowLayer::~OffscreenWindowLayer()
 	delete fHWInterface;
 }
 
-
-void
-OffscreenWindowLayer::Draw(const BRect &r)
-{
-	// Nothing to do here
-}
-
-
-void
-OffscreenWindowLayer::MoveBy(float x, float y)
-{
-	// Nothing to do here
-}
-
-
-void
-OffscreenWindowLayer::ResizeBy(float x, float y)
-{
-	// Nothing to do here
-}
-

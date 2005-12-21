@@ -22,11 +22,6 @@ class OffscreenWindowLayer : public WindowLayer {
 												   ::ServerWindow* window);
 	virtual						~OffscreenWindowLayer();
 	
-	virtual	void				Draw(const BRect &r);
-	
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				ResizeBy(float x, float y);
-
 	virtual	bool				IsOffscreenWindow() const
 									{ return true; }
 
