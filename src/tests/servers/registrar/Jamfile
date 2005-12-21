@@ -98,4 +98,6 @@ Server haiku_registrar
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_registrar
 		: tests!apps ;
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : run_haiku_registrar
+		: tests!apps ;
 }
