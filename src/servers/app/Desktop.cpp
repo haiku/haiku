@@ -1377,8 +1377,11 @@ Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 	if (window->IsNormal() && workspaces == B_CURRENT_WORKSPACE)
 		workspaces = workspace_to_workspaces(CurrentWorkspace());
 
-	window->WorkspacesChanged(window->Workspaces(), workspaces);
-	_ChangeWindowWorkspaces(window, window->Workspaces(), workspaces);
+	uint32 oldWorkspaces = window->Workspaces();
+
+	window->WorkspacesChanged(oldWorkspaces, workspaces);
+	_ChangeWindowWorkspaces(window, oldWorkspaces, workspaces);
+
 	UnlockAllWindows();
 }
 
