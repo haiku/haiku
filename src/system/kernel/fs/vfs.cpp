@@ -2534,14 +2534,19 @@ vfs_vnode_to_node_ref(void *_vnode, mount_id *_mountID, vnode_id *_vnodeID)
 }
 
 
+/**	Looks up a vnode with the given mount and vnode ID.
+ *	Must only be used with "in-use" vnodes as it doesn't grab a reference
+ *	to the node.
+ *	It's currently only be used by file_cache_create().
+ */
+
 extern "C" status_t
 vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 {
-	// ToDo: this currently doesn't use the sVnodeMutex lock - that's
-	//	because it's only called from file_cache_create() with that
-	//	lock held anyway (as it should be called from fs_read_vnode()).
-	//	Find a better solution!
+	mutex_lock(&sVnodeMutex);
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
+	mutex_unlock(&sVnodeMutex);
+
 	if (vnode == NULL)
 		return B_ERROR;
 
