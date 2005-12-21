@@ -688,7 +688,7 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 void
 WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 {
-	if (layer && !fHidden && fDesktop && fDesktop->LockSingleWindow()) {
+	if (layer && IsVisible() && fDesktop && fDesktop->LockSingleWindow()) {
 		if (!layer->IsVisible()) {
 			fDesktop->UnlockSingleWindow();
 			return;
@@ -928,9 +928,14 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 	BPoint delta = where - fLastMousePosition;
 	// moving
 	if (fIsDragging) {
-		if (!(Flags() & B_NOT_MOVABLE))
+		if (!(Flags() & B_NOT_MOVABLE)) {
+			BPoint oldLeftTop = fFrame.LeftTop();
+
 			fDesktop->MoveWindowBy(this, delta.x, delta.y);
-		else
+
+			// constrain delta to true change in size
+			delta = fFrame.LeftTop() - oldLeftTop;
+		} else
 			delta = BPoint(0, 0);
 	}
 	// resizing
@@ -940,8 +945,13 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 				delta.y = 0;
 			if (Flags() & B_NOT_H_RESIZABLE)
 				delta.x = 0;
-	
+
+			BPoint oldRightBottom = fFrame.RightBottom();
+
 			fDesktop->ResizeWindowBy(this, delta.x, delta.y);
+
+			// constrain delta to true change in size
+			delta = fFrame.RightBottom() - oldRightBottom;
 		} else
 			delta = BPoint(0, 0);
 	}
@@ -952,7 +962,6 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 
 	// NOTE: fLastMousePosition is currently only
 	// used for window moving/resizing/sliding the tab
-	// ther
 	fLastMousePosition += delta;
 
 	// change focus in FFM mode
@@ -1546,7 +1555,7 @@ WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 void
 WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 {
-	if (dirtyContentRegion.CountRects() > 0) {
+	if (IsVisible() && dirtyContentRegion.CountRects() > 0) {
 		// put this into the pending dirty region
 		// to eventually trigger a client redraw
 		_TransferToUpdateSession(&dirtyContentRegion);
