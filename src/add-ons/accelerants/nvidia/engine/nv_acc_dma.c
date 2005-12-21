@@ -1898,7 +1898,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 			 * look at Matrox or Neomagic bes engines code for usage example. */
 			//fixme: tested 16-bit depth, verify other depths...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-				(((list[i].src_height + 1 + 1) << 16) |
+				(((list[i].src_height + 1) << 16) |
 				 (((list[i].src_width + 1) + 0x0001) & ~0x0001)); /* SourceHeightWidth */
 			/* setup source pitch (b0-15). Set 'format origin center' (b16-17) and
 			 * select 'format interpolator foh (bilinear filtering)' (b24). */
