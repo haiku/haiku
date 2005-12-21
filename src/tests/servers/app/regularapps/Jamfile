@@ -19,5 +19,7 @@ SimpleTest TestApp_Clock :
 	: Clock.rdef
 	;
 
+HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : TestApp_Clock
+	: tests!apps ;
 
 } # if $(TARGET_PLATFORM) = libbe_test

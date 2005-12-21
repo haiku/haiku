@@ -16,7 +16,7 @@
 // constructor
 ObjectView::ObjectView(BRect frame, const char* name,
 					 uint32 resizeFlags, uint32 flags)
-	: BView(frame, name, resizeFlags, flags | B_FRAME_EVENTS),
+	: BView(frame, name, resizeFlags, flags),
 	  fState(NULL),
 	  fObjectType(OBJECT_LINE),
 	  fStateList(20),
@@ -31,11 +31,12 @@ ObjectView::ObjectView(BRect frame, const char* name,
 
 	SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_1_TINT));
 
-	BFont font;
-	GetFont(&font);
-	font.SetSize(20.0);
-	font.SetRotation(6.0);
-	SetFont(&font, B_FONT_ROTATION | B_FONT_SIZE);
+//	BFont font;
+//	GetFont(&font);
+//	font.SetFamilyAndStyle("Bitstream Vera Serif", "Roman");
+//	font.SetSize(20.0);
+////	font.SetRotation(6.0);
+//	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_ROTATION | B_FONT_SIZE);
 }
 
 // AttachedToWindow
@@ -70,35 +71,18 @@ ObjectView::Draw(BRect updateRect)
 
 	SetHighColor(255, 0, 0, 128);
 
-	const char* message = "Click and drag";
+	const char* message = "Click and drag to draw an object";
 	float width = StringWidth(message);
+
 	BPoint p(r.Width() / 2.0 - width / 2.0,
 			 r.Height() / 2.0);
 
+Sync();
+bigtime_t now = system_time();
 	DrawString(message, p);
 
-	message = "to draw an ";
-	width = StringWidth("to draw an object");
-	p.x = r.Width() / 2.0 - width / 2.0;
-	p.y += 25;
-
-	DrawString(message, p);
-
-//	SetOrigin(BPoint(50.0, 50.0));
-//	SetScale(0.5);
-
-	DrawChar('o');
-	DrawChar('b');
-	DrawChar('j');
-	DrawChar('e');
-	DrawChar('c');
-	DrawChar('t');
-	DrawChar('!');
-
-
-//	SetHighColor(0, 0, 0);
-//	StrokeLine(BPoint(-50, -50), BPoint(0.0, 0.0));
-
+Sync();
+printf("Drawing Text: %lld\n", system_time() - now);
 
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
@@ -236,7 +220,10 @@ ObjectView::AddObject(State* state)
 {
 	if (state) {
 		fStateList.AddItem((void*)state);
-		Window()->PostMessage(MSG_OBJECT_COUNT_CHANGED);
+
+		BMessage message(MSG_OBJECT_ADDED);
+		message.AddPointer("object", state);
+		Window()->PostMessage(&message);
 
 		SetState(state);
 	}

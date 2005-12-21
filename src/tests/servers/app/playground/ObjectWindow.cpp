@@ -43,14 +43,34 @@ enum {
 	MSG_REDO				= 'redo',
 
 	MSG_CLEAR				= 'clir',
+
+	MSG_OBJECT_SELECTED		= 'obsl',
 };
+
+// ObjectItem
+class ObjectItem : public BStringItem {
+ public:
+			ObjectItem(const char* name, State* object)
+				: BStringItem(name),
+				  fObject(object)
+			{
+			}
+
+	State*	Object() const
+			{ return fObject; }
+
+ private:
+	State*	fObject;
+};
+
+// #pragma mark -
 
 // constructor
 ObjectWindow::ObjectWindow(BRect frame, const char* name)
-	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
-//	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+//	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 //			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 //	: BWindow(frame, name, B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 //			  B_ASYNCHRONOUS_CONTROLS)
 //	: BWindow(frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -281,6 +301,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 b.bottom = fDrawingModeMF->Frame().top - 5.0;
 
 	fObjectLV = new BListView(b, "object list", B_MULTIPLE_SELECTION_LIST);
+	fObjectLV->SetSelectionMessage(new BMessage(MSG_OBJECT_SELECTED));
 
 	// wrap a scroll view around the list view
 	scrollView = new BScrollView("list scroller", fObjectLV,
@@ -343,21 +364,23 @@ ObjectWindow::MessageReceived(BMessage* message)
 			fObjectView->SetStateColor(_GetColor());
 			_UpdateColorControls();
 			break;
-		case MSG_OBJECT_COUNT_CHANGED: {
-			int32 count = fObjectView->CountObjects();
-//printf("MSG_OBJECT_COUNT_CHANGED: %ld\n", count);
-			fClearB->SetEnabled(count > 0);
-			int32 listCount = fObjectLV->CountItems();
-			int32 diff = count - listCount;
-			if (diff >= 0) {
-				for (int32 i = 0; i < diff; i++)
-					fObjectLV->AddItem(new BStringItem("Object"));
-			} else {
-				for (int32 i = listCount - 1; i >= count; i--)
-					delete fObjectLV->RemoveItem(i);
+		case MSG_OBJECT_ADDED: {
+			State* object;
+			if (message->FindPointer("object", (void**)&object) >= B_OK) {
+				fObjectLV->AddItem(new ObjectItem("Object", object));
 			}
-			break;
+			// fall through
 		}
+		case MSG_OBJECT_COUNT_CHANGED:
+			fClearB->SetEnabled(fObjectView->CountObjects() > 0);
+			break;
+		case MSG_OBJECT_SELECTED:
+printf("MSG_OBJECT_SELECTED\n");
+			if (ObjectItem* item = (ObjectItem*)fObjectLV->ItemAt(fObjectLV->CurrentSelection(0))) {
+				fObjectView->SetState(item->Object());
+			} else
+				fObjectView->SetState(NULL);
+			break;
 		case MSG_NEW_OBJECT:
 			fObjectView->SetState(NULL);
 			break;

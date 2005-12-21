@@ -55,21 +55,22 @@ void
 TestView::Draw(BRect updateRect)
 {
 	// ellipses
-// TODO: this should be unnecessary
-SetPenSize(1.0);
-	SetHighColor(200, 90, 0, 255);
+	SetHighColor(200, 90, 0, 100);
 	StrokeEllipse(BPoint(80.0, 50.0), 70.0, 40.0);
 
+	SetDrawingMode(B_OP_ALPHA);
+
 	SetPenSize(2.0);
-	SetHighColor(20, 40, 180, 255);
+	SetHighColor(20, 40, 180, 150);
 	StrokeEllipse(BPoint(230.0, 90.0), 14.0, 60.0);
 
 	SetPenSize(5.0);
-	SetHighColor(60, 20, 110, 255);
+	SetHighColor(60, 20, 110, 100);
 	StrokeEllipse(BPoint(100.0, 180.0), 35.0, 25.0);
 
 	// text
 	SetHighColor(0, 0, 0, 255);
+	SetDrawingMode(B_OP_OVER);
 	const char* message = "Click and drag to scroll this view!";
 	DrawString(message, BPoint(0.0, 30.0));
 }
@@ -80,6 +81,7 @@ TestView::MouseDown(BPoint where)
 {
 	fTracking = true;
 	fLastMousePos = where;
+	SetMouseEventMask(B_POINTER_EVENTS);
 }
 
 // MouseUp
@@ -95,7 +97,6 @@ TestView::MouseMoved(BPoint where, uint32 transit,
 					 const BMessage* dragMessage)
 {
 	if (fTracking) {
-printf("TestView::MouseMoved(%.1f, %.1f)\n", where.x, where.y);
 		BPoint offset = fLastMousePos - where;
 		ScrollBy(offset.x, offset.y);
 		fLastMousePos = where + offset;

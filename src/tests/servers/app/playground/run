@@ -1,6 +1,6 @@
 #!/bin/sh
 
-../../../../../tests/servers/registrar/run_haiku_registrar || exit
+../../../../../generated/tests/apps/run_haiku_registrar || exit
 
 if test -f ../../../../../generated/tests/apps/haiku_app_server; then
 	../../../../../generated/tests/apps/haiku_app_server &

@@ -101,9 +101,9 @@ TestView::TestView(BRect frame, const char* name,
 //	  fBitmap(new BBitmap(BRect(0, 0, kBitmapWidth - 1, kBitmapHeight -1), 0, kBitmapFormat)),
 //	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_CMAP8)),
 //	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_GRAY8)),
-	  fBitmap(new BBitmap(BRect(0, 0, 99, 99), B_RGB32, true)),
-//	  fBitmap(new BBitmap(BRect(0, 0, 99, 99), B_CMAP8, true)),
-//	  fBitmap(new BBitmap(BRect(0, 0, 31, 31), B_GRAY8, true)),
+	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_RGB32, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_CMAP8, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_GRAY8, true)),
 	  fOffscreenView(new BView(fBitmap->Bounds(), "Offscreen view",
 							   B_FOLLOW_ALL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)),
 	  fTicker(NULL),
@@ -385,15 +385,20 @@ TestView::_FillBitmap(point* polygon)
 		fOffscreenView->FillRect(fOffscreenView->Bounds(), B_SOLID_LOW);
 
 		fOffscreenView->SetDrawingMode(B_OP_OVER);
+		fOffscreenView->SetPenSize(4);
+		fOffscreenView->SetLineMode(B_BUTT_CAP, B_ROUND_JOIN);
 
-		fOffscreenView->StrokeLine(BPoint(polygon[0].x, polygon[0].y),
-								   BPoint(polygon[1].x, polygon[1].y));
-		fOffscreenView->StrokeLine(BPoint(polygon[1].x, polygon[1].y),
-								   BPoint(polygon[2].x, polygon[2].y));
-		fOffscreenView->StrokeLine(BPoint(polygon[2].x, polygon[2].y),
-								   BPoint(polygon[3].x, polygon[3].y));
-		fOffscreenView->StrokeLine(BPoint(polygon[3].x, polygon[3].y),
-								   BPoint(polygon[0].x, polygon[0].y));
+		BPoint pointList[4];
+		pointList[0].x = polygon[0].x;
+		pointList[0].y = polygon[0].y;
+		pointList[1].x = polygon[1].x;
+		pointList[1].y = polygon[1].y;
+		pointList[2].x = polygon[2].x;
+		pointList[2].y = polygon[2].y;
+		pointList[3].x = polygon[3].x;
+		pointList[3].y = polygon[3].y;
+
+		fOffscreenView->StrokePolygon(pointList, 4);
 
 		fOffscreenView->Sync();
 		fBitmap->Unlock();

@@ -1,6 +1,18 @@
 #!/bin/sh
 
-../../../../../tests/servers/registrar/run_haiku_registrar || exit
-../../../../../distro/x86.release.r5/beos/system/servers/haiku_app_server &
+../../../../../generated/tests/apps/run_haiku_registrar || exit
+
+if test -f ../../../../../generated/tests/apps/haiku_app_server; then
+	../../../../../generated/tests/apps/haiku_app_server &
+else
+	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
+fi
+
 sleep 1s
-../../../../../tests/servers/app/windows/Window
+
+if test -f ../../../../../generated/tests/apps/TextView; then
+	../../../../../generated/tests/apps/TextView
+else
+	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
+fi
+

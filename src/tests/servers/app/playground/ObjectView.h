@@ -9,7 +9,8 @@
 class State;
 
 enum {
-	MSG_OBJECT_COUNT_CHANGED = 'obcc',
+	MSG_OBJECT_COUNT_CHANGED	= 'obcc',
+	MSG_OBJECT_ADDED			= 'obad',
 };
 
 class ObjectView : public BView {
