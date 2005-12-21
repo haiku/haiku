@@ -31,7 +31,6 @@ SharedLibrary libhwinterface.so :
 	HWInterface.cpp
 	MultiLocker.cpp
 	RGBColor.cpp
-	SystemPalette.cpp
 
 	: libhaikuappserver.so be
 ;
