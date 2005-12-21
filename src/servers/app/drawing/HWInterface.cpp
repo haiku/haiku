@@ -458,12 +458,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 				dst += y * dstBPR + x * 4;
 				// copy
 				for (; y <= bottom; y++) {
-#ifndef __HAIKU__
-					memcpy(dst, src, bytes);
-#else
 					// bytes is guaranteed to be multiple of 4
 					gfxcpy32(dst, src, bytes);
-#endif // __HAIKU__
 					dst += dstBPR;
 					src += srcBPR;
 				}
