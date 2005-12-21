@@ -126,8 +126,8 @@ vm_cache_ref_create(vm_cache *cache)
 		return NULL;
 
 	if (mutex_init(&ref->lock, "cache_ref_mutex") < B_OK) {
-		free(ref);
-		return NULL;
+//		free(ref);
+//		return NULL;
 	}
 
 	ref->areas = NULL;
