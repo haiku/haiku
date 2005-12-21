@@ -499,7 +499,6 @@ insert_area(vm_address_space *addressSpace, void **_address,
 }
 
 
-// a ref to the cache holding this store must be held before entering here
 static status_t
 map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtualAddress,
 	off_t offset, addr_t size, uint32 addressSpec, int wiring, int protection,
@@ -508,11 +507,8 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_area *area;
-	vm_cache *nu_cache;
-	vm_cache_ref *nu_cache_ref = NULL;
-	vm_store *nu_store;
 
-	int err;
+	status_t err;
 
 	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, store, *_virtualAddress, offset, size, addressSpec,
@@ -528,6 +524,11 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	// if this is a private map, we need to create a new cache & store object
 	// pair to handle the private copies of pages as they are written to
 	if (mapping == REGION_PRIVATE_MAP) {
+		vm_cache *nu_cache;
+		vm_cache_ref *nu_cache_ref = NULL;
+		vm_store *nu_store;
+
+		// ToDo: panic???
 		// create an anonymous store object
 		nu_store = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0, USER_STACK_GUARD_PAGES);
 		if (nu_store == NULL)
@@ -543,9 +544,6 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 
 		nu_cache->source = cache;
 
-		// grab a ref to the cache object we're now linked to as a source
-		vm_cache_acquire_ref(cache_ref, true);
-
 		cache = nu_cache;
 		cache_ref = cache->ref;
 		store = nu_store;
@@ -554,9 +552,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 
 	err = vm_cache_set_minimal_commitment(cache_ref, offset + size);
 	if (err != B_OK)
-		goto err1a;
-
-	vm_cache_acquire_ref(cache_ref, true);
+		goto err1;
 
 	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
 
@@ -565,12 +561,12 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		// okay, someone is trying to delete this address space now, so we can't
 		// insert the area, so back out
 		err = B_BAD_TEAM_ID;
-		goto err1b;
+		goto err2;
 	}
 
 	err = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
 	if (err < B_OK)
-		goto err1b;
+		goto err2;
 
 	// attach the cache to the area
 	area->cache_ref = cache_ref;
@@ -591,18 +587,14 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	*_area = area;
 	return B_OK;
 
-err1b:
+err2:
 	release_sem_etc(addressSpace->sem, WRITE_COUNT, 0);
-	vm_cache_release_ref(cache_ref);
-	goto err;
-err1a:
-	if (nu_cache_ref) {
-		// had never acquired it's initial ref, so acquire and then release it
-		// this should clean up all the objects it references
-		vm_cache_acquire_ref(cache_ref, true);
+err1:
+	if (mapping == REGION_PRIVATE_MAP) {
+		// we created this cache, so we must delete it again
 		vm_cache_release_ref(cache_ref);
 	}
-err:
+
 	free(area->name);
 	free(area);
 	return err;
@@ -724,7 +716,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 	vm_page *page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
 	bool canOvercommit = false;
-	status_t err;
+	status_t status;
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
@@ -783,6 +775,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 		}
 	}
 
+	// ToDo: panic???
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ?
 		((protection & B_USER_PROTECTION) != 0 ? 
@@ -810,11 +803,10 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			break;
 	}
 
-	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(addressSpace, store, address, 0, size, addressSpec, wiring,
+	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, wiring,
 		protection, REGION_NO_PRIVATE_MAP, &area, name);
-	vm_cache_release_ref(cache_ref);
-	if (err < 0) {
+	if (status < B_OK) {
+		vm_cache_release_ref(cache_ref);
 		vm_put_address_space(addressSpace);
 
 		if (wiring == B_CONTIGUOUS) {
@@ -829,7 +821,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
 		}	
-		return err;
+		return status;
 	}
 
 	cache_ref = store->cache->ref;
@@ -917,8 +909,8 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 					panic("couldn't lookup physical page just allocated\n");
 
 				atomic_add(&page->ref_count, 1);
-				err = (*map->ops->map)(map, virtualAddress, physicalAddress, protection);
-				if (err < 0)
+				status = (*map->ops->map)(map, virtualAddress, physicalAddress, protection);
+				if (status < 0)
 					panic("couldn't map physical page in page run\n");
 
 				vm_page_set_state(page, PAGE_STATE_WIRED);
@@ -936,9 +928,6 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 	vm_put_address_space(addressSpace);
 
 	TRACE(("vm_create_anonymous_area: done\n"));
-
-	if (area == NULL)
-		return B_NO_MEMORY;
 
 	return area->id;
 }
@@ -991,10 +980,10 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
 
-	vm_cache_acquire_ref(cacheRef, true);
 	status = map_backing_store(addressSpace, store, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
-	vm_cache_release_ref(cacheRef);
+	if (status < B_OK)
+		vm_cache_release_ref(cacheRef);
 
 	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
 		// set requested memory type
@@ -1041,6 +1030,7 @@ vm_create_null_area(team_id aid, const char *name, void **address, uint32 addres
 	size = PAGE_ALIGN(size);
 
 	// create an null store object
+	// TODO: panic???
 	store = vm_store_create_null();
 	if (store == NULL)
 		panic("vm_map_physical_memory: vm_store_create_null returned NULL");
@@ -1053,12 +1043,13 @@ vm_create_null_area(team_id aid, const char *name, void **address, uint32 addres
 	// tell the page scanner to skip over this area, no pages will be mapped here
 	cache->scan_skip = 1;
 
-	vm_cache_acquire_ref(cache_ref, true);
 	err = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
-	vm_cache_release_ref(cache_ref);
 	vm_put_address_space(addressSpace);
-	if (err < 0)
+
+	if (err < B_OK) {
+		vm_cache_release_ref(cache_ref);
 		return err;
+	}
 
 	return area->id;
 }
@@ -1090,10 +1081,6 @@ vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 		return B_NO_MEMORY;
 	}
 
-	// acquire the cache ref once to represent the ref that the vnode will have
-	// this is one of the only places where we dont want to ref to ripple down to the store
-	vm_cache_acquire_ref(cacheRef, false);
-
 	*_cacheRef = cacheRef;
 	return B_OK;
 }
@@ -1124,7 +1111,8 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %ld)\n", path, offset, size, mapping));
+	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %ld)\n",
+		path, offset, size, mapping));
 
 	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
@@ -1134,26 +1122,26 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 	if (status < B_OK)
 		goto err1;
 
+	// ToDo: this only works for file systems that use the file cache
 	status = vfs_get_vnode_cache(vnode, &cacheRef, false);
+
+	vfs_put_vnode(vnode);
+		// we don't need this vnode anymore - if the above call was
+		// successful, the store already has a ref to it
+
+	if (status < B_OK)
+		goto err1;
+
+	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
+		offset, size, addressSpec, 0, protection, mapping, &area, name);
 	if (status < B_OK)
 		goto err2;
 
-	// acquire a ref to the cache before we do work on it. Dont ripple the ref acquision to the vnode
-	// below because we'll have to release it later anyway, since we grabbed a ref to the vnode at
-	// vfs_get_vnode_from_path(). This puts the ref counts in sync.
-	vm_cache_acquire_ref(cacheRef, false);
-	status = map_backing_store(addressSpace, cacheRef->cache->store, _address, offset, size,
-					addressSpec, 0, protection, mapping, &area, name);
-	vm_cache_release_ref(cacheRef);
 	vm_put_address_space(addressSpace);
-
-	if (status < B_OK)
-		return status;
-
 	return area->id;
 
 err2:
-	vfs_put_vnode(vnode);
+	vm_cache_release_ref(cacheRef);
 err1:
 	vm_put_address_space(addressSpace);
 	return status;
@@ -1167,7 +1155,8 @@ vm_map_file(team_id aid, const char *name, void **address, uint32 addressSpec,
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
-	return _vm_map_file(aid, name, address, addressSpec, size, protection, mapping, path, offset, true);
+	return _vm_map_file(aid, name, address, addressSpec, size, protection,
+		mapping, path, offset, true);
 }
 
 
@@ -1234,11 +1223,9 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	} else
 #endif
 	{
-		vm_cache_acquire_ref(sourceArea->cache_ref, true);
-		status = map_backing_store(addressSpace, sourceArea->cache_ref->cache->store, address,
-					sourceArea->cache_offset, sourceArea->size, addressSpec, sourceArea->wiring,
-					protection, mapping, &newArea, name);
-		vm_cache_release_ref(sourceArea->cache_ref);
+		status = map_backing_store(addressSpace, sourceArea->cache_ref->cache->store,
+			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
+			sourceArea->wiring, protection, mapping, &newArea, name);
 	}
 
 	vm_put_area(sourceArea);
@@ -1439,7 +1426,7 @@ vm_copy_on_write_area(vm_area *area)
 	upperCacheRef->ref_count = 1;
 
 	// grab a ref to the cache object we're now linked to as a source
-	vm_cache_acquire_ref(lowerCacheRef, true);
+	vm_cache_acquire_ref(lowerCacheRef);
 
 	// We now need to remap all pages from the area read-only, so that
 	// a copy will be created on next write access
@@ -1506,6 +1493,8 @@ vm_copy_area(team_id addressSpaceID, const char *name, void **_address, uint32 a
 
 	if (status < B_OK)
 		goto err;
+
+	vm_cache_acquire_ref(cacheRef);
 
 	// If the source area is writable, we need to move it one layer up as well
 
@@ -1929,7 +1918,7 @@ vm_delete_areas(struct vm_address_space *addressSpace)
 	vm_area *area;
 	vm_area *next, *last = NULL;
 
-	TRACE(("vm_delete_areas: called on aspace 0x%lx\n", addressSpace->id));
+	TRACE(("vm_delete_areas: called on address space 0x%lx\n", addressSpace->id));
 
 	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
 
@@ -2485,7 +2474,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	top_cache_ref = area->cache_ref;
 	cacheOffset = address - area->base + area->cache_offset;
-	vm_cache_acquire_ref(top_cache_ref, true);
+	vm_cache_acquire_ref(top_cache_ref);
 	change_count = addressSpace->change_count;
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 

@@ -947,6 +947,7 @@ cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 
 out:
 	mutex_unlock(&cache->lock);
+	vm_cache_release_ref(cache);
 }
 
 

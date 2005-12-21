@@ -122,7 +122,7 @@ vm_cache_ref_create(vm_cache *cache)
 	ref->cache = cache;
 	mutex_init(&ref->lock, "cache_ref_mutex");
 	ref->areas = NULL;
-	ref->ref_count = 0;
+	ref->ref_count = 1;
 	cache->ref = ref;
 
 	return ref;
@@ -130,14 +130,15 @@ vm_cache_ref_create(vm_cache *cache)
 
 
 void
-vm_cache_acquire_ref(vm_cache_ref *cache_ref, bool acquire_store_ref)
+vm_cache_acquire_ref(vm_cache_ref *cache_ref)
 {
-//	dprintf("vm_cache_acquire_ref: cache_ref 0x%x, ref will be %d\n", cache_ref, cache_ref->ref_count+1);
+	TRACE(("vm_cache_acquire_ref: cache_ref %p, ref will be %ld\n",
+		cache_ref, cache_ref->ref_count + 1));
 
 	if (cache_ref == NULL)
 		panic("vm_cache_acquire_ref: passed NULL\n");
 
-	if (acquire_store_ref && cache_ref->cache->store->ops->acquire_ref)
+	if (cache_ref->cache->store->ops->acquire_ref != NULL)
 		cache_ref->cache->store->ops->acquire_ref(cache_ref->cache->store);
 
 	atomic_add(&cache_ref->ref_count, 1);
@@ -149,12 +150,15 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 {
 	vm_page *page;
 
-	TRACE(("vm_cache_release_ref: cache_ref %p, ref will be %ld\n", cache_ref, cache_ref->ref_count - 1));
+	TRACE(("vm_cache_release_ref: cache_ref %p, ref will be %ld\n",
+		cache_ref, cache_ref->ref_count - 1));
 
 	if (cache_ref == NULL)
 		panic("vm_cache_release_ref: passed NULL\n");
 
 	if (atomic_add(&cache_ref->ref_count, -1) != 1) {
+		// the store ref is only released on the "working" refs, not
+		// on the initial one (this is vnode specific)
 		if (cache_ref->cache->store->ops->release_ref)
 			cache_ref->cache->store->ops->release_ref(cache_ref->cache->store);
 
@@ -184,7 +188,8 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 		release_spinlock(&page_cache_table_lock);
 		restore_interrupts(state);
 
-		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n", oldPage->ppn));
+		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
+			oldPage->physical_page_number));
 		vm_page_set_state(oldPage, PAGE_STATE_FREE);
 	}
 

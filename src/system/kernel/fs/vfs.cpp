@@ -2805,12 +2805,19 @@ vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t
 }
 
 
+/** Gets the vnode's vm_cache object. If it didn't have one, it will be
+ *	created if \a allocate is \c true.
+ *	In case it's successful, it will also grab a reference to the cache
+ *	it returns.
+ */
+
 extern "C" status_t
 vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	if (vnode->cache != NULL) {
+		vm_cache_acquire_ref(vnode->cache);
 		*_cache = vnode->cache;
 		return B_OK;
 	}
@@ -2825,7 +2832,8 @@ vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 			status = vm_create_vnode_cache(vnode, &vnode->cache);
 		else
 			status = B_BAD_VALUE;
-	}
+	} else
+		vm_cache_acquire_ref(vnode->cache);
 
 	if (status == B_OK)
 		*_cache = vnode->cache;

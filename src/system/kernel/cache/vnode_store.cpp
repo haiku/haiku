@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -112,10 +112,8 @@ extern "C" vm_store *
 vm_create_vnode_store(void *vnode)
 {
 	vnode_store *store = (vnode_store *)malloc(sizeof(struct vnode_store));
-	if (store == NULL) {
-		vfs_put_vnode(vnode);
+	if (store == NULL)
 		return NULL;
-	}
 
 	store->vm.ops = &sStoreOps;
 	store->vm.cache = NULL;
