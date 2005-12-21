@@ -65,6 +65,9 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 	fFrame.top = float((int32)fFrame.top);
 	fFrame.right = float((int32)fFrame.right);
 	fFrame.bottom = float((int32)fFrame.bottom);
+
+	if (fDrawState)
+		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
 // destructor
