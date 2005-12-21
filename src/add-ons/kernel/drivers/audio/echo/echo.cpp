@@ -166,12 +166,14 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	
 	LOG(("echo_stream_set_audioparms\n"));
 	
-	close_params.wPipeIndex = stream->pipe;	
-	status = stream->card->pEG->CloseAudio(&close_params);
-	if(status!=ECHOSTATUS_OK && status!=ECHOSTATUS_CHANNEL_NOT_OPEN) {
-		PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
-		PRINT((" status: %s \n", pStatusStrs[status]));
-		return B_ERROR;
+	if (stream->pipe >= 0) {
+		close_params.wPipeIndex = stream->pipe;	
+		status = stream->card->pEG->CloseAudio(&close_params);
+		if(status!=ECHOSTATUS_OK && status!=ECHOSTATUS_CHANNEL_NOT_OPEN) {
+			PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
+			PRINT((" status: %s \n", pStatusStrs[status]));
+			return B_ERROR;
+		}
 	}
 	
 	open_params.bIsCyclic = TRUE;
