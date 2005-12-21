@@ -10,4 +10,6 @@
 #define NUM_IO_PAGES	4
 	/* 16 kB */
 
+#define PAGE_SHIFT 12
+
 #endif	/* ARCH_PPC_VM_H */

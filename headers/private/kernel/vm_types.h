@@ -22,10 +22,11 @@ typedef struct vm_page {
 
 	struct vm_page		*hash_next;
 
-	addr_t				ppn; // physical page number
-	off_t				offset;
+	addr_t				physical_page_number;
 
 	struct vm_cache		*cache;
+	uint32				cache_offset;
+							// in page size units
 
 	struct vm_page		*cache_prev;
 	struct vm_page		*cache_next;

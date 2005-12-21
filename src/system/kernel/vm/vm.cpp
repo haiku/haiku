@@ -819,7 +819,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 
 		if (wiring == B_CONTIGUOUS) {
 			// we had reserved the area space upfront...
-			addr_t pageNumber = page->ppn;
+			addr_t pageNumber = page->physical_page_number;
 			int32 i;
 			for (i = size / B_PAGE_SIZE; i-- > 0; pageNumber++) {
 				page = vm_lookup_page(pageNumber);
@@ -902,7 +902,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			// We have already allocated our continuous pages run, so we can now just
 			// map them in the address space
 			vm_translation_map *map = &addressSpace->translation_map;
-			addr_t physicalAddress = page->ppn * B_PAGE_SIZE;
+			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
 			addr_t virtualAddress;
 			off_t offset = 0;
 
@@ -1449,8 +1449,9 @@ vm_copy_on_write_area(vm_area *area)
 	map->ops->unmap(map, area->base, area->base - 1 + area->size);
 
 	for (page = lowerCache->page_list; page; page = page->cache_next) {
-		map->ops->map(map, area->base + (page->offset - area->cache_offset),
-			page->ppn * B_PAGE_SIZE, protection);
+		map->ops->map(map, area->base + (page->cache_offset << PAGE_SHIFT)
+			- area->cache_offset, page->physical_page_number << PAGE_SHIFT,
+			protection);
 	}
 
 	map->ops->unlock(map);
@@ -1838,8 +1839,8 @@ dump_cache(int argc, char **argv)
 	kprintf("page_list:\n");
 	for (page = cache->page_list; page != NULL; page = page->cache_next) {
 		if (page->type == PAGE_TYPE_PHYSICAL) {
-			kprintf(" %p ppn 0x%lx offset 0x%Lx type %ld state %ld (%s) ref_count %ld\n",
-				page, page->ppn, page->offset, page->type, page->state, 
+			kprintf(" %p ppn 0x%lx offset 0x%lx type %ld state %ld (%s) ref_count %ld\n",
+				page, page->physical_page_number, page->cache_offset, page->type, page->state, 
 				page_state_to_text(page->state), page->ref_count);
 		} else if(page->type == PAGE_TYPE_DUMMY) {
 			kprintf(" %p DUMMY PAGE state %ld (%s)\n", 
@@ -2419,7 +2420,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	vm_cache_ref *cache_ref;
 	vm_cache_ref *last_cache_ref;
 	vm_cache_ref *top_cache_ref;
-	off_t cache_offset;
+	off_t cacheOffset;
 	vm_page dummy_page;
 	vm_page *page = NULL;
 	addr_t address;
@@ -2483,7 +2484,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// At first, the top most cache from the area is investigated
 
 	top_cache_ref = area->cache_ref;
-	cache_offset = address - area->base + area->cache_offset;
+	cacheOffset = address - area->base + area->cache_offset;
 	vm_cache_acquire_ref(top_cache_ref, true);
 	change_count = addressSpace->change_count;
 	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
@@ -2493,7 +2494,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// Note, since the page fault is resolved with interrupts enabled, the
 		// fault handler could be called more than once for the same reason -
 		// the store must take this into account
-		status_t status = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, addressSpace, cache_offset);
+		status_t status = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, addressSpace, cacheOffset);
 		if (status != B_BAD_HANDLER) {
 			vm_cache_release_ref(top_cache_ref);
 			vm_put_address_space(addressSpace);
@@ -2512,7 +2513,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		mutex_lock(&cache_ref->lock);
 
 		for (;;) {
-			page = vm_cache_lookup_page(cache_ref, cache_offset);
+			page = vm_cache_lookup_page(cache_ref, cacheOffset);
 			if (page != NULL && page->state != PAGE_STATE_BUSY) {
 				vm_page_set_state(page, PAGE_STATE_BUSY);
 				mutex_unlock(&cache_ref->lock);
@@ -2538,12 +2539,12 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// from faulting on the same address and chasing us up the cache chain
 		if (cache_ref == top_cache_ref) {
 			dummy_page.state = PAGE_STATE_BUSY;
-			vm_cache_insert_page(cache_ref, &dummy_page, cache_offset);
+			vm_cache_insert_page(cache_ref, &dummy_page, cacheOffset);
 		}
 
 		// see if the vm_store has it
 		if (cache_ref->cache->store->ops->has_page != NULL
-			&& cache_ref->cache->store->ops->has_page(cache_ref->cache->store, cache_offset)) {
+			&& cache_ref->cache->store->ops->has_page(cache_ref->cache->store, cacheOffset)) {
 			size_t bytesRead;
 			iovec vec;
 
@@ -2552,9 +2553,9 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			mutex_unlock(&cache_ref->lock);
 
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
-			addressSpace->translation_map.ops->get_physical_page(page->ppn * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
+			addressSpace->translation_map.ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
-			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cache_offset, &vec, 1, &bytesRead);
+			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cacheOffset, &vec, 1, &bytesRead);
 			addressSpace->translation_map.ops->put_physical_page((addr_t)vec.iov_base);
 
 			mutex_lock(&cache_ref->lock);
@@ -2563,7 +2564,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 				vm_cache_remove_page(cache_ref, &dummy_page);
 				dummy_page.state = PAGE_STATE_INACTIVE;
 			}
-			vm_cache_insert_page(cache_ref, page, cache_offset);
+			vm_cache_insert_page(cache_ref, page, cacheOffset);
 			mutex_unlock(&cache_ref->lock);
 			break;
 		}
@@ -2583,7 +2584,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (page == NULL) {
 		// we still haven't found a page, so we allocate a clean one
 		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
-		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->ppn));
+		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->physical_page_number));
 
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
@@ -2595,7 +2596,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			dummy_page.state = PAGE_STATE_INACTIVE;
 		}
 
-		vm_cache_insert_page(cache_ref, page, cache_offset);
+		vm_cache_insert_page(cache_ref, page, cacheOffset);
 		mutex_unlock(&cache_ref->lock);
 
 		if (dummy_page.state == PAGE_STATE_BUSY) {
@@ -2624,8 +2625,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		// try to get a mapping for the src and dest page so we can copy it
 		for (;;) {
-			(*addressSpace->translation_map.ops->get_physical_page)(src_page->ppn * B_PAGE_SIZE, (addr_t *)&src, PHYSICAL_PAGE_CAN_WAIT);
-			err = (*addressSpace->translation_map.ops->get_physical_page)(page->ppn * B_PAGE_SIZE, (addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT);
+			(*addressSpace->translation_map.ops->get_physical_page)(src_page->physical_page_number * B_PAGE_SIZE, (addr_t *)&src, PHYSICAL_PAGE_CAN_WAIT);
+			err = (*addressSpace->translation_map.ops->get_physical_page)(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT);
 			if (err == B_NO_ERROR)
 				break;
 
@@ -2651,7 +2652,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			dummy_page.state = PAGE_STATE_INACTIVE;
 		}
 
-		vm_cache_insert_page(top_cache_ref, page, cache_offset);
+		vm_cache_insert_page(top_cache_ref, page, cacheOffset);
 		mutex_unlock(&top_cache_ref->lock);
 
 		if (dummy_page.state == PAGE_STATE_BUSY) {
@@ -2671,7 +2672,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		area = vm_area_lookup(addressSpace, address);
 		if (area == NULL
 			|| area->cache_ref != top_cache_ref
-			|| (address - area->base + area->cache_offset) != cache_offset) {
+			|| (address - area->base + area->cache_offset) != cacheOffset) {
 			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
 			err = B_BAD_ADDRESS;
 		}
@@ -2689,7 +2690,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		atomic_add(&page->ref_count, 1);
 		(*addressSpace->translation_map.ops->lock)(&addressSpace->translation_map);
 		(*addressSpace->translation_map.ops->map)(&addressSpace->translation_map, address,
-			page->ppn * B_PAGE_SIZE, newProtection);
+			page->physical_page_number * B_PAGE_SIZE, newProtection);
 		(*addressSpace->translation_map.ops->unlock)(&addressSpace->translation_map);
 	}
 

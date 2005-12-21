@@ -37,7 +37,7 @@ static void *page_cache_table;
 static spinlock page_cache_table_lock;
 
 struct page_lookup_key {
-	off_t offset;
+	uint32	offset;
 	vm_cache *cache;
 };
 
@@ -50,7 +50,7 @@ page_compare_func(void *_p, const void *_key)
 
 	TRACE(("page_compare_func: page %p, key %p\n", page, key));
 
-	if (page->cache == key->cache && page->offset == key->offset)
+	if (page->cache == key->cache && page->cache_offset == key->offset)
 		return 0;
 
 	return -1;
@@ -62,16 +62,11 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 {
 	vm_page *page = _p;
 	const struct page_lookup_key *key = _key;
-#if 0
-	if(p)
-		dprintf("page_hash_func: p 0x%x, key 0x%x, HASH = 0x%x\n", p, key, HASH(p->offset, p->cache_ref) % range);
-	else
-		dprintf("page_hash_func: p 0x%x, key 0x%x, HASH = 0x%x\n", p, key, HASH(key->offset, key->ref) % range);
-#endif
-#define HASH(offset, ref) ((unsigned int)(offset >> 12) ^ ((unsigned int)(ref)>>4))
+
+#define HASH(offset, ref) ((offset) ^ ((uint32)(ref) >> 4))
 
 	if (page)
-		return HASH(page->offset, page->cache) % range;
+		return HASH(page->cache_offset, page->cache) % range;
 
 	return HASH(key->offset, key->cache) % range;
 }
@@ -212,7 +207,7 @@ vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 
 	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
-	key.offset = offset;
+	key.offset = (uint32)(offset >> PAGE_SHIFT);
 	key.cache = cache_ref->cache;
 
 	state = disable_interrupts();
@@ -235,7 +230,7 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cache_ref, page, offset));
 	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
-	page->offset = offset;
+	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
 
 	if (cache_ref->cache->page_list != NULL)
 		cache_ref->cache->page_list->cache_prev = page;
@@ -351,12 +346,13 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 	oldSize = cache->virtual_size;
 	if (newSize < oldSize) {
 		// we need to remove all pages in the cache outside of the new virtual size
+		uint32 lastOffset = (uint32)(newSize >> PAGE_SHIFT);
 		vm_page *page, *next;
 
 		for (page = cache->page_list; page; page = next) {
 			next = page->cache_next;
 
-			if (page->offset >= newSize) {
+			if (page->cache_offset >= lastOffset) {
 				// remove the page and put it into the free queue
 				vm_cache_remove_page(cacheRef, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);

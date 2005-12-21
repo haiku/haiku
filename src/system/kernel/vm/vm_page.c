@@ -137,20 +137,24 @@ write_page(vm_page *page)
 	status_t status;
 	iovec vecs[1];
 
-	TRACE(("write_page(page = %p): offset = %Ld\n", page, page->offset));
+	TRACE(("write_page(page = %p): offset = %Ld\n", page, (off_t)page->cache_offset << PAGE_SHIFT));
 
-	status = vm_get_physical_page(page->ppn * B_PAGE_SIZE,
+	status = vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
 		(addr_t *)&vecs[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
 	if (status < B_OK)
 		panic("could not map page!");
 	vecs->iov_len = B_PAGE_SIZE;
 
-	status = store->ops->write(store, page->offset, vecs, 1, &length);
+	status = store->ops->write(store, (off_t)page->cache_offset << PAGE_SHIFT,
+		vecs, 1, &length);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
 
-	if (status < B_OK)
-		dprintf("write_page(page = %p): offset = %Ld, status = %ld\n", page, page->offset, status);
+	if (status < B_OK) {
+		dprintf("write_page(page = %p): offset = %lx, status = %ld\n",
+			page, page->cache_offset, status);
+	}
+
 	return status;
 }
 
@@ -164,6 +168,7 @@ vm_page_write_modified(vm_cache *cache)
 
 	for (; page; page = page->cache_next) {
 		bool gotPage = false;
+		off_t pageOffset;
 		status_t status;
 		vm_area *area;
 
@@ -188,9 +193,11 @@ vm_page_write_modified(vm_cache *cache)
 		// the chance to write it back, then we'll write it again later - that will
 		// probably not happen that often, though.
 
+		pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
+
 		for (area = page->cache->ref->areas; area; area = area->cache_next) {
-			if (page->offset >= area->cache_offset
-				&& page->offset < area->cache_offset + area->size) {
+			if (pageOffset >= area->cache_offset
+				&& pageOffset < area->cache_offset + area->size) {
 				vm_translation_map *map = &area->address_space->translation_map;
 				map->ops->lock(map);
 
@@ -198,14 +205,14 @@ vm_page_write_modified(vm_cache *cache)
 					// Check if the PAGE_MODIFIED bit hasn't been propagated yet
 					addr_t physicalAddress;
 					uint32 flags;
-					map->ops->query(map, page->offset - area->cache_offset + area->base,
+					map->ops->query(map, pageOffset - area->cache_offset + area->base,
 						&physicalAddress, &flags);
 					if (flags & PAGE_MODIFIED)
 						gotPage = true;
 				}
 				if (gotPage) {
 					// clear the modified flag
-					map->ops->clear_flags(map, page->offset - area->cache_offset
+					map->ops->clear_flags(map, pageOffset - area->cache_offset
 						+ area->base, PAGE_MODIFIED);
 				}
 				map->ops->unlock(map);
@@ -299,7 +306,7 @@ static int pageout_daemon()
 		/* write the page out to it's backing store */
 		vecs->num = 1;
 		vecs->total_len = PAGE_SIZE;
-		vm_get_physical_page(page->ppn * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+		vm_get_physical_page(page->physical_page_number * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
 		vecs->vec[0].iov_len = PAGE_SIZE;
 
 		err = page->cache_ref->cache->store->ops->write(page->cache_ref->cache->store, page->offset, vecs);
@@ -367,7 +374,7 @@ vm_page_init(kernel_args *ka)
 
 	// initialize the free page table
 	for (i = 0; i < num_pages - 1; i++) {
-		all_pages[i].ppn = physical_page_offset + i;
+		all_pages[i].physical_page_number = physical_page_offset + i;
 		all_pages[i].type = PAGE_TYPE_PHYSICAL;
 		all_pages[i].state = PAGE_STATE_FREE;
 		all_pages[i].ref_count = 0;
@@ -466,7 +473,7 @@ page_scrubber(void *unused)
 			scrubCount = i;
 
 			for (i = 0; i < scrubCount; i++) {
-				clear_page(page[i]->ppn * B_PAGE_SIZE);
+				clear_page(page[i]->physical_page_number * B_PAGE_SIZE);
 			}
 
 			state = disable_interrupts();
@@ -601,7 +608,7 @@ out:
 
 	if (p != NULL && page_state == PAGE_STATE_CLEAR
 		&& (old_page_state == PAGE_STATE_FREE || old_page_state == PAGE_STATE_UNUSED))
-		clear_page(p->ppn * B_PAGE_SIZE);
+		clear_page(p->physical_page_number * B_PAGE_SIZE);
 
 	return p;
 }
@@ -663,7 +670,7 @@ vm_page_allocate_page(int page_state)
 
 	// if needed take the page from the free queue and zero it out
 	if (page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE)
-		clear_page(p->ppn * B_PAGE_SIZE);
+		clear_page(p->physical_page_number * B_PAGE_SIZE);
 
 	return p;
 }

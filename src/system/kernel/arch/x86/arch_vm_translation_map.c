@@ -359,7 +359,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		// mark the page WIRED 
 		vm_page_set_state(page, PAGE_STATE_WIRED);
 
-		pgtable = page->ppn * B_PAGE_SIZE;
+		pgtable = page->physical_page_number * B_PAGE_SIZE;
 
 		TRACE(("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable));
 

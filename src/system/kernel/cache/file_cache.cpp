@@ -445,7 +445,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 		vm_cache_insert_page(cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		if (vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) < B_OK)
+		if (vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) < B_OK)
 			panic("could not get physical page");
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
@@ -578,7 +578,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 		vm_cache_insert_page(ref->cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress,
+		vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE, &virtualAddress,
 			PHYSICAL_PAGE_CAN_WAIT);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
@@ -773,7 +773,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 
 		TRACE(("lookup page from offset %Ld: %p, size = %lu, pageOffset = %lu\n", offset, page, bytesLeft, pageOffset));
 		if (page != NULL
-			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE,
+			&& vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
 					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
 			// it is, so let's satisfy the first part of the request, if we have to
 			if (lastBuffer != buffer) {

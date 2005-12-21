@@ -360,7 +360,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 
 		for (uint32 i = 0; i < numPages; i++) {
 			map->ops->map(map, base + chunk * cache->chunk_size + i * B_PAGE_SIZE,
-				pages[pageBaseIndex + i]->ppn * B_PAGE_SIZE,
+				pages[pageBaseIndex + i]->physical_page_number * B_PAGE_SIZE,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 

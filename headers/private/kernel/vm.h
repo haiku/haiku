@@ -9,8 +9,9 @@
 #define _KERNEL_VM_H
 
 
-#include <kernel.h>
+//#include <kernel.h>
 #include <vm_types.h>
+#include <arch/vm.h>
 #include <arch/vm_translation_map.h>
 
 struct kernel_args;
