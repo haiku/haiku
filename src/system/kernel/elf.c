@@ -1013,11 +1013,11 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
-	char baseName[64];
-	int fd;
-	int err;
-	int i;
+	char baseName[B_OS_NAME_LENGTH];
+	status_t err;
 	ssize_t len;
+	int fd;
+	int i;
 
 	TRACE(("elf_load: entry path '%s', team %p\n", path, team));
 
@@ -1066,17 +1066,25 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 	// construct a nice name for the region we have to create below
 	{
-		int32 length = strlen(path);
-		if (length > 52)
-			sprintf(baseName, "...%s", path + length - 52);
+		int32 length;
+
+		const char *leaf = strrchr(path, '/');
+		if (leaf == NULL)
+			leaf = path;
 		else
-			strcpy(baseName, path);
+			leaf++;
+
+		length = strlen(leaf);
+		if (length > B_OS_NAME_LENGTH - 8)
+			sprintf(baseName, "...%s", leaf + length + 8 - B_OS_NAME_LENGTH);
+		else
+			strcpy(baseName, leaf);
 	}
 
 	// map the program's segments into memory
 
 	for (i = 0; i < eheader.e_phnum; i++) {
-		char regionName[64];
+		char regionName[B_OS_NAME_LENGTH];
 		char *regionAddress;
 		area_id id;
 
@@ -1126,7 +1134,7 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 			if (memUpperBound != fileUpperBound) {
 				size_t bss_size = memUpperBound - fileUpperBound;
 
-				sprintf(regionName, "%s_bss%d", baseName, i);
+				snprintf(regionName, B_OS_NAME_LENGTH, "%s_bss%d", baseName, i);
 
 				regionAddress += fileUpperBound;
 				id = create_area_etc(team, regionName, (void **)&regionAddress,
@@ -1141,7 +1149,7 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 			/*
 			 * assume ro/text segment
 			 */
-			sprintf(regionName, "%s_seg%dro", baseName, i);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%dro", baseName, i);
 
 			id = vm_map_file(team->id, regionName,
 				(void **)&regionAddress,
