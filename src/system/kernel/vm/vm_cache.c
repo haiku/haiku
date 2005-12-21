@@ -31,7 +31,7 @@
 
 
 /* hash table of pages keyed by cache they're in and offset */
-#define PAGE_TABLE_SIZE 1024 /* make this dynamic */
+#define PAGE_TABLE_SIZE 1024 /* TODO: make this dynamic */
 
 static void *page_cache_table;
 static spinlock page_cache_table_lock;
@@ -92,6 +92,11 @@ vm_cache_create(vm_store *store)
 {
 	vm_cache *cache;
 
+	if (store == NULL) {
+		panic("vm_cache created with NULL store!");
+		return NULL;
+	}
+
 	cache = malloc(sizeof(vm_cache));
 	if (cache == NULL)
 		return NULL;
@@ -99,12 +104,13 @@ vm_cache_create(vm_store *store)
 	cache->page_list = NULL;
 	cache->ref = NULL;
 	cache->source = NULL;
-	cache->store = store;
-	if (store != NULL)
-		store->cache = cache;
 	cache->virtual_size = 0;
 	cache->temporary = 0;
 	cache->scan_skip = 0;
+
+	// connect the store to its cache
+	cache->store = store;
+	store->cache = cache;
 
 	return cache;
 }
@@ -119,10 +125,16 @@ vm_cache_ref_create(vm_cache *cache)
 	if (ref == NULL)
 		return NULL;
 
-	ref->cache = cache;
-	mutex_init(&ref->lock, "cache_ref_mutex");
+	if (mutex_init(&ref->lock, "cache_ref_mutex") < B_OK) {
+		free(ref);
+		return NULL;
+	}
+
 	ref->areas = NULL;
 	ref->ref_count = 1;
+
+	// connect the cache to its ref
+	ref->cache = cache;
 	cache->ref = ref;
 
 	return ref;
@@ -167,9 +179,8 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 
 	// delete this cache
 
-	// delete the cache's backing store, if it has one
-	if (cache_ref->cache->store)
-		(*cache_ref->cache->store->ops->destroy)(cache_ref->cache->store);
+	// delete the cache's backing store
+	cache_ref->cache->store->ops->destroy(cache_ref->cache->store);
 
 	// free all of the pages in the cache
 	page = cache_ref->cache->page_list;
@@ -322,7 +333,7 @@ vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
 		//	enough for a commitment of that size?
 
 		// try to commit more memory
-		status = (store->ops->commit)(store, commitment);
+		status = store->ops->commit(store, commitment);
 	}
 
 	mutex_unlock(&ref->lock);
