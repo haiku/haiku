@@ -120,14 +120,18 @@ vm_cache_ref *
 vm_cache_ref_create(vm_cache *cache)
 {
 	vm_cache_ref *ref;
+	status_t status;
 
 	ref = malloc(sizeof(vm_cache_ref));
 	if (ref == NULL)
 		return NULL;
 
-	if (mutex_init(&ref->lock, "cache_ref_mutex") < B_OK) {
-//		free(ref);
-//		return NULL;
+	status = mutex_init(&ref->lock, "cache_ref_mutex");
+	if (status < B_OK && (!kernel_startup || status != B_NO_MORE_SEMS)) {
+		// During early boot, we cannot create semaphores - they are
+		// created later in vm_init_post_sem()
+		free(ref);
+		return NULL;
 	}
 
 	ref->areas = NULL;
