@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src tests kernel boot ;
-
-SubInclude HAIKU_TOP src tests kernel boot heap ;
-SubInclude HAIKU_TOP src tests kernel boot loader ;

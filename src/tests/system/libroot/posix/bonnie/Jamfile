@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tests system libroot posix bonnie ;
+
+SimpleTest bonnie :
+	Bonnie.c
+;
+

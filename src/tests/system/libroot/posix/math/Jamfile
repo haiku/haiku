@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src tests system libroot posix math ;
+
+UsePrivateHeaders libroot ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src system libroot posix glibc ] ;
+SubDirCcFlags -Dnational ;
+
+MATH_SOURCES = 	
+	acosh.c	asincos.c	asinh.c	atan.c
+	atan2.c	atanh.c	cabs.c	cbrt.c
+	ceilf.c	cosh.c	erf.c	exp.c
+	exp__E.c	expm1.c	floatmath.c	floor.c
+	floorf.c	fmod.c	gamma.c	ieee.c
+	j0.c	j1.c	jn.c	lgamma.c
+	log.c	log10.c	log1p.c	log__L.c
+	math_globals.c	pow.c
+	sincos.c	sinh.c	tan.c 	tanh.c
+	;
+
+SimpleTest math_test
+	: math_test.cpp $(MATH_SOURCES)
+	;
+
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles
+		$(MATH_SOURCES)
+	] = [ FDirName $(HAIKU_TOP) src system libroot posix math ] ;

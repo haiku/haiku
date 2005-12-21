@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src tests system libroot ;
+
+SubInclude HAIKU_TOP src tests system libroot os ;
+SubInclude HAIKU_TOP src tests system libroot posix ;

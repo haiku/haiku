@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests system consoled ;
+
+UsePrivateHeaders kernel ;
+UseHeaders [ FDirName $(HAIKU_TOP) src apps terminal ] ;
+
+Application consoled :
+	consoled.cpp
+	: libroot.so libbe.so ;

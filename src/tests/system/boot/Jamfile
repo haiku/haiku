@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src tests system boot ;
+
+SubInclude HAIKU_TOP src tests system boot heap ;
+SubInclude HAIKU_TOP src tests system boot loader ;

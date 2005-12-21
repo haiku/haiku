@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src tests system boot heap ;
+
+UsePublicHeaders support ;
+UsePrivateHeaders kernel ;
+
+SubDirHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
+
+ObjectDefines heap.cpp : malloc=heap_malloc free=heap_free realloc=heap_realloc HEAP_TEST=1 ;
+
+# This lets the correct stdio.h header be available
+# on the build platform.
+# This will be fixed with the move to GNU's stdio header
+if $(OS) = "LINUX" {
+	SubDirC++Flags -include /usr/include/stdio.h ;
+} else {
+	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
+}
+
+BuildPlatformTest heapTest :
+	heapTest.cpp
+
+	heap.cpp
+	:
+	;
+
+# Tell Jam where to find the utility sources
+SEARCH on [ FGristFiles 
+		heap.cpp
+	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
+

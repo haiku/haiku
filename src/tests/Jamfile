@@ -27,7 +27,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 SubInclude HAIKU_TOP src tests add-ons ;
 SubInclude HAIKU_TOP src tests apps ;
 SubInclude HAIKU_TOP src tests bin ;
-SubInclude HAIKU_TOP src tests kernel ;
+SubInclude HAIKU_TOP src tests system ;
 SubInclude HAIKU_TOP src tests kits ;
 SubInclude HAIKU_TOP src tests misc ;
 SubInclude HAIKU_TOP src tests servers ;

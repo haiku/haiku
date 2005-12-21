@@ -1,0 +1,133 @@
+SubDir HAIKU_TOP src tests system boot loader ;
+
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders [ FDirName shared ] ;
+SubDirHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirHdrs $(HAIKU_TOP) src system boot loader ;
+
+# we need to redefine certain calls in the boot loader so that
+# they will really be used instead of their POSIX counterparts
+# in libroot.so
+
+ObjectDefines
+	# boot loader
+	main.cpp
+	vfs.cpp
+	partitions.cpp
+	RootFileSystem.cpp
+	elf.cpp
+	menu.cpp
+	loader.cpp
+	kernel_args.cpp
+	load_driver_settings.cpp
+
+	# other
+	platform_menu.cpp
+	driver_settings.c
+
+	# partitions
+	amiga_rdb.cpp
+	apple.cpp
+	intel.cpp
+	PartitionMap.cpp
+	PartitionMapParser.cpp
+	:
+	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close main=boot_main
+	;
+
+{
+	local defines =
+		_BOOT_MODE
+		BOOT_ARCH=\\\"$(TARGET_ARCH)\\\"
+			# the boot loader test application will try to load the BeOS kernel
+			# from a supported partition/file system
+
+		BOOT_SUPPORT_PARTITION_AMIGA
+		BOOT_SUPPORT_PARTITION_APPLE
+		BOOT_SUPPORT_PARTITION_INTEL
+
+		BOOT_SUPPORT_FILE_SYSTEM_BFS
+		BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
+		BOOT_SUPPORT_FILE_SYSTEM_TARFS
+		;
+
+	defines = [ FDefines $(defines) ] ;
+
+	if $(OS) = "LINUX" {
+	} else {
+		#SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fcheck-memory-usage -D_NO_INLINE_ASM ;
+		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -D_NO_INLINE_ASM ;
+	}
+}
+
+SimpleTest BootLoaderTest :
+	# userland bindings
+	platform_start.cpp
+	platform_debug.cpp
+	platform_devices.cpp
+	platform_heap.cpp
+	platform_menu.cpp
+	platform_misc.cpp
+	platform_mmu.cpp
+	Handle.cpp
+
+	# boot loader
+	main.cpp
+	vfs.cpp
+	partitions.cpp
+	RootFileSystem.cpp
+	elf.cpp
+	menu.cpp
+	loader.cpp
+	kernel_args.cpp
+	load_driver_settings.cpp
+
+	# partitioning systems
+	amiga_rdb.cpp
+	apple.cpp
+	intel.cpp
+	PartitionMap.cpp
+	PartitionMapParser.cpp
+
+	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
+	list.c
+	strlcat.c
+	strlcpy.c
+	driver_settings.c
+
+	: boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
+	;
+
+# Tell Jam where to find the utility sources
+
+SEARCH on [ FGristFiles list.c ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
+	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+
+SEARCH on [ FGristFiles driver_settings.c ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+
+SEARCH on [ FGristFiles 
+		main.cpp vfs.cpp partitions.cpp
+		heap.cpp RootFileSystem.cpp
+		elf.cpp menu.cpp loader.cpp
+		kernel_args.cpp load_driver_settings.cpp
+	] = [ FDirName $(HAIKU_TOP) src system boot loader ] ;
+
+# partitioning system modules
+
+SEARCH on [ FGristFiles amiga_rdb.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+SEARCH on [ FGristFiles apple.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
+
+SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
+
+
+SubInclude HAIKU_TOP src tests system boot loader file_systems ;

@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src tests kernel libroot posix bonnie ;
-
-SimpleTest bonnie :
-	Bonnie.c
-;
-

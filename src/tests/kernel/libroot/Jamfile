@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src tests kernel libroot ;
-
-SubInclude HAIKU_TOP src tests kernel libroot os ;
-SubInclude HAIKU_TOP src tests kernel libroot posix ;

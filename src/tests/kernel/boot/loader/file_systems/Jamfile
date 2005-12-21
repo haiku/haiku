@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src tests kernel boot loader file_systems ;
-
-SubInclude HAIKU_TOP src tests kernel boot loader file_systems amiga_ffs ;
-SubInclude HAIKU_TOP src tests kernel boot loader file_systems bfs ;
-SubInclude HAIKU_TOP src tests kernel boot loader file_systems tarfs ;

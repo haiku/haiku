@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src tests system boot loader file_systems tarfs ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders kernel shared storage ;
+SubDirHdrs $(HAIKU_TOP) src tests system boot loader ;
+SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
+ObjectDefines 
+	tarfs.cpp
+	:
+	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close _BOOT_MODE
+	;
+
+#SubDirCcFlags -DGUNZIP=1 ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
+
+KernelStaticLibrary boottest_tarfs :
+	tarfs.cpp
+	inflate.c
+	: #-fcheck-memory-usage -D_NO_INLINE_ASM
+	;
+
+# Tell Jam where to find the sources
+
+SEARCH on [ FGristFiles
+		tarfs.cpp
+	] = [ FDirName $(HAIKU_TOP) src system boot loader file_systems tarfs ] ;
