@@ -7,8 +7,9 @@
  */
 
 
+#include "vm_store_anonymous_noswap.h"
+
 #include <KernelExport.h>
-#include <vm_store_anonymous_noswap.h>
 #include <vm_priv.h>
 #include <arch_config.h>
 

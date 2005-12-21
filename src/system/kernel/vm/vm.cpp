@@ -7,6 +7,10 @@
  */
 
 
+#include "vm_store_anonymous_noswap.h"
+#include "vm_store_device.h"
+#include "vm_store_null.h"
+
 #include <OS.h>
 #include <KernelExport.h>
 
@@ -15,9 +19,6 @@
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
-#include <vm_store_anonymous_noswap.h>
-#include <vm_store_device.h>
-#include <vm_store_null.h>
 #include <vm_low_memory.h>
 #include <file_cache.h>
 #include <memheap.h>

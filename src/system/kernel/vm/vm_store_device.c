@@ -7,8 +7,9 @@
  */
 
 
+#include "vm_store_device.h"
+
 #include <KernelExport.h>
-#include <vm_store_device.h>
 #include <vm_priv.h>
 
 #include <stdlib.h>
