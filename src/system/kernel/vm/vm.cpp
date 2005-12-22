@@ -1265,16 +1265,16 @@ _vm_delete_area(vm_address_space *addressSpace, area_id id)
 
 
 status_t
-vm_delete_area(team_id aid, area_id rid)
+vm_delete_area(team_id team, area_id id)
 {
 	vm_address_space *addressSpace;
 	status_t err;
 
-	addressSpace = vm_get_address_space_by_id(aid);
+	addressSpace = vm_get_address_space_by_id(team);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	err = _vm_delete_area(addressSpace, rid);
+	err = _vm_delete_area(addressSpace, id);
 	vm_put_address_space(addressSpace);
 	return err;
 }
@@ -1847,19 +1847,20 @@ dump_cache(int argc, char **argv)
 static void
 _dump_area(vm_area *area)
 {
-	kprintf("dump of area at %p:\n", area);
-	kprintf("name: '%s'\n", area->name);
-	kprintf("id: 0x%lx\n", area->id);
-	kprintf("base: 0x%lx\n", area->base);
-	kprintf("size: 0x%lx\n", area->size);
-	kprintf("protection: 0x%lx\n", area->protection);
-	kprintf("wiring: 0x%x\n", area->wiring);
-	kprintf("memory_type: 0x%x\n", area->memory_type);
-	kprintf("ref_count: %ld\n", area->ref_count);
-	kprintf("cache_ref: %p\n", area->cache_ref);
-	kprintf("cache_offset: 0x%Lx\n", area->cache_offset);
-	kprintf("cache_next: %p\n", area->cache_next);
-	kprintf("cache_prev: %p\n", area->cache_prev);
+	kprintf("AREA: %p\n", area);
+	kprintf("name:\t\t'%s'\n", area->name);
+	kprintf("owner:\t\t0x%lx\n", area->address_space->id);
+	kprintf("id:\t\t0x%lx\n", area->id);
+	kprintf("base:\t\t0x%lx\n", area->base);
+	kprintf("size:\t\t0x%lx\n", area->size);
+	kprintf("protection:\t0x%lx\n", area->protection);
+	kprintf("wiring:\t\t0x%x\n", area->wiring);
+	kprintf("memory_type:\t0x%x\n", area->memory_type);
+	kprintf("ref_count:\t%ld\n", area->ref_count);
+	kprintf("cache_ref:\t%p\n", area->cache_ref);
+	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
+	kprintf("cache_next:\t%p\n", area->cache_next);
+	kprintf("cache_prev:\t%p\n", area->cache_prev);
 }
 
 
