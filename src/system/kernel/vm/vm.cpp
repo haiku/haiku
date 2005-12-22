@@ -1902,11 +1902,18 @@ dump_area_list(int argc, char **argv)
 {
 	vm_area *area;
 	struct hash_iterator iter;
+	int32 id = -1;
 
-	kprintf("addr\t      id  base\t\tsize\t\tprotect\tlock\tname\n");
+	if (argc > 1)
+		id = strtoul(argv[1], NULL, 0);
+
+	kprintf("addr          id  base\t\tsize\t\tprotect\tlock\tname\n");
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
+		if (id != -1 && area->address_space->id != id)
+			continue;
+
 		kprintf("%p %5lx  %p\t%p\t%ld\t%d\t%s\n", area, area->id, (void *)area->base,
 			(void *)area->size, area->protection, area->wiring, area->name);
 	}
