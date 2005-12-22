@@ -116,8 +116,8 @@ CachedNode::SetTo(off_t offset, bool check)
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node read from offset %Ld, inode at %Ld\n",
-					offset, fTree->fStream->ID()));
+			FATAL(("invalid node (%p) read from offset %Ld, inode at %Ld\n",
+				fNode, offset, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
@@ -146,8 +146,8 @@ CachedNode::SetToWritable(Transaction &transaction, off_t offset, bool check)
 	if (InternalSetTo(&transaction, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node read from offset %Ld, inode at %Ld\n",
-					offset, fTree->fStream->ID()));
+			FATAL(("invalid node [%p] read from offset %Ld, inode at %Ld\n",
+				fNode, offset, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
