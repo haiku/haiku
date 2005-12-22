@@ -1228,6 +1228,8 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name);
 	}
+	if (status == B_OK)
+		vm_cache_acquire_ref(sourceArea->cache_ref);
 
 	vm_put_area(sourceArea);
 	vm_put_address_space(addressSpace);
