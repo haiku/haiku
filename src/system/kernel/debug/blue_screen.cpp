@@ -388,7 +388,9 @@ parse_character(char c)
 					break;
 				case '\t':
 					// ToDo: real tab...
-					put_character(' ');
+					sScreen.x = (sScreen.x + 8) & ~7;
+					if (sScreen.x >= sScreen.columns)
+						next_line();
 					break;
 
 				case '\r':
