@@ -27,6 +27,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+//#define TRACE_CHUNKS
+#ifdef TRACE_CHUNKS
+#	define CTRACE(x) debug_printf x
+#else
+#	define CTRACE(x) ;
+#endif
+
+
 using namespace BPrivate;
 
 // How many iterations we spin waiting for a lock.
@@ -55,10 +63,6 @@ static free_chunk *sFreeChunks;
 static void
 init_after_fork(void)
 {
-	sHeapLock = create_sem(1, "heap");
-	if (sHeapLock < B_OK)
-		exit(1);
-
 	// find the heap area
 	sHeapArea = area_for(sHeapBase);
 	if (sHeapArea < 0) {
@@ -90,9 +94,7 @@ __init_heap(void)
 	sFreeHeapBase = (addr_t)sHeapBase;
 	sHeapAreaSize = kInitialHeapSize;
 
-	sHeapLock = create_sem(1, "heap");
-	if (sHeapLock < B_OK)
-		return sHeapLock;
+	hoardLockInit(sHeapLock, "heap");
 
 	atfork(&init_after_fork);
 		// Note: Needs malloc(). Hence we need to be fully initialized.
@@ -105,28 +107,49 @@ __init_heap(void)
 }
 
 
+static void
+insert_chunk(free_chunk *newChunk)
+{
+	free_chunk *chunk = (free_chunk *)sFreeChunks, *smaller = NULL;
+	for (; chunk != NULL; chunk = chunk->next) {
+		if (chunk->size < newChunk->size)
+			smaller = chunk;
+		else
+			break;
+	}
+
+	if (smaller) {
+		newChunk->next = smaller->next;
+		smaller->next = newChunk;
+	} else {
+		newChunk->next = sFreeChunks;
+		sFreeChunks = newChunk;
+	}
+}
+
+
 namespace BPrivate {
 
 void *
 hoardSbrk(long size)
 {
 	assert(size > 0);
+	CTRACE(("sbrk: size = %ld\n", size));
 
 	// align size request
 	size = (size + hoardHeap::ALIGNMENT - 1) & ~(hoardHeap::ALIGNMENT - 1);
 
-	status_t status;
-	do {
-		status = acquire_sem(sHeapLock);
-	} while (status == B_INTERRUPTED);
-	if (status < B_OK)
-		return NULL;
+	hoardLock(sHeapLock);
 
 	// find chunk in free list
 	free_chunk *chunk = sFreeChunks, *last = NULL;
-	for (; chunk != NULL; chunk = chunk->next, last = chunk) {
-		if (chunk->size < (size_t)size)
+	for (; chunk != NULL; chunk = chunk->next) {
+		CTRACE(("  chunk %p (%ld)\n", chunk, chunk->size));
+
+		if (chunk->size < (size_t)size) {
+			last = chunk;
 			continue;
+		}
 
 		// this chunk is large enough to satisfy the request
 
@@ -135,17 +158,30 @@ hoardSbrk(long size)
 
 		void *address = (void *)chunk;
 
-		if (chunk->size + sizeof(free_chunk) > (size_t)size)
-			chunk = (free_chunk *)((addr_t)chunk + size);
-		else
-			chunk = chunk->next;
-		
-		if (last != NULL)
-			last->next = chunk;
-		else
-			sFreeChunks = chunk;
+		if (chunk->size > (size_t)size + sizeof(free_chunk)) {
+			// divide this chunk into smaller bits
+			uint32 newSize = chunk->size - size;
+			free_chunk *next = chunk->next;
 
-		release_sem(sHeapLock);
+			chunk = (free_chunk *)((addr_t)chunk + size);
+			chunk->next = next;
+			chunk->size = newSize;
+
+			if (last != NULL) {
+				last->next = next;
+				insert_chunk(chunk);
+			} else
+				sFreeChunks = chunk;
+		} else {
+			chunk = chunk->next;
+
+			if (last != NULL)
+				last->next = chunk;
+			else
+				sFreeChunks = chunk;
+		}
+
+		hoardUnlock(sHeapLock);
 		return address;
 	}
 
@@ -160,7 +196,7 @@ hoardSbrk(long size)
 	if (pageSize < sHeapAreaSize) {
 		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n", find_thread(NULL), size));
 		// the area is large enough already
-		release_sem(sHeapLock);
+		hoardUnlock(sHeapLock);
 		return (void *)(sFreeHeapBase + oldHeapSize);
 	}
 
@@ -171,13 +207,13 @@ hoardSbrk(long size)
 
 	if (resize_area(sHeapArea, pageSize) < B_OK) {
 		// out of memory - ToDo: as a fall back, we could try to allocate another area
-		release_sem(sHeapLock);
+		hoardUnlock(sHeapLock);
 		return NULL;
 	}
 
 	sHeapAreaSize = pageSize;
 
-	release_sem(sHeapLock);
+	hoardUnlock(sHeapLock);
 	return (void *)(sFreeHeapBase + oldHeapSize);
 }
 
@@ -185,7 +221,61 @@ hoardSbrk(long size)
 void
 hoardUnsbrk(void *ptr, long size)
 {
-	// NOT CURRENTLY IMPLEMENTED!
+	CTRACE(("unsbrk: %p, %ld!\n", ptr, size));
+
+	hoardLock(sHeapLock);
+
+	// TODO: hoard always allocates and frees in typical sizes, so we could
+	//	save a lot of effort if we just had a similar mechanism
+
+	// We add this chunk to our free list - first, try to find an adjacent
+	// chunk, so that we can merge them together
+
+	free_chunk *chunk = (free_chunk *)sFreeChunks, *last = NULL, *smaller = NULL;
+	for (; chunk != NULL; chunk = chunk->next) {
+		if ((addr_t)chunk + chunk->size == (addr_t)ptr
+			|| (addr_t)ptr + size == (addr_t)chunk) {
+			// chunks are adjacent - merge them
+
+			CTRACE(("  found adjacent chunks: %p, %ld\n", chunk, chunk->size));
+			if (last)
+				last->next = chunk->next;
+			else
+				sFreeChunks = chunk->next;
+
+			if ((addr_t)chunk < (addr_t)ptr)
+				chunk->size += size;
+			else {
+				free_chunk *newChunk = (free_chunk *)ptr;
+				newChunk->next = chunk->next;
+				newChunk->size = size + chunk->size;
+				chunk = newChunk;
+			}
+
+			insert_chunk(chunk);
+			hoardUnlock(sHeapLock);
+			return;
+		}
+
+		last = chunk;
+
+		if (chunk->size < (size_t)size)
+			smaller = chunk;
+	}
+
+	// we didn't find an adjacent chunk, so insert the new chunk into the list
+
+	free_chunk *newChunk = (free_chunk *)ptr;
+	newChunk->size = size;
+	if (smaller) {
+		newChunk->next = smaller->next;
+		smaller->next = newChunk;
+	} else {
+		newChunk->next = sFreeChunks;
+		sFreeChunks = newChunk;
+	}
+
+	hoardUnlock(sHeapLock);
 }
 
 
