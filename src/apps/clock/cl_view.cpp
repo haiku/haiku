@@ -156,16 +156,16 @@ TOffscreenView::DrawX()
 			hours -= 12;
 		hours *= 5;
 		hours += (fMinutes / 12);
-		StrokeLine(BPoint(fOffset, fOffset), fHourPoints[hours]);
 		SetDrawingMode(B_OP_OVER);
+		StrokeLine(BPoint(fOffset, fOffset), fHourPoints[hours]);
 
 		if (fCenter != NULL)
 			DrawBitmap(fCenter, BPoint(fOffset - 3, fOffset - 3));
-		SetDrawingMode(B_OP_COPY);
 		StrokeLine(BPoint(fOffset, fOffset), fMinutePoints[fMinutes]);
 		SetHighColor(180, 180, 180);
 		if (fShowSeconds)
 			StrokeLine(BPoint(fOffset, fOffset), fMinutePoints[fSeconds]);
+		SetDrawingMode(B_OP_COPY);
 		if (fInner != NULL)
 			DrawBitmap(fInner, BPoint(fOffset - 1, fOffset - 1));
 		Sync();
