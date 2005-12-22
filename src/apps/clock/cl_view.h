@@ -11,44 +11,36 @@
 #ifndef	_CL_VIEW_H_
 #define _CL_VIEW_H_
 
-#ifndef _APPLICATION_H
 #include <Application.h>
-#endif
-#ifndef _WINDOW_H
-#include <Window.h>
-#endif
-#ifndef _VIEW_H
-#include <View.h>
-#endif
-#ifndef _BITMAP_H
 #include <Bitmap.h>
-#endif
+#include <View.h>
+#include <Window.h>
 
 #include <time.h>
 
 class TOffscreenView : public BView {
 
 public:
-				TOffscreenView(BRect frame, char *name, short mRadius,
+			TOffscreenView(BRect frame, char *name, short mRadius,
 						short hRadius, short offset, long face, bool show); 
-virtual			~TOffscreenView();
-virtual	void	AttachedToWindow();
-virtual	void	DrawX();
+	virtual		~TOffscreenView();
+	virtual	void	AttachedToWindow();
+	virtual	void	DrawX();
 		void	NextFace();
 
-BBitmap	*fClockFace[9];
-BBitmap	*fCenter;
-BBitmap	*fInner;
-short			fFace;
-BPoint			fMinutePoints[60];
-BPoint			fHourPoints[60];
-short			fMinutesRadius;
-short			fHoursRadius;
-short			fOffset;
-short			fHours;
-short			fMinutes;
-short			fSeconds;
-bool			fShowSeconds;
+	BBitmap		*fClockFace[9];
+	BBitmap		*fCenter;
+	BBitmap		*fInner;
+	short		fFace;
+	BPoint		fMinutePoints[60];
+	BPoint		fHourPoints[60];
+	short		fMinutesRadius;
+	short		fHoursRadius;
+	short		fOffset;
+	short		fHours;
+	short		fMinutes;
+	short		fSeconds;
+	bool		fShowSeconds;
 };
 
 
@@ -80,12 +72,12 @@ private:
 
 	typedef	BView inherited;
 		
-BBitmap	*Offscreen;
-TOffscreenView	*OffscreenView;
-short	fmRadius;
-short	fhRadius;
-short	fOffset;
-BRect	fRect;
+	BBitmap	*fOffscreen;
+	TOffscreenView	*fOffscreenView;
+	short	fmRadius;
+	short	fhRadius;
+	short	fOffset;
+	BRect	fRect;
 };
 
 #endif
