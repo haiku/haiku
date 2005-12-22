@@ -246,6 +246,7 @@ arch_debug_init(kernel_args *args)
 	// at this stage, the debugger command system is alive
 
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
+	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
 	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread");
 
 	return B_NO_ERROR;
