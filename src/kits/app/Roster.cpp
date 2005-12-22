@@ -2457,7 +2457,7 @@ query_for_app(const char *signature, entry_ref *appRef)
 		if (volume.SetTo(dev_for_path("/boot")) != B_OK
 			|| query.SetVolume(&volume) != B_OK
 			|| query.PushAttr("BEOS:APP_SIG") != B_OK
-			|| query.PushString(signature, true) != B_OK
+			|| query.PushString(signature) != B_OK
 			|| query.PushOp(B_EQ) != B_OK
 			|| query.Fetch() != B_OK) {
 			error = B_LAUNCH_FAILED_APP_NOT_FOUND;
