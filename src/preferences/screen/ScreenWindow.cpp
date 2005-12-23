@@ -717,7 +717,8 @@ ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 	if (fSelected == fActive)
 		UpdateActiveMode();
 
-	PostMessage(new BMessage(UPDATE_DESKTOP_COLOR_MSG), fMonitorView);
+	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
+	PostMessage(&message, fMonitorView);
 }
 
 
