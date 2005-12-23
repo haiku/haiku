@@ -234,7 +234,8 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 	fLink.SetSenderPort(fClientReplyPort);
 	fLink.SetReceiverPort(fMessagePort);
 
-	// We cannot call MakeWindowLayer in the constructor, since it 
+	// We cannot call MakeWindowLayer in the constructor, since it
+	// is a virtual function!
 	fWindowLayer = MakeWindowLayer(frame, fTitle, look, feel, flags, workspace);
 	if (!fWindowLayer)
 		return B_NO_MEMORY;
