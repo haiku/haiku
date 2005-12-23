@@ -879,7 +879,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor
 		fGraphicsCard->HideSoftwareCursor(touched);
 
 		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-			static DrawState context;
+			DrawState context;
 			context.SetHighColor(color);
 			context.SetDrawingMode(B_OP_OVER);
 			StrokeLine(start, end, &context);
@@ -903,7 +903,8 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 		if (touched.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(touched);
 
-			touched = fPainter->StrokeLine(start, end, context);
+			fPainter->SetDrawState(context);
+			touched = fPainter->StrokeLine(start, end);
 
 			fGraphicsCard->Invalidate(touched);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -942,17 +943,21 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		if (touched.IsValid()) {
 			fGraphicsCard->HideSoftwareCursor(touched);
 
+			data = (const LineArrayData *)&(linedata[0]);
+
 			DrawState context;
 			context.SetDrawingMode(B_OP_COPY);
-
-			data = (const LineArrayData *)&(linedata[0]);
 			context.SetHighColor(data->color);
-			fPainter->StrokeLine(data->pt1, data->pt2, &context);
+			context.SetPenSize(d->PenSize());
+
+			fPainter->SetDrawState(&context);
+
+			fPainter->StrokeLine(data->pt1, data->pt2);
 
 			for (int32 i = 1; i < numLines; i++) {
 				data = (const LineArrayData *)&(linedata[i]);
-				context.SetHighColor(data->color);
-				fPainter->StrokeLine(data->pt1, data->pt2, &context);
+				fPainter->SetHighColor(data->color);
+				fPainter->StrokeLine(data->pt1, data->pt2);
 			}
 
 			fGraphicsCard->Invalidate(touched);
@@ -981,19 +986,6 @@ DrawingEngine::StrokePoint(const BPoint& pt, DrawState *context)
 
 // #pragma mark -
 
-/*
-// DrawString
-void
-DrawingEngine::DrawString(const char *string, const int32 &length,
-								 const BPoint &pt, const RGBColor &color,
-								 escapement_delta *delta)
-{
-	static DrawState d;
-	d.SetHighColor(color);
-
-	DrawString(string, length, pt, &d, delta);
-}
-*/
 // DrawString
 BPoint
 DrawingEngine::DrawString(const char* string, int32 length,
@@ -1059,7 +1051,7 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 						   const ServerFont& font, escapement_delta* delta)
 {
 	FontLocker locker(&font);
-	static DrawState d;
+	DrawState d;
 	d.SetFont(font);
 	return StringWidth(string, length, &d, delta);
 }
@@ -1079,8 +1071,8 @@ DrawingEngine::StringHeight(const char *string, int32 length,
 // engine after it is already locked here (race condition)
 		FontLocker locker(d);
 		fPainter->SetDrawState(d, true);
-		static BPoint dummy1(0.0, 0.0);
-		static BPoint dummy2(0.0, 0.0);
+		BPoint dummy1(0.0, 0.0);
+		BPoint dummy2(0.0, 0.0);
 		height = fPainter->BoundingBox(string, length, dummy1, &dummy2).Height();
 //		Unlock();
 //	}

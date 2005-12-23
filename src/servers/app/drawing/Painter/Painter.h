@@ -86,11 +86,7 @@ class Painter {
 
 								// lines
 			BRect				StrokeLine(		BPoint a,
-												BPoint b,
-												DrawState* context);
-
-			BRect				StrokeLine(		BPoint b,
-												DrawState* context);
+												BPoint b);
 
 			// returns true if the line was either vertical or horizontal
 			// draws a solid one pixel wide line of color c, no blending

@@ -92,7 +92,9 @@ Painter::Painter()
 	_UpdateFont();
 	fFont.Unlock();
 
+#if USE_OUTLINE_RASTERIZER
 	_UpdateLineWidth();
+#endif
 }
 
 // destructor
@@ -132,6 +134,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
+#if USE_OUTLINE_RASTERIZER
 #if ALIASED_DRAWING
 		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer);
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
@@ -141,7 +144,8 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 
 		// attach our line profile to the renderer, it keeps a pointer
 		fOutlineRenderer->profile(fLineProfile);
-#endif
+#endif // ALIASED_DRAWING
+#endif // USE_OUTLINE_RASTERIZER
 		// the renderer used for filling paths
 		fRenderer = new renderer_type(*fBaseRenderer);
 		fRasterizer = new rasterizer_type();
@@ -165,6 +169,8 @@ Painter::DetachFromBuffer()
 {
 	_MakeEmpty();
 }
+
+// #pragma mark -
 
 // SetDrawState
 void
@@ -200,14 +206,14 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 	fLineJoinMode	= data->LineJoinMode();
 	fMiterLimit		= data->MiterLimit();
 
-	if (updateDrawingMode)
-		_UpdateDrawingMode();
-
 	SetHighColor(data->HighColor().GetColor32());
 	SetLowColor(data->LowColor().GetColor32());
+
+	if (updateDrawingMode)
+		_UpdateDrawingMode();
 }
 
-// #pragma mark -
+// #pragma mark - state
 
 // ConstrainClipping
 void
@@ -256,6 +262,15 @@ Painter::SetPattern(const pattern& p)
 	if (!(p == *fPatternHandler->GetR5Pattern())) {
 		fPatternHandler->SetPattern(p);
 		_UpdateDrawingMode();
+
+		// update renderer color if necessary
+		if (fPatternHandler->IsSolidHigh()) {
+			// pattern was not solid high before
+			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
+		} else if (fPatternHandler->IsSolidLow()) {
+			// pattern was not solid low before
+			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
+		}
 	}
 }
 
@@ -274,11 +289,11 @@ Painter::SetFont(const ServerFont& font)
 	_UpdateFont();
 }
 
-// #pragma mark -
+// #pragma mark - drawing
 
 // StrokeLine
 BRect
-Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
+Painter::StrokeLine(BPoint a, BPoint b)
 {
 	CHECK_CLIPPING
 
@@ -286,8 +301,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 	// because it would mess up our optimized versions
 	_Transform(&a, false);
 	_Transform(&b, false);
-
-	SetPenSize(context->PenSize());
 
 	BRect touched(min_c(a.x, b.x), min_c(a.y, b.y),
 				  max_c(a.x, b.x), max_c(a.y, b.y));
@@ -302,8 +315,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 		touched.Set(0.0, 0.0, -1.0, -1.0);
 		return touched;
 	}
-
-	SetDrawState(context);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
@@ -332,19 +343,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawState* context)
 	return _Clipped(touched);
 }
 
-// StrokeLine
-BRect
-Painter::StrokeLine(BPoint b, DrawState* context)
-{
-	// TODO: move this function elsewhere
-	return StrokeLine(context->PenLocation(), b, context);
-}
-
-typedef union {
-	uint32	data32;
-	int8	data[4];
-} color32;
-
 // StraightLine
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
@@ -358,11 +356,11 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 			dst += x * 4;
 			int32 y1 = (int32)min_c(a.y, b.y);
 			int32 y2 = (int32)max_c(a.y, b.y);
-			color32 color;
-			color.data[0] = c.blue;
-			color.data[1] = c.green;
-			color.data[2] = c.red;
-			color.data[3] = 255;
+			pixel32 color;
+			color.data8[0] = c.blue;
+			color.data8[1] = c.green;
+			color.data8[2] = c.red;
+			color.data8[3] = 255;
 			// draw a line, iterate over clipping boxes
 			fBaseRenderer->first_clip_box();
 			do {
@@ -382,17 +380,16 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	
 		} else if (a.y == b.y) {
 			// horizontal
-			uint8* dst = fBuffer->row(0);
 			uint32 bpr = fBuffer->stride();
 			int32 y = (int32)a.y;
-			dst += y * bpr;
+			uint8* dst = fBuffer->row(y);
 			int32 x1 = (int32)min_c(a.x, b.x);
 			int32 x2 = (int32)max_c(a.x, b.x);
-			color32 color;
-			color.data[0] = c.blue;
-			color.data[1] = c.green;
-			color.data[2] = c.red;
-			color.data[3] = 255;
+			pixel32 color;
+			color.data8[0] = c.blue;
+			color.data8[1] = c.green;
+			color.data8[2] = c.red;
+			color.data8[3] = 255;
 			// draw a line, iterate over clipping boxes
 			fBaseRenderer->first_clip_box();
 			do {
@@ -698,11 +695,11 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 		int32 right = (int32)r.right;
 		int32 bottom = (int32)r.bottom;
 		// get a 32 bit pixel ready with the color
-		color32 color;
-		color.data[0] = c.blue;
-		color.data[1] = c.green;
-		color.data[2] = c.red;
-		color.data[3] = 255;
+		pixel32 color;
+		color.data8[0] = c.blue;
+		color.data8[1] = c.green;
+		color.data8[2] = c.red;
+		color.data8[3] = 255;
 		// fill rects, iterate over clipping boxes
 		fBaseRenderer->first_clip_box();
 		do {
@@ -988,7 +985,7 @@ Painter::InvertRect(const BRect& r) const
 	return _Clipped(r);
 }
 
-// #pragma mark -
+// #pragma mark - private
 
 // _MakeEmpty
 void
@@ -1003,11 +1000,13 @@ Painter::_MakeEmpty()
 	delete fBaseRenderer;
 	fBaseRenderer = NULL;
 
+#if USE_OUTLINE_RASTERIZER
 	delete fOutlineRenderer;
 	fOutlineRenderer = NULL;
 
 	delete fOutlineRasterizer;
 	fOutlineRasterizer = NULL;
+#endif
 
 	delete fScanline;
 	fScanline = NULL;
@@ -1093,13 +1092,6 @@ Painter::_UpdateDrawingMode()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
 	if (fPixelFormat) {
-		if (fPatternHandler->IsSolidHigh()) {
-// TODO: fix me! is already set in SetHighColor()
-			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-		} else if (fPatternHandler->IsSolidLow()) {
-// TODO: fix me! is already set in SetLowColor()
-			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
-		}
 		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 	}
 		
@@ -1109,6 +1101,7 @@ Painter::_UpdateDrawingMode()
 void
 Painter::_SetRendererColor(const rgb_color& color) const
 {
+#if USE_OUTLINE_RASTERIZER
 	if (fOutlineRenderer)
 #if ALIASED_DRAWING
 		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
@@ -1118,7 +1111,8 @@ Painter::_SetRendererColor(const rgb_color& color) const
 		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
 										  color.green / 255.0,
 										  color.blue / 255.0));
-#endif
+#endif // ALIASED_DRAWING
+#endif // USE_OUTLINE_RASTERIZER
 	if (fRenderer)
 		fRenderer->color(agg::rgba(color.red / 255.0,
 								   color.green / 255.0,
