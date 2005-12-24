@@ -320,7 +320,7 @@ BWindowScreen::~BWindowScreen()
 {
 	CALLED();
 	Disconnect();
-	if (fAddonState == 1)
+	if (fAddonImage >= 0)
 		unload_add_on(fAddonImage);
 	
 	SetFullscreen(false);
@@ -438,7 +438,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 				fColorList[x] = list[x];
 		} else {
 			uint32 colorCount = last_index - first_index + 1;
-			if (fAddonState == 1) {
+			if (fAddonImage >= 0) {
 				set_indexed_colors sic = (set_indexed_colors)m_gah(B_SET_INDEXED_COLORS, NULL);
 				if (sic != NULL)
 					sic(colorCount, first_index, (uint8 *)fColorList, 0);
@@ -475,7 +475,7 @@ BWindowScreen::SetSpace(uint32 space)
 bool
 BWindowScreen::CanControlFrameBuffer()
 {
-	return (fAddonState == 1 && (fCardInfo.flags & B_FRAME_BUFFER_CONTROL));
+	return (fAddonImage >= 0 && (fCardInfo.flags & B_FRAME_BUFFER_CONTROL));
 }
 
 
@@ -546,7 +546,7 @@ BWindowScreen::FrameBufferInfo()
 graphics_card_hook
 BWindowScreen::CardHookAt(int32 index)
 {
-	if (fAddonState != 1)
+	if (fAddonImage < 0)
 		return NULL;
 	
 	graphics_card_hook hook = NULL;
@@ -680,11 +680,11 @@ BWindowScreen::CalcFrame(int32 index, int32 space, display_mode *dmode)
 status_t
 BWindowScreen::SetFullscreen(bool enable)
 {
-	status_t retval = B_ERROR;
+	status_t status = B_ERROR;
 
 	// TODO: Set fullscreen
 	
-	return retval;
+	return status;
 }
 
 
@@ -701,8 +701,7 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	fAttributes = attributes;	
 	fScreenIndex = current_workspace();
 	fLockState = 0;
-	fAddonState = 0;
-	direct_enable = 0;
+	fAddonImage = -1;
 	fWindowState = 0;
 	fDebugWorkspace = 0;
 
@@ -728,8 +727,10 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 
 	memcpy(fColorList, screen.ColorMap()->color_list, 256);
 	
-	GetCardInfo();
-
+	status = GetCardInfo();
+	if (status < B_OK)
+		return status;
+	
 	fActivateSem = create_sem(0, "WindowScreen start lock");
 	fActivateState = 0;
 	
@@ -801,7 +802,7 @@ status_t
 BWindowScreen::SetLockState(int32 state)
 {
 	CALLED();
-	if (fAddonState == 1 && state == 1) {
+	if (fAddonImage >= 0 && state == 1) {
 		m_wei();
 		fill_rect_global = NULL;
 		blit_rect_global = NULL;
@@ -820,19 +821,17 @@ BWindowScreen::SetLockState(int32 state)
 	if (status == B_OK) {
 		fLockState = state;
 		if (state == 1) {
-			if (fAddonState == 0) {
+			if (fAddonImage < 0) {
 				status = InitClone();
 				printf("InitClone() returned %s\n", strerror(status));
 				if (status == B_OK) {
-					fAddonState = 1;
 					m_wei = (wait_engine_idle)m_gah(B_WAIT_ENGINE_IDLE, NULL);
 					m_re = (release_engine)m_gah(B_RELEASE_ENGINE, NULL);
 					m_ae = (acquire_engine)m_gah(B_ACQUIRE_ENGINE, NULL);
-				} else
-					fAddonState = -1;
+				}
 			}
 			
-			if (fAddonState == 1 && state == 1) {
+			if (status == B_OK && state == 1) {
 				fill_rect_global = fill_rect;
 				blit_rect_global = blit_rect;
 				trans_blit_rect_global = trans_blit_rect;
@@ -850,15 +849,17 @@ BWindowScreen::SetLockState(int32 state)
 }
 
 
-void
+status_t
 BWindowScreen::GetCardInfo()
 {
 	CALLED();
 	
 	BScreen screen(this);
 	display_mode mode;
-	if (screen.GetMode(&mode) < B_OK)
-		return;
+	
+	status_t status = screen.GetMode(&mode);
+	if (status < B_OK)
+		return status;
 	
 	uint32 bitsPerPixel;
 	switch(mode.space & 0x0fff) {
@@ -894,22 +895,24 @@ BWindowScreen::GetCardInfo()
 	if (mode.flags & B_PARALLEL_ACCESS)
 		fCardInfo.flags |= B_PARALLEL_BUFFER_ACCESS;
 	
-	status_t result = B_ERROR;
-	
 	frame_buffer_config config;
 	AppServerLink link;
 	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
 	link.Attach<screen_id>(screen.ID());
-	if (link.FlushWithReply(result) == B_OK && result == B_OK)
-		link.Read<frame_buffer_config>(&config);
 	
-	if (result == B_OK) {
-		fCardInfo.id = screen.ID().id;
-		fCardInfo.frame_buffer = config.frame_buffer;
-		fCardInfo.bytes_per_row = config.bytes_per_row;
-	}
+	status_t result = B_ERROR;
+	if (link.FlushWithReply(result) < B_OK || result < B_OK)
+		return result;
+	
+	link.Read<frame_buffer_config>(&config);
+	
+	fCardInfo.id = screen.ID().id;
+	fCardInfo.frame_buffer = config.frame_buffer;
+	fCardInfo.bytes_per_row = config.bytes_per_row;
 	
 	memcpy(&card_info_global, &fCardInfo, sizeof(graphics_card_info));
+	
+	return B_OK;
 }
 
 
@@ -983,6 +986,9 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 status_t
 BWindowScreen::InitClone()
 {
+	if (fAddonImage >= 0)
+		return B_OK;
+
 	CALLED();
 	AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_NAME);
@@ -995,12 +1001,16 @@ BWindowScreen::InitClone()
 	BString accelerantName;
 	link.ReadString(accelerantName);
 	fAddonImage = load_add_on(accelerantName.String()); 
-	if (fAddonImage < B_OK)
+	if (fAddonImage < B_OK) {
+		printf("InitClone: cannot load accelerant image\n");
 		return fAddonImage;
+	}
 
 	
-	status = get_image_symbol(fAddonImage, "get_accelerant_hook", B_SYMBOL_TYPE_ANY, (void **)&m_gah);
+	status = get_image_symbol(fAddonImage, B_ACCELERANT_ENTRY_POINT,
+					B_SYMBOL_TYPE_ANY, (void **)&m_gah);
 	if (status < B_OK) {
+		printf("InitClone: cannot get accelerant entry point\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 		return status;
@@ -1008,6 +1018,7 @@ BWindowScreen::InitClone()
 	
 	clone_accelerant clone = (clone_accelerant)m_gah(B_CLONE_ACCELERANT, 0);
 	if (clone == NULL) {
+		printf("InitClone: cannot get clone hook\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 		return status;
@@ -1023,6 +1034,7 @@ BWindowScreen::InitClone()
 	}
 	
 	if (status < B_OK) {
+		printf("InitClone: cannot clone accelerant\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 	}
@@ -1034,17 +1046,19 @@ BWindowScreen::InitClone()
 status_t
 BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
-	status_t result = B_OK;
+	status_t status = B_OK;
 
 	// TODO: Assert display mode: negotiation with app server
 
-	if (result == B_OK) { 
+	if (status == B_OK) { 
 		memcpy(fDisplayMode, dmode, sizeof(display_mode));
 		space_mode = 1;
 	}
 	
-	GetCardInfo();
-	
+	status = GetCardInfo();
+	if (status < B_OK)
+		return status;
+
 	fFrameBufferInfo.bits_per_pixel = fCardInfo.bits_per_pixel;
 	fFrameBufferInfo.bytes_per_row = fCardInfo.bytes_per_row;
 	fFrameBufferInfo.width = fCardInfo.width;
@@ -1054,5 +1068,5 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	fFrameBufferInfo.display_x = 0;
 	fFrameBufferInfo.display_y = 0;
 	
-	return result;
+	return status;
 }
