@@ -141,7 +141,7 @@ virtual	void        SuspensionHook(bool active);
 		
 virtual status_t	Perform(perform_code d, void *arg);
 
- private:
+private:
 
 		typedef BWindow	inherited;
 
@@ -154,39 +154,39 @@ virtual void        _ReservedWindowScreen4();
 		BWindowScreen(BWindowScreen &);
 		BWindowScreen &operator=(BWindowScreen &);
 					
-		char                  addon_state;
+		char                  fAddonState;
 		char                  space_mode;
 		void                  *io_buffer;
-        bool                  direct_enable;
-		bool                  work_state;
-		bool                  window_state;
-		bool                  activate_state;
-        int32                 lock_state;
-		int32                 screen_index;
+        	bool                  direct_enable;
+		bool                  fWorkState;
+		bool                  fWindowState;
+		bool                  fActivateState;
+        	int32                 fLockState;
+		int32                 fScreenIndex;
 		int32                 memory_area, io_area;
-		display_mode          *old_space;
-		display_mode          *new_space;
+		display_mode          *fOldDisplayMode;
+		display_mode          *fDisplayMode;
 		uint32                space0;
-		sem_id                activate_sem;
-		sem_id                debug_sem;
-		image_id              addon_image;
-		rgb_color             colorList[256];
+		sem_id                fActivateSem;
+		sem_id                fDebugSem;
+		image_id              fAddonImage;
+		rgb_color             fColorList[256];
 		GetAccelerantHook     m_gah;
-        graphics_card_info    card_info;
+        	graphics_card_info    fCardInfo;
 		graphics_card_hook    hooks[B_HOOK_COUNT]; 
 		_direct_screen_info_  info;
-		frame_buffer_info     format_info;
+		frame_buffer_info     fFrameBufferInfo;
 
-		char                  *debug_buffer;
-		bool                  debug_state;
-		bool                  debug_first;
-		int32                 debug_list_count;
-		int32                 debug_workspace;
-	    thread_id             *debug_list;
+		char                  *fDebugBuffer;
+		bool                  fDebugState;
+		bool                  fDebugFirst;
+		int32                 fDebugListCount;
+		int32                 fDebugWorkspace;
+	    	thread_id             *fDebugList;
 
-		uint32				  _attributes;
-		uint32                mode_count;
-		display_mode          *mode_list;
+		uint32		      fAttributes;
+		uint32                fModeCount;
+		display_mode          *fModeList;
 		engine_token          *et;
 		wait_engine_idle      m_wei;
 		acquire_engine        m_ae;
@@ -199,10 +199,10 @@ virtual void        _ReservedWindowScreen4();
 		uint32                _reserved_[21];
 		
 static	BRect		CalcFrame(int32 index, int32 space, display_mode *dmode);
-		int32		SetFullscreen(int32 enable);
+		status_t	SetFullscreen(bool enable);
 		status_t	InitData(uint32 space, uint32 attributes);
-        status_t    SetActiveState(int32 state);
-        status_t    SetLockState(int32 state);
+        	status_t    SetActiveState(int32 state);
+        	status_t    SetLockState(int32 state);
 		void        GetCardInfo();
 		void        Suspend();
 		void    	Resume();
