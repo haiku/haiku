@@ -2280,6 +2280,36 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
+		case AS_GET_ACCELERANT_PATH:
+		{
+			int32 index;
+			fLink.Read<int32>(&index);
+			
+			BString path;
+			status_t status = fDesktop->HWInterface()->GetAccelerantPath(path);
+			fLink.StartMessage(status);
+			if (status == B_OK)
+				fLink.AttachString(path.String());
+			
+			fLink.Flush();
+			break;
+		}
+		
+		case AS_GET_DRIVER_PATH:
+		{
+			int32 index;
+			fLink.Read<int32>(&index);
+			
+			BString path;
+			status_t status = fDesktop->HWInterface()->GetDriverPath(path);
+			fLink.StartMessage(status);
+			if (status == B_OK)
+				fLink.AttachString(path.String());
+			
+			fLink.Flush();
+			break;
+		}
 
 		default:
 			printf("ServerApp %s received unhandled message code %ld\n",

@@ -19,6 +19,7 @@ class RenderingBuffer;
 class RGBColor;
 class ServerCursor;
 class UpdateQueue;
+class BString;
 
 enum {
 	HW_ACC_COPY_REGION					= 0x00000001,
@@ -57,6 +58,9 @@ class HWInterface : public MultiLocker {
 	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
 	virtual uint32				DPMSMode() = 0;
 	virtual uint32				DPMSCapabilities() = 0;
+
+	virtual status_t			GetAccelerantPath(BString &path);
+	virtual status_t			GetDriverPath(BString &path);
 
 	// query for available hardware accleration and perform it
 	// (Initialize() must have been called already)

@@ -47,6 +47,9 @@ public:
 	virtual uint32				DPMSMode();
 	virtual uint32				DPMSCapabilities();
 
+	virtual status_t			GetAccelerantPath(BString &path);
+	virtual status_t			GetDriverPath(BString &path);
+
 	// query for available hardware accleration and perform it
 	virtual	uint32				AvailableHWAcceleration() const;
 

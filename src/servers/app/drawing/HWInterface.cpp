@@ -38,6 +38,21 @@ HWInterface::Initialize()
 	return MultiLocker::InitCheck();
 }
 
+
+status_t
+HWInterface::GetAccelerantPath(BString &path)
+{
+	return B_ERROR;
+}
+
+
+status_t
+HWInterface::GetDriverPath(BString &path)
+{
+	return B_ERROR;
+}
+
+
 // SetCursor
 void
 HWInterface::SetCursor(ServerCursor* cursor)

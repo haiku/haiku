@@ -991,16 +991,16 @@ BWindowScreen::InitClone()
 
 	CALLED();
 	AppServerLink link;
-	link.StartMessage(AS_GET_ACCELERANT_NAME);
+	link.StartMessage(AS_GET_ACCELERANT_PATH);
 	link.Attach<int32>(fScreenIndex);
 	
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) < B_OK || status < B_OK)
 		return status;
 
-	BString accelerantName;
-	link.ReadString(accelerantName);
-	fAddonImage = load_add_on(accelerantName.String()); 
+	BString accelerantPath;
+	link.ReadString(accelerantPath);
+	fAddonImage = load_add_on(accelerantPath.String()); 
 	if (fAddonImage < B_OK) {
 		printf("InitClone: cannot load accelerant image\n");
 		return fAddonImage;
@@ -1025,12 +1025,12 @@ BWindowScreen::InitClone()
 	}
 
 	status = B_ERROR;
-	link.StartMessage(AS_GET_DRIVER_NAME);
+	link.StartMessage(AS_GET_DRIVER_PATH);
 	link.Attach<int32>(fScreenIndex);
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-		BString driverName;
-		link.ReadString(driverName);
-		status = clone((void *)driverName.String());
+		BString driverPath;
+		link.ReadString(driverPath);
+		status = clone((void *)driverPath.String());
 	}
 	
 	if (status < B_OK) {

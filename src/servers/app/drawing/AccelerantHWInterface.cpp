@@ -616,6 +616,26 @@ AccelerantHWInterface::DPMSCapabilities()
 	return fAccDPMSCapabilities();
 }
 
+
+status_t
+AccelerantHWInterface::GetAccelerantPath(BString &string)
+{
+	image_info info;
+	status_t status = get_image_info(fAccelerantImage, &info);
+	if (status == B_OK)
+		string = info.name;
+	return status;
+}
+
+
+status_t
+AccelerantHWInterface::GetDriverPath(BString &string)
+{
+	// TODO: Get path from fCardFD: is that possible ?
+	return B_ERROR;
+}
+
+
 // AvailableHardwareAcceleration
 uint32
 AccelerantHWInterface::AvailableHWAcceleration() const
