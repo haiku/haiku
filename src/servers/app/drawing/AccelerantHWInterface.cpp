@@ -631,8 +631,9 @@ AccelerantHWInterface::GetAccelerantPath(BString &string)
 status_t
 AccelerantHWInterface::GetDriverPath(BString &string)
 {
-	// TODO: Get path from fCardFD: is that possible ?
-	return B_ERROR;
+	// TODO: hardcoded to vesa for now. Fix me
+	string = "graphics/vesa";
+	return B_OK;
 }
 
 

@@ -286,8 +286,8 @@ set_mouse_position(int32 x, int32 y)
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 	status_t *error, bool debug_enable)
-	: BWindow(BScreen().Frame().InsetByCopy(100, 100), title, B_TITLED_WINDOW,
-		kWindowScreenFlag | B_NOT_MINIMIZABLE /*| B_NOT_CLOSABLE*/
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
@@ -304,8 +304,8 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 	uint32 attributes, status_t *error)
-	: BWindow(BScreen().Frame().InsetByCopy(100, 100), title, B_TITLED_WINDOW, 
-		kWindowScreenFlag | B_NOT_MINIMIZABLE /*| B_NOT_CLOSABLE*/
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
@@ -752,10 +752,9 @@ BWindowScreen::SetActiveState(int32 state)
 	CALLED();
 	status_t status = B_ERROR;
 	if (state == 1) {
-		//be_app->HideCursor();
-		if (/*be_app->IsCursorHidden() && */(status = SetLockState(1)) == B_OK) {
+		be_app->HideCursor();
+		if (be_app->IsCursorHidden() && (status = SetLockState(1)) == B_OK) {
 			status = AssertDisplayMode(fDisplayMode);			
-			printf("AssertDisplayMode() returned %s\n", strerror(status));
 			if (status == B_OK) {
 				if (!fActivateState) {
 					while (acquire_sem(fActivateSem) == B_INTERRUPTED)
@@ -823,7 +822,6 @@ BWindowScreen::SetLockState(int32 state)
 		if (state == 1) {
 			if (fAddonImage < 0) {
 				status = InitClone();
-				printf("InitClone() returned %s\n", strerror(status));
 				if (status == B_OK) {
 					m_wei = (wait_engine_idle)m_gah(B_WAIT_ENGINE_IDLE, NULL);
 					m_re = (release_engine)m_gah(B_RELEASE_ENGINE, NULL);
@@ -831,7 +829,7 @@ BWindowScreen::SetLockState(int32 state)
 				}
 			}
 			
-			if (status == B_OK && state == 1) {
+			if (status == B_OK) {
 				fill_rect_global = fill_rect;
 				blit_rect_global = blit_rect;
 				trans_blit_rect_global = trans_blit_rect;
@@ -1006,7 +1004,6 @@ BWindowScreen::InitClone()
 		return fAddonImage;
 	}
 
-	
 	status = get_image_symbol(fAddonImage, B_ACCELERANT_ENTRY_POINT,
 					B_SYMBOL_TYPE_ANY, (void **)&m_gah);
 	if (status < B_OK) {
@@ -1046,10 +1043,13 @@ BWindowScreen::InitClone()
 status_t
 BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
-	status_t status = B_OK;
+	status_t status = B_ERROR;
+
+	display_mode mode = *dmode;
+	mode.flags |= B_SCROLL;
 
 	// TODO: Assert display mode: negotiation with app server
-
+	status = BScreen(this).SetMode(&mode);
 	if (status == B_OK) { 
 		memcpy(fDisplayMode, dmode, sizeof(display_mode));
 		space_mode = 1;
