@@ -23,6 +23,7 @@
 	d[0] = (b); \
 	d[1] = (g); \
 	d[2] = (r); \
+	d[3] = 255; \
 }
 
 // blend_pixel_alpha_pc

@@ -1335,6 +1335,12 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		fOwner->fLink->Attach<BPoint>(offset);
 		fOwner->fLink->Attach<int32>(bufferSize);
 		fOwner->fLink->Attach(buffer, bufferSize);
+
+		// we need to wait for the server
+		// to actually process this message
+		// before we can delete the bitmap
+		int32 code;
+		fOwner->fLink->FlushWithReply(code);
 	
 		delete [] buffer;
 	} else {

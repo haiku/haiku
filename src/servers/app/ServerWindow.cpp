@@ -1710,9 +1710,15 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					&& dragMessage.Unflatten(buffer) == B_OK) {
 //						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage/*, bitmap*/);
+if (ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken)) {
+	fDesktop->HWInterface()->SetDragBitmap(bitmap, offset);
+}
 				}
 				delete[] buffer;
 			}
+			// sync the client (it can now delete the bitmap)
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
 
 			break;
 		}

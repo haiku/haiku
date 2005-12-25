@@ -27,6 +27,7 @@
 	d[0] = 255 - _p.data8[0]; \
 	d[1] = 255 - _p.data8[1]; \
 	d[2] = 255 - _p.data8[2]; \
+	d[3] = 255; \
 }
 
 // blend_pixel_invert

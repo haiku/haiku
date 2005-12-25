@@ -18,7 +18,7 @@ blend_pixel_copy_solid(int x, int y, const color_type& c, uint8 cover,
 {
 	uint8* p = buffer->row(y) + (x << 2);
 	if (cover == 255) {
-		ASSIGN_COPY(p, c.r, c.g, c.b);
+		ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
 	} else {
 		rgb_color l = pattern->LowColor().GetColor32();
 		BLEND_COPY(p, c.r, c.g, c.b, cover,
@@ -69,7 +69,7 @@ blend_solid_hspan_copy_solid(int x, int y, unsigned len,
 	do {
 		if (*covers) {
 			if(*covers == 255) {
-				ASSIGN_COPY(p, c.r, c.g, c.b);
+				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
 			} else {
 				BLEND_COPY(p, c.r, c.g, c.b, *covers,
 						   l.red, l.green, l.blue);
@@ -94,7 +94,7 @@ blend_solid_vspan_copy_solid(int x, int y, unsigned len,
 	do {
 		if (*covers) {
 			if (*covers == 255) {
-				ASSIGN_COPY(p, c.r, c.g, c.b);
+				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
 			} else {
 				BLEND_COPY(p, c.r, c.g, c.b, *covers,
 						   l.red, l.green, l.blue);
@@ -121,7 +121,7 @@ blend_color_hspan_copy_solid(int x, int y, unsigned len,
 		do {
 			if(*covers) {
 				if(*covers == 255) {
-					ASSIGN_COPY(p, colors->r, colors->g, colors->b);
+					ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
 				} else {
 					BLEND_COPY(p, colors->r, colors->g, colors->b, *covers,
 							   l.red, l.green, l.blue);
@@ -135,7 +135,7 @@ blend_color_hspan_copy_solid(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_COPY(p, colors->r, colors->g, colors->b);
+				ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
 				p += 4;
 				++colors;
 			} while(--len);

@@ -17,6 +17,7 @@
 
 class RenderingBuffer;
 class RGBColor;
+class ServerBitmap;
 class ServerCursor;
 class UpdateQueue;
 class BString;
@@ -82,6 +83,9 @@ class HWInterface : public MultiLocker {
 											 const float& y);
 			BPoint				GetCursorPosition();
 
+			void				SetDragBitmap(const ServerBitmap* bitmap,
+											  const BPoint& offsetFromCursor);
+
 	// frame buffer access (you need to ReadLock!)
 			RenderingBuffer*	DrawingBuffer() const;
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
@@ -123,6 +127,8 @@ class HWInterface : public MultiLocker {
 
 			BRect				_CursorFrame() const;
 			void				_RestoreCursorArea() const;
+			void				_AdoptDragBitmap(const ServerBitmap* bitmap,
+												 const BPoint& offset);
 
 			// If we draw the cursor somewhere in the drawing buffer,
 			// we need to backup its contents before drawing, so that
@@ -158,6 +164,9 @@ class HWInterface : public MultiLocker {
 			buffer_clip*		fCursorAreaBackup;
 
 			ServerCursor*		fCursor;
+			const ServerBitmap*	fDragBitmap;
+			BPoint				fDragBitmapOffset;
+			ServerCursor*		fCursorAndDragBitmap;
 			bool				fCursorVisible;
 			BPoint				fCursorLocation;
 			bool				fDoubleBuffered;

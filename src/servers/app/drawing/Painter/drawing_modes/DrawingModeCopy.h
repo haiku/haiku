@@ -18,11 +18,12 @@
 }
 
 // ASSIGN_COPY
-#define ASSIGN_COPY(d, r, g, b) \
+#define ASSIGN_COPY(d, r, g, b, a) \
 { \
 	d[0] = (b); \
 	d[1] = (g); \
 	d[2] = (r); \
+	d[3] = (a); \
 }
 
 
@@ -34,7 +35,7 @@ blend_pixel_copy(int x, int y, const color_type& c, uint8 cover,
 	uint8* p = buffer->row(y) + (x << 2);
 	rgb_color color = pattern->R5ColorAt(x, y);
 	if (cover == 255) {
-		ASSIGN_COPY(p, color.red, color.green, color.blue);
+		ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
 	} else {
 		rgb_color l = pattern->LowColor().GetColor32();
 		BLEND_COPY(p, color.red, color.green, color.blue, cover,
@@ -101,7 +102,7 @@ blend_solid_hspan_copy(int x, int y, unsigned len,
 		rgb_color color = pattern->R5ColorAt(x, y);
 		if (*covers) {
 			if (*covers == 255) {
-				ASSIGN_COPY(p, color.red, color.green, color.blue);
+				ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
 			} else {
 				BLEND_COPY(p, color.red, color.green, color.blue, *covers,
 						   l.red, l.green, l.blue);
@@ -127,7 +128,7 @@ blend_solid_vspan_copy(int x, int y, unsigned len,
 		rgb_color color = pattern->R5ColorAt(x, y);
 		if (*covers) {
 			if (*covers == 255) {
-				ASSIGN_COPY(p, color.red, color.green, color.blue);
+				ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
 			} else {
 				BLEND_COPY(p, color.red, color.green, color.blue, *covers,
 						   l.red, l.green, l.blue);
@@ -153,7 +154,7 @@ blend_color_hspan_copy(int x, int y, unsigned len, const color_type* colors,
 		do {
 			if(*covers) {
 				if(*covers == 255) {
-					ASSIGN_COPY(p, colors->r, colors->g, colors->b);
+					ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
 				} else {
 					BLEND_COPY(p, colors->r, colors->g, colors->b, *covers,
 							   l.red, l.green, l.blue);
@@ -167,7 +168,7 @@ blend_color_hspan_copy(int x, int y, unsigned len, const color_type* colors,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_COPY(p, colors->r, colors->g, colors->b);
+				ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
 				p += 4;
 				++colors;
 			} while(--len);

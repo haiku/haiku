@@ -15,6 +15,9 @@ HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
 	  fCursor(NULL),
+	  fDragBitmap(NULL),
+	  fDragBitmapOffset(0, 0),
+	  fCursorAndDragBitmap(NULL),
 	  fCursorVisible(false),
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
@@ -28,6 +31,7 @@ HWInterface::~HWInterface()
 {
 	delete fCursorAreaBackup;
 	delete fCursor;
+	delete fCursorAndDragBitmap;
 	delete fUpdateExecutor;
 }
 
@@ -58,20 +62,25 @@ void
 HWInterface::SetCursor(ServerCursor* cursor)
 {
 	if (WriteLock()) {
+		if (fDragBitmap) {
+			// if a bitmap is being dragged,
+			// we don't currently allow changing
+			// the cursor, part of the reason being
+			// that the original drag bitmap is not
+			// around anymore... but it could be
+			// considered iritating to the user to
+			// change cursor shapes while something
+			// is dragged anyways.
+			WriteUnlock();
+			return;
+		}
 		if (fCursor != cursor) {
 			BRect oldFrame = _CursorFrame();
 			delete fCursor;
-			delete fCursorAreaBackup;
 			fCursor = cursor;
 			Invalidate(oldFrame);
 			BRect r = _CursorFrame();
-			if (fCursor && !IsDoubleBuffered()) {
-				BRect cursorBounds = fCursor->Bounds();
-				fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
-													cursorBounds.IntegerHeight() + 1);
-			 	_DrawCursor(r);
-			} else
-				fCursorAreaBackup = NULL;
+			_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
 			Invalidate(r);
 		}
 		WriteUnlock();
@@ -140,6 +149,17 @@ HWInterface::GetCursorPosition()
 		ReadUnlock();
 	}
 	return location;
+}
+
+// SetDragBitmap
+void
+HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
+						   const BPoint& offsetFromCursor)
+{
+	if (WriteLock()) {
+		_AdoptDragBitmap(bitmap, offsetFromCursor);
+		WriteUnlock();
+	}
 }
 
 // DrawingBuffer
@@ -294,8 +314,8 @@ HWInterface::_DrawCursor(BRect area) const
 		src += top * srcBPR + left * 4;
 
 		// offset into cursor bitmap
-		uint8* crs = (uint8*)fCursor->Bits();
-		uint32 crsBPR = fCursor->BytesPerRow();
+		uint8* crs = (uint8*)fCursorAndDragBitmap->Bits();
+		uint32 crsBPR = fCursorAndDragBitmap->BytesPerRow();
 		// since area is clipped to cf,
 		// the diff between top and cf.top is always positive,
 		// same for diff between left and cf.left
@@ -320,13 +340,15 @@ HWInterface::_DrawCursor(BRect area) const
 				uint8* c = crs;
 				uint8* d = dst;
 				uint8* b = bup;
+				
 				for (int32 x = left; x <= right; x++) {
 					*(uint32*)b = *(uint32*)s;
 					// assumes backbuffer alpha = 255
-					uint8 a = c[3];
-					d[0] = (((c[0] - b[0]) * a) + (b[0] << 8)) >> 8;
-					d[1] = (((c[1] - b[1]) * a) + (b[1] << 8)) >> 8;
-					d[2] = (((c[2] - b[2]) * a) + (b[2] << 8)) >> 8;
+					// assuming pre-multiplied cursor bitmap
+					uint8 a = 255 - c[3];
+					d[0] = ((b[0] * a) >> 8) + c[0];
+					d[1] = ((b[1] * a) >> 8) + c[1];
+					d[2] = ((b[2] * a) >> 8) + c[2];
 					s += 4;
 					c += 4;
 					d += 4;
@@ -345,10 +367,11 @@ HWInterface::_DrawCursor(BRect area) const
 				uint8* d = dst;
 				for (int32 x = left; x <= right; x++) {
 					// assumes backbuffer alpha = 255
-					uint8 a = c[3];
-					d[0] = (((c[0] - s[0]) * a) + (s[0] << 8)) >> 8;
-					d[1] = (((c[1] - s[1]) * a) + (s[1] << 8)) >> 8;
-					d[2] = (((c[2] - s[2]) * a) + (s[2] << 8)) >> 8;
+					// assuming pre-multiplied cursor bitmap
+					uint8 a = 255 - c[3];
+					d[0] = ((s[0] * a) >> 8) + c[0];
+					d[1] = ((s[1] * a) >> 8) + c[1];
+					d[2] = ((s[2] * a) >> 8) + c[2];
 					s += 4;
 					c += 4;
 					d += 4;
@@ -358,7 +381,6 @@ HWInterface::_DrawCursor(BRect area) const
 				dst += width * 4;
 			}
 		}
-
 		// copy result to front buffer
 		_CopyToFront(buffer, width * 4, left, top, right, bottom);
 
@@ -601,9 +623,9 @@ BRect
 HWInterface::_CursorFrame() const
 {
 	BRect frame(0.0, 0.0, -1.0, -1.0);
-	if (fCursor && fCursorVisible) {
-		frame = fCursor->Bounds();
-		frame.OffsetTo(fCursorLocation - fCursor->GetHotSpot());
+	if (fCursorAndDragBitmap && fCursorVisible) {
+		frame = fCursorAndDragBitmap->Bounds();
+		frame.OffsetTo(fCursorLocation - fCursorAndDragBitmap->GetHotSpot());
 	}
 	return frame;
 }
@@ -623,6 +645,166 @@ HWInterface::_RestoreCursorArea() const
 		fCursorAreaBackup->cursor_hidden = true;
 	}
 }
+
+// _AdoptDragBitmap
+void
+HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
+{
+	// TODO: support other colorspaces/convert bitmap
+	if (bitmap && (bitmap->ColorSpace() != B_RGB32 && bitmap->ColorSpace() != B_RGBA32)) {
+		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet unsupported colorspace\n");
+		return;
+	}
+
+	_RestoreCursorArea();
+
+	if (fCursorAndDragBitmap != fCursor) {
+		delete fCursorAndDragBitmap;
+		fCursorAndDragBitmap = NULL;
+	}
+
+	if (bitmap) {
+		BRect bitmapFrame = bitmap->Bounds();
+		if (fCursor) {
+			// put bitmap frame and cursor frame into the same
+			// coordinate space (the cursor location is the origin)
+			bitmapFrame.OffsetTo(BPoint(-offset.x, -offset.y));
+
+			BRect cursorFrame(fCursor->Bounds());
+			BPoint hotspot(fCursor->GetHotSpot());
+				// the hotspot is at the origin
+			cursorFrame.OffsetTo(-hotspot.x, -hotspot.y);
+
+			BRect combindedBounds = bitmapFrame | cursorFrame;
+
+			BPoint shift;
+			shift.x = -combindedBounds.left;
+			shift.y = -combindedBounds.top;
+
+			combindedBounds.OffsetBy(shift);
+			cursorFrame.OffsetBy(shift);
+			bitmapFrame.OffsetBy(shift);
+
+			fCursorAndDragBitmap = new ServerCursor(combindedBounds,
+													bitmap->ColorSpace(), 0,
+													hotspot + shift);
+
+			// clear the combined buffer
+			uint8* dst = (uint8*)fCursorAndDragBitmap->Bits();
+			uint32 dstBPR = fCursorAndDragBitmap->BytesPerRow();
+
+			memset(dst, 0, fCursorAndDragBitmap->BitsLength());
+
+			// put drag bitmap into combined buffer
+			uint8* src = (uint8*)bitmap->Bits();
+			uint32 srcBPR = bitmap->BytesPerRow();
+
+			dst += (int32)bitmapFrame.top * dstBPR + (int32)bitmapFrame.left * 4;
+
+			uint32 width = bitmapFrame.IntegerWidth() + 1;
+			uint32 height = bitmapFrame.IntegerHeight() + 1;
+
+			for (uint32 y = 0; y < height; y++) {
+				memcpy(dst, src, srcBPR);
+				dst += dstBPR;
+				src += srcBPR;
+			}
+
+			// compose cursor into combined buffer
+			dst = (uint8*)fCursorAndDragBitmap->Bits();
+			dst += (int32)cursorFrame.top * dstBPR + (int32)cursorFrame.left * 4;
+
+			src = (uint8*)fCursor->Bits();
+			srcBPR = fCursor->BytesPerRow();
+
+			width = cursorFrame.IntegerWidth() + 1;
+			height = cursorFrame.IntegerHeight() + 1;
+
+			for (uint32 y = 0; y < height; y++) {
+				uint8* d = dst;
+				uint8* s = src;
+				for (uint32 x = 0; x < width; x++) {
+					// takes two semi-transparent pixels
+					// with unassociated alpha (not pre-multiplied)
+					// and produces a premultiplied
+					if (s[3] > 0) {
+						if (s[3] == 255) {
+							d[0] = s[0];
+							d[1] = s[1];
+							d[2] = s[2];
+							d[3] = 255;
+						} else {
+							uint8 alphaRest = 255 - s[3];
+							uint32 alphaTemp = (65025 - alphaRest * (255 - d[3]));
+							uint32 alphaDest = d[3] * alphaRest;
+							uint32 alphaSrc = 255 * s[3];
+							d[0] = (d[0] * alphaDest + s[0] * alphaSrc) / alphaTemp;
+							d[1] = (d[1] * alphaDest + s[1] * alphaSrc) / alphaTemp;
+							d[2] = (d[2] * alphaDest + s[2] * alphaSrc) / alphaTemp;
+							d[3] = alphaTemp / 255;
+						}
+					}
+					// TODO: make sure the alpha is always upside down,
+					// then it doesn't need to be done when drawing the cursor
+					// (see _DrawCursor())
+//					d[3] = 255 - d[3];
+					d += 4;
+					s += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+
+			// handle pre-multiplication with alpha
+			// for faster compositing during cursor drawing
+			width = combindedBounds.IntegerWidth() + 1;
+			height = combindedBounds.IntegerHeight() + 1;
+
+			dst = (uint8*)fCursorAndDragBitmap->Bits();
+
+			for (uint32 y = 0; y < height; y++) {
+				uint8* d = dst;
+				for (uint32 x = 0; x < width; x++) {
+					d[0] = (d[0] * d[3]) >> 8;
+					d[1] = (d[1] * d[3]) >> 8;
+					d[2] = (d[2] * d[3]) >> 8;
+					d += 4;
+				}
+				dst += dstBPR;
+			}
+		} else {
+			fCursorAndDragBitmap = new ServerCursor(bitmap->Bits(),
+													bitmapFrame.IntegerWidth() + 1,
+													bitmapFrame.IntegerHeight() + 1,
+													bitmap->ColorSpace());
+			fCursorAndDragBitmap->SetHotSpot(BPoint(-offset.x, -offset.y));
+		}
+	} else {
+		fCursorAndDragBitmap = fCursor;
+	}
+
+// TODO: handle reference counting stuff
+//	if (fDragBitmap)
+//		fDragBitmap->Release();
+	fDragBitmap = bitmap;
+	fDragBitmapOffset = offset;
+//	if (fDragBitmap)
+//		fDragBitmap->Aquire();
+
+	delete fCursorAreaBackup;
+	fCursorAreaBackup = NULL;
+
+	if (!fCursorAndDragBitmap)
+		return;
+
+	if (fCursorAndDragBitmap && !IsDoubleBuffered()) {
+		BRect cursorBounds = fCursorAndDragBitmap->Bounds();
+		fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
+											cursorBounds.IntegerHeight() + 1);
+	}
+ 	_DrawCursor(_CursorFrame());
+}
+
 
 
 

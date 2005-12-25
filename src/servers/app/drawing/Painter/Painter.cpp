@@ -380,7 +380,6 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	
 		} else if (a.y == b.y) {
 			// horizontal
-			uint32 bpr = fBuffer->stride();
 			int32 y = (int32)a.y;
 			uint8* dst = fBuffer->row(y);
 			int32 x1 = (int32)min_c(a.x, b.x);
@@ -699,7 +698,7 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 		color.data8[0] = c.blue;
 		color.data8[1] = c.green;
 		color.data8[2] = c.red;
-		color.data8[3] = 255;
+		color.data8[3] = c.alpha;
 		// fill rects, iterate over clipping boxes
 		fBaseRenderer->first_clip_box();
 		do {
@@ -1106,25 +1105,30 @@ Painter::_SetRendererColor(const rgb_color& color) const
 #if ALIASED_DRAWING
 		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
 											   color.green / 255.0,
-											   color.blue / 255.0));
+											   color.blue / 255.0,
+											   color.alpha / 255.0));
 #else
 		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
 										  color.green / 255.0,
-										  color.blue / 255.0));
+										  color.blue / 255.0,
+										  color.alpha / 255.0));
 #endif // ALIASED_DRAWING
 #endif // USE_OUTLINE_RASTERIZER
 	if (fRenderer)
 		fRenderer->color(agg::rgba(color.red / 255.0,
 								   color.green / 255.0,
-								   color.blue / 255.0));
+								   color.blue / 255.0,
+								   color.alpha / 255.0));
 	if (fFontRendererSolid)
 		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
 											color.green / 255.0,
-											color.blue / 255.0));
+											color.blue / 255.0,
+											color.alpha / 255.0));
 	if (fFontRendererBin)
 		fFontRendererBin->color(agg::rgba(color.red / 255.0,
 										  color.green / 255.0,
-										  color.blue / 255.0));
+										  color.blue / 255.0,
+										  color.alpha / 255.0));
 
 }
 

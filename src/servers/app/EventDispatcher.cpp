@@ -612,6 +612,8 @@ printf("  sending message to previous mouse target\n");
 	fDragMessage.MakeEmpty();
 	fDragMessage.what = 0;
 	fDraggingMessage = false;
+
+	fHWInterface->SetDragBitmap(NULL, B_ORIGIN);
 }
 
 
