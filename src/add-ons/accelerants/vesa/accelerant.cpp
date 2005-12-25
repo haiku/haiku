@@ -181,7 +181,7 @@ vesa_clone_accelerant(void *info)
 
 	// create full device name
 	char path[MAXPATHLEN];
-	strcpy(path, "/dev");
+	strcpy(path, "/dev/");
 	strcat(path, (const char *)info);
 
 	int fd = open(path, B_READ_WRITE);
