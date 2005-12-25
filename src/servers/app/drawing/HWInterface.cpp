@@ -651,7 +651,7 @@ void
 HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 {
 	// TODO: support other colorspaces/convert bitmap
-	if (bitmap && (bitmap->ColorSpace() != B_RGB32 && bitmap->ColorSpace() != B_RGBA32)) {
+	if (bitmap && !(bitmap->ColorSpace() == B_RGB32 || bitmap->ColorSpace() == B_RGBA32)) {
 		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet unsupported colorspace\n");
 		return;
 	}
