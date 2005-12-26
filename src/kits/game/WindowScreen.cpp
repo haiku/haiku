@@ -286,7 +286,7 @@ set_mouse_position(int32 x, int32 y)
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 				status_t *error, bool debug_enable)
-	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
+	: BWindow(BScreen().Frame().InsetByCopy(200, 200), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
@@ -303,7 +303,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 				uint32 attributes, status_t *error)
-	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
+	: BWindow(BScreen().Frame().InsetByCopy(200, 200), title, B_TITLED_WINDOW, 
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
@@ -408,6 +408,7 @@ BWindowScreen::Hide()
 void
 BWindowScreen::Show()
 {
+	CALLED();
 	BWindow::Show();
 	if (!fActivateState) {
 		release_sem(fActivateSem);
@@ -419,6 +420,7 @@ BWindowScreen::Show()
 void
 BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index)
 {
+	CALLED();
 	if (first_index < 0 || last_index > 255 || first_index > last_index)
 		return;
 
@@ -455,6 +457,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 status_t
 BWindowScreen::SetSpace(uint32 space)
 {
+	CALLED();
 	display_mode mode;
 	status_t status = GetModeFromSpace(space, &mode);
 	if (status == B_OK)
@@ -475,7 +478,8 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 {
 	CALLED();
 	display_mode highMode = *fDisplayMode;
-
+	highMode.flags |= B_SCROLL;
+	
 	highMode.virtual_height = (int16)height;
 	highMode.virtual_width = (int16)width;
 
@@ -495,17 +499,15 @@ status_t
 BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
 	CALLED();
-	status_t status = B_ERROR;
-
-	// TODO: Ask app server to move the frame buffer area
-
-	if (status == B_OK) {		
+	move_display_area moveDisplayArea = (move_display_area)fGetAccelerantHook(B_MOVE_DISPLAY, NULL);
+	if (moveDisplayArea && moveDisplayArea((int16)x, (int16)y) == B_OK) {	
 		fFrameBufferInfo.display_x = x;
 		fFrameBufferInfo.display_y = y;
 		fDisplayMode->h_display_start = x;
 		fDisplayMode->v_display_start = y;
+		return B_OK;
 	}
-	return status;
+	return B_ERROR;
 }
 
 
@@ -520,6 +522,7 @@ BWindowScreen::IOBase()
 rgb_color *
 BWindowScreen::ColorList()
 {
+	CALLED();
 	return fColorList;
 }
 
@@ -527,6 +530,7 @@ BWindowScreen::ColorList()
 frame_buffer_info *
 BWindowScreen::FrameBufferInfo()
 {
+	CALLED();	
 	return &fFrameBufferInfo;
 }
 
@@ -534,6 +538,7 @@ BWindowScreen::FrameBufferInfo()
 graphics_card_hook
 BWindowScreen::CardHookAt(int32 index)
 {
+	CALLED();
 	if (fAddonImage < 0)
 		return NULL;
 	
@@ -569,6 +574,7 @@ BWindowScreen::CardHookAt(int32 index)
 graphics_card_info *
 BWindowScreen::CardInfo()
 {
+	CALLED();
 	return &fCardInfo;
 }
 
@@ -642,6 +648,7 @@ void BWindowScreen::_ReservedWindowScreen4() {}
 BRect
 BWindowScreen::CalcFrame(int32 index, int32 space, display_mode *dmode)
 {
+	CALLED();
 	BScreen screen;	
 	if (dmode)
 		screen.GetMode(dmode);
@@ -691,9 +698,8 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	fDebugSem = create_sem(1, "WindowScreen debug sem");
 	fOldDisplayMode = (display_mode *)calloc(1, sizeof(display_mode));
 	fDisplayMode = (display_mode *)calloc(1, sizeof(display_mode));
-	
-	memcpy(fDisplayMode, &newMode, sizeof(newMode));
-	
+	memcpy(fDisplayMode, &newMode, sizeof(display_mode));
+
 	fWorkState = 1;
 		
 	return B_OK;
@@ -706,7 +712,7 @@ BWindowScreen::SetActiveState(int32 state)
 	CALLED();
 	status_t status = B_ERROR;
 	if (state == 1) {
-		be_app->HideCursor();
+		//be_app->HideCursor();
 		status = AssertDisplayMode(fDisplayMode);
 		if (status == B_OK && (status = SetupAccelerantHooks(true)) == B_OK) {			
 			if (!fActivateState) {
@@ -777,13 +783,13 @@ BWindowScreen::SetupAccelerantHooks(bool enable)
 		if (fAddonImage < 0) {
 			status = InitClone();
 			if (status == B_OK) {
-				m_wei = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, fDisplayMode);
-				m_re = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, fDisplayMode);
-				m_ae = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, fDisplayMode);
-				fill_rect = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, fDisplayMode);
-				blit_rect = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, fDisplayMode);
-				trans_blit_rect = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, fDisplayMode);
-				scaled_filtered_blit_rect = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, fDisplayMode);
+				m_wei = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
+				m_re = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
+				m_ae = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, NULL);
+				fill_rect = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, NULL);
+				blit_rect = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
+				trans_blit_rect = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
+				scaled_filtered_blit_rect = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
 			}
 		}
 		
@@ -842,7 +848,6 @@ BWindowScreen::GetCardInfo()
 		strncpy(fCardInfo.rgba_order, "bgra", 4);
 	
 	fCardInfo.flags = 0;
-	
 	if (mode.flags & B_SCROLL)
 		fCardInfo.flags |= B_FRAME_BUFFER_CONTROL;
 	if (mode.flags & B_PARALLEL_ACCESS)
@@ -936,10 +941,11 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 status_t
 BWindowScreen::InitClone()
 {
+	CALLED();
+	
 	if (fAddonImage >= 0)
 		return B_OK;
 
-	CALLED();
 	AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_PATH);
 	link.Attach<int32>(fScreenIndex);
@@ -965,6 +971,7 @@ BWindowScreen::InitClone()
 		return status;
 	}
 	
+	status = B_ERROR;
 	clone_accelerant clone = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, 0);
 	if (clone == NULL) {
 		printf("InitClone: cannot get clone hook\n");
@@ -973,7 +980,6 @@ BWindowScreen::InitClone()
 		return status;
 	}
 
-	status = B_ERROR;
 	link.StartMessage(AS_GET_DRIVER_PATH);
 	link.Attach<int32>(fScreenIndex);
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
@@ -998,13 +1004,18 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	CALLED();
 
 	status_t status = B_ERROR;
-	if (dmode->virtual_width != fDisplayMode->virtual_width
-			|| dmode->virtual_height != fDisplayMode->virtual_height
-			|| dmode->space != fDisplayMode->space) {
-		status = BScreen(this).SetMode(dmode);
-		if (status < B_OK)
+	BScreen screen(this);
+	display_mode mode;
+	status = screen.GetMode(&mode);
+	if (status < B_OK)
+		return status;
+	if (mode.virtual_height != dmode->virtual_height || mode.virtual_width != dmode->virtual_width
+			|| mode.space != dmode->space || mode.flags != dmode->flags) {
+		status = screen.SetMode(dmode);
+		if (status < B_OK) {
+			printf("AssertDisplayMode: Setting mode failed: %s\n", strerror(status));
 			return status;
-		
+		}
 		memcpy(fDisplayMode, dmode, sizeof(display_mode));
 		space_mode = 1;
 	}
