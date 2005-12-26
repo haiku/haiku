@@ -149,7 +149,9 @@ blend_color_hspan_alpha_cc(int x, int y, unsigned len,
 		// non-solid opacity
 		do {
 			uint16 alpha = hAlpha * *covers;
-			if (alpha) {
+//			if (alpha) {
+if (alpha && (colors->a & 0xff)) {
+	// support for transparent magic
 				if (alpha == 255 * 255) {
 					ASSIGN_ALPHA_CC(p, colors->r, colors->g, colors->b);
 				} else {
@@ -165,14 +167,20 @@ blend_color_hspan_alpha_cc(int x, int y, unsigned len,
 		uint16 alpha = hAlpha * cover;
 		if (alpha == 255 * 255) {
 			do {
+if (colors->a & 0xff) {
+	// support for transparent magic
 				ASSIGN_ALPHA_CC(p, colors->r, colors->g, colors->b);
+}
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (alpha) {
 			do {
+if (colors->a & 0xff) {
+	// support for transparent magic
 				BLEND_ALPHA_CC(p, colors->r, colors->g, colors->b, alpha);
+}
 				p += 4;
 				++colors;
 			} while(--len);
