@@ -56,35 +56,36 @@ enum {
 
 class BWindowScreen : public BWindow {
 public:
-        BWindowScreen(const char *title,
-					  uint32     space,
-					  status_t   *error,
-					  bool       debug_enable = false);
-        BWindowScreen(const char *title,
-					  uint32     space,
-					  uint32	 attributes,
-					  status_t   *error);
-virtual ~BWindowScreen();
-virtual void        Quit(void);
-virtual void        ScreenConnected(bool active);
-        void        Disconnect();
-virtual	void		WindowActivated(bool active);
-virtual void		WorkspaceActivated(int32 ws, bool state);
-virtual void		ScreenChanged(BRect screen_size, color_space depth);
-virtual void        Hide();
-virtual void        Show();
-        void        SetColorList(rgb_color *list,int32 first_index = 0,int32 last_index = 255);
-		status_t    SetSpace(uint32 space);
-		bool        CanControlFrameBuffer();
-		status_t    SetFrameBuffer(int32 width, int32 height);
-		status_t    MoveDisplayArea(int32 x, int32 y);
+	BWindowScreen(const char *title, uint32 space, status_t *error,
+						bool debug_enable = false);
+        BWindowScreen(const char *title, uint32 space, uint32 attributes,
+						status_t *error);
+	virtual ~BWindowScreen();
 
-		void        *IOBase(); // Not supported anymore. It always returns NULL
+	virtual void Quit();
+	virtual void ScreenConnected(bool active);
+        	void Disconnect();
+
+	virtual	void WindowActivated(bool active);
+	virtual void WorkspaceActivated(int32 ws, bool state);
+	virtual void ScreenChanged(BRect screen_size, color_space depth);
+
+	virtual void Hide();
+	virtual void Show();
+
+        void SetColorList(rgb_color *list,int32 first_index = 0,int32 last_index = 255);
+	status_t SetSpace(uint32 space);
+	
+	bool CanControlFrameBuffer();
+	status_t SetFrameBuffer(int32 width, int32 height);
+	status_t MoveDisplayArea(int32 x, int32 y);
+
+	void *IOBase(); // Not supported anymore. It always returns NULL
 		
-		rgb_color           *ColorList();
-		frame_buffer_info   *FrameBufferInfo();
-		graphics_card_hook  CardHookAt(int32 index);
-		graphics_card_info  *CardInfo();
+	rgb_color           *ColorList();
+	frame_buffer_info   *FrameBufferInfo();
+	graphics_card_hook  CardHookAt(int32 index);
+	graphics_card_info  *CardInfo();
 
 /******************************* Debugger API Notice ********************************
   Those three calls, and the debug_enable flag in the constructor, have been added to
@@ -134,16 +135,16 @@ virtual void        Show();
 	The Debug API will not be support after the Preview Release (replaced by the debug
 	API in the new WindowScreen class).
 ***************************************************************************************/
-		void        RegisterThread(thread_id id);		
+	void        RegisterThread(thread_id id);		
 virtual	void        SuspensionHook(bool active);
-		void        Suspend(char *label);
+	void        Suspend(char *label);
 
 		
 virtual status_t	Perform(perform_code d, void *arg);
 
 private:
 
-		typedef BWindow	inherited;
+	typedef BWindow	inherited;
 
 virtual void        _ReservedWindowScreen1();
 virtual void        _ReservedWindowScreen2();
@@ -156,14 +157,13 @@ virtual void        _ReservedWindowScreen4();
 					
 		char                  _unused;
 		char                  space_mode;
-		void                  *io_buffer;
-        	bool                  direct_enable;
+		bool                  direct_enable;
 		bool                  fWorkState;
 		bool                  fWindowState;
 		bool                  fActivateState;
         	int32                 fLockState;
 		int32                 fScreenIndex;
-		int32                 memory_area, io_area;
+		
 		display_mode          *fOldDisplayMode;
 		display_mode          *fDisplayMode;
 		uint32                space0;
@@ -172,8 +172,9 @@ virtual void        _ReservedWindowScreen4();
 		image_id              fAddonImage;
 
 		rgb_color             fColorList[256];
-		GetAccelerantHook     m_gah;
+		GetAccelerantHook     fGetAccelerantHook;
         	graphics_card_info    fCardInfo;
+
 		graphics_card_hook    hooks[B_HOOK_COUNT]; 
 		_direct_screen_info_  info;
 		frame_buffer_info     fFrameBufferInfo;
@@ -188,7 +189,8 @@ virtual void        _ReservedWindowScreen4();
 		uint32		      fAttributes;
 		uint32                fModeCount;
 		display_mode          *fModeList;
-		engine_token          *et;
+
+		engine_token          *fEngineToken;
 		wait_engine_idle      m_wei;
 		acquire_engine        m_ae;
 		release_engine        m_re;
@@ -197,13 +199,12 @@ virtual void        _ReservedWindowScreen4();
 		screen_to_screen_transparent_blit trans_blit_rect;
 		screen_to_screen_scaled_filtered_blit scaled_filtered_blit_rect;
 
-		uint32                _reserved_[21];
+		uint32                _reserved_[24];
 		
-static	BRect		CalcFrame(int32 index, int32 space, display_mode *dmode);
-		status_t	SetFullscreen(bool enable);
+	static	BRect		CalcFrame(int32 index, int32 space, display_mode *dmode);
 		status_t	InitData(uint32 space, uint32 attributes);
         	status_t    	SetActiveState(int32 state);
-        	status_t    	SetLockState(int32 state);
+		status_t	SetupAccelerantHooks(bool enable);
 		status_t    	GetCardInfo();
 		void        	Suspend();
 		void    	Resume();
