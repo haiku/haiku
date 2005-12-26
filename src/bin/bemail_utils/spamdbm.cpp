@@ -65,6 +65,19 @@
  *
  * Revision History (now manually updated due to SVN's philosophy)
  * $Log: spamdbm.cpp,v $
+ * ------------------------------------------------------------------------
+ * r15195 | agmsmith | 2005-11-27 21:07:55 -0500 (Sun, 27 Nov 2005) | 4 lines
+ * Just a few minutes after checking in, I mentioned it to Japanese expert Koki
+ * and he suggested also including the Japanese comma.  So before I forget to
+ * do it...
+ *
+ * ------------------------------------------------------------------------
+ * r15194 | agmsmith | 2005-11-27 20:37:13 -0500 (Sun, 27 Nov 2005) | 5 lines
+ * Truncate overly long URLs to the maximum word length.  Convert Japanese
+ * periods to spaces so that more "words" are found.  Fix UTF-8 comparison
+ * problems with tolower() incorrectly converting characters with the high bit
+ * set.
+ *
  * r15098 | agmsmith | 2005-11-23 23:17:00 -0500 (Wed, 23 Nov 2005) | 5 lines
  * Added better tokenization so that HTML is parsed and things like tags
  * between letters of a word no longer hide that word.  After testing, the
@@ -1942,9 +1955,7 @@ static status_t RemoveSpamPrefixFromSubjectAttribute (BNode *BNodePntr)
 
 static size_t TokenizerPassLowerCase (
   char *BufferPntr,
-  size_t NumberOfBytes,
-  char PrefixCharacter,
-  set<string> &WordSet)
+  size_t NumberOfBytes)
 {
   char *EndOfStringPntr;
 
@@ -2102,9 +2113,7 @@ character in the word. */
 
 static size_t TokenizerPassTruncateLongAsianWords (
   char *BufferPntr,
-  size_t NumberOfBytes,
-  char PrefixCharacter,
-  set<string> &WordSet)
+  size_t NumberOfBytes)
 {
   char *EndOfStringPntr;
   char *InputStringPntr;
@@ -2798,13 +2807,12 @@ void ABSApp::AddWordsToSet (
     switch (PassNumber)
     {
       case 1: /* Lowercase first, rest of them assume lower case inputs. */
-        CurrentSize = TokenizerPassLowerCase (
-          BufferPntr, CurrentSize, PrefixCharacter, WordSet);
+        CurrentSize = TokenizerPassLowerCase (BufferPntr, CurrentSize);
         break;
       case 2: CurrentSize = TokenizerPassJapanesePeriodsToSpaces (
         BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
       case 3: CurrentSize = TokenizerPassTruncateLongAsianWords (
-        BufferPntr, CurrentSize, PrefixCharacter, WordSet); break;
+        BufferPntr, CurrentSize); break;
       case 4: CurrentSize = TokenizerPassRemoveHTMLComments (
         BufferPntr, CurrentSize, 'Z', WordSet); break;
       case 5: CurrentSize = TokenizerPassRemoveHTMLStyle (
