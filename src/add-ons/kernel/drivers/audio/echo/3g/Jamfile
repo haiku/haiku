@@ -78,16 +78,5 @@ Package haiku-echo3g-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-echo3g-cvs
-	:
-	<kernel!drivers!dev!audio!multi>echo3g
-	:
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-echo3g-cvs : audio multi echo3g ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>echo3g ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : echo3g ;
-}

@@ -125,6 +125,7 @@ midi_read(
 	ECHOSTATUS 		err;
 	DWORD			midiData;
 	LONGLONG 		timestamp;
+	PBYTE			next = (PBYTE)ptr;
 	
 	LOG(("midi_read()\n"));
 	
@@ -134,8 +135,8 @@ midi_read(
 	err = card->pEG->ReadMidiByte(&card->midi.context, midiData, timestamp);
 	if (err == ECHOSTATUS_OK) {
 		*nread = 1;
-		*(PDWORD)ptr = midiData;
-		LOG(("midi_read() : 0x%lx\n", midiData));
+		*next = midiData;
+		LOG(("midi_read() : 0x%lx\n", *next));
 		return B_OK;
 	}
 	return B_ERROR;

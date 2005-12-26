@@ -77,16 +77,5 @@ Package haiku-echoindigo-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package haiku-echoindigo-cvs
-	:
-	<kernel!drivers!dev!audio!multi>echoindigo
-	:
-	boot home config add-ons kernel drivers dev audio multi ;
+PackageDriverSymLink haiku-echoindigo-cvs : audio multi echoindigo ;
 
-# Link to kernel/drivers/dev/audio/multi
-{
-	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>echoindigo ;
-	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : echoindigo ;
-}
