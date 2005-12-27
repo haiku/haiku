@@ -2367,7 +2367,8 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 			acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
 			area = vm_area_lookup(addressSpace, fault_address);
 
-			dprintf("vm_page_fault: sending team 0x%lx SIGSEGV, ip %#lx (\"%s\" +%#lx)\n",
+			dprintf("vm_page_fault: sending team \"%s\" 0x%lx SIGSEGV, ip %#lx (\"%s\" +%#lx)\n",
+				thread_get_current_thread()->team->name,
 				thread_get_current_thread()->team->id, fault_address,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
@@ -2384,12 +2385,14 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 					#endif
 				};
 				struct iframe *iframe = i386_get_user_iframe();
+				if (iframe == NULL)
+					panic("iframe is NULL!");
 				struct stack_frame *frame = (struct stack_frame *)iframe->ebp;
-			
+
 				dprintf("stack trace:\n");
 				for (; frame; frame = frame->previous) {
 					dprintf("  0x%p", frame->return_address);
-					area = vm_area_lookup(map,
+					area = vm_area_lookup(addressSpace,
 						(addr_t)frame->return_address);
 					if (area) {
 						dprintf(" (%s + %#lx)", area->name,
