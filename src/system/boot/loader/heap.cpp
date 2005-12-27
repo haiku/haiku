@@ -292,17 +292,24 @@ realloc(void *oldBuffer, size_t newSize)
 {
 	// ToDo: improve this implementation!
 
+	if (newSize == 0) {
+		free(oldBuffer);
+		return NULL;
+	}
+
 	void *newBuffer = malloc(newSize);
 	if (newBuffer == NULL)
 		return NULL;
 
-	free_chunk *oldChunk = free_chunk::SetToAllocated(oldBuffer);
+	if (oldBuffer) {
+		free_chunk *oldChunk = free_chunk::SetToAllocated(oldBuffer);
 
-	if (newSize > oldChunk->size)
-		newSize = oldChunk->size;
+		if (newSize > oldChunk->size)
+			newSize = oldChunk->size;
 
-	memcpy(newBuffer, oldBuffer, newSize);
-	free(oldBuffer);
+		memcpy(newBuffer, oldBuffer, newSize);
+		free(oldBuffer);
+	}
 
 	return newBuffer;
 }
