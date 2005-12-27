@@ -46,7 +46,6 @@ class InputConsoleHandle : public ConsoleHandle {
 static InputConsoleHandle sInput;
 static ConsoleHandle sOutput;
 FILE *stdin, *stdout, *stderr;
-static bool sCursorVisible = true;
 
 
 ConsoleHandle::ConsoleHandle()
