@@ -32,6 +32,12 @@ arch_cpu_init_post_vm(kernel_args *args)
 	return B_OK;
 }
 
+status_t
+arch_cpu_init_post_modules(kernel_args *args)
+{
+	return B_OK;
+}
+
 #define CACHELINE 32
 
 void 
@@ -108,6 +114,13 @@ arch_cpu_global_TLB_invalidate(void)
 	}
 	tlbsync();
 	asm volatile("sync");
+}
+
+
+void 
+arch_cpu_user_TLB_invalidate(void)
+{
+	// TODO: Implement!
 }
 
 
