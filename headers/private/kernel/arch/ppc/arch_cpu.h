@@ -6,7 +6,7 @@
 #define _KERNEL_ARCH_PPC_CPU_H
 
 
-#include <arch/ppc/thread_struct.h>
+#include <arch/ppc/arch_thread_types.h>
 #include <kernel.h>
 
 
