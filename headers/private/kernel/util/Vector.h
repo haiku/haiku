@@ -65,6 +65,9 @@ public:
 	void PopFront();
 	void PopBack();
 
+	status_t Add(const Value &value) { return PushBack(value); }
+	status_t Add(const Value &value, int32 index) { return Insert(value, index); }
+
 	status_t Insert(const Value &value, int32 index);
 	status_t Insert(const Value &value, const Iterator &iterator);
 
