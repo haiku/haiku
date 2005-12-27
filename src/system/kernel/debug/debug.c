@@ -40,7 +40,7 @@ int dbg_register_file[B_MAX_CPU_COUNT][14];
 
 static bool sSerialDebugEnabled = false;
 static bool sSyslogOutputEnabled = false;
-static bool sBlueScreenEnabled = false;
+static bool sBlueScreenEnabled = true;
 static bool sBlueScreenOutput = false;
 static spinlock sSpinlock = 0;
 static int32 sDebuggerOnCPU = -1;
@@ -427,13 +427,14 @@ debug_init_post_vm(kernel_args *args)
 			sSerialDebugEnabled = true;
 		if (get_driver_boolean_parameter(handle, "syslog_debug_output", false, false))
 			sSyslogOutputEnabled = true;
-		if (get_driver_boolean_parameter(handle, "bluescreen", false, false)) {
-			if (blue_screen_init() == B_OK)
-				sBlueScreenEnabled = true;
-		}
+		if (get_driver_boolean_parameter(handle, "bluescreen", true, true))
+			sBlueScreenEnabled = true;
 
 		unload_driver_settings(handle);
 	}
+
+	if (sBlueScreenEnabled && blue_screen_init() != B_OK)
+		sBlueScreenEnabled = false;
 
 	return arch_debug_init(args);
 }

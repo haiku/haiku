@@ -14,8 +14,8 @@
 	# enables syslog debug output - all debug output is also sent to
 	# the syslog service
 
-#bluescreen false
-	# enables on-screen KDL
+#bluescreen true
+	# enables/disables on-screen KDL (defaults to on)
 
 #bochs_debug_output false
 	# Activates Bochs debug output if enabled in the kernel
