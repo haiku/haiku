@@ -96,7 +96,7 @@ struct bplustree_node {
 	static inline off_t FragmentOffset(off_t link);
 	static inline uint32 FragmentIndex(off_t link);
 #endif
-};
+} __attribute__ ((__packed__));
 
 //#define BPLUSTREE_NODE 0
 #define BPLUSTREE_DUPLICATE_NODE 2

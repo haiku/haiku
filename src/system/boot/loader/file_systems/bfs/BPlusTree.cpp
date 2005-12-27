@@ -386,7 +386,8 @@ BPlusTree::FindFreeDuplicateFragment(bplustree_node *node, CachedNode *cached, o
 		if (bplustree_node::LinkType(values[i]) != BPLUSTREE_DUPLICATE_FRAGMENT)
 			continue;
 
-		bplustree_node *fragment = cached->SetTo(bplustree_node::FragmentOffset(values[i]), false);
+		bplustree_node *fragment = cached->SetTo(bplustree_node::FragmentOffset(
+			BFS_ENDIAN_TO_HOST_INT64(values[i])), false);
 		if (fragment == NULL) {
 			FATAL(("Could not get duplicate fragment at %Ld\n",values[i]));
 			continue;
@@ -398,7 +399,8 @@ BPlusTree::FindFreeDuplicateFragment(bplustree_node *node, CachedNode *cached, o
 			duplicate_array *array = fragment->FragmentAt(j);
 
 			if (array->count == 0) {
-				*_offset = bplustree_node::FragmentOffset(values[i]);
+				*_offset = bplustree_node::FragmentOffset(
+					BFS_ENDIAN_TO_HOST_INT64(values[i]));
 				*_fragment = fragment;
 				*_index = j;
 				return B_OK;
@@ -444,7 +446,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 
 		if (node->OverflowLink() == BPLUSTREE_NULL) {
 			if (status == B_OK && _value != NULL)
-				*_value = node->Values()[keyIndex];
+				*_value = BFS_ENDIAN_TO_HOST_INT64(node->Values()[keyIndex]);
 
 			return status;
 		} else if (nextOffset == nodeOffset)
@@ -503,7 +505,7 @@ TreeIterator::Goto(int8 to)
 				|| (uint32)node->Values() > (uint32)node + fTree->fNodeSize - 8 * node->NumKeys())
 				return B_ERROR;
 
-			nextOffset = node->Values()[0];
+			nextOffset = BFS_ENDIAN_TO_HOST_INT64(node->Values()[0]);
 		}
 		if (nextOffset == nodeOffset)
 			break;
@@ -639,7 +641,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 	}
 	*keyLength = length;
 
-	off_t offset = node->Values()[fCurrentKey];
+	off_t offset = BFS_ENDIAN_TO_HOST_INT64(node->Values()[fCurrentKey]);
 
 #ifdef BPLUSTREE_SUPPORTS_DUPLICATES
 	// duplicate fragments?

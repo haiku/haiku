@@ -89,6 +89,8 @@ Directory::Lookup(const char *name, bool traverseLinks)
 		return NULL;
 
 	Node *node = Stream::NodeFactory(fStream.GetVolume(), id);
+	if (!node)
+		return NULL;
 
 	if (S_ISLNK(node->Type())) {
 		// the node is a symbolic link, so we have to resolve the path
