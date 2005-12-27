@@ -27,7 +27,7 @@ of_init(int (*openFirmwareEntry)(void *))
 
 
 int
-of_call_method(const char *method, int numArgs, int numReturns, ...)
+of_call_client_function(const char *method, int numArgs, int numReturns, ...)
 {
 	struct {
 		const char	*name;
@@ -83,7 +83,58 @@ of_interpret(const char *command, int numArgs, int numReturns, ...)
 			// stack_result items."
 		const char	*command;
 		void		*args[13];
-	} args = {"interpret", numArgs + 1, numReturns, command};
+	} args = {"interpret", numArgs + 1, numReturns + 1, command};
+	va_list list;
+	int i;
+
+	// iterate over all arguments and copy them into the
+	// structure passed over to the OpenFirmware
+
+	va_start(list, numReturns);
+	for (i = 0; i < numArgs; i++) {
+		// copy args
+		args.args[i] = (void *)va_arg(list, void *);
+	}
+	for (i = numArgs; i < numArgs + numReturns + 1; i++) {
+		// clear return values
+		args.args[i] = NULL;
+	}
+
+	// args.args[numArgs] is the "catch-result" return value
+	if (gCallOpenFirmware(&args) == OF_FAILED || args.args[numArgs])
+		return OF_FAILED;
+
+	if (numReturns > 0) {
+		// copy return values over to the provided location
+	
+		for (i = numArgs + 1; i < numArgs + 1 + numReturns; i++) {
+			void **store = va_arg(list, void **);
+			if (store)
+				*store = args.args[i];
+		}
+	}
+	va_end(list);
+
+	return 0;
+}
+
+
+int
+of_call_method(int handle, const char *method, int numArgs, int numReturns, ...)
+{
+	struct {
+		const char	*name;
+		int			num_args;
+		int			num_returns;
+			// "IN:	[string] method, ihandle, stack_arg1, ..., stack_argP
+			// OUT:	catch-result, stack_result1, ..., stack_resultQ
+			// [...]
+			// An implementation shall allow at least six stack_arg and six
+			// stack_result items."
+		const char	*method;
+		int			handle;
+		void		*args[13];
+	} args = {"call-method", numArgs + 2, numReturns + 1, method, handle};
 	va_list list;
 	int i;
 

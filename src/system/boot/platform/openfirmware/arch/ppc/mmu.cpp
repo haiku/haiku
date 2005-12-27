@@ -654,7 +654,8 @@ arch_set_callback(void)
 	// instead of maintaining it itself
 
 	void *oldCallback = NULL;
-	if (of_call_method("set-callback", 1, 1, &callback, &oldCallback) == OF_FAILED) {
+	if (of_call_client_function("set-callback", 1, 1, &callback, &oldCallback)
+			== OF_FAILED) {
 		puts("set-callback failed!");
 		return B_ERROR;
 	}

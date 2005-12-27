@@ -46,9 +46,12 @@ extern int of_peer(int node);
 extern int of_parent(int node);
 extern int of_instance_to_path(int instance, char *pathBuffer, int bufferSize);
 extern int of_instance_to_package(int instance);
-extern int of_getprop(int package, const char *property, void *buffer, int bufferSize);
-extern int of_setprop(int package, const char *property, const void *buffer, int bufferSize);
-extern int of_nextprop(int package, const char *previousProperty, char *nextProperty);
+extern int of_getprop(int package, const char *property, void *buffer,
+	int bufferSize);
+extern int of_setprop(int package, const char *property, const void *buffer,
+	int bufferSize);
+extern int of_nextprop(int package, const char *previousProperty,
+	char *nextProperty);
 extern int of_getproplen(int package, const char *property);
 extern int of_package_to_path(int package, char *pathBuffer, int bufferSize);
 
@@ -64,8 +67,11 @@ extern int of_release(void *virtualAddress, int size);
 extern void *of_claim(void *virtualAddress, int size, int align);
 
 /* misc functions */
-extern int of_call_method(const char *method, int numArgs, int numReturns, ...);
+extern int of_call_client_function(const char *method, int numArgs,
+	int numReturns, ...);
 extern int of_interpret(const char *command, int numArgs, int numReturns, ...);
+extern int of_call_method(int handle, const char *method, int numArgs,
+	int numReturns, ...);
 extern int of_test(const char *service);
 extern int of_milliseconds(void);
 extern void of_exit(void);
