@@ -10,6 +10,7 @@
 #include <KernelExport.h>
 #include <kernel.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_priv.h>
 #include <int.h>
 #include <boot/kernel_args.h>
