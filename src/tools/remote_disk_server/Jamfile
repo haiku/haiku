@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tools remote_disk_server ;
+
+UsePrivateHeaders kernel ;
+
+BuildPlatformMain remote_disk_server
+	: remote_disk_server.cpp
+	: $(HOST_LIBSUPC++)
+;

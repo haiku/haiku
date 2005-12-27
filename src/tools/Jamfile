@@ -38,6 +38,7 @@ SubInclude HAIKU_TOP src tools hey ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools makebootable ;
 SubInclude HAIKU_TOP src tools rc ;
+SubInclude HAIKU_TOP src tools remote_disk_server ;
 SubInclude HAIKU_TOP src tools resattr ;
 SubInclude HAIKU_TOP src tools rman ;
 SubInclude HAIKU_TOP src tools translation ;
