@@ -84,3 +84,4 @@ SEARCH on [ FGristFiles stage2_crt0.S ]
 
 
 SubInclude HAIKU_TOP src system boot loader file_systems ;
+SubInclude HAIKU_TOP src system boot loader net ;

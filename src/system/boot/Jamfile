@@ -32,6 +32,7 @@ if $(TARGET_ARCH) = x86 {
 KernelLd boot_loader :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_loader.a
+	boot_net.a
 	boot_partitions.a
 
 	# file systems

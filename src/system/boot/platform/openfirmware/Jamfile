@@ -10,8 +10,10 @@ KernelMergeObject boot_platform_openfirmware.o :
 	heap.cpp
 	menu.cpp
 	mmu.cpp
+	network.cpp
 	openfirmware.c
 	start.c
+	support.cpp
 	video.cpp
 
 	# generic

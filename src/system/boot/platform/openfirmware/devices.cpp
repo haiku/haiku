@@ -12,6 +12,8 @@
 #include <boot/vfs.h>
 #include <boot/stdio.h>
 #include <boot/stage2.h>
+#include <boot/net/NetStack.h>
+#include <boot/net/RemoteDisk.h>
 #include <util/kernel_cpp.h>
 
 #include <string.h>
@@ -97,7 +99,24 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 		char type[16];
 		of_getprop(node, "device_type", type, sizeof(type));
 		printf("boot type = %s\n", type);
-		if (strcmp("block", type)) {
+
+		// If the boot device is a network device, we try to find a
+		// "remote disk" at this point.
+		if (strcmp(type, "network") == 0) {
+			// init the net stack
+			status_t error = net_stack_init();
+			if (error != B_OK)
+				return error;
+		
+			// init a remote disk, if possible
+			RemoteDisk *remoteDisk = RemoteDisk::FindAnyRemoteDisk();
+			if (!remoteDisk)
+				return B_ENTRY_NOT_FOUND;
+			*_device = remoteDisk;
+			return B_OK;
+		}
+
+		if (strcmp("block", type) != 0) {
 			printf("boot device is not a block device!\n");
 			return B_ENTRY_NOT_FOUND;
 		}

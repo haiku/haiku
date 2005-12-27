@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src system boot loader net ;
+
+UsePrivateHeaders kernel ;
+
+SubDirC++Flags -fno-rtti ;
+
+KernelStaticLibrary boot_net.a :
+	ARP.cpp
+	ChainBuffer.cpp
+	Ethernet.cpp
+	IP.cpp
+	NetDefs.cpp
+	NetStack.cpp
+	RemoteDisk.cpp
+	UDP.cpp
+
+	: -fno-pic
+;
