@@ -63,6 +63,8 @@ static void clear_page(addr_t pa);
 static int32 page_scrubber(void *);
 
 
+/**	Dequeues a page from the tail of the given queue */
+
 static vm_page *
 dequeue_page(page_queue *q)
 {
@@ -82,6 +84,8 @@ dequeue_page(page_queue *q)
 	return page;
 }
 
+
+/**	Enqueues a page to the head of the given queue */
 
 static void
 enqueue_page(page_queue *q, vm_page *page)
@@ -168,6 +172,7 @@ vm_page_write_modified(vm_cache *cache)
 
 	for (; page; page = page->cache_next) {
 		bool gotPage = false;
+		bool dequeuedPage = true;
 		off_t pageOffset;
 		status_t status;
 		vm_area *area;
@@ -207,8 +212,10 @@ vm_page_write_modified(vm_cache *cache)
 					uint32 flags;
 					map->ops->query(map, pageOffset - area->cache_offset + area->base,
 						&physicalAddress, &flags);
-					if (flags & PAGE_MODIFIED)
+					if (flags & PAGE_MODIFIED) {
 						gotPage = true;
+						dequeuedPage = false;
+					}
 				}
 				if (gotPage) {
 					// clear the modified flag
@@ -227,20 +234,22 @@ vm_page_write_modified(vm_cache *cache)
 		mutex_lock(&cache->ref->lock);
 
 		if (status == B_OK) {
-			// put it into the active queue
+			if (dequeuedPage) {
+				// put it into the active queue
 
-			state = disable_interrupts();
-			acquire_spinlock(&page_lock);
+				state = disable_interrupts();
+				acquire_spinlock(&page_lock);
 
-			if (page->ref_count > 0)
-				page->state = PAGE_STATE_ACTIVE;
-			else
-				page->state = PAGE_STATE_INACTIVE;
+				if (page->ref_count > 0)
+					page->state = PAGE_STATE_ACTIVE;
+				else
+					page->state = PAGE_STATE_INACTIVE;
 
-			enqueue_page(&page_active_queue, page);
+				enqueue_page(&page_active_queue, page);
 
-			release_spinlock(&page_lock);
-			restore_interrupts(state);
+				release_spinlock(&page_lock);
+				restore_interrupts(state);
+			}
 		} else {
 			// We don't have to put the PAGE_MODIFIED bit back, as it's still
 			// in the modified pages list.
@@ -810,8 +819,8 @@ vm_page_set_state_nolock(vm_page *page, int page_state)
 		default:
 			panic("vm_page_set_state: invalid target state %d\n", page_state);
 	}
-	move_page_to_queue(from_q, to_q, page);
 	page->state = page_state;
+	move_page_to_queue(from_q, to_q, page);
 
 	return B_OK;
 }
@@ -860,18 +869,38 @@ static int
 dump_page(int argc, char **argv)
 {
 	struct vm_page *page;
+	addr_t address;
+	int32 index = 1;
+
+	if (argc > 2 && !strncmp(argv[1], "lookup", strlen(argv[1])))
+		index++;
 
 	if (argc < 2
-		|| strlen(argv[1]) <= 2
-		|| argv[1][0] != '0'
-		|| argv[1][1] != 'x') {
-		dprintf("usage: page_queue <address>\n");
+		|| strlen(argv[index]) <= 2
+		|| argv[index][0] != '0'
+		|| argv[index][1] != 'x') {
+		kprintf("usage: page [lookup] <address>\n");
 		return 0;
 	}
 
-	page = (struct vm_page *)(atoul(argv[1]));
+	address = strtoul(argv[index], NULL, 0);
 
-	dprintf("queue_next = %p, queue_prev = %p, type = %d, state = %d\n", page->queue_next, page->queue_prev, page->type, page->state);
+	if (index == 2)
+		page = vm_lookup_page(address / B_PAGE_SIZE);
+	else
+		page = (struct vm_page *)address;
+
+	kprintf("PAGE: %p\n", page);
+	kprintf("queue_next,prev: %p, %p\n", page->queue_next, page->queue_prev);
+	kprintf("hash_next:       %p\n", page->hash_next);
+	kprintf("physical_number: %lx\n", page->physical_page_number);
+	kprintf("cache:           %p\n", page->cache);
+	kprintf("cache_offset:    %ld\n", page->cache_offset);
+	kprintf("cache_next,prev: %p, %p\n", page->cache_next, page->cache_prev);
+	kprintf("ref_count:       %ld\n", page->ref_count);
+	kprintf("type:            %d\n", page->type);
+	kprintf("state:           %d\n", page->state);
+
 	return 0;
 }
 
@@ -882,7 +911,7 @@ dump_page_queue(int argc, char **argv)
 	struct page_queue *queue;
 
 	if (argc < 2) {
-		dprintf("usage: page_queue <address/name> [list]\n");
+		kprintf("usage: page_queue <address/name> [list]\n");
 		return 0;
 	}
 
@@ -897,18 +926,18 @@ dump_page_queue(int argc, char **argv)
 	else if (!strcmp(argv[1], "active"))
 		queue = &page_active_queue;
 	else {
-		dprintf("page_queue: unknown queue \"%s\".\n", argv[1]);
+		kprintf("page_queue: unknown queue \"%s\".\n", argv[1]);
 		return 0;
 	}
 
-	dprintf("queue->head = %p, queue->tail = %p, queue->count = %d\n", queue->head, queue->tail, queue->count);
+	kprintf("queue->head = %p, queue->tail = %p, queue->count = %d\n", queue->head, queue->tail, queue->count);
 
 	if (argc == 3) {
 		struct vm_page *page = queue->head;
 		int i;
 		
 		for (i = 0; page; i++, page = page->queue_next) {
-			dprintf("%5d. queue_next = %p, queue_prev = %p, type = %d, state = %d\n", i, page->queue_next, page->queue_prev, page->type, page->state);
+			kprintf("%5d. queue_next = %p, queue_prev = %p, type = %d, state = %d\n", i, page->queue_next, page->queue_prev, page->type, page->state);
 		}
 	}
 	return 0;
@@ -931,16 +960,16 @@ dump_page_stats(int argc, char **argv)
 		counter[all_pages[i].state]++;
 	}
 
-	dprintf("page stats:\n");
-	dprintf("active: %lu\ninactive: %lu\nbusy: %lu\nunused: %lu\n",
+	kprintf("page stats:\n");
+	kprintf("active: %lu\ninactive: %lu\nbusy: %lu\nunused: %lu\n",
 		counter[PAGE_STATE_ACTIVE], counter[PAGE_STATE_INACTIVE], counter[PAGE_STATE_BUSY], counter[PAGE_STATE_UNUSED]);
-	dprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
+	kprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
 		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED], counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
 
-	dprintf("\nfree_queue: %p, count = %d\n", &page_free_queue, page_free_queue.count);
-	dprintf("clear_queue: %p, count = %d\n", &page_clear_queue, page_clear_queue.count);
-	dprintf("modified_queue: %p, count = %d\n", &page_modified_queue, page_modified_queue.count);
-	dprintf("active_queue: %p, count = %d\n", &page_active_queue, page_active_queue.count);
+	kprintf("\nfree_queue: %p, count = %d\n", &page_free_queue, page_free_queue.count);
+	kprintf("clear_queue: %p, count = %d\n", &page_clear_queue, page_clear_queue.count);
+	kprintf("modified_queue: %p, count = %d\n", &page_modified_queue, page_modified_queue.count);
+	kprintf("active_queue: %p, count = %d\n", &page_active_queue, page_active_queue.count);
 
 	return 0;
 }
