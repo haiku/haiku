@@ -25,7 +25,9 @@ struct cache_transaction;
 struct cached_block;
 struct block_chunk;
 struct block_cache;
+struct block_range;
 typedef DoublyLinkedListLink<cached_block> block_link;
+typedef DoublyLinkedListLink<block_range> range_link;
 
 
 struct cached_block {
@@ -66,7 +68,7 @@ struct block_chunk {
 
 struct block_range {
 	block_range		*next;			// next in hash
-	block_range		*free_next;
+	range_link		link;
 	addr_t			base;
 	uint32			used_mask;
 	vm_page			*pages[kNumBlockRangePages];
@@ -91,6 +93,10 @@ struct block_range {
 	static uint32 Hash(void *_blockRange, const void *_address, uint32 range);
 };
 
+typedef DoublyLinkedList<block_range,
+	DoublyLinkedListMemberGetLink<block_range,
+		&block_range::link> > range_list;
+
 struct block_cache {
 	hash_table	*hash;
 	benaphore	lock;
@@ -102,7 +108,7 @@ struct block_cache {
 	hash_table	*transaction_hash;
 
 	hash_table	*ranges_hash;
-	block_range	*free_ranges;
+	range_list	free_ranges;
 	uint32		chunks_per_range;
 	size_t		chunk_size;
 	uint32		range_mask;

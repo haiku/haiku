@@ -153,8 +153,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize)
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
-	ranges_hash(NULL),
-	free_ranges(NULL)
+	ranges_hash(NULL)
 {
 	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
@@ -208,8 +207,8 @@ block_cache::InitCheck()
 block_range *
 block_cache::GetFreeRange()
 {
-	if (free_ranges != NULL)
-		return free_ranges;
+	if (!free_ranges.IsEmpty())
+		return free_ranges.First();
 
 	// we need to allocate a new range
 	block_range *range;

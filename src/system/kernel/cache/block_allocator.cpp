@@ -201,8 +201,7 @@ block_range::New(block_cache *cache, block_range **_range)
 	range->base = address;
 
 	// insert into free ranges list in cache
-	range->free_next = cache->free_ranges;
-	cache->free_ranges = range;
+	cache->free_ranges.Add(range);
 
 	*_range = range;
 	return B_OK;
@@ -235,6 +234,9 @@ block_range::Delete(block_cache *cache, block_range *range)
 
 		vm_page_set_state(range->pages[i], PAGE_STATE_FREE);
 	}
+
+	// remove from cache free list
+	cache->free_ranges.Remove(range);
 
 	free(range);
 }
@@ -376,21 +378,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 
 		if (used_mask == cache->range_mask) {
 			// range is full, remove it from the free list
-
-			// usually, the first entry will be ourself, but we don't count on it
-			block_range *last = NULL, *range = cache->free_ranges;
-			while (range != NULL && range != this) {
-				last = range;
-				range = range->free_next;
-			}
-			if (range == NULL) {
-				panic("block_range %p was free but not in the free list\n", this);
-			} else {
-				if (last)
-					last->free_next = free_next;
-				else
-					cache->free_ranges = free_next;
-			}
+			cache->free_ranges.Remove(this);
 		}
 	}
 	TRACE(("Allocate: used masks: chunk = %x, range = %lx\n", chunks[chunk].used_mask, used_mask));
@@ -409,8 +397,7 @@ block_range::Free(block_cache *cache, void *address)
 	if (chunks[chunk].used_mask == cache->chunk_mask) {
 		if (used_mask == cache->range_mask) {
 			// range was full before, add it to the free list
-			free_next = cache->free_ranges;
-			cache->free_ranges = this;
+			cache->free_ranges.Add(this);
 		}
 		// chunk was full before, propagate usage bit to range
 		used_mask &= ~(1UL << chunk);
