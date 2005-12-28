@@ -318,7 +318,7 @@ status_t CLONE_ACCELERANT(void *data) {
 	char path[MAXPATHLEN];
 
 	/* the data is the device name */
-	strcpy(path, "/dev");
+	strcpy(path, "/dev/");
 	strcat(path, (const char *)data);
 	/* open the device, the permissions aren't important */
 	fd = open(path, B_READ_WRITE);
