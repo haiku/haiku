@@ -125,6 +125,16 @@ MonitorView::SetResolution(int32 width, int32 height)
 }
 
 
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
+// r5 doesn't have this one
+bool
+operator!=(const rgb_color &a, const rgb_color &b)
+{
+	return a.red != b.red || a.green != b.green || a.blue != b.blue;
+}
+#endif
+
+
 void
 MonitorView::MessageReceived(BMessage* message)
 {
