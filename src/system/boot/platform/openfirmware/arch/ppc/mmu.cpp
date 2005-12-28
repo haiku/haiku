@@ -443,10 +443,14 @@ arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
 	// set protection to WIMGxPP: -I--xPP
+	// PP:	00 - no access
+	//		01 - read only
+	//		10 - read/write
+	//		11 - read only
 	if (protection & B_WRITE_AREA)
-		protection = 0x23;
-	else
 		protection = 0x22;
+	else
+		protection = 0x21;
 
 	if (virtualAddress == NULL) {
 		// find free address large enough to hold "size"
@@ -633,6 +637,7 @@ static int
 callback(struct of_arguments *args)
 {
 	const char *name = args->name;
+printf("CALLBACK: %s\n", name);
 
 	if (!strcmp(name, "map"))
 		return map_callback(args);
