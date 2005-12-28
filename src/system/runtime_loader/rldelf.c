@@ -1126,13 +1126,16 @@ init_dependencies(image_t *image, bool initHead)
 		initList[--count] = NULL;
 	}
 
+	TRACE(("%ld: init dependencies\n", find_thread(NULL)));
 	for (i = 0; i < count; i++) {
 		addr_t _initf = initList[i]->init_routine;
 		libinit_f *initf = (libinit_f *)(_initf);
 
+		TRACE(("%ld:  init: %s\n", find_thread(NULL), initList[i]->name));
 		if (initf)
 			initf(initList[i]->id, gProgramArgs);
 	}
+	TRACE(("%ld:  init done.\n", find_thread(NULL)));
 
 	rldfree(initList);
 }
