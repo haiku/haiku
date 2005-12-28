@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <OS.h>
 
 #include <boot/platform.h>
 #include <boot/heap.h>
@@ -23,18 +24,12 @@ platform_init_heap(stage2_args *args, void **_base, void **_top)
 {
 	TRACE(("platform_init_heap()\n"));
 
-	int memory;
-	if (of_getprop(gChosen, "memory", &memory, sizeof(int)) == OF_FAILED)
-		return B_ERROR;
+	*_base = NULL;
+	status_t error = platform_allocate_region(_base, args->heap_size,
+		B_READ_AREA | B_WRITE_AREA);
+	if (error != B_OK)
+		return error;
 
-	printf("memory = %d\n", memory);
-	struct of_region available;
-	int memPackage = of_instance_to_package(memory);
-	printf("memPackage = %d\n", memPackage);
-	of_getprop(memPackage, "available", &available, sizeof(struct of_region));
-	printf("available: base = %p, size = %ld\n", available.base, available.size);
-
-	*_base = of_claim(available.base, args->heap_size, 64);
 	printf("heap base = %p\n", *_base);
 	*_top = (void *)((int8 *)*_base + args->heap_size);
 	printf("heap top = %p\n", *_top);
@@ -47,6 +42,6 @@ void
 platform_release_heap(stage2_args *args, void *base)
 {
 	if (base != NULL)
-		of_release(base, args->heap_size);
+		platform_free_region(base, args->heap_size);
 }
 
