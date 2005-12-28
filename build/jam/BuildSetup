@@ -566,7 +566,7 @@ switch $(HOST_PLATFORM) {
 
 if $(TARGET_PLATFORM) = libbe_test {
 	# headers and flags
-	TARGET_HDRS += [ PublicHeaders app interface storage support ]
+	TARGET_HDRS += [ PublicHeaders app game interface storage support ]
 		[ PrivateHeaders $(DOT) ] ;
 	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
 		HaikuBuildCompatibility.h ] ;
