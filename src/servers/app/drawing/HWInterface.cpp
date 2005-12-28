@@ -1,7 +1,14 @@
-// HWInterface.cpp
+//------------------------------------------------------------------------------
+// Copyright 2005, Haiku, Inc. All rights reserved.
+// Distributed under the terms of the MIT License.
+//
+//	Author:			Stephan Aßmus, <superstippi@gmx.de>
+//------------------------------------------------------------------------------
 
 #include <stdio.h>
 #include <string.h>
+
+#include "frame_buffer_support.h"
 
 #include "RenderingBuffer.h"
 #include "ServerCursor.h"
@@ -385,86 +392,6 @@ HWInterface::_DrawCursor(BRect area) const
 		_CopyToFront(buffer, width * 4, left, top, right, bottom);
 
 		delete[] buffer;
-	}
-}
-
-/*
-// gfxcpy
-inline
-void
-gfxcpy(uint8* dst, uint8* src, int32 numBytes)
-{
-	uint64* d64 = (uint64*)dst;
-	uint64* s64 = (uint64*)src;
-	int32 numBytesBegin = numBytes;
-	while (numBytes >= 32) {
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		numBytes -= 32;
-	}
-	while (numBytes >= 16) {
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		numBytes -= 16;
-	}
-	while (numBytes >= 8) {
-		*d64++ = *s64++;
-		numBytes -= 8;
-	}
-	if (numBytes > 0) {
-		// update original pointers
-		dst += numBytesBegin - numBytes;
-		src += numBytesBegin - numBytes;
-		numBytesBegin = numBytes;
-	
-		uint32* d32 = (uint32*)dst;
-		uint32* s32 = (uint32*)src;
-		while (numBytes >= 4) {
-			*d32++ = *s32++;
-			numBytes -= 4;
-		}
-		// update original pointers
-		dst += numBytesBegin - numBytes;
-		src += numBytesBegin - numBytes;
-	
-		while (numBytes > 0) {
-			*dst++ = *src++;
-			numBytes--;
-		}
-	}
-}*/
-
-// gfxcpy32
-// * numBytes is expected to be a multiple of 4
-inline
-void
-gfxcpy32(uint8* dst, uint8* src, int32 numBytes)
-{
-	uint64* d64 = (uint64*)dst;
-	uint64* s64 = (uint64*)src;
-	int32 numBytesStart = numBytes;
-	while (numBytes >= 32) {
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		numBytes -= 32;
-	}
-	if (numBytes >= 16) {
-		*d64++ = *s64++;
-		*d64++ = *s64++;
-		numBytes -= 16;
-	}
-	if (numBytes >= 8) {
-		*d64++ = *s64++;
-		numBytes -= 8;
-	}
-	if (numBytes == 4) {
-		uint32* d32 = (uint32*)(dst + numBytesStart - numBytes);
-		uint32* s32 = (uint32*)(src + numBytesStart - numBytes);
-		*d32 = *s32;
 	}
 }
 

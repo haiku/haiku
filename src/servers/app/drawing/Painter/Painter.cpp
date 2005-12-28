@@ -26,6 +26,8 @@
 #include <agg_span_image_filter_rgba32.h>
 #include <agg_span_interpolator_linear.h>
 
+#include "frame_buffer_support.h"
+
 #include "DrawState.h"
 
 #include "AGGTextRenderer.h"
@@ -63,7 +65,8 @@ Painter::Painter()
 	  fBaseRenderer(NULL),
 	  fOutlineRenderer(NULL),
 	  fOutlineRasterizer(NULL),
-	  fScanline(NULL),
+	  fUnpackedScanline(NULL),
+	  fPackedScanline(NULL),
 	  fRasterizer(NULL),
 	  fRenderer(NULL),
 	  fFontRendererSolid(NULL),
@@ -76,7 +79,6 @@ Painter::Painter()
 	  fValidClipping(false),
 	  fDrawingMode(B_OP_COPY),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
-//	  fAlphaSrcMode(B_CONSTANT_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
 	  fLineCapMode(B_BUTT_CAP),
@@ -149,7 +151,8 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		// the renderer used for filling paths
 		fRenderer = new renderer_type(*fBaseRenderer);
 		fRasterizer = new rasterizer_type();
-		fScanline = new scanline_type();
+		fUnpackedScanline = new scanline_unpacked_type();
+		fPackedScanline = new scanline_packed_type();
 
 #if ALIASED_DRAWING
 		fRasterizer->gamma(agg::gamma_threshold(0.5));
@@ -665,6 +668,22 @@ Painter::FillRect(const BRect& r) const
 			return _Clipped(rect);
 		}
 	}
+	if (fDrawingMode == B_OP_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY) {
+		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH) {
+			BRect rect(a, b);
+			_BlendRect32(rect, fPatternHandler->HighColor().GetColor32());
+			return _Clipped(rect);
+		} else if (p == B_SOLID_LOW) {
+			rgb_color c = fPatternHandler->LowColor().GetColor32();
+			if (fAlphaSrcMode == B_CONSTANT_ALPHA)
+				c.alpha = fPatternHandler->HighColor().GetColor32().alpha;
+			BRect rect(a, b);
+			_BlendRect32(rect, c);
+			return _Clipped(rect);
+		}
+	}
+	
 
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
@@ -769,8 +788,11 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 	
 		// make the inner rect work as a hole
 		fRasterizer->filling_rule(agg::fill_even_odd);
-	
-		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+
+		if (fPenSize > 4)
+			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+		else
+			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
 	
 		// reset to default
 		fRasterizer->filling_rule(agg::fill_non_zero);
@@ -1007,8 +1029,10 @@ Painter::_MakeEmpty()
 	fOutlineRasterizer = NULL;
 #endif
 
-	delete fScanline;
-	fScanline = NULL;
+	delete fUnpackedScanline;
+	fUnpackedScanline = NULL;
+	delete fPackedScanline;
+	fPackedScanline = NULL;
 
 	delete fRasterizer;
 	fRasterizer = NULL;
@@ -1199,7 +1223,10 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 		// make the inner ellipse work as a hole
 		fRasterizer->filling_rule(agg::fill_even_odd);
 
-		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+		if (fPenSize > 4)
+			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+		else
+			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
 
 		// reset to default
 		fRasterizer->filling_rule(agg::fill_non_zero);
@@ -1390,6 +1417,38 @@ Painter::_InvertRect32(BRect r) const
 	}
 }
 
+// _BlendRect32
+void
+Painter::_BlendRect32(const BRect& r, const rgb_color& c) const
+{
+	if (fBuffer && fValidClipping) {
+		uint8* dst = fBuffer->row(0);
+		uint32 bpr = fBuffer->stride();
+
+		int32 left = (int32)r.left;
+		int32 top = (int32)r.top;
+		int32 right = (int32)r.right;
+		int32 bottom = (int32)r.bottom;
+
+		// fill rects, iterate over clipping boxes
+		fBaseRenderer->first_clip_box();
+		do {
+			int32 x1 = max_c(fBaseRenderer->xmin(), left);
+			int32 x2 = min_c(fBaseRenderer->xmax(), right);
+			if (x1 <= x2) {
+				int32 y1 = max_c(fBaseRenderer->ymin(), top);
+				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+
+				uint8* offset = dst + x1 * 4 + y1 * bpr;
+				for (; y1 <= y2; y1++) {
+					blend_line32(offset, x2 - x1 + 1, c.red, c.green, c.blue, c.alpha);
+					offset += bpr;
+				}
+			}
+		} while (fBaseRenderer->next_clip_box());
+	}
+}
+
 // #pragma mark -
 
 template<class VertexSource>
@@ -1465,7 +1524,11 @@ Painter::_StrokePath(VertexSource& path) const
 		agg::conv_clip_polygon<agg::conv_stroke<VertexSource> > clippedPath(stroke);
 		clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
 		fRasterizer->add_path(clippedPath);
-		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+
+		if (fPenSize > 4)
+			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+		else
+			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
 //	} else {
 	// TODO: update to AGG 2.3 to get rid of the remaining problems:
 	// rects which are 2 or 1 pixel high/wide don't render at all.
@@ -1489,7 +1552,7 @@ Painter::_FillPath(VertexSource& path) const
 	agg::conv_clip_polygon<VertexSource> clippedPath(path);
 	clippedPath.clip_box(-500, -500, fBuffer->width() + 500, fBuffer->height() + 500);
 	fRasterizer->add_path(clippedPath);
-	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+	agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
 
 	return _Clipped(_BoundingBox(clippedPath));
 }

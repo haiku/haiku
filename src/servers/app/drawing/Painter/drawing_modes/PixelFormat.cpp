@@ -17,8 +17,10 @@
 #include "DrawingModeAdd.h"
 #include "DrawingModeAlphaCC.h"
 #include "DrawingModeAlphaCO.h"
+#include "DrawingModeAlphaCOSolid.h"
 #include "DrawingModeAlphaPC.h"
 #include "DrawingModeAlphaPO.h"
+#include "DrawingModeAlphaPOSolid.h"
 #include "DrawingModeBlend.h"
 #include "DrawingModeCopy.h"
 #include "DrawingModeCopySolid.h"
@@ -230,10 +232,17 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_ALPHA:
 			if (alphaSrcMode == B_CONSTANT_ALPHA) {
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					fBlendPixel = blend_pixel_alpha_co;
-					fBlendHLine = blend_hline_alpha_co;
-					fBlendSolidHSpan = blend_solid_hspan_alpha_co;
-					fBlendSolidVSpan = blend_solid_vspan_alpha_co;
+					if (fPatternHandler->IsSolid()) {
+						fBlendPixel = blend_pixel_alpha_co_solid;
+						fBlendHLine = blend_hline_alpha_co_solid;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_co_solid;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_co_solid;
+					} else {
+						fBlendPixel = blend_pixel_alpha_co;
+						fBlendHLine = blend_hline_alpha_co;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_co;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_co;
+					}
 					fBlendColorHSpan = blend_color_hspan_alpha_co;
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
 					fBlendPixel = blend_pixel_alpha_cc;
@@ -244,10 +253,17 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 				}
 			} else if (alphaSrcMode == B_PIXEL_ALPHA){
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					fBlendPixel = blend_pixel_alpha_po;
-					fBlendHLine = blend_hline_alpha_po;
-					fBlendSolidHSpan = blend_solid_hspan_alpha_po;
-					fBlendSolidVSpan = blend_solid_vspan_alpha_po;
+					if (fPatternHandler->IsSolid()) {
+						fBlendPixel = blend_pixel_alpha_po_solid;
+						fBlendHLine = blend_hline_alpha_po_solid;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_po_solid;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_po_solid;
+					} else {
+						fBlendPixel = blend_pixel_alpha_po;
+						fBlendHLine = blend_hline_alpha_po;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_po;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_po;
+					}
 					fBlendColorHSpan = blend_color_hspan_alpha_po;
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
 					fBlendPixel = blend_pixel_alpha_pc;

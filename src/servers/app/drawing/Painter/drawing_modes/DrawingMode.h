@@ -9,6 +9,8 @@
 #ifndef DRAWING_MODE_H
 #define DRAWING_MODE_H
 
+#include "frame_buffer_support.h"
+
 #include "PatternHandler.h"
 #include "PixelFormat.h"
 
@@ -16,11 +18,6 @@ class PatternHandler;
 
 typedef PixelFormat::color_type		color_type;
 typedef PixelFormat::agg_buffer		agg_buffer;
-
-union pixel32 {
-	uint32	data32;
-	uint8	data8[4];
-};
 
 // BLEND
 //

@@ -236,7 +236,9 @@ class Painter {
 												BRect bitmapRect,
 												BRect viewRect) const;
 
-			void				_InvertRect32(BRect r) const;
+			void				_InvertRect32(	BRect r) const;
+			void				_BlendRect32(	const BRect& r,
+												const rgb_color& c) const;
 
 
 			template<class VertexSource>
@@ -256,7 +258,8 @@ class Painter {
 	outline_renderer_type*		fOutlineRenderer;
 	outline_rasterizer_type*	fOutlineRasterizer;
 
-	scanline_type*				fScanline;
+	scanline_unpacked_type*		fUnpackedScanline;
+	scanline_packed_type*		fPackedScanline;
 	rasterizer_type*			fRasterizer;
 	renderer_type*				fRenderer;
 

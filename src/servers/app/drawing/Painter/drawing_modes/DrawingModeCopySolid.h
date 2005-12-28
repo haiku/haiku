@@ -32,7 +32,7 @@ blend_hline_copy_solid(int x, int y, unsigned len,
 					   const color_type& c, uint8 cover,
 					   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	if(cover == 255) {
+	if (cover == 255) {
 		// cache the color as 32bit value
 		uint32 v;
 		uint8* p8 = (uint8*)&v;
