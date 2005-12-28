@@ -52,27 +52,26 @@ MonitorView::MouseDown(BPoint point)
 BRect
 MonitorView::MonitorBounds()
 {
-	float maxWidth, maxHeight;
 	float picWidth, picHeight;
 
-	maxWidth = Bounds().Width();
-	maxHeight = Bounds().Height();
+	float maxSize = min_c(Bounds().Width(), Bounds().Height());
 
-	picWidth = maxWidth * fWidth / 1600;
-	picHeight = maxHeight * fHeight / 1200;
+	picWidth = maxSize * fWidth / 1600;
+	picHeight = maxSize * fHeight / 1600;
 
-	if (picWidth > maxWidth) {
-		picHeight = picHeight * maxWidth / picWidth;
-		picWidth = maxWidth;
+	if (picWidth > maxSize) {
+		picHeight = picHeight * maxSize / picWidth;
+		picWidth = maxSize;
 	}
 
-	if (picHeight > maxHeight) {
-		picWidth = picWidth * maxHeight / picHeight;
-		picHeight = maxHeight;
+	if (picHeight > maxSize) {
+		picWidth = picWidth * maxSize / picHeight;
+		picHeight = maxSize;
 	}
 
-	return BRect((maxWidth - picWidth) / 2, (maxHeight - picHeight) / 2, 
-		(maxWidth + picWidth) / 2, (maxHeight + picHeight) / 2);
+	BPoint size = BPoint(Bounds().Width(), Bounds().Height());
+	return BRect((size.x - picWidth) / 2, (size.y - picHeight) / 2, 
+		(size.x + picWidth) / 2, (size.y + picHeight) / 2);
 }
 
 

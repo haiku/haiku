@@ -211,7 +211,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	if (item != NULL)
 		item->SetMarked(true);
 
-	rect = screenBox->Bounds().InsetByCopy(22, 22);
+	rect = screenBox->Bounds().InsetByCopy(8, 8);
+	rect.bottom -= height - 4;
 	fMonitorView = new MonitorView(rect, "monitor",
 		screen.Frame().Width() + 1, screen.Frame().Height() + 1);
 	screenBox->AddChild(fMonitorView);
