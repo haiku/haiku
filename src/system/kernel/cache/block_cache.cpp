@@ -29,7 +29,6 @@
 //	2) the locking could be improved; getting a block should not need to
 //	   wait for blocks to be written
 //	3) dirty blocks are only written back if asked for
-//	4) blocks are never removed yet
 
 //#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
@@ -527,7 +526,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 	}
 
 	if (block->unused) {
-		TRACE(("remove block %Ld from unused\n", blockNumber));
+		//TRACE(("remove block %Ld from unused\n", blockNumber));
 		block->unused = false;
 		cache->unused_blocks.Remove(block);
 	}
@@ -543,8 +542,6 @@ static void *
 get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off_t length,
 	int32 transactionID, bool cleared)
 {
-	BenaphoreLocker locker(&cache->lock);
-
 	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n", blockNumber, transactionID));
 
 	bool allocated;
@@ -679,6 +676,7 @@ extern "C" int32
 cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
 
 	if (cache->last_transaction && cache->last_transaction->open)
 		panic("last transaction (%ld) still open!\n", cache->last_transaction->id);
@@ -692,7 +690,6 @@ cache_start_transaction(void *_cache)
 
 	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
 
-	BenaphoreLocker locker(&cache->lock);
 	hash_insert(cache->transaction_hash, transaction);
 
 	return transaction->id;
@@ -1112,8 +1109,12 @@ block_cache_sync(void *_cache)
 extern "C" status_t
 block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 {
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
 	// ToDo: this can be done better!
-	void *block = block_cache_get_writable_etc(_cache, blockNumber, blockNumber, 1, transaction);
+	void *block = get_writable_cached_block(cache, blockNumber,
+		blockNumber, 1, transaction, false);
 	if (block != NULL) {
 		put_cached_block((block_cache *)_cache, blockNumber);
 		return B_OK;
@@ -1124,27 +1125,36 @@ block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 
 
 extern "C" void *
-block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base, off_t length,
-	int32 transaction)
+block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
+	off_t length, int32 transaction)
 {
-	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n", blockNumber, transaction));
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
 
-	return get_writable_cached_block((block_cache *)_cache, blockNumber,
-				base, length, transaction, false);
+	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
+		blockNumber, transaction));
+
+	return get_writable_cached_block(cache, blockNumber, base, length,
+		transaction, false);
 }
 
 
 extern "C" void *
 block_cache_get_writable(void *_cache, off_t blockNumber, int32 transaction)
 {
-	return block_cache_get_writable_etc(_cache, blockNumber, blockNumber, 1, transaction);
+	return block_cache_get_writable_etc(_cache, blockNumber,
+		blockNumber, 1, transaction);
 }
 
 
 extern "C" void *
 block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
 {
-	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n", blockNumber, transaction));
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
+		blockNumber, transaction));
 
 	return get_writable_cached_block((block_cache *)_cache, blockNumber,
 				blockNumber, 1, transaction, true);
