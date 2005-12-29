@@ -315,9 +315,11 @@ find_dir_entry(DIR *dir, const char *path, NodeRef ref, string &name, bool skipD
 		if ((!skipDot && strcmp(entry->d_name, ".") == 0)
 			|| strcmp(entry->d_name, "..") == 0) {
 			// skip "." and ".."
-		} else if (entry->d_ino == ref.node) {
+		} else /*if (entry->d_ino == ref.node)*/ {
+				// Note: Linux doesn't seem to translate dirent::d_ino of
+				// mount points. Thus we always have to lstat().
 			// We also need to compare the device, which is generally not
-			// included in the direct structure. Hence we lstat().
+			// included in the dirent structure. Hence we lstat().
 			string entryPath(path);
 			entryPath += '/';
 			entryPath += entry->d_name;
