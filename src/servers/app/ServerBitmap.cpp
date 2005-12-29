@@ -1,36 +1,19 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ServerBitmap.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Bitmap class used by the server
-//  
-//------------------------------------------------------------------------------
-#include <new>
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
 
-#include <string.h>
 
 #include "ServerBitmap.h"
 
+#include <new>
+#include <string.h>
+
 using std::nothrow;
+
 
 /*!
 	\brief Constructor called by the BitmapManager (only).
@@ -48,6 +31,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	: fInitialized(false),
 	  fArea(B_ERROR),
 	  fBuffer(NULL),
+	  fReferenceCount(1),
 	  // WARNING: '1' is added to the width and height.
 	  // Same is done in FBBitmap subclass, so if you
 	  // modify here make sure to do the same under
@@ -59,16 +43,17 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	  fFlags(flags),
 	  fBitsPerPixel(0)
 	  // TODO: what about fToken and fOffset ?!?
-	  
 {
 	_HandleSpace(space, bytesPerLine);
 }
+
 
 //! Copy constructor does not copy the buffer.
 ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	: fInitialized(false),
 	  fArea(B_ERROR),
-	  fBuffer(NULL)
+	  fBuffer(NULL),
+	  fReferenceCount(1)
 	  // TODO: what about fToken and fOffset ?!?
 {
 	if (bmp) {
@@ -89,6 +74,7 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	}
 }
 
+
 /*!
 	\brief Empty. Defined for subclasses.
 */
@@ -97,6 +83,24 @@ ServerBitmap::~ServerBitmap()
 	// TODO: Maybe it would be wiser to free the buffer here,
 	// instead of do that in every subclass ?
 }
+
+
+void
+ServerBitmap::Acquire()
+{
+	atomic_add(&fReferenceCount, 1);
+}
+
+
+bool
+ServerBitmap::_Release()
+{
+	if (atomic_add(&fReferenceCount, -1) == 1)
+		return true;
+
+	return false;
+}
+
 
 /*! 
 	\brief Internal function used by subclasses
@@ -115,18 +119,20 @@ ServerBitmap::_AllocateBuffer(void)
 	}
 }
 
+
 /*!
 	\brief Internal function used by subclasses
 	
 	Subclasses should call this to free the internal buffer.
 */
 void
-ServerBitmap::_FreeBuffer(void)
+ServerBitmap::_FreeBuffer()
 {
 	delete[] fBuffer;
 	fBuffer = NULL;
 	fInitialized = false;
 }
+
 
 /*!
 	\brief Internal function used to translate color space values to appropriate internal
@@ -237,6 +243,10 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 	}
 }
 
+
+//	#pragma mark -
+
+
 UtilityBitmap::UtilityBitmap(BRect rect, color_space space,
 							 int32 flags, int32 bytesperline,
 							 screen_id screen)
@@ -245,6 +255,7 @@ UtilityBitmap::UtilityBitmap(BRect rect, color_space space,
 	_AllocateBuffer();
 }
 
+
 UtilityBitmap::UtilityBitmap(const ServerBitmap* bmp)
 	: ServerBitmap(bmp)
 {
@@ -252,6 +263,7 @@ UtilityBitmap::UtilityBitmap(const ServerBitmap* bmp)
 	if (bmp->Bits())
 		memcpy(Bits(), bmp->Bits(), bmp->BitsLength());
 }
+
 
 UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
 							 uint32 width, uint32 height,
@@ -262,6 +274,7 @@ UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
 	if (Bits())
 		memcpy(Bits(), alreadyPaddedData, BitsLength());
 }
+
 
 UtilityBitmap::~UtilityBitmap()
 {

@@ -113,8 +113,12 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 void
 BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 {
-	BAutolock locker(fLock);
+	if (!bitmap->_Release()) {
+		// there are other references to this bitmap, we don't have to delete it yet
+		return;
+	}
 
+	BAutolock locker(fLock);
 	if (!locker.IsLocked())
 		return;
 
