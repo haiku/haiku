@@ -63,7 +63,7 @@ ImageFilePanel::Show()
 		background->AddChild(fImageView);
 
 		rect = BRect(background->Bounds().left + 132, background->Bounds().bottom - 85,
-			background->Bounds().left + 250, background->Bounds().bottom - 65);
+			background->Bounds().right, background->Bounds().bottom - 65);
 		fResolutionView = new BStringView(rect, "ResolutionView", NULL, 
 			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		background->AddChild(fResolutionView);
@@ -116,13 +116,12 @@ ImageFilePanel::SelectionChanged()
 
 				BNode node(&ref);
 				BNodeInfo nodeInfo(&node);
-				char fileType[256];
-				if (nodeInfo.GetType(fileType) == B_OK) {
-					// TODO: this is broken!
-					if (strncmp(fileType, "image/jpeg", 10) == 0)
-						fImageTypeView->SetText("JPEG Image");
-					else
-						fImageTypeView->SetText("");
+				char type[B_MIME_TYPE_LENGTH];
+				if (nodeInfo.GetType(type) == B_OK) {
+					BMimeType mimeType(type);
+					mimeType.GetShortDescription(type);
+						// if this fails, the MIME type will be displayed
+					fImageTypeView->SetText(type);
 				}
 			}
 		} else {
