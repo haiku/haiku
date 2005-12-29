@@ -11,9 +11,11 @@
 
 #include "ViewLayer.h"
 
+#include "BitmapManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "ServerApp.h"
+#include "ServerBitmap.h"
 #include "ServerWindow.h"
 #include "WindowLayer.h"
 
@@ -37,6 +39,7 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 
 	fViewColor(RGBColor(255, 255, 255)),
 	fDrawState(new (nothrow) DrawState),
+	fViewBitmap(NULL),
 
 	fResizeMode(resizeMode),
 	fFlags(flags),
@@ -369,6 +372,25 @@ ViewLayer::SetUserClipping(const BRegion& region)
 	
 	// rebuild clipping
 	RebuildClipping(false);
+}
+
+
+void
+ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
+	BRect destRect, int32 resizingMode, int32 options)
+{
+	if (fViewBitmap != NULL)
+		gBitmapManager->DeleteBitmap(fViewBitmap);
+
+	// the caller is allowed to delete the bitmap after setting the background
+	if (bitmap != NULL)
+		bitmap->Acquire();
+
+	fViewBitmap = bitmap;					
+	fBitmapSource = sourceRect;
+	fBitmapDestination = destRect;
+	fBitmapResizingMode = resizingMode;
+	fBitmapOptions = options;
 }
 
 
@@ -843,6 +865,22 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion redraw(ScreenClipping(windowContentClipping));
 	// add the current clipping
 	redraw.IntersectWith(effectiveClipping);
+
+	if (fViewBitmap != NULL) {
+		// draw view bitmap
+		// TODO: support other options!
+		BRect rect = fBitmapDestination;
+		ConvertToScreenForDrawing(&rect);
+
+		// TODO: this messes with the screen clipping, but might not be supposed to do so.
+		drawingEngine->ConstrainClippingRegion(&redraw);
+		// TODO: fDrawState is probably not what we want to use here...
+		drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+			rect, fDrawState);
+		drawingEngine->ConstrainClippingRegion(NULL);
+
+		redraw.Exclude(rect);
+	}
 
 	if (!fViewColor.IsTransparentMagic()) {
 		// fill visible region with view color

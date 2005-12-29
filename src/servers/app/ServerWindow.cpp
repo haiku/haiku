@@ -1453,34 +1453,60 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		
 			break;
 		}
+		case AS_LAYER_SET_VIEW_BITMAP:
+		{
+			int32 bitmapToken, resizingMode, options;
+			BRect srcRect, dstRect;
+
+			link.Read<int32>(&bitmapToken);
+			link.Read<BRect>(&srcRect);
+			link.Read<BRect>(&dstRect);
+			link.Read<int32>(&resizingMode);
+			status_t status = link.Read<int32>(&options);
+
+			if (status == B_OK) {
+				ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+				if (bitmapToken == -1 || bitmap != NULL) {
+					fCurrentLayer->SetViewBitmap(bitmap, srcRect, dstRect,
+						resizingMode, options);
+
+					BRegion dirty(fCurrentLayer->Bounds());
+					fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+				} else
+					status = B_BAD_VALUE;
+			}
+
+			fLink.StartMessage(status);
+			fLink.Flush();
+			break;
+		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			bool fontAliasing;
-			link.Read<bool>(&fontAliasing);
-			fCurrentLayer->CurrentState()->SetForceFontAliasing(fontAliasing);
-			
+			if (link.Read<bool>(&fontAliasing) == B_OK)
+				fCurrentLayer->CurrentState()->SetForceFontAliasing(fontAliasing);	
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
-		// TODO: you are not allowed to use ViewLayer regions here!!!
-			
+			// TODO: you are not allowed to use ViewLayer regions here!!!
+
 			int32 pictureToken;
 			BPoint where;
 			bool inverse = false;
-			
+
 			link.Read<int32>(&pictureToken);
 			link.Read<BPoint>(&where);
 			link.Read<bool>(&inverse);
-							
+
 			// search for a picture with the specified token.
 			ServerPicture *picture = fServerApp->FindPicture(pictureToken);
 			// TODO: Increase that picture's reference count.(~ allocate a picture)
 			if (picture == NULL)
 				break;
-			
+
 			BRegion region;
 			// TODO: I think we also need the BView's token
 			// I think PictureToRegion would fit better into the ViewLayer class (?)

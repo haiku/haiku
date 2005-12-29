@@ -22,6 +22,7 @@ class BList;
 class DrawState;
 class DrawingEngine;
 class WindowLayer;
+class ServerBitmap;
 
 
 class ViewLayer {
@@ -133,6 +134,8 @@ class ViewLayer {
 								{ return fViewColor; }
 			void			SetViewColor(const RGBColor& color)
 								{ fViewColor = color; }
+			void			SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
+								BRect destRect, int32 resizingMode, int32 options);
 
 			void			PushState();
 			void			PopState();
@@ -188,6 +191,11 @@ class ViewLayer {
 
 			RGBColor		fViewColor;
 			DrawState*		fDrawState;
+			ServerBitmap*	fViewBitmap;
+			BRect			fBitmapSource;
+			BRect			fBitmapDestination;
+			int32			fBitmapResizingMode;
+			int32			fBitmapOptions;
 
 			uint32			fResizeMode;
 			uint32			fFlags;
