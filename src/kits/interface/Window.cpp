@@ -2949,10 +2949,9 @@ BWindow::_LastViewChild(BView *parent)
 
 
 void
-BWindow::SetIsFilePanel(bool yes)
+BWindow::SetIsFilePanel(bool isFilePanel)
 {
-	// TODO: is this not enough?
-	fIsFilePanel = yes;
+	fIsFilePanel = isFilePanel;
 }
 
 

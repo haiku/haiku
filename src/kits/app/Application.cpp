@@ -1144,9 +1144,13 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 	for (int32 i = looperList.CountItems(); i-- > 0; ) {
 		BWindow *window = dynamic_cast<BWindow *>((BLooper *)looperList.ItemAt(i));
 
-		if (window != NULL && window->Lock()) {
-			if ((window->IsFilePanel() && !quitFilePanels)
-				|| (!force && !window->QuitRequested())) {
+		// don't quit file panels if we haven't been asked for it
+		if (window == NULL || (!quitFilePanels && window->IsFilePanel()))
+			continue;
+
+		if (window->Lock()) {
+			if (!force && !window->QuitRequested()
+				&& !(quitFilePanels && window->IsFilePanel())) {
 				// the window does not want to quit, so we don't either
 				window->Unlock();
 				return false;
