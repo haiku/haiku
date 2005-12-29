@@ -153,8 +153,10 @@ kernel_args_malloc(size_t size)
 	if (size > kChunkSize / 2 && sFree < size) {
 		// the block is so large, we'll allocate a new block for it
 		void *block = NULL;
-		if (platform_allocate_region(&block, size, B_READ_AREA | B_WRITE_AREA) != B_OK)
+		if (platform_allocate_region(&block, size, B_READ_AREA | B_WRITE_AREA,
+			false) != B_OK) {
 			return NULL;
+		}
 
 		if (add_kernel_args_range(block, size) != B_OK)
 			panic("kernel_args max range to low!\n");
@@ -163,8 +165,10 @@ kernel_args_malloc(size_t size)
 
 	// just allocate a new block and "close" the old one
 	void *block = NULL;
-	if (platform_allocate_region(&block, kChunkSize, B_READ_AREA | B_WRITE_AREA) != B_OK)
+	if (platform_allocate_region(&block, kChunkSize,
+		B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
 		return NULL;
+	}
 
 	sFirstFree = (void *)((addr_t)block + size);
 	sLast = block;

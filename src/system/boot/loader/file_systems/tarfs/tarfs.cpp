@@ -558,7 +558,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 				return B_BAD_DATA;
 
 			if (platform_allocate_region((void **)&out, kTarRegionSize,
-					B_READ_AREA | B_WRITE_AREA) != B_OK) {
+					B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
 				TRACE(("tarfs: allocating region failed!\n"));
 				return B_NO_MEMORY;
 			}

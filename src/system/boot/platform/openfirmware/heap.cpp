@@ -26,7 +26,7 @@ platform_init_heap(stage2_args *args, void **_base, void **_top)
 
 	*_base = NULL;
 	status_t error = platform_allocate_region(_base, args->heap_size,
-		B_READ_AREA | B_WRITE_AREA);
+		B_READ_AREA | B_WRITE_AREA, false);
 	if (error != B_OK)
 		return error;
 

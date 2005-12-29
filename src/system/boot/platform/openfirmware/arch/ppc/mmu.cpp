@@ -175,6 +175,10 @@ find_physical_memory_ranges(size_t &total)
 static bool
 is_in_range(addr_range *ranges, uint32 numRanges, void *address, size_t size)
 {
+	// TODO: This function returns whether any single allocated range
+	// completely contains the given range. If the given range crosses
+	// allocated range boundaries, but is nevertheless covered completely, the
+	// function returns false!
 	addr_t start = (addr_t)address;
 	addr_t end = start + size;
 
@@ -191,9 +195,29 @@ is_in_range(addr_range *ranges, uint32 numRanges, void *address, size_t size)
 
 
 static bool
+intersects_ranges(addr_range *ranges, uint32 numRanges, void *address,
+	size_t size)
+{
+	addr_t start = (addr_t)address;
+	addr_t end = start + size;
+
+	for (uint32 i = 0; i < numRanges; i++) {
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = rangeStart + ranges[i].size;
+
+		if ((start >= rangeStart && start < rangeEnd)
+			|| (rangeStart >= start && rangeStart < end)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+static bool
 is_virtual_allocated(void *address, size_t size)
 {
-	return is_in_range(gKernelArgs.virtual_allocated_range, 
+	return intersects_ranges(gKernelArgs.virtual_allocated_range, 
 				gKernelArgs.num_virtual_allocated_ranges, 
 				address, size);
 }
@@ -202,7 +226,7 @@ is_virtual_allocated(void *address, size_t size)
 static bool
 is_physical_allocated(void *address, size_t size)
 {
-	return is_in_range(gKernelArgs.physical_allocated_range, 
+	return intersects_ranges(gKernelArgs.physical_allocated_range, 
 				gKernelArgs.num_physical_allocated_ranges, 
 				address, size);
 }
@@ -328,6 +352,7 @@ find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTab
 	for (int i = 0; i < length; i++) {
 		struct translation_map *map = &translations[i];
 		//printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
+printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
 
 		// insert range in physical allocated, if it points to physical memory
 
@@ -425,19 +450,34 @@ find_free_physical_range(size_t size)
 
 
 static void *
-find_free_virtual_range(size_t size)
+find_free_virtual_range(void *base, size_t size)
 {
+	if (base && !is_virtual_allocated(base, size))
+		return base;
+
+	void *firstFound = NULL;
+	void *firstBaseFound = NULL;
 	for (uint32 i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
 		void *address = (void *)(gKernelArgs.virtual_allocated_range[i].start + gKernelArgs.virtual_allocated_range[i].size);
-		if (!is_virtual_allocated(address, size))
-			return address;
+		if (!is_virtual_allocated(address, size)) {
+			if (!base)
+				return address;
+
+			if (firstFound == NULL)
+				firstFound = address;
+			if (address >= base
+				&& (firstBaseFound == NULL || address < firstBaseFound)) {
+				firstBaseFound = address;
+			}
+		}
 	}
-	return NULL;
+	return (firstBaseFound ? firstBaseFound : firstFound);
 }
 
 
 extern "C" void *
-arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
+arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 protection,
+	bool exactAddress)
 {
 	// we only know page sizes
 	size = ROUNDUP(size, B_PAGE_SIZE);
@@ -452,14 +492,17 @@ arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 	else
 		protection = 0x21;
 
-	if (virtualAddress == NULL) {
-		// find free address large enough to hold "size"
-		virtualAddress = find_free_virtual_range(size);
-		if (virtualAddress == NULL)
-			return NULL;
-	} else {
-		if (is_virtual_allocated(virtualAddress, size))
-			return NULL;
+	// find free address large enough to hold "size"
+	void *virtualAddress = find_free_virtual_range(_virtualAddress, size);
+	if (virtualAddress == NULL)
+		return NULL;
+
+	// fail if the exact address was requested, but is not free
+	if (exactAddress && _virtualAddress && virtualAddress != _virtualAddress) {
+		dprintf("arch_mmu_allocate(): exact address requested, but virtual "
+			"range (base: %p, size: %lu) is not free.\n",
+			_virtualAddress, size);
+		return NULL;
 	}
 
 	// we have a free virtual range for the allocation, now
@@ -468,8 +511,11 @@ arch_mmu_allocate(void *virtualAddress, size_t size, uint8 protection)
 	// so that we don't have to optimize for these cases :)
 	
 	void *physicalAddress = find_free_physical_range(size);
-	if (physicalAddress == NULL)
+	if (physicalAddress == NULL) {
+		dprintf("arch_mmu_allocate(base: %p, size: %lu) no free physical "
+			"address\n", virtualAddress, size);
 		return NULL;
+	}
 
 	// everything went fine, so lets mark the space as used.
 

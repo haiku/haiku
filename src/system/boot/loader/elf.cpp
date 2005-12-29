@@ -213,6 +213,13 @@ elf_load_image(int fd, preloaded_image *image)
 			region->start, region->size, region->delta));
 	}
 
+	// found both, text and data?
+	if (image->data_region.size == 0 || image->text_region.size == 0) {
+		dprintf("Couldn't find both text and data segment!\n");
+		status = B_BAD_DATA;
+		goto error1;
+	}
+
 	// get the segment order
 	elf_region *firstRegion;
 	elf_region *secondRegion;
@@ -233,10 +240,11 @@ elf_load_image(int fd, preloaded_image *image)
 		goto error1;
 	}
 
-	// if image->text_region.start == NULL (image is relocatable), 
-	// platform_allocate_region() automatically allocates an address
+	// The kernel and the modules are relocatable, thus
+	// platform_allocate_region() can automatically allocate an address,
+	// but shall prefer the specified base address.
 	if (platform_allocate_region((void **)&firstRegion->start, totalSize,
-			B_READ_AREA | B_WRITE_AREA) < B_OK) {
+			B_READ_AREA | B_WRITE_AREA, false) < B_OK) {
 		status = B_NO_MEMORY;
 		goto error1;
 	}

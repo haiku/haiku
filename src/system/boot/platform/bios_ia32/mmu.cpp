@@ -593,7 +593,8 @@ mmu_init(void)
 
 
 extern "C" status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection)
+platform_allocate_region(void **_address, size_t size, uint8 protection,
+	bool /*exactAddress*/)
 {
 	void *address = mmu_allocate(*_address, size);
 	if (address == NULL)
