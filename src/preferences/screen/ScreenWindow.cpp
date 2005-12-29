@@ -336,10 +336,12 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 			fCombineMenu->AddItem(new BMenuItem(kCombineModes[i].name, message));
 		}
 
-		rect.Set(185, 30, 356, 48);
+		rect.Set(184, 30, 358, 48);
 		BMenuField* menuField = new BMenuField(rect, "CombineMenu",
 			"Combine Displays:", fCombineMenu, true);
-		menuField->SetDivider(90);
+		float rightLabelWidth = menuField->StringWidth(menuField->Label()) + 5.0f;
+		menuField->SetAlignment(B_ALIGN_RIGHT);
+		menuField->SetDivider(rightLabelWidth);
 		controlsBox->AddChild(menuField);
 
 		if (!multiMonSupport)
@@ -356,10 +358,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		message->AddBool("swap", true);
 		fSwapDisplaysMenu->AddItem(new BMenuItem("yes", message));
 
-		rect.Set(199, 58, 356, 76);
+		rect.Set(184, 58, 358, 76);
 		menuField = new BMenuField(rect, "SwapMenu", "Swap Displays:",
 			fSwapDisplaysMenu, true);
-		menuField->SetDivider(76);
+		menuField->SetAlignment(B_ALIGN_RIGHT);
+		menuField->SetDivider(rightLabelWidth);
 
 		controlsBox->AddChild(menuField);
 		if (!multiMonSupport)
@@ -376,9 +379,10 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		message->AddBool("use", true);
 		fUseLaptopPanelMenu->AddItem(new BMenuItem("always", message));
 
-		rect.Set(184, 86, 356, 104);
+		rect.Set(184, 86, 358, 104);
 		menuField = new BMenuField(rect, "UseLaptopPanel", "Use Laptop Panel:",
 			fUseLaptopPanelMenu, true);
+		menuField->SetAlignment(B_ALIGN_RIGHT);
 		menuField->SetDivider(91);
 
 		controlsBox->AddChild(menuField);
@@ -403,10 +407,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 			fTVStandardMenu->AddItem(new BMenuItem(name.String(), message));
 		}
 
-		rect.Set(15, 114, 171, 132);
+		rect.Set(10, 114, 179, 132);
 		menuField = new BMenuField(rect, "tv standard", "Video Format:",
 			fTVStandardMenu, true);
-		menuField->SetDivider(73);
+		menuField->SetAlignment(B_ALIGN_RIGHT);
+		menuField->SetDivider(labelWidth);
 
 		if (!tvStandardSupport || i == 0)
 			menuField->Hide();
