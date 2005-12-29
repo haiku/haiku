@@ -170,7 +170,8 @@ BScrollView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	if ((fHorizontalScrollBar == NULL && fVerticalScrollBar == NULL)
-		|| (fHorizontalScrollBar != NULL && fVerticalScrollBar != NULL))
+		|| (fHorizontalScrollBar != NULL && fVerticalScrollBar != NULL)
+		|| Window()->Look() != B_DOCUMENT_WINDOW_LOOK)
 		return;
 
 	// If we have only one bar, we need to check if we are in the
