@@ -266,7 +266,7 @@ Elf32_Ehdr::IsHostEndian() const
 inline bool 
 Elf32_Phdr::IsReadWrite() const
 {
-	return (p_flags & PF_PROTECTION_MASK) == (PF_READ | PF_WRITE);
+	return !(~p_flags & (PF_READ | PF_WRITE));
 }
 
 
