@@ -48,6 +48,7 @@ local genericSources =
 	w_drem.c w_dremf.c # w_dreml.c
 	w_exp.c w_expf.c # w_expl.c
 	w_fmod.c w_fmodf.c # w_fmodl.c
+	w_hypot.c w_hypotf.c # w_hypotl.c
 	w_j0.c w_j0f.c
 	w_j1.c w_j1f.c
 	w_jn.c w_jnf.c
