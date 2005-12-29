@@ -244,51 +244,79 @@ BButton::Draw(BRect updateRect)
 	}
 
 	// colors	
-	const rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	const rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
-	const rgb_color lightColor = tint_color(panelBgColor, enabled ? B_LIGHTEN_2_TINT
-																  : B_LIGHTEN_1_TINT);
-	const rgb_color maxLightColor = tint_color(panelBgColor, enabled ? B_LIGHTEN_MAX_TINT
-																	 : B_LIGHTEN_2_TINT);	
-	const rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
+	rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
+	rgb_color lightColor;
+	rgb_color maxLightColor;	
+	rgb_color maxShadowColor = tint_color(panelBgColor, B_DARKEN_MAX_TINT);	
 
-	rgb_color dark1BorderColor = tint_color(panelBgColor, enabled ? B_DARKEN_3_TINT
-																  : B_DARKEN_1_TINT);
-	rgb_color dark2BorderColor = tint_color(panelBgColor, enabled ? B_DARKEN_4_TINT
-																  : B_DARKEN_2_TINT);
+	rgb_color dark1BorderColor;
+	rgb_color dark2BorderColor;
 
-	rgb_color bevelColor1 = enabled ? tint_color(panelBgColor, B_DARKEN_2_TINT) 
-									: panelBgColor;
-	rgb_color bevelColor2 = enabled ? panelBgColor : buttonBgColor;
+	rgb_color bevelColor1;
+	rgb_color bevelColor2;
+	rgb_color bevelColorRBCorner;
 
 	rgb_color borderBevelShadow;
 	rgb_color borderBevelLight;
-	if (IsDefault()) {
-		rgb_color focusColor = dark1BorderColor;
 
-		borderBevelShadow = enabled ? tint_color(focusColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2)
-									: focusColor;
-		borderBevelLight = enabled ? tint_color(focusColor, B_LIGHTEN_1_TINT) : focusColor;
-
-		borderBevelLight.red = (borderBevelLight.red + panelBgColor.red) / 2;
-		borderBevelLight.green = (borderBevelLight.green + panelBgColor.green) / 2;
-		borderBevelLight.blue = (borderBevelLight.blue + panelBgColor.blue) / 2;
-
-		dark1BorderColor = tint_color(focusColor, enabled ? B_DARKEN_3_TINT
-														  : B_DARKEN_1_TINT);
-		dark2BorderColor = tint_color(focusColor, enabled ? B_DARKEN_4_TINT
-														  : B_DARKEN_2_TINT);
-	} else {
-		borderBevelShadow = enabled ? tint_color(panelBgColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2)
-									: panelBgColor;
-		borderBevelLight = enabled ? buttonBgColor : panelBgColor;
-	}
+	if (enabled) {
+		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
+		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);	
 	
+		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_3_TINT);
+		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_4_TINT);
+	
+		bevelColor1 = tint_color(panelBgColor, B_DARKEN_2_TINT);
+		bevelColor2 = panelBgColor;
+
+		if (IsDefault()) {
+			borderBevelShadow = tint_color(dark1BorderColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
+			borderBevelLight = tint_color(dark1BorderColor, B_LIGHTEN_1_TINT);
+
+			borderBevelLight.red = (borderBevelLight.red + panelBgColor.red) / 2;
+			borderBevelLight.green = (borderBevelLight.green + panelBgColor.green) / 2;
+			borderBevelLight.blue = (borderBevelLight.blue + panelBgColor.blue) / 2;
+	
+			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_3_TINT);
+			dark2BorderColor = tint_color(dark1BorderColor, B_DARKEN_4_TINT);
+
+			bevelColorRBCorner = borderBevelShadow;
+		} else {
+			borderBevelShadow = tint_color(panelBgColor, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
+			borderBevelLight = buttonBgColor;
+
+			bevelColorRBCorner = dark1BorderColor;
+		}
+	} else {
+		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
+		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);	
+	
+		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_1_TINT);
+		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_2_TINT);
+	
+		bevelColor1 = panelBgColor;
+		bevelColor2 = buttonBgColor;
+
+		if (IsDefault()) {
+			borderBevelShadow = dark1BorderColor;
+			borderBevelLight = panelBgColor;
+			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_1_TINT);
+			dark2BorderColor = tint_color(dark1BorderColor, 1.16);
+
+		} else {
+			borderBevelShadow = panelBgColor;
+			borderBevelLight = panelBgColor;
+		}
+
+		bevelColorRBCorner = tint_color(panelBgColor, 1.08);;
+	}
+
 	// fill the button area
 	SetHighColor(buttonBgColor);
 	FillRect(fillArea);
 
-	BeginLineArray(16);
+	BeginLineArray(22);
 	// bevel around external border
 	AddLine(BPoint(rect.left, rect.bottom),
 			BPoint(rect.left, rect.top), borderBevelShadow);
@@ -316,12 +344,20 @@ BButton::Draw(BRect updateRect)
 	
 	// Light
 	AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.bottom), lightColor);
+			BPoint(rect.left, rect.top), buttonBgColor);
+	AddLine(BPoint(rect.left, rect.top + 1),
+			BPoint(rect.left, rect.bottom - 1), lightColor);
+	AddLine(BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.bottom), bevelColor2);
 	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right, rect.top), lightColor);	
+			BPoint(rect.right - 1, rect.top), lightColor);	
+	AddLine(BPoint(rect.right, rect.top),
+			BPoint(rect.right, rect.top), bevelColor2);	
 	// Shadow
 	AddLine(BPoint(rect.left + 1, rect.bottom),
-			BPoint(rect.right, rect.bottom), bevelColor1);
+			BPoint(rect.right - 1, rect.bottom), bevelColor1);
+	AddLine(BPoint(rect.right, rect.bottom),
+			BPoint(rect.right, rect.bottom), bevelColorRBCorner);
 	AddLine(BPoint(rect.right, rect.bottom - 1),
 			BPoint(rect.right, rect.top + 1), bevelColor1);
 	
@@ -329,9 +365,13 @@ BButton::Draw(BRect updateRect)
 	
 	// Light
 	AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.bottom), maxLightColor);
+			BPoint(rect.left, rect.bottom - 1), maxLightColor);
+	AddLine(BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.bottom), buttonBgColor);
 	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right, rect.top), maxLightColor);	
+			BPoint(rect.right - 1, rect.top), maxLightColor);	
+	AddLine(BPoint(rect.right, rect.top),
+			BPoint(rect.right, rect.top), buttonBgColor);	
 	// Shadow
 	AddLine(BPoint(rect.left + 1, rect.bottom),
 			BPoint(rect.right, rect.bottom), bevelColor2);
