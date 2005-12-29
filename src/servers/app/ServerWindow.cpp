@@ -1410,7 +1410,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fLink.Flush();
 			break;
 
-		case AS_LAYER_SET_BLEND_MODE:
+		case AS_LAYER_SET_BLENDING_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			int8 srcAlpha, alphaFunc;
@@ -1423,7 +1423,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			break;
 		}
-		case AS_LAYER_GET_BLEND_MODE:
+		case AS_LAYER_GET_BLENDING_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
@@ -1433,7 +1433,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			break;
 		}
-		case AS_LAYER_SET_DRAW_MODE:
+		case AS_LAYER_SET_DRAWING_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			int8 drawingMode;
@@ -1444,7 +1444,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			
 			break;
 		}
-		case AS_LAYER_GET_DRAW_MODE:
+		case AS_LAYER_GET_DRAWING_MODE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);

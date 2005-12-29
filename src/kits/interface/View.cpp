@@ -1696,7 +1696,7 @@ BView::SetDrawingMode(drawing_mode mode)
 	if (fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_DRAW_MODE);
+		fOwner->fLink->StartMessage(AS_LAYER_SET_DRAWING_MODE);
 		fOwner->fLink->Attach<int8>((int8)mode);
 
 		fState->valid_flags |= B_VIEW_DRAWING_MODE_BIT;
@@ -1713,7 +1713,7 @@ BView::DrawingMode() const
 	if (!fState->IsValid(B_VIEW_DRAWING_MODE_BIT) && fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_DRAW_MODE);
+		fOwner->fLink->StartMessage(AS_LAYER_GET_DRAWING_MODE);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1741,7 +1741,7 @@ BView::SetBlendingMode(source_alpha sourceAlpha, alpha_function alphaFunction)
 	if (fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_BLEND_MODE);
+		fOwner->fLink->StartMessage(AS_LAYER_SET_BLENDING_MODE);
 		fOwner->fLink->Attach<int8>((int8)sourceAlpha);
 		fOwner->fLink->Attach<int8>((int8)alphaFunction);
 
@@ -1762,7 +1762,7 @@ BView::GetBlendingMode(source_alpha *_sourceAlpha,
 	if (!fState->IsValid(B_VIEW_BLENDING_BIT) && fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_BLEND_MODE);
+		fOwner->fLink->StartMessage(AS_LAYER_GET_BLENDING_MODE);
 
 		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
