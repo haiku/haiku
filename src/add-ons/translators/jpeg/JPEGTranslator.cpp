@@ -107,7 +107,7 @@ SaveSettings(jpeg_settings *settings)
 		path.Append(SETTINGS_FILE);
 	} else
 		path.Append(SETTINGS_FILE);
-	
+
 	// Open settings file (create it if there's no file) and write settings			
 	FILE *file = NULL;
 	if ((file = fopen( path.Path(), "wb+"))) {
@@ -125,14 +125,15 @@ SettingsChangedAlert()
 	// and user wants to run settings
 	if (!gAreSettingsRunning
 		&& (new BAlert("Different settings file",
-					"JPEG settings were set to default because of incompatible settings file.",
-					"Configure settings", "OK", NULL, B_WIDTH_AS_USUAL,
-					B_WARNING_ALERT))->Go() == 0) {
+				"JPEG settings were set to default because of incompatible settings file.",
+				"Configure settings", "OK", NULL, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT))->Go() == 0) {
 		// Create settings window (with no quit on close!), launch
 		// it and wait until it's closed
-		status_t err;
 		TranslatorWindow *window = new TranslatorWindow(false);
 		window->Show();
+
+		status_t err;
 		wait_for_thread(window->Thread(), &err);
 		return true;
 	}
@@ -158,8 +159,8 @@ LoadSettings(jpeg_settings *settings)
 
 	// Open settings file (create it if there's no file) and write settings			
 	FILE *file = NULL;
-	if ((file = fopen( path.Path(), "rb"))) {
-		if ( !fread(settings, sizeof(jpeg_settings), 1, file)) {
+	if ((file = fopen(path.Path(), "rb")) != NULL) {
+		if (!fread(settings, sizeof(jpeg_settings), 1, file)) {
 			// settings struct has changed size
 			// Load default settings, and Save them
 			fclose(file);
@@ -171,14 +172,10 @@ LoadSettings(jpeg_settings *settings)
 				LoadSettings(settings);
 		} else
 			fclose(file);
-	} else if ((file = fopen( path.Path(), "wb+"))) {
+	} else if ((file = fopen(path.Path(), "wb+")) != NULL) {
 		LoadDefaultSettings(settings);
 		fwrite(settings, sizeof(jpeg_settings), 1, file);
 		fclose(file);
-		// Tell user settings were changed to default, and ask to run settings panel or not
-		if (SettingsChangedAlert())
-			// User configured settings, load them again
-			LoadSettings(settings);
 	}
 }
 
