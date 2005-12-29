@@ -14,7 +14,9 @@ SECTIONS
 	.sdata2 : { *(.sdata2) }
 
 	/* writable data  */
-	. = ALIGN(0x1000);
+	/* align to the same offset in the next page (for performance reasons
+	   (not that it really matters in the boot loader)) */
+	. = ALIGN(0x1000) + 0x1000 + (. & (0x1000 - 1));
 
 	__ctor_list = .;
 	.ctors : { *(.ctors) }
