@@ -96,11 +96,7 @@ ServerApp::~ServerApp(void)
 	
 	fQuitting = true;
 	
-	for (int32 i = 0; i< fBitmapList->CountItems(); i++) {
-		delete static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
-	}
 	delete fBitmapList;
-
 	delete fPictureList;
 
 	// This shouldn't be necessary -- all cursors owned by the app
