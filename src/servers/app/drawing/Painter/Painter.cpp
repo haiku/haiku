@@ -738,6 +738,38 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 	}
 }
 
+// FillRectNoClipping
+void
+Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
+{
+	if (fBuffer) {
+		int32 left = (int32)r.left;
+		int32 y = (int32)r.top;
+		int32 right = (int32)r.right;
+		int32 bottom = (int32)r.bottom;
+
+		uint8* dst = fBuffer->row(y);
+		uint32 bpr = fBuffer->stride();
+
+		// get a 32 bit pixel ready with the color
+		pixel32 color;
+		color.data8[0] = c.blue;
+		color.data8[1] = c.green;
+		color.data8[2] = c.red;
+		color.data8[3] = c.alpha;
+
+		dst += left * 4;
+
+		for (; y <= bottom; y++) {
+			uint32* handle = (uint32*)dst;
+			for (int32 x = left; x <= right; x++) {
+				*handle++ = color.data32;
+			}
+			dst += bpr;
+		}
+	}
+}
+
 // StrokeRoundRect
 BRect
 Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const

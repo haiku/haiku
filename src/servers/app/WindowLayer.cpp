@@ -53,6 +53,16 @@
 
 using std::nothrow;
 
+// if the background clearing is delayed until
+// the client draws the view, we have less flickering
+// when contents have to be redrawn because of resizing
+// a window or because the client invalidates parts.
+// when redrawing something that has been exposed from underneath
+// other windows, the other window will be seen longer at
+// its previous position though if the exposed parts are not
+// cleared right away. maybe there ought to be a flag in
+// the update session, which tells us the cause of the update
+#define DELAYED_BACKGROUND_CLEARING 1
 
 WindowLayer::WindowLayer(const BRect& frame, const char *name,
 						 window_look look, window_feel feel,
@@ -291,7 +301,7 @@ WindowLayer::MoveBy(int32 x, int32 y)
 {
 	// this function is only called from the desktop thread
 
-	if ((x == 0 && y == 0) || !ReadLockWindows())
+	if (x == 0 && y == 0)
 		return;
 
 	fWindow->HandleDirectConnection(B_DIRECT_STOP);
@@ -330,8 +340,6 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	msg.AddInt64("when", system_time());
 	msg.AddPoint("where", fFrame.LeftTop());
 	fWindow->SendMessageToClient(&msg);
-
-	ReadUnlockWindows();
 }
 
 
@@ -357,7 +365,7 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	x = wantWidth - fFrame.IntegerWidth();
 	y = wantHeight - fFrame.IntegerHeight();
 
-	if ((x == 0 && y == 0) || !ReadLockWindows())
+	if (x == 0 && y == 0)
 		return;
 
 	fWindow->HandleDirectConnection(B_DIRECT_STOP);
@@ -400,8 +408,6 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	msg.AddInt32("width", frame.IntegerWidth());
 	msg.AddInt32("height", frame.IntegerHeight());
 	fWindow->SendMessageToClient(&msg);
-
-	ReadUnlockWindows();
 }
 
 
@@ -1561,8 +1567,9 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 		_TransferToUpdateSession(&dirtyContentRegion);
 
 #if DELAYED_BACKGROUND_CLEARING
-		if (!fTopLayer->IsBackgroundDirty())
-			fTopLayer->MarkBackgroundDirty();
+// NOTE: currently not used, might come in handy later though
+//		if (!fTopLayer->IsBackgroundDirty())
+//			fTopLayer->MarkBackgroundDirty();
 #else
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
@@ -1691,18 +1698,14 @@ WindowLayer::BeginUpdate()
 		// command from the client during an update
 		// (ViewLayer::IsBackgroundDirty() can be used
 		// for this)
-		if (fDrawingEngine->Lock()) {
-			if (!fContentRegionValid)
-				_UpdateContentRegion();
-	
-			BRegion dirty(fCurrentUpdateSession.DirtyRegion());
-			dirty.IntersectWith(&VisibleContentRegion());
+		if (!fContentRegionValid)
+			_UpdateContentRegion();
 
-			fTopLayer->Draw(fDrawingEngine, &dirty,
-							&fContentRegion, true);
+		BRegion dirty(fCurrentUpdateSession.DirtyRegion());
+		dirty.IntersectWith(&VisibleContentRegion());
 
-			fDrawingEngine->Unlock();
-		}
+		fTopLayer->Draw(fDrawingEngine, &dirty,
+						&fContentRegion, true);
 #endif		
 	} else {
 		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");

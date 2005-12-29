@@ -136,6 +136,9 @@ class Painter {
 			// fills a solid rect with color c, no blending
 			void				FillRect(		const BRect& r,
 												const rgb_color& c) const;
+			// fills a solid rect with color c, no blending, no clipping
+			void				FillRectNoClipping(const BRect& r,
+												const rgb_color& c) const;
 
 								// round rects
 			BRect				StrokeRoundRect(const BRect& r,

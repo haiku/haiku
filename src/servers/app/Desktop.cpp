@@ -1583,14 +1583,14 @@ Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 
 /*!
 	Returns the window under the mouse cursor.
-	You need to have the window write lock acquired when calling this method.
+	You need to have acquired the All Windows lock when calling this method.
 */
 WindowLayer*
 Desktop::WindowAt(BPoint where)
 {
 	for (WindowLayer* window = _CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
-		if (window->VisibleRegion().Contains(where))
+		if (window->IsVisible() && window->VisibleRegion().Contains(where))
 			return window;
 	}
 

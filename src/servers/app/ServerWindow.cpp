@@ -854,10 +854,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&minHeight);
 			link.Read<int32>(&maxHeight);
 */
-			// TODO: setting size limits can change the window size, and therefore,
-			//	it should be done by the Desktop class as well.
-			fWindowLayer->SetSizeLimits(minWidth, maxWidth,
-				minHeight, maxHeight);
+			if (fDesktop->LockAllWindows()) {
+				fWindowLayer->SetSizeLimits(minWidth, maxWidth,
+					minHeight, maxHeight);
+				fDesktop->UnlockAllWindows();
+			}
 
 			// and now, sync the client to the limits that we were able to enforce
 			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth,

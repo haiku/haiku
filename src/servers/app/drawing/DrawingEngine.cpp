@@ -758,33 +758,29 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	// NOTE: Write locking because we might use HW acceleration.
 	// This needs to be investigated, I'm doing this because of
 	// gut feeling.
+	// NOTE: region expected to be already clipped correctly!!
 	if (WriteLock()) {
-		BRect clipped = fPainter->ClipRect(r.Frame());
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
+		fGraphicsCard->HideSoftwareCursor(r.Frame());
 
-			bool doInSoftware = true;
-			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-// NOTE: region expected to be already clipped correctly
-//				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, color);
-				doInSoftware = false;
-			}
-
-			if (doInSoftware) {
-
-				int32 count = r.CountRects();
-				for (int32 i = 0; i < count; i++) {
-					fPainter->FillRect(r.RectAt(i), color.GetColor32());
-				}
-				BRect touched = r.Frame();
-
-				fGraphicsCard->Invalidate(touched);
-			}
-
-			fGraphicsCard->ShowSoftwareCursor();
+		bool doInSoftware = true;
+		// try hardware optimized version first
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+			fGraphicsCard->FillRegion(r, color);
+			doInSoftware = false;
 		}
+
+		if (doInSoftware) {
+
+			int32 count = r.CountRects();
+			for (int32 i = 0; i < count; i++) {
+				fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
+			}
+			BRect touched = r.Frame();
+
+			fGraphicsCard->Invalidate(touched);
+		}
+
+		fGraphicsCard->ShowSoftwareCursor();
 
 		WriteUnlock();
 	}
