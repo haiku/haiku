@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src preferences backgrounds ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders shared ;
 
 Preference Backgrounds : 
@@ -7,6 +10,11 @@ Preference Backgrounds :
 	BGMain.cpp 
 	BGView.cpp 
 	BGWindow.cpp 
-	: libbe.so libtracker.so libtranslation.so
+	: be tracker translation
 	: Backgrounds.rdef
 	;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Backgrounds
+		: tests!apps ;
+}
