@@ -35,6 +35,8 @@
 
 #define SETTINGS_FILE					"Backgrounds_settings"
 
+class ImageFilePanel;
+
 class BGImageMenuItem : public BMenuItem {
 	public:
 		BGImageMenuItem(const char *label, int32 imageIndex, BMessage *message, 
@@ -122,7 +124,7 @@ class BackgroundsView : public BBox {
 		PreView *fPreView;				// the view for previewing the result
 		PreviewBox *fPreview;			// the box which draws a computer/folder
 		BFilePanel *fFolderPanel;		// the file panels for folders
-		BFilePanel *fPanel;				// the file panels for images
+		ImageFilePanel *fPanel;			// the file panels for images
 
 		BackgroundImage *fCurrent;		// the current BackgroundImage object
 		BackgroundImage::BackgroundImageInfo *fCurrentInfo;//the current BackgroundImageInfo object

@@ -37,7 +37,8 @@ class ImageFilePanel : public BFilePanel {
 			bool modal = false, bool hideWhenDone = true);
 
 		virtual void SelectionChanged();
-		virtual void Show();
+
+		void Show();
 
 	protected:
 		BView*			fImageView;
