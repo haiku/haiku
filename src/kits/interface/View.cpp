@@ -3381,11 +3381,6 @@ BView::RemoveSelf()
 	if (fOwner) {
 		check_lock();
 
-		if (!fState->IsAllValid()) {
-			// we need to retrieve the latest state from the server
-			fState->UpdateFrom(*fOwner->fLink);
-		}
-
 		// make sure our owner doesn't need us anymore
 
 		if (fOwner->CurrentFocus() == this)
@@ -4206,8 +4201,7 @@ BView::_UpdateStateForRemove()
 
 	fState->UpdateFrom(*fOwner->fLink);
 	fBounds = Bounds();
-	fParentOffset = LeftTop();
-
+	
 	// update children as well
 
 	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
