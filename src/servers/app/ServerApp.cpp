@@ -2123,6 +2123,33 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SET_DESKTOP_COLOR:
+		{
+			STRACE(("ServerApp %s: set desktop color\n", Signature()));
+
+			rgb_color color;
+			uint32 index;
+			bool makeDefault;
+
+			link.Read<rgb_color>(&color);
+			link.Read<uint32>(&index);
+			if (link.Read<bool>(&makeDefault) != B_OK)
+				break;
+
+			fDesktop->Lock();
+
+			// we're nice to our children (and also take the default case
+			// into account which asks for the current workspace)
+			if (index >= (uint32)kMaxWorkspaces)
+				index = fDesktop->CurrentWorkspace();
+
+			Workspace workspace(*fDesktop, index);
+			workspace.SetColor(color, makeDefault);
+
+			fDesktop->Unlock();
+			break;
+		}
+
 		case AS_GET_ACCELERANT_INFO:
 		{
 			STRACE(("ServerApp %s: get accelerant info\n", Signature()));

@@ -90,6 +90,15 @@ Workspace::Color() const
 }
 
 
+void
+Workspace::SetColor(const RGBColor& color, bool makeDefault)
+{
+	// TODO: support makeDefault
+	// TODO: redraw desktop!
+	fWorkspace.SetColor(color);
+}
+
+
 status_t
 Workspace::GetNextWindow(WindowLayer*& _window, BPoint& _leftTop)
 {

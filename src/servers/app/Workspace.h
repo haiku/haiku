@@ -23,6 +23,7 @@ class Workspace {
 		~Workspace();
 
 		const RGBColor& Color() const;
+		void		SetColor(const RGBColor& color, bool makeDefault);
 		bool		IsCurrent() const
 						{ return fCurrentWorkspace; }
 
