@@ -84,4 +84,4 @@ Package haiku-echogals-cvs
 	boot home config add-ons kernel drivers bin ;
 
 PackageDriverSymLink haiku-echogals-cvs : audio multi echogals ;
-
+PackageDriverSymLink haiku-echogals-cvs : midi echogals ;
