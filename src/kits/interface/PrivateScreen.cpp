@@ -370,7 +370,7 @@ BPrivateScreen::SetDesktopColor(rgb_color color, uint32 workspace,
 
 	link.StartMessage(AS_SET_DESKTOP_COLOR);
 	link.Attach<rgb_color>(color);
-	link.Attach<int32>(workspace);
+	link.Attach<uint32>(workspace);
 	link.Attach<bool>(makeDefault);
 	link.Flush();
 }
