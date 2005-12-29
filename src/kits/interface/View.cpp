@@ -3038,7 +3038,7 @@ void
 BView::SetViewBitmap(const BBitmap *bitmap, BRect srcRect, BRect dstRect,
 	uint32 followFlags, uint32 options)
 {
-	_SetViewImage(bitmap, srcRect, dstRect, followFlags, options);
+	_SetViewBitmap(bitmap, srcRect, dstRect, followFlags, options);
 }
 
 
@@ -3051,14 +3051,14 @@ BView::SetViewBitmap(const BBitmap *bitmap, uint32 followFlags, uint32 options)
 
  	rect.OffsetTo(0, 0);
 
-	_SetViewImage(bitmap, rect, rect, followFlags, options);
+	_SetViewBitmap(bitmap, rect, rect, followFlags, options);
 }
 
 
 void
 BView::ClearViewBitmap()
 {
-	_SetViewImage(NULL, BRect(), BRect(), 0, 0);
+	_SetViewBitmap(NULL, BRect(), BRect(), 0, 0);
 }
 
 
@@ -3066,7 +3066,7 @@ status_t
 BView::SetViewOverlay(const BBitmap *overlay, BRect srcRect, BRect dstRect,
 	rgb_color *colorKey, uint32 followFlags, uint32 options)
 {
-	status_t err = _SetViewImage(overlay, srcRect, dstRect, followFlags,
+	status_t err = _SetViewBitmap(overlay, srcRect, dstRect, followFlags,
 		options | 0x4);
 
 	// TODO: Incomplete?
@@ -3088,7 +3088,7 @@ BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,
 
  	rect.OffsetTo(0, 0);
 
-	status_t err = _SetViewImage(overlay, rect, rect, followFlags,
+	status_t err = _SetViewBitmap(overlay, rect, rect, followFlags,
 			options | 0x4);
 
 	// TODO: Incomplete?
@@ -3103,7 +3103,7 @@ BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,
 void
 BView::ClearViewOverlay()
 {
-	_SetViewImage(NULL, BRect(), BRect(), 0, 0);
+	_SetViewBitmap(NULL, BRect(), BRect(), 0, 0);
 }
 
 
@@ -4251,7 +4251,7 @@ BView::set_shelf(BShelf *shelf)
 
 
 status_t
-BView::_SetViewImage(const BBitmap* bitmap, BRect srcRect,
+BView::_SetViewBitmap(const BBitmap* bitmap, BRect srcRect,
 	BRect dstRect, uint32 followFlags, uint32 options)
 {
 	if (!do_owner_check())
@@ -4259,7 +4259,7 @@ BView::_SetViewImage(const BBitmap* bitmap, BRect srcRect,
 
 	int32 serverToken = bitmap ? bitmap->get_server_token() : -1;
 
-	fOwner->fLink->StartMessage(AS_LAYER_SET_VIEW_IMAGE);
+	fOwner->fLink->StartMessage(AS_LAYER_SET_VIEW_BITMAP);
 	fOwner->fLink->Attach<int32>(serverToken);
 	fOwner->fLink->Attach<BRect>(srcRect);
 	fOwner->fLink->Attach<BRect>(dstRect);

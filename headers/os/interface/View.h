@@ -528,7 +528,7 @@ private:
 
 			void			_InitData(BRect frame, const char* name, uint32 resizeMask,
 								uint32 flags);
-			status_t		_SetViewImage(const BBitmap* bitmap,BRect srcRect,
+			status_t		_SetViewBitmap(const BBitmap* bitmap,BRect srcRect,
 								BRect dstRect, uint32 followFlags, uint32 options);
 			void			DoBezier(int32 gr, BPoint* controlPoints, pattern p);
 			void			DoShape(int32 gr, BShape* shape, pattern p);

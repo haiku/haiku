@@ -6,7 +6,6 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
  */
-
 #ifndef _APP_SERVER_PROTOCOL_H_
 #define _APP_SERVER_PROTOCOL_H_
 
@@ -313,7 +312,7 @@ enum {
 	AS_LAYER_SET_STATE,
 	AS_LAYER_SET_FONT_STATE,
 	AS_LAYER_GET_STATE,
-	AS_LAYER_SET_VIEW_IMAGE,
+	AS_LAYER_SET_VIEW_BITMAP,
 	AS_LAYER_SET_PATTERN,
 	AS_SET_CURRENT_LAYER,
 
