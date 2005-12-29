@@ -113,7 +113,7 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 void
 BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 {
-	if (!bitmap->_Release()) {
+	if (bitmap == NULL || !bitmap->_Release()) {
 		// there are other references to this bitmap, we don't have to delete it yet
 		return;
 	}

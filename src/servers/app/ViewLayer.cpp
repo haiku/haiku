@@ -76,6 +76,9 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 // destructor
 ViewLayer::~ViewLayer()
 {
+	if (fViewBitmap != NULL)
+		gBitmapManager->DeleteBitmap(fViewBitmap);
+
 	delete fDrawState;
 
 	// iterate over children and delete each one

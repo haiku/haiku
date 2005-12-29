@@ -154,7 +154,14 @@ ServerApp::~ServerApp()
 
 	fWindowListLock.Lock();
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		sem_id deathSemaphore = fWindowList.ItemAt(i)->DeathSemaphore();
+		ServerWindow* window = fWindowList.ItemAt(i);
+
+		// a window could have been remove in the mean time (if those 20 millisecs
+		// from above weren't enough)
+		if (window == NULL)
+			continue;
+
+		sem_id deathSemaphore = window->DeathSemaphore();
 		fWindowListLock.Unlock();
 
 		// wait 3 seconds for our window to quit - that's quite a long
