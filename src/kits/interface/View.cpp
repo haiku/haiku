@@ -247,7 +247,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
-		|| code != SERVER_TRUE)
+		|| code != B_OK)
 		return;
 
 	uint32 fontID;
@@ -960,7 +960,7 @@ BView::Origin() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<BPoint>(&fState->origin);
 
 			fState->valid_flags |= B_VIEW_ORIGIN_BIT;
@@ -1395,7 +1395,7 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		fOwner->fLink->Read<BPoint>(location);
 		fOwner->fLink->Read<uint32>(buttons);
 
@@ -1603,7 +1603,7 @@ BView::LineMiterLimit() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			int8 cap, join;
 			fOwner->fLink->Read<int8>((int8 *)&cap);
 			fOwner->fLink->Read<int8>((int8 *)&join);
@@ -1676,7 +1676,7 @@ BView::Scale() const
 
  		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE)
+			&& code == B_OK)
 			fOwner->fLink->Read<float>(&fState->scale);
 
 		fState->valid_flags |= B_VIEW_SCALE_BIT;
@@ -1717,7 +1717,7 @@ BView::DrawingMode() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			int8 drawingMode;
 			fOwner->fLink->Read<int8>(&drawingMode);
 
@@ -1766,7 +1766,7 @@ BView::GetBlendingMode(source_alpha *_sourceAlpha,
 
 		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
- 			&& code == SERVER_TRUE) {
+ 			&& code == B_OK) {
 			int8 alphaSourceMode, alphaFunctionMode;
 			fOwner->fLink->Read<int8>(&alphaSourceMode);
 			fOwner->fLink->Read<int8>(&alphaFunctionMode);
@@ -1838,7 +1838,7 @@ BView::PenLocation() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<BPoint>(&fState->pen_location);
 
 			fState->valid_flags |= B_VIEW_PEN_LOCATION_BIT;
@@ -1879,7 +1879,7 @@ BView::PenSize() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<float>(&fState->pen_size);
 
 			fState->valid_flags |= B_VIEW_PEN_SIZE_BIT;
@@ -1924,7 +1924,7 @@ BView::HighColor() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<rgb_color>(&fState->high_color);
 
 			fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;
@@ -1968,7 +1968,7 @@ BView::LowColor() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<rgb_color>(&fState->low_color);
 
 			fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
@@ -2011,7 +2011,7 @@ BView::ViewColor() const
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE) {
+			&& code == B_OK) {
 			fOwner->fLink->Read<rgb_color>(&fState->view_color);
 
 			fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
@@ -2177,7 +2177,7 @@ BView::GetClippingRegion(BRegion* region) const
 
  		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
- 			&& code == SERVER_TRUE) {
+ 			&& code == B_OK) {
 			int32 count;
 			fOwner->fLink->Read<int32>(&count);
 
@@ -3020,7 +3020,7 @@ BView::EndPicture()
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE
+			&& code == B_OK
 			&& fOwner->fLink->Read<int32>(&token) == B_OK) {
 			BPicture *picture = cpicture;
 			cpicture = picture->step_down();
@@ -3128,12 +3128,12 @@ BView::DrawPicture(const BPicture *picture)
 		return;
 
 	DrawPictureAsync(picture, PenLocation());
-	fOwner->fLink->Attach<int32>(SERVER_TRUE);
+	fOwner->fLink->Attach<int32>(B_OK);
 
 	// ToDo: why a reply?
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		status_t err;
 		fOwner->fLink->Read<int32>(&err);
 	}
@@ -3147,12 +3147,12 @@ BView::DrawPicture(const BPicture *picture, BPoint where)
 		return;
 
 	DrawPictureAsync(picture, where);
-	fOwner->fLink->Attach<int32>(SERVER_TRUE);
+	fOwner->fLink->Attach<int32>(B_OK);
 
 	// ToDo: why a reply?
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		status_t err;
 		fOwner->fLink->Read<int32>(&err);
 	}
@@ -3166,12 +3166,12 @@ BView::DrawPicture(const char *filename, long offset, BPoint where)
 		return;
 
 	DrawPictureAsync(filename, offset, where);
-	fOwner->fLink->Attach<int32>(SERVER_TRUE);
+	fOwner->fLink->Attach<int32>(B_OK);
 
 	// ToDo: why a reply?
 	int32 code;
 	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE) {
+		&& code == B_OK) {
 		status_t err;
 		fOwner->fLink->Read<int32>(&err);
 	}
@@ -4266,15 +4266,8 @@ BView::_SetViewBitmap(const BBitmap* bitmap, BRect srcRect,
 	fOwner->fLink->Attach<int32>(followFlags);
 	fOwner->fLink->Attach<int32>(options);
 
-	// TODO: this needs fixed between here and the server.
-	// The server should return whatever error code is needed, whether it
-	// is B_OK or whatever, not SERVER_TRUE.
-
 	status_t status = B_ERROR;
-	int32 code;
-	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
-		fOwner->fLink->Read<status_t>(&status);
+	fOwner->fLink->FlushWithReply(status);
 
 	return status;
 }
