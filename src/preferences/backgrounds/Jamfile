@@ -6,10 +6,10 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders shared ;
 
 Preference Backgrounds : 
-	BackgroundImage.cpp 
-	BGMain.cpp 
-	BGView.cpp 
-	BGWindow.cpp 
+	BackgroundImage.cpp
+	Backgrounds.cpp
+	BackgroundsView.cpp
+	ImageFilePanel.cpp
 	: be tracker translation
 	: Backgrounds.rdef
 	;

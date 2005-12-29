@@ -40,6 +40,8 @@ All rights reserved.
 
 #include "String.h"
 #include "ObjectList.h"
+
+#include <GraphicsDefs.h>
 #include <Node.h>
 #include <Path.h>
 
@@ -49,7 +51,7 @@ class BBitmap;
 
 class BackgroundImage;
 class Image;
-class BGView;
+class BackgroundsView;
 
 extern const char *kBackgroundImageInfo;
 extern const char *kBackgroundImageInfoOffset;
@@ -97,11 +99,10 @@ public:
 		uint32 fCacheMode;		// image cache strategy (0 cache , 1 no cache)
 	};
 	
-	
-
-	static BackgroundImage *GetBackgroundImage(const BNode *, bool isDesktop, 
-		BGView* view);
+	static BackgroundImage *GetBackgroundImage(const BNode *node,
+		bool isDesktop, BackgroundsView* view);
 		// create a BackgroundImage object by reading it from a node
+
 	virtual ~BackgroundImage();
 
 	void Show(BView *view, int32 workspace);
@@ -111,7 +112,7 @@ public:
 
 	void WorkspaceActivated(BView *view, int32 workspace, bool state);
 		// respond to a workspace change
-	void ScreenChanged(BRect , color_space);
+	void ScreenChanged(BRect rect, color_space space);
 		// respond to a screen size change
 	/*static BackgroundImage *Refresh(BackgroundImage *oldBackgroundImage,
 		const BNode *fromNode, bool desktop, BPoseView *poseView);
@@ -127,20 +128,20 @@ public:
 	
 	void Show(BackgroundImageInfo *, BView *view);
 	
-	uint32 GetShowingImageSet() {return fShowingImageSet;}
+	uint32 GetShowingImageSet() { return fShowingImageSet; }
 	
 	void Add(BackgroundImageInfo *);
 	void RemoveAll();
-	
+
 private:
-	BackgroundImage(const BNode *, bool);
+	BackgroundImage(const BNode *node, bool isDesktop, BackgroundsView* view);
 		// no public constructor, GetBackgroundImage factory function is
 		// used instead
 
 	bool fIsDesktop;
 	BNode fDefinedByNode;
 	BView *fView;
-	BGView* bgView;
+	BackgroundsView* fBackgroundsView;
 	BackgroundImageInfo *fShowingBitmap;
 		
 	BObjectList<BackgroundImageInfo> fBitmapForWorkspaceList;
