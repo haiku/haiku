@@ -1302,6 +1302,13 @@ void
 Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 					 BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
 {
+	if (!fSubpixelPrecise) {
+		// round off viewRect (in a way avoiding too much distortion)
+		viewRect.OffsetTo(roundf(viewRect.left), roundf(viewRect.top));
+		viewRect.right = roundf(viewRect.right);
+		viewRect.bottom = roundf(viewRect.bottom);
+	}
+
 	switch (format) {
 		case B_RGB32:
 		case B_RGBA32:
