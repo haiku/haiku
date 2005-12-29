@@ -864,40 +864,47 @@ void
 ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
-	// we can only draw within our own area
-	BRegion redraw(ScreenClipping(windowContentClipping));
-	// add the current clipping
-	redraw.IntersectWith(effectiveClipping);
+	if (fViewBitmap != NULL || !fViewColor.IsTransparentMagic()) {
+		// we can only draw within our own area
+		BRegion redraw(ScreenClipping(windowContentClipping));
+		// add the current clipping
+		redraw.IntersectWith(effectiveClipping);
+	
+		if (fViewBitmap != NULL) {
+			// draw view bitmap
+			// TODO: support other options!
+			BRect rect = fBitmapDestination;
+			ConvertToScreenForDrawing(&rect);
+	
+			// lock the drawing engine for as long as we need the clipping
+			// to be valid
+			if (drawingEngine->Lock()) {
+				drawingEngine->ConstrainClippingRegion(&redraw);
 
-	if (fViewBitmap != NULL) {
-		// draw view bitmap
-		// TODO: support other options!
-		BRect rect = fBitmapDestination;
-		ConvertToScreenForDrawing(&rect);
-
-		// TODO: this messes with the screen clipping, but might not be supposed to do so.
-		drawingEngine->ConstrainClippingRegion(&redraw);
-		// TODO: fDrawState is probably not what we want to use here...
-		drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-			rect, fDrawState);
-		drawingEngine->ConstrainClippingRegion(NULL);
-
-		redraw.Exclude(rect);
-	}
-
-	if (!fViewColor.IsTransparentMagic()) {
-		// fill visible region with view color
-		drawingEngine->FillRegion(redraw, fViewColor);
+				DrawState defaultDrawState;
+				drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+					rect, &defaultDrawState);
+				// NOTE: It is ok not to reset the clipping, that
+				// would only waste time
+				drawingEngine->Unlock();
+			}
+	
+			redraw.Exclude(rect);
+		}
+	
+		if (!fViewColor.IsTransparentMagic()) {
+			// fill visible region with view color,
+			// this version of FillRegion ignores any
+			// clipping, that's why "redraw" needs to
+			// be correct
+			drawingEngine->FillRegion(redraw, fViewColor);
+		}
 	}
 
 	fBackgroundDirty = false;
 
 	// let children draw
 	if (deep) {
-		// before passing the clipping on to children, exclude our
-		// own region from the available clipping
-		effectiveClipping->Exclude(&fScreenClipping);
-
 		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 			child->Draw(drawingEngine, effectiveClipping,
 						windowContentClipping, deep);
