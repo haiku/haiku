@@ -83,9 +83,9 @@ node_ref::operator=(const node_ref &ref)
 	return *this;
 }
 
-//----------------------------------------------------------------------
-// BNode
-//----------------------------------------------------------------------
+
+//	#pragma mark -
+
 
 /*!	\brief Creates an uninitialized BNode object
 */
@@ -95,6 +95,7 @@ BNode::BNode()
 	   fCStatus(B_NO_INIT)
 {
 }
+
 
 /*!	\brief Creates a BNode object and initializes it to the specified
 	entry_ref.
@@ -108,6 +109,7 @@ BNode::BNode(const entry_ref *ref)
 	SetTo(ref);
 }
 
+
 /*!	\brief Creates a BNode object and initializes it to the specified
 	filesystem entry.
 	\param entry the BEntry representing the entry
@@ -120,6 +122,7 @@ BNode::BNode(const BEntry *entry)
 	SetTo(entry);
 }
 
+
 /*!	\brief Creates a BNode object and initializes it to the entry referred
 	to by the specified path.
 	\param path the path referring to the entry
@@ -131,6 +134,7 @@ BNode::BNode(const char *path)
 {
 	SetTo(path);
 }
+
 
 /*!	\brief Creates a BNode object and initializes it to the entry referred
 	to by the specified path rooted in the specified directory.
@@ -146,6 +150,7 @@ BNode::BNode(const BDirectory *dir, const char *path)
 	SetTo(dir, path);
 }
 
+
 /*! \brief Creates a copy of the given BNode.
 	\param node the BNode to be copied
 */
@@ -157,12 +162,14 @@ BNode::BNode(const BNode &node)
 	*this = node;
 }
 
+
 /*!	\brief Frees all resources associated with this BNode.
 */
 BNode::~BNode()
 {
 	Unset();
 }
+
 
 /*!	\brief Checks whether the object has been properly initialized or not.
 	\return
@@ -175,6 +182,7 @@ BNode::InitCheck() const
 	return fCStatus;
 }
 
+
 /*! \brief Fills in the given stat structure with \code stat() \endcode
 		   information for this object.
 	\param st a pointer to a stat structure to be filled in
@@ -186,10 +194,11 @@ BNode::InitCheck() const
 status_t
 BNode::GetStat(struct stat *st) const
 {
-	return (fCStatus != B_OK)
+	return fCStatus != B_OK
 		? fCStatus
 		: _kern_read_stat(fFd, NULL, false, st, sizeof(struct stat));
 }
+
 
 /*! \brief Reinitializes the object to the specified entry_ref.
 	\param ref the entry_ref referring to the entry
@@ -204,6 +213,7 @@ BNode::SetTo(const entry_ref *ref)
 {
 	return _SetTo(ref, false);
 }
+
 
 /*!	\brief Reinitializes the object to the specified filesystem entry.
 	\param entry the BEntry representing the entry
@@ -223,6 +233,7 @@ BNode::SetTo(const BEntry *entry)
 	return _SetTo(entry->fDirFd, entry->fName, false);
 }
 
+
 /*!	\brief Reinitializes the object to the entry referred to by the specified
 		   path.
 	\param path the path referring to the entry
@@ -237,6 +248,7 @@ BNode::SetTo(const char *path)
 {
 	return _SetTo(-1, path, false);
 }
+
 
 /*! \brief Reinitializes the object to the entry referred to by the specified
 	path rooted in the specified directory.
@@ -259,6 +271,7 @@ BNode::SetTo(const BDirectory *dir, const char *path)
 	return _SetTo(dir->fDirFd, path, false);
 }
 
+
 /*!	\brief Returns the object to an uninitialized state.
 */
 void
@@ -267,6 +280,7 @@ BNode::Unset()
 	close_fd();
 	fCStatus = B_NO_INIT;	
 }
+
 
 /*!	\brief Attains an exclusive lock on the data referred to by this node, so
 	that it may not be modified by any other objects or methods.
@@ -283,6 +297,7 @@ BNode::Lock()
 	return _kern_lock_node(fFd);
 }
 
+
 /*!	\brief Unlocks the node.
 	\return
 	- \c B_OK: Everything went fine.
@@ -297,6 +312,7 @@ BNode::Unlock()
 	return _kern_unlock_node(fFd);
 }
 
+
 /*!	\brief Immediately performs any pending disk actions on the node.
 	\return
 	- \c B_OK: Everything went fine.
@@ -307,6 +323,7 @@ BNode::Sync()
 {
 	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_fsync(fFd);
 }
+
 
 /*!	\brief Writes data from a buffer to an attribute.
 	Write the \a len bytes of data from \a buffer to
@@ -336,9 +353,11 @@ BNode::WriteAttr(const char *attr, type_code type, off_t offset,
 		return B_FILE_ERROR;
 	if (!attr || !buffer)
 		return B_BAD_VALUE;
-	ssize_t result = fs_write_attr (fFd, attr, type, offset, buffer, len);
-	return (result < 0 ? errno : result);
+
+	ssize_t result = fs_write_attr(fFd, attr, type, offset, buffer, len);
+	return result < 0 ? errno : result;
 }
+
 
 /*!	\brief Reads data from an attribute into a buffer.
 	Reads the data of the attribute given by \a name into
@@ -363,9 +382,11 @@ BNode::ReadAttr(const char *attr, type_code type, off_t offset,
 		return B_FILE_ERROR;
 	if (!attr || !buffer)
 		return B_BAD_VALUE;
+
 	ssize_t result = fs_read_attr(fFd, attr, type, offset, buffer, len );
-	return (result == -1 ? errno : result);
+	return result == -1 ? errno : result;
 }
+
 
 /*!	\brief Deletes the attribute given by \a name.
 	\param name the name of the attribute
@@ -379,8 +400,9 @@ BNode::ReadAttr(const char *attr, type_code type, off_t offset,
 status_t
 BNode::RemoveAttr(const char *name)
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_remove_attr(fFd, name);
+	return fCStatus != B_OK ? B_FILE_ERROR : _kern_remove_attr(fFd, name);
 }
+
 
 /*!	\brief Moves the attribute given by \a oldname to \a newname.
 	If \a newname already exists, the current data is clobbered.
@@ -399,6 +421,7 @@ BNode::RenameAttr(const char *oldname, const char *newname)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
+
 	return _kern_rename_attr(fFd, oldname, fFd, newname);
 }
 
@@ -420,8 +443,10 @@ BNode::GetAttrInfo(const char *name, struct attr_info *info) const
 		return B_FILE_ERROR;
 	if (!name || !info)
 		return B_BAD_VALUE;
-	return (fs_stat_attr(fFd, name, info) < 0) ? errno : B_OK ;
+
+	return fs_stat_attr(fFd, name, info) < 0 ? errno : B_OK ;
 }
+
 
 /*!	\brief Returns the next attribute in the node's list of attributes.
 	Every BNode maintains a pointer to its list of attributes.
@@ -439,7 +464,7 @@ BNode::GetAttrInfo(const char *name, struct attr_info *info) const
 	- \c B_FILE_ERROR: The object is not initialized.
 	- \c B_ENTRY_NOT_FOUND: There are no more attributes, the last attribute
 	  name has already been returned.
- */
+*/
 status_t
 BNode::GetNextAttrName(char *buffer)
 {
@@ -461,6 +486,7 @@ BNode::GetNextAttrName(char *buffer)
 	return B_OK;
 }
 
+
 /*! \brief Resets the object's attribute pointer to the first attribute in the
 	list.
 	\return
@@ -472,8 +498,10 @@ BNode::RewindAttrs()
 {
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;	
+
 	return _kern_rewind_dir(fAttrFd);
 }
+
 
 /*!	Writes the specified string to the specified attribute, clobbering any
 	previous data.
@@ -501,6 +529,7 @@ BNode::WriteAttrString(const char *name, const BString *data)
 	return error;
 }
 
+
 /*!	\brief Reads the data of the specified attribute into the pre-allocated
 		   \a result.
 	\param name the name of the attribute
@@ -516,17 +545,19 @@ BNode::ReadAttrString(const char *name, BString *result) const
 {
 	if (!name || !result)
 		return B_BAD_VALUE;
-	
+
 	attr_info info;
 	status_t error;
-	
+
 	error = GetAttrInfo(name, &info);
 	if (error != B_OK)
 		return error;		
+
 	// Lock the string's buffer so we can meddle with it	
 	char *data = result->LockBuffer(info.size+1);
 	if (!data)
 		return B_NO_MEMORY;
+
 	// Read the attribute		
 	ssize_t bytes = ReadAttr(name, B_STRING_TYPE, 0, data, info.size);
 	// Check for failure
@@ -535,12 +566,14 @@ BNode::ReadAttrString(const char *name, BString *result) const
 		bytes = 0;	// In this instance, we simply clear the string
 	} else
 		error = B_OK;
+
 	// Null terminate the new string just to be sure (since it *is*
 	// possible to read and write non-NULL-terminated strings)
 	data[bytes] = 0;		
 	result->UnlockBuffer();
 	return error;
 }
+
 
 /*!	\brief Reinitializes the object as a copy of the \a node.
 	\param node the BNode to be copied
@@ -552,6 +585,7 @@ BNode::operator=(const BNode &node)
 	// No need to do any assignment if already equal
 	if (*this == node)
 		return *this;	
+
 	// Close down out current state
 	Unset();	
 	// We have to manually dup the node, because R5::BNode::Dup()
@@ -560,6 +594,7 @@ BNode::operator=(const BNode &node)
 	fCStatus = (fFd < 0) ? B_NO_INIT : B_OK ;
 	return *this;
 }
+
 
 /*!	Tests whether this and the supplied BNode object are equal.
 	Two BNode objects are said to be equal if they're set to the same node,
@@ -584,6 +619,7 @@ BNode::operator==(const BNode &node) const
 	return false;	
 }
 
+
 /*!	Tests whether this and the supplied BNode object are not equal.
 	Two BNode objects are said to be equal if they're set to the same node,
 	or if they're both \c B_NO_INIT.
@@ -595,6 +631,7 @@ BNode::operator!=(const BNode &node) const
 {
 	return !(*this == node);
 }
+
 
 /*!	\brief Returns a POSIX file descriptor to the node this object refers to.
 	Remember to call close() on the file descriptor when you're through with
@@ -617,6 +654,7 @@ void BNode::_RudeNode4() { }
 void BNode::_RudeNode5() { }
 void BNode::_RudeNode6() { }
 
+
 /*!	\brief Sets the node's file descriptor.
 	Used by each implementation (i.e. BNode, BFile, BDirectory, etc.) to set
 	the node's file descriptor. This allows each subclass to use the various
@@ -637,6 +675,7 @@ BNode::set_fd(int fd)
 	return B_OK;
 }
 
+
 /*!	\brief Closes the node's file descriptor(s).
 	To be implemented by subclasses to close the file descriptor using the
 	proper system call for the given file-type. This implementation calls
@@ -645,8 +684,7 @@ BNode::set_fd(int fd)
 void
 BNode::close_fd()
 {
-	if (fAttrFd >= 0)
-	{
+	if (fAttrFd >= 0) {
 		_kern_close(fAttrFd);
 		fAttrFd = -1;
 	}	
@@ -656,7 +694,7 @@ BNode::close_fd()
 	}	
 }
 
-// set_status
+
 /*! \brief Sets the BNode's status.
 	To be used by derived classes instead of accessing the BNode's private
 	\c fCStatus member directly.
@@ -668,7 +706,7 @@ BNode::set_status(status_t newStatus)
 	fCStatus = newStatus;
 }
 
-// _SetTo
+
 /*!	\brief Initializes the BNode's file descriptor to the node referred to
 		   by the given FD and path combo.
 
@@ -711,7 +749,7 @@ BNode::_SetTo(int fd, const char *path, bool traverse)
 	return fCStatus = error;
 }
 
-// _SetTo
+
 /*!	\brief Initializes the BNode's file descriptor to the node referred to
 		   by the given entry_ref.
 
@@ -746,6 +784,7 @@ BNode::_SetTo(const entry_ref *ref, bool traverse)
 	return fCStatus = error;
 }
 
+
 /*! \brief Modifies a certain setting for this node based on \a what and the
 	corresponding value in \a st.
 	Inherited from and called by BStatable.
@@ -758,9 +797,11 @@ BNode::set_stat(struct stat &st, uint32 what)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
+
 	return _kern_write_stat(fFd, NULL, false, &st, sizeof(struct stat),
 		what);
 }
+
 
 /*! \brief Verifies that the BNode has been properly initialized, and then
 	(if necessary) opens the attribute directory on the node's file
@@ -780,6 +821,7 @@ BNode::InitAttrDir()
 	}
 	return fCStatus;	
 }
+
 
 /*!	\var BNode::fFd
 	File descriptor for the given node.
