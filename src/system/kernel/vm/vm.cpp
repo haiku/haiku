@@ -2243,12 +2243,6 @@ vm_init(kernel_args *args)
 		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
-	{
-		void *null;
-		vm_map_physical_memory(vm_kernel_address_space_id(), "bootdir", &null,
-			B_ANY_KERNEL_ADDRESS, args->bootdir_addr.size, B_KERNEL_READ_AREA,
-			args->bootdir_addr.start);
-	}
 
 	// add some debugger commands
 	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
