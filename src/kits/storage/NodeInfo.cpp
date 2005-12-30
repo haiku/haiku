@@ -145,7 +145,8 @@ BNodeInfo::GetType(char *type) const
 	if (error == B_OK && attrInfo.type != B_MIME_STRING_TYPE)
 		error = B_BAD_TYPE;
 	if (error == B_OK && attrInfo.size > B_MIME_TYPE_LENGTH)
-		error = B_BAD_VALUE;	// TODO: B_BAD_DATA?
+		error = B_BAD_DATA;
+
 	// read the data
 	if (error == B_OK) {
 		ssize_t read = fNode->ReadAttr(kNITypeAttribute, attrInfo.type, 0,
@@ -154,9 +155,11 @@ BNodeInfo::GetType(char *type) const
 			error = read;
 		else if (read != attrInfo.size)
 			error = B_ERROR;
-		// to be save, null terminate the string at the very end
-		if (error == B_OK)
-			type[B_MIME_TYPE_LENGTH - 1] = '\0';
+
+		if (error == B_OK) {
+			// attribute strings doesn't have to be null terminated
+			type[min_c(attrInfo.size, B_MIME_TYPE_LENGTH - 1)] = '\0';
+		}
 	}
 	return error;
 }
