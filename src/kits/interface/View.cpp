@@ -4200,7 +4200,17 @@ BView::_UpdateStateForRemove()
 		return;
 
 	fState->UpdateFrom(*fOwner->fLink);
-	fBounds = Bounds();
+	if (!fState->IsValid(B_VIEW_FRAME_BIT)) {
+		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
+
+		status_t code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK) {
+			fOwner->fLink->Read<BPoint>(const_cast<BPoint *>(&fParentOffset));
+			fOwner->fLink->Read<BRect>(const_cast<BRect *>(&fBounds));
+			fState->valid_flags |= B_VIEW_FRAME_BIT;
+		}
+	}
 	
 	// update children as well
 
