@@ -95,7 +95,7 @@ rule KernelAddon
 	Depends $(target) : $(beginGlue) $(endGlue) ;
 
 	# compile and link
-	SetupKernel $(sources) : -fno-pic ;
+	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) ;
 	local linkFlags = -nostdlib -Xlinker -soname=\"$(target)\" ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
 	Main $(target) : $(sources) ;

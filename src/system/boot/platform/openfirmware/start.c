@@ -8,11 +8,11 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/heap.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <platform_arch.h>
 
 #include <string.h>
 
-#include "openfirmware.h"
 #include "console.h"
 #include "machine.h"
 
@@ -81,8 +81,21 @@ determine_machine(void)
 void
 platform_start_kernel(void)
 {
-	printf("kernel entry at %p\n", (void *)gKernelArgs.kernel_image.elf_header.e_entry);
-	of_exit();
+	addr_t kernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
+	addr_t stackTop = gKernelArgs.cpu_kstack[0].start
+		+ gKernelArgs.cpu_kstack[0].size;
+
+	printf("kernel entry at %p\n", (void*)kernelEntry);
+	printf("kernel stack top: %p\n", (void*)stackTop);
+
+	/* TODO: ? 
+	mmu_init_for_kernel();
+	smp_boot_other_cpus();
+	*/
+
+	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry, stackTop);
+
+	panic("Kernel returned! Return value: %ld\n", error);
 }
 
 
@@ -130,11 +143,16 @@ start(void *openFirmwareEntry)
 	// Initialize and take over MMU and set the OpenFirmware callbacks - it 
 	// will ask us for memory after that instead of maintaining it itself
 	// (the kernel will need to adjust the callback later on as well)
-	arch_mmu_init();
 	arch_set_callback();
+	arch_mmu_init();
+
+	if (boot_arch_cpu_init() != B_OK)
+		platform_exit();
+
+	gKernelArgs.platform_args.openfirmware_entry = openFirmwareEntry;
 
 	main(&args);
-		// if everything wents fine, main() never returns
+		// if everything goes fine, main() never returns
 
 	of_exit();
 }

@@ -5,7 +5,7 @@ SubDir HAIKU_TOP src system kernel lib ;
 KernelMergeObject kernel_os_main.o :
 	driver_settings.c
 	fs_info.c
-	: -fno-pic
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
 SEARCH on [ FGristFiles driver_settings.c fs_info.c ]
@@ -103,7 +103,7 @@ KernelMergeObject kernel_posix.o :
 	strstr.c
 	strtok.c
 
-	: -fno-pic
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
 SEARCH_SOURCE += [ FDirName $(librootSources) os arch $(TARGET_ARCH) ] ;
@@ -113,5 +113,5 @@ KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
 	byteorder.S
 	system_time.S
 
-	: -fno-pic
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

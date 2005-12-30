@@ -65,7 +65,13 @@ load_kernel(stage2_args *args, Directory *volume)
 	close(fd);
 
 	if (status < B_OK) {
-		dprintf("loading kernel failed: %ld!\n", status);
+		dprintf("loading kernel failed: %lx!\n", status);
+		return status;
+	}
+
+	status = elf_relocate_image(&gKernelArgs.kernel_image);
+	if (status < B_OK) {
+		dprintf("relocating kernel failed: %lx!\n", status);
 		return status;
 	}
 

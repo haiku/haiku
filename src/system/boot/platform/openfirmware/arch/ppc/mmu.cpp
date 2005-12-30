@@ -4,12 +4,11 @@
  */
 
 
-#include "openfirmware.h"
-
 #include <platform_arch.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <arch_cpu.h>
 #include <arch_mmu.h>
 #include <kernel.h>
@@ -352,7 +351,6 @@ find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTab
 	for (int i = 0; i < length; i++) {
 		struct translation_map *map = &translations[i];
 		//printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
-printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
 
 		// insert range in physical allocated, if it points to physical memory
 
@@ -476,18 +474,19 @@ find_free_virtual_range(void *base, size_t size)
 
 
 extern "C" void *
-arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 protection,
+arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	bool exactAddress)
 {
 	// we only know page sizes
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
-	// set protection to WIMGxPP: -I--xPP
+	// set protection to WIMGNPP: -I---PP
 	// PP:	00 - no access
 	//		01 - read only
 	//		10 - read/write
 	//		11 - read only
-	if (protection & B_WRITE_AREA)
+	uint8 protection = 0;
+	if (_protection & B_WRITE_AREA)
 		protection = 0x22;
 	else
 		protection = 0x21;

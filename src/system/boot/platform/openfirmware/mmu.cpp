@@ -7,9 +7,8 @@
 #include <platform_arch.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <stdarg.h>
-
-#include "openfirmware.h"
 
 
 status_t

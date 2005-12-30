@@ -31,6 +31,7 @@ if $(TARGET_ARCH) = x86 {
 
 KernelLd boot_loader :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
+	boot_arch_$(TARGET_ARCH).o
 	boot_loader.a
 	boot_net.a
 	boot_partitions.a
@@ -68,5 +69,6 @@ actions BuildZbeos {
 
 BuildZbeos zbeos : boot_loader ;
 
-SubInclude HAIKU_TOP src system boot platform ;
+SubInclude HAIKU_TOP src system boot arch $(TARGET_ARCH) ;
 SubInclude HAIKU_TOP src system boot loader ;
+SubInclude HAIKU_TOP src system boot platform ;

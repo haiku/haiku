@@ -8,7 +8,7 @@
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stdio.h>
-#include "openfirmware.h"
+#include <platform/openfirmware/openfirmware.h>
 
 
 #define TRACE_HEAP 1

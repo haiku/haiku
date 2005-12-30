@@ -3,13 +3,14 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <OS.h>
+#include <platform.h>
 
+#include <boot/kernel_args.h>
 #include <platform/openfirmware/openfirmware.h>
 
-bigtime_t
-system_time(void)
+status_t
+platform_init(struct kernel_args *kernelArgs)
 {
-	int result = of_milliseconds();
-	return (result == OF_FAILED ? 0 : bigtime_t(result) * 1000);
+	return of_init(
+		(int(*)(void*))kernelArgs->platform_args.openfirmware_entry);
 }

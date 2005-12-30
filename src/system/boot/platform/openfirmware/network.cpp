@@ -13,8 +13,7 @@
 
 #include <boot/net/Ethernet.h>
 #include <boot/net/NetStack.h>
-
-#include "openfirmware.h"
+#include <platform/openfirmware/openfirmware.h>
 
 
 //#define TRACE_NETWORK

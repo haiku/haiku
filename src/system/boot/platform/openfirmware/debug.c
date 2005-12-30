@@ -6,9 +6,8 @@
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <stdarg.h>
-
-#include "openfirmware.h"
 
 
 /** ToDo: this works only after console_init() was called.

@@ -18,5 +18,5 @@ KernelMergeObject kernel_fs.o :
 	IOScheduler.cpp
 	KPath.cpp
 
-	: -fno-pic -Wno-unused
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 	;

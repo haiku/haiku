@@ -6,6 +6,7 @@
 
 #include "elf.h"
 
+#include <boot/arch.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <elf32.h>
@@ -32,6 +33,69 @@ verify_elf_header(struct Elf32_Ehdr &header)
 		|| !header.IsHostEndian()
 		|| header.e_phentsize != sizeof(struct Elf32_Phdr))
 		return B_BAD_TYPE;
+
+	return B_OK;
+}
+
+
+static status_t
+elf_parse_dynamic_section(struct preloaded_image *image)
+{
+	image->syms = 0;
+	image->rel = 0;
+	image->rel_len = 0;
+	image->rela = 0;
+	image->rela_len = 0;
+	image->pltrel = 0;
+	image->pltrel_len = 0;
+	image->pltrel_type = 0;
+
+	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_section.start;
+	if (!d)
+		return B_ERROR;
+
+	for (int i = 0; d[i].d_tag != DT_NULL; i++) {
+		switch (d[i].d_tag) {
+			case DT_HASH:
+//				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_STRTAB:
+//				image->strtab = (char *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_SYMTAB:
+				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_REL:
+				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_RELSZ:
+				image->rel_len = d[i].d_un.d_val;
+				break;
+			case DT_RELA:
+				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_RELASZ:
+				image->rela_len = d[i].d_un.d_val;
+				break;
+			case DT_JMPREL:
+				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				break;
+			case DT_PLTRELSZ:
+				image->pltrel_len = d[i].d_un.d_val;
+				break;
+			case DT_PLTREL:
+				image->pltrel_type = d[i].d_un.d_val;
+				break;
+
+			default:
+				continue;
+		}
+	}
+
+	// lets make sure we found all the required sections
+//	if (!image->symhash || !image->syms || !image->strtab)
+	if (/* !image->symhash ||*/ !image->syms /*|| !image->strtab*/)
+		return B_ERROR;
 
 	return B_OK;
 }
@@ -288,8 +352,10 @@ elf_load_image(int fd, preloaded_image *image)
 			memset((void *)(region->start + offset), 0, region->size - offset);
 	}
 
-	// modify the dynamic section by the delta of the regions
+	// offset dynamic section, and program entry addresses by the delta of the
+	// regions
 	image->dynamic_section.start += image->text_region.delta;
+	image->elf_header.e_entry += image->text_region.delta;
 
 	image->num_debug_symbols = 0;
 	image->debug_symbols = NULL;
@@ -361,3 +427,69 @@ elf_load_image(Directory *directory, const char *path)
 	return status;
 }
 
+
+status_t
+elf_relocate_image(struct preloaded_image *image)
+{
+	status_t status = elf_parse_dynamic_section(image);
+	if (status != B_OK)
+		return status;
+
+	// deal with the rels first
+	if (image->rel) {
+		TRACE(("total %i relocs\n",
+			image->rel_len / (int)sizeof(struct Elf32_Rel)));
+
+		status = boot_arch_elf_relocate_rel(image, image->rel, image->rel_len);
+		if (status < B_OK)
+			return status;
+	}
+
+	if (image->pltrel) {
+		TRACE(("total %i plt-relocs\n",
+			image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
+
+		if (image->pltrel_type == DT_REL) {
+			status = boot_arch_elf_relocate_rel(image, image->pltrel,
+				image->pltrel_len);
+		} else {
+			status = boot_arch_elf_relocate_rela(image,
+				(struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+		}
+		if (status < B_OK)
+			return status;
+	}
+
+	if (image->rela) {
+		status = boot_arch_elf_relocate_rela(image, image->rela,
+			image->rela_len);
+		if (status < B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+boot_elf_resolve_symbol(struct preloaded_image *image,
+	struct Elf32_Sym *symbol, addr_t *symbolAddress)
+{
+	switch (symbol->st_shndx) {
+		case SHN_UNDEF:
+			// Since we do that only for the kernel, there shouldn't be
+			// undefined symbols.
+			return B_MISSING_SYMBOL;
+		case SHN_ABS:
+			*symbolAddress = symbol->st_value;
+			return B_NO_ERROR;
+		case SHN_COMMON:
+			// ToDo: finish this
+			TRACE(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
+			return B_ERROR;
+		default:
+			// standard symbol
+			*symbolAddress = symbol->st_value + image->text_region.delta;
+			return B_NO_ERROR;
+	}
+}

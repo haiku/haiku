@@ -5,10 +5,10 @@
 
 
 #include <SupportDefs.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <util/kernel_cpp.h>
 
 #include "Handle.h"
-#include "openfirmware.h"
 
 
 Handle::Handle(int handle, bool takeOwnership)

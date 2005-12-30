@@ -18,5 +18,5 @@ KernelMergeObject kernel_device_manager.o :
 	scan.c
 	settings.cpp
 	:
-	-fno-pic -Wno-unused
-	;
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;

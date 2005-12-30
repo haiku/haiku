@@ -6,11 +6,11 @@
 
 #include <SupportDefs.h>
 #include <string.h>
+#include <platform/openfirmware/openfirmware.h>
 #include <util/kernel_cpp.h>
 
 #include "Handle.h"
 #include "console.h"
-#include "openfirmware.h"
 
 
 class ConsoleHandle : public Handle {

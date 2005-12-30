@@ -24,6 +24,7 @@
 #include <kscheduler.h>
 #include <ksyscalls.h>
 #include <messaging.h>
+#include <platform.h>
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
@@ -79,6 +80,9 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 	// if we're not a boot cpu, spin here until someone wakes us up
 	if (smp_trap_non_boot_cpus(currentCPU)) {
 		thread_id thread;
+
+		// init platform
+		platform_init(&sKernelArgs);
 
 		// setup debug output
 		debug_init(&sKernelArgs);

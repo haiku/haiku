@@ -122,6 +122,16 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
 
+HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+HAIKU_KERNEL_PIC_LINKFLAGS = ;
+if $(HAIKU_ARCH) = ppc {
+	# Build a position independent PPC kernel. We need to be able to relocate
+	# the kernel, since the virtual address space layout at boot time is not
+	# fixed.
+	HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
+	HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
+}
+
 # If the environment variable DEBUG_PRINTF is defined we define an equally
 # named macro to the variable value. Some components use the macro to allow
 # another function than printf() to print the debug output. The variable should
@@ -322,6 +332,16 @@ HOST_KERNEL_CCFLAGS += -finline -fno-builtin
 HOST_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 
+HOST_KERNEL_PIC_CCFLAGS = -fno-pic ;
+HOST_KERNEL_PIC_LINKFLAGS = ;
+if $(HOST_ARCH) = ppc {
+	# Build a position independent PPC kernel. We need to be able to relocate
+	# the kernel, since the virtual address space layout at boot time is not
+	# fixed.
+	HOST_KERNEL_PIC_CCFLAGS = -fPIE ;
+	HOST_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
+}
+
 # warning flags
 HOST_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
 	-Wsign-compare ;
@@ -486,6 +506,7 @@ local buildVars =
 	ARFLAGS UNARFLAGS
 
 	KERNEL_CCFLAGS KERNEL_C++FLAGS
+	KERNEL_PIC_CCFLAGS KERNEL_PIC_LINKFLAGS
 	WARNING_CCFLAGS WARNING_C++FLAGS
 
 	KERNEL_WARNING_CCFLAGS KERNEL_WARNING_C++FLAGS

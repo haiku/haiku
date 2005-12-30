@@ -13,4 +13,6 @@
 extern status_t elf_load_image(Directory *directory, const char *path);
 extern status_t elf_load_image(int fd, preloaded_image *image);
 
+extern status_t elf_relocate_image(struct preloaded_image *image);
+
 #endif	/* LOADER_ELF_H */

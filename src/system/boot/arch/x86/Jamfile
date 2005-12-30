@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src system boot arch x86 ;
+
+SubDirC++Flags -fno-rtti ;
+
+KernelMergeObject boot_arch_x86.o :
+	elf.cpp
+;

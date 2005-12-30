@@ -20,5 +20,5 @@ KernelStaticLibrary libppc :
 	arch_vm_translation_map.cpp
 	arch_asm.S
 	:
-	-fno-pic -Wno-unused
-	;
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;

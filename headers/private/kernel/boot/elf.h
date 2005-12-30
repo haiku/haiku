@@ -19,6 +19,15 @@ struct preloaded_image {
 	addr_range	dynamic_section;
 	struct Elf32_Ehdr elf_header;
 
+	struct Elf32_Sym	*syms;
+	struct Elf32_Rel	*rel;
+	int					rel_len;
+	struct Elf32_Rela	*rela;
+	int					rela_len;
+	struct Elf32_Rel	*pltrel;
+	int					pltrel_len;
+	int					pltrel_type;
+
 	struct Elf32_Sym *debug_symbols;
 	const char	*debug_string_table;
 	uint32		num_debug_symbols, debug_string_table_size;
@@ -27,5 +36,16 @@ struct preloaded_image {
 	image_id	id;
 		// the ID field will be filled out in the kernel
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern status_t boot_elf_resolve_symbol(struct preloaded_image *image,
+	struct Elf32_Sym *symbol, addr_t *symbolAddress);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* KERNEL_BOOT_ELF_H */

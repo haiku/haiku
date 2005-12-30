@@ -6,5 +6,5 @@ KernelMergeObject kernel_cache.o :
 	file_cache.cpp
 	vnode_store.cpp
 
-	: -fno-pic -Wno-unused
-	;
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;

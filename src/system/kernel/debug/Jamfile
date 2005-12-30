@@ -9,5 +9,5 @@ KernelMergeObject kernel_debug.o :
 	gdb.c
 	user_debugger.cpp
 
-	: -fno-pic -Wno-unused
-	;
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;

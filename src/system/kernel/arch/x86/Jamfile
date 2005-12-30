@@ -24,8 +24,8 @@ KernelStaticLibrary libx86 :
 	bios.cpp
 	cpuid.S
 	:
-	-fno-pic -Wno-unused
-	;
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Includes [ FGristFiles arch_x86.S arch_interrupts.S ]

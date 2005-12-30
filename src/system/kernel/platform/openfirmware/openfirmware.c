@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <platform/openfirmware/openfirmware.h>
 
-#include "openfirmware.h"
 #include <stdarg.h>
 
 
