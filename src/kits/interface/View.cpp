@@ -4206,8 +4206,8 @@ BView::_UpdateStateForRemove()
 		status_t code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
 			&& code == B_OK) {
-			fOwner->fLink->Read<BPoint>(const_cast<BPoint *>(&fParentOffset));
-			fOwner->fLink->Read<BRect>(const_cast<BRect *>(&fBounds));
+			fOwner->fLink->Read<BPoint>(&fParentOffset);
+			fOwner->fLink->Read<BRect>(&fBounds);
 			fState->valid_flags |= B_VIEW_FRAME_BIT;
 		}
 	}
