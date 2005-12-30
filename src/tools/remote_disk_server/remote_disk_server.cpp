@@ -61,7 +61,6 @@ public:
 
 	int Run()
 	{
-		_OpenImage();
 		_CreateSocket();
 
 		// main server loop
@@ -117,8 +116,18 @@ public:
 	}
 
 private:
-	void _OpenImage()
+	void _OpenImage(bool reopen)
 	{
+		// already open?
+		if (fImageFD >= 0) {
+			if (!reopen)
+				return;
+
+			close(fImageFD);
+			fImageFD = -1;
+			fImageSize = 0;
+		}
+
 		// open the image
 		fImageFD = open(fImagePath, O_RDWR);
 		if (fImageFD < 0) {
@@ -163,6 +172,8 @@ private:
 	{
 		printf("HELLO request\n");
 
+		_OpenImage(true);
+
 		remote_disk_header reply;
 		reply.offset = htonll(fImageSize);
 
@@ -172,6 +183,8 @@ private:
 
 	void _HandleReadRequest()
 	{
+		_OpenImage(false);
+
 		char buffer[2048];
 		remote_disk_header *reply = (remote_disk_header*)buffer;
 		uint64_t offset = ntohll(fRequest->offset);
@@ -214,6 +227,8 @@ private:
 
 	void _HandleWriteRequest()
 	{
+		_OpenImage(false);
+
 		remote_disk_header reply;
 		uint64_t offset = ntohll(fRequest->offset);
 		int16_t size = ntohs(fRequest->size);
