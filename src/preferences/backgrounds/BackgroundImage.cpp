@@ -52,6 +52,9 @@ All rights reserved.
 #include "BackgroundImage.h"
 #include "BackgroundsView.h"
 
+#include <new>
+
+
 const char *kBackgroundImageInfo 			= "be:bgndimginfo";
 const char *kBackgroundImageInfoOffset 		= "be:bgndimginfooffset";
 const char *kBackgroundImageInfoEraseText	= "be:bgndimginfoerasetext";
@@ -63,6 +66,7 @@ const char *kBackgroundImageInfoCacheMode	= "be:bgndimginfocachemode";
 const char *kBackgroundImageSetPeriod		= "be:bgndimgsetperiod";
 const char *kBackgroundImageRandomChange	= "be:bgndimgrandomchange";
 const char *kBackgroundImageCacheMode		= "be:bgndimgcachemode";
+
 
 BackgroundImage *
 BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop, 
@@ -428,13 +432,22 @@ BackgroundImage::SetBackgroundImage(BNode *node)
 
 	PRINT_OBJECT(container);
 
-	char buffer[container.FlattenedSize()];
-	if ((err = container.Flatten(buffer, container.FlattenedSize())) != B_OK)
+	size_t flattenedSize = container.FlattenedSize();
+	char* buffer = new (std::nothrow) char[flattenedSize];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	if ((err = container.Flatten(buffer, flattenedSize)) != B_OK)
 		return err;
 
-	ssize_t size = node->WriteAttr(kBackgroundImageInfo, 0, 0, buffer,
-		container.FlattenedSize());
-	if (size <= 0)
+	ssize_t size = node->WriteAttr(kBackgroundImageInfo, B_MESSAGE_TYPE,
+		0, buffer, flattenedSize);
+
+	delete[] buffer;
+
+	if (size < B_OK)
+		return size;
+	if ((size_t)size != flattenedSize)
 		return B_ERROR;
 
 	return B_OK;

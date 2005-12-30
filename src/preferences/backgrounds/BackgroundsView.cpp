@@ -355,6 +355,7 @@ BackgroundsView::MessageReceived(BMessage *msg)
 		case APPLY_SETTINGS:
 		{
 			Save();
+
 			//NotifyServer();
 			thread_id notify_thread;
 			notify_thread = spawn_thread(BackgroundsView::NotifyThread, "notifyServer",
@@ -584,7 +585,12 @@ BackgroundsView::Save()
 	}
 
 	BNode node(&fCurrentRef);
-	fCurrent->SetBackgroundImage(&node);
+
+	status_t status = fCurrent->SetBackgroundImage(&node);
+	if (status != B_OK) {
+		// TODO: this should be a BAlert!
+		printf("setting background image failed: %s\n", strerror(status));
+	}
 }
 
 
@@ -714,49 +720,54 @@ BackgroundsView::SaveSettings(void)
 
 
 void
-BackgroundsView::LoadSettings(void)
+BackgroundsView::LoadSettings()
 {
 	fSettings.MakeEmpty();
 
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append(SETTINGS_FILE);
-		BFile file(path.Path(),B_READ_ONLY);
-		if (file.InitCheck() == B_OK && fSettings.Unflatten(&file) == B_OK) {
-			PRINT_OBJECT(fSettings);
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
 
-			BPoint point;
-			if (fSettings.FindPoint("pos", &point) == B_OK)
-				Window()->MoveTo(point);
+	path.Append(SETTINGS_FILE);
+	BFile file(path.Path(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
 
-			BString string;
-			if (fSettings.FindString("paneldir", &string) == B_OK)
-				fPanel->SetPanelDirectory(string.String());
-
-			if (fSettings.FindString("folderpaneldir", &string) == B_OK)
-				fFolderPanel->SetPanelDirectory(string.String());
-
-			int32 index = 0;	
-			while (fSettings.FindString("recentfolder", index, &string) == B_OK) {
-				if (index == 0)
-					fWorkspaceMenu->AddSeparatorItem();
-
-				BPath path(string.String());
-				int32 i = AddPath(path);
-				BString s;
-				s << "Folder: " << path.Leaf();
-				BMenuItem *item = new BMenuItem(s.String(), 
-					new BMessage(FOLDER_SELECTED));
-				fWorkspaceMenu->AddItem(item, -i-1+6);
-				index++;
-			}
-			fWorkspaceMenu->SetTargetForItems(this);
-
-			PRINT(("Settings Loaded\n"));
-		} else {
-			printf("Error unflattening settings file %s\n", path.Path());
-		}
+	if (fSettings.Unflatten(&file) != B_OK) {
+		printf("Error unflattening settings file %s\n", path.Path());
+		return;
 	}
+
+	PRINT_OBJECT(fSettings);
+
+	BPoint point;
+	if (fSettings.FindPoint("pos", &point) == B_OK)
+		Window()->MoveTo(point);
+
+	BString string;
+	if (fSettings.FindString("paneldir", &string) == B_OK)
+		fPanel->SetPanelDirectory(string.String());
+
+	if (fSettings.FindString("folderpaneldir", &string) == B_OK)
+		fFolderPanel->SetPanelDirectory(string.String());
+
+	int32 index = 0;	
+	while (fSettings.FindString("recentfolder", index, &string) == B_OK) {
+		if (index == 0)
+			fWorkspaceMenu->AddSeparatorItem();
+
+		BPath path(string.String());
+		int32 i = AddPath(path);
+		BString s;
+		s << "Folder: " << path.Leaf();
+		BMenuItem *item = new BMenuItem(s.String(), 
+			new BMessage(FOLDER_SELECTED));
+		fWorkspaceMenu->AddItem(item, -i-1+6);
+		index++;
+	}
+	fWorkspaceMenu->SetTargetForItems(this);
+
+	PRINT(("Settings Loaded\n"));
 }
 
 
@@ -896,7 +907,7 @@ BackgroundsView::RefsReceived(BMessage *msg)
 
 		if (node.IsFile()) {
 			BNodeInfo nodeInfo(&node);
-			char fileType[256];
+			char fileType[B_MIME_TYPE_LENGTH];
 			if (nodeInfo.GetType(fileType) != B_OK)
 				continue;
 
@@ -937,6 +948,7 @@ BackgroundsView::RefsReceived(BMessage *msg)
 				item->SetTarget(this);
 				fLastWorkspaceIndex = -index-1 + 6;
 			}
+
 			item->SetMarked(true);
 			BMessenger messenger(this);
 			messenger.SendMessage(FOLDER_SELECTED);
