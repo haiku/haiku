@@ -12,7 +12,7 @@
 
 // gfxcpy
 static inline void
-gfxcpy(uint8* dst, uint8* src, int32 numBytes)
+gfxcpy(uint8* dst, const uint8* src, int32 numBytes)
 {
 	uint64* d64 = (uint64*)dst;
 	uint64* s64 = (uint64*)src;
@@ -59,7 +59,7 @@ gfxcpy(uint8* dst, uint8* src, int32 numBytes)
 // gfxcpy32
 // * numBytes is expected to be a multiple of 4
 static inline void
-gfxcpy32(uint8* dst, uint8* src, int32 numBytes)
+gfxcpy32(uint8* dst, const uint8* src, int32 numBytes)
 {
 	uint64* d64 = (uint64*)dst;
 	uint64* s64 = (uint64*)src;
