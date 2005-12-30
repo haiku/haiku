@@ -129,18 +129,24 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fPreview->SetLabel("Preview");
 	AddChild(fPreview);
 
-	BRect rect(15, fPreview->Bounds().bottom - 30, 70, fPreview->Bounds().bottom - 10);
+	BRect rect(10, fPreview->Bounds().bottom - 30, 70, fPreview->Bounds().bottom - 10);
 	fXPlacementText = new BTextControl(rect, "xPlacementText", "X:", NULL, 
 		new BMessage(kMsgImagePlacement), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fXPlacementText->SetDivider(fXPlacementText->StringWidth(fXPlacementText->Label()) + 4.0f);
-	fXPlacementText->TextView()->SetMaxBytes(4);
+	fXPlacementText->TextView()->SetMaxBytes(5);
+	float width, height;
+	fXPlacementText->GetPreferredSize(&width, &height);
+	float delta = fXPlacementText->Bounds().Height() - height;
+	fXPlacementText->MoveBy(0, delta);
+	fXPlacementText->ResizeTo(fXPlacementText->Bounds().Width(), height);
 	fPreview->AddChild(fXPlacementText);
 
-	rect.OffsetBy(65, 0);
+	rect.OffsetBy(70, delta);
 	fYPlacementText = new BTextControl(rect, "yPlacementText", "Y:", NULL, 
 		new BMessage(kMsgImagePlacement), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fYPlacementText->SetDivider(fYPlacementText->StringWidth(fYPlacementText->Label()) + 4.0f);
-	fYPlacementText->TextView()->SetMaxBytes(4);
+	fYPlacementText->TextView()->SetMaxBytes(5);
+	fXPlacementText->ResizeTo(fYPlacementText->Bounds().Width(), height);
 	fPreview->AddChild(fYPlacementText);
 
 	for (int32 i = 0; i < 256; i++) {
@@ -166,7 +172,7 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 		new BMessage(kMsgUpdateColor));
 	rightbox->AddChild(fPicker);
 
-	float delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
+	delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
 	rightbox->ResizeBy(0, delta);
 	fPreview->ResizeBy(0, delta);
 
