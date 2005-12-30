@@ -36,6 +36,7 @@
 #include "RenderingBuffer.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
+#include "SystemPalette.h"
 
 #include "Painter.h"
 
@@ -1302,6 +1303,12 @@ void
 Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 					 BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
 {
+	if (!fBuffer || !fValidClipping
+		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
+		|| !viewRect.IsValid()) {
+		return;
+	}
+
 	if (!fSubpixelPrecise) {
 		// round off viewRect (in a way avoiding too much distortion)
 		viewRect.OffsetTo(roundf(viewRect.left), roundf(viewRect.top));
@@ -1309,132 +1316,226 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 		viewRect.bottom = roundf(viewRect.bottom);
 	}
 
-	switch (format) {
-		case B_RGB32:
-		case B_RGBA32:
-			_DrawBitmap32(srcBuffer, actualBitmapRect, bitmapRect, viewRect);
-			break;
-		default:
-//printf("Painter::_DrawBitmap() - non-native colorspace: %d\n", format);
-			// TODO: this is only a temporary implementation,
-			// to really handle other colorspaces, one would
-			// rather do the conversion with much less overhead,
-			// for example in the nn filter (hm), or in the
-			// scanline generator (better)
-			BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGB32);
-			status_t err = temp.ImportBits(srcBuffer.buf(),
-										   srcBuffer.height() * srcBuffer.stride(),
-										   srcBuffer.stride(),
-										   0, format);
-			if (err >= B_OK) {
-				agg::rendering_buffer convertedBuffer;
-				convertedBuffer.attach((uint8*)temp.Bits(),
-									   (uint32)actualBitmapRect.IntegerWidth() + 1,
-									   (uint32)actualBitmapRect.IntegerHeight() + 1,
-									   temp.BytesPerRow());
-				_DrawBitmap32(convertedBuffer, actualBitmapRect, bitmapRect, viewRect);
-			} else {
-printf("Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
-			}
-			break;
-	}
-}
+	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
+	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
 
-// _DrawBitmap32
-void
-Painter::_DrawBitmap32(const agg::rendering_buffer& srcBuffer,
-					   BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
-{
-typedef agg::span_allocator<agg::rgba8> span_alloc_type;
+	if (xScale == 0.0 || yScale == 0.0)
+		return;
 
-// AGG pipeline
-typedef agg::span_interpolator_linear<> interpolator_type;
-typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
-										 interpolator_type> scaled_span_gen_type;
-typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_image_renderer_type;
-
-
-	if (bitmapRect.IsValid() && bitmapRect.Intersects(actualBitmapRect)
-		&& viewRect.IsValid()) {
-
-		// compensate for the lefttop offset the actualBitmapRect might have
+	// compensate for the lefttop offset the actualBitmapRect might have
 // NOTE: I have no clue why enabling the next call gives a wrong result!
 // According to the BeBook, bitmapRect is supposed to be in native
 // bitmap space! Disabling this call makes it look like the bitmap bounds are
 // assumed to have a left/top coord of 0,0 at all times. This is simply not true.
 //		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
-		actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
+	// actualBitmapRect has the right size, but put it at B_ORIGIN too
+	actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
 
-		// calculate the scaling
-		double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
-		double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
-
-		if (xScale == 0.0 || yScale == 0.0)
-			return;
-
-		// constrain rect to passed bitmap bounds
-		// and transfer the changes to the viewRect
-		if (bitmapRect.left < actualBitmapRect.left) {
-			float diff = actualBitmapRect.left - bitmapRect.left;
-			viewRect.left += diff * xScale;
-			bitmapRect.left = actualBitmapRect.left;
-		}
-		if (bitmapRect.top < actualBitmapRect.top) {
-			float diff = actualBitmapRect.top - bitmapRect.top;
-			viewRect.top += diff;
-			bitmapRect.top = actualBitmapRect.top;
-		}
-		if (bitmapRect.right > actualBitmapRect.right) {
-			float diff = bitmapRect.right - actualBitmapRect.right;
-			viewRect.right -= diff;
-			bitmapRect.right = actualBitmapRect.right;
-		}
-		if (bitmapRect.bottom > actualBitmapRect.bottom) {
-			float diff = bitmapRect.right - actualBitmapRect.bottom;
-			viewRect.bottom -= diff;
-			bitmapRect.bottom = actualBitmapRect.bottom;
-		}
-
-		float xOffset = viewRect.left - (bitmapRect.left * xScale);
-		float yOffset = viewRect.top - (bitmapRect.top * yScale);
-
-		agg::trans_affine srcMatrix;
-//		srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
-
-		agg::trans_affine imgMatrix;
-		imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
-		imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
-		imgMatrix.invert();
-		
-		span_alloc_type sa;
-		interpolator_type interpolator(imgMatrix);
-
-		agg::rasterizer_scanline_aa<> pf;
-		agg::scanline_u8 sl;
-
-		// clip to the current clipping region's frame
-		viewRect = viewRect & fClippingRegion->Frame();
-		// convert to pixel coords (versus pixel indices)
-		viewRect.right++;
-		viewRect.bottom++;
-
-		// path encloses image
-		agg::path_storage path;
-		path.move_to(viewRect.left, viewRect.top);
-		path.line_to(viewRect.right, viewRect.top);
-		path.line_to(viewRect.right, viewRect.bottom);
-		path.line_to(viewRect.left, viewRect.bottom);
-		path.close_polygon();
-
-		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
-
-		pf.add_path(tr);
-
-		scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
-		scaled_image_renderer_type ri(*fBaseRenderer, sg);
-
-		agg::render_scanlines(pf, sl, ri);
+	// constrain rect to passed bitmap bounds
+	// and transfer the changes to the viewRect
+	if (bitmapRect.left < actualBitmapRect.left) {
+		float diff = actualBitmapRect.left - bitmapRect.left;
+		viewRect.left += diff;
+		bitmapRect.left = actualBitmapRect.left;
 	}
+	if (bitmapRect.top < actualBitmapRect.top) {
+		float diff = actualBitmapRect.top - bitmapRect.top;
+		viewRect.top += diff;
+		bitmapRect.top = actualBitmapRect.top;
+	}
+	if (bitmapRect.right > actualBitmapRect.right) {
+		float diff = bitmapRect.right - actualBitmapRect.right;
+		viewRect.right -= diff;
+		bitmapRect.right = actualBitmapRect.right;
+	}
+	if (bitmapRect.bottom > actualBitmapRect.bottom) {
+		float diff = bitmapRect.right - actualBitmapRect.bottom;
+		viewRect.bottom -= diff;
+		bitmapRect.bottom = actualBitmapRect.bottom;
+	}
+
+	double xOffset = viewRect.left - bitmapRect.left;
+	double yOffset = viewRect.top - bitmapRect.top;
+
+	switch (format) {
+		case B_RGB32:
+		case B_RGBA32:
+			// maybe we can use an optimized version
+			if (fDrawingMode == B_OP_COPY && xScale == 1.0 && yScale == 1.0) {
+				_DrawBitmapNoScale32(srcBuffer, xOffset, yOffset, viewRect);
+			} else {
+				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
+			}
+			break;
+		default:
+			if (format == B_CMAP8 && fDrawingMode == B_OP_COPY && xScale == 1.0 && yScale == 1.0) {
+				_DrawBitmapNoScaleCMAP8(srcBuffer, xOffset, yOffset, viewRect);
+			} else {
+				// TODO: this is only a temporary implementation,
+				// to really handle other colorspaces, one would
+				// rather do the conversion with much less overhead,
+				// for example in the nn filter (hm), or in the
+				// scanline generator (better)
+				// maybe we can use an optimized version
+				BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGB32);
+				status_t err = temp.ImportBits(srcBuffer.buf(),
+											   srcBuffer.height() * srcBuffer.stride(),
+											   srcBuffer.stride(),
+											   0, format);
+				if (err >= B_OK) {
+					agg::rendering_buffer convertedBuffer;
+					convertedBuffer.attach((uint8*)temp.Bits(),
+										   (uint32)actualBitmapRect.IntegerWidth() + 1,
+										   (uint32)actualBitmapRect.IntegerHeight() + 1,
+										   temp.BytesPerRow());
+					_DrawBitmapGeneric32(convertedBuffer, xOffset, yOffset, xScale, yScale, viewRect);
+				} else {
+					fprintf(stderr, "Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
+				}
+			}
+			break;
+	}
+}
+
+// _DrawBitmapNoScale32
+void
+Painter::_DrawBitmapNoScale32(const agg::rendering_buffer& srcBuffer,
+							  int32 xOffset, int32 yOffset, BRect viewRect) const
+{
+	// NOTE: this would crash if viewRect was large enough to read outside the
+	// bitmap, so make sure this is not the case before calling this function!
+	uint8* dst = fBuffer->row(0);
+	uint32 dstBPR = fBuffer->stride();
+
+	const uint8* src = srcBuffer.row(0);
+	uint32 srcBPR = srcBuffer.stride();
+
+	int32 left = (int32)viewRect.left;
+	int32 top = (int32)viewRect.top;
+	int32 right = (int32)viewRect.right;
+	int32 bottom = (int32)viewRect.bottom;
+
+	// copy rects, iterate over clipping boxes
+	fBaseRenderer->first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer->xmin(), left);
+		int32 x2 = min_c(fBaseRenderer->xmax(), right);
+		if (x1 <= x2) {
+			int32 y1 = max_c(fBaseRenderer->ymin(), top);
+			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+			if (y1 <= y2) {
+				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
+				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset) * 4;
+
+				for (; y1 <= y2; y1++) {
+					memcpy(dstHandle, srcHandle, (x2 - x1 + 1) * 4);
+					dstHandle += dstBPR;
+					srcHandle += srcBPR;
+				}
+			}
+		}
+	} while (fBaseRenderer->next_clip_box());
+}
+
+// _DrawBitmapNoScaleCMAP8
+void
+Painter::_DrawBitmapNoScaleCMAP8(const agg::rendering_buffer& srcBuffer,
+								 int32 xOffset, int32 yOffset, BRect viewRect) const
+{
+	// NOTE: this would crash if viewRect was large enough to read outside the
+	// bitmap, so make sure this is not the case before calling this function!
+	uint8* dst = fBuffer->row(0);
+	uint32 dstBPR = fBuffer->stride();
+
+	const uint8* src = srcBuffer.row(0);
+	uint32 srcBPR = srcBuffer.stride();
+
+	int32 left = (int32)viewRect.left;
+	int32 top = (int32)viewRect.top;
+	int32 right = (int32)viewRect.right;
+	int32 bottom = (int32)viewRect.bottom;
+
+	const rgb_color* colorMap = SystemPalette();
+
+	// copy rects, iterate over clipping boxes
+	fBaseRenderer->first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer->xmin(), left);
+		int32 x2 = min_c(fBaseRenderer->xmax(), right);
+		if (x1 <= x2) {
+			int32 y1 = max_c(fBaseRenderer->ymin(), top);
+			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+			if (y1 <= y2) {
+				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
+				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset);
+
+				for (; y1 <= y2; y1++) {
+					uint32* d = (uint32*)dstHandle;
+					const uint8* s = srcHandle;
+					for (int32 x = x1; x <= x2; x++) {
+						const rgb_color c = colorMap[*s++];
+						*d++ = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
+					}
+					dstHandle += dstBPR;
+					srcHandle += srcBPR;
+				}
+			}
+		}
+	} while (fBaseRenderer->next_clip_box());
+}
+
+// _DrawBitmapGeneric32
+void
+Painter::_DrawBitmapGeneric32(const agg::rendering_buffer& srcBuffer,
+							  double xOffset, double yOffset,
+							  double xScale, double yScale,
+							  BRect viewRect) const
+{
+	typedef agg::span_allocator<agg::rgba8> span_alloc_type;
+	
+	// AGG pipeline
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
+											 interpolator_type> scaled_span_gen_type;
+	typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_image_renderer_type;
+
+
+	agg::trans_affine srcMatrix;
+//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
+
+	agg::trans_affine imgMatrix;
+	imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
+	imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
+	imgMatrix.invert();
+	
+	span_alloc_type sa;
+	interpolator_type interpolator(imgMatrix);
+
+	agg::rasterizer_scanline_aa<> pf;
+	agg::scanline_u8 sl;
+
+	// clip to the current clipping region's frame
+	viewRect = viewRect & fClippingRegion->Frame();
+	// convert to pixel coords (versus pixel indices)
+	viewRect.right++;
+	viewRect.bottom++;
+
+	// path encloses image
+	agg::path_storage path;
+	path.move_to(viewRect.left, viewRect.top);
+	path.line_to(viewRect.right, viewRect.top);
+	path.line_to(viewRect.right, viewRect.bottom);
+	path.line_to(viewRect.left, viewRect.bottom);
+	path.close_polygon();
+
+	agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
+
+	pf.add_path(tr);
+
+	scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
+	scaled_image_renderer_type ri(*fBaseRenderer, sg);
+
+	agg::render_scanlines(pf, sl, ri);
 }
 
 // _InvertRect32

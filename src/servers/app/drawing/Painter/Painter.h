@@ -234,9 +234,18 @@ class Painter {
 												BRect actualBitmapRect,
 												BRect bitmapRect,
 												BRect viewRect) const;
-			void				_DrawBitmap32(	const agg::rendering_buffer& srcBuffer,
-												BRect actualBitmapRect,
-												BRect bitmapRect,
+			void				_DrawBitmapNoScale32(
+												const agg::rendering_buffer& srcBuffer,
+												int32 xOffset, int32 yOffset,
+												BRect viewRect) const;
+			void				_DrawBitmapNoScaleCMAP8(
+												const agg::rendering_buffer& srcBuffer,
+												int32 xOffset, int32 yOffset,
+												BRect viewRect) const;
+			void				_DrawBitmapGeneric32(
+												const agg::rendering_buffer& srcBuffer,
+												double xOffset, double yOffset,
+												double xScale, double yScale,
 												BRect viewRect) const;
 
 			void				_InvertRect32(	BRect r) const;
