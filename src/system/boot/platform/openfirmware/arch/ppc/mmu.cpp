@@ -480,16 +480,16 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// we only know page sizes
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
-	// set protection to WIMGNPP: -I---PP
+	// set protection to WIMGNPP: -----PP
 	// PP:	00 - no access
 	//		01 - read only
 	//		10 - read/write
 	//		11 - read only
 	uint8 protection = 0;
 	if (_protection & B_WRITE_AREA)
-		protection = 0x22;
+		protection = 0x02;
 	else
-		protection = 0x21;
+		protection = 0x01;
 
 	// find free address large enough to hold "size"
 	void *virtualAddress = find_free_virtual_range(_virtualAddress, size);
