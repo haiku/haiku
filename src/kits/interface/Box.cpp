@@ -6,38 +6,35 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+
+
+#include <Box.h>
+#include <Message.h>
+#include <Region.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <Box.h>
-#include <Message.h>
-
 
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
-		   border_style border)
-	:	BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
+		border_style border)
+	: BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
 		fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	InitObject();
-}
-
-
-BBox::~BBox()
-{
-	ClearAnyLabel();
+	_InitObject();
 }
 
 
 BBox::BBox(BMessage *archive)
-	:	BView(archive)
+	: BView(archive)
 {
-	InitObject(archive);
+	_InitObject(archive);
 
 	const char *string;
 
@@ -57,13 +54,19 @@ BBox::BBox(BMessage *archive)
 }
 
 
+BBox::~BBox()
+{
+	_ClearLabel();
+}
+
+
 BArchivable *
 BBox::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BBox"))
 		return new BBox(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -107,17 +110,18 @@ BBox::Border() const
 void
 BBox::SetLabel(const char *string)
 { 
-	ClearAnyLabel();
+	_ClearLabel();
 
 	if (string) {
-		// Update fBounds
-		fBounds = Bounds();
-		font_height fh;
-		GetFontHeight(&fh);
-
-		fBounds.top = (float)ceil((fh.ascent + fh.descent) / 2.0f);
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
 		fLabel = strdup(string);
+
+		// leave 6 pixels of the frame, and have a gap of 4 pixels between
+		// the frame and the text on both sides
+		fLabelBox = new BRect(6.0f, 0, StringWidth(string) + 14.0f,
+			ceilf(fontHeight.ascent + fontHeight.descent));
 	}
 
 	if (Window())
@@ -128,14 +132,9 @@ BBox::SetLabel(const char *string)
 status_t
 BBox::SetLabel(BView *viewLabel)
 {
-	ClearAnyLabel();
+	_ClearLabel();
 
 	if (viewLabel) {
-		// Update fBounds
-		fBounds = Bounds();
-
-		fBounds.top = ceilf(viewLabel->Bounds().Height() / 2.0f);
-
 		fLabelView = viewLabel;
 		fLabelView->MoveTo(10.0f, 0.0f);
 		AddChild(fLabelView, ChildAt(0));
@@ -165,41 +164,61 @@ BBox::LabelView() const
 void
 BBox::Draw(BRect updateRect)
 {
+	PushState();
+
+	BRect labelBox = BRect(0, 0, 0, 0);
+	if (fLabel != NULL) {
+		labelBox = *fLabelBox;
+		BRegion update(updateRect);
+		update.Exclude(labelBox);
+
+		ConstrainClippingRegion(&update);
+	} else if (fLabelView != NULL)
+		labelBox = fLabelView->Bounds();
+
 	switch (fStyle) {
 		case B_FANCY_BORDER:
-			DrawFancy();
+			_DrawFancy(labelBox);
 			break;
 
 		case B_PLAIN_BORDER:
-			DrawPlain();
+			_DrawPlain(labelBox);
 			break;
 
 		default:
 			break;
 	}
-	
-	if (fLabel) {
-		font_height fh;
-		GetFontHeight(&fh);
 
+	if (fLabel) {
+		ConstrainClippingRegion(NULL);
+
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+/*
 		SetHighColor(ViewColor());
 
 		FillRect(BRect(6.0f, 1.0f, 12.0f + StringWidth(fLabel),
-			(float)ceil(fh.ascent + fh.descent))/*, B_SOLID_LOW*/);
-
+			(float)ceil(fh.ascent + fh.descent)), B_SOLID_LOW);
+*/
 		SetHighColor(0, 0, 0);
-		DrawString(fLabel, BPoint(10.0f, (float)ceil(fh.ascent - fh.descent)
-			+ 1.0f));
+		DrawString(fLabel, BPoint(10.0f,
+			ceilf(fontHeight.ascent - fontHeight.descent) + 1.0f));
 	}
+
+	PopState();
 }
 
 
-void BBox::AttachedToWindow()
+void
+BBox::AttachedToWindow()
 {
 	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
 		SetLowColor(Parent()->ViewColor());
 	}
+
+	// The box could have been resized in the mean time
+	fBounds = Bounds();
 }
 
 
@@ -313,8 +332,8 @@ BBox::FrameMoved(BPoint newLocation)
 
 BHandler *
 BBox::ResolveSpecifier(BMessage *message, int32 index,
-								 BMessage *specifier, int32 what,
-								 const char *property)
+	BMessage *specifier, int32 what,
+	const char *property)
 {
 	return BView::ResolveSpecifier(message, index, specifier, what, property);
 }
@@ -414,7 +433,7 @@ BBox::operator=(const BBox &)
 
 
 void
-BBox::InitObject(BMessage *data)
+BBox::_InitObject(BMessage *data)
 {
 	fLabel = NULL;
 	fBounds = Bounds();
@@ -436,9 +455,10 @@ BBox::InitObject(BMessage *data)
 
 
 void
-BBox::DrawPlain()
+BBox::_DrawPlain(BRect labelBox)
 {
-	BRect r = fBounds;
+	BRect r = Bounds();
+	r.top += labelBox.Height() / 2.0f;
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
@@ -457,9 +477,10 @@ BBox::DrawPlain()
 
 
 void
-BBox::DrawFancy()
+BBox::_DrawFancy(BRect labelBox)
 {
-	BRect r = fBounds;
+	BRect r = Bounds();
+	r.top += labelBox.Height() / 2.0f;
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
@@ -489,13 +510,15 @@ BBox::DrawFancy()
 
 
 void
-BBox::ClearAnyLabel()
+BBox::_ClearLabel()
 {
 	fBounds.top = 0;
-	
+
 	if (fLabel) {
+		delete fLabelBox;
 		free(fLabel);
 		fLabel = NULL;
+		fLabelBox = NULL;
 	} else if (fLabelView) {
 		fLabelView->RemoveSelf();
 		delete fLabelView;
