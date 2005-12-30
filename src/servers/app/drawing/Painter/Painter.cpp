@@ -1298,6 +1298,42 @@ Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
+// copy_bitmap_row_cmap8_copy
+static inline void
+copy_bitmap_row_cmap8_copy(uint8* dst, const uint8* src, int32 numPixels,
+						   const rgb_color* colorMap)
+{
+	uint32* d = (uint32*)dst;
+	const uint8* s = src;
+	while (numPixels--) {
+		const rgb_color c = colorMap[*s++];
+		*d++ = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
+	}
+}
+
+// copy_bitmap_row_cmap8_over
+static inline void
+copy_bitmap_row_cmap8_over(uint8* dst, const uint8* src, int32 numPixels,
+						   const rgb_color* colorMap)
+{
+	uint32* d = (uint32*)dst;
+	const uint8* s = src;
+	while (numPixels--) {
+		const rgb_color c = colorMap[*s++];
+		if (c.alpha)
+			*d = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
+		d++;
+	}
+}
+
+// copy_bitmap_row_bgr32_copy
+static inline void
+copy_bitmap_row_bgr32_copy(uint8* dst, const uint8* src, int32 numPixels,
+						   const rgb_color* colorMap)
+{
+	memcpy(dst, src, numPixels * 4);
+}
+
 // _DrawBitmap
 void
 Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
@@ -1362,15 +1398,24 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 		case B_RGBA32:
 			// maybe we can use an optimized version
 			if (fDrawingMode == B_OP_COPY && xScale == 1.0 && yScale == 1.0) {
-				_DrawBitmapNoScale32(srcBuffer, xOffset, yOffset, viewRect);
+				_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer, xOffset, yOffset, viewRect);
 			} else {
 				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
 			}
 			break;
-		default:
-			if (format == B_CMAP8 && fDrawingMode == B_OP_COPY && xScale == 1.0 && yScale == 1.0) {
-				_DrawBitmapNoScaleCMAP8(srcBuffer, xOffset, yOffset, viewRect);
-			} else {
+		default: {
+			bool generic = true;
+			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {
+				if (fDrawingMode == B_OP_COPY) {
+					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1, srcBuffer, xOffset, yOffset, viewRect);
+					generic = false;
+				} else if (fDrawingMode == B_OP_OVER) {
+					_DrawBitmapNoScale32(copy_bitmap_row_cmap8_over, 1, srcBuffer, xOffset, yOffset, viewRect);
+					generic = false;
+				}
+			}
+
+			if (generic) {
 				// TODO: this is only a temporary implementation,
 				// to really handle other colorspaces, one would
 				// rather do the conversion with much less overhead,
@@ -1394,53 +1439,16 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 				}
 			}
 			break;
+		}
 	}
 }
 
 // _DrawBitmapNoScale32
+template <class F>
 void
-Painter::_DrawBitmapNoScale32(const agg::rendering_buffer& srcBuffer,
+Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
+							  const agg::rendering_buffer& srcBuffer,
 							  int32 xOffset, int32 yOffset, BRect viewRect) const
-{
-	// NOTE: this would crash if viewRect was large enough to read outside the
-	// bitmap, so make sure this is not the case before calling this function!
-	uint8* dst = fBuffer->row(0);
-	uint32 dstBPR = fBuffer->stride();
-
-	const uint8* src = srcBuffer.row(0);
-	uint32 srcBPR = srcBuffer.stride();
-
-	int32 left = (int32)viewRect.left;
-	int32 top = (int32)viewRect.top;
-	int32 right = (int32)viewRect.right;
-	int32 bottom = (int32)viewRect.bottom;
-
-	// copy rects, iterate over clipping boxes
-	fBaseRenderer->first_clip_box();
-	do {
-		int32 x1 = max_c(fBaseRenderer->xmin(), left);
-		int32 x2 = min_c(fBaseRenderer->xmax(), right);
-		if (x1 <= x2) {
-			int32 y1 = max_c(fBaseRenderer->ymin(), top);
-			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
-			if (y1 <= y2) {
-				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
-				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset) * 4;
-
-				for (; y1 <= y2; y1++) {
-					memcpy(dstHandle, srcHandle, (x2 - x1 + 1) * 4);
-					dstHandle += dstBPR;
-					srcHandle += srcBPR;
-				}
-			}
-		}
-	} while (fBaseRenderer->next_clip_box());
-}
-
-// _DrawBitmapNoScaleCMAP8
-void
-Painter::_DrawBitmapNoScaleCMAP8(const agg::rendering_buffer& srcBuffer,
-								 int32 xOffset, int32 yOffset, BRect viewRect) const
 {
 	// NOTE: this would crash if viewRect was large enough to read outside the
 	// bitmap, so make sure this is not the case before calling this function!
@@ -1467,15 +1475,11 @@ Painter::_DrawBitmapNoScaleCMAP8(const agg::rendering_buffer& srcBuffer,
 			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
 			if (y1 <= y2) {
 				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
-				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset);
+				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR + (x1 - xOffset) * bytesPerSourcePixel;
 
 				for (; y1 <= y2; y1++) {
-					uint32* d = (uint32*)dstHandle;
-					const uint8* s = srcHandle;
-					for (int32 x = x1; x <= x2; x++) {
-						const rgb_color c = colorMap[*s++];
-						*d++ = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
-					}
+					copyRowFunction(dstHandle, srcHandle, x2 - x1 + 1, colorMap);
+
 					dstHandle += dstBPR;
 					srcHandle += srcBPR;
 				}

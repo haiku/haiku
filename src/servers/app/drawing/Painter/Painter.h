@@ -234,11 +234,10 @@ class Painter {
 												BRect actualBitmapRect,
 												BRect bitmapRect,
 												BRect viewRect) const;
+			template <class F>
 			void				_DrawBitmapNoScale32(
-												const agg::rendering_buffer& srcBuffer,
-												int32 xOffset, int32 yOffset,
-												BRect viewRect) const;
-			void				_DrawBitmapNoScaleCMAP8(
+												F copyRowFunction,
+												uint32 bytesPerSourcePixel,
 												const agg::rendering_buffer& srcBuffer,
 												int32 xOffset, int32 yOffset,
 												BRect viewRect) const;
