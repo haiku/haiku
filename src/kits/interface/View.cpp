@@ -3642,7 +3642,47 @@ BView::MessageReceived(BMessage *msg)
 	status_t err;
 
 	if (!msg->HasSpecifiers()) {
-		BHandler::MessageReceived(msg);
+		if (msg->what == B_MOUSE_WHEEL_CHANGED) {
+			float deltaX = 0.0f, deltaY = 0.0f;
+
+			BScrollBar *horizontal = ScrollBar(B_HORIZONTAL);
+			if (horizontal != NULL)
+				msg->FindFloat("be:wheel_delta_x", &deltaX);
+
+			BScrollBar *vertical = ScrollBar(B_VERTICAL);
+			if (vertical != NULL)
+				msg->FindFloat("be:wheel_delta_y", &deltaY);
+
+			if (deltaX == 0.0f && deltaY == 0.0f)
+				return;
+
+			float smallStep, largeStep;
+			if (horizontal != NULL) {
+				horizontal->GetSteps(&smallStep, &largeStep);
+
+				// pressing the option key scrolls faster
+				if (modifiers() & B_OPTION_KEY)
+					deltaX *= largeStep;
+				else
+					deltaX *= smallStep;
+
+				horizontal->SetValue(horizontal->Value() + deltaX);
+			}
+
+			if (vertical != NULL) {
+				vertical->GetSteps(&smallStep, &largeStep);
+
+				// pressing the option key scrolls faster
+				if (modifiers() & B_OPTION_KEY)
+					deltaY *= largeStep;
+				else
+					deltaY *= smallStep;
+
+				vertical->SetValue(vertical->Value() + deltaY);
+			}
+		} else
+			BHandler::MessageReceived(msg);
+
 		return;
 	}
 
