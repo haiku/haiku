@@ -373,7 +373,7 @@ ViewLayer::SetUserClipping(const BRegion& region)
 {
 	fDrawState->SetClippingRegion(region);
 	
-	// rebuild clipping
+	// rebuild clipping (for just this view)
 	RebuildClipping(false);
 }
 
@@ -389,11 +389,18 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 	if (bitmap != NULL)
 		bitmap->Acquire();
 
-	fViewBitmap = bitmap;					
+	fViewBitmap = bitmap;
 	fBitmapSource = sourceRect;
 	fBitmapDestination = destRect;
 	fBitmapResizingMode = resizingMode;
 	fBitmapOptions = options;
+
+	// round off destination rect to avoid problems
+	// with drawing the view color around the bitmap
+	fBitmapDestination.OffsetTo(roundf(fBitmapDestination.left),
+								roundf(fBitmapDestination.top));
+	fBitmapDestination.right = roundf(fBitmapDestination.right);
+	fBitmapDestination.bottom = roundf(fBitmapDestination.bottom);
 }
 
 
