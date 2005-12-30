@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Jerome Duval (jerome.duval@free.fr)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -88,67 +89,17 @@ const uint8 kHandCursorData[68] = {
 };
 
 
-BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize, int32 flags)
+BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
+		int32 flags)
 	: BBox(frame, name, resize,
-		flags | B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER),
+		flags | B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER),
 	fCurrent(NULL),
 	fCurrentInfo(NULL),
 	fLastImageIndex(-1),
 	fPathList(1, true),
 	fImageList(1, true)
 {
-	// SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	/* the preview box */
-
-	BFont font(be_plain_font);
-	fPreview = new PreviewBox(BRect(10, 16, 160, 180), "preview");
-	fPreview->SetFont(&font);
-	fPreview->SetLabel("Preview");
-	AddChild(fPreview);
-	
-	BRect xyrect(15, 135, 70, 155);
-	fXPlacementText = new BTextControl(xyrect, "xPlacementText", "X:", NULL, 
-		new BMessage(XY_PLACEMENT));
-	fXPlacementText->SetDivider(12.0);
-	fXPlacementText->TextView()->SetMaxBytes(4);
-	fPreview->AddChild(fXPlacementText);
-
-	xyrect.OffsetBy(65, 0);
-	fYPlacementText = new BTextControl(xyrect, "yPlacementText", "Y:", NULL, 
-		new BMessage(XY_PLACEMENT));
-	fYPlacementText->SetDivider(12.0);
-	fYPlacementText->TextView()->SetMaxBytes(4);
-	fPreview->AddChild(fYPlacementText);
-
-	for (int i = 0; i < 256; i++) {
-		if (i < '0' || i > '9') {
-			fXPlacementText->TextView()->DisallowChar(i);
-			fYPlacementText->TextView()->DisallowChar(i);
-		}
-	}
-
-	fPreView = new PreView(BRect(15,25,135,115), "preView", 
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_SUBPIXEL_PRECISE);
-	fPreview->AddChild(fPreView);
-
-	/* the right box */
-
-	BBox *rightbox = new BBox(BRect(fPreview->Frame().right + 10,
-		fPreview->Frame().top - 6, Frame().right - 10, fPreview->Frame().bottom),
-		"rightbox");
-	AddChild(rightbox);
-
-	fPicker = new BColorControl(BPoint(10, 110), B_CELLS_32x8, 5.0, "Picker", 
-		new BMessage(UPDATE_COLOR));
-	rightbox->AddChild(fPicker);
-
-	BRect cvrect(80, 76, 280, 96);
-	
-	fIconLabelBackground = new BCheckBox(cvrect, "iconLabelBackground", 
-		"Icon label background", new BMessage(ICONLABEL_CHECKBOX));
-	fIconLabelBackground->SetValue(B_CONTROL_ON);
-	rightbox->AddChild(fIconLabelBackground);
+	// we need the "Current Workspace" first to get its height
 
 	BMenuItem *menuItem;
 	fWorkspaceMenu = new BPopUpMenu("pick one");
@@ -163,6 +114,70 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize, in
 		new BMessage(DEFAULT_FOLDER)));
 	fWorkspaceMenu->AddItem(menuItem = new BMenuItem("Other folder" B_UTF8_ELLIPSIS, 
 		new BMessage(OTHER_FOLDER)));
+
+	BMenuField *workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
+		"workspaceMenuField", NULL, fWorkspaceMenu, true);
+	workspaceMenuField->ResizeToPreferred();
+
+	/* the preview box */
+
+	BFont font(be_plain_font);
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+
+	fPreview = new PreviewBox(BRect(10, 8.0 + workspaceMenuField->Bounds().Height() / 2.0f
+		- ceilf(fontHeight.ascent + fontHeight.descent) / 2.0f, 160, 180), "preview");
+	fPreview->SetFont(&font);
+	fPreview->SetLabel("Preview");
+	AddChild(fPreview);
+
+	BRect xyrect(15, 135, 70, 155);
+	fXPlacementText = new BTextControl(xyrect, "xPlacementText", "X:", NULL, 
+		new BMessage(XY_PLACEMENT));
+	fXPlacementText->SetDivider(fXPlacementText->StringWidth(fXPlacementText->Label()) + 4.0f);
+	fXPlacementText->TextView()->SetMaxBytes(4);
+	fPreview->AddChild(fXPlacementText);
+
+	xyrect.OffsetBy(65, 0);
+	fYPlacementText = new BTextControl(xyrect, "yPlacementText", "Y:", NULL, 
+		new BMessage(XY_PLACEMENT));
+	fYPlacementText->SetDivider(fYPlacementText->StringWidth(fYPlacementText->Label()) + 4.0f);
+	fYPlacementText->TextView()->SetMaxBytes(4);
+	fPreview->AddChild(fYPlacementText);
+
+	for (int32 i = 0; i < 256; i++) {
+		if ((i < '0' || i > '9') && i != '-') {
+			fXPlacementText->TextView()->DisallowChar(i);
+			fYPlacementText->TextView()->DisallowChar(i);
+		}
+	}
+
+	fPreView = new PreView(BRect(15, 25, 135, 115), "preView", 
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_SUBPIXEL_PRECISE);
+	fPreview->AddChild(fPreView);
+
+	/* the right box */
+
+	BBox *rightbox = new BBox(BRect(fPreview->Frame().right + 10,
+		7, Frame().right - 10, fPreview->Frame().bottom),
+		"rightbox");
+	rightbox->SetLabel(workspaceMenuField);
+	AddChild(rightbox);
+
+	fPicker = new BColorControl(BPoint(10, 110), B_CELLS_32x8, 5.0, "Picker", 
+		new BMessage(UPDATE_COLOR));
+	rightbox->AddChild(fPicker);
+
+	float delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
+	rightbox->ResizeBy(0, delta);
+	fPreview->ResizeBy(0, delta);
+
+	BRect cvrect(80, 76, 280, 96);
+
+	fIconLabelBackground = new BCheckBox(cvrect, "iconLabelBackground", 
+		"Icon label background", new BMessage(ICONLABEL_CHECKBOX));
+	fIconLabelBackground->SetValue(B_CONTROL_ON);
+	rightbox->AddChild(fIconLabelBackground);
 
 	fImageMenu = new BPopUpMenu("pick one");
 	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(NONE_IMAGE)));
@@ -195,12 +210,6 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize, in
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	rightbox->AddChild(imageMenuField);
 
-	cvrect.right -= 70;
-	cvrect.bottom -= 2;
-	BMenuField *workspaceMenuField = new BMenuField(cvrect, "workspaceMenuField", 
-		NULL, fWorkspaceMenu, true);
-	rightbox->SetLabel(workspaceMenuField);
-
 	fRevert = new BButton(BRect(fPreview->Frame().left, fPreview->Frame().bottom + 10,
 		fPreview->Frame().left + 80, Frame().bottom - 10), "RevertButton",
 		"Revert", new BMessage(REVERT_SETTINGS), B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -212,6 +221,8 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize, in
 		new BMessage(APPLY_SETTINGS), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(fApply);
+
+	ResizeBy(0, delta);
 }
 
 
@@ -242,6 +253,8 @@ BackgroundsView::AllAttached()
 	fFolderPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL, 
 		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
 	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
+
+	Window()->ResizeTo(Frame().Width(), Frame().Height());
 
 	LoadSettings();
 	LoadDesktopFolder();
@@ -1163,7 +1176,7 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 
 
 PreviewBox::PreviewBox(BRect frame, const char *name)
-	: BBox(frame,name)
+	: BBox(frame, name)
 {
 	fIsDesktop = true;
 }
