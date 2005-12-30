@@ -46,8 +46,9 @@ enum {
 	\see SetTo(BNode *node)
 */
 BNodeInfo::BNodeInfo()
-		 : fNode(NULL),
-		   fCStatus(B_NO_INIT)
+	:
+	fNode(NULL),
+	fCStatus(B_NO_INIT)
 {
 }
 
@@ -59,8 +60,9 @@ BNodeInfo::BNodeInfo()
 	\see SetTo(BNode *node)
 */
 BNodeInfo::BNodeInfo(BNode *node)
-		 : fNode(NULL),
-		   fCStatus(B_NO_INIT)
+	:
+	fNode(NULL),
+	fCStatus(B_NO_INIT)
 {
 	fCStatus = SetTo(node);
 }
@@ -189,6 +191,7 @@ BNodeInfo::SetType(const char *type)
 		error = B_BAD_VALUE;
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// write/remove the attribute
 	if (error == B_OK) {
 		if (type) {
@@ -250,6 +253,7 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 			error = B_BAD_VALUE;
 			break;
 	}
+
 	// check parameter and initialization
 	if (error == B_OK
 		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
@@ -257,6 +261,7 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 	}
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// get the attribute info and check type and size of the attr contents
 	attr_info attrInfo;
 	if (error == B_OK)
@@ -264,7 +269,8 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 	if (error == B_OK && attrInfo.type != attrType)
 		error = B_BAD_TYPE;
 	if (error == B_OK && attrInfo.size != attrSize)
-		error = B_BAD_VALUE;	// TODO: B_BAD_DATA?
+		error = B_BAD_DATA;
+
 	// read the attribute
 	if (error == B_OK) {
 		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
@@ -346,6 +352,7 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 			error = B_BAD_VALUE;
 			break;
 	}
+
 	// check parameter and initialization
 	if (error == B_OK && icon
 		&& (icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
@@ -353,6 +360,7 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 	}
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// write/remove the attribute
 	if (error == B_OK) {
 		if (icon) {
@@ -408,6 +416,7 @@ BNodeInfo::GetPreferredApp(char *signature, app_verb verb) const
 	status_t error = (signature && verb == B_OPEN ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// get the attribute info and check type and length of the attr contents
 	attr_info attrInfo;
 	if (error == B_OK)
@@ -415,7 +424,8 @@ BNodeInfo::GetPreferredApp(char *signature, app_verb verb) const
 	if (error == B_OK && attrInfo.type != B_MIME_STRING_TYPE)
 		error = B_BAD_TYPE;
 	if (error == B_OK && attrInfo.size > B_MIME_TYPE_LENGTH)
-		error = B_BAD_VALUE;	// TODO: B_BAD_DATA?
+		error = B_BAD_DATA;
+
 	// read the data
 	if (error == B_OK) {
 		ssize_t read = fNode->ReadAttr(kNIPreferredAppAttribute, attrInfo.type,
@@ -424,9 +434,11 @@ BNodeInfo::GetPreferredApp(char *signature, app_verb verb) const
 			error = read;
 		else if (read != attrInfo.size)
 			error = B_ERROR;
-		// to be save, null terminate the string at the very end
-		if (error == B_OK)
-			signature[B_MIME_TYPE_LENGTH - 1] = '\0';
+
+		if (error == B_OK) {
+			// attribute strings doesn't have to be null terminated
+			signature[min_c(attrInfo.size, B_MIME_TYPE_LENGTH - 1)] = '\0';
+		}
 	}
 	return error;
 }
@@ -459,6 +471,7 @@ BNodeInfo::SetPreferredApp(const char *signature, app_verb verb)
 		error = B_BAD_VALUE;
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// write/remove the attribute
 	if (error == B_OK) {
 		if (signature) {
@@ -498,6 +511,7 @@ BNodeInfo::GetAppHint(entry_ref *ref) const
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// get the attribute info and check type and length of the attr contents
 	attr_info attrInfo;
 	if (error == B_OK)
@@ -507,7 +521,8 @@ BNodeInfo::GetAppHint(entry_ref *ref) const
 	if (error == B_OK && attrInfo.type != B_MIME_STRING_TYPE)
 		error = B_BAD_TYPE;
 	if (error == B_OK && attrInfo.size > B_PATH_NAME_LENGTH)
-		error = B_BAD_VALUE;	// TODO: B_BAD_DATA?
+		error = B_BAD_DATA;
+
 	// read the data
 	if (error == B_OK) {
 		char path[B_PATH_NAME_LENGTH];
@@ -519,8 +534,8 @@ BNodeInfo::GetAppHint(entry_ref *ref) const
 			error = B_ERROR;
 		// get the entry_ref for the path
 		if (error == B_OK) {
-			// to be save, null terminate the path at the very end
-			path[B_PATH_NAME_LENGTH - 1] = '\0';
+			// attribute strings doesn't have to be null terminated
+			path[min_c(attrInfo.size, B_PATH_NAME_LENGTH - 1)] = '\0';
 			error = get_ref_for_path(path, ref);
 		}
 	}
@@ -550,6 +565,7 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 	status_t error = B_OK;
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	// write/remove the attribute
 	if (error == B_OK) {
 		if (ref) {
@@ -727,14 +743,17 @@ BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size iconSiz
 {
 	// check ref param
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
+
 	// init a BNode
 	BNode node;
 	if (error == B_OK)
 		error = node.SetTo(ref);
+
 	// init a BNodeInfo
 	BNodeInfo nodeInfo;
 	if (error == B_OK)
 		error = nodeInfo.SetTo(&node);
+
 	// let the non-static GetTrackerIcon() do the dirty work
 	if (error == B_OK)
 		error = nodeInfo.GetTrackerIcon(icon, iconSize);
