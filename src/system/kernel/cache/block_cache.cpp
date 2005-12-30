@@ -264,8 +264,9 @@ block_cache::FreeBlock(cached_block *block)
 	ASSERT(range != NULL);
 	range->Free(this, block);
 
-	Free(block->original);
-	Free(block->parent_data);
+	if (block->original != NULL || block->parent_data != NULL)
+		panic("block_cache::FreeBlock(): %p, %p\n", block->original, block->parent_data);
+
 #ifdef DEBUG_CHANGED
 	Free(block->compare);
 #endif
@@ -804,8 +805,9 @@ cache_abort_transaction(void *_cache, int32 id)
 			cache->Free(block->original);
 			block->original = NULL;
 		}
-		if (transaction->has_sub_transaction && block->parent_data != block->data) {
-			cache->Free(block->parent_data);
+		if (transaction->has_sub_transaction) {
+			if (block->parent_data != block->data)
+				cache->Free(block->parent_data);
 			block->parent_data = NULL;
 		}
 
