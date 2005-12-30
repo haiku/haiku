@@ -200,10 +200,14 @@ BScrollBar::BScrollBar(BMessage *data)
 
 BScrollBar::~BScrollBar()
 {
+	if (fTarget) {
+		if (fOrientation == B_VERTICAL)
+			fTarget->fVerScroller = NULL;
+		else
+			fTarget->fHorScroller = NULL;
+	}
 	delete fPrivateData;
 	free(fTargetName);
-	// TODO: detaching from target is currently done in DetachedFromWindow(),
-	// maybe it should be done here instead?
 }
 
 // Instantiate
@@ -577,16 +581,6 @@ BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 void
 BScrollBar::DetachedFromWindow()
 {
-	if (fTarget) {
-		if (fOrientation == B_VERTICAL)
-			fTarget->fVerScroller = NULL;
-		else
-			fTarget->fHorScroller = NULL;
-	}
-		
-	fTarget = NULL;
-	free(fTargetName);
-	fTargetName = NULL;
 }
 
 // Draw
