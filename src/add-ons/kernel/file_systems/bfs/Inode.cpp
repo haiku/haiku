@@ -499,7 +499,7 @@ Inode::AddSmallData(Transaction &transaction, NodeGetter &nodeGetter, const char
 {
 	bfs_inode *node = nodeGetter.WritableNode();
 
-	if (node == NULL || name == NULL || data == NULL || type == 0)
+	if (node == NULL || name == NULL || data == NULL)
 		return B_BAD_VALUE;
 
 	// reject any requests that can't fit into the small_data section
