@@ -26,9 +26,6 @@ typedef struct kernel_args {
 	uint32		kernel_args_size;
 	uint32		version;
 
-	uint32		cons_line;
-	addr_range	bootdir_addr;
-
 	struct preloaded_image kernel_image;
 	struct preloaded_image *preloaded_images;
 
