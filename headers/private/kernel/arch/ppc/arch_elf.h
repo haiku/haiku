@@ -44,5 +44,6 @@
 #define	R_PPC_SECTOFF_LO		34
 #define	R_PPC_SECTOFF_HI		35
 #define	R_PPC_SECTOFF_HA		36
+#define	R_PPC_ADDR30			37
 
 #endif	/* _KERNEL_ARCH_PPC_ELF_H */
