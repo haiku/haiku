@@ -942,9 +942,6 @@ BView::SetOrigin(float x, float y)
 		fState->valid_flags |= B_VIEW_ORIGIN_BIT;
 	}
 
-// TODO: Bounds() is effected by SetOrigin() (?),
-// so should we set the COORD_BIT too?
-
 	// our local coord system origin has changed, so when archiving we'll add this too
 	fState->archiving_flags |= B_VIEW_ORIGIN_BIT;
 }
@@ -1474,7 +1471,6 @@ BView::ScrollBy(float dh, float dv)
 
 	// we modify our bounds rectangle by dh/dv coord units hor/ver.
 	fBounds.OffsetBy(dh, dv);
-//	fState->coordSysOrigin += BPoint(dh, dv);
 
 	// then set the new values of the scrollbars
 	if (fHorScroller)
