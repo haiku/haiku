@@ -707,6 +707,7 @@ EventDispatcher::_EventLoop()
 					// that the mouse has exited its views
 					addedTokens = _AddTokens(event, fPreviousMouseTarget,
 						B_POINTER_EVENTS);
+
 					_SendMessage(fPreviousMouseTarget->Messenger(), event,
 						kMouseTransitImportance);
 					previous = fPreviousMouseTarget;
@@ -718,6 +719,8 @@ EventDispatcher::_EventLoop()
 					addedTokens |= _AddTokens(event, current, B_POINTER_EVENTS);
 					if (viewToken != B_NULL_TOKEN)
 						event->AddInt32("_view_token", viewToken);
+					if (addedTokens)
+						_SetFeedFocus(event);
 
 					_SendMessage(current->Messenger(), event, event->what == B_MOUSE_MOVED
 						? kMouseMovedImportance : kStandardImportance);
@@ -738,7 +741,7 @@ EventDispatcher::_EventLoop()
 
 				keyboardEvent = true;
 
-				if (current != NULL && _AddTokens(event, fFocus, B_KEYBOARD_EVENTS)) {
+				if (fFocus != NULL && _AddTokens(event, fFocus, B_KEYBOARD_EVENTS)) {
 					// if tokens were added, we need to explicetly suspend
 					// focus in the event - if not, the event is simply not
 					// forwarded to the target
@@ -751,7 +754,13 @@ EventDispatcher::_EventLoop()
 				// supposed to fall through
 
 			default:
-				current = fFocus;
+				// TODO: the keyboard filter sets the focus - ie. no other
+				//	focus messages that go through the event dispatcher can
+				//	go through.
+				if (event->what == B_MOUSE_WHEEL_CHANGED)
+					current = fPreviousMouseTarget;
+				else
+					current = fFocus;
 
 				if (current != NULL && (!fSuspendFocus || addedTokens))
 					_SendMessage(current->Messenger(), event, kStandardImportance);
