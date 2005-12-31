@@ -3664,7 +3664,7 @@ BView::MessageReceived(BMessage *msg)
 				if (modifiers() & B_OPTION_KEY)
 					deltaX *= largeStep;
 				else
-					deltaX *= smallStep;
+					deltaX *= smallStep * 3;
 
 				horizontal->SetValue(horizontal->Value() + deltaX);
 			}
@@ -3676,7 +3676,7 @@ BView::MessageReceived(BMessage *msg)
 				if (modifiers() & B_OPTION_KEY)
 					deltaY *= largeStep;
 				else
-					deltaY *= smallStep;
+					deltaY *= smallStep * 3;
 
 				vertical->SetValue(vertical->Value() + deltaY);
 			}
