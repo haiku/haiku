@@ -454,7 +454,7 @@ QueryEntryListCollection::QueryEntryListCollection(Model *model, BHandler *targe
 	if (model->Node()->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
 		char *buffer = NULL;
 
-		if ((buffer = (char *)malloc(info.size)) != NULL
+		if ((buffer = (char *)malloc((size_t)info.size)) != NULL
 			&& model->Node()->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
 					(size_t)info.size) == info.size) {
 

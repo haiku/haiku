@@ -99,6 +99,7 @@ void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 const float kDragSlop = 3.0f;
 
 namespace BPrivate {
+
 const char *kAddOnsMenuName = "Add-Ons";
 
 class DraggableContainerIcon : public BView {
@@ -114,7 +115,9 @@ class DraggableContainerIcon : public BView {
 	private:
 		uint32	fDragButton;
 		BPoint	fClickPoint;
+		bool	fDragStarted;
 };
+
 }	// namespace BPrivate
 
 struct AddOneAddonParams {
@@ -141,7 +144,12 @@ ActivateWindowFilter(BMessage *, BHandler **target, BMessageFilter *)
 {
 	BView *view = dynamic_cast<BView*>(*target);
 
-	if (view && !dynamic_cast<BPoseView*>(view) && view->Window())
+	// activate the window if no PoseView or DraggableContainerIcon had been pressed
+	// (those will activate the window themselves, if necessary)
+	if (view
+		&& !dynamic_cast<BPoseView*>(view)
+		&& !dynamic_cast<DraggableContainerIcon*>(view)
+		&& view->Window())
 		view->Window()->Activate(true);
 
 	return B_DISPATCH_MESSAGE;		
@@ -313,7 +321,8 @@ AddMimeTypeString(BObjectList<BString> &list, Model *model)
 DraggableContainerIcon::DraggableContainerIcon(BRect rect, const char *name,
 	uint32 resizeMask)
 	: BView(rect, name, resizeMask, B_WILL_DRAW),
-	fDragButton(0)
+	fDragButton(0),
+	fDragStarted(false)
 {
 }
 
@@ -345,22 +354,31 @@ DraggableContainerIcon::MouseDown(BPoint point)
 			kNormalIcon, B_MINI_ICON)) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
+		fDragStarted = false;
 		fClickPoint = point;
-	}
+	} else
+		fDragButton = 0;
+
+	if (!fDragButton)
+		Window()->Activate(true);
 }
 
 
 void
 DraggableContainerIcon::MouseUp(BPoint /*point*/)
 {
+	if (!fDragStarted)
+		Window()->Activate(true);
+
 	fDragButton = 0;
+	fDragStarted = false;
 }
 
 
 void
 DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/, const BMessage */*message*/)
 {
-	if (fDragButton == 0
+	if (fDragButton == 0 || fDragStarted
 		|| (abs((int32)(point.x - fClickPoint.x)) <= kDragSlop
 			&& abs((int32)(point.y - fClickPoint.y)) <= kDragSlop))
 		return;
@@ -431,6 +449,9 @@ DraggableContainerIcon::MouseMoved(BPoint point, uint32 /*transit*/, const BMess
 			(modifiers() & B_OPTION_KEY) != 0 ? B_COPY_TARGET : B_MOVE_TARGET);
 	}
 
+	fDragStarted = true;
+	fDragButton = 0;
+
 	DragMessage(&message, dragBitmap, B_OP_ALPHA,
 		BPoint(fClickPoint.x + hIconOffset, fClickPoint.y), this);
 }
@@ -445,9 +466,9 @@ DraggableContainerIcon::Draw(BRect /*updateRect*/)
 
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_OVER);
-	float iconOffset = (Bounds().Width()-B_MINI_ICON)/2;
-	IconCache::sIconCache->Draw(window->TargetModel(), this, BPoint(iconOffset, iconOffset),
-		kNormalIcon, B_MINI_ICON, true);
+	float iconOffset = (Bounds().Width() - B_MINI_ICON) / 2;
+	IconCache::sIconCache->Draw(window->TargetModel(), this,
+		BPoint(iconOffset, iconOffset), kNormalIcon, B_MINI_ICON, true);
 }
 
 
@@ -457,39 +478,39 @@ DraggableContainerIcon::Draw(BRect /*updateRect*/)
 BContainerWindow::BContainerWindow(LockingList<BWindow> *list,
 		uint32 containerWindowFlags,
 		window_look look, window_feel feel, uint32 flags, uint32 workspace)
-	:	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
+	: BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
 			workspace),
-		fFileContextMenu(NULL),
-		fWindowContextMenu(NULL),
-		fDropContextMenu(NULL),
-		fVolumeContextMenu(NULL),
-		fDragContextMenu(NULL),
-		fMoveToItem(NULL),
-		fCopyToItem(NULL),
-		fCreateLinkItem(NULL),
-		fOpenWithItem(NULL),
-		fNavigationItem(NULL),
-		fMenuBar(NULL),
-		fNavigator(NULL),
-		fPoseView(NULL),
-		fWindowList(list),
-		fAttrMenu(NULL),
-		fWindowMenu(NULL),
-		fFileMenu(NULL),
-		fSelectionWindow(NULL),
-		fTaskLoop(NULL),
-		fIsTrash(false),
-		fInTrash(false),
-		fIsPrinters(false),
-		fContainerWindowFlags(containerWindowFlags),
-		fBackgroundImage(NULL),
-		fSavedZoomRect(0, 0, -1, -1),
-		fContextMenu(NULL),
-		fDragMessage(NULL),
-		fCachedTypesList(NULL),
-		fStateNeedsSaving(false),
-		fSaveStateIsEnabled(true),
-		fIsWatchingPath(false)
+	fFileContextMenu(NULL),
+	fWindowContextMenu(NULL),
+	fDropContextMenu(NULL),
+	fVolumeContextMenu(NULL),
+	fDragContextMenu(NULL),
+	fMoveToItem(NULL),
+	fCopyToItem(NULL),
+	fCreateLinkItem(NULL),
+	fOpenWithItem(NULL),
+	fNavigationItem(NULL),
+	fMenuBar(NULL),
+	fNavigator(NULL),
+	fPoseView(NULL),
+	fWindowList(list),
+	fAttrMenu(NULL),
+	fWindowMenu(NULL),
+	fFileMenu(NULL),
+	fSelectionWindow(NULL),
+	fTaskLoop(NULL),
+	fIsTrash(false),
+	fInTrash(false),
+	fIsPrinters(false),
+	fContainerWindowFlags(containerWindowFlags),
+	fBackgroundImage(NULL),
+	fSavedZoomRect(0, 0, -1, -1),
+	fContextMenu(NULL),
+	fDragMessage(NULL),
+	fCachedTypesList(NULL),
+	fStateNeedsSaving(false),
+	fSaveStateIsEnabled(true),
+	fIsWatchingPath(false)
 {
 	InitIconPreloader();
 
@@ -728,7 +749,7 @@ BContainerWindow::AddContextMenus()
 	AddDropContextMenus(fDropContextMenu);
 	
 	fDragContextMenu = new BSlowContextMenu("DragContext");
-		//	will get added and built dynamically in ShowContextMenu
+		// will get added and built dynamically in ShowContextMenu
 }
 
 
@@ -795,7 +816,8 @@ BContainerWindow::RepopulateMenus()
 
 	SetupOpenWithMenu(fFileMenu);
 	SetupMoveCopyMenus(selectCount
-		? PoseView()->SelectionList()->FirstItem()->TargetModel()->EntryRef() : NULL, fFileMenu);
+			? PoseView()->SelectionList()->FirstItem()->TargetModel()->EntryRef() : NULL,
+		fFileMenu);
 }
 
 
@@ -847,7 +869,7 @@ BContainerWindow::Init(const BMessage *message)
 		}
 
 		// add folder icon to menu bar
-		if (!TargetModel()->IsRoot() && !TargetModel()->IsVolume() && !IsTrash() && !IsPrintersDir()) {
+		if (!TargetModel()->IsRoot() && !IsTrash() && !IsPrintersDir()) {
 			float iconSize = fMenuBar->Bounds().Height() - 2;
 			if (iconSize < 16)
 				iconSize = 16;
@@ -857,9 +879,10 @@ BContainerWindow::Init(const BMessage *message)
 				"ThisContainer", B_FOLLOW_RIGHT);
 			fMenuBar->AddChild(icon);
 		}
-	} else
+	} else {
 		// add equivalents of the menu shortcuts to the menuless desktop window
 		AddShortcuts();
+	}
 
 	AddContextMenus();
 	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete), PoseView());

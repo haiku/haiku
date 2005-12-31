@@ -1463,22 +1463,23 @@ TTracker::WatchNode(const node_ref *node, uint32 flags,
 	BMessenger target)
 {
 	status_t result = watch_node(node, flags, target);
-	
-	if (result == B_OK || result != ENOMEM)
+	if (result == B_OK || result != B_NO_MEMORY) {
 		// need to make sure this uses the same error value as
 		// the node monitor code
 		return result;
-	
+	}
+
 	PRINT(("failed to start monitoring, trying to allocate more "
 		"node monitors\n"));
 
 	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
-	if (!tracker)
+	if (!tracker) {
 		// we are the file panel only, just fail
 		return result;
+	}
 
 	result = tracker->NeedMoreNodeMonitors();
-	
+
 	if (result != B_OK) {
 		PRINT(("failed to allocate more node monitors, %s\n",
 			strerror(result)));

@@ -652,13 +652,13 @@ BStatusView::Draw(BRect)
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	BeginLineArray(4);
-		AddLine(BPoint(bounds.left, bounds.bottom - 1.0),
+		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
 				BPoint(bounds.left, bounds.top), light);
-		AddLine(BPoint(bounds.left + 1.0, bounds.top),
+		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
 				BPoint(bounds.right, bounds.top), light);
-		AddLine(BPoint(bounds.right, bounds.top + 1.0),
+		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
 				BPoint(bounds.right, bounds.bottom), shadow);
-		AddLine(BPoint(bounds.right - 1.0, bounds.bottom),
+		AddLine(BPoint(bounds.right - 1.0f, bounds.bottom),
 				BPoint(bounds.left, bounds.bottom), shadow);
 	EndLineArray();
 

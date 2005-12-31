@@ -48,12 +48,14 @@ All rights reserved.
 #include "PoseView.h"
 #include "Utilities.h"
 
-const rgb_color kTitleBackground = {220, 220, 220, 255};
-const rgb_color kDarkTitleBackground = {180, 180, 180, 255};
+static rgb_color sTitleBackground;
+static rgb_color sDarkTitleBackground;
+static rgb_color sShineColor;
+static rgb_color sLightShadowColor;
+static rgb_color sShadowColor;
+static rgb_color sDarkShadowColor;
+
 const rgb_color kHighlightColor = {100, 100, 210, 255};
-const rgb_color kLightGray = {150, 150, 150, 255};
-const rgb_color kGray = {100, 100, 100, 255};
-const rgb_color kDarkGray = {70, 70, 70, 255};
 
 const unsigned char kHorizontalResizeCursor[] = {
 	16, 1, 7, 7,
@@ -64,18 +66,54 @@ const unsigned char kHorizontalResizeCursor[] = {
 };
 
 
+static void
+_DrawLine(BPoseView *view, BPoint from, BPoint to)
+{
+	rgb_color highColor = view->HighColor();
+	view->SetHighColor(kHighlightColor);
+	view->StrokeLine(from, to);
+	view->SetHighColor(highColor);
+}
+
+
+static void
+_UndrawLine(BPoseView *view, BPoint from, BPoint to)
+{
+	view->StrokeLine(from, to, B_SOLID_LOW);
+}
+
+
+static void
+_DrawOutline(BView *view, BRect where)
+{
+	where.InsetBy(1, 1);
+	rgb_color highColor = view->HighColor();
+	view->SetHighColor(kHighlightColor);
+	view->StrokeRect(where);
+	view->SetHighColor(highColor);
+}
+
+
+//	#pragma mark -
+
 
 BTitleView::BTitleView(BRect frame, BPoseView *view)
-	:	BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
-		fPoseView(view),
-		fTitleList(10, true),
-		fHorizontalResizeCursor(kHorizontalResizeCursor),
-		fPreviouslyClickedColumnTitle(0)
-		
+	: BView(frame, "TitleView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
+	fPoseView(view),
+	fTitleList(10, true),
+	fHorizontalResizeCursor(kHorizontalResizeCursor),
+	fPreviouslyClickedColumnTitle(0)
 {
-	SetHighColor(kTitleBackground);
-	SetLowColor(kTitleBackground);
-	SetViewColor(kTitleBackground);
+	sTitleBackground = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.88f); // 216 -> 220
+	sDarkTitleBackground = tint_color(sTitleBackground, B_DARKEN_1_TINT);
+	sShineColor = tint_color(sTitleBackground, B_LIGHTEN_MAX_TINT);
+	sLightShadowColor = tint_color(sTitleBackground, B_DARKEN_2_TINT);
+	sShadowColor = tint_color(sTitleBackground, B_DARKEN_4_TINT);
+	sDarkShadowColor = tint_color(sShadowColor, B_DARKEN_2_TINT);
+
+	SetHighColor(sTitleBackground);
+	SetLowColor(sTitleBackground);
+	SetViewColor(sTitleBackground);
 
 	BFont font(be_plain_font);
 	font.SetSize(9);
@@ -84,9 +122,11 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 	Reset();
 }
 
+
 BTitleView::~BTitleView()
 {
 }
+
 
 void
 BTitleView::Reset()
@@ -100,12 +140,13 @@ BTitleView::Reset()
 	}
 }
 
+
 void
 BTitleView::AddTitle(BColumn *column, const BColumn *after)
 {
 	int32 count = fTitleList.CountItems();
 	int32 index;
-	if (after)
+	if (after) {
 		for (index = 0; index < count; index++) {
 			BColumn *titleColumn = fTitleList.ItemAt(index)->Column();
 			
@@ -114,12 +155,13 @@ BTitleView::AddTitle(BColumn *column, const BColumn *after)
 				break;
 			}
 		}
-	else
+	} else
 		index = count;
 
 	fTitleList.AddItem(new BColumnTitle(this, column), index);
 	Invalidate();
 }
+
 
 void
 BTitleView::RemoveTitle(BColumn *column)
@@ -136,11 +178,13 @@ BTitleView::RemoveTitle(BColumn *column)
 	Invalidate();
 }
 
+
 void
 BTitleView::Draw(BRect rect)
 {
 	Draw(rect, false);
 }
+
 
 void 
 BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
@@ -174,12 +218,12 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 		view->FillRect(bounds, B_SOLID_LOW);
 
 	view->BeginLineArray(4);
-	view->AddLine(bounds.LeftTop(), bounds.RightTop(), kGray);
-	view->AddLine(bounds.LeftBottom(), bounds.RightBottom(), kGray);
+	view->AddLine(bounds.LeftTop(), bounds.RightTop(), sShadowColor);
+	view->AddLine(bounds.LeftBottom(), bounds.RightBottom(), sShadowColor);
 	// draw lighter gray and white inset lines
 	bounds.InsetBy(0, 1);	
-	view->AddLine(bounds.LeftBottom(), bounds.RightBottom(), kLightGray);
-	view->AddLine(bounds.LeftTop(), bounds.RightTop(), kWhite);
+	view->AddLine(bounds.LeftBottom(), bounds.RightBottom(), sLightShadowColor);
+	view->AddLine(bounds.LeftTop(), bounds.RightTop(), sShineColor);
 	view->EndLineArray();
 
 	int32 count = fTitleList.CountItems();
@@ -201,8 +245,8 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 	tmp.left = minx;
 	tmp.InsetBy(-1, 0);
 	view->BeginLineArray(2);
-	view->AddLine(tmp.LeftTop(), tmp.LeftBottom(), kGray);
-	view->AddLine(tmp.RightTop(), tmp.RightBottom(), kWhite);
+	view->AddLine(tmp.LeftTop(), tmp.LeftBottom(), sShadowColor);
+	view->AddLine(tmp.RightTop(), tmp.RightBottom(), sShineColor);
 	view->EndLineArray();
 	
 	if (useOffscreen) {
@@ -214,6 +258,7 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 	} else if (trackRectBlitter)
 		(trackRectBlitter)(view, passThru);
 }
+
 
 void
 BTitleView::MouseDown(BPoint where)
@@ -255,7 +300,6 @@ BTitleView::MouseDown(BPoint where)
 	if (resizedTitle) {
 		bool force = static_cast<bool>(buttons & B_TERTIARY_MOUSE_BUTTON);
 		if (force || buttons & B_PRIMARY_MOUSE_BUTTON) {
-			
 			if (force || fPreviouslyClickedColumnTitle != 0) {
 				if (force || system_time() - fPreviousLeftClickTime < doubleClickSpeed) {
 					if (fPoseView->ResizeColumnToWidest(resizedTitle->Column())) {
@@ -269,13 +313,13 @@ BTitleView::MouseDown(BPoint where)
 		}
 	} else if (!title)
 		return;
-	
+
 	ColumnTrackState *trackState;
 	if (resizedTitle)
 		trackState = new ColumnResizeState(this, resizedTitle, where);
 	else
 		trackState = new ColumnDragState(this, title, where);
-	
+
 	// track the mouse
 	// - if it is pressed shortly and not moved, it is a click 
 	//	all else is a track
@@ -306,12 +350,12 @@ BTitleView::MouseDown(BPoint where)
 		if (!pastClick && system_time() > pastClickTime) 
 			pastClick = true;
 
-
 		snooze(15000);
 	}
 
 	delete trackState;
 }
+
 
 void 
 BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
@@ -331,6 +375,7 @@ BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 	_inherited::MouseMoved(where, code, message);
 }
 
+
 BColumnTitle *
 BTitleView::InColumnResizeArea(BPoint where) const
 {
@@ -343,6 +388,7 @@ BTitleView::InColumnResizeArea(BPoint where) const
 
 	return NULL;
 }
+
 
 BColumnTitle *
 BTitleView::FindColumnTitle(BPoint where) const
@@ -357,6 +403,7 @@ BTitleView::FindColumnTitle(BPoint where) const
 	return NULL;
 }
 
+
 BColumnTitle *
 BTitleView::FindColumnTitle(const BColumn *column) const
 {
@@ -370,6 +417,18 @@ BTitleView::FindColumnTitle(const BColumn *column) const
 	return NULL;
 }
 
+
+//	#pragma mark -
+
+
+BColumnTitle::BColumnTitle(BTitleView *view, BColumn *column)
+	:
+	fColumn(column),
+	fParent(view)
+{
+}
+
+
 bool 
 BColumnTitle::InColumnResizeArea(BPoint where) const
 {
@@ -380,11 +439,6 @@ BColumnTitle::InColumnResizeArea(BPoint where) const
 	return edge.Contains(where);
 }
 
-BColumnTitle::BColumnTitle(BTitleView *view, BColumn *column)
-	:	fColumn(column),
-		fParent(view)
-{
-}
 
 BRect
 BColumnTitle::Bounds() const
@@ -395,24 +449,20 @@ BColumnTitle::Bounds() const
 	return bounds;
 }
 
+
 void
 BColumnTitle::Draw(BView *view, bool pressed)
 {
 	BRect bounds(Bounds());
 	BPoint loc(0, bounds.bottom - 4);
 
-	if (pressed)
-		view->SetLowColor(kDarkTitleBackground);
-	else
-		view->SetLowColor(kTitleBackground);
-	
+	view->SetLowColor(pressed ? sDarkTitleBackground : sTitleBackground);
 	view->FillRect(bounds, B_SOLID_LOW);
 
 	BString titleString(fColumn->Title());
 	view->TruncateString(&titleString, B_TRUNCATE_END,
 		bounds.Width() - kTitleColumnExtraMargin);
 	float resultingWidth = view->StringWidth(titleString.String());
-	
 
 	switch (fColumn->Alignment()) {
 		case B_ALIGN_LEFT:
@@ -449,32 +499,38 @@ BColumnTitle::Draw(BView *view, bool pressed)
 
 	BRect rect(bounds);
 
-	view->SetHighColor(kGray);
+	view->SetHighColor(sShadowColor);
 	view->StrokeRect(rect);
-	
+
 	view->BeginLineArray(4);
 	// draw lighter gray and white inset lines
 	rect.InsetBy(1, 1);	
 	view->AddLine(rect.LeftBottom(), rect.RightBottom(),
-		pressed ? kLightGray : kLightGray);
+		pressed ? sLightShadowColor : sLightShadowColor);
 	view->AddLine(rect.LeftTop(), rect.RightTop(),
-		pressed ? kDarkGray: kWhite);
+		pressed ? sDarkShadowColor : sShineColor);
 
 	view->AddLine(rect.LeftTop(), rect.LeftBottom(),
-		pressed ? kDarkGray : kWhite);
+		pressed ? sDarkShadowColor : sShineColor);
 	view->AddLine(rect.RightTop(), rect.RightBottom(),
-		pressed ? kLightGray : kLightGray);
-	
+		pressed ? sLightShadowColor : sLightShadowColor);
+
 	view->EndLineArray();
 }
 
+
+//	#pragma mark -
+
+
 ColumnTrackState::ColumnTrackState(BTitleView *view, BColumnTitle *title,
 	BPoint where)
-	:	fTitleView(view),
-		fTitle(title),
-		fLastPos(where)
+	:
+	fTitleView(view),
+	fTitle(title),
+	fLastPos(where)
 {
 }
+
 
 void 
 ColumnTrackState::MouseMoved(BPoint where, uint32 buttons)
@@ -486,14 +542,19 @@ ColumnTrackState::MouseMoved(BPoint where, uint32 buttons)
 	fLastPos = where;
 }
 
+
+//	#pragma mark -
+
+
 ColumnResizeState::ColumnResizeState(BTitleView *view, BColumnTitle *title,
 	BPoint where)
-	:	ColumnTrackState(view, title, where),
-		fLastLineDrawPos(-1),
-		fInitialTrackOffset((title->fColumn->Offset() + title->fColumn->Width()) - where.x)
+	: ColumnTrackState(view, title, where),
+	fLastLineDrawPos(-1),
+	fInitialTrackOffset((title->fColumn->Offset() + title->fColumn->Width()) - where.x)
 {
 	DrawLine();
 }
+
 
 bool 
 ColumnResizeState::ValueChanged(BPoint where)
@@ -505,20 +566,6 @@ ColumnResizeState::ValueChanged(BPoint where)
 	return newWidth != fTitle->fColumn->Width();
 }
 
-static void
-_DrawLine(BPoseView *view, BPoint from, BPoint to)
-{
-	rgb_color highColor = view->HighColor();
-	view->SetHighColor(kHighlightColor);
-	view->StrokeLine(from, to);
-	view->SetHighColor(highColor);
-}
-
-static void
-_UndrawLine(BPoseView *view, BPoint from, BPoint to)
-{
-	view->StrokeLine(from, to, B_SOLID_LOW);
-}
 
 void 
 ColumnResizeState::Moved(BPoint where, uint32)
@@ -542,17 +589,20 @@ ColumnResizeState::Moved(BPoint where, uint32)
 	fTitleView->Draw(bounds, true, false); 
 }
 
+
 void 
 ColumnResizeState::Done(BPoint)
 {
 	UndrawLine();
 }
 
+
 void 
 ColumnResizeState::Clicked(BPoint, uint32)
 {
 	UndrawLine();
 }
+
 
 void 
 ColumnResizeState::DrawLine()
@@ -569,6 +619,7 @@ ColumnResizeState::DrawLine()
 	_DrawLine(poseView, poseViewBounds.LeftTop(), poseViewBounds.LeftBottom());
 }
 
+
 void 
 ColumnResizeState::UndrawLine()
 {
@@ -583,12 +634,14 @@ ColumnResizeState::UndrawLine()
 }
 
 
+//	#pragma mark -
+
 
 ColumnDragState::ColumnDragState(BTitleView *view, BColumnTitle *columnTitle,
 	BPoint where)
-	:	ColumnTrackState(view, columnTitle, where),
-		fInitialMouseTrackOffset(where.x),
-		fTrackingRemovedColumn(false)
+	: ColumnTrackState(view, columnTitle, where),
+	fInitialMouseTrackOffset(where.x),
+	fTrackingRemovedColumn(false)
 {
 	ASSERT(columnTitle);
 	ASSERT(fTitle);
@@ -596,15 +649,6 @@ ColumnDragState::ColumnDragState(BTitleView *view, BColumnTitle *columnTitle,
 	DrawPressNoOutline();
 }
 
-static void
-_DrawOutline(BView *view, BRect where)
-{
-	where.InsetBy(1, 1);
-	rgb_color highColor = view->HighColor();
-	view->SetHighColor(kHighlightColor);
-	view->StrokeRect(where);
-	view->SetHighColor(highColor);
-}
 
 // ToDo:
 // Autoscroll when dragging column left/right
@@ -613,7 +657,6 @@ _DrawOutline(BView *view, BRect where)
 void 
 ColumnDragState::Moved(BPoint where, uint32)
 {
-
 	// figure out where we are with the mouse
 	BRect titleBounds(fTitleView->Bounds());
 	bool overTitleView = titleBounds.Contains(where);
@@ -685,6 +728,7 @@ ColumnDragState::Moved(BPoint where, uint32)
 		UndrawOutline();
 }
 
+
 void 
 ColumnDragState::Done(BPoint)
 {
@@ -692,6 +736,7 @@ ColumnDragState::Done(BPoint)
 		fTitleView->EndRectTracking();
 	UndrawOutline();
 }
+
 
 void 
 ColumnDragState::Clicked(BPoint, uint32)
@@ -731,6 +776,7 @@ ColumnDragState::Clicked(BPoint, uint32)
 	poseView->Invalidate();
 }
 
+
 void 
 ColumnDragState::Pressing(BPoint, uint32)
 {
@@ -743,11 +789,13 @@ ColumnDragState::ValueChanged(BPoint)
 	return true;
 }
 
+
 void 
 ColumnDragState::DrawPressNoOutline()
 {
 	fTitleView->Draw(fTitleView->Bounds(), true, false, fTitle);
 }
+
 
 void 
 ColumnDragState::DrawOutline(float pos)
@@ -756,6 +804,7 @@ ColumnDragState::DrawOutline(float pos)
 	outline.OffsetBy(pos, 0);
 	fTitleView->Draw(fTitleView->Bounds(), true, false, fTitle, _DrawOutline, outline);
 }
+
 
 void 
 ColumnDragState::UndrawOutline()

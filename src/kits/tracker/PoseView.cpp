@@ -217,7 +217,6 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fIsWatchingDateFormatChange(false),
 	fHasPosesInClipboard(false)
 {
-	
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive = TrackerSettings().ShowSelectionWhenInactive();
 	fTransparentSelection = TrackerSettings().TransparentSelection();
@@ -301,7 +300,7 @@ BPoseView::InitCommon()
 	EnableScrollBars();
 
 	StartWatching();
-		// trun on volume node monitor, metamime monitor, etc.
+		// turn on volume node monitor, metamime monitor, etc.
 
 	if (window && window->ShouldAddCountView())
 		AddCountView();
@@ -776,7 +775,11 @@ void
 BPoseView::StartWatching()
 {
 	// watch volumes
-	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
+	TTracker::WatchNode(NULL, B_WATCH_MOUNT, this);
+
+	if (TargetModel() != NULL)
+		TTracker::WatchNode(TargetModel()->NodeRef(), B_WATCH_ATTR, this);
+
 	BMimeType::StartWatching(BMessenger(this));
 }
 
@@ -2864,7 +2867,7 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage *clipboardReport)
 	fSelectionList->MakeEmpty();
 	fMimeTypesInSelectionCache.MakeEmpty();
 
-	SetHasPosesInClipboard(hasPosesInClipboard | fHasPosesInClipboard);
+	SetHasPosesInClipboard(hasPosesInClipboard || fHasPosesInClipboard);
 
 	if (fullInvalidateNeeded)
 		Invalidate();
@@ -2959,29 +2962,16 @@ BPoseView::NewFileFromTemplate(const BMessage *message)
 	// try to place new item at click point or under mouse if possible
 	PlaceFolder(&destEntryRef, message);
 
-	if (dir.InitCheck() == B_OK) {
-		// special-case directories - start renaming them
-		int32 index;
-		BPose *pose = EntryCreated(TargetModel()->NodeRef(), &destNodeRef,
-			destEntryRef.name, &index);
+	// start renaming the entry
+	int32 index;
+	BPose *pose = EntryCreated(TargetModel()->NodeRef(), &destNodeRef,
+		destEntryRef.name, &index);
 
-		if (pose) {					
-			UpdateScrollRange();
-			CommitActivePose();
-			SelectPose(pose, index);
-			pose->EditFirstWidget(BPoint(0, index * fListElemHeight), this);
-		}
-	} else {
-		// open the corresponding application
-		BMessage openMessage(B_REFS_RECEIVED);
-		openMessage.AddRef("refs", &destEntryRef);
-
-		// add a messenger to the launch message that will be used to
-		// dispatch scripting calls from apps to the PoseView
-		openMessage.AddMessenger("TrackerViewToken", BMessenger(this));
-
-		if (fSelectionHandler)
-			fSelectionHandler->PostMessage(&openMessage);
+	if (pose) {					
+		UpdateScrollRange();
+		CommitActivePose();
+		SelectPose(pose, index);
+		pose->EditFirstWidget(BPoint(0, index * fListElemHeight), this);
 	}
 }
 
@@ -3878,7 +3868,7 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 
 	// look for srcWindow to determine whether drag was initiated in tracker
 	BContainerWindow *srcWindow = NULL;
-	message->FindPointer("src_window", (void **) &srcWindow);
+	message->FindPointer("src_window", (void **)&srcWindow);
 
 	if (!srcWindow) {
 		// drag was from another app
@@ -4063,7 +4053,7 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 			}
 
 			// handle refs by performing a copy
-			BObjectList<entry_ref> *entryList = new BObjectList<entry_ref>();
+			BObjectList<entry_ref> *entryList = new BObjectList<entry_ref>(10, true);
 
 			for (int32 index = 0; ; index++) {
 				// copy all enclosed refs into a list
@@ -5097,6 +5087,19 @@ BPoseView::AttributeChanged(const BMessage *message)
 
 	const char *attrName;
 	message->FindString("attr", &attrName);
+
+	if (*TargetModel()->NodeRef() == itemNode && TargetModel()->AttrChanged(attrName)) {
+		// the icon of our target has changed, update drag icon
+		// TODO: make this simpler (ie. store the icon with the window)
+		BView *view = Window()->FindView("MenuBar");
+		if (view != NULL) {
+			view = view->FindView("ThisContainer");
+			if (view != NULL) {
+				IconCache::sIconCache->IconChanged(TargetModel());
+				view->Invalidate();
+			}
+		}
+	}
 
 	int32 index;
 	BPose *pose = fPoseList->DeepFindPose(&itemNode, &index);
@@ -8571,54 +8574,61 @@ BPoseView::MouseMoved(BPoint mouseLoc, uint32 moveCode, const BMessage *message)
 	if (!fDropEnabled || !message)
 		return;
 
-	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
+	BContainerWindow* window = ContainerWindow();
 	if (!window)
 		return;
 
 	switch (moveCode) {
 		case B_INSIDE_VIEW:
 		case B_ENTERED_VIEW:
-			UpdateDropTarget(mouseLoc, message, window->ContextMenu());	
-			if (fDropTarget) {
-				bigtime_t dropMenuDelay;
-				get_click_speed(&dropMenuDelay);
-				dropMenuDelay *= 3;
-				
-				BContainerWindow *window = ContainerWindow();
-				if (!window || !message || window->ContextMenu())
+		{
+			UpdateDropTarget(mouseLoc, message, window->ContextMenu());
+			if (fAutoScrollState == kAutoScrollOff) {
+				// turn on auto scrolling if it's not yet on
+				fAutoScrollState = kWaitForTransition;
+				window->SetPulseRate(100000);
+			}
+
+			bigtime_t dropActionDelay;
+			get_click_speed(&dropActionDelay);
+			dropActionDelay *= 3;
+
+			if (window->ContextMenu())
+				break;
+
+			bigtime_t clickTime = system_time();
+			BPoint loc;
+			uint32 buttons;
+			GetMouse(&loc, &buttons);
+			for (;;) {
+				if (buttons == 0
+					|| fabs(loc.x - mouseLoc.x) > 4 || fabs(loc.y - mouseLoc.y) > 4) {
+					// only loop if mouse buttons are down
+					// moved the mouse, cancel showing the context menu
 					break;
+				}
 
-				bigtime_t clickTime = system_time();
-				BPoint loc;
-				uint32 buttons;
-				GetMouse(&loc, &buttons);
-				for (;;) {
-					if (buttons == 0
-						|| fabs(loc.x - mouseLoc.x) > 4 || fabs(loc.y - mouseLoc.y) > 4)
-						// only loop if mouse buttons are down
-						// moved the mouse, cancel showing the context menu
-						break;
-
-					//	handle drag and drop
-					bigtime_t now = system_time();
-					//	use shift key to get around over-loading of Control key
-					//	for context menus and auto-dnd menu
-					if (((modifiers() & B_SHIFT_KEY)
-							&& (now - clickTime) > 200000)
-						|| now - clickTime > dropMenuDelay) {
-						// let go of button or pressing for a while, show menu now
+				//	handle drag and drop
+				bigtime_t now = system_time();
+				//	use shift key to get around over-loading of Control key
+				//	for context menus and auto-dnd menu
+				if (((modifiers() & B_SHIFT_KEY) && (now - clickTime) > 200000)
+					|| now - clickTime > dropActionDelay) {
+					// let go of button or pressing for a while, show menu now
+					if (fDropTarget) {
 						window->DragStart(message);				
 						FrameForPose(fDropTarget, true, &fStartFrame);
 						ShowContextMenu(mouseLoc);					
-						break;
-					}
-		
-					snooze(10000);
-					GetMouse(&loc, &buttons);
+					} else
+						window->Activate();
+					break;
 				}
 
+				snooze(10000);
+				GetMouse(&loc, &buttons);
 			}
 			break;
+		}
 
 		case B_EXITED_VIEW:
 			// ToDo:

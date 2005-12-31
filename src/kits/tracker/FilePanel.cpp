@@ -34,6 +34,7 @@ All rights reserved.
 
 // Implementation for the public FilePanel object.
 
+#include <BeBuild.h>
 #include <Debug.h>
 #include <FilePanel.h>
 
@@ -41,18 +42,23 @@ All rights reserved.
 #include "Commands.h"
 #include "FilePanelPriv.h"
 
+
 // prototypes for some private kernel calls that will some day be public
 #if B_BEOS_VERSION_DANO
-#define _IMPEXP_ROOT
+#	define _IMPEXP_ROOT
+#	define _IMPEXP_TRACKER
 #endif
 extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
-#if B_BEOS_VERSION_DANO
-#undef _IMPEXP_ROOT
-#endif
 
 // these two calls are deprecated
 extern _IMPEXP_TRACKER void run_open_panel();
 extern _IMPEXP_TRACKER void run_save_panel();
+
+#if B_BEOS_VERSION_DANO
+#	undef _IMPEXP_ROOT
+#	undef _IMPEXP_TRACKER
+#endif
+
 
 void
 run_open_panel()
@@ -65,6 +71,9 @@ run_save_panel()
 {
 	(new TFilePanel(B_SAVE_PANEL))->Show();
 }
+
+
+//	#pragma mark -
 
 
 BFilePanel::BFilePanel(file_panel_mode mode, BMessenger *target,

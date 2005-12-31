@@ -234,7 +234,12 @@ BDeskWindow::CreatePoseView(Model *model)
 	rgb_color desktopColor = screen.DesktopColor();
 	if (desktopColor.alpha != 255) {
 		desktopColor.alpha = 255;
+#if B_BEOS_VERSION > B_BEOS_VERSION_5
+		// This call seems to have the power to cause R5 to freeze!
+		// Please report if commenting this out helped or helped not
+		// on your system
 		screen.SetDesktopColor(desktopColor);
+#endif
 	}
 
 	fPoseView->SetViewColor(desktopColor);
