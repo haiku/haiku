@@ -37,6 +37,9 @@
 #	define TRACE(x) ;
 #endif
 
+// This macro is used for fatal situations that are acceptable in a running
+// system, like out of memory situations - should only panic for debugging.
+#define FATAL(x) panic x
 
 struct cache_transaction {
 	cache_transaction();
@@ -238,6 +241,9 @@ block_cache::Free(void *address)
 		return;
 
 	block_range *range = GetRange(address);
+	if (range == NULL)
+		panic("no range for address %p\n", address);
+
 	ASSERT(range != NULL);
 	range->Free(this, address);
 
@@ -282,11 +288,14 @@ cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
 	cached_block *block = new cached_block;
-	if (block == NULL)
+	if (block == NULL) {
+		FATAL(("could not allocate block!\n"));
 		return NULL;
+	}
 
 	block_range *range = GetFreeRange();
 	if (range == NULL) {
+		FATAL(("could not get range!\n"));
 		delete block;
 		return NULL;
 	}
@@ -521,6 +530,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 
 		if (read_pos(cache->fd, blockNumber * blockSize, block->data, blockSize) < blockSize) {
 			cache->FreeBlock(block);
+			FATAL(("could not read block %Ld\n", blockNumber));
 			return NULL;
 		}
 	}
@@ -593,6 +603,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		// we already have data, so we need to save it
 		block->original = cache->Allocate();
 		if (block->original == NULL) {
+			FATAL(("could not allocate original\n"));
 			put_cached_block(cache, block);
 			return NULL;
 		}
@@ -604,6 +615,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
 			// ToDo: maybe we should just continue the current transaction in this case...
+			FATAL(("could not allocate parent\n"));
 			put_cached_block(cache, block);
 			return NULL;
 		}
@@ -635,7 +647,7 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 	ssize_t written = write_pos(cache->fd, block->block_number * blockSize, data, blockSize);
 
 	if (written < blockSize) {
-		dprintf("could not write back block %Ld (%s)\n", block->block_number, strerror(errno));
+		FATAL(("could not write back block %Ld (%s)\n", block->block_number, strerror(errno)));
 		return B_IO_ERROR;
 	}
 
