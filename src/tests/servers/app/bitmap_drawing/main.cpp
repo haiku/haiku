@@ -61,11 +61,19 @@ class TestView : public BView {
 		double y;
 		double direction_x;
 		double direction_y;
+		double velocity_x;
+		double velocity_y;
+	};
+	struct color_cycle {
+		uint8 value;
+		double direction;
 	};
 
 			void	_FillBitmap(point* polygon);
 			void	_InitPolygon(const BRect& b, point* polygon) const;
+			void	_InitColor(color_cycle* color) const;
 			void	_MorphPolygon(const BRect& b, point* polygon);
+			void	_MorphColor(color_cycle* color);
 
 	BBitmap*		fBitmap;
 	BView*			fOffscreenView;
@@ -92,6 +100,7 @@ class TestView : public BView {
 	BPoint			fLastMousePos;
 
 	point			fPolygon[4];
+	color_cycle		fColor[3];
 };
 
 // constructor
@@ -102,6 +111,8 @@ TestView::TestView(BRect frame, const char* name,
 //	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_CMAP8)),
 //	  fBitmap(new BBitmap(BRect(0, 0, 32 - 1, 8 - 1), 0, B_GRAY8)),
 	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_RGB32, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 639, 479), B_RGB32, true)),
+//	  fBitmap(new BBitmap(BRect(0, 0, 639, 479), B_CMAP8, true)),
 //	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_CMAP8, true)),
 //	  fBitmap(new BBitmap(BRect(0, 0, 199, 99), B_GRAY8, true)),
 	  fOffscreenView(new BView(fBitmap->Bounds(), "Offscreen view",
@@ -134,12 +145,13 @@ BRect b(0.0, 10.0, 10.0, 30.0);
 printf("Intersects: %d\n", a.Intersects(b));*/
 	if (fBitmap->Lock()) {
 		fBitmap->AddChild(fOffscreenView);
-		fOffscreenView->SetHighColor(255, 0, 0);
+		fOffscreenView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 		fBitmap->Unlock();
 	}
 
 	srand((long int)system_time());
 	_InitPolygon(fBitmap->Bounds(), fPolygon);
+	_InitColor(fColor);
 
 	_ResetRect();
 }
@@ -166,6 +178,7 @@ TestView::MessageReceived(BMessage* message)
 		}
 		case MSG_TICK:
 			_MorphPolygon(fBitmap->Bounds(), fPolygon);
+			_MorphColor(fColor);
 			_FillBitmap(fPolygon);
 			Invalidate(fBitmapRect);
 			break;
@@ -179,6 +192,10 @@ TestView::MessageReceived(BMessage* message)
 void
 TestView::Draw(BRect updateRect)
 {
+	SetDrawingMode(B_OP_ALPHA);
+	DrawBitmap(fBitmap, fBitmap->Bounds(), fBitmapRect);
+
+	SetDrawingMode(B_OP_COPY);
 	// background arround bitmap
 	BRect topOfBitmap(updateRect.left, updateRect.top, updateRect.right, fBitmapRect.top - 1);
 	if (topOfBitmap.IsValid())
@@ -195,9 +212,6 @@ TestView::Draw(BRect updateRect)
 	BRect bottomOfBitmap(updateRect.left, fBitmapRect.bottom + 1, updateRect.right, updateRect.bottom);
 	if (bottomOfBitmap.IsValid())
 		FillRect(bottomOfBitmap, B_SOLID_LOW);
-
-	// bitmap
-	DrawBitmap(fBitmap, fBitmap->Bounds(), fBitmapRect);
 
 	// indicate the frame to see any errors in the drawing code
 	rgb_color red = (rgb_color){ 255, 0, 0, 255 };
@@ -382,9 +396,14 @@ TestView::_FillBitmap(point* polygon)
 {
 	if (fBitmap->Lock()) {
 		fOffscreenView->SetDrawingMode(B_OP_COPY);
-		fOffscreenView->FillRect(fOffscreenView->Bounds(), B_SOLID_LOW);
+		fOffscreenView->SetHighColor(0, 0, 0, 30);
+		fOffscreenView->FillRect(fOffscreenView->Bounds());
 
-		fOffscreenView->SetDrawingMode(B_OP_OVER);
+		fOffscreenView->SetDrawingMode(B_OP_ALPHA);
+		fOffscreenView->SetHighColor(fColor[0].value,
+									 fColor[1].value,
+									 fColor[2].value,
+									 30);
 		fOffscreenView->SetPenSize(4);
 		fOffscreenView->SetLineMode(B_BUTT_CAP, B_ROUND_JOIN);
 
@@ -413,48 +432,106 @@ TestView::_InitPolygon(const BRect& b, point* polygon) const
 	polygon[0].y = b.top;
 	polygon[0].direction_x = random_number_between(-SPEED, SPEED);
 	polygon[0].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[0].velocity_x = 0.0;
+	polygon[0].velocity_y = 0.0;
 	polygon[1].x = b.right;
 	polygon[1].y = b.top;
 	polygon[1].direction_x = random_number_between(-SPEED, SPEED);
 	polygon[1].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[1].velocity_x = 0.0;
+	polygon[1].velocity_y = 0.0;
 	polygon[2].x = b.right;
 	polygon[2].y = b.bottom;
 	polygon[2].direction_x = random_number_between(-SPEED, SPEED);
 	polygon[2].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[2].velocity_x = 0.0;
+	polygon[2].velocity_y = 0.0;
 	polygon[3].x = b.left;
 	polygon[3].y = b.bottom;
 	polygon[3].direction_x = random_number_between(-SPEED, SPEED);
 	polygon[3].direction_y = random_number_between(-SPEED, SPEED);
+	polygon[3].velocity_x = 0.0;
+	polygon[3].velocity_y = 0.0;
+}
+
+// _InitColor
+void
+TestView::_InitColor(color_cycle* color) const
+{
+	color[0].value = 0;
+	color[0].direction = random_number_between(-SPEED * 4, SPEED * 4);
+	color[1].value = 0;
+	color[1].direction = random_number_between(-SPEED * 4, SPEED * 4);
+	color[2].value = 0;
+	color[2].direction = random_number_between(-SPEED * 4, SPEED * 4);
 }
 
 // morph
 inline void
-morph(double* value, double* direction, double min, double max)
+morph(double* value, double* direction, double* velocity, double min, double max)
 {
-	*value += *direction;
-	if (*value < min) {
-		*value = min;
+	*value += *velocity;
+
+	// flip direction if necessary
+	if (*value < min && *direction < 0.0) {
 		*direction = -*direction;
-	} else if (*value > max) {
-		*value = max;
+	} else if (*value > max && *direction > 0.0) {
 		*direction = -*direction;
 	}
+
+	// accelerate velocity
+	if (*direction < 0.0) {
+		if (*velocity > *direction)
+			*velocity += *direction / 10.0;
+		// truncate velocity
+		if (*velocity < *direction)
+			*velocity = *direction;
+	} else {
+		if (*velocity < *direction)
+			*velocity += *direction / 10.0;
+		// truncate velocity
+		if (*velocity > *direction)
+			*velocity = *direction;
+	}
+}
+
+// morph
+inline void
+morph(uint8* value, double* direction)
+{
+	int32 v = (int32)(*value + *direction);
+	if (v < 0) {
+		v = 0;
+		*direction = -*direction;
+	} else if (v > 255) {
+		v = 255;
+		*direction = -*direction;
+	}
+	*value = (uint8)v;
 }
 
 // _MorphPolygon
 void
 TestView::_MorphPolygon(const BRect& b, point* polygon)
 {
-	morph(&polygon[0].x, &polygon[0].direction_x, b.left, b.right);
-	morph(&polygon[1].x, &polygon[1].direction_x, b.left, b.right);
-	morph(&polygon[2].x, &polygon[2].direction_x, b.left, b.right);
-	morph(&polygon[3].x, &polygon[3].direction_x, b.left, b.right);
-	morph(&polygon[0].y, &polygon[0].direction_y, b.top, b.bottom);
-	morph(&polygon[1].y, &polygon[1].direction_y, b.top, b.bottom);
-	morph(&polygon[2].y, &polygon[2].direction_y, b.top, b.bottom);
-	morph(&polygon[3].y, &polygon[3].direction_y, b.top, b.bottom);
+	morph(&polygon[0].x, &polygon[0].direction_x, &polygon[0].velocity_x, b.left, b.right);
+	morph(&polygon[1].x, &polygon[1].direction_x, &polygon[1].velocity_x, b.left, b.right);
+	morph(&polygon[2].x, &polygon[2].direction_x, &polygon[2].velocity_x, b.left, b.right);
+	morph(&polygon[3].x, &polygon[3].direction_x, &polygon[3].velocity_x, b.left, b.right);
+	morph(&polygon[0].y, &polygon[0].direction_y, &polygon[0].velocity_y, b.top, b.bottom);
+	morph(&polygon[1].y, &polygon[1].direction_y, &polygon[1].velocity_y, b.top, b.bottom);
+	morph(&polygon[2].y, &polygon[2].direction_y, &polygon[2].velocity_y, b.top, b.bottom);
+	morph(&polygon[3].y, &polygon[3].direction_y, &polygon[3].velocity_y, b.top, b.bottom);
 }
 
+// _MorphColor
+void
+TestView::_MorphColor(color_cycle* color)
+{
+	morph(&color[0].value, &color[0].direction);
+	morph(&color[1].value, &color[1].direction);
+	morph(&color[2].value, &color[2].direction);
+}
 
 // show_window
 void
@@ -485,7 +562,8 @@ main(int argc, char** argv)
 {
 	BApplication* app = new BApplication("application/x.vnd-Haiku.BitmapDrawing");
 
-	BRect frame(50.0, 50.0, 400.0, 250.0);
+//	BRect frame(10.0, 30.0, 790.0, 590.0);
+	BRect frame(10.0, 30.0, 330.0, 220.0);
 	show_window(frame, "Bitmap Drawing");
 
 	app->Run();
