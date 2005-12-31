@@ -97,6 +97,10 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
+#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+	be_roster->StartWatching(this);
+#endif
+
 	sBarTeamInfoList.MakeEmpty();
 
 	BList teamList;
@@ -106,9 +110,10 @@ TBarApp::TBarApp()
 	for (int32 i = 0; i < numTeams; i++) {
 		app_info appInfo;
 		team_id tID = (team_id)teamList.ItemAt(i);
-		if (be_roster->GetRunningAppInfo(tID, &appInfo) == B_OK)
+		if (be_roster->GetRunningAppInfo(tID, &appInfo) == B_OK) {
 			AddTeam(appInfo.team, appInfo.flags, appInfo.signature,
 				&appInfo.ref);
+		}
 	}
 
 	sSubscribers.MakeEmpty();
@@ -122,17 +127,13 @@ TBarApp::TBarApp()
 	//	statusview so that all additions to the tray
 	//	follow the same path
 	fStatusViewMess = BMessenger(fBarWindow->FindView("BarView"));
-
-#ifdef __HAIKU__
-	be_roster->StartWatching(this);
-#endif
 }
 
 
 TBarApp::~TBarApp()
 {
-#ifdef __HAIKU__
-	be_roster->StartWatching(this);
+#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+	be_roster->StopWatching(this);
 #endif
 
 	int32 teamCount = sBarTeamInfoList.CountItems();
@@ -552,7 +553,7 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 			return;
 		if (strcasecmp(barInfo->sig, sig) == 0)
 			multiLaunchTeam = barInfo;
-	} 
+	}
 
 	if (multiLaunchTeam != NULL) {
 		multiLaunchTeam->teams->AddItem((void *)team);
@@ -569,8 +570,8 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char *sig, entry_ref *ref)
 		return;
 	}
 
-	BFile theFile(ref, O_RDONLY);
-	BAppFileInfo appMime(&theFile);
+	BFile file(ref, B_READ_ONLY);
+	BAppFileInfo appMime(&file);
 
 	BarTeamInfo *barInfo = new BarTeamInfo(new BList(), flags, strdup(sig), 
 		new BBitmap(kIconSize, B_COLOR_8_BIT), strdup(ref->name));
