@@ -16,10 +16,9 @@
 #include <ColorControl.h>
 #include <Bitmap.h>
 #include <TextControl.h>
+#include <Region.h>
 #include <Screen.h>
 #include <Window.h>
-#include <Errors.h>
-#include <Region.h>
 
 
 const uint32 U_COLOR_CONTROL_RED_CHANGED_MSG = 'CCRC';
@@ -61,25 +60,10 @@ void
 BColorControl::_InitData(color_control_layout layout, float size,
 	bool useOffscreen, BMessage* archive)
 {
-	BRect bounds(Bounds());
-
 	fColumns = layout;
 	fRows = 256 / fColumns;
 	fCellSize = size;
-
-	BScreen screen(Window());
-
-	if (useOffscreen) {
-		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
-		fOffscreenView = new BView(bounds, "off_view", 0, 0);
-
-		fBitmap->Lock();
-		fBitmap->AddChild(fOffscreenView);
-		fBitmap->Unlock();
-	} else {
-		fBitmap = NULL;
-		fOffscreenView = NULL;
-	}
+	fFocusedComponent = 0;
 
 	if (archive) {
 		int32 value = 0;
@@ -137,12 +121,27 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		for (int32 i = '0'; i <= '9'; i++)
 			fBlueText->TextView()->AllowChar(i);
 		fBlueText->TextView()->SetMaxBytes(3);
-
+		
 		_LayoutView();
-
+	
 		AddChild(fRedText);
 		AddChild(fGreenText);
 		AddChild(fBlueText);
+	}
+
+	if (useOffscreen) {
+		BRect bounds(Bounds());
+		bounds.right = floorf(fBlueText->Frame().left) - 1;
+	
+		fBitmap = new BBitmap(bounds, /*BScreen(Window()).ColorSpace()*/B_RGB32, true, false);
+		fOffscreenView = new BView(bounds, "off_view", 0, 0);
+
+		fBitmap->Lock();
+		fBitmap->AddChild(fOffscreenView);
+		fBitmap->Unlock();
+	} else {
+		fBitmap = NULL;
+		fOffscreenView = NULL;
 	}
 }
 
@@ -189,27 +188,22 @@ BColorControl::Instantiate(BMessage *archive)
 status_t
 BColorControl::Archive(BMessage *archive, bool deep) const
 {
-	BControl::Archive(archive, deep);
+	status_t status = BControl::Archive(archive, deep);
 
-	archive->AddInt32("_layout", Layout());
-	archive->AddFloat("_csize", fCellSize);
-	archive->AddBool("_use_off", fOffscreenView != NULL);
+	if (status == B_OK)
+		status = archive->AddInt32("_layout", Layout());
+	if (status == B_OK)
+		status = archive->AddFloat("_csize", fCellSize);
+	if (status == B_OK)
+		status = archive->AddBool("_use_off", fOffscreenView != NULL);
 
-	return B_OK;
+	return status;
 }
 
 
 void
 BColorControl::SetValue(int32 color)
 {
-	if (fBitmap) {
-		if (fBitmap->Lock()) {
-			if (!fOffscreenView)
-				_UpdateOffscreen(Bounds());
-			fBitmap->Unlock();
-		}
-	}
-
 	rgb_color c1 = ValueAsColor();
 	rgb_color c2;
 	c2.red = (color & 0xFF000000) >> 24;
@@ -231,6 +225,9 @@ BColorControl::SetValue(int32 color)
 		sprintf(string, "%d", c2.blue);
 		fBlueText->SetText(string);
 	}
+
+	// TODO: This causes lot of flickering
+	Invalidate();
 
 	if (LockLooper()) {
 		Window()->UpdateIfNeeded();
@@ -590,6 +587,8 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 		case 4:
 			color.blue = shade;
 			break;
+		default:
+			break;
 	}
 
 	SetValue(color);
@@ -684,7 +683,7 @@ BColorControl::AllDetached()
 status_t
 BColorControl::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return BControl::Perform(d, arg);
 }
 
 
