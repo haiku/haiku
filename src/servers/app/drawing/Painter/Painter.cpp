@@ -1334,6 +1334,31 @@ copy_bitmap_row_bgr32_copy(uint8* dst, const uint8* src, int32 numPixels,
 	memcpy(dst, src, numPixels * 4);
 }
 
+// copy_bitmap_row_bgr32_alpha
+static inline void
+copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
+							const rgb_color* colorMap)
+{
+	uint32* d = (uint32*)dst;
+	int32 bytes = numPixels * 4;
+	uint8 buffer[bytes];
+	uint8* b = buffer;
+	while (numPixels--) {
+		if (src[3] == 255) {
+			*(uint32*)b = *(uint32*)src;
+		} else {
+			*(uint32*)b = *d;
+			b[0] = ((src[0] - b[0]) * src[3] + (b[0] << 8)) >> 8;
+			b[1] = ((src[1] - b[1]) * src[3] + (b[1] << 8)) >> 8;
+			b[2] = ((src[2] - b[2]) * src[3] + (b[2] << 8)) >> 8;
+		}
+		d ++;
+		b += 4;
+		src += 4;
+	}
+	memcpy(dst, buffer, bytes);
+}
+
 // _DrawBitmap
 void
 Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
@@ -1395,14 +1420,25 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 
 	switch (format) {
 		case B_RGB32:
-		case B_RGBA32:
+		case B_RGBA32: {
+			bool generic = true;
 			// maybe we can use an optimized version
-			if (fDrawingMode == B_OP_COPY && xScale == 1.0 && yScale == 1.0) {
-				_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer, xOffset, yOffset, viewRect);
-			} else {
+			if (xScale == 1.0 && yScale == 1.0) {
+				if (fDrawingMode == B_OP_COPY) {
+					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer, xOffset, yOffset, viewRect);
+					generic = false;
+				} else if (fDrawingMode == B_OP_ALPHA
+						 && fAlphaSrcMode == B_PIXEL_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY) {
+					_DrawBitmapNoScale32(copy_bitmap_row_bgr32_alpha, 4, srcBuffer, xOffset, yOffset, viewRect);
+					generic = false;
+				}
+			}
+
+			if (generic) {
 				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset, xScale, yScale, viewRect);
 			}
 			break;
+		}
 		default: {
 			bool generic = true;
 			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {

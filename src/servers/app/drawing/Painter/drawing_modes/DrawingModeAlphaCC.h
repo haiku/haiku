@@ -20,9 +20,9 @@
 // ASSIGN_ALPHA_CC
 #define ASSIGN_ALPHA_CC(d, r, g, b) \
 { \
-	d[0] = (r); \
+	d[0] = (b); \
 	d[1] = (g); \
-	d[2] = (b); \
+	d[2] = (r); \
 	d[3] = 255; \
 }
 
