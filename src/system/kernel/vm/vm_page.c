@@ -364,14 +364,16 @@ vm_page_init(kernel_args *ka)
 
 	// calculate the size of memory by looking at the physical_memory_range array
 	{
-		unsigned int last_phys_page = 0;
+		unsigned int physicalPagesEnd = 0;
 
 		physical_page_offset = ka->physical_memory_range[0].start / B_PAGE_SIZE;
 		for (i = 0; i<ka->num_physical_memory_ranges; i++) {
-			last_phys_page = (ka->physical_memory_range[i].start + ka->physical_memory_range[i].size) / B_PAGE_SIZE - 1;
+			physicalPagesEnd = (ka->physical_memory_range[i].start
+				+ ka->physical_memory_range[i].size) / B_PAGE_SIZE;
 		}
-		TRACE(("first phys page = 0x%lx, last 0x%x\n", physical_page_offset, last_phys_page));
-		num_pages = last_phys_page - physical_page_offset;
+		TRACE(("first phys page = 0x%lx, end 0x%x\n", physical_page_offset,
+			physicalPagesEnd));
+		num_pages = physicalPagesEnd - physical_page_offset;
 	}
 
 	// map in the new free page table
@@ -382,7 +384,7 @@ vm_page_init(kernel_args *ka)
 		all_pages, num_pages, (unsigned int)(num_pages * sizeof(vm_page))));
 
 	// initialize the free page table
-	for (i = 0; i < num_pages - 1; i++) {
+	for (i = 0; i < num_pages; i++) {
 		all_pages[i].physical_page_number = physical_page_offset + i;
 		all_pages[i].type = PAGE_TYPE_PHYSICAL;
 		all_pages[i].state = PAGE_STATE_FREE;
@@ -540,7 +542,7 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 		return B_BAD_VALUE;
 	}
 	start_page -= physical_page_offset;
-	if (start_page + length >= num_pages) {
+	if (start_page + length > num_pages) {
 		dprintf("vm_mark_page_range_inuse: range would extend past free list\n");
 		return B_BAD_VALUE;
 	}
@@ -726,7 +728,7 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 
 	for (;;) {
 		bool foundit = true;
-		if (start + len >= num_pages)
+		if (start + len > num_pages)
 			break;
 
 		for (i = 0; i < len; i++) {
@@ -745,10 +747,6 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 			break;
 		} else {
 			start += i;
-			if (start >= num_pages) {
-				// no more pages to look through
-				break;
-			}
 		}
 	}
 	release_spinlock(&page_lock);
@@ -1035,12 +1033,14 @@ vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size)
 	size = PAGE_ALIGN(size);
 	// find a slot in the virtual allocation addr range
 	for (i = 1; i < ka->num_virtual_allocated_ranges; i++) {
+		addr_t previousRangeEnd = ka->virtual_allocated_range[i-1].start
+			+ ka->virtual_allocated_range[i-1].size;
 		last_valloc_entry = i;
 		// check to see if the space between this one and the last is big enough
-		if (ka->virtual_allocated_range[i].start 
-			- (ka->virtual_allocated_range[i-1].start 
-				+ ka->virtual_allocated_range[i-1].size) >= size) {
-			spot = ka->virtual_allocated_range[i-1].start + ka->virtual_allocated_range[i-1].size;
+		if (previousRangeEnd >= KERNEL_BASE
+			&& ka->virtual_allocated_range[i].start
+				- previousRangeEnd >= size) {
+			spot = previousRangeEnd;
 			ka->virtual_allocated_range[i-1].size += size;
 			goto out;
 		}
@@ -1095,9 +1095,11 @@ vm_alloc_physical_page_from_kernel_args(kernel_args *ka)
 	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
 		addr_t next_page;
 
-		next_page = ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size;
+		next_page = ka->physical_allocated_range[i].start
+			+ ka->physical_allocated_range[i].size;
 		// see if the page after the next allocated paddr run can be allocated
-		if (i + 1 < ka->num_physical_allocated_ranges && ka->physical_allocated_range[i+1].size != 0) {
+		if (i + 1 < ka->num_physical_allocated_ranges
+			&& ka->physical_allocated_range[i+1].size != 0) {
 			// see if the next page will collide with the next allocated range
 			if (next_page >= ka->physical_allocated_range[i+1].start)
 				continue;
@@ -1106,7 +1108,7 @@ vm_alloc_physical_page_from_kernel_args(kernel_args *ka)
 		if (is_page_in_phys_range(ka, next_page)) {
 			// we got one!
 			ka->physical_allocated_range[i].size += B_PAGE_SIZE;
-			return ((ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size - B_PAGE_SIZE) / B_PAGE_SIZE);
+			return (next_page / B_PAGE_SIZE);
 		}
 	}
 
