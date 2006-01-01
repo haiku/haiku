@@ -6,6 +6,77 @@
  * Distributed under the terms of the NewOS License.
  */
 
+/*	(bonefish) Some explanatory words on how address translation is implemented
+	for the 32 bit PPC architecture.
+
+	I use the address type nomenclature as used in the PPC architecture
+	specs, i.e.
+	- effective address: An address as used by program instructions, i.e.
+	  that's what elsewhere (e.g. in the VM implementation) is called
+	  virtual address.
+	- virtual address: An intermediate address computed from the effective
+	  address via the segment registers.
+	- physical address: An address referring to physical storage.
+
+	The hardware translates an effective address to a physical address using
+	either of two mechanisms: 1) Block Address Translation (BAT) or
+	2) segment + page translation. The first mechanism does this directly
+	using two sets (for data/instructions) of special purpose registers.
+	The latter mechanism is of more relevance here, though:
+
+	effective address (32 bit):	     [ 0 ESID  3 | 4  PIX 19 | 20 Byte 31 ]
+								           |           |            |
+							     (segment registers)   |            |
+									       |           |            |
+	virtual address (52 bit):   [ 0      VSID 23 | 24 PIX 39 | 40 Byte 51 ]
+	                            [ 0             VPN       39 | 40 Byte 51 ]
+								                 |                  |
+										   (page table)             |
+											     |                  |
+	physical address (32 bit):       [ 0        PPN       19 | 20 Byte 31 ]
+
+
+	ESID: Effective Segment ID
+	VSID: Virtual Segment ID
+	PIX:  Page Index
+	VPN:  Virtual Page Number
+	PPN:  Physical Page Number
+
+
+	Unlike on x86 we can't just switch the context to another team by just
+	setting a register to another page directory, since we only have one
+	page table containing both kernel and user address mappings. Instead we
+	map the effective address space of kernel and *all* teams
+	non-intersectingly into the virtual address space (which fortunately is
+	20 bits wider), and use the segment registers to select the section of
+	the virtual address space for the current team. Half of the 16 segment
+	registers (8 - 15) map the kernel addresses, so they remain unchanged.
+
+	The range of the virtual address space a team's effective address space
+	is mapped to is defined by its vm_translation_map_arch_info::asid_base.
+	Left-shifted by ASID_SHIFT the value is the first of the 8 successive
+	VSID values used for the team.
+
+	Which asid_base values are already taken is defined by the set bits in
+	the bitmap asid_bitmap.
+
+
+	TODO:
+	* Rename asid_bitmap and asid_bitmap_lock.
+	* An ASID_SHIFT of 3 is sufficient. The kernel reserves asid_base 1 then.
+	* The page table lies in physical memory and is identity mapped. Either
+	  the boot loader should already map it into the kernel address space or
+	  we need to remap here. Otherwise we can't create the area for obvious
+	  reasons.
+	* If we want to continue to use the OF services, we would need to add
+	  its address mappings to the kernel space. Unfortunately some stuff
+	  (especially RAM) is mapped in an address range without the kernel
+	  address space. We probably need to map those into each team's address
+	  space as kernel read/write areas.
+	* The current locking scheme is insufficient. The page table is a resource
+	  shared by all teams. We need to synchronize access to it. Probably via a
+	  spinlock.
+ */
 
 #include <KernelExport.h>
 #include <kernel.h>
@@ -51,7 +122,7 @@ ppc_translation_map_change_asid(vm_translation_map *map)
 #if KERNEL_BASE != 0x80000000
 #error fix me
 #endif
-	int asid_base = map->arch_data->asid_base;
+	int asid_base = map->arch_data->asid_base << ASID_SHIFT;
 
 	asm("mtsr	0,%0" : : "g"(asid_base));
 	asm("mtsr	1,%0" : : "g"(asid_base + 1));
@@ -122,8 +193,7 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 	entry->abbr_page_index = (virtualAddress >> 22) & 0x3f;
 	entry->valid = true;
 
-	// ToDo: this is probably a bit too much sledge hammer
-	arch_cpu_global_TLB_invalidate();
+	ptesync();
 }
 
 
@@ -452,6 +522,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	sPageTableRegion = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
 		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
+#if 0
 	// ToDo: for now just map 0 - 512MB of physical memory to the iospace region
 	block_address_translation bat;
 
@@ -495,7 +566,10 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	vm_create_null_area(vm_kernel_address_space_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
-	return 0;
+// TODO: Create areas for all OF mappings we want to keep. And unmap the others.
+#endif
+
+	return B_OK;
 }
 
 
