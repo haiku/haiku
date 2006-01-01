@@ -113,5 +113,6 @@ extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
 #define eieio()	asm volatile("eieio")
 #define isync() asm volatile("isync")
 #define tlbsync() asm volatile("tlbsync")
+#define ptesync() asm volatile("ptesync")
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */
