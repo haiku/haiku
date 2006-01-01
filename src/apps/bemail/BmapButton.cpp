@@ -44,7 +44,7 @@ All rights reserved.
 #include <stdlib.h>
 
 
-#ifndef B_BEOS_VERSION_DANO
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
 static rgb_color
 mix_color(rgb_color color1, rgb_color color2, float portion)
 {
@@ -61,7 +61,7 @@ disable_color(rgb_color color, rgb_color background)
 {
 	return mix_color(color, background, .5);
 }
-#endif // #ifndef B_BEOS_VERSION_DANO
+#endif // #if older versions of BeOS, like R5.
 
 BList BmapButton::fBitmapCache;
 BLocker BmapButton::fBmCacheLock;

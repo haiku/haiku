@@ -142,7 +142,7 @@ protected:
 
 //	Spring Loaded Folder convenience routines
 //		used in both Tracker and Deskbar
-#if B_BEOS_VERSION_DANO
+#if !(defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE))
 #define _IMPEXP_TRACKER
 #endif
 _IMPEXP_TRACKER bool SpringLoadedFolderCompareMessages(const BMessage *incoming,
@@ -153,7 +153,7 @@ _IMPEXP_TRACKER void SpringLoadedFolderAddUniqueTypeToList(entry_ref *ref,
 	BObjectList<BString> *typeslist);
 _IMPEXP_TRACKER void SpringLoadedFolderCacheDragData(const BMessage *incoming,
 	BMessage **, BObjectList<BString> **typeslist);
-#if B_BEOS_VERSION_DANO
+#if !(defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE))
 #undef _IMPEXP_TRACKER
 #endif
 

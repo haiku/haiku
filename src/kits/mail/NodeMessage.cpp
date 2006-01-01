@@ -19,7 +19,7 @@
 */
 _EXPORT BNode& operator<<(BNode& n, const BMessage& m)
 {
-	#ifdef B_BEOS_VERSION_DANO
+	#if !(defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE))
 	const
 	#endif
 	char *name;

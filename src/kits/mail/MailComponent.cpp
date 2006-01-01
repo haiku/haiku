@@ -141,7 +141,7 @@ void BMailComponent::SetHeaderField(const char *key, BMessage *structure, bool r
 	const char *name, *sub_val;
 	type_code type;
 	for (int32 i = 0; structure->GetInfo(B_STRING_TYPE,i,
-		#ifndef B_BEOS_VERSION_DANO
+		#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
 			(char**)
 		#endif
 		&name,&type) == B_OK; i++)
@@ -236,7 +236,7 @@ status_t BMailComponent::RemoveHeader(const char *key) {
 }
 
 const char *BMailComponent::HeaderAt(int32 index) {
-#if B_BEOS_VERSION_DANO
+#if !(defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE))
 	const
 #endif
 	char *name = NULL;
@@ -276,8 +276,8 @@ BMailComponent::RenderToRFC822(BPositionIO *render_to) {
 		headers.FindInt8 (kHeaderEncodingString, &encoding);
 
 	for (int32 index = 0; headers.GetInfo(B_STRING_TYPE,index,
-#ifndef B_BEOS_VERSION_DANO
-	(char**)
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
+	(const char**)
 #endif
 			&key,&stupidity_personified,&count) == B_OK; index++) {
 		for (int32 g = 0; g < count; g++) {

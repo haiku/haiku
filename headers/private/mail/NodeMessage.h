@@ -23,7 +23,7 @@
 #include <Node.h>
 #include <Message.h>
 
-#ifdef B_BEOS_VERSION_DANO
+#if defined(HAIKU_TARGET_PLATFORM_DANO) || defined(HAIKU_TARGET_PLATFORM_HAIKU)
 #define _IMPEXP_MAIL
 #endif
 

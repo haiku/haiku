@@ -619,7 +619,7 @@ status_t BAttributedMailAttachment::SetToRFC822(BPositionIO *data, size_t length
 
 status_t BAttributedMailAttachment::RenderToRFC822(BPositionIO *render_to) {
 	BMallocIO *io = new BMallocIO;
-#if B_BEOS_VERSION_DANO
+#if defined(HAIKU_TARGET_PLATFORM_DANO) || defined(HAIKU_TARGET_PLATFORM_HAIKU)
 	const
 #endif
 	char *name;
