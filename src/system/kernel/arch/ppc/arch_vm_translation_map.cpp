@@ -53,17 +53,14 @@
 	registers (8 - 15) map the kernel addresses, so they remain unchanged.
 
 	The range of the virtual address space a team's effective address space
-	is mapped to is defined by its vm_translation_map_arch_info::asid_base.
-	Left-shifted by ASID_SHIFT the value is the first of the 8 successive
-	VSID values used for the team.
+	is mapped to is defined by its vm_translation_map_arch_info::vsid_base,
+	which is the first of the 8 successive VSID values used for the team.
 
-	Which asid_base values are already taken is defined by the set bits in
-	the bitmap asid_bitmap.
+	Which vsid_base values are already taken is defined by the set bits in
+	the bitmap sVSIDBaseBitmap.
 
 
 	TODO:
-	* Rename asid_bitmap and asid_bitmap_lock.
-	* An ASID_SHIFT of 3 is sufficient. The kernel reserves asid_base 1 then.
 	* The page table lies in physical memory and is identity mapped. Either
 	  the boot loader should already map it into the kernel address space or
 	  we need to remap here. Otherwise we can't create the area for obvious
@@ -102,16 +99,20 @@ static area_id sPageTableRegion;
 // put it 512 MB into kernel space
 #define IOSPACE_BASE (KERNEL_BASE + IOSPACE_SIZE)
 
-#define MAX_ASIDS (PAGE_SIZE * 8)
-static uint32 asid_bitmap[MAX_ASIDS / (sizeof(uint32) * 8)];
-spinlock asid_bitmap_lock;
-#define ASID_SHIFT 4
-#define VADDR_TO_ASID(map, vaddr) \
-	(((map)->arch_data->asid_base << ASID_SHIFT) + ((vaddr) / 0x10000000))
+// The VSID is a 24 bit number. The lower three bits are defined by the
+// (effective) segment number, which leaves us with a 21 bit space of
+// VSID bases (= 2 * 1024 * 1024).
+#define MAX_VSID_BASES (PAGE_SIZE * 8)
+static uint32 sVSIDBaseBitmap[MAX_VSID_BASES / (sizeof(uint32) * 8)];
+static spinlock sVSIDBaseBitmapLock;
+
+#define VSID_BASE_SHIFT 3
+#define VADDR_TO_VSID(map, vaddr) \
+	((map)->arch_data->vsid_base + ((vaddr) >> 28))
 
 // vm_translation object stuff
 typedef struct vm_translation_map_arch_info {
-	int asid_base; // shift left by ASID_SHIFT to get the base asid to use
+	int vsid_base;	// used VSIDs are vside_base ... vsid_base + 7
 } vm_translation_map_arch_info;
 
 
@@ -122,16 +123,16 @@ ppc_translation_map_change_asid(vm_translation_map *map)
 #if KERNEL_BASE != 0x80000000
 #error fix me
 #endif
-	int asid_base = map->arch_data->asid_base << ASID_SHIFT;
+	int vsidBase = map->arch_data->vsid_base;
 
-	asm("mtsr	0,%0" : : "g"(asid_base));
-	asm("mtsr	1,%0" : : "g"(asid_base + 1));
-	asm("mtsr	2,%0" : : "g"(asid_base + 2));
-	asm("mtsr	3,%0" : : "g"(asid_base + 3));
-	asm("mtsr	4,%0" : : "g"(asid_base + 4));
-	asm("mtsr	5,%0" : : "g"(asid_base + 5));
-	asm("mtsr	6,%0" : : "g"(asid_base + 6));
-	asm("mtsr	7,%0" : : "g"(asid_base + 7));
+	asm("mtsr	0,%0" : : "g"(vsidBase));
+	asm("mtsr	1,%0" : : "g"(vsidBase + 1));
+	asm("mtsr	2,%0" : : "g"(vsidBase + 2));
+	asm("mtsr	3,%0" : : "g"(vsidBase + 3));
+	asm("mtsr	4,%0" : : "g"(vsidBase + 4));
+	asm("mtsr	5,%0" : : "g"(vsidBase + 5));
+	asm("mtsr	6,%0" : : "g"(vsidBase + 6));
+	asm("mtsr	7,%0" : : "g"(vsidBase + 7));
 }
 
 
@@ -159,8 +160,9 @@ destroy_tmap(vm_translation_map *map)
 	}
 
 	// mark the asid not in use
-	atomic_and((vint32 *)&asid_bitmap[map->arch_data->asid_base / 32], 
-			~(1 << (map->arch_data->asid_base % 32)));
+	int baseBit = map->arch_data->vsid_base >> VSID_BASE_SHIFT;
+	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32], 
+			~(1 << (baseBit % 32)));
 
 	free(map->arch_data);
 	recursive_lock_destroy(&map->lock);
@@ -201,7 +203,7 @@ static status_t
 map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress, uint32 attributes)
 {
 	// lookup the vsid based off the va
-	uint32 virtualSegmentID = VADDR_TO_ASID(map, virtualAddress);
+	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
 	uint32 protection = 0;
 
 	// ToDo: check this
@@ -254,7 +256,7 @@ static page_table_entry *
 lookup_pagetable_entry(vm_translation_map *map, addr_t virtualAddress)
 {
 	// lookup the vsid based off the va
-	uint32 virtualSegmentID = VADDR_TO_ASID(map, virtualAddress);
+	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
 
 //	dprintf("vm_translation_map.lookup_pagetable_entry: vsid %d, va 0x%lx\n", vsid, va);
 
@@ -454,33 +456,38 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	}
 
 	cpu_status state = disable_interrupts();
-	acquire_spinlock(&asid_bitmap_lock);
+	acquire_spinlock(&sVSIDBaseBitmapLock);
 
 	// allocate a ASID base for this one
 	if (kernel) {
-		map->arch_data->asid_base = 0; // set up by the bootloader
-		asid_bitmap[0] |= 0x1;
+		// The boot loader (respectively the Open Firmware) should has set up
+		// the segment registers for identical mapping. Two VSID bases are
+		// reserved for the kernel: 0 and 8. The latter one for mapping the
+		// kernel address space (0x80000000...), the former one for the lower
+		// addresses required by the Open Firmware services.
+		map->arch_data->vsid_base = 0;
+		sVSIDBaseBitmap[0] |= 0x3;
 	} else {
 		int i = 0;
 
-		while (i < MAX_ASIDS) {
-			if (asid_bitmap[i / 32] == 0xffffffff) {
+		while (i < MAX_VSID_BASES) {
+			if (sVSIDBaseBitmap[i / 32] == 0xffffffff) {
 				i += 32;
 				continue;
 			}
-			if ((asid_bitmap[i / 32] & (1 << (i % 32))) == 0) {
+			if ((sVSIDBaseBitmap[i / 32] & (1 << (i % 32))) == 0) {
 				// we found it
-				asid_bitmap[i / 32] |= 1 << (i % 32);
+				sVSIDBaseBitmap[i / 32] |= 1 << (i % 32);
 				break;
 			}
 			i++;
 		}
-		if (i >= MAX_ASIDS)
-			panic("vm_translation_map_create: out of ASIDs\n");
-		map->arch_data->asid_base = i;
+		if (i >= MAX_VSID_BASES)
+			panic("vm_translation_map_create: out of VSID bases\n");
+		map->arch_data->vsid_base = i << VSID_BASE_SHIFT;
 	}
 
-	release_spinlock(&asid_bitmap_lock);
+	release_spinlock(&sVSIDBaseBitmapLock);
 	restore_interrupts(state);
 
 	return B_OK;
