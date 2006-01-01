@@ -30,7 +30,10 @@ arch_debug_blue_screen_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	return 0;
+	int key;
+	if (of_interpret("key", 0, 1, &key) == OF_FAILED)
+		return 0;
+	return (char)key;
 }
 
 
