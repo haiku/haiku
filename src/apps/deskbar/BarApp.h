@@ -31,13 +31,14 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
 #ifndef BAR_APP_H
 #define BAR_APP_H
+
 
 #include <Application.h>
 #include <List.h>
 #include "BarWindow.h"
+
 
 /* ------------------------------------ */
 // Private app_server defines that I need to use
@@ -45,6 +46,7 @@ All rights reserved.
 #define _DESKTOP_W_TYPE_ 1024
 #define _FLOATER_W_TYPE_ 4
 #define _STD_W_TYPE_ 0
+
 
 class BarTeamInfo {
 public:
@@ -86,7 +88,7 @@ const uint32 CMD_SUSPEND_SYSTEM = 304;
 // if you want to extend this structure, maintain the
 // constants below (used in TBarApp::InitSettings())
 
-struct	desk_settings {
+struct desk_settings {
 	bool vertical;				// version 1
 	bool left;
 	bool top;
@@ -126,53 +128,49 @@ class TBarView;
 class BFile;
 
 namespace BPrivate {
-
-class TFavoritesConfigWindow;
-
+	class TFavoritesConfigWindow;
 }
 
 using namespace BPrivate;
 
 class TBarApp : public BApplication {
-public:
-	TBarApp();
-	virtual ~TBarApp();
+	public:
+		TBarApp();
+		virtual ~TBarApp();
 
-	virtual	bool QuitRequested();
-	virtual void MessageReceived(BMessage *);
+		virtual	bool QuitRequested();
+		virtual void MessageReceived(BMessage *);
 
-	desk_settings *Settings()
-		{ return &fSettings; };
-	TBarView *BarView() const
-		{ return fBarWindow->BarView(); };
-	
-	static void Subscribe(const BMessenger &subscriber, BList *);
-	static void Unsubscribe(const BMessenger &subscriber);
-	
-private:
-	void AddTeam(team_id team, uint32 flags, const char	*sig, entry_ref	*);
-	void RemoveTeam(team_id);
+		desk_settings *Settings()
+			{ return &fSettings; }
+		TBarView *BarView() const
+			{ return fBarWindow->BarView(); }
+		TBarWindow *BarWindow() const
+			{ return fBarWindow; }
 
-	void InitSettings();
-	void SaveSettings();
-	
-	void ShowConfigWindow();
+		static void Subscribe(const BMessenger &subscriber, BList *);
+		static void Unsubscribe(const BMessenger &subscriber);
 
-#if __HAIKU__
-	static int32 _shutdown(void* cookie);
-#endif
+	private:
+		void AddTeam(team_id team, uint32 flags, const char	*sig, entry_ref	*);
+		void RemoveTeam(team_id);
 
-	TBarWindow *fBarWindow;
-	BMessenger fSwitcherMess;
-	BMessenger fStatusViewMess;
-	BFile *fSettingsFile;
-	desk_settings fSettings;
-	
-	TFavoritesConfigWindow *fConfigWindow;
-	
-	static BLocker sSubscriberLock;
-	static BList sBarTeamInfoList;
-	static BList sSubscribers;
+		void InitSettings();
+		void SaveSettings();
+
+		void ShowConfigWindow();
+
+		TBarWindow *fBarWindow;
+		BMessenger fSwitcherMessenger;
+		BMessenger fStatusViewMessenger;
+		BFile *fSettingsFile;
+		desk_settings fSettings;
+
+		TFavoritesConfigWindow *fConfigWindow;
+
+		static BLocker sSubscriberLock;
+		static BList sBarTeamInfoList;
+		static BList sSubscribers;
 };
 
 #endif

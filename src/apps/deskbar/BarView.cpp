@@ -110,13 +110,7 @@ TBarView::AttachedToWindow()
 
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
-		
-#if SA_CLOCK
-	fClock = new TTimeView(this, false, false, false, false, fShowInterval);
-	if (fShowClock)
-		AddChild(fClock);
-#endif
-	
+
 	fReplicantTray = new TReplicantTray(this, fVertical);
 	fDragRegion = new TDragRegion(this, fReplicantTray);
 	fDragRegion->AddChild(fReplicantTray);
@@ -241,7 +235,7 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 	
 		if (!fReplicantTray->IsHidden())
 			fReplicantTray->Hide();	
-	
+
 		return;
 	}
 	
@@ -254,12 +248,7 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 		fDragRegion->ResizeToPreferred();
 
 		if (fVertical) {
-#if SA_CLOCK
-			if (fShowClock)
-				statusLoc.y = fClock->Frame().bottom + 1;
-			else
-#endif
-				statusLoc.y = fBarMenuBar->Frame().bottom + 1;
+			statusLoc.y = fBarMenuBar->Frame().bottom + 1;
 			statusLoc.x = 0;
 			if (Left() && Vertical())
 				fReplicantTray->MoveTo(5, 2);
@@ -273,38 +262,6 @@ TBarView::PlaceTray(bool, bool, BRect screenFrame)
 		fDragRegion->MoveTo(statusLoc);
 	}
 }
-
-
-#if SA_CLOCK
-void
-TBarView::PlaceClock()
-{
-	if (fState == kFullState) {
-		if (!fClock->IsHidden())
-			fClock->Hide();
-		return;
-	}
-	
-	if (fShowClock) {
-		fClock->SetOrientation(fVertical);
-		
-		BPoint loc;
-		if (fVertical) {
-			fClock->ResizeTo(kMinimumWindowWidth, kMenuBarHeight);
-			loc.x = 0;
-			loc.y = fBarMenuBar->Frame().bottom + 1;
-		} else {
-			float width, height;
-			fClock->GetPreferredSize(&width, &height);
-			fClock->ResizeTo(width, kMenuBarHeight);
-			loc = fDragRegion->Frame().LeftTop();
-			loc.x -= fClock->Frame().Width();
-			loc.y = 0;
-		}
-		fClock->MoveTo(loc);
-	}	
-}
-#endif
 
 
 void
@@ -324,12 +281,7 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 		if (fTrayLocation != 0)
 			expandoFrame.top = fDragRegion->Frame().bottom + 2;
 		else {
-#if SA_CLOCK
-			if (fShowClock)
-				expandoFrame.top = fClock->Frame().bottom + 2;
-			else
-#endif
-				expandoFrame.top = fBarMenuBar->Frame().bottom + 2;
+			expandoFrame.top = fBarMenuBar->Frame().bottom + 2;
 		}
 
 		expandoFrame.bottom = expandoFrame.top + 1;
@@ -342,12 +294,7 @@ TBarView::PlaceApplicationBar(BRect screenFrame)
 		expandoFrame.top = -1;
 		expandoFrame.bottom = kHModeHeight;
 		if (fTrayLocation != 0) {
-#if SA_CLOCK
-			if (fShowClock) 
-				expandoFrame.right = fClock->Frame().left;
-			else 
-#endif
-				expandoFrame.right = fDragRegion->Frame().left;
+			expandoFrame.right = fDragRegion->Frame().left;
 		} else
 			expandoFrame.right = screenFrame.Width();
 
@@ -463,17 +410,7 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top)
 	BRect screenFrame = (BScreen(Window())).Frame();
 
 	PlaceBeMenu();
-	if (fVertical){
-#if SA_CLOCK
-		PlaceClock();	// tray dependent on clock location
-#endif
-		PlaceTray(vertSwap, leftSwap, screenFrame);
-	} else {
-		PlaceTray(vertSwap, leftSwap, screenFrame);
-#if SA_CLOCK
-		PlaceClock();	// clock is dependent on tray location
-#endif
-	}
+	PlaceTray(vertSwap, leftSwap, screenFrame);
 
 	// We need to keep track of what apps are expanded.
 	BList expandedItems;
@@ -601,25 +538,7 @@ TBarView::ShowingClock() const
 }
 
 
-#if SA_CLOCK
-void
-TBarView::ToggleClock()
-{
-	fShowClock = !fShowClock;
-	
-#if SA_CLOCK
-	if (fShowClock)
-		AddChild(fClock);
-	else
-		fClock->RemoveSelf();
-#endif
-		
-	UpdatePlacement();
-}
-#endif
-
-
-// Drag and Drop
+//	#pragma mark - Drag and Drop
 
 void
 TBarView::CacheDragData(BMessage *incoming)
@@ -920,7 +839,7 @@ TBarView::HandleBeMenu(BMessage *messagewithdestination)
 }
 
 
-//	Add-on convenience functions
+//	#pragma mark - Add-ons
 
 //	shelf is ignored for now,
 //	it exists in anticipation of having other 'shelves' for

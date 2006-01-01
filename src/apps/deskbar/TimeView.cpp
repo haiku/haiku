@@ -335,9 +335,6 @@ TTimeView::MouseDown(BPoint point)
 	Pulse();
 
 #ifdef _SHOW_CALENDAR_MENU_ITEM
-	if (!fShowingDate)
-		return;
-
 	// see if the user holds down the button long enough to show him the calendar
 
 	bigtime_t startTime = system_time();

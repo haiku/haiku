@@ -88,8 +88,8 @@ using namespace BPrivate;
 
 TBeMenu::TBeMenu(TBarView *barview)
 	: BNavMenu("BeMenu", B_REFS_RECEIVED, BMessenger(kTrackerSignature)),
-		fAddState(kStart),
-		fBarView(barview)
+	fAddState(kStart),
+	fBarView(barview)
 {
 }
 
@@ -128,10 +128,8 @@ TBeMenu::DetachedFromWindow()
 		}
 	}
 
-	//
-	//	don't call BNavMenu::DetachedFromWindow
-	//	it sets the TypesList to NULL
-	//	
+	// don't call BNavMenu::DetachedFromWindow
+	// it sets the TypesList to NULL
 	BMenu::DetachedFromWindow();
 }
 
@@ -185,7 +183,7 @@ TBeMenu::AddNextItem()
 		}
 		if (count > 0) {
 			AddSeparatorItem();
-			
+
 			for (int i = 0;i < recentTypes;i++) {			
 				if (!recentItem[i])
 					continue;
@@ -207,10 +205,10 @@ TBeMenu::AddNextItem()
 		fAddState = kAddingBeMenu;
 		return true;
 	}
-	
+
 	if (fAddState == kAddingBeMenu) {
-		//	keep reentering and adding items
-		//	until this returns false
+		// keep reentering and adding items
+		// until this returns false
 		bool done = BNavMenu::AddNextItem();
 		BMenuItem *item = ItemAt(CountItems() - 1);
 		if (item) {
@@ -228,7 +226,7 @@ TBeMenu::AddNextItem()
 			fAddState = kDone;
 		return done;
 	}
-	
+
 	return false;
 }
 
@@ -236,9 +234,10 @@ TBeMenu::AddNextItem()
 bool
 TBeMenu::AddStandardBeMenuItems()
 {
-	bool dragging=false;
+	bool dragging = false;
 	if (fBarView)
 		dragging = fBarView->Dragging();
+
 #ifdef __HAIKU__
 	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
 #else
@@ -246,7 +245,7 @@ TBeMenu::AddStandardBeMenuItems()
 #endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
-	
+
 #ifdef SHOW_RECENT_FIND_ITEMS
 	item = new BMenuItem(TrackerBuildRecentFindItemsMenu("Find"B_UTF8_ELLIPSIS),
 		new BMessage(kFindButton));
@@ -278,21 +277,22 @@ TBeMenu::AddStandardBeMenuItems()
 	item = new BMenuItem("Always on Top", new BMessage(msg_AlwaysTop));
  	item->SetTarget(be_app);
  	// set checkbox based on current state of Deskbar's main window feel
- 	item->SetMarked((be_app->WindowAt(1)->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0);
+ 	if (BWindow *window = static_cast<TBarApp *>(be_app)->BarWindow())
+	 	item->SetMarked((window->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0);
  	subMenu->AddItem(item);
 
 	item = new BMenuItem("Sort Running Applications", new BMessage(msg_sortRunningApps));
 	item->SetTarget(be_app);
-	item->SetMarked( static_cast<TBarApp *>(be_app)->Settings()->sortRunningApps);
+	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->sortRunningApps);
 	subMenu->AddItem(item);
 
 	item = new BMenuItem("Tracker Always First", new BMessage(msg_trackerFirst));
 	item->SetTarget(be_app);
-	item->SetMarked( static_cast<TBarApp *>(be_app)->Settings()->trackerAlwaysFirst);
+	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->trackerAlwaysFirst);
 	subMenu->AddItem(item);
 
  	subMenu->AddSeparatorItem();
- 	
+ 
  	TReplicantTray *replicantTray = ((TBarApp *)be_app)->BarView()->fReplicantTray;
 
 	item = new BMenuItem("24 Hour Clock", new BMessage(kMsgMilTime));
@@ -323,17 +323,17 @@ TBeMenu::AddStandardBeMenuItems()
 
 	item = new BMenuItem("Show Application Expander", new BMessage(msg_superExpando));
 	item->SetTarget(be_app);
-	item->SetMarked( static_cast<TBarApp *>(be_app)->Settings()->superExpando);
+	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->superExpando);
 	subMenu->AddItem(item);
 
 	item = new BMenuItem("Expand New Applications", new BMessage(msg_expandNewTeams));
 	item->SetTarget(be_app);
-	item->SetMarked( static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams);
+	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->expandNewTeams);
 	item->SetEnabled(static_cast<TBarApp *>(be_app)->Settings()->superExpando);
 	subMenu->AddItem(item);
- 
- 	subMenu->SetFont(be_plain_font);
-  	AddItem(subMenu);
+
+	subMenu->SetFont(be_plain_font);
+	AddItem(subMenu);
 
 	if ((modifiers() & (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY))
 		== (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY)) {

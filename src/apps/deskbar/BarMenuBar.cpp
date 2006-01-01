@@ -48,15 +48,15 @@ All rights reserved.
 
 
 TBarMenuBar::TBarMenuBar(TBarView *bar, BRect frame, const char *name)
-	:	BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
-		fBarView(bar),
-		fAppListMenuItem(NULL)
+	: BMenuBar(frame, name, B_FOLLOW_NONE, B_ITEMS_IN_ROW, false),
+	fBarView(bar),
+	fAppListMenuItem(NULL)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
-	
+
 	TBeMenu *beMenu = new TBeMenu(bar);
 	TBarWindow::SetBeMenu(beMenu);
-	
+
 	fBeMenuItem = new TBarMenuTitle(frame.Width(), frame.Height(),
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_BeLogoIcon), beMenu);
 	AddItem(fBeMenuItem);
@@ -71,13 +71,12 @@ TBarMenuBar::~TBarMenuBar()
 void
 TBarMenuBar::SmartResize(float width, float height)
 {
-	if ((width == -1.0f) && (height == -1.0f)) {
+	if (width == -1.0f && height == -1.0f) {
 		BRect frame = Frame();
 		width = frame.Width();
 		height = frame.Height();
 	} else 
 		ResizeTo(width, height);
-
 
 	width -= 1;
 
@@ -99,7 +98,7 @@ TBarMenuBar::AddTeamMenu()
 
 	BRect frame(Frame());
 	delete fAppListMenuItem;
-	
+
 	fAppListMenuItem = new TBarMenuTitle(0.0f, 0.0f,
 		AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_TeamIcon), new TTeamMenu());
 	AddItem(fAppListMenuItem);
@@ -118,7 +117,7 @@ TBarMenuBar::RemoveTeamMenu()
 		delete fAppListMenuItem;
 		fAppListMenuItem = NULL;
 	}
-	
+
 	BRect frame = Frame();	
 	SmartResize(frame.Width(), frame.Height());
 }
@@ -139,50 +138,53 @@ TBarMenuBar::DrawBackground(BRect rect)
 }
 
 
-//	the following code parallels that in ExpandoMenuBar for DnD tracking
 void
 TBarMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
+	// the following code parallels that in ExpandoMenuBar for DnD tracking
+
 	if (!message) {
-		//	force a cleanup
+		// force a cleanup
 		fBarView->DragStop(true);
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
-	
+
 	switch (code) {
 		case B_ENTERED_VIEW:
-			{
-				BPoint loc;
-				uint32 buttons;
-				GetMouse(&loc, &buttons);
-				//	attempt to start Dnd tracking
-				if (message && buttons != 0) {
-					fBarView->CacheDragData(const_cast<BMessage *>(message));
-					MouseDown(loc);
-				}
+		{
+			BPoint loc;
+			uint32 buttons;
+			GetMouse(&loc, &buttons);
+			// attempt to start DnD tracking
+			if (message && buttons != 0) {
+				fBarView->CacheDragData(const_cast<BMessage *>(message));
+				MouseDown(loc);
 			}
 			break;
+		}
 	}
 	BMenuBar::MouseMoved(where, code, message);
 }
 
 
 static void
-init_tracking_hook(BMenuItem *item,bool (*hookfunction)(BMenu *, void *), void *state)
+init_tracking_hook(BMenuItem *item, bool (*hookFunction)(BMenu *, void *),
+	void *state)
 {
 	if (!item)
 		return;
-		
-	BMenu *windowmenu = item->Submenu();
-	if (windowmenu) 
+
+	BMenu *windowMenu = item->Submenu();
+	if (windowMenu) 
 		//	have a menu, set the tracking hook
-		windowmenu->SetTrackingHook(hookfunction, state);					
+		windowMenu->SetTrackingHook(hookFunction, state);					
 }
 
 
 void
-TBarMenuBar::InitTrackingHook(bool (*hookfunction)(BMenu *, void *), void *state, bool both)
+TBarMenuBar::InitTrackingHook(bool (*hookFunction)(BMenu *, void *),
+	void *state, bool both)
 {
 	BPoint loc;
 	uint32 buttons;
@@ -191,8 +193,8 @@ TBarMenuBar::InitTrackingHook(bool (*hookfunction)(BMenu *, void *), void *state
 	//	will always have the be menu
 	//	may have the app menu as well (mini mode)
 	if (fBeMenuItem->Frame().Contains(loc) || both) 
-		init_tracking_hook(fBeMenuItem, hookfunction, state);
+		init_tracking_hook(fBeMenuItem, hookFunction, state);
 
 	if (fAppListMenuItem && (fAppListMenuItem->Frame().Contains(loc) || both)) 
-		init_tracking_hook(fAppListMenuItem, hookfunction, state);
+		init_tracking_hook(fAppListMenuItem, hookFunction, state);
 }

@@ -59,6 +59,8 @@ class TWindowMenuItem : public BMenuItem {
 		bool RequiresUpdate();
 		bool ChangedState();
 
+	virtual	void	SetLabel(const char* string);
+
 	protected:
 		void Initialize(const char *title);
 		virtual	void GetContentSize(float *width, float *height);
@@ -67,17 +69,18 @@ class TWindowMenuItem : public BMenuItem {
 		virtual void Draw();
 
 	private: 
-		int32 fID;
-		bool fMini;
-		bool fCurrentWorkSpace;
-		const BBitmap *fBitmap;
-		float fTitleWidth;
-		float fTitleAscent;
-		float fTitleDescent;
-		bool fDragging;
-		bool fExpanded;
-		bool fRequireUpdate;
-		bool fModified;
+		int32			fID;
+		bool			fMini;
+		bool			fCurrentWorkSpace;
+		const BBitmap*	fBitmap;
+		float			fTitleWidth;
+		float			fTitleAscent;
+		float			fTitleDescent;
+		bool			fDragging;
+		bool			fExpanded;
+		bool			fRequireUpdate;
+		bool			fModified;
+		BString			fFullTitle;
 };
 
 /****************************************************************************

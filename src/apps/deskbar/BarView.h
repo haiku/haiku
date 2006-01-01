@@ -57,16 +57,11 @@ const float kHModeHeight = 21.0f;
 const float kMenuBarHeight = 21.0f;
 const float kStatusHeight = 22.0f;
 
-#define SA_CLOCK 0
-
 class BShelf;
 class TBarMenuBar;
 class TExpandoMenuBar;
 class TReplicantTray;
 class TDragRegion;
-#if SA_CLOCK
-class TTimeView;
-#endif
 class TTeamMenuItem;
 
 
@@ -95,9 +90,6 @@ class TBarView : public BView {
 		bool MilTime() const;
 		void ShowClock(bool);
 		bool ShowingClock() const;
-	#if SA_CLOCK
-		void ToggleClock();
-	#endif
 
 		void CacheDragData(BMessage *incoming);
 		status_t DragStart();
@@ -144,9 +136,6 @@ class TBarView : public BView {
 
 		void PlaceBeMenu();
 		void PlaceTray(bool vertSwap, bool leftSwap, BRect screenFrame);
-	#if SA_CLOCK
-		void PlaceClock();
-	#endif
 		void PlaceApplicationBar(BRect screenFrame);
 
 		TBarMenuBar *fBarMenuBar;
@@ -158,9 +147,6 @@ class TBarView : public BView {
 
 		bool fShowInterval;
 		bool fShowClock;
-	#if SA_CLOCK
-		TTimeView *fClock;
-	#endif
 		bool fVertical;
 		bool fTop;
 		bool fLeft;

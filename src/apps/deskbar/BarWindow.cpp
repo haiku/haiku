@@ -86,9 +86,6 @@ TBarWindow::TBarWindow()
 	AddChild(fBarView);
 
 	AddShortcut('F', B_COMMAND_KEY, new BMessage(kFindButton));
-#if SA_CLOCK
-	AddShortcut('H', B_COMMAND_KEY, new BMessage('clok'));
-#endif
 }
 
 
@@ -163,12 +160,6 @@ TBarWindow::MessageReceived(BMessage *message)
 			tracker.SendMessage(message);
 			break;
 		}
-
-#if SA_CLOCK
-		case 'clok':
-			fBarView->ToggleClock();
-			break;
-#endif
 
 		case 'gloc':
 			GetLocation(message);

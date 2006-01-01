@@ -112,8 +112,8 @@ DumpList(BList *itemlist)
 #endif	/* DB_ADDONS */
 
 
-//	don't change the name of this view to anything other than
-//	Status 
+// don't change the name of this view to anything other than "Status"!
+
 TReplicantTray::TReplicantTray(TBarView *parent, bool vertical)
 	:	BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS),
@@ -136,16 +136,17 @@ void
 TReplicantTray::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	
+
 	SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	SetDrawingMode(B_OP_COPY);
 	Window()->SetPulseRate(1000000);
-	DealWithClock(fBarView->ShowingClock());	
+	DealWithClock(fBarView->ShowingClock());
 
-#ifdef DB_ADDONS		
-	//	load addons and rehydrate archives		
+#ifdef DB_ADDONS
+	// load addons and rehydrate archives
 #if !defined(__HAIKU__) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-	InitAddOnSupport();	
+// TODO: fix me!
+	InitAddOnSupport();
 #endif
 #endif
 	ResizeToPreferred();
@@ -156,9 +157,9 @@ void
 TReplicantTray::DetachedFromWindow()
 {
 #ifdef DB_ADDONS
-	//	clean up add-on support
+	// clean up add-on support
 	DeleteAddOnSupport();
-#endif	
+#endif
 	BView::DetachedFromWindow();
 }
 
@@ -261,43 +262,34 @@ TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 {
 	float width = 0, height = kMinimumTrayHeight;
 	
-	uint32 id;
-	BView *view;
-	fShelf->ReplicantAt(IconCount() - 1, &view, &id);
 	if (fMultiRowMode) {
-		if (view)
-			height = view->Frame().bottom;
-		
-		// 	the height will be uniform for the number of rows
-		//	necessary to show all the reps + any gutters
-		//	necessary for spacing	
+		if (fShelf->CountReplicants() > 0)
+			height = fRightBottomReplicant.bottom;
+
+		// the height will be uniform for the number of rows
+		// necessary to show all the reps + any gutters
+		// necessary for spacing	
 		int32 rowCount = (int32)(height / kMaxReplicantHeight);
 		height = kGutter + (rowCount * kMaxReplicantHeight)
 			+ ((rowCount - 1) * kIconGap) + kGutter;
-		// if new replicant budges into clock's area on clock row, add a row
-		if (view && fBarView->ShowingClock()
-				&& view->Frame().right >= fClock->Frame().left
-				&& view->Frame().top == fClock->Frame().top)
-				height += kMaxReplicantHeight;
-		height = max (kMinimumTrayHeight, height);
+		height = max(kMinimumTrayHeight, height);
 		width = kMinimumTrayWidth;
 	} else {
 		// if last replicant overruns clock then
 		// resize to accomodate
-		if (view) {
-			BRect viewFrame(view->Frame());	
+		if (fShelf->CountReplicants() > 0) {
 			if (fBarView->ShowingClock()
-				&& viewFrame.right + 6 >= fClock->Frame().left) {
-				width = viewFrame.right + 6 + fClock->Frame().Width();
+				&& fRightBottomReplicant.right + 6 >= fClock->Frame().left) {
+				width = fRightBottomReplicant.right + 6 + fClock->Frame().Width();
 			} else 
-				width = viewFrame.right + 3;
+				width = fRightBottomReplicant.right + 3;
 		}
-		//	this view has a fixed minimum width
+		// this view has a fixed minimum width
 		width = max(kMinimumTrayWidth, width);
 	}
 
 	*preferredWidth = width;
-	//	add 2 for the border
+	// add 2 for the border
 	*preferredHeight = height + 1;
 }
 
@@ -305,10 +297,10 @@ TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 void
 TReplicantTray::AdjustPlacement()
 {
-	//	called when an add-on has been added or removed
-	//	need to resize the parent of this accordingly
+	// called when an add-on has been added or removed
+	// need to resize the parent of this accordingly
 	//		
-	//	call to Parent will call ResizeToPreferred
+	// call to Parent will call ResizeToPreferred
 	BRect bounds = Bounds();
 	float width, height;
 	GetPreferredSize(&width, &height);
@@ -429,14 +421,14 @@ TReplicantTray::MouseDown(BPoint where)
 
 		do {
 			if (fabs(where.x - save.x) > 4 || fabs(where.y - save.y) > 4)
-				//	user moved out of bounds of click area
+				// user moved out of bounds of click area
 				break;
-	
+
 			if ((system_time() - start) > (2 * doubleClickSpeed)) {
 				ShowReplicantMenu(where);
 				break;
 			}
-	
+
 			snooze(50000);
 			GetMouse(&where, &buttons);
 		} while (buttons);
@@ -479,8 +471,8 @@ TReplicantTray::InitAddOnSupport()
 				file.Write(&fDeskbarSecurityCode, sizeof(fDeskbarSecurityCode));
 		}
 	}
-	
-	//	for each volume currently mounted
+
+	// for each volume currently mounted
 	//		index the volume with our indices
 	BVolumeRoster roster;
 	BVolume volume;
@@ -489,7 +481,7 @@ TReplicantTray::InitAddOnSupport()
 		RunAddOnQuery(&volume, kEnabledPredicate);
 	}
 
-	//	we also watch for volumes mounted and unmounted
+	// we also watch for volumes mounted and unmounted
 	watch_node(NULL, B_WATCH_MOUNT | B_WATCH_ATTR, this, Window());
 }
 
@@ -508,7 +500,7 @@ TReplicantTray::DeleteAddOnSupport()
 	}
 	delete fItemList;
 
-	//	stop the volume mount/unmount watch
+	// stop the volume mount/unmount watch
 	stop_watching(this, Window());
 }
 
@@ -533,11 +525,12 @@ TReplicantTray::RunAddOnQuery(BVolume *volume, const char *predicate)
 
 	int32 id;
 	BEntry entry;
-	while (query.GetNextEntry(&entry) == B_OK) 
-		//	scan any entries returned
-		//	attempt to load them as add-ons
-		//	collisions are handled in LoadAddOn
+	while (query.GetNextEntry(&entry) == B_OK) {
+		// scan any entries returned
+		// attempt to load them as add-ons
+		// collisions are handled in LoadAddOn
 		LoadAddOn(&entry, &id);
+	}
 }
 
 
@@ -605,19 +598,19 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 	BPath path;
 	switch (opcode) {
 		case B_ENTRY_CREATED:
-			//	entry was just listed, matches live query
+			// entry was just listed, matches live query
 			{
 				const char *name;
 				ino_t directory;
 				dev_t device;
-				// 	received when an app adds a ref to the
-				//	Deskbar add-ons folder
+				// received when an app adds a ref to the
+				// Deskbar add-ons folder
 				if (message->FindString("name", &name) == B_OK
 					&& message->FindInt64("directory", &directory) == B_OK
 					&& message->FindInt32("device", &device) == B_OK) {
 					entry_ref ref(device, directory, name);
-					//	see if this item has the attribute
-					//	that we expect
+					// see if this item has the attribute
+					// that we expect
 					if (IsAddOn(ref)) {
 						int32 id;
 						BEntry entry(&ref);					
@@ -628,8 +621,8 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 			break;
 
 		case B_ATTR_CHANGED:
-			//	from node watch on individual items
-			//		(node_watch added in LoadAddOn)
+			// from node watch on individual items
+			// (node_watch added in LoadAddOn)
 			{
 				node_ref nodeRef;
 				if (message->FindInt32("device", &(nodeRef.device)) == B_OK
@@ -675,8 +668,8 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 						break;
 
 					ref.set_name(name);
-					//	change the directory reference to
-					//	the new directory
+					// change the directory reference to
+					// the new directory
 					MoveItem(&ref, todirectory);
 				}
 			}
@@ -684,7 +677,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 
 		case B_ENTRY_REMOVED:
 		{
-			//	entry was rm'd from the device
+			// entry was rm'd from the device
 			node_ref nodeRef;
 			if (message->FindInt32("device", &(nodeRef.device)) == B_OK
 				&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
@@ -704,7 +697,7 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 
 		case B_DEVICE_MOUNTED:
 			{
-				//	run a new query on the new device
+				// run a new query on the new device
 				dev_t device;
 				if (message->FindInt32("new device", &device) != B_OK)
 					break;
@@ -714,10 +707,10 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 			break;
 		case B_DEVICE_UNMOUNTED:
 			{
-				//	remove all items associated with the device
-				//	unmounted
-				//  contrary to what the BeBook says, the item is called "device",
-				//  not "new device" like it is for B_DEVICE_MOUNTED
+				// remove all items associated with the device
+				// unmounted
+				// contrary to what the BeBook says, the item is called "device",
+				// not "new device" like it is for B_DEVICE_MOUNTED
 				dev_t device;
 				if (message->FindInt32("device", &device) != B_OK)
 					break;
@@ -729,9 +722,10 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 }
 
 
-//	the add-ons must support the exported C function API
-//	if they do, they will be loaded and added to deskbar
-//	primary function is the Instantiate function
+/** The add-ons must support the exported C function API
+ *	if they do, they will be loaded and added to deskbar
+ *	primary function is the Instantiate function
+ */
 
 status_t
 TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
@@ -741,7 +735,7 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 
 	node_ref nodeRef;
 	entry->GetNodeRef(&nodeRef);
-	//	no duplicates
+	// no duplicates
 	if (NodeExists(nodeRef))
 		return B_ERROR;
 
@@ -763,12 +757,12 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 	BPath path;
 	entry->GetPath(&path);
 
-	//	load the add-on
+	// load the add-on
 	image_id image = load_add_on(path.Path());
 	if (image < 0)
 		return (status_t)image;
 
-	// 	get the view loading function symbol		
+	// get the view loading function symbol		
 	//    we first look for a symbol that takes an image_id
 	//    and entry_ref pointer, if not found, go with normal
 	//    instantiate function
@@ -895,9 +889,9 @@ TReplicantTray::MoveItem(entry_ref *ref, ino_t toDirectory)
 	if (!ref)
 		return;
 
-	//	scan for a matching entry_ref and update it
+	// scan for a matching entry_ref and update it
 	//
-	//	don't need to change node info as it does not change
+	// don't need to change node info as it does not change
 
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
 		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
@@ -945,8 +939,10 @@ TReplicantTray::ItemInfo(int32 id, const char **name)
 }
 
 
-//	for a specific name
-//	return the id (internal to Deskbar)
+/**	for a specific name
+ *	return the id (internal to Deskbar)
+ */
+
 status_t
 TReplicantTray::ItemInfo(const char *name, int32 *id)
 {
@@ -962,8 +958,10 @@ TReplicantTray::ItemInfo(const char *name, int32 *id)
 }
 
 
-//	at a specific index
-//	return both the name and the id of the replicant
+/**	at a specific index
+ *	return both the name and the id of the replicant
+ */
+
 status_t
 TReplicantTray::ItemInfo(int32 index, const char **name, int32 *id)
 {
@@ -981,7 +979,8 @@ TReplicantTray::ItemInfo(int32 index, const char **name, int32 *id)
 }
 
 
-//	replicant exists, by id/index
+/**	replicant exists, by id/index */
+
 bool
 TReplicantTray::IconExists(int32 target, bool byIndex)
 {
@@ -992,7 +991,8 @@ TReplicantTray::IconExists(int32 target, bool byIndex)
 }
 
 
-//	replicant exists, by name
+/**	replicant exists, by name */
+
 bool
 TReplicantTray::IconExists(const char *name)
 {
@@ -1013,9 +1013,11 @@ TReplicantTray::IconCount() const
 }
 
 
-//	message must contain an archivable view
-//	in the Archives folder for later rehydration
-//	returns the current boot id
+/**	message must contain an archivable view
+ *	in the Archives folder for later rehydration
+ *	returns the current boot id
+ */
+
 status_t
 TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 {
@@ -1026,27 +1028,28 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 	if (icon->what == B_ARCHIVED_OBJECT)
 		icon->what = 0;
 
-	//	!! check for name collisions?
+	// !! check for name collisions?
 	status_t err = fShelf->AddReplicant(icon, BPoint(1, 1));
 	if (err != B_OK)
 		return err;
-	
+
 	float oldWidth = Bounds().Width();
 	float oldHeight = Bounds().Height();
 	float width, height;
 	GetPreferredSize(&width, &height);
 	if (oldWidth != width || oldHeight != height) 
 		AdjustPlacement();
-	
+
 	int32 count = fShelf->CountReplicants();
 	BView *view;
 	fShelf->ReplicantAt(count-1, &view, (uint32 *)id, NULL);
 	
-	//	add the item to the add-on list
+	// add the item to the add-on list
 	entry_ref ref;
-	if (addOn) // Use it if we got it
+	if (addOn) {
+		// Use it if we got it
 		ref = *addOn;
-	else {
+	} else {
 		const char *appsig;
 		icon->FindString("add_on", &appsig);
 		BRoster roster;
@@ -1076,11 +1079,11 @@ TReplicantTray::RemoveIcon(int32 target, bool byIndex)
 	int32 index, id;
 	BView *view = ViewAt(&index, &id, target, byIndex);
 	if (view && index >= 0) {
-		//	remove the reference from the item list
+		// remove the reference from the item list & the shelf
 		RemoveItem(id);
-		//	remove the replicant from the shelf
 		fShelf->DeleteReplicant(index);
-		//	force a placement update,  !! need to fix BShelf
+
+		// force a placement update,  !! need to fix BShelf
 		RealReplicantAdjustment(index);
 	}
 }
@@ -1095,38 +1098,44 @@ TReplicantTray::RemoveIcon(const char *name)
 	int32 id, index;
 	BView *view = ViewAt(&index, &id, name);
 	if (view && index >= 0) {
-		//	remove the reference from the item list
+		// remove the reference from the item list & shelf
 		RemoveItem(id);
-		//	remove the replicant from the shelf
 		fShelf->DeleteReplicant(index);
-		//	force a placement update,  !! need to fix BShelf
+
+		// force a placement update,  !! need to fix BShelf
 		RealReplicantAdjustment(index);
 	}
 }
 
 
 void
-TReplicantTray::RealReplicantAdjustment(int32 startindex)
+TReplicantTray::RealReplicantAdjustment(int32 startIndex)
 {
-	if (startindex < 0)
+	if (startIndex < 0)
 		return;
-	//	reset the locations of all replicants after the one deleted
-	RealignReplicants(startindex);
+
+	if (startIndex == fLastReplicant)
+		startIndex = 0;
+
+	// reset the locations of all replicants after the one deleted
+	RealignReplicants(startIndex);
 
 	float oldWidth = Bounds().Width();
 	float oldHeight = Bounds().Height();
 	float width, height;
 	GetPreferredSize(&width, &height);
 	if (oldWidth != width || oldHeight != height) {
-		//	resize view to accomodate the replicants
-		//	redraw as necessary
+		// resize view to accomodate the replicants
+		// redraw as necessary
 		AdjustPlacement();
 	}
 }
 
 
-//	looking for a replicant by id/index
-//	return the view and index
+/**	looking for a replicant by id/index
+ *	return the view and index
+ */
+
 BView *
 TReplicantTray::ViewAt(int32 *index, int32 *id, int32 target, bool byIndex)
 {
@@ -1157,8 +1166,10 @@ TReplicantTray::ViewAt(int32 *index, int32 *id, int32 target, bool byIndex)
 }
 
 
-//	looking for a replicant with a view by name
-//	return the view, index and the id of the replicant
+/**	looking for a replicant with a view by name
+ *	return the view, index and the id of the replicant
+ */
+
 BView *
 TReplicantTray::ViewAt(int32 *index, int32 *id, const char *name)
 {
@@ -1179,14 +1190,16 @@ TReplicantTray::ViewAt(int32 *index, int32 *id, const char *name)
 }
 
 
-// 	Shelf will call to determine where and if
-//	the replicant is to be added
+/**	Shelf will call to determine where and if
+ *	the replicant is to be added
+ */
+
 bool
 TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage *message)
 {
 	if (!message)
 		return false;
-		
+
 	if (replicantFrame.Height() > kMaxReplicantHeight)
 		return false;
 
@@ -1203,12 +1216,11 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage *message)
 		message->FindInt32("deskbar:private_align", (int32 *)&align);
 	else
 		align = B_ALIGN_LEFT;
-	
-	int32 count = fShelf->CountReplicants();
-	BPoint loc = LocForReplicant(count+1, count, replicantFrame.Width());
-	
-	message->AddPoint("_pjp_loc", loc);
 
+	BPoint loc = LocationForReplicant(fShelf->CountReplicants(),
+		replicantFrame.Width());
+
+	message->AddPoint("_pjp_loc", loc);
 	return true;
 }
 
@@ -1219,35 +1231,52 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage *message)
  */
 
 BPoint
-TReplicantTray::LocForReplicant(int32, int32 index, float width)
+TReplicantTray::LocationForReplicant(int32 index, float width)
 {
 	BPoint loc(kIconGap + 1, kGutter + 1);
 
-	if (index > 0) {
-		//	get the last replicant added for placement reference
-		BView *view = NULL;		
-		fShelf->ReplicantAt((index-1), &view);
-		if (view) {
-			// push this rep placement past the last one
-			loc.x = view->Frame().right + kIconGap+1;
-			loc.y = view->Frame().top;
+	if (fMultiRowMode) {
+		// try to find free space in every row
+		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
+			// determine free space in this row
+			BRect rect(loc.x, loc.y, loc.x + kMinimumTrayWidth + 2, kMaxReplicantHeight);
+			if (row == 0 && fBarView->ShowingClock())
+				rect.right -= fClock->Frame().Width() + kIconGap;
+
+			for (int32 i = 0; i < index; i++) {
+				BView *view = NULL;
+				fShelf->ReplicantAt(i, &view);
+				if (view == NULL || view->Frame().top != rect.top)
+					continue;
+
+				rect.left = view->Frame().right + kIconGap + 1;
+			}
+
+			if (rect.Width() >= width) {
+				// the icon fits in this row
+				loc = rect.LeftTop();
+				break;
+			}
+		}
+	} else {
+		if (index > 0) {
+			// get the last replicant added for placement reference
+			BView *view = NULL;
+			fShelf->ReplicantAt(index - 1, &view);
+			if (view) {
+				// push this rep placement past the last one
+				loc.x = view->Frame().right + kIconGap + 1;
+				loc.y = view->Frame().top;
+			}
 		}
 	}
 
-	if (fMultiRowMode) {
-		// if on first row, don't cover the clock
-		// if on any other row, don't go past right edge
-		if ((loc.x + width + 2 >= kMinimumTrayWidth)
-			|| (fBarView->ShowingClock()
-				&& (loc.x + width + 6 >= kMinimumTrayWidth - fClock->Frame().Width())
-				&& (loc.y == kGutter + 1))) {
-			// make the vertical placement uniform
-			// based on the maximum height provided for each
-			// replicant
-			loc.y += kMaxReplicantHeight + kIconGap;
-			loc.x = kIconGap + 1;
-		}
+	if ((loc.y == fRightBottomReplicant.top && loc.x > fRightBottomReplicant.left)
+		|| loc.y > fRightBottomReplicant.top) {
+		fRightBottomReplicant.Set(loc.x, loc.y, loc.x + width, loc.y + kMaxReplicantHeight);
+		fLastReplicant = index;
 	}
+
 	return loc;
 }
 
@@ -1269,18 +1298,18 @@ TReplicantTray::IconFrame(const char *name)
 {
 	if (!name)
 		return BRect(0, 0, 0, 0);
-		
+
 	int32 id, index;
 	BView *view = ViewAt(&index, &id, name);
 	if (view)
 		return view->Frame();
-	
+
 	return BRect(0, 0, 0, 0);
 }
 
 
-/**	scan from the startIndex and reset the location
- *	as defined in LocForReplicant
+/**	Scan from the startIndex and reset the location
+ *	as defined in LocationForReplicant()
  */
 
 void
@@ -1288,15 +1317,18 @@ TReplicantTray::RealignReplicants(int32 startIndex)
 {
 	if (startIndex < 0)
 		startIndex = 0;
-		
+
 	int32 count = fShelf->CountReplicants();
 	if (count <= 0)
 		return;
 
+	if (startIndex == 0)
+		fRightBottomReplicant.Set(0, 0, 0, 0);
+
 	BView *view = NULL;
 	for (int32 i = startIndex ; i < count ; i++){
 		fShelf->ReplicantAt(i, &view);
-		BPoint loc = LocForReplicant(count, i, view->Frame().Width());
+		BPoint loc = LocationForReplicant(i, view->Frame().Width());
 		if (view && (view->Frame().LeftTop() != loc)) {
 			view->MoveTo(loc);
 		}
@@ -1319,8 +1351,10 @@ TReplicantTray::SetMultiRow(bool state)
 //	#pragma mark -
 
 
-//	draggable region that is asynchronous so that
-//	dragging does not block other activities
+/**	draggable region that is asynchronous so that
+ *	dragging does not block other activities
+ */
+
 TDragRegion::TDragRegion(TBarView *parent, BView *child)
 	:	BControl(BRect(0, 0, 0, 0), "", "", NULL, B_FOLLOW_NONE,
 			B_WILL_DRAW | B_FRAME_EVENTS),
@@ -1475,12 +1509,13 @@ TDragRegion::MouseDown(BPoint thePoint)
 	ulong buttons;
 	BPoint where;
 	BRect dragRegion(DragRegion());
-	
-	dragRegion.InsetBy(-2.0f, -2.0f);	// DragRegion() is designed for drawing, not clicking
-	
+
+	dragRegion.InsetBy(-2.0f, -2.0f);
+		// DragRegion() is designed for drawing, not clicking
+
 	if (!dragRegion.Contains(thePoint))
 		return;
-	
+
 	while(true) {
 		GetMouse(&where, &buttons);
 		if (!buttons)
@@ -1525,9 +1560,8 @@ TDragRegion::SwitchModeForRect(BPoint mouse, BRect rect,
 		&& newState == fBarView->State())
 		// already in the correct mode
 		return true;
-		
+
 	fBarView->ChangeState(newState, newVertical, newLeft, newTop);
-		
 	return true;
 }
 
@@ -1549,7 +1583,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 		BRect topLeft(frame.left, frame.top, frame.left + hDivider, miniDivider);
 		BRect topMiddle(frame.left + hDivider, frame.top, frame.right - hDivider, vDivider);
 		BRect topRight(frame.right - hDivider, frame.top, frame.right, miniDivider);
-		
+
 #ifdef FULL_MODE
 		vDivider = miniDivider + thirdScreen;
 #endif
@@ -1559,7 +1593,7 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 #ifdef FULL_MODE
 		BRect leftSide(frame.left, vDivider, frame.left + hDivider, frame.bottom - thirdScreen);
 		BRect rightSide(frame.right - hDivider, vDivider, frame.right, frame.bottom - thirdScreen);
-	
+
 		vDivider = frame.bottom - thirdScreen;
 #endif		
 		BRect bottomLeft(frame.left, vDivider, frame.left + hDivider, frame.bottom);
@@ -1584,11 +1618,9 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 #endif
 				|| SwitchModeForRect(where, bottomLeft, true, true, false, kMiniState)
 				|| SwitchModeForRect(where, bottomMiddle, false, true, false, kExpandoState)
-				|| SwitchModeForRect(where, bottomRight, true, false, false, kMiniState)
-				)
+				|| SwitchModeForRect(where, bottomRight, true, false, false, kMiniState))
 				;
 		}
-
 	} else
 		BControl::MouseMoved(where, code, message);
 }

@@ -156,12 +156,12 @@ CalendarMenuItem::GetContentSize(float *_width, float *_height)
 	font.SetSize(kTitleFontSize);
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
-	fTitleHeight = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+	fTitleHeight = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
 
 	font = be_plain_font;
 	font.GetHeight(&fontHeight);
-	fRowHeight = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.leading + kRowGap);
-	fFontHeight = ceil(fontHeight.ascent);
+	fRowHeight = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading + kRowGap);
+	fFontHeight = ceilf(fontHeight.ascent);
 	fColumnWidth = font.StringWidth("99") + kColumnGap;
 
 	fFirstWeekday = first_weekday_of_month(tm);
