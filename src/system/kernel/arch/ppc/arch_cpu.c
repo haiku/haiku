@@ -101,26 +101,18 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
-	addr_t address = 0;
-	unsigned long i;
-
-	asm volatile("sync");
-	for (i = 0; i < 0x100000; i++) {
-		asm volatile("tlbie %0" :: "r" (address));
-		eieio();
-		asm volatile("sync");
-
-		address += B_PAGE_SIZE;
-	}
-	tlbsync();
-	asm volatile("sync");
+	ppc_sync();
+	tlbia();
+	ppc_sync();
 }
 
 
 void 
 arch_cpu_user_TLB_invalidate(void)
 {
-	// TODO: Implement!
+	ppc_sync();
+	tlbia();
+	ppc_sync();
 }
 
 

@@ -91,7 +91,7 @@
 static struct page_table_entry_group *sPageTable;
 static size_t sPageTableSize;
 static uint32 sPageTableHashMask;
-static area_id sPageTableRegion;
+static area_id sPageTableArea;
 
 
 // 512 MB of iospace
@@ -125,6 +125,7 @@ ppc_translation_map_change_asid(vm_translation_map *map)
 #endif
 	int vsidBase = map->arch_data->vsid_base;
 
+	isync();	// synchronize context
 	asm("mtsr	0,%0" : : "g"(vsidBase));
 	asm("mtsr	1,%0" : : "g"(vsidBase + 1));
 	asm("mtsr	2,%0" : : "g"(vsidBase + 2));
@@ -133,6 +134,7 @@ ppc_translation_map_change_asid(vm_translation_map *map)
 	asm("mtsr	5,%0" : : "g"(vsidBase + 5));
 	asm("mtsr	6,%0" : : "g"(vsidBase + 6));
 	asm("mtsr	7,%0" : : "g"(vsidBase + 7));
+	isync();	// synchronize context
 }
 
 
@@ -159,7 +161,7 @@ destroy_tmap(vm_translation_map *map)
 		panic("vm_translation_map.destroy_tmap: map %p has positive map count %d\n", map, map->map_count);
 	}
 
-	// mark the asid not in use
+	// mark the vsid base not in use
 	int baseBit = map->arch_data->vsid_base >> VSID_BASE_SHIFT;
 	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32], 
 			~(1 << (baseBit % 32)));
@@ -195,7 +197,7 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 	entry->abbr_page_index = (virtualAddress >> 22) & 0x3f;
 	entry->valid = true;
 
-	ptesync();
+	ppc_sync();
 }
 
 
@@ -253,12 +255,12 @@ map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress,
 
 
 static page_table_entry *
-lookup_pagetable_entry(vm_translation_map *map, addr_t virtualAddress)
+lookup_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
 {
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_VSID(map, virtualAddress);
 
-//	dprintf("vm_translation_map.lookup_pagetable_entry: vsid %d, va 0x%lx\n", vsid, va);
+//	dprintf("vm_translation_map.lookup_page_table_entry: vsid %d, va 0x%lx\n", vsid, va);
 
 
 	// Search for the page table entry using the primary hash value
@@ -293,6 +295,23 @@ lookup_pagetable_entry(vm_translation_map *map, addr_t virtualAddress)
 }
 
 
+static bool
+remove_page_table_entry(vm_translation_map *map, addr_t virtualAddress)
+{
+	page_table_entry *entry = lookup_page_table_entry(map, virtualAddress);
+	if (entry) {
+		entry->valid = 0;
+		ppc_sync();
+		tlbie(virtualAddress);
+		eieio();
+		tlbsync();
+		ppc_sync();
+	}
+
+	return entry;
+}
+
+
 static status_t
 unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
@@ -304,13 +323,8 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
 
 	while (start < end) {
-		entry = lookup_pagetable_entry(map, start);
-		if (entry) {
-			// unmap this page
-			entry->valid = 0;
-			arch_cpu_global_TLB_invalidate();
+		if (remove_page_table_entry(map, start))
 			map->map_count--;
-		}
 
 		start += B_PAGE_SIZE;
 	}
@@ -328,7 +342,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_ou
 	*_outFlags = 0;
 	*_outPhysical = 0;
 
-	entry = lookup_pagetable_entry(map, va);
+	entry = lookup_page_table_entry(map, va);
 	if (entry == NULL)
 		return B_NO_ERROR;
 
@@ -366,16 +380,29 @@ protect_tmap(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes
 static status_t
 clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
 {
-	page_table_entry *entry = lookup_pagetable_entry(map, virtualAddress);
+	page_table_entry *entry = lookup_page_table_entry(map, virtualAddress);
 	if (entry == NULL)
 		return B_NO_ERROR;
 
-	if (flags & PAGE_MODIFIED)
-		entry->changed = false;
-	if (flags & PAGE_ACCESSED)
-		entry->referenced = false;
+	bool modified = false;
 
-	arch_cpu_global_TLB_invalidate();
+	// clear the bits
+	if (flags & PAGE_MODIFIED && entry->changed) {
+		entry->changed = false;
+		modified = true;
+	}
+	if (flags & PAGE_ACCESSED && entry->referenced) {
+		entry->referenced = false;
+		modified = true;
+	}
+
+	// synchronize
+	if (modified) {
+		tlbie(virtualAddress);
+		eieio();
+		tlbsync();
+		ppc_sync();
+	}
 
 	return B_OK;
 }
@@ -458,13 +485,13 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sVSIDBaseBitmapLock);
 
-	// allocate a ASID base for this one
+	// allocate a VSID base for this one
 	if (kernel) {
-		// The boot loader (respectively the Open Firmware) should has set up
-		// the segment registers for identical mapping. Two VSID bases are
-		// reserved for the kernel: 0 and 8. The latter one for mapping the
-		// kernel address space (0x80000000...), the former one for the lower
-		// addresses required by the Open Firmware services.
+		// The boot loader has set up the segment registers for identical
+		// mapping. Two VSID bases are reserved for the kernel: 0 and 8. The
+		// latter one for mapping the kernel address space (0x80000000...), the
+		// former one for the lower addresses required by the Open Firmware
+		// services.
 		map->arch_data->vsid_base = 0;
 		sVSIDBaseBitmap[0] |= 0x3;
 	} else {
@@ -525,8 +552,63 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
 status_t
 arch_vm_translation_map_init_post_area(kernel_args *args)
 {
-	// create a region to cover the page table
-	sPageTableRegion = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
+	// If the page table doesn't lie within the kernel address space, we
+	// remap it.
+	if (!IS_KERNEL_ADDRESS(sPageTable)) {
+		vm_address_space *addressSpace = vm_kernel_address_space();
+
+		// reserve space in the address space
+		void *newAddress = NULL;
+		status_t error = vm_reserve_address_range(addressSpace->id,
+			&newAddress, B_ANY_KERNEL_ADDRESS, sPageTableSize,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (error != B_OK) {
+			panic("arch_vm_translation_map_init_post_area(): Failed to reserve "
+				"space for the page table!");
+			return error;
+		}
+
+		// get the table page's first physical page
+		page_table_entry *entry = lookup_page_table_entry(
+			&addressSpace->translation_map, (addr_t)sPageTable);
+		if (!entry) {
+			panic("arch_vm_translation_map_init_post_area(): Couldn't find "
+				"the physical address of the page table!");
+			return B_ERROR;
+		}
+		addr_t physicalBase = entry->physical_page_number << 12;
+
+		// map the pages
+		for (addr_t i = 0; i < sPageTableSize; i += B_PAGE_SIZE) {
+			addr_t virtualAddress = (addr_t)newAddress + i;
+			addr_t physicalAddress = physicalBase + i;
+
+			error = map_tmap(&addressSpace->translation_map, virtualAddress,
+				physicalAddress, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			if (error != B_OK) {
+				panic("arch_vm_translation_map_init_post_area(): Failed to "
+					"remap the page table!");
+				return error;
+			}
+		}
+
+		// set the new page table address
+		addr_t oldVirtualBase = (addr_t)(sPageTable);
+		sPageTable = (page_table_entry_group*)newAddress;
+
+		// unmap the old pages
+		for (addr_t i = 0; i < sPageTableSize; i += B_PAGE_SIZE) {
+			remove_page_table_entry(&addressSpace->translation_map,
+				oldVirtualBase + i);
+		}
+
+// TODO: We should probably map the page table via BAT. It is relatively large,
+// and due to being a hash table the access patterns might look sporadic, which
+// certainly isn't to the liking of the TLB.
+	}
+
+	// create an area to cover the page table
+	sPageTableArea = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
 		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 #if 0
