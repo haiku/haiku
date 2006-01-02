@@ -6,7 +6,7 @@ Application Chart :
 	ChartView.cpp
 	ChartWindow.cpp
 	: libbe.so libgame.so libroot.so
-	: Chart.rsrc
+	: Chart.rdef
 	;
 
 
