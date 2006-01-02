@@ -222,7 +222,6 @@ block_cache::GetFreeRange()
 		return NULL;
 	}
 
-	hash_insert(ranges_hash, range);
 	return range;
 }
 

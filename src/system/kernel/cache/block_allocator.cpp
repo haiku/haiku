@@ -8,9 +8,10 @@
 
 #include <KernelExport.h>
 
-#include <util/AutoLock.h>
 #include <vm_address_space.h>
 #include <vm_page.h>
+#include <util/AutoLock.h>
+#include <util/khash.h>
 
 #include <string.h>
 
@@ -199,8 +200,9 @@ block_range::New(block_cache *cache, block_range **_range)
 	memset(range, 0, sizeof(block_range) + cache->chunks_per_range * sizeof(block_chunk));
 	range->base = address;
 
-	// insert into free ranges list in cache
+	// insert into free ranges list and hash in cache
 	cache->free_ranges.Add(range);
+	hash_insert(cache->ranges_hash, range);
 
 	*_range = range;
 	return B_OK;
@@ -234,8 +236,9 @@ block_range::Delete(block_cache *cache, block_range *range)
 		vm_page_set_state(range->pages[i], PAGE_STATE_FREE);
 	}
 
-	// remove from cache free list
+	// remove from cache free list and hash
 	cache->free_ranges.Remove(range);
+	hash_remove(cache->ranges_hash, range);
 
 	free(range);
 }
