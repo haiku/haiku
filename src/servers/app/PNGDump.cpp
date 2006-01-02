@@ -11,7 +11,6 @@
 
 #include "PNGDump.h"
 
-#include <new>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +30,10 @@
 #	define TRACE(x) ;
 #endif
 
-using std::nothrow;
-
 status_t
 SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	const void* bits, int32 bitsLength, int32 bytesPerRow)
 {
-bigtime_t now = system_time();
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
 
@@ -109,6 +105,5 @@ bigtime_t now = system_time();
 	png_destroy_write_struct(&png, NULL);
 
 	fclose(file);
-printf("PNG Dump: %lld\n", system_time() - now);
 	return B_OK;
 }
