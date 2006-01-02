@@ -1115,8 +1115,7 @@ DrawingEngine::DumpToFile(const char *path)
 		RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
 		if (buffer) {
 			BRect bounds(0.0, 0.0, buffer->Width() - 1, buffer->Height() - 1);
-			// TODO: Don't assume B_RGBA32!!
-			SaveToPNG(path, bounds, B_RGBA32,
+			SaveToPNG(path, bounds, buffer->ColorSpace(),
 					  buffer->Bits(),
 					  buffer->BitsLength(),
 					  buffer->BytesPerRow());
