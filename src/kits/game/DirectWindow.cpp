@@ -291,12 +291,16 @@ BDirectWindow::IsFullScreen() const
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
-	display_mode mode;
+/*	display_mode mode;
 	status_t status = BScreen(id).GetMode(&mode);
 	if (status == B_OK)
 		return mode.flags & B_PARALLEL_ACCESS;
 
-	return false;
+	return false;*/
+	// TODO: Apparently, the above is false for the vesa driver,
+	// but enabling it doesn't do any harm... maybe we should just return always true.
+	// At least, I can't see why window mode shouldn't be supported.
+	return true;
 }
 
 
