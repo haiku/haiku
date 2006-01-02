@@ -7,6 +7,8 @@ SECTIONS
 {
 	. = 0x102000 + SIZEOF_HEADERS;
 
+	__text_begin = .;
+
 	/* text/read-only data */
 	.text :	{ *(.text .gnu.linkonce.t.*) }
 
