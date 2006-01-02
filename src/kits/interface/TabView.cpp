@@ -207,8 +207,10 @@ BTab::DrawFocusMark(BView *owner, BRect frame)
 	float width = owner->StringWidth(Label());
 
 	owner->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	owner->StrokeLine(BPoint(frame.left + frame.Width() * 0.5f - width * 0.5f, frame.bottom),
-		BPoint(frame.left + frame.Width() * 0.5f + width * 0.5f, frame.bottom));
+	// TODO: remove offset
+	float offset = frame.Height() / 2.0;
+	owner->StrokeLine(BPoint((frame.left + frame.right - width + offset) / 2.0, frame.bottom - 3),
+					  BPoint((frame.left + frame.right + width + offset) / 2.0, frame.bottom - 3));
 }
 
 
@@ -220,8 +222,11 @@ BTab::DrawLabel(BView *owner, BRect frame)
 		return;
 
 	owner->SetHighColor(0, 0, 0);
-	owner->DrawString(label, BPoint(frame.left + frame.Width() * 0.5f -
-		owner->StringWidth(label) * 0.5f, frame.bottom - 4.0f - 2.0f));
+	float width = owner->StringWidth(label);
+	// TODO: remove offset
+	float offset = frame.Height() / 2.0;
+	owner->DrawString(label, BPoint((frame.left + frame.right - width + offset) / 2.0,
+									frame.bottom - 4.0f - 2.0f));
 }
 
 
@@ -230,6 +235,8 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT);
+	rgb_color darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
+	rgb_color darken3 = tint_color(no_tint, B_DARKEN_3_TINT);
 	rgb_color darken4 = tint_color(no_tint, B_DARKEN_4_TINT);
 	rgb_color darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
@@ -237,37 +244,46 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 	owner->SetLowColor(no_tint);
 	DrawLabel(owner, frame);
 
+	owner->SetDrawingMode(B_OP_OVER);
+
 	owner->BeginLineArray(12);
 
+	int32 slopeWidth = (int32)ceilf(frame.Height() / 2.0);
+
 	if (position != B_TAB_ANY) {
-		owner->AddLine(BPoint(frame.left - 2.0f, frame.bottom),
-			BPoint(frame.left - 1.0f, frame.bottom - 1.0f), lightenmax);
-		owner->AddLine(BPoint(frame.left, frame.bottom - 2.0f),
-			BPoint(frame.left, frame.bottom - 3.0f), lightenmax);
+		// full height left side
+		owner->AddLine(BPoint(frame.left, frame.bottom),
+					   BPoint(frame.left + slopeWidth, frame.top), darken3);
+		owner->AddLine(BPoint(frame.left, frame.bottom + 1),
+					   BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
+	} else {
+		// upper half of left side
+		owner->AddLine(BPoint(frame.left + slopeWidth / 2, frame.bottom - slopeWidth),
+					   BPoint(frame.left + slopeWidth, frame.top), darken3);
+		owner->AddLine(BPoint(frame.left + slopeWidth / 2 + 2, frame.bottom - slopeWidth - 1),
+					   BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
 	}
 
-	owner->AddLine(BPoint(frame.left + 1.0f, frame.bottom - 4.0f),
-		BPoint(frame.left + 1.0f, frame.top + 5.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 1.0f, frame.top + 4.0f),
-		BPoint(frame.left + 2.0f, frame.top + 2.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 3.0f, frame.top + 1.0f),
-		BPoint(frame.left + 4.0f, frame.top + 1.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 5.0f, frame.top),
-		BPoint(frame.right - 5.0f, frame.top), lightenmax);
-
-	owner->AddLine(BPoint(frame.right - 4.0f, frame.top + 1.0f),
-		BPoint(frame.right - 3.0f, frame.top + 1.0f), lightenmax);
-
-	owner->AddLine(BPoint(frame.right - 2.0f, frame.top + 2.0f),
-		BPoint(frame.right - 2.0f, frame.top + 3.0f), darken4);
-	owner->AddLine(BPoint(frame.right - 1.0f, frame.top + 4.0f),
-		BPoint(frame.right - 1.0f, frame.bottom - 4.0f), darken4);
+	// lines along the top
+	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top),
+				   BPoint(frame.right, frame.top), darken3);
+	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top + 1),
+				   BPoint(frame.right, frame.top + 1), lightenmax);
 
 	if (full) { 
-		owner->AddLine(BPoint(frame.right, frame.bottom - 3.0f),
-			BPoint(frame.right, frame.bottom - 2.0f), darken4);
-		owner->AddLine(BPoint(frame.right + 1.0f, frame.bottom - 1.0f),
-			BPoint(frame.right + 2.0f, frame.bottom), darken4);
+		// full height right side
+		owner->AddLine(BPoint(frame.right, frame.top),
+					   BPoint(frame.right + slopeWidth + 2, frame.bottom), darken2);
+		owner->AddLine(BPoint(frame.right, frame.top + 1),
+					   BPoint(frame.right + slopeWidth + 1, frame.bottom), darken4);
+	} else {
+		// upper half of right side
+		owner->AddLine(BPoint(frame.right, frame.top),
+					   BPoint(frame.right + slopeWidth / 2 + 1,
+					   		  frame.bottom - slopeWidth), darken2);
+		owner->AddLine(BPoint(frame.right, frame.top + 1),
+					   BPoint(frame.right + slopeWidth / 2,
+					   		  frame.bottom - slopeWidth), darken4);
 	}
 
 	owner->EndLineArray();
@@ -301,6 +317,8 @@ BTabView::BTabView(BRect frame, const char *name, button_width width,
 	uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags)
 {
+	SetFont(be_bold_font);
+
 	_InitObject();
 
 	fTabWidthSetting = width;
@@ -432,7 +450,8 @@ BTabView::WindowActivated(bool active)
 {
 	BView::WindowActivated(active);
 
-	DrawTabs();
+	if (IsFocus())
+		Invalidate();
 }
 
 
@@ -495,14 +514,22 @@ BTabView::KeyDown(const char *bytes, int32 numBytes)
 
 	switch (bytes[0]) {
 		case B_DOWN_ARROW:
-		case B_LEFT_ARROW:
-			SetFocusTab((fFocus - 1) % CountTabs(), true);
+		case B_LEFT_ARROW: {
+			int32 focus = fFocus - 1;
+			if (focus < 0)
+				focus = CountTabs() - 1;
+			SetFocusTab(focus, true);
 			break;
+		}
 
 		case B_UP_ARROW:
-		case B_RIGHT_ARROW:
-			SetFocusTab((fFocus + 1) % CountTabs(), true);
+		case B_RIGHT_ARROW: {
+			int32 focus = fFocus + 1;
+			if (focus >= CountTabs())
+				focus = 0;
+			SetFocusTab(focus, true);
 			break;
+		}
 
 		case B_RETURN:
 		case B_SPACE:
@@ -570,7 +597,6 @@ BTabView::Select(int32 index)
 		fSelection = index;
 	}
 
-	//Draw(Bounds());
 	Invalidate();
 }
 
@@ -601,17 +627,21 @@ BTabView::SetFocusTab(int32 tab, bool focused)
 		if (tab == fFocus)
 			return;
 
-		if (fFocus != -1)
-			TabAt (fFocus)->MakeFocus(false);
+		if (fFocus != -1){
+			TabAt(fFocus)->MakeFocus(false);
+			Invalidate(TabFrame(fFocus));
+		}
+		if (tab != -1) {
+			TabAt(tab)->MakeFocus(true);
+			Invalidate(TabFrame(tab));
+		}
 
-		TabAt(tab)->MakeFocus(true);
 		fFocus = tab;
 	} else if (fFocus != -1) {
-		TabAt (fFocus)->MakeFocus(false);
-		fFocus = -1;
+		TabAt(fFocus)->MakeFocus(false);
+		Invalidate(TabFrame(fFocus));
+//		fFocus = -1;
 	}
-
-	Invalidate();
 }
 
 
@@ -651,31 +681,71 @@ void
 BTabView::DrawBox(BRect selTabRect)
 {
 	BRect rect = Bounds();
+	BRect lastTabRect = TabFrame(CountTabs() - 1);
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_LIGHTEN_MAX_TINT));
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
+	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
 
-	StrokeLine(BPoint(0.0f, rect.bottom), BPoint(0.0f, selTabRect.bottom));
-	StrokeLine(BPoint(selTabRect.left - 3.0f, selTabRect.bottom));
-	StrokeLine(BPoint(selTabRect.right + 3.0f, selTabRect.bottom),
-		BPoint(rect.right - 1.0f, selTabRect.bottom));
+	BeginLineArray(12);
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT));
+	int32 offset = (int32)ceilf(selTabRect.Height() / 2.0);
 
-	StrokeLine(BPoint(rect.right, selTabRect.bottom + 1.0f),
-		BPoint(rect.right, rect.bottom));
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
+	// outer lines
+	AddLine(BPoint(rect.left, rect.bottom - 1),
+			BPoint(rect.left, selTabRect.bottom), darken2);
+	if (selTabRect.left >= rect.left + 1)
+		AddLine(BPoint(rect.left + 1, selTabRect.bottom),
+				BPoint(selTabRect.left, selTabRect.bottom), darken2);
+	if (lastTabRect.right + offset + 1 <= rect.right - 1)
+		AddLine(BPoint(lastTabRect.right + offset + 1, selTabRect.bottom),
+				BPoint(rect.right - 1, selTabRect.bottom), darken2);
+	AddLine(BPoint(rect.right, selTabRect.bottom + 2),
+			BPoint(rect.right, rect.bottom), darken2);
+	AddLine(BPoint(rect.right - 1, rect.bottom),
+			BPoint(rect.left + 2, rect.bottom), darken2);
+
+	// inner lines
+	rect.InsetBy(1, 1);
+	selTabRect.bottom += 1;
+
+	AddLine(BPoint(rect.left, rect.bottom - 2),
+			BPoint(rect.left, selTabRect.bottom), lightenMax);
+	if (selTabRect.left >= rect.left + 1)
+		AddLine(BPoint(rect.left + 1, selTabRect.bottom),
+				BPoint(selTabRect.left, selTabRect.bottom), lightenMax);
+	if (selTabRect.right + offset + 1 <= rect.right - 2)
+		AddLine(BPoint(selTabRect.right + offset + 1, selTabRect.bottom),
+				BPoint(rect.right - 2, selTabRect.bottom), lightenMax);
+	AddLine(BPoint(rect.right, selTabRect.bottom),
+			BPoint(rect.right, rect.bottom), darken4);
+	AddLine(BPoint(rect.right - 1, rect.bottom),
+			BPoint(rect.left, rect.bottom), darken4);
+
+	// soft inner bevel at right/bottom
+	rect.right--;
+	rect.bottom--;
+
+	AddLine(BPoint(rect.right, selTabRect.bottom + 1),
+			BPoint(rect.right, rect.bottom), darken1);
+	AddLine(BPoint(rect.right - 1, rect.bottom),
+			BPoint(rect.left + 1, rect.bottom), darken1);
+
+	EndLineArray();
 }
 
+#define X_OFFSET 0.0f
 
 BRect
 BTabView::TabFrame(int32 tab_index) const
 {
+	// TODO: fix to remove "offset" in DrawTab and DrawLabel ...
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
 		{
-			float x = 6.0f;
+			float x = X_OFFSET;
 			for (int32 i = 0; i < tab_index; i++)
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
 
@@ -694,14 +764,14 @@ BTabView::TabFrame(int32 tab_index) const
 					width = tabWidth;
 			}
 
-			return BRect(6.0f + tab_index * width, 0.0f,
-				6.0f + tab_index * width + width, fTabHeight);
+			return BRect(X_OFFSET + tab_index * width, 0.0f,
+				X_OFFSET + tab_index * width + width, fTabHeight);
 		}
 
 		case B_WIDTH_AS_USUAL:
 		default:
-			return BRect(6.0f + tab_index * 100.0f, 0.0f,
-				6.0f + tab_index * 100.0f + 100.0f, fTabHeight);
+			return BRect(X_OFFSET + tab_index * 100.0f, 0.0f,
+				X_OFFSET + tab_index * 100.0f + 100.0f, fTabHeight);
 	}
 }
 
@@ -877,8 +947,8 @@ BTabView::_InitObject()
 
 	BRect bounds = Bounds();
 
-	bounds.top += 1.0f + TabHeight();
-	bounds.InsetBy(2.0f, 2.0f);
+	bounds.top += TabHeight();
+	bounds.InsetBy(3.0f, 3.0f);
 
 	fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
 		B_WILL_DRAW);
