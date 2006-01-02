@@ -550,46 +550,92 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
 
 
 status_t
+ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
+	size_t size)
+{
+	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
+	virtualAddress = ROUNDOWN(virtualAddress, B_PAGE_SIZE);
+	physicalAddress = ROUNDOWN(physicalAddress, B_PAGE_SIZE);
+
+	vm_address_space *addressSpace = vm_kernel_address_space();
+
+	// map the pages
+	for (; virtualAddress < virtualEnd;
+		 virtualAddress += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
+		status_t error = map_tmap(&addressSpace->translation_map,
+			virtualAddress, physicalAddress,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+void
+ppc_unmap_address_range(addr_t virtualAddress, size_t size)
+{
+	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
+	virtualAddress = ROUNDOWN(virtualAddress, B_PAGE_SIZE);
+
+	vm_address_space *addressSpace = vm_kernel_address_space();
+
+	for (0; virtualAddress < virtualEnd; virtualAddress += B_PAGE_SIZE)
+		remove_page_table_entry(&addressSpace->translation_map, virtualAddress);
+}
+
+
+status_t
+ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
+{
+	addr_t virtualAddress = ROUNDOWN(*_virtualAddress, B_PAGE_SIZE);
+	size = ROUNDUP(*_virtualAddress + size - virtualAddress, B_PAGE_SIZE);
+
+	vm_address_space *addressSpace = vm_kernel_address_space();
+
+	// reserve space in the address space
+	void *newAddress = NULL;
+	status_t error = vm_reserve_address_range(addressSpace->id, &newAddress,
+		B_ANY_KERNEL_ADDRESS, size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (error != B_OK)
+		return error;
+
+	// get the area's first physical page
+	page_table_entry *entry = lookup_page_table_entry(
+		&addressSpace->translation_map, virtualAddress);
+	if (!entry)
+		return B_ERROR;
+	addr_t physicalBase = entry->physical_page_number << 12;
+
+	// map the pages
+	error = ppc_map_address_range((addr_t)newAddress, physicalBase, size);
+	if (error != B_OK)
+		return error;
+
+	*_virtualAddress = (addr_t)newAddress;
+
+	// unmap the old pages
+	if (unmap)
+		ppc_unmap_address_range(virtualAddress, size);
+
+	return B_OK;
+}
+
+
+status_t
 arch_vm_translation_map_init_post_area(kernel_args *args)
 {
 	// If the page table doesn't lie within the kernel address space, we
 	// remap it.
 	if (!IS_KERNEL_ADDRESS(sPageTable)) {
-		vm_address_space *addressSpace = vm_kernel_address_space();
-
-		// reserve space in the address space
-		void *newAddress = NULL;
-		status_t error = vm_reserve_address_range(addressSpace->id,
-			&newAddress, B_ANY_KERNEL_ADDRESS, sPageTableSize,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		addr_t newAddress = (addr_t)sPageTable;
+		status_t error = ppc_remap_address_range(&newAddress, sPageTableSize,
+			false);
 		if (error != B_OK) {
-			panic("arch_vm_translation_map_init_post_area(): Failed to reserve "
-				"space for the page table!");
+			panic("arch_vm_translation_map_init_post_area(): Failed to remap "
+				"the page table!");
 			return error;
-		}
-
-		// get the table page's first physical page
-		page_table_entry *entry = lookup_page_table_entry(
-			&addressSpace->translation_map, (addr_t)sPageTable);
-		if (!entry) {
-			panic("arch_vm_translation_map_init_post_area(): Couldn't find "
-				"the physical address of the page table!");
-			return B_ERROR;
-		}
-		addr_t physicalBase = entry->physical_page_number << 12;
-
-		// map the pages
-		for (addr_t i = 0; i < sPageTableSize; i += B_PAGE_SIZE) {
-			addr_t virtualAddress = (addr_t)newAddress + i;
-			addr_t physicalAddress = physicalBase + i;
-
-			error = map_tmap(&addressSpace->translation_map, virtualAddress,
-				physicalAddress, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-			if (error != B_OK) {
-				panic("arch_vm_translation_map_init_post_area(): Failed to "
-					"remap the page table!");
-				return error;
-			}
 		}
 
 		// set the new page table address
@@ -597,10 +643,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 		sPageTable = (page_table_entry_group*)newAddress;
 
 		// unmap the old pages
-		for (addr_t i = 0; i < sPageTableSize; i += B_PAGE_SIZE) {
-			remove_page_table_entry(&addressSpace->translation_map,
-				oldVirtualBase + i);
-		}
+		ppc_unmap_address_range(oldVirtualBase, sPageTableSize);
 
 // TODO: We should probably map the page table via BAT. It is relatively large,
 // and due to being a hash table the access patterns might look sporadic, which

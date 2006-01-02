@@ -6,14 +6,15 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <int.h>
 
 #include <boot/kernel_args.h>
 
-#include <int.h>
+#include <kscheduler.h>
+#include <thread.h>
+#include <timer.h>
 #include <vm.h>
 #include <vm_priv.h>
-#include <timer.h>
-#include <thread.h>
 
 #include <string.h>
 
@@ -164,10 +165,23 @@ status_t
 arch_int_init_post_vm(kernel_args *args)
 {
 	area_id exceptionArea;
-	void *handlers;
+	void *handlers = (void *)args->arch_args.exception_handlers.start;
+
+	// We may need to remap the exception handler area into the kernel address
+	// space.
+	if (!IS_KERNEL_ADDRESS(handlers)) {
+		addr_t address = (addr_t)handlers;
+		status_t error = ppc_remap_address_range(&address,
+			args->arch_args.exception_handlers.size, true);
+		if (error != B_OK) {
+			panic("arch_int_init_post_vm(): Failed to remap the exception "
+				"handler area!");
+			return error;
+		}
+		handlers = (void*)(address);
+	}
 
 	// create a region to map the irq vector code into (physical address 0x0)
-	handlers = (void *)args->arch_args.exception_handlers.start;
 	exceptionArea = create_area("exception_handlers",
 		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -178,7 +192,7 @@ arch_int_init_post_vm(kernel_args *args)
 
 	// copy the handlers into this area
 	memcpy(handlers, &__irqvec_start, args->arch_args.exception_handlers.size);
-	arch_cpu_sync_icache(0, 0x1000);
+	arch_cpu_sync_icache(handlers, 0x1000);
 
 	return B_OK;
 }
