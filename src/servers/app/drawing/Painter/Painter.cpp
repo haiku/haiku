@@ -937,6 +937,11 @@ Painter::DrawString(const char* utf8String, uint32 length,
 {
 	CHECK_CLIPPING
 
+	if (!fSubpixelPrecise) {
+		baseLine.x = roundf(baseLine.x);
+		baseLine.y = roundf(baseLine.y);
+	}
+
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
 	SetPattern(B_SOLID_HIGH);
@@ -958,9 +963,14 @@ Painter::DrawString(const char* utf8String, uint32 length,
 // BoundingBox
 BRect
 Painter::BoundingBox(const char* utf8String, uint32 length,
-					 const BPoint& baseLine, BPoint* penLocation,
+					 BPoint baseLine, BPoint* penLocation,
 					 const escapement_delta* delta) const
 {
+	if (!fSubpixelPrecise) {
+		baseLine.x = roundf(baseLine.x);
+		baseLine.y = roundf(baseLine.y);
+	}
+
 	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,

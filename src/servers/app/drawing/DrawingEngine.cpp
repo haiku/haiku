@@ -942,9 +942,11 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 			data = (const LineArrayData *)&(linedata[0]);
 
 			DrawState context;
-			context.SetDrawingMode(B_OP_COPY);
+			context.SetDrawingMode(d->GetDrawingMode());
+			context.SetLowColor(d->LowColor());
 			context.SetHighColor(data->color);
 			context.SetPenSize(d->PenSize());
+				// pen size is already correctly scaled
 
 			fPainter->SetDrawState(&context);
 

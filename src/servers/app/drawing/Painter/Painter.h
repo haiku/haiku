@@ -179,7 +179,7 @@ class Painter {
 
 			BRect				BoundingBox(	const char* utf8String,
 												uint32 length,
-												const BPoint& baseLine,
+												BPoint baseLine,
 												BPoint* penLocation,
 												const escapement_delta* delta = NULL) const;
 
