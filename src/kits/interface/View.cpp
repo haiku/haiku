@@ -3026,7 +3026,9 @@ BView::EndPicture()
 		}
 	}
 
-	return NULL;
+	// TODO: Was NULL. We might revert when there is BPictures support
+	// in the app-server. For now this allows to avoid hangs with BPictureButtons
+	return cpicture;
 }
 
 
