@@ -21,6 +21,11 @@ page_table_entry_group *sPageTable;
 uint32 sPageTableHashMask;
 
 
+// begin and end of the boot loader
+extern "C" uint8 __text_begin;
+extern "C" uint8 _end;
+
+
 static void
 remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 {
@@ -37,11 +42,13 @@ remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 
 static status_t
 insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
-	const void *_start, uint32 size)
+	const void *_start, uint32 _size)
 {
 	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
-	size = ROUNDUP(size, B_PAGE_SIZE);
-	addr_t end = start + size;
+	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
+	addr_t size = end - start;
+	if (size == 0)
+		return B_OK;
 
 	for (uint32 i = 0; i < numRanges; i++) {
 		addr_t rangeStart = ranges[i].start;
@@ -110,6 +117,49 @@ insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 
 
 static status_t
+remove_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
+	const void *_start, uint32 _size)
+{
+	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
+	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
+
+	for (uint32 i = 0; i < numRanges; i++) {
+		addr_t rangeStart = ranges[i].start;
+		addr_t rangeEnd = rangeStart + ranges[i].size;
+
+		if (start <= rangeStart) {
+			if (end <= rangeStart) {
+				// no intersection
+			} else if (end >= rangeEnd) {
+				// remove the complete range
+				remove_range_index(ranges, numRanges, i);
+				i--;
+			} else {
+				// remove the head of the range
+				ranges[i].start = end;
+				ranges[i].size = rangeEnd - end;
+			}
+		} else if (end >= rangeEnd) {
+			if (start < rangeEnd) {
+				// remove the tail
+				ranges[i].size = start - rangeStart;
+			}	// else: no intersection
+		} else {
+			// rangeStart < start < end < rangeEnd
+			// The ugly case: We have to remove something from the middle of
+			// the range. We keep the head of the range and insert its tail
+			// as a new range.
+			ranges[i].size = start - rangeStart;
+			return insert_memory_range(ranges, numRanges, maxRanges,
+				(void*)end, rangeEnd - end);
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 insert_physical_memory_range(void *start, uint32 size)
 {
 	return insert_memory_range(gKernelArgs.physical_memory_range, 
@@ -133,6 +183,24 @@ insert_virtual_allocated_range(void *start, uint32 size)
 	return insert_memory_range(gKernelArgs.virtual_allocated_range, 
 				gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
 				start, size);
+}
+
+
+static status_t
+insert_virtual_range_to_keep(void *start, uint32 size)
+{
+	return insert_memory_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
+}
+
+
+static status_t
+remove_virtual_range_to_keep(void *start, uint32 size)
+{
+	return remove_memory_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
 }
 
 
@@ -174,10 +242,11 @@ find_physical_memory_ranges(size_t &total)
 static bool
 is_in_range(addr_range *ranges, uint32 numRanges, void *address, size_t size)
 {
-	// TODO: This function returns whether any single allocated range
+	// Note: This function returns whether any single allocated range
 	// completely contains the given range. If the given range crosses
 	// allocated range boundaries, but is nevertheless covered completely, the
-	// function returns false!
+	// function returns false. But since the range management code joins
+	// touching ranges, this should never happen.
 	addr_t start = (addr_t)address;
 	addr_t end = start + size;
 
@@ -319,8 +388,8 @@ map_range(void *virtualAddress, void *physicalAddress, size_t size, uint8 mode)
 
 
 static status_t
-find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTable,
-	void **_exceptionHandlers)
+find_allocated_ranges(void *oldPageTable, void *pageTable,
+	page_table_entry_group **_physicalPageTable, void **_exceptionHandlers)
 {
 	// we have to preserve the OpenFirmware established mappings
 	// if we want to continue to use its service after we've
@@ -350,6 +419,7 @@ find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTab
 
 	for (int i = 0; i < length; i++) {
 		struct translation_map *map = &translations[i];
+		bool keepRange = true;
 		//printf("%i: map: %p, length %d -> physical: %p, mode %d\n", i, map->virtual_address, map->length, map->physical_address, map->mode);
 
 		// insert range in physical allocated, if it points to physical memory
@@ -364,12 +434,16 @@ find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTab
 		if (map->virtual_address == pageTable) {
 			puts("found page table!");
 			*_physicalPageTable = (page_table_entry_group *)map->physical_address;
+			keepRange = false;	// we keep it explicitely anyway
 		}
 		if ((addr_t)map->physical_address <= 0x100 
 			&& (addr_t)map->physical_address + map->length >= 0x1000) {
 			puts("found exception handlers!");
 			*_exceptionHandlers = map->virtual_address;
+			keepRange = false;	// we keep it explicitely anyway
 		}
+		if (map->virtual_address == oldPageTable)
+			keepRange = false;
 
 		// insert range in virtual allocated
 
@@ -382,9 +456,27 @@ find_allocated_ranges(void *pageTable, page_table_entry_group **_physicalPageTab
 
 		map_range(map->virtual_address, map->physical_address, map->length, map->mode);
 
+		// insert range in virtual ranges to keep
+
+		if (keepRange) {
+			if (insert_virtual_range_to_keep(map->virtual_address,
+					map->length) < B_OK) {
+				printf("cannot map virtual range to keep (num ranges = %lu)!\n",
+					gKernelArgs.num_virtual_allocated_ranges);
+			}
+		}
+
 		total += map->length;
 	}
 	//printf("total mapped: %lu\n", total);
+
+	// remove the boot loader code from the virtual ranges to keep in the
+	// kernel
+	if (remove_virtual_range_to_keep(&__text_begin, &_end - &__text_begin)
+			!= B_OK) {
+		printf("find_allocated_ranges(): Failed to remove boot loader range "
+			"from virtual ranges to keep.\n");
+	}
 
 	return B_OK;
 }
@@ -491,8 +583,14 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	else
 		protection = 0x01;
 
+	// If no address is given, use the KERNEL_BASE as base address, since
+	// that avoids trouble in the kernel, when we decide to keep the region.
+	void *virtualAddress = _virtualAddress;
+	if (!virtualAddress)
+		virtualAddress = (void*)KERNEL_BASE;
+
 	// find free address large enough to hold "size"
-	void *virtualAddress = find_free_virtual_range(_virtualAddress, size);
+	virtualAddress = find_free_virtual_range(virtualAddress, size);
 	if (virtualAddress == NULL)
 		return NULL;
 
@@ -729,6 +827,7 @@ arch_mmu_init(void)
 
 	// get OpenFirmware's current page table
 
+	page_table_entry_group *oldTable;
 	page_table_entry_group *table;
 	size_t tableSize;
 	ppc_get_page_table(&table, &tableSize);
@@ -736,6 +835,7 @@ arch_mmu_init(void)
 	if (table == NULL && tableSize == 0) {
 		puts("OpenFirmware is in real addressing mode!");
 	}
+	oldTable = table;
 
 	// can we just keep the page table?
 	size_t suggestedTableSize = suggested_page_table_size(total);
@@ -790,17 +890,27 @@ puts("2");*/
 	// find already allocated ranges of physical memory
 	// and the virtual address space
 
-	page_table_entry_group *physicalTable;
+	page_table_entry_group *physicalTable = NULL;
 	void *exceptionHandlers = (void *)-1;
-	if (find_allocated_ranges(table, &physicalTable, &exceptionHandlers) < B_OK) {
+	if (find_allocated_ranges(oldTable, table, &physicalTable,
+			&exceptionHandlers) < B_OK) {
 		puts("find_allocated_ranges() failed!");
-		//return B_ERROR;
+		return B_ERROR;
+	}
+
+	if (physicalTable == NULL) {
+		puts("arch_mmu_init(): Didn't find physical address of page table!");
+		return B_ERROR;
 	}
 
 	if (exceptionHandlers == (void *)-1) {
 		// ToDo: create mapping for the exception handlers
 		puts("no mapping for the exception handlers!");
 	}
+
+	// Set the Open Firmware memory callback. From now on the Open Firmware
+	// will ask us for memory.
+	arch_set_callback();
 
 	// set up new page table and turn on translation again
 

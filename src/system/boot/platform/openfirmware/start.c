@@ -143,7 +143,6 @@ start(void *openFirmwareEntry)
 	// Initialize and take over MMU and set the OpenFirmware callbacks - it 
 	// will ask us for memory after that instead of maintaining it itself
 	// (the kernel will need to adjust the callback later on as well)
-	arch_set_callback();
 	arch_mmu_init();
 
 	if (boot_arch_cpu_init() != B_OK)
