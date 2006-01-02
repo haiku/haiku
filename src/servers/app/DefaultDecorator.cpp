@@ -554,9 +554,15 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										BPoint(r.right - i, r.top + i),
 										fFrameColors[i]);
 				}
+				if (_tabrect.IsValid()) {
+					// grey along the bottom of the tab (overwrites "white" from frame)
+					_driver->StrokeLine(BPoint(_tabrect.left + 2, _tabrect.bottom + 1),
+										BPoint(_tabrect.right - 2, _tabrect.bottom + 1),
+										fFrameColors[2]);
+				}
 			}
 			//left
-			if (invalid.Intersects(fLeftBorder)) {
+			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
 										BPoint(r.left + i, r.bottom - i),
@@ -572,7 +578,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 				}
 			}
 			//right
-			if (invalid.Intersects(fRightBorder)) {
+			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
 										BPoint(r.right - i, r.bottom - i),
@@ -589,9 +595,15 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										BPoint(r.right - i, r.top + i),
 										fFrameColors[i * 2]);
 				}
+				if (_tabrect.IsValid()) {
+					// grey along the bottom of the tab (overwrites "white" from frame)
+					_driver->StrokeLine(BPoint(_tabrect.left + 2, _tabrect.bottom + 1),
+										BPoint(_tabrect.right - 2, _tabrect.bottom + 1),
+										fFrameColors[2]);
+				}
 			}
 			//left
-			if (invalid.Intersects(fLeftBorder)) {
+			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
 										BPoint(r.left + i, r.bottom - i),
@@ -607,7 +619,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 				}
 			}
 			//right
-			if (invalid.Intersects(fRightBorder)) {
+			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
 										BPoint(r.right - i, r.bottom - i),
@@ -701,11 +713,6 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	_driver->StrokeLine(_tabrect.LeftTop(), _tabrect.LeftBottom(), fFrameColors[0]);
 	_driver->StrokeLine(_tabrect.LeftTop(), _tabrect.RightTop(), fFrameColors[0]);
 	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(), fFrameColors[5]);
-
-	// grey along the bottom (overwrites "white" from frame)
-	_driver->StrokeLine(BPoint(_tabrect.left + 2, _tabrect.bottom + 1),
-						BPoint(_tabrect.right - 2, _tabrect.bottom + 1),
-						fFrameColors[2]);
 
 	// bevel
 	_driver->StrokeLine(BPoint(_tabrect.left + 1, _tabrect.top + 1),
