@@ -104,6 +104,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 			// the boot loader allocated region is not used anymore
 
 		// now we can use the heap and create areas
+		platform_init_post_vm(&sKernelArgs);
 		TRACE(("init driver_settings\n"));
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);

@@ -12,3 +12,10 @@ platform_init(struct kernel_args *kernelArgs)
 {
 	return B_OK;
 }
+
+
+status_t
+platform_init_post_vm(struct kernel_args *kernelArgs)
+{
+	return B_OK;
+}

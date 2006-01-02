@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 status_t platform_init(struct kernel_args *kernelArgs);
+status_t platform_init_post_vm(struct kernel_args *kernelArgs);
 
 #ifdef __cplusplus
 }	// extern "C"
