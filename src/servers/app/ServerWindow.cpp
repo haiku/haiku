@@ -2155,6 +2155,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			free(string);
 			break;
 		}
+#if 0
 		case AS_LAYER_BEGIN_PICTURE:
 			CRITICAL("AS_LAYER_BEGIN_PICTURE not implemented\n");
 			break;
@@ -2164,7 +2165,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_LAYER_END_PICTURE:
 			CRITICAL("AS_LAYER_END_PICTURE not implemented\n");
 			break;
-
+#endif
 		default:
 			printf("ServerWindow %s received unexpected code - message offset %ld\n",
 				Title(), code - B_OK);
