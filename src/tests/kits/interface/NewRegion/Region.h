@@ -15,10 +15,6 @@
 #include <BeBuild.h>
 #include <Rect.h>
 
-namespace BPrivate {
-	class ServerLink;
-};
-
 
 /* Integer rect used to define a cliping rectangle. All bounds are included */
 /* Moved from DirectWindow.h */
@@ -29,9 +25,13 @@ typedef struct {
 	int32	bottom;
 } clipping_rect;
 
+namespace BPrivate {
+	class ServerLink;
+};
 
 /*----- BRegion class --------------------------------------------*/
 class ClipRegion;
+class BDirectWindow;
 class BRegion {
 public:
 				BRegion();
@@ -65,6 +65,9 @@ clipping_rect	RectAtInt(int32 index);
 
 /*----- Private or reserved -----------------------------------------*/
 private:
+friend class BPrivate::ServerLink;
+friend class BDirectWindow;
+
 		ClipRegion *fRegion;
 		char padding[24];
 };
