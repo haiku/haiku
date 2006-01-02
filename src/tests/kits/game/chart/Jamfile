@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tests kits game chart ;
+
+Application Chart :
+	Chart.cpp
+	ChartRender.cpp
+	ChartView.cpp
+	ChartWindow.cpp
+	: libbe.so libgame.so libroot.so
+	: Chart.rsrc
+	;
+
+
