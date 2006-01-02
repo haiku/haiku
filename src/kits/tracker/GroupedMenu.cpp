@@ -119,7 +119,7 @@ TMenuItemGroup::RemoveItem(int32 index)
 {
 	BMenuItem *item = ItemAt(index);
 	if (item == NULL)
-		return false;
+		return NULL;
 
 	if (RemoveItem(item))
 		return item;
