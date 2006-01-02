@@ -375,24 +375,16 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESIZED);
 
-	// put the previous border region into the dirty region as well
-	// to handle the part that was overlapping a layer
-	if (dirtyRegion)
-		dirtyRegion->Include(&fBorderRegion);
-
 	fBorderRegionValid = false;
 	fContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
-	if (fDecorator)
-		fDecorator->ResizeBy(x, y);
-
-	// the border is dirty, put it into
-	// dirtyRegion for a start
-	BRegion newBorderRegion;
-	GetBorderRegion(&newBorderRegion);
-	if (dirtyRegion) {
-		dirtyRegion->Include(&newBorderRegion);
+	if (fDecorator) {
+		fDecorator->ResizeBy(x, y, dirtyRegion);
+//if (dirtyRegion) {
+//fDrawingEngine->FillRegion(*dirtyRegion, RGBColor(255, 255, 0, 255));
+//snooze(40000);
+//}
 	}
 
 	if (fTopLayer != NULL)
@@ -1603,11 +1595,11 @@ WindowLayer::_DrawBorder()
 	// intersect with the dirty region
 	dirtyBorderRegion.IntersectWith(&fDirtyRegion);
 
-	if (dirtyBorderRegion.CountRects() > 0) {
-// TODO: decorator drawing with update region...
+	if (dirtyBorderRegion.CountRects() > 0 && fDrawingEngine->Lock()) {
 		fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
 		fDecorator->Draw(dirtyBorderRegion.Frame());
-		fDrawingEngine->ConstrainClippingRegion(NULL);
+
+		fDrawingEngine->Unlock();
 	}
 }
 

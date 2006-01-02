@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 
-//#define USE_VIEW_FILL_HACK
-
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
 #	include <stdio.h>
@@ -157,13 +155,6 @@ DefaultDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
 
 
 void
-DefaultDecorator::MoveBy(float x, float y)
-{
-	MoveBy(BPoint(x, y));
-}
-
-
-void
 DefaultDecorator::MoveBy(BPoint pt)
 {
 	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
@@ -181,21 +172,53 @@ DefaultDecorator::MoveBy(BPoint pt)
 	fBottomBorder.OffsetBy(pt);
 }
 
-void
-DefaultDecorator::ResizeBy(float x, float y)
-{
-	ResizeBy(BPoint(x, y));
-}
 
 void
-DefaultDecorator::ResizeBy(BPoint pt)
+DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 {
 	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", pt.x, pt.y));
 	// Move all internal rectangles the appropriate amount
 	_frame.right		+= pt.x;
 	_frame.bottom		+= pt.y;
 
+	// handle invalidation of resize rect
+	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
+		BRect realResizeRect;
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+				realResizeRect = _resizerect;
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:
+			case B_MODAL_WINDOW_LOOK:
+				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
+								   fRightBorder.right - 22, fBottomBorder.bottom - 1);
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+
+				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - 22,
+								   fRightBorder.right - 1, fBottomBorder.bottom - 22);
+				// resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(pt);
+				// resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			default:
+				break;
+		}
+	}
+
 	_resizerect.OffsetBy(pt);
+
 	_borderrect.right	+= pt.x;
 	_borderrect.bottom	+= pt.y;
 	
@@ -208,6 +231,32 @@ DefaultDecorator::ResizeBy(BPoint pt)
 	fBottomBorder.OffsetBy(0.0, pt.y);
 	fBottomBorder.right	+= pt.x;
 
+	if (dirty) {
+		if (pt.x > 0.0) {
+			BRect t(fRightBorder.left - pt.x, fTopBorder.top,
+					fRightBorder.right, fTopBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left - pt.x, fBottomBorder.top,
+				  fRightBorder.right, fBottomBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fRightBorder);
+		} else if (pt.x < 0.0) {
+			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
+								 fRightBorder.right, fBottomBorder.bottom));
+		}
+		if (pt.y > 0.0) {
+			BRect t(fLeftBorder.left, fLeftBorder.bottom - pt.y,
+					fLeftBorder.right, fLeftBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left, fRightBorder.bottom - pt.y,
+				  fRightBorder.right, fRightBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fBottomBorder);
+		} else if (pt.y < 0.0) {
+			dirty->Include(fBottomBorder);
+		}
+	}
+
 	// resize tab and layout tab items
 	if (_tabrect.IsValid()) {
 		float tabWidth = fRightBorder.right - fLeftBorder.left;
@@ -218,8 +267,15 @@ DefaultDecorator::ResizeBy(BPoint pt)
 			tabWidth = fMaxTabWidth;
 	
 		if (tabWidth != _tabrect.Width()) {
+			// NOTE: the tab rect becoming smaller is handled
+			// by the Desktop anyways, so it is sufficient
+			// to include it into the dirty region in it's
+			// final state only once at the end
 			_tabrect.right = _tabrect.left + tabWidth;
 			_LayoutTabItems(_tabrect);
+
+			if (dirty)
+				dirty->Include(_tabrect);
 		}
 	}
 }
@@ -476,10 +532,8 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 									 invalid.right, invalid.bottom));
 
-	#ifdef USE_VIEW_FILL_HACK
-		fDrawState.SetHighColor(RGBColor(192, 192, 192 ));	
-		_driver->FillRect(_frame, fDrawState.HighColor());
-	#endif
+	// NOTE: the DrawingEngine needs to be locked for the entire
+	// time for the clipping to stay valid for this decorator
 
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
@@ -494,57 +548,72 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 		case B_DOCUMENT_WINDOW_LOOK:
 		case B_MODAL_WINDOW_LOOK: {
 			//top
-			for (int8 i = 0; i < 5; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.top + i),
-									BPoint(r.right - i, r.top + i),
-									fFrameColors[i]);
+			if (invalid.Intersects(fTopBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.right - i, r.top + i),
+										fFrameColors[i]);
+				}
 			}
 			//left
-			for (int8 i = 0; i < 5; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.top + i),
-									BPoint(r.left + i, r.bottom - i),
-									fFrameColors[i]);
+			if (invalid.Intersects(fLeftBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.left + i, r.bottom - i),
+										fFrameColors[i]);
+				}
 			}
 			//bottom
-			for (int8 i = 0; i < 5; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
-									BPoint(r.right - i, r.bottom - i),
-									fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+			if (invalid.Intersects(fBottomBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+				}
 			}
 			//right
-			for (int8 i = 0; i < 5; i++) {
-				_driver->StrokeLine(BPoint(r.right - i, r.top + i),
-									BPoint(r.right - i, r.bottom - i),
-									fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+			if (invalid.Intersects(fRightBorder)) {
+				for (int8 i = 0; i < 5; i++) {
+					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+				}
 			}
 			break;
 		}
 		case B_FLOATING_WINDOW_LOOK: {
 			//top
-			for (int8 i = 0; i < 3; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.top + i),
-									BPoint(r.right - i, r.top + i),
-									fFrameColors[i * 2]);
+			if (invalid.Intersects(fTopBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.right - i, r.top + i),
+										fFrameColors[i * 2]);
+				}
 			}
 			//left
-			for (int8 i = 0; i < 3; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.top + i),
-									BPoint(r.left + i, r.bottom - i),
-									fFrameColors[i * 2]);
+			if (invalid.Intersects(fLeftBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
+										BPoint(r.left + i, r.bottom - i),
+										fFrameColors[i * 2]);
+				}
 			}
 			//bottom
-			for (int8 i = 0; i < 3; i++) {
-				_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
-									BPoint(r.right - i, r.bottom - i),
-									fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+			if (invalid.Intersects(fBottomBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+				}
 			}
 			//right
-			for (int8 i = 0; i < 3; i++) {
-				_driver->StrokeLine(BPoint(r.right - i, r.top + i),
-									BPoint(r.right - i, r.bottom - i),
-									fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+			if (invalid.Intersects(fRightBorder)) {
+				for (int8 i = 0; i < 3; i++) {
+					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
+										BPoint(r.right - i, r.bottom - i),
+										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+				}
 			}
-			break;
 			break;
 		}
 		case B_BORDERED_WINDOW_LOOK: {
@@ -563,33 +632,37 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 		switch (fLook){
 			case B_DOCUMENT_WINDOW_LOOK: {
-				// Explicitly locking the driver is normally unnecessary. However, we 
-				// need to do this because we are rapidly drawing a series of calls
-				// which would not necessarily draw correctly if we didn't do so.
 				float x = r.right - 3;
 				float y = r.bottom - 3;
-				_driver->Lock();
-				_driver->FillRect(BRect(x-13, y-13, x, y), fFrameColors[2]);
-				_driver->StrokeLine(BPoint(x-15, y-15), BPoint(x-15, y-2), fFrameColors[0]);
-				_driver->StrokeLine(BPoint(x-14, y-14), BPoint(x-14, y-1), fFrameColors[1]);
-				_driver->StrokeLine(BPoint(x-15, y-15), BPoint(x-2, y-15), fFrameColors[0]);
-				_driver->StrokeLine(BPoint(x-14, y-14), BPoint(x-1, y-14), fFrameColors[1]);
+
+				if (!invalid.Intersects(r))
+					break;
+		
+				_driver->FillRect(BRect(x - 13, y - 13, x, y), fFrameColors[2]);
+				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2), fFrameColors[0]);
+				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1), fFrameColors[1]);
+				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15), fFrameColors[0]);
+				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14), fFrameColors[1]);
 
 				for (int8 i = 1; i <= 4; i++) {
 					for (int8 j = 1; j <= i; j++) {
-						BPoint		pt1(x-(3*j)+1, y-(3*(5-i))+1);
-						BPoint		pt2(x-(3*j)+2, y-(3*(5-i))+2);
+						BPoint		pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
+						BPoint		pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
 						_driver->StrokePoint(pt1, fFrameColors[0]);
 						_driver->StrokePoint(pt2, fFrameColors[1]);
 					}
 				}
-				_driver->Unlock();
 				break;
 			}
 
 			case B_TITLED_WINDOW_LOOK:
 			case B_FLOATING_WINDOW_LOOK:
 			case B_MODAL_WINDOW_LOOK: {
+
+				if (!invalid.Intersects(BRect(fRightBorder.right - 22, fBottomBorder.bottom - 22,
+											  fRightBorder.right - 1, fBottomBorder.bottom - 1)))
+					break;
+		
 				_driver->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
 									BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
 									fFrameColors[0]);
@@ -609,17 +682,20 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 // _DrawTab
 void
-DefaultDecorator::_DrawTab(BRect r)
+DefaultDecorator::_DrawTab(BRect invalid)
 {
-	STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawTab(%.1f,%.1f,%.1f,%.1f)\n",
+			invalid.left, invalid.top, invalid.right, invalid.bottom));
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if (!_tabrect.IsValid())
+	if (!_tabrect.IsValid() || !invalid.Intersects(_tabrect))
 		return;
 
 	// TODO: cache these
-	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(), (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
-	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(), B_DARKEN_2_TINT));
+	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
+												 (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
+	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
+												  B_DARKEN_2_TINT));
 
 	// outer frame
 	_driver->StrokeLine(_tabrect.LeftTop(), _tabrect.LeftBottom(), fFrameColors[0]);
@@ -650,9 +726,9 @@ DefaultDecorator::_DrawTab(BRect r)
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
-	if (!(fFlags & B_NOT_CLOSABLE))
+	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(_closerect))
 		_DrawClose(_closerect);
-	if (!(fFlags & B_NOT_ZOOMABLE))
+	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(_zoomrect))
 		_DrawZoom(_zoomrect);
 }
 

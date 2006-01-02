@@ -94,10 +94,10 @@ class Decorator {
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 										int32 modifiers);
 
-	virtual	void				MoveBy(float x, float y);
+			void				MoveBy(float x, float y);
 	virtual	void				MoveBy(BPoint pt);
-	virtual	void				ResizeBy(float x, float y);
-	virtual	void				ResizeBy(BPoint pt);
+			void				ResizeBy(float x, float y, BRegion* dirty);
+	virtual	void				ResizeBy(BPoint pt, BRegion* dirty) = 0;
 
 	virtual	void				SetTabLocation(float location) {}
 	virtual	float				TabLocation() const

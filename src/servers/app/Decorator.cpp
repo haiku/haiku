@@ -374,14 +374,7 @@ Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 void
 Decorator::MoveBy(float x, float y)
 {
-	_zoomrect.OffsetBy(x, y);
-	_closerect.OffsetBy(x, y);
-	_minimizerect.OffsetBy(x, y);
-	_minimizerect.OffsetBy(x, y);
-	_tabrect.OffsetBy(x, y);
-	_frame.OffsetBy(x, y);
-	_resizerect.OffsetBy(x, y);
-	_borderrect.OffsetBy(x, y);
+	MoveBy(BPoint(x, y));
 }
 
 /*!
@@ -395,7 +388,14 @@ Decorator::MoveBy(float x, float y)
 void
 Decorator::MoveBy(BPoint pt)
 {
-	MoveBy(pt.x, pt.y);
+	_zoomrect.OffsetBy(pt);
+	_closerect.OffsetBy(pt);
+	_minimizerect.OffsetBy(pt);
+	_minimizerect.OffsetBy(pt);
+	_tabrect.OffsetBy(pt);
+	_frame.OffsetBy(pt);
+	_resizerect.OffsetBy(pt);
+	_borderrect.OffsetBy(pt);
 }
 
 /*!
@@ -409,22 +409,9 @@ Decorator::MoveBy(BPoint pt)
 	are not inverted. 
 */
 void
-Decorator::ResizeBy(float x, float y)
+Decorator::ResizeBy(float x, float y, BRegion* dirty)
 {
-}
-
-/*!
-	\brief Resizes the decorator frame
-	\param pt Point containing the offsets
-	
-	This is a required function for subclasses to implement - the default does nothing.
-	Note that window resize flags should be followed and _frame should be resized
-	accordingly. It would also be a wise idea to ensure that the window's rectangles
-	are not inverted. 
-*/
-void
-Decorator::ResizeBy(BPoint pt)
-{
+	ResizeBy(BPoint(x, y), dirty);
 }
 
 /*!

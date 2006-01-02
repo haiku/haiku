@@ -27,10 +27,8 @@ public:
 								window_look look, BRegion* updateRegion = NULL);
 	virtual void			SetFlags(uint32 flags, BRegion* updateRegion = NULL);
 
-	virtual	void			MoveBy(float x, float y);
 	virtual	void			MoveBy(BPoint pt);
-	virtual	void			ResizeBy(float x, float y);
-	virtual	void			ResizeBy(BPoint pt);
+	virtual	void			ResizeBy(BPoint pt, BRegion* dirty);
 
 	virtual	void			Draw(BRect r);
 	virtual	void			Draw();
