@@ -17,7 +17,7 @@ BEOS_BIN = addattr arp basename beep cat catattr chgrp chmod chown clockconfig c
 
 BEOS_APPS = MiniTerminal Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit
+	StyledEdit Chart
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
