@@ -202,13 +202,16 @@ BColorControl::Archive(BMessage *archive, bool deep) const
 
 
 void
-BColorControl::SetValue(int32 color)
+BColorControl::SetValue(int32 value)
 {
+	if (Value() == value)
+		return;
+
 	rgb_color c1 = ValueAsColor();
 	rgb_color c2;
-	c2.red = (color & 0xFF000000) >> 24;
-	c2.green = (color & 0x00FF0000) >> 16;
-	c2.blue = (color & 0x0000FF00) >> 8;
+	c2.red = (value & 0xFF000000) >> 24;
+	c2.green = (value & 0x00FF0000) >> 16;
+	c2.blue = (value & 0x0000FF00) >> 8;
 	char string[4];
 
 	if (c1.red != c2.red) {
@@ -226,6 +229,8 @@ BColorControl::SetValue(int32 color)
 		fBlueText->SetText(string);
 	}
 
+	BControl::SetValue(value);
+
 	// TODO: This causes lot of flickering
 	Invalidate();
 
@@ -233,8 +238,6 @@ BColorControl::SetValue(int32 color)
 		Window()->UpdateIfNeeded();
 		UnlockLooper();
 	}
-
-	BControl::SetValue(color);
 }
 
 
@@ -311,7 +314,10 @@ BColorControl::Draw(BRect updateRect)
 
 		if (fOffscreenView->Bounds().Intersects(updateRect)) {
 			_UpdateOffscreen(updateRect);
-			DrawBitmap(fBitmap, updateRect.LeftTop());
+			BRegion region(updateRect);
+			ConstrainClippingRegion(&region);
+			DrawBitmap(fBitmap, B_ORIGIN);
+			ConstrainClippingRegion(NULL);
 		}
 
 		fBitmap->Unlock();
@@ -566,7 +572,7 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 {
 	if (fFocusedComponent == 0)
 		return;
-
+	
 	rgb_color color = ValueAsColor();
 
 	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
