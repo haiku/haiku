@@ -530,15 +530,19 @@ void
 BColorControl::MouseUp(BPoint point)
 {
 	fFocusedComponent = 0;
+	SetTracking(false);
 }
 
 
 void
 BColorControl::MouseDown(BPoint point)
 {
+	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
+	if (!rect.Contains(point))
+		return;
+
 	rgb_color color = ValueAsColor();
 
-	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
 	float rampsize = rect.bottom / 4;
 
 	uint8 shade = (unsigned char)max_c(0,
@@ -561,6 +565,7 @@ BColorControl::MouseDown(BPoint point)
 	SetValue(color);
 	Invoke();
 
+	SetTracking(true);
 	MakeFocus();
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 }
@@ -570,7 +575,7 @@ void
 BColorControl::MouseMoved(BPoint point, uint32 transit,
 	const BMessage *message)
 {
-	if (fFocusedComponent == 0)
+	if (fFocusedComponent == 0 || !IsTracking())
 		return;
 	
 	rgb_color color = ValueAsColor();
@@ -578,7 +583,7 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 	BRect rect(0.0f, 0.0f, fColumns * fCellSize, Bounds().bottom);
 
 	uint8 shade = (unsigned char)max_c(0,
-	min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
+		min_c((point.x - 2) * 255 / (rect.Width() - 4.0f), 255));
 
 	switch (fFocusedComponent) {
 		case 1:
