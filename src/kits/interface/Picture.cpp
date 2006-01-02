@@ -84,7 +84,6 @@ BPicture::BPicture(const BPicture &otherPicture)
 			return;
 	}
 
-	printf("Shouldn't be here\n");
 	if (otherPicture.extent->fNewData != NULL) {
 		extent->fNewSize = otherPicture.extent->fNewSize;
 		extent->fNewData = malloc(extent->fNewSize);
