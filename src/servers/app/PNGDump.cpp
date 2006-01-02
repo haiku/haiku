@@ -4,21 +4,25 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /**	Function for saving a generic framebuffer to a PNG file */
 
 #include "PNGDump.h"
 
-#include <Rect.h>
-
-#include <png.h>
-
+#include <new>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <png.h>
+
+#include <Rect.h>
+#include <OS.h>
+
+#include "frame_buffer_support.h"
 
 #define TRACE_PNGDUMP
 #ifdef TRACE_PNGDUMP
@@ -27,11 +31,13 @@
 #	define TRACE(x) ;
 #endif
 
+using std::nothrow;
 
 status_t
 SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	const void* bits, int32 bitsLength, int32 bytesPerRow)
 {
+bigtime_t now = system_time();
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
 
@@ -68,6 +74,7 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	png_init_io(png, file);
 	png_set_bgr(png);
 
+	// TODO: Don't assume B_BGRA32!
    	png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
 		PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT);
@@ -75,6 +82,7 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 
 	png_write_info(png, info);
 
+#if 1
 	png_byte* rowPointers[height];
 	png_byte* index = (png_byte*)bits;
 	for (int32 i = 0; i < height; i++) {
@@ -83,9 +91,24 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	}
 
 	png_write_image(png, rowPointers);
-	png_write_end(png, info);
 
+#else
+
+	png_byte* index = (png_byte*)bits;
+	int32 visibleBytes = width * 4;
+	png_byte tempRow[visibleBytes];
+	for (int32 i = 0; i < height; i++) {
+		gfxcpy32(tempRow, index, visibleBytes);
+		png_write_row(png, tempRow);
+		index += bytesPerRow;
+	}
+
+#endif
+
+	png_write_end(png, info);
 	png_destroy_write_struct(&png, NULL);
+
 	fclose(file);
+printf("PNG Dump: %lld\n", system_time() - now);
 	return B_OK;
 }
