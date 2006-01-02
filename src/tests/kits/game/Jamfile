@@ -6,3 +6,4 @@ SubInclude HAIKU_TOP src tests kits game simple_game_sound_test ;
 SubInclude HAIKU_TOP src tests kits game direct_window_test ;
 SubInclude HAIKU_TOP src tests kits game direct_window_info_test ;
 SubInclude HAIKU_TOP src tests kits game page_flipper ;
+SubInclude HAIKU_TOP src tests kits game chart ;
