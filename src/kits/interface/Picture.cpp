@@ -76,12 +76,15 @@ BPicture::BPicture(const BPicture &otherPicture)
 		link.StartMessage(AS_CLONE_PICTURE);
 		link.Attach<int32>(otherPicture.token);
 
-		int32 code;
-		if (link.FlushWithReply(code) == B_OK
-			&& code == SERVER_TRUE)
+		status_t status = B_ERROR;
+		if (link.FlushWithReply(status) == B_OK
+			&& status == B_OK)
 			link.Read<int32>(&token);
+		if (status < B_OK)
+			return;
 	}
 
+	printf("Shouldn't be here\n");
 	if (otherPicture.extent->fNewData != NULL) {
 		extent->fNewSize = otherPicture.extent->fNewSize;
 		extent->fNewData = malloc(extent->fNewSize);
@@ -126,8 +129,7 @@ BPicture::BPicture(BMessage *archive)
 	BMessage picMsg;
 	int32 i = 0;
 
-	while (archive->FindMessage("piclib", i++, &picMsg) == B_OK)
-	{
+	while (archive->FindMessage("piclib", i++, &picMsg) == B_OK) {
 		BPicture *pic = new BPicture(&picMsg);
 		extent->fPictures.AddItem(pic);
 	}
@@ -155,9 +157,9 @@ BPicture::BPicture(BMessage *archive)
 			link.Attach<int32>(extent->fNewSize);
 			link.Attach(extent->fNewData, extent->fNewSize);
 
-			int32 code;
-			if (link.FlushWithReply(code) == B_OK
-				&& code == SERVER_TRUE)
+			status_t status = B_ERROR;
+			if (link.FlushWithReply(status) == B_OK
+				&& status == B_OK)
 				link.Read<int32>(&token);
 		}
 	}
@@ -169,8 +171,7 @@ BPicture::BPicture(BMessage *archive)
 		extent->fNewSize = 0;
 	}
 
-	if (extent->fOldData)
-	{
+	if (extent->fOldData) {
 		free(extent->fOldData);
 		extent->fOldData = NULL;
 		extent->fOldSize = 0;
@@ -339,9 +340,9 @@ BPicture::Unflatten(BDataIO *stream)
 	link.Attach<int32>(extent->fNewSize);
 	link.Attach(extent->fNewData, extent->fNewSize);
 
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK
+		&& status == B_OK)
 		link.Read<int32>(&token);
 
 	if (extent->fNewData) {
@@ -350,7 +351,7 @@ BPicture::Unflatten(BDataIO *stream)
 		extent->fNewSize = 0;
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -398,9 +399,9 @@ BPicture::import_data(const void *data, int32 size, BPicture **subs,
 	link.Attach<int32>(size);
 	link.Attach(data, size);
 
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK
-		&& code == SERVER_TRUE)
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK
+		&& status == B_OK)
 		link.Read<int32>(&token);
 }
 
@@ -452,29 +453,29 @@ BPicture::assert_local_copy()
 	if (token == -1)
 		return false;
 
-/*	BPrivate::BAppServerLink link;
-	int32 count;
-
+	BPrivate::AppServerLink link;
+	
 	link.StartMessage(AS_DOWNLOAD_PICTURE);
 	link.Attach<int32>(token);
-	link.FlushWithReply(&code);
-	count=*((int32*)replydata.buffer);
+	
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		int32 count = 0;
+		link.Read<int32>(&count);
 
-	// Read sub picture tokens
-	for (int32 i = 0; i < count; i++)
-	{
-		BPicture *pic = new BPicture;
-
-		link.sread(4, &pic->token);
-		
-		extent->fPictures.AddItem(pic);
+		// Read sub picture tokens
+		for (int32 i = 0; i < count; i++) {
+			BPicture *pic = new BPicture;
+			link.Read<int32>(&pic->token);
+			extent->fPictures.AddItem(pic);
+		}
+	
+		link.Read<int32>(&extent->fNewSize);
+		extent->fNewData = malloc(extent->fNewSize);
+		link.Read(&extent->fNewData, extent->fNewSize);
 	}
 
-	link.sread(4, &extent->fNewSize);
-	extent->fNewData = malloc(extent->fNewSize);
-	link.sread(extent->fNewSize, &extent->fNewData);*/
-
-	return true;
+	return status == B_OK;
 }
 
 
@@ -503,22 +504,22 @@ BPicture::assert_server_copy()
 	if (extent->fNewData == NULL)
 		return false;
 
-/*	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		extent->fPictures.ItemAt(i)->assert_server_copy();
+	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
+		static_cast<BPicture *>(extent->fPictures.ItemAt(i))->assert_server_copy();
 
-	BPrivate::BAppServerLink link;
+	BPrivate::AppServerLink link;
 	link.StartMessage(AS_CREATE_PICTURE);
 	link.Attach<int32>(extent->fPictures.CountItems());
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		link.Attach<int32>(extent->fPictures.ItemAt(i)->token);
+		link.Attach<int32>(static_cast<BPicture *>(extent->fPictures.ItemAt(i))->token);
 	link.Attach<int32>(extent->fNewSize);
 	link.Attach(extent->fNewData,extent->fNewSize);
-	link.FlushWithReply(&code);
-	if(code==SERVER_TRUE)
+	
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
 		link.Read<int32>(&token);
 
-	return token != -1;*/
-	return true;
+	return token != -1;
 }
 
 
