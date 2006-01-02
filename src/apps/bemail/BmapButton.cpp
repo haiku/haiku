@@ -44,7 +44,7 @@ All rights reserved.
 #include <stdlib.h>
 
 
-#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
+#if !defined(HAIKU_TARGET_PLATFORM_DANO)
 static rgb_color
 mix_color(rgb_color color1, rgb_color color2, float portion)
 {
