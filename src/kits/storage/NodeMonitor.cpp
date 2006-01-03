@@ -1,12 +1,17 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-#include <AppMisc.h>
-#include <Looper.h>
+
 #include <Messenger.h>
 #include <NodeMonitor.h>
+
+#include <MessengerPrivate.h>
 
 #include <syscalls.h>
 
@@ -39,13 +44,42 @@
 status_t
 watch_node(const node_ref *node, uint32 flags, BMessenger target)
 {
-	status_t error = (target.IsValid() ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BLooper *looper = NULL;
-		BHandler *handler = target.Target(&looper);
-		error = watch_node(node, flags, handler, looper);
+	if (!target.IsValid())
+		return B_BAD_VALUE;
+
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+
+	if (flags == B_STOP_WATCHING) {
+		// unsubscribe from node node watching
+		if (node == NULL)
+			return B_BAD_VALUE;
+
+		return _kern_stop_watching(node->device, node->node, flags, port, token);
 	}
-	return error;
+
+	// subscribe to...
+	// mount watching
+	if (flags & B_WATCH_MOUNT) {
+		status_t status = _kern_start_watching((dev_t)-1, (ino_t)-1, 0, port,
+			token);
+		if (status < B_OK)
+			return status;
+
+		flags &= ~B_WATCH_MOUNT;
+	}
+
+	// node watching
+	if (flags != 0) {
+		if (node == NULL)
+			return B_BAD_VALUE;
+
+		return _kern_start_watching(node->device, node->node, flags, port,
+			token);
+	}
+
+	return B_OK;
 }
 
 // watch_node
@@ -76,47 +110,12 @@ watch_node(const node_ref *node, uint32 flags, BMessenger target)
 */
 status_t
 watch_node(const node_ref *node, uint32 flags, const BHandler *handler,
-		   const BLooper *looper)
+	const BLooper *looper)
 {
-	status_t error = B_OK;
-	// check looper and handler and get the handler token
-	int32 handlerToken = -2;
-	if (handler) {
-		handlerToken = _get_object_token_(handler);
-		if (looper) {
-			if (looper != handler->Looper())
-				error = B_BAD_VALUE;
-		} else {
-			looper = handler->Looper();
-			if (!looper)
-				error = B_BAD_VALUE;
-		}
-	} else if (!looper)
-		error = B_BAD_VALUE;
-	if (error == B_OK) {
-		port_id port = _get_looper_port_(looper);
-		if (flags == B_STOP_WATCHING) {
-			// unsubscribe from node node watching
-			if (node)
-				error = _kern_stop_watching(node->device, node->node, flags, port, handlerToken);
-			else
-				error = B_BAD_VALUE;
-		} else {
-			// subscribe to...
-			// mount watching
-			if (flags & B_WATCH_MOUNT) {
-				error = _kern_start_watching((dev_t)-1, (ino_t)-1, 0, port, handlerToken);
-				flags &= ~B_WATCH_MOUNT;
-			}
-			// node watching
-			if (error == B_OK && flags)
-				error = _kern_start_watching(node->device, node->node, flags, port, handlerToken);
-		}
-	}
-	return error;
+	return watch_node(node, flags, BMessenger(handler, looper));
 }
 
-// stop_watching
+
 /*!	\brief Unsubscribes a target from node and mount monitoring.
 	\param target Messenger referring to the target. Must be valid.
 	\return \c B_OK, if everything went fine, another error code otherwise.
@@ -124,16 +123,17 @@ watch_node(const node_ref *node, uint32 flags, const BHandler *handler,
 status_t
 stop_watching(BMessenger target)
 {
-	status_t error = (target.IsValid() ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BLooper *looper = NULL;
-		BHandler *handler = target.Target(&looper);
-		error = stop_watching(handler, looper);
-	}
-	return error;
+	if (!target.IsValid())
+		return B_BAD_VALUE;
+
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+
+	return _kern_stop_notifying(port, token);
 }
 
-// stop_watching
+
 /*!	\brief Unsubscribes a target from node and mount monitoring.
 	\param handler The target handler. May be \c NULL, if \a looper is not
 		   \c NULL. Then the preferred handler of the looper is targeted.
@@ -144,26 +144,6 @@ stop_watching(BMessenger target)
 status_t
 stop_watching(const BHandler *handler, const BLooper *looper)
 {
-	status_t error = B_OK;
-	// check looper and handler and get the handler token
-	int32 handlerToken = -2;
-	if (handler) {
-		handlerToken = _get_object_token_(handler);
-		if (looper) {
-			if (looper != handler->Looper())
-				error = B_BAD_VALUE;
-		} else {
-			looper = handler->Looper();
-			if (!looper)
-				error = B_BAD_VALUE;
-		}
-	} else if (!looper)
-		error = B_BAD_VALUE;
-	// unsubscribe
-	if (error == B_OK) {
-		port_id port = _get_looper_port_(looper);
-		error = _kern_stop_notifying(port, handlerToken);
-	}
-	return error;
+	return stop_watching(BMessenger(handler, looper));
 }
 
