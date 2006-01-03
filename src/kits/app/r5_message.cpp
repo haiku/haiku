@@ -274,20 +274,23 @@ flatten_r5_message(const BMessage *message, BDataIO *stream, ssize_t *_size)
 
 
 status_t
-unflatten_r5_message(BMessage *message, const char *flatBuffer)
+unflatten_r5_message(uint32 format, BMessage *message, const char *flatBuffer)
 {
 	r5_message_header *r5header = (r5_message_header *)flatBuffer;
 	BMemoryIO stream(flatBuffer + 4, r5header->flattened_size - 4);
-	return unflatten_r5_message(message, &stream);
+	return unflatten_r5_message(format, message, &stream);
 }
 
 
 status_t
-unflatten_r5_message(BMessage *message, BDataIO *stream)
+unflatten_r5_message(uint32 format, BMessage *message, BDataIO *stream)
 {
 	TReadHelper reader(stream);
 	BMessage::Private messagePrivate(message);
 	BMessage::message_header *header = messagePrivate.GetMessageHeader();
+
+	if (format == kR5MessageMagicSwapped)
+		reader.SetSwap(true);
 
 	// the stream is already advanced by the size of the "format"
 	r5_message_header r5header;
@@ -364,7 +367,7 @@ unflatten_r5_message(BMessage *message, BDataIO *stream)
 
 		char nameBuffer[256];
 		reader(nameBuffer, nameLength);
-		nameBuffer[nameLength] = 0;
+		nameBuffer[nameLength] = '\0';
 
 		uint8 *buffer = (uint8 *)malloc(dataSize);
 		uint8 *pointer = buffer;

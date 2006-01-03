@@ -17,7 +17,7 @@ class BDataIO;
 
 namespace BPrivate {
 
-status_t unflatten_dano_message(uint32 magic, BDataIO& stream, BMessage& message);
+status_t unflatten_dano_message(uint32 format, BDataIO& stream, BMessage& message);
 ssize_t dano_message_flattened_size(const char* buffer);
 
 }

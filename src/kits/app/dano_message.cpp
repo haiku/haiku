@@ -92,13 +92,13 @@ BPrivate::dano_message_flattened_size(const char *buffer)
 
 
 status_t
-BPrivate::unflatten_dano_message(uint32 magic, BDataIO &stream,
+BPrivate::unflatten_dano_message(uint32 format, BDataIO &stream,
 	BMessage &message)
 {
 	TReadHelper reader(&stream);
 	message.MakeEmpty();
 
-	if (magic == kMessageFormatSwapped)
+	if (format == kMessageFormatSwapped)
 		reader.SetSwap(true);
 
 	ssize_t size;
