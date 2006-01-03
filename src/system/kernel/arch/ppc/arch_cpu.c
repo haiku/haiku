@@ -116,19 +116,6 @@ arch_cpu_user_TLB_invalidate(void)
 }
 
 
-// ToDo: doesn't belong here!
-#if 0
-long long 
-system_time(void)
-{
-	bigtime_t time_base = get_time_base();
-
-	return (time_base * 1000000) / ((66*1000*1000) / 4); 
-		// ToDo: remove hard coded
-}
-#endif
-
-
 status_t
 arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *fault_handler)
 {
@@ -217,5 +204,4 @@ void
 arch_cpu_idle(void)
 {
 }
-
 

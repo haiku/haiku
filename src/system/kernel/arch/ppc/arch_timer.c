@@ -39,7 +39,7 @@ arch_timer_clear_hardware_timer()
 int 
 arch_init_timer(kernel_args *ka)
 {
-	sTickRate = (66*1000*1000) / 4; // ToDo: fix
+	sTickRate = ka->arch_args.time_base_frequency;
 
 	return 0;
 }

@@ -30,7 +30,7 @@ boot_arch_cpu_init(void)
 	// iterate through the "/cpus" node to find all CPUs
 	int cpus = of_finddevice("/cpus");
 	if (cpus == OF_FAILED) {
-		printf("arch_cpu_init(): Failed to open \"/cpus\"!\n");
+		printf("boot_arch_cpu_init(): Failed to open \"/cpus\"!\n");
 		return B_ERROR;
 	}
 
@@ -41,11 +41,53 @@ boot_arch_cpu_init(void)
 			sizeof(cpuPath)) == B_OK) {
 		TRACE(("found CPU: %s\n", cpuPath));
 
+		// For the first CPU get the frequencies of CPU, bus, and time base.
+		// We assume they are the same for all CPUs.
+		if (cpuCount == 0) {
+			int cpu = of_finddevice(cpuPath);
+			if (cpu == OF_FAILED) {
+				printf("boot_arch_cpu_init: Failed get CPU device node!\n");
+				return B_ERROR;
+			}
+
+			// TODO: Does encode-int really encode quadlet (32 bit numbers)
+			// only?
+			int32 clockFrequency;
+			if (of_getprop(cpu, "clock-frequency", &clockFrequency, 4)
+					== OF_FAILED) {
+				printf("boot_arch_cpu_init: Failed to get CPU clock "
+					"frequency!\n");
+				return B_ERROR;
+			}
+			int32 busFrequency;
+			if (of_getprop(cpu, "bus-frequency", &busFrequency, 4)
+					== OF_FAILED) {
+				printf("boot_arch_cpu_init: Failed to get bus clock "
+					"frequency!\n");
+				return B_ERROR;
+			}
+			int32 timeBaseFrequency;
+			if (of_getprop(cpu, "timebase-frequency", &timeBaseFrequency, 4)
+					== OF_FAILED) {
+				printf("boot_arch_cpu_init: Failed to get time base "
+					"frequency!\n");
+				return B_ERROR;
+			}
+
+			gKernelArgs.arch_args.cpu_frequency = clockFrequency;
+			gKernelArgs.arch_args.bus_frequency = busFrequency;
+			gKernelArgs.arch_args.time_base_frequency = timeBaseFrequency;
+			
+			TRACE(("  CPU clock frequency: %ld\n", clockFrequency));
+			TRACE(("  bus clock frequency: %ld\n", busFrequency));
+			TRACE(("  time base frequency: %ld\n", timeBaseFrequency));
+		}
+
 		cpuCount++;
 	}
 	
 	if (cpuCount == 0) {
-		printf("arch_cpu_init(): Found no CPUs!\n");
+		printf("boot_arch_cpu_init(): Found no CPUs!\n");
 		return B_ERROR;
 	}
 
@@ -56,7 +98,7 @@ boot_arch_cpu_init(void)
 	addr_t stack = (addr_t)arch_mmu_allocate((void*)0x80000000,
 		cpuCount * KERNEL_STACK_SIZE, B_READ_AREA | B_WRITE_AREA, false);
 	if (!stack) {
-		printf("arch_cpu_init(): Failed to allocate kernel stack(s)!\n");
+		printf("boot_arch_cpu_init(): Failed to allocate kernel stack(s)!\n");
 		return B_NO_MEMORY;
 	}
 

@@ -77,6 +77,7 @@ extern uint32 get_sr(void *virtualAddress);
 extern void set_sr(void *virtualAddress, uint32 value);
 extern uint32 get_msr(void);
 extern uint32 set_msr(uint32 value);
+extern uint32 get_pvr(void);
 
 extern void set_ibat0(struct block_address_translation *bat);
 extern void set_ibat1(struct block_address_translation *bat);
@@ -116,5 +117,41 @@ extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
 #define ppc_sync() asm volatile("sync")
 #define tlbia() asm volatile("tlbia")
 #define tlbie(addr) asm volatile("tlbie %0" :: "r" (addr))
+
+
+// PowerPC processor version (the upper 16 bits of the PVR).
+enum ppc_processor_version {
+	MPC601		= 0x0001,
+	MPC603		= 0x0003,
+	MPC604		= 0x0004,
+	MPC602		= 0x0005,
+	MPC603e		= 0x0006,
+	MPC603ev	= 0x0007,
+	MPC750		= 0x0008,
+	MPC604ev	= 0x0009,
+	MPC7400		= 0x000c,
+	MPC620		= 0x0014,
+	IBM403		= 0x0020,
+	IBM401A1	= 0x0021,
+	IBM401B2	= 0x0022,
+	IBM401C2	= 0x0023,
+	IBM401D2	= 0x0024,
+	IBM401E2	= 0x0025,
+	IBM401F2	= 0x0026,
+	IBM401G2	= 0x0027,
+	IBMPOWER3	= 0x0041,
+	MPC860		= 0x0050,
+	MPC8240		= 0x0081,
+	IBM405GP	= 0x4011,
+	IBM405L		= 0x4161,
+	IBM750FX	= 0x7000,
+	MPC7450		= 0x8000,
+	MPC7455		= 0x8001,
+	MPC7457		= 0x8002,
+	MPC7447A	= 0x8003,
+	MPC7448		= 0x8004,
+	MPC7410		= 0x800c,
+	MPC8245		= 0x8081,
+};
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */

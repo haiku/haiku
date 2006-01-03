@@ -16,6 +16,10 @@
 // kernel args
 typedef struct {
 	// architecture specific
+	uint64		cpu_frequency;
+	uint64		bus_frequency;
+	uint64		time_base_frequency;
+
 	addr_range	page_table;		// virtual address and size of the page table
 	addr_range	exception_handlers;
 	addr_range	framebuffer;		// maps where the framebuffer is located, in physical memory

@@ -379,13 +379,41 @@ typedef enum cpu_types {
 	// ToDo: add latest models
 
 	/* Motorola/IBM */
+	B_CPU_PPC_UNKNOWN					= 0,
 	B_CPU_PPC_601						= 1,
+	B_CPU_PPC_602						= 7,
 	B_CPU_PPC_603						= 2,
 	B_CPU_PPC_603e						= 3,
+	B_CPU_PPC_603ev						= 8,
 	B_CPU_PPC_604						= 4,
 	B_CPU_PPC_604e						= 5,
+	B_CPU_PPC_604ev						= 9,
+	B_CPU_PPC_620						= 10,
 	B_CPU_PPC_750   					= 6,
 	B_CPU_PPC_686						= 13,
+	B_CPU_PPC_860						= 25,
+	B_CPU_PPC_7400						= 26,
+	B_CPU_PPC_7410						= 27,
+	B_CPU_PPC_7447A						= 28,
+	B_CPU_PPC_7448						= 29,
+	B_CPU_PPC_7450						= 30,
+	B_CPU_PPC_7455						= 31,
+	B_CPU_PPC_7457						= 32,
+	B_CPU_PPC_8240						= 33,
+	B_CPU_PPC_8245						= 34,
+
+	B_CPU_PPC_IBM_401A1					= 35,
+	B_CPU_PPC_IBM_401B2					= 36,
+	B_CPU_PPC_IBM_401C2					= 37,
+	B_CPU_PPC_IBM_401D2					= 38,
+	B_CPU_PPC_IBM_401E2					= 39,
+	B_CPU_PPC_IBM_401F2					= 40,
+	B_CPU_PPC_IBM_401G2					= 41,
+	B_CPU_PPC_IBM_403					= 42,
+	B_CPU_PPC_IBM_405GP					= 43,
+	B_CPU_PPC_IBM_405L					= 44,
+	B_CPU_PPC_IBM_750FX					= 45,
+	B_CPU_PPC_IBM_POWER3				= 46,
 
 	/* Intel */
 	

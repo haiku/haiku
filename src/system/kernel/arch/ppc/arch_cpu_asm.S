@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Axel Dï¿½fler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -45,6 +45,12 @@ FUNCTION(get_msr):
  */
 FUNCTION(set_msr):
 	mtmsr	%r3
+	blr
+
+/* uint32 get_pvr(void);
+ */
+FUNCTION(get_pvr):
+	mfpvr	%r3
 	blr
 
 
