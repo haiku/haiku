@@ -11,7 +11,7 @@ KernelStaticLibrary libppc :
 	arch_int.c
 	arch_mmu.cpp
 	arch_platform.cpp
-	arch_real_time_clock.c
+	arch_real_time_clock.cpp
 	arch_smp.c
 	arch_system_info.c
 	arch_thread.c
