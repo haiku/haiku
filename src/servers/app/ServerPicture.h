@@ -1,32 +1,53 @@
-/*
- * Copyright 2001-2005, Haiku, Inc.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- */
-#ifndef SERVER_PICTURE_H
-#define SERVER_PICTURE_H
+#ifndef __SERVER_PICTURE_H
+#define __SERVER_PICTURE_H
 
+#include <Font.h>
+#include <Rect.h>
+#include <Region.h>
+#include <DataIO.h>
+#include <InterfaceDefs.h>
+#include <List.h>
 
-#include <OS.h>
-
-class AreaLink;
-
-
+class ViewLayer;
 class ServerPicture {
-	public:
-		ServerPicture();
-		~ServerPicture();
+public:
+				ServerPicture();
+virtual				~ServerPicture();
+	
+		int32		Token() { return fToken; }
+		
+		void		BeginOp(int16 op);
+		void		EndOp();
 
-		status_t InitCheck() const { return fArea >= B_OK ? B_OK : fArea; }
-		area_id Area() const { return fArea; }
-		int32 Token() const { return fToken; }
+		void		EnterStateChange();
+		void		ExitStateChange();
 
-	private:	
-		AreaLink*	fAreaLink;
-		area_id		fArea;
+		void		EnterFontChange();
+		void		ExitFontChange();
+		
+		void		AddInt8(int8 data);
+		void		AddInt16(int16 data);
+		void		AddInt32(int32 data);
+		void		AddInt64(int64 data);
+		void		AddFloat(float data);
+		void		AddCoord(BPoint data);
+		void		AddRect(BRect data);
+		void		AddColor(rgb_color data);
+		void		AddString(const char *data);
+		void		AddData(const void *data, int32 size);
+		
+		void		SyncState(ViewLayer *view);
+		
+		void		Play(ViewLayer *view);
+		
+		const void	*Data() { return fData.Buffer(); }
+		int32		DataLength() { return fData.BufferLength(); }
+
+private:
 		int32		fToken;
+		BMallocIO	fData;
+		BList		fStack;
+		// DrawState	*fState;
 };
 
-#endif	/* SERVER_PICTURE_H */
+#endif // __SERVER_PICTURE_H
