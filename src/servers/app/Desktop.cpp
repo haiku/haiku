@@ -1402,8 +1402,7 @@ Desktop::AddWindow(WindowLayer *window)
 			window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
 	} else {
 		// subset windows are visible on all workspaces their subset is on
-		// (but floating windows default to not visible)
-		window->SetWorkspaces(window->IsModal() ? window->SubsetWorkspaces() : 0);
+		window->SetWorkspaces(window->SubsetWorkspaces());
 	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
