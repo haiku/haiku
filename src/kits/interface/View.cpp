@@ -3126,15 +3126,7 @@ BView::DrawPicture(const BPicture *picture)
 		return;
 
 	DrawPictureAsync(picture, PenLocation());
-	fOwner->fLink->Attach<int32>(B_OK);
-
-	// ToDo: why a reply?
-	int32 code;
-	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == B_OK) {
-		status_t err;
-		fOwner->fLink->Read<int32>(&err);
-	}
+	Sync();
 }
 
 
@@ -3145,15 +3137,7 @@ BView::DrawPicture(const BPicture *picture, BPoint where)
 		return;
 
 	DrawPictureAsync(picture, where);
-	fOwner->fLink->Attach<int32>(B_OK);
-
-	// ToDo: why a reply?
-	int32 code;
-	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == B_OK) {
-		status_t err;
-		fOwner->fLink->Read<int32>(&err);
-	}
+	Sync();
 }
 
 
@@ -3164,15 +3148,7 @@ BView::DrawPicture(const char *filename, long offset, BPoint where)
 		return;
 
 	DrawPictureAsync(filename, offset, where);
-	fOwner->fLink->Attach<int32>(B_OK);
-
-	// ToDo: why a reply?
-	int32 code;
-	if (fOwner->fLink->FlushWithReply(code) == B_OK
-		&& code == B_OK) {
-		status_t err;
-		fOwner->fLink->Read<int32>(&err);
-	}
+	Sync();
 }
 
 
