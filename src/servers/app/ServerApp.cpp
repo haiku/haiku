@@ -126,6 +126,9 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 		fAppCursor->SetOwningTeam(fClientTeam);
 	}
 
+	fInitialWorkspace = desktop->CurrentWorkspace();
+		// TODO: this should probably be retrieved when the app is loaded!
+
 	STRACE(("ServerApp %s:\n", Signature()));
 	STRACE(("\tBApp port: %ld\n", fClientReplyPort));
 	STRACE(("\tReceiver port: %ld\n", fMessagePort));

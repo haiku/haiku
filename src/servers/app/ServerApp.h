@@ -66,6 +66,7 @@ class ServerApp : public MessageLooper {
 		void RemoveWindow(ServerWindow* window);
 		bool InWorkspace(int32 index) const;
 		uint32 Workspaces() const;
+		int32 InitialWorkspace() const { return fInitialWorkspace; }
 
 		int32 CountBitmaps() const;
 		ServerBitmap *FindBitmap(int32 token) const;
@@ -104,6 +105,8 @@ class ServerApp : public MessageLooper {
 		mutable BLocker fWindowListLock;
 		BObjectList<ServerWindow> fWindowList;
 		BPrivate::BTokenSpace fViewTokens;
+
+		int32 fInitialWorkspace;
 
 		// TODO:
 		// - Are really Bitmaps and Pictures stored per application and not globally ?

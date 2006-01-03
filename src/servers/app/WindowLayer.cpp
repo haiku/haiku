@@ -1237,9 +1237,19 @@ WindowLayer::InWorkspace(int32 index) const
 		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
 		return true;
 
-	if (fFeel == B_MODAL_APP_WINDOW_FEEL
-		|| fFeel == B_FLOATING_APP_WINDOW_FEEL)
+	if (fFeel == B_FLOATING_APP_WINDOW_FEEL)
 		return ServerWindow()->App()->InWorkspace(index);
+
+	if (fFeel == B_MODAL_APP_WINDOW_FEEL) {
+		uint32 workspaces = ServerWindow()->App()->Workspaces();
+		if (workspaces == 0) {
+			// The application doesn't seem to have any other windows
+			// open or visible - but we'd like to see modal windows
+			// anyway, at least when they are first opened.
+			return index == ServerWindow()->App()->InitialWorkspace();
+		}
+		return (workspaces & (1UL << index)) != 0;
+	}
 
 	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
@@ -1422,9 +1432,19 @@ WindowLayer::SubsetWorkspaces() const
 		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
 		return B_ALL_WORKSPACES;
 
-	if (fFeel == B_MODAL_APP_WINDOW_FEEL
-		|| fFeel == B_FLOATING_APP_WINDOW_FEEL)
+	if (fFeel == B_FLOATING_APP_WINDOW_FEEL)
 		return ServerWindow()->App()->Workspaces();
+
+	if (fFeel == B_MODAL_APP_WINDOW_FEEL) {
+		uint32 workspaces = ServerWindow()->App()->Workspaces();
+		if (workspaces == 0) {
+			// The application doesn't seem to have any other windows
+			// open or visible - but we'd like to see modal windows
+			// anyway, at least when they are first opened.
+			return 1UL << ServerWindow()->App()->InitialWorkspace();
+		}
+		return workspaces;
+	}
 
 	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
