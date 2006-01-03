@@ -15,7 +15,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown clockco
 	uptime version waitfor xargs xres zip
 ;
 
-BEOS_APPS = MiniTerminal Terminal Expander People ShowImage Clock Pulse
+BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
 	StyledEdit Chart
 ;
