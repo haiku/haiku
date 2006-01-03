@@ -501,6 +501,8 @@ DefaultDecorator::_DoLayout()
 
 	// calculate left/top/right/bottom borders
 	if (fBorderWidth > 0) {
+		// NOTE: no overlapping, the left and right border rects
+		// don't include the corners!
 		fLeftBorder.Set(_frame.left - fBorderWidth, _frame.top,
 			_frame.left - 1, _frame.bottom);
 
@@ -513,7 +515,7 @@ DefaultDecorator::_DoLayout()
 		fBottomBorder.Set(_frame.left - fBorderWidth, _frame.bottom + 1,
 			_frame.right + fBorderWidth, _frame.bottom + fBorderWidth);
 	} else {
-		// no border ... (?) useful when displaying windows that are just images
+		// no border
 		fLeftBorder.Set(0.0, 0.0, -1.0, -1.0);
 		fRightBorder.Set(0.0, 0.0, -1.0, -1.0);
 		fTopBorder.Set(0.0, 0.0, -1.0, -1.0);
@@ -886,6 +888,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 
 	// calulate close rect based on the tab rectangle
 	if (Flags() & B_NOT_CLOSABLE) {
+		// the close rect has no width
 		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset, tabRect.top + offset + size);
 	} else {
@@ -895,6 +898,7 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 
 	// calulate zoom rect based on the tab rectangle
 	if (Flags() & B_NOT_ZOOMABLE) {
+		// the zoom rect has no width
 		_zoomrect.Set(tabRect.right, tabRect.top + offset,
 			tabRect.right, tabRect.top + offset + size);
 	} else {
