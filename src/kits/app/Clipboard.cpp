@@ -1,44 +1,23 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Clipboard.cpp
-//	Author:			Gabe Yoder (gyoder@stny.rr.com)
-//	Description:	BClipboard provides an interface to a system-wide clipboard
-//                  storage area.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Gabe Yoder (gyoder@stny.rr.com)
+ */
 
-// Standard Includes -----------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-// System Includes -------------------------------------------------------------
+#include <ClipboardPrivate.h>
+
 #include <Clipboard.h>
 #include <Application.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 
-#include <ClipboardPrivate.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-// Globals ---------------------------------------------------------------------
 #ifdef RUN_WITHOUT_REGISTRAR
 	static BClipboard sClipboard(NULL);
 	BClipboard *be_clipboard = &sClipboard;
@@ -86,6 +65,7 @@ BClipboard::Name() const
 	return (const char *)fName;
 }
 
+
 /*!	\brief Returns the (locally cached) number of commits to the clipboard.
 
 	The returned value is the number of successful Commit() invocations for
@@ -101,6 +81,7 @@ BClipboard::LocalCount() const
 {
 	return fCount;
 }
+
 
 /*!	\brief Returns the number of commits to the clipboard.
 
@@ -240,8 +221,7 @@ BClipboard::Data() const
 }
 
 
-//	#pragma mark -
-//	Private methods
+//	#pragma mark - Private methods
 
 
 BClipboard::BClipboard(const BClipboard &)
@@ -305,7 +285,10 @@ BClipboard::UploadToSystem()
 	return B_ERROR;
 }
 
-// init_clipboard
+
+//	#pragma mark -
+
+
 /*!	\brief Initializes the global \c be_clipboard.
 
 	Invoked at libbe initialization time.

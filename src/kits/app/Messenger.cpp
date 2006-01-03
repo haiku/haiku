@@ -1,40 +1,21 @@
- //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Messenger.h
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	BMessenger delivers messages to local or remote targets.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ */
 
-// debugging
-//#define DBG(x) x
-#define DBG(x)
-#define OUT	printf
 
-// Standard Includes -----------------------------------------------------------
-#include <new>
-#include <stdio.h>
-#include <string.h>
+#include <AppMisc.h>
+#include <MessageUtils.h>
+#include "ObjectLocker.h"
+#include "TokenSpace.h"
 
-// System Includes -------------------------------------------------------------
+#ifdef USING_MESSAGE4
+#	include <MessagePrivate.h>
+#endif
+
 #include <Application.h>
 #include <Handler.h>
 #include <Looper.h>
@@ -45,21 +26,15 @@
 #include <Roster.h>
 #include <TokenSpace.h>
 
-// Project Includes ------------------------------------------------------------
-#include <AppMisc.h>
-#include <MessageUtils.h>
-#include "ObjectLocker.h"
-#include "TokenSpace.h"
+#include <new>
+#include <stdio.h>
+#include <string.h>
 
-#ifdef USING_MESSAGE4
-#include <MessagePrivate.h>
-#endif
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
+// debugging
+//#define DBG(x) x
+#define DBG(x)
+#define OUT	printf
 
 using BPrivate::gDefaultTokens;
 using BPrivate::gLooperList;

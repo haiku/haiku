@@ -85,10 +85,9 @@ BTokenSpace::RemoveToken(int32 token, remove_token_callback callback)
 }
 
 
-/**	Checks wether or not the \a token exists with the specified
- *	\a type in the token space or not.
- */
-
+/*!	Checks wether or not the \a token exists with the specified
+	\a type in the token space or not.
+*/
 bool
 BTokenSpace::CheckToken(int32 token, int16 type) const
 {

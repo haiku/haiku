@@ -1,29 +1,11 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Handler.cpp
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	BHandler defines the message-handling protocol.
-//					MessageReceived() is its lynchpin.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
+
 /**
 	@note	Some musings on the member variable 'fToken'.  In searching a dump
 			of libbe.so, I found a struct/class called 'TokenSpace', which has
@@ -119,15 +101,8 @@
 			Maybe that's too heavy-weight a solution, though.
  */
 
-// Standard Includes -----------------------------------------------------------
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <map>
-#include <vector>
+#include <TokenSpace.h>
 
-// System Includes -------------------------------------------------------------
 #include <AppDefs.h>
 #include <Handler.h>
 #include <Looper.h>
@@ -136,8 +111,10 @@
 #include <Messenger.h>
 #include <PropertyInfo.h>
 
-// Project Includes ------------------------------------------------------------
-#include <TokenSpace.h>
+#include <algorithm>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
 
 using std::map;
 using std::vector;

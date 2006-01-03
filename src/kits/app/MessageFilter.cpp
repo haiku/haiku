@@ -1,63 +1,49 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		MessageFilter.cpp
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	BMessageFilter class creates objects that filter
-//					in-coming BMessages.  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
+
 
 #include <MessageFilter.h>
 
+
 BMessageFilter::BMessageFilter(uint32 inWhat, filter_hook func)
-	:	fFiltersAny(false),
-		what(inWhat),
-		fDelivery(B_ANY_DELIVERY),
-		fSource(B_ANY_SOURCE),
-		fLooper(NULL),
-		fFilterFunction(func)
+	:
+	fFiltersAny(false),
+	fWhat(inWhat),
+	fDelivery(B_ANY_DELIVERY),
+	fSource(B_ANY_SOURCE),
+	fLooper(NULL),
+	fFilterFunction(func)
 {
 }
 
 
-BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
-							   filter_hook func)
-	:	fFiltersAny(true),
-		what(0),
-		fDelivery(delivery),
-		fSource(source),
-		fLooper(NULL),
-		fFilterFunction(func)
+BMessageFilter::BMessageFilter(message_delivery delivery,
+	message_source source, filter_hook func)
+	:
+	fFiltersAny(true),
+	fWhat(0),
+	fDelivery(delivery),
+	fSource(source),
+	fLooper(NULL),
+	fFilterFunction(func)
 {
 }
 
 
-BMessageFilter::BMessageFilter(message_delivery delivery, message_source source,
-							   uint32 inWhat, filter_hook func)
-	:	fFiltersAny(false),
-		what(inWhat),
-		fDelivery(delivery),
-		fSource(source),
-		fLooper(NULL),
-		fFilterFunction(func)
+BMessageFilter::BMessageFilter(message_delivery delivery,
+	message_source source, uint32 inWhat, filter_hook func)
+	:
+	fFiltersAny(false),
+	fWhat(inWhat),
+	fDelivery(delivery),
+	fSource(source),
+	fLooper(NULL),
+	fFilterFunction(func)
 {
 }
 
@@ -83,7 +69,7 @@ BMessageFilter &
 BMessageFilter::operator=(const BMessageFilter& from)
 {
 	fFiltersAny			= from.FiltersAnyCommand();
-	what				= from.Command();
+	fWhat				= from.Command();
 	fDelivery			= from.MessageDelivery();
 	fSource				= from.MessageSource();
 	fFilterFunction		= from.FilterFunction();
@@ -118,7 +104,7 @@ BMessageFilter::MessageSource() const
 uint32
 BMessageFilter::Command() const
 {
-	return what;
+	return fWhat;
 }
 
 
