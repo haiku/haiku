@@ -1070,8 +1070,6 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	dirty.Exclude(&clean);
 	MarkDirty(dirty);
 
-	// TODO: if this window has any floating windows, remove them here
-
 	_UpdateFronts();
 	SetFocusWindow(FrontWindow());
 	//_WindowsChanged();
@@ -1386,6 +1384,10 @@ Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 }
 
 
+/*!	\brief Adds the window to the desktop.
+	At this point, the window is still hidden and must be shown explicetly
+	via ShowWindow().
+*/
 void
 Desktop::AddWindow(WindowLayer *window)
 {
@@ -1400,7 +1402,8 @@ Desktop::AddWindow(WindowLayer *window)
 			window->SetWorkspaces(workspace_to_workspaces(CurrentWorkspace()));
 	} else {
 		// subset windows are visible on all workspaces their subset is on
-		window->SetWorkspaces(window->SubsetWorkspaces());
+		// (but floating windows default to not visible)
+		window->SetWorkspaces(window->IsModal() ? window->SubsetWorkspaces() : 0);
 	}
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
