@@ -5,5 +5,4 @@ SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 
 KernelStaticLibrary libopenfirmware.a :
 	openfirmware.c
-	platform.cpp
 ;

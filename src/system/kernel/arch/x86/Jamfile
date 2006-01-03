@@ -10,6 +10,7 @@ KernelStaticLibrary libx86 :
 	arch_debug_console.c
 	arch_elf.c
 	arch_int.c
+	arch_platform.c
 #	arch_selector.c
 	arch_real_time_clock.c
 	arch_smp.c

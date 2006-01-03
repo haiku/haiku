@@ -7,17 +7,13 @@
  */
 
 
+#include <arch_platform.h>
+#include <arch/debug_console.h>
+#include <boot/kernel_args.h>
 #include <kernel.h>
 #include <vm.h>
-#include <boot/kernel_args.h>
-#include <arch/debug_console.h>
-#include <platform/openfirmware/openfirmware.h>
 
 #include <string.h>
-
-
-static int sInput = -1;
-static int sOutput = -1;
 
 
 char
@@ -30,20 +26,14 @@ arch_debug_blue_screen_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	int key;
-	if (of_interpret("key", 0, 1, &key) == OF_FAILED)
-		return 0;
-	return (char)key;
+	return PPCPlatform::Default()->SerialDebugGetChar();
 }
 
 
 void
 arch_debug_serial_putchar(const char c)
 {
-	if (c == '\n')
-		of_write(sOutput, "\r\n", 2);
-	else
-		of_write(sOutput, &c, 1);
+	return PPCPlatform::Default()->SerialDebugPutChar(c);
 }
 
 
@@ -67,12 +57,7 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	if (of_getprop(gChosen, "stdin", &sInput, sizeof(int)) == OF_FAILED)
-		return B_ERROR;
-	if (of_getprop(gChosen, "stdout", &sOutput, sizeof(int)) == OF_FAILED)
-		return B_ERROR;
-
-	return B_OK;
+	return PPCPlatform::Default()->InitSerialDebug(args);
 }
 
 

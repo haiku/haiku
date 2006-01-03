@@ -11,6 +11,7 @@
 
 #include <OS.h>
 
+#include <arch/platform.h>
 #include <boot_item.h>
 #include <cbuf.h>
 #include <cpu.h>
@@ -24,7 +25,6 @@
 #include <kscheduler.h>
 #include <ksyscalls.h>
 #include <messaging.h>
-#include <platform.h>
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
@@ -82,7 +82,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		thread_id thread;
 
 		// init platform
-		platform_init(&sKernelArgs);
+		arch_platform_init(&sKernelArgs);
 
 		// setup debug output
 		debug_init(&sKernelArgs);
@@ -104,7 +104,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 			// the boot loader allocated region is not used anymore
 
 		// now we can use the heap and create areas
-		platform_init_post_vm(&sKernelArgs);
+		arch_platform_init_post_vm(&sKernelArgs);
 		TRACE(("init driver_settings\n"));
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);

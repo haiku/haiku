@@ -4,12 +4,13 @@ KernelStaticLibrary libppc :
 	arch_atomic.c
 	arch_cpu.c
 	arch_cpu_asm.S
-	arch_debug_console.c
+	arch_debug_console.cpp
 	arch_debug.c
 	arch_elf.c
 	arch_exceptions.S
 	arch_int.c
 	arch_mmu.cpp
+	arch_platform.cpp
 	arch_real_time_clock.c
 	arch_smp.c
 	arch_system_info.c
