@@ -9,16 +9,12 @@
 #include <arch/real_time_clock.h>
 #include <arch/cpu.h>
 
+#include <real_time_clock.h>
 #include <real_time_data.h>
 
 
 #define CMOS_ADDR_PORT 0x70
 #define CMOS_DATA_PORT 0x71
-#define BASE_YEAR 1970
-#define SECONDS_31 2678400
-#define SECONDS_30 2592000
-#define SECONDS_28 2419200
-#define SECONDS_DAY 86400
 
 typedef struct	{
 	uint8 second;
@@ -29,10 +25,6 @@ typedef struct	{
 	uint8 year;
 	uint8 century;
 } cmos_time;
-
-static uint32 sSecsPerMonth[12] = {SECONDS_31, SECONDS_28, SECONDS_31, SECONDS_30, 
-	SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_30,
-	SECONDS_31};
 
 
 static uint32
@@ -61,22 +53,6 @@ int_to_bcd(uint32 number)
 	low = number % 10;
 
 	return (high << 4) | low;
-}
-
-
-static bool
-leap_year(uint32 year)
-{
-	if (year % 400 == 0)
-		return true;
-
-	if (year % 100 == 0)
-		return false;
-
-	if (year % 4 == 0)
-		return true;
-
-	return false;
 }
 
 
@@ -160,105 +136,39 @@ write_cmos_clock(cmos_time *cmos)
 }
 
 
-static inline uint32
-secs_this_year(uint32 year)
-{
-	if (leap_year(year))
-		return 31622400;
-	
-	return 31536000;
-}
-
-
 static uint32
 cmos_to_secs(const cmos_time *cmos)
 {
-	uint32 wholeYear;
-	uint32 time = 0;
-	uint32 i;
+	struct tm t;
+	t.tm_year = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year)
+		- RTC_EPOCHE_BASE_YEAR;
+	t.tm_mon = bcd_to_int(cmos->month) - 1;
+	t.tm_mday = bcd_to_int(cmos->day);
+	t.tm_hour = bcd_to_int(cmos->hour);
+	t.tm_min = bcd_to_int(cmos->minute);
+	t.tm_sec = bcd_to_int(cmos->second);
 
-	wholeYear = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year);
-
-	// ToDo: get rid of these loops and compute the correct value
-	//	i.e. days = (long)(year > 0) + year*365 + --year/4 - year/100 + year/400;
-	//	let sSecsPerMonth[] have the values already added up
-
-	// Add up the seconds from all years since 1970 that have elapsed.
-	for (i = BASE_YEAR; i < wholeYear; ++i) {
-		time += secs_this_year(i);
-	}
-
-	// Add up the seconds from all months passed this year.
-	for (i = 0; i < bcd_to_int(cmos->month) - 1 && i < 12; ++i)
-		time += sSecsPerMonth[i];
-
-	// Add up the seconds from all days passed this month.
-	if (leap_year(wholeYear) && bcd_to_int(cmos->month) > 2)
-		time += SECONDS_DAY;
-
-	time += (bcd_to_int(cmos->day) - 1) * SECONDS_DAY;
-	time += bcd_to_int(cmos->hour) * 3600;
-	time += bcd_to_int(cmos->minute) * 60;
-	time += bcd_to_int(cmos->second);
-
-	return time;
+	return rtc_tm_to_secs(&t);
 }
 
 
 static void
 secs_to_cmos(uint32 seconds, cmos_time *cmos)
 {
-	uint32 wholeYear = BASE_YEAR;
-	uint32 secsThisYear;
-	bool keepLooping;
-	bool isLeapYear;
-	int temp;
-	int month;
+	int wholeYear;
 
-	keepLooping = 1;
+	struct tm t;
+	rtc_secs_to_tm(seconds, &t);
 
-	// Determine the current year by starting at 1970 and incrementing whole_year as long as
-	// we can keep subtracting secs_this_year from seconds.
-	while (keepLooping) {
-		secsThisYear = secs_this_year(wholeYear);
-
-		if (seconds >= secsThisYear) {
-			seconds -= secsThisYear;
-			++wholeYear;
-		} else
-			keepLooping = false;
-	}
+	wholeYear = t.tm_year + RTC_EPOCHE_BASE_YEAR;
 
 	cmos->century = int_to_bcd(wholeYear / 100);
 	cmos->year = int_to_bcd(wholeYear % 100);
-
-	// Determine the current month
-	month = 1;
-	isLeapYear = leap_year(wholeYear);
-	do {
-		temp = seconds - sSecsPerMonth[month - 1];
-
-		if (isLeapYear && month == 2)
-			temp -= SECONDS_DAY;
-
-		if (temp >= 0) {
-			seconds = temp;
-			++month;
-		}
-	} while (temp >= 0 && month < 13);
-
-	cmos->month = int_to_bcd(month);
-
-	cmos->day = int_to_bcd(seconds / SECONDS_DAY + 1);
-	seconds = seconds % SECONDS_DAY;
-
-	cmos->hour = int_to_bcd(seconds / 3600);
-	seconds = seconds % 3600;
-
-	cmos->minute = int_to_bcd(seconds / 60);
-	seconds = seconds % 60;
-
-	cmos->second = int_to_bcd(seconds);
+	cmos->month = int_to_bcd(t.tm_mon + 1);
+	cmos->day = int_to_bcd(t.tm_mday);
+	cmos->hour = int_to_bcd(t.tm_hour);
+	cmos->minute = int_to_bcd(t.tm_min);
+	cmos->second = int_to_bcd(t.tm_sec);
 }
 
 

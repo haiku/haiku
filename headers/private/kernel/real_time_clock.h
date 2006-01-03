@@ -8,6 +8,10 @@
 
 #include <KernelExport.h>
 
+#include <time.h>
+
+
+#define RTC_EPOCHE_BASE_YEAR	1970
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +29,11 @@ typedef struct rtc_info {
 } rtc_info;
 
 status_t get_rtc_info(rtc_info *info);
+
+// Both functions use the passed struct tm only partially
+// (no tm_wday, tm_yday, tm_isdst).
+uint32 rtc_tm_to_secs(const struct tm *t);
+void rtc_secs_to_tm(uint32 seconds, struct tm *t);
 
 bigtime_t _user_system_time(void);
 status_t _user_set_real_time_clock(uint32 time);

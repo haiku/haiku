@@ -155,6 +155,136 @@ get_rtc_info(rtc_info *info)
 }
 
 
+// #pragma mark -
+
+
+#define SECONDS_31 2678400
+#define SECONDS_30 2592000
+#define SECONDS_28 2419200
+#define SECONDS_DAY 86400
+
+static uint32 sSecsPerMonth[12] = {SECONDS_31, SECONDS_28, SECONDS_31, SECONDS_30, 
+	SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_30,
+	SECONDS_31};
+
+
+static bool
+leap_year(uint32 year)
+{
+	if (year % 400 == 0)
+		return true;
+
+	if (year % 100 == 0)
+		return false;
+
+	if (year % 4 == 0)
+		return true;
+
+	return false;
+}
+
+
+static inline uint32
+secs_this_year(uint32 year)
+{
+	if (leap_year(year))
+		return 31622400;
+	
+	return 31536000;
+}
+
+
+uint32
+rtc_tm_to_secs(const struct tm *t)
+{
+	uint32 wholeYear;
+	uint32 time = 0;
+	uint32 i;
+
+	wholeYear = 1900 + t->tm_year;
+
+	// ToDo: get rid of these loops and compute the correct value
+	//	i.e. days = (long)(year > 0) + year*365 + --year/4 - year/100 + year/400;
+	//	let sSecsPerMonth[] have the values already added up
+
+	// Add up the seconds from all years since 1970 that have elapsed.
+	for (i = RTC_EPOCHE_BASE_YEAR; i < wholeYear; ++i) {
+		time += secs_this_year(i);
+	}
+
+	// Add up the seconds from all months passed this year.
+	for (i = 0; i < t->tm_mon && i < 12; ++i)
+		time += sSecsPerMonth[i];
+
+	// Add up the seconds from all days passed this month.
+	if (leap_year(wholeYear) && t->tm_mon >= 2)
+		time += SECONDS_DAY;
+
+	time += (t->tm_mday - 1) * SECONDS_DAY;
+	time += t->tm_hour * 3600;
+	time += t->tm_min * 60;
+	time += t->tm_sec;
+
+	return time;
+}
+
+
+void
+rtc_secs_to_tm(uint32 seconds, struct tm *t)
+{
+	uint32 wholeYear = RTC_EPOCHE_BASE_YEAR;
+	uint32 secsThisYear;
+	bool keepLooping;
+	bool isLeapYear;
+	int temp;
+	int month;
+
+	keepLooping = 1;
+
+	// Determine the current year by starting at 1970 and incrementing whole_year as long as
+	// we can keep subtracting secs_this_year from seconds.
+	while (keepLooping) {
+		secsThisYear = secs_this_year(wholeYear);
+
+		if (seconds >= secsThisYear) {
+			seconds -= secsThisYear;
+			++wholeYear;
+		} else
+			keepLooping = false;
+	}
+
+	t->tm_year = wholeYear - RTC_EPOCHE_BASE_YEAR;
+
+	// Determine the current month
+	month = 0;
+	isLeapYear = leap_year(wholeYear);
+	do {
+		temp = seconds - sSecsPerMonth[month];
+
+		if (isLeapYear && month == 1)
+			temp -= SECONDS_DAY;
+
+		if (temp >= 0) {
+			seconds = temp;
+			++month;
+		}
+	} while (temp >= 0 && month < 12);
+
+	t->tm_mon = month;
+
+	t->tm_mday = seconds / SECONDS_DAY + 1;
+	seconds = seconds % SECONDS_DAY;
+
+	t->tm_hour = seconds / 3600;
+	seconds = seconds % 3600;
+
+	t->tm_min = seconds / 60;
+	seconds = seconds % 60;
+
+	t->tm_sec = seconds;
+}
+
+
 //	#pragma mark -
 //	public userland API
 
