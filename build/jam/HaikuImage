@@ -4,8 +4,8 @@ AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
-BEOS_BIN = addattr arp basename beep cat catattr chgrp chmod chown clockconfig cmp
-	comm cp csplit cut date dd df diff dirname dstcheck du eject env error factor
+BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown clockconfig
+	cmp comm cp csplit cut date dd df diff dirname dstcheck du eject env error factor
 	false find finddir fortune gawk gdb grep groups head id ifconfig iroster isvolume
 	keymap kill less listarea listattr listdev listimage listport listsem ln locate
 	ls lsindex md5sum mimeset mkdir mkindex modifiers mount mountvolume mv open ping
