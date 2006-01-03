@@ -736,14 +736,32 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			break;
 		}
-#if 0
+
 		case AS_CLONE_PICTURE:
 		{
-			// TODO: Implement AS_CLONE_PICTURE
-			STRACE(("ServerApp %s: Clone Picture unimplemented\n", Signature()));
+			STRACE(("ServerApp %s: Clone Picture\n", Signature()));
+			int32 token;
+			ServerPicture *original = NULL;
+			if (link.Read<int32>(&token) == B_OK)
+				original = FindPicture(token);
+			
+			ServerPicture *cloned = NULL;
+			if (original != NULL)
+				cloned = CreatePicture();
+		
+			if (cloned != NULL) {
+				// TODO: I'm not sure that this does a plain copy.
+				// Check, and, in case, put the stuff in Data() directly
+				cloned->AddData(original->Data(), original->DataLength());
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(cloned->Token());	
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();	
 			break;
 		}
-
+#if 0
 		case AS_DOWNLOAD_PICTURE:
 		{
 			STRACE(("ServerApp %s: Download Picture unimplemented\n", Signature()));
