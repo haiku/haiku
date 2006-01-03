@@ -1520,18 +1520,19 @@ BView::EventMask()
 status_t
 BView::SetMouseEventMask(uint32 mask, uint32 options)
 {
-//	fEventMask = (mask << 16) | (fEventMask & 0x0000FFFF);
-//	fEventOptions = (options << 16) | (options & 0x0000FFFF);
-	
-	if (do_owner_check()
-		&& fOwner->CurrentMessage()
+	// Just don't do anything if the view is not yet attached
+	// or we were called outside of BView::MouseDown()
+	if (fOwner != NULL
+		&& fOwner->CurrentMessage() != NULL
 		&& fOwner->CurrentMessage()->what == B_MOUSE_DOWN) {
+		check_lock();
 		fOwner->fLink->StartMessage(AS_LAYER_SET_MOUSE_EVENT_MASK);
 		fOwner->fLink->Attach<uint32>(mask);
 		fOwner->fLink->Attach<uint32>(options);
 
 		return B_OK;
 	}
+
 	return B_ERROR;
 }
 
