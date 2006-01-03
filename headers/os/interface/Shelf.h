@@ -93,7 +93,7 @@ class BShelf : public BHandler {
 		void				_InitData(BEntry* entry, BDataIO* stream,
 								BView* view, bool allowDrags);
 		status_t			_DeleteReplicant(_rep_data_* replicant);
-		status_t			_RealAddReplicant(BMessage* data,
+		status_t			_AddReplicant(BMessage* data,
 								BPoint* location, uint32 uniqueID);
 		status_t			_GetProperty(BMessage* message, BMessage* reply);
 

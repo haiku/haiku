@@ -549,8 +549,8 @@ private:
 			void			RealScrollTo(BPoint);
 			void			fetch_font();
 			uchar			font_encoding() const;
-			BShelf*			shelf() const;
-			void			set_shelf(BShelf* shelf);
+			BShelf*			_Shelf() const;
+			void			_SetShelf(BShelf* shelf);
 
 			void			_MoveTo(int32 x, int32 y);
 			void			_ResizeBy(int32 deltaWidth, int32 deltaHeight);

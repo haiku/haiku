@@ -4252,17 +4252,22 @@ BView::_UpdatePattern(::pattern pattern)
 
 
 BShelf *
-BView::shelf() const
+BView::_Shelf() const
 {
 	return fShelf;
 }
 
 
 void
-BView::set_shelf(BShelf *shelf)
+BView::_SetShelf(BShelf *shelf)
 {
-	// TODO: is this all that needs done?
+	if (fShelf != NULL && fOwner != NULL)
+		fOwner->RemoveHandler(fShelf);
+
 	fShelf = shelf;
+
+	if (fShelf != NULL && fOwner != NULL)
+		fOwner->AddHandler(fShelf);
 }
 
 
