@@ -139,7 +139,8 @@ class TBarApp : public BApplication {
 		virtual ~TBarApp();
 
 		virtual	bool QuitRequested();
-		virtual void MessageReceived(BMessage *);
+		virtual void MessageReceived(BMessage *message);
+		virtual void RefsReceived(BMessage *refs);
 
 		desk_settings *Settings()
 			{ return &fSettings; }
@@ -173,4 +174,4 @@ class TBarApp : public BApplication {
 		static BList sSubscribers;
 };
 
-#endif
+#endif	// BAR_APP_H

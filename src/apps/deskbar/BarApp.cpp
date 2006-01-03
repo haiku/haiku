@@ -59,9 +59,11 @@ All rights reserved.
 #include "BarView.h"
 #include "BarWindow.h"
 #include "DeskBarUtils.h"
-#include "TeamMenu.h"
-#include "Switcher.h"
+#include "FSUtils.h"
+#include "PublicCommands.h"
 #include "ResourceSet.h"
+#include "Switcher.h"
+#include "TeamMenu.h"
 #include "WindowMenuItem.h"
 
 
@@ -480,6 +482,14 @@ TBarApp::MessageReceived(BMessage *message)
 		}
 #endif // __HAIKU__
 
+		// in case Tracker is not running
+
+		case kShowSplash:
+#ifdef B_BEOS_VERSION_5
+			run_be_about();
+#endif
+			break;
+
 		default:
 			BApplication::MessageReceived(message);		
 			break;
@@ -487,10 +497,30 @@ TBarApp::MessageReceived(BMessage *message)
 }
 
 
-//	called when ExpandoMenuBar, TeamMenu or Switcher are built/rebuilt
+/**	In case Tracker is not running, the TBeMenu will use us as a target.
+ *	We'll make sure the user won't be completely confused and take over
+ *	Tracker's duties until it's back.
+ */
+
+void
+TBarApp::RefsReceived(BMessage *refs)
+{
+	entry_ref ref;
+	for (int32 i = 0; refs->FindRef("refs", i, &ref) == B_OK; i++) {
+		BMessage refsReceived(B_REFS_RECEIVED);
+		refsReceived.AddRef("refs", &ref);
+
+		BEntry entry(&ref);
+		if (!entry.IsDirectory())
+			TrackerLaunch(&refsReceived, true);
+	}
+}
+
+
 void
 TBarApp::Subscribe(const BMessenger &subscriber, BList *list)
 {
+	// called when ExpandoMenuBar, TeamMenu or Switcher are built/rebuilt
 	list->MakeEmpty();
 
 	BAutolock autolock(sSubscriberLock);

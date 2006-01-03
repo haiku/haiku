@@ -57,16 +57,16 @@ class TRecentsMenu : public BNavMenu {
 		void			DetachedFromWindow();
 		void			ResetTargets();
 
-		int32			RecentsCount();	
+		int32			RecentsCount();
 
-	private:		
+	private:
 		virtual	bool	StartBuildingItemList();
 		virtual	bool	AddNextItem();
 				bool	AddRecents(int32 count);
-		virtual	void	DoneBuildingItemList();	
+		virtual	void	DoneBuildingItemList();
 		virtual	void	ClearMenuBuildingState();
 
-	private:		
+	private:
 		int32			fWhich;
 		entry_ref		*fAppRef;
 		char			*fSignature;
@@ -94,6 +94,8 @@ class TBeMenu : public BNavMenu {
 		void			DetachedFromWindow();
 
 		void			ResetTargets();		
+
+		static BMessenger DefaultTarget();
 
 	private:
 		enum State {

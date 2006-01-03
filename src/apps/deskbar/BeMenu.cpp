@@ -83,13 +83,14 @@ namespace BPrivate {
 }
 using namespace BPrivate;
 
-//********************************************************************************
+
+//	#pragma mark -
 
 
-TBeMenu::TBeMenu(TBarView *barview)
-	: BNavMenu("BeMenu", B_REFS_RECEIVED, BMessenger(kTrackerSignature)),
+TBeMenu::TBeMenu(TBarView *barView)
+	: BNavMenu("BeMenu", B_REFS_RECEIVED, DefaultTarget()),
 	fAddState(kStart),
-	fBarView(barview)
+	fBarView(barView)
 {
 }
 
@@ -101,13 +102,13 @@ TBeMenu::AttachedToWindow()
 		if (fBarView->Dragging()) {
 			SetTypesList(fBarView->CachedTypesList());
 			SetTarget(BMessenger(fBarView));
-			SetTrackingHookDeep(this, fBarView->MenuTrackingHook, 
+			SetTrackingHookDeep(this, fBarView->MenuTrackingHook,
 				fBarView->GetTrackingHookData());
 			fBarView->DragStart();
 		} else {
 			SetTypesList(NULL);
-			SetTarget(BMessenger(kTrackerSignature));
-			SetTrackingHookDeep(this, NULL, NULL);		
+			SetTarget(DefaultTarget());
+			SetTrackingHookDeep(this, NULL, NULL);
 		}
 
 		fBarView->UnlockLooper();
@@ -336,7 +337,7 @@ TBeMenu::AddStandardBeMenuItems()
 	AddItem(subMenu);
 
 	if ((modifiers() & (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY))
-		== (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY)) {
+			== (B_LEFT_SHIFT_KEY|B_LEFT_CONTROL_KEY|B_LEFT_COMMAND_KEY)) {
 		subMenu = new BMenu("Window Decor");
 		subMenu->SetEnabled(!dragging);
 
@@ -402,17 +403,14 @@ void
 TBeMenu::ResetTargets()
 {
 	BNavMenu::ResetTargets();
-	
-	//
-	//	if we are dragging, set the target to whatever was set
-	//	else set it to the default (Tracker)
-	//
+
+	// if we are dragging, set the target to whatever was set
+	// else set it to the default (Tracker)
 	if (!fBarView->Dragging())
-		SetTarget(BMessenger(kTrackerSignature));
-	//
-	//	now set the target for the menuitems to the currently
-	//	set target, which may or may not be tracker
-	//
+		SetTarget(DefaultTarget());
+
+	// now set the target for the menuitems to the currently
+	// set target, which may or may not be tracker
 	SetTargetForItems(Target());
 
 	for (int32 i = 0; ; i++) {
@@ -424,17 +422,15 @@ TBeMenu::ResetTargets()
 			switch (item->Message()->what) {
 				case kShowSplash:
 #ifdef B_BEOS_VERSION_5
-#if 0
-					run_be_about();
 					// about box in libbe in BeOS R5
-#endif
+					item->SetTarget(be_app);
 #endif
 					break;
 				case kFindButton:
 					// about, find
 					item->SetTarget(BMessenger(kTrackerSignature));
 					break;
-	
+
 				case msg_ToggleDraggers:
 				case msg_config_db:
 				case msg_AlwaysTop:
@@ -464,33 +460,45 @@ TBeMenu::ResetTargets()
 BPoint
 TBeMenu::ScreenLocation()
 {
-	BPoint	pt;
-	BRect	r;
-	bool	vertical = fBarView->Vertical();
-	int32	expando = (fBarView->State() == kExpandoState);
+	bool vertical = fBarView->Vertical();
+	int32 expando = (fBarView->State() == kExpandoState);
+	BPoint point;
 
-	r = Supermenu()->Bounds();
-	Supermenu()->ConvertToScreen(&r);
+	BRect rect = Supermenu()->Bounds();
+	Supermenu()->ConvertToScreen(&rect);
+
 	if (expando && vertical && fBarView->Left()) {
 		PRINT(("Left\n"));
-		pt = r.RightTop() + BPoint(0,3);
+		point = rect.RightTop() + BPoint(0,3);
 	} else if (expando && vertical && !fBarView->Left()) {
 		PRINT(("Right\n"));
-		pt = r.LeftTop() - BPoint(Bounds().Width(), 0) + BPoint(0,3);
-	} else {
-		pt = BMenu::ScreenLocation();
-	}
-	return pt;
+		point = rect.LeftTop() - BPoint(Bounds().Width(), 0) + BPoint(0,3);
+	} else
+		point = BMenu::ScreenLocation();
+
+	return point;
 }
 
 
-//********************************************************************************
+/*static*/
+BMessenger
+TBeMenu::DefaultTarget()
+{
+	// if Tracker is not available we target the BarApp
+	BMessenger target(kTrackerSignature);
+	if (target.IsValid())
+		return target;
+
+	return BMessenger(be_app);
+}
+
+
 //	#pragma mark -
-//
 
 
-TRecentsMenu::TRecentsMenu(const char *name, TBarView *bar, int32 which, const char *signature, entry_ref *appRef)
-	: BNavMenu(name, B_REFS_RECEIVED, BMessenger(kTrackerSignature)),
+TRecentsMenu::TRecentsMenu(const char *name, TBarView *bar, int32 which,
+		const char *signature, entry_ref *appRef)
+	: BNavMenu(name, B_REFS_RECEIVED, TBeMenu::DefaultTarget()),
 	fWhich(which),
 	fAppRef(NULL),
 	fSignature(NULL),
@@ -551,13 +559,13 @@ TRecentsMenu::StartBuildingItemList()
 		RemoveItem(index);
 		delete item;
 	}
+
+	// !! note: don't call inherited from here
+	// the navref is not set for this menu
+	// but it still needs to be a draggable navmenu
+	// simply return true so that AddNextItem is called
 	//
-	//	!! note: don't call inherited from here
-	//	the navref is not set for this menu
-	//	but it still needs to be a draggable navmenu
-	//	simply return true so that AddNextItem is called
-	//
-	//	return BNavMenu::StartBuildingItemList();
+	// return BNavMenu::StartBuildingItemList();
 	return true;
 }
 
@@ -657,14 +665,12 @@ TRecentsMenu::AddRecents(int32 count)
 				}
 			}
 
-			//	return true so that we know to reenter this list
+			// return true so that we know to reenter this list
 			return true;
 		}
 	}
 
-	//
-	//	return false if we are done with this list
-	//
+	// return false if we are done with this list
 	return false;
 }
 
@@ -672,12 +678,10 @@ TRecentsMenu::AddRecents(int32 count)
 void 
 TRecentsMenu::DoneBuildingItemList()
 {
-	//
-	//	!! note: don't call inherited here
-	//	the object list is not built
-	//	and this list does not need to be sorted
-	//	BNavMenu::DoneBuildingItemList();
-	//
+	// !! note: don't call inherited here
+	// the object list is not built
+	// and this list does not need to be sorted
+	// BNavMenu::DoneBuildingItemList();
 
 	if (CountItems() > 0)
 		SetTargetForItems(Target());
@@ -696,16 +700,14 @@ void
 TRecentsMenu::ResetTargets()
 {
 	BNavMenu::ResetTargets();	
-	//
-	//	if we are dragging, set the target to whatever was set
-	//	else set it to the default (Tracker)
-	//
+
+	// if we are dragging, set the target to whatever was set
+	// else set it to the default (Tracker)
 	if (!fBarView->Dragging())
-		SetTarget(BMessenger(kTrackerSignature));
-	//
-	//	now set the target for the menuitems to the currently
-	//	set target, which may or may not be tracker
-	//
+		SetTarget(TBeMenu::DefaultTarget());
+
+	// now set the target for the menuitems to the currently
+	// set target, which may or may not be tracker
 	SetTargetForItems(Target());
 }
 
@@ -730,17 +732,13 @@ MountMenu::AddDynamicItem(add_state s)
 	while ((item = RemoveItem(0L)) != NULL)
 		delete item;
 
-	//
 	// Send message to tracker to get items.
-	//
 	BMessage request('gmtv');
 	BMessage reply;
 	BMessenger(kTrackerSignature).SendMessage(&request,
 		&reply);
 
-	//	
 	// populate menu
-	//	
 	type_code code;
 	int32 countFound;
 	reply.GetInfo("DisplayName", &code, &countFound);

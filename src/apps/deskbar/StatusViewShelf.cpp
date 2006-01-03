@@ -41,6 +41,7 @@ All rights reserved.
 #include "StatusViewShelf.h"
 #include "StatusView.h"
 
+
 TReplicantShelf::TReplicantShelf(TReplicantTray* parent)
 	: BShelf(parent, false, "DeskbarShelf")
 {
@@ -48,29 +49,31 @@ TReplicantShelf::TReplicantShelf(TReplicantTray* parent)
 	SetAllowsZombies(false);
 }
 
+
 TReplicantShelf::~TReplicantShelf()
 {
 }
 
+
 void
 TReplicantShelf::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case B_DELETE_PROPERTY:
 		{
 			BMessage repspec;
 			int32 index = 0;
+
+			// this should only occur via scripting
+			// since we can't use ReplicantDeleted
+			// catch the message and find the id or name specifier
+			// then delete the rep vi the api,
 			//
-			//	this should only occur via scripting
-			//	since we can't use ReplicantDeleted
-			//	catch the message and find the id or name specifier
-			//	then delete the rep vi the api,
+			// this will fix the problem of realigning the reps
+			// after a remove when done through scripting
 			//
-			//	this will fix the problem of realigning the reps
-			//	after a remove when done through scripting
-			//
-			//	note: if specified by index its the index not the id!
-			//
+			// note: if specified by index its the index not the id!
+
 			while (message->FindMessage("specifiers", index++, &repspec) == B_OK) {
 				const char* str;
 				if (repspec.FindString("property", &str) == B_OK) {
@@ -89,17 +92,19 @@ TReplicantShelf::MessageReceived(BMessage* message)
 					}
 				}
 			}
+			break;
 		}
-		break;
-		
+
 		default:
 			BShelf::MessageReceived(message);
 			break;
 	}
 }
 
+
 bool 
-TReplicantShelf::CanAcceptReplicantView(BRect frame, BView* view, BMessage* message) const
+TReplicantShelf::CanAcceptReplicantView(BRect frame, BView* view,
+	BMessage* message) const
 {
 	if (view->ResizingMode() != B_FOLLOW_NONE)
 		view->SetResizingMode(B_FOLLOW_NONE);
@@ -108,24 +113,23 @@ TReplicantShelf::CanAcceptReplicantView(BRect frame, BView* view, BMessage* mess
 	return fParent->AcceptAddon(frame, message);
 }
 
+
 BPoint
 TReplicantShelf::AdjustReplicantBy(BRect frame, BMessage *message) const
 {
-	//	added in AcceptAddon, from TReplicantTray
-	BPoint pt;
-	message->FindPoint("_pjp_loc", &pt);
+	// added in AcceptAddon, from TReplicantTray
+	BPoint point;
+	message->FindPoint("_pjp_loc", &point);
 	message->RemoveName("_pjp_loc");
 
-	pt = pt - frame.LeftTop();
-
-	return pt;
+	return point - frame.LeftTop();
 }
 
-//
-//	the virtual BShelf::ReplicantDeleted is called before the
-//	replicant is actually removed from BShelf's internal list
-//	thus, this returns the wrong number of replicants.
-//
+
+// the virtual BShelf::ReplicantDeleted is called before the
+// replicant is actually removed from BShelf's internal list
+// thus, this returns the wrong number of replicants.
+
 void
 TReplicantShelf::ReplicantDeleted(int32, const BMessage*, const BView*)
 {
