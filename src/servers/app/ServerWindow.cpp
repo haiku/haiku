@@ -2155,17 +2155,60 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			free(string);
 			break;
 		}
-#if 0
+
 		case AS_LAYER_BEGIN_PICTURE:
-			CRITICAL("AS_LAYER_BEGIN_PICTURE not implemented\n");
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_PICTURE\n", Title()));
+			ServerPicture *picture = App()->CreatePicture();
+			fCurrentLayer->SetPicture(picture);
 			break;
+		}
+
 		case AS_LAYER_APPEND_TO_PICTURE:
-			CRITICAL("AS_LAYER_APPEND_TO_PICTURE not implemented\n");
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_APPEND_TO_PICTURE\n", Title()));
+			
+			int32 pictureToken;
+			link.Read<int32>(&pictureToken);
+			
+			fCurrentLayer->SetPicture(App()->FindPicture(pictureToken));
+				// we don't care if it's NULL
 			break;
+		}
+
 		case AS_LAYER_END_PICTURE:
-			CRITICAL("AS_LAYER_END_PICTURE not implemented\n");
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_END_PICTURE\n", Title()));
+			
+			ServerPicture *picture = fCurrentLayer->Picture();
+			if (picture != NULL) {
+				fCurrentLayer->SetPicture(NULL);
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(picture->Token());
+			} else
+				fLink.StartMessage(B_ERROR);
+			
+			fLink.Flush();
 			break;
-#endif
+		}
+
+		case AS_LAYER_DRAW_PICTURE:
+		{
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK) {
+				BPoint where;
+				link.Read<BPoint>(&where);
+				
+				ServerPicture *picture = App()->FindPicture(token);
+				if (picture != NULL) {
+					fCurrentLayer->ConvertToScreenForDrawing(&where);
+					fCurrentLayer->CurrentState()->SetPenLocation(where);
+					picture->Play(fCurrentLayer);
+				}
+			}
+			break;
+		}
+
 		default:
 			printf("ServerWindow %s received unexpected code - message offset %ld\n",
 				Title(), code - B_OK);

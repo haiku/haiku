@@ -726,27 +726,37 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Picture unimplemented\n", Signature()));
 			break;
 		}
+#endif
 		case AS_DELETE_PICTURE:
 		{
-			// TODO: Implement AS_DELETE_PICTURE
-			STRACE(("ServerApp %s: Delete Picture unimplemented\n", Signature()));
+			STRACE(("ServerApp %s: Delete Picture\n", Signature()));
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK)
+				DeletePicture(token);
+
 			break;
 		}
+#if 0
 		case AS_CLONE_PICTURE:
 		{
 			// TODO: Implement AS_CLONE_PICTURE
 			STRACE(("ServerApp %s: Clone Picture unimplemented\n", Signature()));
 			break;
 		}
+
 		case AS_DOWNLOAD_PICTURE:
 		{
-			// TODO; Implement AS_DOWNLOAD_PICTURE
 			STRACE(("ServerApp %s: Download Picture unimplemented\n", Signature()));
+			int32 token;
+			link.Read<int32>(&token);
+			ServerPicture *picture = App()->FindPicture(token);
+			if (picture != NULL) {
+				link.StartMessage(B_OK);	
+			} else
+				link.StartMessage(B_ERROR);
 			
-			// What is this particular function call for, anyway?
+			link.Flush();
 			
-			// DW: I think originally it might have been to support 
-			// the undocumented Flatten function.
 			break;
 		}
 #endif
@@ -2546,7 +2556,8 @@ ServerApp::CreatePicture(int32 *token)
 		fPictureList.AddItem(picture);
 		if (token != NULL)
 			*token = picture->Token();
-	}	
+	}
+	
 	return picture;
 }
 
