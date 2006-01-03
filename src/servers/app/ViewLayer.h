@@ -23,7 +23,7 @@ class DrawState;
 class DrawingEngine;
 class WindowLayer;
 class ServerBitmap;
-
+class ServerPicture;
 
 class ViewLayer {
  public:
@@ -147,6 +147,9 @@ class ViewLayer {
 			uint32			EventOptions() const
 								{ return fEventOptions; }
 
+			void			SetPicture(ServerPicture *picture);
+			ServerPicture		*Picture() const;
+
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
 								BRegion* effectiveClipping,
@@ -214,6 +217,7 @@ class ViewLayer {
 			ViewLayer*		fNextSibling;
 			ViewLayer*		fLastChild;
 
+			ServerPicture		*fPicture;
 			// clipping
 			BRegion			fLocalClipping;
 

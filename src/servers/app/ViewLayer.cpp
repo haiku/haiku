@@ -16,6 +16,7 @@
 #include "DrawingEngine.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
+#include "ServerPicture.h"
 #include "ServerWindow.h"
 #include "WindowLayer.h"
 
@@ -59,6 +60,8 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 	fPreviousSibling(NULL),
 	fNextSibling(NULL),
 	fLastChild(NULL),
+	
+	fPicture(NULL),
 
 	fLocalClipping(Bounds()),
 	fScreenClipping(),
@@ -80,6 +83,8 @@ ViewLayer::~ViewLayer()
 		gBitmapManager->DeleteBitmap(fViewBitmap);
 
 	delete fDrawState;
+
+	// TODO: Don't know yet if we should also delete fPicture
 
 	// iterate over children and delete each one
 	ViewLayer* layer = fFirstChild;
@@ -864,6 +869,20 @@ ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
 {
 	fEventMask = eventMask;
 	fEventOptions = options;
+}
+
+
+void
+ViewLayer::SetPicture(ServerPicture *picture)
+{
+	fPicture = picture;
+}
+
+
+ServerPicture *
+ViewLayer::Picture() const
+{
+	return fPicture;
 }
 
 
