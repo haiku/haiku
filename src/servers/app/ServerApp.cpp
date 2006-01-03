@@ -2536,7 +2536,20 @@ ServerApp::CountPictures() const
 
 
 ServerPicture *
-ServerApp::FindPicture(int32 token) const
+ServerApp::CreatePicture(int32 *token)
+{
+	ServerPicture *picture = new (nothrow) ServerPicture();
+	if (picture != NULL) {
+		fPictureList.AddItem(picture);
+		if (token != NULL)
+			*token = picture->Token();
+	}	
+	return picture;
+}
+
+
+ServerPicture *
+ServerApp::FindPicture(const int32 &token) const
 {
 	// TODO: we need to make sure the picture is ours?!
 	ServerPicture* picture;
@@ -2546,7 +2559,23 @@ ServerApp::FindPicture(int32 token) const
 	return NULL;
 }
 
+
+bool
+ServerApp::DeletePicture(const int32 &token)
+{
+	ServerPicture *picture = FindPicture(token);
+	if (picture == NULL)
+		return false;
 	
+	if (!fPictureList.RemoveItem(picture))
+		return false;
+	
+	delete picture;
+
+	return true;
+}
+
+
 team_id
 ServerApp::ClientTeam() const
 {
