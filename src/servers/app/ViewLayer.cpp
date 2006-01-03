@@ -871,6 +871,10 @@ void
 ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
+	if (!fVisible)
+		return;
+		// child views can not be visible either
+
 	if (fViewBitmap != NULL || !fViewColor.IsTransparentMagic()) {
 		// we can only draw within our own area
 		BRegion redraw(ScreenClipping(windowContentClipping));
