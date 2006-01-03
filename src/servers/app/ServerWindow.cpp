@@ -1775,6 +1775,42 @@ if (ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken)) {
 			break;
 		}
 
+		case AS_LAYER_BEGIN_PICTURE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_PICTURE\n", Title()));
+			ServerPicture *picture = App()->CreatePicture();
+			fCurrentLayer->SetPicture(picture);
+			break;
+		}
+
+		case AS_LAYER_APPEND_TO_PICTURE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_APPEND_TO_PICTURE\n", Title()));
+			
+			int32 pictureToken;
+			link.Read<int32>(&pictureToken);
+			
+			fCurrentLayer->SetPicture(App()->FindPicture(pictureToken));
+				// we don't care if it's NULL
+			break;
+		}
+
+		case AS_LAYER_END_PICTURE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_END_PICTURE\n", Title()));
+			
+			ServerPicture *picture = fCurrentLayer->Picture();
+			if (picture != NULL) {
+				fCurrentLayer->SetPicture(NULL);
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(picture->Token());
+			} else
+				fLink.StartMessage(B_ERROR);
+			
+			fLink.Flush();
+			break;
+		}
+
 		default:
 			if (fDesktop->LockSingleWindow()) {
 				_DispatchViewDrawingMessage(code, link);
@@ -2153,42 +2189,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
 
 			free(string);
-			break;
-		}
-
-		case AS_LAYER_BEGIN_PICTURE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_PICTURE\n", Title()));
-			ServerPicture *picture = App()->CreatePicture();
-			fCurrentLayer->SetPicture(picture);
-			break;
-		}
-
-		case AS_LAYER_APPEND_TO_PICTURE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_APPEND_TO_PICTURE\n", Title()));
-			
-			int32 pictureToken;
-			link.Read<int32>(&pictureToken);
-			
-			fCurrentLayer->SetPicture(App()->FindPicture(pictureToken));
-				// we don't care if it's NULL
-			break;
-		}
-
-		case AS_LAYER_END_PICTURE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_END_PICTURE\n", Title()));
-			
-			ServerPicture *picture = fCurrentLayer->Picture();
-			if (picture != NULL) {
-				fCurrentLayer->SetPicture(NULL);
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(picture->Token());
-			} else
-				fLink.StartMessage(B_ERROR);
-			
-			fLink.Flush();
 			break;
 		}
 
