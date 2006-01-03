@@ -5,14 +5,14 @@ AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown clockconfig
-	cmp comm cp csplit cut date dd df diff dirname dstcheck du eject env error factor
-	false find finddir fortune gawk gdb grep groups head id ifconfig iroster isvolume
-	keymap kill less listarea listattr listdev listimage listport listsem ln locate
-	ls lsindex md5sum mimeset mkdir mkindex modifiers mount mountvolume mv open ping
-	play ppp_up pppconfig ps pwd query quit renice rm rmattr rmdir roster safemode
-	screen_blanker sed setversion setvolume sh shutdown sleep strace sync sysinfo
-	tail tee top touch traceroute translate true tty uname unmount unzip uptime
-	version waitfor xargs xres zip
+	cmp comm cp csplit cut date dd df diff dirname dstcheck du echo eject env error
+	factor false find finddir fortune gawk gdb grep groups head id ifconfig iroster
+	isvolume keymap kill less listarea listattr listdev listimage listport listsem
+	ln locate ls lsindex md5sum mimeset mkdir mkindex modifiers mount mountvolume mv
+	open ping play ppp_up pppconfig ps pwd query quit renice rm rmattr rmdir roster
+	safemode screen_blanker sed setversion setvolume sh shutdown sleep strace sync
+	sysinfo tail tee top touch traceroute translate true tty uname unmount unzip
+	uptime version waitfor xargs xres zip
 ;
 
 BEOS_APPS = MiniTerminal Terminal Expander People ShowImage Clock Pulse
