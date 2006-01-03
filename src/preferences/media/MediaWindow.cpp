@@ -1,19 +1,12 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        MediaWindow.cpp
-//  Author:      Sikosis, Jérôme Duval
-//  Description: Media Preferences
-//  Created :    June 25, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright (c) 2003-2005, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Sikosis, Jérôme Duval
+ */
 
-// Includes -------------------------------------------------------------------------------------------------- //
+
 #include <MediaTheme.h>
 #include <MediaRoster.h>
 #include <Alert.h>
@@ -486,30 +479,39 @@ MediaWindow::MessageReceived (BMessage *message)
 			}
 			break;
 		case ML_RESTART_MEDIA_SERVER:
-			{
-				thread_id tid;
-				tid = spawn_thread(&MediaWindow::RestartMediaServices, "restart_thread", B_NORMAL_PRIORITY, this);
-				if(tid<B_OK)
-					fprintf(stderr, "couldn't create restart thread\n");
-				resume_thread(tid);
-			}
+		{
+			thread_id thread = spawn_thread(&MediaWindow::RestartMediaServices,
+				"restart_thread", B_NORMAL_PRIORITY, this);
+			if (thread < B_OK)
+				fprintf(stderr, "couldn't create restart thread\n");
+			else
+				resume_thread(thread);
 			break;
+		}
 		case ML_SHOW_VOLUME_CONTROL:
-			{
-				BDeskbar deskbar;
-				if(mAudioView->mVolumeCheckBox->Value()==B_CONTROL_ON) {
-					BEntry entry("/bin/desklink", true);
-					int32 id;
-					entry_ref ref;
-					entry.GetRef(&ref);
-					if(deskbar.AddItem(&ref, &id)!=B_OK)
-						fprintf(stderr, "Couldn't add Volume control in Deskbar\n");
-				} else {
-					if(deskbar.RemoveItem("MediaReplicant")!=B_OK)
-						fprintf(stderr, "Couldn't remove Volume control in Deskbar\n");
-				}				
+		{
+			BDeskbar deskbar;
+			if (mAudioView->mVolumeCheckBox->Value() == B_CONTROL_ON) {
+				BEntry entry("/bin/desklink", true);
+				int32 id;
+				entry_ref ref;
+				status_t status = entry.GetRef(&ref);
+				if (status == B_OK)
+					status = deskbar.AddItem(&ref, &id);
+
+				if (status != B_OK) {
+					fprintf(stderr, "Couldn't add Volume control in Deskbar: %s\n",
+						strerror(status));
+				}
+			} else {
+				status_t status = deskbar.RemoveItem("MediaReplicant");
+				if (status != B_OK) {
+					fprintf(stderr, "Couldn't remove Volume control in Deskbar: %s\n",
+						strerror(status));
+				}
 			}
 			break;
+		}
 		case ML_ENABLE_REAL_TIME:
 			{
 				bool isVideo = true;
