@@ -33,6 +33,32 @@ bool usage_requested = false;
 bool geometry_requested = false;
 bool color_requested = false;
 
+struct standard_args {
+	char *name;
+	char *longname;
+	int priority;
+	int nargs;
+	const char *prefname;
+};
+
+struct standard_args standard_args[] = {
+	{ "-h", "--help", 90, 0, NULL },
+	{ "-p", "--preference", 80, 1, NULL },
+	{ "-t", "--title", 70, 1, NULL },
+	{ "-geom", "--geometry", 50, 1, NULL },
+#if 0
+	{ "-fg", "--text-fore-color", 40, 1, PREF_TEXT_FORE_COLOR },
+	{ "-bg", "--text-back-color", 35, 1, PREF_TEXT_BACK_COLOR },
+	{ "-curfg", "--cursor-fore-color", 30, 1, PREF_CURSOR_FORE_COLOR },
+	{ "-curbg", "--cursor-back-color", 25, 1, PREF_CURSOR_BACK_COLOR },
+	{ "-selfg", "--select-fore-color", 20, 1, PREF_SELECT_FORE_COLOR },
+	{ "-selbg", "--select-back-color", 15, 1, PREF_SELECT_BACK_COLOR },
+	{ "-imfg", "--im-fore-color", 10, 1, PREF_IM_FORE_COLOR },
+	{ "-imbg", "--im-back-color", 5, 1, PREF_IM_BACK_COLOR },
+	{ "-imsel", "--im-select-color", 0, 1, PREF_IM_SELECT_COLOR },
+#endif
+};
+
 int argmatch(char **, int, char *, char *, int, char **, int *);
 void sort_args(int, char **);
 int text_to_rgb(char *, rgb_color *, char *);
@@ -42,42 +68,44 @@ const ulong MSG_ACTIVATE_TERM = 'msat';
 const ulong MSG_TERM_IS_MINIMIZE = 'mtim';
 
 
-TermApp::TermApp(void)
-  :BApplication( TERM_SIGNATURE )
+TermApp::TermApp()
+	: BApplication(TERM_SIGNATURE)
 {
-	BList teams; 
-	
-	be_roster->GetAppList(TERM_SIGNATURE, &teams); 
+	BList teams;
+	be_roster->GetAppList(TERM_SIGNATURE, &teams);
 	fWindowNumber = teams.CountItems();
-	
-	if(fWindowNumber == 0)
-	{
-		be_roster->GetAppList(R5_TERM_SIGNATURE, &teams); 
+
+	if (fWindowNumber == 0) {
+		be_roster->GetAppList(R5_TERM_SIGNATURE, &teams);
 		fWindowNumber = teams.CountItems();
 	}
-	
+
+	char title[256];
+	snprintf(title, sizeof(title), "Terminal %d", fWindowNumber);
+	fWindowTitle = title;
+
 	int i = fWindowNumber / 16;
 	int j = fWindowNumber % 16;
-	
+
 	int k =(j * 16) + (i * 64) + 50;
 	int l =(j * 16)  + 50;
-	
+
 	fTermWindow = NULL;
 	fAboutPanel = NULL;
 	fTermFrame.Set(k, l, k + 50, k + 50);
-	
+
 	gTermPref = new PrefHandler();
 }
 
 
-TermApp::~TermApp(void)
+TermApp::~TermApp()
 {
 	// delete gTermPref;
 }
 
 
 void
-TermApp::ReadyToRun(void)
+TermApp::ReadyToRun()
 {
 	// Prevent opeing window when option -h is given.
 	if(usage_requested)
@@ -91,16 +119,15 @@ TermApp::ReadyToRun(void)
 	
 	// Get encoding name (setenv TTYPE in spawn_shell functions)
 	const etable *p = encoding_table;
-	while(p->name) {
-	
-		if(!strcmp(p->name, encoding)) {
+	while (p->name) {
+		if (!strcmp(p->name, encoding)) {
 			encoding = p->shortname;
 			break;
 		}
 		p++;
 	}
 	
-	if(CommandLine.Length() > 0)
+	if (CommandLine.Length() > 0)
 		command = CommandLine.String();
 	else
 		command = gTermPref->getString(PREF_SHELL);
@@ -111,7 +138,7 @@ TermApp::ReadyToRun(void)
 	pfd = spawn_shell(rows, cols, command, encoding);
 	
 	// failed spawn, print stdout and open alert panel
-	if(pfd == -1 ) {
+	if (pfd == -1 ) {
 		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
 					"ok", NULL, NULL,B_WIDTH_FROM_LABEL,
 					B_INFO_ALERT))->Go(NULL);
@@ -123,18 +150,16 @@ TermApp::ReadyToRun(void)
 
 
 void
-TermApp::Quit(void)
+TermApp::Quit()
 {
-	if(!usage_requested){
-	
+	if (!usage_requested){
 		int status;
-	
+
 		kill(-sh_pid, SIGHUP);
 		wait(&status);
 	}
-	
+
 	delete gTermPref;
-	
 	BApplication::Quit();
 }
 
@@ -163,23 +188,19 @@ TermApp::AboutRequested()
 void
 TermApp::MessageReceived(BMessage* msg)
 {
-	switch(msg->what)
-	{
+	switch (msg->what) {
 		case MENU_NEW_TREM:
-		{
 			RunNewTerm();
 			break;
-		}
+
 		case MENU_SWITCH_TERM:
-		{
 			SwitchTerm();
 			break;
-		}
+
 		case MSG_ACTIVATE_TERM:
-		{
 			fTermWindow->TermWinActivate();
 			break;
-		}
+
 		case MSG_TERM_IS_MINIMIZE:
 		{
 			BMessage reply(B_REPLY);
@@ -187,80 +208,50 @@ TermApp::MessageReceived(BMessage* msg)
 			msg->SendReply(&reply);
 			break;
 		}
+
 		default:
-		{
 			BApplication::MessageReceived(msg);
 			break;
-		}
 	}
 }
 
-struct standard_args
-{
-	char *name;
-	char *longname;
-	int priority;
-	int nargs;
-	const char *prefname;
-};
-
-struct standard_args standard_args[] =
-{
-	{ "-h", "--help", 90, 0, NULL },
-	{ "-p", "--preference", 80, 1, NULL },
-	{ "-t", "--title", 70, 1, NULL },
-	{ "-geom", "--geometry", 50, 1, NULL },
-	{ "-fg", "--text-fore-color", 40, 1, PREF_TEXT_FORE_COLOR },
-	{ "-bg", "--text-back-color", 35, 1, PREF_TEXT_BACK_COLOR },
-	{ "-curfg", "--cursor-fore-color", 30, 1, PREF_CURSOR_FORE_COLOR },
-	{ "-curbg", "--cursor-back-color", 25, 1, PREF_CURSOR_BACK_COLOR },
-	{ "-selfg", "--select-fore-color", 20, 1, PREF_SELECT_FORE_COLOR },
-	{ "-selbg", "--select-back-color", 15, 1, PREF_SELECT_BACK_COLOR },
-	{ "-imfg", "--im-fore-color", 10, 1, PREF_IM_FORE_COLOR },
-	{ "-imbg", "--im-back-color", 5, 1, PREF_IM_BACK_COLOR },
-	{ "-imsel", "--im-select-color", 0, 1, PREF_IM_SELECT_COLOR },
-};
 
 void
 TermApp::ArgvReceived(int32 argc, char **argv)
 {
 	int skip_args = 0;
 	char *value = 0;
-	rgb_color color;
-	
-	if(argc < 2)
+
+	if (argc < 2)
 		return;
-	
+
 	sort_args(argc, argv);
 	argc = 0;
-	while(argv[argc])
+	while (argv[argc])
 		argc++;
-	
+
 	// Print usage
-	if(argmatch(argv, argc, "-help", "--help", 3, NULL, &skip_args)) {
-	
+	if (argmatch(argv, argc, "-help", "--help", 3, NULL, &skip_args)) {
 		Usage(argv[0]);
 		usage_requested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
-	
+
 	// Load preference file
-	if(argmatch(argv, argc, "-p", "--preference", 4, &value, &skip_args))
+	if (argmatch(argv, argc, "-p", "--preference", 4, &value, &skip_args))
 		gTermPref->Open(value);
-	
+
 	// Set window title
-	if(argmatch(argv ,argc, "-t", "--title", 3, &value, &skip_args))
-		strcpy(gWindowName, value);
+	if (argmatch(argv ,argc, "-t", "--title", 3, &value, &skip_args))
+		fWindowTitle = value;
 
     // Set window geometry
-    if(argmatch(argv, argc, "-geom", "--geometry", 4, &value, &skip_args)) {
-    
+    if (argmatch(argv, argc, "-geom", "--geometry", 4, &value, &skip_args)) {
 		int width, height, xpos, ypos;
-		
+
 		sscanf(value, "%dx%d+%d+%d", &width, &height, &xpos, &ypos);
-		if(width < 0 || height < 0 || xpos < 0 || ypos < 0
+		if (width < 0 || height < 0 || xpos < 0 || ypos < 0
 			|| width >= 256 || height >= 256 || xpos >= 2048 || ypos >= 2048) {
-			
 			fprintf(stderr, "%s: invalid geometry format or value.\n", argv[0]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
 			usage_requested = true;
@@ -268,57 +259,55 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		}
 		gTermPref->setInt32(PREF_COLS, width);
 		gTermPref->setInt32(PREF_ROWS, height);
-		
+
 		fTermFrame.Set(xpos, ypos, xpos + 50, ypos + 50);
 		geometry_requested = true;
     }
 
+#if 0
 	// Open '/etc/rgb.txt' file
 	BFile inFile;
-	status_t sts;
 	off_t size = 0;
-	
-	sts = inFile.SetTo("/etc/rgb.txt", B_READ_ONLY);
-	
-	if(sts != B_OK) {
-	
+
+	status_t status = inFile.SetTo("/etc/rgb.txt", B_READ_ONLY);
+	if (status != B_OK) {
 		fprintf(stderr, "%s: Can't open /etc/rgb.txt file.\n", argv[0]);
 		usage_requested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
-	
+
 	inFile.GetSize(&size);
 	char *buffer = new char [size];
 	inFile.Read(buffer, size);
-	
+
 	// Set window, cursor, area and IM color
-	for(int i = 4; i < 13; i++) {
-		if(argmatch(argv, argc, standard_args[i].name, standard_args[i].longname,
-					9, &value, &skip_args)) {
-		
-			if(text_to_rgb(value, &color, buffer))
+	for (int i = 4; i < 13; i++) {
+		if (argmatch(argv, argc, standard_args[i].name, standard_args[i].longname,
+				9, &value, &skip_args)) {
+			rgb_color color;
+			if (text_to_rgb(value, &color, buffer))
 				gTermPref->setRGB(standard_args[i].prefname, color);
 			else
 				fprintf(stderr, "%s: invalid color string -- %s\n", argv[0], value);
 		}
 	}
-	
+
 	delete buffer;
-	
+#endif
 	skip_args++;
-	
-	if(skip_args < argc) {
+
+	if (skip_args < argc) {
 		// Check invalid options
-		
-		if(*argv[skip_args] == '-') {
+
+		if (*argv[skip_args] == '-') {
 			fprintf(stderr, "%s: invalid option `%s'\n", argv[0], argv[skip_args]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
 			usage_requested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
-		
+
 		CommandLine += argv[skip_args++];
-		while(skip_args < argc) {
+		while (skip_args < argc) {
 			CommandLine += ' ';
 			CommandLine += argv[skip_args++];
 		}
@@ -346,67 +335,70 @@ void
 TermApp::RefsReceived(BMessage *message) 
 { 
 	// Works Only Launced by Double-Click file, or Drags file to App.
-	if(!(IsLaunching()))
+	if (!IsLaunching())
 		return;
-	
+
 	entry_ref ref; 
-	if( message->FindRef("refs", 0, &ref) != B_OK ) 
+	if (message->FindRef("refs", 0, &ref) != B_OK)
 		return;
-	
+
 	BFile file; 
-	if( file.SetTo(&ref, B_READ_WRITE) != B_OK )
+	if (file.SetTo(&ref, B_READ_WRITE) != B_OK)
 		return;
-	
+
 	BNodeInfo info(&file);
 	char mimetype[B_MIME_TYPE_LENGTH];
 	info.GetType(mimetype);
-	
+
 	// if App opened by Pref file
-	if(!strcmp(mimetype, PREFFILE_MIMETYPE)){
+	if (!strcmp(mimetype, PREFFILE_MIMETYPE)) {
 	
 		BEntry ent(&ref);
 		BPath path(&ent);
 		gTermPref->OpenText(path.Path());
 		return;
 	}
-	
+
 	// if App opened by Shell Script
-	if(!strcmp(mimetype, "text/x-haiku-shscript")){
-	
+	if (!strcmp(mimetype, "text/x-haiku-shscript")){
 		// Not implemented.
 		//    beep();
 		return;
 	}
 }  
 
+
 void
 TermApp::MakeTermWindow(BRect &frame)
 {
-	fTermWindow = new TermWindow(frame, fWindowNumber);
+	fTermWindow = new TermWindow(frame, fWindowTitle.String());
 	fTermWindow->Show();
 }
 
+
 void
-TermApp::RunNewTerm(void)
+TermApp::RunNewTerm()
 {
 	app_info info;
 	be_app->GetAppInfo(&info);
-	
+
 	// try launching two different ways to work around possible problems
-	if(be_roster->Launch(&(info.ref))!=B_OK)
+	if (be_roster->Launch(&info.ref)!=B_OK)
 		be_roster->Launch(TERM_SIGNATURE);
 }
+
 
 void
 TermApp::ActivateTermWindow(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
 	
-	if(app.IsTargetLocal())
+	if (app.IsTargetLocal())
 		fTermWindow->Activate();
 	else
 		app.SendMessage(MSG_ACTIVATE_TERM);
 }
+
 
 void
 TermApp::SwitchTerm()
@@ -415,43 +407,43 @@ TermApp::SwitchTerm()
 	BList teams;
 	be_roster->GetAppList(TERM_SIGNATURE, &teams); 
 	int32 numTerms = teams.CountItems();
-	
-	if(numTerms <= 1 )
+
+	if (numTerms <= 1 )
 		return; //Can't Switch !!
-	
+
 	// Find position of mine in app teams.
 	int32 i;
-	
-	for(i = 0; i < numTerms; i++) {
-		if(myId == reinterpret_cast<team_id>(teams.ItemAt(i)))
+
+	for (i = 0; i < numTerms; i++) {
+		if (myId == reinterpret_cast<team_id>(teams.ItemAt(i)))
 			break;
 	}
-	
-	do{
-		if(--i < 0)
+
+	do {
+		if (--i < 0)
 			i = numTerms - 1;
-	} while(IsMinimize(reinterpret_cast<team_id>(teams.ItemAt(i))));
-	
+	} while (IsMinimize(reinterpret_cast<team_id>(teams.ItemAt(i))));
+
 	// Activate switched terminal.
 	ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
 }
+
 
 bool
 TermApp::IsMinimize(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
-	
-	if(app.IsTargetLocal())
+
+	if (app.IsTargetLocal())
 		return fTermWindow->IsMinimized();
-	
+
 	BMessage reply;
 	bool hidden;
-	
-	if(app.SendMessage(MSG_TERM_IS_MINIMIZE, &reply) != B_OK)
+
+	if (app.SendMessage(MSG_TERM_IS_MINIMIZE, &reply) != B_OK)
 		return true;
-	
+
 	reply.FindBool("result", &hidden);
-	
 	return hidden;
 }
 
@@ -494,6 +486,7 @@ TermApp::Usage(char *name)
 	PR("  -t,     --title              set window title\n");
 	PR("  -geom,  --geometry           set window geometry\n");
 	PR("                               An example of geometry is \"80x25+100+100\"\n");
+#if 0
 	PR("  -fg,    --text-fore-color    set window foreground color\n");
 	PR("  -bg,    --text-back-color    set window background color\n");
 	PR("  -curfg, --cursor-fore-color  set cursor foreground color\n");
@@ -501,48 +494,44 @@ TermApp::Usage(char *name)
 	PR("  -selfg, --select-fore-color  set selection area foreground color\n");
 	PR("  -selbg, --select-back-color  set selection area background color\n");
 	PR("                               Examples of color are \"#FF00FF\" and \"purple\"\n");
+#endif
 	PR("\n");
 }
 
 int
 text_to_rgb(char *name, rgb_color *color, char *buffer)
 {
-	if(name[0] != '#') {
-	
-	// Convert from /etc/rgb.txt.
-	BString inStr(buffer);
-	int32 point, offset = 0;
-	
-	// Search color name
-	do {
-		point = inStr.FindFirst(name, offset);
-		if(point < 0)
-			return false;
-		offset = point + 1;
-	} while(*(buffer + point -1) != '\t');
-	
-	char *p = buffer + point;
-	
-	while(*p != '\n')
-		p--;
-	p++;
-	
-	if(sscanf(p, "%d %d %d", (int *)&color->red, (int *)&color->green,
+	if (name[0] != '#') {
+		// Convert from /etc/rgb.txt.
+		BString inStr(buffer);
+		int32 point, offset = 0;
+
+		// Search color name
+		do {
+			point = inStr.FindFirst(name, offset);
+			if (point < 0)
+				return false;
+			offset = point + 1;
+		} while(*(buffer + point -1) != '\t');
+
+		char *p = buffer + point;
+		while (*p != '\n')
+			p--;
+		p++;
+
+		if (sscanf(p, "%d %d %d", (int *)&color->red, (int *)&color->green,
 				(int *)&color->blue) == EOF)
-		return false;
+			return false;
+
 		color->alpha = 0;
-	}
-	else
-	if(name[0] == '#') {
-	
+	} else if (name[0] == '#') {
 		// Convert from #RRGGBB format
 		sscanf(name, "#%2x%2x%2x", (int *)&color->red, (int *)&color->green,
-				(int *)&color->blue);
+			(int *)&color->blue);
 		color->alpha = 0;
-	}
-	else
+	} else
 		return false;
-	
+
 	return true;
 }
 
@@ -550,32 +539,29 @@ text_to_rgb(char *name, rgb_color *color, char *buffer)
 // TODO: This might be a GPL licensing issue here. Investigate.
 int
 argmatch(char **argv, int argc, char *sstr, char *lstr,
-	  int minlen, char **valptr, int *skipptr)
+	int minlen, char **valptr, int *skipptr)
 {
 	char *p = 0;
 	int arglen;
 	char *arg;
-	
+
 	// Don't access argv[argc]; give up in advance
-	if(argc <= *skipptr + 1)
+	if (argc <= *skipptr + 1)
 		return 0;
-	
+
 	arg = argv[*skipptr+1];
-	if(arg == NULL)
+	if (arg == NULL)
 		return 0;
-	
-	if(strcmp(arg, sstr) == 0)
-	{
-		if(valptr != NULL)
-		{
+
+	if (strcmp(arg, sstr) == 0) {
+		if(valptr != NULL) {
 			*valptr = argv[*skipptr+2];
 			*skipptr += 2;
-		}
-		else
+		} else
 			*skipptr += 1;
 		return 1;
 	}
-	
+
 	arglen =(valptr != NULL &&(p = strchr(arg, '=')) != NULL
 			? p - arg : strlen(arg));
 	
@@ -709,33 +695,29 @@ sort_args(int argc, char **argv)
 	
 	// Copy the arguments, in order of decreasing priority, to NEW
 	newargv[0] = argv[0];
-	while(incoming_used < argc)
-	{
+	while (incoming_used < argc) {
 		int best = -1;
 		int best_priority = -9999;
-		
+
 		// Find the highest priority remaining option.
 		// If several have equal priority, take the first of them.
-		for(from = 1; from < argc; from++)
-		{
-			if(argv[from] != 0 && priority[from] > best_priority)
-			{
+		for (from = 1; from < argc; from++) {
+			if (argv[from] != 0 && priority[from] > best_priority) {
 				best_priority = priority[from];
 				best = from;
 			}
 			
 			// Skip option arguments--they are tied to the options.
-			if(options[from] > 0)
+			if (options[from] > 0)
 				from += options[from];
 		}
 		
-		if(best < 0)
+		if (best < 0)
 			abort();
 		
 		// Copy the highest priority remaining option, with its args, to NEW.
 		// Unless it is a duplicate of the previous one
-		if(!(options[best] == 0 && ! strcmp(newargv[to - 1], argv[best])))
-		{
+		if (!(options[best] == 0 && ! strcmp(newargv[to - 1], argv[best]))) {
 			newargv[to++] = argv[best];
 			for(i = 0; i < options[best]; i++)
 				newargv[to++] = argv[best + i + 1];
@@ -745,12 +727,12 @@ sort_args(int argc, char **argv)
 		
 		// Clear out this option in ARGV
 		argv[best] = 0;
-		for(i = 0; i < options[best]; i++)
+		for (i = 0; i < options[best]; i++)
 			argv[best + i + 1] = 0;
 	}
 	
 	// If duplicate options were deleted, fill up extra space with null ptrs
-	while(to < argc)
+	while (to < argc)
 		newargv[to++] = 0;
 	
 	memcpy(argv, newargv, sizeof(char *) * argc);

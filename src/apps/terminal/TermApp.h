@@ -73,6 +73,7 @@ private:
   bool          IsMinimize (team_id);
 
   int		fRows, fCols, fXpos, fYpos;
+  BString	fWindowTitle;
   int		fWindowNumber;
   rgb_color	fFg, fBg, fCurFg, fCurBg, fSelFg, fSelbg;
   rgb_color	fImfg, fImbg, fImSel;

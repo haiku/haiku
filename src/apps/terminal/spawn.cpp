@@ -56,13 +56,9 @@ extern PrefHandler *gTermPref;
 #define SHELL_COMMAND "/bin/sh -login"
 extern char **environ;
 
-// TODO: This is *definitely* not a helpful error message
-char spawn_alert_msg [] = \
-"alert --stop " \
-"'Haiku Terminal Error!!\n\
-Cannot execute shell [%s].\n\
-Check \"Shell\" in preferance panel.' "\
-"'Exec /bin/sh' 'Abort'";
+const char *kSpawnAlertMessage = "alert --stop " "'Cannot execute \"%s\":\n"
+	"\t%s\n'"
+	"'Use Default Shell' 'Abort'";
 
 /*
  * Set environment varriable.
@@ -362,7 +358,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		/*
 		 * setenv TERM and TTY.
 		 */
-		setenv("TERM", "xterm", true);
+		setenv("TERM", "beterm", true);
 		setenv("TTY", tty_name, true);
 		setenv("TTYPE", coding, true);
 
@@ -415,7 +411,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 * Exec failed.
 		 */
 		sleep(1);
-		sprintf(err_msg, spawn_alert_msg, com_line);
+		sprintf(err_msg, kSpawnAlertMessage, com_line, strerror(errno));
 
 		if (system(err_msg) == 0)
 			execl("/bin/sh", "/bin/sh", "-login", NULL);

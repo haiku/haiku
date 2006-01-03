@@ -45,11 +45,10 @@ class PrefDlg2;
 class FindDlg;
 
 
-class TermWindow : public BWindow
-{
-public:
-  TermWindow (BRect frame, int32 windownumber=1);
-  ~TermWindow ();
+class TermWindow : public BWindow {
+	public:
+		TermWindow(BRect frame, const char* title);
+		~TermWindow();
 
   void		Quit (void);
   bool		QuitRequested (void);

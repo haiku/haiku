@@ -50,18 +50,15 @@ extern PrefHandler *gTermPref;
 //#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
 
 extern int gNowCoding;  /* defined TermParce.cpp */
-char gWindowName[256] = "Terminal";
 
 void SetCoding(int);
 
 
-TermWindow::TermWindow(BRect frame, int32 windownumber)
-	: BWindow(frame, "Terminal", B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
+TermWindow::TermWindow(BRect frame, const char* title)
+	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
 {
-	sprintf(gWindowName, "Terminal %ld", windownumber);
-
 	InitWindow();
-	SetTitle(gWindowName);
+
 	fPrintSettings = NULL;
 	fPrefWindow = NULL;
 	fFindPanel = NULL;
