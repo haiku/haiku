@@ -1246,7 +1246,7 @@ WindowLayer::InWorkspace(int32 index) const
 			// The application doesn't seem to have any other windows
 			// open or visible - but we'd like to see modal windows
 			// anyway, at least when they are first opened.
-			return index == ServerWindow()->App()->InitialWorkspace();
+			return index == fDesktop->CurrentWorkspace();
 		}
 		return (workspaces & (1UL << index)) != 0;
 	}
@@ -1441,7 +1441,7 @@ WindowLayer::SubsetWorkspaces() const
 			// The application doesn't seem to have any other windows
 			// open or visible - but we'd like to see modal windows
 			// anyway, at least when they are first opened.
-			return 1UL << ServerWindow()->App()->InitialWorkspace();
+			return 1UL << fDesktop->CurrentWorkspace();
 		}
 		return workspaces;
 	}
