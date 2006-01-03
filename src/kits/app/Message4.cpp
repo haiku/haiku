@@ -393,11 +393,10 @@ void
 BMessage::PrintToStream() const
 {
 	DEBUG_FUNCTION_ENTER;
-	printf("BMessage: what = ");
 
 	int32 value = B_BENDIAN_TO_HOST_INT32(what);
-	printf("%.4s", (char *)&value);
-	printf(" (0x%lx, or %ld)\n", what, what);
+	printf("BMessage: what = '%.4s' (0x%lx, or %ld)\n",
+		(char *)&value, what, what);
 
 	char buffer[1024];
 	field_header *field = fFields;
@@ -871,7 +870,7 @@ BMessage::Unflatten(const char *flatBuffer)
 		}
 
 		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::unflatten_r5_message(this, flatBuffer);
+			return BPrivate::unflatten_r5_message(format, this, flatBuffer);
 
 		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
 			BMemoryIO stream(flatBuffer + sizeof(uint32),
@@ -939,7 +938,7 @@ BMessage::Unflatten(BDataIO *stream)
 	stream->Read(&format, sizeof(uint32));
 	if (format != kMessageMagic4) {
 		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::unflatten_r5_message(this, stream);
+			return BPrivate::unflatten_r5_message(format, this, stream);
 
 		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
 			return BPrivate::unflatten_dano_message(format, *stream, *this);
