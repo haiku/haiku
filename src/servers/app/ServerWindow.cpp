@@ -1935,34 +1935,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			drawingEngine->FillRect(rect, fCurrentLayer->CurrentState());
 			break;
 		}
-		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
-		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
+		case AS_LAYER_DRAW_BITMAP:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_AT_POINT: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
-			int32 bitmapToken;
-			BPoint point;
-			link.Read<int32>(&bitmapToken);
-			link.Read<BPoint>(&point);
-
-			ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
-			if (bitmap) {
-				BRect src = bitmap->Bounds();
-				BRect dst = src.OffsetToCopy(point);
-				fCurrentLayer->ConvertToScreenForDrawing(&dst);
-
-				drawingEngine->DrawBitmap(bitmap, src, dst, fCurrentLayer->CurrentState());
-			}
-
-			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
-			// It Doesn't have to. Sync means: force a sync of the view/link, so that
-			// the bitmap is already drawn when the "BView::DrawBitmap()" call returns.
-			// If this is ever possible.
-			break;
-		}
-		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
-		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_(A)SYNC_IN_RECT: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 
@@ -1977,7 +1952,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				drawingEngine->DrawBitmap(bitmap, srcRect, dstRect, fCurrentLayer->CurrentState());
 			}
 
-			// TODO: how should AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
 			break;
 		}
 		case AS_STROKE_ARC:
@@ -2248,8 +2222,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
-		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
-		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
+		case AS_LAYER_DRAW_BITMAP:
 		{
 			int32 token;
 			link.Read<int32>(&token);

@@ -2236,7 +2236,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 	if (fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT);
+		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
 		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
 		fOwner->fLink->Attach<BRect>(dstRect);
 		fOwner->fLink->Attach<BRect>(srcRect);
@@ -2247,9 +2247,6 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 void
 BView::DrawBitmapAsync(const BBitmap *bitmap, BRect dstRect)
 {
-	if (!bitmap || !dstRect.IsValid())
-		return;
-
 	DrawBitmapAsync(bitmap, bitmap->Bounds(), dstRect);
 }
 
@@ -2270,9 +2267,12 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
 	if (fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT);
+		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
 		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
-		fOwner->fLink->Attach<BPoint>(where);
+		BRect src = bitmap->Bounds();
+		BRect dst = src.OffsetToCopy(where);
+		fOwner->fLink->Attach<BRect>(dst);
+		fOwner->fLink->Attach<BRect>(src);
 	}
 }
 
@@ -2287,26 +2287,14 @@ BView::DrawBitmap(const BBitmap *bitmap)
 void
 BView::DrawBitmap(const BBitmap *bitmap, BPoint where)
 {
-	if (bitmap == NULL)
-		return;
-
-	if (fOwner) {
-		check_lock();
-
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT);
-		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
-		fOwner->fLink->Attach<BPoint>(where);
-		fOwner->fLink->Flush();
-	}
+	DrawBitmapAsync(bitmap, where);
+	Sync();
 }
 
 
 void
 BView::DrawBitmap(const BBitmap *bitmap, BRect dstRect)
 {
-	if (!bitmap || !dstRect.IsValid())
-		return;
-
 	DrawBitmap(bitmap, bitmap->Bounds(), dstRect);
 }
 
@@ -2314,18 +2302,8 @@ BView::DrawBitmap(const BBitmap *bitmap, BRect dstRect)
 void
 BView::DrawBitmap(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 {
-	if ( !bitmap || !srcRect.IsValid() || !dstRect.IsValid())
-		return;
-
-	if (fOwner) {
-		check_lock();
-
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT);
-		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
-		fOwner->fLink->Attach<BRect>(dstRect);
-		fOwner->fLink->Attach<BRect>(srcRect);
-		fOwner->fLink->Flush();
-	}
+	DrawBitmapAsync(bitmap, srcRect, dstRect);
+	Sync();
 }
 
 
