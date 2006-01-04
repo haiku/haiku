@@ -21,7 +21,8 @@ void __init_env(const struct uspace_program_args *args);
 void __init_heap(void);
 
 void __init_time(void);
-void __arch_init_time(struct real_time_data *data);
+void __arch_init_time(struct real_time_data *data, bool setDefaults);
+bigtime_t __arch_get_system_time_offset(struct real_time_data *data);
 
 
 extern char _single_threaded;

@@ -25,6 +25,12 @@ void arch_rtc_set_hw_time(uint32 seconds);
 uint32 arch_rtc_get_hw_time(void);
 	// Returns number of seconds since 1/1/1970 as stored in HW
 
+void arch_rtc_set_system_time_offset(struct real_time_data *data,
+	bigtime_t offset);
+	// Set the system time offset in data.
+bigtime_t arch_rtc_get_system_time_offset(struct real_time_data *data);
+	// Return the system time offset as stored in data.
+
 #ifdef __cplusplus
 }
 #endif

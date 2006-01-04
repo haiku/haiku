@@ -178,7 +178,8 @@ secs_to_cmos(uint32 seconds, cmos_time *cmos)
 status_t
 arch_rtc_init(struct kernel_args *args, struct real_time_data *data)
 {
-	data->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
+	data->arch_data.system_time_conversion_factor
+		= args->arch_args.system_time_cv_factor;
 	return B_OK;
 }
 
@@ -214,3 +215,17 @@ arch_rtc_set_hw_time(uint32 seconds)
 	secs_to_cmos(seconds, &cmos);
 	write_cmos_clock(&cmos);
 }	
+
+
+void
+arch_rtc_set_system_time_offset(struct real_time_data *data, bigtime_t offset)
+{
+	atomic_set64(&data->arch_data.system_time_offset, offset);
+}
+
+
+bigtime_t
+arch_rtc_get_system_time_offset(struct real_time_data *data)
+{
+	return atomic_get64(&data->arch_data.system_time_offset);
+}

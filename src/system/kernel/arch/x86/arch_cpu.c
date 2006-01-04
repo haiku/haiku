@@ -212,7 +212,7 @@ arch_cpu_preboot_init(kernel_args *args)
 status_t
 arch_cpu_init(kernel_args *args)
 {
-	setup_system_time(args->arch_args.system_time_cv_factor);
+	__x86_setup_system_time(args->arch_args.system_time_cv_factor);
 
 	return B_OK;
 }

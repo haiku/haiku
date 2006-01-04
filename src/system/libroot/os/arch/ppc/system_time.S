@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Axel Dï¿½fler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -7,16 +7,11 @@
 
 .text
 
-// ToDo: note, this function absolutely doesn't do what it should do.
-//	It only reads out the time base register, but it doesn't compute
-//	the real system time from its value.
-//	To do so, the kernel has to provide the appropriate system dependent
-//	conversion factors.
-
-/* uint64 system_time(void)
+/* int64 __ppc_get_time_base(void)
  * r3/r4
  */
-FUNCTION(system_time):
+FUNCTION(__ppc_get_time_base):
+		/* get TB (time base) register */
 carry:	mftbu	%r3
 		mftb	%r4
 		mftbu	%r5			// read the upper half again

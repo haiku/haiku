@@ -36,7 +36,7 @@ rtc_system_to_hw(void)
 {
 	uint32 seconds;
 
-	seconds = (sRealTimeData->system_time_offset + system_time() 
+	seconds = (arch_rtc_get_system_time_offset(sRealTimeData) + system_time() 
 		- (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
 	
 	arch_rtc_set_hw_time(seconds);
@@ -58,7 +58,7 @@ rtc_hw_to_system(void)
 bigtime_t
 rtc_boot_time(void)
 {
-	return sRealTimeData->system_time_offset;
+	return arch_rtc_get_system_time_offset(sRealTimeData);
 }
 
 
@@ -68,10 +68,12 @@ rtc_debug(int argc, char **argv)
 	if (argc < 2) {
 		// If no arguments were given, output all useful data.
 		uint32 currentTime;
+		bigtime_t systemTimeOffset
+			= arch_rtc_get_system_time_offset(sRealTimeData);
 	
-		currentTime = (sRealTimeData->system_time_offset + system_time()) / 1000000;
+		currentTime = (systemTimeOffset + system_time()) / 1000000;
 		dprintf("system_time:  %Ld\n", system_time());
-		dprintf("system_time_offset:    %Ld\n", sRealTimeData->system_time_offset);
+		dprintf("system_time_offset:    %Ld\n", systemTimeOffset);
 		dprintf("current_time: %lu\n", currentTime);
 	} else {
 		// If there was an argument, reset the system and hw time.
@@ -122,7 +124,8 @@ rtc_init(kernel_args *args)
 void
 set_real_time_clock(uint32 currentTime)
 {
-	atomic_set64(&sRealTimeData->system_time_offset, currentTime * 1000000LL - system_time());
+	arch_rtc_set_system_time_offset(sRealTimeData,
+		currentTime * 1000000LL - system_time());
 	rtc_system_to_hw();
 }
 
@@ -130,14 +133,15 @@ set_real_time_clock(uint32 currentTime)
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->system_time_offset + system_time()) / 1000000;
+	return (arch_rtc_get_system_time_offset(sRealTimeData) + system_time())
+		/ 1000000;
 }
 
 
 bigtime_t
 real_time_clock_usecs(void)
 {
-	return sRealTimeData->system_time_offset + system_time();
+	return arch_rtc_get_system_time_offset(sRealTimeData) + system_time();
 }
 
 
@@ -315,18 +319,23 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n", sRealTimeData->system_time_offset, sTimezoneOffset, offset, sIsGMT));
+	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n",
+		arch_rtc_get_system_time_offset(sRealTimeData), sTimezoneOffset, offset,
+		sIsGMT));
 
 	// We only need to update our time offset if the hardware clock
 	// does not run in the local timezone.
 	// Since this is shared data, we need to update it atomically.
-	if (!sIsGMT)
-		atomic_add64(&sRealTimeData->system_time_offset, sTimezoneOffset - offset);
+	if (!sIsGMT) {
+		arch_rtc_set_system_time_offset(sRealTimeData,
+			sTimezoneOffset - offset);
+	}
 
 	sTimezoneOffset = offset;
 	sDaylightSavingTime = daylightSavingTime;
 
-	TRACE(("new system_time_offset %Ld\n", sRealTimeData->system_time_offset));
+	TRACE(("new system_time_offset %Ld\n",
+		arch_rtc_get_system_time_offset(sRealTimeData)));
 
 	return B_OK;
 }

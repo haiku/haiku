@@ -8,13 +8,11 @@
 #include <StorageDefs.h>
 #include <SupportDefs.h>
 
+#include <arch_real_time_data.h>
 
-// ToDo: most of this is probably arch dependent. When the PPC port comes
-//	to this, it should be properly separated and moved into the arch tree.
 
 struct real_time_data {
-	bigtime_t	system_time_offset;
-	uint32	system_time_conversion_factor;
+	struct arch_real_time_data	arch_data;
 };
 
 #endif	/* _KERNEL_REAL_TIME_DATA_H */

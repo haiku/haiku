@@ -97,7 +97,7 @@ extern "C" {
 
 struct arch_thread;
 
-void setup_system_time(uint32 cv_factor);
+void __x86_setup_system_time(uint32 cv_factor);
 void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr_t new_pgdir);
 void i386_enter_uspace(addr_t entry, void *args1, void *args2, addr_t ustack_top);
 void i386_set_tss_and_kstack(addr_t kstack);

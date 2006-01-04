@@ -14,16 +14,14 @@
 #include <syscalls.h>
 
 
-static struct real_time_data sRealTimeDefaults = {
-	0,
-	100000
-};
+static struct real_time_data sRealTimeDefaults;
 static struct real_time_data *sRealTimeData;
 
 
 void
 __init_time(void)
 {
+	bool setDefaults = false;
 	area_id dataArea; 
 	area_info info;
 
@@ -31,24 +29,26 @@ __init_time(void)
 	if (dataArea < 0 || get_area_info(dataArea, &info) < B_OK) {
 		syslog(LOG_ERR, "error finding real time data area: %s\n", strerror(dataArea));
 		sRealTimeData = &sRealTimeDefaults;
+		setDefaults = true;
 	} else
 		sRealTimeData = (struct real_time_data *)info.address;
 
-	__arch_init_time(sRealTimeData);
+	__arch_init_time(sRealTimeData, setDefaults);
 }
 
 
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->system_time_offset + system_time()) / 1000000;
+	return (__arch_get_system_time_offset(sRealTimeData) + system_time())
+		/ 1000000;
 }
 
 
 bigtime_t
 real_time_clock_usecs(void)
 {
-	return sRealTimeData->system_time_offset + system_time();
+	return __arch_get_system_time_offset(sRealTimeData) + system_time();
 }
 
 

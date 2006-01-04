@@ -11,7 +11,7 @@
 cv_factor:
 	.word 0
 
-FUNCTION(setup_system_time):
+FUNCTION(__x86_setup_system_time):
 	movl	4(%esp),%eax
 	movl	%eax,cv_factor
 	ret
