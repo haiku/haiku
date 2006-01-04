@@ -121,6 +121,8 @@ private:
 									BPrivate::LinkReceiver &link);
 			void				_DispatchViewDrawingMessage(int32 code,
 									BPrivate::LinkReceiver &link);
+			bool				_DispatchPictureMessage(int32 code,
+									BPrivate::LinkReceiver &link);
 			void				_MessageLooper();
 	virtual void				_PrepareQuit();
 	virtual void				_GetLooperName(char* name, size_t size);

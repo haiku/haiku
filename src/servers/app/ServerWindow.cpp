@@ -37,6 +37,7 @@
 
 #include <DirectWindowPrivate.h>
 #include <MessagePrivate.h>
+#include <PictureProtocol.h>
 
 #include "AppServer.h"
 #include "BGet++.h"
@@ -1023,6 +1024,9 @@ void
 ServerWindow::_DispatchViewMessage(int32 code,
 	BPrivate::LinkReceiver &link)
 {
+	if (_DispatchPictureMessage(code, link))
+		return;
+
 	switch (code) {
 		case AS_LAYER_SCROLL:
 		{
@@ -2222,6 +2226,65 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 	}
 
 	drawingEngine->Unlock();
+}
+
+
+bool
+ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
+{
+	ServerPicture *picture = fCurrentLayer->Picture();
+	if (picture == NULL)
+		return false;
+	
+	switch (code) {
+		case AS_FILL_RECT:
+		{
+			BRect rect;
+			link.Read<BRect>(&rect);
+
+			picture->BeginOp(B_PIC_FILL_RECT);
+			picture->AddRect(rect);
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
+		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
+		{
+			int32 token;
+			link.Read<int32>(&token);
+			
+			BRect destRect;
+			link.Read<BRect>(&destRect);
+			
+			BRect sourceRect;
+			link.Read<BRect>(&sourceRect);
+			
+			ServerBitmap *bitmap = App()->FindBitmap(token);
+			if (bitmap == NULL)
+				break;
+			
+			picture->BeginOp(B_PIC_DRAW_PIXELS);
+			picture->AddRect(sourceRect);
+			picture->AddRect(destRect);
+			picture->AddInt32(bitmap->Width());
+			picture->AddInt32(bitmap->Height());
+			picture->AddInt32(bitmap->BytesPerRow());
+			picture->AddInt32(bitmap->ColorSpace());
+			picture->AddInt32(/*bitmap->Flags()*/0);
+			picture->AddData((void *)bitmap->Bits(), bitmap->BitsLength());
+			picture->EndOp();
+			break;
+		}
+		default:
+			return false;
+	}
+	
+	if (link.NeedsReply()) {
+		fLink.StartMessage(B_ERROR);
+		fLink.Flush();
+	}
+	return true;
 }
 
 
