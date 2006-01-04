@@ -136,7 +136,7 @@ float b_sqrt(float x) {
 void InitPatterns()
 {
 	int32		i, j, k, count;
-	float		radius, x0, y0, x, y, dist, delta, coeff;
+	float		radius, x0, y0, x, y, dist, delta;
 	uint8		color;
 	uint8		*list, *color_offset;
 	
@@ -292,8 +292,8 @@ bool ProjectStar(star *s, geometry *geo)
    of every stars after changing the clipping region of the buffer). */
 bool CheckClipping(star *s, buffer *buf, bool reset_clipping)
 {
-	int32			i, delta;
-	uint32			total_visible, tmp_visible;
+	int32			delta;
+	uint32			i, total_visible, tmp_visible;
 	clipping_rect	box;
 	clipping_rect	*r;
 

@@ -137,7 +137,7 @@ enum {
 #define		abs(x) 	(((x)>0)?(x):-(x))
 
 /* default background color for the UI. */
-rgb_color	background_color = { 216.0, 216.0, 216.0, 255.0 };
+rgb_color	background_color = { 216, 216, 216, 255 };
 
 /* the 7 colors for stars. */
 static rgb_color	color_list[7] = {
@@ -360,7 +360,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	int32			i;
 	int32			colors[3];
 	BRect			r;
-	BFont			font;
+	//BFont			font;
 	BView			*top_view, *left_view;
 	BMenu			*menu;
 	BButton			*button;
@@ -370,7 +370,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	BStringView		*string;
 	version_info	vi;
 	BRadioButton	*radio;
-	BTextControl	*red_ctrl, *green_ctrl, *blue_ctrl;
+	//BTextControl	*red_ctrl, *green_ctrl, *blue_ctrl;
 	
 	/* Check to see if we need the work-around for the case where
 	   DirectConnected is called back with B_BUFFER_RESET not set
@@ -863,8 +863,8 @@ void ChartWindow::MessageReceived(BMessage *message)
 	int32			index, color;
 	BHandler		*handler;
 	BCheckBox		*check_box;
-	BTextControl	*text_ctrl;
-	BColorControl	*color_ctrl;
+	//BTextControl	*text_ctrl;
+	//BColorControl	*color_ctrl;
 	BSlider			*slider;
 	
 	message->FindPointer("source", (void**)&handler);
@@ -1061,7 +1061,7 @@ BPicture *ChartWindow::ButtonPicture(bool active, int32 button_type)
 		   than what a standard BButton would allow) with the current value
 		   of the star density pourcentage. */ 
 		value = (set.star_density*100 + STAR_DENSITY_MAX/2) / STAR_DENSITY_MAX;
-		sprintf(word, "%3d\%", value);
+		sprintf(word, "%3ld", value);
 	draw_string:
 		offwindow_button->SetFont(be_bold_font);
 		offwindow_button->SetFontSize(14.0);
@@ -1310,7 +1310,7 @@ void ChartWindow::InitGeometry()
    that DirectConnected can not stay blocked at the same time that
    this method is executed. */
 void ChartWindow::ChangeSetting(setting new_set) {
-	star			*s;
+	//star			*s;
 	int32			i, color_count, old_step;
 	int32			color_index[7];
 
@@ -1361,7 +1361,7 @@ void ChartWindow::ChangeSetting(setting new_set) {
 			Unlock();
 		}
 		if (set.animation != ANIMATION_OFF)
-			frame_delay = 1000000.0/new_set.refresh_rate;
+			frame_delay = (bigtime_t)(1000000.0/new_set.refresh_rate);
 	}
 	
 	/* check for change in the star colors list */
@@ -1415,7 +1415,7 @@ void ChartWindow::ChangeSetting(setting new_set) {
 		if (new_set.animation == ANIMATION_OFF)
 			frame_delay = 100000;
 		else
-			frame_delay = 1000000.0/new_set.refresh_rate;
+			frame_delay = (bigtime_t)(1000000.0/new_set.refresh_rate);
 		/* reset the free camera animation context for a fresh start */
 		if (new_set.animation == ANIMATION_FREE_MOVE) {
 			d_alpha = 0.0;
@@ -1696,7 +1696,7 @@ void ChartWindow::InitStars(int32 space_model)
 /* Fill a list of star with random position in the [0-1]x[0-1]x[0-1] cube */
 void ChartWindow::FillStarList(star *list, int32 count)
 {
-	uint32		i;
+	int32		i;
 	
 	for (i=0; i<count; i++) {
 		list[i].x = ((float)(crc_alea&2047) + 0.5)*(1.0/2048.0);
@@ -1718,7 +1718,6 @@ void ChartWindow::InitSpecials(int32 code)
 	int			i, j;
 	float		alpha, ksin, kcos, coeff;
 	TPoint		dx, dy;
-	special		*sp;
 	TMatrix		matrix;
 
 	switch (code) {
@@ -1807,7 +1806,7 @@ void ChartWindow::InitSpecials(int32 code)
    looping through the color index list. */
 void ChartWindow::SetStarColors(int32 *color_list, int32 color_count)
 {
-	uint32		i, index;
+	int32		i, index;
 	
 	index = 0;
 	for (i=0; i<STAR_DENSITY_MAX; i++) {
@@ -1847,9 +1846,16 @@ void ChartWindow::SetGeometry(int32 dh, int32 dv)
 void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 {
 	bool		swap_needed;
-	int16		test_endianess;
-	int32		red_shift, green_shift, blue_shift, alpha_shift, step_doubling;
-	int32		red_divide_shift, green_divide_shift, blue_divide_shift, alpha_divide_shift;
+	int32		red_shift = 0,
+			green_shift = 0,
+			blue_shift = 0,
+			alpha_shift = 0,
+			step_doubling = 0;
+
+	int32		red_divide_shift = 0,
+			green_divide_shift = 0,
+			blue_divide_shift = 0,
+			alpha_divide_shift = 0;
 	int32		i;
 	uint32		color;
 	uint32		*col;
@@ -1908,6 +1914,7 @@ void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 		step_doubling = 16;
 		break;
 	case B_CMAP8 :
+	default:
 		buf->depth_mode = PIXEL_1_BYTE;
 		buf->bytes_per_pixel = 1;
 		break;
@@ -1916,14 +1923,6 @@ void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 	/* Check if the endianess of the buffer is different from the
 	   endianess use by the processor to encode the color information */
 	switch (depth) {
-	case B_RGBA32 :
-	case B_RGB32 :
-	case B_RGB16 :
-	case B_RGB15 :
-	case B_RGBA15 :
-	case B_CMAP8 :
-		swap_needed = false;
-		break;
 	case B_RGBA32_BIG :
 	case B_RGB32_BIG :
 	case B_RGB16_BIG :
@@ -1931,11 +1930,20 @@ void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 	case B_RGBA15_BIG :
 		swap_needed = true;
 		break;
+	case B_RGBA32 :
+	case B_RGB32 :
+	case B_RGB16 :
+	case B_RGB15 :
+	case B_RGBA15 :
+	case B_CMAP8 :
+	default:
+		swap_needed = false;
+		break;
 	}
 	
-	if (B_HOST_IS_BENDIAN)
-		swap_needed = ~swap_needed;
-	
+#if B_HOST_IS_BENDIAN
+	swap_needed = ~swap_needed;
+#endif	
 	/* fill the color tables (8 light level for 7 colors, and also encode
 	   the background color */
 	col = buf->colors[0];
@@ -2015,9 +2023,9 @@ void ChartWindow::SetPatternBits(buffer *buf)
    the engine state with the changes coming from the UI. */
 long ChartWindow::Animation(void *data) {
 	int32			i, cur_4_frames_index, cur_last_fps, count_fps;
-	float			time_factor, total_fps;
+	float			time_factor = 0, total_fps;
 	float			last_fps[4];
-	bigtime_t		next_stat, timeout;
+	bigtime_t		next_stat;
 	bigtime_t		timer, time_left, current;
 	bigtime_t		before_frame, after_frame, fps;
 	bigtime_t		last_4_frames[4];
@@ -2086,7 +2094,7 @@ long ChartWindow::Animation(void *data) {
 					last_4_frames[0]+last_4_frames[1]+last_4_frames[2]+last_4_frames[3];
 				/* the instant load is calculated based on the average duration
 				   of the last 16 frames. */ 
-				fps = 16e6/(last_fps[0]+last_fps[1]+last_fps[2]+last_fps[3]);
+				fps = (bigtime_t) (16e6 / (last_fps[0]+last_fps[1]+last_fps[2]+last_fps[3]));
 				w->DrawInstantLoad(fps);
 				
 				total_fps += fps;
@@ -2119,6 +2127,7 @@ long ChartWindow::Animation(void *data) {
 		   for varaiation of the framerate. */			
 		time_factor = (float)(system_time() - before_frame) * (1.0/4e4);
 	}
+	return 0;
 }
 
 /* This is the second thread doing star animation. It's just a poor
@@ -2249,8 +2258,7 @@ void ChartWindow::SetCubeOffset()
 void ChartWindow::CameraAnimation(float time_factor)
 {
 	TPoint			move;
-	TMatrix			rotate;
-
+	
 	switch (set.animation) {
 	/* Slow rotation around the "center" of the visible area. */
 	case ANIMATION_ROTATE :
@@ -2452,8 +2460,7 @@ void ChartWindow::SelectNewTarget()
    of the current target. */
 void ChartWindow::FollowTarget()
 {
-	star		fake_star;
-	float		x0, y0, x, y, z, inv_z, cphi, sphi;
+	float		x0, y0, x, y, z, cphi, sphi;
 	TPoint		pt;
 
 	/* get the target point */
@@ -2545,7 +2552,7 @@ void ChartWindow::AnimSpecials(float time_step)
 			s = specials.list+j+2;
 			sp = special_list+j+2;
 			for (i=j+2; i<specials.count; i+=2) {
-				sp->comet.count -= time_step;
+				sp->comet.count -= (int32)time_step;
 				/* they are reset and reejected again, just a little in
 				   the back of the head of the comet */
 				if (sp->comet.count <= 0.0) {
@@ -2554,7 +2561,7 @@ void ChartWindow::AnimSpecials(float time_step)
 					s->y = comet[j].y + 6.0 * sp->comet.dy - delta_comet[j].y * delta;
 					s->z = comet[j].z + 6.0 * sp->comet.dz - delta_comet[j].z * delta;
 					s->size = 0.6;
-					sp->comet.count = (float)(sp->comet.count0 + (crc_alea & 63));
+					sp->comet.count = (int32)(sp->comet.count0 + (crc_alea & 63));
 					CrcStep();
 				}
 				/* or they just move at their own (ejection) speed */
@@ -2810,8 +2817,8 @@ void ChartWindow::DirectConnected(direct_buffer_info *info)
    update a little later by the view system), it's not a big deal. */
 void ChartWindow::SwitchContext(direct_buffer_info *info)
 {
-	star			*s;
-	int32			i, j;
+	//star			*s;
+	uint32			i, j;
 
 	/* you need to use that mask to read the buffer state. */
 	switch (info->buffer_state & B_DIRECT_MODE_MASK) {
