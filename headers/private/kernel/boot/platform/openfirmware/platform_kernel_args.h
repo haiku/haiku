@@ -18,6 +18,7 @@
 
 typedef struct {
 	void	*openfirmware_entry;
+	char	rtc_path[128];
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_OPENFIRMWARE_KERNEL_ARGS_H */

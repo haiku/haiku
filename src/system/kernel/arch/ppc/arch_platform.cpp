@@ -11,6 +11,7 @@
 
 #include <boot/kernel_args.h>
 #include <platform/openfirmware/openfirmware.h>
+#include <real_time_clock.h>
 #include <util/kernel_cpp.h>
 
 
@@ -48,13 +49,19 @@ public:
 	virtual status_t Init(struct kernel_args *kernelArgs);
 	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs);
 	virtual status_t InitPostVM(struct kernel_args *kernelArgs);
+	virtual status_t InitRTC(struct kernel_args *kernelArgs,
+		struct real_time_data *data);
 
 	virtual char SerialDebugGetChar();
 	virtual void SerialDebugPutChar(char c);
 
+	virtual	void SetHardwareRTC(uint32 seconds);
+	virtual	uint32 GetHardwareRTC();
+
 private:
-	int fInput;
-	int fOutput;
+	int	fInput;
+	int	fOutput;
+	int	fRTC;
 };
 
 }	// namespace BPrivate
@@ -85,7 +92,8 @@ debug_command_of_enter(int argc, char **argv)
 // constructor
 PPCOpenFirmware::PPCOpenFirmware()
 	: fInput(-1),
-	  fOutput(-1)
+	  fOutput(-1),
+	  fRTC(-1)
 {
 }
 
@@ -127,6 +135,23 @@ PPCOpenFirmware::InitPostVM(struct kernel_args *kernelArgs)
 	return B_OK;
 }
 
+// InitRTC
+status_t
+PPCOpenFirmware::InitRTC(struct kernel_args *kernelArgs,
+	struct real_time_data *data)
+{
+kprintf("PPCOpenFirmware::InitRTC(): opening \"%s\"...\n", kernelArgs->platform_args.rtc_path);
+	// open RTC
+	fRTC = of_open(kernelArgs->platform_args.rtc_path);
+kprintf("  of_open() returned: %d\n", fRTC);
+	if (fRTC == OF_FAILED) {
+		dprintf("PPCOpenFirmware::InitRTC(): Failed open RTC device!\n");
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
 // DebugSerialGetChar
 char
 PPCOpenFirmware::SerialDebugGetChar()
@@ -145,6 +170,39 @@ PPCOpenFirmware::SerialDebugPutChar(char c)
 		of_write(fOutput, "\r\n", 2);
 	else
 		of_write(fOutput, &c, 1);
+}
+
+// SetHardwareRTC
+void
+PPCOpenFirmware::SetHardwareRTC(uint32 seconds)
+{
+	struct tm t;
+	rtc_secs_to_tm(seconds, &t);
+
+	t.tm_year += RTC_EPOCHE_BASE_YEAR;
+	t.tm_mon++;
+
+	if (of_call_method(fRTC, "set-time", 6, 0, t.tm_year, t.tm_mon, t.tm_mday,
+			t.tm_hour, t.tm_min, t.tm_sec) == OF_FAILED) {
+		dprintf("PPCOpenFirmware::SetHardwareRTC(): Failed to set RTC!\n");
+	}
+}
+
+// GetHardwareRTC
+uint32
+PPCOpenFirmware::GetHardwareRTC()
+{
+	struct tm t;
+	if (of_call_method(fRTC, "get-time", 0, 6, &t.tm_year, &t.tm_mon,
+			&t.tm_mday, &t.tm_hour, &t.tm_min, &t.tm_sec) == OF_FAILED) {
+		dprintf("PPCOpenFirmware::GetHardwareRTC(): Failed to get RTC!\n");
+		return 0;
+	}
+
+	t.tm_year -= RTC_EPOCHE_BASE_YEAR;
+	t.tm_mon--;
+
+	return rtc_tm_to_secs(&t);
 }
 
 

@@ -105,6 +105,11 @@ extern void reset_dbats(void);
 //extern void setl2cr(unsigned int val);
 extern long long get_time_base(void);
 
+void __ppc_setup_system_time(vint64 *cvFactor);
+	// defined in libroot: os/arch/system_time.c
+int64 __ppc_get_time_base(void);
+	// defined in libroot: os/arch/system_time_asm.S
+
 extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
 
 #ifdef __cplusplus
