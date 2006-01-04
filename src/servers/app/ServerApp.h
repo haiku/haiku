@@ -72,7 +72,7 @@ class ServerApp : public MessageLooper {
 		ServerBitmap *FindBitmap(int32 token) const;
 
 		int32 CountPictures() const;
-		ServerPicture *CreatePicture(int32 *token = NULL);
+		ServerPicture *CreatePicture(const ServerPicture *original = NULL);
 		ServerPicture *FindPicture(const int32 &token) const;
 		bool DeletePicture(const int32 &token);
 

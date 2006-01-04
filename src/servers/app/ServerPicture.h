@@ -6,14 +6,15 @@
 #include <Region.h>
 #include <DataIO.h>
 #include <InterfaceDefs.h>
-#include <List.h>
 
+#include <stack>
+
+using std::stack;
+
+class ServerApp;
 class ViewLayer;
 class ServerPicture {
-public:
-				ServerPicture();
-virtual				~ServerPicture();
-	
+public:	
 		int32		Token() { return fToken; }
 		
 		void		BeginOp(int16 op);
@@ -40,13 +41,19 @@ virtual				~ServerPicture();
 		
 		void		Play(ViewLayer *view);
 		
-		const void	*Data() { return fData.Buffer(); }
-		int32		DataLength() { return fData.BufferLength(); }
+		const void	*Data() const { return fData.Buffer(); }
+		int32		DataLength() const { return fData.BufferLength(); }
 
 private:
+friend class	ServerApp;
+	
+		ServerPicture();
+		ServerPicture(const ServerPicture &);
+		~ServerPicture();
+		
 		int32		fToken;
 		BMallocIO	fData;
-		BList		fStack;
+		stack<off_t>	fStack;
 		// DrawState	*fState;
 };
 

@@ -747,12 +747,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			
 			ServerPicture *cloned = NULL;
 			if (original != NULL)
-				cloned = CreatePicture();
+				cloned = CreatePicture(original);
 		
 			if (cloned != NULL) {
-				// TODO: I'm not sure that this does a plain copy.
-				// Check, and, in case, put the stuff in Data() directly
-				cloned->AddData(original->Data(), original->DataLength());
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(cloned->Token());	
 			} else
@@ -2567,14 +2564,16 @@ ServerApp::CountPictures() const
 
 
 ServerPicture *
-ServerApp::CreatePicture(int32 *token)
+ServerApp::CreatePicture(const ServerPicture *original)
 {
-	ServerPicture *picture = new (nothrow) ServerPicture();
-	if (picture != NULL) {
+	ServerPicture *picture;
+	if (original != NULL)
+		picture = new (nothrow) ServerPicture(*original);
+	else
+		picture = new (nothrow) ServerPicture();
+
+	if (picture != NULL)
 		fPictureList.AddItem(picture);
-		if (token != NULL)
-			*token = picture->Token();
-	}
 	
 	return picture;
 }

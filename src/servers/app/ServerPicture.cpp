@@ -461,6 +461,16 @@ ServerPicture::ServerPicture()
 }
 
 
+ServerPicture::ServerPicture(const ServerPicture &picture)
+	:
+	fStack(picture.fStack)
+{
+	fToken = gTokenSpace.NewToken(kPictureToken, this);
+
+	AddData(picture.Data(), picture.DataLength());
+}
+
+
 ServerPicture::~ServerPicture()
 {
 }
@@ -470,7 +480,7 @@ void
 ServerPicture::BeginOp(int16 op)
 {
 	int32 size = 0;
-	fStack.AddItem((void *)fData.Position());
+	fStack.push(fData.Position());
 	fData.Write(&op, sizeof(op));
 	fData.Write(&size, sizeof(size));
 }
@@ -480,7 +490,9 @@ void
 ServerPicture::EndOp()
 {
 	off_t curPos = fData.Position();
-	off_t stackPos = (off_t)fStack.RemoveItem(fStack.CountItems() - 1);
+	off_t stackPos = fStack.top();
+	fStack.pop();
+
 	size_t size = curPos - stackPos - 6;
 
 	fData.Seek(stackPos + 2, SEEK_SET);
