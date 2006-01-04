@@ -8,7 +8,7 @@
 #define _INSTALLERCOPYLOOPCONTROL_H
 
 #include "FSUtils.h"
-#include "InstallerWindow.h"
+class InstallerWindow;
 
 class InstallerCopyLoopControl : public CopyLoopControl
 {

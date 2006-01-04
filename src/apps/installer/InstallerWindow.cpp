@@ -163,7 +163,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			StartScan();
 			break;
 		case BEGIN_MESSAGE:
-			fCopyEngine.Start();
+			fCopyEngine.Start(fSrcMenu, fDestMenu);
 			break;
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();

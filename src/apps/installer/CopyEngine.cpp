@@ -6,9 +6,22 @@
 #include "CopyEngine.h"
 #include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
+#include "FSUndoRedo.h"
+#include "FSUtils.h"
+#include <FindDirectory.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <Path.h>
+#include <String.h>
+#include <VolumeRoster.h>
+
+namespace BPrivate {
+
+extern status_t FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
+	BPoint *loc, bool makeOriginalName, Undo &undo);
+} // namespace BPrivate
+
+using namespace BPrivate;
 
 extern void SizeAsString(off_t size, char *string);
 
@@ -39,42 +52,84 @@ CopyEngine::CopyEngine(InstallerWindow *window)
 	: BLooper("copy_engine"),
 	fWindow(window)
 {
-
+	fControl = new InstallerCopyLoopControl(window);
 }
 
 
 void
-CopyEngine::LaunchInitScript(BVolume *volume)
+CopyEngine::LaunchInitScript(BPath &path)
 {
-	fWindow->SetStatusMessage("Starting Installation.");
+	BPath bootPath;
+	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
+	BString command(bootPath.Path());
+	command += "/InstallerInitScript ";
+	command += path.Path();
+	fWindow->SetStatusMessage("Starting Installation.");	
+	system(command.String());
 }
 
 
 void
-CopyEngine::LaunchFinishScript(BVolume *volume)
+CopyEngine::LaunchFinishScript(BPath &path)
 {
-	fWindow->SetStatusMessage("Finishing Installation.");
+	BPath bootPath;
+	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
+	BString command(bootPath.Path());
+	command += "/InstallerFinishScript ";
+	command += path.Path();
+	fWindow->SetStatusMessage("Finishing Installation.");	
+	system(command.String());
 }
 
 
 void
-CopyEngine::Start()
+CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
-	BVolume *volume;
+	PartitionMenuItem *item = (PartitionMenuItem *)targetMenu->FindMarked();
+	if (!item)
+		return;
+
+	BPath directory;
+	BDiskDevice device;
+	BPartition *partition;
+	if (fDDRoster.GetPartitionWithID(item->ID(), &device, &partition) == B_OK) {
+		if (partition->GetMountPoint(&directory)!=B_OK)
+			return;
+	} else if (fDDRoster.GetDeviceWithID(item->ID(), &device) == B_OK) {
+		if (device.GetMountPoint(&directory)!=B_OK)
+			return;
+	} else 
+		return; // shouldn't happen
+	
 	// check not installing on boot volume
-
+	BVolume bootVolume;
+	BDirectory bootDir;
+	BEntry bootEntry;
+	BPath bootPath;
+	BVolumeRoster().GetBootVolume(&bootVolume);
+	bootVolume.GetRootDirectory(&bootDir);
+	bootDir.GetEntry(&bootEntry);
+	bootEntry.GetPath(&bootPath);
+	if (strncmp(bootPath.Path(), directory.Path(), strlen(bootPath.Path())) == 0) {
+		
+	}
 
 	// check if target is initialized
 
 	// ask if init ou mount as is
 
-	LaunchInitScript(volume);
+	LaunchInitScript(directory);
 
 	// copy source volume
+	BDirectory targetDir(directory.Path());
+	bootPath.Append("/beos");
+	BEntry srcEntry(bootPath.Path());
+	Undo undo;
+	FSCopyFolder(&srcEntry, &targetDir, fControl, NULL, false, undo);
 
 	// copy selected packages
 
-	LaunchFinishScript(volume);
+	LaunchFinishScript(directory);
 }
 
 

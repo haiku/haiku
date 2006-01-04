@@ -1449,20 +1449,18 @@ FSDuplicate(BObjectList<entry_ref> *srcList, BList *pointList)
 }
 
 
-#if 0
 status_t
 FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
-	BPoint *loc, bool makeOriginalName)
+	BPoint *loc, bool makeOriginalName, Undo &undo)
 {
 	try {
-		CopyFolder(srcEntry, destDir, loopControl, loc, makeOriginalName);
+		CopyFolder(srcEntry, destDir, loopControl, loc, makeOriginalName, undo);
 	} catch (status_t error) {
 		return error;
 	}
 
 	return B_OK;
 }
-#endif
 
 
 status_t

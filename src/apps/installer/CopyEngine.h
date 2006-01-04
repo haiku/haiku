@@ -6,6 +6,8 @@
 #ifndef _CopyEngine_h
 #define _CopyEngine_h
 
+#include "InstallerCopyLoopControl.h"
+
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <Looper.h>
@@ -18,15 +20,16 @@ class InstallerWindow;
 class CopyEngine : public BLooper {
 public:
 	CopyEngine(InstallerWindow *window);
-	void Start();
+	void Start(BMenu *srcMenu, BMenu *targetMenu);
 	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 
 private:
-	void LaunchInitScript(BVolume *volume);
-	void LaunchFinishScript(BVolume *volume);
+	void LaunchInitScript(BPath &path);
+	void LaunchFinishScript(BPath &path);
 	
 	InstallerWindow *fWindow;
 	BDiskDeviceRoster fDDRoster;
+	InstallerCopyLoopControl *fControl;
 };
 
 #endif /* _CopyEngine_h */
