@@ -144,8 +144,7 @@ TReplicantTray::AttachedToWindow()
 
 #ifdef DB_ADDONS
 	// load addons and rehydrate archives
-#if !defined(__HAIKU__) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-// TODO: fix me!
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 	InitAddOnSupport();
 #endif
 #endif
