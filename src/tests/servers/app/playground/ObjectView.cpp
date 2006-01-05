@@ -37,6 +37,16 @@ ObjectView::ObjectView(BRect frame, const char* name,
 //	font.SetSize(20.0);
 ////	font.SetRotation(6.0);
 //	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_ROTATION | B_FONT_SIZE);
+
+//	State* state = State::StateFor(OBJECT_ROUND_RECT, fColor, B_OP_COPY,
+//								   false, 50.0);
+//	state->MouseDown(BPoint(15, 15));
+//	state->MouseMoved(BPoint(255, 305));
+//	state->MouseUp();
+//
+//	AddObject(state);
+
+	SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 }
 
 // AttachedToWindow
@@ -77,16 +87,48 @@ ObjectView::Draw(BRect updateRect)
 	BPoint p(r.Width() / 2.0 - width / 2.0,
 			 r.Height() / 2.0);
 
-Sync();
-bigtime_t now = system_time();
+//Sync();
+//bigtime_t now = system_time();
 	DrawString(message, p);
 
-Sync();
-printf("Drawing Text: %lld\n", system_time() - now);
+//Sync();
+//printf("Drawing Text: %lld\n", system_time() - now);
+
+//	r.OffsetTo(B_ORIGIN);
+//
+//now = system_time();
+//	int32 rectCount = 20;
+//	BeginLineArray(4 * rectCount);
+//	for (int32 i = 0; i < rectCount; i++) {
+//		r.InsetBy(5, 5);
+//	
+//		AddLine(BPoint(r.left, r.top),
+//				BPoint(r.right, r.top), shadow);
+//		AddLine(BPoint(r.right, r.top + 1),
+//				BPoint(r.right, r.bottom), light);
+//		AddLine(BPoint(r.right - 1, r.bottom),
+//				BPoint(r.left, r.bottom), light);
+//		AddLine(BPoint(r.left, r.bottom - 1),
+//				BPoint(r.left, r.top + 1), shadow);
+//	}
+//	EndLineArray();
+//Sync();
+//printf("Drawing Lines: %lld\n", system_time() - now);
+
+//Flush();
+//Sync();
+//bigtime_t start = system_time();
+//SetDrawingMode(B_OP_ALPHA);
+//SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+//SetHighColor(0, 0, 255, 128);
+//FillRect(BRect(0, 0, 250, 300));
+//Sync();
+//printf("Alpha Fill: %lld\n", system_time() - start);
 
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
-
+//Sync();
+//printf("State: %lld\n", system_time() - start);
 }
 
 // MouseDown
@@ -126,7 +168,7 @@ ObjectView::MouseUp(BPoint where)
 		fScrolling = false;
 	} else {
 		if (fState) {
-			fState->MouseUp(where);
+			fState->MouseUp();
 		}
 	}
 }
@@ -136,7 +178,6 @@ void
 ObjectView::MouseMoved(BPoint where, uint32 transit,
 					   const BMessage* dragMessage)
 {
-
 if (dragMessage) {
 //printf("ObjectView::MouseMoved(BPoint(%.1f, %.1f)) - DRAG MESSAGE\n", where.x, where.y);
 //Window()->CurrentMessage()->PrintToStream();
@@ -226,6 +267,22 @@ ObjectView::AddObject(State* state)
 		Window()->PostMessage(&message);
 
 		SetState(state);
+	}
+}
+
+// RemoveObject
+void
+ObjectView::RemoveObject(State* state)
+{
+	if (state && fStateList.RemoveItem((void*)state)) {
+		if (fState == state)
+			SetState(NULL);
+		else
+			Invalidate(state->Bounds());
+
+		Window()->PostMessage(MSG_OBJECT_COUNT_CHANGED);
+
+		delete state;
 	}
 }
 

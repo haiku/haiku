@@ -45,6 +45,7 @@ enum {
 	MSG_CLEAR				= 'clir',
 
 	MSG_OBJECT_SELECTED		= 'obsl',
+	MSG_REMOVE_OBJECT		= 'rmob',
 };
 
 // ObjectItem
@@ -61,6 +62,26 @@ class ObjectItem : public BStringItem {
 
  private:
 	State*	fObject;
+};
+
+// ObjectListView
+class ObjectListView : public BListView {
+ public:
+			ObjectListView(BRect frame, const char* name, list_view_type listType)
+				: BListView(frame, name, listType)
+			{
+			}
+
+	virtual	void KeyDown(const char* bytes, int32 numBytes)
+			{
+				switch (*bytes) {
+					case B_DELETE:
+						Window()->PostMessage(MSG_REMOVE_OBJECT);
+						break;
+					default:
+						BListView::KeyDown(bytes, numBytes);
+				}
+			}
 };
 
 // #pragma mark -
@@ -297,10 +318,10 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	b.top += 10.0;
 	b.InsetBy(9.0, 7.0);
 	b.left = b.left + b.Width() / 2.0 + 6.0;
-	b.right = b.right - B_V_SCROLL_BAR_WIDTH;
+	b.right -= B_V_SCROLL_BAR_WIDTH;
 b.bottom = fDrawingModeMF->Frame().top - 5.0;
 
-	fObjectLV = new BListView(b, "object list", B_MULTIPLE_SELECTION_LIST);
+	fObjectLV = new ObjectListView(b, "object list", B_MULTIPLE_SELECTION_LIST);
 	fObjectLV->SetSelectionMessage(new BMessage(MSG_OBJECT_SELECTED));
 
 	// wrap a scroll view around the list view
@@ -308,6 +329,20 @@ b.bottom = fDrawingModeMF->Frame().top - 5.0;
 								 B_FOLLOW_NONE, 0, false, true,
 								 B_FANCY_BORDER);
 	controlGroup->AddChild(scrollView);
+
+	// add a dummy tab view
+	b.top = b.bottom + 10.0;
+	b.right += B_V_SCROLL_BAR_WIDTH;
+	b.bottom = controlGroup->Bounds().bottom - 7.0;
+	BTabView* tabView = new BTabView(b, "tab view", B_WIDTH_FROM_WIDEST, 
+									 B_FOLLOW_ALL, B_FULL_UPDATE_ON_RESIZE |
+									 B_WILL_DRAW | B_NAVIGABLE_JUMP |
+									 B_FRAME_EVENTS | B_NAVIGABLE);
+	
+	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
+	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
+	tabView->AddTab(new BView(BRect(0, 0, 40, 40), "T", B_FOLLOW_ALL, 0));
+	controlGroup->AddChild(tabView);
 
 	// enforce some size limits
 	float minWidth = controlGroup->Frame().Width() + 30.0;
@@ -375,19 +410,28 @@ ObjectWindow::MessageReceived(BMessage* message)
 			fClearB->SetEnabled(fObjectView->CountObjects() > 0);
 			break;
 		case MSG_OBJECT_SELECTED:
-printf("MSG_OBJECT_SELECTED\n");
 			if (ObjectItem* item = (ObjectItem*)fObjectLV->ItemAt(fObjectLV->CurrentSelection(0))) {
 				fObjectView->SetState(item->Object());
 			} else
 				fObjectView->SetState(NULL);
 			break;
+		case MSG_REMOVE_OBJECT:
+			while (ObjectItem* item = (ObjectItem*)fObjectLV->ItemAt(fObjectLV->CurrentSelection(0))) {
+				fObjectView->RemoveObject(item->Object());
+				fObjectLV->RemoveItem(item);
+				delete item;
+			}
+			break;
 		case MSG_NEW_OBJECT:
 			fObjectView->SetState(NULL);
 			break;
 		case MSG_CLEAR: {
-			BAlert *alert = new BAlert("Playground", "Do you really want to clear all drawing objects?", "No", "Yes");
+			BAlert *alert = new BAlert("Playground",
+									   "Do you really want to clear all drawing objects?",
+									   "No", "Yes");
 			if (alert->Go() == 1) {
 				fObjectView->MakeEmpty();
+				fObjectLV->MakeEmpty();
 			}
 			break;
 		}

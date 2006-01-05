@@ -26,7 +26,7 @@ class State {
 								 bool fill, float penSize);
 
 			void			MouseDown(BPoint where);
-			void			MouseUp(BPoint where);
+			void			MouseUp();
 			void			MouseMoved(BPoint where);
 			bool			IsTracking() const
 								{ return fTracking; }

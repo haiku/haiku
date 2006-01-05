@@ -52,7 +52,7 @@ State::MouseDown(BPoint where)
 
 // MouseUp
 void
-State::MouseUp(BPoint where)
+State::MouseUp()
 {
 	fTracking = TRACKING_NONE;
 }

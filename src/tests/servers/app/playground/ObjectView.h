@@ -38,6 +38,7 @@ class ObjectView : public BView {
 								{ return fObjectType; }
 
 			void			AddObject(State* state);
+			void			RemoveObject(State* state);
 			int32			CountObjects() const;
 			void			MakeEmpty();
 
