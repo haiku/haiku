@@ -360,7 +360,6 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	int32			i;
 	int32			colors[3];
 	BRect			r;
-	//BFont			font;
 	BView			*top_view, *left_view;
 	BMenu			*menu;
 	BButton			*button;
@@ -370,7 +369,6 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	BStringView		*string;
 	version_info	vi;
 	BRadioButton	*radio;
-	//BTextControl	*red_ctrl, *green_ctrl, *blue_ctrl;
 	
 	/* Check to see if we need the work-around for the case where
 	   DirectConnected is called back with B_BUFFER_RESET not set
@@ -512,7 +510,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	
 		r.Set(h, v, h+ANIM_LABEL+ANIM_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Animation:", menu);
-		popup->SetDivider(ANIM_LABEL);
+		popup->ResizeToPreferred();
+		popup->SetDivider(popup->StringWidth(popup->Label()));
 		top_view->AddChild(popup);
 	
 	h += ANIM_LABEL+ANIM_POPUP+H_BORDER;
@@ -536,7 +535,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	
 		r.Set(h, v, h+DISP_LABEL+DISP_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Display:", menu);
-		popup->SetDivider(DISP_LABEL);
+		popup->ResizeToPreferred();
+		popup->SetDivider(popup->StringWidth(popup->Label()));
 		top_view->AddChild(popup);
 	
 	h += DISP_LABEL+DISP_POPUP+H_BORDER;
@@ -557,6 +557,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 										  ButtonPicture(true, REFRESH_BUTTON_PICT),
 										  new BMessage(OPEN_REFRESH_MSG));
 		refresh_button->SetViewColor(B_TRANSPARENT_32_BIT);
+		refresh_button->ResizeToPreferred();
 		top_view->AddChild(refresh_button);
 											  
 	h += BUTTON_WIDTH+2*H_BORDER;
@@ -568,6 +569,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 										  ButtonPicture(true, COLOR_BUTTON_PICT),
 										  new BMessage(OPEN_COLOR_MSG));
 		color_button->SetViewColor(B_TRANSPARENT_32_BIT);
+		color_button->ResizeToPreferred();
 		top_view->AddChild(color_button);
 		
 										  
@@ -580,6 +582,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 											ButtonPicture(true, DENSITY_BUTTON_PICT),
 											new BMessage(OPEN_DENSITY_MSG));
 		density_button->SetViewColor(B_TRANSPARENT_32_BIT);
+		density_button->ResizeToPreferred();
 		top_view->AddChild(density_button);
 
 	h += BUTTON_WIDTH+H_BORDER;
@@ -598,6 +601,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	
 		r.Set(h, v, h+SPACE_LABEL+SPACE_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Space:", menu);
+		popup->ResizeToPreferred();
 		popup->SetDivider(SPACE_LABEL);
 		top_view->AddChild(popup);
 	
@@ -613,13 +617,16 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	v2 = LEFT_OFFSET;
 	h = h2;
 	v = v2;
-
+		
 		/* status box */	
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+STATUS_BOX-1);
 		box = new BBox(r);
 		box->SetLabel("Status");
 		left_view->AddChild(box);
-
+		float boxWidth, boxHeight;
+		box->GetPreferredSize(&boxWidth, &boxHeight);
+		boxWidth += r.left;
+		
 		h = BOX_H_OFFSET;	
 		v = BOX_V_OFFSET;
 			
@@ -627,6 +634,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
 			string = new BStringView(r, "", "Frames/s");
 			string->SetAlignment(B_ALIGN_CENTER);
+			string->ResizeToPreferred();
 			box->AddChild(string);
 	
 		v += STATUS_LABEL+STATUS_OFFSET;
@@ -638,6 +646,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			frames->SetFont(be_bold_font);
 			frames->SetFontSize(24.0);
 			frames->SetViewColor(B_TRANSPARENT_32_BIT);
+			frames->ResizeToPreferred();
 			box->AddChild(frames);
 		
 		v += STATUS_EDIT+STATUS_OFFSET;
@@ -646,6 +655,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
 			string = new BStringView(r, "", "CPU load");
 			string->SetAlignment(B_ALIGN_CENTER);
+			string->ResizeToPreferred();
 			box->AddChild(string);
 		
 		v += STATUS_LABEL+STATUS_OFFSET;
@@ -657,6 +667,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			cpu_load->SetFont(be_bold_font);
 			cpu_load->SetFontSize(24.0);
 			cpu_load->SetViewColor(B_TRANSPARENT_32_BIT);
+			cpu_load->ResizeToPreferred();
 			box->AddChild(cpu_load);
 	
 	v2 += STATUS_BOX+LEFT_OFFSET*2;
@@ -667,6 +678,11 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+FULL_SCREEN-1);
 		full_screen = new BCheckBox(r, "", "FullScreen", new BMessage(FULL_SCREEN_MSG));
 		full_screen->SetTarget(this);
+		full_screen->ResizeToPreferred();
+
+		float width, height;
+		full_screen->GetPreferredSize(&width, &height);
+		boxWidth = max_c(width + r.left, boxWidth);
 		left_view->AddChild(full_screen);
 		
 	v2 += FULL_SCREEN+LEFT_OFFSET*2;
@@ -677,6 +693,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+AUTO_DEMO-1);
 		button = new BButton(r, "", "Auto demo", new BMessage(AUTO_DEMO_MSG));
 		button->SetTarget(this);
+		button->ResizeToPreferred();
+		button->GetPreferredSize(&width, &height);
+		boxWidth = max_c(width + r.left, boxWidth);
 		left_view->AddChild(button);
 		
 	v2 += AUTO_DEMO+LEFT_OFFSET*2;
@@ -687,6 +706,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+SECOND_THREAD-1);
 		check_box = new BCheckBox(r, "", "2 Threads", new BMessage(SECOND_THREAD_MSG));
 		check_box->SetTarget(this);
+		check_box->ResizeToPreferred();
 		left_view->AddChild(check_box);
 		
 	v2 += SECOND_THREAD+LEFT_OFFSET*2;
@@ -705,6 +725,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color red check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Red", new BMessage(COLORS_RED_MSG));
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -713,6 +734,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Green", new BMessage(COLORS_GREEN_MSG));
 			check_box->SetValue(1);
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -721,6 +743,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Blue", new BMessage(COLORS_BLUE_MSG));
 			check_box->SetValue(1);
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -729,6 +752,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Yellow", new BMessage(COLORS_YELLOW_MSG));
 			check_box->SetValue(1);
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -736,6 +760,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color orange check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Orange", new BMessage(COLORS_ORANGE_MSG));
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -743,6 +768,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color pink check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Pink", new BMessage(COLORS_PINK_MSG));
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -750,6 +776,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color white check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "White", new BMessage(COLORS_WHITE_MSG));
+			check_box->ResizeToPreferred();
 			box->AddChild(check_box);
 
 	v2 += COLORS_BOX+LEFT_OFFSET*2;
@@ -769,6 +796,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "None", new BMessage(SPECIAL_NONE_MSG));
 			radio->SetValue(1);
+			radio->ResizeToPreferred();
 			box->AddChild(radio);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -776,6 +804,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* comet special animation radio button */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Comet", new BMessage(SPECIAL_COMET_MSG));
+			radio->ResizeToPreferred();
 			box->AddChild(radio);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -783,6 +812,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* novas special animation radio button */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Novas", new BMessage(SPECIAL_NOVAS_MSG));
+			radio->ResizeToPreferred();
 			box->AddChild(radio);
 	
 		v += COLORS_LABEL+COLORS_OFFSET;
@@ -791,10 +821,13 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Battle", new BMessage(SPECIAL_BATTLE_MSG));
 			radio->SetEnabled(false);
+			radio->ResizeToPreferred();
 			box->AddChild(radio);
 
+	left_view->ResizeTo(max_c(boxWidth + 2, left_view->Bounds().Width()), left_view->Bounds().Height());
+
 	/* animation area */
-	r.Set(LEFT_WIDTH, TOP_LEFT_LIMIT, frame.right, frame.bottom);
+	r.Set(left_view->Frame().right, TOP_LEFT_LIMIT, frame.right, frame.bottom);
 	background = new ChartView(r);
 	background->SetViewColor(0, 0, 0);
 	AddChild(background);
