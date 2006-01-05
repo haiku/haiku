@@ -719,14 +719,32 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
-#if 0
+
 		case AS_CREATE_PICTURE:
 		{
-			// TODO: Implement AS_CREATE_PICTURE
-			STRACE(("ServerApp %s: Create Picture unimplemented\n", Signature()));
+			// TODO: Maybe rename this to AS_UPLOAD_PICTURE ?
+			STRACE(("ServerApp %s: Create Picture\n", Signature()));
+			ServerPicture *picture = CreatePicture();
+			if (picture != NULL) {
+				int32 subPicturesCount = 0;
+				link.Read<int32>(&subPicturesCount);
+				for (int32 c = 0; c < subPicturesCount; c++) {
+					// TODO: Support nested pictures
+				} 
+				
+				int32 size = 0;
+				link.Read<int32>(&size);
+				link.Read(const_cast<void *>(picture->Data()), size);
+				
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(picture->Token());
+			} else
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
 			break;
 		}
-#endif
+
 		case AS_DELETE_PICTURE:
 		{
 			STRACE(("ServerApp %s: Delete Picture\n", Signature()));
@@ -758,23 +776,28 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();	
 			break;
 		}
-#if 0
+
 		case AS_DOWNLOAD_PICTURE:
 		{
-			STRACE(("ServerApp %s: Download Picture unimplemented\n", Signature()));
+			STRACE(("ServerApp %s: Download Picture\n", Signature()));
 			int32 token;
 			link.Read<int32>(&token);
-			ServerPicture *picture = App()->FindPicture(token);
+			ServerPicture *picture = FindPicture(token);
 			if (picture != NULL) {
-				link.StartMessage(B_OK);	
+				fLink.StartMessage(B_OK);
+				
+				// TODO: support nested pictures (subpictures)
+				fLink.Attach<int32>(0); // number of subpictures
+				fLink.Attach<int32>(picture->DataLength());
+				fLink.Attach(picture->Data(), picture->DataLength());
 			} else
-				link.StartMessage(B_ERROR);
+				fLink.StartMessage(B_ERROR);
 			
-			link.Flush();
+			fLink.Flush();
 			
 			break;
 		}
-#endif
+
 		case AS_COUNT_WORKSPACES:
 		{
 			DesktopSettings settings(fDesktop);
