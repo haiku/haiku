@@ -205,7 +205,7 @@ rtc_tm_to_secs(const struct tm *t)
 	uint32 time = 0;
 	uint32 i;
 
-	wholeYear = 1900 + t->tm_year;
+	wholeYear = RTC_EPOCHE_BASE_YEAR + t->tm_year;
 
 	// ToDo: get rid of these loops and compute the correct value
 	//	i.e. days = (long)(year > 0) + year*365 + --year/4 - year/100 + year/400;
@@ -328,7 +328,7 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 	// Since this is shared data, we need to update it atomically.
 	if (!sIsGMT) {
 		arch_rtc_set_system_time_offset(sRealTimeData,
-			sTimezoneOffset - offset);
+			arch_rtc_get_system_time_offset(sRealTimeData) + sTimezoneOffset - offset);
 	}
 
 	sTimezoneOffset = offset;
