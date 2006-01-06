@@ -1,33 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ListView.cpp
-//	Author:			Ulrich Wimboeck
-//					Marc Flerackers (mflerackers@androme.be)
-//	Description:	BListView represents a one-dimensional list view.
-//------------------------------------------------------------------------------
+/*
+ *	Copyright (c) 2001-2006, Haiku, Inc.
+ *  Distributed under the terms of the MIT license.
+ *
+ *	Authors:	
+ *		Ulrich Wimboeck
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stephan Assmus <superstippi@gmx.de>
+ */
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <stdio.h>
 
 #include <ListView.h>
@@ -37,13 +18,14 @@
 #include <PropertyInfo.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
+struct track_data {
+	BPoint		drag_start;
+	int32		item_index;
+	bool		was_selected;
+	bool		try_drag;
+};
 
-// Local Includes --------------------------------------------------------------
 
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 static property_info prop_list[] =
 {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
@@ -305,6 +287,12 @@ BListView::MouseDown(BPoint point)
 	message->FindInt32("modifiers", &modifiers);
 
 	int index = IndexOf(point);
+
+	fTrack->drag_start = point;
+	fTrack->item_index = index;
+	fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
+	fTrack->try_drag = true;
+
 	if (index > -1) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
 			if (modifiers & B_CONTROL_KEY) {
@@ -1165,7 +1153,8 @@ BListView::_InitObject(list_view_type type)
 	fWidth = Bounds().Width();
 	fSelectMessage = NULL;
 	fScrollView = NULL;
-	fTrack = NULL;
+	fTrack = new track_data;
+	fTrack->try_drag = false;
 }
 
 // _FixupScrollBar
@@ -1393,6 +1382,16 @@ BListView::_DeselectAll(int32 except_from, int32 except_to)
 bool
 BListView::_TryInitiateDrag(BPoint where)
 {
+	if (!fTrack->try_drag | fTrack->item_index < 0)
+		return false;
+
+	BPoint offset = where - fTrack->drag_start;
+	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
+
+	if (dragDistance > 5.0) {
+		fTrack->try_drag = false;
+		return InitiateDrag(fTrack->drag_start, fTrack->item_index, fTrack->was_selected);;
+	}
 	return false;
 }
 
@@ -1410,8 +1409,10 @@ BListView::_CalcFirstSelected(int32 after)
 
 	return -1;
 }
-//------------------------------------------------------------------------------
-int32 BListView::_CalcLastSelected(int32 before)
+
+
+int32
+BListView::_CalcLastSelected(int32 before)
 {
 	if (before < 0)
 		return -1;
@@ -1424,13 +1425,17 @@ int32 BListView::_CalcLastSelected(int32 before)
 
 	return -1;
 }
-//------------------------------------------------------------------------------
-void BListView::DrawItem(BListItem *item, BRect itemRect, bool complete)
+
+
+void
+BListView::DrawItem(BListItem *item, BRect itemRect, bool complete)
 {
 	item->DrawItem(this, itemRect, complete);
 }
-//------------------------------------------------------------------------------
-bool BListView::DoSwapItems(int32 a, int32 b)
+
+
+bool
+BListView::DoSwapItems(int32 a, int32 b)
 {
 	if (!fList.SwapItems(a, b))
 		return false;
@@ -1447,8 +1452,10 @@ bool BListView::DoSwapItems(int32 a, int32 b)
 
 	return true;
 }
-//------------------------------------------------------------------------------
-bool BListView::DoMoveItem(int32 from, int32 to)
+
+
+bool
+BListView::DoMoveItem(int32 from, int32 to)
 {
 	BRect frameFrom = ItemFrame(from);
 	BRect frameTo = ItemFrame(to);
@@ -1465,8 +1472,10 @@ bool BListView::DoMoveItem(int32 from, int32 to)
 
 	return true;
 }
-//------------------------------------------------------------------------------
-bool BListView::DoReplaceItem(int32 index, BListItem *item)
+
+
+bool
+BListView::DoReplaceItem(int32 index, BListItem *item)
 {
 	BRect frame = ItemFrame(index);
 
@@ -1480,8 +1489,10 @@ bool BListView::DoReplaceItem(int32 index, BListItem *item)
 
 	return true;
 }
-//------------------------------------------------------------------------------
-void BListView::RescanSelection(int32 from, int32 to)
+
+
+void
+BListView::RescanSelection(int32 from, int32 to)
 {
 	if (from > to)
 	{
@@ -1519,19 +1530,16 @@ void BListView::RescanSelection(int32 from, int32 to)
 		if (ItemAt(i)->IsSelected())
 			fLastSelected = i;
 }
-//------------------------------------------------------------------------------
-void BListView::DoMouseUp(BPoint where)
-{
-}
-//------------------------------------------------------------------------------
-void BListView::DoMouseMoved(BPoint where)
-{
-}
-//------------------------------------------------------------------------------
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */
+
+void
+BListView::DoMouseUp(BPoint where)
+{
+}
+
+
+void
+BListView::DoMouseMoved(BPoint where)
+{
+}
+
