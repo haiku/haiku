@@ -2287,8 +2287,10 @@ BView::DrawBitmap(const BBitmap *bitmap)
 void
 BView::DrawBitmap(const BBitmap *bitmap, BPoint where)
 {
-	DrawBitmapAsync(bitmap, where);
-	Sync();
+	if (fOwner) {
+		DrawBitmapAsync(bitmap, where);
+		Sync();
+	}
 }
 
 
@@ -2302,8 +2304,10 @@ BView::DrawBitmap(const BBitmap *bitmap, BRect dstRect)
 void
 BView::DrawBitmap(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 {
-	DrawBitmapAsync(bitmap, srcRect, dstRect);
-	Sync();
+	if (fOwner) {
+		DrawBitmapAsync(bitmap, srcRect, dstRect);
+		Sync();
+	}
 }
 
 
@@ -3329,32 +3333,6 @@ BView::RemoveSelf()
 	if (!fParent || !fParent->_RemoveChildFromList(this))
 		return false;
 
-	if (fOwner) {
-		check_lock();
-
-		// make sure our owner doesn't need us anymore
-
-		if (fOwner->CurrentFocus() == this)
-			MakeFocus(false);
-
-		if (fOwner->fDefaultButton == this)
-			fOwner->SetDefaultButton(NULL);
-
-		if (fOwner->fKeyMenuBar == this)
-			fOwner->fKeyMenuBar = NULL;
-
-		if (fOwner->fLastMouseMovedView == this)
-			fOwner->fLastMouseMovedView = NULL;
-
-		if (fOwner->fLastViewToken == _get_object_token_(this))
-			fOwner->fLastViewToken = B_NULL_TOKEN;
-
-		BWindow *owner = fOwner;
-		_SetOwner(NULL);
-
-		owner->fLink->StartMessage(AS_LAYER_DELETE);
-	}
-
 	STRACE(("DONE: BView(%s)::removeSelf()\n", Name()));
 
 	return true;
@@ -4115,9 +4093,33 @@ BView::_Detach()
 	}
 
 	AllDetached();
-}
 
-#include <stdio.h>
+	if (fOwner) {
+		check_lock();
+
+		// make sure our owner doesn't need us anymore
+
+		if (fOwner->CurrentFocus() == this)
+			MakeFocus(false);
+
+		if (fOwner->fDefaultButton == this)
+			fOwner->SetDefaultButton(NULL);
+
+		if (fOwner->fKeyMenuBar == this)
+			fOwner->fKeyMenuBar = NULL;
+
+		if (fOwner->fLastMouseMovedView == this)
+			fOwner->fLastMouseMovedView = NULL;
+
+		if (fOwner->fLastViewToken == _get_object_token_(this))
+			fOwner->fLastViewToken = B_NULL_TOKEN;
+
+		BWindow *owner = fOwner;
+		_SetOwner(NULL);
+
+		owner->fLink->StartMessage(AS_LAYER_DELETE);
+	}
+}
 
 void
 BView::_Draw(BRect updateRect)
@@ -4143,9 +4145,9 @@ BView::_Draw(BRect updateRect)
 			Draw(updateRect);
 			PopState();
 		}
-	} else {
-		// TODO: Find out what happens on R5 if a view has ViewColor() = 
-		// B_TRANSPARENT_COLOR but not B_WILL_DRAW
+//	} else {
+		// ViewColor() == B_TRANSPARENT_COLOR and no B_WILL_DRAW
+		// -> View is simply not drawn at all
 	}
 
 	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {

@@ -318,6 +318,9 @@ BWindow::~BWindow()
 		delete (Shortcut *)fShortcuts.ItemAt(index);
 	}
 
+	fTopView->RemoveSelf();
+	delete fTopView;
+
 	// TODO: release other dynamically-allocated objects
 
 	// Deleting this semaphore will tell open menus to quit.
@@ -415,9 +418,6 @@ BWindow::Quit()
 	while (!IsHidden())	{ 
 		Hide(); 
 	}
-
-	// ... also its children
-	//detachTopView();
 
 	if (fFlags & B_QUIT_ON_WINDOW_CLOSE)
 		be_app->PostMessage(B_QUIT_REQUESTED);
