@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,14 +9,14 @@
  */
 
 .section .init
-	// the image ID and program args are still on the stack
+	// the image ID is still on the stack
 	call	_init_after
 	movl	%ebp, %esp
 	popl	%ebp
 	ret
 
 .section .fini
-	// the image ID and program args are still on the stack
+	// the image ID is still on the stack
 	call	_term_after
 	movl	%ebp, %esp
 	popl	%ebp

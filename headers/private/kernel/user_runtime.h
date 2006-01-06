@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -15,6 +15,15 @@
 
 #define MAGIC_APP_NAME	"_APP_"
 
+struct uspace_program_args {
+	char program_name[B_OS_NAME_LENGTH];
+	char program_path[B_PATH_NAME_LENGTH];
+	int  argc;
+	int  envc;
+	char **argv;
+	char **envp;
+};
+
 struct rld_export {
 	// runtime linker API export
 	image_id (*load_add_on)(char const *path, uint32 flags);
@@ -25,20 +34,10 @@ struct rld_export {
 		int32 *nameLength, int32 *symbolType, void **_location);
 	status_t (*test_executable)(const char *path, uid_t user, gid_t group,
 		char *starter);
+
+	const struct uspace_program_args *program_args;
 };
 
-struct uspace_program_args {
-	char program_name[B_OS_NAME_LENGTH];
-	char program_path[B_PATH_NAME_LENGTH];
-	int  argc;
-	int  envc;
-	char **argv;
-	char **envp;
-
-	/*
-	 * hooks into rld for POSIX and BeOS library/module loading
-	 */
-	struct rld_export *rld_export;
-};
+extern struct rld_export *__gRuntimeLoader;
 
 #endif	/* KERNEL_USER_RUNTIME_H_ */

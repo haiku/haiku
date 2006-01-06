@@ -1,8 +1,28 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+
+#include <runtime_loader.h>
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "rld_priv.h"
+
+
+//#define TRACE_RLD
+#ifdef TRACE_RLD
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 
 static int
@@ -93,11 +113,7 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 }
 
 
-/*
- * rldelf.c requires this function to be implemented on a per-cpu basis
- */
-
-static status_t
+status_t
 arch_relocate_image(image_t *image)
 {
 	status_t status;

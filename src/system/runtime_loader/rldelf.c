@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -39,7 +39,6 @@
 
 
 // ToDo: implement better locking strategy
-// ToDo: implement unload_program()
 // ToDo: implement lazy binding
 
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
@@ -55,6 +54,7 @@ enum {
 	RFLAG_RW					= 0x0001,
 	RFLAG_ANON					= 0x0002,
 
+	RFLAG_TERMINATED			= 0x0200,
 	RFLAG_INITIALIZED			= 0x0400,
 	RFLAG_SYMBOLIC				= 0x0800,
 	RFLAG_RELOCATED				= 0x1000,
@@ -73,12 +73,11 @@ enum {
 									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
 
-typedef void (libinit_f)(unsigned, struct uspace_program_args const *);
-
-static image_queue_t gLoadedImages = {0, 0};
-static image_queue_t gLoadingImages = {0, 0};
-static image_queue_t gDisposableImages = {0, 0};
-static uint32 gLoadedImageCount = 0;
+static image_queue_t sLoadedImages = {0, 0};
+static image_queue_t sLoadingImages = {0, 0};
+static image_queue_t sDisposableImages = {0, 0};
+static uint32 sLoadedImageCount = 0;
+static image_t *sProgramImage;
 
 // a recursive lock
 static sem_id rld_sem;
@@ -211,10 +210,10 @@ find_image(char const *name, uint32 typeMask)
 	bool isPath = (strchr(name, '/') != NULL);
 	image_t *image;
 
-	image = find_image_in_queue(&gLoadedImages, name, isPath, typeMask);
+	image = find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
 
 	if (!image)
-		image = find_image_in_queue(&gLoadingImages, name, isPath, typeMask);
+		image = find_image_in_queue(&sLoadingImages, name, isPath, typeMask);
 
 	return image;
 }
@@ -225,7 +224,7 @@ find_loaded_image_by_id(image_id id)
 {
 	image_t *image;
 
-	for (image = gLoadedImages.head; image; image = image->next) {
+	for (image = sLoadedImages.head; image; image = image->next) {
 		if (image->id == id)
 			return image;
 	}
@@ -496,7 +495,7 @@ remap_images(void)
 	image_t *image;
 	uint32 i;
 
-	for (image = gLoadedImages.head; image != NULL; image = image->next) {
+	for (image = sLoadedImages.head; image != NULL; image = image->next) {
 		for (i = 0; i < image->num_regions; i++) {
 			if ((image->regions[i].flags & RFLAG_RW) == 0
 				&& (image->regions[i].flags & RFLAG_REMAPPED) == 0) {
@@ -732,7 +731,7 @@ find_symbol_in_loaded_images(image_t **_image, const char *name)
 {
 	image_t *image;
 
-	for (image = gLoadedImages.head; image; image = image->next) {
+	for (image = sLoadedImages.head; image; image = image->next) {
 		struct Elf32_Sym *symbol;
 
 		if (image->dynamic_ptr == NULL)
@@ -749,7 +748,7 @@ find_symbol_in_loaded_images(image_t **_image, const char *name)
 }
 
 
-static int
+int
 resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 {
 	struct Elf32_Sym *sym2;
@@ -799,9 +798,6 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 			return B_NO_ERROR;
 	}
 }
-
-
-#include "arch/rldreloc.inc"
 
 
 static void
@@ -974,7 +970,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 
 	_kern_close(fd);
 
-	enqueue_image(&gLoadedImages, image);
+	enqueue_image(&sLoadedImages, image);
 
 	*_image = image;
 	return B_OK;
@@ -1031,6 +1027,7 @@ load_dependencies(image_t *image)
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
 				neededOffset = d[i].d_un.d_val;
+
 				status = load_container(STRING(image, neededOffset),
 					B_LIBRARY_IMAGE, rpath, &image->needed[j]);
 				if (status < B_OK)
@@ -1040,9 +1037,7 @@ load_dependencies(image_t *image)
 				break;
 
 			default:
-				/*
-				 * ignore any other tag
-				 */
+				// ignore any other tag
 				continue;
 		}
 	}
@@ -1079,12 +1074,12 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 {
 	image_t **list;
 
-	list = rldalloc(gLoadedImageCount * sizeof(image_t *));
+	list = rldalloc(sLoadedImageCount * sizeof(image_t *));
 	if (list == NULL) {
 		FATAL("memory shortage in get_sorted_image_list()");
 		return 0; // B_NO_MEMORY
 	}
-	memset(list, 0, gLoadedImageCount * sizeof(image_t *));
+	memset(list, 0, sLoadedImageCount * sizeof(image_t *));
 
 	*_list = list;
 	return topological_sort(image, 0, list, sortFlag);
@@ -1128,12 +1123,8 @@ init_dependencies(image_t *image, bool initHead)
 
 	TRACE(("%ld: init dependencies\n", find_thread(NULL)));
 	for (i = 0; i < count; i++) {
-		addr_t _initf = initList[i]->init_routine;
-		libinit_f *initf = (libinit_f *)(_initf);
-
 		TRACE(("%ld:  init: %s\n", find_thread(NULL), initList[i]->name));
-		if (initf)
-			initf(initList[i]->id, gProgramArgs);
+		arch_call_init(initList[i]);
 	}
 	TRACE(("%ld:  init done.\n", find_thread(NULL)));
 
@@ -1150,8 +1141,8 @@ put_image(image_t *image)
 	if (atomic_add(&image->ref_count, -1) == 1) {
 		size_t i;
 
-		dequeue_image(&gLoadedImages, image);
-		enqueue_image(&gDisposableImages, image);
+		dequeue_image(&sLoadedImages, image);
+		enqueue_image(&sDisposableImages, image);
 
 		for (i = 0; i < image->num_needed; i++) {
 			put_image(image->needed[i]);
@@ -1169,42 +1160,50 @@ load_program(char const *path, void **_entry)
 {
 	status_t status;
 	image_t *image;
-	image_t *iter;
 
 	rld_lock();
 		// for now, just do stupid simple global locking
 
 	TRACE(("rld: load %s\n", path));
 
-	status = load_container(path, B_APP_IMAGE, NULL, &image);
+	status = load_container(path, B_APP_IMAGE, NULL, &sProgramImage);
 	if (status < B_OK) {
 		_kern_loading_app_failed(status);
 		rld_unlock();
 		return status;
 	}
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		status = load_dependencies(iter);
+	for (image = sLoadedImages.head; image != NULL; image = image->next) {
+		status = load_dependencies(image);
 		if (status < B_OK)
 			goto err;
 	}
 
-	status = relocate_dependencies(image);
+	status = relocate_dependencies(sProgramImage);
 	if (status < B_OK)
 		goto err;
 
-	init_dependencies(gLoadedImages.head, true);
+	// We patch any exported __gRuntimeLoader symbols to point to our private API
+	{
+		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(&image, "__gRuntimeLoader");
+		if (symbol != NULL) {
+			void **_export = (void **)(symbol->st_value + image->regions[0].delta);
+			*_export = &gRuntimeLoader;
+		}
+	}
+
+	init_dependencies(sLoadedImages.head, true);
 	remap_images();
 		// ToDo: once setup_system_time() is fixed, move this one line higher!
 
-	*_entry = (void *)(image->entry_point);
+	*_entry = (void *)(sProgramImage->entry_point);
 
 	rld_unlock();
-	return image->id;
+	return sProgramImage->id;
 
 err:
 	_kern_loading_app_failed(status);
-	delete_image(image);
+	delete_image(sProgramImage);
 	rld_unlock();
 	return status;
 }
@@ -1241,7 +1240,7 @@ load_library(char const *path, uint32 flags, bool addOn)
 		return status;
 	}
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
+	for (iter = sLoadedImages.head; iter; iter = iter->next) {
 		status = load_dependencies(iter);
 		if (status < B_OK)
 			goto err;
@@ -1269,7 +1268,7 @@ unload_library(image_id imageID, bool addOn)
 {
 	status_t status = B_BAD_IMAGE_ID;
 	image_t *image;
-	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
+	image_type type = addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE;
 
 	rld_lock();
 		// for now, just do stupid simple global locking
@@ -1278,7 +1277,7 @@ unload_library(image_id imageID, bool addOn)
 	 * we only check images that have been already initialized
 	 */
 
-	for (image = gLoadedImages.head; image; image = image->next) {
+	for (image = sLoadedImages.head; image; image = image->next) {
 		if (image->id == imageID) {
 			/*
 			 * do the unloading
@@ -1293,12 +1292,12 @@ unload_library(image_id imageID, bool addOn)
 	}
 
 	if (status == B_OK) {
-		while ((image = gDisposableImages.head) != NULL) {
+		while ((image = sDisposableImages.head) != NULL) {
 			// call image fini here...
 			if (image->term_routine)
-				((libinit_f *)image->term_routine)(image->id, gProgramArgs);
-	
-			dequeue_image(&gDisposableImages, image);
+				arch_call_term(image);
+
+			dequeue_image(&sDisposableImages, image);
 			unmap_image(image);
 	
 			delete_image(image);
@@ -1406,6 +1405,28 @@ elf_verify_header(void *header, int32 length)
 
 
 void
+terminate_program(void)
+{
+	image_t **termList;
+	uint32 count, i;
+
+	count = get_sorted_image_list(sProgramImage, &termList, RFLAG_TERMINATED);
+	if (count == 0)
+		return;
+
+	TRACE(("%ld: terminate dependencies\n", find_thread(NULL)));
+	for (i = count; i-- > 0;) {
+		TRACE(("%ld:  term: %s\n", find_thread(NULL), termList[i]->name));
+		arch_call_term(termList[i]);
+	}
+	TRACE(("%ld:  term done.\n", find_thread(NULL)));
+
+	rldfree(termList);
+	
+}
+
+
+void
 rldelf_init(void)
 {
 	rld_sem = create_sem(1, "rld_lock");
@@ -1425,6 +1446,6 @@ rldelf_init(void)
 			_kern_loading_app_failed(areaID);
 		}
 
-		area->loaded_images = &gLoadedImages;
+		area->loaded_images = &sLoadedImages;
 	}
 }

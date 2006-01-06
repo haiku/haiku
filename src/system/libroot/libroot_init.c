@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,11 +7,16 @@
 #include <libroot_private.h>
 #include <user_runtime.h>
 #include <fork.h>
+#include <image.h>
 
 #include <string.h>
 
 
-void initialize_before(image_id imageID, struct uspace_program_args const *args);
+void initialize_before(image_id imageID);
+
+struct rld_export *__gRuntimeLoader = NULL;
+	// This little bugger is set to something meaningful by the runtime loader
+	// Ugly, eh?
 
 char *__progname = NULL;
 int __libc_argc;
@@ -30,9 +35,9 @@ int _data_offset_main_;
 
 
 void
-initialize_before(image_id imageID, struct uspace_program_args const *args)
+initialize_before(image_id imageID)
 {
-	char *programPath = args->argv[0];
+	char *programPath = __gRuntimeLoader->program_args->argv[0];
 	if (programPath) {
 		if ((__progname = strrchr(programPath, '/')) == NULL)
 			__progname = programPath;
@@ -40,15 +45,13 @@ initialize_before(image_id imageID, struct uspace_program_args const *args)
 			__progname++;
 	}
 
-	__libc_argc = args->argc;
-	__libc_argv = args->argv;
+	__libc_argc = __gRuntimeLoader->program_args->argc;
+	__libc_argv = __gRuntimeLoader->program_args->argv;
 
 	__init_time();
-	__init_image(args);
-	__init_dlfcn(args);
 	__init_fork();
 	__init_heap();
-	__init_env(args);
+	__init_env(__gRuntimeLoader->program_args);
 }
 
 

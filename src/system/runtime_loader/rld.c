@@ -302,6 +302,6 @@ runtime_loader(void *_args)
 		return -1;
 
 	// call the program entry point (usually _start())
-	return ((int (*)(int, void *, void *, const void *))entry)(gProgramArgs->argc,
-		gProgramArgs->argv, gProgramArgs->envp, gProgramArgs);
+	return ((int (*)(int, void *, void *))entry)(gProgramArgs->argc,
+		gProgramArgs->argv, gProgramArgs->envp);
 }

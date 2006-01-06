@@ -3,6 +3,22 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <runtime_loader.h>
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "rld_priv.h"
+
+
+//#define TRACE_RLD
+#ifdef TRACE_RLD
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 static int
 relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
@@ -13,7 +29,7 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 }
 
 
-static status_t
+status_t
 arch_relocate_image(image_t *image)
 {
 	status_t status = B_NO_ERROR;

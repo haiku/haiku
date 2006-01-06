@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef LIBROOT_PRIVATE_H
@@ -15,8 +15,6 @@ struct real_time_data;
 status_t __parse_invoke_line(char *invoker, char ***_newArgs,
 			char * const **_oldArgs, int32 *_argCount);
 status_t __test_executable(const char *path, char *invoker);
-void __init_image(const struct uspace_program_args *args);
-void __init_dlfcn(const struct uspace_program_args *args);
 void __init_env(const struct uspace_program_args *args);
 void __init_heap(void);
 

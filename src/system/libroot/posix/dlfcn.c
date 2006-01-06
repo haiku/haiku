@@ -1,10 +1,10 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <libroot_private.h>
@@ -14,7 +14,6 @@
 #include <string.h>
 
 
-static struct rld_export const *sRuntimeLinker;
 static status_t sStatus;
 	// Note, this is not thread-safe
 
@@ -27,7 +26,7 @@ dlopen(char const *name, int mode)
 	if (name == NULL)
 		name = MAGIC_APP_NAME;
 
-	status = sRuntimeLinker->load_add_on(name, mode);
+	status = __gRuntimeLoader->load_add_on(name, mode);
 	sStatus = status;
 
 	if (status < B_OK)
@@ -43,7 +42,7 @@ dlsym(void *handle, char const *name)
 	status_t status;
 	void *location;
 
-	status = sRuntimeLinker->get_image_symbol((image_id)handle, name, B_SYMBOL_TYPE_ANY, &location);
+	status = get_image_symbol((image_id)handle, name, B_SYMBOL_TYPE_ANY, &location);
 	sStatus = status;
 
 	if (status < B_OK)
@@ -56,7 +55,7 @@ dlsym(void *handle, char const *name)
 int
 dlclose(void *handle)
 {
-	return sRuntimeLinker->unload_add_on((image_id)handle);
+	return unload_add_on((image_id)handle);
 }
 
 
@@ -69,9 +68,3 @@ dlerror(void)
 	return NULL;
 }
 
-
-void
-__init_dlfcn(const struct uspace_program_args *args)
-{
-	sRuntimeLinker = args->rld_export;
-}

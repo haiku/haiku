@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,8 +23,9 @@
 FUNCTION(_init):
 	pushl	%ebp
 	movl	%esp, %ebp
-	pushl	0xc(%ebp)	// program args
-	pushl	0x8(%ebp)	// image ID
+	pushl	%ebx
+		// BeOS unfortunately puts the image ID into %ebx instead of
+		// just passing it over the stack
 	call	_init_before
 	// crtbegin.o stuff comes here
 
@@ -32,7 +33,6 @@ FUNCTION(_init):
 FUNCTION(_fini):
 	pushl	%ebp
 	movl	%esp, %ebp
-	pushl	0xc(%ebp)	// program args
-	pushl	0x8(%ebp)	// image ID
+	pushl	%ebx
 	call	_term_before
-	// crtbegin.o stuff comes here
+	// crtend.o stuff comes here

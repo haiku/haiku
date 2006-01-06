@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,9 +12,6 @@
 #include <image.h>
 
 #include <stdlib.h>
-
-
-static struct rld_export const *sRuntimeLinker;
 
 
 thread_id
@@ -57,21 +54,21 @@ load_image(int32 argCount, const char **args, const char **environ)
 image_id
 load_add_on(char const *name)
 {
-	return sRuntimeLinker->load_add_on(name, 0);
+	return __gRuntimeLoader->load_add_on(name, 0);
 }
 
 
 status_t
 unload_add_on(image_id id)
 {
-	return sRuntimeLinker->unload_add_on(id);
+	return __gRuntimeLoader->unload_add_on(id);
 }
 
 
 status_t
 get_image_symbol(image_id id, char const *symbolName, int32 symbolType, void **_location)
 {
-	return sRuntimeLinker->get_image_symbol(id, symbolName, symbolType, _location);
+	return __gRuntimeLoader->get_image_symbol(id, symbolName, symbolType, _location);
 }
 
 
@@ -79,7 +76,7 @@ status_t
 get_nth_image_symbol(image_id id, int32 num, char *nameBuffer, int32 *_nameLength,
 	int32 *_symbolType, void **_location)
 {
-	return sRuntimeLinker->get_nth_image_symbol(id, num, nameBuffer, _nameLength, _symbolType, _location);
+	return __gRuntimeLoader->get_nth_image_symbol(id, num, nameBuffer, _nameLength, _symbolType, _location);
 }
 
 
@@ -188,14 +185,7 @@ __parse_invoke_line(char *invoker, char ***_newArgs,
 status_t
 __test_executable(const char *path, char *invoker)
 {
-	return sRuntimeLinker->test_executable(path, geteuid(), getegid(), invoker);
-}
-
-
-void
-__init_image(const struct uspace_program_args *args)
-{
-	sRuntimeLinker = args->rld_export;
+	return __gRuntimeLoader->test_executable(path, geteuid(), getegid(), invoker);
 }
 
 

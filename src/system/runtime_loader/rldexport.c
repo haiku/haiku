@@ -49,17 +49,18 @@ export_test_executable(const char *path, uid_t user, gid_t group, char *starter)
 }
 
 
-void 
+struct rld_export gRuntimeLoader = {
+	// dynamic loading support API
+	export_load_add_on,
+	export_unload_add_on,
+	export_get_image_symbol,
+	export_get_nth_image_symbol,
+	export_test_executable
+};
+
+
+void
 rldexport_init(void)
 {
-	static struct rld_export exports = {
-		// dynamic loading support API
-		export_load_add_on,
-		export_unload_add_on,
-		export_get_image_symbol,
-		export_get_nth_image_symbol,
-		export_test_executable
-	};
-
-	gProgramArgs->rld_export = &exports;
+	gRuntimeLoader.program_args = gProgramArgs;
 }

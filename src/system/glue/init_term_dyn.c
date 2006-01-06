@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,41 +19,41 @@
 
 
 void
-_init_before(image_id id, struct uspace_program_args *args)
+_init_before(image_id id)
 {
-	void (*before)(image_id, struct uspace_program_args *);
+	void (*before)(image_id);
 
-	if (args->rld_export->get_image_symbol(id, B_INIT_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&before) == B_OK)
-		before(id, args);
+	if (get_image_symbol(id, B_INIT_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&before) == B_OK)
+		before(id);
 }
 
 
 void
-_init_after(image_id id, struct uspace_program_args *args)
+_init_after(image_id id)
 {
-	void (*after)(image_id, struct uspace_program_args *);
+	void (*after)(image_id);
 
-	if (args->rld_export->get_image_symbol(id, B_INIT_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&after) == B_OK)
-		after(id, args);
+	if (get_image_symbol(id, B_INIT_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&after) == B_OK)
+		after(id);
 }
 
 
 void
-_term_before(image_id id, struct uspace_program_args *args)
+_term_before(image_id id)
 {
-	void (*before)(image_id, struct uspace_program_args *);
+	void (*before)(image_id);
 
-	if (args->rld_export->get_image_symbol(id, B_TERM_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&before) == B_OK)
-		before(id, args);
+	if (get_image_symbol(id, B_TERM_BEFORE_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&before) == B_OK)
+		before(id);
 }
 
 
 void
-_term_after(image_id id, struct uspace_program_args *args)
+_term_after(image_id id)
 {
-	void (*after)(image_id, struct uspace_program_args *);
+	void (*after)(image_id);
 
-	if (args->rld_export->get_image_symbol(id, B_TERM_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&after) == B_OK)
-		after(id, args);
+	if (get_image_symbol(id, B_TERM_AFTER_FUNCTION_NAME, B_SYMBOL_TYPE_TEXT, (void **)&after) == B_OK)
+		after(id);
 }
 

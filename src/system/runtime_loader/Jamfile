@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
-SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 UsePrivateHeaders runtime_loader ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
@@ -54,17 +53,21 @@ StaticLibrary librld.a :
 SEARCH on [ FGristFiles kernel_vsprintf.c ]
 	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+
 Objects
 	rld.c
 	rldexport.c
 	rldelf.c
 	rldheap.c
 	rldaux.c
+	arch_relocate.c
+	arch_call_init_term.c
 ;
 
 Ld rld.so :
-	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o ]
+	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o arch_relocate.o arch_call_init_term.o ]
 	librld.a
 	$(TARGET_GCC_LIBGCC)
-	: $(SUBDIR)/arch/$(TARGET_ARCH)/rld.ld
+	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/rld.ld
 ;
