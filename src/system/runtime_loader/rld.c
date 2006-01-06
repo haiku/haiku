@@ -283,6 +283,7 @@ int
 runtime_loader(void *_args)
 {
 	void *entry = NULL;
+	int returnCode;
 
 	gProgramArgs = (struct uspace_program_args *)_args;
 
@@ -302,6 +303,10 @@ runtime_loader(void *_args)
 		return -1;
 
 	// call the program entry point (usually _start())
-	return ((int (*)(int, void *, void *))entry)(gProgramArgs->argc,
+	returnCode = ((int (*)(int, void *, void *))entry)(gProgramArgs->argc,
 		gProgramArgs->argv, gProgramArgs->envp);
+
+	terminate_program();
+
+	return returnCode;
 }
