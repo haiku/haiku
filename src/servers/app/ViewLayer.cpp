@@ -84,6 +84,9 @@ ViewLayer::~ViewLayer()
 
 	delete fDrawState;
 
+	if (fWindow && this == fWindow->TopLayer())
+		fWindow->SetTopLayer(NULL);
+
 	// TODO: Don't know yet if we should also delete fPicture
 
 	// iterate over children and delete each one

@@ -159,6 +159,9 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 
 WindowLayer::~WindowLayer()
 {
+	if (fTopLayer)
+		fTopLayer->DetachedFromWindow();
+
 	delete fTopLayer;
 	delete fDecorator;
 }
@@ -501,23 +504,25 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 void
 WindowLayer::SetTopLayer(ViewLayer* topLayer)
 {
-	// the top layer is special, it has a coordinate system
-	// as if it was attached directly to the desktop, therefor,
-	// the coordinate conversion through the layer tree works
-	// as expected, since the top layer has no "parent" but has
-	// fFrame as if it had
-
 	fTopLayer = topLayer;
-
-	// make sure the location of the top layer on screen matches ours
-	fTopLayer->MoveBy(fFrame.left - fTopLayer->Frame().left,
-		fFrame.top - fTopLayer->Frame().top, NULL);
-
-	// make sure the size of the top layer matches ours
-	fTopLayer->ResizeBy(fFrame.Width() - fTopLayer->Frame().Width(),
-		fFrame.Height() - fTopLayer->Frame().Height(), NULL);
-
-	fTopLayer->AttachedToWindow(this);
+	
+	if (fTopLayer) {
+		// the top layer is special, it has a coordinate system
+		// as if it was attached directly to the desktop, therefor,
+		// the coordinate conversion through the layer tree works
+		// as expected, since the top layer has no "parent" but has
+		// fFrame as if it had
+	
+		// make sure the location of the top layer on screen matches ours
+		fTopLayer->MoveBy(fFrame.left - fTopLayer->Frame().left,
+			fFrame.top - fTopLayer->Frame().top, NULL);
+	
+		// make sure the size of the top layer matches ours
+		fTopLayer->ResizeBy(fFrame.Width() - fTopLayer->Frame().Width(),
+			fFrame.Height() - fTopLayer->Frame().Height(), NULL);
+	
+		fTopLayer->AttachedToWindow(this);
+	}
 }
 
 
@@ -1329,7 +1334,7 @@ WindowLayer::Backmost(WindowLayer* window, int32 workspace)
 /*!
 	\brief Returns the windows that's in front of the frontmost position
 		this window can get.
-		Returns NULL is this window can be the frontmost window.
+		Returns NULL if this window can be the frontmost window.
 */
 WindowLayer*
 WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
