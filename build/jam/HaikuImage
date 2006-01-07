@@ -4,15 +4,22 @@ AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
-BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown clockconfig
-	cmp comm cp csplit cut date dd desklink df diff dirname dstcheck du echo eject
-	env error factor false find finddir fortune gawk gdb grep groups head id ifconfig
-	iroster isvolume keymap kill less listarea listattr listdev listimage listport
-	listsem ln locate ls lsindex md5sum mimeset mkdir mkindex modifiers mount
-	mountvolume mv open ping play ppp_up pppconfig ps pwd query quit renice rm rmattr
-	rmdir roster safemode screen_blanker sed setversion setvolume sh shutdown sleep
-	strace sync sysinfo tail tee top touch traceroute translate true tty uname
-	unmount unzip uptime version waitfor xargs xres zip
+if $(TARGET_ARCH) = x86 {
+	X86_ONLY = "" ;
+} else if $(TARGET_ARCH) = ppc {
+	X86_ONLY = ;
+}
+
+BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown
+	clockconfig cmp comm cp csplit cut date dd desklink df diff dirname dstcheck
+	du echo eject env error factor false find finddir fortune gawk $(X86_ONLY)gdb
+	grep groups head id ifconfig iroster isvolume keymap kill less listarea
+	listattr listdev listimage listport listsem ln locate ls lsindex md5sum
+	mimeset mkdir mkindex modifiers mount mountvolume mv open ping play ppp_up
+	pppconfig ps pwd query quit renice rm rmattr rmdir roster safemode
+	screen_blanker sed setversion setvolume sh shutdown sleep strace sync sysinfo
+	tail tee top touch traceroute translate true tty uname unmount unzip uptime
+	version waitfor xargs xres zip
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
@@ -37,8 +44,8 @@ BEOS_NETWORK_INTERFACES = ethernet loopback ppp ;
 BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
 BEOS_NETWORK_PROTOCOLS = icmp ipv4 raw route tcp udp ;
 
-BEOS_ADD_ONS_ACCELERANTS = radeon.accelerant nv.accelerant mga.accelerant
-	nm.accelerant vesa.accelerant
+BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
+	mga.accelerant nm.accelerant vesa.accelerant
 ;
 BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
 	JPEGTranslator GIFTranslator BMPTranslator
@@ -53,14 +60,14 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = ich_ac97 auvia emuxki ;
-BEOS_ADD_ONS_DRIVERS_GRAPHICS = radeon.driver nv.driver nm.driver mga.driver
-	vesa
+BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
+	nm.driver mga.driver vesa
 ;
 BEOS_ADD_ONS_DRIVERS_NET = ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack_driver
 	# bcm440x bcm570x (only available with GPLd add-ons)
 ;
-BEOS_ADD_ONS_BUS_MANAGERS = pci isa ide scsi config_manager ;
+BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi config_manager ;
 BEOS_ADD_ONS_FILESYSTEMS = bfs ;
 
 
@@ -68,7 +75,8 @@ BEOS_ADD_ONS_FILESYSTEMS = bfs ;
 AddFilesToHaikuImage beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
-	: generic_ide_pci ide_isa ;
+	: generic_ide_pci $(X86_ONLY)ide_isa
+;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage beos system add-ons kernel file_systems : bfs ;
 AddFilesToHaikuImage beos system add-ons kernel generic
@@ -80,8 +88,8 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddDriversToHaikuImage				: console dprintf keyboard null random
-									  <driver>tty zero ;
+AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
+									  random <driver>tty zero ;
 AddDriversToHaikuImage audio multi	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
@@ -171,9 +179,9 @@ AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
-AddBootModuleSymlinks config_manager bfs block_io fast_log generic_ide_pci isa
-	ide ide_adapter ide_isa intel locked_pool pci scsi scsi_cd scsi_dsk
-	scsi_periph
+AddBootModuleSymlinks config_manager bfs block_io fast_log generic_ide_pci
+	$(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel locked_pool pci scsi
+	scsi_cd scsi_dsk scsi_periph
 ;
 
 # add-ons
