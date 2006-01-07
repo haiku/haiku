@@ -7,6 +7,7 @@
  *		François Revol
  */
 
+#include <string.h>
 
 #include <MediaRoster.h>
 #include <MediaTheme.h>
