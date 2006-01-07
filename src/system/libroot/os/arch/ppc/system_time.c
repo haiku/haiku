@@ -10,10 +10,10 @@
 #include <real_time_data.h>
 
 
-static vint64 *sConversionFactor;
+static vint32 *sConversionFactor;
 
 void
-__ppc_setup_system_time(vint64 *cvFactor)
+__ppc_setup_system_time(vint32 *cvFactor)
 {
 	sConversionFactor = cvFactor;
 }
@@ -26,13 +26,7 @@ bigtime_t
 system_time(void)
 {
 	uint64 timeBase = __ppc_get_time_base();
-	// TODO: The multiplication doesn't look that nice. The value can easily
-	// overflow when timeBase gets big enough. The limit for timebase is
-	// about 2^(64 - 20). This might sound a lot, but the conversion factor
-	// might be quite big. Assuming a worst case factor of 2^32,
-	// this would leave us with only about 2^12 = 4096 seconds we can
-	// represent. The actual factor for my Mac mini is about 40 * 10^6, i.e.
-	// the overflow limit is ca. 100 times greater, but that isn't more than
-	// five days either.
-	return (timeBase * 1000000ULL) / *sConversionFactor;
+
+	uint32 cv = *sConversionFactor;
+	return (timeBase >> 32) * cv + (((timeBase & 0xffffffff) * cv) >> 32);
 }

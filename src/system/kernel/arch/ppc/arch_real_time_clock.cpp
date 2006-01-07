@@ -22,8 +22,12 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 
 	// init the arch specific part of the real_time_data
 	data->arch_data.data[0].system_time_offset = 0;
+	// cvFactor = 2^32 * 1000000 / tbFreq
+	// => (tb * cvFactor) >> 32 = (tb * 2^32 * 1000000 / tbFreq) >> 32
+	//    = tb / tbFreq * 1000000 = time in us
 	data->arch_data.system_time_conversion_factor
-		= args->arch_args.time_base_frequency;
+		= uint32((uint64(1) << 32) * 1000000
+			/ args->arch_args.time_base_frequency);
 	data->arch_data.version = 0;
 
 	// init spinlock

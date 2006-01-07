@@ -15,7 +15,7 @@ struct ppc_real_time_data {
 
 struct arch_real_time_data {
 	struct ppc_real_time_data	data[2];
-	vint64						system_time_conversion_factor;
+	vint32						system_time_conversion_factor;
 	vint32						version;
 		// Since there're no cheap atomic_{set,get,add}64() on PPC 32 (i.e. one
 		// that doesn't involve a syscall), we can't have just a single
