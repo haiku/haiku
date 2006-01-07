@@ -140,10 +140,8 @@ status_t
 PPCOpenFirmware::InitRTC(struct kernel_args *kernelArgs,
 	struct real_time_data *data)
 {
-kprintf("PPCOpenFirmware::InitRTC(): opening \"%s\"...\n", kernelArgs->platform_args.rtc_path);
 	// open RTC
 	fRTC = of_open(kernelArgs->platform_args.rtc_path);
-kprintf("  of_open() returned: %d\n", fRTC);
 	if (fRTC == OF_FAILED) {
 		dprintf("PPCOpenFirmware::InitRTC(): Failed open RTC device!\n");
 		return B_ERROR;

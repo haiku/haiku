@@ -29,6 +29,9 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 	// init spinlock
 	sSetArchDataLock = 0;
 
+	// init system_time() conversion factor
+	__ppc_setup_system_time(&data->arch_data.system_time_conversion_factor);
+
 	return B_OK;
 }
 
