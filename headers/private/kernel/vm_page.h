@@ -23,6 +23,8 @@ status_t vm_page_init(struct kernel_args *args);
 status_t vm_page_init_post_area(struct kernel_args *args);
 status_t vm_page_init_post_thread(struct kernel_args *args);
 
+addr_t vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size);
+
 status_t vm_mark_page_inuse(addr_t page);
 status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);
 status_t vm_page_set_state(vm_page *page, int state);

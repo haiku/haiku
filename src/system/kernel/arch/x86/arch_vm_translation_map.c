@@ -30,8 +30,6 @@
 
 // 256 MB of iospace
 #define IOSPACE_SIZE (256*1024*1024)
-// put it 256 MB into kernel space
-#define IOSPACE_BASE (KERNEL_BASE + IOSPACE_SIZE)
 // 4 MB chunks, to optimize for 4 MB pages
 #define IOSPACE_CHUNK_SIZE (4*1024*1024)
 
@@ -808,7 +806,6 @@ arch_vm_translation_map_init(kernel_args *args)
 	TRACE(("iospace_pgtables %p\n", iospace_pgtables));
 
 	// init physical page mapper
-	sIOSpaceBase = IOSPACE_BASE;
 	error = generic_vm_physical_page_mapper_init(args, map_iospace_chunk,
 		&sIOSpaceBase, IOSPACE_SIZE, IOSPACE_CHUNK_SIZE);
 	if (error != B_OK)

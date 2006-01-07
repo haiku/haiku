@@ -71,19 +71,20 @@ restart:
 	// map it
 	if (first_free_vmapping < num_virtual_chunks) {
 		// there's a free hole
-		paddr_desc[index].va = first_free_vmapping * sIOSpaceChunkSize + sIOSpaceBase;
+		paddr_desc[index].va = first_free_vmapping * sIOSpaceChunkSize
+			+ sIOSpaceBase;
 		*va = paddr_desc[index].va + pa % sIOSpaceChunkSize;
 		virtual_pmappings[first_free_vmapping] = &paddr_desc[index];
 		paddr_desc[index].ref_count++;
 
 		// push up the first_free_vmapping pointer
-		for (; first_free_vmapping < num_virtual_chunks; first_free_vmapping++) {
+		for (; first_free_vmapping < num_virtual_chunks;
+			 first_free_vmapping++) {
 			if(virtual_pmappings[first_free_vmapping] == NULL)
 				break;
 		}
 
-		sMapIOSpaceChunk(paddr_desc[index].va,
-			index * sIOSpaceChunkSize);
+		sMapIOSpaceChunk(paddr_desc[index].va, index * sIOSpaceChunkSize);
 		mutex_unlock(&iospace_mutex);
 
 		return B_OK;
@@ -150,7 +151,6 @@ generic_put_physical_page(addr_t va)
 
 
 //	#pragma mark -
-//	VM API
 
 
 status_t
@@ -161,9 +161,24 @@ generic_vm_physical_page_mapper_init(kernel_args *args,
 	TRACE(("generic_vm_physical_page_mapper_init: entry\n"));
 
 	sMapIOSpaceChunk = mapIOSpaceChunk;
-	sIOSpaceBase = *ioSpaceBase;
 	sIOSpaceSize = ioSpaceSize;
 	sIOSpaceChunkSize = ioSpaceChunkSize;
+
+	// reserve virtual space for the IO space
+	// We reserve (ioSpaceChunkSize - B_PAGE_SIZE) bytes more, so that we
+	// can guarantee to align the base address to ioSpaceChunkSize.
+	sIOSpaceBase = vm_alloc_virtual_from_kernel_args(args,
+		sIOSpaceSize + ioSpaceChunkSize - B_PAGE_SIZE);
+	if (sIOSpaceBase == 0) {
+		panic("generic_vm_physical_page_mapper_init(): Failed to reserve IO "
+			"space in virtual address space!");
+		return B_ERROR;
+	}
+
+	// align the base address to chunk size
+	sIOSpaceBase = (sIOSpaceBase + ioSpaceChunkSize - 1) / ioSpaceChunkSize
+		* ioSpaceChunkSize;
+	*ioSpaceBase = sIOSpaceBase;
 
 	// allocate some space to hold physical page mapping info
 	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_kernel_args(args,
@@ -211,10 +226,6 @@ generic_vm_physical_page_mapper_init_post_area(kernel_args *args)
 	temp = (void *)sIOSpaceBase;
 	area_id ioSpaceArea = vm_create_null_area(vm_kernel_address_space_id(),
 		"iospace", &temp, B_EXACT_ADDRESS, sIOSpaceSize);
-	// TODO: We don't reserve the virtual address space for the IO space in
-	// generic_vm_physical_page_mapper_init() yet. So theoretically it could
-	// happen that a part of that space has been reserved by someone else in
-	// the meantime.
 	if (ioSpaceArea < 0) {
 		panic("generic_vm_physical_page_mapper_init_post_area(): Failed to "
 			"create null area for IO space!\n");

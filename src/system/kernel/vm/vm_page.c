@@ -1023,7 +1023,7 @@ static int dump_free_page_table(int argc, char **argv)
 #endif
 
 
-static addr_t
+addr_t
 vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size)
 {
 	addr_t spot = 0;
@@ -1048,10 +1048,11 @@ vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size)
 	if (spot == 0) {
 		// we hadn't found one between allocation ranges. this is ok.
 		// see if there's a gap after the last one
-		if (ka->virtual_allocated_range[last_valloc_entry].start 
-				+ ka->virtual_allocated_range[last_valloc_entry].size + size 
-			<= KERNEL_BASE + (KERNEL_SIZE - 1)) {
-			spot = ka->virtual_allocated_range[last_valloc_entry].start + ka->virtual_allocated_range[last_valloc_entry].size;
+		addr_t lastRangeEnd
+			= ka->virtual_allocated_range[last_valloc_entry].start 
+				+ ka->virtual_allocated_range[last_valloc_entry].size;
+		if (KERNEL_BASE + (KERNEL_SIZE - 1) - lastRangeEnd >= size) {
+			spot = lastRangeEnd;
 			ka->virtual_allocated_range[last_valloc_entry].size += size;
 			goto out;
 		}
