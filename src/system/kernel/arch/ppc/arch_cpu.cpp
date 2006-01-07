@@ -8,6 +8,8 @@
 
 
 #include <KernelExport.h>
+
+#include <arch_platform.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
@@ -196,7 +198,8 @@ error:
 status_t
 arch_cpu_shutdown(bool reboot)
 {
-	return EOPNOTSUPP;
+	PPCPlatform::Default()->ShutDown(reboot);
+	return B_ERROR;
 }
 
 

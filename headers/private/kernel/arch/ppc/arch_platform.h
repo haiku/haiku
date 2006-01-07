@@ -29,6 +29,8 @@ public:
 
 	virtual	void SetHardwareRTC(uint32 seconds) = 0;
 	virtual	uint32 GetHardwareRTC() = 0;
+
+	virtual	void ShutDown(bool reboot) = 0;
 };
 
 }	// namespace BPrivate

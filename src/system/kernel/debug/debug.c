@@ -326,6 +326,14 @@ cmd_reboot(int argc, char **argv)
 
 
 static int
+cmd_shutdown(int argc, char **argv)
+{
+	arch_cpu_shutdown(false);
+	return 0;
+}
+
+
+static int
 cmd_help(int argc, char **argv)
 {
 	debugger_command *command, *specified = NULL;
@@ -412,6 +420,7 @@ debug_init_post_vm(kernel_args *args)
 
 	add_debugger_command("help", &cmd_help, "List all debugger commands");
 	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
+	add_debugger_command("shutdown", &cmd_shutdown, "Shut down the system");
 	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
 	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
 	add_debugger_command("exit", &cmd_continue, NULL);

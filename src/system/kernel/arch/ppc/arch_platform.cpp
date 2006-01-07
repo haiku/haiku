@@ -58,6 +58,8 @@ public:
 	virtual	void SetHardwareRTC(uint32 seconds);
 	virtual	uint32 GetHardwareRTC();
 
+	virtual	void ShutDown(bool reboot);
+
 private:
 	int	fInput;
 	int	fOutput;
@@ -201,6 +203,18 @@ PPCOpenFirmware::GetHardwareRTC()
 	t.tm_mon--;
 
 	return rtc_tm_to_secs(&t);
+}
+
+// ShutDown
+void
+PPCOpenFirmware::ShutDown(bool reboot)
+{
+	if (reboot) {
+		of_interpret("reset-all", 0, 0);
+	} else {
+		// not standardized, so it might fail
+		of_interpret("shut-down", 0, 0);
+	}
 }
 
 
