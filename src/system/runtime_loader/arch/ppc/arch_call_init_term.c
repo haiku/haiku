@@ -17,13 +17,13 @@ typedef void (*init_term_function)(image_id);
 void
 arch_call_init(image_t *image)
 {
-	((init_term_function *)image->init_routine)(image->id);
+	((init_term_function)image->init_routine)(image->id);
 }
 
 
 void
 arch_call_term(image_t *image)
 {
-	((init_term_function *)image->term_routine)(image->id);
+	((init_term_function)image->term_routine)(image->id);
 }
 
