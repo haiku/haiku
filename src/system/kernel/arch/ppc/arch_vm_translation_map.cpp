@@ -61,10 +61,6 @@
 
 
 	TODO:
-	* The page table lies in physical memory and is identity mapped. Either
-	  the boot loader should already map it into the kernel address space or
-	  we need to remap here. Otherwise we can't create the area for obvious
-	  reasons.
 	* If we want to continue to use the OF services, we would need to add
 	  its address mappings to the kernel space. Unfortunately some stuff
 	  (especially RAM) is mapped in an address range without the kernel
@@ -87,6 +83,7 @@
 #include <arch_mmu.h>
 #include <stdlib.h>
 
+#include "generic_vm_physical_page_mapper.h"
 
 static struct page_table_entry_group *sPageTable;
 static size_t sPageTableSize;
@@ -94,10 +91,16 @@ static uint32 sPageTableHashMask;
 static area_id sPageTableArea;
 
 
-// 512 MB of iospace
-#define IOSPACE_SIZE (512*1024*1024)
-// put it 512 MB into kernel space
-#define IOSPACE_BASE (KERNEL_BASE + IOSPACE_SIZE)
+// 64 MB of iospace
+#define IOSPACE_SIZE (64*1024*1024)
+// We only have small (4 KB) pages. The only reason for choosing greater chunk
+// size is to keep the waste of memory limited, since the generic page mapper
+// allocates structures per physical/virtual chunk.
+// TODO: Implement a page mapper more suitable for small pages!
+#define IOSPACE_CHUNK_SIZE (16 * B_PAGE_SIZE)
+
+static addr_t sIOSpaceBase;
+
 
 // The VSID is a 24 bit number. The lower three bits are defined by the
 // (effective) segment number, which leaves us with a 21 bit space of
@@ -362,6 +365,19 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_ou
 }
 
 
+static status_t
+map_iospace_chunk(addr_t va, addr_t pa)
+{
+	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
+	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
+	if (va < sIOSpaceBase || va >= (sIOSpaceBase + IOSPACE_SIZE))
+		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
+
+	// map the pages
+	return ppc_map_address_range(va, pa, IOSPACE_CHUNK_SIZE);
+}
+
+
 static addr_t 
 get_mapped_size_tmap(vm_translation_map *map)
 {
@@ -418,23 +434,14 @@ flush_tmap(vm_translation_map *map)
 static status_t
 get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
 {
-	pa = ROUNDOWN(pa, PAGE_SIZE);
-
-	if (pa > IOSPACE_SIZE)
-		panic("get_physical_page_tmap: asked for pa 0x%lx, cannot provide\n", pa);
-
-	*va = (IOSPACE_BASE + pa);
-	return B_OK;
+	return generic_get_physical_page(pa, va, flags);
 }
 
 
 static status_t
 put_physical_page_tmap(addr_t va)
 {
-	if (va < IOSPACE_BASE || va >= IOSPACE_BASE + IOSPACE_SIZE)
-		panic("put_physical_page_tmap: va 0x%lx out of iospace region\n", va);
-
-	return B_OK;
+	return generic_put_physical_page(va);
 }
 
 
@@ -538,6 +545,52 @@ arch_vm_translation_map_init(kernel_args *args)
 	sPageTableSize = args->arch_args.page_table.size;
 	sPageTableHashMask = sPageTableSize / sizeof(page_table_entry_group) - 1;
 
+	// init physical page mapper
+	status_t error = generic_vm_physical_page_mapper_init(args,
+		map_iospace_chunk, &sIOSpaceBase, IOSPACE_SIZE, IOSPACE_CHUNK_SIZE);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+status_t
+arch_vm_translation_map_init_post_area(kernel_args *args)
+{
+	// If the page table doesn't lie within the kernel address space, we
+	// remap it.
+	if (!IS_KERNEL_ADDRESS(sPageTable)) {
+		addr_t newAddress = (addr_t)sPageTable;
+		status_t error = ppc_remap_address_range(&newAddress, sPageTableSize,
+			false);
+		if (error != B_OK) {
+			panic("arch_vm_translation_map_init_post_area(): Failed to remap "
+				"the page table!");
+			return error;
+		}
+
+		// set the new page table address
+		addr_t oldVirtualBase = (addr_t)(sPageTable);
+		sPageTable = (page_table_entry_group*)newAddress;
+
+		// unmap the old pages
+		ppc_unmap_address_range(oldVirtualBase, sPageTableSize);
+
+// TODO: We should probably map the page table via BAT. It is relatively large,
+// and due to being a hash table the access patterns might look sporadic, which
+// certainly isn't to the liking of the TLB.
+	}
+
+	// create an area to cover the page table
+	sPageTableArea = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
+		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	// init physical page mapper
+	status_t error = generic_vm_physical_page_mapper_init_post_area(args);
+	if (error != B_OK)
+		return error;
+
 	return B_OK;
 }
 
@@ -545,8 +598,62 @@ arch_vm_translation_map_init(kernel_args *args)
 status_t
 arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
+	// init physical page mapper
+	return generic_vm_physical_page_mapper_init_post_sem(args);
+}
+
+
+/**	Directly maps a page without having knowledge of any kernel structures.
+ *	Used only during VM setup.
+ *	It currently ignores the "attributes" parameter and sets all pages
+ *	read/write.
+ */
+
+status_t
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
+{
+	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
+
+	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
+	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
+
+	for (int32 i = 0; i < 8; i++) {
+		// 8 entries in a group
+		if (group->entry[i].valid)
+			continue;
+
+		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, false);
+		return B_OK;
+	}
+
+	hash = page_table_entry::SecondaryHash(hash);
+	group = &sPageTable[hash & sPageTableHashMask];
+
+	for (int32 i = 0; i < 8; i++) {
+		if (group->entry[i].valid)
+			continue;
+
+		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, true);
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
+// XXX currently assumes this translation map is active
+
+status_t 
+arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
+{
+	//PANIC_UNIMPLEMENTED();
+	panic("vm_translation_map_quick_query(): not yet implemented\n");
 	return B_OK;
 }
+
+
+// #pragma mark -
 
 
 status_t
@@ -619,138 +726,6 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 	if (unmap)
 		ppc_unmap_address_range(virtualAddress, size);
 
-	return B_OK;
-}
-
-
-status_t
-arch_vm_translation_map_init_post_area(kernel_args *args)
-{
-	// If the page table doesn't lie within the kernel address space, we
-	// remap it.
-	if (!IS_KERNEL_ADDRESS(sPageTable)) {
-		addr_t newAddress = (addr_t)sPageTable;
-		status_t error = ppc_remap_address_range(&newAddress, sPageTableSize,
-			false);
-		if (error != B_OK) {
-			panic("arch_vm_translation_map_init_post_area(): Failed to remap "
-				"the page table!");
-			return error;
-		}
-
-		// set the new page table address
-		addr_t oldVirtualBase = (addr_t)(sPageTable);
-		sPageTable = (page_table_entry_group*)newAddress;
-
-		// unmap the old pages
-		ppc_unmap_address_range(oldVirtualBase, sPageTableSize);
-
-// TODO: We should probably map the page table via BAT. It is relatively large,
-// and due to being a hash table the access patterns might look sporadic, which
-// certainly isn't to the liking of the TLB.
-	}
-
-	// create an area to cover the page table
-	sPageTableArea = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
-		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-#if 0
-	// ToDo: for now just map 0 - 512MB of physical memory to the iospace region
-	block_address_translation bat;
-
-	bat.Clear();
-	bat.SetVirtualAddress((void *)IOSPACE_BASE);
-	bat.page_index = IOSPACE_BASE;
-	bat.length = BAT_LENGTH_256MB;
-	bat.kernel_valid = true;
-	bat.SetPhysicalAddress(NULL);
-	bat.memory_coherent = true;
-	bat.protection = BAT_READ_WRITE;
-
-	set_ibat2(&bat);
-	set_dbat2(&bat);
-	isync();
-
-	bat.SetVirtualAddress((void *)(IOSPACE_BASE + 256 * 1024 * 1024));
-	bat.SetPhysicalAddress((void *)(256 * 1024 * 1024));
-
-	set_ibat3(&bat);
-	set_dbat3(&bat);
-	isync();
-/*
-		int ibats[8], dbats[8];
-
-		getibats(ibats);
-		getdbats(dbats);
-
-		// use bat 2 & 3 to do this
-		ibats[4] = dbats[4] = IOSPACE_BASE | BATU_LEN_256M | BATU_VS;
-		ibats[5] = dbats[5] = 0x0 | BATL_MC | BATL_PP_RW;
-		ibats[6] = dbats[6] = (IOSPACE_BASE + 256*1024*1024) | BATU_LEN_256M | BATU_VS;
-		ibats[7] = dbats[7] = (256*1024*1024) | BATL_MC | BATL_PP_RW;
-
-		setibats(ibats);
-		setdbats(dbats);
-*/
-
-	// create a region to cover the iospace
-	void *temp = (void *)IOSPACE_BASE;
-	vm_create_null_area(vm_kernel_address_space_id(), "iospace", &temp,
-		B_EXACT_ADDRESS, IOSPACE_SIZE);
-
-// TODO: Create areas for all OF mappings we want to keep. And unmap the others.
-#endif
-
-	return B_OK;
-}
-
-
-/**	Directly maps a page without having knowledge of any kernel structures.
- *	Used only during VM setup.
- *	It currently ignores the "attributes" parameter and sets all pages
- *	read/write.
- */
-
-status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
-	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
-{
-	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
-
-	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
-	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
-
-	for (int32 i = 0; i < 8; i++) {
-		// 8 entries in a group
-		if (group->entry[i].valid)
-			continue;
-
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, false);
-		return B_OK;
-	}
-
-	hash = page_table_entry::SecondaryHash(hash);
-	group = &sPageTable[hash & sPageTableHashMask];
-
-	for (int32 i = 0; i < 8; i++) {
-		if (group->entry[i].valid)
-			continue;
-
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, true);
-		return B_OK;
-	}
-
-	return B_ERROR;
-}
-
-
-// XXX currently assumes this translation map is active
-
-status_t 
-arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
-{
-	//PANIC_UNIMPLEMENTED();
-	panic("vm_translation_map_quick_query(): not yet implemented\n");
 	return B_OK;
 }
 
