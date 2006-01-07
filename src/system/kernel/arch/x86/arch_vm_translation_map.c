@@ -19,6 +19,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "generic_vm_physical_page_mapper.h"
+
 //#define TRACE_VM_TMAP
 #ifdef TRACE_VM_TMAP
 #	define TRACE(x) dprintf x
@@ -61,21 +63,7 @@ typedef struct page_directory_entry {
 	uint32	addr:20;
 } page_directory_entry;
 
-// data and structures used to represent physical pages mapped into iospace
-typedef struct paddr_chunk_descriptor {
-	struct paddr_chunk_descriptor *next_q; // must remain first in structure, queue code uses it
-	int ref_count;
-	addr_t va;
-} paddr_chunk_desc;
-
-static paddr_chunk_desc *paddr_desc;         // will be one per physical chunk
-static paddr_chunk_desc **virtual_pmappings; // will be one ptr per virtual chunk in iospace
-static int first_free_vmapping;
-static int num_virtual_chunks;
-static queue mapped_paddr_lru;
 static page_table_entry *iospace_pgtables = NULL;
-static mutex iospace_mutex;
-static sem_id iospace_full_sem;
 
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
@@ -95,6 +83,8 @@ static page_directory_entry *sKernelVirtualPageDirectory = NULL;
 
 static vm_translation_map *tmap_list;
 static spinlock tmap_list_lock;
+
+static addr_t sIOSpaceBase;
 
 #define CHATTY_TMAP 0
 
@@ -648,11 +638,11 @@ map_iospace_chunk(addr_t va, addr_t pa)
 
 	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
 	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
-	if (va < IOSPACE_BASE || va >= (IOSPACE_BASE + IOSPACE_SIZE))
+	if (va < sIOSpaceBase || va >= (sIOSpaceBase + IOSPACE_SIZE))
 		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
 
 	ppn = ADDR_SHIFT(pa);
-	pt = &iospace_pgtables[(va - IOSPACE_BASE) / B_PAGE_SIZE];
+	pt = &iospace_pgtables[(va - sIOSpaceBase) / B_PAGE_SIZE];
 	for (i = 0; i < 1024; i++) {
 		init_page_table_entry(&pt[i]);
 		pt[i].addr = ppn + i;
@@ -676,101 +666,14 @@ map_iospace_chunk(addr_t va, addr_t pa)
 static status_t
 get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
 {
-	int index;
-	paddr_chunk_desc *replaced_pchunk;
-
-restart:
-	mutex_lock(&iospace_mutex);
-
-	// see if the page is already mapped
-	index = pa / IOSPACE_CHUNK_SIZE;
-	if (paddr_desc[index].va != 0) {
-		if (paddr_desc[index].ref_count++ == 0) {
-			// pull this descriptor out of the lru list
-			queue_remove_item(&mapped_paddr_lru, &paddr_desc[index]);
-		}
-		*va = paddr_desc[index].va + pa % IOSPACE_CHUNK_SIZE;
-		mutex_unlock(&iospace_mutex);
-		return B_OK;
-	}
-
-	// map it
-	if (first_free_vmapping < num_virtual_chunks) {
-		// there's a free hole
-		paddr_desc[index].va = first_free_vmapping * IOSPACE_CHUNK_SIZE + IOSPACE_BASE;
-		*va = paddr_desc[index].va + pa % IOSPACE_CHUNK_SIZE;
-		virtual_pmappings[first_free_vmapping] = &paddr_desc[index];
-		paddr_desc[index].ref_count++;
-
-		// push up the first_free_vmapping pointer
-		for (; first_free_vmapping < num_virtual_chunks; first_free_vmapping++) {
-			if(virtual_pmappings[first_free_vmapping] == NULL)
-				break;
-		}
-
-		map_iospace_chunk(paddr_desc[index].va, index * IOSPACE_CHUNK_SIZE);
-		mutex_unlock(&iospace_mutex);
-
-		return B_OK;
-	}
-
-	// replace an earlier mapping
-	if (queue_peek(&mapped_paddr_lru) == NULL) {
-		// no free slots available
-		if (flags == PHYSICAL_PAGE_NO_WAIT) {
-			// punt back to the caller and let them handle this
-			mutex_unlock(&iospace_mutex);
-			return B_NO_MEMORY;
-		} else {
-			mutex_unlock(&iospace_mutex);
-			acquire_sem(iospace_full_sem);
-			goto restart;
-		}
-	}
-
-	replaced_pchunk = queue_dequeue(&mapped_paddr_lru);
-	paddr_desc[index].va = replaced_pchunk->va;
-	replaced_pchunk->va = 0;
-	*va = paddr_desc[index].va + pa % IOSPACE_CHUNK_SIZE;
-	paddr_desc[index].ref_count++;
-
-	map_iospace_chunk(paddr_desc[index].va, index * IOSPACE_CHUNK_SIZE);
-
-	mutex_unlock(&iospace_mutex);
-	return B_OK;
+	return generic_get_physical_page(pa, va, flags);
 }
 
 
 static status_t
 put_physical_page_tmap(addr_t va)
 {
-	paddr_chunk_desc *desc;
-
-	if (va < IOSPACE_BASE || va >= IOSPACE_BASE + IOSPACE_SIZE)
-		panic("someone called put_physical_page on an invalid va 0x%lx\n", va);
-	va -= IOSPACE_BASE;
-
-	mutex_lock(&iospace_mutex);
-
-	desc = virtual_pmappings[va / IOSPACE_CHUNK_SIZE];
-	if (desc == NULL) {
-		mutex_unlock(&iospace_mutex);
-		panic("put_physical_page called on page at va 0x%lx which is not checked out\n", va);
-		return B_ERROR;
-	}
-
-	if (--desc->ref_count == 0) {
-		// put it on the mapped lru list
-		queue_enqueue(&mapped_paddr_lru, desc);
-		// no sense rescheduling on this one, there's likely a race in the waiting
-		// thread to grab the iospace_mutex, which would block and eventually get back to
-		// this thread. waste of time.
-		release_sem_etc(iospace_full_sem, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-	mutex_unlock(&iospace_mutex);
-
-	return B_OK;
+	return generic_put_physical_page(va);
 }
 
 
@@ -881,6 +784,7 @@ status_t
 arch_vm_translation_map_init(kernel_args *args)
 {
 	cpuid_info info;
+	status_t error;
 
 	TRACE(("vm_translation_map_init: entry\n"));
 
@@ -898,26 +802,20 @@ arch_vm_translation_map_init(kernel_args *args)
 	tmap_list = NULL;
 
 	// allocate some space to hold physical page mapping info
-	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_kernel_args(args,
-		sizeof(paddr_chunk_desc) * 1024, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	num_virtual_chunks = IOSPACE_SIZE / IOSPACE_CHUNK_SIZE;
-	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_kernel_args(args,
-		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	iospace_pgtables = (page_table_entry *)vm_alloc_from_kernel_args(args,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	TRACE(("paddr_desc %p, virtual_pmappings %p, iospace_pgtables %p\n",
-		paddr_desc, virtual_pmappings, iospace_pgtables));
+	TRACE(("iospace_pgtables %p\n", iospace_pgtables));
+
+	// init physical page mapper
+	sIOSpaceBase = IOSPACE_BASE;
+	error = generic_vm_physical_page_mapper_init(args, map_iospace_chunk,
+		&sIOSpaceBase, IOSPACE_SIZE, IOSPACE_CHUNK_SIZE);
+	if (error != B_OK)
+		return error;
 
 	// initialize our data structures
-	memset(paddr_desc, 0, sizeof(paddr_chunk_desc) * 1024);
-	memset(virtual_pmappings, 0, sizeof(paddr_chunk_desc *) * num_virtual_chunks);
-	first_free_vmapping = 0;
-	queue_init(&mapped_paddr_lru);
 	memset(iospace_pgtables, 0, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)));
-	iospace_mutex.sem = -1;
-	iospace_mutex.holder = -1;
-	iospace_full_sem = -1;
 
 	TRACE(("mapping iospace_pgtables\n"));
 
@@ -932,7 +830,7 @@ arch_vm_translation_map_init(kernel_args *args)
 		virt_pgtable = (addr_t)iospace_pgtables;
 		for (i = 0; i < (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)); i++, virt_pgtable += B_PAGE_SIZE) {
 			early_query(virt_pgtable, &phys_pgtable);
-			e = &page_hole_pgdir[(IOSPACE_BASE / (B_PAGE_SIZE * 1024)) + i];
+			e = &page_hole_pgdir[(sIOSpaceBase / (B_PAGE_SIZE * 1024)) + i];
 			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
@@ -953,10 +851,7 @@ arch_vm_translation_map_init(kernel_args *args)
 status_t
 arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
-	mutex_init(&iospace_mutex, "iospace_mutex");
-	iospace_full_sem = create_sem(1, "iospace_full_sem");
-
-	return iospace_full_sem >= B_OK ? B_OK : iospace_full_sem;
+	return generic_vm_physical_page_mapper_init_post_sem(args);
 }
 
 
@@ -966,6 +861,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	// now that the vm is initialized, create a region that represents
 	// the page hole
 	void *temp;
+	status_t error;
 
 	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
@@ -978,25 +874,14 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	temp = (void *)paddr_desc;
-	create_area("physical_page_mapping_descriptors", &temp, B_EXACT_ADDRESS,
-		ROUNDUP(sizeof(paddr_chunk_desc) * 1024, B_PAGE_SIZE),
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	temp = (void *)virtual_pmappings;
-	create_area("iospace_virtual_chunk_descriptors", &temp, B_EXACT_ADDRESS,
-		ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_PAGE_SIZE),
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
 	temp = (void *)iospace_pgtables;
 	create_area("iospace_pgtables", &temp, B_EXACT_ADDRESS,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	TRACE(("vm_translation_map_init_post_area: creating iospace\n"));
-	temp = (void *)IOSPACE_BASE;
-	vm_create_null_area(vm_kernel_address_space_id(), "iospace", &temp,
-		B_EXACT_ADDRESS, IOSPACE_SIZE);
+	error = generic_vm_physical_page_mapper_init_post_area(args);
+	if (error != B_OK)
+		return error;
 
 	TRACE(("vm_translation_map_init_post_area: done\n"));
 

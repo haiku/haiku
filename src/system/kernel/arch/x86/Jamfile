@@ -3,6 +3,9 @@ SubDir HAIKU_TOP src system kernel arch x86 ;
 SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
 	# for syscall_numbers.h
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers input ps2_hid ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c
@@ -24,6 +27,8 @@ KernelStaticLibrary libx86 :
 	arch_user_debugger.cpp
 	bios.cpp
 	cpuid.S
+
+	generic_vm_physical_page_mapper.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;
