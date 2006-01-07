@@ -7,6 +7,10 @@
 
 #include <kernel.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct queue {
 	void *head;
 	void *tail;
@@ -33,5 +37,8 @@ int fixed_queue_enqueue(fixed_queue *q, void *e);
 void *fixed_queue_dequeue(fixed_queue *q);
 void *fixed_queue_peek(fixed_queue *q);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif	/* _KERNEL_QUEUE_H */
