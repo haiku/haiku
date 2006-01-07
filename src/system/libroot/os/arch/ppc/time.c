@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * Distributed under the terms of the MIT License.
  */
 
