@@ -3325,15 +3325,19 @@ BView::RemoveSelf()
 
 	// Remove this child from its parent
 
-	if (fOwner) {
+	if (fOwner && fOwner->Lock()) {
+		BLooper* owner = fOwner;
+
 		_UpdateStateForRemove();
 		_Detach();
+
+		owner->Unlock();
 	}
 
 	if (!fParent || !fParent->_RemoveChildFromList(this))
 		return false;
 
-	STRACE(("DONE: BView(%s)::removeSelf()\n", Name()));
+	STRACE(("DONE: BView(%s)::RemoveSelf()\n", Name()));
 
 	return true;
 }
@@ -4122,55 +4126,49 @@ BView::_Detach()
 }
 
 void
-BView::_Draw(BRect updateRect)
+BView::_Draw(BRect updateRectScreen)
 {
 	if (IsHidden(this))
 		return;
 
 	check_lock();
 
+	ConvertFromScreen(&updateRectScreen);
+	BRect updateRect = Bounds() & updateRectScreen;
+
 	if (Flags() & B_WILL_DRAW) {
-		// find out if we should draw at all
-		// TODO: can we optimize this some more? Should the app_server
-		// really send _UPDATE_ requests for all dirty views separately?
-		BRegion updateRegion(updateRect);
-		for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
-			updateRegion.Exclude(child->Frame());
-			if (updateRegion.CountRects() == 0)
-				break;
-		}
-		if (updateRegion.CountRects() > 0) {
-			// TODO: make states robust
-			PushState();
-			Draw(updateRect);
-			PopState();
-		}
+		// TODO: make states robust
+		PushState();
+		Draw(updateRect);
+		PopState();
+		Flush();
 //	} else {
 		// ViewColor() == B_TRANSPARENT_COLOR and no B_WILL_DRAW
 		// -> View is simply not drawn at all
 	}
 
-	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
-		BRect rect = child->Frame();
-		if (!updateRect.Intersects(rect))
-			continue;
-
-		// get new update rect in child coordinates
-		rect = updateRect & rect;
-		child->ConvertFromParent(&rect);
-
-		child->_Draw(rect);
-	}
-
-	if (Flags() & B_DRAW_ON_CHILDREN) {
-		// TODO: Since we have hard clipping in the app_server,
-		// a view can never draw "on top of it's child views" as
-		// the BeBook describes.
-		// (TODO: Test if this is really possible in BeOS.)
-		PushState();
-		DrawAfterChildren(updateRect);
-		PopState();
-	}
+//	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
+//		BRect rect = child->Frame();
+//		if (!updateRect.Intersects(rect))
+//			continue;
+//
+//		// get new update rect in child coordinates
+//		rect = updateRect & rect;
+//		child->ConvertFromParent(&rect);
+//
+//		child->_Draw(rect);
+//	}
+//
+//	if (Flags() & B_DRAW_ON_CHILDREN) {
+//		// TODO: Since we have hard clipping in the app_server,
+//		// a view can never draw "on top of it's child views" as
+//		// the BeBook describes.
+//		// (TODO: Test if this is really possible in BeOS.)
+//		PushState();
+//		DrawAfterChildren(updateRect);
+//		PopState();
+//		Flush();
+//	}
 }
 
 
@@ -4208,7 +4206,8 @@ BView::_UpdateStateForRemove()
 	// update children as well
 
 	for (BView *child = fFirstChild; child != NULL; child = child->fNextSibling) {
-		child->_UpdateStateForRemove();
+		if (child->fOwner)
+			child->_UpdateStateForRemove();
 	}
 }
 

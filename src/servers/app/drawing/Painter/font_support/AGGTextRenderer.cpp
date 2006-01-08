@@ -57,9 +57,9 @@ is_white_space(uint16 glyph)
 // constructor
 AGGTextRenderer::AGGTextRenderer()
 	: fFontEngine(gFreeTypeLibrary),
-	  fFontManager(fFontEngine),
+	  fFontCache(fFontEngine),
 
-	  fCurves(fFontManager.path_adaptor()),
+	  fCurves(fFontCache.path_adaptor()),
 	  fContour(fCurves),
 
 	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
@@ -71,7 +71,7 @@ AGGTextRenderer::AGGTextRenderer()
 	  fEmbeddedTransformation(),
 
 	  fFont(),
-	  fLastFamilyAndStyle(0),
+	  fLastFamilyAndStyle(0xffffffff),
 	  fLastPointSize(-1.0),
 	  fLastHinted(false)
 {
@@ -102,12 +102,14 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 
 	if (load) {
 		if (transform.IsIdentity()) {
-//printf("AGGTextRenderer::SetFont() - native\n");
 			success = fFontEngine.load_font(font, agg::glyph_ren_native_gray8);
+//printf("AGGTextRenderer::SetFont() - native: %d\n", success);
 		} else {
-//printf("AGGTextRenderer::SetFont() - outline\n");
 			success = fFontEngine.load_font(font, agg::glyph_ren_outline);
+//printf("AGGTextRenderer::SetFont() - outline: %d\n", success);
 		}
+//	} else {
+//printf("AGGTextRenderer::SetFont() - already loaded\n");
 	}
 
 	fLastFamilyAndStyle = font.GetFamilyAndStyle();
@@ -214,11 +216,11 @@ AGGTextRenderer::RenderString(const char* string,
 				continue;
 			}*/
 
-			const agg::glyph_cache* glyph = fFontManager.glyph(*p);
+			const agg::glyph_cache* glyph = fFontCache.glyph(*p);
 
 			if (glyph) {
 				if (i > 0 && fKerning) {
-					fFontManager.add_kerning(&advanceX, &advanceY);
+					fFontCache.add_kerning(&advanceX, &advanceY);
 				}
 
 				x += advanceX;
@@ -258,26 +260,26 @@ AGGTextRenderer::RenderString(const char* string,
 						// we cannot use the transformation pipeline
 						double transformedX = x + transformOffset.x;
 						double transformedY = y + transformOffset.y;
-						fFontManager.init_embedded_adaptors(glyph,
+						fFontCache.init_embedded_adaptors(glyph,
 															transformedX,
 															transformedY);
 						glyphBounds.OffsetBy(transformOffset);
 					} else {
-						fFontManager.init_embedded_adaptors(glyph, x, y);
+						fFontCache.init_embedded_adaptors(glyph, x, y);
 						glyphBounds = transform.TransformBounds(glyphBounds);
 					}
 	
 					if (clippingFrame.Intersects(glyphBounds)) {
 						switch (glyph->data_type) {
 							case agg::glyph_data_mono:
-								agg::render_scanlines(fFontManager.mono_adaptor(), 
-													  fFontManager.mono_scanline(), 
+								agg::render_scanlines(fFontCache.mono_adaptor(), 
+													  fFontCache.mono_scanline(), 
 													  *binRenderer);
 								break;
 			
 							case agg::glyph_data_gray8:
-								agg::render_scanlines(fFontManager.gray8_adaptor(), 
-													  fFontManager.gray8_scanline(), 
+								agg::render_scanlines(fFontCache.gray8_adaptor(), 
+													  fFontCache.gray8_scanline(), 
 													  *solidRenderer);
 								break;
 			
@@ -370,10 +372,10 @@ AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
 
 		for (uint32 i = 0; i < glyphCount; i++) {
 
-			if ((glyph = fFontManager.glyph(*p))) {
+			if ((glyph = fFontCache.glyph(*p))) {
 
 				if (i > 0 && fKerning) {
-					fFontManager.add_kerning(&width, &y);
+					fFontCache.add_kerning(&width, &y);
 				}
 
 				width += glyph->advance_x;

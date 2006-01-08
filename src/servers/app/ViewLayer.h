@@ -170,6 +170,10 @@ class ViewLayer {
 			bool			IsBackgroundDirty() const
 								{ return fBackgroundDirty; }
 
+			void			AddTokensForLayersInRegion(BMessage* message,
+								BRegion& region,
+								BRegion* windowContentClipping);
+
 			// clipping
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping(BRegion* windowContentClipping,

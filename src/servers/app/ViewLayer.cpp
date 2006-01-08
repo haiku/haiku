@@ -21,6 +21,7 @@
 #include "WindowLayer.h"
 
 #include <List.h>
+#include <Message.h>
 #include <View.h> // for resize modes
 
 #include <stdio.h>
@@ -84,9 +85,9 @@ ViewLayer::~ViewLayer()
 
 	delete fDrawState;
 
-	if (fWindow && this == fWindow->TopLayer())
-		fWindow->SetTopLayer(NULL);
-
+//	if (fWindow && this == fWindow->TopLayer())
+//		fWindow->SetTopLayer(NULL);
+//
 	// TODO: Don't know yet if we should also delete fPicture
 
 	// iterate over children and delete each one
@@ -1001,6 +1002,20 @@ ViewLayer::MarkBackgroundDirty()
 	fBackgroundDirty = true;
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->MarkBackgroundDirty();
+}
+
+// AddTokensForLayersInRegion
+void
+ViewLayer::AddTokensForLayersInRegion(BMessage* message,
+									  BRegion& region,
+									  BRegion* windowContentClipping)
+{
+	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+		message->AddInt32("_token", fToken);
+
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+		child->AddTokensForLayersInRegion(message, region,
+										  windowContentClipping);
 }
 
 // PrintToStream

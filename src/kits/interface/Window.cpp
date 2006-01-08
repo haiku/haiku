@@ -315,10 +315,10 @@ BWindow::~BWindow()
 	fTopView->RemoveSelf();
 	delete fTopView;
 
-	// remove all existing shortcuts
-	int32 noOfItems = fShortcuts.CountItems();
-	for (int32 index = noOfItems - 1; index >= 0; index--) {
-		delete (Shortcut *)fShortcuts.ItemAt(index);
+	// remove all remaining shortcuts
+	int32 shortCutCount = fShortcuts.CountItems();
+	for (int32 i = 0; i < shortCutCount; i++) {
+		delete (Shortcut*)fShortcuts.ItemAtFast(i);
 	}
 
 	// TODO: release other dynamically-allocated objects
@@ -332,7 +332,13 @@ BWindow::~BWindow()
 
 	// tell app_server about our demise
 	fLink->StartMessage(AS_DELETE_WINDOW);
-	fLink->Flush();
+	// sync with the server so that for example
+	// a BBitmap can be sure that there are no
+	// more pending messages that are executed
+	// after the bitmap is deleted (which uses
+	// a different link and server side thread)
+	int32 code;
+	fLink->FlushWithReply(code);
 
 	// the sender port belongs to the app_server
 	delete_port(fLink->ReceiverPort());
@@ -511,7 +517,7 @@ BWindow::Sync() const
 	const_cast<BWindow*>(this)->Lock();
 	fLink->StartMessage(AS_SYNC);
 
-	// ToDo: why with reply?
+	// waiting for the reply is the actual syncing
 	int32 code;
 	fLink->FlushWithReply(code);
 
@@ -542,12 +548,15 @@ BWindow::EnableUpdates()
 void
 BWindow::BeginViewTransaction()
 {
-	if (!fInTransaction) {
-		Lock();
+	if (Lock()) {
+		if (fInTransaction) {
+			Unlock();
+			return;
+		}
 		fLink->StartMessage(AS_BEGIN_TRANSACTION);
-		Unlock();
-
 		fInTransaction = true;
+
+		Unlock();
 	}
 }
 
@@ -555,13 +564,16 @@ BWindow::BeginViewTransaction()
 void
 BWindow::EndViewTransaction()
 {
-	if (fInTransaction) {
-		Lock();
+	if (Lock()) {
+		if (!fInTransaction) {
+			Unlock();
+			return;
+		}
 		fLink->StartMessage(AS_END_TRANSACTION);
 		fLink->Flush();
-		Unlock();
-
 		fInTransaction = false;		
+
+		Unlock();
 	}
 }
 
@@ -896,8 +908,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			uint32 buttons;
 			uint32 transit;
 			msg->FindPoint("be:view_where", &where);
-			msg->FindInt32("buttons", (int32 *)&buttons);
-			msg->FindInt32("be:transit", (int32 *)&transit);
+			msg->FindInt32("buttons", (int32*)&buttons);
+			msg->FindInt32("be:transit", (int32*)&transit);
+//			bigtime_t when;
+//			if (msg->FindInt64("when", (int64*)&when) < B_OK)
+//				printf("BWindow B_MOUSE_MOVED no when\n");
+//			else if (system_time() - when > 5000) {
+//				printf("BWindow B_MOUSE_MOVED lagging behind\n");
+//			}
 			BMessage* dragMessage = NULL;
 			if (msg->HasMessage("be:drag_message")) {
 				dragMessage = new BMessage();
@@ -927,41 +945,23 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case _UPDATE_:
 		{
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
-//			BRect updateRect;
-//			int32 token;
-//			msg->FindRect("_rect", &updateRect);
-//			msg->FindInt32("_token", &token);
-//			// TODO: why is "_token" ignored?
-//
-//			fLink->StartMessage(AS_BEGIN_UPDATE);
-//			fTopView->_Draw(updateRect);
-//			fLink->StartMessage(AS_END_UPDATE);
-//			fLink->Flush();
-
-			BRect total;
-			msg->FindRect("_rect", &total);
-
-			// combine with pending update requests
-			BRect next;
-			BMessage* pendingMessage;
-			while ((pendingMessage = MessageQueue()->FindMessage(_UPDATE_, 0))) {
-				if (pendingMessage != msg) {
-					pendingMessage->FindRect("_rect", &next);
-					total = total | next;
-					MessageQueue()->RemoveMessage(pendingMessage);
-					// TODO: the BeBook says that MessageQueue::RemoveMessage() deletes the message!
-					// this deletes the first *additional* message
-					// fCurrentMessage is safe
-					delete pendingMessage;
-				} else {
-					MessageQueue()->RemoveMessage(pendingMessage);
-				}
-			}
+			BRect updateRect;
+			msg->FindRect("_rect", &updateRect);
+			updateRect.OffsetBy(fFrame.LeftTop());
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
-			fTopView->_Draw(total);
+			fInTransaction = true;
+
+			int32 token;
+			for (int32 i = 0; msg->FindInt32("_token", i, &token) == B_OK; i++) {
+				if (BView* view = _FindView(token))
+					view->_Draw(updateRect);
+			}
+
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
+			fInTransaction = false;
+
 			break;
 		}
 

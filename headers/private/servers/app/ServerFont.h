@@ -63,7 +63,7 @@ class ServerFont {
 			const char*			Path() const
 									{ return fStyle->Path(); }
 
-			void				SetStyle(FontStyle& style);
+			void				SetStyle(FontStyle* style);
 			status_t			SetFamilyAndStyle(uint16 familyID,
 												  uint16 styleID);
 			status_t			SetFamilyAndStyle(uint32 fontID);

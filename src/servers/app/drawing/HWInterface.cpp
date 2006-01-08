@@ -584,6 +584,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	}
 
 	_RestoreCursorArea();
+	Invalidate(_CursorFrame());
 
 	if (fCursorAndDragBitmap != fCursor) {
 		delete fCursorAndDragBitmap;

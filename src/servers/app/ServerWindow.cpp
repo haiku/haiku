@@ -904,7 +904,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_LAYER_DELETE_ROOT:
 		{
 			// Received when a window deletes its internal top view
-			
+printf("AS_LAYER_DELETE_ROOT\n");
 			// TODO: Implement AS_LAYER_DELETE_ROOT
 			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
 			break;
@@ -1064,15 +1064,16 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
 				fCurrentLayer, parent));
 
-			if (parent != NULL)
+			if (parent != NULL) {
 				parent->RemoveChild(fCurrentLayer);
 
-			if (fCurrentLayer->EventMask() != 0) {
-				fDesktop->EventDispatcher().RemoveListener(EventTarget(),
-					fCurrentLayer->Token());
+				if (fCurrentLayer->EventMask() != 0) {
+					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
+						fCurrentLayer->Token());
+				}
+	
+				delete fCurrentLayer;
 			}
-
-			delete fCurrentLayer;
 			// TODO: It is necessary to do this, but I find it very obscure.
 			_SetCurrentLayer(parent);
 			break;
@@ -1847,6 +1848,11 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 	if (!drawingEngine) {
 		// ?!?
 		DTRACE(("ServerWindow %s: no drawing engine!!\n", Title()));
+		if (link.NeedsReply()) {
+			// the client is now blocking and waiting for a reply!
+			fLink.StartMessage(B_ERROR);
+			fLink.Flush();
+		}
 		return;
 	}
 
@@ -2308,6 +2314,11 @@ ServerWindow::_MessageLooper()
 				STRACE(("ServerWindow %s received 'AS_DELETE_WINDOW' message code\n",
 					Title()));
 
+				if (code == AS_DELETE_WINDOW) {
+					fLink.StartMessage(B_OK);
+					fLink.Flush();
+				}
+
 				if (lockedDesktop)
 					fDesktop->UnlockSingleWindow();
 
@@ -2385,7 +2396,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 
 	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
 		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
-			fClientLooperPort, target, 100000);
+			fClientLooperPort, target, 0);
 		if (ret < B_OK) {
 			fprintf(stderr, "ServerWindow(\"%s\")::SendMessageToClient('%.4s'): %s\n",
 				Title(), (char*)&msg->what, strerror(ret));
@@ -2398,7 +2409,7 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 #else
 	BMessenger reply;
 	BMessage::Private messagePrivate((BMessage *)msg);
-	return messagePrivate.SendMessage(fClientLooperPort, target, 100000,
+	return messagePrivate.SendMessage(fClientLooperPort, target, 0,
 		false, reply);
 #endif
 }
@@ -2542,7 +2553,7 @@ ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 #if 0
 #if DELAYED_BACKGROUND_CLEARING
 fWindowLayer->ReadLockWindows();
-		if (fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
+		if (fCurrentLayer && fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
 			DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
 			if (drawingEngine->Lock()) {
 		

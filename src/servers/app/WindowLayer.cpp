@@ -159,8 +159,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 
 WindowLayer::~WindowLayer()
 {
-	if (fTopLayer)
-		fTopLayer->DetachedFromWindow();
+	fTopLayer->DetachedFromWindow();
 
 	delete fTopLayer;
 	delete fDecorator;
@@ -1678,6 +1677,15 @@ WindowLayer::_SendUpdateMessage()
 	BRect updateRect = fPendingUpdateSession.DirtyRegion().Frame();
 	updateRect.OffsetBy(-fFrame.left, -fFrame.top);
 	message.AddRect("_rect", updateRect);
+
+	// find all views that need an update
+	if (!fContentRegionValid)
+		_UpdateContentRegion();
+
+	fTopLayer->AddTokensForLayersInRegion(&message,
+		fPendingUpdateSession.DirtyRegion(),
+		&fContentRegion);
+
 	ServerWindow()->SendMessageToClient(&message);
 
 	fUpdateRequested = true;

@@ -181,17 +181,18 @@ ServerFont::~ServerFont()
 ServerFont&
 ServerFont::operator=(const ServerFont& font)
 {
-	fSize		= font.fSize;
-	fRotation	= font.fRotation;
-	fShear		= font.fShear;
-	fFlags		= font.fFlags;
-	fSpacing	= font.fSpacing;
-	fDirection	= font.fDirection;
-	fFace		= font.fFace;
-	fEncoding	= font.fEncoding;
-	fBounds		= font.fBounds;
+	if (font.fStyle) {
+		fSize		= font.fSize;
+		fRotation	= font.fRotation;
+		fShear		= font.fShear;
+		fFlags		= font.fFlags;
+		fSpacing	= font.fSpacing;
+		fEncoding	= font.fEncoding;
+		fBounds		= font.fBounds;
+	
+		SetStyle(font.fStyle);
+	}
 
-	SetStyle(*font.fStyle);
 	return *this;
 }
 
@@ -233,19 +234,20 @@ ServerFont::Family() const
 
 
 void
-ServerFont::SetStyle(FontStyle& style)
+ServerFont::SetStyle(FontStyle* style)
 {
-	if (&style != fStyle) {
+	if (style && style != fStyle) {
 		// detach from old style
 		if (fStyle)
 			fStyle->Release();
 
 		// attach to new style
-		fStyle = &style;
-		fFace = style.Face();
-		fDirection = style.Direction();
+		fStyle = style;
 
 		fStyle->Acquire();
+
+		fFace = fStyle->Face();
+		fDirection = fStyle->Direction();
 	}
 }
 
@@ -272,7 +274,7 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 	if (!style)
 		return B_ERROR;
 
-	SetStyle(*style);
+	SetStyle(style);
 	style->Release();
 
 	return B_OK;

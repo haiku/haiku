@@ -533,7 +533,7 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 {
 	// TODO: add failed messages to a queue, and start dropping them by importance
 
-	status_t status = messenger.SendMessage(message, (BHandler*)NULL, 100000);
+	status_t status = messenger.SendMessage(message, (BHandler*)NULL, (bigtime_t)(importance * 100000));
 	if (status != B_OK) {
 		printf("EventDispatcher: failed to send message '%.4s' to target: %s\n",
 			(char*)&message->what, strerror(status));
@@ -660,6 +660,14 @@ EventDispatcher::_EventLoop()
 					if (fHWInterface != NULL) {
 						fHWInterface->MoveCursorTo(fLastCursorPosition.x,
 							fLastCursorPosition.y);
+					}
+				}
+				bigtime_t eventTime;
+				if (event->FindInt64("when", &eventTime) == B_OK) {
+					if (system_time() - eventTime > 5000) {
+						// the server itself lags behind too much
+						// -> drop the event
+						break;
 					}
 				}
 

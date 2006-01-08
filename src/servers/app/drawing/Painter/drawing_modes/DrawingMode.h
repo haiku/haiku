@@ -78,14 +78,21 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 	if (_p.data8[3] == 255) { \
 		BLEND(d, r, g, b, a); \
 	} else { \
-		uint8 alphaRest = 255 - (a); \
-		uint32 alphaTemp = (65025 - alphaRest * (255 - _p.data8[3])); \
-		uint32 alphaDest = _p.data8[3] * alphaRest; \
-		uint32 alphaSrc = 255 * (a); \
-		d[0] = (_p.data8[0] * alphaDest + (b) * alphaSrc) / alphaTemp; \
-		d[1] = (_p.data8[1] * alphaDest + (g) * alphaSrc) / alphaTemp; \
-		d[2] = (_p.data8[2] * alphaDest + (r) * alphaSrc) / alphaTemp; \
-		d[3] = alphaTemp >> 8; \
+		if (_p.data8[3] == 0) { \
+			d[0] = (b); \
+			d[1] = (g); \
+			d[2] = (r); \
+			d[3] = (a); \
+		} else { \
+			uint8 alphaRest = 255 - (a); \
+			uint32 alphaTemp = (65025 - alphaRest * (255 - _p.data8[3])); \
+			uint32 alphaDest = _p.data8[3] * alphaRest; \
+			uint32 alphaSrc = 255 * (a); \
+			d[0] = (_p.data8[0] * alphaDest + (b) * alphaSrc) / alphaTemp; \
+			d[1] = (_p.data8[1] * alphaDest + (g) * alphaSrc) / alphaTemp; \
+			d[2] = (_p.data8[2] * alphaDest + (r) * alphaSrc) / alphaTemp; \
+			d[3] = alphaTemp >> 8; \
+		} \
 	} \
 }
 
