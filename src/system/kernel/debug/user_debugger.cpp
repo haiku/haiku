@@ -75,7 +75,7 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	// get the write lock
 	TRACE(("debugger_write(): acquiring write lock...\n"));
 	error = acquire_sem_etc(writeLock, 1,
-		(dontWait ? B_RELATIVE_TIMEOUT : B_KILL_CAN_INTERRUPT), 0);
+		dontWait ? (uint32)B_RELATIVE_TIMEOUT : (uint32)B_KILL_CAN_INTERRUPT, 0);
 	if (error != B_OK) {
 		TRACE(("debugger_write() done1: %lx\n", error));
 		return error;
@@ -96,7 +96,7 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 		TRACE(("debugger_write(): writing to port...\n"));
 
 		error = write_port_etc(port, code, buffer, bufferSize,
-			(dontWait ? B_RELATIVE_TIMEOUT : B_KILL_CAN_INTERRUPT), 0);
+			dontWait ? (uint32)B_RELATIVE_TIMEOUT : (uint32)B_KILL_CAN_INTERRUPT, 0);
 	}
 
 	// release the write lock

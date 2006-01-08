@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler. All rights reserved.
  * Distributed under the terms of the MIT license.
  * 
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -169,7 +169,7 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 	if (num == 0)
 		tmp[i++] = '0';
 	else while (num != 0)
-		tmp[i++] = digits[do_div(&num, base)];
+		tmp[i++] = digits[do_div((uint64 *)&num, base)];
 
 	if (i > precision)
 		precision = i;

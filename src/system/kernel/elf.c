@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -212,14 +212,14 @@ create_image_struct()
 
 
 static uint32
-elf_hash(const unsigned char *name)
+elf_hash(const char *name)
 {
-	unsigned long hash = 0;
-	unsigned long temp;
+	uint32 hash = 0;
+	uint32 temp;
 
 	while (*name) {
-		hash = (hash << 4) + *name++;
-		if((temp = hash & 0xf0000000))
+		hash = (hash << 4) + (uint8)*name++;
+		if ((temp = hash & 0xf0000000) != 0)
 			hash ^= temp >> 24;
 		hash &= ~temp;
 	}

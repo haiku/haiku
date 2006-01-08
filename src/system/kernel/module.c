@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku Inc. All rights reserved.
+ * Copyright 2002-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Thomas Kurschel. All rights reserved.
@@ -127,7 +127,7 @@ typedef struct module_iterator {
 	module_image		*module_image;
 	module_info			**current_header;
 	const char			*current_path;
-	int32				path_base_length;
+	uint32				path_base_length;
 	const char			*current_module_path;
 	bool				builtin_modules;
 } module_iterator;
