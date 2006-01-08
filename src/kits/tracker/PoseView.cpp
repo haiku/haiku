@@ -6722,7 +6722,7 @@ BPoseView::DragSelectionRect(BPoint startPoint, bool shouldExtend)
 
 	BPoint oldMousePoint(startPoint);
 	while (button) {
-		GetMouse(&newMousePoint, &button);
+		GetMouse(&newMousePoint, &button, false);
 		if (newMousePoint != oldMousePoint) {
 			oldMousePoint = newMousePoint;
 			BRect oldRect = fSelectionRect;
