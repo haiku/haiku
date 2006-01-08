@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc. All rights reserved.
+ * Copyright 2004-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALLS_H
@@ -64,7 +64,7 @@ extern status_t		_kern_release_sem(sem_id id);
 extern status_t		_kern_release_sem_etc(sem_id id, uint32 count, uint32 flags);
 extern status_t		_kern_get_sem_count(sem_id id, int32* thread_count);
 extern status_t		_kern_get_sem_info(sem_id semaphore, struct sem_info *info, size_t size);
-extern status_t		_kern_get_next_sem_info(team_id team, uint32 *cookie,
+extern status_t		_kern_get_next_sem_info(team_id team, int32 *cookie,
 						struct sem_info *info, size_t size);
 extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 
@@ -234,7 +234,7 @@ extern status_t		_kern_close_port(port_id id);
 extern status_t		_kern_delete_port(port_id id);
 extern port_id		_kern_find_port(const char *port_name);
 extern status_t		_kern_get_port_info(port_id id, struct port_info *info);
-extern status_t	 	_kern_get_next_port_info(team_id team, uint32 *cookie, struct port_info *info);
+extern status_t	 	_kern_get_next_port_info(team_id team, int32 *cookie, struct port_info *info);
 extern ssize_t		_kern_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout);
 extern int32		_kern_port_count(port_id port);
 extern ssize_t		_kern_read_port_etc(port_id port, int32 *msgCode, void *msgBuffer,
