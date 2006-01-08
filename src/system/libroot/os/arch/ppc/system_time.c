@@ -19,9 +19,6 @@ __ppc_setup_system_time(vint32 *cvFactor)
 }
 
 
-// Note: We don't implement system_time() in assembly since the 64 bit
-// divisions/multiplications are a bit tough to implement for a 32 bit
-// PPC.
 bigtime_t
 system_time(void)
 {
