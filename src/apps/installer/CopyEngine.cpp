@@ -15,14 +15,6 @@
 #include <String.h>
 #include <VolumeRoster.h>
 
-namespace BPrivate {
-
-extern status_t FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
-	BPoint *loc, bool makeOriginalName, Undo &undo);
-} // namespace BPrivate
-
-using namespace BPrivate;
-
 extern void SizeAsString(off_t size, char *string);
 
 class SourceVisitor : public BDiskDeviceVisitor 

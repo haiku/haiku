@@ -7,6 +7,7 @@
 #ifndef _INSTALLERCOPYLOOPCONTROL_H
 #define _INSTALLERCOPYLOOPCONTROL_H
 
+#include "FSUndoRedo.h"
 #include "FSUtils.h"
 class InstallerWindow;
 

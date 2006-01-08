@@ -150,6 +150,8 @@ TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
 #endif
 _IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode *, BNode *);
 
+_IMPEXP_TRACKER status_t FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
+	BPoint *loc, bool makeOriginalName, Undo &undo);
 _IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref> *srcList, BList *pointList);
 _IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref> *srcList, BEntry *, uint32 moveMode,
 	BList *pointList = NULL);
