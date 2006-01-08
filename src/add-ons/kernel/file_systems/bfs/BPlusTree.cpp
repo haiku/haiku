@@ -746,8 +746,7 @@ BPlusTree::FindFreeDuplicateFragment(Transaction &transaction,
 		const bplustree_node *fragment = cached.SetTo(
 			bplustree_node::FragmentOffset(value), false);
 		if (fragment == NULL) {
-			FATAL(("Could not get duplicate fragment at %Ld\n",
-				BFS_ENDIAN_TO_HOST_INT64(values[i])));
+			FATAL(("Could not get duplicate fragment at %Ld\n", value));
 			continue;
 		}
 
@@ -812,7 +811,8 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 					offset = bplustree_node::FragmentOffset(oldValue);
 
 					memmove(duplicate->DuplicateArray(), array, (NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
-					duplicate->left_link = duplicate->right_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
+					duplicate->left_link = duplicate->right_link = HOST_ENDIAN_TO_BFS_INT64(
+						(uint64)BPLUSTREE_NULL);
 
 					array = duplicate->DuplicateArray();
 					array->Insert(value);
@@ -842,15 +842,14 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 				if (cached.MakeWritable(transaction) == NULL)
 					return B_IO_ERROR;
 
-				values[index] = HOST_ENDIAN_TO_BFS_INT64(bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_NODE, offset));
+				values[index] = HOST_ENDIAN_TO_BFS_INT64(bplustree_node::MakeLink(
+					BPLUSTREE_DUPLICATE_NODE, offset));
 			}
 
 			return B_OK;
 		}
 
-		//
 		// Put the value into a dedicated duplicate node
-		//
 
 		// search for free space in the duplicate nodes of that key
 		duplicate_array *array;
@@ -897,10 +896,8 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 		return B_OK;
 	}
 
-	//
 	// Search for a free duplicate fragment or create a new one
 	// to insert the duplicate value into
-	//
 
 	uint32 fragmentIndex = 0;
 	bplustree_node *fragment;
@@ -920,7 +917,8 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 	if (cached.MakeWritable(transaction) == NULL)
 		return B_IO_ERROR;
 
-	values[index] = HOST_ENDIAN_TO_BFS_INT64(bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_FRAGMENT, offset, fragmentIndex));
+	values[index] = HOST_ENDIAN_TO_BFS_INT64(bplustree_node::MakeLink(
+		BPLUSTREE_DUPLICATE_FRAGMENT, offset, fragmentIndex));
 
 	return B_OK;
 }
