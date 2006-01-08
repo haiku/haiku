@@ -1,5 +1,9 @@
 
-#include <BeOSBuildCompatibility.h>
+#ifdef BUILDING_FS_SHELL
+#	include "compat.h"
+#else
+#	include <BeOSBuildCompatibility.h>
+#endif
 
 #include <ByteOrder.h>
 

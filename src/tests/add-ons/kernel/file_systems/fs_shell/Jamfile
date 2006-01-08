@@ -12,6 +12,7 @@ include [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell
 local fsShellCommandSources ;
 local externalCommandsSources ;
 local attributeSupportSources ;
+local byteOrderSupportSources ;
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandSources = fs_shell_command_beos.cpp ;
 	externalCommandsSources = external_commands_beos.cpp ;
@@ -19,6 +20,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandSources = fs_shell_command_unix.cpp ;
 	externalCommandsSources = external_commands_unix.cpp ;
 	attributeSupportSources = fs_attr.cpp ;
+	byteOrderSupportSources = byteorder.cpp ;
 }
 
 SetupFSShellIncludes ;
@@ -54,11 +56,11 @@ BuildLibFSShell libfs_shell.a
 	stub.c tracker.cpp sysdep.c hexdump.c argv.c errors.cpp xcp.cpp
 	path_util.cpp stat_util.cpp
 	$(attributeSupportSources)
+	$(byteOrderSupportSources)
 ;
 
-SEARCH on [ FGristFiles fs_attr.cpp ]
+SEARCH on [ FGristFiles fs_attr.cpp byteorder.cpp ]
 	= [ FDirName $(HAIKU_TOP) src build libroot ] ;
-
 
 # fs_shell_command
 
