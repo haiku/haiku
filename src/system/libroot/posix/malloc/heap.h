@@ -422,7 +422,7 @@ hoardHeap::numBlocks(const int sizeclass)
 	assert(s > 0);
 	const int blksize = align(sizeof(block) + s);
 	// Compute the number of blocks that will go into this superblock.
-	int nb = MAX(1, ((SUPERBLOCK_SIZE - sizeof(superblock)) / blksize));
+	int nb = max_c(1, ((SUPERBLOCK_SIZE - sizeof(superblock)) / blksize));
 	return nb;
 }
 
