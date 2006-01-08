@@ -72,6 +72,7 @@ inline
 CachedBlock::CachedBlock(Volume *volume)
 	:
 	fVolume(volume),
+	fBlockNumber(0),
 	fBlock(NULL)
 {
 }
@@ -81,6 +82,7 @@ inline
 CachedBlock::CachedBlock(Volume *volume, off_t block)
 	:
 	fVolume(volume),
+	fBlockNumber(0),
 	fBlock(NULL)
 {
 	SetTo(block);
@@ -91,6 +93,7 @@ inline
 CachedBlock::CachedBlock(Volume *volume, block_run run)
 	:
 	fVolume(volume),
+	fBlockNumber(0),
 	fBlock(NULL)
 {
 	SetTo(volume->ToBlock(run));
