@@ -10,6 +10,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 Application Installer : 
 	CopyEngine.cpp
 	DrawButton.cpp
+	FSUtils.cpp
 	InstallerApp.cpp
 	InstallerCopyLoopControl.cpp
 	InstallerWindow.cpp
@@ -17,4 +18,3 @@ Application Installer :
 	PartitionMenuItem.cpp
 	: libbe.so libtracker.so libtranslation.so
 	: Installer.rdef ;
-

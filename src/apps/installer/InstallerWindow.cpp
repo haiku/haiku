@@ -98,7 +98,8 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fBeginButton->MakeDefault(true);
 	fBackBox->AddChild(fBeginButton);
 
-	fSetupButton = new BButton(BRect(bounds.left+11, bounds.bottom-35, bounds.left+121, bounds.bottom-22),
+	fSetupButton = new BButton(BRect(bounds.left+11, bounds.bottom-35, 
+		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36, bounds.bottom-22),
 		"setup_button", "Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
 	fBackBox->AddChild(fSetupButton);
 	fSetupButton->Hide();
@@ -134,7 +135,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	sizeRect.top = 105;
 	sizeRect.bottom = sizeRect.top + 15;
 	sizeRect.right -= 12;
-	sizeRect.left = sizeRect.right - 170;
+	sizeRect.left = sizeRect.right - be_plain_font->StringWidth("Disk space required: 0.0 KB") - 10;
 	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required: 0.0 KB", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSizeView);
@@ -287,18 +288,27 @@ void
 InstallerWindow::AdjustMenus()
 {
 	PartitionMenuItem *item1 = (PartitionMenuItem *)fSrcMenu->FindMarked();
-	if (!item1) {
-	} else {
+	if (item1) {
 		fSrcMenuField->MenuItem()->SetLabel(item1->MenuLabel());
+	} else {
+		if (fSrcMenu->CountItems() == 0)
+			fSrcMenuField->MenuItem()->SetLabel("<none>");
+		else
+			fSrcMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel());
 	}
 	
 	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
-	if (!item2) {
-	} else {
+	if (item2) {
 		fDestMenuField->MenuItem()->SetLabel(item2->MenuLabel());
+	} else {
+		if (fDestMenu->CountItems() == 0)
+			fDestMenuField->MenuItem()->SetLabel("<none>");
+		else
+			fDestMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel());
 	}
 	char message[255];
-	sprintf(message, "Press the Begin button to install from '%s' onto '%s'", item1->Name(), item2->Name());
+	sprintf(message, "Press the Begin button to install from '%s' onto '%s'", 
+		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
 	SetStatusMessage(message);
 }
 
