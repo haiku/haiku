@@ -312,14 +312,14 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 
 BWindow::~BWindow()
 {
+	fTopView->RemoveSelf();
+	delete fTopView;
+
 	// remove all existing shortcuts
 	int32 noOfItems = fShortcuts.CountItems();
 	for (int32 index = noOfItems - 1; index >= 0; index--) {
 		delete (Shortcut *)fShortcuts.ItemAt(index);
 	}
-
-	fTopView->RemoveSelf();
-	delete fTopView;
 
 	// TODO: release other dynamically-allocated objects
 
