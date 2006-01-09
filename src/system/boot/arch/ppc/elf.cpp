@@ -139,7 +139,7 @@ boot_arch_elf_relocate_rela(struct preloaded_image *image,
 
 	for (i = 0; i * (int)sizeof(struct Elf32_Rela) < rel_len; i++) {
 #if CHATTY
-		dprintf("looking at rel type %d, offset 0x%x, sym 0x%x, addend 0x%x\n",
+		dprintf("looking at rel type %d, offset 0x%lx, sym 0x%lx, addend 0x%lx\n",
 			ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset, ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
 #endif
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
@@ -174,8 +174,14 @@ boot_arch_elf_relocate_rela(struct preloaded_image *image,
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
 				vlErr = boot_elf_resolve_symbol(image, sym, &S);
-				if (vlErr<0)
+				if (vlErr < 0) {
+					dprintf("boot_arch_elf_relocate_rela(): Failed to relocate "
+						"entry index %d, rel type %d, offset 0x%lx, sym 0x%lx, "
+						"addend 0x%lx\n", i, ELF32_R_TYPE(rel[i].r_info),
+						rel[i].r_offset, ELF32_R_SYM(rel[i].r_info),
+						rel[i].r_addend);
 					return vlErr;
+				}
 				break;
 		}
 
