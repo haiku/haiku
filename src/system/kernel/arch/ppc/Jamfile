@@ -9,7 +9,7 @@ KernelStaticLibrary libppc :
 	arch_cpu.cpp
 	arch_cpu_asm.S
 	arch_debug_console.cpp
-	arch_debug.c
+	arch_debug.cpp
 	arch_elf.c
 	arch_exceptions.S
 	arch_int.cpp
