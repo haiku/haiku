@@ -46,10 +46,10 @@ static inline bool
 write_low24_check(addr_t P, Elf32_Word value)
 {
 	// bits 6:29
-// TODO: This check doesn't work, since negative values are allowed, too.
-//	if (value & 0xff000000)
-//		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xfc000003) | (value << 2);
+	if ((value & 0x3f000000) && (~value & 0x3f800000))
+		return false;
+	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xfc000003)
+		| ((value & 0x00ffffff) << 2);
 	return true;
 }
 
@@ -58,9 +58,10 @@ static inline bool
 write_low14_check(addr_t P, Elf32_Word value)
 {
 	// bits 16:29
-//	if (value & 0xffffc000)
-//		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xffff0003) | (value << 2);
+	if ((value & 0x3fffc000) && (~value & 0x3fffe000))
+		return false;
+	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xffff0003)
+		| ((value & 0x00003fff) << 2);
 	return true;
 }
 
@@ -77,8 +78,8 @@ static inline bool
 write_half16_check(addr_t P, Elf32_Word value)
 {
 	// bits 16:29
-//	if (value & 0xffff0000)
-//		return false;
+	if ((value & 0xffff0000) && (~value & 0xffff8000))
+		return false;
 	*(Elf32_Half*)P = (Elf32_Half)value;
 	return true;
 }
