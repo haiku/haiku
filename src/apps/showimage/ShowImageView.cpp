@@ -168,6 +168,9 @@ ShowImageView::Pulse()
 			}
 		}
 	}
+	if (!fHasBorder) {
+		be_app->ObscureCursor();
+	}
 #if DELAYED_SCALING
 	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
 		fScalingCountDown --;
@@ -188,6 +191,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	InitPatterns();
 	fDither = false;
 	fBitmap = NULL;
+	fDisplayBitmap = NULL;
 	fSelBitmap = NULL;
 	fDocumentIndex = 1;
 	fDocumentCount = 1;
@@ -326,6 +330,11 @@ ShowImageView::DeleteBitmap()
 {
 	DeleteScaler();
 	DeleteSelBitmap();
+
+	if (fDisplayBitmap != fBitmap)
+		delete fDisplayBitmap;
+	fDisplayBitmap = NULL;
+
 	delete fBitmap;
 	fBitmap = NULL;
 }
@@ -334,6 +343,61 @@ void ShowImageView::DeleteSelBitmap()
 {
 	delete fSelBitmap;
 	fSelBitmap = NULL;
+}
+
+const rgb_color kAlphaLow	= (rgb_color){ 0xbb, 0xbb, 0xbb, 0xff };
+const rgb_color kAlphaHigh	= (rgb_color){ 0xe0, 0xe0, 0xe0, 0xff };
+
+inline void
+blend_colors(uint8* d, uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	d[0] = ((b - d[0]) * a + (d[0] << 8)) >> 8;
+	d[1] = ((g - d[1]) * a + (d[1] << 8)) >> 8;
+	d[2] = ((r - d[2]) * a + (d[2] << 8)) >> 8;
+}
+
+BBitmap*
+compose_checker_background(const BBitmap* bitmap)
+{
+	BBitmap* result = new (nothrow) BBitmap(bitmap);
+	if (result && !result->IsValid()) {
+		delete result;
+		result = NULL;
+	}
+	if (!result)
+		return NULL;
+
+	uint8* bits = (uint8*)result->Bits();
+	uint32 bpr = result->BytesPerRow();
+	uint32 width = result->Bounds().IntegerWidth() + 1;
+	uint32 height = result->Bounds().IntegerHeight() + 1;
+
+	for (uint32 i = 0; i < height; i++) {
+		uint8* p = bits;
+		for (uint32 x = 0; x < width; x++) {
+			uint8 alpha = p[3];
+			if (alpha < 255) {
+				p[3] = 255;
+				alpha = 255 - alpha;
+				if (x % 10 >= 5) {
+					if (i % 10 >= 5) {
+						blend_colors(p, kAlphaLow.red, kAlphaLow.green, kAlphaLow.blue, alpha);
+					} else {
+						blend_colors(p, kAlphaHigh.red, kAlphaHigh.green, kAlphaHigh.blue, alpha);
+					}
+				} else {
+					if (i % 10 >= 5) {
+						blend_colors(p, kAlphaHigh.red, kAlphaHigh.green, kAlphaHigh.blue, alpha);
+					} else {
+						blend_colors(p, kAlphaLow.red, kAlphaLow.green, kAlphaLow.blue, alpha);
+					}
+				}
+			}
+			p += 4;
+		}
+		bits += bpr;
+	}
+	return result;
 }
 
 status_t
@@ -382,9 +446,17 @@ ShowImageView::SetImage(const entry_ref *pref)
 	fMakesSelection = false;
 	DeleteBitmap();
 	fBitmap = newBitmap;
+	fDisplayBitmap = NULL;
 	newBitmap = NULL;
 	fCurrentRef = *pref;
-	
+
+	// prepare the display bitmap
+	if (fBitmap->ColorSpace() == B_RGBA32) {
+		fDisplayBitmap = compose_checker_background(fBitmap);
+	}
+	if (!fDisplayBitmap)
+		fDisplayBitmap = fBitmap;
+
 	// restore orientation
 	int32 orientation;
 	fImageOrientation = k0;
@@ -517,8 +589,10 @@ ShowImageView::SetBorder(bool hasBorder)
 		fHasBorder = hasBorder;
 		if (fHasBorder)
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		else
+		else {
 			SetLowColor(0, 0, 0, 255);
+			be_app->ObscureCursor();
+		}
 		FixupScrollBars();
 		Invalidate();
 	}
@@ -795,7 +869,7 @@ ShowImageView::GetScaler(BRect rect)
 	if (fScaler == NULL || !fScaler->Matches(rect, fDither)) {
 		DeleteScaler();
 		BMessenger msgr(this, Window());
-		fScaler = new Scaler(fBitmap, rect, msgr, MSG_INVALIDATE, fDither);
+		fScaler = new Scaler(fDisplayBitmap, rect, msgr, MSG_INVALIDATE, fDither);
 		fScaler->Start();
 	}
 	return fScaler;
@@ -815,13 +889,15 @@ ShowImageView::DrawImage(BRect rect)
 #endif
 		if (scaler != NULL && !scaler->IsRunning()) {
 			BBitmap* bitmap = scaler->GetBitmap();
+
 			if (bitmap) {
 				DrawBitmap(bitmap, BPoint(rect.left, rect.top));
 				return;
 			}
 		}
 	}
-	DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
+
+	DrawBitmap(fDisplayBitmap, fDisplayBitmap->Bounds(), rect);
 }
 
 void

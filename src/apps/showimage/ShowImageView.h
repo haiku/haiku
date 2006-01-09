@@ -205,7 +205,9 @@ private:
 	bool fDither;          // dither the image
 	int32 fDocumentIndex;  // of the image in the file
 	int32 fDocumentCount;  // number of images in the file
-	BBitmap *fBitmap;      // to be displayed
+	BBitmap *fBitmap;      // the original image
+	BBitmap *fDisplayBitmap; // the image to be displayed
+							 // (== fBitmap if the bitmap can be displayed as is)
 	BBitmap *fSelBitmap;   // the bitmap in the selection
 	float fZoom;           // factor to be used to display the image
 	bool fScaleBilinear;   // use bilinear scaling?
