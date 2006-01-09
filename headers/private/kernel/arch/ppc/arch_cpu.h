@@ -159,4 +159,15 @@ enum ppc_processor_version {
 	MPC8245		= 0x8081,
 };
 
+
+/*
+	Use of (some) special purpose registers.
+
+	SPRG0: per CPU physical address pointer to an ppc_cpu_exception_context
+	       structure
+	SPRG1: scratch
+	SPRG2: current struct thread*
+	SPRG3: TLS base pointer (only for userland threads)
+*/
+
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */
