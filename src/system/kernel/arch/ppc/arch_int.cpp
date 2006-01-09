@@ -1,6 +1,10 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Axel Dörfler <axeld@pinc-software.de>
+ * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -10,10 +14,13 @@
 
 #include <boot/kernel_args.h>
 
+#include <arch/smp.h>
 #include <kscheduler.h>
+#include <smp.h>
 #include <thread.h>
 #include <timer.h>
 #include <vm.h>
+#include <vm_address_space.h>
 #include <vm_priv.h>
 
 #include <string.h>
@@ -21,6 +28,12 @@
 // defined in arch_exceptions.S
 extern int __irqvec_start;
 extern int __irqvec_end;
+
+extern"C" void ppc_exception_tail(void);
+
+
+// the exception contexts for all CPUs
+static ppc_cpu_exception_context sCPUExceptionContexts[SMP_MAX_CPUS];
 
 
 void 
@@ -59,7 +72,13 @@ print_iframe(struct iframe *frame)
 }
 
 
-void ppc_exception_entry(int vector, struct iframe *iframe);
+extern "C" void exception_tail_test();
+void
+exception_tail_test()
+{
+}
+
+extern "C" void ppc_exception_entry(int vector, struct iframe *iframe);
 void 
 ppc_exception_entry(int vector, struct iframe *iframe)
 {
@@ -164,7 +183,6 @@ arch_int_init(kernel_args *args)
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
-	area_id exceptionArea;
 	void *handlers = (void *)args->arch_args.exception_handlers.start;
 
 	// We may need to remap the exception handler area into the kernel address
@@ -182,7 +200,7 @@ arch_int_init_post_vm(kernel_args *args)
 	}
 
 	// create a region to map the irq vector code into (physical address 0x0)
-	exceptionArea = create_area("exception_handlers",
+	area_id exceptionArea = create_area("exception_handlers",
 		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (exceptionArea < B_OK)
@@ -192,8 +210,48 @@ arch_int_init_post_vm(kernel_args *args)
 
 	// copy the handlers into this area
 	memcpy(handlers, &__irqvec_start, args->arch_args.exception_handlers.size);
-	arch_cpu_sync_icache(handlers, 0x1000);
+	arch_cpu_sync_icache(handlers, args->arch_args.exception_handlers.size);
+
+	// init the CPU exception contexts
+	int cpuCount = smp_get_num_cpus();
+	for (int i = 0; i < cpuCount; i++) {
+		ppc_cpu_exception_context *context = ppc_get_cpu_exception_context(i);
+		context->kernel_handle_exception = (void*)&ppc_exception_tail;
+		context->exception_context = context;
+		// kernel_stack is set when the current thread changes. At this point
+		// we don't have threads yet.
+	}
+
+	// set the exception context for this CPU
+	ppc_set_current_cpu_exception_context(ppc_get_cpu_exception_context(0));
 
 	return B_OK;
+}
+
+
+// #pragma mark -
+
+struct ppc_cpu_exception_context *
+ppc_get_cpu_exception_context(int cpu)
+{
+	return sCPUExceptionContexts + cpu;
+}
+
+
+void
+ppc_set_current_cpu_exception_context(struct ppc_cpu_exception_context *context)
+{
+	// translate to physical address
+	addr_t physicalPage;
+	addr_t inPageOffset = (addr_t)context & (B_PAGE_SIZE - 1);
+	status_t error = vm_get_page_mapping(vm_kernel_address_space_id(),
+		(addr_t)context - inPageOffset, &physicalPage);
+	if (error != B_OK) {
+		panic("ppc_set_current_cpu_exception_context(): Failed to get physical "
+			"address!");
+		return;
+	}
+	
+	asm volatile("mtsprg0 %0" : : "r"(physicalPage + inPageOffset));
 }
 

@@ -1,134 +1,274 @@
 /*
-** Copyright 2003, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2003, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #define FUNCTION(x) .global x; .type x,@function; x
 #define LOCAL_FUNCTION(x) .type x,@function; x
 
-/*
-** General exception handling pseudocode:
-**  save %r0 into sprg0
-**  save %r2 into sprg1
-**  save %r1 into sprg2
-**  save cr into %r2 (will mess up cr in the conditional check below)
-**  load saved msr into %r0
-**  see if was in kernel mode
-**  if not,
-**   load kernel stack from EAR into %r1
-**  restore cr from %r2
-**  set up in BAT 0 (instruction and data) a identity mapping of 0x0
-**  load old msr
-**  merge old msr mmu bits with current msr
-**  load new msr (should turn the mmu on)
-**  save lr into sprg3
-**  set up and branch to the next instruction (moving the program counter into kernel space)
-**  remove the BAT mapping
-**  set up stack frame and push everything
-*/
+/*	General exception handling concept:
 
+	The PPC architecture specifies entry point offsets for the various
+	exceptions in the first two physical pages. We put a short piece of code
+	(VEC_ENTRY()) into each exception vector. It calls exception_vector_common,
+	which is defined in the unused space at the beginning of the first physical
+	page. It re-enables address translation and calls ppc_exception_tail which
+	lies in the kernel. It dumps an iframe and invokes ppc_exception_entry()
+	(arch_int.cpp), which handles the exception and returns eventually.
+	The registers are restored from the iframe and we return from the
+	interrupt.
+
+	algorithm overview:
+
+	* VEC_ENTRY
+	* exception_vector_common
+	* ppc_exception_tail
+		- dump iframe
+		- ppc_exception_entry()
+		- restore registers and return from interrupt
+
+	Here we use the following SPRG registers, which are at the disposal of the
+	operating system:
+	* SPRG0: Physical address pointer to a struct cpu_exception_context
+			 for the current CPU. The structure contains helpful pointers
+			 as well as some scratch memory for temporarily saving registers.
+	* SPRG1: Scratch.
+
+	struct cpu_exception_context (defined in arch_int.h):
+	offset 0:  virtual address of the exception handler routine in the kernel
+	offset 4:  virtual address of the exception context
+	offset 8:  kernel stack for the current thread
+	offset 12: start of scratch memory for saving registers etc.
+
+	algorithm in detail:
+
+	* VEC_ENTRY
+		- save r1 in SPRG1 and load cpu_exception_context into r1
+		- save r0, save LR in r0
+	* exception_vector_common
+		- params:
+			. r0: old LR
+			. r1: exception context (physical address)
+			. SPRG1: original r1
+		- save r0-3
+		- load virtual exception context address to r1
+		- turn on BAT for exception vector code
+		- turn on address translation
+		- get exception vector offset from LR
+	* ppc_exception_tail
+		- params:
+			. r1: exception context (virtual address)
+			. r3: exception vector offset
+			. SPRG1: original r1
+		- turn off BAT
+		- get kernel stack pointer
+		- dump iframe
+		- ppc_exception_entry()
+		- restore registers and return from interrupt
+ */
+
+
+/* exception vector definitions */
+
+/* code in each exception vector */
 #define VEC_ENTRY() \
-	mtsprg0 %r0					; /* save %r0 */ \
-	mtsprg1	%r2					; /* save %r2 */ \
-	mtsprg2	%r1					; /* save the old stack */ \
-	mfcr	%r2					; /* save cr */ \
-\
-	mfsrr1	%r0					; /* load saved msr */ \
-	andi.	%r0, %r0, (1 << 14)	; /* see if it was in kernel mode */ \
-	beq-	0f					; /* yep */ \
-\
-	/* load the kernel stack */ \
-	mfear	%r1					; /* load the kernel stack pointer from the EAR reg */ \
-0: \
-	mtcrf	0xff, %r2			; /* restore the CR, it was messed up in the previous compare */ \
-\
-	/* we are going to turn on the mmu, lets have a BAT entry in place to keep us identity mapped */ \
-	li		%r0, 0x2				; /* BATU_VS */ \
-	mtibatu	0, %r0				; /* load the upper word of the instruction BAT */ \
-	mtdbatu	0, %r0				; /* load the upper word of the data BAT */ \
-	li		%r0, 0x10|0x2		; /* BATL_MC | BATL_PP_RW */ \
-	mtibatl	0, %r0				; /* load the lower word of the instruction BAT */ \
-	mtdbatl	0, %r0				; /* load the lower word of the data BAT */ \
-	isync						; \
-	sync						; \
-\
-	/* turn the mmu back on */ \
-	mfsrr1	%r0					; /* load saved msr */ \
-	rlwinm	%r0, %r0, 28, 30, 31	; /* extract mmu bits */ \
-	mfmsr	%r2					; /* load the current msr */ \
-	rlwimi  %r2, %r0, 4, 26, 27	; /* merge the mmu bits with the current msr */ \
-	mtmsr	%r2					; /* load the new msr (turning the mmu back on */ \
-	isync						; \
-\
-	mflr	%r0					; /* load the lr */ \
-	mtsprg	3, %r0				; /* save it */ \
-	lis		%r0, 1f@h 			; /* load the address of a label in a few instructions */ \
-	ori		%r0, %r0, 1f@l		; /* we will jump to it to get the program counter into the kernel region */ \
-	mtlr	%r0					; /* get ready to jump to this label */ \
-	blr							; /* branch to the next instruction (with the mmu on) */ \
-1: \
-	/* turn the BAT back off */ \
-	li		%r2, 0				; \
-	mtibatu	0, %r2				; \
-	mtdbatu	0, %r2				; \
-	mtibatl	0, %r2				; \
-	mtdbatl	0, %r2				; \
-	isync						; \
-	sync						; \
-\
-	bl		__save_regs			; /* dump an iframe on the stack */
+	mtsprg1	%r1					; /* temporarily save r1 in SPRG1 */		\
+	mfsprg0	%r1					; /* ppc_cpu_exception_context* -> r1 */	\
+	stw		%r0, 16(%r1)		; /* save r0 */								\
+	mflr	%r0					; /* save LR in r0 */						\
+	bl		exception_vector_common	; /* continue with the common part */
+
+/* defines an exception vector */
+#define DEFINE_VECTOR(offset, name) 	\
+.skip	offset - (. - __irqvec_start);	\
+FUNCTION(name):							\
+	VEC_ENTRY()
+
 
 .global __irqvec_start
 __irqvec_start:
 	.long	0
 
-/* called by the tail end of the VEC_ENTRY macro
-** register expectations:
-**  %r1 - stack
-**  sprg0 - old %r0
-**  sprg1 - old %r2
-**  sprg2 - old stack (%r1)
-**  sprg3 - old lr
-** all other regs should have been unmodified by the exception handler,
-** and ready to be saved
-*/
-FUNCTION(__save_regs):
-	mfsprg	%r0, 0
-	stwu	%r0, -4(%r1)		/* push %r0 */
-	mfsprg	%r0, 2
-	stwu	%r0, -4(%r1)		/* push old %r1 (stack) */
-	mfsprg	%r0, 1
-	stwu	%r0, -4(%r1)		/* push %r2 */
-	stwu	%r3, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r4, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r5, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r6, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r7, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r8, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r9, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r10, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r11, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r12, -4(%r1)		/* push %r3-%r31 */
+/* Called by the exception vector code.
+ * LR:    Points to the end of the exception vector code we're coming from.
+ * r0:    original LR
+ * r1:    ppc_cpu_exception_context* (physical address)
+ * SPRG1: original r1
+ */
+exception_vector_common:
+	stw		%r0, 20(%r1)			/* save original LR */
+	stw		%r2, 24(%r1)			/* save r2 */
+	stw		%r3, 28(%r1)			/* save r3 */
 
-	/* strictly speaking, we dont need to save %r13-%r31, but I will for now */
-	stwu	%r13, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r14, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r15, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r16, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r17, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r18, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r19, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r20, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r21, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r22, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r23, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r24, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r25, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r26, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r27, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r28, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r29, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r30, -4(%r1)		/* push %r3-%r31 */
-	stwu	%r31, -4(%r1)		/* push %r3-%r31 */
+	/* load the virtual address of the ppc_cpu_exception_context for this CPU */
+	lwz		%r1, 4(%r1)
+
+	/* Address translation is turned off. We map this code via BAT, turn on
+	   address translation, and continue in the kernel proper. */
+	li		%r0, 0x10|0x2			/* BATL_MC | BATL_PP_RW */
+	mtibatl	0, %r0					/* load lower word of the instruction BAT */
+	li		%r0, 0x2				/* BEPI = 0, BL = 0 (128 KB), BATU_VS */
+	mtibatu	0, %r0					/* load upper word of the instruction BAT */
+	isync
+	sync
+
+	/* turn on address translation */
+	mfsrr1	%r0						/* load saved msr */
+	rlwinm	%r0, %r0, 28, 30, 31	/* extract mmu bits */
+	mfmsr	%r3						/* load the current msr */
+	rlwimi  %r3, %r0, 4, 26, 27		/* merge the mmu bits with the current msr */
+	mtmsr	%r3						/* load new msr (turning the mmu back on) */
+	isync
+
+	/* Get LR -- it points to the end of the exception vector code. We adjust it
+	   to point to the beginning and can use it to identify the vector later. */
+	mflr	%r3
+	subi	%r3, %r3, 20		/* 5 instructions */
+
+	/* jump to kernel code (ppc_exception_tail) */
+	lwz		%r2, 0(%r1)
+	mtlr	%r2
+	blr
+
+
+DEFINE_VECTOR(0x100, system_reset_exception)
+DEFINE_VECTOR(0x200, machine_check_exception)
+DEFINE_VECTOR(0x300, DSI_exception)
+DEFINE_VECTOR(0x400, ISI_exception)
+DEFINE_VECTOR(0x500, external_interrupt_exception)
+DEFINE_VECTOR(0x600, alignment_exception)
+DEFINE_VECTOR(0x700, program_exception)
+DEFINE_VECTOR(0x800, FP_unavailable_exception)
+DEFINE_VECTOR(0x900, decrementer_exception)
+DEFINE_VECTOR(0xc00, system_call_exception)
+DEFINE_VECTOR(0xd00, trace_exception)
+DEFINE_VECTOR(0xe00, FP_assist_exception)
+DEFINE_VECTOR(0xf00, perf_monitor_exception)
+DEFINE_VECTOR(0xf20, altivec_unavailable_exception)
+DEFINE_VECTOR(0x1000, ITLB_miss_exception)
+DEFINE_VECTOR(0x1100, DTLB_miss_on_load_exception)
+DEFINE_VECTOR(0x1200, DTLB_miss_on_store_exception)
+DEFINE_VECTOR(0x1300, instruction_address_breakpoint_exception)
+DEFINE_VECTOR(0x1400, system_management_exception)
+DEFINE_VECTOR(0x1600, altivec_assist_exception)
+DEFINE_VECTOR(0x1700, thermal_management_exception)
+
+.global __irqvec_end
+__irqvec_end:
+
+
+/* This is where exception_vector_common continues. We're in the kernel here.
+   r1:    ppc_cpu_exception_context* (virtual address)
+   r3:    exception vector offset
+   SPRG1: original r1
+ */
+FUNCTION(ppc_exception_tail):
+	/* turn off BAT */
+	li		%r2, 0
+	mtibatu	0, %r2
+	mtibatl	0, %r2
+	isync
+	sync
+
+	/* save CR */
+	mfcr	%r0
+
+	mfsrr1	%r2					/* load saved msr */
+	andi.	%r2, %r2, (1 << 14)	/* see if it was in kernel mode */
+	beq		.kernel				/* yep */
+
+	/* We come from userland. Load the kernel stack top address for the current
+	   userland thread. */
+	mr		%r2, %r1
+	lwz		%r1, 8(%r1)
+	b		.restore_stack_end
+
+.kernel:
+	mr		%r2, %r1
+	mfsprg1	%r1
+
+.restore_stack_end:
+	/* now r2 points to the ppc_cpu_exception_context, r1 to the kernel stack */
+	/* restore the CR, it was messed up in the previous compare */
+	mtcrf	0xff, %r0
+
+	/* save the registers */
+	bl		__save_regs
+
+	/* iframe pointer to r4 and a backup to r20 */
+	mr		%r4, %r1
+	mr		%r20, %r1
+
+	/* adjust the stack pointer for ABI compatibility */
+	subi	%r1, %r1, 8				/* make sure there's space for the previous
+									   frame pointer and the return address */
+	li		%r2, 0xfffffff0
+	and		%r1, %r1, %r2			/* 16 byte align the stack pointer */
+	li		%r0, 0
+	stw		%r0, 0(%r1)				/* previous frame pointer: NULL */
+		/* 4(%r1) is room for the return address to be filled in by the
+		   called function. */
+
+	/* r3: exception vector offset
+	   r4: iframe pointer */
+	bl 		ppc_exception_entry
+
+	/* move the iframe to r1 */
+	mr		%r1, %r20
+
+	b		__restore_regs_and_rfi
+
+
+/* called by ppc_exception_tail
+ * register expectations:
+ *  r1:        stack
+ *  r2:        ppc_cpu_exception_context*
+ *  SPRG1:     original r1
+ *  r0,r3, LR: scrambled, but saved in scratch memory
+ * all other regs should have been unmodified by the exception handler,
+ * and ready to be saved
+ */
+__save_regs:
+	lwz		%r0, 16(%r2)		/* original r0 */
+	stwu	%r0, -4(%r1)		/* push r0 */
+	mfsprg1	%r0					/* original r1 */
+	stwu	%r0, -4(%r1)		/* push r1 */
+	lwz		%r0, 24(%r2)		/* original r2 */
+	stwu	%r0, -4(%r1)		/* push r2 */
+	lwz		%r0, 28(%r2)		/* original r3 */
+	stwu	%r0, -4(%r1)		/* push r3 */
+
+	/* push r4-r31 */
+	stwu	%r4, -4(%r1)		
+	stwu	%r5, -4(%r1)
+	stwu	%r6, -4(%r1)
+	stwu	%r7, -4(%r1)
+	stwu	%r8, -4(%r1)
+	stwu	%r9, -4(%r1)
+	stwu	%r10, -4(%r1)
+	stwu	%r11, -4(%r1)
+	stwu	%r12, -4(%r1)
+	stwu	%r13, -4(%r1)
+	stwu	%r14, -4(%r1)
+	stwu	%r15, -4(%r1)
+	stwu	%r16, -4(%r1)
+	stwu	%r17, -4(%r1)
+	stwu	%r18, -4(%r1)
+	stwu	%r19, -4(%r1)
+	stwu	%r20, -4(%r1)
+	stwu	%r21, -4(%r1)
+	stwu	%r22, -4(%r1)
+	stwu	%r23, -4(%r1)
+	stwu	%r24, -4(%r1)
+	stwu	%r25, -4(%r1)
+	stwu	%r26, -4(%r1)
+	stwu	%r27, -4(%r1)
+	stwu	%r28, -4(%r1)
+	stwu	%r29, -4(%r1)
+	stwu	%r30, -4(%r1)
+	stwu	%r31, -4(%r1)
 
 	/* save some of the other regs */
 	mfctr	%r0
@@ -137,7 +277,7 @@ FUNCTION(__save_regs):
 	stwu	%r0, -4(%r1)		/* push XER */
 	mfcr	%r0
 	stwu	%r0, -4(%r1)		/* push CR */
-	mfsprg	%r0, 3
+	lwz		%r0, 20(%r2)		/* original LR */
 	stwu	%r0, -4(%r1)		/* push LR */
 	mfspr	%r0, %dsisr
 	stwu	%r0, -4(%r1)		/* push DSISR */
@@ -148,92 +288,13 @@ FUNCTION(__save_regs):
 	mfspr	%r0, %srr0
 	stwu	%r0, -4(%r1)		/* push SRR0 */
 
-	addi	%r1, %r1, -8		/* adjust the stack pointer to leave some padding on it for C */
-
-	/* get outta here */
 	blr
 
-/* not enough space for __restore_regs_and_rfi here, see below */
-
-.skip	0x100 - (. - __irqvec_start)
-FUNCTION(system_reset_exception):
-	VEC_ENTRY();
-	li		%r3, 0x100
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x200 - (. - __irqvec_start)
-FUNCTION(machine_check_exception):
-	VEC_ENTRY();
-	li		%r3, 0x200
-	addi	%r4, %r1, 8
-	bl		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x300 - (. - __irqvec_start)
-FUNCTION(DSI_exception):
-	VEC_ENTRY();
-	li		%r3, 0x300
-	addi	%r4, %r1, 8
-	bl		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x400 - (. - __irqvec_start)
-FUNCTION(ISI_exception):
-	VEC_ENTRY();
-	li		%r3, 0x400
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x500 - (. - __irqvec_start)
-FUNCTION(external_interrupt_exception):
-	VEC_ENTRY();
-	li		%r3, 0x500
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x600 - (. - __irqvec_start)
-FUNCTION(alignment_exception):
-	VEC_ENTRY();
-	li		%r3, 0x600
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x700 - (. - __irqvec_start)
-FUNCTION(program_exception):
-	VEC_ENTRY();
-	li		%r3, 0x700
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x800 - (. - __irqvec_start)
-FUNCTION(FP_unavailable_exception):
-	VEC_ENTRY();
-	li		%r3, 0x800
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x900 - (. - __irqvec_start)
-FUNCTION(decrementer_exception):
-	VEC_ENTRY();
-	li		%r3, 0x900
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
 
 /* called at the tail end of each of the exceptions
-** placed here because of the space between these two
-** exception handlers.
-*/
-FUNCTION(__restore_regs_and_rfi):
-	addi	%r1, %r1, 8		/* adjust the stack pointer to get it back to the base of the iframe */
-
+ * r1: iframe pointer
+ */
+__restore_regs_and_rfi:
 	lwz		%r0, 0(%r1)		/* SRR0 */
 	mtspr	%srr0, %r0
 	lwzu	%r0, 4(%r1)		/* SRR1 */
@@ -251,7 +312,6 @@ FUNCTION(__restore_regs_and_rfi):
 	lwzu	%r0, 4(%r1)		/* CTR */
 	mtctr	%r0
 
-	/* strictly speaking, we dont really need to have saved these regs */
 	lwzu	%r31, 4(%r1)
 	lwzu	%r30, 4(%r1)
 	lwzu	%r29, 4(%r1)
@@ -271,7 +331,6 @@ FUNCTION(__restore_regs_and_rfi):
 	lwzu	%r15, 4(%r1)
 	lwzu	%r14, 4(%r1)
 	lwzu	%r13, 4(%r1)
-
 	lwzu	%r12, 4(%r1)
 	lwzu	%r11, 4(%r1)
 	lwzu	%r10, 4(%r1)
@@ -286,102 +345,5 @@ FUNCTION(__restore_regs_and_rfi):
 	lwz		%r0, 8(%r1)
 	lwz		%r1, 4(%r1)
 
-	/* get out of here */
+	/* return from interrupt */
 	rfi
-
-.skip	0xc00 - (. - __irqvec_start)
-FUNCTION(system_call_exception):
-	VEC_ENTRY();
-	li		%r3, 0xc00
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0xd00 - (. - __irqvec_start)
-FUNCTION(trace_exception):
-	VEC_ENTRY();
-	li		%r3, 0xd00
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0xe00 - (. - __irqvec_start)
-FUNCTION(FP_assist_exception):
-	VEC_ENTRY();
-	li		%r3, 0xe00
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0xf00 - (. - __irqvec_start)
-FUNCTION(perf_monitor_exception):
-	/* XXX deal with this, normal VEC_ENTRY code is too big to fit here */
-	rfi
-
-.skip	0xf20 - (. - __irqvec_start)
-FUNCTION(altivec_unavailable_exception):
-	VEC_ENTRY();
-	li		%r3, 0xf20
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1000 - (. - __irqvec_start)
-FUNCTION(ITLB_miss_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1000
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1100 - (. - __irqvec_start)
-FUNCTION(DTLB_miss_on_load_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1100
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1200 - (. - __irqvec_start)
-FUNCTION(DTLB_miss_on_store_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1200
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1300 - (. - __irqvec_start)
-FUNCTION(instruction_address_breakpoint_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1300
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1400 - (. - __irqvec_start)
-FUNCTION(system_management_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1400
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1600 - (. - __irqvec_start)
-FUNCTION(altivec_assist_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1600
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.skip	0x1700 - (. - __irqvec_start)
-FUNCTION(thermal_management_exception):
-	VEC_ENTRY();
-	li		%r3, 0x1700
-	addi	%r4, %r1, 8
-	bl 		ppc_exception_entry
-	bl		__restore_regs_and_rfi
-
-.global __irqvec_end
-__irqvec_end:
-
