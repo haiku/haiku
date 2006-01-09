@@ -896,6 +896,10 @@ ShowImageView::DrawImage(BRect rect)
 			}
 		}
 	}
+	// TODO: fix composing of fBitmap with other bitmaps
+	// with regard to alpha channel
+	if (!fDisplayBitmap)
+		fDisplayBitmap = fBitmap;
 
 	DrawBitmap(fDisplayBitmap, fDisplayBitmap->Bounds(), rect);
 }
