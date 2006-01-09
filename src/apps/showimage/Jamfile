@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps showimage ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
 	ShowImageSettings.cpp
@@ -10,7 +12,7 @@ Application ShowImage : ShowImageApp.cpp
 	PrintOptionsWindow.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
-	: libbe.so libtracker.so libtranslation.so
+	: be tracker translation
 	: ShowImage.rdef
 	;
 
