@@ -1,5 +1,5 @@
 /* VIA Unichrome Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-9/2005 */
+/* Written by Rudolf Cornelissen 05/2002-1/2006 */
 
 #define MODULE_BIT 0x00000200
 
@@ -926,9 +926,18 @@ status_t eng_configure_bes
 		break;
 	}
 
-	/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
+	/* disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
 	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
-	BESW(COMPOSE, 0x90000001);
+	if (ow->flags & B_OVERLAY_COLOR_KEY)
+	{
+		/* enable colorkeying (b0 = 1) */
+		BESW(COMPOSE, 0x90000001);
+	}
+	else
+	{
+		/* disable colorkeying (b0 = 0) */
+		BESW(COMPOSE, 0x90000000);
+	}
 
 	/* note that overlay is in use (for eng_bes_move_overlay()) */
 	si->overlay.active = true;
