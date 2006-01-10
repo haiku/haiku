@@ -25,6 +25,10 @@ FUNCTION(arch_start_kernel):
 	// set up the kernel stack
 	subi	%r1, %r5, 16
 
+	// clear the pointer to the previous frame
+	li		%r0, 0
+	stw		%r0, 0(%r1)
+
 	// enter the kernel
 	mtlr	%r4
 	blrl
