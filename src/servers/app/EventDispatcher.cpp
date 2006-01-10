@@ -663,9 +663,12 @@ EventDispatcher::_EventLoop()
 							fLastCursorPosition.y);
 					}
 				}
+
+				// TODO: this drops older mouse events, but should probably work
+				//	a bit different (ie. don't drop the last event)
 				bigtime_t eventTime;
 				if (event->FindInt64("when", &eventTime) == B_OK) {
-					if (system_time() - eventTime > 5000) {
+					if (system_time() - eventTime > 25000) {
 						// the server itself lags behind too much
 						// -> drop the event
 						break;
