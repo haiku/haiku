@@ -356,6 +356,8 @@ BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 void
 BMenuItem::DrawContent()
 {
+	fSuper->CacheFontInfo();
+
 	fSuper->MovePenBy(0, fSuper->fAscent);
 	BPoint lineStart = fSuper->PenLocation();
 
@@ -399,8 +401,6 @@ BMenuItem::Draw()
 {
 	// TODO: Cleanup
 	bool enabled = IsEnabled();
-
-	fSuper->CacheFontInfo();
 
 	if (IsSelected() && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
 		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),

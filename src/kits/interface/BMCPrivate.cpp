@@ -69,12 +69,16 @@ BArchivable *_BMCItem_::Instantiate(BMessage *data)
 //------------------------------------------------------------------------------
 void _BMCItem_::Draw()
 {
-	BMenuItem::Draw();
+	BMenu *menu = Menu();
+	
+	// Copy / pasted from BMenuItem::Draw(). We can't use it directly
+	// because we want to skip the Submenu symbol and the rest
+	menu->MovePenTo(ContentLocation());
+	DrawContent();
 
 	if (!fShowPopUpMarker)
 		return;
 
-	BMenu *menu = Menu();
 	BRect rect(menu->Bounds());
 
 	rect.right -= 4;
@@ -119,7 +123,7 @@ _BMCFilter_ &_BMCFilter_::operator=(const _BMCFilter_ &)
 }*/
 //------------------------------------------------------------------------------
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
-	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
+	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_COLUMN,
 			!fixed_size)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);

@@ -252,15 +252,14 @@ BPopUpMenu::ScreenLocation()
 	if (fUseWhere)
 		return fWhere;
 	
-	BMenuItem *item = Superitem();
-	BMenu *menu = Supermenu();
-	BMenuItem *selectedItem = FindItem(item->Label());
-	BRect rect = item->Frame();
-	BPoint point = rect.LeftTop();
+	BMenuItem *superItem = Superitem();
+	BMenu *superMenu = Supermenu();
+	BMenuItem *selectedItem = FindItem(superItem->Label());
+	BPoint point = superItem->Frame().LeftTop();
 
-	menu->ConvertToScreen(&point);
+	superMenu->ConvertToScreen(&point);
 
-	if (selectedItem)
+	if (selectedItem != NULL)
 		point.y -= selectedItem->Frame().top;
 
 	return point;
