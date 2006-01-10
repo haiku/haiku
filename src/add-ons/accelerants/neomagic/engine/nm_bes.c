@@ -1,5 +1,5 @@
 /* NeoMagic Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-11/2004 */
+/* Written by Rudolf Cornelissen 05/2002-1/2006 */
 
 #define MODULE_BIT 0x00000200
 
@@ -533,8 +533,8 @@ status_t nm_configure_bes
 
 	/* enable BES */
 	bi.globctlv |= 1 << 0;
-	/* enable colorkeying */
-	bi.globctlv |= 1 << 1;
+	/* enable colorkeying if requested */
+	if (ow->flags & B_OVERLAY_COLOR_KEY) bi.globctlv |= 1 << 1;
 	/* b3 = 1: distorts right-half of overlay output. Keeping it zero. */
 	/* colorspace is YV12, I420 or YUY2 (no RV15 or RV16) */
 	bi.globctlv |= 0 << 5;
