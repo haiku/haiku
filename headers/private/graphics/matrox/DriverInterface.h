@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-11/2005.
+	Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -160,6 +160,7 @@ typedef struct {
   /*frame buffer config - for BDirectScreen*/
 	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */
 	frame_buffer_config fbc2;	/* bytes_per_row and start of frame buffer: head2 */
+	accelerant_device_info adi;	/* as returned by hook GET_ACCELERANT_DEVICE_INFO */
 
   /*acceleration engine*/
 	struct {
