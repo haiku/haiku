@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-11/2005
+   Rudolf Cornelissen 10/2002-1/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -52,7 +52,7 @@ static void mga_dump_configuration_space (void)
 status_t gx00_general_powerup()
 {
 	status_t status;
-	uint32 card_class;
+	uint8 card_class;
 
 	LOG(1,("POWERUP: Haiku Matrox Accelerant 0.27 running.\n"));
 
@@ -62,40 +62,50 @@ status_t gx00_general_powerup()
 	else
 		LOG(4,("POWERUP: No (usable) INT assigned to HW; Vblank semaphore disabled\n"));
 
+	/* WARNING:
+	 * _adi.name_ and _adi.chipset_ can contain 31 readable characters max.!!! */
+
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
-	case 0x051a102b: //MGA-1064 Mystic PCI
+	case 0x051a102b: //MGA-1064 Mystique PCI
+		sprintf(si->adi.name, "Matrox Mystique PCI");
+		sprintf(si->adi.chipset, "MGA-1064");
 		LOG(8,("POWERUP: Unimplemented Matrox device %08x\n",CFGR(DEVID)));
 		return B_ERROR;
 	case 0x0519102b: //MGA-2064 Millenium PCI
 		si->ps.card_type = MIL1;
-		LOG(4,("POWERUP: Detected MGA-2064 Millennium 1\n"));
+		sprintf(si->adi.name, "Matrox Millennium I");
+		sprintf(si->adi.chipset, "MGA-2064");
 		status = mil_general_powerup();
 		break;
-	case 0x051b102b:case 0x051f102b: //MGA-2164 Millenium 2 PCI/AGP
+	case 0x051b102b:case 0x051f102b: //MGA-2164 Millenium II PCI/AGP
 		si->ps.card_type = MIL2;
-		LOG(4,("POWERUP: Detected MGA-2164 Millennium 2\n"));
+		sprintf(si->adi.name, "Matrox Millennium II");
+		sprintf(si->adi.chipset, "MGA-2164");
 		status = mil_general_powerup();
 		break;
 	case 0x1000102b:case 0x1001102b: //G100
 		si->ps.card_type = G100;
-		LOG(4,("POWERUP: Detected G100\n"));
+		sprintf(si->adi.name, "Matrox MGA G100");
+		sprintf(si->adi.chipset, "G100");
 		status = g100_general_powerup();
 		break;
 	case 0x0520102b:case 0x0521102b: //G200
 		si->ps.card_type = G200;
-		LOG(4,("POWERUP: Detected G200\n"));
+		sprintf(si->adi.name, "Matrox MGA G200");
+		sprintf(si->adi.chipset, "G200");
 		status = g200_general_powerup();
 		break;
 	case 0x0525102b: //G400, G400MAX or G450
-		LOG(4,("POWERUP: Detected G4"));
 		/* get classinfo to distinguish different types */
 		card_class = CFGR(CLASS) & 0xff;
 		if (card_class & 0x80)
 		{
 			/* G450 */
 			si->ps.card_type = G450;
+			sprintf(si->adi.name, "Matrox MGA G450");
+			sprintf(si->adi.chipset, "G450 revision %x", (card_class & 0x7f));
 			LOG(4, ("50 revision %x\n", card_class & 0x7f));
 			status = g450_general_powerup();
 		}
@@ -104,13 +114,15 @@ status_t gx00_general_powerup()
 			/* standard G400, G400MAX */
 			/* the only difference is the max RAMDAC speed, accounted for via pins. */
 			si->ps.card_type = G400;
-			LOG(4, ("00 revision %x\n", card_class & 0x7f));
+			sprintf(si->adi.name, "Matrox MGA G400");
+			sprintf(si->adi.chipset, "G400 revision %x", (card_class & 0x7f));
 			status = g400_general_powerup();
 		}
 		break;
 	case 0x2527102b://G550 patch from Jean-Michel Batto
 		si->ps.card_type = G450;
-		LOG(4,("POWERUP: Detected G550\n"));
+		sprintf(si->adi.name, "Matrox MGA G550");
+		sprintf(si->adi.chipset, "G550");
 		status = g450_general_powerup();
 		break;	
 	default:
@@ -235,6 +247,7 @@ status_t mil_general_powerup()
 	status_t result;
 
 	LOG(4, ("INIT: Millenium I/II powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -281,6 +294,7 @@ status_t g100_general_powerup()
 	status_t result;
 	
 	LOG(4, ("INIT: G100 powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -380,6 +394,7 @@ status_t g200_general_powerup()
 	status_t result;
 	
 	LOG(4, ("INIT: G200 powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -477,6 +492,7 @@ status_t g400_general_powerup()
 	status_t result;
 	
 	LOG(4, ("INIT: G400/G400MAX powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -591,6 +607,7 @@ status_t g450_general_powerup()
 	uint32 maccess = 0x00000000;
 
 	LOG(4, ("INIT: G450/G550 powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
