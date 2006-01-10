@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-11/2005
+   Rudolf Cornelissen 10/2002-01/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -102,6 +102,9 @@ status_t nv_general_powerup()
 	/* preset no laptop */
 	si->ps.laptop = false;
 
+	/* WARNING:
+	 * _adi.name_ and _adi.chipset_ can contain 31 readable characters max.!!! */
+
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
@@ -109,7 +112,8 @@ status_t nv_general_powerup()
 	case 0x002010de: /* Nvidia TNT1 */
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
+		sprintf(si->adi.name, "Nvidia TNT1");
+		sprintf(si->adi.chipset, "NV04");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002810de: /* Nvidia TNT2 (pro) */
@@ -118,26 +122,30 @@ status_t nv_general_powerup()
 	case 0x002b10de: /* Nvidia TNT2 */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT2 (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia TNT2");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002c10de: /* Nvidia Vanta (Lt) */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Vanta (Lt) (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia Vanta (Lt)");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002d10de: /* Nvidia TNT2-M64 (Pro) */
 		si->ps.card_type = NV05M64;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT2-M64 (Pro) (NV05M64)\n"));
+		sprintf(si->adi.name, "Nvidia TNT2-M64 (Pro)");
+		sprintf(si->adi.chipset, "NV05 model 64");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002e10de: /* Nvidia NV06 Vanta */
 	case 0x002f10de: /* Nvidia NV06 Vanta */
 		si->ps.card_type = NV06;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Vanta (NV06)\n"));
+		sprintf(si->adi.name, "Nvidia Vanta");
+		sprintf(si->adi.chipset, "NV06");
 		status = nvxx_general_powerup();
 		break;
 	case 0x004010de: /* Nvidia GeForce FX 6800 Ultra */
@@ -145,13 +153,15 @@ status_t nv_general_powerup()
 	case 0x004210de: /* Nvidia GeForce FX 6800LE */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800");
+		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x004310de: /* Nvidia unknown FX */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV40)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
@@ -159,21 +169,24 @@ status_t nv_general_powerup()
 	case 0x004810de: /* Nvidia GeForce FX 6800 XT */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800");
+		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x004d10de: /* Nvidia Quadro FX 4400 */
 	case 0x004e10de: /* Nvidia Quadro FX 4000 */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000/4400 (NV40)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 4000/4400");
+		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x009110de: /* Nvidia GeForce 7800 GTX PCIe */
 	case 0x009210de: /* Nvidia Geforce 7800 GT PCIe */
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GT PCIe (NV47)\n"));
+		sprintf(si->adi.name, "Nvidia Geforce 7800 GT PCIe");
+		sprintf(si->adi.chipset, "NV47");
 		status = nvxx_general_powerup();
 		break;
 	case 0x009810de: /* Nvidia Geforce 7800 Go PCIe */
@@ -181,25 +194,29 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Geforce 7800 GTX Go PCIe (NV47)\n"));
+		sprintf(si->adi.name, "Nvidia Geforce 7800 GTX Go PCIe");
+		sprintf(si->adi.chipset, "NV47");
 		status = nvxx_general_powerup();
 		break;
 	case 0x009d10de: /* Nvidia Quadro FX 4500 */
 		si->ps.card_type = NV47;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4500 (NV47)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 4500");
+		sprintf(si->adi.chipset, "NV47");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00a010de: /* Nvidia Aladdin TNT2 */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Aladdin TNT2 (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia Aladdin TNT2");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00c010de: /* Nvidia unknown FX */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00c110de: /* Nvidia GeForce FX 6800 */
@@ -207,7 +224,8 @@ status_t nv_general_powerup()
 	case 0x00c310de: /* Nvidia GeForce FX 6800 XT */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00c810de: /* Nvidia GeForce FX 6800 Go */
@@ -215,93 +233,108 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 Go (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800 Go");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00cc10de: /* Nvidia Quadro FX 1400 Go */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1400 Go (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 1400 Go");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00cd10de: /* Nvidia Quadro FX 3450/4000 SDI */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3450/4000 SDI (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 3450/4000 SDI");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00ce10de: /* Nvidia Quadro FX 1400 */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1400 (NV41)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 1400");
+		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f010de: /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 AGP(?) (NV40(?))\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800 AGP(?)");
+		sprintf(si->adi.chipset, "NV40(?)");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f110de: /* Nvidia GeForce FX 6600 GT AGP */
 	case 0x00f210de: /* Nvidia GeForce FX 6600 AGP */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (GT) AGP (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6600 (GT) AGP");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f310de: /* Nvidia GeForce 6200 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f810de: /* Nvidia Quadro FX 3400/4400 PCIe */
 		si->ps.card_type = NV45;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3400 PCIe (NV45)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 3400 PCIe");
+		sprintf(si->adi.chipset, "NV45");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f910de: /* Nvidia GeForce PCX 6800 PCIe */
 		si->ps.card_type = NV45;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 6800 PCIe (NV45)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce PCX 6800 PCIe");
+		sprintf(si->adi.chipset, "NV45");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fa10de: /* Nvidia GeForce PCX 5750 PCIe */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5750 PCIe (NV36)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce PCX 5750 PCIe");
+		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fb10de: /* Nvidia GeForce PCX 5900 PCIe */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5900 PCIe (NV35(?))\n"));
+		sprintf(si->adi.name, "Nvidia GeForce PCX 5900 PCIe");
+		sprintf(si->adi.chipset, "NV35(?)");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fc10de: /* Nvidia GeForce PCX 5300 PCIe */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5300 PCIe (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce PCX 5300 PCIe");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fd10de: /* Nvidia Quadro PCX PCIe */
 		si->ps.card_type = NV45;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro PCX PCIe (NV45)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro PCX PCIe");
+		sprintf(si->adi.chipset, "NV45");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00fe10de: /* Nvidia Quadro FX 1300 PCIe(?) */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1300 PCIe(?) (NV36(?))\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 1300 PCIe(?)");
+		sprintf(si->adi.chipset, "NV36(?)");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00ff10de: /* Nvidia GeForce PCX 4300 PCIe */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 4300 PCIe (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce PCX 4300 PCIe");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x010010de: /* Nvidia GeForce256 SDR */
@@ -309,33 +342,38 @@ status_t nv_general_powerup()
 	case 0x010210de: /* Nvidia GeForce256 Ultra */
 		si->ps.card_type = NV10;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce256 (NV10)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce256");
+		sprintf(si->adi.chipset, "NV10");
 		status = nvxx_general_powerup();
 		break;
 	case 0x010310de: /* Nvidia Quadro */
 		si->ps.card_type = NV10;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro (NV10)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro");
+		sprintf(si->adi.chipset, "NV10");
 		status = nvxx_general_powerup();
 		break;
 	case 0x011010de: /* Nvidia GeForce2 MX/MX400 */
 	case 0x011110de: /* Nvidia GeForce2 MX100/MX200 DDR */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 MX (NV11)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce2 MX");
+		sprintf(si->adi.chipset, "NV11");
 		status = nvxx_general_powerup();
 		break;
 	case 0x011210de: /* Nvidia GeForce2 Go */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 Go (NV11)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce2 Go");
+		sprintf(si->adi.chipset, "NV11");
 		status = nvxx_general_powerup();
 		break;
 	case 0x011310de: /* Nvidia Quadro2 MXR/EX/Go */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro2 MXR/EX/Go (NV11)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro2 MXR/EX/Go");
+		sprintf(si->adi.chipset, "NV11");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014010de: /* Nvidia GeForce FX 6600 GT */
@@ -343,26 +381,30 @@ status_t nv_general_powerup()
 	case 0x014210de: /* Nvidia GeForce FX 6600LE */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6600");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014410de: /* Nvidia GeForce FX 6600 Go */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 Go (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6600 Go");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014510de: /* Nvidia GeForce FX 6610 XL */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6610 XL (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6610 XL");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014710de: /* Nvidia GeForce FX 6700 XL */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6700 XL (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6700 XL");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014610de: /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
@@ -371,19 +413,22 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 Go / 6200 Go (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6600Go/6200Go");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014e10de: /* Nvidia Quadro FX 540 */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 540 (NV43)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 540");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x014f10de: /* Nvidia GeForce 6200 PCIe (128Mb) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 PCIe (128Mb) (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200 PCIe 128Mb");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x015010de: /* Nvidia GeForce2 GTS/Pro */
@@ -391,85 +436,98 @@ status_t nv_general_powerup()
 	case 0x015210de: /* Nvidia GeForce2 Ultra */
 		si->ps.card_type = NV15;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 (NV15)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce2");
+		sprintf(si->adi.chipset, "NV15");
 		status = nvxx_general_powerup();
 		break;
 	case 0x015310de: /* Nvidia Quadro2 Pro */
 		si->ps.card_type = NV15;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro2 Pro (NV15)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro2 Pro");
+		sprintf(si->adi.chipset, "NV15");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016010de: /* Nvidia GeForce 6500 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6500 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6500 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016110de: /* Nvidia GeForce 6200 TurboCache */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 TurboCache (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200 TC");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016210de: /* Nvidia GeForce 6200SE TurboCache */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200SE TurboCache (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200SE TC");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016310de: /* Nvidia GeForce 6200LE */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200LE (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200LE");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016410de: /* Nvidia GeForce FX 6200 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6200 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6200 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016510de: /* Nvidia Quadro FX NVS 285 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX NVS 285 (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX NVS 285");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016610de: /* Nvidia GeForce 6400 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6400 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6400 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016710de: /* Nvidia GeForce 6200 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016810de: /* Nvidia GeForce 6400 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6400 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6400 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016910de: /* Nvidia GeForce 6250 Go */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6250 Go (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6250 Go");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x016e10de: /* Nvidia unknown FX */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x017010de: /* Nvidia GeForce4 MX 460 */
@@ -478,7 +536,8 @@ status_t nv_general_powerup()
 	case 0x017310de: /* Nvidia GeForce4 MX 440SE */ 
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX (NV17)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 MX");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x017410de: /* Nvidia GeForce4 440 Go */ 
@@ -489,28 +548,32 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV17)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Go");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x017810de: /* Nvidia Quadro4 500 XGL/550 XGL */
 	case 0x017a10de: /* Nvidia Quadro4 200 NVS/400 NVS */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV17)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x017c10de: /* Nvidia Quadro4 500 GoGL */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 500 GoGL (NV17)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4 500 GoGL");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x017d10de: /* Nvidia GeForce4 410 Go 16M*/
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 410 Go (NV17)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 410 Go");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018110de: /* Nvidia GeForce4 MX 440 AGP8X */
@@ -519,7 +582,8 @@ status_t nv_general_powerup()
 	case 0x018510de: /* Nvidia GeForce4 MX 4000 AGP8X */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 MX AGP8X");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018610de: /* Nvidia GeForce4 448 Go */
@@ -527,19 +591,22 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Go");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018810de: /* Nvidia Quadro4 580 XGL */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018910de: /* Nvidia GeForce4 MX AGP8X (PPC) */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 MX AGP8X");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018a10de: /* Nvidia Quadro4 280 NVS AGP8X */
@@ -547,26 +614,30 @@ status_t nv_general_powerup()
 	case 0x018c10de: /* Nvidia Quadro4 NVS 50 PCI */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x018d10de: /* Nvidia GeForce4 448 Go */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV18)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Go");
+		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 Integrated GPU (CRUSH, NV11)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce2 Integrated GPU");
+		sprintf(si->adi.chipset, "CRUSH, NV11");
 		status = nvxx_general_powerup();
 		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX Integrated GPU (NFORCE2, NV17)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 MX Integr. GPU");
+		sprintf(si->adi.chipset, "NFORCE2, NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x020010de: /* Nvidia GeForce3 */
@@ -574,13 +645,15 @@ status_t nv_general_powerup()
 	case 0x020210de: /* Nvidia GeForce3 Ti 500 */
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce3 (NV20)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce3");
+		sprintf(si->adi.chipset, "NV20");
 		status = nvxx_general_powerup();
 		break;
 	case 0x020310de: /* Nvidia Quadro DCC */
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro DCC (NV20)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro DCC");
+		sprintf(si->adi.chipset, "NV20");
 		status = nvxx_general_powerup();
 		break;
 	case 0x021110de: /* Nvidia GeForce FX 6800 */
@@ -588,13 +661,15 @@ status_t nv_general_powerup()
 	case 0x021510de: /* Nvidia GeForce FX 6800 GT */
 		si->ps.card_type = NV45; /* NV48 is NV45 with 512Mb */
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV48)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 6800");
+		sprintf(si->adi.chipset, "NV48");
 		status = nvxx_general_powerup();
 		break;
 	case 0x022110de: /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 AGP (256Mb - 128bit) (NV44)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce 6200 AGP 256Mb");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x025010de: /* Nvidia GeForce4 Ti 4600 */
@@ -603,7 +678,8 @@ status_t nv_general_powerup()
 	case 0x025310de: /* Nvidia GeForce4 Ti 4200 */
 		si->ps.card_type = NV25;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti (NV25)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Ti");
+		sprintf(si->adi.chipset, "NV25");
 		status = nvxx_general_powerup();
 		break;
 	case 0x025810de: /* Nvidia Quadro4 900 XGL */
@@ -611,80 +687,92 @@ status_t nv_general_powerup()
 	case 0x025b10de: /* Nvidia Quadro4 700 XGL */
 		si->ps.card_type = NV25;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV25)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4 XGL");
+		sprintf(si->adi.chipset, "NV25");
 		status = nvxx_general_powerup();
 		break;
 	case 0x028010de: /* Nvidia GeForce4 Ti 4800 AGP8X */
 	case 0x028110de: /* Nvidia GeForce4 Ti 4200 AGP8X */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti AGP8X (NV28)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Ti AGP8X");
+		sprintf(si->adi.chipset, "NV28");
 		status = nvxx_general_powerup();
 		break;
 	case 0x028210de: /* Nvidia GeForce4 Ti 4800SE */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti 4800SE (NV28)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 Ti 4800SE");
+		sprintf(si->adi.chipset, "NV28");
 		status = nvxx_general_powerup();
 		break;
 	case 0x028610de: /* Nvidia GeForce4 4200 Go */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 4200 Go (NV28)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce4 4200 Go");
+		sprintf(si->adi.chipset, "NV28");
 		status = nvxx_general_powerup();
 		break;
 	case 0x028810de: /* Nvidia Quadro4 980 XGL */
 	case 0x028910de: /* Nvidia Quadro4 780 XGL */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV28)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4 XGL");
+		sprintf(si->adi.chipset, "NV28");
 		status = nvxx_general_powerup();
 		break;
 	case 0x028c10de: /* Nvidia Quadro4 700 GoGL */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 700 GoGL (NV28)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro4 700 GoGL");
+		sprintf(si->adi.chipset, "NV28");
 		status = nvxx_general_powerup();
 		break;
 	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce3 Integrated GPU (XBOX, NV20)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce3 Integrated GPU");
+		sprintf(si->adi.chipset, "XBOX, NV20");
 		status = nvxx_general_powerup();
 		break;
 	case 0x030110de: /* Nvidia GeForce FX 5800 Ultra */
 	case 0x030210de: /* Nvidia GeForce FX 5800 */
 		si->ps.card_type = NV30;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5800 (NV30)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5800");
+		sprintf(si->adi.chipset, "NV30");
 		status = nvxx_general_powerup();
 		break;
 	case 0x030810de: /* Nvidia Quadro FX 2000 */
 	case 0x030910de: /* Nvidia Quadro FX 1000 */
 		si->ps.card_type = NV30;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX (NV30)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX");
+		sprintf(si->adi.chipset, "NV30");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031110de: /* Nvidia GeForce FX 5600 Ultra */
 	case 0x031210de: /* Nvidia GeForce FX 5600 */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5600");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031310de: /* Nvidia unknown FX */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031410de: /* Nvidia GeForce FX 5600XT */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600XT (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5600XT");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031610de: /* Nvidia unknown FX Go */
@@ -692,28 +780,32 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031a10de: /* Nvidia GeForce FX 5600 Go */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 Go (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5600 Go");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031b10de: /* Nvidia GeForce FX 5650 Go */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5650 Go (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5650 Go");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031c10de: /* Nvidia Quadro FX 700 Go */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 700 Go (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 700 Go");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x031d10de: /* Nvidia unknown FX Go */
@@ -722,7 +814,8 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
+		sprintf(si->adi.chipset, "NV31");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032010de: /* Nvidia GeForce FX 5200 */
@@ -731,58 +824,67 @@ status_t nv_general_powerup()
 	case 0x032310de: /* Nvidia GeForce FX 5200LE */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5200");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032410de: /* Nvidia GeForce FX 5200 Go */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5200 Go");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032510de: /* Nvidia GeForce FX 5250 Go */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5250 Go (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5250 Go");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032610de: /* Nvidia GeForce FX 5500 */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5500 (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5500");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032710de: /* Nvidia GeForce FX 5100 */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5100 (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5100");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032810de: /* Nvidia GeForce FX 5200 Go 32M/64M */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5200 Go");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032910de: /* Nvidia GeForce FX 5200 (PPC) */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5200");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032a10de: /* Nvidia Quadro NVS 280 PCI */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro NVS 280 PCI (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro NVS 280 PCI");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032b10de: /* Nvidia Quadro FX 500/600 PCI */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 500/600 PCI (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 500/600 PCI");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032c10de: /* Nvidia GeForce FX 5300 Go */
@@ -790,7 +892,8 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX Go (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX Go");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x032e10de: /* Nvidia unknown FX Go */
@@ -798,44 +901,51 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
+		sprintf(si->adi.chipset, "NV34");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033010de: /* Nvidia GeForce FX 5900 Ultra */
 	case 0x033110de: /* Nvidia GeForce FX 5900 */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 (NV35)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5900");
+		sprintf(si->adi.chipset, "NV35");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033210de: /* Nvidia GeForce FX 5900 XT */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 XT (NV35)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5900 XT");
+		sprintf(si->adi.chipset, "NV35");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033310de: /* Nvidia GeForce FX 5950 Ultra */
 		si->ps.card_type = NV38;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5950 Ultra (NV38)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5950 Ultra");
+		sprintf(si->adi.chipset, "NV38");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033410de: /* Nvidia GeForce FX 5900 ZT */
 		si->ps.card_type = NV38;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 ZT (NV38(?))\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5900 ZT");
+		sprintf(si->adi.chipset, "NV38(?)");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033810de: /* Nvidia Quadro FX 3000 */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3000 (NV35)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 3000");
+		sprintf(si->adi.chipset, "NV35");
 		status = nvxx_general_powerup();
 		break;
 	case 0x033f10de: /* Nvidia Quadro FX 700 */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 700 (NV35)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 700");
+		sprintf(si->adi.chipset, "NV35");
 		status = nvxx_general_powerup();
 		break;
 	case 0x034110de: /* Nvidia GeForce FX 5700 Ultra */
@@ -844,7 +954,8 @@ status_t nv_general_powerup()
 	case 0x034410de: /* Nvidia GeForce FX 5700VE */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 (NV36)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5700");
+		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
 	case 0x034710de: /* Nvidia GeForce FX 5700 Go */
@@ -852,40 +963,46 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 Go (NV36)\n"));
+		sprintf(si->adi.name, "Nvidia GeForce FX 5700 Go");
+		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
 	case 0x034c10de: /* Nvidia Quadro FX 1000 Go */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1000 Go (NV36)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 1000 Go");
+		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
 	case 0x034e10de: /* Nvidia Quadro FX 1100 */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1100 (NV36)\n"));
+		sprintf(si->adi.name, "Nvidia Quadro FX 1100");
+		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
 	case 0x034f10de: /* Nvidia unknown FX */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV36(?))\n"));
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV36(?)");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Elsa GmbH */
 	case 0x0c601048: /* Elsa Gladiac Geforce2 MX */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Elsa Gladiac Geforce2 MX (NV11)\n"));
+		sprintf(si->adi.name, "Elsa Gladiac Geforce2 MX");
+		sprintf(si->adi.chipset, "NV11");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Nvidia STB/SGS-Thompson */
 	case 0x002012d2: /* Nvidia STB/SGS-Thompson TNT1 */
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT1 (NV04)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson TNT1");
+		sprintf(si->adi.chipset, "NV04");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002812d2: /* Nvidia STB/SGS-Thompson TNT2 (pro) */
@@ -894,45 +1011,52 @@ status_t nv_general_powerup()
 	case 0x002b12d2: /* Nvidia STB/SGS-Thompson TNT2 */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT2 (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson TNT2");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002c12d2: /* Nvidia STB/SGS-Thompson Vanta (Lt) */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Vanta (Lt) (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson Vanta");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002d12d2: /* Nvidia STB/SGS-Thompson TNT2-M64 (Pro) */
 		si->ps.card_type = NV05M64;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT2-M64 (Pro) (NV05M64)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson TNT2M64");
+		sprintf(si->adi.chipset, "NV05 model 64");
 		status = nvxx_general_powerup();
 		break;
 	case 0x002e12d2: /* Nvidia STB/SGS-Thompson NV06 Vanta */
 	case 0x002f12d2: /* Nvidia STB/SGS-Thompson NV06 Vanta */
 		si->ps.card_type = NV06;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Vanta (NV06)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson Vanta");
+		sprintf(si->adi.chipset, "NV06");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00a012d2: /* Nvidia STB/SGS-Thompson Aladdin TNT2 */
 		si->ps.card_type = NV05;
 		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Aladdin TNT2 (NV05)\n"));
+		sprintf(si->adi.name, "Nvidia STB/SGS-Thompson TNT2");
+		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Varisys Limited */
 	case 0x35031888: /* Varisys GeForce4 MX440 */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Varisys GeForce4 MX440 (NV17)\n"));
+		sprintf(si->adi.name, "Varisys GeForce4 MX440");
+		sprintf(si->adi.chipset, "NV17");
 		status = nvxx_general_powerup();
 		break;
 	case 0x35051888: /* Varisys GeForce4 Ti 4200 */
 		si->ps.card_type = NV25;
 		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Varisys GeForce4 Ti 4200 (NV25)\n"));
+		sprintf(si->adi.name, "Varisys GeForce4 Ti 4200");
+		sprintf(si->adi.chipset, "NV25");
 		status = nvxx_general_powerup();
 		break;
 	default:
@@ -1130,6 +1254,7 @@ void set_crtc_owner(bool head)
 static status_t nvxx_general_powerup()
 {
 	LOG(4, ("INIT: NV powerup\n"));
+	LOG(4,("POWERUP: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 
 	/* setup cardspecs */
 	/* note:
