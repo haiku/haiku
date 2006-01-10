@@ -532,8 +532,9 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 	float importance)
 {
 	// TODO: add failed messages to a queue, and start dropping them by importance
+	//	(and use the same mechanism in ServerWindow::SendMessageToClient())
 
-	status_t status = messenger.SendMessage(message, (BHandler*)NULL, (bigtime_t)(importance * 100000));
+	status_t status = messenger.SendMessage(message, (BHandler*)NULL, 0);
 	if (status != B_OK) {
 		printf("EventDispatcher: failed to send message '%.4s' to target: %s\n",
 			(char*)&message->what, strerror(status));
