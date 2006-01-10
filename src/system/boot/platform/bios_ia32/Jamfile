@@ -24,6 +24,7 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	smp_trampoline.S
 	support.S
 	video.cpp
+	apm.cpp
 	
 	# generic
 	text_menu.cpp

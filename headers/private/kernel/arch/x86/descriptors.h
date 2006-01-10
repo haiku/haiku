@@ -1,7 +1,10 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ARCH_x86_DESCRIPTORS_H
 #define _KERNEL_ARCH_x86_DESCRIPTORS_H
 
@@ -12,14 +15,18 @@
 #define USER_CODE_SEG	0x1b
 #define USER_DATA_SEG	0x23
 
+#define APM_CODE32_SEGMENT	0x28
+#define APM_CODE16_SEGMENT	0x30
+#define APM_DATA_SEGMENT	0x38
 
 #ifndef _ASSEMBLER
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
 
-#define DOUBLE_FAULT_TSS_BASE_SEGMENT 5
+#define DOUBLE_FAULT_TSS_BASE_SEGMENT 8
 #define TSS_BASE_SEGMENT (DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
 #define TLS_BASE_SEGMENT (TSS_BASE_SEGMENT + smp_get_num_cpus())
+#define APM_BASE_SEGMENT (TLS_BASE_SEGMENT + smp_get_num_cpus())
 
 
 // defines entries in the GDT/LDT

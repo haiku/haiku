@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "serial.h"
 #include "console.h"
+#include "apm.h"
 #include "cpu.h"
 #include "mmu.h"
 #include "smp.h"
@@ -128,6 +129,7 @@ _start(void)
 	//if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
 		serial_enable();
 
+	apm_init();
 	smp_init();
 	main(&args);
 }

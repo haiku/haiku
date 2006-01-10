@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H
@@ -9,6 +9,8 @@
 #	error This file is included from <boot/kernel_args.h> only
 #endif
 
+
+#include <apm.h>
 #include <bios_drive.h>
 
 
@@ -25,6 +27,8 @@ typedef struct {
 
 	uint16		boot_drive_number;
 	bios_drive	*drives;	// this does not contain the boot drive
+
+	apm_info	apm;
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H */
