@@ -36,6 +36,11 @@ extern"C" void ppc_exception_tail(void);
 static ppc_cpu_exception_context sCPUExceptionContexts[SMP_MAX_CPUS];
 
 
+// An iframe stack used in the early boot process when we don't have
+// threads yet.
+struct iframe_stack gBootFrameStack;
+
+
 void 
 arch_int_enable_io_interrupt(int irq)
 {
@@ -72,20 +77,24 @@ print_iframe(struct iframe *frame)
 }
 
 
-extern "C" void exception_tail_test();
-void
-exception_tail_test()
-{
-}
-
 extern "C" void ppc_exception_entry(int vector, struct iframe *iframe);
 void 
 ppc_exception_entry(int vector, struct iframe *iframe)
 {
 	int ret = B_HANDLED_INTERRUPT;
 
-	if (vector != 0x900)
-		dprintf("ppc_exception_entry: time %Ld vector 0x%x, iframe %p\n", system_time(), vector, iframe);
+	if (vector != 0x900) {
+		dprintf("ppc_exception_entry: time %lld vector 0x%x, iframe %p, "
+			"srr0: %p\n", system_time(), vector, iframe, (void*)iframe->srr0);
+	}
+
+	struct thread *thread = thread_get_current_thread();
+
+	// push iframe
+	if (thread)
+		ppc_push_iframe(&thread->arch_info.iframes, iframe);
+	else
+		ppc_push_iframe(&gBootFrameStack, iframe);
 
 	switch (vector) {
 		case 0x100: // system reset
@@ -170,6 +179,12 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	}
+
+	// pop iframe
+	if (thread)
+		ppc_pop_iframe(&thread->arch_info.iframes);
+	else
+		ppc_pop_iframe(&gBootFrameStack);
 }
 
 

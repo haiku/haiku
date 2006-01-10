@@ -288,6 +288,8 @@ __save_regs:
 	mfspr	%r0, %srr0
 	stwu	%r0, -4(%r1)		/* push SRR0 */
 
+	stwu	%r3, -4(%r1)		/* exception vector offset */
+
 	blr
 
 
@@ -295,7 +297,7 @@ __save_regs:
  * r1: iframe pointer
  */
 __restore_regs_and_rfi:
-	lwz		%r0, 0(%r1)		/* SRR0 */
+	lwzu	%r0, 4(%r1)		/* SRR0 (skip vector offset) */
 	mtspr	%srr0, %r0
 	lwzu	%r0, 4(%r1)		/* SRR1 */
 	mtspr	%srr1, %r0

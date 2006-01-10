@@ -1,11 +1,16 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Axel Dörfler <axeld@pinc-software.de>
+ * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
+#include <arch_thread.h>
 
 #include <kernel.h>
 #include <thread.h>
@@ -14,6 +19,40 @@
 //#include <arch/vm_translation_map.h>
 
 #include <string.h>
+
+
+void
+ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+{
+	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
+	stack->frames[stack->index++] = frame;
+}
+
+
+void
+ppc_pop_iframe(struct iframe_stack *stack)
+{
+	ASSERT(stack->index > 0);
+	stack->index--;
+}
+
+
+/**	Returns the current iframe structure of the running thread.
+ *	This function must only be called in a context where it's actually
+ *	sure that such iframe exists; ie. from syscalls, but usually not
+ *	from standard kernel threads.
+ */
+static struct iframe *
+ppc_get_current_iframe(void)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	ASSERT(thread->arch_info.iframes.index >= 0);
+	return thread->arch_info.iframes.frames[thread->arch_info.iframes.index - 1];
+}
+
+
+// #pragma mark -
 
 
 status_t
@@ -58,23 +97,6 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 	t->arch_info.sp = (void *)kstack_top;
 
 	return B_OK;
-}
-
-
-// ToDo: we are single proc for now
-static struct thread *current_thread = NULL;
-
-struct thread *
-arch_thread_get_current_thread(void)
-{
-	return current_thread;
-}
-
-
-void 
-arch_thread_set_current_thread(struct thread *t)
-{
-	current_thread = t;
 }
 
 

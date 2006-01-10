@@ -10,6 +10,7 @@
 #include <KernelExport.h>
 
 #include <arch_platform.h>
+#include <arch_thread.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
@@ -17,6 +18,10 @@
 status_t 
 arch_cpu_preboot_init(kernel_args *args)
 {
+	// The current thread must be NULL for all CPUs till we have threads.
+	// Some boot code relies on this.
+	arch_thread_set_current_thread(NULL);
+
 	return B_OK;
 }
 

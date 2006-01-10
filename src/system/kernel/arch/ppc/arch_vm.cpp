@@ -6,12 +6,21 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <KernelExport.h>
 
 #include <kernel.h>
 #include <boot/kernel_args.h>
 
 #include <arch/vm.h>
 #include <arch_mmu.h>
+
+
+//#define TRACE_ARCH_VM
+#ifdef TRACE_ARCH_VM
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 
 status_t 
@@ -93,8 +102,34 @@ arch_vm_init_post_area(kernel_args *args)
 status_t
 arch_vm_init_end(kernel_args *args)
 {
-	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
-	//vm_free_unused_boot_loader_range(KERNEL_BASE, 0x400000 * args->arch_args.num_pgtables);
+	TRACE(("arch_vm_init_end(): %lu virtual ranges to keep:\n",
+		args->arch_args.num_virtual_ranges_to_keep));
+	
+	for (int i = 0; i < (int)args->arch_args.num_virtual_ranges_to_keep; i++) {
+		addr_range &range = args->arch_args.virtual_ranges_to_keep[i];
+
+		TRACE(("  start: %p, size: 0x%lx\n", (void*)range.start, range.size));
+
+		// skip ranges outside the kernel address space
+		if (!IS_KERNEL_ADDRESS(range.start)) {
+			TRACE(("    no kernel address, skipping...\n"));
+			continue;
+		}
+
+		void *address = (void*)range.start;
+		area_id area = create_area("boot loader reserved area", &address,
+			B_EXACT_ADDRESS, range.size, B_ALREADY_WIRED,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (area < 0) {
+			panic("arch_vm_init_end(): Failed to create area for boot loader "
+				"reserved area: %p - %p\n", (void*)range.start,
+				(void*)(range.start + range.size));
+		}
+	}
+
+	// Throw away any address space mappings we've inherited from the boot
+	// loader and have not yet turned into an area.
+	vm_free_unused_boot_loader_range(0, 0xffffffff - B_PAGE_SIZE + 1);
 
 	return B_OK;
 }

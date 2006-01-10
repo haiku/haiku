@@ -13,6 +13,7 @@
 #define PAGE_SIZE 4096
 
 struct iframe {
+	uint32 vector;
 	uint32 srr0;
 	uint32 srr1;
 	uint32 dar;

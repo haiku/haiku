@@ -323,7 +323,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	start = ROUNDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
 
-	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
+//	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
 
 	while (start < end) {
 		if (remove_page_table_entry(map, start))
