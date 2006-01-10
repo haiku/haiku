@@ -272,8 +272,9 @@ find_and_insert_area_slot(vm_address_space *addressSpace, addr_t start,
 	vm_area *next;
 	bool foundSpot = false;
 
-	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n",
-		map, start, size, end, addressSpec, area));
+	TRACE(("find_and_insert_region_slot: address space %p, start 0x%lx, "
+		"size %ld, end 0x%lx, addressSpec %ld, area %p\n", addressSpace, start,
+		size, end, addressSpec, area));
 
 	// do some sanity checking
 	if (start < addressSpace->base || size == 0
@@ -2164,6 +2165,15 @@ reserve_boot_loader_ranges(kernel_args *args)
 
 	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
 		void *address = (void *)args->virtual_allocated_range[i].start;
+
+		// If the address is no kernel address, we just skip it. The
+		// architecture specific code has to deal with it.
+		if (!IS_KERNEL_ADDRESS(address)) {
+			dprintf("reserve_boot_loader_ranges(): Skipping range: %p, %lu\n",
+				address, args->virtual_allocated_range[i].size);
+			continue;
+		}
+
 		status_t status = vm_reserve_address_range(vm_kernel_address_space_id(), &address,
 			B_EXACT_ADDRESS, args->virtual_allocated_range[i].size, 0);
 		if (status < B_OK)
@@ -2188,6 +2198,7 @@ vm_init(kernel_args *args)
 	// initialize some globals
 	sNextAreaID = 1;
 	sAreaHashLock = -1;
+	sAvailableMemoryLock.sem = -1;
 
 	// map in the new heap and initialize it
 	heap_base = vm_alloc_from_kernel_args(args, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
