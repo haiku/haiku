@@ -1070,29 +1070,30 @@ BMenu::_hide()
 BMenuItem *
 BMenu::_track(int *action, long start)
 {
-	// TODO: Take Sticky mode into account
-	BPoint location;
+	// TODO: Take Sticky mode into account, cleanup
 	ulong buttons;
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
 	do {
 		if (!LockLooper())
 			break;
-		
+	
+		BPoint location;
 		GetMouse(&location, &buttons);
-		if (OverSuper(location)) {
-			UnlockLooper();
-			break;
-		}
 					
 		item = HitTestItems(location, B_ORIGIN);
-					
 		if (item != NULL) {
 			if (item != fSelected)
 				SelectItem(item);
-		} else if (fSelected != NULL && !OverSubmenu(fSelected, ConvertToScreen(location)))
+		} else {
+			if (OverSuper(location)) {
+				UnlockLooper();
+				break;
+			}
+			if (fSelected != NULL && !OverSubmenu(fSelected, ConvertToScreen(location)))
 				SelectItem(NULL);
-				
+		}
+		
 		if (fSelected != NULL && fSelected->Submenu() != NULL) {
 			UnlockLooper();
 			
