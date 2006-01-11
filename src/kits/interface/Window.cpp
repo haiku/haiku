@@ -2501,6 +2501,9 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 BHandler *
 BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 {
+	if (target == NULL)
+		target = this;
+
 	switch (message->what) {
 		case B_KEY_DOWN:
 		case B_KEY_UP:
@@ -2519,7 +2522,9 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
 			// these messages should be dispatched by the focus view
-			return CurrentFocus();
+			if (CurrentFocus() != NULL)
+				return CurrentFocus();
+			break;
 
 		case B_MOUSE_DOWN:
 		case B_MOUSE_UP:
@@ -2735,6 +2740,7 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	if ((modifiers & B_COMMAND_KEY) != 0) {
 		// Command+q has been pressed, so, we will quit
 		// the shortcut mechanism doesn't allow handlers outside the window
+		// TODO: in BeOS, this shortcut can be removed!
 		if (key == 'Q' || key == 'q') {
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			return true;
