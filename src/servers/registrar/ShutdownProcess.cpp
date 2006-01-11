@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1231,9 +1231,9 @@ ShutdownProcess::_WorkerDoShutdown()
 	// If we are here, the shutdown process has been initiated successfully,
 	// that is, if an asynchronous BRoster::Shutdown() was requested, we
 	// notify the caller at this point.
-	bool synchronously;
-	if (fRequest->FindBool("synchronously", &synchronously) == B_OK
-		&& !synchronously) {
+	bool synchronous;
+	if (fRequest->FindBool("synchronous", &synchronous) == B_OK
+		&& !synchronous) {
 		_SendReply(B_OK);
 	}
 
