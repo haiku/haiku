@@ -191,7 +191,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 		return B_ERROR;
 	}
 	
-	dprintf( "USB Stack::Allocate() listhead: %l\n" , listhead );
+	dprintf( "USB Stack::Allocate() listhead: %ld\n" , listhead );
 	
 	memory_chunk *chunk = (memory_chunk *)listhead;
 	*log = (void *)listhead;

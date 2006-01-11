@@ -43,7 +43,8 @@
 
 #include "ohci.h"
 #include "ohci_hardware.h"
-#include <usb_p.h>
+#include "usb_p.h"
+
 //------------------------------------------------------
 //	OHCI:: 	Reverse the bits in a value between 0 and 31
 //			(Section 3.3.2) 

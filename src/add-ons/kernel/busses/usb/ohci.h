@@ -28,7 +28,7 @@
 //	OHCI::	Includes
 //	---------------------------
 
-#include <usb_p.h>
+#include "usb_p.h"
 #include "ohci_software.h"
 
 struct pci_info;

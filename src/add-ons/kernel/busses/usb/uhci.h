@@ -22,7 +22,7 @@
 #ifndef UHCI_H
 #define UHCI_H
 
-#include <usb_p.h>
+#include "usb_p.h"
 #include "uhci_hardware.h"
 
 struct pci_info;

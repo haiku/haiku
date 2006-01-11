@@ -27,7 +27,7 @@
 
 #include "uhci.h"
 #include "uhci_hardware.h"
-#include <usb_p.h>
+#include "usb_p.h"
 
 
 /* ++++++++++

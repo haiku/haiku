@@ -22,7 +22,7 @@
 #ifndef USB_P
 #define USB_P
 
-#include <usbspec_p.h>
+#include "usbspec_p.h"
 
 /* ++++++++++
 Forward declarations
