@@ -12,14 +12,21 @@
 
 #include <arch_thread.h>
 
+#include <arch_cpu.h>
+#include <boot/stage2.h>
 #include <kernel.h>
 #include <thread.h>
-#include <boot/stage2.h>
 #include <vm_types.h>
 //#include <arch/vm_translation_map.h>
 
 #include <string.h>
 
+// Valid initial arch_thread state. We just memcpy() it when initializing
+// a new thread structure.
+static struct arch_thread sInitialState;
+
+// Helper functions for thread creation, defined in arch_asm.S.
+extern void ppc_kernel_thread_root();
 
 void
 ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame)
@@ -52,12 +59,37 @@ ppc_get_current_iframe(void)
 }
 
 
+/** \brief Returns the current thread's topmost (i.e. most recent)
+ *  userland->kernel transition iframe (usually the first one, save for
+ *  interrupts in signal handlers).
+ *  \return The iframe, or \c NULL, if there is no such iframe (e.g. when
+ *          the thread is a kernel thread).
+ */
+struct iframe *
+ppc_get_user_iframe(void)
+{
+	struct thread *thread = thread_get_current_thread();
+	int i;
+
+	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
+		struct iframe *frame = thread->arch_info.iframes.frames[i];
+		if (frame->srr1 & MSR_PRIVILEGE_LEVEL)
+			return frame;
+	}
+
+	return NULL;
+}
+
+
 // #pragma mark -
 
 
 status_t
 arch_thread_init(struct kernel_args *args)
 {
+	// Initialize the static initial arch_thread state (sInitialState).
+	// Currently nothing to do, i.e. zero initialized is just fine.
+
 	return B_OK;
 }
 
@@ -65,36 +97,59 @@ arch_thread_init(struct kernel_args *args)
 status_t
 arch_team_init_team_struct(struct team *team, bool kernel)
 {
+	// Nothing to do. The structure is empty.
 	return B_OK;
 }
 
 
 status_t
-arch_thread_init_thread_struct(struct thread *t)
+arch_thread_init_thread_struct(struct thread *thread)
 {
 	// set up an initial state (stack & fpu)
-	memset(&t->arch_info, 0, sizeof(t->arch_info));
+	memcpy(&thread->arch_info, &sInitialState, sizeof(struct arch_thread));
 
 	return B_OK;
 }
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
+arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	size_t kstack_size = KERNEL_STACK_SIZE;
-	addr_t *kstack_top = kstack + kstack_size / sizeof(addr_t) - 2 * 4;
+	addr_t *kstackTop = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
 
-	// r13-r31, cr, r2
-	kstack_top -= (31 - 13 + 1) + 1 + 1;
+	// clear the kernel stack
+#ifdef DEBUG_KERNEL_STACKS
+#	ifdef STACK_GROWS_DOWNWARDS
+	memset((void *)((addr_t)kstack + KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE), 0,
+		KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+#	else
+	memset(kstack, 0, KERNEL_STACK_SIZE - KERNEL_STACK_GUARD_PAGES * B_PAGE_SIZE);
+#	endif
+#else
+	memset(kstack, 0, KERNEL_STACK_SIZE);
+#endif
 
-	// set the saved lr address to be the start_func
-	kstack_top--;
-	*kstack_top = (addr_t)start_func;
+	// space for frame pointer and return address, and stack frames must be
+	// 16 byte aligned
+	kstackTop -= 2;
+	kstackTop = (addr_t*)((addr_t)kstackTop & ~0xf);
+
+	// LR, CR, r2, r13-r31, as pushed by ppc_context_switch()
+	kstackTop -= 22;
+
+	// let LR point to ppc_kernel_thread_root()
+	kstackTop[0] = (addr_t)&ppc_kernel_thread_root;
+
+	// the arguments of ppc_kernel_thread_root() are the functions to call,
+	// provided in registers r13-r15
+	kstackTop[3] = (addr_t)entry_func;
+	kstackTop[4] = (addr_t)start_func;
+	kstackTop[5] = (addr_t)exit_func;
 
 	// save this stack position
-	t->arch_info.sp = (void *)kstack_top;
+	t->arch_info.sp = (void *)kstackTop;
 
 	return B_OK;
 }
@@ -103,6 +158,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 void
 arch_thread_init_tls(struct thread *thread)
 {
+// TODO: Implement!
 }
 
 

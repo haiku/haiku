@@ -1,7 +1,10 @@
 /*
-** Copyright 2003, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Copyright 2003, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #define FUNCTION(x) .global x; .type x,@function; x
 
@@ -185,42 +188,104 @@ FUNCTION(setl2cr):
 	mtspr		1017, %r3
 	blr
 
+	
 // void ppc_context_switch(addr_t *old_sp, addr_t new_sp);
 FUNCTION(ppc_context_switch):
 
 	// regs to push on the stack: r13-r31, cr, r2, lr
-#define SAVE_FRAME_SIZE (((31 - 13 + 1) + 1 + 1 + 1) * 4)
 
 	// push the old regs we need to save on the stack
-	addi		%sp, %sp, -SAVE_FRAME_SIZE
-	stmw		%r13, 12(%sp)
-	stw			%r2, 8(%sp)
+	// r31-13, r2
+	stwu		%r31, -4(%r1)
+	stwu		%r30, -4(%r1)
+	stwu		%r29, -4(%r1)
+	stwu		%r28, -4(%r1)
+	stwu		%r27, -4(%r1)
+	stwu		%r26, -4(%r1)
+	stwu		%r25, -4(%r1)
+	stwu		%r24, -4(%r1)
+	stwu		%r23, -4(%r1)
+	stwu		%r22, -4(%r1)
+	stwu		%r21, -4(%r1)
+	stwu		%r20, -4(%r1)
+	stwu		%r19, -4(%r1)
+	stwu		%r18, -4(%r1)
+	stwu		%r17, -4(%r1)
+	stwu		%r16, -4(%r1)
+	stwu		%r15, -4(%r1)
+	stwu		%r14, -4(%r1)
+	stwu		%r13, -4(%r1)
+	stwu		%r2, -4(%r1)
+
+	// CR and LR
 	mfcr		%r0
-	stw			%r0, 4(%sp)
+	stwu		%r0, -4(%r1)
 	mflr		%r0
-	stw			%r0, 0(%sp)
+	stwu		%r0, -4(%r1)
 
 	// save the old stack pointer
-	stw			%sp, 0(%r3)
+	stwu		%r1, 0(%r3)
 
 	// restore the new stack pointer
-	mr			%sp, %r4
+	mr			%r1, %r4
 
 	// restore the new regs
-	lwz			%r0, 0(%sp)
+	// LR and CR
+	lwz			%r0, 0(%r1)
 	mtlr		%r0
-	lwz			%r0, 4(%sp)
+	lwzu		%r0, 4(%r1)
 	mtcr		%r0
-	lwz			%r2, 8(%sp)
-	lmw			%r13, 12(%sp)
-	addi		%sp, %sp, SAVE_FRAME_SIZE
+
+	// r2, r13-31
+	lwzu		%r2, 4(%r1)
+	lwzu		%r13, 4(%r1)
+	lwzu		%r14, 4(%r1)
+	lwzu		%r15, 4(%r1)
+	lwzu		%r16, 4(%r1)
+	lwzu		%r17, 4(%r1)
+	lwzu		%r18, 4(%r1)
+	lwzu		%r19, 4(%r1)
+	lwzu		%r20, 4(%r1)
+	lwzu		%r21, 4(%r1)
+	lwzu		%r22, 4(%r1)
+	lwzu		%r23, 4(%r1)
+	lwzu		%r24, 4(%r1)
+	lwzu		%r25, 4(%r1)
+	lwzu		%r26, 4(%r1)
+	lwzu		%r27, 4(%r1)
+	lwzu		%r28, 4(%r1)
+	lwzu		%r29, 4(%r1)
+	lwzu		%r30, 4(%r1)
+	lwzu		%r31, 4(%r1)
+
+	addi		%r1, %r1, 4
 
 	blr
 
-// void arch_thread_switch_kstack_and_call(addr_t new_kstack, void (*func)(void *), void *arg)
+
+// void arch_thread_switch_kstack_and_call(addr_t new_kstack,
+//		void (*func)(void *), void *arg)
 FUNCTION(arch_thread_switch_kstack_and_call):
-	mr			%sp, %r3	// set the new stack pointer
+	mr			%r1, %r3	// set the new stack pointer
 	mtctr		%r4			// move the target function into CTR
 	mr			%r3, %r5	// move the arg to this func to the new arg
 	bctr
+
+
+// ppc_kernel_thread_root(): parameters in r13-r15, the functions to call
+// (in that order). The function is used when spawing threads. It usually calls
+// an initialization function, the actual thread function, and a function that
+// destroys the thread.
+FUNCTION(ppc_kernel_thread_root):
+	mtlr		%r13
+	blrl
+	mtlr		%r14
+	blrl
+	mtlr		%r15
+	blrl
+
+	// We should never get here. If we do, it's time to enter the kernel
+	// debugger (without a message at the moment).
+	li			%r3, 0
+	b			kernel_debugger
 
