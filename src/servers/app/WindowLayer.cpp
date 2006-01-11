@@ -905,10 +905,17 @@ WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
 
 
 void
-WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
+WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
+	bool isLatestMouseMoved)
 {
-	if (fDecorator) {
+	if (ViewLayer* view = ViewAt(where))
+		*_viewToken = view->Token();
 
+	// ignore pointer history
+	if (!isLatestMouseMoved)
+		return;
+
+	if (fDecorator) {
 		BRegion visibleBorder;
 		GetBorderRegion(&visibleBorder);
 		visibleBorder.IntersectWith(&VisibleRegion());
@@ -971,9 +978,6 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken)
 
 	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus())
 		fDesktop->SetFocusWindow(this);
-
-	if (ViewLayer* view = ViewAt(where))
-		*_viewToken = view->Token();
 }
 
 

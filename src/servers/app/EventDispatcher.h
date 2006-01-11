@@ -55,7 +55,7 @@ class EventTarget {
 class EventFilter {
 	public:
 		virtual filter_result Filter(BMessage* event, EventTarget** _target,
-			int32* _viewToken = NULL) = 0;
+			int32* _viewToken = NULL, BMessage* latestMouseMoved = NULL) = 0;
 };
 
 class EventDispatcher : public BLocker {
@@ -96,7 +96,8 @@ class EventDispatcher : public BLocker {
 
 		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
 
-		bool _AddTokens(BMessage* message, EventTarget* target, uint32 eventMask);
+		bool _AddTokens(BMessage* message, EventTarget* target, uint32 eventMask,
+				BMessage* nextMouseMoved = NULL, int32* _viewToken = NULL);
 		void _RemoveTokens(BMessage* message);
 		void _SetFeedFocus(BMessage* message);
 		void _UnsetFeedFocus(BMessage* message);
@@ -130,6 +131,7 @@ class EventDispatcher : public BLocker {
 
 		BObjectList<EventTarget> fTargets;
 
+		BMessage*		fNextLatestMouseMoved;
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;
 

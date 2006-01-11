@@ -53,7 +53,7 @@ class KeyboardFilter : public EventFilter {
 		KeyboardFilter(Desktop* desktop);
 
 		virtual filter_result Filter(BMessage* message, EventTarget** _target,
-			int32* _viewToken);
+			int32* _viewToken, BMessage* latestMouseMoved);
 
 	private:
 		Desktop*		fDesktop;
@@ -66,7 +66,7 @@ class MouseFilter : public EventFilter {
 		MouseFilter(Desktop* desktop);
 
 		virtual filter_result Filter(BMessage* message, EventTarget** _target,
-			int32* _viewToken);
+			int32* _viewToken, BMessage* latestMouseMoved);
 
 	private:
 		Desktop*	fDesktop;
@@ -87,7 +87,7 @@ KeyboardFilter::KeyboardFilter(Desktop* desktop)
 
 filter_result
 KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
-	int32* /*_viewToken*/)
+	int32* /*_viewToken*/, BMessage* /*latestMouseMoved*/)
 {
 	int32 key;
 	int32 modifiers;
@@ -190,7 +190,8 @@ MouseFilter::MouseFilter(Desktop* desktop)
 
 
 filter_result
-MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
+MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
+	BMessage* latestMouseMoved)
 {
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
@@ -216,7 +217,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken)
 				break;
 
 			case B_MOUSE_MOVED:
-				window->MouseMoved(message, where, _viewToken);
+				window->MouseMoved(message, where, _viewToken,
+					latestMouseMoved == NULL || latestMouseMoved == message);
 				break;
 		}
 

@@ -118,7 +118,8 @@ class WindowLayer {
 
 			void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
 			void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
-			void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken);
+			void				MouseMoved(BMessage* message, BPoint where, int32* _viewToken,
+									bool isLatestMouseMoved);
 
 			// some hooks to inform the client window
 			// TODO: move this to ServerWindow maybe?

@@ -31,6 +31,8 @@ class EventStream {
 
 		virtual bool GetNextEvent(BMessage** _event) = 0;
 		virtual bool GetNextCursorPosition(BPoint& where);
+
+		virtual BMessage* PeekLatestMouseMoved() = 0;
 };
 
 
@@ -53,6 +55,8 @@ class InputServerStream : public EventStream {
 		virtual bool GetNextEvent(BMessage** _event);
 		virtual bool GetNextCursorPosition(BPoint& where);
 
+		virtual BMessage* PeekLatestMouseMoved();
+
 	private:
 		status_t _MessageFromPort(BMessage** _message,
 			bigtime_t timeout = B_INFINITE_TIMEOUT);
@@ -64,6 +68,7 @@ class InputServerStream : public EventStream {
 		sem_id	fCursorSemaphore;
 		area_id	fCursorArea;
 		shared_cursor* fCursorBuffer;
+		BMessage* fLatestMouseMoved;
 };
 
 #endif	/* EVENT_STREAM_H */

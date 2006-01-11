@@ -49,7 +49,8 @@ InputServerStream::InputServerStream(BMessenger& messenger)
 	:
 	fInputServer(messenger),
 	fPort(-1),
-	fQuitting(false)
+	fQuitting(false),
+	fLatestMouseMoved(NULL)
 {
 	BMessage message(IS_ACQUIRE_INPUT);
 	fCursorArea = create_area("shared cursor", (void **)&fCursorBuffer, B_ANY_ADDRESS,
@@ -72,7 +73,8 @@ InputServerStream::InputServerStream(BMessenger& messenger)
 InputServerStream::InputServerStream()
 	:
 	fQuitting(false),
-	fCursorSemaphore(-1)
+	fCursorSemaphore(-1),
+	fLatestMouseMoved(NULL)
 {
 	fPort = find_port(SERVER_INPUT_PORT);
 }
@@ -122,9 +124,12 @@ InputServerStream::GetNextEvent(BMessage** _event)
 		// wait for new events
 		BMessage* event;
 		status_t status = _MessageFromPort(&event);
-		if (status == B_OK)
+		if (status == B_OK) {
+			if (event->what == B_MOUSE_MOVED)
+				fLatestMouseMoved = event;
+
 			fEvents.AddMessage(event);
-		else if (status == B_BAD_PORT_ID) {
+		} else if (status == B_BAD_PORT_ID) {
 			// our port got deleted - the input_server must have died
 			fPort = -1;
 			return false;
@@ -134,8 +139,11 @@ InputServerStream::GetNextEvent(BMessage** _event)
 		if (count > 0) {
 			// empty port queue completely while we're at it
 			for (int32 i = 0; i < count; i++) {
-				if (_MessageFromPort(&event, 0) == B_OK)
+				if (_MessageFromPort(&event, 0) == B_OK) {
+					if (event->what == B_MOUSE_MOVED)
+						fLatestMouseMoved = event;
 					fEvents.AddMessage(event);
+				}
 			}
 		}
 	}
@@ -180,6 +188,13 @@ InputServerStream::GetNextCursorPosition(BPoint &where)
 	}
 
 	return true;
+}
+
+
+BMessage*
+InputServerStream::PeekLatestMouseMoved()
+{
+	return fLatestMouseMoved;
 }
 
 

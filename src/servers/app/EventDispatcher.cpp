@@ -61,6 +61,7 @@ struct event_listener {
 	uint32		temporary_options;
 
 	uint32		EffectiveEventMask() const { return event_mask | temporary_event_mask; }
+	uint32		EffectiveOptions() const { return options | temporary_options; }
 };
 
 static const char* kTokenName = "_token";
@@ -220,6 +221,7 @@ EventDispatcher::EventDispatcher()
 	fMouseFilter(NULL),
 	fKeyboardFilter(NULL),
 	fTargets(10),
+	fNextLatestMouseMoved(NULL),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL)
 {
@@ -550,25 +552,36 @@ EventDispatcher::_SendMessage(BMessenger& messenger, BMessage* message,
 
 
 bool
-EventDispatcher::_AddTokens(BMessage* message, EventTarget* target, uint32 eventMask)
+EventDispatcher::_AddTokens(BMessage* message, EventTarget* target,
+	uint32 eventMask, BMessage* nextMouseMoved, int32* _viewToken)
 {
 	_RemoveTokens(message);
 
 	int32 count = target->CountListeners();
-	for (int32 i = count; i-- > 0;) {
+	int32 added = 0;
+
+	for (int32 i = 0; i < count; i++) {
 		event_listener* listener = target->ListenerAt(i);
-		if ((listener->EffectiveEventMask() & eventMask) == 0) {
-			count--;
+		if ((listener->EffectiveEventMask() & eventMask) == 0)
+			continue;
+
+		if (nextMouseMoved != NULL
+			&& (listener->EffectiveOptions() & B_NO_POINTER_HISTORY) != 0
+			&& message != nextMouseMoved) {
+			if (listener->token == *_viewToken) {
+				// focus view doesn't want to get pointer history
+				*_viewToken = B_NULL_TOKEN;
+			}
 			continue;
 		}
 
 		ETRACE(("  add token %ld\n", listener->token));
 
-		if (message->AddInt32(kTokenName, listener->token) != B_OK)
-			count--;
+		if (message->AddInt32(kTokenName, listener->token) == B_OK)
+			added++;
 	}
 
-	return count != 0;
+	return added != 0;
 }
 
 
@@ -664,14 +677,17 @@ EventDispatcher::_EventLoop()
 					}
 				}
 
-				// TODO: this drops older mouse events, but should probably work
-				//	a bit different (ie. don't drop the last event)
-				bigtime_t eventTime;
-				if (event->FindInt64("when", &eventTime) == B_OK) {
-					if (system_time() - eventTime > 25000) {
-						// the server itself lags behind too much
-						// -> drop the event
-						break;
+				// This is for B_NO_POINTER_HISTORY - we always want the
+				// latest mouse moved event in the queue only
+				if (fNextLatestMouseMoved == NULL)
+					fNextLatestMouseMoved = fStream->PeekLatestMouseMoved();
+				else if (fNextLatestMouseMoved != event) {
+					// Drop older mouse moved messages if the server is lagging too
+					// much (if the message is older than 100 msecs)
+					bigtime_t eventTime;
+					if (event->FindInt64("when", &eventTime) == B_OK) {
+						if (system_time() - eventTime > 100000)
+							break;
 					}
 				}
 
@@ -691,7 +707,8 @@ EventDispatcher::_EventLoop()
 
 				EventTarget* mouseTarget = fPreviousMouseTarget;
 				int32 viewToken = B_NULL_TOKEN;
-				if (fMouseFilter->Filter(event, &mouseTarget, &viewToken) == B_SKIP_MESSAGE) {
+				if (fMouseFilter->Filter(event, &mouseTarget, &viewToken,
+						fNextLatestMouseMoved) == B_SKIP_MESSAGE) {
 					// this is a work-around if the wrong B_MOUSE_UP
 					// event is filtered out
 					if (event->what == B_MOUSE_UP) {
@@ -728,11 +745,21 @@ EventDispatcher::_EventLoop()
 				current = fPreviousMouseTarget = mouseTarget;
 
 				if (current != NULL) {
-					addedTokens |= _AddTokens(event, current, B_POINTER_EVENTS);
+					int32 focusView = viewToken;
+					addedTokens |= _AddTokens(event, current, B_POINTER_EVENTS,
+						fNextLatestMouseMoved, &focusView);
+
+					bool noPointerHistoryFocus = focusView != viewToken;
+
 					if (viewToken != B_NULL_TOKEN)
 						event->AddInt32("_view_token", viewToken);
-					if (addedTokens)
+
+					if (addedTokens && !noPointerHistoryFocus)
 						_SetFeedFocus(event);
+					else if (noPointerHistoryFocus) {
+						// no tokens were added or the focus shouldn't get a mouse moved
+						break;
+					}
 
 					_SendMessage(current->Messenger(), event, event->what == B_MOUSE_MOVED
 						? kMouseMovedImportance : kStandardImportance);
@@ -801,7 +828,8 @@ EventDispatcher::_EventLoop()
 
 				// don't send the message if there are no tokens for this event
 				if (!_AddTokens(event, target,
-						keyboardEvent ? B_KEYBOARD_EVENTS : B_POINTER_EVENTS))
+						keyboardEvent ? B_KEYBOARD_EVENTS : B_POINTER_EVENTS,
+						event->what == B_MOUSE_MOVED ? fNextLatestMouseMoved : NULL))
 					continue;
 
 				if (!_SendMessage(target->Messenger(), event, event->what == B_MOUSE_MOVED
@@ -819,6 +847,8 @@ EventDispatcher::_EventLoop()
 			}
 		}
 
+		if (fNextLatestMouseMoved == event)
+			fNextLatestMouseMoved = NULL;
 		delete event;
 	}
 }
