@@ -192,9 +192,30 @@ FUNCTION(setl2cr):
 // void ppc_context_switch(addr_t *old_sp, addr_t new_sp);
 FUNCTION(ppc_context_switch):
 
-	// regs to push on the stack: r13-r31, cr, r2, lr
+	// regs to push on the stack: f13-f31, r13-r31, cr, r2, lr
 
 	// push the old regs we need to save on the stack
+	// f31-13
+	stfdu		%f31, -8(%r1)
+	stfdu		%f30, -8(%r1)
+	stfdu		%f29, -8(%r1)
+	stfdu		%f28, -8(%r1)
+	stfdu		%f27, -8(%r1)
+	stfdu		%f26, -8(%r1)
+	stfdu		%f25, -8(%r1)
+	stfdu		%f24, -8(%r1)
+	stfdu		%f23, -8(%r1)
+	stfdu		%f22, -8(%r1)
+	stfdu		%f21, -8(%r1)
+	stfdu		%f20, -8(%r1)
+	stfdu		%f19, -8(%r1)
+	stfdu		%f18, -8(%r1)
+	stfdu		%f17, -8(%r1)
+	stfdu		%f16, -8(%r1)
+	stfdu		%f15, -8(%r1)
+	stfdu		%f14, -8(%r1)
+	stfdu		%f13, -8(%r1)
+
 	// r31-13, r2
 	stwu		%r31, -4(%r1)
 	stwu		%r30, -4(%r1)
@@ -258,7 +279,28 @@ FUNCTION(ppc_context_switch):
 	lwzu		%r30, 4(%r1)
 	lwzu		%r31, 4(%r1)
 
-	addi		%r1, %r1, 4
+	// f13-31
+	lfdu		%f13, 4(%r1)
+	lfdu		%f14, 8(%r1)
+	lfdu		%f15, 8(%r1)
+	lfdu		%f16, 8(%r1)
+	lfdu		%f17, 8(%r1)
+	lfdu		%f18, 8(%r1)
+	lfdu		%f19, 8(%r1)
+	lfdu		%f20, 8(%r1)
+	lfdu		%f21, 8(%r1)
+	lfdu		%f22, 8(%r1)
+	lfdu		%f23, 8(%r1)
+	lfdu		%f24, 8(%r1)
+	lfdu		%f25, 8(%r1)
+	lfdu		%f26, 8(%r1)
+	lfdu		%f27, 8(%r1)
+	lfdu		%f28, 8(%r1)
+	lfdu		%f29, 8(%r1)
+	lfdu		%f30, 8(%r1)
+	lfdu		%f31, 8(%r1)
+	
+	addi		%r1, %r1, 8
 
 	blr
 

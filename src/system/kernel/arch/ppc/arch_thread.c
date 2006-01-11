@@ -136,8 +136,8 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 	kstackTop -= 2;
 	kstackTop = (addr_t*)((addr_t)kstackTop & ~0xf);
 
-	// LR, CR, r2, r13-r31, as pushed by ppc_context_switch()
-	kstackTop -= 22;
+	// LR, CR, r2, r13-r31, f13-f31, as pushed by ppc_context_switch()
+	kstackTop -= 22 + 2 * 19;
 
 	// let LR point to ppc_kernel_thread_root()
 	kstackTop[0] = (addr_t)&ppc_kernel_thread_root;

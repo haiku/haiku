@@ -19,6 +19,9 @@ static bool sHasTlbia;
 status_t 
 arch_cpu_preboot_init(kernel_args *args)
 {
+	// enable FPU
+	set_msr(get_msr() | MSR_FP_AVAILABLE);
+
 	// The current thread must be NULL for all CPUs till we have threads.
 	// Some boot code relies on this.
 	arch_thread_set_current_thread(NULL);

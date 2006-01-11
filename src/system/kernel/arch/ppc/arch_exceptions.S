@@ -119,6 +119,8 @@ exception_vector_common:
 	rlwinm	%r0, %r0, 28, 30, 31	/* extract mmu bits */
 	mfmsr	%r3						/* load the current msr */
 	rlwimi  %r3, %r0, 4, 26, 27		/* merge the mmu bits with the current msr */
+	li		%r0, 1
+	rlwimi  %r3, %r0, 13, 18, 18	/* turn on FPU, too */
 	mtmsr	%r3						/* load new msr (turning the mmu back on) */
 	isync
 
@@ -194,6 +196,10 @@ FUNCTION(ppc_exception_tail):
 	/* restore the CR, it was messed up in the previous compare */
 	mtcrf	0xff, %r0
 
+	/* align r1 to 8 bytes, so the iframe will be aligned too */
+	li		%r0, 0xfffffff8
+	and		%r1, %r1, %r0
+
 	/* save the registers */
 	bl		__save_regs
 
@@ -231,6 +237,46 @@ FUNCTION(ppc_exception_tail):
  * and ready to be saved
  */
 __save_regs:
+	/* Note: The iframe must be 8 byte aligned. The stack pointer we are passed
+	   in r1 is aligned. So we store the floating point registers first and
+	   need to take care that an even number of 4 byte registers is stored,
+	   or insert padding respectively. */
+
+	/* push f0-f31 */
+	stfdu	%f0, -8(%r1)
+	stfdu	%f1, -8(%r1)
+	stfdu	%f2, -8(%r1)
+	stfdu	%f3, -8(%r1)
+	stfdu	%f4, -8(%r1)
+	stfdu	%f5, -8(%r1)
+	stfdu	%f6, -8(%r1)
+	stfdu	%f7, -8(%r1)
+	stfdu	%f8, -8(%r1)
+	stfdu	%f9, -8(%r1)
+	stfdu	%f10, -8(%r1)
+	stfdu	%f11, -8(%r1)
+	stfdu	%f12, -8(%r1)
+	stfdu	%f13, -8(%r1)
+	stfdu	%f14, -8(%r1)
+	stfdu	%f15, -8(%r1)
+	stfdu	%f16, -8(%r1)
+	stfdu	%f17, -8(%r1)
+	stfdu	%f18, -8(%r1)
+	stfdu	%f19, -8(%r1)
+	stfdu	%f20, -8(%r1)
+	stfdu	%f21, -8(%r1)
+	stfdu	%f22, -8(%r1)
+	stfdu	%f23, -8(%r1)
+	stfdu	%f24, -8(%r1)
+	stfdu	%f25, -8(%r1)
+	stfdu	%f26, -8(%r1)
+	stfdu	%f27, -8(%r1)
+	stfdu	%f28, -8(%r1)
+	stfdu	%f29, -8(%r1)
+	stfdu	%f30, -8(%r1)
+	stfdu	%f31, -8(%r1)
+
+	/* push r0-r3 */
 	lwz		%r0, 16(%r2)		/* original r0 */
 	stwu	%r0, -4(%r1)		/* push r0 */
 	mfsprg1	%r0					/* original r1 */
@@ -271,6 +317,8 @@ __save_regs:
 	stwu	%r31, -4(%r1)
 
 	/* save some of the other regs */
+	mffs	%f0
+	stfs	%f0, -4(%r1)		/* push FPSCR */
 	mfctr	%r0
 	stwu	%r0, -4(%r1)		/* push CTR */
 	mfxer	%r0
@@ -313,6 +361,8 @@ __restore_regs_and_rfi:
 	mtxer	%r0
 	lwzu	%r0, 4(%r1)		/* CTR */
 	mtctr	%r0
+	lfs		%f0, 4(%r1)		/* FPSCR */
+	mtfsf	0xff, %f0
 
 	lwzu	%r31, 4(%r1)
 	lwzu	%r30, 4(%r1)
@@ -343,6 +393,46 @@ __restore_regs_and_rfi:
 	lwzu	%r5, 4(%r1)
 	lwzu	%r4, 4(%r1)
 	lwzu	%r3, 4(%r1)
+	
+	/* Stop here, before we overwrite r1, and continue with the floating point
+	   registers first. */
+	addi	%r2, %r1, 16		/* skip r3-r0 */
+
+	/* f31-f0 */
+	lfd		%f31, 0(%r2)
+	lfdu	%f30, 8(%r2)
+	lfdu	%f29, 8(%r2)
+	lfdu	%f28, 8(%r2)
+	lfdu	%f27, 8(%r2)
+	lfdu	%f26, 8(%r2)
+	lfdu	%f25, 8(%r2)
+	lfdu	%f24, 8(%r2)
+	lfdu	%f23, 8(%r2)
+	lfdu	%f22, 8(%r2)
+	lfdu	%f21, 8(%r2)
+	lfdu	%f20, 8(%r2)
+	lfdu	%f19, 8(%r2)
+	lfdu	%f18, 8(%r2)
+	lfdu	%f17, 8(%r2)
+	lfdu	%f16, 8(%r2)
+	lfdu	%f15, 8(%r2)
+	lfdu	%f14, 8(%r2)
+	lfdu	%f13, 8(%r2)
+	lfdu	%f12, 8(%r2)
+	lfdu	%f11, 8(%r2)
+	lfdu	%f10, 8(%r2)
+	lfdu	%f9, 8(%r2)
+	lfdu	%f8, 8(%r2)
+	lfdu	%f7, 8(%r2)
+	lfdu	%f6, 8(%r2)
+	lfdu	%f5, 8(%r2)
+	lfdu	%f4, 8(%r2)
+	lfdu	%f3, 8(%r2)
+	lfdu	%f2, 8(%r2)
+	lfdu	%f1, 8(%r2)
+	lfd		%f0, 8(%r2)
+
+	/* r2-r0 */
 	lwzu	%r2, 4(%r1)
 	lwz		%r0, 8(%r1)
 	lwz		%r1, 4(%r1)
