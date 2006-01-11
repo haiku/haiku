@@ -97,6 +97,7 @@ virtual	void		Draw(BRect updateRect);
 virtual	void		FrameResized(float width, float height);
 virtual	void		MessageReceived(BMessage* msg);
 virtual	void		MakeFocus(bool focused = true);
+virtual void		MouseDown(BPoint where);
 
 private:
 		_BMCMenuBar_&operator=(const _BMCMenuBar_ &);

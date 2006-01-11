@@ -24,9 +24,6 @@
 //	Description:	The BMCPrivate classes are used by BMenuField.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <BMCPrivate.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -34,45 +31,48 @@
 #include <Region.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 _BMCItem_::_BMCItem_(BMenu *menu)
 	:	BMenuItem(menu),
 		fShowPopUpMarker(true)
 {
 }
-//------------------------------------------------------------------------------
+
+
 _BMCItem_::_BMCItem_(BMessage *message)
 	:	BMenuItem(message),
 		fShowPopUpMarker(true)
 {
 }
-//------------------------------------------------------------------------------
+
+
 _BMCItem_::~_BMCItem_()
 {
 }
-//------------------------------------------------------------------------------
-BArchivable *_BMCItem_::Instantiate(BMessage *data)
+
+
+BArchivable *
+_BMCItem_::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "_BMCItem_"))
 		return new _BMCItem_(data);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-void _BMCItem_::Draw()
+
+
+void
+_BMCItem_::Draw()
 {
 	BMenu *menu = Menu();
 	
 	// Copy / pasted from BMenuItem::Draw(). We can't use it directly
 	// because we want to skip the Submenu symbol and the rest
+	if (IsEnabled())
+		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	else
+		menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DISABLED_LABEL_TINT));
 	menu->MovePenTo(ContentLocation());
 	DrawContent();
 
@@ -99,36 +99,45 @@ void _BMCItem_::Draw()
 	menu->StrokeLine(BPoint(rect.left + 2.0f, rect.bottom),
 		BPoint(rect.left + 2.0f, rect.bottom));
 }
-//------------------------------------------------------------------------------
-void _BMCItem_::GetContentSize(float *width, float *height)
+
+
+void
+_BMCItem_::GetContentSize(float *width, float *height)
 {
 	BMenuItem::GetContentSize(width, height);
 }
-//------------------------------------------------------------------------------
-/*_BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32)
+
+
+/*
+_BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32)
 {
 }
-//------------------------------------------------------------------------------
+
+
 _BMCFilter_::~_BMCFilter_()
 {
 }
-//------------------------------------------------------------------------------
-filter_result _BMCFilter_::Filter(BMessage *message, BHandler **handler)
+
+
+filter_result
+_BMCFilter_::Filter(BMessage *message, BHandler **handler)
 {
 }
-//------------------------------------------------------------------------------
-_BMCFilter_ &_BMCFilter_::operator=(const _BMCFilter_ &)
+
+
+_BMCFilter_ &
+_BMCFilter_::operator=(const _BMCFilter_ &)
 {
 	return *this;
 }*/
-//------------------------------------------------------------------------------
+
+
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
 	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_COLUMN,
 			!fixed_size)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	SetBorder(B_BORDER_CONTENTS);
-
 
 	fMenuField = menuField;
 	fFixedSize = fixed_size;
@@ -141,7 +150,8 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
 
 	SetMaxContentWidth(frame.Width() - (left + right));
 }
-//------------------------------------------------------------------------------
+
+
 _BMCMenuBar_::_BMCMenuBar_(BMessage *data)
 	:	BMenuBar(data)
 {
@@ -154,20 +164,25 @@ _BMCMenuBar_::_BMCMenuBar_(BMessage *data)
 	else
 		fFixedSize = true;
 }
-//------------------------------------------------------------------------------
+
+
 _BMCMenuBar_::~_BMCMenuBar_()
 {
 }
-//------------------------------------------------------------------------------
-BArchivable *_BMCMenuBar_::Instantiate(BMessage *data)
+
+
+BArchivable *
+_BMCMenuBar_::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "_BMCMenuBar_"))
 		return new _BMCMenuBar_(data);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-void _BMCMenuBar_::AttachedToWindow()
+
+
+void
+_BMCMenuBar_::AttachedToWindow()
 {
 	fMenuField = (BMenuField*)Parent();
 
@@ -175,8 +190,10 @@ void _BMCMenuBar_::AttachedToWindow()
 	BMenuBar::AttachedToWindow();
 	Window()->SetKeyMenuBar(menuBar);
 }
-//------------------------------------------------------------------------------
-void _BMCMenuBar_::Draw(BRect updateRect)
+
+
+void
+_BMCMenuBar_::Draw(BRect updateRect)
 {
 	// draw the right and bottom line here in a darker tint
 	BRect bounds(Bounds());
@@ -204,8 +221,10 @@ void _BMCMenuBar_::Draw(BRect updateRect)
 	StrokeLine(BPoint(bounds.right - 1, bounds.bottom - 1),
 			   BPoint(bounds.right - 1, bounds.top + 1));
 }
-//------------------------------------------------------------------------------
-void _BMCMenuBar_::FrameResized(float width, float height)
+
+
+void
+_BMCMenuBar_::FrameResized(float width, float height)
 {
 	// we need to take care of resizing and cleaning up
 	// the parent menu field
@@ -236,44 +255,48 @@ void _BMCMenuBar_::FrameResized(float width, float height)
 	}
 	BMenuBar::FrameResized(width, height);
 }
-//------------------------------------------------------------------------------
-void _BMCMenuBar_::MessageReceived(BMessage *msg)
+
+
+void
+_BMCMenuBar_::MessageReceived(BMessage *msg)
 {
-	if (msg->what == 'TICK')
-	{
-		BMenuItem *item = ItemAt(0);
-
-		if (item && item->Submenu() &&  item->Submenu()->Window())
+	switch (msg->what) {
+		case 'TICK':
 		{
-			BMessage message(B_KEY_DOWN);
+			BMenuItem *item = ItemAt(0);
 
-			message.AddInt8("byte", B_ESCAPE);
-			message.AddInt8("key", B_ESCAPE);
-			message.AddInt32("modifiers", 0);
-			message.AddInt8("raw_char", B_ESCAPE);
-
-			Window()->PostMessage(&message, this, NULL);
+			if (item && item->Submenu() &&  item->Submenu()->Window()) {
+				BMessage message(B_KEY_DOWN);
+	
+				message.AddInt8("byte", B_ESCAPE);
+				message.AddInt8("key", B_ESCAPE);
+				message.AddInt32("modifiers", 0);
+				message.AddInt8("raw_char", B_ESCAPE);
+	
+				Window()->PostMessage(&message, this, NULL);
+			}
 		}
+		// fall through	
+		default:
+			BMenuBar::MessageReceived(msg);
+			break;
 	}
-
-	BMenuBar::MessageReceived(msg);
 }
-//------------------------------------------------------------------------------
-void _BMCMenuBar_::MakeFocus(bool focused)
+
+
+void
+_BMCMenuBar_::MakeFocus(bool focused)
 {
 	if (IsFocus() == focused)
 		return;
 
 	BMenuBar::MakeFocus(focused);
 
-	if (focused)
-	{
+	if (focused) {
 		BMessage message('TICK');
 		//fRunner = new BMessageRunner(BMessenger(this, NULL, NULL), &message,
 		//	50000, -1);
-	}
-	else if (fRunner)
-	{
+	} else if (fRunner) {
 		//delete fRunner;
 		fRunner = NULL;
 	}
@@ -289,9 +312,19 @@ void _BMCMenuBar_::MakeFocus(bool focused)
 	fMenuField->Invalidate(BRect(bounds.left, bounds.top, fMenuField->fDivider,
 		bounds.bottom));
 }
-//------------------------------------------------------------------------------
-_BMCMenuBar_ &_BMCMenuBar_::operator=(const _BMCMenuBar_ &)
+
+
+void
+_BMCMenuBar_::MouseDown(BPoint where)
+{
+	// Don't show the associated menu if it's disabled
+	if (fMenuField->IsEnabled() && SubmenuAt(0)->IsEnabled())
+		BMenuBar::MouseDown(where);
+}
+
+
+_BMCMenuBar_ 
+&_BMCMenuBar_::operator=(const _BMCMenuBar_ &)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------

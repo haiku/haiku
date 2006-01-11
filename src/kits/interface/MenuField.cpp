@@ -6,8 +6,6 @@
  *		Marc Flerackers (mflerackers@androme.be)
  */
 
-
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,7 +34,7 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 		false, this);
 
 	AddChild(fMenuBar);
-	fMenuBar->AddItem(menu);
+	fMenuBar->AddItem(new _BMCItem_(menu));
 
 	fMenuBar->SetFont(be_plain_font);
 
@@ -223,7 +221,7 @@ BMenuField::AllAttached()
 void
 BMenuField::MouseDown(BPoint where)
 {
-	if (where.x > fDivider && !fMenuBar->Frame().Contains(where))
+	if (!IsEnabled() || (where.x > fDivider && !fMenuBar->Frame().Contains(where)))
 		return;
 
 	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
@@ -245,6 +243,9 @@ BMenuField::KeyDown(const char *bytes, int32 numBytes)
 		case B_RIGHT_ARROW:
 		case B_DOWN_ARROW:
 		{
+			if (!IsEnabled())
+				break;
+
 			BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
 			fMenuBar->StartMenuBar(0, true, true, &bounds);
