@@ -2,8 +2,10 @@
 
 #include <stdio.h>
 
+#include <Application.h>
 #include <Bitmap.h>
 #include <Message.h>
+#include <MessageQueue.h>
 #include <Region.h>
 #include <Shape.h>
 #include <String.h>
@@ -49,11 +51,22 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 }
 
+// destructor
+ObjectView::~ObjectView()
+{
+}
+
 // AttachedToWindow
 void
 ObjectView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
+}
+
+// DetachedFromWindow
+void
+ObjectView::DetachedFromWindow()
+{
 }
 
 // Draw
@@ -137,11 +150,43 @@ ObjectView::MouseDown(BPoint where)
 {
 	uint32 buttons;
 	int32 clicks;
+//
+//	snooze(1000000);
+//	BMessageQueue* queue = Window()->MessageQueue();
+//	BMessage* msg;
+//	int32 count = 0;
+//	for (int32 i = 0; (msg = queue->FindMessage(i)); i++) {
+//		if (msg->what == B_MOUSE_MOVED)
+//			count++;
+//	}
+//	printf("B_MOUSE_MOVED count before GetMouse(): %ld\n", count);
+//
+//	GetMouse(&where, &buttons);
+//
+//	count = 0;
+//	for (int32 i = 0; (msg = queue->FindMessage(i)); i++) {
+//		if (msg->what == B_MOUSE_MOVED)
+//			count++;
+//	}
+//	printf("B_MOUSE_MOVED count after 1st GetMouse(): %ld\n", count);
+//
+//	GetMouse(&where, &buttons);
+//
+//	count = 0;
+//	for (int32 i = 0; (msg = queue->FindMessage(i)); i++) {
+//		if (msg->what == B_MOUSE_MOVED)
+//			count++;
+//	}
+//	printf("B_MOUSE_MOVED count after 2nd GetMouse(): %ld\n", count);
+//	return;
+
+//be_app->HideCursor();
+
 	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 	Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 //printf("ObjectView::MouseDown() - clicks: %ld\n", clicks);
-	fScrolling = buttons & B_SECONDARY_MOUSE_BUTTON;
-	fInitiatingDrag = !fScrolling && (buttons & B_TERTIARY_MOUSE_BUTTON);
+	fInitiatingDrag = buttons & B_SECONDARY_MOUSE_BUTTON;
+	fScrolling = !fInitiatingDrag && (buttons & B_TERTIARY_MOUSE_BUTTON);
 
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 
@@ -153,9 +198,7 @@ ObjectView::MouseDown(BPoint where)
 									  fFill, fPenSize));
 	
 		if (fState) {
-//			Invalidate(fState->Bounds());
 			fState->MouseDown(where);
-//			Invalidate(fState->Bounds());
 		}
 	}
 }
@@ -164,6 +207,8 @@ ObjectView::MouseDown(BPoint where)
 void
 ObjectView::MouseUp(BPoint where)
 {
+//be_app->ShowCursor();
+
 	if (fScrolling) {
 		fScrolling = false;
 	} else {
@@ -193,8 +238,28 @@ if (dragMessage) {
 		BPoint offset = fLastMousePos - where;
 		if (sqrtf(offset.x * offset.x + offset.y * offset.y) > 5.0) {
 			BMessage dragMessage('drag');
-			BBitmap* dragBitmap = new BBitmap(BRect(0, 0, 20, 20), B_RGBA32);
-			memset(dragBitmap->Bits(), 128, dragBitmap->BitsLength());
+			BBitmap* dragBitmap = new BBitmap(BRect(0, 0, 40, 40), B_RGBA32, true);
+			if (dragBitmap->Lock()) {
+				BView* helper = new BView(dragBitmap->Bounds(), "offscreen view",
+										  B_FOLLOW_ALL, B_WILL_DRAW);
+				dragBitmap->AddChild(helper);
+				helper->SetDrawingMode(B_OP_ALPHA);
+				helper->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+
+				BRect r(helper->Bounds());
+				helper->SetHighColor(0, 0, 0, 128);
+				helper->StrokeRect(r);
+
+				helper->SetHighColor(200, 200, 200, 100);
+				r.InsetBy(1, 1);
+				helper->FillRect(r);
+
+				helper->SetHighColor(0, 0, 0, 255);
+				const char* text = "Test";
+				float pos = (r.Width() - helper->StringWidth(text)) / 2;
+				helper->DrawString(text, BPoint(pos, 25));
+				helper->Sync();
+			}
 			
 			DragMessage(&dragMessage, dragBitmap, B_OP_ALPHA, B_ORIGIN, this);
 			fInitiatingDrag = false;

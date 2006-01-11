@@ -17,9 +17,11 @@ class ObjectView : public BView {
  public:
 							ObjectView(BRect frame, const char* name,
 									   uint32 resizeFlags, uint32 flags);
+	virtual					~ObjectView();
 
 							// BView
 	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 
 	virtual	void			Draw(BRect updateRect);
 

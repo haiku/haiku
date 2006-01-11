@@ -21,6 +21,7 @@
 #include <Slider.h>
 #include <String.h>
 #include <RadioButton.h>
+#include <Region.h>
 #include <TabView.h>
 #include <TextControl.h>
 #include <TextView.h>
