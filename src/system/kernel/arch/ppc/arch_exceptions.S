@@ -197,8 +197,7 @@ FUNCTION(ppc_exception_tail):
 	mtcrf	0xff, %r0
 
 	/* align r1 to 8 bytes, so the iframe will be aligned too */
-	li		%r0, 0xfffffff8
-	and		%r1, %r1, %r0
+	rlwinm	%r1, %r1, 0, 0, 28
 
 	/* save the registers */
 	bl		__save_regs
@@ -210,8 +209,7 @@ FUNCTION(ppc_exception_tail):
 	/* adjust the stack pointer for ABI compatibility */
 	subi	%r1, %r1, 8				/* make sure there's space for the previous
 									   frame pointer and the return address */
-	li		%r2, 0xfffffff0
-	and		%r1, %r1, %r2			/* 16 byte align the stack pointer */
+	rlwinm	%r1, %r1, 0, 0, 27		/* 16 byte align the stack pointer */
 	li		%r0, 0
 	stw		%r0, 0(%r1)				/* previous frame pointer: NULL */
 		/* 4(%r1) is room for the return address to be filled in by the
