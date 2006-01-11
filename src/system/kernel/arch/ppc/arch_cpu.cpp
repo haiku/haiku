@@ -14,6 +14,7 @@
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
+static bool sHasTlbia;
 
 status_t 
 arch_cpu_preboot_init(kernel_args *args)
@@ -29,6 +30,10 @@ arch_cpu_preboot_init(kernel_args *args)
 status_t
 arch_cpu_init(kernel_args *args)
 {
+	// TODO: Let the boot loader put that info into the kernel args
+	// (property "tlbia" in the CPU node).
+	sHasTlbia = false;
+
 	return B_OK;
 }
 
@@ -108,18 +113,32 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
-	ppc_sync();
-	tlbia();
-	ppc_sync();
+	if (sHasTlbia) {
+		ppc_sync();
+		tlbia();
+		ppc_sync();
+	} else {
+		addr_t address = 0;
+		unsigned long i;
+
+		ppc_sync();
+		for (i = 0; i < 0x100000; i++) {
+			tlbie(address);
+			eieio();
+			ppc_sync();
+	
+			address += B_PAGE_SIZE;
+		}
+		tlbsync();
+		ppc_sync();
+	}
 }
 
 
 void 
 arch_cpu_user_TLB_invalidate(void)
 {
-	ppc_sync();
-	tlbia();
-	ppc_sync();
+	arch_cpu_global_TLB_invalidate();
 }
 
 
