@@ -920,15 +920,36 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 		focus = focus->PreviousWindow(fCurrentWorkspace);
 	}
 
-	if (fFocus != NULL)
+	ServerApp* oldActiveApp = NULL;
+	ServerApp* newActiveApp = NULL;
+
+	if (fFocus != NULL) {
 		fFocus->SetFocus(false);
+		oldActiveApp = fFocus->ServerWindow()->App();
+	}
 
 	fFocus = focus;
 
-	if (focus != NULL)
-		focus->SetFocus(true);
+	if (fFocus != NULL) {
+		fFocus->SetFocus(true);
+		newActiveApp = fFocus->ServerWindow()->App();
+	}
 
 	UnlockAllWindows();
+
+	// change the "active" app if appropriate
+	if (oldActiveApp != newActiveApp) {
+		if (oldActiveApp) {
+			oldActiveApp->Activate(false);
+		}
+
+		if (newActiveApp) {
+			newActiveApp->Activate(true);
+		} else {
+			// make sure the cursor is visible
+			HWInterface()->SetCursorVisible(true);
+		}
+	}
 }
 
 
