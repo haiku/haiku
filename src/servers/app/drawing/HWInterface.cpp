@@ -100,8 +100,22 @@ HWInterface::SetCursorVisible(bool visible)
 {
 	if (WriteLock()) {
 		if (fCursorVisible != visible) {
-			fCursorVisible = visible;
-			Invalidate(_CursorFrame());
+			// NOTE: _CursorFrame() will
+			// return an invalid rect if
+			// fCursorVisible == false!
+			if (visible) {
+				fCursorVisible = visible;
+				BRect r = _CursorFrame();
+
+				_DrawCursor(r);
+				Invalidate(r);
+			} else {
+				BRect r = _CursorFrame();
+				fCursorVisible = visible;
+
+				_RestoreCursorArea();
+				Invalidate(r);
+			}
 		}
 		WriteUnlock();
 	}
