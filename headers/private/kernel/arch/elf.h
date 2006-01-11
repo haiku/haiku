@@ -9,10 +9,18 @@ struct Elf32_Rel;
 struct Elf32_Rela;
 struct elf_image_info;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len);
 extern int arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <arch_elf.h>
 
