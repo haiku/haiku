@@ -2284,13 +2284,11 @@ BWindow::task_looper()
 				// dispatch loop.
 				dispatchNextMessage = false;
 			} else {
-				//	Get the target handler
-				BHandler *handler = NULL;
-				//	Use the private BMessage accessor to determine if we are
-				//	using the preferred handler, or if a target has been
-				//	specified
+				// Get the target handler
 				BMessage::Private messagePrivate(fLastMessage);
 				bool usePreferred = messagePrivate.UsePreferredTarget();
+				BHandler *handler = NULL;
+				bool dropMessage = false;
 
 				if (usePreferred) {
 					handler = PreferredHandler();
@@ -2301,11 +2299,13 @@ BWindow::task_looper()
 						B_HANDLER_TOKEN, (void **)&handler);
 
 					// if this handler doesn't belong to us, we drop the message
-					if (handler != NULL && handler->Looper() != this)
+					if (handler != NULL && handler->Looper() != this) {
+						dropMessage = true;
 						handler = NULL;
+					}
 				}
 
-				if (handler == NULL || usePreferred)
+				if ((handler == NULL && !dropMessage) || usePreferred)
 					handler = _DetermineTarget(fLastMessage, handler);
 
 				unpack_cookie cookie;
