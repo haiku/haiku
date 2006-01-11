@@ -3242,7 +3242,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 
 	int32 drawOffset = fromOffset;
 	if (LineHeight(fromLine) != saveLineHeight || 
-		 newHeight < saveHeight || fromLine < saveFromLine )
+		 newHeight < saveHeight || fromLine < saveFromLine || fAlignment != B_ALIGN_LEFT)
 		drawOffset = (*fLines)[fromLine]->offset;
 	
 	// TODO: Is it ok here ?
@@ -3634,7 +3634,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	BRect eraseRect = clipRect;
 	long startEraseLine = startLine;
 	STELine* line = (*fLines)[startLine];
-	if (erase && startOffset != -1) {
+	if (erase && startOffset != -1 && fAlignment == B_ALIGN_LEFT) {
 		// erase only to the right of startOffset
 		startEraseLine++;
 		long startErase = startOffset;

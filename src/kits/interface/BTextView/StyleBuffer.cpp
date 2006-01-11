@@ -244,15 +244,15 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		return;
 	}
 
-	int32 styleIndex = 0;
 	int32 offset = fromOffset;
 	int32 runIndex = OffsetToRun(offset);
+	int32 styleIndex = 0;
 	do {
-		STEStyleRunDesc runDesc = *fStyleRunDesc[runIndex];
+		const STEStyleRunDesc runDesc = *fStyleRunDesc[runIndex];
 		int32 runEnd = textLen;
 		if (runIndex < fStyleRunDesc.ItemCount() - 1)
 			runEnd = fStyleRunDesc[runIndex + 1]->offset;
-
+		
 		STEStyle style = fStyleRecord[runDesc.index]->style;
 		SetStyle(inMode, inFont, &style.font, inColor, &style.color);
 
@@ -290,7 +290,8 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		if (offset == runEnd) {
 			// TODO: this hides a bug somewhere else in the code that
 			//	should probably be fixed...
-			printf("offset == runEnd!\n");
+			// Can't reproduce this anymore...
+			printf("_BStyleBuffer_::SetStyleRange(): offset == runEnd!\n");
 			break;
 		}
 		offset = runEnd;
