@@ -139,9 +139,7 @@ standard_gcc_settings()
 #
 set_default_value()
 {
-	local var=$1;
-	# any better way?
-	(set -u; (eval "echo \${$var}") &> /dev/null) || eval "$var=$2"
+	eval "$1=\${$1-$2}"
 }
 
 # get_build_tool_path
