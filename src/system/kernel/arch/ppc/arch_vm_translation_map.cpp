@@ -427,6 +427,10 @@ clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
 static void 
 flush_tmap(vm_translation_map *map)
 {
+// TODO: arch_cpu_global_TLB_invalidate() is extremely expensive and doesn't
+// even cut it here. We are supposed to invalidate all TLB entries for this
+// map on all CPUs. We should loop over the virtual pages and invoke tlbie
+// instead (which marks the entry invalid on all CPUs).
 	arch_cpu_global_TLB_invalidate();
 }
 
