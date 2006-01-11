@@ -186,8 +186,9 @@ ServerApp::~ServerApp()
 		gBitmapManager->DeleteBitmap(static_cast<ServerBitmap *>(fBitmapList.ItemAt(i)));
 	}
 
-	for (int32 i = 0; i < fPictureList.CountItems(); i++) {
-		delete (ServerPicture*)fPictureList.ItemAt(i);
+	int32 pictureCount = fPictureList.CountItems();
+	for (int32 i = 0; i < pictureCount; i++) {
+		delete (ServerPicture*)fPictureList.ItemAtFast(i);
 	}
 
 	fDesktop->GetCursorManager().RemoveAppCursors(fClientTeam);
@@ -281,8 +282,16 @@ ServerApp::SendMessageToClient(BMessage *msg) const
 void
 ServerApp::Activate(bool value)
 {
+	if (fIsActive == value)
+		return;
+
+	// TODO: send some message to the client?!?
+
 	fIsActive = value;
-	SetAppCursor();
+
+	if (fIsActive) {
+		SetAppCursor();
+	}
 }
 
 
@@ -290,8 +299,10 @@ ServerApp::Activate(bool value)
 void
 ServerApp::SetAppCursor()
 {
-	if (fAppCursor)
-		fDesktop->HWInterface()->SetCursor(fAppCursor);
+// TODO: look into custom cursors...
+//	if (fAppCursor)
+//		fDesktop->HWInterface()->SetCursor(fAppCursor);
+
 	fDesktop->HWInterface()->SetCursorVisible(!fCursorHidden);
 }
 
@@ -883,13 +894,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Attached data: 68 bytes of fAppCursor data
 			
 			int8 cdata[68];
-			link.Read(cdata,68);
+			link.Read(cdata, 68);
 			
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
-			if(fAppCursor)
+			if (fAppCursor)
 				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor = new ServerCursor(cdata);
@@ -919,8 +930,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fDesktop->HWInterface()->SetCursor(cursor);
 
 			if (sync) {
-				// the application is expecting a reply, but plans to do literally nothing
-				// with the data, so we'll just reuse the cursor token variable
+				// the application is expecting a reply so that it
+				// knows the cursor shape has truely changed
 				fLink.StartMessage(B_OK);
 				fLink.Flush();
 			}
@@ -968,6 +979,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fDesktop->GetCursorManager().DeleteCursor(ctoken);
 			break;
 		}
+
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
