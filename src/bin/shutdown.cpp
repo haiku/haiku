@@ -1,24 +1,12 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2002-2005, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//
-//  File:        shutdown.cpp
-//  Author:      Francois Revol (mmu_man@users.sf.net)
-//  Description: shuts down the system, either halting or rebooting.
-//
-//  Notes:
-//  This program behaves identically as the BeOS R5 version, with these 
-//  added arguments:
-//  
-//  -a asks the user to confirm the shutdown
-//  -c cancels any running shutdown
-//
-//  Some code from Shard's Archiver from BeBits (was BSD/MIT too :).
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2002-2005, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Francois Revol (mmu_man@users.sf.net)
+ */
+
+/*!	Shuts down the system, either halting or rebooting. */
 
 #include <syscalls.h>
 
@@ -84,6 +72,7 @@ usage(const char *arg0)
 		"\t-q quick shutdown (don't broadcast apps),\n"
 		"\t-a ask user to confirm the shutdown (ignored when -q is given),\n"
 		"\t-c cancel a running shutdown,\n"
+		"\t-s run shutdown synchronously (only returns if shutdown is cancelled)\n"
 		"\t-d delay shutdown by <time> seconds.\n", program);
 	exit(1);
 }
@@ -94,6 +83,7 @@ main(int argc, char **argv)
 {
 	bool askUser = false;
 	bool quick = false;
+	bool async = true;
 
 	for (int32 i = 1; i < argc; i++) {
 		char *arg = argv[i];
@@ -111,6 +101,9 @@ main(int argc, char **argv)
 						break;
 					case 'r':
 						gReboot = true;
+						break;
+					case 's':
+						async = false;
 						break;
 					case 'c':
 					{
@@ -174,8 +167,9 @@ main(int argc, char **argv)
 	} else {
 		BRoster roster;
 		BRoster::Private rosterPrivate(roster);
-		status_t error = rosterPrivate.ShutDown(gReboot, askUser, true);
-		fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
+		status_t error = rosterPrivate.ShutDown(gReboot, askUser, !async);
+		if (error != B_OK)
+			fprintf(stderr, "Shutdown failed: %s\n", strerror(error));
 		return 2;
 	}
 
