@@ -5,7 +5,6 @@ void setup_virtualized_heads(bool);
 void set_crtc_owner(bool);
 status_t nv_general_output_select(bool);
 status_t nv_general_head_select(bool);
-status_t nv_general_wait_retrace(void);
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 
 /* AGP functions */

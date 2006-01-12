@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-11/2005
+   Rudolf Cornelissen 11/2002-1/2006
 */
 
 #define MODULE_BIT 0x00040000
@@ -917,6 +917,7 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 	if (si->ps.card_arch < NV10A)
 	{
 		uint16 yhigh;
+		uint32 timeout = 0;
 
 		/* make sure we are beyond the first line of the cursorbitmap being drawn during
 		 * updating the position to prevent distortions: no double buffering feature */
@@ -933,18 +934,25 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 		{
 			/* we have vertical lines below old and new cursorposition to spare. So we
 			 * update the cursor postion 'mid-screen', but below that area. */
-			while (((uint16)(NV_REG32(NV32_RASTER) & 0x000007ff)) < (yhigh + 16))
+			/* wait 25mS max. (refresh > 40Hz) */
+			while ((((uint16)(NV_REG32(NV32_RASTER) & 0x000007ff)) < (yhigh + 16)) &&
+			(timeout < (25000/10)))
 			{
 				snooze(10);
+				timeout++;
 			}
 		}
 		else
 		{
+			timeout = 0;
 			/* no room to spare, just wait for retrace (is relatively slow) */
-			while ((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display)
+			/* wait 25mS max. (refresh > 40Hz) */
+			while (((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
+			(timeout < (25000/10)))
 			{
 				/* don't snooze much longer or retrace might get missed! */
 				snooze(10);
+				timeout++;
 			}
 		}
 	}
@@ -957,6 +965,8 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 
 status_t nv_crtc_stop_tvout(void)
 {
+	uint16 cnt;
+
 	LOG(4,("CRTC: stopping TV output\n"));
 
 	/* enable access to primary head */
@@ -973,13 +983,27 @@ status_t nv_crtc_stop_tvout(void)
 	 * programming in the driver makes sure this is the case.
 	 * (except for driver startup: see nv_general.c.) */
 
-	/* make sure we are 'in' active VGA picture */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-	/* wait for next vertical retrace start on VGA */
-	while (!(NV_REG8(NV8_INSTAT1) & 0x08)) snooze(1);
-	/* now wait until we are 'in' active VGA picture again */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-
+	/* make sure we are 'in' active VGA picture: wait with timeout! */
+	cnt = 1;
+	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
+	/* wait for next vertical retrace start on VGA: wait with timeout! */
+	cnt = 1;
+	while ((!(NV_REG8(NV8_INSTAT1) & 0x08)) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
+	/* now wait until we are 'in' active VGA picture again: wait with timeout! */
+	cnt = 1;
+	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
 
 	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
 	if (!(si->ps.slaved_tmds1))	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));

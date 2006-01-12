@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-11/2005
+   Rudolf Cornelissen 11/2002-1/2006
 */
 
 #define MODULE_BIT 0x00020000
@@ -880,6 +880,8 @@ status_t nv_crtc2_cursor_position(uint16 x, uint16 y)
 
 status_t nv_crtc2_stop_tvout(void)
 {
+	uint16 cnt;
+
 	LOG(4,("CRTC2: stopping TV output\n"));
 
 	/* enable access to secondary head */
@@ -896,13 +898,27 @@ status_t nv_crtc2_stop_tvout(void)
 	 * programming in the driver makes sure this is the case.
 	 * (except for driver startup: see nv_general.c.) */
 
-	/* make sure we are 'in' active VGA picture */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-	/* wait for next vertical retrace start on VGA */
-	while (!(NV_REG8(NV8_INSTAT1) & 0x08)) snooze(1);
-	/* now wait until we are 'in' active VGA picture again */
-	while (NV_REG8(NV8_INSTAT1) & 0x08) snooze(1);
-
+	/* make sure we are 'in' active VGA picture: wait with timeout! */
+	cnt = 1;
+	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
+	/* wait for next vertical retrace start on VGA: wait with timeout! */
+	cnt = 1;
+	while ((!(NV_REG8(NV8_INSTAT1) & 0x08)) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
+	/* now wait until we are 'in' active VGA picture again: wait with timeout! */
+	cnt = 1;
+	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
+	{
+		snooze(1);
+		cnt++;
+	}
 
 	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
 	if (!(si->ps.slaved_tmds2))	CRTC2W(PIXEL, (CRTC2R(PIXEL) & 0x03));
