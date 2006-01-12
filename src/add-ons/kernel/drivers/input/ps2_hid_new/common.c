@@ -62,6 +62,35 @@ static uint8 *sResultBuffer;
 static int32 sResultBytes;
 
 
+inline uint8
+ps2_read_ctrl()
+{
+	return gIsa->read_io_8(PS2_PORT_CTRL);
+}
+
+
+inline uint8
+ps2_read_data()
+{
+	return gIsa->read_io_8(PS2_PORT_DATA);
+}
+
+
+inline void
+ps2_write_ctrl(uint8 ctrl)
+{
+	gIsa->write_io_8(PS2_PORT_CTRL, ctrl);
+}
+
+
+inline void
+ps2_write_data(uint8 data)
+{
+	gIsa->write_io_8(PS2_PORT_DATA, data);
+}
+
+
+
 /**	Wait until the specified status bits are cleared or set, depending on the
  *	second parameter.
  *	This currently busy waits, but should nonetheless be avoided in interrupt
@@ -248,41 +277,26 @@ ps2_wait_for_result(void)
 }
 
 
-void
-ps2_common_uninitialize(void)
+static int32 
+ps2_interrupt(void* cookie)
 {
-	// do we still need the resources?
-	if (atomic_add(&sInitialized, -1) > 1)
-		return;
+	uint8 ctrl;
+	uint8 data;
+	
+	ctrl = ps2_read_ctrl();
+	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
+		return B_UNHANDLED_INTERRUPT;
+	
+	data = ps2_read_data();
 
-	delete_sem(sResultSemaphore);
-	delete_sem(sResultOwnerSemaphore);
+	TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
+
+	if (ctrl & PS2_STATUS_MOUSE_DATA)
+		return mouse_handle_int(data);
+	else
+		return keyboard_handle_int(data);
 }
 
-
-status_t
-ps2_common_initialize(void)
-{
-	if (atomic_add(&sInitialized, 1) > 0) {
-		// we're already initialized
-		return B_OK;
-	}
-
-	sResultSemaphore = create_sem(0, "ps/2 result");
-	if (sResultSemaphore < B_OK)
-		return sResultSemaphore;
-
-	sResultOwnerSemaphore = create_sem(1, "ps/2 result owner");
-	if (sResultOwnerSemaphore < B_OK) {
-		delete_sem(sResultSemaphore);
-		return sResultOwnerSemaphore;
-	}
-
-	sResultBytes = 0;
-	sResultBuffer = NULL;
-
-	return B_OK;
-}
 
 
 //	#pragma mark -
@@ -302,10 +316,8 @@ publish_devices(void)
 	static char *kDevices[3];
 	int index = 0;
 
-	if (sMouseDetected)
 		kDevices[index++] = DEVICE_MOUSE_NAME;
 
-	if (sKeyboardDetected)
 		kDevices[index++] = DEVICE_KEYBOARD_NAME;
 
 	kDevices[index++] = NULL;
@@ -332,45 +344,46 @@ init_driver(void)
 	status_t status;
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
-	if (status < B_OK) {
-		TRACE(("Failed getting isa module: %s\n", strerror(status)));	
-		return status;
-	}
-
-	// Try to probe for the mouse first, as this can hang the keyboard if no
-	// mouse is found.
-	// Probing the mouse first and initializing the keyboard later appearantly
-	// clears the keyboard stall.
-
-	if (probe_mouse(NULL) == B_OK)
-		sMouseDetected = true;
-	else
-		dprintf("ps2_hid: no mouse detected!\n");
-
-	if (probe_keyboard() == B_OK)
-		sKeyboardDetected = true;
-	else
-		dprintf("ps2_hid: no keyboard detected!\n");
-
-	// If there is no keyboard or mouse, we don't need to publish ourselves
-	if (!sKeyboardDetected && !sMouseDetected) {
-		put_module(B_ISA_MODULE_NAME);
-		return B_ERROR;
-	}
-
-	// A semaphore to synchronize open keyboard and mouse devices
+	if (status < B_OK)
+		goto err_1;
 
 	gDeviceOpenSemaphore = create_sem(1, "ps/2 open");
 	if (gDeviceOpenSemaphore < B_OK)
-		return gDeviceOpenSemaphore;
+		goto err_2;
 
-	return get_command_byte(&sCommandByte);
+	status = install_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL, 0);
+	if (status)
+		goto err_3;
+	
+	status = install_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL, 0);
+	if (status)
+		goto err_4;
+
+
+
+	//goto err_5;	
+	
+	
+	return B_OK;
+
+err_5:
+	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
+err_4:	
+	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
+err_3:
+	delete_sem(gDeviceOpenSemaphore);
+err_2:
+	put_module(B_ISA_MODULE_NAME);
+err_1:
+	return B_ERROR;
 }
 
 
 void
 uninit_driver(void)
 {
+	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
+	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	delete_sem(gDeviceOpenSemaphore);
-	put_module(B_ISA_MODULE_NAME);	
+	put_module(B_ISA_MODULE_NAME);
 }

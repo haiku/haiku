@@ -52,6 +52,10 @@ extern status_t ps2_common_initialize(void);
 extern status_t probe_keyboard(void);
 extern status_t probe_mouse(size_t *probed_packet_size);
 
+extern int32 mouse_handle_int(uint8 data);
+extern int32 keyboard_handle_int(uint8 data);
+
+
 extern status_t keyboard_open(const char *name, uint32 flags, void **cookie);
 extern status_t keyboard_close(void *cookie);
 extern status_t keyboard_freecookie(void *cookie);

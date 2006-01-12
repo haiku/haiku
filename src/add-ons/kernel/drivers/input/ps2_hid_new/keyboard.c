@@ -146,31 +146,24 @@ set_leds(led_info *ledInfo)
 }
 
 
-static int32
-handle_keyboard_interrupt(void *data)
+int32 keyboard_handle_int(uint8 data)
 {
-	uint8 read = gIsa->read_io_8(PS2_PORT_CTRL);
-	TRACE(("handle_keyboard_interrupt: read = 0x%x\n", read));
+	if (atomic_and(&sKeyboardOpenMask, 1) == 0)
+		return B_HANDLED_INTERRUPT;
 
-	if (read & PS2_STATUS_OUTPUT_BUFFER_FULL) {
+
 		at_kbd_io keyInfo;
 		uint8 scancode;
 
-		read = gIsa->read_io_8(PS2_PORT_DATA);
-
-		// someone else might wait for a result from the keyboard controller
-		if (ps2_handle_result(read))
-			return B_INVOKE_SCHEDULER;
-
 		// TODO: Handle braindead "pause" key special case
 
-		if (read == EXTENDED_KEY) {
+		if (data == EXTENDED_KEY) {
 			sIsExtended = true;
 			TRACE(("Extended key\n"));
 			return B_HANDLED_INTERRUPT;
 		} 
 
-		scancode = read;
+		scancode = data;
 
 		TRACE(("scancode: %x\n", scancode));
 
@@ -200,11 +193,6 @@ handle_keyboard_interrupt(void *data)
 		}
 
 		release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
-	} else {
-		// ToDo: the buffer is not yet available, we should come back soon...
-		// (depending on how often we see the message below... :-)
-		dprintf("ps2_hid: keyboard: buffer not available!\n");
-	}
 
 	return B_INVOKE_SCHEDULER;
 }
@@ -309,10 +297,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	acquire_sem(gDeviceOpenSemaphore);
 
-	status = ps2_common_initialize();
-	if (status != B_OK)
-		goto err1;
-
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
 		status = sKeyboardSem;
@@ -337,12 +321,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		goto err4;
 	}
 
-	status = install_io_interrupt_handler(INT_PS2_KEYBOARD,
-		&handle_keyboard_interrupt, NULL, 0);
-	if (status < B_OK)
-		goto err4;
-
-	sInterruptHandlerInstalled = true;
 	release_sem(gDeviceOpenSemaphore);
 
 	*_cookie = NULL;
@@ -355,7 +333,6 @@ err4:
 err3:
 	delete_sem(sKeyboardSem);
 err2:
-	ps2_common_uninitialize();
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
 	release_sem(gDeviceOpenSemaphore);
@@ -369,13 +346,10 @@ keyboard_close(void *cookie)
 {
 	TRACE(("keyboard_close()\n"));
 
-	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &handle_keyboard_interrupt, NULL);
-	sInterruptHandlerInstalled = false;
 
 	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
 
-	ps2_common_uninitialize();
 	atomic_and(&sKeyboardOpenMask, 0);
 
 	return B_OK;

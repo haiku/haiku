@@ -1,29 +1,13 @@
-SubDir HAIKU_TOP src add-ons kernel drivers input ps2_hid ;
+SubDir HAIKU_TOP src add-ons kernel drivers input ps2_hid_new ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 
-if ! $(HAIKU_COMPATIBLE) {
-SubDirCcFlags -DCOMPILE_FOR_R5 ;
-
-KernelAddon ps2_hid : kernel drivers bin :
-	common.c
-	keyboard.c
-	mouse.c
-;
-} else {
-KernelAddon ps2_hid : kernel drivers bin :
+KernelAddon ps2_hid_new : kernel drivers bin :
 	common.c
 	keyboard.c
 	mouse.c
 	packet_buffer.cpp
 ;
-}
-
-Package haiku-inputkit-cvs :
-        ps2_hid :
-        boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-inputkit-cvs : input ps2_hid ;

@@ -249,17 +249,10 @@ set_mouse_enabled(bool enable)
  *	calls to the handler, each holds a different byte on the data port.
  */
 
-static int32 
-handle_mouse_interrupt(void* cookie)
+int32 mouse_handle_int(uint8 data)
 {
-	uint8 data = gIsa->read_io_8(PS2_PORT_CTRL);
-	if (!(data & PS2_STATUS_OUTPUT_BUFFER_FULL)) {
-		TRACE(("no ps2 mouse data available\n"));
-		return B_UNHANDLED_INTERRUPT;
-	}
-
-	data = gIsa->read_io_8(PS2_PORT_DATA);
-	TRACE(("mouse interrupt: %d byte: 0x%02x\n", sPacketIndex, data));
+	if (atomic_and(&sMouseOpenMask, 1) == 0)
+		return B_HANDLED_INTERRUPT;
 
 	if (sPacketIndex == 0 && !(data & 8)) {
 		TRACE(("bad mouse data, trying resync\n"));
