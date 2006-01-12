@@ -1013,7 +1013,7 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 
 
 void
-BView::Flush(void) const 
+BView::Flush() const 
 {
 	if (fOwner)
 		fOwner->Flush();
@@ -1021,7 +1021,7 @@ BView::Flush(void) const
 
 
 void
-BView::Sync(void) const 
+BView::Sync() const 
 {
 	do_owner_check_no_pick();
 	if (fOwner)
@@ -2240,6 +2240,8 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
 		fOwner->fLink->Attach<BRect>(dstRect);
 		fOwner->fLink->Attach<BRect>(srcRect);
+
+		_FlushIfNotInTransaction();
 	}
 }
 
@@ -2273,6 +2275,8 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
 		BRect dst = src.OffsetToCopy(where);
 		fOwner->fLink->Attach<BRect>(dst);
 		fOwner->fLink->Attach<BRect>(src);
+
+		_FlushIfNotInTransaction();
 	}
 }
 
@@ -2373,6 +2377,8 @@ BView::DrawString(const char *string, int32 length, BPoint location,
 
 		fOwner->fLink->AttachString(string, length);
 
+		_FlushIfNotInTransaction();
+
 		// this modifies our pen location, so we invalidate the flag.
 		fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
 	}
@@ -2399,6 +2405,8 @@ BView::StrokeEllipse(BRect rect, ::pattern pattern)
 
 	fOwner->fLink->StartMessage(AS_STROKE_ELLIPSE);
 	fOwner->fLink->Attach<BRect>(rect);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2422,6 +2430,8 @@ BView::FillEllipse(BRect rect, ::pattern pattern)
 
 	fOwner->fLink->StartMessage(AS_FILL_ELLIPSE);
 	fOwner->fLink->Attach<BRect>(rect);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2448,6 +2458,8 @@ BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(startAngle);
 	fOwner->fLink->Attach<float>(arcAngle);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2474,6 +2486,8 @@ BView::FillArc(BRect rect, float startAngle, float arcAngle,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(startAngle);
 	fOwner->fLink->Attach<float>(arcAngle);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2491,6 +2505,8 @@ BView::StrokeBezier(BPoint *controlPoints, ::pattern pattern)
 	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2508,6 +2524,8 @@ BView::FillBezier(BPoint *controlPoints, ::pattern pattern)
 	fOwner->fLink->Attach<BPoint>(controlPoints[1]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[2]);
 	fOwner->fLink->Attach<BPoint>(controlPoints[3]);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2552,6 +2570,8 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPoints, BRect bounds,
 		fOwner->fLink->Attach<bool>(closed);
 		fOwner->fLink->Attach<int32>(polygon.fCount);
 		fOwner->fLink->Attach(polygon.fPts, polygon.fCount * sizeof(BPoint));
+
+		_FlushIfNotInTransaction();
 	} else {
 		// TODO: send via an area
 		fprintf(stderr, "ERROR: polygon to big for BPortLink!\n");
@@ -2575,6 +2595,8 @@ BView::FillPolygon(const BPolygon *polygon, ::pattern pattern)
 		fOwner->fLink->Attach<BRect>(polygon->Frame());
 		fOwner->fLink->Attach<int32>(polygon->fCount);
 		fOwner->fLink->Attach(polygon->fPts, polygon->fCount * sizeof(BPoint));
+
+		_FlushIfNotInTransaction();
 	} else {
 		// TODO: send via an area
 		fprintf(stderr, "ERROR: polygon to big for BPortLink!\n");
@@ -2618,6 +2640,8 @@ BView::StrokeRect(BRect rect, ::pattern pattern)
 
 	fOwner->fLink->StartMessage(AS_STROKE_RECT);
 	fOwner->fLink->Attach<BRect>(rect);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2632,6 +2656,8 @@ BView::FillRect(BRect rect, ::pattern pattern)
 
 	fOwner->fLink->StartMessage(AS_FILL_RECT);
 	fOwner->fLink->Attach<BRect>(rect);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2649,6 +2675,8 @@ BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(xRadius);
 	fOwner->fLink->Attach<float>(yRadius);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2667,6 +2695,8 @@ BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
 	fOwner->fLink->Attach<BRect>(rect);
 	fOwner->fLink->Attach<float>(xRadius);
 	fOwner->fLink->Attach<float>(yRadius);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2688,6 +2718,8 @@ BView::FillRegion(BRegion *region, ::pattern pattern)
 
 		for (int32 i = 0; i < count; i++)
 			fOwner->fLink->Attach<BRect>(region->RectAt(i));
+
+		_FlushIfNotInTransaction();
 	} else {
 		// TODO: send via area
 	}
@@ -2710,6 +2742,8 @@ BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	fOwner->fLink->Attach<BPoint>(pt2);
 	fOwner->fLink->Attach<BPoint>(pt3);
 	fOwner->fLink->Attach<BRect>(bounds);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2806,6 +2840,8 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	fOwner->fLink->Attach<BPoint>(pt2);
 	fOwner->fLink->Attach<BPoint>(pt3);
 	fOwner->fLink->Attach<BRect>(bounds);
+
+	_FlushIfNotInTransaction();
 }
 
 
@@ -2828,6 +2864,8 @@ BView::StrokeLine(BPoint pt0, BPoint pt1, ::pattern pattern)
 	fOwner->fLink->StartMessage(AS_STROKE_LINE);
 	fOwner->fLink->Attach<BPoint>(pt0);
 	fOwner->fLink->Attach<BPoint>(pt1);
+
+	_FlushIfNotInTransaction();
 
 	// this modifies our pen location, so we invalidate the flag.
 	fState->valid_flags &= ~B_VIEW_PEN_LOCATION_BIT;
@@ -2854,6 +2892,8 @@ BView::StrokeShape(BShape *shape, ::pattern pattern)
 		fOwner->fLink->Attach<int32>(sd->ptCount);
 		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
 		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+
+		_FlushIfNotInTransaction();
 	} else {
 		// TODO: send via an area
 	}
@@ -2880,6 +2920,8 @@ BView::FillShape(BShape *shape, ::pattern pattern)
 		fOwner->fLink->Attach<int32>(sd->ptCount);
 		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(int32));
 		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+
+		_FlushIfNotInTransaction();
 	} else {
 		// TODO: send via an area
 		// BTW, in a perfect world, the fLink API would take care of that -- axeld.
@@ -2950,6 +2992,8 @@ BView::EndLineArray()
 	fOwner->fLink->StartMessage(AS_STROKE_LINEARRAY);
 	fOwner->fLink->Attach<int32>(comm->count);
 	fOwner->fLink->Attach(comm->array, comm->count * sizeof(_array_hdr_));
+
+	_FlushIfNotInTransaction();
 
 	delete [] comm->array;
 	delete comm;
@@ -3096,6 +3140,8 @@ BView::CopyBits(BRect src, BRect dst)
 		fOwner->fLink->StartMessage(AS_LAYER_COPY_BITS);
 		fOwner->fLink->Attach<BRect>(src);
 		fOwner->fLink->Attach<BRect>(dst);
+
+		_FlushIfNotInTransaction();
 	}
 }
 
@@ -3153,6 +3199,8 @@ BView::DrawPictureAsync(const BPicture *picture, BPoint where)
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->token);
 		fOwner->fLink->Attach<BPoint>(where);
+
+		_FlushIfNotInTransaction();
 	}
 }
 
@@ -3217,6 +3265,8 @@ BView::InvertRect(BRect rect)
 
 		fOwner->fLink->StartMessage(AS_LAYER_INVERT_RECT);
 		fOwner->fLink->Attach<BRect>(rect);
+
+		_FlushIfNotInTransaction();
 	}
 }
 
@@ -4228,6 +4278,15 @@ BView::_UpdatePattern(::pattern pattern)
 	}
 
 	fState->pattern = pattern;
+}
+
+
+void
+BView::_FlushIfNotInTransaction()
+{
+	if (!fOwner->fInTransaction) {
+		fOwner->Flush();
+	}
 }
 
 

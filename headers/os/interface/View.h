@@ -565,6 +565,8 @@ private:
 			void			_UpdateStateForRemove();
 			void			_UpdatePattern(::pattern pattern);
 
+			void			_FlushIfNotInTransaction();
+
 			bool			_CreateSelf();
 			bool			_AddChildToList(BView* child, BView* before = NULL);
 			bool			_RemoveChildFromList(BView* child);
