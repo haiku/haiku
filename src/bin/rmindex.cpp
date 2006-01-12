@@ -1,15 +1,11 @@
-//	Copyright (c) 2003, OpenBeOS
-//
-//	This software is part of the OpenBeOS distribution and is covered
-//	by the OpenBeOS license.
-//
-//	File:        rmindex.cpp
-//	Author:      Scott Dellinger (dellinsd@myrealbox.com)
-//	Description: Removes an index from a volume.
-//
-//	Changelog:
-//	  2003-03-09  initial version
-//
+/*
+ * Copyright 2003-2006 Haiku Inc.
+ * Distributed under the terms of the MIT license
+ *
+ * Authors:
+ *		Scott Dellinger (dellinsd@myrealbox.com)
+ *		Jérôme Duval
+ */
 
 // std C includes
 #include <stdio.h>
@@ -20,9 +16,6 @@
 #include <fs_info.h>
 #include <fs_index.h>
 #include <TypeConstants.h>
-#include <Directory.h>
-#include <Path.h>
-#include <Volume.h>
 
 #include <getopt.h>
 
@@ -55,7 +48,8 @@ static struct option const longopts[] =
 void usage(int);
 const char* lookup_index_type(uint32);
 
-int main (int32 argc, char **argv)
+int 
+main (int32 argc, char **argv)
 {
 	int c;
 	int verbose = 0;
@@ -63,93 +57,75 @@ int main (int32 argc, char **argv)
 	char *index_name = NULL;
 	int retval;
 	char *error_message;
+	char *path = NULL;
 	
-	while ((c = getopt_long(argc, argv, "d:ht:v", longopts, NULL)) != -1)
-	{
-		switch (c)
-		{
+	while ((c = getopt_long(argc, argv, "d:ht:v", longopts, NULL)) != -1) {
+		switch (c) {
 			case 0:
-			  break;
+				break;
 			case 'd':
-			  vol_device = dev_for_path(optarg);
-			  if (vol_device < 0)
-			  {
-			      fprintf(stderr, "%s: can't get information about volume: %s\n", argv[0], optarg);
-			      return (-1);
-			  }
-			  break;
+				path = optarg;
+			  	break;
 			case GETOPT_HELP_CHAR:
-			  usage(0);
-			  break;
+				usage(0);
+				break;
 			case 'v':
-			  verbose = 1;
-			  break;
+				verbose = 1;
+				break;
 			default:
-			  usage(1);
-			  break;
+	  			usage(1);
+		  		break;
 		}
 	}
 
 	/* Remove the index from the volume of the current
 	   directory if no volume was specified. */
-	if (vol_device == 0)
-	{
-		vol_device = dev_for_path(".");
-		if (vol_device < 0)
-		{
-			fprintf(stderr, "%s: can't get information about current volume\n", argv[0]);
-			return (-1);
-		}
+	if (path == NULL) {
+		path = ".";
 	}
-
-	if (argc - optind == 1)  // last argument
-	{
+	
+	vol_device = dev_for_path(path);
+	if (vol_device < 0) {
+		fprintf(stderr, "%s: can't get information about current volume\n", argv[0]);
+		return B_ERROR;
+	}
+	
+	if (argc - optind == 1) {  // last argument
 		index_name = argv[optind];
-	} else
-	{
+	} else {
 		usage(1);
 	}
 
-	if (verbose)
-	{
-		/* Get the mount point of the specified volume. */
-		BVolume volume(vol_device);
-		BDirectory dir;
-		volume.GetRootDirectory(&dir);
-		BPath path(&dir, NULL);
-
+	if (verbose) {
 		/* Get the index type. */
 		index_info i_info;
 		status_t status = fs_stat_index(vol_device, index_name, &i_info);
-		if (status != B_OK)
-		{
-			printf("%s: fs_stat_index(): (%d) %s\n", argv[0], errno, strerror(errno));
+		if (status != B_OK) {
+			fprintf(stderr, "%s: fs_stat_index(): (%d) %s\n", argv[0], errno, strerror(errno));
 			return (errno);
 		}
 
 		/* Look up the string name equivalent of the index type. */
 		const char* index_type_str = lookup_index_type(i_info.type);
 
-		fprintf(stdout, "Removing index \"%s\" of type %s from volume mounted at %s.\n", index_name, index_type_str, path.Path());
+		fprintf(stdout, "Removing index \"%s\" of type %s from volume containing %s\n", index_name, index_type_str, path);
 	}
 
-	if ((retval = fs_remove_index(vol_device, index_name)) != 0)
-	{
-		switch (errno)
-		{
-			B_FILE_ERROR:
+	if ((retval = fs_remove_index(vol_device, index_name)) != 0) {
+		switch (errno) {
+			case B_FILE_ERROR:
 			  error_message = "A filesystem error prevented the operation.";
 			  break;
-			B_BAD_VALUE:
+			case B_BAD_VALUE:
 			  error_message = "Invalid device specified.";
 			  break;
-			B_NOT_ALLOWED:
+			case B_NOT_ALLOWED:
 			  error_message = "Can't remove a system-reserved index, or the device is read-only.";
 			  break;
-			B_NO_MEMORY:
+			case B_NO_MEMORY:
 			  error_message = "Insufficient memory to complete the operation.";
 			  break;
-			B_ENTRY_NOT_FOUND:
+			case B_ENTRY_NOT_FOUND:
 			  error_message = "The specified index does not exist.";
 			  break;
 			default:
@@ -160,10 +136,12 @@ int main (int32 argc, char **argv)
 		fprintf(stderr, "%s\n", error_message);
 	}
 
-	return (0);
+	return 0;
 }
 
-void usage (int status)
+
+void 
+usage (int status)
 {
 	fprintf (stderr, 
 		"Usage: rmindex [OPTION]... INDEX_NAME\n"
@@ -184,10 +162,11 @@ void usage (int status)
 	exit(status);
 }
 
-const char* lookup_index_type(uint32 device_type)
+
+const char* 
+lookup_index_type(uint32 device_type)
 {
-	switch (device_type)
-	{
+	switch (device_type) {
 		case B_DOUBLE_TYPE:
 		  return "double";
 		  break;
