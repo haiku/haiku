@@ -79,6 +79,7 @@ class HWInterface : public MultiLocker {
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();
+	virtual	void				ObscureCursor();
 	virtual	void				MoveCursorTo(const float& x,
 											 const float& y);
 			BPoint				GetCursorPosition();
@@ -168,6 +169,7 @@ class HWInterface : public MultiLocker {
 			BPoint				fDragBitmapOffset;
 			ServerCursor*		fCursorAndDragBitmap;
 			bool				fCursorVisible;
+			bool				fCursorObscured;
 			BPoint				fCursorLocation;
 			bool				fDoubleBuffered;
 

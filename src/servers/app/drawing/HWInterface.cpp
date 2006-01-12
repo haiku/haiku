@@ -26,6 +26,7 @@ HWInterface::HWInterface(bool doubleBuffered)
 	  fDragBitmapOffset(0, 0),
 	  fCursorAndDragBitmap(NULL),
 	  fCursorVisible(false),
+	  fCursorObscured(false),
 	  fCursorLocation(0, 0),
 	  fDoubleBuffered(doubleBuffered),
 //	  fUpdateExecutor(new UpdateQueue(this))
@@ -105,6 +106,7 @@ HWInterface::SetCursorVisible(bool visible)
 			// fCursorVisible == false!
 			if (visible) {
 				fCursorVisible = visible;
+				fCursorObscured = false;
 				BRect r = _CursorFrame();
 
 				_DrawCursor(r);
@@ -133,6 +135,19 @@ HWInterface::IsCursorVisible()
 	return visible;
 }
 
+// ObscureCursor
+void
+HWInterface::ObscureCursor()
+{
+	if (WriteLock()) {
+		if (!fCursorObscured) {
+			SetCursorVisible(false);
+			fCursorObscured = true;
+		}
+		WriteUnlock();
+	}
+}
+
 // MoveCursorTo
 void
 HWInterface::MoveCursorTo(const float& x, const float& y)
@@ -140,6 +155,12 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 	if (WriteLock()) {
 		BPoint p(x, y);
 		if (p != fCursorLocation) {
+			// unhide cursor if it is obscured only
+			if (fCursorObscured) {
+				// TODO: causes nested lock, which
+				// the MultiLocker doesn't actually support?
+				SetCursorVisible(true);
+			}
 			BRect oldFrame = _CursorFrame();
 			fCursorLocation = p;
 			if (fCursorVisible) {

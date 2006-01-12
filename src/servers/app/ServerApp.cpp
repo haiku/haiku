@@ -877,8 +877,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n", Signature()));
-			// ToDo: Enable ObscureCursor
-			//fDesktop->HWInterface()->ObscureCursor();
+			fDesktop->HWInterface()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
