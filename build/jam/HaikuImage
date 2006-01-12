@@ -10,16 +10,16 @@ if $(TARGET_ARCH) = x86 {
 	X86_ONLY = ;
 }
 
-BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chown
-	clockconfig cmp comm cp csplit cut date dd desklink df diff dirname dstcheck
-	du echo eject env error factor false find finddir fortune gawk $(X86_ONLY)gdb
-	grep groups head id ifconfig iroster isvolume keymap kill less listarea
-	listattr listdev listimage listport listsem ln locate ls lsindex md5sum
+BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
+	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname dstcheck
+	du echo eject env error factor false ffm find finddir fortune gawk $(X86_ONLY)gdb
+	grep groups gzip head id ifconfig iroster isvolume keymap kill less listarea
+	listattr listdev listimage listport listsem ln locate logname ls lsindex md5sum
 	mimeset mkdir mkindex modifiers mount mountvolume mv open ping play ppp_up
-	pppconfig ps pwd query quit renice rm rmattr rmdir roster safemode
-	screen_blanker sed setversion setvolume sh shutdown sleep strace sync sysinfo
-	tail tee top touch traceroute translate true tty uname unmount unzip uptime
-	version waitfor xargs xres zip
+	pppconfig ps pwd query quit renice rm rmattr rmindex rmdir roster safemode
+	screen_blanker sed settype setversion setvolume sh shutdown sleep strace sync sysinfo
+	tail tar tee top touch tput traceroute translate true tty uname unmount unzip uptime
+	version waitfor wc whoami xargs xres yes zip
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
