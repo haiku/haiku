@@ -91,7 +91,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
 	fAppCursor(NULL),
-	fCursorHidden(false),
+	fCursorHideLevel(0),
 	fIsActive(false),
 	fSharedMem("shared memory", 32768)
 {
@@ -303,7 +303,7 @@ ServerApp::SetAppCursor()
 //	if (fAppCursor)
 //		fDesktop->HWInterface()->SetCursor(fAppCursor);
 
-	fDesktop->HWInterface()->SetCursorVisible(!fCursorHidden);
+	fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 }
 
 
@@ -861,17 +861,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n", Signature()));
-			// TODO: support nested showing/hiding
-			fDesktop->HWInterface()->SetCursorVisible(true);
-			fCursorHidden = false;
+			fCursorHideLevel--;
+			if (fCursorHideLevel < 0)
+				fCursorHideLevel = 0;
+			fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n", Signature()));
-			// TODO: support nested showing/hiding
-			fDesktop->HWInterface()->SetCursorVisible(false);
-			fCursorHidden = true;
+			fCursorHideLevel++;
+			fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
@@ -883,7 +883,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
 			STRACE(("ServerApp %s: Received IsCursorHidden request\n", Signature()));
-			fLink.StartMessage(fCursorHidden ? B_OK : B_ERROR);
+			fLink.StartMessage(fCursorHideLevel > 0 ? B_OK : B_ERROR);
 			fLink.Flush();
 			break;
 		}

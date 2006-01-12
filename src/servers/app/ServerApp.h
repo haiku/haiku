@@ -37,89 +37,97 @@ namespace BPrivate {
 };
 
 class ServerApp : public MessageLooper {
-	public:
-		ServerApp(Desktop* desktop, port_id clientAppPort,
-			port_id clientLooperPort, team_id clientTeamID,
-			int32 handlerID, const char* signature);
-		virtual ~ServerApp();
+ public:
+								ServerApp(Desktop* desktop,
+										  port_id clientAppPort,
+										  port_id clientLooperPort,
+										  team_id clientTeamID,
+										  int32 handlerID,
+										  const char* signature);
+	virtual						~ServerApp();
 
-		status_t InitCheck();
-		void Quit(sem_id shutdownSemaphore = -1);
+			status_t			InitCheck();
+			void				Quit(sem_id shutdownSemaphore = -1);
 
-		virtual bool Run();
-		virtual port_id MessagePort() const { return fMessagePort; }
+	virtual	bool				Run();
+	virtual	port_id				MessagePort() const { return fMessagePort; }
 
-		/*!
-			\brief Determines whether the application is the active one
-			\return true if active, false if not.
-		*/
-		bool IsActive(void) const { return fIsActive; }
-		void Activate(bool value);
+	/*!
+		\brief Determines whether the application is the active one
+		\return true if active, false if not.
+	*/
+			bool				IsActive(void) const { return fIsActive; }
+			void				Activate(bool value);
 
-		void SendMessageToClient(BMessage* msg) const;
+			void				SendMessageToClient(BMessage* message) const;
 
-		void SetAppCursor(void);
+			void				SetAppCursor();
 
-		team_id	ClientTeam() const;
-		const char *Signature() const { return fSignature.String(); }
+			team_id				ClientTeam() const;
+			const char*			Signature() const { return fSignature.String(); }
 
-		void RemoveWindow(ServerWindow* window);
-		bool InWorkspace(int32 index) const;
-		uint32 Workspaces() const;
-		int32 InitialWorkspace() const { return fInitialWorkspace; }
+			void				RemoveWindow(ServerWindow* window);
+			bool				InWorkspace(int32 index) const;
+			uint32				Workspaces() const;
+			int32				InitialWorkspace() const { return fInitialWorkspace; }
 
-		int32 CountBitmaps() const;
-		ServerBitmap *FindBitmap(int32 token) const;
+			int32				CountBitmaps() const;
+			ServerBitmap*		FindBitmap(int32 token) const;
+	
+			int32				CountPictures() const;
+			ServerPicture*		CreatePicture(const ServerPicture* original = NULL);
+			ServerPicture*		FindPicture(const int32& token) const;
+			bool				DeletePicture(const int32& token);
+	
+			AreaPool*			AppAreaPool() { return &fSharedMem; }
+	
+			Desktop*			GetDesktop() const { return fDesktop; }
+	
+			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
-		int32 CountPictures() const;
-		ServerPicture *CreatePicture(const ServerPicture *original = NULL);
-		ServerPicture *FindPicture(const int32 &token) const;
-		bool DeletePicture(const int32 &token);
+ private:
+	virtual	void				_DispatchMessage(int32 code,
+												 BPrivate::LinkReceiver& link);
+	virtual	void				_MessageLooper();
+	virtual	void				_GetLooperName(char* name, size_t size);
+			status_t			_CreateWindow(int32 code,
+											  BPrivate::LinkReceiver& link,
+											  port_id& clientReplyPort);
 
-		AreaPool *AppAreaPool() { return &fSharedMem; }
+			port_id				fMessagePort;
+			port_id				fClientReplyPort;	
+									// our BApplication's event port
 
-		Desktop* GetDesktop() const { return fDesktop; }
+			BMessenger			fHandlerMessenger;
+			port_id				fClientLooperPort;
+			int32				fClientToken;
+									// To send a BMessage to the client
+									// (port + token)
 
-		BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
+			Desktop* fDesktop;
+			BString fSignature;
+			team_id fClientTeam;
 
-	private:
-		virtual void _DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
-		virtual void _MessageLooper();
-		virtual void _GetLooperName(char* name, size_t size);
-		status_t _CreateWindow(int32 code, BPrivate::LinkReceiver& link,
-					port_id& clientReplyPort);
+	mutable	BLocker				fWindowListLock;
+			BObjectList<ServerWindow> fWindowList;
+			BPrivate::BTokenSpace fViewTokens;
 
-		port_id	fMessagePort;
-		port_id	fClientReplyPort;	
-			// our BApplication's event port
+			int32				fInitialWorkspace;
 
-		BMessenger fHandlerMessenger;
-		port_id	fClientLooperPort;
-		int32 fClientToken;
-			// To send a BMessage to the client (port + token)
-
-		Desktop* fDesktop;
-		BString fSignature;
-		team_id fClientTeam;
-
-		mutable BLocker fWindowListLock;
-		BObjectList<ServerWindow> fWindowList;
-		BPrivate::BTokenSpace fViewTokens;
-
-		int32 fInitialWorkspace;
-
+		// NOTE: Bitmaps and Pictures are stored globally, but ServerApps remember
+		// which ones they own so that they can destroy them when they quit.
 		// TODO:
-		// - Are really Bitmaps and Pictures stored per application and not globally ?
 		// - As we reference these stuff by token, what about putting them in hash tables ?
-		BList fBitmapList;
-		BList fPictureList;
+			BList				fBitmapList;
+			BList				fPictureList;
 
-		ServerCursor *fAppCursor;
-		bool fCursorHidden;
+			ServerCursor*		fAppCursor;
+			int32				fCursorHideLevel;
+									// 0 = cursor visible
 
-		bool fIsActive;
+			bool				fIsActive;
 
-		AreaPool fSharedMem;
+			AreaPool			fSharedMem;
 };
 
 #endif	// _SERVERAPP_H_
