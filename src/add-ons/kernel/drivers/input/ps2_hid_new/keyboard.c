@@ -93,19 +93,6 @@ keyboard_read_bytes(uint8 *buffer, size_t bufferSize)
 }
 
 
-static void
-keyboard_empty_data(void)
-{
-	uint8 data;
-
-	TRACE(("keyboard_empty_data()\n"));
-
-	while (ps2_read_data(&data) == B_OK) {
-		// empty keyboard output buffer
-	}
-}
-
-
 static status_t
 keyboard_command(uint8 command, uint8 *buffer, size_t bufferSize)
 {
@@ -248,8 +235,6 @@ probe_keyboard(void)
 
 	// ToDo: for now there just is a keyboard ready to be used...
 	
-	keyboard_empty_data();
-
 	// Keyboard detection does not seem to be working always correctly
 #if 0
 	// Keyboard self-test
@@ -308,8 +293,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		status = B_NO_MEMORY;
 		goto err3;
 	}
-
-	keyboard_empty_data();
 
 	commandByte = ps2_get_command_byte()
 		| PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_TRANSLATE_SCANCODES;

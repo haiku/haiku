@@ -53,8 +53,6 @@ sem_id gDeviceOpenSemaphore;
 
 static int32 sInitialized = 0;
 static uint8 sCommandByte = 0;
-static bool sKeyboardDetected = false;
-static bool sMouseDetected = false;
 
 static sem_id sResultSemaphore;
 static sem_id sResultOwnerSemaphore;
@@ -132,150 +130,9 @@ ps2_flush()
 	}
 }
 
-/**	Reads the command byte from the 8042 controller.
- *	Since the read goes through the data port, this function must not be
- *	called when the keyboard driver is up and running.
- */
-
-static status_t
-get_command_byte(uint8 *data)
-{
-	TRACE(("get_command_byte()\n"));
-
-	if (ps2_write_ctrl(PS2_CTRL_READ_CMD) == B_OK)
-		return ps2_read_data(data);
-
-	return B_ERROR;
-}
-
 
 //	#pragma mark -
 
-
-/** Wait until the control port is ready to be written. This requires that
- *	the "Input buffer full" and "Output buffer full" bits will both be set
- *	to 0. Returns true if the control port is ready to be written, false
- *	if 10ms have passed since the function has been called, and the control
- *	port is still busy.
- */
-
-status_t
-ps2_write_ctrl(uint8 data)
-{
-	if (wait_for_bits_cleared(PS2_STATUS_INPUT_BUFFER_FULL | PS2_STATUS_OUTPUT_BUFFER_FULL) != B_OK)
-		return B_ERROR;
-
-	gIsa->write_io_8(PS2_PORT_CTRL, data);
-	return B_OK;
-}
-
-
-/** Wait until the data port is ready to be written, and then writes \a data to it.
- */
-
-status_t
-ps2_write_data(uint8 data)
-{
-	if (wait_for_bits_cleared(PS2_STATUS_INPUT_BUFFER_FULL) != B_OK)
-		return B_ERROR;
-
-	gIsa->write_io_8(PS2_PORT_DATA, data);
-	return B_OK;
-}
-
-
-/** Wait until the data port can be read from, and then transfers the byte read
- *	to /a data.
- */
-
-status_t
-ps2_read_data(uint8 *data)
-{
-	if (wait_for_bits_set(PS2_STATUS_OUTPUT_BUFFER_FULL) != B_OK)
-		return B_ERROR;
-
-	*data = gIsa->read_io_8(PS2_PORT_DATA);
-	TRACE(("ps2_read_data(): read %u\n", *data));
-	return B_OK;
-}
-
-
-/** Get the PS/2 command byte. This cannot fail, since we're using our buffered
- *	data, read out in init_driver().
- */
-
-uint8
-ps2_get_command_byte(void)
-{
-	TRACE(("ps2_get_command_byte(): command byte = %x\n", sCommandByte));
-
-	return sCommandByte;
-}
-
-
-/** Set the ps2 command byte.
- */
-
-status_t
-ps2_set_command_byte(uint8 command)
-{
-	TRACE(("set_command_byte(command = %x)\n", command));
-
-	if (ps2_write_ctrl(PS2_CTRL_WRITE_CMD) == B_OK
-		&& ps2_write_data(command) == B_OK) {
-		sCommandByte = command;
-		return B_OK;
-	}
-
-	return B_ERROR;
-}
-
-
-bool
-ps2_handle_result(uint8 data)
-{
-	int32 bytesLeft;
-
-	if (sResultBuffer == NULL
-		|| (bytesLeft = atomic_add(&sResultBytes, -1)) <= 0)
-		return false;
-
-	*(sResultBuffer++) = data;
-	if (bytesLeft == 1)
-		release_sem_etc(sResultSemaphore, 1, B_DO_NOT_RESCHEDULE);
-	return true;
-}
-
-
-void
-ps2_claim_result(uint8 *buffer, size_t bytes)
-{
-	acquire_sem(sResultOwnerSemaphore);
-
-	sResultBuffer = buffer;
-	sResultBytes = bytes;
-}
-
-
-void
-ps2_unclaim_result(void)
-{
-	sResultBytes = 0;
-	sResultBuffer = NULL;
-
-	release_sem(sResultOwnerSemaphore);
-}
-
-
-status_t
-ps2_wait_for_result(void)
-{
-	status_t status = acquire_sem_etc(sResultSemaphore, 1, B_RELATIVE_TIMEOUT, 100000);
-		// 0.1 secs for now
-
-	ps2_unclaim_result();
-	return status;
-}
 
 
 static int32 
