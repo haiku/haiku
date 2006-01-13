@@ -59,6 +59,9 @@ static sem_id sResultOwnerSemaphore;
 static uint8 *sResultBuffer;
 static int32 sResultBytes;
 
+static sem_id sKbcSem;
+static int32 sIgnoreInterrupts = 0;
+
 
 inline uint8
 ps2_read_ctrl()
@@ -118,6 +121,10 @@ void
 ps2_flush()
 {
 	int i;
+
+	acquire_sem(sKbcSem);
+	atomic_add(&sIgnoreInterrupts, 1);
+
 	for (i = 0; i < 64; i++) {
 		uint8 ctrl;
 		uint8 data;
@@ -128,8 +135,42 @@ ps2_flush()
 		TRACE(("ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
 		snooze(100);
 	}
+
+	atomic_add(&sIgnoreInterrupts, -1);
+	release_sem(sKbcSem);
 }
 
+
+status_t
+ps2_command(uint8 cmd, const void *out, int in_count, void *out, int out_count)
+{
+	status_t res;
+	int i;
+	
+	acquire_sem(sKbcSem);
+	atomic_add(&sIgnoreInterrupts, 1);
+
+	res = ps2_wait_write();
+	if (res == B_OK)
+		ps2_write_ctrl(cmd);
+	
+	for (i = 0; res == B_OK && i < out_count; i++) {
+		res = ps2_wait_write();
+		if (res == B_OK)
+			ps2_write_data((const uint8 *)out[i]);
+	}
+
+	for (i = 0; res == B_OK && i < in_count; i++) {
+		res = ps2_wait_read();
+		if (res == B_OK)
+			(uint8 *)in[i] = ps2_read_data();
+	}
+
+	atomic_add(&sIgnoreInterrupts, -1);
+	release_sem(sKbcSem);
+	
+	return res;
+}
 
 //	#pragma mark -
 
@@ -144,6 +185,11 @@ ps2_interrupt(void* cookie)
 	ctrl = ps2_read_ctrl();
 	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 		return B_UNHANDLED_INTERRUPT;
+		
+	if (atomic_get(&sIgnoreInterrupts)) {
+		TRACE(("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
+		return B_HANDLED_INTERRUPT;
+	}
 	
 	data = ps2_read_data();
 
@@ -180,6 +226,8 @@ publish_devices(void)
 
 	kDevices[index++] = NULL;
 
+ //status_t devfs_publish_device(const char *path, NULL, device_hooks *calls);
+
 	return (const char **)kDevices;
 }
 
@@ -204,6 +252,8 @@ init_driver(void)
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK)
 		goto err_1;
+
+	sKbcSem = create_sem(1, "ps/2 keyb ctrl");
 
 	gDeviceOpenSemaphore = create_sem(1, "ps/2 open");
 	if (gDeviceOpenSemaphore < B_OK)
@@ -230,6 +280,7 @@ err_4:
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 err_3:
 	delete_sem(gDeviceOpenSemaphore);
+	delete_sem(sKbcSem);
 err_2:
 	put_module(B_ISA_MODULE_NAME);
 err_1:
@@ -243,5 +294,6 @@ uninit_driver(void)
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	delete_sem(gDeviceOpenSemaphore);
+	delete_sem(sKbcSem);
 	put_module(B_ISA_MODULE_NAME);
 }
