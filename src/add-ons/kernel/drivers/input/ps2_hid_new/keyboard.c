@@ -39,80 +39,6 @@ static int32 sKeyboardOpenMask;
 static sem_id sKeyboardSem;
 static struct packet_buffer *sKeyBuffer;
 static bool sIsExtended = false;
-static bool sInterruptHandlerInstalled = false;
-
-
-static status_t
-keyboard_write_byte(uint8 byte)
-{
-	uint8 acknowledged = 0;
-
-	TRACE(("keyboard_write_byte(byte = %u)\n", byte));
-
-	if (sInterruptHandlerInstalled) {
-		ps2_claim_result(&acknowledged, 1);
-
-		if (ps2_write_data(byte) != B_OK) {
-			ps2_unclaim_result();
-			return B_TIMED_OUT;
-		}
-
-		ps2_wait_for_result();
-	} else {
-		status_t status = ps2_write_data(byte);
-		if (status == B_OK)
-			status = ps2_read_data(&acknowledged);
-
-		if (status != B_OK)
-			return status;
-	}
-
-	return acknowledged == PS2_REPLY_ACK ? B_OK : B_ERROR;
-}
-
-
-static status_t
-keyboard_read_bytes(uint8 *buffer, size_t bufferSize)
-{
-	uint32 i;
-
-	TRACE(("keyboard_read_bytes(bufferSize = %lu)\n", bufferSize));
-
-	if (sInterruptHandlerInstalled) {
-		ps2_claim_result(buffer, bufferSize);
-		return ps2_wait_for_result();
-	}
-
-	for (i = 0; i < bufferSize; i++) {
-		status_t status = ps2_read_data(&buffer[i]);
-		if (status != B_OK)
-			return status;
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-keyboard_command(uint8 command, uint8 *buffer, size_t bufferSize)
-{
-	status_t status;
-	uint32 i;
-
-	TRACE(("keyboard_command(command = %u, bufferSize = %lu)\n", command, bufferSize));
-
-	status = keyboard_write_byte(command);
-	if (status != B_OK)
-		return status;
-
-	for (i = 0; i < bufferSize; i++) {
-		status = keyboard_write_byte(buffer[i]);
-		if (status != B_OK)
-			return status;
-	}
-
-	return B_OK;
-}
 
 
 static status_t
@@ -129,18 +55,19 @@ set_leds(led_info *ledInfo)
 	if (ledInfo->caps_lock)
 		leds |= LED_CAPS;
 
-	return keyboard_command(PS2_DATA_SET_LEDS, &leds, sizeof(leds));
+	return ps2_keyboard_command(PS2_DATA_SET_LEDS, &leds, 1, NULL, 0);
 }
 
 
 int32 keyboard_handle_int(uint8 data)
 {
+		at_kbd_io keyInfo;
+		uint8 scancode;
+
 	if (atomic_and(&sKeyboardOpenMask, 1) == 0)
 		return B_HANDLED_INTERRUPT;
 
 
-		at_kbd_io keyInfo;
-		uint8 scancode;
 
 		// TODO: Handle braindead "pause" key special case
 
@@ -214,9 +141,9 @@ enable_keyboard(void)
 	uint32 tries = 3;
 
 	while (tries-- > 0) {
-		keyboard_empty_data();
+//		keyboard_empty_data();
 
-		if (keyboard_command(PS2_ENABLE_KEYBOARD, NULL, 0) == B_OK)
+		if (ps2_keyboard_command(PS2_ENABLE_KEYBOARD, NULL, 0, NULL, 0) == B_OK)
 			return B_OK;
 	}
 
@@ -272,7 +199,6 @@ probe_keyboard(void)
 status_t
 keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
-	uint8 commandByte;
 	status_t status;
 
 	TRACE(("keyboard open()\n"));

@@ -117,6 +117,8 @@ ps2_wait_write()
 }
 
 
+//	#pragma mark -
+
 void
 ps2_flush()
 {
@@ -174,20 +176,38 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 
 
 status_t
+ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+{
+
+	return B_OK;
+}
+
+
+status_t
+ps2_mouse_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+{
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+inline status_t
 ps2_get_command_byte(uint8 *byte)
 {
 	return ps2_command(PS2_CTRL_READ_CMD, NULL, 0, byte, 1);
 }
 
 
-status_t
+inline status_t
 ps2_set_command_byte(uint8 byte)
 {
 	return ps2_command(PS2_CTRL_WRITE_CMD, &byte, 1, NULL, 0);
 }
 	
-//	#pragma mark -
 
+//	#pragma mark -
 
 
 static int32 
@@ -286,7 +306,7 @@ init_driver(void)
 		uint8 d;
 		status_t res;
 		
-		res = ps2_get_command_byte(&d)
+		res = ps2_get_command_byte(&d);
 		dprintf("ps2_get_command_byte: res 0x%08x, d 0x%02x\n", res, d);
 		
 		d |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT;

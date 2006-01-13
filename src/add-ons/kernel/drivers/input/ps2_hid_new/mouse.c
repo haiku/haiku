@@ -83,40 +83,22 @@ static size_t sPacketIndex;
 static uint8 sPacketBuffer[PS2_MAX_PACKET_SIZE];
 
 
-/** Writes a byte to the mouse device. Uses the control port to indicate
- *	that the byte is sent to the auxiliary device (mouse), instead of the
- *	keyboard.
- */
 
-status_t
-ps2_write_aux_byte(uint8 data)
-{
-	TRACE(("ps2_write_aux_byte(data = %u)\n", data));
-
-	if (ps2_write_ctrl(PS2_CTRL_WRITE_AUX) == B_OK
-		&& ps2_write_data(data) == B_OK
-		&& ps2_read_data(&data) == B_OK)
-		return data == PS2_REPLY_ACK ? B_OK : B_TIMED_OUT;
-
-	return B_ERROR;
-}
-
-
-/*
 static status_t
 ps2_reset_mouse()
 {
-	int8 read;
+	uint8 read;
+	status_t status;
 	
 	TRACE(("ps2_reset_mouse()\n"));
 	
-	write_aux_byte(PS2_CMD_RESET_MOUSE);
-	read = read_data_byte();
+	status = ps2_mouse_command(PS2_CMD_RESET_MOUSE, NULL, 0, &read, 1);
+		
+	TRACE(("reset mouse: status 0x%08x, data 0x%02x\n", status, read));
 	
-	TRACE(("reset mouse: %2x\n", read));
 	return B_OK;	
 }
-*/
+
 
 
 /** Set sampling rate of the ps2 port.
@@ -128,9 +110,8 @@ ps2_set_sample_rate(uint32 rate)
 	int32 tries = 5;
 
 	while (--tries > 0) {
-		status_t status = ps2_write_aux_byte(PS2_CMD_SET_SAMPLE_RATE);
-		if (status == B_OK)
-			status = ps2_write_aux_byte(rate);
+		uint8 d = rate;
+		status_t status = ps2_mouse_command(PS2_CMD_SET_SAMPLE_RATE, &d, 1, NULL, 0);
 
 		if (status == B_OK)
 			return B_OK;
@@ -196,13 +177,13 @@ ps2_packet_to_movement(uint8 packet[], mouse_movement *pos)
  */
 
 static status_t
-ps2_mouse_read(mouse_movement *userMovement)
+mouse_read_event(mouse_movement *userMovement)
 {
 	uint8 packet[PS2_MAX_PACKET_SIZE];
 	mouse_movement movement;
 	status_t status;
 
-	TRACE(("ps2_mouse_read()\n"));
+	TRACE(("mouse_read_event()\n"));
 	status = acquire_sem_etc(sMouseSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
@@ -230,8 +211,7 @@ set_mouse_enabled(bool enable)
 	int32 tries = 5;
 
 	while (true) {
-		if (ps2_write_aux_byte(enable ?
-				PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE) == B_OK)
+		if (ps2_mouse_command(enable ? PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE, NULL, 0, NULL, 0) == B_OK)
 			return B_OK;
 
 		if (--tries <= 0)
@@ -251,7 +231,7 @@ set_mouse_enabled(bool enable)
 
 int32 mouse_handle_int(uint8 data)
 {
-	if (atomic_and(&sMouseOpenMask, 1) == 0)
+	if (atomic_and(&sOpenMask, 1) == 0)
 		return B_HANDLED_INTERRUPT;
 
 	if (sPacketIndex == 0 && !(data & 8)) {
@@ -286,11 +266,10 @@ int32 mouse_handle_int(uint8 data)
 status_t
 probe_mouse(size_t *probed_packet_size)
 {
-	int8 deviceId = -1;
+	uint8 deviceId = 0;
 
 	// get device id
-	if (ps2_write_aux_byte(PS2_CMD_GET_DEVICE_ID) == B_OK)
-		ps2_read_data(&deviceId);
+	ps2_mouse_command(PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
 
 	TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
 
@@ -303,8 +282,7 @@ probe_mouse(size_t *probed_packet_size)
 				&& ps2_set_sample_rate(100) == B_OK
 				&& ps2_set_sample_rate(80) == B_OK) {
 				// get device id, again
-				if (ps2_write_aux_byte(PS2_CMD_GET_DEVICE_ID) == B_OK)
-					ps2_read_data(&deviceId);
+				ps2_mouse_command(PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
 				break;
 			}
 		}
@@ -350,10 +328,6 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 		
 	sPacketIndex = 0;
 
-	status = ps2_common_initialize();
-	if (status != B_OK)
-		goto err1;
-
 	sMouseBuffer = create_packet_buffer(MOUSE_HISTORY_SIZE * sPacketSize);
 	if (sMouseBuffer == NULL) {
 		TRACE(("can't allocate mouse actions buffer\n"));
@@ -378,13 +352,6 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 		goto err4;
 	}
 
-	status = install_io_interrupt_handler(INT_PS2_MOUSE,
-		handle_mouse_interrupt, NULL, 0);
-	if (status < B_OK) {
-		TRACE(("mouse_open(): cannot install interrupt handler\n"));
-		goto err4;
-	}
-
 	release_sem(gDeviceOpenSemaphore);
 
 	TRACE(("mouse_open(): mouse succesfully enabled\n"));
@@ -395,7 +362,6 @@ err4:
 err3:
 	delete_packet_buffer(sMouseBuffer);
 err2:
-	ps2_common_uninitialize();
 err1:
 	atomic_and(&sOpenMask, 0);
 	release_sem(gDeviceOpenSemaphore);
@@ -414,9 +380,6 @@ mouse_close(void *cookie)
 	delete_packet_buffer(sMouseBuffer);
 	delete_sem(sMouseSem);
 
-	remove_io_interrupt_handler(INT_PS2_MOUSE, handle_mouse_interrupt, NULL);
-
-	ps2_common_uninitialize();
 	atomic_and(&sOpenMask, 0);
 
 	return B_OK;
@@ -460,7 +423,7 @@ mouse_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case MS_READ:
 			TRACE(("MS_READ\n"));	
-			return ps2_mouse_read((mouse_movement *)buffer);
+			return mouse_read_event((mouse_movement *)buffer);
 
 		case MS_SET_TYPE:
 			TRACE(("MS_SET_TYPE not implemented\n"));

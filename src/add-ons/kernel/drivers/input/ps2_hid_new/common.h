@@ -32,13 +32,19 @@ extern isa_module_info *gIsa;
 extern sem_id gDeviceOpenSemaphore;
 
 // prototypes from common.c
-extern status_t ps2_write_ctrl(uint8 data);
-extern status_t ps2_write_data(uint8 data);
-extern status_t ps2_read_data(uint8 *data);
 
-extern status_t ps2_write_aux_byte(uint8 data);
-extern uint8 ps2_get_command_byte(void);
-extern status_t ps2_set_command_byte(uint8 command);
+extern status_t ps2_wait_read();
+extern status_t ps2_wait_write();
+
+extern void ps2_flush();
+
+extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
+
+extern status_t ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
+extern status_t ps2_mouse_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
+
+extern status_t ps2_get_command_byte(uint8 *byte);
+extern status_t ps2_set_command_byte(uint8 byte);
 
 extern void ps2_claim_result(uint8 *buffer, size_t bytes);
 extern void ps2_unclaim_result(void);
