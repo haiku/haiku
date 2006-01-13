@@ -13,6 +13,7 @@
 #include <arch_thread.h>
 
 #include <arch_cpu.h>
+#include <arch/thread.h>
 #include <boot/stage2.h>
 #include <kernel.h>
 #include <thread.h>
@@ -25,8 +26,12 @@
 // a new thread structure.
 static struct arch_thread sInitialState;
 
-// Helper functions for thread creation, defined in arch_asm.S.
+// Helper function for thread creation, defined in arch_asm.S.
 extern void ppc_kernel_thread_root();
+
+extern void ppc_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
+	void *arg);
+
 
 void
 ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame)
@@ -159,6 +164,14 @@ void
 arch_thread_init_tls(struct thread *thread)
 {
 // TODO: Implement!
+}
+
+
+void
+arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
+	void (*func)(void *), void *arg)
+{
+	ppc_switch_stack_and_call(newKstack, func, arg);
 }
 
 

@@ -1,10 +1,16 @@
 /* 
- * Copyright 2003-2005, Axel D�fler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Axel Dörfler <axeld@pinc-software.de>
+ * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 
 #include <arch/debug.h>
+
+#include <arch_cpu.h>
 #include <debug.h>
 #include <elf.h>
 #include <kernel.h>
@@ -61,8 +67,10 @@ get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 	struct thread *thread = thread_get_current_thread();
 
 	// set fault handler, so that we can safely access user stacks
-	if (thread)
-		thread->fault_handler = (addr_t)&&error;
+	if (thread) {
+		if (ppc_set_fault_handler(&thread->fault_handler, (addr_t)&&error))
+			goto error;
+	}
 
 	*ip = ((struct stack_frame *)framePointer)->return_address;
 	*next = (addr_t)((struct stack_frame *)framePointer)->previous;
@@ -209,13 +217,11 @@ return 0;
 				frame->r24, frame->r25, frame->r26, frame->r27);
 			kprintf("  r28 0x%08lx   r29 0x%08lx   r30 0x%08lx   r31 0x%08lx\n",
 				frame->r28, frame->r29, frame->r30, frame->r31);
-			kprintf(" srr0 0x%08lx  srr1 0x%08lx", frame->srr0, frame->srr1);
-// TODO: Look up the bit in srr1!
-//			if ((frame->error_code & 0x4) != 0) {
-//				// from user space
-//				kprintf("user esp 0x%lx", frame->user_esp);
-//			}
-			kprintf("\n");
+			kprintf("   lr 0x%08lx    cr 0x%08lx   xer 0x%08lx   ctr 0x%08lx\n",
+				frame->lr, frame->cr, frame->xer, frame->ctr);
+			kprintf("fpscr 0x%08lx\n", frame->fpscr);
+			kprintf(" srr0 0x%08lx  srr1 0x%08lx   dar 0x%08lx dsisr 0x%08lx\n",
+				frame->srr0, frame->srr1, frame->dar, frame->dsisr);
 			kprintf(" vector: 0x%lx\n", frame->vector);
 
 			print_stack_frame(thread, frame->srr0, framePointer, frame->r1);

@@ -22,6 +22,7 @@ struct iframe {
 	uint32 cr;
 	uint32 xer;
 	uint32 ctr;
+	uint32 fpscr;
 	uint32 r31;
 	uint32 r30;
 	uint32 r29;
@@ -54,6 +55,38 @@ struct iframe {
 	uint32 r2;
 	uint32 r1;
 	uint32 r0;
+	double f31;
+	double f30;
+	double f29;
+	double f28;
+	double f27;
+	double f26;
+	double f25;
+	double f24;
+	double f23;
+	double f22;
+	double f21;
+	double f20;
+	double f19;
+	double f18;
+	double f17;
+	double f16;
+	double f15;
+	double f14;
+	double f13;
+	double f12;
+	double f11;
+	double f10;
+	double f9;
+	double f8;
+	double f7;
+	double f6;
+	double f5;
+	double f4;
+	double f3;
+	double f2;
+	double f1;
+	double f0;
 };
 
 enum machine_state {
@@ -112,6 +145,9 @@ int64 __ppc_get_time_base(void);
 	// defined in libroot: os/arch/system_time_asm.S
 
 extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
+
+extern bool ppc_set_fault_handler(addr_t *handlerLocation, addr_t handler)
+	__attribute__((noinline));
 
 #ifdef __cplusplus
 }

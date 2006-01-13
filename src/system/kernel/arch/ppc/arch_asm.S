@@ -305,9 +305,9 @@ FUNCTION(ppc_context_switch):
 	blr
 
 
-// void arch_thread_switch_kstack_and_call(addr_t new_kstack,
+// void ppc_switch_stack_and_call(addr_t newKstack,
 //		void (*func)(void *), void *arg)
-FUNCTION(arch_thread_switch_kstack_and_call):
+FUNCTION(ppc_switch_stack_and_call):
 	mr			%r1, %r3	// set the new stack pointer
 	mtctr		%r4			// move the target function into CTR
 	mr			%r3, %r5	// move the arg to this func to the new arg

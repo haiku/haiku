@@ -106,6 +106,37 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 		case 0x300: // DSI
 		case 0x400: // ISI
 		{
+			bool kernelDebugger = debug_debugger_running();
+
+			if (kernelDebugger) {
+				// if this thread has a fault handler, we're allowed to be here
+				struct thread *thread = thread_get_current_thread();
+				if (thread && thread->fault_handler != NULL) {
+					iframe->srr0 = thread->fault_handler;
+					break;
+				}
+
+				// otherwise, not really
+				panic("page fault in debugger without fault handler! Touching "
+					"address %p from ip %p\n", (void *)iframe->dar,
+					(void *)iframe->srr0);
+				break;
+			} else if ((iframe->srr1 & MSR_EXCEPTIONS_ENABLED) == 0) {
+				// if the interrupts were disabled, and we are not running the
+				// kernel startup the page fault was not allowed to happen and
+				// we must panic
+				panic("page fault, but interrupts were disabled. Touching "
+					"address %p from ip %p\n", (void *)iframe->dar,
+					(void *)iframe->srr0);
+				break;
+			} else if (thread != NULL && thread->page_faults_allowed < 1) {
+				panic("page fault not allowed at this place. Touching address "
+					"%p from ip %p\n", (void *)iframe->dar,
+					(void *)iframe->srr0);
+			}
+
+			enable_interrupts();
+
 			addr_t newip;
 
 			ret = vm_page_fault(iframe->dar, iframe->srr0,

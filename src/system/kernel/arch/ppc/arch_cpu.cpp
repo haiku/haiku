@@ -146,21 +146,23 @@ arch_cpu_user_TLB_invalidate(void)
 
 
 status_t
-arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *fault_handler)
+arch_cpu_user_memcpy(void *to, const void *from, size_t size,
+	addr_t *faultHandler)
 {
 	char *tmp = (char *)to;
 	char *s = (char *)from;
 
-	*fault_handler = (addr_t)&&error;
+	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
+		goto error;
 
 	while (size--)
 		*tmp++ = *s++;
 
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return 0;
 
 error:
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return B_BAD_ADDRESS;
 }
 
@@ -180,7 +182,8 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHand
 {
 	int from_length = 0;
 
-	*faultHandler = (addr_t)&&error;
+	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
+		goto error;
 
 	if (size > 0) {
 		to[--size] = '\0';
@@ -204,20 +207,21 @@ error:
 
 
 status_t
-arch_cpu_user_memset(void *s, char c, size_t count, addr_t *fault_handler)
+arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler)
 {
 	char *xs = (char *)s;
 
-	*fault_handler = (addr_t)&&error;
+	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
+		goto error;
 
 	while (count--)
 		*xs++ = c;
 
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return 0;
 
 error:
-	*fault_handler = 0;
+	*faultHandler = 0;
 	return B_BAD_ADDRESS;
 }
 
@@ -235,3 +239,23 @@ arch_cpu_idle(void)
 {
 }
 
+
+// The purpose of this function is to trick the compiler. When setting the
+// page_handler to a label that is obviously (to the compiler) never used,
+// it may reorganize the control flow, so that the labeled part is optimized
+// away.
+// By invoking the function like this
+//
+//	if (ppc_set_fault_handler(faultHandler, (addr_t)&&error))
+//		goto error;
+//
+// the compiler has to keep the labeled code, since it can't guess the return
+// value of this (non-inlinable) function. At least in my tests it worked that
+// way, and I hope it will continue to work like this in the future.
+//
+bool
+ppc_set_fault_handler(addr_t *handlerLocation, addr_t handler)
+{
+	*handlerLocation = handler;
+	return false;
+}

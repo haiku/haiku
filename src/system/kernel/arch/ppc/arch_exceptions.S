@@ -316,7 +316,7 @@ __save_regs:
 
 	/* save some of the other regs */
 	mffs	%f0
-	stfs	%f0, -4(%r1)		/* push FPSCR */
+	stfsu	%f0, -4(%r1)		/* push FPSCR */
 	mfctr	%r0
 	stwu	%r0, -4(%r1)		/* push CTR */
 	mfxer	%r0
@@ -359,7 +359,7 @@ __restore_regs_and_rfi:
 	mtxer	%r0
 	lwzu	%r0, 4(%r1)		/* CTR */
 	mtctr	%r0
-	lfs		%f0, 4(%r1)		/* FPSCR */
+	lfsu	%f0, 4(%r1)		/* FPSCR */
 	mtfsf	0xff, %f0
 
 	lwzu	%r31, 4(%r1)
