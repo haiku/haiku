@@ -19,6 +19,7 @@
 #include <Screen.h>
 #include <Window.h>
 
+#include <BMCPrivate.h>
 #include <MenuPrivate.h>
 #include <MenuWindow.h>
 
@@ -288,7 +289,7 @@ bool
 BMenu::AddItem(BMenuItem *item, int32 index)
 {
 	if (fLayout == B_ITEMS_IN_MATRIX)
-		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only"
+		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
 	return _AddItem(item, index);
@@ -299,8 +300,8 @@ bool
 BMenu::AddItem(BMenuItem *item, BRect frame)
 {
 	if (fLayout != B_ITEMS_IN_MATRIX)
-		debugger("BMenu::AddItem(BMenuItem *, BRect) this method can only"
-			" be called if the menu layout is B_ITEMS_IN_MATRIX");
+		debugger("BMenu::AddItem(BMenuItem *, BRect) this method can only "
+			"be called if the menu layout is B_ITEMS_IN_MATRIX");
 			
 	if (!item)
 		return false;
@@ -326,7 +327,7 @@ bool
 BMenu::AddItem(BMenu *submenu, int32 index)
 {
 	if (fLayout == B_ITEMS_IN_MATRIX)
-		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only"
+		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
 	BMenuItem *item = new BMenuItem(submenu);
@@ -341,8 +342,8 @@ bool
 BMenu::AddItem(BMenu *submenu, BRect frame)
 {
 	if (fLayout != B_ITEMS_IN_MATRIX)
-		debugger("BMenu::AddItem(BMenu *, BRect) this method can only"
-			" be called if the menu layout is B_ITEMS_IN_MATRIX");
+		debugger("BMenu::AddItem(BMenu *, BRect) this method can only "
+			"be called if the menu layout is B_ITEMS_IN_MATRIX");
 	
 	BMenuItem *item = new BMenuItem(submenu);
 	item->fBounds = frame;
@@ -1429,7 +1430,11 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 	BMenu *superMenu = Supermenu();
 	BMenuItem *superItem = Superitem();
 
-	if (superMenu == NULL || superItem == NULL) {
+	// TODO: Horrible hack:
+	// When added to a BMenuField, a BPopUpMenu is the child of
+	// a _BMCItem_ inside a _BMCMenuBar_ to "fake" the menu hierarchy
+	if (superMenu == NULL || superItem == NULL
+		|| dynamic_cast<_BMCItem_ *>(superItem) != NULL) {
 		// just move the window on screen
 
 		if (frame.bottom > screenFrame.bottom)
