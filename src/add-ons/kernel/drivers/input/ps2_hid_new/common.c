@@ -90,46 +90,47 @@ ps2_write_data(uint8 data)
 }
 
 
-
-/**	Wait until the specified status bits are cleared or set, depending on the
- *	second parameter.
- *	This currently busy waits, but should nonetheless be avoided in interrupt
- *	handlers.
- */
-
-static status_t
-wait_for_status(int32 bits, bool set)
+status_t
+ps2_wait_read()
 {
-	int8 read;
-	int32 tries = 100;
-
-	TRACE(("wait_write_ctrl(bits = %lx, %s)\n", bits, set ? "set" : "cleared"));
-
-	while (tries-- > 0) {
-		read = gIsa->read_io_8(PS2_PORT_CTRL);
-		if (((read & bits) == bits) == set)
+	int i;
+	for (i = 0; i < PS2_CTRL_WAIT_TIMEOUT / 50; i++) {
+		if (ps2_read_ctrl() & PS2_STATUS_OUTPUT_BUFFER_FULL)
 			return B_OK;
-
-		spin(100);
+		snooze(50);
 	}
-
 	return B_ERROR;
 }
 
 
-static inline status_t
-wait_for_bits_cleared(int32 bits)
+status_t
+ps2_wait_write()
 {
-	return wait_for_status(bits, false);
+	int i;
+	for (i = 0; i < PS2_CTRL_WAIT_TIMEOUT / 50; i++) {
+		if (!(ps2_read_ctrl() & PS2_STATUS_INPUT_BUFFER_FULL))
+			return B_OK;
+		snooze(50);
+	}
+	return B_ERROR;
 }
 
 
-static inline status_t
-wait_for_bits_set(int32 bits)
+void
+ps2_flush()
 {
-	return wait_for_status(bits, true);
+	int i;
+	for (i = 0; i < 64; i++) {
+		uint8 ctrl;
+		uint8 data;
+		ctrl = ps2_read_ctrl();
+		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
+			return;
+		data = ps2_read_data();
+		TRACE(("ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
+		snooze(100);
+	}
 }
-
 
 /**	Reads the command byte from the 8042 controller.
  *	Since the read goes through the data port, this function must not be
@@ -355,7 +356,7 @@ init_driver(void)
 	if (status)
 		goto err_3;
 	
-	status = install_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL, 0);
+	status = install_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL, 0);
 	if (status)
 		goto err_4;
 

@@ -74,4 +74,7 @@
 #define PS2_MAX_PACKET_SIZE				4
 	// Should be equal to the biggest packet size
 
+// timeouts
+#define PS2_CTRL_WAIT_TIMEOUT			500000
+
 #endif /* _PS2_H */
