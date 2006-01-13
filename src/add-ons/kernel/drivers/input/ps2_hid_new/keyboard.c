@@ -294,15 +294,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		goto err3;
 	}
 
-	commandByte = ps2_get_command_byte()
-		| PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_TRANSLATE_SCANCODES;
-	commandByte &= ~PS2_BITS_KEYBOARD_DISABLED;
-
-	status = ps2_set_command_byte(commandByte);
-	if (status < B_OK) {
-		TRACE(("keyboard_open(): cannot set command byte\n"));
-		goto err4;
-	}
 
 	release_sem(gDeviceOpenSemaphore);
 

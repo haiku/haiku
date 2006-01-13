@@ -372,15 +372,6 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 
 	*_cookie = NULL;
 
-	commandByte = ps2_get_command_byte() | PS2_BITS_AUX_INTERRUPT;
-	commandByte &= ~PS2_BITS_MOUSE_DISABLED;
-
-	status = ps2_set_command_byte(commandByte);
-	if (status < B_OK) {
-		TRACE(("mouse_open(): sending command byte failed\n"));
-		goto err4;
-	}
-
 	status = set_mouse_enabled(true);
 	if (status < B_OK) {
 		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
