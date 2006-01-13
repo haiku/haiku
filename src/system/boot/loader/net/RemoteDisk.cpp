@@ -16,6 +16,8 @@
 #include <boot/net/UDP.h>
 
 
+static const bigtime_t kRequestTimeout = 100000LL;
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
 static inline
@@ -260,7 +262,7 @@ RemoteDisk::_SendRequest(UDPSocket *socket, ip_addr_t serverAddress,
 			return error;
 
 		// receive reply
-		bigtime_t timeout = system_time() + 10000LL;
+		bigtime_t timeout = system_time() + kRequestTimeout;
 		do {
 			UDPPacket *packet;
 			error = socket->Receive(&packet, timeout - system_time());
