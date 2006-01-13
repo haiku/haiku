@@ -142,7 +142,7 @@ ps2_flush()
 
 
 status_t
-ps2_command(uint8 cmd, const void *out, int in_count, void *out, int out_count)
+ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
 	status_t res;
 	int i;
@@ -157,13 +157,13 @@ ps2_command(uint8 cmd, const void *out, int in_count, void *out, int out_count)
 	for (i = 0; res == B_OK && i < out_count; i++) {
 		res = ps2_wait_write();
 		if (res == B_OK)
-			ps2_write_data((const uint8 *)out[i]);
+			ps2_write_data(out[i]);
 	}
 
 	for (i = 0; res == B_OK && i < in_count; i++) {
 		res = ps2_wait_read();
 		if (res == B_OK)
-			(uint8 *)in[i] = ps2_read_data();
+			in[i] = ps2_read_data();
 	}
 
 	atomic_add(&sIgnoreInterrupts, -1);
