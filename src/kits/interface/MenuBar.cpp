@@ -1,4 +1,4 @@
- //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
@@ -400,7 +400,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 	while (true) {
 		bigtime_t snoozeAmount = 30000;
-		if (window->LockWithTimeout(200000) < B_OK)
+		if (!window->Lock())//WithTimeout(200000) < B_OK)
 			break;
 
 		BPoint where;
@@ -426,7 +426,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					menu->SetStickyMode(true);
 				snoozeAmount = 0;
 				resultItem = menu->_track(&localAction);
-				if (window->LockWithTimeout(200000) < B_OK)
+				if (!window->Lock())//WithTimeout(200000) < B_OK)
 					break;
 			}
 		}
@@ -447,6 +447,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			resultItem->Invoke();
 		window->Unlock();
 	}
+
+	DeleteMenuWindow();
 
 	if (action != NULL)
 		*action = static_cast<int32>(localAction);

@@ -1030,18 +1030,36 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	// Menu windows get the BMenu's handler name
-	fCachedMenuWindow = new BMenuWindow(Name());
-	fCachedMenuWindow->ChildAt(0)->AddChild(this);
+	// See if the supermenu has a cached menuwindow,
+	// and use that one if possible.
+	BMenuWindow *window = NULL;
+	if (fSuper != NULL)
+		window = fSuper->MenuWindow();
+	
+	// Otherwise, create a new one
+	// Actually, I think this can only happen for
+	// "stand alone" BPopUpMenus (i.e. not within a BMenuField)
+	if (window == NULL) {
+		// Menu windows get the BMenu's handler name
+		window = new BMenuWindow(Name());
+	}
 
-	// We're doing this here because ConvertToScreen() needs:
-	// 1. The BView to be attached (see the above line).
-	// 2. The looper locked or not running (the Show() call below starts the looper)
+	if (window == NULL)
+		return false;
+
+	if (!window->IsLocked())
+		window->Lock();
+
+	window->ChildAt(0)->AddChild(this);
+
 	if (fSuper != NULL)
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 
 	UpdateWindowViewSize();
-	fCachedMenuWindow->Show();
+	window->Show();
+
+	if (window->IsLocked())
+		window->Unlock();
 
 	return true;
 }
@@ -1052,18 +1070,23 @@ BMenu::_hide()
 {
 	if (!LockLooper())
 		return;
-	if (fCachedMenuWindow == NULL) {
+
+	BMenuWindow *menuWindow = fSuper ? fSuper->fCachedMenuWindow : NULL;
+	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
+	if (window == NULL) {
 		// Huh? What did happen here? - we're trying to be on the safe side
 		UnlockLooper();
 		return;
 	}
 
-	fCachedMenuWindow->Hide();
-	fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
+	window->Hide();
+	window->ChildAt(0)->RemoveChild(this);
 		// we don't want to be deleted when the window is removed
-
-	fCachedMenuWindow->Quit();
-	fCachedMenuWindow = NULL;
+	
+	// Only quit if the window isn't cached. The cached menu window
+	// will be deleted at the end of BMenu::_track().
+	if (menuWindow != window)
+		window->Quit();
 }
 
 
@@ -1128,7 +1151,10 @@ BMenu::_track(int *action, long start)
 		SelectItem(NULL);
 		UnlockLooper();
 	}
-		
+	
+	// delete the menu window recycled for all the child menus
+	DeleteMenuWindow();
+	
 	return item;
 }
 
@@ -1506,9 +1532,15 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 }
 
 
-BMenuWindow	*
+BMenuWindow *
 BMenu::MenuWindow()
 {
+	if (fCachedMenuWindow == NULL) {
+		char windowName[64];
+		snprintf(windowName, 64, "%s cached menuwindow\n", Name());
+		fCachedMenuWindow = new BMenuWindow(windowName);
+	}
+	
 	return fCachedMenuWindow;
 }
 
@@ -1736,14 +1768,13 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
-	ASSERT(fCachedMenuWindow != NULL);
-
+	BWindow *window = Window();
 	bool scroll;
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
-	fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
-	fCachedMenuWindow->MoveTo(frame.LeftTop());
+	window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+	window->MoveTo(frame.LeftTop());
 }
 
 
