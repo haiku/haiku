@@ -157,12 +157,12 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 	
 	BMessage *message = MakeValueMessage(value);
 	if (message == NULL)
-		return B_ERROR;	// TODO: Should return B_NO_MEMORY instead ?
+		return B_NO_MEMORY;
 	
 	BMenuItem *newItem = new BMenuItem(name, message);
 	if (newItem == NULL) {
 		delete message;
-		return B_ERROR; // TODO: same as above
+		return B_NO_MEMORY;
 	}
 	
 	menu->AddItem(newItem, index);
@@ -355,7 +355,7 @@ BOptionPopUp::BOptionPopUp(const BOptionPopUp &clone)
 BOptionPopUp &
 BOptionPopUp::operator=(const BOptionPopUp & clone)
 {
-		return *this;
+	return *this;
 }
 
 
