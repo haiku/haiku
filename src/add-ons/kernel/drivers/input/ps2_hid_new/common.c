@@ -51,14 +51,6 @@ static device_hooks sMouseDeviceHooks = {
 isa_module_info *gIsa = NULL;
 sem_id gDeviceOpenSemaphore;
 
-static int32 sInitialized = 0;
-static uint8 sCommandByte = 0;
-
-static sem_id sResultSemaphore;
-static sem_id sResultOwnerSemaphore;
-static uint8 *sResultBuffer;
-static int32 sResultBytes;
-
 static sem_id sKbcSem;
 static int32 sIgnoreInterrupts = 0;
 
