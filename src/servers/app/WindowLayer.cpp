@@ -976,7 +976,7 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
 
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus())
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus() && !(Flags() & B_AVOID_FOCUS))
 		fDesktop->SetFocusWindow(this);
 }
 
