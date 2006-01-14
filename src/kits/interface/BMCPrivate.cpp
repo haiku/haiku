@@ -66,15 +66,7 @@ _BMCItem_::Draw()
 {
 	BMenu *menu = Menu();
 	
-	// Copy / pasted from BMenuItem::Draw(). We can't use it directly
-	// because we want to skip the Submenu symbol and the rest
-	if (IsEnabled())
-		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	else
-		menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT));
-	menu->MovePenTo(ContentLocation());
-	DrawContent();
+	BMenuItem::Draw();
 
 	if (!fShowPopUpMarker)
 		return;
@@ -133,7 +125,7 @@ _BMCFilter_::operator=(const _BMCFilter_ &)
 
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
-	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_COLUMN,
+	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
 			!fixed_size)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
