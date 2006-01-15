@@ -35,7 +35,7 @@ ps2_dev_publish(ps2_dev *dev)
 	dev->result_buf = NULL;
 	dev->result_buf_idx = 0;
 	dev->result_buf_cnt = 0;
-	dev->flags &= ~PS2_FLAG_KEYB;
+	dev->flags &= PS2_FLAG_KEYB;
 
 	dev->active = true;
 	
