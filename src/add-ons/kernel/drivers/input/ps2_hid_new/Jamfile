@@ -10,5 +10,6 @@ KernelAddon ps2_hid_new : kernel drivers bin :
 	keyboard.c
 	mouse.c
 	packet_buffer.cpp
+	ps2_dev.c
 	ps2_service.c
 ;

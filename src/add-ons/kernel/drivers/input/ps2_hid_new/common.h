@@ -14,6 +14,7 @@
 
 
 #include <ISA.h>
+#include <Drivers.h>
 #include <KernelExport.h>
 #include <OS.h>
 
@@ -30,6 +31,9 @@
 // global variables
 extern isa_module_info *gIsa;
 extern sem_id gDeviceOpenSemaphore;
+
+extern device_hooks sKeyboardDeviceHooks;
+extern device_hooks sMouseDeviceHooks;
 
 // prototypes from common.c
 

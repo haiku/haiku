@@ -11,8 +11,12 @@
 #define __PS2_SERVICE_H
 
 #include "common.h"
+#include "ps2_dev.h"
 
 status_t	ps2_service_init(void);
 void		ps2_service_exit(void);
+
+void		ps2_service_handle_device_added(ps2_dev *dev);
+void		ps2_service_handle_device_removed(ps2_dev *dev);
 
 #endif

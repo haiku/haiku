@@ -10,19 +10,15 @@
  */
 
 
-#include <Drivers.h>
 #include <string.h>
 
 #include "common.h"
 #include "ps2_service.h"
-
-
-#define DEVICE_MOUSE_NAME		"input/mouse/ps2/0"
-#define DEVICE_KEYBOARD_NAME	"input/keyboard/at/0"
+#include "ps2_dev.h"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-static device_hooks sKeyboardDeviceHooks = {
+device_hooks sKeyboardDeviceHooks = {
 	keyboard_open,
 	keyboard_close,
 	keyboard_freecookie,
@@ -35,7 +31,7 @@ static device_hooks sKeyboardDeviceHooks = {
 	NULL
 };
 
-static device_hooks sMouseDeviceHooks = {
+device_hooks sMouseDeviceHooks = {
 	mouse_open,
 	mouse_close,
 	mouse_freecookie,
@@ -54,6 +50,7 @@ sem_id gDeviceOpenSemaphore;
 
 static sem_id sKbcSem;
 static int32 sIgnoreInterrupts = 0;
+static bool sMultiplexingActive = false;
 
 
 inline uint8
@@ -208,6 +205,7 @@ ps2_interrupt(void* cookie)
 {
 	uint8 ctrl;
 	uint8 data;
+	ps2_dev *dev;
 	
 	ctrl = ps2_read_ctrl();
 	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
@@ -222,16 +220,18 @@ ps2_interrupt(void* cookie)
 
 	TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
 
-	if (ctrl & PS2_STATUS_MOUSE_DATA)
-		return mouse_handle_int(data);
-	else
-		return keyboard_handle_int(data);
+	if (ctrl & PS2_STATUS_MOUSE_DATA) {
+		uint8 idx = 0;
+		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
+	} else {
+		dev = &ps2_device[PS2_DEVICE_KEYB];
+	}
+	
+	return ps2_dev_handle_int(dev, data);
 }
 
 
-
-//	#pragma mark -
-//	driver interface
+//	#pragma mark - driver interface
 
 
 status_t
@@ -244,29 +244,13 @@ init_hardware(void)
 const char **
 publish_devices(void)
 {
-	static char *kDevices[3];
-	int index = 0;
-
-		kDevices[index++] = DEVICE_MOUSE_NAME;
-
-		kDevices[index++] = DEVICE_KEYBOARD_NAME;
-
-	kDevices[index++] = NULL;
-
- //status_t devfs_publish_device(const char *path, NULL, device_hooks *calls);
-
-	return (const char **)kDevices;
+	return NULL;
 }
 
 
 device_hooks *
 find_device(const char *name)
 {
-	if (!strcmp(name, DEVICE_MOUSE_NAME))
-		return &sMouseDeviceHooks;
-	else if (!strcmp(name, DEVICE_KEYBOARD_NAME))
-		return &sKeyboardDeviceHooks;
-
 	return NULL;
 }
 
@@ -296,7 +280,6 @@ init_driver(void)
 	if (status)
 		goto err_4;
 
-
 	{
 		uint8 d;
 		status_t res;
@@ -309,18 +292,14 @@ init_driver(void)
 		
 		res = ps2_set_command_byte(d);
 		dprintf("ps2_set_command_byte: res 0x%08x, d 0x%02x\n", res, d);
-		
-		res = ps2_command(0xae, NULL, 0, NULL, 0);
-		dprintf("KBD enable: res 0x%08x\n", res);
+	}
 
-		res = ps2_command(0xa8, NULL, 0, NULL, 0);
-		dprintf("AUX enable: res 0x%08x\n", res);
-
-		res = ps2_command(0xab, NULL, 0, &d, 1);
-		dprintf("KBD test: res 0x%08x, d 0x%02x\n", res, d);
-
-		res = ps2_command(0xa9, NULL, 0, &d, 1);
-		dprintf("AUX test: res 0x%08x, d 0x%02x\n", res, d);
+	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_KEYB]);
+	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
+	if (sMultiplexingActive) {
+		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
+		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
+		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
 	}
 	
 	//goto err_5;	

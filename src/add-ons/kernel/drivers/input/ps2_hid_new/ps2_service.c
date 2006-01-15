@@ -15,6 +15,50 @@ static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
 
 
+void
+ps2_service_handle_device_added(ps2_dev *dev)
+{
+	TRACE(("ps2_service_handle_device_added %s\n", dev->name));
+
+}
+
+
+void
+ps2_service_handle_device_removed(ps2_dev *dev)
+{
+	TRACE(("ps2_service_handle_device_removed %s\n", dev->name));
+}
+
+
+static status_t
+ps2_service_probe_device(ps2_dev *dev)
+{
+	uint8 d;
+	status_t res;
+
+	TRACE(("ps2_service_probe_device %s\n", dev->name));
+
+	if (dev->flags & PS2_FLAG_KEYB) {
+
+		res = ps2_command(0xae, NULL, 0, NULL, 0);
+		dprintf("KBD enable: res 0x%08x\n", res);
+
+		res = ps2_command(0xab, NULL, 0, &d, 1);
+		dprintf("KBD test: res 0x%08x, d 0x%02x\n", res, d);
+
+	} else {
+
+		res = ps2_command(0xa8, NULL, 0, NULL, 0);
+		dprintf("AUX enable: res 0x%08x\n", res);
+
+		res = ps2_command(0xa9, NULL, 0, &d, 1);
+		dprintf("AUX test: res 0x%08x, d 0x%02x\n", res, d);
+	}
+	
+	return B_OK;
+}
+
+
 static int32
 ps2_service_thread(void *arg)
 {
