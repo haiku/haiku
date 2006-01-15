@@ -1,0 +1,763 @@
+<HTML>
+<HEAD>
+   <TITLE>MailComponent</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#2222AA" BACKGROUND="../art/bodyBack.gif">
+<P><A NAME=BCursor></A> <!--TOP LINKS--></P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+
+<HR NOSHADE>
+
+</CENTER>
+
+<P><!--TOP LINKS--></P>
+
+<H1><FONT SIZE="+4">MailComponent</FONT></H1>
+
+<BLOCKQUOTE><FONT FACE="helvetica"><B>Derived
+   from:</B></FONT>&nbsp;none<BR>
+   <FONT FACE="helvetica"><B>Declared in:</B></FONT>&nbsp;
+   include/public/MailComponent.h<BR>
+   <FONT FACE="helvetica"><B>Library:</B></FONT>&nbsp;libmail.so<BR>
+   
+   <P><BR>
+   </P>
+   
+   <P>MailComponent is the base class for the vast majority of the
+   public Mail Kit. It is, however, important to remember that
+   MailComponent is not abstract, and is useful by itself. A
+   MailComponent has the important quality of being able to read the
+   headers of a message or component without instantiating whatever
+   massive quantity of data might lie therein. This is useful
+   primarily to determine the kind of data you are dealing with, so
+   that the user can make a decision as to whether it should be
+   shown.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">C</FONT><FONT COLOR="#430000">onstructor
+and
+</FONT><FONT SIZE="+3" COLOR="#430000">D</FONT><FONT COLOR="#430000">estructor</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=MailComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">MailComponent()
+         </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P><FONT SIZE="+1"><B><TT>MailComponent()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Initializes the MailComponent and does nothing else.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME="~MailComponent"></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">~MailComponent()
+         </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual
+                     <FONT SIZE="+1"><B><TT>~MailComponent()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Destroys the MailComponent. Does nothing of interest.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">H</FONT><FONT COLOR="#430000">ook
+</FONT><FONT SIZE="+3" COLOR="#430000">F</FONT><FONT COLOR="#430000">unctions</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=GetDecodedData></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">GetDecodedData () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>GetDecodedData(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Retrieves the data contained in this component in canonical
+   format and places this data in<FONT FACE="HELVETICA" COLOR="#991122"><I>
+   data</I></FONT>. The various attachments subclasses implement this
+   function to return decoded data, and PlainTextBodyComponent
+   returns UTF8 text. MailComponent implements this function to do
+   nothing and return <B>B_OK</B>.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- Something else in the event of failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetDecodedData></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetDecodedData () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>SetDecodedData(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the content of this component to the canonical format data
+   contained in <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>.
+   Thus, an attachment subclass would accept a file here and encode
+   it into the specified encoding. MailComponent implements this
+   function to do nothing and return <B>B_OK</B>.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- Something else in the event of failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Instantiate></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Instantiate () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Instantiate(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+                     size_t <FONT FACE="HELVETICA" COLOR="#991122"><I>length</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Initializes this component to the RFC 822 format data in
+   <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+   starting at <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>-&gt;Position(), for up to <FONT FACE="HELVETICA" COLOR="#991122"><I>length
+   </I></FONT>bytes. Note that if you implement this function, your
+   subclass may have taken up some of your data. As such, cache the
+   position of <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>before calling your parent's version of
+   <FONT SIZE="+1"><B><TT>Instantiate()</TT></B></FONT>, and then
+   subtract the difference between the new position and your cached
+   value, like this:</P>
+   
+   <BLOCKQUOTE><CODE>off_t cache = data-&gt;Position();<BR>
+      MailComponent::Instantiate(data,length);<BR>
+      length -= (data-&gt;Position() - cache);</CODE></BLOCKQUOTE>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- <B>B_BAD_TYPE</B> if we cannot handle <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT FACE="HELVETICA">.</FONT></P>
+      
+      <P>- Something else in the event of another kind of
+      failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Render></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Render () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Render(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Renders the component into RFC 822 format and places the result
+   in <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+   starting at <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>-&gt;Position().</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- Something else in the event of failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=MIMEType></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">MIMEType () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>MIMEType(</TT></B></FONT>BMimeType
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>mime</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Places the MIME type of the data into <FONT FACE="HELVETICA" COLOR="#991122"><I>mime</I></FONT>.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- Something else in the event of failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">M</FONT><FONT COLOR="#430000">ember
+</FONT><FONT SIZE="+3" COLOR="#430000">F</FONT><FONT COLOR="#430000">unctions</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=WhatIsThis></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">WhatIsThis() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>MailComponent*
+                     <FONT SIZE="+1"><B><TT>WhatIsThis()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Employs simple heuristics such as the MIME type to present you
+   with an instance of a useful subclass of MailComponent. You can
+   then use any of MailComponent's hook functions or RTTI calls to
+   get more information. Bear in mind that the returned component is
+   <I>not</I> set to any data. You must still <A HREF="#Instantiate">Instantiate()</A>
+   it from whatever data this object was instantiated from.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=IsAttachment></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">IsAttachment() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>bool
+                     <FONT SIZE="+1"><B><TT>IsAttachment()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Employs simple heuristics such as the MIME type and the
+   Content-Disposition: header to determine whether this component is
+   an attachment. Returns <B>true</B> if it is an attachment,
+   <B>false</B> if not.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetHeaderField></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetHeaderField() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetHeaderField(</TT></B></FONT>
+                     
+                     <BLOCKQUOTE>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>,<BR>
+                        const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>value</I></FONT>,<BR>
+                        uint32 <FONT FACE="HELVETICA" COLOR="#991122"><I>charset</I></FONT> = <B>B_ISO1_CONVERSION</B>,<BR>
+                        mail_encoding <FONT FACE="HELVETICA" COLOR="#991122"><I>encoding</I></FONT> = <B>quoted_printable</B>,<BR>
+                        bool <FONT FACE="HELVETICA" COLOR="#991122"><I>replace_existing</I></FONT>= <B>true</B>
+                        
+                        <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P></BLOCKQUOTE>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetHeaderField(</TT></B></FONT>
+                     
+                     <BLOCKQUOTE>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>,<BR>
+                        BMessage *<FONT FACE="HELVETICA" COLOR="#991122"><I>structured_header</I></FONT>,<BR>
+                        bool <FONT FACE="HELVETICA" COLOR="#991122"><I>replace_existing</I></FONT>= <B>true</B>
+                        
+                        <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P></BLOCKQUOTE>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Adds the specificed header of type <FONT FACE="HELVETICA" COLOR="#991122"><I>key
+   </I></FONT>and with the UTF8 contents <FONT FACE="HELVETICA" COLOR="#991122"><I>value</I></FONT>
+   to the component.
+   <FONT SIZE="+1"><B><TT>SetHeaderField()</TT></B></FONT> converts
+   any 8 bit data in <FONT FACE="HELVETICA" COLOR="#991122"><I>value</I></FONT>
+   to <FONT FACE="HELVETICA" COLOR="#991122"><I>charset</I></FONT>
+   (see the Support Kit on UTF8 for more information on this), and
+   encodes it into 7 bit data using <FONT FACE="HELVETICA" COLOR="#991122"><I>encoding</I></FONT>.
+   
+   If <FONT FACE="HELVETICA" COLOR="#991122"><I>replace_existing</I></FONT>
+   is true, replaces any existing header of this type with this one,
+   otherwise adds a second one.</P>
+   <P>Thus, to set the header <CODE>To:</CODE> of some <B>MailComponent</B> <I>component</I> to foo@bar.com, we would do this:</P>
+   <BLOCKQUOTE><CODE>
+   	component-&gt;SetHeaderField(&quot;To&quot;,&quot;foo@bar.com&quot;);
+   </CODE></BLOCKQUOTE>
+   <P>The version of the function that takes a BMessage sets a structured header. These are in the format
+   <CODE>unlabeled; key=value; key=value</CODE>. The most common instance of this is the <CODE>Content-Type</CODE> header,
+   where the MIME type is unlabeled, and various other information, such as character set, is specified in the
+   key/value pairs. The format for <FONT FACE="HELVETICA" COLOR="#991122"><I>structured_header</I></FONT> is relatively
+   simple: simply use <TT>BMessage::AddString(key,value)</TT> for each key/value pair. The only exception to this
+   rule is the unlabeled data. For this, simply use the key <I>unlabeled</I>. Please note that the <I>charset</I> and <I>encoding</I> arguments
+   defined for the text version of <TT>SetHeaderField</TT> is not provided here because structured headers cannot be encoded.</P>
+   <P>Thus, a relatively standard <CODE>Content-Type</CODE> header would be specified as follows:
+   <BLOCKQUOTE><CODE>
+   	BMessage structured;<BR>
+   	structured.AddString(&quot;unlabeled&quot;,&quot;text/plain&quot;);<BR>
+   	structured.AddString(&quot;charset&quot;,&quot;iso-8859-1&quot;);<BR>
+   	component-&gt;SetHeaderField(&quot;To&quot;,&amp;structured);
+   </CODE></BLOCKQUOTE>
+   </BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=HeaderField></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">HeaderField() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>HeaderField(</TT></B></FONT>const
+                     char *<FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>,
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+                     =
+                     <B>0</B><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>status_t
+                     <FONT SIZE="+1"><B><TT>HeaderField(</TT></B></FONT>
+                     <BLOCKQUOTE>
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>,<BR>
+                     BMessage *<FONT FACE="HELVETICA" COLOR="#991122"><I>structured_header</I></FONT>,<BR>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> = <B>0</B>
+                     
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P></BLOCKQUOTE>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the header <FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>.
+   If there is more than one header <FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>,
+   use <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> to
+   iterate through them. In the event that the specified header does
+   not exist, <FONT SIZE="+1"><B><TT>HeaderField()
+   </TT></B></FONT>returns <B>NULL</B>. Thus, to retrieve the contents of the <CODE>Subject:</CODE> field in
+   UTF8 format, you would do this:</P>
+   <BLOCKQUOTE><CODE>
+   	const char *subject = component-&gt;HeaderField(&quot;Subject&quot;);
+   </CODE></BLOCKQUOTE>
+   <P>The version of this function that takes a BMessage
+   decodes whatever structured header may exist in <FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>
+   and places it in <FONT FACE="HELVETICA" COLOR="#991122"><I>structured_header</I></FONT> according to the
+   format laid out in <A HREF="#SetHeaderField">SetHeaderField()</A>. Returns <B>B_NAME_NOT_FOUND</B>
+   if the header <FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT> does not exist. If it does exist,
+   but is not structured, no error is returned; the entire contents of the header are placed in <I>unlabeled</I>.
+   </P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+   
+  
+
+<P>
+
+<HR>
+
+<A NAME=HeaderAt></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">HeaderAt() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>HeaderAt(</TT></B></FONT>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the key of the header at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>.
+   Useful for iterating through all the headers. If <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+   is out of range, <TT>HeaderAt()</TT> returns <B>NULL</B>.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+   
+   <P></TABLE></P>
+   
+  
+
+<P>
+
+<HR>
+
+<A NAME=RemoveHeader></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">RemoveHeader() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>RemoveHeader(</TT></B></FONT>
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Removes all headers with the key <FONT FACE="HELVETICA" COLOR="#991122"><I>key</I></FONT>.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+   
+<P><!--TOP LINKS-->
+
+<HR NOSHADE>
+
+</P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+</CENTER>
+
+<P><!--TOP LINKS--> <!-- Footer for Release 5 HTML Be Book --><BR>
+</P>
+
+<CENTER><FONT SIZE="+3" COLOR="#555555"><I>Mail Daemon 2 API
+Documentation</I></FONT>
+
+<P><FONT SIZE="+1" COLOR="#555555"><I>&copy;2001 Dr. Zoidberg
+Enterprises</I></FONT></P></CENTER>
+</BODY>
+</HTML>

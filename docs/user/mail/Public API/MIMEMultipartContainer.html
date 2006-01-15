@@ -1,0 +1,668 @@
+<HTML>
+<HEAD>
+   <TITLE>MIMEMultipartContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#2222AA" BACKGROUND="../art/bodyBack.gif">
+<P><A NAME=BCursor></A> <!--TOP LINKS--></P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+
+<HR NOSHADE>
+
+</CENTER>
+
+<P><!--TOP LINKS--></P>
+
+<H1><FONT SIZE="+4">MIMEMultipartContainer</FONT></H1>
+
+<BLOCKQUOTE><FONT FACE="helvetica"><B>Derived
+   from:</B></FONT>&nbsp;<A HREF="MailComponent.html">MailComponent</A><BR>
+   <FONT FACE="helvetica"><B>Declared in:</B></FONT>&nbsp;
+   include/public/MailContainer.h<BR>
+   <FONT FACE="helvetica"><B>Library:</B></FONT>&nbsp;libmail.so<BR>
+   
+   <P><BR>
+   </P>
+   
+   <P>MIMEMultipartContainer uses the RFC 2046 multipart specification to allow you to place 
+   multiple components in a single message. Mostly useful for attachments and things.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">C</FONT><FONT COLOR="#430000">onstructor
+and
+</FONT><FONT SIZE="+3" COLOR="#430000">D</FONT><FONT COLOR="#430000">estructor</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=MIMEMultipartContainer></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">MIMEMultipartContainer()
+         </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <FONT SIZE="+1"><B><TT>MIMEMultipartContainer(</TT></B></FONT>
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT> = <B>NULL</B>,
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>this_is_an_MIME_message_text</I></FONT> = <B>NULL</B>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Initializes the <B>MIMEMultipartContainer</B>. Sets the boundary between parts to <FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT>.
+   Note that <FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT> can be an arbitrary text string but <B>must</B> contain only US-ASCII
+   characters and be unique to this particular MIMEMultipartContainer. It does not have to be globally unique, however. <FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT> must be specified,
+   either here or through <A HREF="#SetBoundary">SetBoundary()</A>. Also, sets the warning text about &quot;This is an MIME message...&quot; to <FONT FACE="HELVETICA" COLOR="#991122"><I>this_is_an_MIME_message_text</I></FONT>,
+   which need not be specified at all.</P>
+   
+   </BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME="~MIMEMultipartContainer"></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">~MIMEMultipartContainer()
+         </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual
+                     <FONT SIZE="+1"><B><TT>~MIMEMultipartContainer()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Destroys the <B>MIMEMultipartContainer</B>. Note that this deletes all components which may have been added to
+   this object. The ownership of all components is assumed by <B>MIMEMultipartContainer</B> when they are added.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">M</FONT><FONT COLOR="#430000">ember
+</FONT><FONT SIZE="+3" COLOR="#430000">F</FONT><FONT COLOR="#430000">unctions</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=GetDecodedData></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">GetDecodedData () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>GetDecodedData(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns an error. MIMEMultipartComponents don't have data of their own..</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_BAD_TYPE</B> This operation is guranteed to fail.</BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetDecodedData></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetDecodedData () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>SetDecodedData(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns an error. MIMEMultipartComponents don't have data of their own..</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_BAD_TYPE</B> This operation is guranteed to fail.</BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Instantiate></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Instantiate () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Instantiate(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+                     size_t <FONT FACE="HELVETICA" COLOR="#991122"><I>length</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Does what you would expect. Creates a list of components from <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>. Note that you <B>cannot</B> delete <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>, as we cache
+   it for later. This is because, as a memory and CPU saving measure, we do not actually instantiate these components until asked to. Thus instantiating an MIMEMultipartContainer is not a
+   processor or memory-intensive operation.</BLOCKQUOTE>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- <B>B_BAD_TYPE</B> if <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT FACE="HELVETICA"></FONT> is not an MIME multipart component</P>
+	</BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Render></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Render () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Render(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Renders the component into RFC 822 format and places the result
+   in <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+   starting at <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>-&gt;Position().</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- Something else in the event of failure.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetBoundary></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetBoundary() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetBoundary(</TT></B></FONT>
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the boundary between parts to <FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT>.
+   Note that <FONT FACE="HELVETICA" COLOR="#991122"><I>boundary</I></FONT> can be an arbitrary text string but <B>must</B> contain only US-ASCII
+   characters and be unique to this particular MIMEMultipartContainer. It does not have to be globally unique, however.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetThisIsAnMIMEMessageText></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetThisIsAnMIMEMessageText() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetThisIsAnMIMEMessageText(</TT></B></FONT>
+                     const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>text</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the warning text about &quot;This is an MIME message...&quot; to <FONT FACE="HELVETICA" COLOR="#991122"><I>text</I></FONT>,
+   which need not be specified at all. We reccomend that it only be set in the top-most <B>MIMEMultipartContainer</B> of the message.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=AddComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">AddComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     void <FONT SIZE="+1"><B><TT>AddComponent(</TT></B></FONT>
+                     <A HREF="MailComponent.html">MailComponent</A> *<FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Adds <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT> to this MIMEMultipartContainer. Note that the MIMEMultipartContainer
+   assumes ownership of <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>. Thus, you <B>may not</B> delete <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>.
+   If you continue to modify to it after calling <A HREF="#AddComponent">AddComponent()</A>, your changes will be reflected when you
+   call <A HREF="#Render">Render()</A>.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=GetComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">GetComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     <A HREF="MailComponent.html">MailComponent</A> * <FONT SIZE="+1"><B><TT>GetComponent(</TT></B></FONT>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>.
+   Instantiate()s it if it has not yet been instantiated. Otherwise, returns already instantiated
+   component. Use RTTI or <A HREF="MailComponent.html">MailComponent</A> hooks to do useful things with the returned
+   component.</P>
+   
+   <P>&nbsp;</P>
+   
+   <P></BLOCKQUOTE>
+
+<HR>
+
+<A NAME=CountComponents></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">CountComponents() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     int32 <FONT SIZE="+1"><B><TT>CountComponents()</TT></B></FONT> const</P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the total number of components in this MIMEMultipartContainer.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+   
+   <P>
+   
+
+<HR>
+
+<A NAME=ManualGetComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">ManualGetComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     status_t <FONT SIZE="+1"><B><TT>ManualGetComponent(</TT></B></FONT>
+                     <A HREF="MailComponent.html">MailComponent</A> * <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>,
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Attempts to Instantiate() <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT> from the component at
+   <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>. Note that this will fail either if <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>->Instantiate() fails
+   or if the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> either does not exist or exists only as a <A HREF="MailComponent.html">MailComponent</A> and not as a raw buffer. In other words,
+   this function will succeed if and only if the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> exists, was part of the message
+   when this MIMEMultipartContainer was instantiated and has not been written over since then, and <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>->Instantiate() succeeds on this buffer.
+   <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT> must be a valid <A HREF="MailComponent.html">MailComponent</A>.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- <B>B_BAD_INDEX</B> if <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> is out of range</P>
+      <P>- <B>B_NAME_IN_USE</B> if the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> does not exist in raw buffer form</P>
+      
+      <P>- Something else if <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>->Instantiate() fails.</P>
+	</BLOCKQUOTE>
+	
+</BLOCKQUOTE>
+<P>
+
+<HR>
+
+<A NAME=RemoveComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">RemoveComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     status_t <FONT SIZE="+1"><B><TT>RemoveComponent(</TT></B></FONT>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Removes the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> from the container and
+   frees all memory associated with it (i.e. we delete it).</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.<P>
+      
+      - <B>B_BAD_INDEX</B> if <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> is out of range</P>
+	</BLOCKQUOTE>
+	
+</BLOCKQUOTE>   
+
+</TABLE></P>
+
+<P><!--TOP LINKS-->
+
+<HR NOSHADE>
+
+</P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+</CENTER>
+
+<P><!--TOP LINKS--> <!-- Footer for Release 5 HTML Be Book --><BR>
+</P>
+
+<CENTER><FONT SIZE="+3" COLOR="#555555"><I>Mail Daemon 2 API
+Documentation</I></FONT>
+
+<P><FONT SIZE="+1" COLOR="#555555"><I>&copy;2001 Dr. Zoidberg
+Enterprises</I></FONT></P></CENTER>
+</BODY>
+</HTML>

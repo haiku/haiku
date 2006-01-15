@@ -1,0 +1,950 @@
+<HTML>
+<HEAD>
+   <TITLE>MailMessage</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" LINK="#2222AA" BACKGROUND="../art/bodyBack.gif">
+<P><A NAME=BCursor></A> <!--TOP LINKS--></P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+
+<HR NOSHADE>
+
+</CENTER>
+
+<P><!--TOP LINKS--></P>
+
+<H1><FONT SIZE="+4">MailMessage</FONT></H1>
+
+<BLOCKQUOTE><FONT FACE="helvetica"><B>Derived
+   from:</B></FONT>&nbsp;<A HREF="MailComponent.html">MailComponent</A><BR>
+   <FONT FACE="helvetica"><B>Declared in:</B></FONT>&nbsp;
+   include/public/MailMessage.h<BR>
+   <FONT FACE="helvetica"><B>Library:</B></FONT>&nbsp;libmail.so<BR>
+   
+   <P><BR>
+   </P>
+   
+   <P>MailMessage is what you use if you are interested in actually
+   sending messages. It allows you to add an arbitrary number of
+   components (naturally making it multipart only if there is more
+   than one), and provides many convenience functions for adding, modifying
+   and accessing both headers and data. If you use this kit, you will get to
+   know MailMessage very well.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">C</FONT><FONT COLOR="#430000">onstructor
+and
+</FONT><FONT SIZE="+3" COLOR="#430000">D</FONT><FONT COLOR="#430000">estructor</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=MailMessage></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">MailMessage() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P><FONT SIZE="+1"><B><TT>MailMessage(</TT></B></FONT>
+                     BPositionIO *<FONT FACE="HELVETICA" COLOR="#991122"><I>mail_file</I></FONT> = <B>NULL</B>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Creates a new MailMessage. If <FONT FACE="HELVETICA" COLOR="#991122"><I>mail_file</I></FONT> is not <B>NULL</B>,
+   the MailMessage will be instantiated to the RFC 822 format data contained
+   in <FONT FACE="HELVETICA" COLOR="#991122"><I>mail_file</I></FONT>.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME="~MailMessage"></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">~MailMessage() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual
+                     <FONT SIZE="+1"><B><TT>~MailMessage()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Destroys the message, frees internal buffers, and deletes all added
+   components.</P></BLOCKQUOTE>
+
+<P>
+
+<HR NOSHADE>
+
+</P>
+
+<H2><FONT SIZE="+3" COLOR="#430000">M</FONT><FONT COLOR="#430000">ember
+</FONT><FONT SIZE="+3" COLOR="#430000">F</FONT><FONT COLOR="#430000">unctions</FONT></H2>
+
+<P>
+
+<HR>
+
+<A NAME=To></A>
+<A NAME=From></A>
+<A NAME=ReplyTo></A>
+<A NAME=CC></A>
+<A NAME=Subject></A>
+<A NAME=Priority></A>
+<TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">To (), From (), ReplyTo (), CC (), Subject (), Priority ()</FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>To()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>From()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>ReplyTo()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>CC()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>Subject()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>int
+                     <FONT SIZE="+1"><B><TT>Priority()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the relevant header field from the message. These are simply a convenience. <CODE>Subject()</CODE>,
+   for instance, is equivalent to, and implemented as, <CODE>HeaderField(&quot;Subject&quot;)</CODE>. There is
+   no <CODE>BCC()</CODE> function because, for obvious reasons, it is impossible to retrieve BCCs from the message.</P>
+   
+   </BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SetTo></A>
+<A NAME=SetFrom></A>
+<A NAME=SetReplyTo></A>
+<A NAME=SetCC></A>
+<A NAME=SetSubject></A>
+<A NAME=SetPriority></A>
+<TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetTo (), SetFrom (), SetReplyTo (), SetCC (), SetBCC (), SetSubject (), SetPriority ()</FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetTo(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetFrom(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetReplyTo(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetCC(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetBCC(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetSubject(</TT></B></FONT>
+                     	const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetPriority(</TT></B></FONT>
+                     	int <FONT FACE="HELVETICA" COLOR="#991122"><I>to</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the relevant header field of the message. With the exception of
+   <TT>SetBCC()</TT>, these are simply conveniences which can be easily emulated
+   with <A HREF="MailComponent.html#SetHeaderField">SetHeaderField()</A>.</P>
+   
+   </BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=SendViaAccount></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SendViaAccount () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SendViaAccount(</TT></B></FONT>
+                    	 const char *<FONT FACE="HELVETICA" COLOR="#991122"><I>account_name</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SendViaAccount(</TT></B></FONT>
+                    	 int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>chain_id</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the message up so that it is sent via the account specified by either <FONT FACE="HELVETICA" COLOR="#991122"><I>account_name</I></FONT>
+   or <FONT FACE="HELVETICA" COLOR="#991122"><I>chain_id</I></FONT>, which of course must exist as an outbound chain (see
+   <A HREF="MailChain.html#ChainDirection">MailChain::ChainDirection()</A> for details). Automatically calls <A HREF="#SetFrom">SetFrom()</A> with
+   the return address indicated in the specified chain using the format "Real Name" &lt;e-mail&gt;.</P>
+   
+   </BLOCKQUOTE>
+<P>
+
+<HR>
+
+<A NAME=AddComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">AddComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     void <FONT SIZE="+1"><B><TT>AddComponent(</TT></B></FONT>
+                    <A HREF="MailComponent.html">MailComponent</A> *<FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Adds <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT> to this MailMessage. Note that the MailMessage
+   assumes ownership of <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>. Thus, you <B>may not</B> delete <FONT FACE="HELVETICA" COLOR="#991122"><I>component</I></FONT>.
+   If you continue to modify to it after calling <TT>AddComponent()</TT>, your changes will be reflected when you
+   call <A HREF="#Render">Render()</A>. <TT>AddComponent()</TT> automatically makes the message multipart if there is
+   more than one component.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=GetComponent></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">GetComponent() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     <A HREF="MailComponent.html">MailComponent</A> * <FONT SIZE="+1"><B><TT>GetComponent(</TT></B></FONT>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT>.
+   Instantiate()s it if it has not yet been instantiated. Otherwise, returns already instantiated
+   component. Use RTTI or <A HREF="MailComponent.html">MailComponent</A> hooks to do useful things with the returned
+   component.</P>
+   
+   <P>&nbsp;</P>
+   
+   <P></BLOCKQUOTE>
+
+<HR>
+
+<A NAME=CountComponents></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">CountComponents() </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>
+                     int32 <FONT SIZE="+1"><B><TT>CountComponents()</TT></B></FONT> const</P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the total number of components in this MailMessage.</P>
+   
+   <P>&nbsp;</P></BLOCKQUOTE>
+   
+   <P>
+   
+<HR>
+
+<A NAME=Attach></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Attach () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>Attach(</TT></B></FONT>
+                     	entry_ref *<FONT FACE="HELVETICA" COLOR="#991122"><I>ref</I></FONT>,
+                     	bool <FONT FACE="HELVETICA" COLOR="#991122"><I>include_attributes</I></FONT> = <B>true</B>
+                     <FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Attaches <FONT FACE="HELVETICA" COLOR="#991122"><I>ref</I></FONT> to this message. If <FONT FACE="HELVETICA" COLOR="#991122"><I>include_attributes</I></FONT>
+   is <B>true</B>, uses an <A HREF="AttributedMailAttachment.html">AttributedMailAttachment</A>
+   instead of a <A HREF="SimpleMailAttachment.html">SimpleMailAttachment</A>. Be aware that is
+   attached in the state it is in when the message is rendered, not when <TT>Attach()</TT> is
+   called.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=IsComponentAttachment></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">IsComponentAttachment () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>bool
+                     <FONT SIZE="+1"><B><TT>IsComponentAttachment(</TT></B></FONT>
+                     int32 <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>If the component at <FONT FACE="HELVETICA" COLOR="#991122"><I>index</I></FONT> is an attachment of any
+   kind, returns <B>true</B>, otherwise returns <B>false</B>.</P></BLOCKQUOTE>
+
+<P>
+
+
+<HR>
+
+<A NAME=SetBodyTextTo></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetBodyTextTo () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>void
+                     <FONT SIZE="+1"><B><TT>SetBodyTextTo(</TT></B></FONT>const
+                     char *<FONT FACE="HELVETICA" COLOR="#991122"><I>text</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the body of this message to the UTF8 string
+   contained in <FONT FACE="HELVETICA" COLOR="#991122"><I>text</I></FONT>.
+   If no body has been specified through <A HREF="#SetBody">SetBody()</A>,
+   <TT>SetBodyTextTo()</TT> creates one.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=BodyText></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">BodyText () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>const char *
+                     <FONT SIZE="+1"><B><TT>BodyText()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the contents of <A HREF="#Body">Body()</A> as a UTF8
+      string. Returns <B>NULL</B> if no body exists.</P></BLOCKQUOTE>
+
+<P>
+<HR>
+
+<A NAME=SetBody></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">SetBody () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>status_t
+                     <FONT SIZE="+1"><B><TT>SetBody(</TT></B></FONT>
+                     <A HREF="PlainTextBodyComponent.html">PlainTextBodyComponent</A> *<FONT FACE="HELVETICA" COLOR="#991122"><I>body</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Sets the body of this message to <FONT FACE="HELVETICA" COLOR="#991122"><I>body</I></FONT>.
+   If a body has already been specified, <TT>SetBody()</TT> returns <B>B_ERROR</B>, otherwise
+   returns <B>B_OK</B>.</P></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Body></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Body () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P><A HREF="PlainTextBodyComponent.html">PlainTextBodyComponent</A> *
+                     <FONT SIZE="+1"><B><TT>Body()</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Returns the body as a <A HREF="PlainTextBodyComponent.html">PlainTextBodyComponent</A> pointer.
+   Returns <B>NULL</B> if no body exists. This object belongs to the MailMessage, do <I>not</I> delete it.</P></BLOCKQUOTE>
+
+<P>
+<HR>
+
+<A NAME=Instantiate></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Instantiate () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Instantiate(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+                     size_t <FONT FACE="HELVETICA" COLOR="#991122"><I>length</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Initializes this message to the RFC 822 format data in
+   <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+   starting at <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>-&gt;Position(), for up to <FONT FACE="HELVETICA" COLOR="#991122"><I>length
+   </I></FONT>bytes.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.
+      
+      <P>- <B>B_BAD_TYPE</B> if <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT FACE="HELVETICA">
+      </FONT>does not seem to be an e-mail message.</P></BLOCKQUOTE></BLOCKQUOTE>
+
+<P>
+
+<HR>
+
+<A NAME=Render></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Render () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>virtual status_t
+                     <FONT SIZE="+1"><B><TT>Render(</TT></B></FONT>BPositionIO
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Renders the message into RFC 822 format and places the result
+   in <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>,
+   starting at <FONT FACE="HELVETICA" COLOR="#991122"><I>data
+   </I></FONT>-&gt;Position(). If <FONT FACE="HELVETICA" COLOR="#991122"><I>data</I></FONT>
+   is a BFile, writes appropriate attributes and sets its MIME type to text/x-email.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.</BLOCKQUOTE>
+   
+   <P></TABLE></P></BLOCKQUOTE>
+<P>
+
+<HR>
+
+<A NAME=RenderTo></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">RenderTo () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>status_t
+                     <FONT SIZE="+1"><B><TT>RenderTo(</TT></B></FONT>BDirectory
+                     *<FONT FACE="HELVETICA" COLOR="#991122"><I>dir</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Creates a new file in <FONT FACE="HELVETICA" COLOR="#991122"><I>dir</I></FONT>, named according to
+   the following format: &quot;Subject&quot; &lt;To&gt; <I>unique indentifier</I>. Calls
+   <A HREF="#Render">Render()</A> on the resulting file and writes appropriate attributes.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.</BLOCKQUOTE>
+   
+   <P></TABLE></P></BLOCKQUOTE>
+ <P>
+
+<HR>
+
+<A NAME=Send></A><TABLE>
+   <TR>
+      <TD>
+         <P></P>
+      </TD>
+      <TD>
+         <P><FONT SIZE="+2">Send () </FONT></P>
+      </TD>
+   </TR>
+</TABLE>
+</P>
+
+<P>&nbsp;</P>
+
+<BLOCKQUOTE><TABLE BORDER=2 BGCOLOR="#550033" WIDTH=1000>
+      <TR>
+         <TD>
+            <P><TABLE BORDER=1 BGCOLOR="#FFFFFF" CELLPADDING=8 WIDTH=1000>
+               <TR>
+                  <TD>
+                     <P>status_t
+                     <FONT SIZE="+1"><B><TT>Send(</TT></B></FONT>bool
+                     <FONT FACE="HELVETICA" COLOR="#991122"><I>send_now</I></FONT><FONT SIZE="+1"><B><TT>)</TT></B></FONT></P>
+                  </TD>
+               </TR>
+            </TABLE>
+            </P>
+         </TD>
+      </TR>
+   </TABLE>
+   
+   <P>Calls <A HREF="#RenderTo">RenderTo()</A> with the directory specified by the <A HREF="MailChain.html">MailChain</A>
+   passed to <A HREF="#SendViaAccount">SendViaAccount()</A>. If that is invalid, it uses the default outbound chain
+   given by <A HREF="MailSettings.html#DefaultOutboundChainID">MailSettings::DefaultOutboundChainID()</A>. After
+   rendering the message, if <FONT FACE="HELVETICA" COLOR="#991122"><I>send_now</I></FONT> is <B>true</B>,
+   calls <A HREF="MailDaemon.html#SendQueuedMail">MailDaemon::SendQueuedMail()</A>.</P>
+   
+   <P><B>Return Value:</B></P>
+   
+   <BLOCKQUOTE>- <B>B_OK</B> if everything succeeds.<P>
+   - <B>B_MAIL_NO_DAEMON</B> if the mail daemon is not running.<P>
+   - something else if there is another error.</BLOCKQUOTE>
+   
+   <P></TABLE></P></BLOCKQUOTE>  
+<P><!--TOP LINKS-->
+
+<HR NOSHADE>
+
+</P>
+
+<CENTER><TABLE BORDER=2 BGCOLOR="#FFDD88">
+   <TR>
+      <TD>
+         <P><TABLE BGCOLOR="#550033" CELLPADDING=5>
+            <TR>
+               <TD>
+                  <P><A HREF="../index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>Mail
+                  Kit 2 Root</B></FONT></A></P>
+               </TD>
+               <TD>
+                  <P><A HREF="index.html"><FONT FACE="HELVETICA" COLOR="#FFFFFF"><B>The
+                  Public API</B></FONT></A></P>
+               </TD>
+            </TR>
+         </TABLE>
+         </P>
+      </TD>
+   </TR>
+</TABLE>
+</CENTER>
+
+<P><!--TOP LINKS--> <!-- Footer for Release 5 HTML Be Book --><BR>
+</P>
+
+<CENTER><FONT SIZE="+3" COLOR="#555555"><I>Mail Daemon 2 API
+Documentation</I></FONT>
+
+<P><FONT SIZE="+1" COLOR="#555555"><I>&copy;2001 Dr. Zoidberg
+Enterprises</I></FONT></P></CENTER>
+</BODY>
+</HTML>

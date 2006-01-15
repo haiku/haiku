@@ -1,0 +1,207 @@
+How to Send Customized E-Mail
+
+So you wish to send out customized e-mail to many people?  Please reconsider
+doing that, if it is unwanted spam.  Still want to do it?  Here's one way of
+doing it:
+
+Save your message text in a file named "TemplateLetter.txt".  It should look
+something like this (I didn't word wrap the paragraphs, leaving each as one
+long line, because the length would change depending on the inserted text
+length):
+
+Hi there NAME, how are you today?
+
+I'm sending this message to EMAIL to inform you about a good deal for your company, COMPANY.
+
+Hope you like it.
+
+- Alex
+
+
+Then save this following text as a script file, call it "MailToTemplate":
+
+#!/bin/sh
+
+# Make a mail merge letter by combining data from a given people file and a
+# template letter text file.
+# $Revision: 1.2 $
+# Some code from Scot Hacker's PeoplePorter http://www.bebits.com/app/1747
+
+PeopleFile=$1
+echo "Mail merging using people file: $PeopleFile"
+
+Name=$(catattr META:name "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)
+EMail=$(catattr META:email "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)
+Company=$(catattr META:company "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)	
+
+sed "s/NAME/$Name/g" <TemplateLetter.txt >/tmp/stage1
+sed "s/EMAIL/$EMail/g" </tmp/stage1 >/tmp/stage2
+sed "s/COMPANY/$Company/g" </tmp/stage2 >/tmp/stage3
+mail -v -s "Test Message to $Name" "$EMail" </tmp/stage3
+
+
+After you have saved it, make it executable with the "chmod a+x MailToTemplate"
+command.  Then run it with a people file as an argument:
+
+Fri Jun 13 12:13:11 67 /Programming/bemaildaemon/documentation/Mass Mailing>MailToTemplate /boot/home/people/Test\ Person
+Mail merging using people file: /boot/home/people/Test Person
+EOT
+sent successfully!
+
+
+And the result will be an e-mail like this:
+
+Subject: Test Message to Mr. Test A. Person
+To: test@be.com
+Date: Fri, 13 Jun 2003 12:13:29 -0400 EDT
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi there Mr. Test A. Person, how are you today=3F
+
+I'm sending this message to test@be.com to inform you about a good deal for your company, Masters of Scripting, Inc..
+
+Hope you like it.
+
+- Alex
+
+
+If you want to use the BeOS attribute indices system to select people, you can
+run the results of a query though the mail customizing script like this example
+(watch out - very long line) which sends the e-mail to all people (presumably
+the people files are on the /boot disk volume, which is why the -v is needed)
+with "test" in their groups listing:
+
+Fri Jun 13 12:24:14 78 /Programming/bemaildaemon/documentation/Mass Mailing>query -v /boot META:group=*test* | sed "s/^/MailToTemplate /g" >/tmp/BatchMailCommands ; source /tmp/BatchMailCommands
+Mail merging using people file: /boot/home/people/Test Person
+EOT
+sent successfully!
+Mail merging using people file: /boot/home/people/Another Test
+EOT
+sent successfully!
+
+
+Just so you know how it works, here is the batch commands file which was
+automatically generated and used in the previous step:
+
+Fri Jun 13 12:24:20 79 /Programming/bemaildaemon/documentation/Mass Mailing>cat /tmp/BatchMailCommands
+MailToTemplate /boot/home/people/Test\ Person
+MailToTemplate /boot/home/people/Another\ Test
+
+
+Finally, if you want to do fancier messages, like HTML mixed ones, you have to
+also specify the headers.  Since the usual "mail" program doesn't let you do
+that, you have to prepare the entire message and use the attribute system to
+tag it for mailing.  Look at an existing message in your out box to see the
+attributes needed.
+
+Prepare the message elsewhere (use some other e-mail package which lets you
+insert HTML and pictures) then mail it to yourself, open the resulting file in
+BeIDE (it takes care of the CRLF end of line conversion problems automatically,
+you want this template file to have CRLF line ends, the earlier example doesn't
+use them) and edit it to make it into a new message like this one:
+
+
+To: "NAME" <EMAIL>
+From: "Imaginary Test Account" <test@be.com>
+Subject: Hi there NAME
+Mime-Version: 1.0
+Content-Type: multipart/related;
+	type="multipart/alternative";
+	boundary="----=_NextPart_000_0009_01C331AA.016FA080"
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0009_01C331AA.016FA080
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_001_000A_01C331AA.016FA080"
+
+
+------=_NextPart_001_000A_01C331AA.016FA080
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi NAME, this is a reminder that you shouldn't annoy people with [No Spam Icon] spam!
+
+--------------------------------------------------------------------------------
+
+Fine print: Even if it is customised and otherwise pretty.
+------=_NextPart_001_000A_01C331AA.016FA080
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<HTML><HEAD><TITLE>This is your Spam!</TITLE></HEAD>
+<BODY BGCOLOR=3DWHITE>
+<P>Hi NAME, this is a <STRONG>reminder</STRONG> that <FONT COLOR=3DBLUE SIZE=3D5>you</FONT>
+<STRONG>shouldn't</STRONG> annoy <FONT COLOR=3DRED>people</FONT> with
+<IMG alt=3D"[No Spam Icon]" WIDTH=3D32 HEIGHT=3D32
+SRC=3D"cid:000801c331cb$88136380$42ae10ac@be.com"
+BORDER=3D0> spam!
+<HR>
+<P><FONT size=3D1>Fine print: Even if it is customised and otherwise
+pretty.</FONT>
+</BODY></HTML>
+
+------=_NextPart_001_000A_01C331AA.016FA080--
+
+------=_NextPart_000_0009_01C331AA.016FA080
+Content-Type: image/png;
+	name="NoSpamIcon.png"
+Content-Transfer-Encoding: base64
+Content-ID: <000801c331cb$88136380$42ae10ac@be.com>
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABTElEQVR42r2XDQ6DMAhGuVPvtHP0
+GN5ph2KpqY5QoF/xx4Rs2UzfAysKMXAQUSqgtREwJwMRoQhuLVon4YksCVAAnh2eiCdBMzgKRkQs
+CZrBrxwEVILehFsS9BbcuxyDwGPwvi8GgTuzj+BaQPQJ/J6ddUcLrjtjvSpwLrZ9mL/bHmHm7bwe
+pPbCIGDepzqLDm1RgswlmEv5f4oqhAIW8IyefQjv553VavAeoYALFiUP4fJ8HYiABhfx2/F9mrkU
+VnC5D3wBla1cFMo8KP9yBaDdLs4pcgMem2+pAn2xomQ8eAGvu9UL4AqEZQ+gGqw74v6f2aOR3Q5A
+rb4yNKJIAG4yQbbLArzQ21ffgk2OZ8Y3vyO4j2PP7km4KeBJPAk334prYrjIwt25oCanHPkUTb2W
+zyQYmQcXpyPKTDmZGTE1nGqR+uZweseojhw/XAq+WQDwT5wAAAAASUVORK5CYII=
+
+------=_NextPart_000_0009_01C331AA.016FA080--
+
+
+Then in the mailing script, rather than calling "mail" to do the job, you have
+to add attributes to the final file.  Some you can clone from another outgoing
+mail (like the chain), others you need to set to specify the recipient.  Here's
+the current full set:
+
+  Type         Size                 Name
+----------  ---------   -------------------------------
+  MIME str         13                         BEOS:TYPE
+      Text         46                   MAIL:recipients
+      Text         43                           MAIL:to
+      Text          1                           MAIL:cc
+      Text         42                      MAIL:subject
+      Text          1                        MAIL:reply
+      Text         46                         MAIL:from
+      Text          4                         MAIL:mime
+      Text         18                      MAIL:account
+0x54494d45          4                         MAIL:when
+    Int-32          4                        MAIL:flags
+    Int-32          4                        MAIL:chain
+      Text          5                       MAIL:status
+
+You need at the minimum:
+BEOS:TYPE set to: text/x-email
+MAIL:recipients lists the address you are sending to, for example: <test@be.com>
+MAIL:from lists your return address: "Imaginary Test Account" <test@be.com>
+MAIL:chain set to your outgoing mail chain number, happens to be 1 here.
+MAIL:flags set to 5.
+
+The commands to do that look like:
+addattr -t string BEOS:TYPE text/x-email /tmp/stage3
+addattr -t string MAIL:recipients "<$EMail>" /tmp/stage3
+addattr -t string MAIL:from "\"Imaginary Test Account\" <test@be.com>" /tmp/stage3
+addattr -t int MAIL:chain 1 /tmp/stage3
+addattr -t int MAIL:flags 5 /tmp/stage3
+
+Then move the message to the /boot/home/mail/out folder, using a unique name,
+since there has to be one file for each person.  A suitable command might be:
+mv /tmp/stage3 "/boot/home/mail/out/MessageTo$EMail"
+
+Finally, tell the daemon to check for mail.  Right click on the mailbox icon in
+the deskbar and pick "check for mail".  It will then send all the pending mail.

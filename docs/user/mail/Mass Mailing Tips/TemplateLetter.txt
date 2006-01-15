@@ -1,0 +1,7 @@
+Hi there NAME, how are you today?
+
+I'm sending this message to EMAIL to inform you about a good deal for your company, COMPANY.
+
+Hope you like it.
+
+- Alex

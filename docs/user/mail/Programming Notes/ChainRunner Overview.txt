@@ -1,0 +1,24 @@
+NathanW wrote on June 30 2003:
+
+Here's the overview:
+
+ChainRunner:
+	It's now a BLooper and it goes like this: Running the chain 
+triggers an 'INIT' message, which causes it to begin to load add-ons. 
+The constructor of the producer add-on calls ChainRunner's 
+GetMessages() routine with a list of unique ids to fetch. It then runs 
+through the list, passing in those, then calls any registered process 
+callbacks after the list is exhausted. Note that finishing the list *
+does not* cause the connection to be terminated and the add-ons to be 
+destructed. Single pass add-ons (e.g. POP and Outbox) register a 
+process callback that calls ChainRunner::Stop().
+
+MailProtocol/MailFilter:
+	No longer sets the unique id, because it's passed in. Calls 
+GetMessages(), and uses ReportProgress() and ShowError() methods of 
+ChainRunner instead of using the functions in status.h. Also sets SIZE 
+attribute in out_headers that contains the final downloaded size of the 
+message. Also now passed a ChainRunner instead of a StatusView.
+
+That's about it, really.
+-Nathan

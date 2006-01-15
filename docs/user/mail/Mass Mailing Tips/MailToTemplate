@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Make a mail merge letter by combining data from a given people file and a
+# template letter text file.
+# $Revision: 1.1 $
+# Some code from Scot Hacker's PeoplePorter http://www.bebits.com/app/1747
+
+PeopleFile=$1
+echo "Mail merging using people file: $PeopleFile"
+
+Name=$(catattr META:name "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)
+EMail=$(catattr META:email "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)
+Company=$(catattr META:company "$PeopleFile" | sed s/\ \:\ /%/g | cut -f3 -d\%)	
+
+sed "s/NAME/$Name/g" <TemplateLetter.txt >/tmp/stage1
+sed "s/EMAIL/$EMail/g" </tmp/stage1 >/tmp/stage2
+sed "s/COMPANY/$Company/g" </tmp/stage2 >/tmp/stage3
+mail -v -s "Test Message to $Name" "$EMail" </tmp/stage3
