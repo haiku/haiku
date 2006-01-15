@@ -163,6 +163,11 @@ probe_keyboard(void)
 	// ToDo: for now there just is a keyboard ready to be used...
 	
 	// Keyboard detection does not seem to be working always correctly
+
+	// not sure if this is the correct way
+	ps2_keyboard_command(PS2_CTRL_KEYBOARD_SELF_TEST, NULL, 0, NULL, 0);
+	ps2_keyboard_command(PS2_CTRL_KEYBOARD_SELF_TEST, NULL, 0, NULL, 0);
+
 #if 0
 	// Keyboard self-test
 

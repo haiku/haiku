@@ -105,13 +105,12 @@ ps2_reset_mouse()
  */
  
 static status_t
-ps2_set_sample_rate(uint32 rate)
+ps2_set_sample_rate(uint8 rate)
 {
 	int32 tries = 5;
 
 	while (--tries > 0) {
-		uint8 d = rate;
-		status_t status = ps2_mouse_command(PS2_CMD_SET_SAMPLE_RATE, &d, 1, NULL, 0);
+		status_t status = ps2_mouse_command(PS2_CMD_SET_SAMPLE_RATE, &rate, 1, NULL, 0);
 
 		if (status == B_OK)
 			return B_OK;
