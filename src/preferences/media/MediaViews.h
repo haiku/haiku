@@ -17,8 +17,9 @@
 #ifndef __MEDIAVIEWS_H__
 #define __MEDIAVIEWS_H__
 #include <CheckBox.h>
-#include <View.h>
 #include <MenuItem.h>
+#include <TextView.h>
+#include <View.h>
 
 const uint32 ML_RESTART_MEDIA_SERVER = 'resr';
 const uint32 ML_SHOW_VOLUME_CONTROL = 'shvc';
