@@ -1,5 +1,20 @@
 SubDir HAIKU_TOP src kits media ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os media ] : true ;
+		# We need the public media headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+		# We need the public headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public posix headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os support ] : true ;
+		# We need the public support headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os app ] : true ;
+		# We need the public app headers also when not compiling for Haiku.
+}
+
 UsePrivateHeaders media ;
 UsePrivateHeaders shared ;
 
