@@ -4,11 +4,12 @@
  *
  * Authors:
  *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
+#include <FindDirectory.h>
 #include <Screen.h>
 #include <ScreenSaver.h>
-#include <FindDirectory.h>
+#include <View.h>
 #include <stdio.h>
 #include "ScreenSaverThread.h"
 #include "ScreenSaverPrefs.h"
@@ -85,21 +86,21 @@ ScreenSaverThread::LoadAddOn()
 		unload_add_on(fAddonImage);
 	}
 	char temp[B_PATH_NAME_LENGTH]; 
-	if (B_OK==find_directory(B_BEOS_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
+	if (B_OK==find_directory(B_BEOS_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
 		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 		fAddonImage = load_add_on(temp);
 	}
 	if (fAddonImage<0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
 		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
-		if (B_OK==find_directory(B_COMMON_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
+		if (B_OK==find_directory(B_COMMON_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
 			sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 			fAddonImage = load_add_on(temp);
 		}
 	}
 	if (fAddonImage<0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
-		if (B_OK==find_directory(B_USER_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
+		if (B_OK==find_directory(B_USER_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
 			sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 			fAddonImage = load_add_on(temp);
 		}
