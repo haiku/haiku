@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences media ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
@@ -12,7 +14,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: be libmedia.so
+	: be media
 	: media.rdef 
 	;
 

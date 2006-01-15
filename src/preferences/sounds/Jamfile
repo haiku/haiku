@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences sounds ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -fmultiple-symbol-spaces ;
 }
