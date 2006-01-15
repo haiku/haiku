@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences keyboard ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;
         SubDirC++Flags -fmultiple-symbol-spaces ;
@@ -12,6 +14,6 @@ Preference Keyboard :
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp
-	: libtranslation.so libbe.so
+	: translation be
 	: Keyboard.rdef
 	;
