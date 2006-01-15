@@ -4,11 +4,12 @@
  *
  * Authors:
  *              Michael Phipps
- *              Jérôme Duval, jerome.duval@free.fr
+ *              JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #include "PasswordWindow.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <Alert.h>
 #include <Box.h>
 #include <RadioButton.h>

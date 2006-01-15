@@ -9,11 +9,12 @@
 #ifndef PASSWORDWINDOW_H
 #define PASSWORDWINDOW_H
 
-#include <Window.h>
-#include <String.h>
-#include <TextControl.h>
 #include <Button.h>
 #include <Constants.h>
+#include <RadioButton.h>
+#include <String.h>
+#include <TextControl.h>
+#include <Window.h>
 #include "ScreenSaverPrefs.h"
 
 class PasswordWindow : public BWindow

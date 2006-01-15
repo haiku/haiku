@@ -9,7 +9,7 @@
 #ifndef __SCREENSAVERITEM_H__
 #define __SCREENSAVERITEM_H__
 
-#include <StringItem.h>
+#include <ListItem.h>
 #include <String.h>
 #include <Entry.h>
 

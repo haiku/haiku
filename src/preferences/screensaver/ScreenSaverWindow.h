@@ -4,13 +4,17 @@
  *
  * Authors:
  *              Michael Phipps
- *              Jérôme Duval, jerome.duval@free.fr
+ *              JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #ifndef _ScreenSaverWindow_H
 #define _ScreenSaverWindow_H
+#include <Box.h>
 #include <CheckBox.h>
 #include <FilePanel.h>
+#include <Slider.h>
+#include <ListView.h>
+#include <StringView.h>
 #include "PasswordWindow.h"
 #include "ScreenSaverPrefs.h"
 
