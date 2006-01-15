@@ -73,6 +73,7 @@ extern struct file_descriptor *get_fd(struct io_context *, int);
 extern void close_fd(struct file_descriptor *descriptor);
 extern void put_fd(struct file_descriptor *descriptor);
 extern void disconnect_fd(struct file_descriptor *descriptor);
+extern void inc_fd_ref_count(struct file_descriptor *descriptor);
 extern status_t select_fd(int fd, uint8 event, uint32 ref,
 					struct select_sync *sync, bool kernel);
 extern status_t deselect_fd(int fd, uint8 event, struct select_sync *sync,

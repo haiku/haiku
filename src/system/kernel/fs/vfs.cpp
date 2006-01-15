@@ -1249,7 +1249,6 @@ resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
 	if (error != B_OK)
 		return error;
 
-
 	// resolve the node
 	struct vnode *resolvedNode = resolve_mount_point_to_volume_root(node);
 	if (resolvedNode) {
@@ -1538,7 +1537,7 @@ static status_t
 path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 	vnode_id *_parentID, bool kernel)
 {
-	struct vnode *start;
+	struct vnode *start = NULL;
 
 	FUNCTION(("path_to_vnode(path = \"%s\")\n", path));
 
@@ -1561,8 +1560,12 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 
 		mutex_lock(&context->io_mutex);
 		start = context->cwd;
-		inc_vnode_ref_count(start);
+		if (start != NULL)
+			inc_vnode_ref_count(start);
 		mutex_unlock(&context->io_mutex);
+
+		if (start == NULL)
+			return B_ERROR;
 	}
 
 	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, _parentID, NULL);
@@ -3015,8 +3018,6 @@ vfs_free_io_context(void *_ioContext)
 		}
 	}
 
-	mutex_unlock(&context->io_mutex);
-
 	mutex_destroy(&context->io_mutex);
 
 	remove_node_monitors(context);
@@ -3826,10 +3827,12 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				// we only accept changes to O_APPEND and O_NONBLOCK
 				argument &= O_APPEND | O_NONBLOCK;
 
-				status = FS_CALL(vnode, set_flags)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, (int)argument);
+				status = FS_CALL(vnode, set_flags)(vnode->mount->cookie,
+					vnode->private_node, descriptor->cookie, (int)argument);
 				if (status == B_OK) {
 					// update this descriptor's open_mode field
-					descriptor->open_mode = (descriptor->open_mode & ~(O_APPEND | O_NONBLOCK)) | argument;
+					descriptor->open_mode = (descriptor->open_mode & ~(O_APPEND | O_NONBLOCK))
+						| argument;
 				}
 			} else
 				status = EOPNOTSUPP;
@@ -5138,19 +5141,129 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	// from the path_to_vnode() call above
 	mount->root_vnode->ref_count -= 2;
 
-	// cycle through the list of vnodes associated with this mount and
-	// make sure all of them are not busy or have refs on them
-	vnode = NULL;
-	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
-		if (vnode->busy || vnode->ref_count != 0) {
-			// there are still vnodes in use on this mount, so we cannot unmount yet
-			// ToDo: cut read/write access file descriptors, depending on the B_FORCE_UNMOUNT flag
+	bool disconnectedDescriptors = false;
+
+	while (true) {
+		bool busy = false;
+
+		// cycle through the list of vnodes associated with this mount and
+		// make sure all of them are not busy or have refs on them
+		vnode = NULL;
+		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+			if (vnode->busy || vnode->ref_count != 0) {
+				// there are still vnodes in use on this mount, so we cannot
+				// unmount yet
+				busy = true;
+				break;
+			}
+		}
+
+		if (!busy)
+			break;
+
+		if ((flags & B_FORCE_UNMOUNT) == 0) {
 			mount->root_vnode->ref_count += 2;
 			mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
 			return B_BUSY;
 		}
+
+		if (disconnectedDescriptors) {
+			// wait a bit until the last access is finished, and then try again
+			mutex_unlock(&sVnodeMutex);
+			snooze(100000);
+			mutex_lock(&sVnodeMutex);
+			continue;
+		}
+
+		// the file system is still busy - but we're forced to unmount it,
+		// so let's disconnect all open file descriptors
+
+		mount->unmounting = true;
+			// prevent new vnodes from being created
+
+		mutex_unlock(&sVnodeMutex);
+
+		// iterate over all teams and peek into their file descriptors
+
+		int32 nextTeamID = 0;
+
+		while (true) {
+			struct io_context *context = NULL;
+			sem_id contextMutex = -1;
+			struct team *team = NULL;
+			team_id lastTeamID;
+
+			cpu_status state = disable_interrupts();
+			GRAB_TEAM_LOCK();
+
+			lastTeamID = peek_next_thread_id();
+			if (nextTeamID < lastTeamID) {
+				// get next valid team
+				while (nextTeamID < lastTeamID
+					&& !(team = team_get_team_struct_locked(nextTeamID))) {
+					nextTeamID++;
+				}
+
+				if (team) {
+					context = (io_context *)team->io_context;
+					contextMutex = context->io_mutex.sem;
+					nextTeamID++;
+				}
+			}
+
+			RELEASE_TEAM_LOCK();
+			restore_interrupts(state);
+
+			if (context == NULL)
+				break;
+
+			// we now have a context - since we couldn't lock it while having
+			// safe access to the team structure, we now need to lock the mutex
+			// manually
+
+			if (acquire_sem(contextMutex) != B_OK) {
+				// team seems to be gone, go over to the next team
+				continue;
+			}
+
+			// the team cannot be deleted completely while we're owning its
+			// io_context mutex, so we can safely play with it now
+
+			context->io_mutex.holder = thread_get_current_thread_id();
+
+			if (context->cwd != NULL && context->cwd->mount == mount) {
+				put_vnode(context->cwd);
+
+				if (context->cwd == mount->root_vnode) {
+					// redirect the current working directory to the covered vnode
+					context->cwd = mount->covers_vnode;
+					inc_vnode_ref_count(context->cwd);
+				} else
+					context->cwd = NULL;
+			}
+
+			for (uint32 i = 0; i < context->table_size; i++) {
+				if (struct file_descriptor *descriptor = context->fds[i]) {
+					inc_fd_ref_count(descriptor);
+
+					// if this descriptor points at this mount, we
+					// need to disconnect it to be able to unmount
+					vnode = fd_vnode(descriptor);
+					if (vnode != NULL && vnode->mount == mount
+						|| vnode == NULL && descriptor->u.mount == mount)
+						disconnect_fd(descriptor);
+
+					put_fd(descriptor);
+				}
+			}
+
+			mutex_unlock(&context->io_mutex);
+		}
+
+		disconnectedDescriptors = true;
+		mutex_lock(&sVnodeMutex);
 	}
 
 	// we can safely continue, mark all of the vnodes busy and this mount

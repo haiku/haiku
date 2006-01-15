@@ -139,7 +139,7 @@ put_fd(struct file_descriptor *descriptor)
 
 		free(descriptor);
 	} else if ((descriptor->open_mode & O_DISCONNECTED) != 0
-		&& previous == descriptor->open_count) {
+		&& previous - 1 == descriptor->open_count) {
 		// the descriptor has been disconnected - it cannot
 		// be accessed anymore, let's close it (no one is
 		// currently accessing this descriptor)
@@ -188,6 +188,13 @@ disconnect_fd(struct file_descriptor *descriptor)
 }
 
 
+void
+inc_fd_ref_count(struct file_descriptor *descriptor)
+{
+	atomic_add(&descriptor->ref_count, 1);
+}
+
+
 struct file_descriptor *
 get_fd(struct io_context *context, int fd)
 {
@@ -206,7 +213,7 @@ get_fd(struct io_context *context, int fd)
 		if (descriptor->open_mode & O_DISCONNECTED)
 			descriptor = NULL;
 		else
-			atomic_add(&descriptor->ref_count, 1);
+			inc_fd_ref_count(descriptor);
 	}
 
 	mutex_unlock(&context->io_mutex);
@@ -231,10 +238,14 @@ remove_fd(struct io_context *context, int fd)
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
 
-	if (descriptor)	{	// fd is valid
+	if (descriptor)	{
+		// fd is valid
 		context->fds[fd] = NULL;
 		fd_set_close_on_exec(context, fd, false);
 		context->num_used_fds--;
+
+		if (descriptor->open_mode & O_DISCONNECTED)
+			descriptor = NULL;
 	}
 
 	mutex_unlock(&context->io_mutex);
