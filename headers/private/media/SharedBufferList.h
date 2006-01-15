@@ -7,6 +7,8 @@
 #ifndef _SHARED_BUFFER_LIST_H_
 #define _SHARED_BUFFER_LIST_H_
 
+#include <Buffer.h>
+
 // created in the media server, cloned into 
 // each BBufferGroup (visible in all address spaces / teams)
 struct _shared_buffer_list
