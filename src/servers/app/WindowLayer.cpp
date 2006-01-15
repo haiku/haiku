@@ -823,7 +823,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				DesktopSettings desktopSettings(fDesktop);
 
 				// Activate window in case it doesn't accept first click, and
-				// we're not in FFM mode
+				// we're not in FFM mode, and it's not the desktop window
 				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
 					&& desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 					fDesktop->ActivateWindow(this);
@@ -976,7 +976,8 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
 
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus() && !(Flags() & B_AVOID_FOCUS))
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus()
+		&& !(Flags() & B_AVOID_FOCUS) && Feel() != kDesktopWindowFeel)
 		fDesktop->SetFocusWindow(this);
 }
 

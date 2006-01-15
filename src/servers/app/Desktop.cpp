@@ -22,6 +22,7 @@
 #include "ServerConfig.h"
 #include "ServerScreen.h"
 #include "ServerWindow.h"
+#include "WindowPrivate.h"
 #include "WindowLayer.h"
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
@@ -896,8 +897,8 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 
 	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
 
-	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
-		&& !hasModal) {
+	if ((focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
+		&& !hasModal) || focus->Feel() == kDesktopWindowFeel) {
 		// the window that is supposed to get focus already has focus
 		UnlockAllWindows();
 		return;
