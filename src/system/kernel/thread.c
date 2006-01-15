@@ -2089,7 +2089,7 @@ _user_wait_for_thread(thread_id id, status_t *userReturnCode)
 	status_t returnCode;
 	status_t status;
 
-	if (!IS_USER_ADDRESS(userReturnCode))
+	if (userReturnCode != NULL && !IS_USER_ADDRESS(userReturnCode))
 		return B_BAD_ADDRESS;
 
 	status = wait_for_thread(id, &returnCode);
