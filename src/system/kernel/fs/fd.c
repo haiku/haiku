@@ -1,6 +1,6 @@
 /* Operations on file descriptors
  *
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -126,15 +126,36 @@ new_fd(struct io_context *context, struct file_descriptor *descriptor)
 void
 put_fd(struct file_descriptor *descriptor)
 {
-	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n", descriptor, descriptor->ref_count, descriptor->cookie));
+	int32 previous = atomic_add(&descriptor->ref_count, -1);
+
+	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n",
+		descriptor, descriptor->ref_count, descriptor->cookie));
 
 	// free the descriptor if we don't need it anymore
-	if (atomic_add(&descriptor->ref_count, -1) == 1) {
+	if (previous == 1) {
 		// free the underlying object
 		if (descriptor->ops->fd_free)
 			descriptor->ops->fd_free(descriptor);
 
 		free(descriptor);
+	} else if ((descriptor->open_mode & O_DISCONNECTED) != 0
+		&& previous == descriptor->open_count) {
+		// the descriptor has been disconnected - it cannot
+		// be accessed anymore, let's close it (no one is
+		// currently accessing this descriptor)
+
+		if (descriptor->ops->fd_close)
+			descriptor->ops->fd_close(descriptor);
+		if (descriptor->ops->fd_free)
+			descriptor->ops->fd_free(descriptor);
+
+		// prevent this descriptor from being closed/freed again
+		descriptor->open_count = -1;
+		descriptor->ref_count = -1;
+		descriptor->u.vnode = NULL;
+
+		// the file descriptor is kept intact, so that it's not
+		// reused until someone explicetly closes it
 	}
 }
 
@@ -153,6 +174,20 @@ close_fd(struct file_descriptor *descriptor)
 }
 
 
+/**	This descriptor's underlying object will be closed and freed
+ *	as soon as possible (in one of the next calls to put_fd() -
+ *	get_fd() will no longer succeed on this descriptor).
+ *	This is useful if the underlying object is gone, for instance
+ *	when a (mounted) volume got removed unexpectedly.
+ */
+
+void
+disconnect_fd(struct file_descriptor *descriptor)
+{
+	descriptor->open_mode |= O_DISCONNECTED;
+}
+
+
 struct file_descriptor *
 get_fd(struct io_context *context, int fd)
 {
@@ -165,6 +200,10 @@ get_fd(struct io_context *context, int fd)
 
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
+
+	// Disconnected descriptors cannot be accessed anymore
+	if (descriptor->open_mode & O_DISCONNECTED)
+		descriptor = NULL;
 
 	if (descriptor != NULL) // fd is valid
 		atomic_add(&descriptor->ref_count, 1);
