@@ -1,5 +1,14 @@
 SubDir HAIKU_TOP src bin desklink ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os interface ] : true ;
+		# We need the public interface headers also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+		# We need the public headers also when not compiling for Haiku.
+}
+
 AddResources desklink : desklink.rsrc ;
 
 BinCommand desklink :
