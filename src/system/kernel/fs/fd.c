@@ -201,12 +201,13 @@ get_fd(struct io_context *context, int fd)
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
 
-	// Disconnected descriptors cannot be accessed anymore
-	if (descriptor->open_mode & O_DISCONNECTED)
-		descriptor = NULL;
-
-	if (descriptor != NULL) // fd is valid
-		atomic_add(&descriptor->ref_count, 1);
+	if (descriptor != NULL) {
+		// Disconnected descriptors cannot be accessed anymore
+		if (descriptor->open_mode & O_DISCONNECTED)
+			descriptor = NULL;
+		else
+			atomic_add(&descriptor->ref_count, 1);
+	}
 
 	mutex_unlock(&context->io_mutex);
 
