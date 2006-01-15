@@ -6,6 +6,7 @@
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 
+#include <RadioButton.h>
 #include <View.h>
 
 #include "AnalogClock.h"

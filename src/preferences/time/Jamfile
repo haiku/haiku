@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences time ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Preference Time : 
 	AnalogClock.cpp 
 	BaseView.cpp 
@@ -15,7 +17,7 @@ Preference Time :
 	TimeWindow.cpp 
 	TZDisplay.cpp 
 	ZoneView.cpp 
-	: libbe.so
+	: be
 	: Time.rdef
 	;
 

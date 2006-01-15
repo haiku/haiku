@@ -8,7 +8,9 @@
 
 
 #include <ListItem.h>
+#include <ListView.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <View.h>
 
 #include "TZDisplay.h"

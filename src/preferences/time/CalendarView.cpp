@@ -349,7 +349,7 @@ TCalendarView::Draw(BRect updaterect)
 	float offset = FontHeight(this, true);
 	
 	for (int i = 0; i < 7; i++) {
-		day = kDays[i];
+		day = BString(&kDays[i], 1);
 		width = be_plain_font->StringWidth(day.String());
 		drawpt.x = bounds.left + (x - width / 2.0 + 2);
 		drawpt.y = bounds.bottom - offset / 2.0;
