@@ -18,7 +18,7 @@
 #include <KernelExport.h>
 #include <OS.h>
 
-#include "ps2.h"
+#include "ps2_defs.h"
 
 
 // debug defines
@@ -36,6 +36,9 @@ extern device_hooks sKeyboardDeviceHooks;
 extern device_hooks sMouseDeviceHooks;
 
 // prototypes from common.c
+
+status_t ps2_init_driver(void);
+void ps2_uninit_driver(void);
 
 extern status_t ps2_wait_read();
 extern status_t ps2_wait_write();

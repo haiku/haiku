@@ -9,8 +9,8 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _PS2_H
-#define _PS2_H
+#ifndef _PS2_DEFS_H
+#define _PS2_DEFS_H
 
 
 /** Interface definitions for the Intel 8042, 8741, or 8742 (PS/2) */

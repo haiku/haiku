@@ -10,7 +10,7 @@
 #ifndef __PS2_DEV_H
 #define __PS2_DEV_H
 
-#include "common.h"
+#include "ps2_common.h"
 
 typedef struct
 {

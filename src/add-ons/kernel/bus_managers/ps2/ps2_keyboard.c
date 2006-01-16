@@ -10,7 +10,7 @@
  */
 
 
-#include "common.h"
+#include "ps2_common.h"
 #include "kb_mouse_driver.h"
 #include "packet_buffer.h"
 

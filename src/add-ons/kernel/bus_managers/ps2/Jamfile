@@ -1,8 +1,14 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers ps2 ;
 
+UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 
 KernelAddon ps2 : kernel bus_managers :
+	packet_buffer.cpp
+	ps2_common.c
+	ps2_dev.c
+	ps2_keyboard.c
 	ps2_module.c
+	ps2_mouse.c
+	ps2_service.c
 	;
-

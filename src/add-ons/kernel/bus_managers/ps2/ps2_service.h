@@ -10,7 +10,7 @@
 #ifndef __PS2_SERVICE_H
 #define __PS2_SERVICE_H
 
-#include "common.h"
+#include "ps2_common.h"
 #include "ps2_dev.h"
 
 status_t	ps2_service_init(void);

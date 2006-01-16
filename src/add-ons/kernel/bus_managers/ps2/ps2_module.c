@@ -9,6 +9,7 @@
  */
 
 #include "PS2.h"
+#include "ps2_common.h"
 
 
 static int32 function1()
@@ -28,8 +29,10 @@ std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			break;
+			return ps2_init_driver();
+
 		case B_MODULE_UNINIT: 
+			ps2_uninit_driver();
 			break; 
 		default: 
 			return B_ERROR;

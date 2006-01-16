@@ -12,11 +12,9 @@
 
 #include <string.h>
 
-#include "common.h"
+#include "ps2_common.h"
 #include "ps2_service.h"
 #include "ps2_dev.h"
-
-int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 device_hooks sKeyboardDeviceHooks = {
 	keyboard_open,
@@ -237,31 +235,7 @@ ps2_interrupt(void* cookie)
 
 
 status_t
-init_hardware(void)
-{
-	TRACE(("ps2_hid: init_hardware\n"));
-	return B_OK;
-}
-
-
-const char **
-publish_devices(void)
-{
-	TRACE(("ps2_hid: publish_devices\n"));
-	return NULL;
-}
-
-
-device_hooks *
-find_device(const char *name)
-{
-	TRACE(("ps2_hid: find_device\n"));
-	return NULL;
-}
-
-
-status_t
-init_driver(void)
+ps2_init_driver(void)
 {
 	status_t status;
 
@@ -335,7 +309,7 @@ err_1:
 
 
 void
-uninit_driver(void)
+ps2_uninit_driver(void)
 {
 	TRACE(("ps2_hid: uninit_driver\n"));
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);

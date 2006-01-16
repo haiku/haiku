@@ -62,7 +62,7 @@
 #include <string.h>
 
 #include "kb_mouse_driver.h"
-#include "common.h"
+#include "ps2_common.h"
 #include "packet_buffer.h"
 
 
