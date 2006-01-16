@@ -897,8 +897,8 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 
 	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
 
-	if ((focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
-		&& !hasModal) || focus->Feel() == kDesktopWindowFeel) {
+	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
+		&& !hasModal) {
 		// the window that is supposed to get focus already has focus
 		UnlockAllWindows();
 		return;
