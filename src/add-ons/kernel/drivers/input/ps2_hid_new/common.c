@@ -207,6 +207,8 @@ ps2_interrupt(void* cookie)
 	uint8 data;
 	ps2_dev *dev;
 	
+	TRACE(("ps2_interrupt\n"));
+	
 	ctrl = ps2_read_ctrl();
 	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 		return B_UNHANDLED_INTERRUPT;
@@ -237,6 +239,7 @@ ps2_interrupt(void* cookie)
 status_t
 init_hardware(void)
 {
+	TRACE(("ps2_hid: init_hardware\n"));
 	return B_OK;
 }
 
@@ -244,6 +247,7 @@ init_hardware(void)
 const char **
 publish_devices(void)
 {
+	TRACE(("ps2_hid: publish_devices\n"));
 	return NULL;
 }
 
@@ -251,6 +255,7 @@ publish_devices(void)
 device_hooks *
 find_device(const char *name)
 {
+	TRACE(("ps2_hid: find_device\n"));
 	return NULL;
 }
 
@@ -259,6 +264,8 @@ status_t
 init_driver(void)
 {
 	status_t status;
+
+	TRACE(("ps2_hid: init_driver\n"));
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK)
@@ -321,6 +328,7 @@ err_3:
 err_2:
 	put_module(B_ISA_MODULE_NAME);
 err_1:
+	TRACE(("ps2_hid: init_driver failed!\n"));
 	return B_ERROR;
 }
 
@@ -328,6 +336,7 @@ err_1:
 void
 uninit_driver(void)
 {
+	TRACE(("ps2_hid: uninit_driver\n"));
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
