@@ -35,6 +35,14 @@ UpdateMimeInfoThread::UpdateMimeInfoThread(const char *name, int32 priority,
 status_t
 UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 {
+// TODO: This implementation is incomplete.
+// For application executables we also need to copy several things from the
+// resources into attributes (basically that is supported by BAppFileInfo,
+// which we can use here, BTW).
+// Furthermore fForce shouldn't be a boolean. The do_mime_update() API
+// functions takes an "int force", which can have three valid values, 0, 1,
+// and 2. 0 is no-force, 1 and 2 correspond to the mimeset flags -f and -F,
+// respectively.
 	status_t err = entry ? B_OK : B_BAD_VALUE;
 	bool doUpdate = true;
 	BNode node;
