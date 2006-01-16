@@ -10,6 +10,7 @@
 
 
 struct packet_buffer;
+typedef struct packet_buffer packet_buffer;
 
 #ifdef __cplusplus
 extern "C" {

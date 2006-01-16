@@ -9,26 +9,54 @@
  */
 
 #include "ps2_service.h"
+#include "packet_buffer.h"
 
 static sem_id			sServiceSem;
 static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
+static packet_buffer *  sServiceCmdBuffer;
 
 #define PS2_SERVICE_INTERVAL 200000
 
+typedef struct
+{
+	uint32		id;
+	ps2_dev *	dev;
+} ps2_service_cmd;
+
+enum
+{
+	PS2_SERVICE_HANDLE_DEVICE_ADDED = 1,
+	PS2_SERVICE_HANDLE_DEVICE_REMOVED,
+};
 
 void
 ps2_service_handle_device_added(ps2_dev *dev)
 {
-	TRACE(("ps2_service_handle_device_added %s\n", dev->name));
+	ps2_service_cmd cmd;
 
+	TRACE(("ps2_service_handle_device_added %s\n", dev->name));
+	
+	cmd.id = PS2_SERVICE_HANDLE_DEVICE_ADDED;
+	cmd.dev = dev;
+	
+	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
+	release_sem_etc(sServiceSem, 0, B_DO_NOT_RESCHEDULE);
 }
 
 
 void
 ps2_service_handle_device_removed(ps2_dev *dev)
 {
+	ps2_service_cmd cmd;
+
 	TRACE(("ps2_service_handle_device_removed %s\n", dev->name));
+
+	cmd.id = PS2_SERVICE_HANDLE_DEVICE_REMOVED;
+	cmd.dev = dev;
+	
+	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
+	release_sem_etc(sServiceSem, 0, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -71,7 +99,27 @@ ps2_service_thread(void *arg)
 			break;
 		if (status == B_OK) {
 			// process service commands
-		
+
+			ps2_service_cmd cmd;
+			
+			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
+			switch (cmd.id) {
+				case PS2_SERVICE_HANDLE_DEVICE_ADDED:
+					TRACE(("PS2_SERVICE_HANDLE_DEVICE_ADDED %s\n", cmd.dev->name));
+					if (ps2_service_probe_device(cmd.dev) == B_OK)
+						ps2_dev_publish(cmd.dev);
+					break;
+					
+				case PS2_SERVICE_HANDLE_DEVICE_REMOVED:
+					TRACE(("PS2_SERVICE_HANDLE_DEVICE_REMOVED %s\n", cmd.dev->name));
+					ps2_dev_unpublish(cmd.dev);
+					break;
+
+				default:
+					TRACE(("PS2_SERVICE: unknown id %lu\n", cmd.id));
+					break;
+			}
+
 		} else if (status == B_TIMED_OUT) {
 			// do periodic processing
 		
@@ -87,18 +135,23 @@ ps2_service_thread(void *arg)
 status_t
 ps2_service_init(void)
 {
+	sServiceCmdBuffer = create_packet_buffer(sizeof(ps2_service_cmd) * 50);
+	if (sServiceCmdBuffer == NULL)
+		goto err1;
 	sServiceSem = create_sem(0, "ps2 service");
 	if (sServiceSem < B_OK)
-		goto err1;
+		goto err2;
 	sServiceThread = spawn_kernel_thread(ps2_service_thread, "ps2 service", 20, NULL);
 	if (sServiceThread < B_OK)
-		goto err2;
+		goto err3;
 	sServiceTerminate = false;
 	resume_thread(sServiceThread);
 	return B_OK;
 	
-err2:
+err3:
 	delete_sem(sServiceSem);
+err2:
+	delete_packet_buffer(sServiceCmdBuffer);
 err1:
 	return B_ERROR;
 }
@@ -111,4 +164,5 @@ ps2_service_exit(void)
 	release_sem(sServiceSem);
 	wait_for_thread(sServiceThread, NULL);
 	delete_sem(sServiceSem);
+	delete_packet_buffer(sServiceCmdBuffer);
 }
