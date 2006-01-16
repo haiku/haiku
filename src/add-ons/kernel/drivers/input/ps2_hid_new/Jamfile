@@ -1,15 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input ps2_hid_new ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders input ;
 UsePrivateHeaders kernel ;
 
 KernelAddon ps2_hid_new : kernel drivers bin :
-	common.c
-	keyboard.c
-	mouse.c
-	packet_buffer.cpp
-	ps2_dev.c
-	ps2_service.c
+	ps2_hid.c
 ;
