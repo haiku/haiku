@@ -530,6 +530,14 @@ BMenu::SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
 
+	
+	if (fSuper) {
+		// Can't use fSuper->SetEnabled() here, as
+		// it would call SetEnabled() on us again, thus
+		// entering an infinite loop
+		fSuper->fEnabled = enabled;
+	}
+
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->SetEnabled(enabled);
 }
@@ -539,6 +547,8 @@ void
 BMenu::SetRadioMode(bool flag)
 {
 	fRadioMode = flag;
+	if (!flag)
+		SetLabelFromMarked(false);
 }
 
 
@@ -560,6 +570,8 @@ void
 BMenu::SetLabelFromMarked(bool flag)
 {
 	fDynamicName = flag;
+	if (flag)
+		SetRadioMode(true);
 }
 
 
@@ -935,7 +947,7 @@ BMenu::Hide()
 BMenuItem *
 BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 {
-	if (IsStickyPrefOn())
+	if (!IsStickyPrefOn())
 		openAnyway = false;
 		
 	SetStickyMode(openAnyway);

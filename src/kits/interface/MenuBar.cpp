@@ -136,34 +136,28 @@ void
 BMenuBar::Draw(BRect updateRect)
 {
 	// TODO: implement additional border styles
-	if (IsEnabled()) {
-		rgb_color color = HighColor();
+	rgb_color color = HighColor();
+	
+	BRect bounds(Bounds());
+	// Restore the background of the previously selected menuitem
+	DrawBackground(bounds & updateRect);
 
-		BRect bounds(Bounds());
-		// Restore the background of the previously selected menuitem
-		DrawBackground(bounds & updateRect);
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
+	StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
+	StrokeLine(BPoint(bounds.right, 0.0f));
 
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
-		StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
-		StrokeLine(BPoint(bounds.right, 0.0f));
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	StrokeLine(BPoint(1.0f, bounds.bottom - 1.0f),
+		BPoint(bounds.right, bounds.bottom - 1.0f));
 
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-		StrokeLine(BPoint(1.0f, bounds.bottom - 1.0f),
-			BPoint(bounds.right, bounds.bottom - 1.0f));
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
+	StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
 
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
-		StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
+	SetHighColor(color);
+		// revert to previous used color (cheap PushState()/PopState())
 
-		SetHighColor(color);
-			// revert to previous used color (cheap PushState()/PopState())
-
-		DrawItems(updateRect);
-	} else {
-		LayoutItems(0);
-		Sync();
-		Invalidate();
-	}
+	DrawItems(updateRect);
 }
 
 
