@@ -823,7 +823,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				DesktopSettings desktopSettings(fDesktop);
 
 				// Activate window in case it doesn't accept first click, and
--				// we're not in FFM mode
+				// we're not in FFM mode
 				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
 					&& desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 					fDesktop->ActivateWindow(this);
