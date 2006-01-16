@@ -313,6 +313,7 @@ init_driver(void)
 	
 	//goto err_5;	
 	
+	TRACE(("ps2_hid: init_driver done!\n"));
 	
 	return B_OK;
 

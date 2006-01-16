@@ -92,6 +92,8 @@ ps2_service_probe_device(ps2_dev *dev)
 static int32
 ps2_service_thread(void *arg)
 {
+	TRACE(("ps2_service_thread started\n"));
+
 	for (;;) {
 		status_t status;
 		status = acquire_sem_etc(sServiceSem, 1, B_RELATIVE_TIMEOUT, PS2_SERVICE_INTERVAL);
@@ -135,6 +137,7 @@ ps2_service_thread(void *arg)
 status_t
 ps2_service_init(void)
 {
+	TRACE(("ps2_service_init\n"));
 	sServiceCmdBuffer = create_packet_buffer(sizeof(ps2_service_cmd) * 50);
 	if (sServiceCmdBuffer == NULL)
 		goto err1;
@@ -146,6 +149,7 @@ ps2_service_init(void)
 		goto err3;
 	sServiceTerminate = false;
 	resume_thread(sServiceThread);
+	TRACE(("ps2_service_init done\n"));
 	return B_OK;
 	
 err3:
@@ -153,6 +157,7 @@ err3:
 err2:
 	delete_packet_buffer(sServiceCmdBuffer);
 err1:
+	TRACE(("ps2_service_init failed\n"));
 	return B_ERROR;
 }
 
@@ -160,6 +165,7 @@ err1:
 void
 ps2_service_exit(void)
 {
+	TRACE(("ps2_service_exit\n"));
 	sServiceTerminate = true;
 	release_sem(sServiceSem);
 	wait_for_thread(sServiceThread, NULL);
