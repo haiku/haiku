@@ -528,18 +528,15 @@ BMenu::SetTargetForItems(BMessenger messenger)
 void
 BMenu::SetEnabled(bool enabled)
 {
+	if (fEnabled == enabled)
+		return;
+
 	fEnabled = enabled;
-
-	
-	if (fSuper) {
-		// Can't use fSuper->SetEnabled() here, as
-		// it would call SetEnabled() on us again, thus
-		// entering an infinite loop
-		fSuper->fEnabled = enabled;
-	}
-
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->SetEnabled(enabled);
+	
+	if (fSuper)
+		fSuper->SetEnabled(enabled);
 }
 
 
