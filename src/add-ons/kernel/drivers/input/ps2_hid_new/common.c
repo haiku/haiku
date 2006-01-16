@@ -270,6 +270,8 @@ init_driver(void)
 	if (gDeviceOpenSemaphore < B_OK)
 		goto err_2;
 
+	status = ps2_dev_init();
+
 	status = ps2_service_init();
 
 	status = install_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL, 0);
@@ -313,6 +315,7 @@ err_4:
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 err_3:
 	ps2_service_exit();
+	ps2_dev_exit();
 	delete_sem(gDeviceOpenSemaphore);
 	delete_sem(sKbcSem);
 err_2:
@@ -328,6 +331,7 @@ uninit_driver(void)
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
+	ps2_dev_exit();
 	delete_sem(gDeviceOpenSemaphore);
 	delete_sem(sKbcSem);
 	put_module(B_ISA_MODULE_NAME);

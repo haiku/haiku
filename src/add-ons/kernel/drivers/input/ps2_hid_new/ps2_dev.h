@@ -30,6 +30,9 @@ extern ps2_dev ps2_device[5];
 
 #define PS2_FLAG_KEYB    1
 
+status_t	ps2_dev_init(void);
+void		ps2_dev_exit(void);
+
 void		ps2_dev_publish(ps2_dev *dev);
 void		ps2_dev_unpublish(ps2_dev *dev);
 
