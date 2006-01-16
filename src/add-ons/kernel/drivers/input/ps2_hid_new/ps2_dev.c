@@ -98,7 +98,7 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 		dev->result_buf_idx++;
 		dev->result_buf_cnt--;
 		if (dev->result_buf_cnt == 0) {
-			release_sem_etc(dev->result_sem, 0, B_DO_NOT_RESCHEDULE);
+			release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
 			return B_INVOKE_SCHEDULER;
 		}
 		return B_HANDLED_INTERRUPT;

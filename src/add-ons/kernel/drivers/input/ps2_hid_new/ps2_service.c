@@ -41,7 +41,9 @@ ps2_service_handle_device_added(ps2_dev *dev)
 	cmd.dev = dev;
 	
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
-	release_sem_etc(sServiceSem, 0, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
+
+	TRACE(("ps2_service_handle_device_added done\n"));
 }
 
 
@@ -56,7 +58,7 @@ ps2_service_handle_device_removed(ps2_dev *dev)
 	cmd.dev = dev;
 	
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
-	release_sem_etc(sServiceSem, 0, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -103,6 +105,8 @@ ps2_service_thread(void *arg)
 			// process service commands
 
 			ps2_service_cmd cmd;
+
+			TRACE(("ps2_service_thread: reading cmd\n"));
 			
 			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
 			switch (cmd.id) {
