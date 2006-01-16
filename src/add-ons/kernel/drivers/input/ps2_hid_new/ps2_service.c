@@ -14,6 +14,8 @@ static sem_id			sServiceSem;
 static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
 
+#define PS2_SERVICE_INTERVAL 200000
+
 
 void
 ps2_service_handle_device_added(ps2_dev *dev)
@@ -63,11 +65,20 @@ static int32
 ps2_service_thread(void *arg)
 {
 	for (;;) {
-		while (B_INTERRUPTED == acquire_sem(sServiceSem))
-			;
+		status_t status;
+		status = acquire_sem_etc(sServiceSem, 1, B_RELATIVE_TIMEOUT, PS2_SERVICE_INTERVAL);
 		if (sServiceTerminate)
 			break;
+		if (status == B_OK) {
+			// process service commands
 		
+		} else if (status == B_TIMED_OUT) {
+			// do periodic processing
+		
+		} else {
+			dprintf("ps2_service_thread: Error, status 0x%08x, terminating\n");
+			break;
+		}
 	}
 	return 0;
 }
