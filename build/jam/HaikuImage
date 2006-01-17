@@ -12,14 +12,16 @@ if $(TARGET_ARCH) = x86 {
 
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname dstcheck
-	du echo eject env error factor false ffm find finddir fortune gawk $(X86_ONLY)gdb
-	grep groups gzip head id ifconfig iroster isvolume keymap kill less listarea
-	listattr listdev listimage listport listsem ln locate logname ls lsindex md5sum
-	mimeset mkdir mkindex modifiers mount mountvolume mv open ping play ppp_up
-	pppconfig ps pwd query quit renice rm rmattr rmindex rmdir roster safemode
-	screen_blanker sed settype setversion setvolume sh shutdown sleep strace sync sysinfo
-	tail tar tee top touch tput traceroute translate true tty uname unmount unzip uptime
-	version waitfor wc whoami xargs xres yes zip
+	du echo eject env error factor false ffm find finddir fortune funzip gawk $(X86_ONLY)gdb
+	grep groups gzip head id ifconfig iroster isvolume join keymap kill 
+	less lessecho lesskey link listarea listattr listdev listimage
+	listport listsem ln locate logname ls lsindex md5sum mimeset mkdir mkindex
+	modifiers mount mountvolume mv open pathchk ping play ppp_up pppconfig ps pwd
+	query quit renice rm rmattr rmindex rmdir roster safemode screen_blanker sed settype
+	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
+	tail tar tee top touch tput traceroute translate true tty uname unmount unzip unzipsfx 
+	uptime version waitfor wc whoami xargs xres yes zdiff zforce zgrep zip zipcloak 
+	zipnote zipsplit zmore znew
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
@@ -118,6 +120,10 @@ AddSymlinkToHaikuImage home config be : /boot/beos/apps : Applications ;
 AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
 
 AddSymlinkToHaikuImage beos bin : less : more ;
+AddSymlinkToHaikuImage beos bin : gzip : gunzip ;
+AddSymlinkToHaikuImage beos bin : gzip : zcat ;
+AddSymlinkToHaikuImage beos bin : zdiff : zcmp ;
+AddSymlinkToHaikuImage beos bin : unzip : zipinfo ;
 
 
 # scripts and data files
