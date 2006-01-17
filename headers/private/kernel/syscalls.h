@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 struct dirent;
+struct fd_info;
 struct fd_set;
 struct fs_info;
 struct iovec;
@@ -180,7 +181,8 @@ extern ssize_t		_kern_write(int fd, off_t pos, const void *buffer, size_t buffer
 extern ssize_t		_kern_writev(int fd, off_t pos, const struct iovec *vecs,
 						size_t count);
 extern status_t		_kern_ioctl(int fd, ulong cmd, void *data, size_t length);
-extern ssize_t		_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
+extern ssize_t		_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
+						uint32 maxCount);
 extern status_t		_kern_rewind_dir(int fd);
 extern status_t		_kern_read_stat(int fd, const char *path, bool traverseLink,
 						struct stat *stat, size_t statSize);
@@ -192,6 +194,8 @@ extern int			_kern_dup(int fd);
 extern int			_kern_dup2(int ofd, int nfd);
 extern status_t		_kern_lock_node(int fd);
 extern status_t		_kern_unlock_node(int fd);
+extern status_t		_kern_get_next_fd_info(team_id team, uint32 *_cookie,
+						struct fd_info *info, size_t infoSize);
 
 // node monitor functions
 extern status_t		_kern_stop_notifying(port_id port, uint32 token);

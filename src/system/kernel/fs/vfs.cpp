@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -5561,6 +5561,73 @@ _kern_next_device(int32 *_cookie)
 }
 
 
+status_t
+_kern_get_next_fd_info(team_id teamID, uint32 *_cookie, fd_info *info,
+	size_t infoSize)
+{
+	if (infoSize != sizeof(fd_info))
+		return B_BAD_VALUE;
+
+	struct io_context *context = NULL;
+	sem_id contextMutex = -1;
+	struct team *team = NULL;
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(teamID);
+	if (team) {
+		context = (io_context *)team->io_context;
+		contextMutex = context->io_mutex.sem;
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	// we now have a context - since we couldn't lock it while having
+	// safe access to the team structure, we now need to lock the mutex
+	// manually
+
+	if (context == NULL || acquire_sem(contextMutex) != B_OK) {
+		// team doesn't exit or seems to be gone
+		return B_BAD_TEAM_ID;
+	}
+
+	// the team cannot be deleted completely while we're owning its
+	// io_context mutex, so we can safely play with it now
+
+	context->io_mutex.holder = thread_get_current_thread_id();
+
+	uint32 slot = *_cookie;
+
+	struct file_descriptor *descriptor;
+	while (slot < context->table_size && (descriptor = context->fds[slot]) == NULL)
+		slot++;
+
+	if (slot >= context->table_size) {
+		mutex_unlock(&context->io_mutex);
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	info->number = slot;
+	info->open_mode = descriptor->open_mode;
+
+	struct vnode *vnode = fd_vnode(descriptor);
+	if (vnode != NULL) {
+		info->device = vnode->device;
+		info->node = vnode->id;
+	} else if (descriptor->u.mount != NULL) {
+		info->device = descriptor->u.mount->id;
+		info->node = -1;
+	}
+
+	mutex_unlock(&context->io_mutex);
+
+	*_cookie = slot + 1;
+	return B_OK;
+}
+
+
 int
 _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms)
 {
@@ -6269,6 +6336,32 @@ status_t
 _user_sync(void)
 {
 	return _kern_sync();
+}
+
+
+status_t
+_user_get_next_fd_info(team_id team, uint32 *userCookie, fd_info *userInfo,
+	size_t infoSize)
+{
+	struct fd_info info;
+	uint32 cookie;
+
+	if (infoSize != sizeof(fd_info))
+		return B_BAD_VALUE;
+
+	if (!IS_USER_ADDRESS(userCookie) || !IS_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(uint32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status_t status = _kern_get_next_fd_info(team, &cookie, &info, infoSize);
+	if (status < B_OK)
+		return status;
+
+	if (user_memcpy(userCookie, &cookie, sizeof(uint32)) < B_OK
+		|| user_memcpy(userInfo, &info, infoSize) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 

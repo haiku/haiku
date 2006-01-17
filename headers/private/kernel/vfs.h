@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -43,6 +43,12 @@ typedef struct io_context {
 	uint32		max_monitors;
 } io_context;
 
+struct fd_info {
+	int		number;
+	int32	open_mode;
+	dev_t	device;
+	ino_t	node;
+};
 
 /* macro to allocate a iovec array on the stack */
 #define IOVECS(name, size) \
@@ -111,6 +117,8 @@ status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 dev_t _user_next_device(int32 *_cookie);
 status_t _user_sync(void);
+status_t _user_get_next_fd_info(team_id team, uint32 *cookie, struct fd_info *info,
+			size_t infoSize);
 status_t _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 			char *userPath, size_t pathLength);
 int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms);
