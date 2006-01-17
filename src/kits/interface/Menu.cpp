@@ -532,11 +532,9 @@ BMenu::SetEnabled(bool enabled)
 		return;
 
 	fEnabled = enabled;
-	for (int32 i = 0; i < CountItems(); i++)
-		ItemAt(i)->SetEnabled(enabled);
 	
-	if (fSuper)
-		fSuper->SetEnabled(enabled);
+	if (fSuperitem)
+		fSuperitem->SetEnabled(enabled);
 }
 
 
@@ -582,7 +580,10 @@ BMenu::IsLabelFromMarked()
 bool
 BMenu::IsEnabled() const
 {
-	return fEnabled;
+	if (!fEnabled)
+		return false;
+
+	return fSuper ? fSuper->IsEnabled() : true ;
 }
 
 
