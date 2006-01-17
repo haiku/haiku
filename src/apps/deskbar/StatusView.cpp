@@ -157,7 +157,9 @@ TReplicantTray::DetachedFromWindow()
 {
 #ifdef DB_ADDONS
 	// clean up add-on support
+#if !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 	DeleteAddOnSupport();
+#endif
 #endif
 	BView::DetachedFromWindow();
 }
