@@ -565,9 +565,10 @@ EventDispatcher::_AddTokens(BMessage* message, EventTarget* target,
 		if ((listener->EffectiveEventMask() & eventMask) == 0)
 			continue;
 
-		if (nextMouseMoved != NULL
+		if (nextMouseMoved != NULL && message->what == B_MOUSE_MOVED
 			&& (listener->EffectiveOptions() & B_NO_POINTER_HISTORY) != 0
-			&& message != nextMouseMoved) {
+			&& message != nextMouseMoved
+			&& _viewToken != NULL) {
 			if (listener->token == *_viewToken) {
 				// focus view doesn't want to get pointer history
 				*_viewToken = B_NULL_TOKEN;
