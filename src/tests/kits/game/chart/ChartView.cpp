@@ -24,8 +24,8 @@ void ChartView::Draw(BRect r)
 	ChartWindow		*w;
 	
 	w = dynamic_cast<ChartWindow *>(Window());
-	if ((w->offscreen != 0) && (w->set.display == DISPLAY_BITMAP))
-		DrawBitmap(w->offscreen, r, r);
+	if ((w->fOffscreen != 0) && (w->fCurrentSettings.display == DISPLAY_BITMAP))
+		DrawBitmap(w->fOffscreen, r, r);
 }
 
 /* Send a message to the window if the user click anywhere in the animation
@@ -48,11 +48,8 @@ BView(rect, "", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
    as encoded by step. */
 void InstantView::Draw(BRect r)
 {
-	int32			i;
-	ChartWindow		*w;
-	
-	w = dynamic_cast<ChartWindow *>(Window());
-	for (i=0; i< w->instant_load_level; i++) {
+	ChartWindow *w = dynamic_cast<ChartWindow *>(Window());
+	for (int32 i=0; i< w->fInstantLoadLevel; i++) {
 		if (i<step) SetHighColor(255.0, 90.0, 90.0);
 		else if ((i/step) & 1) SetHighColor(90.0, 255.0, 90.0);
 		else SetHighColor(40.0, 200.0, 40.0);

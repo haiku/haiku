@@ -14,22 +14,14 @@
 #ifndef CHART_WINDOW_H
 #define CHART_WINDOW_H
 
-#ifndef _DIRECT_WINDOW_H
 #include <DirectWindow.h>
-#endif
-
-#ifndef CHART_VIEW_H
-#include "ChartView.h"
-#endif
-
 #include <OS.h>
 #include <Locker.h>
 #include <StringView.h>
 #include <PictureButton.h>
 
-#ifndef _CHART_RENDER_
 #include "ChartRender.h"
-#endif
+#include "ChartView.h"
 
 /* This window can be used in 3 modes : window mode is just a
    normal window (that you move and resize freely), fullscreen
@@ -155,6 +147,10 @@ public:
 	void		Set(const float alpha, const float theta, const float phi);
 };
 
+
+class BBox;
+class BView;
+
 /* The main window class, encapsulating both UI and engine. */
 class ChartWindow : public BDirectWindow {
 public:
@@ -237,17 +233,24 @@ virtual	void	FrameResized(float new_width, float new_height);
 	/* public instance members */
 		/* the current instantenuous potential frame/rate
 		   as display by the vue-meter. */
-		int32			instant_load_level;
+		int32			fInstantLoadLevel;
 		/* the offscreen Bitmap used, if any. */	
-		BBitmap			*offscreen;
+		BBitmap			*fOffscreen;
 		/* the current active setting used by the engine */
-		setting			set;
+		setting			fCurrentSettings;
 
 
 
 /* the private stuff... */		
 private:
 	/* User Interface related stuff. */
+		BBox		*fStatusBox;
+		BBox		*fColorsBox;
+		BBox		*fSpecialBox;
+		
+		BView		*fLeftView;
+		BView		*fTopView;
+
 		/* Find a window by its name if already opened. */
 static	BWindow		*GetAppWindow(char *name);
 		/* Used to set the content of PictureButton. */
@@ -372,9 +375,9 @@ inline	void		CrcStep();
 		
 		/* various UI object that we need to reach directly. */
 		BButton			*offwindow_button;
-		ChartView		*background;
+		ChartView		*fChartView;
 		BStringView		*cpu_load, *frames;
-		InstantView		*instant_load;
+		InstantView		*fInstantLoad;
 		BPictureButton	*color_button, *density_button, *refresh_button;
 
 		/* states used to describe the camera position, rotation
@@ -409,8 +412,8 @@ inline	void		CrcStep();
 		star_packet		specials;
 		
 		/* the two processing threads. */
-		thread_id		animation_thread;
-		thread_id		second_animation_thread;
+		thread_id		fAnimationThread;
+		thread_id		fSecondAnimationThread;
 		
 		/* context of the second processing thread (when used). */
 		float			second_thread_threshold;
@@ -422,13 +425,13 @@ inline	void		CrcStep();
 		star_packet		specials2;
 		
 		/* Flag used to terminate the processing threads */
-		bool			kill_my_thread;
+		bool			fKillThread;
 		
 		/* Direct connection status */
-		bool			direct_connected;
+		bool			fDirectConnected;
 		
 		/* used to synchronise the star animation drawing. */
-		sem_id			drawing_lock;
+		sem_id			fDrawingLock;
 };
 
 #endif
