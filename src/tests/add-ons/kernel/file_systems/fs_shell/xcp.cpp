@@ -1125,15 +1125,15 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 int
 do_xcp(int argc, char **argv)
 {
-	enum { MAX_SOURCE_FILES = 128 };
-	const char *sources[MAX_SOURCE_FILES];
 	int sourceCount = 0;
 	Options options;
 
-	if (argc > MAX_SOURCE_FILES) {
-		fprintf(stderr, "Too many args!\n");
+	const char **sources = new const char*[argc];
+	if (!sources) {
+		fprintf(stderr, "No memory!\n");
 		return FS_EINVAL;
 	}
+	ArrayDeleter<const char*> _(sources);
 
 	// parse parameters
 	for (int argi = 1; argi < argc; argi++) {
