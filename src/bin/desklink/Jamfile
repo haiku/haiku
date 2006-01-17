@@ -9,12 +9,11 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need the public headers also when not compiling for Haiku.
 }
 
-AddResources desklink : desklink.rsrc ;
-
 BinCommand desklink :
 	desklink.cpp
 	VolumeSlider.cpp
 	DeskButton.cpp
 	: be libmedia.so
+	: desklink.rdef
 	;
 

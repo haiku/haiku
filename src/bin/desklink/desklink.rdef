@@ -1,0 +1,13 @@
+
+resource app_signature "application/x-vnd.be.desklink";
+
+resource file_types message;
+
+resource app_version
+{
+	short_info = "Haiku-Desklink",
+	long_info  = "Haiku version of Desklink"
+};
+
+resource app_flags B_MULTIPLE_LAUNCH|B_ARGV_ONLY|B_BACKGROUND_APP ;
+
