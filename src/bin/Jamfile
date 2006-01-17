@@ -3,10 +3,9 @@ SubDir HAIKU_TOP src bin ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders app ;
-UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
-UseArchHeaders $(TARGET_ARCH) ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
 # standard commands that don't need any additional library
@@ -21,6 +20,7 @@ StdBinCommands
 #	echo.c
 	eject.c
 	error.c
+	fdinfo.cpp
 	fortune.c
 	finddir.c
 	hd.c
