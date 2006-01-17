@@ -6346,6 +6346,10 @@ _user_get_next_fd_info(team_id team, uint32 *userCookie, fd_info *userInfo,
 	struct fd_info info;
 	uint32 cookie;
 
+	// only root can do this (or should root's group be enough?)
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+
 	if (infoSize != sizeof(fd_info))
 		return B_BAD_VALUE;
 
