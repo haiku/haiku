@@ -71,10 +71,6 @@ private:
 };
 
 
-status_t do_playback(void * data, int32 size, BList& pictures,
-	void **callBackTable, int32 tableEntries, void *user);
-
-
 BPicture::BPicture()
 	:
 	token(-1),
@@ -265,7 +261,8 @@ BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 	if (!assert_local_copy())
 		return B_ERROR;
 
-	return do_playback(const_cast<void *>(extent->Data()), extent->Size(), extent->Pictures(),
+	BList &pictures = extent->Pictures();
+	return do_playback(const_cast<void *>(extent->Data()), extent->Size(), &pictures,
 		callBackTable, tableEntries, user);
 }
 
@@ -584,7 +581,7 @@ BPicture::step_down()
 
 
 status_t
-do_playback(void * data, int32 size, BList& pictures,
+do_playback(void * data, int32 size, BList* pictures,
 	void **callBackTable, int32 tableEntries, void *user)
 {
 	TPicture picture(data, size, pictures);

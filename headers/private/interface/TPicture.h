@@ -23,31 +23,20 @@
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	TPicture is used to create and play picture data.
 //------------------------------------------------------------------------------
-
 #ifndef	_TPICTURE_H
 #define	_TPICTURE_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <GraphicsDefs.h>
 #include <Point.h>
 #include <Rect.h>
 #include <DataIO.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-// TPicture class --------------------------------------------------------------
 class TPicture {
 public:
 					TPicture();
-					TPicture(void *data, int32 size, BList &pictures);
+					TPicture(void *data, int32 size, BList *pictures);
 virtual				~TPicture();
 
 		int16		GetOp();
@@ -109,10 +98,10 @@ virtual				~TPicture();
 private:
 		BMemoryIO	fData;
 		int32		fSize;
-		BList		&fPictures;
+		BList		*fPictures;
 };
 //------------------------------------------------------------------------------
 
-//status_t do_playback(void *, long, BArray<BPicture *> &, void **, long, void *)
+status_t do_playback(void *, long, BList *, void **, long, void *);
 
 #endif // _TPICTURE_H

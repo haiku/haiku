@@ -36,7 +36,6 @@ Server app_server :
 	OffscreenServerWindow.cpp
 	OffscreenWindowLayer.cpp
 	PNGDump.cpp
-	PicturePlayer.cpp
 	RAMLinkMsgReader.cpp
 	RGBColor.cpp
 	ScreenManager.cpp

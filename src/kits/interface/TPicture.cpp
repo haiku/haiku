@@ -61,7 +61,7 @@ typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, void*);
 
 //------------------------------------------------------------------------------
-TPicture::TPicture(void *data, int32 size, BList &pictures)
+TPicture::TPicture(void *data, int32 size, BList *pictures)
 	:	fData(data, size),
 		fPictures(pictures)
 {

@@ -196,11 +196,14 @@ BMenuItem::SetLabel(const char *string)
 void
 BMenuItem::SetEnabled(bool state)
 {
-	if (fSubmenu != NULL)
-		fSubmenu->SetEnabled(state);
+	if (fEnabled == state)
+		return;
 
 	fEnabled = state;
 	
+	if (fSubmenu != NULL)
+		fSubmenu->SetEnabled(state);
+
 	BMenu *menu = Menu();
 	if (menu != NULL && menu->LockLooper()) {
 		menu->Invalidate(fBounds);
