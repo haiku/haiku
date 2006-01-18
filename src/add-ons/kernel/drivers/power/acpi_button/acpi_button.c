@@ -5,6 +5,7 @@
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <Errors.h>
+#include <string.h>
 
 #include <ACPI.h>
 
