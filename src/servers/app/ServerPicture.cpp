@@ -1,12 +1,15 @@
+#include "DrawingEngine.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerTokenSpace.h"
 #include "ViewLayer.h"
+#include "WindowLayer.h"
 
 #include <ServerProtocol.h>
 #include <TPicture.h>
 
 #include <stdio.h>
+
 
 static void
 nop()
@@ -26,30 +29,25 @@ move_pen_by(ViewLayer *view, BPoint delta)
 static void
 stroke_line(ViewLayer *view, BPoint start, BPoint end)
 {
-	//view->MovePenTo(start);
-	//view->StrokeLine(end);
-	printf("StrokeLine(BPoint(%.2f, %.2f), BPoint(%.2f, %.2f))\n", start.x, start.y, 
-		end.x, end.y);
+	view->ConvertToScreenForDrawing(&start);
+	view->ConvertToScreenForDrawing(&end);	
+	view->Window()->GetDrawingEngine()->StrokeLine(start, end, view->CurrentState()->HighColor());
 }
 
 
 static void
 stroke_rect(ViewLayer *view, BRect rect)
 {
-	//view->StrokeRect(rect);
-
-	printf("StrokeRect(BRect(%.2f, %.2f, %.2f, %.2f))\n", rect.left, rect.top,
-		rect.right, rect.bottom);
+	view->ConvertToScreenForDrawing(&rect);	
+	view->Window()->GetDrawingEngine()->StrokeRect(rect, view->CurrentState()->HighColor());
 }
 
 
 static void
 fill_rect(ViewLayer *view, BRect rect)
 {
-	//view->FillRect(rect);
-
-	printf("FillRect(BRect(%.2f, %.2f, %.2f, %.2f))\n", rect.left, rect.top,
-		rect.right, rect.bottom);
+	view->ConvertToScreenForDrawing(&rect);			
+	view->Window()->GetDrawingEngine()->FillRect(rect, view->CurrentState()->HighColor());
 }
 
 
@@ -297,20 +295,14 @@ set_pen_size(ViewLayer *view, float size)
 static void
 set_fore_color(ViewLayer *view, rgb_color color)
 {
-	//view->SetHighColor(color);
-
-	printf("SetForeColor(%d, %d, %d, %d)\n", color.red, color.green,
-		color.blue, color.alpha);
+	view->CurrentState()->SetHighColor(RGBColor(color));
 }
 
 
 static void
 set_back_color(ViewLayer *view, rgb_color color)
 {
-	//view->SetLowColor(color);
-
-	printf("SetBackColor(%d, %d, %d, %d)\n", color.red, color.green,
-		color.blue, color.alpha);
+	view->CurrentState()->SetLowColor(RGBColor(color));
 }
 
 

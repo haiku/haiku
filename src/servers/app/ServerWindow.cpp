@@ -2187,6 +2187,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				if (picture != NULL) {
 					fCurrentLayer->ConvertToScreenForDrawing(&where);
 					fCurrentLayer->CurrentState()->SetPenLocation(where);
+					// TODO: pass the location to the play method and handle it there
 					picture->Play(fCurrentLayer);
 				}
 			}
@@ -2218,12 +2219,41 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 	
 	switch (code) {
 		case AS_FILL_RECT:
+		case AS_STROKE_RECT:
 		{
 			BRect rect;
 			link.Read<BRect>(&rect);
 
-			picture->BeginOp(B_PIC_FILL_RECT);
+			picture->BeginOp(code == AS_FILL_RECT ? B_PIC_FILL_RECT : B_PIC_STROKE_RECT);
 			picture->AddRect(rect);
+			picture->EndOp();
+			break;
+		}
+		
+		case AS_STROKE_LINE:
+		{
+			float x1, y1, x2, y2;
+
+			link.Read<float>(&x1);
+			link.Read<float>(&y1);
+			link.Read<float>(&x2);
+			link.Read<float>(&y2);
+
+			picture->BeginOp(B_PIC_STROKE_LINE);
+			picture->AddCoord(BPoint(x1, y1));
+			picture->AddCoord(BPoint(x2, y2));
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_SET_LOW_COLOR:
+		case AS_LAYER_SET_HIGH_COLOR:
+		{
+			rgb_color color;
+			link.Read(&color, sizeof(rgb_color));
+
+			picture->BeginOp(code == AS_LAYER_SET_HIGH_COLOR ? B_PIC_SET_FORE_COLOR : B_PIC_SET_BACK_COLOR);
+			picture->AddColor(color);
 			picture->EndOp();
 			break;
 		}
