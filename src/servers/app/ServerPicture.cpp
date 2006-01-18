@@ -8,6 +8,8 @@
 #include <ServerProtocol.h>
 #include <TPicture.h>
 
+#include <Bitmap.h>
+
 #include <stdio.h>
 
 
@@ -162,13 +164,15 @@ fill_shape(ViewLayer *view, BShape *shape)
 
 
 static void
-draw_string(ViewLayer *view, char *string, float deltax, float deltay)
+draw_string(ViewLayer *view, char *string, float deltaSpace, float deltaNonSpace)
 {
-	//int32 len = string ? strlen(string) : 0;
-
-	//view->DrawString(string, len, NULL);
-
-	printf("DrawString(\"%s\", %.2f, %.2f)\n", string, deltax, deltay);
+	BPoint location = view->CurrentState()->PenLocation();
+	escapement_delta delta = {deltaSpace, deltaNonSpace };
+	view->ConvertToScreenForDrawing(&location);
+	view->Window()->GetDrawingEngine()->DrawString(string, strlen(string), location,
+		view->CurrentState(), &delta);
+	// TODO: Update pen location ?
+	
 }
 
 
@@ -176,19 +180,18 @@ static void
 draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 				 int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
-	//ServerBitmap bitmap(BRect(0, 0, width - 1, height - 1),
-	//	(color_space)pixelFormat);
+	/*BBitmap *bitmap = new (nothrow) BBitmap(BRect(0, 0, width - 1, height - 1),
+				flags | B_BITMAP_NO_SERVER_LINK, (color_space)pixelFormat);
+	
+	if (bitmap == NULL || bitmap->ImportBits(data, bytesPerRow * height,
+			bitmap->BytesPerRow(), 0, (color_space)pixelFormat) < B_OK)
+		return;
 
-	//bitmap.SetBits(data, bytesPerRow * height, 0, (color_space)pixelFormat);
+	view->ConvertToScreenForDrawing(&dest);
+	
+	view->Window()->GetDrawingEngine()->DrawBitmap(bitmap, src, dest, view->CurrentState());
 
-	//view->DrawBitmap(&bitmap, src, dest);
-
-	printf("DrawPixels(BRect(%.2f, %.2f, %.2f, %.2f),\n"
-		"BRect(%.2f, %.2f, %.2f, %.2f),\n"
-		"%ld, %ld, %ld, %ld, %ld)\n",
-		src.left, src.top, src.right, src.bottom,
-		dest.left, dest.top, dest.right, dest.bottom,
-		width, height, bytesPerRow, pixelFormat, flags);
+	delete bitmap;*/
 }
 
 

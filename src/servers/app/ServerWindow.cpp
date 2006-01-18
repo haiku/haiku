@@ -2257,7 +2257,33 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
+		
+		case AS_DRAW_STRING:
+		{
+			char* string;
+			int32 length;
+			BPoint location;
+			escapement_delta delta;
 
+			link.Read<int32>(&length);
+			link.Read<BPoint>(&location);
+			link.Read<escapement_delta>(&delta);
+			link.ReadString(&string);
+
+			picture->BeginOp(B_PIC_MOVE_PEN_BY);
+			picture->AddCoord(location - fCurrentLayer->CurrentState()->PenLocation());
+			picture->EndOp();
+		
+			picture->BeginOp(B_PIC_DRAW_STRING);
+			picture->AddInt32(length);
+			picture->AddData(string, length);
+			picture->AddFloat(delta.space);
+			picture->AddFloat(delta.nonspace);
+			picture->EndOp();
+
+			break;		
+		}
+		
 		case AS_LAYER_DRAW_BITMAP:
 		{
 			int32 token;
