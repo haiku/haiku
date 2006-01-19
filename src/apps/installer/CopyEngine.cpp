@@ -77,21 +77,32 @@ CopyEngine::LaunchFinishScript(BPath &path)
 void
 CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
-	PartitionMenuItem *item = (PartitionMenuItem *)targetMenu->FindMarked();
-	if (!item)
+	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
+	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
+	if (!srcItem || !targetItem)
 		return;
 
-	BPath directory;
+	BPath targetDirectory;
 	BDiskDevice device;
 	BPartition *partition;
-	if (fDDRoster.GetPartitionWithID(item->ID(), &device, &partition) == B_OK) {
-		if (partition->GetMountPoint(&directory)!=B_OK)
+	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
+		if (partition->GetMountPoint(&targetDirectory)!=B_OK)
 			return;
-	} else if (fDDRoster.GetDeviceWithID(item->ID(), &device) == B_OK) {
-		if (device.GetMountPoint(&directory)!=B_OK)
+	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
+		if (device.GetMountPoint(&targetDirectory)!=B_OK)
 			return;
 	} else 
 		return; // shouldn't happen
+
+	BPath srcDirectory;
+        if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
+                if (partition->GetMountPoint(&srcDirectory)!=B_OK)
+                        return;
+        } else if (fDDRoster.GetDeviceWithID(srcItem->ID(), &device) == B_OK) {
+                if (device.GetMountPoint(&srcDirectory)!=B_OK)
+                        return;
+        } else
+                return; // shouldn't happen
 	
 	// check not installing on boot volume
 	BVolume bootVolume;
@@ -102,7 +113,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	bootVolume.GetRootDirectory(&bootDir);
 	bootDir.GetEntry(&bootEntry);
 	bootEntry.GetPath(&bootPath);
-	if (strncmp(bootPath.Path(), directory.Path(), strlen(bootPath.Path())) == 0) {
+	if (strncmp(bootPath.Path(), targetDirectory.Path(), strlen(bootPath.Path())) == 0) {
 		
 	}
 
@@ -110,18 +121,19 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 
 	// ask if init ou mount as is
 
-	LaunchInitScript(directory);
+	LaunchInitScript(targetDirectory);
 
 	// copy source volume
-	BDirectory targetDir(directory.Path());
-	bootPath.Append("/beos");
-	BEntry srcEntry(bootPath.Path());
+	BDirectory targetDir(targetDirectory.Path());
+	srcDirectory.Append("beos");
+	BEntry srcEntry(srcDirectory.Path());
 	Undo undo;
+	printf("Copying folder '%s' to '%s'.\n", srcDirectory.Path(), targetDirectory.Path());
 	FSCopyFolder(&srcEntry, &targetDir, fControl, NULL, false, undo);
 
 	// copy selected packages
 
-	LaunchFinishScript(directory);
+	LaunchFinishScript(targetDirectory);
 }
 
 
