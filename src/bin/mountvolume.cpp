@@ -147,7 +147,9 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				(readOnly ? B_MOUNT_READ_ONLY : 0));
 			if (!silent) {
 				if (error >= B_OK) {
-					printf("Volume `%s' mounted successfully.\n", name);
+					BPath mountPoint;
+					partition->GetMountPoint(&mountPoint);
+					printf("Volume `%s' mounted successfully at '%s'.\n", name, mountPoint.Path());
 				} else {
 					fprintf(stderr, "Failed to mount volume `%s': %s\n",
 						name, strerror(error));
