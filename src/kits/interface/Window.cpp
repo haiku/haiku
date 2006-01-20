@@ -2533,14 +2533,9 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 			// is there a token of the view that is currently under the mouse?
 			int32 token;
 			if (message->FindInt32("_view_token", &token) == B_OK) {
-				BHandler* handler;
-				if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
-						(void**)&handler) == B_OK
-					&& handler->Looper() == this) {
-					BView* view = dynamic_cast<BView*>(handler);
-					if (view != NULL)
-						return view;
-				}
+				BView* view = _FindView(token);
+				if (view != NULL)
+					return view;
 			}
 
 			// if there is no valid token in the message, we try our
@@ -2626,23 +2621,35 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message, BHandler** _
 	// if there is a last mouse moved view, and the new focus is
 	// different, the previous view wants to get its B_EXITED_VIEW
 	// message
-	if (cookie.last_view_token != B_NULL_TOKEN && fLastMouseMovedView != cookie.focus) {
+	if (cookie.last_view_token != B_NULL_TOKEN && fLastMouseMovedView != NULL
+		&& fLastMouseMovedView != cookie.focus) {
 		*_message = new BMessage(*cookie.message);
 		*_target = fLastMouseMovedView;
 		cookie.last_view_token = B_NULL_TOKEN;
 		return true;
 	}
 
-	if (cookie.index > 0) {
+	bool dispatchToFocus = true;
+
+	// check if the focus token is still valid (could have been removed in the mean time)
+	BHandler* handler;
+	if (gDefaultTokens.GetToken(cookie.focus_token, B_HANDLER_TOKEN, (void**)&handler) != B_OK
+		|| handler->Looper() != this)
+		dispatchToFocus = false;
+	
+	if (dispatchToFocus && cookie.index > 0) {
 		// should this message still be dispatched by the focus view?
 		bool feedFocus;
 		if (!cookie.found_focus
 			&& (cookie.message->FindBool("_feed_focus", &feedFocus) != B_OK
-				|| feedFocus == false)) {
-			delete cookie.message;
-			cookie.message = NULL;
-			return false;
-		}
+				|| feedFocus == false))
+			dispatchToFocus = false;
+	}
+
+	if (!dispatchToFocus) {
+		delete cookie.message;
+		cookie.message = NULL;
+		return false;
 	}
 
 	*_message = cookie.message;
@@ -2679,13 +2686,8 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 					// is there a token of the view that is currently under the mouse?
 					BView* viewUnderMouse = NULL;
 					int32 token;
-					if (message->FindInt32("_view_token", &token) == B_OK) {
-						BHandler* handler;
-						if (gDefaultTokens.GetToken(token, B_HANDLER_TOKEN,
-								(void**)&handler) == B_OK
-							&& handler->Looper() == this)
-							viewUnderMouse = dynamic_cast<BView*>(handler);
-					}
+					if (message->FindInt32("_view_token", &token) == B_OK)
+						viewUnderMouse = _FindView(token);
 
 					// add transit information
 					int32 transit;
