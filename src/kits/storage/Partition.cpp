@@ -516,6 +516,10 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	if (device < B_OK && deleteMountPoint)
 		rmdir(mountPoint);
 
+	// update object, if successful
+	if (device >= 0)
+		error = Device()->Update();
+
 	return device;
 }
 
@@ -543,7 +547,13 @@ BPartition::Unmount(uint32 unmountFlags)
 		return error;
 
 	// unmount
-	return fs_unmount_volume(partitionPath.Path(), unmountFlags);
+	error = fs_unmount_volume(partitionPath.Path(), unmountFlags);
+
+	// update object, if successful
+	if (error == B_OK)
+		error = Device()->Update();
+
+	return error;
 }
 
 // Device
