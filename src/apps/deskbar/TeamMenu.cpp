@@ -45,7 +45,7 @@ All rights reserved.
 
 
 TTeamMenu::TTeamMenu()
-	:	BMenu("Team Menu")
+	: BMenu("Team Menu")
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
@@ -53,10 +53,9 @@ TTeamMenu::TTeamMenu()
 
 
 int
-TTeamMenu::CompareByName( const void *first, const void *second)
+TTeamMenu::CompareByName(const void *first, const void *second)
 {
-	return strcasecmp(
-		(*(static_cast<BarTeamInfo * const*>(first )))->name,
+	return strcasecmp((*(static_cast<BarTeamInfo * const*>(first)))->name,
 		(*(static_cast<BarTeamInfo * const*>(second)))->name);
 }
 
@@ -113,6 +112,12 @@ TTeamMenu::AttachedToWindow()
 			barInfo->sig = NULL;
 		}
 		delete barInfo;
+	}
+
+	if (CountItems() == 0) {
+		BMenuItem *item = new BMenuItem("no application running", NULL);
+		item->SetEnabled(false);
+		AddItem(item);
 	}
 
 	if (dragging && barview->LockLooper()) {

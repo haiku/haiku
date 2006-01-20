@@ -92,10 +92,9 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView *bar, BRect frame, const char *name,
 
 
 int
-TExpandoMenuBar::CompareByName( const void *first, const void *second)
+TExpandoMenuBar::CompareByName(const void *first, const void *second)
 {
-	return strcasecmp(
-		(*(static_cast<BarTeamInfo * const*>(first )))->name,
+	return strcasecmp((*(static_cast<BarTeamInfo * const*>(first)))->name,
 		(*(static_cast<BarTeamInfo * const*>(second)))->name);
 }
 
@@ -157,6 +156,12 @@ TExpandoMenuBar::AttachedToWindow()
 	}
 
 	BMenuBar::AttachedToWindow();
+
+	if (CountItems() == 0) {
+		// If we're empty, BMenuBar::AttachedToWindow() resizes us to some
+		// weird value - we just override it again
+		ResizeTo(width, 0);
+	}
 
 	if (fVertical) {
 		sDoMonitor = true;
@@ -667,8 +672,9 @@ TExpandoMenuBar::DrawBackground(BRect)
 }
 
 
-//	something to help determine if we are showing too many apps
-//	need to add in scrolling functionality
+/**	Something to help determine if we are showing too many apps
+ *	need to add in scrolling functionality.
+ */
 
 void
 TExpandoMenuBar::CheckForSizeOverrun()
