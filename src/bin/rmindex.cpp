@@ -7,17 +7,17 @@
  *		Jérôme Duval
  */
 
-// std C includes
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 
-// BeOS C includes
 #include <fs_info.h>
 #include <fs_index.h>
 #include <TypeConstants.h>
 
+#include <errno.h>
 #include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 // The following enum and #define are copied from gnu/sys2.h, because it
 // didn't want to compile when including that directly.  Since that file
@@ -36,8 +36,7 @@ enum
 #define GETOPT_HELP_OPTION_DECL \
   "help", no_argument, 0, GETOPT_HELP_CHAR
 
-static struct option const longopts[] =
-{
+static struct option const longopts[] = {
 	{"volume", required_argument, 0, 'd'},
 	{"type", required_argument, 0, 't'},
 	{"verbose", no_argument, 0, 'v'},
@@ -45,8 +44,10 @@ static struct option const longopts[] =
 	{0, 0, 0, 0}
 };
 
+
 void usage(int);
 const char* lookup_index_type(uint32);
+
 
 int 
 main (int32 argc, char **argv)
