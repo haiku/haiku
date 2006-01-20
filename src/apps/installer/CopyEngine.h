@@ -17,9 +17,13 @@
 
 class InstallerWindow;
 
+const uint32 ENGINE_START = 'eSRT';
+
 class CopyEngine : public BLooper {
 public:
 	CopyEngine(InstallerWindow *window);
+	void MessageReceived(BMessage *msg);
+	void SetStatusMessage(char *status);
 	void Start(BMenu *srcMenu, BMenu *targetMenu);
 	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 

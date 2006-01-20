@@ -164,7 +164,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			StartScan();
 			break;
 		case BEGIN_MESSAGE:
-			fCopyEngine.Start(fSrcMenu, fDestMenu);
+			printf("BEGIN_MESSAGE\n");
+			BMessenger(&fCopyEngine).SendMessage(ENGINE_START);
 			break;
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
@@ -186,6 +187,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			sprintf(string, "Disk space required: %s", buffer);
 			fSizeView->SetText(string);
 			break;
+		}
+		case STATUS_MESSAGE: {
+			const char *status;
+			if (msg->FindString("status", &status) == B_OK)
+				SetStatusMessage(status);
 		}
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
@@ -373,7 +379,7 @@ InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
 
 
 void
-InstallerWindow::SetStatusMessage(char *text)
+InstallerWindow::SetStatusMessage(const char *text)
 {
 	BAutolock(this);
 	fStatusView->SetText(text);

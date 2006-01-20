@@ -15,6 +15,13 @@
 #include <String.h>
 #include <VolumeRoster.h>
 
+//#define COPY_TRACE
+#ifdef COPY_TRACE
+#define CALLED() 			printf("CALLED %s\n",__PRETTY_FUNCTION__)
+#else
+#define CALLED()
+#endif
+
 extern void SizeAsString(off_t size, char *string);
 
 class SourceVisitor : public BDiskDeviceVisitor 
@@ -45,6 +52,28 @@ CopyEngine::CopyEngine(InstallerWindow *window)
 	fWindow(window)
 {
 	fControl = new InstallerCopyLoopControl(window);
+	Run();
+}
+
+
+void
+CopyEngine::MessageReceived(BMessage*msg)
+{
+	CALLED();
+	switch (msg->what) {
+		case ENGINE_START:
+			Start(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
+			break;
+	}
+}
+
+
+void
+CopyEngine::SetStatusMessage(char *status)
+{
+	BMessage msg(STATUS_MESSAGE);
+	msg.AddString("status", status);
+	BMessenger(fWindow).SendMessage(&msg);
 }
 
 
@@ -56,7 +85,7 @@ CopyEngine::LaunchInitScript(BPath &path)
 	BString command(bootPath.Path());
 	command += "/InstallerInitScript ";
 	command += path.Path();
-	fWindow->SetStatusMessage("Starting Installation.");	
+	SetStatusMessage("Starting Installation.");	
 	system(command.String());
 }
 
@@ -69,7 +98,7 @@ CopyEngine::LaunchFinishScript(BPath &path)
 	BString command(bootPath.Path());
 	command += "/InstallerFinishScript ";
 	command += path.Path();
-	fWindow->SetStatusMessage("Finishing Installation.");	
+	SetStatusMessage("Finishing Installation.");	
 	system(command.String());
 }
 
@@ -77,10 +106,13 @@ CopyEngine::LaunchFinishScript(BPath &path)
 void
 CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
+	CALLED();
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
 	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
-	if (!srcItem || !targetItem)
+	if (!srcItem || !targetItem) {
+		fprintf(stderr, "bad menu items\n");
 		return;
+	}
 
 	BPath targetDirectory;
 	BDiskDevice device;
@@ -113,6 +145,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	bootVolume.GetRootDirectory(&bootDir);
 	bootDir.GetEntry(&bootEntry);
 	bootEntry.GetPath(&bootPath);
+	printf("Copying to boot disk ? '%s' / '%s'\n", bootPath.Path(), targetDirectory.Path());
 	if (strncmp(bootPath.Path(), targetDirectory.Path(), strlen(bootPath.Path())) == 0) {
 		
 	}

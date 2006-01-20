@@ -19,6 +19,8 @@
 
 #define INSTALLER_RIGHT 402
 
+const uint32 STATUS_MESSAGE = 'iSTM';
+
 class InstallerWindow : public BWindow {
 public:
 	InstallerWindow(BRect frameRect);
@@ -26,7 +28,9 @@ public:
 
 	virtual void MessageReceived(BMessage *msg);
 	virtual bool QuitRequested();
-	void SetStatusMessage(char *text);
+	void SetStatusMessage(const char *text);
+	BMenu *GetSourceMenu() { return fSrcMenu; };
+	BMenu *GetTargetMenu() { return fDestMenu; };
 private:
 	void DisableInterface(bool disable);
 	void LaunchDriveSetup();
