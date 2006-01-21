@@ -35,6 +35,8 @@ extern sem_id gDeviceOpenSemaphore;
 extern device_hooks sKeyboardDeviceHooks;
 extern device_hooks sMouseDeviceHooks;
 
+extern bool gMultiplexingActive;
+
 // prototypes from common.c
 
 status_t ps2_init_driver(void);

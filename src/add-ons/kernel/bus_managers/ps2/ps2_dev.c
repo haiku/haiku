@@ -16,10 +16,10 @@
 
 ps2_dev ps2_device[PS2_DEV_COUNT] =
 {
-	{ .name = "input/mouse/ps2/0",   .active = false, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/1",   .active = false, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/2",   .active = false, .result_sem = -1 },
-	{ .name = "input/mouse/ps2/3",   .active = false, .result_sem = -1 },
+	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1 },
+	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1 },
+	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1 },
+	{ .name = "input/mouse/ps2/3",   .active = false, .idx = 3, .result_sem = -1 },
 	{ .name = "input/keyboard/at/0", .active = false, .result_sem = -1, .flags = PS2_FLAG_KEYB }
 };
 
@@ -113,5 +113,59 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 		return keyboard_handle_int(data);
 	else
 		return mouse_handle_int(data);
+}
+
+
+status_t
+ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+{
+	status_t res = B_OK;
+	int i, count;
+	
+	dprintf("ps2_dev_command %02x, %d out, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
+	
+
+	dev->result_buf_cnt = in_count;
+	dev->result_buf_idx = 0;
+	dev->result_buf = in;
+
+	for (i = -1; res == B_OK && i < out_count; i++) {
+
+		if (!(dev->flags & PS2_FLAG_KEYB)) {
+			uint8 prefix_cmd;
+			if (gMultiplexingActive)
+				prefix_cmd = 0x90 + dev->idx;
+			else
+				prefix_cmd = 0xd4;
+			res = ps2_wait_write();
+			if (res == B_OK)
+				ps2_write_ctrl(prefix_cmd);
+		}
+
+		res = ps2_wait_write();
+		if (res == B_OK) {
+			ps2_write_data(i == -1 ? cmd : out[i]);
+		}
+	}
+	
+	if (res != B_OK) {
+		dprintf("ps2_dev_command send failed\n");
+	}
+
+	if (in_count != 0) {
+		dprintf("ps2_dev_command waiting for result\n");
+	
+		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+
+		count = in_count - dev->result_buf_cnt;
+		dev->result_buf_cnt = 0;
+	
+		dprintf("ps2_dev_command res %08x, in %d\n", res, count);
+
+		for (i = 0; i < count; i++)
+			dprintf("ps2_dev_command data %02x\n", in[i]);
+	}
+
+	return res;
 }
 

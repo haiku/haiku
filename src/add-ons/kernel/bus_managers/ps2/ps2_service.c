@@ -69,7 +69,7 @@ ps2_service_probe_device(ps2_dev *dev)
 	status_t res;
 
 	TRACE(("ps2_service_probe_device %s\n", dev->name));
-
+/*
 	if (dev->flags & PS2_FLAG_KEYB) {
 
 		res = ps2_command(0xae, NULL, 0, NULL, 0);
@@ -86,7 +86,7 @@ ps2_service_probe_device(ps2_dev *dev)
 		res = ps2_command(0xa9, NULL, 0, &d, 1);
 		dprintf("AUX test: res 0x%08x, d 0x%02x\n", res, d);
 	}
-	
+*/	
 	return B_OK;
 }
 

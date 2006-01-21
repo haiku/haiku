@@ -282,6 +282,7 @@ probe_mouse(size_t *probed_packet_size)
 				&& ps2_set_sample_rate(80) == B_OK) {
 				// get device id, again
 				ps2_mouse_command(PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
+				TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
 				break;
 			}
 		}

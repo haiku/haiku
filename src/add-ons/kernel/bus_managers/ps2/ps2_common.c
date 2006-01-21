@@ -48,7 +48,8 @@ sem_id gDeviceOpenSemaphore;
 
 static sem_id sKbcSem;
 static int32 sIgnoreInterrupts = 0;
-static bool sMultiplexingActive = false;
+
+bool gMultiplexingActive = false;
 
 
 inline uint8
@@ -68,6 +69,8 @@ ps2_read_data()
 inline void
 ps2_write_ctrl(uint8 ctrl)
 {
+	dprintf("ps2_write_ctrl 0x%02x\n", ctrl);
+
 	gIsa->write_io_8(PS2_PORT_CTRL, ctrl);
 }
 
@@ -75,6 +78,8 @@ ps2_write_ctrl(uint8 ctrl)
 inline void
 ps2_write_data(uint8 data)
 {
+	dprintf("ps2_write_data 0x%02x\n", data);
+
 	gIsa->write_io_8(PS2_PORT_DATA, data);
 }
 
@@ -162,22 +167,18 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	return res;
 }
 
-
 status_t
 ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
-
-	return B_OK;
+       return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], cmd, out, out_count, in, in_count);
 }
 
 
 status_t
 ps2_mouse_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
-
-	return B_OK;
-}
-
+       return ps2_dev_command(&ps2_device[PS2_DEVICE_MOUSE], cmd, out, out_count, in, in_count);
+}  
 
 //	#pragma mark -
 
@@ -205,8 +206,6 @@ ps2_interrupt(void* cookie)
 	uint8 data;
 	ps2_dev *dev;
 	
-	TRACE(("ps2_interrupt\n"));
-	
 	ctrl = ps2_read_ctrl();
 	if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 		return B_UNHANDLED_INTERRUPT;
@@ -221,7 +220,12 @@ ps2_interrupt(void* cookie)
 	TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
 
 	if (ctrl & PS2_STATUS_MOUSE_DATA) {
-		uint8 idx = 0;
+		uint8 idx;
+		if (gMultiplexingActive) {
+			idx = ctrl >> 6;
+		} else {
+			idx = 0;
+		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
 		dev = &ps2_device[PS2_DEVICE_KEYB];
@@ -264,7 +268,7 @@ ps2_init_driver(void)
 		goto err_4;
 
 	{
-		uint8 d;
+		uint8 d, in, out;
 		status_t res;
 		
 		res = ps2_get_command_byte(&d);
@@ -275,11 +279,56 @@ ps2_init_driver(void)
 		
 		res = ps2_set_command_byte(d);
 		dprintf("ps2_set_command_byte: res 0x%08x, d 0x%02x\n", res, d);
+		
+		in = 0x00;
+		out = 0xf0;
+		res = ps2_command(0xd3, &out, 1, &in, 1);
+		dprintf("step1: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
+
+		in = 0x00;
+		out = 0x56;
+		res = ps2_command(0xd3, &out, 1, &in, 1);
+		dprintf("step2: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
+
+		in = 0x00;
+		out = 0xa4;
+		res = ps2_command(0xd3, &out, 1, &in, 1);
+		dprintf("step3: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
+		
+		if (res == B_OK && in != 0xa4) {
+			dprintf("found active multiplexing v%d.%d\n", (in >> 4), in & 0xf);
+			gMultiplexingActive = true;
+
+			res = ps2_command(0xa8, NULL, 0, NULL, 0);
+			dprintf("step4: res 0x%08x\n", res);
+
+			res = ps2_command(0x90, NULL, 0, NULL, 0);
+			dprintf("step5: res 0x%08x\n", res);
+			res = ps2_command(0xa8, NULL, 0, NULL, 0);
+			dprintf("step6: res 0x%08x\n", res);
+
+			res = ps2_command(0x91, NULL, 0, NULL, 0);
+			dprintf("step7: res 0x%08x\n", res);
+			res = ps2_command(0xa8, NULL, 0, NULL, 0);
+			dprintf("step8: res 0x%08x\n", res);
+
+			res = ps2_command(0x92, NULL, 0, NULL, 0);
+			dprintf("step9: res 0x%08x\n", res);
+			res = ps2_command(0xa8, NULL, 0, NULL, 0);
+			dprintf("step10: res 0x%08x\n", res);
+
+			res = ps2_command(0x93, NULL, 0, NULL, 0);
+			dprintf("step11: res 0x%08x\n", res);
+			res = ps2_command(0xa8, NULL, 0, NULL, 0);
+			dprintf("step12: res 0x%08x\n", res);
+			
+			
+		}
 	}
 
 	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
-	if (sMultiplexingActive) {
+	if (gMultiplexingActive) {
 		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
 		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
 		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
