@@ -1108,17 +1108,31 @@ BMenu::_track(int *action, long start)
 	ulong buttons;
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
+	
+	bigtime_t startTime = system_time();
+	bigtime_t clickTime = 0;
+	get_click_speed(&clickTime);
 	do {
 		if (!LockLooper())
 			break;
 	
+		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		GetMouse(&location, &buttons);
 					
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
-			if (item != fSelected)
+			if (item != fSelected) {
+				SelectItem(item, -1);
+				startTime = system_time();
+				snoozeAmount = 20000;
+			} else if (system_time() > clickTime + startTime && item->Submenu() 
+				&& item->Submenu()->Window() == NULL) {
+				// Open the submenu if it's not opened yet, but only if
+				// the mouse pointer stayed over there for some time
+				// (hysteresis)
 				SelectItem(item);
+			}
 		} else {
 			if (OverSuper(location)) {
 				UnlockLooper();
@@ -1128,7 +1142,8 @@ BMenu::_track(int *action, long start)
 				SelectItem(NULL);
 		}
 		
-		if (fSelected != NULL && fSelected->Submenu() != NULL) {
+		if (fSelected != NULL && fSelected->Submenu() != NULL
+			&& fSelected->Submenu()->Window() != NULL) {
 			UnlockLooper();
 			
 			int submenuAction = MENU_ACT_NONE;
@@ -1145,7 +1160,7 @@ BMenu::_track(int *action, long start)
 																
 		UnlockLooper();
 		
-		snooze(50000);
+		snooze(snoozeAmount);
 	} while (buttons != 0);
 	
 	if (localAction == MENU_ACT_NONE) {
