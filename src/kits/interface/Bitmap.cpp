@@ -819,6 +819,7 @@ BBitmap::BBitmap(BMessage *data)
 	InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
 
 	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
+		AssertPtr();
 		ssize_t size = 0;
 		const void *buffer;
 		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
@@ -880,7 +881,7 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		// true and it does save all formats as B_RAW_TYPE and it does save
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)
-			
+		const_cast<BBitmap *>(this)->AssertPtr();
 		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
 	}
 	
@@ -942,6 +943,7 @@ BBitmap::Area() const
 void *
 BBitmap::Bits() const
 {
+	const_cast<BBitmap *>(this)->AssertPtr();
 	return fBasePtr;
 }
 
@@ -1821,6 +1823,8 @@ status_t
 BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 					color_space colorSpace)
 {
+	AssertPtr();
+
 	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
 	// check params 
 	if (error == B_OK && (data == NULL || offset > fSize || length < 0))
@@ -2255,43 +2259,36 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				// Get token
 				link.Read<int32>(&fServerToken);
 
-				area_id area;
 				int32 areaOffset;
-				link.Read<area_id>(&area);
+				link.Read<area_id>(&fOrigArea);
 				link.Read<int32>(&areaOffset);
-
-				// Get the area in which the data resides
-// TODO: the actual cloning doesn't have to happen before someone calls Bits()
-//		that would make bitmap creation a lot cheaper and faster...
-				fArea = clone_area("shared bitmap area",
-								   (void**)&fBasePtr,
-								   B_ANY_ADDRESS,
-								   B_READ_AREA | B_WRITE_AREA,
-								   area);
-				if (fArea >= B_OK) {
-					// Jump to the location in the area
-					fBasePtr = (int8*)fBasePtr + areaOffset;
-
+				
+				// TODO: We save the area offset into "fArea" because
+				// we need it into AssertPtr(), and we can't add any member
+				// to BBitmap due to binary compatibility
+				fArea = (area_id)areaOffset;
+				
+				if (fOrigArea >= B_OK) {
 					fSize = size;
 					fColorSpace = colorSpace;
 					fBounds = bounds;
 					fBytesPerRow = bytesPerRow;
 					fFlags = flags;
 				} else
-					error = fArea;
+					error = fOrigArea;
 			}
 
 			if (error < B_OK) {
 				fBasePtr = NULL;
 				fServerToken = -1;
 				fArea = -1;
+				fOrigArea = -1;
 				// NOTE: why not "0" in case of error?
 				fFlags = flags;
 			}
 		}
 		fWindow = NULL;
 		fToken = -1;
-		fOrigArea = -1;
 	}
 
 	fInitError = error;
@@ -2330,7 +2327,7 @@ BBitmap::CleanUp()
 		link.StartMessage(AS_DELETE_BITMAP);
 		link.Attach<int32>(fServerToken);
 		link.Flush();
-
+		
 		delete_area(fArea);
 		fArea = -1;
 		fServerToken = -1;
@@ -2342,6 +2339,20 @@ BBitmap::CleanUp()
 void
 BBitmap::AssertPtr()
 {
-	// TODO: what's this supposed to do?
+	if (fBasePtr == NULL && InitCheck() == B_OK) {
+		// Offset was saved into "fArea" as we can't add
+		// any member variable due to Binary compatibility
+		int32 offset = (int32)fArea;
+		
+		// Get the area in which the data resides
+		fArea = clone_area("shared bitmap area", (void **)&fBasePtr, B_ANY_ADDRESS,
+								B_READ_AREA | B_WRITE_AREA, fOrigArea);
+		
+		if (fArea >= B_OK) {
+			// Jump to the location in the area
+			fBasePtr = (int8 *)fBasePtr + offset;
+		} else
+			fBasePtr = NULL;
+	}
 }
 
