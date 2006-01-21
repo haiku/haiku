@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-11/2005.
+	Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #define MODULE_BIT 0x00800000
@@ -16,7 +16,8 @@
 static status_t init_common(int the_fd);
 
 /* Initialization code shared between primary and cloned accelerants */
-static status_t init_common(int the_fd) {
+static status_t init_common(int the_fd)
+{
 	status_t result;
 	gx00_get_private_data gpd;
 	
@@ -92,7 +93,8 @@ We need to determine if the kernel driver and the accelerant are compatible.
 If they are, get the accelerant ready to handle other hook functions and
 report success or failure.
 */
-status_t INIT_ACCELERANT(int the_fd) {
+status_t INIT_ACCELERANT(int the_fd)
+{
 	status_t result;
 	int pointer_reservation; //mem reserved for pointer
 	int cnt; 				 //used for iteration through the overlay buffers
@@ -113,6 +115,13 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error0;
 	// LOG now available: !NULL si
+
+	/* ensure that INIT_ACCELERANT is executed just once (copies should be clones) */
+	if (si->accelerant_in_use)
+	{
+		result = B_NOT_ALLOWED;
+		goto error1;
+	}
 
 	/* assume G450/G550 signals are connected straight through (before powerup) */
 	si->crossed_conns = false;
@@ -192,6 +201,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* a winner! */
 	result = B_OK;
+	/* ensure that INIT_ACCELERANT won't be executed again (copies should be clones) */
+	si->accelerant_in_use = true;
 	goto error0;
 
 error1:
@@ -272,6 +283,13 @@ status_t CLONE_ACCELERANT(void *data) {
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error1;
 
+	/* ensure that INIT_ACCELERANT is executed first (i.e. primary accelerant exists) */
+	if (!(si->accelerant_in_use))
+	{
+		result = B_NOT_ALLOWED;
+		goto error2;
+	}
+
 	/* get shared area for display modes */
 	result = my_mode_list_area = clone_area(
 		DRIVER_PREFIX " cloned display_modes",
@@ -311,6 +329,9 @@ void UNINIT_ACCELERANT(void)
 		/* delete benaphores ONLY if we are the primary accelerant */
 		DELETE_BEN(si->engine.lock);
 		DELETE_BEN(si->overlay.lock);
+
+		/* ensure that INIT_ACCELERANT can be executed again */
+		si->accelerant_in_use = false;
 	}
 
 	/* free our mode list area */
