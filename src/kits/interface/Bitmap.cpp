@@ -701,7 +701,7 @@ BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 	  fBytesPerRow(0),
 	  fWindow(NULL),
 	  fServerToken(-1),
-	  fToken(-1),
+	  fAreaOffset(-1),
 	  fArea(-1),
 	  fOrigArea(-1),
 	  fFlags(0),
@@ -729,7 +729,7 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 	  fBytesPerRow(0),
 	  fWindow(NULL),
 	  fServerToken(-1),
-	  fToken(-1),
+	  fAreaOffset(-1),
 	  fArea(-1),
 	  fOrigArea(-1),
 	  fFlags(0),
@@ -760,7 +760,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 	  fBytesPerRow(0),
 	  fWindow(NULL),
 	  fServerToken(-1),
-	  fToken(-1),
+	  fAreaOffset(-1),
 	  fArea(-1),
 	  fOrigArea(-1),
 	  fFlags(0),
@@ -798,7 +798,7 @@ BBitmap::BBitmap(BMessage *data)
 	  fBytesPerRow(0),
 	  fWindow(NULL),
 	  fServerToken(-1),
-	  fToken(-1),
+	  fAreaOffset(-1),
 	  fArea(-1),
 	  fOrigArea(-1),
 	  fFlags(0),
@@ -933,6 +933,7 @@ BBitmap::UnlockBits()
 area_id
 BBitmap::Area() const
 {
+	const_cast<BBitmap *>(this)->AssertPtr();
 	return fArea;
 }
 
@@ -2258,15 +2259,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				// server side success
 				// Get token
 				link.Read<int32>(&fServerToken);
-
-				int32 areaOffset;
 				link.Read<area_id>(&fOrigArea);
-				link.Read<int32>(&areaOffset);
-				
-				// TODO: We save the area offset into "fArea" because
-				// we need it into AssertPtr(), and we can't add any member
-				// to BBitmap due to binary compatibility
-				fArea = (area_id)areaOffset;
+				link.Read<int32>(&fAreaOffset);
 				
 				if (fOrigArea >= B_OK) {
 					fSize = size;
@@ -2283,12 +2277,12 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				fServerToken = -1;
 				fArea = -1;
 				fOrigArea = -1;
+				fAreaOffset = -1;
 				// NOTE: why not "0" in case of error?
 				fFlags = flags;
 			}
 		}
 		fWindow = NULL;
-		fToken = -1;
 	}
 
 	fInitError = error;
@@ -2328,9 +2322,11 @@ BBitmap::CleanUp()
 		link.Attach<int32>(fServerToken);
 		link.Flush();
 		
-		delete_area(fArea);
+		if (fArea >= 0)
+			delete_area(fArea);
 		fArea = -1;
 		fServerToken = -1;
+		fAreaOffset = -1;
 	}
 	fBasePtr = NULL;
 }
@@ -2339,18 +2335,16 @@ BBitmap::CleanUp()
 void
 BBitmap::AssertPtr()
 {
-	if (fBasePtr == NULL && InitCheck() == B_OK) {
+	if (fBasePtr == NULL && fAreaOffset != -1 && InitCheck() == B_OK) {
 		// Offset was saved into "fArea" as we can't add
 		// any member variable due to Binary compatibility
-		int32 offset = (int32)fArea;
-		
 		// Get the area in which the data resides
 		fArea = clone_area("shared bitmap area", (void **)&fBasePtr, B_ANY_ADDRESS,
 								B_READ_AREA | B_WRITE_AREA, fOrigArea);
 		
 		if (fArea >= B_OK) {
 			// Jump to the location in the area
-			fBasePtr = (int8 *)fBasePtr + offset;
+			fBasePtr = (int8 *)fBasePtr + fAreaOffset;
 		} else
 			fBasePtr = NULL;
 	}

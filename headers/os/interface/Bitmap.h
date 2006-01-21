@@ -118,7 +118,7 @@ private:
 	int32		fBytesPerRow;
 	BWindow		*fWindow;
 	int32		fServerToken;
-	int32		fToken;
+	int32		fAreaOffset;
 	uint8		unused;
 	area_id		fArea;
 	area_id		fOrigArea;
