@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-11/2004.
+	Rudolf Cornelissen 5/2002-1/2006.
 */
 
 /* standard kernel driver stuff */
@@ -673,7 +673,6 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	thread_id	thid;
 	thread_info	thinfo;
 	status_t	result = B_OK;
-	vuint32		*regs, *regs2;
 	char shared_name[B_OS_NAME_LENGTH];
 
 	/* find the device name in the list of devices */
@@ -711,17 +710,25 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	si->device_id = di->pcii.device_id;
 	si->revision = di->pcii.revision;
 
+	/* ensure that the accelerant's INIT_ACCELERANT function can be executed */
+	si->accelerant_in_use = false;
+
 	/* map the device */
 	result = map_device(di);
 	if (result < 0) goto free_shared;
+
+	/* we will be returning OK status for sure now */
 	result = B_OK;
+
+	/* disable and clear any pending interrupts */
+	disable_vbi(di->regs, di->regs2);
+
+	/* preset we can't use INT related functions */
+	si->ps.int_assigned = false;
 
 	/* create a semaphore for vertical blank management */
 	si->vblank = create_sem(0, di->name);
-	if (si->vblank < 0) {
-		result = si->vblank;
-		goto unmap;
-	}
+	if (si->vblank < 0) goto mark_as_open;
 
 	/* change the owner of the semaphores to the opener's team */
 	/* this is required because apps can't aquire kernel semaphores */
@@ -729,30 +736,31 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	get_thread_info(thid, &thinfo);
 	set_sem_owner(si->vblank, thinfo.team);
 
-	/* assign local regs pointer for SAMPLExx() macros */
-	regs = di->regs;
-	regs2 = di->regs2;
-
-	/* disable and clear any pending interrupts */
-	disable_vbi(regs, regs2);
-
 	/* If there is a valid interrupt line assigned then set up interrupts */
 	if ((di->pcii.u.h0.interrupt_pin == 0x00) ||
 	    (di->pcii.u.h0.interrupt_line == 0xff) || /* no IRQ assigned */
 	    (di->pcii.u.h0.interrupt_line <= 0x02))   /* system IRQ assigned */
 	{
-		/* we are aborting! */
-		/* Note: the R4 graphics driver kit lacks this statement!! */
-		result = B_ERROR;
-		/* interrupt does not exist so exit without installing our handler */
-		goto delete_the_sem;
+		/* delete the semaphore as it won't be used */
+		delete_sem(si->vblank);
+		si->vblank = -1;
 	}
 	else
 	{
 		/* otherwise install our interrupt handler */
 		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nm_interrupt, (void *)di, 0);
 		/* bail if we couldn't install the handler */
-		if (result != B_OK) goto delete_the_sem;
+		if (result != B_OK)
+		{
+			/* delete the semaphore as it won't be used */
+			delete_sem(si->vblank);
+			si->vblank = -1;
+		}
+		else
+		{
+			/* inform accelerant(s) we can use INT related functions */
+			si->ps.int_assigned = true;
+		}
 	}
 
 mark_as_open:
@@ -764,12 +772,6 @@ mark_as_open:
 	
 	goto done;
 
-
-delete_the_sem:
-	delete_sem(si->vblank);
-
-unmap:
-	unmap_device(di);
 
 free_shared:
 	/* clean up our shared area */
@@ -835,13 +837,16 @@ free_hook (void* dev) {
 
 	/* disable and clear any pending interrupts */
 	disable_vbi(regs, regs2);
-	
-	/* remove interrupt handler */
-	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nm_interrupt, di);
 
-	/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
-	delete_sem(si->vblank);
-	si->vblank = -1;
+	if (si->ps.int_assigned)
+	{
+		/* remove interrupt handler */
+		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nm_interrupt, di);
+
+		/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
+		delete_sem(si->vblank);
+		si->vblank = -1;
+	}
 
 	/* free regs and framebuffer areas */
 	unmap_device(di);

@@ -4,6 +4,18 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head (svn 0.12, Rudolf)</h1></p>
+<ul>
+<li>Added capability to driver to run without an INT assigned. Driver will now automatically disable the 'Sync_to_Retrace' function if no INT was assigned instead of not loading/running at all;<br>
+<strong>Note please:</strong>
+<ul>
+ <li>The retrace semaphore is always disabled yet due to lack of specs for interrupt handling.
+</ul>
+<li>Several ProposeMode updates and fixes making the Neomagic driver better compatible with Dualhead Setup 0.04 (although this driver doesn't support dualhead and TVout yet);
+<li>The overlay engine code now respects the B_OVERLAY_COLOR_KEY flag instead of forcing keying ON;
+<li>Hook GET_ACCELERANT_DEVICE_INFO now returns much more detailed info about the card in use;
+<li>Hooks INIT_ACCELERANT and CLONE_ACCELERANT now enforce their correct use; returning error B_NOT_ALLOWED in case of errors.
+</ul>
 <p><h1>nm_driver 0.11 (Rudolf)</h1></p>
 <ul>
 	<li>Added full 2D acceleration for all remaining cards that did not have that yet with this driver (still largely untested);
