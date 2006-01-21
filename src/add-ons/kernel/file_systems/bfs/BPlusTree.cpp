@@ -449,7 +449,8 @@ BPlusTree::SetTo(Inode *stream)
 	// is header valid?
 
 	if (fHeader->MaximumSize() != stream->Size()) {
-		FATAL(("B+tree header size doesn't fit file size!\n"));
+		FATAL(("B+tree header size %Ld doesn't fit file size %Ld!\n",
+			fHeader->MaximumSize(), stream->Size()));
 		// we can't change the header since we don't have a transaction
 		//fHeader->maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
 	}
