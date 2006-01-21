@@ -4,41 +4,11 @@
  *
  */
 #include "InstallerCopyLoopControl.h"
-
-/* copied from libtracker, because beos loader doesn't seem to find them correctly in libtracker.so */
-
-/*BPrivate::CopyLoopControl::~CopyLoopControl()
-{
-}
-
-void 
-BPrivate::CopyLoopControl::ChecksumChunk(const char *, size_t)
-{
-}
-
-
-bool 
-BPrivate::CopyLoopControl::ChecksumFile(const entry_ref *)
-{
-	return true;
-}
-
-
-bool
-BPrivate::CopyLoopControl::SkipAttribute(const char*)
-{
-	return false;
-}
-
-
-bool
-BPrivate::CopyLoopControl::PreserveAttribute(const char*)
-{
-	return false;
-}*/
+#include "InstallerWindow.h"
 
 InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
-	: fWindow(window)
+	: fWindow(window),
+	fMessenger(window)
 {
 }
 
@@ -55,6 +25,11 @@ void
 InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 count, 
 			bool optional)
 {
+	if (name) {
+		BMessage msg(STATUS_MESSAGE);
+		msg.AddString("status", name);
+		fMessenger.SendMessage(&msg);
+	}
 }
 
 

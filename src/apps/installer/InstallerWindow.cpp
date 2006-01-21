@@ -164,7 +164,6 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			StartScan();
 			break;
 		case BEGIN_MESSAGE:
-			printf("BEGIN_MESSAGE\n");
 			BMessenger(&fCopyEngine).SendMessage(ENGINE_START);
 			break;
 		case SHOW_BOTTOM_MESSAGE:
@@ -218,6 +217,7 @@ InstallerWindow::QuitRequested()
 		return false;
 	}
 	be_app->PostMessage(B_QUIT_REQUESTED);
+	fCopyEngine.PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 

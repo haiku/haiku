@@ -38,6 +38,7 @@ public:
 	
 private:
 	InstallerWindow *fWindow;
+	BMessenger fMessenger;
 };
 
 #endif
