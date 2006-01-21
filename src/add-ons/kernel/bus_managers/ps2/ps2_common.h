@@ -31,7 +31,6 @@
 
 // global variables
 extern isa_module_info *gIsa;
-extern sem_id gDeviceOpenSemaphore;
 
 extern device_hooks sKeyboardDeviceHooks;
 extern device_hooks sMouseDeviceHooks;

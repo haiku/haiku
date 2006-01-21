@@ -12,9 +12,7 @@
 #include "ps2_dev.h"
 #include "ps2_service.h"
 
-#define PS2_DEV_COUNT 5
-
-ps2_dev ps2_device[PS2_DEV_COUNT] =
+ps2_dev ps2_device[PS2_DEVICE_COUNT] =
 {
 	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1 },
 	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1 },
@@ -28,7 +26,7 @@ status_t
 ps2_dev_init(void)
 {
 	int i;
-	for (i = 0; i < PS2_DEV_COUNT; i++) {
+	for (i = 0; i < PS2_DEVICE_COUNT; i++) {
 		ps2_dev *dev = &ps2_device[i];
 		dev->result_sem = create_sem(0, "ps2 result");
 		if (dev->result_sem < 0)
@@ -45,7 +43,7 @@ void
 ps2_dev_exit(void)
 {
 	int i;
-	for (i = 0; i < PS2_DEV_COUNT; i++) {
+	for (i = 0; i < PS2_DEVICE_COUNT; i++) {
 		ps2_dev *dev = &ps2_device[i];
 		if (dev->result_sem >= 0) {
 			delete_sem(dev->result_sem);
@@ -96,6 +94,8 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	if (flags & PS2_FLAG_CMD) {
 		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
 			atomic_or(&dev->flags, data == 0xfa ? PS2_FLAG_ACK : PS2_FLAG_NACK);
+			release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
+			return B_INVOKE_SCHEDULER;
 		} else if (dev->result_buf_cnt) {
 			dev->result_buf[dev->result_buf_idx] = data;
 			dev->result_buf_idx++;
@@ -133,6 +133,7 @@ status_t
 ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
 	status_t res = B_OK;
+	bigtime_t start;
 	int i, count;
 	
 	dprintf("ps2_dev_command %02x, %d out, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
@@ -143,6 +144,8 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	dev->result_buf_cnt = in_count;
 	dev->result_buf_idx = 0;
 	dev->result_buf = in;
+	
+	start = system_time();
 
 	for (i = -1; res == B_OK && i < out_count; i++) {
 
@@ -162,6 +165,14 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 			ps2_write_data(i == -1 ? cmd : out[i]);
 		}
 	}
+	
+	dprintf("ps2_dev_command send-time %Ld\n", system_time() - start);
+	
+
+	start = system_time();
+	res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+	dprintf("ps2_dev_command wait for ack res %08x, wait-time %Ld\n", res, system_time() - start);
+
 
 	if (dev->flags & PS2_FLAG_ACK) {
 		dprintf("ps2_dev_command got ACK\n");
@@ -179,13 +190,15 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 	if (in_count != 0) {
 		dprintf("ps2_dev_command waiting for result\n");
+
+		start = system_time();
 	
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
 
 		count = in_count - dev->result_buf_cnt;
 		dev->result_buf_cnt = 0;
 	
-		dprintf("ps2_dev_command res %08x, in %d\n", res, count);
+		dprintf("ps2_dev_command res %08x, in %d, wait-time %Ld\n", res, count, system_time() - start);
 
 		for (i = 0; i < count; i++)
 			dprintf("ps2_dev_command data %02x\n", in[i]);

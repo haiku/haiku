@@ -44,7 +44,6 @@ device_hooks sMouseDeviceHooks = {
 
 
 isa_module_info *gIsa = NULL;
-sem_id gDeviceOpenSemaphore;
 
 static sem_id sKbcSem;
 static int32 sIgnoreInterrupts = 0;
@@ -244,10 +243,6 @@ ps2_init_driver(void)
 
 	sKbcSem = create_sem(1, "ps/2 keyb ctrl");
 
-	gDeviceOpenSemaphore = create_sem(1, "ps/2 open");
-	if (gDeviceOpenSemaphore < B_OK)
-		goto err_2;
-
 	status = ps2_dev_init();
 
 	status = ps2_service_init();
@@ -340,7 +335,6 @@ err_4:
 err_3:
 	ps2_service_exit();
 	ps2_dev_exit();
-	delete_sem(gDeviceOpenSemaphore);
 	delete_sem(sKbcSem);
 err_2:
 	put_module(B_ISA_MODULE_NAME);
@@ -358,7 +352,6 @@ ps2_uninit_driver(void)
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
 	ps2_dev_exit();
-	delete_sem(gDeviceOpenSemaphore);
 	delete_sem(sKbcSem);
 	put_module(B_ISA_MODULE_NAME);
 }

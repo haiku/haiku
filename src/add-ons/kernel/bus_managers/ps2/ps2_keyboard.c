@@ -211,8 +211,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
 
-	acquire_sem(gDeviceOpenSemaphore);
-
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
 		status = sKeyboardSem;
@@ -227,8 +225,6 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 
-	release_sem(gDeviceOpenSemaphore);
-
 	*_cookie = NULL;
 
 	TRACE(("keyboard_open(): done.\n"));
@@ -241,7 +237,6 @@ err3:
 err2:
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
-	release_sem(gDeviceOpenSemaphore);
 
 	return status;
 }

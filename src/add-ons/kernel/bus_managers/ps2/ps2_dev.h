@@ -29,7 +29,9 @@ struct ps2_dev
 	void *			cookie;
 };
 
-extern ps2_dev ps2_device[5];
+#define PS2_DEVICE_COUNT 5
+
+extern ps2_dev ps2_device[PS2_DEVICE_COUNT];
 
 #define PS2_DEVICE_MOUSE 0
 #define PS2_DEVICE_KEYB  4

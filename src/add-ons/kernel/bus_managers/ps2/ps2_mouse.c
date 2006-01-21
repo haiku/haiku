@@ -323,7 +323,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	
 	TRACE(("mouse_open() %s\n", name));	
 
-	for (dev = NULL, i = 0; i < 5; i++) {
+	for (dev = NULL, i = 0; i < PS2_DEVICE_COUNT; i++) {
 		if (0 == strcmp(ps2_device[i].name, name)) {
 			dev = &ps2_device[i];
 			break;
