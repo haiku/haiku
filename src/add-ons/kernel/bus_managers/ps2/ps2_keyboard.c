@@ -225,6 +225,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		goto err3;
 	}
 
+	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 
 	release_sem(gDeviceOpenSemaphore);
 

@@ -10,9 +10,13 @@
 #ifndef __PS2_DEV_H
 #define __PS2_DEV_H
 
+struct ps2_dev;
+typedef struct ps2_dev ps2_dev;
+
 #include "ps2_common.h"
 
-typedef struct
+
+struct ps2_dev
 {
 	const char *	name;
 	bool			active;
@@ -22,14 +26,20 @@ typedef struct
 	uint8 *			result_buf;
 	int				result_buf_idx;
 	int				result_buf_cnt;
-} ps2_dev;
+	void *			cookie;
+};
 
 extern ps2_dev ps2_device[5];
 
 #define PS2_DEVICE_MOUSE 0
 #define PS2_DEVICE_KEYB  4
 
-#define PS2_FLAG_KEYB    1
+#define PS2_FLAG_KEYB		(1<<0)
+#define PS2_FLAG_OPEN		(1<<1)
+#define PS2_FLAG_ENABLED	(1<<2)
+#define PS2_FLAG_CMD		(1<<3)
+#define PS2_FLAG_ACK		(1<<4)
+#define PS2_FLAG_NACK		(1<<5)
 
 status_t	ps2_dev_init(void);
 void		ps2_dev_exit(void);

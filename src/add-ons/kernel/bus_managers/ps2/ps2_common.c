@@ -173,13 +173,6 @@ ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int 
        return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], cmd, out, out_count, in, in_count);
 }
 
-
-status_t
-ps2_mouse_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
-{
-       return ps2_dev_command(&ps2_device[PS2_DEVICE_MOUSE], cmd, out, out_count, in, in_count);
-}  
-
 //	#pragma mark -
 
 inline status_t

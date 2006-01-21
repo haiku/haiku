@@ -89,30 +89,43 @@ ps2_dev_unpublish(ps2_dev *dev)
 int32
 ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 {
-	if (!dev->active) {
-		ps2_service_handle_device_added(dev);
-	}
-
-	if (dev->result_buf_cnt) {
-		dev->result_buf[dev->result_buf_idx] = data;
-		dev->result_buf_idx++;
-		dev->result_buf_cnt--;
-		if (dev->result_buf_cnt == 0) {
-			release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
-			return B_INVOKE_SCHEDULER;
+	uint32 flags;
+	
+	flags = atomic_get(&dev->flags);
+	
+	if (flags & PS2_FLAG_CMD) {
+		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
+			atomic_or(&dev->flags, data == 0xfa ? PS2_FLAG_ACK : PS2_FLAG_NACK);
+		} else if (dev->result_buf_cnt) {
+			dev->result_buf[dev->result_buf_idx] = data;
+			dev->result_buf_idx++;
+			dev->result_buf_cnt--;
+			if (dev->result_buf_cnt == 0) {
+				release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
+				return B_INVOKE_SCHEDULER;
+			}
+		} else {
+			dprintf("ps2_dev_handle_int can't handle\n");
 		}
 		return B_HANDLED_INTERRUPT;
 	}
-
+	
 	if (!dev->active) {
+		ps2_service_handle_device_added(dev);
+		dprintf("not active, data dropped\n");
 		return B_HANDLED_INTERRUPT;
 	}
 	
+	if ((flags & PS2_FLAG_ENABLED) == 0) {
+		dprintf("not enabled, data dropped\n");
+		return B_HANDLED_INTERRUPT;
+	}
+			
 	// temporary hack...
-	if (dev->flags & PS2_FLAG_KEYB)
+	if (flags & PS2_FLAG_KEYB)
 		return keyboard_handle_int(data);
 	else
-		return mouse_handle_int(data);
+		return mouse_handle_int(dev, data);
 }
 
 
@@ -124,6 +137,8 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	
 	dprintf("ps2_dev_command %02x, %d out, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
 	
+	dev->flags |= PS2_FLAG_CMD;
+	dev->flags &= ~(PS2_FLAG_ACK | PS2_FLAG_NACK);
 
 	dev->result_buf_cnt = in_count;
 	dev->result_buf_idx = 0;
@@ -147,6 +162,16 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 			ps2_write_data(i == -1 ? cmd : out[i]);
 		}
 	}
+
+	if (dev->flags & PS2_FLAG_ACK) {
+		dprintf("ps2_dev_command got ACK\n");
+	}
+
+	if (dev->flags & PS2_FLAG_NACK) {
+		dev->flags &= ~PS2_FLAG_CMD;
+		dprintf("ps2_dev_command got NACK\n");
+		return B_ERROR;
+	}
 	
 	if (res != B_OK) {
 		dprintf("ps2_dev_command send failed\n");
@@ -165,6 +190,8 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 		for (i = 0; i < count; i++)
 			dprintf("ps2_dev_command data %02x\n", in[i]);
 	}
+
+	dev->flags &= ~PS2_FLAG_CMD;
 
 	return res;
 }

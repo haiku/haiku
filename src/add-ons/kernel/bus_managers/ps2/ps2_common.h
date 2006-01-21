@@ -19,6 +19,7 @@
 #include <OS.h>
 
 #include "ps2_defs.h"
+#include "ps2_dev.h"
 
 
 // debug defines
@@ -50,7 +51,6 @@ extern void ps2_flush();
 extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
 
 extern status_t ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
-extern status_t ps2_mouse_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
 
 extern status_t ps2_get_command_byte(uint8 *byte);
 extern status_t ps2_set_command_byte(uint8 byte);
@@ -60,14 +60,11 @@ extern void ps2_unclaim_result(void);
 extern status_t ps2_wait_for_result(void);
 extern bool ps2_handle_result(uint8 data);
 
-extern void ps2_common_uninitialize(void);
-extern status_t ps2_common_initialize(void);
 
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);
-extern status_t probe_mouse(size_t *probed_packet_size);
 
-extern int32 mouse_handle_int(uint8 data);
+extern int32 mouse_handle_int(ps2_dev *dev, uint8 data);
 extern int32 keyboard_handle_int(uint8 data);
 
 
