@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-01/2006.
+	Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -126,15 +126,18 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   vga_on_tv;
 } nv_settings;
 
-/*shared info*/
+/* shared info */
 typedef struct {
-  /*a few ID things*/
+  /* a few ID things */
 	uint16	vendor_id;	/* PCI vendor ID, from pci_info */
 	uint16	device_id;	/* PCI device ID, from pci_info */
 	uint8	revision;	/* PCI device revsion, from pci_info */
 	uint8	bus;		/* PCI bus number, from pci_info */
 	uint8	device;		/* PCI device number on bus, from pci_info */
 	uint8	function;	/* PCI function number in device, from pci_info */
+
+  /* used to return status for INIT_ACCELERANT and CLONE_ACCELERANT */
+	bool	accelerant_in_use;
 
   /* bug workaround for 4.5.0 */
 	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
