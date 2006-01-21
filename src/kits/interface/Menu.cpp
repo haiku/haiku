@@ -1112,13 +1112,17 @@ BMenu::_track(int *action, long start)
 	bigtime_t startTime = system_time();
 	bigtime_t clickTime = 0;
 	get_click_speed(&clickTime);
+	
+	// TODO: Test and reduce the timeout if needed.
+	clickTime /= 2;
+	
 	do {
 		if (!LockLooper())
 			break;
 	
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
-		GetMouse(&location, &buttons);
+		GetMouse(&location, &buttons, true);
 					
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
