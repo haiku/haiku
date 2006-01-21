@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-11/2004
+	Rudolf Cornelissen 4/2003-1/2006
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -49,6 +49,8 @@ typedef struct {
 #define TV_PAL (1<<9)
 #define TV_NTSC (2<<9)
 #define TV_CAPABLE (1<<11)
+#define TV_VIDEO (1<<12)
+#define TV_PRIMARY (1<<13)
 
 #define SKD_MOVE_CURSOR    0x00000001
 #define SKD_PROGRAM_CLUT   0x00000002
@@ -94,6 +96,9 @@ typedef struct {
 	uint16	vendor_id;	/* PCI vendor ID, from pci_info */
 	uint16	device_id;	/* PCI device ID, from pci_info */
 	uint8	revision;	/* PCI device revsion, from pci_info */
+
+  /* used to return status for INIT_ACCELERANT and CLONE_ACCELERANT */
+	bool	accelerant_in_use;
 
   /* bug workaround for 4.5.0 */
 	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
@@ -150,6 +155,7 @@ typedef struct {
 
   /*frame buffer config - for BDirectScreen*/
 	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */
+	accelerant_device_info adi;	/* as returned by hook GET_ACCELERANT_DEVICE_INFO */
 
   /*acceleration engine*/
 	struct {
@@ -179,6 +185,7 @@ typedef struct {
 
 		/* general card information */
 		uint32 card_type;           /* see card_type enum above */
+		bool int_assigned;			/* card has a useable INT assigned to it */
 
 		/* PINS */
 		float f_ref;				/* PLL reference-oscillator frequency (Mhz) */
