@@ -214,6 +214,8 @@ status_t INIT_ACCELERANT(int the_fd)
 
 	/* a winner! */
 	result = B_OK;
+	/* ensure that INIT_ACCELERANT won't be executed again (copies should be clones) */
+	si->accelerant_in_use = true;
 	goto error0;
 
 error1:
