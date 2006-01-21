@@ -60,7 +60,7 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		bool _HasSubTransaction() { return fUnwrittenTransactions > 1; }
+		bool _HasSubTransaction() { return fHasSubtransaction; }
 		uint32 _TransactionSize() const;
 		status_t _WriteTransactionToLog();
 		status_t _CheckRunArray(const run_array *array);
@@ -77,6 +77,7 @@ class Journal {
 		LogEntryList	fEntries;
 		bigtime_t		fTimestamp;
 		int32			fTransactionID;
+		bool			fHasSubtransaction;
 };
 
 

@@ -300,7 +300,8 @@ Journal::Journal(Volume *volume)
 	fLogSize(volume->Log().length),
 	fMaxTransactionSize(fLogSize / 4 - 5),
 	fUsed(0),
-	fUnwrittenTransactions(0)
+	fUnwrittenTransactions(0),
+	fHasSubtransaction(false)
 {
 	if (fMaxTransactionSize > fLogSize / 2)
 		fMaxTransactionSize = fLogSize / 2 - 5;
@@ -330,10 +331,13 @@ Journal::InitCheck()
 status_t
 Journal::_CheckRunArray(const run_array *array)
 {
-	int32 maxRuns = run_array::MaxRuns(fVolume->BlockSize());
+	int32 maxRuns = run_array::MaxRuns(fVolume->BlockSize()) - 1;
+		// the -1 works around an off-by-one bug in Be's BFS implementation,
+		// same as in run_array::MaxRuns()
 	if (array->MaxRuns() != maxRuns
 		|| array->CountRuns() > maxRuns
 		|| array->CountRuns() <= 0) {
+		dprintf("run count: %ld, array max: %ld, max runs: %ld\n", array->CountRuns(), array->MaxRuns(), maxRuns);
 		FATAL(("Log entry has broken header!\n"));
 		return B_ERROR;
 	}
@@ -507,6 +511,7 @@ Journal::_WriteTransactionToLog()
 	//	changed blocks back to disk immediately
 
 	fUnwrittenTransactions = 0;
+	fHasSubtransaction = false;
 
 	int32 blockShift = fVolume->BlockShift();
 	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
@@ -721,6 +726,7 @@ Journal::Lock(Transaction *owner)
 	if (fUnwrittenTransactions > 0) {
 		// start a sub transaction
 		cache_start_sub_transaction(fVolume->BlockCache(), fTransactionID);
+		fHasSubtransaction = true;
 	} else
 		fTransactionID = cache_start_transaction(fVolume->BlockCache());
 
