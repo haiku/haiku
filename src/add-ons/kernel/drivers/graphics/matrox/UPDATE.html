@@ -4,6 +4,18 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head (svn 0.27, Rudolf)</h1></p>
+<ul>
+<li><strong>G200-G550:</strong>
+<ul>
+<li>The overlay engine code now respects the B_OVERLAY_COLOR_KEY flag instead of forcing keying ON.
+</ul>
+<li><strong>General:</strong>
+<ul>
+<li>Hook GET_ACCELERANT_DEVICE_INFO now returns more detailed info about the card in use;
+<li>Hooks INIT_ACCELERANT and CLONE_ACCELERANT now enforce their correct use; returning error B_NOT_ALLOWED in case of errors.
+</ul>
+</ul>
 <p><h1>mga_driver 0.26 (Rudolf)</h1></p>
 <ul>
 <li><strong>G200-G550:</strong>

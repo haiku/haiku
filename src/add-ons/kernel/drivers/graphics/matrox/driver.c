@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-11/2005.
+	Rudolf Cornelissen 3/2002-1/2006.
 */
 
 /* standard kernel driver stuff */
@@ -790,6 +790,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	si->bus = di->pcii.bus;
 	si->device = di->pcii.device;
 	si->function = di->pcii.function;
+
+	/* ensure that the accelerant's INIT_ACCELERANT function can be executed */
+	si->accelerant_in_use = false;
 
 	/* map the device */
 	result = map_device(di);
