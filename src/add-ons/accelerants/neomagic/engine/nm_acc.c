@@ -49,6 +49,8 @@ static status_t nm_acc_wait_fifo(uint32 n)
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10);
 	}
+
+	return B_OK;
 }
 
 /* AFAIK this must be done for every new screenmode.

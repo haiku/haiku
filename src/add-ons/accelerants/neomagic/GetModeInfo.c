@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-8/2003
+	Rudolf Cornelissen 4/2003-1/2006
 */
 
 #define MODULE_BIT 0x02000000
@@ -86,7 +86,10 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 /* Return the semaphore id that will be used to signal a vertical sync occured.  */
 sem_id ACCELERANT_RETRACE_SEMAPHORE(void)
 {
-//	return si->vblank;
+	if (si->ps.int_assigned)
+//		return si->vblank;
 //temp:
-	return B_ERROR;
+		return B_ERROR;
+	else
+		return B_ERROR;
 }

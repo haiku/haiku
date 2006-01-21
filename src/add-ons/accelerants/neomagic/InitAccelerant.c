@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-11/2004.
+	Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #define MODULE_BIT 0x00800000
@@ -16,7 +16,8 @@
 static status_t init_common(int the_fd);
 
 /* Initialization code shared between primary and cloned accelerants */
-static status_t init_common(int the_fd) {
+static status_t init_common(int the_fd)
+{
 	status_t result;
 	nm_get_private_data gpd;
 	
@@ -100,7 +101,8 @@ error0:
 }
 
 /* Clean up code shared between primary and cloned accelrants */
-static void uninit_common(void) {
+static void uninit_common(void)
+{
 	/* release the memory mapped registers if they exist */
 	if (si->ps.card_type > NM2093)
 	{
@@ -123,7 +125,8 @@ We need to determine if the kernel driver and the accelerant are compatible.
 If they are, get the accelerant ready to handle other hook functions and
 report success or failure.
 */
-status_t INIT_ACCELERANT(int the_fd) {
+status_t INIT_ACCELERANT(int the_fd)
+{
 	status_t result;
 	int cnt; 				 //used for iteration through the overlay buffers
 
@@ -142,7 +145,14 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error0;
 	// LOG now available: !NULL si
-	
+
+	/* ensure that INIT_ACCELERANT is executed just once (copies should be clones) */
+	if (si->accelerant_in_use)
+	{
+		result = B_NOT_ALLOWED;
+		goto error1;
+	}
+
 	/* call the device specific init code */
 	result = nm_general_powerup();
 
@@ -211,6 +221,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* a winner! */
 	result = B_OK;
+	/* ensure that INIT_ACCELERANT won't be executed again (copies should be clones) */
+	si->accelerant_in_use = true;
 	goto error0;
 
 error1:
@@ -228,7 +240,8 @@ error0:
 Return the number of bytes required to hold the information required
 to clone the device.
 */
-ssize_t ACCELERANT_CLONE_INFO_SIZE(void) {
+ssize_t ACCELERANT_CLONE_INFO_SIZE(void)
+{
 	/*
 	Since we're passing the name of the device as the only required
 	info, return the size of the name buffer
@@ -241,7 +254,8 @@ ssize_t ACCELERANT_CLONE_INFO_SIZE(void) {
 Return the info required to clone the device.  void *data points to
 a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
 */
-void GET_ACCELERANT_CLONE_INFO(void *data) {
+void GET_ACCELERANT_CLONE_INFO(void *data)
+{
 	nm_device_name dn;
 	status_t result;
 
@@ -256,7 +270,8 @@ void GET_ACCELERANT_CLONE_INFO(void *data) {
 Initialize a copy of the accelerant as a clone.  void *data points to
 a copy of the data returned by GET_ACCELERANT_CLONE_INFO().
 */
-status_t CLONE_ACCELERANT(void *data) {
+status_t CLONE_ACCELERANT(void *data)
+{
 	status_t result;
 	char path[MAXPATHLEN];
 
@@ -290,6 +305,13 @@ status_t CLONE_ACCELERANT(void *data) {
 
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error1;
+
+	/* ensure that INIT_ACCELERANT is executed first (i.e. primary accelerant exists) */
+	if (!(si->accelerant_in_use))
+	{
+		result = B_NOT_ALLOWED;
+		goto error2;
+	}
 
 	/* get shared area for display modes */
 	result = my_mode_list_area = clone_area(
@@ -330,6 +352,9 @@ void UNINIT_ACCELERANT(void)
 		/* delete benaphores ONLY if we are the primary accelerant */
 		DELETE_BEN(si->engine.lock);
 		DELETE_BEN(si->overlay.lock);
+
+		/* ensure that INIT_ACCELERANT can be executed again */
+		si->accelerant_in_use = false;
 	}
 
 	/* free our mode list area */

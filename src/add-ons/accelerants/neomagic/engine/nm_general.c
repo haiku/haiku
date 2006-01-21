@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-11/2004
+   Rudolf Cornelissen 4/2003-1/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -88,46 +88,64 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku Neomagic Accelerant 0.11 running.\n"));
+	LOG(1,("POWERUP: Haiku Neomagic Accelerant 0.12 running.\n"));
+
+	/* log VBLANK INT usability status */
+	if (si->ps.int_assigned)
+		LOG(4,("POWERUP: Usable INT assigned to HW; Vblank semaphore enabled\n"));
+	else
+		LOG(4,("POWERUP: No (usable) INT assigned to HW; Vblank semaphore disabled\n"));
+
+	/* WARNING:
+	 * _adi.name_ and _adi.chipset_ can contain 31 readable characters max.!!! */
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
 	case 0x000110c8: //NM2070 ISA
 		si->ps.card_type = NM2070;
-		LOG(4,("POWERUP: Detected MagicGraph 128 (NM2070)\n"));
+		sprintf(si->adi.name, "Neomagic MagicGraph 128");
+		sprintf(si->adi.chipset, "NM2070 (ISA)");
 		break;
 	case 0x000210c8: //NM2090 ISA
 		si->ps.card_type = NM2090;
-		LOG(4,("POWERUP: Detected MagicGraph 128V (NM2090)\n"));
+		sprintf(si->adi.name, "Neomagic MagicGraph 128V");
+		sprintf(si->adi.chipset, "NM2090 (ISA)");
 		break;
 	case 0x000310c8: //NM2093 ISA
 		si->ps.card_type = NM2093;
-		LOG(4,("POWERUP: Detected MagicGraph 128ZV (NM2093)\n"));
+		sprintf(si->adi.name, "Neomagic MagicGraph 128ZV");
+		sprintf(si->adi.chipset, "NM2093 (ISA)");
 		break;
 	case 0x008310c8: //NM2097 PCI
 		si->ps.card_type = NM2097;
-		LOG(4,("POWERUP: Detected MagicGraph 128ZV+ (NM2097)\n"));
+		sprintf(si->adi.name, "Neomagic MagicGraph 128ZV+");
+		sprintf(si->adi.chipset, "NM2097 (PCI)");
 		break;
 	case 0x000410c8: //NM2160 PCI
 		si->ps.card_type = NM2160;
-		LOG(4,("POWERUP: Detected MagicGraph 128XD (NM2160)\n"));
+		sprintf(si->adi.name, "Neomagic MagicGraph 128XD");
+		sprintf(si->adi.chipset, "NM2160 (PCI)");
 		break;
 	case 0x000510c8: //NM2200
 		si->ps.card_type = NM2200;
-		LOG(4,("POWERUP: Detected MagicMedia 256AV (NM2200)\n"));
+		sprintf(si->adi.name, "Neomagic MagicMedia 256AV");
+		sprintf(si->adi.chipset, "NM2200");
 		break;
 	case 0x002510c8: //NM2230
 		si->ps.card_type = NM2230;
-		LOG(4,("POWERUP: Detected MagicMedia 256AV+ (NM2230)\n"));
+		sprintf(si->adi.name, "Neomagic MagicMedia 256AV+");
+		sprintf(si->adi.chipset, "NM2230");
 		break;
 	case 0x000610c8: //NM2360
 		si->ps.card_type = NM2360;
-		LOG(4,("POWERUP: Detected MagicMedia 256ZX (NM2360)\n"));
+		sprintf(si->adi.name, "Neomagic MagicMedia 256ZX");
+		sprintf(si->adi.chipset, "NM2360");
 		break;
 	case 0x001610c8: //NM2380
 		si->ps.card_type = NM2380;
-		LOG(4,("POWERUP: Detected MagicMedia 256XL+ (NM2380)\n"));
+		sprintf(si->adi.name, "Neomagic MagicMedia 256XL+");
+		sprintf(si->adi.chipset, "NM2380");
 		break;
 	default:
 		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
@@ -204,6 +222,7 @@ static status_t nmxxxx_general_powerup()
 //	status_t result;
 	
 	LOG(4, ("INIT: powerup\n"));
+	LOG(4, ("INIT: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
 	if (si->settings.logmask & 0x80000000) nm_dump_configuration_space();
 
 	/* set ISA registermapping to VGA colormode */

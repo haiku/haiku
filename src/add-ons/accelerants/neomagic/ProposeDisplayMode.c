@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors for nm driver:
-	Rudolf Cornelissen 4/2003-11/2005
+	Rudolf Cornelissen 4/2003-1/2006
 */
 
 #define MODULE_BIT 0x00400000
@@ -274,7 +274,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 //fixme: introduce dualhead_clone_only flag compatible with matrox so the same prefs
 //util can be used
 	target->flags &=
-		~(DUALHEAD_CAPABLE | TV_CAPABLE | B_SUPPORTS_OVERLAYS | B_IO_FB_NA);
+		~(DUALHEAD_CAPABLE | TV_CAPABLE | B_SUPPORTS_OVERLAYS | B_HARDWARE_CURSOR | B_IO_FB_NA);
 	/* we always allow parallel access (fixed), the DAC is always in 'enhanced'
 	 * mode (fixed), and all modes support DPMS (fixed);
 	 * We support scrolling and panning in every mode, so we 'send a signal' to
@@ -282,6 +282,21 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	/* BTW: B_PARALLEL_ACCESS in combination with a hardcursor enables
 	 * BDirectWindow windowed modes. */
 	target->flags |= (B_PARALLEL_ACCESS | B_8_BIT_DAC | B_DPMS | B_SCROLL);
+
+	/* if not dualhead capable card clear dualhead flags */
+	if (!(target->flags & DUALHEAD_CAPABLE))
+	{
+		target->flags &= ~DUALHEAD_BITS;
+	}
+
+	/* if not TVout capable card clear TVout flags */
+	if (!(target->flags & TV_CAPABLE))
+	{
+		target->flags &= ~TV_BITS;
+	}
+
+	/* TVout is on primary head (presumably, if we'd have that) */
+	target->flags |= TV_PRIMARY;
 
 	/* set HARDWARE_CURSOR mode if suitable */
 	if (si->settings.hardcursor)
@@ -291,7 +306,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	if (si->ps.card_type > NM2070)
 		target->flags |= B_SUPPORTS_OVERLAYS;
 
-	LOG(1, ("PROPOSEMODE: validated status modeflags: $%08x\n", target->flags));
+	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
 
 	/* overrule timing command flags to be (fixed) blank_pedestal = 0.0IRE,
 	 * progressive scan (fixed), and sync_on_green not used */
