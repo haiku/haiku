@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-10/2005.
+	Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #define MODULE_BIT 0x00800000
@@ -91,7 +91,8 @@ We need to determine if the kernel driver and the accelerant are compatible.
 If they are, get the accelerant ready to handle other hook functions and
 report success or failure.
 */
-status_t INIT_ACCELERANT(int the_fd) {
+status_t INIT_ACCELERANT(int the_fd)
+{
 	status_t result;
 	int pointer_reservation; //mem reserved for pointer
 	int cnt; 				 //used for iteration through the overlay buffers
@@ -112,6 +113,13 @@ status_t INIT_ACCELERANT(int the_fd) {
 	if (result != B_OK) goto error0;
 	// LOG now available: !NULL si
 	
+	/* ensure that INIT_ACCELERANT is executed just once (copies should be clones) */
+	if (si->accelerant_in_use)
+	{
+		result = B_NOT_ALLOWED;
+		goto error1;
+	}
+
 	/* call the device specific init code */
 	result = nv_general_powerup();
 
@@ -251,7 +259,8 @@ void GET_ACCELERANT_CLONE_INFO(void *data) {
 Initialize a copy of the accelerant as a clone.  void *data points to
 a copy of the data returned by GET_ACCELERANT_CLONE_INFO().
 */
-status_t CLONE_ACCELERANT(void *data) {
+status_t CLONE_ACCELERANT(void *data)
+{
 	status_t result;
 	char path[MAXPATHLEN];
 
@@ -283,11 +292,18 @@ status_t CLONE_ACCELERANT(void *data) {
 	/* call the shared initialization code */
 	result = init_common(fd);
 
-	/* setup CRTC and DAC functions access */
-	setup_virtualized_heads(si->crtc_switch_mode);
-
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error1;
+
+	/* ensure that INIT_ACCELERANT is executed first (i.e. primary accelerant exists) */
+	if (!(si->accelerant_in_use))
+	{
+		result = B_NOT_ALLOWED;
+		goto error2;
+	}
+
+	/* setup CRTC and DAC functions access */
+	setup_virtualized_heads(si->crtc_switch_mode);
 
 	/* get shared area for display modes */
 	result = my_mode_list_area = clone_area(
@@ -328,6 +344,9 @@ void UNINIT_ACCELERANT(void)
 		/* delete benaphores ONLY if we are the primary accelerant */
 		DELETE_BEN(si->engine.lock);
 		DELETE_BEN(si->overlay.lock);
+
+		/* ensure that INIT_ACCELERANT can be executed again */
+		si->accelerant_in_use = false;
 	}
 
 	/* free our mode list area */
