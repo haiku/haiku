@@ -111,7 +111,7 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	}
 	
 	if (!dev->active) {
-		ps2_service_handle_device_added(dev);
+		ps2_service_notify_device_added(dev);
 		dprintf("not active, data dropped\n");
 		return B_HANDLED_INTERRUPT;
 	}

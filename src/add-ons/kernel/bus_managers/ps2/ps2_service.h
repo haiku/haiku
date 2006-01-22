@@ -16,7 +16,7 @@
 status_t	ps2_service_init(void);
 void		ps2_service_exit(void);
 
-void		ps2_service_handle_device_added(ps2_dev *dev);
-void		ps2_service_handle_device_removed(ps2_dev *dev);
+void		ps2_service_notify_device_added(ps2_dev *dev);
+void		ps2_service_notify_device_removed(ps2_dev *dev);
 
 #endif

@@ -314,12 +314,12 @@ ps2_init_driver(void)
 		}
 	}
 
-	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_KEYB]);
-	ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
+	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
+	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 	if (gMultiplexingActive) {
-		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
-		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
-		ps2_service_handle_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
 	}
 	
 	//goto err_5;	
