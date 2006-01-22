@@ -52,7 +52,7 @@ private:
 
 	BBitmap *fLogo;
 	BPoint fDrawPoint;
-	CopyEngine fCopyEngine;
+	CopyEngine *fCopyEngine;
 };
 
 #endif /* _InstallerWindow_h */

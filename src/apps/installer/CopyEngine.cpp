@@ -158,11 +158,18 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 
 	// copy source volume
 	BDirectory targetDir(targetDirectory.Path());
-	srcDirectory.Append("beos");
-	BEntry srcEntry(srcDirectory.Path());
-	Undo undo;
-	printf("Copying folder '%s' to '%s'.\n", srcDirectory.Path(), targetDirectory.Path());
-	FSCopyFolder(&srcEntry, &targetDir, fControl, NULL, false, undo);
+	BDirectory srcDir(srcDirectory.Path());
+	BEntry entry;
+	status_t status;
+	while (srcDir.GetNextEntry(&entry) == B_OK) {
+		Undo undo;
+		status = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
+		if (status != B_OK) {
+			BPath path;
+			entry.GetPath(&path);
+			fprintf(stderr, "error while copying %s : %s\n", path.Path(), strerror(status));
+		}
+	}
 
 	// copy selected packages
 

@@ -64,9 +64,10 @@ LogoView::Draw(BRect update)
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-	fDriveSetupLaunched(false),
-	fCopyEngine(this)
+	fDriveSetupLaunched(false)	
 {
+	fCopyEngine = new CopyEngine(this);
+	
 	BRect bounds = Bounds();
 	bounds.bottom += 1;
 	bounds.right += 1;
@@ -164,7 +165,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			StartScan();
 			break;
 		case BEGIN_MESSAGE:
-			BMessenger(&fCopyEngine).SendMessage(ENGINE_START);
+			BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 			break;
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
@@ -217,7 +218,7 @@ InstallerWindow::QuitRequested()
 		return false;
 	}
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	fCopyEngine.PostMessage(B_QUIT_REQUESTED);
+	fCopyEngine->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
@@ -280,7 +281,7 @@ InstallerWindow::StartScan()
 	while ((item = fDestMenu->RemoveItem((int32)0)))
 		delete item;
 
-	fCopyEngine.ScanDisksPartitions(fSrcMenu, fDestMenu);
+	fCopyEngine->ScanDisksPartitions(fSrcMenu, fDestMenu);
 
 	if (fSrcMenu->ItemAt(0)) {
 		PublishPackages();
