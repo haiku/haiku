@@ -151,6 +151,7 @@ typedef struct {
 
   /*more display mode stuff*/
 	display_mode dm;		/* current display mode configuration: head1 */
+	uint32 dpms_flags;		/* current DPMS mode */
 	bool acc_mode;			/* signals (non)accelerated mode */
 
   /*frame buffer config - for BDirectScreen*/
