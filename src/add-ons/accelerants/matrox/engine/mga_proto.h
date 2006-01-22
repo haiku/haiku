@@ -106,9 +106,9 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v);
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
 status_t gx00_acc_init(void);
+void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
 status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
 status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
-status_t gx00_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
 status_t gx00_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
 status_t gx00_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);

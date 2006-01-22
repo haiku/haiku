@@ -1,7 +1,7 @@
 /* MGA Acceleration functions */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-1/2004.
+   Rudolf Cornelissen 10/2002-1/2006.
 */
 
 #define MODULE_BIT 0x00080000
@@ -201,71 +201,75 @@ status_t gx00_acc_init()
 	return B_OK;
 }
 
+
+/*
+	note:
+	moved acceleration 'top-level' routines to be integrated in the engine:
+	it is costly to call the engine for every single function within a loop!
+	(measured with BeRoMeter 1.2.6: upto 15% speed increase on all CPU's.)
+*/
+
 /* screen to screen blit - i.e. move windows around.
  * Engine function bitblit, paragraph 4.5.7.2 */
-status_t gx00_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
+void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 {
 	uint32 t_start,t_end,offset;
 	uint32 b_start,b_end;
+	int i = 0;
 
-	/*find where the top,bottom and offset are*/
+	/* calc offset 'per line' */
 	offset = (si->fbc.bytes_per_row / (si->engine.depth >> 3));
 
-	t_end = t_start = xs + (offset*ys) + si->engine.src_dst;
-	t_end += w;
-
-	b_end = b_start = xs + (offset*(ys+h)) + si->engine.src_dst;
-	b_end +=w;
-
-	/* sgnzero bit _must_ be '0' before accessing SGN! */
-	ACCW(DWGCTL,0x00000000);
-
-	/*find which quadrant */
-	switch((yd>ys)|((xd>xs)<<1))
+	while (count--)
 	{
-	case 0: /*L->R,down*/ 
-		ACCW(SGN,0);
+		/* find where the top and bottom are */
+		t_end = t_start = list[i].src_left + (offset * list[i].src_top) + si->engine.src_dst;
+		t_end += list[i].width;
 
-		ACCW(AR3,t_start);
-		ACCW(AR0,t_end);
-		ACCW(AR5,offset);
+		b_end = b_start = list[i].src_left + (offset * (list[i].src_top + list[i].height)) + si->engine.src_dst;
+		b_end += list[i].width;
 
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 1: /*L->R,up*/
-		ACCW(SGN,4);
+		/* sgnzero bit _must_ be '0' before accessing SGN! */
+		ACCW(DWGCTL,0x00000000);
 
-		ACCW(AR3,b_start);
-		ACCW(AR0,b_end);
-		ACCW(AR5,-offset);
+		/*find which quadrant */
+		switch((list[i].dest_top > list[i].src_top) | ((list[i].dest_left > list[i].src_left) << 1))
+		{
+		case 0: /*L->R,down*/ 
+			ACCW(SGN, 0);
+			ACCW(AR3, t_start);
+			ACCW(AR0, t_end);
+			ACCW(AR5, offset);
+			ACCW_YDSTLEN(list[i].dest_top, list[i].height + 1);
+			break;
+		case 1: /*L->R,up*/
+			ACCW(SGN, 4);
+			ACCW(AR3, b_start);
+			ACCW(AR0, b_end);
+			ACCW(AR5, -offset);
+			ACCW_YDSTLEN(list[i].dest_top + list[i].height, list[i].height + 1);
+			break;
+		case 2: /*R->L,down*/
+			ACCW(SGN, 1);
+			ACCW(AR3, t_end);
+			ACCW(AR0, t_start);
+			ACCW(AR5, offset);
+			ACCW_YDSTLEN(list[i].dest_top, list[i].height + 1);
+			break;
+		case 3: /*R->L,up*/
+			ACCW(SGN, 5);
+			ACCW(AR3, b_end);
+			ACCW(AR0, b_start);
+			ACCW(AR5, -offset);
+			ACCW_YDSTLEN(list[i].dest_top + list[i].height, list[i].height + 1);
+			break;
+		}
+		ACCW(FXBNDRY,((list[i].dest_left + list[i].width) << 16) | list[i].dest_left);
 
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
-	case 2: /*R->L,down*/
-		ACCW(SGN,1);
-
-		ACCW(AR3,t_end);
-		ACCW(AR0,t_start);
-		ACCW(AR5,offset);
-
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 3: /*R->L,up*/
-		ACCW(SGN,5);
-
-		ACCW(AR3,b_end);
-		ACCW(AR0,b_start);
-		ACCW(AR5,-offset);
-
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
+		/* start the blit */
+		ACCGO(DWGCTL,0x040C4018); // atype RSTR
+		i++;
 	}
-	ACCW(FXBNDRY,((xd+w)<<16)|xd);
-
-	/*do the blit*/
-	ACCGO(DWGCTL,0x040C4018); // atype RSTR
-
-	return B_OK;
 }
 
 /* screen to screen tranparent blit - not sure what uses this.

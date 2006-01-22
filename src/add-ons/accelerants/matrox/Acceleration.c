@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 2/2003.
+	Rudolf Cornelissen 1/2006.
 */
 
 #define MODULE_BIT 0x40000000
@@ -13,26 +13,6 @@
 // apsed, TODO ?? change interface of gx00_acc_* and use MGA pseudo DMA
 
 #include "acc_std.h"
-
-void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
-	int i;
-
-	/*do each blit*/
-	i=0;
-	while (count--)
-	{
-		gx00_acc_blit
-		(
-			list[i].src_left,
-			list[i].src_top,
-			list[i].dest_left,
-			list[i].dest_top,
-			list[i].width,
-			list[i].height
-		);
-		i++;
-	}
-}
 
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count) {
 	int i;
