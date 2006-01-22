@@ -51,7 +51,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	uint8 colour_depth = 24;
 	uint32 startadd;
-	bool display, h, v;
 
 	/* if internal panel is active we don't touch the CRTC timing and the pixelPLL */
 	bool crt_only = true;
@@ -80,8 +79,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		crt_only = false;
 	}
 
-	/* find current DPMS state, then turn off screen(s) */
-	nm_crtc_dpms_fetch(&display, &h, &v);
+	/* turn off screen(s) */
 	nm_crtc_dpms(false, false, false);
 
 	/* where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?) */
@@ -139,11 +137,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* update driver's mode store */
 	si->dm = target;
 
-	/* turn screen on */
-	nm_crtc_dpms(display,h,v);
-
 	/* set up acceleration for this mode */
 	nm_acc_init();
+
+	/* restore screen(s) output state(s) */
+	SET_DPMS_MODE(si->dpms_flags);
 
 	/* log currently selected output */
 	nm_general_output_select();
@@ -253,7 +251,10 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: $%08x\n", dpms_flags));
-	
+
+	/* note current DPMS state for our reference */
+	si->dpms_flags = dpms_flags;
+
 	switch(dpms_flags) 
 	{
 	case B_DPMS_ON:	/* H: on, V: on */
@@ -292,31 +293,5 @@ uint32 DPMS_CAPABILITIES(void)
 /* Return the current DPMS mode. */
 uint32 DPMS_MODE(void)
 {
-	bool display, h, v;
-	
-	interrupt_enable(false);
-	nm_crtc_dpms_fetch(&display, &h, &v);
-	interrupt_enable(true);
-
-	if (si->ps.card_type < NM2200)
-	{
-		/* MagicGraph cards don't have full DPMS support */
-		if (display && h && v)
-			return B_DPMS_ON;
-		else
-			return B_DPMS_OFF;
-	}
-	else
-	{
-		/* MagicMedia cards do have full DPMS support for external monitors */
-		//fixme: checkout if this is true...
-		if (display && h && v)
-			return B_DPMS_ON;
-		else if(v)
-			return B_DPMS_STAND_BY;
-		else if(h)
-			return B_DPMS_SUSPEND;
-		else
-			return B_DPMS_OFF;
-	}
+	return si->dpms_flags;
 }

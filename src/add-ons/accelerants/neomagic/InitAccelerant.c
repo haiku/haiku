@@ -219,6 +219,9 @@ status_t INIT_ACCELERANT(int the_fd)
 	/* ensure cursor state */
 	SHOW_CURSOR(false);
 
+	/* ensure DPMS state */
+	si->dpms_flags = B_DPMS_ON;
+
 	/* a winner! */
 	result = B_OK;
 	/* ensure that INIT_ACCELERANT won't be executed again (copies should be clones) */

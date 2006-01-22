@@ -45,7 +45,6 @@ status_t nm_crtc_center(display_mode target, bool crt_only);
 status_t nm_crtc_prg_panel(void);
 
 status_t nm_crtc_dpms(bool, bool, bool);
-status_t nm_crtc_dpms_fetch(bool*, bool*, bool*);
 status_t nm_crtc_mem_priority(uint8);
 
 status_t nm_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/

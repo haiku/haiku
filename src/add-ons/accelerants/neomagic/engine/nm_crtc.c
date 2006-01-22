@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-11/2004
+   Rudolf Cornelissen 4/2003-1/2006
 */
 
 #define MODULE_BIT 0x00040000
@@ -386,9 +386,10 @@ status_t nm_crtc_depth(int mode)
 
 status_t nm_crtc_dpms(bool display, bool h, bool v)
 {
+	char msg[100];
 	uint8 temp, size_outputs;
 
-	LOG(4,("CRTC: setting DPMS: "));
+	sprintf(msg, "CRTC: setting DPMS: ");
 
 	/* start synchronous reset: required before turning screen off! */
 	ISASEQW(RESET, 0x01);
@@ -404,35 +405,35 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 
 		/* end synchronous reset if display should be enabled */
 		ISASEQW(RESET, 0x03);
-
-		LOG(4,("display on, "));
+		sprintf(msg, "%sdisplay on, ", msg);
 	}
 	else
 	{
 		ISASEQW(CLKMODE, (temp | 0x20));
-
-		LOG(4,("display off, "));
+		sprintf(msg, "%sdisplay off, ", msg);
 	}
 
 	temp = 0x00;
 	if (h)
 	{
-		LOG(4,("hsync enabled, "));
+		sprintf(msg, "%shsync enabled, ", msg);
 	}
 	else
 	{
 		temp |= 0x10;
-		LOG(4,("hsync disabled, "));
+		sprintf(msg, "%shsync disabled, ", msg);
 	}
 	if (v)
 	{
-		LOG(4,("vsync enabled\n"));
+		sprintf(msg, "%svsync enabled\n", msg);
 	}
 	else
 	{
 		temp |= 0x20;
-		LOG(4,("vsync disabled\n"));
+		sprintf(msg, "%svsync disabled\n", msg);
 	}
+
+	LOG(4, (msg));
 
 	/* read panelsize and currently active outputs */
 	size_outputs = nm_general_output_read();
@@ -480,34 +481,6 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 			LOG(4,("CRTC: DPMS readback $%02x, programmed $%02x\n", ISAGRPHR(ENSETRESET), temp));
 		}
 	}
-
-	return B_OK;
-}
-
-status_t nm_crtc_dpms_fetch(bool * display, bool * h, bool * v)
-{
-	*display = !(ISASEQR(CLKMODE) & 0x20);
-
-	if (si->ps.card_type < NM2200)
-	{
-		/* no full DPMS support */
-		*h = *v = *display;
-	}
-	else
-	{
-		/* full DPMS support for external monitors */
-		//fixme: checkout if so...
-		*h = !(ISAGRPHR(ENSETRESET) & 0x10);
-		*v = !(ISAGRPHR(ENSETRESET) & 0x20);
-	}
-
-	LOG(4,("CTRC: fetched DPMS state: "));
-	if (*display) LOG(4,("display on, "));
-	else LOG(4,("display off, "));
-	if (*h) LOG(4,("hsync enabled, "));
-	else LOG(4,("hsync disabled, "));
-	if (*v) LOG(4,("vsync enabled\n"));
-	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }

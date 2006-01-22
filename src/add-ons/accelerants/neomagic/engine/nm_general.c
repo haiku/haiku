@@ -88,7 +88,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku Neomagic Accelerant 0.12 running.\n"));
+	LOG(1,("POWERUP: Haiku Neomagic Accelerant 0.14 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
