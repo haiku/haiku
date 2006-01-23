@@ -92,16 +92,23 @@ typedef struct
 static status_t
 ps2_reset_mouse(mouse_cookie *cookie)
 {
-	uint8 read;
+	uint8 data[2];
 	status_t status;
 	
 	TRACE(("ps2_reset_mouse()\n"));
 	
-	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET_MOUSE, NULL, 0, &read, 1);
+	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET_MOUSE, NULL, 0, data, 2);
 		
-	TRACE(("reset mouse: status 0x%08x, data 0x%02x\n", status, read));
+	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
+		TRACE(("reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]));
+		status = B_ERROR;
+	} else if (status != B_OK) {
+		TRACE(("reset mouse failed\n"));
+	} else {
+		TRACE(("reset mouse success\n"));
+	}
 	
-	return B_OK;	
+	return status;
 }
 
 
@@ -269,26 +276,31 @@ int32 mouse_handle_int(ps2_dev *dev, uint8 data)
 status_t
 probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 {
+	status_t status;
 	uint8 deviceId = 0;
+	
+	
+	status = ps2_reset_mouse(cookie);
 
 	// get device id
-	ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
+	status = ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
+	if (status != B_OK) {
+		TRACE(("probe_mouse(): get device id failed\n"));
+		return B_ERROR;
+	}
 
 	TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
 
+	// check for MS Intellimouse
 	if (deviceId == 0) {
-		int32 tries = 5;
-
-		while (--tries > 0) {
-			// try to switch to intellimouse mode
-			if (ps2_set_sample_rate(cookie, 200) == B_OK
-				&& ps2_set_sample_rate(cookie, 100) == B_OK
-				&& ps2_set_sample_rate(cookie, 80) == B_OK) {
-				// get device id, again
-				ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &deviceId, 1);
-				TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
-				break;
-			}
+		uint8 alternate_device_id;
+		status  = ps2_set_sample_rate(cookie, 200);
+		status |= ps2_set_sample_rate(cookie, 100);
+		status |= ps2_set_sample_rate(cookie, 80);
+		status |= ps2_dev_command(cookie->dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, &alternate_device_id, 1);
+		if (status == 0) {
+			TRACE(("probe_mouse(): alternate device id: %2x\n", alternate_device_id));		
+			deviceId = alternate_device_id;
 		}
 	}
 
