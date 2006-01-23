@@ -126,7 +126,7 @@ ps2_flush()
 		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 			return;
 		data = ps2_read_data();
-		TRACE(("ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
+		TRACE(("ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb"));
 		snooze(100);
 	}
 
@@ -203,23 +203,24 @@ ps2_interrupt(void* cookie)
 		return B_UNHANDLED_INTERRUPT;
 		
 	if (atomic_get(&sIgnoreInterrupts)) {
-		TRACE(("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
+		TRACE(("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb"));
 		return B_HANDLED_INTERRUPT;
 	}
 	
 	data = ps2_read_data();
 
-	TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_MOUSE_DATA) ? "mouse" : "keyb"));
-
-	if (ctrl & PS2_STATUS_MOUSE_DATA) {
+	if (ctrl & PS2_STATUS_AUX_DATA) {
 		uint8 idx;
 		if (gMultiplexingActive) {
 			idx = ctrl >> 6;
+			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx));
 		} else {
 			idx = 0;
+			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data));
 		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
+		TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data));
 		dev = &ps2_device[PS2_DEVICE_KEYB];
 	}
 	

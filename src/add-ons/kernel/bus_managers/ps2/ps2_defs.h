@@ -22,7 +22,7 @@
 // data port bits
 #define PS2_STATUS_OUTPUT_BUFFER_FULL	0x01
 #define PS2_STATUS_INPUT_BUFFER_FULL	0x02
-#define PS2_STATUS_MOUSE_DATA			0x20
+#define PS2_STATUS_AUX_DATA				0x20
 #define PS2_STATUS_TIMEOUT				0x40
 
 // control words
