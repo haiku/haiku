@@ -42,6 +42,7 @@ extern ps2_dev ps2_device[PS2_DEVICE_COUNT];
 #define PS2_FLAG_CMD		(1<<3)
 #define PS2_FLAG_ACK		(1<<4)
 #define PS2_FLAG_NACK		(1<<5)
+#define PS2_FLAG_GETID		(1<<6)
 
 status_t	ps2_dev_init(void);
 void		ps2_dev_exit(void);

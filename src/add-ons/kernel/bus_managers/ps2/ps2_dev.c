@@ -93,8 +93,21 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	
 	if (flags & PS2_FLAG_CMD) {
 		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
-			atomic_or(&dev->flags, data == 0xfa ? PS2_FLAG_ACK : PS2_FLAG_NACK);
-			release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
+			int cnt = 1;
+			if ((flags & PS2_FLAG_GETID) && (data == 0 || data == 3 || data == 4)) {
+				dprintf("ps2_dev_handle_int stupid mouse!\n");
+				atomic_or(&dev->flags, PS2_FLAG_ACK);
+				if (dev->result_buf_cnt) {
+					dev->result_buf[dev->result_buf_idx] = data;
+					dev->result_buf_idx++;
+					dev->result_buf_cnt--;
+					if (dev->result_buf_cnt == 0)
+						cnt++;
+				}
+			} else {
+				atomic_or(&dev->flags, data == 0xfa ? PS2_FLAG_ACK : PS2_FLAG_NACK);
+			}
+			release_sem_etc(dev->result_sem, cnt, B_DO_NOT_RESCHEDULE);
 			return B_INVOKE_SCHEDULER;
 		} else if (dev->result_buf_cnt) {
 			dev->result_buf[dev->result_buf_idx] = data;
@@ -132,22 +145,34 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 status_t
 ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
-	status_t res = B_OK;
+	status_t res;
 	bigtime_t start;
 	int i, count;
-	
+	int32 sem_count;
+
 	dprintf("ps2_dev_command %02x, %d out, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
 	
+	res = get_sem_count(dev->result_sem, &sem_count);
+	if (res == B_OK && sem_count != 0) {
+		dprintf("ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
+		if (sem_count > 0)
+			acquire_sem_etc(dev->result_sem, sem_count, 0, 0);
+		else
+			release_sem_etc(dev->result_sem, -sem_count, 0);
+	}
+		
 	dev->flags |= PS2_FLAG_CMD;
-	dev->flags &= ~(PS2_FLAG_ACK | PS2_FLAG_NACK);
 
 	dev->result_buf_cnt = in_count;
 	dev->result_buf_idx = 0;
 	dev->result_buf = in;
 	
-	start = system_time();
-
+	res = B_OK;
 	for (i = -1; res == B_OK && i < out_count; i++) {
+
+		dev->flags &= ~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID);
+		if (i == -1 && cmd == PS2_CMD_GET_DEVICE_ID)
+			dev->flags |= PS2_FLAG_GETID;
 
 		if (!(dev->flags & PS2_FLAG_KEYB)) {
 			uint8 prefix_cmd;
@@ -164,47 +189,46 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 		if (res == B_OK) {
 			ps2_write_data(i == -1 ? cmd : out[i]);
 		}
-	}
-	
-	dprintf("ps2_dev_command send-time %Ld\n", system_time() - start);
-	
-
-	start = system_time();
-	res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-	dprintf("ps2_dev_command wait for ack res %08x, wait-time %Ld\n", res, system_time() - start);
-
-
-	if (dev->flags & PS2_FLAG_ACK) {
-		dprintf("ps2_dev_command got ACK\n");
-	}
-
-	if (dev->flags & PS2_FLAG_NACK) {
-		dev->flags &= ~PS2_FLAG_CMD;
-		dprintf("ps2_dev_command got NACK\n");
-		return B_ERROR;
-	}
-	
-	if (res != B_OK) {
-		dprintf("ps2_dev_command send failed\n");
-	}
-
-	if (in_count != 0) {
-		dprintf("ps2_dev_command waiting for result\n");
 
 		start = system_time();
+		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+		dprintf("ps2_dev_command wait for ack res %08x, wait-time %Ld\n", res, system_time() - start);
+
+		if (res != B_OK)
+			break;
+
+		if (dev->flags & PS2_FLAG_ACK) {
+			dprintf("ps2_dev_command got ACK\n");
+		}
+
+		if (dev->flags & PS2_FLAG_NACK) {
+			dprintf("ps2_dev_command got NACK\n");
+			res = B_ERROR;
+			break;
+		}
+
+	}	
 	
+	if (res == B_OK && in_count != 0) {
+		dprintf("ps2_dev_command waiting input data\n");
+
+		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
 
 		count = in_count - dev->result_buf_cnt;
 		dev->result_buf_cnt = 0;
-	
-		dprintf("ps2_dev_command res %08x, in %d, wait-time %Ld\n", res, count, system_time() - start);
+
+		dprintf("ps2_dev_command wait for input res %08x, in %d, wait-time %Ld\n", res, count, system_time() - start);
 
 		for (i = 0; i < count; i++)
 			dprintf("ps2_dev_command data %02x\n", in[i]);
 	}
 
 	dev->flags &= ~PS2_FLAG_CMD;
+
+	if (res != B_OK) {
+		dprintf("ps2_dev_command send failed\n");
+	}
 
 	return res;
 }
