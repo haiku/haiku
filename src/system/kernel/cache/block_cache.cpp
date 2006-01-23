@@ -951,7 +951,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
-		panic("cache_start_sub_transaction(): invalid transaction ID\n");
+		panic("cache_start_sub_transaction(): invalid transaction ID %ld\n", id);
 		return B_BAD_VALUE;
 	}
 
