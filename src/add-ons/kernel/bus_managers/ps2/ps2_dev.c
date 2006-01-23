@@ -226,10 +226,6 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 	dev->flags &= ~PS2_FLAG_CMD;
 
-	if (res != B_OK) {
-		dprintf("ps2_dev_command send failed\n");
-	}
-
 	return res;
 }
 
