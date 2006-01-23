@@ -141,7 +141,8 @@ TTimeEdit::DrawSeperator(uint32 index)
 	in f_sections or the section to the seps left
 	*/
 	
-	if (index == 3) return;  // no seperator for am/pm
+	if (index >= 2)
+		return;  // no seperator for am/pm
 	BString text(":");
 	uint32 sep;
 	GetSeperatorWidth(&sep);
@@ -239,6 +240,9 @@ TTimeEdit::SetTo(uint32 hour, uint32 minute, uint32 second)
 void
 TTimeEdit::DoUpPress()
 {
+	if (f_focus == -1)
+		SectionFocus(0);
+	
 	// update displayed value
 	f_holdvalue += 1;
 	
@@ -252,6 +256,9 @@ TTimeEdit::DoUpPress()
 void
 TTimeEdit::DoDownPress()
 {
+	if (f_focus == -1)
+		SectionFocus(0);
+
 	// update display value
 	f_holdvalue -= 1;
 	
@@ -295,14 +302,14 @@ TTimeEdit::CheckRange()
 				value = 0;
 			 else if (value < 0) 
 				value = 23;
-		break;
+			break;
 		
 		case 1: //minute
 			if (value> 59)
 				value = 0;
 			else if (value < 0)
 				value = 59;
-		break;
+			break;
 		
 		case 2: //second
 			if (value > 59)
@@ -310,7 +317,7 @@ TTimeEdit::CheckRange()
 			else if (value < 0)
 				value = 59;
 			
-		break;
+			break;
 		
 		case 3:
 			// modify hour value to reflect change in am/pm
@@ -321,10 +328,10 @@ TTimeEdit::CheckRange()
 				value -= 12;
 			if (value == 24) value = 0;
 			((TDateTimeSection *)f_sections->ItemAt(0))->SetData(value);
-		break;
+			break;
 		
 		default:
-		break;
+			return;
 	}
 	
 	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
@@ -541,6 +548,9 @@ TDateEdit::SetTo(uint32 year, uint32 month, uint32 day)
 void
 TDateEdit::DoUpPress()
 {
+	if (f_focus == -1)
+		SectionFocus(0);
+
 	// update displayed value
 	f_holdvalue += 1;
 	
@@ -554,6 +564,9 @@ TDateEdit::DoUpPress()
 void
 TDateEdit::DoDownPress()
 {
+	if (f_focus == -1)
+		SectionFocus(0);
+
 	// update display value
 	f_holdvalue -= 1;
 	
@@ -596,9 +609,9 @@ TDateEdit::CheckRange()
 				value = 0;
 			else if (value < 0)
 				value = 11;
+			break;
 		}
-		break;
-		
+			
 		case 1: //day
 		{
 			uint32 month = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
@@ -609,8 +622,8 @@ TDateEdit::CheckRange()
 				value = 1;
 			else if (value < 1)
 				value = daycnt;
+			break;
 		}
-		break;
 		
 		case 2: //year
 		{
@@ -618,11 +631,11 @@ TDateEdit::CheckRange()
 				value = YEAR_DELTA_MIN;
 			else if (value < YEAR_DELTA_MIN)
 				value = YEAR_DELTA_MAX;
+			break;
 		}
-		break;
 		
 		default:
-		break;
+			return;
 	}
 	
 	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
