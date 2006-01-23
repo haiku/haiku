@@ -26,6 +26,14 @@ class BMessage::Private {
 			fMessage->fPreferred = token == B_PREFERRED_TOKEN;
 		}
 
+		inline void SetReply(team_id team, port_id port, int32 token)
+		{
+			fMessage->fReplyTo.port = port;
+			fMessage->fReplyTo.target = token;
+			fMessage->fReplyTo.team = team;
+			fMessage->fReplyTo.preferred = token == B_PREFERRED_TOKEN;
+		}
+
 		inline void SetReply(BMessenger messenger)
 		{
 			BMessenger::Private mp(messenger);

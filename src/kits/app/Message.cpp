@@ -38,6 +38,7 @@
 #include <DataBuffer.h>
 #include <KMessage.h>
 #include <MessageBody.h>
+#include <MessagePrivate.h>
 #include <MessageUtils.h>
 #include <TokenSpace.h>
 
@@ -2171,9 +2172,14 @@ convert_message(const KMessage *fromMessage, BMessage *toMessage)
 	if (!fromMessage || !toMessage)
 		return B_BAD_VALUE;
 
-	// make empty and init what of the target message
+	// make empty and init the header of the target message
 	toMessage->MakeEmpty();
 	toMessage->what = fromMessage->What();
+	
+	BMessage::Private toPrivate(toMessage);
+	toPrivate.SetTarget(fromMessage->TargetToken());
+	toPrivate.SetReply(B_SYSTEM_TEAM, fromMessage->ReplyPort(),
+		fromMessage->ReplyToken());
 
 	// iterate through the fields and import them in the target message
 	KMessageField field;
