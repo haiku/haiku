@@ -5,6 +5,7 @@
 
 
 #include <KernelExport.h>
+#define __HAIKU_PCI_BUS_MANAGER_TESTING 1
 #include <PCI.h>
 #include <string.h>
 #include "pci_info.h"
@@ -19,29 +20,30 @@
 #endif
 
 
-void print_bridge_info(const pci_info *info, bool verbose);
-void print_generic_info(const pci_info *info, bool verbose);
-void print_capabilities(const pci_info *info);
-void print_info_basic(const pci_info *info, bool verbose);
 void get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull);
 void get_device_info(uint16 vendorID, uint16 deviceID, const char **devShort, const char **devFull);
 const char *get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api);
 const char *get_capability_name(uint8 cap_id);
 
 
-void
-print_bridge_info(const pci_info *info, bool verbose)
+static void
+print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 {
+	TRACE(("PCI:   subsystem_id %04x, subsystem_vendor_id %04x\n",
+			info->u.h1.subsystem_id, info->u.h1.subsystem_vendor_id));
 	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
 			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
-	TRACE(("PCI:   io_base %04x%02x, io_limit %04x%02x\n",
-			info->u.h1.io_base_upper16, info->u.h1.io_base, info->u.h1.io_limit_upper16, info->u.h1.io_limit));
+	TRACE(("PCI:   io_base_upper_16 %04x, io_base %02x\n",
+			info->u.h1.io_base_upper16, info->u.h1.io_base));
+	TRACE(("PCI:   io_limit_upper_16 %04x, io_limit %02x\n",
+			info->u.h1.io_limit_upper16, info->u.h1.io_limit));
 	TRACE(("PCI:   memory_base %04x, memory_limit %04x\n",
 			info->u.h1.memory_base, info->u.h1.memory_limit));
-	TRACE(("PCI:   prefetchable memory base %08lx%04x, limit %08lx%04x\n",
-		info->u.h1.prefetchable_memory_base_upper32, info->u.h1.prefetchable_memory_base,
+	TRACE(("PCI:   prefetchable_memory_base_upper32 %08lx, prefetchable_memory_base %04x\n",
+		info->u.h1.prefetchable_memory_base_upper32, info->u.h1.prefetchable_memory_base));
+	TRACE(("PCI:   prefetchable_memory_limit_upper32 %08lx, prefetchable_memory_limit %04x\n",
 		info->u.h1.prefetchable_memory_limit_upper32, info->u.h1.prefetchable_memory_limit));
-	TRACE(("PCI:   bridge_control %04x, secondary_status %04x\n",
+	TRACE(("PCI:   bridge_control %02x, secondary_status %04x\n",
 			info->u.h1.bridge_control, info->u.h1.secondary_status));
 	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x\n",
 			info->u.h1.interrupt_line, info->u.h1.interrupt_pin));
@@ -54,7 +56,27 @@ print_bridge_info(const pci_info *info, bool verbose)
 }
 
 
-void
+static void
+print_pci2cardbus_bridge_info(const pci_info *info, bool verbose)
+{
+	TRACE(("PCI:   subsystem_id %04x, subsystem_vendor_id %04x\n",
+			info->u.h2.subsystem_id, info->u.h2.subsystem_vendor_id));
+	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
+			info->u.h2.primary_bus, info->u.h2.secondary_bus, info->u.h2.subordinate_bus, info->u.h2.secondary_latency));
+	TRACE(("PCI:   bridge_control %02x, secondary_status %04x\n",
+			info->u.h2.bridge_control, info->u.h2.secondary_status));
+	TRACE(("PCI:   memory_base_upper32 %08lx, memory_base %08lx\n",
+		info->u.h2.memory_base_upper32, info->u.h2.memory_base));
+	TRACE(("PCI:   memory_limit_upper32 %08lx, memory_limit %08lx\n",
+		info->u.h2.memory_limit_upper32, info->u.h2.memory_limit));
+	TRACE(("PCI:   io_base_upper32 %08lx, io_base %08lx\n",
+		info->u.h2.io_base_upper32, info->u.h2.io_base));
+	TRACE(("PCI:   io_limit_upper32 %08lx, io_limit %08lx\n",
+		info->u.h2.io_limit_upper32, info->u.h2.io_limit));
+}
+
+
+static void
 print_generic_info(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size %08lx\n",
@@ -70,7 +92,7 @@ print_generic_info(const pci_info *info, bool verbose)
 }
 
 
-void
+static void
 print_capabilities(const pci_info *info)
 {
 	uint16	status;
@@ -85,8 +107,20 @@ print_capabilities(const pci_info *info)
 		TRACE(("(not supported)\n"));
 		return;
 	}
-	
-	cap_ptr = pci_read_config(info->bus, info->device, info->function, PCI_capabilities_ptr, 1);
+
+	switch (info->header_type & PCI_header_type_mask) {
+		case PCI_header_type_generic:
+		case PCI_header_type_PCI_to_PCI_bridge:
+			cap_ptr = pci_read_config(info->bus, info->device, info->function, PCI_capabilities_ptr, 1);
+			break;
+		case PCI_header_type_cardbus:
+			cap_ptr = pci_read_config(info->bus, info->device, info->function, PCI_capabilities_ptr_2, 1);
+			break;
+		default:
+			TRACE(("(unknown header type)\n"));
+			return;
+	}
+
 	cap_ptr &= ~3;
 	if (!cap_ptr) {
 		TRACE(("(empty list)\n"));
@@ -114,7 +148,7 @@ print_capabilities(const pci_info *info)
 }
 
 
-void
+static void
 print_info_basic(const pci_info *info, bool verbose)
 {
 	TRACE(("PCI: bus %2d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
@@ -151,11 +185,14 @@ print_info_basic(const pci_info *info, bool verbose)
 			info->line_size, info->latency, info->header_type, info->bist));
 			
 	switch (info->header_type & PCI_header_type_mask) {
-		case 0:
+		case PCI_header_type_generic:
 			print_generic_info(info, verbose);
 			break;
-		case 1:
-			print_bridge_info(info, verbose);
+		case PCI_header_type_PCI_to_PCI_bridge:
+			print_pci2pci_bridge_info(info, verbose);
+			break;
+		case PCI_header_type_cardbus:
+			print_pci2cardbus_bridge_info(info, verbose);
 			break;
 		default:
 			TRACE(("PCI:   unknown header type\n"));

@@ -7,6 +7,7 @@
 
 
 #include <KernelExport.h>
+#define __HAIKU_PCI_BUS_MANAGER_TESTING 1
 #include <PCI.h>
 
 #include "util/kernel_cpp.h"
@@ -258,7 +259,7 @@ void
 PCI::ReadPciHeaderInfo(PCIDev *dev)
 {
 	switch (dev->info.header_type & PCI_header_type_mask) {
-		case 0:
+		case PCI_header_type_generic:
 		{
 			// disable PCI device address decoding (io and memory) while BARs are modified
 			uint16 pcicmd = pci_read_config(dev->bus, dev->dev, dev->func, PCI_command, 2);
@@ -291,7 +292,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			break;
 		}
 
-		case 1:
+		case PCI_header_type_PCI_to_PCI_bridge:
 		{
 			// disable PCI device address decoding (io and memory) while BARs are modified
 			uint16 pcicmd = pci_read_config(dev->bus, dev->dev, dev->func, PCI_command, 2);
@@ -330,12 +331,37 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			dev->info.u.h1.io_limit_upper16 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit_upper16, 2);
 			dev->info.u.h1.interrupt_line = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_line, 1);
 			dev->info.u.h1.interrupt_pin = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_pin, 1);
-			dev->info.u.h1.bridge_control = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);		
+			dev->info.u.h1.bridge_control = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);	
+			dev->info.u.h1.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_sub_device_id_1, 2);
+			dev->info.u.h1.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_sub_vendor_id_1, 2);
+			break;
+		}
+		
+		case PCI_header_type_cardbus:
+		{
+			// for testing only, not final:
+			dev->info.u.h2.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_sub_device_id_2, 2);
+			dev->info.u.h2.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_sub_vendor_id_2, 2);
+			dev->info.u.h2.primary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_primary_bus_2, 1);
+			dev->info.u.h2.secondary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_bus_2, 1);
+			dev->info.u.h2.subordinate_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subordinate_bus_2, 1);
+			dev->info.u.h2.secondary_latency = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_latency_2, 1);
+			dev->info.u.h2.reserved = 0;
+			dev->info.u.h2.memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_base0_2, 4);
+			dev->info.u.h2.memory_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_limit0_2, 4);
+			dev->info.u.h2.memory_base_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_base1_2, 4);
+			dev->info.u.h2.memory_limit_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_limit1_2, 4);
+			dev->info.u.h2.io_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_base0_2, 4);
+			dev->info.u.h2.io_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit0_2, 4);
+			dev->info.u.h2.io_base_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_base1_2, 4);
+			dev->info.u.h2.io_limit_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit1_2, 4);
+			dev->info.u.h2.secondary_status = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_status_2, 2);
+			dev->info.u.h2.bridge_control = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bridge_control_2, 1);
 			break;
 		}
 
 		default:
-			TRACE(("PCI: Header type unknown (%d)\n", dev->info.header_type));
+			TRACE(("PCI: Header type unknown (0x%02x)\n", dev->info.header_type));
 			break;
 	}
 }

@@ -90,6 +90,25 @@ typedef struct pci_info {
 		struct {
 			ushort	subsystem_id;			/* subsystem (add-in card) id */
 			ushort	subsystem_vendor_id;	/* subsystem (add-in card) vendor id */
+
+#ifdef __HAIKU_PCI_BUS_MANAGER_TESTING
+			// for testing only, not final (do not use!):
+			uchar   primary_bus;
+			uchar   secondary_bus;
+			uchar   subordinate_bus;
+			uchar   secondary_latency;
+			ushort  reserved;
+			ulong   memory_base;
+			ulong   memory_limit;
+			ulong   memory_base_upper32;
+			ulong   memory_limit_upper32;
+			ulong   io_base;
+			ulong   io_limit;
+			ulong   io_base_upper32;
+			ulong   io_limit_upper32;
+			ushort  secondary_status;
+			uchar   bridge_control;
+#endif /* __HAIKU_PCI_BUS_MANAGER_TESTING */
 		} h2;			
 	} u;
 } pci_info;
