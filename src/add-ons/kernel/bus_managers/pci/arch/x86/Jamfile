@@ -4,7 +4,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
 KernelStaticLibrary pci_arch_bus_manager : 
 	bios.c
-	pci_config.c
+	pci_controller.c
 	pci_io.c
 	pci_irq.c
 	;
