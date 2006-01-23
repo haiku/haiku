@@ -117,7 +117,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 			else if (!silent)
 				fprintf(stderr, "Volume `%s' already mounted.\n", name);
 		} else if (mountAll) {
-			mount = true;
+			mount = !partition->IsMounted();
 		} else if (mountBFS && type != NULL
 			&& strcmp(type, kPartitionTypeBFS) == 0) {
 			mount = true;
