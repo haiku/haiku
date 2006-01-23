@@ -33,13 +33,13 @@ print_pci2pci_bridge_info(const pci_info *info, bool verbose)
 			info->u.h1.subsystem_id, info->u.h1.subsystem_vendor_id));
 	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
 			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
-	TRACE(("PCI:   io_base_upper_16 %04x, io_base %02x\n",
+	TRACE(("PCI:   io_base_upper_16  %04x, io_base  %02x\n",
 			info->u.h1.io_base_upper16, info->u.h1.io_base));
 	TRACE(("PCI:   io_limit_upper_16 %04x, io_limit %02x\n",
 			info->u.h1.io_limit_upper16, info->u.h1.io_limit));
 	TRACE(("PCI:   memory_base %04x, memory_limit %04x\n",
 			info->u.h1.memory_base, info->u.h1.memory_limit));
-	TRACE(("PCI:   prefetchable_memory_base_upper32 %08lx, prefetchable_memory_base %04x\n",
+	TRACE(("PCI:   prefetchable_memory_base_upper32  %08lx, prefetchable_memory_base  %04x\n",
 		info->u.h1.prefetchable_memory_base_upper32, info->u.h1.prefetchable_memory_base));
 	TRACE(("PCI:   prefetchable_memory_limit_upper32 %08lx, prefetchable_memory_limit %04x\n",
 		info->u.h1.prefetchable_memory_limit_upper32, info->u.h1.prefetchable_memory_limit));
@@ -65,11 +65,11 @@ print_pci2cardbus_bridge_info(const pci_info *info, bool verbose)
 			info->u.h2.primary_bus, info->u.h2.secondary_bus, info->u.h2.subordinate_bus, info->u.h2.secondary_latency));
 	TRACE(("PCI:   bridge_control %02x, secondary_status %04x\n",
 			info->u.h2.bridge_control, info->u.h2.secondary_status));
-	TRACE(("PCI:   memory_base_upper32 %08lx, memory_base %08lx\n",
+	TRACE(("PCI:   memory_base_upper32  %08lx, memory_base  %08lx\n",
 		info->u.h2.memory_base_upper32, info->u.h2.memory_base));
 	TRACE(("PCI:   memory_limit_upper32 %08lx, memory_limit %08lx\n",
 		info->u.h2.memory_limit_upper32, info->u.h2.memory_limit));
-	TRACE(("PCI:   io_base_upper32 %08lx, io_base %08lx\n",
+	TRACE(("PCI:   io_base_upper32  %08lx, io_base  %08lx\n",
 		info->u.h2.io_base_upper32, info->u.h2.io_base));
 	TRACE(("PCI:   io_limit_upper32 %08lx, io_limit %08lx\n",
 		info->u.h2.io_limit_upper32, info->u.h2.io_limit));
