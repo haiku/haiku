@@ -214,7 +214,8 @@ BScrollBar::~BScrollBar()
 BArchivable*
 BScrollBar::Instantiate(BMessage *data)
 {
-	// TODO: Implement
+	if (validate_instantiation(data, "BScrollBar"))
+		return new BScrollBar(data);
 	return NULL;
 }
 
@@ -581,6 +582,7 @@ BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 void
 BScrollBar::DetachedFromWindow()
 {
+	BView::DetachedFromWindow();
 }
 
 // Draw
@@ -874,8 +876,9 @@ BScrollBar::Draw(BRect updateRect)
 
 // FrameMoved
 void
-BScrollBar::FrameMoved(BPoint new_position)
+BScrollBar::FrameMoved(BPoint newPosition)
 {
+	BView::FrameMoved(newPosition);
 }
 
 // FrameResized
@@ -887,11 +890,10 @@ BScrollBar::FrameResized(float new_width, float new_height)
 
 // ResolveSpecifier
 BHandler*
-BScrollBar::ResolveSpecifier(BMessage *msg,int32 index,
-		BMessage *specifier,int32 form,const char *property)
+BScrollBar::ResolveSpecifier(BMessage *msg, int32 index,
+		BMessage *specifier, int32 form, const char *property)
 {
-	// TODO: Implement
-	return NULL;
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 // ResizeToPreferred
@@ -922,21 +924,21 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 void
 BScrollBar::MakeFocus(bool state)
 {
-	// TODO: ?!? Really?
-	if (fTarget)
-		fTarget->MakeFocus(state);
+	BView::MakeFocus(state);
 }
 
 // AllAttached
 void
 BScrollBar::AllAttached()
 {
+	BView::AllAttached();
 }
 
 // AllDetached
 void
 BScrollBar::AllDetached()
 {
+	BView::AllDetached();
 }
 
 // GetSupportedSuites
