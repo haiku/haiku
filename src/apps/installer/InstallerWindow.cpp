@@ -164,9 +164,15 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case START_SCAN:
 			StartScan();
 			break;
-		case BEGIN_MESSAGE:
+		case BEGIN_MESSAGE: 
+		{
+			BList *list = new BList();
+			int32 size = 0;
+			fPackagesView->GetPackagesToInstall(list, &size);
+			fCopyEngine->SetPackagesList(list);
 			BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 			break;
+		}
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
 			break;
@@ -341,7 +347,7 @@ InstallerWindow::PublishPackages()
 	} else 
 		return; // shouldn't happen
 	
-	directory.Append("_packages_");
+	directory.Append(PACKAGES_DIRECTORY);
 	BDirectory dir(directory.Path());
 	if (dir.InitCheck()!=B_OK)
 		return;
@@ -384,4 +390,6 @@ InstallerWindow::SetStatusMessage(const char *text)
 {
 	BAutolock(this);
 	fStatusView->SetText(text);
+	fStatusView->Invalidate();
 }
+

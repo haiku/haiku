@@ -5,6 +5,7 @@
 
 #include <fs_attr.h>
 #include <Directory.h>
+#include <Entry.h>
 #include <ScrollBar.h>
 #include <String.h>
 #include <stdio.h>
@@ -42,12 +43,12 @@ SizeAsString(off_t size, char *string)
 }
 
 
-Package::Package()
+Package::Package(const char *folder)
 	: Group(),
 	fSize(0),
 	fIcon(NULL)
 {
-
+	SetFolder(folder);
 }
 
 
@@ -60,10 +61,12 @@ Package::~Package()
 Package *
 Package::PackageFromEntry(BEntry &entry)
 {
+	char folder[B_FILE_NAME_LENGTH];
+	entry.GetName(folder);
 	BDirectory directory(&entry);
 	if (directory.InitCheck()!=B_OK)
 		return NULL;
-	Package *package = new Package();
+	Package *package = new Package(folder);
 	bool alwaysOn;
 	bool onByDefault;
 	int32 size;
@@ -244,5 +247,20 @@ PackagesView::GetTotalSizeAsString(char *string)
 			size += cb->GetPackage()->Size();
 	}
 	SizeAsString(size, string);
+}
+
+
+void 
+PackagesView::GetPackagesToInstall(BList *list, int32 *size)
+{
+	int32 count = CountChildren();
+	*size = 0;
+	for (int32 i=0; i<count; i++) {
+		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
+		if (cb && cb->Value()) {
+			list->AddItem(cb->GetPackage());
+			*size += cb->GetPackage()->Size();
+		}
+	}
 }
 

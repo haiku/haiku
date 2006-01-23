@@ -20,6 +20,7 @@
 #define INSTALLER_RIGHT 402
 
 const uint32 STATUS_MESSAGE = 'iSTM';
+const char PACKAGES_DIRECTORY[] = "_packages_";
 
 class InstallerWindow : public BWindow {
 public:

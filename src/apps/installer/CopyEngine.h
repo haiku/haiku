@@ -26,14 +26,16 @@ public:
 	void SetStatusMessage(char *status);
 	void Start(BMenu *srcMenu, BMenu *targetMenu);
 	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
-
+	void SetPackagesList(BList *list);
 private:
 	void LaunchInitScript(BPath &path);
 	void LaunchFinishScript(BPath &path);
+	void CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
 	
 	InstallerWindow *fWindow;
 	BDiskDeviceRoster fDDRoster;
 	InstallerCopyLoopControl *fControl;
+	BList *fPackages;
 };
 
 #endif /* _CopyEngine_h */

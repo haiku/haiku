@@ -27,7 +27,9 @@ InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 co
 {
 	if (name) {
 		BMessage msg(STATUS_MESSAGE);
-		msg.AddString("status", name);
+		BString s = "Installing ";
+		s << name;
+		msg.AddString("status", s.String());
 		fMessenger.SendMessage(&msg);
 	}
 }

@@ -26,14 +26,16 @@ private:
 
 class Package : public Group {
 public:
-	Package();
+	Package(const char *folder);
 	virtual ~Package();
+	void SetFolder(const char *folder) { strcpy(fFolder, folder); };
 	void SetName(const char *name) { strcpy(fName, name);};
 	void SetDescription(const char *description) { strcpy(fDescription, description);};
 	void SetSize(const int32 size) { fSize = size; };
 	void SetIcon(BBitmap * icon) { delete fIcon; fIcon = icon; };
 	void SetOnByDefault(bool onByDefault) { fOnByDefault = onByDefault; };
 	void SetAlwaysOn(bool alwaysOn) { fAlwaysOn = alwaysOn; };
+	const char * Folder() const { return fFolder; };
 	const char * Name() const { return fName; };
 	const char * Description() const { return fDescription; };
 	const int32 Size() const { return fSize; };
@@ -44,6 +46,7 @@ public:
 
 	static Package *PackageFromEntry(BEntry &dir);
 private:
+	char fFolder[64];
 	char fName[64];
 	char fDescription[64];
 	int32 fSize;
@@ -79,6 +82,7 @@ public:
 	void Clean();
 	void AddPackages(BList &list, BMessage *msg);
 	void GetTotalSizeAsString(char *string);
+	void GetPackagesToInstall(BList *list, int32 *size);
 private:
 	BList fViews;
 };

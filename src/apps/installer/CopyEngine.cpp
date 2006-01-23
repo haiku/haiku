@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Jérôme DUVAL. All rights reserved.
+ * Copyright 2005-2006, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -49,7 +49,8 @@ private:
 
 CopyEngine::CopyEngine(InstallerWindow *window)
 	: BLooper("copy_engine"),
-	fWindow(window)
+	fWindow(window),
+	fPackages(NULL)
 {
 	fControl = new InstallerCopyLoopControl(window);
 	Run();
@@ -159,9 +160,36 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	// copy source volume
 	BDirectory targetDir(targetDirectory.Path());
 	BDirectory srcDir(srcDirectory.Path());
+	CopyFolder(srcDir, targetDir);
+
+	// copy selected packages
+	srcDirectory.Append(PACKAGES_DIRECTORY);
+	srcDir.SetTo(srcDirectory.Path());
+	BDirectory packageDir;
+	if (fPackages) {
+		int32 count = fPackages->CountItems();
+		for (int32 i=0; i<count; i++) {
+			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
+			packageDir.SetTo(&srcDir, p->Folder());
+			CopyFolder(packageDir, targetDir);
+		}
+	}
+
+	LaunchFinishScript(targetDirectory);
+}
+
+
+void
+CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
+{
 	BEntry entry;
 	status_t status;
 	while (srcDir.GetNextEntry(&entry) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		entry.GetName(name);
+		if (strcmp(name, PACKAGES_DIRECTORY) == 0)
+			continue;
+
 		Undo undo;
 		status = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
 		if (status != B_OK) {
@@ -170,10 +198,6 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 			fprintf(stderr, "error while copying %s : %s\n", path.Path(), strerror(status));
 		}
 	}
-
-	// copy selected packages
-
-	LaunchFinishScript(targetDirectory);
 }
 
 
@@ -190,6 +214,15 @@ CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 	printf("ScanDisksPartitions partitions begin\n");
 	TargetVisitor targetVisitor(targetMenu);
 	fDDRoster.VisitEachPartition(&targetVisitor, &device, &partition);
+}
+
+
+void
+CopyEngine::SetPackagesList(BList *list)
+{
+	if (fPackages)
+		delete fPackages;
+	fPackages = list;
 }
 
 
