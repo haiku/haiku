@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences devices ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 rule ISAPnPHeaderGen
 {
 	SEARCH on $(2) = $(SEARCH_SOURCE) ;
@@ -44,7 +46,7 @@ Preference Devices :
 	cm_wrapper.c
 	DevicesInfo.cpp
 	ConfigurationWindow.cpp
-	: libbe.so
+	: be
 	: Devices.rdef
 ;
 
