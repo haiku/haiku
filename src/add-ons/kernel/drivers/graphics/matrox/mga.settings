@@ -40,7 +40,7 @@ greensync	false				# if true generate sync on green output signal
 #logmask   0x00010000	# engine: dac1 (including Millennium tvp)
 #logmask   0x00020000	# engine: crtc2
 #logmask   0x00040000	# engine: crtc1
-#logmask   0x00080000	# engine: acc
+#logmask   0x00080000	# engine: acceleration
 #logmask   0x00100000	# engine: maven tv
 #logmask   0x00200000	# set displaymode
 #logmask   0x00400000	# propose displaymode
@@ -51,4 +51,3 @@ greensync	false				# if true generate sync on green output signal
 #logmask   0x08000000	# get accelerant hook
 #logmask   0x10000000	# engine management
 #logmask   0x20000000	# cursor
-#logmask   0x40000000	# acceleration
