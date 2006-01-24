@@ -1,6 +1,6 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de
- * Distributed under the terms of the Haiku License.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
+ * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -11,21 +11,25 @@
 #include "blue_screen.h"
 
 #include <debug.h>
+#include <driver_settings.h>
 #include <frame_buffer_console.h>
 #include <gdb.h>
-
-#include <smp.h>
 #include <int.h>
+#include <smp.h>
 #include <vm.h>
-#include <driver_settings.h>
+
 #include <arch/debug_console.h>
 #include <arch/debug.h>
+#include <util/ring_buffer.h>
 
+#include <syslog_daemon.h>
+
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <syslog.h>
 
 
 typedef struct debugger_command {
@@ -45,8 +49,14 @@ static bool sBlueScreenOutput = false;
 static spinlock sSpinlock = 0;
 static int32 sDebuggerOnCPU = -1;
 
+static sem_id sSyslogNotify = -1;
+static struct syslog_message *sSyslogMessage;
+static struct ring_buffer *sSyslogBuffer;
+static bool sSyslogDropped = false;
+
 static struct debugger_command *sCommands;
 
+#define SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 
@@ -376,6 +386,160 @@ cmd_continue(int argc, char **argv)
 }
 
 
+static status_t
+syslog_sender(void *data)
+{
+	status_t error = B_BAD_PORT_ID;
+	port_id port = -1;
+	bool bufferPending = false;
+	int32 length = 0;
+
+	while (true) {
+		// wait for syslog data to become available
+		acquire_sem(sSyslogNotify);
+
+		sSyslogMessage->when = real_time_clock();
+
+		if (error == B_BAD_PORT_ID) {
+			// last message couldn't be sent, try to locate the syslog_daemon
+			port = find_port(SYSLOG_PORT_NAME);
+		}
+
+		if (port >= B_OK) {
+			if (!bufferPending) {
+				// we need to have exclusive access to our syslog buffer
+				cpu_status state = disable_interrupts();
+				acquire_spinlock(&sSpinlock);
+
+				length = ring_buffer_readable(sSyslogBuffer);
+				if (length > SYSLOG_MAX_MESSAGE_LENGTH)
+					length = SYSLOG_MAX_MESSAGE_LENGTH;
+
+				length = ring_buffer_read(sSyslogBuffer, sSyslogMessage->message, length);
+				if (sSyslogDropped) {
+					// add drop marker
+					if (length < SYSLOG_MAX_MESSAGE_LENGTH - 6)
+						strlcat(sSyslogMessage->message, "<DROP>", SYSLOG_MAX_MESSAGE_LENGTH);
+					else if (length > 7)
+						strcpy(sSyslogMessage->message + length - 7, "<DROP>");
+
+					sSyslogDropped = false;
+				}
+
+				release_spinlock(&sSpinlock);
+				restore_interrupts(state);
+			}
+
+			error = write_port_etc(port, SYSLOG_MESSAGE, sSyslogMessage,
+				sizeof(struct syslog_message) + length, B_RELATIVE_TIMEOUT, 0);
+
+			if (error < B_OK) {
+				// sending has failed - just wait, maybe it'll work later.
+				bufferPending = true;
+				continue;
+			}
+
+			if (bufferPending) {
+				// we could write the last pending buffer, try to read more
+				// from the syslog ring buffer
+				release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
+				bufferPending = false;
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+static void
+syslog_write(const char *text, int32 length)
+{
+	bool trunc = false;
+
+	if (sSyslogBuffer == NULL)
+		return;
+
+	if (ring_buffer_writable(sSyslogBuffer) < length) {
+		// truncate data
+		length = ring_buffer_writable(sSyslogBuffer);
+
+		if (length > 8) {
+			trunc = true;
+			length -= 8;
+		} else
+			sSyslogDropped = true;
+	}
+
+	ring_buffer_write(sSyslogBuffer, text, length);
+	if (trunc)
+		ring_buffer_write(sSyslogBuffer, "<TRUNC>", 7);
+
+	release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+static status_t
+syslog_init_post_threads(void)
+{
+	sSyslogNotify = create_sem(0, "syslog data");
+	if (sSyslogNotify >= B_OK) {
+		thread_id thread = spawn_kernel_thread(syslog_sender, "syslog sender",
+			B_LOW_PRIORITY, NULL);
+		if (thread >= B_OK && resume_thread(thread) == B_OK)
+			return B_OK;
+	}
+
+	// initializing kernel syslog service failed -- disable it
+
+	sSyslogOutputEnabled = false;
+	free(sSyslogMessage);
+	free(sSyslogBuffer);
+	delete_sem(sSyslogNotify);
+
+	return B_ERROR;
+}
+
+
+static status_t
+syslog_init(void)
+{
+	status_t status;
+
+	if (!sSyslogOutputEnabled)
+		return B_OK;
+
+	sSyslogMessage = malloc(SYSLOG_MESSAGE_BUFFER_SIZE);
+	if (sSyslogMessage == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+
+	sSyslogBuffer = create_ring_buffer(SYSLOG_BUFFER_SIZE);
+	if (sSyslogBuffer == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	// initialize syslog message
+	sSyslogMessage->from = 0;
+	sSyslogMessage->options = LOG_KERN;
+	sSyslogMessage->priority = LOG_DEBUG;
+	sSyslogMessage->ident[0] = '\0';
+	//strcpy(sSyslogMessage->ident, "KERNEL");
+
+	return B_OK;
+
+err3:
+	free(sSyslogBuffer);
+err2:
+	free(sSyslogMessage);
+err1:
+	sSyslogOutputEnabled = false;
+	return status;
+}
+
+
 //	#pragma mark - private kernel API
 
 
@@ -445,6 +609,8 @@ debug_init_post_vm(kernel_args *args)
 	if (sBlueScreenEnabled && blue_screen_init() != B_OK)
 		sBlueScreenEnabled = false;
 
+	syslog_init();
+
 	return arch_debug_init(args);
 }
 
@@ -452,6 +618,8 @@ debug_init_post_vm(kernel_args *args)
 status_t
 debug_init_post_modules(struct kernel_args *args)
 {
+	syslog_init_post_threads();
+
 	return frame_buffer_console_init_post_modules(args);
 }
 
@@ -596,8 +764,9 @@ dprintf(const char *format, ...)
 {
 	cpu_status state;
 	va_list args;
+	int32 length;
 
-	if (!sSerialDebugEnabled)
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled)
 		return;
 
 	// ToDo: maybe add a non-interrupt buffer and path that only
@@ -608,10 +777,13 @@ dprintf(const char *format, ...)
 	acquire_spinlock(&sSpinlock);
 
 	va_start(args, format);
-	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
+	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	arch_debug_serial_puts(sOutputBuffer);
+	if (sSerialDebugEnabled)
+		arch_debug_serial_puts(sOutputBuffer);
+	if (sSyslogOutputEnabled)
+		syslog_write(sOutputBuffer, length);
 	if (sBlueScreenOutput)
 		blue_screen_puts(sOutputBuffer);
 

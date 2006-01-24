@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef SYSLOG_DAEMON_H
 #define SYSLOG_DAEMON_H
 
@@ -27,6 +27,9 @@ struct syslog_message {
 	char		ident[B_OS_NAME_LENGTH];
 	char		message[1];
 };
+
+#define SYSLOG_MESSAGE_BUFFER_SIZE	8192
+#define SYSLOG_MAX_MESSAGE_LENGTH	(SYSLOG_MESSAGE_BUFFER_SIZE - sizeof(struct syslog_message))
 
 #define SYSLOG_PRIORITY(options)	((options) & 0x7)
 #define SYSLOG_FACILITY(options)	((options) & 0x03f8)
