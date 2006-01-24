@@ -389,7 +389,7 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 //acc fixme: checkout blockmode constraints for G100+ (mil: nc?): also add blockmode
 //	         for other functions, and use fastblt on MIL1/2 if possible...
 //or is CMAP8 contraint a non-blockmode contraint? (linearisation problem maybe?)
-		if (si->dm.space==B_CMAP8 || si->ps.sdram)
+		if ((si->dm.space == B_CMAP8) || si->ps.sdram)
 		{
 			ACCGO(DWGCTL, 0x400c7814); // atype RSTR
 		}
@@ -401,10 +401,10 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 	}
 }
 
-/* rectangle fill.
+/* horizontal span fill.
  * Engine function rectangle_fill: paragraph 4.5.5.2 */
-/*colorIndex,fill_rect_params,count*/
-status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
+//(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
+void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count)
 {
 /*
 	FXBNDRY - left and right coordinates    a
@@ -413,33 +413,34 @@ status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 	DWGCTL - atype must be RSTR or BLK      a
 	FCOL - foreground colour                a
 */
+	int i = 0;
 
-	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
-	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
-	ACCW(FCOL,col);            /*set colour*/
+	while (count--)
+	{
+		ACCW(FXBNDRY, ((list[i + 2] + 1) << 16)| list[i + 1]);
+		ACCW_YDSTLEN(list[i], 1);
+		ACCW(FCOL, colorIndex);
 
+		/* start the fill */
 //acc fixme: checkout blockmode constraints for G100+ (mil: nc?): also add blockmode
 //	         for other functions, and use fastblt on MIL1/2 if possible...
 //or is CMAP8 contraint a non-blockmode contraint? (linearisation problem maybe?)
-	if (si->dm.space==B_CMAP8 || si->ps.sdram)
-	{
-		ACCGO(DWGCTL,0x400C7814); // atype RSTR
+		if ((si->dm.space == B_CMAP8) || si->ps.sdram)
+		{
+			ACCGO(DWGCTL, 0x400c7814); // atype RSTR
+		}
+		else
+		{
+			ACCGO(DWGCTL, 0x400c7844); // atype BLK
+		}
+		i += 3;
 	}
-	else
-	{
-		ACCGO(DWGCTL,0x400C7844); // atype BLK 
-	}
-	return B_OK;
 }
 
 /* rectangle invert.
  * Engine function rectangle_fill: paragraph 4.5.5.2 */
-/*colorIndex,fill_rect_params,count*/
-status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
+void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count)
 {
-//	int i;
-//	uint32 * dma;
-//	uint32 pci;
 /*
 	FXBNDRY - left and right coordinates    a
 	YDSTLEN - y start and no of lines       a
@@ -447,42 +448,48 @@ status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint3
 	DWGCTL - atype must be RSTR or BLK      a
 	FCOL - foreground colour                a
 */
+	int i = 0;
+//	uint32 * dma;
+//	uint32 pci;
 
-	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
-	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
-	ACCW(FCOL,col);            /*set colour*/
-	
-	/*draw it! top nibble is c is clipping enabled*/
-	ACCGO(DWGCTL,0x40057814); // atype RSTR
+	while (count--)
+	{
+		ACCW(FXBNDRY, (((list[i].right) + 1) << 16) | list[i].left);
+		ACCW_YDSTLEN(list[i].top, ((list[i].bottom - list[i].top) + 1));
+		ACCW(FCOL, 0); /* color */
 
-	/*pseudo_dma version!*/
-//MGAACC_DWGCTL      =0x1C00,
-//MGAACC_FCOL        =0x1C24,
-//MGAACC_FXBNDRY     =0x1C84,
-//MGAACC_YDSTLEN     =0x1C88,
+		/* start the invert (top nibble is c is clipping enabled) */
+		ACCGO(DWGCTL, 0x40057814); // atype RSTR
+
+		/* pseudo_dma version! */
+//		MGAACC_DWGCTL      =0x1c00,
+//		MGAACC_FCOL        =0x1c24,
+//		MGAACC_FXBNDRY     =0x1c84,
+//		MGAACC_YDSTLEN     =0x1c88,
 //
-//40,09,21,22 (ordered as registers)
+//		40,09,21,22 (ordered as registers)
 
-//	dma = (uint32 *)si->pseudo_dma;
-//	*dma++=0x40092221;
-//	*dma++=(xe<<16)|xs;
-//	*dma++=(ys<<16)|yl;
-//	*dma++=col;
-//	*dma++=0x40057814;
+//		dma = (uint32 *)si->pseudo_dma;
+//		*dma++= 0x40092221;
+//		*dma++= (((list[i].right) + 1) << 16) | list[i].left;
+//		*dma++= (list[i].top << 16) | ((list[i].bottom - list[i].top) + 1);
+//		*dma++= 0; /* color */
+//		*dma++= 0x40057814;
 
-	/*real dma version!*/
-//	dma = (vuint32 *)si->dma_buffer;
-//	*dma++=0x40092221;/*indices*/
-//	*dma++=(xe<<16)|xs;
-//	*dma++=(ys<<16)|yl;
-//	*dma++=col;
-//	*dma++=0x40057814;
+		/* real dma version! */
+//		dma = (vuint32 *)si->dma_buffer;
+//		*dma++= 0x40092221; /* indices */
+//		*dma++= (((list[i].right) + 1) << 16) | list[i].left;
+//		*dma++= (list[i].top << 16) | ((list[i].bottom - list[i].top) + 1);
+//		*dma++= 0; /* color */
+//		*dma++= 0x40057814;
 
-//	pci = si->dma_buffer_pci;
-//	ACCW(PRIMADDRESS,(pci));
-//	ACCW(PRIMEND,(20+pci));
+//		pci = si->dma_buffer_pci;
+//		ACCW(PRIMADDRESS, (pci));
+//		ACCW(PRIMEND, (20 + pci));
 
-//	delay(100);
+//		delay(100);
 
-	return B_OK;
+		i++;
+	}
 }

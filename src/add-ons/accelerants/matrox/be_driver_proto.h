@@ -45,9 +45,6 @@ void WAIT_ENGINE_IDLE(void);
 status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st);
 status_t SYNC_TO_TOKEN(sync_token *st);
 
-void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
-void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
-
 /* video_overlay */
 uint32 OVERLAY_COUNT(const display_mode *dm);
 const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm);

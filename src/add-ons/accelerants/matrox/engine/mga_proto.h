@@ -111,8 +111,8 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count);
 void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
-status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
-status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
+void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
+void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
