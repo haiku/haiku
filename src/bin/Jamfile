@@ -30,6 +30,7 @@ StdBinCommands
 	listimage.c
 	listport.c
 	listsem.c
+	logger.cpp
 	lsindex.cpp
 	mount.c
 	prio.c
