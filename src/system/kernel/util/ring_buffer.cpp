@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 
 #include <KernelExport.h>
 #include <lock.h>
+#include <port.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -206,3 +207,46 @@ ring_buffer_user_write(struct ring_buffer *buffer, const uint8 *data, ssize_t le
 	return write_to_buffer(buffer, data, length, true);
 }
 
+
+#if 0
+/**	Sends the contents of the ring buffer to a port.
+ *	The buffer will be empty afterwards only if sending the data actually works.
+ */
+
+status_t
+ring_buffer_write_to_port(struct ring_buffer *buffer, port_id port, int32 code,
+	uint32 flags, bigtime_t timeout)
+{
+	int32 length = buffer->in;
+	if (length == 0)
+		return B_OK;
+
+	status_t status;
+
+	if (buffer->first + length <= buffer->size) {
+		// simple write
+		status = write_port_etc(port, code, buffer->buffer + buffer->first, length,
+			flags, timeout);
+	} else {
+		// need to write both ends
+		size_t upper = buffer->size - buffer->first;
+		size_t lower = length - upper;
+
+		iovec vecs[2];
+		vecs[0].iov_base = buffer->buffer + buffer->first;
+		vecs[0].iov_len = upper;
+		vecs[1].iov_base = buffer->buffer;
+		vecs[1].iov_len = lower;
+
+		status = writev_port_etc(port, code, vecs, 2, length, flags, timeout);
+	}
+
+	if (status < B_OK)
+		return status;
+
+	buffer->first = (buffer->first + length) % buffer->size;
+	buffer->in -= length;
+
+	return status;
+}
+#endif
