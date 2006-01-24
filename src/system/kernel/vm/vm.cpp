@@ -2377,8 +2377,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 				thread_get_current_thread()->team->id, fault_address,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
-// We can print a stack trace of the userland thread here. Since we're accessing
-// user memory freely and unchecked, this is not enabled by default.
+// We can print a stack trace of the userland thread here.
 #if 0
 			if (area) {
 				struct stack_frame {
@@ -2392,18 +2391,24 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 				struct iframe *iframe = i386_get_user_iframe();
 				if (iframe == NULL)
 					panic("iframe is NULL!");
-				struct stack_frame *frame = (struct stack_frame *)iframe->ebp;
+
+				struct stack_frame frame;
+				status_t status = user_memcpy(&frame, (void *)iframe->ebp,
+					sizeof(struct stack_frame));
 
 				dprintf("stack trace:\n");
-				for (; frame; frame = frame->previous) {
-					dprintf("  0x%p", frame->return_address);
+				while (status == B_OK) {
+					dprintf("  0x%p", frame.return_address);
 					area = vm_area_lookup(addressSpace,
-						(addr_t)frame->return_address);
+						(addr_t)frame.return_address);
 					if (area) {
 						dprintf(" (%s + %#lx)", area->name,
-							(addr_t)frame->return_address - area->base);
+							(addr_t)frame.return_address - area->base);
 					}
 					dprintf("\n");
+
+					status = user_memcpy(&frame, frame.previous,
+						sizeof(struct stack_frame));
 				}
 			}
 #endif	// 0 (stack trace)
