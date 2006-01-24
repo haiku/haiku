@@ -45,7 +45,6 @@ void WAIT_ENGINE_IDLE(void);
 status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st);
 status_t SYNC_TO_TOKEN(sync_token *st);
 
-void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
 void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
 

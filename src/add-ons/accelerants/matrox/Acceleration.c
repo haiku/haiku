@@ -12,25 +12,6 @@
 
 #include "acc_std.h"
 
-void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count) {
-	int i;
-
-	/*draw each rectangle*/
-	i=0;
-	while (count--)
-	{
-		gx00_acc_rectangle
-		(
-			list[i].left,
-			(list[i].right)+1,
-			list[i].top,
-			(list[i].bottom-list[i].top)+1,
-			colorIndex
-		);
-		i++;
-	}
-}
-
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 	int i;
 

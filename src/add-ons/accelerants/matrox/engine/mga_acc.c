@@ -368,6 +368,41 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params 
 
 /* rectangle fill.
  * Engine function rectangle_fill: paragraph 4.5.5.2 */
+void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count)
+{
+/*
+	FXBNDRY - left and right coordinates    a
+	YDSTLEN - y start and no of lines       a
+	(or YDST and LEN)                       
+	DWGCTL - atype must be RSTR or BLK      a
+	FCOL - foreground colour                a
+*/
+	int i = 0;
+
+	while (count--)
+	{
+		ACCW(FXBNDRY, (((list[i].right + 1) << 16) | list[i].left));
+		ACCW_YDSTLEN(list[i].top, ((list[i].bottom - list[i].top) + 1));
+		ACCW(FCOL, colorIndex);
+
+		/* start the fill */
+//acc fixme: checkout blockmode constraints for G100+ (mil: nc?): also add blockmode
+//	         for other functions, and use fastblt on MIL1/2 if possible...
+//or is CMAP8 contraint a non-blockmode contraint? (linearisation problem maybe?)
+		if (si->dm.space==B_CMAP8 || si->ps.sdram)
+		{
+			ACCGO(DWGCTL, 0x400c7814); // atype RSTR
+		}
+		else
+		{
+			ACCGO(DWGCTL, 0x400c7844); // atype BLK 
+		}
+		i++;
+	}
+}
+
+/* rectangle fill.
+ * Engine function rectangle_fill: paragraph 4.5.5.2 */
 /*colorIndex,fill_rect_params,count*/
 status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 {

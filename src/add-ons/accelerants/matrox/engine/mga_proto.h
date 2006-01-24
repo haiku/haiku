@@ -105,16 +105,14 @@ status_t g400_crtc2_dpms(bool display, bool h, bool v);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
+status_t gx00_acc_wait_idle(void);
 status_t gx00_acc_init(void);
 void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count);
+void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
 status_t gx00_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
 status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
-status_t gx00_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
-status_t gx00_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
-	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
-status_t gx00_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
