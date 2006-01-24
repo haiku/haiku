@@ -223,14 +223,16 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 	while (count--)
 	{
 		/* find where the top and bottom are */
-		t_end = t_start = list[i].src_left + (offset * list[i].src_top) + si->engine.src_dst;
+		t_end = t_start =
+			list[i].src_left + (offset * list[i].src_top) + si->engine.src_dst;
 		t_end += list[i].width;
 
-		b_end = b_start = list[i].src_left + (offset * (list[i].src_top + list[i].height)) + si->engine.src_dst;
+		b_end = b_start =
+			list[i].src_left + (offset * (list[i].src_top + list[i].height)) + si->engine.src_dst;
 		b_end += list[i].width;
 
 		/* sgnzero bit _must_ be '0' before accessing SGN! */
-		ACCW(DWGCTL,0x00000000);
+		ACCW(DWGCTL, 0x00000000);
 
 		/*find which quadrant */
 		switch((list[i].dest_top > list[i].src_top) | ((list[i].dest_left > list[i].src_left) << 1))
@@ -267,79 +269,101 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 		ACCW(FXBNDRY,((list[i].dest_left + list[i].width) << 16) | list[i].dest_left);
 
 		/* start the blit */
-		ACCGO(DWGCTL,0x040C4018); // atype RSTR
+		ACCGO(DWGCTL, 0x040c4018); // atype RSTR
 		i++;
 	}
 }
 
 /* screen to screen tranparent blit - not sure what uses this.
  * Engine function bitblit, paragraph 4.5.7.2 */
-status_t gx00_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
+//WARNING:
+//yet untested function!!
+void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count)
 {
 	uint32 t_start,t_end,offset;
 	uint32 b_start,b_end;
+	int i = 0;
 
-	return B_ERROR;
-
-	/*find where the top,bottom and offset are*/
+	/* calc offset 'per line' */
 	offset = (si->fbc.bytes_per_row / (si->engine.depth >> 3));
 
-	t_end = t_start = xs + (offset*ys) + si->engine.src_dst;
-	t_end += w;
-
-	b_end = b_start = xs + (offset*(ys+h)) + si->engine.src_dst;
-	b_end +=w;
-
-	/* sgnzero bit _must_ be '0' before accessing SGN! */
-	ACCW(DWGCTL,0x00000000);
-
-	/*find which quadrant */
-	switch((yd>ys)|((xd>xs)<<1))
+	while (count--)
 	{
-	case 0: /*L->R,down*/ 
-		ACCW(SGN,0);
+		/* find where the top and bottom are */
+		t_end = t_start =
+			list[i].src_left + (offset * list[i].src_top) + si->engine.src_dst;
+		t_end += list[i].width;
 
-		ACCW(AR3,t_start);
-		ACCW(AR0,t_end);
-		ACCW(AR5,offset);
+		b_end = b_start =
+			list[i].src_left + (offset * (list[i].src_top + list[i].height)) + si->engine.src_dst;
+		b_end += list[i].width;
 
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 1: /*L->R,up*/
-		ACCW(SGN,4);
+		/* sgnzero bit _must_ be '0' before accessing SGN! */
+		ACCW(DWGCTL, 0x00000000);
 
-		ACCW(AR3,b_start);
-		ACCW(AR0,b_end);
-		ACCW(AR5,-offset);
+		/*find which quadrant */
+		switch((list[i].dest_top > list[i].src_top) | ((list[i].dest_left > list[i].src_left) << 1))
+		{
+		case 0: /*L->R,down*/ 
+			ACCW(SGN, 0);
+			ACCW(AR3, t_start);
+			ACCW(AR0, t_end);
+			ACCW(AR5, offset);
+			ACCW_YDSTLEN(list[i].dest_top, list[i].height + 1);
+			break;
+		case 1: /*L->R,up*/
+			ACCW(SGN, 4);
+			ACCW(AR3, b_start);
+			ACCW(AR0, b_end);
+			ACCW(AR5, -offset);
+			ACCW_YDSTLEN(list[i].dest_top + list[i].height, list[i].height + 1);
+			break;
+		case 2: /*R->L,down*/
+			ACCW(SGN, 1);
+			ACCW(AR3, t_end);
+			ACCW(AR0, t_start);
+			ACCW(AR5, offset);
+			ACCW_YDSTLEN(list[i].dest_top, list[i].height + 1);
+			break;
+		case 3: /*R->L,up*/
+			ACCW(SGN, 5);
+			ACCW(AR3, b_end);
+			ACCW(AR0, b_start);
+			ACCW(AR5, -offset);
+			ACCW_YDSTLEN(list[i].dest_top + list[i].height, list[i].height + 1);
+			break;
+		}
+		ACCW(FXBNDRY,((list[i].dest_left + list[i].width) << 16) | list[i].dest_left);
 
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
-	case 2: /*R->L,down*/
-		ACCW(SGN,1);
-
-		ACCW(AR3,t_end);
-		ACCW(AR0,t_start);
-		ACCW(AR5,offset);
-
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 3: /*R->L,up*/
-		ACCW(SGN,5);
-
-		ACCW(AR3,b_end);
-		ACCW(AR0,b_start);
-		ACCW(AR5,-offset);
-
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
+		/* start the blit */
+		ACCW(FCOL, transparent_colour);
+		ACCW(BCOL, 0xffffffff);
+		ACCGO(DWGCTL, 0x440c4018); // atype RSTR
+		i++;
 	}
-	ACCW(FXBNDRY,((xd+w)<<16)|xd);
-	
-	/*do the blit*/
-	ACCW(FCOL,colour);
-	ACCW(BCOL,0xffffffff);
-	ACCGO(DWGCTL,0x440C4018); // atype RSTR
-	return B_OK;
+}
+
+/* screen to screen scaled filtered blit - i.e. scale video in memory.
+ * Engine function texture mapping for video, paragraphs 4.5.5.5 - 4.5.5.9 */
+//fixme: implement...
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count)
+{
+	int i = 0;
+
+	while (count--)
+	{
+/*
+			list[i].src_left,
+			list[i].src_top,
+			list[i].src_width,
+			list[i].src_height,
+			list[i].dest_left,
+			list[i].dest_top,
+			list[i].dest_width,
+			list[i].dest_height
+*/
+		i++;
+	}
 }
 
 /* rectangle fill.
@@ -424,17 +448,6 @@ status_t gx00_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint3
 //	ACCW(PRIMEND,(20+pci));
 
 //	delay(100);
-
-	return B_OK;
-}
-
-/* screen to screen scaled filtered blit - i.e. scale video in memory.
- * Engine function texture mapping for video, paragraphs 4.5.5.5 - 4.5.5.9 */
-status_t gx00_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
-	uint16 xd,uint16 yd,uint16 wd,uint16 hd)
-{
-	//fixme: implement. Used for G450/G550 Desktop TVout...
-	//fixme: see if MIL1 - G200 support this function as well...
 
 	return B_OK;
 }
