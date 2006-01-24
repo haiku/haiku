@@ -171,6 +171,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			fPackagesView->GetPackagesToInstall(list, &size);
 			fCopyEngine->SetPackagesList(list);
 			BMessenger(fCopyEngine).SendMessage(ENGINE_START);
+			DisableInterface(true);
 			break;
 		}
 		case SHOW_BOTTOM_MESSAGE:
@@ -199,13 +200,21 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			if (msg->FindString("status", &status) == B_OK)
 				SetStatusMessage(status);
 		}
+		case INSTALL_FINISHED:
+			DisableInterface(false);
+			break;
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
 			if (msg->FindString("be:signature", &signature)==B_OK
 				&& strcasecmp(signature, DRIVESETUP_SIG)==0) {
-				DisableInterface(msg->what == B_SOME_APP_LAUNCHED);
+				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
+				DisableInterface(fDriveSetupLaunched);
+				if (fDriveSetupLaunched)
+					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
+				else
+					StartScan();
                         }
                         break;
                 }
@@ -263,16 +272,10 @@ InstallerWindow::LaunchDriveSetup()
 void
 InstallerWindow::DisableInterface(bool disable)
 {
-	if (!disable) {
-		StartScan();
-	}
-	fDriveSetupLaunched = disable;
 	fBeginButton->SetEnabled(!disable);
 	fSetupButton->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
-	if (disable)
-		SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
 }
 
 

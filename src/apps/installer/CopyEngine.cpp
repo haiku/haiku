@@ -8,9 +8,10 @@
 #include "PartitionMenuItem.h"
 #include "FSUndoRedo.h"
 #include "FSUtils.h"
-#include <FindDirectory.h>
+#include <Alert.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
+#include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
 #include <VolumeRoster.h>
@@ -21,6 +22,8 @@
 #else
 #define CALLED()
 #endif
+
+const char BOOT_PATH[] = "/boot";
 
 extern void SizeAsString(off_t size, char *string);
 
@@ -127,6 +130,10 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	} else 
 		return; // shouldn't happen
 
+	// check if target is initialized
+	// ask if init or mount as is
+	// check if target has enough space
+
 	BPath srcDirectory;
         if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
                 if (partition->GetMountPoint(&srcDirectory)!=B_OK)
@@ -137,23 +144,20 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
         } else
                 return; // shouldn't happen
 	
-	// check not installing on boot volume
-	BVolume bootVolume;
-	BDirectory bootDir;
-	BEntry bootEntry;
-	BPath bootPath;
-	BVolumeRoster().GetBootVolume(&bootVolume);
-	bootVolume.GetRootDirectory(&bootDir);
-	bootDir.GetEntry(&bootEntry);
-	bootEntry.GetPath(&bootPath);
-	printf("Copying to boot disk ? '%s' / '%s'\n", bootPath.Path(), targetDirectory.Path());
-	if (strncmp(bootPath.Path(), targetDirectory.Path(), strlen(bootPath.Path())) == 0) {
-		
+	// check not installing on itself
+	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
+		SetStatusMessage("You can't install the contents of a disk onto itself. Please choose a different disk.");
+		return;
 	}
-
-	// check if target is initialized
-
-	// ask if init ou mount as is
+	
+	// check not installing on boot volume
+	if ((strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0) 
+		&& ((new BAlert("", "Are you sure you want to install onto the current boot disk? \
+The installer will have to reboot your machine if you proceed.", "OK", "Cancel", 0,
+                        B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+		SetStatusMessage("Installation stopped.");
+		return;
+	}
 
 	LaunchInitScript(targetDirectory);
 
@@ -163,10 +167,10 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	CopyFolder(srcDir, targetDir);
 
 	// copy selected packages
-	srcDirectory.Append(PACKAGES_DIRECTORY);
-	srcDir.SetTo(srcDirectory.Path());
-	BDirectory packageDir;
 	if (fPackages) {
+		srcDirectory.Append(PACKAGES_DIRECTORY);
+		srcDir.SetTo(srcDirectory.Path());
+		BDirectory packageDir;
 		int32 count = fPackages->CountItems();
 		for (int32 i=0; i<count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
@@ -176,6 +180,9 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	}
 
 	LaunchFinishScript(targetDirectory);
+
+	BMessage msg(INSTALL_FINISHED);
+	BMessenger(fWindow).SendMessage(&msg);
 }
 
 
@@ -240,7 +247,14 @@ SourceVisitor::Visit(BDiskDevice *device)
 	if (device->GetPath(&path)==B_OK)
 		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, contentType:%s\n", 
 			path.Path(), device->Type(), device->ContentType());
-	fMenu->AddItem(new PartitionMenuItem(NULL, device->ContentName(), NULL, new BMessage(SRC_PARTITION), device->ID()));
+	PartitionMenuItem *item = new PartitionMenuItem(NULL, device->ContentName(), NULL, new BMessage(SRC_PARTITION), device->ID());
+	if (device->IsMounted()) {
+		BPath mountPoint;
+		device->GetMountPoint(&mountPoint);
+		if (strcmp(BOOT_PATH, mountPoint.Path())==0)
+			item->SetMarked(true);
+	}
+	fMenu->AddItem(item);
 	return false;
 }
 
@@ -254,7 +268,14 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	if (partition->GetPath(&path)==B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
-	fMenu->AddItem(new PartitionMenuItem(NULL, partition->ContentName(), NULL, new BMessage(SRC_PARTITION), partition->ID()));
+	PartitionMenuItem *item = new PartitionMenuItem(NULL, partition->ContentName(), NULL, new BMessage(SRC_PARTITION), partition->ID());
+	if (partition->IsMounted()) {
+		BPath mountPoint;
+		partition->GetMountPoint(&mountPoint);
+		if (strcmp(BOOT_PATH, mountPoint.Path())==0)
+			item->SetMarked(true);
+	}
+	fMenu->AddItem(item);
 	return false;
 }
 

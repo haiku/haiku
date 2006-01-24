@@ -5,6 +5,7 @@
  */
 #include "InstallerCopyLoopControl.h"
 #include "InstallerWindow.h"
+#include <Alert.h>
 
 InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
 	: fWindow(window),
@@ -17,6 +18,15 @@ bool
 InstallerCopyLoopControl::FileError(const char *message, const char *name, status_t error,
 			bool allowContinue)
 {
+	char buffer[512];
+	sprintf(buffer, message, name, strerror(error));
+
+	if (allowContinue)
+		return (new BAlert("", buffer, "Cancel", "OK", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
+
+	(new BAlert("", buffer, "Cancel", 0, 0,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	return false;
 }
 	
