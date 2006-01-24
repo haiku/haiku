@@ -15,7 +15,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 	du echo eject env error factor false ffm find finddir fortune funzip gawk $(X86_ONLY)gdb
 	grep groups gzip head id ifconfig iroster isvolume join keymap kill 
 	less lessecho lesskey link listarea listattr listdev listimage
-	listport listsem ln locate logname ls lsindex md5sum mimeset mkdir mkindex
+	listport listsem ln locate logname ls lsindex makebootable md5sum mimeset mkdir mkindex
 	modifiers mount mountvolume mv open pathchk ping play ppp_up pppconfig ps pwd
 	query quit renice rm rmattr rmindex rmdir roster safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
