@@ -268,7 +268,7 @@ TargetVisitor::TargetVisitor(BMenu *menu)
 bool
 TargetVisitor::Visit(BDiskDevice *device)
 {
-	if (device->IsReadOnly())
+	if (device->IsReadOnly() || device->IsReadOnlyMedia())
 		return false;
 	BPath path;
 	if (device->GetPath(&path)==B_OK)
