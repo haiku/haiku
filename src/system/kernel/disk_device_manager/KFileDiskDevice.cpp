@@ -157,13 +157,13 @@ KFileDiskDevice::GetGeometry(device_geometry *geometry)
 	if (heads == 0)
 		heads = 1;
 	geometry->bytes_per_sector = blockSize;
-    geometry->sectors_per_track = 1;
-    geometry->cylinder_count = blocks / heads;
-    geometry->head_count = heads;
-    geometry->device_type = B_DISK;	// TODO: Add a new constant.
-    geometry->removable = false;
-    geometry->read_only = false;
-    geometry->write_once = false;
+	geometry->sectors_per_track = 1;
+	geometry->cylinder_count = blocks / heads;
+	geometry->head_count = heads;
+	geometry->device_type = B_DISK;	// TODO: Add a new constant.
+	geometry->removable = false;
+	geometry->read_only = false;
+	geometry->write_once = false;
 
 	return B_OK;
 
