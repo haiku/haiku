@@ -62,13 +62,6 @@ const int32 msg_dump = 'dump';
 const int32 msg_add_cross_hair = 'acrs';
 const int32 msg_remove_cross_hair = 'rcrs';
 
-#ifndef B_BEOS_VERSION_4
-#define PR31
-#endif
-
-#ifdef PR31
-extern void _get_screen_bitmap_(BBitmap *offscreen,BRect src, bool enable = TRUE);
-#endif
 
 //******************************************************************************
 
@@ -85,16 +78,6 @@ FontHeight(BView* target, bool full)
 	return h;
 }
 
-static color_map*
-ColorMap()
-{
-	color_map* cmap;
-	
-	BScreen screen(B_MAIN_SCREEN_ID);
-	cmap = (color_map*)screen.ColorMap();
-	
-	return cmap;
-}
 
 static void
 CenterWindowOnScreen(BWindow* w)
@@ -1738,8 +1721,6 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 	:BView(r, "ImageView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
 		fColorSpace(space), fParent(parent)
 {
-	fColorMap = ColorMap();
-
 	switch (space) {
 		case B_COLOR_8_BIT:
 			fBytesPerPixel = 1;
@@ -1749,7 +1730,7 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB16:
-        case B_RGB16_BIG:
+        	case B_RGB16_BIG:
 			fBytesPerPixel = 2;
 			break;
 		case B_RGB32:
@@ -1879,11 +1860,7 @@ TOSMagnify::CopyScreenRect(BRect srcRect)
 	// save a copy of the bits for comparison later
 	memcpy(fOldBits, fBitmap->Bits(), fBitmap->BitsLength());
 
-#ifdef PR31
-	_get_screen_bitmap_(fBitmap, srcRect);
-#else
 	screen.ReadBitmap(fBitmap, false, &srcRect);
-#endif
 
 	// let caller know whether bits have actually changed
 	return(memcmp(fBitmap->Bits(), fOldBits, fBitmap->BitsLength()) != 0);

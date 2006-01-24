@@ -47,7 +47,6 @@ public:
 		BBitmap*		Bitmap() { return fBitmap; }
 		
 private:
-		color_map*		fColorMap;
 		color_space		fColorSpace;
 		char*			fOldBits;
 		long			fBytesPerPixel;
