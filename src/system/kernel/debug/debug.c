@@ -44,8 +44,8 @@ int dbg_register_file[B_MAX_CPU_COUNT][14];
 
 static bool sSerialDebugEnabled = false;
 static bool sSyslogOutputEnabled = false;
-static bool sBlueScreenEnabled = true;
-static bool sBlueScreenOutput = false;
+static bool sBlueScreenEnabled = false;
+static bool sBlueScreenOutput = true;
 static spinlock sSpinlock = 0;
 static int32 sDebuggerOnCPU = -1;
 
@@ -107,7 +107,7 @@ kputchar(char c)
 {
 	if (sSerialDebugEnabled)
 		arch_debug_serial_putchar(c);
-	if (sBlueScreenOutput)
+	if (sBlueScreenEnabled)
 		blue_screen_putchar(c);
 }
 
@@ -117,7 +117,7 @@ kputs(const char *s)
 {
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(s);
-	if (sBlueScreenOutput)
+	if (sBlueScreenEnabled)
 		blue_screen_puts(s);
 }
 
@@ -131,7 +131,7 @@ read_line(char *buffer, int32 maxLength)
 	char c;
 
 	char (*readChar)(void);
-	if (sBlueScreenEnabled)
+	if (sBlueScreenOutput)
 		readChar = blue_screen_getchar;
 	else
 		readChar = arch_debug_serial_getchar;
@@ -215,7 +215,7 @@ read_line(char *buffer, int32 maxLength)
 				break;
 			case '$':
 			case '+':
-				if (!sBlueScreenEnabled) {
+				if (!sBlueScreenOutput) {
 					/* HACK ALERT!!!
 					 *
 					 * If we get a $ at the beginning of the line
@@ -596,18 +596,18 @@ debug_init_post_vm(kernel_args *args)
 	// get debug settings
 	handle = load_driver_settings("kernel");
 	if (handle != NULL) {
-		if (get_driver_boolean_parameter(handle, "serial_debug_output", true, true))
-			sSerialDebugEnabled = true;
-		if (get_driver_boolean_parameter(handle, "syslog_debug_output", false, false))
-			sSyslogOutputEnabled = true;
-		if (get_driver_boolean_parameter(handle, "bluescreen", true, true))
-			sBlueScreenEnabled = true;
+		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
+			"serial_debug_output", true, true);
+		sSyslogOutputEnabled = get_driver_boolean_parameter(handle,
+			"syslog_debug_output", false, false);
+		sBlueScreenOutput = get_driver_boolean_parameter(handle,
+			"bluescreen", true, true);
 
 		unload_driver_settings(handle);
 	}
 
-	if (sBlueScreenEnabled && blue_screen_init() != B_OK)
-		sBlueScreenEnabled = false;
+	if (sBlueScreenOutput && blue_screen_init() != B_OK)
+		sBlueScreenOutput = false;
 
 	syslog_init();
 
@@ -732,8 +732,8 @@ kernel_debugger(const char *message)
 		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 
-	if (sBlueScreenEnabled) {
-		sBlueScreenOutput = true;
+	if (sBlueScreenOutput) {
+		sBlueScreenEnabled = true;
 		blue_screen_enter();
 	}
 
@@ -742,7 +742,7 @@ kernel_debugger(const char *message)
 
 	kernel_debugger_loop();
 
-	sBlueScreenOutput = false;
+	sBlueScreenEnabled = false;
 	restore_interrupts(state);
 
 	// ToDo: in case we change dbg_register_file - don't we want to restore it?
@@ -784,7 +784,7 @@ dprintf(const char *format, ...)
 		arch_debug_serial_puts(sOutputBuffer);
 	if (sSyslogOutputEnabled)
 		syslog_write(sOutputBuffer, length);
-	if (sBlueScreenOutput)
+	if (sBlueScreenEnabled)
 		blue_screen_puts(sOutputBuffer);
 
 	release_spinlock(&sSpinlock);
@@ -809,7 +809,7 @@ kprintf(const char *format, ...)
 
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(sOutputBuffer);
-	if (sBlueScreenOutput)
+	if (sBlueScreenEnabled)
 		blue_screen_puts(sOutputBuffer);
 }
 
