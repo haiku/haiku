@@ -28,6 +28,14 @@
 extern "C" {
 #endif
 
+/* this structure describes all info we gather from the BIOS that we can't gather otherwise.  In the 
+ * end it should disappear, which would mean we are BIOS pre-init independant or fully coldstart capable. */
+typedef struct {
+	bool		done;				/* for discovering one-time VGA BIOS pre-init programming: */
+	uint32		p1_timing_flags;	/* panel 1 modeline timing flags */
+	uint32		p2_timing_flags;	/* panel 2 modeline timing flags */
+} bios_init;
+
 typedef struct {
 	sem_id	sem;
 	int32	ben;
@@ -71,7 +79,8 @@ enum {
 	NV_GET_NTH_AGP_INFO,
 	NV_ENABLE_AGP,
 	NV_ISA_OUT,
-	NV_ISA_IN
+	NV_ISA_IN,
+	NV_SET_BIOS_PRE_INIT
 };
 
 /* handles to pre-defined engine commands */
@@ -138,6 +147,9 @@ typedef struct {
 
   /* used to return status for INIT_ACCELERANT and CLONE_ACCELERANT */
 	bool	accelerant_in_use;
+
+  /* used to detect the first time we startup (preventing loosing BIOS pre-init info) */
+	bool	system_start_done;
 
   /* bug workaround for 4.5.0 */
 	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
@@ -419,6 +431,12 @@ typedef struct {
 	uint8	size;		/* Number of bytes to transfer */
 	uint16	data;		/* The value read or written */
 } nv_in_out_isa;
+
+/* Save BIOS pre-init programming we might need */
+typedef struct {
+	uint32		magic;	/* magic number to make sure the caller groks us */
+	bios_init	data;	/* contains all BIOS pre-init data we rely on */
+} nv_set_bios_pre_init;
 
 enum {
 	
