@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "SyslogDaemon.h"
@@ -28,22 +28,23 @@ SyslogDaemon::SyslogDaemon()
 }
 
 
-void 
+void
 SyslogDaemon::ReadyToRun()
 {
 	fPort = create_port(256, SYSLOG_PORT_NAME);
 	fDaemon = spawn_thread(daemon_thread, "daemon", B_NORMAL_PRIORITY, this);
-	resume_thread(fDaemon);
 
 	if (fPort >= B_OK && fDaemon >= B_OK) {
 		init_syslog_output(this);
 		init_listener_output(this);
+
+		resume_thread(fDaemon);
 	} else
 		Quit();
 }
 
 
-void 
+void
 SyslogDaemon::AboutRequested()
 {
 	BPath path;
@@ -72,7 +73,7 @@ SyslogDaemon::AboutRequested()
 }
 
 
-bool 
+bool
 SyslogDaemon::QuitRequested()
 {
 	delete_port(fPort);
@@ -84,7 +85,7 @@ SyslogDaemon::QuitRequested()
 }
 
 
-void 
+void
 SyslogDaemon::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
@@ -109,17 +110,17 @@ SyslogDaemon::MessageReceived(BMessage *msg)
 }
 
 
-void 
+void
 SyslogDaemon::AddHandler(handler_func function)
 {
 	fHandlers.AddItem((void *)function);
 }
 
 
-void 
+void
 SyslogDaemon::Daemon()
 {
-	char buffer[4096];
+	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE + 1];
 	syslog_message &message = *(syslog_message *)buffer;
 	int32 code;
 
@@ -134,6 +135,9 @@ SyslogDaemon::Daemon()
 		if (bytesRead < (ssize_t)sizeof(syslog_message) || code != SYSLOG_MESSAGE)
 			continue;
 
+		// add terminating null byte
+		message.message[bytesRead - sizeof(syslog_message)] = '\0';
+
 		fHandlerLock.Lock();
 
 		for (int32 i = fHandlers.CountItems(); i-- > 0;) {
@@ -147,7 +151,7 @@ SyslogDaemon::Daemon()
 }
 
 
-int32 
+int32
 SyslogDaemon::daemon_thread(void *data)
 {
 	((SyslogDaemon *)data)->Daemon();
@@ -155,7 +159,7 @@ SyslogDaemon::daemon_thread(void *data)
 }
 
 
-int 
+int
 main(int argc, char **argv)
 {
 	SyslogDaemon daemon;

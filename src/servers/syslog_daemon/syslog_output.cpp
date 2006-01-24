@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "syslog_output.h"
@@ -35,6 +35,10 @@ thread_id sLastThread;
 int32 sRepeatCount;
 
 
+/*!
+	Creates the log file if not yet existing, or renames the old
+	log file, if it's too big already.
+*/
 static status_t
 prepare_output()
 {
@@ -119,7 +123,7 @@ syslog_output(syslog_message &message)
 		return;
 	}
 
-	char buffer[4096];
+	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE + 64];
 
 #if 0
 	// parse & nicely print the time stamp from the message
@@ -146,11 +150,16 @@ syslog_output(syslog_message &message)
 		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "[%ld]", message.from);
 
 	// add message itself
-	int32 length = pos + snprintf(buffer + pos, sizeof(buffer) - pos, ": %s\n", message.message);
+	int32 length = pos + snprintf(buffer + pos, sizeof(buffer) - pos, ": %s\n",
+		message.message);
+
+	// TODO: insert header too every single line of the message
 
 	// ToDo: be less lazy about it - there is virtually no reason to truncate the message
-	if (strlen(message.message) > sizeof(buffer) - pos - 1)
-		strcpy(&buffer[sizeof(buffer) - 8], "<TRUNC>\n");
+	if (strlen(message.message) > sizeof(buffer) - pos - 1) {
+		strcpy(&buffer[sizeof(buffer) - 9], "<TRUNC>\n");
+		length = sizeof(buffer) - 1;
+	}
 
 	// dump message
 
