@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,15 @@
 #include <kernel.h>
 
 #include <OS.h>
+
+
+// set protection to WIMGNPP: -----PP
+// PP:	00 - no access
+//		01 - read only
+//		10 - read/write
+//		11 - read only
+#define PAGE_READ_ONLY	0x01
+#define PAGE_READ_WRITE	0x02
 
 
 segment_descriptor sSegments[16];
@@ -572,16 +581,11 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 	// we only know page sizes
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
-	// set protection to WIMGNPP: -----PP
-	// PP:	00 - no access
-	//		01 - read only
-	//		10 - read/write
-	//		11 - read only
 	uint8 protection = 0;
 	if (_protection & B_WRITE_AREA)
-		protection = 0x02;
+		protection = PAGE_READ_WRITE;
 	else
-		protection = 0x01;
+		protection = PAGE_READ_ONLY;
 
 	// If no address is given, use the KERNEL_BASE as base address, since
 	// that avoids trouble in the kernel, when we decide to keep the region.
@@ -817,7 +821,7 @@ extern "C" status_t
 arch_mmu_init(void)
 {
 	// get map of physical memory (fill in kernel_args structure)
-	
+
 	size_t total;
 	if (find_physical_memory_ranges(total) < B_OK) {
 		puts("could not find physical memory ranges!");
@@ -831,11 +835,13 @@ arch_mmu_init(void)
 	page_table_entry_group *table;
 	size_t tableSize;
 	ppc_get_page_table(&table, &tableSize);
-	printf("-> table = %p, size = %u\n", table, tableSize);
-	if (table == NULL && tableSize == 0) {
-		puts("OpenFirmware is in real addressing mode!");
-	}
+
 	oldTable = table;
+
+	bool realMode = false;
+	// TODO: read these values out of the OF settings
+	addr_t realBase = 0;
+	addr_t realSize = 0x400000;
 
 	// can we just keep the page table?
 	size_t suggestedTableSize = suggested_page_table_size(total);
@@ -843,7 +849,7 @@ arch_mmu_init(void)
 	if (tableSize < suggestedTableSize) {
 		// nah, we need a new one!
 		printf("need new page table, size = %u!\n", suggestedTableSize);
-		table = (page_table_entry_group *)of_claim(0, suggestedTableSize, suggestedTableSize);
+		table = (page_table_entry_group *)of_claim(NULL, suggestedTableSize, suggestedTableSize);
 			// KERNEL_BASE would be better as virtual address, but
 			// at least with Apple's OpenFirmware, it makes no
 			// difference - we will have to remap it later
@@ -851,17 +857,32 @@ arch_mmu_init(void)
 			panic("Could not allocate new page table (size = %ld)!!\n", suggestedTableSize);
 			return B_NO_MEMORY;
 		}
+		if (table == NULL) {
+			// work-around for the broken Pegasos OpenFirmware
+			puts("broken OpenFirmware detected (claim doesn't work).");
+			realMode = true;
+
+			addr_t tableBase = 0;
+			for (int32 i = 0; tableBase < realBase + realSize * 3; i++) {
+				tableBase = suggestedTableSize * i;
+			}
+
+			table = (page_table_entry_group *)tableBase;
+		}
+
 		printf("new table at: %p\n", table);
-		sPageTable = (page_table_entry_group *)table;
+		sPageTable = table;
 		tableSize = suggestedTableSize;
 	} else {
 		// ToDo: we could check if the page table is much too large
 		//	and create a smaller one in this case (in order to save 
 		//	memory).
-		sPageTable = (page_table_entry_group *)table;
+		sPageTable = table;
 	}
+
 	sPageTableHashMask = tableSize / sizeof(page_table_entry_group) - 1;
-	memset(sPageTable, 0, tableSize);
+	if (sPageTable != oldTable)
+		memset(sPageTable, 0, tableSize);
 
 	// turn off address translation via the page table/segment mechanism,
 	// identity map the first 256 MB (where our code/data reside)
@@ -898,9 +919,30 @@ puts("2");*/
 		return B_ERROR;
 	}
 
+#if 0
+	block_address_translation bats[8];
+	getibats(bats);
+	for (int32 i = 0; i < 8; i++)
+		printf("page index %u, length %u, ppn %u\n", bats[i].page_index, bats[i].length, bats[i].physical_block_number);
+#endif
+
 	if (physicalTable == NULL) {
 		puts("arch_mmu_init(): Didn't find physical address of page table!");
-		return B_ERROR;
+		if (!realMode)
+			return B_ERROR;
+
+		// Pegasos work-around
+		//map_range((void *)realBase, (void *)realBase, realSize * 2, PAGE_READ_WRITE);
+		//map_range((void *)(total - realSize), (void *)(total - realSize), realSize, PAGE_READ_WRITE);
+		//map_range((void *)table, (void *)table, tableSize, PAGE_READ_WRITE);
+		insert_physical_allocated_range((void *)realBase, realSize * 2);
+		insert_virtual_allocated_range((void *)realBase, realSize * 2);
+		insert_physical_allocated_range((void *)(total - realSize), realSize);
+		insert_virtual_allocated_range((void *)(total - realSize), realSize);
+		insert_physical_allocated_range((void *)table, tableSize);
+		insert_virtual_allocated_range((void *)table, tableSize);
+
+		physicalTable = table;
 	}
 
 	if (exceptionHandlers == (void *)-1) {
@@ -922,9 +964,11 @@ puts("2");*/
 	ppc_set_page_table(physicalTable, tableSize);
 	invalidate_tlb();
 
-	// clear BATs
-	reset_ibats();
-	reset_dbats();
+	if (!realMode) {
+		// clear BATs
+		reset_ibats();
+		reset_dbats();
+	}
 
 	set_msr(MSR_MACHINE_CHECK_ENABLED | MSR_FP_AVAILABLE 
 			| MSR_INST_ADDRESS_TRANSLATION 
