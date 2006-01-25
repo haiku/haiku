@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -487,9 +487,10 @@ blue_screen_init(void)
 
 
 void
-blue_screen_enter(void)
+blue_screen_enter(bool debugOutput)
 {
-	sScreen.attr = 0x0f;	// black on white
+	sScreen.attr = debugOutput ? 0xf0 : 0x0f;
+		// black on white for KDL, white on black for debug output
 	sScreen.x = sScreen.y = 0;
 	sScreen.state = CONSOLE_STATE_NORMAL;
 

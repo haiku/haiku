@@ -45,6 +45,7 @@ int dbg_register_file[B_MAX_CPU_COUNT][14];
 static bool sSerialDebugEnabled = false;
 static bool sSyslogOutputEnabled = false;
 static bool sBlueScreenEnabled = false;
+static bool sDebugScreenEnabled = false;
 static bool sBlueScreenOutput = true;
 static spinlock sSpinlock = 0;
 static int32 sDebuggerOnCPU = -1;
@@ -482,6 +483,9 @@ syslog_write(const char *text, int32 length)
 static status_t
 syslog_init_post_threads(void)
 {
+	if (!sSyslogOutputEnabled)
+		return B_OK;
+
 	sSyslogNotify = create_sem(0, "syslog data");
 	if (sSyslogNotify >= B_OK) {
 		thread_id thread = spawn_kernel_thread(syslog_sender, "syslog sender",
@@ -541,6 +545,13 @@ err1:
 
 
 //	#pragma mark - private kernel API
+
+
+void
+debug_stop_screen_debug_output(void)
+{
+	sDebugScreenEnabled = false;
+}
 
 
 bool
@@ -606,8 +617,20 @@ debug_init_post_vm(kernel_args *args)
 		unload_driver_settings(handle);
 	}
 
-	if (sBlueScreenOutput && blue_screen_init() != B_OK)
-		sBlueScreenOutput = false;
+	handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle != NULL) {
+		sDebugScreenEnabled = get_driver_boolean_parameter(handle,
+			"debug_screen", false, false);
+
+		unload_driver_settings(handle);
+	}
+
+	if ((sBlueScreenOutput || sDebugScreenEnabled)
+		&& blue_screen_init() != B_OK)
+		sBlueScreenOutput = sDebugScreenEnabled = false;
+
+	if (sDebugScreenEnabled)
+		blue_screen_enter(true);
 
 	syslog_init();
 
@@ -734,7 +757,7 @@ kernel_debugger(const char *message)
 
 	if (sBlueScreenOutput) {
 		sBlueScreenEnabled = true;
-		blue_screen_enter();
+		blue_screen_enter(false);
 	}
 
 	if (message)
@@ -784,7 +807,7 @@ dprintf(const char *format, ...)
 		arch_debug_serial_puts(sOutputBuffer);
 	if (sSyslogOutputEnabled)
 		syslog_write(sOutputBuffer, length);
-	if (sBlueScreenEnabled)
+	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_puts(sOutputBuffer);
 
 	release_spinlock(&sSpinlock);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the Haiku License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -34,6 +34,7 @@ extern status_t	debug_init_post_modules(struct kernel_args *args);
 extern void debug_early_boot_message(const char *string);
 extern void debug_puts(const char *s);
 extern bool debug_debugger_running(void);
+extern void debug_stop_screen_debug_output(void);
 
 extern void _user_debug_output(const char *userString);
 

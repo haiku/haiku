@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -445,6 +445,10 @@ add_safe_mode_menu()
 	item->SetType(MENU_ITEM_MARKABLE);
 
 	platform_add_menus(safeMenu);
+
+	safeMenu->AddItem(item = new MenuItem("Enable on screen debug output"));
+	item->SetData("debug_screen");
+	item->SetType(MENU_ITEM_MARKABLE);
 
 	safeMenu->AddSeparatorItem();
 	safeMenu->AddItem(item = new MenuItem("Return to main menu"));

@@ -1,7 +1,8 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include <KernelExport.h>
 #include <kernel.h>
@@ -448,6 +449,8 @@ status_t
 _user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
 	int32 depth, int32 bytesPerRow)
 {
+	debug_stop_screen_debug_output();
+
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 	if (IS_USER_ADDRESS(baseAddress) && baseAddress != NULL)
