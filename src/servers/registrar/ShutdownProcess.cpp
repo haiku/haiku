@@ -490,8 +490,6 @@ public:
 		fCancelShutdownButton->Hide();
 		fRebootSystemButton->MakeDefault(true);
 		fRebootSystemButton->Show();
-		// TODO: Temporary work-around for a Haiku bug.
-		fRebootSystemButton->Invalidate();
 
 		SetTitle("System is Shut Down");
 		fTextView->SetText("It's now safe to turn off the computer.");
@@ -1285,8 +1283,8 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
-	_SetShutdownWindowWaitForShutdown();
 	_ShutDown();
+	_SetShutdownWindowWaitForShutdown();
 
 	PRINT(("  _kern_shutdown() failed\n"));
 
@@ -1307,7 +1305,7 @@ ShutdownProcess::_WorkerDoShutdown()
 		_kern_shutdown(true);
 		#endif
 	}
-	
+
 	// either there's no GUI or reboot failed: we enter the kernel debugger
 	// instead
 	#ifdef __HAIKU__
