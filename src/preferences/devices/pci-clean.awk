@@ -17,7 +17,7 @@ BEGIN {
 	print "#\tHeader created on " strftime( "%A, %d %b %Y %H:%M:%S %Z", systime() )
 	print "#endif"
 
-	print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tchar *\tChipDesc ;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"
+	print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tchar *\tChipDesc ;\n\tchar *\tChip ;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"
 	print "PCI_DEVTABLE\tPciDevTable [] =\n{"
 }
 
@@ -84,7 +84,7 @@ END {
 	print "} ;\n\n// Use this value for loop control during searching:\n#define	PCI_DEVTABLE_LEN	(sizeof(PciDevTable)/sizeof(PCI_DEVTABLE))\n";
 
 	if ( length( vendor ) > 0 ) {
-		print "\ntypedef struct _PCI_VENTABLE\n{\n\tunsigned short\tVenId ;\n\tchar *\tVenFull ;\n}  PCI_VENTABLE, *PPCI_VENTABLE ;\n"
+		print "\ntypedef struct _PCI_VENTABLE\n{\n\tunsigned short\tVenId ;\n\tchar *\tVenFull ;\n\tchar *\tVenShort ;\n}  PCI_VENTABLE, *PPCI_VENTABLE ;\n"
 		print "PCI_VENTABLE\tPciVenTable [] =\n{"
 		print vendor
 		print "};\n\n// Use this value for loop control during searching:\n#define\tPCI_VENTABLE_LEN\t(sizeof(PciVenTable)/sizeof(PCI_VENTABLE))\n"
