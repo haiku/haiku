@@ -38,6 +38,24 @@ actions USBHeaderGen1
 
 USBHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs : usb_devlist2h.awk ;
 
+rule PCIHeaderGen
+{
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	SEARCH on $(3) = $(SEARCH_SOURCE) ;
+
+	Depends $(1) : $(2) $(3) ;
+	MakeLocateArch $(<) ;
+	PCIHeaderGen1 $(1) : $(2) $(3) ;
+	LocalClean clean : $(<) ;
+}
+
+actions PCIHeaderGen1
+{
+	awk -f $(2[2]) $(2[1]) > $(1)
+}
+
+PCIHeaderGen [ FGristFiles pcihdr.h ] : pci.ids : pci-clean.awk ;
+
 Preference Devices :
 	Devices.cpp
 	DevicesWindow.cpp
@@ -51,3 +69,4 @@ Preference Devices :
 ;
 
 Includes [ FGristFiles DevicesInfo.cpp ] : [ FGristFiles isapnpids.h usbdevs.h usbdevs_data.h ] ;
+Includes [ FGristFiles ConfigurationWindow.cpp ] : [ FGristFiles pcihdr.h ] ;
