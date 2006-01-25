@@ -127,7 +127,7 @@ AddSymlinkToHaikuImage beos bin : unzip : zipinfo ;
 
 
 # scripts and data files
-local bootScripts = Bootscript SetupEnvironment Netscript ;
+local bootScripts = Bootscript SetupEnvironment Netscript InstallerInitScript InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
 
