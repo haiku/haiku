@@ -15,8 +15,6 @@
 #include "pci_priv.h"
 #include "pci.h"
 
-spinlock gConfigLock = 0;
-
 static PCI *sPCI;
 
 // #pragma mark bus manager exports
