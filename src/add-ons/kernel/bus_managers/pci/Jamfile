@@ -16,8 +16,9 @@ SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
-# pci_info.cpp currently needs pcihdr.h so we make its path available
+# pci_info.cpp currently needs pcihdr.h so we make its path available and adds dependency
 ObjectHdrs [ FGristFiles pci_info$(SUFOBJ) ]
-	: [ FDirName $(HAIKU_TOP) src preferences devices ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
+Includes [ FGristFiles pci_info.cpp ] : <src!preferences!devices>pcihdr.h ;
 
 SubInclude HAIKU_TOP src add-ons kernel bus_managers pci arch $(TARGET_ARCH) ;
