@@ -577,7 +577,7 @@ switch $(HOST_PLATFORM) {
 	case dano		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DANO ;
 	case haiku		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
-	case freebsd	: HOST_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
+	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 }
 
 
@@ -593,6 +593,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 		HaikuBuildCompatibility.h ] ;
 	TARGET_CCFLAGS += $(compatibilityHeader) ;
 	TARGET_C++FLAGS += $(compatibilityHeader) ;
+	TARGET_DEFINES += __HAIKU__ ;
 
 	# compatibility library
 	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
