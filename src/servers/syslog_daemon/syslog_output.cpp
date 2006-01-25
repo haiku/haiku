@@ -99,8 +99,8 @@ write_to_log(const char *buffer, int32 length)
 	if (sRepeatCount > 0) {
 		char repeat[64];
 		ssize_t size = snprintf(repeat, sizeof(repeat),
-							"Last message repeated %ld time%s\n", sRepeatCount,
-							sRepeatCount > 1 ? "s" : "");
+			"Last message repeated %ld time%s\n", sRepeatCount,
+			sRepeatCount > 1 ? "s" : "");
 		sRepeatCount = 0;
 		if (write(sLog, repeat, strlen(repeat)) < size)
 			return B_ERROR;
@@ -116,14 +116,8 @@ write_to_log(const char *buffer, int32 length)
 static void
 syslog_output(syslog_message &message)
 {
-	// did we get this message already?
-	if (message.from == sLastThread
-		&& !strncmp(message.message, sLastMessage, sizeof(sLastMessage))) {
-		sRepeatCount++;
-		return;
-	}
-
-	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE + 64];
+	char header[128];
+	int32 headerLength;
 
 #if 0
 	// parse & nicely print the time stamp from the message
@@ -138,40 +132,68 @@ syslog_output(syslog_message &message)
 	int facility = SYSLOG_FACILITY_INDEX(message.priority);
 	if (facility >= kNumFacilities)
 		facility = SYSLOG_FACILITY_INDEX(LOG_USER);
-	pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%s", kFacilities[facility]);
+	pos += snprintf(header + pos, sizeof(header) - pos, "%s", kFacilities[facility]);
 
 	// add ident/thread ID
 	if (message.ident[0] == '\0') {
 		// ToDo: find out team name?
 	} else
-		pos += snprintf(buffer + pos, sizeof(buffer) - pos, " '%s'", message.ident);
+		pos += snprintf(header + pos, sizeof(header) - pos, " '%s'", message.ident);
 
 	if (message.options & LOG_PID)
-		pos += snprintf(buffer + pos, sizeof(buffer) - pos, "[%ld]", message.from);
+		pos += snprintf(header + pos, sizeof(header) - pos, "[%ld]", message.from);
 
-	// add message itself
-	int32 length = pos + snprintf(buffer + pos, sizeof(buffer) - pos, ": %s\n",
-		message.message);
+	headerLength = pos + strlcpy(header + pos, ": ", sizeof(header) - pos);
+	if (headerLength >= (int32)sizeof(header))
+		headerLength = sizeof(header) - 1;
 
-	// TODO: insert header too every single line of the message
+	// add header to every line of the message and write it to the syslog
 
-	// ToDo: be less lazy about it - there is virtually no reason to truncate the message
-	if (strlen(message.message) > sizeof(buffer) - pos - 1) {
-		strcpy(&buffer[sizeof(buffer) - 9], "<TRUNC>\n");
-		length = sizeof(buffer) - 1;
+	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE];
+	pos = 0;
+
+	while (true) {
+		strcpy(buffer, header);
+		int32 length;
+
+		const char *newLine = strchr(message.message + pos, '\n');
+		if (newLine != NULL) {
+			length = newLine - message.message + 1 - pos;
+			strlcpy(buffer + headerLength, message.message + pos, length + 1);
+			pos += length;
+		} else {
+			length = strlcpy(buffer + headerLength, message.message + pos,
+				sizeof(buffer) - headerLength);
+		}
+
+		length += headerLength;
+
+		if (length >= (int32)sizeof(buffer))
+			length = sizeof(buffer) - 1;
+
+		if (message.from == sLastThread
+			&& !strncmp(buffer + headerLength, sLastMessage, sizeof(sLastMessage))) {
+			// we got this message already
+			sRepeatCount++;
+		} else {
+			// dump message line
+
+			if (prepare_output() < B_OK
+				|| write_to_log(buffer, length) < B_OK) {
+				// cannot write to syslog!
+				fputs(buffer, stderr);
+			}
+
+			// save this message to suppress repeated messages
+			strlcpy(sLastMessage, buffer + headerLength, sizeof(sLastMessage));
+			sLastThread = message.from;
+		}
+
+		if (newLine == NULL || !newLine[1]) {
+			// wrote last line of output
+			break;
+		}
 	}
-
-	// dump message
-
-	if (prepare_output() < B_OK
-		|| write_to_log(buffer, length) < B_OK) {
-		// cannot write to syslog!
-		fputs(buffer, stderr);
-	}
-
-	// save this message to suppress repeated messages
-	strlcpy(sLastMessage, message.message, sizeof(sLastMessage));
-	sLastThread = message.from;
 }
 
 
