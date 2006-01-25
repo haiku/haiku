@@ -707,6 +707,10 @@ BEntry::Remove()
 {
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
+
+	if (IsDirectory())
+		return _kern_remove_dir(fDirFd, fName);
+
 	return _kern_unlink(fDirFd, fName);
 }
 

@@ -541,6 +541,24 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 	return B_OK;
 }
 
+
+// _kern_remove_dir
+extern "C"
+status_t
+_kern_remove_dir(int fd, const char *relPath)
+{
+	BPath path;
+	status_t error = get_path(fd, relPath, path);
+	if (error != B_OK)
+		return error;
+
+	if (rmdir(path.Path()) < 0) {
+		return errno;
+
+	return B_OK;
+}
+
+
 // _kern_unlink
 extern "C"
 status_t
@@ -550,16 +568,13 @@ _kern_unlink(int fd, const char *relPath)
 	status_t error = get_path(fd, relPath, path);
 	if (error != B_OK)
 		return error;
-	if (unlink(path.Path()) < 0) {
-		error = errno;
-		if (error == B_IS_A_DIRECTORY) {
-			if (rmdir(path.Path()) < 0)
-				return errno;
-		} else
-			return error;
-	}
+
+	if (unlink(path.Path()) < 0)
+		return errno;
+
 	return B_OK;
 }
+
 
 // _kern_rename
 extern "C"

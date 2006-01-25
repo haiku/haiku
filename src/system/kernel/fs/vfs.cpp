@@ -3739,19 +3739,20 @@ dir_rewind(struct file_descriptor *descriptor)
 
 
 static status_t
-dir_remove(char *path, bool kernel)
+dir_remove(int fd, char *path, bool kernel)
 {
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *directory;
 	status_t status;
-	
-	status = path_to_dir_vnode(path, &directory, name, kernel);
-	if (status < B_OK)
+
+	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
+	if (status < 0)
 		return status;
 
-	if (FS_CALL(directory, remove_dir))
-		status = FS_CALL(directory, remove_dir)(directory->mount->cookie, directory->private_node, name);
-	else
+	if (FS_CALL(directory, remove_dir)) {
+		status = FS_CALL(directory, remove_dir)(directory->mount->cookie,
+			directory->private_node, name);
+	} else
 		status = EROFS;
 
 	put_vnode(directory);
@@ -5780,13 +5781,17 @@ _kern_create_dir(int fd, const char *path, int perms)
 
 
 status_t
-_kern_remove_dir(const char *path)
+_kern_remove_dir(int fd, const char *path)
 {
-	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
-	if (pathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
+	if (path) {
+		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
 
-	return dir_remove(pathBuffer.LockBuffer(), true);
+		return dir_remove(fd, pathBuffer.LockBuffer(), true);
+	}
+
+	return dir_remove(fd, NULL, true);
 }
 
 
@@ -6634,19 +6639,15 @@ _user_create_dir(int fd, const char *userPath, int perms)
 
 
 status_t
-_user_remove_dir(const char *userPath)
+_user_remove_dir(int fd, const char *userPath)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
-	status_t status;
 
-	if (!IS_USER_ADDRESS(userPath))
+	if ((userPath != NULL && !IS_USER_ADDRESS(userPath))
+		|| (userPath != NULL && user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	return dir_remove(path, false);
+	return dir_remove(fd, userPath ? path : NULL, false);
 }
 
 
