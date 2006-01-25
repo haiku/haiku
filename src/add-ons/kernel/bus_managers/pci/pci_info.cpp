@@ -662,12 +662,13 @@ get_vendor_info(uint16 vendorID, const char **venShort, const char **venFull)
 {
 	for (int i = 0; i < (int)PCI_VENTABLE_LEN; i++) {
 		if (PciVenTable[i].VenId == vendorID) {
-			if (0 == strcmp(PciVenTable[i].VenShort, PciVenTable[i].VenFull)) {
+			if (PciVenTable[i].VenShort && PciVenTable[i].VenFull
+				&& 0 == strcmp(PciVenTable[i].VenShort, PciVenTable[i].VenFull)) {
 				*venShort = PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
 				*venFull = NULL;
 			} else {
-				*venShort = PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
-				*venFull = PciVenTable[i].VenFull[0] ? PciVenTable[i].VenFull : NULL;
+				*venShort = PciVenTable[i].VenShort && PciVenTable[i].VenShort[0] ? PciVenTable[i].VenShort : NULL;
+				*venFull = PciVenTable[i].VenFull && PciVenTable[i].VenFull[0] ? PciVenTable[i].VenFull : NULL;
 			}
 			return;
 		}
@@ -682,8 +683,8 @@ get_device_info(uint16 vendorID, uint16 deviceID, const char **devShort, const c
 {
 	for (int i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
 		if (PciDevTable[i].VenId == vendorID && PciDevTable[i].DevId == deviceID ) {
-			*devShort = PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
-			*devFull = PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
+			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
 			return;
 		}
 	}
