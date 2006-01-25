@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -69,12 +69,13 @@ fprintf(FILE *file, const char *format, ...)
 
 
 int
-fputc(int character, FILE *file)
+fputc(int c, FILE *file)
 {
 	if (file == NULL)
 		return B_FILE_ERROR;
 
     status_t status;
+	char character = (char)c;
 
 	// we only support direct console output right now...	
 	status = ((ConsoleNode *)file)->Write(&character, 1);
