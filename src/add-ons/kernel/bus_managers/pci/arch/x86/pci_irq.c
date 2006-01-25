@@ -1,20 +1,32 @@
-#include "pci_priv.h"
+/*
+ * Copyright 2006, Marcus Overhagen. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#include "pci_irq.h"
 
-status_t
-pci_irq_init(void)
+
+status_t 
+pci_x86_irq_init(void)
+{
+	return B_OK;
+}
+
+
+status_t 
+pci_x86_irq_read(void *cookie,
+				 uint8 bus, uint8 device, uint8 function, 
+				 uint8 pin, uint8 *irq)
 {
 	return B_ERROR;
 }
 
 
-uint8
-pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 pin)
+status_t 
+pci_x86_irq_write(void *cookie,
+				  uint8 bus, uint8 device, uint8 function, 
+				  uint8 pin, uint8 irq)
 {
-	return 0;
+	return B_ERROR;
 }
 
-
-void
-pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 pin, uint8 irq)
-{
-}

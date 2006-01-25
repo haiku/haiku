@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003-2005, Marcus Overhagen. All rights reserved.
+** Copyright 2003-2006, Marcus Overhagen. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
 
@@ -151,7 +151,9 @@ print_capabilities(const pci_info *info)
 static void
 print_info_basic(const pci_info *info, bool verbose)
 {
-	TRACE(("PCI: bus %2d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
+	TRACE(("PCI: [dom %d, bus %2d] bus %3d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
+	// XXX this works only as long as PCI manager virtual bus mapping isn't changed:
+			(info->bus >> 5) /* domain */, (info->bus & 0x1f) /* bus */,
 			info->bus, info->device, info->function, info->vendor_id, info->device_id, info->revision));
 	TRACE(("PCI:   class_base %02x, class_function %02x, class_api %02x\n",
 			info->class_base, info->class_sub, info->class_api));

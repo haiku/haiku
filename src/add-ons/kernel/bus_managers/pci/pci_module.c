@@ -48,6 +48,11 @@ pci_module_supports_device(device_node_handle parent, bool *_noConnection)
 static status_t 
 pci_module_register_device(device_node_handle parent)
 {
+
+// XXX how do we handle this for PPC?
+// I/O port for PCI config space address
+#define PCI_CONFIG_ADDRESS 0xcf8
+
 	io_resource resources[2] = {
 		{ IO_PORT, PCI_CONFIG_ADDRESS, 8 },
 		{}
@@ -137,22 +142,6 @@ pci_module_get_paths(const char ***_bus, const char ***_device)
 
 	*_bus = kBus;
 	*_device = NULL;
-}
-
-
-static uint32
-pci_module_read_config(uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size)
-{
-	return pci_read_config(bus, device, function, offset, size);
-}
-
-
-static void
-pci_module_write_config(uint8 bus, uint8 device, uint8 function,
-	uint8 offset, uint8 size, uint32 value)
-{
-	pci_write_config(bus, device, function, offset, size, value);
 }
 
 
@@ -255,8 +244,8 @@ static struct pci_root_info sPCIModule = {
 		NULL,		// rescan bus
 	},
 
-	pci_module_read_config,
-	pci_module_write_config
+	&pci_read_config,
+	&pci_write_config
 };
 
 module_dependency module_dependencies[] = {
