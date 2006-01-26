@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -29,6 +29,8 @@
 //	2) the locking could be improved; getting a block should not need to
 //	   wait for blocks to be written
 //	3) dirty blocks are only written back if asked for
+// TODO: the retrieval/copy of the original data could be delayed until the
+//		new data must be written, ie. in low memory situations.
 
 //#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
@@ -265,12 +267,12 @@ block_cache::Allocate()
 void
 block_cache::FreeBlock(cached_block *block)
 {
-	block_range *range = GetRange(block->data);
+	block_range *range = GetRange(block->current_data);
 	ASSERT(range != NULL);
 	range->Free(this, block);
 
-	if (block->original != NULL || block->parent_data != NULL)
-		panic("block_cache::FreeBlock(): %p, %p\n", block->original, block->parent_data);
+	if (block->original_data != NULL || block->parent_data != NULL)
+		panic("block_cache::FreeBlock(): %p, %p\n", block->original_data, block->parent_data);
 
 #ifdef DEBUG_CHANGED
 	Free(block->compare);
@@ -306,7 +308,7 @@ block_cache::NewBlock(off_t blockNumber)
 	block->accessed = 0;
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
-	block->original = NULL;
+	block->original_data = NULL;
 	block->parent_data = NULL;
 	block->is_dirty = false;
 	block->unused = false;
@@ -440,9 +442,9 @@ static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
 #ifdef DEBUG_CHANGED
-	if (!block->is_dirty && block->compare != NULL && memcmp(block->data, block->compare, cache->block_size)) {
+	if (!block->is_dirty && block->compare != NULL && memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
-		dumpBlock((const char *)block->data, 256, "  ");
+		dumpBlock((const char *)block->current_data, 256, "  ");
 		dprintf("unchanged block:\n");
 		dumpBlock((const char *)block->compare, 256, "  ");
 		write_cached_block(cache, block);
@@ -459,7 +461,7 @@ put_cached_block(block_cache *cache, cached_block *block)
 		// put this block in the list of unused blocks
 		block->unused = true;
 		cache->unused_blocks.Add(block);
-//		block->data = cache->allocator->Release(block->data);
+//		block->current_data = cache->allocator->Release(block->current_data);
 	}
 
 	// free some blocks according to the low memory state
@@ -508,15 +510,15 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 		allocated = true;
 	} else {
 /*
-		if (block->ref_count == 0 && block->data != NULL) {
+		if (block->ref_count == 0 && block->current_data != NULL) {
 			// see if the old block can be resurrected
-			block->data = cache->allocator->Acquire(block->data);
+			block->current_data = cache->allocator->Acquire(block->current_data);
 		}
 
-		if (block->data == NULL) {
+		if (block->current_data == NULL) {
 			// there is no block yet, but we need one
-			block->data = cache->allocator->Get();
-			if (block->data == NULL)
+			block->current_data = cache->allocator->Get();
+			if (block->current_data == NULL)
 				return NULL;
 
 			allocated = true;
@@ -527,7 +529,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 	if (allocated && readBlock) {
 		int32 blockSize = cache->block_size;
 
-		if (read_pos(cache->fd, blockNumber * blockSize, block->data, blockSize) < blockSize) {
+		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data, blockSize) < blockSize) {
 			cache->FreeBlock(block);
 			FATAL(("could not read block %Ld\n", blockNumber));
 			return NULL;
@@ -547,6 +549,13 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 }
 
 
+/**	Returns the writable block data for the requested blockNumber.
+ *	If \a cleared is true, the block is not read from disk; an empty block
+ *	is returned.
+ *	This is the only method to insert a block into a transaction. It makes
+ *	sure that the previous block contents are preserved in that case.
+ */
+
 static void *
 get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off_t length,
 	int32 transactionID, bool cleared)
@@ -561,12 +570,12 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 	// if there is no transaction support, we just return the current block
 	if (transactionID == -1) {
 		if (cleared)
-			memset(block->data, 0, cache->block_size);
+			memset(block->current_data, 0, cache->block_size);
 
 		block->is_dirty = true;
 			// mark the block as dirty
 
-		return block->data;
+		return block->current_data;
 	}
 
 	if (block->transaction != NULL && block->transaction->id != transactionID) {
@@ -598,18 +607,18 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 		transaction->num_blocks++;
 	}
 
-	if (!(allocated && cleared) && block->original == NULL) {
-		// we already have data, so we need to save it
-		block->original = cache->Allocate();
-		if (block->original == NULL) {
-			FATAL(("could not allocate original\n"));
+	if (!(allocated && cleared) && block->original_data == NULL) {
+		// we already have data, so we need to preserve it
+		block->original_data = cache->Allocate();
+		if (block->original_data == NULL) {
+			FATAL(("could not allocate original_data\n"));
 			put_cached_block(cache, block);
 			return NULL;
 		}
 
-		memcpy(block->original, block->data, cache->block_size);
+		memcpy(block->original_data, block->current_data, cache->block_size);
 	}
-	if (block->parent_data == block->data) {
+	if (block->parent_data == block->current_data) {
 		// remember any previous contents for the parent transaction
 		block->parent_data = cache->Allocate();
 		if (block->parent_data == NULL) {
@@ -619,16 +628,16 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 			return NULL;
 		}
 
-		memcpy(block->parent_data, block->data, cache->block_size);
+		memcpy(block->parent_data, block->current_data, cache->block_size);
 		block->transaction->sub_num_blocks++;
 	}
 
 	if (cleared)
-		memset(block->data, 0, cache->block_size);
+		memset(block->current_data, 0, cache->block_size);
 
 	block->is_dirty = true;
 
-	return block->data;
+	return block->current_data;
 }
 
 
@@ -638,7 +647,7 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 	cache_transaction *previous = block->previous_transaction;
 	int32 blockSize = cache->block_size;
 
-	void *data = previous && block->original ? block->original : block->data;
+	void *data = previous && block->original_data ? block->original_data : block->current_data;
 		// we first need to write back changes from previous transactions
 
 	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
@@ -650,7 +659,7 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 		return B_IO_ERROR;
 	}
 
-	if (data == block->data)
+	if (data == block->current_data)
 		block->is_dirty = false;
 
 	if (previous != NULL) {
@@ -765,12 +774,12 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 			write_cached_block(cache, block);
 		}
 
-		if (block->original != NULL) {
-			cache->Free(block->original);
-			block->original = NULL;
+		if (block->original_data != NULL) {
+			cache->Free(block->original_data);
+			block->original_data = NULL;
 		}
 		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->data)
+			if (block->parent_data != block->current_data)
 				cache->Free(block->parent_data);
 			block->parent_data = NULL;
 		}
@@ -809,15 +818,15 @@ cache_abort_transaction(void *_cache, int32 id)
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (block->original != NULL) {
+		if (block->original_data != NULL) {
 			TRACE(("cache_abort_transaction(id = %ld): restored contents of block %Ld\n",
 				transaction->id, block->block_number));
-			memcpy(block->data, block->original, cache->block_size);
-			cache->Free(block->original);
-			block->original = NULL;
+			memcpy(block->current_data, block->original_data, cache->block_size);
+			cache->Free(block->original_data);
+			block->original_data = NULL;
 		}
 		if (transaction->has_sub_transaction) {
-			if (block->parent_data != block->data)
+			if (block->parent_data != block->current_data)
 				cache->Free(block->parent_data);
 			block->parent_data = NULL;
 		}
@@ -830,6 +839,11 @@ cache_abort_transaction(void *_cache, int32 id)
 	return B_OK;
 }
 
+
+/**	Acknowledges the current parent transaction, and starts a new transaction
+ *	from its sub transaction.
+ *	The new transaction also gets a new transaction ID.
+ */
 
 extern "C" int32
 cache_detach_sub_transaction(void *_cache, int32 id,
@@ -869,13 +883,16 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 			write_cached_block(cache, block);
 		}
 
-		if (block->original != NULL) {
-			cache->Free(block->original);
-			block->original = NULL;
+		if (block->original_data != NULL && block->parent_data != NULL
+			&& block->parent_data != block->current_data) {
+			// free the original data if the parent data of the transaction
+			// will be made current - but keep them otherwise
+			cache->Free(block->original_data);
+			block->original_data = NULL;
 		}
-		if (block->parent_data != block->data) {
+		if (block->parent_data != NULL && block->parent_data != block->current_data) {
 			// we need to move this block over to the new transaction
-			block->original = block->parent_data;
+			block->original_data = block->parent_data;
 			if (last == NULL)
 				newTransaction->first_block = block;
 			else
@@ -924,14 +941,17 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (!block->parent_data)
-			continue;
-
-		if (block->parent_data != block->data) {
+		if (block->parent_data == NULL) {
+			if (block->original_data != NULL) {
+				// the parent transaction didn't change the block, but the sub
+				// transaction did - we need to revert from the original data
+				memcpy(block->current_data, block->original_data, cache->block_size);
+			}
+		} else if (block->parent_data != block->current_data) {
 			// the block has been changed and must be restored
 			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents of block %Ld\n",
 				transaction->id, block->block_number));
-			memcpy(block->data, block->parent_data, cache->block_size);
+			memcpy(block->current_data, block->parent_data, cache->block_size);
 			cache->Free(block->parent_data);
 		}
 
@@ -964,7 +984,9 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
 
-		if (transaction->has_sub_transaction && block->parent_data != block->data) {
+		if (transaction->has_sub_transaction
+			&& block->parent_data != NULL
+			&& block->parent_data != block->current_data) {
 			// there already is an older sub transaction - we acknowledge
 			// its changes and move its blocks up to the parent
 			cache->Free(block->parent_data);
@@ -972,7 +994,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 
 		// we "allocate" the parent data lazily, that means, we don't copy
 		// the data (and allocate memory for it) until we need to
-		block->parent_data = block->data;
+		block->parent_data = block->current_data;
 	}
 
 	// all subsequent changes will go into the sub transaction
@@ -1007,9 +1029,9 @@ cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *
 	if (_blockNumber)
 		*_blockNumber = block->block_number;
 	if (_data)
-		*_data = block->data;
+		*_data = block->current_data;
 	if (_unchangedData)
-		*_unchangedData = block->original;
+		*_unchangedData = block->original_data;
 
 	*_cookie = (uint32)block;
 	return B_OK;	
@@ -1191,9 +1213,9 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 	if (block->compare == NULL)
 		block->compare = cache->Allocate();
 	if (block->compare != NULL)
-		memcpy(block->compare, block->data, cache->block_size);
+		memcpy(block->compare, block->current_data, cache->block_size);
 #endif
-	return block->data;
+	return block->current_data;
 }
 
 

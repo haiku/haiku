@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -274,7 +274,7 @@ block_range::Allocate(block_cache *cache, cached_block *block)
 	if (address == NULL)
 		return B_NO_MEMORY;
 
-	block->data = address;
+	block->current_data = address;
 
 	// add the block to the chunk
 	block->chunk_next = chunk->blocks;
@@ -287,8 +287,8 @@ block_range::Allocate(block_cache *cache, cached_block *block)
 void
 block_range::Free(block_cache *cache, cached_block *block)
 {
-	Free(cache, block->data);
-	block_chunk *chunk = Chunk(cache, block->data);
+	Free(cache, block->current_data);
+	block_chunk *chunk = Chunk(cache, block->current_data);
 
 	// remove block from list
 
@@ -306,7 +306,7 @@ block_range::Free(block_cache *cache, cached_block *block)
 			chunk->blocks = block->chunk_next;
 	}
 
-	block->data = NULL;
+	block->current_data = NULL;
 }
 
 

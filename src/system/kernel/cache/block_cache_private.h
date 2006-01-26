@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BLOCK_CACHE_PRIVATE_H
@@ -36,8 +36,8 @@ struct cached_block {
 	block_link		link;
 	cached_block	*chunk_next;
 	off_t			block_number;
-	void			*data;
-	void			*original;
+	void			*current_data;
+	void			*original_data;
 	void			*parent_data;
 #ifdef DEBUG_CHANGED
 	void			*compare;
