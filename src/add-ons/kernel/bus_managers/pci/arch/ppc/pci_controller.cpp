@@ -1,4 +1,5 @@
 #include "pci_controller.h"
+#include "pci_priv.h"
 
 
 status_t
