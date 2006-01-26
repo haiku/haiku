@@ -699,7 +699,7 @@ cache_start_transaction(void *_cache)
 	transaction->id = atomic_add(&cache->next_transaction_id, 1);
 	cache->last_transaction = transaction;
 
-	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
+	TRACE(("cache_start_transaction(): id %ld started\n", transaction->id));
 
 	hash_insert(cache->transaction_hash, transaction);
 
@@ -838,11 +838,11 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
-	TRACE(("cache_end_transaction(id = %ld)\n", id));
+	TRACE(("cache_detach_sub_transaction(id = %ld)\n", id));
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
-		panic("cache_end_transaction(): invalid transaction ID\n");
+		panic("cache_detach_sub_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
 	}
 	if (!transaction->has_sub_transaction)
@@ -923,6 +923,9 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 	cached_block *block = transaction->first_block, *next;
 	for (; block != NULL; block = next) {
 		next = block->transaction_next;
+
+		if (!block->parent_data)
+			continue;
 
 		if (block->parent_data != block->data) {
 			// the block has been changed and must be restored
