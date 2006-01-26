@@ -393,6 +393,5 @@ InstallerWindow::SetStatusMessage(const char *text)
 {
 	BAutolock(this);
 	fStatusView->SetText(text);
-	fStatusView->Invalidate();
 }
 
