@@ -552,7 +552,7 @@ _kern_remove_dir(int fd, const char *relPath)
 	if (error != B_OK)
 		return error;
 
-	if (rmdir(path.Path()) < 0) {
+	if (rmdir(path.Path()) < 0)
 		return errno;
 
 	return B_OK;
@@ -733,5 +733,13 @@ extern "C" status_t
 _kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize)
 {
 	return _kget_safemode_option_(parameter, buffer, _bufferSize);
+}
+
+
+extern "C" status_t
+_kern_shutdown(bool reboot)
+{
+	puts(reboot ? "reboot" : "shutdown");
+	return B_ERROR;
 }
 
