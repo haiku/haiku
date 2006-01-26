@@ -735,11 +735,3 @@ _kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSi
 	return _kget_safemode_option_(parameter, buffer, _bufferSize);
 }
 
-
-extern "C" status_t
-_kern_shutdown(bool reboot)
-{
-	puts(reboot ? "reboot" : "shutdown");
-	return B_ERROR;
-}
-

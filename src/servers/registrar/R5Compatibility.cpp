@@ -3,21 +3,30 @@
  * Distributed under the terms of the MIT License.
  */
 
-// Syscalls not existing under R5
+//! Syscalls not existing under R5
 
 #include <syscalls.h>
+#include <stdio.h>
+
 
 // _kern_register_messaging_service
-area_id
+extern "C" area_id
 _kern_register_messaging_service(sem_id lockSem, sem_id counterSem)
 {
 	return B_ERROR;
 }
 
 // _kern_unregister_messaging_service
-status_t
+extern "C" status_t
 _kern_unregister_messaging_service()
 {
+	return B_ERROR;
+}
+
+extern "C" status_t
+_kern_shutdown(bool reboot)
+{
+	puts(reboot ? "reboot" : "shutdown");
 	return B_ERROR;
 }
 
