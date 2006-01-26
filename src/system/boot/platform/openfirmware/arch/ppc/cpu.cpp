@@ -12,9 +12,8 @@
 #include <boot/kernel_args.h>
 #include <boot/stage2.h>
 #include <kernel.h>
+#include <platform/openfirmware/devices.h>
 #include <platform/openfirmware/openfirmware.h>
-
-#include "devices.h"
 
 #define TRACE_CPU
 #ifdef TRACE_CPU
@@ -37,7 +36,7 @@ boot_arch_cpu_init(void)
 	char cpuPath[256];
 	int cookie = 0;
 	int cpuCount = 0;
-	while (platform_get_next_device(&cookie, cpus, "cpu", cpuPath,
+	while (of_get_next_device(&cookie, cpus, "cpu", cpuPath,
 			sizeof(cpuPath)) == B_OK) {
 		TRACE(("found CPU: %s\n", cpuPath));
 

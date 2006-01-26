@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src system kernel platform openfirmware ;
 SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 
-KernelStaticLibrary libopenfirmware.a :
+KernelMergeObject kernel_platform_openfirmware.o :
 	openfirmware.c
+	openfirmware_devices.cpp
 ;

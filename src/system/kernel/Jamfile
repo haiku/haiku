@@ -63,7 +63,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_debug.o
 
 	lib$(TARGET_ARCH).a
-	lib$(TARGET_BOOT_PLATFORM).a
+	kernel_platform_$(TARGET_BOOT_PLATFORM).o
 
 	linkhack.so
 
@@ -92,7 +92,7 @@ KernelLd kernel.so :
 	kernel_debug.o
 
 	lib$(TARGET_ARCH).a
-	lib$(TARGET_BOOT_PLATFORM).a
+	kernel_platform_$(TARGET_BOOT_PLATFORM).o
 
 	linkhack.so
 
