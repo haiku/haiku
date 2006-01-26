@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-11/2005
+	Rudolf Cornelissen 11/2002-1/2006
 */
 
 #define MODULE_BIT 0x00200000
@@ -16,7 +16,8 @@
 	Enable/Disable interrupts.  Just a wrapper around the
 	ioctl() to the kernel driver.
 */
-static void interrupt_enable(bool flag) {
+static void interrupt_enable(bool flag)
+{
 	status_t result;
 	gx00_set_bool_state sbs;
 
@@ -91,14 +92,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		display_mode target2 = target;
 
 		LOG(1,("SETMODE: setting DUALHEAD mode\n"));
-
-		/* validate flags for secondary TVout */
-		if ((i2c_sec_tv_adapter() != B_OK) && (target2.flags & TV_BITS))
-		{
-			target.flags &= ~TV_BITS;//still needed for some routines...
-			target2.flags &= ~TV_BITS;
-			LOG(1,("SETMODE: blocking TVout: no TVout cable connected!\n"));
-		}
 
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));

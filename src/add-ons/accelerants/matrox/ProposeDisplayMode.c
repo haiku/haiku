@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-11/2005
+	Rudolf Cornelissen 9/2002-1/2006
 */
 
 #define MODULE_BIT 0x00400000
@@ -418,7 +418,14 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		break;
 	}
 
-	/* if not TVout capable card clear TVout flags */
+	/* TVout can only be done if the interface cable is connected */
+	if ((i2c_sec_tv_adapter() != B_OK) && (target->flags & TV_CAPABLE))
+	{
+		target->flags &= ~TV_CAPABLE;
+		LOG(1, ("PROPOSEMODE: blocking TVout: no TVout cable connected!\n"));
+	}
+
+	/* if not TVout capable card and mode clear TVout flags */
 	if (!(target->flags & TV_CAPABLE))
 	{
 		target->flags &= ~TV_BITS;
