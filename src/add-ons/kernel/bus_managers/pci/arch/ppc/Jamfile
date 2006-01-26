@@ -2,7 +2,13 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers pci arch ppc ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) openfirmware ] ;
+
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_controller.cpp
 	pci_io.c
-	;
+
+	# openfirmware
+	pci_openfirmware.cpp
+	uninorth.cpp
+;
