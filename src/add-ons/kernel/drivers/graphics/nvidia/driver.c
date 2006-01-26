@@ -60,7 +60,6 @@ struct device_info {
 	vuint32		*regs;				/* kernel's pointer to memory mapped registers */
 	pci_info	pcii;					/* a convenience copy of the pci info for this device */
 	char		name[B_OS_NAME_LENGTH];	/* where we keep the name of the device for publishing and comparing */
-	bios_init	bios_pre_init;			/* we keep several things here we don't have coldstart support for yet. */
 };
 
 typedef struct {
@@ -820,8 +819,6 @@ static void probe_devices(void) {
 						di->shared_area = -1;
 						/* mark pointer to shared data as invalid */
 						di->si = NULL;
-						/* mark one-time accelerant init flag to 'is not yet done' */
-						di->bios_pre_init.done = false;
 						/* inc pointer to device info */
 						di++;
 						/* inc count */
@@ -989,13 +986,6 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 
 	/* ensure that the accelerant's INIT_ACCELERANT function can be executed */
 	si->accelerant_in_use = false;
-	/* copy the results of the one-time startup processing possibly done that discovered
-	 * BIOS pre-init programming that can't be 'recovered' once the accelerant has
-	 * been running (it 'overwrites' numerous BIOS pre-programmed items after all...) */
-	/* Note: This is kind of a hack. */
-	si->system_start_done = di->bios_pre_init.done;
-	si->ps.p1_timing.flags = di->bios_pre_init.p1_timing_flags;
-	si->ps.p2_timing.flags = di->bios_pre_init.p2_timing_flags;
 
 	/* note the amount of system RAM the system BIOS assigned to the card if applicable:
 	 * unified memory architecture (UMA) */
@@ -1333,27 +1323,6 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				tmpUlong = get_pci(PCI_command, 2);
 				tmpUlong &= ~PCI_command_io;
 				set_pci(PCI_command, 2, tmpUlong);
-
-				/* end of critical section */
-				RELEASE_BEN(pd->kernel);
-   			}
-		} break;
-		case NV_SET_BIOS_PRE_INIT: {
-			nv_set_bios_pre_init *bios_info = (nv_set_bios_pre_init *)buf;
-			if (bios_info->magic == NV_PRIVATE_DATA_MAGIC) {
-
-				/* lock the driver:
-				 * no other graphics card may have ISA I/O enabled when we enter */
-				AQUIRE_BEN(pd->kernel);
-
-				/* copy the results of the one-time BIOS startup processing relayed
-				 * to us that we depend on */
-				/* Note: This is kind of a hack (lack of full coldstart support). */
-				di->bios_pre_init.p1_timing_flags = bios_info->data.p1_timing_flags;
-				di->bios_pre_init.p2_timing_flags = bios_info->data.p2_timing_flags;
-				/* we are done */
-				di->bios_pre_init.done = true;
-   				result = B_OK;
 
 				/* end of critical section */
 				RELEASE_BEN(pd->kernel);
