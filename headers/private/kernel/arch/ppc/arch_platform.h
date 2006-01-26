@@ -9,14 +9,20 @@
 
 struct real_time_data;
 
+enum ppc_platform_type {
+	PPC_PLATFORM_OPEN_FIRMWARE = 0,
+};
+
 namespace BPrivate {
 
 class PPCPlatform {
 public:
-	PPCPlatform();
+	PPCPlatform(ppc_platform_type platformType);
 	virtual ~PPCPlatform();
 
 	static PPCPlatform *Default();
+
+	inline ppc_platform_type PlatformType() const	{ return fPlatformType; }
 
 	virtual status_t Init(struct kernel_args *kernelArgs) = 0;
 	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs) = 0;
@@ -31,6 +37,9 @@ public:
 	virtual	uint32 GetHardwareRTC() = 0;
 
 	virtual	void ShutDown(bool reboot) = 0;
+
+private:
+	ppc_platform_type	fPlatformType;
 };
 
 }	// namespace BPrivate

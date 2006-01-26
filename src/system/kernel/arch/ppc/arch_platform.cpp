@@ -19,7 +19,8 @@ static PPCPlatform *sPPCPlatform;
 
 
 // constructor
-PPCPlatform::PPCPlatform()
+PPCPlatform::PPCPlatform(ppc_platform_type platformType)
+	: fPlatformType(platformType)
 {
 }
 
@@ -93,7 +94,8 @@ debug_command_of_enter(int argc, char **argv)
 
 // constructor
 PPCOpenFirmware::PPCOpenFirmware()
-	: fInput(-1),
+	: PPCPlatform(PPC_PLATFORM_OPEN_FIRMWARE),
+	  fInput(-1),
 	  fOutput(-1),
 	  fRTC(-1)
 {
