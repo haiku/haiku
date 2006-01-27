@@ -152,7 +152,7 @@ static status_t test_ram()
 	for (offset = 0, value = 0x55aa55aa; offset < 256; offset++)
 	{
 		/* write testpattern to cardRAM */
-		((uint32 *)si->fbc.frame_buffer)[offset] = value;
+		((vuint32 *)si->fbc.frame_buffer)[offset] = value;
 		/* toggle testpattern */
 		value = 0xffffffff - value;
 	}
@@ -160,7 +160,7 @@ static status_t test_ram()
 	for (offset = 0, value = 0x55aa55aa; offset < 256; offset++)
 	{
 		/* readback and verify testpattern from cardRAM */
-		if (((uint32 *)si->fbc.frame_buffer)[offset] != value) result = B_ERROR;
+		if (((vuint32 *)si->fbc.frame_buffer)[offset] != value) result = B_ERROR;
 		/* toggle testpattern */
 		value = 0xffffffff - value;
 	}

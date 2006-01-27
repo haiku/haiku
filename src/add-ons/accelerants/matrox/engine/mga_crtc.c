@@ -512,7 +512,7 @@ status_t gx00_crtc_cursor_init()
 
 	if (si->ps.card_type >= G100)
 	{
-		uint32 * fb;
+		vuint32 * fb;
 		/* cursor bitmap will be stored at the start of the framebuffer on >= G100 */
 		const uint32 curadd = 0;
 
@@ -535,7 +535,7 @@ status_t gx00_crtc_cursor_init()
 		DXIW(CURCOL2BLUE,0);
 
 		/*clear cursor*/
-		fb = (uint32 *) si->framebuffer + curadd;
+		fb = (vuint32 *) si->framebuffer + curadd;
 		for (i=0;i<(1024/4);i++)
 		{
 			fb[i]=0;
@@ -610,10 +610,10 @@ status_t gx00_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 
 	if(si->ps.card_type >= G100)
 	{
-		uint8 * cursor;
+		vuint8 * cursor;
 
 		/*get a pointer to the cursor*/
-		cursor = (uint8*) si->framebuffer;
+		cursor = (vuint8*) si->framebuffer;
 
 		/*draw the cursor*/
 		for(y=0;y<16;y++)
