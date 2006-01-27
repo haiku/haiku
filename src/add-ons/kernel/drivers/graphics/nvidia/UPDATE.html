@@ -4,11 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.69, Rudolf)</h1></p>
+<p><h1>head (SVN 0.70, Rudolf)</h1></p>
 <ul>
 <li>The overlay engine code now respects the B_OVERLAY_COLOR_KEY flag instead of forcing keying ON;
 <li>Hook GET_ACCELERANT_DEVICE_INFO now returns much more detailed info about the card in use;
 <li>Hooks INIT_ACCELERANT and CLONE_ACCELERANT now enforce their correct use; returning error B_NOT_ALLOWED in case of errors;
+<li>Improved coldstart RAM tests for NV10 and higher: they could fail to correctly program the card on 'high-voltage' AGP 1.0 slots (confirmed a NV11);
 <li>Added support for acceleration engine 2D command SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT (as defined by Be) for all cards. Note: still untested for 15 and 8 bit spaces, and breaks overlay support currently (because of FIFO assignment switching being in use).Will fix that asap (I hope).
 </ul>
 <p><h1>nv_driver 0.67 (Rudolf)</h1></p>
