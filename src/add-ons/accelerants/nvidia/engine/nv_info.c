@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-11/2005
+   Rudolf Cornelissen 7/2003-1/2006
 */
 
 #define MODULE_BIT 0x00002000
@@ -1857,6 +1857,12 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 
 static void	setup_ram_config_nv10_up(uint8* rom)
 {
+	/* note:
+	 * After writing data to RAM a snooze is required to make the test work.
+	 * Confirmed a NV11: without snooze it worked OK on a low-voltage AGP2.0 slot,
+	 * but on a higher-voltage AGP 1.0 slot it failed to identify errors correctly!!
+	 * Adding the snooze fixed that. */
+
 	uint32 data, dummy;
 	uint8 cnt = 0;
 	status_t stat = B_ERROR;
@@ -1869,13 +1875,19 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	{
 		/* reset RAM bits at offset 224-255 bits four times */
 		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		snooze(10);
 		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		snooze(10);
 		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		snooze(10);
 		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		snooze(10);
 		/* write testpattern */
 		((uint32 *)si->framebuffer)[0x07] = 0x4e563131;
+		snooze(10);
 		/* reset RAM bits at offset 480-511 bits */
 		((uint32 *)si->framebuffer)[0x0f] = 0x00000000;
+		snooze(10);
 		/* check testpattern to have survived */
 		if (((uint32 *)si->framebuffer)[0x07] == 0x4e563131) stat = B_OK;
 		cnt++;
@@ -1913,8 +1925,10 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 		data -= 0x00100000;
 		/* write testpattern at generated RAM adress */
 		((uint32 *)si->framebuffer)[(data >> 2)] = 0x4e564441;
+		snooze(10);
 		/* reset first RAM adress */
 		((uint32 *)si->framebuffer)[0x00] = 0x00000000;
+		snooze(10);
 		/* dummyread first RAM adress four times */
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
@@ -1941,6 +1955,12 @@ static void	setup_ram_config_nv10_up(uint8* rom)
  * It doesn't matter if the card actually _has_ this amount of RAM or not(!) */
 static void	setup_ram_config_nv28(uint8* rom)
 {
+	/* note:
+	 * After writing data to RAM a snooze is required to make the test work.
+	 * Confirmed a NV11: without snooze it worked OK on a low-voltage AGP2.0 slot,
+	 * but on a higher-voltage AGP 1.0 slot it failed to identify errors correctly!!
+	 * Adding the snooze fixed that. */
+
 	uint32 dummy;
 	uint8 cnt = 0;
 	status_t stat = B_ERROR;
@@ -1955,8 +1975,10 @@ static void	setup_ram_config_nv28(uint8* rom)
 		NV_REG32(NV32_PFB_CONFIG_0) |= 0x00000800;
 		/* write testpattern to RAM adress 127Mb */
 		((uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
+		snooze(10);
 		/* reset first RAM adress */
 		((uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
+		snooze(10);
 		/* dummyread first RAM adress four times */
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("INFO: (#%d) dummy1 = $%08x, ", cnt, dummy));
