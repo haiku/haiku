@@ -765,7 +765,7 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 status_t nv_crtc_cursor_init()
 {
 	int i;
-	uint32 * fb;
+	vuint32 * fb;
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
@@ -799,7 +799,7 @@ status_t nv_crtc_cursor_init()
 	/* set cursor colour: not needed because of direct nature of cursor bitmap. */
 
 	/*clear cursor*/
-	fb = (uint32 *) si->framebuffer + curadd;
+	fb = (vuint32 *) si->framebuffer + curadd;
 	for (i=0;i<(2048/4);i++)
 	{
 		fb[i]=0;
@@ -860,11 +860,11 @@ status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
 	int x, y;
 	uint8 b;
-	uint16 *cursor;
+	vuint16 *cursor;
 	uint16 pixel;
 
 	/* get a pointer to the cursor */
-	cursor = (uint16*) si->framebuffer;
+	cursor = (vuint16*) si->framebuffer;
 
 	/* draw the cursor */
 	/* (Nvidia cards have a RGB15 direct color cursor bitmap, bit #16 is transparancy) */
