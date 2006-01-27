@@ -874,7 +874,7 @@ status_t stat = B_ERROR;
 status_t nm_crtc_cursor_init()
 {
 	int i;
-	uint32 * fb;
+	vuint32 * fb;
 	uint32 curadd, curreg;
 
 	/* the cursor is at the end of cardRAM */
@@ -914,7 +914,7 @@ status_t nm_crtc_cursor_init()
 	nm_crtc_depth(BPP8);
 
 	/* clear cursor: so we need full RAM access! */
-	fb = ((uint32 *)(((uint32)si->framebuffer) + curadd));
+	fb = ((vuint32 *)(((uint32)si->framebuffer) + curadd));
 	for (i = 0; i < (1024/4); i++)
 	{
 		fb[i] = 0;
@@ -962,10 +962,10 @@ status_t nm_crtc_cursor_hide()
 status_t nm_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
 	uint8 y;
-	uint8 * cursor;
+	vuint8 * cursor;
 
 	/* get a pointer to the cursor: it's at the end of cardRAM */
-	cursor = (uint8*) si->framebuffer;
+	cursor = (vuint8*) si->framebuffer;
 	cursor += ((si->ps.memory_size * 1024) - si->ps.curmem_size);
 
 	/*draw the cursor*/
