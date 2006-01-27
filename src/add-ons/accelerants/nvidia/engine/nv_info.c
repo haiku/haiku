@@ -890,10 +890,10 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	/* write testpattern to first 128 bits of graphics memory... */
 	data = 0x4e563541;
 	for (cnt = 0; cnt < 4; cnt++)
-		((uint32 *)si->framebuffer)[cnt] = data;
+		((volatile uint32 *)si->framebuffer)[cnt] = data;
 	/* ... if second 64 bits does not contain the testpattern we are apparantly
 	 * set to 128bits width while we should be set to 64bits width, so correct. */
-	if (((uint32 *)si->framebuffer)[3] != data)
+	if (((volatile uint32 *)si->framebuffer)[3] != data)
 	{
 		LOG(8,("INFO: ---RAM width tested: width is 64bits, correcting settings.\n"));
 		NV_REG32(NV32_NV4STRAPINFO) &= ~0x00000004;
@@ -910,14 +910,14 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	if (!ram_cfg)
 	{
 		/* write testpattern to just above the 16Mb boundary */
-		((uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] = data;
+		((volatile uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] = data;
 		/* check if pattern reads back */
-		if (((uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] == data)
+		if (((volatile uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] == data)
 		{
 			/* write second testpattern to base adress */
 			data = 0x4135564e;
-			((uint32 *)si->framebuffer)[0] = data;
-			if (((uint32 *)si->framebuffer)[0] == data)
+			((volatile uint32 *)si->framebuffer)[0] = data;
+			if (((volatile uint32 *)si->framebuffer)[0] == data)
 			{
 				LOG(8,("INFO: ---RAM size tested: size was set OK (32Mb).\n"));
 				return;
@@ -936,9 +936,9 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 		/* increment testpattern */
 		data++;
 		/* write testpattern to just above the 8Mb boundary */
-		((uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] = data;
+		((volatile uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] = data;
 		/* check if pattern reads back */
-		if (((uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] == data)
+		if (((volatile uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] == data)
 		{
 			LOG(8,("INFO: ---RAM size tested: size was set OK (16Mb).\n"));
 			return;
@@ -957,9 +957,9 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 		/* increment testpattern (again) */
 		data++;
 		/* write testpattern to just above the 4Mb boundary */
-		((uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] = data;
+		((volatile uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] = data;
 		/* check if pattern reads back */
-		if (((uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] == data)
+		if (((volatile uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] == data)
 		{
 			/* we have 8Mb, make sure this is set. */
 			ram_cfg = 0x00000002;
@@ -1874,22 +1874,22 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	while ((cnt < 4) && (stat != B_OK))
 	{
 		/* reset RAM bits at offset 224-255 bits four times */
-		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x07] = 0x00000000;
 		snooze(10);
-		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x07] = 0x00000000;
 		snooze(10);
-		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x07] = 0x00000000;
 		snooze(10);
-		((uint32 *)si->framebuffer)[0x07] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x07] = 0x00000000;
 		snooze(10);
 		/* write testpattern */
-		((uint32 *)si->framebuffer)[0x07] = 0x4e563131;
+		((volatile uint32 *)si->framebuffer)[0x07] = 0x4e563131;
 		snooze(10);
 		/* reset RAM bits at offset 480-511 bits */
-		((uint32 *)si->framebuffer)[0x0f] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x0f] = 0x00000000;
 		snooze(10);
 		/* check testpattern to have survived */
-		if (((uint32 *)si->framebuffer)[0x07] == 0x4e563131) stat = B_OK;
+		if (((volatile uint32 *)si->framebuffer)[0x07] == 0x4e563131) stat = B_OK;
 		cnt++;
 	}
 
@@ -1924,10 +1924,10 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 		/* subtract 1MB */
 		data -= 0x00100000;
 		/* write testpattern at generated RAM adress */
-		((uint32 *)si->framebuffer)[(data >> 2)] = 0x4e564441;
+		((volatile uint32 *)si->framebuffer)[(data >> 2)] = 0x4e564441;
 		snooze(10);
 		/* reset first RAM adress */
-		((uint32 *)si->framebuffer)[0x00] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x00] = 0x00000000;
 		snooze(10);
 		/* dummyread first RAM adress four times */
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
@@ -1935,7 +1935,7 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00];
 		/* check testpattern to have survived */
-		if (((uint32 *)si->framebuffer)[(data >> 2)] == 0x4e564441) stat = B_OK;
+		if (((volatile uint32 *)si->framebuffer)[(data >> 2)] == 0x4e564441) stat = B_OK;
 		cnt++;
 	}
 
@@ -1974,10 +1974,10 @@ static void	setup_ram_config_nv28(uint8* rom)
 		/* set bit 11: 'pulse' something into a new setting? */
 		NV_REG32(NV32_PFB_CONFIG_0) |= 0x00000800;
 		/* write testpattern to RAM adress 127Mb */
-		((uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
+		((volatile uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
 		snooze(10);
 		/* reset first RAM adress */
-		((uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
+		((volatile uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
 		snooze(10);
 		/* dummyread first RAM adress four times */
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
@@ -1989,7 +1989,7 @@ static void	setup_ram_config_nv28(uint8* rom)
 		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
 		LOG(8,("dummy4 = $%08x\n", dummy));
 		/* check testpattern to have survived */
-		if (((uint32 *)si->framebuffer)[0x01fc0000] == 0x4e564441) stat = B_OK;
+		if (((volatile uint32 *)si->framebuffer)[0x01fc0000] == 0x4e564441) stat = B_OK;
 		cnt++;
 	}
 
