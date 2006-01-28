@@ -6,6 +6,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build private shared ] : true ;
 USES_BE_API on <libbe_build>app_kit.o = true ;
 
 BuildPlatformMergeObject <libbe_build>app_kit.o :
+ 	Application.cpp
  	AppMisc.cpp
 	Message.cpp
 	MessageBody.cpp
