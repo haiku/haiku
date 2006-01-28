@@ -1063,7 +1063,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		// check type and size, allocate a buffer, if required
 		if (error == B_OK && info.type != type)
 			error = B_BAD_VALUE;
-		if (allocatedBuffer) {
+		if (error == B_OK && allocatedBuffer) {
 			buffer = malloc(info.size);
 			if (!buffer)
 				error = B_NO_MEMORY;
@@ -1084,6 +1084,12 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		}
 
 		foundData = (error == B_OK);
+
+		// free the allocated buffer on error
+		if (!foundData && allocatedBuffer && buffer) {
+			free(buffer);
+			buffer = NULL;
+		}
 	}
 
 	if (!foundData && IsUsingResources()) {
@@ -1099,7 +1105,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 		// check id and size, allocate a buffer, if required
 		if (error == B_OK && id >= 0 && idFound != id)
 			error = B_ENTRY_NOT_FOUND;
-		if (allocatedBuffer) {
+		if (error == B_OK && allocatedBuffer) {
 			buffer = malloc(sizeFound);
 			if (!buffer)
 				error = B_NO_MEMORY;
