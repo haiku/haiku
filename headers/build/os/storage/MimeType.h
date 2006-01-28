@@ -109,6 +109,11 @@ public:
 	/* Deprecated  Use SetTo instead. */
 	status_t SetType(const char *mimeType);
 
+	static status_t GuessMimeType(const entry_ref *file, BMimeType *type);
+	static status_t GuessMimeType(const void *buffer, int32 length,
+								  BMimeType *type);
+	static status_t GuessMimeType(const char *filename, BMimeType *type);
+
 private:
 	BMimeType(const char *mimeType, const char *mimePath);
 		// if mimePath is NULL, defaults to "/boot/home/config/settings/beos_mime/"

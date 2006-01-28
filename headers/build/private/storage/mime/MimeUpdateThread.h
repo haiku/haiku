@@ -11,7 +11,7 @@
 #define _MIME_UPDATE_THREAD_H
 
 #include <Entry.h>
-#include <RegistrarThread.h>
+//#include <RegistrarThread.h>
 #include <SupportDefs.h>
 
 #include <list>
@@ -24,21 +24,24 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-class MimeUpdateThread : public RegistrarThread {
+class MimeUpdateThread /*: public RegistrarThread*/ {
 public:
-	MimeUpdateThread(const char *name, int32 priority, BMessenger managerMessenger,
-		const entry_ref *root, bool recursive, bool force, BMessage *replyee);
+	MimeUpdateThread(const char *name, int32 priority,
+		BMessenger managerMessenger, const entry_ref *root, bool recursive,
+		int32 force, BMessage *replyee);
 	virtual ~MimeUpdateThread();
 	
 	virtual status_t InitCheck();	
-	
+
+	status_t DoUpdate()	{ return ThreadFunction(); }
+
 protected:
 	virtual status_t ThreadFunction();
 	virtual status_t DoMimeUpdate(const entry_ref *entry, bool *entryIsDir) = 0;
 	
 	const entry_ref fRoot;
 	const bool fRecursive;
-	const bool fForce;
+	const int32 fForce;
 	BMessage *fReplyee;
 	
 	bool DeviceSupportsAttributes(dev_t device);

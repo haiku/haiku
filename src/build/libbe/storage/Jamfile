@@ -5,6 +5,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private storage ] : true ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
+
 USES_BE_API on <libbe_build>storage_kit.o = true ;
 
 BuildPlatformMergeObject <libbe_build>storage_kit.o :
@@ -13,6 +15,7 @@ BuildPlatformMergeObject <libbe_build>storage_kit.o :
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
+	Mime.cpp
 	MimeType.cpp
 	Node.cpp
 	NodeInfo.cpp
@@ -27,4 +30,8 @@ BuildPlatformMergeObject <libbe_build>storage_kit.o :
 	SymLink.cpp
 	Volume.cpp
 	storage_support.cpp
+
+	database_support.cpp
+	MimeUpdateThread.cpp
+	UpdateMimeInfoThread.cpp
 ;

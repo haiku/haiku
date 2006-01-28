@@ -18,8 +18,9 @@ namespace Mime {
 
 class CreateAppMetaMimeThread : public MimeUpdateThread {
 public:
-	CreateAppMetaMimeThread(const char *name, int32 priority, BMessenger managerMessenger,
-		const entry_ref *root, bool recursive, bool force, BMessage *replyee);
+	CreateAppMetaMimeThread(const char *name, int32 priority,
+		BMessenger managerMessenger, const entry_ref *root, bool recursive,
+		int32 force, BMessage *replyee);
 	status_t DoMimeUpdate(const entry_ref *entry, bool *entryIsDir);
 };
 	

@@ -351,6 +351,72 @@ BMimeType::SetType(const char *mimeType)
 	return SetTo(mimeType);
 }
 
+// GuessMimeType
+status_t
+BMimeType::GuessMimeType(const entry_ref *ref, BMimeType *type)
+{
+	if (!ref || !type)
+		return B_BAD_VALUE;
+
+	// get BEntry
+	BEntry entry;
+	status_t error = entry.SetTo(ref);
+	if (error != B_OK)
+		return error;
+
+	// does entry exist?
+	if (!entry.Exists())
+		return B_ENTRY_NOT_FOUND;
+
+	// check entry type
+	if (entry.IsDirectory())
+		return type->SetType("application/x-vnd.be-directory");
+	if (entry.IsSymLink())
+		return type->SetType("application/x-vnd.be-symlink");
+	if (!entry.IsFile())
+		return B_ERROR;
+
+	// we have a file, read the first 4 bytes
+	BFile file;
+	char buffer[4];
+	if (file.SetTo(ref, B_READ_ONLY) == B_OK
+		&& file.Read(buffer, 4) == 4) {
+		return GuessMimeType(buffer, 4, type);
+	}
+
+	// we couldn't open or read the file
+	return type->SetType(B_FILE_MIME_TYPE);
+}
+
+// GuessMimeType
+status_t
+BMimeType::GuessMimeType(const void *_buffer, int32 length, BMimeType *type)
+{
+	const uint8 *buffer = (const uint8*)_buffer;
+	if (!buffer || !type)
+		return B_BAD_VALUE;
+
+	// we only know ELF files
+	if (length >= 4 && buffer[0] == 0x7f && buffer[1] == 'E' && buffer[2] == 'L'
+		&&  buffer[3] == 'F') {
+		return type->SetType(B_ELF_APP_MIME_TYPE);
+	}
+
+	return type->SetType(B_FILE_MIME_TYPE);
+}
+
+// GuessMimeType
+status_t
+BMimeType::GuessMimeType(const char *filename, BMimeType *type)
+{
+	if (!filename || !type)
+		return B_BAD_VALUE;
+
+	entry_ref ref;
+	status_t error = get_ref_for_path(filename, &ref);
+	return (error == B_OK ? GuessMimeType(&ref, type) : error);
+}
+
 void BMimeType::_ReservedMimeType1() {}
 void BMimeType::_ReservedMimeType2() {}
 void BMimeType::_ReservedMimeType3() {}

@@ -39,6 +39,8 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+#if 0
+
 static const char *get_user_settings_dir(BPath &path);
 
 static BPath sSettingsDirPath;
@@ -51,6 +53,8 @@ static const char *sBeOSDBDirName	= "obos_mime";
 const std::string kDatabaseDir = sSettingsDir + "/"
 	+ (is_running_on_haiku() ? sHaikuDBDirName : sBeOSDBDirName);
 const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
+
+#endif	// 0
 
 #define ATTR_PREFIX "META:"
 #define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
@@ -103,6 +107,8 @@ const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
+
+#if 0
 
 // get_settings_dir
 /*!	\brief Sets the supplied BPath to the user settings directory and returns
@@ -369,6 +375,7 @@ delete_attribute(const char *type, const char *attr)
 	return err;
 }
 
+#endif	// 0
 
 
 } // namespace Mime

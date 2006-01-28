@@ -45,8 +45,8 @@ namespace Mime {
 MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority,
 	BMessenger managerMessenger, const entry_ref *root, bool recursive,
 	int32 force, BMessage *replyee)
-	: RegistrarThread(name, priority, managerMessenger)
-	, fRoot(root ? *root : entry_ref())
+	: /*RegistrarThread(name, priority, managerMessenger)
+	,*/ fRoot(root ? *root : entry_ref())
 	, fRecursive(recursive)
 	, fForce(force)
 	, fReplyee(replyee)
@@ -74,10 +74,7 @@ MimeUpdateThread::~MimeUpdateThread()
 status_t
 MimeUpdateThread::InitCheck()
 {
-	status_t err = RegistrarThread::InitCheck();
-	if (!err)
-		err = fStatus;
-	return err;
+	return fStatus;
 }
 
 // ThreadFunction
@@ -92,7 +89,7 @@ MimeUpdateThread::ThreadFunction()
 	// Do the updates
 	if (!err)
 		err = UpdateEntry(&fRoot);
-	// Send a reply if we have a message to reply to
+/*	// Send a reply if we have a message to reply to
 	if (fReplyee) {
 		BMessage reply(B_REG_RESULT);
 		status_t error = reply.AddInt32("result", err);
@@ -112,7 +109,7 @@ MimeUpdateThread::ThreadFunction()
 	}
 	DBG(OUT("(id: %ld) exiting mime update thread with result 0x%lx\n",
 		find_thread(NULL), err));
-	return err;
+*/	return err;
 }
 
 // DeviceSupportsAttributes
@@ -132,34 +129,7 @@ MimeUpdateThread::ThreadFunction()
 bool
 MimeUpdateThread::DeviceSupportsAttributes(dev_t device)
 {
-	// See if an entry for this device already exists
-	std::list< std::pair<dev_t,bool> >::iterator i;
-	for (i = fAttributeSupportList.begin();
-		   i != fAttributeSupportList.end();
-		     i++)
-	{
-		if (i->first == device)
-			return i->second;
-	}
-	
-	bool result = false;
-
-	// If we get here, no such device is yet in our list,
-	// so we attempt to remedy the situation
-	BVolume volume;
-	status_t err = volume.SetTo(device);
-	if (!err) {
-		result = volume.KnowsAttr();
-		// devices supporting attributes are likely to be queried
-		// again, devices not supporting attributes are not
-		std::pair<dev_t,bool> p(device, result);
-		if (result)
-			fAttributeSupportList.push_front(p);
-		else
-			fAttributeSupportList.push_back(p);
-	}
-	
-	return result;		
+	return true;
 }
 
 // UpdateEntry
@@ -173,8 +143,8 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 	bool entryIsDir = false;
 	
 	// Look to see if we're being terminated
-	if (!err && fShouldExit)
-		err = B_CANCELED;
+//	if (!err && fShouldExit)
+//		err = B_CANCELED;
 		
 	// Before we update, make sure this entry lives on a device that supports
 	// attributes. If not, we skip it and any of its children for
