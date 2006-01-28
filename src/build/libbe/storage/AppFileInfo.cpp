@@ -1118,7 +1118,7 @@ BAppFileInfo::_ReadData(const char *name, int32 id, type_code type,
 				error = B_ERROR;
 		}
 
-	} else
+	} else if (!foundData)
 		error = B_BAD_VALUE;
 
 	// return the allocated buffer, or free it on error
