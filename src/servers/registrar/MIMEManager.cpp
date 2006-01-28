@@ -186,8 +186,9 @@ MIMEManager::MessageReceived(BMessage *message)
 			using BPrivate::Storage::Mime::UpdateMimeInfoThread;
 			
 			entry_ref root;
-			bool recursive, force;
+			bool recursive;
 			bool synchronous = false;
+			int32 force;
 			
 			MimeUpdateThread *thread = NULL;
 			
@@ -202,7 +203,7 @@ MIMEManager::MessageReceived(BMessage *message)
 			if (!err)
 				err = message->FindBool("synchronous", &synchronous);
 			if (!err)
-				err = message->FindBool("force", &force);
+				err = message->FindInt32("force", &force);
 			
 			// Detach the message for synchronous calls	
 			if (!err && synchronous) {

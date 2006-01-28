@@ -1,7 +1,8 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/* 
+ * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 /*!
 	\file Mime.h
 	Mime type C functions interface declarations.
@@ -37,11 +38,18 @@ enum icon_size {
 	B_MINI_ICON		= 16
 };
 
+// values for the "force" parameter of update_mime_info() (Haiku only)
+enum {
+	B_UPDATE_MIME_INFO_NO_FORCE			= 0,
+	B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE	= 1,
+	B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL	= 2,
+};
+
 #ifdef __cplusplus
 }
 #endif
 
-// OpenBeOS only!
+// Haiku only!
 #ifdef __cplusplus
 
 class BBitmap;
@@ -56,5 +64,3 @@ status_t get_device_icon(const char *dev, BBitmap *icon, icon_size which);
 #endif
 
 #endif	// _MIME_H
-
-

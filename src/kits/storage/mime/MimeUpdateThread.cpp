@@ -42,8 +42,9 @@ namespace Mime {
 	field detached from the registrar's	mime manager looper (though this is not verified).
 	The message will be	replied to at the end of the thread's execution.
 */
-MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority, BMessenger managerMessenger,
-	const entry_ref *root, bool recursive, bool force, BMessage *replyee)
+MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority,
+	BMessenger managerMessenger, const entry_ref *root, bool recursive,
+	int32 force, BMessage *replyee)
 	: RegistrarThread(name, priority, managerMessenger)
 	, fRoot(root ? *root : entry_ref())
 	, fRecursive(recursive)

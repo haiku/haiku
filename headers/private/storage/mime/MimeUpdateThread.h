@@ -26,8 +26,9 @@ namespace Mime {
 
 class MimeUpdateThread : public RegistrarThread {
 public:
-	MimeUpdateThread(const char *name, int32 priority, BMessenger managerMessenger,
-		const entry_ref *root, bool recursive, bool force, BMessage *replyee);
+	MimeUpdateThread(const char *name, int32 priority,
+		BMessenger managerMessenger, const entry_ref *root, bool recursive,
+		int32 force, BMessage *replyee);
 	virtual ~MimeUpdateThread();
 	
 	virtual status_t InitCheck();	
@@ -38,7 +39,7 @@ protected:
 	
 	const entry_ref fRoot;
 	const bool fRecursive;
-	const bool fForce;
+	const int32 fForce;
 	BMessage *fReplyee;
 	
 	bool DeviceSupportsAttributes(dev_t device);

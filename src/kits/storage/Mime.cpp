@@ -53,7 +53,7 @@ status_t do_mime_update(int32 what, const char *path, int recursive,
 		if (!err)
 			err = msg.AddBool("synchronous", synchronous);
 		if (!err)
-			err = msg.AddBool("force", force);
+			err = msg.AddInt32("force", force);
 		if (!err) 
 			err = BRoster::Private().SendTo(&msg, &reply, true);
 		if (!err)
@@ -78,8 +78,16 @@ status_t do_mime_update(int32 what, const char *path, int recursive,
 	\param synchronous If non-null update_mime_info() waits until the
 		   operation is finished, otherwise it returns immediately and the
 		   update is done asynchronously.
-	\param force If non-null, also the information for files are updated that
-		   have already been updated.
+	\param force Specifies how to handle files that already have MIME
+		   information:
+			- \c B_UPDATE_MIME_INFO_NO_FORCE: Files that already have a
+			  \c BEOS:TYPE attribute won't be updated.
+			- \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE: Files that already have a
+			  \c BEOS:TYPE attribute will be updated too, but \c BEOS:TYPE
+			  itself will remain untouched.
+			- \c B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL: Similar to
+			  \c B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE, but the \c BEOS:TYPE
+			  attribute will be updated too.
 	\return
 	- \c B_OK: Everything went fine.
 	- An error code otherwise.

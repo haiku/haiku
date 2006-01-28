@@ -579,7 +579,7 @@ message:	B_REG_MIME_UPDATE_MIME_INFO
 			"entry": B_REF_TYPE
 			"recursive": B_BOOLEAN_TYPE
 			"synchronous": B_BOOLEAN_TYPE
-			"force": B_BOOLEAN_TYPE
+			"force": B_INT32_TYPE
 reply:		standard general result
 
 message fields:
@@ -589,8 +589,9 @@ message fields:
 - "synchronous": If true, the call will block until the operation is
   completed. If false, the call will return immediately and the operation
   will run asynchronously in another thread.                 
-- "force": If true, also update entries for which a BEOS:TYPE attribute
-           already exists.
+- "force": Specifies how to handle entries for which a BEOS:TYPE attribute
+  already exists. Valid values are 
+  B_UPDATE_MIME_INFO_{NO_FORCE, FORCE_KEEP_TYPE, FORCE_UPDATE_ALL}.
 
 reply fields:
 - "result":
@@ -607,7 +608,7 @@ message:	B_REG_MIME_CREATE_APP_META_MIME
 			"entry": B_REF_TYPE
 			"recursive": B_BOOLEAN_TYPE
 			"synchronous": B_BOOLEAN_TYPE
-			"force": B_BOOLEAN_TYPE
+			"force": B_INT32_TYPE
 reply:		standard general result
 
 message fields:
@@ -617,7 +618,7 @@ message fields:
 - "synchronous": If true, the call will block until the operation is
   completed. If false, the call will return immediately and the operation
   will run asynchronously in another thread.                 
-- "force": If true, also update entries for which meta app information
+- "force": If != 0, also update entries for which meta app information
   already exists.
 
 reply fields:

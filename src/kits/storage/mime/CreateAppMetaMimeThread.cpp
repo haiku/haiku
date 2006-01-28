@@ -23,9 +23,11 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-CreateAppMetaMimeThread::CreateAppMetaMimeThread(const char *name, int32 priority,
-	BMessenger managerMessenger, const entry_ref *root, bool recursive, bool force, BMessage *replyee)
-	: MimeUpdateThread(name, priority, managerMessenger, root, recursive, force, replyee)
+CreateAppMetaMimeThread::CreateAppMetaMimeThread(const char *name,
+	int32 priority, BMessenger managerMessenger, const entry_ref *root,
+	bool recursive, int32 force, BMessage *replyee)
+	: MimeUpdateThread(name, priority, managerMessenger, root, recursive, force,
+		replyee)
 {
 }
 
