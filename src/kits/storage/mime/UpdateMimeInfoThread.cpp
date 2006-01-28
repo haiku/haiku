@@ -40,7 +40,7 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 static bool
 is_shared_object_mime_type(BMimeType &type)
 {
-	return (type == "application/x-vnd.Be-elfexecutable");
+	return (type == B_ELF_APP_MIME_TYPE);
 }
 
 
