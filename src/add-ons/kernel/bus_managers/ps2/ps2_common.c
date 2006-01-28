@@ -68,7 +68,7 @@ ps2_read_data()
 inline void
 ps2_write_ctrl(uint8 ctrl)
 {
-	dprintf("ps2_write_ctrl 0x%02x\n", ctrl);
+	TRACE(("ps2_write_ctrl 0x%02x\n", ctrl));
 
 	gIsa->write_io_8(PS2_PORT_CTRL, ctrl);
 }
@@ -77,7 +77,7 @@ ps2_write_ctrl(uint8 ctrl)
 inline void
 ps2_write_data(uint8 data)
 {
-	dprintf("ps2_write_data 0x%02x\n", data);
+	TRACE(("ps2_write_data 0x%02x\n", data));
 
 	gIsa->write_io_8(PS2_PORT_DATA, data);
 }
@@ -284,8 +284,11 @@ ps2_init_driver(void)
 		res = ps2_command(0xd3, &out, 1, &in, 1);
 		dprintf("step3: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
 		
-		if (res == B_OK && in != 0xa4) {
-			dprintf("found active multiplexing v%d.%d\n", (in >> 4), in & 0xf);
+		// If the controller doesn't support active multiplexing, 
+		// data is 0xa4 (or 0xac on some broken USB legacy emulation)
+		
+		if (res == B_OK && in != 0xa4 && in != 0xac) {
+			dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
 			gMultiplexingActive = true;
 
 			res = ps2_command(0xa8, NULL, 0, NULL, 0);
@@ -310,8 +313,8 @@ ps2_init_driver(void)
 			dprintf("step11: res 0x%08x\n", res);
 			res = ps2_command(0xa8, NULL, 0, NULL, 0);
 			dprintf("step12: res 0x%08x\n", res);
-			
-			
+		} else {
+			dprintf("ps2: active multiplexing not supported\n");
 		}
 	}
 
