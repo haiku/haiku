@@ -9,7 +9,7 @@
  */
 
 
-#include "ps2.h"
+#include "ps2_defs.h"
 
 #include <KernelExport.h>
 #include <driver_settings.h>
@@ -136,7 +136,7 @@ arch_debug_blue_screen_getchar(void)
 		spin(200);
 		key = in8(PS2_PORT_DATA);
 
-		if (status & PS2_STATUS_MOUSE_DATA) {
+		if (status & PS2_STATUS_AUX_DATA) {
 			// we read mouse data, ignore it
 			continue;
 		}
