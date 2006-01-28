@@ -6,6 +6,7 @@ local tools =
 	<build>catattr
 	<build>copyattr
 	<build>listattr
+	<build>mimeset
 	<build>rmattr
 	<build>settype
 	<build>setversion
@@ -20,6 +21,8 @@ BuildPlatformMain <build>copyattr : copyattr.cpp
 	: $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>mimeset : mimeset.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 

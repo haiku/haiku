@@ -123,6 +123,15 @@ actions SetType1
 rule MimeSet
 {
 	# MimeSet <target>
+
+	Depends $(1) : <build>mimeset ;
+	MimeSet1 $(1) : <build>mimeset ;
+}
+
+actions MimeSet1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) -f "$(1)" ;
 }
 
 rule ResComp
@@ -143,15 +152,4 @@ actions ResComp1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) --auto-names -o $(1) $(2[2-])
 }
-
-
-if $(OS) = BEOS
-{
-
-actions MimeSet
-{
-	mimeset -f "$(1)" ;
-}
-
-}	# if BEOS
 
