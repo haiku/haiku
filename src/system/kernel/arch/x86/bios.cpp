@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -54,7 +54,7 @@ enum {
 };
 
 
-static addr_t sBiosBase;
+addr_t gBiosBase;
 static addr_t sBios32ServiceDirectory;
 
 
@@ -121,17 +121,17 @@ bios_init(void)
 {
 	// map BIOS area 0xe0000 - 0xfffff
 	area_id biosArea = map_physical_memory("pc bios", (void *)0xe0000, 0x20000,
-		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&sBiosBase);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&gBiosBase);
 	if (biosArea < 0)
 		return biosArea;
 
-	TRACE(("PC BIOS mapped to %p\n", (void *)sBiosBase));
+	TRACE(("PC BIOS mapped to %p\n", (void *)gBiosBase));
 
 	// ToDo: add driver settings support to disable the services below
 
 	// search for available BIOS services
 
-	addr_t base = sBiosBase;
+	addr_t base = gBiosBase;
 	addr_t end = base + 0x20000;
 
 	while (base < end) {
@@ -145,7 +145,7 @@ bios_init(void)
 
 					if (bios32->service_directory >= 0xe0000
 						&& bios32->service_directory <= 0xfffff)
-						sBios32ServiceDirectory = sBiosBase - 0xe0000 + bios32->service_directory;
+						sBios32ServiceDirectory = gBiosBase - 0xe0000 + bios32->service_directory;
 				}
 				break;
 			case SMBIOS:

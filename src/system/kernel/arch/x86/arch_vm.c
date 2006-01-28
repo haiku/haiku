@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -32,6 +32,8 @@
 
 
 #define kMaxMemoryTypeRegisters 32
+
+void *gDmaAddress;
 
 static uint32 sMemoryTypeBitmap;
 static int32 sMemoryTypeIDs[kMaxMemoryTypeRegisters];
@@ -164,7 +166,6 @@ arch_vm_init(kernel_args *args)
 status_t
 arch_vm_init_post_area(kernel_args *args)
 {
-	void *dmaAddress;
 	area_id id;
 
 	TRACE(("arch_vm_init_post_area: entry\n"));
@@ -174,7 +175,8 @@ arch_vm_init_post_area(kernel_args *args)
 
 	// map 0 - 0xa0000 directly
 	id = map_physical_memory("dma_region", (void *)0x0, 0xa0000,
-		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &dmaAddress);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		&gDmaAddress);
 	if (id < 0) {
 		panic("arch_vm_init_post_area: unable to map dma region\n");
 		return B_NO_MEMORY;

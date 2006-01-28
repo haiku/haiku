@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -141,6 +141,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		port_init(&sKernelArgs);
 		TRACE(("init kernel daemons\n"));
 		kernel_daemon_init();
+		arch_platform_init_post_thread(&sKernelArgs);
 
 		TRACE(("init VM threads\n"));
 		vm_init_post_thread(&sKernelArgs);

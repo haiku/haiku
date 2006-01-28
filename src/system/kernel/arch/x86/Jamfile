@@ -25,6 +25,7 @@ KernelStaticLibrary libx86 :
 	arch_interrupts.S
 	arch_system_info.c
 	arch_user_debugger.cpp
+	apm.cpp
 	bios.cpp
 	cpuid.S
 

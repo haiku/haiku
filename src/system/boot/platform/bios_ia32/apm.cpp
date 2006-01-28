@@ -20,12 +20,6 @@
 #endif
 
 
-// int 0x15 APM definitions
-#define BIOS_APM_CHECK			0x5300
-#define BIOS_APM_CONNECT_32_BIT	0x5303
-#define BIOS_APM_DISCONNECT		0x5304
-
-
 status_t
 apm_init(void)
 {
@@ -68,8 +62,11 @@ apm_init(void)
 	regs.eax = BIOS_APM_CONNECT_32_BIT;
 	regs.ebx = 0;
 	call_bios(0x15, &regs);
-	if ((regs.flags & CARRY_FLAG) != 0)
+	if ((regs.flags & CARRY_FLAG) != 0) {
+		// reset the version, so that the kernel won't try to use APM
+		info.version = 0;
 		return B_ERROR;
+	}
 
 	info.code32_segment_base = regs.eax & 0xffff;
 	info.code32_segment_offset = regs.ebx;

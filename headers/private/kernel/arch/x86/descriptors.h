@@ -19,11 +19,13 @@
 #define APM_CODE16_SEGMENT	0x30
 #define APM_DATA_SEGMENT	0x38
 
+#define BIOS_DATA_SEGMENT	0x40
+
 #ifndef _ASSEMBLER
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
 
-#define DOUBLE_FAULT_TSS_BASE_SEGMENT 8
+#define DOUBLE_FAULT_TSS_BASE_SEGMENT 9
 #define TSS_BASE_SEGMENT (DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
 #define TLS_BASE_SEGMENT (TSS_BASE_SEGMENT + smp_get_num_cpus())
 #define APM_BASE_SEGMENT (TLS_BASE_SEGMENT + smp_get_num_cpus())

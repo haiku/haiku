@@ -273,8 +273,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 		// add TSS descriptor for this new TSS
 		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i], (addr_t)sTSS[i], sizeof(struct tss));
-		
-		
+
 		// create double-fault task
 		sprintf(tssName, "double_fault_tss%lu", i);
 		area = create_area(tssName, (void **)&sDoubleFaultTSS[i], B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
