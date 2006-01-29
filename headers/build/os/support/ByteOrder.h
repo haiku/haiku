@@ -4,10 +4,15 @@
 #ifndef _sk_byte_order_h_
 #define _sk_byte_order_h_
 
+
 #include <BeBuild.h>
-#include <endian.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>	/* For convenience */
+
+#ifndef HAIKU_HOST_PLATFORM_FREEBSD
+#	include <endian.h>
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
