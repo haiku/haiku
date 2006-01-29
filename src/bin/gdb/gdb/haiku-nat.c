@@ -733,7 +733,14 @@ haiku_stop_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 	}
 
 	// wait for the event to hit our port
-	
+
+	// TODO: debug_thread() doesn't guarantee that the thread will enter the
+	// debug loop any time soon. E.g. a wait_for_thread() is (at the moment)
+	// not interruptable, so we block here forever, if we already debug the
+	// thread that is being waited for. We should probably limit the time
+	// we're waiting, and return the info to the caller, which can then try
+	// to deal with the situation in an appropriate way.
+
 	// prepare closure for finding interesting events
 	threadEventClosure.context = teamDebugInfo;
 	threadEventClosure.thread = threadID;
@@ -752,6 +759,10 @@ haiku_stop_thread(team_debug_info *teamDebugInfo, thread_id threadID)
 	// We should check, whether we really got an event for the thread in
 	// question, but the only possible other event is that the team has
 	// been delete, which ends the game anyway.
+	
+	// TODO: That's actually not true. We also get messages when an add-on
+	// has been loaded/unloaded, a signal arrives, or a thread calls the
+	// debugger.
 
 	return B_OK;
 }
