@@ -61,52 +61,50 @@ set_leds(led_info *ledInfo)
 
 int32 keyboard_handle_int(uint8 data)
 {
-		at_kbd_io keyInfo;
-		uint8 scancode;
+	at_kbd_io keyInfo;
+	uint8 scancode;
 
 	if (atomic_and(&sKeyboardOpenMask, 1) == 0)
 		return B_HANDLED_INTERRUPT;
 
+	// TODO: Handle braindead "pause" key special case
 
+	if (data == EXTENDED_KEY) {
+		sIsExtended = true;
+		TRACE(("Extended key\n"));
+		return B_HANDLED_INTERRUPT;
+	} 
 
-		// TODO: Handle braindead "pause" key special case
+	scancode = data;
 
-		if (data == EXTENDED_KEY) {
-			sIsExtended = true;
-			TRACE(("Extended key\n"));
-			return B_HANDLED_INTERRUPT;
-		} 
+	TRACE(("scancode: %x\n", scancode));
 
-		scancode = data;
+	// For now, F12 enters the kernel debugger
+	// ToDo: remove me later :-)
+	if (scancode == 88)
+		panic("keyboard requested halt.\n");
 
-		TRACE(("scancode: %x\n", scancode));
+	if (scancode & 0x80) {
+		keyInfo.is_keydown = false;
+		scancode -= 0x80;	
+	} else
+		keyInfo.is_keydown = true;
 
-		// For now, F12 enters the kernel debugger
-		// ToDo: remove me later :-)
-		if (scancode == 88)
-			panic("keyboard requested halt.\n");
+	if (sIsExtended) {
+		scancode |= 0x80;
+		sIsExtended = false;
+	}
 
-		if (scancode & 0x80) {
-			keyInfo.is_keydown = false;
-			scancode -= 0x80;	
-		} else
-			keyInfo.is_keydown = true;
+	keyInfo.timestamp = system_time();
+	keyInfo.scancode = scancode;
 
-		if (sIsExtended) {
-			scancode |= 0x80;
-			sIsExtended = false;
-		}
+	if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
+		// If there is no space left in the buffer, we drop this key stroke. We avoid
+		// dropping old key strokes, to not destroy what already was typed.
+		return B_HANDLED_INTERRUPT;
+	}
 
-		keyInfo.timestamp = system_time();
-		keyInfo.scancode = scancode;
-
-		if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
-			// If there is no space left in the buffer, we drop this key stroke. We avoid
-			// dropping old key strokes, to not destroy what already was typed.
-			return B_HANDLED_INTERRUPT;
-		}
-
-		release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
 
 	return B_INVOKE_SCHEDULER;
 }

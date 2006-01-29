@@ -131,6 +131,10 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	
 	if ((flags & PS2_FLAG_ENABLED) == 0) {
 		dprintf("not enabled, data dropped\n");
+		// TODO: remove me again; let us drop into the kernel debugger with F12
+		if ((flags & PS2_FLAG_KEYB) != 0 && data == 88)
+			panic("keyboard requested halt.\n");
+
 		return B_HANDLED_INTERRUPT;
 	}
 			
