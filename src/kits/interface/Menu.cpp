@@ -1044,15 +1044,17 @@ BMenu::_show(bool selectFirstItem)
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
 	BMenuWindow *window = NULL;
-	if (fSuper != NULL)
+	if (fSuper != NULL) {
 		window = fSuper->MenuWindow();
-	
+		if (window != NULL)
+			window->SetMenu(this);
+	}
 	// Otherwise, create a new one
 	// Actually, I think this can only happen for
 	// "stand alone" BPopUpMenus (i.e. not within a BMenuField)
 	if (window == NULL) {
 		// Menu windows get the BMenu's handler name
-		window = new BMenuWindow(Name());
+		window = new BMenuWindow(Name(), this);
 	}
 
 	if (window == NULL)
@@ -1572,7 +1574,7 @@ BMenu::MenuWindow()
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menuwindow\n", Name());
-		fCachedMenuWindow = new BMenuWindow(windowName);
+		fCachedMenuWindow = new BMenuWindow(windowName, this);
 	}
 	
 	return fCachedMenuWindow;
@@ -1807,7 +1809,12 @@ BMenu::UpdateWindowViewSize(bool upWind)
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
-	window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+	if (fItems.CountItems() > 0)
+		window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+	else {
+		CacheFontInfo();
+		window->ResizeTo(StringWidth("<empty>") + 4, fFontHeight + 6);
+	}
 	window->MoveTo(frame.LeftTop());
 }
 

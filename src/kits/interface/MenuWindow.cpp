@@ -36,14 +36,17 @@ const window_feel kMenuWindowFeel = (window_feel)1025;
 // This draws the frame around the BMenu
 class BMenuFrame : public BView {
 public:
-	BMenuFrame() ;
+	BMenuFrame(BMenu *menu) ;
 	
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
+
+private:
+	BMenu *fMenu;
 };
 
 
-BMenuWindow::BMenuWindow(const char *name)
+BMenuWindow::BMenuWindow(const char *name, BMenu *menu)
 	:
 	// The window will be resized by BMenu, so just pass a dummy rect
 	//BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
@@ -53,8 +56,7 @@ BMenuWindow::BMenuWindow(const char *name)
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)
 {
-	BMenuFrame *menuFrame = new BMenuFrame();
-	AddChild(menuFrame);
+	SetMenu(menu);
 }
 
 
@@ -63,10 +65,21 @@ BMenuWindow::~BMenuWindow()
 }
 
 
+void
+BMenuWindow::SetMenu(BMenu *menu)
+{
+	if (CountChildren() > 0)
+		RemoveChild(ChildAt(0));
+	BMenuFrame *menuFrame = new BMenuFrame(menu);
+	AddChild(menuFrame);
+}
+
+
 // BMenuFrame
-BMenuFrame::BMenuFrame()
+BMenuFrame::BMenuFrame(BMenu *menu)
 	:
-	BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fMenu(menu)
 {
 }
 	
@@ -82,9 +95,18 @@ BMenuFrame::AttachedToWindow()
 void
 BMenuFrame::Draw(BRect updateRect)
 {
+	if (fMenu->CountItems() == 0) {
+		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
+		FillRect(updateRect);
+		font_height height;
+		fMenu->GetFontHeight(&height);
+		fMenu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+		// TODO: This doesn't get drawn for some reason
+		fMenu->DrawString("<empty>", BPoint(2, ceilf(height.ascent + 2)));
+	}
+
+	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
 	BRect bounds(Bounds());
-	
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(BPoint(bounds.right, bounds.top),
 				BPoint(bounds.right, bounds.bottom - 1));
 	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),

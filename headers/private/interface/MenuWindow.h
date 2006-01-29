@@ -34,9 +34,10 @@ class BMenuScroller;
 
 class BMenuWindow : public BWindow {
 public:
-	BMenuWindow(const char *name);
+	BMenuWindow(const char *name, BMenu *menu);
 	virtual ~BMenuWindow();
 	
+	void SetMenu(BMenu *menu);
 	void UpdateScrollers();
 
 private:
