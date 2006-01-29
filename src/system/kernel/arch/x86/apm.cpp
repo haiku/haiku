@@ -18,12 +18,24 @@
 #	define TRACE(x) ;
 #endif
 
+#define APM_ERROR_DISABLED				0x01
+#define APM_ERROR_DISCONNECTED			0x03
+#define APM_ERROR_UNKNOWN_DEVICE		0x09
+#define APM_ERROR_OUT_OF_RANGE			0x0a
+#define APM_ERROR_DISENGAGED			0x0b
+#define APM_ERROR_NOT_SUPPORTED			0x0c
+#define APM_ERROR_RESUME_TIMER_DISABLED	0x0d
+#define APM_ERROR_UNABLE_TO_ENTER_STATE	0x60
+#define APM_ERROR_NO_EVENTS_PENDING		0x80
+#define APM_ERROR_APM_NOT_PRESENT		0x86
+
 #define CARRY_FLAG	0x01
 
 extern segment_descriptor *gGDT;
 extern void *gDmaAddress;
 extern addr_t gBiosBase;
 
+static bool sAPMEnabled = false;
 static struct {
 	uint32	offset;
 	uint16	segment;
@@ -39,6 +51,39 @@ struct bios_regs {
 	uint32	esi;
 	uint32	flags;
 };
+
+
+#ifdef TRACE_APM
+static const char *
+apm_error(uint32 error)
+{
+	switch (error >> 8) {
+		case APM_ERROR_DISABLED:
+			return "Power Management disabled";
+		case APM_ERROR_DISCONNECTED:
+			return "Interface disconnected";
+		case APM_ERROR_UNKNOWN_DEVICE:
+			return "Unrecognized device ID";
+		case APM_ERROR_OUT_OF_RANGE:
+			return "Parameter value out of range";
+		case APM_ERROR_DISENGAGED:
+			return "Interface not engaged";
+		case APM_ERROR_NOT_SUPPORTED:
+			return "Function not supported";
+		case APM_ERROR_RESUME_TIMER_DISABLED:
+			return "Resume timer disabled";
+		case APM_ERROR_UNABLE_TO_ENTER_STATE:
+			return "Unable to enter requested state";
+		case APM_ERROR_NO_EVENTS_PENDING:
+			return "No power management events pending";
+		case APM_ERROR_APM_NOT_PRESENT:
+			return "APM not present";
+
+		default:
+			return "Unknown error";
+	}
+}
+#endif	// TRACE_APM
 
 
 static status_t
@@ -88,7 +133,12 @@ apm_set_state(uint16 device, uint16 state)
 	regs.ebx = device;
 	regs.ecx = state;
 
-	return call_apm_bios(&regs);
+	status_t status = call_apm_bios(&regs);
+	if (status == B_OK)
+		return B_OK;
+
+	TRACE(("apm_set_state() error: %s\n", apm_error(regs.eax)));
+	return status;
 }
 
 
@@ -98,17 +148,19 @@ apm_enable_power_management(uint16 device, bool enable)
 	bios_regs regs;
 	regs.eax = BIOS_APM_ENABLE;
 	regs.ebx = device;
+	regs.ecx = enable ? 0x01 : 0x00;
 
 	return call_apm_bios(&regs);
 }
 
 
 static status_t
-apm_engage_power_management(uint16 device, bool enable)
+apm_engage_power_management(uint16 device, bool engage)
 {
 	bios_regs regs;
 	regs.eax = BIOS_APM_ENGAGE;
 	regs.ebx = device;
+	regs.ecx = engage ? 0x01 : 0x00;
 
 	return call_apm_bios(&regs);
 }
@@ -140,6 +192,19 @@ apm_daemon(void *arg, int iteration)
 		return;
 
 	dprintf("APM event: %x, info: %x\n", event, info);
+}
+
+
+//	#pragma mark -
+
+
+status_t
+apm_shutdown(void)
+{
+	if (!sAPMEnabled)
+		return B_NOT_SUPPORTED;
+
+	return apm_set_state(APM_ALL_DEVICES, APM_POWER_STATE_OFF);
 }
 
 
@@ -189,9 +254,17 @@ apm_init(kernel_args *args)
 	gGDT[APM_CODE16_SEGMENT >> 3].d_b = 0;
 		// 16-bit segment
 
-	set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
-		gBiosBase + (info.data_segment_base << 4) - 0xe0000, info.data_segment_length,
-		DT_DATA_WRITEABLE, DPL_KERNEL);
+	if ((info.data_segment_base << 4) < 0xe0000) {
+		// use the BIOS data segment as data segment for APM
+		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
+			(addr_t)gDmaAddress + (info.data_segment_base << 4), info.data_segment_length,
+			DT_DATA_WRITEABLE, DPL_KERNEL);
+	} else {
+		// use the BIOS area as data segment
+		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
+			gBiosBase + (info.data_segment_base << 4) - 0xe0000, info.data_segment_length,
+			DT_DATA_WRITEABLE, DPL_KERNEL);
+	}
 
 	// setup APM entry point
 
@@ -208,9 +281,7 @@ apm_init(kernel_args *args)
 	register_kernel_daemon(apm_daemon, NULL, 10);
 		// run the daemon once every second
 
-	//apm_set_state(APM_ALL_DEVICES, APM_POWER_STATE_OFF);
-	panic("done");
-
+	sAPMEnabled = true;
 	return B_OK;
 }
 

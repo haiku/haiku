@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -450,18 +450,25 @@ error:
 
 
 status_t
-arch_cpu_shutdown(bool _reboot)
+arch_cpu_shutdown(bool rebootSystem)
 {
-	// ToDo: support real shutdown
-	if (!_reboot)
-		return B_NOT_SUPPORTED;
+	cpu_status state = disable_interrupts();
+
+	if (!rebootSystem) {
+		status_t status = apm_shutdown();
+
+		restore_interrupts(state);
+		return status;
+	}
 
 	// try to reset the system using the keyboard controller
 	out8(0xfe, 0x64);
 
 	// if that didn't help, try it this way
 	reboot();
-	return B_OK;
+
+	restore_interrupts(state);
+	return B_ERROR;
 }
 
 

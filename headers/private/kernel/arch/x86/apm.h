@@ -52,6 +52,7 @@ typedef struct apm_info {
 extern "C" {
 #endif
 
+status_t apm_shutdown(void);
 status_t apm_init(struct kernel_args *args);
 
 #ifdef __cplusplus
