@@ -1137,12 +1137,28 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 	BList looperList;
 	{
 		BObjectLocker<BLooperList> listLock(gLooperList);
-		if (listLock.IsLocked())
+		if (listLock.IsLocked()) {
 			gLooperList.GetLooperList(&looperList);
+
+			// Filter the list: We replace the BLooper pointers by BWindow
+			// pointers (dynamic_cast<>() on unlocked loopers is only safe as
+			// long as the looper list is locked!). Furthermore we filter out
+			// windows, that have not been run yet -- those belong to their
+			// creator yet (which also has a lock) and we must not try to
+			// delete them.
+			int32 count = looperList.CountItems();
+			for (int32 i = 0; i < count; i++) {
+				BWindow *window
+					= dynamic_cast<BWindow*>((BLooper*)looperList.ItemAt(i));
+				if (window && window->Thread() < 0)
+					window = NULL;
+				looperList.ReplaceItem(i, window);
+			}
+		}
 	}
 
 	for (int32 i = looperList.CountItems(); i-- > 0; ) {
-		BWindow *window = dynamic_cast<BWindow *>((BLooper *)looperList.ItemAt(i));
+		BWindow *window = (BWindow*)looperList.ItemAt(i);
 
 		// don't quit file panels if we haven't been asked for it
 		if (window == NULL || (!quitFilePanels && window->IsFilePanel()))
@@ -1156,11 +1172,11 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 				return false;
 			}
 
-			// ToDo: QuitRequested() can be overridden by others, IOW we
-			// cannot assume the window hasn't been unlocked in the mean
-			// time and is gone by now.
-			// We probably don't want to die in that case here, do we?
-			window->Quit();
+			// Re-lock, just to make sure that the user hasn't done nasty
+			// things in QuitRequested(). Quit() unlocks fully, thus
+			// double-locking is harmless.
+			if (window->Lock())
+				window->Quit();
 		}
 	}
 	return true;
