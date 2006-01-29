@@ -1,11 +1,11 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <MimeType.h>
 #include <Application.h>
+#include <Mime.h>
 
 #include <stdlib.h>
 #include <stdio.h>
