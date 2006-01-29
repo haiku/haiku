@@ -469,18 +469,32 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 
 static int
-make_all_threads_unreal(int argc, char **argv)
+make_thread_unreal(int argc, char **argv)
 {
 	struct thread *thread;
 	struct hash_iterator i;
+	int32 id = -1;
+
+	if (argc > 2) {
+		kprintf("usage: unreal [id]\n");
+		return 0;
+	}
+
+	if (argc > 1)
+		id = strtoul(argv[1], NULL, 0);
 
 	hash_open(sThreadHash, &i);
+
 	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if (id != -1 && thread->id != id)
+			continue;
+
 		if (thread->priority > B_DISPLAY_PRIORITY) {
 			thread->priority = B_NORMAL_PRIORITY;
 			kprintf("thread 0x%lx made unreal\n", thread->id);
 		}
 	}
+
 	hash_close(sThreadHash, &i, false);
 	return 0;
 }
@@ -610,11 +624,14 @@ dump_thread_list(int argc, char **argv)
 {
 	struct thread *thread;
 	struct hash_iterator i;
+	bool realTimeOnly = false;
 	int32 requiredState = 0;
 	team_id team = -1;
 	sem_id sem = -1;
 
-	if (!strcmp(argv[0], "ready"))
+	if (!strcmp(argv[0], "realtime"))
+		realTimeOnly = true;
+	else if (!strcmp(argv[0], "ready"))
 		requiredState = B_THREAD_READY;
 	else if (!strcmp(argv[0], "running"))
 		requiredState = B_THREAD_RUNNING;
@@ -632,14 +649,15 @@ dump_thread_list(int argc, char **argv)
 			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state       sem cpu  stack      team  name\n");
+	kprintf("thread         id  state       sem cpu pri  stack      team  name\n");
 
 	hash_open(sThreadHash, &i);
 	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
 		// filter out threads not matching the search criteria
 		if ((requiredState && thread->state != requiredState)
 			|| (sem > 0 && thread->sem.blocking != sem)
-			|| (team > 0 && thread->team->id != team))
+			|| (team > 0 && thread->team->id != team)
+			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
 
 		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread, thread->state));
@@ -656,8 +674,9 @@ dump_thread_list(int argc, char **argv)
 		else
 			kprintf(" -");
 
-		kprintf("  %p%5lx  %s\n", (void *)thread->kernel_stack_base,
-			thread->team->id, thread->name != NULL ? thread->name : "<NULL>");
+		kprintf("%4ld  %p%5lx  %s\n", thread->priority,
+			(void *)thread->kernel_stack_base, thread->team->id,
+			thread->name != NULL ? thread->name : "<NULL>");
 	}
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -1380,11 +1399,12 @@ thread_init(kernel_args *args)
 	add_debugger_command("ready", &dump_thread_list, "list all ready threads");
 	add_debugger_command("running", &dump_thread_list, "list all running threads");
 	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads (optionally for a specific semaphore)");
+	add_debugger_command("realtime", &dump_thread_list, "list all realtime threads");
 	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
-	add_debugger_command("unreal", &make_all_threads_unreal, "set all realtime priority threads to normal priority");
+	add_debugger_command("unreal", &make_thread_unreal, "set realtime priority threads to normal priority");
 
 	return B_OK;
 }
