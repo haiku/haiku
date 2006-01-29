@@ -83,6 +83,8 @@ StdBinCommands
 #	yes.cpp
 	: libbe.so ;
 
+AddResources mimeset : mimeset.rdef ;
+
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
 	copyattr.cpp
