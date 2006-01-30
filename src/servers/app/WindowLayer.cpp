@@ -1275,7 +1275,9 @@ WindowLayer::InWorkspace(int32 index) const
 bool
 WindowLayer::SupportsFront()
 {
-	if (fFeel == kDesktopWindowFeel)
+	if (fFeel == kDesktopWindowFeel
+		|| fFeel == kMenuWindowFeel
+		|| (fFlags & B_AVOID_FRONT) != 0)
 		return false;
 
 	return true;
