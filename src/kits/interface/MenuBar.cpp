@@ -1,29 +1,12 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Menubar.cpp
-//	Authors:		Marc Flerackers (mflerackers@androme.be)
-//					Stefano Ceccherini (burton666@libero.it)
-//	Description:	BMenuBar is a menu that's at the root of a menu hierarchy.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
 // TODO: Finish this class
 
 #include <Application.h>
@@ -36,8 +19,8 @@
 #include <MenuPrivate.h>
 #include <TokenSpace.h>
 
-struct menubar_data
-{
+
+struct menubar_data {
 	BMenuBar *menuBar;
 	int32 menuIndex;
 	
@@ -50,28 +33,28 @@ struct menubar_data
 
 
 BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
-				   menu_layout layout, bool resizeToFit)
-	:	BMenu(frame, title, resizeMask,
+			menu_layout layout, bool resizeToFit)
+	: BMenu(frame, title, resizeMask,
 			B_WILL_DRAW | B_FRAME_EVENTS, layout, resizeToFit),
-		fBorder(B_BORDER_FRAME),
-		fTrackingPID(-1),
-		fPrevFocusToken(-1),
-		fMenuSem(-1),
-		fLastBounds(NULL),
-		fTracking(false)
+	fBorder(B_BORDER_FRAME),
+	fTrackingPID(-1),
+	fPrevFocusToken(-1),
+	fMenuSem(-1),
+	fLastBounds(NULL),
+	fTracking(false)
 {
 	InitData(layout);
 }
 
 
 BMenuBar::BMenuBar(BMessage *data)
-	:	BMenu(data),
-		fBorder(B_BORDER_FRAME),
-		fTrackingPID(-1),
-		fPrevFocusToken(-1),
-		fMenuSem(-1),
-		fLastBounds(NULL),
-		fTracking(false)
+	: BMenu(data),
+	fBorder(B_BORDER_FRAME),
+	fTrackingPID(-1),
+	fPrevFocusToken(-1),
+	fMenuSem(-1),
+	fLastBounds(NULL),
+	fTracking(false)
 {
 	int32 border;
 	
@@ -412,7 +395,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 		}
 
-		if (fSelected != NULL) {
+		if (fSelected != NULL && OverSubmenu(fSelected, ConvertToScreen(where))) {
+			// call _track() from the selected sub-menu when the mouse cursor
+			// is over its window
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
 				window->Unlock();
@@ -423,7 +408,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				if (!window->Lock())//WithTimeout(200000) < B_OK)
 					break;
 			}
-		}
+		} else if (menuItem == NULL)
+			SelectItem(NULL);
 
 		window->Unlock();
 

@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (burton666@libero.it)
  */
+
 
 #include <string.h>
 
@@ -1110,22 +1111,23 @@ BMenu::_track(int *action, long start)
 	ulong buttons;
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
-	
+
 	bigtime_t startTime = system_time();
 	bigtime_t clickTime = 0;
 	get_click_speed(&clickTime);
-	
+
 	// TODO: Test and reduce the timeout if needed.
 	clickTime /= 2;
-	
+
 	do {
 		if (!LockLooper())
 			break;
-	
+
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		GetMouse(&location, &buttons, true);
-					
+		BPoint screenLocation = ConvertToScreen(location);
+
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
 			if (item != fSelected) {
@@ -1140,18 +1142,18 @@ BMenu::_track(int *action, long start)
 				SelectItem(item);
 			}
 		} else {
-			if (OverSuper(location)) {
+			if (OverSuper(screenLocation)) {
 				UnlockLooper();
 				break;
 			}
-			if (fSelected != NULL && !OverSubmenu(fSelected, ConvertToScreen(location)))
+			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation))
 				SelectItem(NULL);
 		}
-		
-		if (fSelected != NULL && fSelected->Submenu() != NULL
+
+		if (item != NULL && fSelected != NULL && OverSubmenu(fSelected, screenLocation)
 			&& fSelected->Submenu()->Window() != NULL) {
 			UnlockLooper();
-			
+
 			int submenuAction = MENU_ACT_NONE;
 			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction);
 			if (submenuAction == MENU_ACT_CLOSE) {
@@ -1159,31 +1161,31 @@ BMenu::_track(int *action, long start)
 				localAction = submenuAction;
 				break;
 			}
-			
+
 			if (!LockLooper())
 				break;
 		}
-																
+
 		UnlockLooper();
 		
 		snooze(snoozeAmount);
 	} while (buttons != 0);
-	
+
 	if (localAction == MENU_ACT_NONE) {
 		if (buttons != 0)
 			localAction = MENU_ACT_NONE;
 		else 
 			localAction = MENU_ACT_CLOSE;
 	}
-	
+
 	if (action != NULL)
 		*action = localAction;
-	
+
 	if (LockLooper()) {
 		SelectItem(NULL);
 		UnlockLooper();
 	}
-	
+
 	// delete the menu window recycled for all the child menus
 	DeleteMenuWindow();
 	
@@ -1543,9 +1545,7 @@ BMenu::OverSuper(BPoint location)
 {
 	if (!Supermenu())
 		return false;
-	
-	ConvertToScreen(&location);
-	
+
 	return fSuperbounds.Contains(location);
 }
 
@@ -1557,7 +1557,7 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 	BMenu *subMenu = item->Submenu();
 	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
-	
+
 	if (subMenu->Window()->Frame().Contains(loc))
 		return true;
 
