@@ -259,7 +259,10 @@ apm_init(kernel_args *args)
 	// TODO: test if APM segments really are in the BIOS ROM area (especially the
 	//	data segment)
 
-	// setup APM GDTs
+	// Setup APM GDTs
+
+	// We ignore their length, and just set their segments to 64 kB which
+	// shouldn't cause any headaches
 
 	set_segment_descriptor(&gGDT[APM_CODE32_SEGMENT >> 3],
 		gBiosBase + (info.code32_segment_base << 4) - 0xe0000, 0xffff,
@@ -272,13 +275,17 @@ apm_init(kernel_args *args)
 
 	if ((info.data_segment_base << 4) < 0xe0000) {
 		// use the BIOS data segment as data segment for APM
+
+		if (info.data_segment_length == 0)
+			info.data_segment_length = B_PAGE_SIZE - info.data_segment_base;
+
 		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
 			(addr_t)gDmaAddress + (info.data_segment_base << 4), info.data_segment_length,
 			DT_DATA_WRITEABLE, DPL_KERNEL);
 	} else {
 		// use the BIOS area as data segment
 		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
-			gBiosBase + (info.data_segment_base << 4) - 0xe0000, info.data_segment_length,
+			gBiosBase + (info.data_segment_base << 4) - 0xe0000, 0xffff,
 			DT_DATA_WRITEABLE, DPL_KERNEL);
 	}
 
