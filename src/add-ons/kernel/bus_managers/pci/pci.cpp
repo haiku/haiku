@@ -119,7 +119,7 @@ PCI::InitBus()
 		ppnext = &bus->next;
 	}
 	
-	bool bus_enumeration = false;
+	bool bus_enumeration = true;
 
 	if (bus_enumeration) {
 		for (int i = 0; i < fDomainCount; i++) {
@@ -239,7 +239,7 @@ PCI::GetNthPciInfo(PCIBus *bus, long *curindex, long wantindex, pci_info *outInf
 void
 PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 {
-	TRACE(("PCI: EnumerateBus, domain %u, bus %u\n", domain, bus));
+	TRACE(("PCI: EnumerateBus: domain %u, bus %u\n", domain, bus));
 	
 	int max_bus_devices = GetDomainData(domain)->max_bus_devices;
 
@@ -261,8 +261,8 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			if (base_class != PCI_bridge || sub_class != PCI_pci)
 				continue;
 			
-			TRACE(("PCI:   found PCI-PCI bridge, domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, func));
-			TRACE(("PCI:   pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: found PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, func));
+			TRACE(("PCI: original settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
 				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
 				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
 				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
@@ -278,15 +278,17 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			WritePciConfig(domain, bus, dev, func, PCI_primary_bus, 1, 0);
 			WritePciConfig(domain, bus, dev, func, PCI_secondary_bus, 1, 0);
 			WritePciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1, 0);
+
+			TRACE(("PCI: disabled settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
+				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1)));
 		}
 	}
 	
 	uint8 last_used_bus_number = bus;
 	
-	// testing:
-	if (last_used_bus_number == 0)
-		last_used_bus_number = 3;
-
 	// step 2: assign busses to all bridges, and enable them again
 	for (int dev = 0; dev < max_bus_devices; dev++) {
 		uint16 vendor_id = ReadPciConfig(domain, bus, dev, 0, PCI_vendor_id, 2);
@@ -305,7 +307,8 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			if (base_class != PCI_bridge || sub_class != PCI_pci)
 				continue;
 			
-			TRACE(("PCI:   configuring PCI-PCI bridge, domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, func));
+			TRACE(("PCI: configuring PCI-PCI bridge: domain %u, bus %u, dev %u, func %u\n", 
+				domain, bus, dev, func));
 			
 			// open Scheunentor for enumerating the bus behind the bridge
 			WritePciConfig(domain, bus, dev, func, PCI_primary_bus, 1, bus);
@@ -317,14 +320,20 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			pcicmd = ReadPciConfig(domain, bus, dev, func, PCI_command, 2);
 			pcicmd |= PCI_command_io | PCI_command_memory | PCI_command_master;
 			WritePciConfig(domain, bus, dev, func, PCI_command, 2, pcicmd);
+
+			TRACE(("PCI: probing settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
+				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1)));
 			
-			// enumarate bus
+			// enumerate bus
 			EnumerateBus(domain, last_used_bus_number + 1, &last_used_bus_number);
 
 			// close Scheunentor
 			WritePciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1, last_used_bus_number);
 			
-			TRACE(("PCI:   pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+			TRACE(("PCI: configured settings: pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
 				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
 				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
 				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
@@ -334,7 +343,7 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 	if (subordinate_bus)
 		*subordinate_bus = last_used_bus_number;
 
-	TRACE(("PCI: EnumerateBus done, domain %u, bus %u, last_used_bus_number %u\n", domain, bus, last_used_bus_number));
+	TRACE(("PCI: EnumerateBus done: domain %u, bus %u, last used bus number %u\n", domain, bus, last_used_bus_number));
 }
 
 
