@@ -108,7 +108,6 @@ void
 PCI::InitBus()
 {
 	PCIBus **ppnext = &fRootBus;
-	
 	for (int i = 0; i < fDomainCount; i++) {
 		PCIBus *bus = new PCIBus;
 		bus->next = NULL;
@@ -118,6 +117,14 @@ PCI::InitBus()
 		bus->bus = 0;
 		*ppnext = bus;
 		ppnext = &bus->next;
+	}
+	
+	bool bus_enumeration = false;
+
+	if (bus_enumeration) {
+		for (int i = 0; i < fDomainCount; i++) {
+			EnumerateBus(i, 0);
+		}
 	}
 	
 	if (fRootBus) {
@@ -228,6 +235,108 @@ PCI::GetNthPciInfo(PCIBus *bus, long *curindex, long wantindex, pci_info *outInf
 		
 	return B_ERROR;
 }
+
+void
+PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
+{
+	TRACE(("PCI: EnumerateBus, domain %u, bus %u\n", domain, bus));
+	
+	int max_bus_devices = GetDomainData(domain)->max_bus_devices;
+
+	// step 1: disable all bridges on this bus
+	for (int dev = 0; dev < max_bus_devices; dev++) {
+		uint16 vendor_id = ReadPciConfig(domain, bus, dev, 0, PCI_vendor_id, 2);
+		if (vendor_id == 0xffff)
+			continue;
+		
+		uint8 type = ReadPciConfig(domain, bus, dev, 0, PCI_header_type, 1);
+		int nfunc = (type & PCI_multifunction) ? 8 : 1;
+		for (int func = 0; func < nfunc; func++) {
+			uint16 device_id = ReadPciConfig(domain, bus, dev, func, PCI_device_id, 2);
+			if (device_id == 0xffff)
+				continue;
+
+			uint8 base_class = ReadPciConfig(domain, bus, dev, func, PCI_class_base, 1);
+			uint8 sub_class	 = ReadPciConfig(domain, bus, dev, func, PCI_class_sub, 1);
+			if (base_class != PCI_bridge || sub_class != PCI_pci)
+				continue;
+			
+			TRACE(("PCI:   found PCI-PCI bridge, domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, func));
+			TRACE(("PCI:   pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
+				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1)));
+			
+			// disable decoding
+			uint16 pcicmd;
+			pcicmd = ReadPciConfig(domain, bus, dev, func, PCI_command, 2);
+			pcicmd &= ~(PCI_command_io | PCI_command_memory | PCI_command_master);
+			WritePciConfig(domain, bus, dev, func, PCI_command, 2, pcicmd);
+
+			// disable busses
+			WritePciConfig(domain, bus, dev, func, PCI_primary_bus, 1, 0);
+			WritePciConfig(domain, bus, dev, func, PCI_secondary_bus, 1, 0);
+			WritePciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1, 0);
+		}
+	}
+	
+	uint8 last_used_bus_number = bus;
+	
+	// testing:
+	if (last_used_bus_number == 0)
+		last_used_bus_number = 3;
+
+	// step 2: assign busses to all bridges, and enable them again
+	for (int dev = 0; dev < max_bus_devices; dev++) {
+		uint16 vendor_id = ReadPciConfig(domain, bus, dev, 0, PCI_vendor_id, 2);
+		if (vendor_id == 0xffff)
+			continue;
+		
+		uint8 type = ReadPciConfig(domain, bus, dev, 0, PCI_header_type, 1);
+		int nfunc = (type & PCI_multifunction) ? 8 : 1;
+		for (int func = 0; func < nfunc; func++) {
+			uint16 device_id = ReadPciConfig(domain, bus, dev, func, PCI_device_id, 2);
+			if (device_id == 0xffff)
+				continue;
+
+			uint8 base_class = ReadPciConfig(domain, bus, dev, func, PCI_class_base, 1);
+			uint8 sub_class	 = ReadPciConfig(domain, bus, dev, func, PCI_class_sub, 1);
+			if (base_class != PCI_bridge || sub_class != PCI_pci)
+				continue;
+			
+			TRACE(("PCI:   configuring PCI-PCI bridge, domain %u, bus %u, dev %u, func %u\n", domain, bus, dev, func));
+			
+			// open Scheunentor for enumerating the bus behind the bridge
+			WritePciConfig(domain, bus, dev, func, PCI_primary_bus, 1, bus);
+			WritePciConfig(domain, bus, dev, func, PCI_secondary_bus, 1, last_used_bus_number + 1);
+			WritePciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1, 255);
+			
+			// enable decoding (too early here?)
+			uint16 pcicmd;
+			pcicmd = ReadPciConfig(domain, bus, dev, func, PCI_command, 2);
+			pcicmd |= PCI_command_io | PCI_command_memory | PCI_command_master;
+			WritePciConfig(domain, bus, dev, func, PCI_command, 2, pcicmd);
+			
+			// enumarate bus
+			EnumerateBus(domain, last_used_bus_number + 1, &last_used_bus_number);
+
+			// close Scheunentor
+			WritePciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1, last_used_bus_number);
+			
+			TRACE(("PCI:   pcicmd %04lx, primary-bus %lu, secondary-bus %lu, subordinate-bus %lu\n",
+				ReadPciConfig(domain, bus, dev, func, PCI_command, 2),
+				ReadPciConfig(domain, bus, dev, func, PCI_primary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1),
+				ReadPciConfig(domain, bus, dev, func, PCI_subordinate_bus, 1)));
+			}
+	}
+	if (subordinate_bus)
+		*subordinate_bus = last_used_bus_number;
+
+	TRACE(("PCI: EnumerateBus done, domain %u, bus %u, last_used_bus_number %u\n", domain, bus, last_used_bus_number));
+}
+
 
 
 void

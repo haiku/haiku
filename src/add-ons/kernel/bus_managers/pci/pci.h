@@ -77,7 +77,9 @@ class PCI {
 
 		status_t			GetVirtBus(uint8 virt_bus, int *domain, uint8 *bus);
 		
-	private:	
+	private:
+
+		void EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus = NULL);
 
 		void DiscoverBus(PCIBus *bus);
 		void DiscoverDevice(PCIBus *bus, uint8 dev, uint8 func);
