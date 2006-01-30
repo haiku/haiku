@@ -53,6 +53,7 @@ SYSHDRS = $(HAIKU_HDRS) ;
 			close=build_platform_close
 			fstat=build_platform_fstat
 			read_pos=build_platform_read_pos
+			ioctl=build_platform_ioctl
 		;
 	}
 
