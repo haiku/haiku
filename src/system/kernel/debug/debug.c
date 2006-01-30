@@ -431,6 +431,12 @@ syslog_sender(void *data)
 				restore_interrupts(state);
 			}
 
+			if (length == 0) {
+				// the buffer we came here for might have been sent already
+				bufferPending = false;
+				continue;
+			}
+
 			error = write_port_etc(port, SYSLOG_MESSAGE, sSyslogMessage,
 				sizeof(struct syslog_message) + length, B_RELATIVE_TIMEOUT, 0);
 

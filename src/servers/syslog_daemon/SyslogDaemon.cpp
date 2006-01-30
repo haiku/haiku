@@ -138,6 +138,11 @@ SyslogDaemon::Daemon()
 		// add terminating null byte
 		message.message[bytesRead - sizeof(syslog_message)] = '\0';
 
+		if (!message.message[0]) {
+			// ignore empty messages
+			continue;
+		}
+
 		fHandlerLock.Lock();
 
 		for (int32 i = fHandlers.CountItems(); i-- > 0;) {

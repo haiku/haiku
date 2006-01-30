@@ -164,6 +164,8 @@ syslog_output(syslog_message &message)
 		} else {
 			length = strlcpy(buffer + headerLength, message.message + pos,
 				sizeof(buffer) - headerLength);
+			if (length == 0)
+				break;
 		}
 
 		length += headerLength;
