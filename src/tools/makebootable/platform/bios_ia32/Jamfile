@@ -1,10 +1,27 @@
 SubDir HAIKU_TOP src tools makebootable platform bios_ia32 ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin makebootable platform bios_ia32 ] ;
+UsePrivateHeaders storage ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src bin makebootable platform bios_ia32 ] ;
 
 USES_BE_API on <build>makebootable = true ;
+
+local hostPlatformSources ;
+if $(HOST_PLATFORM) = linux {
+	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp ;
+
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
+		partitioning_systems intel ] ;
+
+	DEFINES += _USER_MODE ;
+}
 
 # write the stage 1 boot loader into the makebootable resources
 AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
 
-BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBBE) ;
+BuildPlatformMain <build>makebootable :
+	makebootable.cpp
+	$(hostPlatformSources)
+	: $(HOST_LIBBE)
+;
