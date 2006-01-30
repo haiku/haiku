@@ -11,6 +11,7 @@ extern "C" {
 
 char *get_external_command(const char *prompt, char *input, int len);
 void reply_to_external_command(int result);
+void external_command_cleanup();
 
 #ifdef __cplusplus
 }

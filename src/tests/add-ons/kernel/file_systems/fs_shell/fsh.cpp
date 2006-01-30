@@ -2165,6 +2165,9 @@ do_fsh(void)
         free(argv);
     }
 
+	if (!sInteractiveMode)
+		external_command_cleanup();
+
     if (feof(stdin))
         printf("\n");
 

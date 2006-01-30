@@ -166,3 +166,10 @@ reply_to_external_command(int result)
 	if (bytesWritten < 0)
 		close_client_connection();
 }
+
+
+void
+external_command_cleanup()
+{
+	unlink(kFSShellCommandSocketAddress);
+}

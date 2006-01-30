@@ -95,3 +95,10 @@ reply_to_external_command(int result)
 		}
 	}
 }
+
+
+void
+external_command_cleanup()
+{
+	// The port will be deleted automatically when the team exits.
+}
