@@ -86,7 +86,8 @@ CopyEngine::LaunchInitScript(BPath &path)
 {
 	BPath bootPath;
 	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command(bootPath.Path());
+	BString command("/bin/sh ");
+	command += bootPath.Path();
 	command += "/InstallerInitScript ";
 	command += path.Path();
 	SetStatusMessage("Starting Installation.");	
@@ -99,7 +100,8 @@ CopyEngine::LaunchFinishScript(BPath &path)
 {
 	BPath bootPath;
 	find_directory(B_BEOS_BOOT_DIRECTORY, &bootPath);
-	BString command(bootPath.Path());
+	BString command("/bin/sh ");
+	command += bootPath.Path();
 	command += "/InstallerFinishScript ";
 	command += path.Path();
 	SetStatusMessage("Finishing Installation.");	
