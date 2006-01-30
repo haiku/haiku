@@ -39,6 +39,15 @@
 #define DEVNAME 32
 #define NUM_CARDS 3
 
+typedef struct {
+	uint8	channels;
+	uint8	bitsPerSample;
+	uint32	sample_rate;
+	uint32	buffer_frames;
+	int32	buffer_count;
+} echo_settings;
+
+extern echo_settings current_settings;
 
 /*
  * Echo midi

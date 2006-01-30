@@ -1,0 +1,11 @@
+# Settings file for the echo driver 
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+#channels 	2
+#bitsPerSample 	16
+#sample_rate	48000
+#buffer_frames	512
+#buffer_count	2

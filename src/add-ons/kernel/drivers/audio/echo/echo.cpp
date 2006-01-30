@@ -24,6 +24,7 @@
 
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <driver_settings.h>
 #include <malloc.h>
 #include <unistd.h>
 #include "OsSupportBeOS.h"
@@ -74,6 +75,14 @@ echo_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
 #endif // CARDBUS
+
+echo_settings current_settings = {
+	2,	// channels
+	16,	// bits per sample
+	48000,	// sample rate
+	512,	// buffer frames
+	2	// buffer count
+};
 
 extern device_hooks multi_hooks;
 #ifdef MIDI_SUPPORT
@@ -513,6 +522,40 @@ init_hardware(void)
 status_t
 init_driver(void)
 {
+	PRINT(("init_driver()\n"));
+	load_driver_symbols(DRIVER_NAME);
+
+	void *settings_handle;
+	// get driver settings
+	settings_handle  = load_driver_settings ("echo.settings");
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "channels", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.channels = value;
+
+		item = get_driver_parameter (settings_handle, "bitsPerSample", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.bitsPerSample = value;
+
+		item = get_driver_parameter (settings_handle, "sample_rate", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.sample_rate = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_frames", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_frames = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_count", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_count = value;
+
+		unload_driver_settings (settings_handle);
+	}
+
 #ifdef CARDBUS
 	// Get card services client module
 	if (get_module(CB_ENABLER_MODULE_NAME, (module_info **)&cbemi) != B_OK) {
@@ -541,9 +584,6 @@ cb_error:
 	pci_info info;
 	num_cards = 0;
 	
-	PRINT(("init_driver()\n"));
-	load_driver_symbols(DRIVER_NAME);
-
 	if (get_module(pci_name, (module_info **) &pci))
 		return ENOSYS;
 		

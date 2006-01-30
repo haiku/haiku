@@ -506,16 +506,21 @@ echo_get_description(echo_dev *card, multi_description *data)
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
 	}
 
-	data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	//data->output_rates = B_SR_44100;
-	//data->input_rates = B_SR_44100;
+	switch (current_settings.sample_rate) {
+		case 192000: data->output_rates = data->input_rates = B_SR_192000; break;
+		case 96000: data->output_rates = data->input_rates = B_SR_96000; break;
+		case 48000: data->output_rates = data->input_rates = B_SR_48000; break;
+		case 44100: data->output_rates = data->input_rates = B_SR_44100; break;
+	}
 	data->min_cvsr_rate = 0;
 	data->max_cvsr_rate = 48000;
-	//data->max_cvsr_rate = 44100;
 
-	data->output_formats = B_FMT_16BIT;
-	data->input_formats = B_FMT_16BIT;
+	switch (current_settings.bitsPerSample) {
+		case 8: data->output_formats = data->input_formats = B_FMT_8BIT_U; break;
+		case 16: data->output_formats = data->input_formats = B_FMT_16BIT; break;
+		case 24: data->output_formats = data->input_formats = B_FMT_24BIT; break;
+		case 32: data->output_formats = data->input_formats = B_FMT_32BIT; break;
+	}
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
@@ -559,18 +564,19 @@ echo_get_global_format(echo_dev *card, multi_format_info *data)
 	data->output_latency = 0;
 	data->input_latency = 0;
 	data->timecode_kind = 0;
-	data->input.rate = B_SR_48000;
-	data->input.cvsr = 48000;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_48000;
-	data->output.cvsr = 48000;
-	data->output.format = B_FMT_16BIT;
-	/*data->input.rate = B_SR_44100;
-	data->input.cvsr = 44100;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_44100;
-	data->output.cvsr = 44100;
-	data->output.format = B_FMT_16BIT;*/
+	switch (current_settings.sample_rate) {
+		case 192000: data->output.rate = data->input.rate = B_SR_192000; break;
+		case 96000: data->output.rate = data->input.rate = B_SR_96000; break;
+		case 48000: data->output.rate = data->input.rate = B_SR_48000; break;
+		case 44100: data->output.rate = data->input.rate = B_SR_44100; break;
+	}
+	switch (current_settings.bitsPerSample) {
+		case 8: data->input.format = data->output.format = B_FMT_8BIT_U; break;
+		case 16: data->input.format = data->output.format = B_FMT_16BIT; break;
+		case 24: data->input.format = data->output.format = B_FMT_24BIT; break;
+		case 32: data->input.format = data->output.format = B_FMT_32BIT; break;
+	}
+	data->input.cvsr = data->output.cvsr = current_settings.sample_rate;
 	return B_OK;
 }
 
@@ -588,19 +594,19 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 	LOG(("request_record_channels = %#x\n",data->request_record_channels));
 	LOG(("request_record_buffer_size = %#x\n",data->request_record_buffer_size));
 	
-	if (data->request_playback_buffers < BUFFER_COUNT ||
-		data->request_record_buffers < BUFFER_COUNT) {
+	if (data->request_playback_buffers < current_settings.buffer_count ||
+		data->request_record_buffers < current_settings.buffer_count) {
 		LOG(("not enough channels/buffers\n"));
 	}
 
-	ASSERT(BUFFER_COUNT == 2);
+	ASSERT(current_settings.buffer_count == 2);
 	
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; // XXX ???
 //	data->flags = 0;
 		
-	data->return_playback_buffers = BUFFER_COUNT;	/* playback_buffers[b][] */
+	data->return_playback_buffers = current_settings.buffer_count;	/* playback_buffers[b][] */
 	data->return_playback_channels = 0;	/* playback_buffers[][c] */
-	data->return_playback_buffer_size = BUFFER_FRAMES;		/* frames */
+	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
 	LIST_FOREACH(stream, &card->streams, next) {
 		if ((stream->use & ECHO_USE_PLAY) == 0)
@@ -611,16 +617,16 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_playback_channels < data->return_playback_channels) {
 			LOG(("not enough channels\n"));
 		}	
-		for(i=0; i<BUFFER_COUNT; i++)
+		for(i=0; i<current_settings.buffer_count; i++)
 			for(j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->playback_buffers[i][channels+j].base,
 					&data->playback_buffers[i][channels+j].stride);
 	}
 	
-	data->return_record_buffers = BUFFER_COUNT;
+	data->return_record_buffers = current_settings.buffer_count;
 	data->return_record_channels = 0;
-	data->return_record_buffer_size = BUFFER_FRAMES;	/* frames */
+	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 
 	LIST_FOREACH(stream, &card->streams, next) {
 		if ((stream->use & ECHO_USE_PLAY) != 0)
@@ -631,7 +637,7 @@ echo_get_buffers(echo_dev *card, multi_buffer_list *data)
 		if (data->request_record_channels < data->return_record_channels) {
 			LOG(("not enough channels\n"));
 		}
-		for(i=0; i<BUFFER_COUNT; i++)
+		for(i=0; i<current_settings.buffer_count; i++)
 			for(j=0; j<stream->channels; j++)
 				echo_stream_get_nth_buffer(stream, j, i, 
 					&data->record_buffers[i][channels+j].base,
@@ -652,7 +658,7 @@ echo_play_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = (stream->trigblk 
 		+ stream->blkmod) % stream->blkmod;
 	stream->update_needed = true;
@@ -673,7 +679,7 @@ echo_record_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = (stream->trigblk 
 		+ stream->blkmod - 1) % stream->blkmod;
 	stream->update_needed = true;
@@ -914,10 +920,11 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	LOG(("creating play streams\n"));
 	
 	for (i=card->caps.wNumPipesOut - 2; i >=0 ; i-=2) {
-		stream = echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
+		stream = echo_stream_new(card, ECHO_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
 		if (!card->pstream)
 			card->pstream = stream;
-		echo_stream_set_audioparms(stream, 2, 16, 48000, i);
+		echo_stream_set_audioparms(stream, current_settings.channels, 
+			current_settings.bitsPerSample, current_settings.sample_rate, i);
 		stream->first_channel = i;
 	}
 	
@@ -926,10 +933,11 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	LOG(("creating record streams\n"));
 	
 	for (i=card->caps.wNumPipesIn - 2; i >= 0; i-=2) {
-		stream = echo_stream_new(card, ECHO_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
+		stream = echo_stream_new(card, ECHO_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
 		if (!card->rstream)
 			card->rstream = stream;
-		echo_stream_set_audioparms(stream, 2, 16, 48000, i);
+		echo_stream_set_audioparms(stream, current_settings.channels, 
+			current_settings.bitsPerSample, current_settings.sample_rate, i);
 		stream->first_channel = i + first_record_channel;
 	}
 	

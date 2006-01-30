@@ -34,9 +34,6 @@
 #include "OsSupportBeOS.h"
 #include "MixerXface.h"
 
-#define BUFFER_FRAMES	512
-#define BUFFER_COUNT	2
-
 typedef struct _multi_mixer_control {
 	struct _multi_dev 	*multi;
 	void	(*get) (void *card, MIXER_AUDIO_CHANNEL, int32 type, float *values);
