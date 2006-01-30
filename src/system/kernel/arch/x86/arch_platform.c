@@ -29,6 +29,7 @@ arch_platform_init_post_vm(struct kernel_args *args)
 status_t
 arch_platform_init_post_thread(struct kernel_args *args)
 {
-	return apm_init(args);
+	apm_init(args);
+	return B_OK;
 }
 

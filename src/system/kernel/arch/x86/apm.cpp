@@ -8,6 +8,7 @@
 
 #include <apm.h>
 #include <descriptors.h>
+#include <safemode.h>
 #include <boot/kernel_args.h>
 
 
@@ -217,7 +218,7 @@ apm_init(kernel_args *args)
 
 	if ((info.version & 0xf) < 2) {
 		// no APM or connect failed
-		return B_OK;
+		return B_ERROR;
 	}
 
 	TRACE(("  code32: 0x%x, 0x%lx, length 0x%x\n",
@@ -227,8 +228,23 @@ apm_init(kernel_args *args)
 	TRACE(("  data: 0x%x, length 0x%x\n",
 		info.data_segment_base, info.data_segment_length));
 
-	// TODO: remove me when tested on more hardware
-	if (1)
+	// get APM setting - safemode settings override kernel settings
+
+	bool apm = false;
+
+	void *handle = load_driver_settings("kernel");
+	if (handle != NULL) {
+		apm = get_driver_boolean_parameter(handle, "apm", false, false);
+		unload_driver_settings(handle);
+	}
+
+	handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle != NULL) {
+		apm = !get_driver_boolean_parameter(handle, "disable_apm", !apm, !apm);
+		unload_driver_settings(handle);
+	}
+
+	if (!apm)
 		return B_OK;
 
 	// Apparently, some broken BIOS try to access segment 0x40 for the BIOS

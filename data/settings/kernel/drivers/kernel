@@ -28,3 +28,7 @@
 #load_symbols false
 	# load kernel and kernel add-on symbols
 
+#apm false
+	# APM (advanced power management) support
+	# (system shutdown, battery info, ...)
+
