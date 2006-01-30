@@ -12,7 +12,12 @@
 #define _INTEL_PARTITION_MAP_H
 
 #include <SupportDefs.h>
-#include <util/kernel_cpp.h>
+
+#ifndef _USER_MODE
+#	include <util/kernel_cpp.h>
+#else
+#	include <new>
+#endif
 
 // These match those in DiskDeviceTypes.cpp and *must* be kept in sync.
 #define INTEL_PARTITION_NAME "Intel Partition Map"

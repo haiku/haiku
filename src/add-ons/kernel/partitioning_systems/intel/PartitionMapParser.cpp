@@ -1,6 +1,8 @@
 // PartitionMapParser.cpp
 
-#include <KernelExport.h>
+#ifndef _USER_MODE
+#	include <KernelExport.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -14,6 +16,9 @@
 
 #define TRACE(x) ;
 //#define TRACE(x) dprintf x
+
+
+using std::nothrow;
 
 // Maximal number of logical partitions per extended partition we allow.
 static const int32 kMaxLogicalPartitionCount = 128;

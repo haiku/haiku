@@ -12,19 +12,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <util/kernel_cpp.h>
+#ifndef _USER_MODE
+#	include <util/kernel_cpp.h>
+#else
+#	include <new>
+#endif
 #ifndef _BOOT_MODE
 #	include <DiskDeviceTypes.h>
 #else
 #	include <boot/partitions.h>
 #endif
-#include <KernelExport.h>
+#ifndef _USER_MODE
+#	include <KernelExport.h>
+#endif
 
 #include "PartitionMap.h"
 
 #define TRACE(x) ;
 //#define TRACE(x) dprintf x
 
+
+using std::nothrow;
 
 // partition_type
 struct partition_type {
