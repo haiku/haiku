@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005 Haiku, Inc.
+ * Copyright 2004-2006 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 hid device driver
@@ -8,6 +8,7 @@
  *		Elad Lahav (elad@eldarshany.com)
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
+ *      Marcus Overhagen <marcus@overhagen.de>
  */
 #ifndef __PS2_COMMON_H
 #define __PS2_COMMON_H
@@ -32,15 +33,15 @@
 // global variables
 extern isa_module_info *gIsa;
 
-extern device_hooks sKeyboardDeviceHooks;
-extern device_hooks sMouseDeviceHooks;
+extern device_hooks gKeyboardDeviceHooks;
+extern device_hooks gMouseDeviceHooks;
 
 extern bool gMultiplexingActive;
 
 // prototypes from common.c
 
-status_t ps2_init_driver(void);
-void ps2_uninit_driver(void);
+status_t		ps2_init(void);
+void			ps2_uninit(void);
 
 extern status_t ps2_wait_read();
 extern status_t ps2_wait_write();
@@ -65,20 +66,5 @@ extern status_t probe_keyboard(void);
 
 extern int32 mouse_handle_int(ps2_dev *dev, uint8 data);
 extern int32 keyboard_handle_int(uint8 data);
-
-
-extern status_t keyboard_open(const char *name, uint32 flags, void **cookie);
-extern status_t keyboard_close(void *cookie);
-extern status_t keyboard_freecookie(void *cookie);
-extern status_t keyboard_read(void *cookie, off_t pos, void *buf, size_t *len);
-extern status_t keyboard_write(void * cookie, off_t pos, const void *buf, size_t *len);
-extern status_t keyboard_ioctl(void *cookie, uint32 op, void *buf, size_t len);
-
-extern status_t mouse_open(const char *name, uint32 flags, void **cookie);
-extern status_t mouse_close(void *cookie);
-extern status_t mouse_freecookie(void *cookie);
-extern status_t mouse_read(void *cookie, off_t pos, void *buf, size_t *len);
-extern status_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *len);
-extern status_t mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len);
 
 #endif /* __PS2_COMMON_H */

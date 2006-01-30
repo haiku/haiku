@@ -29,10 +29,10 @@ std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			return ps2_init_driver();
+			return ps2_init();
 
 		case B_MODULE_UNINIT: 
-			ps2_uninit_driver();
+			ps2_uninit();
 			break; 
 		default: 
 			return B_ERROR;

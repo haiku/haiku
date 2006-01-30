@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005 Haiku, Inc.
+ * Copyright 2004-2006 Haiku, Inc.
  * Distributed under the terms of the Haiku License.
  *
  * common.c:
@@ -7,6 +7,7 @@
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
+ *      Marcus Overhagen <marcus@overhagen.de>
  */
 
 
@@ -15,33 +16,6 @@
 #include "ps2_common.h"
 #include "ps2_service.h"
 #include "ps2_dev.h"
-
-device_hooks sKeyboardDeviceHooks = {
-	keyboard_open,
-	keyboard_close,
-	keyboard_freecookie,
-	keyboard_ioctl,
-	keyboard_read,
-	keyboard_write,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
-device_hooks sMouseDeviceHooks = {
-	mouse_open,
-	mouse_close,
-	mouse_freecookie,
-	mouse_ioctl,
-	mouse_read,
-	mouse_write,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
-
 
 isa_module_info *gIsa = NULL;
 
@@ -232,11 +206,11 @@ ps2_interrupt(void* cookie)
 
 
 status_t
-ps2_init_driver(void)
+ps2_init(void)
 {
 	status_t status;
 
-	TRACE(("ps2_hid: init_driver\n"));
+	TRACE(("ps2: init\n"));
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK)
@@ -349,9 +323,9 @@ err_1:
 
 
 void
-ps2_uninit_driver(void)
+ps2_uninit(void)
 {
-	TRACE(("ps2_hid: uninit_driver\n"));
+	TRACE(("ps2: uninit\n"));
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();

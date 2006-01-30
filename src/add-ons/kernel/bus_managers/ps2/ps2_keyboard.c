@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005 Haiku, Inc.
+ * Copyright 2004-2006 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 keyboard device driver
@@ -7,6 +7,7 @@
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
+ *      Marcus Overhagen <marcus@overhagen.de>
  */
 
 
@@ -15,7 +16,6 @@
 #include "packet_buffer.h"
 
 #include <string.h>
-
 
 #define KEY_BUFFER_SIZE 100
 	// we will buffer 100 key strokes before we start dropping them
@@ -199,7 +199,7 @@ probe_keyboard(void)
 //	#pragma mark -
 
 
-status_t
+static status_t
 keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
 	status_t status;
@@ -240,29 +240,30 @@ err1:
 }
 
 
-status_t
+static status_t
 keyboard_close(void *cookie)
 {
 	TRACE(("keyboard_close()\n"));
 
-
 	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
 
+	atomic_and(&ps2_device[PS2_DEVICE_KEYB].flags, ~PS2_FLAG_ENABLED);
+	
 	atomic_and(&sKeyboardOpenMask, 0);
 
 	return B_OK;
 }
 
 
-status_t
+static status_t
 keyboard_freecookie(void *cookie)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	TRACE(("keyboard read()\n"));
@@ -271,7 +272,7 @@ keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 }
 
 
-status_t
+static status_t
 keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 {
 	TRACE(("keyboard write()\n"));
@@ -280,7 +281,7 @@ keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 }
 
 
-status_t
+static status_t
 keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE(("keyboard ioctl()\n"));
@@ -309,3 +310,12 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return EINVAL;
 	}
 }
+
+device_hooks gKeyboardDeviceHooks = {
+	keyboard_open,
+	keyboard_close,
+	keyboard_freecookie,
+	keyboard_ioctl,
+	keyboard_read,
+	keyboard_write,
+};

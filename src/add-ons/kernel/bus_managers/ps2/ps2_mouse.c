@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005 Haiku, Inc.
+ * Copyright 2001-2006 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 mouse device driver
@@ -8,6 +8,7 @@
  * 		Elad Lahav (elad@eldarshany.com)
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
+ *      Marcus Overhagen <marcus@overhagen.de>
  */
 
 /*
@@ -240,7 +241,8 @@ set_mouse_enabled(mouse_cookie *cookie, bool enable)
  *	calls to the handler, each holds a different byte on the data port.
  */
 
-int32 mouse_handle_int(ps2_dev *dev, uint8 data)
+int32
+mouse_handle_int(ps2_dev *dev, uint8 data)
 {
 	mouse_cookie *cookie = dev->cookie;
 	
@@ -325,7 +327,7 @@ probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 //	Device functions
 
 
-status_t 
+static status_t 
 mouse_open(const char *name, uint32 flags, void **_cookie)
 {
 	mouse_cookie *cookie;
@@ -403,7 +405,7 @@ err1:
 }
 
 
-status_t
+static status_t
 mouse_close(void *_cookie)
 {
 	mouse_cookie *cookie = _cookie;
@@ -422,7 +424,7 @@ mouse_close(void *_cookie)
 }
 
 
-status_t
+static status_t
 mouse_freecookie(void *_cookie)
 {
 	mouse_cookie *cookie = _cookie;
@@ -431,7 +433,7 @@ mouse_freecookie(void *_cookie)
 }
 
 
-status_t
+static status_t
 mouse_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	*_length = 0;
@@ -439,7 +441,7 @@ mouse_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 }
 
 
-status_t
+static status_t
 mouse_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	*_length = 0;
@@ -447,7 +449,7 @@ mouse_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 }
 
 
-status_t
+static status_t
 mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	mouse_cookie *cookie = _cookie;
@@ -491,3 +493,11 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 	}
 }
 
+device_hooks gMouseDeviceHooks = {
+	mouse_open,
+	mouse_close,
+	mouse_freecookie,
+	mouse_ioctl,
+	mouse_read,
+	mouse_write,
+};
