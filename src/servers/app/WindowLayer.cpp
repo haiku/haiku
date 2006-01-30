@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author:  DarkWyrm <bpmagic@columbus.rr.com>
- *			Adi Oanca <adioanca@gmail.com>
- *			Stephan Aßmus <superstippi@gmx.de>
- *			Axel Dörfler, axeld@pinc-software.de
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adi Oanca <adioanca@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -1347,7 +1348,7 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 	if (fFeel == kDesktopWindowFeel)
 		return first ? first : NextWindow(workspace);
 
-	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL)
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL || fFeel == kMenuWindowFeel)
 		return NULL;
 
 	if (first == NULL)
@@ -1359,7 +1360,8 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 			continue;
 
 		// no one can be in front of a floating all window
-		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL
+			|| window->Feel() == kMenuWindowFeel)
 			return window;
 
 		if (window->HasInSubset(this))
