@@ -37,6 +37,7 @@ extern device_hooks gKeyboardDeviceHooks;
 extern device_hooks gMouseDeviceHooks;
 
 extern bool gMultiplexingActive;
+extern sem_id gControllerSem;
 
 // prototypes from common.c
 

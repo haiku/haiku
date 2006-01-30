@@ -19,10 +19,10 @@
 
 isa_module_info *gIsa = NULL;
 
-static sem_id sKbcSem;
 static int32 sIgnoreInterrupts = 0;
 
-bool gMultiplexingActive = false;
+bool	gMultiplexingActive = false;
+sem_id	gControllerSem;
 
 
 inline uint8
@@ -90,7 +90,7 @@ ps2_flush()
 {
 	int i;
 
-	acquire_sem(sKbcSem);
+	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
 	for (i = 0; i < 64; i++) {
@@ -105,7 +105,7 @@ ps2_flush()
 	}
 
 	atomic_add(&sIgnoreInterrupts, -1);
-	release_sem(sKbcSem);
+	release_sem(gControllerSem);
 }
 
 
@@ -115,7 +115,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	status_t res;
 	int i;
 	
-	acquire_sem(sKbcSem);
+	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
 	res = ps2_wait_write();
@@ -135,7 +135,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	}
 
 	atomic_add(&sIgnoreInterrupts, -1);
-	release_sem(sKbcSem);
+	release_sem(gControllerSem);
 	
 	return res;
 }
@@ -216,7 +216,7 @@ ps2_init(void)
 	if (status < B_OK)
 		goto err_1;
 
-	sKbcSem = create_sem(1, "ps/2 keyb ctrl");
+	gControllerSem = create_sem(1, "ps/2 keyb ctrl");
 
 	status = ps2_dev_init();
 
@@ -313,7 +313,7 @@ err_4:
 err_3:
 	ps2_service_exit();
 	ps2_dev_exit();
-	delete_sem(sKbcSem);
+	delete_sem(gControllerSem);
 err_2:
 	put_module(B_ISA_MODULE_NAME);
 err_1:
@@ -330,6 +330,6 @@ ps2_uninit(void)
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
 	ps2_dev_exit();
-	delete_sem(sKbcSem);
+	delete_sem(gControllerSem);
 	put_module(B_ISA_MODULE_NAME);
 }
