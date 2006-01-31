@@ -53,6 +53,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 	if (!err) 
 		err = node.ReadAttrString("BEOS:APP_SIG", &sig);
 	if (!err) {
+		sig.ToLower();
 		// Init our various objects
 		err = mime.SetTo(sig.String());
 		if (!err && !mime.IsInstalled())
