@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -672,7 +672,7 @@ call_all_cpus(void (*func)(void *, int), void *cookie)
 
 	if (smp_get_num_cpus() > 1) {
 		smp_send_broadcast_ici(SMP_MSG_CALL_FUNCTION, (uint32)cookie,
-			0, 0, (void *)func, SMP_MSG_FLAG_SYNC);
+			0, 0, (void *)func, SMP_MSG_FLAG_ASYNC);
 	}
 
 	// we need to call this function ourselves as well
