@@ -1905,7 +1905,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 			 * note:
 			 * horizontal granularity is 2 pixels, vertical granularity is 1 pixel.
 			 * look at Matrox or Neomagic bes engines code for usage example. */
-			//fixme: tested 16-bit depth, verify other depths...
+			//fixme: tested 15, 16 and 32-bit RGB depth, verify other depths...
 			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i].src_height + 1) << 16) |
 				 (((list[i].src_width + 1) + 0x0001) & ~0x0001)); /* SourceHeightWidth */
