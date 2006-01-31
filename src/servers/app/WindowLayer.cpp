@@ -987,12 +987,18 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 void
 WindowLayer::WorkspaceActivated(int32 index, bool active)
 {
+	if (!active)
+		fWindow->HandleDirectConnection(B_DIRECT_STOP);
+
 	BMessage activatedMsg(B_WORKSPACE_ACTIVATED);
 	activatedMsg.AddInt64("when", system_time());
 	activatedMsg.AddInt32("workspace", index);
 	activatedMsg.AddBool("active", active);
 
 	ServerWindow()->SendMessageToClient(&activatedMsg);
+	
+	if (active)
+		fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
 
 
