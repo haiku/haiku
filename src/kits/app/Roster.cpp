@@ -2094,7 +2094,7 @@ BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
 		error = type.SetTo(mimeType);
 	// get the preferred app
 	char appSignature[B_MIME_TYPE_LENGTH];
-	if (error == B_OK)
+	if (error == B_OK) {
 		if (type.IsInstalled()) {
 			BMimeType superType;
 			if (type.GetPreferredApp(appSignature) != B_OK
@@ -2109,6 +2109,7 @@ BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
 			// The type is not installed. We assume it is an app signature.
 			strcpy(appSignature, mimeType);
 		}
+	}
 	if (error == B_OK)
 		error = appMeta->SetTo(appSignature);
 	// check, whether the signature is installed and has an app hint
