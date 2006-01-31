@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-12/2005.
+   Rudolf Cornelissen 8/2003-1/2006.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -1792,7 +1792,6 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 /* scaled and filtered screen to screen blit - i.e. video playback without overlay */
 /* note: source and destination may not overlap. */
 //fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
-//fixme: test 15-bit depth for correct space (conversion)...
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count)
 {
 	uint32 i = 0;
@@ -1833,6 +1832,16 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		//fixme: the NV10 version of this cmd supports B_CMAP8 src though... (checkout)
 		LOG(8,("ACC_DMA: scaled_filtered_blit, invalid bit depth\n"));
 		return;
+	}
+
+	/* modify surface depth settings for 15-bit colorspace so command works as intended */
+	if (si->dm.space == B_RGB15_LITTLE)
+	{
+		/* wait for room in fifo for surface setup cmd if needed */
+		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		/* now setup 2D surface (writing 1 32bit word) */
+		nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000002; /* Format */
 	}
 
 	/* TNT1 has fixed operation mode 'SRCcopy' while the rest can be programmed: */
@@ -1917,6 +1926,20 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 
 			i++;
 		}
+
+		/* tell the engine to fetch the commands in the DMA buffer that where not
+		 * executed before. */
+		nv_start_dma();
+	}
+
+	/* reset surface depth settings so the other engine commands works as intended */
+	if (si->dm.space == B_RGB15_LITTLE)
+	{
+		/* wait for room in fifo for surface setup cmd if needed */
+		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		/* now setup 2D surface (writing 1 32bit word) */
+		nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000004; /* Format */
 
 		/* tell the engine to fetch the commands in the DMA buffer that where not
 		 * executed before. */
