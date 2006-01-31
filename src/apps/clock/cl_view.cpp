@@ -48,10 +48,8 @@ TOffscreenView::TOffscreenView(BRect frame, char *name, short mRadius,
 	for (index = 0; index <= 8; index++)
 		fClockFace[index] = NULL;
 
-// TODO: Simply use be_app->AppResources() instead of this FindApp() -> BFile
-// -> BResources stunt.
-
-//+	error = get_ref_for_path("/boot/apps/Clock", &ref);
+	// Note: Since we can be run as replicant, we get our resources this way,
+	// not via be_app->AppResources().
 	error = be_roster->FindApp(app_signature, &ref);
 	printf("be_roster->FindApp() returned %s\n", strerror(error));
 	if (error == B_NO_ERROR) {
