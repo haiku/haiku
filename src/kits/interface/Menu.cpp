@@ -1150,7 +1150,7 @@ BMenu::_track(int *action, long start)
 				SelectItem(NULL);
 		}
 
-		if (item != NULL && fSelected != NULL && OverSubmenu(fSelected, screenLocation)
+		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)
 			&& fSelected->Submenu()->Window() != NULL) {
 			UnlockLooper();
 
