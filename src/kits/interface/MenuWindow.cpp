@@ -71,6 +71,11 @@ BMenuFrame::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 	ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
+	if (fMenu != NULL) {
+		BFont font;
+		fMenu->GetFont(&font);
+		SetFont(&font);
+	}
 }
 	
 
@@ -78,13 +83,20 @@ void
 BMenuFrame::Draw(BRect updateRect)
 {
 	if (fMenu->CountItems() == 0) {
+		// TODO: Review this as it's a bit hacky.
+		// Menu has a size of 0, 0, since there are no items in it.
+		// So the BMenuFrame class has to fake it and draw an empty item.
+		// Note that we can't add a real "empty" item because then we couldn't
+		// tell if the item was added by us or not.
+		// See also BMenu::UpdateWindowViewSize()
 		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
+		SetLowColor(HighColor());
 		FillRect(updateRect);
+
 		font_height height;
-		fMenu->GetFontHeight(&height);
-		fMenu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-		// TODO: This doesn't get drawn for some reason
-		fMenu->DrawString("<empty>", BPoint(2, ceilf(height.ascent + 2)));
+		GetFontHeight(&height);
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+		DrawString("<empty>", BPoint(2, ceilf(height.ascent + 2)));
 	}
 
 	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
