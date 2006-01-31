@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc.
+ * Copyright 2004-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -135,6 +135,7 @@ struct thread {
 	thread_id		id;
 	char			name[B_OS_NAME_LENGTH];
 	int32			priority;
+	int32			next_priority;
 	int32			state;
 	int32			next_state;
 	union cpu_ent	*cpu;

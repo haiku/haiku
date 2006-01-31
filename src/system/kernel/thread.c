@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -196,7 +196,7 @@ create_thread_struct(const char *name, thread_id threadID)
 	thread->kernel_errno = 0;
 	thread->team_next = NULL;
 	thread->queue_next = NULL;
-	thread->priority = -1;
+	thread->priority = thread->next_priority = -1;
 	thread->args1 = NULL;  thread->args2 = NULL;
 	thread->sig_pending = 0;
 	thread->sig_block_mask = 0;
@@ -342,6 +342,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		return B_NO_MEMORY;
 
 	thread->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
+	thread->next_priority = thread->priority;
 	// ToDo: this could be dangerous in case someone calls resume_thread() on us
 	thread->state = B_THREAD_SUSPENDED;
 	thread->next_state = B_THREAD_SUSPENDED;
@@ -490,7 +491,7 @@ make_thread_unreal(int argc, char **argv)
 			continue;
 
 		if (thread->priority > B_DISPLAY_PRIORITY) {
-			thread->priority = B_NORMAL_PRIORITY;
+			thread->priority = thread->next_priority = B_NORMAL_PRIORITY;
 			kprintf("thread 0x%lx made unreal\n", thread->id);
 		}
 	}
@@ -540,7 +541,7 @@ _dump_thread_info(struct thread *thread)
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
 		thread->all_next, thread->team_next, thread->queue_next);
-	kprintf("priority:           %ld\n", thread->priority);
+	kprintf("priority:           %ld (next %ld)\n", thread->priority, thread->next_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
 	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
@@ -903,7 +904,7 @@ thread_exit(void)
 		(int)thread->exit.status));
 
 	// boost our priority to get this over with
-	thread->priority = B_URGENT_DISPLAY_PRIORITY;
+	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
 
 	// stop debugging for this thread
 	state = disable_interrupts();
@@ -1342,7 +1343,7 @@ thread_init(kernel_args *args)
 		}
 
 		thread->team = team_get_kernel_team();
-		thread->priority = B_IDLE_PRIORITY;
+		thread->priority = thread->next_priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;
 		thread->next_state = B_THREAD_READY;
 		sprintf(name, "idle thread %lu kstack", i + 1);
@@ -1780,7 +1781,7 @@ set_thread_priority(thread_id id, int32 priority)
 			// note that this might not return the correct value if we are preempted
 			// here, and another thread changes our priority before the next line is
 			// executed
-		thread->priority = priority;
+		thread->priority = thread->next_priority = priority;
 	} else {
 		cpu_status state = disable_interrupts();
 		GRAB_THREAD_LOCK();
@@ -1788,12 +1789,9 @@ set_thread_priority(thread_id id, int32 priority)
 		thread = thread_get_thread_struct_locked(id);
 		if (thread) {
 			oldPriority = thread->priority;
+			thread->next_priority = priority;
 			if (thread->state == B_THREAD_READY && thread->priority != priority) {
 				// if the thread is in the run queue, we reinsert it at a new position
-				// ToDo: this doesn't seem to be necessary: if a thread is already in
-				//	the run queue, running it once doesn't hurt, and if the priority
-				//	is now very low, it probably wouldn't have been selected to be in
-				//	the run queue at all right now, anyway.
 				scheduler_remove_from_run_queue(thread);
 				thread->priority = priority;
 				scheduler_enqueue_in_run_queue(thread);

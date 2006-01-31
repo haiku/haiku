@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
@@ -79,13 +79,8 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 {
 	struct thread *curr, *prev;
 
-	// these shouldn't exist
-	if (thread->priority > B_MAX_PRIORITY)
-		thread->priority = B_MAX_PRIORITY;
-	if (thread->priority < B_MIN_PRIORITY)
-		thread->priority = B_MIN_PRIORITY;
-
-	for (curr = sRunQueue.head, prev = NULL; curr && curr->priority >= thread->priority;
+	for (curr = sRunQueue.head, prev = NULL; curr
+			&& curr->priority >= thread->next_priority;
 			curr = curr->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
@@ -98,6 +93,8 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 		prev->queue_next = thread;
 	else
 		sRunQueue.head = thread;
+
+	thread->next_priority = thread->priority;
 }
 
 

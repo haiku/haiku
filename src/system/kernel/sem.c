@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -689,16 +689,14 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	// pull off any items in the release queue and put them in the run queue
 	if (releaseQueue.head != NULL) {
 		struct thread *thread;
-		int32 priority;
 
 		GRAB_THREAD_LOCK();
 		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
 			// temporarily place thread in a run queue with high priority to boost it up
-			priority = thread->priority;
-			thread->priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
-				thread->priority : B_FIRST_REAL_TIME_PRIORITY;
+			// TODO: isn't realtime priority a bit too much??
+			thread->next_priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
+				thread->priority : B_FIRST_REAL_TIME_PRIORITY - 1;
 			scheduler_enqueue_in_run_queue(thread);
-			thread->priority = priority;
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 			scheduler_reschedule();
