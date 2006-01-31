@@ -1,20 +1,19 @@
 SubDir HAIKU_TOP src tests system kernel ;
 
 UsePrivateHeaders kernel ;
-
-if $(TARGET_PLATFORM) = r5 {
-	LIBROOT = root ;
-} else {
-	LIBROOT = libroot.so ;
-}
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 SimpleTest transfer_area_test :
 	transfer_area_test.cpp
-	: libroot.so ;
+	;
 
 SimpleTest syscall_time :
 	syscall_time.cpp
-	: $(LIBROOT) ;
+	;
+
+SimpleTest yield_test :
+	yield_test.cpp
+	;
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;

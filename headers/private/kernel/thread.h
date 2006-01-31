@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -31,6 +31,7 @@ void thread_at_kernel_exit(void);
 
 status_t thread_init(struct kernel_args *args);
 status_t thread_per_cpu_init(int32 cpuNum);
+void thread_yield(void);
 void thread_exit(void);
 
 bigtime_t thread_get_active_cpu_time(int32 cpuNum);
@@ -66,6 +67,7 @@ thread_id _user_spawn_thread(thread_entry_func entry, const char *name, int32 pr
 status_t _user_wait_for_thread(thread_id id, status_t *_returnCode);
 status_t _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags);
 status_t _user_kill_thread(thread_id thread);
+void _user_thread_yield(void);
 void _user_exit_thread(status_t return_value);
 bool _user_has_data(thread_id thread);
 status_t _user_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);

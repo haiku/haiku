@@ -96,6 +96,7 @@ extern status_t		_kern_rename_thread(thread_id thread, const char *newName);
 extern status_t		_kern_set_thread_priority(thread_id thread, int32 newPriority);
 extern status_t		_kern_kill_thread(thread_id thread);
 extern void			_kern_exit_thread(status_t returnValue);
+extern void			_kern_thread_yield(void);
 extern status_t		_kern_wait_for_thread(thread_id thread, status_t *_returnCode);
 extern bool			_kern_has_data(thread_id thread);
 extern status_t		_kern_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize);

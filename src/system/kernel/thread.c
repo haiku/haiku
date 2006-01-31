@@ -1232,16 +1232,37 @@ thread_dequeue_id(struct thread_queue *q, thread_id id)
 
 
 thread_id
-allocate_thread_id()
+allocate_thread_id(void)
 {
 	return atomic_add(&sNextThreadID, 1);
 }
 
 
 thread_id
-peek_next_thread_id()
+peek_next_thread_id(void)
 {
 	return atomic_get(&sNextThreadID);
+}
+
+
+void
+thread_yield(void)
+{
+	cpu_status state;
+
+	struct thread *thread = thread_get_current_thread();
+	if (thread == NULL)
+		return;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	// just add the thread at the end of the run queue
+	thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
+	scheduler_reschedule();
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
 }
 
 
@@ -2041,6 +2062,13 @@ status_t
 _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 {
 	return snooze_etc(timeout, timebase, flags | B_CAN_INTERRUPT);
+}
+
+
+void
+_user_thread_yield(void)
+{
+	thread_yield();
 }
 
 
