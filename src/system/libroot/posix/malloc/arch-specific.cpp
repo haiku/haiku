@@ -317,10 +317,10 @@ hoardUnlock(hoardLockType &lock)
 void
 hoardYield(void)
 {
-	// A thread's quantum is definitely larger than this, so this is
-	// an expensive yield function.
+	// We need to snooze longer than a thread quantum (3ms) to ensure
+	// real-time threads won't hog the CPU completely
 	// ToDo: we should have a real one in the kernel
-	snooze(5);
+	snooze(4000);
 }
 
 }	// namespace BPrivate
