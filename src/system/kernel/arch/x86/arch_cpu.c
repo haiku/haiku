@@ -41,7 +41,7 @@ static struct tss **sTSS;
 //static struct tss **sDoubleFaultTSS;
 struct tss **sDoubleFaultTSS;
 static int *sIsTSSLoaded;
-static int32 sWaitAllCPUs;
+static vint32 sWaitAllCPUs;
 
 segment_descriptor *gGDT = NULL;
 
