@@ -48,6 +48,13 @@ TOffscreenView::TOffscreenView(BRect frame, char *name, short mRadius,
 	for (index = 0; index <= 8; index++)
 		fClockFace[index] = NULL;
 
+#ifdef __HAIKU__
+	BResources rsrcs;
+	error = rsrcs.SetToImage(&&dummy_label);
+dummy_label:
+	if (error == B_OK) {
+		{
+#else	// !__HAIKU__
 	// Note: Since we can be run as replicant, we get our resources this way,
 	// not via be_app->AppResources().
 	error = be_roster->FindApp(app_signature, &ref);
@@ -57,6 +64,7 @@ TOffscreenView::TOffscreenView(BRect frame, char *name, short mRadius,
 		error = file.InitCheck();
 		if (error == B_NO_ERROR) {
 			BResources rsrcs(&file);
+#endif	// !__HAIKU__
 			
 			for (loop = 0; loop <= 8; loop++) {
 				if ((picH = rsrcs.FindResource('PICT', loop+4, &len))) {
