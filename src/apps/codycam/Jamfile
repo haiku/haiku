@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps codycam ;
 
-AddResources CodyCam : CodyCam.rdef ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application CodyCam :
 	CodyCam.cpp
@@ -8,6 +8,7 @@ Application CodyCam :
 	Settings.cpp
 	SettingsHandler.cpp
 	VideoConsumer.cpp
+	: be media translation $(NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: CodyCam.rdef
 ;
 
-LinkAgainst CodyCam : be media translation netapi $(TARGET_LIBSTDC++) ;

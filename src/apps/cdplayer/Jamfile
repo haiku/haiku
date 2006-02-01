@@ -12,6 +12,6 @@ Application CDPlayer :
 	TrackMenu.cpp
 	TwoStateDrawButton.cpp
 
-	: be net netapi translation textencoding 
+	: be $(SELECT_UNAME_ETC_LIB) $(NETAPI_LIB) translation textencoding 
 	: CDPlayer.rdef
 ;
