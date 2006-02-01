@@ -17,7 +17,7 @@ class StyledEditWindow
 public:
 					StyledEditWindow(BRect frame, int32 id, uint32 encoding = 0);
 					StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding = 0);
-					~StyledEditWindow();
+					virtual ~StyledEditWindow();
 	
 	virtual void	Quit();
 	virtual bool 	QuitRequested();

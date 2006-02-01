@@ -1,6 +1,13 @@
 SubDir HAIKU_TOP src apps stylededit ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders textencoding ;
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os support ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+}
+
 
 local styled_edit_rsrc =
 	[ FGristFiles StyledEdit.rsrc ]

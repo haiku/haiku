@@ -8,7 +8,7 @@
 class StyledEditView : public BTextView {
 public:
 	StyledEditView(BRect viewframe, BRect textframe, BHandler *handler);
-	~StyledEditView();
+	virtual ~StyledEditView();
 
 	virtual void Select(int32 start, int32 finish);
 	virtual void FrameResized(float width, float height);
