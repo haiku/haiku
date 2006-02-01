@@ -10,7 +10,7 @@
 #include <system_info.h>
 #include <arch/system_info.h>
 
-#include <vm.h>
+#include <cpu.h>
 #include <debug.h>
 #include <port.h>
 #include <real_time_clock.h>
@@ -18,6 +18,7 @@
 #include <smp.h>
 #include <team.h>
 #include <thread.h>
+#include <vm.h>
 #include <vm_page.h>
 
 #include <string.h>
@@ -41,7 +42,7 @@ _get_system_info(system_info *info, size_t size)
 	info->cpu_count = smp_get_num_cpus();
 
 	for (i = 0; i < info->cpu_count; i++)
-		info->cpu_infos[i].active_time = thread_get_active_cpu_time(i);
+		info->cpu_infos[i].active_time = cpu_get_active_time(i);
 
 	// ToDo: Add page_faults
 	info->max_pages = vm_page_num_pages();

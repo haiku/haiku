@@ -8,9 +8,9 @@
 
 /* This file contains the cpu functions (init, etc). */
 
-#include <kernel.h>
+
 #include <cpu.h>
-#include <vm.h>
+#include <thread_types.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
@@ -55,6 +55,30 @@ status_t
 cpu_preboot_init(kernel_args *args)
 {
 	return arch_cpu_preboot_init(args);
+}
+
+
+bigtime_t
+cpu_get_active_time(int32 cpu)
+{
+	bigtime_t activeTime;
+	cpu_status state;
+
+	if (cpu < 0 || cpu > smp_get_num_cpus())
+		return 0;
+
+	// We need to grab the thread lock here, because the thread activity
+	// time is not maintained atomically (because there is no need to)
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	activeTime = gCPU[cpu].info.active_time;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return activeTime;
 }
 
 

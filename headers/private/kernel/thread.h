@@ -34,7 +34,6 @@ status_t thread_per_cpu_init(int32 cpuNum);
 void thread_yield(void);
 void thread_exit(void);
 
-bigtime_t thread_get_active_cpu_time(int32 cpuNum);
 int32 thread_max_threads(void);
 int32 thread_used_threads(void);
 
@@ -47,8 +46,14 @@ static thread_id thread_get_current_thread_id(void);
 static inline thread_id
 thread_get_current_thread_id(void)
 {
-	struct thread *t = thread_get_current_thread();
-	return t ? t->id : 0;
+	struct thread *thread = thread_get_current_thread();
+	return thread ? thread->id : 0;
+}
+
+static inline bool
+thread_is_idle_thread(struct thread *thread)
+{
+	return thread->entry == NULL;
 }
 
 thread_id allocate_thread_id(void);

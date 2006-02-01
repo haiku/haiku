@@ -1281,34 +1281,6 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 }
 
 
-bigtime_t
-thread_get_active_cpu_time(int32 cpuNum)
-{
-	bigtime_t activeTime;
-	cpu_status state;
-
-	if (cpuNum < 0 || cpuNum > B_MAX_CPU_COUNT || sIdleThreads[cpuNum] == NULL)
-		return 0;
-
-	activeTime = system_time();
-
-	// we need to grab the thread lock here, because the thread activity
-	// time is not maintained atomically (because there is no need to)
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	// TODO: this is wrong - the idle threads are arbitrarly executed by the CPUs
-	//		there is no CPU affinity!
-	activeTime -= sIdleThreads[cpuNum]->kernel_time;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	return activeTime;
-}
-
-
 int32
 thread_max_threads(void)
 {
@@ -1371,6 +1343,7 @@ thread_init(kernel_args *args)
 		thread->next_state = B_THREAD_READY;
 		sprintf(name, "idle thread %lu kstack", i + 1);
 		thread->kernel_stack_area = find_area(name);
+		thread->entry = NULL;
 
 		if (get_area_info(thread->kernel_stack_area, &info) != B_OK)
 			panic("error finding idle kstack area\n");

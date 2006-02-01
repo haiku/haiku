@@ -25,7 +25,7 @@ KernelMergeObject kernel_core.o :
 	module.c
 	port.c
 	real_time_clock.c
-	scheduler.c
+	scheduler.cpp
 	sem.c
 	shutdown.c
 	signal.c

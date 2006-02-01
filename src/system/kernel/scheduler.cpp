@@ -127,11 +127,6 @@ scheduler_remove_from_run_queue(struct thread *thread)
 static void
 context_switch(struct thread *fromThread, struct thread *toThread)
 {
-	// track kernel time (user time is tracked in thread_at_kernel_entry())
-	bigtime_t now = system_time();
-	fromThread->kernel_time += now - fromThread->last_time;
-	toThread->last_time = now;
-
 	toThread->cpu = fromThread->cpu;
 	fromThread->cpu = NULL;
 
@@ -222,6 +217,23 @@ scheduler_reschedule(void)
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
+
+	// track kernel time (user time is tracked in thread_at_kernel_entry())
+	bigtime_t now = system_time();
+	oldThread->kernel_time += now - oldThread->last_time;
+	nextThread->last_time = now;
+
+	// track CPU activity
+	if (!thread_is_idle_thread(oldThread)) {
+		oldThread->cpu->info.active_time +=
+			(oldThread->kernel_time - oldThread->cpu->info.last_kernel_time)
+			+ (oldThread->user_time - oldThread->cpu->info.last_user_time);
+	}
+
+	if (!thread_is_idle_thread(nextThread)) {
+		oldThread->cpu->info.last_kernel_time = nextThread->kernel_time;
+		oldThread->cpu->info.last_user_time = nextThread->user_time;
+	}
 
 	if (nextThread != oldThread || oldThread->cpu->info.preempted) {
 		bigtime_t quantum = 3000;	// ToDo: calculate quantum!

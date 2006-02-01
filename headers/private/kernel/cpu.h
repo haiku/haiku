@@ -23,6 +23,12 @@ typedef union cpu_ent {
 		// thread.c: used to force a reschedule at quantum expiration time
 		int preempted;
 		timer quantum_timer;
+
+		// keeping track of CPU activity
+		bigtime_t active_time;
+		bigtime_t last_kernel_time;
+		bigtime_t last_user_time;
+
 		bool disabled;
 	} info;
 } cpu_ent __attribute__((aligned(64)));
@@ -39,6 +45,7 @@ status_t cpu_preboot_init(struct kernel_args *args);
 status_t cpu_init(struct kernel_args *args);
 status_t cpu_init_post_vm(struct kernel_args *args);
 status_t cpu_init_post_modules(struct kernel_args *args);
+bigtime_t cpu_get_active_time(int32 cpu);
 
 cpu_ent *get_cpu_struct(void);
 extern inline cpu_ent *get_cpu_struct(void) { return &gCPU[smp_get_current_cpu()]; }
