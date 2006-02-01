@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps expander ;
 
-AddResources Expander : Expander.rdef ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application Expander : 
 	ExpanderApp.cpp
@@ -10,7 +10,8 @@ Application Expander :
 	ExpanderSettings.cpp
 	ExpanderPreferences.cpp
 	DirectoryFilePanel.cpp
-	ExpanderRules.cpp ;
-
-LinkAgainst Expander : libbe.so libtracker.so ;
+	ExpanderRules.cpp
+	: be tracker	
+	: Expander.rdef
+;
 
