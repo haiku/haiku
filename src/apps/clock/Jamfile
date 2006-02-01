@@ -1,9 +1,11 @@
 SubDir HAIKU_TOP src apps clock ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application Clock : 
 	cl_view.cpp 
 	cl_wind.cpp 
 	clock.cpp 
-	: libbe.so
+	: be
 	: Clock.rdef
 	;
