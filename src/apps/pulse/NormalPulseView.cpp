@@ -249,13 +249,13 @@ NormalPulseView::AttachedToWindow()
 	CalculateFontSize();
 
 	fPreviousTime = system_time();
-	
+
 	BMessenger messenger(Window());
 	mode1->SetTarget(messenger);
 	mode2->SetTarget(messenger);
 	preferences->SetTarget(messenger);
 	about->SetTarget(messenger);
-	
+
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count >= 2) {
@@ -273,7 +273,7 @@ NormalPulseView::UpdateColors(BMessage *message)
 	bool fade = message->FindBool("fade");
 	system_info sys_info;
 	get_system_info(&sys_info);
-	
+
 	for (int x = 0; x < sys_info.cpu_count; x++) {
 		fProgressBars[x]->UpdateColors(color, fade);
 		fCpuButtons[x]->UpdateColors(color);

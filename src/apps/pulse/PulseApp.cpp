@@ -229,7 +229,9 @@ LoadInDeskbar()
 		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
 		alert->Go(NULL);
 		return false;
-	} else return true;
+	}
+
+	return true;
 }
 
 
