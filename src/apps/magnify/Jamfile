@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src apps magnify ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application Magnify : 
 	main.cpp 
-	: libbe.so libtracker.so libgame.so 
+	: be tracker game 
 	: Magnify.rdef ;
