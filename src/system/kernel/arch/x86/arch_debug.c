@@ -104,29 +104,42 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 }
 
 
+static void
+print_iframe(struct iframe *frame)
+{
+	kprintf("iframe at %p (end = %p)\n", frame, frame + 1);
+
+	kprintf(" eax 0x%-9lx    ebx 0x%-9lx     ecx 0x%-9lx  edx 0x%lx\n",
+		frame->eax, frame->ebx, frame->ecx, frame->edx);
+	kprintf(" esi 0x%-9lx    edi 0x%-9lx     ebp 0x%-9lx  esp 0x%lx\n",
+		frame->esi, frame->edi, frame->ebp, frame->esp);
+	kprintf(" eip 0x%-9lx eflags 0x%-9lx", frame->eip, frame->flags);
+	if ((frame->error_code & 0x4) != 0) {
+		// from user space
+		kprintf("user esp 0x%lx", frame->user_esp);
+	}
+	kprintf("\n");
+	kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector, frame->error_code);
+}
+
+
 static int
 stack_trace(int argc, char **argv)
 {
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct iframe_stack *frameStack;
-	struct thread *thread;
+	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
-	uint32 ebp;
+	uint32 ebp = 0;
 	int32 i, num = 0, last = 0;
 
-	if (argc < 2) {
-		thread = thread_get_current_thread();
-		ebp = x86_read_ebp();
-	} else {
+	if (argc == 2) {
 		thread_id id = strtoul(argv[1], NULL, 0);
 		thread = thread_get_thread_struct_locked(id);
 		if (thread == NULL) {
 			kprintf("could not find thread %ld\n", id);
 			return 0;
 		}
-
-		// read %ebp from the thread's stack stored by a pushad
-		ebp = thread->arch_info.current_stack.esp[2];
 
 		if (id != thread_get_current_thread_id()) {
 			// switch to the page directory of the new thread to be
@@ -138,7 +151,20 @@ stack_trace(int argc, char **argv)
 				read_cr3(oldPageDirectory);
 				write_cr3(newPageDirectory);
 			}
-		}
+
+			// read %ebp from the thread's stack stored by a pushad
+			ebp = thread->arch_info.current_stack.esp[2];
+		} else
+			thread == NULL;
+	} else if (argc > 2) {
+		kprintf("usage: %s [thread id]\n", argv[0]);
+		return 0;
+	}
+
+	if (thread == NULL) {
+		// if we don't have a thread yet, we want the current one
+		thread = thread_get_current_thread();
+		ebp = x86_read_ebp();
 	}
 
 	// We don't have a thread pointer early in the boot process
@@ -146,11 +172,6 @@ stack_trace(int argc, char **argv)
 		frameStack = &thread->arch_info.iframes;
 	else
 		frameStack = &gBootFrameStack;
-
-	for (i = 0; i < frameStack->index; i++) {
-		kprintf("iframe %p (end = %p)\n",
-			frameStack->frames[i], frameStack->frames[i] + 1);
-	}
 
 	if (thread != NULL) {
 		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
@@ -178,20 +199,9 @@ stack_trace(int argc, char **argv)
 		if (isIFrame) {
 			struct iframe *frame = (struct iframe *)(ebp + 8);
 
-			kprintf("iframe at %p\n", frame);
-			kprintf(" eax 0x%-9lx    ebx 0x%-9lx     ecx 0x%-9lx  edx 0x%lx\n",
-				frame->eax, frame->ebx, frame->ecx, frame->edx);
-			kprintf(" esi 0x%-9lx    edi 0x%-9lx     ebp 0x%-9lx  esp 0x%lx\n",
-				frame->esi, frame->edi, frame->ebp, frame->esp);
-			kprintf(" eip 0x%-9lx eflags 0x%-9lx", frame->eip, frame->flags);
-			if ((frame->error_code & 0x4) != 0) {
-				// from user space
-				kprintf("user esp 0x%lx", frame->user_esp);
-			}
-			kprintf("\n");
-			kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector, frame->error_code);
-
+			print_iframe(frame);
 			print_stack_frame(thread, frame->eip, ebp, frame->ebp);
+
  			ebp = frame->ebp;
 		} else {
 			addr_t eip, nextEbp;
@@ -225,6 +235,44 @@ stack_trace(int argc, char **argv)
 }
 
 
+static int
+dump_iframes(int argc, char **argv)
+{
+	struct iframe_stack *frameStack;
+	struct thread *thread = NULL;
+	int32 i;
+
+	if (argc < 2) {
+		thread = thread_get_current_thread();
+	} else if (argc == 2) {
+		thread_id id = strtoul(argv[1], NULL, 0);
+		thread = thread_get_thread_struct_locked(id);
+		if (thread == NULL) {
+			kprintf("could not find thread %ld\n", id);
+			return 0;
+		}
+	} else if (argc > 2) {
+		kprintf("usage: %s [thread id]\n", argv[0]);
+		return 0;
+	}
+
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL)
+		frameStack = &thread->arch_info.iframes;
+	else
+		frameStack = &gBootFrameStack;
+
+	if (thread != NULL)
+		kprintf("iframes for thread 0x%lx \"%s\"\n", thread->id, thread->name);
+
+	for (i = 0; i < frameStack->index; i++) {
+		print_iframe(frameStack->frames[i]);
+	}
+
+	return 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -247,7 +295,8 @@ arch_debug_init(kernel_args *args)
 
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
-	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread");
+	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread (or any other)");
+	add_debugger_command("iframe", &dump_iframes, "Dump iframes for the specified thread");
 
 	return B_NO_ERROR;
 }
