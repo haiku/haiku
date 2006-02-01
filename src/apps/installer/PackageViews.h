@@ -60,6 +60,7 @@ class PackageCheckBox : public BCheckBox {
 		PackageCheckBox(BRect rect, Package *item);
 		virtual ~PackageCheckBox();
 		virtual void Draw(BRect update);
+		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
 		Package *GetPackage() { return fPackage; };
 	private:
 		Package *fPackage;

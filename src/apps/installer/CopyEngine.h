@@ -27,6 +27,7 @@ public:
 	void Start(BMenu *srcMenu, BMenu *targetMenu);
 	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 	void SetPackagesList(BList *list);
+	void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
 private:
 	void LaunchInitScript(BPath &path);
 	void LaunchFinishScript(BPath &path);
@@ -36,6 +37,7 @@ private:
 	BDiskDeviceRoster fDDRoster;
 	InstallerCopyLoopControl *fControl;
 	BList *fPackages;
+	off_t fSpaceRequired;
 };
 
 #endif /* _CopyEngine_h */

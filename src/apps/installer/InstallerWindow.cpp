@@ -136,7 +136,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	sizeRect.top = 105;
 	sizeRect.bottom = sizeRect.top + 15;
 	sizeRect.right -= 12;
-	sizeRect.left = sizeRect.right - be_plain_font->StringWidth("Disk space required: 0.0 KB") - 10;
+	sizeRect.left = sizeRect.right - be_plain_font->StringWidth("Disk space required: 0.0 KB") - 40;
 	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required: 0.0 KB", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSizeView);
@@ -170,6 +170,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			int32 size = 0;
 			fPackagesView->GetPackagesToInstall(list, &size);
 			fCopyEngine->SetPackagesList(list);
+			fCopyEngine->SetSpaceRequired(size);
 			BMessenger(fCopyEngine).SendMessage(ENGINE_START);
 			DisableInterface(true);
 			break;
@@ -197,8 +198,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case STATUS_MESSAGE: {
 			const char *status;
-			if (msg->FindString("status", &status) == B_OK)
+			if (msg->FindString("status", &status) == B_OK) {
+				fLastStatus = fStatusView->Text();
 				SetStatusMessage(status);
+			} else
+				SetStatusMessage(fLastStatus.String());
 		}
 		case INSTALL_FINISHED:
 			DisableInterface(false);

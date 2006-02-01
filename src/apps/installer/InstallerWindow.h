@@ -55,6 +55,7 @@ private:
 	BBitmap *fLogo;
 	BPoint fDrawPoint;
 	CopyEngine *fCopyEngine;
+	BString fLastStatus;
 };
 
 #endif /* _InstallerWindow_h */

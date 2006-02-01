@@ -53,7 +53,8 @@ private:
 CopyEngine::CopyEngine(InstallerWindow *window)
 	: BLooper("copy_engine"),
 	fWindow(window),
-	fPackages(NULL)
+	fPackages(NULL),
+	fSpaceRequired(0)
 {
 	fControl = new InstallerCopyLoopControl(window);
 	Run();
@@ -119,22 +120,35 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 		fprintf(stderr, "bad menu items\n");
 		return;
 	}
+	
+	// check if target is initialized
+	// ask if init or mount as is
 
 	BPath targetDirectory;
 	BDiskDevice device;
 	BPartition *partition;
+	BVolume targetVolume;
+
 	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
+		if (partition->GetVolume(&targetVolume)!=B_OK)
+			return;
 		if (partition->GetMountPoint(&targetDirectory)!=B_OK)
 			return;
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
+		if (device.GetVolume(&targetVolume)!=B_OK)
+			return;
 		if (device.GetMountPoint(&targetDirectory)!=B_OK)
 			return;
 	} else 
 		return; // shouldn't happen
 
-	// check if target is initialized
-	// ask if init or mount as is
 	// check if target has enough space
+	if ((fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired) 
+		&& ((new BAlert("", "The destination disk may not have enough space. Try choosing a different disk or \
+choose to not install optional items.", "Try installing anyway", "Cancel", 0,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+		return;
+	}
 
 	BPath srcDirectory;
         if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {

@@ -6,11 +6,13 @@
 #include <fs_attr.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <Messenger.h>
 #include <ScrollBar.h>
 #include <String.h>
 #include <stdio.h>
 #include <View.h>
 #include "PackageViews.h"
+#include "InstallerWindow.h"
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 
@@ -148,6 +150,22 @@ PackageCheckBox::Draw(BRect update)
 	if (icon)
 		DrawBitmap(icon, BPoint(Bounds().right - 92, 0));
 }
+
+
+void
+PackageCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+{
+	printf("coucouc\n");
+	if (transit == B_ENTERED_VIEW) {
+		BMessage msg(STATUS_MESSAGE);
+		msg.AddString("status", fPackage->Description());
+		BMessenger(NULL, Window()).SendMessage(&msg);
+	} else if (transit == B_EXITED_VIEW) {
+		BMessage msg(STATUS_MESSAGE);
+		BMessenger(NULL, Window()).SendMessage(&msg);
+	}
+}
+
 
 GroupView::GroupView(BRect rect, Group *group)
 	: BStringView(rect, "group", group->GroupName()),
