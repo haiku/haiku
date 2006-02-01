@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc.
+ * Copyright 2005-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,9 @@
 #include "intel.h"
 #include "amd.h"
 #include "via.h"
+
+#include <KernelExport.h>
+#include <arch_system_info.h>
 
 
 //#define TRACE_MTRR
@@ -44,12 +47,12 @@ uint32
 generic_count_mtrrs(void)
 {
 	cpuid_info cpuInfo;
-	if (get_cpuid(&cpuInfo, 1, 0) != B_OK
+	if (get_current_cpuid(&cpuInfo, 1) != B_OK
 		|| (cpuInfo.eax_1.features & IA32_FEATURE_MTRR) == 0)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
-	TRACE(("cpu has %ld variable range MTRs.\n", capabilities.variable_ranges));
+	TRACE(("CPU has %u variable range MTRs.\n", (uint8)capabilities.variable_ranges));
 	return capabilities.variable_ranges;
 }
 
@@ -60,6 +63,7 @@ generic_init_mtrrs(uint32 count)
 	// disable and clear all MTRRs
 	// (we leave the fixed MTRRs as is)
 	// TODO: check if the fixed MTRRs are set on all CPUs identically?
+	TRACE(("generic_init_mtrrs(count = %ld)\n", count));
 
 	x86_write_msr(IA32_MSR_MTRR_DEFAULT_TYPE,
 		x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE) & ~IA32_MTRR_ENABLE);
