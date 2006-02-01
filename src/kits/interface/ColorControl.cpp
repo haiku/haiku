@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -229,7 +229,7 @@ BColorControl::SetValue(int32 value)
 		fBlueText->SetText(string);
 	}
 
-	BControl::SetValue(value);
+	BControl::SetValueNoUpdate(value);
 
 	// TODO: This causes lot of flickering
 	Invalidate();

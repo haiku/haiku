@@ -581,10 +581,8 @@ BButton::DetachedFromWindow()
 void
 BButton::SetValue(int32 value)
 {
-	if (value != Value()) {
+	if (value != Value())
 		BControl::SetValue(value);
-		Invalidate();
-	}
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -265,7 +265,7 @@ void
 BRadioButton::SetValue(int32 value)
 {
 	if (value != Value()) {
-		BControl::SetValue(value);
+		BControl::SetValueNoUpdate(value);
 		Invalidate(_KnobFrame());
 	}
 

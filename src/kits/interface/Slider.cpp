@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -621,8 +621,7 @@ BSlider::SetValue(int32 value)
 
 		_SetLocation(loc);
 
-		BControl::SetValue(value);
-
+		BControl::SetValueNoUpdate(value);
 		Invalidate(oldThumbFrame | ThumbFrame());
 	}
 }
