@@ -1,13 +1,13 @@
 SubDir HAIKU_TOP src apps glteapot ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application GLTeapot :
 	FPS.cpp
 	GLObject.cpp
 	ObjectView.cpp
 	error.cpp
 	teapot_main.cpp
-
-	: libbe.so libGL.so libgame.so
-
+	: be GL game
 	: GLTeapot.rdef
 ;
