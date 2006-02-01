@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -18,7 +18,9 @@
 
 
 /* global per-cpu structure */
-cpu_ent cpu[MAX_BOOT_CPUS];
+cpu_ent gCPU[MAX_BOOT_CPUS];
+
+static spinlock sSetCpuLock;
 
 
 status_t
@@ -26,9 +28,9 @@ cpu_init(kernel_args *args)
 {
 	int i;
 
-	memset(cpu, 0, sizeof(cpu));
+	memset(gCPU, 0, sizeof(gCPU));
 	for (i = 0; i < MAX_BOOT_CPUS; i++) {
-		cpu[i].info.cpu_num = i;
+		gCPU[i].info.cpu_num = i;
 	}
 
 	return arch_cpu_init(args);
@@ -70,5 +72,51 @@ void
 _user_clear_caches(void *address, size_t length, uint32 flags)
 {
 	clear_caches(address, length, flags);
+}
+
+
+bool
+_user_cpu_enabled(int32 cpu)
+{
+	if (cpu < 0 || cpu >= smp_get_num_cpus())
+		return B_BAD_VALUE;
+
+	return !gCPU[cpu].info.disabled;
+}
+
+
+status_t
+_user_set_cpu_enabled(int32 cpu, bool enabled)
+{
+	status_t status = B_OK;
+	cpu_status state;
+	int32 i, count;
+
+	if (cpu < 0 || cpu >= smp_get_num_cpus())
+		return B_BAD_VALUE;
+
+	// We need to lock here to make sure that no one can disable
+	// the last CPU
+
+	state = disable_interrupts();
+	acquire_spinlock(&sSetCpuLock);
+
+	if (!enabled) {
+		// check if this is the last CPU to be disabled
+		for (i = 0, count = 0; i < smp_get_num_cpus(); i++) {
+			if (!gCPU[i].info.disabled)
+				count++;
+		}
+
+		if (count == 1)
+			status = B_NOT_ALLOWED;
+	}
+
+	if (status == B_OK)
+		gCPU[cpu].info.disabled = !enabled;
+
+	release_spinlock(&sSetCpuLock);
+	restore_interrupts(state);
+	return status;
 }
 

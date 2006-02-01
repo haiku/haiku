@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,8 @@
 // ToDo: maybe they should indeed do something...
 
 #include <SupportDefs.h>
+
+#include <syscalls.h>
 
 
 int _kset_mon_limit_(int num);
@@ -32,13 +34,13 @@ _kset_fd_limit_(int num)
 int
 _kget_cpu_state_(int cpuNum)
 {
-	return 1;
+	return _kern_cpu_enabled(cpuNum);
 }
 
 
 int
 _kset_cpu_state_(int cpuNum, int state)
 {
-	return state ? B_OK : B_ERROR;
+	return _kern_set_cpu_enabled(cpuNum, state != 0);
 }
 

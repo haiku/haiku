@@ -35,7 +35,7 @@ static int dump_run_queue(int argc, char **argv);
 static int _rand(void);
 
 // The run queue. Holds the threads ready to run ordered by priority.
-static struct thread_queue sRunQueue = {NULL, NULL};
+static struct thread *sRunQueue = NULL;
 
 
 static int
@@ -56,7 +56,7 @@ dump_run_queue(int argc, char **argv)
 {
 	struct thread *thread;
 
-	thread = sRunQueue.head;
+	thread = sRunQueue;
 	if (!thread)
 		dprintf("Run queue is empty!\n");
 	else {
@@ -79,20 +79,20 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 {
 	struct thread *curr, *prev;
 
-	for (curr = sRunQueue.head, prev = NULL; curr
+	for (curr = sRunQueue, prev = NULL; curr
 			&& curr->priority >= thread->next_priority;
 			curr = curr->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
-			prev = sRunQueue.head;
+			prev = sRunQueue;
 	}
 
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
 	else
-		sRunQueue.head = thread;
+		sRunQueue = thread;
 
 	thread->next_priority = thread->priority;
 }
@@ -108,11 +108,11 @@ scheduler_remove_from_run_queue(struct thread *thread)
 	struct thread *item, *prev;
 
 	// find thread in run queue
-	for (item = sRunQueue.head, prev = NULL; item && item != thread; item = item->queue_next) {
+	for (item = sRunQueue, prev = NULL; item && item != thread; item = item->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
-			prev = sRunQueue.head;
+			prev = sRunQueue;
 	}
 
 	ASSERT(item == thread);
@@ -120,7 +120,7 @@ scheduler_remove_from_run_queue(struct thread *thread)
 	if (prev)
 		prev->queue_next = item->queue_next;
 	else
-		sRunQueue.head = item->queue_next;
+		sRunQueue = item->queue_next;
 }
 
 
@@ -182,24 +182,33 @@ scheduler_reschedule(void)
 	}
 	oldThread->state = oldThread->next_state;
 
-	// select next thread from the run queue
-	nextThread = sRunQueue.head;
+	nextThread = sRunQueue;
 	prevThread = NULL;
-	while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
-		// always extract real time threads
-		if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-			break;
 
-		// never skip last non-idle normal thread
-		if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
-			break;
+	if (oldThread->cpu->info.disabled) {
+		// just select an idle thread
+		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+			prevThread = nextThread;
+			nextThread = nextThread->queue_next;
+		}
+	} else {
+		// select next thread from the run queue
+		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+			// always extract real time threads
+			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+				break;
+	
+			// never skip last non-idle normal thread
+			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
+				break;
 
-		// skip normal threads sometimes
-		if (_rand() > 0x3000)
-			break;
+			// skip normal threads sometimes
+			if (_rand() > 0x3000)
+				break;
 
-		prevThread = nextThread;
-		nextThread = nextThread->queue_next;
+			prevThread = nextThread;
+			nextThread = nextThread->queue_next;
+		}
 	}
 
 	if (!nextThread)
@@ -209,7 +218,7 @@ scheduler_reschedule(void)
 	if (prevThread)
 		prevThread->queue_next = nextThread->queue_next;
 	else
-		sRunQueue.head = nextThread->queue_next;
+		sRunQueue = nextThread->queue_next;
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;

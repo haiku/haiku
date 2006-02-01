@@ -1298,6 +1298,8 @@ thread_get_active_cpu_time(int32 cpuNum)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
+	// TODO: this is wrong - the idle threads are arbitrarly executed by the CPUs
+	//		there is no CPU affinity!
 	activeTime -= sIdleThreads[cpuNum]->kernel_time;
 
 	RELEASE_THREAD_LOCK();
@@ -1382,7 +1384,7 @@ thread_init(kernel_args *args)
 		if (i == 0)
 			arch_thread_set_current_thread(thread);
 
-		thread->cpu = &cpu[i];
+		thread->cpu = &gCPU[i];
 	}
 	sUsedThreads = args->num_cpus;
 

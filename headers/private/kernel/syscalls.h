@@ -300,6 +300,8 @@ extern area_id		_kern_register_messaging_service(sem_id lockingSem,
 extern status_t		_kern_unregister_messaging_service();
 
 extern void			_kern_clear_caches(void *address, size_t length, uint32 flags);
+extern bool			_kern_cpu_enabled(int32 cpu);
+extern status_t		_kern_set_cpu_enabled(int32 cpu, bool enabled);
 
 #ifdef __INTEL__
 // our only x86 only syscall
