@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 /*!
 	\file Resources.h
 	BResources interface declaration.
@@ -10,11 +10,9 @@
 #ifndef _RESOURCES_H
 #define _RESOURCES_H
 
+#include <Entry.h>
 #include <File.h>
-
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
+#include <image.h>
 
 namespace BPrivate {
 	namespace Storage {
@@ -29,17 +27,27 @@ namespace BPrivate {
 	
 	Provides an interface for accessing and manipulating resources.
 
-	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
+	\author Ingo Weinhold
 	
-	\version 0.0.0
+	\version 1.0.0
 */
 class BResources {
 public:
 	BResources();
 	BResources(const BFile *file, bool clobber = false);
+	BResources(const char *path, bool clobber = false);			// Haiku only
+	BResources(const entry_ref *ref, bool clobber = false);		// Haiku only
+
 	virtual ~BResources();
 
 	status_t SetTo(const BFile *file, bool clobber = false);
+	status_t SetTo(const char *path, bool clobber = false);		// Haiku only
+	status_t SetTo(const entry_ref *ref, bool clobber = false);	// Haiku only
+	
+	// Haiku only
+	status_t SetToImage(image_id image, bool clobber = false);
+	status_t SetToImage(const void *codeOrDataPointer, bool clobber = false);
+
 	void Unset();
 	status_t InitCheck() const;
 
@@ -108,11 +116,4 @@ private:
 	uint32							_reserved[3];	// FBC
 };
 
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
-
 #endif	// _RESOURCES_H
-
-

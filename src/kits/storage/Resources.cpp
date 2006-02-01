@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * All Rights Reserved. Distributed under the terms of the MIT License.
+ */
 /*!
 	\file Resources.cpp
 	BResources implementation.
@@ -56,7 +56,7 @@ BResources::BResources()
 	The BResources object makes a copy of \a file, that is the caller remains
 	owner of the BFile object.
 	\param file the file
-	\param clobber if \c true, the \a file is truncated to size 0
+	\param clobber if \c true, the file's resources are truncated to size 0
 */
 BResources::BResources(const BFile *file, bool clobber)
 		  : fFile(),
@@ -66,6 +66,38 @@ BResources::BResources(const BFile *file, bool clobber)
 {
 	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(file, clobber);
+}
+
+// constructor
+/*!	\brief Creates a BResources object that represents the resources of the
+	supplied file.
+	If the \a clobber argument is \c true, the data of the file are erased
+	and it is turned into an empty resource file. Otherwise \a path
+	must refer either to a resource file or to an executable (ELF or PEF
+	binary).
+	\param path a path referring to the file
+	\param clobber if \c true, the file's resources are truncated to size 0
+*/
+BResources::BResources(const char *path, bool clobber)
+{
+	fContainer = new(nothrow) ResourcesContainer;
+	SetTo(path, clobber);
+}
+
+// constructor
+/*!	\brief Creates a BResources object that represents the resources of the
+	supplied file.
+	If the \a clobber argument is \c true, the data of the file are erased
+	and it is turned into an empty resource file. Otherwise \a ref
+	must refer either to a resource file or to an executable (ELF or PEF
+	binary).
+	\param ref an entry_ref referring to the file
+	\param clobber if \c true, the file's resources are truncated to size 0
+*/
+BResources::BResources(const entry_ref *ref, bool clobber)
+{
+	fContainer = new(nothrow) ResourcesContainer;
+	SetTo(ref, clobber);
 }
 
 // destructor
@@ -93,7 +125,7 @@ BResources::~BResources()
 	The BResources object makes a copy of \a file, that is the caller remains
 	owner of the BFile object.
 	\param file the file
-	\param clobber if \c true, the \a file is truncated to size 0
+	\param clobber if \c true, the file's resources are truncated to size 0
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL or uninitialized \a file.
@@ -132,6 +164,139 @@ BResources::SetTo(const BFile *file, bool clobber)
 			fContainer->MakeEmpty();
 	}
 	return error;
+}
+
+// SetTo
+/*!	\brief Re-initialized the BResources object to represent the resources of
+	the supplied file.
+	What happens, if \a clobber is \c true, depends on the type of the file.
+	If the file is capable of containing resources, that is, is a resource
+	file or an executable (ELF or PEF), its resources are removed. Otherwise
+	the file's data are erased and it is turned into an empty resource file.
+	If \a clobber is \c false, \a path must refer to a file that is capable
+	of containing resources.
+	\param path a path referring to the file
+	\param clobber if \c true, the file's resources are truncated to size 0
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a path.
+	- \c B_ENTRY_NOT_FOUND: The file couldn't be found.
+	- \c B_ERROR: Failed to initialize the object (for whatever reason).
+*/
+status_t
+BResources::SetTo(const char *path, bool clobber)
+{
+	if (!path)
+		return B_BAD_VALUE;
+
+	// open file
+	BFile file;
+	status_t error = file.SetTo(path, B_READ_WRITE);
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+
+	// delegate the actual work
+	return SetTo(&file, clobber);
+}
+
+// SetTo
+/*!	\brief Re-initialized the BResources object to represent the resources of
+	the supplied file.
+	What happens, if \a clobber is \c true, depends on the type of the file.
+	If the file is capable of containing resources, that is, is a resource
+	file or an executable (ELF or PEF), its resources are removed. Otherwise
+	the file's data are erased and it is turned into an empty resource file.
+	If \a clobber is \c false, \a ref must refer to a file that is capable
+	of containing resources.
+	\param ref an entry_ref referring to the file
+	\param clobber if \c true, the file's resources are truncated to size 0
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref.
+	- \c B_ENTRY_NOT_FOUND: The file couldn't be found.
+	- \c B_ERROR: Failed to initialize the object (for whatever reason).
+*/
+status_t
+BResources::SetTo(const entry_ref *ref, bool clobber)
+{
+	if (!ref)
+		return B_BAD_VALUE;
+
+	// open file
+	BFile file;
+	status_t error = file.SetTo(ref, B_READ_WRITE);
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+
+	// delegate the actual work
+	return SetTo(&file, clobber);
+}
+	
+// SetToImage
+/*!	\brief Re-initialized the BResources object to represent the resources of
+	the file from which the specified image has been loaded.
+	If \a clobber is \c true, the file's resources are removed.
+	\param image ID of a loaded image
+	\param clobber if \c true, the file's resources are truncated to size 0
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: The file couldn't be found.
+	- \c B_ERROR: Failed to initialize the object (for whatever reason).
+*/
+status_t
+BResources::SetToImage(image_id image, bool clobber)
+{
+	// get an image info
+	image_info info;
+	status_t error = get_image_info(image, &info);
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+
+	// delegate the actual work
+	return SetTo(info.name, clobber);
+}
+	
+/*!	\brief Re-initialized the BResources object to represent the resources of
+	the file from which the specified image has been loaded.
+	The image belongs to the current team and is identified by a pointer into
+	it's code (aka text) or data segment, i.e. any pointer to a function or a
+	static (or global) variable will do.
+	If \a clobber is \c true, the file's resources are removed.
+	\param codeOrDataPointer pointer into the text or data segment of the image
+	\param clobber if \c true, the file's resources are truncated to size 0
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref.
+	- \c B_ENTRY_NOT_FOUND: The image or the file couldn't be found.
+	- \c B_ERROR: Failed to initialize the object (for whatever reason).
+*/
+status_t
+BResources::SetToImage(const void *codeOrDataPointer, bool clobber)
+{
+	if (!codeOrDataPointer)
+		return B_BAD_VALUE;
+
+	// iterate through the images and find the one in question
+	addr_t address = (addr_t)codeOrDataPointer;
+	image_info info;
+	int32 cookie = 0;
+
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		if ((addr_t)info.text <= address
+				&& address - (addr_t)info.text < (addr_t)info.text_size
+			|| (addr_t)info.data <= address
+				&& address - (addr_t)info.data < (addr_t)info.data_size) {
+			return SetTo(info.name, clobber);
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 // Unset
