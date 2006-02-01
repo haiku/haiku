@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps soundrecorder ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 Application SoundRecorder :
 	DrawButton.cpp
 	DrawingTidbits.cpp
@@ -19,8 +21,3 @@ Application SoundRecorder :
 	: SoundRecorder.rdef
 ;
 
-if $(TARGET_PLATFORM) = haiku {
-	LinkAgainst SoundRecorder : libbe.so libmedia.so libtracker.so ;
-} else {
-	LinkAgainst SoundRecorder : be media tracker ;
-}
