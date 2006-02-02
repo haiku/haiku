@@ -251,7 +251,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 # init library name map
 {
 	local i ;
-	for i in be game mail media midi midi2 net netapi opengl screensaver root z
+	for i in be game mail media midi midi2 network netapi opengl screensaver root z
 			textencoding tracker translation {
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
@@ -476,14 +476,18 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 # TODO: Fix the naming!
-if $(TARGET_PLATFORM_BONE_COMPATIBLE) {
-	NETWORK_LIBS = libsocket.so libbind.so ;
-	NETAPI_LIB = libbnetapi.so ;
+if $(TARGET_PLATFORM) = haiku {
+	NETWORK_LIBS = network ;
+	SELECT_UNAME_ETC_LIB = root ;
+	NETAPI_LIB = netapi ;
+} else if $(TARGET_PLATFORM_BONE_COMPATIBLE) {
+	NETWORK_LIBS = socket bind ;
+	NETAPI_LIB = bnetapi ;
 	SELECT_UNAME_ETC_LIB = root ;
 } else {
-	NETWORK_LIBS = libnet.so ;
-	NETAPI_LIB = libnetapi.so ;
-	SELECT_UNAME_ETC_LIB = libnet.so ;
+	NETWORK_LIBS = net ;
+	NETAPI_LIB = netapi ;
+	SELECT_UNAME_ETC_LIB = net ;
 }
 
 # TODO: For compatibility only. Remove when no longer used.
