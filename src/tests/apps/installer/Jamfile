@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src tests apps installer ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps installer ] ;
+
+Application TestInstaller : 
+	CopyEngine.cpp
+	DrawButton.cpp
+	InstallerApp.cpp
+	InstallerWindow.cpp
+	PackageViews.cpp
+	PartitionMenuItem.cpp
+	: be tracker translation
+	: Installer.rdef ;
+
+SEARCH on [ FGristFiles
+	DrawButton.cpp
+        InstallerApp.cpp
+	InstallerWindow.cpp
+        PackageViews.cpp
+        PartitionMenuItem.cpp
+	Installer.rdef
+        ] = [ FDirName $(HAIKU_TOP) src apps installer ] ;
