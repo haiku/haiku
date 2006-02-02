@@ -51,7 +51,7 @@ rule PCIHeaderGen
 
 actions PCIHeaderGen1
 {
-	awk -f $(2[2]) $(2[1]) > $(1)
+	awk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
 PCIHeaderGen [ FGristFiles pcihdr.h ] : pci.ids : pci-clean.awk ;
