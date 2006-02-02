@@ -155,7 +155,7 @@ PackageCheckBox::Draw(BRect update)
 void
 PackageCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
-	printf("coucouc\n");
+	printf("%s called\n", __PRETTY_FUNCTION__);
 	if (transit == B_ENTERED_VIEW) {
 		BMessage msg(STATUS_MESSAGE);
 		msg.AddString("status", fPackage->Description());

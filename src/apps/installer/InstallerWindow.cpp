@@ -64,7 +64,9 @@ LogoView::Draw(BRect update)
 
 InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-	fDriveSetupLaunched(false)	
+	fDriveSetupLaunched(false),
+	fLastSrcItem(NULL),
+	fLastTargetItem(NULL)
 {
 	fCopyEngine = new CopyEngine(this);
 	
@@ -179,10 +181,16 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			ShowBottom();
 			break;
 		case SRC_PARTITION:
+			if (fLastSrcItem == fSrcMenu->FindMarked())
+				break;
+			fLastSrcItem = fSrcMenu->FindMarked();
 			PublishPackages();
 			AdjustMenus();
 			break;
 		case TARGET_PARTITION:
+			if (fLastTargetItem == fDestMenu->FindMarked())
+				break;
+			fLastTargetItem = fDestMenu->FindMarked();
 			AdjustMenus();
 			break;
 		case SETUP_MESSAGE:
@@ -341,6 +349,7 @@ InstallerWindow::PublishPackages()
 	if (!item)
 		return;
 
+#ifdef __HAIKU__
 	BPath directory;
 	BDiskDeviceRoster roster;
 	BDiskDevice device;
@@ -353,6 +362,9 @@ InstallerWindow::PublishPackages()
 			return;
 	} else 
 		return; // shouldn't happen
+#else
+	BPath directory = "/BeOS 5 PE Max Edition V3.1 beta";
+#endif
 	
 	directory.Append(PACKAGES_DIRECTORY);
 	BDirectory dir(directory.Path());

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps installer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
@@ -16,5 +14,5 @@ Application Installer :
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
-	: libbe.so libtracker.so libtranslation.so
+	: be tracker translation
 	: Installer.rdef ;

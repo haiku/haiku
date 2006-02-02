@@ -11,6 +11,7 @@
 #include <Menu.h>
 #include <MenuField.h>
 #include <ScrollView.h>
+#include <String.h>
 #include <TextView.h>
 #include <Window.h>
 #include "CopyEngine.h"
@@ -56,6 +57,7 @@ private:
 	BPoint fDrawPoint;
 	CopyEngine *fCopyEngine;
 	BString fLastStatus;
+	BMenuItem *fLastSrcItem, *fLastTargetItem;
 };
 
 #endif /* _InstallerWindow_h */
