@@ -1191,7 +1191,8 @@ status_t nv_acc_init_dma()
 	 * engine crash! Drawing a small rectangle (Z-only) containing rubbish. */
 	/* note:
 	 * 3D only works on pre-NV20 currently... */
-	if (si->ps.card_arch < NV20A)
+	//fixme: looks like this is not needed anymore since the 'dangerous RAM' patch!
+	if (0)//si->ps.card_arch < NV20A)
 	{
 		/* wait for room in fifo for 3D 'workaround' cmd if needed */
 		if (nv_acc_fifofree_dma(50) != B_OK) return B_ERROR;
