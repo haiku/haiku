@@ -2673,6 +2673,21 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 	for (int32 i = 0; i < array->count; i++) {
 		run_array->runs[i].offset = array->styles[i].offset;
 
+		// TODO: Here we are leaking memory.
+		// We should use placement new instead
+		// new (&run_array->runs[i].font) BFont();
+		// The reason we're calling the constructor explicitly is
+		// that the text_run_array() is allocated with malloc. It can't
+		// be allocated with new due to its nature: see its definition
+		// on the top of TextView.h
+
+		// Note that BFont doesn't have a destructor.
+		// If it had one, our whole RunArray()/SetRunArray() api
+		// would have to be changed, as it doesn't fit with the fact
+		// that we'd have to call the BFont's destructor. Or, as Waldemar
+		// suggested, we'd have to provide a "free_text_run_array()" method
+		// which would take care of calling the destructors.
+			
 		run_array->runs[i].font = new BFont;
 		run_array->runs[i].font.SetFamilyAndStyle(array->styles[i].family,
 			array->styles[i].style);
