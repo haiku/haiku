@@ -323,8 +323,11 @@ BSlider::AttachedToWindow()
 
 	BControl::AttachedToWindow();
 
-	if (view && Parent()) {
-		rgb_color color = Parent()->ViewColor();
+	if (view) {
+		
+		rgb_color color = ViewColor();
+		if (Parent() != NULL)
+			color = Parent()->ViewColor();
 
 /*		fOffScreenBits->Lock();
 		fOffScreenView->SetViewColor(color);
