@@ -366,7 +366,7 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		return B_ERROR;
 
 	// Update the frame buffer used by the on-screen KDL
-#ifdef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	uint32 depth = (fFrameBufferConfig.bytes_per_row / fDisplayMode.virtual_width) << 3;
 	if (fDisplayMode.space == B_RGB15)
 		depth = 15;
