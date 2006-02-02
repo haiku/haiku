@@ -232,10 +232,12 @@ BChannelSlider::Draw(BRect updateRect)
 	UpdateFontDimens();
 	DrawThumbs();
 	
-	BRect bounds(Bounds());
-	float labelWidth = StringWidth(Label());
+	if (Label()) {
+		BRect bounds(Bounds());
+		float labelWidth = StringWidth(Label());
 	
-	DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2, fBaseLine));
+		DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2, fBaseLine));
+	}
 }
 
 
@@ -398,7 +400,7 @@ BChannelSlider::SetEnabled(bool on)
 void
 BChannelSlider::GetPreferredSize(float *width, float *height)
 {
-	// TODO: Implement
+	BChannelControl::GetPreferredSize(width, height);
 }
 
 
