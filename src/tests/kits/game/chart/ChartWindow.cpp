@@ -51,12 +51,12 @@ enum {
    set the various UI elements. */
 enum {
 	TOP_LEFT_LIMIT	= 26,
-	H_BORDER		= 8,
+	H_BORDER		= 5,
 	V_BORDER		= 2,
 	ANIM_LABEL		= 52,
-	ANIM_POPUP		= 85,
+	ANIM_POPUP		= 42,
 	DISP_LABEL		= 40,
-	DISP_POPUP		= 88,
+	DISP_POPUP		= 42,
 	BUTTON_WIDTH	= 50,
 	BUTTON_OFFSET	= -100,
 	SPACE_LABEL		= 40,
@@ -402,7 +402,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	max_height = WINDOW_V_STD - TOP_LEFT_LIMIT;
 
 	/* initialise the default setting state */
-	for (int32 i=0; i<7; i++)
+	for (int32 i = 0; i < 7; i++)
 		fCurrentSettings.colors[i] = false;
 	fCurrentSettings.colors[1] = true;
 	fCurrentSettings.colors[2] = true;
@@ -486,7 +486,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	fTopView->SetViewColor(background_color);
 	AddChild(fTopView);
 
-	h = H_BORDER;
+	h = 2;
 	v = V_BORDER;
 
 		/* instant load vue-meter */	
@@ -495,7 +495,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		fTopView->AddChild(fInstantLoad);
 		fInstantLoad->SetViewColor(0.0, 0.0, 0.0);
 
-	h += INSTANT_LOAD+2*H_BORDER;
+	h += INSTANT_LOAD+H_BORDER;
 
 		/* camera animation popup */
 		menu = new BPopUpMenu("Off");
@@ -524,7 +524,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += ANIM_LABEL+ANIM_POPUP+H_BORDER;
+	h += ANIM_LABEL + ANIM_POPUP + popup->StringWidth("Slow rotation");
 
 		/* display mode popup */
 		menu = new BPopUpMenu("Off");
@@ -552,7 +552,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += DISP_LABEL+DISP_POPUP+H_BORDER;
+	h += DISP_LABEL + DISP_POPUP + popup->StringWidth("DirectWindow") + H_BORDER;
 
 		/* create the offwindow (invisible) button on the left side.
 		   this will be used to record the content of the Picture
