@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-2/2005 */
+/* Written by Rudolf Cornelissen 05/2002-2/2006 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -205,27 +205,12 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
 
 		adress = (((uint32)((uint8*)si->framebuffer)) + si->ps.memory_size);
-		/* don't touch the DMA acceleration engine command buffer if it exists */
-		/* note:
-		 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
-		if (si->settings.dma_acc)
-		{
-			if (si->ps.card_arch < NV40A)
-			{
-				/* keeping 32kB distance from the DMA buffer */
-				adress -= (64 * 1024);
-			}
-			else
-			{
-				/* 416kB distance is just OK: keeping another 64kB distance for safety;
-				 * confirmed for NV43. */
-				/* note:
-				 * if you get too close to the DMA command buffer on NV40 and NV43 at
-				 * least (both confirmed), the source DMA instance will mess-up for
-				 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
-				adress -= (512 * 1024);
-			}
-		}
+		/* Keep some extra distance as a workaround for certain bugs (see
+		 * DriverInterface.h for an explanation). */
+		if (si->ps.card_arch < NV40A)
+			adress -= PRE_NV40_OFFSET;
+		else
+			adress -= NV40_PLUS_OFFSET;
 
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
@@ -311,27 +296,12 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* calculate physical memory adress (for dma use) */
 		adress = (((uint32)((uint8*)si->framebuffer_pci)) + si->ps.memory_size);
-		/* don't touch the DMA acceleration engine command buffer if it exists */
-		/* note:
-		 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
-		if (si->settings.dma_acc)
-		{
-			if (si->ps.card_arch < NV40A)
-			{
-				/* keeping 32kB distance from the DMA buffer */
-				adress -= (64 * 1024);
-			}
-			else
-			{
-				/* 416kB distance is just OK: keeping another 64kB distance for safety;
-				 * confirmed for NV43. */
-				/* note:
-				 * if you get too close to the DMA command buffer on NV40 and NV43 at
-				 * least (both confirmed), the source DMA instance will mess-up for
-				 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
-				adress -= (512 * 1024);
-			}
-		}
+		/* Keep some extra distance as a workaround for certain bugs (see
+		 * DriverInterface.h for an explanation). */
+		if (si->ps.card_arch < NV40A)
+			adress -= PRE_NV40_OFFSET;
+		else
+			adress -= NV40_PLUS_OFFSET;
 
 		for (cnt = 0; cnt <= offset; cnt++)
 		{

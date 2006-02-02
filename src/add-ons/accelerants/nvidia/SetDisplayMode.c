@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-11/2005
+	Rudolf Cornelissen 11/2002-2/2006
 */
 
 #define MODULE_BIT 0x00200000
@@ -326,27 +326,13 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	//if overlay buffers are allocated subtract buffersize from mem_high;
 	//only allocate overlay buffers if 3D is not in use. (block overlay during 3D)
 	si->engine.threeD.mem_high = si->ps.memory_size - 1;
-	/* don't touch the DMA acceleration engine command buffer if it exists */
-	/* note:
-	 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
-	if (si->settings.dma_acc)
-	{
-		if (si->ps.card_arch < NV40A)
-		{
-			/* keeping 32kB distance from the DMA buffer */
-			si->engine.threeD.mem_high -= (64 * 1024);
-		}
-		else
-		{
-			/* 416kB distance is just OK: keeping another 64kB distance for safety;
-			 * confirmed for NV43. */
-			/* note:
-			 * if you get too close to the DMA command buffer on NV40 and NV43 at
-			 * least (both confirmed), the source DMA instance will mess-up for
-			 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
-			si->engine.threeD.mem_high -= (512 * 1024);
-		}
-	}
+	/* Keep some extra distance as a workaround for certain bugs (see
+	 * DriverInterface.h for an explanation). */
+	if (si->ps.card_arch < NV40A)
+		si->engine.threeD.mem_high -= PRE_NV40_OFFSET;
+	else
+		si->engine.threeD.mem_high -= NV40_PLUS_OFFSET;
+
 	si->engine.threeD.mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
 
 	/* restore screen(s) output state(s) */

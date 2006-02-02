@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-01/2006
+   Rudolf Cornelissen 10/2002-2/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.70 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.71 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)

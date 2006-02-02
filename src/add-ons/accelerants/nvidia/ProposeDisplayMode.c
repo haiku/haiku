@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-11/2005
+	Rudolf Cornelissen 9/2002-2/2006
 */
 
 #define MODULE_BIT 0x00400000
@@ -377,27 +377,12 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	mem_reservation = 0;
 	/* checkout space needed for hardcursor (if any) */
 	if (si->settings.hardcursor) mem_reservation = 2048;
-	/* reserve space for DMA acceleration engine command buffer (if active) */
-	/* note:
-	 * the buffer is 32kB in size. Keep some extra distance for safety (faulty apps). */
-	if (si->settings.dma_acc)
-	{
-		if (si->ps.card_arch < NV40A)
-		{
-			/* keeping 32kB distance from the DMA buffer */
-			mem_reservation += (64 * 1024);
-		}
-		else
-		{
-			/* 416kB distance is just OK: keeping another 64kB distance for safety;
-			 * confirmed for NV43. */
-			/* note:
-			 * if you get too close to the DMA command buffer on NV40 and NV43 at
-			 * least (both confirmed), the source DMA instance will mess-up for
-			 * at least engine cmd NV_IMAGE_BLIT and NV12_IMAGE_BLIT. */
-			mem_reservation += (512 * 1024);
-		}
-	}
+	/* Reserve extra space as a workaround for certain bugs (see DriverInterface.h
+	 * for an explanation). */
+	if (si->ps.card_arch < NV40A)
+		mem_reservation += PRE_NV40_OFFSET;
+	else
+		mem_reservation += NV40_PLUS_OFFSET;
 
 	/* memory requirement for frame buffer */
 	if ((row_bytes * target->virtual_height) >

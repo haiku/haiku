@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-1/2006.
+   Rudolf Cornelissen 8/2003-2/2006.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -12,12 +12,9 @@
 
 /* 3D command defines (needed for concurrent overlay/3D 'workaround')
  * note:
- * the workaround contains of two pieces:
+ * the workaround is:
  * - we have to issue a 3D drawing command before overlay is activated to prevent
  *   the acceleration engine to crash;
- * - we have to forego FIFO assignment switching: switching while we use overlay
- *   crashes the acceleration engine as well. (broken since adding
- *   NV_SCALED_IMAGE_FROM_MEMORY...)
  *
  * Hopefully we can find the _real_ solution for this one day... */
 #define RIVA_STATE3D_05(t0, t1, t2, bb, cc) \
@@ -1056,10 +1053,6 @@ status_t nv_acc_init_dma()
 	si->engine.fifo.handle[3] = NV4_SURFACE; /* NV10_CONTEXT_SURFACES_2D is identical */
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 	si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
-//fixme: nolonger switching FIFO assignment for 3D as doing that causes trouble when
-//overlay is concurrently active!!!!
-//we can forego switching for now as we had FIFO CH6 still unused...
-//(note btw: switching has no noticable slowdown: measured 0.2% with Quake2)
 	si->engine.fifo.handle[6] = NV4_CONTEXT_SURFACES_ARGB_ZS;//NV1_RENDER_SOLID_LIN;
 	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
 	/* preset no FIFO channels assigned to cmd's */
@@ -1654,9 +1647,9 @@ static void nv_acc_set_ch_dma(uint16 ch, uint32 handle)
 	si->engine.dma.free -= 2;
 }
 
-//fixme:
-//adding NV_SCALED_IMAGE_FROM_MEMORY here forces fifo channel assignment switching
-//when 3D is also used: the 3D/overlay compatibility tweak is now broken again...
+/* note:
+ * switching fifo channel assignments this way has no noticable slowdown:
+ * measured 0.2% with Quake2. */
 void nv_acc_assert_fifo_dma(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
