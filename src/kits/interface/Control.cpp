@@ -270,13 +270,18 @@ BControl::DetachedFromWindow()
 
 
 void
-BControl::SetLabel(const char *string)
+BControl::SetLabel(const char *label)
 {
-	if (fLabel && string && strcmp(fLabel, string) == 0)
+	if (label != NULL && !label[0])
+		label = NULL;
+
+	// Has the label been changed?
+	if ((fLabel && label && !strcmp(fLabel, label))
+		|| ((fLabel == NULL || !fLabel[0]) && label == NULL))
 		return;
 
 	free(fLabel);
-	fLabel = strdup(string ? string : B_EMPTY_STRING);
+	fLabel = label ? strdup(label) : NULL;
 
 	Invalidate();
 }
