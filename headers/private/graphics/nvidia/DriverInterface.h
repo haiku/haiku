@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-1/2006.
+	Rudolf Cornelissen 10/2002-2/2006.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -100,6 +100,38 @@ enum {
 
 /* max. number of overlay buffers */
 #define MAXBUFFERS 3
+
+//-----------------------------------------------------------------------------------
+/* safety byte-offset from end of cardRAM for preventing acceleration engine crashes
+ * caused by the existance of DMA engine command buffers in cardRAM and/or fifo
+ * channel engine command re-assigning on-the-fly */
+
+/* pre-NV40 notes:
+ * - we need at least 70kB distance from the end of RAM for fifo-reassigning 'bug'
+ *   (confirmed on a TNT1);
+ * - keep extra failsafe room to prevent malfunctioning apps from crashing engine. */
+#define PRE_NV40_OFFSET		80 * 1024
+
+/* NV40 and higher notes:
+ * - we need at least 416kB distance from the DMA command buffer:
+ *   If you get too close to the DMA command buffer on NV40 and NV43 at least (both
+ *   confirmed), the source DMA instance will mess-up for at least engine command
+ *   NV_IMAGE_BLIT and NV12_IMAGE_BLIT; 
+ * - we need at least ???kB distance from the end of RAM for fifo-reassigning 'bug'
+ *   (fixme: unknown yet because fifo assignment switching isn't used here atm);
+ * - keep extra failsafe room to prevent malfunctioning apps from crashing engine. */
+#define NV40_PLUS_OFFSET	512 * 1024
+
+/* fifo re-assigning bug definition:
+ * if the fifo assignment is changed while at the same time card memory in the
+ * dangerous region is being accessed by some application, the engine will crash.
+ * This bug applies for both PIO and DMA mode acceleration! */
+
+/* source-DMA instance bug definition:
+ * if card memory in the dangerous region is being accessed by some application while
+ * a DMA command buffer exists in the same memory (though in a different place),
+ * the engine will crash. */
+//-----------------------------------------------------------------------------------
 
 /* internal used info on overlay buffers */
 typedef	struct {
