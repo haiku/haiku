@@ -151,6 +151,10 @@ BStringView::ResizeToPreferred()
 	float width, height;
 	GetPreferredSize(&width, &height);
 
+	// Resize the width only for B_ALIGN_LEFT (if its large enough already, that is)
+	if (Bounds().Width() > width && Alignment() != B_ALIGN_LEFT)
+		width = Bounds().Width();
+
 	BView::ResizeTo(width, height);
 }
 
