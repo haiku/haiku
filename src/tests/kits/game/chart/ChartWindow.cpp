@@ -10,27 +10,28 @@
 
 #include "ChartWindow.h"
 
-#include <Box.h>
-#include <Menu.h>
-#include <PopUpMenu.h>
-#include <File.h>
-#include <Path.h>
-#include <Entry.h>
-#include <Button.h>
-#include <Slider.h>
-#include <MenuItem.h>
-#include <CheckBox.h>
-#include <Directory.h>
-#include <PlaySound.h>
-#include <MenuField.h>
-#include <TextControl.h>
-#include <RadioButton.h>
 #include <AppFileInfo.h>
 #include <Application.h>
-#include <FindDirectory.h>
 #include <Bitmap.h>
-#include <Screen.h>
+#include <Box.h>
+#include <Button.h>
 #include <ByteOrder.h>
+#include <CheckBox.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <Path.h>
+#include <PlaySound.h>
+#include <PopUpMenu.h>
+#include <RadioButton.h>
+#include <Screen.h>
+#include <Slider.h>
+#include <TextControl.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -43,6 +44,8 @@ enum {
 	CRC_START		= 0x29dec231,
 	CRC_KEY			= 0x1789feb3
 };
+
+#define	MAX_FONT_SIZE	12.0f
 
 /* various offse, width, height and position used to align and
    set the various UI elements. */
@@ -59,7 +62,7 @@ enum {
 	SPACE_LABEL		= 40,
 	SPACE_POPUP		= 53,
 	INSTANT_LOAD	= 205,
-	LEFT_WIDTH		= 72,
+	LEFT_WIDTH		= 90,
 	LEFT_OFFSET		= 2,
 	STATUS_BOX		= 96,
 	STATUS_LABEL	= 12,
@@ -70,11 +73,11 @@ enum {
 	FULL_SCREEN		= 16,
 	AUTO_DEMO		= 22,
 	SECOND_THREAD	= 16,
-	COLORS_BOX		= 145,
+	COLORS_BOX		= 146,
 	COLORS_LABEL	= 16,
 	COLORS_OFFSET	= 2,
 	COLOR_CELL		= 8,
-	SPECIAL_BOX		= 90,
+	SPECIAL_BOX		= 92,
 	SPECIAL_LABEL	= 16,
 	SPECIAL_OFFSET	= 2,
 	STAR_DENSITY_H	= 160,
@@ -163,15 +166,13 @@ static int32 light_gradient[8] = {
 };
 
 
+//	#pragma mark helper classes
 
-/*****************************************************
-**													**
-**		Implementation of various helper classes	**
-**													**
-*****************************************************/
 
 /* multiply a vector by a constant */
-TPoint TPoint::operator* (const float k) const {
+TPoint
+TPoint::operator* (const float k) const
+{
 	TPoint v;
 
 	v.x = x*k;
@@ -181,7 +182,9 @@ TPoint TPoint::operator* (const float k) const {
 }
 
 /* substract 2 vectors */
-TPoint TPoint::operator- (const TPoint& v2) const {
+TPoint
+TPoint::operator- (const TPoint& v2) const
+{
 	TPoint v;
 
 	v.x = x-v2.x;
@@ -201,7 +204,9 @@ TPoint TPoint::operator+ (const TPoint& v2) const {
 }
 
 /* vectorial product of 2 vectors */
-TPoint TPoint::operator^ (const TPoint& v2) const {
+TPoint
+TPoint::operator^ (const TPoint& v2) const
+{
 	TPoint v;
 
 	v.x = y*v2.z - z*v2.y;
@@ -211,13 +216,17 @@ TPoint TPoint::operator^ (const TPoint& v2) const {
 }
 
 /* length of a vector */
-float TPoint::Length() const {
+float
+TPoint::Length() const
+{
 	return sqrt(x*x + y*y + z*z);
 }
 
 /* product of a vector by a matrix */
-TPoint TMatrix::operator* (const TPoint& v) const {
-	TPoint    res;
+TPoint
+TMatrix::operator* (const TPoint& v) const
+{
+	TPoint res;
 
 	res.x = m[0][0]*v.x + m[1][0]*v.y + m[2][0]*v.z;
 	res.y = m[0][1]*v.x + m[1][1]*v.y + m[2][1]*v.z;
@@ -226,10 +235,11 @@ TPoint TMatrix::operator* (const TPoint& v) const {
 }
 
 /* extract the Nth vector/column of a matrix. */
-TPoint TMatrix::Axis(int32 index)
+TPoint
+TMatrix::Axis(int32 index)
 {
-	TPoint		v;
-	
+	TPoint v;
+
 	v.x = m[index][0];
 	v.y = m[index][1];
 	v.z = m[index][2];
@@ -238,9 +248,11 @@ TPoint TMatrix::Axis(int32 index)
 
 /* as we use rotation matrix, the invert of the matrix
    is equal to the transpose */
-TMatrix TMatrix::Transpose() const {
-	TMatrix		inv;
-	
+TMatrix
+TMatrix::Transpose() const
+{
+	TMatrix inv;
+
 	inv.m[0][0] = m[0][0];
 	inv.m[0][1] = m[1][0];
 	inv.m[0][2] = m[2][0];
@@ -254,9 +266,11 @@ TMatrix TMatrix::Transpose() const {
 }
 
 /* set a spherical rotation matrix */
-void TMatrix::Set(const float alpha, const float theta, const float phi) {
-	float		cD,sD,cI,sI,cA,sA;
-	
+void
+TMatrix::Set(const float alpha, const float theta, const float phi)
+{
+	float cD,sD,cI,sI,cA,sA;
+
 	/* trigonometry */
 	cD = cos(alpha);
 	sD = sin(alpha);
@@ -264,7 +278,7 @@ void TMatrix::Set(const float alpha, const float theta, const float phi) {
 	sI = sin(theta);
 	cA = cos(phi);
 	sA = sin(phi);
-	
+
 	/* rotation matrix */
 	m[0][0] = cD*cA+sD*sI*sA;
 	m[1][0] = -sA*cI;
@@ -277,25 +291,16 @@ void TMatrix::Set(const float alpha, const float theta, const float phi) {
 	m[2][2] = cD*cI;
 }
 
-/* copy a setting into another */
-void ChartWindow::setting::Set(setting *master)
-{
-	memcpy(this, master, sizeof(setting));
-}
 
+//	#pragma mark -
 
-
-
-/*****************************************************
-**													**
-**			A couple global functions...			**
-**													**
-*****************************************************/
 
 /* this function will play a wav sound file, with the specified
    following name, in the application folder. This is activated
    when you press the button "Auto demo". */
-void LaunchSound() {
+void
+LaunchSound()
+{
 /*	
 	BEntry			soundFile;
 	app_info 		info;
@@ -319,9 +324,10 @@ void LaunchSound() {
 
 /* return the version_info of a file, described by its name
    and its generic folder (in find_directory syntax). */
-status_t get_file_version_info(	directory_which	dir,
-								char			*filename,
-								version_info	*info) {
+status_t
+get_file_version_info(directory_which dir,
+	char *filename, version_info *info)
+{
 	BPath 			path;
 	BFile			file;
 	status_t		res;
@@ -344,50 +350,52 @@ status_t get_file_version_info(	directory_which	dir,
 }
 
 
+//	#pragma mark -
 
-
-/*****************************************************
-**													**
-**		Standard constructor and destructor.		**
-**													**
-*****************************************************/
 
 ChartWindow::ChartWindow(BRect frame, const char *name)
-: BDirectWindow(frame, name, B_TITLED_WINDOW, 0)
+	: BDirectWindow(frame, name, B_TITLED_WINDOW, 0)
 {
-	float			h, v, h2, v2;
-	int32			colors[3];
-	BRect			r;
-	BMenu			*menu;
-	BButton			*button;
-	BCheckBox		*check_box, *full_screen;
-	BMenuItem		*item;
-	BMenuField		*popup;
-	BStringView		*string;
-	BRadioButton	*radio;
-	
+	float h, v, h2, v2;
+	int32 colors[3];
+	BRect r;
+	BMenu *menu;
+	BButton *button;
+	BCheckBox *check_box, *full_screen;
+	BMenuItem *item;
+	BMenuField *popup;
+	BStringView *string;
+	BRadioButton *radio;
+
+	// we're not font-sensitive, so we make sure we don't look too ugly
+	BFont font;
+	if (font.Size() > MAX_FONT_SIZE)
+		font.SetSize(MAX_FONT_SIZE);
+	BFont boldFont(be_bold_font);
+	if (boldFont.Size() > MAX_FONT_SIZE)
+		boldFont.SetSize(MAX_FONT_SIZE);
+
 	/* Check to see if we need the work-around for the case where
 	   DirectConnected is called back with B_BUFFER_RESET not set
 	   properly. This happens only with version 1.3.0 of the
 	   app_server. */
 	need_r3_buffer_reset_work_around = false;
-	
+
 	version_info vi;
 	if (get_file_version_info(B_BEOS_SERVERS_DIRECTORY, "app_server", &vi) == B_NO_ERROR
 		&& (vi.major == 1) && (vi.middle == 3) && (vi.minor == 0))
 			need_r3_buffer_reset_work_around = true;
-
 	
 	/* offset the content area frame in window relative coordinate */
 	frame.OffsetTo(0.0, 0.0);
-	
+
 	/* init the pattern anti-aliasing tables. */
 	InitPatterns();
 
 	/* set window size limits */
 	SetSizeLimits(WINDOW_H_MIN, WINDOW_H_MAX, WINDOW_V_MIN, WINDOW_V_MAX);
 	SetZoomLimits(WINDOW_H_STD, WINDOW_V_STD);
-	
+
 	/* initial bitmap buffer */
 	fOffscreen = NULL;
 	max_width = WINDOW_H_STD - LEFT_WIDTH;
@@ -415,13 +423,13 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	fCurrentSettings.height = (int32)frame.bottom+1-TOP_LEFT_LIMIT;
 	previous_fullscreen_mode = WINDOW_MODE;
 	next_set.Set(&fCurrentSettings);
-	
+
 	/* initialise various global parameters */
 	fInstantLoadLevel = 0;
 	second_thread_threshold = 0.5;
 	last_dynamic_delay = 0.0;
 	crc_alea = CRC_START;
-	
+
 	/* initialise the starfield and the special structs */
 	stars.list = (star*)malloc(sizeof(star)*STAR_DENSITY_MAX);
 	specials.list = (star*)malloc(sizeof(star)*SPECIAL_COUNT_MAX);
@@ -445,12 +453,12 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	origin.x = 0.5;
 	origin.y = 0.5;
 	origin.z = 0.1;
-	
+
 	/* initialise camera animation */
 	tracking_target = -1;
 	speed = 0.0115;
 	target_speed = speed;
-	
+
 	/* initialise the view coordinate system */	
 	InitGeometry();
 	SetGeometry(fCurrentSettings.width, fCurrentSettings.height);
@@ -470,7 +478,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	direct_buffer.clip_list[0].bottom = -1;
 	fDirectConnected = false;
 
-/* build the UI content of the window */
+	/* build the UI content of the window */
+
 	/* top line background */
 	r.Set(0.0, 0.0, frame.right, TOP_LEFT_LIMIT - 1);  
 	fTopView = new BView(r, "top view", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
@@ -485,9 +494,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		fInstantLoad = new InstantView(r);
 		fTopView->AddChild(fInstantLoad);
 		fInstantLoad->SetViewColor(0.0, 0.0, 0.0);
-		
+
 	h += INSTANT_LOAD+2*H_BORDER;
-	
+
 		/* camera animation popup */
 		menu = new BPopUpMenu("Off");
 		item = new BMenuItem("Off", new BMessage(ANIM_OFF_MSG));
@@ -505,13 +514,16 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		item = new BMenuItem("Free motion", new BMessage(ANIM_FREE_MOVE_MSG));
 		item->SetTarget(this);
 		menu->AddItem(item);
-	
+
 		r.Set(h, v, h+ANIM_LABEL+ANIM_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Animation:", menu);
+		popup->SetFont(&font);
+		popup->MenuBar()->SetFont(&font);
+		popup->Menu()->SetFont(&font);
 		popup->ResizeToPreferred();
-		popup->SetDivider(popup->StringWidth(popup->Label()));
+		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
-	
+
 	h += ANIM_LABEL+ANIM_POPUP+H_BORDER;
 
 		/* display mode popup */
@@ -530,15 +542,18 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		item->SetTarget(this);
 		item->SetEnabled(BDirectWindow::SupportsWindowMode());
 		menu->AddItem(item);
-	
+
 		r.Set(h, v, h+DISP_LABEL+DISP_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Display:", menu);
+		popup->SetFont(&font);
+		popup->MenuBar()->SetFont(&font);
+		popup->Menu()->SetFont(&font);
 		popup->ResizeToPreferred();
-		popup->SetDivider(popup->StringWidth(popup->Label()));
+		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
-	
+
 	h += DISP_LABEL+DISP_POPUP+H_BORDER;
-	
+
 		/* create the offwindow (invisible) button on the left side.
 		   this will be used to record the content of the Picture
 		   button. */
@@ -557,9 +572,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		refresh_button->SetViewColor(B_TRANSPARENT_32_BIT);
 		refresh_button->ResizeToPreferred();
 		fTopView->AddChild(refresh_button);
-											  
+
 	h += BUTTON_WIDTH+2*H_BORDER;
-		
+
 		/* background color button */									  
 		r.Set(h, v, h+BUTTON_WIDTH-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		color_button = new BPictureButton(r, "",
@@ -569,8 +584,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		color_button->SetViewColor(B_TRANSPARENT_32_BIT);
 		color_button->ResizeToPreferred();
 		fTopView->AddChild(color_button);
-		
-										  
+
 	h += BUTTON_WIDTH+2*H_BORDER;
 
 		/* star density button */											  
@@ -599,14 +613,17 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	
 		r.Set(h, v, h+SPACE_LABEL+SPACE_POPUP-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
 		popup = new BMenuField(r, "", "Space:", menu);
+		popup->SetFont(&font);
+		popup->MenuBar()->SetFont(&font);
+		popup->Menu()->SetFont(&font);
 		popup->ResizeToPreferred();
-		popup->SetDivider(SPACE_LABEL);
+		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 	
 	h += SPACE_LABEL+SPACE_POPUP+2*H_BORDER;
 	
 	/* left column gray background */
-	r.Set(0.0, TOP_LEFT_LIMIT, LEFT_WIDTH-1, frame.bottom-1);  
+	r.Set(0.0, TOP_LEFT_LIMIT, LEFT_WIDTH-1, frame.bottom);  
 	fLeftView = new BView(r, "top view", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
 	fLeftView->SetViewColor(background_color);
 	AddChild(fLeftView);
@@ -617,8 +634,9 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	v = v2;
 		
 		/* status box */	
-		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+STATUS_BOX-1);
+		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+STATUS_BOX-1);
 		fStatusBox = new BBox(r);
+		fStatusBox->SetFont(&boldFont);
 		fStatusBox->SetLabel("Status");
 		fLeftView->AddChild(fStatusBox);
 		float boxWidth, boxHeight;
@@ -627,16 +645,16 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		
 		h = BOX_H_OFFSET;	
 		v = BOX_V_OFFSET;
-			
+
 			/* frames per second title string */
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
 			string = new BStringView(r, "", "Frames/s");
+			string->SetFont(&font);
 			string->SetAlignment(B_ALIGN_CENTER);
-			string->ResizeToPreferred();
 			fStatusBox->AddChild(string);
-	
+
 		v += STATUS_LABEL+STATUS_OFFSET;
-			
+
 			/* frames per second display string */
 			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
 			frames = new BStringView(r, "", "0.0");
@@ -644,20 +662,19 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			frames->SetFont(be_bold_font);
 			frames->SetFontSize(24.0);
 			frames->SetViewColor(B_TRANSPARENT_32_BIT);
-			frames->ResizeToPreferred();
 			fStatusBox->AddChild(frames);
-		
+
 		v += STATUS_EDIT+STATUS_OFFSET;
-		
+
 			/* CPU load pourcentage title string */
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+STATUS_LABEL-1);
 			string = new BStringView(r, "", "CPU load");
 			string->SetAlignment(B_ALIGN_CENTER);
-			string->ResizeToPreferred();
+			string->SetFont(&font);
 			fStatusBox->AddChild(string);
-		
+
 		v += STATUS_LABEL+STATUS_OFFSET;
-		
+
 			/* CPU load pourcentage display string */
 			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
 			cpu_load = new BStringView(r, "", "0.0");
@@ -665,17 +682,17 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			cpu_load->SetFont(be_bold_font);
 			cpu_load->SetFontSize(24.0);
 			cpu_load->SetViewColor(B_TRANSPARENT_32_BIT);
-			cpu_load->ResizeToPreferred();
 			fStatusBox->AddChild(cpu_load);
-	
+
 	v2 += STATUS_BOX+LEFT_OFFSET*2;
 	h = h2;
 	v = v2;
 	
 		/* Fullscreen mode check box */
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+FULL_SCREEN-1);
-		full_screen = new BCheckBox(r, "", "FullScreen", new BMessage(FULL_SCREEN_MSG));
+		full_screen = new BCheckBox(r, "", "Full Screen", new BMessage(FULL_SCREEN_MSG));
 		full_screen->SetTarget(this);
+		full_screen->SetFont(&font);
 		full_screen->ResizeToPreferred();
 
 		float width, height;
@@ -704,17 +721,19 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+SECOND_THREAD-1);
 		check_box = new BCheckBox(r, "", "2 Threads", new BMessage(SECOND_THREAD_MSG));
 		check_box->SetTarget(this);
+		check_box->SetFont(&font);
 		check_box->ResizeToPreferred();
 		fLeftView->AddChild(check_box);
 		
-	v2 += SECOND_THREAD+LEFT_OFFSET*2;
+	v2 += SECOND_THREAD+LEFT_OFFSET*2 + 2;
 	h = h2;
 	v = v2;
 
 		/* Star color selection box */
-		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+COLORS_BOX-1);
+		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+COLORS_BOX-1);
 		fColorsBox = new BBox(r);
 		fColorsBox->SetLabel("Colors");
+		fColorsBox->SetFont(&boldFont);
 		fLeftView->AddChild(fColorsBox);
 
 		h = BOX_H_OFFSET;	
@@ -723,6 +742,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color red check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Red", new BMessage(COLORS_RED_MSG));
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -732,6 +752,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Green", new BMessage(COLORS_GREEN_MSG));
 			check_box->SetValue(1);
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -741,6 +762,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Blue", new BMessage(COLORS_BLUE_MSG));
 			check_box->SetValue(1);
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -750,6 +772,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Yellow", new BMessage(COLORS_YELLOW_MSG));
 			check_box->SetValue(1);
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -758,6 +781,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color orange check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Orange", new BMessage(COLORS_ORANGE_MSG));
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -766,6 +790,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color pink check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "Pink", new BMessage(COLORS_PINK_MSG));
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 	
@@ -774,6 +799,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* star color white check box */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			check_box = new BCheckBox(r, "", "White", new BMessage(COLORS_WHITE_MSG));
+			check_box->SetFont(&font);
 			check_box->ResizeToPreferred();
 			fColorsBox->AddChild(check_box);
 
@@ -782,18 +808,20 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	v = v2;
 
 		/* Special type selection box */
-		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-1, v+SPECIAL_BOX-1);
+		r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2, v+SPECIAL_BOX-1);
 		fSpecialBox = new BBox(r);
+		fSpecialBox->SetFont(&boldFont);
 		fSpecialBox->SetLabel("Special");
 		fLeftView->AddChild(fSpecialBox);
 
 		h = BOX_H_OFFSET;	
 		v = BOX_V_OFFSET;
-	
+
 			/* no special radio button */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "None", new BMessage(SPECIAL_NONE_MSG));
 			radio->SetValue(1);
+			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
 	
@@ -802,6 +830,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* comet special animation radio button */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Comet", new BMessage(SPECIAL_COMET_MSG));
+			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
 	
@@ -810,6 +839,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			/* novas special animation radio button */	
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Novas", new BMessage(SPECIAL_NOVAS_MSG));
+			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
 	
@@ -819,10 +849,12 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			r.Set(h, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET-1, v+COLORS_LABEL-1);
 			radio = new BRadioButton(r, "", "Battle", new BMessage(SPECIAL_BATTLE_MSG));
 			radio->SetEnabled(false);
+			radio->SetFont(&font);
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
 
-	fLeftView->ResizeTo(max_c(boxWidth + 2, fLeftView->Bounds().Width()), fLeftView->Bounds().Height());
+	// Note: direct window mode uses LEFT_WIDTH
+	//fLeftView->ResizeTo(max_c(boxWidth + 2, fLeftView->Bounds().Width()), fLeftView->Bounds().Height());
 
 	/* animation area */
 	r.Set(fLeftView->Frame().right, TOP_LEFT_LIMIT, frame.right, frame.bottom);
@@ -847,6 +879,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	resume_thread(fSecondAnimationThread);
 	resume_thread(fAnimationThread);
 }
+
 
 ChartWindow::~ChartWindow()
 {
@@ -874,21 +907,19 @@ ChartWindow::~ChartWindow()
 }
 
 
+//	#pragma mark Standard window members			
 
 
-/*****************************************************
-**													**
-**				Standard window members				**
-**													**
-*****************************************************/
-
-bool ChartWindow::QuitRequested()
+bool
+ChartWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(TRUE);
 }
 
-void ChartWindow::MessageReceived(BMessage *message)
+
+void
+ChartWindow::MessageReceived(BMessage *message)
 {
 	int32			index, color;
 	BHandler		*handler;
@@ -899,113 +930,115 @@ void ChartWindow::MessageReceived(BMessage *message)
 	
 	message->FindPointer("source", (void**)&handler);
 	switch(message->what) {
-	/* This is a key part of the architecture. MessageReceived is
-	   called whenever the user interact with a UI element to change
-	   a setting. The window is locked at this point, so changing
-	   the setting of the engine at that point would be dangerous.
-	   We could easily goofed and create a bad dependencies between
-	   the Window locking mechanism and DirectConnected, that
-	   would generate a deadlock and force the app_server to kill
-	   the application. Bad business. To avoid that, we keep two
-	   different engine setting. One that is currently used by the
-	   animation engine, the other one that will retain all the
-	   changes generated by the user until the engine is ready to
-	   use them. So message received will write into that setting
-	   state and the engine will read it from time to time. Both
-	   access can be done asynchronously as all intermediate state
-	   generated by the MessageReceived write are valid (we don't
-	   need to make those transactions atomic). */
-	case ANIM_OFF_MSG :
-	case ANIM_SLOW_ROT_MSG :
-	case ANIM_SLOW_MOVE_MSG :
-	case ANIM_FAST_MOVE_MSG :
-	case ANIM_FREE_MOVE_MSG :
-		next_set.animation = ANIMATION_OFF + (message->what - ANIM_OFF_MSG);
-		break;
-	case DISP_OFF_MSG :
-	case DISP_BITMAP_MSG :
-	case DISP_DIRECT_MSG :
-		next_set.display = DISPLAY_OFF + (message->what - DISP_OFF_MSG);
-		break;
-	case SPACE_CHAOS_MSG :
-	case SPACE_AMAS_MSG :
-	case SPACE_SPIRAL_MSG :
-		next_set.space_model = SPACE_CHAOS + (message->what - SPACE_CHAOS_MSG);
-		break;
-	case FULL_SCREEN_MSG :
-		check_box = dynamic_cast<BCheckBox*>(handler);
-		if (check_box->Value())
-			next_set.fullscreen_mode = FULLSCREEN_MODE;
-		else
-			next_set.fullscreen_mode = WINDOW_MODE;
-		break;
-	case AUTO_DEMO_MSG :
-		next_set.fullscreen_mode = FULLDEMO_MODE;
-		next_set.animation = ANIMATION_FREE_MOVE;
-		next_set.special = SPECIAL_COMET;
-		LaunchSound();
-		break;
-	case BACK_DEMO_MSG :
-		next_set.fullscreen_mode = previous_fullscreen_mode;
-		break;
-	case SECOND_THREAD_MSG :
-		check_box = dynamic_cast<BCheckBox*>(handler);
-		next_set.second_thread = check_box->Value();
-		break;
-	case COLORS_RED_MSG :
-	case COLORS_GREEN_MSG :
-	case COLORS_BLUE_MSG :
-	case COLORS_YELLOW_MSG :
-	case COLORS_ORANGE_MSG :
-	case COLORS_PINK_MSG :
-	case COLORS_WHITE_MSG :
-		index = message->what - COLORS_RED_MSG;
-		check_box = dynamic_cast<BCheckBox*>(handler);
-		next_set.colors[index] = (check_box->Value()?true:false);
-		break;
-	case SPECIAL_NONE_MSG :
-	case SPECIAL_COMET_MSG :
-	case SPECIAL_NOVAS_MSG :
-	case SPECIAL_BATTLE_MSG :
-		next_set.special = SPECIAL_NONE + (message->what - SPECIAL_NONE_MSG);
-		break;
-	case COLOR_PALETTE_MSG :
-		message->FindInt32("be:value", &color);
-		next_set.back_color.red = (color >> 24);
-		next_set.back_color.green = (color >> 16);
-		next_set.back_color.blue = (color >> 8);
-		next_set.back_color.alpha = color;
-		break;
-	case STAR_DENSITY_MSG :
-		slider = dynamic_cast<BSlider*>(handler);
-		next_set.star_density = slider->Value();
-		break;
-	case REFRESH_RATE_MSG :
-		slider = dynamic_cast<BSlider*>(handler);
-		next_set.refresh_rate = exp(slider->Value()*0.001*(log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)))*
-								REFRESH_RATE_MIN;
-		break;
-	/* open the three floating window used to do live setting of
-	   some advanced parameters. Those windows will return live
-	   feedback that will be executed by some of the previous
-	   messages. */	
-	case OPEN_COLOR_MSG :
-		OpenColorPalette(BPoint(200.0, 200.0));
-		break;
-	case OPEN_DENSITY_MSG :
-		OpenStarDensity(BPoint(280.0, 280.0));
-		break;
-	case OPEN_REFRESH_MSG :
-		OpenRefresh(BPoint(240.0, 340.0));
-		break;
-	/* let other messages pass through... */
-	default :
-		BDirectWindow::MessageReceived(message);
-		break;
+		/* This is a key part of the architecture. MessageReceived is
+		   called whenever the user interact with a UI element to change
+		   a setting. The window is locked at this point, so changing
+		   the setting of the engine at that point would be dangerous.
+		   We could easily goofed and create a bad dependencies between
+		   the Window locking mechanism and DirectConnected, that
+		   would generate a deadlock and force the app_server to kill
+		   the application. Bad business. To avoid that, we keep two
+		   different engine setting. One that is currently used by the
+		   animation engine, the other one that will retain all the
+		   changes generated by the user until the engine is ready to
+		   use them. So message received will write into that setting
+		   state and the engine will read it from time to time. Both
+		   access can be done asynchronously as all intermediate state
+		   generated by the MessageReceived write are valid (we don't
+		   need to make those transactions atomic). */
+		case ANIM_OFF_MSG :
+		case ANIM_SLOW_ROT_MSG :
+		case ANIM_SLOW_MOVE_MSG :
+		case ANIM_FAST_MOVE_MSG :
+		case ANIM_FREE_MOVE_MSG :
+			next_set.animation = ANIMATION_OFF + (message->what - ANIM_OFF_MSG);
+			break;
+		case DISP_OFF_MSG :
+		case DISP_BITMAP_MSG :
+		case DISP_DIRECT_MSG :
+			next_set.display = DISPLAY_OFF + (message->what - DISP_OFF_MSG);
+			break;
+		case SPACE_CHAOS_MSG :
+		case SPACE_AMAS_MSG :
+		case SPACE_SPIRAL_MSG :
+			next_set.space_model = SPACE_CHAOS + (message->what - SPACE_CHAOS_MSG);
+			break;
+		case FULL_SCREEN_MSG :
+			check_box = dynamic_cast<BCheckBox*>(handler);
+			if (check_box->Value())
+				next_set.fullscreen_mode = FULLSCREEN_MODE;
+			else
+				next_set.fullscreen_mode = WINDOW_MODE;
+			break;
+		case AUTO_DEMO_MSG :
+			next_set.fullscreen_mode = FULLDEMO_MODE;
+			next_set.animation = ANIMATION_FREE_MOVE;
+			next_set.special = SPECIAL_COMET;
+			LaunchSound();
+			break;
+		case BACK_DEMO_MSG :
+			next_set.fullscreen_mode = previous_fullscreen_mode;
+			break;
+		case SECOND_THREAD_MSG :
+			check_box = dynamic_cast<BCheckBox*>(handler);
+			next_set.second_thread = check_box->Value();
+			break;
+		case COLORS_RED_MSG :
+		case COLORS_GREEN_MSG :
+		case COLORS_BLUE_MSG :
+		case COLORS_YELLOW_MSG :
+		case COLORS_ORANGE_MSG :
+		case COLORS_PINK_MSG :
+		case COLORS_WHITE_MSG :
+			index = message->what - COLORS_RED_MSG;
+			check_box = dynamic_cast<BCheckBox*>(handler);
+			next_set.colors[index] = (check_box->Value()?true:false);
+			break;
+		case SPECIAL_NONE_MSG :
+		case SPECIAL_COMET_MSG :
+		case SPECIAL_NOVAS_MSG :
+		case SPECIAL_BATTLE_MSG :
+			next_set.special = SPECIAL_NONE + (message->what - SPECIAL_NONE_MSG);
+			break;
+		case COLOR_PALETTE_MSG :
+			message->FindInt32("be:value", &color);
+			next_set.back_color.red = (color >> 24);
+			next_set.back_color.green = (color >> 16);
+			next_set.back_color.blue = (color >> 8);
+			next_set.back_color.alpha = color;
+			break;
+		case STAR_DENSITY_MSG :
+			slider = dynamic_cast<BSlider*>(handler);
+			next_set.star_density = slider->Value();
+			break;
+		case REFRESH_RATE_MSG :
+			slider = dynamic_cast<BSlider*>(handler);
+			next_set.refresh_rate = exp(slider->Value()*0.001*(log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)))*
+									REFRESH_RATE_MIN;
+			break;
+		/* open the three floating window used to do live setting of
+		   some advanced parameters. Those windows will return live
+		   feedback that will be executed by some of the previous
+		   messages. */	
+		case OPEN_COLOR_MSG :
+			OpenColorPalette(BPoint(200.0, 200.0));
+			break;
+		case OPEN_DENSITY_MSG :
+			OpenStarDensity(BPoint(280.0, 280.0));
+			break;
+		case OPEN_REFRESH_MSG :
+			OpenRefresh(BPoint(240.0, 340.0));
+			break;
+		/* let other messages pass through... */
+		default :
+			BDirectWindow::MessageReceived(message);
+			break;
 	}
 }
 
-void ChartWindow::ScreenChanged(BRect screen_size, color_space depth)
+
+void
+ChartWindow::ScreenChanged(BRect screen_size, color_space depth)
 {
 	BScreen		my_screen(this);
 
@@ -1016,7 +1049,9 @@ void ChartWindow::ScreenChanged(BRect screen_size, color_space depth)
 	next_set.depth = my_screen.ColorSpace();
 }
 
-void ChartWindow::FrameResized(float new_width, float new_height)
+
+void
+ChartWindow::FrameResized(float new_width, float new_height)
 {
 	/* this is the same principle than the one described for
 	   MessageReceived, to inform the engine that the window
@@ -1027,17 +1062,13 @@ void ChartWindow::FrameResized(float new_width, float new_height)
 }
 
 
+//	#pragma mark User Interface related stuff...
 
-
-/*****************************************************
-**													**
-**			User Interface related stuff...			**
-**													**
-*****************************************************/
 
 /* loop through the window list of the application, looking for
    a window with a specified name. */
-BWindow	*ChartWindow::GetAppWindow(char *name)
+BWindow	*
+ChartWindow::GetAppWindow(char *name)
 {
 	int32		index;
 	BWindow		*window;
@@ -1060,7 +1091,8 @@ BWindow	*ChartWindow::GetAppWindow(char *name)
 /* this function return a picture (in active or inactive state) of
    a standard BButton with some specific content draw in the middle.
    button_type indicate what special content should be used. */
-BPicture *ChartWindow::ButtonPicture(bool active, int32 button_type)
+BPicture *
+ChartWindow::ButtonPicture(bool active, int32 button_type)
 {
 	char		word[6];
 	int32		value;
@@ -1114,14 +1146,13 @@ BPicture *ChartWindow::ButtonPicture(bool active, int32 button_type)
    BColorControl, ChartColorControl, that will return live feedback
    as the same time the user will change the color setting of the
    background. */
-void ChartWindow::OpenColorPalette(BPoint here)
+void
+ChartWindow::OpenColorPalette(BPoint here)
 {
-	BRect			frame;
-	BPoint			point;
-	BWindow			*window;
-	BColorControl	*color_ctrl;
+	BRect frame;
+	BPoint point;
 
-	window = GetAppWindow("Space color");
+	BWindow *window = GetAppWindow("Space color");
 	if (window == NULL) {
 		frame.Set(here.x, here.y, here.x + 199.0, here.y + 99.0);
 		window = new BWindow(frame, "Space color",
@@ -1129,14 +1160,14 @@ void ChartWindow::OpenColorPalette(BPoint here)
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE);
 		point.Set(0, 0);
-		color_ctrl = new ChartColorControl(point, new BMessage(COLOR_PALETTE_MSG));
-		window->AddChild(color_ctrl);
-		color_ctrl->SetViewColor(background_color);
-		color_ctrl->SetTarget(NULL, this);
-		color_ctrl->SetValue(fCurrentSettings.back_color);
-		window->ResizeTo(color_ctrl->Bounds().Width(), color_ctrl->Bounds().Height());
-		window->SetSizeLimits(frame.Width(), frame.Width(), frame.Height(), frame.Height());
-		window->SetZoomLimits(frame.Width(), frame.Height());
+		BColorControl *colorControl = new ChartColorControl(point,
+			new BMessage(COLOR_PALETTE_MSG));
+		colorControl->SetViewColor(background_color);
+		colorControl->SetTarget(NULL, this);
+		colorControl->SetValue(fCurrentSettings.back_color);
+		colorControl->ResizeToPreferred();
+		window->ResizeTo(colorControl->Bounds().Width(), colorControl->Bounds().Height());
+		window->AddChild(colorControl);
 		window->Show();
 	}
 	window->Activate();
@@ -1145,7 +1176,8 @@ void ChartWindow::OpenColorPalette(BPoint here)
 /* Create a floating window including a BSlider, that will return
    live feedback when the user will change the star density of the
    starfield */
-void ChartWindow::OpenStarDensity(BPoint here)
+void
+ChartWindow::OpenStarDensity(BPoint here)
 {
 	BRect		frame;
 	BSlider		*slider;
@@ -1158,9 +1190,6 @@ void ChartWindow::OpenStarDensity(BPoint here)
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
-		window->SetSizeLimits(frame.Width(), frame.Width(),
-									frame.Height(), frame.Height());
-		window->SetZoomLimits(frame.Width(), frame.Height());
 		frame.OffsetTo(0.0, 0.0);
 		slider = new BSlider(frame, "", NULL, new BMessage(STAR_DENSITY_MSG),
 							 STAR_DENSITY_MIN, STAR_DENSITY_MAX);
@@ -1169,6 +1198,8 @@ void ChartWindow::OpenStarDensity(BPoint here)
 		slider->SetValue(fCurrentSettings.star_density);
 		slider->SetModificationMessage(new BMessage(STAR_DENSITY_MSG));
 		slider->SetLimitLabels(" 5% (low)", "(high) 100% ");
+		slider->ResizeToPreferred();
+		window->ResizeTo(slider->Bounds().Width(), slider->Bounds().Height());
 		window->AddChild(slider);
 		window->Show();
 	}
@@ -1178,11 +1209,12 @@ void ChartWindow::OpenStarDensity(BPoint here)
 /* Create a floating window including a BSlider, that will return
    live feedback when the user will change the target refresh rate
    of the animation */
-void ChartWindow::OpenRefresh(BPoint here)
+void
+ChartWindow::OpenRefresh(BPoint here)
 {
-	BRect		frame;
-	BSlider		*slider;
-	BWindow		*window;
+	BRect frame;
+	BSlider *slider;
+	BWindow *window;
 
 	window = GetAppWindow("Refresh rate");
 	if (window == NULL) {
@@ -1191,9 +1223,6 @@ void ChartWindow::OpenRefresh(BPoint here)
 							 B_FLOATING_WINDOW_LOOK,
 							 B_FLOATING_APP_WINDOW_FEEL,
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
-		window->SetSizeLimits(frame.Width(), frame.Width(),
-									frame.Height(), frame.Height());
-		window->SetZoomLimits(frame.Width(), frame.Height());
 		frame.OffsetTo(0.0, 0.0);
 		slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0.0, 1000.0);
 		slider->SetViewColor(background_color);
@@ -1201,6 +1230,8 @@ void ChartWindow::OpenRefresh(BPoint here)
 		slider->SetValue(1000.0*log(fCurrentSettings.refresh_rate/REFRESH_RATE_MIN)/log(REFRESH_RATE_MAX/REFRESH_RATE_MIN));
 		slider->SetModificationMessage(new BMessage(REFRESH_RATE_MSG));
 		slider->SetLimitLabels(" 0.6 f/s  (logarythmic scale)", "600.0 f/s");
+		slider->ResizeToPreferred();
+		window->ResizeTo(slider->Bounds().Width(), slider->Bounds().Height());
 		window->AddChild(slider);
 		window->Show();
 	}
@@ -1208,7 +1239,8 @@ void ChartWindow::OpenRefresh(BPoint here)
 }
 
 /* This update the state of the frames per second vue-meter in a lazy way. */
-void ChartWindow::DrawInstantLoad(float frame_per_second)
+void
+ChartWindow::DrawInstantLoad(float frame_per_second)
 {
 	int32		level, i;
 	bigtime_t	timeout;
@@ -1257,7 +1289,9 @@ void ChartWindow::DrawInstantLoad(float frame_per_second)
 	Unlock();
 }
 
-void ChartWindow::PrintStatNumbers(float fps)
+
+void
+ChartWindow::PrintStatNumbers(float fps)
 {
 	char		text_frames[6];
 	char		text_cpu_load[6];
@@ -1299,15 +1333,11 @@ void ChartWindow::PrintStatNumbers(float fps)
 }
 
 
+//	#pragma mark Engine setting related functions.
 
 
-/*****************************************************
-**													**
-**			Engine setting related functions.		**
-**													**
-*****************************************************/
-
-void ChartWindow::InitGeometry()
+void
+ChartWindow::InitGeometry()
 {
 	float		dz;
 
@@ -1339,7 +1369,9 @@ void ChartWindow::InitGeometry()
    because the structure of the animation engine loop guarantees
    that DirectConnected can not stay blocked at the same time that
    this method is executed. */
-void ChartWindow::ChangeSetting(setting new_set) {
+void
+ChartWindow::ChangeSetting(setting new_set)
+{
 	//star			*s;
 	int32			i, color_count, old_step;
 	int32			color_index[7];
@@ -1538,7 +1570,8 @@ void ChartWindow::ChangeSetting(setting new_set) {
 }
 
 /* Initialise the starfield in the different modes */
-void ChartWindow::InitStars(int32 space_model)
+void
+ChartWindow::InitStars(int32 space_model)
 {
 	star		*s;
 	int32		step;
@@ -1724,7 +1757,8 @@ void ChartWindow::InitStars(int32 space_model)
 }
 
 /* Fill a list of star with random position in the [0-1]x[0-1]x[0-1] cube */
-void ChartWindow::FillStarList(star *list, int32 count)
+void
+ChartWindow::FillStarList(star *list, int32 count)
 {
 	int32		i;
 	
@@ -1743,7 +1777,8 @@ void ChartWindow::FillStarList(star *list, int32 count)
 }
 
 /* initialise anything needed to enable a specific special animation */
-void ChartWindow::InitSpecials(int32 code)
+void
+ChartWindow::InitSpecials(int32 code)
 {
 	int			i, j;
 	float		alpha, ksin, kcos, coeff;
@@ -1834,7 +1869,8 @@ void ChartWindow::InitSpecials(int32 code)
 
 /* select a color for each star (and special animation point) by
    looping through the color index list. */
-void ChartWindow::SetStarColors(int32 *color_list, int32 color_count)
+void
+ChartWindow::SetStarColors(int32 *color_list, int32 color_count)
 {
 	int32		i, index;
 	
@@ -1853,16 +1889,18 @@ void ChartWindow::SetStarColors(int32 *color_list, int32 color_count)
 	}
 }
 
-void ChartWindow::SetGeometry(int32 dh, int32 dv)
+
+void
+ChartWindow::SetGeometry(int32 dh, int32 dv)
 {
-	float		zoom;
+	float zoom;
 
 	/* calculate the zoom factor for the 3d projection */
 	geo.zoom_factor = (float)dh*(depth_ref/DH_REF);
 	zoom = (float)dv*(depth_ref/DV_REF);
 	if (zoom > geo.zoom_factor)
 		geo.zoom_factor = zoom;
-	
+
 	/* offset of the origin in the view area */
 	geo.offset_h = (float)dh * 0.5;
 	geo.offset_v = (float)dv * 0.5;
@@ -1873,102 +1911,100 @@ void ChartWindow::SetGeometry(int32 dh, int32 dv)
 	geo.offset_v = geo.offset_v * 2.0 - 1.0;
 }
 
-void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
-{
-	bool		swap_needed;
-	int32		red_shift = 0,
-			green_shift = 0,
-			blue_shift = 0,
-			alpha_shift = 0,
-			step_doubling = 0;
 
-	int32		red_divide_shift = 0,
-			green_divide_shift = 0,
-			blue_divide_shift = 0,
-			alpha_divide_shift = 0;
-	int32		i;
-	uint32		color;
-	uint32		*col;
-	BScreen		screen(this);
-	rgb_color	ref_color;
+void
+ChartWindow::SetColorSpace(buffer *buf, color_space depth)
+{
+	bool swap_needed;
+	int32 red_shift = 0, green_shift = 0;
+	int32 blue_shift = 0, alpha_shift = 0;
+	int32 step_doubling = 0;
+
+	int32 red_divide_shift = 0, green_divide_shift = 0;
+	int32 blue_divide_shift = 0, alpha_divide_shift = 0;
+	int32 i;
+	uint32 color;
+	uint32 *col;
+	BScreen screen(this);
+	rgb_color ref_color;
 
 	/* depending the colorspace of the target buffer, set parameters used
 	   to encode the RGBA information for various color information in
 	   the right format. */
 	buf->depth = depth;
 	switch (depth) {
-	case B_RGBA32_BIG :
-	case B_RGB32_BIG :
-	case B_RGBA32 :
-	case B_RGB32 :
-		buf->depth_mode = PIXEL_4_BYTES;
-		buf->bytes_per_pixel = 4;
-		red_shift = 16;
-		green_shift = 8;
-		blue_shift = 0;
-		alpha_shift = 24;
-		red_divide_shift = 0;
-		green_divide_shift = 0;
-		blue_divide_shift = 0;
-		alpha_divide_shift = 0;
-		step_doubling = 32;
-		break;
-	case B_RGB16_BIG :
-	case B_RGB16 :
-		buf->depth_mode = PIXEL_2_BYTES;
-		buf->bytes_per_pixel = 2;
-		red_shift = 11;
-		red_divide_shift = 3;
-		green_shift = 5;
-		green_divide_shift = 2;
-		blue_shift = 0;
-		blue_divide_shift = 3;
-		alpha_shift = 32;
-		alpha_divide_shift = 8;
-		step_doubling = 16;
-		break;
-	case B_RGB15 :
-	case B_RGBA15 :
-	case B_RGB15_BIG :
-	case B_RGBA15_BIG :
-		buf->depth_mode = PIXEL_2_BYTES;
-		buf->bytes_per_pixel = 2;
-		red_shift = 10;
-		red_divide_shift = 3;
-		green_shift = 5;
-		green_divide_shift = 3;
-		blue_shift = 0;
-		blue_divide_shift = 3;
-		alpha_shift = 15;
-		alpha_divide_shift = 7;
-		step_doubling = 16;
-		break;
-	case B_CMAP8 :
-	default:
-		buf->depth_mode = PIXEL_1_BYTE;
-		buf->bytes_per_pixel = 1;
-		break;
+		case B_RGBA32_BIG :
+		case B_RGB32_BIG :
+		case B_RGBA32 :
+		case B_RGB32 :
+			buf->depth_mode = PIXEL_4_BYTES;
+			buf->bytes_per_pixel = 4;
+			red_shift = 16;
+			green_shift = 8;
+			blue_shift = 0;
+			alpha_shift = 24;
+			red_divide_shift = 0;
+			green_divide_shift = 0;
+			blue_divide_shift = 0;
+			alpha_divide_shift = 0;
+			step_doubling = 32;
+			break;
+		case B_RGB16_BIG :
+		case B_RGB16 :
+			buf->depth_mode = PIXEL_2_BYTES;
+			buf->bytes_per_pixel = 2;
+			red_shift = 11;
+			red_divide_shift = 3;
+			green_shift = 5;
+			green_divide_shift = 2;
+			blue_shift = 0;
+			blue_divide_shift = 3;
+			alpha_shift = 32;
+			alpha_divide_shift = 8;
+			step_doubling = 16;
+			break;
+		case B_RGB15 :
+		case B_RGBA15 :
+		case B_RGB15_BIG :
+		case B_RGBA15_BIG :
+			buf->depth_mode = PIXEL_2_BYTES;
+			buf->bytes_per_pixel = 2;
+			red_shift = 10;
+			red_divide_shift = 3;
+			green_shift = 5;
+			green_divide_shift = 3;
+			blue_shift = 0;
+			blue_divide_shift = 3;
+			alpha_shift = 15;
+			alpha_divide_shift = 7;
+			step_doubling = 16;
+			break;
+		case B_CMAP8 :
+		default:
+			buf->depth_mode = PIXEL_1_BYTE;
+			buf->bytes_per_pixel = 1;
+			break;
 	}
 	
 	/* Check if the endianess of the buffer is different from the
 	   endianess use by the processor to encode the color information */
 	switch (depth) {
-	case B_RGBA32_BIG :
-	case B_RGB32_BIG :
-	case B_RGB16_BIG :
-	case B_RGB15_BIG :
-	case B_RGBA15_BIG :
-		swap_needed = true;
-		break;
-	case B_RGBA32 :
-	case B_RGB32 :
-	case B_RGB16 :
-	case B_RGB15 :
-	case B_RGBA15 :
-	case B_CMAP8 :
-	default:
-		swap_needed = false;
-		break;
+		case B_RGBA32_BIG :
+		case B_RGB32_BIG :
+		case B_RGB16_BIG :
+		case B_RGB15_BIG :
+		case B_RGBA15_BIG :
+			swap_needed = true;
+			break;
+		case B_RGBA32 :
+		case B_RGB32 :
+		case B_RGB16 :
+		case B_RGB15 :
+		case B_RGBA15 :
+		case B_CMAP8 :
+		default:
+			swap_needed = false;
+			break;
 	}
 	
 #if B_HOST_IS_BENDIAN
@@ -1978,58 +2014,63 @@ void ChartWindow::SetColorSpace(buffer *buf, color_space depth)
 	   the background color */
 	col = buf->colors[0];
 	switch (buf->depth_mode) {
-	case PIXEL_1_BYTE :
-		/* 8 bits, indexed mode */
-		for (i=0; i<7*8; i++) {
-			ref_color = color_list[i>>3];
-			ref_color.red   = (ref_color.red*light_gradient[i&7])>>16;
-			ref_color.green = (ref_color.green*light_gradient[i&7])>>16;
-			ref_color.blue  = (ref_color.blue*light_gradient[i&7])>>16;
-			color = screen.IndexForColor(ref_color);
-			col[i] = (color<<24) | (color<<16) | (color<<8) | color;
-		}
-		color = screen.IndexForColor(fCurrentSettings.back_color);
-		buf->back_color = (color<<24) | (color<<16) | (color<<8) | color;
-		break;
-	case PIXEL_2_BYTES :
-	case PIXEL_4_BYTES :
-		/* 15, 16 or 32 bytes, RGB modes. Those modes just directly encode
-		   part of the bits of the initial rgba_color, at the right bit
-		   position */
-		for (i=0; i<7*8; i++) {
-			ref_color = color_list[i>>3];
-			ref_color.red   = (ref_color.red*light_gradient[i&7])>>16;
-			ref_color.green = (ref_color.green*light_gradient[i&7])>>16;
-			ref_color.blue  = (ref_color.blue*light_gradient[i&7])>>16;
-			color = ((uint8)ref_color.red >> red_divide_shift) << red_shift;
-			color |= ((uint8)ref_color.green >> green_divide_shift) << green_shift;
-			color |= ((uint8)ref_color.blue >> blue_divide_shift) << blue_shift;
-			color |= ((uint8)ref_color.alpha >> alpha_divide_shift) << alpha_shift;
-			col[i] = (color<<step_doubling) | color;
-		}
-		color = ((uint8)fCurrentSettings.back_color.red >> red_divide_shift) << red_shift;
-		color |= ((uint8)fCurrentSettings.back_color.green >> green_divide_shift) << green_shift;
-		color |= ((uint8)fCurrentSettings.back_color.blue >> blue_divide_shift) << blue_shift;
-		color |= ((uint8)fCurrentSettings.back_color.alpha >> alpha_divide_shift) << alpha_shift;
-		buf->back_color = (color<<step_doubling) | color;
-		break;
+		case PIXEL_1_BYTE :
+			/* 8 bits, indexed mode */
+			for (i=0; i<7*8; i++) {
+				ref_color = color_list[i>>3];
+				ref_color.red   = (ref_color.red*light_gradient[i&7])>>16;
+				ref_color.green = (ref_color.green*light_gradient[i&7])>>16;
+				ref_color.blue  = (ref_color.blue*light_gradient[i&7])>>16;
+				color = screen.IndexForColor(ref_color);
+				col[i] = (color<<24) | (color<<16) | (color<<8) | color;
+			}
+			color = screen.IndexForColor(fCurrentSettings.back_color);
+			buf->back_color = (color<<24) | (color<<16) | (color<<8) | color;
+			break;
+		case PIXEL_2_BYTES :
+		case PIXEL_4_BYTES :
+			/* 15, 16 or 32 bytes, RGB modes. Those modes just directly encode
+			   part of the bits of the initial rgba_color, at the right bit
+			   position */
+			for (i=0; i<7*8; i++) {
+				ref_color = color_list[i>>3];
+				ref_color.red   = (ref_color.red*light_gradient[i&7])>>16;
+				ref_color.green = (ref_color.green*light_gradient[i&7])>>16;
+				ref_color.blue  = (ref_color.blue*light_gradient[i&7])>>16;
+				color = ((uint8)ref_color.red >> red_divide_shift) << red_shift;
+				color |= ((uint8)ref_color.green >> green_divide_shift) << green_shift;
+				color |= ((uint8)ref_color.blue >> blue_divide_shift) << blue_shift;
+				color |= ((uint8)ref_color.alpha >> alpha_divide_shift) << alpha_shift;
+				col[i] = (color<<step_doubling) | color;
+			}
+			color = ((uint8)fCurrentSettings.back_color.red >> red_divide_shift) << red_shift;
+			color |= ((uint8)fCurrentSettings.back_color.green >> green_divide_shift) << green_shift;
+			color |= ((uint8)fCurrentSettings.back_color.blue >> blue_divide_shift) << blue_shift;
+			color |= ((uint8)fCurrentSettings.back_color.alpha >> alpha_divide_shift) << alpha_shift;
+			buf->back_color = (color<<step_doubling) | color;
+			break;
 	}
-	
+
 	/* do the endianess swap if needed */
 	if (swap_needed) {
 		col = buf->colors[0];
-		for (i=0; i<7*8; i++)
+		for (i = 0; i < 7*8; i++) {
 			B_SWAP_INT32(col[i]);
+		}
 		B_SWAP_INT32(buf->back_color);
 	}
 }
 
-/* For each different offset used to access a pixel of the star matrix,
-   create a buffer pointer based on the main buffer pointer offset by
-   the pixel matrix offset. That way, any pixel of the matrix can be
-   address later by just picking the right pointer and indexing it by
-   the global star offset */
-void ChartWindow::SetPatternBits(buffer *buf)
+
+/*!
+	For each different offset used to access a pixel of the star matrix,
+	create a buffer pointer based on the main buffer pointer offset by
+	the pixel matrix offset. That way, any pixel of the matrix can be
+	address later by just picking the right pointer and indexing it by
+	the global star offset
+*/
+void
+ChartWindow::SetPatternBits(buffer *buf)
 {	
 	for (int32 i=0; i<32; i++) {
 		buf->pattern_bits[i] = (void*)((char*)buf->bits +
@@ -2039,17 +2080,16 @@ void ChartWindow::SetPatternBits(buffer *buf)
 }
 
 
+//	#pragma mark Engine processing related functions.
 
 
-/*****************************************************
-**													**
-**		Engine processing related functions.		**
-**													**
-*****************************************************/
-
-/* That's the main thread controling the animation and synchronising
-   the engine state with the changes coming from the UI. */
-long ChartWindow::Animation(void *data) {
+/*!
+	That's the main thread controling the animation and synchronising
+	the engine state with the changes coming from the UI.
+*/
+long
+ChartWindow::Animation(void *data)
+{
 	int32			i, cur_4_frames_index, cur_last_fps, count_fps;
 	float			time_factor = 0, total_fps;
 	float			last_fps[4];
@@ -2162,7 +2202,9 @@ long ChartWindow::Animation(void *data) {
    slave of the Animation thread. It's directly synchronised with its
    master, and will only do some star animation processing whenever
    its master allows him to do so. */
-long ChartWindow::Animation2(void *data) {
+long
+ChartWindow::Animation2(void *data)
+{
 	bigtime_t		before, after;
 	ChartWindow		*w;
 	
@@ -2189,7 +2231,9 @@ long ChartWindow::Animation2(void *data) {
 	return 0;
 }
 
-void ChartWindow::SetCubeOffset()
+
+void
+ChartWindow::SetCubeOffset()
 {
 	int32		i;
 	TPoint		min, max, dx, dy, dz, p1;
@@ -2283,7 +2327,8 @@ void ChartWindow::SetCubeOffset()
 /* move the camera around, as defined by the animation popup.
    This is adjusted by a time factor to compensate for change
    in the framerate. */
-void ChartWindow::CameraAnimation(float time_factor)
+void
+ChartWindow::CameraAnimation(float time_factor)
 {
 	TPoint			move;
 	
@@ -2428,7 +2473,9 @@ void ChartWindow::CameraAnimation(float time_factor)
 	}
 }
 
-void ChartWindow::SelectNewTarget()
+
+void
+ChartWindow::SelectNewTarget()
 {
 	float		ratio, ratio_min;
 	float		dist, lateral, axial, ftmp;
@@ -2486,7 +2533,8 @@ void ChartWindow::SelectNewTarget()
 
 /* Try to change the angular acceleration to aim in direction
    of the current target. */
-void ChartWindow::FollowTarget()
+void
+ChartWindow::FollowTarget()
 {
 	float		x0, y0, x, y, z, cphi, sphi;
 	TPoint		pt;
@@ -2548,7 +2596,8 @@ void ChartWindow::FollowTarget()
 /* Do whatever special processing is required to do special
    animation. This used a time_step (or time_factor) to
    compensate for change in the framerate of the animation. */
-void ChartWindow::AnimSpecials(float time_step)
+void
+ChartWindow::AnimSpecials(float time_step)
 {
 	int			i, j;
 	star		*s;
@@ -2632,9 +2681,12 @@ void ChartWindow::AnimSpecials(float time_step)
 	}
 }
 
+
 /* Sync the embedded camera state with the window class camera
    state (before calling the embedded C-engine in ChartRender.c */
-void ChartWindow::SyncGeo() {
+void
+ChartWindow::SyncGeo()
+{
 	geo.x = origin.x;
 	geo.y = origin.y;
 	geo.z = origin.z;
@@ -2644,7 +2696,9 @@ void ChartWindow::SyncGeo() {
 	memcpy(geo.m, camera_invert.m, sizeof(float)*9);
 }
 
-void ChartWindow::RefreshStars(buffer *buf, float time_step)
+
+void
+ChartWindow::RefreshStars(buffer *buf, float time_step)
 {
 	float			ratio;
 	int32			star_threshold, special_threshold;
@@ -2727,15 +2781,11 @@ void ChartWindow::RefreshStars(buffer *buf, float time_step)
 }
 
 
+//	#pragma mark Offscreen bitmap configuration related functions.
 
 
-/*****************************************************
-**													**
-** Offscreen bitmap configuration related functions.**
-**													**
-*****************************************************/
-
-void ChartWindow::CheckBitmap(color_space depth, int32 width, int32 height)
+void
+ChartWindow::CheckBitmap(color_space depth, int32 width, int32 height)
 {
 	color_space		cur_depth;
 
@@ -2787,7 +2837,9 @@ void ChartWindow::CheckBitmap(color_space depth, int32 width, int32 height)
 	Unlock();
 }
 
-void ChartWindow::SetBitmapClipping(int32 width, int32 height) 
+
+void
+ChartWindow::SetBitmapClipping(int32 width, int32 height) 
 {
 	/* Set the bitmap buffer clipping to the required size of
 	   the buffer (even if the allocated buffer is larger) */
@@ -2802,7 +2854,9 @@ void ChartWindow::SetBitmapClipping(int32 width, int32 height)
 	bitmap_buffer.clip_list[0].bottom = bitmap_buffer.clip_bounds.bottom;
 }
 
-void ChartWindow::SetBitmapBackGround()
+
+void
+ChartWindow::SetBitmapBackGround()
 {
 	int32		i, count;
 	uint32		*bits;
@@ -2818,15 +2872,11 @@ void ChartWindow::SetBitmapBackGround()
 }
 
 
+//	#pragma mark DirectWindow related functions.
 
 
-/*****************************************************
-**													**
-** 			DirectWindow related functions.			**
-**													**
-*****************************************************/
-
-void ChartWindow::DirectConnected(direct_buffer_info *info)
+void
+ChartWindow::DirectConnected(direct_buffer_info *info)
 {
 	/* block the animation thread. */
 	acquire_sem(fDrawingLock);
@@ -2843,7 +2893,8 @@ void ChartWindow::DirectConnected(direct_buffer_info *info)
    in DirectConnected, it's a bad idea to do any heavy drawing (long)
    operation. But as we only update the stars (the background will be
    update a little later by the view system), it's not a big deal. */
-void ChartWindow::SwitchContext(direct_buffer_info *info)
+void
+ChartWindow::SwitchContext(direct_buffer_info *info)
 {
 	//star			*s;
 	uint32			i, j;
@@ -2986,15 +3037,17 @@ void ChartWindow::SwitchContext(direct_buffer_info *info)
 }
 
 
+/*! copy a setting into another */
+void
+ChartWindow::setting::Set(setting *master)
+{
+	memcpy(this, master, sizeof(setting));
+}
 
 
-/*****************************************************
-**													**
-**	Pseudo-random generator increment function.		**
-**													**
-*****************************************************/
-
-void ChartWindow::CrcStep()
+/*! Pseudo-random generator increment function.	*/
+void
+ChartWindow::CrcStep()
 {
 	crc_alea <<= 1;
 	if (crc_alea < 0)
