@@ -1,6 +1,6 @@
 /*
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2003, Marcus Overhagen. All rights reserved.
+ * Copyright 2003-2006, Marcus Overhagen. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
