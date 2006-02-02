@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
@@ -61,7 +62,8 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 	fPreviousSibling(NULL),
 	fNextSibling(NULL),
 	fLastChild(NULL),
-	
+
+	fCursor(NULL),
 	fPicture(NULL),
 
 	fLocalClipping(Bounds()),
@@ -873,6 +875,13 @@ ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
 {
 	fEventMask = eventMask;
 	fEventOptions = options;
+}
+
+
+void
+ViewLayer::SetCursor(ServerCursor *cursor)
+{
+	fCursor = cursor;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1246,13 +1246,14 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		case AS_LAYER_CURSOR:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
-			int32 token;
-
+			int32 token = -1;
 			link.Read<int32>(&token);
 
-			// TODO: implement; I think each ViewLayer should have a member pointing
-			// to this requested cursor.
+			// TODO: this badly needs reference counting
+			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
+			fCurrentLayer->SetCursor(cursor);
 			
+			// TODO: if fCurrentLayer is the view under the cursor, the appearance should change immediately!
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
@@ -1260,7 +1261,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			uint32 flags;
 			link.Read<uint32>(&flags);
 			fCurrentLayer->SetFlags(flags);
-			
+
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			break;
 		}
@@ -2402,7 +2403,7 @@ ServerWindow::_MessageLooper()
 			if (code >= 0 && code < AS_LAST_CODE) {
 				diff = system_time() - start;
 				atomic_add(&sMessageProfile[code].count, 1);
-#ifdef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 				atomic_add64(&sMessageProfile[code].time, diff);
 #else
 				sMessageProfile[code].time += diff;

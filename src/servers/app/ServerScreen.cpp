@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -165,7 +165,7 @@ Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 		return err;
 	}
 
-#if __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	int32 index = _FindMode(dm, count, width, height, colorspace, frequency);
 	if (index < 0) {
 		fprintf(stderr, "mode not found (%d, %d, %f) -> ignoring frequency and using B_CMAP8!\n", width, height, frequency);

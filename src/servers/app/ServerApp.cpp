@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -171,7 +171,7 @@ ServerApp::~ServerApp()
 		// time, but killing it might have desastrous effects
 		if (MessageLooper::WaitForQuit(deathSemaphore, 3000000) != B_OK) {
 			// This really shouldn't happen, as it shows we're buggy
-#if __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 			syslog(LOG_ERR, "ServerApp %s: ServerWindow doesn't respond!\n",
 				Signature());
 #else
@@ -289,17 +289,16 @@ ServerApp::Activate(bool value)
 
 	fIsActive = value;
 
-	if (fIsActive) {
-		SetAppCursor();
-	}
+	if (fIsActive)
+		SetCursor();
 }
 
 
 //! Sets the cursor to the application cursor, if any.
 void
-ServerApp::SetAppCursor()
+ServerApp::SetCursor()
 {
-// TODO: look into custom cursors...
+// TODO: custom cursors cannot be drawn by the HWInterface right now (wrong bitmap format)
 //	if (fAppCursor)
 //		fDesktop->HWInterface()->SetCursor(fAppCursor);
 
@@ -310,7 +309,7 @@ ServerApp::SetAppCursor()
 void
 ServerApp::_GetLooperName(char* name, size_t length)
 {
-#ifdef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	strlcpy(name, Signature(), length);
 #else
 	strncpy(name, Signature(), length);
@@ -891,10 +890,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: SetCursor via cursor data\n", Signature()));
 			// Attached data: 68 bytes of fAppCursor data
-			
-			int8 cdata[68];
-			link.Read(cdata, 68);
-			
+
+			int8 cursorData[68];
+			link.Read(cursorData, 68);
+
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
 			// otherwise be easy to crash the server by calling SetCursor a
@@ -902,7 +901,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (fAppCursor)
 				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
-			fAppCursor = new ServerCursor(cdata);
+			fAppCursor = new ServerCursor(cursorData);
 			fAppCursor->SetOwningTeam(fClientTeam);
 			fAppCursor->SetAppSignature(Signature());
 

@@ -1,9 +1,11 @@
-//------------------------------------------------------------------------------
-// Copyright 2005, Haiku, Inc. All rights reserved.
-// Distributed under the terms of the MIT License.
-//
-//	Author:			Stephan Aßmus, <superstippi@gmx.de>
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2005-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
 
 #include <stdio.h>
 #include <string.h>

@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Adi Oanca <adioanca@gmail.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef	VIEW_LAYER_H
@@ -23,6 +24,7 @@ class DrawState;
 class DrawingEngine;
 class WindowLayer;
 class ServerBitmap;
+class ServerCursor;
 class ServerPicture;
 
 class ViewLayer {
@@ -147,8 +149,11 @@ class ViewLayer {
 			uint32			EventOptions() const
 								{ return fEventOptions; }
 
-			void			SetPicture(ServerPicture *picture);
-			ServerPicture		*Picture() const;
+			ServerCursor*	Cursor() const { return fCursor; }
+			void			SetCursor(ServerCursor* cursor);
+
+			ServerPicture*	Picture() const;
+			void			SetPicture(ServerPicture* picture);
 
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
@@ -221,7 +226,9 @@ class ViewLayer {
 			ViewLayer*		fNextSibling;
 			ViewLayer*		fLastChild;
 
-			ServerPicture		*fPicture;
+			ServerCursor*	fCursor;
+			ServerPicture*	fPicture;
+
 			// clipping
 			BRegion			fLocalClipping;
 

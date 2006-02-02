@@ -17,6 +17,7 @@
 #include "DecorManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
+#include "HWInterface.h"
 #include "MessagePrivate.h"
 #include "PortLink.h"
 #include "ServerApp.h"
@@ -909,7 +910,8 @@ void
 WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	bool isLatestMouseMoved)
 {
-	if (ViewLayer* view = ViewAt(where))
+	ViewLayer* view = ViewAt(where);
+	if (view != NULL)
 		*_viewToken = view->Token();
 
 	// ignore pointer history
@@ -978,6 +980,22 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	DesktopSettings desktopSettings(fDesktop);
 	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus() && !(Flags() & B_AVOID_FOCUS))
 		fDesktop->SetFocusWindow(this);
+
+	// mouse cursor
+
+	if (IsFocus()) {
+		// TODO: there is more for real cursor support, ie. if a window is closed,
+		//		new app cursor shouldn't override view cursor, ...
+		ServerCursor* currentCursor = fDesktop->HWInterface()->Cursor();
+		ServerCursor* cursor = ServerWindow()->App()->Cursor();
+		if (view != NULL && view->Cursor() != NULL)
+			cursor = view->Cursor();
+
+		if (cursor != currentCursor) {
+// TODO: custom cursors cannot be drawn by the HWInterface right now (wrong bitmap format)
+//			fDesktop->HWInterface()->SetCursor(cursor);
+		}
+	}
 }
 
 

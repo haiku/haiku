@@ -1,12 +1,13 @@
-//------------------------------------------------------------------------------
-// Copyright 2005, Haiku, Inc. All rights reserved.
-// Distributed under the terms of the MIT License.
-//
-//	Author:			Stephan Aßmus, <superstippi@gmx.de>
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2005-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef HW_INTERFACE_H
 #define HW_INTERFACE_H
+
 
 #include <Accelerant.h>
 #include <GraphicsCard.h>
@@ -76,6 +77,7 @@ class HWInterface : public MultiLocker {
 	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
 
 	// cursor handling (these do their own Read/Write locking)
+			ServerCursor*		Cursor() const { return fCursor; }
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();

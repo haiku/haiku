@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,8 +9,8 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _SERVERAPP_H_
-#define _SERVERAPP_H_
+#ifndef SERVER_APP_H
+#define SERVER_APP_H
 
 
 #include "MessageLooper.h"
@@ -61,7 +61,8 @@ class ServerApp : public MessageLooper {
 
 			void				SendMessageToClient(BMessage* message) const;
 
-			void				SetAppCursor();
+			void				SetCursor();
+			ServerCursor*		Cursor() const { return fAppCursor; }
 
 			team_id				ClientTeam() const;
 			const char*			Signature() const { return fSignature.String(); }
@@ -104,9 +105,9 @@ class ServerApp : public MessageLooper {
 									// To send a BMessage to the client
 									// (port + token)
 
-			Desktop* fDesktop;
-			BString fSignature;
-			team_id fClientTeam;
+			Desktop*			fDesktop;
+			BString				fSignature;
+			team_id				fClientTeam;
 
 	mutable	BLocker				fWindowListLock;
 			BObjectList<ServerWindow> fWindowList;
@@ -130,4 +131,4 @@ class ServerApp : public MessageLooper {
 			AreaPool			fSharedMem;
 };
 
-#endif	// _SERVERAPP_H_
+#endif	// SERVER_APP_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,7 +45,7 @@ using std::nothrow;
 
 
 // This call updates the frame buffer used by the on-screen KDL
-#ifdef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
 						int32 width, int32 height,
 						int32 depth, int32 bytesPerRow);
