@@ -50,8 +50,7 @@ static void addbuf(uint8);  // appends byte to lexbuf
 // When we encounter an #include directive, we push the current 
 // buffer, filename, and line number on the include stack, so we 
 // can resume lexing that file when we're done with the include.
-struct include_t
-{
+struct include_t {
 	YY_BUFFER_STATE buffer;
 	char* filename;
 	int lineno;
@@ -188,24 +187,22 @@ $\"                      BEGIN(RAWDATA); resetbuf();
 %%
 //------------------------------------------------------------------------------
 
-void resetbuf()
+void
+resetbuf()
 {
 	lexptr = lexbuf;
 	lexcnt = 0;
 }
 
-//------------------------------------------------------------------------------
 
-void addbuf(uint8 b)
+void
+addbuf(uint8 b)
 {
-	if (lexcnt == lexsize)
-	{
+	if (lexcnt == lexsize) {
 		lexsize += LEX_BUF_SIZE;
 		lexbuf = (uint8*) realloc(lexbuf, lexsize);
 		if (lexbuf == NULL)
-		{
 			abort_compile(B_NO_MEMORY, "out of memory");
-		}
 
 		lexptr = lexbuf + lexcnt;
 	}
@@ -214,18 +211,16 @@ void addbuf(uint8 b)
 	++lexcnt;
 }
 
-//------------------------------------------------------------------------------
 
-void open_include()
+void
+open_include()
 {
 	yytext[yyleng - 1] = '\0';  // remove trailing " quote
 
 	char tmpname[B_PATH_NAME_LENGTH];
-	if (open_file_from_include_dir(yytext, tmpname))
-	{
+	if (open_file_from_include_dir(yytext, tmpname)) {
 		yyin = fopen(tmpname, "r");
-		if (yyin != NULL)
-		{
+		if (yyin != NULL) {
 			include_t incl;
 			incl.buffer   = YY_CURRENT_BUFFER;
 			incl.lineno   = yylineno;
@@ -240,13 +235,13 @@ void open_include()
 			return;
 		}
 	}
-	
+
 	abort_compile(RDEF_COMPILE_ERR, "cannot open include %s", yytext);
 }
 
-//------------------------------------------------------------------------------
 
-void close_include()
+void
+close_include()
 {
 	fclose(yyin);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
@@ -261,34 +256,31 @@ void close_include()
 	free(incl.filename);
 }
 
-//------------------------------------------------------------------------------
 
-void init_lexer()
+void
+init_lexer()
 {
 	lexsize = LEX_BUF_SIZE;
 	lexbuf = (uint8*) malloc(lexsize);
 	if (lexbuf == NULL)
-	{
 		abort_compile(B_NO_MEMORY, "out of memory");
-	}
 
 	yyrestart(yyin);  // necessary for multiple input files
 	yylineno = 1;
 }
 
-//------------------------------------------------------------------------------
 
-void clean_up_lexer()
+void
+clean_up_lexer()
 {
-	while (!include_stack.empty())
-	{
+	while (!include_stack.empty()) {
 		close_include();
 	}
 
-	fclose(yyin);
+	if (stdin != yyin)
+		fclose(yyin);
 	yy_delete_buffer(YY_CURRENT_BUFFER);
 
 	free(lexbuf);
 }
 
-//------------------------------------------------------------------------------

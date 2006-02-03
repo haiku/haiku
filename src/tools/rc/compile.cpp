@@ -79,11 +79,18 @@ class AddIncludeDir {
 
 
 AddIncludeDir::AddIncludeDir(const char *file)
-	:
-	fPath(file)
 {
-	if (fPath.GetParent(&fPath) == B_OK)
-		rdef_add_include_dir(fPath.Path(), false);
+	// ignore the special stdin file
+	if (!strcmp(file, "-"))
+		return;
+
+	if (fPath.SetTo(file) != B_OK
+		|| fPath.GetParent(&fPath) != B_OK) {
+		fPath.Unset();
+		return;
+	}
+
+	rdef_add_include_dir(fPath.Path(), false);
 }
 
 
@@ -187,7 +194,12 @@ compile_file(char *file)
 {
 	strcpy(lexfile, file);
 
-	yyin = fopen(lexfile, "r");
+	// "-" means reading from stdin
+	if (strcmp(file, "-"))
+		yyin = fopen(lexfile, "r");
+	else
+		yyin = stdin;
+
 	if (yyin == NULL) {
 		strcpy(rdef_err_file, lexfile);
 		rdef_err = RDEF_FILE_NOT_FOUND;

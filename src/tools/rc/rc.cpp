@@ -210,6 +210,9 @@ parse_options(int argc, char *argv[])
 		} else if (strcmp(argv[i], "-V") == 0
 				|| strcmp(argv[i], "--version") == 0) {
 			version();
+		} else if (!strcmp(argv[i], "-")) {
+			// stdin input file
+			break;
 		} else if (argv[i][0] == '-') {
 			error("unknown option %s", argv[i]);
 			argv[i] = NULL;
