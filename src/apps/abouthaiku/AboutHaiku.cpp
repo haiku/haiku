@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Haiku, Inc.
+ * Copyright (c) 2005-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author: DarkWyrm <bpmagic@columbus.rr.com>
@@ -16,6 +16,7 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Path.h>
+#include <Resources.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
@@ -122,7 +123,6 @@ AboutView::AboutView(const BRect &rect)
 
 	font_height height;
 	float labelHeight, textHeight;
-	char string[255];
 
 	system_info systemInfo;
 	get_system_info(&systemInfo);
@@ -158,6 +158,7 @@ AboutView::AboutView(const BRect &rect)
 	r.OffsetBy(0, labelHeight);
 	r.bottom = r.top + textHeight;
 
+	char string[256];
 	strcpy(string, "Unknown");
 
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
@@ -173,6 +174,16 @@ AboutView::AboutView(const BRect &rect)
 			&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK
 			&& versionInfo.short_info[0] != '\0')
 			strcpy(string, versionInfo.short_info);
+	}
+
+	// Add revision from resources
+	BResources* resources = be_app->AppResources();
+	const char* versionString = (const char *)resources->LoadResource(
+		B_STRING_TYPE, "SVN:REVISION", NULL);
+	if (versionString != NULL) {
+		strlcat(string, " (r", sizeof(string));
+		strlcat(string, versionString, sizeof(string));
+		strlcat(string, ")", sizeof(string));
 	}
 
 	stringView = new BStringView(r, "ostext", string);
@@ -285,7 +296,6 @@ AboutView::AboutView(const BRect &rect)
 		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_PLAIN_BORDER);
 	AddChild(creditsScroller);
 
-
 	rgb_color darkgrey 		= { 100, 100, 100, 255 };
 	rgb_color haiku_green 	= {  42, 131,  36, 255 };
 	rgb_color haiku_orange 	= { 255,  69,   0, 255 };
@@ -376,6 +386,7 @@ AboutView::AboutView(const BRect &rect)
 		"Jonas Sundström\n"
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
+		"Oliver Tappe\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
 		"Nathan Whitehorn\n"
