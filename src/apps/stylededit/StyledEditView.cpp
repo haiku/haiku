@@ -160,21 +160,24 @@ status_t
 StyledEditView::WriteStyledEditFile(BFile * file)
 {
 	status_t result = B_OK;
+	ssize_t bytes = 0;
 	result = BTranslationUtils::WriteStyledEditFile(this,file);
 	if (result != B_OK) {
 		return result;
 	}
 	if (fEncoding == 0) {
 		int32 encoding = 65535;
-		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&encoding,sizeof(encoding));
+		bytes = file->WriteAttr("be:encoding",B_INT32_TYPE,0,&encoding,sizeof(encoding));
+		if (bytes < 0)
+			return bytes;
 	} else {
 		result = file->SetSize(0);
 		if (result != B_OK) {
 			return result;
 		}
-		result = file->Seek(0,SEEK_SET);
-		if (result != B_OK) {
-			return result;
+		bytes = file->Seek(0, SEEK_SET);
+		if (bytes != 0) {
+			return bytes;
 		}
 		const BCharacterSet * cs = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding);
 		if (cs != 0) {
@@ -190,18 +193,26 @@ StyledEditView::WriteStyledEditFile(BFile * file)
 				if (result != B_OK) {
 					return result;
 				}
-				file->Write(buffer,written);
+				bytes = file->Write(buffer,written);
+				if (bytes < 0)
+					return bytes;
 				sourceLength -= length;
 				outText += length;
 			}
-			file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
+			bytes = file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
+			if (bytes < 0)
+				return bytes;
 		}
 	} 
 
 	alignment align = Alignment();
-	file->WriteAttr("alignment",B_INT32_TYPE,0,&align,sizeof(align));
+	bytes = file->WriteAttr("alignment",B_INT32_TYPE,0,&align,sizeof(align));
+	if (bytes < 0)
+		return bytes;
 	bool wrap = DoesWordWrap();
-	file->WriteAttr("wrap",B_BOOL_TYPE,0,&wrap,sizeof(wrap));
+	bytes = file->WriteAttr("wrap",B_BOOL_TYPE,0,&wrap,sizeof(wrap));
+	if (bytes < 0)
+		return bytes;
 	return result;	
 }
 
