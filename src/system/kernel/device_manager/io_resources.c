@@ -321,15 +321,15 @@ static void
 wait_for_resources(void)
 {
 	TRACE(("wait_for_resources()\n"));
-	
+
 	++pnp_resource_wait_count;
 
 	// we have to release while waiting
-	benaphore_lock(&gNodeLock);
-	
-	acquire_sem(pnp_resource_wait_sem);
-	
 	benaphore_unlock(&gNodeLock);
+
+	acquire_sem(pnp_resource_wait_sem);
+
+	benaphore_lock(&gNodeLock);
 }
 
 
