@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <new>
 
 #include <Application.h>
 #include <Beep.h>
@@ -274,7 +275,7 @@ BTextView::BTextView(BMessage *archive)
 		text_run_array *runArray = UnflattenRunArray(flattenedRun, (int32 *)&runSize);
 		if (runArray) {
 			SetRunArray(0, TextLength(), runArray);
-			free(runArray);
+			FreeRunArray(runArray);
 		}
 	}
 	
@@ -351,7 +352,7 @@ BTextView::Archive(BMessage *data, bool deep) const
 	} else
 		err = B_NO_MEMORY;
 
-	free(runArray);
+	FreeRunArray(runArray);
 	
 	return err;
 }
@@ -1337,7 +1338,7 @@ BTextView::Copy(BClipboard *clipboard)
 				text_run_array *runArray = RunArray(fSelStart, fSelEnd, &size);
 				clip->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 					runArray, size);
-				free(runArray);
+				FreeRunArray(runArray);
 			}
 			clipboard->Commit();
 		}
@@ -1647,25 +1648,16 @@ BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 	if (styleRange == NULL)
 		return NULL;
 
-	text_run_array *res = (text_run_array *)malloc(sizeof(int32)
-		+ (sizeof(text_run) * styleRange->count));
+	text_run_array *res = AllocRunArray(styleRange->count, outSize);
 
-	if (!res) {
-		if (outSize)
-			*outSize = 0;
+	if (!res)
 		return NULL;
-	}
-
-	res->count = styleRange->count;
 
 	for (int32 i = 0; i < res->count; i++) {
 		res->runs[i].offset = styleRange->runs[i].offset;
 		res->runs[i].font = &styleRange->runs[i].style.font;
 		res->runs[i].color = styleRange->runs[i].style.color;
 	}
-
-	if (outSize != NULL)
-		*outSize = sizeof(int32) + (sizeof(text_run) * res->count);
 
 	return res;
 }
@@ -2599,6 +2591,65 @@ BTextView::AllDetached()
 }
 
 
+/* static */
+text_run_array *
+BTextView::AllocRunArray(int32 entryCount, int32 *outSize)
+{
+	int32 size = sizeof(text_run_array) + (entryCount - 1) * sizeof(text_run);
+
+	text_run_array *runArray = (text_run_array *)malloc(size);
+	if (runArray == NULL) {
+		if (outSize != NULL)
+			*outSize = 0;
+		return NULL;
+	}
+	
+	memset(runArray, 0, sizeof(size));
+
+	runArray->count = entryCount;
+
+	// Call constructors explicitly as the text_run_array
+	// was allocated with malloc
+	for (int32 i = 0; i < runArray->count; i++)
+		new (&runArray->runs[i].font) BFont;
+		//runArray->runs[i].font = new BFont;
+		
+	if (outSize != NULL)
+		*outSize = size;
+
+	return runArray;
+}
+
+
+/* static */
+text_run_array *
+BTextView::CopyRunArray(const text_run_array *orig, int32 countDelta)
+{
+	text_run_array *copy = AllocRunArray(countDelta, NULL);
+	if (copy != NULL) {
+		for (int32 i = 0; i < countDelta; i++) {
+			copy->runs[i].offset = orig->runs[i].offset;
+			copy->runs[i].font = orig->runs[i].font;
+			copy->runs[i].color = orig->runs[i].color;	
+		}
+	}
+	return copy;
+}
+
+
+/* static */
+void
+BTextView::FreeRunArray(text_run_array *array)
+{
+	// Call destructors explicitly
+	for (int32 i = 0; i < array->count; i++)
+		array->runs[i].font.~BFont();
+	
+	free(array);
+}
+
+
+/* static */
 void *
 BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 {
@@ -2643,6 +2694,7 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 }
 
 
+/* static */
 text_run_array *
 BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 {
@@ -2660,35 +2712,14 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 		return NULL;
 	}
 
-	int32 size = sizeof(text_run_array) + (array->count - 1) * sizeof(text_run);
-
-	text_run_array *run_array = (text_run_array *)malloc(size);
-	if (run_array == NULL) {
-		*outSize = 0;
+	
+	text_run_array *run_array = AllocRunArray(array->count, outSize);
+	if (run_array == NULL)
 		return NULL;
-	}
-
-	run_array->count = array->count;
 
 	for (int32 i = 0; i < array->count; i++) {
-		run_array->runs[i].offset = array->styles[i].offset;
-
-		// TODO: Here we are leaking memory.
-		// We should use placement new instead
-		// new (&run_array->runs[i].font) BFont();
-		// The reason we're calling the constructor explicitly is
-		// that the text_run_array() is allocated with malloc. It can't
-		// be allocated with new due to its nature: see its definition
-		// on the top of TextView.h
-
-		// Note that BFont doesn't have a destructor.
-		// If it had one, our whole RunArray()/SetRunArray() api
-		// would have to be changed, as it doesn't fit with the fact
-		// that we'd have to call the BFont's destructor. Or, as Waldemar
-		// suggested, we'd have to provide a "free_text_run_array()" method
-		// which would take care of calling the destructors.
-			
-		run_array->runs[i].font = new BFont;
+		run_array->runs[i].offset = array->styles[i].offset;	
+		
 		run_array->runs[i].font.SetFamilyAndStyle(array->styles[i].family,
 			array->styles[i].style);
 		run_array->runs[i].font.SetSize(array->styles[i].size);
@@ -2700,9 +2731,6 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 		run_array->runs[i].color.blue = array->styles[i].blue;
 		run_array->runs[i].color.alpha = array->styles[i].alpha;
 	}
-
-	if (outSize)
-		*outSize = size;
 
 	return run_array;
 }
@@ -2803,7 +2831,7 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap, BPoint *point, BH
 		drag->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 			styles, size);
 	
-		free(styles);
+		FreeRunArray(styles);
 	}
 
 	if (bitmap != NULL)

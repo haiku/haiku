@@ -236,10 +236,12 @@ virtual void			GetPreferredSize(float *width, float *height);
 virtual void			AllAttached();
 virtual void			AllDetached();
 
-static	void*			FlattenRunArray(const text_run_array *inArray, 
-										int32				 *outSize = NULL);
-static	text_run_array*	UnflattenRunArray(const void	*data,
-										  int32			*outSize = NULL);
+
+static	text_run_array*		AllocRunArray(int32 entryCount, int32 *outSize = NULL);
+static	text_run_array* 	CopyRunArray(const text_run_array *orig, int32 countDelta = 0);
+static	void			FreeRunArray(text_run_array *array);
+static	void *			FlattenRunArray(const text_run_array *inArray, int32 *outSize = NULL);
+static	text_run_array*		UnflattenRunArray(const void *data, int32 *outSize = NULL);
 	
 protected:
 virtual	void			InsertText(const char				*inText, 
