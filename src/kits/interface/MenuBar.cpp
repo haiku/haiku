@@ -413,7 +413,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 		window->Unlock();
 
-		if (localAction == MENU_ACT_CLOSE)
+		if (localAction == MENU_ACT_CLOSE || buttons == 0)
 			break;
 
 		if (snoozeAmount > 0)
