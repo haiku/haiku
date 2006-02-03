@@ -32,10 +32,11 @@ BuildPlatformSharedLibrary libroot_build.so :
 
 	strlcpy.c
 	strlcat.c
+	strnlen.c
 
 	:
 	$(HOST_LIBSTDC++)
 ;
 
-SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
+SEARCH on [ FGristFiles strlcat.c strlcpy.c strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;

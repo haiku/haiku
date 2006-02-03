@@ -16,6 +16,10 @@ extern "C" {
 extern size_t   strlcpy(char *dest, const char *source, size_t length);
 extern size_t	strlcat(char *dest, const char *source, size_t length);
 
+#ifdef HAIKU_HOST_PLATFORM_FREEBSD
+extern size_t	strnlen(const char *string, size_t length);
+#endif
+
 // BeOS only
 extern ssize_t  read_pos(int fd, off_t pos, void *buffer, size_t count);
 extern ssize_t  write_pos(int fd, off_t pos, const void *buffer,size_t count);
