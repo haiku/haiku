@@ -6,29 +6,31 @@ if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
+rule GenerateRevisionFile
+{
+	MakeLocateCommonPlatform $(1) ;
+	Always $(1) ;
+		# we want to rebuild the resources everytime AboutHaiku
+		# is built to keep them up-to-date
+}
+
+actions GenerateRevisionFile
+{
+	(svn info $(HAIKU_TOP) 2> /dev/null || echo Revision: unknown) |
+		grep Revision | awk '{printf $2}' > $(1)
+}
+
+local revisionFile = [ FGristFiles haiku-revision ] ;
+GenerateRevisionFile $(revisionFile) ;
+
+AddFileDataResource AboutHaiku : CSTR:201:SVN:REVISION : $(revisionFile) ;
+
 Application AboutHaiku :
 	AboutHaiku.cpp
 	: libbe.so libtranslation.so libroot.so
 	: AboutHaiku.rdef
-	;
-
-rule AddRevisionToResources {
-	Depends $(1) ;
-	AddRevisionToResources1 $(1) : <build>rc ;
-}
-
-actions AddRevisionToResources1 {
-	VERSION=`svn info | grep Revision | cut -d\  -f2`
-	echo "resource(201, \"SVN:REVISION\") #'CSTR' \""$VERSION"\";" | $(2) -m -o $(1) -
-}
-
-# This must come after the Application rule, so that the
-# AboutHaiku.rsrc file is already created
-AddRevisionToResources [ FGristFiles AboutHaiku.rsrc ] ;
-ALWAYS [ FGristFiles AboutHaiku.rsrc ] ;
-	# we want to rebuild the resources everytime AboutHaiku
-	# is built to keep them up-to-date
+;
 
 Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles haikulogo.png ] ;
-SEARCH on [ FGristFiles haikulogo.png ] = [ FDirName $(HAIKU_TOP) src apps abouthaiku ] ;
-
+SEARCH on [ FGristFiles haikulogo.png ]
+	= [ FDirName $(HAIKU_TOP) src apps abouthaiku ] ;
