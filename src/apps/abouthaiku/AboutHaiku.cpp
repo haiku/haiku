@@ -180,7 +180,7 @@ AboutView::AboutView(const BRect &rect)
 	BResources* resources = be_app->AppResources();
 	const char* versionString = (const char *)resources->LoadResource(
 		B_STRING_TYPE, "SVN:REVISION", NULL);
-	if (versionString != NULL) {
+	if (versionString != NULL && strcmp(versionString, "unknown") != 0) {
 		strlcat(string, " (r", sizeof(string));
 		strlcat(string, versionString, sizeof(string));
 		strlcat(string, ")", sizeof(string));
