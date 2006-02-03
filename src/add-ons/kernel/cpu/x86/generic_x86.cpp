@@ -139,6 +139,10 @@ generic_mtrr_compute_physical_mask(void)
 		&& cpuInfo.eax_0.max_eax & 0xff >= 8) {
 		get_cpuid(&cpuInfo, 0x80000008, 0);
 		bits = cpuInfo.regs.eax & 0xff;
+
+		// Obviously, the bits are not always reported correctly
+		if (bits < 36)
+			bits = 36;
 	}
 
 	gPhysicalMask = ((1ULL << bits) - 1) & ~(B_PAGE_SIZE - 1);
