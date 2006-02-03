@@ -14,6 +14,7 @@ extern "C" {
 
 // Is kernel-only under Linux.
 extern size_t   strlcpy(char *dest, const char *source, size_t length);
+extern size_t	strlcat(char *dest, const char *source, size_t length);
 
 // BeOS only
 extern ssize_t  read_pos(int fd, off_t pos, void *buffer, size_t count);
