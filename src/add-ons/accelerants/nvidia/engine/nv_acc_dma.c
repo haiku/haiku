@@ -10,46 +10,6 @@
 
 #define MODULE_BIT 0x00080000
 
-/* 3D command defines (needed for concurrent overlay/3D 'workaround')
- * note:
- * the workaround is:
- * - we have to issue a 3D drawing command before overlay is activated to prevent
- *   the acceleration engine to crash;
- *
- * Hopefully we can find the _real_ solution for this one day... */
-#define RIVA_STATE3D_05(t0, t1, t2, bb, cc) \
-{ \
-	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_COLORKEY, 7); \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Colorkey */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t0; /* Offset */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t1; /* Format */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = t2; /* Filter */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = bb; /* Blend */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cc; /* Control */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* FogColor */ \
-}
-
-#define RIVA_VERTEX3D_05(ii, xx, yy) \
-{ \
-	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_TLVERTEX(ii), 8); \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = xx; /* ScreenX */ \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = yy; /* ScreenY */ \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* ScreenZ */ \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = 1.0f; /* RWH */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Color */ \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0; /* Specular */ \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* TU */ \
-	((float *)(si->dma_buffer))[si->engine.dma.current++] = 0.0f; /* TV */ \
-}
-
-#define RIVA_DRAWQUAD3D_05(v0, v1, v2, v3) \
-{ \
-	nv_acc_cmd_dma(NV4_DX5_TEXTURE_TRIANGLE, NV4_DX5_TEXTURE_TRIANGLE_TLVDRAWPRIM(0), 1); \
-	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = \
-		(((v3)<<20)|((v2)<<16)|((v0)<<12)|((v2)<<8)|((v1)<<4)|(v0)); /* TLVDrawPrim */ \
-}
-
-
 #include "nv_std.h"
 
 /*acceleration notes*/
@@ -1186,40 +1146,6 @@ status_t nv_acc_init_dma()
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 
-	/* concurrent overlay/3D 'workaround':
-	 * we _must_ execute a 3D command before overlay is started to prevent a hard
-	 * engine crash! Drawing a small rectangle (Z-only) containing rubbish. */
-	/* note:
-	 * 3D only works on pre-NV20 currently... */
-	//fixme: looks like this is not needed anymore since the 'dangerous RAM' patch!
-	if (0)//si->ps.card_arch < NV20A)
-	{
-		/* wait for room in fifo for 3D 'workaround' cmd if needed */
-		if (nv_acc_fifofree_dma(50) != B_OK) return B_ERROR;
-
-		/* setup fake 3D surfaces: */
-		nv_acc_cmd_dma(NV4_CONTEXT_SURFACES_ARGB_ZS, NV4_CONTEXT_SURFACES_ARGB_ZS_PITCH, 3);
-		/* Set minimum pitch (granularity) required by hardware */
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =	64 | (64 << 16); /* Pitches */
-		/* Place colorbuffer in Desktop */
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 
-			((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer); /* SetOffsetColor */
-		/* Place Z-buffer in Desktop */
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
-			((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer); /* SetOffsetZeta */
-
-		/* Set a valid 3D state (write Z-buffer only): texture is in Desktop */
-		RIVA_STATE3D_05(((uint32)si->fbc.frame_buffer - (uint32)si->framebuffer),
-			0x11221551, 0x11000000, 0x21100162, 0x41186800);
-		/* Enter a small two dimensional quad */
-		RIVA_VERTEX3D_05(0, 0, 0);
-		RIVA_VERTEX3D_05(1, 16, 0);
-		RIVA_VERTEX3D_05(2, 16, 16);
-		RIVA_VERTEX3D_05(3, 0, 16);
-		/* Render quad */
-		RIVA_DRAWQUAD3D_05(0, 1, 2, 3);
-	}
-
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
 
@@ -1466,7 +1392,7 @@ static void nv_init_for_3D_dma(void)
 		/* Z-buffer state is:
 		 * initialized, set to: 'fixed point' (integer?); Z-buffer; 16bits depth */
 		/* note:
-		 * other options possible are: floating point; 24bits depth; W-buffer(?) */
+		 * other options possible are: floating point; 24bits depth; W-buffer */
 		ACCW(GLOB_STAT_0, 0x10000000);
 		/* set DMA instance 2 and 3 to be invalid */
 		ACCW(GLOB_STAT_1, 0x00000000);
