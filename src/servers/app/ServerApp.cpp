@@ -1565,7 +1565,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 5) float - rotation
 			// 6) uint32 - flags
 			// 7) int32 - numChars
-			// 8) char - chars (numChars times)
+			// 8) int32 - numBytes
+			// 8) char - chars (bytesInBuffer times)
 
 			// Returns:
 			// 1) BShape - glyph shape
@@ -1582,11 +1583,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<float>(&rotation);
 			link.Read<uint32>(&flags);
 
-			int32 numChars;
+			int32 numChars, numBytes;
 			link.Read<int32>(&numChars);
+			link.Read<int32>(&numBytes);
 
-			char charArray[numChars];			
-			link.Read(&charArray, numChars);
+			char charArray[numBytes];			
+			link.Read(&charArray, numBytes);
 
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
@@ -1620,21 +1622,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) int32 - numChars
-                        // 4) int32 - numBytes
-                        // 5) char - the char buffer with size numBytes
+			// 4) int32 - numBytes
+			// 5) char - the char buffer with size numBytes
 
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 
-			int32 numChars;
+			int32 numChars, numBytes;
 			link.Read<int32>(&numChars);
-
-			uint32 numBytes;
-			link.Read<uint32>(&numBytes);
+			link.Read<int32>(&numBytes);
 			char* charArray = new char[numBytes];
 			link.Read(charArray, numBytes);
-			
+
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
@@ -1738,7 +1738,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						fLink.Attach<BPoint>(escapements[i]);
 					}
 
-					delete escapements;
+					delete[] escapements;
 				} else
 					fLink.StartMessage(B_ERROR);
 			} else

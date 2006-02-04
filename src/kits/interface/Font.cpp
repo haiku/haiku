@@ -1274,7 +1274,7 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	// TODO: implement code specifically for passing BShapes to and from the server
 	if (!charArray || numChars < 1 || !glyphShapeArray)
 		return;
-	
+
 	int32 code;
 	BPrivate::AppServerLink link;
 
@@ -1285,9 +1285,11 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	link.Attach<float>(fShear);
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
-	
 	link.Attach<int32>(numChars);
-	link.Attach(charArray, numChars);
+
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+	link.Attach(charArray, bytesInBuffer);
 
 	if (link.FlushWithReply(code) != B_OK
 		|| code != B_OK)
@@ -1303,7 +1305,7 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 {
 	if (!charArray || numChars < 1 || !hasArray)
 		return;
-	
+
 	int32 code;
 	BPrivate::AppServerLink link;
 
