@@ -9,10 +9,19 @@
 
 namespace BPrivate {
 
-DIR *open_attr_dir(NodeRef ref);
+// defined in fs_attr.cpp
 
-status_t get_attribute_path(NodeRef ref, const char *attribute,
-	std::string &attrPath, std::string &typePath);
+// Note: Only one of path or fd can be supplied.
+DIR *open_attr_dir(NodeRef ref, const char *path, int fd);
+
+// Note: Only one of path or fd can be supplied.
+status_t get_attribute_path(NodeRef ref, const char *path, int fd,
+	const char *attribute, std::string &attrPath, std::string &typePath);
+
+
+// defined in fs.cpp
+
+status_t get_path(int fd, const char *name, std::string &path);
 
 }	// namespace BPrivate
 

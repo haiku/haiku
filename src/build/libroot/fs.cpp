@@ -25,7 +25,6 @@ using namespace BPrivate;
 
 static const int kVirtualDescriptorStart = 10000;
 
-static status_t get_path(int fd, const char *name, string &path);
 static status_t get_path(dev_t device, ino_t node, const char *name, string &path);
 
 namespace BPrivate {
@@ -506,8 +505,8 @@ get_path(const NodeRef *ref, const char *name, string &path)
 }
 
 // get_path
-static status_t
-get_path(int fd, const char *name, string &path)
+status_t
+BPrivate::get_path(int fd, const char *name, string &path)
 {
 	// get the node ref for the fd, if any, and the path part is not absolute
 	if (fd >= 0 && !(name && name[0] == '/')) {
@@ -522,10 +521,10 @@ get_path(int fd, const char *name, string &path)
 		if (error != B_OK)
 			return error;
 
-		return get_path(&ref, name, path);
+		return ::get_path(&ref, name, path);
 	
 	} else	// no descriptor or absolute path
-		return get_path((NodeRef*)NULL, name, path);
+		return ::get_path((NodeRef*)NULL, name, path);
 }
 
 // get_path
@@ -1210,8 +1209,17 @@ _kern_open_attr_dir(int fd, const char *path)
 	}
 	NodeRef ref(st);
 
+	// If a path was given, get a usable path.
+	string realPath;
+	if (path) {
+		error = get_path(fd, path, realPath);
+		if (error != B_OK)
+			return error;
+	}
+	
 	// open the attr dir
-	DIR *dir = open_attr_dir(ref);
+	DIR *dir = open_attr_dir(ref, (path ? realPath.c_str() : NULL),
+		(path ? -1 : fd));
 	if (!dir)
 		return errno;
 
@@ -1232,8 +1240,14 @@ get_attribute_path(int fd, const char *attribute, string &attrPath,
 		return error;
 	NodeRef ref(st);
 
+	// Try to get a path. If we can't get a path, this is must be a "real"
+	// (i.e. system) file descriptor, which is just as well.
+	string path;
+	bool pathValid = (get_path(fd, NULL, path) == B_OK);
+	
 	// get the attribute path
-	return get_attribute_path(ref, attribute, attrPath, typePath);
+	return get_attribute_path(ref, (pathValid ? path.c_str() : NULL),
+		(pathValid ? -1 : fd), attribute, attrPath, typePath);
 }
 
 // _kern_rename_attr
