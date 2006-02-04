@@ -1,12 +1,7 @@
-/*******************************************************************************
-/
-/	File:			Shape.h
-/
-/   Description:    BShape encapsulates a Postscript-style "path"
-/
-/	Copyright 1992-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+/*
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _SHAPE_H
 #define _SHAPE_H
@@ -88,6 +83,8 @@ virtual	void			_ReservedShape4();
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);
 		void			SetData(int32 opCount, int32 ptCount, uint32 *opList, BPoint *ptList);
 		void			InitData();
+		void			AllocatePts(int32 count);
+		void			AllocateOps(int32 count);
 
 		uint32			fState;
 		uint32			fBuildingOp;
