@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku Inc.
+ * Copyright 2002-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,9 +7,10 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	BPrivateScreen is the class which does the real work for
- *	the proxy class BScreen (it interacts with the app server).
- */
+/*!
+	BPrivateScreen is the class which does the real work for
+	the proxy class BScreen (it interacts with the app_server).
+*/
 
 
 #include "AppMisc.h"
@@ -17,6 +18,7 @@
 #include "PrivateScreen.h"
 #include "ServerProtocol.h"
 
+#include <Application.h>
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Locker.h>
@@ -65,6 +67,10 @@ BPrivateScreen::Get(screen_id id)
 BPrivateScreen *
 BPrivateScreen::_Get(screen_id id, bool check)
 {
+	// Nothing works without an app_server connection
+	if (be_app == NULL)
+		return NULL;
+
 	BAutolock locker(sScreenLock);
 
 	// search for the screen ID
