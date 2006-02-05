@@ -520,14 +520,14 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 	for (int32 i = 0; i < opCount; i++) {
 		uint32 op = opList[i] & 0xFF000000;
 		if (op & OP_MOVETO) {
-			path.move_to(points->x, points->y);
+			path.move_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
 			points++;
 		}
 
 		if (op & OP_LINETO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count--) {
-				path.line_to(points->x, points->y);
+				path.line_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
 				points++;
 			}
 		}
@@ -535,9 +535,9 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				path.curve4(points[0].x, points[0].y,
-							points[1].x, points[1].y,
-							points[2].x, points[2].y);
+				path.curve4(points[0].x + fPenLocation.x, points[0].y + fPenLocation.y,
+							points[1].x + fPenLocation.x, points[1].y + fPenLocation.y,
+							points[2].x + fPenLocation.x, points[2].y + fPenLocation.y);
 				points += 3;
 				count -= 3;
 			}
@@ -547,10 +547,7 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 			path.close_polygon();
 	}
 
-	typedef agg::conv_transform<agg::path_storage, agg::trans_affine> conv_trans_type;
-	conv_trans_type transformed(path, agg::trans_affine_translation(fPenLocation.x, fPenLocation.y));
-	agg::conv_curve<conv_trans_type> curve(transformed);
-
+	agg::conv_curve<agg::path_storage> curve(path);
 	if (filled)
 		return _FillPath(curve);
 	else
