@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,6 +65,10 @@ BTokenSpace::SetToken(int32 token, int16 type, void* object)
 	token_info tokenInfo = { type, object };
 
 	fTokenMap[token] = tokenInfo;
+
+	// this makes sure SetToken() plays more or less nice with NewToken()
+	if (token >= fTokenCount)
+		fTokenCount = token + 1;
 }
 
 
