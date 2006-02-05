@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -263,6 +263,7 @@ Desktop::Desktop(uid_t userID)
 	fSettings(new DesktopSettings::Private()),
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
+	fCurrentWorkspace(0),
 	fAllWindows(kAllWindowList),
 	fSubsetWindows(kSubsetList),
 	fWorkspacesLayer(NULL),
@@ -478,12 +479,6 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPrivate::PortLink replyLink(replyPort);
 			replyLink.StartMessage(status);
 			replyLink.Flush();
-			break;
-		}
-
-		case AS_SET_SYSCURSOR_DEFAULTS:
-		{
-			GetCursorManager().SetDefaults();
 			break;
 		}
 
