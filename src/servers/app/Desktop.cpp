@@ -268,7 +268,11 @@ Desktop::Desktop(uid_t userID)
 	fSubsetWindows(kSubsetList),
 	fWorkspacesLayer(NULL),
 	fActiveScreen(NULL),
-	fWindowLock("window lock")
+	fWindowLock("window lock"),
+	fMouseEventWindow(NULL),
+	fFocus(NULL),
+	fFront(NULL),
+	fBack(NULL)
 {
 	char name[B_OS_NAME_LENGTH];
 	Desktop::_GetLooperName(name, sizeof(name));
