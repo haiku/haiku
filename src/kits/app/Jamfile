@@ -19,6 +19,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 
 UsePrivateHeaders shared app interface ;
 UsePrivateHeaders [ FDirName kernel util ] ;   # For KMessage.h
+UsePrivateHeaders [ FDirName servers app ] ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 

@@ -1243,16 +1243,16 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				fCurrentLayer->SetResizeMode(resizeMode);
 			break;
 		}
-		case AS_LAYER_CURSOR:
+		case AS_LAYER_SET_CURSOR:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
-			int32 token = -1;
-			link.Read<int32>(&token);
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK) {
+				// TODO: this badly needs reference counting
+				ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
+				fCurrentLayer->SetCursor(cursor);
+			}
 
-			// TODO: this badly needs reference counting
-			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
-			fCurrentLayer->SetCursor(cursor);
-			
 			// TODO: if fCurrentLayer is the view under the cursor, the appearance should change immediately!
 			break;
 		}

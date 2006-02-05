@@ -1,37 +1,21 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		CursorSet.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Private file encapsulating OBOS system cursor API
-//  
-//------------------------------------------------------------------------------
-#include <PortLink.h>
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+
+
 #include <AppServerLink.h>
+#include <CursorSet.h>
+#include <PortLink.h>
+#include <ServerCursor.h>
 #include <ServerProtocol.h>
+
 #include <OS.h>
 #include <String.h>
 #include <File.h>
-#include "CursorSet.h"
-#include "ServerCursor.h"
 
 
 /*!
@@ -44,6 +28,7 @@ CursorSet::CursorSet(const char *name)
 	AddString("name", name ? name : "Untitled");
 }
 
+
 /*!
 	\brief Saves the data in the cursor set to a file
 	\param path Path of the file to save to.
@@ -54,18 +39,19 @@ CursorSet::CursorSet(const char *name)
 	- \c other value: See BFile::SetTo and BMessage::Flatten return codes
 */
 status_t
-CursorSet::Save(const char *path, int32 saveflags)
+CursorSet::Save(const char *path, int32 saveFlags)
 {
 	if (!path)
 		return B_BAD_VALUE;
 
 	BFile file;
-	status_t status = file.SetTo(path, B_READ_WRITE | saveflags);
+	status_t status = file.SetTo(path, B_READ_WRITE | saveFlags);
 	if (status != B_OK)
 		return status;
 
 	return Flatten(&file);
 }
+
 
 /*!
 	\brief Loads the data into the cursor set from a file
@@ -89,6 +75,7 @@ CursorSet::Load(const char *path)
 	return Unflatten(&file);
 }
 
+
 /*!
 	\brief Adds the cursor to the set and replaces any existing entry for the given specifier
 	\param which System cursor specifier defined in CursorSet.h
@@ -103,7 +90,7 @@ CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &ho
 		return B_BAD_VALUE;
 
 	// Remove the data if it exists already
-	RemoveData(CursorWhichToString(which));
+	RemoveData(_CursorWhichToString(which));
 
 	// Actually add the data to our set
 	BMessage msg((int32)which);
@@ -116,10 +103,11 @@ CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &ho
 	msg.AddInt32("_rowbytes",cursor->BytesPerRow());
 	msg.AddPoint("hotspot",hotspot);
 	msg.AddData("_data",B_RAW_TYPE,cursor->Bits(), cursor->BitsLength());
-	AddMessage(CursorWhichToString(which),&msg);
+	AddMessage(_CursorWhichToString(which),&msg);
 	
 	return B_OK;
 }
+
 
 /*!
 	\brief Adds the cursor to the set and replaces any existing entry for the given specifier
@@ -138,7 +126,7 @@ CursorSet::AddCursor(cursor_which which, int8 *data)
 	if (!data)
 		return B_BAD_VALUE;
 
-	BBitmap *bmp = CursorDataToBitmap(data);
+	BBitmap *bmp = _CursorDataToBitmap(data);
 	BPoint pt(data[2],data[3]);
 
 	status_t stat = AddCursor(which,bmp,pt);
@@ -147,6 +135,7 @@ CursorSet::AddCursor(cursor_which which, int8 *data)
 	return stat;
 }
 
+
 /*!
 	\brief Removes the data associated with the specifier from the cursor set
 	\param which System cursor specifier defined in CursorSet.h
@@ -154,8 +143,9 @@ CursorSet::AddCursor(cursor_which which, int8 *data)
 void
 CursorSet::RemoveCursor(cursor_which which)
 {
-	RemoveData(CursorWhichToString(which));
+	RemoveData(_CursorWhichToString(which));
 }
+
 
 /*!
 	\brief Retrieves a cursor from the set.
@@ -177,7 +167,7 @@ CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
 		return B_BAD_VALUE;
 
 	BMessage msg;
-	if (FindMessage(CursorWhichToString(which), &msg) != B_OK)
+	if (FindMessage(_CursorWhichToString(which), &msg) != B_OK)
 		return B_NAME_NOT_FOUND;
 
 	const void *buffer;
@@ -206,6 +196,7 @@ CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot)
 	return B_ERROR;
 }
 
+
 /*!
 	\brief Retrieves a cursor from the set.
 	\param which System cursor specifier defined in CursorSet.h
@@ -222,7 +213,7 @@ status_t
 CursorSet::FindCursor(cursor_which which, ServerCursor **_cursor)
 {
 	BMessage msg;
-	if (FindMessage(CursorWhichToString(which), &msg) != B_OK)
+	if (FindMessage(_CursorWhichToString(which), &msg) != B_OK)
 		return B_NAME_NOT_FOUND;
 
 	const char *className;
@@ -250,6 +241,7 @@ CursorSet::FindCursor(cursor_which which, ServerCursor **_cursor)
 	return B_ERROR;
 }
 
+
 /*!
 	\brief Returns the name of the set
 	\return The name of the set
@@ -263,6 +255,7 @@ CursorSet::GetName(void)
 
 	return NULL;
 }
+
 
 /*!
 	\brief Renames the cursor set
@@ -287,7 +280,7 @@ CursorSet::SetName(const char *name)
 	\return Name for the cursor specifier
 */
 const char *
-CursorWhichToString(cursor_which which)
+CursorSet::_CursorWhichToString(cursor_which which)
 {
 	switch (which) {
 		case B_CURSOR_DEFAULT:
@@ -323,7 +316,7 @@ CursorWhichToString(cursor_which which)
 	BBitmaps returned by this function are always in the RGBA32 color space
 */
 BBitmap *
-CursorDataToBitmap(int8 *data)
+CursorSet::_CursorDataToBitmap(int8 *data)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2

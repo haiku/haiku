@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,51 +26,34 @@ class BitmapManager;
 */
 class ServerBitmap {
  public:
+	inline	bool			IsValid() const
+								{ return fInitialized; }
+
 			void			Acquire();
 
-	/*!
-		\brief Returns the area in which the buffer resides
-		\return
-		- \c B_ERROR if the buffer is not allocated in an area
-		- area_id for the buffer
-	*/
 	inline	area_id			Area() const
 								{ return fArea; }
-
-	// Returns the offset of the bitmap in its area
 	inline	int32			AreaOffset() const
 								{ return fOffset; }
 
-	//! Returns the bitmap's buffer
 	inline	uint8*			Bits() const
 								{ return fBuffer; }
-
 	inline	uint32			BitsLength() const
 								{ return (uint32)(fBytesPerRow * fHeight); }
 
 	inline	BRect			Bounds() const
 								{ return BRect(0, 0, fWidth - 1, fHeight - 1); }
-
-	//! Returns the number of bytes in each row, including padding
-	inline	int32			BytesPerRow() const
-								{ return fBytesPerRow; }
-
-	inline	uint8			BitsPerPixel() const
-								{ return fBitsPerPixel; } 
-
-	inline	color_space		ColorSpace() const
-								{ return fSpace; }
-
-	//! Returns the bitmap's width in pixels per row
 	inline	int32			Width() const
 								{ return fWidth; }
-
-	//! Returns the bitmap's row count
 	inline	int32			Height() const
 								{ return fHeight; }
 
-	inline	bool			IsValid() const
-								{ return fInitialized; }
+	inline	int32			BytesPerRow() const
+								{ return fBytesPerRow; }
+	inline	uint8			BitsPerPixel() const
+								{ return fBitsPerPixel; } 
+	inline	color_space		ColorSpace() const
+								{ return fSpace; }
 
 	//! Returns the identifier token for the bitmap
 	inline	int32			Token() const
@@ -79,6 +62,8 @@ class ServerBitmap {
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
 
+			void			PrintToStream();
+
 protected:
 	friend class BitmapManager;
 	friend class PicturePlayer;
@@ -86,7 +71,7 @@ protected:
 							ServerBitmap(BRect rect,
 										 color_space space,
 										 int32 flags,
-										 int32 bytesperline = -1,
+										 int32 bytesPerRow = -1,
 										 screen_id screen = B_MAIN_SCREEN_ID);
 							ServerBitmap(const ServerBitmap* bmp);
 	virtual					~ServerBitmap();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,9 +9,6 @@
 /**	Handles the system's cursor infrastructure */
 
 
-#include <Directory.h>
-#include <String.h>
-
 #include "CursorData.h"
 #include "CursorManager.h"
 #include "HaikuSystemCursor.h"
@@ -19,10 +16,13 @@
 #include "ServerConfig.h"
 #include "ServerTokenSpace.h"
 
+#include <Autolock.h>
+#include <Directory.h>
+#include <String.h>
 
-//! Initializes the CursorManager
+
 CursorManager::CursorManager()
- :	BLocker("CursorManager")
+	: BLocker("CursorManager")
 {
 	// Set system cursors to "unassigned"
 	// ToDo: decide about default cursor
@@ -34,11 +34,11 @@ CursorManager::CursorManager()
 	fDefaultCursor->SetHotSpot(BPoint(1, 0));
 #else
 	fDefaultCursor = new ServerCursor(default_cursor_data);
-	AddCursor(fDefaultCursor);
 #endif
+	AddCursor(fDefaultCursor, B_CURSOR_DEFAULT);
 
 	fTextCursor = new ServerCursor(default_text_data);
-	AddCursor(fTextCursor);
+	AddCursor(fTextCursor, B_CURSOR_TEXT);
 
 	fMoveCursor = new ServerCursor(default_move_data);
 	AddCursor(fMoveCursor);
@@ -67,16 +67,8 @@ CursorManager::CursorManager()
 CursorManager::~CursorManager()
 {
 	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
-		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
-		if (cursor)
-			delete cursor;
+		delete (ServerCursor *)fCursorList.ItemAt(i);
 	}
-
-	// Note that it is not necessary to remove and delete the system
-	// cursors. These cursors are kept in the list with a empty application
-	// signature so they cannot be removed very easily except via
-	// SetCursor(cursor_which). At shutdown, they are removed with the 
-	// above loop.
 }
 
 
@@ -86,7 +78,7 @@ CursorManager::~CursorManager()
 	\return The token assigned to the cursor or B_ERROR if sc is NULL
 */
 int32
-CursorManager::AddCursor(ServerCursor* cursor)
+CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 {
 	if (!cursor)
 		return B_ERROR;
@@ -94,17 +86,32 @@ CursorManager::AddCursor(ServerCursor* cursor)
 	Lock();
 
 	fCursorList.AddItem(cursor);
-	int32 token = fTokenSpace.NewToken(B_SERVER_TOKEN, cursor);
-	cursor->fToken = token;
+	if (token == -1)
+		cursor->fToken = fTokenSpace.NewToken(kCursorToken, cursor);
+	else {
+		fTokenSpace.SetToken(token, kCursorToken, cursor);
+		cursor->fToken = token;
+	}
 
 	Unlock();
 	return token;
 }
 
 
+ServerCursor*
+CursorManager::_RemoveCursor(int32 index)
+{
+	ServerCursor* cursor = (ServerCursor *)fCursorList.RemoveItem(index);
+	if (cursor != NULL)
+		fTokenSpace.RemoveToken(cursor->fToken);
+
+	return cursor;
+}
+
+
 /*!
 	\brief Removes a cursor from the internal list and deletes it
-	\param token ID value of the cursor to be deleted
+	\param token Token of the cursor to be deleted
 	
 	If the cursor is not found, this call does nothing
 */
@@ -113,11 +120,11 @@ CursorManager::DeleteCursor(int32 token)
 {
 	Lock();
 
-	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
-		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(i);
+	for (int32 index = 0; index < fCursorList.CountItems(); index++) {
+		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(index);
 
 		if (cursor && cursor->fToken == token) {
-			fCursorList.RemoveItem(i);
+			_RemoveCursor(index);
 			delete cursor;
 			break;
 		}
@@ -132,21 +139,17 @@ CursorManager::DeleteCursor(int32 token)
 	\param signature Signature to which the cursors belong
 */
 void
-CursorManager::RemoveAppCursors(team_id team)
+CursorManager::DeleteCursors(team_id team)
 {
 	Lock();
 
-	int32 index = 0;
-	while (index < fCursorList.CountItems()) {
+	for (int32 index = fCursorList.CountItems(); index-- > 0;) {
 		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(index);
-		if (!cursor)
-			break;
+		if (cursor->OwningTeam() != team)
+			continue;
 
-		if (cursor->OwningTeam() == team) {
-			fCursorList.RemoveItem(index);
-			delete cursor;
-		} else
-			index++;
+		_RemoveCursor(index);
+		delete cursor;
 	}
 
 	Unlock();
@@ -165,7 +168,8 @@ CursorManager::RemoveAppCursors(team_id team)
 void
 CursorManager::SetCursorSet(const char *path)
 {
-	Lock();
+	BAutolock locker (this);
+
 	CursorSet cursorSet(NULL);
 
 	if (!path || cursorSet.Load(path) != B_OK)
@@ -226,8 +230,6 @@ CursorManager::SetCursorSet(const char *path)
 			delete fEWCursor;
 		fEWCursor = cursor;
 	}
-
-	Unlock();
 }
 
 
@@ -240,52 +242,31 @@ CursorManager::SetCursorSet(const char *path)
 ServerCursor *
 CursorManager::GetCursor(cursor_which which)
 {
-	ServerCursor *cursor = NULL;
-	Lock();
+	BAutolock locker(this);
 
 	switch (which) {
 		case B_CURSOR_DEFAULT:
-			cursor = fDefaultCursor;
-			break;
-
+			return fDefaultCursor;
 		case B_CURSOR_TEXT:
-			cursor = fTextCursor;
-			break;
-
+			return fTextCursor;
 		case B_CURSOR_MOVE:
-			cursor = fMoveCursor;
-			break;
-
+			return fMoveCursor;
 		case B_CURSOR_DRAG:
-			cursor = fDragCursor;
-			break;
-
+			return fDragCursor;
 		case B_CURSOR_RESIZE:
-			cursor = fResizeCursor;
-			break;
-
+			return fResizeCursor;
 		case B_CURSOR_RESIZE_NWSE:
-			cursor = fNWSECursor;
-			break;
-
+			return fNWSECursor;
 		case B_CURSOR_RESIZE_NESW:
-			cursor = fNESWCursor;
-			break;
-
+			return fNESWCursor;
 		case B_CURSOR_RESIZE_NS:
-			cursor = fNSCursor;
-			break;
-
+			return fNSCursor;
 		case B_CURSOR_RESIZE_EW:
-			cursor = fEWCursor;
-			break;
+			return fEWCursor;
 
 		default:
-			break;
+			return NULL;
 	}
-
-	Unlock();
-	return cursor;
 }
 
 
@@ -382,9 +363,6 @@ CursorManager::ChangeCursor(cursor_which which, int32 token)
 			return;
 	}
 
-	if (cursor->GetAppSignature())
-		cursor->SetAppSignature("");
-
 	fCursorList.RemoveItem(cursor);
 	Unlock();
 }
@@ -399,7 +377,7 @@ ServerCursor *
 CursorManager::FindCursor(int32 token)
 {
 	ServerCursor* cursor;
-	if (gTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
+	if (fTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
 		return cursor;
 
 	return NULL;

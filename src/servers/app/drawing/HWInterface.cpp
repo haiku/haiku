@@ -40,8 +40,11 @@ HWInterface::HWInterface(bool doubleBuffered)
 HWInterface::~HWInterface()
 {
 	delete fCursorAreaBackup;
-	delete fCursor;
-	delete fCursorAndDragBitmap;
+
+	// The standard cursor doesn't belong us - the drag bitmap might
+	if (fCursor != fCursorAndDragBitmap)
+		delete fCursorAndDragBitmap;
+
 	delete fUpdateExecutor;
 }
 
@@ -81,17 +84,24 @@ HWInterface::SetCursor(ServerCursor* cursor)
 			// considered iritating to the user to
 			// change cursor shapes while something
 			// is dragged anyways.
+			// TODO: like a "+" or "-" sign when dragging some files to indicate
+			//		the current drag mode?
 			WriteUnlock();
 			return;
 		}
 		if (fCursor != cursor) {
 			BRect oldFrame = _CursorFrame();
-			delete fCursor;
+
+			if (fCursorAndDragBitmap == fCursor) {
+				// make sure _AdoptDragBitmap doesn't delete a real cursor
+				fCursorAndDragBitmap = NULL;
+			}
+
 			fCursor = cursor;
 			Invalidate(oldFrame);
-			BRect r = _CursorFrame();
+
 			_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
-			Invalidate(r);
+			Invalidate(_CursorFrame());
 		}
 		WriteUnlock();
 	}

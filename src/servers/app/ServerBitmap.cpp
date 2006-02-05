@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
 #include "ServerBitmap.h"
 
 #include <new>
+#include <stdio.h>
 #include <string.h>
 
 using std::nothrow;
@@ -26,7 +27,7 @@ using std::nothrow;
 	\param screen Screen assigned to the bitmap.
 */
 ServerBitmap::ServerBitmap(BRect rect, color_space space,
-						   int32 flags, int32 bytesPerLine,
+						   int32 flags, int32 bytesPerRow,
 						   screen_id screen)
 	: fInitialized(false),
 	  fArea(B_ERROR),
@@ -44,7 +45,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	  fBitsPerPixel(0)
 	  // TODO: what about fToken and fOffset ?!?
 {
-	_HandleSpace(space, bytesPerLine);
+	_HandleSpace(space, bytesPerRow);
 }
 
 
@@ -241,6 +242,14 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 			fBytesPerRow = ((minBPR + 3) / 4) * 4;
 		}
 	}
+}
+
+
+void
+ServerBitmap::PrintToStream()
+{
+	printf("Bitmap@%p: (%ld:%ld), space %ld, bpr %ld, buffer %p\n",
+		this, fWidth, fHeight, (int32)fSpace, fBytesPerRow, fBuffer);
 }
 
 

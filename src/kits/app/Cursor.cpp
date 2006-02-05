@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Frans van Nispen (xlr8@tref.nl)
  *		Gabe Yoder (gyoder@stny.rr.com)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /**	BCursor describes a view-wide or application-wide cursor. */
@@ -15,8 +16,9 @@
  */
 
 #include <AppDefs.h>
-
 #include <Cursor.h>
+
+#include <CursorSet.h>
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
 
@@ -27,9 +29,20 @@ const BCursor *B_CURSOR_I_BEAM;
 
 
 BCursor::BCursor(const void *cursorData)
+	:
+	fServerToken(-1),
+	fNeedToFree(false)
 {
-	int8 *data = (int8 *)cursorData;
-	m_serverToken = 0;
+	const uint8 *data = (const uint8 *)cursorData;
+
+	if (data == B_HAND_CURSOR || data == B_I_BEAM_CURSOR) {
+		// just use the default cursors from the app_server
+		fServerToken = data == B_HAND_CURSOR ?
+			B_CURSOR_DEFAULT : B_CURSOR_TEXT;
+		return;
+	}
+
+	// Create a new cursor in the app_server
 
 	if (data == NULL
 		|| data[0] != 16	// size
@@ -38,47 +51,50 @@ BCursor::BCursor(const void *cursorData)
 		return;
 
 	// Send data directly to server
-	BPrivate::AppServerLink serverlink;
-	int32 code = SERVER_FALSE;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_CREATE_CURSOR);
+	link.Attach(cursorData, 68);
 
-	serverlink.StartMessage(AS_CREATE_BCURSOR);
-	serverlink.Attach(cursorData, 68);
-	serverlink.FlushWithReply(code);
-	if (code == SERVER_TRUE)
-		serverlink.Read<int32>(&m_serverToken);
+	status_t status;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<int32>(&fServerToken);
+		fNeedToFree = true;
+	}
 }
 
 
-// undefined on BeOS
-
 BCursor::BCursor(BMessage *data)
 {
-	m_serverToken = 0;
+	// undefined on BeOS
+	fServerToken = -1;
+	fNeedToFree = false;
 }
 
 
 BCursor::~BCursor()
 {
 	// Notify server to deallocate server-side objects for this cursor
-	BPrivate::AppServerLink serverlink;
-	serverlink.StartMessage(AS_DELETE_BCURSOR);
-	serverlink.Attach<int32>(m_serverToken);
-	serverlink.Flush();
+	if (fNeedToFree) {
+		BPrivate::AppServerLink link;
+		link.StartMessage(AS_DELETE_CURSOR);
+		link.Attach<int32>(fServerToken);
+		link.Flush();
+	}
 }
 
 
-// not implemented on BeOS
-
-status_t BCursor::Archive(BMessage *into, bool deep) const
+status_t
+BCursor::Archive(BMessage *into, bool deep) const
 {
+	// not implemented on BeOS
 	return B_OK;
 }
 
 
-// not implemented on BeOS
-
-BArchivable	*BCursor::Instantiate(BMessage *data)
+BArchivable	*
+BCursor::Instantiate(BMessage *data)
 {
+	// not implemented on BeOS
 	return NULL;
 }
 
@@ -86,9 +102,6 @@ BArchivable	*BCursor::Instantiate(BMessage *data)
 status_t
 BCursor::Perform(perform_code d, void *arg)
 {
-  /*
-	printf("perform %d\n", (int)d);
-  */
 	return B_OK;
 }
 

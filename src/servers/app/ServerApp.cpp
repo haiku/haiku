@@ -118,14 +118,6 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	BMessenger::Private(fHandlerMessenger).SetTo(fClientTeam,
 		clientLooperPort, clientToken);
 
-	ServerCursor *defaultCursor = 
-		fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
-
-	if (defaultCursor) {
-		fAppCursor = new ServerCursor(defaultCursor);
-		fAppCursor->SetOwningTeam(fClientTeam);
-	}
-
 	fInitialWorkspace = desktop->CurrentWorkspace();
 		// TODO: this should probably be retrieved when the app is loaded!
 
@@ -191,7 +183,7 @@ ServerApp::~ServerApp()
 		delete (ServerPicture*)fPictureList.ItemAtFast(i);
 	}
 
-	fDesktop->GetCursorManager().RemoveAppCursors(fClientTeam);
+	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -298,9 +290,8 @@ ServerApp::Activate(bool value)
 void
 ServerApp::SetCursor()
 {
-// TODO: custom cursors cannot be drawn by the HWInterface right now (wrong bitmap format)
-//	if (fAppCursor)
-//		fDesktop->HWInterface()->SetCursor(fAppCursor);
+	if (fAppCursor != NULL)
+		fDesktop->HWInterface()->SetCursor(fAppCursor);
 
 	fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 }
@@ -886,95 +877,76 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
-		case AS_SET_CURSOR_DATA:
+		case AS_SET_CURSOR:
 		{
-			STRACE(("ServerApp %s: SetCursor via cursor data\n", Signature()));
-			// Attached data: 68 bytes of fAppCursor data
-
-			int8 cursorData[68];
-			link.Read(cursorData, 68);
-
-			// Because we don't want an overaccumulation of these particular
-			// cursors, we will delete them if there is an existing one. It would
-			// otherwise be easy to crash the server by calling SetCursor a
-			// sufficient number of times
-			if (fAppCursor)
-				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
-
-			fAppCursor = new ServerCursor(cursorData);
-			fAppCursor->SetOwningTeam(fClientTeam);
-			fAppCursor->SetAppSignature(Signature());
-
-			// ToDo: These two should probably both be done in Desktop directly
-			fDesktop->GetCursorManager().AddCursor(fAppCursor);
-			fDesktop->HWInterface()->SetCursor(fAppCursor);
-			break;
-		}
-		case AS_SET_CURSOR_BCURSOR:
-		{
-			STRACE(("ServerApp %s: SetCursor via BCursor\n", Signature()));
+			STRACE(("ServerApp %s: SetCursor\n", Signature()));
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
 			// 3) port_id port to receive a reply. Only exists if the sync flag is true.
 			bool sync;
-			int32 ctoken = B_NULL_TOKEN;
-			
-			link.Read<bool>(&sync);
-			link.Read<int32>(&ctoken);
+			int32 token = B_NULL_TOKEN;
 
-			ServerCursor *cursor = fDesktop->GetCursorManager().FindCursor(ctoken);
-			if (cursor)
-				fDesktop->HWInterface()->SetCursor(cursor);
+			link.Read<bool>(&sync);
+			link.Read<int32>(&token);
+
+			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
+			if (fAppCursor != NULL)
+				fDesktop->HWInterface()->SetCursor(fAppCursor);
+			else {
+				// if there is no new cursor, we just set the default cursor
+				fDesktop->HWInterface()->SetCursor(fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT));
+			}
 
 			if (sync) {
-				// the application is expecting a reply so that it
-				// knows the cursor shape has truely changed
+				// The application is expecting a reply
 				fLink.StartMessage(B_OK);
 				fLink.Flush();
 			}
 			break;
 		}
-		case AS_CREATE_BCURSOR:
+		case AS_CREATE_CURSOR:
 		{
-			STRACE(("ServerApp %s: Create BCursor\n", Signature()));
+			STRACE(("ServerApp %s: Create Cursor\n", Signature()));
 			// Attached data:
 			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
-			
+
+			status_t status = B_ERROR;
 			int8 cursorData[68];
-			link.Read(cursorData, sizeof(cursorData));
+			ServerCursor* cursor = NULL;
 
-			// Because we don't want an overaccumulation of these particular
-			// cursors, we will delete them if there is an existing one. It would
-			// otherwise be easy to crash the server by calling CreateCursor a
-			// sufficient number of times
-			if (fAppCursor)
-				fDesktop->GetCursorManager().DeleteCursor(fAppCursor->ID());
+			if (link.Read(cursorData, sizeof(cursorData)) >= B_OK) {
+				cursor = new (nothrow) ServerCursor(cursorData);
+				if (cursor == NULL)
+					status = B_NO_MEMORY;
+			}
 
-			fAppCursor = new ServerCursor(cursorData);
-			fAppCursor->SetOwningTeam(fClientTeam);
-			fAppCursor->SetAppSignature(Signature());
-			fDesktop->GetCursorManager().AddCursor(fAppCursor);
+			if (cursor != NULL) {
+				cursor->SetOwningTeam(fClientTeam);
+				fDesktop->GetCursorManager().AddCursor(cursor);
 
-			// Synchronous message - BApplication is waiting on the cursor's ID
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(fAppCursor->ID());
+				// Synchronous message - BApplication is waiting on the cursor's ID
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(cursor->Token());
+			} else
+				fLink.StartMessage(status);
+
 			fLink.Flush();
 			break;
 		}
-		case AS_DELETE_BCURSOR:
+		case AS_DELETE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Delete BCursor\n", Signature()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
-			int32 ctoken = B_NULL_TOKEN;
-			link.Read<int32>(&ctoken);
+			int32 token = B_NULL_TOKEN;
+			link.Read<int32>(&token);
 
-			if (fAppCursor && fAppCursor->ID() == ctoken)
+			if (fAppCursor && fAppCursor->Token() == token)
 				fAppCursor = NULL;
 
-			fDesktop->GetCursorManager().DeleteCursor(ctoken);
+			fDesktop->GetCursorManager().DeleteCursor(token);
 			break;
 		}
 

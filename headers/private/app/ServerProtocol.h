@@ -1,13 +1,14 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef _APP_SERVER_PROTOCOL_H_
-#define _APP_SERVER_PROTOCOL_H_
+#ifndef APP_SERVER_PROTOCOL_H
+#define APP_SERVER_PROTOCOL_H
 
 
 #include <SupportDefs.h>
@@ -54,25 +55,16 @@ enum {
 	AS_RELEASE_SERVERMEM,
 	AS_AREA_MESSAGE,
 
-	// Cursor definitions
-	AS_SET_CURSOR_DATA,	
-	AS_SET_CURSOR_BCURSOR,
-	AS_SET_CURSOR_BBITMAP,
-	AS_SET_CURSOR_SYSTEM,
-
-	AS_SET_SYSCURSOR_DATA,
-	AS_SET_SYSCURSOR_BCURSOR,
-	AS_SET_SYSCURSOR_BBITMAP,
-	AS_SET_SYSCURSOR_DEFAULTS,
-	AS_GET_SYSCURSOR,
+	// Cursor commands
+	AS_SET_CURSOR,
 
 	AS_SHOW_CURSOR,
 	AS_HIDE_CURSOR,
 	AS_OBSCURE_CURSOR,
 	AS_QUERY_CURSOR_HIDDEN,
 
-	AS_CREATE_BCURSOR,
-	AS_DELETE_BCURSOR,
+	AS_CREATE_CURSOR,
+	AS_DELETE_CURSOR,
 
 	AS_BEGIN_RECT_TRACKING,
 	AS_END_RECT_TRACKING,
@@ -260,7 +252,7 @@ enum {
 	AS_LAYER_SET_ORIGIN,
 	AS_LAYER_GET_ORIGIN,
 	AS_LAYER_RESIZE_MODE,
-	AS_LAYER_CURSOR,
+	AS_LAYER_SET_CURSOR,
 	AS_LAYER_BEGIN_RECT_TRACK,
 	AS_LAYER_END_RECT_TRACK,
 	AS_LAYER_DRAG_RECT,
@@ -320,4 +312,4 @@ enum {
 	AS_LAST_CODE
 };
 
-#endif	// _APP_SERVER_PROTOCOL_H_
+#endif	// APP_SERVER_PROTOCOL_H

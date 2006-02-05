@@ -1004,8 +1004,8 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 
 	check_lock();
 
-	fOwner->fLink->StartMessage(AS_LAYER_CURSOR);
-	fOwner->fLink->Attach<int32>(cursor->m_serverToken);
+	fOwner->fLink->StartMessage(AS_LAYER_SET_CURSOR);
+	fOwner->fLink->Attach<int32>(cursor->fServerToken);
 
 	if (sync)
 		fOwner->fLink->Flush();

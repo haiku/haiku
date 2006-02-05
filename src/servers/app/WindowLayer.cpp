@@ -988,13 +988,15 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 		//		new app cursor shouldn't override view cursor, ...
 		ServerCursor* currentCursor = fDesktop->HWInterface()->Cursor();
 		ServerCursor* cursor = ServerWindow()->App()->Cursor();
+
 		if (view != NULL && view->Cursor() != NULL)
 			cursor = view->Cursor();
 
-		if (cursor != currentCursor) {
-// TODO: custom cursors cannot be drawn by the HWInterface right now (wrong bitmap format)
-//			fDesktop->HWInterface()->SetCursor(cursor);
-		}
+		if (cursor == NULL)
+			cursor = fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+
+		if (cursor != currentCursor && cursor != NULL)
+			fDesktop->HWInterface()->SetCursor(cursor);
 	}
 }
 

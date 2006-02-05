@@ -1,39 +1,21 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		CursorSet.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Private file encapsulating of the Haiku system cursor API
-//  
-//------------------------------------------------------------------------------
-#ifndef CURSORSET_H_
-#define CURSORSET_H_
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+#ifndef CURSOR_SET_H
+#define CURSOR_SET_H
+
 
 #include <Bitmap.h>
 #include <Cursor.h>
 #include <Message.h>
 
-typedef enum
-{
-	B_CURSOR_DEFAULT=0,
+
+typedef enum {
+	B_CURSOR_DEFAULT = 1,
 	B_CURSOR_TEXT,
 	B_CURSOR_MOVE,
 	B_CURSOR_DRAG,
@@ -49,15 +31,14 @@ typedef enum
 
 class ServerCursor;
 
-const char *CursorWhichToString(cursor_which which);
-BBitmap *CursorDataToBitmap(int8 *data);
 
 /*!
 	\brief Class to manage system cursor sets
 */
 class CursorSet : public BMessage {
-public:
-						CursorSet(const char *name);
+	public:
+		CursorSet(const char *name);
+
 		status_t		Save(const char *path,int32 saveflags=0);
 		status_t		Load(const char *path);
 		status_t		AddCursor(cursor_which which,const BBitmap *cursor, const BPoint &hotspot);
@@ -67,6 +48,10 @@ public:
 		status_t		FindCursor(cursor_which which, ServerCursor **cursor);
 		void			SetName(const char *name);
 		const char		*GetName(void);
+
+	private:
+		const char *_CursorWhichToString(cursor_which which);
+		BBitmap *_CursorDataToBitmap(int8 *data);
 };
 
-#endif
+#endif	// CURSOR_SET_H

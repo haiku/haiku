@@ -666,13 +666,11 @@ BApplication::IsCursorHidden() const
 
 
 void
-BApplication::SetCursor(const void *cursor)
+BApplication::SetCursor(const void *cursorData)
 {
-	// BeBook sez: If you want to call SetCursor() without forcing an immediate
-	//				sync of the Application Server, you have to use a BCursor.
-	// By deductive reasoning, this function forces a sync. =)
-	BCursor Cursor(cursor);
-	SetCursor(&Cursor, true);
+	BCursor cursor(cursorData);
+	SetCursor(&cursor, true);
+		// forces the cursor to be sync'ed
 }
 
 
@@ -680,14 +678,14 @@ void
 BApplication::SetCursor(const BCursor *cursor, bool sync)
 {
 	BPrivate::AppServerLink link;
-	int32 code = SERVER_FALSE;
-
-	link.StartMessage(AS_SET_CURSOR_BCURSOR);
+	link.StartMessage(AS_SET_CURSOR);
 	link.Attach<bool>(sync);
-	link.Attach<int32>(cursor->m_serverToken);
-	if (sync)
+	link.Attach<int32>(cursor->fServerToken);
+
+	if (sync) {
+		int32 code;
 		link.FlushWithReply(code);
-	else
+	} else
 		link.Flush();
 }
 
@@ -695,24 +693,16 @@ BApplication::SetCursor(const BCursor *cursor, bool sync)
 int32
 BApplication::CountWindows() const
 {
-	// BeBook sez: The windows list includes all windows explicitely created by
-	//				the app ... but excludes private windows create by Be
-	//				classes.
-	// I'm taking this to include private menu windows, thus the incl_menus
-	// param is false.
 	return count_windows(false);
+		// we're ignoring menu windows
 }
 
 
 BWindow *
 BApplication::WindowAt(int32 index) const
 {
-	// BeBook sez: The windows list includes all windows explicitely created by
-	//				the app ... but excludes private windows create by Be
-	//				classes.
-	// I'm taking this to include private menu windows, thus the incl_menus
-	// param is false.
 	return window_at(index, false);
+		// we're ignoring menu windows
 }
 
 

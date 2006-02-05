@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,9 +33,9 @@ class CursorManager : public BLocker {
 						CursorManager();
 		virtual			~CursorManager();
 
-		int32			AddCursor(ServerCursor* cursor);
+		int32			AddCursor(ServerCursor* cursor, int32 token = -1);
 		void			DeleteCursor(int32 token);
-		void			RemoveAppCursors(team_id team);
+		void			DeleteCursors(team_id team);
 
 		void			SetCursorSet(const char* path);
 		ServerCursor*	GetCursor(cursor_which which);
@@ -45,6 +45,8 @@ class CursorManager : public BLocker {
 		ServerCursor*	FindCursor(int32 token);
 
 	private:
+		ServerCursor*	_RemoveCursor(int32 index);
+
 		BList			fCursorList;
 		BTokenSpace		fTokenSpace;
 
