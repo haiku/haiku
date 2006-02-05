@@ -234,7 +234,6 @@ AppServer::MainLoop(void)
 			case AS_GET_DESKTOP:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			case AS_SET_SYSCURSOR_DEFAULTS:
 				DispatchMessage(code, pmsg);
 				break;
 			default:
@@ -451,14 +450,10 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			release_sem(fAppListLock);
 			break;
 		}
+
 		case B_QUIT_REQUESTED:
-		{
 			break;
-		}
-		case AS_SET_SYSCURSOR_DEFAULTS:
-		{
-			break;
-		}
+
 		default:
 			// we should never get here.
 			break;
