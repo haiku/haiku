@@ -20,6 +20,7 @@
 #include "InputManager.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
+#include "ServerCursor.h"
 #include "ServerScreen.h"
 #include "ServerWindow.h"
 #include "WindowPrivate.h"
@@ -316,10 +317,8 @@ Desktop::Init()
 	fEventDispatcher.SetMouseFilter(new MouseFilter(this));
 	fEventDispatcher.SetKeyboardFilter(new KeyboardFilter(this));
 
-	// take care of setting the default cursor
-	ServerCursor *cursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
-	if (cursor)
-		fVirtualScreen.HWInterface()->SetCursor(cursor);
+	SetCursor(NULL);
+		// this will set the default cursor
 
 	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
 		fVirtualScreen.Frame().Height() / 2);
@@ -561,6 +560,31 @@ Desktop::BroadcastToAllApps(int32 code)
 	for (int32 i = 0; i < fApplications.CountItems(); i++) {
 		fApplications.ItemAt(i)->PostMessage(code);
 	}
+}
+
+
+ServerCursor*
+Desktop::Cursor() const
+{
+	return HWInterface()->Cursor();
+}
+
+
+void
+Desktop::SetCursor(ServerCursor* newCursor)
+{
+	if (newCursor == NULL)
+		newCursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
+
+	ServerCursor* oldCursor = Cursor();
+	if (newCursor == oldCursor)
+		return;
+
+	newCursor->Acquire();
+	HWInterface()->SetCursor(newCursor);
+
+	if (oldCursor != NULL)
+		fCursorManager.ReleaseCursor(oldCursor);
 }
 
 

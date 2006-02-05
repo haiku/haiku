@@ -46,11 +46,16 @@ class ServerCursor : public ServerBitmap {
 
 			int32			Token() const
 								{ return fToken; }
+
+			void			Acquire() { atomic_add(&fReferenceCount, 1); }
+			bool			Release() { return atomic_add(&fReferenceCount, -1) == 1; }
+
  private:
 	friend class CursorManager;
-	
+
 			BPoint			fHotSpot;
 			team_id			fOwningTeam;
+			int32			fReferenceCount;
 };
 
 #endif	// SERVER_CURSOR_H

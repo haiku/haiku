@@ -98,6 +98,14 @@ CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 }
 
 
+void
+CursorManager::_RemoveCursor(ServerCursor* cursor)
+{
+	fCursorList.RemoveItem(cursor);
+	fTokenSpace.RemoveToken(cursor->fToken);
+}
+
+
 ServerCursor*
 CursorManager::_RemoveCursor(int32 index)
 {
@@ -110,24 +118,20 @@ CursorManager::_RemoveCursor(int32 index)
 
 
 /*!
-	\brief Removes a cursor from the internal list and deletes it
-	\param token Token of the cursor to be deleted
-	
-	If the cursor is not found, this call does nothing
+	\brief Releases a reference to a cursor
+
+	If this was the last reference to this cursor, it will be deleted.
 */
 void
-CursorManager::DeleteCursor(int32 token)
+CursorManager::ReleaseCursor(ServerCursor* cursor)
 {
 	Lock();
 
-	for (int32 index = 0; index < fCursorList.CountItems(); index++) {
-		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(index);
-
-		if (cursor && cursor->fToken == token) {
-			_RemoveCursor(index);
-			delete cursor;
-			break;
-		}
+	if (cursor->Release()) {
+		// this was the last reference, remove the cursor
+		
+		_RemoveCursor(cursor);
+		delete cursor;
 	}
 
 	Unlock();

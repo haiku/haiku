@@ -986,17 +986,12 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	if (IsFocus()) {
 		// TODO: there is more for real cursor support, ie. if a window is closed,
 		//		new app cursor shouldn't override view cursor, ...
-		ServerCursor* currentCursor = fDesktop->HWInterface()->Cursor();
 		ServerCursor* cursor = ServerWindow()->App()->Cursor();
 
 		if (view != NULL && view->Cursor() != NULL)
 			cursor = view->Cursor();
 
-		if (cursor == NULL)
-			cursor = fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
-
-		if (cursor != currentCursor && cursor != NULL)
-			fDesktop->HWInterface()->SetCursor(cursor);
+		fDesktop->SetCursor(cursor);
 	}
 }
 

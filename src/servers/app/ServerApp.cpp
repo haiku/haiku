@@ -290,9 +290,7 @@ ServerApp::Activate(bool value)
 void
 ServerApp::SetCursor()
 {
-	if (fAppCursor != NULL)
-		fDesktop->HWInterface()->SetCursor(fAppCursor);
-
+	fDesktop->SetCursor(fAppCursor);
 	fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 }
 
@@ -946,7 +944,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (fAppCursor && fAppCursor->Token() == token)
 				fAppCursor = NULL;
 
-			fDesktop->GetCursorManager().DeleteCursor(token);
+			if (ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token))
+				fDesktop->GetCursorManager().ReleaseCursor(cursor);
 			break;
 		}
 

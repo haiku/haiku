@@ -34,8 +34,9 @@ class CursorManager : public BLocker {
 		virtual			~CursorManager();
 
 		int32			AddCursor(ServerCursor* cursor, int32 token = -1);
-		void			DeleteCursor(int32 token);
 		void			DeleteCursors(team_id team);
+
+		void			ReleaseCursor(ServerCursor* cursor);
 
 		void			SetCursorSet(const char* path);
 		ServerCursor*	GetCursor(cursor_which which);
@@ -45,6 +46,7 @@ class CursorManager : public BLocker {
 		ServerCursor*	FindCursor(int32 token);
 
 	private:
+		void			_RemoveCursor(ServerCursor* cursor);
 		ServerCursor*	_RemoveCursor(int32 index);
 
 		BList			fCursorList;

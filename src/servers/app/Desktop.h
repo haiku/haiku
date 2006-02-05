@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -72,6 +72,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fActiveScreen; }
 
 		CursorManager&			GetCursorManager() { return fCursorManager; }
+
+		void					SetCursor(ServerCursor* cursor);
+		ServerCursor*			Cursor() const;
 
 		void					ScreenChanged(Screen* screen);
 

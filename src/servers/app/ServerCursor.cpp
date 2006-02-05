@@ -35,7 +35,8 @@ ServerCursor::ServerCursor(BRect r, color_space format,
 						   screen_id screen)
 	: ServerBitmap(r, format, flags, bytesPerRow, screen),
 	  fHotSpot(hotspot),
-	  fOwningTeam(-1)
+	  fOwningTeam(-1),
+	  fReferenceCount(1)
 {
 	fHotSpot.ConstrainTo(Bounds());
 	_AllocateBuffer();
@@ -49,7 +50,8 @@ ServerCursor::ServerCursor(BRect r, color_space format,
 ServerCursor::ServerCursor(const int8* data)
 	: ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
 	  fHotSpot(0, 0),
-	  fOwningTeam(-1)
+	  fOwningTeam(-1),
+	  fReferenceCount(1)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
@@ -116,7 +118,8 @@ ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
 						   color_space format)
 	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
 	  fHotSpot(0, 0),
-	  fOwningTeam(-1)
+	  fOwningTeam(-1),
+	  fReferenceCount(1)
 {	
 	_AllocateBuffer();
 	if (Bits())
@@ -131,7 +134,8 @@ ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
 ServerCursor::ServerCursor(const ServerCursor* cursor)
 	: ServerBitmap(cursor),
 	  fHotSpot(0, 0),
-	  fOwningTeam(-1)
+	  fOwningTeam(-1),
+	  fReferenceCount(1)
 {
 	// TODO: Hm. I don't move this into the if clause,
 	// because it might break code elsewhere.
@@ -158,9 +162,9 @@ ServerCursor::~ServerCursor()
 	\param pt New location of hotspot, constrained to the cursor's boundaries.
 */
 void
-ServerCursor::SetHotSpot(BPoint pt)
+ServerCursor::SetHotSpot(BPoint hotSpot)
 {
-	fHotSpot = pt;
+	fHotSpot = hotSpot;
 	fHotSpot.ConstrainTo(Bounds());
 }
 
