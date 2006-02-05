@@ -107,33 +107,39 @@ class ServerFont {
 			uint16				CharMapCount() const
 									{ return fStyle->CharMapCount(); }
 
-			BShape**			GetGlyphShapes(const char charArray[],
-									int32 numChars) const;
 
-			void				GetHasGlyphs(const char charArray[], 
+			FT_Face				GetTransformedFace(bool rotate, bool shear) const;
+			void				PutTransformedFace(FT_Face face) const;
+
+			status_t			GetGlyphShapes(const char charArray[],
+									int32 numChars, BShape *shapeArray[]) const;
+
+			status_t			GetHasGlyphs(const char charArray[], 
 									int32 numChars, bool hasArray[]) const;
 			
-			void				GetEdges(const char charArray[], 
+			status_t			GetEdges(const char charArray[], 
 									int32 numChars, edge_info edgeArray[]) const;
 
-			BPoint*				GetEscapements(const char charArray[],
-											   int32 numChars,
-											   BPoint offsetArray[]) const;
-			bool				GetEscapements(const char charArray[],
-											   int32 numChars,
-											   int32 numBytes,
-											   float widthArray[],
-											   escapement_delta delta) const;
+			status_t			GetEscapements(const char charArray[],
+									int32 numChars, escapement_delta delta,
+									BPoint escapementArray[],
+									BPoint offsetArray[]) const;
 
-			bool				GetBoundingBoxesAsString(const char charArray[],
-									int32 numChars, BRect rectArray[], bool string_escapement,
-									font_metric_mode mode, escapement_delta delta);
+			status_t			GetEscapements(const char charArray[],
+									int32 numChars, escapement_delta delta,
+									float widthArray[]) const;
 
-			bool				GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
-									int32 numStrings, BRect rectArray[],
-									font_metric_mode mode, escapement_delta deltaArray[]);
+			status_t			GetBoundingBoxesAsString(const char charArray[],
+									int32 numChars, BRect rectArray[],
+									bool stringEscapement, font_metric_mode mode,
+									escapement_delta delta);
 
-			float				StringWidth(const char* string, int32 numBytes) const;
+			status_t			GetBoundingBoxesForStrings(char *charArray[],
+									int32 lengthArray[], int32 numStrings,
+									BRect rectArray[], font_metric_mode mode,
+									escapement_delta deltaArray[]);
+
+			float				StringWidth(const char *string, int32 numChars) const;
 
 			bool				Lock() const { return fStyle->Lock(); }
 			void				Unlock() const { fStyle->Unlock(); }

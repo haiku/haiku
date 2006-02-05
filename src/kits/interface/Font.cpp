@@ -1048,10 +1048,9 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 	link.Attach<float>(delta ? delta->nonspace : 0.0);
 	link.Attach<float>(delta ? delta->space : 0.0);
-
-	// TODO: Should we not worry about the port capacity here?!?
 	link.Attach<int32>(numChars);
 
+	// TODO: Should we not worry about the port capacity here?!?
 	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
 	link.Attach<int32>(bytesInBuffer);
 	link.Attach(charArray, bytesInBuffer);
@@ -1088,22 +1087,15 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
 
+	link.Attach<float>(delta ? delta->nonspace : 0.0);
+	link.Attach<float>(delta ? delta->space : 0.0);
+	link.Attach<bool>(offsetArray != NULL);
 	link.Attach<int32>(numChars);
 
-	// TODO: Support UTF8 characters
-	if (offsetArray) {
-		for (int32 i = 0; i < numChars; i++) {
-			link.Attach<char>(charArray[i]);
-			link.Attach<BPoint>(offsetArray[i]);
-		}
-	} else {
-		BPoint dummypt(0, 0);
-
-		for (int32 i = 0; i < numChars; i++) {
-			link.Attach<char>(charArray[i]);
-			link.Attach<BPoint>(dummypt);
-		}
-	}
+	// TODO: Should we not worry about the port capacity here?!?
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+	link.Attach(charArray, bytesInBuffer);
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
@@ -1111,6 +1103,8 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 		return;
 
 	link.Read(escapementArray, sizeof(BPoint) * numChars);
+	if (offsetArray)
+		link.Read(offsetArray, sizeof(BPoint) * numChars);
 }
 
 

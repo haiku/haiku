@@ -1558,8 +1558,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&numChars);
 			link.Read<int32>(&numBytes);
 
-			char charArray[numBytes];			
-			link.Read(&charArray, numBytes);
+			char *charArray = new char[numBytes];
+			link.Read(charArray, numBytes);
 
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
@@ -1569,20 +1569,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				BShape **shapes = font.GetGlyphShapes(charArray, numChars);
-				if (shapes) {
+				BShape **shapes = new BShape *[numChars];
+				status = font.GetGlyphShapes(charArray, numChars, shapes);
+				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					for (int32 i = 0; i < numChars; i++) {
 						fLink.AttachShape(*shapes[i]);
 						delete shapes[i];
 					}
 
-					delete shapes;
+					delete[] shapes;
 				} else
-					fLink.StartMessage(B_ERROR);
+					fLink.StartMessage(status);
 			} else
 				fLink.StartMessage(status);
 
+			delete[] charArray;
 			fLink.Flush();
 			break;
 		}
@@ -1610,14 +1612,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				bool hasArray[numChars];
-				font.GetHasGlyphs(charArray, numChars, hasArray);
-				fLink.StartMessage(B_OK);
-				fLink.Attach(hasArray, sizeof(hasArray));
+				status = font.GetHasGlyphs(charArray, numChars, hasArray);
+				if (status == B_OK) {
+					fLink.StartMessage(B_OK);
+					fLink.Attach(hasArray, sizeof(hasArray));
+				} else
+					fLink.StartMessage(status);
 			} else
 				fLink.StartMessage(status);
 
 			delete[] charArray;
-
 			fLink.Flush();
 			break;
 		}
@@ -1647,14 +1651,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				edge_info edgeArray[numChars];
-				font.GetEdges(charArray, numChars, edgeArray);
-				fLink.StartMessage(B_OK);
-				fLink.Attach(edgeArray, sizeof(edgeArray));
+				status = font.GetEdges(charArray, numChars, edgeArray);
+				if (status == B_OK) {
+					fLink.StartMessage(B_OK);
+					fLink.Attach(edgeArray, sizeof(edgeArray));
+				} else
+					fLink.StartMessage(status);
 			} else
 				fLink.StartMessage(status);
 
 			delete[] charArray;
-
 			fLink.Flush();
 			break;
 		}
@@ -1685,15 +1691,20 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<float>(&rotation);
 			link.Read<uint32>(&flags);
 
+			escapement_delta delta;
+			link.Read<float>(&delta.nonspace);
+			link.Read<float>(&delta.space);
+
+			bool wantsOffsets;
+			link.Read<bool>(&wantsOffsets);
+
 			int32 numChars;
 			link.Read<int32>(&numChars);
 
-			char charArray[numChars];			
-			BPoint offsetArray[numChars];
-			for (int32 i = 0; i < numChars; i++) {
-				link.Read<char>(&charArray[i]);
-				link.Read<BPoint>(&offsetArray[i]);
-			}
+			uint32 numBytes;
+			link.Read<uint32>(&numBytes);
+			char *charArray = new char[numBytes];
+			link.Read(charArray, numBytes);
 
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
@@ -1702,19 +1713,33 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				BPoint *escapements = font.GetEscapements(charArray, numChars, offsetArray);
-				if (escapements) {
+				BPoint *escapements = new BPoint[numChars];
+				BPoint *offsets = NULL;
+				if (wantsOffsets)
+					offsets = new BPoint[numChars];
+
+				status = font.GetEscapements(charArray, numChars, delta,
+					escapements, offsets);
+
+				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
-					for (int32 i = 0; i < numChars; i++) {
+					for (int32 i = 0; i < numChars; i++)
 						fLink.Attach<BPoint>(escapements[i]);
-					}
 
 					delete[] escapements;
+
+					if (wantsOffsets) {
+						for (int32 i = 0; i < numChars; i++)
+							fLink.Attach<BPoint>(offsets[i]);
+
+						delete[] offsets;
+					}
 				} else
-					fLink.StartMessage(B_ERROR);
+					fLink.StartMessage(status);
 			} else
 				fLink.StartMessage(status);
 
+			delete[] charArray;
 			fLink.Flush();
 			break;
 		}
@@ -1771,11 +1796,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				if (font.GetEscapements(charArray, numChars, numBytes, escapements, delta)) {
+				status = font.GetEscapements(charArray, numChars, delta,
+					escapements);
+
+				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(escapements, numChars * sizeof(float));
-				} else
-					status = B_ERROR;
+				}
 			}
 
 			delete[] charArray;
@@ -1837,7 +1864,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
-			char charArray[numBytes];
+			char *charArray = new char[numBytes];
 			link.Read(charArray, numBytes);
 
 			BRect rectArray[numChars];
@@ -1853,7 +1880,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetFlags(flags);
 
 				// TODO implement for real
-				if (font.GetBoundingBoxesAsString(charArray, numChars, rectArray, string_escapement, mode, delta)) {
+				if (font.GetBoundingBoxesAsString(charArray, numChars,
+					rectArray, string_escapement, mode, delta) == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;
@@ -1863,6 +1891,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (!success)
 				fLink.StartMessage(B_ERROR);
 
+			delete[] charArray;
 			fLink.Flush();
 			break;
 		}
@@ -1927,7 +1956,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetFlags(flags);
 
 				// TODO implement for real
-				if (font.GetBoundingBoxesForStrings(stringArray, lengthArray, numStrings, rectArray, mode, deltaArray)) {
+				if (font.GetBoundingBoxesForStrings(stringArray, lengthArray,
+					numStrings, rectArray, mode, deltaArray) == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;

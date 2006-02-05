@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 
@@ -312,17 +313,64 @@ ServerFont::SetFace(uint32 face)
 	\return the combination of family and style ID numbers
 */
 uint32
-ServerFont::GetFamilyAndStyle(void) const
+ServerFont::GetFamilyAndStyle() const
 {
 	return (FamilyID() << 16) | StyleID();
 }
 
 
-BShape **
-ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
+FT_Face
+ServerFont::GetTransformedFace(bool rotate, bool shear) const
 {
-	if (!charArray || numChars <= 0)
+	FaceGetter getter(fStyle);
+	FT_Face face = getter.Face();
+	if (!face)
 		return NULL;
+
+	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+
+	if ((rotate && fRotation != 0) || (shear && fShear != 90)) {
+		FT_Matrix rmatrix, smatrix;
+
+		Angle rotationAngle(fRotation);
+		rmatrix.xx = (FT_Fixed)( rotationAngle.Cosine() * 0x10000);
+		rmatrix.xy = (FT_Fixed)(-rotationAngle.Sine() * 0x10000);
+		rmatrix.yx = (FT_Fixed)( rotationAngle.Sine() * 0x10000);
+		rmatrix.yy = (FT_Fixed)( rotationAngle.Cosine() * 0x10000);
+
+		Angle shearAngle(fShear);
+		smatrix.xx = (FT_Fixed)(0x10000); 
+		smatrix.xy = (FT_Fixed)(-shearAngle.Cosine() * 0x10000);
+		smatrix.yx = (FT_Fixed)(0);
+		smatrix.yy = (FT_Fixed)(0x10000);
+
+		// Multiply togheter and apply transform
+		FT_Matrix_Multiply(&rmatrix, &smatrix);
+		FT_Set_Transform(face, &smatrix, NULL);
+	}
+
+	return face;
+}
+
+
+void
+ServerFont::PutTransformedFace(FT_Face face) const
+{
+	// Reset transformation
+	FT_Set_Transform(face, NULL, NULL);	
+}
+
+
+status_t
+ServerFont::GetGlyphShapes(const char charArray[], int32 numChars,
+	BShape *shapeArray[]) const
+{
+	if (!charArray || numChars <= 0 || !shapeArray)
+		return B_BAD_DATA;
+
+	FT_Face face = GetTransformedFace(true, true);
+	if (!face)
+		return B_ERROR;
 
 	FT_Outline_Funcs funcs;
 	funcs.move_to = MoveToFunc;
@@ -332,357 +380,208 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	funcs.shift = 0;
 	funcs.delta = 0;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
-	if (!face)
-		return NULL;
-
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-
-	Angle rotation(fRotation);
-	Angle shear(fShear);
-
-	// First, rotate
-	FT_Matrix rmatrix;
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
-
-	// Next, shear
-	FT_Matrix smatrix;
-	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
-	smatrix.yx = (FT_Fixed)(0);
-	smatrix.yy = (FT_Fixed)(0x10000);
-
-	// Multiply togheter
-	FT_Matrix_Multiply(&rmatrix, &smatrix);
-	FT_Set_Transform(face, &smatrix, NULL);
-
-	BShape **shapes = new BShape *[numChars];
+	const char *string = charArray;
 	for (int i = 0; i < numChars; i++) {
-		shapes[i] = new BShape();
-		shapes[i]->Clear();
-
-		// TODO : this is wrong (the nth char isn't charArray[i])
-		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
+		shapeArray[i] = new BShape();
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
 		FT_Outline outline = face->glyph->outline;
-		FT_Outline_Decompose(&outline, &funcs, shapes[i]);
-		shapes[i]->Close();
+		FT_Outline_Decompose(&outline, &funcs, shapeArray[i]);
+		shapeArray[i]->Close();
 	}
 
-	// Reset transformation
-	FT_Set_Transform(face, NULL, NULL);
-	return shapes;
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
-void
-ServerFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) const
+status_t
+ServerFont::GetHasGlyphs(const char charArray[], int32 numChars,
+	bool hasArray[]) const
 {
 	if (!charArray || numChars <= 0 || !hasArray)
-		return;
+		return B_BAD_DATA;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(false, false);
 	if (!face)
-		return;
+		return B_ERROR;
 
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+	const char *string = charArray;
+	for (int i = 0; i < numChars; i++)
+		hasArray[i] = FT_Get_Char_Index(face, UTF8ToCharCode(&string)) > 0;
 
-	// UTF8 handling...this can probably be smarter
-	// Here is what I do in the AGGTextRenderer to handle UTF8...
-	// It is probably highly inefficient, so it should be reviewed.
-	int32 numBytes = UTF8CountBytes(charArray, numChars);
-	int32 convertedLength = numBytes * 2;
-	char* convertedBuffer = new char[convertedLength];
-
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 charArray, &numBytes,
-								 convertedBuffer, &convertedLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
-
-		uint16* glyphIndex = (uint16*)convertedBuffer;
-		// just to be sure
-		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
-
-		for (int i = 0; i < numChars; i++) {
-			hasArray[i] = FT_Get_Char_Index(face, glyphIndex[i]) > 0;
-		}
-	}
-	delete[] convertedBuffer;
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
-void
-ServerFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) const
+status_t
+ServerFont::GetEdges(const char charArray[], int32 numChars,
+	edge_info edgeArray[]) const
 {
 	if (!charArray || numChars <= 0 || !edgeArray)
-		return;
+		return B_BAD_DATA;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(false, false);
 	if (!face)
-		return;
+		return B_ERROR;
 
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-
-	// UTF8 handling...this can probably be smarter
-	// Here is what I do in the AGGTextRenderer to handle UTF8...
-	// It is probably highly inefficient, so it should be reviewed.
-	int32 numBytes = UTF8CountBytes(charArray, numChars);
-	int32 convertedLength = numBytes * 2;
-	char* convertedBuffer = new char[convertedLength];
-
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 charArray, &numBytes,
-								 convertedBuffer, &convertedLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
-
-		uint16* glyphIndex = (uint16*)convertedBuffer;
-		// just to be sure
-		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
-
-		for (int i = 0; i < numChars; i++) {
-			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			if (face->glyph) {
-				edgeArray[i].left = float(face->glyph->metrics.horiBearingX /64) / fSize;
-				edgeArray[i].right = float((face->glyph->metrics.horiBearingX 
-					+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)/64) /fSize;
-			}
-		}
-	}
-	delete[] convertedBuffer;
-}
-
-
-BPoint*
-ServerFont::GetEscapements(const char charArray[], int32 numChars,
-						   BPoint offsetArray[]) const
-{
-	if (!charArray || numChars <= 0 || !offsetArray)
-		return NULL;
-
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
-	if (!face)
-		return NULL;
-
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-
-	Angle rotation(fRotation);
-	Angle shear(fShear);
-
-	// First, rotate
-	FT_Matrix rmatrix;
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
-
-	// Next, shear
-	FT_Matrix smatrix;
-	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
-	smatrix.yx = (FT_Fixed)(0);
-	smatrix.yy = (FT_Fixed)(0x10000);
-
-	// Multiply togheter
-	FT_Matrix_Multiply(&rmatrix, &smatrix);
-	FT_Set_Transform(face, &smatrix, NULL);
-
-	// TODO: handle UTF8... see below!!
-	BPoint *escapements = new BPoint[numChars];
+	const char *string = charArray;
 	for (int i = 0; i < numChars; i++) {
-		// TODO : this is wrong (the nth char isn't charArray[i])
-		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
-		escapements[i].x = float(face->glyph->advance.x) / 64 / fSize;
-		escapements[i].y = -float(face->glyph->advance.y) / 64 / fSize;
-		escapements[i] += offsetArray[i];
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		edgeArray[i].left = float(face->glyph->metrics.horiBearingX)
+			/ 64 / fSize;
+		edgeArray[i].right = float(face->glyph->metrics.horiBearingX 
+			+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)
+			/ 64 / fSize;
 	}
 
-	// Reset transformation
-	FT_Set_Transform(face, NULL, NULL);
-	return escapements;
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
-bool
-ServerFont::GetEscapements(const char charArray[], int32 numChars, int32 numBytes,
-						   float widthArray[], escapement_delta delta) const
+status_t
+ServerFont::GetEscapements(const char charArray[], int32 numChars,
+	escapement_delta delta, BPoint escapementArray[], BPoint offsetArray[]) const
 {
-	if (!charArray || numChars <= 0)
-		return false;
+	if (!charArray || numChars <= 0 || !escapementArray)
+		return B_BAD_DATA;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(true, false);
 	if (!face)
-		return false;
+		return B_ERROR;
 
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+	const char *string = charArray;
+	for (int i = 0; i < numChars; i++) {
+		// Do this first as UTF8ToCharCode advances string.
+		escapementArray[i].x = is_white_space(*string) ? delta.space : delta.nonspace;
 
-	// UTF8 handling...this can probably be smarter
-	// Here is what I do in the AGGTextRenderer to handle UTF8...
-	// It is probably highly inefficient, so it should be reviewed.
-	int32 convertedLength = numBytes * 2;
-	char* convertedBuffer = new char[convertedLength];
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		escapementArray[i].x += float(face->glyph->advance.x) / 64;
+		escapementArray[i].y = -float(face->glyph->advance.y) / 64;
+		escapementArray[i].x /= fSize;
+		escapementArray[i].y /= fSize;
 
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 charArray, &numBytes,
-								 convertedBuffer, &convertedLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
-
-		uint16* glyphIndex = (uint16*)convertedBuffer;
-		// just to be sure
-		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
-
-		for (int i = 0; i < numChars; i++) {
-			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			if (face->glyph) {
-				widthArray[i] = ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
-				widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
-			}
+		if (offsetArray) {
+			// ToDo: According to the BeBook: "The offsetArray is applied by
+			// the dynamic spacing in order to improve the relative position
+			// of the character's width with relation to another character,
+			// without altering the width." So this will probably depend on
+			// the spacing mode.
+			offsetArray[i].x = 0;
+			offsetArray[i].y = 0;
 		}
 	}
-	delete[] convertedBuffer;
 
-	return ret >= B_OK;
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
-bool
+status_t
+ServerFont::GetEscapements(const char charArray[], int32 numChars,
+	escapement_delta delta, float widthArray[]) const
+{
+	if (!charArray || numChars <= 0 || !widthArray)
+		return B_BAD_DATA;
+
+	FT_Face face = GetTransformedFace(false, false);
+	if (!face)
+		return B_ERROR;
+
+	const char *string = charArray;
+	for (int i = 0; i < numChars; i++) {
+		// Do this first as UTF8ToCharCode advances string.
+		widthArray[i] = is_white_space(*string) ? delta.space : delta.nonspace;
+
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		widthArray[i] += float(face->glyph->metrics.horiAdvance) / 64.0;
+		widthArray[i] /= fSize;
+	}
+
+	PutTransformedFace(face);
+	return B_OK;
+}
+
+
+status_t
 ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
-	BRect rectArray[], bool string_escapement, font_metric_mode mode,
+	BRect rectArray[], bool stringEscapement, font_metric_mode mode,
 	escapement_delta delta)
 {
 	if (!charArray || numChars <= 0 || !rectArray)
-		return false;
+		return B_BAD_DATA;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(true, true);
 	if (!face)
-		return false;
-	
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-	
-	// UTF8 handling...this can probably be smarter
-	// Here is what I do in the AGGTextRenderer to handle UTF8...
-	// It is probably highly inefficient, so it should be reviewed.
-	int32 numBytes = UTF8CountBytes(charArray, numChars);
-	int32 convertedLength = numBytes * 2;
-	char* convertedBuffer = new char[convertedLength];
+		return B_ERROR;
 
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 charArray, &numBytes,
-								 convertedBuffer, &convertedLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+	const char *string = charArray;
+	for (int i = 0; i < numChars; i++) {
+		if (stringEscapement) {
+			if (i > 0)
+				rectArray[i].OffsetBy(is_white_space(*string) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
 
-		uint16* glyphIndex = (uint16*)convertedBuffer;
-		// just to be sure
-		numChars = min_c((uint32)numChars, convertedLength / sizeof(uint16));
-
-		for (int i = 0; i < numChars; i++) {
-			if (string_escapement) {
-				if (i>0)
-					rectArray[i].OffsetBy(is_white_space(glyphIndex[i-1]) ? delta.space/2.0 : delta.nonspace/2.0, 0.0);
-				rectArray[i].OffsetBy(is_white_space(glyphIndex[i]) ? delta.space/2.0 : delta.nonspace/2.0, 0.0);
-			}
-			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			if (face->glyph) {
-				if (i<numChars-1)
-					rectArray[i+1].left = rectArray[i+1].right = rectArray[i].left + 
-						face->glyph->metrics.horiAdvance / 64.0;
-				rectArray[i].left += float(face->glyph->metrics.horiBearingX) /64.0;
-				rectArray[i].right += float(face->glyph->metrics.horiBearingX 
-					+ face->glyph->metrics.width)/64.0;
-				rectArray[i].top = -float(face->glyph->metrics.horiBearingY) /64.0;
-				rectArray[i].bottom = float(face->glyph->metrics.height 
-					- face->glyph->metrics.horiBearingY) /64.0;
-			}
+			rectArray[i].OffsetBy(is_white_space(*string) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
 		}
-	}
-	delete[] convertedBuffer;
 
-	return true;
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		if (i < numChars - 1) {
+			rectArray[i + 1].left = rectArray[i + 1].right = rectArray[i].left
+				+ face->glyph->metrics.horiAdvance / 64.0;
+		}
+
+		rectArray[i].left += float(face->glyph->metrics.horiBearingX) /64.0;
+		rectArray[i].right += float(face->glyph->metrics.horiBearingX
+			+ face->glyph->metrics.width) / 64.0;
+		rectArray[i].top = -float(face->glyph->metrics.horiBearingY) / 64.0;
+		rectArray[i].bottom = float(face->glyph->metrics.height
+			- face->glyph->metrics.horiBearingY) /64.0;
+	}
+
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
-bool
+status_t
 ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
 {
 	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
-		return false;
+		return B_BAD_DATA;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(true, true);
 	if (!face)
-		return false;
-
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
+		return B_ERROR;
 
 	for (int32 i = 0; i < numStrings; i++) {
 		// TODO: ...
 	}
 
-	return true;
+	PutTransformedFace(face);
+	return B_OK;
 }
 
 
 float
-ServerFont::StringWidth(const char* string, int32 numBytes) const
+ServerFont::StringWidth(const char *_string, int32 numChars) const
 {
-	if (!string || numBytes <= 0)
+	if (!_string || numChars <= 0)
 		return 0.0;
 
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
+	FT_Face face = GetTransformedFace(false, false);
 	if (!face)
 		return 0.0;
 
-	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
-
-	int32 convertedLength = numBytes * 2;
-	char* convertedBuffer = new char[convertedLength];
 	float width = 0.0;
-
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 string, &numBytes,
-								 convertedBuffer, &convertedLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
-
-		uint16* glyphIndex = (uint16*)convertedBuffer;
-		// just to be sure
-		int numChars = convertedLength / sizeof(uint16);
-
-		for (int i = 0; i < numChars; i++) {
-			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			width += face->glyph->advance.x / 64.0;
-		}
+	const char *string = _string;
+	for (int i = 0; i < numChars; i++) {
+		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		width += face->glyph->advance.x / 64.0;
 	}
-	delete[] convertedBuffer;
 
+	PutTransformedFace(face);
 	return width;
 }
 
@@ -725,7 +624,7 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 		// get the escapement of each glyph in font units
 		float* escapementArray = new float[numChars];
 		static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-		GetEscapements(string, numChars, length, escapementArray, delta);
+		GetEscapements(string, numChars, delta, escapementArray);
 
 		truncate_string(string, mode, width, result,
 						escapementArray, fSize, ellipsisWidth, length, numChars);
