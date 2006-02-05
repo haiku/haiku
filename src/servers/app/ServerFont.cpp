@@ -358,9 +358,7 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 
 	// Multiply togheter
 	FT_Matrix_Multiply(&rmatrix, &smatrix);
-
-	//FT_Vector pen;
-	//FT_Set_Transform(face, &smatrix, &pen);
+	FT_Set_Transform(face, &smatrix, NULL);
 
 	BShape **shapes = new BShape *[numChars];
 	for (int i = 0; i < numChars; i++) {
@@ -374,6 +372,8 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 		shapes[i]->Close();
 	}
 
+	// Reset transformation
+	FT_Set_Transform(face, NULL, NULL);
 	return shapes;
 }
 
@@ -498,25 +498,20 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 	// Multiply togheter
 	FT_Matrix_Multiply(&rmatrix, &smatrix);
-
-	//FT_Vector pen;
-	//FT_Set_Transform(face, &smatrix, &pen);
-
-	// TODO: I'm not sure if this the correct interpretation
-	// of the BeBook. Have actual tests been done here?
+	FT_Set_Transform(face, &smatrix, NULL);
 
 	// TODO: handle UTF8... see below!!
 	BPoint *escapements = new BPoint[numChars];
 	for (int i = 0; i < numChars; i++) {
 		// TODO : this is wrong (the nth char isn't charArray[i])
 		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
-//		escapements[i].x = float(face->glyph->metrics.width / 64) / fSize;
-//		escapements[i].y = 0;
-		escapements[i].x = float(face->glyph->metrics.horiAdvance / 64) / fSize;
-		escapements[i].y = float(face->glyph->metrics.vertAdvance / 64) / fSize;
+		escapements[i].x = float(face->glyph->advance.x) / 64 / fSize;
+		escapements[i].y = -float(face->glyph->advance.y) / 64 / fSize;
 		escapements[i] += offsetArray[i];
 	}
 
+	// Reset transformation
+	FT_Set_Transform(face, NULL, NULL);
 	return escapements;
 }
 

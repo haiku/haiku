@@ -518,60 +518,39 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 
 	agg::path_storage path;
 	for (int32 i = 0; i < opCount; i++) {
-		switch (opList[i] & 0xFF000000) {
-			case OP_LINETO: {
-				int32 count = opList[i] & 0x00FFFFFF;
-				while (count--) {
-					path.line_to(points->x, points->y);
-					points++;
-				}
-				break;
-			}
-			case (OP_MOVETO | OP_LINETO): {
-				int32 count = opList[i] & 0x00FFFFFF;
-				path.move_to(points->x, points->y);
+		uint32 op = opList[i] & 0xFF000000;
+		if (op & OP_MOVETO) {
+			path.move_to(points->x, points->y);
+			points++;
+		}
+
+		if (op & OP_LINETO) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count--) {
+				path.line_to(points->x, points->y);
 				points++;
-				// execute "line to(s)"
-				while (count--) {
-					path.line_to(points->x, points->y);
-					points++;
-				}
-				break;
-			}
-			case OP_BEZIERTO: {
-				int32 count = opList[i] & 0x00FFFFFF;
-				while (count) {
-					path.curve4(points[0].x, points[0].y,
-								points[1].x, points[1].y,
-								points[2].x, points[2].y);
-					points += 3;
-					count -= 3;
-				}
-				break;
-			}
-			case (OP_MOVETO | OP_BEZIERTO): {
-				int32 count = opList[i] & 0x00FFFFFF;
-				// execute "move to"
-				path.move_to(points->x, points->y);
-				points++;
-				// execute "bezier to(s)"
-				while (count) {
-					path.curve4(points[0].x, points[0].y,
-								points[1].x, points[1].y,
-								points[2].x, points[2].y);
-					points += 3;
-					count -= 3;
-				}
-				break;
-			}
-			case OP_CLOSE:
-			case OP_CLOSE | OP_LINETO | OP_BEZIERTO: {
-				path.close_polygon();
-				break;
 			}
 		}
+
+		if (op & OP_BEZIERTO) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count) {
+				path.curve4(points[0].x, points[0].y,
+							points[1].x, points[1].y,
+							points[2].x, points[2].y);
+				points += 3;
+				count -= 3;
+			}
+		}
+
+		if (op & OP_CLOSE)
+			path.close_polygon();
 	}
-	agg::conv_curve<agg::path_storage> curve(path);
+
+	typedef agg::conv_transform<agg::path_storage, agg::trans_affine> conv_trans_type;
+	conv_trans_type transformed(path, agg::trans_affine_translation(fPenLocation.x, fPenLocation.y));
+	agg::conv_curve<conv_trans_type> curve(transformed);
+
 	if (filled)
 		return _FillPath(curve);
 	else
