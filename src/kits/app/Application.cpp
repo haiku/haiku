@@ -1027,7 +1027,6 @@ BApplication::_InitGUIContext()
 		return error;
 
 	// create global system cursors
-	// ToDo: these could have a predefined server token to safe the communication!
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
 	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
 	
