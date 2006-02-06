@@ -1241,7 +1241,7 @@ struct Gray1Reader : public BaseReader<uint8> {
 
 
 ////////////////////////////////////////////////////////////////////
-// Writer classes being able to read pixels of certain color spaces
+// Writer classes being able to write pixels of certain color spaces
 
 // BaseWriter
 template<typename _PixelType>
@@ -1270,8 +1270,7 @@ struct RGB32Writer : public BaseWriter<_PixelType> {
 		pixel.red = color.red;
 		pixel.green = color.green;
 		pixel.blue = color.blue;
-//		pixel.alpha = 255;
-pixel.alpha = color.alpha;
+		pixel.alpha = color.alpha;
 		BaseWriter<_PixelType>::pixels++;
 	}
 
@@ -1757,7 +1756,7 @@ set_bits(const void *inData, int32 inLength, int32 inBPR, int32 inRowSkip,
 	The currently supported source/target color spaces are
 	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
 
-	\note As this methods is apparently a bit strange to use, OBOS introduces
+	\note As this methods is apparently a bit strange to use, Haiku introduces
 		  ImportBits() methods, which are recommended to be used instead.
 
 	\param data The data to be copied.
