@@ -1596,7 +1596,7 @@ WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 	if (common.CountRects() > 0) {
 		// cut the common part from the region,
 		// offset that to destination and include again
-//		region->Exclude(&common);
+		region->Exclude(&common);
 		common.OffsetBy(xOffset, yOffset);
 		region->Include(&common);
 	}
@@ -1751,10 +1751,18 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		BRegion dirty(fCurrentUpdateSession.DirtyRegion());
 		dirty.IntersectWith(&VisibleContentRegion());
 
+//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
+
+		link.StartMessage(B_OK);
+		// append the current window geometry to the
+		// message, the client will need it
+		link.Attach<BPoint>(fFrame.LeftTop());
+		link.Attach<float>(fFrame.Width());
+		link.Attach<float>(fFrame.Height());
+		// append he update rect in screen coords
+		link.Attach<BRect>(dirty.Frame());
 		// find and attach all views that intersect with
 		// the dirty region
-		link.StartMessage(B_OK);
-		link.Attach<BRect>(dirty.Frame());
 		fTopLayer->AddTokensForLayersInRegion(link, dirty, &fContentRegion);
 		// mark the end of the token "list"
 		link.Attach<int32>(B_NULL_TOKEN);
@@ -1767,6 +1775,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 						&fContentRegion, true);
 #endif		
 	} else {
+printf("BeginUpdate() but no update requested!!\n");
 		link.StartMessage(B_ERROR);
 		link.Flush();
 		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");

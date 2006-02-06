@@ -776,11 +776,15 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 						MessageQueue()->RemoveMessage(pendingMessage);
 					}
 				}
-				fFrame.right = fFrame.left + width;
-				fFrame.bottom = fFrame.top + height;
-
-				_AdoptResize();
-				FrameResized(width, height);
+				if (width != fFrame.Width() || height != fFrame.Height()) {
+					// NOTE: we might have already handled the resize
+					// in an _UPDATE_ message
+					fFrame.right = fFrame.left + width;
+					fFrame.bottom = fFrame.top + height;
+	
+					_AdoptResize();
+					FrameResized(width, height);
+				}
 			}
 			break;
 		}
@@ -789,9 +793,13 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		{
 			BPoint origin;
 			if (msg->FindPoint("where", &origin) == B_OK) {
-				fFrame.OffsetTo(origin);
+				if (fFrame.LeftTop() != origin) {
+					// NOTE: we might have already handled the move
+					// in an _UPDATE_ message
+					fFrame.OffsetTo(origin);
 
-				FrameMoved(origin);
+					FrameMoved(origin);
+				}
 			}
 			break;
 		}
@@ -953,7 +961,34 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			int32 code;
 			if (fLink->FlushWithReply(code) == B_OK
 				&& code == B_OK) {
-				// read culmulated update rect
+				// read current window position and size first,
+				// the update rect is in screen coordinates...
+				// so we need to be up to date
+				BPoint origin;
+				fLink->Read<BPoint>(&origin);
+				float width;
+				float height;
+				fLink->Read<float>(&width);
+				fLink->Read<float>(&height);
+				if (origin != fFrame.LeftTop()) {
+					// TODO: remove code duplicatation with 
+					// B_WINDOW_MOVED case...
+//printf("window position was not up to date\n");
+					fFrame.OffsetTo(origin);
+					FrameMoved(origin);
+				}
+				if (width != fFrame.Width() || height != fFrame.Height()) {
+					// TODO: remove code duplicatation with 
+					// B_WINDOW_RESIZED case...
+//printf("window size was not up to date\n");
+					fFrame.right = fFrame.left + width;
+					fFrame.bottom = fFrame.top + height;
+	
+					_AdoptResize();
+					FrameResized(width, height);
+				}
+
+				// read culmulated update rect (is in screen coords)
 				fLink->Read<BRect>(&updateRect);
 
 				// read tokens for views that need to be drawn
