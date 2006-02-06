@@ -1,7 +1,9 @@
 #ifndef _MIXER_CORE_H
 #define _MIXER_CORE_H
 
+#include <Buffer.h>
 #include <Locker.h>
+#include <TimeSource.h>
 #include "MixerSettings.h"
 
 class AudioMixer;

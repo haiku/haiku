@@ -14,7 +14,7 @@
 class Resampler
 {
 public:
-	Resampler(uint32 sourceformat, uint32 destformat);
+	Resampler(uint32 sourceformat, uint32 destformat, int16 dst_valid_bits);
 	virtual ~Resampler();
 	
 	status_t InitCheck();
@@ -33,7 +33,9 @@ protected:
 				  				 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void uint8_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
 								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
-	virtual void float_to_int32	(const void *src, int32 src_sample_offset, int32 src_sample_count,
+	virtual void float_to_int32_32	(const void *src, int32 src_sample_offset, int32 src_sample_count,
+								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+	virtual void float_to_int32_24	(const void *src, int32 src_sample_offset, int32 src_sample_count,
 								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_int16	(const void *src, int32 src_sample_offset, int32 src_sample_count,
 				  				 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);

@@ -2,6 +2,7 @@
 #define _MIXER_SETTINGS_H
 
 #include <Message.h>
+#include <Path.h>
 
 class MixerInput;
 class MixerOutput;

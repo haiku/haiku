@@ -13,7 +13,7 @@
 #include "Resampler.h"
 #include "debug.h"
 
-Resampler::Resampler(uint32 src_format, uint32 dst_format)
+Resampler::Resampler(uint32 src_format, uint32 dst_format, int16 dst_valid_bits)
  :	fFunc(0)
 {
 	if (dst_format == media_raw_audio_format::B_AUDIO_FLOAT) {
@@ -43,7 +43,11 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 		switch (dst_format) {
 			// float=>float already handled above
 			case media_raw_audio_format::B_AUDIO_INT:
-				fFunc = &Resampler::float_to_int32;
+				fFunc = &Resampler::float_to_int32_32;
+				if (dst_valid_bits == 24)
+					fFunc = &Resampler::float_to_int32_24;
+				//if (dst_valid_bits == 20)
+				//	fFunc = &Resampler::float_to_int32_20;
 				return;
 			case media_raw_audio_format::B_AUDIO_SHORT:
 				fFunc = &Resampler::float_to_int16;
@@ -304,7 +308,7 @@ Resampler::uint8_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 }
 
 void
-Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+Resampler::float_to_int32_32(const void *_src, int32 src_sample_offset, int32 src_sample_count,
 						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 	register const char * src = (const char *) _src;
@@ -366,6 +370,72 @@ Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_s
 		}
 	}
 }
+
+
+void
+Resampler::float_to_int32_24(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
+{
+	register const char * src = (const char *) _src;
+	register char * dst = (char *) _dst;
+	register int32 count = dst_sample_count;
+	register float gain = _gain * 8388607.0;
+	
+	if (src_sample_count == dst_sample_count) {
+		// optimized case for no resampling
+		while (count--) {
+			register float sample = *(const float *)src * gain;
+			if (sample > 8388607.0f)
+				*(int32 *)dst = 8388607L;
+			else if (sample < -2147483647.0f)
+				*(int32 *)dst = -8388607L;
+			else
+				*(int32 *)dst = (int32)sample;
+			src += src_sample_offset;
+			dst += dst_sample_offset;
+		}
+		return;
+	}
+
+	register float delta = float(src_sample_count) / float(dst_sample_count);
+	register float current = 0.0f;
+
+	if (delta < 1.0) {
+		// upsample
+		while (count--) {
+			register float sample = *(const float *)src * gain;
+			if (sample > 8388607.0f)
+				*(int32 *)dst = 8388607L;
+			else if (sample < -8388607.0f)
+				*(int32 *)dst = -8388607L;
+			else
+				*(int32 *)dst = (int32)sample;
+			dst += dst_sample_offset;
+			current += delta;
+			if (current >= 1.0f) {
+				current -= 1.0f;
+				src += src_sample_offset;
+			}
+		}
+	} else {
+		// downsample
+		while (count--) {
+			register float sample = *(const float *)src * gain;
+			if (sample > 8388607.0f)
+				*(int32 *)dst = 8388607L;
+			else if (sample < -8388607.0f)
+				*(int32 *)dst = -8388607L;
+			else
+				*(int32 *)dst = (int32)sample;
+			dst += dst_sample_offset;
+			current += delta;
+			register int32 skipcount = (int32)current;
+			current -= skipcount;
+			src += skipcount * src_sample_offset;
+		}
+	}
+}
+
 
 void
 Resampler::float_to_int16(const void *_src, int32 src_sample_offset, int32 src_sample_count,
