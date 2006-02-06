@@ -139,7 +139,6 @@ BDragger::AttachedToWindow()
 	if (fIsZombie) {
 		SetLowColor(kZombieColor);
 		SetViewColor(kZombieColor);
-	
 	} else {
 		SetLowColor(B_TRANSPARENT_COLOR);
 		SetViewColor(B_TRANSPARENT_COLOR);
@@ -188,9 +187,8 @@ BDragger::MouseDown(BPoint where)
 	if (!fTarget || !AreDraggersDrawn())
 		return;
 
-	int32 buttons;
-
-	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
+	uint32 buttons;
+	Window()->CurrentMessage()->FindInt32("buttons", (int32 *)&buttons);
 
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 		if (!fShelf || !fTarget) {
@@ -201,21 +199,18 @@ BDragger::MouseDown(BPoint where)
 		ShowPopUp(fTarget, where);
 	
 	} else {
-		// TODO code to determine drag or menu
-		/*bigtime_t time = system_time();
-		bigtime_t click_speed = 0;
+		bigtime_t time = system_time();
+		bigtime_t clickSpeed = 0;
 
-		get_click_speed(&click_speed);*/
+		get_click_speed(&clickSpeed);
 
 		bool drag = false;
 
 		while (true) {
 			BPoint mousePoint;
-			uint32 buttons;
-
 			GetMouse(&mousePoint, &buttons);
 			
-			if (!buttons)
+			if (!buttons || system_time() > time + clickSpeed)
 				break;
 			
 			if (mousePoint != where) {
@@ -340,9 +335,9 @@ BDragger::AreDraggersDrawn()
 }
 
 
-BHandler *BDragger::ResolveSpecifier(BMessage *msg, int32 index,
-									 BMessage *specifier, int32 form,
-									 const char *property)
+BHandler *
+BDragger::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+					int32 form, const char *property)
 {
 	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
@@ -536,8 +531,10 @@ BDragger::SetZombied(bool state)
 {
 	fIsZombie = state;
 
-	SetLowColor(kZombieColor);
-	SetViewColor(kZombieColor);
+	if (state) {
+		SetLowColor(kZombieColor);
+		SetViewColor(kZombieColor);
+	}
 }
 
 
