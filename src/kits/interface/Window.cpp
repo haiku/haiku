@@ -946,16 +946,38 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		{
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
 			BRect updateRect;
-			msg->FindRect("_rect", &updateRect);
-			updateRect.OffsetBy(fFrame.LeftTop());
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
 			fInTransaction = true;
 
-			int32 token;
-			for (int32 i = 0; msg->FindInt32("_token", i, &token) == B_OK; i++) {
-				if (BView* view = _FindView(token))
-					view->_Draw(updateRect);
+			int32 code;
+			if (fLink->FlushWithReply(code) == B_OK
+				&& code == B_OK) {
+				// read culmulated update rect
+				fLink->Read<BRect>(&updateRect);
+
+				// read tokens for views that need to be drawn
+				// NOTE: we need to read the tokens completely
+				// first, or other calls would likely mess up the
+				// data in the link.
+				BList tokens(20);
+				int32 token;
+				status_t error = fLink->Read<int32>(&token);
+				while (error >= B_OK && token != B_NULL_TOKEN) {
+					tokens.AddItem((void*)token);
+					error = fLink->Read<int32>(&token);
+				}
+				// draw
+				int32 count = tokens.CountItems();
+				for (int32 i = 0; i < count; i++) {
+					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
+						view->_Draw(updateRect);
+				}
+				// TODO: the tokens are actually hirachically sorted,
+				// so traversing the list in revers and calling
+				// child->DrawAfterChildren would actually work correctly,
+				// only that drawing outside a view is not yet supported
+				// in the app_server.
 			}
 
 			fLink->StartMessage(AS_END_UPDATE);

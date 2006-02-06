@@ -23,6 +23,7 @@
 
 #include <List.h>
 #include <Message.h>
+#include <PortLink.h>
 #include <View.h> // for resize modes
 
 #include <stdio.h>
@@ -1024,6 +1025,20 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message,
 
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->AddTokensForLayersInRegion(message, region,
+										  windowContentClipping);
+}
+
+// AddTokensForLayersInRegion
+void
+ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
+									  BRegion& region,
+									  BRegion* windowContentClipping)
+{
+	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+		link.Attach<int32>(fToken);
+
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+		child->AddTokensForLayersInRegion(link, region,
 										  windowContentClipping);
 }
 

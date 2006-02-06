@@ -892,7 +892,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 // whoever holds the read lock on purpose.
 
 //fDesktop->LockSingleWindow();
-			fWindowLayer->BeginUpdate();
+			fWindowLayer->BeginUpdate(fLink);
 			break;
 
 		case AS_END_UPDATE:

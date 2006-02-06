@@ -29,6 +29,7 @@
 
 #include <Debug.h>
 #include <DirectWindow.h>
+#include <PortLink.h>
 #include <View.h>
 
 #include <new>
@@ -442,7 +443,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 		BRegion newDirty(*region);
 
 		// clip the region to the visible contents at the
-		// source and destination location (not that VisibleContentRegion()
+		// source and destination location (note that VisibleContentRegion()
 		// is used once to make sure it is valid, then fVisibleContentRegion
 		// is used directly)
 		region->IntersectWith(&VisibleContentRegion());
@@ -1595,7 +1596,7 @@ WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 	if (common.CountRects() > 0) {
 		// cut the common part from the region,
 		// offset that to destination and include again
-		region->Exclude(&common);
+//		region->Exclude(&common);
 		common.OffsetBy(xOffset, yOffset);
 		region->Include(&common);
 	}
@@ -1615,6 +1616,8 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 //		if (!fTopLayer->IsBackgroundDirty())
 //			fTopLayer->MarkBackgroundDirty();
 #else
+// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
+// need investigation if it even still works...
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
@@ -1682,6 +1685,8 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// that have not yet been redrawn in the current update
 	// session)
 #if !DELAYED_BACKGROUND_CLEARING
+// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
+// need investigation if it even still works...
 	if (fCurrentUpdateSession.IsUsed()) {
 		fCurrentUpdateSession.Exclude(contentDirtyRegion);
 		fEffectiveDrawingRegionValid = false;
@@ -1702,31 +1707,13 @@ void
 WindowLayer::_SendUpdateMessage()
 {
 	BMessage message(_UPDATE_);
-	BRect updateRect = fPendingUpdateSession.DirtyRegion().Frame();
-	updateRect.OffsetBy(-fFrame.left, -fFrame.top);
-	message.AddRect("_rect", updateRect);
-
-	// find all views that need an update
-	if (!fContentRegionValid)
-		_UpdateContentRegion();
-
-	fTopLayer->AddTokensForLayersInRegion(&message,
-		fPendingUpdateSession.DirtyRegion(),
-		&fContentRegion);
-
 	ServerWindow()->SendMessageToClient(&message);
 
 	fUpdateRequested = true;
-
-	// TODO: the toggling between the update sessions is too
-	// expensive, optimize with some pointer tricks
-	fCurrentUpdateSession = fPendingUpdateSession;
-	fPendingUpdateSession.SetUsed(false);
 }
 
-
 void
-WindowLayer::BeginUpdate()
+WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 {
 	// NOTE: since we might "shift" parts of the
 	// internal dirty regions from the desktop thread
@@ -1735,17 +1722,24 @@ WindowLayer::BeginUpdate()
 	// on the global clipping lock so that the internal
 	// dirty regions are not messed with from the Desktop thread
 	// and ServerWindow thread at the same time.
-	if (!fDesktop->LockSingleWindow())
+	if (!fDesktop->LockSingleWindow()) {
+		link.StartMessage(B_ERROR);
+		link.Flush();
 		return;
+	}
 
-	if (fUpdateRequested && fCurrentUpdateSession.IsUsed()) {
+	if (fUpdateRequested) {
+		// make the pending update session the current update session
+		// TODO: the toggling between the update sessions is too
+		// expensive, optimize with some pointer tricks
+		fCurrentUpdateSession = fPendingUpdateSession;
+		fPendingUpdateSession.SetUsed(false);
 		// all drawing command from the client
 		// will have the dirty region from the update
 		// session enforced
 		fInUpdate = true;
 		fEffectiveDrawingRegionValid = false;
 
-#if DELAYED_BACKGROUND_CLEARING
 		// TODO: each view could be drawn individually
 		// right before carrying out the first drawing
 		// command from the client during an update
@@ -1757,10 +1751,24 @@ WindowLayer::BeginUpdate()
 		BRegion dirty(fCurrentUpdateSession.DirtyRegion());
 		dirty.IntersectWith(&VisibleContentRegion());
 
+		// find and attach all views that intersect with
+		// the dirty region
+		link.StartMessage(B_OK);
+		link.Attach<BRect>(dirty.Frame());
+		fTopLayer->AddTokensForLayersInRegion(link, dirty, &fContentRegion);
+		// mark the end of the token "list"
+		link.Attach<int32>(B_NULL_TOKEN);
+		link.Flush();
+
+#if DELAYED_BACKGROUND_CLEARING
+// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
+// need investigation if it even still works...
 		fTopLayer->Draw(fDrawingEngine, &dirty,
 						&fContentRegion, true);
 #endif		
 	} else {
+		link.StartMessage(B_ERROR);
+		link.Flush();
 		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");
 	}
 
@@ -1795,8 +1803,6 @@ WindowLayer::EndUpdate()
 void
 WindowLayer::_UpdateContentRegion()
 {
-	// TODO: speed up by avoiding "Exclude()"
-	// start from the frame, extend to include decorator border
 	fContentRegion.Set(fFrame);
 
 	// resize handle

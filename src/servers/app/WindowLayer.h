@@ -20,6 +20,9 @@
 #include <Region.h>
 #include <String.h>
 
+namespace BPrivate {
+	class PortLink;
+};
 
 class ClientLooper;
 class Decorator;
@@ -102,7 +105,7 @@ class WindowLayer {
 			void				EnableUpdateRequests();
 			void				DisableUpdateRequests();
 
-			void				BeginUpdate();
+			void				BeginUpdate(BPrivate::PortLink& link);
 			void				EndUpdate();
 			bool				InUpdate() const
 									{ return fInUpdate; }

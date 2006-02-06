@@ -20,6 +20,10 @@
 
 class BList;
 
+namespace BPrivate {
+	class PortLink;
+};
+
 class DrawState;
 class DrawingEngine;
 class WindowLayer;
@@ -176,6 +180,10 @@ class ViewLayer {
 								{ return fBackgroundDirty; }
 
 			void			AddTokensForLayersInRegion(BMessage* message,
+								BRegion& region,
+								BRegion* windowContentClipping);
+
+			void			AddTokensForLayersInRegion(BPrivate::PortLink& link,
 								BRegion& region,
 								BRegion* windowContentClipping);
 
