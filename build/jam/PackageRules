@@ -5,7 +5,7 @@
 rule Copy
 {
 	if $(2) {
-		SEARCH on $(2) = $(SEARCH_SOURCE) ;
+		SEARCH on $(2) += $(SEARCH_SOURCE) ;
 		Depends $(1) : <build>copyattr $(2) ;
 		Copy1 $(1) : <build>copyattr $(2) ;
 	}
