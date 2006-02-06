@@ -119,7 +119,7 @@ FontStyle::Lock()
 void
 FontStyle::Unlock()
 {
-	return sFontLock.Unlock();
+	sFontLock.Unlock();
 }
 
 
