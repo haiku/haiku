@@ -1,65 +1,52 @@
-/*****************************************************************************/
-// ShowImageApp
-// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
-//
-// ShowImageApp.h
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Fernando Francisco de Oliveira
+ *		Michael Wilber
+ *		Michael Pfeiffer
+ */
+#ifndef SHOW_IMAGE_APP_H
+#define SHOW_IMAGE_APP_H
 
-#ifndef _ShowImageApp_h
-#define _ShowImageApp_h
-
-#include <Application.h>
 
 #include "ShowImageSettings.h"
 
+#include <Application.h>
+
+
 class ShowImageApp : public BApplication {
-public:
-	ShowImageApp();
+	public:
+		ShowImageApp();
+		virtual ~ShowImageApp();
 
-public:
-	virtual void AboutRequested();
-	virtual void ArgvReceived(int32 argc, char **argv);
-	virtual void MessageReceived(BMessage *pmsg);
-	virtual void ReadyToRun();
-	virtual void Pulse();
-	virtual void RefsReceived(BMessage *pmsg);
-	virtual void Quit();
+	public:
+		virtual void AboutRequested();
+		virtual void ArgvReceived(int32 argc, char **argv);
+		virtual void MessageReceived(BMessage *message);
+		virtual void ReadyToRun();
+		virtual void Pulse();
+		virtual void RefsReceived(BMessage *message);
+		virtual bool QuitRequested();
 
-	ShowImageSettings* Settings() { return &fSettings; }
+		ShowImageSettings* Settings() { return &fSettings; }
 
-private:
-	void StartPulse();
-	void Open(const entry_ref *pref);
-	void BroadcastToWindows(BMessage *pmsg);
-	void CheckClipboard();
+	private:
+		void StartPulse();
+		void Open(const entry_ref *ref);
+		void BroadcastToWindows(BMessage *message);
+		void CheckClipboard();
 
-	BMessenger fTrackerMessenger; // of the window this was launched
-	BFilePanel *fOpenPanel;
-	bool fPulseStarted;
-	ShowImageSettings fSettings;
+		BMessenger fTrackerMessenger; // of the window this was launched
+		BFilePanel *fOpenPanel;
+		bool fPulseStarted;
+		ShowImageSettings fSettings;
 };
+
+extern const char *kApplicationSignature;
 
 #define my_app dynamic_cast<ShowImageApp*>(be_app)
 
-#endif /* _ShowImageApp_h */
+#endif	// SHOW_IMAGE_APP_H
+

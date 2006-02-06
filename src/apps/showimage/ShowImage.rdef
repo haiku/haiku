@@ -1,28 +1,8 @@
 /*
-** ShowImage.rdef
-**
-*/
+ * ShowImage.rdef
+ */
 
-/* BEOS:APP_SIG :
-   application:/x-vnd.obos.app-name
-   */
-
-resource app_signature "application/x-vnd.obos.showimage";
-
-/* BEOS:APP_FLAGS :
-   00000000 = 							   SINGLE LAUNCH
-   00000001 = 							   MULTIPLE LAUNCH
-   00000002 = 							   EXCLUSIVE LAUNCH
-   00000004 = 			  BACKGROUND APP + SINGLE LAUNCH
-   00000005 = 			  BACKGROUND APP + MULTIPLE LAUNCH
-   00000006 = 			  BACKGROUND APP + EXCLUSIVE LAUNCH
-   00000008 = ARGV_ONLY + 				   SINGLE LAUNCH
-   00000009 = ARGV_ONLY + 				   MULTIPLE LAUNCH
-   0000000A = ARGV_ONLY + 				   EXCLUSIVE LAUNCH
-   0000000C = ARGV_ONLY + BACKGROUND APP + SINGLE LAUNCH
-   0000000D = ARGV_ONLY + BACKGROUND APP + MULTIPLE LAUNCH
-   0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
-   */
+resource app_signature "application/x-vnd.haiku-showimage";
 
 resource app_flags B_SINGLE_LAUNCH;
 
@@ -36,19 +16,18 @@ resource file_types message {
 };
 
 resource app_version {
-
 	major  = 0, 
 	middle = 0,
 	minor  = 1,
-	
+
 	/* 0 = development	1 = alpha			2 = beta
 	   3 = gamma		4 = golden master	5 = final */
 	variety = 1,
-	
+
 	internal = 0,
-	
+
 	short_info = "Show Image",
-	long_info = "OpenBeOS - ShowImage"
+	long_info = "ShowImage - Copyright 2003-2006 Haiku."
 };
 
 resource large_icon array {

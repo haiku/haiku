@@ -1,40 +1,22 @@
-/*****************************************************************************/
-// ShowImageConstants
-// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
-//
-// ShowImageConstants.h
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Fernando Francisco de Oliveira
+ *		Michael Wilber
+ *		Michael Pfeiffer
+ */
+#ifndef SHOW_IMAGE_CONSTANTS_H
+#define SHOW_IMAGE_CONSTANTS_H
 
-#ifndef _ShowImageConstants_
-#define _ShowImageConstants_
 
 #include <SupportDefs.h>
+
 
 const uint32 MSG_CAPTURE_MOUSE		= 'mCPM';
 const uint32 MSG_CHANGE_FOCUS		= 'mCFS';
 const uint32 MSG_FILE_OPEN			= 'mFOP';
-const uint32 MSG_CLOSE				= 'mCLS';
 const uint32 MSG_WINDOW_QUIT		= 'mWQT';
 const uint32 MSG_OUTPUT_TYPE		= 'BTMN';
 const uint32 MSG_SAVE_PANEL			= 'mFSP';
@@ -75,7 +57,4 @@ const uint32 MSG_ORIGINAL_SIZE      = 'mOSZ';
 const uint32 MSG_INVALIDATE         = 'mIVD';
 const uint32 MSG_SCALE_BILINEAR     = 'mSBL';
 
-extern const char *APP_SIG;
-
-
-#endif /* _ShowImageConstants_ */
+#endif	// SHOW_IMAGE_CONSTANTS_H

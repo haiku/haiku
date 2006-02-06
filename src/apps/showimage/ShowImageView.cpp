@@ -1,64 +1,46 @@
-/*****************************************************************************/
-// ShowImageView
-// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
-//
-// ShowImageView.cpp
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
-
-#include <stdio.h>
-#include <math.h>
-#include <new>
-
-#include <Debug.h>
-#include <Message.h>
-#include <ScrollBar.h>
-#include <StopWatch.h>
-#include <Alert.h>
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <File.h>
-#include <Bitmap.h>
-#include <TranslatorRoster.h>
-#include <BitmapStream.h>
-#include <Rect.h>
-#include <SupportDefs.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <Application.h>
-#include <Roster.h>
-#include <NodeInfo.h>
-#include <Clipboard.h>
-#include <Path.h>
-#include <PopUpMenu.h>
-#include <Region.h>
-#include <Screen.h>
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Fernando Francisco de Oliveira
+ *		Michael Wilber
+ *		Michael Pfeiffer
+ */
 
 
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
 #include "ShowImageWindow.h"
+
+#include <Alert.h>
+#include <Application.h>
+#include <Bitmap.h>
+#include <BitmapStream.h>
+#include <Clipboard.h>
+#include <Debug.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <Message.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+#include <Rect.h>
+#include <Region.h>
+#include <Roster.h>
+#include <Screen.h>
+#include <ScrollBar.h>
+#include <StopWatch.h>
+#include <SupportDefs.h>
+#include <TranslatorRoster.h>
+
+#include <math.h>
+#include <new>
+#include <stdio.h>
 
 using std::nothrow;
 
@@ -306,11 +288,13 @@ ShowImageView::Notify(const char* status)
 	Invalidate();
 }
 
+
 void
 ShowImageView::AddToRecentDocuments()
 {
-	be_roster->AddToRecentDocuments(&fCurrentRef, APP_SIG);
+	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
 }
+
 
 void
 ShowImageView::DeleteScaler()
@@ -324,6 +308,7 @@ ShowImageView::DeleteScaler()
 	fScalingCountDown = 3; // delay for 3/10 seconds
 #endif
 }
+
 
 void
 ShowImageView::DeleteBitmap()
@@ -339,14 +324,17 @@ ShowImageView::DeleteBitmap()
 	fBitmap = NULL;
 }
 
+
 void ShowImageView::DeleteSelBitmap()
 {
 	delete fSelBitmap;
 	fSelBitmap = NULL;
 }
 
+
 const rgb_color kAlphaLow	= (rgb_color){ 0xbb, 0xbb, 0xbb, 0xff };
 const rgb_color kAlphaHigh	= (rgb_color){ 0xe0, 0xe0, 0xe0, 0xff };
+
 
 inline void
 blend_colors(uint8* d, uint8 r, uint8 g, uint8 b, uint8 a)
@@ -355,6 +343,7 @@ blend_colors(uint8* d, uint8 r, uint8 g, uint8 b, uint8 a)
 	d[1] = ((g - d[1]) * a + (d[1] << 8)) >> 8;
 	d[2] = ((r - d[2]) * a + (d[2] << 8)) >> 8;
 }
+
 
 BBitmap*
 compose_checker_background(const BBitmap* bitmap)

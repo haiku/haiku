@@ -28,4 +28,3 @@
 
 #include "ShowImageConstants.h"
 
-extern const char *APP_SIG		= "application/x-vnd.obos.showimage";
