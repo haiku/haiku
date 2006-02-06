@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons media plugins speex ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders media ;
 
 SubDirHdrs $(SUBDIR) .. ogg ;

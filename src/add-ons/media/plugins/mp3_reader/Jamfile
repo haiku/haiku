@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons media plugins mp3_reader ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders media ;
 
 Addon mp3_reader : media plugins :
