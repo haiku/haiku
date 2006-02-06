@@ -115,7 +115,7 @@ UTF8ToCharCode(const char **bytes)
 				if ((*bytes)[0] & 0x10) {
 					if ((*bytes)[0] & 0x08) {
 						/*	A five byte char?!
-							Something's wrong, substitue. */
+							Something's wrong, substitute. */
 						result += 0x20;
 						(*bytes)++;
 						return result;

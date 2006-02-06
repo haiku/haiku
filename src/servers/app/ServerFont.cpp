@@ -9,7 +9,6 @@
  */
 
 
-#include <ByteOrder.h>
 #include <Shape.h>
 #include <String.h>
 #include <UTF8.h>
@@ -89,33 +88,6 @@ is_white_space(uint16 glyph)
 		return true;
 	return false;
 }
-
-
-//	#pragma mark -
-
-
-class FaceGetter {
-	public:
-		FaceGetter(FontStyle *style)
-			:
-			fStyle(style)
-		{
-			style->Lock();
-		}
-
-		~FaceGetter()
-		{
-			fStyle->Unlock();
-		}
-
-		FT_Face Face()
-		{
-			return fStyle->FreeTypeFace();
-		}
-
-	private:
-		FontStyle *fStyle;
-};
 
 
 //	#pragma mark -
@@ -322,10 +294,12 @@ ServerFont::GetFamilyAndStyle() const
 FT_Face
 ServerFont::GetTransformedFace(bool rotate, bool shear) const
 {
-	FaceGetter getter(fStyle);
-	FT_Face face = getter.Face();
-	if (!face)
+	fStyle->Lock();
+	FT_Face face = fStyle->FreeTypeFace();
+	if (!face) {
+		fStyle->Unlock();
 		return NULL;
+	}
 
 	FT_Set_Char_Size(face, 0, int32(fSize * 64), 72, 72);
 
@@ -357,7 +331,8 @@ void
 ServerFont::PutTransformedFace(FT_Face face) const
 {
 	// Reset transformation
-	FT_Set_Transform(face, NULL, NULL);	
+	FT_Set_Transform(face, NULL, NULL);
+	fStyle->Unlock();
 }
 
 
@@ -612,27 +587,31 @@ ServerFont::GetHeight(font_height& height) const
 void
 ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 {
-	if (inOut) {
-		// the width of the "…" glyph
-		float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, 3);
-		const char* string = inOut->String();
-		int32 length = strlen(string);
-		// temporary array to hold result
-		char* result = new char[length + 3];
-		// count the individual glyphs
-		int32 numChars = UTF8CountChars(string, length);
-		// get the escapement of each glyph in font units
-		float* escapementArray = new float[numChars];
-		static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-		GetEscapements(string, numChars, delta, escapementArray);
+	if (!inOut)
+		return;
 
-		truncate_string(string, mode, width, result,
-						escapementArray, fSize, ellipsisWidth, length, numChars);
+	// the width of the "…" glyph
+	float ellipsisWidth = StringWidth(B_UTF8_ELLIPSIS, 1);
+	const char *string = inOut->String();
+	int32 length = inOut->Length();
+
+	// temporary array to hold result
+	char *result = new char[length + 3];
+
+	// count the individual glyphs
+	int32 numChars = UTF8ToLength(string);
+
+	// get the escapement of each glyph in font units
+	float *escapementArray = new float[numChars];
+	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
+	if (GetEscapements(string, numChars, delta, escapementArray) == B_OK) {
+		truncate_string(string, mode, width, result, escapementArray, fSize,
+			ellipsisWidth, length, numChars);
 
 		inOut->SetTo(result);
-
-		delete[] escapementArray;
-		delete[] result;
 	}
+
+	delete[] escapementArray;
+	delete[] result;
 }
 
