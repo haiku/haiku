@@ -178,11 +178,15 @@ AboutView::AboutView(const BRect &rect)
 
 	// Add revision from resources
 	BResources* resources = be_app->AppResources();
-	const char* versionString = (const char *)resources->LoadResource(
-		B_STRING_TYPE, "SVN:REVISION", NULL);
-	if (versionString != NULL && strcmp(versionString, "unknown") != 0) {
-		strlcat(string, " (r", sizeof(string));
-		strlcat(string, versionString, sizeof(string));
+	char version[32];
+	size_t size;
+	const char* versionResource = (const char *)resources->LoadResource(
+		B_STRING_TYPE, "SVN:REVISION", &size);
+	if (versionResource != NULL)
+		strlcpy(version, versionResource, min_c(size + 1, sizeof(version)));
+	if (versionResource != NULL && strcmp(version, "unknown") != 0) {
+		strlcat(string, " (Revision ", sizeof(string));
+		strlcat(string, version, sizeof(string));
 		strlcat(string, ")", sizeof(string));
 	}
 
@@ -311,7 +315,7 @@ AboutView::AboutView(const BRect &rect)
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT "2001-2005 Haiku, Inc.\n\n");
+	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT "2001-2006 Haiku, Inc.\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
 	fCreditsView->Insert("Team Leads:\n");
@@ -412,20 +416,20 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("AntiGrain Geometry\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright (C) 2002-2005 Maxim Shemanarev (McSeem)\n\n");
+	fCreditsView->Insert("Copyright (C) 2002-2006 Maxim Shemanarev (McSeem)\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("PDFLib\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright (c) 1997-2005 PDFlib GmbH and Thomas Merz. "
+		"Copyright (c) 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
 		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
 	fCreditsView->Insert("FreeType2\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Portions of this software are copyright (C) 1996-2002 The FreeType"
+	fCreditsView->Insert("Portions of this software are copyright (C) 1996-2006 The FreeType"
 		" Project (www.freetype.org).  All rights reserved.\n\n");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
@@ -433,7 +437,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("Mesa\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Copyright (c) 1999-2005 Brian Paul. "
+		"Copyright (c) 1999-2006 Brian Paul. "
 		"Mesa3D project (www.mesa3d.org).  All rights reserved.\n\n");
 
 	// SGI's GLU implementation copyrights
