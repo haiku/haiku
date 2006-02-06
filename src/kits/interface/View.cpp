@@ -2941,6 +2941,10 @@ BView::BeginLineArray(int32 count)
 	check_lock_no_pick();
 
 	if (comm) {
+		debugger("Can't nest BeginLineArray calls");
+			// not fatal, but it helps during
+			// development of your app and is in
+			// line with R5...
 		delete [] comm->array;
 		delete comm;
 	}
