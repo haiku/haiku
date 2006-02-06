@@ -175,6 +175,8 @@ ViewLayer::AddChild(ViewLayer* layer)
 	}
 	fLastChild = layer;
 
+	layer->UpdateVisibleDeep(fVisible);
+
 	if (layer->IsVisible())
 		RebuildClipping(false);
 
@@ -484,21 +486,21 @@ ViewLayer::ConvertToScreen(BPoint* pt) const
 void
 ViewLayer::ConvertToScreen(BRect* rect) const
 {
-	ConvertToParent(rect);
+	BPoint offset(0.0, 0.0);
+	ConvertToScreen(&offset);
 
-	if (fParent)
-		fParent->ConvertToScreen(rect);
+	rect->OffsetBy(offset);
 }
 
 
 //! converts a region from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(BRegion* reg) const
+ViewLayer::ConvertToScreen(BRegion* region) const
 {
-	ConvertToParent(reg);
+	BPoint offset(0.0, 0.0);
+	ConvertToScreen(&offset);
 
-	if (fParent)
-		fParent->ConvertToScreen(reg);
+	region->OffsetBy(offset.x, offset.y);
 }
 
 
@@ -517,21 +519,21 @@ ViewLayer::ConvertFromScreen(BPoint* pt) const
 void
 ViewLayer::ConvertFromScreen(BRect* rect) const
 {
-	ConvertFromParent(rect);
+	BPoint offset(0.0, 0.0);
+	ConvertFromScreen(&offset);
 
-	if (fParent)
-		fParent->ConvertFromScreen(rect);
+	rect->OffsetBy(offset.x, offset.y);
 }
 
 
 //! converts a region from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(BRegion* reg) const
+ViewLayer::ConvertFromScreen(BRegion* region) const
 {
-	ConvertFromParent(reg);
+	BPoint offset(0.0, 0.0);
+	ConvertFromScreen(&offset);
 
-	if (fParent)
-		fParent->ConvertFromScreen(reg);
+	region->OffsetBy(offset.x, offset.y);
 }
 
 
@@ -1020,6 +1022,9 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message,
 									  BRegion& region,
 									  BRegion* windowContentClipping)
 {
+	if (!fVisible)
+		return;
+
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		message->AddInt32("_token", fToken);
 
@@ -1034,6 +1039,9 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 									  BRegion& region,
 									  BRegion* windowContentClipping)
 {
+	if (!fVisible)
+		return;
+
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		link.Attach<int32>(fToken);
 
