@@ -20,6 +20,7 @@ enum { // Audio Interface Subclasses
 };
 
 enum { // Audio Class-Specific AudioControl Interface descriptor subtypes
+	USB_AUDIO_AC_DESCRIPTOR_UNDEFINED				= 0x00,
 	USB_AUDIO_AC_HEADER						= 0x01,
 	USB_AUDIO_AC_INPUT_TERMINAL,
 	USB_AUDIO_AC_OUTPUT_TERMINAL,
@@ -121,6 +122,17 @@ enum { // Terminal Control Selectors
 #define USB_AUDIO_EP_CONTROL_UNDEFINED 0x00
 #define USB_AUDIO_SAMPLING_FREQ_CONTROL 0x01
 #define USB_AUDIO_PITCH_CONTROL 0x02
+
+typedef struct
+{
+	uint8 length;
+	uint8 type;
+	uint8 subtype;
+	uint8 unit_id;
+	uint8 source_id;
+	uint8 control_size;
+	uint16 controls[0];
+} _PACKED usb_audio_feature_unit_descriptor;
 
 typedef struct {
 	uint8 length;
