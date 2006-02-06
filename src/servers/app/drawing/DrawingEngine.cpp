@@ -6,6 +6,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include "DrawingEngine.h"
+
 #include <stdio.h>
 #include <algo.h>
 #include <stack.h>
@@ -16,8 +18,7 @@
 #include "PNGDump.h"
 #include "RenderingBuffer.h"
 
-#include "DrawingEngine.h"
-
+#include "frame_buffer_support.h"
 
 // make_rect_valid
 static inline void
@@ -1182,7 +1183,7 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 	int32 xIncrement;
 	int32 yIncrement;
 
-	if (xOffset > 0) {
+	if (yOffset == 0 && xOffset > 0) {
 		// copy from right to left
 		xIncrement = -1;
 		src += (width - 1) * 4;
@@ -1202,16 +1203,37 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 
 	uint8* dst = src + yOffset * bytesPerRow + xOffset * 4;
 
-	for (uint32 y = 0; y < height; y++) {
-		uint32* srcHandle = (uint32*)src;
-		uint32* dstHandle = (uint32*)dst;
-		for (uint32 x = 0; x < width; x++) {
-			*dstHandle = *srcHandle;
-			srcHandle += xIncrement;
-			dstHandle += xIncrement;
+	if (xIncrement == 1) {
+		uint8 tmpBuffer[width * 4];
+		for (uint32 y = 0; y < height; y++) {
+			// NOTE: read into temporary scanline buffer,
+			// avoid memcpy because it might be graphics card memory
+			gfxcpy32(tmpBuffer, src, width * 4);
+			// write back temporary scanline buffer
+			// NOTE: **don't read and write over the PCI bus
+			// at the same time**
+			memcpy(dst, tmpBuffer, width * 4);
+// NOTE: this (instead of the two pass copy above) might
+// speed up QEMU -> ?!? (would depend on how it emulates
+// the PCI bus...)
+// TODO: would be nice if we actually knew
+// if we're operating in graphics memory or main memory...
+//memcpy(dst, src, width * 4);
+			src += yIncrement;
+			dst += yIncrement;
 		}
-		src += yIncrement;
-		dst += yIncrement;
+	} else {
+		for (uint32 y = 0; y < height; y++) {
+			uint32* srcHandle = (uint32*)src;
+			uint32* dstHandle = (uint32*)dst;
+			for (uint32 x = 0; x < width; x++) {
+				*dstHandle = *srcHandle;
+				srcHandle += xIncrement;
+				dstHandle += xIncrement;
+			}
+			src += yIncrement;
+			dst += yIncrement;
+		}
 	}
 }
 

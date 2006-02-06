@@ -87,6 +87,22 @@ gfxcpy32(uint8* dst, const uint8* src, int32 numBytes)
 	}
 }
 
+// gfxset32
+// * numBytes is expected to be a multiple of 4
+static inline void
+gfxset32(uint8* dst, uint32 color, int32 numBytes)
+{
+	uint64 s64 = ((uint64)color << 32) | color;
+	while (numBytes >= 8) {
+		*(uint64*)dst = s64;
+		numBytes -= 8;
+		dst += 8;
+	}
+	if (numBytes == 4) {
+		*(uint32*)dst = color;
+	}
+}
+
 union pixel32 {
 	uint32	data32;
 	uint8	data8[4];

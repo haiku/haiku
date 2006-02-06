@@ -705,10 +705,11 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
 				uint8* offset = dst + x1 * 4;
 				for (; y1 <= y2; y1++) {
-					uint32* handle = (uint32*)(offset + y1 * bpr);
-					for (int32 x = x1; x <= x2; x++) {
-						*handle++ = color.data32;
-					}
+//					uint32* handle = (uint32*)(offset + y1 * bpr);
+//					for (int32 x = x1; x <= x2; x++) {
+//						*handle++ = color.data32;
+//					}
+gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
 				}
 			}
 		} while (fBaseRenderer->next_clip_box());
@@ -738,10 +739,11 @@ Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
 		dst += left * 4;
 
 		for (; y <= bottom; y++) {
-			uint32* handle = (uint32*)dst;
-			for (int32 x = left; x <= right; x++) {
-				*handle++ = color.data32;
-			}
+//			uint32* handle = (uint32*)dst;
+//			for (int32 x = left; x <= right; x++) {
+//				*handle++ = color.data32;
+//			}
+gfxset32(dst, color.data32, (right - left + 1) * 4);
 			dst += bpr;
 		}
 	}
