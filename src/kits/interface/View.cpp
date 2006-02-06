@@ -740,17 +740,9 @@ BView::ConvertFromScreen(BPoint pt) const
 void
 BView::ConvertToScreen(BRect *rect) const
 {
-	if (!fParent) {
-		if (fOwner)
-			fOwner->ConvertToScreen(rect);
-
-		return;
-	}
-	
-	do_owner_check_no_pick();
-
-	ConvertToParent(rect);
-	fParent->ConvertToScreen(rect);
+	BPoint offset(0.0, 0.0);
+	ConvertToScreen(&offset);
+	rect->OffsetBy(offset);
 }
 
 
@@ -766,17 +758,9 @@ BView::ConvertToScreen(BRect rect) const
 void
 BView::ConvertFromScreen(BRect *rect) const
 {
-	if (!fParent) {
-		if (fOwner)
-			fOwner->ConvertFromScreen(rect);
-
-		return;
-	}
-	
-	do_owner_check_no_pick();
-
-	ConvertFromParent(rect);
-	fParent->ConvertFromScreen(rect);
+	BPoint offset(0.0, 0.0);
+	ConvertFromScreen(&offset);
+	rect->OffsetBy(offset);
 }
 
 
