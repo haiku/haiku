@@ -19,13 +19,19 @@ class ServerFont;
 
 static const int32 kMaxWorkspaces = 32;
 
+enum {
+	kAllSettings		= 0xff,
+	kWorkspacesSettings	= 0x01,
+	kFontSettings		= 0x02,
+	kAppearanceSettings	= 0x04
+};
 
 class DesktopSettings {
 	public:
 		DesktopSettings(Desktop* desktop);
 		~DesktopSettings();
 
-		status_t		Save();
+		status_t		Save(uint32 mask = kAllSettings);
 
 		void			SetDefaultPlainFont(const ServerFont& font);
 		void			GetDefaultPlainFont(ServerFont& font) const;

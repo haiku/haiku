@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2005-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,7 +20,7 @@ class DesktopSettings::Private : public BLocker {
 		Private();
 		~Private();
 
-		status_t		Save();
+		status_t		Save(uint32 mask = kAllSettings);
 
 		void			SetDefaultPlainFont(const ServerFont& font);
 		const ServerFont& DefaultPlainFont() const;
@@ -50,6 +50,7 @@ class DesktopSettings::Private : public BLocker {
 	private:
 		void			_SetDefaults();
 		status_t		_Load();
+		status_t		_GetPath(BPath& path);
 
 		ServerFont		fPlainFont;
 		ServerFont		fBoldFont;

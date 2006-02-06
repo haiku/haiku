@@ -25,7 +25,8 @@
 Screen::Screen(::HWInterface *interface, int32 id)
 	: fID(id),
 	  fDriver(interface ? new DrawingEngine(interface) : NULL),
-	  fHWInterface(interface)
+	  fHWInterface(interface),
+	  fIsDefault(true)
 {
 }
 
@@ -33,7 +34,8 @@ Screen::Screen(::HWInterface *interface, int32 id)
 Screen::Screen()
 	: fID(-1),
 	  fDriver(NULL),
-	  fHWInterface(NULL)
+	  fHWInterface(NULL),
+	  fIsDefault(true)
 {
 }
 
@@ -49,12 +51,12 @@ Screen::~Screen()
 status_t
 Screen::Initialize()
 {
-	status_t ret = B_NO_INIT;
 	if (fDriver) {
 		// this will also init the graphics hardware the driver is attached to
-		ret = fDriver->Initialize();
+		return fDriver->Initialize();
 	}
-	return ret;
+
+	return B_NO_INIT;
 }
 
 
@@ -67,39 +69,38 @@ Screen::Shutdown()
 
 
 status_t
-Screen::SetMode(display_mode mode)
+Screen::SetMode(display_mode mode, bool makeDefault)
 {
-	status_t ret = fHWInterface->SetMode(mode);
+	status_t status = fHWInterface->SetMode(mode);
 
 	// the DrawingEngine needs to adjust itself
-	if (ret >= B_OK)
+	if (status >= B_OK) {
 		fDriver->Update();
+		fIsDefault = makeDefault;
+	}
 
-	return ret;
+	return status;
 }
 
 
 status_t
 Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
-				float frequency)
+	float frequency, bool makeDefault)
 {
-	status_t ret = B_ERROR;
-
 	// search for a matching mode
 	display_mode mode;
-	ret = _FindMode(width, height, colorspace, frequency, &mode);
-
-	if (ret < B_OK) {
+	status_t status = _FindMode(width, height, colorspace, frequency, &mode);
+	if (status < B_OK) {
 		// TODO: Move fallback elsewhere, this function should simply
 		// fail if requested to set unsupported mode.
 		// Ups. Not good. Ignore the requested mode and use fallback params.
-		ret = _FindMode(640, 480, B_CMAP8, 60.0, &mode);
+		status = _FindMode(640, 480, B_CMAP8, 60.0, &mode);
 	}
 
-	if (ret >= B_OK)
-		ret = SetMode(mode);
+	if (status >= B_OK)
+		status = SetMode(mode, makeDefault);
 
-	return ret;
+	return status;
 }
 
 
@@ -152,8 +153,8 @@ Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 	display_mode* dm = NULL;
 	uint32 count;
 
-	status_t err = fHWInterface->GetModeList(&dm, &count);
-	if (err < B_OK || count <= 0) {
+	status_t status = fHWInterface->GetModeList(&dm, &count);
+	if (status < B_OK || count <= 0) {
 		// We've run into quite a problem here! This is a function which is a requirement
 		// for a graphics module. The best thing that we can hope for is 640x480x8 without
 		// knowing anything else. While even this seems like insanity to assume that we
@@ -162,7 +163,7 @@ Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
 		if (width == 640 && height == 480 && colorspace == B_CMAP8)
 			return B_OK;
 
-		return err;
+		return status;
 	}
 
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST

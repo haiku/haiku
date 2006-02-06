@@ -76,7 +76,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetCursor(ServerCursor* cursor);
 		ServerCursor*			Cursor() const;
 
-		void					ScreenChanged(Screen* screen);
+		void					ScreenChanged(Screen* screen, bool makeDefault);
 
 		void					ScreenRemoved(Screen* screen) {}
 		void					ScreenAdded(Screen* screen) {}

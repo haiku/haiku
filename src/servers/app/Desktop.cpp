@@ -280,6 +280,7 @@ Desktop::Desktop(uid_t userID)
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		_Windows(i).SetIndex(i);
+		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
 	}
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
@@ -725,7 +726,7 @@ Desktop::SetWorkspace(int32 index)
 
 
 void
-Desktop::ScreenChanged(Screen* screen)
+Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 {
 	// TODO: confirm that everywhere this is used,
 	// the Window WriteLock is held
@@ -757,6 +758,16 @@ Desktop::ScreenChanged(Screen* screen)
 	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->SendMessageToClient(&update);
+	}
+
+	if (makeDefault) {
+		// store settings
+		BMessage settings;
+		fVirtualScreen.StoreConfiguration(settings);
+		fWorkspaces[fCurrentWorkspace].StoreConfiguration(settings);
+
+		fSettings->SetWorkspacesMessage(fCurrentWorkspace, settings);
+		fSettings->Save(kWorkspacesSettings);
 	}
 }
 

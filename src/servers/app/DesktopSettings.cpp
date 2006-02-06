@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,12 @@
 #include "Desktop.h"
 #include "FontManager.h"
 #include "ServerConfig.h"
+
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
+//#include <DataIO./h>
+#include <Path.h>
 
 
 DesktopSettings::Private::Private()
@@ -61,17 +67,87 @@ DesktopSettings::Private::_SetDefaults()
 
 
 status_t
+DesktopSettings::Private::_GetPath(BPath& path)
+{
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status < B_OK)
+		return status;
+
+	status = path.Append("system/app_server");
+	if (status < B_OK)
+		return status;
+
+	return create_directory(path.Path(), 0755);
+}
+
+
+status_t
 DesktopSettings::Private::_Load()
 {
 	// TODO: add support for old app_server_settings file as well
+
+	BPath basePath;
+	status_t status = _GetPath(basePath);
+	if (status < B_OK)
+		return status;
+
+	// read workspaces settings
+
+	BPath path(basePath);
+	path.Append("workspaces");
+	
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status == B_OK) {
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status == B_OK) {
+			int32 count;
+			if (settings.FindInt32("count", &count) == B_OK) {
+				fWorkspacesCount = count;
+				if (fWorkspacesCount < 1 || fWorkspacesCount > 32)
+					fWorkspacesCount = 4;
+			}
+
+			int32 i = 0;
+			while (i < 32
+				&& settings.FindMessage("workspace", i, &fWorkspaceMessages[i]) == B_OK) {
+				i++;
+			}
+		}
+	}
+
 	return B_ERROR;
 }
 
 
 status_t
-DesktopSettings::Private::Save()
+DesktopSettings::Private::Save(uint32 mask)
 {
-	return B_ERROR;
+	BPath basePath;
+	status_t status = _GetPath(basePath);
+	if (status < B_OK)
+		return status;
+
+	if (mask & kWorkspacesSettings) {
+		BPath path(basePath);
+		if (path.Append("workspaces") == B_OK) {
+			BMessage settings('asws');
+			settings.AddInt32("count", fWorkspacesCount);
+
+			for (int32 i = 0; i < kMaxWorkspaces; i++) {
+				settings.AddMessage("workspace", &fWorkspaceMessages[i]);
+			}
+
+			BFile file;
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			if (status == B_OK) {
+				status = settings.Flatten(&file, NULL);
+			}
+		}
+	}
+
+	return status;
 }
 
 

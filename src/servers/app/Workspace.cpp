@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,14 +45,19 @@ Workspace::Private::SetColor(const RGBColor& color)
 
 
 void
-Workspace::Private::SetSettings(BMessage& settings)
+Workspace::Private::RestoreConfiguration(const BMessage& settings)
 {
+	rgb_color color;
+	if (settings.FindInt32("color", (int32 *)&color) == B_OK)
+		fColor.SetColor(color);
 }
 
 
 void
-Workspace::Private::GetSettings(BMessage& settings)
+Workspace::Private::StoreConfiguration(BMessage& settings)
 {
+	rgb_color color = fColor.GetColor32();
+	settings.AddInt32("color", *(int32 *)&color);
 }
 
 

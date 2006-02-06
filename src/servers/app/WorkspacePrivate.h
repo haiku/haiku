@@ -45,8 +45,8 @@ class Workspace::Private {
 		const RGBColor&		Color() const { return fColor; }
 		void				SetColor(const RGBColor& color);
 
-		void				SetSettings(BMessage& settings);
-		void				GetSettings(BMessage& settings);
+		void				RestoreConfiguration(const BMessage& settings);
+		void				StoreConfiguration(BMessage& settings);
 
 	private:
 		void				_SetDefaults();

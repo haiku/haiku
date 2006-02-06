@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus, <superstippi@gmx.de>
  */
-#ifndef _SCREEN_H_
-#define _SCREEN_H_
+#ifndef SCREEN_H
+#define SCREEN_H
 
 
 #include <Accelerant.h>
@@ -28,14 +28,13 @@ class Screen {
 			status_t			Initialize();
 			void				Shutdown();
 
-			void				SetID(int32 ID)
-									{ fID = ID; }
+			int32				ID() const { return fID; }
 
-			status_t			SetMode(display_mode mode);
-			status_t			SetMode(uint16 width,
-										uint16 height,
-										uint32 colorspace,
-										float frequency);
+			status_t			SetMode(display_mode mode, bool makeDefault);
+			status_t			SetMode(uint16 width, uint16 height,
+									uint32 colorspace, float frequency,
+									bool makeDefault);
+
 			void				GetMode(display_mode* mode) const;
 			void				GetMode(uint16 &width,
 										uint16 &height,
@@ -44,8 +43,7 @@ class Screen {
 			BRect				Frame() const;
 			color_space			ColorSpace() const;
 
-	inline	int32				ScreenNumber() const
-									{ return fID; }
+			bool				IsDefaultMode() const { return fIsDefault; }
 
 	inline	DrawingEngine*		GetDrawingEngine() const
 									{ return fDriver; }
@@ -67,6 +65,7 @@ class Screen {
 			int32				fID;
 			DrawingEngine*		fDriver;
 			::HWInterface*		fHWInterface;
+			bool				fIsDefault;
 };
 
-#endif	/* _SCREEN_H_ */
+#endif	/* SCREEN_H */

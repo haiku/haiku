@@ -2079,18 +2079,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			display_mode mode;
 			link.Read<display_mode>(&mode);
 
-			bool makedefault = false;
-			link.Read<bool>(&makedefault);
+			bool makeDefault = false;
+			status_t status = link.Read<bool>(&makeDefault);
 
-			status_t status = B_ERROR;
-			if (fDesktop->LockAllWindows()) {
-				status = fDesktop->ScreenAt(0)->SetMode(mode);
+			if (status == B_OK && fDesktop->LockAllWindows()) {
+				status = fDesktop->ScreenAt(0)->SetMode(mode, makeDefault);
 				if (status == B_OK) {
 					gInputManager->UpdateScreenBounds(fDesktop->ScreenAt(0)->Frame());
-					fDesktop->ScreenChanged(fDesktop->ScreenAt(0));
+					fDesktop->ScreenChanged(fDesktop->ScreenAt(0), makeDefault);
 				}
 				fDesktop->UnlockAllWindows();
-			}
+			} else
+				status = B_ERROR;
 
 			fLink.StartMessage(status);
 			fLink.Flush();
