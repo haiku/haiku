@@ -83,6 +83,25 @@ uint32 MultiAudioDevice::convert_multiaudio_format_to_media_format(uint32 fmt)
 	}
 }
 
+
+int16 MultiAudioDevice::convert_multiaudio_format_to_valid_bits(uint32 fmt)
+{
+	switch(fmt) {
+		case B_FMT_18BIT:
+			return 18;
+		case B_FMT_20BIT:
+			return 20;
+		case B_FMT_24BIT:
+			return 24;
+		case B_FMT_32BIT:
+			return 32;
+		default: {
+			return 0;
+		}
+	}
+}
+
+
 uint32 MultiAudioDevice::convert_media_format_to_multiaudio_format(uint32 fmt)
 {
 	switch(fmt) {

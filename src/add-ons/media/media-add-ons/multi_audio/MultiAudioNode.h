@@ -35,6 +35,7 @@
 #include <BufferProducer.h>
 #include <Controllable.h>
 #include <MediaEventLooper.h>
+#include <ParameterWeb.h>
 #include <TimeSource.h>
 #include <Controllable.h>
 #include <File.h>

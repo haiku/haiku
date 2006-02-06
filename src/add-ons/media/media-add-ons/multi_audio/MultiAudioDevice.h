@@ -45,6 +45,7 @@ public:
 	static float convert_multiaudio_rate_to_media_rate(uint32 rate);
 	static uint32 convert_media_rate_to_multiaudio_rate(float rate);
 	static uint32 convert_multiaudio_format_to_media_format(uint32 fmt);
+	static int16 convert_multiaudio_format_to_valid_bits(uint32 fmt);
 	static uint32 convert_media_format_to_multiaudio_format(uint32 fmt);
 	static uint32 select_multiaudio_rate(uint32 rate);
 	static uint32 select_multiaudio_format(uint32 fmt);
