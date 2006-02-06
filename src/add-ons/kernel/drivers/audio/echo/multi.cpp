@@ -918,8 +918,17 @@ echo_open(const char *name, uint32 flags, void** cookie)
 #endif
 		
 	LOG(("creating play streams\n"));
+
+	i = card->caps.wNumPipesOut - 2;
+	first_record_channel = card->caps.wNumPipesOut;
+#ifdef ECHO3G_FAMILY
+	if (current_settings.sample_rate > 50000) {
+		i = card->caps.wFirstDigitalBusOut;
+		first_record_channel = card->caps.wFirstDigitalBusOut + 2;
+	}
+#endif
 	
-	for (i=card->caps.wNumPipesOut - 2; i >=0 ; i-=2) {
+	for (; i >=0 ; i-=2) {
 		stream = echo_stream_new(card, ECHO_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
 		if (!card->pstream)
 			card->pstream = stream;
@@ -928,11 +937,15 @@ echo_open(const char *name, uint32 flags, void** cookie)
 		stream->first_channel = i;
 	}
 	
-	first_record_channel = card->caps.wNumPipesOut;
-	
 	LOG(("creating record streams\n"));
+	i = card->caps.wNumPipesIn - 2;
+#ifdef ECHO3G_FAMILY
+	if (current_settings.sample_rate > 50000) {
+		i = card->caps.wFirstDigitalBusIn;
+	}
+#endif
 	
-	for (i=card->caps.wNumPipesIn - 2; i >= 0; i-=2) {
+	for (; i >= 0; i-=2) {
 		stream = echo_stream_new(card, ECHO_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
 		if (!card->rstream)
 			card->rstream = stream;
