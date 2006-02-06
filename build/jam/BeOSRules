@@ -41,7 +41,6 @@ actions together AddStringDataResource1
 rule AddFileDataResource
 {
 	# AddFileDataResource <target> : <resourceID> : [ <dataFile> ]
-	#	: [ <dataString> ]
 	# Adds a single resource to the resources of an executable/library.
 	# <target>: The executable/library.
 	# <resourceID>: A resource ID string as understood by xres (type:id[:name]).
