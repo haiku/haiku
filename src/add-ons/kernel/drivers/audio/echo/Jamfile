@@ -1,5 +1,9 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio echo ;
 
+# The settings file is located in this dir and included in the packages built
+# in the subdirectories. We specify its location once.
+SEARCH on <echo!driver>echo.settings = $(SUBDIR) ;
+
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo gals ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo 24 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo 3g ;
