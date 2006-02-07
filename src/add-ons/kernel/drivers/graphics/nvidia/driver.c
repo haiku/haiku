@@ -693,9 +693,6 @@ static status_t map_device(device_info *di)
 		}
 	}
 
-	/* restore original ROM shadowing setting to prevent trouble starting (some) cards */
-	set_pci(NVCFG_ROMSHADOW, 4, tmpROMshadow);
-
 	if (!tmpUlong)
 	{
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
@@ -727,6 +724,9 @@ static status_t map_device(device_info *di)
 	tmpUlong &= 0xfffffffe;
 	set_pci(PCI_rom_base, 4, tmpUlong);
 	delete_area(rom_area);
+
+	/* restore original ROM shadowing setting to prevent trouble starting (some) cards */
+	set_pci(NVCFG_ROMSHADOW, 4, tmpROMshadow);
 
 	/* work out a name for the framebuffer mapping*/
 	sprintf(buffer, DEVICE_FORMAT " framebuffer",
