@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-1/2006.
+	Rudolf Cornelissen 3/2002-2/2006.
 */
 
 /* standard kernel driver stuff */
@@ -586,22 +586,17 @@ static status_t map_device(device_info *di)
 {
 	char buffer[B_OS_NAME_LENGTH]; /*memory for device name*/
 	shared_info *si = di->si;
-	uint32	tmpUlong;
+	uint32	tmpUlong, tmpROMshadow;
 	pci_info *pcii = &(di->pcii);
 	system_info sysinfo;
 
-	/*storage for the physical to virtual table (used for dma buffer)*/
-//	physical_entry physical_memory[2];
-//	#define G400_DMA_BUFFER_SIZE 1024*1024
-
 	/* variables for making copy of ROM */
 	uint8* rom_temp;
-	area_id rom_area;
+	area_id rom_area = -1;
 
 	/* Nvidia cards have registers in [0] and framebuffer in [1] */
 	int registers = 0;
 	int frame_buffer = 1;
-//	int pseudo_dma = 2;
 
 	/* enable memory mapped IO, disable VGA I/O - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_command, 2);
@@ -648,13 +643,15 @@ static status_t map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	/* disable ROM shadowing, we want the guaranteed exact contents of the chip */
+	/* preserve ROM shadowing setting, we need to restore the current state later on. */
 	/* warning:
-	 * don't touch: (confirmed) NV04, NV05, NV05-M64, NV11 all shutoff otherwise.
+	 * 'don't touch': (confirmed) NV04, NV05, NV05-M64, NV11 all shutoff otherwise.
 	 * NV18, NV28 and NV34 keep working.
 	 * confirmed NV28 and NV34 to use upper part of shadowed ROM for scratch purposes,
 	 * however the actual ROM content (so the used part) is intact (confirmed). */
-	//set_pci(NVCFG_ROMSHADOW, 4, 0);
+	tmpROMshadow = get_pci(NVCFG_ROMSHADOW, 4);
+	/* temporary disable ROM shadowing, we want the guaranteed exact contents of the chip */
+	set_pci(NVCFG_ROMSHADOW, 4, 0);
 
 	/* get ROM memory mapped base adress - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
@@ -677,16 +674,27 @@ static status_t map_device(device_info *di)
 			(void **)&(rom_temp)
 		);
 
-		/* check if we got the BIOS signature (might fail on laptops..) */
-		if (rom_temp[0]!=0x55 || rom_temp[1]!=0xaa)
+		/* check if we got the BIOS and signature (might fail on laptops..) */
+		if (rom_area >= 0)
 		{
-			/* apparantly no ROM is mapped here */
-			delete_area(rom_area);
-			rom_area = -1;
-			/* force using ISA legacy map as fall-back */
+			if ((rom_temp[0] != 0x55) || (rom_temp[1] != 0xaa))
+			{
+				/* apparantly no ROM is mapped here */
+				delete_area(rom_area);
+				rom_area = -1;
+				/* force using ISA legacy map as fall-back */
+				tmpUlong = 0x00000000;
+			}
+		}
+		else
+		{
+			/* mapping failed: force using ISA legacy map as fall-back */
 			tmpUlong = 0x00000000;
 		}
 	}
+
+	/* restore original ROM shadowing setting to prevent trouble starting (some) cards */
+	set_pci(NVCFG_ROMSHADOW, 4, tmpROMshadow);
 
 	if (!tmpUlong)
 	{
