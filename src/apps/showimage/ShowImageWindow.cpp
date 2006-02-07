@@ -377,7 +377,7 @@ void
 ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 {
 	BScreen screen;
-	if (screen.IsValid())
+	if (!screen.IsValid())
 		return;
 
 	BRect r(pbitmap->Bounds());
