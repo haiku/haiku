@@ -202,10 +202,11 @@ AddFilesToHaikuImage beos system add-ons Translators
 AddFilesToHaikuImage beos system add-ons media : $(BEOS_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage beos system add-ons media plugins
 	: $(BEOS_ADD_ONS_MEDIA_PLUGINS) ;
+AddFilesToHaikuImage beos system add-ons Tracker : FileType-F ZipOMatic-Z ;
 AddFilesToHaikuImage beos system add-ons input_server devices
 	: <input>keyboard <input>mouse ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
-AddFilesToHaikuImage beos system add-ons input_server methods : canna ;
+# AddFilesToHaikuImage beos system add-ons input_server methods : canna ;
 AddFilesToHaikuImage beos system add-ons kernel network
 	: $(BEOS_NETWORK_CORE) ;
 AddFilesToHaikuImage beos system add-ons kernel network interfaces
