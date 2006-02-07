@@ -11,7 +11,8 @@ extern int accelerantIsClone;
 extern nv_get_set_pci nv_pci_access;
 extern nv_in_out_isa nv_isa_access;
 
-
+typedef status_t (*crtc_interrupt_enable)(bool);
+typedef status_t (*crtc_update_fifo)(void);
 typedef status_t (*crtc_validate_timing)(uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*);
 typedef status_t (*crtc_set_timing)(display_mode);
 typedef status_t (*crtc_depth)(int);
@@ -31,6 +32,8 @@ typedef status_t (*dac_palette)(uint8[256], uint8[256], uint8[256]);
 typedef status_t (*dac_set_pix_pll)(display_mode);
 typedef status_t (*dac_pix_pll_find)(display_mode, float*, uint8*, uint8*, uint8*, uint8);
 
+crtc_interrupt_enable	head1_interrupt_enable;
+crtc_update_fifo		head1_update_fifo;
 crtc_validate_timing 	head1_validate_timing;
 crtc_set_timing 		head1_set_timing;
 crtc_depth				head1_depth;
@@ -45,6 +48,8 @@ crtc_cursor_position	head1_cursor_position;
 crtc_stop_tvout			head1_stop_tvout;
 crtc_start_tvout		head1_start_tvout;
 
+crtc_interrupt_enable	head2_interrupt_enable;
+crtc_update_fifo		head2_update_fifo;
 crtc_validate_timing	head2_validate_timing;
 crtc_set_timing			head2_set_timing;
 crtc_depth				head2_depth;

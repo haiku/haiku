@@ -65,6 +65,7 @@ status_t BT_stop_tvout(void);
 status_t BT_setmode(display_mode target);
 
 /* CRTC1 functions */
+status_t nv_crtc_interrupt_enable(bool);
 status_t nv_crtc_update_fifo(void);
 status_t nv_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
@@ -84,6 +85,7 @@ status_t nv_crtc_stop_tvout(void);
 status_t nv_crtc_start_tvout(void);
 
 /* CRTC2 functions */
+status_t nv_crtc2_interrupt_enable(bool);
 status_t nv_crtc2_update_fifo(void);
 status_t nv_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,

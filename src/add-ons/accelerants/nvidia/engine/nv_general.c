@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.71 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.72 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1142,6 +1142,8 @@ void setup_virtualized_heads(bool cross)
 {
 	if (cross)
 	{
+		head1_interrupt_enable	= (crtc_interrupt_enable)	nv_crtc2_interrupt_enable;
+		head1_update_fifo		= (crtc_update_fifo)		nv_crtc2_update_fifo;
 		head1_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
 		head1_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
 		head1_depth				= (crtc_depth)				nv_crtc2_depth;
@@ -1161,6 +1163,8 @@ void setup_virtualized_heads(bool cross)
 		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac2_set_pix_pll;
 		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac2_pix_pll_find;
 
+		head2_interrupt_enable	= (crtc_interrupt_enable)	nv_crtc_interrupt_enable;
+		head2_update_fifo		= (crtc_update_fifo)		nv_crtc_update_fifo;
 		head2_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
 		head2_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc_depth;
@@ -1182,6 +1186,8 @@ void setup_virtualized_heads(bool cross)
 	}
 	else
 	{
+		head1_interrupt_enable	= (crtc_interrupt_enable)	nv_crtc_interrupt_enable;
+		head1_update_fifo		= (crtc_update_fifo)		nv_crtc_update_fifo;
 		head1_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
 		head1_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
 		head1_depth				= (crtc_depth)				nv_crtc_depth;
@@ -1201,6 +1207,8 @@ void setup_virtualized_heads(bool cross)
 		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac_set_pix_pll;
 		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac_pix_pll_find;
 
+		head2_interrupt_enable	= (crtc_interrupt_enable)	nv_crtc2_interrupt_enable;
+		head2_update_fifo		= (crtc_update_fifo)		nv_crtc2_update_fifo;
 		head2_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
 		head2_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc2_depth;

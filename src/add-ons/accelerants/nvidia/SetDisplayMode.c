@@ -13,25 +13,6 @@
 
 #include "acc_std.h"
 
-/*
-	Enable/Disable interrupts.  Just a wrapper around the
-	ioctl() to the kernel driver.
-*/
-static void interrupt_enable(bool flag)
-{
-	status_t result = B_OK;
-	nv_set_bool_state sbs;
-
-	if (si->ps.int_assigned)
-	{
-		/* set the magic number so the driver knows we're for real */
-		sbs.magic = NV_PRIVATE_DATA_MAGIC;
-		sbs.do_it = flag;
-		/* contact driver and get a pointer to the registers and shared data */
-		result = ioctl(fd, NV_RUN_INTERRUPTS, &sbs, sizeof(sbs));
-	}
-}
-
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */
 status_t SET_DISPLAY_MODE(display_mode *mode_to_set) 
 {
@@ -78,7 +59,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	si->engine.threeD.clones = 0x00000000;
 
 	/* disable interrupts using the kernel driver */
-	interrupt_enable(false);
+	head1_interrupt_enable(false);
+	if (si->ps.secondary_head) head2_interrupt_enable(false);
 
 	/* disable TVout if supported */
 	if (si->ps.tvout) BT_stop_tvout();
@@ -339,7 +321,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	SET_DPMS_MODE(si->dpms_flags);
 
 	/* enable interrupts using the kernel driver */
-	interrupt_enable(true);
+	//fixme:
+	//add head2 once we use one driver instance 'per head' (instead of 'per card')
+	head1_interrupt_enable(true);
 
 	/* make sure a possible 3D add-on will re-initialize itself by signalling ready */
 	si->engine.threeD.mode_changing = false;
@@ -416,7 +400,9 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	startadd += (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 	startadd_right = startadd + si->dm.timing.h_display * (colour_depth >> 3);
 
-	interrupt_enable(false);
+	/* disable interrupts using the kernel driver */
+	head1_interrupt_enable(false);
+	if (si->ps.secondary_head) head2_interrupt_enable(false);
 
 	switch (si->dm.flags & DUALHEAD_BITS)
 	{
@@ -434,7 +420,10 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 			break;
 	}
 
-	interrupt_enable(true);
+	//fixme:
+	//add head2 once we use one driver instance 'per head' (instead of 'per card')
+	head1_interrupt_enable(true);
+
 	return B_OK;
 }
 
@@ -467,7 +456,9 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 {
 	bool display, h1h, h1v, h2h, h2v, do_p1, do_p2;
 
-	interrupt_enable(false);
+	/* disable interrupts using the kernel driver */
+	head1_interrupt_enable(false);
+	if (si->ps.secondary_head) head2_interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: $%08x\n", dpms_flags));
 
@@ -494,7 +485,10 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 		break;
 	default:
 		LOG(8,("SET: Invalid DPMS settings $%08x\n", dpms_flags));
-		interrupt_enable(true);
+		//fixme:
+		//add head2 once we use one driver instance 'per head' (instead of 'per card')
+		head1_interrupt_enable(true);
+
 		return B_ERROR;
 	}
 
@@ -593,7 +587,10 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	if (si->dm.flags & TV_BITS)
 		BT_dpms(display);
 
-	interrupt_enable(true);
+	//fixme:
+	//add head2 once we use one driver instance 'per head' (instead of 'per card')
+	head1_interrupt_enable(true);
+
 	return B_OK;
 }
 

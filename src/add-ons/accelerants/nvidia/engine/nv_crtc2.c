@@ -1,11 +1,33 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-1/2006
+   Rudolf Cornelissen 11/2002-2/2006
 */
 
 #define MODULE_BIT 0x00020000
 
 #include "nv_std.h"
+
+/*
+	Enable/Disable interrupts.  Just a wrapper around the
+	ioctl() to the kernel driver.
+*/
+status_t nv_crtc2_interrupt_enable(bool flag)
+{
+	status_t result = B_OK;
+	nv_set_vblank_int svi;
+
+	if (si->ps.int_assigned)
+	{
+		/* set the magic number so the driver knows we're for real */
+		svi.magic = NV_PRIVATE_DATA_MAGIC;
+		svi.crtc = 1;
+		svi.do_it = flag;
+		/* contact driver and get a pointer to the registers and shared data */
+		result = ioctl(fd, NV_RUN_INTERRUPTS, &svi, sizeof(svi));
+	}
+
+	return result;
+}
 
 /* doing general fail-safe default setup here */
 //fixme: this is a _very_ basic setup, and it's preliminary...
