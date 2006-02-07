@@ -871,7 +871,7 @@ ShowImageView::DrawCaption()
 
 	// draw background
 	SetDrawingMode(B_OP_ALPHA);
-	SetHighColor(255, 255, 255, 128);
+	SetHighColor(255, 255, 255, 160);
 	FillRect(rect);
 
 	// draw text

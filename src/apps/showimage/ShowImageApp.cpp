@@ -105,8 +105,15 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 		cwd = "";
 
 	for (int32 i = 1; i < argc; i++) {
-		BPath path(cwd);
-		path.Append(argv[i]);
+		BPath path;
+		if (argv[i][0] == '/') {
+			// absolute path
+			path.SetTo(argv[i]);
+		} else {
+			// relative path
+			path.SetTo(cwd);
+			path.Append(argv[i]);
+		}
 
 		entry_ref ref;
 		status_t err = get_ref_for_path(path.Path(), &ref);
