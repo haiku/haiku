@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src add-ons kernel disk_scanner ;
 SubInclude HAIKU_TOP src add-ons kernel drivers ;
 SubInclude HAIKU_TOP src add-ons kernel file_cache ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ;
+SubInclude HAIKU_TOP src add-ons kernel interrupt_controllers ;
 SubInclude HAIKU_TOP src add-ons kernel network ;
 SubInclude HAIKU_TOP src add-ons kernel media ;
 SubInclude HAIKU_TOP src add-ons kernel partitioning_systems ;

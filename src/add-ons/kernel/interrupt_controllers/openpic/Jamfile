@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src add-ons kernel interrupt_controllers openpic ;
+
+UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
+
+KernelAddon openpic : kernel interrupt_controllers : openpic.cpp ;

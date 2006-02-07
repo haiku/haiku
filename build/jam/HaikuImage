@@ -6,8 +6,10 @@ AddDirectoryToHaikuImage var tmp ;
 
 if $(TARGET_ARCH) = x86 {
 	X86_ONLY = "" ;
+	PPC_ONLY = ;
 } else if $(TARGET_ARCH) = ppc {
 	X86_ONLY = ;
+	PPC_ONLY = "" ;
 }
 
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
@@ -84,6 +86,8 @@ AddFilesToHaikuImage beos system add-ons kernel file_systems : bfs ;
 AddFilesToHaikuImage beos system add-ons kernel generic
 	: block_io fast_log ide_adapter locked_pool scsi_periph ;
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel ;
+AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
+	: $(PPC_ONLY)openpic ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
@@ -186,8 +190,8 @@ AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
 AddBootModuleSymlinks config_manager bfs block_io fast_log generic_ide_pci
-	$(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel locked_pool pci scsi
-	scsi_cd scsi_dsk scsi_periph
+	$(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel locked_pool
+	$(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
 ;
 
 # add-ons
