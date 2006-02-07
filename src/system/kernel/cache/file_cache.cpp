@@ -598,7 +598,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 		status = pages_io(ref, offset, &readVec, 1, &bytesRead, false);
 		// ToDo: handle errors for real!
 		if (status < B_OK)
-			panic("pages_io() failed!\n");
+			panic("1. pages_io() failed: %s!\n", strerror(status));
 	}
 
 	addr_t lastPageOffset = (pageOffset + bufferSize) & (B_PAGE_SIZE - 1);
@@ -620,7 +620,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
 				&bytesRead, false);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
-				panic("pages_io() failed!\n");
+				panic("pages_io() failed: %s!\n", strerror(status));
 		}
 	}
 
