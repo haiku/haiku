@@ -17,6 +17,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "pci.h"
 #include "pci_priv.h"
 
 
@@ -94,6 +95,26 @@ pci_device_ram_address(pci_device_info *device,
 {
 	return pci_ram_address(physical_address_in_system_memory);
 }	
+
+
+static status_t
+pci_device_get_pci_info(pci_device device, struct pci_info *info)
+{
+	int i;
+
+	if (device == NULL || info == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: Implement more efficiently!	
+	for (i = 0; pci_get_nth_pci_info(i, info) == B_OK; i++) {
+		if (device->bus == info->bus && device->device == info->device
+				&& device->function == info->function) {
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
 
 
 static status_t
@@ -203,4 +224,6 @@ pci_device_module_info gPCIDeviceModule = {
 	pci_device_write_pci_config,
 
 	pci_device_ram_address,
+
+	pci_device_get_pci_info,
 };

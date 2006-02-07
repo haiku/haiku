@@ -8,6 +8,8 @@
 #ifndef __PCI_H__
 #define __PCI_H__
 
+#include <PCI.h>
+
 #include "pci_controller.h"
 
 
