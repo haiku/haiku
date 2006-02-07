@@ -844,18 +844,18 @@ ShowImageView::LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
 	float width, height;
 	BRect bounds(Bounds());
 	font = be_plain_font;
-	width = font.StringWidth(fCaption.String()) + 1; // 1 for text shadow
+	width = font.StringWidth(fCaption.String());
 	font.GetHeight(&fontHeight);
 	height = fontHeight.ascent + fontHeight.descent;
 	// center text horizontally
-	pos.x = (bounds.left + bounds.right - width)/2;
+	pos.x = (bounds.left + bounds.right - width) / 2;
 	// flush bottom
-	pos.y = bounds.bottom - fontHeight.descent - 5;
-	
+	pos.y = bounds.bottom - fontHeight.descent - 7;
+
 	// background rectangle
-	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
+	rect.Set(0, 0, width + 4, height + 4);
 	rect.OffsetTo(pos);
-	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+	rect.OffsetBy(-2, -2 - fontHeight.ascent); // -2 for border
 }
 
 
@@ -863,28 +863,24 @@ void
 ShowImageView::DrawCaption()
 {
 	BFont font;
-	BPoint pos;
+	BPoint position;
 	BRect rect;
-	LayoutCaption(font, pos, rect);		
+	LayoutCaption(font, position, rect);		
 
 	PushState();
+
 	// draw background
 	SetDrawingMode(B_OP_ALPHA);
-	SetHighColor(0, 0, 255, 128);
+	SetHighColor(255, 255, 255, 128);
 	FillRect(rect);
+
 	// draw text
 	SetDrawingMode(B_OP_OVER);
 	SetFont(&font);
 	SetLowColor(B_TRANSPARENT_COLOR);
-	// text shadow
-	pos += BPoint(1, 1);
 	SetHighColor(0, 0, 0);
-	SetPenSize(1);
-	DrawString(fCaption.String(), pos);
-	// text
-	pos -= BPoint(1, 1);
-	SetHighColor(255, 255, 0);
-	DrawString(fCaption.String(), pos);
+	DrawString(fCaption.String(), position);
+
 	PopState();
 }
 
@@ -952,41 +948,39 @@ ShowImageView::DrawImage(BRect rect)
 void
 ShowImageView::Draw(BRect updateRect)
 {
-	if (fBitmap) {
-		if (!IsPrinting()) {
-			BRect rect = AlignBitmap();
-			Setup(rect);
+	if (fBitmap == NULL)
+		return;
 
-			BRect border(rect);
-			border.InsetBy(-PEN_SIZE, -PEN_SIZE);
+	if (IsPrinting()) {
+		DrawBitmap(fBitmap);
+		return;
+	}
 
-			DrawBorder(border);
+	BRect rect = AlignBitmap();
+	Setup(rect);
 
-			// Draw black rectangle around image
-			StrokeRect(border);
+	BRect border(rect);
+	border.InsetBy(-PEN_SIZE, -PEN_SIZE);
 
-			// Draw image
-			DrawImage(rect);
+	DrawBorder(border);
 
-			if (fShowCaption) {
-				// fShowCaption is set to false by ScrollRestricted()
-				// to prevent the caption from dirtying up the image
-				// during scrolling.
-				DrawCaption();
-			}
+	// Draw black rectangle around image
+	StrokeRect(border);
 
-			if (HasSelection()) {
-				if (fSelBitmap) {
-					BRect srcBits, destRect;
-					GetSelMergeRects(srcBits, destRect);
-					destRect = ImageToView(destRect);
-					DrawBitmap(fSelBitmap, srcBits, destRect);
-				}
-				DrawSelectionBox();
-			}
-		} else {
-			DrawBitmap(fBitmap);
+	// Draw image
+	DrawImage(rect);
+
+	if (fShowCaption)
+		DrawCaption();
+
+	if (HasSelection()) {
+		if (fSelBitmap) {
+			BRect srcBits, destRect;
+			GetSelMergeRects(srcBits, destRect);
+			destRect = ImageToView(destRect);
+			DrawBitmap(fSelBitmap, srcBits, destRect);
 		}
+		DrawSelectionBox();
 	}
 }
 
@@ -1572,6 +1566,8 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 
 	// hide the caption when using mouse wheel
 	// in full screen mode
+	// to prevent the caption from dirtying up the image
+	// during scrolling.
 	bool caption = fShowCaption;
 	if (caption) {
 		fShowCaption = false;
