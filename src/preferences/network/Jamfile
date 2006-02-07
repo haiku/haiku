@@ -4,7 +4,15 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources Network : Network.rdef ;
 
-Preference Network : Network.cpp funcs.cpp ;
+Preference Network : 
+	BackupWindow.cpp
+	ConfigData.cpp
+	InterfaceWin.cpp
+	LoginInfo.cpp
+	NetListView.cpp
+	Network.cpp
+	NetworkWindow.cpp
+	;
 
 LinkAgainst Network : be root ;
 
