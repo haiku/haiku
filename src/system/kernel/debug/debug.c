@@ -108,7 +108,7 @@ kputchar(char c)
 {
 	if (sSerialDebugEnabled)
 		arch_debug_serial_putchar(c);
-	if (sBlueScreenEnabled)
+	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_putchar(c);
 }
 
@@ -118,7 +118,7 @@ kputs(const char *s)
 {
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(s);
-	if (sBlueScreenEnabled)
+	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_puts(s);
 }
 
@@ -570,10 +570,22 @@ debug_debugger_running(void)
 void
 debug_puts(const char *string)
 {
-	cpu_status state = disable_interrupts();
+	cpu_status state;
+
+	// we only need the length for syslog
+	size_t length = 0;
+	if (sSyslogOutputEnabled)
+		length = strlen(string);
+
+	state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
 	kputs(string);
+
+	// kputs() doesn't output to syslog (as it's only used
+	// from the kernel debugger elsewhere)
+	if (sSyslogOutputEnabled)
+		syslog_write(sOutputBuffer, length);
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
@@ -836,10 +848,7 @@ kprintf(const char *format, ...)
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	if (sSerialDebugEnabled)
-		arch_debug_serial_puts(sOutputBuffer);
-	if (sBlueScreenEnabled)
-		blue_screen_puts(sOutputBuffer);
+	kputs(sOutputBuffer);
 }
 
 
