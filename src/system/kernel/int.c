@@ -126,6 +126,13 @@ int_init_post_vm(kernel_args *args)
 }
 
 
+status_t
+int_init_post_device_manager(kernel_args *args)
+{
+	return arch_int_init_post_device_manager(args);
+}
+
+
 /** Install a handler to be called when an interrupt is triggered
  *	for the given interrupt number with \a data as the argument.
  */

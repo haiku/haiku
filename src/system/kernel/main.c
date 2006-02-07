@@ -218,6 +218,8 @@ main2(void *unused)
 	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
 	//	but instead, the hardware and drivers are rescanned then.
 
+	int_init_post_device_manager(&sKernelArgs);
+
 	TRACE(("Mount boot file system\n"));
 	vfs_mount_boot_file_system(&sKernelArgs);
 

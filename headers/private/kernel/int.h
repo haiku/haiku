@@ -21,6 +21,7 @@ extern "C" {
 
 status_t int_init(struct kernel_args *args);
 status_t int_init_post_vm(struct kernel_args *args);
+status_t int_init_post_device_manager(struct kernel_args *args);
 int int_io_interrupt_handler(int vector);
 
 bool interrupts_enabled(void);

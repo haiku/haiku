@@ -618,3 +618,10 @@ arch_int_init_post_vm(kernel_args *args)
 
 	return area >= B_OK ? B_OK : area;
 }
+
+
+status_t
+arch_int_init_post_device_manager(struct kernel_args *args)
+{
+	return B_OK;
+}

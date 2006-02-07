@@ -12,13 +12,16 @@
 
 #include <int.h>
 
-#include <boot/kernel_args.h>
-
 #include <arch/smp.h>
+#include <boot/kernel_args.h>
+#include <device_manager.h>
 #include <kscheduler.h>
+#include <interrupt_controller.h>
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/DoublyLinkedList.h>
+#include <util/kernel_cpp.h>
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
@@ -40,18 +43,30 @@ static ppc_cpu_exception_context sCPUExceptionContexts[SMP_MAX_CPUS];
 // threads yet.
 struct iframe_stack gBootFrameStack;
 
+// interrupt controller interface (initialized
+// in arch_int_init_post_device_manager())
+static struct interrupt_controller_module_info *sPIC;
+static void *sPICCookie;
+
 
 void 
 arch_int_enable_io_interrupt(int irq)
 {
-	return;
+	if (!sPIC)
+		return;
+
+	// TODO: I have no idea, what IRQ type is appropriate.
+	sPIC->enable_io_interrupt(sPICCookie, irq, IRQ_TYPE_LEVEL);
 }
 
 
 void 
 arch_int_disable_io_interrupt(int irq)
 {
-	return;
+	if (!sPIC)
+		return;
+
+	sPIC->disable_io_interrupt(sPICCookie, irq);
 }
 
 
@@ -150,9 +165,24 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			}
  			break;
 		}
+		
 		case 0x500: // external interrupt
-			panic("external interrrupt exception: unimplemented\n");
+		{
+			if (!sPIC) {
+				panic("ppc_exception_entry(): external interrupt although we "
+					"don't have a PIC driver!");
+				ret = B_HANDLED_INTERRUPT;
+				break;
+			}
+
+dprintf("handling I/O interrupts...\n");
+			int irq;
+			while ((irq = sPIC->acknowledge_io_interrupt(sPICCookie)) >= 0)
+				ret = int_io_interrupt_handler(irq);
+dprintf("handling I/O interrupts done\n");
 			break;
+		}
+
 		case 0x600: // alignment exception
 			panic("alignment exception: unimplemented\n");
 			break;
@@ -177,7 +207,7 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 		case 0xf00: // performance monitor exception
 			panic("performance monitor exception: unimplemented\n");
 			break;
-		case 0xf20: // alitivec unavailable exception
+		case 0xf20: // altivec unavailable exception
 			panic("alitivec unavailable exception: unimplemented\n");
 			break;
 		case 0x1000:
@@ -272,6 +302,217 @@ arch_int_init_post_vm(kernel_args *args)
 	ppc_set_current_cpu_exception_context(ppc_get_cpu_exception_context(0));
 
 	return B_OK;
+}
+
+
+template<typename ModuleInfo>
+struct Module : DoublyLinkedListLinkImpl<Module<ModuleInfo> > {
+	Module(ModuleInfo *module)
+		: module(module)
+	{
+	}
+
+	~Module()
+	{
+		if (module)
+			put_module(((module_info*)module)->name);
+	}
+
+	ModuleInfo	*module;
+};
+
+typedef Module<interrupt_controller_module_info> PICModule;
+
+struct PICModuleList : DoublyLinkedList<PICModule> {
+	~PICModuleList()
+	{
+		while (PICModule *module = First()) {
+			Remove(module);
+			delete module;
+		}
+	}
+};
+
+
+class DeviceTreeIterator {
+public:
+	DeviceTreeIterator(device_manager_info *deviceManager)
+		: fDeviceManager(deviceManager),
+		  fNode(NULL),
+		  fParent(NULL)
+	{
+		Rewind();
+	}
+
+	~DeviceTreeIterator()
+	{
+		if (fParent != NULL)
+			fDeviceManager->put_device_node(fParent);
+		if (fNode != NULL)
+			fDeviceManager->put_device_node(fNode);
+	}
+
+	void Rewind()
+	{
+		fNode = fDeviceManager->get_root();
+	}
+
+	bool HasNext() const
+	{
+		return (fNode != NULL);
+	}
+
+	device_node_handle Next()
+	{
+		if (fNode == NULL)
+			return NULL;
+
+		device_node_handle foundNode = fNode;
+
+		// get first child
+		device_node_handle child = NULL;
+		if (fDeviceManager->get_next_child_device(fNode, &child, NULL)
+				== B_OK) {
+			// move to the child node
+			if (fParent != NULL)
+				fDeviceManager->put_device_node(fParent);
+			fParent = fNode;
+			fNode = child;
+
+		// no more children; backtrack to find the next sibling
+		} else {
+			while (fParent != NULL) {
+				if (fDeviceManager->get_next_child_device(fParent, &fNode, NULL)
+						== B_OK) {
+						// get_next_child_device() always puts the node
+					break;
+				}
+				fNode = fParent;
+				fParent = fDeviceManager->get_parent(fNode);
+			}
+
+			// if we hit the root node again, we're done
+			if (fParent == NULL) {
+				fDeviceManager->put_device_node(fNode);
+				fNode = NULL;
+			}
+		}
+
+		return foundNode;
+	}
+
+private:
+	device_manager_info *fDeviceManager;
+	device_node_handle	fNode;
+	device_node_handle	fParent;
+};
+
+
+static void
+get_interrupt_controller_modules(PICModuleList &list)
+{
+	const char *namePrefix = "interrupt_controllers/";
+	size_t namePrefixLen = strlen(namePrefix);
+	
+	char name[B_PATH_NAME_LENGTH];
+	size_t length;
+	uint32 cookie = 0;
+	while (get_next_loaded_module_name(&cookie, name, &(length = sizeof(name)))
+			== B_OK) {
+		// an interrupt controller module?
+		if (length <= namePrefixLen
+			|| strncmp(name, namePrefix, namePrefixLen) != 0) {
+			continue;
+		}
+
+		// get the module
+		interrupt_controller_module_info *moduleInfo;
+		if (get_module(name, (module_info**)&moduleInfo) != B_OK)
+			continue;
+
+		// add it to the list
+		PICModule *module = new(nothrow) PICModule(moduleInfo);
+		if (!module) {
+			put_module(((module_info*)moduleInfo)->name);
+			continue;
+		}
+		list.Add(module);
+	}
+}
+
+
+static bool
+probe_pic_device(device_node_handle node, PICModuleList &picModules)
+{
+	for (PICModule *module = picModules.Head();
+		 module;
+		 module = picModules.GetNext(module)) {
+		bool noConnection;
+		if (module->module->info.supports_device(node, &noConnection) > 0) {
+			if (module->module->info.register_device(node) == B_OK)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
+status_t
+arch_int_init_post_device_manager(struct kernel_args *args)
+{
+	// get the interrupt controller driver modules
+	PICModuleList picModules;
+	get_interrupt_controller_modules(picModules);
+	if (picModules.IsEmpty()) {
+		panic("arch_int_init_post_device_manager(): Found no PIC modules!");
+		return B_ENTRY_NOT_FOUND;
+	}
+	
+	// get the device manager module
+	device_manager_info *deviceManager;
+	status_t error = get_module(B_DEVICE_MANAGER_MODULE_NAME,
+		(module_info**)&deviceManager);
+	if (error != B_OK) {
+		panic("arch_int_init_post_device_manager(): Failed to get device "
+			"manager: %s", strerror(error));
+		return error;
+	}
+	Module<device_manager_info> _deviceManager(deviceManager);	// auto put
+
+	// iterate through the device tree and probe the interrupt controllers
+	DeviceTreeIterator iterator(deviceManager);
+	while (device_node_handle node = iterator.Next())
+		probe_pic_device(node, picModules);
+
+	// iterate through the tree again and get an interrupt controller node
+	iterator.Rewind();
+	while (device_node_handle node = iterator.Next()) {
+		char *deviceType;
+		if (deviceManager->get_attr_string(node, B_DRIVER_DEVICE_TYPE,
+				&deviceType, false) == B_OK) {
+			bool isPIC
+				= (strcmp(deviceType, B_INTERRUPT_CONTROLLER_DRIVER_TYPE) == 0);
+			free(deviceType);
+
+			if (isPIC) {
+				driver_module_info *driver;
+				void *driverCookie;
+				error = deviceManager->init_driver(node, NULL, &driver,
+					&driverCookie);
+				if (error == B_OK) {
+					sPIC = (interrupt_controller_module_info *)driver;
+					sPICCookie = driverCookie;
+					return B_OK;
+				}
+			}
+		}
+	}
+
+	// no PIC found
+	panic("arch_int_init_post_device_manager(): Found no supported PIC!");
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
