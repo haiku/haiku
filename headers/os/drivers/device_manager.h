@@ -77,6 +77,7 @@ typedef struct device_manager_info {
 					device_node_handle *node);
 	status_t (*unregister_device)(device_node_handle node);
 
+	device_node_handle (*get_root)();
 	status_t (*get_next_child_device)(device_node_handle parent,
 		device_node_handle *_node, const device_attr *attrs);
 	device_node_handle (*get_parent)(device_node_handle node);
@@ -165,6 +166,7 @@ struct driver_module_info {
 #define B_MISC_DRIVER_TYPE			"misc"
 #define B_NETWORK_DRIVER_TYPE		"net"
 #define B_VIDEO_DRIVER_TYPE			"video"
+#define B_INTERRUPT_CONTROLLER_DRIVER_TYPE	"interrupt controller"
 
 #define PNP_DRIVER_CONNECTION "connection"
 	// connection of parent the device is attached to (optional, string)

@@ -79,6 +79,7 @@ device_manager_info gDeviceManagerModule = {
 	dm_register_node,
 	dm_unregister_node,
 
+	dm_get_root,
 	dm_get_next_child_node,
 	dm_get_parent,
 	dm_put_node,

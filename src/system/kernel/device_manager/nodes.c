@@ -328,7 +328,7 @@ dm_get_node(device_node_info *node)
 
 
 // remove node reference and clean it up if necessary
-// (node_lock must be hold)
+// (gNodeLock must be hold)
 
 void
 dm_put_node_nolock(device_node_info *node)
@@ -454,6 +454,14 @@ dm_put_node(device_node_info *node)
 
 
 device_node_info *
+dm_get_root(void)
+{
+	dm_get_node(gRootNode);
+	return gRootNode;
+}
+
+
+device_node_info *
 dm_get_parent(device_node_info *node)
 {
 	dm_get_node(node->parent);
@@ -466,9 +474,8 @@ dm_get_next_child_node(device_node_info *parent, device_node_info **_node,
 	const device_attr *attrs)
 {
 	device_node_info *node = *_node;
-	if (node != NULL)
-		dm_put_node(node);
-
+	device_node_info *nodeToPut = node;
+	
 	benaphore_lock(&gNodeLock);
 
 	while ((node = (device_node_info *)list_get_next_item(&parent->children, node)) != NULL) {
@@ -490,9 +497,17 @@ dm_get_next_child_node(device_node_info *parent, device_node_info **_node,
 		// we found a node
 		dm_get_node_nolock(node);
 		*_node = node;
+
+		if (nodeToPut != NULL)
+			dm_put_node_nolock(nodeToPut);
+
 		benaphore_unlock(&gNodeLock);
+		
 		return B_OK;
 	}
+
+	if (nodeToPut != NULL)
+		dm_put_node_nolock(nodeToPut);
 
 	benaphore_unlock(&gNodeLock);
 	return B_ENTRY_NOT_FOUND;
