@@ -635,6 +635,11 @@ ShutdownProcess::~ShutdownProcess()
 	// remove the application quit watcher
 	fRoster->RemoveWatcher(this);
 
+	// If an error occurred (e.g. the shutdown process was cancelled), the
+	// roster should accept applications again.
+	if (fShutdownError != B_OK)
+		fRoster->SetShuttingDown(false);
+
 	// delete the internal event semaphore
 	if (fInternalEventSemaphore >= 0)
 		delete_sem(fInternalEventSemaphore);
