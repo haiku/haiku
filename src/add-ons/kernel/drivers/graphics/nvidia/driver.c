@@ -391,18 +391,18 @@ static void dumprom (void *rom, uint32 size, pci_info pcii)
 }
 
 /* return 1 if vblank interrupt has occured */
-static int caused_vbi(vuint32 * regs)
+static int caused_vbi_crtc1(vuint32 * regs)
 {
 	return (NV_REG32(NV32_CRTC_INTS) & 0x00000001);
 }
 
 /* clear the vblank interrupt */
-static void clear_vbi(vuint32 * regs)
+static void clear_vbi_crtc1(vuint32 * regs)
 {
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
 }
 
-static void enable_vbi(vuint32 * regs)
+static void enable_vbi_crtc1(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
@@ -412,12 +412,56 @@ static void enable_vbi(vuint32 * regs)
 	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
 }
 
-static void disable_vbi(vuint32 * regs)
+static void disable_vbi_crtc1(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
 	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
 	/* clear the vblank interrupt */
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+}
+
+/* return 1 if vblank interrupt has occured */
+static int caused_vbi_crtc2(vuint32 * regs)
+{
+	return (NV_REG32(NV32_CRTC2_INTS) & 0x00000001);
+}
+
+/* clear the vblank interrupt */
+static void clear_vbi_crtc2(vuint32 * regs)
+{
+	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
+}
+
+static void enable_vbi_crtc2(vuint32 * regs)
+{
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
+	/* enable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC2_INTE) |= 0x00000001;
+	/* enable nVidia interrupt system hardware (b0-1) */
+	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
+}
+
+static void disable_vbi_crtc2(vuint32 * regs)
+{
+	/* disable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC2_INTE) &= 0xfffffffe;
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
+}
+
+static void disable_vbi_all(vuint32 * regs)
+{
+	/* disable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+
+	/* disable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC2_INTE) &= 0xfffffffe;
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
+
 	/* disable nVidia interrupt system hardware (b0-1) */
 	NV_REG32(NV32_MAIN_INTE) = 0x00000000;
 }
@@ -880,10 +924,13 @@ nv_interrupt(void *data)
 	regs = di->regs;
 
 	/* was it a VBI? */
-	if (caused_vbi(regs)) {
-		/*clear the interrupt*/
-		clear_vbi(regs);
-		/*release the semaphore*/
+	//fixme:
+	//rewrite once we use one driver instance 'per head' (instead of 'per card')
+	if (caused_vbi_crtc1(regs) || caused_vbi_crtc2(regs)) {
+		/* clear the interrupt(s) */
+		clear_vbi_crtc1(regs);
+		clear_vbi_crtc2(regs);
+		/* release the semaphore */
 		handled = thread_interrupt_work(flags, regs, si);
 	}
 
@@ -1027,7 +1074,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	result = B_OK;
 
 	/* disable and clear any pending interrupts */
-	disable_vbi(di->regs);
+	//fixme:
+	//distinquish between crtc1/crtc2 once all heads get seperate driver instances!
+	disable_vbi_all(di->regs);
 
 	/* preset we can't use INT related functions */
 	si->ps.int_assigned = false;
@@ -1152,7 +1201,9 @@ free_hook (void* dev) {
 		goto unlock_and_exit;
 
 	/* disable and clear any pending interrupts */
-	disable_vbi(regs);
+	//fixme:
+	//distinquish between crtc1/crtc2 once all heads get seperate driver instances!
+	disable_vbi_all(regs);
 
 	if (si->ps.int_assigned)
 	{
@@ -1240,13 +1291,21 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_RUN_INTERRUPTS: {
-			nv_set_bool_state *ri = (nv_set_bool_state *)buf;
-			if (ri->magic == NV_PRIVATE_DATA_MAGIC) {
+			nv_set_vblank_int *vi = (nv_set_vblank_int *)buf;
+			if (vi->magic == NV_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
-				if (ri->do_it) {
-					enable_vbi(regs);
+				if (!(vi->crtc)) {
+					if (vi->do_it) {
+						enable_vbi_crtc1(regs);
+					} else {
+						disable_vbi_crtc1(regs);
+					}
 				} else {
-					disable_vbi(regs);
+					if (vi->do_it) {
+						enable_vbi_crtc2(regs);
+					} else {
+						disable_vbi_crtc2(regs);
+					}
 				}
 				result = B_OK;
 			}
