@@ -38,6 +38,7 @@ All rights reserved.
 #include <Background.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Path.h>
 #include <Window.h>
@@ -248,9 +249,20 @@ BackgroundImage::SetImage(BDirectory& directory, const char* path, Mode mode,
 
 /*static*/
 status_t
-BackgroundImage::SetDesktopImage(BDirectory& directory, uint32 workspaces, const char* path,
+BackgroundImage::SetDesktopImage(uint32 workspaces, const char* image,
 	Mode mode, BPoint offset, bool eraseIconBackground)
 {
-	return _SetImage(directory, true, workspaces, path, mode, offset, eraseIconBackground);
+	BPath path;
+	status_t status = find_directory(B_DESKTOP_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	BDirectory directory;
+	status = directory.SetTo(path.Path());
+	if (status != B_OK)
+		return status;
+
+	return _SetImage(directory, true, workspaces, image, mode, offset,
+		eraseIconBackground);
 }
 

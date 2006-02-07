@@ -55,8 +55,8 @@ class BackgroundImage {
 
 		static status_t SetImage(BDirectory& directory, const char* path, Mode mode,
 							BPoint offset, bool eraseIconBackground = false);
-		static status_t SetDesktopImage(BDirectory& directory, uint32 workspaces,
-							const char* path, Mode mode, BPoint offset,
+		static status_t SetDesktopImage(uint32 workspaces, const char* path,
+							Mode mode, BPoint offset,
 							bool eraseIconBackground = false);
 
 	private:

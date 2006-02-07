@@ -24,7 +24,6 @@
 #include <Clipboard.h>
 #include <Entry.h>
 #include <File.h>
-#include <FindDirectory.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -801,15 +800,10 @@ ShowImageWindow::MessageReceived(BMessage *message)
 		case MSG_DESKTOP_BACKGROUND:
 		{
 			BPath path;
-			if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK) {
-				BDirectory directory(path.Path());
-				if (directory.InitCheck() == B_OK) {
-					if (path.SetTo(fImageView->Image()) == B_OK) {
-						BackgroundImage::SetDesktopImage(directory, B_CURRENT_WORKSPACE,
-							path.Path(), BackgroundImage::kScaledToFit, BPoint(0, 0),
-							false);
-					}
-				}
+			if (path.SetTo(fImageView->Image()) == B_OK) {
+				BackgroundImage::SetDesktopImage(B_CURRENT_WORKSPACE,
+					path.Path(), BackgroundImage::kScaledToFit,
+					BPoint(0, 0), false);
 			}
 			break;
 		}
