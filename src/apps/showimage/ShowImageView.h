@@ -37,12 +37,12 @@ class ShowImageView : public BView {
 		virtual void Draw(BRect updateRect);
 		virtual void FrameResized(float width, float height);
 		virtual void MouseDown(BPoint point);
-		virtual void MouseMoved(BPoint point, uint32 state, const BMessage *pmsg);
+		virtual void MouseMoved(BPoint point, uint32 state, const BMessage *message);
 		virtual void MouseUp(BPoint point);
 		virtual void KeyDown(const char *bytes, int32 numBytes);
 		virtual void Pulse();
 
-		virtual void MessageReceived(BMessage *pmsg);
+		virtual void MessageReceived(BMessage *message);
 
 		void SetTrackerMessenger(const BMessenger& trackerMessenger);
 		status_t SetImage(const entry_ref *ref);
@@ -234,8 +234,12 @@ class ShowImageView : public BView {
 		BString fCaption;			// caption text
 
 		bool fInverted;
+
+		bool fShowingPopUpMenu;
+
 		enum image_orientation fImageOrientation;
-		static enum image_orientation fTransformation[ImageProcessor::kNumberOfAffineTransformations][kNumberOfOrientations];
+		static enum image_orientation fTransformation[
+			ImageProcessor::kNumberOfAffineTransformations][kNumberOfOrientations];
 };
 
 #endif	// SHOW_IMAGE_VIEW_H
