@@ -70,6 +70,8 @@
 #define NV32_MAIN_INTE		0x00000140
 #define NV32_CRTC_INTS		0x00600100
 #define NV32_CRTC_INTE		0x00600140
+#define NV32_CRTC2_INTS		0x00602100
+#define NV32_CRTC2_INTE		0x00602140
 
 /* NV ACCeleration registers */
 /* engine initialisation registers */

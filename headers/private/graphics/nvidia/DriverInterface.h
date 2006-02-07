@@ -408,11 +408,12 @@ typedef struct {
 	uint32	value;		/* The value read or written */
 } nv_get_set_pci;
 
-/* Set some boolean condition (like enabling or disabling interrupts) */
+/* Enable or Disable CRTC (1,2) interrupts */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
+	bool	crtc;		/* adressed CRTC */
 	bool	do_it;		/* state to set */
-} nv_set_bool_state;
+} nv_set_vblank_int;
 
 /* Retrieve the area_id of the kernel/accelerant shared info */
 typedef struct {
