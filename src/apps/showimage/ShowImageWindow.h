@@ -29,7 +29,7 @@ class ShowImageStatusView;
 class RecentDocumentsMenu : public BMenu {
 	public:
 		RecentDocumentsMenu(const char *title, menu_layout layout = B_ITEMS_IN_COLUMN);	
-		bool AddDynamicItem(add_state s);
+		bool AddDynamicItem(add_state addState);
 
 	private:
 		void UpdateRecentDocumentsMenu();
@@ -37,11 +37,11 @@ class RecentDocumentsMenu : public BMenu {
 
 class ShowImageWindow : public BWindow {
 	public:
-		ShowImageWindow(const entry_ref *pref, const BMessenger& trackerMessenger);
+		ShowImageWindow(const entry_ref *ref, const BMessenger& trackerMessenger);
 		virtual ~ShowImageWindow();
 
 		virtual void FrameResized(float width, float height);
-		virtual void MessageReceived(BMessage *pmsg);
+		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
 		virtual	void Zoom(BPoint origin, float width, float height);
 
@@ -50,14 +50,14 @@ class ShowImageWindow : public BWindow {
 
 		void UpdateTitle();
 		void BuildViewMenu(BMenu *menu);
-		void AddMenus(BMenuBar *pbar);
-		void WindowRedimension(BBitmap *pbitmap);
+		void AddMenus(BMenuBar *bar);
+		void WindowRedimension(BBitmap *bitmap);
 
 	private:
-		BMenuItem *AddItemMenu(BMenu *pmenu, char *caption,
-			long unsigned int msg, char shortcut, uint32 modifier,
+		BMenuItem *AddItemMenu(BMenu *menu, char *caption,
+			uint32 command, char shortcut, uint32 modifier,
 			char target, bool enabled);
-		BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value);
+		BMenuItem* AddDelayItem(BMenu *menu, char *caption, float value);
 
 		bool ToggleMenuItem(uint32 what);
 		void EnableMenuItem(BMenu *menu, uint32 what, bool enable);
@@ -65,9 +65,9 @@ class ShowImageWindow : public BWindow {
 		void MarkSlideShowDelay(float value);
 		void ResizeToWindow(bool shrink, uint32 what);
 			
-		void SaveAs(BMessage *pmsg);
+		void SaveAs(BMessage *message);
 			// Handle Save As submenu choice
-		void SaveToFile(BMessage *pmsg);
+		void SaveToFile(BMessage *message);
 			// Handle save file panel message
 		bool ClosePrompt();
 		void ToggleFullScreen();

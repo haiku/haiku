@@ -12,6 +12,7 @@ Application ShowImage : ShowImageApp.cpp
 	PrintOptionsWindow.cpp
 	Filter.cpp
 	EntryMenuItem.cpp
+	BackgroundImage.cpp
 	: be tracker translation
 	: ShowImage.rdef
 	;

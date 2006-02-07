@@ -9,6 +9,7 @@
  */
 
 
+#include "BackgroundImage.h"
 #include "EntryMenuItem.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
@@ -23,6 +24,7 @@
 #include <Clipboard.h>
 #include <Entry.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -46,9 +48,9 @@ RecentDocumentsMenu::RecentDocumentsMenu(const char *title, menu_layout layout)
 
 
 bool 
-RecentDocumentsMenu::AddDynamicItem(add_state s)
+RecentDocumentsMenu::AddDynamicItem(add_state addState)
 {
-	if (s != B_INITIAL_ADD)
+	if (addState != B_INITIAL_ADD)
 		return false;
 
 	BMenuItem *item;
@@ -264,6 +266,11 @@ ShowImageWindow::BuildViewMenu(BMenu *menu)
 	EnableMenuItem(menu, MSG_ORIGINAL_SIZE, enabled);
 	EnableMenuItem(menu, MSG_ZOOM_IN, enabled);
 	EnableMenuItem(menu, MSG_ZOOM_OUT, enabled);
+	
+	menu->AddSeparatorItem();
+
+	AddItemMenu(menu, "As Desktop Background", MSG_DESKTOP_BACKGROUND, 0, 0, 'W',
+		true);
 }
 
 
@@ -292,7 +299,7 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Quit", B_QUIT_REQUESTED, 'Q', 0, 'A', true);
 	bar->AddItem(menu);
-	
+
 	menu = new BMenu("Edit");
 	AddItemMenu(menu, "Undo", B_UNDO, 'Z', 0, 'W', false);
 	menu->AddSeparatorItem();
@@ -313,7 +320,7 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	fGoToPageMenu->SetRadioMode(true);
 	menu->AddItem(fGoToPageMenu);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);	
+	AddItemMenu(menu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);
 	AddItemMenu(menu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
 	bar->AddItem(menu);
 
@@ -321,21 +328,21 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	AddItemMenu(menu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Rotate -90°", MSG_ROTATE_270, '[', 0, 'W', true);
-	AddItemMenu(menu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);	
+	AddItemMenu(menu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
 	AddItemMenu(menu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Invert", MSG_INVERT, 0, 0, 'W', true);	
+	AddItemMenu(menu, "Invert", MSG_INVERT, 0, 0, 'W', true);
 	bar->AddItem(menu);
 }
 
 
 BMenuItem *
-ShowImageWindow::AddItemMenu(BMenu *menu, char *caption, long unsigned int msg, 
+ShowImageWindow::AddItemMenu(BMenu *menu, char *caption, uint32 command, 
 	char shortcut, uint32 modifier, char target, bool enabled)
 {
-	BMenuItem* item = new BMenuItem(caption, new BMessage(msg), shortcut, modifier);
+	BMenuItem* item = new BMenuItem(caption, new BMessage(command), shortcut, modifier);
 
 	if (target == 'A')
 		item->SetTarget(be_app);
@@ -791,6 +798,22 @@ ShowImageWindow::MessageReceived(BMessage *message)
 			fImageView->SetScaleBilinear(ToggleMenuItem(message->what));
 			break;
 
+		case MSG_DESKTOP_BACKGROUND:
+		{
+			BPath path;
+			if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK) {
+				BDirectory directory(path.Path());
+				if (directory.InitCheck() == B_OK) {
+					if (path.SetTo(fImageView->Image()) == B_OK) {
+						BackgroundImage::SetDesktopImage(directory, B_CURRENT_WORKSPACE,
+							path.Path(), BackgroundImage::kScaledToFit, BPoint(0, 0),
+							false);
+					}
+				}
+			}
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -812,15 +835,16 @@ ShowImageWindow::SaveAs(BMessage *message)
 
 	// Add the chosen translator and output type to the
 	// message that the save panel will send back
-	BMessage *ppanelMsg = new BMessage(MSG_SAVE_PANEL);
-	ppanelMsg->AddInt32(TRANSLATOR_FLD, outTranslator);
-	ppanelMsg->AddInt32(TYPE_FLD, outType);
+	BMessage *panelMsg = new BMessage(MSG_SAVE_PANEL);
+	panelMsg->AddInt32(TRANSLATOR_FLD, outTranslator);
+	panelMsg->AddInt32(TYPE_FLD, outType);
 
 	// Create save panel and show it
 	fSavePanel = new (std::nothrow) BFilePanel(B_SAVE_PANEL,
-		new BMessenger(this), NULL, 0, false, ppanelMsg);
+		new BMessenger(this), NULL, 0, false, panelMsg);
 	if (!fSavePanel)
 		return;
+
 	fSavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 	fSavePanel->Show();
 }

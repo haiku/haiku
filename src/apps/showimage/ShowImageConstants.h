@@ -56,5 +56,6 @@ const uint32 MSG_ZOOM_OUT           = 'mZOU';
 const uint32 MSG_ORIGINAL_SIZE      = 'mOSZ';
 const uint32 MSG_INVALIDATE         = 'mIVD';
 const uint32 MSG_SCALE_BILINEAR     = 'mSBL';
+const uint32 MSG_DESKTOP_BACKGROUND = 'mDBG';
 
 #endif	// SHOW_IMAGE_CONSTANTS_H
