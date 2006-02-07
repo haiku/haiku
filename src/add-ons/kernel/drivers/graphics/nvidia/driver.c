@@ -450,6 +450,12 @@ static void disable_vbi_crtc2(vuint32 * regs)
 	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
 }
 
+//fixme:
+//dangerous code, on singlehead cards better not try accessing secondary head
+//registers (card might react in unpredictable ways, though there's only a small
+//chance we actually run into this).
+//fix requires (some) card recognition code to be moved from accelerant to
+//kerneldriver...
 static void disable_vbi_all(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
@@ -917,21 +923,35 @@ nv_interrupt(void *data)
 	vuint32 *regs;
 
 	/* is someone already handling an interrupt for this device? */
-	if (atomic_or(flags, SKD_HANDLER_INSTALLED) & SKD_HANDLER_INSTALLED) {
-		goto exit0;
-	}
+	if (atomic_or(flags, SKD_HANDLER_INSTALLED) & SKD_HANDLER_INSTALLED) goto exit0;
+
 	/* get regs */
 	regs = di->regs;
 
 	/* was it a VBI? */
-	//fixme:
-	//rewrite once we use one driver instance 'per head' (instead of 'per card')
-	if (caused_vbi_crtc1(regs) || caused_vbi_crtc2(regs)) {
-		/* clear the interrupt(s) */
-		clear_vbi_crtc1(regs);
-		clear_vbi_crtc2(regs);
-		/* release the semaphore */
-		handled = thread_interrupt_work(flags, regs, si);
+	/* note: si->ps.secondary_head was cleared by kerneldriver earlier! (at least) */
+	if (si->ps.secondary_head)
+	{
+		//fixme:
+		//rewrite once we use one driver instance 'per head' (instead of 'per card')
+		if (caused_vbi_crtc1(regs) || caused_vbi_crtc2(regs))
+		{
+			/* clear the interrupt(s) */
+			clear_vbi_crtc1(regs);
+			clear_vbi_crtc2(regs);
+			/* release the semaphore */
+			handled = thread_interrupt_work(flags, regs, si);
+		}
+	}
+	else
+	{
+		if (caused_vbi_crtc1(regs))
+		{
+			/* clear the interrupt */
+			clear_vbi_crtc1(regs);
+			/* release the semaphore */
+			handled = thread_interrupt_work(flags, regs, si);
+		}
 	}
 
 	/* note that we're not in the handler any more */
@@ -1041,6 +1061,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 
 	/* ensure that the accelerant's INIT_ACCELERANT function can be executed */
 	si->accelerant_in_use = false;
+	/* preset singlehead card to prevent early INT routine calls (once installed) to
+	 * wrongly identify the INT request coming from us! */
+	si->ps.secondary_head = false;
 
 	/* note the amount of system RAM the system BIOS assigned to the card if applicable:
 	 * unified memory architecture (UMA) */
