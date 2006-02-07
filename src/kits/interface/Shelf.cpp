@@ -118,6 +118,7 @@ _rep_data_::_rep_data_()
 	fDragger(NULL),
 	fRelation(BDragger::TARGET_UNKNOWN),
 	fId(0),
+	fImage(-1),
 	fError(B_ERROR),
 	fZombieView(NULL)
 {
@@ -193,12 +194,13 @@ _rep_data_::index_of(BList const *list, BView const *view, bool allowZombie)
 {
 	int32 i = 0;
 	_rep_data_ *item;
-	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+	while ((item = (_rep_data_*)list->ItemAt(i)) != NULL) {
 		if (item->fView == view)
 			return i;
 
 		if (allowZombie && item->fZombieView == view)
 			return i;
+		i++;
 	}
 
 	return -1;
@@ -211,9 +213,10 @@ _rep_data_::index_of(BList const *list, unsigned long id)
 {
 	int32 i = 0;
 	_rep_data_ *item;
-	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+	while ((item = (_rep_data_*)list->ItemAt(i)) != NULL) {
 		if (item->fId == id)
 			return i;
+		i++;
 	}
 
 	return -1;
@@ -276,9 +279,8 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		point = mouseView->ConvertFromScreen(point - offset);
 	}
 
-	BHandler *handler;
 	BLooper *looper;
-	handler = msg->ReturnAddress().Target(&looper);
+	BHandler *handler = msg->ReturnAddress().Target(&looper);
 
 	BDragger *dragger;
 
@@ -401,14 +403,32 @@ BShelf::Instantiate(BMessage *data)
 void
 BShelf::MessageReceived(BMessage *msg)
 {
+	//TODO: Implement
 }
 
 
 status_t
 BShelf::Save()
 {
-	//TODO
-	return B_ERROR;
+	status_t status = B_ERROR;
+	if (fEntry != NULL) {
+		BFile *file = new BFile(fEntry, B_READ_WRITE);
+		status = file->InitCheck();
+		if (status < B_OK) {
+			delete file;
+			return status;
+		}
+		fStream = file;
+	}
+
+	if (fStream != NULL) {
+		BMessage message;
+		status = _Archive(&message);
+		if (status == B_OK)
+			status = message.Flatten(fStream);
+	}
+
+	return status;
 }
 
 
@@ -689,11 +709,13 @@ BShelf::ReplicantDeleted(int32 index, const BMessage *archive,
 {
 }
 
+
 void
 _ReservedShelf1__6BShelfFv(BShelf *const, int32, const BMessage*, 
 								const BView*)
 {
 }
+
 
 void BShelf::_ReservedShelf2() {}
 void BShelf::_ReservedShelf3() {}
@@ -786,8 +808,7 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 status_t
 BShelf::_DeleteReplicant(_rep_data_* item)
 {
-	bool loadedImage;
-	item->fMessage->FindBool("", &loadedImage);
+	bool loadedImage = item->fMessage->FindBool("");
 
 	BView *view = item->fView;
 	if (view == NULL)
@@ -799,6 +820,11 @@ BShelf::_DeleteReplicant(_rep_data_* item)
 	if (item->fDragger)
 		item->fDragger->RemoveSelf();
 
+	int32 index = _rep_data_::index_of(&fReplicants, item->fMessage);
+	
+	// TODO: Test if it's ok here
+	ReplicantDeleted(index, item->fMessage, view);
+	
 	fReplicants.RemoveItem(item);
 
 	if (loadedImage && item->fImage >= 0)
@@ -833,31 +859,31 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	}
 
 	// Check if we can accept this message
-	if (!CanAcceptReplicantMessage(data))
+	if (!CanAcceptReplicantMessage(data)) {
+		printf("Replicant was rejected by BShelf: CanAcceptReplicant() returned false");
 		return send_reply(data, B_ERROR, uniqueID);
+	}
 
 	// Check if we can create multiple instances
 	if (data->FindBool("be:load_each_time")) {
 		const char *_class = NULL;
 		const char *add_on = NULL;
 
-		if (data->FindString("class", &_class)) {
-			if (data->FindString("add_on", &add_on)) {
-				int32 i = 0;
-				_rep_data_ *item;
-				const char *rep_class = NULL;
-				const char *rep_add_on = NULL;
-
-				while ((item = (_rep_data_*)fReplicants.ItemAt(i++)) !=NULL) {
-					item->fMessage->FindString("class", &rep_class);
-					item->fMessage->FindString("add_on", &rep_add_on);
-
-					if (!strcmp(_class, rep_class) && add_on && rep_add_on
-						&& strcmp(_class, rep_class) == 0) {
-						printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
-							rep_class, rep_add_on);
-						return send_reply(data, B_ERROR, uniqueID);
-					}
+		if (data->FindString("class", &_class) == B_OK
+			&& data->FindString("add_on", &add_on) == B_OK) {
+			int32 i = 0;
+			_rep_data_ *item;
+			const char *rep_class = NULL;
+			const char *rep_add_on = NULL;
+			
+			while ((item = (_rep_data_*)fReplicants.ItemAt(i++)) != NULL) {
+				if (item->fMessage->FindString("class", &rep_class) == B_OK
+					&& item->fMessage->FindString("add_on", &rep_add_on) == B_OK
+					&& !strcmp(_class, rep_class) && add_on && rep_add_on
+					&& !strcmp(add_on, rep_add_on)) {
+					printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
+						rep_class, rep_add_on);
+					return send_reply(data, B_ERROR, uniqueID);
 				}
 			}
 		}
