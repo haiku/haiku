@@ -22,5 +22,5 @@ pci_controller_init(void)
 void *
 pci_ram_address(const void *physical_address_in_system_memory)
 {
-	return 0;
+	return (void *)physical_address_in_system_memory;
 }
