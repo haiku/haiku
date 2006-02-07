@@ -47,7 +47,7 @@ runprog() {
 # Set up stdin/out/err to nirvana
 
 exec </dev/null
-exec >/dev/null 2>&1
+exec >/dev/dprintf 2>&1
 
 # Standard locations of boot files
 SCRIPTS=beos/system/boot
@@ -90,6 +90,7 @@ fi
 # Launch MiniTerminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
 	launch beos/apps/Terminal
+	launch beos/system/Deskbar
 else
 	launch beos/bin/consoled
 fi
