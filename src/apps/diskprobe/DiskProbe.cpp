@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -226,7 +226,7 @@ DiskProbe::~DiskProbe()
 }
 
 
-void 
+void
 DiskProbe::ReadyToRun()
 {
 	// are there already windows open?
@@ -246,7 +246,7 @@ DiskProbe::ReadyToRun()
  *	This function must be called with the application looper locked.
  */
 
-status_t 
+status_t
 DiskProbe::Probe(BEntry &entry, const char *attribute)
 {
 	int32 probeWindows = 0;
@@ -292,7 +292,7 @@ DiskProbe::Probe(BEntry &entry, const char *attribute)
 }
 
 
-void 
+void
 DiskProbe::RefsReceived(BMessage *message)
 {
 	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
@@ -341,10 +341,10 @@ DiskProbe::RefsReceived(BMessage *message)
 }
 
 
-void 
+void
 DiskProbe::ArgvReceived(int32 argc, char **argv)
 {
-	BMessage *message = Looper()->CurrentMessage();
+	BMessage *message = CurrentMessage();
 
 	BDirectory currentDirectory;
 	if (message)
@@ -376,7 +376,7 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 }
 
 
-void 
+void
 DiskProbe::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -452,7 +452,7 @@ DiskProbe::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2004-2005, Haiku.\n\n"
+		"\tCopyright 2004-2006, Haiku.\n\n"
 		"original Be version by Robert Polic\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
@@ -468,7 +468,7 @@ DiskProbe::AboutRequested()
 }
 
 
-bool 
+bool
 DiskProbe::QuitRequested()
 {
 	return true;
@@ -478,7 +478,7 @@ DiskProbe::QuitRequested()
 //	#pragma mark -
 
 
-int 
+int
 main(int argc, char **argv)
 {
 	DiskProbe probe;
