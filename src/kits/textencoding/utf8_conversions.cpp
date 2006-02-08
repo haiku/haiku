@@ -31,7 +31,8 @@ convert_encoding(const char * from, const char * to,
 	if (*srcLen == 0) {
 		// nothing to do!
 		DEBPRINT(("nothing to do\n"));
-		return B_OK;
+		*dstLen = 0;
+		return B_ERROR;
 	}
 	iconv_t conversion = iconv_open(to,from);
 	if (conversion == (iconv_t)-1) {
