@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "OpenWindow.h"
@@ -62,9 +62,9 @@ OpenWindow::OpenWindow()
 	button->MoveBy(-button->Bounds().Width() - 8, 0);
 	view->AddChild(button);
 
-	BScreen screen;
-	MoveTo((screen.Frame().Width() - Frame().Width()) / 2,
-		(screen.Frame().Height() - Frame().Height()) / 2);
+	BScreen screen(this);
+	MoveTo(screen.Frame().left + (screen.Frame().Width() - Frame().Width()) / 2,
+		screen.Frame().top + (screen.Frame().Height() - Frame().Height()) / 2);
 }
 
 
