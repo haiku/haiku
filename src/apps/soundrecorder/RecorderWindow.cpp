@@ -182,7 +182,7 @@ void
 RecorderWindow::CalcSizes(float min_wid, float min_hei)
 {
 	//	Set up size limits based on new screen size
-	BScreen screen;
+	BScreen screen(this);
 	BRect r = screen.Frame();
 	float wid = r.Width()-12;
 	SetSizeLimits(min_wid, wid, min_hei, r.Height()-24);
