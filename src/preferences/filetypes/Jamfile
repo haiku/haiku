@@ -1,13 +1,17 @@
 SubDir HAIKU_TOP src preferences filetypes ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 SubDirSysHdrs $(SUBDIR) ;
 
 Preference FileTypes :
-	main.cpp
-	FileTypesApp.cpp
-	FileTypesView.cpp
+	FileTypes.cpp
 	FileTypesWindow.cpp
-	: libbe.so libtracker.so
-	: FileTypes.rdef FileTypes.icons.rdef FileTypes.version.rdef
+	: be tracker
+	: FileTypes.rdef FileTypes.icons.rdef
 	;
 
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : FileTypes
+		: tests!apps ;
+}
