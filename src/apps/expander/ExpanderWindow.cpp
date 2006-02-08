@@ -163,7 +163,7 @@ ExpanderWindow::ExpanderWindow(BRect frame_rect, const entry_ref *ref, BMessage 
 	box->AddChild(fListingScroll);
 	fListingScroll->Hide();
 	
-	SetSizeLimits(450, BScreen().Frame().Width(), 120, 120);
+	SetSizeLimits(450, BScreen(this).Frame().Width(), 120, 120);
 	
 	// finish creating window
 	Show();

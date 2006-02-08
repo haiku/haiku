@@ -153,7 +153,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 		new BMessage(MSG_CANCEL));
 	background->AddChild(button);
 	
-	BScreen screen;
+	BScreen screen(this);
 	MoveBy((screen.Frame().Width()-Bounds().Width())/2, 
 		(screen.Frame().Height()-Bounds().Height())/2);
 	
