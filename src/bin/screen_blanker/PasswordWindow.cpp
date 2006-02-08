@@ -15,7 +15,7 @@
 void 
 PasswordWindow::Setup() 
 {
-	BScreen theScreen(B_MAIN_SCREEN_ID);
+	BScreen theScreen(this);
 	MoveTo((theScreen.Frame().IntegerWidth()-Bounds().IntegerWidth())/2,(theScreen.Frame().IntegerHeight()-Bounds().IntegerHeight())/2);
 	fBgd=new BView (Bounds(),"fBgdView",0,0);
 	fBgd->SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
