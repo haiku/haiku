@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -48,7 +48,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	BMenu *menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS,
-					new BMessage(kMsgOpenOpenWindow), 'N', B_COMMAND_KEY));
+		new BMessage(kMsgOpenOpenWindow), 'N', B_COMMAND_KEY));
 
 	BMenu *devicesMenu = new BMenu("Open Device");
 	OpenWindow::CollectDevices(devicesMenu);
@@ -56,7 +56,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	menu->AddItem(new BMenuItem(devicesMenu));
 
 	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu("Open File" B_UTF8_ELLIPSIS,
-							NULL, NULL, be_app, 10, false, NULL, kSignature);
+		NULL, NULL, be_app, 10, false, NULL, kSignature);
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem(recentsMenu, new BMessage(kMsgOpenFilePanel)));
 	item->SetShortcut('O', B_COMMAND_KEY);
@@ -70,7 +70,8 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	// the ProbeView print menu items will be inserted here
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("About DiskProbe" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem("About DiskProbe" B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
@@ -80,9 +81,9 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add our interface widgets
 
-	BRect _rect = Bounds();
-	_rect.top = menuBar->Bounds().Height() + 1;
-	fProbeView = new ProbeView(_rect, ref, NULL, settings);
+	rect = Bounds();
+	rect.top = menuBar->Bounds().Height() + 1;
+	fProbeView = new ProbeView(rect, ref, NULL, settings);
 	AddChild(fProbeView);
 
 	fProbeView->AddSaveMenuItems(menu, 4);
