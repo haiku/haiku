@@ -49,6 +49,8 @@ All rights reserved.
 #include <stdlib.h>
 
 
+using std::nothrow;
+
 const char *kBackgroundImageInfoSet = "be:bgndimginfoset";
 
 
