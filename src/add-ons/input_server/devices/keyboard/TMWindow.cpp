@@ -56,7 +56,7 @@ TMWindow::TMWindow()
 	fView->GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
 
-	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
+	BRect screenFrame = BScreen(this).Frame();
 	BPoint point;
 	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
 	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
