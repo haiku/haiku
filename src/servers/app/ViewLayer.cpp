@@ -599,7 +599,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	// to move on screen, we must not be hidden and we must have a parent
 	if (fVisible && fParent && dirtyRegion) {
-#if 0
+#if 1
 // based on redraw on new location
 		// the place were we are now visible
 		BRect newVisibleBounds = Bounds();
