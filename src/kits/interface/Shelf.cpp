@@ -179,9 +179,10 @@ _rep_data_::index_of(BList const *list, BMessage const *msg)
 {
 	int32 i = 0;
 	_rep_data_ *item;
-	while ((item = (_rep_data_*)list->ItemAt(i++)) != NULL) {
+	while ((item = (_rep_data_*)list->ItemAt(i)) != NULL) {
 		if (item->fMessage == msg)
 			return i;
+		i++;
 	}
 
 	return -1;
