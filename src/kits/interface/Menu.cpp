@@ -1463,6 +1463,12 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 	BMenu *superMenu = Supermenu();
 	BMenuItem *superItem = Superitem();
 
+	if (scrollOn != NULL) {
+		// basically, if this returns false, it means
+		// that the menu frame won't fit completely inside the screen
+		*scrollOn = !screenFrame.Contains(bounds);
+	}
+
 	// TODO: Horrible hack:
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCItem_ inside a _BMCMenuBar_ to "fake" the menu hierarchy
@@ -1472,9 +1478,13 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 
 		if (frame.bottom > screenFrame.bottom)
 			frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
-		
+		else if (frame.top < screenFrame.top)
+			frame.OffsetBy(0, -frame.top);
+
 		if (frame.right > screenFrame.right)
 			frame.OffsetBy(screenFrame.right - frame.right, 0);
+		else if (frame.left < screenFrame.left)
+			frame.OffsetBy(-frame.left, 0);
 
 		return frame;
 	}
