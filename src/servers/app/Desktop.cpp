@@ -1279,6 +1279,11 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 
 	window->MoveBy(x, y);
 
+	if (!window->IsVisible()) {
+		UnlockAllWindows();
+		return;
+	}
+
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
 
@@ -1313,6 +1318,12 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 {
 	if (!LockAllWindows())
 		return;
+
+	if (!window->IsVisible()) {
+		window->ResizeBy(x, y, NULL);
+		UnlockAllWindows();
+		return;
+	}
 
 	// the dirty region for the inside of the window is
 	// constructed by the window itself in ResizeBy()
