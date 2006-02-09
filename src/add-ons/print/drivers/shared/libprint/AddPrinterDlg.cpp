@@ -120,14 +120,23 @@ AddPrinterView::AttachedToWindow()
 {
 	/* protocol class box */
 	BBox *box;
-	box = new BBox(PROTOCOL_CLASS_BOX_RECT);
+	box = new BBox(PROTOCOL_CLASS_BOX_RECT, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	box->SetLabel("Protocol Classes:");
 	AddChild(box);
 	
 	/* protocol class */
-	fProtocolClassList = new BListView(PROTOCOL_CLASS_RECT, "protocolClassList");
-	box->AddChild(new BScrollView("protocolClassListScroller", fProtocolClassList, 
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
+	fProtocolClassList = new BListView(
+		PROTOCOL_CLASS_RECT, 
+		"protocolClassList", 
+		B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	box->AddChild(new BScrollView(
+		"protocolClassListScroller", 
+		fProtocolClassList, 
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 
+		0, 
+		false, 
+		true));
 	fProtocolClassList->SetSelectionMessage(new BMessage(kMsgProtocolClassChanged));
 	fProtocolClassList->SetTarget(this);
 	
@@ -146,27 +155,27 @@ AddPrinterView::AttachedToWindow()
 	}
 	
 	/* description of protocol class box */
-	box = new BBox(DESCRIPTION_BOX_RECT);
+	box = new BBox(DESCRIPTION_BOX_RECT, NULL, B_FOLLOW_ALL_SIDES);
 	box->SetLabel("Description:");
 	AddChild(box);
 
 	/* description of protocol class */
 	BRect textRect(DESCRIPTION_RECT);
 	textRect.OffsetTo(0, 0);
-	fDescription = new BTextView(DESCRIPTION_RECT, "description", textRect, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fDescription = new BTextView(DESCRIPTION_RECT, "description", textRect, B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
 	fDescription->SetViewColor(box->ViewColor());
 	box->AddChild(new BScrollView("descriptionScroller", fDescription, 
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true, B_NO_BORDER));
+		B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));
 	fDescription->MakeEditable(false);
 
 	/* cancel */
 	BButton *button;
-	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(kMsgCancel));
+	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(kMsgCancel), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(button);
 
 	/* ok */
 
-	button = new BButton(OK_RECT, "", OK_TEXT, new BMessage(kMsgOK));
+	button = new BButton(OK_RECT, "", OK_TEXT, new BMessage(kMsgOK), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(button);
 	button->MakeDefault(true);
 	
@@ -211,9 +220,16 @@ AddPrinterView::Save()
 AddPrinterDlg::AddPrinterDlg(PrinterData *printerData, const PrinterCap *printerCap)
 	: DialogWindow(BRect(100, 100, 100 + DIALOG_WIDTH, 100 + DIALOG_HEIGHT),
 		"Add Printer", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	SetResult(B_ERROR);
+
+	// increase min. window size	
+	float minWidth, maxWidth, minHeight, maxHeight;
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	minHeight = DIALOG_HEIGHT;
+	minWidth = DIALOG_WIDTH;
+	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 	
 	fAddPrinterView = new AddPrinterView(Bounds(), printerData, printerCap);
 	AddChild(fAddPrinterView);
