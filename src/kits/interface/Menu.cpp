@@ -104,8 +104,7 @@ sPropList[] = {
 
 
 BMenu::BMenu(const char *name, menu_layout layout)
-//	:	BView(BRect(), name, 0,	B_WILL_DRAW),
-	:	BView(BRect(0.0, 0.0, 5.0, 5.0), name, 0, B_WILL_DRAW),
+	:	BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
 		fChosenItem(NULL),
 		fPad(14.0f, 2.0f, 20.0f, 0.0f),
 		fSelected(NULL),
@@ -1113,11 +1112,7 @@ BMenu::_track(int *action, long start)
 	int localAction = MENU_ACT_NONE;
 
 	bigtime_t startTime = system_time();
-	bigtime_t clickTime = 0;
-	get_click_speed(&clickTime);
-
-	// TODO: Test and reduce the timeout if needed.
-	clickTime /= 2;
+	bigtime_t delay = 200000; // TODO: Test and reduce if needed.
 
 	do {
 		if (!LockLooper())
@@ -1127,14 +1122,13 @@ BMenu::_track(int *action, long start)
 		BPoint location;
 		GetMouse(&location, &buttons, true);
 		BPoint screenLocation = ConvertToScreen(location);
-
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
 			if (item != fSelected) {
 				SelectItem(item, -1);
 				startTime = system_time();
 				snoozeAmount = 20000;
-			} else if (system_time() > clickTime + startTime && item->Submenu() 
+			} else if (system_time() > delay + startTime && item->Submenu() 
 				&& item->Submenu()->Window() == NULL) {
 				// Open the submenu if it's not opened yet, but only if
 				// the mouse pointer stayed over there for some time
@@ -1150,8 +1144,7 @@ BMenu::_track(int *action, long start)
 				SelectItem(NULL);
 		}
 
-		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)
-			&& fSelected->Submenu()->Window() != NULL) {
+		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
 			UnlockLooper();
 
 			int submenuAction = MENU_ACT_NONE;
@@ -1167,7 +1160,7 @@ BMenu::_track(int *action, long start)
 		}
 
 		UnlockLooper();
-		
+
 		snooze(snoozeAmount);
 	} while (buttons != 0);
 
