@@ -2560,8 +2560,7 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
 		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
 
-		WindowLayer *layer = const_cast<WindowLayer *>(GetWindowLayer());
-		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(layer->Frame());
+		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(fWindowLayer->Frame());
 
 		// TODO: Review this
 		const int32 kMaxClipRectsCount = (B_PAGE_SIZE - sizeof(direct_buffer_info))
