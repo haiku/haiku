@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:  DarkWyrm <bpmagic@columbus.rr.com>
@@ -138,6 +138,9 @@ class WindowLayer {
 
 			void				SetHidden(bool hidden);
 	inline	bool				IsHidden() const { return fHidden; }
+
+			void				SetMinimized(bool minimized);
+	inline	bool				IsMinimized() const { return fMinimized; }
 
 			void				SetCurrentWorkspace(int32 index)
 									{ fCurrentWorkspace = index; }
@@ -302,6 +305,7 @@ class WindowLayer {
 			bool				fInUpdate;
 
 			bool				fHidden;
+			bool				fMinimized;
 			bool				fIsFocus;
 
 			window_look			fLook;

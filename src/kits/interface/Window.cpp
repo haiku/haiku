@@ -463,21 +463,17 @@ BWindow::ChildAt(int32 index) const
 void
 BWindow::Minimize(bool minimize)
 {
-	if (IsModal())
+	if (IsModal() || IsFloating() || fMinimized == minimize)
 		return;
 
-	if (IsFloating())
-		return;		
-
-	if (fMinimized == minimize)
-		return;
+	Lock();
 
 	fMinimized = minimize;
 
-	Lock();
-	fLink->StartMessage(AS_WINDOW_MINIMIZE);
+	fLink->StartMessage(AS_MINIMIZE_WINDOW);
 	fLink->Attach<bool>(minimize);
 	fLink->Flush();
+
 	Unlock();
 }
 

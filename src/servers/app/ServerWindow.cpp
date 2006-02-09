@@ -407,32 +407,15 @@ ServerWindow::NotifyQuitRequested()
 void
 ServerWindow::NotifyMinimize(bool minimize)
 {
-	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	// This function doesn't need much -- check to make sure that we should and
-	// send the message to the client. According to the BeBook, the BWindow hook function
-	// does all the heavy lifting for us. :)
-	bool sendMessages = false;
+	// The client is responsible for the actual minimization
 
-	if (minimize) {
-		if (!fWindowLayer->IsHidden()) {
-			Hide();
-			sendMessages = true;
-		}
-	} else {
-		if (fWindowLayer->IsHidden()) {
-			Show();
-			sendMessages = true;
-		}
-	}
+	BMessage msg(B_MINIMIZE);
+	msg.AddInt64("when", real_time_clock_usecs());
+	msg.AddBool("minimize", minimize);
 
-	if (sendMessages) {
-		BMessage msg(B_MINIMIZE);
-		msg.AddInt64("when", real_time_clock_usecs());
-		msg.AddBool("minimize", minimize);
-
-		SendMessageToClient(&msg);
-	}
+	SendMessageToClient(&msg);
 }
+
 
 //! Sends a message to the client to perform a Zoom
 void
@@ -463,8 +446,8 @@ ServerWindow::GetInfo(window_info& info)
 	info.window_right = (int)floor(fWindowLayer->Frame().right);
 	info.window_bottom = (int)floor(fWindowLayer->Frame().bottom);
 
-	info.show_hide_level = fWindowLayer->IsHidden() ? 1 : -1; // ???
-	info.is_mini = fWindowLayer->IsHidden();
+	info.show_hide_level = fWindowLayer->IsHidden() ? 1 : 0; // ???
+	info.is_mini = fWindowLayer->IsMinimized();
 }
 
 
@@ -585,6 +568,21 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
 			Hide();
 			break;
+
+		case AS_MINIMIZE_WINDOW:
+		{
+			DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW\n", Title()));
+			bool minimize;
+			if (link.Read<bool>(&minimize) == B_OK) {
+				if (minimize && !fWindowLayer->IsHidden())
+					Hide();
+				else if (!minimize && fWindowLayer->IsHidden())
+					Show();
+
+				fWindowLayer->SetMinimized(minimize);
+			}
+			break;
+		}
 
 		case AS_ACTIVATE_WINDOW:
 		{
