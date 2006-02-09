@@ -309,14 +309,10 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (x == 0 && y == 0)
 		return;
 
-	fWindow->HandleDirectConnection(B_DIRECT_STOP);
-
 	fFrame.OffsetBy(x, y);
 	_PropagatePosition();
 
-	fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
-
-	// take along the dirty region which have not
+	// take along the dirty region which is not
 	// processed yet
 	fDirtyRegion.OffsetBy(x, y);
 

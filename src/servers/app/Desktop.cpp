@@ -31,6 +31,7 @@
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
 
+#include <DirectWindow.h>
 #include <Entry.h>
 #include <Message.h>
 #include <MessageFilter.h>
@@ -1274,15 +1275,19 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 	if (!LockAllWindows())
 		return;
 
-	// the dirty region starts with the visible area of the window being moved
-	BRegion newDirtyRegion(window->VisibleRegion());
-
-	window->MoveBy(x, y);
-
 	if (!window->IsVisible()) {
+		window->MoveBy(x, y);
 		UnlockAllWindows();
 		return;
 	}
+
+	// the dirty region starts with the visible area of the window being moved
+	BRegion newDirtyRegion(window->VisibleRegion());
+
+	// no more drawing for DirectWindows
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_STOP);
+
+	window->MoveBy(x, y);
 
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
@@ -1299,6 +1304,10 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
 	newDirtyRegion.Include(&window->VisibleRegion());
 
 	GetDrawingEngine()->CopyRegion(&copyRegion, x, y);
+
+	// allow DirectWindows to draw again after the visual
+	// content is at the new location
+	window->ServerWindow()->HandleDirectConnection(B_DIRECT_START | B_BUFFER_MOVED);
 
 	// in the dirty region, exclude the parts that we
 	// could move by blitting
