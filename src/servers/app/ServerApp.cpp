@@ -426,18 +426,32 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_WINDOW_LIST:
 		{
 			team_id team;
-			link.Read<team_id>(&team);
-
-			fDesktop->WriteWindowList(team, fLink.Sender());
+			if (link.Read<team_id>(&team) == B_OK)
+				fDesktop->WriteWindowList(team, fLink.Sender());
 			break;
 		}
 
 		case AS_GET_WINDOW_INFO:
 		{
 			int32 serverToken;
-			link.Read<int32>(&serverToken);
+			if (link.Read<int32>(&serverToken) == B_OK)
+				fDesktop->WriteWindowInfo(serverToken, fLink.Sender());
+			break;
+		}
 
-			fDesktop->WriteWindowInfo(serverToken, fLink.Sender());
+		case AS_MINIMIZE_TEAM:
+		{
+			team_id team;
+			if (link.Read<team_id>(&team) == B_OK)
+				fDesktop->MinimizeApplication(team);
+			break;
+		}
+
+		case AS_BRING_TEAM_TO_FRONT:
+		{
+			team_id team;
+			if (link.Read<team_id>(&team) == B_OK)
+				fDesktop->BringApplicationToFront(team);
 			break;
 		}
 

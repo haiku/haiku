@@ -1055,16 +1055,28 @@ get_token_list(team_id team, int32 *_count)
 
 
 void
-do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom)
+do_bring_to_front_team(BRect zoomRect, team_id team, bool zoom)
 {
-	// ToDo: implement me, needed for Deskbar!
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_BRING_TEAM_TO_FRONT);
+	link.Attach<team_id>(team);
+		// we don't have any zooming effect
+
+	link.Flush();
 }
 
 
 void
 do_minimize_team(BRect zoomRect, team_id team, bool zoom)
 {
-	// ToDo: implement me, needed for Deskbar!
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_MINIMIZE_TEAM);
+	link.Attach<team_id>(team);
+		// we don't have any zooming effect
+
+	link.Flush();
 }
 
 

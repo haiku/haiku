@@ -1711,6 +1711,40 @@ Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 
 
 void
+Desktop::MinimizeApplication(team_id team)
+{
+	BAutolock locker(fWindowLock);
+
+	// Just minimize all windows of that application
+
+	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->ServerWindow()->ClientTeam() != team)
+			continue;
+
+		window->ServerWindow()->NotifyMinimize(true);
+	}
+}
+
+
+void
+Desktop::BringApplicationToFront(team_id team)
+{
+	BAutolock locker(fWindowLock);
+
+	// TODO: for now, just maximize all windows of that application
+
+	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->ServerWindow()->ClientTeam() != team)
+			continue;
+
+		window->ServerWindow()->NotifyMinimize(false);
+	}
+}
+
+
+void
 Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 {
 	BAutolock locker(fWindowLock);

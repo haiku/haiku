@@ -158,6 +158,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		BRegion&				BackgroundRegion()
 									{ return fBackgroundRegion; }
 
+		void					MinimizeApplication(team_id team);
+		void					BringApplicationToFront(team_id team);
+
 		void					WriteWindowList(team_id team,
 									BPrivate::LinkSender& sender);
 		void					WriteWindowInfo(int32 serverToken,

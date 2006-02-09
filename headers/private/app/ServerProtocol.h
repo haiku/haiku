@@ -36,6 +36,8 @@ enum {
 	// Desktop definitions
 	AS_GET_WINDOW_LIST,
 	AS_GET_WINDOW_INFO,
+	AS_MINIMIZE_TEAM,
+	AS_BRING_TEAM_TO_FRONT,
 
 	// Application definitions
 	AS_CREATE_APP,
