@@ -783,8 +783,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					fFrame.bottom = fFrame.top + height;
 	
 					_AdoptResize();
-					FrameResized(width, height);
+//					FrameResized(width, height);
 				}
+// call hook function anyways
+// TODO: When a window is resized programmatically,
+// it receives this message, and maybe it is wise to
+// keep the asynchronous nature of this process to
+// not risk breaking any apps.
+FrameResized(width, height);
 			}
 			break;
 		}
@@ -798,8 +804,14 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 					// in an _UPDATE_ message
 					fFrame.OffsetTo(origin);
 
-					FrameMoved(origin);
+//					FrameMoved(origin);
 				}
+// call hook function anyways
+// TODO: When a window is moved programmatically,
+// it receives this message, and maybe it is wise to
+// keep the asynchronous nature of this process to
+// not risk breaking any apps.
+FrameMoved(origin);
 			}
 			break;
 		}
@@ -1232,23 +1244,19 @@ BWindow::SetZoomLimits(float maxWidth, float maxHeight)
 
 
 void
-BWindow::Zoom(BPoint rec_position, float rec_width, float rec_height)
+BWindow::Zoom(BPoint leftTop, float width, float height)
 {
-	// this is also a Hook function!
-
-	MoveTo(rec_position);
-	ResizeTo(rec_width, rec_height);
+	// the default implementation of this hook function
+	// just does the obvious:
+	MoveTo(leftTop);
+	ResizeTo(width, height);
 }
 
 
 void
 BWindow::Zoom()
 {
-	// TODO: broken.
 	// TODO: What about locking?!?
-	float minWidth, minHeight;
-	BScreen screen;
-
 	/*
 		from BeBook:
 		However, if the window's rectangle already matches these "zoom" dimensions
@@ -1256,34 +1264,54 @@ BWindow::Zoom()
 		("non-zoomed") size and location. (??????)
 	*/
 
-	if (Frame().Width() == fMaxZoomWidth && Frame().Height() == fMaxZoomHeight) {
-		BPoint position(Frame().left, Frame().top);
-		Zoom(position, fMaxZoomWidth, fMaxZoomHeight);
-		return;
-	}
-
 	/* From BeBook:
 		The dimensions that non-virtual Zoom() passes to hook Zoom() are deduced from
 		the smallest of three rectangles:
 	*/
 
+	// TODO: make more elaborate (figure out this window's
+	// tab height and border width... maybe ask app_server)
+	float borderWidth = 5.0;
+	float tabHeight = 26.0;
+
 	// 1) the rectangle defined by SetZoomLimits(), 
-	minHeight = fMaxZoomHeight;
-	minWidth = fMaxZoomWidth;
+	float zoomedWidth = fMaxZoomWidth;
+	float zoomedHeight = fMaxZoomHeight;
 
 	// 2) the rectangle defined by SetSizeLimits()
-	if (fMaxHeight < minHeight)
-		minHeight = fMaxHeight;
-	if (fMaxWidth < minWidth)
-		minWidth = fMaxWidth;
+	if (fMaxWidth < zoomedWidth)
+		zoomedWidth = fMaxWidth;
+	if (fMaxHeight < zoomedHeight)
+		zoomedHeight = fMaxHeight;
 
 	// 3) the screen rectangle
-	if (screen.Frame().Width() < minWidth)
-		minWidth = screen.Frame().Width();
-	if (screen.Frame().Height() < minHeight)
-		minHeight = screen.Frame().Height();
+	BScreen screen(this);
+	float screenWidth = screen.Frame().Width() - 2 * borderWidth;
+	float screenHeight = screen.Frame().Height() - (borderWidth + tabHeight);
+	if (screenWidth < zoomedWidth)
+		zoomedWidth = screenWidth;
+	if (screenHeight < zoomedHeight)
+		zoomedHeight = screenHeight;
 
-	Zoom(Frame().LeftTop(), minWidth, minHeight);
+	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth, tabHeight);
+
+	// UN-ZOOM:
+	if (fPreviousFrame.IsValid()
+		// NOTE: don't check for fFrame.LeftTop() == zoomedLeftTop
+		// -> makes it easier on the user to get a window back into place
+		&& fFrame.Width() == zoomedWidth
+		&& fFrame.Height() == zoomedHeight) {
+		// already zoomed!
+		Zoom(fPreviousFrame.LeftTop(), fPreviousFrame.Width(), fPreviousFrame.Height());
+		return;
+	}
+
+	// ZOOM:
+
+	// remember fFrame for later "unzooming"
+	fPreviousFrame = fFrame;
+
+	Zoom(zoomedLeftTop, zoomedWidth, zoomedHeight);
 }
 
 

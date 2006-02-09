@@ -338,7 +338,7 @@ private:
 	int32			fLastViewToken;
 	BPrivate::PortLink	*fLink;
 	BMessageRunner	*fPulseRunner;
-	BRect			fCurrentFrame;				// not yet used
+	BRect			fPreviousFrame;
 
 	uint32			_reserved[9];
 };
