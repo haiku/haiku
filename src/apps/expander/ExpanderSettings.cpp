@@ -91,7 +91,7 @@ ExpanderSettings::ExpanderSettings()
 		&& (file.Read(&ref.device, sizeof(ref.device)) == sizeof(ref.device))
 		&& (file.Read(&ref.directory, sizeof(ref.directory)) == sizeof(ref.directory))
 		&& (file.Read(&name_size, sizeof(name_size)) == sizeof(name_size))
-		&& ((name_size <= 0) || (ref.name = (char*)malloc(name_size)))
+		&& ((name_size <= 0) || (ref.name = (char*)malloc(name_size+1)))
 		&& (file.Read(ref.name, name_size) == name_size)
 		&& (file.Read(&open_destination_folder, sizeof(open_destination_folder)) == sizeof(open_destination_folder))
 		&& (file.Read(&show_contents_listing, sizeof(show_contents_listing)) == sizeof(show_contents_listing))
@@ -107,6 +107,8 @@ ExpanderSettings::ExpanderSettings()
 		fMessage.ReplaceBool("close_when_done", close_when_done);
 		if(destination_folder == 0x66 || destination_folder == 0x63 || destination_folder == 0x65)
 			fMessage.ReplaceInt8("destination_folder", destination_folder);
+		if (name_size > 0)
+			ref.name[name_size] = '\0';
 		BEntry entry(&ref);
 		if(entry.Exists())
 			fMessage.ReplaceRef("destination_folder_use", &ref);
