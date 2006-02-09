@@ -958,6 +958,7 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 	if (fFocus == focus) {
 		// turns out the window that is supposed to get focus now already has it
 		UnlockAllWindows();
+		return;
 	}
 
 	ServerApp* oldActiveApp = NULL;
