@@ -68,6 +68,7 @@ StdBinCommands
 	ffm.cpp
 	iroster.cpp
 	listattr.cpp
+	listres.cpp
 	mimeset.cpp
 	mkindex.cpp
 	modifiers.cpp
@@ -81,7 +82,7 @@ StdBinCommands
 	shutdown.cpp
 	version.cpp
 #	yes.cpp
-	: libbe.so ;
+	: be ;
 
 AddResources mimeset : mimeset.rdef ;
 
