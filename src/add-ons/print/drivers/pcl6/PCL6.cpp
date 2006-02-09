@@ -212,7 +212,8 @@ void PCL6Driver::jobStart()
 {
 	// PCL6 begin
 	fWriter = new PCL6Writer(this);
-	fWriter->PJLHeader(PCL6Writer::kProtocolClass1_1, getJobData()->getXres(), "Copyright (c) 2003, 2004 Haiku");
+	PCL6Writer::ProtocolClass pc = (PCL6Writer::ProtocolClass)getProtocolClass();
+	fWriter->PJLHeader(pc, getJobData()->getXres(), "Copyright (c) 2003, 2004 Haiku");
 	fWriter->BeginSession(getJobData()->getXres(), getJobData()->getYres(), PCL6Writer::kInch, PCL6Writer::kBackChAndErrPage);
 	fWriter->OpenDataSource();
 	fMediaSide = PCL6Writer::kFrontMediaSide;
@@ -353,7 +354,7 @@ void PCL6Driver::move(int x, int y)
 bool
 PCL6Driver::supportsDeltaRowCompression()
 {
-	return getProtocolClass() >= kProtocolClass2_1;
+	return getProtocolClass() >= PCL6Writer::kProtocolClass2_1;
 }
 
 PCL6Writer::MediaSize PCL6Driver::mediaSize(JobData::Paper paper)

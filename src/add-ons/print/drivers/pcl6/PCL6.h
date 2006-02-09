@@ -9,6 +9,7 @@
 
 
 #include "GraphicsDriver.h"
+#include "PCL6Cap.h"
 #include "PCL6Writer.h"
 
 class Halftone;

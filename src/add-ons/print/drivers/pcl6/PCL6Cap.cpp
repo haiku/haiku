@@ -6,6 +6,7 @@
 
 #include "PCL6Cap.h"
 #include "PCL6Config.h"
+#include "PCL6Writer.h"
 #include "PrinterData.h"
 
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
@@ -38,7 +39,7 @@ const PaperCap a4(
 // since 1.1
 const PaperCap exec(
 	"Executive",
-	true,
+	false,
 	JobData::kA4,
 	BRect(0.0f,            0.0f,            TO72DPI(4960.0f), TO72DPI(7014.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4840.0f), TO72DPI(6894.0f)));
@@ -142,7 +143,7 @@ const PaperSourceCap envelopeTray("Envelope Tray",  false,  JobData::kCassette2)
 // since 2.0:
 const PaperSourceCap thridCassette("Thrid Cassette",  false,  JobData::kMiddle);
 
-const ResolutionCap dpi150("150dpi",   true, 150,  150);
+const ResolutionCap dpi150("150dpi",   false, 150,  150);
 const ResolutionCap dpi300("300dpi",   true, 300,  300);
 const ResolutionCap dpi600("600dpi",  false, 600,  600);
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
@@ -150,26 +151,38 @@ const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
 const PrintStyleCap simplex("Simplex", true, JobData::kSimplex);
 const PrintStyleCap duplex("Duplex", false, JobData::kDuplex);
 
-const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, kProtocolClass1_1, 
-"Protocol Class 1.1\n"
-"* No compression"
+const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, PCL6Writer::kProtocolClass1_1, 
+"The printer driver supports the following features of protocol class 1.1:\n"
+"* Monochrome and Color Printing.\n"
+"* Paper Formats: Letter, Legal, A4, A3, A5 and Japanese Postcard.\n"
+"* Paper Sources: Auto, Default, Manual Feed, Multi Purpose Tray, Upper and Lower Cassette and Envelope Tray.\n"
+"* Resolutions: 150, 300, 600 and 1200 DPI."
 #if ENABLE_RLE_COMPRESSION
-"\n* RLE compression"
+"\n* Compression Method: RLE."
+#else
+"\n* Compression Method: None."
 #endif
 );
-const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, kProtocolClass2_0, 
-"Protocol Class 2.0\n"
-"* Additonal Paper Source: Third Cassette\n"
-"* JPEG compression (not implemented yet)");
-const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false, kProtocolClass2_1, 
-"Protocol Class 2.1\n"
-"* Additional Paper Format: B5\n"
+
+const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, PCL6Writer::kProtocolClass2_0, 
+"Additionally to features of protocol class 1.1, the printer driver supports the "
+"following features of protocol class 2.0:\n"
+"* Additonal Paper Source: Third Cassette."
+// "\n* JPEG compression (not implemented yet)"
+);
+
+const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false, PCL6Writer::kProtocolClass2_1, 
+"Additionally to features of previous protocol classes, the printer driver supports the "
+"following features of protocol class 2.1:\n"
+"* Additional Paper Format: B5."
 #if ENABLE_DELTA_ROW_COMPRESSION
-"* Delta Row Compression"
+"\n* Additional Compression Method: Delta Row Compression."
 #endif
 );
-const ProtocolClassCap pc3_0("PCL 6 Protocol Class 3.0", false, kProtocolClass3_0, 
-"Protocol Class 3.0");
+
+// Disable until driver supports new features of protocol class 3.0
+//const ProtocolClassCap pc3_0("PCL 6 Protocol Class 3.0", false, PCL6Writer::kProtocolClass3_0, 
+//"Protocol Class 3.0");
 
 const PaperCap *papers1_1[] = {
 	&letter,
@@ -228,8 +241,9 @@ const PrintStyleCap *printStyles[] = {
 const ProtocolClassCap *protocolClasses[] = {
 	&pc1_1,
 	&pc2_0,
-	&pc2_1,
-	&pc3_0
+	&pc2_1
+// Disabled until driver supports features of protocol class 3.0
+//	&pc3_0
 };
 
 const ColorCap color("Color", false, JobData::kColor);
@@ -249,12 +263,12 @@ int PCL6Cap::countCap(CapID capid) const
 {
 	switch (capid) {
 	case kPaper:
-		if (getProtocolClass() >= kProtocolClass2_1) {
+		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1) {
 			return sizeof(papers2_1) / sizeof(papers2_1[0]);
 		}
 		return sizeof(papers1_1) / sizeof(papers1_1[0]);
 	case kPaperSource:
-		if (getProtocolClass() >= kProtocolClass2_0) {
+		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0) {
 			return sizeof(paperSources2_0) / sizeof(paperSources2_0[0]);
 		}
 		return sizeof(paperSources1_1) / sizeof(paperSources1_1[0]);
@@ -275,12 +289,12 @@ const BaseCap **PCL6Cap::enumCap(CapID capid) const
 {
 	switch (capid) {
 	case kPaper:
-		if (getProtocolClass() >= kProtocolClass2_1) {
+		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1) {
 			return (const BaseCap **)papers2_1;
 		}
 		return (const BaseCap **)papers1_1;
 	case kPaperSource:
-		if (getProtocolClass() >= kProtocolClass2_0) {
+		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0) {
 			return (const BaseCap **)paperSources2_0;
 		}
 		return (const BaseCap **)paperSources1_1;
