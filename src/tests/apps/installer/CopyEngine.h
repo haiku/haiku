@@ -6,8 +6,11 @@
 #ifndef _CopyEngine_h
 #define _CopyEngine_h
 
+#include <Directory.h>
 #include <Looper.h>
+#include <Menu.h>
 #include <Messenger.h>
+#include <Path.h>
 
 class InstallerWindow;
 
