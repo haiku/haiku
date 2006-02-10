@@ -324,31 +324,8 @@ BTextControl::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 
-	bool enabled = IsEnabled();
-	rgb_color textColor;
-	rgb_color color = HighColor();
-	BFont font;
-
-	fText->GetFontAndColor(0, &font, &color);
-
-	if (enabled)
-		textColor = color;
-	else
-		textColor = tint_color(color, B_LIGHTEN_2_TINT);
-
-	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
-
-	if (enabled) {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
-	} else
-		color = tint_color(color, B_LIGHTEN_2_TINT);
-
-	fText->SetViewColor(color);
-	fText->SetLowColor(color);
-
-	fText->MakeEditable(enabled);
+	_UpdateTextViewColors();
+	fText->MakeEditable(IsEnabled());
 }
 
 
@@ -373,29 +350,7 @@ BTextControl::SetEnabled(bool state)
 	if (Window()) {
 		fText->MakeEditable(state);
 
-		rgb_color textColor;
-		rgb_color color = {0, 0, 0, 255};
-		BFont font;
-
-		fText->GetFontAndColor(0, &font, &color);
-
-		if (state)
-			textColor = color;
-		else
-			textColor = tint_color(color, B_DISABLED_LABEL_TINT);
-
-		fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
-
-		if (state) {
-			color.red = 255;
-			color.green = 255;
-			color.blue = 255;
-		} else
-			color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_LIGHTEN_2_TINT);
-
-		fText->SetViewColor(color);
-		fText->SetLowColor(color);
+		_UpdateTextViewColors();
 
 		fText->Invalidate();
 		Window()->UpdateIfNeeded();
@@ -619,6 +574,37 @@ BTextControl &
 BTextControl::operator=(const BTextControl&)
 {
 	return *this;
+}
+
+
+void
+BTextControl::_UpdateTextViewColors()
+{
+	bool enabled = IsEnabled();
+	rgb_color textColor;
+	rgb_color color = {0, 0, 0, 255};
+	BFont font;
+
+	fText->GetFontAndColor(0, &font, &color);
+
+	if (enabled)
+		textColor = color;
+	else
+		textColor = tint_color(color, B_DISABLED_LABEL_TINT);
+
+	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
+
+	if (enabled) {
+		color.red = 255;
+		color.green = 255;
+		color.blue = 255;
+	} else {
+		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_LIGHTEN_2_TINT);
+	}
+
+	fText->SetViewColor(color);
+	fText->SetLowColor(color);
 }
 
 
