@@ -1217,6 +1217,7 @@ TMagnify::MouseDown(BPoint where)
 			BMenuItem *selected = menu->Go(ConvertToScreen(where));
 			if (selected)
 				Window()->PostMessage(selected->Message()->what);
+			delete menu;
 			return;
 		}
 	
