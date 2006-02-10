@@ -1460,7 +1460,8 @@ ChartWindow::ChangeSetting(setting new_set)
 		}
 		if (new_set.display == DISPLAY_DIRECT) {
 			/* this need to be atomic in regard of DirectConnected */
-			acquire_sem(fDrawingLock);
+			while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
+				;
 			/* synchronise the camera geometry and the direct buffer geometry */
 			SetGeometry(direct_buffer.buffer_width, direct_buffer.buffer_height);
 			/* cancel erasing of stars not in visible part of the direct window */
@@ -1514,7 +1515,8 @@ ChartWindow::ChangeSetting(setting new_set)
 			/* update all dependencies in the offscreen buffer descriptor */
 			SetColorSpace(&bitmap_buffer, bitmap_buffer.depth);
 			/* update all dependencies in the directwindow buffer descriptor */
-			acquire_sem(fDrawingLock);
+			while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
+				;
 			SetColorSpace(&direct_buffer, direct_buffer.depth);
 			release_sem(fDrawingLock);
 			/* in offscreen mode, erase the background and cancel star erasing */
@@ -2139,7 +2141,8 @@ ChartWindow::Animation(void *data)
 			   directbuffer context won't change during the drawing
 			   operations. During that period, no Window should be
 			   done to avoid any potential deadlock. */
-			acquire_sem(w->fDrawingLock);
+			while (acquire_sem(w->fDrawingLock) == B_INTERRUPTED)
+				;
 			if (w->fDirectConnected)
 				w->RefreshStars(&w->direct_buffer, time_factor * 2.4);
 			release_sem(w->fDrawingLock);
@@ -2213,9 +2216,13 @@ ChartWindow::Animation2(void *data)
 		/* This thread need to both wait for its master to unblock
 		   him to do some real work, or for the main control to
 		   set the fKillThread flag, asking it to quit. */
-		while (acquire_sem_etc(w->second_thread_lock, 1, B_TIMEOUT, 500000) == B_TIMED_OUT)
-			if (w->fKillThread)
-				return 0;
+		status_t status;
+		do {
+			status = acquire_sem_etc(w->second_thread_lock, 1, B_TIMEOUT, 500000);
+
+		} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
+		if (w->fKillThread)
+			return 0;
 		
 		/* the duration of the processing is needed to control the
 		   dynamic load split (see RefreshStar) */
@@ -2757,7 +2764,8 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 		after = system_time();
 	
 		/* wait for completion of the second thread */	
-		acquire_sem(second_thread_release);
+		while (acquire_sem(second_thread_release) == B_INTERRUPTED)
+			;
 		
 		/* calculate the new optimal split ratio depending
 		   of the previous one and the time used by both
@@ -2879,7 +2887,8 @@ void
 ChartWindow::DirectConnected(direct_buffer_info *info)
 {
 	/* block the animation thread. */
-	acquire_sem(fDrawingLock);
+	while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
+		;
 	/* update the direct screen infos. */
 	SwitchContext(info);
 	/* unblock the animation thread. */
