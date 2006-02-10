@@ -57,8 +57,8 @@ void NetListView::SelectionChanged(void)
 				
 }
 
-NetListItem::NetListItem(const char *text)
- :	BStringItem(text),
- 	fData(text)
+NetListItem::NetListItem(const InterfaceData &data)
+ :	BStringItem(data.fPrettyName.String()),
+ 	fData(data)
 {
 }

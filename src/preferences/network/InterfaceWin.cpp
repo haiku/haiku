@@ -125,10 +125,11 @@ InterfaceWin::InterfaceWin(const BRect &frame, const InterfaceData &data)
 
 void InterfaceWin::MessageReceived(BMessage *message)
 {
-	switch(message->what){
+	switch(message->what) {
 	
-		case kDone_inter_M:{
-			if (fChanged==true){
+		case kDone_inter_M: {
+			// TODO: Re-enable
+/*			if (fChanged==true){
 				fParentWindow->PostMessage(fParentWindow->kSOMETHING_HAS_CHANGED_M);
 				
 				NetListItem *item=dynamic_cast <NetListItem *> (fParentWindow->fInterfacesList->ItemAt(fParentWindow->fInterfacesList->CurrentSelection()));
@@ -147,9 +148,10 @@ void InterfaceWin::MessageReceived(BMessage *message)
 					item->fDHCP=1;			 
 			}	
 			Quit();
-			break;
+*/			break;
 		}
-		case kSOMETHING_HAS_CHANGED:{
+		case kSOMETHING_HAS_CHANGED: {
+		
 			fChanged=true;
 			break;
 		}

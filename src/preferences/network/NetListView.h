@@ -18,15 +18,9 @@ public:
 class NetListItem : public BStringItem
 {
 public:
-	NetListItem(const char *text);
+	NetListItem(const InterfaceData &data);
 	
 	InterfaceData fData;
-	
-	BString fIPADDRESS;
-	BString fNETMASK;
-	BString fPRETTYNAME;
-	int 	fENABLED;
-	int		fDHCP;
 };
 
 #endif

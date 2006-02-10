@@ -69,7 +69,7 @@ public:
 	
 /*
 	As this window is the 'main' one and that at startup it gathers up the
-	info with the GetEverything() method, some data are kept here and will be passed
+	info with the LoadSettings() method, some data are kept here and will be passed
 	to who needs it.
 */
 	BString fusername;
@@ -81,7 +81,7 @@ public:
 	//All these are defined in funcs.cpp
 	void DeleteConfigFile();			
 	void LoadConfigEntries();												
-	void GetEverything(const char *bakname = NULL); 		
+	void LoadSettings(const char *bakname = NULL); 		
 		
 	// Gets all the infos of the interfaces at startup, display and store them
 	// or get them from a backup file.

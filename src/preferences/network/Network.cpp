@@ -20,13 +20,10 @@ class Network : public BApplication
 		NetworkWindow *fwindow;
 }; 
 
-Network::Network() : BApplication("application/x-vnd.OBOS-Network")
+Network::Network() : BApplication("application/x-vnd.Haiku-Network")
 {
 	fwindow = new NetworkWindow();
 	fwindow ->Show();
-	
-	fwindow ->LoadConfigEntries();
-	fwindow ->GetEverything();
 }
 
 int main()

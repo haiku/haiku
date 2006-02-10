@@ -12,14 +12,15 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <Region.h>
 #include <Path.h>
 
 #include "InterfaceWin.h"
 #include "BackupWindow.h"
 #include "LoginInfo.h"
 
-#define NETWORK_WINDOW_RIGHT 435
-#define NETWORK_WINDOW_BOTTOM 309
+//#define NETWORK_WINDOW_RIGHT 435
+//#define NETWORK_WINDOW_BOTTOM 309
 
 class RestartWindow : public BWindow
 {
@@ -39,8 +40,10 @@ RestartWindow::RestartWindow()
 	
 	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	fRestarting     = new BStringView(BRect(60,5,200,25),"Restarting_Text_1","Restarting Networking");
-	fWhatsHappening = new BStringView(BRect(60,30,200,50),"Restarting_Text_2","Please Wait..."); 
+	fRestarting = new BStringView(BRect(60,5,200,25),"Restarting_Text_1",
+									"Restarting Networking");
+	fWhatsHappening = new BStringView(BRect(60,30,200,50),"Restarting_Text_2",
+									"Please Wait..."); 
 	
 	BFont font(be_bold_font);
 	
@@ -50,163 +53,284 @@ RestartWindow::RestartWindow()
 	fView->AddChild(fRestarting);
 	fView->AddChild(fWhatsHappening);
 
-	AddChild(fView);		
+	AddChild(fView);
 }
 
 NetworkWindow::NetworkWindow()
-  : BWindow(BRect(0, 0, NETWORK_WINDOW_RIGHT, NETWORK_WINDOW_BOTTOM),"Network",
+  : BWindow(BRect(0, 0, 435, 309),"Network",
 			B_TITLED_WINDOW,B_NOT_ANCHORED_ON_ACTIVATE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE,
 			B_CURRENT_WORKSPACE) 
 {
-	// if(!Network_settings)
-	// { ...
 	BScreen screen;
 	
-	BRect screenframe = screen.Frame();
+	BRect screenframe = screen.Frame(), bounds = Bounds(), workrect(0,0,1,1);
+	float width,height;
 	float screenx, screeny;
-	screenx = ((screenframe.right + 1) / 2) - (NETWORK_WINDOW_RIGHT / 2) - 1;
-	screeny = ((screenframe.bottom + 1) / 2) - (NETWORK_WINDOW_BOTTOM / 2) - 1;
+	
+	screenx = ((screenframe.right + 1) / 2) - (bounds.right / 2) - 1;
+	screeny = ((screenframe.bottom + 1) / 2) - (bounds.bottom / 2) - 1;
 	MoveTo(screenx, screeny);
-	// }
-	// else
-	// {
-	// ...
-	// }
 	
-	BRect bounds = Bounds();
-	fView    = new BView(bounds,"View",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	fView = new BView(bounds,"View",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fView);
 	
-	fRestart = new BButton(BRect(11,274,122,298),"Restart_Networking","Restart Networking",new BMessage(kRestart_Networking_M));
-	fRevert  = new BButton(BRect(145,274,220,298),"Revert","Revert",new BMessage(kRevert_M));
-	fSave	 = new BButton(BRect(349,274,424,297),"Save","Save",new BMessage(kSave_M));
-	fSave->MakeDefault(true);
-	fSave->SetEnabled(false);
+	fRestart = new BButton(workrect,"Restart_Networking",
+							"Restart Networking",new BMessage(kRestart_Networking_M),
+							B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fRestart->GetPreferredSize(&width,&height);
+	fRestart->ResizeTo(width,height);
+	fRestart->MoveTo(10,bounds.bottom - 10 - height);
+	
+	// We fake the divider line by using a BBox. We have to call ConstrainClippingRegion
+	// because otherwise we also see the corners drawn, which doesn't look nice
+	BBox *vr = new BBox(BRect(width + 18, bounds.bottom - 11 - height, width + 19,
+								bounds.bottom - 9),
+						"vertical_rule", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fView->AddChild(vr);
+	
+	BRegion clipreg(vr->Bounds().InsetByCopy(0,2));
+	vr->ConstrainClippingRegion(&clipreg);
+	
+	fRevert = new BButton(BRect(width + 25,bounds.bottom - 10 - height,width + 26,
+								bounds.bottom - 10),
+						"Revert","Revert", new BMessage(kRevert_M),
+						B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fRevert->ResizeToPreferred();
 	fRevert->SetEnabled(false);
 	
-	bounds.bottom = Bounds().Height();
-	bounds.top += 10;
-	bounds.right = Bounds().Width();
-	fTabView = new BTabView(bounds,"tab_view", B_WIDTH_FROM_WIDEST);
+	fSave = new BButton(workrect,"Save","Save",new BMessage(kSave_M),
+						B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fSave->GetPreferredSize(&width,&height);
+	fSave->ResizeTo(width,height);
+	fSave->MoveTo(bounds.right - 10 - width, bounds.bottom - 10 - height);
+	fSave->MakeDefault(true);
+	fSave->SetEnabled(false);
 	
-	fIdentity       = new BTab();
+	BBox *hr = new BBox(BRect(0,bounds.bottom - height - 20,bounds.right,
+								bounds.bottom - height - 19),
+						"horizontal_rule",B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fView->AddChild(hr);
+	
+	workrect = Bounds();
+	workrect.bottom = hr->Frame().top;
+	workrect.top = 10;
+	
+	fTabView = new BTabView(workrect,"tab_view",B_WIDTH_FROM_WIDEST, B_FOLLOW_ALL);
+	fTabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));	
+	fView->AddChild(fTabView);
 	bounds.bottom -= fTabView->TabHeight();
-	fIdentityView  = new BView(bounds,"Identity",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
-	fServicesView  = new BView(bounds,"Services",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+
+	fView->AddChild(fRestart);
+	fView->AddChild(fRevert);	
+	fView->AddChild(fSave);
 	
-	bounds.top -= 10;
-	bounds.bottom -= 209;
-	bounds.left += 11;
-	bounds.right  -= 12; 
-	fNames 	   	   = new BBox(bounds,"Names",B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW | B_FRAME_EVENTS);
+	bounds = fTabView->Bounds();
+	bounds.bottom -= fTabView->TabHeight();
 	
-	fDomain     	= new BTextControl(BRect(15,19,195,50),"Domain_Name","Domain name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
-	fHost			= new BTextControl(BRect(15,49,195,90),"Host_Name","Host name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
-	fPrimaryDNS	= new BTextControl(BRect(209,19,399,45),"Primary_DNS","Primary DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
-	fSecondaryDNS	= new BTextControl(BRect(209,49,399,90),"Secondary_DNS","Secondary DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
+	fIdentityView = new BView(bounds,"Identity",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	fIdentityView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	bounds.top     = bounds.bottom + 12;
-	bounds.bottom  = 208; 
-	fInterfaces     = new BBox(bounds,"Network_Interfaces",B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW | B_FRAME_EVENTS); 
-	
-	fSettings	= new BButton(BRect(325,16,400,37),"Settings","Settings...",new BMessage(kSettings_M));
-	fClear		= new BButton(BRect(325,45,400,67),"Clear","Clear",new BMessage(kClear_M));
-	fCustom		= new BButton(BRect(325,83,400,107),"Custom","Custom...",new BMessage(kCustom_M));
-	//fSettings	->SetEnabled(false);
-	//fClear		->SetEnabled(false);
-	
-	bounds							 = fInterfaces->Bounds();
-	bounds.InsetBy(20,20);
-	bounds.top						 ++;
-	bounds.bottom					 += 6;
-	bounds.right					 -= 94;
-	bounds.left						 -= 5;  
-	fInterfacesList 			 = new NetListView(bounds,"Interfaces_List");	
-	BScrollView *interfaces_scroller = new BScrollView("Interfaces_Scroller",fInterfacesList, B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, 0, 1, B_FANCY_BORDER);	
-	
-	fServices       = new BTab();
-	fFTPServer	   = new BCheckBox(BRect(10,20,120,40),"FTP_Server","FTP Server",new BMessage(kSOMETHING_HAS_CHANGED_M));
-	fTelnetServer  = new BCheckBox(BRect(10,50,120,70),"Telnet_Server","Telnet Server",new BMessage(kSOMETHING_HAS_CHANGED_M));
-	fAppleTalk	   = new BCheckBox(BRect(10,110,120,130),"Apple_Talk","Apple Talk",new BMessage(kSOMETHING_HAS_CHANGED_M));
-	fIPForwarding  = new BCheckBox(BRect(10,140,120,160),"IP_Forwarding","IP Forwarding",new BMessage(kSOMETHING_HAS_CHANGED_M));
-	fLoginInfo	   = new BButton(BRect(10,80,120,100),"Login_Info","Login Info...",new BMessage(kLogin_Info_M));
-	
-	fConfigurations = new BBox(BRect(200,10,460,210),"Configurations",B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW | B_FRAME_EVENTS); 							
-	
-	bounds = fConfigurations->Bounds();
-	bounds.InsetBy(20,20);
-	bounds.right -= 80;
-	fConfigurationsList 			 = new NetListView(bounds,"Configurations_List");	
-	BScrollView *configurations_scroller = new BScrollView("Configurations_Scroller",fConfigurationsList);	
-	
-	fBackup   = new BButton(BRect(170,17,250,37),"Backup","Backup",new BMessage(kBackup_M));
-	fRestore  = new BButton(BRect(170,47,250,67),"Restore","Restore",new BMessage(kRestore_M));
-	fRemove   = new BButton(BRect(170,87,250,107),"Delete","Delete",new BMessage(kDelete_M));
-	fRestore->SetEnabled(false);
-	fRemove->SetEnabled(false);
-	
-	BBox *hr = new BBox(BRect(1,261,Bounds().Width()-1,262), "horizontal_rule");
-	BBox *vr = new BBox(BRect(133, 274, 134, 299), "vertical_rule");
-	
-	fDomain->SetDivider(70);
-	fDomain->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fHost->SetDivider(70);
-	fHost->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fPrimaryDNS->SetDivider(80);
-	fPrimaryDNS->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fSecondaryDNS->SetDivider(80);
-	fSecondaryDNS->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);			
-	
-	fNames			->SetLabel("Names");
-	fInterfaces		->SetLabel("Network Interfaces");
-	fConfigurations	->SetLabel("Configurations");
-	fIdentityView	->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fServicesView	->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fTabView		->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));	
-	fView			->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
-	// Casts an AddEverything 
+	fIdentity = new BTab();
 	fTabView->AddTab(fIdentityView,fIdentity);
-	fTabView->AddTab(fServicesView,fServices);
-		
+	
+	// We can just pick a view to call StringWidth because we're not using anything
+	// except the unaltered be_plain_font. Note that for each BTextControl pair we
+	// just use the longer word of the two in order to save us some speed and code size
+	float labelwidth = fTabView->StringWidth("Domain name: ");
+	
+	workrect.Set(10,20,11,21);
+	fDomain = new BTextControl(workrect,"Domain_Name","Domain name:"," ",
+							new BMessage(kSOMETHING_HAS_CHANGED_M));  
+	
+	// BTextControl::ResizeToPreferred() is a little strange for our purposes, so we
+	// get the preferred size and ignore the width that we get.
+	fDomain->GetPreferredSize(&width, &height);
+	fDomain->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fDomain->SetDivider(labelwidth);
+	
+	workrect.left = 10;
+	workrect.right = 11;
+	workrect.top = height + 30;
+	workrect.bottom = workrect.top + height;
+	
+	fHost = new BTextControl(workrect,"Host_Name","Host name:",NULL,
+							new BMessage(kSOMETHING_HAS_CHANGED_M));   
+	fHost->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fHost->SetDivider(labelwidth);
+	
+	labelwidth = fTabView->StringWidth("Secondary DNS: ");
+	
+	workrect.OffsetTo((bounds.right / 2),20);
+	workrect.right = bounds.right - 30;
+	fPrimaryDNS = new BTextControl(workrect,"Primary_DNS","Primary DNS:",
+								NULL,new BMessage(kSOMETHING_HAS_CHANGED_M),
+								B_FOLLOW_TOP | B_FOLLOW_RIGHT);  
+	fPrimaryDNS->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fPrimaryDNS->SetDivider(labelwidth);
+	
+	workrect.OffsetBy(0,height + 10);
+	fSecondaryDNS = new BTextControl(workrect,"Secondary_DNS","Secondary DNS:",
+								NULL,new BMessage(kSOMETHING_HAS_CHANGED_M),
+								B_FOLLOW_TOP | B_FOLLOW_RIGHT);  
+	fSecondaryDNS->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);			
+	fSecondaryDNS->SetDivider(labelwidth);
+	
+	fNames = new BBox(BRect(10,10,bounds.right - 10, (height * 2) + 50),
+					"Names",B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,B_WILL_DRAW | 
+					B_FRAME_EVENTS);
+	fIdentityView->AddChild(fNames);
+	fNames->SetLabel("Names");
+	
 	fNames->AddChild(fDomain);
 	fNames->AddChild(fHost);
 	fNames->AddChild(fPrimaryDNS);
 	fNames->AddChild(fSecondaryDNS);
 	
-	fInterfaces->AddChild(interfaces_scroller);
-	fInterfaces->AddChild(fSettings);
-	fInterfaces->AddChild(fClear);
-	fInterfaces->AddChild(fCustom);
+	// BTextControl resizing operations don't do anything under R5 unless they
+	// have an owner. To make things worse, BTabView does some of its BView hierarchy
+	// stuff in AttachedToWindow such that if you add a tab before it's attached to 
+	// a window, it won't be visible. :( As such, we make an extra call to 
+	// AttachedToWindow to be assured that everything works the way it is intended.
+	fTabView->AttachedToWindow();
+	fDomain->ResizeTo( (bounds.right / 2) - 25, height);
+	fHost->ResizeTo( (bounds.right / 2) - 25, height);
 	
-	fIdentityView->AddChild(fNames);
+	workrect.left = 10;
+	workrect.right = bounds.right - 10;
+	workrect.top = fNames->Frame().bottom + 10;
+	workrect.bottom = fIdentityView->Bounds().bottom - 15;
+	fInterfaces = new BBox(workrect,"Network_Interfaces",B_FOLLOW_ALL,
+						B_WILL_DRAW | B_FRAME_EVENTS); 
+	fInterfaces->SetLabel("Network Interfaces");
 	fIdentityView->AddChild(fInterfaces);
 	
+	workrect = fInterfaces->Bounds().InsetByCopy(5,5);
+	fSettings = new BButton(BRect(0,0,1,1),"Settings","Settings...",
+							new BMessage(kSettings_M),
+							B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fSettings->ResizeToPreferred();
+	fSettings->MoveTo(workrect.right - 5 - fSettings->Bounds().Width(), 15);
+	fInterfaces->AddChild(fSettings);
+	
+	workrect = fSettings->Frame();
+	workrect.OffsetBy(0,workrect.Height()+5);
+	
+	fClear = new BButton(workrect,"Clear","Clear",new BMessage(kClear_M),
+						B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fInterfaces->AddChild(fClear);
+	
+	workrect.OffsetBy(0,workrect.Height()+15);
+	fCustom = new BButton(workrect,"Custom","Custom...",new BMessage(kCustom_M),
+							B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fInterfaces->AddChild(fCustom);
+	
+	if(workrect.bottom > fInterfaces->Bounds().bottom)
+		ResizeBy(0,workrect.bottom - fInterfaces->Bounds().bottom + 10);
+	
+	workrect.left = 10;
+	workrect.top = 20;
+	workrect.right = fCustom->Frame().left - 15 - B_V_SCROLL_BAR_WIDTH;
+	workrect.bottom = fCustom->Frame().bottom - 5;
+	
+	fInterfacesList = new NetListView(workrect,"Interfaces_List");	
+	BScrollView *interfaces_scroller = new BScrollView("Interfaces_Scroller",
+														fInterfacesList, B_FOLLOW_ALL,
+														0, 0, 1, B_FANCY_BORDER);	
+	fInterfaces->AddChild(interfaces_scroller);
+	
+	fServicesView = new BView(bounds,"Services",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	fServicesView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fServices = new BTab();
+	fTabView->AddTab(fServicesView,fServices);
+	
+	workrect.Set(10,10,11,11);
+	fFTPServer = new BCheckBox(workrect,"FTP_Server","FTP Server",
+								new BMessage(kSOMETHING_HAS_CHANGED_M));
+	fFTPServer->GetPreferredSize(&width,&height);
+	fFTPServer->ResizeTo(width,height);
 	fServicesView->AddChild(fFTPServer);
+	
+	fTelnetServer = new BCheckBox(workrect,"Telnet_Server","Telnet Server",
+								new BMessage(kSOMETHING_HAS_CHANGED_M));
+	fTelnetServer->ResizeToPreferred();
+	fTelnetServer->MoveTo(10,height + 15);
 	fServicesView->AddChild(fTelnetServer);
-	fServicesView->AddChild(fIPForwarding);
-	fServicesView->AddChild(fAppleTalk);
+	
+	fLoginInfo = new BButton(workrect,"Login_Info","Login Info...",
+								new BMessage(kLogin_Info_M));
+	fLoginInfo->ResizeToPreferred();
+	fLoginInfo->MoveTo(10,(height * 2) + 25);
 	fServicesView->AddChild(fLoginInfo);
+	
+	workrect = fLoginInfo->Frame();
+	workrect.left -= 5;
+	workrect.top = workrect.bottom + 10;
+	workrect.bottom = workrect.top + 1;
+	workrect.right += 70;
+	BBox *hr2 = new BBox(workrect,"horizontal_rule2",B_FOLLOW_LEFT | B_FOLLOW_TOP);
+	fServicesView->AddChild(hr2);
+	
+	
+	fAppleTalk = new BCheckBox(workrect,"Apple_Talk","Apple Talk",
+								new BMessage(kSOMETHING_HAS_CHANGED_M));
+	fAppleTalk->ResizeToPreferred();
+	fAppleTalk->MoveTo(10, workrect.bottom + 10);
+	fServicesView->AddChild(fAppleTalk);
+	
+	fIPForwarding = new BCheckBox(workrect,"IP_Forwarding","IP Forwarding",
+								new BMessage(kSOMETHING_HAS_CHANGED_M));
+	fIPForwarding->ResizeToPreferred();
+	fIPForwarding->MoveTo(10, fAppleTalk->Frame().bottom + 5);
+	fServicesView->AddChild(fIPForwarding);
+	
+	workrect = bounds.InsetByCopy(10,10);
+	workrect.bottom += 10;
+	workrect.left = hr2->Frame().right + 10;
+	fConfigurations = new BBox(workrect,"Configurations",B_FOLLOW_ALL,
+								B_WILL_DRAW | B_FRAME_EVENTS); 							
+	fConfigurations->SetLabel("Configurations");
 	fServicesView->AddChild(fConfigurations);
 	
-	fConfigurations->AddChild(configurations_scroller);
+	workrect = fConfigurations->Bounds();
+	fBackup = new BButton(BRect(0,0,1,1),"Backup","Backup", new BMessage(kBackup_M));
+	fBackup->GetPreferredSize(&width,&height);
+	fBackup->ResizeTo(width,height);
+	fBackup->MoveTo(workrect.right - width - 10,15);
 	fConfigurations->AddChild(fBackup);
-	fConfigurations->AddChild(fRestore);
-	fConfigurations->AddChild(fRemove);
 	
-	fView->AddChild(fTabView);
-	fView->AddChild(fRestart);
-	fView->AddChild(fRevert);	
-	fView->AddChild(fSave);
-	fView->AddChild(hr);
-	fView->AddChild(vr);
-	AddChild(fView);	
+	fRestore = new BButton(BRect(0,0,width,height),"Restore","Restore",
+							new BMessage(kRestore_M));
+	fConfigurations->AddChild(fRestore);
+	fRestore->MoveTo(workrect.right - width - 10, 20 + height);
+	fRestore->SetEnabled(false);
+	
+	fRemove = new BButton(BRect(0,0,width,height),"Delete","Delete",
+							new BMessage(kDelete_M));
+	fRemove->MoveTo(workrect.right - width - 10, 25 + (height * 2));
+	fRemove->SetEnabled(false);
+	fConfigurations->AddChild(fRemove);
+
+	workrect = fConfigurations->Bounds().InsetByCopy(15,15);
+	workrect.top += 5;
+	workrect.right = fBackup->Frame().left - 10 - B_V_SCROLL_BAR_WIDTH;
+	fConfigurationsList = new NetListView(workrect,"Configurations_List");	
+	BScrollView *configurations_scroller = new BScrollView("Configurations_Scroller",
+														fConfigurationsList, 
+														B_FOLLOW_ALL, 0, 0, 1,
+														B_FANCY_BORDER);	
+	fConfigurations->AddChild(configurations_scroller);
+	
+	LoadConfigEntries();
+	LoadSettings();
+	
+	fTabView->AttachedToWindow();
 }
 
 void NetworkWindow::MessageReceived(BMessage *message)
 {
-	switch (message->what){
-		case kRestart_Networking_M:{
-		
+	switch (message->what) {
+		case kRestart_Networking_M: {
 			RestartWindow *restartWindow = new RestartWindow();
 			restartWindow->Show();
 					
@@ -236,23 +360,19 @@ void NetworkWindow::MessageReceived(BMessage *message)
 			restartWindow->Quit();			
 			break;				
 		}
-		case kRevert_M:{
-			GetEverything();
+		case kRevert_M: {
+			LoadSettings();
 			fRevert->SetEnabled(false);
 			fSave->SetEnabled(false);			
 			break;
 		}
-		case kSave_M:{
-			BackupWin *bak = new BackupWin(Bounds());
-			bak->fParentWindow = dynamic_cast <NetworkWindow *> (fView->Window());
-			bak->SaveBackup();
-			bak->Quit();
+		case kSave_M: {
+			SaveBackup(NULL,fData);
 			fRevert->SetEnabled(false);
 			fSave->SetEnabled(false);			
 			break;
 		}
-		case kSettings_M:{
-			
+		case kSettings_M: {
 			BRect r(Frame());
 			r.right = r.left + 325;
 			r.bottom = r.top + 225;
@@ -289,13 +409,13 @@ void NetworkWindow::MessageReceived(BMessage *message)
 			win->Show();
 			break;
 		}
-		case kClear_M:{
+		case kClear_M: {
 			break;
 		}
-		case kCustom_M:{
+		case kCustom_M: {
 			break;
 		}
-		case kLogin_Info_M:{
+		case kLogin_Info_M: {
 			LoginInfo *login_info_pop = new LoginInfo();
 			login_info_pop->fParentWindow = dynamic_cast <NetworkWindow *> (fView->Window());
 			login_info_pop->fName->SetText(fusername.String());
@@ -303,8 +423,7 @@ void NetworkWindow::MessageReceived(BMessage *message)
 			login_info_pop->Show();
 			break;
 		}
-		case kBackup_M:{
-			
+		case kBackup_M: {
 			BRect r(Frame());
 			r.right = r.left + 260;
 			r.bottom = r.top + 77;
@@ -314,19 +433,19 @@ void NetworkWindow::MessageReceived(BMessage *message)
 			backup_pop->Show();
 			break;
 		}
-		case kRestore_M:{
+		case kRestore_M: {
 			BStringItem *string_item = dynamic_cast <BStringItem *> (fConfigurationsList->ItemAt(fConfigurationsList->CurrentSelection()));
-			GetEverything(string_item->Text());
+			LoadSettings(string_item->Text());
 			PostMessage(kSOMETHING_HAS_CHANGED_M);
 			break;
 		}
-		case kDelete_M:{
+		case kDelete_M: {
 			DeleteConfigFile();
 			LoadConfigEntries();
 			fConfigurationsList->SelectionChanged();
 			break;
 		}	
-		case kSOMETHING_HAS_CHANGED_M:{
+		case kSOMETHING_HAS_CHANGED_M: {
 			fRevert->SetEnabled(true);
 			fSave->SetEnabled(true);	
 			break;	
@@ -334,13 +453,16 @@ void NetworkWindow::MessageReceived(BMessage *message)
 	}
 }
 
-bool NetworkWindow::QuitRequested()
+bool
+NetworkWindow::QuitRequested(void)
 {
-	if (fSave->IsEnabled() == true){
-		BAlert *alert = new BAlert("Save Info Alert","Save changes before quitting ?","Don't Save","Cancel","Save",B_WIDTH_FROM_WIDEST,B_INFO_ALERT);
+	if (fSave->IsEnabled() == true) {
+		BAlert *alert = new BAlert("Save Info Alert","Save changes before quitting?",
+									"Don't Save","Cancel","Save");
 		int32 result = alert->Go();
-		switch (result){
-			case 0:{
+		
+		switch (result) {
+			case 0: {
 				// Don't Save
 				break;
 			}
@@ -351,10 +473,7 @@ bool NetworkWindow::QuitRequested()
 			}
 			case 2:{
 				// Save
-				BackupWin *sav = new BackupWin(Bounds());
-				sav->fParentWindow = dynamic_cast <NetworkWindow *> (fView->Window());
-				sav->SaveBackup();
-				sav->Quit();	
+				SaveBackup(NULL,fData);
 				break;
 			}
 			default:
@@ -370,8 +489,8 @@ void NetworkWindow::DeleteConfigFile()
 	BAlert *alert = new BAlert("Alert","Really delete networking configuration?",
 								"Delete","Cancel");
 	int32 result = alert->Go();
+	
 	if (result == 0) {
-		
 		BStringItem *item = dynamic_cast <BStringItem *> (fConfigurationsList->ItemAt(fConfigurationsList->CurrentSelection()));
 	
 		BString path;
@@ -383,7 +502,8 @@ void NetworkWindow::DeleteConfigFile()
 	}						
 }
 
-void NetworkWindow::LoadConfigEntries()
+void
+NetworkWindow::LoadConfigEntries()
 {
 	fConfigurationsList->MakeEmpty();
 	
@@ -391,9 +511,7 @@ void NetworkWindow::LoadConfigEntries()
 	BEntry entry;
 
 	if (settings.InitCheck() == B_OK) {
-	
 		while (settings.GetNextEntry(&entry) == B_OK) {
-			
 			// All the config files start with "network." so we only compare the 
 			// first 8 characters
 			char buffer[9];
@@ -401,7 +519,6 @@ void NetworkWindow::LoadConfigEntries()
 			buffer[8]='\0';
 
 			if (strcmp(buffer,"network.") == 0) {
-			
 				BString string;
 				char name[B_FILE_NAME_LENGTH];
 				entry.GetName(name);          
@@ -410,156 +527,35 @@ void NetworkWindow::LoadConfigEntries()
 				
 				BStringItem *item = new BStringItem(string.String());
 				fConfigurationsList->AddItem(item);
-				
 			}
 		}
 	}
 }
 
-void NetworkWindow::GetEverything(const char *bakname)
+void
+NetworkWindow::LoadSettings(const char *filename)
 {
-/*
-// The configuration is saved in the /boot/home/config/settings/network
-// text file so the config is static. Maybe we could switch to dynamic by
-// directly asking the net_server how things are
+	if(LoadBackup(filename,fData)!=B_OK)
+		return;
 	
-	if (bakname == NULL &&
-	    BEntry("/boot/home/config/settings/network").Exists() == false) {
-	    
-		BAlert *alert = new BAlert("Network Alert",
-		"Your network config file doesn't exist.\n"
-		"It should be located at/boot/home/config/settings/network ","OK");
-		alert->Go();
+	Lock();
+	for(int32 i=0; i<fData.fInterfaceList.CountItems(); i++) {
+		InterfaceData *idata = (InterfaceData*)fData.fInterfaceList.ItemAt(i);
+		fInterfacesList->AddItem(new NetListItem(*idata));
 	}
-	else {
-		// This function being used when pressing "Revert" so first we need to
-		// empty things before setting the new values
-		Lock();
-		fInterfacesList->MakeEmpty();	
-		fFTPServer	  ->SetValue(0);
-		fTelnetServer ->SetValue(0);
-		fAppleTalk	  ->SetValue(0);
-		fIPForwarding ->SetValue(0);
-		Unlock();
-		
-		BString path_S = "/boot/home/config/settings/network";
-		if (bakname != NULL) path_S<<"."<<bakname;
-											
-    	size_t s = 0;
-    	size_t i = 0;
+	fInterfacesList->Select(0L);
 	
-		FILE *cfg_file = fopen(path_S.String(),"r");   
-		
-		while (fgetc(cfg_file)!=EOF) s++;
-		char buffer[s+1];       //Build a buffer that has the exact size
-		
-		fseek(cfg_file,0,SEEK_SET);
-		
-		for (i=0;i<s;i++)
-			buffer[i] = fgetc(cfg_file); //Now let's fill it
-			
-		buffer[i+1] = '\0';
-		BString cfg_str = buffer; //We parse the buffer which is a char
-								  //and we 'cut' the fields in this BString
-								  //with the method CopyInto() 
-		fclose(cfg_file);	
-			
-		int field_begin = 0, field_length;
-		BString GLOBAL[14];		  //The GLOBAL: part has 14 fields we'll copy here
-		i = 0; 
-		
-		for (int j=0;j<14;j++){
-			field_length = 0 ;
-			while (buffer[i] != '=') 
-				i++;
-			field_begin = i + 2; //Each field begins 2 characters after a '='
-				
-			while (buffer[i] != '\n') //Each field ends just before a '\n'
-				i++;		
-			field_length = i-field_begin; 
-			
-			cfg_str.CopyInto(GLOBAL[j],field_begin,field_length);	
-		}	
-	
-//Now let's see how many interfaces there are and note 
-//where each interface's description begins in the file 
-		int number_of_interfaces = 0;
-		bool first = true;
-	
-		for (i=0;i<strlen(buffer);i++){
-			if (buffer[i]==':'){   //We recognize an interface
-				if (first == true) //with the ':' of the "interfacexx :".        
-					first = false; //bool first is there to make         
-				else {			   //'jump' the ':' of "GLOBAL :"		    					  			
-					number_of_interfaces++;
-				}
-			}										  
-		}
-	
-		int starts[number_of_interfaces];
-		first = true;		
-		int j =0;								   		
-		for (i=0;i<strlen(buffer);i++){
-			if (buffer[i]==':'){   
-				if (first == true)         
-					first = false;          
-				else {			   		   
-					starts[j] = i;
-					j++;  					  			
-				}
-			}										  
-		}		
-		//Now let's get the fields of each interface	
-		field_begin = 0, field_length;
-		BString INTERFACES[number_of_interfaces][8];	//Each interface has 8 fields
-	
-		for (int k=0;k<number_of_interfaces;k++){
-			i = starts[k];	
-			for (int j=0;j<8;j++){
-				field_length = 0 ;
-				while (buffer[i] != '=') 
-					i++;
-				field_begin = i + 2; //Each field begins 2 characters after a '='
-		
-				while (buffer[i] != '\n') //Each field ends just before a '\n'
-					i++;		
-				field_length = i-field_begin; 
-		
-				cfg_str.CopyInto(INTERFACES[k][j],field_begin,field_length);	
-			}
-		}																		   
-		
-//Now let's fill up every field everywhere in the app
-		Lock();
-	
-		fDomain		   ->SetText(GLOBAL[0].String()); //The BTextControls
-		fHost  		   ->SetText(GLOBAL[1].String());
-		fPrimaryDNS   ->SetText(GLOBAL[9].String());
-		fSecondaryDNS ->SetText(GLOBAL[10].String());
-	
-		if (GLOBAL[5]== "1") fFTPServer->SetValue(1);    //Now the BCheckBoxes
-		if (GLOBAL[6]== "1") fIPForwarding->SetValue(1); 
-		if (GLOBAL[8]== "1") fTelnetServer->SetValue(1);
-		
-		for (i=0;i<(unsigned)number_of_interfaces;i++){ //Now the interfaces list
-			BString string = INTERFACES[i][3];
-			string<<"->"<<INTERFACES[i][5]<<"->"<<"State(Not implemented yet)";
-			NetListItem *item = new NetListItem(string.String());
-		
-			item->fData.fIPAddress  = INTERFACES[i][3];
-			item->fData.fNetMask  = INTERFACES[i][4];
-			item->fData.fPrettyName = INTERFACES[i][5];
-			item->fData.fEnabled  = atoi(INTERFACES[i][6].String());   		
-			item->fData.fDHCP	  = atoi(INTERFACES[i][7].String());
-		
-			fInterfacesList->AddItem(item);
-		}	
-		fInterfacesList->Select(0L);
-	
-		Unlock(); 
+	fDomain->SetText(fData.fDomainName.String());
+	fHost->SetText(fData.fHostname.String());
+	fPrimaryDNS->SetText(fData.fPrimaryDNS.String());
+	fSecondaryDNS->SetText(fData.fSecondaryDNS.String());
 
-//And save some of them
-		fusername = GLOBAL[2];
-	}
-*/
+	if(fData.fFTPServer)
+		fFTPServer->SetValue(B_CONTROL_ON);
+	if(fData.fIPForwarding)
+		fIPForwarding->SetValue(B_CONTROL_ON); 
+	if(fData.fTelnetServer)
+		fTelnetServer->SetValue(B_CONTROL_ON);
+
+	Unlock(); 
 }
