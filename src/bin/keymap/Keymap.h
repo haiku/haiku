@@ -24,6 +24,7 @@ class Keymap
 {
 public:
 	Keymap();
+	~Keymap();
 	status_t LoadCurrent();
 	status_t Load(entry_ref &ref);
 	status_t Save(entry_ref &ref);

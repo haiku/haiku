@@ -32,6 +32,13 @@ Keymap::Keymap()
 }
 
 
+Keymap::~Keymap()
+{
+	if (fChars)
+		free(fChars);
+}
+
+
 void 
 Keymap::GetKey( char *chars, int32 offset, char* string) 
 {
@@ -239,7 +246,7 @@ Keymap::LoadCurrent()
 		return B_ERROR;
 	}
 	memcpy(&fKeys, keys, sizeof(fKeys));
-	delete keys;
+	free(keys);
 	return B_OK;
 
 	#else	// ! __BEOS__
