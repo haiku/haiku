@@ -11,6 +11,8 @@
 #include <Screen.h>
 #include <Window.h>
 
+#define max(a,b) ((a)>(b)?(a):(b))
+
 const static unsigned char
 kVerticalKnobData[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -43,7 +45,8 @@ kHorizontalKnobData[] = {
 	0xff, 0x00, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x00, 0x12, 0xff,
 	0xff, 0x00, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x00, 0x12, 0xff,
 	0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x12, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0xff, 0xff	
+	0xff, 0xff, 0xff, 0xff, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff	
 };
 
 
@@ -400,7 +403,20 @@ BChannelSlider::SetEnabled(bool on)
 void
 BChannelSlider::GetPreferredSize(float *width, float *height)
 {
-	BChannelControl::GetPreferredSize(width, height);
+	if (width) {
+		float _width = (float)ceil(StringWidth(Label()));
+		if (Vertical()) {
+			*width = max(_width, 2 + 12 * CountChannels());
+		} else {
+			*width = max(_width, 64);
+		}
+	}
+	if (height) {
+		if (Vertical())
+			*height = 195;
+		else
+			*height = 71;
+	}
 }
 
 
@@ -518,7 +534,7 @@ BChannelSlider::ThumbFor(int32 channel, bool pressed)
 			fLeftKnob = new BBitmap(BRect(0, 0, 11, 14), B_CMAP8);
 			fLeftKnob->SetBits(kVerticalKnobData, sizeof(kVerticalKnobData), 0, B_CMAP8);
 		} else {
-			fLeftKnob = new BBitmap(BRect(0, 0, 14, 10), B_CMAP8);
+			fLeftKnob = new BBitmap(BRect(0, 0, 14, 11), B_CMAP8);
 			fLeftKnob->SetBits(kHorizontalKnobData, sizeof(kHorizontalKnobData), 0, B_CMAP8);	
 		}
 	}
@@ -641,8 +657,7 @@ BChannelSlider::DrawThumbs()
 {	
 	if (fBacking == NULL) {
 		// This is the idea: we build a bitmap by taking the coordinates
-		// of the first and last thumb frames (top/left and bottom/right),
-		// and by enlarging this rectangle a bit (hence the "InsetBy(-3, -3)").
+		// of the first and last thumb frames (top/left and bottom/right)
 		BRect first = ThumbFrameFor(0);
 		BRect last = ThumbFrameFor(CountChannels() - 1);
 		BRect bitmapFrame(first.LeftTop(), last.RightBottom());
@@ -652,15 +667,20 @@ BChannelSlider::DrawThumbs()
 		else
 			bitmapFrame.right += ThumbRangeFor(0);
 	
-		bitmapFrame.InsetBy(-3, -3);
-		fBacking = new BBitmap(bitmapFrame, BScreen(Window()).ColorSpace(), true, false);
+		fBacking = new BBitmap(bitmapFrame, 
+#ifdef __HAIKU__
+		BScreen(Window()).ColorSpace(),
+#else
+		B_RGB32, 
+#endif
+		true, false);
 		if (fBacking->Lock()) {
 			fBackingView = new BView(bitmapFrame.OffsetToCopy(B_ORIGIN), "backing view", B_FOLLOW_NONE, B_WILL_DRAW);
 			fBacking->AddChild(fBackingView);
 			fBackingView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			fBackingView->SetLowColor(fBackingView->ViewColor());
 			fBacking->Unlock();
-		}			
+		}
 	}
 	
 	BPoint drawHere;
