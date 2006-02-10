@@ -1504,10 +1504,16 @@ InputServer::_MethodizeEvents(EventList& events)
 			SERIAL_PRINT(("IME received\n"));
 
 			int32 opcode;
-			if (fInputMethodWindow == NULL
-				&& event->FindInt32("be:opcode", &opcode) == B_OK
-				&& opcode == B_INPUT_METHOD_STARTED)
-				fInputMethodWindow = new (nothrow) BottomlineWindow();
+			if (event->FindInt32("be:opcode", &opcode) == B_OK) {
+				if (fInputMethodWindow && opcode == B_INPUT_METHOD_STOPPED) {
+					fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
+					fInputMethodWindow = NULL;
+					continue;
+				}
+				if (fInputMethodWindow == NULL
+					&& opcode == B_INPUT_METHOD_STARTED)
+					fInputMethodWindow = new (nothrow) BottomlineWindow();
+			}
 
 			if (fInputMethodWindow != NULL) {
 				EventList newEvents;
