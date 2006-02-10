@@ -2218,6 +2218,17 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		return false;
 	
 	switch (code) {
+		case AS_LAYER_SET_ORIGIN:
+		{
+			float x, y;
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+			
+			picture->BeginOp(B_PIC_SET_ORIGIN);
+			picture->AddCoord(BPoint(x, y));
+			picture->EndOp();
+			break;
+		}
 		case AS_FILL_RECT:
 		case AS_STROKE_RECT:
 		{
@@ -2245,6 +2256,32 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
+		
+		case AS_STROKE_LINEARRAY:
+		{
+			int32 lineCount;
+			link.Read<int32>(&lineCount);
+			for (int32 i = 0; i < lineCount; i++) {
+				float x1, y1, x2, y2;
+				link.Read<float>(&x1);
+				link.Read<float>(&y1);
+				link.Read<float>(&x2);
+				link.Read<float>(&y2);
+
+				rgb_color color;
+				link.Read<rgb_color>(&color);
+			
+				picture->BeginOp(B_PIC_SET_FORE_COLOR);
+				picture->AddColor(color);
+				picture->EndOp();
+
+				picture->BeginOp(B_PIC_STROKE_LINE);
+				picture->AddCoord(BPoint(x1, y1));
+				picture->AddCoord(BPoint(x2, y2));
+				picture->EndOp();
+			}
+			break;
+		}
 
 		case AS_LAYER_SET_LOW_COLOR:
 		case AS_LAYER_SET_HIGH_COLOR:
@@ -2270,8 +2307,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 
-			picture->BeginOp(B_PIC_MOVE_PEN_BY);
-			picture->AddCoord(location - fCurrentLayer->CurrentState()->PenLocation());
+			picture->BeginOp(B_PIC_SET_PEN_LOCATION);
+			picture->AddCoord(location);
 			picture->EndOp();
 		
 			picture->BeginOp(B_PIC_DRAW_STRING);

@@ -16,15 +16,13 @@
 static void
 nop()
 {
-	printf("nop\n");
 }
 
 
 static void
 move_pen_by(ViewLayer *view, BPoint delta)
 {
-	//view->MovePenBy(delta)
-	printf("MovePenBy(%.2f, %.2f)\n", delta.x, delta.y);
+	view->CurrentState()->SetPenLocation(delta - view->CurrentState()->PenLocation());
 }
 
 
@@ -214,84 +212,82 @@ clip_to_picture(void *user, BPicture *picture, BPoint pt,
 
 
 static void
-push_state(void *user)
+push_state(ViewLayer *view)
 {
-	printf("PushState\n");
+	view->PushState();
 }
 
 
 static void
-pop_state(void *user)
+pop_state(ViewLayer *view)
 {
-	printf("PopState\n");
+	view->PopState();
 }
 
 
 static void
-enter_state_change(void *user)
+enter_state_change(ViewLayer *view)
 {
 	printf("EnterStateChange\n");
 }
 
 
 static void
-exit_state_change(void *user)
+exit_state_change(ViewLayer *view)
 {
 	printf("ExitStateChange\n");
 }
 
 
 static void 
-enter_font_state(void *user)
+enter_font_state(ViewLayer *view)
 {
 	printf("EnterFontState\n");
 }
 
 
 static void
-exit_font_state(void *user)
+exit_font_state(ViewLayer *view)
 {
 	printf("ExitFontState\n");
 }
 
 
 static void 
-set_origin(void *user, BPoint pt)
+set_origin(ViewLayer *view, BPoint pt)
 {
-	printf("SetOrigin(%.2f, %.2f)\n", pt.x, pt.y);
+	view->CurrentState()->SetOrigin(pt);
 }
 
 
 static void
 set_pen_location(ViewLayer *view, BPoint pt)
 {
-	//view->MovePenTo(pt);
-
-	printf("SetPenLocation(%.2f, %.2f)\n", pt.x, pt.y);
+	view->CurrentState()->SetPenLocation(pt);
 }
 
 
 static void
-set_drawing_mode(void *user, drawing_mode mode)
+set_drawing_mode(ViewLayer *view, drawing_mode mode)
 {
-	printf("SetDrawingMode(%d)\n", mode);
+	view->CurrentState()->SetDrawingMode(mode);
 }
 
 
 static void
-set_line_mode(ViewLayer *view, cap_mode capMode, join_mode joinMode,
-				 float miterLimit)
+set_line_mode(ViewLayer *view, cap_mode capMode, join_mode joinMode, float miterLimit)
 {
-	//view->SetLineMode(capMode, joinMode, miterLimit);
-	printf("SetLineMode(%d, %d, %.2f)\n", capMode, joinMode, miterLimit);
+	DrawState *state = view->CurrentState();
+	state->SetLineCapMode(capMode);
+	state->SetLineJoinMode(joinMode);
+	state->SetMiterLimit(miterLimit);
 }
 
 
 static void
 set_pen_size(ViewLayer *view, float size)
 {
-	//view->SetPenSize(size);
-	printf("SetPenSize(%.2f)\n", size);
+	view->CurrentState()->SetPenSize(size);
 }
 
 
@@ -310,35 +306,35 @@ set_back_color(ViewLayer *view, rgb_color color)
 
 
 static void
-set_stipple_pattern(void *user, pattern p)
+set_stipple_pattern(ViewLayer *view, pattern p)
 {
 	printf("SetStipplePattern\n");
 }
 
 
 static void
-set_scale(void *user, float scale)
+set_scale(ViewLayer *view, float scale)
 {
-	printf("SetScale(%.2f)\n", scale);
+	view->CurrentState()->SetScale(scale);
 }
 
 
 static void
-set_font_family(void *user, char *family)
+set_font_family(ViewLayer *view, char *family)
 {
 	printf("SetFontFamily(%s)\n", family);
 }
 
 
 static void
-set_font_style(void *user, char *style)
+set_font_style(ViewLayer *view, char *style)
 {
 	printf("SetFontStyle(%s)\n", style);
 }
 
 
 static void
-set_font_spacing(void *user, int32 spacing)
+set_font_spacing(ViewLayer *view, int32 spacing)
 {
 	printf("SetFontSpacing(%ld)\n", spacing);
 }
@@ -358,35 +354,35 @@ set_font_size(ViewLayer *view, float size)
 
 
 static void
-set_font_rotate(void *user, float rotation)
+set_font_rotate(ViewLayer *view, float rotation)
 {
 	printf("SetFontRotate(%.2f)\n", rotation);
 }
 
 
 static void
-set_font_encoding(void *user, int32 encoding)
+set_font_encoding(ViewLayer *view, int32 encoding)
 {
 	printf("SetFontEncoding(%ld)\n", encoding);
 }
 
 
 static void
-set_font_flags(void *user, int32 flags)
+set_font_flags(ViewLayer *view, int32 flags)
 {
 	printf("SetFontFlags(%ld)\n", flags);
 }
 
 
 static void
-set_font_shear(void *user, float shear)
+set_font_shear(ViewLayer *view, float shear)
 {
 	printf("SetFontShear(%.2f)\n", shear);
 }
 
 
 static void
-set_font_face(void *user, int32 flags)
+set_font_face(ViewLayer *view, int32 flags)
 {
 	printf("SetFontFace(%ld)\n", flags);
 }
@@ -395,7 +391,6 @@ set_font_face(void *user, int32 flags)
 static void
 reserved()
 {
-	printf("reserved\n");
 }
 
 
