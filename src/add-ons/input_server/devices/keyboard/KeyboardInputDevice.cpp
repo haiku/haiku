@@ -753,18 +753,22 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				
 					if (numBytes2<=0) {
 						numBytes2 = 1;
+						delete[] str2;
 						str2 = str;
-					}
+					} else
+						delete[] str;
 					
 					if (is_keydown && (lastKeyCode == keycode)) {
 						repeatCount++;
 						msg->AddInt32("be:key_repeat", repeatCount);
 					} else
 						repeatCount = 1;
-				}
+				} else
+					delete[] str;
 				
 				if (numBytes2>0)
 					msg->AddInt32("raw_char", (uint32)((uint8)str2[0] & 0x7f));
+				delete[] str2;
 				
 				if (dev->owner->EnqueueMessage(msg)!=B_OK)
 				delete msg;
