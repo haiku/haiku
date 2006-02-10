@@ -1,6 +1,11 @@
 SubDir HAIKU_TOP src apps pulse ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders shared ;
+if $(TARGET_PLATFORM) != haiku {
+        UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
+}
 
 if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
@@ -20,7 +25,7 @@ Application Pulse :
 	PulseView.cpp
 	PulseWindow.cpp 
 
-	: libbe.so  
+	: be  
 	: Pulse.rdef 
 ;
 
