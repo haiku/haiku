@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BOX_H
@@ -25,6 +25,9 @@ class BBox : public BView {
 
 		virtual	void		SetBorder(border_style border);
 		border_style		Border() const;
+
+		float				TopBorderOffset();
+		BRect				InnerFrame();
 
 		void				SetLabel(const char* string);
 		status_t			SetLabel(BView* viewLabel);

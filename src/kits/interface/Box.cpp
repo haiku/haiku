@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -22,7 +22,7 @@
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		border_style border)
 	: BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
-		fStyle(border)
+	fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -35,22 +35,6 @@ BBox::BBox(BMessage *archive)
 	: BView(archive)
 {
 	_InitObject(archive);
-
-	const char *string;
-
-	if (archive->FindString("_label", &string) == B_OK)
-		SetLabel(string);
-
-	bool aBool;
-	int32 anInt32;
-
-	if (archive->FindBool("_style", &aBool) == B_OK)
-		fStyle = aBool ? B_FANCY_BORDER : B_PLAIN_BORDER;
-	else if (archive->FindInt32("_style", &anInt32) == B_OK)
-		fStyle = (border_style)anInt32;
-
-	if (archive->FindBool("_lblview", &aBool) == B_OK)
-		fLabelView = ChildAt(0);
 }
 
 
@@ -104,6 +88,42 @@ border_style
 BBox::Border() const
 {
 	return fStyle;
+}
+
+
+//! This function is not part of the R5 API and is not yet finalized yet
+float
+BBox::TopBorderOffset()
+{
+	float labelHeight = 0;
+
+	if (fLabel != NULL)
+		labelHeight = fLabelBox->Height();
+	else if (fLabelView != NULL)
+		labelHeight = fLabelView->Bounds().Height();
+
+	return labelHeight / 2.0f;
+}
+
+
+//! This function is not part of the R5 API and is not yet finalized yet
+BRect
+BBox::InnerFrame()
+{
+	float borderSize = Border() == B_FANCY_BORDER ? 2.0f
+		: Border() == B_PLAIN_BORDER ? 1.0f : 0.0f;
+	float labelHeight = 0.0f;
+
+	if (fLabel != NULL)
+		labelHeight = fLabelBox->Height();
+	else if (fLabelView != NULL)
+		labelHeight = fLabelView->Bounds().Height();
+
+	BRect rect = Bounds().InsetByCopy(borderSize, borderSize);
+	if (labelHeight)
+		rect.top = Bounds().top + labelHeight;
+
+	return rect;
 }
 
 
@@ -427,24 +447,44 @@ BBox::operator=(const BBox &)
 
 
 void
-BBox::_InitObject(BMessage *data)
+BBox::_InitObject(BMessage* archive)
 {
-	fLabel = NULL;
 	fBounds = Bounds();
+
+	fLabel = NULL;
 	fLabelView = NULL;
+	fLabelBox = NULL;
 
 	int32 flags = 0;
 
 	BFont font(be_bold_font);
 
-	if (!data || !data->HasString("_fname"))
+	if (!archive || !archive->HasString("_fname"))
 		flags = B_FONT_FAMILY_AND_STYLE;
 
-	if (!data || !data->HasFloat("_fflt"))
+	if (!archive || !archive->HasFloat("_fflt"))
 		flags |= B_FONT_SIZE;
 
 	if (flags != 0)
 		SetFont(&font, flags);
+	
+	if (archive != NULL) {
+		const char *string;
+		if (archive->FindString("_label", &string) == B_OK)
+			SetLabel(string);
+
+		bool fancy;
+		int32 style;
+
+		if (archive->FindBool("_style", &fancy) == B_OK)
+			fStyle = fancy ? B_FANCY_BORDER : B_PLAIN_BORDER;
+		else if (archive->FindInt32("_style", &style) == B_OK)
+			fStyle = (border_style)style;
+
+		bool hasLabelView;
+		if (archive->FindBool("_lblview", &hasLabelView) == B_OK)
+			fLabelView = ChildAt(0);
+	}
 }
 
 
