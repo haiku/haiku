@@ -31,7 +31,6 @@ public:
 
 	virtual void MessageReceived(BMessage *msg);
 	virtual bool QuitRequested();
-	void SetStatusMessage(const char *text);
 	BMenu *GetSourceMenu() { return fSrcMenu; };
 	BMenu *GetTargetMenu() { return fDestMenu; };
 private:
@@ -41,6 +40,7 @@ private:
 	void ShowBottom();
 	void StartScan();
 	void AdjustMenus();
+	void SetStatusMessage(const char *text);
 	static int ComparePackages(const void *firstArg, const void *secondArg);
 	BBox *fBackBox;
 	BButton *fBeginButton, *fSetupButton;

@@ -407,7 +407,6 @@ InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
 void
 InstallerWindow::SetStatusMessage(const char *text)
 {
-	BAutolock(this);
 	fStatusView->SetText(text);
 }
 

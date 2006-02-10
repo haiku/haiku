@@ -8,6 +8,7 @@
 
 #include <Bitmap.h>
 #include <CheckBox.h>
+#include <Entry.h>
 #include <List.h>
 #include <StringView.h>
 #include <stdlib.h>
