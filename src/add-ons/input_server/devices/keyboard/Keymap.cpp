@@ -14,6 +14,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include "Keymap.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ByteOrder.h>
@@ -80,8 +81,17 @@ Keymap::Keymap() :
 	key_map *keys;
 	get_key_map(&keys, &fChars);
 	
-	if (keys)
+	if (keys) {
 		memcpy(&fKeys, keys, sizeof(key_map));
+		free(keys);
+	}
+}
+
+
+Keymap::~Keymap()
+{
+	if (fChars)
+		free(fChars);
 }
 
 
@@ -364,12 +374,16 @@ status_t
 Keymap::LoadCurrent()
 {
 	key_map *keys = NULL;
+	if (fChars)
+		free(fChars);
+	fChars = NULL;
 	get_key_map(&keys, &fChars);
 	if (!keys) {
 		fprintf(stderr, "error while getting current keymap!\n");
 		return B_ERROR;
 	}
 	memcpy(&fKeys, keys, sizeof(fKeys));
-	delete keys;
+	free(keys);
 	return B_OK;
 }
+

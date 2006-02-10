@@ -23,6 +23,7 @@ class Keymap
 {
 public:
 	Keymap();
+	~Keymap();
 	void DumpKeymap();
 	bool IsModifierKey(uint32 keyCode);
 	uint32 Modifier(uint32 keyCode);
