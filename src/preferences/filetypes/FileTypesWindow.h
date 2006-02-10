@@ -11,7 +11,7 @@
 
 class FileTypesWindow : public BWindow {
 	public:
-		FileTypesWindow(BPoint position);
+		FileTypesWindow(BRect frame);
 		virtual ~FileTypesWindow();
 
 		virtual void MessageReceived(BMessage* message);

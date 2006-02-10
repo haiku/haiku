@@ -42,7 +42,7 @@ class FileTypes : public BApplication {
 		BFilePanel	*fFilePanel;
 		BWindow		*fTypesWindow;
 		uint32		fWindowCount;
-		BPoint		fTypesWindowPosition;
+		BRect		fTypesWindowFrame;
 };
 
 
@@ -52,7 +52,7 @@ FileTypes::FileTypes()
 	fWindowCount(0)
 {
 	fFilePanel = new BFilePanel();
-	fTypesWindowPosition = BPoint(100.0f, 100.0f);
+	fTypesWindowFrame = BRect(80.0f, 80.0f, 540.0f, 440.0f);
 		// TODO: read from settings
 }
 
@@ -146,7 +146,7 @@ FileTypes::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgOpenTypesWindow:
 			if (fTypesWindow == NULL) {
-				fTypesWindow = new FileTypesWindow(fTypesWindowPosition);
+				fTypesWindow = new FileTypesWindow(fTypesWindowFrame);
 				fTypesWindow->Show();
 				fWindowCount++;
 			} else
