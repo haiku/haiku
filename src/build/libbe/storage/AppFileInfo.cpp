@@ -638,37 +638,46 @@ status_t
 BAppFileInfo::GetVersionInfo(version_info *info, version_kind kind) const
 {
 	// check params and initialization
-	status_t error = (info ? B_OK : B_BAD_VALUE);
+	if (!info)
+		return B_BAD_VALUE;
+
 	int32 index = 0;
-	if (error == B_OK) {
-		switch (kind) {
-			case B_APP_VERSION_KIND:
-				index = 0;
-				break;
-			case B_SYSTEM_VERSION_KIND:
-				index = 1;
-				break;
-			default:
-				error = B_BAD_VALUE;
-				break;
-		}
+	switch (kind) {
+		case B_APP_VERSION_KIND:
+			index = 0;
+			break;
+		case B_SYSTEM_VERSION_KIND:
+			index = 1;
+			break;
+		default:
+			return B_BAD_VALUE;
 	}
-	if (error == B_OK && InitCheck() != B_OK)
-		error = B_NO_INIT;
+
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
 	// read the data
 	size_t read = 0;
 	version_info infos[2];
-	if (error == B_OK) {
-		error = _ReadData(kVersionInfoAttribute, kVersionInfoResourceID,
-						  B_VERSION_INFO_TYPE, infos,
-						  2 * sizeof(version_info), read);
-	}
-	// check the read data -- null terminate the string
-	if (error == B_OK && read != 2 * sizeof(version_info))
-		error = B_ERROR;
-	if (error == B_OK)
+	status_t error = _ReadData(kVersionInfoAttribute, kVersionInfoResourceID,
+		B_VERSION_INFO_TYPE, infos, 2 * sizeof(version_info), read);
+	if (error != B_OK)
+		return error;
+
+	// check the read data
+	if (read == sizeof(version_info)) {
+		// only the app version info is there -- return a cleared system info
+		if (index == 0)
+			*info = infos[index];
+		else if (index == 1)
+			memset(info, 0, sizeof(version_info));
+	} else if (read == 2 * sizeof(version_info)) {
 		*info = infos[index];
-	return error;
+	} else
+		return B_ERROR;
+
+	// return result	
+	return B_OK;
 }
 
 // SetVersionInfo
@@ -714,9 +723,16 @@ BAppFileInfo::SetVersionInfo(const version_info *info, version_kind kind)
 			version_info infos[2];
 			if (error == B_OK) {
 				size_t read;
-				_ReadData(kVersionInfoAttribute, kVersionInfoResourceID,
-						  B_VERSION_INFO_TYPE, infos,
-						  2 * sizeof(version_info), read);
+				if (_ReadData(kVersionInfoAttribute, kVersionInfoResourceID,
+						B_VERSION_INFO_TYPE, infos, 2 * sizeof(version_info),
+						read) == B_OK) {
+					// clear the part that hasn't been read
+					if (read < sizeof(infos))
+						memset((char*)infos + read, 0, sizeof(infos) - read);
+				} else {
+					// failed to read -- clear
+					memset(infos, 0, sizeof(infos));
+				}
 			}
 			infos[index] = *info;
 			// write the data
