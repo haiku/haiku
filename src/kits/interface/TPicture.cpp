@@ -149,24 +149,21 @@ void TPicture::GetData(void *data, int32 size)
 	fData.Read(data, size);
 }
 //------------------------------------------------------------------------------
-status_t TPicture::Play(void **callBackTable, int32 tableEntries,
-						void *userData)
+status_t TPicture::Play(void **callBackTable, int32 tableEntries, void *userData)
 {
 	// TODO: we should probably check if the functions in the table are not 0
 	//       before calling them.
 
-	int16 op=0;
-	int32 size=0;
-	off_t pos=0;
+	// lenght of the stream
+	size_t length = fData.Seek(0, SEEK_END);
+	fData.Seek(0, SEEK_SET);
 
-	while (fData.Position() < size)
-	{
-		op = GetOp();
-		size = GetInt32();
-		pos = fData.Position();
+	while (fData.Position() < length) {
+		int16 op = GetOp();
+		int32 size = GetInt32();
+		off_t pos = fData.Position();
 
-		switch (op)
-		{
+		switch (op) {
 			case B_PIC_MOVE_PEN_BY:
 			{
 				BPoint where = GetCoord();

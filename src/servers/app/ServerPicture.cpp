@@ -457,8 +457,6 @@ ServerPicture::ServerPicture()
 
 
 ServerPicture::ServerPicture(const ServerPicture &picture)
-	:
-	fStack(picture.fStack)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -474,9 +472,11 @@ ServerPicture::~ServerPicture()
 void
 ServerPicture::BeginOp(int16 op)
 {
-	int32 size = 0;
 	fStack.push(fData.Position());
 	fData.Write(&op, sizeof(op));
+	
+	// Init the size of the opcode block to 0
+	size_t size = 0;
 	fData.Write(&size, sizeof(size));
 }
 
@@ -487,10 +487,15 @@ ServerPicture::EndOp()
 	off_t curPos = fData.Position();
 	off_t stackPos = fStack.top();
 	fStack.pop();
+	
+	// The size of the op is calculated like this:
+	// current position on the stream minus the position on the stack,
+	// minus the space occupied by the op code itself (int16)
+	// and the space occupied by the size field (size_t) 
+	size_t size = curPos - stackPos - sizeof(size_t) - sizeof(int16);
 
-	size_t size = curPos - stackPos - 6;
-
-	fData.Seek(stackPos + 2, SEEK_SET);
+	// Size was set to 0 in BeginOp(). Now we overwrite it with the correct value
+	fData.Seek(stackPos + sizeof(int16), SEEK_SET);
 	fData.Write(&size, sizeof(size));
 	fData.Seek(curPos, SEEK_SET);
 }
