@@ -181,13 +181,13 @@ AGGTextRenderer::RenderString(const char* string,
 	uint32 glyphCount;
 
 	if (_PrepareUnicodeBuffer(string, length, &glyphCount) >= B_OK) {
-
 		fCurves.approximation_scale(transform.scale());
-	
+
 		// use a transformation behind the curves
 		// (only if glyph->data_type == agg::glyph_data_outline)
 		// in the pipeline for the rasterizer
-		typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>	conv_font_trans_type;
+		typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>
+			conv_font_trans_type;
 		conv_font_trans_type transformedOutline(fCurves, transform);
 
 		uint16* p = (uint16*)fUnicodeBuffer;
@@ -204,7 +204,6 @@ AGGTextRenderer::RenderString(const char* string,
 		transform.Transform(&transformOffset);
 
 		for (uint32 i = 0; i < glyphCount; i++) {
-
 /*			// line break (not supported by R5)
 			if (*p == '\n') {
 				y0 += LineOffset();
@@ -219,9 +218,8 @@ AGGTextRenderer::RenderString(const char* string,
 			const agg::glyph_cache* glyph = fFontCache.glyph(*p);
 
 			if (glyph) {
-				if (i > 0 && fKerning) {
+				if (i > 0 && fKerning)
 					fFontCache.add_kerning(&advanceX, &advanceY);
-				}
 
 				x += advanceX;
 				y += advanceY;
@@ -268,7 +266,7 @@ AGGTextRenderer::RenderString(const char* string,
 						fFontCache.init_embedded_adaptors(glyph, x, y);
 						glyphBounds = transform.TransformBounds(glyphBounds);
 					}
-	
+
 					if (clippingFrame.Intersects(glyphBounds)) {
 						switch (glyph->data_type) {
 							case agg::glyph_data_mono:
@@ -276,7 +274,7 @@ AGGTextRenderer::RenderString(const char* string,
 													  fFontCache.mono_scanline(), 
 													  *binRenderer);
 								break;
-			
+
 							case agg::glyph_data_gray8:
 								agg::render_scanlines(fFontCache.gray8_adaptor(), 
 													  fFontCache.gray8_scanline(), 
@@ -347,6 +345,7 @@ AGGTextRenderer::RenderString(const char* string,
 	return transform.TransformBounds(bounds);
 }
 
+
 // StringWidth
 double
 AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
@@ -364,19 +363,15 @@ AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
 	double width = 0.0;
 	uint32 glyphCount;
 	if (_PrepareUnicodeBuffer(utf8String, length, &glyphCount) >= B_OK) {
-
 		uint16* p = (uint16*)fUnicodeBuffer;
 
 		double y  = 0.0;
 		const agg::glyph_cache* glyph;
 
 		for (uint32 i = 0; i < glyphCount; i++) {
-
 			if ((glyph = fFontCache.glyph(*p))) {
-
-				if (i > 0 && fKerning) {
+				if (i > 0 && fKerning)
 					fFontCache.add_kerning(&width, &y);
-				}
 
 				width += glyph->advance_x;
 			}
@@ -386,11 +381,17 @@ AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
 	return width;
 }
 
+
 // _PrepareUnicodeBuffer
 status_t
 AGGTextRenderer::_PrepareUnicodeBuffer(const char* utf8String,
 									   uint32 length, uint32* glyphCount)
 {
+	if (length == 0) {
+		*glyphCount = 0;
+		return B_OK;
+	}
+
 	int32 srcLength = length;
 	int32 dstLength = srcLength * 4;
 
