@@ -25,7 +25,7 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 						   uint32 flags)
 	: BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
 {
-	InitData(label, text);
+	_InitData(label, text);
 
 	float height;
 	BTextControl::GetPreferredSize(NULL, &height);
@@ -35,6 +35,8 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 	float lineHeight = ceil(fText->LineHeight(0));
 	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
 	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
+
+	fPreviousHeight = Bounds().Height();
 }
 
 
@@ -44,29 +46,29 @@ BTextControl::~BTextControl()
 }
 
 
-BTextControl::BTextControl(BMessage *data)
-	:	BControl(data)
+BTextControl::BTextControl(BMessage* archive)
+	: BControl(archive)
 {
-	InitData(Label(), NULL, data);
+	_InitData(Label(), NULL, archive);
 
-	int32 _a_label = B_ALIGN_LEFT;
-	int32 _a_text = B_ALIGN_LEFT;
+	int32 labelAlignment = B_ALIGN_LEFT;
+	int32 textAlignment = B_ALIGN_LEFT;
 
-	if (data->HasInt32("_a_label"))
-		data->FindInt32("_a_label", &_a_label);
+	if (archive->HasInt32("_a_label"))
+		archive->FindInt32("_a_label", &labelAlignment);
 
-	if (data->HasInt32("_a_text"))
-		data->FindInt32("_a_text", &_a_text);
+	if (archive->HasInt32("_a_text"))
+		archive->FindInt32("_a_text", &textAlignment);
 	
-	SetAlignment((alignment)_a_label, (alignment)_a_text);
+	SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
 
-	if (data->HasFloat("_divide"))
-		data->FindFloat("_a_text", &fDivider);
+	if (archive->HasFloat("_divide"))
+		archive->FindFloat("_a_text", &fDivider);
 
-	if (data->HasMessage("_mod_msg")) {
-		BMessage *_mod_msg = new BMessage;
-		data->FindMessage("_mod_msg", _mod_msg);
-		SetModificationMessage(_mod_msg);
+	if (archive->HasMessage("_mod_msg")) {
+		BMessage* message = new BMessage;
+		archive->FindMessage("_mod_msg", message);
+		SetModificationMessage(message);
 	}
 }
 
@@ -542,9 +544,45 @@ BTextControl::FrameMoved(BPoint newPosition)
 
 
 void
-BTextControl::FrameResized(float newWidth, float newHeight)
+BTextControl::FrameResized(float width, float height)
 {
-	BControl::FrameResized(newWidth, newHeight);
+	BControl::FrameResized(width, height);
+
+	// changes in width
+
+	BRect bounds = Bounds();
+	const float border = 2.0f;
+
+	if (bounds.Width() > fPreviousWidth) {
+		// invalidate the region between the old and the new right border
+		BRect rect = bounds;
+		rect.left += fPreviousWidth - border;
+		rect.right--;
+		Invalidate(rect);
+	} else if (bounds.Width() < fPreviousWidth) {
+		// invalidate the region of the new right border
+		BRect rect = bounds;
+		rect.left = rect.right - border;
+		Invalidate(rect);
+	}
+
+	// changes in height
+
+	if (bounds.Height() > fPreviousHeight) {
+		// invalidate the region between the old and the new bottom border
+		BRect rect = bounds;
+		rect.top += fPreviousHeight - border;
+		rect.bottom--;
+		Invalidate(rect);
+	} else if (bounds.Height() < fPreviousHeight) {
+		// invalidate the region of the new bottom border
+		BRect rect = bounds;
+		rect.top = rect.bottom - border;
+		Invalidate(rect);
+	}
+
+	fPreviousWidth = uint16(bounds.Width());
+	fPreviousHeight = uint16(bounds.Height());
 }
 
 
@@ -585,14 +623,14 @@ BTextControl::operator=(const BTextControl&)
 
 
 void
-BTextControl::CommitValue()
+BTextControl::_CommitValue()
 {
 }
 
 
 void
-BTextControl::InitData(const char *label, const char *initialText,
-	BMessage *data)
+BTextControl::_InitData(const char* label, const char* initialText,
+	BMessage* archive)
 {
 	BRect bounds(Bounds());
 
@@ -600,18 +638,18 @@ BTextControl::InitData(const char *label, const char *initialText,
 	fModificationMessage = NULL;
 	fLabelAlign = B_ALIGN_LEFT;
 	fDivider = 0.0f;
-	fPrevWidth = 0;
-	fPrevHeight = 0;
+	fPreviousWidth = bounds.Width();
+	fPreviousHeight = bounds.Height();
 	fSkipSetFlags = false;
 
 	int32 flags = 0;
 
 	BFont font(be_plain_font);
 
-	if (!data || !data->HasString("_fname"))
+	if (!archive || !archive->HasString("_fname"))
 		flags |= B_FONT_FAMILY_AND_STYLE;
 
-	if (!data || !data->HasFloat("_fflt"))
+	if (!archive || !archive->HasFloat("_fflt"))
 		flags |= B_FONT_SIZE;
 
 	if (flags != 0)
@@ -627,7 +665,7 @@ BTextControl::InitData(const char *label, const char *initialText,
 		fSkipSetFlags = false;
 	}
 
-	if (data)
+	if (archive)
 		fText = static_cast<_BTextInput_ *>(FindView("_input_"));
 	else {
 		BRect frame(fDivider, bounds.top,
