@@ -114,9 +114,13 @@ BBox::InnerFrame()
 		: Border() == B_PLAIN_BORDER ? 1.0f : 0.0f;
 	float labelHeight = 0.0f;
 
-	if (fLabel != NULL)
-		labelHeight = fLabelBox->Height();
-	else if (fLabelView != NULL)
+	if (fLabel != NULL) {
+		// fLabelBox doesn't contain the font's descent, but we want it here
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		labelHeight = ceilf(fontHeight.ascent + fontHeight.descent);
+	} else if (fLabelView != NULL)
 		labelHeight = fLabelView->Bounds().Height();
 
 	BRect rect = Bounds().InsetByCopy(borderSize, borderSize);
