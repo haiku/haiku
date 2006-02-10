@@ -611,6 +611,6 @@ ServerPicture::SyncState(ViewLayer *view)
 void
 ServerPicture::Play(ViewLayer *view)
 {
-	TPicture picture(const_cast<void *>(fData.Buffer()), fData.BufferLength(), NULL);
-	picture.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
+	PicturePlayer player(const_cast<void *>(fData.Buffer()), fData.BufferLength(), NULL);
+	player.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
 }

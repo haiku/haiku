@@ -584,9 +584,9 @@ status_t
 do_playback(void * data, int32 size, BList* pictures,
 	void **callBackTable, int32 tableEntries, void *user)
 {
-	TPicture picture(data, size, pictures);
+	PicturePlayer player(data, size, pictures);
 
-	return picture.Play(callBackTable, tableEntries, user);
+	return player.Play(callBackTable, tableEntries, user);
 }
 
 

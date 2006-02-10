@@ -1,43 +1,19 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		TPicture.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	TPicture is used to create and play picture data.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
 
-// Standard Includes -----------------------------------------------------------
+/**	PicturePlayer is used to create and play picture data. */
+
 #include <stdio.h>
 
-// System Includes -------------------------------------------------------------
 #include <TPicture.h>
 #include <PictureProtocol.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
@@ -60,19 +36,21 @@ typedef void (*fnc_PBRecti)(void*, BRect*, int32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, void*);
 
-//------------------------------------------------------------------------------
-TPicture::TPicture(void *data, int32 size, BList *pictures)
+
+PicturePlayer::PicturePlayer(void *data, int32 size, BList *pictures)
 	:	fData(data, size),
 		fPictures(pictures)
 {
-	
 }
-//------------------------------------------------------------------------------
-TPicture::~TPicture()
+
+
+PicturePlayer::~PicturePlayer()
 {
 }
-//------------------------------------------------------------------------------
-int16 TPicture::GetOp()
+
+
+int16
+PicturePlayer::GetOp()
 {
 	int16 data;
 
@@ -80,8 +58,10 @@ int16 TPicture::GetOp()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-bool TPicture::GetBool()
+
+
+bool
+PicturePlayer::GetBool()
 {
 	bool data;
 
@@ -89,8 +69,10 @@ bool TPicture::GetBool()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-int16 TPicture::GetInt16()
+
+
+int16
+PicturePlayer::GetInt16()
 {
 	int16 data;
 
@@ -98,8 +80,10 @@ int16 TPicture::GetInt16()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-int32 TPicture::GetInt32()
+
+
+int32
+PicturePlayer::GetInt32()
 {
 	int32 data;
 
@@ -107,8 +91,10 @@ int32 TPicture::GetInt32()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-float TPicture::GetFloat()
+
+
+float
+PicturePlayer::GetFloat()
 {
 	float data;
 
@@ -116,8 +102,10 @@ float TPicture::GetFloat()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-BPoint TPicture::GetCoord()
+
+
+BPoint
+PicturePlayer::GetCoord()
 {
 	BPoint data;
 
@@ -125,8 +113,10 @@ BPoint TPicture::GetCoord()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-BRect TPicture::GetRect()
+
+
+BRect
+PicturePlayer::GetRect()
 {
 	BRect data;
 
@@ -134,8 +124,10 @@ BRect TPicture::GetRect()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-rgb_color TPicture::GetColor()
+
+
+rgb_color
+PicturePlayer::GetColor()
 {
 	rgb_color data;
 
@@ -143,13 +135,17 @@ rgb_color TPicture::GetColor()
 	
 	return data;
 }
-//------------------------------------------------------------------------------
-void TPicture::GetData(void *data, int32 size)
+
+
+void
+PicturePlayer::GetData(void *data, int32 size)
 {
 	fData.Read(data, size);
 }
-//------------------------------------------------------------------------------
-status_t TPicture::Play(void **callBackTable, int32 tableEntries, void *userData)
+
+
+status_t
+PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 {
 	// TODO: we should probably check if the functions in the table are not 0
 	//       before calling them.
@@ -482,6 +478,3 @@ status_t TPicture::Play(void **callBackTable, int32 tableEntries, void *userData
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-
-
