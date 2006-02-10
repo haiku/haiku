@@ -429,7 +429,7 @@ status_t nv_acc_init_dma()
 			ACCW(PR_CTX0_7, 0x0300a054); /* NVclass $054, patchcfg ROP_AND, userclip enable,
 										  * context surface0 valid */
 		}
-		ACCW(PR_CTX1_7, 0x00000d01); /* format is A8RGB24, MSB mono */
+		ACCW(PR_CTX1_7, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
 		/* setup set '8' ... */
@@ -445,7 +445,7 @@ status_t nv_acc_init_dma()
 			ACCW(PR_CTX0_8, 0x0300a055); /* NVclass $055, patchcfg ROP_AND, userclip enable,
 										  * context surface0 valid */
 		}
-		ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
+		ACCW(PR_CTX1_8, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
 		/* setup set '9' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
@@ -481,89 +481,50 @@ status_t nv_acc_init_dma()
 									  * table is located in main system RAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
 
-//3D stuff:
-/*
-	rud's (temp.) notes:
-	(problem: 3D driver renders in 32bit whatever the frontbuffer space in DMA mode.)
-	- the colorspace dependant info under 'acc engine' also sets the outcome for the
-	  3D add-on. I don't know yet if the 3D render funcs render in the frontbuffer
-	  space and the back-to-front blit isn't set (stays in 32bit!) (likely),
-	  or if the 3D funcs render always in 32bit space and back-to-front blit color-
-	  space converts... I'll try to nail this down at some point.
-	- the colorspace dependant info under 'pramin' is needed to get the 3D related
-	  surface commands up and running. An alternate solution would probably be calling
-	  the surface command with the colorspace set.
-*/
+		/* set the 3D rendering functions colordepth via BPIXEL's 'depth 2' */
+		/* note:
+		 * setting a depth to 'invalid' (zero) makes the engine report
+		 * ready with drawing 'immediately'. */
+		//fixme: NV30A and above (probably) needs to be corrected...
 		switch(si->dm.space)
 		{
 		case B_CMAP8:
-			/* acc engine */
-			ACCW(FORMATS, 0x00001010);
 			if (si->ps.card_arch < NV30A)
-				/* set depth 0-5: $1 = Y8 */
-				ACCW(BPIXEL, 0x00111111);
+				/* set depth 2: $1 = Y8 */
+				ACCW(BPIXEL, 0x00000100);
 			else
 				/* set depth 0-1: $1 = Y8, $2 = X1R5G5B5_Z1R5G5B5 */
 				ACCW(BPIXEL, 0x00000021);
-			ACCW(STRD_FMT, 0x03020202);
-			/* PRAMIN */
-			if (si->ps.card_arch == NV04A)
-				ACCW(PR_CTX1_6, 0x00000302); /* format is X24Y8, LSB mono */
-			else
-				ACCW(PR_CTX1_6, 0x00000000); /* format is invalid */
-			ACCW(PR_CTX1_A, 0x00000302); /* format is X24Y8, LSB mono */
 			break;
 		case B_RGB15_LITTLE:
-			/* acc engine */
-			ACCW(FORMATS, 0x00002071);
 			if (si->ps.card_arch < NV30A)
-				/* set depth 0-5: $2 = X1R5G5B5_Z1R5G5B5, $6 = Y16 */
-				ACCW(BPIXEL, 0x00226222);
+				/* set depth 2: $4 = A1R5G5B5 */
+				ACCW(BPIXEL, 0x00000400);
 			else
 				/* set depth 0-1: $2 = X1R5G5B5_Z1R5G5B5, $4 = A1R5G5B5 */
 				ACCW(BPIXEL, 0x00000042);
-			ACCW(STRD_FMT, 0x09080808);
-			/* PRAMIN */
-			ACCW(PR_CTX1_6, 0x00000902); /* format is X17RGB15, LSB mono */
-			ACCW(PR_CTX1_A, 0x00000902); /* format is X17RGB15, LSB mono */
 			break;
 		case B_RGB16_LITTLE:
-			/* acc engine */
-			ACCW(FORMATS, 0x000050C2);
 			if (si->ps.card_arch < NV30A)
-				/* set depth 0-5: $5 = R5G6B5, $6 = Y16 */
-				ACCW(BPIXEL, 0x00556555);
+				/* set depth 2: $5 = R5G6B5 */
+				ACCW(BPIXEL, 0x00000500);
 			else
 				/* set depth 0-1: $5 = R5G6B5, $a = X1A7R8G8B8_O1A7R8G8B8 */
 				ACCW(BPIXEL, 0x000000a5);
-			if (si->ps.card_arch == NV04A)
-				ACCW(STRD_FMT, 0x0c0b0b0b);
-			else
-				ACCW(STRD_FMT, 0x000b0b0c);
-			/* PRAMIN */
-			ACCW(PR_CTX1_6, 0x00000c02); /* format is X16RGB16, LSB mono */
-			ACCW(PR_CTX1_A, 0x00000c02); /* format is X16RGB16, LSB mono */
 			break;
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE:
-			/* acc engine */
-			ACCW(FORMATS, 0x000070e5);
 			if (si->ps.card_arch < NV30A)
-				/* set depth 0-5: $7 = X8R8G8B8_Z8R8G8B8, $d = Y32 */
-				ACCW(BPIXEL, 0x0077d777);
+				/* set depth 2: $c = A8R8G8B8 */
+				ACCW(BPIXEL, 0x00000c00);
 			else
 				/* set depth 0-1: $7 = X8R8G8B8_Z8R8G8B8, $e = V8YB8U8YA8 */
 				ACCW(BPIXEL, 0x000000e7);
-			ACCW(STRD_FMT, 0x0e0d0d0d);
-			/* PRAMIN */
-			ACCW(PR_CTX1_6, 0x00000e02); /* format is X8RGB24, LSB mono */
-			ACCW(PR_CTX1_A, 0x00000e02); /* format is X8RGB24, LSB mono */
 			break;
 		default:
 			LOG(8,("ACC: init, invalid bit depth\n"));
 			return B_ERROR;
 		}
-//end 3D stuff.
 	}
 
 	if (si->ps.card_arch == NV04A)
