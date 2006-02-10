@@ -121,7 +121,7 @@ BBox::SetLabel(const char *string)
 		// leave 6 pixels of the frame, and have a gap of 4 pixels between
 		// the frame and the text on both sides
 		fLabelBox = new BRect(6.0f, 0, StringWidth(string) + 14.0f,
-			ceilf(fontHeight.ascent + fontHeight.descent));
+			ceilf(fontHeight.ascent));
 	}
 
 	if (Window())
@@ -194,15 +194,9 @@ BBox::Draw(BRect updateRect)
 
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-/*
-		SetHighColor(ViewColor());
 
-		FillRect(BRect(6.0f, 1.0f, 12.0f + StringWidth(fLabel),
-			(float)ceil(fh.ascent + fh.descent)), B_SOLID_LOW);
-*/
 		SetHighColor(0, 0, 0);
-		DrawString(fLabel, BPoint(10.0f,
-			ceilf(fontHeight.ascent - fontHeight.descent) + 1.0f));
+		DrawString(fLabel, BPoint(10.0f, ceilf(fontHeight.ascent)));
 	}
 
 	PopState();
@@ -457,21 +451,21 @@ BBox::_InitObject(BMessage *data)
 void
 BBox::_DrawPlain(BRect labelBox)
 {
-	BRect r = Bounds();
-	r.top += labelBox.Height() / 2.0f;
+	BRect rect = Bounds();
+	rect.top += labelBox.Height() / 2.0f;
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
 
 	BeginLineArray(4);
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.left, r.top), light);
-		AddLine(BPoint(r.left + 1.0f, r.top),
-				BPoint(r.right, r.top), light);
-		AddLine(BPoint(r.left + 1.0f, r.bottom),
-				BPoint(r.right, r.bottom), shadow);
-		AddLine(BPoint(r.right, r.bottom - 1.0f),
-				BPoint(r.right, r.top + 1.0f), shadow);
+		AddLine(BPoint(rect.left, rect.bottom),
+				BPoint(rect.left, rect.top), light);
+		AddLine(BPoint(rect.left + 1.0f, rect.top),
+				BPoint(rect.right, rect.top), light);
+		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
+				BPoint(rect.right, rect.bottom), shadow);
+		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
+				BPoint(rect.right, rect.top + 1.0f), shadow);
 	EndLineArray();
 }
 
@@ -479,32 +473,32 @@ BBox::_DrawPlain(BRect labelBox)
 void
 BBox::_DrawFancy(BRect labelBox)
 {
-	BRect r = Bounds();
-	r.top += labelBox.Height() / 2.0f;
+	BRect rect = Bounds();
+	rect.top += labelBox.Height() / 2.0f;
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
 
 	BeginLineArray(8);
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.left, r.top), shadow);
-		AddLine(BPoint(r.left + 1.0f, r.top),
-				BPoint(r.right, r.top), shadow);
-		AddLine(BPoint(r.left + 1.0f, r.bottom),
-				BPoint(r.right, r.bottom), light);
-		AddLine(BPoint(r.right, r.bottom - 1.0f),
-				BPoint(r.right, r.top + 1.0f), light);
+		AddLine(BPoint(rect.left, rect.bottom),
+				BPoint(rect.left, rect.top), shadow);
+		AddLine(BPoint(rect.left + 1.0f, rect.top),
+				BPoint(rect.right, rect.top), shadow);
+		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
+				BPoint(rect.right, rect.bottom), light);
+		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
+				BPoint(rect.right, rect.top + 1.0f), light);
 
-		r.InsetBy(1.0, 1.0);
+		rect.InsetBy(1.0, 1.0);
 
-		AddLine(BPoint(r.left, r.bottom),
-				BPoint(r.left, r.top), light);
-		AddLine(BPoint(r.left + 1.0f, r.top),
-				BPoint(r.right, r.top), light);
-		AddLine(BPoint(r.left + 1.0f, r.bottom),
-				BPoint(r.right, r.bottom), shadow);
-		AddLine(BPoint(r.right, r.bottom - 1.0f),
-				BPoint(r.right, r.top + 1.0f), shadow);
+		AddLine(BPoint(rect.left, rect.bottom),
+				BPoint(rect.left, rect.top), light);
+		AddLine(BPoint(rect.left + 1.0f, rect.top),
+				BPoint(rect.right, rect.top), light);
+		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
+				BPoint(rect.right, rect.bottom), shadow);
+		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
+				BPoint(rect.right, rect.top + 1.0f), shadow);
 	EndLineArray();
 }
 
