@@ -52,7 +52,7 @@ FileTypes::FileTypes()
 	fWindowCount(0)
 {
 	fFilePanel = new BFilePanel();
-	fTypesWindowFrame = BRect(80.0f, 80.0f, 540.0f, 440.0f);
+	fTypesWindowFrame = BRect(80.0f, 80.0f, 600.0f, 480.0f);
 		// TODO: read from settings
 }
 

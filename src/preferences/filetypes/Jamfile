@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src preferences filetypes ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SubDirSysHdrs $(SUBDIR) ;
@@ -7,6 +8,7 @@ SubDirSysHdrs $(SUBDIR) ;
 Preference FileTypes :
 	FileTypes.cpp
 	FileTypesWindow.cpp
+	MimeTypeListView.cpp
 	: be tracker
 	: FileTypes.rdef FileTypes.icons.rdef
 	;
