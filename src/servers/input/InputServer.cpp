@@ -1445,6 +1445,25 @@ InputServer::_SanitizeEvents(EventList& events)
 	   		}
 			case B_KEY_DOWN:
 			case B_UNMAPPED_KEY_DOWN:
+				// update or add modifiers
+				uint32 modifiers;
+				if (event->FindInt32("modifiers", (int32*)&modifiers) == B_OK)
+					fKeyInfo.modifiers = modifiers;
+				else
+					event->AddInt32("modifiers", fKeyInfo.modifiers);
+	
+				// update or add key states
+				const uint8 *data;
+				ssize_t size;
+				if (event->FindData("states", B_UINT8_TYPE,
+						(const void**)&data, &size) == B_OK) {
+					PRINT(("updated keyinfo\n"));
+					if (size == sizeof(fKeyInfo.key_states))
+						memcpy(fKeyInfo.key_states, data, size);
+				} else {
+					event->AddData("states", B_UINT8_TYPE, fKeyInfo.key_states,
+						sizeof(fKeyInfo.key_states));
+				}
 				if (fActiveMethod == NULL)
 					break;
 
@@ -1492,10 +1511,20 @@ InputServer::_MethodizeEvents(EventList& events)
 	for (int32 i = 0; i < count;) {
 		_FilterEvent(fActiveMethod, events, i, count);
 	}
+	
+	{
+		// move the method events into the event queue - they are not
+		// "methodized" either
+		BAutolock _(fEventQueueLock);
+		events.AddList(&fMethodQueue);
+		fMethodQueue.MakeEmpty();
+	}
+	
+	int32 newCount = events.CountItems();
 
 	if (!fInputMethodAware) {
 		// special handling for non-input-method-aware views
-		for (int32 i = 0; i < count; i++) {
+		for (int32 i = count; i < newCount; i++) {
 			BMessage* event = events.ItemAt(i);
 
 			if (event->what != B_INPUT_METHOD_EVENT)
@@ -1530,17 +1559,11 @@ InputServer::_MethodizeEvents(EventList& events)
 
 					events.AddList(&newEvents, i);
 					i += newEvents.CountItems() - 1;
-					count = events.CountItems();
+					newCount = events.CountItems();
 				}
 			}
 		}
 	}
-
-	// move the method events into the event queue - they are not
-	// "methodized" either
-	BAutolock _(fEventQueueLock);
-	events.AddList(&fMethodQueue);
-	fMethodQueue.MakeEmpty();
 
 	return events.CountItems() > 0;
 }
@@ -1678,7 +1701,6 @@ InputServer::_DispatchEvent(BMessage* event)
 					sizeof(fKeyInfo.key_states));
 			}
 
-			PRINT(("keyinfo %ld %ld\n", size, (ssize_t)sizeof(fKeyInfo.key_states)));
 			break;
 		}
 
