@@ -2229,6 +2229,60 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->EndOp();
 			break;
 		}
+
+		case AS_LAYER_INVERT_RECT:
+		{
+			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
+			picture->AddInt16((int16)B_OP_INVERT);
+			picture->EndOp();
+			
+			BRect rect;
+			link.Read<BRect>(&rect);
+			picture->BeginOp(B_PIC_FILL_RECT);
+			picture->AddRect(rect);
+			picture->EndOp();
+
+			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
+			picture->AddInt16((int16)B_OP_COPY);
+			picture->EndOp();
+
+			break;
+		}
+		case AS_LAYER_PUSH_STATE:
+		{
+			picture->BeginOp(B_PIC_PUSH_STATE);
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_POP_STATE:
+		{
+			picture->BeginOp(B_PIC_POP_STATE);
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_SET_DRAWING_MODE:
+		{
+			int8 drawingMode;
+			link.Read<int8>(&drawingMode);
+			
+			picture->BeginOp(B_PIC_SET_DRAWING_MODE);
+			picture->AddInt16((int16)drawingMode);
+			picture->EndOp();
+			break;
+		}
+
+		case AS_LAYER_SET_PEN_SIZE:
+		{
+			float penSize;
+			link.Read<float>(&penSize);
+			picture->BeginOp(B_PIC_SET_PEN_SIZE);
+			picture->AddFloat(penSize);
+			picture->EndOp();
+			break;
+		}
+
 		case AS_FILL_RECT:
 		case AS_STROKE_RECT:
 		{
@@ -2237,6 +2291,23 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			picture->BeginOp(code == AS_FILL_RECT ? B_PIC_FILL_RECT : B_PIC_STROKE_RECT);
 			picture->AddRect(rect);
+			picture->EndOp();
+			break;
+		}
+		
+		case AS_STROKE_ROUNDRECT:
+		case AS_FILL_ROUNDRECT:
+		{
+			BRect rect;
+			link.Read<BRect>(&rect);
+			
+			BPoint radii;
+			link.Read<float>(&radii.x);
+			link.Read<float>(&radii.y);
+			
+			picture->BeginOp(code == AS_FILL_ROUNDRECT ? B_PIC_FILL_ROUND_RECT : B_PIC_STROKE_ROUND_RECT);
+			picture->AddRect(rect);
+			picture->AddCoord(radii);
 			picture->EndOp();
 			break;
 		}
@@ -2261,6 +2332,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			int32 lineCount;
 			link.Read<int32>(&lineCount);
+			if (lineCount <= 0)
+				break;
+
 			for (int32 i = 0; i < lineCount; i++) {
 				float x1, y1, x2, y2;
 				link.Read<float>(&x1);
@@ -2280,6 +2354,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				picture->AddCoord(BPoint(x2, y2));
 				picture->EndOp();
 			}
+			
+			// reset the color to the previous one
+			picture->BeginOp(B_PIC_SET_FORE_COLOR);
+			picture->AddColor(fCurrentLayer->CurrentState()->HighColor().GetColor32());
+			picture->EndOp();
 			break;
 		}
 

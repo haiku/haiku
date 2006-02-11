@@ -53,103 +53,132 @@ fill_rect(ViewLayer *view, BRect rect)
 
 
 static void
-stroke_round_rect(void *user, BRect rect, BPoint radii)
+stroke_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 {
-	printf("StrokeRoundRect(BRect(%.2f, %.2f, %.2f, %.2f), BPoint(%.2f, %.2f))\n",
-		rect.left, rect.top, rect.right, rect.bottom, radii.x, radii.y);
+	view->ConvertToScreenForDrawing(&rect);	
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, view->CurrentState(), false);
 }
 
 
 static void
-fill_round_rect(void *user, BRect rect, BPoint radii)
+fill_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 {
-	printf("FillRoundRect(BRect(%.2f, %.2f, %.2f, %.2f), BPoint(%.2f, %.2f))\n",
-		rect.left, rect.top, rect.right, rect.bottom, radii.x, radii.y);
+	view->ConvertToScreenForDrawing(&rect);	
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, view->CurrentState(), true);
 }
 
 
 static void
-stroke_bezier(void *user, BPoint *control)
+stroke_bezier(ViewLayer *view, BPoint *points)
 {
-	printf("StrokeBezier\n");
 	for (int32 i = 0; i < 4; i++)
-		control[i].PrintToStream();
+		view->ConvertToScreenForDrawing(&points[i]);
+
+	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), false);
 }
 
 
 static void
-fill_bezier(void *user, BPoint *control)
+fill_bezier(ViewLayer *view, BPoint *points)
 {
-	printf("FillBezier\n");
 	for (int32 i = 0; i < 4; i++)
-		control[i].PrintToStream();
+		view->ConvertToScreenForDrawing(&points[i]);
+
+	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), true);
 }
 
 
 static void
-stroke_arc(void *user, BPoint center, BPoint radii, float startTheta,
+stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			   float arcTheta)
 {
-	printf("StrokeArc(BPoint(%.2f, %.2f), BPoint(%.2f, %.2f), %.2f, %.2f)\n",
-		center.x, center.y, radii.x, radii.y, startTheta, arcTheta);
+	/*view->ConvertToScreenForDrawing(&r);
+	view->Window()->GetDrawingEngine()->DrawArc(r, angle, span, view->CurrentState(), false);*/
 }
 
 
 static void
-fill_arc(void *user, BPoint center, BPoint radii, float startTheta,
+fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			 float arcTheta)
 {
-	printf("FillArc(BPoint(%.2f, %.2f), BPoint(%.2f, %.2f), %.2f, %.2f)\n",
-		center.x, center.y, radii.x, radii.y, startTheta, arcTheta);
+	/*view->ConvertToScreenForDrawing(&r);
+	view->Window()->GetDrawingEngine()->DrawArc(r, angle, span, view->CurrentState(), true);*/
 }
 
 
 static void
 stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	//view->StrokeEllipse(BRect(BPoint(center.x - radii.x, center.y - radii.y),
-	//	BPoint(center.x + radii.x, center.y + radii.y)));
-
-	printf("StrokeEllipse(BPoint(%.2f, %.2f), BPoint(%.2f, %.2f))\n",
-		center.x, center.y, radii.x, radii.y);
+	/*view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), false);*/
 }
 
 
 static void
 fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	//view->FillEllipse(BRect(BPoint(center.x - radii.x, center.y - radii.y),
-	//	BPoint(center.x + radii.x, center.y + radii.y)));
-
-	printf("FillEllipse(BPoint(%.2f, %.2f), BPoint(%.2f, %.2f))\n", center.x, center.y,
-		radii.x, radii.y);
+	/*view->ConvertToScreenForDrawing(&rect);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), true);*/
 }
 
 
 static void
-stroke_polygon(void *user, int32 numPoints, BPoint *points, bool isClosed)
+stroke_polygon(ViewLayer *view, int32 numPoints, BPoint *points, bool isClosed)
 {
-	printf("StrokePolygon %ld %s\n", numPoints, isClosed ? "closed" : "");
 	for (int32 i = 0; i < numPoints; i++)
-		points[i].PrintToStream();
+		view->ConvertToScreenForDrawing(&points[i]);
+
+	BRect polyFrame = BRect(points[0], points[0]);
+
+	for (int32 i = 1; i < numPoints; i++) {
+		if (points[i].x < polyFrame.left)
+			polyFrame.left = points[i].x;
+		if (points[i].y < polyFrame.top)
+			polyFrame.top = points[i].y;
+		if (points[i].x > polyFrame.right)
+			polyFrame.right = points[i].x;
+		if (points[i].y > polyFrame.bottom)
+			polyFrame.bottom = points[i].y;
+	}
+
+	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
+							false, isClosed && numPoints > 2);
 }
 
 
 static void
-fill_polygon(void *user, int32 numPoints, BPoint *points)
+fill_polygon(ViewLayer *view, int32 numPoints, BPoint *points)
 {
-	printf("FillPolygon %ld\n", numPoints);
 	for (int32 i = 0; i < numPoints; i++)
-		points[i].PrintToStream();
+		view->ConvertToScreenForDrawing(&points[i]);
+
+	BRect polyFrame = BRect(points[0], points[0]);
+
+	for (int32 i = 1; i < numPoints; i++) {
+		if (points[i].x < polyFrame.left)
+			polyFrame.left = points[i].x;
+		if (points[i].y < polyFrame.top)
+			polyFrame.top = points[i].y;
+		if (points[i].x > polyFrame.right)
+			polyFrame.right = points[i].x;
+		if (points[i].y > polyFrame.bottom)
+			polyFrame.bottom = points[i].y;
+	}
+
+	view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, view->CurrentState(),
+							true, true);
 }
 
 
 static void
 stroke_shape(ViewLayer *view, BShape *shape)
 {
-	//view->StrokeShape(shape);
+	//TODO: Oh-ho... how do I access BShape private members ?
+	/*for (int32 i = 0; i < ptCount; i++)
+		fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
 
-	printf("StrokeShape\n");
+	view->Window()->GetDrawingEngine()->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
+				fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);*/
 }
 
 
@@ -200,16 +229,18 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 
 
 static void
-set_clipping_rects(void *user, BRect *rects, uint32 numRects)
+set_clipping_rects(ViewLayer *view, BRect *rects, uint32 numRects)
 {
-	printf("SetClippingRects %ld\n", numRects);
-	for (uint32 i = 0; i < numRects; i++)
-		rects[i].PrintToStream();
+	// TODO: This is too slow, we should copy the rects directly to BRegion's internal data
+	BRegion region;
+	for (uint32 c = 0; c < numRects; c++)
+		region.Include(rects[c]);
+	view->SetUserClipping(region);	
 }
 
 
 static void
-clip_to_picture(void *user, BPicture *picture, BPoint pt,
+clip_to_picture(ViewLayer *view, BPicture *picture, BPoint pt,
 				   bool clip_to_inverse_picture)
 {
 	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n", pt.x, pt.y,
@@ -349,13 +380,9 @@ set_font_spacing(ViewLayer *view, int32 spacing)
 static void
 set_font_size(ViewLayer *view, float size)
 {
-	/*
-	BFont font;
-	view->GetFont(&font);
+	ServerFont font;
 	font.SetSize(size);
-	view->SetFont(&font, B_FONT_SIZE);
-	*/
-	printf("SetFontSize(%.2f)\n", size);
+	view->CurrentState()->SetFont(font, B_FONT_SIZE);
 }
 
 
@@ -451,6 +478,7 @@ const void *tableEntries[] = {
 };
 
 
+// ServerPicture
 ServerPicture::ServerPicture()
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
