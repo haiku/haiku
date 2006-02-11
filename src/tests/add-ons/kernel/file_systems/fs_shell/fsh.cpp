@@ -1557,6 +1557,7 @@ do_link(int argc, char **argv)
 {
 	bool force = false;
 	bool symbolic = false;
+	bool dereference = true;
 
 	// parse parameters
 	int argi = 1;
@@ -1578,6 +1579,9 @@ do_link(int argc, char **argv)
 				case 's':
 					symbolic = true;
 					break;
+				case 'n':
+					dereference = false;
+					break;
 				default:
 					fprintf(stderr, "Unknown option `-%c'\n", arg[i]);
 					return FS_EINVAL;
@@ -1596,7 +1600,7 @@ do_link(int argc, char **argv)
 	// check, if the the target is an existing directory
 	struct my_stat st;
 	char targetBuffer[B_PATH_NAME_LENGTH];
-	status_t error = sys_rstat(true, -1, target, &st, true);
+	status_t error = sys_rstat(true, -1, target, &st, dereference);
 	if (error == FS_OK) {
 		if (MY_S_ISDIR(st.mode)) {
 			// get source leaf
@@ -1623,10 +1627,10 @@ do_link(int argc, char **argv)
 	}
 
 	// check, if the target exists
-	error = sys_rstat(true, -1, target, &st, true);
+	error = sys_rstat(true, -1, target, &st, false);
 	if (error == FS_OK) {
 		if (!force) {
-			fprintf(stderr, "Can't create link. `%s' is in the way.", target);
+			fprintf(stderr, "Can't create link. `%s' is in the way.\n", target);
 			return FS_FILE_EXISTS;
 		}
 
