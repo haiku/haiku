@@ -310,7 +310,7 @@ actions AppendToHaikuImageCopyFilesScriptSingleFile
 
 actions AddSymlinkToHaikuImageCopyFilesScript
 {
-	echo \$ln -sf "\"$(SYMLINK_TARGET)\"" "\"\${tPrefix}$(1:G=)\"" >> $(2[1])
+	echo \$ln -sfn "\"$(SYMLINK_TARGET)\"" "\"\${tPrefix}$(1:G=)\"" >> $(2[1])
 }
 
 rule BuildHaikuImage
