@@ -93,7 +93,7 @@ struct vnode {
 
 struct fsystem {
     fsystem_id          fsid;
-    bool                fixed;
+    int                fixed;
     image_id            aid;
     char                name[IDENT_NAME_LENGTH];
     int                 rcnt;
@@ -168,19 +168,17 @@ static int          usdvnnum;
 
 
 
-int                 sys_rstat(bool kernel, int fd, const char *path,
-                              struct my_stat *st, bool eatlink);
 static fsystem *    inc_file_system(const char *name);
 static int          dec_file_system(fsystem *fs);
 static ioctx *		get_cur_ioctx(void);
 
-static int      get_dir_fd(bool kernel, int fd, const char *path, char *filename,
+static int      get_dir_fd(int kernel, int fd, const char *path, char *filename,
                     vnode **dvn);
-static int      get_file_fd(bool kernel, int fd, const char *path,
+static int      get_file_fd(int kernel, int fd, const char *path,
                     int eatsymlink, vnode **vn);
 static int      get_file_vn(nspace_id nsid, vnode_id vnid, const char *path,
                     int eatsymlink, vnode **vn);
-static int      parse_path_fd(bool kerne, int fd, char **pstart,
+static int      parse_path_fd(int kerne, int fd, char **pstart,
                     int eatsymlink, vnode **vn);
 static int      parse_path_vn(nspace_id nsid, vnode_id vnid, char **start,
                     int eatsymlink, vnode **vn);
@@ -201,19 +199,19 @@ static void     dec_vnode(vnode *vn, char r);
 static int      compare_vnode(vnode *vna, vnode *vnb);
 
 static nspace * nsidtons(nspace_id nsid);
-//static int      alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp);
+//static int      alloc_wd_fd(int kernel, vnode *vn, int coe, int *fdp);
 
 static int      is_root(vnode *root, vnode **mount);
 static int      is_mount_vnode(vnode *mount, vnode **root);
 static int      is_mount_vnid(nspace_id nsid, vnode_id vnid, vnode_id *mount);
 
-static ofile *      get_fd(bool kernel, int fd, int type);
+static ofile *      get_fd(int kernel, int fd, int type);
 static int          put_fd(ofile *f);
-static int          new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe);
-static int          remove_fd(bool kernel, int fd, int type);
-//static int          get_coe(bool kernel, int fd, int type, bool *coe);
-//static int          set_coe(bool kernel, int fd, int type, bool coe);
-//static int          get_omode(bool kernel, int fd, int type, int *omode);
+static int          new_fd(int kernel, int nfd, ofile *f, int fd, int coe);
+static int          remove_fd(int kernel, int fd, int type);
+//static int          get_coe(int kernel, int fd, int type, int *coe);
+//static int          set_coe(int kernel, int fd, int type, int coe);
+//static int          get_omode(int kernel, int fd, int type, int *omode);
 static int          invoke_close(ofile *f);
 static int          invoke_free(ofile *f);
 
@@ -640,7 +638,7 @@ get_cur_ioctx(void)
  */
 
 int
-sys_chdir(bool kernel, int fd, const char *path)
+sys_chdir(int kernel, int fd, const char *path)
 {
     int              err;
     ioctx           *io;
@@ -683,7 +681,7 @@ error1:
  */
 
 int
-sys_access(bool kernel, int fd, const char *path, int mode)
+sys_access(int kernel, int fd, const char *path, int mode)
 {
     int         err;
     vnode       *vn;
@@ -714,7 +712,7 @@ error1:
  */
 
 int
-sys_symlink(bool kernel, const char *oldpath, int nfd, const char *newpath)
+sys_symlink(int kernel, const char *oldpath, int nfd, const char *newpath)
 {
     int             err;
     char            filename[FILE_NAME_LENGTH];
@@ -755,7 +753,7 @@ error1:
  */
 
 ssize_t
-sys_readlink(bool kernel, int fd, const char *path, char *buf, size_t bufsize)
+sys_readlink(int kernel, int fd, const char *path, char *buf, size_t bufsize)
 {
     int             err;
     vnode           *vn;
@@ -789,7 +787,7 @@ error1:
  */
 
 int
-sys_mkdir(bool kernel, int fd, const char *path, int perms)
+sys_mkdir(int kernel, int fd, const char *path, int perms)
 {
     int             err;
     char            filename[FILE_NAME_LENGTH];
@@ -824,7 +822,7 @@ error1:
  */
 
 int
-sys_opendir(bool kernel, int fd, const char *path, bool coe)
+sys_opendir(int kernel, int fd, const char *path, int coe)
 {
     int             err;
     op_opendir      *op;
@@ -892,7 +890,7 @@ error1:
  */
 
 int
-sys_closedir(bool kernel, int fd)
+sys_closedir(int kernel, int fd)
 {
     return remove_fd(kernel, fd, FD_DIR | FD_ATTR_DIR);
 }
@@ -902,7 +900,7 @@ sys_closedir(bool kernel, int fd)
  */
 
 int
-sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
+sys_readdir(int kernel, int fd, struct my_dirent *buf, size_t bufsize,
         long count)
 {
     ofile            *f;
@@ -976,7 +974,7 @@ error1:
  */
 
 int
-sys_rewinddir(bool kernel, int fd)
+sys_rewinddir(int kernel, int fd)
 {
     ofile       *f;
     int         err;
@@ -1002,8 +1000,8 @@ sys_rewinddir(bool kernel, int fd)
  */
 
 int
-sys_open(bool kernel, int fd, const char *path, int omode, int perms,
-        bool coe)
+sys_open(int kernel, int fd, const char *path, int omode, int perms,
+        int coe)
 {
     int             err;
     char            filename[FILE_NAME_LENGTH];
@@ -1102,8 +1100,8 @@ errorA:
 
 
 int
-sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *name,
-	int openMode, bool coe)
+sys_open_entry_ref(int kernel, nspace_id device, vnode_id parent, const char *name,
+	int openMode, int coe)
 {
     int             err;
     vnode           *vn;
@@ -1171,7 +1169,7 @@ error1:
  */
 
 int
-sys_close(bool kernel, int fd)
+sys_close(int kernel, int fd)
 {
     return remove_fd(kernel, fd, FD_FILE);
 }
@@ -1182,7 +1180,7 @@ sys_close(bool kernel, int fd)
  */
 
 fs_off_t
-sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
+sys_lseek(int kernel, int fd, fs_off_t pos, int whence)
 {
     ofile           *f;
     int              err;
@@ -1258,7 +1256,7 @@ error1:
 
 
 ssize_t
-sys_read(bool kernel, int fd, void *buf, size_t len)
+sys_read(int kernel, int fd, void *buf, size_t len)
 {
     ofile       *f;
     int         err;
@@ -1305,7 +1303,7 @@ error1:
  */
 
 ssize_t
-sys_write(bool kernel, int fd, const void *buf, size_t len)
+sys_write(int kernel, int fd, const void *buf, size_t len)
 {
     ofile       *f;
     int         err;
@@ -1350,7 +1348,7 @@ error1:
  */
 
 int
-sys_ioctl(bool kernel, int fd, int cmd, void *arg, size_t sz)
+sys_ioctl(int kernel, int fd, int cmd, void *arg, size_t sz)
 {
     ofile       *f;
     int         err;
@@ -1386,7 +1384,7 @@ error1:
  */
 
 int
-sys_link(bool kernel, int ofd, const char *oldpath, int nfd,
+sys_link(int kernel, int ofd, const char *oldpath, int nfd,
     const char *newpath)
 {
     int             err;
@@ -1431,7 +1429,7 @@ error1:
  */
 
 int
-sys_unlink(bool kernel, int fd, const char *path)
+sys_unlink(int kernel, int fd, const char *path)
 {
     int             err;
     vnode           *dvn;
@@ -1466,7 +1464,7 @@ error1:
  */
 
 int
-sys_rmdir(bool kernel, int fd, const char *path)
+sys_rmdir(int kernel, int fd, const char *path)
 {
     int             err;
     vnode           *dvn;
@@ -1500,7 +1498,7 @@ error1:
  */
 
 int
-sys_rename(bool kernel, int ofd, const char *oldpath,
+sys_rename(int kernel, int ofd, const char *oldpath,
     int nfd, const char *newpath)
 {
     int             err;
@@ -1547,7 +1545,7 @@ error1:
  */
 
 int
-sys_rstat(bool kernel, int fd, const char *path, struct my_stat *st, bool eatlink)
+sys_rstat(int kernel, int fd, const char *path, struct my_stat *st, int eatlink)
 {
     int         err;
     vnode       *vn;
@@ -1581,8 +1579,8 @@ error1:
  */
 
 int
-sys_wstat(bool kernel, int fd, const char *path, struct my_stat *st, long mask,
-        bool eatlink)
+sys_wstat(int kernel, int fd, const char *path, struct my_stat *st, long mask,
+        int eatlink)
 {
     int         err;
     vnode       *vn;
@@ -1724,7 +1722,7 @@ add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino
 
 
 int
-sys_open_attr_dir(bool kernel, int fd, const char *path)
+sys_open_attr_dir(int kernel, int fd, const char *path)
 {
     int             err;
     op_open_attrdir *op;
@@ -1785,7 +1783,7 @@ error1:
 
 
 ssize_t
-sys_read_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos)
+sys_read_attr(int kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos)
 {
     ofile       *f;
     int         err;
@@ -1816,7 +1814,7 @@ error1:
 
 
 ssize_t
-sys_write_attr(bool kernel, int fd, const char *name,int type,
+sys_write_attr(int kernel, int fd, const char *name,int type,
 	const void *buffer, size_t len, off_t pos)
 {
     ofile       *f;
@@ -1847,7 +1845,7 @@ error1:
 
 
 ssize_t
-sys_remove_attr(bool kernel, int fd, const char *name)
+sys_remove_attr(int kernel, int fd, const char *name)
 {
     ofile       *f;
     int         err;
@@ -1876,7 +1874,7 @@ error1:
 
 
 int
-sys_stat_attr(bool kernel, int fd, const char *path, const char *name,
+sys_stat_attr(int kernel, int fd, const char *path, const char *name,
 	my_attr_info *info)
 {
     int         err;
@@ -1910,7 +1908,7 @@ error1:
  */
 
 void *
-sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
+sys_mount(int kernel, const char *filesystem, int fd, const char *where,
 	const char *device, ulong flags, void *parms, size_t len)
 {
     int                 err;
@@ -2020,7 +2018,7 @@ error1:
  */
 
 int
-sys_unmount(bool kernel, int fd, const char *where)
+sys_unmount(int kernel, int fd, const char *where)
 {
     int             err;
     nspace          *ns;
@@ -2087,7 +2085,7 @@ error1:
 
 
 int
-sys_mkindex(bool kernel, dev_t device, const char *index, int type, int flags)
+sys_mkindex(int kernel, dev_t device, const char *index, int type, int flags)
 {
 	int status = FS_EINVAL;
 	fsystem	*fs = NULL;
@@ -2117,7 +2115,7 @@ sys_mkindex(bool kernel, dev_t device, const char *index, int type, int flags)
 
 
 int
-sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie)
+sys_open_query(int kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie)
 {
 	int		err;
 	nspace	*ns;
@@ -2147,7 +2145,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 
 
 int
-sys_close_query(bool kernel, int fd, const char *path, void *cookie)
+sys_close_query(int kernel, int fd, const char *path, void *cookie)
 {
 	int		err;
 	nspace	*ns;
@@ -2178,7 +2176,7 @@ sys_close_query(bool kernel, int fd, const char *path, void *cookie)
 
 
 int
-sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct my_dirent *dent,size_t bufferSize,long count)
+sys_read_query(int kernel, int fd, const char *path, void *cookie,struct my_dirent *dent,size_t bufferSize,long count)
 {
 	int		err;
 	nspace	*ns;
@@ -2217,7 +2215,7 @@ sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct my_dir
  */
 
 static int
-get_dir_fd(bool kernel, int fd, const char *path, char *filename, vnode **dvn)
+get_dir_fd(int kernel, int fd, const char *path, char *filename, vnode **dvn)
 {
     int         err;
     char        *p, *np;
@@ -2247,7 +2245,7 @@ error1:
 }
 
 static int
-get_file_fd(bool kernel, int fd, const char *path, int eatsymlink, vnode **vn)
+get_file_fd(int kernel, int fd, const char *path, int eatsymlink, vnode **vn)
 {
     int         err;
     char        *p;
@@ -2290,7 +2288,7 @@ error1:
 }
 
 static int
-parse_path_fd(bool kernel, int fd, char **pstart, int eatsymlink, vnode **vnp)
+parse_path_fd(int kernel, int fd, char **pstart, int eatsymlink, vnode **vnp)
 {
     vnode           *bvn;
     ofile           *f;
@@ -3006,7 +3004,7 @@ is_root(vnode *root, vnode **mount)
  */
  
 static ofile *
-get_fd(bool kernel, int fd, int type)
+get_fd(int kernel, int fd, int type)
 {
     ofile       *f;
     fdarray     *fds;
@@ -3041,7 +3039,7 @@ put_fd(ofile *f)
 }
 
 static int
-new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe)
+new_fd(int kernel, int nfd, ofile *f, int fd, int coe)
 {
     int         i, j, num, end;
     fdarray     *fds;
@@ -3125,7 +3123,7 @@ error1:
 }
 
 static int
-remove_fd(bool kernel, int fd, int type)
+remove_fd(int kernel, int fd, int type)
 {
     ofile       *f;
     fdarray     *fds;
@@ -3162,7 +3160,7 @@ remove_fd(bool kernel, int fd, int type)
 
 #if 0
 static int
-get_coe(bool kernel, int fd, int type, bool *coe)
+get_coe(int kernel, int fd, int type, int *coe)
 {
     ofile       *f;
     fdarray     *fds;
@@ -3186,7 +3184,7 @@ get_coe(bool kernel, int fd, int type, bool *coe)
 }
 
 static int
-set_coe(bool kernel, int fd, int type, bool coe)
+set_coe(int kernel, int fd, int type, int coe)
 {
     ofile       *f;
     fdarray     *fds;
@@ -3210,7 +3208,7 @@ set_coe(bool kernel, int fd, int type, bool coe)
 }
 
 static int
-get_omode(bool kernel, int fd, int type, int *omode)
+get_omode(int kernel, int fd, int type, int *omode)
 {
     ofile       *f;
     fdarray     *fds;
@@ -3309,7 +3307,7 @@ nsidtons(nspace_id nsid)
 
 #if 0
 static int
-alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp)
+alloc_wd_fd(int kernel, vnode *vn, int coe, int *fdp)
 {
     int             err;
     ofile           *f;
@@ -3352,7 +3350,7 @@ error1:
  */
 
 void *
-install_file_system(vnode_ops *ops, const char *name, bool fixed, image_id aid)
+install_file_system(vnode_ops *ops, const char *name, int fixed, image_id aid)
 {
     fsystem     *fs;
     int         i;
