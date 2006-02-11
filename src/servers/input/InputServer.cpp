@@ -262,8 +262,8 @@ InputServer::_InitKeyboardMouseStates()
 	if (_LoadKeymap() != B_OK)
 		_LoadSystemKeymap();
 
-	BMessage *msg = new BMessage(B_MOUSE_MOVED);
-	HandleSetMousePosition(msg, msg);
+	BMessage msg(B_MOUSE_MOVED);
+	HandleSetMousePosition(&msg, &msg);
 
 	fActiveMethod = &gKeymapMethod;
 }
@@ -1244,8 +1244,8 @@ InputServer::DoMouseAcceleration(int32* _x, int32* _y)
 
 	// ToDo: implement mouse acceleration
 	(void)speed;
-	//*y = *x * speed;
-	PRINT(("DoMouse : %ld %ld %ld %ld\n", *x, *y, speed, fMouseSettings.MouseSpeed()));
+	//*_y = *_x * speed;
+	PRINT(("DoMouse : %ld %ld %ld %ld\n", *_x, *_y, speed, fMouseSettings.MouseSpeed()));
 	return true;
 }
 
@@ -1323,7 +1323,7 @@ InputServer::_EventLoop()
 		// Block until we find the size of the next message
 		ssize_t length = port_buffer_size(fEventLooperPort);
 		if (length < B_OK) {
-			PRINT("[Event Looper] port gone, exiting.\n");
+			PRINT(("[Event Looper] port gone, exiting.\n"));
 			return;
 		}
 
@@ -1431,7 +1431,7 @@ InputServer::_SanitizeEvents(EventList& events)
 					event->AddPoint("where", fMousePos);
 
 					PRINT(("new position: %f, %f, %ld, %ld\n",
-						fMousePos.x, fMousePos.y, xValue, yValue));
+						fMousePos.x, fMousePos.y, x, y));
 		   		} else if (event->FindPoint("where", &where) == B_OK) {
 		   			fMousePos = where;
 					fMousePos.ConstrainTo(fFrame);
