@@ -1,186 +1,224 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		OutlineListView.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	BOutlineListView represents a "nestable" list view.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-// Standard Includes -----------------------------------------------------------
+//! BOutlineListView represents a "nestable" list view.
 
-// System Includes -------------------------------------------------------------
 #include <OutlineListView.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
+/*!
+	\brief A simple recursive quick sort implementations for BListItem arrays.
 
-// Local Defines ---------------------------------------------------------------
+	We need to implement it ourselves, since the BOutlineListView sort methods
+	use a different comparison function than the standard functions.
+*/
+static void
+quick_sort_item_array(BListItem** items, int32 first, int32 last,
+	int (*compareFunc)(const BListItem* a, const BListItem* b))
+{
+	if (last - 1 <= first)
+		return;
 
-// Globals ---------------------------------------------------------------------
+	BListItem* pivot = items[first + (rand() % (last - first))];
+		// choose an arbitrary pivot element
 
-//------------------------------------------------------------------------------
-BOutlineListView::BOutlineListView(BRect frame, const char * name,
-								   list_view_type type, uint32 resizeMask,
-								   uint32 flags)
-	:	BListView(frame, name, type, resizeMask, flags)
+	int32 left = first;
+	int32 right = last;
+
+	do {
+		while (compareFunc(items[left], pivot) < 0) {
+			left++;
+		}
+		while (compareFunc(items[right], pivot) > 0) {
+			right--;
+		}
+
+		if (left <= right) {
+			// swap entries
+			BListItem* temp = items[left];
+			items[left] = items[right];
+			items[right] = temp;
+
+			left++;
+			right--;
+		}
+	} while (left <= right);
+	
+	// At this point, the elements in the left half are all smaller
+	// than the elements in the right half
+
+	if (first < right) {
+		// sort left half
+		quick_sort_item_array(items, first, right, compareFunc);
+	}
+	if (left < last) {
+		// sort right half
+		quick_sort_item_array(items, left, last, compareFunc);
+	}
+}
+
+
+//	#pragma mark -
+
+
+BOutlineListView::BOutlineListView(BRect frame, const char* name,
+		list_view_type type, uint32 resizeMode, uint32 flags)
+	: BListView(frame, name, type, resizeMode, flags)
 {
 }
-//------------------------------------------------------------------------------	
-BOutlineListView::BOutlineListView(BMessage *archive)
-	:	BListView(archive)
+
+
+BOutlineListView::BOutlineListView(BMessage* archive)
+	: BListView(archive)
 {
 }
-//------------------------------------------------------------------------------
+
+
 BOutlineListView::~BOutlineListView()
 {
-	fullList.MakeEmpty();
+	fFullList.MakeEmpty();
 }
-//------------------------------------------------------------------------------
-BArchivable *BOutlineListView::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BOutlineListView::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BOutlineListView"))
 		return new BOutlineListView(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BOutlineListView::Archive(BMessage *data, bool deep) const
+
+
+status_t
+BOutlineListView::Archive(BMessage* archive, bool deep) const
 {
-	return BListView::Archive(data, deep);
+	return BListView::Archive(archive, deep);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::MouseDown(BPoint point)
+
+
+void
+BOutlineListView::MouseDown(BPoint point)
 {
 	MakeFocus();
 
 	int32 index = IndexOf(point);
 
-	if (index != -1)
-	{
+	if (index != -1) {
 		BListItem *item = ItemAt(index);
 
-		if (item->fHasSubitems &&
-			LatchRect (ItemFrame(index ), item->fLevel).Contains(point))
-		{
+		if (item->fHasSubitems
+			&& LatchRect(ItemFrame(index), item->fLevel).Contains(point)) {
 			if (item->IsExpanded())
 				Collapse(item);
 			else
 				Expand(item);
-		}
-		else BListView::MouseDown(point);
+		} else
+			BListView::MouseDown(point);
 	}
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::KeyDown(const char *bytes, int32 numBytes)
-{
-	if (numBytes == 1)
-	{
-		switch (bytes[0])
-		{
-			case '+':
-			{
-				BListItem *item = ItemAt(CurrentSelection());
-				
-				if ( item && item->fHasSubitems)
-					Expand(item);
 
-				break;
-			}
-			case '-':
+
+void
+BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (numBytes == 1) {
+		switch (bytes[0]) {
+			case B_RIGHT_ARROW:
 			{
 				BListItem *item = ItemAt(CurrentSelection());
-				
+				if (item && item->fHasSubitems)
+					Expand(item);
+				return;
+			}
+
+			case B_LEFT_ARROW:
+			{
+				BListItem *item = ItemAt(CurrentSelection());
 				if (item && item->fHasSubitems)
 					Collapse(item);
-
-				break;
+				return;
 			}
-			default:
-				BListView::KeyDown(bytes, numBytes);
 		}
 	}
-	else
-		BListView::KeyDown(bytes, numBytes);
+
+	BListView::KeyDown(bytes, numBytes);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::FrameMoved(BPoint new_position)
+
+
+void
+BOutlineListView::FrameMoved(BPoint newPosition)
 {
-	BListView::FrameMoved(new_position);
+	BListView::FrameMoved(newPosition);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::FrameResized(float new_width, float new_height)
+
+
+void
+BOutlineListView::FrameResized(float newWidth, float newHeight)
 {
-	BListView::FrameResized(new_width, new_height);
+	BListView::FrameResized(newWidth, newHeight);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::MouseUp(BPoint where)
+
+
+void
+BOutlineListView::MouseUp(BPoint where)
 {
 	BListView::MouseUp(where);
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::AddUnder(BListItem *item, BListItem *superitem)
+
+
+bool
+BOutlineListView::AddUnder(BListItem* item, BListItem* superitem)
 {
-	fullList.AddItem(item, FullListIndexOf(superitem) + 1);
+	fFullList.AddItem(item, FullListIndexOf(superitem) + 1);
 
 	item->fLevel = superitem->OutlineLevel() + 1;
 	superitem->fHasSubitems = true;
 
-	if (superitem->IsItemVisible() && superitem->IsExpanded())
-	{
+	if (superitem->IsItemVisible() && superitem->IsExpanded()) {
 		item->SetItemVisible(true);
 
 		int32 index = BListView::IndexOf(superitem);
 
 		BListView::AddItem(item, index + 1);
 		Invalidate(LatchRect(ItemFrame(index), superitem->OutlineLevel()));
-	}
-	else
+	} else
 		item->SetItemVisible(false);
 
 	return true;
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::AddItem(BListItem *item)
-{
-	bool result = fullList.AddItem(item);
 
-	if (!result)
+
+bool
+BOutlineListView::AddItem(BListItem* item)
+{
+	if (!fFullList.AddItem(item))
 		return false;
 
 	return BListView::AddItem(item);
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::AddItem(BListItem *item, int32 fullListIndex)
+
+
+bool
+BOutlineListView::AddItem(BListItem* item, int32 fullListIndex)
 {
 	if (fullListIndex < 0)
 		fullListIndex = 0;
 	else if (fullListIndex > CountItems())
 		fullListIndex = CountItems();
 
-	fullList.AddItem(item, fullListIndex);
+	fFullList.AddItem(item, fullListIndex);
 
-	if (item->fLevel > 0)
-	{
+	if (item->fLevel > 0) {
 		BListItem *super = SuperitemForIndex(fullListIndex, item->fLevel);
 
 		if (!super->IsItemVisible() || !super->IsExpanded())
@@ -188,28 +226,34 @@ bool BOutlineListView::AddItem(BListItem *item, int32 fullListIndex)
 	}
 
 	int32 list_index = FindPreviousVisibleIndex(fullListIndex);
-		
+
 	return BListView::AddItem(item, IndexOf(FullListItemAt(list_index)) + 1);
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::AddList(BList *newItems)
+
+
+bool
+BOutlineListView::AddList(BList* newItems)
 {
 	printf("BOutlineListView::AddList Not implemented\n");
 	return false;
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::AddList(BList *newItems, int32 fullListIndex)
+
+
+bool
+BOutlineListView::AddList(BList* newItems, int32 fullListIndex)
 {
 	printf("BOutlineListView::AddList Not implemented\n");
 	return false;
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::RemoveItem(BListItem *item)
+
+
+bool
+BOutlineListView::RemoveItem(BListItem* item)
 {
 	if (!FullListHasItem(item))
 		return false;
 
-	fullList.RemoveItem(item);
+	fFullList.RemoveItem(item);
 	if (item->fVisible)
 		BListView::RemoveItem(item);
 
@@ -217,15 +261,16 @@ bool BOutlineListView::RemoveItem(BListItem *item)
 
 	return true;
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::RemoveItem(int32 fullListIndex)
-{
-	BListItem *item = FullListItemAt(fullListIndex);
 
+
+BListItem*
+BOutlineListView::RemoveItem(int32 fullListIndex)
+{
+	BListItem* item = FullListItemAt(fullListIndex);
 	if (item == NULL)
 		return NULL;
 
-	fullList.RemoveItem(fullListIndex);
+	fFullList.RemoveItem(fullListIndex);
 	if (item->fVisible)
 		BListView::RemoveItem(item);
 
@@ -233,159 +278,185 @@ BListItem *BOutlineListView::RemoveItem(int32 fullListIndex)
 
 	return item;
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::RemoveItems(int32 fullListIndex, int32 count)
+
+
+bool
+BOutlineListView::RemoveItems(int32 fullListIndex, int32 count)
 {
 	printf("BOutlineListView::RemoveItems Not implemented\n");
 
 	return false;
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::FullListItemAt(int32 fullListIndex) const
+
+
+BListItem *
+BOutlineListView::FullListItemAt(int32 fullListIndex) const
 {
-	return (BListItem*)fullList.ItemAt(fullListIndex);
+	return (BListItem*)fFullList.ItemAt(fullListIndex);
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FullListIndexOf(BPoint point) const
+
+
+int32
+BOutlineListView::FullListIndexOf(BPoint point) const
 {
 	return BListView::IndexOf(point);
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FullListIndexOf(BListItem *item) const
+
+
+int32
+BOutlineListView::FullListIndexOf(BListItem* item) const
 {
-	return fullList.IndexOf(item);
+	return fFullList.IndexOf(item);
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::FullListFirstItem() const
+
+
+BListItem *
+BOutlineListView::FullListFirstItem() const
 {
-	return (BListItem*)fullList.FirstItem();
+	return (BListItem*)fFullList.FirstItem();
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::FullListLastItem() const
+
+
+BListItem *
+BOutlineListView::FullListLastItem() const
 {
-	return (BListItem*)fullList.LastItem();
+	return (BListItem*)fFullList.LastItem();
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::FullListHasItem(BListItem *item) const
+
+
+bool
+BOutlineListView::FullListHasItem(BListItem *item) const
 {
-	return fullList.HasItem(item);
+	return fFullList.HasItem(item);
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FullListCountItems() const
+
+
+int32
+BOutlineListView::FullListCountItems() const
 {
-	return fullList.CountItems();
+	return fFullList.CountItems();
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FullListCurrentSelection(int32 index) const
+
+
+int32
+BOutlineListView::FullListCurrentSelection(int32 index) const
 {
 	int32 i = BListView::CurrentSelection(index);
-	BListItem *item = BListView::ItemAt(i);
 
+	BListItem *item = BListView::ItemAt(i);
 	if (item)
-		return fullList.IndexOf(item);
-	else
-		return -1;
+		return fFullList.IndexOf(item);
+
+	return -1;
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::MakeEmpty()
+
+
+void
+BOutlineListView::MakeEmpty()
 {
-	fullList.MakeEmpty();
+	fFullList.MakeEmpty();
 	BListView::MakeEmpty();
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::FullListIsEmpty() const
+
+
+bool
+BOutlineListView::FullListIsEmpty() const
 {
-	return fullList.IsEmpty();
+	return fFullList.IsEmpty();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::FullListDoForEach(bool(*func)(BListItem *))
+
+
+void
+BOutlineListView::FullListDoForEach(bool(*func)(BListItem* item))
 {
-	printf("BOutlineListView::fullListDoForEach Not implemented\n");
-	//fullList.DoForEach(func);
+	fFullList.DoForEach(reinterpret_cast<bool (*)(void*)>(func));
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::FullListDoForEach(bool (*func)(BListItem *, void *),
-										 void *data)
+
+
+void
+BOutlineListView::FullListDoForEach(bool (*func)(BListItem* item, void* arg),
+	void* arg)
 {
-	printf("BOutlineListView::fullListDoForEach Not implemented\n");
-	//fullList.DoForEach(func, data);
+	fList.DoForEach(reinterpret_cast<bool (*)(void*, void*)>(func), arg);
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::Superitem(const BListItem *item)
+
+
+BListItem *
+BOutlineListView::Superitem(const BListItem* item)
 {
 	int32 index = FullListIndexOf((BListItem*)item);
-
 	if (index == -1)
 		return NULL;
-	else
-		return SuperitemForIndex(index, item->OutlineLevel());
-}
-//------------------------------------------------------------------------------
-void BOutlineListView::Expand(BListItem *item)
-{
-	if (!FullListHasItem(item))
-		return;
 
-	if (item->fExpanded)
+	return SuperitemForIndex(index, item->OutlineLevel());
+}
+
+
+void
+BOutlineListView::Expand(BListItem* item)
+{
+	if (item->IsExpanded() || !FullListHasItem(item))
 		return;
 
 	item->fExpanded = true;
 
-	uint32 level = item->fLevel, full_index = FullListIndexOf(item),
-		index = IndexOf(item) + 1, count = FullListCountItems() - full_index - 1;
-	BListItem **items = (BListItem**)fullList.Items() + full_index + 1;
+	uint32 level = item->fLevel;
+	uint32 fullIndex = FullListIndexOf(item);
+	uint32 index = IndexOf(item) + 1;
+	uint32 count = FullListCountItems() - fullIndex - 1;
+	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
 	BFont font;
 	GetFont(&font);
 
-	while (count-- > 0 && (*items)->fLevel > level)
-	{
-		if (!(*items)->IsItemVisible())
-		{
-			//BListView::AddItem((*items), index++);
-			fList.AddItem((*items), index++);
-			(*items)->Update(this,&font);
-			(*items)->SetItemVisible(true);
+	while (count-- > 0) {
+		item = items[0];
+		if (item->fLevel <= level)
+			break;
+
+		if (!item->IsItemVisible()) {
+			fList.AddItem(item, index++);
+			item->Update(this, &font);
+			item->SetItemVisible(true);
 		}
 
-		// Skip hidden children
-		if ((*items)->HasSubitems() && !(*items)->IsExpanded())
-		{
-			uint32 level = (*items)->fLevel;
+		if (item->HasSubitems() && !item->IsExpanded()) {
+			// Skip hidden children
+			uint32 subLevel = item->fLevel;
 			items++;
-			
-			while (--count > 0 && (*items)->fLevel > level)
+
+			while (--count > 0 && items[0]->fLevel > subLevel)
 				items++;
-		}
-		else
+		} else
 			items++;
 	}
 
 	_FixupScrollBar();
 	Invalidate();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::Collapse(BListItem *item)
-{
-	if (!FullListHasItem(item))
-		return;
 
-	if (!item->fExpanded)
+
+void
+BOutlineListView::Collapse(BListItem* item)
+{
+	if (!item->IsExpanded() || !FullListHasItem(item))
 		return;
 
 	item->fExpanded = false;
 
-	uint32 level = item->fLevel, full_index = FullListIndexOf(item),
-		count = FullListCountItems() - full_index - 1;
-	BListItem **items = (BListItem**)fullList.Items() + full_index + 1;
+	uint32 level = item->fLevel;
+	uint32 fullIndex = FullListIndexOf(item);
+	uint32 count = FullListCountItems() - fullIndex - 1;
+	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
-	while (count-- > 0 && (*items)->fLevel > level)
-	{
-		if ((*items)->IsItemVisible())
-		{
-			//BListView::RemoveItem ((*items));
-			fList.RemoveItem((*items));
-			(*items)->SetItemVisible(false);
+	while (count-- > 0) {
+		item = items[0];
+		if (item->fLevel <= level)
+			break;
+
+		if (item->IsItemVisible()) {
+			fList.RemoveItem(item);
+			item->SetItemVisible(false);
 		}
 
 		items++;
@@ -394,239 +465,353 @@ void BOutlineListView::Collapse(BListItem *item)
 	_FixupScrollBar();
 	Invalidate();
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::IsExpanded(int32 fullListIndex)
+
+
+bool
+BOutlineListView::IsExpanded(int32 fullListIndex)
 {
 	BListItem *item = FullListItemAt(fullListIndex);
-	
 	if (!item)
 		return false;
 
 	return item->IsExpanded();
 }
-//------------------------------------------------------------------------------
-BHandler *BOutlineListView::ResolveSpecifier(BMessage *msg, int32 index,
-											 BMessage *specifier, int32 form,
-											 const char *property)
+
+
+BHandler *
+BOutlineListView::ResolveSpecifier(BMessage* msg, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
-	return BListView::ResolveSpecifier(msg, index, specifier, form, property);
+	return BListView::ResolveSpecifier(msg, index, specifier, what, property);
 }
-//------------------------------------------------------------------------------
-status_t BOutlineListView::GetSupportedSuites(BMessage *data)
+
+
+status_t
+BOutlineListView::GetSupportedSuites(BMessage* data)
 {
 	return BListView::GetSupportedSuites(data);
 }
-//------------------------------------------------------------------------------
-status_t BOutlineListView::Perform(perform_code d, void *arg)
+
+
+status_t
+BOutlineListView::Perform(perform_code d, void* arg)
 {
 	return BListView::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::ResizeToPreferred()
+
+
+void
+BOutlineListView::ResizeToPreferred()
 {
 	BListView::ResizeToPreferred();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::GetPreferredSize(float *width, float *height)
+
+
+void
+BOutlineListView::GetPreferredSize(float* _width, float* _height)
 {
-	BListView::GetPreferredSize(width, height);
+	BListView::GetPreferredSize(_width, _height);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::MakeFocus(bool state)
+
+
+void
+BOutlineListView::MakeFocus(bool state)
 {
 	BListView::MakeFocus(state);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::AllAttached()
+
+
+void
+BOutlineListView::AllAttached()
 {
 	BListView::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::AllDetached()
+
+
+void
+BOutlineListView::AllDetached()
 {
 	BListView::AllDetached();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::DetachedFromWindow()
+
+
+void
+BOutlineListView::DetachedFromWindow()
 {
 	BListView::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::FullListSortItems(int (*compareFunc)(const BListItem *,
-										 const BListItem *))
+
+
+void
+BOutlineListView::FullListSortItems(int (*compareFunc)(const BListItem* a,
+	const BListItem* b))
 {
-	//fullList.SortItems(compareFunc);
-	printf("BOutlineListView::FullListSortItems not implemented\n");
+	SortItemsUnder(NULL, false, compareFunc);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::SortItemsUnder(BListItem *underItem, bool oneLevelOnly,
-		int (*compareFunc)(const BListItem *, const BListItem*))
+
+
+void
+BOutlineListView::SortItemsUnder(BListItem* underItem, bool oneLevelOnly,
+	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
-	printf("BOutlineListView::SortItemsUnder not implemented\n");
+	// This method is quite complicated: basically, it creates a real tree
+	// from the items of the full list, sorts them as needed, and then
+	// populates the entries back into the full and display lists
+
+	int32 firstIndex = FullListIndexOf(underItem) + 1;
+	int32 lastIndex = firstIndex;
+	BList* tree = _BuildTree(underItem, lastIndex);
+
+	_SortTree(tree, oneLevelOnly, compareFunc);
+
+	// Populate to the full list
+	_PopulateTree(tree, fFullList, firstIndex, false);
+
+	// Populate to BListView's list
+	firstIndex = fList.IndexOf(underItem) + 1;
+	_PopulateTree(tree, fList, firstIndex, true);
+
+	_DestructTree(tree);
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::CountItemsUnder(BListItem *underItem,
-									  bool oneLevelOnly) const
+
+
+void
+BOutlineListView::_PopulateTree(BList* tree, BList& target,
+	int32& firstIndex, bool onlyVisible)
+{
+	BListItem** items = (BListItem**)target.Items();
+	int32 count = tree->CountItems();
+
+	for (int32 index = 0; index < count; index++) {
+		BListItem* item = (BListItem*)tree->ItemAtFast(index);
+
+		items[firstIndex++] = item;
+
+		if (item->HasSubitems() && (!onlyVisible || item->IsExpanded()))
+			_PopulateTree(item->fTemporaryList, target, firstIndex, onlyVisible);
+	}
+}
+
+
+void
+BOutlineListView::_SortTree(BList* tree, bool oneLevelOnly,
+	int (*compareFunc)(const BListItem* a, const BListItem* b))
+{
+	// home-brewn quick sort for our compareFunc
+	quick_sort_item_array((BListItem**)tree->Items(), 0, tree->CountItems() - 1,
+		compareFunc);
+
+	if (oneLevelOnly)
+		return;
+
+	for (int32 index = tree->CountItems(); index-- > 0;) {
+		BListItem* item = (BListItem*)tree->ItemAt(index);
+
+		if (item->HasSubitems())
+			_SortTree(item->fTemporaryList, false, compareFunc);
+	}
+}
+
+
+void
+BOutlineListView::_DestructTree(BList* tree)
+{
+	for (int32 index = tree->CountItems(); index-- > 0;) {
+		BListItem* item = (BListItem*)tree->ItemAt(index);
+
+		if (item->HasSubitems())
+			_DestructTree(item->fTemporaryList);
+	}
+
+	delete tree;
+}
+
+
+BList*
+BOutlineListView::_BuildTree(BListItem* underItem, int32& fullIndex)
+{
+	int32 fullCount = FullListCountItems();
+	uint32 level = underItem != NULL ? underItem->OutlineLevel() + 1 : 0;
+	BList* list = new BList;
+	if (underItem != NULL)
+		underItem->fTemporaryList = list;
+
+	while (fullIndex < fullCount) {
+		BListItem *item = FullListItemAt(fullIndex);
+
+		// If we jump out of the subtree, break out
+		if (item->fLevel < level)
+			break;
+
+		if (item->fLevel == level) {
+			// If the level matches, put them into the list
+			list->AddItem(item);
+		}
+
+		fullIndex++;
+
+		if (item->HasSubitems()) {
+			// we're going deeper
+			_BuildTree(item, fullIndex);
+		}
+	}
+
+	return list;
+}
+
+
+int32
+BOutlineListView::CountItemsUnder(BListItem* underItem,
+	bool oneLevelOnly) const
 {
 	int32 i = IndexOf(underItem);
-
 	if (i == -1)
 		return 0;
 
 	int32 count = 0;
 
-	if (oneLevelOnly)
-	{
-		while (i < FullListCountItems())
-		{
-			BListItem *item = FullListItemAt(i);
+	while (i < FullListCountItems()) {
+		BListItem *item = FullListItemAt(i);
 
-			// If we jump out of the subtree, return count
-			if (item->fLevel < underItem->OutlineLevel())
-				return count;
+		// If we jump out of the subtree, return count
+		if (item->fLevel < underItem->OutlineLevel())
+			return count;
 
-			// If the level matches, increase count
-			if (item->fLevel == underItem->OutlineLevel() + 1)
-				count++;
-
-			i++;
-		}
-	}
-	else
-	{
-		while (i < FullListCountItems())
-		{
-			BListItem *item = FullListItemAt(i);
-
-			// If we jump out of the subtree, return count
-			if (item->fLevel < underItem->OutlineLevel())
-				return count;
-
-			// Increase count
+		// If the level matches, increase count
+		if (!oneLevelOnly || item->fLevel == underItem->OutlineLevel() + 1)
 			count++;
 
-			i++;
-		}
+		i++;
 	}
 
 	return count;
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::EachItemUnder(BListItem *underItem,
-										   bool oneLevelOnly,
-										   BListItem *(*eachFunc)(BListItem *,
-										   void *), void *)
-{
-	printf("BOutlineListView::EachItemUnder Not implemented\n");
 
-	return NULL;
-}
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::ItemUnderAt(BListItem *underItem,
-										 bool oneLevelOnly, int32 index) const
+
+BListItem *
+BOutlineListView::EachItemUnder(BListItem *underItem, bool oneLevelOnly,
+	BListItem *(*eachFunc)(BListItem* item, void* arg), void* arg)
 {
 	int32 i = IndexOf(underItem);
-
 	if (i == -1)
 		return NULL;
 
-	if (oneLevelOnly)
-	{
-		while (i < FullListCountItems())
-		{
-			BListItem *item = FullListItemAt(i);
+	while (i < FullListCountItems()) {
+		BListItem *item = FullListItemAt(i);
 
-			// If we jump out of the subtree, return NULL
-			if (item->fLevel < underItem->OutlineLevel())
-				return NULL;
+		// If we jump out of the subtree, return NULL
+		if (item->fLevel < underItem->OutlineLevel())
+			return NULL;
 
-			// If the level matches, check the index
-			if (item->fLevel == underItem->OutlineLevel() + 1)
-			{
-				if (index == 0)
-					return item;
-				else
-					index--;
-			}
-
-			i++;
-		}
-	}
-	else
-	{
-		while (i < FullListCountItems())
-		{
-			BListItem *item = FullListItemAt(i);
-
-			// If we jump out of the subtree, return NULL
-			if (item->fLevel < underItem->OutlineLevel())
-				return NULL;
-
-			// Check the index
-			if (index == 0)
+		// If the level matches, check the index
+		if (!oneLevelOnly || item->fLevel == underItem->OutlineLevel() + 1) {
+			item = eachFunc(item, arg);
+			if (item != NULL)
 				return item;
-			else
-				index--;
-
-			i++;
 		}
+
+		i++;
 	}
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::DoMiscellaneous(MiscCode code, MiscData * data)
+
+
+BListItem *
+BOutlineListView::ItemUnderAt(BListItem* underItem,
+	bool oneLevelOnly, int32 index) const
+{
+	int32 i = IndexOf(underItem);
+	if (i == -1)
+		return NULL;
+
+	while (i < FullListCountItems()) {
+		BListItem *item = FullListItemAt(i);
+
+		// If we jump out of the subtree, return NULL
+		if (item->fLevel < underItem->OutlineLevel())
+			return NULL;
+
+		// If the level matches, check the index
+		if (!oneLevelOnly || item->fLevel == underItem->OutlineLevel() + 1) {
+			if (index == 0)
+				return item;
+
+			index--;
+		}
+
+		i++;
+	}
+
+	return NULL;
+}
+
+
+bool
+BOutlineListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
 	return BListView::DoMiscellaneous(code, data);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::MessageReceived(BMessage *msg)
+
+
+void
+BOutlineListView::MessageReceived(BMessage* msg)
 {
 	BListView::MessageReceived(msg);
 }
-//------------------------------------------------------------------------------
+
+
 void BOutlineListView::_ReservedOutlineListView1() {}
 void BOutlineListView::_ReservedOutlineListView2() {}
 void BOutlineListView::_ReservedOutlineListView3() {}
 void BOutlineListView::_ReservedOutlineListView4() {}
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FullListIndex(int32 index) const
+
+
+int32
+BOutlineListView::FullListIndex(int32 index) const
 {
 	BListItem *item = ItemAt(index);
 
 	if (item == NULL)
 		return -1;
-	else
-		return FullListIndexOf(item);
+
+	return FullListIndexOf(item);
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::ListViewIndex(int32 index) const
+
+
+int32
+BOutlineListView::ListViewIndex(int32 index) const
 {
 	BListItem *item = ItemAt(index);
 
 	if (item == NULL)
 		return -1;
-	else
-		return BListView::IndexOf(item);
+
+	return BListView::IndexOf(item);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::ExpandOrCollapse(BListItem *underItem, bool expand)
+
+
+void
+BOutlineListView::ExpandOrCollapse(BListItem *underItem, bool expand)
 {
 }
-//------------------------------------------------------------------------------
-BRect BOutlineListView::LatchRect(BRect itemRect, int32 level) const
+
+
+BRect
+BOutlineListView::LatchRect(BRect itemRect, int32 level) const
 {
-	return BRect(itemRect.left, itemRect.top, itemRect.left +
-		(level * 10.0f + 15.0f), itemRect.bottom);
+	return BRect(itemRect.left, itemRect.top, itemRect.left
+		+ (level * 10.0f + 15.0f), itemRect.bottom);
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
-								 bool highlighted, bool misTracked)
+
+
+void
+BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
+	bool highlighted, bool misTracked)
 {
 	float left = level * 10.0f;
 
-	if (collapsed)
-	{
+	if (collapsed) {
 		SetHighColor(192, 192, 192);
 
 		FillTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 2.0f),
@@ -638,11 +823,9 @@ void BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 		StrokeTriangle(itemRect.LeftTop() + BPoint(left + 4.0f, 2.0f),
 			itemRect.LeftTop() + BPoint(left + 4.0f, 10.0f),
 			itemRect.LeftTop() + BPoint(left + 8.0f, 6.0f));
-	}
-	else
-	{
+	} else {
 		SetHighColor(192, 192, 192);
-			
+
 		FillTriangle(itemRect.LeftTop() + BPoint(left + 2.0f, 4.0f),
 			itemRect.LeftTop() + BPoint(left + 10.0f, 4.0f),
 			itemRect.LeftTop() + BPoint(left + 6.0f, 8.0f));
@@ -654,61 +837,79 @@ void BOutlineListView::DrawLatch(BRect itemRect, int32 level, bool collapsed,
 			itemRect.LeftTop() + BPoint(left + 6.0f, 8.0f));
 	}
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::DrawItem(BListItem *item, BRect itemRect, bool complete)
+
+
+void
+BOutlineListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 {
 	if (item->fHasSubitems)
 		DrawLatch(itemRect, item->fLevel, !item->IsExpanded(), false, false);
 
 	itemRect.left += (item->fLevel) * 10.0f + 15.0f;
-
 	item->DrawItem(this, itemRect, complete);
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::RemoveCommon(int32 fullListIndex)
+
+
+BListItem *
+BOutlineListView::RemoveCommon(int32 fullListIndex)
 {
 	return NULL;
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::RemoveOne(int32 fullListIndex)
+
+
+BListItem *
+BOutlineListView::RemoveOne(int32 fullListIndex)
 {
 	return NULL;
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::TrackInLatchItem(void *)
+
+
+void
+BOutlineListView::TrackInLatchItem(void *)
 {
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::TrackOutLatchItem(void *)
+
+
+void
+BOutlineListView::TrackOutLatchItem(void *)
 {
 }
-//------------------------------------------------------------------------------
-bool BOutlineListView::OutlineSwapItems(int32 a, int32 b)
-{
-	return false;
-}
-//------------------------------------------------------------------------------
-bool BOutlineListView::OutlineMoveItem(int32 from, int32 to)
-{
-	return false;
-}
-//------------------------------------------------------------------------------
-bool BOutlineListView::OutlineReplaceItem(int32 index, BListItem *item)
+
+
+bool
+BOutlineListView::OutlineSwapItems(int32 a, int32 b)
 {
 	return false;
 }
-//------------------------------------------------------------------------------
-void BOutlineListView::CommonMoveItems(int32 from, int32 count, int32 to)
+
+
+bool
+BOutlineListView::OutlineMoveItem(int32 from, int32 to)
+{
+	return false;
+}
+
+
+bool
+BOutlineListView::OutlineReplaceItem(int32 index, BListItem *item)
+{
+	return false;
+}
+
+
+void
+BOutlineListView::CommonMoveItems(int32 from, int32 count, int32 to)
 {
 }
-//------------------------------------------------------------------------------
-BListItem *BOutlineListView::SuperitemForIndex(int32 fullListIndex, int32 level)
+
+
+BListItem *
+BOutlineListView::SuperitemForIndex(int32 fullListIndex, int32 level)
 {
 	BListItem *item;
 	fullListIndex--;
 
-	while (fullListIndex >= 0)
-	{
+	while (fullListIndex >= 0) {
 		if ((item = FullListItemAt(fullListIndex))->OutlineLevel() <
 			(uint32)level)
 			return item;
@@ -718,13 +919,14 @@ BListItem *BOutlineListView::SuperitemForIndex(int32 fullListIndex, int32 level)
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-int32 BOutlineListView::FindPreviousVisibleIndex(int32 fullListIndex)
+
+
+int32
+BOutlineListView::FindPreviousVisibleIndex(int32 fullListIndex)
 {
 	fullListIndex--;
 
-	while (fullListIndex >= 0)
-	{
+	while (fullListIndex >= 0) {
 		if (FullListItemAt(fullListIndex)->fVisible)
 			return fullListIndex;
 
@@ -733,11 +935,4 @@ int32 BOutlineListView::FindPreviousVisibleIndex(int32 fullListIndex)
 
 	return -1;
 }
-//------------------------------------------------------------------------------
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */

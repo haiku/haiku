@@ -1,17 +1,11 @@
-/*******************************************************************************
-/
-/	File:			ListItem.h
-/
-/   Description:    BListView represents a one-dimensional list view. 
-/
-/	Copyright 1996-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
-
+/*
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _LIST_ITEM_H
 #define _LIST_ITEM_H
 
-#include <BeBuild.h>
+
 #include <Archivable.h>
 #include <Rect.h>
 
@@ -20,68 +14,64 @@ class BMessage;
 class BOutlineListView;
 class BView;
 
-/*----------------------------------------------------------------*/
-/*----- BListItem class ------------------------------------------*/
 
 class BListItem : public BArchivable {
-public:
-					BListItem(uint32 outlineLevel = 0, bool expanded = true);
-					BListItem(BMessage *data);
-virtual				~BListItem();
-virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+	public:
+							BListItem(uint32 outlineLevel = 0, bool expanded = true);
+							BListItem(BMessage* archive);
+		virtual				~BListItem();
 
-		float		Height() const;
-		float		Width() const;
-		bool		IsSelected() const;
-		void		Select();
-		void		Deselect();
+		virtual	status_t	Archive(BMessage* archive, bool deep = true) const;
 
-virtual	void		SetEnabled(bool on);
-		bool		IsEnabled() const;
+		float				Height() const;
+		float				Width() const;
+		bool				IsSelected() const;
+		void				Select();
+		void				Deselect();
 
-		void		SetHeight(float height);
-		void		SetWidth(float width);
-virtual	void		DrawItem(BView *owner,
-							BRect bounds,
-							bool complete = false) = 0;
-virtual	void		Update(BView *owner, const BFont *font);
+		virtual	void		SetEnabled(bool enabled);
+		bool				IsEnabled() const;
 
-virtual status_t	Perform(perform_code d, void *arg);
+		void				SetHeight(float height);
+		void				SetWidth(float width);
+		virtual	void		DrawItem(BView* owner, BRect frame,
+								bool complete = false) = 0;
+		virtual	void		Update(BView* owner, const BFont* font);
 
-		bool 		IsExpanded() const;
-		void 		SetExpanded(bool expanded);
-		uint32 		OutlineLevel() const;
+		virtual status_t	Perform(perform_code code, void* arg);
 
-/*----- Private or reserved -----------------------------------------*/
-private:
-friend class BOutlineListView;
+		bool				IsExpanded() const;
+		void				SetExpanded(bool expanded);
+		uint32				OutlineLevel() const;
 
-		bool 		HasSubitems() const;
+	private:
+		friend class BOutlineListView;
 
-virtual	void		_ReservedListItem1();
-virtual	void		_ReservedListItem2();
+		bool				HasSubitems() const;
 
-					BListItem(const BListItem &);
-		BListItem	&operator=(const BListItem &);
+		virtual	void		_ReservedListItem1();
+		virtual	void		_ReservedListItem2();
 
-		/* calls used by BOutlineListView*/
-		bool 		IsItemVisible() const;
-		void 		SetItemVisible(bool);
+							BListItem(const BListItem& item);
+		BListItem&			operator=(const BListItem& item);
 
-		uint32		_reserved[2];
-		float		fWidth;
-		float		fHeight;
-		uint32 		fLevel;
-		bool		fSelected;
-		bool		fEnabled;
-		bool 		fExpanded;
-		bool 		fHasSubitems : 1;
-		bool 		fVisible : 1;
+		bool				IsItemVisible() const;
+		void				SetItemVisible(bool visible);
+
+	private:
+		uint32				_reserved[1];
+		BList*				fTemporaryList;
+		float				fWidth;
+		float				fHeight;
+		uint32				fLevel;
+		bool				fSelected;
+		bool				fEnabled;
+		bool				fExpanded;
+		bool				fHasSubitems : 1;
+		bool				fVisible : 1;
 };
 
+#include <StringItem.h>
+	// to maintain source compatibility
 
-/*-------------------------------------------------------------*/
-
-#include <StringItem.h> /* to maintain compatibility */
-
-#endif /* _LIST_ITEM_H */
+#endif	// _LIST_ITEM_H
