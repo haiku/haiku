@@ -5,6 +5,7 @@
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
+#include <ServerBitmap.h>
 #include <ServerProtocol.h>
 #include <TPicture.h>
 
@@ -178,18 +179,23 @@ static void
 draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 				 int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
-	/*BBitmap *bitmap = new (nothrow) BBitmap(BRect(0, 0, width - 1, height - 1),
-				flags | B_BITMAP_NO_SERVER_LINK, (color_space)pixelFormat);
+	// TODO: Review this
+	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1), (color_space)pixelFormat, flags, bytesPerRow);
 	
-	if (bitmap == NULL || bitmap->ImportBits(data, bytesPerRow * height,
-			bitmap->BytesPerRow(), 0, (color_space)pixelFormat) < B_OK)
+	if (!bitmap.IsValid())
 		return;
+	
+	uint8 *pixels = (uint8 *)data;
+	uint8 *destPixels = (uint8 *)bitmap.Bits();
+	for (int32 h = 0; h < height; h++) {
+		memcpy(destPixels, pixels, bytesPerRow);
+		pixels += bytesPerRow;
+		destPixels += bytesPerRow;
+	}
 
 	view->ConvertToScreenForDrawing(&dest);
 	
-	view->Window()->GetDrawingEngine()->DrawBitmap(bitmap, src, dest, view->CurrentState());
-
-	delete bitmap;*/
+	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, view->CurrentState());
 }
 
 
