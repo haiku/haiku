@@ -46,6 +46,7 @@ const uint32 kMsgSelectPreferredApp = 'slpa';
 const uint32 kMsgSamePreferredAppAs = 'spaa';
 
 const uint32 kMsgTypeEntered = 'type';
+const uint32 kMsgDescriptionEntered = 'dsce';
 
 
 const struct type_map {
@@ -72,6 +73,7 @@ class IconView : public BControl {
 		void SetTo(BMimeType* type);
 
 		virtual void Draw(BRect updateRect);
+		virtual void GetPreferredSize(float* _width, float* _height);
 
 #if 0
 		virtual void MouseDown(BPoint where);
@@ -80,7 +82,14 @@ class IconView : public BControl {
 #endif
 
 	private:
+		enum {
+			kNoIcon = 0,
+			kOwnIcon,
+			kApplicationIcon,
+			kSupertypeIcon
+		};
 		BBitmap*	fIcon;
+		int32		fIconSource;
 };
 
 class AttributeListView : public BListView {
@@ -163,7 +172,8 @@ name_for_type(BString& string, type_code type)
 IconView::IconView(BRect frame, const char* name, BMessage* message)
 	: BControl(frame, name, NULL, message,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
-	fIcon(NULL)
+	fIcon(NULL),
+	fIconSource(kNoIcon)
 {
 }
 
@@ -177,22 +187,45 @@ IconView::~IconView()
 void
 IconView::SetTo(BMimeType* type)
 {
-	bool hadIcon = fIcon != NULL;
+	int32 sourceWas = fIconSource;
+	fIconSource = kNoIcon;
 
 	if (type != NULL) {
 		if (fIcon == NULL)
 			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
 
-		if (type->GetIcon(fIcon, B_LARGE_ICON) == B_OK) {
-			Invalidate();
-			return;
+		if (type->GetIcon(fIcon, B_LARGE_ICON) == B_OK)
+			fIconSource = kOwnIcon;
+
+		if (fIconSource == kNoIcon) {
+			// check for icon from preferred app
+
+			char preferred[B_MIME_TYPE_LENGTH];
+			if (type->GetPreferredApp(preferred) == B_OK) {
+				BMimeType preferredApp(preferred);
+	
+				if (preferredApp.GetIconForType(type->Type(), fIcon, B_LARGE_ICON) == B_OK)
+					fIconSource = kApplicationIcon;
+			}
+		}
+
+		if (fIconSource == kNoIcon) {
+			// check super type for an icon
+
+			BMimeType superType;
+			if (type->GetSupertype(&superType) == B_OK) {
+				if (superType.GetIcon(fIcon, B_LARGE_ICON) == B_OK)
+					fIconSource = kSupertypeIcon;
+			}
 		}
 	}
 
-	delete fIcon;
-	fIcon = NULL;
+	if (fIconSource == kNoIcon) {
+		delete fIcon;
+		fIcon = NULL;
+	}
 
-	if (hadIcon)
+	if (sourceWas != fIconSource)
 		Invalidate();
 }
 
@@ -200,41 +233,71 @@ IconView::SetTo(BMimeType* type)
 void
 IconView::Draw(BRect updateRect)
 {
+	SetHighColor(ViewColor());
+	FillRect(updateRect);
+
+	if (!IsEnabled())
+		return;
+
 	if (fIcon != NULL) {
 		SetDrawingMode(B_OP_ALPHA);
-		DrawBitmap(fIcon, BPoint(0, 0));
-	} else if (IsEnabled()) {
-		BRect rect = Bounds();
+		DrawBitmap(fIcon,
+			BPoint((Bounds().Width() - fIcon->Bounds().Width()) / 2.0f, 0.0f));
+	}
 
-		rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
-		rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
+	const char* text = NULL;
 
-		BeginLineArray(8);
+	switch (fIconSource) {
+		case kNoIcon:
+			text = "no icon";
+			break;
+		case kApplicationIcon:
+			text = "(from application)";
+			break;
+		case kSupertypeIcon:
+			text = "(from super type)";
+			break;
 
-		AddLine(BPoint(rect.left, rect.bottom),
-				BPoint(rect.left, rect.top), shadow);
-		AddLine(BPoint(rect.left + 1.0f, rect.top),
-				BPoint(rect.right, rect.top), shadow);
-		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-				BPoint(rect.right, rect.bottom), light);
-		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
-				BPoint(rect.right, rect.top + 1.0f), light);
+		default:
+			return;
+	}
 
-		rect.InsetBy(1.0, 1.0);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+	SetLowColor(ViewColor());
 
-		AddLine(BPoint(rect.left, rect.bottom),
-				BPoint(rect.left, rect.top), light);
-		AddLine(BPoint(rect.left + 1.0f, rect.top),
-				BPoint(rect.right, rect.top), light);
-		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-				BPoint(rect.right, rect.bottom), shadow);
-		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
-				BPoint(rect.right, rect.top + 1.0f), shadow);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
-		EndLineArray();
-	} else {
-		SetHighColor(ViewColor());
-		FillRect(updateRect);
+	float y = fontHeight.ascent;
+	if (fIconSource == kNoIcon) {
+		// center text in the middle of the icon
+		y += (B_LARGE_ICON - fontHeight.ascent - fontHeight.descent) / 2.0f;
+	} else
+		y += B_LARGE_ICON + 3.0f;
+
+	DrawString(text, BPoint((Bounds().Width() - StringWidth(text)) / 2.0f,
+		y));
+}
+
+
+void
+IconView::GetPreferredSize(float* _width, float* _height)
+{
+	if (_width) {
+		float a = StringWidth("(from application)");
+		float b = StringWidth("(from super type)");
+		float width = max_c(a, b);
+		if (width < B_LARGE_ICON)
+			width = B_LARGE_ICON;
+
+		*_width = ceilf(width);
+	}
+
+	if (_height) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		*_height = B_LARGE_ICON + 3.0f + ceilf(fontHeight.ascent + fontHeight.descent);
 	}
 }
 
@@ -463,20 +526,27 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 
+	BRect innerRect;
+	fIconView = new IconView(innerRect, "icon box", NULL);
+	fIconView->ResizeToPreferred();
+
 	rect.left = rect.right + 12.0f + B_V_SCROLL_BAR_WIDTH;
-	rect.right = rect.left + max_c(B_LARGE_ICON, labelWidth) + 32.0f;
+	rect.right = rect.left + max_c(fIconView->Bounds().Width(), labelWidth) + 16.0f;
 	rect.bottom = rect.top + ceilf(fontHeight.ascent)
-		+ max_c(B_LARGE_ICON, button->Bounds().Height() * 2.0f + 4.0f) + 12.0f;
+		+ max_c(fIconView->Bounds().Height(),
+			button->Bounds().Height() * 2.0f + 4.0f) + 12.0f;
 	rect.top -= 2.0f;
 	BBox* box = new BBox(rect);
 	box->SetLabel("Icon");
 	topView->AddChild(box);
 
-	BRect innerRect = BRect(0.0f, 0.0f, B_LARGE_ICON - 1.0f, B_LARGE_ICON - 1.0f);
-	innerRect.OffsetTo((rect.Width() - innerRect.Width()) / 2.0f,
-		fontHeight.ascent / 2.0f
-		+ (rect.Height() - fontHeight.ascent / 2.0f - innerRect.Height()) / 2.0f);
-	fIconView = new IconView(innerRect, "icon box", NULL);
+	innerRect.left = 8.0f;
+	innerRect.top = fontHeight.ascent / 2.0f
+		+ (rect.Height() - fontHeight.ascent / 2.0f - fIconView->Bounds().Height()) / 2.0f
+		+ 3.0f + fontHeight.ascent;
+	if (innerRect.top + fIconView->Bounds().Height() > box->Bounds().Height() - 6.0f)
+		innerRect.top = box->Bounds().Height() - 6.0f - fIconView->Bounds().Height();
+	fIconView->MoveTo(innerRect.LeftTop());
 	box->AddChild(fIconView);
 
 	// "File Extensions" group
@@ -518,7 +588,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	// "Description" group
 
 	rect.top = rect.bottom + 8.0f;
-	rect.bottom = rect.top + ceilf(fontHeight.ascent) + 19.0f;
+	rect.bottom = rect.top + ceilf(fontHeight.ascent) + 24.0f;
 	rect.right = rightRect.right;
 	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
 	box->SetLabel("Description");
@@ -533,7 +603,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fInternalNameControl->SetDivider(labelWidth);
 	fInternalNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fInternalNameControl->SetEnabled(false);
-	box->ResizeBy(0, fInternalNameControl->Bounds().Height() * 2.0f);
+	box->ResizeBy(0, fInternalNameControl->Bounds().Height() * 3.0f);
 	box->AddChild(fInternalNameControl);
 
 	innerRect.OffsetBy(0, fInternalNameControl->Bounds().Height() + 5.0f);
@@ -542,6 +612,13 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fTypeNameControl->SetDivider(labelWidth);
 	fTypeNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	box->AddChild(fTypeNameControl);
+
+	innerRect.OffsetBy(0, fInternalNameControl->Bounds().Height() + 5.0f);
+	fDescriptionControl = new BTextControl(innerRect, "description", "Description:", "",
+		new BMessage(kMsgDescriptionEntered), B_FOLLOW_LEFT_RIGHT);
+	fDescriptionControl->SetDivider(labelWidth);
+	fDescriptionControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	box->AddChild(fDescriptionControl);
 
 	// "Preferred Application" group
 
@@ -628,11 +705,13 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 		+ menuBar->Bounds().Height(), 32767.0f);
 
 	_SetType(NULL);
+	BMimeType::StartWatching(this);
 }
 
 
 FileTypesWindow::~FileTypesWindow()
 {
+	BMimeType::StopWatching(this);
 }
 
 
@@ -802,25 +881,32 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 
 
 void
-FileTypesWindow::_SetType(BMimeType* type)
+FileTypesWindow::_SetType(BMimeType* type, bool forceUpdate)
 {
 	bool enabled = type != NULL;
 
 	if (type != NULL) {
-		if (fCurrentType == *type)
+		if (fCurrentType == *type && !forceUpdate)
 			return;
 
-		fCurrentType.SetTo(type->Type());
+		if (&fCurrentType != type)
+			fCurrentType.SetTo(type->Type());
+
 		fInternalNameControl->SetText(type->Type());
 
 		char description[B_MIME_TYPE_LENGTH];
 		if (type->GetShortDescription(description) != B_OK)
 			description[0] = '\0';
 		fTypeNameControl->SetText(description);
+
+		if (type->GetLongDescription(description) != B_OK)
+			description[0] = '\0';
+		fDescriptionControl->SetText(description);
 	} else {
 		fCurrentType.Unset();
 		fInternalNameControl->SetText(NULL);
 		fTypeNameControl->SetText(NULL);
+		fDescriptionControl->SetText(NULL);
 	}
 
 	_UpdateExtensions(type);
@@ -831,6 +917,7 @@ FileTypesWindow::_SetType(BMimeType* type)
 	fIconView->SetEnabled(enabled);
 
 	fTypeNameControl->SetEnabled(enabled);
+	fDescriptionControl->SetEnabled(enabled);
 	fPreferredField->SetEnabled(enabled);
 
 	fRemoveTypeButton->SetEnabled(enabled);
@@ -934,6 +1021,17 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		case kMsgRemoveAttribute:
 			puts("remove attr");
 			break;
+
+		case B_META_MIME_CHANGED:
+		{
+			const char* type;
+			if (message->FindString("be:type", &type) != B_OK)
+				break;
+
+			if (!strcasecmp(fCurrentType.Type(), type))
+				_SetType(&fCurrentType, true);
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);

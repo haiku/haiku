@@ -33,7 +33,7 @@ class FileTypesWindow : public BWindow {
 		void _UpdateExtensions(BMimeType* type);
 		void _AddSignature(BMenuItem* item, const char* signature);
 		void _UpdatePreferredApps(BMimeType* type);
-		void _SetType(BMimeType* type);
+		void _SetType(BMimeType* type, bool forceUpdate = false);
 
 	private:
 		BMimeType		fCurrentType;
@@ -49,6 +49,7 @@ class FileTypesWindow : public BWindow {
 
 		BTextControl*	fInternalNameControl;
 		BTextControl*	fTypeNameControl;
+		BTextControl*	fDescriptionControl;
 
 		BMenuField*		fPreferredField;
 		BButton*		fSelectButton;
