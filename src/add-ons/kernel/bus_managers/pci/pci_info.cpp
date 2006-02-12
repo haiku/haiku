@@ -606,7 +606,7 @@ get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api)
 				case 0x00:
 					return "DPIO modules (data acquisition and signal processing controller)";
 				case 0x80:
-					return " Other data acquisition and signal processing controller";
+					return "Other data acquisition and signal processing controller";
 				default:
 					return "Unknown data acquisition and signal processing controller";
 			}
