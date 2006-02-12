@@ -1,29 +1,9 @@
-/*****************************************************************************/
-// Keyboard input server device addon
-// Written by Jérôme Duval
-//
-// KeyboardInputDevice.cpp
-//
-// Copyright (c) 2004 Haiku Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2004-2006, Jérôme Duval. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ * Keyboard input server device addon
+ */
+
 #include "KeyboardInputDevice.h"
 #include "kb_mouse_driver.h"
 #include <Directory.h>
@@ -437,8 +417,10 @@ KeyboardInputDevice::Start(const char *name, void *cookie)
 	CALLED();
 	keyboard_device *device = (keyboard_device *)cookie;
 
-	if ((device->fd = open(device->path, O_RDWR)) < B_OK)
+	if ((device->fd = open(device->path, O_RDWR)) < B_OK) {
+		fprintf(stderr, "error when opening %s: %s\n", device->path, strerror(device->fd));
 		return B_ERROR;
+	}
 	
 	InitFromSettings(device);
 
@@ -464,6 +446,7 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 	LOG("Stop(%s)\n", name);
 
 	close(device->fd);
+	device->fd = -1;
 	
 	device->active = false;
 	if (device->device_watcher >= 0) {
@@ -546,14 +529,8 @@ KeyboardInputDevice::AddDevice(const char *path)
 	keyboard_device *device = new keyboard_device();
 	if (!device)
 		return B_NO_MEMORY;
-		
-	if ((device->fd = open(path, O_RDWR)) < B_OK) {
-		fprintf(stderr, "error when opening %s\n", path);
-		delete device;
-		return B_ERROR;
-	}
-	close(device->fd);
-		
+	
+	device->fd = -1;
 	device->device_watcher = -1;
 	device->active = false;
 	strcpy(device->path, path);
@@ -584,8 +561,6 @@ KeyboardInputDevice::RemoveDevice(const char *path)
 	while ((device = (keyboard_device *)fDevices.ItemAt(i)) != NULL) {
 		if (!strcmp(device->path, path)) {
 			free(device->device_ref.name);
-			if (device->fd >= 0)
-				close(device->fd);
 			fDevices.RemoveItem(device);
 			delete device;
 			return B_OK;
