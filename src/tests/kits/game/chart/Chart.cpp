@@ -29,7 +29,7 @@ main()
 
 ChartApp::ChartApp() : BApplication("application/x-vnd.Be.ChartDemo")
 {
-	fWindow = new ChartWindow(BRect(120, 150, 629, 589), "Charts");
+	fWindow = new ChartWindow(BRect(120, 150, 629, 591), "Charts");
 	
 	// showing the window will also start the direct connection. If you
 	// Sync() after the show, the direct connection will be established
