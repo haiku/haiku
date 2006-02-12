@@ -324,7 +324,7 @@ BTextControl::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 
-	_UpdateTextViewColors();
+	_UpdateTextViewColors(IsEnabled());
 	fText->MakeEditable(IsEnabled());
 }
 
@@ -342,21 +342,21 @@ BTextControl::MakeFocus(bool state)
 
 
 void
-BTextControl::SetEnabled(bool state)
+BTextControl::SetEnabled(bool enabled)
 {
-	if (IsEnabled() == state)
+	if (IsEnabled() == enabled)
 		return;
 
 	if (Window()) {
-		fText->MakeEditable(state);
+		fText->MakeEditable(enabled);
 
-		_UpdateTextViewColors();
+		_UpdateTextViewColors(enabled);
 
 		fText->Invalidate();
 		Window()->UpdateIfNeeded();
 	}
 
-	BControl::SetEnabled(state);
+	BControl::SetEnabled(enabled);
 }
 
 
@@ -578,9 +578,8 @@ BTextControl::operator=(const BTextControl&)
 
 
 void
-BTextControl::_UpdateTextViewColors()
+BTextControl::_UpdateTextViewColors(bool enabled)
 {
-	bool enabled = IsEnabled();
 	rgb_color textColor;
 	rgb_color color = {0, 0, 0, 255};
 	BFont font;

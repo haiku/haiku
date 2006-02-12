@@ -81,7 +81,7 @@ class BTextControl : public BControl {
 		BTextControl&		operator=(const BTextControl& other);
 
 		void				_CommitValue();
-		void				_UpdateTextViewColors();
+		void				_UpdateTextViewColors(bool enabled);
 		void				_InitData(const char* label, const char* initialText,
 								BMessage* archive = NULL);
 
