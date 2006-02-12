@@ -881,13 +881,25 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 
 
 void
-FileTypesWindow::_SetType(BMimeType* type, bool forceUpdate)
+FileTypesWindow::_UpdateIcon(BMimeType* type)
+{
+	fIconView->SetTo(type);
+}
+
+
+void
+FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 {
 	bool enabled = type != NULL;
 
+	// update controls
+
 	if (type != NULL) {
-		if (fCurrentType == *type && !forceUpdate)
-			return;
+		if (fCurrentType == *type) {
+			if (!forceUpdate)
+				return;
+		} else
+			forceUpdate = B_EVERYTHING_CHANGED;
 
 		if (&fCurrentType != type)
 			fCurrentType.SetTo(type->Type());
@@ -895,13 +907,18 @@ FileTypesWindow::_SetType(BMimeType* type, bool forceUpdate)
 		fInternalNameControl->SetText(type->Type());
 
 		char description[B_MIME_TYPE_LENGTH];
-		if (type->GetShortDescription(description) != B_OK)
-			description[0] = '\0';
-		fTypeNameControl->SetText(description);
 
-		if (type->GetLongDescription(description) != B_OK)
-			description[0] = '\0';
-		fDescriptionControl->SetText(description);
+		if ((forceUpdate & B_SHORT_DESCRIPTION_CHANGED) != 0) {
+			if (type->GetShortDescription(description) != B_OK)
+				description[0] = '\0';
+			fTypeNameControl->SetText(description);
+		}
+
+		if ((forceUpdate & B_LONG_DESCRIPTION_CHANGED) != 0) {
+			if (type->GetLongDescription(description) != B_OK)
+				description[0] = '\0';
+			fDescriptionControl->SetText(description);
+		}
 	} else {
 		fCurrentType.Unset();
 		fInternalNameControl->SetText(NULL);
@@ -909,10 +926,19 @@ FileTypesWindow::_SetType(BMimeType* type, bool forceUpdate)
 		fDescriptionControl->SetText(NULL);
 	}
 
-	_UpdateExtensions(type);
-	_UpdatePreferredApps(type);
-	fIconView->SetTo(type);
-	fAttributeListView->SetTo(type);
+	if ((forceUpdate & B_FILE_EXTENSIONS_CHANGED) != 0)
+		_UpdateExtensions(type);
+
+	if ((forceUpdate & B_PREFERRED_APP_CHANGED) != 0)
+		_UpdatePreferredApps(type);
+
+	if ((forceUpdate & (B_ICON_CHANGED | B_PREFERRED_APP_CHANGED)) != 0)
+		_UpdateIcon(type);
+
+	if ((forceUpdate & B_ATTR_INFO_CHANGED) != 0)
+		fAttributeListView->SetTo(type);
+
+	// enable/disable controls
 
 	fIconView->SetEnabled(enabled);
 
@@ -980,11 +1006,6 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		case kMsgTypeEntered:
 		{
 			fCurrentType.SetShortDescription(fTypeNameControl->Text());
-
-			MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(
-				fTypeListView->ItemAt(fTypeListView->CurrentSelection()));
-			if (item != NULL)
-				fTypeListView->UpdateItem(item);
 			break;
 		}
 
@@ -1030,11 +1051,23 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				|| message->FindInt32("be:which", &which) != B_OK)
 				break;
 
-			if (fCurrentType.Type() != NULL && !strcasecmp(fCurrentType.Type(), type)) {
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			if (!strcasecmp(fCurrentType.Type(), type)) {
 				if (which != B_MIME_TYPE_DELETED)
-					_SetType(&fCurrentType, true);
+					_SetType(&fCurrentType, which);
 				else
 					_SetType(NULL);
+			} else {
+				// this change could still affect our current type
+				
+				if (which == B_MIME_TYPE_DELETED
+					|| which == B_PREFERRED_APP_CHANGED
+					|| which == B_ICON_FOR_TYPE_CHANGED) {
+					_UpdatePreferredApps(&fCurrentType);
+					_UpdateIcon(&fCurrentType);
+				}
 			}
 			break;
 		}

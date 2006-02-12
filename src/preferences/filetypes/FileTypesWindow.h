@@ -33,7 +33,8 @@ class FileTypesWindow : public BWindow {
 		void _UpdateExtensions(BMimeType* type);
 		void _AddSignature(BMenuItem* item, const char* signature);
 		void _UpdatePreferredApps(BMimeType* type);
-		void _SetType(BMimeType* type, bool forceUpdate = false);
+		void _UpdateIcon(BMimeType* type);
+		void _SetType(BMimeType* type, int32 forceUpdate = 0);
 
 	private:
 		BMimeType		fCurrentType;
