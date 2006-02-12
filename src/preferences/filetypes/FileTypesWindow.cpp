@@ -191,8 +191,10 @@ IconView::SetTo(BMimeType* type)
 	fIconSource = kNoIcon;
 
 	if (type != NULL) {
-		if (fIcon == NULL)
-			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
+		if (fIcon == NULL) {
+			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
+				B_CMAP8);
+		}
 
 		if (type->GetIcon(fIcon, B_LARGE_ICON) == B_OK)
 			fIconSource = kOwnIcon;
@@ -204,7 +206,8 @@ IconView::SetTo(BMimeType* type)
 			if (type->GetPreferredApp(preferred) == B_OK) {
 				BMimeType preferredApp(preferred);
 	
-				if (preferredApp.GetIconForType(type->Type(), fIcon, B_LARGE_ICON) == B_OK)
+				if (preferredApp.GetIconForType(type->Type(), fIcon,
+						B_LARGE_ICON) == B_OK)
 					fIconSource = kApplicationIcon;
 			}
 		}
@@ -216,6 +219,17 @@ IconView::SetTo(BMimeType* type)
 			if (type->GetSupertype(&superType) == B_OK) {
 				if (superType.GetIcon(fIcon, B_LARGE_ICON) == B_OK)
 					fIconSource = kSupertypeIcon;
+				else {
+					// check the super type's preferred app
+					char preferred[B_MIME_TYPE_LENGTH];
+					if (superType.GetPreferredApp(preferred) == B_OK) {
+						BMimeType preferredApp(preferred);
+
+						if (preferredApp.GetIconForType(superType.Type(),
+								fIcon, B_LARGE_ICON) == B_OK)
+							fIconSource = kSupertypeIcon;
+					}
+				}
 			}
 		}
 	}
