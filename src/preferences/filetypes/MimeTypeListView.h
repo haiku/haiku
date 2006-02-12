@@ -24,11 +24,14 @@ class MimeTypeItem : public BStringItem {
 		const char* Type() const { return fType.String(); }
 		const char* Subtype() const { return fSubtype.String(); }
 		const char* Supertype() const { return fSupertype.String(); }
+		const char* Description() const { return fDescription.String(); }
 		bool IsSupertypeOnly() const { return fIsSupertype; }
 
+		void Update();
 		void AddSubtype();
 
 		static int Compare(const BListItem* a, const BListItem* b);
+		static int CompareLabels(const BListItem* a, const BListItem* b);
 
 	private:
 		void _SetTo(BMimeType& type);
@@ -36,6 +39,7 @@ class MimeTypeItem : public BStringItem {
 		BString		fSupertype;
 		BString		fSubtype;
 		BString		fType;
+		BString		fDescription;
 		bool		fIsSupertype;
 };
 
@@ -45,8 +49,12 @@ class MimeTypeListView : public BOutlineListView {
 			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~MimeTypeListView();
 
+		void UpdateItem(MimeTypeItem* item);
+		void RemoveItem(MimeTypeItem* item);
+
 	private:
 		void _CollectTypes();
+		void _MakeTypesUnique(MimeTypeItem* underItem = NULL);
 };
 
 bool mimetype_is_application_signature(BMimeType& type);

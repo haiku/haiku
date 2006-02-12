@@ -28,9 +28,24 @@
 
 
 const uint32 kMsgTypeSelected = 'typs';
+const uint32 kMsgAddType = 'atyp';
+const uint32 kMsgRemoveType = 'rtyp';
+
 const uint32 kMsgExtensionSelected = 'exts';
+const uint32 kMsgExtensionInvoked = 'exti';
+const uint32 kMsgAddExtension = 'aext';
+const uint32 kMsgRemoveExtension = 'rext';
+
 const uint32 kMsgAttributeSelected = 'atrs';
+const uint32 kMsgAttributeInvoked = 'atri';
+const uint32 kMsgAddAttribute = 'aatr';
+const uint32 kMsgRemoveAttribute = 'ratr';
+
 const uint32 kMsgPreferredAppChosen = 'papc';
+const uint32 kMsgSelectPreferredApp = 'slpa';
+const uint32 kMsgSamePreferredAppAs = 'spaa';
+
+const uint32 kMsgTypeEntered = 'type';
 
 
 const struct type_map {
@@ -412,15 +427,16 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	BButton* button = new BButton(rect, "add", "Add" B_UTF8_ELLIPSIS, NULL,
-		B_FOLLOW_BOTTOM);
+	BButton* button = new BButton(rect, "add", "Add" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgAddType), B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveTo(8.0f, topView->Bounds().bottom - 8.0f - button->Bounds().Height());
 	topView->AddChild(button);
 
 	rect = button->Frame();
 	rect.OffsetBy(rect.Width() + 8.0f, 0.0f);
-	fRemoveTypeButton = new BButton(rect, "remove", "Remove", NULL, B_FOLLOW_BOTTOM);
+	fRemoveTypeButton = new BButton(rect, "remove", "Remove",
+		new BMessage(kMsgRemoveType), B_FOLLOW_BOTTOM);
 	fRemoveTypeButton->ResizeToPreferred();
 	topView->AddChild(fRemoveTypeButton);
 
@@ -476,12 +492,12 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	innerRect.left = innerRect.right - button->StringWidth("Remove") - 16.0f;
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
 	fAddExtensionButton = new BButton(innerRect, "add ext", "Add" B_UTF8_ELLIPSIS,
-		NULL, B_FOLLOW_RIGHT);
+		new BMessage(kMsgAddExtension), B_FOLLOW_RIGHT);
 	box->AddChild(fAddExtensionButton);
 
 	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
-	fRemoveExtensionButton = new BButton(innerRect, "remove ext", "Remove", NULL,
-		B_FOLLOW_RIGHT);
+	fRemoveExtensionButton = new BButton(innerRect, "remove ext", "Remove",
+		new BMessage(kMsgRemoveExtension), B_FOLLOW_RIGHT);
 	box->AddChild(fRemoveExtensionButton);
 
 	innerRect.right = innerRect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
@@ -492,6 +508,8 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fExtensionListView = new BListView(innerRect, "listview ext",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
 	fExtensionListView->SetSelectionMessage(new BMessage(kMsgExtensionSelected));
+	fExtensionListView->SetInvocationMessage(new BMessage(kMsgExtensionInvoked));
+
 	scrollView = new BScrollView("scrollview ext", fExtensionListView,
 		B_FOLLOW_LEFT_RIGHT, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	box->AddChild(scrollView);
@@ -519,7 +537,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 
 	innerRect.OffsetBy(0, fInternalNameControl->Bounds().Height() + 5.0f);
 	fTypeNameControl = new BTextControl(innerRect, "type", "Type Name:", "",
-		NULL, B_FOLLOW_LEFT_RIGHT);
+		new BMessage(kMsgTypeEntered), B_FOLLOW_LEFT_RIGHT);
 	fTypeNameControl->SetDivider(labelWidth);
 	fTypeNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	box->AddChild(fTypeNameControl);
@@ -538,13 +556,13 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	innerRect.top += ceilf(fontHeight.ascent);
 	innerRect.left = innerRect.right - button->StringWidth("Same As" B_UTF8_ELLIPSIS) - 24.0f;
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fSameAsButton = new BButton(innerRect, "same as", "Same As" B_UTF8_ELLIPSIS, NULL,
-		B_FOLLOW_RIGHT);
+	fSameAsButton = new BButton(innerRect, "same as", "Same As" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_RIGHT);
 	box->AddChild(fSameAsButton);
 
 	innerRect.OffsetBy(-innerRect.Width() - 6.0f, 0.0f);
-	fSelectButton = new BButton(innerRect, "select", "Select" B_UTF8_ELLIPSIS, NULL,
-		B_FOLLOW_RIGHT);
+	fSelectButton = new BButton(innerRect, "select", "Select" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgSelectPreferredApp), B_FOLLOW_RIGHT);
 	box->AddChild(fSelectButton);
 
 	menu = new BPopUpMenu("preferred");
@@ -581,13 +599,13 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	innerRect.top += ceilf(fontHeight.ascent);
 	innerRect.left = innerRect.right - button->StringWidth("Remove") - 16.0f;
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fAddAttributeButton = new BButton(innerRect, "add attr", "Add" B_UTF8_ELLIPSIS, NULL,
-		B_FOLLOW_RIGHT);
+	fAddAttributeButton = new BButton(innerRect, "add attr", "Add" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgAddAttribute), B_FOLLOW_RIGHT);
 	box->AddChild(fAddAttributeButton);
 
 	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
 	fRemoveAttributeButton = new BButton(innerRect, "remove attr", "Remove",
-		NULL, B_FOLLOW_RIGHT);
+		new BMessage(kMsgRemoveAttribute), B_FOLLOW_RIGHT);
 	box->AddChild(fRemoveAttributeButton);
 
 	innerRect.right = innerRect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
@@ -598,6 +616,8 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fAttributeListView = new AttributeListView(innerRect, "listview attr",
 		B_FOLLOW_ALL);
 	fAttributeListView->SetSelectionMessage(new BMessage(kMsgAttributeSelected));
+	fAttributeListView->SetInvocationMessage(new BMessage(kMsgAttributeInvoked));
+
 	scrollView = new BScrollView("scrollview attr", fAttributeListView,
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	box->AddChild(scrollView);
@@ -738,6 +758,7 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 	bool lastItemSame = false;
 	const char* lastSignature = NULL;
 	BMenuItem* last = NULL;
+	BMenuItem* select = NULL;
 
 	for (int32 index = 0; index < menu->CountItems(); index++) {
 		BMenuItem* item = menu->ItemAt(index);
@@ -749,7 +770,7 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 			continue;
 
 		if (!strcasecmp(signature, preferred))
-			item->SetMarked(true);
+			select = item;
 
 		if (last == NULL || strcmp(last->Label(), item->Label())) {
 			if (lastItemSame)
@@ -770,6 +791,12 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 
 	if (lastItemSame)
 		_AddSignature(last, lastSignature);
+
+	if (select != NULL) {
+		// We don't select the item earlier, so that the menu field can
+		// pick up the signature as well as label.
+		select->SetMarked(true);
+	}
 }
 
 
@@ -779,13 +806,18 @@ FileTypesWindow::_SetType(BMimeType* type)
 	bool enabled = type != NULL;
 
 	if (type != NULL) {
+		if (fCurrentType == *type)
+			return;
+
+		fCurrentType.SetTo(type->Type());
 		fInternalNameControl->SetText(type->Type());
-		
+
 		char description[B_MIME_TYPE_LENGTH];
 		if (type->GetShortDescription(description) != B_OK)
 			description[0] = '\0';
 		fTypeNameControl->SetText(description);
 	} else {
+		fCurrentType.Unset();
 		fInternalNameControl->SetText(NULL);
 		fTypeNameControl->SetText(NULL);
 	}
@@ -831,6 +863,8 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		// File Extensions group
+
 		case kMsgExtensionSelected:
 		{
 			int32 index;
@@ -841,6 +875,43 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgExtensionInvoked:
+			puts("ext");
+			break;
+
+		case kMsgAddExtension:
+			puts("add ext");
+			break;
+
+		case kMsgRemoveExtension:
+			puts("remove ext");
+			break;
+
+		// Description group
+
+		case kMsgTypeEntered:
+		{
+			fCurrentType.SetShortDescription(fTypeNameControl->Text());
+
+			MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(
+				fTypeListView->ItemAt(fTypeListView->CurrentSelection()));
+			if (item != NULL)
+				fTypeListView->UpdateItem(item);
+			break;
+		}
+
+		// Preferred Application group
+
+		case kMsgPreferredAppChosen:
+		{
+			const char* signature;
+			if (message->FindString("signature", &signature) == B_OK)
+				fCurrentType.SetPreferredApp(signature);
+			break;
+		}
+
+		// Extra Attributes group
+
 		case kMsgAttributeSelected:
 		{
 			int32 index;
@@ -850,6 +921,18 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		case kMsgAttributeInvoked:
+			puts("attr");
+			break;
+
+		case kMsgAddAttribute:
+			puts("add attr");
+			break;
+
+		case kMsgRemoveAttribute:
+			puts("remove attr");
+			break;
 
 		default:
 			BWindow::MessageReceived(message);

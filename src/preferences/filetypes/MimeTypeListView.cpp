@@ -77,6 +77,7 @@ MimeTypeItem::_SetTo(BMimeType& type)
 	if (IsSupertypeOnly()) {
 		// this is a super type
 		fSupertype = type.Type();
+		fDescription = type.Type();
 		return;
 	}
 
@@ -85,18 +86,32 @@ MimeTypeItem::_SetTo(BMimeType& type)
 	fSubtype.SetTo(subType + 1);
 		// omit the slash
 
+	Update();
+}
+
+
+void
+MimeTypeItem::Update()
+{
+	BMimeType type(fType.String());
+
 	char description[B_MIME_TYPE_LENGTH];
 	if (type.GetShortDescription(description) == B_OK)
 		SetText(description);
 	else
 		SetText(Subtype());
+
+	fDescription = Text();
 }
 
 
 void
 MimeTypeItem::AddSubtype()
 {
-	BString text = Text();
+	if (fSubtype == Text())
+		return;
+
+	BString text = Description();
 	text.Append(" (");
 	text.Append(fSubtype);
 	text.Append(")");
@@ -113,6 +128,28 @@ MimeTypeItem::Compare(const BListItem* a, const BListItem* b)
 
 	if (typeA != NULL && typeB != NULL) {
 		int compare = strcasecmp(typeA->Supertype(), typeB->Supertype());
+		if (compare != 0)
+			return compare;
+	}
+
+	const BStringItem* stringA = dynamic_cast<const BStringItem*>(a);
+	const BStringItem* stringB = dynamic_cast<const BStringItem*>(b);
+
+	if (stringA != NULL && stringB != NULL)
+		return strcasecmp(stringA->Text(), stringB->Text());
+
+	return (int)(a - b);
+}
+
+
+int
+MimeTypeItem::CompareLabels(const BListItem* a, const BListItem* b)
+{
+	const MimeTypeItem* typeA = dynamic_cast<const MimeTypeItem*>(a);
+	const MimeTypeItem* typeB = dynamic_cast<const MimeTypeItem*>(b);
+
+	if (typeA != NULL && typeB != NULL) {
+		int compare = strcasecmp(typeA->Description(), typeB->Description());
 		if (compare != 0)
 			return compare;
 	}
@@ -178,21 +215,43 @@ MimeTypeListView::_CollectTypes()
 		}
 	}
 
-	FullListSortItems(&MimeTypeItem::Compare);
+	_MakeTypesUnique();
+}
 
-	// make double entries unique
+
+void
+MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
+{
+	SortItemsUnder(underItem, false, &MimeTypeItem::Compare);
 
 	bool lastItemSame = false;
 	MimeTypeItem* last = NULL;
 
-	for (index = 0; index < FullListCountItems(); index++) {
+	int32 index = 0;
+	uint32 level = 0;
+	if (underItem != NULL) {
+		index = FullListIndexOf(underItem) + 1;
+		level = underItem->OutlineLevel() + 1;
+	}
+
+	for (; index < FullListCountItems(); index++) {
 		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(FullListItemAt(index));
 		if (item == NULL)
 			continue;
 
-		if (last == NULL || MimeTypeItem::Compare(last, item)) {
-			if (lastItemSame)
+		if (item->OutlineLevel() < level) {
+			// left sub-tree
+			break;
+		}
+
+		item->SetText(item->Description());
+
+		if (last == NULL || MimeTypeItem::CompareLabels(last, item)) {
+			if (lastItemSame) {
 				last->AddSubtype();
+				if (Window())
+					InvalidateItem(IndexOf(last));
+			}
 
 			lastItemSame = false;
 			last = item;
@@ -201,10 +260,43 @@ MimeTypeListView::_CollectTypes()
 
 		lastItemSame = true;
 		last->AddSubtype();
+		if (Window())
+			InvalidateItem(IndexOf(last));
 		last = item;
 	}
 
-	if (lastItemSame)
+	if (lastItemSame) {
 		last->AddSubtype();
+		if (Window())
+			InvalidateItem(IndexOf(last));
+	}
+}
+
+
+void
+MimeTypeListView::UpdateItem(MimeTypeItem* item)
+{
+	int32 selected = -1;
+	if (IndexOf(item) == CurrentSelection())
+		selected = CurrentSelection();
+
+	item->Update();
+	_MakeTypesUnique(dynamic_cast<MimeTypeItem*>(Superitem(item)));
+
+	if (selected != -1) {
+		int32 index = IndexOf(item);
+		if (index != selected) {
+			Select(index);
+			ScrollToSelection();
+		}
+	}
+	if (Window())
+		InvalidateItem(IndexOf(item));
+}
+
+
+void
+MimeTypeListView::RemoveItem(MimeTypeItem* item)
+{
 }
 

@@ -6,6 +6,7 @@
 #define FILE_TYPES_WINDOW_H
 
 
+#include <Mime.h>
 #include <Window.h>
 
 class BButton;
@@ -17,6 +18,7 @@ class BTextControl;
 
 class AttributeListView;
 class IconView;
+class MimeTypeListView;
 
 
 class FileTypesWindow : public BWindow {
@@ -34,7 +36,9 @@ class FileTypesWindow : public BWindow {
 		void _SetType(BMimeType* type);
 
 	private:
-		BOutlineListView* fTypeListView;
+		BMimeType		fCurrentType;
+
+		MimeTypeListView* fTypeListView;
 		BButton*		fRemoveTypeButton;
 
 		IconView*		fIconView;
