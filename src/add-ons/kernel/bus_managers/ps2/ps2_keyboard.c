@@ -40,6 +40,8 @@ static sem_id sKeyboardSem;
 static struct packet_buffer *sKeyBuffer;
 static bool sIsExtended = false;
 
+static int32		sKeyboardRepeatRate;
+static bigtime_t	sKeyboardRepeatDelay;
 
 static status_t
 set_leds(led_info *ledInfo)
@@ -55,7 +57,39 @@ set_leds(led_info *ledInfo)
 	if (ledInfo->caps_lock)
 		leds |= LED_CAPS;
 
-	return ps2_keyboard_command(PS2_DATA_SET_LEDS, &leds, 1, NULL, 0);
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_DATA_SET_LEDS, &leds, 1, NULL, 0);
+}
+
+
+static status_t
+set_typematic(int32 rate, bigtime_t delay)
+{
+	uint8 value;
+	
+	dprintf("ps2: set_typematic rate %ld, delay %Ld\n", rate, delay);
+
+	// input server and keyboard preferences *seem* to use a range of 20-300
+	if (rate < 20)
+		rate = 20;
+	if (rate > 300)
+		rate = 300;
+		
+	// map this into range 0-31
+	rate = ((rate - 20) * 31) / (300 - 20);
+
+	// keyboard uses 0 == fast, 31 == slow
+	value = 31 - rate;
+	
+	if (delay >= 875000)
+		value |= 3 << 5;
+	else if (delay >= 625000)
+		value |= 2 << 5;
+	else if (delay >= 375000)
+		value |= 1 << 5;
+	else 
+		value |= 0 << 5;
+		
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf3, &value, 1, NULL, 0);
 }
 
 
@@ -133,65 +167,42 @@ read_keyboard_packet(at_kbd_io *userBuffer)
 }
 
 
-static status_t
-enable_keyboard(void)
-{
-	uint32 tries = 3;
-
-	while (tries-- > 0) {
-//		keyboard_empty_data();
-
-		if (ps2_keyboard_command(PS2_ENABLE_KEYBOARD, NULL, 0, NULL, 0) == B_OK)
-			return B_OK;
-	}
-
-	dprintf("enable_keyboard() failed\n");	
-	return B_ERROR;
-}
-
-
 //	#pragma mark -
 
 
 status_t
 probe_keyboard(void)
 {
-	int32 tries;
-
-	// ToDo: for now there just is a keyboard ready to be used...
+	uint8 data;
+	status_t status;
 	
-	// Keyboard detection does not seem to be working always correctly
+//	status = ps2_command(PS2_CTRL_KEYBOARD_ACTIVATE, const uint8 *out, int out_count, uint8 *in, int in_count)
 
-	// not sure if this is the correct way
-	ps2_keyboard_command(PS2_CTRL_KEYBOARD_SELF_TEST, NULL, 0, NULL, 0);
-	ps2_keyboard_command(PS2_CTRL_KEYBOARD_SELF_TEST, NULL, 0, NULL, 0);
-
-#if 0
-	// Keyboard self-test
-
-	if (ps2_write_ctrl(PS2_CTRL_KEYBOARD_SELF_TEST) != B_OK)
+	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
+	if (status != B_OK || data != 0x00) {
+		dprintf("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
 		return B_ERROR;
-
-	tries = 3;
-	while (tries-- > 0) {
-		uint8 acknowledged;
-		if (ps2_read_data(&acknowledged) == B_OK && acknowledged == PS2_REPLY_ACK)
-			break;
 	}
 
-	// This selftest appears to fail quite frequently we'll just disable it
-	/*if (tries < 0)
-		return B_ERROR;*/
-
-	// Activate keyboard
-
-	if (ps2_write_ctrl(PS2_CTRL_KEYBOARD_ACTIVATE) != B_OK)
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL, 0, &data, 1);
+	if (status != B_OK || data != 0xaa) {
+		dprintf("ps2: keyboard reset failed, status 0x%08lx, data 0x%02x\n", status, data);
 		return B_ERROR;
+	}
 
-	// Enable keyboard
+	// default settings after keyboard reset: delay = 0x01 (500 ms), rate = 0x0b (10.9 chr/sec)
+	sKeyboardRepeatRate = ((31 - 0x0b) * 280) / 31 + 20;
+	sKeyboardRepeatDelay = 500000;
 
-	return enable_keyboard();
-#endif
+//	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_ENABLE_KEYBOARD, NULL, 0, NULL, 0);
+
+//  On my notebook, the keyboard controller does NACK the echo command.
+//	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_ECHO, NULL, 0, &data, 1);
+//	if (status != B_OK || data != 0xee) {
+//		dprintf("ps2: keyboard echo test failed, status 0x%08lx, data 0x%02x\n", status, data);
+//		return B_ERROR;
+//	}
+
 	return B_OK;
 }
 
@@ -208,6 +219,12 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
+		
+	status = probe_keyboard();
+	if (status != B_OK) {
+		dprintf("ps2: keyboard probing failed\n");
+		goto err1;
+	}
 
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
@@ -300,8 +317,58 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return set_leds(&info);
 		}
 
+		
 		case KB_SET_KEY_REPEATING:
+		{
+			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds with "ack" (0xFA).
+			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xfa, NULL, 0, NULL, 0);
+		}
+
 		case KB_SET_KEY_NONREPEATING:
+		{
+			// 0xF8 (Set All Keys Make/Break) - Keyboard responds with "ack" (0xFA).
+			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf8, NULL, 0, NULL, 0);
+		}
+		
+		case KB_SET_KEY_REPEAT_RATE:
+		{
+			int32 key_repeat_rate;
+			if (user_memcpy(&key_repeat_rate, buffer, sizeof(key_repeat_rate)) < B_OK)
+				return B_BAD_ADDRESS;
+			dprintf("ps2: KB_SET_KEY_REPEAT_RATE %ld\n", key_repeat_rate);
+			if (set_typematic(key_repeat_rate, sKeyboardRepeatDelay) < B_OK)
+				return B_ERROR;
+			sKeyboardRepeatRate = key_repeat_rate;
+			return B_OK;
+		}
+		
+		case KB_GET_KEY_REPEAT_RATE:
+		{
+			return user_memcpy(buffer, &sKeyboardRepeatRate, sizeof(sKeyboardRepeatRate));
+		}
+
+		case KB_SET_KEY_REPEAT_DELAY:
+		{
+			bigtime_t key_repeat_delay;
+			if (user_memcpy(&key_repeat_delay, buffer, sizeof(key_repeat_delay)) < B_OK)
+				return B_BAD_ADDRESS;
+			dprintf("ps2: KB_SET_KEY_REPEAT_DELAY %Ld\n", key_repeat_delay);
+			if (set_typematic(sKeyboardRepeatRate, key_repeat_delay) < B_OK)
+				return B_ERROR;
+			sKeyboardRepeatDelay = key_repeat_delay;
+			return B_OK;
+				
+		}
+
+		case KB_GET_KEY_REPEAT_DELAY:
+		{
+			return user_memcpy(buffer, &sKeyboardRepeatDelay, sizeof(sKeyboardRepeatDelay));
+		}
+
+		case KB_GET_KEYBOARD_ID:
+		case KB_SET_CONTROL_ALT_DEL_TIMEOUT:
+		case KB_CANCEL_CONTROL_ALT_DEL:
+		case KB_DELAY_CONTROL_ALT_DEL:
 			TRACE(("ps2_hid: ioctl 0x%lx not implemented yet, returning B_OK\n", op));
 			return B_OK;
 

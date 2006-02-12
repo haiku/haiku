@@ -98,7 +98,7 @@ ps2_reset_mouse(mouse_cookie *cookie)
 	
 	TRACE(("ps2_reset_mouse()\n"));
 	
-	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET_MOUSE, NULL, 0, data, 2);
+	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET, NULL, 0, data, 2);
 		
 	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
 		TRACE(("reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]));

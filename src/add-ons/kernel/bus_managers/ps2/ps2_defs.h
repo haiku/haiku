@@ -32,7 +32,8 @@
 #define PS2_CTRL_MOUSE_DISABLE			0xa7
 #define PS2_CTRL_MOUSE_ENABLE			0xa8
 #define PS2_CTRL_MOUSE_TEST				0xa9
-#define PS2_CTRL_KEYBOARD_SELF_TEST		0xaa
+#define PS2_CTRL_SELF_TEST				0xaa
+#define PS2_CTRL_KEYBOARD_TEST			0xab
 #define PS2_CTRL_KEYBOARD_ACTIVATE		0xae
 #define PS2_CTRL_KEYBOARD_DEACTIVATE	0xad
 
@@ -47,12 +48,13 @@
 #define PS2_BITS_TRANSLATE_SCANCODES	0x40
 
 // data words
+#define PS2_CMD_ECHO					0xee
 #define PS2_CMD_TEST_PASSED				0xaa
 #define PS2_CMD_GET_DEVICE_ID			0xf2
 #define PS2_CMD_SET_SAMPLE_RATE			0xf3
 #define PS2_CMD_ENABLE_MOUSE			0xf4
 #define PS2_CMD_DISABLE_MOUSE			0xf5
-#define PS2_CMD_RESET_MOUSE				0xff
+#define PS2_CMD_RESET					0xff
 
 // reply codes
 #define PS2_REPLY_TEST_PASSED			0x55
