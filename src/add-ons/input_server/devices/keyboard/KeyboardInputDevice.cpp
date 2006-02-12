@@ -38,14 +38,6 @@
 FILE *KeyboardInputDevice::sLogFile = NULL;
 #endif
 
-const static uint32 kSetLeds = 0x2711;
-const static uint32 kSetRepeatingKey = 0x2712;
-const static uint32 kSetNonRepeatingKey = 0x2713;
-const static uint32 kSetKeyRepeatRate = 0x2714;
-const static uint32 kSetKeyRepeatDelay = 0x2716;
-const static uint32 kCancelTimer = 0x2719;
-const static uint32 kGetNextKey = 0x270f;
-
 const static uint32 kKeyboardThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char *kKeyboardDevicesDirectory = "/dev/input/keyboard";
 
@@ -403,8 +395,8 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 		if (get_key_repeat_rate(&device->settings.key_repeat_rate) != B_OK)
 			LOG_ERR("error when get_key_repeat_rate\n");
 		else
-			if (ioctl(device->fd, kSetKeyRepeatRate, &device->settings.key_repeat_rate)!=B_OK)
-				LOG_ERR("error when kSetKeyRepeatRate, fd:%d\n", device->fd);
+			if (ioctl(device->fd, KB_SET_KEY_REPEAT_RATE, &device->settings.key_repeat_rate)!=B_OK)
+				LOG_ERR("error when KB_SET_KEY_REPEAT_RATE, fd:%d\n", device->fd);
 	}
 	
 	if (opcode == 0 
@@ -413,8 +405,8 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 		if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
 			LOG_ERR("error when get_key_repeat_delay\n");
 		else
-			if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
-				LOG_ERR("error when kSetKeyRepeatDelay, fd:%d\n", device->fd);
+			if (ioctl(device->fd, KB_SET_KEY_REPEAT_DELAY, &device->settings.key_repeat_delay)!=B_OK)
+				LOG_ERR("error when KB_SET_KEY_REPEAT_DELAY, fd:%d\n", device->fd);
 	}
 	
 	if (opcode == 0 
@@ -622,7 +614,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 	while (dev->active) {
 		
-		if (ioctl(dev->fd, kGetNextKey, &buffer) != B_OK) {
+		if (ioctl(dev->fd, KB_READ, &buffer) != B_OK) {
 			snooze(10000); // this is a realtime thread, and something is wrong...
 			continue;
 		}
@@ -631,7 +623,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			bool is_keydown = false;
 			bigtime_t timestamp = 0;
 			
-			LOG("kGetNextKey :");
+			LOG("KB_READ :");
 			if (dev->isAT) {
 				at_kbd_io *at_kbd = (at_kbd_io *)buffer;
 				if (at_kbd->scancode>0)
@@ -686,8 +678,8 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				dev->owner->fTMWindow->Enable();
 				
 				// cancel timer only for R5
-				if (ioctl(dev->fd, kCancelTimer, NULL) == B_OK)
-					LOG("kCancelTimer : OK\n");
+				if (ioctl(dev->fd, KB_CANCEL_CONTROL_ALT_DEL, NULL) == B_OK)
+					LOG("KB_CANCEL_CONTROL_ALT_DEL : OK\n");
 			}
 			
 			uint32 modifiers = keymap->Modifier(keycode);
@@ -843,5 +835,5 @@ KeyboardInputDevice::SetLeds(keyboard_device *device)
 	if (locks & B_SCROLL_LOCK)
 		lock_io[2] = 1;
 	
-	ioctl(device->fd, kSetLeds, &lock_io);
+	ioctl(device->fd, KB_SET_LEDS, &lock_io);
 }
