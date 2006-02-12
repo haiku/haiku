@@ -14,6 +14,7 @@
 #include "ShowImageSettings.h"
 
 #include <Application.h>
+#include <FilePanel.h>
 
 
 class ShowImageApp : public BApplication {

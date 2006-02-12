@@ -146,7 +146,7 @@ BackgroundImage::_GetImages(BDirectory& directory, BMessage& container)
 
 	char *buffer = new (nothrow) char [info.size];
 	if (buffer == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
 	status = directory.ReadAttr(B_BACKGROUND_INFO, info.type,
 		0, buffer, (size_t)info.size);

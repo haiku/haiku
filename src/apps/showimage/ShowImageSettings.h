@@ -29,6 +29,7 @@
 #ifndef _ShowImageSettings_H
 #define _ShowImageSettings_H
 
+#include <File.h>
 #include <Message.h>
 #include <Locker.h>
 

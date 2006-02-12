@@ -34,7 +34,8 @@ All rights reserved.
 #ifndef BACKGROUND_IMAGE_H
 #define BACKGROUND_IMAGE_H
 
-
+#include <Message.h>
+#include <Point.h>
 #include <SupportDefs.h>
 
 class BDirectory;
