@@ -28,11 +28,30 @@
 
 
 const uint32 kMsgTypeSelected = 'typs';
+const uint32 kMsgExtensionSelected = 'exts';
+const uint32 kMsgAttributeSelected = 'atrs';
+const uint32 kMsgPreferredAppChosen = 'papc';
 
+
+const struct type_map {
+	const char*	name;
+	type_code	type;
+} kTypeMap[] = {
+	{"String",			B_STRING_TYPE},
+	{"Boolean",			B_BOOL_TYPE},
+	{"Integer 8 bit",	B_INT8_TYPE},
+	{"Integer 16 bit",	B_INT16_TYPE},
+	{"Integer 32 bit",	B_INT32_TYPE},
+	{"Integer 64 bit",	B_INT64_TYPE},
+	{"Float",			B_FLOAT_TYPE},
+	{"Double",			B_DOUBLE_TYPE},
+	{"Time",			B_TIME_TYPE},
+	{NULL,				0}
+};
 
 class IconView : public BControl {
 	public:
-		IconView(BRect rect, const char* name, BMessage* message);
+		IconView(BRect frame, const char* name, BMessage* message);
 		virtual ~IconView();
 
 		void SetTo(BMimeType* type);
@@ -49,9 +68,85 @@ class IconView : public BControl {
 		BBitmap*	fIcon;
 };
 
+class AttributeListView : public BListView {
+	public:
+		AttributeListView(BRect frame, const char* name, uint32 resizingMode);
+		virtual ~AttributeListView();
 
-IconView::IconView(BRect rect, const char* name, BMessage* message)
-	: BControl(rect, name, NULL, message,
+		void SetTo(BMimeType* type);
+
+		virtual void Draw(BRect updateRect);
+
+	private:
+		void _DeleteItems();
+};
+
+class AttributeItem : public BStringItem {
+	public:
+		AttributeItem(const char* name, const char* publicName, type_code type,
+			int32 alignment, int32 width, bool visible, bool editable);
+		~AttributeItem();
+
+		virtual void DrawItem(BView* owner, BRect itemRect,
+			bool drawEverything = false);
+
+	private:
+		BString		fName;
+		BString		fPublicName;
+		type_code	fType;
+		int32		fAlignment;
+		int32		fWidth;
+		bool		fVisible;
+		bool		fEditable;
+};
+
+
+//	#pragma mark -
+
+
+static int
+compare_menu_items(const void* _a, const void* _b)
+{
+	BMenuItem* a = *(BMenuItem**)_a;
+	BMenuItem* b = *(BMenuItem**)_b;
+
+	return strcasecmp(a->Label(), b->Label());
+}
+
+
+static void
+name_for_type(BString& string, type_code type)
+{
+	for (int32 i = 0; kTypeMap[i].name != NULL; i++) {
+		if (kTypeMap[i].type == type) {
+			string = kTypeMap[i].name;
+			return;
+		}
+	}
+
+	char buffer[32];
+	buffer[0] = '\'';
+	buffer[1] = 0xff & (type >> 24);
+	buffer[2] = 0xff & (type >> 16);
+	buffer[3] = 0xff & (type >> 8);
+	buffer[4] = 0xff & (type);
+	buffer[5] = '\'';
+	buffer[6] = 0;
+	for (int16 i = 0;i < 4;i++) {
+		if (buffer[i] < ' ')
+			buffer[i] = '.';
+	}
+
+	snprintf(buffer + 6, sizeof(buffer), " (0x%lx)", type);
+	string = buffer;
+}
+
+
+//	#pragma mark -
+
+
+IconView::IconView(BRect frame, const char* name, BMessage* message)
+	: BControl(frame, name, NULL, message,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
 	fIcon(NULL)
 {
@@ -72,7 +167,7 @@ IconView::SetTo(BMimeType* type)
 	if (type != NULL) {
 		if (fIcon == NULL)
 			fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
-		
+
 		if (type->GetIcon(fIcon, B_LARGE_ICON) == B_OK) {
 			Invalidate();
 			return;
@@ -95,10 +190,10 @@ IconView::Draw(BRect updateRect)
 		DrawBitmap(fIcon, BPoint(0, 0));
 	} else if (IsEnabled()) {
 		BRect rect = Bounds();
-	
+
 		rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 		rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
-	
+
 		BeginLineArray(8);
 
 		AddLine(BPoint(rect.left, rect.bottom),
@@ -126,6 +221,151 @@ IconView::Draw(BRect updateRect)
 		SetHighColor(ViewColor());
 		FillRect(updateRect);
 	}
+}
+
+
+//	#pragma mark -
+
+
+AttributeItem::AttributeItem(const char* name, const char* publicName,
+		type_code type, int32 alignment, int32 width, bool visible,
+		bool editable)
+	: BStringItem(publicName),
+	fName(name),
+	fType(type),
+	fAlignment(alignment),
+	fWidth(width),
+	fVisible(visible),
+	fEditable(editable)
+{
+}
+
+
+AttributeItem::~AttributeItem()
+{
+}
+
+
+void
+AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
+{
+	BStringItem::DrawItem(owner, frame, drawEverything);
+
+	rgb_color highColor = owner->HighColor();
+	rgb_color lowColor = owner->LowColor();
+
+	if (IsSelected())
+		owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
+
+	rgb_color black = {0, 0, 0, 255};
+
+	if (!IsEnabled())
+		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
+	else
+		owner->SetHighColor(black);
+
+	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f, owner->PenLocation().y);
+
+	BString type;
+	name_for_type(type, fType);
+	owner->DrawString(type.String());
+
+	owner->SetHighColor(tint_color(owner->ViewColor(), B_DARKEN_1_TINT));
+
+	float middle = frame.left + frame.Width() / 2.0f;
+	owner->StrokeLine(BPoint(middle, 0.0f), BPoint(middle, frame.bottom));
+
+	owner->SetHighColor(highColor);
+	owner->SetLowColor(lowColor);
+}
+
+
+//	#pragma mark -
+
+
+AttributeListView::AttributeListView(BRect frame, const char* name,
+		uint32 resizingMode)
+	: BListView(frame, name, B_SINGLE_SELECTION_LIST, resizingMode)
+{
+}
+
+
+AttributeListView::~AttributeListView()
+{
+	_DeleteItems();
+}
+
+
+void
+AttributeListView::_DeleteItems()
+{
+	for (int32 i = CountItems(); i-- > 0;) {
+		delete ItemAt(i);
+	}
+	MakeEmpty();
+}
+
+
+void
+AttributeListView::SetTo(BMimeType* type)
+{
+	_DeleteItems();
+
+	// fill it again
+	
+	if (type == NULL)
+		return;
+
+	BMessage attributes;
+	if (type->GetAttrInfo(&attributes) != B_OK)
+		return;
+
+	const char* publicName;
+	int32 i = 0;
+	while (attributes.FindString("attr:public_name", i, &publicName) == B_OK) {
+		const char* name;
+		if (attributes.FindString("attr:name", i, &name) != B_OK)
+			name = "-";
+
+		type_code type;
+		if (attributes.FindInt32("attr:type", i, (int32 *)&type) != B_OK)
+			type = B_STRING_TYPE;
+
+		bool editable;
+		if (attributes.FindBool("attr:editable", i, &editable) != B_OK)
+			editable = false;
+		bool visible;
+		if (attributes.FindBool("attr:viewable", i, &visible) != B_OK)
+			visible = false;
+		bool extra;
+		if (attributes.FindBool("attr:extra", i, &extra) != B_OK)
+			extra = false;
+
+		int32 alignment;
+		if (attributes.FindInt32("attr:alignment", i, &alignment) != B_OK)
+			alignment = B_ALIGN_LEFT;
+
+		int32 width;
+		if (attributes.FindInt32("attr:width", i, &width) != B_OK)
+			width = 50;
+
+		AddItem(new AttributeItem(name, publicName, type, alignment, width,
+			visible, editable));
+
+		i++;
+	}
+}
+
+
+void
+AttributeListView::Draw(BRect updateRect)
+{
+	BListView::Draw(updateRect);
+
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+
+	float middle = Bounds().Width() / 2.0f;
+	StrokeLine(BPoint(middle, 0.0f), BPoint(middle, Bounds().bottom));
 }
 
 
@@ -251,6 +491,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 		// take scrollview border into account
 	fExtensionListView = new BListView(innerRect, "listview ext",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
+	fExtensionListView->SetSelectionMessage(new BMessage(kMsgExtensionSelected));
 	scrollView = new BScrollView("scrollview ext", fExtensionListView,
 		B_FOLLOW_LEFT_RIGHT, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	box->AddChild(scrollView);
@@ -312,13 +553,21 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 
 	innerRect.right = innerRect.left - 6.0f;
 	innerRect.left = 8.0f;
-	fPreferredField = new BMenuField(innerRect, "preferred", NULL, menu,
-		B_FOLLOW_LEFT_RIGHT);
+	BView* constrainingView = new BView(innerRect, NULL, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
+	constrainingView->SetViewColor(topView->ViewColor());
+
+	fPreferredField = new BMenuField(innerRect.OffsetToCopy(B_ORIGIN), "preferred",
+		NULL, menu);
 	float width, height;
 	fPreferredField->GetPreferredSize(&width, &height);
 	fPreferredField->ResizeTo(innerRect.Width(), height);
 	fPreferredField->MoveBy(0.0f, (innerRect.Height() - height) / 2.0f);
-	box->AddChild(fPreferredField);
+	constrainingView->AddChild(fPreferredField);
+		// we embed the menu field in another view to make it behave like
+		// we want so that it can't obscure other elements with larger
+		// labels
+
+	box->AddChild(constrainingView);
 
 	// "Extra Attributes" group
 
@@ -346,9 +595,10 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	innerRect.top = 8.0f + ceilf(fontHeight.ascent);
 	innerRect.bottom = box->Bounds().bottom - 10.0f;
 		// take scrollview border into account
-	BListView* listView = new BListView(innerRect, "listview attr",
-		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
-	scrollView = new BScrollView("scrollview attr", listView,
+	fAttributeListView = new AttributeListView(innerRect, "listview attr",
+		B_FOLLOW_ALL);
+	fAttributeListView->SetSelectionMessage(new BMessage(kMsgAttributeSelected));
+	scrollView = new BScrollView("scrollview attr", fAttributeListView,
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	box->AddChild(scrollView);
 
@@ -396,6 +646,20 @@ FileTypesWindow::_UpdateExtensions(BMimeType* type)
 
 
 void
+FileTypesWindow::_AddSignature(BMenuItem* item, const char* signature)
+{
+	const char* subType = strchr(signature, '/');
+	if (subType == NULL)
+		return;
+
+	char label[B_MIME_TYPE_LENGTH];
+	snprintf(label, sizeof(label), "%s (%s)", item->Label(), subType + 1);
+
+	item->SetLabel(label);
+}
+
+
+void
 FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 {
 	// clear menu
@@ -421,28 +685,91 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 	if (applications.FindInt32("be:sub", &lastFullSupport) != B_OK)
 		lastFullSupport = -1;
 
+	BList subList;
+	BList superList;
+
 	const char* signature;
 	int32 i = 0;
 	while (applications.FindString("applications", i, &signature) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
 		BMenuItem *item;
 
+		BMessage* message = new BMessage(kMsgPreferredAppChosen);
+		message->AddString("signature", signature);
+
 		BMimeType applicationType(signature);
 		if (applicationType.GetShortDescription(name) == B_OK)
-			item = new BMenuItem(name, NULL);
+			item = new BMenuItem(name, message);
 		else
-			item = new BMenuItem(signature, NULL);
+			item = new BMenuItem(signature, message);
 
-		// Add type separator
-		if (i == 0 || i == lastFullSupport)
-			menu->AddSeparatorItem();
+		if (i < lastFullSupport)
+			subList.AddItem(item);
+		else
+			superList.AddItem(item);
+
+		i++;
+	}
+
+	// sort lists
+	
+	subList.SortItems(compare_menu_items);
+	superList.SortItems(compare_menu_items);
+
+	// add lists to the menu
+
+	if (subList.CountItems() != 0 || superList.CountItems() != 0)
+		menu->AddSeparatorItem();
+
+	for (int32 i = 0; i < subList.CountItems(); i++) {
+		menu->AddItem((BMenuItem*)subList.ItemAt(i));
+	}
+
+	// Add type separator
+	if (superList.CountItems() != 0 && subList.CountItems() != 0)
+		menu->AddSeparatorItem();
+
+	for (int32 i = 0; i < superList.CountItems(); i++) {
+		menu->AddItem((BMenuItem*)superList.ItemAt(i));
+	}
+
+	// make items unique and select current choice
+
+	bool lastItemSame = false;
+	const char* lastSignature = NULL;
+	BMenuItem* last = NULL;
+
+	for (int32 index = 0; index < menu->CountItems(); index++) {
+		BMenuItem* item = menu->ItemAt(index);
+		if (item == NULL)
+			continue;
+
+		if (item->Message() == NULL
+			|| item->Message()->FindString("signature", &signature) != B_OK)
+			continue;
 
 		if (!strcasecmp(signature, preferred))
 			item->SetMarked(true);
 
-		menu->AddItem(item);
-		i++;
+		if (last == NULL || strcmp(last->Label(), item->Label())) {
+			if (lastItemSame)
+				_AddSignature(last, lastSignature);
+
+			lastItemSame = false;
+			last = item;
+			lastSignature = signature;
+			continue;
+		}
+
+		lastItemSame = true;
+		_AddSignature(last, lastSignature);
+
+		last = item;
+		lastSignature = signature;
 	}
+
+	if (lastItemSame)
+		_AddSignature(last, lastSignature);
 }
 
 
@@ -466,6 +793,7 @@ FileTypesWindow::_SetType(BMimeType* type)
 	_UpdateExtensions(type);
 	_UpdatePreferredApps(type);
 	fIconView->SetTo(type);
+	fAttributeListView->SetTo(type);
 
 	fIconView->SetEnabled(enabled);
 
@@ -490,6 +818,7 @@ FileTypesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgTypeSelected:
+		{
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
 				MimeTypeItem* item = (MimeTypeItem*)fTypeListView->ItemAt(index);
@@ -500,6 +829,27 @@ FileTypesWindow::MessageReceived(BMessage* message)
 					_SetType(NULL);
 			}
 			break;
+		}
+
+		case kMsgExtensionSelected:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				BStringItem* item = (BStringItem*)fExtensionListView->ItemAt(index);
+				fRemoveExtensionButton->SetEnabled(item != NULL);
+			}
+			break;
+		}
+
+		case kMsgAttributeSelected:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				AttributeItem* item = (AttributeItem*)fAttributeListView->ItemAt(index);
+				fRemoveAttributeButton->SetEnabled(item != NULL);
+			}
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);

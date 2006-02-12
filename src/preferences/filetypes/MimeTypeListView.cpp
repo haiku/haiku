@@ -203,5 +203,8 @@ MimeTypeListView::_CollectTypes()
 		last->AddSubtype();
 		last = item;
 	}
+
+	if (lastItemSame)
+		last->AddSubtype();
 }
 

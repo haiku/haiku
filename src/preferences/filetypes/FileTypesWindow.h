@@ -15,6 +15,7 @@ class BMimeType;
 class BOutlineListView;
 class BTextControl;
 
+class AttributeListView;
 class IconView;
 
 
@@ -28,6 +29,7 @@ class FileTypesWindow : public BWindow {
 
 	private:
 		void _UpdateExtensions(BMimeType* type);
+		void _AddSignature(BMenuItem* item, const char* signature);
 		void _UpdatePreferredApps(BMimeType* type);
 		void _SetType(BMimeType* type);
 
@@ -48,6 +50,7 @@ class FileTypesWindow : public BWindow {
 		BButton*		fSelectButton;
 		BButton*		fSameAsButton;
 
+		AttributeListView* fAttributeListView;
 		BButton*		fAddAttributeButton;
 		BButton*		fRemoveAttributeButton;
 
