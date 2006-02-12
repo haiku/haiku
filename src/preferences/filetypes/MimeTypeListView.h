@@ -49,8 +49,15 @@ class MimeTypeListView : public BOutlineListView {
 			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~MimeTypeListView();
 
+		MimeTypeItem* FindItem(const char* type);
+
 		void UpdateItem(MimeTypeItem* item);
-		void RemoveItem(MimeTypeItem* item);
+
+	protected:
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+
+		virtual void MessageReceived(BMessage* message);
 
 	private:
 		void _CollectTypes();

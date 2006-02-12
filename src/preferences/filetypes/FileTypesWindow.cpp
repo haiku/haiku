@@ -1025,11 +1025,17 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		case B_META_MIME_CHANGED:
 		{
 			const char* type;
-			if (message->FindString("be:type", &type) != B_OK)
+			int32 which;
+			if (message->FindString("be:type", &type) != B_OK
+				|| message->FindInt32("be:which", &which) != B_OK)
 				break;
 
-			if (!strcasecmp(fCurrentType.Type(), type))
-				_SetType(&fCurrentType, true);
+			if (fCurrentType.Type() != NULL && !strcasecmp(fCurrentType.Type(), type)) {
+				if (which != B_MIME_TYPE_DELETED)
+					_SetType(&fCurrentType, true);
+				else
+					_SetType(NULL);
+			}
 			break;
 		}
 

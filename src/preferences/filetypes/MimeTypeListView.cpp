@@ -29,7 +29,7 @@ mimetype_is_application_signature(BMimeType& type)
 
 
 MimeTypeItem::MimeTypeItem(BMimeType& type, bool flat)
-	: BStringItem(type.Type(), !flat && type.IsSupertypeOnly() ? 1 : 0, false),
+	: BStringItem(type.Type(), !flat && !type.IsSupertypeOnly() ? 1 : 0, false),
 	fType(type.Type())
 {
 	_SetTo(type);
@@ -93,6 +93,9 @@ MimeTypeItem::_SetTo(BMimeType& type)
 void
 MimeTypeItem::Update()
 {
+	if (IsSupertypeOnly())
+		return;
+
 	BMimeType type(fType.String());
 
 	char description[B_MIME_TYPE_LENGTH];
@@ -222,7 +225,7 @@ MimeTypeListView::_CollectTypes()
 void
 MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
 {
-	SortItemsUnder(underItem, false, &MimeTypeItem::Compare);
+	SortItemsUnder(underItem, underItem != NULL, &MimeTypeItem::Compare);
 
 	bool lastItemSame = false;
 	MimeTypeItem* last = NULL;
@@ -274,6 +277,109 @@ MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
 
 
 void
+MimeTypeListView::AttachedToWindow()
+{
+	BOutlineListView::AttachedToWindow();
+
+	BMimeType::StartWatching(this);
+}
+
+
+void
+MimeTypeListView::DetachedFromWindow()
+{
+	BOutlineListView::DetachedFromWindow();
+
+	BMimeType::StopWatching(this);
+}
+
+
+void
+MimeTypeListView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_META_MIME_CHANGED:
+		{
+			const char* type;
+			int32 which;
+			if (message->FindString("be:type", &type) != B_OK
+				|| message->FindInt32("be:which", &which) != B_OK)
+				break;
+
+			switch (which) {
+				case B_SHORT_DESCRIPTION_CHANGED:
+				{
+					// update label
+	
+					MimeTypeItem* item = FindItem(type);
+					if (item != NULL)
+						UpdateItem(item);
+					break;
+				}
+				case B_MIME_TYPE_CREATED:
+				{
+					// create new item
+					BMimeType created(type);
+					BMimeType superType;
+					MimeTypeItem* superItem = NULL;
+					if (created.GetSupertype(&superType) == B_OK)
+						superItem = FindItem(superType.Type());
+
+					MimeTypeItem* item = new MimeTypeItem(created);
+
+					if (superItem != NULL) {
+						AddUnder(item, superItem);
+						InvalidateItem(IndexOf(superItem));
+							// the super item is not picked up from the class (ie. bug)
+					} else
+						AddItem(item);
+
+					UpdateItem(item);
+					break;
+				}
+				case B_MIME_TYPE_DELETED:
+				{
+					// delete item
+					MimeTypeItem* item = FindItem(type);
+					if (item != NULL) {
+						RemoveItem(item);
+						delete item;
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+			break;
+		}
+
+		default:
+			BOutlineListView::MessageReceived(message);
+	}
+}
+
+
+MimeTypeItem*
+MimeTypeListView::FindItem(const char* type)
+{
+	if (type == NULL)
+		return NULL;
+
+	for (int32 i = FullListCountItems(); i-- > 0;) {
+		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(FullListItemAt(i));
+		if (item == NULL)
+			continue;
+		
+		if (!strcasecmp(item->Type(), type))
+			return item;
+	}
+
+	return NULL;
+}
+
+
+void
 MimeTypeListView::UpdateItem(MimeTypeItem* item)
 {
 	int32 selected = -1;
@@ -292,11 +398,5 @@ MimeTypeListView::UpdateItem(MimeTypeItem* item)
 	}
 	if (Window())
 		InvalidateItem(IndexOf(item));
-}
-
-
-void
-MimeTypeListView::RemoveItem(MimeTypeItem* item)
-{
 }
 
