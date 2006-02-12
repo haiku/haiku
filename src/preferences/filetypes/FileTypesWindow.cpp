@@ -225,7 +225,7 @@ IconView::SetTo(BMimeType* type)
 		fIcon = NULL;
 	}
 
-	if (sourceWas != fIconSource)
+	if (sourceWas != fIconSource || sourceWas != kNoIcon)
 		Invalidate();
 }
 
