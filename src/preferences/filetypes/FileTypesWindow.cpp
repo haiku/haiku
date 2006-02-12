@@ -300,7 +300,8 @@ AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
 
 AttributeListView::AttributeListView(BRect frame, const char* name,
 		uint32 resizingMode)
-	: BListView(frame, name, B_SINGLE_SELECTION_LIST, resizingMode)
+	: BListView(frame, name, B_SINGLE_SELECTION_LIST, resizingMode,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE)
 {
 }
 
