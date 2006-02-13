@@ -18,8 +18,6 @@ public:
 	void MessageReceived(BMessage *message);
 		
 	void AboutRequested(void);
-private:
-	static const char kKeyboardApplicationSig[];
 };
 
 #endif

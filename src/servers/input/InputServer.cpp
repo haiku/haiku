@@ -137,6 +137,8 @@ InputServer::InputServer()
 	: BApplication(INPUTSERVER_SIGNATURE),
 	fSafeMode(false),
 	fInputDeviceListLocker("input server device list"),
+	fKeyboardSettings(),
+	fMouseSettings(),
 	fChars(NULL),
 	fScreen(B_MAIN_SCREEN_ID),
 	fInputMethodWindow(NULL),

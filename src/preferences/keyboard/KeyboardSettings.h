@@ -32,7 +32,6 @@ public :
 	void SetKeyboardRepeatDelay(bigtime_t delay);
 	
 private:
-	static const char 	kKeyboardSettingsFile[];
 	BPoint				fCorner;
 	kb_settings			fSettings;
 	kb_settings			fOriginalSettings;

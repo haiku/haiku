@@ -1,53 +1,41 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
+** Copyright 2004-2006, the Haiku project. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
-** Author : Jérôme Duval
-** Original authors: mccall@digitalparadise.co.uk
+** Authors in chronological order:
+**  mccall@digitalparadise.co.uk
+**  Jérôme Duval
+**  Marcus Overhagen
 */
  
-#include <Application.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
-#include <String.h>
-#include <stdio.h>
-
 #include "KeyboardSettings.h"
 
 KeyboardSettings::KeyboardSettings()
 {
-	fSettings.key_repeat_delay=200;
-	fSettings.key_repeat_rate=250000;
-	
 	BPath path;
+	BFile file;
 	
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK) {
-		path.Append(kb_settings_file);
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			// Now read in the data
-			if (file.Read(&fSettings, sizeof(kb_settings)) != sizeof(kb_settings)) {
-				fSettings.key_repeat_delay=200;
-				fSettings.key_repeat_rate=250000;
-			}
-		}
-	}	
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
+		goto err;
+	if (path.Append(kb_settings_file) < B_OK)
+		goto err;
+	if (file.SetTo(path.Path(), B_READ_ONLY) < B_OK)
+		goto err;
+	if (file.Read(&fSettings, sizeof(kb_settings)) != sizeof(kb_settings))
+		goto err;
+		
+	return;
+err:
+	fSettings.key_repeat_delay = kb_default_key_repeat_delay;
+	fSettings.key_repeat_rate  = kb_default_key_repeat_rate;
 }
+
 
 KeyboardSettings::~KeyboardSettings()
 {	
-	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
-		return;
-
-	path.Append(kb_settings_file);
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK) {
-		file.Write(&fSettings, sizeof(kb_settings));
-	}		
 }
 
 
@@ -55,11 +43,30 @@ void
 KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 {
 	fSettings.key_repeat_rate = rate;
+	Save();
 }
 
 
 void
-KeyboardSettings::SetKeyboardRepeatDelay(int32 rate)
+KeyboardSettings::SetKeyboardRepeatDelay(bigtime_t delay)
 {
-	fSettings.key_repeat_delay = rate;
+	fSettings.key_repeat_delay = delay;
+	Save();
+}
+
+
+void
+KeyboardSettings::Save()
+{
+	BPath path;
+	BFile file;
+	
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
+		return;
+	if (path.Append(kb_settings_file) < B_OK)
+		return;
+	if (file.SetTo(path.Path(), B_WRITE_ONLY | B_CREATE_FILE) < B_OK)
+		return;
+	
+	file.Write(&fSettings, sizeof(kb_settings));
 }

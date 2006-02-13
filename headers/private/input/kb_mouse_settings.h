@@ -14,6 +14,9 @@ typedef struct {
 	int32		key_repeat_rate;
 } kb_settings;
 
+#define kb_default_key_repeat_delay 500000
+#define kb_default_key_repeat_rate	200
+
 #define kb_settings_file "Keyboard_settings"
 
 typedef struct {

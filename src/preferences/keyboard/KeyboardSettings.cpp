@@ -1,63 +1,68 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
+** Copyright 2004-2006, the Haiku project. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
-** Author : mccall@digitalparadise.co.uk, Jérôme Duval
+** Authors in chronological order:
+**  mccall@digitalparadise.co.uk
+**  Jérôme Duval
+**  Marcus Overhagen
 */
  
-#include <Application.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
-#include <String.h>
 #include <stdio.h>
-
 #include "KeyboardSettings.h"
-#include "KeyboardMessages.h"
 
+// Keyboard setting file layout is like this:
+// struct {
+//    struct kb_settings; // managed by input server
+//    BPoint corner;      // used by pref app
+// }
 
 KeyboardSettings::KeyboardSettings()
 {
-	if (get_key_repeat_rate(&fSettings.key_repeat_rate)!=B_OK)
-		fprintf(stderr, "error while get_key_repeat_rate!\n");
-	if (get_key_repeat_delay(&fSettings.key_repeat_delay)!=B_OK)
-		fprintf(stderr, "error while get_key_repeat_delay!\n");
-		
-	fCorner.x = 50;
-	fCorner.y = 50;
-	
-	BPath path;
-	
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK) {
-		path.Append(kb_settings_file);
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			// Now read in the data
+	if (get_key_repeat_rate(&fSettings.key_repeat_rate) != B_OK)
+		fSettings.key_repeat_rate = kb_default_key_repeat_rate;
 
-			file.ReadAt(sizeof(kb_settings), &fCorner, sizeof(BPoint));
-		}
-	} else
-		be_app->PostMessage(ERROR_DETECTED);
-		
+	if (get_key_repeat_delay(&fSettings.key_repeat_delay) != B_OK)
+		fSettings.key_repeat_delay = kb_default_key_repeat_delay;
+
 	fOriginalSettings = fSettings;
+		
+	BPath path;
+	BFile file;
+	
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
+		goto err;
+	if (path.Append(kb_settings_file) < B_OK)
+		goto err;
+	if (file.SetTo(path.Path(), B_READ_ONLY) < B_OK)
+		goto err;
+	if (file.ReadAt(sizeof(kb_settings), &fCorner, sizeof(fCorner)) != sizeof(fCorner))
+		goto err;
+
+	return;
+err:		
+	fCorner.x = 150;
+	fCorner.y = 100;
 }
 
 
 KeyboardSettings::~KeyboardSettings()
 {	
 	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
-		return;
-
-	path.Append(kb_settings_file);
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK) {
-		file.WriteAt(sizeof(kb_settings), &fCorner, sizeof(BPoint));
-	}
+	BFile file;
 	
-		
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
+		return;
+	if (path.Append(kb_settings_file) < B_OK)
+		return;
+	// be careful: don't create the file if it doesn't already exist
+	if (file.SetTo(path.Path(), B_WRITE_ONLY) < B_OK) 
+		return;
+	
+	file.WriteAt(sizeof(kb_settings), &fCorner, sizeof(fCorner));
 }
 
 
@@ -71,7 +76,7 @@ KeyboardSettings::SetWindowCorner(BPoint corner)
 void
 KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 {
-	if (set_key_repeat_rate(rate)!=B_OK)
+	if (set_key_repeat_rate(rate) != B_OK)
 		fprintf(stderr, "error while set_key_repeat_rate!\n");
 	fSettings.key_repeat_rate = rate;
 }
@@ -80,7 +85,7 @@ KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 void
 KeyboardSettings::SetKeyboardRepeatDelay(bigtime_t delay)
 {
-	if (set_key_repeat_delay(delay)!=B_OK)
+	if (set_key_repeat_delay(delay) != B_OK)
 		fprintf(stderr, "error while set_key_repeat_delay!\n");
 	fSettings.key_repeat_delay = delay;
 }
@@ -105,6 +110,6 @@ KeyboardSettings::Revert()
 void
 KeyboardSettings::Defaults()
 {
-	SetKeyboardRepeatDelay(250000);
-	SetKeyboardRepeatRate(200);
+	SetKeyboardRepeatDelay(kb_default_key_repeat_delay);
+	SetKeyboardRepeatRate(kb_default_key_repeat_rate);
 }

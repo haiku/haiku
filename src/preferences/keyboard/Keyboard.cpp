@@ -11,7 +11,6 @@
 #include "KeyboardWindow.h"
 #include "KeyboardMessages.h"
 
-const char KeyboardApplication::kKeyboardApplicationSig[] = "application/x-vnd.Haiku-KeyboardPrefs";
 
 int main(int, char**)
 {
@@ -23,7 +22,7 @@ int main(int, char**)
 }
 
 KeyboardApplication::KeyboardApplication()
-					:BApplication(kKeyboardApplicationSig)
+ :	BApplication("application/x-vnd.Haiku-KeyboardPrefs")
 {
 
 	new KeyboardWindow();
