@@ -1049,7 +1049,7 @@ shutdown_media_server(bigtime_t timeout,
 			return err;
 
 		int32 rv;
-		if ((err = reply.FindInt32("error", &rv)) == B_OK && rv != B_OK)
+		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
 			return rv;
 	}
 
@@ -1061,7 +1061,7 @@ shutdown_media_server(bigtime_t timeout,
 			return err;
 
 		int32 rv;
-		if ((err = reply.FindInt32("error", &rv)) == B_OK && rv != B_OK)
+		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
 			return rv;
 	}
 
