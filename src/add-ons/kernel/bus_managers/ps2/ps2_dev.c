@@ -156,7 +156,7 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 	dprintf("ps2: ps2_dev_command cmd 0x%02x, out %d, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
 	for (i = 0; i < out_count; i++)
-		dprintf("ps2: ps2_dev_command out 0x%02x", out[i]);
+		dprintf("ps2: ps2_dev_command out 0x%02x\n", out[i]);
 
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {

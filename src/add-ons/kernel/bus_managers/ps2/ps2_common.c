@@ -98,7 +98,7 @@ ps2_flush(void)
 		uint8 data;
 		ctrl = ps2_read_ctrl();
 		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
-			return;
+			break;
 		data = ps2_read_data();
 		dprintf("ps2: ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		snooze(100);
@@ -120,7 +120,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 
 	dprintf("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, out_count, in_count);
 	for (i = 0; i < out_count; i++)
-		dprintf("ps2: ps2_command out 0x%02x", out[i]);
+		dprintf("ps2: ps2_command out 0x%02x\n", out[i]);
 
 	res = ps2_wait_write();
 	if (res == B_OK)
@@ -143,7 +143,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	}
 
 	for (i = 0; i < in_count; i++)
-		dprintf("ps2: ps2_command in 0x%02x", in[i]);
+		dprintf("ps2: ps2_command in 0x%02x\n", in[i]);
 	dprintf("ps2: ps2_command result 0x%08lx\n", res);
 
 	atomic_add(&sIgnoreInterrupts, -1);
