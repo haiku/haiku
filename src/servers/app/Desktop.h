@@ -158,6 +158,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		BRegion&				BackgroundRegion()
 									{ return fBackgroundRegion; }
 
+		void					RedrawBackground();
+
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
 

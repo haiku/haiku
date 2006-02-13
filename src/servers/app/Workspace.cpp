@@ -98,9 +98,12 @@ Workspace::Color() const
 void
 Workspace::SetColor(const RGBColor& color, bool makeDefault)
 {
+	if (color == Color())
+		return;
+
 	// TODO: support makeDefault
-	// TODO: redraw desktop!
 	fWorkspace.SetColor(color);
+	fDesktop.RedrawBackground();
 }
 
 

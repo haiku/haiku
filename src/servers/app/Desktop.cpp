@@ -590,6 +590,31 @@ Desktop::SetCursor(ServerCursor* newCursor)
 }
 
 
+/*!
+	\brief Redraws the background (ie. the desktop window, if any).
+*/
+void
+Desktop::RedrawBackground()
+{
+	LockAllWindows();
+
+	BRegion redraw;
+
+	WindowLayer* window = _CurrentWindows().FirstWindow();
+	if (window->Feel() == kDesktopWindowFeel) {
+		// TODO: this doesn't work correctly, yet
+		redraw = window->VisibleContentRegion();
+		window->ProcessDirtyRegion(redraw);
+	} else {
+		redraw = BackgroundRegion();
+		fBackgroundRegion.MakeEmpty();
+		_SetBackground(redraw);
+	}
+
+	UnlockAllWindows();
+}
+
+
 void
 Desktop::UpdateWorkspaces()
 {
