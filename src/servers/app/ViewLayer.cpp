@@ -25,6 +25,7 @@
 #include <Message.h>
 #include <PortLink.h>
 #include <View.h> // for resize modes
+#include <WindowPrivate.h>
 
 #include <stdio.h>
 
@@ -52,6 +53,7 @@ ViewLayer::ViewLayer(BRect frame, const char* name,
 	fHidden(false),
 	fVisible(true),
 	fBackgroundDirty(true),
+	fIsDesktopBackground(false),
 
 	fEventMask(0),
 	fEventOptions(0),
@@ -129,6 +131,10 @@ void
 ViewLayer::AttachedToWindow(WindowLayer* window)
 {
 	fWindow = window;
+
+	// an ugly hack to detect the desktop background
+	if (window->Feel() == kDesktopWindowFeel && Parent() == TopLayer())
+		fIsDesktopBackground = true;
 
 	// insert view into local token space
 	if (fWindow != NULL)
@@ -906,22 +912,23 @@ void
 ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
-	if (!fVisible)
+	if (!fVisible) {
+		// child views cannot be visible either
 		return;
-		// child views can not be visible either
+	}
 
 	if (fViewBitmap != NULL || !fViewColor.IsTransparentMagic()) {
 		// we can only draw within our own area
 		BRegion redraw(ScreenClipping(windowContentClipping));
 		// add the current clipping
 		redraw.IntersectWith(effectiveClipping);
-	
+
 		if (fViewBitmap != NULL) {
 			// draw view bitmap
 			// TODO: support other options!
 			BRect rect = fBitmapDestination;
 			ConvertToScreenForDrawing(&rect);
-	
+
 			// lock the drawing engine for as long as we need the clipping
 			// to be valid
 			if (drawingEngine->Lock()) {
@@ -934,10 +941,10 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 				// would only waste time
 				drawingEngine->Unlock();
 			}
-	
+
 			redraw.Exclude(rect);
 		}
-	
+
 		if (!fViewColor.IsTransparentMagic()) {
 			// fill visible region with view color,
 			// this version of FillRegion ignores any

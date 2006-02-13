@@ -602,8 +602,22 @@ Desktop::RedrawBackground()
 
 	WindowLayer* window = _CurrentWindows().FirstWindow();
 	if (window->Feel() == kDesktopWindowFeel) {
-		// TODO: this doesn't work correctly, yet
 		redraw = window->VisibleContentRegion();
+
+		// look for desktop background view, and update its background color
+		// TODO: is there a better way to do this?
+		ViewLayer* view = window->TopLayer();
+		if (view != NULL)
+			view = view->FirstChild();
+
+		while (view) {
+			if (view->IsDesktopBackground()) {
+				view->SetViewColor(fWorkspaces[fCurrentWorkspace].Color());
+				break;
+			}
+			view = view->NextSibling();
+		}
+
 		window->ProcessDirtyRegion(redraw);
 	} else {
 		redraw = BackgroundRegion();

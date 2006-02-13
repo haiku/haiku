@@ -179,6 +179,9 @@ class ViewLayer {
 			bool			IsBackgroundDirty() const
 								{ return fBackgroundDirty; }
 
+			bool			IsDesktopBackground() const
+								{ return fIsDesktopBackground; }
+
 			void			AddTokensForLayersInRegion(BMessage* message,
 								BRegion& region,
 								BRegion* windowContentClipping);
@@ -222,6 +225,7 @@ class ViewLayer {
 			bool			fHidden;
 			bool			fVisible;
 			bool			fBackgroundDirty;
+			bool			fIsDesktopBackground;
 
 			uint32			fEventMask;
 			uint32			fEventOptions;
