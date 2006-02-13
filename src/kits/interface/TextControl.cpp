@@ -588,8 +588,10 @@ BTextControl::_UpdateTextViewColors(bool enabled)
 
 	if (enabled)
 		textColor = color;
-	else
-		textColor = tint_color(color, B_DISABLED_LABEL_TINT);
+	else {
+		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DISABLED_LABEL_TINT);
+	}
 
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
