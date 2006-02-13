@@ -367,6 +367,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	do {
 		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
 				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+		// XXX this loop deadlocks
+		if (err) panic("map_tmap: get_physical_page_tmap failed");
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
