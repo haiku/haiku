@@ -581,13 +581,13 @@ void
 BTextControl::_UpdateTextViewColors(bool enabled)
 {
 	rgb_color textColor;
-	rgb_color color = {0, 0, 0, 255};
+	rgb_color color;
 	BFont font;
 
-	fText->GetFontAndColor(0, &font, &color);
+	fText->GetFontAndColor(0, &font);
 
 	if (enabled)
-		textColor = color;
+		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	else {
 		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_DISABLED_LABEL_TINT);
@@ -596,9 +596,7 @@ BTextControl::_UpdateTextViewColors(bool enabled)
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
 	if (enabled) {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
+		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	} else {
 		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_LIGHTEN_2_TINT);
