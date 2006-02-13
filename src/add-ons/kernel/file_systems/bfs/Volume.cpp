@@ -556,7 +556,6 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 	return B_OK;
 }
 
-
 #ifdef USER
 extern "C" void kill_device_vnodes(dev_t id);
 	// This call is only available in the userland fs_shell
@@ -610,7 +609,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	if (!IsValidSuperBlock())
 		RETURN_ERROR(B_ERROR);
 
-	if (opener.InitCache(numBlocks) != B_OK)
+	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
 	fJournal = new Journal(this);
@@ -625,7 +624,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 		RETURN_ERROR(B_ERROR);
 
 	off_t id;
-	status_t status = Inode::Create(&transaction, NULL, NULL,
+	status_t status = Inode::Create(transaction, NULL, NULL,
 		S_DIRECTORY | 0755, 0, 0, &id, &fRootNode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
@@ -636,15 +635,15 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 		// The indices root directory will be created automatically
 		// when the standard indices are created (or any other).
 		Index index(this);
-		status = index.Create(&transaction, "name", B_STRING_TYPE);
+		status = index.Create(transaction, "name", B_STRING_TYPE);
 		if (status < B_OK)
 			return status;
 
-		status = index.Create(&transaction, "last_modified", B_INT64_TYPE);
+		status = index.Create(transaction, "last_modified", B_INT64_TYPE);
 		if (status < B_OK)
 			return status;
 
-		status = index.Create(&transaction, "size", B_INT64_TYPE);
+		status = index.Create(transaction, "size", B_INT64_TYPE);
 		if (status < B_OK)
 			return status;
 	}
@@ -660,7 +659,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 		// This call is only available in the userland fs_shell
 
 	Sync();
-	opener.RemoveCache(ALLOW_WRITES);
+	opener.RemoveCache(true);
 	return B_OK;
 }
 #endif
