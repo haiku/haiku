@@ -184,7 +184,7 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		if (!(atomic_get(&dev->flags) & PS2_FLAG_KEYB)) {
 			uint8 prefix_cmd;
-			if (gMultiplexingActive)
+			if (gActiveMultiplexingEnabled)
 				prefix_cmd = 0x90 + dev->idx;
 			else
 				prefix_cmd = 0xd4;

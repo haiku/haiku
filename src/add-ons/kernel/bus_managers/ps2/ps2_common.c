@@ -21,7 +21,7 @@ isa_module_info *gIsa = NULL;
 
 static int32 sIgnoreInterrupts = 0;
 
-bool	gMultiplexingActive = false;
+bool	gActiveMultiplexingEnabled = false;
 sem_id	gControllerSem;
 
 
@@ -109,6 +109,71 @@ ps2_flush(void)
 }
 
 
+static status_t
+ps2_setup_command_byte()
+{
+	status_t res;
+	uint8 cmdbyte;
+	
+	res = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
+	dprintf("ps2: get command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	if (res != B_OK)
+		cmdbyte = 0x47;
+		
+	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT;
+	cmdbyte &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
+		
+	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
+	dprintf("ps2: set command byte: res 0x%08lx, cmdbyte 0x%02x\n", res, cmdbyte);
+	
+	return res;	
+}
+
+
+static status_t
+ps2_setup_active_multiplexing(bool *enabled)
+{
+	status_t res;
+	uint8 in, out;
+
+	out = 0xf0;
+	res = ps2_command(0xd3, &out, 1, &in, 1);
+	if (res)
+		return res;
+
+	out = 0x56;
+	res = ps2_command(0xd3, &out, 1, &in, 1);
+	if (res)
+		return res;
+
+	out = 0xa4;
+	res = ps2_command(0xd3, &out, 1, &in, 1);
+	if (res)
+		return res;
+		
+	// If the controller doesn't support active multiplexing, 
+	// in data is 0xa4 (or 0xac on some broken USB legacy emulation)
+
+	if (in != 0xa4 && in != 0xac) {
+		dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
+		*enabled = true;
+		ps2_command(0xa8, NULL, 0, NULL, 0);
+		ps2_command(0x90, NULL, 0, NULL, 0);
+		ps2_command(0xa8, NULL, 0, NULL, 0);
+		ps2_command(0x91, NULL, 0, NULL, 0);
+		ps2_command(0xa8, NULL, 0, NULL, 0);
+		ps2_command(0x92, NULL, 0, NULL, 0);
+		ps2_command(0xa8, NULL, 0, NULL, 0);
+		ps2_command(0x93, NULL, 0, NULL, 0);
+		ps2_command(0xa8, NULL, 0, NULL, 0);
+	} else {
+		dprintf("ps2: active multiplexing not supported\n");
+		*enabled = false;
+	}
+	return B_OK;
+}
+
+
 status_t
 ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
@@ -155,22 +220,6 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 
 //	#pragma mark -
 
-inline status_t
-ps2_get_command_byte(uint8 *byte)
-{
-	return ps2_command(PS2_CTRL_READ_CMD, NULL, 0, byte, 1);
-}
-
-
-inline status_t
-ps2_set_command_byte(uint8 byte)
-{
-	return ps2_command(PS2_CTRL_WRITE_CMD, &byte, 1, NULL, 0);
-}
-	
-
-//	#pragma mark -
-
 
 static int32 
 ps2_interrupt(void* cookie)
@@ -192,7 +241,7 @@ ps2_interrupt(void* cookie)
 
 	if (ctrl & PS2_STATUS_AUX_DATA) {
 		uint8 idx;
-		if (gMultiplexingActive) {
+		if (gActiveMultiplexingEnabled) {
 			idx = ctrl >> 6;
 			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx));
 		} else {
@@ -238,79 +287,27 @@ ps2_init(void)
 	status = install_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL, 0);
 	if (status)
 		goto err_4;
-
-	{
-		uint8 d, in, out;
-		status_t res;
 		
-		res = ps2_get_command_byte(&d);
-		dprintf("ps2_get_command_byte: res 0x%08x, d 0x%02x\n", res, d);
-		
-		d |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT;
-		d &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
-		
-		res = ps2_set_command_byte(d);
-		dprintf("ps2_set_command_byte: res 0x%08x, d 0x%02x\n", res, d);
-		
-		in = 0x00;
-		out = 0xf0;
-		res = ps2_command(0xd3, &out, 1, &in, 1);
-		dprintf("step1: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
+	status = ps2_setup_command_byte();
+	if (status) {
+		dprintf("ps2: setting up command byte failed\n");
+		goto err_5;
+	}
 
-		in = 0x00;
-		out = 0x56;
-		res = ps2_command(0xd3, &out, 1, &in, 1);
-		dprintf("step2: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
-
-		in = 0x00;
-		out = 0xa4;
-		res = ps2_command(0xd3, &out, 1, &in, 1);
-		dprintf("step3: res 0x%08x, out 0x%02x, in 0x%02x\n", res, out, in);
-		
-		// If the controller doesn't support active multiplexing, 
-		// data is 0xa4 (or 0xac on some broken USB legacy emulation)
-		
-		if (res == B_OK && in != 0xa4 && in != 0xac) {
-			dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
-			gMultiplexingActive = true;
-
-			res = ps2_command(0xa8, NULL, 0, NULL, 0);
-			dprintf("step4: res 0x%08x\n", res);
-
-			res = ps2_command(0x90, NULL, 0, NULL, 0);
-			dprintf("step5: res 0x%08x\n", res);
-			res = ps2_command(0xa8, NULL, 0, NULL, 0);
-			dprintf("step6: res 0x%08x\n", res);
-
-			res = ps2_command(0x91, NULL, 0, NULL, 0);
-			dprintf("step7: res 0x%08x\n", res);
-			res = ps2_command(0xa8, NULL, 0, NULL, 0);
-			dprintf("step8: res 0x%08x\n", res);
-
-			res = ps2_command(0x92, NULL, 0, NULL, 0);
-			dprintf("step9: res 0x%08x\n", res);
-			res = ps2_command(0xa8, NULL, 0, NULL, 0);
-			dprintf("step10: res 0x%08x\n", res);
-
-			res = ps2_command(0x93, NULL, 0, NULL, 0);
-			dprintf("step11: res 0x%08x\n", res);
-			res = ps2_command(0xa8, NULL, 0, NULL, 0);
-			dprintf("step12: res 0x%08x\n", res);
-		} else {
-			dprintf("ps2: active multiplexing not supported\n");
-		}
+	status = ps2_setup_active_multiplexing(&gActiveMultiplexingEnabled);
+	if (status) {
+		dprintf("ps2: setting up active multiplexing failed\n");
+		goto err_5;
 	}
 
 	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
-	if (gMultiplexingActive) {
+	if (gActiveMultiplexingEnabled) {
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
 	}
-	
-	//goto err_5;	
-	
+		
 	TRACE(("ps2_hid: init_driver done!\n"));
 	
 	return B_OK;

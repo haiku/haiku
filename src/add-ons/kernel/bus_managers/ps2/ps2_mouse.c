@@ -335,7 +335,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	status_t status;
 	int i;
 	
-	TRACE(("mouse_open() %s\n", name));	
+	dprintf("ps2: mouse_open %s\n", name);
 
 	for (dev = NULL, i = 0; i < PS2_DEVICE_COUNT; i++) {
 		if (0 == strcmp(ps2_device[i].name, name)) {
@@ -390,7 +390,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 
 	atomic_or(&dev->flags, PS2_FLAG_ENABLED);
 
-	TRACE(("mouse_open(): mouse succesfully enabled\n"));
+	dprintf("ps2: mouse_open %s success\n", name);
 	return B_OK;
 
 err4:
@@ -401,6 +401,8 @@ err2:
 	free(cookie);
 err1:
 	atomic_and(&dev->flags, ~PS2_FLAG_OPEN);
+
+	dprintf("ps2: mouse_open %s failed\n", name);
 	return B_ERROR;
 }
 
