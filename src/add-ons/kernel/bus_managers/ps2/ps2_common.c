@@ -224,6 +224,8 @@ ps2_init(void)
 		goto err_1;
 
 	gControllerSem = create_sem(1, "ps/2 keyb ctrl");
+	
+	ps2_flush();
 
 	status = ps2_dev_init();
 
