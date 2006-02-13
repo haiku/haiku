@@ -68,7 +68,7 @@ ps2_dev_publish(ps2_dev *dev)
 	status = devfs_publish_device(dev->name, NULL, 
 		(atomic_get(&dev->flags) & PS2_FLAG_KEYB) ? &gKeyboardDeviceHooks : &gMouseDeviceHooks);
 
-	TRACE(("devfs_publish_device %s, status = 0x%08x\n", dev->name, status));
+	dprintf("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
 
@@ -151,14 +151,16 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 {
 	status_t res;
 	bigtime_t start;
-	int i, count;
 	int32 sem_count;
+	int i;
 
-	dprintf("ps2_dev_command %02x, %d out, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
+	dprintf("ps2: ps2_dev_command cmd 0x%02x, out %d, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
+	for (i = 0; i < out_count; i++)
+		dprintf("ps2: ps2_dev_command out 0x%02x", out[i]);
 
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
-		dprintf("ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
+		dprintf("ps2: ps2_dev_command: sem_count %ld, fixing!\n", sem_count);
 		if (sem_count > 0)
 			acquire_sem_etc(dev->result_sem, sem_count, 0, 0);
 		else
@@ -200,17 +202,17 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-		dprintf("ps2_dev_command wait for ack res %08x, wait-time %Ld\n", res, system_time() - start);
+		dprintf("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
 		if (res != B_OK)
 			break;
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_ACK) {
-			dprintf("ps2_dev_command got ACK\n");
+			dprintf("ps2: ps2_dev_command got ACK\n");
 		}
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_NACK) {
-			dprintf("ps2_dev_command got NACK\n");
+			dprintf("ps2: ps2_dev_command got NACK\n");
 			res = B_ERROR;
 			break;
 		}
@@ -218,19 +220,20 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	}	
 	
 	if (res == B_OK && in_count != 0) {
-		dprintf("ps2_dev_command waiting input data\n");
-
 		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+		dprintf("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
-		count = in_count - dev->result_buf_cnt;
-		dev->result_buf_cnt = 0;
-
-		dprintf("ps2_dev_command wait for input res %08x, in %d, wait-time %Ld\n", res, count, system_time() - start);
-
-		for (i = 0; i < count; i++)
-			dprintf("ps2_dev_command data %02x\n", in[i]);
+		if (dev->result_buf_cnt != 0) {
+			dprintf("ps2: ps2_dev_command error: %d input bytes not received\n", dev->result_buf_cnt);
+			dev->result_buf_cnt = 0;
+		}
+		
+		for (i = 0; i < in_count; i++)
+			dprintf("ps2: ps2_dev_command in 0x%02x\n", in[i]);
 	}
+
+	dprintf("ps2: ps2_dev_command result 0x%08lx\n", res);
 
 	atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 

@@ -25,21 +25,21 @@ bool	gMultiplexingActive = false;
 sem_id	gControllerSem;
 
 
-inline uint8
-ps2_read_ctrl()
+uint8
+ps2_read_ctrl(void)
 {
 	return gIsa->read_io_8(PS2_PORT_CTRL);
 }
 
 
-inline uint8
-ps2_read_data()
+uint8
+ps2_read_data(void)
 {
 	return gIsa->read_io_8(PS2_PORT_DATA);
 }
 
 
-inline void
+void
 ps2_write_ctrl(uint8 ctrl)
 {
 	TRACE(("ps2_write_ctrl 0x%02x\n", ctrl));
@@ -48,7 +48,7 @@ ps2_write_ctrl(uint8 ctrl)
 }
 
 
-inline void
+void
 ps2_write_data(uint8 data)
 {
 	TRACE(("ps2_write_data 0x%02x\n", data));
@@ -58,7 +58,7 @@ ps2_write_data(uint8 data)
 
 
 status_t
-ps2_wait_read()
+ps2_wait_read(void)
 {
 	int i;
 	for (i = 0; i < PS2_CTRL_WAIT_TIMEOUT / 50; i++) {
@@ -71,7 +71,7 @@ ps2_wait_read()
 
 
 status_t
-ps2_wait_write()
+ps2_wait_write(void)
 {
 	int i;
 	for (i = 0; i < PS2_CTRL_WAIT_TIMEOUT / 50; i++) {
@@ -86,7 +86,7 @@ ps2_wait_write()
 //	#pragma mark -
 
 void
-ps2_flush()
+ps2_flush(void)
 {
 	int i;
 
@@ -100,7 +100,7 @@ ps2_flush()
 		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 			return;
 		data = ps2_read_data();
-		TRACE(("ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb"));
+		dprintf("ps2: ps2_flush: ctrl 0x%02x, data 0x%02x (%s)\n", ctrl, data, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		snooze(100);
 	}
 
@@ -114,9 +114,13 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 {
 	status_t res;
 	int i;
-	
+		
 	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
+
+	dprintf("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, out_count, in_count);
+	for (i = 0; i < out_count; i++)
+		dprintf("ps2: ps2_command out 0x%02x", out[i]);
 
 	res = ps2_wait_write();
 	if (res == B_OK)
@@ -126,13 +130,21 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 		res = ps2_wait_write();
 		if (res == B_OK)
 			ps2_write_data(out[i]);
+		else
+			dprintf("ps2: ps2_command out byte %d failed\n", i);
 	}
 
 	for (i = 0; res == B_OK && i < in_count; i++) {
 		res = ps2_wait_read();
 		if (res == B_OK)
 			in[i] = ps2_read_data();
+		else
+			dprintf("ps2: ps2_command in byte %d failed\n", i);
 	}
+
+	for (i = 0; i < in_count; i++)
+		dprintf("ps2: ps2_command in 0x%02x", in[i]);
+	dprintf("ps2: ps2_command result 0x%08lx\n", res);
 
 	atomic_add(&sIgnoreInterrupts, -1);
 	release_sem(gControllerSem);

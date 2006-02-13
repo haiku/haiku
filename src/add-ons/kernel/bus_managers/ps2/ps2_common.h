@@ -44,10 +44,14 @@ extern sem_id gControllerSem;
 status_t		ps2_init(void);
 void			ps2_uninit(void);
 
-extern status_t ps2_wait_read();
-extern status_t ps2_wait_write();
+uint8			ps2_read_ctrl(void);
+uint8			ps2_read_data(void);
+void			ps2_write_ctrl(uint8 ctrl);
+void			ps2_write_data(uint8 data);
+status_t		ps2_wait_read(void);
+status_t		ps2_wait_write(void);
 
-extern void ps2_flush();
+void			ps2_flush(void);
 
 extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
 

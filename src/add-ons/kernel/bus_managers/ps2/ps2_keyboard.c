@@ -215,7 +215,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
 	status_t status;
 
-	TRACE(("keyboard open()\n"));
+	dprintf("ps2: keyboard_open\n");
 
 	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
@@ -242,7 +242,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	*_cookie = NULL;
 
-	TRACE(("keyboard_open(): done.\n"));
+	dprintf("ps2: keyboard_open success\n");
 	return B_OK;
 
 err4:
@@ -253,6 +253,7 @@ err2:
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
 
+	dprintf("ps2: keyboard_open failed\n");
 	return status;
 }
 

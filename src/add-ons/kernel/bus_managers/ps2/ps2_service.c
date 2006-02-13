@@ -130,7 +130,7 @@ ps2_service_thread(void *arg)
 			// do periodic processing
 		
 		} else {
-			dprintf("ps2_service_thread: Error, status 0x%08x, terminating\n", status);
+			dprintf("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
 			break;
 		}
 	}
