@@ -627,6 +627,10 @@
 #define NV32_2PANEL_PWR		0x0060281c//verify!!!
 #define NV32_2FUNCSEL		0x00602860
 
+/* both heads */
+#define NVACC_NV11_CRTC_LO	0x00600830
+#define NVACC_NV11_CRTC_HI	0x00600834
+
 /* Nvidia DAC direct registers (standard VGA palette RAM registers) */
 /* primary head */
 #define NV8_PALMASK			0x006813c6
