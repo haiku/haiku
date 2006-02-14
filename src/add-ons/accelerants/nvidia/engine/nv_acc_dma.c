@@ -312,8 +312,8 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
 		ACCW(PR_CTX0_5, 0x00000000); /* extra */
 		ACCW(PR_CTX1_5, 0x00000000); /* extra */
-		/* setup set '4' for cmd NV_IMAGE_BLIT */
-		ACCW(PR_CTX0_6, 0x0208005f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
+		/* setup set '4' for cmd NV12_IMAGE_BLIT */
+		ACCW(PR_CTX0_6, 0x0208009f); /* NVclass $09f, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_6, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
 		ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
@@ -392,8 +392,17 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX1_3, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_3, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
 		ACCW(PR_CTX3_3, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
-		/* setup set '4' for cmd NV_IMAGE_BLIT */
-		ACCW(PR_CTX0_4, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
+		/* setup set '4' for ... */
+		if (si->ps.card_type >= NV11)
+		{
+			/* ... cmd NV12_IMAGE_BLIT */
+			ACCW(PR_CTX0_4, 0x0100809f); /* NVclass $09f, patchcfg ROP_AND, nv10+: little endian */
+		}
+		else
+		{
+			/* ... cmd NV_IMAGE_BLIT */
+			ACCW(PR_CTX0_4, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
+		}
 		ACCW(PR_CTX1_4, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_4, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
 		ACCW(PR_CTX3_4, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
