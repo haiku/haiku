@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.72, Rudolf)</h1></p>
+<p><h1>head (SVN 0.73, Rudolf)</h1></p>
 <ul>
 <li>The overlay engine code now respects the B_OVERLAY_COLOR_KEY flag instead of forcing keying ON;
 <li>Hook GET_ACCELERANT_DEVICE_INFO now returns much more detailed info about the card in use;
@@ -12,7 +12,9 @@
 <li>Improved coldstart RAM tests for NV10 and higher: they could fail to correctly program the card on 'high-voltage' AGP 1.0 slots (confirmed a NV11);
 <li>Added support for acceleration engine 2D command SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT (as defined by Be) for all cards;
 <li>Fixed driver not always finding it's VGA BIOS when started and stopped more than once per system uptime 'session';
-<li>Fixed 'BScreen Sync-to-Retrace not working' bug that appeared on all dualhead cards when CRTC2 was used as primary CRTC. On some systems outthere this bug might have shown itself as a 'system (or app) hanging' error occuring while using apps that feature explicit retrace sync. Completely rewrote interrupt handling to now handle retrace syncs on both CRTC1 and CRTC2, although only the CRTC used as primary will be enabled (for now).
+<li>Fixed 'BScreen Sync-to-Retrace not working' bug that appeared on all dualhead cards when CRTC2 was used as primary CRTC. On some systems outthere this bug might have shown itself as a 'system (or app) hanging' error occuring while using apps that feature explicit retrace sync. Completely rewrote interrupt handling to now handle retrace syncs on both CRTC1 and CRTC2, although only the CRTC used as primary will be enabled (for now);
+<li>Modified hardware 3D rendering colorspace setting for 32bit depth: this gives us upto some 11% gain on accelerated 3D rendering speed using the 3D accelerant;
+<li>Added new nv.setting called 'force_sync': this option (if enabled) forces accelerated 3D rendering to be synchronized to the screen's vertical retrace (refreshrate). This option is disabled by default.
 </ul>
 <p><h1>nv_driver 0.67 (Rudolf)</h1></p>
 <ul>

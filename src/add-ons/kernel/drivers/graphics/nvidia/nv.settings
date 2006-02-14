@@ -20,6 +20,7 @@ switchhead	false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
 dma_acc	true			# if true enable DMA cmd fetching for 2D acc (instead of using PIO)
 #tv_output	0			# disabled or 0 = autodetect, 1 = Y/C (and CVBS if possible), 2 = CVBS
+force_sync	false			# if true forces 3D rendering to be synchronized to the vertical retrace
 
 # WARNING: tweak alert! modify stuff below on your own risk...
 unhide_fw	false			# if true 'unhide' cards AGP fastwrite support on cards that hide it

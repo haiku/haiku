@@ -368,6 +368,7 @@ static nv_settings current_settings = { // see comments in nv.settings
 	true,					// pgm_panel
 	true,					// dma_acc
 	false,					// vga_on_tv
+	false,					// force_sync
 };
 
 static void dumprom (void *rom, uint32 size, pci_info pcii)
@@ -568,6 +569,7 @@ init_driver(void) {
 		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
 		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
 		current_settings.vga_on_tv = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
+		current_settings.force_sync = get_driver_boolean_parameter (settings_handle, "force_sync", false, false);
 
 		unload_driver_settings (settings_handle);
 	}

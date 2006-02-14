@@ -211,6 +211,17 @@ This option only has an effect if you have a card with supported TV encoder chip
 If you select <strong>vga_on_tv false</strong> the driver will automatically shut-off your VGA (or DVI) monitor (by means of special internal DPMS settings) when a TVout mode is enabled on the head the monitor is connected to. This means that on singlehead cards and on dualhead cards using singlehead TV modes your only output will be on TV. This is the standard way of doing things.
 		<li><strong>true:</strong> With this setting VGA (or DVI) output on a head is enabled concurrent with TV output on that head: that is if you select a TVout mode. This setting is a 'tweak' because the modeline used to drive your monitor is the same modeline that is used for the TV output. This means that the monitor picture positioning is probably a bit odd, in some modes it might distort somewhat, and the refreshrate will be 50Hz for PAL modes, and 60Hz for NTSC modes. Make sure you only enable this tweak if you know your monitor supports down to 50Hz refreshrate, and preferably has a failsafe built in that blocks output when out-of-range signals are sent to it (almost every newer monitor has this feature).<br>
 	</ul>
+	<li><strong>force_sync:</strong><br>
+This option only has an effect on hardware accelerated 3D rendering. When set to <strong>true</strong> it forces the 3D screen updates to be synchronized to your screen's vertical retraces, preventing 'tearing' to occur.
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+If you select <strong>force_sync false</strong> the driver's 3D accelerant will render 3D scenes as fast as it can, without paying attention to the actual screen's refreshrate. The upside of this setting is that you can measure the actual rendering power your card has in a specific mode for a specific application (if that application supports benchmarking). The downside is that you'll be able to witness 'tearing': the effect of seeing random horizontal distortion 'stripes' onscreen, especially when the view moves fast in a horizontal direction (like looking around in a room in Quake2). If you need the last bit of rendering power because you run a heavy app on a relatively 'slow' card, this setting might be your best option: it's a bit faster than using <strong>force_sync true</strong>.
+		<li><strong>true:</strong> With this setting all tearing effects should be gone. Another reason to use this setting would be 'fixing' the driver's fps (frames per second) rendered. That is, when you are using a screen mode that your card can render at least at the speed your screen's refreshrate is set to: In this case the fps will be virtually independant of the complexity of the rendered scenes. Hardcore gamers amongst us really want this feature to get 'fixed' latencies so they can issue (firing) commands at the exact right time...<br>
+	</ul>
+<strong>Note please:</strong>
+<ul>
+<li>Forcing vertical retrace synchronisation using the force_sync option 'overrules' retrace sync settings done in your applications: all applications will be synchronized to the vertical retrace events.
+</ul>
 <li><strong>primary:</strong> (set to disabled by default)<br>
 Primary lets you force a certain card to be used as primary card in your system if you have multiple graphics cards installed: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also set 'usebios false' as otherwise the card(s) aren't coldstarted by the driver.<br>
 <strong>Note please:</strong>
@@ -223,6 +234,6 @@ Primary lets you force a certain card to be used as primary card in your system 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 29, 2005)</p>
+<p>(Page last updated on February 14, 2006)</p>
 </body>
 </html>
