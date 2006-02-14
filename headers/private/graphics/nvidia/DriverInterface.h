@@ -156,6 +156,7 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   pgm_panel;
 	bool   dma_acc;
 	bool   vga_on_tv;
+	bool   force_sync;
 } nv_settings;
 
 /* shared info */
