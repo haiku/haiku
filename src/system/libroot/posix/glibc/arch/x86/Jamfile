@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src system libroot posix glibc arch x86 ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
@@ -30,12 +31,21 @@ local genericSources =
 	k_cos.c k_cosf.c
 	k_sin.c k_sinf.c
 	k_tan.c k_tanf.c
+	s_cacos.c s_cacosf.c
+	s_cacosh.c s_cacoshf.c
+	s_casin.c s_casinf.c
+	s_casinh.c s_casinhf.c
+	s_catan.c s_catanf.c
+	s_catanh.c s_catanhf.c
+	s_clog.c s_clogf.c #s_clogl.c
+	s_csqrt.c s_csqrtf.c #s_csqrtl.c
 	s_erf.c s_erff.c # s_erfl.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
 	s_isinf.c s_isinff.c
 	s_isnan.c s_isnanf.c
 	s_ldexp.c s_ldexpf.c #s_ldexpl.c
 	s_modf.c s_modff.c # s_modfl.c
+	s_nan.c s_nanf.c
 	s_signbit.c s_signbitl.c
 	s_round.c s_roundf.c # s_roundl.c
 	s_signgam.c
