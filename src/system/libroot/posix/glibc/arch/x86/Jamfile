@@ -40,14 +40,17 @@ local genericSources =
 	s_round.c s_roundf.c # s_roundl.c
 	s_signgam.c
 	s_tanh.c s_tanhf.c
-	
+
 	w_acos.c w_acosf.c # w_acosl.c
 	w_acosh.c w_acoshf.c # w_acoshl.c
+	w_asin.c w_asinf.c # w_asinl.c
 	w_atan2.c w_atan2f.c # w_atan2l.c
 	w_atanh.c w_atanhf.c # w_atanhl.c
 	w_cosh.c w_coshf.c # w_coshl.c
 	w_drem.c w_dremf.c # w_dreml.c
 	w_exp.c w_expf.c # w_expl.c
+	w_exp10.c w_exp10f.c # w_exp10l.c
+	w_exp2.c w_exp2f.c # w_exp2l.c
 	w_fmod.c w_fmodf.c # w_fmodl.c
 	w_hypot.c w_hypotf.c # w_hypotl.c
 	w_j0.c w_j0f.c
@@ -57,10 +60,13 @@ local genericSources =
 	w_lgamma_r.c w_lgammaf_r.c 
 	w_log.c w_logf.c # w_logl.c
 	w_log10.c w_log10f.c # w_log10l.c
+	w_log2.c w_log2f.c # w_log2l.c
 	w_pow.c w_powf.c # w_powl.c
 	w_remainder.c w_remainderf.c # w_remainderl.c
+	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
 	w_sqrt.c w_sqrtf.c # w_sqrtl.c
+	w_tgamma.c w_tgammaf.c # w_tgammal.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
@@ -84,9 +90,12 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_e.o :
 	e_atan2.S e_atan2f.S e_atan2l.c
 	e_atanh.S e_atanhf.S e_atanhl.S
 	e_exp.S e_expf.S e_expl.c
+	e_exp2.S e_exp2f.S e_exp2l.S
+	e_exp10.S e_exp10f.S e_exp10l.S
 	e_fmod.S e_fmodf.S e_fmodl.c
 	e_hypot.S e_hypotf.S
 	e_log.S e_logf.S e_logl.S
+	e_log2.S e_log2f.S e_log2l.S
 	e_log10.S e_log10f.S e_log10l.S
 	e_pow.S e_powf.S e_powl.S
 	e_remainder.S e_remainderf.S e_remainderl.S
