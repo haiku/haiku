@@ -890,6 +890,15 @@ status_t nv_acc_init_dma()
 	ACCW(ABS_UCLP_XMAX, 0x00007fff);
 	ACCW(ABS_UCLP_YMAX, 0x00007fff);
 
+	/* setup sync parameters for NV12_IMAGE_BLIT command for the current mode:
+	 * values given are CRTC vertical counter limit values. The NV12 command will wait
+	 * for the specified's CRTC's vertical counter to be in between the given values */
+	if (si->ps.card_type >= NV11)
+	{
+		ACCW(NV11_CRTC_LO, si->dm.timing.v_display - 1);
+		ACCW(NV11_CRTC_HI, si->dm.timing.v_display + 1);
+	}
+
 	/*** PFIFO ***/
 	/* (setup caches) */
 	/* disable caches reassign */
