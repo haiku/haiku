@@ -31,7 +31,9 @@ class FileTypesWindow : public BWindow {
 
 	private:
 		void _UpdateExtensions(BMimeType* type);
+		void _AdoptPreferredApplication(BMessage* message, bool sameAs);
 		void _AddSignature(BMenuItem* item, const char* signature);
+		BMenuItem* _CreateApplicationItem(const char* signature);
 		void _UpdatePreferredApps(BMimeType* type);
 		void _UpdateIcon(BMimeType* type);
 		void _SetType(BMimeType* type, int32 forceUpdate = 0);
@@ -61,5 +63,8 @@ class FileTypesWindow : public BWindow {
 		BButton*		fRemoveAttributeButton;
 
 };
+
+static const uint32 kMsgPreferredAppOpened = 'paOp';
+static const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 #endif	// FILE_TYPES_WINDOW_H

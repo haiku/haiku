@@ -9,6 +9,7 @@
 #include "MimeTypeListView.h"
 
 #include <Alert.h>
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
@@ -18,6 +19,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
+#include <NodeInfo.h>
 #include <OutlineListView.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
@@ -762,6 +764,56 @@ FileTypesWindow::_UpdateExtensions(BMimeType* type)
 
 
 void
+FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
+{
+	if (fCurrentType.Type() == NULL)
+		return;
+
+	entry_ref ref;
+	if (message->FindRef("refs", &ref) != B_OK)
+		return;
+
+	// TODO: add error reporting!
+
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	char preferred[B_MIME_TYPE_LENGTH];
+
+	if (sameAs) {
+		// get preferred app from file
+		BNodeInfo nodeInfo(&file);
+		if (nodeInfo.InitCheck() != B_OK)
+			return;
+
+		if (nodeInfo.GetPreferredApp(preferred) != B_OK)
+			preferred[0] = '\0';
+
+		if (!preferred[0]) {
+			// get MIME type from file
+			char type[B_MIME_TYPE_LENGTH];
+			if (nodeInfo.GetType(type) == B_OK) {
+				BMimeType mimeType(type);
+				mimeType.GetPreferredApp(preferred);
+			}
+		}
+	} else {
+		// get application signature
+		BAppFileInfo appInfo(&file);
+		if (appInfo.InitCheck() != B_OK)
+			return;
+
+		if (appInfo.GetSignature(preferred) != B_OK)
+			preferred[0] = '\0';
+	}
+
+	if (preferred[0])
+		fCurrentType.SetPreferredApp(preferred);
+}
+
+
+void
 FileTypesWindow::_AddSignature(BMenuItem* item, const char* signature)
 {
 	const char* subType = strchr(signature, '/');
@@ -772,6 +824,22 @@ FileTypesWindow::_AddSignature(BMenuItem* item, const char* signature)
 	snprintf(label, sizeof(label), "%s (%s)", item->Label(), subType + 1);
 
 	item->SetLabel(label);
+}
+
+
+BMenuItem*
+FileTypesWindow::_CreateApplicationItem(const char* signature)
+{
+	char name[B_FILE_NAME_LENGTH];
+
+	BMessage* message = new BMessage(kMsgPreferredAppChosen);
+	message->AddString("signature", signature);
+
+	BMimeType applicationType(signature);
+	if (applicationType.GetShortDescription(name) == B_OK)
+		return new BMenuItem(name, message);
+
+	return new BMenuItem(signature, message);
 }
 
 
@@ -807,17 +875,7 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 	const char* signature;
 	int32 i = 0;
 	while (applications.FindString("applications", i, &signature) == B_OK) {
-		char name[B_FILE_NAME_LENGTH];
-		BMenuItem *item;
-
-		BMessage* message = new BMessage(kMsgPreferredAppChosen);
-		message->AddString("signature", signature);
-
-		BMimeType applicationType(signature);
-		if (applicationType.GetShortDescription(name) == B_OK)
-			item = new BMenuItem(name, message);
-		else
-			item = new BMenuItem(signature, message);
+		BMenuItem* item = _CreateApplicationItem(signature);
 
 		if (i < lastFullSupport)
 			subList.AddItem(item);
@@ -892,6 +950,14 @@ FileTypesWindow::_UpdatePreferredApps(BMimeType* type)
 		// We don't select the item earlier, so that the menu field can
 		// pick up the signature as well as label.
 		select->SetMarked(true);
+	} else if (preferred[0]) {
+		// The preferred application is not an application that support
+		// this file type!
+		BMenuItem* item = _CreateApplicationItem(preferred);
+
+		menu->AddSeparatorItem();
+		menu->AddItem(item);
+		item->SetMarked(item);
 	}
 }
 
@@ -1078,6 +1144,20 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				fCurrentType.SetPreferredApp(signature);
 			break;
 		}
+
+		case kMsgSelectPreferredApp:
+			be_app->PostMessage(kMsgOpenSelectPanel);
+			break;
+		case kMsgPreferredAppOpened:
+			_AdoptPreferredApplication(message, false);
+			break;
+
+		case kMsgSamePreferredAppAs:
+			be_app->PostMessage(kMsgOpenSameAsPanel);
+			break;
+		case kMsgSamePreferredAppAsOpened:
+			_AdoptPreferredApplication(message, true);
+			break;
 
 		// Extra Attributes group
 

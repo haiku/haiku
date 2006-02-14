@@ -51,7 +51,8 @@ FileTypes::FileTypes()
 	fTypesWindow(NULL),
 	fWindowCount(0)
 {
-	fFilePanel = new BFilePanel();
+	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
+		B_FILE_NODE | B_DIRECTORY_NODE, false);
 	fTypesWindowFrame = BRect(80.0f, 80.0f, 600.0f, 480.0f);
 		// TODO: read from settings
 }
@@ -162,8 +163,38 @@ FileTypes::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgOpenFilePanel:
-			fFilePanel->Show();
+			// the open file panel sends us a message when it's done
+			fFilePanel->Window()->SetTitle("Open File");
+			fFilePanel->SetMessage(new BMessage(B_REFS_RECEIVED));
+
+			if (!fFilePanel->IsShowing())
+				fFilePanel->Show();
 			break;
+
+		case kMsgOpenSelectPanel:
+			fFilePanel->Window()->SetTitle("Select Preferred Application");
+			fFilePanel->SetMessage(new BMessage(kMsgPreferredAppOpened));
+
+			if (!fFilePanel->IsShowing())
+				fFilePanel->Show();
+			break;
+		case kMsgPreferredAppOpened:
+			if (fTypesWindow != NULL)
+				fTypesWindow->PostMessage(message);
+			break;
+
+		case kMsgOpenSameAsPanel:
+			fFilePanel->Window()->SetTitle("Select Same Preferred Application As");
+			fFilePanel->SetMessage(new BMessage(kMsgSamePreferredAppAsOpened));
+
+			if (!fFilePanel->IsShowing())
+				fFilePanel->Show();
+			break;
+		case kMsgSamePreferredAppAsOpened:
+			if (fTypesWindow != NULL)
+				fTypesWindow->PostMessage(message);
+			break;
+
 		case B_CANCEL:
 			if (fWindowCount == 0)
 				PostMessage(B_QUIT_REQUESTED);

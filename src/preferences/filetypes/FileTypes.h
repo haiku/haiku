@@ -12,6 +12,9 @@
 extern const char* kSignature;
 
 static const uint32 kMsgOpenFilePanel = 'opFp';
+static const uint32 kMsgOpenSelectPanel = 'opSp';
+static const uint32 kMsgOpenSameAsPanel = 'opAp';
+
 static const uint32 kMsgOpenTypesWindow = 'opTw';
 static const uint32 kMsgTypesWindowClosed = 'clTw';
 static const uint32 kMsgWindowClosed = 'WiCl';
