@@ -41,7 +41,7 @@ typedef struct {
 
 #define NV_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
 
-/*dualhead extensions to flags*/
+/* dualhead extensions to flags */
 #define DUALHEAD_OFF (0<<6)
 #define DUALHEAD_CLONE (1<<6)
 #define DUALHEAD_ON (2<<6)
@@ -82,6 +82,7 @@ enum {
 #define NV4_SURFACE						0x00000010 /* 2D */
 #define NV10_CONTEXT_SURFACES_2D		0x00000010 /* 2D */
 #define NV_IMAGE_BLIT					0x00000011 /* 2D */
+#define NV12_IMAGE_BLIT					0x00000011 /* 2D */
 /* fixme:
  * never use NV3_GDI_RECTANGLE_TEXT for DMA acceleration:
  * There's a hardware fault in the input->output colorspace conversion here.
