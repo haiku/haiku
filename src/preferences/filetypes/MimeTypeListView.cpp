@@ -335,6 +335,11 @@ MimeTypeListView::MessageReceived(BMessage* message)
 						AddItem(item);
 
 					UpdateItem(item);
+
+					if (!fSelectNewType.ICompare(type)) {
+						SelectItem(item);
+						fSelectNewType = "";
+					}
 					break;
 				}
 				case B_MIME_TYPE_DELETED:
@@ -360,6 +365,57 @@ MimeTypeListView::MessageReceived(BMessage* message)
 }
 
 
+/*!
+	\brief This method makes sure a new MIME type will be selected.
+	
+	If it's not in the list yet, it will be selected as soon as it's
+	added.
+*/
+void
+MimeTypeListView::SelectNewType(const char* type)
+{
+	if (SelectType(type))
+		return;
+
+	fSelectNewType = type;
+}
+
+
+bool
+MimeTypeListView::SelectType(const char* type)
+{
+	MimeTypeItem* item = FindItem(type);
+	if (item == NULL)
+		return false;
+
+	SelectItem(item);
+	return true;
+}
+
+
+void
+MimeTypeListView::SelectItem(MimeTypeItem* item)
+{
+	if (item == NULL) {
+		Select(-1);
+		return;
+	}
+
+	// Make sure the item is visible
+
+	BListItem* superItem = item;
+	while ((superItem = Superitem(superItem)) != NULL) {
+		Expand(superItem);
+	}
+
+	// Select it, and make it visible
+
+	int32 index = IndexOf(item);
+	Select(index);
+	ScrollToSelection();
+}
+
+
 MimeTypeItem*
 MimeTypeListView::FindItem(const char* type)
 {
@@ -370,7 +426,7 @@ MimeTypeListView::FindItem(const char* type)
 		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(FullListItemAt(i));
 		if (item == NULL)
 			continue;
-		
+
 		if (!strcasecmp(item->Type(), type))
 			return item;
 	}

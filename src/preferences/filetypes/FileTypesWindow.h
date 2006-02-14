@@ -6,6 +6,7 @@
 #define FILE_TYPES_WINDOW_H
 
 
+#include <Alert.h>
 #include <Mime.h>
 #include <Window.h>
 
@@ -28,6 +29,8 @@ class FileTypesWindow : public BWindow {
 
 		virtual void MessageReceived(BMessage* message);
 		virtual bool QuitRequested();
+
+		void PlaceSubWindow(BWindow* window);
 
 	private:
 		void _UpdateExtensions(BMimeType* type);
@@ -62,9 +65,19 @@ class FileTypesWindow : public BWindow {
 		BButton*		fAddAttributeButton;
 		BButton*		fRemoveAttributeButton;
 
+		BWindow*		fNewTypeWindow;
+		BWindow*		fExtensionWindow;
+		BWindow*		fAttributeWindow;
 };
 
 static const uint32 kMsgPreferredAppOpened = 'paOp';
 static const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
+
+static const uint32 kMsgSelectNewType = 'slnt';
+static const uint32 kMsgNewTypeWindowClosed = 'ntwc';
+
+
+extern void error_alert(const char* message, status_t status = B_OK,
+	alert_type type = B_WARNING_ALERT);
 
 #endif	// FILE_TYPES_WINDOW_H

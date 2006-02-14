@@ -164,7 +164,7 @@ FileTypes::MessageReceived(BMessage *message)
 
 		case kMsgOpenFilePanel:
 			// the open file panel sends us a message when it's done
-			fFilePanel->Window()->SetTitle("Open File");
+			fFilePanel->Window()->SetTitle("FileTypes: Open File");
 			fFilePanel->SetMessage(new BMessage(B_REFS_RECEIVED));
 
 			if (!fFilePanel->IsShowing())
@@ -172,7 +172,7 @@ FileTypes::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgOpenSelectPanel:
-			fFilePanel->Window()->SetTitle("Select Preferred Application");
+			fFilePanel->Window()->SetTitle("FileTypes: Select Preferred Application");
 			fFilePanel->SetMessage(new BMessage(kMsgPreferredAppOpened));
 
 			if (!fFilePanel->IsShowing())
@@ -184,7 +184,7 @@ FileTypes::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgOpenSameAsPanel:
-			fFilePanel->Window()->SetTitle("Select Same Preferred Application As");
+			fFilePanel->Window()->SetTitle("FileTypes: Select Same Preferred Application As");
 			fFilePanel->SetMessage(new BMessage(kMsgSamePreferredAppAsOpened));
 
 			if (!fFilePanel->IsShowing())

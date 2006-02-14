@@ -49,6 +49,10 @@ class MimeTypeListView : public BOutlineListView {
 			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~MimeTypeListView();
 
+		void SelectNewType(const char* type);
+		bool SelectType(const char* type);
+
+		void SelectItem(MimeTypeItem* item);
 		MimeTypeItem* FindItem(const char* type);
 
 		void UpdateItem(MimeTypeItem* item);
@@ -62,6 +66,8 @@ class MimeTypeListView : public BOutlineListView {
 	private:
 		void _CollectTypes();
 		void _MakeTypesUnique(MimeTypeItem* underItem = NULL);
+
+		BString fSelectNewType;
 };
 
 bool mimetype_is_application_signature(BMimeType& type);

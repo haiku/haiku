@@ -9,6 +9,7 @@ Preference FileTypes :
 	FileTypes.cpp
 	FileTypesWindow.cpp
 	MimeTypeListView.cpp
+	NewFileTypeWindow.cpp
 	: be tracker
 	: FileTypes.rdef FileTypes.icons.rdef
 	;

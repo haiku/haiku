@@ -7,8 +7,8 @@
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
 #include "MimeTypeListView.h"
+#include "NewFileTypeWindow.h"
 
-#include <Alert.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -51,7 +51,6 @@ const uint32 kMsgSamePreferredAppAs = 'spaa';
 
 const uint32 kMsgTypeEntered = 'type';
 const uint32 kMsgDescriptionEntered = 'dsce';
-
 
 const struct type_map {
 	const char*	name;
@@ -113,7 +112,7 @@ class AttributeItem : public BStringItem {
 	public:
 		AttributeItem(const char* name, const char* publicName, type_code type,
 			int32 alignment, int32 width, bool visible, bool editable);
-		~AttributeItem();
+		virtual ~AttributeItem();
 
 		virtual void DrawItem(BView* owner, BRect itemRect,
 			bool drawEverything = false);
@@ -127,9 +126,6 @@ class AttributeItem : public BStringItem {
 		bool		fVisible;
 		bool		fEditable;
 };
-
-static void error_alert(const char* message, status_t status = B_OK,
-	alert_type type = B_WARNING_ALERT);
 
 
 //	#pragma mark -
@@ -187,7 +183,7 @@ name_for_type(BString& string, type_code type)
 }
 
 
-static void
+void
 error_alert(const char* message, status_t status, alert_type type)
 {
 	char warning[512];
@@ -501,7 +497,10 @@ AttributeListView::Draw(BRect updateRect)
 
 FileTypesWindow::FileTypesWindow(BRect frame)
 	: BWindow(frame, "FileTypes", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
+	fNewTypeWindow(NULL),
+	fExtensionWindow(NULL),
+	fAttributeWindow(NULL)
 {
 	// add the menu
 
@@ -1117,6 +1116,14 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 
 void
+FileTypesWindow::PlaceSubWindow(BWindow* window)
+{
+	window->MoveTo(Frame().left + (Frame().Width() - window->Frame().Width()) / 2.0f,
+		Frame().top + (Frame().Height() - window->Frame().Height()) / 2.0f);
+}
+
+
+void
 FileTypesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -1135,7 +1142,16 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgAddType:
-			puts("add type");
+		{
+			if (fNewTypeWindow == NULL) {
+				fNewTypeWindow = new NewFileTypeWindow(this, fCurrentType.Type());
+				fNewTypeWindow->Show();
+			} else
+				fNewTypeWindow->Activate();
+			break;
+		}
+		case kMsgNewTypeWindowClosed:
+			fNewTypeWindow = NULL;
 			break;
 
 		case kMsgRemoveType:
@@ -1165,6 +1181,14 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			status_t status = fCurrentType.Delete();
 			if (status != B_OK)
 				fprintf(stderr, "Could not remove file type: %s\n", strerror(status));
+			break;
+		}
+
+		case kMsgSelectNewType:
+		{
+			const char* type;
+			if (message->FindString("type", &type) == B_OK)
+				fTypeListView->SelectNewType(type);
 			break;
 		}
 
