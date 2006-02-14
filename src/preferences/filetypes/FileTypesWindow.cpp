@@ -128,6 +128,9 @@ class AttributeItem : public BStringItem {
 		bool		fEditable;
 };
 
+static void error_alert(const char* message, status_t status = B_OK,
+	alert_type type = B_WARNING_ALERT);
+
 
 //	#pragma mark -
 
@@ -139,6 +142,20 @@ compare_menu_items(const void* _a, const void* _b)
 	BMenuItem* b = *(BMenuItem**)_b;
 
 	return strcasecmp(a->Label(), b->Label());
+}
+
+
+static bool
+is_application_in_message(BMessage& applications, const char* app)
+{
+	const char* signature;
+	int32 i = 0;
+	while (applications.FindString("applications", i++, &signature) == B_OK) {
+		if (!strcasecmp(signature, app))
+			return true;
+	}
+
+	return false;
 }
 
 
@@ -167,6 +184,19 @@ name_for_type(BString& string, type_code type)
 
 	snprintf(buffer + 6, sizeof(buffer), " (0x%lx)", type);
 	string = buffer;
+}
+
+
+static void
+error_alert(const char* message, status_t status, alert_type type)
+{
+	char warning[512];
+	if (status != B_OK)
+		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message, strerror(status));
+
+	(new BAlert("FileTypes Request",
+		status == B_OK ? message : warning,
+		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
 }
 
 
@@ -773,43 +803,88 @@ FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
 	if (message->FindRef("refs", &ref) != B_OK)
 		return;
 
-	// TODO: add error reporting!
-
 	BFile file(&ref, B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return;
+	status_t status = file.InitCheck();
 
 	char preferred[B_MIME_TYPE_LENGTH];
 
-	if (sameAs) {
-		// get preferred app from file
-		BNodeInfo nodeInfo(&file);
-		if (nodeInfo.InitCheck() != B_OK)
-			return;
-
-		if (nodeInfo.GetPreferredApp(preferred) != B_OK)
-			preferred[0] = '\0';
-
-		if (!preferred[0]) {
-			// get MIME type from file
-			char type[B_MIME_TYPE_LENGTH];
-			if (nodeInfo.GetType(type) == B_OK) {
-				BMimeType mimeType(type);
-				mimeType.GetPreferredApp(preferred);
+	if (status == B_OK) {
+		if (sameAs) {
+			// get preferred app from file
+			BNodeInfo nodeInfo(&file);
+			status = nodeInfo.InitCheck();
+			if (status == B_OK) {
+				if (nodeInfo.GetPreferredApp(preferred) != B_OK)
+					preferred[0] = '\0';
+		
+				if (!preferred[0]) {
+					// get MIME type from file
+					char type[B_MIME_TYPE_LENGTH];
+					if (nodeInfo.GetType(type) == B_OK) {
+						BMimeType mimeType(type);
+						mimeType.GetPreferredApp(preferred);
+					}
+				}
 			}
-		}
-	} else {
-		// get application signature
-		BAppFileInfo appInfo(&file);
-		if (appInfo.InitCheck() != B_OK)
-			return;
+		} else {
+			// get application signature
+			BAppFileInfo appInfo(&file);
+			status = appInfo.InitCheck();
 
-		if (appInfo.GetSignature(preferred) != B_OK)
-			preferred[0] = '\0';
+			if (status == B_OK && appInfo.GetSignature(preferred) != B_OK)
+				preferred[0] = '\0';
+		}
 	}
 
-	if (preferred[0])
-		fCurrentType.SetPreferredApp(preferred);
+	if (status != B_OK) {
+		error_alert("File could not be opened", status, B_STOP_ALERT);
+		return;
+	}
+
+	if (!preferred[0]) {
+		error_alert(sameAs ? "Could not retrieve preferred application of this file."
+			: "Could not retrieve application signature.");
+		return;
+	}
+
+	// Check if the application chosen supports this type
+
+	bool found = false;
+
+	BMessage applications;
+	if (fCurrentType.GetSupportingApps(&applications) == B_OK
+		&& is_application_in_message(applications, preferred))
+		found = true;
+
+	applications.MakeEmpty();
+
+	if (!found && fCurrentType.GetWildcardApps(&applications) == B_OK
+		&& is_application_in_message(applications, preferred))
+		found = true;
+
+	if (!found) {
+		// warn user
+		BMimeType appType(preferred);
+		char description[B_MIME_TYPE_LENGTH];
+		if (appType.GetShortDescription(description) != B_OK)
+			description[0] = '\0';
+
+		char warning[512];
+		snprintf(warning, sizeof(warning), "The application \"%s\" does not "
+			"support this file type.\n"
+			"Are you sure you want to set it anyway?",
+			description[0] ? description : preferred);
+
+		BAlert* alert = new BAlert("FileTypes Request", warning,
+			"Set Preferred Application", "Cancel", NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
+		if (alert->Go() == 1)
+			return;
+	}
+
+	status = fCurrentType.SetPreferredApp(preferred);
+	if (status != B_OK)
+		error_alert("Could not set preferred application", status);
 }
 
 
