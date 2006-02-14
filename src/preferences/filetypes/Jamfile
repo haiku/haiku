@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src preferences filetypes ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-SubDirSysHdrs $(SUBDIR) ;
+SubDirSysHdrs $(HAIKU_TOP) src kits tracker ;
 
 Preference FileTypes :
 	FileTypes.cpp

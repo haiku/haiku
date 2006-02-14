@@ -8,6 +8,7 @@
 #include "FileTypesWindow.h"
 #include "MimeTypeListView.h"
 
+#include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
@@ -22,6 +23,7 @@
 #include <ScrollView.h>
 #include <TextControl.h>
 
+#include <OverrideAlert.h>
 #include <be_apps/Tracker/RecentItems.h>
 
 #include <stdio.h>
@@ -988,6 +990,40 @@ FileTypesWindow::MessageReceived(BMessage* message)
 				} else
 					_SetType(NULL);
 			}
+			break;
+		}
+
+		case kMsgAddType:
+			puts("add type");
+			break;
+
+		case kMsgRemoveType:
+		{
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			BAlert* alert;
+			if (fCurrentType.IsSupertypeOnly()) {
+				alert = new BPrivate::OverrideAlert("FileTypes Request",
+					"Removing a super type cannot be reverted.\n"
+					"All file types that belong to this super type "
+					"will be lost!\n\n"
+					"Are you sure you want to do this? To remove the whole "
+					"group, hold down the Shift key and press \"Remove\".",
+					"Remove", B_SHIFT_KEY, "Cancel", 0, NULL, 0,
+					B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			} else {
+				alert = new BAlert("FileTypes Request",
+					"Removing a file type cannot be reverted.\n"
+					"Are you sure you want to remove it?",
+					"Remove", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			}
+			if (alert->Go())
+				break;
+
+			status_t status = fCurrentType.Delete();
+			if (status != B_OK)
+				fprintf(stderr, "Could not remove file type: %s\n", strerror(status));
 			break;
 		}
 
