@@ -37,8 +37,17 @@ local genericSources =
 	s_casinh.c s_casinhf.c
 	s_catan.c s_catanf.c
 	s_catanh.c s_catanhf.c
+	s_ccos.c s_ccosf.c #s_ccosl.c
+	s_ccosh.c s_ccoshf.c #s_ccoshl.c
 	s_clog.c s_clogf.c #s_clogl.c
+	s_clog10.c s_clog10f.c #s_clog10l.c
+	s_cpow.c s_cpowf.c #s_cpowl.c
+	s_cproj.c s_cprojf.c #s_cprojl.c
+	s_csin.c s_csinf.c #s_csinl.c
+	s_csinh.c s_csinhf.c #s_csinhl.c
 	s_csqrt.c s_csqrtf.c #s_csqrtl.c
+	s_ctan.c s_ctanf.c #s_ctanl.c
+	s_ctanh.c s_ctanhf.c #s_ctanhl.c
 	s_erf.c s_erff.c # s_erfl.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
 	s_isinf.c s_isinff.c
@@ -46,6 +55,7 @@ local genericSources =
 	s_ldexp.c s_ldexpf.c #s_ldexpl.c
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c
+	s_nextafter.c
 	s_signbit.c s_signbitl.c
 	s_round.c s_roundf.c # s_roundl.c
 	s_signgam.c
@@ -82,6 +92,7 @@ local genericSources =
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 	add_n.S
 	addmul_1.S
+	fraiseexcpt.c
 	ldbl2mpn.c
 	mpa.c mpatan.c mpatan2.c mptan.c
 	
@@ -118,6 +129,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_atan.S s_atanf.S s_atanl.c
 	s_cbrt.S s_cbrtf.S s_cbrtl.S
 	s_ceil.S s_ceilf.S s_ceill.S
+	s_cexp.S s_cexpf.S s_cexpl.S
 	s_copysign.S s_copysignf.S s_copysignl.S
 	s_cos.S s_cosf.S s_cosl.S
 	s_expm1.S s_expm1f.S s_expm1l.S
