@@ -1048,8 +1048,18 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgRemoveExtension:
-			puts("remove ext");
+		{
+			int32 index = fExtensionListView->CurrentSelection();
+			if (index < 0 || fCurrentType.Type() == NULL)
+				break;
+
+			BMessage extensions;
+			if (fCurrentType.GetFileExtensions(&extensions) == B_OK) {
+				extensions.RemoveData("extensions", index);
+				fCurrentType.SetFileExtensions(&extensions);
+			}
 			break;
+		}
 
 		// Description group
 
@@ -1090,8 +1100,28 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgRemoveAttribute:
-			puts("remove attr");
+		{
+			int32 index = fAttributeListView->CurrentSelection();
+			if (index < 0 || fCurrentType.Type() == NULL)
+				break;
+
+			BMessage attributes;
+			if (fCurrentType.GetAttrInfo(&attributes) == B_OK) {
+				const char* kAttributeNames[] = {
+					"attr:public_name", "attr:name", "attr:type",
+					"attr:editable", "attr:viewable", "attr:extra",
+					"attr:alignment", "attr:width", "attr:display_as"
+				};
+
+				for (uint32 i = 0; i <
+						sizeof(kAttributeNames) / sizeof(kAttributeNames[0]); i++) {
+					attributes.RemoveData(kAttributeNames[i], index);
+				}
+
+				fCurrentType.SetAttrInfo(&attributes);
+			}
 			break;
+		}
 
 		case B_META_MIME_CHANGED:
 		{
