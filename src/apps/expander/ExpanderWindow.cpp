@@ -113,7 +113,7 @@ ExpanderWindow::ExpanderWindow(BRect frame_rect, const entry_ref *ref, BMessage 
 	box->AddChild(fExpandButton);
 	fExpandButton->SetEnabled(false);
 	
-	rect = BRect(80, 12, Bounds().right - 10, 25);
+	rect = BRect(rect.right+5, 12, Bounds().right - 10, 25);
 	fSourceText = new BTextControl(rect, "sourceText", "", NULL, 
 		new BMessage(MSG_SOURCETEXT), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fSourceText->SetDivider(0);
