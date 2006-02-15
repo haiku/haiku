@@ -1,7 +1,7 @@
 #ifndef USB_MIDI_H
 #define USB_MIDI_H
 
-#include "USB_audio.h"
+#include <usb/USB_audio.h>
 
 // (Partial) USB Class Definitions for MIDI Devices, version 1.0
 // Reference: http://www.usb.org/developers/devclass_docs/midi10.pdf
