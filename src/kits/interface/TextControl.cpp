@@ -175,12 +175,12 @@ BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
 
 
 void
-BTextControl::GetAlignment(alignment *label, alignment *text) const
+BTextControl::GetAlignment(alignment* _label, alignment* _text) const
 {
-	if (label)
-		*label = fLabelAlign;
-	if (text)
-		*text = fText->Alignment();
+	if (_label)
+		*_label = fLabelAlign;
+	if (_text)
+		*_text = fText->Alignment();
 }
 
 
@@ -213,15 +213,14 @@ BTextControl::Divider() const
 void
 BTextControl::Draw(BRect updateRect)
 {
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR),
-	lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT),
-	lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT),
-	lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT),
-	darken1 = tint_color(noTint, B_DARKEN_1_TINT),
-	darken2 = tint_color(noTint, B_DARKEN_2_TINT),
-	darken4 = tint_color(noTint, B_DARKEN_4_TINT),
-	darkenMax = tint_color(noTint, B_DARKEN_MAX_TINT),
-	navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
+	rgb_color lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
+	rgb_color lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
+	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
+	rgb_color navigationColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 	bool enabled = IsEnabled();
 	bool active = false;
@@ -302,7 +301,7 @@ BTextControl::Draw(BRect updateRect)
 				break;
 		}
 
-		SetHighColor(IsEnabled() ? darkenMax
+		SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
 			: tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
 		DrawString(Label(), BPoint(x, y));
 	}
