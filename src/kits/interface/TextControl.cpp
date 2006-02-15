@@ -302,7 +302,7 @@ BTextControl::Draw(BRect updateRect)
 		}
 
 		SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
-			: tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+			: tint_color(noTint, B_DISABLED_LABEL_TINT));
 		DrawString(Label(), BPoint(x, y));
 	}
 }
