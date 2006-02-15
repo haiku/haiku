@@ -1547,13 +1547,13 @@ FindPanel::SetCurrentMimeType(const char *label)
 		if (submenu != NULL && !found) {
 			for (int32 subIndex = submenu->CountItems(); subIndex-- > 0;) {
 				BMenuItem *subItem = submenu->ItemAt(subIndex);
-				if (strcmp(label, subItem->Label()) == 0) {
+				if (subItem->Label() != NULL && !strcmp(label, subItem->Label())) {
 					subItem->SetMarked(true);
 					found = true;
 				}
 			}
 		}
-		if (strcmp(label, item->Label()) == 0) {
+		if (item->Label() != NULL && !strcmp(label, item->Label())) {
 			item->SetMarked(true);
 			return B_OK;
 		}

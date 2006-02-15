@@ -1,42 +1,26 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005 Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		SeparatorItem.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//					Bill Hayden (haydentech@users.sourceforge.net)
-//					Stefano Ceccherini (burton666@libero.it)
-//	Description:	Display separator item for BMenu class
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Bill Hayden (haydentech@users.sourceforge.net)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
+/*!	Display separator item for BMenu class */
+
 #include <MenuItem.h>
 
 
 BSeparatorItem::BSeparatorItem()
-	:	BMenuItem(NULL, NULL, 0, 0)
+	: BMenuItem("", NULL, 0, 0)
 {
 }
 
 
-BSeparatorItem::BSeparatorItem(BMessage *data)
-	:	BMenuItem(data)
+BSeparatorItem::BSeparatorItem(BMessage* archive)
+	: BMenuItem(archive)
 {
 }
 
@@ -47,19 +31,19 @@ BSeparatorItem::~BSeparatorItem()
 
 
 status_t
-BSeparatorItem::Archive(BMessage *data, bool deep) const
+BSeparatorItem::Archive(BMessage* archive, bool deep) const
 {
-	return BMenuItem::Archive(data, deep);
+	return BMenuItem::Archive(archive, deep);
 }
 
 
 BArchivable *
-BSeparatorItem::Instantiate(BMessage *data)
+BSeparatorItem::Instantiate(BMessage* archive)
 {
-	if (validate_instantiation(data, "BSeparatorItem"))
-		return new BSeparatorItem(data);
-	else
-		return NULL;
+	if (validate_instantiation(archive, "BSeparatorItem"))
+		return new BSeparatorItem(archive);
+
+	return NULL;
 }
 
 
@@ -71,12 +55,13 @@ BSeparatorItem::SetEnabled(bool state)
 
 
 void
-BSeparatorItem::GetContentSize(float *width, float *height)
+BSeparatorItem::GetContentSize(float* _width, float* _height)
 {
-	if (width != NULL)
-		*width = 2.0f;
-	if (height != NULL)
-		*height = 8.0f;
+	if (_width != NULL)
+		*_width = 2.0f;
+
+	if (_height != NULL)
+		*_height = 8.0f;
 }
 
 
@@ -86,10 +71,11 @@ BSeparatorItem::Draw()
 	BMenu *menu = Menu();
 	if (menu == NULL)
 		return;
-		
+
 	BRect bounds = Frame();
 	rgb_color oldColor = menu->HighColor();
-	
+
+	// TODO: remove superfluous separators
 	menu_info menuInfo;
 	get_menu_info(&menuInfo);
 	switch (menuInfo.separator) {
@@ -103,7 +89,7 @@ BSeparatorItem::Draw()
 			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
 				BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
 			break;
-		
+
 		case 1:
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 				B_DARKEN_1_TINT));
@@ -114,7 +100,7 @@ BSeparatorItem::Draw()
 			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 5.0f),
 				BPoint(bounds.right - 9.0f, bounds.top + 5.0f));
 			break;
-			
+
 		case 2:
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 				B_DARKEN_1_TINT));
@@ -127,11 +113,11 @@ BSeparatorItem::Draw()
 			menu->StrokeLine(BPoint(bounds.left + 11.0f, bounds.top + 6.0f),
 				BPoint(bounds.right - 11.0f, bounds.top + 6.0f));
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 	menu->SetHighColor(oldColor);
 }
 
