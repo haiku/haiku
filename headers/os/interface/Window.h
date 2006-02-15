@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -325,6 +325,8 @@ private:
 	bigtime_t		fPulseRate;
 	bool			fWaitingForMenu;
 	bool			fMinimized;
+	bool			fNoQuitShortcut;
+	bool			_unused2;
 	sem_id			fMenuSem;
 	float			fMaxZoomHeight;
 	float			fMaxZoomWidth;

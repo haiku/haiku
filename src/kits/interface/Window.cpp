@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1397,6 +1397,9 @@ BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 	if (shortcut != NULL) {
 		fShortcuts.RemoveItem(shortcut);
 		delete shortcut;
+	} else if ((key == 'q' || key == 'Q') && modifiers == B_COMMAND_KEY) {
+		// the quit shortcut is a fake shortcut
+		fNoQuitShortcut = true;
 	}
 }
 
@@ -2178,6 +2181,8 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	// Shortcut 'Q' is handled in _HandleKeyDown() directly, as its message
 	// get sent to the application, and not one of our handlers
+	fNoQuitShortcut = false;
+
 	if ((fFlags & B_NOT_CLOSABLE) == 0)
 		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
@@ -2823,9 +2828,11 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	if ((modifiers & B_COMMAND_KEY) != 0) {
 		// Command+q has been pressed, so, we will quit
 		// the shortcut mechanism doesn't allow handlers outside the window
-		// TODO: in BeOS, this shortcut can be removed!
-		if (key == 'Q' || key == 'q') {
-			be_app->PostMessage(B_QUIT_REQUESTED);
+		if (!fNoQuitShortcut && (key == 'Q' || key == 'q')) {
+			BMessage message(B_QUIT_REQUESTED);
+			message.AddBool("shortcut", true);
+
+			be_app->PostMessage(&message);
 			return true;
 		}
 
@@ -2846,11 +2853,16 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 				if (target == NULL)
 					target = CurrentFocus();
 
-				BMessage* message = shortcut->Message();
-				if (message->ReplaceInt64("when", system_time()) != B_OK)
-					message->AddInt64("when", system_time());
+				if (shortcut->Message() != NULL) {
+					BMessage message(*shortcut->Message());
 
-				PostMessage(message, target);
+					if (message.ReplaceInt64("when", system_time()) != B_OK)
+						message.AddInt64("when", system_time());
+					if (message.ReplaceBool("shortcut", true) != B_OK)
+						message.AddBool("shortcut", true);
+
+					PostMessage(&message, target);
+				}
 			}
 
 			return true;
