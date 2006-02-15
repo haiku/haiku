@@ -1287,7 +1287,7 @@ DEFINE_LAZY_FIND_FUNCTION(const char*	, String)
 status_t 
 BMessage::AddString(const char* name, const char* string)
 {
-	return AddData(name, B_STRING_TYPE, string, strlen(string) + 1);
+	return AddData(name, B_STRING_TYPE, string, string ? strlen(string) + 1 : 0);
 }
 
 
