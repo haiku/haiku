@@ -59,6 +59,8 @@ class KeyboardFilter : public EventFilter {
 			int32* _viewToken, BMessage* latestMouseMoved);
 
 	private:
+		void _UpdateFocus(int32 key, EventTarget** _target);
+
 		Desktop*		fDesktop;
 		EventTarget*	fLastFocus;
 		bigtime_t		fTimestamp;
@@ -88,67 +90,13 @@ KeyboardFilter::KeyboardFilter(Desktop* desktop)
 }
 
 
-filter_result
-KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
-	int32* /*_viewToken*/, BMessage* /*latestMouseMoved*/)
+void
+KeyboardFilter::_UpdateFocus(int32 key, EventTarget** _target)
 {
-	int32 key;
-	int32 modifiers;
-
-	if (message->what != B_KEY_DOWN
-		|| message->FindInt32("key", &key) != B_OK
-		|| message->FindInt32("modifiers", &modifiers) != B_OK)
-		return B_DISPATCH_MESSAGE;
-
-	// Check for safe video mode (F12 + l-cmd + l-ctrl + l-shift)
-	if (key == 0x0d
-		&& (modifiers & (B_LEFT_COMMAND_KEY
-				| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0)
-	{
-		// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN.
-		STRACE(("Safe Video Mode invoked - code unimplemented\n"));
-		return B_SKIP_MESSAGE;
-	}
-
-	if (key > 0x01 && key < 0x0e) {
-		// workspace change, F1-F12
-
-#if !TEST_MODE
-		if (modifiers & B_COMMAND_KEY)
-#else
-		if (modifiers & B_CONTROL_KEY)
-#endif
-		{
-			STRACE(("Set Workspace %ld\n", key - 1));
-
-			fDesktop->SetWorkspace(key - 2);
-			return B_SKIP_MESSAGE;
-		}
-	}
-
-	// TODO: this should be moved client side!
-	// (that's how it is done in BeOS, clients could need this key for
-	// different purposes - also, it's preferrable to let the client
-	// write the dump within his own environment)
-	if (key == 0xe) {
-		// screen dump, PrintScreen
-		char filename[128];
-		BEntry entry;
-
-		int32 index = 1;
-		do {
-			sprintf(filename, "/boot/home/screen%ld.png", index++);
-			entry.SetTo(filename);
-		} while(entry.Exists());
-
-		fDesktop->GetDrawingEngine()->DumpToFile(filename);
-		return B_SKIP_MESSAGE;
-	}
+	if (!fDesktop->LockSingleWindow())
+		return;
 
 	bigtime_t now = system_time();
-
-	if (!fDesktop->LockSingleWindow())
-		return B_DISPATCH_MESSAGE;
 
 	EventTarget* focus = NULL;
 	if (fDesktop->FocusWindow() != NULL)
@@ -168,7 +116,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		// it, and the event focus passed in is always valid (or NULL)
 		*_target = focus;
 		fLastFocus = focus;
-	}	
+	}
 
 	fDesktop->UnlockSingleWindow();
 
@@ -177,6 +125,73 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		fTimestamp = 0;
 	else
 		fTimestamp = now;
+}
+
+
+filter_result
+KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
+	int32* /*_viewToken*/, BMessage* /*latestMouseMoved*/)
+{
+	int32 key = 0;
+	int32 modifiers;
+
+	if (message->what == B_KEY_DOWN
+		&& message->FindInt32("key", &key) == B_OK
+		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
+		// TODO: for some reason, one of the above is failing when pressing
+		//	a modifier key at least with the old BMessage implementation
+		//	(a message dump shows all entries, though)
+		//	Try again with BMessage4!
+
+		// Check for safe video mode (F12 + l-cmd + l-ctrl + l-shift)
+		if (key == 0x0d
+			&& (modifiers & (B_LEFT_COMMAND_KEY
+					| B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY)) != 0) {
+			// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN.
+			STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+			return B_SKIP_MESSAGE;
+		}
+
+		if (key > 0x01 && key < 0x0e) {
+			// workspace change, F1-F12
+
+#if !TEST_MODE
+			if (modifiers & B_COMMAND_KEY)
+#else
+			if (modifiers & B_CONTROL_KEY)
+#endif
+			{
+				STRACE(("Set Workspace %ld\n", key - 1));
+
+				fDesktop->SetWorkspace(key - 2);
+				return B_SKIP_MESSAGE;
+			}
+		}
+
+		// TODO: this should be moved client side!
+		// (that's how it is done in BeOS, clients could need this key for
+		// different purposes - also, it's preferrable to let the client
+		// write the dump within his own environment)
+		if (key == 0xe) {
+			// screen dump, PrintScreen
+			char filename[128];
+			BEntry entry;
+
+			int32 index = 1;
+			do {
+				sprintf(filename, "/boot/home/screen%ld.png", index++);
+				entry.SetTo(filename);
+			} while(entry.Exists());
+
+			fDesktop->GetDrawingEngine()->DumpToFile(filename);
+			return B_SKIP_MESSAGE;
+		}
+	}
+
+	if (message->what == B_KEY_DOWN
+		|| message->what == B_MODIFIERS_CHANGED
+		|| message->what == B_UNMAPPED_KEY_DOWN)
+		_UpdateFocus(key, _target);
 
 	return B_DISPATCH_MESSAGE;
 }
