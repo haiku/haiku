@@ -51,16 +51,16 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	box->AddChild(textView);
 	textView->SetText("Expansion:");
 	
-	frameRect.OffsetBy(0, 58);
-	textRect.OffsetBy(0, 58);
+	frameRect.OffsetBy(0, 52);
+	textRect.OffsetBy(0, 52);
 	textView = new BTextView(frameRect, "destinationFolder", textRect,
 		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	box->AddChild(textView);
 	textView->SetText("Destination Folder:");
 	
-	frameRect.OffsetBy(0, 84);
-	textRect.OffsetBy(0, 84);
+	frameRect.OffsetBy(0, 90);
+	textRect.OffsetBy(0, 90);
 	textView = new BTextView(frameRect, "other", textRect,
 		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -78,17 +78,17 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fCloseWindow = new BCheckBox(rect, "closeWindowWhenDone", "Close window when done expanding", NULL);
 	box->AddChild(fCloseWindow);
 	
-	rect.OffsetBy(0, 50);
+	rect.OffsetBy(0, 44);
 	fLeaveDest = new BRadioButton(rect, "leaveDest", "Leave destination folder path empty", 
 		new BMessage(MSG_LEAVEDEST));
 	box->AddChild(fLeaveDest);
 	
-	rect.OffsetBy(0, 17);
+	rect.OffsetBy(0, 20);
 	fSameDest = new BRadioButton(rect, "sameDir", "Same directory as source (archive) file", 
 		new BMessage(MSG_SAMEDIR));
 	box->AddChild(fSameDest);
 	
-	rect.OffsetBy(0, 17);
+	rect.OffsetBy(0, 20);
 	BRect useRect = rect;
 	useRect.right = useRect.left + 50;
 	fDestUse = new BRadioButton(useRect, "destUse", "Use:", 
