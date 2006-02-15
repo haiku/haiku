@@ -13,6 +13,8 @@ class BButton;
 class BMenu;
 class BTextControl;
 
+class FileTypesWindow;
+
 
 class NewFileTypeWindow : public BWindow {
 	public:

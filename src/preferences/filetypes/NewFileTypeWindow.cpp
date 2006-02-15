@@ -121,7 +121,7 @@ NewFileTypeWindow::~NewFileTypeWindow()
 {
 }
 
-#include <stdio.h>
+
 void
 NewFileTypeWindow::MessageReceived(BMessage* message)
 {

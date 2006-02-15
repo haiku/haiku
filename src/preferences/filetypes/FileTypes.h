@@ -17,6 +17,10 @@ static const uint32 kMsgOpenSameAsPanel = 'opAp';
 
 static const uint32 kMsgOpenTypesWindow = 'opTw';
 static const uint32 kMsgTypesWindowClosed = 'clTw';
+
+static const uint32 kMsgOpenApplicationTypesWindow = 'opAw';
+static const uint32 kMsgApplicationTypesWindowClosed = 'clAw';
+
 static const uint32 kMsgWindowClosed = 'WiCl';
 
 #endif	// FILE_TYPES_H

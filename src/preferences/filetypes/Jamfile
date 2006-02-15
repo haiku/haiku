@@ -8,8 +8,11 @@ SubDirSysHdrs $(HAIKU_TOP) src kits tracker ;
 Preference FileTypes :
 	FileTypes.cpp
 	FileTypesWindow.cpp
+	ApplicationTypesWindow.cpp
 	MimeTypeListView.cpp
 	NewFileTypeWindow.cpp
+	ExtensionWindow.cpp
+	StringView.cpp
 	: be tracker
 	: FileTypes.rdef FileTypes.icons.rdef
 	;

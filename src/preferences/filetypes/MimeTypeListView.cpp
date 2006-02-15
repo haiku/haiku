@@ -6,7 +6,7 @@
 
 #include "MimeTypeListView.h"
 
-#include <Mime.h>
+#include <Bitmap.h>
 
 
 // TODO: lazy type collecting (super types only at startup)
@@ -28,17 +28,21 @@ mimetype_is_application_signature(BMimeType& type)
 //	#pragma mark -
 
 
-MimeTypeItem::MimeTypeItem(BMimeType& type, bool flat)
+MimeTypeItem::MimeTypeItem(BMimeType& type, bool showIcon, bool flat)
 	: BStringItem(type.Type(), !flat && !type.IsSupertypeOnly() ? 1 : 0, false),
-	fType(type.Type())
+	fType(type.Type()),
+	fFlat(flat),
+	fShowIcon(showIcon)
 {
 	_SetTo(type);
 }
 
 
-MimeTypeItem::MimeTypeItem(const char* type, bool flat)
+MimeTypeItem::MimeTypeItem(const char* type, bool showIcon, bool flat)
 	: BStringItem(type, !flat && strchr(type, '/') != NULL ? 1 : 0, false),
-	fType(type)
+	fType(type),
+	fFlat(flat),
+	fShowIcon(showIcon)
 {
 	BMimeType mimeType(type);
 	_SetTo(mimeType);
@@ -51,7 +55,7 @@ MimeTypeItem::~MimeTypeItem()
 
 
 void
-MimeTypeItem::DrawItem(BView* owner, BRect itemRect, bool drawEverything)
+MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	BFont font;
 
@@ -62,10 +66,67 @@ MimeTypeItem::DrawItem(BView* owner, BRect itemRect, bool drawEverything)
 		owner->SetFont(&boldFont);
 	}
 
-	BStringItem::DrawItem(owner, itemRect, drawEverything);
+	BRect rect = frame;
+	if (fFlat) {
+		// This is where the latch would be - yet can freely consider this
+		// as an ugly hack
+		rect.left -= 11.0f;
+	}
+
+	if (fShowIcon) {
+		rgb_color highColor = owner->HighColor();
+		rgb_color lowColor = owner->LowColor();
+
+		if (IsSelected() || complete) {
+			if (IsSelected())
+				owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
+
+			owner->FillRect(rect, B_SOLID_LOW);
+		}
+
+		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
+		BMimeType mimeType(fType.String());
+		if (mimeType.GetIcon(&bitmap, B_MINI_ICON) == B_OK) {
+			BPoint point(rect.left + 2.0f, 
+				rect.top + (rect.Height() - B_MINI_ICON) / 2.0f);
+
+			owner->SetDrawingMode(B_OP_ALPHA);
+			owner->DrawBitmap(&bitmap, point);
+		}
+
+		owner->SetDrawingMode(B_OP_COPY);
+
+		owner->MovePenTo(rect.left + B_MINI_ICON + 8.0f, frame.top + fBaselineOffset);
+		owner->SetHighColor(0, 0, 0);
+		owner->DrawString(Text());
+
+		owner->SetHighColor(highColor);
+		owner->SetLowColor(lowColor);
+	} else
+		BStringItem::DrawItem(owner, rect, complete);
 
 	if (IsSupertypeOnly())
 		owner->SetFont(&font);
+}
+
+
+void
+MimeTypeItem::Update(BView* owner, const BFont* font)
+{
+	BStringItem::Update(owner, font);
+
+	if (fShowIcon) {
+		SetWidth(Width() + B_MINI_ICON + 2.0f);
+
+		if (Height() < B_MINI_ICON + 4.0f)
+			SetHeight(B_MINI_ICON + 4.0f);
+
+		font_height fontHeight;
+		font->GetHeight(&fontHeight);
+
+		fBaselineOffset = fontHeight.ascent
+			+ (Height() - ceilf(fontHeight.ascent + fontHeight.descent)) / 2.0f;
+	}
 }
 
 
@@ -86,12 +147,12 @@ MimeTypeItem::_SetTo(BMimeType& type)
 	fSubtype.SetTo(subType + 1);
 		// omit the slash
 
-	Update();
+	UpdateText();
 }
 
 
 void
-MimeTypeItem::Update()
+MimeTypeItem::UpdateText()
 {
 	if (IsSupertypeOnly())
 		return;
@@ -171,19 +232,43 @@ MimeTypeItem::CompareLabels(const BListItem* a, const BListItem* b)
 
 
 MimeTypeListView::MimeTypeListView(BRect rect, const char* name,
+		const char* supertype, bool showIcons, bool applicationMode,
 		uint32 resizingMode)
-	: BOutlineListView(rect, name, B_SINGLE_SELECTION_LIST, resizingMode)
+	: BOutlineListView(rect, name, B_SINGLE_SELECTION_LIST, resizingMode),
+	fSupertype(supertype),
+	fShowIcons(showIcons),
+	fApplicationMode(applicationMode)
 {
-	_CollectTypes();
 }
 
 
 MimeTypeListView::~MimeTypeListView()
 {
-	// free items, stupid BOutlineListView doesn't do this itself
+}
 
-	for (int32 i = FullListCountItems(); i-- > 0;) {
-		delete FullListItemAt(i);
+
+void
+MimeTypeListView::_CollectSubtypes(const char* supertype, MimeTypeItem* supertypeItem)
+{
+	BMessage types;
+	if (BMimeType::GetInstalledTypes(supertype, &types) != B_OK)
+		return;
+
+	const char* type;
+	int32 index = 0;
+	while (types.FindString("types", index++, &type) == B_OK) {
+		BMimeType mimeType(type);
+
+		bool isApp = mimetype_is_application_signature(mimeType);
+		if (fApplicationMode ^ isApp)
+			continue;
+
+		BStringItem* typeItem = new MimeTypeItem(mimeType, fShowIcons,
+			supertypeItem == NULL);
+		if (supertypeItem != NULL)
+			AddUnder(typeItem, supertypeItem);
+		else
+			AddItem(typeItem);
 	}
 }
 
@@ -191,30 +276,21 @@ MimeTypeListView::~MimeTypeListView()
 void
 MimeTypeListView::_CollectTypes()
 {
-	BMessage superTypes;
-	if (BMimeType::GetInstalledSupertypes(&superTypes) != B_OK)
-		return;
+	if (fSupertype.Type() != NULL) {
+		// only show MIME types that belong to this supertype
+		_CollectSubtypes(fSupertype.Type(), NULL);
+	} else {
+		BMessage superTypes;
+		if (BMimeType::GetInstalledSupertypes(&superTypes) != B_OK)
+			return;
 
-	const char* superType;
-	int32 index = 0;
-	while (superTypes.FindString("super_types", index++, &superType) == B_OK) {
-		BStringItem* superTypeItem = new MimeTypeItem(superType);
-		AddItem(superTypeItem);
+		const char* supertype;
+		int32 index = 0;
+		while (superTypes.FindString("super_types", index++, &supertype) == B_OK) {
+			MimeTypeItem* supertypeItem = new MimeTypeItem(supertype);
+			AddItem(supertypeItem);
 
-		BMessage types;
-		if (BMimeType::GetInstalledTypes(superType, &types) != B_OK)
-			continue;
-
-		const char* type;
-		int32 typeIndex = 0;
-		while (types.FindString("types", typeIndex++, &type) == B_OK) {
-			BMimeType mimeType(type);
-
-			if (mimetype_is_application_signature(mimeType))
-				continue;
-
-			BStringItem* typeItem = new MimeTypeItem(mimeType);
-			AddUnder(typeItem, superTypeItem);
+			_CollectSubtypes(supertype, supertypeItem);
 		}
 	}
 
@@ -225,7 +301,10 @@ MimeTypeListView::_CollectTypes()
 void
 MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
 {
-	SortItemsUnder(underItem, underItem != NULL, &MimeTypeItem::Compare);
+#ifndef __HAIKU__
+	if (fSupertype.Type() == NULL)
+#endif
+		SortItemsUnder(underItem, underItem != NULL, &MimeTypeItem::Compare);
 
 	bool lastItemSame = false;
 	MimeTypeItem* last = NULL;
@@ -282,6 +361,7 @@ MimeTypeListView::AttachedToWindow()
 	BOutlineListView::AttachedToWindow();
 
 	BMimeType::StartWatching(this);
+	_CollectTypes();
 }
 
 
@@ -289,8 +369,13 @@ void
 MimeTypeListView::DetachedFromWindow()
 {
 	BOutlineListView::DetachedFromWindow();
-
 	BMimeType::StopWatching(this);
+
+	// free all items, they will be retrieved again in AttachedToWindow()
+
+	for (int32 i = FullListCountItems(); i-- > 0;) {
+		delete FullListItemAt(i);
+	}
 }
 
 
@@ -442,7 +527,7 @@ MimeTypeListView::UpdateItem(MimeTypeItem* item)
 	if (IndexOf(item) == CurrentSelection())
 		selected = CurrentSelection();
 
-	item->Update();
+	item->UpdateText();
 	_MakeTypesUnique(dynamic_cast<MimeTypeItem*>(Superitem(item)));
 
 	if (selected != -1) {

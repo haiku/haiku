@@ -6,20 +6,20 @@
 #define MIME_TYPE_LIST_VIEW_H
 
 
+#include <Mime.h>
 #include <OutlineListView.h>
 #include <String.h>
-
-class BMimeType;
 
 
 class MimeTypeItem : public BStringItem {
 	public:
-		MimeTypeItem(BMimeType& type, bool flat = false);
-		MimeTypeItem(const char* type, bool flat = false);
+		MimeTypeItem(BMimeType& type, bool showIcon = false, bool flat = false);
+		MimeTypeItem(const char* type, bool showIcon = false, bool flat = false);
 		virtual ~MimeTypeItem();
 
 		virtual void DrawItem(BView* owner, BRect itemRect,
 			bool drawEverything = false);
+		virtual void Update(BView* owner, const BFont* font);
 
 		const char* Type() const { return fType.String(); }
 		const char* Subtype() const { return fSubtype.String(); }
@@ -27,7 +27,7 @@ class MimeTypeItem : public BStringItem {
 		const char* Description() const { return fDescription.String(); }
 		bool IsSupertypeOnly() const { return fIsSupertype; }
 
-		void Update();
+		void UpdateText();
 		void AddSubtype();
 
 		static int Compare(const BListItem* a, const BListItem* b);
@@ -40,12 +40,17 @@ class MimeTypeItem : public BStringItem {
 		BString		fSubtype;
 		BString		fType;
 		BString		fDescription;
+		float		fBaselineOffset;
 		bool		fIsSupertype;
+		bool		fFlat;
+		bool		fShowIcon;
 };
 
 class MimeTypeListView : public BOutlineListView {
 	public:
 		MimeTypeListView(BRect rect, const char* name,
+			const char* supertype = NULL, bool showIcons = false,
+			bool applicationMode = false,
 			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~MimeTypeListView();
 
@@ -64,10 +69,14 @@ class MimeTypeListView : public BOutlineListView {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		void _CollectSubtypes(const char* supertype, MimeTypeItem* supertypeItem);
 		void _CollectTypes();
 		void _MakeTypesUnique(MimeTypeItem* underItem = NULL);
 
-		BString fSelectNewType;
+		BMimeType	fSupertype;
+		BString		fSelectNewType;
+		bool		fShowIcons;
+		bool		fApplicationMode;
 };
 
 bool mimetype_is_application_signature(BMimeType& type);

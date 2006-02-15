@@ -20,6 +20,7 @@ class BTextControl;
 class AttributeListView;
 class IconView;
 class MimeTypeListView;
+class StringView;
 
 
 class FileTypesWindow : public BWindow {
@@ -53,7 +54,7 @@ class FileTypesWindow : public BWindow {
 		BButton*		fAddExtensionButton;
 		BButton*		fRemoveExtensionButton;
 
-		BTextControl*	fInternalNameControl;
+		StringView*		fInternalNameView;
 		BTextControl*	fTypeNameControl;
 		BTextControl*	fDescriptionControl;
 
@@ -66,8 +67,6 @@ class FileTypesWindow : public BWindow {
 		BButton*		fRemoveAttributeButton;
 
 		BWindow*		fNewTypeWindow;
-		BWindow*		fExtensionWindow;
-		BWindow*		fAttributeWindow;
 };
 
 static const uint32 kMsgPreferredAppOpened = 'paOp';

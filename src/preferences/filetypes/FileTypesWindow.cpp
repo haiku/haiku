@@ -4,10 +4,12 @@
  */
 
 
+#include "ExtensionWindow.h"
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
 #include "MimeTypeListView.h"
 #include "NewFileTypeWindow.h"
+#include "StringView.h"
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -498,9 +500,7 @@ AttributeListView::Draw(BRect updateRect)
 FileTypesWindow::FileTypesWindow(BRect frame)
 	: BWindow(frame, "FileTypes", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
-	fNewTypeWindow(NULL),
-	fExtensionWindow(NULL),
-	fAttributeWindow(NULL)
+	fNewTypeWindow(NULL)
 {
 	// add the menu
 
@@ -517,7 +517,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	item->SetShortcut('O', B_COMMAND_KEY);
 	menu->AddItem(item);
 	menu->AddItem(new BMenuItem("Application Types" B_UTF8_ELLIPSIS,
-		new BMessage));
+		new BMessage(kMsgOpenApplicationTypesWindow)));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("About FileTypes" B_UTF8_ELLIPSIS,
@@ -558,7 +558,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	if (rect.right < 180)
 		rect.right = 180;
 
-	fTypeListView = new MimeTypeListView(rect, "listview",
+	fTypeListView = new MimeTypeListView(rect, "listview", NULL, false, false,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
@@ -644,23 +644,24 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	innerRect = box->Bounds().InsetByCopy(8.0f, 6.0f);
 	innerRect.top += ceilf(fontHeight.ascent);
 	innerRect.bottom = innerRect.top + button->Bounds().Height();
-	fInternalNameControl = new BTextControl(innerRect, "internal", "Internal Name:", "",
-		NULL, B_FOLLOW_LEFT_RIGHT);
-	labelWidth = fInternalNameControl->StringWidth(fInternalNameControl->Label()) + 2.0f;
-	fInternalNameControl->SetDivider(labelWidth);
-	fInternalNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fInternalNameControl->SetEnabled(false);
-	box->ResizeBy(0, fInternalNameControl->Bounds().Height() * 3.0f);
-	box->AddChild(fInternalNameControl);
+	fInternalNameView = new StringView(innerRect, "internal", "Internal Name:", "",
+		B_FOLLOW_LEFT_RIGHT);
+	labelWidth = fInternalNameView->StringWidth(fInternalNameView->Label()) + 2.0f;
+	fInternalNameView->SetDivider(labelWidth);
+	fInternalNameView->SetEnabled(false);
+	fInternalNameView->ResizeToPreferred();
+	box->AddChild(fInternalNameView);
 
-	innerRect.OffsetBy(0, fInternalNameControl->Bounds().Height() + 5.0f);
+	innerRect.OffsetBy(0, fInternalNameView->Bounds().Height() + 5.0f);
 	fTypeNameControl = new BTextControl(innerRect, "type", "Type Name:", "",
 		new BMessage(kMsgTypeEntered), B_FOLLOW_LEFT_RIGHT);
 	fTypeNameControl->SetDivider(labelWidth);
 	fTypeNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	box->ResizeBy(0, fInternalNameView->Bounds().Height()
+		+ fTypeNameControl->Bounds().Height() * 2.0f);
 	box->AddChild(fTypeNameControl);
 
-	innerRect.OffsetBy(0, fInternalNameControl->Bounds().Height() + 5.0f);
+	innerRect.OffsetBy(0, fTypeNameControl->Bounds().Height() + 5.0f);
 	fDescriptionControl = new BTextControl(innerRect, "description", "Description:", "",
 		new BMessage(kMsgDescriptionEntered), B_FOLLOW_LEFT_RIGHT);
 	fDescriptionControl->SetDivider(labelWidth);
@@ -1060,7 +1061,7 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		if (&fCurrentType != type)
 			fCurrentType.SetTo(type->Type());
 
-		fInternalNameControl->SetText(type->Type());
+		fInternalNameView->SetText(type->Type());
 
 		char description[B_MIME_TYPE_LENGTH];
 
@@ -1077,7 +1078,7 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		}
 	} else {
 		fCurrentType.Unset();
-		fInternalNameControl->SetText(NULL);
+		fInternalNameView->SetText(NULL);
 		fTypeNameControl->SetText(NULL);
 		fDescriptionControl->SetText(NULL);
 	}
@@ -1098,6 +1099,7 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 	fIconView->SetEnabled(enabled);
 
+	fInternalNameView->SetEnabled(enabled);
 	fTypeNameControl->SetEnabled(enabled);
 	fDescriptionControl->SetEnabled(enabled);
 	fPreferredField->SetEnabled(enabled);
@@ -1205,12 +1207,31 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgExtensionInvoked:
-			puts("ext");
+		{
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				BStringItem* item = (BStringItem*)fExtensionListView->ItemAt(index);
+				if (item == NULL)
+					break;
+
+				BWindow* window = new ExtensionWindow(this, fCurrentType, item->Text());
+				window->Show();
+			}
 			break;
+		}
 
 		case kMsgAddExtension:
-			puts("add ext");
+		{
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			BWindow* window = new ExtensionWindow(this, fCurrentType, NULL);
+			window->Show();
 			break;
+		}
 
 		case kMsgRemoveExtension:
 		{

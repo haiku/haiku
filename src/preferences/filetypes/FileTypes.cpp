@@ -4,12 +4,11 @@
  */
 
 
+#include "ApplicationTypesWindow.h"
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
 
 #include <Application.h>
-//#include <Screen.h>
-//#include <Autolock.h>
 #include <Alert.h>
 #include <TextView.h>
 #include <FilePanel.h>
@@ -39,21 +38,28 @@ class FileTypes : public BApplication {
 		virtual bool QuitRequested();
 
 	private:
+		void _WindowClosed();
+
 		BFilePanel	*fFilePanel;
 		BWindow		*fTypesWindow;
+		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
 		BRect		fTypesWindowFrame;
+		BRect		fApplicationTypesWindowFrame;
 };
 
 
 FileTypes::FileTypes()
 	: BApplication(kSignature),
 	fTypesWindow(NULL),
+	fApplicationTypesWindow(NULL),
 	fWindowCount(0)
 {
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_FILE_NODE | B_DIRECTORY_NODE, false);
+
 	fTypesWindowFrame = BRect(80.0f, 80.0f, 600.0f, 480.0f);
+	fApplicationTypesWindowFrame = BRect(100.0f, 100.0f, 540.0f, 480.0f);
 		// TODO: read from settings
 }
 
@@ -142,6 +148,14 @@ FileTypes::ArgvReceived(int32 argc, char **argv)
 
 
 void
+FileTypes::_WindowClosed()
+{
+	if (--fWindowCount == 0 && !fFilePanel->IsShowing())
+		PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void
 FileTypes::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -153,14 +167,29 @@ FileTypes::MessageReceived(BMessage *message)
 			} else
 				fTypesWindow->Activate(true);
 			break;
-
 		case kMsgTypesWindowClosed:
 			fTypesWindow = NULL;
-			// supposed to fall through
-		case kMsgWindowClosed:
-			if (--fWindowCount == 0 && !fFilePanel->IsShowing())
-				PostMessage(B_QUIT_REQUESTED);
+			_WindowClosed();
 			break;
+
+		case kMsgOpenApplicationTypesWindow:
+			if (fApplicationTypesWindow == NULL) {
+				fApplicationTypesWindow = new ApplicationTypesWindow(
+					fApplicationTypesWindowFrame);
+				fApplicationTypesWindow->Show();
+				fWindowCount++;
+			} else
+				fApplicationTypesWindow->Activate(true);
+			break;
+		case kMsgApplicationTypesWindowClosed:
+			fApplicationTypesWindow = NULL;
+			_WindowClosed();
+			break;
+
+		case kMsgWindowClosed:
+			_WindowClosed();
+			break;
+
 
 		case kMsgOpenFilePanel:
 			// the open file panel sends us a message when it's done
