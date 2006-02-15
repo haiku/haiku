@@ -55,12 +55,12 @@ resource mini_icon
 	$"FFFF000000FFFFFFFF0000000000FFFF"
 };
 
-resource app_signature "application/x-vnd.obos-Expander";
+resource app_signature "application/x-vnd.haiku-Expander";
 
 resource app_version
 {
-	short_info = "OBOS-Expander", 
-    long_info  = "OpenBeOS version of Expander"
+	short_info = "Haiku-Expander", 
+	long_info  = "Haiku version of Expander"
 };
 
 resource app_flags B_MULTIPLE_LAUNCH;
