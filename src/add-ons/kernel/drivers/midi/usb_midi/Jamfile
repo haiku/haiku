@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src add-ons kernel drivers midi usb_midi ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
+                # We need the public usb headers also when not compiling for Haiku.
+}
+
+KernelAddon usb_midi : kernel drivers bin :
+	usb_midi.c
+	devlist.c
+;
+
+ObjectHdrs [ FGristFiles usb_midi$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) preferences devices ] ;
+
+Includes [ FGristFiles usb_midi.c ] :
+	<src!preferences!devices>usbdevs.h <src!preferences!devices>usbdevs_data.h ;
