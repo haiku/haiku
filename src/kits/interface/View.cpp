@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2316,6 +2316,9 @@ BView::DrawChar(char c, BPoint location)
 void
 BView::DrawString(const char *string, escapement_delta *delta)
 {
+	if (string == NULL)
+		return;
+
 	DrawString(string, strlen(string), PenLocation(), delta);
 }
 
@@ -2323,6 +2326,9 @@ BView::DrawString(const char *string, escapement_delta *delta)
 void
 BView::DrawString(const char *string, BPoint location, escapement_delta *delta)
 {
+	if (string == NULL)
+		return;
+
 	DrawString(string, strlen(string), location, delta);
 }
 
