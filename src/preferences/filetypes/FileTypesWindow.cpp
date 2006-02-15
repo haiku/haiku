@@ -87,14 +87,8 @@ class IconView : public BControl {
 #endif
 
 	private:
-		enum {
-			kNoIcon = 0,
-			kOwnIcon,
-			kApplicationIcon,
-			kSupertypeIcon
-		};
 		BBitmap*	fIcon;
-		int32		fIconSource;
+		icon_source	fIconSource;
 };
 
 class AttributeListView : public BListView {
@@ -228,42 +222,7 @@ IconView::SetTo(BMimeType* type)
 				B_CMAP8);
 		}
 
-		if (type->GetIcon(fIcon, B_LARGE_ICON) == B_OK)
-			fIconSource = kOwnIcon;
-
-		if (fIconSource == kNoIcon) {
-			// check for icon from preferred app
-
-			char preferred[B_MIME_TYPE_LENGTH];
-			if (type->GetPreferredApp(preferred) == B_OK) {
-				BMimeType preferredApp(preferred);
-	
-				if (preferredApp.GetIconForType(type->Type(), fIcon,
-						B_LARGE_ICON) == B_OK)
-					fIconSource = kApplicationIcon;
-			}
-		}
-
-		if (fIconSource == kNoIcon) {
-			// check super type for an icon
-
-			BMimeType superType;
-			if (type->GetSupertype(&superType) == B_OK) {
-				if (superType.GetIcon(fIcon, B_LARGE_ICON) == B_OK)
-					fIconSource = kSupertypeIcon;
-				else {
-					// check the super type's preferred app
-					char preferred[B_MIME_TYPE_LENGTH];
-					if (superType.GetPreferredApp(preferred) == B_OK) {
-						BMimeType preferredApp(preferred);
-
-						if (preferredApp.GetIconForType(superType.Type(),
-								fIcon, B_LARGE_ICON) == B_OK)
-							fIconSource = kSupertypeIcon;
-					}
-				}
-			}
-		}
+		icon_for_type(*type, *fIcon, B_LARGE_ICON, &fIconSource);
 	}
 
 	if (fIconSource == kNoIcon) {
@@ -558,7 +517,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	if (rect.right < 180)
 		rect.right = 180;
 
-	fTypeListView = new MimeTypeListView(rect, "listview", NULL, false, false,
+	fTypeListView = new MimeTypeListView(rect, "typeview", NULL, false, false,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
@@ -733,7 +692,12 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fRemoveAttributeButton = new BButton(innerRect, "remove attr", "Remove",
 		new BMessage(kMsgRemoveAttribute), B_FOLLOW_RIGHT);
 	box->AddChild(fRemoveAttributeButton);
-
+/*
+	innerRect.OffsetBy(0, innerRect.Height() + 4.0f);
+	button = new BButton(innerRect, "push attr", "Push Up",
+		new BMessage(kMsgRemoveAttribute), B_FOLLOW_RIGHT);
+	box->AddChild(button);
+*/
 	innerRect.right = innerRect.left - 10.0f - B_V_SCROLL_BAR_WIDTH;
 	innerRect.left = 10.0f;
 	innerRect.top = 8.0f + ceilf(fontHeight.ascent);

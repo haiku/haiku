@@ -12,6 +12,57 @@
 // TODO: lazy type collecting (super types only at startup)
 
 
+status_t
+icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
+	icon_source* _source)
+{
+	icon_source source = kNoIcon;
+
+	if (type.GetIcon(&bitmap, size) == B_OK) {
+		source = kOwnIcon;
+		return B_OK;
+	}
+
+	if (source == kNoIcon) {
+		// check for icon from preferred app
+
+		char preferred[B_MIME_TYPE_LENGTH];
+		if (type.GetPreferredApp(preferred) != B_OK) {
+			BMimeType preferredApp(preferred);
+
+			if (preferredApp.GetIconForType(type.Type(), &bitmap, size) == B_OK)
+				source = kApplicationIcon;
+		}
+	}
+
+	if (source == kNoIcon) {
+		// check super type for an icon
+
+		BMimeType superType;
+		if (type.GetSupertype(&superType) == B_OK) {
+			if (superType.GetIcon(&bitmap, size) == B_OK)
+				source = kSupertypeIcon;
+			else {
+				// check the super type's preferred app
+				char preferred[B_MIME_TYPE_LENGTH];
+				if (superType.GetPreferredApp(preferred) == B_OK) {
+					BMimeType preferredApp(preferred);
+
+					if (preferredApp.GetIconForType(superType.Type(),
+							&bitmap, size) == B_OK)
+						source = kSupertypeIcon;
+				}
+			}
+		}
+	}
+
+	if (_source)
+		*_source = source;
+
+	return source != kNoIcon ? B_OK : B_ERROR;
+}
+
+
 bool
 mimetype_is_application_signature(BMimeType& type)
 {
@@ -86,7 +137,7 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
 		BMimeType mimeType(fType.String());
-		if (mimeType.GetIcon(&bitmap, B_MINI_ICON) == B_OK) {
+		if (icon_for_type(mimeType, bitmap, B_MINI_ICON) == B_OK) {
 			BPoint point(rect.left + 2.0f, 
 				rect.top + (rect.Height() - B_MINI_ICON) / 2.0f);
 
