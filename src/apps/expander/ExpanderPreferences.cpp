@@ -93,7 +93,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	rect = box->Bounds();
 	rect.OffsetBy(25, 42);
 	rect.bottom = rect.top + 20;
-	rect.right = rect.left + 220;
+	rect.right = rect.right - 30;
 	fAutoExpand = new BCheckBox(rect, "autoExpand", "Automatically expand files", NULL);
 	box->AddChild(fAutoExpand);
 	
