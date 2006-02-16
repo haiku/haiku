@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include <stdlib.h>
@@ -169,7 +170,7 @@ BMenuField::Draw(BRect update)
 
 	BRect frame(fMenuBar->Frame());
 
-	if (frame.InsetByCopy(-2, -2).Intersects(update)) {
+	if (frame.InsetByCopy(-kVMargin, -kVMargin).Intersects(update)) {
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 		StrokeLine(BPoint(frame.left - 1.0f, frame.top - 1.0f),
 			BPoint(frame.left - 1.0f, frame.bottom - 1.0f));
@@ -478,6 +479,8 @@ BMenuField::GetSupportedSuites(BMessage *data)
 void
 BMenuField::ResizeToPreferred()
 {
+	fMenuBar->ResizeToPreferred();
+
 	BView::ResizeToPreferred();
 }
 
@@ -485,38 +488,39 @@ BMenuField::ResizeToPreferred()
 void
 BMenuField::GetPreferredSize(float *_width, float *_height)
 {
-	BView::GetPreferredSize(_width, _height);
+	fMenuBar->GetPreferredSize(_width, _height);
 
-	if (!fFixedSizeMB && _width != NULL) {
-		BMenu* menu = Menu();
-		float width = 0;
+	if (_width) {
+		// the width is already the menu bars preferred width
+		// add the room we need to draw the shadow and stuff
+		*_width += 2 * kVMargin;
 
-		if (menu != NULL) {
-			if (menu->IsLabelFromMarked()) {
-				// find the width of the largest item
-				for (int32 i = menu->CountItems(); i-- > 0;) {
-					BMenuItem* item = menu->ItemAt(i);
+		// add the room needed for the label
+		float labelWidth = fDivider;
+		if (Label()) {
+			labelWidth = ceilf(StringWidth(Label()));
+			if (labelWidth > 0.0) {
+				// add some room between label and menu bar
+				labelWidth += 5.0;
+			}
 
-					if (item != NULL && item->Label() != NULL) {
-						float labelWidth = StringWidth(item->Label());
-						if (labelWidth > width)
-							width = labelWidth;
-					}
-				}
-			} else if (menu->Superitem() != NULL)
-				width = StringWidth(menu->Superitem()->Label());
+			// have divider override the calculated label width
+			labelWidth = max_c(labelWidth, fDivider);
 		}
 
-		// TODO: fix these values (they should match the visual appearance)
-		width += 45 + fDivider;
-		if (Label())
-			width += StringWidth(Label()) + 5;
-
-		*_width = width;
+		*_width += labelWidth;
 	}
 
-	if (_height)
-		*_height = fMenuBar->Bounds().Height();
+	if (_height) {
+		// the height is already the menu bars preferred height
+		// add the room we need to draw the shadow and stuff
+		*_height += 2 * kVMargin;
+
+		// see if our label would fit vertically
+		font_height fh;
+		GetFontHeight(&fh);
+		*_height = max_c(*_height, ceilf(fh.ascent + fh.descent));
+	}
 }
 
 
