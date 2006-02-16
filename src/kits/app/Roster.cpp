@@ -542,10 +542,10 @@ BRoster::GetActiveAppInfo(app_info *info) const
 status_t
 BRoster::FindApp(const char *mimeType, entry_ref *app) const
 {
-	status_t error = (mimeType && app ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = _ResolveApp(mimeType, NULL, app, NULL, NULL, NULL);
-	return error;
+	if (mimeType == NULL || app == NULL)
+		return B_BAD_VALUE;
+
+	return _ResolveApp(mimeType, NULL, app, NULL, NULL, NULL);
 }
 
 // FindApp
@@ -584,12 +584,11 @@ BRoster::FindApp(const char *mimeType, entry_ref *app) const
 status_t
 BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 {
-	status_t error = (ref && app ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		entry_ref _ref(*ref);
-		error = _ResolveApp(NULL, &_ref, app, NULL, NULL, NULL);
-	}
-	return error;
+	if (ref == NULL || app == NULL)
+		return B_BAD_VALUE;
+
+	entry_ref _ref(*ref);
+	return _ResolveApp(NULL, &_ref, app, NULL, NULL, NULL);
 }
 
 
@@ -1894,30 +1893,33 @@ BRoster::_DumpRoster() const
 */
 status_t
 BRoster::_ResolveApp(const char *inType, entry_ref *ref,
-	entry_ref *appRef, char *appSig, uint32 *appFlags,
-	bool *wasDocument) const
+	entry_ref* _appRef, char* _appSig, uint32* _appFlags,
+	bool* _wasDocument) const
 {
-	status_t error = (inType || ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && inType && strlen(inType) >= B_MIME_TYPE_LENGTH)
-		error = B_BAD_VALUE;
+	if ((inType == NULL && ref == NULL)
+		|| (inType != NULL && strlen(inType) >= B_MIME_TYPE_LENGTH))
+		return B_BAD_VALUE;
+
 	// find the app
 	BMimeType appMeta;
 	BFile appFile;
-	entry_ref _appRef;
-	if (error == B_OK) {
-		if (inType)
-			error = _TranslateType(inType, &appMeta, &_appRef, &appFile);
-		else {
-			error = _TranslateRef(ref, &appMeta, &_appRef, &appFile,
-								  wasDocument);
-		}
+	entry_ref appRef;
+	status_t error;
+
+	if (inType)
+		error = _TranslateType(inType, &appMeta, &appRef, &appFile);
+	else {
+		error = _TranslateRef(ref, &appMeta, &appRef, &appFile,
+			_wasDocument);
 	}
+
 	// create meta mime
 	if (error == B_OK) {
 		BPath path;
-		if (path.SetTo(&_appRef) == B_OK)
+		if (path.SetTo(&appRef) == B_OK)
 			create_app_meta_mime(path.Path(), false, true, false);
 	}
+
 	// set the app hint on the type -- but only if the file has the
 	// respective signature, otherwise unset the app hint
 	BAppFileInfo appFileInfo;
@@ -1926,7 +1928,7 @@ BRoster::_ResolveApp(const char *inType, entry_ref *ref,
 		if (appFileInfo.SetTo(&appFile) == B_OK
 			&& appFileInfo.GetSignature(signature) == B_OK) {
 			if (!strcasecmp(appMeta.Type(), signature))
-				appMeta.SetAppHint(&_appRef);
+				appMeta.SetAppHint(&appRef);
 			else {
 				appMeta.SetAppHint(NULL);
 				appMeta.SetTo(signature);
@@ -1934,30 +1936,34 @@ BRoster::_ResolveApp(const char *inType, entry_ref *ref,
 		} else
 			appMeta.SetAppHint(NULL);
 	}
+
 	// set the return values
 	if (error == B_OK) {
-		if (appRef)
-			*appRef = _appRef;
-		if (appSig) {
+		if (_appRef)
+			*_appRef = appRef;
+
+		if (_appSig) {
 			// there's no warranty, that appMeta is valid
 			if (appMeta.IsValid())
-				strcpy(appSig, appMeta.Type());
+				strcpy(_appSig, appMeta.Type());
 			else
-				appSig[0] = '\0';
+				_appSig[0] = '\0';
 		}
-		if (appFlags) {
+
+		if (_appFlags) {
 			// if an error occurs here, we don't care and just set a default
 			// value
 			if (appFileInfo.InitCheck() != B_OK
-				|| appFileInfo.GetAppFlags(appFlags) != B_OK) {
-				*appFlags = B_REG_DEFAULT_APP_FLAGS;
+				|| appFileInfo.GetAppFlags(_appFlags) != B_OK) {
+				*_appFlags = B_REG_DEFAULT_APP_FLAGS;
 			}
 		}
 	} else {
 		// unset the ref on error
-		if (appRef)
-			*appRef = _appRef;
+		if (_appRef)
+			*_appRef = appRef;
 	}
+
 	return error;
 }
 
@@ -2127,6 +2133,7 @@ BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
 		} else
 			appMeta->SetAppHint(NULL);	// bad app hint -- remove it
 	}
+
 	// in case there is no app hint or it is invalid, we need to query for the
 	// app
 	if (error == B_OK && !appFound)
