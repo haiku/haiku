@@ -1055,7 +1055,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			ViewLayer *view;
 			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
 					(void**)&view) == B_OK
-				&& view->Window()->ServerWindow() != this) {
+				&& view->Window()->ServerWindow() == this) {
 				ViewLayer* parent = view->Parent();
 
 				STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n",
