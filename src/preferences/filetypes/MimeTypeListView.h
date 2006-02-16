@@ -29,7 +29,9 @@ class MimeTypeItem : public BStringItem {
 
 		void UpdateText();
 		void AddSubtype();
+
 		void ShowIcon(bool showIcon);
+		void SetApplicationMode(bool applicationMode);
 
 		static int Compare(const BListItem* a, const BListItem* b);
 		static int CompareLabels(const BListItem* a, const BListItem* b);
@@ -45,6 +47,7 @@ class MimeTypeItem : public BStringItem {
 		bool		fIsSupertype;
 		bool		fFlat;
 		bool		fShowIcon;
+		bool		fApplicationMode;
 };
 
 class MimeTypeListView : public BOutlineListView {

@@ -18,16 +18,14 @@ icon_for_type(BMimeType& type, BBitmap& bitmap, icon_size size,
 {
 	icon_source source = kNoIcon;
 
-	if (type.GetIcon(&bitmap, size) == B_OK) {
+	if (type.GetIcon(&bitmap, size) == B_OK)
 		source = kOwnIcon;
-		return B_OK;
-	}
 
 	if (source == kNoIcon) {
 		// check for icon from preferred app
 
 		char preferred[B_MIME_TYPE_LENGTH];
-		if (type.GetPreferredApp(preferred) != B_OK) {
+		if (type.GetPreferredApp(preferred) == B_OK) {
 			BMimeType preferredApp(preferred);
 
 			if (preferredApp.GetIconForType(type.Type(), &bitmap, size) == B_OK)
@@ -137,7 +135,14 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
 		BMimeType mimeType(fType.String());
-		if (icon_for_type(mimeType, bitmap, B_MINI_ICON) == B_OK) {
+		status_t status = icon_for_type(mimeType, bitmap, B_MINI_ICON);
+		if (status < B_OK && fApplicationMode) {
+			// get default application icon
+			BMimeType appType(B_ELF_APP_MIME_TYPE);
+			status = icon_for_type(appType, bitmap, B_MINI_ICON);
+		}
+
+		if (status == B_OK) {
 			BPoint point(rect.left + 2.0f, 
 				rect.top + (rect.Height() - B_MINI_ICON) / 2.0f);
 
@@ -242,6 +247,13 @@ MimeTypeItem::ShowIcon(bool showIcon)
 }
 
 
+void
+MimeTypeItem::SetApplicationMode(bool applicationMode)
+{
+	fApplicationMode = applicationMode;
+}
+
+
 /*static*/
 int
 MimeTypeItem::Compare(const BListItem* a, const BListItem* b)
@@ -323,8 +335,10 @@ MimeTypeListView::_CollectSubtypes(const char* supertype, MimeTypeItem* supertyp
 		if (fApplicationMode ^ isApp)
 			continue;
 
-		BStringItem* typeItem = new MimeTypeItem(mimeType, fShowIcons,
+		MimeTypeItem* typeItem = new MimeTypeItem(mimeType, fShowIcons,
 			supertypeItem == NULL);
+		typeItem->SetApplicationMode(isApp);
+
 		if (supertypeItem != NULL)
 			AddUnder(typeItem, supertypeItem);
 		else
