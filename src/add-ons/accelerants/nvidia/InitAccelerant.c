@@ -307,7 +307,12 @@ status_t CLONE_ACCELERANT(void *data)
 	}
 
 	/* setup CRTC and DAC functions access */
-	setup_virtualized_heads(si->crtc_switch_mode);
+	//fixme: setup_virtualized_heads is a problem for clones: needs to be run
+	//for each clone if the mode is changed!
+	if (si->ps.secondary_head)
+		setup_virtualized_heads(si->crtc_switch_mode);
+	else
+		setup_virtualized_heads(si->ps.crtc2_prim);
 
 	/* get shared area for display modes */
 	result = my_mode_list_area = clone_area(
