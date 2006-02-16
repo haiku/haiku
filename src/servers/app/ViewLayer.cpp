@@ -972,8 +972,6 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 void
 ViewLayer::SetHidden(bool hidden)
 {
-	// TODO: test...
-
 	if (fHidden != hidden) {
 		fHidden = hidden;
 
@@ -982,8 +980,10 @@ ViewLayer::SetHidden(bool hidden)
 			bool oldVisible = fVisible;
 			UpdateVisibleDeep(fParent->IsVisible());
 			if (oldVisible != fVisible) {
-				// include or exclude us from the parent area
-				fParent->RebuildClipping(false);
+				// Include or exclude us from the parent area, and update the
+				// children's clipping as well when the view will be visible
+				fParent->RebuildClipping(!hidden);
+
 				if (fWindow) {
 					// trigger a redraw
 					BRect clippedBounds = Bounds();
