@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1038,7 +1038,6 @@ ScreenWindow::LayoutControls(uint32 flags)
 	fApplyButton->ResizeToPreferred();
 	fApplyButton->MoveTo(boxFrame.right - fApplyButton->Bounds().Width(),
 						 fDefaultsButton->Frame().top);
-
 
 	ResizeTo(boxFrame.right + 10, fDefaultsButton->Frame().bottom + 10);
 }

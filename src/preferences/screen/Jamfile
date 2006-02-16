@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src preferences screen ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders [ FDirName graphics radeon ] ;
