@@ -3369,17 +3369,22 @@ BView::RemoveSelf()
 
 	// Remove this child from its parent
 
-	if (fOwner && fOwner->Lock()) {
-		BLooper* owner = fOwner;
+	BWindow* owner = fOwner;
+	check_lock_no_pick();
 
+	if (owner != NULL) {
 		_UpdateStateForRemove();
 		_Detach();
-
-		owner->Unlock();
 	}
 
 	if (!fParent || !fParent->_RemoveChildFromList(this))
 		return false;
+
+	if (owner != NULL && fTopLevelView) {
+		// the top level view is deleted by the app_server automatically
+		owner->fLink->StartMessage(AS_LAYER_DELETE);
+		owner->fLink->Attach<int32>(_get_object_token_(fParent));
+	}
 
 	STRACE(("DONE: BView(%s)::RemoveSelf()\n", Name()));
 
@@ -3974,7 +3979,7 @@ BView::_CreateSelf()
 	fOwner->fLink->Attach<uint32>(Flags());
 	fOwner->fLink->Attach<bool>(IsHidden(this));
 	fOwner->fLink->Attach<rgb_color>(fState->view_color);
-	if (fTopLevelView)	
+	if (fTopLevelView)
 		fOwner->fLink->Attach<int32>(B_NULL_TOKEN);
 	else
 		fOwner->fLink->Attach<int32>(_get_object_token_(fParent));
@@ -4162,12 +4167,10 @@ BView::_Detach()
 		if (fOwner->fLastViewToken == _get_object_token_(this))
 			fOwner->fLastViewToken = B_NULL_TOKEN;
 
-		BWindow *owner = fOwner;
 		_SetOwner(NULL);
-
-		owner->fLink->StartMessage(AS_LAYER_DELETE);
 	}
 }
+
 
 void
 BView::_Draw(BRect updateRectScreen)
@@ -4406,8 +4409,6 @@ void BView::_ReservedView5(){}
 void BView::_ReservedView6(){}
 void BView::_ReservedView7(){}
 void BView::_ReservedView8(){}
-
-#if !_PR3_COMPATIBLE_
 void BView::_ReservedView9(){}
 void BView::_ReservedView10(){}
 void BView::_ReservedView11(){}
@@ -4416,7 +4417,6 @@ void BView::_ReservedView13(){}
 void BView::_ReservedView14(){}
 void BView::_ReservedView15(){}
 void BView::_ReservedView16(){}
-#endif
 
 
 BView::BView(const BView &other)

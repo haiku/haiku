@@ -900,15 +900,6 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 //fDesktop->UnlockSingleWindow();
 			break;
 
-		case AS_LAYER_DELETE_ROOT:
-		{
-			// Received when a window deletes its internal top view
-printf("AS_LAYER_DELETE_ROOT\n");
-			// TODO: Implement AS_LAYER_DELETE_ROOT
-			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n", Title()));
-			break;
-		}
-
 		case AS_GET_MOUSE:
 		{
 fDesktop->UnlockSingleWindow();
@@ -956,7 +947,8 @@ fDesktop->LockSingleWindow();
 		case AS_SET_CURRENT_LAYER:
 		{
 			int32 token;
-			link.Read<int32>(&token);
+			if (link.Read<int32>(&token) != B_OK)
+				break;
 
 			ViewLayer *current;
 			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
@@ -1054,27 +1046,31 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 		case AS_LAYER_DELETE:
 		{
-			// Received when a view is detached from a window. This is definitely
-			// the less taxing operation - we call PruneTree() on the removed
-			// layer, detach the layer itself, delete it, and invalidate the
-			// area assuming that the view was visible when removed
-			ViewLayer *parent = fCurrentLayer->Parent();
+			// Received when a view is detached from a window
 
-			STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n", fTitle,
-				fCurrentLayer, parent));
+			int32 token;
+			if (link.Read<int32>(&token) != B_OK)
+				break;
 
-			if (parent != NULL) {
-				parent->RemoveChild(fCurrentLayer);
+			ViewLayer *view;
+			if (App()->ViewTokens().GetToken(token, B_HANDLER_TOKEN,
+					(void**)&view) == B_OK
+				&& view->Window()->ServerWindow() != this) {
+				ViewLayer* parent = view->Parent();
 
-				if (fCurrentLayer->EventMask() != 0) {
-					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
-						fCurrentLayer->Token());
+				STRACE(("ServerWindow %s: AS_LAYER_DELETE view: %p, parent: %p\n",
+					fTitle, view, parent));
+
+				if (parent != NULL) {
+					parent->RemoveChild(view);
+
+					if (view->EventMask() != 0) {
+						fDesktop->EventDispatcher().RemoveListener(EventTarget(),
+							token);
+					}
+					delete view;
 				}
-	
-				delete fCurrentLayer;
 			}
-			// TODO: It is necessary to do this, but I find it very obscure.
-			_SetCurrentLayer(parent);
 			break;
 		}
 		case AS_LAYER_SET_STATE:
