@@ -52,10 +52,18 @@ class ScreenWindow : public BWindow {
 		bool CanApply() const;
 		bool CanRevert() const;
 
+		void LayoutControls(uint32 flags);
+		BRect LayoutMenuFields(uint32 flags, bool sideBySide = false);
+
 		ScreenSettings*	fSettings;
+
+		BBox*			fScreenBox;
+		BBox*			fControlsBox;
 
 		MonitorView*	fMonitorView;
 		BMenuItem*		fAllWorkspacesItem;
+
+		BMenuField*		fWorkspaceCountField;
 
 		BPopUpMenu*		fResolutionMenu;
 		BMenuField*		fResolutionField;
@@ -66,13 +74,19 @@ class ScreenWindow : public BWindow {
 		BMenuItem*		fOtherRefresh;
 
 		BPopUpMenu*		fCombineMenu;
+		BMenuField*		fCombineField;
 		BPopUpMenu*		fSwapDisplaysMenu;
+		BMenuField*		fSwapDisplaysField;
 		BPopUpMenu*		fUseLaptopPanelMenu;
+		BMenuField*		fUseLaptopPanelField;
 		BPopUpMenu*		fTVStandardMenu;
+		BMenuField*		fTVStandardField;
 
 		BButton*		fDefaultsButton;
 		BButton*		fApplyButton;
 		BButton*		fRevertButton;
+
+		BButton*		fBackgroundsButton;
 
 		ScreenMode		fScreenMode;
 		bool			fChangingAllWorkspaces;

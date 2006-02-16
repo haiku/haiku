@@ -11,6 +11,7 @@
 
 // Messages
 static const uint32 WORKSPACE_CHECK_MSG = 'wchk';
+static const uint32 BUTTON_LAUNCH_BACKGROUNDS_MSG = 'blbk';
 static const uint32 BUTTON_DEFAULTS_MSG = 'bdef';
 static const uint32 BUTTON_REVERT_MSG = 'brev';
 static const uint32 BUTTON_APPLY_MSG = 'bapl';
