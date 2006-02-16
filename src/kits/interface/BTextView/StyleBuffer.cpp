@@ -473,9 +473,8 @@ _BStyleBuffer_::operator[](int32 index) const
 		run.style = fNullStyle;
 	} else {
 		STEStyleRunDesc* runDesc = fStyleRunDesc[index];
-		const STEStyleRecord* record = fStyleRecord[runDesc->index];
 		run.offset = runDesc->offset;
-		run.style = record->style;
+		run.style = fStyleRecord[runDesc->index]->style;
 	}
 
 	return run;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -69,7 +69,7 @@ struct flattened_text_run {
 	uint8	green;
 	uint8	blue;
 	uint8	alpha;		/* 255 == opaque */
-	uint16	_reserved_; /* 0 */
+	uint16	_reserved_;	/* 0 */
 };
 
 
@@ -1642,24 +1642,22 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array 
 text_run_array *
 BTextView::RunArray(int32 startOffset, int32 endOffset, int32 *outSize) const
 {
-	CALLED();
-
 	STEStyleRange* styleRange = fStyles->GetStyleRange(startOffset, endOffset - 1);
 	if (styleRange == NULL)
 		return NULL;
 
-	text_run_array *res = AllocRunArray(styleRange->count, outSize);
-
-	if (!res)
-		return NULL;
-
-	for (int32 i = 0; i < res->count; i++) {
-		res->runs[i].offset = styleRange->runs[i].offset;
-		res->runs[i].font = &styleRange->runs[i].style.font;
-		res->runs[i].color = styleRange->runs[i].style.color;
+	text_run_array *runArray = AllocRunArray(styleRange->count, outSize);
+	if (runArray != NULL) {
+		for (int32 i = 0; i < runArray->count; i++) {
+			runArray->runs[i].offset = styleRange->runs[i].offset;
+			runArray->runs[i].font = styleRange->runs[i].style.font;
+			runArray->runs[i].color = styleRange->runs[i].style.color;
+		}
 	}
 
-	return res;
+	free(styleRange);
+
+	return runArray;
 }
 
 
