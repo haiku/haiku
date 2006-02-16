@@ -15,7 +15,8 @@ StringView::StringView(BRect frame, const char* name, const char* label,
 	fLabel(label),
 	fText(text),
 	fLabelAlignment(B_ALIGN_RIGHT),
-	fTextAlignment(B_ALIGN_LEFT)
+	fTextAlignment(B_ALIGN_LEFT),
+	fEnabled(true)
 {
 	fDivider = StringWidth(label) + 4.0f;
 }

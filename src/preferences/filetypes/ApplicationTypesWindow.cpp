@@ -26,6 +26,7 @@
 #include <Roster.h>
 #include <ScrollView.h>
 #include <StringView.h>
+#include <TextView.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
@@ -34,6 +35,31 @@
 
 const uint32 kMsgTypeSelected = 'typs';
 const uint32 kMsgRemoveUninstalled = 'runs';
+
+
+const char*
+variety_to_text(uint32 variety)
+{
+	switch (variety) {
+		case B_DEVELOPMENT_VERSION:
+			return "Development";
+		case B_ALPHA_VERSION:
+			return "Alpha";
+		case B_BETA_VERSION:
+			return "Beta";
+		case B_GAMMA_VERSION:
+			return "Gamma";
+		case B_GOLDEN_MASTER_VERSION:
+			return "Golden Master";
+		case B_FINAL_VERSION:
+			return "Final";
+	}
+
+	return "-";
+}
+
+
+//	#pragma mark -
 
 
 ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
@@ -66,10 +92,9 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 	topView->AddChild(scrollView);
 
-	// "Description" group
+	// "Information" group
 
 	BFont font(be_bold_font);
-	float labelWidth = font.StringWidth("Icon");
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 
@@ -78,11 +103,11 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 	rect.right = topView->Bounds().Width() - 8.0f;
 	rect.bottom = rect.top + ceilf(fontHeight.ascent) + 24.0f;
 	BBox* box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
-	box->SetLabel("Description");
+	box->SetLabel("Information");
 	topView->AddChild(box);
 
 	BRect innerRect = box->Bounds().InsetByCopy(8.0f, 6.0f);
-	labelWidth = topView->StringWidth("Signature:") + 4.0f;
+	float labelWidth = topView->StringWidth("Description:") + 4.0f;
 
 	innerRect.right = box->Bounds().Width() - 8.0f;
 	innerRect.top += ceilf(fontHeight.ascent);
@@ -105,6 +130,39 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 		B_FOLLOW_LEFT_RIGHT);
 	fPathView->SetDivider(labelWidth);
 	box->AddChild(fPathView);
+
+	// "Version" group
+
+	rect.top = box->Frame().bottom + 8.0f;
+	rect.bottom = rect.top + ceilf(fontHeight.ascent)
+		+ fNameView->Bounds().Height() * 4.0f + 20.0f;
+	box = new BBox(rect, NULL, B_FOLLOW_LEFT_RIGHT);
+	box->SetLabel("Version");
+	topView->AddChild(box);
+
+	innerRect = fNameView->Frame();
+	fVersionView = new StringView(innerRect, "version", "Version:", NULL,
+		B_FOLLOW_LEFT_RIGHT);
+	fVersionView->SetDivider(labelWidth);
+	box->AddChild(fVersionView);
+
+	innerRect.OffsetBy(0, fNameView->Bounds().Height() + 5.0f);
+	innerRect.right = innerRect.left + labelWidth;
+	fDescriptionLabel = new StringView(innerRect, "description", "Description:", NULL);
+	fDescriptionLabel->SetDivider(labelWidth);
+	box->AddChild(fDescriptionLabel);
+
+	innerRect.left = innerRect.right + 3.0f;
+	innerRect.top += 2.0f;
+	innerRect.right = box->Bounds().Width() - 8.0f;
+	innerRect.bottom += fNameView->Bounds().Height() * 2.0f;
+	fDescriptionView = new BTextView(innerRect, "description",
+		innerRect.OffsetToCopy(B_ORIGIN), B_FOLLOW_LEFT_RIGHT,
+		B_WILL_DRAW | B_FRAME_EVENTS);
+	fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
+	fDescriptionView->MakeEditable(false);
+	box->AddChild(fDescriptionView);
 
 	// Launch and Tracker buttons
 
@@ -244,10 +302,11 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 			// Set "Open In Tracker" message
 			BEntry entry(path.Path());
-			if (entry.GetRef(&ref) == B_OK) {
+			entry_ref directoryRef;
+			if (entry.GetRef(&directoryRef) == B_OK) {
 				BMessenger tracker("application/x-vnd.Be-TRAK");			
 				message = new BMessage(B_REFS_RECEIVED);
-				message->AddRef("refs", &ref);
+				message->AddRef("refs", &directoryRef);
 
 				fTrackerButton->SetMessage(message);
 				fTrackerButton->SetTarget(tracker);
@@ -256,18 +315,55 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 				appFound = false;
 			}
 		}
+
+		if (forceUpdate == B_EVERYTHING_CHANGED) {
+			// update version information
+
+			BFile file(&ref, B_READ_ONLY);
+			if (file.InitCheck() == B_OK) {
+				BAppFileInfo appInfo(&file);
+				version_info versionInfo;
+				if (appInfo.InitCheck() == B_OK
+					&& appInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK) {
+					char version[256];
+					snprintf(version, sizeof(version), "%lu.%lu.%lu, %s/%lu",
+						versionInfo.major, versionInfo.middle, versionInfo.minor,
+						variety_to_text(versionInfo.variety), versionInfo.internal);
+					fVersionView->SetText(version);
+					fDescriptionView->SetText(versionInfo.long_info);
+				} else {
+					fVersionView->SetText(NULL);
+					fDescriptionView->SetText(NULL);
+				}
+			}
+		}
 	} else {
 		fNameView->SetText(NULL);
 		fNameView->SetText(NULL);
 		fPathView->SetText(NULL);
+
+		fVersionView->SetText(NULL);
+		fDescriptionView->SetText(NULL);
 	}
 
 	fNameView->SetEnabled(enabled);
 	fSignatureView->SetEnabled(enabled);
 	fPathView->SetEnabled(enabled);
 
+	fVersionView->SetEnabled(enabled);
+	fDescriptionLabel->SetEnabled(enabled);
+
 	fTrackerButton->SetEnabled(enabled && appFound);
 	fLaunchButton->SetEnabled(enabled && appFound);
+}
+
+
+
+void
+ApplicationTypesWindow::FrameResized(float width, float height)
+{
+	// This works around a flaw of BTextView
+	fDescriptionView->SetTextRect(fDescriptionView->Bounds());
 }
 
 

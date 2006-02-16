@@ -16,6 +16,7 @@ class BMenuField;
 class BMimeType;
 class BOutlineListView;
 class BStringView;
+class BTextView;
 
 class MimeTypeListView;
 class StringView;
@@ -26,6 +27,7 @@ class ApplicationTypesWindow : public BWindow {
 		ApplicationTypesWindow(BRect frame);
 		virtual ~ApplicationTypesWindow();
 
+		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage* message);
 		virtual bool QuitRequested();
 
@@ -43,6 +45,10 @@ class ApplicationTypesWindow : public BWindow {
 		StringView*		fNameView;
 		StringView*		fSignatureView;
 		StringView*		fPathView;
+
+		StringView*		fVersionView;
+		StringView*		fDescriptionLabel;
+		BTextView*		fDescriptionView;
 
 		BButton*		fTrackerButton;
 		BButton*		fLaunchButton;
