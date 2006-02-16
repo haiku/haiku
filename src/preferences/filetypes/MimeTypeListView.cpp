@@ -512,6 +512,16 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					}
 					break;
 				}
+				case B_PREFERRED_APP_CHANGED:
+				case B_ICON_CHANGED:
+				// TODO: take B_ICON_FOR_TYPE_CHANGED into account, too
+					if (fShowIcons) {
+						// refresh item
+						MimeTypeItem* item = FindItem(type);
+						if (item != NULL)
+							InvalidateItem(IndexOf(item));
+					}
+					break;
 
 				default:
 					break;

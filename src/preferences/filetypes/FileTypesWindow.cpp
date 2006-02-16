@@ -658,7 +658,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	box->AddChild(fSelectButton);
 
 	menu = new BPopUpMenu("preferred");
-	menu->AddItem(item = new BMenuItem("None", NULL));
+	menu->AddItem(item = new BMenuItem("None", new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
 
 	innerRect.right = innerRect.left - 6.0f;
@@ -1237,13 +1237,21 @@ FileTypesWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kMsgDescriptionEntered:
+		{
+			fCurrentType.SetLongDescription(fDescriptionControl->Text());
+			break;
+		}
+
 		// Preferred Application group
 
 		case kMsgPreferredAppChosen:
 		{
 			const char* signature;
-			if (message->FindString("signature", &signature) == B_OK)
-				fCurrentType.SetPreferredApp(signature);
+			if (message->FindString("signature", &signature) != B_OK)
+				signature = NULL;
+
+			fCurrentType.SetPreferredApp(signature);
 			break;
 		}
 
