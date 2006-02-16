@@ -35,7 +35,8 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 		false, this);
 
 	AddChild(fMenuBar);
-	fMenuBar->AddItem(new _BMCItem_(menu));
+//	fMenuBar->AddItem(new _BMCItem_(menu));
+	fMenuBar->AddItem(menu);
 
 	fMenuBar->SetFont(be_plain_font);
 
@@ -60,7 +61,8 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 		fixedSize, this);
 
 	AddChild(fMenuBar);
-	fMenuBar->AddItem(new _BMCItem_(menu));
+//	fMenuBar->AddItem(new _BMCItem_(menu));
+	fMenuBar->AddItem(menu);
 
 	fMenuBar->SetFont(be_plain_font);
 
@@ -95,17 +97,17 @@ BMenuField::BMenuField(BMessage *data)
 	if (data->FindBool("be:fixeds", &fixed) == B_OK)
 		fFixedSizeMB = fixed;
 
-	BMenuItem *item = fMenuBar->ItemAt(0);
-	if (!item)
-		return;
-
-	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
-	if (!bmcitem)
-		return;
-
-	bool dmark;
-	if (data->FindBool("be:dmark", &dmark))
-		bmcitem->fShowPopUpMarker = dmark;
+//	BMenuItem *item = fMenuBar->ItemAt(0);
+//	if (!item)
+//		return;
+//
+//	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
+//	if (!bmcitem)
+//		return;
+//
+//	bool dmark;
+//	if (data->FindBool("be:dmark", &dmark))
+//		bmcitem->fShowPopUpMarker = dmark;
 }
 
 
@@ -145,13 +147,13 @@ BMenuField::Archive(BMessage *data, bool deep) const
 	if (fFixedSizeMB)
 		data->AddBool("be:fixeds", true);
 
-	BMenuItem *item = fMenuBar->ItemAt(0);
-	if (!item)
-		return B_OK;
-
-	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
-	if (bmcitem && !bmcitem->fShowPopUpMarker)
-		data->AddBool("be:dmark", false);
+//	BMenuItem *item = fMenuBar->ItemAt(0);
+//	if (!item)
+//		return B_OK;
+//
+//	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
+//	if (bmcitem && !bmcitem->fShowPopUpMarker)
+//		data->AddBool("be:dmark", false);
 
 	return B_OK;
 }

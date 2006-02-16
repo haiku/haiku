@@ -1,28 +1,13 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		BMCPrivate.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	The BMCPrivate classes are used by BMenuField.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+#include <stdio.h>
 
 #include <BMCPrivate.h>
 #include <MenuField.h>
@@ -31,11 +16,11 @@
 #include <Region.h>
 #include <Window.h>
 
-
 _BMCItem_::_BMCItem_(BMenu *menu)
 	:	BMenuItem(menu),
 		fShowPopUpMarker(true)
 {
+	printf("_BMCItem_::_BMCItem_()\n");
 }
 
 
@@ -70,7 +55,7 @@ _BMCItem_::Draw()
 
 	if (!fShowPopUpMarker)
 		return;
-
+return;
 	BRect rect(menu->Bounds());
 
 	rect.right -= 4;
@@ -187,31 +172,98 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
-	// draw the right and bottom line here in a darker tint
-	BRect bounds(Bounds());
-	bounds.right -= 2.0;
-	bounds.bottom -= 1.0;
+	// draw the right side with the popup marker
 
 	// prevent the original BMenuBar's Draw from
 	// drawing in those parts
+	BRect bounds(Bounds());
+	bounds.right -= 10.0;
+	bounds.bottom -= 1.0;
+
 	BRegion clipping(bounds);
 	ConstrainClippingRegion(&clipping);
 
 	BMenuBar::Draw(updateRect);
 
+	// restore clipping
 	ConstrainClippingRegion(NULL);
-
-	bounds.right += 2.0;
+	bounds.right += 10.0;
 	bounds.bottom += 1.0;
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-	StrokeLine(BPoint(bounds.left, bounds.bottom),
-			   BPoint(bounds.right, bounds.bottom));
-	StrokeLine(BPoint(bounds.right, bounds.bottom - 1),
-			   BPoint(bounds.right, bounds.top));
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-	StrokeLine(BPoint(bounds.right - 1, bounds.bottom - 1),
-			   BPoint(bounds.right - 1, bounds.top + 1));
+	// prepare some colors
+	rgb_color normalNoTint = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color noTint = tint_color(normalNoTint, 0.74);
+	rgb_color darken4;
+	rgb_color normalDarken4;
+	rgb_color darken1;
+	rgb_color lighten1;
+	rgb_color lighten2;
+
+	if (IsEnabled()) {
+		darken4 = tint_color(noTint, B_DARKEN_4_TINT);
+		normalDarken4 = tint_color(normalNoTint, B_DARKEN_4_TINT);
+		darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+		lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
+		lighten2 = tint_color(noTint, B_LIGHTEN_2_TINT);
+	} else {
+		darken4 = tint_color(noTint, B_DARKEN_2_TINT);
+		normalDarken4 = tint_color(normalNoTint, B_DARKEN_2_TINT);
+		darken1 = tint_color(noTint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
+		lighten1 = tint_color(noTint, (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0);
+		lighten2 = tint_color(noTint, B_LIGHTEN_1_TINT);
+	}
+
+	BRect r(bounds);
+	r.left = r.right - 10.0;	
+
+	BeginLineArray(6);
+		// bottom below item text, darker then BMenuBar
+		// would normaly draw it
+		AddLine(BPoint(bounds.left, r.bottom),
+				BPoint(r.left - 1.0, r.bottom), normalDarken4);
+
+		// bottom below popup marker
+		AddLine(BPoint(r.left, r.bottom),
+				BPoint(r.right, r.bottom), darken4);
+		// right of popup marker
+		AddLine(BPoint(r.right, r.bottom - 1),
+				BPoint(r.right, r.top), darken4);
+		// top above popup marker
+		AddLine(BPoint(r.left, r.top),
+				BPoint(r.right - 2, r.top), lighten2);
+
+		r.top += 1;
+		r.bottom -= 1;
+		r.right -= 1;
+
+		// bottom below popup marker
+		AddLine(BPoint(r.left, r.bottom),
+				BPoint(r.right, r.bottom), darken1);
+		// right of popup marker
+		AddLine(BPoint(r.right, r.bottom - 1),
+				BPoint(r.right, r.top), darken1);
+	EndLineArray();
+
+	r.bottom -= 1;
+	r.right -= 1;
+	SetHighColor(noTint);
+	FillRect(r);
+
+	// popup marker
+	BPoint center(roundf((r.left + r.right) / 2.0),
+				  roundf((r.top + r.bottom) / 2.0));
+	BPoint triangle[3];
+	triangle[0] = center + BPoint(-2.5, -0.5);
+	triangle[1] = center + BPoint(2.5, -0.5);
+	triangle[2] = center + BPoint(0.0, 2.0);
+
+	uint32 flags = Flags();
+	SetFlags(flags | B_SUBPIXEL_PRECISE);
+
+	SetHighColor(normalDarken4);
+	FillTriangle(triangle[0], triangle[1], triangle[2]);
+
+	SetFlags(flags);
 }
 
 
