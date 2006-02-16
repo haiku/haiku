@@ -653,6 +653,9 @@ BMenuItem::DrawShortcutSymbol()
 
 	shortcut += fShortcutChar;
 
+	// TODO: If the shortcut is one of B_DOWN_ARROW, B_UP_ARROW, B_ENTER, etc.
+	// we can't just use DrawString(), as those aren't valid ascii/UTF8 charachters.
+	// In that case we need to build a BBitmap for the given shortcut and draw it using DrawBitmap()
 	fSuper->DrawString(shortcut.String(), ContentLocation() +
 		BPoint(fBounds.Width() - 14.0f - 32.0f, fBounds.Height() - 4.0f));
 }
