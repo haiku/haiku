@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -223,10 +223,10 @@ BRoster::ArgVector::Unset()
 
 BRoster::BRoster()
 	:
-	fMess(),
-	fMimeMess()
+	fMessenger(),
+	fMimeMessenger()
 {
-	InitMessengers();
+	_InitMessengers();
 }
 
 
@@ -328,7 +328,7 @@ BRoster::GetAppList(BList *teamIDList) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -368,7 +368,7 @@ BRoster::GetAppList(const char *sig, BList *teamIDList) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -403,7 +403,7 @@ BRoster::GetAppInfo(const char *sig, app_info *info) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS)
@@ -437,7 +437,7 @@ BRoster::GetAppInfo(entry_ref *ref, app_info *info) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS)
@@ -472,7 +472,7 @@ BRoster::GetRunningAppInfo(team_id team, app_info *info) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS)
@@ -501,7 +501,7 @@ BRoster::GetActiveAppInfo(app_info *info) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS)
@@ -544,7 +544,7 @@ BRoster::FindApp(const char *mimeType, entry_ref *app) const
 {
 	status_t error = (mimeType && app ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
-		error = resolve_app(mimeType, NULL, app, NULL, NULL, NULL);
+		error = _ResolveApp(mimeType, NULL, app, NULL, NULL, NULL);
 	return error;
 }
 
@@ -587,7 +587,7 @@ BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 	status_t error = (ref && app ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		entry_ref _ref(*ref);
-		error = resolve_app(NULL, &_ref, app, NULL, NULL, NULL);
+		error = _ResolveApp(NULL, &_ref, app, NULL, NULL, NULL);
 	}
 	return error;
 }
@@ -649,7 +649,7 @@ BRoster::Broadcast(BMessage *message, BMessenger replyTo) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -703,7 +703,7 @@ BRoster::StartWatching(BMessenger target, uint32 eventMask) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -729,7 +729,7 @@ BRoster::StopWatching(BMessenger target) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -842,17 +842,16 @@ BRoster::ActivateApp(team_id team) const
 */
 status_t
 BRoster::Launch(const char *mimeType, BMessage *initialMessage,
-				team_id *appTeam) const
+	team_id *appTeam) const
 {
-	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BList messageList;
-		if (initialMessage)
-			messageList.AddItem(initialMessage);
-		error = xLaunchAppPrivate(mimeType, NULL, &messageList, 0, NULL,
-								  appTeam);
-	}
-	return error;
+	if (mimeType == NULL)
+		return B_BAD_VALUE;
+
+	BList messageList;
+	if (initialMessage)
+		messageList.AddItem(initialMessage);
+
+	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL, appTeam);
 }
 
 // Launch
@@ -886,14 +885,12 @@ BRoster::Launch(const char *mimeType, BMessage *initialMessage,
 */
 status_t
 BRoster::Launch(const char *mimeType, BList *messageList,
-				team_id *appTeam) const
+	team_id *appTeam) const
 {
-	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		error = xLaunchAppPrivate(mimeType, NULL, messageList, 0, NULL,
-								  appTeam);
-	}
-	return error;
+	if (mimeType == NULL)
+		return B_BAD_VALUE;
+
+	return _LaunchApp(mimeType, NULL, messageList, 0, NULL, appTeam);
 }
 
 // Launch
@@ -928,12 +925,12 @@ BRoster::Launch(const char *mimeType, BList *messageList,
 */
 status_t
 BRoster::Launch(const char *mimeType, int argc, char **args,
-				team_id *appTeam) const
+	team_id *appTeam) const
 {
-	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = xLaunchAppPrivate(mimeType, NULL, NULL, argc, args, appTeam);
-	return error;
+	if (mimeType == NULL)
+		return B_BAD_VALUE;
+
+	return _LaunchApp(mimeType, NULL, NULL, argc, args, appTeam);
 }
 
 // Launch
@@ -977,16 +974,16 @@ BRoster::Launch(const char *mimeType, int argc, char **args,
 */
 status_t
 BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
-				team_id *appTeam) const
+	team_id *appTeam) const
 {
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		BList messageList;
-		if (initialMessage)
-			messageList.AddItem(const_cast<BMessage*>(initialMessage));
-		error = xLaunchAppPrivate(NULL, ref, &messageList, 0, NULL, appTeam);
-	}
-	return error;
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	BList messageList;
+	if (initialMessage)
+		messageList.AddItem(const_cast<BMessage*>(initialMessage));
+
+	return _LaunchApp(NULL, ref, &messageList, 0, NULL, appTeam);
 }
 
 // Launch
@@ -1027,12 +1024,12 @@ BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
 */
 status_t
 BRoster::Launch(const entry_ref *ref, const BList *messageList,
-				team_id *appTeam) const
+	team_id *appTeam) const
 {
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = xLaunchAppPrivate(NULL, ref, messageList, 0, NULL, appTeam);
-	return error;
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	return _LaunchApp(NULL, ref, messageList, 0, NULL, appTeam);
 }
 
 // Launch
@@ -1079,10 +1076,10 @@ status_t
 BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 				team_id *appTeam) const
 {
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = xLaunchAppPrivate(NULL, ref, NULL, argc, args, appTeam);
-	return error;
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	return _LaunchApp(NULL, ref, NULL, argc, args, appTeam);
 }
 
 
@@ -1091,8 +1088,7 @@ BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 // GetRecentDocuments
 void
 BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *fileType,
-							const char *appSig) const
+	const char *fileType, const char *appSig) const
 {
 	if (!refList)
 		return;
@@ -1113,7 +1109,7 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 		err = msg.AddString("file type", fileType);
 	if (!err && appSig)
 		err = msg.AddString("app sig", appSig);
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1154,7 +1150,7 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 	}
 	if (!err && appSig)
 		err = msg.AddString("app sig", appSig);
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1190,7 +1186,7 @@ BRoster::GetRecentFolders(BMessage *refList, int32 maxCount,
 	}
 	if (!err && appSig)
 		err = msg.AddString("app sig", appSig);
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1223,7 +1219,7 @@ BRoster::GetRecentApps(BMessage *refList, int32 maxCount) const
 		msg.what = B_REG_GET_RECENT_APPS;
 		err = msg.AddInt32("max count", maxCount);
 	}
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1263,7 +1259,7 @@ BRoster::AddToRecentDocuments(const entry_ref *doc, const char *appSig) const
 		err = msg.AddRef("ref", doc);
 	if (!err)
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1300,7 +1296,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 		err = msg.AddRef("ref", folder);
 	if (!err)
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
-	fMess.SendMessage(&msg, &reply);
+	fMessenger.SendMessage(&msg, &reply);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
@@ -1333,7 +1329,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 	- another error code in case something went wrong.
 */
 status_t
-BRoster::ShutDown(bool reboot, bool confirm, bool synchronous)
+BRoster::_ShutDown(bool reboot, bool confirm, bool synchronous)
 {
 	status_t error = B_OK;
 
@@ -1349,7 +1345,7 @@ BRoster::ShutDown(bool reboot, bool confirm, bool synchronous)
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
@@ -1402,10 +1398,10 @@ BRoster::ShutDown(bool reboot, bool confirm, bool synchronous)
 	  is already registered.
 */
 status_t
-BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
-						uint32 flags, team_id team, thread_id thread,
-						port_id port, bool fullReg, uint32 *pToken,
-						team_id *otherTeam) const
+BRoster::_AddApplication(const char *mimeSig, const entry_ref *ref,
+	uint32 flags, team_id team, thread_id thread,
+	port_id port, bool fullReg, uint32 *pToken,
+	team_id *otherTeam) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1427,7 +1423,7 @@ BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -1462,7 +1458,7 @@ BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
 	  registered application.
 */
 status_t
-BRoster::SetSignature(team_id team, const char *mimeSig) const
+BRoster::_SetSignature(team_id team, const char *mimeSig) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1474,7 +1470,7 @@ BRoster::SetSignature(team_id team, const char *mimeSig) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -1486,7 +1482,7 @@ BRoster::SetSignature(team_id team, const char *mimeSig) const
 	\todo Really needed?
 */
 void
-BRoster::SetThread(team_id team, thread_id thread) const
+BRoster::_SetThread(team_id team, thread_id thread) const
 {
 }
 
@@ -1507,8 +1503,8 @@ BRoster::SetThread(team_id team, thread_id thread) const
 	  pre-registered application.
 */
 status_t
-BRoster::SetThreadAndTeam(uint32 entryToken, thread_id thread,
-						  team_id team) const
+BRoster::_SetThreadAndTeam(uint32 entryToken, thread_id thread,
+	team_id team) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1522,7 +1518,7 @@ BRoster::SetThreadAndTeam(uint32 entryToken, thread_id thread,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -1545,8 +1541,8 @@ BRoster::SetThreadAndTeam(uint32 entryToken, thread_id thread,
 	  application or the identified application is already fully registered.
 */
 status_t
-BRoster::CompleteRegistration(team_id team, thread_id thread,
-							  port_id port) const
+BRoster::_CompleteRegistration(team_id team, thread_id thread,
+	port_id port) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1560,7 +1556,7 @@ BRoster::CompleteRegistration(team_id team, thread_id thread,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -1580,8 +1576,8 @@ BRoster::CompleteRegistration(team_id team, thread_id thread,
 	\return \c true, if the application is pre-registered, \c false if not.
 */
 bool
-BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
-							app_info *info) const
+BRoster::_IsAppPreRegistered(const entry_ref *ref, team_id team,
+	app_info *info) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1593,7 +1589,8 @@ BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
+
 	// evaluate the reply
 	bool isPreRegistered = false;
 	if (error == B_OK) {
@@ -1623,7 +1620,7 @@ BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
 	  pre-registered application.
 */
 status_t
-BRoster::RemovePreRegApp(uint32 entryToken) const
+BRoster::_RemovePreRegApp(uint32 entryToken) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1633,7 +1630,7 @@ BRoster::RemovePreRegApp(uint32 entryToken) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
@@ -1654,7 +1651,7 @@ BRoster::RemovePreRegApp(uint32 entryToken) const
 	  (pre-)registered application.
 */
 status_t
-BRoster::RemoveApp(team_id team) const
+BRoster::_RemoveApp(team_id team) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -1664,14 +1661,14 @@ BRoster::RemoveApp(team_id team) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	if (error == B_OK && reply.what != B_REG_SUCCESS)
 		reply.FindInt32("error", &error);
 	return error;
 }
 
-// xLaunchAppPrivate
+// _LaunchApp
 /*!	\brief Launches the application associated with the supplied MIME type or
 		   the entry referred to by the supplied entry_ref.
 
@@ -1726,11 +1723,11 @@ BRoster::RemoveApp(team_id team) const
 	- other error codes
 */
 status_t
-BRoster::xLaunchAppPrivate(const char *mimeType, const entry_ref *ref,
-						   const BList *messageList, int argc,
-						   const char *const *args, team_id *appTeam) const
+BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
+	const BList *messageList, int argc,
+	const char *const *args, team_id *appTeam) const
 {
-DBG(OUT("BRoster::xLaunchAppPrivate()"));
+	DBG(OUT("BRoster::xLaunchAppPrivate()"));
 	status_t error = (mimeType || ref ? B_OK : B_BAD_VALUE);
 	// use a mutable copy of the document entry_ref
 	entry_ref _docRef;
@@ -1745,17 +1742,17 @@ DBG(OUT("BRoster::xLaunchAppPrivate()"));
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	bool wasDocument = true;
 	if (error == B_OK) {
-		error = resolve_app(mimeType, docRef, &appRef, signature, &appFlags,
-						 &wasDocument);
+		error = _ResolveApp(mimeType, docRef, &appRef, signature, &appFlags,
+			&wasDocument);
 	}
-DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
+	DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
 	// build an argument vector
 	ArgVector argVector;
 	if (error == B_OK) {
 		error = argVector.Init(argc, args, &appRef,
-							   (wasDocument ? docRef : NULL));
+			(wasDocument ? docRef : NULL));
 	}
-DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
+	DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
 	// pre-register the app
 	app_info appInfo;
 	bool alreadyRunning = false;
@@ -1763,10 +1760,10 @@ DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
 	team_id otherTeam = -1;
 	uint32 otherAppFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (error == B_OK && !alreadyRunning) {
-		error = AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
-							   &appToken, &otherTeam);
+		error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
+			&appToken, &otherTeam);
 		if (error == B_ALREADY_RUNNING) {
-DBG(OUT("  already running\n"));
+			DBG(OUT("  already running\n"));
 			alreadyRunning = true;
 			error = B_OK;
 			// get the app flags for the running application
@@ -1774,16 +1771,16 @@ DBG(OUT("  already running\n"));
 				otherAppFlags = appInfo.flags;
 		}
 	}
-DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
+	DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
 	// launch the app
 	team_id team = -1;
 	if (error == B_OK && !alreadyRunning) {
-DBG(OUT("  token: %lu\n", appToken));
+		DBG(OUT("  token: %lu\n", appToken));
 		// load the app image
 		thread_id appThread = load_image(argVector.Count(),
-										 const_cast<const char**>(
-										 	argVector.Args()),
-										 const_cast<const char**>(environ));
+			const_cast<const char**>(argVector.Args()),
+			const_cast<const char**>(environ));
+
 		// get the app team
 		if (appThread >= 0) {
 			thread_info threadInfo;
@@ -1794,22 +1791,26 @@ DBG(OUT("  token: %lu\n", appToken));
 			error = B_LAUNCH_FAILED_EXECUTABLE;
 		} else
 			error = appThread;
-DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
+
+		DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
 		// finish the registration
 		if (error == B_OK)
-			error = SetThreadAndTeam(appToken, appThread, team);
-DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
+			error = _SetThreadAndTeam(appToken, appThread, team);
+
+		DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
 		// resume the launched team
 		if (error == B_OK)
 			error = resume_thread(appThread);
-DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
+
+		DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
 		// on error: kill the launched team and unregister the app
 		if (error != B_OK) {
 			if (appThread >= 0)
 				kill_thread(appThread);
-			RemovePreRegApp(appToken);
+			_RemovePreRegApp(appToken);
 		}
 	}
+
 	// send "on launch" messages
 	if (error == B_OK) {
 		// the messages go to the launched team or to the already running one
@@ -1825,32 +1826,35 @@ DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
 		const entry_ref *_ref = (argvOnly || !wasDocument
 								 || argVector.Count() > 1 ? NULL : docRef);
 		if (!(argvOnly && alreadyRunning)) {
-			send_to_running(targetTeam, argVector.Count(), argVector.Args(),
-							_messageList, _ref, !alreadyRunning);
+			_SendToRunning(targetTeam, argVector.Count(), argVector.Args(),
+				_messageList, _ref, !alreadyRunning);
 		}
 	}
+
 	// set return values
 	if (error == B_OK && alreadyRunning)
 		error = B_ALREADY_RUNNING;
 	if (appTeam)
 		*appTeam = (error == B_OK ? team : -1);
-DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error));
+
+	DBG(OUT("BRoster::_LaunchApp() done: %s (%lx)\n",
+		strerror(error), error));
 	return error;
 }
 
 // SetAppFlags
 void
-BRoster::SetAppFlags(team_id team, uint32 flags) const
+BRoster::_SetAppFlags(team_id team, uint32 flags) const
 {
 }
 
 // DumpRoster
 void
-BRoster::DumpRoster() const
+BRoster::_DumpRoster() const
 {
 }
 
-// resolve_app
+// _ResolveApp
 /*!	\brief Finds an application associated with a MIME type or a file.
 
 	It does also supply the caller with some more information about the
@@ -1889,9 +1893,9 @@ BRoster::DumpRoster() const
 	- \see FindApp() for other error codes.
 */
 status_t
-BRoster::resolve_app(const char *inType, entry_ref *ref,
-					 entry_ref *appRef, char *appSig, uint32 *appFlags,
-					 bool *wasDocument) const
+BRoster::_ResolveApp(const char *inType, entry_ref *ref,
+	entry_ref *appRef, char *appSig, uint32 *appFlags,
+	bool *wasDocument) const
 {
 	status_t error = (inType || ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && inType && strlen(inType) >= B_MIME_TYPE_LENGTH)
@@ -1902,9 +1906,9 @@ BRoster::resolve_app(const char *inType, entry_ref *ref,
 	entry_ref _appRef;
 	if (error == B_OK) {
 		if (inType)
-			error = translate_type(inType, &appMeta, &_appRef, &appFile);
+			error = _TranslateType(inType, &appMeta, &_appRef, &appFile);
 		else {
-			error = translate_ref(ref, &appMeta, &_appRef, &appFile,
+			error = _TranslateRef(ref, &appMeta, &_appRef, &appFile,
 								  wasDocument);
 		}
 	}
@@ -1957,7 +1961,7 @@ BRoster::resolve_app(const char *inType, entry_ref *ref,
 	return error;
 }
 
-// translate_ref
+// _TranslateRef
 /*!	\brief Finds an application associated with a file.
 
 	\a appMeta is left unmodified, if the file is executable, but has no
@@ -1984,9 +1988,9 @@ BRoster::resolve_app(const char *inType, entry_ref *ref,
 	- \see FindApp() for other error codes.
 */
 status_t
-BRoster::translate_ref(entry_ref *ref, BMimeType *appMeta,
-					   entry_ref *appRef, BFile *appFile,
-					   bool *wasDocument) const
+BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
+	entry_ref *appRef, BFile *appFile,
+	bool *wasDocument) const
 {
 	status_t error = (ref && appMeta && appRef && appFile ? B_OK
 														  : B_BAD_VALUE);
@@ -2039,20 +2043,20 @@ BRoster::translate_ref(entry_ref *ref, BMimeType *appMeta,
 				error = nodeInfo.SetTo(&node);
 			char preferredApp[B_MIME_TYPE_LENGTH];
 			if (error == B_OK) {
-				// if the file has a preferred app, let translate_type() find
+				// if the file has a preferred app, let _TranslateType() find
 				// it for us
 				if (nodeInfo.GetPreferredApp(preferredApp) == B_OK) {
-					error = translate_type(preferredApp, appMeta, appRef,
+					error = _TranslateType(preferredApp, appMeta, appRef,
 										   appFile);
 				} else {
 					// no preferred app -- we need to get the file's type
 					char fileType[B_MIME_TYPE_LENGTH];
 					// get the type from the file, or guess a type
 					if (nodeInfo.GetType(fileType) != B_OK)
-						error = sniff_file(ref, &nodeInfo, fileType);
-					// now let translate_type() do the actual work
+						error = _SniffFile(ref, &nodeInfo, fileType);
+					// now let _TranslateType() do the actual work
 					if (error == B_OK) {
-						error = translate_type(fileType, appMeta, appRef,
+						error = _TranslateType(fileType, appMeta, appRef,
 											   appFile);
 					}
 				}
@@ -2064,7 +2068,7 @@ BRoster::translate_ref(entry_ref *ref, BMimeType *appMeta,
 	return error;
 }
 
-// translate_type
+// _TranslateType
 /*!	\brief Finds an application associated with a MIME type.
 
 	\see FindApp() for how the application is searched.
@@ -2082,8 +2086,8 @@ BRoster::translate_ref(entry_ref *ref, BMimeType *appMeta,
 	- \see FindApp() for other error codes.
 */
 status_t
-BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
-						entry_ref *appRef, BFile *appFile) const
+BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
+	entry_ref *appRef, BFile *appFile) const
 {
 	status_t error = (mimeType && appMeta && appRef && appFile
 					  && strlen(mimeType) < B_MIME_TYPE_LENGTH ? B_OK
@@ -2135,7 +2139,7 @@ BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
 	return error;
 }
 
-// sniff_file
+// _SniffFile
 /*!	\brief Sniffs the MIME type for a file.
 
 	Also updates the file's MIME info, if possible.
@@ -2151,8 +2155,8 @@ BRoster::translate_type(const char *mimeType, BMimeType *appMeta,
 	- other errors
 */
 status_t
-BRoster::sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
-					char *mimeType) const
+BRoster::_SniffFile(const entry_ref *file, BNodeInfo *nodeInfo,
+	char *mimeType) const
 {
 	status_t error = (file && nodeInfo && mimeType ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -2171,7 +2175,7 @@ BRoster::sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 	return error;
 }
 
-// send_to_running
+// _SendToRunning
 /*!	\brief Sends messages to a running team.
 
 	In particular those messages are \c B_ARGV_RECEIVED, \c B_REFS_RECEIVED,
@@ -2200,9 +2204,9 @@ BRoster::sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 	- an error code otherwise
 */
 status_t
-BRoster::send_to_running(team_id team, int argc, const char *const *args,
-						 const BList *messageList, const entry_ref *ref,
-						 bool readyToRun) const
+BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
+	const BList *messageList, const entry_ref *ref,
+	bool readyToRun) const
 {
 	status_t error = B_OK;
 	// Construct a messenger to the app: We can't use the public constructor,
@@ -2243,7 +2247,7 @@ BRoster::send_to_running(team_id team, int argc, const char *const *args,
 
 
 void
-BRoster::InitMessengers()
+BRoster::_InitMessengers()
 {
 	DBG(OUT("BRoster::InitMessengers()\n"));
 
@@ -2253,15 +2257,16 @@ BRoster::InitMessengers()
 	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
 		DBG(OUT("  found roster port\n"));
 		// ask for the MIME messenger
-		BMessenger::Private(fMess).SetTo(info.team, rosterPort, B_PREFERRED_TOKEN);
+		BMessenger::Private(fMessenger).SetTo(info.team, rosterPort,
+			B_PREFERRED_TOKEN);
 		BMessage reply;
-		status_t error = fMess.SendMessage(B_REG_GET_MIME_MESSENGER, &reply);
+		status_t error = fMessenger.SendMessage(B_REG_GET_MIME_MESSENGER, &reply);
 		if (error == B_OK && reply.what == B_REG_SUCCESS) {
 			DBG(OUT("  got reply from roster\n"));
-			reply.FindMessenger("messenger", &fMimeMess);
+				reply.FindMessenger("messenger", &fMimeMessenger);
 		} else {
 			DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
-			strerror(error)));
+				strerror(error)));
 			if (error == B_OK)
 				DBG(reply.PrintToStream());
 		}
@@ -2274,7 +2279,7 @@ BRoster::InitMessengers()
 	given signature to the front of the recent apps list.
 */
 void
-BRoster::AddToRecentApps(const char *appSig) const
+BRoster::_AddToRecentApps(const char *appSig) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -2284,7 +2289,7 @@ BRoster::AddToRecentApps(const char *appSig) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)
@@ -2301,33 +2306,33 @@ BRoster::AddToRecentApps(const char *appSig) const
 	documents list.
 */
 void
-BRoster::ClearRecentDocuments() const
+BRoster::_ClearRecentDocuments() const
 {
 	BMessage request(B_REG_CLEAR_RECENT_DOCUMENTS);
 	BMessage reply;
-	fMess.SendMessage(&request, &reply);
+	fMessenger.SendMessage(&request, &reply);
 }
 
 /*! \brief Sends a request to the roster to clear the recent
 	documents list.
 */
 void
-BRoster::ClearRecentFolders() const
+BRoster::_ClearRecentFolders() const
 {
 	BMessage request(B_REG_CLEAR_RECENT_FOLDERS);
 	BMessage reply;
-	fMess.SendMessage(&request, &reply);
+	fMessenger.SendMessage(&request, &reply);
 }
 
 /*! \brief Sends a request to the roster to clear the recent
 	documents list.
 */
 void
-BRoster::ClearRecentApps() const
+BRoster::_ClearRecentApps() const
 {
 	BMessage request(B_REG_CLEAR_RECENT_APPS);
 	BMessage reply;
-	fMess.SendMessage(&request, &reply);
+	fMessenger.SendMessage(&request, &reply);
 }
 
 // LoadRecentLists
@@ -2339,7 +2344,7 @@ BRoster::ClearRecentApps() const
 	\param filename The name of the file to load from
 */
 void
-BRoster::LoadRecentLists(const char *filename) const
+BRoster::_LoadRecentLists(const char *filename) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -2349,7 +2354,7 @@ BRoster::LoadRecentLists(const char *filename) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)
@@ -2369,7 +2374,7 @@ BRoster::LoadRecentLists(const char *filename) const
 	\param filename The name of the file to save to
 */
 void
-BRoster::SaveRecentLists(const char *filename) const
+BRoster::_SaveRecentLists(const char *filename) const
 {
 	status_t error = B_OK;
 	// compose the request message
@@ -2379,7 +2384,7 @@ BRoster::SaveRecentLists(const char *filename) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = fMess.SendMessage(&request, &reply);
+		error = fMessenger.SendMessage(&request, &reply);
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)

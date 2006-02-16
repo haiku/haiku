@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,8 +28,8 @@ void
 BRoster::Private::SetTo(BMessenger mainMessenger, BMessenger mimeMessenger)
 {
 	if (fRoster) {
-		fRoster->fMess = mainMessenger;
-		fRoster->fMimeMess = mimeMessenger;
+		fRoster->fMessenger = mainMessenger;
+		fRoster->fMimeMessenger = mimeMessenger;
 	}
 }
 
@@ -59,9 +59,9 @@ BRoster::Private::SendTo(BMessage *message, BMessage *reply, bool mime)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		if (mime)
-			error = fRoster->fMimeMess.SendMessage(message, reply);
+			error = fRoster->fMimeMessenger.SendMessage(message, reply);
 		else
-			error = fRoster->fMess.SendMessage(message, reply);
+			error = fRoster->fMessenger.SendMessage(message, reply);
 	}
 	return error;
 }
@@ -79,8 +79,8 @@ BRoster::Private::SendTo(BMessage *message, BMessage *reply, bool mime)
 bool
 BRoster::Private::IsMessengerValid(bool mime) const
 {
-	return (fRoster && (mime ? fRoster->fMimeMess.IsValid()
-							 : fRoster->fMess.IsValid()));
+	return (fRoster && (mime ? fRoster->fMimeMessenger.IsValid()
+							 : fRoster->fMessenger.IsValid()));
 }
 
 // InitBeRoster
