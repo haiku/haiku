@@ -593,7 +593,8 @@ BButton::GetPreferredSize(float *_width, float *_height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = 12.0f + (float)ceil(fontHeight.ascent + fontHeight.descent)
+//		*_height = 12.0f + ceilf(fontHeight.ascent + fontHeight.descent)
+		*_height = ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
 			+ (fDrawAsDefault ? 6.0f : 0);
 	}
 
