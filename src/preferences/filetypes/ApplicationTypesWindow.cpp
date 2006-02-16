@@ -120,6 +120,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 	box->AddChild(fNameView);
 
 	innerRect.OffsetBy(0, fNameView->Bounds().Height() + 5.0f);
+	innerRect.bottom = innerRect.top + height;
 	fSignatureView = new StringView(innerRect, "signature", "Signature:", NULL,
 		B_FOLLOW_LEFT_RIGHT);
 	fSignatureView->SetDivider(labelWidth);
@@ -283,9 +284,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		}
 
 		entry_ref ref;
-		// TODO: disabled because of somewhat broken BRoster::FindApp() behaviour
-		if (/*(forceUpdate & B_APP_HINT_CHANGED) != 0*/
-			forceUpdate == B_EVERYTHING_CHANGED
+		if ((forceUpdate & B_APP_HINT_CHANGED) != 0
 			&& be_roster->FindApp(fCurrentType.Type(), &ref) == B_OK) {
 			// Set launch message
 			BMessenger tracker("application/x-vnd.Be-TRAK");			
