@@ -54,16 +54,20 @@ namespace Mime {
 status_t
 get_app_hint(const char *type, entry_ref *ref)
 {
-	char path[B_MIME_TYPE_LENGTH];
+	if (type == NULL || ref == NULL)
+		return B_BAD_VALUE;
+
+	char path[B_PATH_NAME_LENGTH];
 	BEntry entry;
-	ssize_t err = ref ? B_OK : B_BAD_VALUE;
-	if (!err)
-		err = read_mime_attr(type, kAppHintAttr, path, B_MIME_TYPE_LENGTH, kAppHintType);
-	if (err >= 0)
-		err = entry.SetTo(path);
-	if (!err)
-		err = entry.GetRef(ref);		
-	return err;
+	ssize_t status = read_mime_attr(type, kAppHintAttr, path,
+		B_PATH_NAME_LENGTH, kAppHintType);
+
+	if (status >= B_OK)
+		status = entry.SetTo(path);
+	if (status == B_OK)
+		status = entry.GetRef(ref);		
+
+	return status;
 }
 
 // get_attr_info
