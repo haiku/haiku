@@ -136,10 +136,11 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
 		BMimeType mimeType(fType.String());
 		status_t status = icon_for_type(mimeType, bitmap, B_MINI_ICON);
-		if (status < B_OK && fApplicationMode) {
-			// get default application icon
-			BMimeType appType(B_ELF_APP_MIME_TYPE);
-			status = icon_for_type(appType, bitmap, B_MINI_ICON);
+		if (status < B_OK) {
+			// get default generic/application icon
+			BMimeType genericType(fApplicationMode
+				? B_ELF_APP_MIME_TYPE : B_FILE_MIME_TYPE);
+			status = icon_for_type(genericType, bitmap, B_MINI_ICON);
 		}
 
 		if (status == B_OK) {
