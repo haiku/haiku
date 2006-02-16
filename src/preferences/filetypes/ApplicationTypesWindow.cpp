@@ -153,9 +153,9 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 	box->AddChild(fDescriptionLabel);
 
 	innerRect.left = innerRect.right + 3.0f;
-	innerRect.top += 2.0f;
+	innerRect.top += 1.0f;
 	innerRect.right = box->Bounds().Width() - 8.0f;
-	innerRect.bottom += fNameView->Bounds().Height() * 2.0f;
+	innerRect.bottom += fNameView->Bounds().Height() * 2.0f - 1.0f;
 	fDescriptionView = new BTextView(innerRect, "description",
 		innerRect.OffsetToCopy(B_ORIGIN), B_FOLLOW_LEFT_RIGHT,
 		B_WILL_DRAW | B_FRAME_EVENTS);
