@@ -3380,10 +3380,10 @@ BView::RemoveSelf()
 	if (!fParent || !fParent->_RemoveChildFromList(this))
 		return false;
 
-	if (owner != NULL && fTopLevelView) {
+	if (owner != NULL && !fTopLevelView) {
 		// the top level view is deleted by the app_server automatically
 		owner->fLink->StartMessage(AS_LAYER_DELETE);
-		owner->fLink->Attach<int32>(_get_object_token_(fParent));
+		owner->fLink->Attach<int32>(_get_object_token_(this));
 	}
 
 	STRACE(("DONE: BView(%s)::RemoveSelf()\n", Name()));
@@ -4148,7 +4148,7 @@ BView::_Detach()
 	AllDetached();
 
 	if (fOwner) {
-		check_lock();
+		check_lock_no_pick();
 
 		// make sure our owner doesn't need us anymore
 
