@@ -54,6 +54,8 @@ const uint32 kMsgSamePreferredAppAs = 'spaa';
 const uint32 kMsgTypeEntered = 'type';
 const uint32 kMsgDescriptionEntered = 'dsce';
 
+const uint32 kMsgToggleIcons = 'tgic';
+
 const struct type_map {
 	const char*	name;
 	type_code	type;
@@ -486,7 +488,12 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
 		'Q', B_COMMAND_KEY));
 	menu->SetTargetForItems(be_app);
+	menuBar->AddItem(menu);
+
+	menu = new BMenu("Settings");
+	item = new BMenuItem("Show Icons in List", new BMessage(kMsgToggleIcons));
 	item->SetTarget(this);
+	menu->AddItem(item);
 	menuBar->AddItem(menu);
 
 	// MIME Types list
@@ -1093,6 +1100,17 @@ void
 FileTypesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kMsgToggleIcons:
+		{
+			BMenuItem* item;
+			if (message->FindPointer("source", (void **)&item) != B_OK)
+				break;
+
+			item->SetMarked(!fTypeListView->IsShowingIcons());
+			fTypeListView->ShowIcons(item->IsMarked());
+			break;
+		}
+
 		case kMsgTypeSelected:
 		{
 			int32 index;

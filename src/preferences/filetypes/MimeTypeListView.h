@@ -29,6 +29,7 @@ class MimeTypeItem : public BStringItem {
 
 		void UpdateText();
 		void AddSubtype();
+		void ShowIcon(bool showIcon);
 
 		static int Compare(const BListItem* a, const BListItem* b);
 		static int CompareLabels(const BListItem* a, const BListItem* b);
@@ -61,6 +62,9 @@ class MimeTypeListView : public BOutlineListView {
 		MimeTypeItem* FindItem(const char* type);
 
 		void UpdateItem(MimeTypeItem* item);
+
+		void ShowIcons(bool showIcons);
+		bool IsShowingIcons() const { return fShowIcons; }
 
 	protected:
 		virtual void AttachedToWindow();

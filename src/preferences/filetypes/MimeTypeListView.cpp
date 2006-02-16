@@ -235,6 +235,14 @@ MimeTypeItem::AddSubtype()
 }
 
 
+void
+MimeTypeItem::ShowIcon(bool showIcon)
+{
+	fShowIcon = showIcon;
+}
+
+
+/*static*/
 int
 MimeTypeItem::Compare(const BListItem* a, const BListItem* b)
 {
@@ -257,6 +265,7 @@ MimeTypeItem::Compare(const BListItem* a, const BListItem* b)
 }
 
 
+/*static*/
 int
 MimeTypeItem::CompareLabels(const BListItem* a, const BListItem* b)
 {
@@ -590,5 +599,39 @@ MimeTypeListView::UpdateItem(MimeTypeItem* item)
 	}
 	if (Window())
 		InvalidateItem(IndexOf(item));
+}
+
+
+void
+MimeTypeListView::ShowIcons(bool showIcons)
+{
+	if (showIcons == fShowIcons)
+		return;
+
+	fShowIcons = showIcons;
+
+	if (Window() == NULL)
+		return;
+
+	// update items
+
+	BFont font;
+	GetFont(&font);
+
+	for (int32 i = FullListCountItems(); i-- > 0;) {
+		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(FullListItemAt(i));
+		if (item == NULL)
+			continue;
+
+		if (!item->IsSupertypeOnly())
+			item->ShowIcon(showIcons);
+
+		item->Update(this, &font);
+	}
+
+	FrameResized(Bounds().Width(), Bounds().Height());
+		// update scroller
+
+	Invalidate();
 }
 
