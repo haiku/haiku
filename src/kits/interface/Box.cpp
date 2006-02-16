@@ -102,7 +102,7 @@ BBox::TopBorderOffset()
 	else if (fLabelView != NULL)
 		labelHeight = fLabelView->Bounds().Height();
 
-	return labelHeight / 2.0f;
+	return ceilf(labelHeight / 2.0f);
 }
 
 
@@ -496,7 +496,7 @@ void
 BBox::_DrawPlain(BRect labelBox)
 {
 	BRect rect = Bounds();
-	rect.top += labelBox.Height() / 2.0f;
+	rect.top += TopBorderOffset();
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
@@ -518,7 +518,7 @@ void
 BBox::_DrawFancy(BRect labelBox)
 {
 	BRect rect = Bounds();
-	rect.top += labelBox.Height() / 2.0f;
+	rect.top += TopBorderOffset();
 
 	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
 	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
