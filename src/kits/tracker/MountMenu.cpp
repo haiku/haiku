@@ -49,15 +49,16 @@ All rights reserved.
 #include "Bitmaps.h"
 
 #if OPEN_TRACKER
-#include "DeviceMap.h"
+#	include "DeviceMap.h"
 #else
-#include <private/storage/DeviceMap.h>
+#	include <private/storage/DeviceMap.h>
 #endif
 
 #define SHOW_NETWORK_VOLUMES
 
+
 MountMenu::MountMenu(const char *name)
-	:	BMenu(name)
+	: BMenu(name)
 {
 	SetFont(be_plain_font);
 }
@@ -126,7 +127,7 @@ AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
 
 	return NULL;
 }
-#endif
+#endif	// _INCLUDES_CLASS_DEVICE_MAP
 
 
 bool
@@ -150,7 +151,6 @@ MountMenu::AddDynamicItem(add_state)
 	autoMounter->EachPartition(&AddOnePartitionAsMenuItem, &params);
 
 #ifdef SHOW_NETWORK_VOLUMES
-
 	// iterate the volume roster and look for volumes with the
 	// 'shared' attributes -- these same volumes will not be returned
 	// by the autoMounter because they do not show up in the /dev tree
@@ -181,7 +181,7 @@ MountMenu::AddDynamicItem(add_state)
 			AddItem(item);
 		}
 	}
-#endif
+#endif	// SHOW_NETWORK_VOLUMES
 
 	AddSeparatorItem();
 
@@ -202,9 +202,7 @@ MountMenu::AddDynamicItem(add_state)
 	
 	if (rescanItem)
 		rescanItem->SetTarget(autoMounter);
+#endif	// _INCLUDES_CLASS_DEVICE_MAP
 
 	return false;
-#else
-	return true;
-#endif
 }
