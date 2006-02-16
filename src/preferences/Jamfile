@@ -22,4 +22,3 @@ SubInclude HAIKU_TOP src preferences scrollbar ;
 SubInclude HAIKU_TOP src preferences sounds ;
 SubInclude HAIKU_TOP src preferences time ;
 SubInclude HAIKU_TOP src preferences virtualmemory ;
-SubInclude HAIKU_TOP src preferences workspaces ;

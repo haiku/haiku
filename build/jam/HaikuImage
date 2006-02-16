@@ -28,11 +28,11 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit Chart
+	StyledEdit Chart Workspaces
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
-	Workspaces ScreenSaver
+	ScreenSaver
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libbind.so libnetapi.so libsocket.so libdebug.so

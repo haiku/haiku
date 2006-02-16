@@ -1,9 +1,9 @@
-SubDir HAIKU_TOP src preferences workspaces ;
+SubDir HAIKU_TOP src apps workspaces ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-Preference Workspaces : 
+Application Workspaces :
 	Workspaces.cpp 
 	: be
 	: Workspaces.rdef 

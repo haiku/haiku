@@ -21,3 +21,4 @@ SubInclude HAIKU_TOP src apps soundrecorder ;
 SubInclude HAIKU_TOP src apps stylededit ;
 SubInclude HAIKU_TOP src apps terminal ;
 SubInclude HAIKU_TOP src apps tracker ;
+SubInclude HAIKU_TOP src apps workspaces ;
