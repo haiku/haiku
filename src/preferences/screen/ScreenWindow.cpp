@@ -71,7 +71,7 @@ static const struct {
 static const int32 kColorSpaceCount = sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
 
 // list of standard refresh rates
-static const int32 kRefreshRates[] = {56, 60, 70, 72, 75};
+static const int32 kRefreshRates[] = { 60, 75, 80, 85, 95, 100 };
 static const int32 kRefreshRateCount = sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
 
 
@@ -144,16 +144,15 @@ screen_errors(status_t status)
 	}
 }
 
-
-//	#pragma mark -
-
-
 enum {
 	SHOW_COMBINE_FIELD		= 0x01,
 	SHOW_SWAP_FIELD			= 0x02,
 	SHOW_LAPTOP_PANEL_FIELD	= 0x04,
 	SHOW_TV_STANDARD_FIELD	= 0x08,
 };
+
+
+//	#pragma mark -
 
 
 ScreenWindow::ScreenWindow(ScreenSettings *settings)
@@ -401,6 +400,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	BRect buttonRect(0.0, 0.0, 30.0, 10.0);
 	fBackgroundsButton = new BButton(buttonRect, "BackgroundsButton",
 		"Set Background"B_UTF8_ELLIPSIS, new BMessage(BUTTON_LAUNCH_BACKGROUNDS_MSG));
+	fBackgroundsButton->SetFontSize(be_plain_font->Size() * 0.9);
 	fScreenBox->AddChild(fBackgroundsButton);
 
 	fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
