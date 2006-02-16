@@ -74,6 +74,46 @@ enum {
 	NV_ISA_IN
 };
 
+/* card_type in order of date of NV chip design */
+enum {
+	NV04 = 0,
+	NV05,
+	NV05M64,
+	NV06,
+	NV10,
+	NV11,
+	NV11M,
+	NV15,
+	NV17,
+	NV17M,
+	NV18,
+	NV18M,
+	NV20,
+	NV25,
+	NV28,
+	NV30,
+	NV31,
+	NV34,
+	NV35,
+	NV36,
+	NV38,
+	NV40,
+	NV41,
+	NV43,
+	NV44,
+	NV45,
+	NV47
+};
+
+/* card_arch in order of date of NV chip design */
+enum {
+	NV04A = 0,
+	NV10A,
+	NV20A,
+	NV30A,
+	NV40A
+};
+
 /* handles to pre-defined engine commands */
 #define NV_ROP5_SOLID					0x00000000 /* 2D */
 #define NV_IMAGE_BLACK_RECTANGLE		0x00000001 /* 2D/3D */
@@ -256,44 +296,6 @@ typedef struct {
 	} engine;
 
   /* card info - information gathered from PINS (and other sources) */
-	enum
-	{	// card_type in order of date of NV chip design
-		NV04 = 0,
-		NV05,
-		NV05M64,
-		NV06,
-		NV10,
-		NV11,
-		NV11M,
-		NV15,
-		NV17,
-		NV17M,
-		NV18,
-		NV18M,
-		NV20,
-		NV25,
-		NV28,
-		NV30,
-		NV31,
-		NV34,
-		NV35,
-		NV36,
-		NV38,
-		NV40,
-		NV41,
-		NV43,
-		NV44,
-		NV45,
-		NV47
-	};
-	enum
-	{	// card_arch in order of date of NV chip design
-		NV04A = 0,
-		NV10A,
-		NV20A,
-		NV30A,
-		NV40A
-	};
 	enum
 	{	// tv_encoder_type in order of capability (more or less)
 		NONE = 0,
