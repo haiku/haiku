@@ -231,9 +231,13 @@ read_line(char *buffer, int32 maxLength)
 				}
 				/* supposed to fall through */
 			default:
-				buffer[position++] = c;
-				kputchar(c);
+				if (isprint(c)) {
+					buffer[position++] = c;
+					kputchar(c);
+				}
+				break;
 		}
+
 		if (position >= maxLength - 2) {
 			buffer[position++] = '\0';
 			kputchar('\n');
