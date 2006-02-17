@@ -393,7 +393,7 @@ TCalendarView::InitDates()
 	
 	int32 label = 0;
 	int idx = 0;
-	f_firstday = getFirstDay(f_month+1, f_year);
+	f_firstday = getFirstDay(f_month, f_year);
 	int daycnt = getDaysInMonth(f_month, f_year);
 	bool cday = false;
 	for (int row = 0; row < 6; row++) {
@@ -403,7 +403,8 @@ TCalendarView::InitDates()
 			if (idx < f_firstday || idx > daycnt +f_firstday +1)
 				label = 0;
 			else
-				label = idx -(f_firstday +1);
+				label = idx - (f_firstday - 1);
+			
 			idx++;
 			cday = label == f_day;
 			day->SetTo(label, cday);
@@ -441,7 +442,7 @@ TCalendarView::SetTo(int32 year, int32 month, int32 day)
 		InitDates();
 	} else if (f_day != day) {
 		f_day = day;
-		int idx = ((f_day/7)*7) + (f_day%7 +f_firstday +1);
+		int idx = ((f_day/7)*7) + (f_day%7 +f_firstday - 1);
 		TDay *day = dynamic_cast<TDay *>(ChildAt(idx));
 		f_cday->SetValue(B_CONTROL_OFF);
 		f_cday = day;

@@ -1,6 +1,8 @@
 #include "DateUtils.h"
 #include "math.h"
 
+#include <time.h>
+
 bool
 isLeapYear(const int year)
 {
@@ -28,26 +30,19 @@ getDaysInMonth(const int month, const int year)
 int
 getFirstDay(const int month, const int year)
 {
-	int l_century = year/100;
-	int l_decade = year%100;
-	int l_month = (month +10)%12;
-	int l_day = 1;
+	struct tm tm;
+	time_t currentTime = time(NULL);
+	localtime_r(&currentTime, &tm);
 	
-	if (l_month == 1 || l_month == 2) {
-		if (l_decade == 0) {
-			l_decade = 99;
-			l_century -= 1;
-		} else
-		 l_decade-= 1;
-	}
+	// TODO: review this.
+	// We rely on the fact that tm.tm_wday is calculated
+	// starting from the following parameters
+	tm.tm_mon = month;
+	tm.tm_year = year;
+	tm.tm_mday = 1;
 	
-	float tmp = (l_day +(floor(((13 *l_month) -1)/5)) 
-		+l_decade +(floor(l_decade /4)) 
-		+(floor(l_century/4)) -(2 *l_century));
-	int result = static_cast<int>(tmp)%7;
-	
-	if (result < 0)
-		result += 7;
+	currentTime = mktime(&tm);
+	localtime_r(&currentTime, &tm);
 		
-	return result;
+	return tm.tm_wday;
 }
