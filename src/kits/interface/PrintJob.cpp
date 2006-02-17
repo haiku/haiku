@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -29,14 +29,16 @@
 static BMessenger *sPrintServer = NULL;
 
 
-static void
+static bool
 EnsureValidMessenger()
 {
 	if (sPrintServer == NULL)
-    	sPrintServer = new BMessenger;
+    		sPrintServer = new BMessenger;
     
-    if (!sPrintServer->IsValid())
-    	*sPrintServer = BMessenger(PSRV_SIGNATURE_TYPE);
+	if (!sPrintServer->IsValid())
+    		*sPrintServer = BMessenger(PSRV_SIGNATURE_TYPE);
+
+	return sPrintServer->IsValid();
 }
 
 
@@ -109,28 +111,30 @@ BPrintJob::CommitJob()
 		return;
 	}
 		
-	EnsureValidMessenger();
+	if (!EnsureValidMessenger())
+		return;
+
 	BMessage *message = new BMessage(PSRV_GET_ACTIVE_PRINTER);
-    BMessage *reply = new BMessage;
+	BMessage *reply = new BMessage;
     
-    const char *printerName = NULL;
-    if (sPrintServer->SendMessage(message, reply) < B_OK ||
-    	reply->FindString("printer_name", &printerName) < B_OK) {
-    	// TODO: Show an alert
-    	delete message;
+	const char *printerName = NULL;
+	if (sPrintServer->SendMessage(message, reply) < B_OK ||
+    		reply->FindString("printer_name", &printerName) < B_OK) {
+		// TODO: Show an alert
+    		delete message;
    		delete reply;
-    	return;
-    }	
+    		return;
+	}	
     
-    delete message;
-    delete reply;
+	delete message;
+	delete reply;
     
-    app_info appInfo;
-    be_app->GetAppInfo(&appInfo);
+ 	app_info appInfo;
+	be_app->GetAppInfo(&appInfo);
     
-    spoolFile->WriteAttr("_spool/Page Count", B_INT32_TYPE, 0, &page_number, sizeof(int32));    
-    spoolFile->WriteAttr("_spool/Description", B_STRING_TYPE, 0, print_job_name, strlen(print_job_name) + 1); 
-    spoolFile->WriteAttr("_spool/Printer", B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);    
+	spoolFile->WriteAttr("_spool/Page Count", B_INT32_TYPE, 0, &page_number, sizeof(int32));    
+	spoolFile->WriteAttr("_spool/Description", B_STRING_TYPE, 0, print_job_name, strlen(print_job_name) + 1); 
+	spoolFile->WriteAttr("_spool/Printer", B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);    
 	spoolFile->WriteAttr("_spool/Status", B_STRING_TYPE, 0, "waiting", strlen("waiting") + 1);    
 	spoolFile->WriteAttr("_spool/MimeType", B_STRING_TYPE, 0, appInfo.signature, strlen(appInfo.signature) + 1);
 	
@@ -150,7 +154,7 @@ status_t
 BPrintJob::ConfigJob()
 {
 	// TODO: Implement
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -166,7 +170,7 @@ BPrintJob::CancelJob()
 status_t
 BPrintJob::ConfigPage()
 {
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -181,7 +185,7 @@ bool
 BPrintJob::CanContinue()
 {
 		// Check if our local error storage is still B_OK
-    return pr_error == B_OK && !stop_the_show;
+	return pr_error == B_OK && !stop_the_show;
 }
 
 
@@ -206,12 +210,12 @@ BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 BMessage *
 BPrintJob::Settings()
 {
-    BMessage *message = NULL;
+	BMessage *message = NULL;
     
-    if (setup_msg != NULL)
-    	message = new BMessage(*setup_msg);
+	if (setup_msg != NULL)
+		message = new BMessage(*setup_msg);
     
-    return message;
+	return message;
 }
 
 
@@ -231,29 +235,29 @@ bool
 BPrintJob::IsSettingsMessageValid(BMessage *message) const
 {
 	const char *messageName = NULL;
-    char *printerName = GetCurrentPrinterName();
+	char *printerName = GetCurrentPrinterName();
     
-    bool result = false;
+	bool result = false;
     
-    // The passed message is valid if it contains the right printer name.
-    if (message != NULL 
-    	&& message->FindString("printer_name", &messageName) == B_OK
-    	&& strcmp(printerName, messageName) == 0)
-    	result = true;
+	// The passed message is valid if it contains the right printer name.
+	if (message != NULL 
+		&& message->FindString("printer_name", &messageName) == B_OK
+		&& strcmp(printerName, messageName) == 0)
+		result = true;
     
-    free(printerName);
+	free(printerName);
     
-    return result;
+	return result;
 }
 
 
 BRect
 BPrintJob::PaperRect()
 {
-    if (default_setup_msg == NULL)
-    	LoadDefaultSettings();
+	if (default_setup_msg == NULL)
+		LoadDefaultSettings();
     	
-    return paper_size;
+	return paper_size;
 }
 
 
@@ -261,9 +265,9 @@ BRect
 BPrintJob::PrintableRect()
 {
 	if (default_setup_msg == NULL)
-    	LoadDefaultSettings();
+		LoadDefaultSettings();
     	
-    return usable_size;
+	return usable_size;
 }
 
 
@@ -313,17 +317,19 @@ BPrintJob::LastPage()
 int32
 BPrintJob::PrinterType(void *) const
 {
-    EnsureValidMessenger();
+
+	if (!EnsureValidMessenger())
+		return B_COLOR_PRINTER; // default
     
-    BMessage message(PSRV_GET_ACTIVE_PRINTER);
-    BMessage reply;
+	BMessage message(PSRV_GET_ACTIVE_PRINTER);
+	BMessage reply;
     
-    sPrintServer->SendMessage(&message, &reply);
+	sPrintServer->SendMessage(&message, &reply);
     
-    int32 type = B_COLOR_PRINTER;
-    reply.FindInt32("color", &type);
+	int32 type = B_COLOR_PRINTER;
+	reply.FindInt32("color", &type);
     
-    return type;
+	return type;
 }
 
 
@@ -367,16 +373,16 @@ BPrintJob::HandlePageSetup(BMessage *setup)
 bool
 BPrintJob::HandlePrintSetup(BMessage *message)
 {
-    if (message->HasRect(PSRV_FIELD_PRINTABLE_RECT))
-    	message->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
-    if (message->HasRect(PSRV_FIELD_PAPER_RECT))
-    	message->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
-    if (message->HasInt32(PSRV_FIELD_FIRST_PAGE))
-    	message->FindInt32(PSRV_FIELD_FIRST_PAGE, &first_page);
-    if (message->HasInt32(PSRV_FIELD_LAST_PAGE))
-    	message->FindInt32(PSRV_FIELD_LAST_PAGE, &last_page);
+	if (message->HasRect(PSRV_FIELD_PRINTABLE_RECT))
+		message->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+	if (message->HasRect(PSRV_FIELD_PAPER_RECT))
+		message->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+	if (message->HasInt32(PSRV_FIELD_FIRST_PAGE))
+		message->FindInt32(PSRV_FIELD_FIRST_PAGE, &first_page);
+	if (message->HasInt32(PSRV_FIELD_LAST_PAGE))
+		message->FindInt32(PSRV_FIELD_LAST_PAGE, &last_page);
     	
-    return true;
+	return true;
 }
 
 
@@ -420,37 +426,40 @@ BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
 char *
 BPrintJob::GetCurrentPrinterName() const
 {  
-	EnsureValidMessenger();
+	if (!EnsureValidMessenger())
+		return NULL;
 
-    BMessage message(PSRV_GET_ACTIVE_PRINTER);
-    BMessage reply;
+	BMessage message(PSRV_GET_ACTIVE_PRINTER);
+	BMessage reply;
     
-    const char *printerName = NULL;
+	const char *printerName = NULL;
     
-    if (sPrintServer->SendMessage(&message, &reply) == B_OK)
-    	reply.FindString("printer_name", &printerName);
+	if (sPrintServer->SendMessage(&message, &reply) == B_OK)
+		reply.FindString("printer_name", &printerName);
         
-    return printerName != NULL ? strdup(printerName) : NULL;
+	return printerName != NULL ? strdup(printerName) : NULL;
 }
 
 
 void
 BPrintJob::LoadDefaultSettings()
 {
-	EnsureValidMessenger();
+	if (!EnsureValidMessenger())
+		return;
+
 	
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
-    BMessage *reply = new BMessage;
+	BMessage *reply = new BMessage;
     
-    sPrintServer->SendMessage(&message, reply);
+	sPrintServer->SendMessage(&message, reply);
     
-    if (reply->HasRect(PSRV_FIELD_PAPER_RECT))
-    	reply->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
-    if (reply->HasRect(PSRV_FIELD_PRINTABLE_RECT))
-    	reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+	if (reply->HasRect(PSRV_FIELD_PAPER_RECT))
+ 		reply->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+	if (reply->HasRect(PSRV_FIELD_PRINTABLE_RECT))
+		reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
     
-    delete default_setup_msg;  	
-    default_setup_msg = reply;
+	delete default_setup_msg;  	
+	default_setup_msg = reply;
 }
 
 
