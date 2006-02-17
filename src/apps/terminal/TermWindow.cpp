@@ -620,7 +620,7 @@ TermWindow::DoPrint()
 //#if B_BEOS_VERSION < 0x0460
   BPrintJob job("Print"); 
 
-  if((! fPrintSettings) && (DoPageSetup() != B_NO_ERROR)) {
+  if((! fPrintSettings) || (DoPageSetup() != B_NO_ERROR)) {
     (new BAlert("Cancel", "Print cancelled.", "OK"))->Go();
   return;
   }
