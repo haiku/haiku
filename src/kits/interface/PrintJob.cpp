@@ -44,23 +44,23 @@ EnsureValidMessenger()
 
 BPrintJob::BPrintJob(const char *job_name)
 	:
-	print_job_name(NULL),
-	page_number(0),
-	spoolFile(NULL),
-	pr_error(B_OK),
-	setup_msg(NULL),
-	default_setup_msg(NULL),
-	m_curPageHeader(NULL)
+	fPrintJobName(NULL),
+	fPageNumber(0),
+	fSpoolFile(NULL),
+	fError(B_OK),
+	fSetupMessage(NULL),
+	fDefaultSetupMessage(NULL),
+	fCurrentPageHeader(NULL)
 {
-	memset(&current_header, 0, sizeof(current_header));
+	memset(&fCurrentHeader, 0, sizeof(fCurrentHeader));
 	if (job_name != NULL)
-		print_job_name = strdup(job_name);
+		fPrintJobName = strdup(job_name);
 }
 
 
 BPrintJob::~BPrintJob()
 {
-	free(print_job_name);
+	free(fPrintJobName);
 }
 
 
@@ -91,11 +91,11 @@ BPrintJob::BeginJob()
 	if (path.InitCheck() < B_OK)
 		return;
 	
-	stop_the_show = 0;
-	page_number = 0;
+	fAbort = 0;
+	fPageNumber = 0;
 	
-	strncpy(spool_file_name, path.Path(), sizeof(spool_file_name));
-	spoolFile = new BFile(spool_file_name, B_READ_WRITE|B_CREATE_FILE);
+	strncpy(fSpoolFileName, path.Path(), sizeof(fSpoolFileName));
+	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE|B_CREATE_FILE);
 	
 	AddSetupSpec();
 }
@@ -104,7 +104,7 @@ BPrintJob::BeginJob()
 void
 BPrintJob::CommitJob()
 {
-	if (page_number <= 0) {
+	if (fPageNumber <= 0) {
 		BAlert *alert = new BAlert("Alert", "No Pages to print!", "Okay");
 		alert->Go();
 		CancelJob();
@@ -132,17 +132,17 @@ BPrintJob::CommitJob()
  	app_info appInfo;
 	be_app->GetAppInfo(&appInfo);
     
-	spoolFile->WriteAttr("_spool/Page Count", B_INT32_TYPE, 0, &page_number, sizeof(int32));    
-	spoolFile->WriteAttr("_spool/Description", B_STRING_TYPE, 0, print_job_name, strlen(print_job_name) + 1); 
-	spoolFile->WriteAttr("_spool/Printer", B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);    
-	spoolFile->WriteAttr("_spool/Status", B_STRING_TYPE, 0, "waiting", strlen("waiting") + 1);    
-	spoolFile->WriteAttr("_spool/MimeType", B_STRING_TYPE, 0, appInfo.signature, strlen(appInfo.signature) + 1);
+	fSpoolFile->WriteAttr("_spool/Page Count", B_INT32_TYPE, 0, &fPageNumber, sizeof(int32));    
+	fSpoolFile->WriteAttr("_spool/Description", B_STRING_TYPE, 0, fPrintJobName, strlen(fPrintJobName) + 1); 
+	fSpoolFile->WriteAttr("_spool/Printer", B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);    
+	fSpoolFile->WriteAttr("_spool/Status", B_STRING_TYPE, 0, "waiting", strlen("waiting") + 1);    
+	fSpoolFile->WriteAttr("_spool/MimeType", B_STRING_TYPE, 0, appInfo.signature, strlen(appInfo.signature) + 1);
 	
 	message = new BMessage(PSRV_PRINT_SPOOLED_JOB);
 	reply = new BMessage;
 	
-	message->AddString("JobName", print_job_name);
-	message->AddString("Spool File", spool_file_name);
+	message->AddString("JobName", fPrintJobName);
+	message->AddString("Spool File", fSpoolFileName);
 	sPrintServer->SendMessage(message, reply);
 		
 	delete message;
@@ -161,9 +161,9 @@ BPrintJob::ConfigJob()
 void
 BPrintJob::CancelJob()
 {
-	stop_the_show = 1;
-	BEntry(spool_file_name).Remove();
-	delete spoolFile;
+	fAbort = 1;
+	BEntry(fSpoolFileName).Remove();
+	delete fSpoolFile;
 }
 
 
@@ -185,7 +185,7 @@ bool
 BPrintJob::CanContinue()
 {
 		// Check if our local error storage is still B_OK
-	return pr_error == B_OK && !stop_the_show;
+	return fError == B_OK && !fAbort;
 }
 
 
@@ -212,8 +212,8 @@ BPrintJob::Settings()
 {
 	BMessage *message = NULL;
     
-	if (setup_msg != NULL)
-		message = new BMessage(*setup_msg);
+	if (fSetupMessage != NULL)
+		message = new BMessage(*fSetupMessage);
     
 	return message;
 }
@@ -225,8 +225,8 @@ BPrintJob::SetSettings(BMessage *message)
 	if (message != NULL) {
 		HandlePageSetup(message);
 		HandlePrintSetup(message);
-		delete setup_msg;
-		setup_msg = message;
+		delete fSetupMessage;
+		fSetupMessage = message;
 	}
 }
 
@@ -254,20 +254,20 @@ BPrintJob::IsSettingsMessageValid(BMessage *message) const
 BRect
 BPrintJob::PaperRect()
 {
-	if (default_setup_msg == NULL)
+	if (fDefaultSetupMessage == NULL)
 		LoadDefaultSettings();
     	
-	return paper_size;
+	return fPaperSize;
 }
 
 
 BRect
 BPrintJob::PrintableRect()
 {
-	if (default_setup_msg == NULL)
+	if (fDefaultSetupMessage == NULL)
 		LoadDefaultSettings();
     	
-	return usable_size;
+	return fUsableSize;
 }
 
 
@@ -278,12 +278,12 @@ BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 	
 	const BMessage *message = NULL;
 	
-	if (setup_msg != NULL)
-		message = setup_msg;
+	if (fSetupMessage != NULL)
+		message = fSetupMessage;
 	else {
-		if (default_setup_msg == NULL)
+		if (fDefaultSetupMessage == NULL)
 			LoadDefaultSettings();
-		message = default_setup_msg;
+		message = fDefaultSetupMessage;
 	}
 	
 	if (message != NULL) {
@@ -303,14 +303,14 @@ BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 int32
 BPrintJob::FirstPage()
 {
-    return first_page;
+    return fFirstPage;
 }
 
 
 int32
 BPrintJob::LastPage()
 {
-    return last_page;
+    return fLastPage;
 }
 
 
@@ -359,7 +359,7 @@ BPrintJob::MangleName(char *filename)
 {
 	char sysTime[10];
 	snprintf(sysTime, sizeof(sysTime), "@%lld", system_time() / 1000);
-	strncpy(filename, print_job_name, B_FILE_NAME_LENGTH - sizeof(sysTime));
+	strncpy(filename, fPrintJobName, B_FILE_NAME_LENGTH - sizeof(sysTime));
 	strcat(filename, sysTime);
 }
 
@@ -374,13 +374,13 @@ bool
 BPrintJob::HandlePrintSetup(BMessage *message)
 {
 	if (message->HasRect(PSRV_FIELD_PRINTABLE_RECT))
-		message->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+		message->FindRect(PSRV_FIELD_PRINTABLE_RECT, &fUsableSize);
 	if (message->HasRect(PSRV_FIELD_PAPER_RECT))
-		message->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+		message->FindRect(PSRV_FIELD_PAPER_RECT, &fPaperSize);
 	if (message->HasInt32(PSRV_FIELD_FIRST_PAGE))
-		message->FindInt32(PSRV_FIELD_FIRST_PAGE, &first_page);
+		message->FindInt32(PSRV_FIELD_FIRST_PAGE, &fFirstPage);
 	if (message->HasInt32(PSRV_FIELD_LAST_PAGE))
-		message->FindInt32(PSRV_FIELD_LAST_PAGE, &last_page);
+		message->FindInt32(PSRV_FIELD_LAST_PAGE, &fLastPage);
     	
 	return true;
 }
@@ -392,7 +392,7 @@ BPrintJob::NewPage()
 	// TODO: this function could be removed, and its functionality moved
 	// to SpoolPage()
 	// TODO: Implement for real
-	page_number++;
+	fPageNumber++;
 }
 
 
@@ -405,8 +405,8 @@ BPrintJob::EndLastPage()
 void
 BPrintJob::AddSetupSpec()
 {
-	if (setup_msg != NULL && spoolFile != NULL)
-		setup_msg->Flatten(spoolFile);
+	if (fSetupMessage != NULL && fSpoolFile != NULL)
+		fSetupMessage->Flatten(fSpoolFile);
 }
 
 
@@ -414,12 +414,12 @@ void
 BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
 {
 	ASSERT(picture != NULL);
-	ASSERT(spoolFile != NULL);
+	ASSERT(fSpoolFile != NULL);
 	ASSERT(rect != NULL);
 	
-	spoolFile->Write(&where, sizeof(where));
-	spoolFile->Write(rect, sizeof(*rect));
-	picture->Flatten(spoolFile);
+	fSpoolFile->Write(&where, sizeof(where));
+	fSpoolFile->Write(rect, sizeof(*rect));
+	picture->Flatten(fSpoolFile);
 }
 
 
@@ -454,12 +454,12 @@ BPrintJob::LoadDefaultSettings()
 	sPrintServer->SendMessage(&message, reply);
     
 	if (reply->HasRect(PSRV_FIELD_PAPER_RECT))
- 		reply->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+ 		reply->FindRect(PSRV_FIELD_PAPER_RECT, &fPaperSize);
 	if (reply->HasRect(PSRV_FIELD_PRINTABLE_RECT))
-		reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+		reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &fUsableSize);
     
-	delete default_setup_msg;  	
-	default_setup_msg = reply;
+	delete fDefaultSetupMessage;  	
+	fDefaultSetupMessage = reply;
 }
 
 
