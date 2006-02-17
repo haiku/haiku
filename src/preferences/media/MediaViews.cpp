@@ -68,12 +68,13 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	AddChild(defaultsBox);
 	
 	BRect defaultRect(20, 22, 250, 40);
+	float divider = StringWidth(mIsVideo ? "Video Output:" : "Audio Output:") + 5;
 	mMenu1 = new BPopUpMenu("<none>");
 	mMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1", 
 		mIsVideo ? "Video Input:" : "Audio Input:", mMenu1);
 	defaultsBox->AddChild(menuField1);
-	menuField1->SetDivider(75);
+	menuField1->SetDivider(divider);
 	
 	defaultRect.OffsetBy(0, 26);
 	mMenu2 = new BPopUpMenu("<none>");
@@ -81,7 +82,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2", 
 		mIsVideo ? "Video Output:" : "Audio Output:", mMenu2);
 	defaultsBox->AddChild(menuField2);
-	menuField2->SetDivider(75);
+	menuField2->SetDivider(divider);
 	
 	if(!mIsVideo) {
 		defaultRect.OffsetBy(186, 0);
@@ -90,7 +91,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		BMenuField *mMenuField3 = new BMenuField(defaultRect, "menuField3", 
 			"Channel:", mMenu3);
 		defaultsBox->AddChild(mMenuField3);
-		mMenuField3->SetDivider(50);
+		mMenuField3->SetDivider(StringWidth("Channel:")+5);
 		defaultRect.OffsetBy(-186, 0);
 	}
 	
@@ -137,7 +138,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	
 	rect.top = rect.bottom + 11;
 	rect.bottom = rect.top + 20;
-	rect.left = rect.right - 130;
+	rect.left = rect.right - StringWidth("Restart Media Services") - 20;
 	BButton *restartButton = new BButton(rect, "restartButton", 
 		"Restart Media Services", new BMessage(ML_RESTART_MEDIA_SERVER));
 	AddChild(restartButton);
