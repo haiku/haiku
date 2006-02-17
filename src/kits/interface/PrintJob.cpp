@@ -26,6 +26,14 @@
 #include <string.h>
 
 
+// TODO: No clue at the moment
+// We'll need to find out examining a r5 spool file
+// Maybe the Print kit team found out already ?
+struct _page_header_ {
+	char padding[52];
+};
+
+
 static BMessenger *sPrintServer = NULL;
 
 
@@ -55,12 +63,14 @@ BPrintJob::BPrintJob(const char *job_name)
 	memset(&fCurrentHeader, 0, sizeof(fCurrentHeader));
 	if (job_name != NULL)
 		fPrintJobName = strdup(job_name);
+	fCurrentPageHeader = new _page_header_;
 }
 
 
 BPrintJob::~BPrintJob()
 {
 	free(fPrintJobName);
+	delete fCurrentPageHeader;
 }
 
 
@@ -98,6 +108,9 @@ BPrintJob::BeginJob()
 	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE|B_CREATE_FILE);
 	
 	AddSetupSpec();
+
+	fCurrentPageHeaderOffset = fSpoolFile->Position();
+	fSpoolFile->Write(fCurrentPageHeader, sizeof(_page_header_));
 }
 
 
@@ -317,7 +330,6 @@ BPrintJob::LastPage()
 int32
 BPrintJob::PrinterType(void *) const
 {
-
 	if (!EnsureValidMessenger())
 		return B_COLOR_PRINTER; // default
     
@@ -350,7 +362,13 @@ BPrintJob::RecurseView(BView *view, BPoint origin,
 	view->f_is_printing = false;
 	view->EndPicture();
 	
-	// TODO: call recursively on every view's children.
+	BView *child = view->ChildAt(0);
+	while (child != NULL) {
+		// TODO: origin and rect should probably
+		// be converted for children views in some way
+		RecurseView(child, origin, picture, rect);
+		child = child->NextSibling();
+	}
 }
 
 
@@ -367,6 +385,15 @@ BPrintJob::MangleName(char *filename)
 void
 BPrintJob::HandlePageSetup(BMessage *setup)
 {
+	if (fSetupMessage != NULL && setup != fSetupMessage && setup != NULL)
+		delete fSetupMessage;
+
+	if (setup->HasRect(PSRV_FIELD_PRINTABLE_RECT))
+		setup->FindRect(PSRV_FIELD_PRINTABLE_RECT, &fUsableSize);
+	if (setup->HasRect(PSRV_FIELD_PAPER_RECT))
+		setup->FindRect(PSRV_FIELD_PAPER_RECT, &fPaperSize);
+	
+	fSetupMessage = setup;
 }
 
 
@@ -399,6 +426,13 @@ BPrintJob::NewPage()
 void
 BPrintJob::EndLastPage()
 {
+	if (fSpoolFile == NULL)
+		return;
+
+	fCurrentHeader.page_count++;
+	fSpoolFile->Seek(fCurrentPageHeaderOffset, SEEK_SET);
+	fSpoolFile->Write(fCurrentPageHeader, sizeof(_page_header_));
+	fSpoolFile->Seek(0, SEEK_END);
 }
 
 
@@ -446,7 +480,6 @@ BPrintJob::LoadDefaultSettings()
 {
 	if (!EnsureValidMessenger())
 		return;
-
 	
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
 	BMessage *reply = new BMessage;
