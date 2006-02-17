@@ -312,6 +312,8 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 
 BWindow::~BWindow()
 {
+	Lock();
+
 	fTopView->RemoveSelf();
 	delete fTopView;
 
@@ -435,6 +437,7 @@ BWindow::Quit()
 void
 BWindow::AddChild(BView *child, BView *before)
 {
+	BAutolock locker(this);
 	fTopView->AddChild(child, before);
 }
 
@@ -442,6 +445,7 @@ BWindow::AddChild(BView *child, BView *before)
 bool
 BWindow::RemoveChild(BView *child)
 {
+	BAutolock locker(this);
 	return fTopView->RemoveChild(child);
 }
 
@@ -449,6 +453,7 @@ BWindow::RemoveChild(BView *child)
 int32
 BWindow::CountChildren() const
 {
+	BAutolock locker(this);
 	return fTopView->CountChildren();
 }
 
@@ -456,6 +461,7 @@ BWindow::CountChildren() const
 BView *
 BWindow::ChildAt(int32 index) const
 {
+	BAutolock locker(this);
 	return fTopView->ChildAt(index);
 }
 
