@@ -453,7 +453,7 @@ BWindow::RemoveChild(BView *child)
 int32
 BWindow::CountChildren() const
 {
-	BAutolock locker(this);
+	BAutolock _(const_cast<BWindow*>(this));
 	return fTopView->CountChildren();
 }
 
@@ -461,7 +461,7 @@ BWindow::CountChildren() const
 BView *
 BWindow::ChildAt(int32 index) const
 {
-	BAutolock locker(this);
+	BAutolock _(const_cast<BWindow*>(this));
 	return fTopView->ChildAt(index);
 }
 
