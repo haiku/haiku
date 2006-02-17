@@ -7,7 +7,7 @@
 #include <Box.h>
 #include <Path.h>
 #include <Screen.h>
-#include <TextView.h>
+#include <StringView.h>
 
 const uint32 MSG_OK			= 'mgOK';
 const uint32 MSG_CANCEL		= 'mCan';
@@ -45,27 +45,19 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	BRect textRect(frameRect);
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(1,1);
-	BTextView *textView = new BTextView(frameRect, "expansion", textRect,
-		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	box->AddChild(textView);
-	textView->SetText("Expansion:");
+	BStringView *stringView = new BStringView(frameRect, "expansion", "Expansion:",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	box->AddChild(stringView);
 	
-	frameRect.OffsetBy(0, 52);
-	textRect.OffsetBy(0, 52);
-	textView = new BTextView(frameRect, "destinationFolder", textRect,
-		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	box->AddChild(textView);
-	textView->SetText("Destination Folder:");
+	frameRect.OffsetBy(0, 60);
+	stringView = new BStringView(frameRect, "destinationFolder", "Destination Folder:",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	box->AddChild(stringView);
 	
 	frameRect.OffsetBy(0, 90);
-	textRect.OffsetBy(0, 90);
-	textView = new BTextView(frameRect, "other", textRect,
-		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	box->AddChild(textView);
-	textView->SetText("Other:");
+	stringView = new BStringView(frameRect, "other", "Other:",
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	box->AddChild(stringView);
 	
 	rect = box->Bounds();
 	rect.OffsetBy(25, 42);
