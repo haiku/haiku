@@ -126,7 +126,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		mRealtimeCheckBox->SetValue(B_CONTROL_ON);
 		
 	rect2.top += 26;
-	rect2.bottom = rect2.top + 80;
+	rect2.bottom = rect.Height() - 5;
 	rect2.right = rect.right - 15;
 	BRect textRect(3, 3, rect2.Width() - 3, rect2.Height() - 3);
 	BTextView *textView = new BTextView(rect2, "textView", textRect, B_FOLLOW_ALL, B_WILL_DRAW);
