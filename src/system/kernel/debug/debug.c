@@ -253,7 +253,7 @@ parse_line(char *buf, char **argv, int *argc, int max_args)
 
 	strcpy(sParseLine, buf);
 
-	if (!isspace(sParseLine[0])) {
+	if (sParseLine[0] != '\0' && !isspace(sParseLine[0])) {
 		argv[0] = sParseLine;
 		*argc = 1;
 	} else
