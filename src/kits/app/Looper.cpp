@@ -1171,6 +1171,7 @@ BLooper::ConvertToMessage(void *buffer, int32 code)
 		return NULL;
 
 	BMessage *message = new BMessage();
+#ifdef USING_MESSAGE4
 	if (code == kPortMessageCodeByArea) {
 		BMessage::Private messagePrivate(message);
 		if (messagePrivate.Reference((BMessage::message_header *)buffer) != B_OK) {
@@ -1178,12 +1179,15 @@ BLooper::ConvertToMessage(void *buffer, int32 code)
 			delete message;
 			message = NULL;
 		}
-	} else {
-		if (message->Unflatten((const char *)buffer) != B_OK) {
-			PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
-			delete message;
-			message = NULL;
-		}
+
+		return message;
+	}
+#endif
+
+	if (message->Unflatten((const char *)buffer) != B_OK) {
+		PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
+		delete message;
+		message = NULL;
 	}
 
 	PRINT(("BLooper::ConvertToMessage(): %p\n", message));
