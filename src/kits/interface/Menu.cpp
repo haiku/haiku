@@ -1466,7 +1466,7 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCItem_ inside a _BMCMenuBar_ to "fake" the menu hierarchy
 	if (superMenu == NULL || superItem == NULL
-		|| dynamic_cast<_BMCItem_ *>(superItem) != NULL) {
+		|| dynamic_cast<_BMCMenuBar_ *>(superMenu) != NULL) {
 		// just move the window on screen
 
 		if (frame.bottom > screenFrame.bottom)
