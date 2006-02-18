@@ -1112,7 +1112,7 @@ void *
 BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 {
 	PRINT(("BLooper::ReadRawFromPort()\n"));
-	int8 *msgBuffer = NULL;
+	uint8 *buffer = NULL;
 	ssize_t bufferSize;
 
 	do {
@@ -1125,60 +1125,69 @@ BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 	}
 
 	if (bufferSize > 0)
-		msgBuffer = new int8[bufferSize];
+		buffer = (uint8 *)malloc(bufferSize);
 
 	// we don't want to wait again here, since that can only mean
 	// that someone else has read our message and our bufferSize
 	// is now probably wrong
 	PRINT(("read_port()...\n"));
-	bufferSize = read_port_etc(fMsgPort, msgCode, msgBuffer, bufferSize,
-					  B_RELATIVE_TIMEOUT, 0);
+	bufferSize = read_port_etc(fMsgPort, msgCode, buffer, bufferSize,
+		B_RELATIVE_TIMEOUT, 0);
+
 	if (bufferSize < B_OK) {
-		delete[] msgBuffer;
+		free(buffer);
 		return NULL;
 	}
 
-	PRINT(("BLooper::ReadRawFromPort() read: %.4s, %p\n", (char *)msgCode, msgBuffer));
-	return msgBuffer;
+	PRINT(("BLooper::ReadRawFromPort() read: %.4s, %p (%d bytes)\n", (char *)msgCode, buffer, bufferSize));
+	return buffer;
 }
 
 
 BMessage *
-BLooper::ReadMessageFromPort(bigtime_t tout)
+BLooper::ReadMessageFromPort(bigtime_t timeout)
 {
 	PRINT(("BLooper::ReadMessageFromPort()\n"));
-	int32 msgcode;
-	BMessage* bmsg;
+	int32 msgCode;
+	BMessage *message = NULL;
 
-	void* msgbuffer = ReadRawFromPort(&msgcode, tout);
-	if (!msgbuffer)
+	void *buffer = ReadRawFromPort(&msgCode, timeout);
+	if (!buffer)
 		return NULL;
 
-	bmsg = ConvertToMessage(msgbuffer, msgcode);
+	message = ConvertToMessage(buffer, msgCode);
+	free(buffer);
 
-	delete[] (int8*)msgbuffer;
-
-	PRINT(("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
-	return bmsg;
+	PRINT(("BLooper::ReadMessageFromPort() done: %p\n", message));
+	return message;
 }
 
 
-BMessage*
-BLooper::ConvertToMessage(void* raw, int32 code)
+BMessage *
+BLooper::ConvertToMessage(void *buffer, int32 code)
 {
 	PRINT(("BLooper::ConvertToMessage()\n"));
-	BMessage* bmsg = new BMessage(code);
+	if (!buffer)
+		return NULL;
 
-	if (raw != NULL) {
-		if (bmsg->Unflatten((const char*)raw) != B_OK) {
+	BMessage *message = new BMessage();
+	if (code == kPortMessageCodeByArea) {
+		BMessage::Private messagePrivate(message);
+		if (messagePrivate.Reference((BMessage::message_header *)buffer) != B_OK) {
+			PRINT(("BLooper::ConvertToMessage(): referencing message failed\n"));
+			delete message;
+			message = NULL;
+		}
+	} else {
+		if (message->Unflatten((const char *)buffer) != B_OK) {
 			PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
-			delete bmsg;
-			bmsg = NULL;
+			delete message;
+			message = NULL;
 		}
 	}
 
-	PRINT(("BLooper::ConvertToMessage(): %p\n", bmsg));
-	return bmsg;
+	PRINT(("BLooper::ConvertToMessage(): %p\n", message));
+	return message;
 }
 
 

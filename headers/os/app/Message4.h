@@ -269,6 +269,11 @@ class BMessage {
 		status_t		_InitHeader();
 		status_t		_Clear();
 
+		status_t		_FlattenToArea(message_header **_header) const;
+		status_t		_CopyForWrite();
+		status_t		_Reference(message_header *header);
+		status_t		_Dereference();
+
 		status_t		_ResizeData(int32 offset, int32 change);
 
 		uint32			_HashName(const char* name) const;

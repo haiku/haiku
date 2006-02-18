@@ -33,7 +33,8 @@
 #include <string.h>
 
 
-#define DEBUG_FUNCTION_ENTER	//debug_printf("%ld: %s\n", __LINE__, __PRETTY_FUNCTION__);
+#define DEBUG_FUNCTION_ENTER	//debug_printf("thread: 0x%x; this: 0x%08x; header: 0x%08x; fields: 0x%08x; data: 0x%08x; line: %04ld; func: %s\n", find_thread(NULL), this, fHeader, fFields, fData, __LINE__, __PRETTY_FUNCTION__);
+#define DEBUG_FUNCTION_ENTER2	//debug_printf("thread: 0x%x;                                                                             line: %04ld: func: %s\n", find_thread(NULL), __LINE__, __PRETTY_FUNCTION__);
 
 
 static const uint32 kMessageMagicR5 = 'FOB1';
@@ -81,6 +82,7 @@ BMessage::BMessage(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
+	_InitHeader();
 	*this = other;
 }
 
@@ -99,6 +101,7 @@ BMessage &
 BMessage::operator=(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
+
 	_Clear();
 
 	fHeader = (message_header *)malloc(sizeof(message_header));
@@ -110,10 +113,11 @@ BMessage::operator=(const BMessage &other)
 	}
 
 	if (fHeader->data_size > 0) {
-		fData = (uint8 *)malloc(other.fHeader->data_size);
-		memcpy(fData, other.fData, other.fHeader->data_size);
+		fData = (uint8 *)malloc(fHeader->data_size);
+		memcpy(fData, other.fData, fHeader->data_size);
 	}
 
+	fHeader->shared_area = -1;
 	fHeader->fields_available = 0;
 	fHeader->data_available = 0;
 	what = fHeader->what;
@@ -125,18 +129,19 @@ BMessage::operator=(const BMessage &other)
 void *
 BMessage::operator new(size_t size)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	if (!sMsgCache)
 		sMsgCache = new BBlockCache(10, size, B_OBJECT_CACHE);
 
-	return sMsgCache->Get(size);
+	void *pointer = sMsgCache->Get(size);
+	return pointer;
 }
 
 
 void *
 BMessage::operator new(size_t, void *pointer)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	return pointer;
 }
 
@@ -144,7 +149,7 @@ BMessage::operator new(size_t, void *pointer)
 void
 BMessage::operator delete(void *pointer, size_t size)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	sMsgCache->Save(pointer, size);
 }
 
@@ -175,6 +180,7 @@ BMessage::_InitHeader()
 	fHeader->format = kMessageMagic4;
 	fHeader->flags = MESSAGE_FLAG_VALID;
 	fHeader->current_specifier = -1;
+	fHeader->shared_area = -1;
 
 	fHeader->target = B_NULL_TOKEN;
 	fHeader->reply_target = B_NULL_TOKEN;
@@ -191,9 +197,9 @@ BMessage::_InitHeader()
 status_t
 BMessage::_Clear()
 {
-	delete fOriginal;
-	fOriginal = NULL;
-	fQueueLink = NULL;
+	DEBUG_FUNCTION_ENTER;
+	if (fHeader && fHeader->shared_area >= B_OK)
+		_Dereference();
 
 	free(fHeader);
 	fHeader = NULL;
@@ -201,6 +207,10 @@ BMessage::_Clear()
 	fFields = NULL;
 	free(fData);
 	fData = NULL;
+
+	delete fOriginal;
+	fOriginal = NULL;
+	fQueueLink = NULL;
 
 	return B_OK;
 }
@@ -524,6 +534,9 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 	if (!oldEntry || !newEntry)
 		return B_BAD_VALUE;
 
+	if (fHeader->shared_area >= B_OK)
+		_CopyForWrite();
+
 	uint32 hash = _HashName(oldEntry) % fHeader->hash_table_size;
 	int32 *nextField = &fHeader->hash_table[hash];
 
@@ -604,8 +617,7 @@ BMessage::Previous() const
 	DEBUG_FUNCTION_ENTER;
 	/* ToDo: test if the "_previous_" field is used in R5 */
 	if (!fOriginal) {
-		delete fOriginal;
-		fOriginal = new BMessage;
+		fOriginal = new BMessage();
 
 		if (FindMessage("_previous_", fOriginal) != B_OK) {
 			delete fOriginal;
@@ -621,7 +633,7 @@ bool
 BMessage::WasDropped() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return fHeader->flags & MESSAGE_FLAG_READ_ONLY;
+	return fHeader->flags & MESSAGE_FLAG_WAS_DROPPED;
 }
 
 
@@ -752,7 +764,6 @@ ssize_t
 BMessage::FlattenedSize() const
 {
 	DEBUG_FUNCTION_ENTER;
-	//return _NativeFlattenedSize();
 	return BPrivate::r5_message_flattened_size(this);
 }
 
@@ -761,7 +772,6 @@ status_t
 BMessage::Flatten(char *buffer, ssize_t size) const
 {
 	DEBUG_FUNCTION_ENTER;
-	//return _NativeFlatten(buffer, size);
 	return BPrivate::flatten_r5_message(this, buffer, size);
 }
 
@@ -770,7 +780,6 @@ status_t
 BMessage::Flatten(BDataIO *stream, ssize_t *size) const
 {
 	DEBUG_FUNCTION_ENTER;
-	//return _NativeFlatten(stream, size);
 	return BPrivate::flatten_r5_message(this, stream, size);
 }
 
@@ -883,13 +892,19 @@ BMessage::Unflatten(const char *flatBuffer)
 
 	// native message unflattening
 
-	free(fHeader);
+	_Clear();
+
 	fHeader = (message_header *)malloc(sizeof(message_header));
 	if (!fHeader)
 		return B_NO_MEMORY;
 
 	memcpy(fHeader, flatBuffer, sizeof(message_header));
 	flatBuffer += sizeof(message_header);
+
+	fHeader->shared_area = -1;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
+	what = fHeader->what;
 
 	/* ToDo: better message validation (checksum) */
 	if (fHeader->format != kMessageMagic4 ||
@@ -899,8 +914,6 @@ BMessage::Unflatten(const char *flatBuffer)
 		return B_BAD_VALUE;
 	}
 
-	free(fFields);
-	fFields = NULL;
 	if (fHeader->fields_size > 0) {
 		fFields = (field_header *)malloc(fHeader->fields_size);
 		if (!fFields)
@@ -910,8 +923,6 @@ BMessage::Unflatten(const char *flatBuffer)
 		flatBuffer += fHeader->fields_size;
 	}
 
-	free(fData);
-	fData = NULL;
 	if (fHeader->data_size > 0) {
 		fData = (uint8 *)malloc(fHeader->data_size);
 		if (!fData)
@@ -920,9 +931,6 @@ BMessage::Unflatten(const char *flatBuffer)
 		memcpy(fData, flatBuffer, fHeader->data_size);
 	}
 
-	fHeader->fields_available = 0;
-	fHeader->data_available = 0;
-	what = fHeader->what;
 	return B_OK;
 }
 
@@ -948,7 +956,8 @@ BMessage::Unflatten(BDataIO *stream)
 
 	// native message unflattening
 
-	free(fHeader);
+	_Clear();
+
 	fHeader = (message_header *)malloc(sizeof(message_header));
 	if (!fHeader)
 		return B_NO_MEMORY;
@@ -957,6 +966,12 @@ BMessage::Unflatten(BDataIO *stream)
 	uint8 *header = (uint8 *)fHeader;
 	ssize_t result = stream->Read(header + sizeof(uint32),
 		sizeof(message_header) - sizeof(uint32));
+
+	fHeader->shared_area = -1;
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
+	what = fHeader->what;
+
 	if (result != sizeof(message_header) - sizeof(uint32)) {
 		_Clear();
 		_InitHeader();
@@ -971,8 +986,6 @@ BMessage::Unflatten(BDataIO *stream)
 		return B_BAD_VALUE;
 	}
 
-	free(fFields);
-	fFields = NULL;
 	if (fHeader->fields_size > 0) {
 		fFields = (field_header *)malloc(fHeader->fields_size);
 		if (!fFields)
@@ -986,8 +999,6 @@ BMessage::Unflatten(BDataIO *stream)
 		}
 	}
 
-	free(fData);
-	fData = NULL;
 	if (fHeader->data_size > 0) {
 		fData = (uint8 *)malloc(fHeader->data_size);
 		if (!fData)
@@ -1001,9 +1012,6 @@ BMessage::Unflatten(BDataIO *stream)
 		}
 	}
 
-	fHeader->fields_available = 0;
-	fHeader->data_available = 0;
-	what = fHeader->what;
 	return B_OK;
 }
 
@@ -1162,6 +1170,157 @@ BMessage::PopSpecifier()
 	if (fHeader->current_specifier >= 0)
 		fHeader->current_specifier--;
 
+	return B_OK;
+}
+
+
+/*	The concept of message sending by area:
+
+	The traditional way of sending a message is to send it by flattening it to
+	a buffer, pushing it through a port, reading it into the outputbuffer and
+	unflattening it from there (copying the data again). While this works ok
+	for small messages it does not make any sense for larger ones and may even
+	hit some port capacity limit.
+	Often in the life of a BMessage, it will be sent to someone. Almost as
+	often the one receiving the message will not need to change the message
+	in any way, but uses it "read only" to get information from it. This means
+	that all that copying is pretty pointless in the first place since we
+	could simply pass the original buffers on.
+	It's obviously not exactly as simple as this, since we cannot just use the
+	memory of one application in another - but we can share areas with
+	eachother.
+	Therefore instead of flattening into a buffer, we copy the message data
+	into an area, put this information into the message header and only push
+	this through the port. The receiving looper then builds a BMessage from
+	the header, that only references the data in the area (not copying it),
+	allowing read only access to it.
+	Only if write access is necessary the message will be copyed from the area
+	to its own buffers (like in the unflatten step before).
+	The double copying is reduced to a single copy in most cases and we safe
+	the possibly dangerous and slower route of moving the data through a port.
+	Additionally we save us the reference counting with the use of areas that
+	are reference counted internally. So we don't have to worry about leaving
+	an area behind or deleting one that is still in use.
+*/
+
+status_t
+BMessage::_FlattenToArea(message_header **_header) const
+{
+	DEBUG_FUNCTION_ENTER;
+	message_header *header = (message_header *)malloc(sizeof(message_header));
+	memcpy(header, fHeader, sizeof(message_header));
+	*_header = header;
+
+	if (header->shared_area >= B_OK)
+		return B_OK;
+
+	if (header->fields_size == 0 && header->data_size == 0)
+		return B_OK;
+
+	uint8 *address = NULL;
+	ssize_t size = sizeof(int32) + header->fields_size + header->data_size;
+	size = ((size + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1)) + B_PAGE_SIZE;
+	area_id area = create_area("Shared BMessage data", (void **)&address,
+		B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	if (area < B_OK) {
+		free(header);
+		*_header = NULL;
+		return area;
+	}
+
+	if (header->fields_size > 0) {
+		memcpy(address, fFields, header->fields_size);
+		address += header->fields_size;
+	}
+
+	if (header->data_size > 0)
+		memcpy(address, fData, header->data_size);
+
+	header->shared_area = area;
+	header->fields_available = 0;
+	header->data_available = 0;
+	return B_OK;
+}
+
+
+status_t
+BMessage::_CopyForWrite()
+{
+	DEBUG_FUNCTION_ENTER;
+	if (fHeader->shared_area < B_OK)
+		return B_OK;
+
+	field_header *newFields = NULL;
+	uint8 *newData = NULL;
+
+	if (fHeader->fields_size > 0) {
+		newFields = (field_header *)malloc(fHeader->fields_size);
+		memcpy(newFields, fFields, fHeader->fields_size);
+	}
+
+	if (fHeader->data_size > 0) {
+		newData = (uint8 *)malloc(fHeader->data_size);
+		memcpy(newData, fData, fHeader->data_size);
+	}
+
+	_Dereference();
+
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
+
+	fFields = newFields;
+	fData = newData;
+	return B_OK;
+}
+
+
+status_t
+BMessage::_Reference(message_header *header)
+{
+	DEBUG_FUNCTION_ENTER;
+	_Clear();
+
+	fHeader = (message_header *)malloc(sizeof(message_header));
+	memcpy(fHeader, header, sizeof(message_header));
+	fHeader->fields_available = 0;
+	fHeader->data_available = 0;
+	what = fHeader->what;
+
+	if (fHeader->shared_area < B_OK) {
+		if (fHeader->fields_size == 0 && header->data_size == 0)
+			return B_OK;
+
+		_InitHeader();
+		return B_BAD_DATA;
+	}
+
+	uint8 *address = NULL;
+	area_id clone = clone_area("Cloned BMessage data", (void **)&address,
+		B_ANY_ADDRESS, B_READ_AREA, fHeader->shared_area);
+
+	if (clone < B_OK) {
+		_InitHeader();
+		return clone;
+	}
+
+	fHeader->shared_area = clone;
+	fFields = (field_header *)address;
+	address += fHeader->fields_size;
+	fData = address;
+
+	return B_OK;
+}
+
+
+status_t
+BMessage::_Dereference()
+{
+	DEBUG_FUNCTION_ENTER;
+	delete_area(fHeader->shared_area);
+	fHeader->shared_area = -1;
+	fFields = NULL;
+	fData = NULL;
 	return B_OK;
 }
 
@@ -1377,6 +1536,9 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (numBytes <= 0 || !data)
 		return B_BAD_VALUE;
 
+	if (fHeader->shared_area >= B_OK)
+		_CopyForWrite();
+
 	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 	if (result == B_NAME_NOT_FOUND)
@@ -1428,6 +1590,9 @@ BMessage::RemoveData(const char *name, int32 index)
 	if (index >= field->count)
 		return B_BAD_INDEX;
 
+	if (fHeader->shared_area >= B_OK)
+		_CopyForWrite();
+
 	if (field->count == 1)
 		return _RemoveField(field);
 
@@ -1467,6 +1632,9 @@ BMessage::RemoveName(const char *name)
 	if (!field)
 		return B_ERROR;
 
+	if (fHeader->shared_area >= B_OK)
+		_CopyForWrite();
+
 	return _RemoveField(field);
 }
 
@@ -1475,23 +1643,8 @@ status_t
 BMessage::MakeEmpty()
 {
 	DEBUG_FUNCTION_ENTER;
-
-	free(fFields);
-	fFields = NULL;
-	free(fData);
-	fData = NULL;
-
-	fHeader->fields_size = 0;
-	fHeader->data_size = 0;
-	fHeader->fields_available = 0;
-	fHeader->data_available = 0;
-	fHeader->current_specifier = -1;
-	fHeader->field_count = 0;
-
-	fHeader->flags &= ~MESSAGE_FLAG_HAS_SPECIFIERS;
-
-	// initializing the hash table to -1 because 0 is a valid index
-	memset(&fHeader->hash_table, 255, sizeof(fHeader->hash_table));
+	_Clear();
+	_InitHeader();
 	return B_OK;
 }
 
@@ -1554,6 +1707,9 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 	if (index >= field->count)
 		return B_BAD_INDEX;
 
+	if (fHeader->shared_area >= B_OK)
+		_CopyForWrite();
+
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
 		ssize_t size = field->data_size / field->count;
 		if (size != numBytes)
@@ -1606,7 +1762,7 @@ BMessage::HasData(const char *name, type_code type, int32 index) const
 void
 BMessage::_StaticInit()
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	sReplyPorts[0] = create_port(1, "tmp_rport0");
 	sReplyPorts[1] = create_port(1, "tmp_rport1");
 	sReplyPorts[2] = create_port(1, "tmp_rport2");
@@ -1622,7 +1778,7 @@ BMessage::_StaticInit()
 void
 BMessage::_StaticCleanup()
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	delete_port(sReplyPorts[0]);
 	sReplyPorts[0] = -1;
 	delete_port(sReplyPorts[1]);
@@ -1635,7 +1791,7 @@ BMessage::_StaticCleanup()
 void
 BMessage::_StaticCacheCleanup()
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	delete sMsgCache;
 	sMsgCache = NULL;
 }
@@ -1644,7 +1800,7 @@ BMessage::_StaticCacheCleanup()
 int32
 BMessage::_StaticGetCachedReplyPort()
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	int index = -1;
 	for (int32 i = 0; i < sNumReplyPorts; i++) {
 		int32 old = atomic_add(&(sReplyPortInUse[i]), 1);
@@ -1667,11 +1823,27 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	bool replyRequired, BMessenger &replyTo) const
 {
 	DEBUG_FUNCTION_ENTER;
-	uint32 oldFlags = fHeader->flags;
-	int32 oldTarget = fHeader->target;
-	port_id oldReplyPort = fHeader->reply_port;
-	int32 oldReplyTarget = fHeader->reply_target;
-	team_id oldReplyTeam = fHeader->reply_team;
+	ssize_t size = 0;
+	char *buffer = NULL;
+	message_header *header = NULL;
+	status_t result;
+	int32 code;
+
+	if (/*fHeader->fields_size + fHeader->data_size > B_PAGE_SIZE*/false) {
+		result = _FlattenToArea(&header);
+		buffer = (char *)header;
+		size = sizeof(message_header);
+		code = kPortMessageCodeByArea;
+	} else {
+		size = _NativeFlattenedSize();
+		buffer = (char *)malloc(size);
+		result = _NativeFlatten(buffer, size);
+		header = (message_header *)buffer;
+		code = kPortMessageCodeDirect;
+	}
+
+	if (result < B_OK)
+		return result;
 
 	if (!replyTo.IsValid()) {
 		BMessenger::Private(replyTo).SetTo(fHeader->reply_team,
@@ -1684,50 +1856,22 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	BMessenger::Private replyToPrivate(replyTo);
 
 	if (replyRequired)
-		fHeader->flags |= MESSAGE_FLAG_REPLY_REQUIRED;
+		header->flags |= MESSAGE_FLAG_REPLY_REQUIRED;
 	else
-		fHeader->flags &= ~MESSAGE_FLAG_REPLY_REQUIRED;
+		header->flags &= ~MESSAGE_FLAG_REPLY_REQUIRED;
 
-	fHeader->target = token;
-	fHeader->reply_team = replyToPrivate.Team();
-	fHeader->reply_port = replyToPrivate.Port();
-	fHeader->reply_target = replyToPrivate.Token();
-	fHeader->flags |= MESSAGE_FLAG_WAS_DELIVERED;
-
-	/* ToDo: we can use _kern_writev_port to send the three parts directly:
-		iovec vectors[3];
-		vectors[0].iov_base = fHeader;
-		vectors[0].iov_len = sizeof(message_header);
-		vectors[1].iov_base = fFields;
-		vectors[1].iov_len = fHeader->fields_size;
-		vectors[2].iov_base = fData;
-		vectors[2].iov_len = fHeader->data_size;
-		status_t result;
-
-		do {
-			result = _kern_writev_port_etc(port, 'pjpp', vectors, 3,
-				_NativeFlattenedSize(), B_RELATIVE_TIMEOUT, timeout);
-		} while (result == B_INTERRUPTED);
-	*/
-
-	ssize_t size = _NativeFlattenedSize();
-	char *buffer = new char[size];
-	status_t result = _NativeFlatten(buffer, size);
-	if (result < B_OK)
-		goto error;
+	header->target = token;
+	header->reply_team = replyToPrivate.Team();
+	header->reply_port = replyToPrivate.Port();
+	header->reply_target = replyToPrivate.Token();
+	header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
 	do {
-		result = write_port_etc(port, 'pjpp', buffer, size,
+		result = write_port_etc(port, code, (void *)buffer, size,
 			B_RELATIVE_TIMEOUT, timeout);
 	} while (result == B_INTERRUPTED);
 
-error:
-	fHeader->flags = oldFlags;
-	fHeader->target = oldTarget;
-	fHeader->reply_port = oldReplyPort;
-	fHeader->reply_target = oldReplyTarget;
-	fHeader->reply_team = oldReplyTeam;
-	delete[] buffer;
+	free(buffer);
 	return result;
 }
 
@@ -1803,11 +1947,11 @@ status_t
 BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	int32 token, bigtime_t timeout)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	if (!data)
 		return B_BAD_VALUE;
 
-	uint32 magic = *(uint32*)data;
+	uint32 magic = *(uint32 *)data;
 
 	if (magic == kMessageMagic4 || magic == kMessageMagic4Swapped) {
 		message_header *header = (message_header *)data;
@@ -1829,8 +1973,8 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	status_t result;
 
 	do {
-		result = write_port_etc(port, 'pjpp', data, size, B_RELATIVE_TIMEOUT,
-			timeout);
+		result = write_port_etc(port, kPortMessageCodeDirect, data, size,
+			B_RELATIVE_TIMEOUT, timeout);
 	} while (result == B_INTERRUPTED);
 
 	return result;
@@ -1841,7 +1985,7 @@ static status_t
 handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
 	BMessage *reply)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	status_t result;
 	do {
 		result = port_buffer_size_etc(replyPort, B_RELATIVE_TIMEOUT, timeout);
@@ -1851,19 +1995,25 @@ handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
 		return result;
 
 	// The API lied. It really isn't an error code, but the message size...
-	char *buffer = new char[result];
-
+	char *buffer = (char *)malloc(result);
 	do {
 		result = read_port(replyPort, pCode, buffer, result);
 	} while (result == B_INTERRUPTED);
 
-	if (result < B_OK || *pCode != 'pjpp') {
-		delete[] buffer;
+	if (result < B_OK || (*pCode != kPortMessageCodeDirect
+		&& *pCode != kPortMessageCodeByArea)) {
+		free(buffer);
 		return (result < B_OK ? result : B_ERROR);
 	}
 
-	result = reply->Unflatten(buffer);
-	delete[] buffer;
+	if (*pCode == kPortMessageCodeDirect) {
+		result = reply->Unflatten(buffer);
+	} else if (*pCode == kPortMessageCodeByArea) {
+		BMessage::Private messagePrivate(reply);
+		result = messagePrivate.Reference((BMessage::message_header *)buffer);
+	}
+
+	free(buffer);
 	return result;
 }
 
@@ -1871,7 +2021,7 @@ handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
 static status_t
 convert_message(const KMessage *fromMessage, BMessage *toMessage)
 {
-	DEBUG_FUNCTION_ENTER;
+	DEBUG_FUNCTION_ENTER2;
 	if (!fromMessage || !toMessage)
 		return B_BAD_VALUE;
 
@@ -2083,10 +2233,10 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 	copying an extra buffer. Functions can be added that return a direct
 	pointer into the message. */
 
-	ssize_t size = message->FlattenedSize();
+	ssize_t size = message->_NativeFlattenedSize();
 	char buffer[size];
 
-	status_t error = message->Flatten(buffer, size);
+	status_t error = message->_NativeFlatten(buffer, size);
 
 	if (error >= B_OK)
 		error = AddData(name, B_MESSAGE_TYPE, &buffer, size, false);

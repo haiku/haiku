@@ -20,6 +20,10 @@
 #define MAX_ITEM_PREALLOCATION			B_PAGE_SIZE
 
 
+static const int32 kPortMessageCodeDirect = 'pjpp';
+static const int32 kPortMessageCodeByArea = 'pjp2';
+
+
 enum {
 	MESSAGE_FLAG_VALID = 0x0001,
 	MESSAGE_FLAG_REPLY_REQUIRED = 0x0002,
@@ -27,7 +31,7 @@ enum {
 	MESSAGE_FLAG_IS_REPLY = 0x0008,
 	MESSAGE_FLAG_WAS_DELIVERED = 0x0010,
 	MESSAGE_FLAG_HAS_SPECIFIERS = 0x0020,
-	MESSAGE_FLAG_READ_ONLY = 0x0040
+	MESSAGE_FLAG_WAS_DROPPED = 0x0080
 };
 
 
@@ -61,6 +65,7 @@ struct BMessage::message_header {
 
 	int32		target;
 	int32		current_specifier;
+	area_id		shared_area;
 
 	// reply info
 	port_id		reply_port;
@@ -166,6 +171,18 @@ class BMessage::Private {
 		NativeFlatten(BDataIO *stream, ssize_t *size) const
 		{
 			return fMessage->_NativeFlatten(stream, size);
+		}
+
+		status_t
+		FlattenToArea(message_header **header) const
+		{
+			return fMessage->_FlattenToArea(header);
+		}
+
+		status_t
+		Reference(message_header *header)
+		{
+			return fMessage->_Reference(header);
 		}
 
 		status_t
