@@ -108,12 +108,18 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	BPoint offset = window->Frame().LeftTop() - windowPosition;
 	BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 		windowPosition);
-	BRect tabFrame = window->Decorator()->TabRect();
+	Decorator *decorator = window->Decorator();
+	BRect tabFrame(0, 0, 0, 0);
+	if (decorator != NULL)
+		tabFrame = decorator->TabRect();
+
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);
 
 	// ToDo: let decorator do this!
-	RGBColor yellow = window->Decorator()->Colors().window_tab;
+	RGBColor yellow;
+	if (decorator != NULL)
+		yellow = decorator->Colors().window_tab;
 	RGBColor gray(180, 180, 180);
 	RGBColor white(255, 255, 255);
 
@@ -134,7 +140,8 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	backgroundRegion.Exclude(tabFrame);
 	backgroundRegion.Exclude(frame);
 
-	drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
+	if (decorator != NULL)
+		drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
 	drawingEngine->StrokeRect(frame, gray);
 
