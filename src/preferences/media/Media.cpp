@@ -56,8 +56,8 @@ Media::Media()
 		}
 	}
 
-	mWindow = new MediaWindow(rect);
-	mWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
+	fWindow = new MediaWindow(rect);
+	fWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
 	
 	be_roster->StartWatching(BMessenger(this)); 
 }
@@ -72,8 +72,8 @@ Media::~Media()
 status_t
 Media::InitCheck()
 {
-	if (mWindow)
-		return mWindow->InitCheck();
+	if (fWindow)
+		return fWindow->InitCheck();
 	return B_OK;
 }
 
@@ -85,7 +85,7 @@ void Media::MessageReceived (BMessage *message)
 	{
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
-			mWindow->PostMessage(message);
+			fWindow->PostMessage(message);
 			break;
 	    default:
     	    BApplication::MessageReceived(message); // pass it along ... 

@@ -17,7 +17,6 @@
 // Includes -------------------------------------------------------------------------------------------------- //
 #include <Box.h>
 #include <Button.h>
-#include <TextView.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
 #include <MediaRoster.h>
@@ -26,11 +25,12 @@
 #include <stdio.h>
 #include <MediaAddOn.h>
 #include <String.h>
+#include <TextView.h>
 #include "MediaViews.h"
 
 BarView::BarView(BRect frame) 
  : BView (frame, "barView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW ),
- 	mDisplay(true)
+ 	fDisplay(true)
 {
 }
 
@@ -39,7 +39,7 @@ BarView::Draw(BRect updateRect)
 {
 	BRect r = Bounds();
 	
-	if(mDisplay) {
+	if(fDisplay) {
 		// Display the 3D Look Divider Bar
 		SetHighColor(140,140,140,0);
 		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
@@ -55,7 +55,7 @@ BarView::Draw(BRect updateRect)
 
 SettingsView::SettingsView (BRect frame, bool isVideo)
  : BView (frame, "SettingsView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW ),
- 	mIsVideo(isVideo)
+ 	fIsVideo(isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BRect rect(frame);
@@ -64,48 +64,47 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	rect.right -=21;
 	rect.bottom = rect.top + 104;
 	BBox *defaultsBox = new BBox(rect, "defaults");
-	defaultsBox->SetLabel(mIsVideo ? "Default Nodes" : "Defaults");
+	defaultsBox->SetLabel(fIsVideo ? "Default Nodes" : "Defaults");
 	AddChild(defaultsBox);
 	
 	BRect defaultRect(20, 22, 250, 40);
-	float divider = StringWidth(mIsVideo ? "Video Output:" : "Audio Output:") + 5;
-	mMenu1 = new BPopUpMenu("<none>");
-	mMenu1->SetLabelFromMarked(true);
+	float divider = StringWidth(fIsVideo ? "Video Output:" : "Audio Output:") + 5;
+	fMenu1 = new BPopUpMenu("<none>");
+	fMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1", 
-		mIsVideo ? "Video Input:" : "Audio Input:", mMenu1);
+		fIsVideo ? "Video Input:" : "Audio Input:", fMenu1);
 	defaultsBox->AddChild(menuField1);
 	menuField1->SetDivider(divider);
 	
 	defaultRect.OffsetBy(0, 26);
-	mMenu2 = new BPopUpMenu("<none>");
-	mMenu2->SetLabelFromMarked(true);
+	fMenu2 = new BPopUpMenu("<none>");
+	fMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2", 
-		mIsVideo ? "Video Output:" : "Audio Output:", mMenu2);
+		fIsVideo ? "Video Output:" : "Audio Output:", fMenu2);
 	defaultsBox->AddChild(menuField2);
 	menuField2->SetDivider(divider);
 	
-	if(!mIsVideo) {
+	if(!fIsVideo) {
 		defaultRect.OffsetBy(186, 0);
-		mMenu3 = new BPopUpMenu("<none>");
-		mMenu3->SetLabelFromMarked(true);
-		BMenuField *mMenuField3 = new BMenuField(defaultRect, "menuField3", 
-			"Channel:", mMenu3);
-		defaultsBox->AddChild(mMenuField3);
-		mMenuField3->SetDivider(StringWidth("Channel:")+5);
+		defaultRect.right -= 30;
+		fMenu3 = new BPopUpMenu("<none>");
+		fMenu3->SetLabelFromMarked(true);
+		BMenuField *menuField3 = new BMenuField(defaultRect, "menuField3", 
+			"Channel:", fMenu3);
+		defaultsBox->AddChild(menuField3);
+		menuField3->SetDivider(StringWidth("Channel:")+5);
+		defaultRect.right += 30;
 		defaultRect.OffsetBy(-186, 0);
 	}
 	
 	defaultRect.OffsetBy(0, 32);
-	BRect restartTextRect(defaultRect);
-	restartTextRect.OffsetTo(B_ORIGIN);
-	restartTextRect.InsetBy(1,1);
+	defaultRect.right += 100;
 	rgb_color red_color = {222, 32, 33};
-	mRestartTextView = new BTextView(defaultRect, "restartTextView", restartTextRect, 
-		be_plain_font, &red_color, B_FOLLOW_ALL, B_WILL_DRAW);
-	mRestartTextView->Insert("Restart the Media Server to apply changes.");
-	mRestartTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	defaultsBox->AddChild(mRestartTextView);
-	mRestartTextView->Hide();
+	fRestartView = new BStringView(defaultRect, "restartStringView", "Restart the Media Server to apply changes.", 
+		B_FOLLOW_ALL, B_WILL_DRAW);
+	fRestartView->SetHighColor(red_color);
+	defaultsBox->AddChild(fRestartView);
+	fRestartView->Hide();
 	
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 162;
@@ -114,25 +113,28 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	AddChild(realtimeBox);
 	
 	BMessage *message = new BMessage(ML_ENABLE_REAL_TIME);
-	message->AddBool("isVideo", mIsVideo);
+	message->AddBool("isVideo", fIsVideo);
 	BRect rect2(22,20, 190, 40);
-	mRealtimeCheckBox = new BCheckBox(rect2, "realtimeCheckBox", 
-		mIsVideo ? "Enable Real-Time Video" : "Enable Real-Time Audio", message);
-	realtimeBox->AddChild(mRealtimeCheckBox);
+	fRealtimeCheckBox = new BCheckBox(rect2, "realtimeCheckBox", 
+		fIsVideo ? "Enable Real-Time Video" : "Enable Real-Time Audio", message);
+	realtimeBox->AddChild(fRealtimeCheckBox);
 	
 	uint32 flags;
 	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
-	if(flags & (mIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
-		mRealtimeCheckBox->SetValue(B_CONTROL_ON);
+	if(flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
+		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
 		
 	rect2.top += 26;
 	rect2.bottom = rect.Height() - 5;
 	rect2.right = rect.right - 15;
 	BRect textRect(3, 3, rect2.Width() - 3, rect2.Height() - 3);
-	BTextView *textView = new BTextView(rect2, "textView", textRect, B_FOLLOW_ALL, B_WILL_DRAW);
-	textView->Insert(mIsVideo ? "Enabling Real-Time Video allows the BeOS to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
-		: "Enabling Real-time Audio allows BeOS to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM.");
-	textView->Insert("\n\nOnly enable this feature if you need the lowest latency possible.");
+	BTextView *textView = new BTextView(rect2, "stringView", textRect, B_FOLLOW_ALL, B_WILL_DRAW);
+	textView->Insert(fIsVideo ? "Enabling Real-Time Video allows the BeOS to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
+		"\n\nOnly enable this feature if you need the lowest latency possible."
+		: "Enabling Real-time Audio allows BeOS to record and play audio as fast as possible.  It achieves this performance by using more CPU and RAM."
+		"\n\nOnly enable this feature if you need the lowest latency possible.");
+	textView->MakeEditable(false);
+	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	realtimeBox->AddChild(textView);
 	
@@ -143,30 +145,32 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		"Restart Media Services", new BMessage(ML_RESTART_MEDIA_SERVER));
 	AddChild(restartButton);
 	
-	if(!mIsVideo) {
+	if(!fIsVideo) {
+		rect.right = rect.left - 10;
 		rect.top += 4;
 		rect.left = frame.left + 33;
-		rect.right = rect.left + 180;
+		if (StringWidth("Show Volume Control on Deskbar") > rect.Width() - 30)
+			rect.left -= 10;
 		
-		mVolumeCheckBox = new BCheckBox(rect, "volumeCheckBox", 
+		fVolumeCheckBox = new BCheckBox(rect, "volumeCheckBox", 
 			"Show Volume Control on Deskbar", new BMessage(ML_SHOW_VOLUME_CONTROL));
-		AddChild(mVolumeCheckBox);
+		AddChild(fVolumeCheckBox);
 		
 		if(BDeskbar().HasItem("MediaReplicant"))
-			mVolumeCheckBox->SetValue(B_CONTROL_ON);	
+			fVolumeCheckBox->SetValue(B_CONTROL_ON);	
 	}
 }
 
 void
 SettingsView::AddNodes(BList &list, bool isInput)
 {
-	BMenu *menu = isInput ? mMenu1 : mMenu2;
+	BMenu *menu = isInput ? fMenu1 : fMenu2;
 	void *item;
 	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete static_cast<dormant_node_info *>(item);
 
 	BMessage message(ML_DEFAULT_CHANGE);
-	message.AddBool("isVideo", mIsVideo);
+	message.AddBool("isVideo", fIsVideo);
 	message.AddBool("isInput", isInput);
 
 	for (int32 i = 0; i < list.CountItems(); i++) {
@@ -178,19 +182,19 @@ SettingsView::AddNodes(BList &list, bool isInput)
 void
 SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
-	BMenu *menu = isInput ? mMenu1 : mMenu2;
+	BMenu *menu = isInput ? fMenu1 : fMenu2;
 		
 	for (int32 i = 0; i < menu->CountItems(); i++) {
 		SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(i));
-		if(item->mInfo && item->mInfo->addon == info.addon && item->mInfo->flavor_id == info.flavor_id) {
+		if(item->fInfo && item->fInfo->addon == info.addon && item->fInfo->flavor_id == info.flavor_id) {
 			item->SetMarked(true);
 			break;
 		}
 	}
 	
-	if (!mIsVideo&&!isInput&&outputID>-1) {
+	if (!fIsVideo&&!isInput&&outputID>-1) {
 		BMenuItem *item;
-		while ((item = mMenu3->RemoveItem((int32)0)) != NULL)
+		while ((item = fMenu3->RemoveItem((int32)0)) != NULL)
 			delete item;
 		BMediaRoster *roster = BMediaRoster::Roster();
 		media_node node;
@@ -210,7 +214,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 				for (int32 i = 0; i < inputCount; i++) {
 					media_input *input = new media_input();
 					memcpy(input, &inputs[i], sizeof(*input));
-					mMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
+					fMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
 					if(inputs[i].destination.id == outputID)
 						item->SetMarked(true);
 				}
@@ -222,7 +226,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message, 
 			char shortcut, uint32 modifiers)
 	: BMenuItem(info->name, message, shortcut, modifiers),
-	mInfo(info)
+	fInfo(info)
 {
 	
 }
@@ -230,14 +234,14 @@ SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
 Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
 			char shortcut, uint32 modifiers)
 	: BMenuItem(input->name, message, shortcut, modifiers),
-	mInfo(info),
-	mInput(input)
+	fInfo(info),
+	fInput(input)
 {
 	
 }
 
 Settings2Item::~Settings2Item()
 {
-	delete mInput;
+	delete fInput;
 }
 

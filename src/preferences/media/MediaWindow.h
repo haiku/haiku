@@ -47,25 +47,25 @@ class MediaWindow : public BWindow
 		static status_t RestartMediaServices(void *data);
 		static bool UpdateProgress(int stage, const char * message, void * cookie);
 		
-		BBox *					mBox;
-		BListView*				mListView;
-		BStringView*			mTitleView;
-		BView*					mContentView;
-		SettingsView*			mAudioView;
-		SettingsView*			mVideoView;
-		BarView*				mBar;
+		BBox *					fBox;
+		BListView*				fListView;
+		BStringView*			fTitleView;
+		BView*					fContentView;
+		SettingsView*			fAudioView;
+		SettingsView*			fVideoView;
+		BarView*				fBar;
 	    	    
-	    media_node*				mCurrentNode;
-	    BParameterWeb*			mParamWeb;
+	    media_node*				fCurrentNode;
+	    BParameterWeb*			fParamWeb;
 		
-		BList					mAudioInputs;
-		BList					mAudioOutputs;
-		BList					mVideoInputs;
-		BList					mVideoOutputs;
+		BList					fAudioInputs;
+		BList					fAudioOutputs;
+		BList					fVideoInputs;
+		BList					fVideoOutputs;
 		
-		BList					mIcons;
-		MediaAlert				*mAlert;
-		status_t				mInitCheck;
+		BList					fIcons;
+		MediaAlert				*fAlert;
+		status_t				fInitCheck;
 };
 
 #endif

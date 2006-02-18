@@ -14,7 +14,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: be media
+	: media be 
 	: media.rdef 
 	;
 

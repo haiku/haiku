@@ -18,7 +18,7 @@
 #define __MEDIAVIEWS_H__
 #include <CheckBox.h>
 #include <MenuItem.h>
-#include <TextView.h>
+#include <StringView.h>
 #include <View.h>
 
 const uint32 ML_RESTART_MEDIA_SERVER = 'resr';
@@ -32,7 +32,7 @@ class BarView : public BView
 	public:
     	BarView(BRect frame);
     	virtual	void	Draw(BRect updateRect);
-    	bool	mDisplay;
+    	bool	fDisplay;
 };
 
 class SettingsItem : public BMenuItem
@@ -40,7 +40,7 @@ class SettingsItem : public BMenuItem
 	public:
 		SettingsItem(dormant_node_info *info, BMessage *message, 
 			char shortcut = 0, uint32 modifiers = 0);
-		dormant_node_info *mInfo;
+		dormant_node_info *fInfo;
 };
 
 class Settings2Item : public BMenuItem
@@ -49,8 +49,8 @@ class Settings2Item : public BMenuItem
 		Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
 			char shortcut = 0, uint32 modifiers = 0);
 		~Settings2Item();
-		dormant_node_info *mInfo;
-		media_input *mInput;
+		dormant_node_info *fInfo;
+		media_input *fInput;
 };
 
 class SettingsView : public BView
@@ -59,15 +59,15 @@ class SettingsView : public BView
     	SettingsView(BRect frame, bool isVideo);
     	void AddNodes(BList &list, bool isInput);
     	void SetDefault(dormant_node_info &info, bool isInput, int32 outputID = -1);
-    	BCheckBox 		*mRealtimeCheckBox;
-    	BCheckBox 		*mVolumeCheckBox;
-    	BMenu 			*mMenu1;
-    	BMenu 			*mMenu2;
-    	BMenu			*mMenu3;
-    	BTextView		*mRestartTextView;
+    	BCheckBox 		*fRealtimeCheckBox;
+    	BCheckBox 		*fVolumeCheckBox;
+    	BMenu 			*fMenu1;
+    	BMenu 			*fMenu2;
+    	BMenu			*fMenu3;
+    	BStringView		*fRestartView;
 
     private:
-    	bool			mIsVideo;
+    	bool			fIsVideo;
 };	
 
 #endif

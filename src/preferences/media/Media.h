@@ -32,7 +32,7 @@ class Media : public BApplication
 	status_t InitCheck();	
 	    	    
 	private:
-		MediaWindow   *mWindow;
+		MediaWindow   *fWindow;
 		
 };
 

@@ -31,23 +31,23 @@ class MediaListItem : public BListItem {
 
 		void SetDefault(bool isDefaultInput, bool isInput);
 		void SetAudioMixer(bool isAudioMixer);
-		bool IsDefault(bool isInput) { return isInput ? mIsDefaultInput : mIsDefaultOutput; }
-		bool IsAudioMixer() { return mIsAudioMixer; }
-		bool IsVideo() { return mIsVideo; }
-		const char *GetLabel() { return mLabel; }
+		bool IsDefault(bool isInput) { return isInput ? fIsDefaultInput : fIsDefaultOutput; }
+		bool IsAudioMixer() { return fIsAudioMixer; }
+		bool IsVideo() { return fIsVideo; }
+		const char *GetLabel() { return fLabel; }
 
-		dormant_node_info *mInfo;
+		dormant_node_info *fInfo;
 
 		static int Compare(const void *firstArg, const void *secondArg);
 
 	private:
-		const char *mLabel;
-		bool mIsAudioMixer;
-		bool mIsVideo;
-		bool mIsDefaultInput;
-		bool mIsDefaultOutput;
-		dormant_node_info node_info;
-		BList *mIcons;
+		const char *fLabel;
+		bool fIsAudioMixer;
+		bool fIsVideo;
+		bool fIsDefaultInput;
+		bool fIsDefaultOutput;
+		//dormant_node_info fNodeInfo;
+		BList *fIcons;
 };
 
 #endif	/* __MEDIALISTITEM_H__ */

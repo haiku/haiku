@@ -34,10 +34,10 @@ const uint32 ML_INIT_MEDIA = 'MlIM';
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame) 
 : BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
-	mCurrentNode(NULL),
-	mParamWeb(NULL),
-	mAlert(NULL),
-	mInitCheck(B_OK)
+	fCurrentNode(NULL),
+	fParamWeb(NULL),
+	fAlert(NULL),
+	fInitCheck(B_OK)
 {
 	InitWindow();
 }
@@ -46,25 +46,25 @@ MediaWindow::MediaWindow(BRect frame)
 status_t
 MediaWindow::InitCheck()
 {
-	return mInitCheck;
+	return fInitCheck;
 }
 
 
 // MediaWindow - Destructor
 MediaWindow::~MediaWindow()
 {
-	for(int i=0; i<mAudioOutputs.CountItems(); i++)
-		delete static_cast<dormant_node_info *>(mAudioOutputs.ItemAt(i));
-	for(int i=0; i<mAudioInputs.CountItems(); i++)
-		delete static_cast<dormant_node_info *>(mAudioInputs.ItemAt(i));
-	for(int i=0; i<mVideoOutputs.CountItems(); i++)
-		delete static_cast<dormant_node_info *>(mVideoOutputs.ItemAt(i));
-	for(int i=0; i<mVideoInputs.CountItems(); i++)
-		delete static_cast<dormant_node_info *>(mVideoInputs.ItemAt(i));
+	for(int i=0; i<fAudioOutputs.CountItems(); i++)
+		delete static_cast<dormant_node_info *>(fAudioOutputs.ItemAt(i));
+	for(int i=0; i<fAudioInputs.CountItems(); i++)
+		delete static_cast<dormant_node_info *>(fAudioInputs.ItemAt(i));
+	for(int i=0; i<fVideoOutputs.CountItems(); i++)
+		delete static_cast<dormant_node_info *>(fVideoOutputs.ItemAt(i));
+	for(int i=0; i<fVideoInputs.CountItems(); i++)
+		delete static_cast<dormant_node_info *>(fVideoInputs.ItemAt(i));
 	
 	BMediaRoster *roster = BMediaRoster::Roster();
-	if(roster && mCurrentNode)
-		roster->ReleaseNode(*mCurrentNode);
+	if(roster && fCurrentNode)
+		roster->ReleaseNode(*fCurrentNode);
 		
 	char buffer[512];
 	BRect rect = Frame();
@@ -119,9 +119,9 @@ MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 MediaListItem *
 MediaWindow::FindMediaListItem(dormant_node_info *info)
 {
-	for(int32 j=0; j<mListView->CountItems(); j++) {
-		MediaListItem *item = static_cast<MediaListItem *>(mListView->ItemAt(j));
-		if(item->mInfo && item->mInfo->addon == info->addon && item->mInfo->flavor_id == info->flavor_id) {
+	for(int32 j=0; j<fListView->CountItems(); j++) {
+		MediaListItem *item = static_cast<MediaListItem *>(fListView->ItemAt(j));
+		if(item->fInfo && item->fInfo->addon == info->addon && item->fInfo->flavor_id == info->flavor_id) {
 			return item;
 			break;
 		}
@@ -136,7 +136,7 @@ MediaWindow::AddNodes(BList &list, bool isVideo)
 	for(int32 i=0; i<list.CountItems(); i++) {
 		dormant_node_info *info = static_cast<dormant_node_info *>(list.ItemAt(i));
 		if(!FindMediaListItem(info))
-			mListView->AddItem(new MediaListItem(info, 1, isVideo, &mIcons));
+			fListView->AddItem(new MediaListItem(info, 1, isVideo, &fIcons));
 	}
 }
 
@@ -149,22 +149,22 @@ MediaWindow::InitWindow(void)
 	BRect iconRect(0,0,15,15);
   	BBitmap *icon = new BBitmap(iconRect, B_CMAP8);
   	icon->SetBits(kDevicesBits, kDevicesWidth*kDevicesHeight, 0, kDevicesColorSpace);
-  	mIcons.AddItem(icon);
+  	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0, kMixerColorSpace);
-	mIcons.AddItem(icon);
+	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kMicBits, kMicWidth*kMicHeight, 0, kMicColorSpace);
-	mIcons.AddItem(icon);
+	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, kSpeakerColorSpace);
-	mIcons.AddItem(icon);
+	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kCamBits, kCamWidth*kCamHeight, 0, kCamColorSpace);
-	mIcons.AddItem(icon);
+	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kTVBits, kTVWidth*kTVHeight, 0, kTVColorSpace);
-	mIcons.AddItem(icon);
+	fIcons.AddItem(icon);
 
 
 	BRect bounds = Bounds(); // the whole view
@@ -172,43 +172,43 @@ MediaWindow::InitWindow(void)
 	// Create the OutlineView
 	BRect menuRect(bounds.left+14,bounds.top+14,bounds.left+146,bounds.bottom-14);
 	BRect titleRect(menuRect.right+14,menuRect.top,bounds.right-10,menuRect.top+16);
-	BRect availableRect(menuRect.right+15,titleRect.bottom+12,bounds.right-14,bounds.bottom-14);
+	BRect availableRect(menuRect.right+15,titleRect.bottom+12,bounds.right-14,bounds.bottom-4);
 	BRect barRect(titleRect.left,titleRect.bottom+10,titleRect.right-2,titleRect.bottom+11);
 
-	mListView = new BListView(menuRect,"audio_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-	mListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
+	fListView = new BListView(menuRect,"audio_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
 			
 	// Add ScrollView to Media Menu
-	BScrollView *scrollView = new BScrollView("scroll_audio", mListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false, B_FANCY_BORDER);
+	BScrollView *scrollView = new BScrollView("scroll_audio", fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false, B_FANCY_BORDER);
 	
 	// Create the Views	
-	mBox = new BBox(bounds, "mediaView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
+	fBox = new BBox(bounds, "mediaView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	
 	// Add Child(ren)
-	AddChild(mBox);
-	mBox->AddChild(scrollView);
+	AddChild(fBox);
+	fBox->AddChild(scrollView);
 	
 	// StringViews
 	rgb_color titleFontColor = { 0,0,0,0 };	
-	mTitleView = new BStringView(titleRect, "AudioSettings", "Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	mTitleView->SetFont(be_bold_font);
-	mTitleView->SetFontSize(12.0);
-	mTitleView->SetHighColor(titleFontColor);
+	fTitleView = new BStringView(titleRect, "AudioSettings", "Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fTitleView->SetFont(be_bold_font);
+	fTitleView->SetFontSize(12.0);
+	fTitleView->SetHighColor(titleFontColor);
 	
-	mBox->AddChild(mTitleView);
+	fBox->AddChild(fTitleView);
 	
-	mContentView = new BBox(availableRect, "contentView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
-	mBox->AddChild(mContentView);
+	fContentView = new BBox(availableRect, "contentView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
+	fBox->AddChild(fContentView);
 	
-	BRect settingsRect(0, 0, 442, 330);
-	mAudioView = new SettingsView(settingsRect, false);
-	mVideoView = new SettingsView(settingsRect, true);
+	BRect settingsRect(0, 0, 442, 335);
+	fAudioView = new SettingsView(settingsRect, false);
+	fVideoView = new SettingsView(settingsRect, true);
 	
-	mBar = new BarView(barRect);
-	mBox->AddChild(mBar);
+	fBar = new BarView(barRect);
+	fBox->AddChild(fBar);
 	
-	mInitCheck = InitMedia(true);
-	if (mInitCheck != B_OK) {
+	fInitCheck = InitMedia(true);
+	if (fInitCheck != B_OK) {
 		PostMessage(B_QUIT_REQUESTED);
 	} else {
 		if (IsHidden())
@@ -231,9 +231,9 @@ MediaWindow::InitMedia(bool first)
 		if(alert->Go()==0)
 			return B_ERROR;
 		
-		mAlert = new MediaAlert(BRect(0,0,300,60), 
+		fAlert = new MediaAlert(BRect(0,0,300,60), 
 			"restart_alert", "Restarting Media Services\nStarting Media Server...\n");
-		mAlert->Show();
+		fAlert->Show();
 		
 		Show();
 				
@@ -243,58 +243,58 @@ MediaWindow::InitMedia(bool first)
 	Lock();
 	
 	bool isVideoSelected = true;
-	if(!first && mListView->ItemAt(0) && mListView->ItemAt(0)->IsSelected())
+	if(!first && fListView->ItemAt(0) && fListView->ItemAt(0)->IsSelected())
 		isVideoSelected = false;
 		
-	if((!first || (first && err) ) && mAlert) {
-		BAutolock locker(mAlert);
+	if((!first || (first && err) ) && fAlert) {
+		BAutolock locker(fAlert);
 		if(locker.IsLocked())
-			mAlert->TextView()->SetText("Ready For Use...");
+			fAlert->TextView()->SetText("Ready For Use...");
 	}
 	
 	void *listItem;
-	while((listItem = mListView->RemoveItem((int32)0)))
+	while((listItem = fListView->RemoveItem((int32)0)))
 		delete static_cast<MediaListItem *>(listItem);
-	while((listItem = mAudioOutputs.RemoveItem((int32)0)))
+	while((listItem = fAudioOutputs.RemoveItem((int32)0)))
 		delete static_cast<dormant_node_info *>(listItem);
-	while((listItem = mAudioInputs.RemoveItem((int32)0)))
+	while((listItem = fAudioInputs.RemoveItem((int32)0)))
 		delete static_cast<dormant_node_info *>(listItem);
-	while((listItem = mVideoOutputs.RemoveItem((int32)0)))
+	while((listItem = fVideoOutputs.RemoveItem((int32)0)))
 		delete static_cast<dormant_node_info *>(listItem);
-	while((listItem = mVideoInputs.RemoveItem((int32)0)))
+	while((listItem = fVideoInputs.RemoveItem((int32)0)))
 		delete static_cast<dormant_node_info *>(listItem);
 		
 	MediaListItem    *item, *mixer, *audio, *video;
 
 	// Grab Media Info
-	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_OUTPUT, mAudioOutputs);
-	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_INPUT, mAudioInputs);
-	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_OUTPUT, mAudioOutputs);
-	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_INPUT, mAudioInputs);
-	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_OUTPUT, mVideoOutputs);
-	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, mVideoInputs);
-	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, mVideoOutputs);
-	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_INPUT, mVideoInputs);
+	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
+	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
+	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
+	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
+	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
+	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
+	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
+	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
 
 	// Add video nodes first. They might have an additional audio
 	// output or input, but still should be listed as video node.
-	AddNodes(mVideoOutputs, true);
-	AddNodes(mVideoInputs, true);
-	AddNodes(mAudioOutputs, false);
-	AddNodes(mAudioInputs, false);
+	AddNodes(fVideoOutputs, true);
+	AddNodes(fVideoInputs, true);
+	AddNodes(fAudioOutputs, false);
+	AddNodes(fAudioInputs, false);
 	
-	mAudioView->AddNodes(mAudioOutputs, false);
-	mAudioView->AddNodes(mAudioInputs, true);
-	mVideoView->AddNodes(mVideoOutputs, false);
-	mVideoView->AddNodes(mVideoInputs, true);
+	fAudioView->AddNodes(fAudioOutputs, false);
+	fAudioView->AddNodes(fAudioInputs, true);
+	fVideoView->AddNodes(fVideoOutputs, false);
+	fVideoView->AddNodes(fVideoInputs, true);
 	
-	mListView->AddItem(audio = new MediaListItem("Audio Settings", 0, false, &mIcons));
-	mListView->AddItem(video = new MediaListItem("Video Settings", 0, true, &mIcons));
+	fListView->AddItem(audio = new MediaListItem("Audio Settings", 0, false, &fIcons));
+	fListView->AddItem(video = new MediaListItem("Video Settings", 0, true, &fIcons));
 	
-	mListView->AddItem(mixer = new MediaListItem("Audio Mixer", 1, false, &mIcons));
+	fListView->AddItem(mixer = new MediaListItem("Audio Mixer", 1, false, &fIcons));
 	mixer->SetAudioMixer(true);		
 		
-	mListView->SortItems(&MediaListItem::Compare);
+	fListView->SortItems(&MediaListItem::Compare);
 	
 	media_node default_node;
 	dormant_node_info node_info;
@@ -306,7 +306,7 @@ MediaWindow::InitMedia(bool first)
 		item = FindMediaListItem(&node_info);
 		if(item)
 			item->SetDefault(true, true);
-		mAudioView->SetDefault(node_info, true);
+		fAudioView->SetDefault(node_info, true);
 	}
 		
 	if(roster->GetAudioOutput(&default_node, &outputID, &outputName)==B_OK) {
@@ -314,7 +314,7 @@ MediaWindow::InitMedia(bool first)
 		item = FindMediaListItem(&node_info);
 		if(item)
 			item->SetDefault(true, false);
-		mAudioView->SetDefault(node_info, false, outputID);
+		fAudioView->SetDefault(node_info, false, outputID);
 	}
 	
 	if(roster->GetVideoInput(&default_node)==B_OK) {
@@ -322,7 +322,7 @@ MediaWindow::InitMedia(bool first)
 		item = FindMediaListItem(&node_info);
 		if(item)
 			item->SetDefault(true, true);
-		mVideoView->SetDefault(node_info, true);
+		fVideoView->SetDefault(node_info, true);
 	}
 	
 	if(roster->GetVideoOutput(&default_node)==B_OK) {
@@ -330,28 +330,28 @@ MediaWindow::InitMedia(bool first)
 		item = FindMediaListItem(&node_info);
 		if(item)
 			item->SetDefault(true, false);
-		mVideoView->SetDefault(node_info, false);
+		fVideoView->SetDefault(node_info, false);
 	}
 	
 	if(first) {
-		mListView->Select(mListView->IndexOf(mixer));
+		fListView->Select(fListView->IndexOf(mixer));
 	} else {
-		if(!mAudioView->mRestartTextView->IsHidden())
-			mAudioView->mRestartTextView->Hide();
-		if(!mVideoView->mRestartTextView->IsHidden())
-			mVideoView->mRestartTextView->Hide();
+		if(!fAudioView->fRestartView->IsHidden())
+			fAudioView->fRestartView->Hide();
+		if(!fVideoView->fRestartView->IsHidden())
+			fVideoView->fRestartView->Hide();
 	
 		if(isVideoSelected)
-			mListView->Select(mListView->IndexOf(video));
+			fListView->Select(fListView->IndexOf(video));
 		else
-			mListView->Select(mListView->IndexOf(audio));
+			fListView->Select(fListView->IndexOf(audio));
 	}
 	
-	if(mAlert) {
+	if(fAlert) {
 		snooze(800000);
-		mAlert->PostMessage(B_QUIT_REQUESTED);
+		fAlert->PostMessage(B_QUIT_REQUESTED);
 	}
-	mAlert = NULL;
+	fAlert = NULL;
 	
 	Unlock();
 	
@@ -365,8 +365,8 @@ MediaWindow::QuitRequested()
 {
 	// stop watching the MediaRoster
 	BMediaRoster *roster = BMediaRoster::CurrentRoster();
-	if (roster && mCurrentNode)	{
-		roster->StopWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);
+	if (roster && fCurrentNode)	{
+		roster->StopWatching(this, *fCurrentNode, B_MEDIA_WILDCARD);
 	}
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -409,14 +409,14 @@ MediaWindow::MessageReceived (BMessage *message)
 				int32 index;
 				if(message->FindInt32("index", &index)!=B_OK)
 					break;
-				Settings2Item *item = static_cast<Settings2Item *>(mAudioView->mMenu3->ItemAt(index));
+				Settings2Item *item = static_cast<Settings2Item *>(fAudioView->fMenu3->ItemAt(index));
 				
 				if(item) {
 					BMediaRoster *roster = BMediaRoster::Roster();
-					roster->SetAudioOutput(*item->mInput);
+					roster->SetAudioOutput(*item->fInput);
 					
-					if(mAudioView->mRestartTextView->IsHidden())
-						mAudioView->mRestartTextView->Show();	
+					if(fAudioView->fRestartView->IsHidden())
+						fAudioView->fRestartView->Show();	
 				} else 
 					fprintf(stderr, "Settings2Item not found\n");
 			}
@@ -432,8 +432,8 @@ MediaWindow::MessageReceived (BMessage *message)
 				int32 index;
 				if(message->FindInt32("index", &index)!=B_OK)
 					break;
-				SettingsView *settingsView = isVideo ? mVideoView : mAudioView;
-				BMenu *menu = isInput ? settingsView->mMenu1 : settingsView->mMenu2;
+				SettingsView *settingsView = isVideo ? fVideoView : fAudioView;
+				BMenu *menu = isInput ? settingsView->fMenu1 : settingsView->fMenu2;
 				SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(index));
 				
 				if(item) {
@@ -441,22 +441,22 @@ MediaWindow::MessageReceived (BMessage *message)
 					BMediaRoster *roster = BMediaRoster::Roster();
 					if(isVideo) {
 						if(isInput)
-							roster->SetVideoInput(*item->mInfo);
+							roster->SetVideoInput(*item->fInfo);
 						else
-							roster->SetVideoOutput(*item->mInfo);
+							roster->SetVideoOutput(*item->fInfo);
 					} else {
 						if(isInput)
-							roster->SetAudioInput(*item->mInfo);
+							roster->SetAudioInput(*item->fInfo);
 						else {
-							roster->SetAudioOutput(*item->mInfo);
-							mAudioView->SetDefault(*item->mInfo, false, 0);
+							roster->SetAudioOutput(*item->fInfo);
+							fAudioView->SetDefault(*item->fInfo, false, 0);
 						}
 					}
 					
 					MediaListItem *oldListItem = NULL;
-					for(int32 j=0; j<mListView->CountItems(); j++) {
-						oldListItem = static_cast<MediaListItem *>(mListView->ItemAt(j));
-						if(oldListItem->mInfo && oldListItem->IsVideo() == isVideo 
+					for(int32 j=0; j<fListView->CountItems(); j++) {
+						oldListItem = static_cast<MediaListItem *>(fListView->ItemAt(j));
+						if(oldListItem->fInfo && oldListItem->IsVideo() == isVideo 
 							&& oldListItem->IsDefault(isInput))
 							break;
 					}
@@ -465,15 +465,15 @@ MediaWindow::MessageReceived (BMessage *message)
 					else
 						fprintf(stderr, "oldListItem not found\n");
 					
-					MediaListItem *listItem = FindMediaListItem(item->mInfo);
+					MediaListItem *listItem = FindMediaListItem(item->fInfo);
 					if(listItem) {
 						listItem->SetDefault(true, isInput);
 					} else 
 						fprintf(stderr, "MediaListItem not found\n");
-					mListView->Invalidate();
+					fListView->Invalidate();
 					
-					if(settingsView->mRestartTextView->IsHidden())
-						settingsView->mRestartTextView->Show();
+					if(settingsView->fRestartView->IsHidden())
+						settingsView->fRestartView->Show();
 				} else 
 					fprintf(stderr, "SettingsItem not found\n");			
 			}
@@ -491,7 +491,7 @@ MediaWindow::MessageReceived (BMessage *message)
 		case ML_SHOW_VOLUME_CONTROL:
 		{
 			BDeskbar deskbar;
-			if (mAudioView->mVolumeCheckBox->Value() == B_CONTROL_ON) {
+			if (fAudioView->fVolumeCheckBox->Value() == B_CONTROL_ON) {
 				BEntry entry("/bin/desklink", true);
 				int32 id;
 				entry_ref ref;
@@ -517,12 +517,12 @@ MediaWindow::MessageReceived (BMessage *message)
 				bool isVideo = true;
 				if(message->FindBool("isVideo", &isVideo)!=B_OK)
 					break;
-				SettingsView *settingsView = isVideo ? mVideoView : mAudioView;
+				SettingsView *settingsView = isVideo ? fVideoView : fAudioView;
 				uint32 flags;
 				uint32 realtimeFlag = isVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO;
 				BMediaRoster *roster = BMediaRoster::Roster();
 				roster->GetRealtimeFlags(&flags);
-				if(settingsView->mRealtimeCheckBox->Value()==B_CONTROL_ON)
+				if(settingsView->fRealtimeCheckBox->Value()==B_CONTROL_ON)
 					flags |= realtimeFlag;
 				else
 					flags &= ~realtimeFlag;
@@ -534,68 +534,68 @@ MediaWindow::MessageReceived (BMessage *message)
 			{
 				PRINT_OBJECT(*message);
 				
-				MediaListItem *item = static_cast<MediaListItem *>(mListView->ItemAt(mListView->CurrentSelection()));
+				MediaListItem *item = static_cast<MediaListItem *>(fListView->ItemAt(fListView->CurrentSelection()));
 				if(!item)
 					break;
 				BMediaRoster* roster = BMediaRoster::Roster();
-				if(mCurrentNode) {
+				if(fCurrentNode) {
 					// stop watching the MediaRoster
-					roster->StopWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);
-					roster->ReleaseNode(*mCurrentNode);
+					roster->StopWatching(this, *fCurrentNode, B_MEDIA_WILDCARD);
+					roster->ReleaseNode(*fCurrentNode);
 				}
-				mCurrentNode = NULL;
-				BView *paramView = mContentView->ChildAt(0);
+				fCurrentNode = NULL;
+				BView *paramView = fContentView->ChildAt(0);
 				if(paramView!=NULL) {
-					mContentView->RemoveChild(paramView);
+					fContentView->RemoveChild(paramView);
 				}
 				paramView = NULL;
-				if(mParamWeb)
-					delete mParamWeb;
-				mParamWeb = NULL;
+				if(fParamWeb)
+					delete fParamWeb;
+				fParamWeb = NULL;
 									
-				mTitleView->SetText(item->GetLabel());
+				fTitleView->SetText(item->GetLabel());
 								
 				if(item->OutlineLevel() == 0) {
 					if(item->IsVideo())
-						mContentView->AddChild(mVideoView);
+						fContentView->AddChild(fVideoView);
 					else
-						mContentView->AddChild(mAudioView);
+						fContentView->AddChild(fAudioView);
 				} else {
 				
-					if(!mCurrentNode)
-						mCurrentNode = new media_node();
+					if(!fCurrentNode)
+						fCurrentNode = new media_node();
 					media_node_id node_id;
 					if(item->IsAudioMixer())
-						roster->GetAudioMixer(mCurrentNode);
-					else if(roster->GetInstancesFor(item->mInfo->addon, item->mInfo->flavor_id, &node_id)!=B_OK) 
-						roster->InstantiateDormantNode(*(item->mInfo), mCurrentNode, B_FLAVOR_IS_GLOBAL);
+						roster->GetAudioMixer(fCurrentNode);
+					else if(roster->GetInstancesFor(item->fInfo->addon, item->fInfo->flavor_id, &node_id)!=B_OK) 
+						roster->InstantiateDormantNode(*(item->fInfo), fCurrentNode, B_FLAVOR_IS_GLOBAL);
 					else
-						roster->GetNodeFor(node_id, mCurrentNode);
+						roster->GetNodeFor(node_id, fCurrentNode);
 					
 					
-					if(roster->GetParameterWebFor(*mCurrentNode, &mParamWeb)==B_OK) {
+					if(roster->GetParameterWebFor(*fCurrentNode, &fParamWeb)==B_OK) {
 						BMediaTheme* theme = BMediaTheme::PreferredTheme();
-						paramView = theme->ViewFor(mParamWeb);
-						mContentView->AddChild(paramView);
-						paramView->ResizeTo(mContentView->Bounds().Width(), mContentView->Bounds().Height());
+						paramView = theme->ViewFor(fParamWeb);
+						fContentView->AddChild(paramView);
+						paramView->ResizeTo(fContentView->Bounds().Width(), fContentView->Bounds().Height() - 10);
 						
-						roster->StartWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);				
+						roster->StartWatching(this, *fCurrentNode, B_MEDIA_WILDCARD);				
 					} else {
-						mParamWeb = NULL;
-						BRect bounds = mContentView->Bounds();
+						fParamWeb = NULL;
+						BRect bounds = fContentView->Bounds();
 						BStringView* stringView = new BStringView(bounds, 
 							"noControls", "This hardware has no controls.", B_FOLLOW_V_CENTER | B_FOLLOW_H_CENTER);
 						stringView->ResizeToPreferred();
-						mContentView->AddChild(stringView);
+						fContentView->AddChild(stringView);
 						stringView->MoveBy((bounds.Width()-stringView->Bounds().Width())/2, 
 							(bounds.Height()-stringView->Bounds().Height())/2);
 					}
 				}
 				
-				bool barChanged = (item->OutlineLevel() == 0 || mParamWeb == NULL || mParamWeb->CountGroups()<2);
-				if(barChanged != mBar->mDisplay) {
-					mBar->mDisplay = barChanged;
-					mBar->Invalidate();
+				bool barChanged = (item->OutlineLevel() == 0 || fParamWeb == NULL || fParamWeb->CountGroups()<2);
+				if(barChanged != fBar->fDisplay) {
+					fBar->fDisplay = barChanged;
+					fBar->Invalidate();
 				}
 			}
 			break;
@@ -603,12 +603,12 @@ MediaWindow::MessageReceived (BMessage *message)
 			{
 				PRINT_OBJECT(*message);
 				const char *mimeSig;
-				if(mAlert && message->FindString("be:signature", &mimeSig)==B_OK
+				if(fAlert && message->FindString("be:signature", &mimeSig)==B_OK
 					&& (strcmp(mimeSig, "application/x-vnd.Be.addon-host")==0 
 						|| strcmp(mimeSig, "application/x-vnd.Be.media-server")==0)) {
-					mAlert->Lock();
-					mAlert->TextView()->SetText("Starting Media Server...");
-					mAlert->Unlock();
+					fAlert->Lock();
+					fAlert->TextView()->SetText("Starting Media Server...");
+					fAlert->Unlock();
 				}
 			}			
 			break;
@@ -637,17 +637,17 @@ status_t
 MediaWindow::RestartMediaServices(void *data) 
 {
 	MediaWindow *window = (MediaWindow *)data;
-	window->mAlert = new MediaAlert(BRect(0,0,300,60), 
+	window->fAlert = new MediaAlert(BRect(0,0,300,60), 
 		"restart_alert", "Restarting Media Services\nShutting down Media Server\n");
 					
-	window->mAlert->Show();
+	window->fAlert->Show();
 	
-	shutdown_media_server(B_INFINITE_TIMEOUT, MediaWindow::UpdateProgress, window->mAlert);
+	shutdown_media_server(B_INFINITE_TIMEOUT, MediaWindow::UpdateProgress, window->fAlert);
 	
 	{
-		BAutolock locker(window->mAlert);
+		BAutolock locker(window->fAlert);
 		if(locker.IsLocked())
-			window->mAlert->TextView()->SetText("Starting Media Server...");
+			window->fAlert->TextView()->SetText("Starting Media Server...");
 	}
 	launch_media_server();
 	
