@@ -89,6 +89,7 @@
 // rv350
 #define DEVICE_ID_RADEON_AP		0x4150
 #define DEVICE_ID_RADEON_AQ		0x4151
+#define DEVICE_ID_RADEON_AS		0x4153
 
 // m10
 #define DEVICE_ID_RADEON_NP		0x4e50
@@ -195,6 +196,7 @@ RadeonDevice radeon_device_list[] = {
 	// RV350
 	{ DEVICE_ID_RADEON_AP, 	rt_rv350,	"Radeon 9600 AP" },
 	{ DEVICE_ID_RADEON_AQ, 	rt_rv350,	"Radeon 9600 AQ" },
+	{ DEVICE_ID_RADEON_AS, 	rt_rv350,	"Radeon 9600 AS" },
 	
 	// M10 (based on rv350)
 	{ DEVICE_ID_RADEON_NP,	rt_m10,		"Radeon Mobility 9600 NP" },
