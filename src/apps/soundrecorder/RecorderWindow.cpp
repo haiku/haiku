@@ -454,7 +454,7 @@ RecorderWindow::InitWindow()
 		r.right -= 70;
 		msg = new BMessage(LENGTH_CHANGED);
 		fLengthControl = new BTextControl(r, "Length", "Length:", "8", msg);
-		fLengthControl->SetDivider(60);
+		fLengthControl->SetDivider(fLengthControl->StringWidth("Length:") + 4.0f);
 		fLengthControl->SetAlignment(B_ALIGN_CENTER, B_ALIGN_RIGHT);
 		fBottomBox->AddChild(fLengthControl);
 
