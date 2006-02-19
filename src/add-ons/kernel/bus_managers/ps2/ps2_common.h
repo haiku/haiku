@@ -55,17 +55,6 @@ void			ps2_flush(void);
 
 extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
 
-extern status_t ps2_keyboard_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
-
-extern status_t ps2_get_command_byte(uint8 *byte);
-extern status_t ps2_set_command_byte(uint8 byte);
-
-extern void ps2_claim_result(uint8 *buffer, size_t bytes);
-extern void ps2_unclaim_result(void);
-extern status_t ps2_wait_for_result(void);
-extern bool ps2_handle_result(uint8 data);
-
-
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);
 

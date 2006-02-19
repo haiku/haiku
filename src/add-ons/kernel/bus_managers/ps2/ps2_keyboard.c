@@ -27,10 +27,6 @@ enum {
 } leds_status;
 
 enum {
-	PS2_DATA_SET_LEDS		= 0xed,
-	PS2_ENABLE_KEYBOARD		= 0xf4,
-	PS2_DISABLE_KEYBOARD	= 0xf5,
-
 	EXTENDED_KEY = 0xe0,
 };
 
@@ -57,7 +53,7 @@ set_leds(led_info *ledInfo)
 	if (ledInfo->caps_lock)
 		leds |= LED_CAPS;
 
-	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_DATA_SET_LEDS, &leds, 1, NULL, 0);
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_KEYBOARD_SET_LEDS, &leds, 1, NULL, 0);
 }
 
 
@@ -89,7 +85,7 @@ set_typematic(int32 rate, bigtime_t delay)
 	else 
 		value |= 0 << 5;
 		
-	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf3, &value, 1, NULL, 0);
+	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_KEYBOARD_SET_TYPEMATIC, &value, 1, NULL, 0);
 }
 
 
@@ -145,9 +141,8 @@ int32 keyboard_handle_int(uint8 data)
 
 
 static status_t
-read_keyboard_packet(at_kbd_io *userBuffer)
+read_keyboard_packet(at_kbd_io *packet)
 {
-	at_kbd_io packet;
 	status_t status;
 
 	TRACE(("read_keyboard_packet()\n"));
@@ -156,14 +151,13 @@ read_keyboard_packet(at_kbd_io *userBuffer)
 	if (status < B_OK)
 		return status;
 
-	if (packet_buffer_read(sKeyBuffer, (uint8 *)&packet, sizeof(at_kbd_io)) == 0) {
+	if (packet_buffer_read(sKeyBuffer, (uint8 *)packet, sizeof(*packet)) == 0) {
 		TRACE(("read_keyboard_packet(): error reading packet: %s\n", strerror(status)));
 		return B_ERROR;
 	}
 
-	TRACE(("scancode: %x, keydown: %s\n", packet.scancode, packet.is_keydown ? "true" : "false"));
-
-	return user_memcpy(userBuffer, &packet, sizeof(at_kbd_io));
+	TRACE(("scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false"));
+	return B_OK;
 }
 
 
@@ -305,20 +299,23 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	TRACE(("keyboard ioctl()\n"));
 	switch (op) {
 		case KB_READ:
+		{
+			at_kbd_io packet;
 			TRACE(("KB_READ\n"));
-			return read_keyboard_packet((at_kbd_io *)buffer);
+			if (read_keyboard_packet(&packet) < B_OK)
+				return B_ERROR;
+			return user_memcpy(buffer, &packet, sizeof(packet));
+		}
 
 		case KB_SET_LEDS:
 		{
 			led_info info;
+			TRACE(("KB_SET_LEDS\n"));
 			if (user_memcpy(&info, buffer, sizeof(led_info)) < B_OK)
 				return B_BAD_ADDRESS;
-
-			TRACE(("KB_SET_LEDS\n"));
 			return set_leds(&info);
 		}
 
-		
 		case KB_SET_KEY_REPEATING:
 		{
 			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds with "ack" (0xFA).
