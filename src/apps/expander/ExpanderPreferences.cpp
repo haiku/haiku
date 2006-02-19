@@ -40,7 +40,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	 
 	BRect frameRect = box->Bounds();
 	frameRect.OffsetBy(15,23);
-	frameRect.right = frameRect.left + 100;
+	frameRect.right = frameRect.left + 200;
 	frameRect.bottom = frameRect.top + 20;
 	BRect textRect(frameRect);
 	textRect.OffsetTo(B_ORIGIN);
@@ -88,7 +88,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	box->AddChild(fDestUse);
 	
 	textRect = rect;
-	textRect.OffsetBy(45, 0);
+	textRect.OffsetBy(fDestUse->StringWidth("Use:") + 20, 0);
 	textRect.right = textRect.left + 158;
 	fDestText = new BTextControl(textRect, "destText", "", "", new BMessage(MSG_DESTTEXT));
 	fDestText->SetDivider(0);
