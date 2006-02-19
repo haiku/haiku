@@ -57,6 +57,7 @@ const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char *kMouseDevicesDirectory = "/dev/input/mouse";
 
 // "/dev/" is automatically prepended by StartMonitoringDevice()
+const static char *kMouseDevicesDirectoryPS2 = "input/mouse/ps2";
 const static char *kMouseDevicesDirectoryUSB = "input/mouse/usb";
 
 struct mouse_device {
@@ -97,6 +98,7 @@ MouseInputDevice::MouseInputDevice()
 #endif
 	CALLED();
 	
+	StartMonitoringDevice(kMouseDevicesDirectoryPS2);
 	StartMonitoringDevice(kMouseDevicesDirectoryUSB);
 }
 
@@ -105,7 +107,8 @@ MouseInputDevice::~MouseInputDevice()
 {
 	CALLED();
 	StopMonitoringDevice(kMouseDevicesDirectoryUSB);
-
+	StopMonitoringDevice(kMouseDevicesDirectoryPS2);
+	
 	for (int32 i = 0; i < fDevices.CountItems(); i++)
 		delete (mouse_device *)fDevices.ItemAt(i);
 	
