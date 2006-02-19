@@ -52,7 +52,7 @@ BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
 	mga.accelerant nm.accelerant vesa.accelerant
 ;
 BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
-	JPEGTranslator GIFTranslator BMPTranslator
+	JPEGTranslator JPEG2000Translator GIFTranslator BMPTranslator
 ;
 BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
 	multi_audio.media_addon
