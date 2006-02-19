@@ -294,7 +294,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	if (mh)
 		*mh = header;
 		
-	printf("BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
+	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
 
 	return result;
 }
@@ -356,7 +356,7 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time,
 	fCurFrame = frame;
 	fCurTime = time;
 	
-	printf("BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n", seekTime / 1000000.0, *inout_time / 1000000.0);
+	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n", seekTime / 1000000.0, *inout_time / 1000000.0);
 
 	return B_OK;
 }
@@ -407,7 +407,7 @@ BMediaTrack::SeekToFrame(int64 *inout_frame,
 	fCurFrame = frame;
 	fCurTime = time;
 
-	printf("BMediaTrack::SeekToTime SeekToFrame, requested %Ld, result %Ld\n", seekFrame, *inout_frame);
+	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %Ld, result %Ld\n", seekFrame, *inout_frame);
 
 	return B_OK;
 }
