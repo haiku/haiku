@@ -175,7 +175,9 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				sprintf(tty_name, "/dev/tt/%s", dirEntry->d_name);
 				break;
 			} else {
-				fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
+				// B_BUSY is a normal case
+				if (master != B_BUSY) 
+					fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
 			}
 		}
 		closedir(dir);
