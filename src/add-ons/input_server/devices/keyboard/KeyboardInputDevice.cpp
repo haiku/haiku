@@ -22,6 +22,7 @@ const static uint32 kKeyboardThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char *kKeyboardDevicesDirectory = "/dev/input/keyboard";
 
 // "/dev/" is automatically prepended by StartMonitoringDevice()
+const static char *kKeyboardDevicesDirectoryPS2 = "input/keyboard/at";
 const static char *kKeyboardDevicesDirectoryUSB = "input/keyboard/usb";
 
 const uint32 at_keycode_map[] = {
@@ -337,6 +338,7 @@ KeyboardInputDevice::KeyboardInputDevice()
 #endif
 	CALLED();
 	
+	StartMonitoringDevice(kKeyboardDevicesDirectoryPS2);
 	StartMonitoringDevice(kKeyboardDevicesDirectoryUSB);
 }
 
@@ -345,6 +347,7 @@ KeyboardInputDevice::~KeyboardInputDevice()
 {
 	CALLED();
 	StopMonitoringDevice(kKeyboardDevicesDirectoryUSB);
+	StopMonitoringDevice(kKeyboardDevicesDirectoryPS2);
 	
 #if DEBUG	
 	fclose(sLogFile);
