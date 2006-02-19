@@ -456,7 +456,7 @@ FontManager::_AddSystemPaths()
 
 	// We don't scan these in test mode to help shave off some startup time
 #if !TEST_MODE
-	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK)
+	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path) == B_OK)
 		_AddPath(path.Path());
 #endif
 }
