@@ -446,16 +446,17 @@ RecorderWindow::InitWindow()
 		r.InsetBy(10,10);
 		r.top = r.bottom - 18;
 		fInputField = new BMenuField(r, "Input", "Input:", popup);
-		fInputField->SetDivider(50);
+		fInputField->SetDivider(fInputField->StringWidth("Input:") + 4.0f);
 		fBottomBox->AddChild(fInputField);
 
 		//	Text field for entering length to record (in seconds)
-		r.OffsetBy(r.Width()+20, 1);
-		r.right -= 70;
+		r.OffsetBy(0, 1);
+		r.left = r.right + 10;
+		r.right = frame.right - (frame.right - frame.left) / 4;
 		msg = new BMessage(LENGTH_CHANGED);
 		fLengthControl = new BTextControl(r, "Length", "Length:", "8", msg);
 		fLengthControl->SetDivider(fLengthControl->StringWidth("Length:") + 4.0f);
-		fLengthControl->SetAlignment(B_ALIGN_CENTER, B_ALIGN_RIGHT);
+		fLengthControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
 		fBottomBox->AddChild(fLengthControl);
 
 		r.left += r.Width()+5;
