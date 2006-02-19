@@ -130,9 +130,6 @@ void *
 BMessage::operator new(size_t size)
 {
 	DEBUG_FUNCTION_ENTER2;
-	if (!sMsgCache)
-		sMsgCache = new BBlockCache(10, size, B_OBJECT_CACHE);
-
 	void *pointer = sMsgCache->Get(size);
 	return pointer;
 }
@@ -1197,7 +1194,7 @@ BMessage::PopSpecifier()
 	Only if write access is necessary the message will be copyed from the area
 	to its own buffers (like in the unflatten step before).
 	The double copying is reduced to a single copy in most cases and we safe
-	the possibly dangerous and slower route of moving the data through a port.
+	the slower route of moving the data through a port.
 	Additionally we save us the reference counting with the use of areas that
 	are reference counted internally. So we don't have to worry about leaving
 	an area behind or deleting one that is still in use.
@@ -1771,7 +1768,7 @@ BMessage::_StaticInit()
 	sReplyPortInUse[1] = 0;
 	sReplyPortInUse[2] = 0;
 
-	sMsgCache = NULL;
+	sMsgCache = new BBlockCache(20, sizeof(BMessage), B_OBJECT_CACHE);
 }
 
 
@@ -1986,18 +1983,18 @@ handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
 	BMessage *reply)
 {
 	DEBUG_FUNCTION_ENTER2;
+	ssize_t size;
+	do {
+		size = port_buffer_size_etc(replyPort, B_RELATIVE_TIMEOUT, timeout);
+	} while (size == B_INTERRUPTED);
+
+	if (size < B_OK)
+		return size;
+
 	status_t result;
+	char *buffer = (char *)malloc(size);
 	do {
-		result = port_buffer_size_etc(replyPort, B_RELATIVE_TIMEOUT, timeout);
-	} while (result == B_INTERRUPTED);
-
-	if (result < B_OK)
-		return result;
-
-	// The API lied. It really isn't an error code, but the message size...
-	char *buffer = (char *)malloc(result);
-	do {
-		result = read_port(replyPort, pCode, buffer, result);
+		result = read_port(replyPort, pCode, buffer, size);
 	} while (result == B_INTERRUPTED);
 
 	if (result < B_OK || (*pCode != kPortMessageCodeDirect
