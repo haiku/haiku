@@ -278,6 +278,7 @@ BTextControl::Draw(BRect updateRect)
 	BRegion updateRegion(updateRect);
 		// why is there no IntersectWith(BRect &) version?
 	region.IntersectWith(&updateRegion);
+	region.Exclude(fText->Frame());
 	FillRegion(&region);
 
 	if (Label()) {
@@ -657,7 +658,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
 		frame.InsetBy(4.0, 3.0);
-		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
+		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
 		fText = new _BTextInput_(frame, textRect,
 			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
