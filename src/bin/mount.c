@@ -18,7 +18,7 @@ static void
 usage(const char *programName)
 {
 	
-	printf("usage: %s [-ro] [-t fstype] device directory\n"
+	printf("usage: %s [-ro] [-t fstype] [-p parameter] device directory\n"
 		"\t-ro\tmounts the volume read-only\n"
 		"\t-t\tspecifies the file system to use (defaults to automatic recognition)\n",programName);
 	exit(0);
