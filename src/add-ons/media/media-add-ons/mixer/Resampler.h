@@ -24,25 +24,27 @@ public:
 
 protected:
 	virtual void float_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void int32_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void int16_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-							     void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void int8_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-				  				 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+				  				void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void uint8_to_float	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_int32_32	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_int32_24	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+	virtual void float_to_int32_20  (const void *src, int32 src_sample_offset, int32 src_sample_count,
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_int16	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-				  				 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+				  				void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_int8	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-			 				  	 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+			 				  	void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 	virtual void float_to_uint8	(const void *src, int32 src_sample_offset, int32 src_sample_count,
-								 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
+								void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain);
 private:
 	void (Resampler::*fFunc)	(const void *, int32, int32, void *, int32, int32, float);
 };

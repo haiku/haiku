@@ -17,3 +17,8 @@ Addon mixer.media_addon : media :
 	: false
 	: be media
 ;
+
+Package haiku-mixer-cvs
+	: mixer.media_addon
+	: boot home config add-ons media ;
+
