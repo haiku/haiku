@@ -63,6 +63,9 @@ struct BMessage::message_header {
 	ssize_t		fields_available;
 	ssize_t		data_available;
 
+	uint32		fields_checksum;
+	uint32		data_checksum;
+
 	int32		target;
 	int32		current_specifier;
 	area_id		shared_area;

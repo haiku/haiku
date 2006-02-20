@@ -120,7 +120,7 @@ BMessage::operator=(const BMessage &other)
 	fHeader->shared_area = -1;
 	fHeader->fields_available = 0;
 	fHeader->data_available = 0;
-	what = fHeader->what;
+	fHeader->what = what = other.what;
 	fQueueLink = other.fQueueLink;
 	return *this;
 }
@@ -176,6 +176,7 @@ BMessage::_InitHeader()
 
 	fHeader->format = kMessageMagic4;
 	fHeader->flags = MESSAGE_FLAG_VALID;
+	fHeader->what = what;
 	fHeader->current_specifier = -1;
 	fHeader->shared_area = -1;
 
@@ -801,6 +802,8 @@ BMessage::_NativeFlatten(char *buffer, ssize_t size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
+	fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
+	fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	memcpy(buffer, fHeader, min_c(sizeof(message_header), (size_t)size));
 	buffer += sizeof(message_header);
@@ -830,6 +833,8 @@ BMessage::_NativeFlatten(BDataIO *stream, ssize_t *size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
+	fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
+	fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	ssize_t result1 = stream->Write(fHeader, sizeof(message_header));
 	if (result1 != sizeof(message_header))
@@ -903,7 +908,6 @@ BMessage::Unflatten(const char *flatBuffer)
 	fHeader->data_available = 0;
 	what = fHeader->what;
 
-	/* ToDo: better message validation (checksum) */
 	if (fHeader->format != kMessageMagic4 ||
 		!(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		_Clear();
@@ -926,6 +930,14 @@ BMessage::Unflatten(const char *flatBuffer)
 			return B_NO_MEMORY;
 
 		memcpy(fData, flatBuffer, fHeader->data_size);
+	}
+
+	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
+		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
+		debug_printf("checksum mismatch\n");
+		_Clear();
+		_InitHeader();
+		return B_BAD_VALUE;
 	}
 
 	return B_OK;
@@ -975,7 +987,6 @@ BMessage::Unflatten(BDataIO *stream)
 		return (result >= 0 ? B_ERROR : result);
 	}
 
-	/* ToDo: better message validation (checksum) */
 	if (fHeader->format != kMessageMagic4 ||
 		!(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		_Clear();
@@ -1009,6 +1020,14 @@ BMessage::Unflatten(BDataIO *stream)
 		}
 	}
 
+	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
+		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
+		debug_printf("checksum mismatch\n");
+		_Clear();
+		_InitHeader();
+		return B_BAD_VALUE;
+	}
+
 	return B_OK;
 }
 
@@ -1035,6 +1054,7 @@ BMessage::AddSpecifier(const char *property, int32 index)
 	if (result < B_OK)
 		return result;
 
+	result = message.AddInt32("index", index);
 	if (result < B_OK)
 		return result;
 
@@ -1206,6 +1226,10 @@ BMessage::_FlattenToArea(message_header **_header) const
 	DEBUG_FUNCTION_ENTER;
 	message_header *header = (message_header *)malloc(sizeof(message_header));
 	memcpy(header, fHeader, sizeof(message_header));
+
+	header->what = what;
+	header->fields_available = 0;
+	header->data_available = 0;
 	*_header = header;
 
 	if (header->shared_area >= B_OK)
@@ -1215,8 +1239,8 @@ BMessage::_FlattenToArea(message_header **_header) const
 		return B_OK;
 
 	uint8 *address = NULL;
-	ssize_t size = sizeof(int32) + header->fields_size + header->data_size;
-	size = ((size + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1)) + B_PAGE_SIZE;
+	ssize_t size = header->fields_size + header->data_size;
+	size = (size + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1);
 	area_id area = create_area("Shared BMessage data", (void **)&address,
 		B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
@@ -1228,15 +1252,16 @@ BMessage::_FlattenToArea(message_header **_header) const
 
 	if (header->fields_size > 0) {
 		memcpy(address, fFields, header->fields_size);
+		header->fields_checksum = BPrivate::CalculateChecksum((uint8 *)address, header->fields_size);
 		address += header->fields_size;
 	}
 
-	if (header->data_size > 0)
+	if (header->data_size > 0) {
 		memcpy(address, fData, header->data_size);
+		header->data_checksum = BPrivate::CalculateChecksum((uint8 *)address, header->data_size);
+	}
 
 	header->shared_area = area;
-	header->fields_available = 0;
-	header->data_available = 0;
 	return B_OK;
 }
 
@@ -1285,6 +1310,7 @@ BMessage::_Reference(message_header *header)
 	what = fHeader->what;
 
 	if (fHeader->shared_area < B_OK) {
+		/* if there is no data at all we don't need the area */
 		if (fHeader->fields_size == 0 && header->data_size == 0)
 			return B_OK;
 
@@ -1305,7 +1331,6 @@ BMessage::_Reference(message_header *header)
 	fFields = (field_header *)address;
 	address += fHeader->fields_size;
 	fData = address;
-
 	return B_OK;
 }
 
@@ -2511,10 +2536,10 @@ BMessage::ReplaceMessage(const char *name, const BMessage *message)
 status_t
 BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *message)
 {
-	ssize_t size = message->FlattenedSize();
+	ssize_t size = message->_NativeFlattenedSize();
 	char buffer[size];
 
-	status_t error = message->Flatten(buffer, size);
+	status_t error = message->_NativeFlatten(buffer, size);
 
 	if (error >= B_OK)
 		error = ReplaceData(name, B_MESSAGE_TYPE, index, &buffer, size);
