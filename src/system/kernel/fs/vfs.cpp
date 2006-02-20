@@ -5498,7 +5498,7 @@ err:
 
 dev_t
 _kern_mount(const char *path, const char *device, const char *fsName,
-	uint32 flags, const char *args)
+	uint32 flags, const char *args, size_t argsLength)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -6199,7 +6199,7 @@ _kern_setcwd(int fd, const char *path)
 
 dev_t
 _user_mount(const char *userPath, const char *userDevice, const char *userFileSystem,
-	uint32 flags, const char *userArgs)
+	uint32 flags, const char *userArgs, size_t argsLength)
 {
 	char fileSystem[B_OS_NAME_LENGTH];
 	KPath path, device;
@@ -6225,29 +6225,17 @@ _user_mount(const char *userPath, const char *userDevice, const char *userFileSy
 		&& user_strlcpy(device.LockBuffer(), userDevice, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (userArgs != NULL) {
-		// We have no real length restriction, so we need to create
-		// a buffer large enough to hold the argument string
-		// ToDo: we could think about determinung the length of the string
-		//	in userland :)
-		ssize_t length = user_strlcpy(args, userArgs, 0);
-		if (length < B_OK)
+	if (userArgs != NULL && argsLength > 0) {
+		if (argsLength >= 65536)
+			return B_BAD_VALUE;
+		args = (char *)malloc(argsLength + 1);
+		if (args == NULL)
+			return B_NO_MEMORY;
+		if (user_strlcpy(args, userArgs, argsLength + 1) < B_OK) {
+			free(args);
 			return B_BAD_ADDRESS;
-
-		// this is a safety restriction
-		if (length > 32 * 1024)
-			return B_NAME_TOO_LONG;
-
-		if (length > 0) {
-			args = (char *)malloc(length + 1);
-			if (args == NULL)
-				return B_NO_MEMORY;
-
-			if (user_strlcpy(args, userArgs, length + 1) < B_OK) {
-				free(args);
-				return B_BAD_ADDRESS;
-			}
 		}
+
 	}
 	path.UnlockBuffer();
 	device.UnlockBuffer();

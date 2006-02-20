@@ -111,7 +111,7 @@ status_t resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
 
 /* calls the syscall dispatcher should use for user file I/O */
 dev_t _user_mount(const char *path, const char *device, const char *fs_name,
-			uint32 flags, const char *args);
+			uint32 flags, const char *args, size_t argsLength);
 status_t _user_unmount(const char *path, uint32 flags);
 status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);

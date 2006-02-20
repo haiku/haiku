@@ -12,7 +12,7 @@ dev_t
 fs_mount_volume(const char *where, const char *device,
 	const char *fileSystem, uint32 flags, const char *parameters)
 {
-	return _kern_mount(where, device, fileSystem, flags, (void *)parameters);
+	return _kern_mount(where, device, fileSystem, flags, (void *)parameters, parameters ? strlen(parameters) : 0);
 }
 
 

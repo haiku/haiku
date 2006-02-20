@@ -191,7 +191,7 @@ vfs_bootstrap_file_systems(void)
 	status_t status;
 
 	// bootstrap the root filesystem
-	status = _kern_mount("/", NULL, "rootfs", 0, NULL);
+	status = _kern_mount("/", NULL, "rootfs", 0, NULL, 0);
 	if (status < B_OK)
 		panic("error mounting rootfs!\n");
 
@@ -199,13 +199,13 @@ vfs_bootstrap_file_systems(void)
 
 	// bootstrap the devfs
 	_kern_create_dir(-1, "/dev", 0755);
-	status = _kern_mount("/dev", NULL, "devfs", 0, NULL);
+	status = _kern_mount("/dev", NULL, "devfs", 0, NULL, 0);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
 	_kern_create_dir(-1, "/pipe", 0755);
-	status = _kern_mount("/pipe", NULL, "pipefs", 0, NULL);
+	status = _kern_mount("/pipe", NULL, "pipefs", 0, NULL, 0);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
@@ -240,7 +240,7 @@ vfs_mount_boot_file_system(kernel_args *args)
 		if (bootPartition->GetPath(&path) != B_OK)
 			panic("could not get boot device!\n");
 
-		gBootDevice = _kern_mount("/boot", path.Path(), NULL, 0, NULL);
+		gBootDevice = _kern_mount("/boot", path.Path(), NULL, 0, NULL, 0);
 		if (gBootDevice >= B_OK)
 			break;
 	}
