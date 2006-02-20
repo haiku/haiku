@@ -1006,47 +1006,13 @@ BTextView::Perform(perform_code d, void *arg)
 void
 BTextView::SetText(const char *inText, const text_run_array *inRuns)
 {
-	CALLED();
-	
-	CancelInputMethod();
-	
-	// hide the caret/unhilite the selection
-	if (fActive) {
-		if (fSelStart != fSelEnd)
-			Highlight(fSelStart, fSelEnd);
-		else {
-			if (fCaretVisible)
-				InvertCaret();
-		}
-	}
-	
-	// remove data from buffer
-	if (fText->Length() > 0)
-		DeleteText(0, fText->Length()); // TODO: was fText->Length() - 1
-
-	int32 len = inText ? strlen(inText) : 0;
-	
-	if (inText != NULL && len > 0)
-		InsertText(inText, len, 0, inRuns);
-	
-	fClickOffset = fSelStart = fSelEnd = 0;	
-
-	// recalc line breaks and draw the text
-	Refresh(0, len, true, true);
-
-	// draw the caret
-	if (fActive) {
-		if (!fCaretVisible)
-			InvertCaret();
-	}
+	SetText(inText, inText ? strlen(inText) : 0, inRuns);
 }
 
 
 void
 BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inRuns)
 {
-	CALLED();
-	
 	CancelInputMethod();
 	
 	// hide the caret/unhilite the selection
@@ -2769,7 +2735,7 @@ BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 {
 	CALLED();
 	// sanity checking
-	if (fromOffset >= toOffset || fromOffset < 0 || toOffset < 0)
+	if (fromOffset >= toOffset || fromOffset < 0 || toOffset > fText->Length())
 		return;
 		
 	// set nullStyle to style at beginning of range
@@ -4121,8 +4087,16 @@ BTextView::UpdateScrollbars()
 void
 BTextView::AutoResize(bool doredraw)
 {
-	CALLED();
-	// TODO: Implement
+	// TODO: What about fContainerView ? Should we resize it as well ?
+	if (fResizable) {
+		float width = 0;
+		for (int32 i = 0; i < CountLines(); i++)
+			width = max_c(width, LineWidth(i));
+		
+		ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
+		if (fContainerView)
+			fContainerView->ResizeTo(Bounds().Width(), Bounds().Height());
+	}
 }
 
 
