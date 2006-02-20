@@ -44,6 +44,7 @@ using namespace BPrivate;
 
 menu_info *_menu_info_ptr_;
 
+extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
 
 static status_t
 mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
