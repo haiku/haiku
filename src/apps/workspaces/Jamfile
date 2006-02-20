@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src apps workspaces ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders interface ;
+
 Application Workspaces :
 	Workspaces.cpp 
 	: be

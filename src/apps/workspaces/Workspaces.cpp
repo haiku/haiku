@@ -33,9 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-// here is the trick :)
-static const uint32 kWorkspacesWindow = 0x00008000;
+#include "WindowPrivate.h"
 
 static const char *kWorkspacesSignature = "application/x-vnd.Be-WORK";
 static const char *kWorkspacesSettingFile = "Workspace_data";
@@ -193,7 +191,7 @@ WorkspacesPreferences::SetWindowFrame(BRect frame)
 WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
 	: BWindow(preferences->WindowFrame(), "Workspaces", B_TITLED_WINDOW_LOOK,
  			B_NORMAL_WINDOW_FEEL,
-			kWorkspacesWindow | B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
+			kWorkspacesWindowFlag | B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
  			B_ALL_WORKSPACES),
  	fPreferences(preferences)
 {
