@@ -37,16 +37,19 @@ struct _page_header_ {
 static BMessenger *sPrintServer = NULL;
 
 
-static bool
+static status_t
 EnsureValidMessenger()
 {
 	if (sPrintServer == NULL)
     		sPrintServer = new BMessenger;
     
+    if (sPrintServer == NULL)
+    	return B_NO_MEMORY;
+    	
 	if (!sPrintServer->IsValid())
     		*sPrintServer = BMessenger(PSRV_SIGNATURE_TYPE);
 
-	return sPrintServer->IsValid();
+	return sPrintServer->IsValid() ? B_OK : B_ERROR;
 }
 
 
@@ -124,19 +127,19 @@ BPrintJob::CommitJob()
 		return;
 	}
 		
-	if (!EnsureValidMessenger())
+	if (EnsureValidMessenger() != B_OK)
 		return;
 
 	BMessage *message = new BMessage(PSRV_GET_ACTIVE_PRINTER);
 	BMessage *reply = new BMessage;
     
 	const char *printerName = NULL;
-	if (sPrintServer->SendMessage(message, reply) < B_OK ||
-    		reply->FindString("printer_name", &printerName) < B_OK) {
+	if (sPrintServer->SendMessage(message, reply) < B_OK
+		|| reply->FindString("printer_name", &printerName) < B_OK) {
 		// TODO: Show an alert
-    		delete message;
+		delete message;
    		delete reply;
-    		return;
+    	return;
 	}	
     
 	delete message;
@@ -238,8 +241,10 @@ BPrintJob::SetSettings(BMessage *message)
 	if (message != NULL) {
 		HandlePageSetup(message);
 		HandlePrintSetup(message);
+	
+	} else if (fSetupMessage != NULL) {
 		delete fSetupMessage;
-		fSetupMessage = message;
+		fSetupMessage = NULL;
 	}
 }
 
@@ -330,7 +335,7 @@ BPrintJob::LastPage()
 int32
 BPrintJob::PrinterType(void *) const
 {
-	if (!EnsureValidMessenger())
+	if (EnsureValidMessenger() != B_OK)
 		return B_COLOR_PRINTER; // default
     
 	BMessage message(PSRV_GET_ACTIVE_PRINTER);
@@ -460,7 +465,7 @@ BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
 char *
 BPrintJob::GetCurrentPrinterName() const
 {  
-	if (!EnsureValidMessenger())
+	if (EnsureValidMessenger() != B_OK)
 		return NULL;
 
 	BMessage message(PSRV_GET_ACTIVE_PRINTER);
@@ -478,7 +483,7 @@ BPrintJob::GetCurrentPrinterName() const
 void
 BPrintJob::LoadDefaultSettings()
 {
-	if (!EnsureValidMessenger())
+	if (EnsureValidMessenger() != B_OK)
 		return;
 	
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
