@@ -43,8 +43,8 @@ EnsureValidMessenger()
 	if (sPrintServer == NULL)
     		sPrintServer = new BMessenger;
     
-    if (sPrintServer == NULL)
-    	return B_NO_MEMORY;
+	if (sPrintServer == NULL)
+    		return B_NO_MEMORY;
     	
 	if (!sPrintServer->IsValid())
     		*sPrintServer = BMessenger(PSRV_SIGNATURE_TYPE);
@@ -139,7 +139,7 @@ BPrintJob::CommitJob()
 		// TODO: Show an alert
 		delete message;
    		delete reply;
-    	return;
+    		return;
 	}	
     
 	delete message;
@@ -170,7 +170,8 @@ status_t
 BPrintJob::ConfigJob()
 {
 	// TODO: Implement
-	return B_OK;
+	
+	return ConfigPage();
 }
 
 
@@ -185,8 +186,9 @@ BPrintJob::CancelJob()
 
 status_t
 BPrintJob::ConfigPage()
-{
-	return B_OK;
+{	
+	// TODO: Launch config window and get settings from it
+	return B_ERROR;
 }
 
 
