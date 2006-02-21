@@ -96,7 +96,7 @@ CustomTab::Select(BView *view)
 
 
 ScreenSaverWin::ScreenSaverWin() 
-	: BWindow(BRect(50,50,496,375),"OBOS Screen Saver",
+	: BWindow(BRect(50,50,496,375),"Screen Saver",
 		B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) ,
 	fFadeState(0),fNoFadeState(0), fListView1(NULL),
 	fSelectedAddonFileName(NULL), 
