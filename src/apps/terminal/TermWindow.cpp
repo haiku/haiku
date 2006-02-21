@@ -5,38 +5,37 @@
  *
  * Distributed unter the terms of the MIT license.
  */
-#include <app/Application.h>
+#include <Alert.h>
+#include <Application.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Path.h>
+#include <PrintJob.h>
+#include <PropertyInfo.h>
 #include <ScrollBar.h>
 #include <TextControl.h>
-#include <PrintJob.h>
-#include <Alert.h>
-#include <float.h>
 #include <WindowScreen.h>
-#include <PropertyInfo.h>
-
+#include <float.h>
 #include <stdio.h>
-#include <sys/time.h>
 #include <string>
+#include <sys/time.h>
 #include <unistd.h>
 
-
-#include "TermApp.h"
-#include "TermParse.h"
-#include "TermWindow.h"
-#include "TermView.h"
-#include "TermBuffer.h"
-#include "TermBaseView.h"
 #include "CodeConv.h"
-#include "TermConst.h"
+#include "ColorWindow.h"
+#include "MenuUtil.h"
 #include "PrefDlg.h"
 #include "PrefView.h"
 #include "PrefHandler.h"
-#include "MenuUtil.h"
+#include "TermApp.h"
+#include "TermBaseView.h"
+#include "TermBuffer.h"
+#include "TermParse.h"
+#include "TermView.h"
+#include "TermWindow.h"
+#include "TermConst.h"
 #include "spawn.h"
-#include "ColorWindow.h"
 
 
 // Global Preference Handler
@@ -222,14 +221,14 @@ TermWindow::SetupMenu(void)
   fEditmenu->AddItem (new BMenuItem ("Find", new BMessage (MENU_FIND_STRING),'F'));
   fEditmenu->AddItem (new BMenuItem ("Find Again", new BMessage (MENU_FIND_AGAIN), ']'));
 */
-  fMenubar->AddItem (fEditmenu);
+	fMenubar->AddItem (fEditmenu);
   
 
   /*
    * Make Help Menu.
    */
-  fHelpmenu = new BMenu("Settings");
-  fWindowSizeMenu = new BMenu("Window Size");
+	fHelpmenu = new BMenu("Settings");
+	fWindowSizeMenu = new BMenu("Window Size");
   	fWindowSizeMenu->AddItem(new BMenuItem("80x24", new BMessage(EIGHTYTWENTYFOUR)));
   	fWindowSizeMenu->AddItem(new BMenuItem("80x25", new BMessage(EIGHTYTWENTYFIVE)));  
    	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
@@ -252,17 +251,19 @@ TermWindow::SetupMenu(void)
   fNewFontMenu->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
 */
 
-  fEncodingmenu = new BMenu("Font Encoding");
-  fEncodingmenu->SetRadioMode(true);
-  MakeEncodingMenu(fEncodingmenu, gNowCoding, true);
-  fHelpmenu->AddItem(fWindowSizeMenu);  
-  fHelpmenu->AddItem(fEncodingmenu);
+	fEncodingmenu = new BMenu("Font Encoding");
+	fEncodingmenu->SetRadioMode(true);
+	MakeEncodingMenu(fEncodingmenu, gNowCoding, true);
+	fHelpmenu->AddItem(fWindowSizeMenu);  
+	fHelpmenu->AddItem(fEncodingmenu);
 //  fHelpmenu->AddItem(fNewFontMenu);
-  fHelpmenu->AddSeparatorItem();
-  fHelpmenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
-  fMenubar->AddItem(fHelpmenu);
+	fHelpmenu->AddSeparatorItem();
+	fHelpmenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
+	fHelpmenu->AddSeparatorItem();
+	fHelpmenu->AddItem(new BMenuItem("Save as default", new BMessage(SAVE_AS_DEFAULT))); 
+	fMenubar->AddItem(fHelpmenu);
 
-  AddChild(fMenubar);
+	AddChild(fMenubar);
 }
 
 
@@ -436,19 +437,25 @@ TermWindow::MessageReceived(BMessage *message)
     break;
 
 
-  case MSG_COLOR_CHANGED:
-    fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
-    fTermView->SetTermColor ();
-    fBaseView->Invalidate();
-    fTermView->Invalidate();
-    break;
-    
-  case MENU_PAGE_SETUP:
-    DoPageSetup ();
-    break;
-  case MENU_PRINT:
-    DoPrint ();
-    break;
+	case MSG_COLOR_CHANGED:
+		fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
+		fTermView->SetTermColor ();
+		fBaseView->Invalidate();
+		fTermView->Invalidate();
+		break;
+	case SAVE_AS_DEFAULT:
+		{
+			BPath path;
+			if (PrefHandler::GetDefaultPath(path) == B_OK)
+				gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+		}
+		break;
+	case MENU_PAGE_SETUP:
+		DoPageSetup ();
+		break;
+	case MENU_PRINT:
+		DoPrint ();
+		break;
 
   case MSGRUN_WINDOW:
     fTermView->UpdateSIGWINCH ();
