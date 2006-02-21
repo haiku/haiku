@@ -850,7 +850,7 @@ BListView::DeselectAll()
 
 	for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
 		BListItem *item = ItemAt(index);
-		if (item->IsSelected()) {
+		if (item && item->IsSelected()) {
 			item->Deselect();
 			InvalidateItem(index);
 		}
@@ -874,14 +874,14 @@ BListView::DeselectExcept(int32 start, int32 finish)
 	// supposed to be selected if not already
     	for (index = fFirstSelected; index < start; index++) {
 		BListItem *item = ItemAt(index);
-		if (item->IsSelected()) {
+		if (item && item->IsSelected()) {
 			item->Deselect();
 			InvalidateItem(index);
 		}
     	}
     	for (index = finish + 1; index <= fLastSelected; index++) {
 		BListItem *item = ItemAt(index);
-		if (item->IsSelected()) {
+		if (item && item->IsSelected()) {
 			item->Deselect();
 			InvalidateItem(index);
 		}
