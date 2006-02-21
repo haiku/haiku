@@ -37,7 +37,7 @@ XSLTPROC ?= xsltproc ;
 rule Doc2HTML
 {
 	local source = [ FGristFiles $(1) ] ;
-	local target = $(2) ;
+	local target = [ FGristFiles $(2) ] ;
 	local xslsheet = $(3) ;
 	local basedir = [ FDirName $(HAIKU_DOCUMENTATION_DIR) $(4) ] ;
 	local paths = $(5) ;
