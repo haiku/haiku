@@ -1343,13 +1343,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.
 
 	if (numBytes == 1) {
-		if (mod & B_OPTION_KEY) {
-			c = *bytes;
-			c |= 0x80;
-			write(pfd, &c, 1);
-			return;
-		}
-
+	
 		switch (*bytes) {
 			case B_RETURN:
 				c = 0x0d;
