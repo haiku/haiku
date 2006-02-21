@@ -849,8 +849,9 @@ BListView::DeselectAll()
 		return;
 
 	for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
-		if (ItemAt(index)->IsSelected()) {
-			ItemAt(index)->Deselect();
+		BListItem *item = ItemAt(index);
+		if (item->IsSelected()) {
+			item->Deselect();
 			InvalidateItem(index);
 		}
 	}
@@ -872,14 +873,16 @@ BListView::DeselectExcept(int32 start, int32 finish)
 	// TODO: check if the items from start to finish are
 	// supposed to be selected if not already
     	for (index = fFirstSelected; index < start; index++) {
-		if (ItemAt(index)->IsSelected()) {
-			ItemAt(index)->Deselect();
+		BListItem *item = ItemAt(index);
+		if (item->IsSelected()) {
+			item->Deselect();
 			InvalidateItem(index);
 		}
     	}
     	for (index = finish + 1; index <= fLastSelected; index++) {
-		if (ItemAt(index)->IsSelected()) {
-			ItemAt(index)->Deselect();
+		BListItem *item = ItemAt(index);
+		if (item->IsSelected()) {
+			item->Deselect();
 			InvalidateItem(index);
 		}
 	}
@@ -1266,7 +1269,7 @@ BListView::_Select(int32 from, int32 to, bool extend)
 		for (int32 i = fFirstSelected; i <= fLastSelected; ++i) {
 			BListItem *item = ItemAt(i);
 			if (item && item->IsSelected() && (i < from || i > to)) {
-				ItemAt(i)->Deselect();
+				item->Deselect();
 				InvalidateItem(i);
 			}
 		}
@@ -1305,20 +1308,16 @@ BListView::_Deselect(int32 index)
 
 	BListItem *item = ItemAt(index);
 
-	if (item->IsSelected())
-	{
+	if (item && item->IsSelected()) {
 		BRect frame(ItemFrame(index));
 		BRect bounds(Bounds());
 
 		item->Deselect();
 
-		if (fFirstSelected == index && fLastSelected == index)
-		{
+		if (fFirstSelected == index && fLastSelected == index) {
 			fFirstSelected = -1;
 			fLastSelected = -1;
-		}
-		else
-		{
+		} else {
 			if (fFirstSelected == index)
 				fFirstSelected = _CalcFirstSelected(index);
 
