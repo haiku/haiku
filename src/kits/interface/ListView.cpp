@@ -848,7 +848,7 @@ BListView::DeselectAll()
 	if (fFirstSelected == -1)
 		return;
 
-    for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
+	for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
 		if (ItemAt(index)->IsSelected()) {
 			ItemAt(index)->Deselect();
 			InvalidateItem(index);
@@ -871,13 +871,13 @@ BListView::DeselectExcept(int32 start, int32 finish)
 
 	// TODO: check if the items from start to finish are
 	// supposed to be selected if not already
-    for (index = fFirstSelected; index < start; index++) {
+    	for (index = fFirstSelected; index < start; index++) {
 		if (ItemAt(index)->IsSelected()) {
 			ItemAt(index)->Deselect();
 			InvalidateItem(index);
 		}
-    }
-    for (index = finish + 1; index <= fLastSelected; index++) {
+    	}
+    	for (index = finish + 1; index <= fLastSelected; index++) {
 		if (ItemAt(index)->IsSelected()) {
 			ItemAt(index)->Deselect();
 			InvalidateItem(index);
@@ -1227,35 +1227,30 @@ BListView::_Select(int32 index, bool extend)
 	if (index < 0 || index >= CountItems())
 		return false;
 
-    if ((fFirstSelected != -1) && (!extend))
-    {
-		for (int32 item = fFirstSelected; item <= fLastSelected; ++item)
-		{
-			if ((ItemAt(item)->IsSelected()) && (item != index))
-			{
-				ItemAt(item)->Deselect();
-				InvalidateItem(item);
+	if ((fFirstSelected != -1) && (!extend)) {
+		for (int32 i = fFirstSelected; i <= fLastSelected; ++i) {
+			BListItem *item = ItemAt(i);
+			if (item && item->IsSelected() && (i != index)) {
+				item->Deselect();
+				InvalidateItem(i);
 			}
 		}
-
 		fFirstSelected = -1;
 	}
 
-    if (fFirstSelected == -1)
-    {
+	if (fFirstSelected == -1) {
 		fFirstSelected = index;
 		fLastSelected = index;
 	}
-    else if (index < fFirstSelected)
+	else if (index < fFirstSelected)
 		fFirstSelected = index;
-    else if (index > fLastSelected)
+	else if (index > fLastSelected)
 		fLastSelected = index;
 
-    if (!ItemAt(index)->IsSelected())
-    {
+	if (ItemAt(index) && !ItemAt(index)->IsSelected()) {
 		ItemAt(index)->Select();
 		InvalidateItem(index);
-    }
+	}
 
 	return true;
 }
@@ -1267,36 +1262,31 @@ BListView::_Select(int32 from, int32 to, bool extend)
 	if (to < from)
 		return false;
 
-	if ((fFirstSelected != -1) && (!extend))
-    {
-		for (int32 item = fFirstSelected; item <= fLastSelected; ++item)
-		{
-			if ((ItemAt(item)->IsSelected()) && (item < from || item > to))
-			{
-				ItemAt(item)->Deselect();
-				InvalidateItem(item);
+	if ((fFirstSelected != -1) && (!extend)) {
+		for (int32 i = fFirstSelected; i <= fLastSelected; ++i) {
+			BListItem *item = ItemAt(i);
+			if (item && item->IsSelected() && (i < from || i > to)) {
+				ItemAt(i)->Deselect();
+				InvalidateItem(i);
 			}
 		}
-
 		fFirstSelected = -1;
 	}
 
-	if (fFirstSelected == -1)
-    {
+	if (fFirstSelected == -1) {
 		fFirstSelected = from;
 		fLastSelected = to;
 	}
-    else if (from < fFirstSelected)
+	else if (from < fFirstSelected)
 		fFirstSelected = from;
-    else if (to > fLastSelected)
+	else if (to > fLastSelected)
 		fLastSelected = to;
 
-	for (int32 item = from; item <= to; ++item)
-	{
-		if (!ItemAt(item)->IsSelected())
-		{
-			ItemAt(item)->Select();
-			InvalidateItem(item);
+	for (int32 i = from; i <= to; ++i) {
+		BListItem *item = ItemAt(i);
+		if (item && !item->IsSelected()) {
+			item->Select();
+			InvalidateItem(i);
 		}
 	}
 
