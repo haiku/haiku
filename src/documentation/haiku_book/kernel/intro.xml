@@ -5,21 +5,21 @@
 ]>
 
 <sect1 id="kernel-intro">
-<title>Introduction</title>
+	<title>Introduction</title>
 
-<para>
-Kernel Kit is about classes needed to interact with the kernel. Information about it is available in several topics :
-</para>
-<itemizedlist>
-<listitem><para>
-<xref linkend="kern-threads"/> helps to perform tasks.
-</para></listitem>
-<listitem><para>
-<xref linkend="kern-ports"/> helps to communicate between threads.
-</para></listitem>
-<listitem><para>
-<xref linkend="kern-sems"/> helps to synchronize threads.
-</para></listitem>
-</itemizedlist>
+	<para>
+		Kernel Kit is about classes needed to interact with the kernel. Information about it is available in several topics :
+	</para>
 
+	<itemizedlist>
+		<listitem><para>
+			<xref linkend="kern-threads"/> helps to perform tasks.
+		</para></listitem>
+		<listitem><para>
+			<xref linkend="kern-ports"/> helps to communicate between threads.
+		</para></listitem>
+		<listitem><para>
+			<xref linkend="kern-sems"/> helps to synchronize threads.
+		</para></listitem>
+	</itemizedlist>
 </sect1>

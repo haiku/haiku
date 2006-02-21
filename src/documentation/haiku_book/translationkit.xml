@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <chapter id="st-translationkit">
-<title>The Translation Kit</title>
+	<title>The Translation Kit</title>
 
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="translation/intro.xml" />
 </chapter>
 

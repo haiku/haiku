@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="support-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Support Kit</emphasis> is an assortment of easy to use classes which allow a programmer to quickly extend their applications without re-writing much common functionality. Many benefits can arrise from using these classes when one starts to extend an application in the future. Functionality includes:
+		<itemizedlist>
+			<listitem><para>
+				Threading utility classes:
+				<itemizedlist>
+					<listitem><para> BLocker and BAutoLock </para></listitem>
+					<listitem><para> "Thread Local Storage" </para></listitem>
+				</itemizedlist>
+			</para></listitem>
+			<listitem><para>
+				Archiving and IO:
+				<itemizedlist>
+					<listitem><para> BArchivable </para></listitem>
+					<listitem><para> BFlattenable </para></listitem>
+					<listitem><para> BDataIO and BPositionIO </para></listitem>
+					<listitem><para> BMemoryIO and BMallocIO </para></listitem>
+				</itemizedlist>
+			</para></listitem>
+			<listitem><para> BBlockCache </para></listitem>
+			<listitem><para> BList </para></listitem>
+			<listitem><para> BString </para></listitem>
+			<listitem><para> BStopWatch </para></listitem>
+			<listitem><para> Common types and constants </para></listitem>
+			<listitem><para> Error codes for all kits </para></listitem>
+		</itemizedlist> 
+	</para>
+</sect1>

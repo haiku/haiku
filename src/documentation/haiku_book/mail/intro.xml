@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="mail-intro">
+	<title>Introduction</title>
+
+	<para> The <emphasis>Mail Kit</emphasis> encompasses all email activities on Haiku, providing means for, but not limited to:
+		<itemizedlist>
+			<listitem>Sending and receiving of email</listitem>
+			<listitem>Interfacing for the manipulation of email messages and attachments</listitem>
+			<listitem>Manipulating email account information</listitem>
+		</itemizedlist>  
+	</para>
+</sect1>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="device-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Device Kit</emphasis> provides a collection of classes which provide a programmer a convenient interface with hardware devices attached to the computer. These classes free one from dealing with extraneous details, instead focusing on the device itself.
+	</para>
+
+	<itemizedlist>
+		<listitem><para>
+			<xref linkend="device-SerialPort"/> facilitates usage of an RS-232 port.
+		</para></listitem>
+		<listitem><para>
+			<xref linkend="device-Joystick"/> allows polling of any joystick or gamepad.
+		</para></listitem>
+	</itemizedlist>
+</sect1>
+

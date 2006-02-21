@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="midi-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Midi Kit</emphasis> provides classes capable of understanding the MIDI file format and synthesising the sounds described within. Furthermore, it also provides mechanisms for communicating with MIDI compliant hardware via messages.
+
+		<note>There are two versions of the Midi Kit, the latter reportedly much more up-to-date and more compatible with other applications. Though sadly it is undocumented. For more information consult the headers (At least until such time as this document is further updated).
+		</note>
+	</para>
+</sect1>

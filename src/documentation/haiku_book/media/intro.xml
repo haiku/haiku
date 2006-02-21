@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="media-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Media Kit</emphasis> controls the heart of the Haiku media playback, recording and transformation. It contains classes in two main areas:
+		<itemizedlist>
+			<listitem>Application: The consumption and production of media. Encoding, decoding and playback.</listitem>
+			<listitem>Node: Direct manipulation of media nodes which process the media</listitem>
+		</itemizedlist>
+	</para>
+</sect1>

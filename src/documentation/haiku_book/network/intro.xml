@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="network-intro">
+	<title>Introduction</title>
+
+	<para> The <emphasis>Network Kit</emphasis> encompasses all user network functionality in Haiku, providing both the standard UNIX/POSIX socket implementation along with a number of convenience classes for simple buffering, address operations and endpoint manipulation.
+	</para>
+</sect1>
+

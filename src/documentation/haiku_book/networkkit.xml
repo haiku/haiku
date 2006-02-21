@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <chapter id="st-networkkit">
-<title>The Network Kit</title>
+	<title>The Network Kit</title>
 
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="network/intro.xml" />
 </chapter>
 

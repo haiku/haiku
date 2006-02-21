@@ -2,13 +2,24 @@ SubDir HAIKU_TOP src documentation haiku_book ;
 
 Doc2HTML 
 	Haiku_Book.xml
-	: 
-	: http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl
+	: index.html
+	: http://docbook.sourceforge.net/release/xsl/current/html/chunk.xsl
 	: Haiku_Book
+	:
+	: -stringparam use.id.as.filename 1
 	;
 
+# Single most ugly string manipulation ever ...
 rule FRelGristFiles 
 {
+	#local targets = $(1) ;
+
+	#local fallbackgrist = $(2:J=!) ;
+	#local gristval = $(SOURCE_GRIST:E=$(fallbackgrist)) ;
+
+	#local sourcegrist = $(targets:G=gristval) ;
+	#return $(targets:G=$(gristval)) ;
+
 	return $(<:G=$(SOURCE_GRIST:E)$(>:J=!)) ;
 }
 
@@ -28,12 +39,56 @@ translationkit.xml ;
 
 Includes [ FGristFiles Haiku_Book.xml ] 
 	: [ FGristFiles $(chapter_files) ] <src!documentation>license.xml ;
-SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(SUB_DIR) ] ;
+SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(SUBDIR) ] ;
 
 local app_files = intro.xml messaging.xml scripting.xml Application.xml ;
 Includes [ FGristFiles appkit.xml ] : [ FRelGristFiles $(app_files) : app ] ;
-SEARCH on [ FRelGristFiles $(app_files) : app ] = [ FDirName $(SUB_DIR) app ] ;
+SEARCH on [ FRelGristFiles $(app_files) : app ] = [ FDirName $(SUBDIR) app ] ;
+
+local device_files = intro.xml Joystick.xml SerialPort.xml ;
+Includes [ FGristFiles devicekit.xml ] : [ FRelGristFiles $(device_files) : device ] ;
+SEARCH on [ FRelGristFiles $(device_files) : device ] = [ FDirName $(SUBDIR) device ] ;
+
+local game_files = intro.xml ;
+Includes [ FGristFiles gamekit.xml ] : [ FRelGristFiles $(game_files) : game ] ;
+SEARCH on [ FRelGristFiles $(game_files) : game ] = [ FDirName $(SUBDIR) game ] ;
+
+local interface_files = intro.xml ;
+Includes [ FGristFiles interfacekit.xml ] : [ FRelGristFiles $(interface_files) : interface ] ;
+SEARCH on [ FRelGristFiles $(interface_files) : interface ] = [ FDirName $(SUBDIR) interface ] ;
 
 local kern_files = intro.xml threads.xml ports.xml sems.xml ;
 Includes [ FGristFiles kernelkit.xml ] : [ FRelGristFiles $(kern_files) : kernel ] ;
-SEARCH on [ FRelGristFiles $(kern_files) : kernel ] = [ FDirName $(SUB_DIR) kernel ] ;
+SEARCH on [ FRelGristFiles $(kern_files) : kernel ] = [ FDirName $(SUBDIR) kernel ] ;
+
+local mail_files = intro.xml ;
+Includes [ FGristFiles mailkit.xml ] : [ FRelGristFiles $(mail_files) : mail ] ;
+SEARCH on [ FRelGristFiles $(mail_files) : mail ] = [ FDirName $(SUBDIR) mail ] ;
+
+local media_files = intro.xml ;
+Includes [ FGristFiles mediakit.xml ] : [ FRelGristFiles $(media_files) : media ] ;
+SEARCH on [ FRelGristFiles $(media_files) : media ] = [ FDirName $(SUBDIR) media ] ;
+
+local midi_files = intro.xml ;
+Includes [ FGristFiles midikit.xml ] : [ FRelGristFiles $(midi_files) : midi ] ;
+SEARCH on [ FRelGristFiles $(midi_files) : midi ] = [ FDirName $(SUBDIR) midi ] ;
+
+local network_files = intro.xml ;
+Includes [ FGristFiles networkkit.xml ] : [ FRelGristFiles $(network_files) : network ] ;
+SEARCH on [ FRelGristFiles $(network_files) : network ] = [ FDirName $(SUBDIR) network ] ;
+
+local opengl_files = intro.xml ;
+Includes [ FGristFiles openglkit.xml ] : [ FRelGristFiles $(opengl_files) : opengl ] ;
+SEARCH on [ FRelGristFiles $(opengl_files) : opengl ] = [ FDirName $(SUBDIR) opengl ] ;
+
+local storage_files = intro.xml ;
+Includes [ FGristFiles storagekit.xml ] : [ FRelGristFiles $(storage_files) : storage ] ;
+SEARCH on [ FRelGristFiles $(storage_files) : storage ] = [ FDirName $(SUBDIR) storage ] ;
+
+local support_files = intro.xml ;
+Includes [ FGristFiles supportkit.xml ] : [ FRelGristFiles $(support_files) : support ] ;
+SEARCH on [ FRelGristFiles $(support_files) : support ] = [ FDirName $(SUBDIR) support ] ;
+
+local translation_files = intro.xml ;
+Includes [ FGristFiles translationkit.xml ] : [ FRelGristFiles $(translation_files) : translation ] ;
+SEARCH on [ FRelGristFiles $(translation_files) : translation ] = [ FDirName $(SUBDIR) translation ] ;

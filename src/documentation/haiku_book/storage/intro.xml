@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="storage-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Storage Kit</emphasis> deals with the manipulation, retrieval and creation of filesystem objects. This is enabled by the Haiku implementation of the POSIX filesystem functions (written in C) and a collection of C++ classes which are concerned with areas such as:
+		<itemizedlist>
+			<listitem><para> Entries/nodes </para></listitem>
+			<listitem><para> Volumes </para></listitem>
+			<listitem><para> Queries/Indices </para></listitem>
+			<listitem><para> Utility classes </para></listitem>
+		</itemizedlist>
+	</para>
+</sect1>

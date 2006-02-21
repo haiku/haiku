@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <chapter id="st-interfacekit">
-<title>The Interface Kit</title>
-
+	<title>The Interface Kit</title>
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="interface/intro.xml" />
 </chapter>
 

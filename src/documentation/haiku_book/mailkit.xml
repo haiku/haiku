@@ -3,5 +3,6 @@
 <chapter id="st-mailkit">
 <title>The Mail Kit</title>
 
-</chapter>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="mail/intro.xml" />
 
+</chapter>

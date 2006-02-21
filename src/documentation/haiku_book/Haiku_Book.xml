@@ -25,56 +25,57 @@
 <!ENTITY license SYSTEM "../license.xml">
 
 <!-- Text Macros -->
-<!ENTITY haikuorg '<ulink url="http://www.haiku-os.org">Haiku</ulink>'>
+<!ENTITY haikuorg '<ulink url="http://www.haiku-os.org/">Haiku</ulink>'>
 <!ENTITY haiku "Haiku">
 
 ]>
 
 <book id="index">
-  <bookinfo>
-    <title>Haiku Book</title>
-    <pubdate>2005-05-16</pubdate>
-    <author>
-      <firstname>Jerome</firstname>
-      <surname>Duval</surname>
-    </author>
+	<bookinfo>
+		<title>Haiku Book</title>
+		<pubdate>2005-05-16</pubdate>
+		<authorgroup>
+			<author>
+				<firstname>Jerome</firstname>
+				<surname>Duval</surname>
+    		</author>
+		</authorgroup>
 
-    <abstract>
-	 	<para>
-			This guide is the documentation for the C and C++ API of &haiku;.
-		</para>
-    </abstract>
+    	<abstract>
+			<para>
+				This guide is the documentation for the C and C++ API of &haiku;.
+			</para>
+    	</abstract>
 	 
-    <revhistory>
-	 <revision>
-	 <revnumber>1.0</revnumber>
-	 <date>2005-05-16</date>
-	 <authorinitials>kor</authorinitials>
-	 <revremark>Initial version.</revremark>
-	 </revision>
-    </revhistory>
-  </bookinfo>
+		<revhistory>
+			<revision>
+				<revnumber>1.00</revnumber>
+				<date>2005-05-16</date>
+				<authorinitials>kor</authorinitials>
+				<revremark>Initial version.</revremark>
+			</revision>
+		</revhistory>
+  	</bookinfo>
 
 
-<!-- Chapters
--->
-&appkit;
-&devicekit;
-&gamekit;
-&interfacekit;
-&kernelkit;
-&mailkit;
-&mediakit;
-&midikit;
-&networkkit;
-&openglkit;
-&storagekit;
-&supportkit;
-&translationkit;
-
-<!-- 
-	The License 
--->
-&license;
-
+	<!-- Chapters
+	-->
+	&appkit;
+	&devicekit;
+	&gamekit;
+	&interfacekit;
+	&kernelkit;
+	&mailkit;
+	&mediakit;
+	&midikit;
+	&networkkit;
+	&openglkit;
+	&storagekit;
+	&supportkit;
+	&translationkit;
+	
+	<!-- 
+		The License 
+	-->
+	&license;
 </book>

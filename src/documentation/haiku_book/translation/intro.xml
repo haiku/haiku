@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="translation-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>Translation Kit</emphasis> gives the user the ability to convert media from one format into a number of target formats. To accomplish this it provides functionality in the form of BTranslatorRoster for the act, management and configuration of the translation and BTranslator for the creation of new translators between additional formats.
+	</para>
+</sect1>

@@ -5,21 +5,21 @@
 ]>
 
 <sect1 id="app-intro">
-<title>Introduction</title>
+	<title>Introduction</title>
 
-<para>
-Application Kit is about classes needed to interact with other applications or the screen. Information about it is available in several topics :
-</para>
-<itemizedlist>
-<listitem><para>
-<xref linkend="app-messaging"/> helps to send and receive data from other processes.
-</para></listitem>
-<listitem><para>
-<xref linkend="app-scripting"/> helps to operate by program on other applications.
-</para></listitem>
-<listitem><para>
-<xref linkend="app-Application"/> describes an application object. Each application creates one instance to register with the system.
-</para></listitem>
-</itemizedlist>
+	<para>
+		Application Kit is about classes needed to interact with other applications or the screen. Information about it is available in several topics :
+	</para>
 
+	<itemizedlist>
+		<listitem><para>
+			<xref linkend="app-messaging"/> helps to send and receive data from other processes.
+		</para></listitem>
+		<listitem><para>
+			<xref linkend="app-scripting"/> helps to operate by program on other applications.	
+		</para></listitem>
+		<listitem><para>
+			<xref linkend="app-Application"/> describes an application object. Each application creates one instance to register with the system.
+		</para></listitem>
+	</itemizedlist>
 </sect1>

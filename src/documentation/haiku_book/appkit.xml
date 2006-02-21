@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <chapter id="st-appkit">
-<title>The Application Kit</title>
+	<title>The Application Kit</title>
 
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/intro.xml" />
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/messaging.xml" />
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/scripting.xml" />
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/Application.xml" />
-
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/intro.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/messaging.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/scripting.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="app/Application.xml" />
 </chapter>
 

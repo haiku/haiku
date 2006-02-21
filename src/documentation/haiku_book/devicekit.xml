@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <chapter id="st-devicekit">
-<title>The Device Kit</title>
+	<title>The Device Kit</title>
 
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="device/intro.xml" />
+
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="device/Joystick.xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="device/SerialPort.xml" />
 </chapter>
 

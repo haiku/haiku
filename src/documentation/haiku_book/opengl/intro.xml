@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+
+]>
+
+<sect1 id="opengl-intro">
+	<title>Introduction</title>
+
+	<para>
+		The <emphasis>OpenGL Kit</emphasis> contains the Haiku OpenGL bindings and the BView subclass BGLView which manages the hardware interface and GL contexts.
+	</para>
+</sect1>
+
