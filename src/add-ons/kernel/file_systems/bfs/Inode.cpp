@@ -2258,7 +2258,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 			else if (parent != NULL && (mode & S_ATTR_DIR) != 0)
 				parent->Node().attributes.SetTo(0, 0, 0);
 
-			return status;
+			RETURN_ERROR(status);
 		}
 	}
 

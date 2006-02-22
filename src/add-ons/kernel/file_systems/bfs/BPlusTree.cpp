@@ -826,7 +826,7 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 					bplustree_node *newDuplicate;
 					status = cachedDuplicate.Allocate(transaction, &newDuplicate, &offset);
 					if (status < B_OK)
-						return status;
+						RETURN_ERROR(status);
 
 					// copy the array from the fragment node to the duplicate node
 					// and free the old entry (by zero'ing all values)
@@ -884,7 +884,7 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 			bplustree_node *newDuplicate;
 			status = cachedDuplicate.Allocate(transaction, &newDuplicate, &offset);
 			if (status < B_OK)
-				return status;
+				RETURN_ERROR(status);
 
 			// link the two nodes together
 			writableDuplicate->right_link = HOST_ENDIAN_TO_BFS_INT64(offset);
@@ -906,7 +906,7 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 			&offset, &fragment, &fragmentIndex) != B_OK) {
 		// allocate a new duplicate fragment node
 		if ((status = cachedDuplicate.Allocate(transaction, &fragment, &offset)) < B_OK)
-			return status;
+			RETURN_ERROR(status);
 
 		memset(fragment, 0, fNodeSize);
 	}
@@ -1233,9 +1233,13 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength, 
 
 			// is this a duplicate entry?
 			if (status == B_OK) {
-				if (fAllowDuplicates)
-					return InsertDuplicate(transaction, cached, node, nodeAndKey.keyIndex, value);
-
+				if (fAllowDuplicates) {
+					status = InsertDuplicate(transaction, cached, node, nodeAndKey.keyIndex, value);
+					if (status != B_OK)
+						RETURN_ERROR(status);
+					return B_OK;
+				}
+				
 				RETURN_ERROR(B_NAME_IN_USE);
 			}
 		}
