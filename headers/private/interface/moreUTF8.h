@@ -159,10 +159,8 @@ UTF8ToCharCode(const char **bytes)
 	}
 
 	if ((*bytes)[0] == 0) {
-		/*	We do not advance beyond the terminating 0. Just pad any further
-			request with spaces. */
-		result += 0x20;
-		return result;
+		/*	We do not advance beyond the terminating 0. */
+		return 0x00;
 	}
 
 	result += (*bytes)[0];

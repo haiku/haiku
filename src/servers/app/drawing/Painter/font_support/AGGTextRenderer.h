@@ -48,9 +48,6 @@ class AGGTextRenderer {
 											uint32 length);
 
  private:
-			status_t			_PrepareUnicodeBuffer(const char* utf8String,
-													  uint32 length,
-													  uint32* glyphCount);
 			void				_UpdateSizeAndHinting(float size, bool hinted,
 													  bool force = false);
 

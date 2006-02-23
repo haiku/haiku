@@ -81,11 +81,21 @@ CubicToFunc(FT_Vector *control1, FT_Vector *control2, FT_Vector *to, void *user)
 
 
 inline bool
-is_white_space(uint16 glyph)
+is_white_space(uint32 charCode)
 {
-	// TODO: handle them all!
-	if (glyph == ' ' || glyph == B_TAB)
-		return true;
+	switch (charCode) {
+		case 0x0009:	/* tab */
+		case 0x000b:	/* vertical tab */
+		case 0x000c:	/* form feed */
+		case 0x0020:	/* space */
+		case 0x00a0:	/* non breaking space */
+		case 0x000a:	/* line feed */
+		case 0x000d:	/* carriage return */
+		case 0x2028:	/* line separator */
+		case 0x2029:	/* paragraph separator */
+			return true;
+	}
+
 	return false;
 }
 
@@ -428,10 +438,9 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 	const char *string = charArray;
 	for (int i = 0; i < numChars; i++) {
-		// Do this first as UTF8ToCharCode advances string.
-		escapementArray[i].x = is_white_space(*string) ? delta.space : delta.nonspace;
-
-		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		uint32 charCode = UTF8ToCharCode(&string);
+		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
+		escapementArray[i].x = is_white_space(charCode) ? delta.space : delta.nonspace;
 		escapementArray[i].x += float(face->glyph->advance.x) / 64;
 		escapementArray[i].y = -float(face->glyph->advance.y) / 64;
 		escapementArray[i].x /= fSize;
@@ -466,10 +475,9 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 	const char *string = charArray;
 	for (int i = 0; i < numChars; i++) {
-		// Do this first as UTF8ToCharCode advances string.
-		widthArray[i] = is_white_space(*string) ? delta.space : delta.nonspace;
-
-		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		uint32 charCode = UTF8ToCharCode(&string);
+		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
+		widthArray[i] = is_white_space(charCode) ? delta.space : delta.nonspace;
 		widthArray[i] += float(face->glyph->metrics.horiAdvance) / 64.0;
 		widthArray[i] /= fSize;
 	}
@@ -493,14 +501,15 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
 
 	const char *string = charArray;
 	for (int i = 0; i < numChars; i++) {
+		uint32 charCode = UTF8ToCharCode(&string);
 		if (stringEscapement) {
 			if (i > 0)
-				rectArray[i].OffsetBy(is_white_space(*string) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
+				rectArray[i].OffsetBy(is_white_space(charCode) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
 
-			rectArray[i].OffsetBy(is_white_space(*string) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
+			rectArray[i].OffsetBy(is_white_space(charCode) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
 		}
 
-		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
 		if (i < numChars - 1) {
 			rectArray[i + 1].left = rectArray[i + 1].right = rectArray[i].left
 				+ face->glyph->metrics.horiAdvance / 64.0;
