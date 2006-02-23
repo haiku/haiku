@@ -148,12 +148,17 @@ my_device_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	size_t bytes = 0;
 	
-	if (position > 0) {
-		*num_bytes = 0;
-	} else {
+	if (position == 0) { // First read
 		dump_acpi_namespace("\\", buf, &bytes, 0);
-		*num_bytes = bytes;
-		dprintf("num_bytes %lu\n", *num_bytes);
+		if (bytes <= *num_bytes) {
+			*num_bytes = bytes;
+			dprintf("acpi_ns_dump: read %lu bytes\n", *num_bytes);
+		} else {
+			*num_bytes = 0;
+			return B_IO_ERROR;
+		}
+	} else {
+		*num_bytes = 0;
 	}
 	
 	return B_OK;
