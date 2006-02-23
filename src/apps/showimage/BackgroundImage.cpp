@@ -39,6 +39,7 @@ All rights reserved.
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <Messenger.h>
 #include <Message.h>
 #include <Path.h>
 #include <Window.h>
