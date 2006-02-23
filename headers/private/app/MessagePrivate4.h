@@ -20,8 +20,7 @@
 #define MAX_ITEM_PREALLOCATION			B_PAGE_SIZE
 
 
-static const int32 kPortMessageCodeDirect = 'pjpp';
-static const int32 kPortMessageCodeByArea = 'pjp2';
+static const int32 kPortMessageCode = 'pjpp';
 
 
 enum {
@@ -31,7 +30,8 @@ enum {
 	MESSAGE_FLAG_IS_REPLY = 0x0008,
 	MESSAGE_FLAG_WAS_DELIVERED = 0x0010,
 	MESSAGE_FLAG_HAS_SPECIFIERS = 0x0020,
-	MESSAGE_FLAG_WAS_DROPPED = 0x0080
+	MESSAGE_FLAG_WAS_DROPPED = 0x0080,
+	MESSAGE_FLAG_PASS_BY_AREA = 0x0100
 };
 
 
@@ -180,12 +180,6 @@ class BMessage::Private {
 		FlattenToArea(message_header **header) const
 		{
 			return fMessage->_FlattenToArea(header);
-		}
-
-		status_t
-		Reference(message_header *header)
-		{
-			return fMessage->_Reference(header);
 		}
 
 		status_t
