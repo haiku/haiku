@@ -255,7 +255,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type, const uint
 		
 	BPlusTree *tree;
 	if ((status = Node()->GetTree(&tree)) < B_OK)
-		status;
+		return status;
 
 	// remove the old key from the tree
 
@@ -265,7 +265,7 @@ Index::Update(Transaction &transaction, const char *name, int32 type, const uint
 			// That's not nice, but should be no reason to let the whole thing fail
 			INFORM(("Could not find value in index \"%s\"!\n", name));
 		} else if (status < B_OK)
-			status;
+			return status;
 	}
 
 	// add the new key to the tree
