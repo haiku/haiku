@@ -708,6 +708,18 @@ BMenuItem::DrawMarkSymbol()
 void
 BMenuItem::DrawShortcutSymbol()
 {
+	// TODO: Review this
+	BPoint where(ContentLocation() + BPoint(fBounds.Width() - 32.0f, fBounds.Height() - 4.0f));
+	if (fSubmenu)
+		where.x -= 12;
+
+	// TODO: If the shortcut is one of B_DOWN_ARROW, B_UP_ARROW, B_ENTER, etc.
+	// we can't just use DrawString(), as those aren't valid ascii/UTF8 charachters.
+	// In that case we need to build a BBitmap for the given shortcut and draw it using DrawBitmap()
+	fSuper->DrawChar(fShortcutChar, where);
+	
+	where -= BPoint(20, 10);
+
 	if (fModifiers & B_COMMAND_KEY) {
 		key_map *keys; 
 		char *chars; 
@@ -718,9 +730,10 @@ BMenuItem::DrawShortcutSymbol()
 			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
 		else
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
-		fSuper->DrawBitmap(&control, rect, rect.OffsetByCopy(ContentLocation() +
-			BPoint(fBounds.Width() - 52.0f, fBounds.Height() - 4.0f - rect.Height())));
-				
+		fSuper->DrawBitmap(&control, where);
+		
+		where.x -= rect.Width();
+	
 		free(chars);
 		free(keys);
 	}
@@ -728,15 +741,8 @@ BMenuItem::DrawShortcutSymbol()
 		BRect rect(0,0,21,10);
 		BBitmap shift(rect, B_COLOR_8_BIT);
 		shift.SetBits(kShiftBits, kShiftLength, 0, B_COLOR_8_BIT);
-		fSuper->DrawBitmap(&shift, rect, rect.OffsetByCopy(ContentLocation() +
-			BPoint(fBounds.Width() - 74.0f, fBounds.Height() - 4.0f - rect.Height())));
+		fSuper->DrawBitmap(&shift, where - BPoint(6, 0));
 	}
-	
-	// TODO: If the shortcut is one of B_DOWN_ARROW, B_UP_ARROW, B_ENTER, etc.
-	// we can't just use DrawString(), as those aren't valid ascii/UTF8 charachters.
-	// In that case we need to build a BBitmap for the given shortcut and draw it using DrawBitmap()
-	fSuper->DrawChar(fShortcutChar, ContentLocation() +
-		BPoint(fBounds.Width() - 32.0f, fBounds.Height() - 4.0f));
 }
 
 
