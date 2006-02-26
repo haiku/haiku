@@ -222,12 +222,10 @@ AGGTextRenderer::RenderString(const char* string,
 		}*/
 
 		const agg::glyph_cache* glyph = fFontCache.glyph(charCode);
+		if (glyph == NULL) {
+			fprintf(stderr, "failed to load glyph for 0x%04lx (%c)\n", charCode,
+				isprint(charCode) ? (char)charCode : '-');
 
-		if (!glyph) {
-			if (charCode >= 0x20 && charCode < 0x80)
-				fprintf(stderr, "failed to load glyph for '%c'\n", (char)charCode);
-			else
-				fprintf(stderr, "failed to load glyph for 0x%04x\n", charCode);
 			continue;
 		}
 
