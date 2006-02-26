@@ -1,30 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ColorSet.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for encapsulating GUI system colors
-//					
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+/**	Class for encapsulating GUI system colors */
+
 #include <stdio.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -152,32 +136,32 @@ ColorSet::SetToDefaults(void)
 #ifdef DEBUG_COLORSET
 printf("Initializing color settings to defaults\n");
 #endif
-	SetRGBColor(&panel_background,216,216,216);
-	SetRGBColor(&panel_text,0,0,0);
-	SetRGBColor(&document_background,255,255,255);
-	SetRGBColor(&document_text,0,0,0);
-	SetRGBColor(&control_background,245,245,245);
-	SetRGBColor(&control_text,0,0,0);
-	SetRGBColor(&control_border,0,0,0);
+	SetRGBColor(&panel_background, 216, 216, 216);
+	SetRGBColor(&panel_text, 0, 0, 0);
+	SetRGBColor(&document_background, 255, 255, 255);
+	SetRGBColor(&document_text, 0, 0, 0);
+	SetRGBColor(&control_background, 245, 245, 245);
+	SetRGBColor(&control_text, 0, 0, 0);
+	SetRGBColor(&control_border, 0, 0, 0);
 	SetRGBColor(&control_highlight, 102, 152, 203);
-	SetRGBColor(&keyboard_navigation_base,0,0,229);
-	SetRGBColor(&keyboard_navigation_pulse,0,0,0);
-	SetRGBColor(&shine,255,255,255);
-	SetRGBColor(&shadow,0,0,0);
-	SetRGBColor(&menu_background,216,216,216);
-	SetRGBColor(&menu_selected_background,115,120,184);
-	SetRGBColor(&menu_text,0,0,0);
-	SetRGBColor(&menu_selected_text,255,255,255);
-	SetRGBColor(&menu_selected_border,0,0,0);
-	SetRGBColor(&tooltip_background,255,255,0);
-	SetRGBColor(&tooltip_text,0,0,0);
-	SetRGBColor(&success,0,255,0);
-	SetRGBColor(&failure,255,0,0);
-	SetRGBColor(&window_tab,255,203,0);
+	SetRGBColor(&keyboard_navigation_base, 0, 0, 229);
+	SetRGBColor(&keyboard_navigation_pulse, 0, 0, 0);
+	SetRGBColor(&shine, 255, 255, 255);
+	SetRGBColor(&shadow, 0, 0, 0);
+	SetRGBColor(&menu_background, 216, 216, 216);
+	SetRGBColor(&menu_selected_background, 115, 120, 184);
+	SetRGBColor(&menu_text, 0, 0, 0);
+	SetRGBColor(&menu_selected_text, 255, 255, 255);
+	SetRGBColor(&menu_selected_border, 0, 0, 0);
+	SetRGBColor(&tooltip_background, 255, 255, 0);
+	SetRGBColor(&tooltip_text, 0, 0, 0);
+	SetRGBColor(&success, 0, 255, 0);
+	SetRGBColor(&failure, 255, 0, 0);
+	SetRGBColor(&window_tab, 255, 203, 0);
 
-	SetRGBColor(&window_tab_text,0,0,0);
-	SetRGBColor(&inactive_window_tab,216,216,216);
-	SetRGBColor(&inactive_window_tab_text,80,80,80);
+	SetRGBColor(&window_tab_text, 0, 0, 0);
+	SetRGBColor(&inactive_window_tab, 232, 232, 232);
+	SetRGBColor(&inactive_window_tab_text, 80, 80, 80);
 }
 
 /*!
