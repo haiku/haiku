@@ -161,10 +161,10 @@ void
 BListView::Draw(BRect updateRect)
 {
 	for (int i = 0; i < CountItems(); i++) {
-		BRect item_frame = ItemFrame(i);
+		BRect itemFrame = ItemFrame(i);
 
-		if (item_frame.Intersects(updateRect))
-			DrawItem(((BListItem*)ItemAt(i)), item_frame);
+		if (itemFrame.Intersects(updateRect))
+			DrawItem(((BListItem*)ItemAt(i)), itemFrame);
 	}
 }
 
@@ -324,6 +324,33 @@ BListView::MouseDown(BPoint point)
 		if (!(modifiers & B_SHIFT_KEY))
 			DeselectAll();
 	}
+}
+
+// MouseUp
+void
+BListView::MouseUp(BPoint pt)
+{
+	if (fWidth == 0)
+		return;
+
+	DoMouseMoved(pt);
+	DoMouseUp(pt);
+
+	fTrack->item_index = -1;
+	fTrack->try_drag = false;
+}
+
+// MouseMoved
+void
+BListView::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
+{
+	if (fTrack->item_index == -1)
+		return;
+
+	if (_TryInitiateDrag(pt))
+		return;
+
+	DoMouseMoved(pt);
 }
 
 // KeyDown
@@ -986,11 +1013,12 @@ BListView::ItemFrame(int32 index)
 	if (index < 0 || index >= CountItems())
 		return frame;
 
+	// TODO: this is very expensive, the (last) offsets could be cached
 	for (int32 i = 0; i <= index; i++) {
 		frame.top = frame.bottom + 1;
 		frame.bottom += (float)ceil(ItemAt(i)->Height());
 	}
-	
+
 	return frame;
 }
 
@@ -1038,30 +1066,6 @@ BListView::WindowActivated(bool state)
 	if (IsFocus()) {
 		Invalidate();
 	}
-}
-
-// MouseUp
-void
-BListView::MouseUp(BPoint pt)
-{
-	if (fWidth == 0)
-		return;
-
-	DoMouseMoved(pt);
-	DoMouseUp(pt);
-}
-
-// MouseMoved
-void
-BListView::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
-{
-	if (fTrack == NULL)
-		return;
-
-	if (_TryInitiateDrag(pt))
-		return;
-
-	DoMouseMoved(pt);
 }
 
 // DetachedFromWindow
@@ -1158,6 +1162,7 @@ BListView::_InitObject(list_view_type type)
 	fScrollView = NULL;
 	fTrack = new track_data;
 	fTrack->try_drag = false;
+	fTrack->item_index = -1;
 }
 
 // _FixupScrollBar
