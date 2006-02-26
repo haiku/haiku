@@ -101,6 +101,9 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fDrawingEngine(drawingEngine),
 	fDesktop(window->Desktop()),
 
+	fLastMousePosition(0.0, 0.0),
+	fLastMoveTime(0),
+
 	fCurrentUpdateSession(),
 	fPendingUpdateSession(),
 	fUpdateRequested(false),
@@ -916,6 +919,18 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	if (!isLatestMouseMoved)
 		return;
 
+	// limit the rate at which "mouse moved" events
+	// are handled that move or resize the window
+	if (fIsDragging || fIsResizing) {
+		bigtime_t now = system_time();
+		if (now - fLastMoveTime < 20000) {
+			// TODO: add a "timed event" to query for
+			// the then current mouse position
+			return;
+		}
+		fLastMoveTime = now;
+	}
+
 	if (fDecorator) {
 		BRegion visibleBorder;
 		GetBorderRegion(&visibleBorder);
@@ -976,8 +991,10 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE && !IsFocus() && !(Flags() & B_AVOID_FOCUS))
+	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE
+		&& !IsFocus() && !(Flags() & B_AVOID_FOCUS)) {
 		fDesktop->SetFocusWindow(this);
+	}
 
 	// mouse cursor
 
