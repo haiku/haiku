@@ -81,10 +81,6 @@ public:
 									window_look look, window_feel feel, uint32 flags,
 									uint32 workspace);
 
-			// TODO: Ouch, that's not exactly a nice name
-			inline BMessage		&ClientViewsWithInvalidCoords()
-									{ return fClientViewsWithInvalidCoords; };
-		
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
 			::Desktop*			Desktop() const { return fDesktop; }
@@ -153,7 +149,6 @@ private:
 			BMessenger			fHandlerMessenger;
 			::EventTarget		fEventTarget;
 
-			BMessage			fClientViewsWithInvalidCoords;
 			int32				fRedrawRequested;
 
 			int32				fServerToken;
