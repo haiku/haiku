@@ -419,7 +419,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 
 		// the last allocation group may contain less blocks than the others
 		if (i == fNumGroups - 1) {
-			fGroups[i].fNumBits = volume->NumBlocks() - i * numBits;
+			fGroups[i].fNumBits = fVolume->NumBlocks() - i * numBits;
 			fGroups[i].fNumBlocks = fGroups[i].fNumBits >> (blockShift + 3);
 		} else {
 			fGroups[i].fNumBits = numBits;
