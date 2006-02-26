@@ -461,7 +461,16 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
 
 		dprintf("file_cache: read pages failed: %s\n", strerror(status));
 
+		for (int32 i = 0; i < vecCount; i++) {
+			addr_t base = (addr_t)vecs[i].iov_base;
+			size_t size = vecs[i].iov_len;
+	
+			for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE, base += B_PAGE_SIZE)
+				vm_put_physical_page(base);
+		}
+
 		mutex_lock(&cache->lock);
+
 		for (int32 i = 0; i < pageIndex; i++) {
 			vm_cache_remove_page(cache, pages[i]);
 			vm_page_set_state(pages[i], PAGE_STATE_FREE);
