@@ -1,6 +1,6 @@
 /* BlockAllocator - block bitmap handling and allocation policies
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -85,11 +85,19 @@ class AllocationGroup {
 		status_t Allocate(Transaction &transaction, uint16 start, int32 length);
 		status_t Free(Transaction &transaction, uint16 start, int32 length);
 
-		uint32 fNumBits;
-		int32 fStart;
-		int32 fFirstFree, fLargest, fLargestFirst;
+		uint32 NumBits() const { return fNumBits; }
+		uint32 NumBlocks() const { return fNumBlocks; }
+		int32 Start() const { return fStart; }
+
+	private:
+		friend class BlockAllocator;
+
+		uint32	fNumBits;
+		uint32	fNumBlocks;
+		int32	fStart;
+		int32	fFirstFree, fLargest, fLargestFirst;
 			// ToDo: fLargest & fLargestFirst are not maintained (and therefore used) yet!
-		int32 fFreeBits;
+		int32	fFreeBits;
 };
 
 
@@ -99,43 +107,45 @@ AllocationBlock::AllocationBlock(Volume *volume)
 }
 
 
-status_t 
+status_t
 AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
 {
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
-	// the last group may have less bits in the last block
-	if ((block + 1) * fNumBits > group.fNumBits)
-		fNumBits = group.fNumBits % fNumBits;
+	// the last group may have less bits than the others
+	if ((block + 1) * fNumBits > group.NumBits())
+		fNumBits = group.NumBits() % fNumBits;
 
 #ifdef DEBUG
 	fWritable = false;
 #endif
-	return CachedBlock::SetTo(group.fStart + block) != NULL ? B_OK : B_ERROR;
+	return CachedBlock::SetTo(group.Start() + block) != NULL ? B_OK : B_ERROR;
 }
 
 
-status_t 
+status_t
 AllocationBlock::SetToWritable(Transaction &transaction, AllocationGroup &group, uint16 block)
 {
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
 	// the last group may have less bits in the last block
-	if ((block + 1) * fNumBits > group.fNumBits)
-		fNumBits = group.fNumBits % fNumBits;
+	if ((block + 1) * fNumBits > group.NumBits())
+		fNumBits = group.NumBits() % fNumBits;
 
 #ifdef DEBUG
 	fWritable = true;
 #endif
-	return CachedBlock::SetToWritable(transaction, group.fStart + block) != NULL ? B_OK : B_ERROR;
+	return CachedBlock::SetToWritable(transaction, group.Start() + block) != NULL
+		? B_OK : B_ERROR;
 }
 
 
-bool 
+bool
 AllocationBlock::IsUsed(uint16 block)
 {
 	if (block > fNumBits)
 		return true;
+
 	// the block bitmap is accessed in 32-bit blocks
 	return Block(block >> 5) & HOST_ENDIAN_TO_BFS_INT32(1UL << (block % 32));
 }
@@ -205,6 +215,11 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 //	#pragma mark -
 
 
+/**	The allocation groups are created and initialized in
+ *	BlockAllocator::Initialize() and BlockAllocator::InitializeAndClearBitmap()
+ *	respectively.
+ */
+
 AllocationGroup::AllocationGroup()
 	:
 	fFirstFree(-1),
@@ -215,7 +230,7 @@ AllocationGroup::AllocationGroup()
 }
 
 
-void 
+void
 AllocationGroup::AddFreeRange(int32 start, int32 blocks)
 {
 	//D(if (blocks > 512)
@@ -350,7 +365,7 @@ BlockAllocator::~BlockAllocator()
 }
 
 
-status_t 
+status_t
 BlockAllocator::Initialize(bool full)
 {
 	if (fLock.InitCheck() < B_OK)
@@ -368,16 +383,16 @@ BlockAllocator::Initialize(bool full)
 	fLock.Lock();
 		// the lock will be released by the initialize() function
 
-	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::initialize,
+	thread_id id = spawn_kernel_thread((thread_func)BlockAllocator::_Initialize,
 			"bfs block allocator", B_LOW_PRIORITY, (void *)this);
 	if (id < B_OK)
-		return initialize(this);
+		return _Initialize(this);
 
 	return resume_thread(id);
 }
 
 
-status_t 
+status_t
 BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 {
 	status_t status = Initialize(false);
@@ -403,7 +418,13 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 			return B_ERROR;
 
 		// the last allocation group may contain less blocks than the others
-		fGroups[i].fNumBits = i == fNumGroups - 1 ? fVolume->NumBlocks() - i * numBits : numBits;
+		if (i == fNumGroups - 1) {
+			fGroups[i].fNumBits = volume->NumBlocks() - i * numBits;
+			fGroups[i].fNumBlocks = fGroups[i].fNumBits >> (blockShift + 3);
+		} else {
+			fGroups[i].fNumBits = numBits;
+			fGroups[i].fNumBlocks = blocks;
+		}
 		fGroups[i].fStart = offset;
 		fGroups[i].fFirstFree = fGroups[i].fLargestFirst = 0;
 		fGroups[i].fFreeBits = fGroups[i].fLargest = fGroups[i].fNumBits;
@@ -425,8 +446,8 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 }
 
 
-status_t 
-BlockAllocator::initialize(BlockAllocator *allocator)
+status_t
+BlockAllocator::_Initialize(BlockAllocator *allocator)
 {
 	// The lock must already be held at this point
 
@@ -447,11 +468,18 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 	int32 num = allocator->fNumGroups;
 
 	for (int32 i = 0; i < num; i++) {
-		if (read_pos(volume->Device(), offset << blockShift, buffer, blocks << blockShift) < B_OK)
+		if (read_pos(volume->Device(), offset << blockShift, buffer,
+				blocks << blockShift) < B_OK)
 			break;
 
 		// the last allocation group may contain less blocks than the others
-		groups[i].fNumBits = i == num - 1 ? volume->NumBlocks() - i * numBits : numBits;
+		if (i == num - 1) {
+			groups[i].fNumBits = volume->NumBlocks() - i * numBits;
+			groups[i].fNumBlocks = groups[i].fNumBits >> (blockShift + 3);
+		} else {
+			groups[i].fNumBits = numBits;
+			groups[i].fNumBlocks = blocks;
+		}
 		groups[i].fStart = offset;
 
 		// finds all free ranges in this allocation group
@@ -525,7 +553,7 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 sta
 	for (int32 i = 0; i < fNumGroups * 2; i++, group++, start = 0) {
 		group = group % fNumGroups;
 
-		if (start >= fGroups[group].fNumBits || fGroups[group].IsFull())
+		if (start >= fGroups[group].NumBits() || fGroups[group].IsFull())
 			continue;
 
 		if (i >= fNumGroups) {
@@ -553,12 +581,13 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 sta
 		uint32 block = start / (fVolume->BlockSize() << 3);
 		int32 range = 0, rangeStart = 0;
 
-		for (; block < fBlocksPerGroup; block++) {
+		for (; block < fGroups[group].NumBlocks(); block++) {
 			if (cached.SetTo(fGroups[group], block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
 			// find a block large enough to hold the allocation
-			for (uint32 bit = start % cached.NumBlockBits(); bit < cached.NumBlockBits(); bit++) {
+			for (uint32 bit = start % cached.NumBlockBits();
+					bit < cached.NumBlockBits(); bit++) {
 				if (!cached.IsUsed(bit)) {
 					if (range == 0) {
 						// start new range
@@ -576,6 +605,10 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 sta
 					range = 0;
 				}
 			}
+
+			// ToDo: we could also remember a "largest free block that fits the minimal
+			//	requirement" in the group, and use that - this would avoid the need
+			//	for a second run
 
 			// if we found a suitable block, mark the blocks as in use, and write
 			// the updated block bitmap back to disk
@@ -610,7 +643,7 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 sta
 }
 
 
-status_t 
+status_t
 BlockAllocator::AllocateForInode(Transaction &transaction, const block_run *parent,
 	mode_t type, block_run &run)
 {
@@ -628,7 +661,7 @@ BlockAllocator::AllocateForInode(Transaction &transaction, const block_run *pare
 }
 
 
-status_t 
+status_t
 BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks,
 	block_run &run, uint16 minimum)
 {
@@ -636,8 +669,8 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 		return B_ERROR;
 
 	// one block_run can't hold more data than there is in one allocation group
-	if (numBlocks > fGroups[0].fNumBits)
-		numBlocks = fGroups[0].fNumBits;
+	if (numBlocks > fGroups[0].NumBits())
+		numBlocks = fGroups[0].NumBits();
 
 	// since block_run.length is uint16, the largest number of blocks that
 	// can be covered by a block_run is 65535
@@ -686,7 +719,7 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 }
 
 
-status_t 
+status_t
 BlockAllocator::Free(Transaction &transaction, block_run run)
 {
 	Locker lock(fLock);
@@ -700,8 +733,8 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
 	// against the group size (the last group may have a different length)
 	if (group < 0 || group >= fNumGroups
-		|| start > fGroups[group].fNumBits
-		|| uint32(start + length) > fGroups[group].fNumBits
+		|| start > fGroups[group].NumBits()
+		|| uint32(start + length) > fGroups[group].NumBits()
 		|| length == 0) {
 		FATAL(("tried to free an invalid block_run (%ld, %u, %u)\n", group, start, length));
 		DEBUGGER(("tried to free invalid block_run"));
@@ -732,7 +765,7 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 }
 
 
-size_t 
+size_t
 BlockAllocator::BitmapSize() const
 {
 	return fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
@@ -744,8 +777,8 @@ BlockAllocator::BitmapSize() const
 //	the "chkbfs" command
 
 
-bool 
-BlockAllocator::IsValidCheckControl(check_control *control)
+bool
+BlockAllocator::_IsValidCheckControl(check_control *control)
 {
 	if (control == NULL
 		|| control->magic != BFS_IOCTL_CHECK_MAGIC) {
@@ -757,10 +790,10 @@ BlockAllocator::IsValidCheckControl(check_control *control)
 }
 
 
-status_t 
+status_t
 BlockAllocator::StartChecking(check_control *control)
 {
-	if (!IsValidCheckControl(control))
+	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
 	status_t status = fLock.Lock();
@@ -785,8 +818,9 @@ BlockAllocator::StartChecking(check_control *control)
 
 	// initialize bitmap
 	memset(fCheckBitmap, 0, size);
-	for (int32 block = fVolume->Log().Start() + fVolume->Log().Length(); block-- > 0;)
-		SetCheckBitmapAt(block);
+	for (int32 block = fVolume->Log().Start() + fVolume->Log().Length(); block-- > 0;) {
+		_SetCheckBitmapAt(block);
+	}
 
 	cookie->stack.Push(fVolume->Root());
 	cookie->stack.Push(fVolume->Indices());
@@ -802,7 +836,7 @@ BlockAllocator::StartChecking(check_control *control)
 }
 
 
-status_t 
+status_t
 BlockAllocator::StopChecking(check_control *control)
 {
 	check_cookie *cookie;
@@ -886,7 +920,7 @@ BlockAllocator::StopChecking(check_control *control)
 status_t
 BlockAllocator::CheckNextNode(check_control *control)
 {
-	if (!IsValidCheckControl(control))
+	if (!_IsValidCheckControl(control))
 		return B_BAD_VALUE;
 
 	check_cookie *cookie = (check_cookie *)control->cookie;
@@ -1046,7 +1080,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 
 bool
-BlockAllocator::CheckBitmapIsUsedAt(off_t block) const
+BlockAllocator::_CheckBitmapIsUsedAt(off_t block) const
 {
 	size_t size = BitmapSize();
 	uint32 index = block / 32;	// 32bit resolution
@@ -1058,7 +1092,7 @@ BlockAllocator::CheckBitmapIsUsedAt(off_t block) const
 
 
 void
-BlockAllocator::SetCheckBitmapAt(off_t block)
+BlockAllocator::_SetCheckBitmapAt(off_t block)
 {
 	size_t size = BitmapSize();
 	uint32 index = block / 32;	// 32bit resolution
@@ -1125,7 +1159,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 				// Set the block in the check bitmap as well, but have a look if it
 				// is already allocated first
 				uint32 offset = pos + block * bitsPerBlock;
-				if (CheckBitmapIsUsedAt(firstGroupBlock + offset)) {
+				if (_CheckBitmapIsUsedAt(firstGroupBlock + offset)) {
 					if (firstSet == -1) {
 						firstSet = firstGroupBlock + offset;
 						control->errors |= BFS_BLOCKS_ALREADY_SET;
@@ -1137,7 +1171,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 							type, run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + offset - 1));
 						firstSet = -1;
 					}
-					SetCheckBitmapAt(firstGroupBlock + offset);
+					_SetCheckBitmapAt(firstGroupBlock + offset);
 				}
 			}
 			length++;
