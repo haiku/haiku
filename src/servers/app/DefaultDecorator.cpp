@@ -646,17 +646,20 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 		switch (fLook){
 			case B_DOCUMENT_WINDOW_LOOK: {
+				if (!invalid.Intersects(r))
+					break;
+
 				float x = r.right - 3;
 				float y = r.bottom - 3;
 
-				if (!invalid.Intersects(r))
-					break;
-		
 				_driver->FillRect(BRect(x - 13, y - 13, x, y), fFrameColors[2]);
 				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2), fFrameColors[0]);
 				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1), fFrameColors[1]);
 				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15), fFrameColors[0]);
 				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14), fFrameColors[1]);
+
+				if (!IsFocus())
+					break;
 
 				for (int8 i = 1; i <= 4; i++) {
 					for (int8 j = 1; j <= i; j++) {
@@ -803,11 +806,25 @@ DefaultDecorator::_SetFocus()
 		fButtonLowColor.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->window_tab_text;
 		fTabColor = _colors->window_tab;
+
+//		fFrameColors[0].SetColor(152, 152, 152);
+//		fFrameColors[1].SetColor(255, 255, 255);
+		fFrameColors[2].SetColor(216, 216, 216);
+		fFrameColors[3].SetColor(136, 136, 136);
+//		fFrameColors[4].SetColor(152, 152, 152);
+//		fFrameColors[5].SetColor(96, 96, 96);
 	} else {
 		fButtonHighColor.SetColor(tint_color(_colors->inactive_window_tab,B_LIGHTEN_2_TINT));
 		fButtonLowColor.SetColor(tint_color(_colors->inactive_window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->inactive_window_tab_text;
 		fTabColor = _colors->inactive_window_tab;
+
+//		fFrameColors[0].SetColor(152, 152, 152);
+//		fFrameColors[1].SetColor(255, 255, 255);
+		fFrameColors[2].SetColor(232, 232, 232);
+		fFrameColors[3].SetColor(148, 148, 148);
+//		fFrameColors[4].SetColor(152, 152, 152);
+//		fFrameColors[5].SetColor(96, 96, 96);
 	}
 }
 
