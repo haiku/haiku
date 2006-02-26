@@ -836,26 +836,30 @@ BScrollBar::Draw(BRect updateRect)
 			_DrawDisabledBackground(thumbBG, light, dark, dark1);
 		} else {
 			// we could scroll, but we're simply disabled
+			float bgTint = 1.06;
+			rgb_color bgLight = tint_color(light, bgTint * 3);
+			rgb_color bgShadow = tint_color(dark, bgTint);
+			rgb_color bgFill = tint_color(dark1, bgTint);
 			if (fOrientation == B_HORIZONTAL) {
 				// left of thumb
 				BRect besidesThumb(thumbBG);
 				besidesThumb.right = rect.left - 1;
-				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
 				// right of thumb
 				besidesThumb.left = rect.right + 1;
 				besidesThumb.right = thumbBG.right;
-				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
 			} else {
 				// above thumb
 				BRect besidesThumb(thumbBG);
 				besidesThumb.bottom = rect.top - 1;
-				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
 				// below thumb
 				besidesThumb.top = rect.bottom + 1;
 				besidesThumb.bottom = thumbBG.bottom;
-				_DrawDisabledBackground(besidesThumb, light, dark, dark1);
+				_DrawDisabledBackground(besidesThumb, bgLight, bgShadow, bgFill);
 			}
-			// thumb
+			// thumb bevel
 			BeginLineArray(4);
 				AddLine(BPoint(rect.left, rect.bottom),
 						BPoint(rect.left, rect.top), light);
@@ -866,7 +870,7 @@ BScrollBar::Draw(BRect updateRect)
 				AddLine(BPoint(rect.right - 1, rect.bottom),
 						BPoint(rect.left + 1, rect.bottom), dark2);
 			EndLineArray();
-			// fill thumb
+			// thumb fill
 			rect.InsetBy(1.0, 1.0);
 			SetHighColor(dark1);
 			FillRect(rect);
@@ -1279,7 +1283,8 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 // _DrawDisabledBackground
 void
 BScrollBar::_DrawDisabledBackground(BRect area,
-									const rgb_color& light, const rgb_color& dark,
+									const rgb_color& light,
+									const rgb_color& dark,
 									const rgb_color& fill)
 {
 	if (!area.IsValid())
