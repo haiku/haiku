@@ -263,6 +263,7 @@ class WindowLayer {
 			::Desktop*			fDesktop;
 
 			BPoint				fLastMousePosition;
+			bigtime_t			fLastMoveTime;
 
 			// The synchronization, which client drawing commands
 			// belong to the redraw of which dirty region is handled
