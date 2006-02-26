@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -84,6 +84,8 @@ class EventDispatcher : public BLocker {
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
 
+		int32 ViewUnderMouse(EventTarget& target);
+
 		void SetDragMessage(BMessage& message);
 			// the message should be delivered on the next
 			// "mouse up".
@@ -123,6 +125,7 @@ class EventDispatcher : public BLocker {
 		thread_id		fCursorThread;
 
 		EventTarget*	fPreviousMouseTarget;
+		int32			fPreviousViewToken;
 		EventTarget*	fFocus;
 		bool			fSuspendFocus;
 

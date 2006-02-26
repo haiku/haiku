@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -216,6 +216,7 @@ EventDispatcher::EventDispatcher()
 	fThread(-1),
 	fCursorThread(-1),
 	fPreviousMouseTarget(NULL),
+	fPreviousViewToken(B_NULL_TOKEN),
 	fFocus(NULL),
 	fSuspendFocus(false),
 	fMouseFilter(NULL),
@@ -503,12 +504,24 @@ EventDispatcher::SetHWInterface(HWInterface* interface)
 }
 
 
+int32
+EventDispatcher::ViewUnderMouse(EventTarget& target)
+{
+	BAutolock _(this);
+	
+	if (&target == fPreviousMouseTarget)
+		return fPreviousViewToken;
+
+	return B_NULL_TOKEN;
+}
+
+
 void
 EventDispatcher::SetDragMessage(BMessage& message)
 {
 	printf("EventDispatcher::SetDragMessage()\n");
 
-	BAutolock _(*this);
+	BAutolock _(this);
 
 	fDragMessage = message;
 
@@ -744,6 +757,7 @@ EventDispatcher::_EventLoop()
 				}
 
 				current = fPreviousMouseTarget = mouseTarget;
+				fPreviousViewToken = viewToken;
 
 				if (current != NULL) {
 					int32 focusView = viewToken;
