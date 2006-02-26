@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -171,7 +171,10 @@ bfs_inode::InitCheck(Volume *volume)
 Inode::Inode(Volume *volume, vnode_id id)
 	:
 	fVolume(volume),
-	fID(id)
+	fID(id),
+	fTree(NULL),
+	fAttributes(NULL),
+	fCache(NULL)
 {
 	PRINT(("Inode::Inode(volume = %p, id = %Ld) @ %p\n", volume, id, this));
 
@@ -187,9 +190,6 @@ Inode::Inode(Volume *volume, vnode_id id)
 	fOldSize = Size();
 	fOldLastModified = LastModified();
 
-	fTree = NULL;
-	fCache = NULL;
-
 	if (IsContainer())
 		fTree = new BPlusTree(this);
 	if (IsFile() || IsAttribute())
@@ -200,7 +200,10 @@ Inode::Inode(Volume *volume, vnode_id id)
 Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode, block_run &run)
 	:
 	fVolume(volume),
-	fID(id)
+	fID(id),
+	fTree(NULL),
+	fAttributes(NULL),
+	fCache(NULL)
 {
 	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %Ld) @ %p\n",
 		volume, &transaction, id, this));
@@ -233,9 +236,6 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 	// these two will help to maintain the indices
 	fOldSize = Size();
 	fOldLastModified = LastModified();
-
-	fTree = NULL;
-	fCache = NULL;
 }
 
 
@@ -1154,6 +1154,7 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 				return fVolume->ValidateBlockRun(run);
 			}
 		}
+
 		//PRINT(("FindBlockRun() failed in direct range: size = %Ld, pos = %Ld\n",data->size,pos));
 		return B_ENTRY_NOT_FOUND;
 	}

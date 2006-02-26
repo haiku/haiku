@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -373,7 +373,7 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 {
 	Inode *inode = (Inode *)_node;
 
-	if (!inode->HasUserAccessableStream())
+	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	ReadLocked locked(inode->Lock());
@@ -411,7 +411,7 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 {
 	Inode *inode = (Inode *)_node;
 
-	if (!inode->HasUserAccessableStream())
+	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	ReadLocked locked(inode->Lock());

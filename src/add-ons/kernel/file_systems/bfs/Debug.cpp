@@ -1,6 +1,6 @@
 /* Debug - debug stuff
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * Some code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -41,20 +41,6 @@ void
 dump_block_run(const char *prefix, const block_run &run)
 {
 	Print("%s(%ld, %d, %d)\n", prefix, run.allocation_group, run.start, run.length);
-}
-
-
-void
-dump_inode(Inode &inode)
-{
-	Print("Inode (%p) {\n", &inode);
-	Print("\tfVolume = %p\n", inode.fVolume);
-	Print("\tfBlockNumber = 0x%16Lx\n", inode.BlockNumber());
-	Print("\tfTree = %p\n", inode.fTree);
-	Print("\tfAttributes = %p\n", inode.fAttributes);
-	Print("\tfOldSize = 0x%16Lx\n", inode.fOldSize);
-	Print("\tfOldLastModified = 0x%16Lx\n", inode.fOldLastModified);
-	Print("}\n");
 }
 
 
@@ -271,7 +257,7 @@ dbg_inode(int argc, char **argv)
 	}
 
 	Inode *inode = (Inode *)parse_expression(argv[1]);
-	dump_inode(*inode);
+	dump_inode(&inode->Node());
 
 	return B_OK;
 }

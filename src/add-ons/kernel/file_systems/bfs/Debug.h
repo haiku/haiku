@@ -1,6 +1,6 @@
 /* Debug - debug stuff
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef DEBUG_H
@@ -92,7 +92,6 @@
 	
 	// some structure dump functions
 	extern void dump_block_run(const char *prefix, block_run &run);
-	extern void dump_inode(Inode &inode);
 	extern void dump_super_block(const disk_super_block *superBlock);
 	extern void dump_data_stream(const data_stream *stream);
 	extern void dump_inode(const bfs_inode *inode);
