@@ -40,6 +40,15 @@ const uint32 kMsgRemoveUninstalled = 'runs';
 const char*
 variety_to_text(uint32 variety)
 {
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
+#	define B_DEVELOPMENT_VERSION	0
+#	define B_ALPHA_VERSION			1
+#	define B_BETA_VERSION			2
+#	define B_GAMMA_VERSION			3
+#	define B_GOLDEN_MASTER_VERSION	4
+#	define B_FINAL_VERSION			5
+#endif
+
 	switch (variety) {
 		case B_DEVELOPMENT_VERSION:
 			return "Development";

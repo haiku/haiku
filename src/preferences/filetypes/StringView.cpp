@@ -6,8 +6,6 @@
 
 #include "StringView.h"
 
-//#include <Region.h>
-
 
 StringView::StringView(BRect frame, const char* name, const char* label,
 	const char* text, uint32 resizeMask, uint32 flags)
@@ -84,7 +82,13 @@ StringView::Draw(BRect updateRect)
 	float y = ceilf(fontHeight.ascent) + 1.0f;
 	float x;
 
-	SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
+	rgb_color textColor = {0, 0, 0, 255};
+#else
+	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
+#endif
+
+	SetHighColor(IsEnabled() ? textColor
 		: tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
 
 	if (Label()) {

@@ -9,8 +9,10 @@ Preference FileTypes :
 	FileTypes.cpp
 	FileTypesWindow.cpp
 	ApplicationTypesWindow.cpp
+	AttributeListView.cpp
 	MimeTypeListView.cpp
 	NewFileTypeWindow.cpp
+	AttributeWindow.cpp
 	ExtensionWindow.cpp
 	StringView.cpp
 	: be tracker

@@ -4,6 +4,8 @@
  */
 
 
+#include "AttributeListView.h"
+#include "AttributeWindow.h"
 #include "ExtensionWindow.h"
 #include "FileTypes.h"
 #include "FileTypesWindow.h"
@@ -56,22 +58,6 @@ const uint32 kMsgDescriptionEntered = 'dsce';
 
 const uint32 kMsgToggleIcons = 'tgic';
 
-const struct type_map {
-	const char*	name;
-	type_code	type;
-} kTypeMap[] = {
-	{"String",			B_STRING_TYPE},
-	{"Boolean",			B_BOOL_TYPE},
-	{"Integer 8 bit",	B_INT8_TYPE},
-	{"Integer 16 bit",	B_INT16_TYPE},
-	{"Integer 32 bit",	B_INT32_TYPE},
-	{"Integer 64 bit",	B_INT64_TYPE},
-	{"Float",			B_FLOAT_TYPE},
-	{"Double",			B_DOUBLE_TYPE},
-	{"Time",			B_TIME_TYPE},
-	{NULL,				0}
-};
-
 class IconView : public BControl {
 	public:
 		IconView(BRect frame, const char* name, BMessage* message);
@@ -91,38 +77,6 @@ class IconView : public BControl {
 	private:
 		BBitmap*	fIcon;
 		icon_source	fIconSource;
-};
-
-class AttributeListView : public BListView {
-	public:
-		AttributeListView(BRect frame, const char* name, uint32 resizingMode);
-		virtual ~AttributeListView();
-
-		void SetTo(BMimeType* type);
-
-		virtual void Draw(BRect updateRect);
-
-	private:
-		void _DeleteItems();
-};
-
-class AttributeItem : public BStringItem {
-	public:
-		AttributeItem(const char* name, const char* publicName, type_code type,
-			int32 alignment, int32 width, bool visible, bool editable);
-		virtual ~AttributeItem();
-
-		virtual void DrawItem(BView* owner, BRect itemRect,
-			bool drawEverything = false);
-
-	private:
-		BString		fName;
-		BString		fPublicName;
-		type_code	fType;
-		int32		fAlignment;
-		int32		fWidth;
-		bool		fVisible;
-		bool		fEditable;
 };
 
 
@@ -150,34 +104,6 @@ is_application_in_message(BMessage& applications, const char* app)
 	}
 
 	return false;
-}
-
-
-static void
-name_for_type(BString& string, type_code type)
-{
-	for (int32 i = 0; kTypeMap[i].name != NULL; i++) {
-		if (kTypeMap[i].type == type) {
-			string = kTypeMap[i].name;
-			return;
-		}
-	}
-
-	char buffer[32];
-	buffer[0] = '\'';
-	buffer[1] = 0xff & (type >> 24);
-	buffer[2] = 0xff & (type >> 16);
-	buffer[3] = 0xff & (type >> 8);
-	buffer[4] = 0xff & (type);
-	buffer[5] = '\'';
-	buffer[6] = 0;
-	for (int16 i = 0;i < 4;i++) {
-		if (buffer[i] < ' ')
-			buffer[i] = '.';
-	}
-
-	snprintf(buffer + 6, sizeof(buffer), " (0x%lx)", type);
-	string = buffer;
 }
 
 
@@ -306,152 +232,6 @@ IconView::GetPreferredSize(float* _width, float* _height)
 
 		*_height = B_LARGE_ICON + 3.0f + ceilf(fontHeight.ascent + fontHeight.descent);
 	}
-}
-
-
-//	#pragma mark -
-
-
-AttributeItem::AttributeItem(const char* name, const char* publicName,
-		type_code type, int32 alignment, int32 width, bool visible,
-		bool editable)
-	: BStringItem(publicName),
-	fName(name),
-	fType(type),
-	fAlignment(alignment),
-	fWidth(width),
-	fVisible(visible),
-	fEditable(editable)
-{
-}
-
-
-AttributeItem::~AttributeItem()
-{
-}
-
-
-void
-AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
-{
-	BStringItem::DrawItem(owner, frame, drawEverything);
-
-	rgb_color highColor = owner->HighColor();
-	rgb_color lowColor = owner->LowColor();
-
-	if (IsSelected())
-		owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
-
-	rgb_color black = {0, 0, 0, 255};
-
-	if (!IsEnabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-	else
-		owner->SetHighColor(black);
-
-	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f, owner->PenLocation().y);
-
-	BString type;
-	name_for_type(type, fType);
-	owner->DrawString(type.String());
-
-	owner->SetHighColor(tint_color(owner->ViewColor(), B_DARKEN_1_TINT));
-
-	float middle = frame.left + frame.Width() / 2.0f;
-	owner->StrokeLine(BPoint(middle, 0.0f), BPoint(middle, frame.bottom));
-
-	owner->SetHighColor(highColor);
-	owner->SetLowColor(lowColor);
-}
-
-
-//	#pragma mark -
-
-
-AttributeListView::AttributeListView(BRect frame, const char* name,
-		uint32 resizingMode)
-	: BListView(frame, name, B_SINGLE_SELECTION_LIST, resizingMode,
-		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE)
-{
-}
-
-
-AttributeListView::~AttributeListView()
-{
-	_DeleteItems();
-}
-
-
-void
-AttributeListView::_DeleteItems()
-{
-	for (int32 i = CountItems(); i-- > 0;) {
-		delete ItemAt(i);
-	}
-	MakeEmpty();
-}
-
-
-void
-AttributeListView::SetTo(BMimeType* type)
-{
-	_DeleteItems();
-
-	// fill it again
-	
-	if (type == NULL)
-		return;
-
-	BMessage attributes;
-	if (type->GetAttrInfo(&attributes) != B_OK)
-		return;
-
-	const char* publicName;
-	int32 i = 0;
-	while (attributes.FindString("attr:public_name", i, &publicName) == B_OK) {
-		const char* name;
-		if (attributes.FindString("attr:name", i, &name) != B_OK)
-			name = "-";
-
-		type_code type;
-		if (attributes.FindInt32("attr:type", i, (int32 *)&type) != B_OK)
-			type = B_STRING_TYPE;
-
-		bool editable;
-		if (attributes.FindBool("attr:editable", i, &editable) != B_OK)
-			editable = false;
-		bool visible;
-		if (attributes.FindBool("attr:viewable", i, &visible) != B_OK)
-			visible = false;
-		bool extra;
-		if (attributes.FindBool("attr:extra", i, &extra) != B_OK)
-			extra = false;
-
-		int32 alignment;
-		if (attributes.FindInt32("attr:alignment", i, &alignment) != B_OK)
-			alignment = B_ALIGN_LEFT;
-
-		int32 width;
-		if (attributes.FindInt32("attr:width", i, &width) != B_OK)
-			width = 50;
-
-		AddItem(new AttributeItem(name, publicName, type, alignment, width,
-			visible, editable));
-
-		i++;
-	}
-}
-
-
-void
-AttributeListView::Draw(BRect updateRect)
-{
-	BListView::Draw(updateRect);
-
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-
-	float middle = Bounds().Width() / 2.0f;
-	StrokeLine(BPoint(middle, 0.0f), BPoint(middle, Bounds().bottom));
 }
 
 
@@ -1282,12 +1062,32 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgAttributeInvoked:
-			puts("attr");
+		{
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				AttributeItem* item = (AttributeItem*)fAttributeListView->ItemAt(index);
+				if (item == NULL)
+					break;
+
+				BWindow* window = new AttributeWindow(this, fCurrentType,
+					item);
+				window->Show();
+			}
 			break;
+		}
 
 		case kMsgAddAttribute:
-			puts("add attr");
+		{
+			if (fCurrentType.Type() == NULL)
+				break;
+
+			BWindow* window = new AttributeWindow(this, fCurrentType, NULL);
+			window->Show();
 			break;
+		}
 
 		case kMsgRemoveAttribute:
 		{

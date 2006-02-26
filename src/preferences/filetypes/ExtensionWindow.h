@@ -19,11 +19,11 @@ class FileTypesWindow;
 
 class ExtensionWindow : public BWindow {
 	public:
-		ExtensionWindow(FileTypesWindow* target, BMimeType& type, const char* extension);
+		ExtensionWindow(FileTypesWindow* target, BMimeType& type,
+			const char* extension);
 		virtual ~ExtensionWindow();
 
 		virtual void MessageReceived(BMessage* message);
-		virtual bool QuitRequested();
 
 	private:
 		BMessenger		fTarget;

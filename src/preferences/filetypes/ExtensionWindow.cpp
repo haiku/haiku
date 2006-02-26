@@ -41,7 +41,7 @@ compare_extensions(const void* _a, const void* _b)
 
 
 ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
-	const char* extension)
+		const char* extension)
 	: BWindow(BRect(100, 100, 350, 200), "Extension", B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
 			| B_ASYNCHRONOUS_CONTROLS),
@@ -177,10 +177,3 @@ ExtensionWindow::MessageReceived(BMessage* message)
 	}
 }
 
-
-bool
-ExtensionWindow::QuitRequested()
-{
-	fTarget.SendMessage(kMsgNewTypeWindowClosed);
-	return true;
-}
