@@ -601,7 +601,7 @@ Desktop::SetCursor(ServerCursor* newCursor)
 	HWInterface()->SetCursor(newCursor);
 
 	if (oldCursor != NULL)
-		fCursorManager.ReleaseCursor(oldCursor);
+		oldCursor->Release();
 }
 
 

@@ -925,19 +925,33 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) port_id reply port
 
 			status_t status = B_ERROR;
-			int8 cursorData[68];
+			uint8 cursorData[68];
 			ServerCursor* cursor = NULL;
 
+//			if (link.Read(cursorData, sizeof(cursorData)) >= B_OK) {
+//				cursor = new (nothrow) ServerCursor(cursorData);
+//				if (cursor == NULL)
+//					status = B_NO_MEMORY;
+//			}
+//
+//			if (cursor != NULL) {
+//				cursor->SetOwningTeam(fClientTeam);
+//				fDesktop->GetCursorManager().AddCursor(cursor);
+//
+//				// Synchronous message - BApplication is waiting on the cursor's ID
+//				fLink.StartMessage(B_OK);
+//				fLink.Attach<int32>(cursor->Token());
+//			} else
+//				fLink.StartMessage(status);
+
 			if (link.Read(cursorData, sizeof(cursorData)) >= B_OK) {
-				cursor = new (nothrow) ServerCursor(cursorData);
+				cursor = fDesktop->GetCursorManager().CreateCursor(fClientTeam,
+																   cursorData);
 				if (cursor == NULL)
 					status = B_NO_MEMORY;
 			}
 
 			if (cursor != NULL) {
-				cursor->SetOwningTeam(fClientTeam);
-				fDesktop->GetCursorManager().AddCursor(cursor);
-
 				// Synchronous message - BApplication is waiting on the cursor's ID
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(cursor->Token());
@@ -952,14 +966,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Delete BCursor\n", Signature()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
-			int32 token = B_NULL_TOKEN;
+			int32 token;
+			bool pendingViewCursor;
 			link.Read<int32>(&token);
+			if (link.Read<bool>(&pendingViewCursor) != B_OK)
+				break;
 
 			if (fAppCursor && fAppCursor->Token() == token)
 				fAppCursor = NULL;
 
-			if (ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token))
-				fDesktop->GetCursorManager().ReleaseCursor(cursor);
+			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
+			if (cursor) {
+				if (pendingViewCursor)
+					cursor->SetPendingViewCursor(true);
+
+				cursor->Release();
+			}
 			break;
 		}
 

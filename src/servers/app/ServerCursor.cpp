@@ -17,8 +17,12 @@
 
 #include "ServerCursor.h"
 
+#include <new>
 #include <stdio.h>
 
+#include "CursorManager.h"
+
+using std::nothrow;
 
 /*!
 	\brief Constructor
@@ -36,7 +40,10 @@ ServerCursor::ServerCursor(BRect r, color_space format,
 	: ServerBitmap(r, format, flags, bytesPerRow, screen),
 	  fHotSpot(hotspot),
 	  fOwningTeam(-1),
-	  fReferenceCount(1)
+	  fReferenceCount(1),
+	  fCursorData(NULL),
+	  fManager(NULL),
+	  fPendingViewCursor(0)
 {
 	fHotSpot.ConstrainTo(Bounds());
 	_AllocateBuffer();
@@ -47,11 +54,14 @@ ServerCursor::ServerCursor(BRect r, color_space format,
 	\brief Constructor
 	\param data Pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
 */
-ServerCursor::ServerCursor(const int8* data)
+ServerCursor::ServerCursor(const uint8* data)
 	: ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
 	  fHotSpot(0, 0),
 	  fOwningTeam(-1),
-	  fReferenceCount(1)
+	  fReferenceCount(1),
+	  fCursorData(NULL),
+	  fManager(NULL),
+	  fPendingViewCursor(0)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
@@ -99,6 +109,10 @@ ServerCursor::ServerCursor(const int8* data)
 				bmppos[i] = ((cursorval != 0) ? black : white) &
 							((maskval > 0) ? 0xFFFFFFFF : 0x00FFFFFF);
 			}
+
+			fCursorData = new (nothrow) uint8[68];
+			if (fCursorData)
+				memcpy(fCursorData, data, 68);
 		}
 	} else {
 		fWidth = 0;
@@ -119,7 +133,10 @@ ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
 	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
 	  fHotSpot(0, 0),
 	  fOwningTeam(-1),
-	  fReferenceCount(1)
+	  fReferenceCount(1),
+	  fCursorData(NULL),
+	  fManager(NULL),
+	  fPendingViewCursor(0)
 {	
 	_AllocateBuffer();
 	if (Bits())
@@ -135,7 +152,10 @@ ServerCursor::ServerCursor(const ServerCursor* cursor)
 	: ServerBitmap(cursor),
 	  fHotSpot(0, 0),
 	  fOwningTeam(-1),
-	  fReferenceCount(1)
+	  fReferenceCount(1),
+	  fCursorData(NULL),
+	  fManager(NULL),
+	  fPendingViewCursor(0)
 {
 	// TODO: Hm. I don't move this into the if clause,
 	// because it might break code elsewhere.
@@ -146,6 +166,11 @@ ServerCursor::ServerCursor(const ServerCursor* cursor)
 		if (Bits() && cursor->Bits())
 			memcpy(Bits(), cursor->Bits(), BitsLength());
 		fHotSpot = cursor->fHotSpot;
+		if (cursor->fCursorData) {
+			fCursorData = new (nothrow) uint8[68];
+			if (fCursorData)
+				memcpy(fCursorData, cursor->fCursorData, 68);
+		}
 	}
 }
 
@@ -166,5 +191,39 @@ ServerCursor::SetHotSpot(BPoint hotSpot)
 {
 	fHotSpot = hotSpot;
 	fHotSpot.ConstrainTo(Bounds());
+}
+
+
+bool
+ServerCursor::Release()
+{
+	if (atomic_add(&fReferenceCount, -1) == 1) {
+		if (fPendingViewCursor > 0) {
+			// There is a SetViewCursor() waiting to be carried out
+			return false;
+		}
+
+		if (fManager) {
+			fManager->RemoveCursor(this);
+		}
+		delete this;
+
+		return true;
+	}
+	return false;
+}
+
+
+void
+ServerCursor::SetPendingViewCursor(bool pending)
+{
+	atomic_add(&fPendingViewCursor, pending ? 1 : -1);
+}
+
+
+void
+ServerCursor::AttachedToManager(CursorManager* manager)
+{
+	fManager = manager;
 }
 

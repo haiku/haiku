@@ -26,7 +26,7 @@ class ServerCursor : public ServerBitmap {
 										 int32 flags, BPoint hotspot,
 										 int32 bytesperrow = -1,
 										 screen_id screen = B_MAIN_SCREEN_ID);
-							ServerCursor(const int8* cursorDataFromR5);
+							ServerCursor(const uint8* cursorDataFromR5);
 							ServerCursor(const uint8* alreadyPaddedData,
 										 uint32 width, uint32 height,
 										 color_space format);
@@ -47,8 +47,16 @@ class ServerCursor : public ServerBitmap {
 			int32			Token() const
 								{ return fToken; }
 
-			void			Acquire() { atomic_add(&fReferenceCount, 1); }
-			bool			Release() { return atomic_add(&fReferenceCount, -1) == 1; }
+			void			Acquire()
+								{ atomic_add(&fReferenceCount, 1); }
+			bool			Release();
+
+			void			SetPendingViewCursor(bool pending);
+
+			void			AttachedToManager(CursorManager* manager);
+
+			const uint8*	CursorData() const
+								{ return fCursorData; }
 
  private:
 	friend class CursorManager;
@@ -56,6 +64,9 @@ class ServerCursor : public ServerBitmap {
 			BPoint			fHotSpot;
 			team_id			fOwningTeam;
 			int32			fReferenceCount;
+			uint8*			fCursorData;
+			CursorManager*	fManager;
+			vint32			fPendingViewCursor;
 };
 
 #endif	// SERVER_CURSOR_H

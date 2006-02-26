@@ -8,9 +8,11 @@
 
 /**	Handles the system's cursor infrastructure */
 
+#include "CursorManager.h"
+
+#include <stdio.h>
 
 #include "CursorData.h"
-#include "CursorManager.h"
 #include "HaikuSystemCursor.h"
 #include "ServerCursor.h"
 #include "ServerConfig.h"
@@ -67,53 +69,65 @@ CursorManager::CursorManager()
 CursorManager::~CursorManager()
 {
 	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
-		delete (ServerCursor *)fCursorList.ItemAt(i);
+		delete (ServerCursor*)fCursorList.ItemAtFast(i);
 	}
+}
+
+ServerCursor*
+CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
+{
+	if (!Lock())
+		return NULL;
+
+	ServerCursor* cursor = _FindCursor(clientTeam, cursorData);
+
+	if (!cursor) {
+		cursor = new (nothrow) ServerCursor(cursorData);
+		if (cursor) {
+			cursor->SetOwningTeam(clientTeam);
+			if (AddCursor(cursor) < B_OK) {
+				delete cursor;
+				cursor = NULL;
+			}
+		}
+	} else {
+		cursor->Acquire();
+	}
+
+	Unlock();
+	
+	return cursor;
 }
 
 
 /*!
 	\brief Registers a cursor with the manager.
-	\param sc ServerCursor object to register
-	\return The token assigned to the cursor or B_ERROR if sc is NULL
+	\param cursor ServerCursor object to register
+	\return The token assigned to the cursor or B_ERROR if cursor is NULL
 */
 int32
 CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 {
-	if (!cursor)
+	if (!cursor || !Lock())
 		return B_ERROR;
 
-	Lock();
-
-	fCursorList.AddItem(cursor);
-	if (token == -1)
-		cursor->fToken = fTokenSpace.NewToken(kCursorToken, cursor);
-	else {
-		fTokenSpace.SetToken(token, kCursorToken, cursor);
-		cursor->fToken = token;
+	if (!fCursorList.AddItem(cursor)) {
+		Unlock();
+		return B_ERROR;
 	}
 
+	if (token == -1) {
+		token = fTokenSpace.NewToken(kCursorToken, cursor);
+	} else {
+		fTokenSpace.SetToken(token, kCursorToken, cursor);
+	}
+
+	cursor->fToken = token;
+	cursor->AttachedToManager(this);
+
 	Unlock();
+
 	return token;
-}
-
-
-void
-CursorManager::_RemoveCursor(ServerCursor* cursor)
-{
-	fCursorList.RemoveItem(cursor);
-	fTokenSpace.RemoveToken(cursor->fToken);
-}
-
-
-ServerCursor*
-CursorManager::_RemoveCursor(int32 index)
-{
-	ServerCursor* cursor = (ServerCursor *)fCursorList.RemoveItem(index);
-	if (cursor != NULL)
-		fTokenSpace.RemoveToken(cursor->fToken);
-
-	return cursor;
 }
 
 
@@ -123,16 +137,12 @@ CursorManager::_RemoveCursor(int32 index)
 	If this was the last reference to this cursor, it will be deleted.
 */
 void
-CursorManager::ReleaseCursor(ServerCursor* cursor)
+CursorManager::RemoveCursor(ServerCursor* cursor)
 {
-	Lock();
+	if (!Lock())
+		return;
 
-	if (cursor->Release()) {
-		// this was the last reference, remove the cursor
-		
-		_RemoveCursor(cursor);
-		delete cursor;
-	}
+	_RemoveCursor(cursor);
 
 	Unlock();
 }
@@ -145,15 +155,13 @@ CursorManager::ReleaseCursor(ServerCursor* cursor)
 void
 CursorManager::DeleteCursors(team_id team)
 {
-	Lock();
+	if (!Lock())
+		return;
 
 	for (int32 index = fCursorList.CountItems(); index-- > 0;) {
-		ServerCursor *cursor = (ServerCursor *)fCursorList.ItemAt(index);
-		if (cursor->OwningTeam() != team)
-			continue;
-
-		_RemoveCursor(index);
-		delete cursor;
+		ServerCursor *cursor = (ServerCursor*)fCursorList.ItemAtFast(index);
+		if (cursor->OwningTeam() == team)
+			cursor->Release();
 	}
 
 	Unlock();
@@ -372,22 +380,6 @@ CursorManager::ChangeCursor(cursor_which which, int32 token)
 }
 
 
-/*!
-	\brief Internal function which finds the cursor with a particular ID
-	\param token ID of the cursor to find
-	\return The cursor or NULL if not found
-*/
-ServerCursor *
-CursorManager::FindCursor(int32 token)
-{
-	ServerCursor* cursor;
-	if (fTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
-		return cursor;
-
-	return NULL;
-}
-
-
 //! Sets the cursors to the defaults and saves them to CURSOR_SETTINGS_DIR/"d
 void
 CursorManager::SetDefaults()
@@ -415,3 +407,56 @@ CursorManager::SetDefaults()
 	SetCursorSet(string.String());
 	Unlock();
 }
+
+
+/*!
+	\brief Internal function which finds the cursor with a particular ID
+	\param token ID of the cursor to find
+	\return The cursor or NULL if not found
+*/
+ServerCursor *
+CursorManager::FindCursor(int32 token)
+{
+	ServerCursor* cursor;
+	if (fTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
+		return cursor;
+
+	return NULL;
+}
+
+
+ServerCursor *
+CursorManager::_FindCursor(team_id clientTeam, const uint8* cursorData)
+{
+	int32 count = fCursorList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ServerCursor* cursor = (ServerCursor*)fCursorList.ItemAtFast(i);
+		if (cursor->OwningTeam() == clientTeam
+			&& cursor->CursorData()
+			&& memcmp(cursor->CursorData(), cursorData, 68) == 0) {
+			return cursor;
+		}
+	}
+	return NULL;
+}
+
+
+void
+CursorManager::_RemoveCursor(ServerCursor* cursor)
+{
+	fCursorList.RemoveItem(cursor);
+	fTokenSpace.RemoveToken(cursor->fToken);
+}
+
+
+//ServerCursor*
+//CursorManager::_RemoveCursor(int32 index)
+//{
+//	ServerCursor* cursor = (ServerCursor*)fCursorList.RemoveItem(index);
+//	if (cursor != NULL)
+//		fTokenSpace.RemoveToken(cursor->fToken);
+//
+//	return cursor;
+//}
+
+

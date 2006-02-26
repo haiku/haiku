@@ -33,6 +33,7 @@ class BCursor : BArchivable {
 
 		int32				fServerToken;
 		bool				fNeedToFree;
+		mutable bool		fPendingViewCursor;
 
 		uint32				_reserved[6];
 };

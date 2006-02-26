@@ -162,8 +162,6 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fClientReplyPort(clientPort),
 	fClientLooperPort(looperPort),
 
-	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
-
 	fClientToken(clientToken),
 
 	fCurrentLayer(NULL),
@@ -1242,13 +1240,21 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
 			int32 token;
-			if (link.Read<int32>(&token) == B_OK) {
-				// TODO: this badly needs reference counting
-				ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
-				fCurrentLayer->SetCursor(cursor);
-			}
+			if (link.Read<int32>(&token) != B_OK)
+				break;
 
-			// TODO: if fCurrentLayer is the view under the cursor, the appearance should change immediately!
+			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
+			fCurrentLayer->SetCursor(cursor);
+
+			if (fWindowLayer->IsFocus()) {
+				// The cursor might need to be updated now
+				fDesktop->UnlockSingleWindow();
+
+				if (fDesktop->EventDispatcher().ViewUnderMouse(fEventTarget) == fCurrentLayer->Token())
+					fDesktop->SetCursor(cursor);
+
+				fDesktop->LockSingleWindow();
+			}
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
@@ -1263,14 +1269,12 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		case AS_LAYER_HIDE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
-// TODO: test
 			fCurrentLayer->SetHidden(true);
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
-// TODO: test
 			fCurrentLayer->SetHidden(false);
 			break;
 		}

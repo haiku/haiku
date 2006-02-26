@@ -31,7 +31,8 @@ const BCursor *B_CURSOR_I_BEAM;
 BCursor::BCursor(const void *cursorData)
 	:
 	fServerToken(-1),
-	fNeedToFree(false)
+	fNeedToFree(false),
+	fPendingViewCursor(false)
 {
 	const uint8 *data = (const uint8 *)cursorData;
 
@@ -68,6 +69,7 @@ BCursor::BCursor(BMessage *data)
 	// undefined on BeOS
 	fServerToken = -1;
 	fNeedToFree = false;
+	fPendingViewCursor = false;
 }
 
 
@@ -78,6 +80,7 @@ BCursor::~BCursor()
 		BPrivate::AppServerLink link;
 		link.StartMessage(AS_DELETE_CURSOR);
 		link.Attach<int32>(fServerToken);
+		link.Attach<bool>(fPendingViewCursor);
 		link.Flush();
 	}
 }

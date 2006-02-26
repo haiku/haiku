@@ -17,6 +17,7 @@
 #include "DrawingEngine.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
+#include "ServerCursor.h"
 #include "ServerPicture.h"
 #include "ServerWindow.h"
 #include "WindowLayer.h"
@@ -94,6 +95,9 @@ ViewLayer::~ViewLayer()
 //		fWindow->SetTopLayer(NULL);
 //
 	// TODO: Don't know yet if we should also delete fPicture
+
+	if (fCursor)
+		fCursor->Release();
 
 	// iterate over children and delete each one
 	ViewLayer* layer = fFirstChild;
@@ -890,7 +894,17 @@ ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
 void
 ViewLayer::SetCursor(ServerCursor *cursor)
 {
-	fCursor = cursor;
+	if (cursor != fCursor) {
+		if (fCursor)
+			fCursor->Release();
+
+		fCursor = cursor;
+
+		if (fCursor) {
+			fCursor->Acquire();
+			fCursor->SetPendingViewCursor(false);
+		}
+	}
 }
 
 

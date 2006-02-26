@@ -980,18 +980,20 @@ BView::ResizingMode() const
 void
 BView::SetViewCursor(const BCursor *cursor, bool sync)
 {
-	if (!cursor)
+	if (cursor == NULL || fOwner == NULL)
 		return;
-
-	if (!fOwner)
-		debugger("View method requires owner and doesn't have one");
 
 	check_lock();
 
 	fOwner->fLink->StartMessage(AS_LAYER_SET_CURSOR);
 	fOwner->fLink->Attach<int32>(cursor->fServerToken);
 
-	if (sync)
+	if (!sync) {
+		cursor->fPendingViewCursor = true;
+			// this avoids a race condition in case the cursor is
+			// immediately deleted after this call, as the deletion
+			// is handled by the application, not the window
+	} else
 		fOwner->fLink->Flush();
 }
 

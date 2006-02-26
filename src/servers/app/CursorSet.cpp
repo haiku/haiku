@@ -119,7 +119,7 @@ CursorSet::AddCursor(cursor_which which, const BBitmap *cursor, const BPoint &ho
 	function must convert the R5 cursor data into a BBitmap
 */
 status_t
-CursorSet::AddCursor(cursor_which which, int8 *data)
+CursorSet::AddCursor(cursor_which which, uint8 *data)
 {
 	// Convert cursor data to a bitmap because all cursors are internally stored
 	// as bitmaps
@@ -316,7 +316,7 @@ CursorSet::_CursorWhichToString(cursor_which which)
 	BBitmaps returned by this function are always in the RGBA32 color space
 */
 BBitmap *
-CursorSet::_CursorDataToBitmap(int8 *data)
+CursorSet::_CursorDataToBitmap(uint8 *data)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
