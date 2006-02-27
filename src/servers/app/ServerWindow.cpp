@@ -277,7 +277,9 @@ ServerWindow::_PrepareQuit()
 {
 	if (fThread == find_thread(NULL)) {
 		// make sure we're hidden
-		Hide();
+		fDesktop->LockSingleWindow();
+		_Hide();
+		fDesktop->UnlockSingleWindow();
 
 		App()->RemoveWindow(this);
 	} else if (fThread >= B_OK)
@@ -310,10 +312,10 @@ ServerWindow::ReplaceDecorator()
 
 //! Shows the window's WindowLayer
 void
-ServerWindow::Show()
+ServerWindow::_Show()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Show\n", Title()));
+	STRACE(("ServerWindow %s: _Show\n", Title()));
 
 	if (fQuitting || !fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
@@ -331,10 +333,10 @@ fDesktop->LockSingleWindow();
 
 //! Hides the window's WindowLayer
 void
-ServerWindow::Hide()
+ServerWindow::_Hide()
 {
 	// NOTE: if you do something else, other than sending a port message, PLEASE lock
-	STRACE(("ServerWindow %s: Hide\n", Title()));
+	STRACE(("ServerWindow %s: _Hide\n", Title()));
 
 	if (fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
@@ -449,36 +451,8 @@ ServerWindow::GetInfo(window_info& info)
 }
 
 
-/*!
-	\brief Sets the font state for a layer
-	\param layer The layer to set the font
-*/
-void
-ServerWindow::SetLayerFontState(ViewLayer *layer, BPrivate::LinkReceiver &link)
-{
-	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
-			fTitle, layer->Name()));
-	// NOTE: no need to check for a lock. This is a private method.
-
-	layer->CurrentState()->ReadFontFromLink(link);
-}
-
-
-void
-ServerWindow::SetLayerState(ViewLayer *layer, BPrivate::LinkReceiver &link)
-{
-	STRACE(("ServerWindow %s: SetLayerState for layer %s\n", Title(),
-			 layer->Name()));
-	// NOTE: no need to check for a lock. This is a private method.
-
-	layer->CurrentState()->ReadFromLink(link);
-	// TODO: When is this used?!?
-	layer->RebuildClipping(true);
-}
-
-
 ViewLayer*
-ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent)
+ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 
@@ -504,7 +478,7 @@ ServerWindow::CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent)
 	link.Read<rgb_color>(&viewColor);
 	link.Read<int32>(&parentToken);
 
-	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n",
+	STRACE(("ServerWindow(%s)::_CreateLayerTree()-> layer %s, token %ld\n",
 		fTitle, name, token));
 
 	ViewLayer* newLayer;
@@ -559,12 +533,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 	switch (code) {
 		case AS_SHOW_WINDOW:
 			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n", Title()));
-			Show();
+			_Show();
 			break;
 
 		case AS_HIDE_WINDOW:
 			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n", Title()));
-			Hide();
+			_Hide();
 			break;
 
 		case AS_MINIMIZE_WINDOW:
@@ -574,9 +548,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<bool>(&minimize) == B_OK) {
 				// TODO: this actually needs to take the window's show/hide counter into account
 				if (minimize && !fWindowLayer->IsHidden())
-					Hide();
+					_Hide();
 				else if (!minimize && fWindowLayer->IsHidden())
-					Show();
+					_Show();
 
 				fWindowLayer->SetMinimized(minimize);
 			}
@@ -792,7 +766,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 #endif
 		case AS_GET_WORKSPACES:
 		{
-			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_GET_WORKSPACES\n", Title()));
 			fLink.StartMessage(B_OK);
 			fLink.Attach<uint32>(fWindowLayer->Workspaces());
 			fLink.Flush();
@@ -800,9 +774,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SET_WORKSPACES:
 		{
-			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n", Title()));
 			uint32 newWorkspaces;
-			link.Read<uint32>(&newWorkspaces);
+			if (link.Read<uint32>(&newWorkspaces) != B_OK)
+				break;
+
+			STRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
+				Title(), newWorkspaces));
 
 			fDesktop->SetWindowWorkspaces(fWindowLayer, newWorkspaces);
 			break;
@@ -812,9 +789,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			float xResizeBy;
 			float yResizeBy;
 			link.Read<float>(&xResizeBy);
-			link.Read<float>(&yResizeBy);
+			if (link.Read<float>(&yResizeBy) != B_OK)
+				break;
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n", Title(), xResizeBy, yResizeBy));
+			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
+				Title(), xResizeBy, yResizeBy));
 
 			fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
 			break;
@@ -824,9 +803,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			float xMoveBy;
 			float yMoveBy;
 			link.Read<float>(&xMoveBy);
-			link.Read<float>(&yMoveBy);
+			if (link.Read<float>(&yMoveBy) != B_OK)
+				break;
 
-			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n", Title(), xMoveBy, yMoveBy));
+			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
+				Title(), xMoveBy, yMoveBy));
 
 			fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
 			break;
@@ -973,7 +954,7 @@ fDesktop->LockSingleWindow();
 				break;
 			}
 
-			_SetCurrentLayer(CreateLayerTree(link, NULL));
+			_SetCurrentLayer(_CreateLayerTree(link, NULL));
 			fWindowLayer->SetTopLayer(fCurrentLayer);
 			break;
 		}
@@ -983,7 +964,7 @@ fDesktop->LockSingleWindow();
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 
 			ViewLayer* parent = NULL;
-			ViewLayer* newLayer = CreateLayerTree(link, &parent);
+			ViewLayer* newLayer = _CreateLayerTree(link, &parent);
 			if (parent != NULL && newLayer != NULL)
 				parent->AddChild(newLayer);
 			else
@@ -1074,13 +1055,16 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		case AS_LAYER_SET_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
-			SetLayerState(fCurrentLayer, link);
+
+			fCurrentLayer->CurrentState()->ReadFromLink(link);
+			// TODO: When is this used?!?
+			fCurrentLayer->RebuildClipping(true);
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
-			SetLayerFontState(fCurrentLayer, link);
+			fCurrentLayer->CurrentState()->ReadFontFromLink(link);
 			break;
 		}
 		case AS_LAYER_GET_STATE:

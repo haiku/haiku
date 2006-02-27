@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,8 +62,6 @@ public:
 			::EventTarget&		EventTarget() { return fEventTarget; }
 
 			void				ReplaceDecorator();
-			void				Show();
-			void				Hide();
 
 			// methods for sending various messages to client.
 			void				NotifyQuitRequested();
@@ -103,13 +101,11 @@ public:
 			void				GetInfo(window_info& info);
 
 private:
-			// methods for retrieving and creating a tree strcture of Layers.
-			ViewLayer*			CreateLayerTree(BPrivate::LinkReceiver &link,
+			ViewLayer*			_CreateLayerTree(BPrivate::LinkReceiver &link,
 									ViewLayer **_parent);
-			void				SetLayerState(ViewLayer *layer,
-									BPrivate::LinkReceiver &link);
-			void				SetLayerFontState(ViewLayer *layer,
-									BPrivate::LinkReceiver &link);
+
+			void				_Show();
+			void				_Hide();
 
 			// message handling methods.
 			void				_DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
