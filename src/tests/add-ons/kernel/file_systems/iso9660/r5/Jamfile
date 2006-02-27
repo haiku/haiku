@@ -1,0 +1,43 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems iso9660 ;
+
+# save original optimization level
+oldOPTIM = $(OPTIM) ;
+
+# set some additional defines (most of them are currently unused in the iso9660 add-on)
+{
+	local defines =
+		KEEP_WRONG_DIRENT_RECLEN
+		;
+
+#	if $(COMPILE_FOR_R5) {
+		defines += COMPILE_FOR_R5 ;
+#	}
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+}
+
+KernelAddon iso9660 : kernel file_systems :
+	iso.c
+	kernel_interface.c
+	;
+
+rule InstallISO9660
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallISO9660
+{
+	cp $(>) /boot/home/config/add-ons/kernel/file_systems/
+}
+
+InstallISO9660 install : iso9660 ;
+
+# restore original optimization level
+OPTIM = $(oldOPTIM) ;
