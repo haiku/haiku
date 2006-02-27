@@ -489,6 +489,9 @@ put_cached_block(block_cache *cache, cached_block *block)
 static void
 put_cached_block(block_cache *cache, off_t blockNumber)
 {
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
+		panic("put_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
+	
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
@@ -496,10 +499,13 @@ put_cached_block(block_cache *cache, off_t blockNumber)
 
 
 static cached_block *
-get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool readBlock = true)
+get_cached_block(block_cache *cache, off_t blockNumber, bool *allocated, bool readBlock = true)
 {
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
+		panic("get_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
+
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
-	allocated = false;
+	*allocated = false;
 
 	if (block == NULL) {
 		// read block into cache
@@ -507,7 +513,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 		if (block == NULL)
 			return NULL;
 
-		allocated = true;
+		*allocated = true;
 	} else {
 /*
 		if (block->ref_count == 0 && block->current_data != NULL) {
@@ -521,12 +527,12 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool &allocated, bool re
 			if (block->current_data == NULL)
 				return NULL;
 
-			allocated = true;
+			*allocated = true;
 		}
 */
 	}
 
-	if (allocated && readBlock) {
+	if (*allocated && readBlock) {
 		int32 blockSize = cache->block_size;
 
 		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data, blockSize) < blockSize) {
@@ -562,8 +568,11 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 {
 	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n", blockNumber, transactionID));
 
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks)
+		panic("get_writable_cached_block: invalid block number %lld (max %lld)", blockNumber, cache->max_blocks - 1);
+
 	bool allocated;
-	cached_block *block = get_cached_block(cache, blockNumber, allocated, !cleared);
+	cached_block *block = get_cached_block(cache, blockNumber, &allocated, !cleared);
 	if (block == NULL)
 		return NULL;
 
@@ -1205,7 +1214,7 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 	BenaphoreLocker locker(&cache->lock);
 	bool allocated;
 
-	cached_block *block = get_cached_block(cache, blockNumber, allocated);
+	cached_block *block = get_cached_block(cache, blockNumber, &allocated);
 	if (block == NULL)
 		return NULL;
 
