@@ -106,14 +106,16 @@ ServerCursor::ServerCursor(const uint8* data)
 				powval = 1 << (15 - i);
 				cursorval = cursorflip & powval;
 				maskval = maskflip & powval;
-				bmppos[i] = ((cursorval != 0) ? black : white) &
-							((maskval > 0) ? 0xFFFFFFFF : 0x00FFFFFF);
+				bmppos[i] = maskval > 0 ? (cursorval != 0 ? black : white)
+										: 0x00000000;
 			}
-
-			fCursorData = new (nothrow) uint8[68];
-			if (fCursorData)
-				memcpy(fCursorData, data, 68);
 		}
+
+		// remember cursor data for later
+		fCursorData = new (nothrow) uint8[68];
+		if (fCursorData)
+			memcpy(fCursorData, data, 68);
+
 	} else {
 		fWidth = 0;
 		fHeight = 0;
@@ -125,7 +127,8 @@ ServerCursor::ServerCursor(const uint8* data)
 
 /*!
 	\brief Constructor
-	\param data Pointer to bitmap data in memory, the padding bytes should be contained when format less than 32 bpp.
+	\param data Pointer to bitmap data in memory,
+	the padding bytes should be contained when format less than 32 bpp.
 */
 ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
 						   uint32 width, uint32 height,
