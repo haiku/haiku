@@ -20,12 +20,19 @@ oldOPTIM = $(OPTIM) ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
 KernelAddon iso9660 : kernel file_systems :
 	iso.c
-	kernel_interface.c
+	iso9660.cpp
+	kernel_interface.cpp
+	kernel_cpp.cpp
 	;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 rule InstallISO9660
 {

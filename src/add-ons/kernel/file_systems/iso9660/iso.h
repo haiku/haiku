@@ -10,12 +10,15 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include <fsproto.h>
+#include <fs_interface.h>
 #include <lock.h>
 #include <time.h>
 #include <endian.h>
 
 #include <SupportDefs.h>
+
+// Size of primary volume descriptor for ISO9660
+#define ISO_PVD_SIZE 882
 
 // ISO structure has both msb and lsb first data. These let you do a 
 // compile-time switch for different platforms.
@@ -168,10 +171,11 @@ typedef struct attrfilemap
 typedef struct nspace
 {
 	// Start of members other drivers will definitely want.
-	nspace_id		id;				// ID passed in to fs_mount
+	mount_id		id;				// ID passed in to fs_mount
 	int				fd;				// File descriptor
 	int				fdOfSession;	// File descriptor of the (mounted) session
 	//unsigned int 	blockSize;  	// usually need this, but it's part of ISO
+	void                            *fBlockCache;
 		
 	char			devicePath[127];
 	//off_t			numBlocks;		// May need this, but it's part of ISO
@@ -222,9 +226,17 @@ typedef struct nspace
 	uint8			fileStructVers;		// File structure version								byte882
 } nspace;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int 		ISOMount(const char *path, const int flags, nspace** newVol, bool allow_joliet);
 int			ISOReadDirEnt(nspace* ns, dircookie* cookie, struct dirent* buf, size_t bufsize);
 int			InitNode(vnode* rec, char* buf, int* bytesRead, uint8 joliet_level);
 int			ConvertRecDate(ISORecDate* inDate, time_t* outDate);
+
+#ifdef __cplusplus
+}
+#endif 
 
 #endif

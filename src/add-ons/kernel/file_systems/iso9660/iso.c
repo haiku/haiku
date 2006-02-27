@@ -16,18 +16,18 @@
 #include <Drivers.h>
 #include <OS.h>
 #include <lock.h>
-#include <cache.h>
 #include <KernelExport.h> 
 #include <string.h>
 #include <dirent.h>
 #include <time.h>
 #include <malloc.h>
 #include <ByteOrder.h>
+#include <fs_cache.h>
 
 #include "rock.h"
 #include "iso.h"
 
-#define TRACE_ISO9660 0
+//#define TRACE_ISO9660 1
 #if TRACE_ISO9660
 #	define TRACE(x) dprintf x
 #else
@@ -38,9 +38,6 @@
 // Just needed here
 static status_t unicode_to_utf8(const char	*src, int32	*srcLen, char *dst, int32 *dstLen);
 
-
-// Size of primary volume descriptor for ISO9660
-#define ISO_PVD_SIZE 882
 
 // ISO9660 should start with this string
 const char *kISO9660IDString = "CD001";
@@ -55,7 +52,7 @@ static int		InitVolDate(ISOVolDate *date, char *buf);
 static int		InitRecDate(ISORecDate *date, char *buf);
 static int		InitVolDesc(nspace *vol, char *buf);
 
-#if 0	// currently unused
+#if 0  // currently unused
 static int
 GetLogicalBlockSize(int fd)
 {
@@ -90,7 +87,6 @@ GetNumDeviceBlocks(int fd, int block_size)
 	return st.st_size / block_size;
 }
 #endif
-
 
 static int
 GetDeviceBlockSize(int fd)
@@ -271,7 +267,7 @@ ISOMount(const char *path, const int flags, nspace **newVol, bool allow_joliet)
 
 				/* Initialize access to the cache so that we can do cached i/o */
 				TRACE(("ISO9660: cache init: dev %d, max blocks %Ld\n", vol->fd, maxBlocks));
-				init_cache_for_device(vol->fd,maxBlocks);
+				vol->fBlockCache = block_cache_create(vol->fd, maxBlocks, vol->logicalBlkSize[FS_DATA_FORMAT]);
 				is_iso = true;
 			} else if ((*buffer == 0x02) && is_iso && allow_joliet) {
 				// ISO_VD_SUPPLEMENTARY
@@ -347,13 +343,13 @@ ISOReadDirEnt(nspace *ns, dircookie *cookie, struct dirent *dirent, size_t bufsi
 
 	// If we're at the end of the data in a block, move to the next block.	
 	while (1) {
-		blockData = (char *)get_block(ns->fd, cookie->block,
+		blockData = (char *)block_cache_get_etc(ns->fBlockCache, cookie->block, 0,
 							ns->logicalBlkSize[FS_DATA_FORMAT]);
 		block_out = true;
 
 		if (blockData != NULL && *(blockData + cookie->pos) == 0) {
 			//NULL data, move to next block.
-			release_block(ns->fd, cookie->block);
+			block_cache_put(ns->fBlockCache, cookie->block);
 			block_out = false;
 			totalRead += ns->logicalBlkSize[FS_DATA_FORMAT] - cookie->pos;
 			cookie->pos = 0;
@@ -397,7 +393,7 @@ ISOReadDirEnt(nspace *ns, dircookie *cookie, struct dirent *dirent, size_t bufsi
 	}
 
 	if (block_out)
-		release_block(ns->fd, cacheBlock);
+		block_cache_put(ns->fBlockCache, cacheBlock);
 
 	TRACE(("ISOReadDirEnt - EXIT, result is %s, vnid is %Lu\n", strerror(result), dirent->d_ino));
 	return result;
