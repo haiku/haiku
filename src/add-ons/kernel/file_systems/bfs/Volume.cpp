@@ -381,7 +381,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 			opener.Keep();
 			return B_OK;
 		} else
-			FATAL(("could not create root node: new_vnode() failed!\n"));
+			FATAL(("could not create root node: publish_vnode() failed!\n"));
 
 		delete fRootNode;
 	} else {
