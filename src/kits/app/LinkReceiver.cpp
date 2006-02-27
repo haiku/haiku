@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -268,7 +268,7 @@ LinkReceiver::Read(void *data, ssize_t size)
 
 
 status_t
-LinkReceiver::ReadString(char **_string)
+LinkReceiver::ReadString(char** _string, size_t* _length)
 {
 	int32 length = 0;
 	status_t status;
@@ -277,36 +277,45 @@ LinkReceiver::ReadString(char **_string)
 	if (status < B_OK)
 		return status;
 
-	if (length >= 0) {
-		char *string = (char *)malloc(length + 1);
-		if (string == NULL) {
-			fRecvPosition -= sizeof(int32);	// rewind the transaction
-			return B_NO_MEMORY;
-		}
+	char *string;
 
-		if (length > 0) {
-			status = Read(string, length);
-			if (status < B_OK) {
-				free(string);
-				fRecvPosition -= sizeof(int32);	// rewind the transaction
-				return status;
-			}
-		}
-
-		// make sure the string is null terminated
-		string[length] = '\0';
-
-		*_string = string;
-		return B_OK;
-	} else {
-		fRecvPosition -= sizeof(int32);	// rewind the transaction
-		return B_ERROR;
+	if (length < 0) {
+		status = B_ERROR;
+		goto err;
 	}
+
+	string = (char *)malloc(length + 1);
+	if (string == NULL) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+
+	if (length > 0) {
+		status = Read(string, length);
+		if (status < B_OK) {
+			free(string);
+			return status;
+		}
+	}
+
+	// make sure the string is null terminated
+	string[length] = '\0';
+
+	if (_length)
+		*_length = length;
+	*_string = string;
+
+	return B_OK;
+
+err:
+	fRecvPosition -= sizeof(int32);
+		// rewind the transaction
+	return status;
 }
 
 
 status_t
-LinkReceiver::ReadString(BString &string)
+LinkReceiver::ReadString(BString &string, size_t* _length)
 {
 	int32 length = 0;
 	status_t status;
@@ -338,6 +347,9 @@ LinkReceiver::ReadString(BString &string)
 		string.UnlockBuffer(length);
 	} else
 		string = "";
+
+	if (_length)
+		*_length = length;
 
 	return B_OK;
 
