@@ -87,14 +87,20 @@ TermWindow::InitWindow(void)
 
 	BFont halfFont;
 	halfFont.SetFamilyAndStyle(family, NULL);
-	halfFont.SetSize(gTermPref->getFloat(PREF_HALF_FONT_SIZE));
+	float size = gTermPref->getFloat(PREF_HALF_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	halfFont.SetSize(size);
 	halfFont.SetSpacing(B_FIXED_SPACING);
 
 	family = gTermPref->getString(PREF_FULL_FONT_FAMILY);
 
 	BFont fullFont;
 	fullFont.SetFamilyAndStyle(family, NULL);
-	fullFont.SetSize(gTermPref->getFloat(PREF_FULL_FONT_SIZE));
+	size = gTermPref->getFloat(PREF_FULL_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	fullFont.SetSize(size);
 	fullFont.SetSpacing(B_FIXED_SPACING);
 
 	// Make Terminal text view.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Distributed under the terms of the MIT license.
@@ -152,9 +152,9 @@ TermView::GetFontSize(int* _width, int* _height)
 BRect
 TermView::SetTermSize(int rows, int cols, bool resize)
 {
-	if (rows)
+	if (rows > 0)
 		fTermRows = rows;
-	if (cols)
+	if (cols > 0)
 		fTermColumns = cols;
 
 	fTextBuffer->ResizeTo(fTermRows, fTermColumns, 0);
@@ -162,12 +162,10 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	fScrTop = 0;
 	fScrBot = fTermRows - 1;
 
-	BRect rect(0, 0,
-		fTermColumns * fFontWidth,
-		fTermRows * fFontHeight);
+	BRect rect(0, 0, fTermColumns * fFontWidth, fTermRows * fFontHeight);
 
 	if (resize) {
-		ResizeTo(fTermColumns * fFontWidth -1,
+		ResizeTo(fTermColumns * fFontWidth - 1,
 			fTermRows * fFontHeight -1);
 	}
 	Invalidate(Frame());

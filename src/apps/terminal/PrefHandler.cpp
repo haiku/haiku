@@ -97,12 +97,11 @@ PrefHandler::GetDefaultPath(BPath& path)
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return B_ERROR;
 
-#ifdef __HAIKU__
-	path.Append("Terminal");
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	path.Append("Terminal_settings");
 #else
-	path.Append("HaikuTerminal");
+	path.Append("HaikuTerminal_settings");
 #endif
-	//path.Append("settings");
 
 	return B_OK;
 }

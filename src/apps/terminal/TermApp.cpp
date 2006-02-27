@@ -19,6 +19,7 @@
 #include <TextView.h>
 
 #include "TermApp.h"
+#include "TermBuffer.h"
 #include "TermWindow.h"
 #include "TermConst.h"
 #include "spawn.h"
@@ -108,7 +109,7 @@ void
 TermApp::ReadyToRun()
 {
 	// Prevent opeing window when option -h is given.
-	if(usage_requested)
+	if (usage_requested)
 		return;
 	
 	const char *command = NULL;
@@ -133,18 +134,23 @@ TermApp::ReadyToRun()
 		command = gTermPref->getString(PREF_SHELL);
 	
 	rows = gTermPref->getInt32(PREF_ROWS);
+	if (rows < 1)
+		gTermPref->setInt32(PREF_ROWS, rows = 1);
+
 	cols = gTermPref->getInt32(PREF_COLS);
-	
+	if (cols < MIN_COLS)
+		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
+
 	pfd = spawn_shell(rows, cols, command, encoding);
-	
+
 	// failed spawn, print stdout and open alert panel
 	if (pfd == -1 ) {
 		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
-					"ok", NULL, NULL,B_WIDTH_FROM_LABEL,
-					B_INFO_ALERT))->Go(NULL);
+			"ok", NULL, NULL, B_WIDTH_FROM_LABEL,
+			B_INFO_ALERT))->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
 	}
-	
+
 	MakeTermWindow(fTermFrame);
 }
 
