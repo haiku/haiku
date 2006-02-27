@@ -6226,16 +6226,18 @@ _user_mount(const char *userPath, const char *userDevice, const char *userFileSy
 		return B_BAD_ADDRESS;
 
 	if (userArgs != NULL && argsLength > 0) {
+		// this is a safety restriction
 		if (argsLength >= 65536)
-			return B_BAD_VALUE;
+			return B_NAME_TOO_LONG;
+
 		args = (char *)malloc(argsLength + 1);
 		if (args == NULL)
 			return B_NO_MEMORY;
+
 		if (user_strlcpy(args, userArgs, argsLength + 1) < B_OK) {
 			free(args);
 			return B_BAD_ADDRESS;
 		}
-
 	}
 	path.UnlockBuffer();
 	device.UnlockBuffer();
@@ -7093,8 +7095,12 @@ _user_open_query(dev_t device, const char *userQuery, size_t queryLength,
 {
 	char *query;
 
-	if (device < 0 || userQuery == NULL || queryLength == 0 || queryLength >= 65536)
+	if (device < 0 || userQuery == NULL || queryLength == 0)
 		return B_BAD_VALUE;
+
+	// this is a safety restriction
+	if (queryLength >= 65536)
+		return B_NAME_TOO_LONG;
 
 	query = (char *)malloc(queryLength + 1);
 	if (query == NULL)
