@@ -1401,23 +1401,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<float>(&size);
 			link.Read<uint8>(&spacing);
 			int32 numStrings;
-			link.Read<int32>(&numStrings);
+			if (link.Read<int32>(&numStrings) != B_OK) {
+				// this results in a B_BAD_VALUE return
+				numStrings = 0;
+				size = 0.0f;
+			}
 
 			float widthArray[numStrings];
 			int32 lengthArray[numStrings];
 			char *stringArray[numStrings];
 			for (int32 i = 0; i < numStrings; i++) {
-				// TODO: the length is actually encoded twice here
-				//	It would be nicer to only send as much from the string as needed
-				link.Read<int32>(&lengthArray[i]);
-				link.ReadString(&stringArray[i]);
+				link.ReadString(&stringArray[i], (size_t *)&lengthArray[i]);
 			}
 
 			ServerFont font;
 
-			if (font.SetFamilyAndStyle(family, style) == B_OK
-				&& size > 0) {
-
+			if (font.SetFamilyAndStyle(family, style) == B_OK && size > 0) {
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 

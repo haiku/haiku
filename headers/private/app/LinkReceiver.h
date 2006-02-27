@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,13 +32,12 @@ class LinkReceiver {
 		int32 Code() const;
 
 		virtual status_t Read(void *data, ssize_t size);
-		status_t ReadString(char **string);
-		status_t ReadString(BString& string);
+		status_t ReadString(char** _string, size_t* _length = NULL);
+		status_t ReadString(BString& string, size_t* _length = NULL);
 		status_t ReadString(char *buffer, size_t bufferSize);
+
 		template <class Type> status_t Read(Type *data)
-		{
-			return Read(data, sizeof(Type));
-		}
+			{ return Read(data, sizeof(Type)); }
 
 	protected:
 		virtual status_t ReadFromPort(bigtime_t timeout);

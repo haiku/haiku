@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,8 +60,8 @@ class ServerLink {
 		bool NeedsReply() const;
 		status_t Read(void *data, ssize_t size);
 		status_t ReadString(char *buffer, size_t bufferSize);
-		status_t ReadString(BString& string);
-		status_t ReadString(char **string);
+		status_t ReadString(BString& string, size_t* _length = NULL);
+		status_t ReadString(char** _string, size_t* _length = NULL);
 		status_t ReadRegion(BRegion *region);
 		status_t ReadShape(BShape *shape);
 		template <class Type> status_t Read(Type *data);
@@ -173,15 +173,15 @@ ServerLink::ReadString(char *buffer, size_t bufferSize)
 }
 
 inline status_t
-ServerLink::ReadString(BString& string)
+ServerLink::ReadString(BString& string, size_t* _length)
 {
-	return fReceiver->ReadString(string);
+	return fReceiver->ReadString(string, _length);
 }
 
 inline status_t
-ServerLink::ReadString(char **string)
+ServerLink::ReadString(char** _string, size_t* _length)
 {
-	return fReceiver->ReadString(string);
+	return fReceiver->ReadString(_string, _length);
 }
 
 template <class Type> status_t

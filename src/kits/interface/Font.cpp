@@ -984,9 +984,9 @@ float
 BFont::StringWidth(const char *string, int32 length) const
 {
 	if (!string || length < 1)
-		return 0.0;
+		return 0.0f;
 
-	float width;
+	float width = 0.0f;
 	GetStringWidths(&string, &length, 1, &width);
 
 	return width;
@@ -1011,13 +1011,12 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	// TODO: all strings into a single array???
 	//	we do have a maximum message length, and it could be easily touched here...
 	for (int32 i = 0; i < numStrings; i++) {
-		link.Attach<int32>(lengthArray[i]);
-		link.AttachString(stringArray[i]);
+		link.AttachString(stringArray[i], lengthArray[i]);
 	}
 
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK
-		|| code != B_OK)
+	status_t status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK)
 		return;
 
 	link.Read(widthArray, sizeof(float) * numStrings);
@@ -1046,8 +1045,8 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
 
-	link.Attach<float>(delta ? delta->nonspace : 0.0);
-	link.Attach<float>(delta ? delta->space : 0.0);
+	link.Attach<float>(delta ? delta->nonspace : 0.0f);
+	link.Attach<float>(delta ? delta->space : 0.0f);
 	link.Attach<int32>(numChars);
 
 	// TODO: Should we not worry about the port capacity here?!?
