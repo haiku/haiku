@@ -20,8 +20,8 @@ UseFreeTypeHeaders ;
 local defines = [ FDefines TEST_MODE=1 ] ;
 	# USE_DIRECT_WINDOW_TEST_MODE=1
 
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
+SubDirCcFlags $(defines) ; # -fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirC++Flags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
@@ -54,6 +54,7 @@ SharedLibrary libhaikuappserver.so :
 	BGet++.cpp
 	ColorSet.cpp
 	CursorData.cpp
+	CursorManager.cpp
 	CursorSet.cpp
 	DesktopSettings.cpp
 	DrawState.cpp
@@ -88,7 +89,6 @@ Server haiku_app_server :
 
 	# Manager Classes
 	BitmapManager.cpp
-	CursorManager.cpp
 	DecorManager.cpp
 	InputManager.cpp
 	ScreenManager.cpp
