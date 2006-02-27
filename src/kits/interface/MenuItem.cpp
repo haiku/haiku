@@ -1,40 +1,24 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		MenuItem.cpp
-//	Authors			Marc Flerackers (mflerackers@androme.be)
-//					Bill Hayden (haydentech@users.sourceforge.net)
-//					Stefano Ceccherini (burton666@libero.it)
-//					Olivier Milla
-//	Description:	Display item for BMenu class
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Bill Hayden (haydentech@users.sourceforge.net)
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Olivier Milla
+ */
 
-#include <string.h>
-#include <stdlib.h>
+//!	Display item for BMenu class
 
 #include <Bitmap.h>
 #include <MenuItem.h>
 #include <String.h>
 #include <Window.h>
+
+#include <string.h>
+#include <stdlib.h>
+
 
 const uint32 kCtrlLength = 20*11;
 const unsigned char kCtrlBits [] = {
@@ -726,12 +710,15 @@ BMenuItem::DrawShortcutSymbol()
 		get_key_map(&keys, &chars);
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_COLOR_8_BIT);
-		if ((keys->left_command_key == 0x5d) && (keys->right_command_key == 0x5f)) 
+
+		// TODO: isn't there a better way to do this?
+		if (keys != NULL
+			&& keys->left_command_key == 0x5d && keys->right_command_key == 0x5f) 
 			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
 		else
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
 		fSuper->DrawBitmap(&control, where);
-		
+
 		where.x -= rect.Width();
 	
 		free(chars);
