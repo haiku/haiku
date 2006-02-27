@@ -478,6 +478,7 @@ BWindow::Minimize(bool minimize)
 
 	fLink->StartMessage(AS_MINIMIZE_WINDOW);
 	fLink->Attach<bool>(minimize);
+	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
 
 	Unlock();
@@ -2038,25 +2039,21 @@ BWindow::ResizeTo(float width, float height)
 void
 BWindow::Show()
 {
-	bool isLocked = this->IsLocked();
-
-	fShowLevel--;
-
-	if (fShowLevel == 0) {
-		STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name()));
-		if (Lock()) {
-			fLink->StartMessage(AS_SHOW_WINDOW);
-			fLink->Flush();
-			Unlock();
-		}
+	if (!fRunCalled) {
+		// this is the fist time Show() is called, which implicetly runs the looper
+		Run();
 	}
 
-	// if it's the fist time Show() is called... start the Looper thread.
-	if (Thread() == B_ERROR) {
-		// normally this won't happen, but I want to be sure!
-		if (!isLocked) 
-			Lock();
-		Run();
+	if (Lock()) {
+		fShowLevel++;
+
+		if (fShowLevel == 1) {
+			STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name()));
+			fLink->StartMessage(AS_SHOW_WINDOW);
+			fLink->Flush();
+		}
+
+		Unlock();
 	}
 }
 
@@ -2064,19 +2061,22 @@ BWindow::Show()
 void
 BWindow::Hide()
 {
-	if (fShowLevel == 0 && Lock()) {
+	if (!Lock())
+		return;
+
+	if (--fShowLevel == 0) {
 		fLink->StartMessage(AS_HIDE_WINDOW);
 		fLink->Flush();
-		Unlock();
 	}
-	fShowLevel++;
+
+	Unlock();
 }
 
 
 bool
 BWindow::IsHidden() const
 {
-	return fShowLevel > 0; 
+	return fShowLevel <= 0; 
 }
 
 
@@ -2177,7 +2177,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	fInTransaction = false;
 	fActive = false;
-	fShowLevel = 1;
+	fShowLevel = 0;
 
 	fTopView = NULL;
 	fFocus = NULL;

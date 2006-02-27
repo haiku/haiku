@@ -544,9 +544,16 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		case AS_MINIMIZE_WINDOW:
 		{
 			DTRACE(("ServerWindow %s: Message AS_MINIMIZE_WINDOW\n", Title()));
+			int32 showLevel;
 			bool minimize;
-			if (link.Read<bool>(&minimize) == B_OK) {
-				// TODO: this actually needs to take the window's show/hide counter into account
+
+			link.Read<bool>(&minimize);
+			if (link.Read<int32>(&showLevel) == B_OK) {
+				if (showLevel <= 0) {
+					// window is currently hidden - ignore the minimize request
+					break;
+				}
+
 				if (minimize && !fWindowLayer->IsHidden())
 					_Hide();
 				else if (!minimize && fWindowLayer->IsHidden())
