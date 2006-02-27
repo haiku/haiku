@@ -1117,10 +1117,20 @@ Desktop::ActivateWindow(WindowLayer* window)
 		return;
 
 	if (window == FrontWindow()) {
-		SetFocusWindow(window);
+		// see if there is a normal B_AVOID_FRONT window still in front of us
+		WindowLayer* avoidsFront = window->NextWindow(fCurrentWorkspace);
+		while (avoidsFront && avoidsFront->IsNormal()
+			&& (avoidsFront->Flags() & B_AVOID_FRONT) == 0) {
+			avoidsFront = avoidsFront->NextWindow(fCurrentWorkspace);
+		}
 
-		UnlockAllWindows();
-		return;
+		if (avoidsFront == NULL) {
+			// we're already the frontmost window, we might just not have focus yet
+			SetFocusWindow(window);
+
+			UnlockAllWindows();
+			return;
+		}
 	}
 
 	// we don't need to redraw what is currently
