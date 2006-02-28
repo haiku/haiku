@@ -10,6 +10,7 @@
 #include "BottomlineWindow.h"
 #include "WindowPrivate.h"
 
+#include <String.h>
 #include <TextView.h>
 
 
@@ -28,7 +29,6 @@ BottomlineWindow::BottomlineWindow()
 	AddChild(fTextView);
 
 	fTextView->SetText("");
-	fTextView->MakeFocus(true);
 
 	BRect   screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
 	BPoint pt;
@@ -101,7 +101,8 @@ BottomlineWindow::HandleInputMethodEvent(BMessage* event, EventList& newEvents)
 		if (newEvent != NULL) {
 			newEvent->AddInt32("key", 0);
 			newEvent->AddInt64("when", system_time());
-			newEvent->AddData("bytes", B_STRING_TYPE, string + offset, nextOffset - offset);
+			BString bytes(string + offset, nextOffset - offset);
+			newEvent->AddString("bytes", bytes);
 			newEvents.AddItem(newEvent);
 		}
 
