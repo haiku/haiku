@@ -10,8 +10,6 @@
 
 #include "CursorManager.h"
 
-#include <stdio.h>
-
 #include "CursorData.h"
 #include "HaikuSystemCursor.h"
 #include "ServerCursor.h"
@@ -21,6 +19,9 @@
 #include <Autolock.h>
 #include <Directory.h>
 #include <String.h>
+
+#include <new>
+#include <stdio.h>
 
 
 CursorManager::CursorManager()
@@ -82,7 +83,7 @@ CursorManager::CreateCursor(team_id clientTeam, const uint8* cursorData)
 	ServerCursor* cursor = _FindCursor(clientTeam, cursorData);
 
 	if (!cursor) {
-		cursor = new (nothrow) ServerCursor(cursorData);
+		cursor = new (std::nothrow) ServerCursor(cursorData);
 		if (cursor) {
 			cursor->SetOwningTeam(clientTeam);
 			if (AddCursor(cursor) < B_OK) {
