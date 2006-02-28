@@ -320,20 +320,20 @@ Radeon_CleanupIRQ(device_info *di)
 
 	Radeon_DisableIRQ(di);
 
-#if 0
 	/* if we were faking the interrupts */
-	if ((di->pcii.u.h0.interrupt_pin == 0x00) || (di->pcii.u.h0.interrupt_line == 0xff)){
+	if (di->pcii.u.h0.interrupt_pin == 0x00 || di->pcii.u.h0.interrupt_line == 0xff) {
 		/* stop our interrupt faking thread */
 		di->shutdown_virtual_irq = true;
 		/* cancel the timer */
 		/* we don't know which one is current, so cancel them both and ignore any error */
-		cancel_timer((timer *)&(di->ti_a));
-		cancel_timer((timer *)&(di->ti_b));
+		cancel_timer((timer *)&di->ti_a);
+		cancel_timer((timer *)&di->ti_b);
 	} else {
+#if 0
 		/* remove interrupt handler */
 		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, Radeon_Interrupt, di);
-	}
 #endif
+	}
 
 	delete_sem(si->crtc[0].vblank);
 
