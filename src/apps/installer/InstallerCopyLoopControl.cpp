@@ -57,7 +57,10 @@ InstallerCopyLoopControl::OverwriteOnConflict(const BEntry *srcEntry,
 			const char *destName, const BDirectory *destDir, bool srcIsDir, 
 			bool dstIsDir)
 {
-	return kReplace;
+	if (srcIsDir && dstIsDir)
+		return kMerge;
+	else
+		return kReplace;
 }
 
 
