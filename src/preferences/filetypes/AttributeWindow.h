@@ -14,7 +14,9 @@
 #include <Window.h>
 
 class BButton;
+class BCheckBox;
 class BMenu;
+class BMenuField;
 class BTextControl;
 
 class FileTypesWindow;

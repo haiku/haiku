@@ -117,7 +117,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	topView->AddChild(menuField);
 
 	rect.OffsetBy(0.0f, rect.Height() + 4.0f);
-	rect.bottom = rect.top + fAttributeControl->Bounds().Height() * 5.0f + 22.0f;
+	rect.bottom = rect.top + fAttributeControl->Bounds().Height() * 2.0f + 18.0f;
 	BBox* box = new BBox(rect, "", B_FOLLOW_LEFT_RIGHT);
 	topView->AddChild(box);
 
@@ -210,6 +210,8 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	fAlignmentMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fAlignmentMenuField->ResizeTo(rect.Width(), height);
 	box->AddChild(fAlignmentMenuField);
+	box->ResizeBy(0.0f, fAlignmentMenuField->Bounds().Height() * 2.0f
+		+ fVisibleCheckBox->Bounds().Height());
 
 	fAcceptButton = new BButton(rect, "add", item ? "Done" : "Add",
 		new BMessage(kMsgAccept), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);

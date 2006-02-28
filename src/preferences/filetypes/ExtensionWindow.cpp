@@ -90,7 +90,8 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		fAcceptButton->Frame().top);
 	topView->AddChild(button);
 
-	ResizeTo(labelWidth * 4.0f + 24.0f, fExtensionControl->Bounds().Height() * 2.0f + 30.0f);
+	ResizeTo(labelWidth * 4.0f + 24.0f, fExtensionControl->Bounds().Height()
+		+ fAcceptButton->Bounds().Height() + 28.0f);
 	SetSizeLimits(button->Bounds().Width() + fAcceptButton->Bounds().Width() + 26.0f,
 		32767.0f, Frame().Height(), Frame().Height());
 

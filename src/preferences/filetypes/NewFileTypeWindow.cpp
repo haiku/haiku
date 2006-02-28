@@ -36,28 +36,9 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	rect.InsetBy(8.0f, 8.0f);
-	fNameControl = new BTextControl(rect, "internal", "Internal Name:", "",
-		NULL, B_FOLLOW_LEFT_RIGHT);
+	float labelWidth = be_plain_font->StringWidth("Internal Name:") + 2.0f;
 
-	float labelWidth = fNameControl->StringWidth(fNameControl->Label()) + 2.0f;
-	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
-	fNameControl->SetDivider(labelWidth);
-	fNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-
-	// filter out invalid characters that can't be part of a MIME type name
-	BTextView* textView = fNameControl->TextView();
-	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
-	for (int32 i = 0; disallowedCharacters[i]; i++) {
-		textView->DisallowChar(disallowedCharacters[i]);
-	}
-
-	float width, height;
-	fNameControl->GetPreferredSize(&width, &height);
-	fNameControl->ResizeTo(rect.Width(), height);
-	fNameControl->MoveTo(8.0f, 12.0f + fNameControl->Bounds().Height());
-	topView->AddChild(fNameControl);
-
+	rect.InsetBy(8.0f, 6.0f);
 	fSupertypesMenu = new BPopUpMenu("supertypes");
 	BMenuItem* item;
 	BMessage types;
@@ -82,14 +63,32 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 	fSupertypesMenu->AddItem(new BMenuItem("Add New Group",
 		new BMessage(kMsgNewSupertypeChosen)));
 
-	rect.bottom = rect.top + fNameControl->Bounds().Height() + 2.0f;
 	BMenuField* menuField = new BMenuField(rect, "supertypes",
 		"Group:", fSupertypesMenu);
 	menuField->SetDivider(labelWidth);
 	menuField->SetAlignment(B_ALIGN_RIGHT);
+	float width, height;
 	menuField->GetPreferredSize(&width, &height);
 	menuField->ResizeTo(rect.Width(), height);
 	topView->AddChild(menuField);
+
+	fNameControl = new BTextControl(rect, "internal", "Internal Name:", "",
+		NULL, B_FOLLOW_LEFT_RIGHT);
+	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
+	fNameControl->SetDivider(labelWidth);
+	fNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+
+	// filter out invalid characters that can't be part of a MIME type name
+	BTextView* textView = fNameControl->TextView();
+	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
+	for (int32 i = 0; disallowedCharacters[i]; i++) {
+		textView->DisallowChar(disallowedCharacters[i]);
+	}
+
+	fNameControl->GetPreferredSize(&width, &height);
+	fNameControl->ResizeTo(rect.Width(), height);
+	fNameControl->MoveTo(8.0f, 12.0f + menuField->Bounds().Height());
+	topView->AddChild(fNameControl);
 
 	fAddButton = new BButton(rect, "add", "Add Type", new BMessage(kMsgAddType),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
@@ -106,7 +105,8 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target, const char* curren
 		fAddButton->Frame().top);
 	topView->AddChild(button);
 
-	ResizeTo(labelWidth * 4.0f + 24.0f, fNameControl->Bounds().Height() * 3.0f + 34.0f);
+	ResizeTo(labelWidth * 4.0f + 24.0f, fNameControl->Bounds().Height()
+		+ menuField->Bounds().Height() + fAddButton->Bounds().Height() + 30.0f);
 	SetSizeLimits(button->Bounds().Width() + fAddButton->Bounds().Width() + 26.0f,
 		32767.0f, Frame().Height(), Frame().Height());
 
