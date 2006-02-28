@@ -1,8 +1,9 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
+#include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -617,9 +618,10 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 }
 
 
-/**	\brief To be called when an unhandled processor fault (exception/error)
+/**	\brief To be called when an unhandled processor exception (error/fault)
  *		   occurred.
- *	\param fault The debug_why_stopped value identifying the kind of fault.
+ *	\param exception The debug_why_stopped value identifying the kind of fault.
+ *	\param singal The signal corresponding to the exception.
  *	\return \c true, if the caller shall continue normally, i.e. usually send
  *			a deadly signal. \c false, if the debugger insists to continue the
  *			program (e.g. because it has solved the removed the cause of the
@@ -628,6 +630,16 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 bool
 user_debug_exception_occurred(debug_exception_type exception, int signal)
 {
+	// First check whether there's a signal handler installed for the signal.
+	// If so, we don't want to install a debugger for the team. We always send
+	// the signal instead. An already installed debugger will be notified, if
+	// it has requested notifications of signal.
+	struct sigaction signalAction;
+	if (sigaction(signal, NULL, &signalAction) == B_OK
+		&& signalAction.sa_handler != SIG_DFL) {
+		return true;
+	}
+
 	// ensure that a debugger is installed for this team
 	struct thread *thread = thread_get_current_thread();
 	port_id nubPort;
@@ -635,7 +647,7 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 	if (error != B_OK) {
 		dprintf("user_debug_exception_occurred(): Failed to install debugger: "
 			"thread: %ld: %s\n", thread->id, strerror(error));
-		return error;
+		return true;
 	}
 
 	// prepare the message
