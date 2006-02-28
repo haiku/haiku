@@ -486,33 +486,43 @@ Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSy
 {
 	DBG(OUT("Database::SetSupportedTypes()\n"));
 
-	bool didCreate = false;
-	status_t err = (type && types) ? B_OK : B_BAD_VALUE;
+	if (type == NULL || types == NULL)
+		return B_BAD_VALUE;
+
 	// Install the types
-	if (!err) {
-		const char *supportedType;
-		for (int32 i = 0;
-			 err == B_OK
-			 && types->FindString("types", i, &supportedType) == B_OK;
-			 i++) {
-			if (!is_installed(supportedType))
-				err = Install(supportedType);
+	const char *supportedType;
+	for (int32 i = 0; types->FindString("types", i, &supportedType) == B_OK; i++) {
+		if (!is_installed(supportedType)) {
+			if (Install(supportedType) != B_OK)
+				break;
+
+			// Since the type has been introduced by this application
+			// we take the liberty and make it the preferred handler
+			// for them, too.
+			SetPreferredApp(supportedType, type, B_OPEN);
 		}
 	}
+
 	// Write the attr
-	if (!err)
-		err = write_mime_attr_message(type, kSupportedTypesAttr, types, &didCreate);
+	bool didCreate = false;
+	status_t status = write_mime_attr_message(type, kSupportedTypesAttr, types,
+		&didCreate);
+
 	// Notify the monitor if we created the type when we opened it
-	if (!err && didCreate)
+	if (status == B_OK && didCreate)
 		_SendInstallNotification(type);
+
 	// Update the supporting apps map
-	if (!err)
-		err = fSupportingApps.SetSupportedTypes(type, types, fullSync);
+	if (status == B_OK)
+		status = fSupportingApps.SetSupportedTypes(type, types, fullSync);
+
 	// Notify the monitor
-	if (!err)
+	if (status == B_OK)
 		_SendMonitorUpdate(B_SUPPORTED_TYPES_CHANGED, type, B_META_MIME_MODIFIED);
-	return err;
+
+	return status;
 }
+
 
 // GetInstalledSupertypes
 /*! \brief Fetches a BMessage listing all the MIME supertypes currently
