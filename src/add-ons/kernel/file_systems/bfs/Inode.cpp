@@ -209,8 +209,8 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 		volume, &transaction, id, this));
 
 	char lockName[B_OS_NAME_LENGTH];
-	snprintf(lockName, sizeof(lockName), "bfs inode %ld.%d",
-		BlockRun().AllocationGroup(), BlockRun().Start());
+	snprintf(lockName, sizeof(lockName), "bfs inode+%ld.%d",
+		run.AllocationGroup(), run.Start());
 	fLock.Initialize(lockName);
 
 	NodeGetter node(volume, transaction, this, true);
