@@ -48,15 +48,15 @@ compare_attributes(const void* _a, const void* _b)
 
 
 AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
-		AttributeItem* item)
+		AttributeItem* attributeItem)
 	: BWindow(BRect(100, 100, 350, 200), "Attribute", B_MODAL_WINDOW_LOOK,
 		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
 			| B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
 	fMimeType(mimeType.Type())
 {
-	if (item != NULL)
-		fAttribute = *item;
+	if (attributeItem != NULL)
+		fAttribute = *attributeItem;
 
 	BRect rect = Bounds();
 	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);

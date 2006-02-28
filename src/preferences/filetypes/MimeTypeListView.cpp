@@ -480,12 +480,18 @@ MimeTypeListView::MessageReceived(BMessage* message)
 				{
 					// create new item
 					BMimeType created(type);
+					bool isApp = mimetype_is_application_signature(created);
+					if (fApplicationMode ^ isApp)
+						break;
+
 					BMimeType superType;
 					MimeTypeItem* superItem = NULL;
 					if (created.GetSupertype(&superType) == B_OK)
 						superItem = FindItem(superType.Type());
 
-					MimeTypeItem* item = new MimeTypeItem(created);
+					MimeTypeItem* item = new MimeTypeItem(created, fShowIcons,
+						fSupertype.Type() != NULL);
+					item->SetApplicationMode(isApp);
 
 					if (superItem != NULL) {
 						AddUnder(item, superItem);
