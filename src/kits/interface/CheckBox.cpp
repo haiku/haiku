@@ -15,8 +15,8 @@
 
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 					 BMessage *message, uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode, flags),
-		fOutlined(false)
+	: BControl(frame, name, label, message, resizingMode, flags),
+	fOutlined(false)
 {
 	// Resize to minimum height if needed
 	font_height fontHeight;
@@ -33,8 +33,8 @@ BCheckBox::~BCheckBox()
 
 
 BCheckBox::BCheckBox(BMessage *archive)
-	:	BControl(archive),
-		fOutlined(false)
+	: BControl(archive),
+	fOutlined(false)
 {
 }
 
@@ -44,8 +44,8 @@ BCheckBox::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BCheckBox"))
 		return new BCheckBox(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -334,6 +334,9 @@ BCheckBox::DetachedFromWindow()
 void
 BCheckBox::SetValue(int32 value)
 {
+	value = value ? B_CONTROL_ON : B_CONTROL_OFF;
+		// we only accept boolean values
+
 	if (value != Value()) {
 		BControl::SetValueNoUpdate(value);
 		Invalidate(_CheckBoxFrame());
@@ -391,8 +394,7 @@ BCheckBox::FrameResized(float width, float height)
 
 BHandler *
 BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
-									  BMessage *specifier, int32 what,
-									  const char *property)
+	BMessage *specifier, int32 what, const char *property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, what, property);
 }
