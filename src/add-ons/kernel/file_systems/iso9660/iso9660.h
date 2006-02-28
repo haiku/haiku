@@ -1,3 +1,8 @@
+/* 
+ * Copyright 2002, Tyler Dauwalder.
+ * This file may be used under the terms of the MIT License.
+ */
+
 #ifndef _ISO9660_H
 #define _ISO9660_H
 

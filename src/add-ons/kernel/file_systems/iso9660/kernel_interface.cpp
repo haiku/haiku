@@ -50,6 +50,8 @@ static status_t		fs_mount(mount_id mountID, const char *device, uint32 flags,
 				const char *args, void **_data, vnode_id *_rootID);
 static status_t		fs_unmount(void *ns);
 
+static status_t		fs_get_vnode_name(void *_ns, void *_node, 
+				char *buffer, size_t bufferSize);
 static status_t		fs_walk(void *_ns, void *_base, const char *file, 
 				vnode_id *_vnodeID, int *_type);
 
@@ -79,14 +81,14 @@ static status_t		fs_rewind_dir(void *_ns, void *_node, void *cookie);
 // fs_closedir - Do whatever you need to to close a directory (sometimes
 //					nothing), but DON'T free the cookie!
 static status_t		fs_close_dir(void *_ns, void *_node, void *cookie);
-// fs_fee_dircookie - Free the fs-specific cookie struct
+// fs_free_dircookie - Free the fs-specific cookie struct
 static status_t		fs_free_dir_cookie(void *_ns, void *_node, void *cookie);
 
 // fs_rfsstat - Fill in fs_info struct for device.
 static status_t		fs_read_fs_stat(void *_ns, struct fs_info *);
 
 // fs_readlink - Read in the name of a symbolic link.
-static status_t 		fs_read_link(void *_ns, void *_node, char *buf, size_t *bufsize);
+static status_t 	fs_read_link(void *_ns, void *_node, char *buf, size_t *bufsize);
 
 
 //	#pragma mark - Scanning
@@ -277,6 +279,17 @@ fs_read_fs_stat(void *_ns, struct fs_info *fss)
 	return 0;
 }
 
+
+static status_t
+fs_get_vnode_name(void *ns, void *_node, char *buffer, size_t bufferSize)
+{
+	vnode *node = (vnode*)_node;
+
+	strlcpy(buffer, node->fileIDString, bufferSize);
+	return B_OK;
+}
+
+
 /* fs_walk - the walk function just "walks" through a directory looking for
 	the specified file. When you find it, call get_vnode on its vnid to init
 	it for the kernel.
@@ -393,7 +406,8 @@ fs_walk(void *_ns, void *base, const char *file, vnode_id *_vnodeID, int *_type)
 				done = TRUE;
 		}
 
-		*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode;
+		if (newNode)
+			*_type = newNode->attr.stat[FS_DATA_FORMAT].st_mode;
 
 	}
 	TRACE(("fs_walk - EXIT, result is %s, vnid is %Lu\n", strerror(result), *_vnodeID));
@@ -480,10 +494,10 @@ fs_read_stat(void *_ns, void *_node, struct stat *st)
 {
 	nspace *ns = (nspace*)_ns;
 	vnode *node = (vnode*)_node;
-	int result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 	time_t time;
 
-	TRACE(("fs_rstat - ENTER\n"));
+	TRACE(("fs_read_stat - ENTER\n"));
 
 	st->st_dev = ns->id;
 	st->st_ino = node->id;
@@ -498,7 +512,7 @@ fs_read_stat(void *_ns, void *_node, struct stat *st)
 	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR) 
 		st->st_ctime = st->st_mtime = st->st_atime = time;
 
-	TRACE(("fs_rstat - EXIT, result is %s\n", strerror(result)));
+	TRACE(("fs_read_stat - EXIT, result is %s\n", strerror(result)));
 
 	return result;
 }
@@ -597,27 +611,21 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len)
 			*len += startLen;
 			block_cache_put(ns->fBlockCache, cachedBlock);
 			startBlock++;	
-		}
-		else result = EIO;
+		} else
+			result = EIO;
 	}
 
 	// Read in the middle blocks.
 	if (numBlocks > 0 && result == B_NO_ERROR) {
 		TRACE(("fs_read - getting middle blocks\n"));
-		/*
-		result = cached_read(ns->fd, startBlock, 
-					((char *)buf) + startLen, 
-					numBlocks, 
-					blockSize);
-		*/
+		char *endBuf = ((char *)buf) + startLen;
 		for (int32 i=startBlock; i<startBlock+numBlocks; i++) {
 			char *blockData = (char *)block_cache_get_etc(ns->fBlockCache, i, 0, blockSize);
-			memcpy(((char *)buf) + startLen + (i - startBlock) * blockSize, blockData, blockSize);
+			memcpy(endBuf, blockData, blockSize);
 			*len += blockSize;
+			endBuf += blockSize;
 			block_cache_put(ns->fBlockCache, i);
 		}
-		/*if (result == B_NO_ERROR)
-			*len += blockSize * numBlocks;*/
 	}
 
 	// Read in the last partial block.
@@ -692,12 +700,13 @@ fs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 	if (S_ISLNK(node->attr.stat[FS_DATA_FORMAT].st_mode)) {
 		size_t length = strlen(node->attr.slName);
 		if (length > *_bufferSize)
+			memcpy(buffer, node->attr.slName, *_bufferSize);
+		else {
 			memcpy(buffer, node->attr.slName, length);
-		else
-			memcpy(buffer, node->attr.slName, length);
+			*_bufferSize = length;
+		}
 
 		result = B_NO_ERROR;
-		*_bufferSize = length;
 	}
 
 	return result;
@@ -857,7 +866,7 @@ static file_system_module_info sISO660FileSystem = {
 
 	/* vnode operations */
 	&fs_walk,
-	NULL, 	// &fs_get_vnode_name()
+	&fs_get_vnode_name,
 	&fs_read_vnode,
 	&fs_release_vnode,
 	NULL, 	// &fs_remove_vnode()
@@ -871,12 +880,12 @@ static file_system_module_info sISO660FileSystem = {
 
 	NULL, 	// &fs_ioctl
 	NULL, 	// &fs_set_flags
-	NULL,	// &bfs_select
-	NULL,	// &bfs_deselect
+	NULL,	// &fs_select
+	NULL,	// &fs_deselect
 	NULL, 	// &fs_fsync
 
 	&fs_read_link,
-	NULL,						// write link
+	NULL,	// write link
 	NULL, 	// &fs_create_symlink,
 
 	NULL, 	// &fs_link,

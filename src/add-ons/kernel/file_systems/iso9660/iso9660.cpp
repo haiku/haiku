@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/* 
+ * Copyright 2002, Tyler Dauwalder.
+ * This file may be used under the terms of the MIT License.
+ */
 /*!
 	\file iso9660.cpp
 	\brief disk_scanner filesystem module for iso9660 CD-ROM filesystems
