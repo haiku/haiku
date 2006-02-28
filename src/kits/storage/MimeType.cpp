@@ -46,8 +46,9 @@ const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 /*!	\brief Creates an uninitialized BMimeType object.
 */
 BMimeType::BMimeType()
-	: fType(NULL)
-	, fCStatus(B_NO_INIT)
+	:
+	fType(NULL),
+	fCStatus(B_NO_INIT)
 {
 }
 
@@ -59,8 +60,9 @@ BMimeType::BMimeType()
 	\param mimeType The MIME string.
 */
 BMimeType::BMimeType(const char *mimeType)
-	: fType(NULL)
-	, fCStatus(B_NO_INIT)
+	:
+	fType(NULL),
+	fCStatus(B_NO_INIT)
 {
 	SetTo(mimeType);
 }
@@ -102,7 +104,7 @@ BMimeType::SetTo(const char *mimeType)
 		fCStatus = B_BAD_VALUE;
 	} else {
 		Unset();
-		fType = new(std::nothrow) char[strlen(mimeType)+1];
+		fType = new(std::nothrow) char[strlen(mimeType) + 1];
 		if (fType) {
 			strcpy(fType, mimeType);
 			fCStatus = B_OK;
@@ -119,8 +121,7 @@ BMimeType::SetTo(const char *mimeType)
 void
 BMimeType::Unset()
 {
-	if (fType)
-		delete [] fType;
+	delete [] fType;
 	fType = NULL;
 	fCStatus = B_NO_INIT;
 }

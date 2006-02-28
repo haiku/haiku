@@ -301,7 +301,7 @@ SupportingApps::BuildSupportingAppsTable()
 						for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
 							supportedTypes.insert(type);
 							AddSupportingApp(type, appSig);						
-						}					
+						}
 					}
 				}				
 			}
