@@ -337,7 +337,8 @@ Journal::_CheckRunArray(const run_array *array)
 	if (array->MaxRuns() != maxRuns
 		|| array->CountRuns() > maxRuns
 		|| array->CountRuns() <= 0) {
-		dprintf("run count: %ld, array max: %ld, max runs: %ld\n", array->CountRuns(), array->MaxRuns(), maxRuns);
+		dprintf("run count: %ld, array max: %ld, max runs: %ld\n",
+			array->CountRuns(), array->MaxRuns(), maxRuns);
 		FATAL(("Log entry has broken header!\n"));
 		return B_ERROR;
 	}
@@ -347,7 +348,7 @@ Journal::_CheckRunArray(const run_array *array)
 			return B_ERROR;
 	}
 
-	PRINT(("Log entry has %ld entries (%Ld)\n", array->CountRuns()));
+	PRINT(("Log entry has %ld entries\n", array->CountRuns()));
 	return B_OK;
 }
 
