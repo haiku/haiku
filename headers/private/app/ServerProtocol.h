@@ -33,11 +33,12 @@ enum {
 	AS_REGISTER_INPUT_SERVER = 1,
 	AS_GET_DESKTOP,
 
-	// Desktop definitions
+	// Desktop definitions (through the ServerApp, though)
 	AS_GET_WINDOW_LIST,
 	AS_GET_WINDOW_INFO,
 	AS_MINIMIZE_TEAM,
 	AS_BRING_TEAM_TO_FRONT,
+	AS_WINDOW_ACTION,
 
 	// Application definitions
 	AS_CREATE_APP,

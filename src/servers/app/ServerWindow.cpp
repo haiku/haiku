@@ -407,6 +407,9 @@ ServerWindow::NotifyQuitRequested()
 void
 ServerWindow::NotifyMinimize(bool minimize)
 {
+	if (fWindowLayer->Feel() != B_NORMAL_WINDOW_FEEL)
+		return;
+
 	// The client is responsible for the actual minimization
 
 	BMessage msg(B_MINIMIZE);
@@ -448,6 +451,14 @@ ServerWindow::GetInfo(window_info& info)
 
 	info.show_hide_level = fWindowLayer->IsHidden() ? 1 : 0; // ???
 	info.is_mini = fWindowLayer->IsMinimized();
+}
+
+
+WindowLayer*
+ServerWindow::Window() const
+{
+	// TODO: ensure desktop is locked!
+	return fWindowLayer;
 }
 
 

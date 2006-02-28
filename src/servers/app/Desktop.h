@@ -162,6 +162,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
+		void					WindowAction(int32 windowToken, int32 action);
 
 		void					WriteWindowList(team_id team,
 									BPrivate::LinkSender& sender);

@@ -1103,6 +1103,11 @@ Desktop::ActivateWindow(WindowLayer* window)
 {
 //	printf("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>");
 
+	// TODO: handle this case correctly! (ie. honour B_NOT_ANCHORED_ON_ACTIVATE,
+	//		B_NO_WORKSPACE_ACTIVATION, switch workspaces, ...)
+	if (!window->InWorkspace(fCurrentWorkspace))
+		return;
+
 	if (window == NULL) {
 		fBack = NULL;
 		fFront = NULL;
@@ -1805,6 +1810,30 @@ Desktop::BringApplicationToFront(team_id team)
 
 		window->ServerWindow()->NotifyMinimize(false);
 	}
+}
+
+
+void
+Desktop::WindowAction(int32 windowToken, int32 action)
+{
+	if (action != B_MINIMIZE_WINDOW && action != B_BRING_TO_FRONT)
+		return;
+
+	LockAllWindows();
+
+	::ServerWindow* serverWindow;
+	if (BPrivate::gDefaultTokens.GetToken(windowToken,
+			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK)
+		return;
+
+	if (action == B_BRING_TO_FRONT
+		&& !serverWindow->Window()->IsMinimized()) {
+		// the window is visible, we just need to make it the front window
+		ActivateWindow(serverWindow->Window());
+	} else
+		serverWindow->NotifyMinimize(action == B_MINIMIZE_WINDOW);
+
+	UnlockAllWindows();
 }
 
 

@@ -999,10 +999,17 @@ void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 
 
 void 
-do_window_action(int32 window_id, int32 action, 
+do_window_action(int32 windowToken, int32 action, 
 	BRect zoomRect, bool zoom)
 {
-	// ToDo: implement me, needed for Deskbar!
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_WINDOW_ACTION);
+	link.Attach<int32>(windowToken);
+	link.Attach<int32>(action);
+		// we don't have any zooming effect
+
+	link.Flush();
 }
 
 

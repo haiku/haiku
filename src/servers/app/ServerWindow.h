@@ -82,7 +82,7 @@ public:
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
 			::Desktop*			Desktop() const { return fDesktop; }
-	inline	const WindowLayer*	GetWindowLayer() const { return fWindowLayer; }
+			::WindowLayer*		Window() const;
 
 			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }

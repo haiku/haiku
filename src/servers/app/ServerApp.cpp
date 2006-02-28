@@ -455,6 +455,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_WINDOW_ACTION:
+		{
+			int32 token;
+			int32 action;
+
+			link.Read<int32>(&token);
+			if (link.Read<int32>(&action) != B_OK)
+				break;
+
+			fDesktop->WindowAction(token, action);
+			break;
+		}
+
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
@@ -466,7 +479,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			
 			for(int32 i = 0; i < fWindowList.CountItems(); i++) {
 				win=(ServerWindow*)fWindowList.ItemAt(i);
-				win->GetWindowLayer()->UpdateColors();
+				win->Window()->UpdateColors();
 				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 			}
 */			break;
@@ -483,7 +496,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			for(int32 i=0; i<fSWindowList->CountItems(); i++)
 			{
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->GetWindowLayer()->UpdateFont();
+				win->Window()->UpdateFont();
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 			}
 */			break;
@@ -598,7 +611,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 /*			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
 				ServerWindow *window = fWindowList.ItemAt(i);
 				window->Lock();
-				const_cast<WindowLayer *>(window->GetWindowLayer())->UpdateDecorator();
+				const_cast<WindowLayer *>(window->Window())->UpdateDecorator();
 				window->Unlock();
 			}
 */			break;
@@ -2564,7 +2577,7 @@ ServerApp::InWorkspace(int32 index) const
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* window = fWindowList.ItemAt(i);
-		const WindowLayer* layer = window->GetWindowLayer();
+		const WindowLayer* layer = window->Window();
 
 		// only normal and unhidden windows count
 
@@ -2588,7 +2601,7 @@ ServerApp::Workspaces() const
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* window = fWindowList.ItemAt(i);
-		const WindowLayer* layer = window->GetWindowLayer();
+		const WindowLayer* layer = window->Window();
 
 		// only normal and unhidden windows count
 
