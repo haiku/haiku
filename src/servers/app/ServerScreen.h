@@ -58,9 +58,8 @@ class Screen {
 										  display_mode* mode) const;
 
 			int32				_FindMode(const display_mode* modeList,
-										  uint32 count, uint16 width, uint16 height, uint32 colorspace,
-										  float frequency,
-										  bool ignoreFrequency = false) const;
+										  uint32 count, uint16 width, uint16 height,
+										  uint32 colorspace, float frequency) const;
 
 			int32				fID;
 			DrawingEngine*		fDriver;
