@@ -1512,25 +1512,28 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode, const rgb_color *
 
 
 void
-BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont *inFont,
-					uint32 inMode, const rgb_color *inColor)
+BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font,
+	uint32 fontMode, const rgb_color* color)
 {
 	CALLED();
-	
-	BFont newFont = *inFont;
-	NormalizeFont(&newFont);
-	
+
+	BFont newFont;
+	if (font != NULL) {
+		newFont = font;
+		NormalizeFont(&newFont);
+	}
+
 	// add the style to the style buffer
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
-						  inMode, &newFont, inColor);
-						
-	if (inMode & B_FONT_FAMILY_AND_STYLE || inMode & B_FONT_SIZE)
+		fontMode, &newFont, color);
+
+	if (fontMode & B_FONT_FAMILY_AND_STYLE || fontMode & B_FONT_SIZE) {
 		// recalc the line breaks and redraw with new style
 		Refresh(startOffset, endOffset, startOffset != endOffset, false);
-	else
+	} else {
 		// the line breaks wont change, simply redraw
 		DrawLines(LineAt(startOffset), LineAt(endOffset), startOffset, true);
-	
+	}
 }
 
 
