@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -156,22 +156,21 @@ class Inode {
 		Inode &operator=(const Inode &);
 			// no implementation
 
-		friend void dump_inode(Inode &inode);
 		friend class AttributeIterator;
 		friend class InodeAllocator;
 
-		status_t RemoveSmallData(bfs_inode *node, small_data *item, int32 index);
+		status_t _RemoveSmallData(bfs_inode *node, small_data *item, int32 index);
 
-		void AddIterator(AttributeIterator *iterator);
-		void RemoveIterator(AttributeIterator *iterator);
+		void _AddIterator(AttributeIterator *iterator);
+		void _RemoveIterator(AttributeIterator *iterator);
 
-		status_t FreeStaticStreamArray(Transaction &transaction, int32 level, block_run run,
-					off_t size, off_t offset, off_t &max);
-		status_t FreeStreamArray(Transaction &transaction, block_run *array, uint32 arrayLength,
-					off_t size, off_t &offset, off_t &max);
-		status_t AllocateBlockArray(Transaction &transaction, block_run &run);
-		status_t GrowStream(Transaction &transaction, off_t size);
-		status_t ShrinkStream(Transaction &transaction, off_t size);
+		status_t _FreeStaticStreamArray(Transaction &transaction, int32 level,
+					block_run run, off_t size, off_t offset, off_t &max);
+		status_t _FreeStreamArray(Transaction &transaction, block_run *array,
+					uint32 arrayLength, off_t size, off_t &offset, off_t &max);
+		status_t _AllocateBlockArray(Transaction &transaction, block_run &run);
+		status_t _GrowStream(Transaction &transaction, off_t size);
+		status_t _ShrinkStream(Transaction &transaction, off_t size);
 
 	private:
 		ReadWriteLock	fLock;
@@ -284,17 +283,17 @@ class AttributeIterator {
 		status_t GetNext(char *name, size_t *length, uint32 *type, vnode_id *id);
 
 	private:
-		int32		fCurrentSmallData;
-		Inode		*fInode, *fAttributes;
-		TreeIterator *fIterator;
-		void		*fBuffer;
-
-	private:
 		friend class Chain<AttributeIterator>;
 		friend class Inode;
 
 		void Update(uint16 index, int8 change);
 		AttributeIterator *fNext;
+
+	private:
+		int32		fCurrentSmallData;
+		Inode		*fInode, *fAttributes;
+		TreeIterator *fIterator;
+		void		*fBuffer;
 };
 
 

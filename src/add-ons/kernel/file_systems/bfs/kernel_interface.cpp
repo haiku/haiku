@@ -1137,6 +1137,9 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 		Transaction transaction(volume, inode->BlockNumber());
 
 		status_t status = inode->SetFileSize(transaction, 0);
+		if (status >= B_OK)
+			status = inode->WriteBack(transaction);
+
 		if (status < B_OK) {
 			// bfs_free_cookie() is only called if this function is successful
 			free(cookie);
