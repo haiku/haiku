@@ -11,7 +11,9 @@
 
 
 #include "HWInterface.h"
+
 #include <image.h>
+#include <video_overlay.h>
 
 class MallocBuffer;
 class AccelerantBuffer;
@@ -117,14 +119,23 @@ private:
 		dpms_mode				fAccDPMSMode;
 		set_dpms_mode			fAccSetDPMSMode;
 
+		// overlay hooks
+		overlay_count				fAccOverlayCount;
+		overlay_supported_spaces	fAccOverlaySupportedSpaces;
+		overlay_supported_features	fAccOverlaySupportedFeatures;
+		allocate_overlay_buffer		fAccAllocateOverlayBuffer;
+		release_overlay_buffer		fAccReleaseOverlayBuffer;
+		get_overlay_constraints		fAccGetOverlayConstraints;
+		allocate_overlay			fAccAllocateOverlay;
+		release_overlay				fReleaseOverlay;
+		configure_overlay			fConfigureOverlay;
+
 		frame_buffer_config		fFrameBufferConfig;
 		int						fModeCount;
 		display_mode			*fModeList;
 
-
 		MallocBuffer			*fBackBuffer;
 		AccelerantBuffer		*fFrontBuffer;
-
 
 		display_mode			fDisplayMode;
 };

@@ -309,6 +309,17 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccDPMSMode = (dpms_mode)fAccelerantHook(B_DPMS_MODE, NULL);
 	fAccSetDPMSMode = (set_dpms_mode)fAccelerantHook(B_SET_DPMS_MODE, NULL);
 
+	// overlay
+	fAccOverlayCount = (overlay_count)fAccelerantHook(B_OVERLAY_COUNT, NULL);
+	fAccOverlaySupportedSpaces = (overlay_supported_spaces)fAccelerantHook(B_OVERLAY_SUPPORTED_SPACES, NULL);
+	fAccOverlaySupportedFeatures = (overlay_supported_features)fAccelerantHook(B_OVERLAY_SUPPORTED_FEATURES, NULL);
+	fAccAllocateOverlayBuffer = (allocate_overlay_buffer)fAccelerantHook(B_ALLOCATE_OVERLAY_BUFFER, NULL);
+	fAccReleaseOverlayBuffer = (release_overlay_buffer)fAccelerantHook(B_RELEASE_OVERLAY_BUFFER, NULL);
+	fAccGetOverlayConstraints = (get_overlay_constraints)fAccelerantHook(B_GET_OVERLAY_CONSTRAINTS, NULL);
+	fAccAllocateOverlay = (allocate_overlay)fAccelerantHook(B_ALLOCATE_OVERLAY, NULL);
+	fReleaseOverlay = (release_overlay)fAccelerantHook(B_RELEASE_OVERLAY, NULL);
+	fConfigureOverlay = (configure_overlay)fAccelerantHook(B_CONFIGURE_OVERLAY, NULL);
+
 	return B_OK;
 }
 
@@ -508,6 +519,7 @@ AccelerantHWInterface::GetModeList(display_mode** modes, uint32 *count)
 	return ret;
 }
 
+
 status_t
 AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
@@ -518,6 +530,7 @@ AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint
 	
 	return fAccGetPixelClockLimits(mode, low, high);
 }
+
 
 status_t
 AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
@@ -532,6 +545,7 @@ AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 	
 	return B_UNSUPPORTED;
 }
+
 
 status_t
 AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
@@ -552,7 +566,7 @@ AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *
 	return fAccProposeDisplayMode(candidate, &this_low, &this_high);
 }
 
-// RetraceSemaphore
+
 sem_id
 AccelerantHWInterface::RetraceSemaphore()
 {
@@ -563,7 +577,7 @@ AccelerantHWInterface::RetraceSemaphore()
 	return AccelerantRetraceSemaphore();
 }
 
-// WaitForRetrace
+
 status_t
 AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 {
@@ -580,7 +594,7 @@ AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 	return acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
 }
 
-// SetDPMSMode
+
 status_t
 AccelerantHWInterface::SetDPMSMode(const uint32 &state)
 {

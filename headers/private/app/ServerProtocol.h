@@ -22,6 +22,9 @@
 #	define SERVER_INPUT_PORT "OBinputport"
 #endif
 
+#define AS_REQUEST_COLOR_KEY 0x00010000
+	// additional option for AS_LAYER_SET_VIEW_BITMAP
+
 enum {
 	// Used for quick replies from the app_server
 	SERVER_TRUE = B_OK,
@@ -53,6 +56,7 @@ enum {
 	AS_DELETE_WINDOW,
 	AS_CREATE_BITMAP,
 	AS_DELETE_BITMAP,
+	AS_GET_BITMAP_OVERLAY_RESTRICTIONS,
 
 	AS_ACQUIRE_SERVERMEM,
 	AS_RELEASE_SERVERMEM,

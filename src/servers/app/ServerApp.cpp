@@ -715,14 +715,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
 						Signature(), frame.Width(), frame.Height()));
 
-			if (bitmap && fBitmapList.AddItem((void*)bitmap)) {
+			if (bitmap != NULL && fBitmapList.AddItem(bitmap)) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<area_id>(bitmap->Area());
 				fLink.Attach<int32>(bitmap->AreaOffset());
-			} else {
+			} else
 				fLink.StartMessage(B_NO_MEMORY);
-			}
 
 			fLink.Flush();
 			break;
@@ -734,15 +733,39 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Attached Data:
 			// 1) int32 token
-			int32 id;
-			link.Read<int32>(&id);
+			int32 token;
+			link.Read<int32>(&token);
 
-			ServerBitmap *bitmap = FindBitmap(id);
-			if (bitmap && fBitmapList.RemoveItem((void*)bitmap)) {
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), id));
+			ServerBitmap *bitmap = FindBitmap(token);
+			if (bitmap && fBitmapList.RemoveItem(bitmap)) {
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n", Signature(), token));
 
 				gBitmapManager->DeleteBitmap(bitmap);
 			}
+			break;
+		}
+		case AS_GET_BITMAP_OVERLAY_RESTRICTIONS:
+		{
+			overlay_restrictions overlayRestrictions;
+			status_t status = B_ERROR;
+
+			int32 token;
+			if (link.Read<int32>(&token) != B_OK)
+				break;
+
+			ServerBitmap *bitmap = FindBitmap(token);
+			if (bitmap != NULL) {
+				STRACE(("ServerApp %s: Get overlay restrictions for bitmap %ld\n",
+					Signature(), token));
+
+				// TODO: fill overlay restrictions
+			}
+
+			fLink.StartMessage(status);
+			if (status == B_OK)
+				fLink.Attach(&overlayRestrictions, sizeof(overlay_restrictions));
+
+			fLink.Flush();
 			break;
 		}
 

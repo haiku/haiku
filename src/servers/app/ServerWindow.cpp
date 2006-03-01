@@ -1484,6 +1484,13 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			}
 
 			fLink.StartMessage(status);
+			if (status == B_OK && (options & AS_REQUEST_COLOR_KEY) != 0) {
+				// Attach color key for the overlay bitmap
+				// TODO: get color key from the accelerant
+				rgb_color colorKey = {40, 40, 40, 255};
+				fLink.Attach<rgb_color>(colorKey);
+			}
+
 			fLink.Flush();
 			break;
 		}

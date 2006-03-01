@@ -1998,17 +1998,28 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 	return error;
 }
 
-// GetOverlayRestrictions
-/*!	\brief ???
+
+/*!	\brief Returns the overlay_restrictions structure for this bitmap
 */
 status_t
 BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 {
-	// TODO: Implement
-	return B_ERROR;
+	if ((fFlags & B_BITMAP_WILL_OVERLAY) == 0)
+		return B_BAD_TYPE;
+
+	BPrivate::AppServerLink link;
+
+	link.StartMessage(AS_GET_BITMAP_OVERLAY_RESTRICTIONS);
+	link.Attach<int32>(fServerToken);
+
+	status_t status;
+	if (link.FlushWithReply(status) < B_OK)
+		return B_ERROR;
+
+	return status;
 }
 
-// AddChild
+
 /*!	\brief Adds a BView to the bitmap's view hierarchy.
 
 	The bitmap must accept views and the supplied view must not be child of

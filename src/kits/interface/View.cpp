@@ -3085,15 +3085,17 @@ status_t
 BView::SetViewOverlay(const BBitmap *overlay, BRect srcRect, BRect dstRect,
 	rgb_color *colorKey, uint32 followFlags, uint32 options)
 {
-	status_t err = _SetViewBitmap(overlay, srcRect, dstRect, followFlags,
-		options | 0x4);
+	if ((overlay->fFlags & B_BITMAP_WILL_OVERLAY) == 0)
+		return B_BAD_VALUE;
 
-	// TODO: Incomplete?
+	status_t status = _SetViewBitmap(overlay, srcRect, dstRect, followFlags,
+		options | AS_REQUEST_COLOR_KEY);
+	if (status == B_OK) {
+		// read the color that will be treated as transparent
+		fOwner->fLink->Read<rgb_color>(colorKey);
+	}
 
-	// read the color that will be treated as transparent
-	fOwner->fLink->Read<rgb_color>(colorKey);
-
-	return err;
+	return status;
 }
 
 
@@ -3102,20 +3104,12 @@ BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,
 	uint32 followFlags, uint32 options)
 {
 	BRect rect;
- 	if (overlay)
+ 	if (overlay != NULL) {
 		rect = overlay->Bounds();
+	 	rect.OffsetTo(B_ORIGIN);
+ 	}
 
- 	rect.OffsetTo(0, 0);
-
-	status_t err = _SetViewBitmap(overlay, rect, rect, followFlags,
-			options | 0x4);
-
-	// TODO: Incomplete?
-
-	// read the color that will be treated as transparent
-	fOwner->fLink->Read<rgb_color>(colorKey);
-
-	return err;
+	return SetViewOverlay(overlay, rect, rect, colorKey, followFlags, options);
 }
 
 

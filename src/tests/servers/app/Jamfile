@@ -6,7 +6,7 @@ SetSubDirSupportedPlatforms libbe_test ;
 if $(TARGET_PLATFORM) = libbe_test {
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app input interface shared [ FDirName servers app ] ;
+UsePrivateHeaders app graphics input interface shared [ FDirName servers app ] ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
