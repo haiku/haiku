@@ -1319,8 +1319,8 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 }
 
 
-BFont
-&BFont::operator=(const BFont &font)
+BFont &
+BFont::operator=(const BFont &font)
 {
 	fFamilyID = font.fFamilyID;
 	fStyleID = font.fStyleID;
