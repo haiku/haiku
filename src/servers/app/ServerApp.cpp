@@ -2439,8 +2439,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerBitmap *bitmap = FindBitmap(bitmapToken);
 			if (bitmap != NULL) {
-				fLink.StartMessage(B_OK);
-				// TODO: Implement for real
+				if (fDesktop->GetDrawingEngine()->ReadBitmap(bitmap,
+					drawCursor, bounds) == B_OK) {
+					fLink.StartMessage(B_OK);
+				} else
+					fLink.StartMessage(B_BAD_VALUE);
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 

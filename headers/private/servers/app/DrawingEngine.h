@@ -59,7 +59,8 @@ public:
 			// for screen shots
 			bool			DumpToFile(const char *path);
 			ServerBitmap*	DumpToBitmap();
-
+			status_t		ReadBitmap(ServerBitmap *bitmap, bool drawCursor,
+								BRect bounds);
 
 			// clipping for all drawing functions, passing a NULL region
 			// will remove any clipping (drawing allowed everywhere)

@@ -16,6 +16,7 @@
 #include "DrawState.h"
 #include "Painter.h"
 #include "PNGDump.h"
+#include "ServerBitmap.h"
 #include "RenderingBuffer.h"
 
 #include "frame_buffer_support.h"
@@ -1133,6 +1134,39 @@ ServerBitmap*
 DrawingEngine::DumpToBitmap()
 {
 	return NULL;
+}
+
+status_t
+DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
+{
+	if (Lock()) {
+		RenderingBuffer *buffer = fGraphicsCard->DrawingBuffer();
+		if (!buffer)
+			return B_ERROR;
+
+		BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
+		bounds = bounds & clip;
+
+		uint32 width = (bounds.IntegerWidth() + 1) * 4;
+		uint32 height = bounds.IntegerHeight() + 1;
+		uint32 srcBytesPerRow = buffer->BytesPerRow();
+		uint32 dstBytesPerRow = bitmap->BytesPerRow();
+		uint8 *dst = (uint8 *)bitmap->Bits();
+		uint8 *src = (uint8 *)buffer->Bits();
+		src += (uint32)bounds.top * srcBytesPerRow + (uint32)bounds.left * 4;
+
+		/* ToDo: handle color conversion */
+		for (uint32 i = 0; i < height; i++) {
+			memcpy(dst, src, width);
+			dst += dstBytesPerRow;
+			src += srcBytesPerRow;
+		}
+
+		Unlock();
+		return B_OK;
+	}
+
+	return B_ERROR;
 }
 
 // #pragma mark -
