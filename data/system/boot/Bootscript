@@ -87,9 +87,10 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/input_server
 fi
 
-# Launch MiniTerminal or consoled depending on $SAFEMODE
+# Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
 	launch beos/apps/Terminal
+	#launch beos/system/Tracker
 	launch beos/system/Deskbar
 else
 	launch beos/bin/consoled
@@ -99,3 +100,9 @@ fi
 # TODO to be launched when tracker and deskbar are launched
 #launch beos/bin/dstcheck
 
+if [ "$SAFEMODE" != "yes" ]; then
+	# Start user boot script
+	if [ -f $HOME/config/boot/UserBootscript ]; then
+		. $HOME/config/boot/UserBootscript
+	fi
+fi
