@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -44,6 +44,102 @@ struct list sModeList;
 static addr_t sFrameBuffer;
 static bool sModeChosen;
 static bool sSettingsLoaded;
+
+
+static int
+compare_video_modes(video_mode *a, video_mode *b)
+{
+	int compare = a->width - b->width;
+	if (compare != 0)
+		return compare;
+
+	compare = a->height - b->height;
+	if (compare != 0)
+		return compare;
+
+	// TODO: compare video_mode::mode?
+	return a->bits_per_pixel - b->bits_per_pixel;
+}
+
+
+/**	Insert the video mode into the list, sorted by resolution and bit depth.
+ *	Higher resolutions/depths come first.
+ */
+
+static void
+add_video_mode(video_mode *videoMode)
+{
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		int compare = compare_video_modes(videoMode, mode);
+		if (compare == 0) {
+			// mode already exists
+			return;
+		}
+
+		if (compare > 0)
+			break;
+	}
+
+	list_insert_item_before(&sModeList, mode, videoMode);
+}
+
+
+static video_mode *
+find_video_mode(int32 width, int32 height, int32 depth)
+{
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		if (mode->width == width
+			&& mode->height == height
+			&& mode->bits_per_pixel == depth) {
+			return mode;
+		}
+	}
+
+	return NULL;
+}
+
+
+static void
+get_mode_from_settings(void)
+{
+	if (sSettingsLoaded)
+		return;
+
+	void *handle = load_driver_settings("vesa");
+	if (handle == NULL)
+		return;
+
+	const driver_settings *settings = get_driver_settings(handle);
+	if (settings == NULL)
+		goto out;
+
+	sSettingsLoaded = true;
+
+	for (int32 i = 0; i < settings->parameter_count; i++) {
+		driver_parameter &parameter = settings->parameters[i];
+
+		if (!strcmp(parameter.name, "mode") && parameter.value_count > 2) {
+			// parameter found, now get its values
+			int32 width = strtol(parameter.values[0], NULL, 0);
+			int32 height = strtol(parameter.values[1], NULL, 0);
+			int32 depth = strtol(parameter.values[2], NULL, 0);
+
+			// search mode that fits
+
+			video_mode *mode = find_video_mode(width, height, depth);
+			if (mode != NULL)
+				sMode = mode;
+		}
+	}
+
+out:
+	unload_driver_settings(handle);
+}
+
+
+//	#pragma mark - vga
 
 
 static void
@@ -189,7 +285,7 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 					}
 				}
 
-				list_add_item(&sModeList, videoMode);
+				add_video_mode(videoMode);
 			}
 		} else
 			TRACE(("(failed)\n"));
@@ -341,60 +437,6 @@ video_mode_menu()
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
 	return menu;
-}
-
-
-static video_mode *
-find_video_mode(int32 width, int32 height, int32 depth)
-{
-	video_mode *mode = NULL;
-	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
-		if (mode->width == width
-			&& mode->height == height
-			&& mode->bits_per_pixel == depth) {
-			return mode;
-		}
-	}
-
-	return NULL;
-}
-
-
-static void
-get_mode_from_settings(void)
-{
-	if (sSettingsLoaded)
-		return;
-
-	void *handle = load_driver_settings("vesa");
-	if (handle == NULL)
-		return;
-
-	const driver_settings *settings = get_driver_settings(handle);
-	if (settings == NULL)
-		goto out;
-
-	sSettingsLoaded = true;
-
-	for (int32 i = 0; i < settings->parameter_count; i++) {
-		driver_parameter &parameter = settings->parameters[i];
-
-		if (!strcmp(parameter.name, "mode") && parameter.value_count > 2) {
-			// parameter found, now get its values
-			int32 width = strtol(parameter.values[0], NULL, 0);
-			int32 height = strtol(parameter.values[1], NULL, 0);
-			int32 depth = strtol(parameter.values[2], NULL, 0);
-
-			// search mode that fits
-
-			video_mode *mode = find_video_mode(width, height, depth);
-			if (mode != NULL)
-				sMode = mode;
-		}
-	}
-
-out:
-	unload_driver_settings(handle);
 }
 
 

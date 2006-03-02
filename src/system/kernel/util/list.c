@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <util/list.h>
@@ -153,6 +153,33 @@ void
 list_remove_item(struct list *list, void *item)
 {
 	list_remove_link(GET_LINK(list, item));
+}
+
+
+/** Inserts an item before another item in the list.
+ *	If you pass NULL as \a before item, the item is added at the end of
+ *	the list.
+ */
+
+void
+list_insert_item_before(struct list *list, void *before, void *item)
+{
+	list_link *beforeLink;
+	list_link *link;
+
+	if (before == NULL) {
+		list_add_item(list, item);
+		return;
+	}
+
+	beforeLink = GET_LINK(list, before);
+	link = GET_LINK(list, item);
+
+	link->prev = beforeLink->prev;
+	link->next = beforeLink;
+
+	beforeLink->prev->next = link;
+	beforeLink->prev = link;
 }
 
 
