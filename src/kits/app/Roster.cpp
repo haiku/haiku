@@ -1724,27 +1724,36 @@ BRoster::_RemoveApp(team_id team) const
 status_t
 BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 	const BList *messageList, int argc,
-	const char *const *args, team_id *appTeam) const
+	const char *const *args, team_id *_appTeam) const
 {
-	DBG(OUT("BRoster::xLaunchAppPrivate()"));
-	status_t error = (mimeType || ref ? B_OK : B_BAD_VALUE);
+	DBG(OUT("BRoster::_LaunchApp()"));
+
+	if (_appTeam != NULL) {
+		// we're supposed to set _appTeam to -1 on error; we'll
+		// reset it later if everything goes well
+		*_appTeam = -1;
+	}
+
+	if (mimeType == NULL && ref == NULL)
+		return B_BAD_VALUE;
+
 	// use a mutable copy of the document entry_ref
 	entry_ref _docRef;
 	entry_ref *docRef = NULL;
-	if (error == B_OK && ref) {
+	if (ref != NULL) {
 		_docRef = *ref;
 		docRef = &_docRef;
 	}
+
 	// find the app
 	entry_ref appRef;
 	char signature[B_MIME_TYPE_LENGTH];
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	bool wasDocument = true;
-	if (error == B_OK) {
-		error = _ResolveApp(mimeType, docRef, &appRef, signature, &appFlags,
+	status_t error = _ResolveApp(mimeType, docRef, &appRef, signature, &appFlags,
 			&wasDocument);
-	}
 	DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
+
 	// build an argument vector
 	ArgVector argVector;
 	if (error == B_OK) {
@@ -1752,27 +1761,28 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 			(wasDocument ? docRef : NULL));
 	}
 	DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
+
 	// pre-register the app
 	app_info appInfo;
 	bool alreadyRunning = false;
 	uint32 appToken = 0;
-	team_id otherTeam = -1;
+	team_id team = -1;
 	uint32 otherAppFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (error == B_OK && !alreadyRunning) {
 		error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
-			&appToken, &otherTeam);
+			&appToken, &team);
 		if (error == B_ALREADY_RUNNING) {
 			DBG(OUT("  already running\n"));
 			alreadyRunning = true;
 			error = B_OK;
 			// get the app flags for the running application
-			if (GetRunningAppInfo(otherTeam, &appInfo) == B_OK)
+			if (GetRunningAppInfo(team, &appInfo) == B_OK)
 				otherAppFlags = appInfo.flags;
 		}
 	}
 	DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
+
 	// launch the app
-	team_id team = -1;
 	if (error == B_OK && !alreadyRunning) {
 		DBG(OUT("  token: %lu\n", appToken));
 		// load the app image
@@ -1810,10 +1820,14 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 		}
 	}
 
+	if (alreadyRunning && current_team() == team) {
+		// The target team is calling us, so we don't send it the message
+		// to prevent an endless loop
+		error = B_BAD_VALUE;
+	}
+
 	// send "on launch" messages
 	if (error == B_OK) {
-		// the messages go to the launched team or to the already running one
-		team_id targetTeam = (alreadyRunning ? otherTeam : team);
 		// If the target app is B_ARGV_ONLY almost no messages are sent to it.
 		// More precisely, the launched app gets at least B_ARGV_RECEIVED and
 		// B_READY_TO_RUN, an already running app gets nothing.
@@ -1822,19 +1836,21 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 		const BList *_messageList = (argvOnly ? NULL : messageList);
 		// don't send ref, if it refers to the app or is included in the
 		// argument vector
-		const entry_ref *_ref = (argvOnly || !wasDocument
-								 || argVector.Count() > 1 ? NULL : docRef);
+		const entry_ref *_ref = argvOnly || !wasDocument
+			|| argVector.Count() > 1 ? NULL : docRef;
 		if (!(argvOnly && alreadyRunning)) {
-			_SendToRunning(targetTeam, argVector.Count(), argVector.Args(),
+			_SendToRunning(team, argVector.Count(), argVector.Args(),
 				_messageList, _ref, !alreadyRunning);
 		}
 	}
 
 	// set return values
-	if (error == B_OK && alreadyRunning)
-		error = B_ALREADY_RUNNING;
-	if (appTeam)
-		*appTeam = (error == B_OK ? team : -1);
+	if (error == B_OK) {
+		if (alreadyRunning)
+			error = B_ALREADY_RUNNING;
+		else if (_appTeam)
+			*_appTeam = team;
+	}
 
 	DBG(OUT("BRoster::_LaunchApp() done: %s (%lx)\n",
 		strerror(error), error));
@@ -1998,21 +2014,21 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 	entry_ref *appRef, BFile *appFile,
 	bool *wasDocument) const
 {
-	status_t error = (ref && appMeta && appRef && appFile ? B_OK
-														  : B_BAD_VALUE);
+	if (ref == NULL || appMeta == NULL || appRef == NULL || appFile == NULL)
+		return B_BAD_VALUE;
+
 	// resolve ref, if necessary
-	if (error == B_OK) {
-		BEntry entry;
-		error = entry.SetTo(ref, false);
-		if (error == B_OK && entry.IsSymLink()) {
-			// ref refers to a link
-			error = entry.SetTo(ref, true);
-			if (error == B_OK)
-				error = entry.GetRef(ref);
-			if (error != B_OK)
-				error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
-		}
+	BEntry entry;
+	status_t error = entry.SetTo(ref, false);
+	if (error == B_OK && entry.IsSymLink()) {
+		// ref refers to a link
+		error = entry.SetTo(ref, true);
+		if (error == B_OK)
+			error = entry.GetRef(ref);
+		if (error != B_OK)
+			error = B_LAUNCH_FAILED_NO_RESOLVE_LINK;
 	}
+
 	// init node
 	BNode node;
 	if (error == B_OK)
@@ -2095,13 +2111,14 @@ status_t
 BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
 	entry_ref *appRef, BFile *appFile) const
 {
-	status_t error = (mimeType && appMeta && appRef && appFile
-					  && strlen(mimeType) < B_MIME_TYPE_LENGTH ? B_OK
-															   : B_BAD_VALUE);
+	if (mimeType == NULL || appMeta == NULL || appRef == NULL
+		|| appFile == NULL || strlen(mimeType) >= B_MIME_TYPE_LENGTH)
+		return B_BAD_VALUE;
+
 	// create a BMimeType and check, if the type is installed
 	BMimeType type;
-	if (error == B_OK)
-		error = type.SetTo(mimeType);
+	status_t error = type.SetTo(mimeType);
+
 	// get the preferred app
 	char appSignature[B_MIME_TYPE_LENGTH];
 	if (error == B_OK) {
