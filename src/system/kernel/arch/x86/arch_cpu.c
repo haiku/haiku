@@ -12,6 +12,7 @@
 #include <tls.h>
 #include <vm.h>
 
+#include <arch_system_info.h>
 #include <arch/cpu.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
@@ -25,6 +26,11 @@
 
 #define CR0_CACHE_DISABLE		(1UL << 30)
 #define CR0_NOT_WRITE_THROUGH	(1UL << 29)
+#define CR0_FPU_EMULATION		(1UL << 2)
+#define CR0_MONITOR_FPU			(1UL << 1)
+
+#define CR4_OS_FXSR				(1UL << 9)
+#define CR4_OS_XMM_EXCEPTION	(1UL << 10)
 
 struct set_mtrr_parameter {
 	int32	index;
@@ -36,6 +42,9 @@ struct set_mtrr_parameter {
 
 extern void reboot(void);
 	// from arch_x86.S
+
+void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
+bool gHasSSE = false;
 
 static struct tss **sTSS;
 //static struct tss **sDoubleFaultTSS;
@@ -163,6 +172,26 @@ x86_get_mtrr(uint32 index, uint64 *_base, uint64 *_length, uint8 *_type)
 
 
 static void
+init_sse(void)
+{
+	cpuid_info info;
+	if (get_current_cpuid(&info, 1) != B_OK
+		|| (info.eax_1.features & IA32_FEATURE_SSE) == 0
+		|| (info.eax_1.features & IA32_FEATURE_FXSR) == 0) {
+		// we don't have proper SSE support
+		return;
+	}
+
+	// enable OS support for SSE
+	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
+	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
+
+	gX86SwapFPUFunc = i386_fxsave_swap;
+	gHasSSE = true;
+}
+
+
+static void
 load_tss(void *data, int cpu)
 {
 	short seg = ((TSS_BASE_SEGMENT + cpu) << 3) | DPL_KERNEL;
@@ -201,10 +230,15 @@ init_double_fault(int cpuNum)
 }
 
 
+//	#pragma mark -
+
+
 status_t
 arch_cpu_preboot_init(kernel_args *args)
 {
 	write_dr3(0);
+	gX86SwapFPUFunc = i386_fsave_swap;
+
 	return B_OK;
 }
 
@@ -297,6 +331,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
+
+	// setup SSE2/3 support
+	init_sse();
 
 	return B_OK;
 }

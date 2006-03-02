@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -24,7 +24,8 @@
 // cpuid eax 1 features
 #define IA32_FEATURE_MTRR			(1UL << 12)
 #define IA32_FEATURE_GLOBAL_PAGES	(1UL << 13)
-
+#define IA32_FEATURE_SSE			(1UL << 25)
+#define IA32_FEATURE_FXSR			(1UL << 24)
 
 // cr4 flags
 #define IA32_CR4_GLOBAL_PAGES		(1UL << 7)

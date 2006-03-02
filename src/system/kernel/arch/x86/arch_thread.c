@@ -32,10 +32,11 @@
 extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
 extern void i386_restore_frame_from_syscall(struct iframe frame);
 
+// from arch_cpu.c
+extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
+extern bool gHasSSE;
 
-static struct arch_thread sInitialState;
-	// ToDo:
-	// __attribute__ ((aligned(16)));
+static struct arch_thread sInitialState _ALIGNED(16);
 	// the fpu_state must be aligned on a 16 byte boundary, so that fxsave can use it
 
 
@@ -46,8 +47,10 @@ arch_thread_init(struct kernel_args *args)
 	// part of each new thread
 
 	asm("fninit");
-	// ToDo: add MMX/SSE support (ie. use fxsave)
-	i386_fsave(sInitialState.fpu_state);
+	if (gHasSSE)
+		i386_fxsave(sInitialState.fpu_state);
+	else
+		i386_fsave(sInitialState.fpu_state);
 
 	// let the asm function know the offset to the interrupt stack within struct thread
 	// I know no better ( = static) way to tell the asm function the offset
@@ -282,7 +285,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if (to->team->address_space != NULL)
 		i386_reinit_user_debug_after_context_switch(to);
 
-	i386_fsave_swap(from->arch_info.fpu_state, to->arch_info.fpu_state);
+	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
 }
 

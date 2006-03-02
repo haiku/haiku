@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -235,9 +235,9 @@ arch_int_disable_io_interrupt(int irq)
 	// disable PIC 8259 controlled interrupt
 
 	if (irq < 8)
-		out8(in8(0x21) | (1 << irq), 0x21);
+		out8(in8(PIC_MASTER_MASK) | (1 << irq), PIC_MASTER_MASK);
 	else
-		out8(in8(0xa1) | (1 << (irq - 8)), 0xa1);
+		out8(in8(PIC_SLAVE_MASK) | (1 << (irq - 8)), PIC_SLAVE_MASK);
 }
 
 
@@ -351,7 +351,6 @@ i386_handle_trap(struct iframe frame)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
 
 	switch (frame.vector) {
-
 		// fatal exceptions
 
 		case 2:		// NMI Interrupt
@@ -577,6 +576,7 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(16,  &trap16);
 	set_intr_gate(17,  &trap17);
 	set_intr_gate(18,  &trap18);
+	set_intr_gate(19,  &trap19);
 
 	set_intr_gate(32,  &trap32);
 	set_intr_gate(33,  &trap33);

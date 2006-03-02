@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, The Haiku Team. All rights reserved.
+ * Copyright 2002-2006, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -11,6 +11,8 @@
 
 #include <arch_cpu.h>
 
+#define _ALIGNED(bytes) __attribute__((aligned(bytes)))
+	// move this to somewhere else, maybe BeBuild.h?
 
 struct farcall {
 	uint32 *esp;
@@ -29,12 +31,12 @@ struct arch_thread {
 	struct farcall current_stack;
 	struct farcall interrupt_stack;
 
+	// 512 byte floating point save point - this must be 16 byte aligned
+	uint8 fpu_state[512];
+
 	// used to track interrupts on this thread
 	struct iframe_stack	iframes;
-
-	// 512 byte floating point save point
-	uint8 fpu_state[512];
-};
+} _ALIGNED(16);
 
 struct arch_team {
 	// gcc treats empty structures as zero-length in C, but as if they contain
