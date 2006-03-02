@@ -3,14 +3,11 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "image/jpeg";
 
-resource(2, "META:SNIFF_RULE") "0.50          (\"\\377\\330\\377\")";
+resource(2, "META:SNIFF_RULE") "0.50 (\"\\377\\330\\377\")";
 
 resource(3, "META:S:DESC") #'MSDC' "JPEG Image";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.obos.showimage";
-
-resource(5, "META:EXTENS") message(234)
-{
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "jpeg",
 	"extensions" = "jpg",
 	"type" = "image/jpeg"

@@ -3,14 +3,11 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "image/gif";
 
-resource(2, "META:SNIFF_RULE") "0.70          (\"GIF8\")";
+resource(2, "META:SNIFF_RULE") "0.70 (\"GIF8\")";
 
 resource(3, "META:S:DESC") #'MSDC' "GIF Image";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.obos.showimage";
-
-resource(5, "META:EXTENS") message(234)
-{
+resource(4, "META:EXTENS") message(234) {
 	"extensions" = "gif",
 	"type" = "image/gif"
 };
