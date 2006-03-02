@@ -140,8 +140,10 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_frexp.S s_frexpf.S s_frexpl.S
 	s_isinfl.c
 	s_isnanl.c
+	s_llrint.S s_llrintf.S s_llrintl.S
 	s_log1p.S s_log1pf.S s_log1pl.S
 	s_logb.S s_logbf.S s_logbl.c
+	s_lrint.S s_lrintf.S s_lrintl.S
 	s_rint.S s_rintf.S s_rintl.c
 	s_scalbn.S s_scalbnf.S s_scalbnl.S
 	s_sin.S s_sinf.S s_sinl.S
