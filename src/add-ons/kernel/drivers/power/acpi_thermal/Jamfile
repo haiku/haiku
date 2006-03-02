@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers power acpi_thermal ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	# Needed for <ACPI.h>. Unfortunately we also get the other headers there,
+	# that we don't really want.
+	UsePublicHeaders drivers ;
+}
+
+KernelAddon acpi_thermal : kernel drivers bin :
+	acpi_thermal.c
+	;
+
+Depends acpi_thermal : acpi ;

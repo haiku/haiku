@@ -66,6 +66,7 @@ void dump_acpi_namespace(char *root, void *buf, size_t* num_bytes, int indenting
 	sprintf(tabs, "%s|--- ", tabs);
 	depth = sizeof(char) * 5 * indenting + sizeof(char); // index into result where the device name will be.
 	
+	dprintf("acpi_ns_dump: recursing from %s\n", root);
 	while (acpi->get_next_entry(ACPI_TYPE_ANY, root, result, 255, &counter) == B_OK) {
 		type = acpi->get_object_type(result);
 		sprintf(output, "%s%s", tabs, result + depth);
