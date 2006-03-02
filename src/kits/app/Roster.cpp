@@ -2120,46 +2120,81 @@ BRoster::_TranslateType(const char *mimeType, BMimeType *appMeta,
 	status_t error = type.SetTo(mimeType);
 
 	// get the preferred app
-	char appSignature[B_MIME_TYPE_LENGTH];
+	char primarySignature[B_MIME_TYPE_LENGTH];
+	char secondarySignature[B_MIME_TYPE_LENGTH];
+	primarySignature[0] = '\0';
+	secondarySignature[0] = '\0';
+
 	if (error == B_OK) {
 		if (type.IsInstalled()) {
 			BMimeType superType;
-			if (type.GetPreferredApp(appSignature) != B_OK
-				&& (type.GetSupertype(&superType) != B_OK
-					|| superType.GetPreferredApp(appSignature) != B_OK)) {
+			if (type.GetSupertype(&superType) == B_OK)
+				superType.GetPreferredApp(secondarySignature);
+
+			if (type.GetPreferredApp(primarySignature) != B_OK
+				&& !primarySignature[0]) {
 				// The type is installed, but has no preferred app.
 				// In fact it might be an app signature and even having a
 				// valid app hint. Nevertheless we fail.
 				error = B_LAUNCH_FAILED_NO_PREFERRED_APP;
+			} else if (!strcmp(primarySignature, secondarySignature)) {
+				// Both types have the same preferred app, there is
+				// no point in testing it twice.
+				secondarySignature[0] = '\0';
 			}
 		} else {
 			// The type is not installed. We assume it is an app signature.
-			strcpy(appSignature, mimeType);
+			strcpy(primarySignature, mimeType);
 		}
 	}
-	if (error == B_OK)
-		error = appMeta->SetTo(appSignature);
-	// check, whether the signature is installed and has an app hint
-	bool appFound = false;
-	if (error == B_OK && appMeta->GetAppHint(appRef) == B_OK) {
-		// resolve symbolic links, if necessary
-		BEntry entry;
-		if (entry.SetTo(appRef, true) == B_OK && entry.IsFile()
-			&& entry.GetRef(appRef) == B_OK) {
-			appFound = true;
+
+	if (error != B_OK)
+		return error;
+
+	// see if we can find the application and if it's valid, try
+	// both preferred app signatures, if available (from type and
+	// super type)
+
+	status_t primaryError = B_OK;
+
+	for (int32 tries = 0; tries < 2; tries++) {
+		const char* signature = tries == 0 ? primarySignature : secondarySignature;
+		if (signature[0] == '\0')
+			continue;
+
+		error = appMeta->SetTo(signature);
+
+		// check, whether the signature is installed and has an app hint
+		bool appFound = false;
+		if (error == B_OK && appMeta->GetAppHint(appRef) == B_OK) {
+			// resolve symbolic links, if necessary
+			BEntry entry;
+			if (entry.SetTo(appRef, true) == B_OK && entry.IsFile()
+				&& entry.GetRef(appRef) == B_OK) {
+				appFound = true;
+			} else
+				appMeta->SetAppHint(NULL);	// bad app hint -- remove it
+		}
+
+		// in case there is no app hint or it is invalid, we need to query for the
+		// app
+		if (error == B_OK && !appFound)
+			error = query_for_app(appMeta->Type(), appRef);
+		if (error == B_OK)
+			error = appFile->SetTo(appRef, B_READ_ONLY);
+		// check, whether the app can be used
+		if (error == B_OK)
+			error = can_app_be_used(appRef);
+
+		if (error != B_OK) {
+			if (tries == 0)
+				primaryError = error;
+			else if (primarySignature[0])
+				error = primaryError;
 		} else
-			appMeta->SetAppHint(NULL);	// bad app hint -- remove it
+			break;
 	}
 
-	// in case there is no app hint or it is invalid, we need to query for the
-	// app
-	if (error == B_OK && !appFound)
-		error = query_for_app(appMeta->Type(), appRef);
-	if (error == B_OK)
-		error = appFile->SetTo(appRef, B_READ_ONLY);
-	// check, whether the app can be used
-	if (error == B_OK)
-		error = can_app_be_used(appRef);
 	return error;
 }
 
