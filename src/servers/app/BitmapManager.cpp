@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include <Autolock.h>
+#include <Bitmap.h>
 
 #include "BitmapManager.h"
 #include "ServerBitmap.h"
@@ -77,12 +78,14 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 	if (!locker.IsLocked())
 		return NULL;
 
+// TODO: create an overlay bitmap if graphics card supports it
+if (flags & B_BITMAP_WILL_OVERLAY)
+	return NULL;
+
 	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags, bytesPerRow);
 	if (bitmap == NULL)
 		return NULL;
 
-	// Server version of this code will also need to handle such things as
-	// bitmaps which accept child views by checking the flags.
 	uint8* buffer = (uint8*)fMemPool.GetBuffer(bitmap->BitsLength());
 
 	if (buffer && fBitmapList.AddItem(bitmap)) {
@@ -95,6 +98,11 @@ BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 		area_info info;
 		get_area_info(bitmap->fArea, &info);
 		bitmap->fOffset = buffer - (uint8*)info.address;
+
+		if (flags & B_BITMAP_CLEAR_TO_WHITE) {
+			// should work for most colorspaces
+			memset(bitmap->Bits(), 255, bitmap->BitsLength());
+		}
 	} else {
 		// Allocation failed for buffer or bitmap list
 		fMemPool.ReleaseBuffer(buffer);
