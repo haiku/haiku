@@ -5061,6 +5061,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		fileDeviceDeleter.id = -1;
 	}
 
+	notify_mount(mount->id, mount->covers_vnode ? mount->covers_vnode->device : -1,
+		mount->covers_vnode ? mount->covers_vnode->id : -1);
+
 	return mount->id;
 
 err7:
@@ -5295,6 +5298,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	mountOpLocker.Unlock();
 
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
+	notify_unmount(mount->id);
 
 	// release the file system
 	put_file_system(mount->fs);

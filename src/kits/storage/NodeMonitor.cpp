@@ -62,8 +62,8 @@ watch_node(const node_ref *node, uint32 flags, BMessenger target)
 	// subscribe to...
 	// mount watching
 	if (flags & B_WATCH_MOUNT) {
-		status_t status = _kern_start_watching((dev_t)-1, (ino_t)-1, 0, port,
-			token);
+		status_t status = _kern_start_watching((dev_t)-1, (ino_t)-1,
+			B_WATCH_MOUNT, port, token);
 		if (status < B_OK)
 			return status;
 

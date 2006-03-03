@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <drivers/node_monitor.h>
@@ -21,8 +21,8 @@
 #include <stddef.h>
 
 
-#define TRACE_MONITOR 0
-#if TRACE_MONITOR
+//#define TRACE_MONITOR
+#ifdef TRACE_MONITOR
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -325,8 +325,203 @@ remove_node_monitors_by_target(struct io_context *context, port_id port, uint32 
 }
 
 
-//	#pragma mark -
-//	Exported private kernel API
+/**	\brief Given device and node ID and a node monitoring event mask, the
+ *		   function checks whether there are listeners interested in any of
+ *		   the events for that node and, if so, adds the respective listener
+ *		   list to a supplied array of listener lists.
+ *
+ *	Note, that in general not all of the listeners in an appended list will be
+ *	interested in the events, but it is guaranteed that
+ *	interested_monitor_listener_list::first_listener is indeed
+ *	the first listener in the list, that is interested.
+ *
+ *	\param device The ID of the mounted FS, the node lives in.
+ *	\param node The ID of the node.
+ *	\param flags The mask specifying the events occurred for the given node
+ *		   (a combination of \c B_WATCH_* constants).
+ *	\param interestedListeners An array of listener lists. If there are
+ *		   interested listeners for the node, the list will be appended to
+ *		   this array.
+ *	\param interestedListenerCount The number of elements in the
+ *		   \a interestedListeners array. Will be incremented, if a list is
+ *		   appended.
+ */
+
+static void
+get_interested_monitor_listeners(mount_id device, vnode_id node,
+	uint32 flags, interested_monitor_listener_list *interestedListeners,
+	int32 &interestedListenerCount)
+{
+	// get the monitor for the node
+	node_monitor *monitor = get_monitor_for(device, node);
+	if (!monitor)
+		return;
+
+	// iterate through the listeners until we find one with matching flags
+	monitor_listener *listener = NULL;
+	while ((listener = (monitor_listener*)list_get_next_item(
+			&monitor->listeners, listener)) != NULL) {
+		if (listener->flags & flags) {
+			interested_monitor_listener_list &list
+				= interestedListeners[interestedListenerCount++];
+			list.listeners = &monitor->listeners;
+			list.first_listener = listener;
+			list.flags = flags;
+			return;
+		}
+	}
+}
+
+
+/**	\brief Sends a notifcation message to the given listeners.
+ *	\param message The message to be sent.
+ *	\param interestedListeners An array of listener lists.
+ *	\param interestedListenerCount The number of elements in the
+ *		   \a interestedListeners array. 
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
+ */
+
+static status_t
+send_notification_message(KMessage &message,
+	interested_monitor_listener_list *interestedListeners,
+	int32 interestedListenerCount)
+{
+	// Since the messaging service supports broadcasting and that is more
+	// efficient than sending the messages individually, we collect the
+	// listener targets in an array and send the message to them at once.
+	const int32 maxTargetCount = 16;
+	messaging_target targets[maxTargetCount];
+	int32 targetCount = 0;
+
+	// iterate through the lists
+	interested_monitor_listener_list *list = interestedListeners;
+	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
+		// iterate through the listeners
+		monitor_listener *listener = list->first_listener;
+		do {
+			if (listener->flags & list->flags) {
+				// the listener's flags match: add it to the targets
+				messaging_target &target = targets[targetCount++];
+				target.port = listener->port;
+				target.token = listener->token;
+
+				// if the target array is full, send the message
+				if (targetCount == maxTargetCount) {
+					status_t error = send_message(&message, targets,
+						targetCount);
+					if (error != B_OK)
+						return error;
+
+					targetCount = 0;
+				}
+			}
+		} while ((listener = (monitor_listener*)list_get_next_item(
+				list->listeners, listener)) != NULL);
+	}
+
+	// if any targets are left (the usual case, unless the target array got
+	// full early), send the message
+	if (targetCount > 0)
+		return send_message(&message, targets, targetCount);
+
+	return B_OK;
+}
+
+
+/**	\brief Notifies all interested listeners that an entry has been created
+ *		   or removed.
+ *	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
+ *	\param device The ID of the mounted FS, the entry lives/lived in.
+ *	\param directory The entry's parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry refers/referred to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
+ */
+
+static status_t
+notify_entry_created_or_removed(int32 opcode, mount_id device,
+	vnode_id directory, const char *name, vnode_id node)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	MutexLocker locker(gMonitorMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	// ... for the node
+	if (opcode != B_ENTRY_CREATED) {
+		get_interested_monitor_listeners(device, node, B_WATCH_NAME,
+			interestedListeners, interestedListenerCount);
+	}
+	// ... for the directory
+	get_interested_monitor_listeners(device, directory, B_WATCH_DIRECTORY,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", opcode);
+	message.AddInt32("device", device);
+	message.AddInt64("directory", directory);
+	message.AddInt64("node", node);
+	message.AddString("name", name);			// for "removed" Haiku only
+
+	return send_notification_message(message, interestedListeners,
+		interestedListenerCount);
+}
+
+
+/**	\brief Notifies the listener of a live query that an entry has been added
+ *		   to or removed from the query (for whatever reason).
+ *	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
+ *	\param port The target port of the listener.
+ *	\param token The BHandler token of the listener.
+ *	\param device The ID of the mounted FS, the entry lives in.
+ *	\param directory The entry's parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry refers to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
+ */
+
+static status_t
+notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
+	mount_id device, vnode_id directory, const char *name, vnode_id node)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	// construct the message
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
+	message.AddInt32("opcode", opcode);
+	message.AddInt32("device", device);
+	message.AddInt64("directory", directory);
+	message.AddInt64("node", node);
+	message.AddString("name", name);
+
+	// send the message
+	messaging_target target;
+	target.port = port;
+	target.token = token;
+
+	return send_message(&message, &target, 1);
+}
+
+
+//	#pragma mark - private kernel API
 
 
 status_t
@@ -358,8 +553,70 @@ node_monitor_init(void)
 }
 
 
-//	#pragma mark -
-//	Exported public kernel API
+status_t
+notify_unmount(mount_id device)
+{
+	TRACE(("unmounted device: %ld\n", device));
+
+	MutexLocker locker(gMonitorMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	get_interested_monitor_listeners(-1, -1, B_WATCH_MOUNT,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[96];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_DEVICE_UNMOUNTED);
+	message.AddInt32("device", device);
+
+	return send_notification_message(message, interestedListeners,
+		interestedListenerCount);
+
+	return B_OK;
+}
+
+
+status_t
+notify_mount(mount_id device, mount_id parentDevice, vnode_id parentDirectory)
+{
+	TRACE(("mounted device: %ld, parent %ld:%Ld\n", device, parentDevice,
+		parentDirectory));
+
+	MutexLocker locker(gMonitorMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	get_interested_monitor_listeners(-1, -1, B_WATCH_MOUNT,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[128];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_DEVICE_MOUNTED);
+	message.AddInt32("new device", device);
+	message.AddInt32("device", parentDevice);
+	message.AddInt64("directory", parentDirectory);
+
+	return send_notification_message(message, interestedListeners,
+		interestedListenerCount);
+
+	return B_OK;
+}
+
+
+//	#pragma mark - public kernel API
 
 
 /**	\brief Subscribes a target to node and/or mount watching.
@@ -505,170 +762,16 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 }
 
 
-/**	\brief Given device and node ID and a node monitoring event mask, the
-		   function checks whether there are listeners interested in any of
-		   the events for that node and, if so, adds the respective listener
-		   list to a supplied array of listener lists.
-
-	Note, that in general not all of the listeners in an appended list will be
-	interested in the events, but it is guaranteed that
-	interested_monitor_listener_list::first_listener is indeed
-	the first listener in the list, that is interested.
-
-	\param device The ID of the mounted FS, the node lives in.
-	\param node The ID of the node.
-	\param flags The mask specifying the events occurred for the given node
-		   (a combination of \c B_WATCH_* constants).
-	\param interestedListeners An array of listener lists. If there are
-		   interested listeners for the node, the list will be appended to
-		   this array.
-	\param interestedListenerCount The number of elements in the
-		   \a interestedListeners array. Will be incremented, if a list is
-		   appended.
- */
-static
-void
-get_interested_monitor_listeners(mount_id device, vnode_id node,
-	uint32 flags, interested_monitor_listener_list *interestedListeners,
-	int32 &interestedListenerCount)
-{
-	// get the monitor for the node
-	node_monitor *monitor = get_monitor_for(device, node);
-	if (!monitor)
-		return;
-
-	// iterate through the listeners until we find one with matching flags
-	monitor_listener *listener = NULL;
-	while ((listener = (monitor_listener*)list_get_next_item(
-			&monitor->listeners, listener)) != NULL) {
-		if (listener->flags & flags) {
-			interested_monitor_listener_list &list
-				= interestedListeners[interestedListenerCount++];
-			list.listeners = &monitor->listeners;
-			list.first_listener = listener;
-			list.flags = flags;
-			return;
-		}
-	}
-}
-
-
-/**	\brief Sends a notifcation message to the given listeners.
-	\param message The message to be sent.
-	\param interestedListeners An array of listener lists.
-	\param interestedListenerCount The number of elements in the
-		   \a interestedListeners array. 
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
- */
-static
-status_t
-send_notification_message(KMessage &message,
-	interested_monitor_listener_list *interestedListeners,
-	int32 interestedListenerCount)
-{
-	// Since the messaging service supports broadcasting and that is more
-	// efficient than sending the messages individually, we collect the
-	// listener targets in an array and send the message to them at once.
-	const int32 maxTargetCount = 16;
-	messaging_target targets[maxTargetCount];
-	int32 targetCount = 0;
-
-	// iterate through the lists
-	interested_monitor_listener_list *list = interestedListeners;
-	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
-		// iterate through the listeners
-		monitor_listener *listener = list->first_listener;
-		do {
-			if (listener->flags & list->flags) {
-				// the listener's flags match: add it to the targets
-				messaging_target &target = targets[targetCount++];
-				target.port = listener->port;
-				target.token = listener->token;
-
-				// if the target array is full, send the message
-				if (targetCount == maxTargetCount) {
-					status_t error = send_message(&message, targets,
-						targetCount);
-					if (error != B_OK)
-						return error;
-
-					targetCount = 0;
-				}
-			}
-		} while ((listener = (monitor_listener*)list_get_next_item(
-				list->listeners, listener)) != NULL);
-	}
-
-	// if any targets are left (the usual case, unless the target array got
-	// full early), send the message
-	if (targetCount > 0)
-		return send_message(&message, targets, targetCount);
-
-	return B_OK;
-}
-
-
-/**	\brief Notifies all interested listeners that an entry has been created
-		   or removed.
-	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
-	\param device The ID of the mounted FS, the entry lives/lived in.
-	\param directory The entry's parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry refers/referred to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
- */
-static status_t
-notify_entry_created_or_removed(int32 opcode, mount_id device,
-	vnode_id directory, const char *name, vnode_id node)
-{
-	if (!name)
-		return B_BAD_VALUE;
-
-	MutexLocker locker(gMonitorMutex);
-
-	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
-	int32 interestedListenerCount = 0;
-	// ... for the node
-	if (opcode != B_ENTRY_CREATED) {
-		get_interested_monitor_listeners(device, node, B_WATCH_NAME,
-			interestedListeners, interestedListenerCount);
-	}
-	// ... for the directory
-	get_interested_monitor_listeners(device, directory, B_WATCH_DIRECTORY,
-		interestedListeners, interestedListenerCount);
-
-	if (interestedListenerCount == 0)
-		return B_OK;
-
-	// there are interested listeners: construct the message and send it
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
-	message.AddInt32("opcode", opcode);
-	message.AddInt32("device", device);
-	message.AddInt64("directory", directory);
-	message.AddInt64("node", node);
-	message.AddString("name", name);			// for "removed" Haiku only
-
-	return send_notification_message(message, interestedListeners,
-		interestedListenerCount);
-}
-
-
 /**	\brief Notifies all interested listeners that an entry has been created.
-	\param device The ID of the mounted FS, the entry lives in.
-	\param directory The entry's parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry refers to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *	\param device The ID of the mounted FS, the entry lives in.
+ *	\param directory The entry's parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry refers to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_entry_created(mount_id device, vnode_id directory, const char *name,
 	vnode_id node)
@@ -679,14 +782,15 @@ notify_entry_created(mount_id device, vnode_id directory, const char *name,
 
 
 /**	\brief Notifies all interested listeners that an entry has been removed.
-	\param device The ID of the mounted FS, the entry lived in.
-	\param directory The entry's former parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry referred to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *	\param device The ID of the mounted FS, the entry lived in.
+ *	\param directory The entry's former parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry referred to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_entry_removed(mount_id device, vnode_id directory, const char *name,
 	vnode_id node)
@@ -697,16 +801,17 @@ notify_entry_removed(mount_id device, vnode_id directory, const char *name,
 
 
 /**	\brief Notifies all interested listeners that an entry has been moved.
-	\param device The ID of the mounted FS, the entry lives in.
-	\param fromDirectory The entry's previous parent directory ID.
-	\param fromName The entry's previous name.
-	\param toDirectory The entry's new parent directory ID.
-	\param toName The entry's new name.
-	\param node The ID of the node the entry refers to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *	\param device The ID of the mounted FS, the entry lives in.
+ *	\param fromDirectory The entry's previous parent directory ID.
+ *	\param fromName The entry's previous name.
+ *	\param toDirectory The entry's new parent directory ID.
+ *	\param toName The entry's new name.
+ *	\param node The ID of the node the entry refers to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_entry_moved(mount_id device, vnode_id fromDirectory,
 	const char *fromName, vnode_id toDirectory, const char *toName,
@@ -757,16 +862,17 @@ notify_entry_moved(mount_id device, vnode_id fromDirectory,
 
 
 /**	\brief Notifies all interested listeners that a node's stat data have
-		   changed.
-	\param device The ID of the mounted FS, the node lives in.
-	\param node The ID of the node.
-	\param statFields A bitwise combination of one or more of the \c B_STAT_*
-		   constants defined in <NodeMonitor.h>, indicating what fields of the
-		   stat data have changed.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *		   changed.
+ *	\param device The ID of the mounted FS, the node lives in.
+ *	\param node The ID of the node.
+ *	\param statFields A bitwise combination of one or more of the \c B_STAT_*
+ *		   constants defined in <NodeMonitor.h>, indicating what fields of the
+ *		   stat data have changed.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
 {
@@ -797,15 +903,16 @@ notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
 
 
 /**	\brief Notifies all interested listeners that a node attribute has changed.
-	\param device The ID of the mounted FS, the node lives in.
-	\param node The ID of the node.
-	\param attribute The attribute's name.
-	\param cause Either of \c B_ATTR_CREATED, \c B_ATTR_REMOVED, or
-		   \c B_ATTR_CHANGED, indicating what exactly happened to the attribute.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *	\param device The ID of the mounted FS, the node lives in.
+ *	\param node The ID of the node.
+ *	\param attribute The attribute's name.
+ *	\param cause Either of \c B_ATTR_CREATED, \c B_ATTR_REMOVED, or
+ *		   \c B_ATTR_CHANGED, indicating what exactly happened to the attribute.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_attribute_changed(mount_id device, vnode_id node, const char *attribute,
 	int32 cause)
@@ -841,56 +948,18 @@ notify_attribute_changed(mount_id device, vnode_id node, const char *attribute,
 
 
 /**	\brief Notifies the listener of a live query that an entry has been added
-		   to or removed from the query (for whatever reason).
-	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
-	\param port The target port of the listener.
-	\param token The BHandler token of the listener.
-	\param device The ID of the mounted FS, the entry lives in.
-	\param directory The entry's parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry refers to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *		   to the query (for whatever reason).
+ *	\param port The target port of the listener.
+ *	\param token The BHandler token of the listener.
+ *	\param device The ID of the mounted FS, the entry lives in.
+ *	\param directory The entry's parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry refers to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
-static status_t
-notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
-	mount_id device, vnode_id directory, const char *name, vnode_id node)
-{
-	if (!name)
-		return B_BAD_VALUE;
 
-	// construct the message
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_QUERY_UPDATE);
-	message.AddInt32("opcode", opcode);
-	message.AddInt32("device", device);
-	message.AddInt64("directory", directory);
-	message.AddInt64("node", node);
-	message.AddString("name", name);
-
-	// send the message
-	messaging_target target;
-	target.port = port;
-	target.token = token;
-
-	return send_message(&message, &target, 1);
-}
-
-
-/**	\brief Notifies the listener of a live query that an entry has been added
-		   to the query (for whatever reason).
-	\param port The target port of the listener.
-	\param token The BHandler token of the listener.
-	\param device The ID of the mounted FS, the entry lives in.
-	\param directory The entry's parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry refers to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
- */
 status_t
 notify_query_entry_created(port_id port, int32 token, mount_id device,
 	vnode_id directory, const char *name, vnode_id node)
@@ -901,17 +970,18 @@ notify_query_entry_created(port_id port, int32 token, mount_id device,
 
 
 /**	\brief Notifies the listener of a live query that an entry has been removed
-		   from the query (for whatever reason).
-	\param port The target port of the listener.
-	\param token The BHandler token of the listener.
-	\param device The ID of the mounted FS, the entry lives in.
-	\param directory The entry's parent directory ID.
-	\param name The entry's name.
-	\param node The ID of the node the entry refers to.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code otherwise.
+ *		   from the query (for whatever reason).
+ *	\param port The target port of the listener.
+ *	\param token The BHandler token of the listener.
+ *	\param device The ID of the mounted FS, the entry lives in.
+ *	\param directory The entry's parent directory ID.
+ *	\param name The entry's name.
+ *	\param node The ID of the node the entry refers to.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code otherwise.
  */
+
 status_t
 notify_query_entry_removed(port_id port, int32 token,
 	mount_id device, vnode_id directory, const char *name, vnode_id node)
@@ -921,9 +991,7 @@ notify_query_entry_removed(port_id port, int32 token,
 }
 
 
-
-//	#pragma mark -
-//	Userland syscalls
+//	#pragma mark - User syscalls
 
 
 status_t
