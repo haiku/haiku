@@ -8,5 +8,7 @@ enum menu_actions {
 };
 
 
+const static char *kEmptyMenuLabel = "<empty>";
+
 
 #endif // __MENU_PRIVATE_H
