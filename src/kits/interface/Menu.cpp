@@ -1816,7 +1816,7 @@ BMenu::UpdateWindowViewSize(bool upWind)
 		window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
 	else {
 		CacheFontInfo();
-		window->ResizeTo(StringWidth("<empty>") + 4, fFontHeight + 6);
+		window->ResizeTo(StringWidth(kEmptyMenuLabel) + 5, fFontHeight + 6);
 	}
 	window->MoveTo(frame.LeftTop());
 }

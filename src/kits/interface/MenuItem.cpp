@@ -647,14 +647,17 @@ BMenuItem::SetSuper(BMenu *super)
 
 
 void
-BMenuItem::Select(bool on)
+BMenuItem::Select(bool selected)
 {
+	if (fSelected == selected)
+		return;
+
 	if (Submenu()) {
-		fSelected = on;
-		Highlight(on);
+		fSelected = selected;
+		Highlight(selected);
 	} else if (IsEnabled()) {
-		fSelected = on;
-		Highlight(on);
+		fSelected = selected;
+		Highlight(selected);
 	}	
 }
 
@@ -704,26 +707,42 @@ BMenuItem::DrawShortcutSymbol()
 	
 	where -= BPoint(20, 10);
 
+	// TODO: Do this in a better way
+	bool altAsCommandKey = true;
+	key_map *keys = NULL; 
+	char *chars; 
+	get_key_map(&keys, &chars);
+	if (keys == NULL || keys->left_command_key != 0x5d || keys->right_command_key != 0x5f)
+		altAsCommandKey = false;
+	free(chars);
+	free(keys);
+
 	if (fModifiers & B_COMMAND_KEY) {
-		key_map *keys; 
-		char *chars; 
-		get_key_map(&keys, &chars);
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_COLOR_8_BIT);
 
-		// TODO: isn't there a better way to do this?
-		if (keys != NULL
-			&& keys->left_command_key == 0x5d && keys->right_command_key == 0x5f) 
+		if (altAsCommandKey)
 			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
 		else
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
 		fSuper->DrawBitmap(&control, where);
 
-		where.x -= rect.Width();
-	
-		free(chars);
-		free(keys);
+		where.x -= rect.Width() + 1;
 	}
+
+	if (fModifiers & B_CONTROL_KEY) {
+		BRect rect(0,0,16,10);
+		BBitmap control(rect, B_COLOR_8_BIT);
+
+		if (altAsCommandKey)
+			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
+		else	
+			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
+		fSuper->DrawBitmap(&control, where);
+
+		where.x -= rect.Width() + 1;
+	}
+
 	if (fModifiers & B_SHIFT_KEY) {
 		BRect rect(0,0,21,10);
 		BBitmap shift(rect, B_COLOR_8_BIT);

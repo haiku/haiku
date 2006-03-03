@@ -4090,15 +4090,13 @@ BTextView::UpdateScrollbars()
 void
 BTextView::AutoResize(bool doredraw)
 {
-	// TODO: What about fContainerView ? Should we resize it as well ?
 	if (fResizable) {
 		float width = 0;
 		for (int32 i = 0; i < CountLines(); i++)
 			width = max_c(width, LineWidth(i));
 		
-		ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
-		if (fContainerView)
-			fContainerView->ResizeTo(Bounds().Width(), Bounds().Height());
+		BView *viewToResize = fContainerView != NULL ? fContainerView : this;
+		viewToResize->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
 	}
 }
 

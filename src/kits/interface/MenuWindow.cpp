@@ -12,8 +12,9 @@
 // TODO: Add scrollers
 
 #include <Menu.h>
-#include <MenuWindow.h>
 
+#include <MenuPrivate.h>
+#include <MenuWindow.h>
 #include <WindowPrivate.h>
 
 
@@ -96,7 +97,7 @@ BMenuFrame::Draw(BRect updateRect)
 		font_height height;
 		GetFontHeight(&height);
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-		DrawString("<empty>", BPoint(2, ceilf(height.ascent + 2)));
+		DrawString(kEmptyMenuLabel, BPoint(3, ceilf(height.ascent + 2)));
 	}
 
 	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	
