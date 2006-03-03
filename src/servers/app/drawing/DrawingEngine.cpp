@@ -1148,7 +1148,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 		bounds = bounds & clip;
 
 		uint32 width = (bounds.IntegerWidth() + 1) * 4;
-		uint32 height = bounds.IntegerHeight() + 1;
+		uint32 height = bounds.IntegerHeight();
 		uint32 srcBytesPerRow = buffer->BytesPerRow();
 		uint32 dstBytesPerRow = bitmap->BytesPerRow();
 		uint8 *dst = (uint8 *)bitmap->Bits();
