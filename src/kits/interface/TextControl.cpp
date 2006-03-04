@@ -271,7 +271,7 @@ BTextControl::Draw(BRect updateRect)
 	}
 
 	// area around text view
-
+	
 	SetHighColor(fText->ViewColor());
 	rect.InsetBy(1, 1);
 	BRegion region(rect);
@@ -281,6 +281,8 @@ BTextControl::Draw(BRect updateRect)
 	region.Exclude(fText->Frame());
 	FillRegion(&region);
 
+	// label
+
 	if (Label()) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
@@ -288,13 +290,14 @@ BTextControl::Draw(BRect updateRect)
 		float y = fontHeight.ascent + fText->Frame().top + 1;
 		float x;
 
+		float labelWidth = StringWidth(Label());
 		switch (fLabelAlign) {
 			case B_ALIGN_RIGHT:
-				x = fDivider - StringWidth(Label()) - 3.0f;
+				x = fDivider - labelWidth - 3.0f;
 				break;
 
 			case B_ALIGN_CENTER:
-				x = fDivider - StringWidth(Label()) / 2.0f;
+				x = fDivider - labelWidth / 2.0f;
 				break;
 
 			default:
@@ -302,9 +305,17 @@ BTextControl::Draw(BRect updateRect)
 				break;
 		}
 
-		SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
-			: tint_color(noTint, B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(x, y));
+		BRect labelArea(x, fText->Frame().top, x + labelWidth,
+				ceilf(fontHeight.ascent + fontHeight.descent) + 1);
+		if (x < fDivider && updateRect.Intersects(labelArea)) {
+			labelArea.right = fDivider;
+			
+			BRegion clipRegion(labelArea);
+			ConstrainClippingRegion(&clipRegion);
+			SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
+				: tint_color(noTint, B_DISABLED_LABEL_TINT));
+			DrawString(Label(), BPoint(x, y));
+		}
 	}
 }
 
