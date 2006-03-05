@@ -5,9 +5,14 @@
 
 namespace BPrivate {
 
-status_t ConvertBits(const void *srcBuffer, void *dstBuffer,
-	uint32 srcBytesPerRow, uint32 dstBytesPerRow, color_space srcColorSpace,
-	color_space dstColorSpace, int32 width, int32 height);
+status_t ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 srcBytesPerRow, int32 dstBytesPerRow,
+	color_space srcColorSpace, color_space dstColorSpace, int32 width,
+	int32 height);
+status_t ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 srcBytesPerRow, int32 dstBytesPerRow,
+	color_space srcColorSpace, color_space dstColorSpace, BPoint srcOffset,
+	BPoint dstOffset, int32 width, int32 height);
 
 
 /*!	\brief Helper class for conversion between RGB and palette colors.

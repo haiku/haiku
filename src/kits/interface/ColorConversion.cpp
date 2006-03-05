@@ -14,6 +14,7 @@
 #include "ColorConversion.h"
 #include <Locker.h>
 #include <new.h>
+#include <Point.h>
 
 namespace BPrivate {
 
@@ -621,51 +622,106 @@ ReadCMAP8(const uint8 **source, int32 index)
 
 
 template<typename srcByte, typename dstByte>
-void
-ConvertBits(const srcByte *srcBuffer, dstByte *dstBuffer, int32 redShift,
-	int32 greenShift, int32 blueShift, int32 alphaShift, int32 alphaBits,
-	uint32 redMask, uint32 greenMask, uint32 blueMask, uint32 alphaMask,
-	int32 srcBytesPerRow, int32 dstBytesPerRow, int32 srcBitsPerPixel,
-	int32 dstBitsPerPixel, int32 width, int32 height, bool srcSwap,
-	bool dstSwap, readFunc *srcFunc, writeFunc *dstFunc)
+status_t
+ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 redShift, int32 greenShift, int32 blueShift,
+	int32 alphaShift, int32 alphaBits, uint32 redMask, uint32 greenMask,
+	uint32 blueMask, uint32 alphaMask, int32 srcBytesPerRow,
+	int32 dstBytesPerRow, int32 srcBitsPerPixel, int32 dstBitsPerPixel,
+	color_space srcColorSpace, color_space dstColorSpace, BPoint srcOffset,
+	BPoint dstOffset, int32 width, int32 height, bool srcSwap, bool dstSwap,
+	readFunc *srcFunc, writeFunc *dstFunc)
 {
-	int32 srcLinePad = ((srcBytesPerRow << 3) - width * srcBitsPerPixel) >> 3;
-	int32 dstLinePad = ((dstBytesPerRow << 3) - width * dstBitsPerPixel) >> 3;
+	char *srcBitsEnd = (char *)srcBits + srcBitsLength;
+	char *dstBitsEnd = (char *)dstBits + dstBitsLength;
+
+	int32 srcBitsPerRow = srcBytesPerRow << 3;
+	int32 dstBitsPerRow = dstBytesPerRow << 3;
+
+	// Advance the buffers to reach their offsets
+	int32 srcOffsetX = (int32)srcOffset.x;
+	int32 dstOffsetX = (int32)dstOffset.x;
+	(char *)srcBits += ((int32)srcOffset.y * srcBitsPerRow + srcOffsetX
+		* srcBitsPerPixel) >> 3;
+	(char *)dstBits += ((int32)dstOffset.y * dstBitsPerRow + dstOffsetX
+		* dstBitsPerPixel) >> 3;
+
+	// Ensure that the width fits
+	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
+		/ srcBitsPerPixel;
+	if (srcWidth < width)
+		width = srcWidth;
+
+	int32 dstWidth = (dstBitsPerRow - dstOffsetX * dstBitsPerPixel)
+		/ dstBitsPerPixel;
+	if (dstWidth < width)
+		width = dstWidth;
+
+	if (width < 0)
+		return B_OK;
+
+	// Catch the copy case
+	if (srcColorSpace == dstColorSpace && srcBitsPerPixel % 8 == 0) {
+		int32 copyCount = (width * srcBitsPerPixel) >> 3;
+		for (int32 i = 0; i < height; i++) {
+			memcpy(dstBits, srcBits, copyCount);
+
+			(char *)srcBits += srcBytesPerRow;
+			(char *)dstBits += dstBytesPerRow;
+
+			if ((char *)srcBits > srcBitsEnd || (char *)dstBits > dstBitsEnd)
+				return B_OK;
+		}
+
+		return B_OK;
+	}
+
+	int32 srcLinePad = (srcBitsPerRow - width * srcBitsPerPixel) >> 3;
+	int32 dstLinePad = (dstBitsPerRow - width * dstBitsPerPixel) >> 3;
 
 	register uint32 result;
 	register uint32 source;
 	for (int32 i = 0; i < height; i++) {
 		for (int32 j = 0; j < width; j++) {
 			if (srcFunc)
-				source = srcFunc((const uint8 **)&srcBuffer, j);
+				source = srcFunc((const uint8 **)&srcBits, srcOffsetX++);
 			else {
-				source = *srcBuffer;
-				srcBuffer++;
+				source = *srcBits;
+				srcBits++;
 			}
 
+			// This is valid, as only 16 bit modes will need to swap
 			if (srcSwap)
 				source = (source << 8) | (source >> 8);
 
 			if (redShift > 0)
 				result = ((source >> redShift) & redMask);
-			else
+			else if (redShift < 0)
 				result = ((source << -redShift) & redMask);
+			else
+				result = source & redMask;
 
 			if (greenShift > 0)
 				result |= ((source >> greenShift) & greenMask);
-			else
+			else if (greenShift < 0)
 				result |= ((source << -greenShift) & greenMask);
+			else
+				result |= source & greenMask;
 
 			if (blueShift > 0)
 				result |= ((source >> blueShift) & blueMask);
-			else
+			else if (blueShift < 0)
 				result |= ((source << -blueShift) & blueMask);
+			else
+				result |= source & blueMask;
 
 			if (alphaBits > 0) {
 				if (alphaShift > 0)
 					result |= ((source >> alphaShift) & alphaMask);
-				else
+				else if (alphaShift < 0)
 					result |= ((source << -alphaShift) & alphaMask);
+				else
+					result |= source & alphaMask;
 
 				// if we only had one alpha bit we want it to be 0/255
 				if (alphaBits == 1 && result & alphaMask)
@@ -673,132 +729,154 @@ ConvertBits(const srcByte *srcBuffer, dstByte *dstBuffer, int32 redShift,
 			} else
 				result |= alphaMask;
 
+			// This is valid, as only 16 bit modes will need to swap
 			if (dstSwap)
-				*dstBuffer = (result << 8) | (result >> 8);
+				result = (result << 8) | (result >> 8);
 
 			if (dstFunc)
-				dstFunc((uint8 **)&dstBuffer, (uint8 *)&result, j);
+				dstFunc((uint8 **)&dstBits, (uint8 *)&result, dstOffsetX++);
 			else {
-				*dstBuffer = result;
-				dstBuffer++;
+				*dstBits = result;
+				dstBits++;
 			}
+
+			if ((char *)srcBits > srcBitsEnd || (char *)dstBits > dstBitsEnd)
+				return B_OK;
 		}
 
-		(char *)srcBuffer += srcLinePad;
-		(char *)dstBuffer += dstLinePad;
+		(char *)srcBits += srcLinePad;
+		(char *)dstBits += dstLinePad;
+		dstOffsetX -= width;
+		srcOffsetX -= width;
 	}
+
+	return B_OK;
 }
 
 
 template<typename srcByte>
 status_t
-ConvertBits(const srcByte *srcBuffer, void *dstBuffer, int32 redShift,
-	int32 greenShift, int32 blueShift, int32 alphaShift, int32 alphaBits,
-	int32 srcBytesPerRow, int32 dstBytesPerRow, int32 srcBitsPerPixel,
-	color_space dstColorSpace, int32 width, int32 height, bool srcSwap,
-	readFunc *srcFunc)
+ConvertBits(const srcByte *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 redShift, int32 greenShift, int32 blueShift,
+	int32 alphaShift, int32 alphaBits, int32 srcBytesPerRow,
+	int32 dstBytesPerRow, int32 srcBitsPerPixel, color_space srcColorSpace,
+	color_space dstColorSpace, BPoint srcOffset, BPoint dstOffset, int32 width,
+	int32 height, bool srcSwap,	readFunc *srcFunc)
 {
 	switch (dstColorSpace) {
 		case B_RGBA32:
-			ConvertBits(srcBuffer, (uint32 *)dstBuffer, redShift - 24,
-				greenShift - 16, blueShift - 8, alphaShift - 32, alphaBits,
-				0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, srcBytesPerRow,
-				dstBytesPerRow, srcBitsPerPixel, 32, width, height, srcSwap,
-				false, srcFunc, NULL);
+			ConvertBits(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				alphaShift - 32, alphaBits, 0x00ff0000, 0x0000ff00, 0x000000ff,
+				0xff000000, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel,
+				32, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
 			break;
 
 		case B_RGBA32_BIG:
-			ConvertBits(srcBuffer, (uint32 *)dstBuffer, redShift - 16,
-				greenShift - 24, blueShift - 32, alphaShift - 8, alphaBits,
-				0x0000ff00, 0x00ff0000, 0xff000000, 0x00000ff, srcBytesPerRow,
-				dstBytesPerRow, srcBitsPerPixel, 32, width, height, srcSwap,
-				false, srcFunc, NULL);
+			ConvertBits(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 16, greenShift - 24, blueShift - 32,
+				alphaShift - 8, alphaBits, 0x0000ff00, 0x00ff0000, 0xff000000,
+				0x00000ff, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
 			break;
 
 		/* Note:	we set the unused alpha to 255 here. This is because BeOS
 					uses the unused alpha for B_OP_ALPHA even though it should
 					not care about it. */
 		case B_RGB32:
-			ConvertBits(srcBuffer, (uint32 *)dstBuffer, redShift - 24,
-				greenShift - 16, blueShift - 8, 0, 0, 0x00ff0000, 0x0000ff00,
-				0x000000ff, 0xff000000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 32, width, height, srcSwap, false, srcFunc,
-				NULL);
+			ConvertBits(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				0, 0, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
 			break;
 
 		case B_RGB32_BIG:
-			ConvertBits(srcBuffer, (uint32 *)dstBuffer, redShift - 16,
-				greenShift - 24, blueShift - 32, 0, 0, 0x0000ff00, 0x00ff0000,
-				0xff000000, 0x000000ff, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 32, width, height, srcSwap, false, srcFunc,
-				NULL);
+			ConvertBits(srcBits, (uint32 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 16, greenShift - 24, blueShift - 32,
+				0, 0, 0x0000ff00, 0x00ff0000, 0xff000000, 0x000000ff,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 32,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, NULL);
 			break;
 
 		case B_RGB24:
-			ConvertBits(srcBuffer, (uint8 *)dstBuffer, redShift - 24,
-				greenShift - 16, blueShift - 8, 0, 0, 0xff0000, 0x00ff00,
-				0x0000ff, 0x000000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 24, width, height, srcSwap, false, srcFunc,
-				WriteRGB24);
+			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				0, 0, 0xff0000, 0x00ff00, 0x0000ff, 0x000000, srcBytesPerRow,
+				dstBytesPerRow, srcBitsPerPixel, 24, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
+				false, srcFunc, WriteRGB24);
 			break;
 
 		case B_RGB24_BIG:
-			ConvertBits(srcBuffer, (uint8 *)dstBuffer, redShift - 8,
-				greenShift - 16, blueShift - 24, 0, 0, 0x0000ff, 0x00ff00,
-				0xff0000, 0x000000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 24, width, height, srcSwap, false, srcFunc,
-				WriteRGB24);
+			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 8, greenShift - 16, blueShift - 24,
+				0, 0, 0x0000ff, 0x00ff00, 0xff0000, 0x000000, srcBytesPerRow,
+				dstBytesPerRow, srcBitsPerPixel, 24, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
+				false, srcFunc, WriteRGB24);
 			break;
 
 		case B_RGB16:
 		case B_RGB16_BIG:
-			ConvertBits(srcBuffer, (uint16 *)dstBuffer, redShift - 16,
-				greenShift - 11, blueShift - 5, 0, 0, 0xf800, 0x07e0, 0x001f,
-				0x0000, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 16,
-				width, height, srcSwap, dstColorSpace == B_RGB16_BIG, srcFunc,
-				NULL);
+			ConvertBits(srcBits, (uint16 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 16, greenShift - 11, blueShift - 5,
+				0, 0, 0xf800, 0x07e0, 0x001f, 0x0000, srcBytesPerRow,
+				dstBytesPerRow, srcBitsPerPixel, 16, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
+				dstColorSpace == B_RGB16_BIG, srcFunc, NULL);
 			break;
 
 		case B_RGBA15:
 		case B_RGBA15_BIG:
-			ConvertBits(srcBuffer, (uint16 *)dstBuffer, redShift - 15,
-				greenShift - 10, blueShift - 5, alphaShift - 16, alphaBits,
-				0x7c00, 0x03e0, 0x001f, 0x8000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 16, width, height, srcSwap,
-				dstColorSpace == B_RGBA15_BIG, srcFunc, NULL);
+			ConvertBits(srcBits, (uint16 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
+				alphaShift - 16, alphaBits, 0x7c00, 0x03e0, 0x001f, 0x8000,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 16,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, dstColorSpace == B_RGBA15_BIG, srcFunc, NULL);
 			break;
 
 		case B_RGB15:
 		case B_RGB15_BIG:
-			ConvertBits(srcBuffer, (uint16 *)dstBuffer, redShift - 15,
-				greenShift - 10, blueShift - 5, 0, 0, 0x7c00, 0x03e0, 0x001f,
-				0x0000, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 16,
-				width, height, srcSwap, dstColorSpace == B_RGB15_BIG, srcFunc,
-				NULL);
+			ConvertBits(srcBits, (uint16 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
+				0, 0, 0x7c00, 0x03e0, 0x001f, 0x0000, srcBytesPerRow,
+				dstBytesPerRow, srcBitsPerPixel, 16, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
+				dstColorSpace == B_RGB15_BIG, srcFunc, NULL);
 			break;
 
 		case B_GRAY8:
-			ConvertBits(srcBuffer, (uint8 *)dstBuffer, redShift - 24,
-				greenShift - 16, blueShift - 8, 0, 0, 0x00ff0000, 0x0000ff00,
-				0x000000ff, 0x00000000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 8, width, height, srcSwap, false, srcFunc,
-				WriteGray8);
+			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				0, 0, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 8,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, WriteGray8);
 			break;
 
 		case B_GRAY1:
-			ConvertBits(srcBuffer, (uint8 *)dstBuffer, redShift - 24,
-				greenShift - 16, blueShift - 8, 0, 0, 0x00ff0000, 0x0000ff00,
-				0x000000ff, 0x00000000, srcBytesPerRow, dstBytesPerRow,
-				srcBitsPerPixel, 1, width, height, srcSwap, false, srcFunc,
-				WriteGray1);
+			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 24, greenShift - 16, blueShift - 8,
+				0, 0, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000,
+				srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 1,
+				srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, srcSwap, false, srcFunc, WriteGray1);
 			break;
 
 		case B_CMAP8:
 			palette_converter();
-			ConvertBits(srcBuffer, (uint8 *)dstBuffer, redShift - 15,
-				greenShift - 10, blueShift - 5, 0, 0, 0x7c00, 0x03e0, 0x001f,
-				0x0000, srcBytesPerRow, dstBytesPerRow, srcBitsPerPixel, 8,
-				width, height, srcSwap, false, srcFunc, WriteCMAP8);
+			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
+				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
+				0, 0, 0x7c00, 0x03e0, 0x001f, 0x0000, srcBytesPerRow,
+				dstBytesPerRow, srcBitsPerPixel, 8, srcColorSpace,
+				dstColorSpace, srcOffset, dstOffset, width, height, srcSwap,
+				false, srcFunc, WriteCMAP8);
 			break;
 
 		default:
@@ -813,8 +891,8 @@ ConvertBits(const srcByte *srcBuffer, void *dstBuffer, int32 redShift,
 /*!	\brief Converts a source buffer in one colorspace into a destination
 		   buffer of another colorspace.
 
-	\param srcBuffer The raw source buffer.
-	\param dstBuffer The raw destination buffer.
+	\param srcBits The raw source buffer.
+	\param dstBits The raw destination buffer.
 	\param srcBytesPerRow How many bytes per row the source buffer has got.
 	\param dstBytesPerRow How many bytes per row the destination buffer has got.
 	\param srcColorSpace The colorspace the source buffer is in.
@@ -826,93 +904,131 @@ ConvertBits(const srcByte *srcBuffer, void *dstBuffer, int32 redShift,
 	- \c B_BAD_VALUE: \c NULL buffer or at least one colorspace is unsupported.
 */
 status_t
-ConvertBits(const void *srcBuffer, void *dstBuffer, uint32 srcBytesPerRow,
-	uint32 dstBytesPerRow, color_space srcColorSpace,
-	color_space dstColorSpace, int32 width, int32 height)
+ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 srcBytesPerRow, int32 dstBytesPerRow,
+	color_space srcColorSpace, color_space dstColorSpace, int32 width,
+	int32 height)
 {
-	if (!srcBuffer || !dstBuffer)
-		return B_BAD_VALUE;
+	return ConvertBits(srcBits, dstBits, srcBitsLength, dstBitsLength,
+		srcBytesPerRow, dstBytesPerRow, srcColorSpace, dstColorSpace,
+		BPoint(0, 0), BPoint(0, 0), width, height);
+}
 
-	if (srcColorSpace == dstColorSpace && srcBytesPerRow == dstBytesPerRow) {
-		memcpy(dstBuffer, srcBuffer, height * srcBytesPerRow);
-		return B_OK;
-	}
+
+/*!	\brief Converts a source buffer in one colorspace into a destination
+		   buffer of another colorspace.
+
+	\param srcBits The raw source buffer.
+	\param dstBits The raw destination buffer.
+	\param srcBytesPerRow How many bytes per row the source buffer has got.
+	\param dstBytesPerRow How many bytes per row the destination buffer has got.
+	\param srcColorSpace The colorspace the source buffer is in.
+	\param dstColorSpace The colorspace the buffer shall be converted to.
+	\param srcOffset The offset at which to start reading in the source.
+	\param srcOffset The offset at which to start writing in the destination.
+	\param width The width (in pixels) to convert.
+	\param height The height (in pixels) to convert.
+	\return
+	- \c B_OK: Indicates success.
+	- \c B_BAD_VALUE: \c NULL buffer or at least one colorspace is unsupported.
+*/
+status_t
+ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
+	int32 dstBitsLength, int32 srcBytesPerRow, int32 dstBytesPerRow,
+	color_space srcColorSpace, color_space dstColorSpace, BPoint srcOffset,
+	BPoint dstOffset, int32 width, int32 height)
+{
+	if (!srcBits || !dstBits || srcBitsLength < 0 || dstBitsLength < 0
+		|| width < 0 || height < 0 || srcBytesPerRow < 0 || dstBytesPerRow < 0)
+		return B_BAD_VALUE;
 
 	switch (srcColorSpace) {
 		case B_RGBA32:
-			return ConvertBits((const uint32 *)srcBuffer, dstBuffer, 24, 16,
-				8, 32, 8, srcBytesPerRow, dstBytesPerRow, 32, dstColorSpace,
-				width, height, false, NULL);
+			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,
+				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, false, NULL);
 			break;
 
 		case B_RGBA32_BIG:
-			return ConvertBits((const uint32 *)srcBuffer, dstBuffer, 16, 24,
-				32, 8, 8, srcBytesPerRow, dstBytesPerRow, 32, dstColorSpace,
-				width, height, false, NULL);
+			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 16, 24, 32, 8, 8, srcBytesPerRow,
+				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, false, NULL);
 			break;
 
 		case B_RGB32:
-			return ConvertBits((const uint32 *)srcBuffer, dstBuffer, 24, 16,
-				8, 0, 0, srcBytesPerRow, dstBytesPerRow, 32, dstColorSpace,
-				width, height, false, NULL);
+			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 24, 16, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				32, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, false, NULL);
 			break;
 
 		case B_RGB32_BIG:
-			return ConvertBits((const uint32 *)srcBuffer, dstBuffer, 16, 24,
-				32, 0, 0, srcBytesPerRow, dstBytesPerRow, 32, dstColorSpace,
-				width, height, false, NULL);
+			return ConvertBits((const uint32 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 16, 24, 32, 0, 0, srcBytesPerRow,
+				dstBytesPerRow, 32, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, false, NULL);
 			break;
 
 		case B_RGB24:
-			return ConvertBits((const uint8 *)srcBuffer, dstBuffer, 24, 16, 8,
-				0, 0, srcBytesPerRow, dstBytesPerRow, 24, dstColorSpace,
-				width, height, false, ReadRGB24);
+			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 24, 16, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				24, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, false, ReadRGB24);
 			break;
 
 		case B_RGB24_BIG:
-			return ConvertBits((const uint8 *)srcBuffer, dstBuffer, 8, 16, 24,
-				0, 0, srcBytesPerRow, dstBytesPerRow, 24, dstColorSpace,
-				width, height, false, ReadRGB24);
+			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 8, 16, 24, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				24, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
+				height, false, ReadRGB24);
 			break;
 
 		case B_RGB16:
 		case B_RGB16_BIG:
-			return ConvertBits((const uint16 *)srcBuffer, dstBuffer, 16, 11, 5,
-				0, 0, srcBytesPerRow, dstBytesPerRow, 16, dstColorSpace, width,
+			return ConvertBits((const uint16 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 16, 11, 5, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				16, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, srcColorSpace == B_RGB16_BIG, NULL);
 			break;
 
 		case B_RGBA15:
 		case B_RGBA15_BIG:
-			return ConvertBits((const uint16 *)srcBuffer, dstBuffer, 15, 10, 5,
-				16, 1, srcBytesPerRow, dstBytesPerRow, 16, dstColorSpace,
-				width, height, srcColorSpace == B_RGBA15_BIG, NULL);
+			return ConvertBits((const uint16 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 15, 10, 5, 16, 1, srcBytesPerRow,
+				dstBytesPerRow, 16, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, srcColorSpace == B_RGBA15_BIG, NULL);
 			break;
 
 		case B_RGB15:
 		case B_RGB15_BIG:
-			return ConvertBits((const uint16 *)srcBuffer, dstBuffer, 15, 10, 5,
-				0, 0, srcBytesPerRow, dstBytesPerRow, 16, dstColorSpace, width,
+			return ConvertBits((const uint16 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 15, 10, 5, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				16, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, srcColorSpace == B_RGB15_BIG, NULL);
 			break;
 
 		case B_GRAY8:
-			return ConvertBits((const uint8 *)srcBuffer, dstBuffer, 8, 8, 8, 0,
-				0, srcBytesPerRow, dstBytesPerRow, 8, dstColorSpace, width,
+			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 8, 8, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				8, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadGray8);
 			break;
 
 		case B_GRAY1:
-			return ConvertBits((const uint8 *)srcBuffer, dstBuffer, 8, 8, 8, 0,
-				0, srcBytesPerRow, dstBytesPerRow, 1, dstColorSpace, width,
+			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 8, 8, 8, 0, 0, srcBytesPerRow, dstBytesPerRow,
+				1, srcColorSpace, dstColorSpace, srcOffset, dstOffset, width,
 				height, false, ReadGray1);
 			break;
 
 		case B_CMAP8:
 			palette_converter();
-			return ConvertBits((const uint8 *)srcBuffer, dstBuffer, 24, 16, 8,
-				32, 8, srcBytesPerRow, dstBytesPerRow, 8, dstColorSpace, width,
-				height, false, ReadCMAP8);
+			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
+				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,
+				dstBytesPerRow, 8, srcColorSpace, dstColorSpace, srcOffset,
+				dstOffset, width, height, false, ReadCMAP8);
 			break;
 
 		default:

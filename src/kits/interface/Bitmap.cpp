@@ -519,8 +519,9 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	if (bpr < 0)
 		bpr = get_bytes_per_row(colorSpace, width);
 
-	return BPrivate::ConvertBits(data, fBasePtr, bpr, fBytesPerRow,
-		colorSpace, fColorSpace, width, fBounds.IntegerHeight() + 1);
+	return BPrivate::ConvertBits(data, fBasePtr, length, fSize, bpr,
+		fBytesPerRow, colorSpace, fColorSpace, width,
+		fBounds.IntegerHeight() + 1);
 }
 
 // ImportBits
