@@ -64,7 +64,7 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 			result = 0.5;		
 		} 	
 	}
-	PRINT(("returning %4.2f\n", result));
+	PRINT(("returning %ld\n", int32(result * 10000)));
 	return result;
 }
 
