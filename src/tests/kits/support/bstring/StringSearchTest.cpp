@@ -250,6 +250,18 @@ StringSearchTest::PerformTest(void)
 	delete string1;
 
 	NextSubTest();
+	string1 = new BString("abcd abcd");
+	i = string1->FindLast('b', 6);
+	CPPUNIT_ASSERT(i == 6);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("abcd abcd");
+	i = string1->FindLast('b', 5);
+	CPPUNIT_ASSERT(i == 1);
+	delete string1;
+
+	NextSubTest();
 	string1 = new BString("abc abc abc");
 	i = string1->FindLast("a", 0);
 	CPPUNIT_ASSERT(i == B_ERROR);
