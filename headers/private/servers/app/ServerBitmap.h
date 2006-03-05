@@ -62,6 +62,9 @@ class ServerBitmap {
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
 
+			status_t		ImportBits(const void *bits, int32 bitsLength,
+								int32 bytesPerRow, color_space colorSpace);
+
 			void			PrintToStream();
 
 protected:

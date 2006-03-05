@@ -8,6 +8,7 @@
 
 
 #include "ServerBitmap.h"
+#include "ColorConversion.h"
 
 #include <new>
 #include <stdio.h>
@@ -242,6 +243,18 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 			fBytesPerRow = ((minBPR + 3) / 4) * 4;
 		}
 	}
+}
+
+
+status_t
+ServerBitmap::ImportBits(const void *bits, int32 bitsLength, int32 bytesPerRow,
+	color_space colorSpace)
+{
+	if (!bits || bitsLength < 0 || bytesPerRow <= 0)
+		return B_BAD_VALUE;
+
+	return BPrivate::ConvertBits(bits, fBuffer, bytesPerRow, fBytesPerRow,
+		colorSpace, fSpace, fWidth, fHeight);
 }
 
 
