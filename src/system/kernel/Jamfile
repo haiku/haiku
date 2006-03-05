@@ -22,7 +22,7 @@ KernelMergeObject kernel_core.o :
 	linkhack.c
 	lock.c
 	main.c
-	module.c
+	module.cpp
 	port.c
 	real_time_clock.c
 	scheduler.cpp

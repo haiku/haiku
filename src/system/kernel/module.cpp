@@ -6,18 +6,18 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* The Module manager
- * Manages kernel add-ons and their exported modules.
- */
+/** Manages kernel add-ons and their exported modules. */
 
 
 #include <boot_device.h>
 #include <elf.h>
 #include <kmodule.h>
 #include <lock.h>
-#include <util/khash.h>
 #include <vfs.h>
+
 #include <boot/elf.h>
+#include <fs/KPath.h>
+#include <util/khash.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -62,14 +62,14 @@ static module_info *sBuiltInModules[] = {
 	NULL
 };
 
-typedef enum {
+enum module_state {
 	MODULE_QUERIED = 0,
 	MODULE_LOADED,
 	MODULE_INIT,
 	MODULE_READY,
 	MODULE_UNINIT,
 	MODULE_ERROR
-} module_state;
+};
 
 
 /* Each loaded module image (which can export several modules) is put
@@ -79,7 +79,7 @@ typedef enum {
  * a little bit slower, but would lower the memory foot print quite a lot.
  */
 
-typedef struct module_image {
+struct module_image {
 	struct module_image	*next;
 	module_info			**info;		/* the module_info we use */
 	module_dependency	*dependencies;
@@ -87,15 +87,15 @@ typedef struct module_image {
 	image_id			image;
 	int32				ref_count;	/* how many ref's to this file */
 	bool				keep_loaded;
-} module_image;
+};
 
 /* Each known module will have this structure which is put in the
  * gModulesHash, and looked up by name.
  */
 
-typedef struct module {
+struct module {
 	struct module		*next;
-	module_image		*module_image;
+	::module_image		*module_image;
 	char				*name;
 	char				*file;
 	int32				ref_count;
@@ -103,7 +103,7 @@ typedef struct module {
 	int32				offset;		/* this is the offset in the headers */
 	module_state		state;		/* state of module */
 	uint32				flags;
-} module;
+};
 
 #define B_BUILT_IN_MODULE	2
 
@@ -124,7 +124,7 @@ typedef struct module_iterator {
 	int32				module_offset;
 		/* This is used to keep track of which module_info
 		 * within a module we're addressing. */
-	module_image		*module_image;
+	::module_image		*module_image;
 	module_info			**current_header;
 	const char			*current_path;
 	uint32				path_base_length;
@@ -738,13 +738,10 @@ nextPath:
 nextModuleImage:
 	if (iterator->current_header == NULL) {
 		// get next entry from the current directory
-		char path[B_PATH_NAME_LENGTH];
-		struct dirent *dirent;
-		struct stat st;
-		int32 passedOffset, commonLength;
 
 		errno = 0;
 
+		struct dirent *dirent;
 		if ((dirent = readdir(iterator->current_dir)) == NULL) {
 			closedir(iterator->current_dir);
 			iterator->current_dir = NULL;
@@ -756,6 +753,7 @@ nextModuleImage:
 		}
 
 		// check if the prefix matches
+		int32 passedOffset, commonLength;
 		passedOffset = strlen(iterator->current_path) + 1;
 		commonLength = iterator->path_base_length + iterator->prefix_length - passedOffset;
 
@@ -776,11 +774,17 @@ nextModuleImage:
 			goto nextModuleImage;
 
 		// build absolute path to current file
+		KPath pathBuffer;
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
+
+		char *path = pathBuffer.LockBuffer();
 		strlcpy(path, iterator->current_path, sizeof(path));
 		strlcat(path, "/", sizeof(path));
 		strlcat(path, dirent->d_name, sizeof(path));
 
 		// find out if it's a directory or a file
+		struct stat st;
 		if (stat(path, &st) < 0)
 			return errno;
 
@@ -1096,17 +1100,22 @@ open_module_list(const char *prefix)
 
 	// put all search paths on the stack
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
-		const char *path;
-
 		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
 			break;
 
-		path = strdup(sModulePaths[i]);
+		// Build path component: base path + '/' + prefix
+		size_t length = strlen(sModulePaths[i]);
+		char *path = (char *)malloc(length + iterator->prefix_length + 2);
 		if (path == NULL) {
 			// ToDo: should we abort the whole operation here?
 			//	if we do, don't forget to empty the stack
 			continue;
 		}
+
+		memcpy(path, sModulePaths[i], length);
+		path[length] = '/';
+		memcpy(path + length + 1, prefix, iterator->prefix_length + 1);
+
 		iterator_push_path_on_stack(iterator, path, strlen(path) + 1);
 	}
 
@@ -1192,10 +1201,6 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 status_t 
 get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 {
-	hash_iterator *iterator = (hash_iterator *)*_cookie;
-	struct module *module;
-	status_t status;
-
 	if (sModulesHash == NULL) {
 		dprintf("get_next_loaded_module_name() called too early!\n");
 		return NULL;
@@ -1205,6 +1210,9 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 
 	if (_cookie == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
+
+	hash_iterator *iterator = (hash_iterator *)*_cookie;
+	status_t status;
 
 	if (iterator == NULL) {
 		iterator = hash_open(sModulesHash, NULL);
@@ -1216,7 +1224,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 
 	recursive_lock_lock(&sModulesLock);
 
-	module = hash_next(sModulesHash, iterator);
+	struct module *module = (struct module *)hash_next(sModulesHash, iterator);
 	if (module != NULL) {
 		*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 		status = B_OK;
