@@ -20,7 +20,7 @@
 #define IS_KERNEL_ADDRESS(x) \
 	((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
 
-//#define DEBUG_KERNEL_STACKS
+#define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
 	// interrupt will also try to use the stack on a page fault, all
 	// you get is a double fault.
