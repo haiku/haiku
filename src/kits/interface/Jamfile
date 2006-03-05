@@ -38,8 +38,9 @@ MergeObject <libbe>interface_kit.o :
 	ChannelControl.cpp
 	ChannelSlider.cpp
 	CheckBox.cpp
-	ColorUtils.cc
+	ColorConversion.cpp
 	ColorControl.cpp
+	ColorUtils.cc
 	Control.cpp
 	Deskbar.cpp
 	Dragger.cpp
