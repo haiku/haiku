@@ -695,18 +695,16 @@ free_vnode(struct vnode *vnode, bool reenter)
 static status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
-	int32 oldRefCount;
-
 	mutex_lock(&sVnodeMutex);
 
-	if (vnode->busy)
-		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", vnode);
-
-	oldRefCount = atomic_add(&vnode->ref_count, -1);
+	int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
 
 	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 
 	if (oldRefCount == 1) {
+		if (vnode->busy)
+			panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
+
 		bool freeNode = false;
 
 		// Just insert the vnode into an unused list if we don't need
