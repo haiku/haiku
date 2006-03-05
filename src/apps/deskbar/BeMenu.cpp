@@ -445,7 +445,7 @@ TBeMenu::ResetTargets()
 				case CMD_SUSPEND_SYSTEM:
 				case CMD_SHUTDOWN_SYSTEM:
 					// restart/shutdown
-#if __HAIKU__
+#ifdef __HAIKU__
 					item->SetTarget(be_app);
 #else
 					item->SetTarget(BMessenger(ROSTER_SIG));

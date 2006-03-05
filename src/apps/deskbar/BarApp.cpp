@@ -99,7 +99,7 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
-#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#ifdef __HAIKU__
 	be_roster->StartWatching(this);
 #endif
 
@@ -134,7 +134,7 @@ TBarApp::TBarApp()
 
 TBarApp::~TBarApp()
 {
-#if defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#ifdef __HAIKU__
 	be_roster->StopWatching(this);
 #endif
 
