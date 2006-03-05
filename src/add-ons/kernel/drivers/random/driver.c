@@ -4,19 +4,21 @@
  */
 
 /* Made into a BeOS /dev/random and /dev/urandom by Daniel Berlin */
-/* Adapted for Haiku by David Reid, Axel Doerfler */
+/* Adapted for Haiku by David Reid, Axel Dörfler */
 
 
 #include <OS.h>
 #include <Drivers.h>
+
+#include <kernel/thread.h>
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 
-#define TRACE_DRIVER 0
-#if TRACE_DRIVER
+//#define TRACE_DRIVER
+#ifdef TRACE_DRIVER
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -169,7 +171,7 @@ chseed(ch_randgen *prandgen, const uint64 seed)
 /**	The heart of Yarrow 2000 Chuma Random Number Generator: fast and reliable
  *	randomness collection.
  *	Thread yielding function is the most OPTIMAL source of randomness combined
- *	with a clock counter (editor's note: thread_yield() is not properly done in BeOS).
+ *	with a clock counter.
  *	It doesn't have to switch to another thread, the call itself is random enough.
  *	Test it yourself.
  *	This FASTEST way to collect minimal randomness on each step couldn't use the
@@ -189,11 +191,7 @@ reseed(ch_randgen *prandgen, const uint32 initTimes)
 
 	for (j = initTimes; j; j--) {
 		for (i = NK * initTimes; i; i--) {
-			// Note: there is no yield() in BeOS - we use snooze as an approximation,
-			//	although it might not work as good as this one (especially, it's not
-			//	as cheap as).
-			//thread_yield();
-			snooze(5);
+			thread_yield();
 
 			y.Q[0] += system_time();
 			attach(&x, &y, 0x52437EFFU, 0x026A4CEBU, 0xD9E66AC9U, 0x56E5A975U);
