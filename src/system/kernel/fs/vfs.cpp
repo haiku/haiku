@@ -1703,15 +1703,19 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
 	FUNCTION(("dir_vnode_to_path(%p, %p, %lu)\n", vnode, buffer, bufferSize));
 
+	if (vnode == NULL || buffer == NULL)
+		return B_BAD_VALUE;
+
 	/* this implementation is currently bound to B_PATH_NAME_LENGTH */
-	char path[B_PATH_NAME_LENGTH];
-	int32 insert = sizeof(path);
+	KPath pathBuffer;
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
+	int32 insert = pathBuffer.BufferSize();
 	int32 maxLevel = 256;
 	int32 length;
 	status_t status;
-
-	if (vnode == NULL || buffer == NULL)
-		return EINVAL;
 
 	// we don't use get_vnode() here because this call is more
 	// efficient and does all we need from get_vnode()
@@ -1735,7 +1739,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, "..", &parentID, &type);
+		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, "..",
+			&parentID, &type);
 		if (status < B_OK)
 			goto out;
 
@@ -1744,7 +1749,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		mutex_unlock(&sVnodeMutex);
 
 		if (parentVnode == NULL) {
-			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, parentID);
+			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n",
+				vnode->device, parentID);
 			status = B_ENTRY_NOT_FOUND;
 			goto out;
 		}
@@ -1761,8 +1767,10 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
-		if (status == B_OK && FS_CALL(vnode, get_vnode_name))
-			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie, vnode->private_node, name, B_FILE_NAME_LENGTH);
+		if (status == B_OK && FS_CALL(vnode, get_vnode_name)) {
+			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie, vnode->private_node,
+				name, B_FILE_NAME_LENGTH);
+		}
 
 		// ... if not, find it out later (by iterating through
 		// the parent directory, searching for the id)
@@ -1795,7 +1803,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			// in the parent directory now
 			fs_cookie cookie;
 
-			status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+			status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node,
+				&cookie);
 			if (status >= B_OK) {
 				struct dirent *dirent = (struct dirent *)nameBuffer;
 				while (true) {
@@ -1836,7 +1845,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 	TRACE(("  path is: %s\n", path + insert));
 
 	// copy the path to the output buffer
-	length = sizeof(path) - insert;
+	length = pathBuffer.BufferSize() - insert;
 	if (length <= (int)bufferSize)
 		memcpy(buffer, path + insert, length);
 	else
@@ -2488,15 +2497,17 @@ vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 extern "C" status_t
 vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 {
-	struct vnode *vnode;
-	status_t status;
-	char buffer[B_PATH_NAME_LENGTH + 1];
-
 	TRACE(("vfs_get_vnode_from_path: entry. path = '%s', kernel %d\n", path, kernel));
 
-	strlcpy(buffer, path, sizeof(buffer));
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
+	char *buffer = pathBuffer.LockBuffer();
+	strlcpy(buffer, path, pathBuffer.BufferSize());
+
+	struct vnode *vnode;
+	status_t status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2561,14 +2572,18 @@ vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 extern "C" status_t
 vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node)
 {
-	char buffer[B_PATH_NAME_LENGTH + 1];
+	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
+		mountID, path, kernel));
+
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *buffer = pathBuffer.LockBuffer();
+	strlcpy(buffer, path, pathBuffer.BufferSize());
+
 	struct vnode *vnode;
-	status_t status;
-
-	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n", mountID, path, kernel));
-
-	strlcpy(buffer, path, sizeof(buffer));
-	status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
+	status_t status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2704,7 +2719,11 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	TRACE(("vfs_normalize_path(`%s')\n", path));
 
 	// copy the supplied path to the stack, so it can be modified
-	char mutablePath[B_PATH_NAME_LENGTH + 1];
+	KPath mutablePathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (mutablePathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *mutablePath = mutablePathBuffer.LockBuffer();
 	if (strlcpy(mutablePath, path, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
 		return B_NAME_TOO_LONG;
 
@@ -2723,7 +2742,8 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	if (isDir)
 		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL, NULL);
 	if (error != B_OK) {
-		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
+		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n",
+			strerror(error)));
 		return error;
 	}
 
@@ -6372,7 +6392,10 @@ status_t
 _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	char *userPath, size_t pathLength)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	struct vnode *vnode;
 	status_t status;
 
@@ -6408,8 +6431,10 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	if (status < B_OK)
 		return status;
 
+	char *path = pathBuffer.LockBuffer();
+
 	// get the directory path
-	status = dir_vnode_to_path(vnode, path, sizeof(path));
+	status = dir_vnode_to_path(vnode, path, pathBuffer.BufferSize());
 	put_vnode(vnode);
 		// we don't need the vnode anymore
 	if (status < B_OK)
@@ -6418,8 +6443,9 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	// append the leaf name
 	if (leaf) {
 		// insert a directory separator if this is not the file system root
-		if ((strcmp(path, "/") && strlcat(path, "/", sizeof(path)) >= sizeof(path))
-			|| strlcat(path, leaf, sizeof(path)) >= sizeof(path)) {
+		if ((strcmp(path, "/") && strlcat(path, "/", pathBuffer.BufferSize())
+				>= pathBuffer.BufferSize())
+			|| strlcat(path, leaf, pathBuffer.BufferSize()) >= pathBuffer.BufferSize()) {
 			return B_NAME_TOO_LONG;
 		}
 	}
@@ -6429,6 +6455,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		return len;
 	if (len >= (int)pathLength)
 		return B_BUFFER_OVERFLOW;
+
 	return B_OK;
 }
 
@@ -6457,35 +6484,32 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName,
 int
 _user_open(int fd, const char *userPath, int openMode, int perms)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userPath))
+	char *buffer = path.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userPath)
+		|| user_strlcpy(buffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
 	if (openMode & O_CREAT)
-		return file_create(fd, path, openMode, perms, false);
+		return file_create(fd, buffer, openMode, perms, false);
 
-	return file_open(fd, path, openMode, false);
+	return file_open(fd, buffer, openMode, false);
 }
 
 
 int
-_user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
+_user_open_dir_entry_ref(dev_t device, ino_t inode, const char *userName)
 {
-	if (uname) {
+	if (userName != NULL) {
 		char name[B_FILE_NAME_LENGTH];
 
-		if (!IS_USER_ADDRESS(uname))
+		if (!IS_USER_ADDRESS(userName)
+			|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
 			return B_BAD_ADDRESS;
-
-		int status = user_strlcpy(name, uname, sizeof(name));
-		if (status < B_OK)
-			return status;
 
 		return dir_open_entry_ref(device, inode, name, false);
 	}
@@ -6496,17 +6520,17 @@ _user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 int
 _user_open_dir(int fd, const char *userPath)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userPath))
+	char *buffer = path.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userPath)
+		|| user_strlcpy(buffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	return dir_open(fd, path, false);
+	return dir_open(fd, buffer, false);
 }
 
 
@@ -6618,15 +6642,15 @@ _user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int 
 status_t
 _user_create_dir(int fd, const char *userPath, int perms)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userPath))
+	char *path = pathBuffer.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
 
 	return dir_create(fd, path, perms, false);
 }
@@ -6635,11 +6659,17 @@ _user_create_dir(int fd, const char *userPath, int perms)
 status_t
 _user_remove_dir(int fd, const char *userPath)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if ((userPath != NULL && !IS_USER_ADDRESS(userPath))
-		|| (userPath != NULL && user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK))
-		return B_BAD_ADDRESS;
+	char *path = pathBuffer.LockBuffer();
+
+	if (userPath != NULL) {
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+			return B_BAD_ADDRESS;
+	}
 
 	return dir_remove(fd, userPath ? path : NULL, false);
 }
@@ -6648,28 +6678,30 @@ _user_remove_dir(int fd, const char *userPath)
 status_t
 _user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBufferSize)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	char buffer[B_PATH_NAME_LENGTH];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1), linkBuffer;
+	if (pathBuffer.InitCheck() != B_OK || linkBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	size_t bufferSize;
-	status_t status;
 
 	if (!IS_USER_ADDRESS(userBuffer) || !IS_USER_ADDRESS(userBufferSize)
 		|| user_memcpy(&bufferSize, userBufferSize, sizeof(size_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (userPath) {
-		if (!IS_USER_ADDRESS(userPath))
-			return B_BAD_ADDRESS;
+	char *path = pathBuffer.LockBuffer();
+	char *buffer = linkBuffer.LockBuffer();
 
-		status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-		if (status < 0)
-			return status;
+	if (userPath) {
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+			return B_BAD_ADDRESS;
 
 		if (bufferSize > B_PATH_NAME_LENGTH)
 			bufferSize = B_PATH_NAME_LENGTH;
 	}
 
-	status = common_read_link(fd, userPath ? path : NULL, buffer, &bufferSize, false);
+	status_t status = common_read_link(fd, userPath ? path : NULL, buffer,
+		&bufferSize, false);
 
 	// we also update the bufferSize in case of errors
 	// (the real length will be returned in case of B_BUFFER_OVERFLOW)
@@ -6689,23 +6721,21 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBuff
 status_t
 _user_write_link(const char *userPath, const char *userToPath)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	char toPath[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
+	char *toPath = toPathBuffer.LockBuffer();
 
 	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath))
+		|| !IS_USER_ADDRESS(userToPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
+		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = check_path(toPath);
+	status_t status = check_path(toPath);
 	if (status < B_OK)
 		return status;
 
@@ -6717,23 +6747,21 @@ status_t
 _user_create_symlink(int fd, const char *userPath, const char *userToPath,
 	int mode)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	char toPath[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
+	char *toPath = toPathBuffer.LockBuffer();
 
 	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath))
+		|| !IS_USER_ADDRESS(userToPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
+		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = check_path(toPath);
+	status_t status = check_path(toPath);
 	if (status < B_OK)
 		return status;
 
@@ -6744,23 +6772,21 @@ _user_create_symlink(int fd, const char *userPath, const char *userToPath,
 status_t
 _user_create_link(const char *userPath, const char *userToPath)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	char toPath[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
+	char *toPath = toPathBuffer.LockBuffer();
 
 	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userToPath))
+		|| !IS_USER_ADDRESS(userToPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
+		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = check_path(toPath);
+	status_t status = check_path(toPath);
 	if (status < B_OK)
 		return status;
 
@@ -6771,15 +6797,15 @@ _user_create_link(const char *userPath, const char *userToPath)
 status_t
 _user_unlink(int fd, const char *userPath)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userPath))
+	char *path = pathBuffer.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
 
 	return common_unlink(fd, path, false);
 }
@@ -6789,20 +6815,18 @@ status_t
 _user_rename(int oldFD, const char *userOldPath, int newFD,
 	const char *userNewPath)
 {
-	char oldPath[B_PATH_NAME_LENGTH + 1];
-	char newPath[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath oldPathBuffer(B_PATH_NAME_LENGTH + 1);
+	KPath newPathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (oldPathBuffer.InitCheck() != B_OK || newPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userOldPath) || !IS_USER_ADDRESS(userNewPath))
+	char *oldPath = oldPathBuffer.LockBuffer();
+	char *newPath = newPathBuffer.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userOldPath) || !IS_USER_ADDRESS(userNewPath)
+		|| user_strlcpy(oldPath, userOldPath, B_PATH_NAME_LENGTH) < B_OK
+		|| user_strlcpy(newPath, userNewPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(oldPath, userOldPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
-
-	status = user_strlcpy(newPath, userNewPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
 
 	return common_rename(oldFD, oldPath, newFD, newPath, false);
 }
@@ -6811,15 +6835,15 @@ _user_rename(int oldFD, const char *userOldPath, int newFD,
 status_t
 _user_access(const char *userPath, int mode)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
-	if (!IS_USER_ADDRESS(userPath))
+	char *path = pathBuffer.LockBuffer();
+
+	if (!IS_USER_ADDRESS(userPath)
+		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
 
 	return common_access(path, mode, false);
 }
@@ -6840,13 +6864,19 @@ _user_read_stat(int fd, const char *userPath, bool traverseLink,
 
 	if (userPath) {
 		// path given: get the stat of the node referred to by (fd, path)
-		char path[B_PATH_NAME_LENGTH + 1];
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
-		int len = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-		if (len < 0)
-			return len;
-		if (len >= B_PATH_NAME_LENGTH)
+		
+		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
+	
+		char *path = pathBuffer.LockBuffer();
+	
+		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
+		if (length < B_OK)
+			return length;
+		if (length >= B_PATH_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
 
 		status = common_path_read_stat(fd, path, traverseLink, &stat, false);
@@ -6876,11 +6906,10 @@ status_t
 _user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
 	const struct stat *userStat, size_t statSize, int statMask)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	struct stat stat;
-
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
+
+	struct stat stat;
 
 	if (!IS_USER_ADDRESS(userStat)
 		|| user_memcpy(&stat, userStat, statSize) < B_OK)
@@ -6896,10 +6925,17 @@ _user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
 		// path given: write the stat of the node referred to by (fd, path)
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
-		int len = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-		if (len < 0)
-			return len;
-		if (len >= B_PATH_NAME_LENGTH)
+		
+		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
+	
+		char *path = pathBuffer.LockBuffer();
+	
+		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
+		if (length < B_OK)
+			return length;
+		if (length >= B_PATH_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
 
 		status = common_path_write_stat(fd, path, traverseLeafLink, &stat,
@@ -6926,15 +6962,19 @@ _user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
 int
 _user_open_attr_dir(int fd, const char *userPath)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
 		if (!IS_USER_ADDRESS(userPath)
-			|| user_strlcpy(pathBuffer, userPath, B_PATH_NAME_LENGTH) < B_OK)
+			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 			return B_BAD_ADDRESS;
 	}
 
-	return attr_dir_open(fd, userPath ? pathBuffer : NULL, false);
+	return attr_dir_open(fd, userPath ? path : NULL, false);
 }
 
 
@@ -6980,12 +7020,17 @@ _user_remove_attr(int fd, const char *userName)
 status_t
 _user_rename_attr(int fromFile, const char *userFromName, int toFile, const char *userToName)
 {
-	char fromName[B_FILE_NAME_LENGTH];
-	char toName[B_FILE_NAME_LENGTH];
-
 	if (!IS_USER_ADDRESS(userFromName)
 		|| !IS_USER_ADDRESS(userToName))
 		return B_BAD_ADDRESS;
+
+	KPath fromNameBuffer(B_FILE_NAME_LENGTH);
+	KPath toNameBuffer(B_FILE_NAME_LENGTH);
+	if (fromNameBuffer.InitCheck() != B_OK || toNameBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *fromName = fromNameBuffer.LockBuffer();
+	char *toName = toNameBuffer.LockBuffer();
 
 	if (user_strlcpy(fromName, userFromName, B_FILE_NAME_LENGTH) < B_OK
 		|| user_strlcpy(toName, userToName, B_FILE_NAME_LENGTH) < B_OK)
@@ -7053,23 +7098,26 @@ _user_remove_index(dev_t device, const char *userName)
 status_t
 _user_getcwd(char *userBuffer, size_t size)
 {
-	char buffer[B_PATH_NAME_LENGTH];
-	status_t status;
-
-	TRACE(("user_getcwd: buf %p, %ld\n", userBuffer, size));
-
 	if (!IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
+
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	TRACE(("user_getcwd: buf %p, %ld\n", userBuffer, size));
 
 	if (size > B_PATH_NAME_LENGTH)
 		size = B_PATH_NAME_LENGTH;
 
-	status = get_cwd(buffer, size, false);
-	if (status < 0)
+	char *path = pathBuffer.LockBuffer();
+
+	status_t status = get_cwd(path, size, false);
+	if (status < B_OK)
 		return status;
 
 	// Copy back the result
-	if (user_strlcpy(userBuffer, buffer, size) < B_OK)
+	if (user_strlcpy(userBuffer, path, size) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
@@ -7079,9 +7127,13 @@ _user_getcwd(char *userBuffer, size_t size)
 status_t
 _user_setcwd(int fd, const char *userPath)
 {
-	char path[B_PATH_NAME_LENGTH];
-
 	TRACE(("user_setcwd: path = %p\n", userPath));
+
+	KPath pathBuffer(B_PATH_NAME_LENGTH);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	char *path = pathBuffer.LockBuffer();
 
 	if (userPath != NULL) {
 		if (!IS_USER_ADDRESS(userPath)
