@@ -1080,14 +1080,12 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 		goto err2;
 
 	if (vfs_get_vnode_cache(ref->vnode, &ref->cache, true) != B_OK)
-		goto err3;
+		goto err2;
 
 	ref->cache->cache->virtual_size = size;
 	((vnode_store *)ref->cache->cache->store)->file_cache_ref = ref;
 	return ref;
 
-err3:
-	vfs_put_vnode(ref->vnode);
 err2:
 	vfs_put_vnode(ref->device);
 err1:
