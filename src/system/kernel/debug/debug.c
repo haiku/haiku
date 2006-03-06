@@ -619,9 +619,9 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
 	add_debugger_command("shutdown", &cmd_shutdown, "Shut down the system");
 	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
+	add_debugger_command("exit", &cmd_continue, "Same as \"continue\"");
+	add_debugger_command("es", &cmd_continue, "Same as \"continue\"");
 	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
-	add_debugger_command("exit", &cmd_continue, NULL);
-	add_debugger_command("es", &cmd_continue, NULL);
 
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
