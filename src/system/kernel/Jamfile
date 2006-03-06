@@ -1,9 +1,8 @@
 SubDir HAIKU_TOP src system kernel ;
 
 {
-	# TODO: Rename the macro OBOS_ARCH to TARGET_ARCH, or something like that.
 	local defines =
-		OBOS_ARCH=\\\"$(TARGET_ARCH)\\\"
+		HAIKU_ARCH=\\\"$(TARGET_ARCH)\\\"
 		;
 
 	defines = [ FDefines $(defines) ] ;
