@@ -400,7 +400,7 @@ TCalendarView::InitDates()
 		for (int col = 0; col < 7; col++) {
 			day = dynamic_cast<TDay *>(ChildAt((row *7) +col));
 			
-			if (idx < f_firstday || idx > daycnt +f_firstday +1)
+			if (idx < f_firstday || idx > daycnt + f_firstday - 1)
 				label = 0;
 			else
 				label = idx - (f_firstday - 1);
