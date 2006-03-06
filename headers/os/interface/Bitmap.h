@@ -71,7 +71,12 @@ public:
 	// not part of the R5 API
 	status_t ImportBits(const void *data, int32 length, int32 bpr,
 						int32 offset, color_space colorSpace);
+	status_t ImportBits(const void *data, int32 length, int32 bpr,
+						color_space colorSpace, BPoint from, BPoint to,
+						int32 width, int32 height);
 	status_t ImportBits(const BBitmap *bitmap);
+	status_t ImportBits(const BBitmap *bitmap, BPoint from, BPoint to,
+						int32 width, int32 height);
 
 	status_t GetOverlayRestrictions(overlay_restrictions *restrictions) const;
 

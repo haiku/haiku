@@ -509,12 +509,6 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	if (!data || offset > fSize || length < 0)
 		return B_BAD_VALUE;
 
-	if (colorSpace == fColorSpace && bpr == fBytesPerRow) {
-		length = min(length, fSize - offset);
-		memcpy((char *)fBasePtr + offset, data, length);
-		return B_OK;
-	}
-
 	int32 width = fBounds.IntegerWidth() + 1;
 	if (bpr < 0)
 		bpr = get_bytes_per_row(colorSpace, width);
@@ -524,7 +518,49 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 		fBounds.IntegerHeight() + 1);
 }
 
-// ImportBits
+
+/*!	\brief Assigns data to the bitmap.
+
+	Allows for a BPoint offset in the source and in the bitmap. The region
+	of the source at \a from extending \a width and \a height is assigned
+	(and converted if necessary) to the bitmap at \a to.
+
+	The currently supported source/target color spaces are
+	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param bpr The number of bytes per row in the source data.
+	\param colorSpace Color space of the source data.
+	\param from The offset in the source where reading should begin.
+	\param to The offset in the bitmap where the source should be written.
+	\param width The width (in pixels) to be imported.
+	\param height The height (in pixels) to be imported.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a data, invalid \a bpr, unsupported
+	  \a colorSpace or invalid width/height.
+*/
+status_t
+BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
+	color_space colorSpace, BPoint from, BPoint to, int32 width, int32 height)
+{
+	AssertPtr();
+
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (!data || length < 0 || bpr < 0 || width < 0 || height < 0)
+		return B_BAD_VALUE;
+
+	if (bpr < 0)
+		bpr = get_bytes_per_row(colorSpace, fBounds.IntegerWidth() + 1);
+
+	return BPrivate::ConvertBits(data, fBasePtr, length, fSize, bpr,
+		fBytesPerRow, colorSpace, fColorSpace, from, to, width, height);
+}
+
+
 /*!	\briefly Assigns another bitmap's data to this bitmap.
 
 	The supplied bitmap must have the exactly same dimensions as this bitmap.
@@ -550,6 +586,40 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 
 	return ImportBits(bitmap->Bits(), bitmap->BitsLength(),
 		bitmap->BytesPerRow(), 0, bitmap->ColorSpace());
+}
+
+
+/*!	\brief Assigns data to the bitmap.
+
+	Allows for a BPoint offset in the source and in the bitmap. The region
+	of the source at \a from extending \a width and \a height is assigned
+	(and converted if necessary) to the bitmap at \a to. The source bitmap is
+	clipped to the bitmap and they don't need to have the same dimensions.
+
+	The currently supported source/target color spaces are
+	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
+
+	\param bitmap The source bitmap.
+	\param from The offset in the source where reading should begin.
+	\param to The offset in the bitmap where the source should be written.
+	\param width The width (in pixels) to be imported.
+	\param height The height (in pixels) to be imported.
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a bitmap, the conversion from or to one of
+	  the color spaces is not supported, or invalid width/height.
+*/
+status_t
+BBitmap::ImportBits(const BBitmap *bitmap, BPoint from, BPoint to, int32 width,
+	int32 height)
+{
+	if (InitCheck() != B_OK)
+		return B_NO_INIT;
+
+	if (!bitmap || bitmap->InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	return ImportBits(bitmap->Bits(), bitmap->BitsLength(),
+		bitmap->BytesPerRow(), bitmap->ColorSpace(), from, to, width, height);
 }
 
 
