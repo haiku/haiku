@@ -1778,117 +1778,29 @@ BTextView::OffsetAt(BPoint point) const
 	point.x -= fTextRect.left;
 	point.x = max_c(point.x, 0.0);
 
-	// TODO: The following isn't efficient like the part after the #else,
-	// but it's multi-byte characters safe.
-#if 1
+	// TODO: The following code isn't very efficient because it always starts from the left end,
+	// so when the point is near the right end it's very slow.
 	int32 offset = line->offset;
 	int32 limit = (line + 1)->offset;
 	int32 saveOffset;
-	float x = 0;
+	float location = 0;
 	do {
 		saveOffset = offset;
 		int32 nextInitial = NextInitialByte(offset);
 		float width = 0;
 		if (ByteAt(offset) == B_TAB)
-			width = ActualTabWidth(offset);
+			width = ActualTabWidth(location);
 		else
 			width = StyledWidth(saveOffset, nextInitial - saveOffset);
-		if (x + width > point.x) {
-			if (fabs(x + width - point.x) < fabs(x - point.x))
+		if (location + width > point.x) {
+			if (fabs(location + width - point.x) < fabs(location - point.x))
 				offset = nextInitial;
 			break;
 		}
 
-		x += width;
+		location += width;
 		offset = nextInitial;
 	} while (offset < limit);
-
-#else
-
-	// do a pseudo-binary search of the character widths on the line
-	// that PixelToLine() gave us
-	// note: the right half of a character returns its offset + 1	
-	int32 offset = line->offset;
-	int32 saveOffset = offset;
-	int32 delta = 0;
-	int32 limit = (line + 1)->offset;
-	int32 length = limit - line->offset;
-	float sigmaWidth = 0.0;
-	float tabWidth = 0.0;
-	int32 numChars = length;
-	bool done = false;
-	bool foundTab = false;
-	do {
-		saveOffset = offset;
-		
-		if (foundTab) {
-			// is the point in the right-half of the tab?
-			if (point.x >= (sigmaWidth - (tabWidth / 2)) &&
-				point.x < sigmaWidth)
-				break;
-		}
-		
-		// any more tabs?
-		foundTab = fText->FindChar(B_TAB, offset, &numChars);
-		
-		delta = numChars / 2;
-		delta = max_c(delta, 1);
-		
-		if (numChars > 1) {
-			do {
-				float deltaWidth = StyledWidth(offset, delta);
-				float leftWidth = StyledWidth(offset + delta - 1, 1);
-				sigmaWidth += deltaWidth;
-	
-				if (point.x >= (sigmaWidth - (leftWidth / 2))) {
-					// we're to the left of the point
-					float rightWidth = StyledWidth(offset + delta, 1);
-					if (point.x < (sigmaWidth + (rightWidth / 2))) {
-						// the next character is to the right, we're done!
-						offset += delta;
-						done = true;
-						break;
-					} else {
-						// still too far to the left, measure some more
-						offset += delta;
-						delta /= 2;
-						delta = max_c(delta, 1);
-					}
-				} else {
-					// oops, we overshot the point, go back some 
-					sigmaWidth -= deltaWidth;
-					
-					if (delta == 1) {
-						done = true;
-						break;
-					}
-						
-					delta /= 2;
-					delta = min_c(delta, 1);
-	
-				}
-			} while (offset < (numChars + saveOffset));
-		}
-		
-		if (done || offset >= limit)
-			break;
-			
-		if (foundTab) {
-			tabWidth = ActualTabWidth(sigmaWidth);
-			
-			// is the point in the left-half of the tab?
-			if (point.x < (sigmaWidth + (tabWidth / 2)))
-				break;
-				
-			sigmaWidth += tabWidth;
-			numChars++;
-		}
-
-		offset = saveOffset + numChars;
-		length -= numChars;
-		numChars = length;
-	} while (foundTab && length > 0);
-#endif	
 
 	if (offset == (line + 1)->offset) {
 		// special case: newlines aren't visible
