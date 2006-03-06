@@ -1148,13 +1148,10 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 		bounds = bounds & clip;
 		fGraphicsCard->HideSoftwareCursor(bounds);
 
-		int32 bytesPerRow = buffer->BytesPerRow();
-		int32 bitsLength = bytesPerRow * (bounds.IntegerHeight() + 1);
-		uint8 *bits = (uint8 *)buffer->Bits();
-		bits += (uint32)bounds.top * bytesPerRow + (uint32)bounds.left * 4;
-
-		status_t result = bitmap->ImportBits(bits, bitsLength, bytesPerRow,
-			buffer->ColorSpace());
+		status_t result = bitmap->ImportBits(buffer->Bits(),
+			buffer->BitsLength(), buffer->BytesPerRow(), buffer->ColorSpace(),
+			bounds.LeftTop(), BPoint(0, 0), bounds.IntegerWidth(),
+			bounds.IntegerHeight());
 
 		if (drawCursor) {
 			// ToDo: blend the cursor
