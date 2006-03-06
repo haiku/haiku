@@ -105,7 +105,7 @@ public:
   //
   // Initializer, Set function
   //
-  void	SetTermFont(BFont *halfFont, BFont *fullFont);
+  void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
   void	GetFontSize (int *width, int *height);
   BRect	SetTermSize (int rows, int cols, bool flag);
   void	SetTermColor (void);

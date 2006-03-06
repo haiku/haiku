@@ -123,6 +123,13 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv)
 	fViewThread = -1;
 	fMouseThread = -1;
 	fQuitting = 1;
+	
+	fFontHeight = 0;
+	fFontWidth = 0;
+
+	// Set fonts to some defaults
+	SetTermFont(be_plain_font, be_plain_font);	
+	
 	InitViewThread();
 
 	fDrawRect_p = 0;
@@ -213,7 +220,7 @@ TermView::SetTermColor()
 
 //! Sets half and full fonts for terminal
 void
-TermView::SetTermFont(BFont *halfFont, BFont *fullFont)
+TermView::SetTermFont(const BFont *halfFont, const BFont *fullFont)
 {
 	char buf[4];
 	int halfWidth = 0;
