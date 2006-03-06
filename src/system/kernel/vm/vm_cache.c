@@ -348,6 +348,8 @@ vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
 /**	This function updates the size field of the vm_cache structure.
  *	If needed, it will free up all pages that don't belong to the cache anymore.
  *	The vm_cache_ref lock must be held when you call it.
+ *	Since removed pages don't belong to the cache any longer, they are not
+ *	written back before they will be removed.
  */
 
 status_t
@@ -355,7 +357,7 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 {
 	vm_cache *cache = cacheRef->cache;
 	status_t status;
-	off_t oldSize;
+	uint32 oldPageCount, newPageCount;
 
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
@@ -363,16 +365,17 @@ vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 	if (status != B_OK)
 		return status;
 
-	oldSize = cache->virtual_size;
-	if (newSize < oldSize) {
+	oldPageCount = (uint32)((cache->virtual_size + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+
+	if (newPageCount < oldPageCount) {
 		// we need to remove all pages in the cache outside of the new virtual size
-		uint32 lastOffset = (uint32)(newSize >> PAGE_SHIFT);
 		vm_page *page, *next;
 
 		for (page = cache->page_list; page; page = next) {
 			next = page->cache_next;
 
-			if (page->cache_offset >= lastOffset) {
+			if (page->cache_offset >= newPageCount) {
 				// remove the page and put it into the free queue
 				vm_cache_remove_page(cacheRef, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
