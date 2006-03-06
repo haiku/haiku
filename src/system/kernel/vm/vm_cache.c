@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -116,7 +116,7 @@ vm_cache_create(vm_store *store)
 }
 
 
-vm_cache_ref *
+status_t
 vm_cache_ref_create(vm_cache *cache)
 {
 	vm_cache_ref *ref;
@@ -124,14 +124,14 @@ vm_cache_ref_create(vm_cache *cache)
 
 	ref = malloc(sizeof(vm_cache_ref));
 	if (ref == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
 	status = mutex_init(&ref->lock, "cache_ref_mutex");
 	if (status < B_OK && (!kernel_startup || status != B_NO_MORE_SEMS)) {
 		// During early boot, we cannot create semaphores - they are
 		// created later in vm_init_post_sem()
 		free(ref);
-		return NULL;
+		return status;
 	}
 
 	ref->areas = NULL;
@@ -141,7 +141,7 @@ vm_cache_ref_create(vm_cache *cache)
 	ref->cache = cache;
 	cache->ref = ref;
 
-	return ref;
+	return B_OK;
 }
 
 

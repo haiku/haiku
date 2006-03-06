@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -507,54 +507,62 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	int mapping, vm_area **_area, const char *areaName)
 {
 	vm_cache *cache;
-	vm_cache_ref *cache_ref;
-	vm_area *area;
+	vm_cache_ref *cacheRef;
 
-	status_t err;
+	status_t status;
 
 	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, store, *_virtualAddress, offset, size, addressSpec,
 		wiring, protection, _area, areaName));
 
-	area = _vm_create_area_struct(addressSpace, areaName, wiring, protection);
+	vm_area *area = _vm_create_area_struct(addressSpace, areaName, wiring, protection);
 	if (area == NULL)
 		return B_NO_MEMORY;
 
 	cache = store->cache;
-	cache_ref = cache->ref;
+	cacheRef = cache->ref;
 
 	// if this is a private map, we need to create a new cache & store object
 	// pair to handle the private copies of pages as they are written to
 	if (mapping == REGION_PRIVATE_MAP) {
-		vm_cache *nu_cache;
-		vm_cache_ref *nu_cache_ref = NULL;
-		vm_store *nu_store;
+		vm_cache *newCache;
+		vm_store *newStore;
 
 		// ToDo: panic???
 		// create an anonymous store object
-		nu_store = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0, USER_STACK_GUARD_PAGES);
-		if (nu_store == NULL)
-			panic("map_backing_store: vm_create_store_anonymous_noswap returned NULL");
-		nu_cache = vm_cache_create(nu_store);
-		if (nu_cache == NULL)
-			panic("map_backing_store: vm_cache_create returned NULL");
-		nu_cache_ref = vm_cache_ref_create(nu_cache);
-		if (nu_cache_ref == NULL)
-			panic("map_backing_store: vm_cache_ref_create returned NULL");
-		nu_cache->temporary = 1;
-		nu_cache->scan_skip = cache->scan_skip;
+		newStore = vm_store_create_anonymous_noswap((protection & B_STACK_AREA) != 0,
+			USER_STACK_GUARD_PAGES);
+		if (newStore == NULL) {
+			status = B_NO_MEMORY;
+			goto err1;
+		}
+		newCache = vm_cache_create(newStore);
+		if (newCache == NULL) {
+			status = B_NO_MEMORY;
+			newStore->ops->destroy(newStore);
+			goto err1;
+		}
+		status = vm_cache_ref_create(newCache);
+		if (status < B_OK) {
+			newStore->ops->destroy(newStore);
+			free(newCache);
+			goto err1;
+		}
 
-		nu_cache->source = cache;
+		newCache->temporary = 1;
+		newCache->scan_skip = cache->scan_skip;
 
-		cache = nu_cache;
-		cache_ref = cache->ref;
-		store = nu_store;
+		newCache->source = cache;
+
+		cache = newCache;
+		cacheRef = cache->ref;
+		store = newStore;
 		cache->virtual_size = offset + size;
 	}
 
-	err = vm_cache_set_minimal_commitment(cache_ref, offset + size);
-	if (err != B_OK)
-		goto err1;
+	status = vm_cache_set_minimal_commitment(cacheRef, offset + size);
+	if (status != B_OK)
+		goto err2;
 
 	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
 
@@ -562,19 +570,19 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this address space now, so we can't
 		// insert the area, so back out
-		err = B_BAD_TEAM_ID;
-		goto err2;
+		status = B_BAD_TEAM_ID;
+		goto err3;
 	}
 
-	err = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
-	if (err < B_OK)
-		goto err2;
+	status = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
+	if (status < B_OK)
+		goto err3;
 
 	// attach the cache to the area
-	area->cache_ref = cache_ref;
+	area->cache_ref = cacheRef;
 	area->cache_offset = offset;
 	// point the cache back to the area
-	vm_cache_insert_area(cache_ref, area);
+	vm_cache_insert_area(cacheRef, area);
 
 	// insert the area in the global area hash table
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
@@ -589,17 +597,17 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 	*_area = area;
 	return B_OK;
 
-err2:
+err3:
 	release_sem_etc(addressSpace->sem, WRITE_COUNT, 0);
-err1:
+err2:
 	if (mapping == REGION_PRIVATE_MAP) {
 		// we created this cache, so we must delete it again
-		vm_cache_release_ref(cache_ref);
+		vm_cache_release_ref(cacheRef);
 	}
-
+err1:
 	free(area->name);
 	free(area);
-	return err;
+	return status;
 }
 
 
@@ -710,11 +718,10 @@ area_id
 vm_create_anonymous_area(team_id aid, const char *name, void **address, 
 	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection)
 {
+	vm_cache_ref *cacheRef;
 	vm_area *area;
 	vm_cache *cache;
 	vm_store *store;
-	vm_address_space *addressSpace;
-	vm_cache_ref *cache_ref;
 	vm_page *page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
 	bool canOvercommit = false;
@@ -761,7 +768,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			return B_BAD_VALUE;
 	}
 
-	addressSpace = vm_get_address_space_by_id(aid);
+	vm_address_space *addressSpace = vm_get_address_space_by_id(aid);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -777,19 +784,23 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 		}
 	}
 
-	// ToDo: panic???
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ?
 		((protection & B_USER_PROTECTION) != 0 ? 
 			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0);
-	if (store == NULL)
-		panic("vm_create_anonymous_area: vm_create_store_anonymous_noswap returned NULL");
+	if (store == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 	cache = vm_cache_create(store);
-	if (cache == NULL)
-		panic("vm_create_anonymous_area: vm_cache_create returned NULL");
-	cache_ref = vm_cache_ref_create(cache);
-	if (cache_ref == NULL)
-		panic("vm_create_anonymous_area: vm_cache_ref_create returned NULL");
+	if (cache == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+	status = vm_cache_ref_create(cache);
+	if (status < B_OK)
+		goto err3;
+
 	cache->temporary = 1;
 
 	switch (wiring) {
@@ -808,25 +819,12 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, wiring,
 		protection, REGION_NO_PRIVATE_MAP, &area, name);
 	if (status < B_OK) {
-		vm_cache_release_ref(cache_ref);
-		vm_put_address_space(addressSpace);
-
-		if (wiring == B_CONTIGUOUS) {
-			// we had reserved the area space upfront...
-			addr_t pageNumber = page->physical_page_number;
-			int32 i;
-			for (i = size / B_PAGE_SIZE; i-- > 0; pageNumber++) {
-				page = vm_lookup_page(pageNumber);
-				if (page == NULL)
-					panic("couldn't lookup physical page just allocated\n");
-
-				vm_page_set_state(page, PAGE_STATE_FREE);
-			}
-		}	
-		return status;
+		vm_cache_release_ref(cache->ref);
+		goto err1;
 	}
 
-	cache_ref = store->cache->ref;
+	cacheRef = store->cache->ref;
+
 	switch (wiring) {
 		case B_NO_LOCK:
 		case B_LAZY_LOCK:
@@ -869,7 +867,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			if (!kernel_startup)
 				panic("ALREADY_WIRED flag used outside kernel startup\n");
 
-			mutex_lock(&cache_ref->lock);
+			mutex_lock(&cacheRef->lock);
 			(*map->ops->lock)(map);
 			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 				err = (*map->ops->query)(map, va, &pa, &flags);
@@ -884,10 +882,10 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 				}
 				atomic_add(&page->ref_count, 1);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
-				vm_cache_insert_page(cache_ref, page, offset);
+				vm_cache_insert_page(cacheRef, page, offset);
 			}
 			(*map->ops->unlock)(map);
-			mutex_unlock(&cache_ref->lock);
+			mutex_unlock(&cacheRef->lock);
 			break;
 		}
 
@@ -900,7 +898,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 			addr_t virtualAddress;
 			off_t offset = 0;
 
-			mutex_lock(&cache_ref->lock);
+			mutex_lock(&cacheRef->lock);
 			(*map->ops->lock)(map);
 
 			for (virtualAddress = area->base; virtualAddress < area->base + area->size;
@@ -916,11 +914,11 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 					panic("couldn't map physical page in page run\n");
 
 				vm_page_set_state(page, PAGE_STATE_WIRED);
-				vm_cache_insert_page(cache_ref, page, offset);
+				vm_cache_insert_page(cacheRef, page, offset);
 			}
 
 			(*map->ops->unlock)(map);
-			mutex_unlock(&cache_ref->lock);
+			mutex_unlock(&cacheRef->lock);
 			break;
 		}
 
@@ -932,6 +930,27 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 	TRACE(("vm_create_anonymous_area: done\n"));
 
 	return area->id;
+
+err3:
+	free(cache);
+err2:
+	store->ops->destroy(store);
+err1:
+	if (wiring == B_CONTIGUOUS) {
+		// we had reserved the area space upfront...
+		addr_t pageNumber = page->physical_page_number;
+		int32 i;
+		for (i = size / B_PAGE_SIZE; i-- > 0; pageNumber++) {
+			page = vm_lookup_page(pageNumber);
+			if (page == NULL)
+				panic("couldn't lookup physical page just allocated\n");
+
+			vm_page_set_state(page, PAGE_STATE_FREE);
+		}
+	}	
+
+	vm_put_address_space(addressSpace);
+	return status;	
 }
 
 
@@ -942,11 +961,9 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 {
 	vm_area *area;
 	vm_cache *cache;
-	vm_cache_ref *cacheRef;
 	vm_store *store;
 	addr_t mapOffset;
 	status_t status;
-	vm_address_space *addressSpace = vm_get_address_space_by_id(areaID);
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %ld,"
 		" size = %lu, protection = %ld, phys = %p)\n",
@@ -956,6 +973,7 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
+	vm_address_space *addressSpace = vm_get_address_space_by_id(areaID);
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
@@ -968,16 +986,20 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	size = PAGE_ALIGN(size);
 
 	// create an device store object
-	// TODO: panic???
+
 	store = vm_store_create_device(physicalAddress);
-	if (store == NULL)
-		panic("vm_map_physical_memory: vm_store_create_device returned NULL");
+	if (store == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 	cache = vm_cache_create(store);
-	if (cache == NULL)
-		panic("vm_map_physical_memory: vm_cache_create returned NULL");
-	cacheRef = vm_cache_ref_create(cache);
-	if (cacheRef == NULL)
-		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
+	if (cache == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+	status = vm_cache_ref_create(cache);
+	if (status < B_OK)
+		goto err3;
 
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
@@ -985,7 +1007,7 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	status = map_backing_store(addressSpace, store, _address, 0, size,
 		addressSpec & ~B_MTR_MASK, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	if (status < B_OK)
-		vm_cache_release_ref(cacheRef);
+		vm_cache_release_ref(cache->ref);
 
 	if (status >= B_OK && (addressSpec & B_MTR_MASK) != 0) {
 		// set requested memory type
@@ -1012,6 +1034,14 @@ vm_map_physical_memory(team_id areaID, const char *name, void **_address,
 	*_address = (void *)((addr_t)*_address + mapOffset);
 
 	return area->id;
+
+err3:
+	free(cache);
+err2:
+	store->ops->destroy(store);
+err1:
+	vm_put_address_space(addressSpace);
+	return status;
 }
 
 
@@ -1022,8 +1052,7 @@ vm_create_null_area(team_id aid, const char *name, void **address, uint32 addres
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
-//	addr_t map_offset;
-	int err;
+	status_t status;
 
 	vm_address_space *addressSpace = vm_get_address_space_by_id(aid);
 	if (addressSpace == NULL)
@@ -1032,59 +1061,72 @@ vm_create_null_area(team_id aid, const char *name, void **address, uint32 addres
 	size = PAGE_ALIGN(size);
 
 	// create an null store object
-	// TODO: panic???
+
 	store = vm_store_create_null();
-	if (store == NULL)
-		panic("vm_map_physical_memory: vm_store_create_null returned NULL");
+	if (store == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
 	cache = vm_cache_create(store);
-	if (cache == NULL)
-		panic("vm_map_physical_memory: vm_cache_create returned NULL");
-	cache_ref = vm_cache_ref_create(cache);
-	if (cache_ref == NULL)
-		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
+	if (cache == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+	status = vm_cache_ref_create(cache);
+	if (status < B_OK)
+		goto err3;
+
 	// tell the page scanner to skip over this area, no pages will be mapped here
 	cache->scan_skip = 1;
 
-	err = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
+	status = map_backing_store(addressSpace, store, address, 0, size, addressSpec, 0,
+		B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_put_address_space(addressSpace);
 
-	if (err < B_OK) {
-		vm_cache_release_ref(cache_ref);
-		return err;
+	if (status < B_OK) {
+		vm_cache_release_ref(cache->ref);
+		return status;
 	}
 
 	return area->id;
+
+err3:
+	free(cache);
+err2:
+	store->ops->destroy(store);
+err1:
+	vm_put_address_space(addressSpace);
+	return status;
 }
 
 
 status_t
 vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 {
-	vm_cache_ref *cacheRef;
-	vm_cache *cache;
-	vm_store *store;
+	status_t status;
 
 	// create a vnode store object
-	store = vm_create_vnode_store(vnode);
-	if (store == NULL) {
-		dprintf("vm_create_vnode_cache: couldn't create vnode store\n");
+	vm_store *store = vm_create_vnode_store(vnode);
+	if (store == NULL)
 		return B_NO_MEMORY;
-	}
 
-	cache = vm_cache_create(store);
+	vm_cache *cache = vm_cache_create(store);
 	if (cache == NULL) {
-		dprintf("vm_create_vnode_cache: vm_cache_create returned NULL\n");
-		return B_NO_MEMORY;
+		status = B_NO_MEMORY;
+		goto err1;
 	}
+	status = vm_cache_ref_create(cache);
+	if (status < B_OK)
+		goto err2;
 
-	cacheRef = vm_cache_ref_create(cache);
-	if (cacheRef == NULL) {
-		dprintf("vm_create_vnode_cache: vm_cache_ref_create returned NULL\n");
-		return B_NO_MEMORY;
-	}
-
-	*_cacheRef = cacheRef;
+	*_cacheRef = cache->ref;
 	return B_OK;
+
+err2:
+	free(cache);
+err1:
+	store->ops->destroy(store);
+	return status;
 }
 
 
@@ -1400,11 +1442,11 @@ vm_copy_on_write_area(vm_area *area)
 		goto err1;
 	}
 
-	lowerCacheRef = vm_cache_ref_create(lowerCache);
-	if (lowerCacheRef == NULL) {
-		status = B_NO_MEMORY;
+	status = vm_cache_ref_create(lowerCache);
+	if (status < B_OK)
 		goto err2;
-	}
+
+	lowerCacheRef = lowerCache->ref;
 
 	// The area must be readable in the same way it was previously writable
 	protection = B_KERNEL_READ_AREA;
@@ -2378,7 +2420,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
 // We can print a stack trace of the userland thread here.
-#if 0
+#if 1
 			if (area) {
 				struct stack_frame {
 					#ifdef __INTEL__

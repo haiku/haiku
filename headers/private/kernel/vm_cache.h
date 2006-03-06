@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -21,7 +21,7 @@ extern "C" {
 
 status_t vm_cache_init(struct kernel_args *args);
 vm_cache *vm_cache_create(vm_store *store);
-vm_cache_ref *vm_cache_ref_create(vm_cache *cache);
+status_t vm_cache_ref_create(vm_cache *cache);
 void vm_cache_acquire_ref(vm_cache_ref *cache_ref);
 void vm_cache_release_ref(vm_cache_ref *cache_ref);
 vm_page *vm_cache_lookup_page(vm_cache_ref *cacheRef, off_t page);
