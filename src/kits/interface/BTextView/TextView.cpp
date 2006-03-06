@@ -1733,8 +1733,8 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	result.x += fTextRect.left;// - 1.0;
 
 	// round up
-	result.x = ceil(result.x);
-	result.y = ceil(result.y);
+	result.x = ceilf(result.x);
+	result.y = ceilf(result.y);
 	if (outHeight != NULL)
 		*outHeight = height;
 		
@@ -1754,10 +1754,10 @@ BTextView::OffsetAt(BPoint point) const
 		return fText->Length();
 	else if (point.y < fTextRect.top)
 		return 0;
-
+	
 	int32 lineNum = LineAt(point);
 	STELine* line = (*fLines)[lineNum];
-	
+
 	// special case: if point is within the text rect and PixelToLine()
 	// tells us that it's on the last line, but if point is actually  
 	// lower than the bottom of the last line, return the last offset 
@@ -1922,7 +1922,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
-	return ceil(height);
+	return ceilf(height);
 }
 
 
@@ -1943,8 +1943,8 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 	BPoint startPt = PointAt(startOffset, &startLineHeight);
 	BPoint endPt = PointAt(endOffset, &endLineHeight);
 	
-	startLineHeight = ceil(startLineHeight);
-	endLineHeight = ceil(endLineHeight);
+	startLineHeight = ceilf(startLineHeight);
+	endLineHeight = ceilf(endLineHeight);
 		
 	BRect selRect;
 
@@ -3234,13 +3234,13 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 			// the new line comes before the old line start, add a line
 			STELine newLine;
 			newLine.offset = toOffset;
-			newLine.origin = ceil(curLine->origin + ascent + descent) + 1;
+			newLine.origin = ceilf(curLine->origin + ascent + descent) + 1;
 			newLine.ascent = 0;
 			fLines->InsertLine(&newLine, lineIndex);
 		} else {
 			// update the exising line
 			nextLine->offset = toOffset;
-			nextLine->origin = ceil(curLine->origin + ascent + descent) + 1;
+			nextLine->origin = ceilf(curLine->origin + ascent + descent) + 1;
 			
 			// remove any lines that start before the current line
 			while ( lineIndex < fLines->NumLines() &&
@@ -3974,7 +3974,7 @@ BTextView::UpdateScrollbars()
 	if (horizontalScrollBar != NULL) {
 		long viewWidth = bounds.IntegerWidth();
 		long dataWidth = fTextRect.IntegerWidth();
-		dataWidth += (long)ceil(fTextRect.left) + 1;
+		dataWidth += (long)ceilf(fTextRect.left) + 1;
 		
 		long maxRange = dataWidth - viewWidth;
 		maxRange = max_c(maxRange, 0);
@@ -3988,7 +3988,7 @@ BTextView::UpdateScrollbars()
 	if (verticalScrollBar != NULL) {
 		long viewHeight = bounds.IntegerHeight();
 		long dataHeight = fTextRect.IntegerHeight();
-		dataHeight += (long)ceil(fTextRect.top) + 1;
+		dataHeight += (long)ceilf(fTextRect.top) + 1;
 		
 		long maxRange = dataHeight - viewHeight;
 		maxRange = max_c(maxRange, 0);
