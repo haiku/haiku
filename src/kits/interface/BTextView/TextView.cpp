@@ -1778,9 +1778,8 @@ BTextView::OffsetAt(BPoint point) const
 	point.x -= fTextRect.left;
 	point.x = max_c(point.x, 0.0);
 
-	// TODO: The following code chokes on TABs.
-	// we should do something like the part after the #else, but
-	// multi-byte characters safe.
+	// TODO: The following isn't efficient like the part after the #else,
+	// but it's multi-byte characters safe.
 #if 1
 	int32 offset = line->offset;
 	int32 limit = (line + 1)->offset;
@@ -1789,7 +1788,11 @@ BTextView::OffsetAt(BPoint point) const
 	do {
 		saveOffset = offset;
 		int32 nextInitial = NextInitialByte(offset);
-		float width = StyledWidth(saveOffset, nextInitial - saveOffset);
+		float width = 0;
+		if (ByteAt(offset) == B_TAB)
+			width = ActualTabWidth(offset);
+		else
+			width = StyledWidth(saveOffset, nextInitial - saveOffset);
 		if (x + width > point.x) {
 			if (fabs(x + width - point.x) < fabs(x - point.x))
 				offset = nextInitial;
