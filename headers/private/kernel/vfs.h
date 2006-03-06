@@ -96,6 +96,7 @@ status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path,
 status_t vfs_stat_vnode(void *_vnode, struct stat *stat);
 status_t vfs_get_vnode_name(void *vnode, char *name, size_t nameSize);
 status_t vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID);
+void vfs_free_unused_vnodes(int32 level);
 
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName,

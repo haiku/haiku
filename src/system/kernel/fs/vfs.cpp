@@ -816,6 +816,7 @@ restart:
 		if (vnode->ref_count == 0) {
 			// this vnode has been unused before
 			list_remove_item(&sUnusedVnodeList, vnode);
+			sUnusedVnodes--;
 		}
 		inc_vnode_ref_count(vnode);
 	} else {
@@ -2813,6 +2814,13 @@ vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID)
 
 	mutex_unlock(&context->io_mutex);
 	return status;
+}
+
+
+extern "C" void
+vfs_free_unused_vnodes(int32 level)
+{
+	vnode_low_memory_handler(NULL, level);
 }
 
 

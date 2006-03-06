@@ -21,6 +21,8 @@
 #include <debug.h>
 #include <thread.h>
 #include <team.h>
+#include <vfs.h>
+#include <vm_low_memory.h>
 #include <vm_page.h>
 #include <boot/kernel_args.h>
 
@@ -257,7 +259,21 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	char *tempName;
 	size_t nameLength;
 
-	if (sSemsActive == false || sUsedSems == sMaxSems)
+	if (sSemsActive == false)
+		return B_NO_MORE_SEMS;
+
+	if (sUsedSems == sMaxSems) {
+		// The vnode cache may have collected lots of semaphores.
+		// Freeing some unused vnodes should improve our situation.
+		// TODO: maybe create a generic "low resources" handler, instead
+		//	of only the specialised low memory thing?
+		vfs_free_unused_vnodes(B_LOW_MEMORY_WARNING);
+	}
+	if (sUsedSems == sMaxSems) {
+		// try again with more enthusiasm
+		vfs_free_unused_vnodes(B_LOW_MEMORY_CRITICAL);
+	}
+	if (sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 
 	if (name == NULL)
