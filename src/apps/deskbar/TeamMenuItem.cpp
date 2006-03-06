@@ -327,7 +327,7 @@ TTeamMenuItem::DrawContent()
 		rgb_color outlineColor = {80, 80, 80, 255};
 		rgb_color middleColor = {200, 200, 200, 255};
 
-		menu->SetDrawingMode(B_OP_COPY);
+		menu->SetDrawingMode(B_OP_OVER);
 
 		if (!fExpanded) {
 			menu->BeginLineArray(6);
