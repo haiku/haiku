@@ -4010,8 +4010,11 @@ BTextView::AutoResize(bool doredraw)
 		for (int32 i = 0; i < CountLines(); i++)
 			width = max_c(width, LineWidth(i));
 		
+		float textRectPadding = Bounds().right - fTextRect.right;
 		BView *viewToResize = fContainerView != NULL ? fContainerView : this;
 		viewToResize->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
+		
+		fTextRect.right = Bounds().right - textRectPadding;
 	}
 }
 
