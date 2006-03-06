@@ -2292,6 +2292,27 @@ dump_io_context(int argc, char **argv)
 	return 0;
 }
 
+
+int
+dump_vnode_usage(int argc, char **argv)
+{
+	kprintf("Unused vnodes: %ld (max unused %ld)\n", sUnusedVnodes, kMaxUnusedVnodes);
+
+	struct hash_iterator iterator;
+	hash_open(sVnodeTable, &iterator);
+
+	uint32 count = 0;
+	struct vnode *vnode;
+	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
+		count++;
+	}
+
+	hash_close(sVnodeTable, &iterator, false);
+
+	kprintf("%lu vnodes total (%ld in use).\n", count, count - sUnusedVnodes);
+	return 0;
+}
+
 #endif	// ADD_DEBUGGER_COMMANDS
 
 
@@ -3186,6 +3207,7 @@ vfs_init(kernel_args *args)
 	add_debugger_command("mount", &dump_mount, "info about the specified fs_mount");
 	add_debugger_command("mounts", &dump_mounts, "list all fs_mounts");
 	add_debugger_command("io_context", &dump_io_context, "info about the I/O context");
+	add_debugger_command("vnode_usage", &dump_vnode_usage, "info about vnode usage");
 #endif
 
 	register_low_memory_handler(&vnode_low_memory_handler, NULL, 0);
