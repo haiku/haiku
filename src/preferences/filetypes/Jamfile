@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src preferences filetypes ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders shared ;
 SubDirSysHdrs $(HAIKU_TOP) src kits tracker ;
 
 Preference FileTypes :
@@ -14,6 +15,8 @@ Preference FileTypes :
 	NewFileTypeWindow.cpp
 	AttributeWindow.cpp
 	ExtensionWindow.cpp
+	FileTypeWindow.cpp
+	PreferredAppMenu.cpp
 	StringView.cpp
 	: be tracker
 	: FileTypes.rdef FileTypes.icons.rdef

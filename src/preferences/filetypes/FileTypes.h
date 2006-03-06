@@ -21,6 +21,7 @@ static const uint32 kMsgTypesWindowClosed = 'clTw';
 static const uint32 kMsgOpenApplicationTypesWindow = 'opAw';
 static const uint32 kMsgApplicationTypesWindowClosed = 'clAw';
 
+static const uint32 kMsgTypeWindowClosed = 'cltw';
 static const uint32 kMsgWindowClosed = 'WiCl';
 
 #endif	// FILE_TYPES_H

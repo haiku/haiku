@@ -6,8 +6,10 @@
 
 #include "ApplicationTypesWindow.h"
 #include "FileTypes.h"
+#include "FileTypeWindow.h"
 #include "FileTypesWindow.h"
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <Alert.h>
 #include <TextView.h>
@@ -44,6 +46,7 @@ class FileTypes : public BApplication {
 		BWindow		*fTypesWindow;
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
+		uint32		fTypeWindowCount;
 		BRect		fTypesWindowFrame;
 		BRect		fApplicationTypesWindowFrame;
 };
@@ -53,7 +56,8 @@ FileTypes::FileTypes()
 	: BApplication(kSignature),
 	fTypesWindow(NULL),
 	fApplicationTypesWindow(NULL),
-	fWindowCount(0)
+	fWindowCount(0),
+	fTypeWindowCount(0)
 {
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_FILE_NODE | B_DIRECTORY_NODE, false);
@@ -87,6 +91,7 @@ FileTypes::RefsReceived(BMessage *message)
 {
 	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
 
+	// filter out applications and entries we can't open
 	int32 index = 0;
 	entry_ref ref;
 	while (message->FindRef("refs", index++, &ref) == B_OK) {
@@ -96,7 +101,11 @@ FileTypes::RefsReceived(BMessage *message)
 			// TODO: open FileType window
 		}
 
+		BFile file;
+		status = file.SetTo(&ref, B_READ_ONLY);
 		if (status != B_OK) {
+			// file cannot be opened
+
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
 				"Could not open \"%s\":\n"
@@ -106,8 +115,36 @@ FileTypes::RefsReceived(BMessage *message)
 			(new BAlert("FileTypes request",
 				buffer, "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+
+			message->RemoveData("refs", --index);
+			continue;
 		}
+		
+		BAppFileInfo appInfo(&file);
+		if (appInfo.InitCheck() != B_OK)
+			continue;
+		
+		char signature[B_MIME_TYPE_LENGTH];
+		if (appInfo.GetSignature(signature) != B_OK)
+			continue;
+
+		// remove application from list
+		message->RemoveData("refs", --index);
+
+		printf("found app: %s\n", ref.name);
 	}
+
+	if (message->FindRef("refs", &ref) != B_OK)
+		return;
+
+	// There are some refs left that want to be handled by the type window
+	BPoint point(100.0f + 20.0f * fTypeWindowCount, 110.0f + 20.0f * fTypeWindowCount);
+
+	BWindow* window = new FileTypeWindow(point, *message);
+	window->Show();
+
+	fTypeWindowCount++;
+	fWindowCount++;
 }
 
 
@@ -186,6 +223,10 @@ FileTypes::MessageReceived(BMessage *message)
 			_WindowClosed();
 			break;
 
+		case kMsgTypeWindowClosed:
+			fTypeWindowCount--;
+			// supposed to fall through
+
 		case kMsgWindowClosed:
 			_WindowClosed();
 			break;
@@ -227,6 +268,10 @@ FileTypes::MessageReceived(BMessage *message)
 		case B_CANCEL:
 			if (fWindowCount == 0)
 				PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		case B_SIMPLE_DATA:
+			RefsReceived(message);
 			break;
 
 		default:
