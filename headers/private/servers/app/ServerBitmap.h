@@ -64,6 +64,10 @@ class ServerBitmap {
 
 			status_t		ImportBits(const void *bits, int32 bitsLength,
 								int32 bytesPerRow, color_space colorSpace);
+			status_t		ImportBits(const void *bits, int32 bitsLength,
+								int32 bytesPerRow, color_space colorSpace,
+								BPoint from, BPoint to, int32 width,
+								int32 height);
 
 			void			PrintToStream();
 
