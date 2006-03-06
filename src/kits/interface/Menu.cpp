@@ -1327,12 +1327,11 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
 					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right + 20);
-					if (fMaxContentWidth > 0)
-						frame.right = min_c(frame.right, fMaxContentWidth);
-
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
 			}
+			if (fMaxContentWidth > 0)
+				frame.right = min_c(frame.right, fMaxContentWidth);
 
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.right = frame.right;
