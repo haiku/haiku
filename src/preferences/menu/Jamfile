@@ -2,7 +2,6 @@ SubDir HAIKU_TOP src preferences menu ;
 
 Preference Menu : 
 	BitmapMenuItem.cpp 
-	ColorPicker.cpp 
 	ColorWindow.cpp 
 	FontMenu.cpp 
 	FontSizeMenu.cpp 

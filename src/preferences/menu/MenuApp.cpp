@@ -1,42 +1,30 @@
+#include "MenuApp.h"
+#include "MenuWindow.h"	
+#include "msg.h"
 
-	#include "MenuApp.h"
+MenuApp::MenuApp()
+	: BApplication("application/x-vnd.Be-GGUI")
+{
+	get_menu_info(&info);
 	
-	MenuApp::MenuApp()
-		: BApplication("application/x-vnd.Be-GGUI")
-	{
-		get_menu_info(&info);
-		
-		menuWindow = new MenuWindow();
-		Update();
-		menuWindow->Show();
-	}
-	
-	MenuApp::~MenuApp()
-	{/*nothing to clean up*/}
-	
-	bool
-	MenuApp::QuitRequested() 
-	{
-		return true;
-	}
+	menuWindow = new MenuWindow();
+	Update();
+	menuWindow->Show();
+}
 
-	void
-	MenuApp::Update()
-	{
-		menuWindow->Update();
- 	}
+
+void
+MenuApp::Update()
+{
+	menuWindow->Update();
+}
 	
-	int	main()
-	{
-		new MenuApp();
-		be_app -> Run();
-		delete be_app;
-	}
 	
-	void
-	MenuApp::MessageReceived(BMessage *msg){
-		switch(msg->what) {
-		
+void
+MenuApp::MessageReceived(BMessage *msg)
+{
+	switch(msg->what) {
+	
 		//others
 		case UPDATE_WINDOW:
 		case CLICK_OPEN_MSG:
@@ -47,9 +35,18 @@
 		case MENU_COLOR:
 			menuWindow->PostMessage(msg);
 			break;
-						
+					
 		default:
-			BMessage(msg);
+			BApplication::MessageReceived(msg);
 			break;
-		}
 	}
+}
+
+
+int main()
+{
+	new MenuApp();
+	be_app->Run();
+	delete be_app;
+}
+	

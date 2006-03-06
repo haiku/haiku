@@ -1,138 +1,141 @@
-	#include "MenuApp.h"
+#include "BitmapMenuItem.h"
+#include "FontMenu.h"
+#include "MenuBar.h"
+#include "msg.h"
 
-	#include <Application.h>	
-	#include <Resources.h>
-	#include <TranslationUtils.h>	
+#include <Application.h>
+#include <Resources.h>
+#include <TranslationUtils.h>	
+#include <Window.h>
 
-	#include <stdio.h>
-	#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-	MenuBar::MenuBar()
-		:BMenuBar(BRect(40,10,10,10), "menu", B_FOLLOW_TOP|B_FRAME_EVENTS, B_ITEMS_IN_COLUMN, true)
-	{
-		get_menu_info(&info);
-		build_menu();
-		set_menu();
-	}
-	
-	
-	void
-	MenuBar::build_menu()
-	{
-		// font and font size menus
-		fontMenu = new FontMenu();
-		fontSizeMenu = new FontSizeMenu();
-		
-		// create the menu items
-		clickToOpenItem = new BMenuItem("Click To Open", new BMessage(CLICK_OPEN_MSG), 0, 0);
-		alwaysShowTriggersItem = new BMenuItem("Always Show Triggers", new BMessage(ALLWAYS_TRIGGERS_MSG), 0, 0);
-		separatorStyleItem = new BMenuItem("Separator Style", new BMessage(DEFAULT_MSG), 0, 0);
-		ctlAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
-				 new BMessage(CTL_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "CTL"));
-		altAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
-				 new BMessage(ALT_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "ALT"));
-		
-		// color menu
-		colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_MSG), 0, 0);
-	
-		// create the separator menu
-		separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);
-		separatorStyleMenu->SetRadioMode(true);
-		BMessage *msg = new BMessage(MENU_SEP_TYPE);
-		msg->AddInt32("sep", 0);
-		separatorStyleZero = new BitmapMenuItem("                 ", msg,
-							BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
-		msg = new BMessage(MENU_SEP_TYPE);
-		msg->AddInt32("sep", 1);
-		separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
-		msg = new BMessage(MENU_SEP_TYPE);
-		msg->AddInt32("sep", 2);
-		separatorStyleTwo = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
-		if (info.separator == 0)
-			separatorStyleZero->SetMarked(true);
-		if (info.separator == 1)
-			separatorStyleOne->SetMarked(true);
-		if (info.separator == 2)
-			separatorStyleTwo->SetMarked(true);
-		separatorStyleMenu->AddItem(separatorStyleZero);
-		separatorStyleMenu->AddItem(separatorStyleOne);
-		separatorStyleMenu->AddItem(separatorStyleTwo);
-		separatorStyleMenu->SetTargetForItems(Window());
-	
-		// Add items to menubar	
-		AddItem(fontMenu, 0);
-		AddItem(fontSizeMenu, 1);
-		AddSeparatorItem();
-		AddItem(clickToOpenItem);
-		AddItem(alwaysShowTriggersItem);
-		AddSeparatorItem();
-		AddItem(colorSchemeItem);
-		AddItem(separatorStyleMenu);
-		AddSeparatorItem();
-		AddItem(ctlAsShortcutItem);
-		AddItem(altAsShortcutItem);
-		SetTargetForItems(Window());
-	}
-	
-	void
-	MenuBar::set_menu()
-	{
-		key_map *keys; 
-        	char *chars; 
-        	bool altAsShortcut;
-		
-		// get up-to-date menu info
-		get_menu_info(&info);
-		
-		alwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
+MenuBar::MenuBar()
+	:BMenuBar(BRect(40,10,10,10), "menu", B_FOLLOW_TOP|B_FRAME_EVENTS, B_ITEMS_IN_COLUMN, true)
+{
+	get_menu_info(&info);
+	build_menu();
+	set_menu();
+}
 
+
+void
+MenuBar::build_menu()
+{
+	// font and font size menus
+	fontMenu = new FontMenu();
+	fontSizeMenu = new FontSizeMenu();
+	
+	// create the menu items
+	clickToOpenItem = new BMenuItem("Click To Open", new BMessage(CLICK_OPEN_MSG), 0, 0);
+	alwaysShowTriggersItem = new BMenuItem("Always Show Triggers", new BMessage(ALLWAYS_TRIGGERS_MSG), 0, 0);
+	separatorStyleItem = new BMenuItem("Separator Style", new BMessage(DEFAULT_MSG), 0, 0);
+	ctlAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
+			 new BMessage(CTL_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "CTL"));
+	altAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
+			 new BMessage(ALT_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "ALT"));
+	
+	// color menu
+	colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_MSG), 0, 0);
+
+	// create the separator menu
+	separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);
+	separatorStyleMenu->SetRadioMode(true);
+	BMessage *msg = new BMessage(MENU_SEP_TYPE);
+	msg->AddInt32("sep", 0);
+	separatorStyleZero = new BitmapMenuItem("                 ", msg,
+						BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
+	msg = new BMessage(MENU_SEP_TYPE);
+	msg->AddInt32("sep", 1);
+	separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
+	msg = new BMessage(MENU_SEP_TYPE);
+	msg->AddInt32("sep", 2);
+	separatorStyleTwo = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
+	if (info.separator == 0)
+		separatorStyleZero->SetMarked(true);
+	if (info.separator == 1)
+		separatorStyleOne->SetMarked(true);
+	if (info.separator == 2)
+		separatorStyleTwo->SetMarked(true);
+	separatorStyleMenu->AddItem(separatorStyleZero);
+	separatorStyleMenu->AddItem(separatorStyleOne);
+	separatorStyleMenu->AddItem(separatorStyleTwo);
+	separatorStyleMenu->SetTargetForItems(Window());
+
+	// Add items to menubar	
+	AddItem(fontMenu, 0);
+	AddItem(fontSizeMenu, 1);
+	AddSeparatorItem();
+	AddItem(clickToOpenItem);
+	AddItem(alwaysShowTriggersItem);
+	AddSeparatorItem();
+	AddItem(colorSchemeItem);
+	AddItem(separatorStyleMenu);
+	AddSeparatorItem();
+	AddItem(ctlAsShortcutItem);
+	AddItem(altAsShortcutItem);
+	SetTargetForItems(Window());
+}
+
+void
+MenuBar::set_menu()
+{
+	key_map *keys; 
+       	char *chars; 
+       	bool altAsShortcut;
+	
+	// get up-to-date menu info
+	get_menu_info(&info);
+	
+	alwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
 		clickToOpenItem->SetMarked(info.click_to_open);
-		alwaysShowTriggersItem->SetEnabled(info.click_to_open);
-		
-		get_key_map(&keys, &chars); 
-        
-        	altAsShortcut = (keys->left_command_key == 0x5d) && (keys->right_command_key == 0x5f); 
-        	altAsShortcutItem->SetMarked(altAsShortcut); 
-        	ctlAsShortcutItem->SetMarked(!altAsShortcut); 
-                
-        	free(chars); 
-        	free(keys);
-	}
+	alwaysShowTriggersItem->SetEnabled(info.click_to_open);
 	
-	void
-	MenuBar::Update()
-	{
-		// get up-to-date menu info
-		get_menu_info(&info);
+	get_key_map(&keys, &chars); 
+       
+       	altAsShortcut = (keys->left_command_key == 0x5d) && (keys->right_command_key == 0x5f); 
+       	altAsShortcutItem->SetMarked(altAsShortcut); 
+       	ctlAsShortcutItem->SetMarked(!altAsShortcut); 
+               
+       	free(chars); 
+       	free(keys);
+}
 
+
+void
+MenuBar::Update()
+{
+	// get up-to-date menu info
+	get_menu_info(&info);
 		// update submenus
-		fontMenu->Update();
-		fontSizeMenu->Update();
-
+	fontMenu->Update();
+	fontSizeMenu->Update();
 		// this needs to be updated in case the Defaults
-		// were requested.
-		if (info.separator == 0)
-			separatorStyleZero->SetMarked(true);
-		else if (info.separator == 1)
-			separatorStyleOne->SetMarked(true);
-		else if (info.separator == 2)
-			separatorStyleTwo->SetMarked(true);
-
+	// were requested.
+	if (info.separator == 0)
+		separatorStyleZero->SetMarked(true);
+	else if (info.separator == 1)
+		separatorStyleOne->SetMarked(true);
+	else if (info.separator == 2)
+		separatorStyleTwo->SetMarked(true);
 		set_menu();
-		
-		BFont font;
-		Window()->Lock();
- 		font.SetFamilyAndStyle(info.f_family, info.f_style);
- 		font.SetSize(info.font_size);
- 		SetFont(&font);
- 		SetViewColor(info.background_color);
-		Window()->Unlock();
 	
-		// force the menu to redraw
-		InvalidateLayout();
-	}
-	
-	void MenuBar::FrameResized(float width, float height)
-	{
-		Window()->PostMessage(UPDATE_WINDOW);	
-	}
+	BFont font;
+	Window()->Lock();
+	font.SetFamilyAndStyle(info.f_family, info.f_style);
+	font.SetSize(info.font_size);
+	SetFont(&font);
+	SetViewColor(info.background_color);
+	Window()->Unlock();
+
+	// force the menu to redraw
+	InvalidateLayout();
+}
+
+
+void
+MenuBar::FrameResized(float width, float height)
+{
+	Window()->PostMessage(UPDATE_WINDOW);	
+}
