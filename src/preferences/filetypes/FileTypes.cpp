@@ -43,6 +43,7 @@ class FileTypes : public BApplication {
 		void _WindowClosed();
 
 		BFilePanel	*fFilePanel;
+		BMessenger	fFilePanelTarget;
 		BWindow		*fTypesWindow;
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
@@ -233,37 +234,34 @@ FileTypes::MessageReceived(BMessage *message)
 
 
 		case kMsgOpenFilePanel:
+		{
 			// the open file panel sends us a message when it's done
-			fFilePanel->Window()->SetTitle("FileTypes: Open File");
-			fFilePanel->SetMessage(new BMessage(B_REFS_RECEIVED));
+			const char* subTitle;
+			if (message->FindString("title", &subTitle) != B_OK)
+				subTitle = "Open File";
+
+			int32 what;
+			if (message->FindInt32("message", &what) != B_OK)
+				what = B_REFS_RECEIVED;
+
+			BMessenger target;
+			if (message->FindMessenger("target", &target) != B_OK)
+				target = be_app_messenger;
+
+			BString title = "FileTypes";
+			if (subTitle != NULL && subTitle[0]) {
+				title.Append(": ");
+				title.Append(subTitle);
+			}
+
+			fFilePanel->SetMessage(new BMessage(what));
+			fFilePanel->Window()->SetTitle(title.String());
+			fFilePanel->SetTarget(target);
 
 			if (!fFilePanel->IsShowing())
 				fFilePanel->Show();
 			break;
-
-		case kMsgOpenSelectPanel:
-			fFilePanel->Window()->SetTitle("FileTypes: Select Preferred Application");
-			fFilePanel->SetMessage(new BMessage(kMsgPreferredAppOpened));
-
-			if (!fFilePanel->IsShowing())
-				fFilePanel->Show();
-			break;
-		case kMsgPreferredAppOpened:
-			if (fTypesWindow != NULL)
-				fTypesWindow->PostMessage(message);
-			break;
-
-		case kMsgOpenSameAsPanel:
-			fFilePanel->Window()->SetTitle("FileTypes: Select Same Preferred Application As");
-			fFilePanel->SetMessage(new BMessage(kMsgSamePreferredAppAsOpened));
-
-			if (!fFilePanel->IsShowing())
-				fFilePanel->Show();
-			break;
-		case kMsgSamePreferredAppAsOpened:
-			if (fTypesWindow != NULL)
-				fTypesWindow->PostMessage(message);
-			break;
+		}
 
 		case B_CANCEL:
 			if (fWindowCount == 0)
@@ -309,6 +307,19 @@ FileTypes::QuitRequested()
 
 
 //	#pragma mark -
+
+
+void
+error_alert(const char* message, status_t status, alert_type type)
+{
+	char warning[512];
+	if (status != B_OK)
+		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message, strerror(status));
+
+	(new BAlert("FileTypes Request",
+		status == B_OK ? message : warning,
+		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
+}
 
 
 int

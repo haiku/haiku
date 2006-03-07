@@ -54,6 +54,9 @@ const uint32 kMsgPreferredAppChosen = 'papc';
 const uint32 kMsgSelectPreferredApp = 'slpa';
 const uint32 kMsgSamePreferredAppAs = 'spaa';
 
+const uint32 kMsgPreferredAppOpened = 'paOp';
+const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
+
 const uint32 kMsgTypeEntered = 'type';
 const uint32 kMsgDescriptionEntered = 'dsce';
 
@@ -79,36 +82,6 @@ class TypeIconView : public BControl {
 		BBitmap*	fIcon;
 		icon_source	fIconSource;
 };
-
-
-//	#pragma mark -
-
-
-static bool
-is_application_in_message(BMessage& applications, const char* app)
-{
-	const char* signature;
-	int32 i = 0;
-	while (applications.FindString("applications", i++, &signature) == B_OK) {
-		if (!strcasecmp(signature, app))
-			return true;
-	}
-
-	return false;
-}
-
-
-void
-error_alert(const char* message, status_t status, alert_type type)
-{
-	char warning[512];
-	if (status != B_OK)
-		snprintf(warning, sizeof(warning), "%s:\n\t%s\n", message, strerror(status));
-
-	(new BAlert("FileTypes Request",
-		status == B_OK ? message : warning,
-		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
-}
 
 
 //	#pragma mark -
@@ -541,90 +514,11 @@ FileTypesWindow::_AdoptPreferredApplication(BMessage* message, bool sameAs)
 	if (fCurrentType.Type() == NULL)
 		return;
 
-	entry_ref ref;
-	if (message->FindRef("refs", &ref) != B_OK)
+	BString preferred;
+	if (retrieve_preferred_app(message, sameAs, fCurrentType.Type(), preferred) != B_OK)
 		return;
 
-	BFile file(&ref, B_READ_ONLY);
-	status_t status = file.InitCheck();
-
-	char preferred[B_MIME_TYPE_LENGTH];
-
-	if (status == B_OK) {
-		if (sameAs) {
-			// get preferred app from file
-			BNodeInfo nodeInfo(&file);
-			status = nodeInfo.InitCheck();
-			if (status == B_OK) {
-				if (nodeInfo.GetPreferredApp(preferred) != B_OK)
-					preferred[0] = '\0';
-		
-				if (!preferred[0]) {
-					// get MIME type from file
-					char type[B_MIME_TYPE_LENGTH];
-					if (nodeInfo.GetType(type) == B_OK) {
-						BMimeType mimeType(type);
-						mimeType.GetPreferredApp(preferred);
-					}
-				}
-			}
-		} else {
-			// get application signature
-			BAppFileInfo appInfo(&file);
-			status = appInfo.InitCheck();
-
-			if (status == B_OK && appInfo.GetSignature(preferred) != B_OK)
-				preferred[0] = '\0';
-		}
-	}
-
-	if (status != B_OK) {
-		error_alert("File could not be opened", status, B_STOP_ALERT);
-		return;
-	}
-
-	if (!preferred[0]) {
-		error_alert(sameAs ? "Could not retrieve preferred application of this file."
-			: "Could not retrieve application signature.");
-		return;
-	}
-
-	// Check if the application chosen supports this type
-
-	bool found = false;
-
-	BMessage applications;
-	if (fCurrentType.GetSupportingApps(&applications) == B_OK
-		&& is_application_in_message(applications, preferred))
-		found = true;
-
-	applications.MakeEmpty();
-
-	if (!found && fCurrentType.GetWildcardApps(&applications) == B_OK
-		&& is_application_in_message(applications, preferred))
-		found = true;
-
-	if (!found) {
-		// warn user
-		BMimeType appType(preferred);
-		char description[B_MIME_TYPE_LENGTH];
-		if (appType.GetShortDescription(description) != B_OK)
-			description[0] = '\0';
-
-		char warning[512];
-		snprintf(warning, sizeof(warning), "The application \"%s\" does not "
-			"support this file type.\n"
-			"Are you sure you want to set it anyway?",
-			description[0] ? description : preferred);
-
-		BAlert* alert = new BAlert("FileTypes Request", warning,
-			"Set Preferred Application", "Cancel", NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
-		if (alert->Go() == 1)
-			return;
-	}
-
-	status = fCurrentType.SetPreferredApp(preferred);
+	status_t status = fCurrentType.SetPreferredApp(preferred.String());
 	if (status != B_OK)
 		error_alert("Could not set preferred application", status);
 }
@@ -893,15 +787,29 @@ FileTypesWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgSelectPreferredApp:
-			be_app->PostMessage(kMsgOpenSelectPanel);
+		{
+			BMessage panel(kMsgOpenFilePanel);
+			panel.AddString("title", "Select Preferred Application");
+			panel.AddInt32("message", kMsgPreferredAppOpened);
+			panel.AddMessenger("target", this);
+
+			be_app_messenger.SendMessage(&panel);
 			break;
+		}
 		case kMsgPreferredAppOpened:
 			_AdoptPreferredApplication(message, false);
 			break;
 
 		case kMsgSamePreferredAppAs:
-			be_app->PostMessage(kMsgOpenSameAsPanel);
+		{
+			BMessage panel(kMsgOpenFilePanel);
+			panel.AddString("title", "Select Same Preferred Application As");
+			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
+			panel.AddMessenger("target", this);
+
+			be_app_messenger.SendMessage(&panel);
 			break;
+		}
 		case kMsgSamePreferredAppAsOpened:
 			_AdoptPreferredApplication(message, true);
 			break;

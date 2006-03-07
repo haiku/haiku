@@ -31,7 +31,9 @@ class FileTypeWindow : public BWindow {
 	private:
 		BString _Title(const BMessage& refs);
 		void _SetTo(const BMessage& refs);
+		void _AdoptType(BMessage* message);
 		void _AdoptType();
+		void _AdoptPreferredApp(BMessage* message, bool sameAs);
 		void _AdoptPreferredApp();
 		void _UpdatePreferredApps();
 

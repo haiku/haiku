@@ -5,6 +5,7 @@
 
 
 #include "AttributeWindow.h"
+#include "FileTypes.h"
 #include "FileTypesWindow.h"
 
 #include <Box.h>

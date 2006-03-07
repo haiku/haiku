@@ -66,7 +66,8 @@ IconView::MouseDown(BPoint where)
 		BPopUpMenu* menu = new BPopUpMenu("context");
 		menu->SetFont(be_plain_font);
 		BMenuItem* item;
-		menu->AddItem(item = new BMenuItem("Edit Icon" B_UTF8_ELLIPSIS, NULL));
+		menu->AddItem(item = new BMenuItem(fIcon != NULL
+			? "Edit Icon" B_UTF8_ELLIPSIS : "Add Icon" B_UTF8_ELLIPSIS, NULL));
 		item->SetEnabled(false);
 		menu->AddItem(item = new BMenuItem("Remove Icon", NULL));
 		item->SetEnabled(false);

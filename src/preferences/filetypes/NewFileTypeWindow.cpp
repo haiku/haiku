@@ -4,6 +4,7 @@
  */
 
 
+#include "FileTypes.h"
 #include "FileTypesWindow.h"
 #include "NewFileTypeWindow.h"
 

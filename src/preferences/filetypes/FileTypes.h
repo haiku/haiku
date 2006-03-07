@@ -6,14 +6,12 @@
 #define FILE_TYPES_H
 
 
-#include <SupportDefs.h>
+#include <Alert.h>
 
 
 extern const char* kSignature;
 
 static const uint32 kMsgOpenFilePanel = 'opFp';
-static const uint32 kMsgOpenSelectPanel = 'opSp';
-static const uint32 kMsgOpenSameAsPanel = 'opAp';
 
 static const uint32 kMsgOpenTypesWindow = 'opTw';
 static const uint32 kMsgTypesWindowClosed = 'clTw';
@@ -23,5 +21,9 @@ static const uint32 kMsgApplicationTypesWindowClosed = 'clAw';
 
 static const uint32 kMsgTypeWindowClosed = 'cltw';
 static const uint32 kMsgWindowClosed = 'WiCl';
+
+
+extern void error_alert(const char* message, status_t status = B_OK,
+	alert_type type = B_WARNING_ALERT);
 
 #endif	// FILE_TYPES_H

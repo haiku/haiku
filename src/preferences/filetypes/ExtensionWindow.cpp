@@ -5,6 +5,7 @@
 
 
 #include "ExtensionWindow.h"
+#include "FileTypes.h"
 #include "FileTypesWindow.h"
 
 #include <Button.h>

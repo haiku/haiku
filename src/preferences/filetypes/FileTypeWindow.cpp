@@ -26,10 +26,13 @@
 const uint32 kMsgTypeEntered = 'type';
 const uint32 kMsgSelectType = 'sltp';
 const uint32 kMsgSameTypeAs = 'stpa';
+const uint32 kMsgSameTypeAsOpened = 'stpO';
 
 const uint32 kMsgPreferredAppChosen = 'papc';
 const uint32 kMsgSelectPreferredApp = 'slpa';
 const uint32 kMsgSamePreferredAppAs = 'spaa';
+const uint32 kMsgPreferredAppOpened = 'paOp';
+const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 
 
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
@@ -78,7 +81,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	rect.OffsetBy(fSelectTypeButton->Bounds().Width() + 8.0f, 0.0f);
 	fSameTypeAsButton = new BButton(rect, "same type as", "Same As" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
+		new BMessage(kMsgSameTypeAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fSameTypeAsButton->ResizeToPreferred();
 	box->AddChild(fSameTypeAsButton);
 
@@ -264,6 +267,39 @@ FileTypeWindow::_SetTo(const BMessage& refs)
 
 
 void
+FileTypeWindow::_AdoptType(BMessage* message)
+{
+	entry_ref ref;
+	if (message == NULL || message->FindRef("refs", &ref) != B_OK)
+		return;
+
+	BNode node(&ref);
+	status_t status = node.InitCheck();
+
+	char type[B_MIME_TYPE_LENGTH];
+
+	if (status == B_OK) {
+			// get type from file
+		BNodeInfo nodeInfo(&node);
+		status = nodeInfo.InitCheck();
+		if (status == B_OK) {
+			if (nodeInfo.GetType(type) != B_OK)
+				type[0] = '\0';
+		}
+	}
+
+	if (status != B_OK) {
+		error_alert("Could not open file", status);
+		return;
+	}
+
+	fCommonType = type;
+	fTypeControl->SetText(type);
+	_AdoptType();
+}
+
+
+void
 FileTypeWindow::_AdoptType()
 {
 	for (int32 i = 0; i < fEntries.CountItems(); i++) {
@@ -274,6 +310,17 @@ FileTypeWindow::_AdoptType()
 			continue;
 
 		info.SetType(fCommonType.String());
+	}
+}
+
+
+void
+FileTypeWindow::_AdoptPreferredApp(BMessage* message, bool sameAs)
+{
+	if (retrieve_preferred_app(message, sameAs, fCommonType.String(),
+			fCommonPreferredApp) == B_OK) {
+		_AdoptPreferredApp();
+		_UpdatePreferredApps();
 	}
 }
 
@@ -318,6 +365,21 @@ FileTypeWindow::MessageReceived(BMessage* message)
 			_AdoptType();
 			break;
 
+		case kMsgSameTypeAs:
+		{
+			BMessage panel(kMsgOpenFilePanel);
+			panel.AddString("title", "Select Same Type As");
+			panel.AddInt32("message", kMsgSameTypeAsOpened);
+			panel.AddMessenger("target", this);
+
+			be_app_messenger.SendMessage(&panel);
+			break;
+		}
+		case B_SIMPLE_DATA:
+		case kMsgSameTypeAsOpened:
+			_AdoptType(message);
+			break;
+
 		// Preferred Application group
 
 		case kMsgPreferredAppChosen:
@@ -332,21 +394,33 @@ FileTypeWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-#if 0
 		case kMsgSelectPreferredApp:
-			be_app->PostMessage(kMsgOpenSelectPanel);
+		{
+			BMessage panel(kMsgOpenFilePanel);
+			panel.AddString("title", "Select Preferred Application");
+			panel.AddInt32("message", kMsgPreferredAppOpened);
+			panel.AddMessenger("target", this);
+
+			be_app_messenger.SendMessage(&panel);
 			break;
+		}
 		case kMsgPreferredAppOpened:
-			_AdoptPreferredApplication(message, false);
+			_AdoptPreferredApp(message, false);
 			break;
 
 		case kMsgSamePreferredAppAs:
-			be_app->PostMessage(kMsgOpenSameAsPanel);
+		{
+			BMessage panel(kMsgOpenFilePanel);
+			panel.AddString("title", "Select Same Preferred Application As");
+			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
+			panel.AddMessenger("target", this);
+
+			be_app_messenger.SendMessage(&panel);
 			break;
+		}
 		case kMsgSamePreferredAppAsOpened:
-			_AdoptPreferredApplication(message, true);
+			_AdoptPreferredApp(message, true);
 			break;
-#endif
 
 		case B_META_MIME_CHANGED:
 			const char* type;

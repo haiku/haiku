@@ -67,14 +67,7 @@ class FileTypesWindow : public BWindow {
 		BWindow*		fNewTypeWindow;
 };
 
-static const uint32 kMsgPreferredAppOpened = 'paOp';
-static const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
-
 static const uint32 kMsgSelectNewType = 'slnt';
 static const uint32 kMsgNewTypeWindowClosed = 'ntwc';
-
-
-extern void error_alert(const char* message, status_t status = B_OK,
-	alert_type type = B_WARNING_ALERT);
 
 #endif	// FILE_TYPES_WINDOW_H
