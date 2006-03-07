@@ -162,8 +162,9 @@ BDragger::Draw(BRect update)
 	BRect bounds(Bounds());
 
 	if (AreDraggersDrawn() && (!fShelf || fShelf->AllowsDragging())) {
+		BPoint where = bounds.RightBottom() - BPoint(fBitmap->Bounds().Width(), fBitmap->Bounds().Height());
 		SetDrawingMode(B_OP_OVER);
-		DrawBitmap(fBitmap, bounds.LeftTop());
+		DrawBitmap(fBitmap, where);
 		SetDrawingMode(B_OP_COPY);
 
 		if (fIsZombie) {
@@ -282,7 +283,8 @@ BDragger::MessageReceived(BMessage *msg)
 	} else if (msg->what == B_SCREEN_CHANGED) {
 		if (fRelation == TARGET_IS_CHILD) {
 			fTransition = true;
-			Draw(BRect());
+			Invalidate();
+			Flush();
 			fTransition = false;
 		
 		} else {
