@@ -263,8 +263,7 @@ BSoundPlayer::~BSoundPlayer()
 		// our node is already stopped, and we can't stop the System Mixer.
 		// So, we just disconnect from it, and release our references to the nodes that
 		// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
-		err = roster->Disconnect(fMediaInput.node.node, fMediaInput.source, 
-			fMediaOutput.node.node, fMediaOutput.destination);
+		err = roster->Disconnect(fMediaOutput, fMediaInput);
 #if DEBUG >0	
 		if (err) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Error disconnecting nodes:  %ld (%s)\n", err, strerror(err));
