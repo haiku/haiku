@@ -8,6 +8,8 @@
 
 #include <Alert.h>
 
+class BFile;
+
 
 extern const char* kSignature;
 
@@ -23,6 +25,9 @@ static const uint32 kMsgTypeWindowClosed = 'cltw';
 static const uint32 kMsgWindowClosed = 'WiCl';
 
 
+// exported functions
+
+extern bool is_application(BFile& file);
 extern void error_alert(const char* message, status_t status = B_OK,
 	alert_type type = B_WARNING_ALERT);
 

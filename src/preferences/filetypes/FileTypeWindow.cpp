@@ -13,6 +13,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <File.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -375,7 +376,6 @@ FileTypeWindow::MessageReceived(BMessage* message)
 			be_app_messenger.SendMessage(&panel);
 			break;
 		}
-		case B_SIMPLE_DATA:
 		case kMsgSameTypeAsOpened:
 			_AdoptType(message);
 			break;
@@ -421,6 +421,22 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSamePreferredAppAsOpened:
 			_AdoptPreferredApp(message, true);
 			break;
+
+		// Other
+
+		case B_SIMPLE_DATA:
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) != B_OK)
+				break;
+
+			BFile file(&ref, B_READ_ONLY);
+			if (is_application(file))
+				_AdoptPreferredApp(message, false);
+			else
+				_AdoptType(message);
+			break;
+		}
 
 		case B_META_MIME_CHANGED:
 			const char* type;

@@ -97,13 +97,12 @@ FileTypes::RefsReceived(BMessage *message)
 	entry_ref ref;
 	while (message->FindRef("refs", index++, &ref) == B_OK) {
 		BEntry entry;
-		status_t status = entry.SetTo(&ref, traverseLinks);
-		if (status == B_OK) {
-			// TODO: open FileType window
-		}
-
 		BFile file;
-		status = file.SetTo(&ref, B_READ_ONLY);
+
+		status_t status = entry.SetTo(&ref, traverseLinks);
+		if (status == B_OK)
+			status = file.SetTo(&entry, B_READ_ONLY);
+
 		if (status != B_OK) {
 			// file cannot be opened
 
@@ -120,14 +119,12 @@ FileTypes::RefsReceived(BMessage *message)
 			message->RemoveData("refs", --index);
 			continue;
 		}
-		
-		BAppFileInfo appInfo(&file);
-		if (appInfo.InitCheck() != B_OK)
+
+		if (!is_application(file)) {
+			if (entry.GetRef(&ref) == B_OK)
+				message->ReplaceRef("refs", index - 1, &ref);
 			continue;
-		
-		char signature[B_MIME_TYPE_LENGTH];
-		if (appInfo.GetSignature(signature) != B_OK)
-			continue;
+		}
 
 		// remove application from list
 		message->RemoveData("refs", --index);
@@ -307,6 +304,21 @@ FileTypes::QuitRequested()
 
 
 //	#pragma mark -
+
+
+bool
+is_application(BFile& file)
+{
+	BAppFileInfo appInfo(&file);
+	if (appInfo.InitCheck() != B_OK)
+		return false;
+
+	char signature[B_MIME_TYPE_LENGTH];
+	if (appInfo.GetSignature(signature) != B_OK)
+		return false;
+
+	return true;
+}
 
 
 void
