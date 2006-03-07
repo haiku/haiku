@@ -652,12 +652,13 @@ get_tty_index(const char *name)
 {
 	// device names follow this form: "pt/%c%x"
 	int8 digit = name[4];
-	if (digit >= 'a')
-		digit -= 'a';
-	else
+	if (digit >= 'a') {
+		// hexadecimal digits
+		digit -= 'a' - 10;
+	} else
 		digit -= '0';
 
-	return (name[3] - 'p') * digit;
+	return (name[3] - 'p') * 16 + digit;
 }
 
 
