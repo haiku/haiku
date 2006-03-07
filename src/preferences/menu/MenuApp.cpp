@@ -5,18 +5,8 @@
 MenuApp::MenuApp()
 	: BApplication("application/x-vnd.Be-GGUI")
 {
-	get_menu_info(&info);
-	
-	menuWindow = new MenuWindow();
-	Update();
-	menuWindow->Show();
-}
-
-
-void
-MenuApp::Update()
-{
-	menuWindow->Update();
+	fMenuWindow = new MenuWindow(BRect(100, 100, 400, 300));
+	fMenuWindow->Show();
 }
 	
 	
@@ -24,7 +14,6 @@ void
 MenuApp::MessageReceived(BMessage *msg)
 {
 	switch(msg->what) {
-	
 		//others
 		case UPDATE_WINDOW:
 		case CLICK_OPEN_MSG:
@@ -33,7 +22,7 @@ MenuApp::MessageReceived(BMessage *msg)
 		case ALT_MARKED_MSG:
 		case COLOR_SCHEME_MSG:
 		case MENU_COLOR:
-			menuWindow->PostMessage(msg);
+			fMenuWindow->PostMessage(msg);
 			break;
 					
 		default:

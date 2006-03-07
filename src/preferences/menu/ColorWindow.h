@@ -7,10 +7,11 @@
 class BColorControl;
 class BButton;
 class ColorWindow : public BWindow {
-	public:
+public:
 			ColorWindow();
 	virtual void	MessageReceived(BMessage *msg);
-	
+
+private:	
 	BColorControl 	*colorPicker;
 	BButton 	*DefaultButton;
 	BButton 	*RevertButton;

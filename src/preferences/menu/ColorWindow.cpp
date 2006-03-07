@@ -40,34 +40,33 @@ void
 ColorWindow::MessageReceived(BMessage *msg)
 {
 	switch(msg->what) {
-	
-	case MENU_REVERT:
-		colorPicker->SetValue(revert_info.background_color);
-		info.background_color = colorPicker->ValueAsColor();
-		set_menu_info(&info);
-		be_app->PostMessage(UPDATE_WINDOW);
-		break;
+		case MENU_REVERT:
+			colorPicker->SetValue(revert_info.background_color);
+			info.background_color = colorPicker->ValueAsColor();
+			set_menu_info(&info);
+			be_app->PostMessage(UPDATE_WINDOW);
+			break;
 				
-	case MENU_COLOR_DEFAULT:
-	//	change to system color for system wide
-	//	compatability
-		rgb_color color;
-		color.red = 219;
-		color.blue = 219;
-		color.green = 219;
-		color.alpha = 255;
-		colorPicker->SetValue(color);
-	
-	case MENU_COLOR:{
-		get_menu_info(&info);
-		info.background_color = colorPicker->ValueAsColor();
-		set_menu_info(&info);
-		be_app->PostMessage(UPDATE_WINDOW);
-		break;}
-	
-	default:
-		be_app->PostMessage(UPDATE_WINDOW);
-		BMessage(msg);
-		break;
+		case MENU_COLOR_DEFAULT:
+		//	change to system color for system wide
+		//	compatability
+			rgb_color color;
+			color.red = 219;
+			color.blue = 219;
+			color.green = 219;
+			color.alpha = 255;
+			colorPicker->SetValue(color);
+		
+		case MENU_COLOR:
+			get_menu_info(&info);
+			info.background_color = colorPicker->ValueAsColor();
+			set_menu_info(&info);
+			be_app->PostMessage(UPDATE_WINDOW);
+			break;
+		
+		default:
+			be_app->PostMessage(UPDATE_WINDOW);
+			BWindow::MessageReceived(msg);
+			break;
 	}
-}
+}	

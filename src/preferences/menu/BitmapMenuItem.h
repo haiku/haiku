@@ -5,8 +5,6 @@
 #include <String.h>
 
 class BBitmap;
-
-// MBitmapMenuItem class declaration
 class BitmapMenuItem : public BMenuItem {
 public:
 				BitmapMenuItem(const char* name, BMessage* message, BBitmap* bmp,

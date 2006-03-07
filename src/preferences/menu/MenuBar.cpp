@@ -44,14 +44,14 @@ MenuBar::build_menu()
 	separatorStyleMenu->SetRadioMode(true);
 	BMessage *msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 0);
-	separatorStyleZero = new BitmapMenuItem("                 ", msg,
+	separatorStyleZero = new BitmapMenuItem("separator0", msg,
 						BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
 	msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 1);
-	separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
+	separatorStyleOne = new BitmapMenuItem("separator1", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
 	msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 2);
-	separatorStyleTwo = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
+	separatorStyleTwo = new BitmapMenuItem("separator2", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
 	if (info.separator == 0)
 		separatorStyleZero->SetMarked(true);
 	if (info.separator == 1)
@@ -119,7 +119,8 @@ MenuBar::Update()
 		separatorStyleOne->SetMarked(true);
 	else if (info.separator == 2)
 		separatorStyleTwo->SetMarked(true);
-		set_menu();
+	
+	set_menu();
 	
 	BFont font;
 	Window()->Lock();
