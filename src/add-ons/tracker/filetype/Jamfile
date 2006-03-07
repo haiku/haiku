@@ -1,21 +1,12 @@
 SubDir HAIKU_TOP src add-ons tracker filetype ;
 
-AddResources FileType-F :
-	FileType.rdef FileType.icons.rdef FileType.version.rdef
-	;
-	
-Application FileType-F :
-	main.cpp
-	FileTypeApp.cpp
-	FileTypeView.cpp
-	FileTypeWindow.cpp
-	AppTypeWindow.cpp
-	AppTypeView.cpp
-	AppTypeAppFlagsView.cpp
-	AppTypeSupportedTypesView.cpp
-	AppTypeVersionInfoView.cpp
-	process_refs.cpp
-	;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
-LinkAgainst FileType-F : be tracker ;
+AddResources FileType-F : FileType.rdef ;
 
+Addon FileType-F : Tracker :
+	FileType.cpp
+
+	: false
+	: be tracker
+	;
