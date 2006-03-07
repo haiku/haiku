@@ -16,6 +16,7 @@ Preference FileTypes :
 	AttributeWindow.cpp
 	ExtensionWindow.cpp
 	FileTypeWindow.cpp
+	IconView.cpp
 	PreferredAppMenu.cpp
 	StringView.cpp
 	: be tracker

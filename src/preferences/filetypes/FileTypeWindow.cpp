@@ -6,6 +6,7 @@
 
 #include "FileTypes.h"
 #include "FileTypeWindow.h"
+#include "IconView.h"
 #include "PreferredAppMenu.h"
 
 #include <Application.h>
@@ -36,37 +37,6 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		"File Type", B_TITLED_WINDOW,
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	// "Icon" group
-
-#if 0
-	BFont font(be_bold_font);
-	float labelWidth = font.StringWidth("Icon");
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-
-	BRect innerRect;
-	fIconView = new IconView(innerRect, "icon box", NULL);
-	fIconView->ResizeToPreferred();
-
-	rect.left = rect.right + 12.0f + B_V_SCROLL_BAR_WIDTH;
-	rect.right = rect.left + max_c(fIconView->Bounds().Width(), labelWidth) + 16.0f;
-	rect.bottom = rect.top + ceilf(fontHeight.ascent)
-		+ max_c(fIconView->Bounds().Height(),
-			button->Bounds().Height() * 2.0f + 4.0f) + 12.0f;
-	rect.top -= 2.0f;
-	BBox* box = new BBox(rect);
-	box->SetLabel("Icon");
-	topView->AddChild(box);
-
-	innerRect.left = 8.0f;
-	innerRect.top = fontHeight.ascent / 2.0f
-		+ (rect.Height() - fontHeight.ascent / 2.0f - fIconView->Bounds().Height()) / 2.0f
-		+ 3.0f + fontHeight.ascent;
-	if (innerRect.top + fIconView->Bounds().Height() > box->Bounds().Height() - 6.0f)
-		innerRect.top = box->Bounds().Height() - 6.0f - fIconView->Bounds().Height();
-	fIconView->MoveTo(innerRect.LeftTop());
-	box->AddChild(fIconView);
-#endif
 	BRect rect = Bounds();
 	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -75,7 +45,6 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	// "File Type" group
 
 	BFont font(be_bold_font);
-//	float labelWidth = font.StringWidth("Icon");
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 
@@ -113,8 +82,31 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	fSameTypeAsButton->ResizeToPreferred();
 	box->AddChild(fSameTypeAsButton);
 
-	box->ResizeTo(box->Bounds().Width(), fSelectTypeButton->Frame().bottom
-		+ 8.0f);
+	width = font.StringWidth("Icon") + 16.0f;
+	if (width < B_LARGE_ICON + 16.0f)
+		width = B_LARGE_ICON + 16.0f;
+
+	height = fSelectTypeButton->Frame().bottom + 8.0f;
+	if (height < 8.0f + B_LARGE_ICON + fontHeight.ascent + fontHeight.descent)
+		height = 8.0f + B_LARGE_ICON + fontHeight.ascent + fontHeight.descent;
+	box->ResizeTo(box->Bounds().Width() - width - 8.0f, height);
+
+	// "Icon" group
+
+	rect = box->Frame();
+	rect.left = rect.right + 8.0f;
+	rect.right += width + 8.0f;
+	float iconBoxWidth = rect.Width();
+	box = new BBox(rect, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	box->SetLabel("Icon");
+	topView->AddChild(box);
+
+	rect = BRect(8.0f, 0.0f, 7.0f + B_LARGE_ICON, B_LARGE_ICON - 1.0f);
+	rect.OffsetBy(0.0f, (box->Bounds().Height() - rect.Height()) / 2.0f);
+	if (rect.top < fontHeight.ascent + fontHeight.descent + 4.0f)
+		rect.top = fontHeight.ascent + fontHeight.descent + 4.0f;
+	fIconView = new IconView(rect, "icon");
+	box->AddChild(fIconView);
 
 	// "Preferred Application" group
 
@@ -160,8 +152,8 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	box->AddChild(fSameAppAsButton);
 
 	ResizeTo(fSameAppAsButton->Frame().right + 100.0f, box->Frame().bottom + 8.0f);
-	SetSizeLimits(fSameAppAsButton->Frame().right + 24.0f, 32767.0f, Bounds().Height(),
-		Bounds().Height());
+	SetSizeLimits(fSameAppAsButton->Frame().right + iconBoxWidth + 32.0f, 32767.0f,
+		Bounds().Height(), Bounds().Height());
 
 	fTypeControl->MakeFocus(true);
 
@@ -259,10 +251,15 @@ FileTypeWindow::_SetTo(const BMessage& refs)
 				fCommonPreferredApp = "";
 		} else
 			fCommonPreferredApp = preferredApp;
+
+		if (i == 0)
+			fIconView->SetTo(&ref);
 	}
 
 	fTypeControl->SetText(fCommonType.String());
 	_UpdatePreferredApps();
+
+	fIconView->ShowIconHeap(fEntries.CountItems() != 1);
 }
 
 

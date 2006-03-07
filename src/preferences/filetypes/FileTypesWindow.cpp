@@ -59,10 +59,10 @@ const uint32 kMsgDescriptionEntered = 'dsce';
 
 const uint32 kMsgToggleIcons = 'tgic';
 
-class IconView : public BControl {
+class TypeIconView : public BControl {
 	public:
-		IconView(BRect frame, const char* name, BMessage* message);
-		virtual ~IconView();
+		TypeIconView(BRect frame, const char* name, BMessage* message);
+		virtual ~TypeIconView();
 
 		void SetTo(BMimeType* type);
 
@@ -114,7 +114,7 @@ error_alert(const char* message, status_t status, alert_type type)
 //	#pragma mark -
 
 
-IconView::IconView(BRect frame, const char* name, BMessage* message)
+TypeIconView::TypeIconView(BRect frame, const char* name, BMessage* message)
 	: BControl(frame, name, NULL, message,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
 	fIcon(NULL),
@@ -123,14 +123,14 @@ IconView::IconView(BRect frame, const char* name, BMessage* message)
 }
 
 
-IconView::~IconView()
+TypeIconView::~TypeIconView()
 {
 	delete fIcon;
 }
 
 
 void
-IconView::SetTo(BMimeType* type)
+TypeIconView::SetTo(BMimeType* type)
 {
 	int32 sourceWas = fIconSource;
 	fIconSource = kNoIcon;
@@ -155,7 +155,7 @@ IconView::SetTo(BMimeType* type)
 
 
 void
-IconView::Draw(BRect updateRect)
+TypeIconView::Draw(BRect updateRect)
 {
 	SetHighColor(ViewColor());
 	FillRect(updateRect);
@@ -205,7 +205,7 @@ IconView::Draw(BRect updateRect)
 
 
 void
-IconView::GetPreferredSize(float* _width, float* _height)
+TypeIconView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width) {
 		float a = StringWidth("(from application)");
@@ -311,7 +311,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	font.GetHeight(&fontHeight);
 
 	BRect innerRect;
-	fIconView = new IconView(innerRect, "icon box", NULL);
+	fIconView = new TypeIconView(innerRect, "icon", NULL);
 	fIconView->ResizeToPreferred();
 
 	rect.left = rect.right + 12.0f + B_V_SCROLL_BAR_WIDTH;
