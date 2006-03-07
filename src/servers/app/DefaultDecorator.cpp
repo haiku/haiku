@@ -39,8 +39,9 @@
 
 
 DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
-	window_look look, uint32 flags)
-	: Decorator(settings, rect, look, flags)
+		window_look look, uint32 flags)
+	: Decorator(settings, rect, look, flags),
+	fLastClicked(0)
 {
 	DefaultDecorator::SetLook(settings, look);
 
@@ -358,6 +359,13 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
+	// TODO: have a real double-click mechanism, ie. take user settings into account
+	bigtime_t now = system_time();
+	if (buttons != 0) {
+		fWasDoubleClick = now - fLastClicked < 200000;
+		fLastClicked = now;
+	}
+
 	// In checking for hit test stuff, we start with the smallest rectangles the user might
 	// be clicking on and gradually work our way out into larger rectangles.
 	if (!(fFlags & B_NOT_CLOSABLE) && _closerect.Contains(pt))
@@ -369,20 +377,19 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	if (fLook == B_DOCUMENT_WINDOW_LOOK && _resizerect.Contains(pt))
 		return DEC_RESIZE;
 
+	bool clicked = false;
+
 	// Clicking in the tab?
 	if (_tabrect.Contains(pt)) {
 		// tab sliding in any case if either shift key is held down
 		if (modifiers & B_SHIFT_KEY)
 			return DEC_SLIDETAB;
-		// Here's part of our window management stuff
-		if (buttons == B_SECONDARY_MOUSE_BUTTON)
-			return DEC_MOVETOBACK;
-		return DEC_DRAG;
-	}
 
-	// We got this far, so user is clicking on the border?
-	if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
+		clicked = true;
+	} else if (fLeftBorder.Contains(pt) || fRightBorder.Contains(pt)
 		|| fTopBorder.Contains(pt) || fBottomBorder.Contains(pt)) {
+		// Clicked on border
+
 		// check resize area
 		if (!(fFlags & B_NOT_RESIZABLE)
 			&& (fLook == B_TITLED_WINDOW_LOOK
@@ -394,10 +401,17 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 				return DEC_RESIZE;
 		}
 
-		// NOTE: On R5, windows are not moved to back if clicked inside the resize area with
-		// the second mouse button. So we check this after the check above
+		clicked = true;
+	}
+
+	if (clicked) {
+		// NOTE: On R5, windows are not moved to back if clicked inside the resize area
+		// with the second mouse button. So we check this after the check above
 		if (buttons == B_SECONDARY_MOUSE_BUTTON)
 			return DEC_MOVETOBACK;
+
+		if (fWasDoubleClick)
+			return DEC_MINIMIZE;
 
 		return DEC_DRAG;
 	}
@@ -750,7 +764,7 @@ DefaultDecorator::_DrawClose(BRect r)
 {
 	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Just like DrawZoom, but for a close button
-	_DrawBlendedRect( r, GetClose());
+	_DrawBlendedRect(r, GetClose());
 }
 
 // _DrawTitle
@@ -835,14 +849,14 @@ DefaultDecorator::_SetColors()
 	_SetFocus();
 }
 
-// _DrawBlendedRect
+
+/*!
+	\brief Draws a framed rectangle with a gradient.
+	\param down The rectangle should be drawn recessed or not
+*/
 void
 DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 {
-	// This bad boy is used to draw a rectangle with a gradient.
-	// Note that it is not part of the Decorator API - it's specific
-	// to just the BeDecorator. Called by DrawZoom and DrawClose
-
 	// Actually just draws a blended square
 	int32 w = r.IntegerWidth();
 	int32 h = r.IntegerHeight();
@@ -854,11 +868,11 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 	int steps = (w < h) ? w : h;
 
 	if (down) {
-		startcol	= fButtonLowColor.GetColor32();
-		endcol		= fButtonHighColor.GetColor32();
+		startcol = fButtonLowColor.GetColor32();
+		endcol = fButtonHighColor.GetColor32();
 	} else {
-		startcol	= fButtonHighColor.GetColor32();
-		endcol		= fButtonLowColor.GetColor32();
+		startcol = fButtonHighColor.GetColor32();
+		endcol = fButtonLowColor.GetColor32();
 	}
 
 	halfcol = MakeBlendColor(startcol,endcol,0.5);

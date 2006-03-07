@@ -756,19 +756,16 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		switch (action) {
 			case DEC_CLOSE:
 				fIsClosing = true;
-				fDecorator->SetClose(true);
 				STRACE_CLICK(("===> DEC_CLOSE\n"));
 				break;
 
 			case DEC_ZOOM:
 				fIsZooming = true;
-				fDecorator->SetZoom(true);
 				STRACE_CLICK(("===> DEC_ZOOM\n"));
 				break;
 
 			case DEC_MINIMIZE:
 				fIsMinimizing = true;
-				fDecorator->SetMinimize(true);
 				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
 				break;
 
@@ -794,7 +791,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				break;
 		}
 
-		// redraw decoratpr
+		// redraw decorator
 		BRegion visibleBorder;
 		GetBorderRegion(&visibleBorder);
 		visibleBorder.IntersectWith(&VisibleRegion());
@@ -805,7 +802,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		if (fIsZooming) {
 			fDecorator->SetZoom(true);
 		} else if (fIsClosing) {
-			fDecorator->SetClose(true);
+			//fDecorator->SetClose(true);
 		} else if (fIsMinimizing) {
 			fDecorator->SetMinimize(true);
 		}
@@ -855,21 +852,13 @@ WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
 	if (fDecorator) {
 		click_type action = _ActionFor(msg);
 
-		// redraw decoratpr
+		// redraw decorator
 		BRegion visibleBorder;
 		GetBorderRegion(&visibleBorder);
 		visibleBorder.IntersectWith(&VisibleRegion());
 
 		fDrawingEngine->Lock();
 		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
-
-		if (fIsZooming) {
-			fDecorator->SetZoom(true);
-		} else if (fIsClosing) {
-			fDecorator->SetClose(true);
-		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(true);
-		}
 
 		if (fIsZooming) {
 			fIsZooming	= false;
@@ -1853,21 +1842,25 @@ WindowLayer::_UpdateContentRegion()
 click_type
 WindowLayer::_ActionFor(const BMessage* msg) const
 {
-	BPoint where(0, 0);
-	int32 buttons = 0;
-	int32 modifiers = 0;
+	if (fDecorator == NULL)
+		return DEC_NONE;
 
-	msg->FindPoint("where", &where);
-	msg->FindInt32("buttons", &buttons);
-	msg->FindInt32("modifiers", &modifiers);
+	BPoint where;
+	if (msg->FindPoint("where", &where) != B_OK)
+		return DEC_NONE;
 
-	if (fDecorator)
-		return fDecorator->Clicked(where, buttons, modifiers);
+	int32 buttons;
+	if (msg->FindInt32("buttons", &buttons) != B_OK)
+		buttons = 0;
 
-	return DEC_NONE;
+	int32 modifiers;
+	if (msg->FindInt32("modifiers", &modifiers) != B_OK)
+		modifiers = 0;
+
+	return fDecorator->Clicked(where, buttons, modifiers);
 }
 
-// _ObeySizeLimits
+
 void
 WindowLayer::_ObeySizeLimits()
 {
