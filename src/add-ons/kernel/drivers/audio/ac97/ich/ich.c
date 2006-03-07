@@ -492,7 +492,7 @@ init_driver(void)
 		return B_ERROR;
 	}
 
-	PRINT((VERSION "\n"));
+	PRINT((INFO "\n"));
 	PRINT(("found %s\n", config->name));
 	PRINT(("IRQ = %ld, NAMBAR = %#lX, NABMBAR = %#lX, MMBAR = %#lX, MBBAR = %#lX\n",config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar));
 

@@ -39,7 +39,7 @@
 	#define VERSION_DEBUG ""
 #endif
 
-#define VERSION "Version " VERSION_NUMBER VERSION_DEBUG ", Copyright (c) 2002-2005 Marcus Overhagen, compiled on " __DATE__ " " __TIME__ 
+#define VERSION "Version " VERSION_NUMBER VERSION_DEBUG ", written by Marcus Overhagen. Build " __DATE__ " " __TIME__ 
 #define DRIVER_NAME "ich_ac97"
 
 #define BUFFER_SIZE		2048
