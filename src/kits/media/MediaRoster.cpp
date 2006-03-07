@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
+ * Copyright (c) 2002-2006 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -28,7 +28,7 @@
  */
 
 /* to comply with the license above, do not remove the following line */
-char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
+char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus Overhagen <Marcus@Overhagen.de>";
 
 #include <MediaRoster.h>
 #include <Locker.h>
@@ -204,6 +204,11 @@ BMediaRosterEx::GetAllOutputs(const media_node & node, List<media_output> *list)
 	status_t result;
 	
 	PRINT(4, "BMediaRosterEx::GetAllOutputs() node %ld, port %ld\n", node.node, node.port);
+
+	if (!(node.kind & B_BUFFER_PRODUCER)) {
+		ERROR("BMediaRosterEx::GetAllOutputs: node %ld is not a B_BUFFER_PRODUCER\n", node.node);
+		return B_MEDIA_BAD_NODE;
+	}
 	
 	result = B_OK;
 	cookie = 0;
@@ -269,6 +274,11 @@ BMediaRosterEx::GetAllInputs(const media_node & node, List<media_input> *list)
 	status_t result;
 
 	PRINT(4, "BMediaRosterEx::GetAllInputs() node %ld, port %ld\n", node.node, node.port);
+
+	if (!(node.kind & B_BUFFER_CONSUMER)) {
+		ERROR("BMediaRosterEx::GetAllInputs: node %ld is not a B_BUFFER_CONSUMER\n", node.node);
+		return B_MEDIA_BAD_NODE;
+	}
 	
 	result = B_OK;
 	cookie = 0;
@@ -572,7 +582,7 @@ BMediaRoster::GetNodeFor(media_node_id node,
 	CALLED();
 	if (clone == NULL)
 		return B_BAD_VALUE;	
-	if (node <= 0)
+	if (IS_INVALID_NODEID(node))
 		return B_MEDIA_BAD_NODE;
 
 	server_get_node_for_request request;
@@ -741,6 +751,33 @@ BMediaRoster::Connect(const media_source & from,
 	}
 
 	status_t rv;
+
+	// find the output and input nodes
+	// XXX isn't there a easier way?
+	media_node sourcenode;
+	media_node destnode;
+	rv = GetNodeFor(NodeIDFor(from.port), &sourcenode);
+	if (rv != B_OK) {
+		ERROR("BMediaRoster::Connect: Can't find source node for port %ld\n", from.port);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	ReleaseNode(sourcenode);
+	rv = GetNodeFor(NodeIDFor(to.port), &destnode);
+	if (rv != B_OK) {
+		ERROR("BMediaRoster::Connect: Can't find destination node for port %ld\n", to.port);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	ReleaseNode(destnode);
+	
+	if (!(sourcenode.kind & B_BUFFER_PRODUCER)) {
+		ERROR("BMediaRoster::Connect: source node %ld is not a B_BUFFER_PRODUCER\n", sourcenode.node);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (!(destnode.kind & B_BUFFER_CONSUMER)) {
+		ERROR("BMediaRoster::Connect: destination node %ld is not a B_BUFFER_CONSUMER\n", destnode.node);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+
 	producer_format_proposal_request request1;
 	producer_format_proposal_reply reply1;
 	
@@ -789,16 +826,6 @@ BMediaRoster::Connect(const media_source & from,
 	// reply3.format is still our pretty media format
 	// reply3.out_source the real source to be used for the connection
 	// reply3.name the name BBufferConsumer::Connected will see in the outInput->name argument
-
-
-	// find the output and input nodes
-	// XXX isn't there a easier way?
-	media_node sourcenode;
-	media_node destnode;
-	GetNodeFor(NodeIDFor(from.port), &sourcenode);
-	GetNodeFor(NodeIDFor(to.port), &destnode);
-	ReleaseNode(sourcenode);
-	ReleaseNode(destnode);
 	
 	// BBufferConsumer::Connected
 	consumer_connected_request request4;
@@ -924,21 +951,27 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 	// XXX we should just send a notification, instead of republishing all endpoints
 	List<media_output> outlist;
 	List<media_input> inlist;
-	media_node sourcenode; 
+	media_node sourcenode;
 	media_node destnode;
 	if (B_OK == GetNodeFor(source_nodeid, &sourcenode)) {
+		if (!(sourcenode.kind & B_BUFFER_PRODUCER)) {
+			ERROR("BMediaRoster::Disconnect: source_nodeid %ld is not a B_BUFFER_PRODUCER\n", source_nodeid);
+		}
 		if (B_OK == MediaRosterEx(this)->GetAllOutputs(sourcenode , &outlist))
 			MediaRosterEx(this)->PublishOutputs(sourcenode , &outlist);
 		ReleaseNode(sourcenode);
 	} else {
-		ERROR("BMediaRoster::Disconnect: source GetNodeFor failed\n");
+		ERROR("BMediaRoster::Disconnect: GetNodeFor source_nodeid %ld failed\n", source_nodeid);
 	}
 	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
+		if (!(destnode.kind & B_BUFFER_CONSUMER)) {
+			ERROR("BMediaRoster::Disconnect: destination_nodeid %ld is not a B_BUFFER_CONSUMER\n", destination_nodeid);
+		}
 		if (B_OK == MediaRosterEx(this)->GetAllInputs(destnode , &inlist))
 			MediaRosterEx(this)->PublishInputs(destnode, &inlist);
 		ReleaseNode(destnode);
 	} else {
-		ERROR("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
+		ERROR("BMediaRoster::Disconnect: GetNodeFor destination_nodeid %ld failed\n", destination_nodeid);
 	}
 	
 
@@ -946,6 +979,52 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 	BPrivate::media::notifications::ConnectionBroken(source, destination);
 
 	return (rv1 != B_OK || rv2 != B_OK) ? B_ERROR : B_OK;
+}
+
+status_t 
+BMediaRoster::Disconnect(const media_output &output, const media_input &input)
+{
+	if (IS_INVALID_NODEID(output.node.node)) {
+		printf("BMediaRoster::Disconnect: output.node.node %ld invalid\n",
+			output.node.node);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (IS_INVALID_NODEID(input.node.node)) {
+		printf("BMediaRoster::Disconnect: input.node.node %ld invalid\n",
+			input.node.node);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	if (!(output.node.kind & B_BUFFER_PRODUCER)) {
+		printf("BMediaRoster::Disconnect: output.node.kind 0x%lx is no B_BUFFER_PRODUCER\n",
+			output.node.kind);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (!(input.node.kind & B_BUFFER_CONSUMER)) {
+		printf("BMediaRoster::Disconnect: input.node.kind 0x%lx is no B_BUFFER_PRODUCER\n",
+			input.node.kind);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	if (input.source.port != output.source.port) {
+		printf("BMediaRoster::Disconnect: input.source.port %ld doesn't match output.source.port %ld\n",
+			input.source.port, output.source.port);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (input.source.id != output.source.id) {
+		printf("BMediaRoster::Disconnect: input.source.id %ld doesn't match output.source.id %ld\n",
+			input.source.id, output.source.id);
+		return B_MEDIA_BAD_SOURCE;
+	}
+	if (input.destination.port != output.destination.port) {
+		printf("BMediaRoster::Disconnect: input.destination.port %ld doesn't match output.destination.port %ld\n",
+			input.destination.port, output.destination.port);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	if (input.destination.id != output.destination.id) {
+		printf("BMediaRoster::Disconnect: input.destination.id %ld doesn't match output.destination.id %ld\n",
+			input.destination.id, output.destination.id);
+		return B_MEDIA_BAD_DESTINATION;
+	}
+	return Disconnect(output.node.node, output.source, input.node.node, input.destination);
 }
 
 

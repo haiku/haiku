@@ -89,6 +89,7 @@ public:
 		enum connect_flags {
 			B_CONNECT_MUTED = 0x1
 		};
+		
 		status_t Connect(
 				const media_source & from,
 				const media_destination & to,
@@ -97,11 +98,16 @@ public:
 				media_input * out_input,
 				uint32 in_flags,
 				void * _reserved = 0);
+				
 		status_t Disconnect(
 				media_node_id source_node,
 				const media_source & source,
 				media_node_id destination_node,
 				const media_destination & destination);
+
+		status_t Disconnect( /* Haiku extension, not in R5 */
+				const media_output &output,
+				const media_input &input);
 
 		status_t StartNode(
 				const media_node & node,
