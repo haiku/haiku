@@ -57,17 +57,18 @@ static status_t buffer_force_stop();
 
 static status_t list_mix_controls(multi_mix_control_info * data)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 static status_t list_mix_connections(multi_mix_connection_info * data)
 {
-	return B_ERROR;
+	data->actual_count = 0;
+	return B_OK;
 }
 
 static status_t list_mix_channels(multi_mix_channel_info *data)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 multi_channel_info chans[] = {
