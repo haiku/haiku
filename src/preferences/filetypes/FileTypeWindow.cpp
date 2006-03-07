@@ -138,6 +138,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		NULL, menu);
 	fPreferredField->GetPreferredSize(&width, &height);
 	fPreferredField->ResizeTo(rect.Width(), height);
+	constrainingView->ResizeTo(rect.Width(), height);
 	constrainingView->AddChild(fPreferredField);
 		// we embed the menu field in another view to make it behave like
 		// we want so that it can't obscure other elements with larger
@@ -145,7 +146,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	box->AddChild(constrainingView);
 
-	rect.OffsetBy(0.0f, fTypeControl->Bounds().Height() + 5.0f);
+	rect.OffsetBy(0.0f, height + 5.0f);
 	fSelectAppButton = new BButton(rect, "select app", "Select" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgSelectPreferredApp), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fSelectAppButton->ResizeToPreferred();
@@ -156,6 +157,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		new BMessage(kMsgSamePreferredAppAs), B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	fSameAppAsButton->ResizeToPreferred();
 	box->AddChild(fSameAppAsButton);
+	box->ResizeBy(0.0f, height - fTypeControl->Bounds().Height());
 
 	ResizeTo(fSameAppAsButton->Frame().right + 100.0f, box->Frame().bottom + 8.0f);
 	SetSizeLimits(fSameAppAsButton->Frame().right + iconBoxWidth + 32.0f, 32767.0f,

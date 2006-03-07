@@ -47,6 +47,12 @@ IconView::Draw(BRect updateRect)
 		DrawBitmap(fHeapIcon, BPoint(0.0f, 0.0f));
 	else if (fIcon != NULL)
 		DrawBitmap(fIcon, BPoint(0.0f, 0.0f));
+	else {
+		// draw frame so that the user knows here is something he
+		// might be able to click on
+		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		StrokeRect(Bounds());
+	}
 }
 
 
