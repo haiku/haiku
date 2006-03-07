@@ -152,6 +152,8 @@ static recursive_lock sMountOpLock;
  *	guarded by sMountOpLock.
  *
  *	The thread trying to lock the mutex must not hold sMountMutex.
+ *	You must not have this mutex held when calling create_sem(), as this
+ *	might call vfs_free_unused_vnodes().
  */
 static mutex sVnodeMutex;
 
@@ -917,13 +919,59 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 }
 
 
+static inline void
+put_advisory_locking(struct advisory_locking *locking)
+{
+	release_sem(locking->lock);
+}
+
+
+/**	Returns the advisory_locking object of the \a vnode in case it
+ *	has one, and locks it.
+ *	You have to call put_advisory_locking() when you're done with
+ *	it.
+ *	Note, you must not have the vnode mutex locked when calling
+ *	this function.
+ */
+
+static struct advisory_locking *
+get_advisory_locking(struct vnode *vnode)
+{
+	mutex_lock(&sVnodeMutex);
+
+	struct advisory_locking *locking = vnode->advisory_locking;
+	sem_id lock = locking != NULL ? locking->lock : B_ERROR;
+
+	mutex_unlock(&sVnodeMutex);
+
+	if (lock >= B_OK)
+		lock = acquire_sem(lock);
+	if (lock < B_OK) {
+		// This means the locking has been deleted in the mean time
+		// or had never existed in the first place - otherwise, we
+		// would get the lock at some point.
+		return NULL;
+	}
+
+	return locking;
+}
+
+
+/**	Creates a locked advisory_locking object, and attaches it to the
+ *	given \a vnode.
+ *	Returns B_OK in case of success - also if the vnode got such an
+ *	object from someone else in the mean time, you'll still get this
+ *	one locked then.
+ */
+
 static status_t
 create_advisory_locking(struct vnode *vnode)
 {
 	if (vnode == NULL)
 		return B_FILE_ERROR;
 
-	struct advisory_locking *locking = (struct advisory_locking *)malloc(sizeof(struct advisory_locking));
+	struct advisory_locking *locking = (struct advisory_locking *)malloc(
+		sizeof(struct advisory_locking));
 	if (locking == NULL)
 		return B_NO_MEMORY;
 
@@ -935,16 +983,27 @@ create_advisory_locking(struct vnode *vnode)
 		goto err1;
 	}
 
-	locking->lock = create_sem(1, "advisory locking");
+	locking->lock = create_sem(0, "advisory locking");
 	if (locking->lock < B_OK) {
 		status = locking->lock;
 		goto err2;
 	}
 
 	list_init(&locking->locks);
-	vnode->advisory_locking = locking;
-	return B_OK;
 
+	// We need to set the locking structure atomically - someone
+	// else might set one at the same time
+	do {
+		if (atomic_test_and_set((vint32 *)&vnode->advisory_locking, (addr_t)locking,
+				NULL) == NULL)
+			return B_OK;
+	} while (get_advisory_locking(vnode) == NULL);
+
+	status = B_OK;
+		// we delete the one we've just created, but nevertheless, the vnode
+		// does have a locking structure now
+
+	delete_sem(locking->lock);
 err2:
 	delete_sem(locking->wait_sem);
 err1:
@@ -953,31 +1012,32 @@ err1:
 }
 
 
-static inline void
-put_advisory_locking(struct advisory_locking *locking)
-{
-	release_sem(locking->lock);
-}
-
-
-static struct advisory_locking *
-get_advisory_locking(struct vnode *vnode)
-{
-	mutex_lock(&sVnodeMutex);
-
-	struct advisory_locking *locking = vnode->advisory_locking;
-	if (locking != NULL)
-		acquire_sem(locking->lock);
-
-	mutex_unlock(&sVnodeMutex);
-	return locking;
-}
-
+/**	Retrieves the first lock that has been set by the current team.
+ */
 
 static status_t
 get_advisory_lock(struct vnode *vnode, struct flock *flock)
 {
-	return B_ERROR;
+	struct advisory_locking *locking = get_advisory_locking(vnode);
+	if (locking == NULL)
+		return B_BAD_VALUE;
+
+	// TODO: this should probably get the flock by its file descriptor!
+	team_id team = team_get_current_team_id();
+	status_t status = B_BAD_VALUE;
+
+	struct advisory_lock *lock = NULL;
+	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+		if (lock->team == team) {
+			flock->l_start = lock->offset;
+			flock->l_len = lock->length;
+			status = B_OK;
+			break;
+		}
+	}
+
+	put_advisory_locking(locking);
+	return status;
 }
 
 
@@ -1022,26 +1082,21 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 
 	if (removeLocking) {
 		// we can remove the whole advisory locking structure; it's no longer used
-		mutex_lock(&sVnodeMutex);
-		locking = vnode->advisory_locking;
-		if (locking != NULL)
-			acquire_sem(locking->lock);
+		locking = get_advisory_locking(vnode);
+		if (locking != NULL) {
+			// the locking could have been changed in the mean time
+			if (list_is_empty(&locking->locks)) {
+				vnode->advisory_locking = NULL;
 
-		// the locking could have been changed in the mean time
-		if (list_is_empty(&locking->locks))
-			vnode->advisory_locking = NULL;
-		else {
-			removeLocking = false;
-			release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
+				// we've detached the locking from the vnode, so we can safely delete it
+				delete_sem(locking->lock);
+				delete_sem(locking->wait_sem);
+				free(locking);
+			} else {
+				// the locking is in use again
+				release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
+			}
 		}
-
-		mutex_unlock(&sVnodeMutex);
-	}
-	if (removeLocking) {
-		// we've detached the locking from the vnode, so we can safely delete it
-		delete_sem(locking->lock);
-		delete_sem(locking->wait_sem);
-		free(locking);
 	}
 
 	return B_OK;
@@ -1059,7 +1114,7 @@ acquire_advisory_lock(struct vnode *vnode, struct flock *flock, bool wait)
 
 restart:
 	// if this vnode has an advisory_locking structure attached,
-	// lock that one and search for any colliding lock
+	// lock that one and search for any colliding file lock
 	struct advisory_locking *locking = get_advisory_locking(vnode);
 	sem_id waitForLock = -1;
 
@@ -1101,21 +1156,16 @@ restart:
 
 	// install new lock
 
-	mutex_lock(&sVnodeMutex);
-
-	locking = vnode->advisory_locking;
+	locking = get_advisory_locking(vnode);
 	if (locking == NULL) {
+		// we need to create a new locking object
 		status = create_advisory_locking(vnode);
+		if (status < B_OK)
+			return status;
+
 		locking = vnode->advisory_locking;
+			// we own the locking object, so it can't go away
 	}
-
-	if (locking != NULL)
-		acquire_sem(locking->lock);
-
-	mutex_unlock(&sVnodeMutex);
-
-	if (status < B_OK)
-		return status;
 
 	struct advisory_lock *lock = (struct advisory_lock *)malloc(sizeof(struct advisory_lock));
 	if (lock == NULL) {
@@ -1132,7 +1182,7 @@ restart:
 	lock->shared = shared;
 
 	list_add_item(&locking->locks, lock);
-	release_sem(locking->lock);
+	put_advisory_locking(locking);
 
 	return status;
 }
@@ -2883,9 +2933,16 @@ vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 
 	// The cache could have been created in the meantime
 	if (vnode->cache == NULL) {
-		if (allocate)
+		if (allocate) {
+			bool wasBusy = vnode->busy;
+			vnode->busy = true;
+			mutex_unlock(&sVnodeMutex);
+
 			status = vm_create_vnode_cache(vnode, &vnode->cache);
-		else
+
+			mutex_lock(&sVnodeMutex);
+			vnode->busy = wasBusy;
+		} else
 			status = B_BAD_VALUE;
 	} else
 		vm_cache_acquire_ref(vnode->cache);
