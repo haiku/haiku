@@ -21,8 +21,6 @@
 
 #define VERSION "0.3"
 
-#define INFO1 "Intel PRO/1000 Family Driver. Version " VERSION " Build " __DATE__ " "__TIME__
-#define INFO2 "Copyright (c) 2001-2003, Intel Corporation. All rights reserved."
-#define INFO3 "Copyright (c) 2004 Marcus Overhagen. All rights reserved."
+#define INFO "Intel PRO/1000 Family Driver. Version " VERSION " Build " __DATE__ " "__TIME__
 
 #endif

@@ -113,9 +113,7 @@ init_driver(void)
 	load_driver_symbols("ipro1000");
 #endif
 	
-	dprintf("ipro1000: " INFO1 "\n");
-	dprintf("ipro1000: " INFO2 "\n");
-	dprintf("ipro1000: " INFO3 "\n");
+	dprintf("ipro1000: " INFO "\n");
 	
 	item = (pci_info *)malloc(sizeof(pci_info));
 	if (!item)

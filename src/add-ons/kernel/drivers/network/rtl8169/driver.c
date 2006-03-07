@@ -75,7 +75,6 @@ init_driver(void)
 
 	dprintf(INFO1"\n");
 	dprintf(INFO2"\n");
-	dprintf(INFO3"\n");
 
 	item = (pci_info *)malloc(sizeof(pci_info));
 	if (!item)
