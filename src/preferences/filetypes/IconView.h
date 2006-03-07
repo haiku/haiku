@@ -11,7 +11,8 @@
 
 class IconView : public BView {
 	public:
-		IconView(BRect rect, const char* name);
+		IconView(BRect rect, const char* name,
+			uint32 resizeMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		virtual ~IconView();
 
 		virtual void AttachedToWindow();

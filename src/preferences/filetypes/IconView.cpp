@@ -15,8 +15,8 @@
 #include <Resources.h>
 
 
-IconView::IconView(BRect rect, const char* name)
-	: BView(rect, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
+IconView::IconView(BRect rect, const char* name, uint32 resizeMode)
+	: BView(rect, name, resizeMode, B_WILL_DRAW),
 	fIcon(NULL),
 	fHeapIcon(NULL)
 {

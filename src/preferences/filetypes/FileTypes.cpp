@@ -5,9 +5,10 @@
 
 
 #include "ApplicationTypesWindow.h"
+#include "ApplicationTypeWindow.h"
 #include "FileTypes.h"
-#include "FileTypeWindow.h"
 #include "FileTypesWindow.h"
+#include "FileTypeWindow.h"
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -129,7 +130,14 @@ FileTypes::RefsReceived(BMessage *message)
 		// remove application from list
 		message->RemoveData("refs", --index);
 
-		printf("found app: %s\n", ref.name);
+		// There are some refs left that want to be handled by the type window
+		BPoint point(100.0f + 20.0f * fTypeWindowCount, 110.0f + 20.0f * fTypeWindowCount);
+
+		BWindow* window = new ApplicationTypeWindow(point, entry);
+		window->Show();
+
+		fTypeWindowCount++;
+		fWindowCount++;
 	}
 
 	if (message->FindRef("refs", &ref) != B_OK)
