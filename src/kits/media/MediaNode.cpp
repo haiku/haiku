@@ -359,6 +359,8 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	
 	size = read_port_etc(ControlPort(), &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size <= 0) {
+		if (size == 0 && message == 0)
+			return B_OK; // a null message was received (to unblock the read)
 		if (size != B_TIMED_OUT)
 			ERROR("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
 		return size; // returns the error code
