@@ -8,6 +8,7 @@
 #include "FileTypeWindow.h"
 #include "IconView.h"
 #include "PreferredAppMenu.h"
+#include "TypeListWindow.h"
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -26,6 +27,7 @@
 
 const uint32 kMsgTypeEntered = 'type';
 const uint32 kMsgSelectType = 'sltp';
+const uint32 kMsgTypeSelected = 'tpsd';
 const uint32 kMsgSameTypeAs = 'stpa';
 const uint32 kMsgSameTypeAsOpened = 'stpO';
 
@@ -365,6 +367,24 @@ FileTypeWindow::MessageReceived(BMessage* message)
 			fCommonType = fTypeControl->Text();
 			_AdoptType();
 			break;
+
+		case kMsgSelectType:
+		{
+			BWindow* window = new TypeListWindow(fCommonType.String(),
+				kMsgTypeSelected, this);
+			window->Show();
+			break;
+		}
+		case kMsgTypeSelected:
+		{
+			const char* type;
+			if (message->FindString("type", &type) == B_OK) {
+				fCommonType = type;
+				fTypeControl->SetText(type);
+				_AdoptType();
+			}
+			break;
+		}
 
 		case kMsgSameTypeAs:
 		{

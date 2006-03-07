@@ -384,6 +384,10 @@ AttributeWindow::MessageReceived(BMessage* message)
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
+
+		default:
+			BWindow::MessageReceived(message);
+			break;
 	}
 }
 
