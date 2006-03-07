@@ -13,6 +13,7 @@
 #include <MenuItem.h>
 #include <Mime.h>
 #include <NodeInfo.h>
+#include <String.h>
 
 #include <stdio.h>
 #include <string.h>
