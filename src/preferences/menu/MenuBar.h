@@ -10,13 +10,13 @@ class FontSizeMenu;
 class MenuBar : public BMenuBar {
 public:
 			MenuBar();
+	virtual	void	AttachedToWindow();
 		void	set_menu();
 		void	build_menu();
 	virtual void	Update();
 	virtual void 	FrameResized(float width, float height);
-	
-	BRect 			menu_rect;
-	BRect			rect;
+
+private:	
 	menu_info 		info;
 	
 	//seperator submenu

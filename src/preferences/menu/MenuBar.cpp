@@ -21,6 +21,14 @@ MenuBar::MenuBar()
 
 
 void
+MenuBar::AttachedToWindow()
+{
+	BMenuBar::AttachedToWindow();
+	SetTargetForItems(Window());
+}
+
+
+void
 MenuBar::build_menu()
 {
 	// font and font size menus
@@ -40,27 +48,24 @@ MenuBar::build_menu()
 	colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_MSG), 0, 0);
 
 	// create the separator menu
+	// TODO: Use B_ITEMS_IN_MATRIX here
 	separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);
 	separatorStyleMenu->SetRadioMode(true);
 	BMessage *msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 0);
-	separatorStyleZero = new BitmapMenuItem("separator0", msg,
+	separatorStyleZero = new BitmapMenuItem("            ", msg,
 						BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
 	msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 1);
-	separatorStyleOne = new BitmapMenuItem("separator1", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
+	separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));
 	msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 2);
-	separatorStyleTwo = new BitmapMenuItem("separator2", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
-	if (info.separator == 0)
-		separatorStyleZero->SetMarked(true);
-	if (info.separator == 1)
-		separatorStyleOne->SetMarked(true);
-	if (info.separator == 2)
-		separatorStyleTwo->SetMarked(true);
+	separatorStyleTwo = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP2"));
+	
 	separatorStyleMenu->AddItem(separatorStyleZero);
 	separatorStyleMenu->AddItem(separatorStyleOne);
 	separatorStyleMenu->AddItem(separatorStyleTwo);
+	separatorStyleMenu->SetRadioMode(true);
 	separatorStyleMenu->SetTargetForItems(Window());
 
 	// Add items to menubar	
@@ -75,7 +80,6 @@ MenuBar::build_menu()
 	AddSeparatorItem();
 	AddItem(ctlAsShortcutItem);
 	AddItem(altAsShortcutItem);
-	SetTargetForItems(Window());
 }
 
 void
@@ -100,6 +104,13 @@ MenuBar::set_menu()
                
        	free(chars); 
        	free(keys);
+
+	if (info.separator == 0)
+		separatorStyleZero->SetMarked(true);
+	else if (info.separator == 1)
+		separatorStyleOne->SetMarked(true);
+	else if (info.separator == 2)
+		separatorStyleTwo->SetMarked(true);
 }
 
 
