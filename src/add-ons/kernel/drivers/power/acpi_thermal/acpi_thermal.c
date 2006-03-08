@@ -36,6 +36,7 @@ void enumerate_devices (char* parent)
 			if (td != NULL) {
 				td->open = 0;
 				td->num = device_count;
+				
 				dprintf("acpi_thermal: Adding thermal device from: %s\n", result);
 				td->path = malloc(sizeof(char) * strlen(result) + 1);
 				strcpy(td->path, result);
@@ -139,6 +140,7 @@ acpi_thermal_open (const char *name, uint32 flags, void** cookie)
 static status_t
 acpi_thermal_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
+	int i;
 	acpi_thermal_type therm_info;
 	if (*num_bytes < 1)
 		return B_IO_ERROR;
@@ -149,15 +151,36 @@ acpi_thermal_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 		sprintf((char *)buf, "ACPI Thermal Device %u\n", therm_info.devnum);
 		*num_bytes = strlen((char *)buf);
 	
-		sprintf((char *)buf + *num_bytes, "  Critical Temperature: %lu.%lu K\n", (therm_info.critical_temp / 10), (therm_info.critical_temp % 10));
+		sprintf((char *)buf + *num_bytes, "  Critical Temperature: %lu.%lu K\n", 
+				(therm_info.critical_temp / 10), (therm_info.critical_temp % 10));
 		*num_bytes = strlen((char *)buf);
 		
-		sprintf((char *)buf + *num_bytes, "  Current Temperature: %lu.%lu K\n", (therm_info.current_temp / 10), (therm_info.current_temp % 10));
+		sprintf((char *)buf + *num_bytes, "  Current Temperature: %lu.%lu K\n", 
+				(therm_info.current_temp / 10), (therm_info.current_temp % 10));
 		*num_bytes = strlen((char *)buf);
 	
 		if (therm_info.hot_temp > 0) {
-			sprintf((char *)buf, "Hot Temperature: %lu.%lu K\n", (therm_info.hot_temp / 10), (therm_info.hot_temp % 10));
+			sprintf((char *)buf + *num_bytes, "  Hot Temperature: %lu.%lu K\n", 
+					(therm_info.hot_temp / 10), (therm_info.hot_temp % 10));
 			*num_bytes = strlen((char *)buf);
+		}
+
+		if (therm_info.passive_package) {
+/* Incomplete. 
+     Needs to obtain acpi global lock.
+     acpi_object_type needs Reference entry (with Handle that can be resolved)
+     what you see here is _highly_ unreliable.
+*/
+/*      		if (therm_info.passive_package->data.package.count > 0) {
+				sprintf((char *)buf + *num_bytes, "  Passive Devices\n");
+				*num_bytes = strlen((char *)buf);
+				for (i = 0; i < therm_info.passive_package->data.package.count; i++) {
+					sprintf((char *)buf + *num_bytes, "    Processor: %lu\n", therm_info.passive_package->data.package.objects[i].data.processor.cpu_id);
+					*num_bytes = strlen((char *)buf);
+				}
+			}
+*/
+			free(therm_info.passive_package);
 		}
 	} else {
 		*num_bytes = 0;
@@ -178,16 +201,18 @@ acpi_thermal_control (void* cookie, uint32 op, void* arg, size_t len)
 	status_t err = B_ERROR;
 	
 	thermal_dev *td = (thermal_dev *)cookie;
+	char objname[255];
 	acpi_thermal_type *att = NULL;
 	
+	size_t bufsize = sizeof(acpi_object_type);
 	acpi_object_type buf;
-	size_t bufsize = sizeof(buf);
-
+	
 	switch (op) {
 		case drvOpGetThermalType: {
 			dprintf("acpi_thermal: GetThermalType()\n");
 			att = (acpi_thermal_type *)arg;
 			
+			// Read basic temperature thresholds.
 			att->devnum = td->num;
 			err = acpi->evaluate_method(td->path, "_CRT", &buf, bufsize, NULL, 0);
 			att->critical_temp = buf.data.integer;
@@ -201,9 +226,10 @@ acpi_thermal_control (void* cookie, uint32 op, void* arg, size_t len)
 			}
 			dprintf("acpi_thermal: GotBasicTemperatures()\n");
 			
-			// TODO: Fill this out
-			att->passive_count = 0;
+			// Read Passive Cooling devices
 			att->passive_package = NULL;
+			sprintf(objname, "%s._PSL", td->path);
+			err = acpi->get_object(objname, &(att->passive_package));
 			
 			att->active_count = 0;
 			att->active_devices = NULL;

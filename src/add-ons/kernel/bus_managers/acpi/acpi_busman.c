@@ -23,6 +23,8 @@ status_t get_next_entry (uint32 object_type, const char *base, char *result, siz
 status_t get_device (const char *hid, uint32 index, char *result);
 
 status_t get_device_hid (const char *path, char *hid);
+status_t get_object(const char *path, acpi_object_type **return_value);
+status_t get_object_typed(const char *path, acpi_object_type **return_value, uint32 object_type);
 uint32 get_object_type (const char *path);
 
 status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len);
@@ -50,6 +52,8 @@ struct acpi_module_info acpi_module = {
 	get_next_entry,
 	get_device,
 	get_device_hid,
+	get_object,
+	get_object_typed,
 	get_object_type,
 	evaluate_object,
 	evaluate_method,
@@ -249,6 +253,42 @@ uint32 get_object_type (const char *path) {
 		
 	AcpiGetType(handle,&type);
 	return type;
+}
+
+status_t get_object (const char *path, acpi_object_type **return_value) {
+	ACPI_HANDLE handle;
+	ACPI_BUFFER buffer;
+	ACPI_STATUS status;
+	
+	status = AcpiGetHandle(NULL, path, &handle);
+	if (status != AE_OK) {
+		return B_ENTRY_NOT_FOUND;
+	}
+	buffer.Pointer = NULL;
+	buffer.Length = ACPI_ALLOCATE_BUFFER;
+	
+	status = AcpiEvaluateObject(handle, NULL, NULL, &buffer);
+	
+	*return_value = buffer.Pointer;
+	return (status == AE_OK) ? B_OK : B_ERROR;
+}
+
+status_t get_object_typed (const char *path, acpi_object_type **return_value, uint32 object_type) {
+	ACPI_HANDLE handle;
+	ACPI_BUFFER buffer;
+	ACPI_STATUS status;
+	
+	status = AcpiGetHandle(NULL, path, &handle);
+	if (status != AE_OK) {
+		return B_ENTRY_NOT_FOUND;
+	}
+	buffer.Pointer = NULL;
+	buffer.Length = ACPI_ALLOCATE_BUFFER;
+	
+	status = AcpiEvaluateObjectTyped(handle, NULL, NULL, &buffer, object_type);
+	
+	*return_value = buffer.Pointer;
+	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
 status_t evaluate_object (const char *object, acpi_object_type *return_value, size_t buf_len) {

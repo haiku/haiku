@@ -26,8 +26,9 @@ struct acpi_thermal_type {
 	/* Optional HOT temp, S4 sleep threshold */
 	uint32 hot_temp;
 	
-	/* List of acpi_objects_types assigned to the passive device list */
-	uint32 passive_count;
+	/* acpi_objects_type evaluated from _PSL 
+	   if != NULL, client must free()
+	*/
 	acpi_object_type *passive_package;
 	
 	/* List of acpi_thermal_active_objects that can actively manage this thermal device */
