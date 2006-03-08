@@ -366,6 +366,15 @@ get_port_msg(int32 code, size_t bufferSize)
 }
 
 
+/**	You need to own the port's lock when calling this function */
+
+static bool
+is_port_closed(int32 slot)
+{
+	return sPorts[slot].capacity == 0;
+}
+
+
 int32
 port_max_ports(void)
 {
@@ -772,13 +781,15 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
 
-	if (sPorts[slot].id != id) {
+	if (sPorts[slot].id != id
+		|| (is_port_closed(slot) && list_is_empty(&sPorts[slot].msg_queue))) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		TRACE(("get_buffer_size_etc: invalid port_id %ld\n", id));
+		TRACE(("port_buffer_size_etc(): %s port %ld\n",
+			sPorts[slot].id == id ? "closed" : "invalid", id));
 		return B_BAD_PORT_ID;
 	}
-	
+
 	cachedSem = sPorts[slot].read_sem;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
@@ -891,10 +902,12 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
 
-	if (sPorts[slot].id != id) {
+	if (sPorts[slot].id != id
+		|| (is_port_closed(slot) && list_is_empty(&sPorts[slot].msg_queue))) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		TRACE(("read_port_etc: invalid port_id %ld\n", id));
+		TRACE(("read_port_etc(): %s port %ld\n",
+			sPorts[slot].id == id ? "closed" : "invalid", id));
 		return B_BAD_PORT_ID;
 	}
 	// store sem_id in local variable
@@ -1017,7 +1030,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].capacity == 0) {
+	if (is_port_closed(slot)) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
 		TRACE(("write_port_etc: port %ld closed\n", id));
