@@ -9,7 +9,7 @@
 #include <string.h>
 
 
-/* A full port can't be written to. Thus the write from thread should block, until main thread reads.
+/*
  *
  */
 
