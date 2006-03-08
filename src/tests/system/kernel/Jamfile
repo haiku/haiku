@@ -3,6 +3,14 @@ SubDir HAIKU_TOP src tests system kernel ;
 UsePrivateHeaders kernel ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
+SimpleTest port_close_test_1 :
+	port_close_test_1.cpp
+	;
+
+SimpleTest port_close_test_2 :
+	port_close_test_2.cpp
+	;
+
 SimpleTest transfer_area_test :
 	transfer_area_test.cpp
 	;
