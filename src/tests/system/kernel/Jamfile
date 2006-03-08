@@ -11,6 +11,10 @@ SimpleTest port_close_test_2 :
 	port_close_test_2.cpp
 	;
 
+SimpleTest port_delete_test :
+	port_delete_test.cpp
+	;
+
 SimpleTest transfer_area_test :
 	transfer_area_test.cpp
 	;
