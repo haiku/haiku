@@ -1345,8 +1345,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		{
 			font_height fh;
 			GetFontHeight(&fh);
-			frame = BRect(0.0f, 0.0f, 0.0f,	
-				ceilf(fh.ascent) + ceilf(fh.descent) + fPad.top + fPad.bottom);	
+			frame = BRect(0.0f, 0.0f, 0.0f,	ceilf(fh.ascent + fh.descent + fPad.top + fPad.bottom));	
 
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
 				item = ItemAt(i);
@@ -1364,8 +1363,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;			
-
-			frame.right = ceilf(frame.right) + 8.0f;
+			
+			frame.right = ceilf(frame.right);// + 8.0f;
 			break;
 		}
 
