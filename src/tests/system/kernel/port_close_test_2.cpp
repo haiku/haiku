@@ -13,7 +13,7 @@ main()
 {
 	port_id id;
 	status_t s;
-	size_t size;
+	ssize_t size;
 	int32 code;
 	
 	char data[100];

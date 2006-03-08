@@ -15,6 +15,42 @@ SimpleTest port_delete_test :
 	port_delete_test.cpp
 	;
 
+SimpleTest port_wakeup_test_1 :
+	port_wakeup_test_1.cpp
+	;
+
+SimpleTest port_wakeup_test_2 :
+	port_wakeup_test_2.cpp
+	;
+
+SimpleTest port_wakeup_test_3 :
+	port_wakeup_test_3.cpp
+	;
+
+SimpleTest port_wakeup_test_4 :
+	port_wakeup_test_4.cpp
+	;
+
+SimpleTest port_wakeup_test_5 :
+	port_wakeup_test_5.cpp
+	;
+
+SimpleTest port_wakeup_test_6 :
+	port_wakeup_test_6.cpp
+	;
+
+SimpleTest port_wakeup_test_7 :
+	port_wakeup_test_7.cpp
+	;
+
+SimpleTest port_wakeup_test_8 :
+	port_wakeup_test_8.cpp
+	;
+
+SimpleTest port_wakeup_test_9 :
+	port_wakeup_test_9.cpp
+	;
+
 SimpleTest transfer_area_test :
 	transfer_area_test.cpp
 	;
