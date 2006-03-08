@@ -544,7 +544,6 @@ BListItem*
 BListView::RemoveItem(int32 index)
 {
 	BListItem *item = ItemAt(index);
-
 	if (!item)
 		return NULL;
 
@@ -570,7 +569,7 @@ BListView::RemoveItem(int32 index)
 bool
 BListView::RemoveItem(BListItem *item)
 {
-	return RemoveItem(IndexOf(item)) != NULL;
+	return BListView::RemoveItem(IndexOf(item)) != NULL;
 }
 
 // RemoveItems
@@ -585,7 +584,7 @@ BListView::RemoveItems(int32 index, int32 count)
 
 	// TODO: very bad for performance!!
 	while (count--)
-		RemoveItem(index);
+		BListView::RemoveItem(index);
 
 	return true;
 }

@@ -250,33 +250,14 @@ BOutlineListView::AddList(BList* newItems, int32 fullListIndex)
 bool
 BOutlineListView::RemoveItem(BListItem* item)
 {
-	if (!FullListHasItem(item))
-		return false;
-
-	fFullList.RemoveItem(item);
-	if (item->fVisible)
-		BListView::RemoveItem(item);
-
-	// TODO: remove children
-
-	return true;
+	return _RemoveItem(item, FullListIndexOf(item)) != NULL;
 }
 
 
 BListItem*
-BOutlineListView::RemoveItem(int32 fullListIndex)
+BOutlineListView::RemoveItem(int32 fullIndex)
 {
-	BListItem* item = FullListItemAt(fullListIndex);
-	if (item == NULL)
-		return NULL;
-
-	fFullList.RemoveItem(fullListIndex);
-	if (item->fVisible)
-		BListView::RemoveItem(item);
-
-	// TODO: remove children
-
-	return item;
+	return _RemoveItem(FullListItemAt(fullIndex), fullIndex);
 }
 
 
@@ -401,9 +382,9 @@ BOutlineListView::Expand(BListItem* item)
 	item->fExpanded = true;
 
 	uint32 level = item->fLevel;
-	uint32 fullIndex = FullListIndexOf(item);
-	uint32 index = IndexOf(item) + 1;
-	uint32 count = FullListCountItems() - fullIndex - 1;
+	int32 fullIndex = FullListIndexOf(item);
+	int32 index = IndexOf(item) + 1;
+	int32 count = FullListCountItems() - fullIndex - 1;
 	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
 	BFont font;
@@ -415,6 +396,12 @@ BOutlineListView::Expand(BListItem* item)
 			break;
 
 		if (!item->IsItemVisible()) {
+			// fix selection hints
+			if (index <= fFirstSelected)
+				fFirstSelected++;
+			if (index <= fLastSelected)
+				fLastSelected++;
+
 			fList.AddItem(item, index++);
 			item->Update(this, &font);
 			item->SetItemVisible(true);
@@ -445,11 +432,13 @@ BOutlineListView::Collapse(BListItem* item)
 	item->fExpanded = false;
 
 	uint32 level = item->fLevel;
-	uint32 fullIndex = FullListIndexOf(item);
-	uint32 count = FullListCountItems() - fullIndex - 1;
+	int32 fullIndex = FullListIndexOf(item);
+	int32 index = IndexOf(item);
+	int32 max = FullListCountItems() - fullIndex - 1;
+	int32 count = 0;
 	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
-	while (count-- > 0) {
+	while (max-- > 0) {
 		item = items[0];
 		if (item->fLevel <= level)
 			break;
@@ -457,9 +446,27 @@ BOutlineListView::Collapse(BListItem* item)
 		if (item->IsItemVisible()) {
 			fList.RemoveItem(item);
 			item->SetItemVisible(false);
+			if (item->IsSelected())
+				item->Deselect();
+
+			count++;
 		}
 
 		items++;
+	}
+
+	// fix selection hints
+	// TODO: revise for multi selection lists
+	if (index < fFirstSelected) {
+		if (index + count < fFirstSelected) {
+			fFirstSelected -= count;
+			fLastSelected -= count;
+		} else {
+			// select top item
+			//fFirstSelected = fLastSelected = index;
+			//item->Select();
+			Select(index);
+		}
 	}
 
 	_FixupScrollBar();
@@ -850,10 +857,45 @@ BOutlineListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 }
 
 
+/*!
+	\brief Removes a single item from the list and all of its children.
+
+	Unlike the BeOS version, this one will actually delete the children, too,
+	as there should be no reference left to them. This may cause problems for
+	applications that actually take the misbehaviour of the Be classes into
+	account.
+*/
 BListItem *
-BOutlineListView::RemoveCommon(int32 fullListIndex)
+BOutlineListView::_RemoveItem(BListItem* item, int32 fullIndex)
 {
-	return NULL;
+	if (item == NULL || fullIndex < 0 || fullIndex >= FullListCountItems())
+		return NULL;
+
+	if (item->IsItemVisible()) {
+		// remove children, too
+		uint32 level = item->OutlineLevel();
+		int32 max = FullListCountItems() - fullIndex - 1;
+		BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
+
+		while (max-- > 0) {
+			BListItem* subItem = items[0];
+			if (subItem->fLevel <= level)
+				break;
+
+			if (subItem->IsItemVisible())
+				BListView::RemoveItem(subItem);
+
+			fFullList.RemoveItem(fullIndex + 1);
+
+			// TODO: this might be problematic, see comment above
+			delete subItem;
+		}
+
+		BListView::RemoveItem(item);
+	}
+
+	fFullList.RemoveItem(fullIndex);
+	return item;
 }
 
 
