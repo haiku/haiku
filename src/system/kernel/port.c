@@ -389,8 +389,7 @@ port_used_ports(void)
 }
 
 
-//	#pragma mark -
-// public kernel API
+//	#pragma mark - public kernel API
 
 
 port_id		
@@ -516,8 +515,9 @@ err1:
 status_t
 close_port(port_id id)
 {
+	sem_id readSem, writeSem;
 	cpu_status state;
-	int slot;
+	int32 slot;
 
 	TRACE(("close_port(id = %ld)\n", id));
 
@@ -537,11 +537,17 @@ close_port(port_id id)
 		return B_BAD_PORT_ID;
 	}
 
-	// mark port to disable writing
+	// mark port to disable writing - deleting the semaphores will
+	// wake up waiting read/writes
 	sPorts[slot].capacity = 0;
+	readSem = sPorts[slot].read_sem;
+	writeSem = sPorts[slot].write_sem;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
+
+	delete_sem(readSem);
+	delete_sem(writeSem);
 
 	return B_NO_ERROR;
 }
@@ -555,7 +561,7 @@ delete_port(port_id id)
 	const char *name;
 	struct list list;
 	port_msg *msg;
-	int slot;
+	int32 slot;
 
 	TRACE(("delete_port(id = %ld)\n", id));
 
@@ -616,7 +622,7 @@ find_port(const char *name)
 {
 	port_id portFound = B_NAME_NOT_FOUND;
 	cpu_status state;
-	int i;
+	int32 i;
 
 	TRACE(("find_port(name = \"%s\")\n", name));
 
@@ -771,7 +777,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	status_t status;
 	port_msg *msg;
 	ssize_t size;
-	int slot;
+	int32 slot;
 
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
@@ -798,12 +804,11 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	// block if no message, or, if B_TIMEOUT flag set, block with timeout
 
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
-	if (status == B_BAD_SEM_ID) {
-		// somebody deleted the port
-		return B_BAD_PORT_ID;
-	}
-	if (status != B_OK)
+	if (status != B_OK && status != B_BAD_SEM_ID)
 		return status;
+
+	// in case of B_BAD_SEM_ID, the port might have been closed but not yet
+	// deleted, ie. there could still be messages waiting for us
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -817,10 +822,13 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 
 	// determine tail & get the length of the message
 	msg = list_get_first_item(&sPorts[slot].msg_queue);
-	if (msg == NULL)
-		panic("port %ld: no messages found\n", sPorts[slot].id);
+	if (msg == NULL) {
+		if (status == B_OK)
+			panic("port %ld: no messages found\n", sPorts[slot].id);
 
-	size = msg->size;
+		size = B_BAD_PORT_ID;
+	} else
+		size = msg->size;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
@@ -837,8 +845,8 @@ ssize_t
 port_count(port_id id)
 {
 	cpu_status state;
-	int32 count;
-	int slot;
+	int32 count = 0;
+	int32 slot;
 
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
@@ -855,15 +863,22 @@ port_count(port_id id)
 		return B_BAD_PORT_ID;
 	}
 
-	get_sem_count(sPorts[slot].read_sem, &count);
-	// do not return negative numbers
-	if (count < 0)
-		count = 0;
+	if (get_sem_count(sPorts[slot].read_sem, &count) == B_OK) {
+		// do not return negative numbers
+		if (count < 0)
+			count = 0;
+	} else {
+		// the port might have been closed - we need to actually count the messages
+		void *message = NULL;
+		while ((message = list_get_next_item(&sPorts[slot].msg_queue, message)) != NULL) {
+			count++;
+		}
+	}
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
 
-	// return count of messages (sem_count)
+	// return count of messages
 	return count;
 }
 
@@ -920,12 +935,11 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
 		// get 1 entry from the queue, block if needed
 
-	if (status == B_BAD_SEM_ID) {
-		// somebody deleted the port
-		return B_BAD_PORT_ID;
-	}
-	if (status != B_OK)
+	if (status != B_OK && status != B_BAD_SEM_ID)
 		return status;
+
+	// in case of B_BAD_SEM_ID, the port might have been closed but not yet
+	// deleted, ie. there could still be messages waiting for us
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -939,8 +953,15 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	}
 
 	msg = list_get_first_item(&sPorts[slot].msg_queue);
-	if (msg == NULL)
-		panic("port %ld: no messages found", sPorts[slot].id);
+	if (msg == NULL) {
+		if (status == B_OK)
+			panic("port %ld: no messages found", sPorts[slot].id);
+
+		// the port has obviously been closed, but no messages are left anymore
+		RELEASE_PORT_LOCK(sPorts[slot]);
+		restore_interrupts(state);
+		return B_BAD_PORT_ID;
+	}
 
 	list_remove_link(msg);
 
@@ -1047,7 +1068,7 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 		// get 1 entry from the queue, block if needed
 
 	if (status == B_BAD_SEM_ID) {
-		// somebody deleted the port
+		// somebody deleted or closed the port
 		return B_BAD_PORT_ID;
 	}
 	if (status != B_OK)
@@ -1156,10 +1177,7 @@ set_port_owner(port_id id, team_id team)
 }
 
 
-//	#pragma mark -
-/* 
- *	user level ports
- */
+//	#pragma mark - syscalls
 
 
 port_id
