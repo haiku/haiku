@@ -1417,6 +1417,8 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
  *	\a path must not be NULL.
  *	If it returns successfully, \a path contains the name of the last path
  *	component.
+ *	Note, this reduces the ref_count of the starting \a vnode, no matter if
+ *	it is successful or not!
  */
 
 static status_t
@@ -1429,8 +1431,10 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 
-	if (path == NULL)
+	if (path == NULL) {
+		put_vnode(vnode);
 		return B_BAD_VALUE;
+	}
 
 	while (true) {
 		struct vnode *nextVnode;
@@ -2721,10 +2725,10 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		moduleName = nextPath;
 
 		status = vnode_path_to_vnode(dir, path, true, 0, &file, NULL, &type);
-		if (status < B_OK)
-			goto err;
-
-		put_vnode(dir);
+		if (status < B_OK) {
+			// vnode_path_to_vnode() has already released the reference to dir
+			return status;
+		}
 
 		if (S_ISDIR(type)) {
 			// goto the next directory
@@ -2742,6 +2746,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		} else {
 			TRACE(("vfs_get_module_path(): something is strange here: %d...\n", type));
 			status = B_ERROR;
+			dir = file;
 			goto err;
 		}
 	}
@@ -2934,6 +2939,8 @@ vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 	// The cache could have been created in the meantime
 	if (vnode->cache == NULL) {
 		if (allocate) {
+			// TODO: actually the vnode need to be busy already here, or
+			//	else this won't work...
 			bool wasBusy = vnode->busy;
 			vnode->busy = true;
 			mutex_unlock(&sVnodeMutex);
@@ -3781,8 +3788,8 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 	if (strcmp(entry->d_name, "..") == 0
 		&& parent->mount->root_vnode == parent
 		&& parent->mount->covers_vnode) {
-
-		inc_vnode_ref_count(parent);	// vnode_path_to_vnode() puts the node
+		inc_vnode_ref_count(parent);
+			// vnode_path_to_vnode() puts the node
 
 		struct vnode *vnode;
 		status_t status = vnode_path_to_vnode(parent, "..", false, 0, &vnode,
@@ -5381,6 +5388,12 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		vnode->busy = true;
+
+		if (vnode->ref_count == 0) {
+			// this vnode has been unused before
+			list_remove_item(&sUnusedVnodeList, vnode);
+			sUnusedVnodes--;
+		}
 	}
 
 	mutex_unlock(&sVnodeMutex);
