@@ -32,62 +32,30 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#ifndef __AUTOMOUNTER_SETTINGS__
-#define __AUTOMOUNTER_SETTINGS__
+#ifndef AUTOMOUNTER_SETTINGS_H
+#define AUTOMOUNTER_SETTINGS_H
+
 
 #include <Window.h>
-#include <Box.h>
 
-class BCheckBox;
-class BRadioButton;
-class BButton;
 
 namespace BPrivate {
 
 class AutoMounter;
 
-class AutomountSettingsPanel : public BBox {
-public:
-	AutomountSettingsPanel(BRect, BMessage *, AutoMounter *);
-	virtual ~AutomountSettingsPanel();
-
-protected:
-	virtual void MessageReceived(BMessage *);
-	virtual void AttachedToWindow();
-	
-private:
-	void SendSettings(bool rescan);
-	
-	BRadioButton *initialDontMountCheck;
-	BRadioButton *initialMountAllBFSCheck;
-	BRadioButton *initialMountAllCheck;
-	BRadioButton *initialMountRestoreCheck;
-
-	BRadioButton *scanningDisabledCheck;
-	BRadioButton *autoMountAllBFSCheck;
-	BRadioButton *autoMountAllCheck;
-	
-	BButton *fDone;
-	BButton *fMountAllNow;
-
-	AutoMounter *fTarget;
-	
-	typedef BBox _inherited;
-};
-
 class AutomountSettingsDialog : public BWindow {
-public:
-	AutomountSettingsDialog(BMessage *settings, AutoMounter *);
-	virtual ~AutomountSettingsDialog();
+	public:
+		AutomountSettingsDialog(BMessage *settings, AutoMounter *);
+		virtual ~AutomountSettingsDialog();
 
-	static void RunAutomountSettings(AutoMounter *);
+		static void RunAutomountSettings(AutoMounter *);
 
-private:
-	static AutomountSettingsDialog *oneCopyOnly;
+	private:
+		static AutomountSettingsDialog *sOneCopyOnly;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// AUTOMOUNTER_SETTINGS_H

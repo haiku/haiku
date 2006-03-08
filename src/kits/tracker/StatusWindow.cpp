@@ -140,7 +140,7 @@ BStatusWindow::BStatusWindow()
 	BRect bounds(Bounds());
 
 	BView *view = new BView(bounds, "BackView", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(216, 216, 216);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
 	Run();
