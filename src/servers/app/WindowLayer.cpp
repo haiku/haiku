@@ -1298,7 +1298,7 @@ WindowLayer::InWorkspace(int32 index) const
 		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
 		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
 			WindowLayer* window = fSubsets.ItemAt(i);
-			if (window->InWorkspace(index))
+			if (!window->IsHidden() && window->InWorkspace(index))
 				return true;
 		}
 	}
