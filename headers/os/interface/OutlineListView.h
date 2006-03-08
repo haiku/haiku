@@ -116,7 +116,7 @@ class BOutlineListView : public BListView {
 		void				_DestructTree(BList* tree);
 		BList*				_BuildTree(BListItem* underItem, int32& index);
 
-		BListItem*			RemoveCommon(int32 fullListIndex);
+		BListItem*			_RemoveItem(BListItem* item, int32 fullListIndex);
 		BListItem*			RemoveOne(int32 fullListIndex);
 
 		static void			TrackInLatchItem(void *);
