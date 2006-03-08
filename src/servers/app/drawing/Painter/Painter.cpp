@@ -1446,7 +1446,7 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 				// for example in the nn filter (hm), or in the
 				// scanline generator (better)
 				// maybe we can use an optimized version
-				BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGB32);
+				BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 				status_t err = temp.ImportBits(srcBuffer.buf(),
 											   srcBuffer.height() * srcBuffer.stride(),
 											   srcBuffer.stride(),
