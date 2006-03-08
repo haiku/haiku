@@ -1476,9 +1476,9 @@ InputServer::_SanitizeEvents(EventList& events)
 				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
 					fKeyInfo.key_states[KEY_Spacebar >> 3]));
 
+				int8 byte;
 				if ((fKeyInfo.modifiers & B_COMMAND_KEY) != 0
-					&& (fKeyInfo.key_states[KEY_Spacebar >> 3]
-						& (1 << (7 - (KEY_Spacebar % 8))))) {
+					&& event->FindInt8("byte", &byte) == B_OK && byte == ' ') {
 					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
 
 					// this event isn't sent to the user
@@ -1526,7 +1526,7 @@ InputServer::_MethodizeEvents(EventList& events)
 
 	if (!fInputMethodAware) {
 		// special handling for non-input-method-aware views
-		for (int32 i = count; i < newCount; i++) {
+		for (int32 i = 0; i < newCount; i++) {
 			BMessage* event = events.ItemAt(i);
 
 			if (event->what != B_INPUT_METHOD_EVENT)
@@ -1536,32 +1536,29 @@ InputServer::_MethodizeEvents(EventList& events)
 
 			int32 opcode;
 			if (event->FindInt32("be:opcode", &opcode) == B_OK) {
-				if (fInputMethodWindow && opcode == B_INPUT_METHOD_STOPPED) {
-					fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
-					fInputMethodWindow = NULL;
-					continue;
-				}
 				if (fInputMethodWindow == NULL
 					&& opcode == B_INPUT_METHOD_STARTED)
 					fInputMethodWindow = new (nothrow) BottomlineWindow();
-			}
 
-			if (fInputMethodWindow != NULL) {
-				EventList newEvents;
-				fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
-
-				if (!newEvents.IsEmpty()) {
-					fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
-					fInputMethodWindow = NULL;
+				if (fInputMethodWindow != NULL) {
+					EventList newEvents;
+					fInputMethodWindow->HandleInputMethodEvent(event, newEvents);
 
 					// replace event with new events (but don't scan them again
 					// for input method messages)
-					events.RemoveItemAt(i);
+					events.RemoveItemAt(i--);
 					delete event;
+					newCount--;
 
-					events.AddList(&newEvents, i);
-					i += newEvents.CountItems() - 1;
-					newCount = events.CountItems();
+					if (!newEvents.IsEmpty()) {
+						events.AddList(&newEvents);
+						opcode = B_INPUT_METHOD_STOPPED;
+					}
+
+					if (opcode == B_INPUT_METHOD_STOPPED) {
+						fInputMethodWindow->PostMessage(B_QUIT_REQUESTED);
+						fInputMethodWindow = NULL;
+					}
 				}
 			}
 		}
