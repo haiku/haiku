@@ -218,8 +218,17 @@ block_cache::GetFreeRange()
 	// we need to allocate a new range
 	block_range *range;
 	if (block_range::New(this, &range) != B_OK) {
-		// ToDo: free up space in existing ranges
-		// We may also need to free ranges from other caches to get a free one
+		RemoveUnusedBlocks(2, 50);
+
+		if (!free_ranges.IsEmpty())
+			return free_ranges.First();
+
+		RemoveUnusedBlocks(LONG_MAX, 50);
+
+		if (!free_ranges.IsEmpty())
+			return free_ranges.First();
+
+		// TODO: We also need to free ranges from other caches to get a free one
 		// (if not, an active volume might have stolen all free ranges already)
 		return NULL;
 	}
@@ -377,11 +386,11 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 		case B_NO_LOW_MEMORY:
 			return;
 		case B_LOW_MEMORY_NOTE:
-			free = 10;
+			free = 50;
 			accessed = 2;
 			break;
 		case B_LOW_MEMORY_WARNING:
-			free = 50;
+			free = 200;
 			accessed = 10;
 			break;
 		case B_LOW_MEMORY_CRITICAL:
