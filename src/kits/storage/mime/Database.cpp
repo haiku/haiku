@@ -143,20 +143,45 @@ Database::Delete(const char *type)
 
 	// Open the type
 	BEntry entry;
-	status_t err = entry.SetTo(type_to_filename(type).c_str());
+	status_t status = entry.SetTo(type_to_filename(type).c_str());
+	if (status != B_OK)
+		return status;
+
 	// Remove it
-	if (!err)
-		err = entry.Remove();
+	if (entry.IsDirectory()) {
+		// We need to remove all files in this directory
+		BDirectory directory(&entry);
+		if (directory.InitCheck() == B_OK) {
+			size_t length = strlen(type);
+			char subType[B_PATH_NAME_LENGTH];
+			memcpy(subType, type, length);
+			subType[length++] = '/';
+
+			BEntry subEntry;
+			while (directory.GetNextEntry(&subEntry) == B_OK) {
+				// Construct MIME type and remove it
+				if (subEntry.GetName(subType + length) == B_OK) {
+					status = Delete(subType);
+					if (status != B_OK)
+						return status;
+				}
+			}
+		}
+	}
+
+	status = entry.Remove();
+
 	// Notify the installed types database
-	if (!err)
+	if (status != B_OK)
 		fInstalledTypes.RemoveType(type);
 	// Notify the supporting apps database
-	if (!err)
-		err = fSupportingApps.DeleteSupportedTypes(type, true);
+	if (status != B_OK)
+		fSupportingApps.DeleteSupportedTypes(type, true);
 	// Notify the monitor service
-	if (!err)
+	if (status != B_OK)
 		_SendDeleteNotification(type);
-	return err;
+
+	return status;
 }
 
 
