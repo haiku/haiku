@@ -1,0 +1,196 @@
+<HTML>
+<HEAD>
+<TITLE>Media Nodes Made Easy (Well, Easier...)</TITLE>
+</HEAD>
+<BODY BGCOLOR="0xFFFFFF">
+<!-- Developer's Workshop --> 
+
+<FONT SIZE=+1><B><A NAME="Workshop"></A>DEVELOPERS' WORKSHOP: Media Nodes Made Easy (Well, Easier...)</B></FONT> 
+<br><B>By Christopher Tate (<A HREF="mailto:ctate@be.com">ctate@be.com</A>)</B><BR> 
+
+
+<P><FONT="-1">"Developers' Workshop" is a weekly feature that provides 
+answers to our developers' questions, or topic requests. 
+To submit a question, visit 
+<P><A HREF="http://www.be.com/developers/suggestion_box.html">http://www.be.com/developers/suggestion_box.html</A>. 
+
+<P> 
+<P>As anyone who sat through the Node Track of the recent Be 
+Developers Conference can attest, writing Media Kit nodes 
+is a complex task. Be's engineering team has been hard at 
+work extending the Media Kit APIs to simplify node 
+construction; similarly, DTS has been developing tools 
+developers can use to debug their own BMediaNodes. This 
+week's article introduces a tool for analyzing the behavior 
+of any BBufferProducer node or node chain: the 
+LoggingConsumer. Designed to work with the Genki/6 beta 
+release (I told you the APIs were under construction!), 
+this node tracks the behavior of its input stream, logging 
+a trace of all activity to a file for post-mortem analysis. 
+
+
+<P>Before I discuss what exactly the LoggingConsumer does, 
+here's the URL to download it, so that you can follow along 
+at home: 
+
+
+<P>&lt;<a href="ftp://ftp.be.com/pub/samples/media kit/LoggingConsumer.zip">ftp://ftp.be.com/pub/samples/media kit/LoggingConsumer.zip
+</a>&gt; 
+
+
+<P> 
+<b>So, What Is This &quot;LoggingConsumer&quot; Anyway?</b> 
+
+
+<P>As BBufferConsumers go, LoggingConsumer is pretty simple: it 
+doesn't manipulate its input buffers in any way, it doesn't 
+talk to hardware, and it doesn't pass buffers downstream -- 
+it sits at the end of the node chain. It has a single input, 
+which can accept any kind of data. You, the developer, connect 
+to a node or node chain that you're interested in, point it at 
+an output file entry ref, and voila! Useful information about 
+buffer flow and internode handshaking is recorded for later 
+interpretation. 
+
+
+<P>The LoggingConsumer node serves two purposes: it produces a 
+trace of node activity, for the purpose of debugging 
+producers and producer/filter node chains; and it serves as 
+a clean example of BBufferConsumer structure and behavior. 
+The node tries to do everything &quot;right,&quot; and is commented to 
+help you understand what's going on at all points in the 
+code. The node uses the latest and greatest 
+BMediaEventLooper class. It publishes a set of controllable 
+parameters via a BParameterWeb, and handles the 
+B MEDIA PARAMETERS buffer type for changing those 
+parameters. It reports late buffers to the producer, and 
+reports latency changes as well. In short, it demonstrates 
+pretty much all of the major functionality that a 
+BBufferConsumer has to worry about. 
+
+
+<P> 
+<b>So, How's It Work?</b> 
+
+
+<P>In order to preserve the realtime behavior of a proper Media 
+Kit node, the LoggingConsumer doesn't do any disk access 
+from within its main BMediaNode control thread. Instead, it 
+spawns a separate thread to write logged messages to disk, 
+and passes messages to that thread via a kernel port. The 
+LogWriter class encapsulates this pattern, managing the 
+non-realtime thread and message port transparently to the 
+LoggingConsumer node implementation. 
+
+
+<P>The LoggingConsumer itself is another example of using the 
+new BMediaEventLooper class to handle most of the 
+nitty-gritty details of being a node. Because it does very 
+little actual media-related processing, it's a pretty clear 
+illustration of the organization we recommend that nodes 
+use. The example application, which hooks the 
+LoggingConsumer up to an audio file reader, also uses a 
+simple &quot;Connection&quot; structure to illustrate the necessary 
+bookkeeping for setting up and tearing down the connection 
+between two nodes. 
+
+
+<P> 
+<b>What's It Give Me?</b> 
+
+
+<P>Lots. Every virtual entry point a media node has generates 
+an entry in the log file (with the minor exception of 
+GetNextInput() and DisposeInputCookie() -- and you can add 
+support for these easily). Log entries are marked with the 
+current real time (i.e., system time()) when they are 
+generated, as well as the current time according to the 
+LoggingConsumer's time source. Some operations log 
+additional information, as well. For example, when a buffer 
+is received, the logged message will indicate whether it is 
+already late. When a buffer is handled (i.e., popped off of 
+the BMediaEventLooper's event queue) the buffer's 
+performance time is logged, as well as how early the buffer 
+was handled. That &quot;offset&quot; needs to lie within the node's 
+scheduling latency; if it doesn't, the buffer is late. The 
+node also maintains a count of late buffers, so your testing 
+application can follow what's happening. 
+
+
+<P>LoggingConsumer is a BControllable, too, and you can 
+manipulate certain aspects of its behavior while it's 
+running. In particular, you can adjust its latency on the 
+fly. Reacting to latency changes is one of the trickier 
+aspects of BBufferProducer nodes, so having this facility in 
+the buffer consumer lets you test a producer in a reliable, 
+repeatable fashion. Future versions of the LoggingConsumer 
+will have other controllable features as well, such as the 
+ability to change media formats on the fly.
+
+
+<P>Here's an example of what you get in the log file: 
+
+<blockquote><pre> 
+LOG REGISTERED           : realtime = 240371553910, perftime = 262890 
+LOG ACCEPT FORMAT        : realtime = 240371564256, perftime = 2331465007 
+LOG CONNECTED            : realtime = 240371564475, perftime = 2331465228 
+LOG PREROLL              : realtime = 240371565650, perftime = 2331466400 
+LOG START                : realtime = 240372603671, perftime = 2332503192 
+LOG START HANDLED        : realtime = 240372603726, perftime = 2332503245 
+LOG PRODUCER DATA STATUS : realtime = 240372604250, perftime = 2332503773 
+LOG DATA STATUS HANDLED  : realtime = 240372604285, perftime = 2332503809 
+        status = 2 
+LOG BUFFER RECEIVED      : realtime = 240372604448, perftime = 2332503969 
+        start = 2332553303, offset = -5666 
+        Buffer received *LATE* 
+LOG BUFFER HANDLED       : realtime = 240372604481,  perftime = 2332504002 
+        start = 2332553303, offset = -701 
+        Buffer handled *LATE* 
+LOG BUFFER RECEIVED      : realtime = 240372604687, perftime = 2332504209 
+LOG BUFFER RECEIVED      : realtime = 240372605766, perftime = 2332505279 
+LOG BUFFER RECEIVED      : realtime = 240372606497, perftime = 2332506016 
+LOG BUFFER RECEIVED      : realtime = 240372607226, perftime = 2332506744 
+LOG BUFFER RECEIVED      : realtime = 240372608545, perftime = 2332508060 
+LOG BUFFER RECEIVED      : realtime = 240372624297, perftime = 2332523788 
+LOG BUFFER HANDLED       : realtime = 240372638948, perftime = 2332538420 
+        start = 2332593303, offset = 4876 
+LOG BUFFER RECEIVED      : realtime = 240372678548, perftime = 2332577979 
+LOG BUFFER HANDLED       : realtime = 240372678965, perftime = 2332578395 
+        start = 2332633303, offset = 4906 
+</pre></blockquote> 
+
+<P>The &quot;realtime&quot; field is the current system time() at the 
+moment the message was logged, and &quot;perftime&quot; is the 
+LoggingConsumer's idea of the current time according to its 
+time source (i.e., the current performance time). As you can 
+see, the node is registered, then the format negotiation 
+with the producer occurs, the node is Preroll()ed, then it's 
+Start()ed. When the producer node was started it sent a 
+ProducerDataStatus() message, then began sending buffers. 
+Note that there is a distinction between the buffer's 
+receipt in BufferReceived() and its eventual handling in 
+HandleEvent(). Also note that given our stated scheduling 
+latency of 5000 microseconds, the first buffer was sent too 
+late for the LoggingConsumer to handle in a timely manner -- 
+information to be communicated to whoever wrote this 
+particular BBufferProducer node! 
+
+
+<P>The LogWriter class can easily be adapted to log other sorts 
+of messages. Just add your own custom message codes to the 
+log what enum in LogWriter.h, string translations for them 
+to the log what to string() function, and appropriate 
+handling in LogWriter::HandleMessage(). If you need to pass 
+custom information in the log message, add a new variant to 
+the union declared in the log message struct. 
+
+
+<P>If you're developing BBufferProducer nodes, this class will 
+help you debug them. If you're developing BBufferConsumers, 
+this node will show you how to structure your code. And if 
+you're just writing Media Kit applications, this node gives 
+you an easy way to tell whether you've set up the rest of 
+the node chain correctly. Any way you slice it, 
+LoggingConsumer is a must-have component in any Media Kit 
+development suite!
+</HTML>

@@ -1,0 +1,87 @@
+<raw_audio_format
+	frame_rate     = '44100.0'
+	channel_count  = '1'
+	format         = B_AUDIO_UCHAR | B_AUDIO_SHORT | B_AUDIO_FLOAT | B_AUDIO_INT
+	byte_order     = B_MEDIA_BIG_ENDIAN | B_MEDIA_LITTLE_ENDIAN
+	buffer_size    = '1024'
+/>
+
+<raw_video_format
+	field_rate           = '30'
+	interlace            = '1'
+	first_active         = '0'
+	last_active          = '239'
+	orientation          = B_VIDEO_TOP_LEFT_RIGHT | B_VIDEO_BOTTOM_LEFT_RIGHT
+	pixel_width_aspect   = '3'
+	pixel_height_aspect  = '4'>
+
+	<video_display_info
+		format             = B_RGB32 | B_RGBA32 | B_RGB24 | B_RGB16 | B_RGB15 | B_RGBA15 | B_CMAP8 | B_GRAY8 | B_GRAY1 | <val>
+		line_width         = '320'
+		line_count         = '240'
+		bytes_per_row      = '1280'
+		pixel_offset       = '0'
+		line_offset        = '0'
+	/>
+</raw_video_format>
+
+<multistream_format
+	format               = B_ANY | B_VID | B_AVI | B_MPEG1 | B_MPEG2 | B_QUICKTIME | [val]
+	avg_bit_rate         = '0.0'
+	max_bit_rate         = '0.0'
+	avg_chunk_size       = '0'
+	max_chunk_size       = '0'>
+	
+	<multistream_flags
+	  header_has_flags   = '1' | '0' [def=0]
+	  clean_buffers      = '1' | '0' [def=0]
+	  homogenous_buffers = '1' | '0' [def=0]
+	/>
+
+	<!-- either this element -->	
+	<multistream_vid_info
+		frame_rate         = '0.0'
+		width              = '0'
+		height             = '0'
+		space              = [color space]
+		sampling_rate      = '0.0'
+	  sample_format      = B_UNDEFINED_SAMPLES | B_LINEAR_SAMPLES | B_FLOAT_SAMPLES | B_MULAW_SAMPLES
+  	byte_order         = B_MEDIA_BIG_ENDIAN | B_MEDIA_LITTLE_ENDIAN
+  	channel_count      = '0'
+	/>
+	
+	<!-- or this one -->
+	<multistream_avi_info
+		us_per_frame			 = '0'
+		width							 = '0'
+		height             = '0'>
+		
+		<!-- up to 5 types may be nested -->
+		<media_type>B_MEDIA_RAW_AUDIO</media_type>
+		<media_type>B_MEDIA_RAW_AUDIO</media_type>
+		<media_type>B_MEDIA_RAW_AUDIO</media_type>
+		<media_type>B_MEDIA_RAW_AUDIO</media_type>
+		<media_type>B_MEDIA_RAW_AUDIO</media_type>
+	</multistream_avi_info>	
+</multistream_format>
+
+<encoded_audio_format
+	encoding						= B_ANY
+	bit_rate						= '0.0'
+	frame_size          = '0'>
+	
+	<!-- the output format -->
+	<raw_audio_format ... />
+</encoded_audio_format>
+
+<encoded_video_format
+	encoding						= B_ANY
+	avg_bit_rate 				= '0.0'
+	max_bit_rate				= '0.0'
+	frame_size					= '0'
+	forward_history			= '0'
+	backward_history    = '0'>
+	
+	<!-- output format -->
+	<raw_video_format ... />
+</encoded_video_format>
