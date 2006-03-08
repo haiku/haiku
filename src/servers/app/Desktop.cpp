@@ -597,11 +597,7 @@ Desktop::SetCursor(ServerCursor* newCursor)
 	if (newCursor == oldCursor)
 		return;
 
-	newCursor->Acquire();
 	HWInterface()->SetCursor(newCursor);
-
-	if (oldCursor != NULL)
-		oldCursor->Release();
 }
 
 

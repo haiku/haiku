@@ -75,20 +75,18 @@ void
 HWInterface::SetCursor(ServerCursor* cursor)
 {
 	if (WriteLock()) {
-		if (fDragBitmap) {
-			// if a bitmap is being dragged,
-			// we don't currently allow changing
-			// the cursor, part of the reason being
-			// that the original drag bitmap is not
-			// around anymore... but it could be
-			// considered iritating to the user to
-			// change cursor shapes while something
-			// is dragged anyways.
-			// TODO: like a "+" or "-" sign when dragging some files to indicate
-			//		the current drag mode?
-			WriteUnlock();
-			return;
-		}
+		// TODO: if a bitmap is being dragged, it could
+		// be considered iritating to the user to change
+		// cursor shapes while something is dragged.
+		// The disabled code below would do this (except
+		// for the minor annoyance that the cursor is not
+		// updated when the drag is over)
+//		if (fDragBitmap) {
+//			// TODO: like a "+" or "-" sign when dragging some files to indicate
+//			//		the current drag mode?
+//			WriteUnlock();
+//			return;
+//		}
 		if (fCursor != cursor) {
 			BRect oldFrame = _CursorFrame();
 
@@ -97,7 +95,14 @@ HWInterface::SetCursor(ServerCursor* cursor)
 				fCursorAndDragBitmap = NULL;
 			}
 
+			if (fCursor)
+				fCursor->Release();
+
 			fCursor = cursor;
+
+			if (fCursor)
+				fCursor->Acquire();
+
 			Invalidate(oldFrame);
 
 			_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
@@ -625,7 +630,8 @@ void
 HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 {
 	// TODO: support other colorspaces/convert bitmap
-	if (bitmap && !(bitmap->ColorSpace() == B_RGB32 || bitmap->ColorSpace() == B_RGBA32)) {
+	if (bitmap && !(bitmap->ColorSpace() == B_RGB32
+		|| bitmap->ColorSpace() == B_RGBA32)) {
 		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet unsupported colorspace\n");
 		return;
 	}
@@ -633,7 +639,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	_RestoreCursorArea();
 	Invalidate(_CursorFrame());
 
-	if (fCursorAndDragBitmap != fCursor) {
+	if (fCursorAndDragBitmap && fCursorAndDragBitmap != fCursor) {
 		delete fCursorAndDragBitmap;
 		fCursorAndDragBitmap = NULL;
 	}
@@ -701,7 +707,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 				for (uint32 x = 0; x < width; x++) {
 					// takes two semi-transparent pixels
 					// with unassociated alpha (not pre-multiplied)
-					// and produces a premultiplied
+					// and stays within non-premultiplied color space
 					if (s[3] > 0) {
 						if (s[3] == 255) {
 							d[0] = s[0];
@@ -758,13 +764,16 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 		fCursorAndDragBitmap = fCursor;
 	}
 
-// TODO: handle reference counting stuff
+// NOTE: the EventDispatcher does the reference counting stuff for us
+// TODO: You can not simply call Release() on a ServerBitmap like you
+// can for a ServerCursor... it could be changed, but there are linking
+// troubles with the test environment that need to be solved than.
 //	if (fDragBitmap)
 //		fDragBitmap->Release();
 	fDragBitmap = bitmap;
 	fDragBitmapOffset = offset;
 //	if (fDragBitmap)
-//		fDragBitmap->Aquire();
+//		fDragBitmap->Acquire();
 
 	delete fCursorAreaBackup;
 	fCursorAreaBackup = NULL;

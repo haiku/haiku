@@ -8,9 +8,12 @@
 
 
 #include "EventDispatcher.h"
+
+#include "BitmapManager.h"
 #include "EventStream.h"
 #include "HWInterface.h"
 #include "InputManager.h"
+#include "ServerBitmap.h"
 
 #include <TokenSpace.h>
 
@@ -517,9 +520,23 @@ EventDispatcher::ViewUnderMouse(EventTarget& target)
 
 
 void
-EventDispatcher::SetDragMessage(BMessage& message)
+EventDispatcher::SetDragMessage(BMessage& message,
+								ServerBitmap* bitmap,
+								const BPoint& offsetFromCursor)
 {
-	printf("EventDispatcher::SetDragMessage()\n");
+//	printf("EventDispatcher::SetDragMessage()\n");
+
+	if (fDragBitmap != bitmap) {
+		if (fDragBitmap)
+			gBitmapManager->DeleteBitmap(fDragBitmap);
+
+		fDragBitmap = bitmap;
+	
+		if (fDragBitmap)
+			fDragBitmap->Acquire();
+	}
+
+	fHWInterface->SetDragBitmap(bitmap, offsetFromCursor);
 
 	BAutolock _(this);
 
@@ -624,7 +641,7 @@ EventDispatcher::_UnsetFeedFocus(BMessage* message)
 void
 EventDispatcher::_DeliverDragMessage()
 {
-	printf("EventDispatcher::_DeliverDragMessage()\n");
+//	printf("EventDispatcher::_DeliverDragMessage()\n");
 
 	if (fDraggingMessage && fPreviousMouseTarget) {
 		fDragMessage.RemoveName("_original_what");
@@ -632,7 +649,7 @@ EventDispatcher::_DeliverDragMessage()
 		fDragMessage.what = _MESSAGE_DROPPED_;
 
 //		fDragMessage.AddBool("dropped", true);
-printf("  sending message to previous mouse target\n");
+//printf("  sending message to previous mouse target\n");
 		_SendMessage(fPreviousMouseTarget->Messenger(), 
 			&fDragMessage, 100.0);
 	}
@@ -642,6 +659,9 @@ printf("  sending message to previous mouse target\n");
 	fDraggingMessage = false;
 
 	fHWInterface->SetDragBitmap(NULL, B_ORIGIN);
+	if (fDragBitmap)
+		gBitmapManager->DeleteBitmap(fDragBitmap);
+	fDragBitmap = NULL;
 }
 
 

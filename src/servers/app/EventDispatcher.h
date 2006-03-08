@@ -18,6 +18,7 @@
 
 class EventStream;
 class HWInterface;
+class ServerBitmap;
 
 struct event_listener;
 
@@ -86,7 +87,8 @@ class EventDispatcher : public BLocker {
 
 		int32 ViewUnderMouse(EventTarget& target);
 
-		void SetDragMessage(BMessage& message);
+		void SetDragMessage(BMessage& message, ServerBitmap* bitmap,
+							const BPoint& offsetFromCursor);
 			// the message should be delivered on the next
 			// "mouse up".
 			// if the mouse is not pressed, it should
@@ -140,6 +142,13 @@ class EventDispatcher : public BLocker {
 
 		BMessage		fDragMessage;
 		bool			fDraggingMessage;
+		ServerBitmap*	fDragBitmap;
+			// NOTE: unfortunately, the EventDispatcher
+			// has to know what a ServerBitmap is...
+			// otherwise, linking the libs in the
+			// testenvironment is problematic, because
+			// the alternative is that HWInterface knows
+			// about BitmapManager
 
 		BLocker			fCursorLock;
 		HWInterface*	fHWInterface;
