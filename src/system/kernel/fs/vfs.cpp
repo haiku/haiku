@@ -5252,10 +5252,6 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	// a vnode while we're figuring out if we can continue
 	mutex_lock(&sVnodeMutex);
 
-	// simplify the loop below: we decrement the root vnode ref_count
-	// by the known number of references: one for the file system, one
-	// from the path_to_vnode() call above
-	mount->root_vnode->ref_count -= 2;
 
 	bool disconnectedDescriptors = false;
 
@@ -5266,7 +5262,11 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 		// make sure all of them are not busy or have refs on them
 		vnode = NULL;
 		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
-			if (vnode->busy || vnode->ref_count != 0) {
+			// The root vnode ref_count needs to be 2 here: one for the file
+			// system, one from the path_to_vnode() call above
+			if (vnode->busy
+				|| ((vnode->ref_count != 0 && mount->root_vnode != vnode)
+					|| (vnode->ref_count != 2 && mount->root_vnode == vnode))) {
 				// there are still vnodes in use on this mount, so we cannot
 				// unmount yet
 				busy = true;
@@ -5278,7 +5278,6 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 			break;
 
 		if ((flags & B_FORCE_UNMOUNT) == 0) {
-			mount->root_vnode->ref_count += 2;
 			mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
@@ -5395,6 +5394,9 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 			sUnusedVnodes--;
 		}
 	}
+
+	// The ref_count of the root node is 2 at this point, see above why this is
+	mount->root_vnode->ref_count -= 2;
 
 	mutex_unlock(&sVnodeMutex);
 
