@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>CORTEX media toolkit: Documentation</title>
+</head>
+<body bgcolor="#103050" text=white link=white vlink=white alink=yellow>
+
+<table cellspacing=0 cellpadding=0 width=630><tr><td width=80>&nbsp;</td><td width=490><big><big>
+<b>CORTEX</b> documentation index</big></big><small><br>&nbsp;</small>
+</td><td width=60>&nbsp;</td></tr>
+<tr><td align=right><small>release</small>&nbsp;&nbsp;</td>
+<td><b>2.1.2</b></td></tr>
+<tr><td align=right><small>maintained&nbsp;by</small>&nbsp;&nbsp;</td>
+<td><b><a
+ href="mailto:em@be.com">Eric Moon</a></b></td></tr>
+<tr><td align=right><small>last&nbsp;updated</small>&nbsp;&nbsp;</td>
+<td><b>13 June, 2000</td></tr>
+
+<tr><td></td><td><small>For current project info, visit <a
+ href="http://cortex.sourceforge.net">http://cortex.sourceforge.net</a></small><br><br>
+<a href="INSTALLATION.html">Installation</a><br>
+<a href="RELEASE%20NOTES.html">Release Notes</a><br>
+<a href="license.html">Source &amp; Binary License</a><br>
+&nbsp;</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1><br>
+&nbsp;</td></tr>
+
+<!-- section 1 header
+     'overview' ************* -->
+<tr valign=top><td align=right><b>1)&nbsp;&nbsp;&nbsp;</b></td><td>
+<b><a name="1">Overview &amp; General Usage</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font>up<font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font><a href="#2">down</a><font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section 1 body
+     'overview' ************* -->
+<tr valign=top><td><font color="#e0c0a0"><small><small>routing<br>window<br>intro</td><td>
+<p>Revision 2.1.0 of <b>Cortex</b> introduced a kick-ass new routing window design courtesy
+of Christopher Lenz (<a href="mailto:cmlenz@gmx.de">cmlenz@gmx.de<a>.)
+The routing view now has two distinct
+viewing modes: "Icon View" and "Mini Icon View", selectable from the context menu that
+appears when you click the right mouse button in an empty area of the window.
+</p>
+<p>"Icon View" is the default; it's similar to the old look &amp; feel (though a lot nicer
+to look at) -- nodes are displayed as rectangular tiles with inputs and outputs
+arranged vertically on the left and right sides, respectively.  Nodes are assigned icons
+based on the type of node, or the owning application if any.
+</p><p>
+"Mini Icon View" is a more compact display: connection points are layed out horizontally,
+with inputs on the top and outputs on the bottom.)
+</p>
+<p>In either view, nodes can be freely dragged around.  You can select multiple nodes by
+&lt;shift&gt;-clicking or by dragging a selection rectangle around them.  Try right-clicking
+a node or connection to see the specific commands available for it.
+Node positions in both views will be remembered the next time <b>Cortex</b> is run.
+If you find the gray background dull, try dragging in an image file or a color from one
+of the many color-chooser apps out there (I like <a href="http://www.bebits.com/app/918/">kColor</a>.)
+</p>
+</td></tr>
+
+<tr valign=top><td><font color="#e0c0a0"><small><small>making<br>connections</td><td>
+<p>New connections can be made by dragging between two connection points (it doesn't
+matter if you drag from an input or an output.)  The wire will snap to connection points
+as the mouse nears them (this doesn't guarantee that such a connection is possible.)
+</p>
+<p>To disconnect two nodes, click on a wire and press the <b>&lt;delete&gt;</b>
+key, or right-click it and select "Disconnect."
+</p>
+<p>
+<b>Restrictions:</b> Cortex locks the connection between the system mixer and the
+audio output.  The Media Server doesn't look kindly upon apps that break that
+connection.  Connections from file-producer nodes (more about those below) are also locked,
+due to a bug in the Media Kit.
+</p></td></tr>
+<tr valign=top><td><font color="#e0c0a0"><small><small>dormant<br>nodes</td><td>
+<p>
+Now for a look at the second window: labeled "Media Add-Ons", it displays all the
+media nodes available in add-ons (these are also known as "Dormant Nodes.")  Additional
+information on a given node can be had by right-clicking and selecting "Get Info."
+</p>
+<p>To create, or <b>instantiate</b>, a new copy of a given dormant node, drag it 
+to a spot in the routing window.  If <b>Cortex</b> was able to successfully
+create a new instance of the node, a corresponding panel will appear in the routing
+window.
+</p><p><i><b>Danger!</b> Cortex currently allows you to instantiate any dormant node
+you want.  Some add-on nodes, such as sound-card inputs and outputs, can't be
+created more than once, and instantiating a new copy will break the existing one.
+If this happens, the "Restart Media Services" in the Media preferences panel should
+return the system to a usable state.</i></p>
+
+<p><b>File-producers:</b> to create a node capable of playing a given media file (audio
+or video), drag it the file into the routing window.  Note that if you create a video-producer
+in this fashion, it can't be hooked straight up to a raw video output, since it
+produces <i>compressed</i> video.  You can use the "Decoder Node" add-on to produce
+raw video that can be directly displayed in the Video Window (and hopefully a
+video output as well -- but I don't have one to test with, so no guarantees!)  Note
+as well that <b>the Video Window must be started manually</b> before it'll display anything.
+</p>
+
+<p>To delete a node, click on it (to select the node), then press the
+<b>&lt;delete&gt;</b> key, or right-click the nodeand select "Release."</p>
+
+</p>
+</td></tr>
+
+<tr valign=top><td><font color="#e0c0a0"><small><small>saving<br>node-sets</td><td>
+<p>
+<b>new cool thing:</b> you can save an XML-based description of the currently selected set
+of nodes via the "Save Nodes" option in the 'File' menu.  Nodes that you've instantiated
+in <b>Cortex</b> are fully described, so that they are recreated when you load the node-set.
+Nodes owned by outside applications are described to the point that connections to/from them
+may be reestablished if they still exist but <b>Cortex</b> will make no attempt to
+recreate outside nodes if it can't find them.
+</p>
+</td></tr>
+<tr valign=top><td><font color="#e0c0a0"><small><small>the<br>transport<br>window</td><td>
+<p>The transport controls (start/stop) are located in a separate floating window (if it's
+not visible, select "Transport" from the "Window" menu.)
+When one or more nodes are connected, <b>Cortex</b> binds them together into a group,
+allowing you to control the nodes in unison.  If you want, you can disable this behavior by
+right-clicking any node in a group and picking "Lock Group" under the "Advanced" submenu.
+Nodes connected to or from any node in the group will thereafter remain in their own groups.
+</p>
+
+<p>
+The upper-left quadrant of the transport window lists information on the currently selected
+group, if any.  Selecting a node in the routing window causes its group -- if it has one -- to
+be selected in the inspector.  You can click on the group name to edit it; there's not much
+reason to do so yet (groups aren't saved with node-sets yet.)  The bottom of this
+status display may be used to show error information in a future release.
+</p>
+<p>
+In the upper-right are the transport controls: pretty self-explanatory except for the "Preroll"
+button.  This tells all the nodes in the group to get ready to play -- a properly implemented
+media node should be able to do as much pre-processing as it needs to start instantly.
+</p>
+<p>
+The rest of the transport window is devoted to settings.  The "Roll from" and "to" values allow
+you to set a range over which the group will play.  If the "to" setting is less than or equal
+to the "from" setting, the group will play unhindered until you stop it.  If you do specify a
+valid range, playback will stop when the "to" position is reached, unless one or more nodes
+in the group have "cycle" enabled, in which case those nodes will repeatedly play the selected
+region. The loop isn't guaranteed to be perfectly accurate, especially at short loop lengths,
+but cycle mode is useful for stress-testing a node's "seek" abilities, or for keeping a
+file-player node running. The "Roll to/from" controls are live while cycling nodes are running,
+although Cortex gives up trying to cycle a node if the loop length is too small (less than one
+millisecond.)  The cycle setting for each node is located in the node context menu obtained by
+right-clicking on a node panel.
+</p>
+<p>
+The "Run Mode" control lets you tell the nodes how to cope when they fall behind
+(or, if "Offline", to ignore the concept of real time altogether.) This setting
+may be overridden on a node-by-node basis via the "Run Mode" options in the node context menu.
+</p>
+<p>
+The "Time Source" control lets you set the time-source for all nodes in the group.  A time
+source is a node that regularly publishes timestamps used by other nodes to synchronize their
+output.  The default time source used for new nodes is the "DAC Time Source" (provided you have
+an audio output device of some sort.)  If you instantiate nodes that can act as time sources,
+they'll be added to this menu.
+</p>
+</td></tr>
+
+<tr valign=top><td><font color="#e0c0a0"><small><small>parameters</td><td>
+<p>
+Chris has been hard at work expanding parameter (control panel) support.  To open the
+new control-panel window for a node that has parameters, double-click the node or select
+"Tweak Parameters" from its context menu.  If a node supports its own control-panel window,
+it can be displayed from the <b>Cortex</b> parameter window or by selecting
+"Start Control Panel" from the "Advanced" context submenu.
+</p>
+</td></tr>
+
+<tr valign=top><td><font color="#e0c0a0"><small><small>sample<br>nodes</td><td>
+<p><b>Cortex</b> comes with several sample add-on nodes.  Two of them, <b>LoggingConsumer</b>
+and <b>ToneProducer</b>, are based on sample code from the Be Developer Newsletter.  I've
+made a few changes to them to implement add-on support, and to make them a bit more flexible.
+Since they are very useful testbed nodes, future <b>Cortex</b> releases will likely include
+further improved versions of them.</p>
+<p>Also included is a sample audio filter, <b>Flanger</b>.  It is somewhat limited: only
+floating-point audio is supported (the same is true of <b>ToneProducer</b>.)  It does include
+a control panel.  Try instantiating <b>ToneProducer</b> and <b>Flanger</b>, connecting
+them together, then connecting <b>Flanger</b>'s output to the system mixer.  This is a
+simple example of the Media Kit's flexibility.  (For truly warped sounds, try connecting a
+few <b>Flanger</b>s in a row!)
+</p>
+<p>To help ease format-conflict pains, <b>AudioAdapter</b> converts
+from one raw audio format to another on the fly.  In most cases you can simply connect
+nodes to either side of it.  If you get a "Bad media format" error, you may need to help
+<b>AudioAdapter</b> decide the format: in the Parameters section of the node inspector,
+you can pick format requirements.  (Note that currently you HAVE to fully specify the output
+format to get it to connect to the system mixer.)
+</p>
+</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1><br>
+&nbsp;</td></tr>
+
+<!-- section 2 header
+     'bugs' ************* -->
+<tr valign=top><td align=right><b>2)&nbsp;&nbsp;&nbsp;</b></td><td>
+<b><a name="2">Known Bugs (&amp; Missing Features)</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font><a href="#1">up</a><font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font><a href="#3">down</a><font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section 2 body
+     'bugs' ************* -->
+<tr valign=top><td></td><td><p>
+<b>back-end (NodeManager)</b><ul>
+	<li>misbehaved nodes not handled well (the UI can lock up as it waits for NodeManager to
+	time out on a failed operation.)
+	<li>groups aren't split correctly.  for example, if two producers are connected to a
+	mixer, then the mixer is deleted, the producers will remain in the same group.
+	
+</ul>
+<b>application/routing window</b><ul>
+	<li>node-sets loaded by drag &amp; drop should be placed at the drop point.
+	<li>grouping information isn't saved with node-sets.
+	<li>the workspace doesn't autoscroll as nodes are dragged.<br><br>
+</ul>
+<b>AudioAdapter</b><ul>
+        <li>format negotiation needs some work (can't connect output to 
+the system mixer without help from the user.)
+        <li>needs a LOT of buffers (>16) if input is connected to a 
+system audio-player node that's being cycled (looped).  probably a bug 
+with the file-player node, but I need to do some more research...<br><br>
+</ul>
+<b>ToneProducer</b><ul>
+	<li>only floating-point output supported.<br><br>
+</ul>
+<b>LoggingConsumer</b><ul>
+	<li>takes after the Be System Mixer in not sending late notices
+</ul>
+<b>Flanger</b><ul>
+	<li>weird noise (aliasing?) given high-pitched tones as input.
+	<li>only floating-point output supported.<br><br>
+</ul>
+</p>
+</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1 hspace=0><br>
+&nbsp;</td></tr>
+
+<!-- section 3 header
+     'developers' ************* -->
+<tr valign=top><td align=right><b>3)&nbsp;&nbsp;&nbsp;</b></td><td>
+<b><a name="3">Notes for Developers</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font><a href="#2">up</a><font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font>down<font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section 3 body
+     'developers' ************* -->
+<tr valign=top><td></td><td><p>
+Come check out the <a href="http://sourceforge.net/project/?group_id=2848">SourceForge
+Project Page</a>!
+</p>
+<p><b>Comments/questions?</b><br>
+Let me know: <a href="mailto:em@be.com">em@be.com</a><br>
+&nbsp;
+</td></tr>
+
+
+<!--
+<tr valign=top><td align=right><b>n)&nbsp;&nbsp;&nbsp;</b></td><td><b>Change Log</b></td></tr>
+-->
+</table>
+
+<!-- copyright notice -->
+<br><br><br>
+<img src="images/pix-white.gif" width=630 height=1><br clear=all>
+<table cellpadding=0 cellspacing=0 width=630><tr>
+<td align=right>
+<small><small>Copyright &copy; 1999-2000, Eric Moon.  All rights reserved.</td></tr></table>
+<!-- end copyright notice -->
+
+</body>
+</html>

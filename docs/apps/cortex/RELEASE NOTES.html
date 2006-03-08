@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Release Notes for Cortex r2.1.2</title>
+</head>
+<body bgcolor="#103050" text=white link=white vlink=white alink=yellow>
+
+<table cellspacing=0 cellpadding=0 width=630><tr><td width=80>&nbsp;</td><td width=490><big><big>
+<b>CORTEX Release Notes</b></big></big><small><br>&nbsp;</small>
+</td><td width=60>&nbsp;</td></tr>
+<tr><td align=right><small>this release</small>&nbsp;&nbsp;</td>
+<td><b>2.1.2</b></td></tr>
+<tr><td align=right><small>maintained&nbsp;by</small>&nbsp;&nbsp;</td>
+<td><b><a
+ href="mailto:em@be.com">Eric Moon</a></b></td></tr>
+<tr><td align=right><small>last&nbsp;updated</small>&nbsp;&nbsp;</td>
+<td><b>13 June, 2000</td></tr>
+
+<tr><td></td><td><small>For current project info, visit <a
+ href="http://cortex.sourceforge.net">http://cortex.sourceforge.net</a><br>
+ Please send bug reports to <a
+ href="mailto:em@be.com">em@be.com</a></small><br><br>
+<a href="index.html">Back to index...</a><br>
+&nbsp;</td></tr>
+
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1 hspace=0><br>
+&nbsp;</td></tr>
+
+
+<!-- section 2.1.2 header
+     ************* -->
+<tr valign=top><td align=right></td><td>
+<b><a name="r2_1_2">r2.1.2</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font>up<font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font><a href="#r2_1_0">down</a><font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section 2.1.2 body
+     ************* -->
+<tr valign=top><td></td><td><b>Bug fixes &amp; minor UI improvements</b><ul>
+	<li>Fixes for several UI bugs (including a severe one exposed by the BeOS 5.0.1
+	update -- the inability to drag nodes from the Media Add-Ons window.)
+	<li>Errors and confirmation of actions now appear in the status panel in the
+	lower left of the routing window.
+</ul>
+</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1 hspace=0><br>
+&nbsp;</td></tr>
+
+
+<!-- section 2.1.0 header
+     ************* -->
+<tr valign=top><td align=right></td><td>
+<b><a name="r2_1_0">r2.1.0</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font><a href="#r2_1_2">up</a><font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font><a href="#dr2_0_2">down</a><font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section 2.1.0 body
+     ************* -->
+<tr valign=top><td></td><td><b>BeOS 5 Version, new UI</b><ul>
+	<li>Cortex is ready for BeOS 5.  Thanks to the hard work of
+	Christopher Lenz (<a href="mailto:cmlenz@gmx.de">cmlenz@gmx.de</a> it
+	sports a much friendlier user interface.
+	<li>Bugs fixed, blah blah blah.
+</ul>
+</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1 hspace=0><br>
+&nbsp;</td></tr>
+
+
+
+<!-- section dr2.0.2 header
+     ************* -->
+<tr valign=top><td align=right></td><td>
+<b><a name="dr2_0_2">dr2.0.2</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font><a href="#r2_1_0">up</a><font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font><a href="#dr2_0_1">down</a><font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section dr2.0.2 body
+     ************* -->
+<tr valign=top><td></td><td><b>PowerPC Version</b><ul>
+	<li>Cortex now compiles on the Metrowerks PPC compiler.
+</ul>
+</td></tr>
+
+<tr valign=top><td></td><td><b>Features</b><ul>
+	<li>Position reporting: the node inspector window now displays the node's playback
+	position in SMPTE format.  Position reporting has been disabled for video-buffer
+	producers that read from files (the video-file players and/or codecs in BeOS R4.5.2
+	don't take well to repeated querying about their position.)<br>&nbsp;
+	<li>Improved tool-tips.
+</ul>
+</td></tr>
+
+<tr><td></td><td colspan=2><img src="images/pix-white.gif" width=550 height=1 hspace=0><br>
+&nbsp;</td></tr>
+
+
+
+<!-- section dr2.0.1 header
+     ************* -->
+<tr valign=top><td align=right></td><td>
+<b><a name="dr2_0_1">dr2.0.1</a><br>&nbsp;
+</td><td align=right>
+<small><small>
+ <font color="#e0c0a0">[</font><a href="#dr2_0_2">up</a><font color="#e0c0a0">]</font>
+ <font color="#e0c0a0">[</font>down<font color="#e0c0a0">]</font>
+</td></tr>
+<!-- section dr2.0.1 body
+     ************* -->
+<tr valign=top><td></td><td><b>Fixed Bugs:</b><ul>
+	<li>Broken ToneProducer sawtooth waveform.
+	<li>Groups not split when the sole connection joining them is broken.
+	<li>No default group for video input node(s) (which keeps you from starting them.)
+	<li>Thread-control variables not declared <code>volatile</code>.
+</ul>
+
+<p><b>B_RECORDING:</b> support for filtering live streams from physical inputs
+has been vastly improved.
+</p>
+<p><b>Workaround:</b> on the BeOS R4.5.2, some nodes for audio-input hardware (such as the emu10k) stop 
+responding when requested to stop.  Physical-input nodes cannot be stopped for now
+(once the node has been started, the group inspector 'Start' and 'Stop' buttons will
+have no effect.)
+</p>
+
+</td></tr>
+
+
+<!--
+<tr valign=top><td align=right><b>n)&nbsp;&nbsp;&nbsp;</b></td><td><b>Change Log</b></td></tr>
+-->
+</table>
+
+<!-- copyright notice -->
+<br><br><br>
+<img src="images/pix-white.gif" width=630 height=1><br clear=all>
+<table cellpadding=0 cellspacing=0 width=630><tr>
+<td align=right>
+<small><small>Copyright &copy; 1999-2000, Eric Moon.  All rights reserved.</td></tr></table>
+<!-- end copyright notice -->
+
+</body>
+</html>
