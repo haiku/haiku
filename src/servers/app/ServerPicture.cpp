@@ -235,7 +235,7 @@ set_clipping_rects(ViewLayer *view, BRect *rects, uint32 numRects)
 	BRegion region;
 	for (uint32 c = 0; c < numRects; c++)
 		region.Include(rects[c]);
-	view->SetUserClipping(region);	
+	view->SetUserClipping(&region);	
 }
 
 
