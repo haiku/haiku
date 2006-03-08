@@ -1364,7 +1364,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;			
 			
-			frame.right = ceilf(frame.right);// + 8.0f;
+			frame.right = ceilf(frame.right);
 			break;
 		}
 
