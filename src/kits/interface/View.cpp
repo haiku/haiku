@@ -129,8 +129,11 @@ ViewState::ViewState()
 	pen_location.Set(0, 0);
 	pen_size = 1.0;
 
-	// This probably needs to be set to bounds by the owning BView
-	clipping_region.MakeEmpty();
+	// NOTE: the clipping_region is empty
+	// on construction but it is not used yet,
+	// we avoid having to keep track of it via
+	// this flag
+	clipping_region_used = false;
 
 	set_rgb_color(high_color, 0, 0, 0);
 	set_rgb_color(low_color, 255, 255, 255);
@@ -226,11 +229,15 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	link.Attach<bool>(font_aliasing);
 
 	// we send the 'local' clipping region... if we have one...
-	int32 count = clipping_region.CountRects();
-
-	link.Attach<int32>(count);
-	for (int32 i = 0; i < count; i++)
-		link.Attach<BRect>(clipping_region.RectAt(i));
+	if (clipping_region_used) {
+		int32 count = clipping_region.CountRects();
+		link.Attach<int32>(count);
+		for (int32 i = 0; i < count; i++)
+			link.Attach<BRect>(clipping_region.RectAt(i));
+	} else {
+		// no clipping region
+		link.Attach<int32>(-1);
+	}
 
 	//	Although we might have a 'local' clipping region, when we call
 	//	BView::GetClippingRegion() we ask for the 'global' one and it
@@ -299,8 +306,22 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	link.Read<float>(&scale);
 	link.Read<bool>(&font_aliasing);
 
-	// no need to read the clipping region, as it's invalid
-	// next time we need it anyway
+	// read the user clipping
+	// (that's NOT the current View visible clipping but the additional
+	// user specified clipping!)
+	int32 clippingRectCount;
+	link.Read<int32>(&clippingRectCount);
+	if (clippingRectCount >= 0) {
+		clipping_region.MakeEmpty();
+		for (int32 i = 0; i < clippingRectCount; i++) {
+			BRect rect;
+			link.Read<BRect>(&rect);
+			clipping_region.Include(rect);
+		}
+	} else {
+		// no user clipping used
+		clipping_region_used = false;
+	}
 
 	valid_flags = ~B_VIEW_CLIP_REGION_BIT;
 }
@@ -2151,10 +2172,10 @@ BView::GetClippingRegion(BRegion* region) const
 	if (!region)
 		return;
 
-	// TODO: For now, the clipping bit is ignored, since the client has no
-	// idea when the clipping in the server changed. -Stephan
+	// NOTE: the client has no idea when the clipping in the server
+	// changed, so it is always read from the serber
+	region->MakeEmpty();
 
-//	if (!fState->IsValid(B_VIEW_CLIP_REGION_BIT) && fOwner && do_owner_check()) {
 	if (fOwner && do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_GET_CLIP_REGION);
 
@@ -2164,21 +2185,15 @@ BView::GetClippingRegion(BRegion* region) const
 			int32 count;
 			fOwner->fLink->Read<int32>(&count);
 
-			fState->clipping_region.MakeEmpty();
-
 			for (int32 i = 0; i < count; i++) {
 				BRect rect;
 				fOwner->fLink->Read<BRect>(&rect);
 
-				fState->clipping_region.Include(rect);
+				region->Include(rect);
 			}
 			fState->valid_flags |= B_VIEW_CLIP_REGION_BIT;
 		}
-	} else {
-		fState->clipping_region.MakeEmpty();
 	}
-
-	*region = fState->clipping_region;
 }
 
 
@@ -2186,19 +2201,19 @@ void
 BView::ConstrainClippingRegion(BRegion* region)
 {
 	if (do_owner_check()) {
-		int32 count = 0;
-		if (region)
-			count = region->CountRects();
 
 		fOwner->fLink->StartMessage(AS_LAYER_SET_CLIP_REGION);
 
-		// '0' means that in the app_server, there won't be any 'local'
-		// clipping region (it will be = NULL)
-
-		// TODO: note this in the specs
-		fOwner->fLink->Attach<int32>(count);
-		for (int32 i = 0; i < count; i++)
-			fOwner->fLink->Attach<BRect>(region->RectAt(i));
+		if (region) {
+			int32 count = region->CountRects();
+			fOwner->fLink->Attach<int32>(count);
+			for (int32 i = 0; i < count; i++)
+				fOwner->fLink->Attach<clipping_rect>(region->RectAtInt(i));
+		} else {
+			fOwner->fLink->Attach<int32>(-1);
+			// '-1' means that in the app_server, there won't be any 'local'
+			// clipping region (it will be NULL)
+		}
 
 		// we flush here because app_server waits for all the rects
 		fOwner->fLink->Flush();

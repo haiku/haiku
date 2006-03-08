@@ -75,6 +75,7 @@ class ViewState {
 
 		::drawing_mode		drawing_mode;
 		BRegion				clipping_region;
+		bool				clipping_region_used;
 		BPoint				origin;
 
 		// line modes

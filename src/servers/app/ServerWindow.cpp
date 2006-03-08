@@ -1527,7 +1527,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			if (PictureToRegion(picture, region, inverse, where) < B_OK)
 				break;
 
-			fCurrentLayer->CurrentState()->SetClippingRegion(region);
+			fCurrentLayer->SetUserClipping(&region);
 
 // TODO: reenable AS_LAYER_CLIP_TO_PICTURE
 #if 0
@@ -1576,15 +1576,31 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			int32 rectCount;
-			link.Read<int32>(&rectCount);
-
+			status_t status = link.Read<int32>(&rectCount);
+				// a negative count means no
+				// region for the current draw state,
+				// but an *empty* region is actually valid!
+				// even if it means no drawing is allowed
 			BRegion region;
-			for (int32 i = 0; i < rectCount; i++) {
-				BRect r;
-				link.Read<BRect>(&r);
-				region.Include(r);
+			if (status == B_OK && rectCount >= 0) {
+				for (int32 i = 0; i < rectCount; i++) {
+					clipping_rect r;
+					status = link.Read<clipping_rect>(&r);
+					if (status < B_OK)
+						break;
+					region.Include(r);
+				}
+			} else
+				status = B_ERROR;
+
+			if (status == B_OK) {
+				fCurrentLayer->SetUserClipping(&region);
+			} else {
+				// passing NULL sets this states region
+				// to that of the previous state
+				fCurrentLayer->SetUserClipping(NULL);
 			}
-			fCurrentLayer->SetUserClipping(region);
+
 			break;
 		}
 
@@ -1749,11 +1765,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
-//						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
-						fDesktop->EventDispatcher().SetDragMessage(dragMessage/*, bitmap*/);
-if (ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken)) {
-	fDesktop->HWInterface()->SetDragBitmap(bitmap, offset);
-}
+						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
+																   bitmap, offset);
 				}
 				delete[] buffer;
 			}
@@ -1781,7 +1795,9 @@ if (ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken)) {
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
-						fDesktop->EventDispatcher().SetDragMessage(dragMessage/*, dragRect*/);
+						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
+																   NULL, // should be dragRect
+																   offset);
 				}
 				delete[] buffer;
 			}

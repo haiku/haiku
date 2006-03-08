@@ -393,7 +393,7 @@ ViewLayer::Scale() const
 
 
 void
-ViewLayer::SetUserClipping(const BRegion& region)
+ViewLayer::SetUserClipping(const BRegion* region)
 {
 	fDrawState->SetClippingRegion(region);
 	

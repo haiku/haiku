@@ -70,7 +70,7 @@ class DrawState {
 				void		InverseTransform(BPoint* point) const;
 
 							// additional clipping as requested by client
-		void				SetClippingRegion(const BRegion& region);
+		void				SetClippingRegion(const BRegion* region);
 		const BRegion*		ClippingRegion() const
 								{ return fClippingRegion; }
 /*	inline	int32				CountClippingRects() const

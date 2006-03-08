@@ -64,7 +64,7 @@ class ViewLayer {
 			void			SetScale(float scale);
 			float			Scale() const;
 
-			void			SetUserClipping(const BRegion& region);
+			void			SetUserClipping(const BRegion* region);
 				// region is expected in layer coordinates
 
 			// converts the given frame up the view hierarchy and

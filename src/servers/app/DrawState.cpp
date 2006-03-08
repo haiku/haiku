@@ -214,15 +214,18 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	int32 clipRectCount;
 	link.Read<int32>(&clipRectCount);
 
-	BRegion region;
-	if (clipRectCount > 0) {
+	if (clipRectCount >= 0) {
+		BRegion region;
 		BRect rect;
 		for (int32 i = 0; i < clipRectCount; i++) {
 			link.Read<BRect>(&rect);
 			region.Include(rect);
 		}
+		SetClippingRegion(&region);
+	} else {
+		// No user clipping used
+		SetClippingRegion(NULL);
 	}
-	SetClippingRegion(region);
 }
 
 
@@ -258,12 +261,15 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	link.Attach<float>(fScale);
 	link.Attach<bool>(fFontAliasing);
 
-	int32 clippingRectCount = fClippingRegion ? fClippingRegion->CountRects() : 0;
-	link.Attach<int32>(clippingRectCount);
 
 	if (fClippingRegion) {
+		int32 clippingRectCount = fClippingRegion->CountRects();
+		link.Attach<int32>(clippingRectCount);
 		for (int i = 0; i < clippingRectCount; i++)
 			link.Attach<BRect>(fClippingRegion->RectAt(i));
+	} else {
+		// no client clipping
+		link.Attach<int32>(-1);
 	}
 }
 
@@ -374,11 +380,11 @@ DrawState::InverseTransform(BPoint* point) const
 }
 
 
-
 void
-DrawState::SetClippingRegion(const BRegion& region)
+DrawState::SetClippingRegion(const BRegion* region)
 {
 	// reset clipping to that of previous state
+	// (that's the starting point)
 	if (PreviousState() != NULL && PreviousState()->ClippingRegion()) {
 		if (fClippingRegion)
 			*fClippingRegion = *(PreviousState()->ClippingRegion());
@@ -389,12 +395,15 @@ DrawState::SetClippingRegion(const BRegion& region)
 		fClippingRegion = NULL;
 	}
 
-	// add the clipping from the passed region
-	if (region.Frame().IsValid()) {
+	// intersect with the clipping from the passed region
+	// (even if it is empty)
+	// passing NULL unsets this states additional region,
+	// it will then be the region of the previous state
+	if (region) {
 		if (fClippingRegion)
-			fClippingRegion->IntersectWith(&region);
+			fClippingRegion->IntersectWith(region);
 		else 
-			fClippingRegion = new BRegion(region);
+			fClippingRegion = new BRegion(*region);
 	}
 }
 
