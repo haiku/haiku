@@ -60,8 +60,11 @@ BMenuBar::BMenuBar(BMessage *data)
 	
 	if (data->FindInt32("_border", &border) == B_OK)
 		SetBorder((menu_bar_border)border);
-		
-	// TODO: InitData() ??	
+	
+	menu_layout layout = B_ITEMS_IN_COLUMN;
+	data->FindInt32("_layout", (int32 *)&layout);
+	
+	InitData(layout);	
 }
 
 
@@ -81,8 +84,8 @@ BMenuBar::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenuBar"))
 		return new BMenuBar(data);
-	else
-		return NULL;
+	
+	return NULL;
 }
 
 
@@ -224,9 +227,7 @@ BMenuBar::Hide()
 
 
 BHandler *
-BMenuBar::ResolveSpecifier(BMessage *msg, int32 index,
-									 BMessage *specifier, int32 form,
-									 const char *property)
+BMenuBar::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier, int32 form, const char *property)
 {
 	return BMenu::ResolveSpecifier(msg, index, specifier, form, property);
 }
@@ -295,8 +296,7 @@ BMenuBar::operator=(const BMenuBar &)
 
 
 void 
-BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
-							BRect *specialRect)
+BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *specialRect)
 {
 	BWindow *window = Window();
 	if (window == NULL) 
