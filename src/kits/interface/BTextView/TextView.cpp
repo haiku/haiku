@@ -1523,6 +1523,13 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font
 		NormalizeFont(&newFont);
 	}
 
+	if (!fStylable) {
+		// When the text view is not stylable, we always set the whole text's
+		// style and ignore the offsets
+		startOffset = 0;
+		endOffset = fText->Length();
+	}
+
 	// add the style to the style buffer
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
 		fontMode, &newFont, color);
