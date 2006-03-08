@@ -1164,8 +1164,7 @@ thread_at_kernel_exit(void)
 }
 
 
-//	#pragma mark -
-//	private kernel exported functions
+//	#pragma mark - private kernel API
 
 
 /** Insert a thread to the tail of a queue
@@ -1278,6 +1277,66 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 {
 	return create_thread(name, team, (thread_entry_func)function, arg, NULL,
 		priority, true, threadID);
+}
+
+
+status_t
+wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_returnCode)
+{
+	sem_id sem = B_BAD_THREAD_ID;
+	struct death_entry death;
+	struct thread *thread;
+	cpu_status state;
+	status_t status;
+
+	// we need to resume the thread we're waiting for first
+	status = resume_thread(id);
+	if (status != B_OK)
+		return status;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	thread = thread_get_thread_struct_locked(id);
+	if (thread != NULL) {
+		// remember the semaphore we have to wait on and place our death entry
+		sem = thread->exit.sem;
+		list_add_link_to_head(&thread->exit.waiters, &death);
+	}
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	if (sem < B_OK)
+		return B_BAD_THREAD_ID;
+
+	status = acquire_sem_etc(sem, 1, flags, timeout);
+
+	if (status == B_OK) {
+		// this should never happen as the thread deletes the semaphore on exit
+		panic("could acquire exit_sem for thread %lx\n", id);
+	} else if (status == B_BAD_SEM_ID) {
+		// this is the way the thread normally exits
+		status = B_OK;
+
+		if (_returnCode)
+			*_returnCode = death.status;
+	} else {
+		// We were probably interrupted; we need to remove our death entry now.
+		// When the thread is already gone, we don't have to care
+
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread != NULL)
+			list_remove_link(&death);
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+
+	return status;
 }
 
 
@@ -1415,8 +1474,7 @@ thread_per_cpu_init(int32 cpuNum)
 }
 
 
-//	#pragma mark -
-//	public kernel exported functions
+//	#pragma mark - public kernel API
 
 
 void
@@ -1841,62 +1899,9 @@ snooze_until(bigtime_t timeout, int timebase)
 
 
 status_t
-wait_for_thread(thread_id id, status_t *_returnCode)
+wait_for_thread(thread_id thread, status_t *_returnCode)
 {
-	sem_id sem = B_BAD_THREAD_ID;
-	struct death_entry death;
-	struct thread *thread;
-	cpu_status state;
-	status_t status;
-
-	// we need to resume the thread we're waiting for first
-	status = resume_thread(id);
-	if (status != B_OK)
-		return status;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	thread = thread_get_thread_struct_locked(id);
-	if (thread != NULL) {
-		// remember the semaphore we have to wait on and place our death entry
-		sem = thread->exit.sem;
-		list_add_link_to_head(&thread->exit.waiters, &death);
-	}
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	if (sem < B_OK)
-		return B_BAD_THREAD_ID;
-
-	status = acquire_sem(sem);
-
-	if (status == B_OK) {
-		// this should never happen as the thread deletes the semaphore on exit
-		panic("could acquire exit_sem for thread %lx\n", id);
-	} else if (status == B_BAD_SEM_ID) {
-		// this is the way the thread normally exits
-		status = B_OK;
-
-		if (_returnCode)
-			*_returnCode = death.status;
-	} else {
-		// We were probably interrupted; we need to remove our death entry now.
-		// When the thread is already gone, we don't have to care
-
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		thread = thread_get_thread_struct_locked(id);
-		if (thread != NULL)
-			list_remove_link(&death);
-
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-	}
-
-	return status;
+	return wait_for_thread_etc(thread, 0, 0, _returnCode);
 }
 
 
@@ -1959,8 +1964,7 @@ setrlimit(int resource, const struct rlimit * rlp)
 }
 
 
-//	#pragma mark -
-//	Calls from userland (with extra address checks)
+//	#pragma mark - syscalls
 
 
 void
@@ -2113,7 +2117,7 @@ _user_wait_for_thread(thread_id id, status_t *userReturnCode)
 	if (userReturnCode != NULL && !IS_USER_ADDRESS(userReturnCode))
 		return B_BAD_ADDRESS;
 
-	status = wait_for_thread(id, &returnCode);
+	status = wait_for_thread_etc(id, B_CAN_INTERRUPT, 0, &returnCode);
 
 	if (status == B_OK && userReturnCode != NULL
 		&& user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK)
