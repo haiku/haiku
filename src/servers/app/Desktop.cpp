@@ -847,9 +847,6 @@ Desktop::_Windows(int32 index)
 void
 Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
 {
-	if (fFront == NULL)
-		return;
-
 	if (previousWorkspace == -1)
 		previousWorkspace = fCurrentWorkspace;
 	if (nextWorkspace == -1)
@@ -862,7 +859,7 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
 			&& floating->Feel() != B_FLOATING_APP_WINDOW_FEEL)
 			continue;
 
-		if (fFront->IsNormal() && floating->HasInSubset(fFront)) {
+		if (fFront != NULL && fFront->IsNormal() && floating->HasInSubset(fFront)) {
 			// is now visible
 			if (_Windows(previousWorkspace).HasWindow(floating)
 				&& previousWorkspace != nextWorkspace) {
@@ -1101,7 +1098,7 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 void
 Desktop::ActivateWindow(WindowLayer* window)
 {
-//	printf("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>");
+	STRACE(("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>"));
 
 	// TODO: handle this case correctly! (ie. honour B_NOT_ANCHORED_ON_ACTIVATE,
 	//		B_NO_WORKSPACE_ACTIVATION, switch workspaces, ...)
@@ -1439,6 +1436,8 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 void
 Desktop::_UpdateSubsetWorkspaces(WindowLayer* window)
 {
+	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
+
 	// if the window is hidden, the subset windows are up-to-date already
 	if (!window->IsNormal() || window->IsHidden())
 		return;
