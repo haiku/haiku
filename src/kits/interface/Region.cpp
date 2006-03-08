@@ -413,17 +413,19 @@ BRegion &
 BRegion::operator=(const BRegion &region)
 {
 	if (&region != this) {
-		free(data);
 		bound = region.bound;
 		count = region.count;
-		data_size = region.data_size;
-		
+
+		// handle reallocation if we're too small to contain
+		// the other region
+		set_size(region.data_size);
+
+		// TODO: what is this supposed to do??
 		if (data_size <= 0)
 			data_size = 1;
 			
-		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
-		
-		memcpy(data, region.data, count * sizeof(clipping_rect));
+		if (data)
+			memcpy(data, region.data, count * sizeof(clipping_rect));
 	}
 	
 	return *this;
