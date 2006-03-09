@@ -5,6 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
+UsePrivateHeaders interface ;
 
 Application LookAndFeel :
 	LookAndFeel.cpp

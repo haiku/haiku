@@ -16,6 +16,8 @@
 #include <String.h>
 #include <Window.h>
 
+#include <WindowPrivate.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -66,7 +68,8 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 	const struct { const char* name; int32 look; } looks[] = {
 		{"Titled", B_TITLED_WINDOW_LOOK}, {"Document", B_DOCUMENT_WINDOW_LOOK},
 		{"Floating", B_FLOATING_WINDOW_LOOK}, {"Modal", B_MODAL_WINDOW_LOOK},
-		{"Bordered", B_BORDERED_WINDOW_LOOK}, {"No Border", B_NO_BORDER_WINDOW_LOOK}
+		{"Bordered", B_BORDERED_WINDOW_LOOK}, {"No Border", B_NO_BORDER_WINDOW_LOOK},
+		{"Left Titled", kLeftTitledWindowLook}, {"Desktop", kDesktopWindowLook}
 	};
 	for (uint32 i = 0; i < sizeof(looks) / sizeof(looks[0]); i++) {
 		BMessage* message = new BMessage(kMsgUpdateLook);
