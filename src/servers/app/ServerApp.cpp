@@ -938,13 +938,21 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<bool>(&sync);
 			link.Read<int32>(&token);
 
+			ServerCursor* oldCursor = fAppCursor;
 			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
-			if (fAppCursor != NULL)
+			if (fAppCursor != NULL) {
+				fAppCursor->Acquire();
+				// TODO: This is wrong: We need to take view cursors into account here!
 				fDesktop->HWInterface()->SetCursor(fAppCursor);
-			else {
-				// if there is no new cursor, we just set the default cursor
-				fDesktop->HWInterface()->SetCursor(fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT));
+			} else {
+				// if the new cursor doesn't exist, we just set the default cursor
+				// TODO: This is wrong: We need to take view cursors into account here!
+				fDesktop->HWInterface()->SetCursor(
+					fDesktop->GetCursorManager().GetCursor(B_CURSOR_DEFAULT));
 			}
+
+			if (oldCursor != NULL)
+				oldCursor->Release();
 
 			if (sync) {
 				// The application is expecting a reply
