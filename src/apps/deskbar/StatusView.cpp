@@ -1014,7 +1014,7 @@ TReplicantTray::IconCount() const
 }
 
 
-/**	message must contain an archivable view
+/**	Message must contain an archivable view
  *	in the Archives folder for later rehydration
  *	returns the current boot id
  */
@@ -1025,14 +1025,50 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 	if (!icon || !id)
 		return B_ERROR;
 
+	// find entry_ref
+
+	entry_ref ref;
+	if (addOn) {
+		// Use it if we got it
+		ref = *addOn;
+	} else {
+		const char *signature;
+		status_t status = icon->FindString("add_on", &signature);
+		if (status == B_OK) {
+			BRoster roster;
+			status = roster.FindApp(signature, &ref);
+		}
+		if (status < B_OK)
+			return status;
+	}
+
+	BFile file;
+	status_t status = file.SetTo(&ref, B_READ_ONLY);
+	if (status < B_OK)
+		return status;
+
+	node_ref nodeRef;
+	status = file.GetNodeRef(&nodeRef);
+	if (status < B_OK)
+		return status;
+
+	BEntry entry(&ref, true);
+		// ToDo: this resolves an eventual link for the item
+		// being added - this is okay for now, but in multi-user
+		// environments, one might want to have links that
+		// carry the be:deskbar_item_status attribute
+	status = entry.InitCheck();
+	if (status != B_OK)
+		return status;
+
 	*id = 999;
 	if (icon->what == B_ARCHIVED_OBJECT)
 		icon->what = 0;
 
 	// !! check for name collisions?
-	status_t err = fShelf->AddReplicant(icon, BPoint(1, 1));
-	if (err != B_OK)
-		return err;
+	status = fShelf->AddReplicant(icon, BPoint(1, 1));
+	if (status != B_OK)
+		return status;
 
 	float oldWidth = Bounds().Width();
 	float oldHeight = Bounds().Height();
@@ -1044,29 +1080,10 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 	int32 count = fShelf->CountReplicants();
 	BView *view;
 	fShelf->ReplicantAt(count-1, &view, (uint32 *)id, NULL);
-	
+
 	// add the item to the add-on list
-	entry_ref ref;
-	if (addOn) {
-		// Use it if we got it
-		ref = *addOn;
-	} else {
-		const char *appsig;
-		icon->FindString("add_on", &appsig);
-		BRoster roster;
-		roster.FindApp(appsig, &ref);
-	}
 
-	BFile file(&ref, B_READ_ONLY);
-	node_ref nodeRef;
-	file.GetNodeRef(&nodeRef);
-	BEntry entry(&ref, true);
-		// ToDo: this resolves an eventual link for the item
-		// being added - this is okay for now, but in multi-user
-		// environments, one might want to have links that
-		// carry the be:deskbar_item_status attribute
 	AddItem(*id, nodeRef, entry, addOn != NULL);
-
  	return B_OK;
 }
 
