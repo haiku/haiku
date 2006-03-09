@@ -878,7 +878,8 @@ DefaultDecorator::_SetFocus()
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 	
-	if (IsFocus()) {
+	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+			&& (fFlags & B_AVOID_FOCUS) != 0)) {
 		fButtonHighColor.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
 		fButtonLowColor.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
 		fTextColor = _colors->window_tab_text;
