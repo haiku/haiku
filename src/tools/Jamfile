@@ -22,6 +22,9 @@ BuildPlatformMain <build>copyattr : copyattr.cpp
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	AddResources <build>mimeset : mimeset.rdef ;
+}
 BuildPlatformMain <build>mimeset : mimeset.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
