@@ -265,6 +265,22 @@ ServerApp::SendMessageToClient(BMessage *msg) const
 }
 
 
+bool
+ServerApp::_HasWindowUnderMouse()
+{
+	BAutolock locker(fWindowListLock);
+	
+	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+		ServerWindow* window = fWindowList.ItemAt(i);
+
+		if (fDesktop->EventDispatcher().ViewUnderMouse(window->EventTarget()) != B_NULL_TOKEN)
+			return true;
+	}
+
+	return false;
+}
+
+
 /*!
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
@@ -283,8 +299,10 @@ ServerApp::Activate(bool value)
 	fIsActive = value;
 
 	if (fIsActive) {
-		// Set the cursor to the application cursor, if any
-		fDesktop->SetCursor(CurrentCursor());
+		if (_HasWindowUnderMouse()) {
+			// Set the cursor to the application cursor, if any
+			fDesktop->SetCursor(CurrentCursor());
+		}
 		fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 	}
 }
@@ -958,7 +976,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (fAppCursor != NULL)
 				fAppCursor->Acquire();
 
-			if (fIsActive)
+			if (_HasWindowUnderMouse())
 				fDesktop->SetCursor(CurrentCursor());
 
 			if (oldCursor != NULL)

@@ -987,10 +987,10 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 
 	// mouse cursor
 
-	if (IsFocus()) {
+	if (view != NULL) {
 		// TODO: there is more for real cursor support, ie. if a window is closed,
 		//		new app cursor shouldn't override view cursor, ...
-		ServerWindow()->App()->SetCurrentCursor(view != NULL ? view->Cursor() : NULL);
+		ServerWindow()->App()->SetCurrentCursor(view->Cursor());
 	}
 }
 

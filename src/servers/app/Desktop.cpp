@@ -244,8 +244,10 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 			*_target = &window->EventTarget();
 		else
 			*_target = NULL;
-	} else
+	} else {
+		fDesktop->SetCursor(NULL);
 		*_target = NULL;
+	}
 
 	fDesktop->UnlockAllWindows();
 

@@ -95,6 +95,8 @@ class ServerApp : public MessageLooper {
 											  BPrivate::LinkReceiver& link,
 											  port_id& clientReplyPort);
 
+			bool				_HasWindowUnderMouse();
+
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;	
 									// our BApplication's event port
