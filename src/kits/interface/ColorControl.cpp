@@ -21,9 +21,8 @@
 #include <Window.h>
 
 
-const uint32 U_COLOR_CONTROL_RED_CHANGED_MSG = 'CCRC';
-const uint32 U_COLOR_CONTROL_GREEN_CHANGED_MSG = 'CCGC';
-const uint32 U_COLOR_CONTROL_BLUE_CHANGED_MSG = 'CCBC';
+static const uint32 kMsgColorEntered = 'ccol';
+static const uint32 kMinCellSize = 6;
 
 
 BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
@@ -62,7 +61,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 {
 	fColumns = layout;
 	fRows = 256 / fColumns;
-	fCellSize = size;
+	fCellSize = max_c(kMinCellSize, size);
 	fFocusedComponent = 0;
 
 	if (archive) {
@@ -82,7 +81,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		// red
 
 		fRedText = new BTextControl(rect, "_red", "Red:", "0",
-			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fRedText->SetDivider(labelWidth);
 
@@ -98,7 +97,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 		rect.OffsetBy(0.0f, offset);
 		fGreenText = new BTextControl(rect, "_green", "Green:", "0",
-			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fGreenText->SetDivider(labelWidth);
 
@@ -112,7 +111,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 		rect.OffsetBy(0.0f, offset);
 		fBlueText = new BTextControl(rect, "_blue", "Blue:", "0",
-			new BMessage('ccol'), B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			new BMessage(kMsgColorEntered), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_NAVIGABLE);
 		fBlueText->SetDivider(labelWidth);
 
@@ -287,10 +286,9 @@ void
 BColorControl::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case 'ccol':
+		case kMsgColorEntered:
 		{
 			rgb_color color;
-
 			color.red = strtol(fRedText->Text(), NULL, 10);
 			color.green = strtol(fGreenText->Text(), NULL, 10);
 			color.blue = strtol(fBlueText->Text(), NULL, 10);
@@ -449,7 +447,7 @@ BColorControl::_UpdateOffscreen(BRect update)
 void
 BColorControl::SetCellSize(float cellSide)
 {
-	fCellSize = cellSide;
+	fCellSize = max_c(kMinCellSize, cellSide);
 
 	ResizeToPreferred();
 }
