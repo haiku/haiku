@@ -83,7 +83,7 @@ RSRCS= Resource.rsrc
 # @<-src@ 
 #%}
 
-LIBS= be media tracker translation mail
+LIBS= be media tracker translation
 X86_LIBS= stdc++.r4
 PPC_LIBS= mslcpp_4_0
 
