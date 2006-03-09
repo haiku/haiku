@@ -11,6 +11,7 @@
 #include "StringView.h"
 #include "TypeListWindow.h"
 
+#include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Box.h>
@@ -25,11 +26,18 @@
 #include <NodeInfo.h>
 #include <PopUpMenu.h>
 #include <RadioButton.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <TextControl.h>
 
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+
+const uint32 kMsgSave = 'save';
+const uint32 kMsgFlagsChanged = 'flgc';
 
 const uint32 kMsgAddType = 'adtp';
 const uint32 kMsgRemoveType = 'rmtp';
@@ -46,9 +54,11 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	AddChild(menuBar);
 
 	BMenu* menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("Save", NULL, 'S', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Save Into Resource File" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("Save", new BMessage(kMsgSave), 'S', B_COMMAND_KEY));
+	BMenuItem* item;
+	menu->AddItem(item = new BMenuItem("Save Into Resource File" B_UTF8_ELLIPSIS,
 		NULL));
+	item->SetEnabled(false);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
@@ -75,6 +85,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fSignatureControl->TextView();
+	textView->SetMaxBytes(B_MIME_TYPE_LENGTH);
 	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
@@ -97,7 +108,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	topView->AddChild(box);
 
 	fFlagsCheckBox = new BCheckBox(rect, "flags", "Application Flags",
-		NULL); //new BMessage(kMsgFlagChanged));
+		new BMessage(kMsgFlagsChanged));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
 	fFlagsCheckBox->ResizeToPreferred();
 	box->SetLabel(fFlagsCheckBox);
@@ -223,10 +234,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	topView->AddChild(box);
 
 	BMenuField* menuField;
-	BPopUpMenu *popUpMenu;
-	BMenuItem* item;
 #if 0
-	popUpMenu = new BPopUpMenu("version info", true, true);
+	BPopUpMenu *popUpMenu = new BPopUpMenu("version info", true, true);
 	item = new BMenuItem("Version Info", NULL);
 	item->SetMarked(true);
 	popUpMenu->AddItem(item);
@@ -247,38 +256,41 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	fMajorVersionControl->GetPreferredSize(&width, &height);
 	width = 12.0f + fMajorVersionControl->StringWidth("99");
 	fMajorVersionControl->ResizeTo(fMajorVersionControl->Divider() + width, height);
+	_MakeNumberTextControl(fMajorVersionControl);
 	box->AddChild(fMajorVersionControl);
 
-	rect.left = fMajorVersionControl->Frame().right;
+	rect.left = fMajorVersionControl->Frame().right + 1.0f;
 	fMiddleVersionControl = new BTextControl(rect, "middle", ".", NULL,
 		NULL);
 	fMiddleVersionControl->SetDivider(fMiddleVersionControl->StringWidth(
 		fMiddleVersionControl->Label()) + 4.0f);
 	fMiddleVersionControl->ResizeTo(fMiddleVersionControl->Divider() + width, height);
+	_MakeNumberTextControl(fMiddleVersionControl);
 	box->AddChild(fMiddleVersionControl);
 
-	rect.left = fMiddleVersionControl->Frame().right;
+	rect.left = fMiddleVersionControl->Frame().right + 1.0f;
 	fMinorVersionControl = new BTextControl(rect, "middle", ".", NULL,
 		NULL);
 	fMinorVersionControl->SetDivider(fMinorVersionControl->StringWidth(
 		fMinorVersionControl->Label()) + 4.0f);
 	fMinorVersionControl->ResizeTo(fMinorVersionControl->Divider() + width, height);
+	_MakeNumberTextControl(fMinorVersionControl);
 	box->AddChild(fMinorVersionControl);
 
-	popUpMenu = new BPopUpMenu("variety", true, true);
-	popUpMenu->AddItem(new BMenuItem("Development", NULL));
-	popUpMenu->AddItem(new BMenuItem("Alpha", NULL));
-	popUpMenu->AddItem(new BMenuItem("Beta", NULL));
-	popUpMenu->AddItem(new BMenuItem("Gamma", NULL));
-	popUpMenu->AddItem(item = new BMenuItem("Golden Master", NULL));
+	fVarietyMenu = new BPopUpMenu("variety", true, true);
+	fVarietyMenu->AddItem(new BMenuItem("Development", NULL));
+	fVarietyMenu->AddItem(new BMenuItem("Alpha", NULL));
+	fVarietyMenu->AddItem(new BMenuItem("Beta", NULL));
+	fVarietyMenu->AddItem(new BMenuItem("Gamma", NULL));
+	fVarietyMenu->AddItem(item = new BMenuItem("Golden Master", NULL));
 	item->SetMarked(true);
-	popUpMenu->AddItem(new BMenuItem("Final", NULL));
+	fVarietyMenu->AddItem(new BMenuItem("Final", NULL));
 
 	rect.top--;
 		// BMenuField oddity
 	rect.left = fMinorVersionControl->Frame().right + 6.0f;
 	menuField = new BMenuField(rect,
-		"variety", NULL, popUpMenu, true);
+		"variety", NULL, fVarietyMenu, true);
 	menuField->ResizeToPreferred();
 	box->AddChild(menuField);
 
@@ -301,6 +313,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	fShortDescriptionControl->SetDivider(labelWidth);
 	fShortDescriptionControl->GetPreferredSize(&width, &height);
 	fShortDescriptionControl->ResizeTo(rect.Width(), height);
+	fShortDescriptionControl->TextView()->SetMaxBytes(sizeof(version_info::short_info));
 	box->AddChild(fShortDescriptionControl);
 
 	rect.OffsetBy(0.0f, fShortDescriptionControl->Bounds().Height() + 5.0f);
@@ -315,6 +328,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.bottom = rect.top + fShortDescriptionControl->Bounds().Height() * 3.0f - 1.0f;
 	fLongDescriptionView = new BTextView(rect, "long desc",
 		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
+	fLongDescriptionView->SetMaxBytes(sizeof(version_info::long_info));
+//	box->AddChild(fLongDescriptionView);
 
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW, false, false);
@@ -364,6 +379,197 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 {
 	SetTitle(_Title(entry).String());
 	fEntry = entry;
+
+	// Retrieve Info
+
+	BFile file(&entry, B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BAppFileInfo info(&file);
+	if (info.InitCheck() != B_OK)
+		return;
+
+	char signature[B_MIME_TYPE_LENGTH];
+	if (info.GetSignature(signature) != B_OK)
+		signature[0] = '\0';
+
+	bool gotFlags = false;
+	uint32 flags;
+	if (info.GetAppFlags(&flags) == B_OK)
+		gotFlags = true;
+	else
+		flags = B_MULTIPLE_LAUNCH;
+
+	BMessage supportedTypes;
+	info.GetSupportedTypes(&supportedTypes);
+
+	version_info versionInfo;
+	if (info.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) != B_OK)
+		memset(&versionInfo, 0, sizeof(version_info));
+
+	// Set Controls
+
+	fSignatureControl->SetText(signature);
+
+	// flags
+
+	switch (flags & (B_SINGLE_LAUNCH | B_MULTIPLE_LAUNCH | B_EXCLUSIVE_LAUNCH)) {
+		case B_SINGLE_LAUNCH:
+			fSingleLaunchButton->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_EXCLUSIVE_LAUNCH:
+			fExclusiveLaunchButton->SetValue(B_CONTROL_ON);
+			break;
+
+		case B_MULTIPLE_LAUNCH:
+		default:
+			fMultipleLaunchButton->SetValue(B_CONTROL_ON);
+			break;
+	}
+
+	fArgsOnlyCheckBox->SetValue((flags & B_ARGV_ONLY) != 0);
+	fBackgroundAppCheckBox->SetValue((flags & B_BACKGROUND_APP) != 0);
+	fFlagsCheckBox->SetValue(gotFlags);
+
+	_UpdateAppFlagsEnabled();
+
+	// icon
+
+	entry_ref ref;
+	if (entry.GetRef(&ref) == B_OK)
+		fIconView->SetTo(&ref);
+
+	// supported types
+
+	for (int32 i = fTypeListView->CountItems(); i-- > 0;) {
+		BListItem* item = fTypeListView->RemoveItem(i);
+		delete item;
+	}
+
+	const char* type;
+	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++) {
+		fTypeListView->AddItem(new BStringItem(type));
+	}
+	fRemoveTypeButton->SetEnabled(false);
+
+	// version info
+	
+	char text[256];
+	snprintf(text, sizeof(text), "%ld", versionInfo.major);
+	fMajorVersionControl->SetText(text);
+	snprintf(text, sizeof(text), "%ld", versionInfo.middle);
+	fMiddleVersionControl->SetText(text);
+	snprintf(text, sizeof(text), "%ld", versionInfo.minor);
+	fMinorVersionControl->SetText(text);
+
+	if (versionInfo.variety >= (uint32)fVarietyMenu->CountItems())
+		versionInfo.variety = 0;
+	BMenuItem* item = fVarietyMenu->ItemAt(versionInfo.variety);
+	if (item != NULL)
+		item->SetMarked(true);
+
+	snprintf(text, sizeof(text), "%ld", versionInfo.internal);
+	fInternalVersionControl->SetText(text);
+
+	fShortDescriptionControl->SetText(versionInfo.short_info);
+	fLongDescriptionView->SetText(versionInfo.long_info);
+}
+
+
+void
+ApplicationTypeWindow::_UpdateAppFlagsEnabled()
+{
+	bool enabled = fFlagsCheckBox->Value() != B_CONTROL_OFF;
+
+	fSingleLaunchButton->SetEnabled(enabled);
+	fMultipleLaunchButton->SetEnabled(enabled);
+	fExclusiveLaunchButton->SetEnabled(enabled);
+	fArgsOnlyCheckBox->SetEnabled(enabled);
+	fBackgroundAppCheckBox->SetEnabled(enabled);
+}
+
+
+void
+ApplicationTypeWindow::_MakeNumberTextControl(BTextControl* control)
+{
+	// filter out invalid characters that can't be part of a MIME type name
+	BTextView* textView = control->TextView();
+	textView->SetMaxBytes(10);
+
+	for (int32 i = 0; i < 256; i++) {
+		if (!isdigit(i))
+			textView->DisallowChar(i);
+	}
+}
+
+
+void
+ApplicationTypeWindow::_Save()
+{
+	BFile file;
+	status_t status = file.SetTo(&fEntry, B_READ_WRITE);
+	if (status != B_OK)
+		return;
+
+	BAppFileInfo info(&file);
+	status = info.InitCheck();
+	if (status != B_OK)
+		return;
+
+	// Retrieve Info
+
+	uint32 flags = 0;
+	if (fFlagsCheckBox->Value() != B_CONTROL_OFF) {
+		if (fSingleLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_SINGLE_LAUNCH;
+		else if (fMultipleLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_MULTIPLE_LAUNCH;
+		else if (fExclusiveLaunchButton->Value() != B_CONTROL_OFF)
+			flags |= B_EXCLUSIVE_LAUNCH;
+
+		if (fArgsOnlyCheckBox->Value() != B_CONTROL_OFF)
+			flags |= B_ARGV_ONLY;
+		if (fBackgroundAppCheckBox->Value() != B_CONTROL_OFF)
+			flags |= B_BACKGROUND_APP;
+	}
+
+	BMessage supportedTypes;
+	// TODO!
+
+	version_info versionInfo;
+	versionInfo.major = atol(fMajorVersionControl->Text());
+	versionInfo.middle = atol(fMiddleVersionControl->Text());
+	versionInfo.minor = atol(fMinorVersionControl->Text());
+	versionInfo.variety = fVarietyMenu->IndexOf(fVarietyMenu->FindMarked());
+	versionInfo.internal = atol(fInternalVersionControl->Text());
+	strlcpy(versionInfo.short_info, fShortDescriptionControl->Text(),
+		sizeof(versionInfo.short_info));
+	strlcpy(versionInfo.long_info, fLongDescriptionView->Text(),
+		sizeof(versionInfo.long_info));
+
+	// Save
+
+	status = info.SetSignature(fSignatureControl->Text());
+	if (status == B_OK)
+		status = info.SetAppFlags(flags);
+	if (status == B_OK)
+		status = info.SetVersionInfo(&versionInfo, B_APP_VERSION_KIND);
+
+// TODO: icon & supported types
+//	if (status == B_OK)
+//		status = info.SetIcon(&icon);
+//	if (status == B_OK)
+//		status = info.SetSupportedTypes(&supportedTypes);
+}
+
+
+void
+ApplicationTypeWindow::FrameResized(float width, float height)
+{
+	// This works around a flaw of BTextView
+	fLongDescriptionView->SetTextRect(fLongDescriptionView->Bounds());
 }
 
 
@@ -371,6 +577,14 @@ void
 ApplicationTypeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kMsgFlagsChanged:
+			_UpdateAppFlagsEnabled();
+			break;
+
+		case kMsgSave:
+			_Save();
+			break;
+
 		case B_SIMPLE_DATA:
 		{
 			entry_ref ref;

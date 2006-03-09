@@ -84,24 +84,27 @@ IconView::MouseDown(BPoint where)
 
 
 void
-IconView::SetTo(entry_ref* file)
+IconView::SetTo(entry_ref* ref)
 {
 	delete fIcon;
 	fIcon = NULL;
 
-	BNode node(file);
-	BNodeInfo info(&node);
-	if (node.InitCheck() != B_OK
-		|| info.InitCheck() != B_OK)
-		return;
+	if (ref != NULL) {
+		BNode node(ref);
+		BNodeInfo info(&node);
+		if (node.InitCheck() != B_OK
+			|| info.InitCheck() != B_OK)
+			return;
+	
+		BBitmap* icon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
+		if (info.GetIcon(icon, B_LARGE_ICON) != B_OK) {
+			delete icon;
+			return;
+		}
 
-	BBitmap* icon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
-	if (info.GetIcon(icon, B_LARGE_ICON) != B_OK) {
-		delete icon;
-		return;
+		fIcon = icon;
 	}
 
-	fIcon = icon;
 	Invalidate();
 }
 

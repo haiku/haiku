@@ -13,7 +13,7 @@
 class BButton;
 class BCheckBox;
 class BListView;
-class BMenuField;
+class BPopUpMenu;
 class BRadioButton;
 class BTextControl;
 class BTextView;
@@ -27,12 +27,16 @@ class ApplicationTypeWindow : public BWindow {
 		ApplicationTypeWindow(BPoint position, const BEntry& entry);
 		virtual ~ApplicationTypeWindow();
 
+		virtual void FrameResized(float width, float height);
 		virtual void MessageReceived(BMessage* message);
 		virtual bool QuitRequested();
 
 	private:
 		BString _Title(const BEntry& entry);
 		void _SetTo(const BEntry& entry);
+		void _UpdateAppFlagsEnabled();
+		void _MakeNumberTextControl(BTextControl* control);
+		void _Save();
 
 	private:
 		BEntry			fEntry;
@@ -55,6 +59,7 @@ class ApplicationTypeWindow : public BWindow {
 		BTextControl*	fMajorVersionControl;
 		BTextControl*	fMiddleVersionControl;
 		BTextControl*	fMinorVersionControl;
+		BPopUpMenu*		fVarietyMenu;
 		BTextControl*	fInternalVersionControl;
 		BTextControl*	fShortDescriptionControl;
 		BTextView*		fLongDescriptionView;
