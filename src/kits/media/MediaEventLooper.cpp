@@ -438,7 +438,6 @@ BMediaEventLooper::Quit()
 		return;
 	
 	SetRunState(B_QUITTING);
-	write_port(ControlPort(), 0, NULL, 0); // null message to unblock the read (see BMediaNode::WaitForMessage)
 	close_port(ControlPort());
 	if (fControlThread != -1) {
 		status_t err;
