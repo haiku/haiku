@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,6 +22,8 @@
 
 #include <Rect.h>
 #include <View.h>
+
+#include <WindowPrivate.h>
 
 #include <stdio.h>
 
@@ -112,9 +114,11 @@ DefaultDecorator::SetLook(DesktopSettings& settings,
 	}
 
 	ServerFont font;
-	if (look == B_FLOATING_WINDOW_LOOK)
+	if (look == B_FLOATING_WINDOW_LOOK || look == kLeftTitledWindowLook) {
 		settings.GetDefaultPlainFont(font);
-	else
+		if (look == kLeftTitledWindowLook)
+			font.SetRotation(90.0f);
+	} else
 		settings.GetDefaultBoldFont(font);
 
 	font.SetFlags(B_FORCE_ANTIALIASING);
@@ -179,8 +183,8 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 {
 	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", pt.x, pt.y));
 	// Move all internal rectangles the appropriate amount
-	_frame.right		+= pt.x;
-	_frame.bottom		+= pt.y;
+	_frame.right += pt.x;
+	_frame.bottom += pt.y;
 
 	// handle invalidation of resize rect
 	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
@@ -197,6 +201,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 			case B_TITLED_WINDOW_LOOK:
 			case B_FLOATING_WINDOW_LOOK:
 			case B_MODAL_WINDOW_LOOK:
+			case kLeftTitledWindowLook:
 				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
 								   fRightBorder.right - 22, fBottomBorder.bottom - 1);
 				// resize rect at old location
@@ -260,19 +265,29 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 	// resize tab and layout tab items
 	if (_tabrect.IsValid()) {
-		float tabWidth = fRightBorder.right - fLeftBorder.left;
-	
-		if (tabWidth < fMinTabWidth)
-			tabWidth = fMinTabWidth;
-		if (tabWidth > fMaxTabWidth)
-			tabWidth = fMaxTabWidth;
-	
-		if (tabWidth != _tabrect.Width()) {
+		float tabSize;
+		if (fLook != kLeftTitledWindowLook)
+			tabSize = fRightBorder.right - fLeftBorder.left;
+		else
+			tabSize = fBottomBorder.bottom - fTopBorder.top;
+
+		if (tabSize < fMinTabSize)
+			tabSize = fMinTabSize;
+		if (tabSize > fMaxTabSize)
+			tabSize = fMaxTabSize;
+
+		if (fLook != kLeftTitledWindowLook && tabSize != _tabrect.Width()) {
 			// NOTE: the tab rect becoming smaller is handled
 			// by the Desktop anyways, so it is sufficient
 			// to include it into the dirty region in it's
 			// final state only once at the end
-			_tabrect.right = _tabrect.left + tabWidth;
+			_tabrect.right = _tabrect.left + tabSize;
+			_LayoutTabItems(_tabrect);
+
+			if (dirty)
+				dirty->Include(_tabrect);
+		} else if (fLook == kLeftTitledWindowLook && tabSize != _tabrect.Height()) {
+			_tabrect.bottom = _tabrect.top + tabSize;
 			_LayoutTabItems(_tabrect);
 
 			if (dirty)
@@ -285,7 +300,8 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 void
 DefaultDecorator::Draw(BRect update)
 {
-	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
+	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
+		update.left, update.top, update.right, update.bottom));
 
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
@@ -311,7 +327,7 @@ DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 								int32* maxWidth, int32* maxHeight) const
 {
 	if (_tabrect.IsValid())
-		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabWidth - 2 * fBorderWidth));
+		*minWidth = (int32)roundf(max_c(*minWidth, fMinTabSize - 2 * fBorderWidth));
 	if (_resizerect.IsValid())
 		*minHeight = (int32)roundf(max_c(*minHeight, _resizerect.Height() - fBorderWidth));
 }
@@ -394,7 +410,8 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 		if (!(fFlags & B_NOT_RESIZABLE)
 			&& (fLook == B_TITLED_WINDOW_LOOK
 				|| fLook == B_FLOATING_WINDOW_LOOK
-				|| fLook == B_MODAL_WINDOW_LOOK)) {
+				|| fLook == B_MODAL_WINDOW_LOOK
+				|| fLook == kLeftTitledWindowLook)) {
 			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
 					   fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
@@ -441,6 +458,7 @@ DefaultDecorator::_DoLayout()
 			fBorderWidth = 5;
 			break;
 		case B_FLOATING_WINDOW_LOOK:
+		case kLeftTitledWindowLook:
 			hasTab = true;
 			fBorderWidth = 3;
 			break;
@@ -452,24 +470,30 @@ DefaultDecorator::_DoLayout()
 		default:
 			fBorderWidth = 0;
 	}
-	
+
 	// calculate our tab rect
 	if (hasTab) {
 		// tab is initially on the left
 		fTabOffset = 0;
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK) ? 10 : 18;
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+			? 10 : 18;
 
 		font_height fontHeight;
 		fDrawState.Font().GetHeight(fontHeight);
 
-		_tabrect.Set(_frame.left - fBorderWidth,
-					 _frame.top - fBorderWidth
-					 	- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
-					 ((_frame.right - _frame.left) < 35.0 ?
-					 _frame.left + 35.0 : _frame.right) + fBorderWidth,
-					 _frame.top - fBorderWidth);
+		if (fLook != kLeftTitledWindowLook) {
+			_tabrect.Set(_frame.left - fBorderWidth,
+				_frame.top - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
+				((_frame.right - _frame.left) < 35.0 ?
+					_frame.left + 35.0 : _frame.right) + fBorderWidth,
+				_frame.top - fBorderWidth);
+		} else {
+			_tabrect.Set(_frame.left - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+				_frame.top - fBorderWidth, _frame.left - fBorderWidth,
+				_frame.bottom + fBorderWidth);
+		}
 
 		// format tab rect for a floating window - make the rect smaller
 		if (fLook == B_FLOATING_WINDOW_LOOK) {
@@ -481,33 +505,37 @@ DefaultDecorator::_DoLayout()
 		float size;
 		_GetButtonSizeAndOffset(_tabrect, &offset, &size);
 
-		// fMinTabWidth contains just the room for the buttons
-		fMinTabWidth = 4.0 + fTextOffset;
-		if (!(fFlags & B_NOT_CLOSABLE))
-			fMinTabWidth += offset + size;
-		if (!(fFlags & B_NOT_ZOOMABLE))
-			fMinTabWidth += offset + size;
+		// fMinTabSize contains just the room for the buttons
+		fMinTabSize = 4.0 + fTextOffset;
+		if ((fFlags & B_NOT_CLOSABLE) == 0)
+			fMinTabSize += offset + size;
+		if ((fFlags & B_NOT_ZOOMABLE) == 0)
+			fMinTabSize += offset + size;
 
-		// fMaxTabWidth contains fMinWidth + the width required for the title
-		fMaxTabWidth = _driver ? _driver->StringWidth(Title(), strlen(Title()),
-			&fDrawState) : 0.0;
-		if (fMaxTabWidth > 0.0)
-			fMaxTabWidth += fTextOffset;
-		fMaxTabWidth += fMinTabWidth;
+		// fMaxTabSize contains fMinWidth + the width required for the title
+		fMaxTabSize = _driver ? ceilf(_driver->StringWidth(Title(), strlen(Title()),
+			&fDrawState)) : 0.0;
+		if (fMaxTabSize > 0.0)
+			fMaxTabSize += fTextOffset;
+		fMaxTabSize += fMinTabSize;
 
-		float tabWidth = _frame.Width();
-		if (tabWidth < fMinTabWidth)
-			tabWidth = fMinTabWidth;
-		if (tabWidth > fMaxTabWidth)
-			tabWidth = fMaxTabWidth;
+		float tabSize = fLook != kLeftTitledWindowLook ? _frame.Width() : _frame.Height();
+		if (tabSize < fMinTabSize)
+			tabSize = fMinTabSize;
+		if (tabSize > fMaxTabSize)
+			tabSize = fMaxTabSize;
 
 		// layout buttons and truncate text
-		_tabrect.right = _tabrect.left + tabWidth;
+		if (fLook != kLeftTitledWindowLook)
+			_tabrect.right = _tabrect.left + tabSize;
+		else
+			_tabrect.bottom = _tabrect.top + tabSize;
+
 		_LayoutTabItems(_tabrect);
 	} else {
 		// no tab
-		fMinTabWidth = 0.0;
-		fMaxTabWidth = 0.0;
+		fMinTabSize = 0.0;
+		fMaxTabSize = 0.0;
 		_tabrect.Set(0.0, 0.0, -1.0, -1.0);
 		_closerect.Set(0.0, 0.0, -1.0, -1.0);
 		_zoomrect.Set(0.0, 0.0, -1.0, -1.0);
@@ -562,8 +590,9 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	switch (fLook) {
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
-		case B_MODAL_WINDOW_LOOK: {
-			//top
+		case B_MODAL_WINDOW_LOOK:
+		{
+			// top
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -577,7 +606,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										fFrameColors[2]);
 				}
 			}
-			//left
+			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
@@ -585,7 +614,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										fFrameColors[i]);
 				}
 			}
-			//bottom
+			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
@@ -593,7 +622,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
-			//right
+			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
@@ -603,30 +632,39 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 			}
 			break;
 		}
-		case B_FLOATING_WINDOW_LOOK: {
-			//top
+		
+		case B_FLOATING_WINDOW_LOOK:
+		case kLeftTitledWindowLook:
+		{
+			// top
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
 										BPoint(r.right - i, r.top + i),
 										fFrameColors[i * 2]);
 				}
-				if (_tabrect.IsValid()) {
+				if (_tabrect.IsValid() && fLook != kLeftTitledWindowLook) {
 					// grey along the bottom of the tab (overwrites "white" from frame)
 					_driver->StrokeLine(BPoint(_tabrect.left + 2, _tabrect.bottom + 1),
 										BPoint(_tabrect.right - 2, _tabrect.bottom + 1),
 										fFrameColors[2]);
 				}
 			}
-			//left
+			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.top + i),
 										BPoint(r.left + i, r.bottom - i),
 										fFrameColors[i * 2]);
 				}
+				if (fLook == kLeftTitledWindowLook && _tabrect.IsValid()) {
+					// grey along the right side of the tab (overwrites "white" from frame)
+					_driver->StrokeLine(BPoint(_tabrect.right + 1, _tabrect.top + 2),
+										BPoint(_tabrect.right + 1, _tabrect.bottom - 2),
+										fFrameColors[2]);
+				}
 			}
-			//bottom
+			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.left + i, r.bottom - i),
@@ -634,7 +672,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
-			//right
+			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					_driver->StrokeLine(BPoint(r.right - i, r.top + i),
@@ -644,10 +682,10 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 			}
 			break;
 		}
-		case B_BORDERED_WINDOW_LOOK: {
+
+		case B_BORDERED_WINDOW_LOOK:
 			_driver->StrokeRect(r, fFrameColors[5]);
 			break;
-		}
 
 		default:
 			// don't draw a border frame
@@ -658,8 +696,9 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	if (!(fFlags & B_NOT_RESIZABLE)) {
 		r = _resizerect;
 
-		switch (fLook){
-			case B_DOCUMENT_WINDOW_LOOK: {
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+			{
 				if (!invalid.Intersects(r))
 					break;
 
@@ -667,10 +706,14 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 				float y = r.bottom - 3;
 
 				_driver->FillRect(BRect(x - 13, y - 13, x, y), fFrameColors[2]);
-				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2), fFrameColors[0]);
-				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1), fFrameColors[1]);
-				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15), fFrameColors[0]);
-				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14), fFrameColors[1]);
+				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2),
+					fFrameColors[0]);
+				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1),
+					fFrameColors[1]);
+				_driver->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15),
+					fFrameColors[0]);
+				_driver->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14),
+					fFrameColors[1]);
 
 				if (!IsFocus())
 					break;
@@ -688,10 +731,12 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 			case B_TITLED_WINDOW_LOOK:
 			case B_FLOATING_WINDOW_LOOK:
-			case B_MODAL_WINDOW_LOOK: {
-
-				if (!invalid.Intersects(BRect(fRightBorder.right - 22, fBottomBorder.bottom - 22,
-											  fRightBorder.right - 1, fBottomBorder.bottom - 1)))
+			case B_MODAL_WINDOW_LOOK:
+			case kLeftTitledWindowLook:
+			{
+				if (!invalid.Intersects(BRect(fRightBorder.right - 22,
+						fBottomBorder.bottom - 22, fRightBorder.right - 1,
+						fBottomBorder.bottom - 1)))
 					break;
 		
 				_driver->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
@@ -703,10 +748,9 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 				break;
 			}
 
-			default: {
+			default:
 				// don't draw resize corner
 				break;
-			}
 		}
 	}
 }
@@ -731,23 +775,35 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	// outer frame
 	_driver->StrokeLine(_tabrect.LeftTop(), _tabrect.LeftBottom(), fFrameColors[0]);
 	_driver->StrokeLine(_tabrect.LeftTop(), _tabrect.RightTop(), fFrameColors[0]);
-	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(), fFrameColors[5]);
+	if (fLook != kLeftTitledWindowLook)
+		_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(), fFrameColors[5]);
+	else
+		_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(), fFrameColors[5]);
 
 	// bevel
 	_driver->StrokeLine(BPoint(_tabrect.left + 1, _tabrect.top + 1),
-						BPoint(_tabrect.left + 1, _tabrect.bottom),
-						tabColorLight);
+		BPoint(_tabrect.left + 1, _tabrect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
+		tabColorLight);
 	_driver->StrokeLine(BPoint(_tabrect.left + 1, _tabrect.top + 1),
-						BPoint(_tabrect.right - 1, _tabrect.top + 1),
-						tabColorLight);
+		BPoint(_tabrect.right - (fLook == kLeftTitledWindowLook ? 0 : 1), _tabrect.top + 1),
+		tabColorLight);
 
-	_driver->StrokeLine(BPoint(_tabrect.right - 1, _tabrect.top + 2),
-						BPoint(_tabrect.right - 1, _tabrect.bottom),
-						tabColorShadow);
+	if (fLook != kLeftTitledWindowLook) {
+		_driver->StrokeLine(BPoint(_tabrect.right - 1, _tabrect.top + 2),
+			BPoint(_tabrect.right - 1, _tabrect.bottom), tabColorShadow);
+	} else {
+		_driver->StrokeLine(BPoint(_tabrect.left + 2, _tabrect.bottom - 1),
+			BPoint(_tabrect.right, _tabrect.bottom - 1), tabColorShadow);
+	}
 
 	// fill
-	_driver->FillRect(BRect(_tabrect.left + 2, _tabrect.top + 2,
-							_tabrect.right - 2, _tabrect.bottom), fTabColor);
+	if (fLook != kLeftTitledWindowLook) {
+		_driver->FillRect(BRect(_tabrect.left + 2, _tabrect.top + 2,
+			_tabrect.right - 2, _tabrect.bottom), fTabColor);
+	} else {
+		_driver->FillRect(BRect(_tabrect.left + 2, _tabrect.top + 2,
+			_tabrect.right, _tabrect.bottom - 2), fTabColor);
+	}
 
 	_DrawTitle(_tabrect);
 
@@ -781,10 +837,17 @@ DefaultDecorator::_DrawTitle(BRect r)
 	fDrawState.Font().GetHeight(fontHeight);
 
 	BPoint titlePos;
-	titlePos.x = _closerect.IsValid() ? _closerect.right + fTextOffset
-		: _tabrect.left + fTextOffset;
-	titlePos.y = floorf(((_tabrect.top + 2.0) + _tabrect.bottom + fontHeight.ascent
-		+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+	if (fLook != kLeftTitledWindowLook) {
+		titlePos.x = _closerect.IsValid() ? _closerect.right + fTextOffset
+			: _tabrect.left + fTextOffset;
+		titlePos.y = floorf(((_tabrect.top + 2.0) + _tabrect.bottom + fontHeight.ascent
+			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+	} else {
+		titlePos.x = floorf(((_tabrect.left + 2.0) + _tabrect.right + fontHeight.ascent
+			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.y = _zoomrect.IsValid() ? _zoomrect.top - fTextOffset
+			: _tabrect.bottom - fTextOffset;
+	}
 
 	_driver->DrawString(fTruncatedTitle.String(), fTruncatedTitleLength, titlePos, &fDrawState);
 }
@@ -865,7 +928,7 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 	rgb_color halfcol, startcol, endcol;
 	float rstep, gstep, bstep;
 
-	int steps = (w < h) ? w : h;
+	int steps = w < h ? w : h;
 
 	if (down) {
 		startcol = fButtonLowColor.GetColor32();
@@ -901,12 +964,17 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 
 // _GetButtonSizeAndOffset
 void
-DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* offset, float* size) const
+DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
+	float* _size) const
 {
-	*offset = fLook == B_FLOATING_WINDOW_LOOK ? 4.0 : 5.0;
+	*_offset = fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook ? 4.0 : 5.0;
+
 	// "+ 2" so that the rects are centered within the solid area
 	// (without the 2 pixels for the top border)
-	*size = tabRect.Height() - 2.0 * *offset + 2.0;
+	if (fLook != kLeftTitledWindowLook)
+		*_size = tabRect.Height() - 2.0 * *_offset + 2.0f;
+	else
+		*_size = tabRect.Width() - 2.0 * *_offset + 2.0f;
 }
 
 // _LayoutTabItems
@@ -918,31 +986,42 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	_GetButtonSizeAndOffset(tabRect, &offset, &size);
 
 	// calulate close rect based on the tab rectangle
-	if (Flags() & B_NOT_CLOSABLE) {
-		// the close rect has no width
+	if (fLook != kLeftTitledWindowLook) {
 		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
-			tabRect.left + offset, tabRect.top + offset + size);
+			tabRect.left + offset + size, tabRect.top + offset + size);
+
+		_zoomrect.Set(tabRect.right - offset - size, tabRect.top + offset,
+			tabRect.right - offset, tabRect.top + offset + size);
+
+		// hidden buttons have no width
+		if ((Flags() & B_NOT_CLOSABLE) != 0)
+			_closerect.right = _closerect.left - offset;
+		if ((Flags() & B_NOT_ZOOMABLE) != 0)
+			_zoomrect.left = _zoomrect.right + offset;
 	} else {
 		_closerect.Set(tabRect.left + offset, tabRect.top + offset,
 			tabRect.left + offset + size, tabRect.top + offset + size);
-	}
 
-	// calulate zoom rect based on the tab rectangle
-	if (Flags() & B_NOT_ZOOMABLE) {
-		// the zoom rect has no width
-		_zoomrect.Set(tabRect.right, tabRect.top + offset,
-			tabRect.right, tabRect.top + offset + size);
-	} else {
-		_zoomrect.Set(tabRect.right - offset - size, tabRect.top + offset,
-			tabRect.right - offset, tabRect.top + offset + size);
+		_zoomrect.Set(tabRect.left + offset, tabRect.bottom - offset - size,
+			tabRect.left + size + offset, tabRect.bottom - offset);
+
+		// hidden buttons have no height
+		if ((Flags() & B_NOT_CLOSABLE) != 0)
+			_closerect.bottom = _closerect.top - offset;
+		if ((Flags() & B_NOT_ZOOMABLE) != 0)
+			_zoomrect.top = _zoomrect.bottom + offset;
 	}
 
 	// calculate room for title
 	// ToDo: the +2 is there because the title often appeared
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
-	float width = (_zoomrect.left - _closerect.right) - fTextOffset * 2 + 2;
+	if (fLook != kLeftTitledWindowLook)
+		size = (_zoomrect.left - _closerect.right) - fTextOffset * 2 + 2;
+	else
+		size = (_zoomrect.top - _closerect.bottom) - fTextOffset * 2 + 2;
+
 	fTruncatedTitle = Title();
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, width);
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, size);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }

@@ -79,8 +79,8 @@ class DefaultDecorator: public Decorator {
 		uint32			fTabOffset;
 		float			fTextOffset;
 
-		float			fMinTabWidth;
-		float			fMaxTabWidth;
+		float			fMinTabSize;
+		float			fMaxTabSize;
 		BString			fTruncatedTitle;
 		int32			fTruncatedTitleLength;
 
