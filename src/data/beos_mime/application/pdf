@@ -6,3 +6,6 @@ resource(1, "META:TYPE") "application/pdf";
 resource(2, "META:SNIFF_RULE") "0.50          (\"%PDF\")";
 
 resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.mp-xpdf";
+
+resource(4, "META:S:DESC") #'MSDC' "PDF Document";
+
