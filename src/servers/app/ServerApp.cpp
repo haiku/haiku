@@ -91,6 +91,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fClientTeam(clientTeam),
 	fWindowListLock("window list"),
 	fAppCursor(NULL),
+	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
 	fSharedMem("shared memory", 32768)
@@ -281,17 +282,29 @@ ServerApp::Activate(bool value)
 
 	fIsActive = value;
 
-	if (fIsActive)
-		SetCursor();
+	if (fIsActive) {
+		// Set the cursor to the application cursor, if any
+		fDesktop->SetCursor(CurrentCursor());
+		fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
+	}
 }
 
 
-//! Sets the cursor to the application cursor, if any.
 void
-ServerApp::SetCursor()
+ServerApp::SetCurrentCursor(ServerCursor* cursor)
 {
-	fDesktop->SetCursor(fAppCursor);
-	fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
+	fViewCursor = cursor;
+	fDesktop->SetCursor(CurrentCursor());
+}
+
+
+ServerCursor*
+ServerApp::CurrentCursor() const
+{
+	if (fViewCursor != NULL)
+		return fViewCursor;
+
+	return fAppCursor;
 }
 
 
@@ -928,6 +941,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SET_CURSOR:
 		{
 			STRACE(("ServerApp %s: SetCursor\n", Signature()));
+
 			// Attached data:
 			// 1) bool flag to send a reply
 			// 2) int32 token ID of the cursor to set
@@ -941,13 +955,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerCursor* oldCursor = fAppCursor;
 			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
-			if (fAppCursor != NULL) {
+			if (fAppCursor != NULL)
 				fAppCursor->Acquire();
-				fDesktop->HWInterface()->SetCursor(fAppCursor);
-			}
 
-			// TODO: This is wrong: We need to take view cursors into account here!
-			fDesktop->SetCursor(fAppCursor);
+			if (fIsActive)
+				fDesktop->SetCursor(CurrentCursor());
 
 			if (oldCursor != NULL)
 				oldCursor->Release();
@@ -1013,9 +1025,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&token);
 			if (link.Read<bool>(&pendingViewCursor) != B_OK)
 				break;
-
-			if (fAppCursor && fAppCursor->Token() == token)
-				fAppCursor = NULL;
 
 			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
 			if (cursor) {

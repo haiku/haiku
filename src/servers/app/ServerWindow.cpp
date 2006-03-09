@@ -590,7 +590,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_SEND_BEHIND:
 		{
-			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_SEND_BEHIND\n", Title()));
 			int32 token;
 			team_id teamID;
 			status_t status;
@@ -650,7 +650,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		case AS_NEEDS_UPDATE:
 		{
-			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n", Title()));
+			STRACE(("ServerWindow %s: Message AS_NEEDS_UPDATE\n", Title()));
 			if (fWindowLayer->NeedsUpdate())
 				fLink.StartMessage(B_OK);
 			else
@@ -1240,7 +1240,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 		case AS_LAYER_SET_CURSOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s - NOT IMPLEMENTED\n", Title(), fCurrentLayer->Name()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: ViewLayer: %s\n", Title(),	
+				fCurrentLayer->Name()));
+
 			int32 token;
 			if (link.Read<int32>(&token) != B_OK)
 				break;
@@ -1253,7 +1255,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				fDesktop->UnlockSingleWindow();
 
 				if (fDesktop->EventDispatcher().ViewUnderMouse(fEventTarget) == fCurrentLayer->Token())
-					fDesktop->SetCursor(cursor);
+					fServerApp->SetCurrentCursor(cursor);
 
 				fDesktop->LockSingleWindow();
 			}

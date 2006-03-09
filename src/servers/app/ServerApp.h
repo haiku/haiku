@@ -61,8 +61,8 @@ class ServerApp : public MessageLooper {
 
 			void				SendMessageToClient(BMessage* message) const;
 
-			void				SetCursor();
-			ServerCursor*		Cursor() const { return fAppCursor; }
+			void				SetCurrentCursor(ServerCursor* cursor);
+			ServerCursor*		CurrentCursor() const;
 
 			team_id				ClientTeam() const;
 			const char*			Signature() const { return fSignature.String(); }
@@ -74,16 +74,16 @@ class ServerApp : public MessageLooper {
 
 			int32				CountBitmaps() const;
 			ServerBitmap*		FindBitmap(int32 token) const;
-	
+
 			int32				CountPictures() const;
 			ServerPicture*		CreatePicture(const ServerPicture* original = NULL);
 			ServerPicture*		FindPicture(const int32& token) const;
 			bool				DeletePicture(const int32& token);
-	
+
 			AreaPool*			AppAreaPool() { return &fSharedMem; }
-	
+
 			Desktop*			GetDesktop() const { return fDesktop; }
-	
+
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
  private:
@@ -123,6 +123,7 @@ class ServerApp : public MessageLooper {
 			BList				fPictureList;
 
 			ServerCursor*		fAppCursor;
+			ServerCursor*		fViewCursor;
 			int32				fCursorHideLevel;
 									// 0 = cursor visible
 
