@@ -696,7 +696,7 @@ void
 BMenuItem::DrawShortcutSymbol()
 {
 	// TODO: Review this
-	BPoint where(ContentLocation() + BPoint(fBounds.Width() - 32.0f, fBounds.Height() - 4.0f));
+	BPoint where(ContentLocation() + BPoint(fBounds.Width() - 28.0f, fBounds.Height() - 4.0f));
 	if (fSubmenu)
 		where.x -= 12;
 
