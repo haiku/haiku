@@ -407,8 +407,7 @@ BSlider::FrameResized(float w,float h)
 	}
 #endif
 
-	SetValue(Value());
-	// virtual
+	Invalidate();
 }
 
 
