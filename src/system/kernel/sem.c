@@ -499,8 +499,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
-		dprintf("thread %ld tried to acquire kernel semaphore.\n",
-			thread_get_current_thread_id());
+		dprintf("thread %ld tried to acquire kernel semaphore %ld.\n",
+			thread_get_current_thread_id(), id);
 		status = B_NOT_ALLOWED;
 		goto err;
 	}
@@ -617,6 +617,11 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 err:
 	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
+
+#if 0
+	if (status == B_NOT_ALLOWED)
+	_user_debugger("Thread tried to acquire kernel semaphore.");
+#endif
 
 	return status;
 }
