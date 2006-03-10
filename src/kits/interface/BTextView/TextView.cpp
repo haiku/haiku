@@ -4010,7 +4010,7 @@ BTextView::UpdateScrollbars()
 /*!	\brief Autoresizes the view to fit the contained text.
 */
 void
-BTextView::AutoResize(bool doredraw)
+BTextView::AutoResize(bool redraw)
 {
 	if (fResizable) {
 		float width = 0;
@@ -4018,10 +4018,14 @@ BTextView::AutoResize(bool doredraw)
 			width = max_c(width, LineWidth(i));
 		
 		float textRectPadding = Bounds().right - fTextRect.right;
+		width += fTextRect.left + textRectPadding;
+		
 		BView *viewToResize = fContainerView != NULL ? fContainerView : this;
 		viewToResize->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
 		
 		fTextRect.right = Bounds().right - textRectPadding;
+		if (redraw)
+			DrawLines(0, CountLines());
 	}
 }
 
