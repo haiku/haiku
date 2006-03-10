@@ -22,8 +22,10 @@
 #include <String.h>
 #include <Window.h>
 
+#include <input_globals.h>
 #include <AppMisc.h>
 #include <ApplicationPrivate.h>
+#include <InputServerTypes.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
@@ -2576,13 +2578,24 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 	if (focusView)
 		focusView->MakeFocus(true);
 
-	// TODO: Notify the input server if we are passing focus
+	// we notify the input server if we are passing focus
 	// from a view which has the B_INPUT_METHOD_AWARE to a one
 	// which does not, or vice-versa
 	if (notifyInputServer) {
-		// TODO: Send a message to input server using
-		// control_input_server()
+		bool oldIMAware = false, newIMAware = false;
+		if (focusView)
+			newIMAware = focusView->Flags() & B_INPUT_METHOD_AWARE;
+		if (fFocus)
+			oldIMAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
+		if (newIMAware ^ oldIMAware) {
+			BMessage msg(newIMAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+			BMessage reply;
+			_control_input_server_(&msg, &reply);
+			// do we care return code ?
+		}
 	}
+
+	fFocus = focusView;
 }
 
 
