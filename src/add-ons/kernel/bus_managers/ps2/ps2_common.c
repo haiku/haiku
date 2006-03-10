@@ -140,36 +140,52 @@ ps2_setup_active_multiplexing(bool *enabled)
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
 		return res;
+	// Step 1, if controller is good, in does match out.
+	// This test failes with MS Virtual PC.
+	if (in != out)
+		goto no_support;
 
 	out = 0x56;
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
 		return res;
+	// Step 2, if controller is good, in does match out.
+	if (in != out)
+		goto no_support;
 
 	out = 0xa4;
 	res = ps2_command(0xd3, &out, 1, &in, 1);
 	if (res)
 		return res;
-		
-	// If the controller doesn't support active multiplexing, 
-	// in data is 0xa4 (or 0xac on some broken USB legacy emulation)
+	// Step 3, if the controller doesn't support active multiplexing, 
+	// then in data does match out data (0xa4), else it's version number.
+	if (in == out)
+		goto no_support;
 
-	if (in != 0xa4 && in != 0xac) {
-		dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
-		*enabled = true;
-		ps2_command(0xa8, NULL, 0, NULL, 0);
-		ps2_command(0x90, NULL, 0, NULL, 0);
-		ps2_command(0xa8, NULL, 0, NULL, 0);
-		ps2_command(0x91, NULL, 0, NULL, 0);
-		ps2_command(0xa8, NULL, 0, NULL, 0);
-		ps2_command(0x92, NULL, 0, NULL, 0);
-		ps2_command(0xa8, NULL, 0, NULL, 0);
-		ps2_command(0x93, NULL, 0, NULL, 0);
-		ps2_command(0xa8, NULL, 0, NULL, 0);
-	} else {
-		dprintf("ps2: active multiplexing not supported\n");
-		*enabled = false;
+	// With some broken USB legacy emulation, it's 0xac, and with
+	// MS Virtual PC, it's 0xa6. Since current active multiplexing
+	// specification version is 1.1 (0x11), we validate the data.
+	if (in > 0x9f) {
+		dprintf("ps2: active multiplexing v%d.%d detected, but ignored!\n", (in >> 4), in & 0xf);
+		goto no_support;
 	}
+
+	dprintf("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
+	ps2_command(0xa8, NULL, 0, NULL, 0);
+	ps2_command(0x90, NULL, 0, NULL, 0);
+	ps2_command(0xa8, NULL, 0, NULL, 0);
+	ps2_command(0x91, NULL, 0, NULL, 0);
+	ps2_command(0xa8, NULL, 0, NULL, 0);
+	ps2_command(0x92, NULL, 0, NULL, 0);
+	ps2_command(0xa8, NULL, 0, NULL, 0);
+	ps2_command(0x93, NULL, 0, NULL, 0);
+	ps2_command(0xa8, NULL, 0, NULL, 0);
+	*enabled = true;
+	return B_OK;
+
+no_support:	
+	dprintf("ps2: active multiplexing not supported\n");
+	*enabled = false;
 	return B_OK;
 }
 

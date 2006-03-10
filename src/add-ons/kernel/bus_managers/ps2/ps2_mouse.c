@@ -58,7 +58,6 @@
  * byte, on the second the X offset, and on the 3rd the Y offset.
  */
 
-
 #include <Drivers.h>
 #include <string.h>
 #include <malloc.h>
@@ -88,7 +87,7 @@ typedef struct
 	uint8			packet_buffer[PS2_MAX_PACKET_SIZE];
 
 } mouse_cookie;
-	
+
 
 static status_t
 ps2_reset_mouse(mouse_cookie *cookie)
@@ -113,29 +112,17 @@ ps2_reset_mouse(mouse_cookie *cookie)
 }
 
 
-
 /** Set sampling rate of the ps2 port.
  */
- 
-static status_t
+static inline status_t
 ps2_set_sample_rate(mouse_cookie *cookie, uint8 rate)
 {
-	int32 tries = 5;
-
-	while (--tries > 0) {
-		status_t status = ps2_dev_command(cookie->dev, PS2_CMD_SET_SAMPLE_RATE, &rate, 1, NULL, 0);
-
-		if (status == B_OK)
-			return B_OK;
-	}
-
-	return B_ERROR;
+	return ps2_dev_command(cookie->dev, PS2_CMD_SET_SAMPLE_RATE, &rate, 1, NULL, 0);
 }
 
 
 /** Converts a packet received by the mouse to a "movement".
- */  
- 
+ */
 static void
 ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos)
 {
@@ -187,7 +174,6 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 
 /** Read a mouse event from the mouse events chain buffer.
  */
-
 static status_t
 mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 {
@@ -216,7 +202,6 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 
 /** Enables or disables mouse reporting for the PS/2 port.
  */
-
 static status_t
 set_mouse_enabled(mouse_cookie *cookie, bool enable)
 {
@@ -240,7 +225,6 @@ set_mouse_enabled(mouse_cookie *cookie, bool enable)
  *	by read() operations. The full data is obtained using 3 consecutive
  *	calls to the handler, each holds a different byte on the data port.
  */
-
 int32
 mouse_handle_int(ps2_dev *dev, uint8 data)
 {
