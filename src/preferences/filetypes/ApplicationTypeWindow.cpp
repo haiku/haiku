@@ -39,8 +39,55 @@
 const uint32 kMsgSave = 'save';
 const uint32 kMsgFlagsChanged = 'flgc';
 
+const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgAddType = 'adtp';
+const uint32 kMsgTypeAdded = 'tpad';
 const uint32 kMsgRemoveType = 'rmtp';
+
+
+class SupportedTypeItem : public BStringItem {
+	public:
+		SupportedTypeItem(const char* type);
+		~SupportedTypeItem();
+
+		const char* Type() const { return fType.String(); }
+
+		static int Compare(const void* _a, const void* _b);
+
+	private:
+		BString	fType;
+};
+
+
+SupportedTypeItem::SupportedTypeItem(const char* type)
+	: BStringItem(type),
+	fType(type)
+{
+	BMimeType mimeType(type);
+
+	char description[B_MIME_TYPE_LENGTH];
+	if (mimeType.GetShortDescription(description) == B_OK && description[0])
+		SetText(description);
+}
+
+
+SupportedTypeItem::~SupportedTypeItem()
+{
+}
+
+
+/*static*/
+int
+SupportedTypeItem::Compare(const void* _a, const void* _b)
+{
+	const SupportedTypeItem* a = *(const SupportedTypeItem**)_a;
+	const SupportedTypeItem* b = *(const SupportedTypeItem**)_b;
+
+	return strcasecmp(a->Type(), b->Type());
+}
+
+
+//	#pragma mark -
 
 
 ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entry)
@@ -202,8 +249,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 		// take scrollview border into account
 	fTypeListView = new BListView(rect, "type listview",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT);
-//	fTypeListView->SetSelectionMessage(new BMessage(kMsgExtensionSelected));
-//	fTypeListView->SetInvocationMessage(new BMessage(kMsgExtensionInvoked));
+	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
 	BScrollView* scrollView = new BScrollView("type scrollview", fTypeListView,
 		B_FOLLOW_LEFT_RIGHT, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
@@ -450,8 +496,9 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 
 	const char* type;
 	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++) {
-		fTypeListView->AddItem(new BStringItem(type));
+		fTypeListView->AddItem(new SupportedTypeItem(type));
 	}
+	fTypeListView->SortItems(&SupportedTypeItem::Compare);
 	fRemoveTypeButton->SetEnabled(false);
 
 	// version info
@@ -536,7 +583,14 @@ ApplicationTypeWindow::_Save()
 	}
 
 	BMessage supportedTypes;
-	// TODO!
+	for (int32 i = 0; i < fTypeListView->CountItems(); i++) {
+		SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
+			fTypeListView->ItemAt(i));
+		if (item == NULL)
+			continue;
+
+		supportedTypes.AddString("types", item->Type());
+	}
 
 	version_info versionInfo;
 	versionInfo.major = atol(fMajorVersionControl->Text());
@@ -557,11 +611,12 @@ ApplicationTypeWindow::_Save()
 	if (status == B_OK)
 		status = info.SetVersionInfo(&versionInfo, B_APP_VERSION_KIND);
 
-// TODO: icon & supported types
+// TODO: icon & supported types icons
 //	if (status == B_OK)
 //		status = info.SetIcon(&icon);
-//	if (status == B_OK)
-//		status = info.SetSupportedTypes(&supportedTypes);
+
+	if (status == B_OK)
+		status = info.SetSupportedTypes(&supportedTypes);
 }
 
 
@@ -584,6 +639,71 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSave:
 			_Save();
 			break;
+
+		case kMsgTypeSelected:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				BStringItem* item = (BStringItem*)fTypeListView->ItemAt(index);
+				fRemoveTypeButton->SetEnabled(item != NULL);
+			}
+			break;
+		}
+
+		case kMsgAddType:
+		{
+			BWindow* window = new TypeListWindow(NULL,
+				kMsgTypeAdded, this);
+			window->Show();
+			break;
+		}
+
+		case kMsgTypeAdded:
+		{
+			const char* type;
+			if (message->FindString("type", &type) != B_OK)
+				break;
+
+			// check if this type already exists
+
+			SupportedTypeItem* newItem = new SupportedTypeItem(type);
+			int32 insertAt = 0;
+
+			for (int32 i = fTypeListView->CountItems(); i-- > 0;) {
+				SupportedTypeItem* item = dynamic_cast<SupportedTypeItem*>(
+					fTypeListView->ItemAt(i));
+				if (item == NULL)
+					continue;
+
+				int compare = strcasecmp(item->Type(), type);
+				if (!compare) {
+					// type does already exist, select it and bail out
+					delete newItem;
+					newItem = NULL;
+					fTypeListView->Select(i);
+					break;
+				}
+				if (compare < 0)
+					insertAt = i + 1;
+			}
+
+			if (newItem == NULL)
+				break;
+
+			fTypeListView->AddItem(newItem, insertAt);
+			fTypeListView->Select(insertAt);
+			break;
+		}
+
+		case kMsgRemoveType:
+		{
+			int32 index = fTypeListView->CurrentSelection();
+			if (index < 0)
+				break;
+
+			delete fTypeListView->RemoveItem(index);
+			break;
+		}
 
 		case B_SIMPLE_DATA:
 		{
