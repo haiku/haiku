@@ -1246,12 +1246,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			if (fWindowLayer->IsFocus()) {
 				// The cursor might need to be updated now
-				fDesktop->UnlockSingleWindow();
-
-				if (fDesktop->EventDispatcher().ViewUnderMouse(fEventTarget) == fCurrentLayer->Token())
+				if (fDesktop->ViewUnderMouse(fWindowLayer) == fCurrentLayer->Token())
 					fServerApp->SetCurrentCursor(cursor);
-
-				fDesktop->LockSingleWindow();
 			}
 			break;
 		}

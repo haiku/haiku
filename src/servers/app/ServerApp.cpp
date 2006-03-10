@@ -273,7 +273,7 @@ ServerApp::_HasWindowUnderMouse()
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* window = fWindowList.ItemAt(i);
 
-		if (fDesktop->EventDispatcher().ViewUnderMouse(window->EventTarget()) != B_NULL_TOKEN)
+		if (fDesktop->ViewUnderMouse(window->Window()) != B_NULL_TOKEN)
 			return true;
 	}
 

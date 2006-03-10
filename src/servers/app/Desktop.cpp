@@ -240,11 +240,15 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 				break;
 		}
 
-		if (*_viewToken != B_NULL_TOKEN)
+		if (*_viewToken != B_NULL_TOKEN) {
+			fDesktop->SetViewUnderMouse(window, *_viewToken);
 			*_target = &window->EventTarget();
-		else
+		} else {
+			fDesktop->SetViewUnderMouse(NULL, B_NULL_TOKEN);
 			*_target = NULL;
+		}
 	} else {
+		fDesktop->SetViewUnderMouse(NULL, B_NULL_TOKEN);
 		fDesktop->SetCursor(NULL);
 		*_target = NULL;
 	}
@@ -1753,6 +1757,24 @@ void
 Desktop::SetMouseEventWindow(WindowLayer* window)
 {
 	fMouseEventWindow = window;
+}
+
+
+void
+Desktop::SetViewUnderMouse(const WindowLayer* window, int32 viewToken)
+{
+	fWindowUnderMouse = window;
+	fViewUnderMouse = viewToken;
+}
+
+
+int32
+Desktop::ViewUnderMouse(const WindowLayer* window)
+{
+	if (fWindowUnderMouse == window)
+		return fViewUnderMouse;
+
+	return B_NULL_TOKEN;
 }
 
 

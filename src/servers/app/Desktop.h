@@ -134,6 +134,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		WindowLayer*			MouseEventWindow() const { return fMouseEventWindow; }
 		void					SetMouseEventWindow(WindowLayer* window);
 
+		void					SetViewUnderMouse(const WindowLayer* window, int32 viewToken);
+		int32					ViewUnderMouse(const WindowLayer* window);
+
 		void					SetFocusWindow(WindowLayer* window);
 
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
@@ -241,6 +244,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		bool					fFocusFollowsMouse;
 
 		WindowLayer*			fMouseEventWindow;
+		const WindowLayer*		fWindowUnderMouse;
+		int32					fViewUnderMouse;
+
 		WindowLayer*			fFocus;
 		WindowLayer*			fFront;
 		WindowLayer*			fBack;

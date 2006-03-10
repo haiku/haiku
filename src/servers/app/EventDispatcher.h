@@ -85,8 +85,6 @@ class EventDispatcher : public BLocker {
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
 
-		int32 ViewUnderMouse(EventTarget& target);
-
 		void SetDragMessage(BMessage& message, ServerBitmap* bitmap,
 							const BPoint& offsetFromCursor);
 			// the message should be delivered on the next
@@ -127,7 +125,6 @@ class EventDispatcher : public BLocker {
 		thread_id		fCursorThread;
 
 		EventTarget*	fPreviousMouseTarget;
-		int32			fPreviousViewToken;
 		EventTarget*	fFocus;
 		bool			fSuspendFocus;
 

@@ -219,7 +219,6 @@ EventDispatcher::EventDispatcher()
 	fThread(-1),
 	fCursorThread(-1),
 	fPreviousMouseTarget(NULL),
-	fPreviousViewToken(B_NULL_TOKEN),
 	fFocus(NULL),
 	fSuspendFocus(false),
 	fMouseFilter(NULL),
@@ -507,24 +506,11 @@ EventDispatcher::SetHWInterface(HWInterface* interface)
 }
 
 
-int32
-EventDispatcher::ViewUnderMouse(EventTarget& target)
-{
-	BAutolock _(this);
-	
-	if (&target == fPreviousMouseTarget)
-		return fPreviousViewToken;
-
-	return B_NULL_TOKEN;
-}
-
-
 void
 EventDispatcher::SetDragMessage(BMessage& message,
-								ServerBitmap* bitmap,
-								const BPoint& offsetFromCursor)
+	ServerBitmap* bitmap, const BPoint& offsetFromCursor)
 {
-//	printf("EventDispatcher::SetDragMessage()\n");
+	ETRACE(("EventDispatcher::SetDragMessage()\n"));
 
 	if (fDragBitmap != bitmap) {
 		if (fDragBitmap)
@@ -541,9 +527,9 @@ EventDispatcher::SetDragMessage(BMessage& message,
 	BAutolock _(this);
 
 	fDragMessage = message;
-
 	fDraggingMessage = true;
 }
+
 
 //	#pragma mark - Message methods
 
@@ -641,9 +627,9 @@ EventDispatcher::_UnsetFeedFocus(BMessage* message)
 void
 EventDispatcher::_DeliverDragMessage()
 {
-//	printf("EventDispatcher::_DeliverDragMessage()\n");
+	ETRACE(("EventDispatcher::_DeliverDragMessage()\n"));
 
-	if (fDraggingMessage && fPreviousMouseTarget) {
+	if (fDraggingMessage && fPreviousMouseTarget != NULL) {
 		fDragMessage.RemoveName("_original_what");
 		fDragMessage.AddInt32("_original_what", fDragMessage.what);
 		fDragMessage.what = _MESSAGE_DROPPED_;
@@ -777,7 +763,6 @@ EventDispatcher::_EventLoop()
 				}
 
 				current = fPreviousMouseTarget = mouseTarget;
-				fPreviousViewToken = viewToken;
 
 				if (current != NULL) {
 					int32 focusView = viewToken;
