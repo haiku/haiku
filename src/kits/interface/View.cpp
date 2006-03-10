@@ -3482,12 +3482,12 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 	if (fBounds.bottom + deltaHeight < 0)
 		deltaHeight = -fBounds.bottom;
 
-	if (deltaWidth == 0 && deltaHeight == 0)
-		return;
-
 	// BeBook says we should do this. And it makes sense.
 	deltaWidth = roundf(deltaWidth);
 	deltaHeight = roundf(deltaHeight);
+
+	if (deltaWidth == 0 && deltaHeight == 0)
+		return;
 
 	if (fOwner) {
 		check_lock();
