@@ -851,11 +851,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&minHeight);
 			link.Read<int32>(&maxHeight);
 */
+			fDesktop->UnlockSingleWindow();
+
 			if (fDesktop->LockAllWindows()) {
 				fWindowLayer->SetSizeLimits(minWidth, maxWidth,
 					minHeight, maxHeight);
 				fDesktop->UnlockAllWindows();
 			}
+
+			fDesktop->LockSingleWindow();
 
 			// and now, sync the client to the limits that we were able to enforce
 			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth,
@@ -899,9 +903,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_GET_MOUSE:
 		{
-fDesktop->UnlockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
 
+			fDesktop->UnlockSingleWindow();
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
@@ -914,7 +918,7 @@ fDesktop->UnlockSingleWindow();
 			fLink.Attach<BPoint>(where);
 			fLink.Attach<int32>(buttons);
 			fLink.Flush();
-fDesktop->LockSingleWindow();
+			fDesktop->LockSingleWindow();
 			break;
 		}
 
@@ -1150,21 +1154,18 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			float offsetX = x - fCurrentLayer->Frame().left;
 			float offsetY = y - fCurrentLayer->Frame().top;
 
-			if (fDesktop->LockSingleWindow()) {
-				BRegion dirty;
-				fCurrentLayer->MoveBy(offsetX, offsetY, &dirty);
+			BRegion dirty;
+			fCurrentLayer->MoveBy(offsetX, offsetY, &dirty);
 
-				// TODO: think about how to avoid this hack:
-				// the parent clipping needs to be updated, it is not
-				// done in ResizeBy() since it would need to avoid
-				// too much computations when children are resized because
-				// follow modes
-				if (ViewLayer* parent = fCurrentLayer->Parent())
-					parent->RebuildClipping(false);
+			// TODO: think about how to avoid this hack:
+			// the parent clipping needs to be updated, it is not
+			// done in ResizeBy() since it would need to avoid
+			// too much computations when children are resized because
+			// follow modes
+			if (ViewLayer* parent = fCurrentLayer->Parent())
+				parent->RebuildClipping(false);
 
-				fWindowLayer->MarkContentDirty(dirty);
-				fDesktop->UnlockSingleWindow();
-			}
+			fWindowLayer->MarkContentDirty(dirty);
 			break;
 		}
 		case AS_LAYER_RESIZE_TO:
@@ -1179,23 +1180,18 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			float deltaWidth = newWidth - fCurrentLayer->Frame().Width();
 			float deltaHeight = newHeight - fCurrentLayer->Frame().Height();
 
-			if (fDesktop->LockSingleWindow()) {
-				BRegion dirty;
-				fCurrentLayer->ResizeBy(deltaWidth, deltaHeight, &dirty);
+			BRegion dirty;
+			fCurrentLayer->ResizeBy(deltaWidth, deltaHeight, &dirty);
 
-				// TODO: see above
-				if (ViewLayer* parent = fCurrentLayer->Parent())
-					parent->RebuildClipping(false);
+			// TODO: see above
+			if (ViewLayer* parent = fCurrentLayer->Parent())
+				parent->RebuildClipping(false);
 
-				fWindowLayer->MarkContentDirty(dirty);
-				fDesktop->UnlockSingleWindow();
-			}
+			fWindowLayer->MarkContentDirty(dirty);
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			fDesktop->LockSingleWindow();
-
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
 			// our offset in the parent -> will be originX and originY in BView
@@ -1203,8 +1199,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fLink.Attach<float>(fCurrentLayer->Frame().top);
 			fLink.Attach<BRect>(fCurrentLayer->Bounds());
 			fLink.Flush();
-
-			fDesktop->UnlockSingleWindow();
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -1844,10 +1838,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 
 		default:
-			if (fDesktop->LockSingleWindow()) {
-				_DispatchViewDrawingMessage(code, link);
-				fDesktop->UnlockSingleWindow();
-			}
+			_DispatchViewDrawingMessage(code, link);
 			break;
 	}
 }

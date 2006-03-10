@@ -1707,7 +1707,6 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 
 	_TriggerWindowRedrawing(dirty);
 
-
 	UnlockAllWindows();
 }
 
@@ -1820,8 +1819,10 @@ Desktop::WindowAction(int32 windowToken, int32 action)
 
 	::ServerWindow* serverWindow;
 	if (BPrivate::gDefaultTokens.GetToken(windowToken,
-			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK)
+			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK) {
+		UnlockAllWindows();
 		return;
+	}
 
 	if (action == B_BRING_TO_FRONT
 		&& !serverWindow->Window()->IsMinimized()) {
