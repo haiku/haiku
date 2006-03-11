@@ -40,8 +40,6 @@ MergeObject <libbe>app_kit.o :
 	Looper.cpp
 	LooperList.cpp
 	Message.cpp
-	MessageBody.cpp
-	MessageField.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
 	MessageRunner.cpp
