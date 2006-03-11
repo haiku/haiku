@@ -1,114 +1,48 @@
-/*****************************************************************************/
-//               File: TranslationUtils.h
-//              Class: BTranslationUtils
-//   Reimplemented by: Michael Wilber, Translation Kit Team
-//   Reimplementation: 2002-04
-//
-// Description: Utility functions for the Translation Kit
-//
-//
-// Copyright (c) 2002 OpenBeOS Project
-//
-// Original Version: Copyright 1998, Be Incorporated, All Rights Reserved.
-//                   Copyright 1995-1997, Jon Watte
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Wilber
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+/*! Utility functions for the Translation Kit */
+
+
 #include <Application.h>
-#include <Roster.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <Entry.h>
 #include <File.h>
 #include <MenuItem.h>
+#include <NodeInfo.h>
+#include <Path.h>
 #include <Resources.h>
-#include <stdlib.h>
+#include <Roster.h>
 #include <TextView.h>
+#include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
-#include <TranslationUtils.h>
-#include <Entry.h>
-#include <Path.h>
 
-// ---------------------------------------------------------------
-// Constructor
-//
-// Does nothing! :) This class has no data members.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+#include <stdlib.h>
+
+
 BTranslationUtils::BTranslationUtils()
 {
 }
 
-// ---------------------------------------------------------------
-// Desstructor
-//
-// Does nothing! :) This class has no data members.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
 BTranslationUtils::~BTranslationUtils()
 {
 }
 
-// ---------------------------------------------------------------
-// Constructor
-//
-// Does nothing! :) This class has no data members.
-//
-// Preconditions:
-//
-// Parameters: kUtils, not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
 BTranslationUtils::BTranslationUtils(const BTranslationUtils &kUtils)
 {
 }
 
-// ---------------------------------------------------------------
-// operator=
-//
-// Does nothing! :) This class has no data members.
-//
-// Preconditions:
-//
-// Parameters: kUtils, not used
-//
-// Postconditions:
-//
-// Returns: reference to the object
-// ---------------------------------------------------------------
+
 BTranslationUtils &
 BTranslationUtils::operator=(const BTranslationUtils &kUtils)
 {
@@ -361,35 +295,30 @@ BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
 		return NULL;
 }
 
-// ---------------------------------------------------------------
-// GetStyledText
-//
-// This function translates the styled text in fromStream and 
-// inserts it at the end of the text in intoView, using the
-// BTranslatorRoster *roster to do the translation. The structs
-// that make it possible to work with the translated data are
-// defined in
-// /boot/develop/headers/be/translation/TranslatorFormats.h
-//
-// Preconditions:
-//
-// Parameters: fromStream, the stream with the styled text
-//             intoView, the view where the test will be inserted
-//             roster, BTranslatorRoster used to do the translation
-//
-// Postconditions:
-//
-// Returns: B_BAD_VALUE, if fromStream or intoView is NULL
-//          B_ERROR, if any other error occurred
-//          B_NO_ERROR, if successful
-// ---------------------------------------------------------------
+
+/*!
+	This function translates the styled text in fromStream and 
+	inserts it at the end of the text in intoView, using the
+	BTranslatorRoster *roster to do the translation. The structs
+	that make it possible to work with the translated data are
+	defined in
+	/boot/develop/headers/be/translation/TranslatorFormats.h
+	
+	\param fromStream the stream with the styled text
+	\param intoView the view where the test will be inserted
+		roster, BTranslatorRoster used to do the translation
+
+	\return B_BAD_VALUE, if fromStream or intoView is NULL
+	\return B_ERROR, if any other error occurred
+	\return B_OK, if successful
+*/
 status_t
 BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	BTranslatorRoster *roster)
 {
 	if (fromStream == NULL || intoView == NULL)
 		return B_BAD_VALUE;
-	
+
 	// Use default Translator if none is specified 
 	if (roster == NULL) {
 		roster = BTranslatorRoster::Default();
@@ -397,139 +326,127 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 			return B_ERROR;
 	}
 
-	// Translate the file from whatever format it is in the file
-	// to the B_STYLED_TEXT_FORMAT, placing the translated data into mallio
-	BMallocIO mallio;
-	if (roster->Translate(fromStream, NULL, NULL, &mallio,
-		B_STYLED_TEXT_FORMAT) < B_OK)
-		return B_ERROR;
-	
+	// Translate the file from whatever format it is to B_STYLED_TEXT_FORMAT
+	// we understand
+	BMallocIO mallocIO;
+	if (roster->Translate(fromStream, NULL, NULL, &mallocIO,
+			B_STYLED_TEXT_FORMAT) < B_OK)
+		return B_BAD_TYPE;
+
+	const uint8* buffer = (const uint8*)mallocIO.Buffer();
+
 	// make sure there is enough data to fill the stream header
 	const size_t kStreamHeaderSize = sizeof(TranslatorStyledTextStreamHeader);
-	if (mallio.BufferLength() < kStreamHeaderSize)
+	if (mallocIO.BufferLength() < kStreamHeaderSize)
 		return B_ERROR;
-	
+
 	// copy the stream header from the mallio buffer
 	TranslatorStyledTextStreamHeader stm_header =
-		*(reinterpret_cast<const TranslatorStyledTextStreamHeader *> (mallio.Buffer()));
-	
+		*(reinterpret_cast<const TranslatorStyledTextStreamHeader *>(buffer));
+
 	// convert the stm_header.header struct to the host format
 	const size_t kRecordHeaderSize = sizeof(TranslatorStyledTextRecordHeader);
 	if (swap_data(B_UINT32_TYPE, &stm_header.header, kRecordHeaderSize,
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+			B_SWAP_BENDIAN_TO_HOST) != B_OK
+		|| swap_data(B_INT32_TYPE, &stm_header.version, sizeof(int32),
+			B_SWAP_BENDIAN_TO_HOST) != B_OK
+		|| stm_header.header.magic != 'STXT')
 		return B_ERROR;
-	if (swap_data(B_INT32_TYPE, &stm_header.version, sizeof(int32),
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
-		return B_ERROR;
-	if (stm_header.header.magic != 'STXT')
-		return B_ERROR;
-	
-	// copy the text header from the mallio buffer
+
+	// copy the text header from the mallocIO buffer
+
 	uint32 offset = stm_header.header.header_size +
 		stm_header.header.data_size;
 	const size_t kTextHeaderSize = sizeof(TranslatorStyledTextTextHeader);
-	if (mallio.BufferLength() < offset + kTextHeaderSize)
+	if (mallocIO.BufferLength() < offset + kTextHeaderSize)
 		return B_ERROR;
-	
-	TranslatorStyledTextTextHeader txt_header = 
-		*(reinterpret_cast<const TranslatorStyledTextTextHeader *>
-			(reinterpret_cast<const char *> (mallio.Buffer()) + offset));
-	
+
+	TranslatorStyledTextTextHeader textHeader = 
+		*(const TranslatorStyledTextTextHeader *)(buffer + offset);
+
 	// convert the stm_header.header struct to the host format
-	if (swap_data(B_UINT32_TYPE, &txt_header.header, kRecordHeaderSize,
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+	if (swap_data(B_UINT32_TYPE, &textHeader.header, kRecordHeaderSize,
+			B_SWAP_BENDIAN_TO_HOST) != B_OK
+		|| swap_data(B_INT32_TYPE, &textHeader.charset, sizeof(int32),
+			B_SWAP_BENDIAN_TO_HOST) != B_OK
+		|| textHeader.header.magic != 'TEXT'
+		|| textHeader.charset != B_UNICODE_UTF8)
 		return B_ERROR;
-	if (swap_data(B_INT32_TYPE, &txt_header.charset, sizeof(int32),
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+
+	offset += textHeader.header.header_size;
+	if (mallocIO.BufferLength() < offset + textHeader.header.data_size)
 		return B_ERROR;
-	if (txt_header.header.magic != 'TEXT')
-		return B_ERROR;
-	if (txt_header.charset != B_UNICODE_UTF8)
-		return B_ERROR;
-	
-	offset += txt_header.header.header_size;
-	if (mallio.BufferLength() < offset + txt_header.header.data_size)
-		return B_ERROR;
-	
-	const char *pTextData =
-		(reinterpret_cast<const char *> (mallio.Buffer())) + offset;
+
+	const char* text = (const char*)buffer + offset;
 		// point text pointer at the actual character data
-	
-	if (mallio.BufferLength() > offset + txt_header.header.data_size) {
+
+	if (mallocIO.BufferLength() > offset + textHeader.header.data_size) {
 		// If the stream contains information beyond the text data
 		// (which means that this data is probably styled text data)
 
-		offset += txt_header.header.data_size;
+		offset += textHeader.header.data_size;
 		const size_t kStyleHeaderSize =
 			sizeof(TranslatorStyledTextStyleHeader);
-		if (mallio.BufferLength() < offset + kStyleHeaderSize)
+		if (mallocIO.BufferLength() < offset + kStyleHeaderSize)
 			return B_ERROR;
-		
-		TranslatorStyledTextStyleHeader stl_header = 
-			*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>
-				(reinterpret_cast<const char *> (mallio.Buffer()) + offset));
-		if (swap_data(B_UINT32_TYPE, &stl_header.header, kRecordHeaderSize,
-			B_SWAP_BENDIAN_TO_HOST) != B_OK)
-			return B_ERROR;
-		if (swap_data(B_UINT32_TYPE, &stl_header.apply_offset, sizeof(uint32),
-			B_SWAP_BENDIAN_TO_HOST) != B_OK)
-			return B_ERROR;
-		if (swap_data(B_UINT32_TYPE, &stl_header.apply_length, sizeof(uint32),
-			B_SWAP_BENDIAN_TO_HOST) != B_OK)
-			return B_ERROR;
-		if (stl_header.header.magic != 'STYL')
-			return B_ERROR;
-		
-		offset += stl_header.header.header_size;
-		if (mallio.BufferLength() < offset + stl_header.header.data_size)
-			return B_ERROR;
-		
-		// set pRawData to the flattened run array data
-		const void *kpRawData = reinterpret_cast<const void *>
-			(reinterpret_cast<const char *> (mallio.Buffer()) + offset);
-		text_run_array *pRunArray = BTextView::UnflattenRunArray(kpRawData);
-	
-		if (pRunArray) {
-			intoView->Insert(intoView->TextLength(), pTextData,
-				txt_header.header.data_size, pRunArray);
-			free(pRunArray);
-			pRunArray = NULL;
-		} else
-			return B_ERROR;
-	} else
-		intoView->Insert(intoView->TextLength(), pTextData,
-			txt_header.header.data_size);
 
-	return B_NO_ERROR;
+		TranslatorStyledTextStyleHeader styleHeader = 
+			*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>(buffer + offset));
+		if (swap_data(B_UINT32_TYPE, &styleHeader.header, kRecordHeaderSize,
+				B_SWAP_BENDIAN_TO_HOST) != B_OK
+			|| swap_data(B_UINT32_TYPE, &styleHeader.apply_offset, sizeof(uint32),
+				B_SWAP_BENDIAN_TO_HOST) != B_OK
+			|| swap_data(B_UINT32_TYPE, &styleHeader.apply_length, sizeof(uint32),
+				B_SWAP_BENDIAN_TO_HOST) != B_OK
+			|| styleHeader.header.magic != 'STYL')
+			return B_ERROR;
+
+		offset += styleHeader.header.header_size;
+		if (mallocIO.BufferLength() < offset + styleHeader.header.data_size)
+			return B_ERROR;
+
+		// get the text run array
+
+		text_run_array *runArray = BTextView::UnflattenRunArray(buffer + offset);
+		if (runArray) {
+			intoView->Insert(intoView->TextLength(), text,
+				textHeader.header.data_size, runArray);
+			BTextView::FreeRunArray(runArray);
+		} else {
+			// run array seems to be garbled; the text alone must be enough
+			intoView->Insert(intoView->TextLength(), text,
+				textHeader.header.data_size);
+		}
+	} else {
+		intoView->Insert(intoView->TextLength(), text,
+			textHeader.header.data_size);
+	}
+
+	return B_OK;
 }
 
-// ---------------------------------------------------------------
-// PutStyledText
-//
-// This function takes styled text data from fromView and writes it to
-// intoStream.  The plain text data and styled text data are combined
-// when they are written to intoStream.  This is different than how
-// a save operation in StyledEdit works.  With StyledEdit, it writes
-// plain text data to the file, but puts the styled text data in
-// the "styles" attribute.  In other words, this function writes
-// styled text data to files in a manner that isn't human readable.
-// 
-// So, if you want to write styled text
-// data to a file, and you want it to behave the way StyledEdit does,
-// you want to use the BTranslationUtils::WriteStyledEditFile() function.
-//
-// Preconditions:
-//
-// Parameters: fromView, the view with the styled text in it
-//             intoStream, the stream where the styled text is put
-//             roster, not used
-//
-// Postconditions:
-//
-// Returns: B_BAD_VALUE, if fromView or intoStream is NULL
-//          B_ERROR, if anything else went wrong
-//          B_NO_ERROR, if successful
-// ---------------------------------------------------------------
+
+/*!
+	This function takes styled text data from fromView and writes it to
+	intoStream.  The plain text data and styled text data are combined
+	when they are written to intoStream.  This is different than how
+	a save operation in StyledEdit works.  With StyledEdit, it writes
+	plain text data to the file, but puts the styled text data in
+	the "styles" attribute.  In other words, this function writes
+	styled text data to files in a manner that isn't human readable.
+	
+	So, if you want to write styled text
+	data to a file, and you want it to behave the way StyledEdit does,
+	you want to use the BTranslationUtils::WriteStyledEditFile() function.
+	
+	\param fromView, the view with the styled text in it
+	\param intoStream, the stream where the styled text is put
+		roster, not used
+
+	\return B_BAD_VALUE, if fromView or intoStream is NULL
+	\return B_ERROR, if anything else went wrong
+	\return B_NO_ERROR, if successful
+*/
 status_t
 BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 	BTranslatorRoster *roster)
@@ -545,32 +462,28 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		// its OK if the result of fromView->Text() is NULL
 	
 	int32 runArrayLength = 0;
-	text_run_array *pRunArray = fromView->RunArray(0, textLength,
+	text_run_array *runArray = fromView->RunArray(0, textLength,
 		&runArrayLength);
-	if (pRunArray == NULL)
+	if (runArray == NULL)
 		return B_ERROR;
 	
 	int32 flatRunArrayLength = 0;
 	void *pflatRunArray =
-		BTextView::FlattenRunArray(pRunArray, &flatRunArrayLength);
+		BTextView::FlattenRunArray(runArray, &flatRunArrayLength);
 	if (pflatRunArray == NULL) {
-		free(pRunArray);
-		pRunArray = NULL;
-		
+		BTextView::FreeRunArray(runArray);
 		return B_ERROR;
 	}
 	
 	// Rather than use a goto, I put a whole bunch of code that
 	// could error out inside of a loop, and break out of the loop
-	// if there is an error. If there is no error, loop is set
-	// to false.  This is so that I don't have to put free()
-	// calls everywhere there could be an error.
-	
-	// This block of code is where I do all of the writting of the
+	// if there is an error. 
+
+	// This block of code is where I do all of the writing of the
 	// data to the stream.  I've gathered all of the data that I
 	// need at this point.
-	bool loop = true;
-	while (loop) {
+	bool ok = false;
+	while (ok) {
 		const size_t kStreamHeaderSize =
 			sizeof(TranslatorStyledTextStreamHeader);
 		TranslatorStyledTextStreamHeader stm_header;
@@ -588,14 +501,14 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		if (swap_data(B_INT32_TYPE, &stm_header.version, sizeof(int32),
 			B_SWAP_HOST_TO_BENDIAN) != B_OK)
 			break;
-		
+
 		const size_t kTextHeaderSize = sizeof(TranslatorStyledTextTextHeader);
 		TranslatorStyledTextTextHeader txt_header;
 		txt_header.header.magic = 'TEXT';
 		txt_header.header.header_size = kTextHeaderSize;
 		txt_header.header.data_size = textLength;
 		txt_header.charset = B_UNICODE_UTF8;
-		
+
 		// convert the stm_header.header struct to the host format
 		if (swap_data(B_UINT32_TYPE, &txt_header.header, kRecordHeaderSize,
 			B_SWAP_HOST_TO_BENDIAN) != B_OK)
@@ -603,7 +516,7 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		if (swap_data(B_INT32_TYPE, &txt_header.charset, sizeof(int32),
 			B_SWAP_HOST_TO_BENDIAN) != B_OK)
 			break;
-		
+
 		const size_t kStyleHeaderSize =
 			sizeof(TranslatorStyledTextStyleHeader);
 		TranslatorStyledTextStyleHeader stl_header;
@@ -612,7 +525,7 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		stl_header.header.data_size = flatRunArrayLength;
 		stl_header.apply_offset = 0;
 		stl_header.apply_length = textLength;
-		
+
 		// convert the stl_header.header struct to the host format
 		if (swap_data(B_UINT32_TYPE, &stl_header.header, kRecordHeaderSize,
 			B_SWAP_HOST_TO_BENDIAN) != B_OK)
@@ -623,7 +536,7 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		if (swap_data(B_UINT32_TYPE, &stl_header.apply_length, sizeof(uint32),
 			B_SWAP_HOST_TO_BENDIAN) != B_OK)
 			break;
-		
+
 		// Here, you can see the structure of the styled text data by
 		// observing the order that the various structs and data are
 		// written to the stream
@@ -643,185 +556,134 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		amountWritten = intoStream->Write(pflatRunArray, flatRunArrayLength);
 		if (amountWritten != flatRunArrayLength)
 			break;
-		
-		loop = false;
+
+		ok = true;
 			// gracefully break out of the loop
-	} // end of while(loop)
-	
+	}
+
 	free(pflatRunArray);
-	pflatRunArray = NULL;
-	free(pRunArray);
-	pRunArray = NULL;
-	
-	if (loop)
-		return B_ERROR;
-	else
-		return B_NO_ERROR;
+	BTextView::FreeRunArray(runArray);
+
+	return ok ? B_OK : B_ERROR;
 }
 
-// ---------------------------------------------------------------
-// WriteStyledEditFile
-//
-// This function writes the styled text data from fromView
-// and stores it in the file intoFile.
-//
-// This function is similar to PutStyledText() except that it
-// only writes styled text data to files and it puts the
-// plain text data in the file and stores the styled data as
-// the attribute "styles".
-//
-// You can use PutStyledText() to write styled text data
-// to files, but it writes the data in a format that isn't
-// human readable.
-//
-// It is important to note that this function doesn't
-// write files in exactly the same manner that you get
-// when you do a File->Save operation in StyledEdit.
-// This function doesn't write all of the attributes
-// that StyledEdit does, even though it easily could.
-//
-// Preconditions:
-//
-// Parameters: fromView, the view with the styled text
-//             intoFile, the file where the styled text
-//                       is written to
-//
-// Postconditions:
-//
-// Returns: B_BAD_VALUE, if either parameter is NULL
-//          B_ERROR, if anything else went wrong
-//          B_OK, if successful
-// ---------------------------------------------------------------
+
+/*!
+	\brief Writes the styled text data from \a view to the specified \a file.
+
+	This function is similar to PutStyledText() except that it
+	only writes styled text data to files and it puts the
+	plain text data in the file and stores the styled data as
+	the attribute "styles".
+
+	You can use PutStyledText() to write styled text data
+	to files, but it writes the data in a format that isn't
+	human readable.
+
+	\param view the view with the styled text
+	\param file the file where the styled text is written to
+
+	\return B_BAD_VALUE, if either parameter is NULL
+		B_OK, if successful, and any possible file error
+		if writing failed.
+*/
 status_t
-BTranslationUtils::WriteStyledEditFile(BTextView *fromView, BFile *intoFile)
+BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file)
 {
-	if (fromView == NULL || intoFile == NULL)		
+	if (view == NULL || file == NULL)
 		return B_BAD_VALUE;
-	
-	int32 textLength = fromView->TextLength();
+
+	int32 textLength = view->TextLength();
 	if (textLength < 0)
 		return B_ERROR;
-	
-	const char *kpTextData = fromView->Text();
-	if (kpTextData == NULL && textLength != 0)
+
+	const char *text = view->Text();
+	if (text == NULL && textLength != 0)
 		return B_ERROR;
-	
+
 	// move to the start of the file if not already there
-	status_t result = B_OK;
-	result = intoFile->Seek(0,SEEK_SET);
+	status_t result = file->Seek(0, SEEK_SET);
 	if (result != B_OK)
 		return result;	
-	
+
 	// Write plain text data to file
-	ssize_t amtWritten = intoFile->Write(kpTextData, textLength);
-	if (amtWritten != textLength)
+	ssize_t bytesWritten = file->Write(text, textLength);
+	if (bytesWritten != textLength)
 		return B_ERROR;
-		
+
 	// truncate any extra text
-	result = intoFile->SetSize(textLength);
+	result = file->SetSize(textLength);
 	if (result != B_OK)
 		return result;
 
-	// get the BVolume that this file is on and
-	// check the volume for the attribute support
-	node_ref nref;
-	result = intoFile->GetNodeRef(&nref);
-	if (result != B_OK)
-		return result;
-	BVolume volume(nref.device);
-	result = volume.InitCheck();
-	if (result != B_OK)
-		return result;
-	if (!volume.KnowsAttr())
-		return B_OK;
-	
-	// Write attributes
-	// BEOS:TYPE
-	// (this is so that the BeOS will recognize this file as a text file)
-	amtWritten = intoFile->WriteAttr("BEOS:TYPE", 'MIMS', 0, "text/plain", 11);
-	if ((size_t) amtWritten != 11)
-		return B_ERROR;
-		
-	// wrap
+	// Write attributes. We don't report an error anymore after this point,
+	// as attributes aren't that crucial - not all volumes support attributes.
+	// However, if writing one attribute fails, no further attributes are
+	// tried to be written.
+
+	BNodeInfo info(file);
+	char type[B_MIME_TYPE_LENGTH];
+	if (info.GetType(type) != B_OK) {
+		// This file doesn't have a file type yet, so let's set it
+		result = info.SetType("text/plain");
+		if (result < B_OK)
+			return B_OK;
+	}
+
 	// word wrap setting, turned on by default
-	int32 nwrap = ((fromView->DoesWordWrap()) ? 1 : 0);
-	amtWritten = intoFile->WriteAttr("wrap", B_INT32_TYPE, 0,
-		&nwrap, sizeof(int32));
-	if (amtWritten != sizeof(int32))
-		return B_ERROR;
-		
-	// alignment
-	// alignment, either B_ALIGN_LEFT, B_ALIGN_RIGHT or B_ALIGN_CENTER,
-	// default is B_ALIGN_LEFT
-	int32 nalignment = fromView->Alignment();
-	amtWritten = intoFile->WriteAttr("alignment", B_INT32_TYPE, 0,
-		&nalignment, sizeof(int32));
-	if (amtWritten != sizeof(int32))
-		return B_ERROR;
-		
-	// be:encoding
-	// how the text is encoded, StyledEdit's list of encoding options
-	// is listed under the Encoding menu in the Save As dialog box
-	// default is Unicode UTF8 (65535)
-	// note that the B_UNICODE_UTF8 constant is 0 and not appropriate
-	// for use here
-	int32 nencoding = 65535;
-	amtWritten = intoFile->WriteAttr("be:encoding", B_INT32_TYPE, 0,
-		&nencoding, sizeof(int32));
-	if (amtWritten != sizeof(int32))
-		return B_ERROR;
-	
-	text_run_array *pRunArray = fromView->RunArray(0, fromView->TextLength());
-	if (pRunArray == NULL)
-		return B_ERROR;
-	
-	int32 runArraySize = 0;
-	void *pflatRunArray = BTextView::FlattenRunArray(pRunArray, &runArraySize);
-	if (pflatRunArray == NULL) {
-		free(pRunArray);
-		pRunArray = NULL;
-		return B_ERROR;
-	}
-	if (runArraySize < 0) {
-		free(pflatRunArray);
-		pflatRunArray = NULL;
-		free(pRunArray);
-		pRunArray = NULL;
-		return B_ERROR;
-	}
-	
-	// This is how the styled text data is stored in the file
-	// (the trick is that it isn't actually stored in the file, its stored 
-	// as an attribute in the file's node)
-	amtWritten = intoFile->WriteAttr("styles", B_RAW_TYPE, 0, pflatRunArray,
-		runArraySize);
-	free(pflatRunArray);
-	pflatRunArray = NULL;		
-	free(pRunArray);
-	pRunArray = NULL;
-	if (amtWritten == runArraySize)
+	int32 wordWrap = view->DoesWordWrap() ? 1 : 0;
+	bytesWritten = file->WriteAttr("wrap", B_INT32_TYPE, 0,
+		&wordWrap, sizeof(int32));
+	if (bytesWritten != sizeof(int32))
 		return B_OK;
-	else
-		return B_ERROR;
+
+	// alignment, default is B_ALIGN_LEFT
+	int32 alignment = view->Alignment();
+	bytesWritten = file->WriteAttr("alignment", B_INT32_TYPE, 0,
+		&alignment, sizeof(int32));
+	if (bytesWritten != sizeof(int32))
+		return B_OK;
+
+	// be:encoding, defaults to UTF-8 (65535)
+	// Note that the B_UNICODE_UTF8 constant is 0 and for some reason
+	// not appropriate for use here.
+	int32 encoding = 65535;
+	bytesWritten = file->WriteAttr("be:encoding", B_INT32_TYPE, 0,
+		&encoding, sizeof(int32));
+	if (bytesWritten != sizeof(int32))
+		return B_OK;
+
+	// Write text_run_array, ie. the styles of the text
+
+	text_run_array *runArray = view->RunArray(0, view->TextLength());
+	if (runArray != NULL) {
+		int32 runArraySize = 0;
+		void *flattenedRunArray = BTextView::FlattenRunArray(runArray, &runArraySize);
+		if (flattenedRunArray != NULL) {
+			file->WriteAttr("styles", B_RAW_TYPE, 0, flattenedRunArray,
+				runArraySize);
+		}
+
+		free(flattenedRunArray);
+		BTextView::FreeRunArray(runArray);
+	}
+
+	return B_OK;
 }
 
-// ---------------------------------------------------------------
-// GetDefaultSettings
-//
-// Each translator can have default settings, set by the
-// "translations" control panel. You can read these settings to
-// pass on to a translator using one of these functions.
-//
-// Preconditions:
-//
-// Parameters: forTranslator, the translator the settings are for
-//             roster, the roster used to get the settings
-//
-// Postconditions:
-//
-// Returns: NULL, if anything went wrong
-//          BMessage * of configuration data for forTranslator
-// ---------------------------------------------------------------
+
+/*!
+	Each translator can have default settings, set by the
+	"translations" control panel. You can read these settings to
+	pass on to a translator using one of these functions.
+
+	\param forTranslator, the translator the settings are for
+		roster, the roster used to get the settings
+
+	\return BMessage of configuration data for forTranslator - you own
+		this message and have to free it when you're done with it.
+	\return NULL, if anything went wrong
+*/
 BMessage *
 BTranslationUtils::GetDefaultSettings(translator_id forTranslator,
 	BTranslatorRoster *roster)
@@ -833,36 +695,21 @@ BTranslationUtils::GetDefaultSettings(translator_id forTranslator,
 			return NULL;
 	}
 	
-	BMessage *pMessage = new BMessage();
-	if (pMessage == NULL)
+	BMessage *message = new BMessage();
+	if (message == NULL)
 		return NULL;
 	
-	status_t result = roster->GetConfigurationMessage(forTranslator, pMessage);
-	switch (result) {
-		case B_OK:
-			break;
-			
-		case B_NO_TRANSLATOR:
-			// Be's version seems to just pass an empty
-			// BMessage for this case, well, in some cases anyway
-			break;
-			
-		case B_NOT_INITIALIZED:
-			delete pMessage;
-			pMessage = NULL;
-			break;
-			
-		case B_BAD_VALUE:
-			delete pMessage;
-			pMessage = NULL;
-			break;
-			
-		default:
-			break;
+	status_t result = roster->GetConfigurationMessage(forTranslator, message);
+	if (result != B_OK && result != B_NO_TRANSLATOR) {
+		// Be's version seems to just pass an empty BMessage
+		// in case of B_NO_TRANSLATOR, well, in some cases anyway
+		delete message;
+		return NULL;
 	}
-	
-	return pMessage;
+
+	return message;
 }
+
 
 // ---------------------------------------------------------------
 // GetDefaultSettings
