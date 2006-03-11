@@ -1,21 +1,30 @@
-#ifndef _MENU_ITEM_H
-#include <MenuItem.h>
-#endif
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mattias Sundblad
+ *		Andrew Bachmann
+ */
 
-#ifndef COLOR_MENU_ITEM_H
+
 #include "ColorMenuItem.h"
-#endif
 
-ColorMenuItem::ColorMenuItem(const char	*label, rgb_color color,BMessage *message)
-	:BMenuItem(label, message,0,0){
-	fItemColor= color;
+
+ColorMenuItem::ColorMenuItem(const char	*label, rgb_color color, BMessage *message)
+	: BMenuItem(label, message, 0, 0)
+{
+	fItemColor = color;
 }
 
-void ColorMenuItem::DrawContent(){
-	
-		BMenu *menu= Menu();
-		rgb_color menuColor = menu->HighColor();
-		menu->SetHighColor(fItemColor);
-		BMenuItem::DrawContent();
-		menu->SetHighColor(menuColor);
+
+void
+ColorMenuItem::DrawContent()
+{
+	BMenu *menu = Menu();
+	rgb_color menuColor = menu->HighColor();
+
+	menu->SetHighColor(fItemColor);
+	BMenuItem::DrawContent();
+	menu->SetHighColor(menuColor);
 }

@@ -1,3 +1,12 @@
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mattias Sundblad
+ *		Andrew Bachmann
+ */
+
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -14,47 +23,56 @@
 
 using namespace BPrivate;
 
-BRect windowRect(7-15,26-15,507,426);
+StyledEditApp * styled_edit_app;
+BRect gWindowRect(7-15, 26-15, 507, 426);
 
-void cascade() {
+
+void
+cascade()
+{
 	BScreen screen(NULL);
 	BRect screenBorder = screen.Frame();
-	float left = windowRect.left + 15;
-	if (left + windowRect.Width() > screenBorder.right) {
+	float left = gWindowRect.left + 15;
+	if (left + gWindowRect.Width() > screenBorder.right)
 		left = 7;
-	}
-	float top = windowRect.top + 15;
-	if (top + windowRect.Height() > screenBorder.bottom) {
+
+	float top = gWindowRect.top + 15;
+	if (top + gWindowRect.Height() > screenBorder.bottom)
 		top = 26;
-	}
-	windowRect.OffsetTo(BPoint(left,top));	
+
+	gWindowRect.OffsetTo(BPoint(left,top));	
 }
 
-void uncascade() {
+
+void
+uncascade()
+{
 	BScreen screen(NULL);
 	BRect screenBorder = screen.Frame();
-	float left = windowRect.left - 15;
+
+	float left = gWindowRect.left - 15;
 	if (left < 7) {
-		left = screenBorder.right - windowRect.Width() - 7;
+		left = screenBorder.right - gWindowRect.Width() - 7;
 		left = left - ((int)left % 15) + 7;
 	}
-	float top = windowRect.top - 15;
+
+	float top = gWindowRect.top - 15;
 	if (top < 26) {
-		top = screenBorder.bottom - windowRect.Height() - 26;
+		top = screenBorder.bottom - gWindowRect.Height() - 26;
 		top = top - ((int)left % 15) + 26;
 	}
-	windowRect.OffsetTo(BPoint(left,top));	
+
+	gWindowRect.OffsetTo(BPoint(left,top));	
 }
 
-StyledEditApp * styled_edit_app;
 
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE)
 {
 	fOpenPanel= new BFilePanel();
 	BMenuBar * menuBar =
-	   dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
-	   
+		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
+
 	fOpenAsEncoding = 0;
 	fOpenPanelEncodingMenu= new BMenu("Encoding");
 	menuBar->AddItem(fOpenPanelEncodingMenu);
@@ -64,91 +82,95 @@ StyledEditApp::StyledEditApp()
 	BCharacterSet charset;
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
 		BString name(charset.GetPrintName());
-		const char * mime = charset.GetMIMEName();
+		const char* mime = charset.GetMIMEName();
 		if (mime) {
 			name.Append(" (");
 			name.Append(mime);
 			name.Append(")");
 		}
-		BMenuItem * item = new BMenuItem(name.String(),new BMessage(OPEN_AS_ENCODING));
+		BMenuItem* item = new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
 		item->SetTarget(this);
 		fOpenPanelEncodingMenu->AddItem(item);
-		if (charset.GetFontID() == fOpenAsEncoding) {
+		if (charset.GetFontID() == fOpenAsEncoding)
 			item->SetMarked(true);
-		}
 	}
-	
-	fWindowCount= 0;
-	fNext_Untitled_Window= 1;
-	styled_edit_app = this;
-} /***StyledEditApp::StyledEditApp()***/
 
-void StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
+	fWindowCount = 0;
+	fNextUntitledWindow = 1;
+
+	styled_edit_app = this;
+}
+
+
+void
+StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
 {
-	if ( msg->what == B_ARGV_RECEIVED ) {
+	if (msg->what == B_ARGV_RECEIVED) {
 		int32 argc;
-		if (msg->FindInt32("argc",&argc) != B_OK) {
-			argc=0;
-		}
-		const char ** argv = new const char*[argc];
-		for (int arg = 0; (arg < argc) ; arg++) {
-			if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
+		if (msg->FindInt32("argc", &argc) != B_OK)
+			argc = 0;
+
+		const char** argv = new const char*[argc];
+		for (int arg = 0; arg < argc; arg++) {
+			if (msg->FindString("argv", arg, &argv[arg]) != B_OK) {
 				argv[arg] = "";
 			}
 		}
-		const char * cwd;
-		if (msg->FindString("cwd",&cwd) != B_OK) {
+		const char* cwd;
+		if (msg->FindString("cwd", &cwd) != B_OK)
 			cwd = "";
-		}
+
 		ArgvReceived(argc, argv, cwd);
-	} else {
-		BApplication::DispatchMessage(msg,handler);
-	}
+	} else
+		BApplication::DispatchMessage(msg, handler);
 }
 
 
 void
 StyledEditApp::MessageReceived(BMessage *message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case MENU_NEW:
 			OpenDocument();
-		break;
+			break;
 		case MENU_OPEN:
-			fOpenPanel->Show(); //
-		break;
+			fOpenPanel->Show();
+			break;
 		case B_SILENT_RELAUNCH:
 			OpenDocument();
-		break;
+			break;
 		case OPEN_AS_ENCODING:
-			void * ptr;
-			if (message->FindPointer("source",&ptr) == B_OK) {
-				if (fOpenPanelEncodingMenu != 0) {
-					fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf((BMenuItem*)ptr);
-				}
+			void* ptr;
+			if (message->FindPointer("source", &ptr) == B_OK
+				&& fOpenPanelEncodingMenu != 0) {
+				fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf((BMenuItem*)ptr);
 			}
-		break;
+			break;
+
 		default:
 			BApplication::MessageReceived(message);
-		break;
+			break;
 	} 
 }
+
 
 void
 StyledEditApp::OpenDocument()
 {
 	cascade();
-	new StyledEditWindow(windowRect,fNext_Untitled_Window++,fOpenAsEncoding);
+	new StyledEditWindow(gWindowRect, fNextUntitledWindow++, fOpenAsEncoding);
 	fWindowCount++;
 }
 
+
 void
-StyledEditApp::OpenDocument(entry_ref * ref)
+StyledEditApp::OpenDocument(entry_ref* ref)
 {
 	cascade();
-	new StyledEditWindow(windowRect,ref,fOpenAsEncoding);
+	new StyledEditWindow(gWindowRect, ref, fOpenAsEncoding);
 	fWindowCount++;
 }
+
 
 void
 StyledEditApp::CloseDocument()
@@ -161,75 +183,71 @@ StyledEditApp::CloseDocument()
 	}
 }
 
+
 void
 StyledEditApp::RefsReceived(BMessage *message)
 {
-	int32		refNum;
-	entry_ref	ref;
-	status_t	err;
-	
-	refNum = 0;
-	do {
-		err = message->FindRef("refs", refNum, &ref);
-		if (err != B_OK)
-			return;
+	int32 index = 0;
+	entry_ref ref;
+
+	while (message->FindRef("refs", index++, &ref) == B_OK) {
 		OpenDocument(&ref);
-		refNum++;
-	} while (true);
-} /***StyledEditApp::RefsReceived();***/
+	}
+}
+
 
 void
-StyledEditApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
+StyledEditApp::ArgvReceived(int32 argc, const char* argv[], const char* cwd)
 {
 	for (int i = 1 ; (i < argc) ; i++) {
 		BPath path;
-		if (argv[i][0] == '/') {
+		if (argv[i][0] == '/')
 			path.SetTo(argv[i]);
-		} else {
-			path.SetTo(cwd,argv[i]);
-		}
+		else
+			path.SetTo(cwd, argv[i]);
+
 		if (path.InitCheck() != B_OK) {
-			printf("path.InitCheck failed: \"");
-			if (argv[i][0] == '/') {
-				printf("%s",argv[i]);
-			} else {
-				printf("%s/%s",cwd,argv[i]);
-			}
-			printf("\".\n");
+			fprintf(stderr, "Setting path failed: \"");
+			if (argv[i][0] == '/')
+				fprintf(stderr, "%s\".\n", argv[i]);
+			else
+				fprintf(stderr, "%s/%s\".\n", cwd, argv[i]);
 			continue;
 		}
-		
+
 		entry_ref ref;
 		if (get_ref_for_path(path.Path(), &ref) != B_OK) {
-			printf("get_ref_for_path failed: \"");
-			printf("%s",path.Path());
-			printf("\".\n");
+			fprintf(stderr, "Entry not found: \"%s\".\n", path.Path());
 			continue;
 		}
 		OpenDocument(&ref);
 	}
 }
+
 
 void 
 StyledEditApp::ReadyToRun() 
 {
-	if (fWindowCount == 0) {
+	if (fWindowCount == 0)
 		OpenDocument();
-	}
 }
+
 
 int32
 StyledEditApp::NumberOfWindows()
 {
- 	
  	return fWindowCount;
 
-}/***StyledEditApp::NumberOfWindows()***/
+}
+
+
+//	#pragma mark -
+
 
 int
-main()
+main(int argc, char** argv)
 {
-	StyledEditApp	styledEdit;
+	StyledEditApp styledEdit;
 	styledEdit.Run();
 	return 0;
 }
