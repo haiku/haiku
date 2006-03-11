@@ -76,7 +76,7 @@ translation_format inputFormats[] = {
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{ 0, 0, 0, 0, 0, 0 },
+	{},
 };
 
 // Define the formats we know how to write
@@ -85,7 +85,7 @@ translation_format outputFormats[] = {
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{ 0, 0, 0, 0, 0, 0 },
+	{},
 };
 
 bool AreSettingsRunning = false;
