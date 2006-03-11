@@ -425,14 +425,23 @@ BPrivateScreen::GetModeList(display_mode **_modeList, uint32 *_count)
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-		link.Read<uint32>(_count);
+		uint32 count;
+		if (link.Read<uint32>(&count) < B_OK)
+			return B_ERROR;
+
 		// TODO: this could get too big for the link
-		int32 size = *_count * sizeof(display_mode);
-		*_modeList = (display_mode *)malloc(size);
-		if (_modeList == NULL)
+		int32 size = count * sizeof(display_mode);
+		display_mode* modeList = (display_mode *)malloc(size);
+		if (modeList == NULL)
 			return B_NO_MEMORY;
 
-		link.Read(*_modeList, size);
+		if (link.Read(modeList, size) < B_OK) {
+			free(modeList);
+			return B_ERROR;
+		}
+
+		*_modeList = modeList;
+		*_count = count;
 	}
 
 	return status;
