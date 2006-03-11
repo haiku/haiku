@@ -41,8 +41,8 @@ static const uint32 kMessageMagicR5 = 'FOB1';
 static const uint32 kMessageMagicR5Swapped = '1BOF';
 static const uint32 kMessageMagicDano = 'FOB2';
 static const uint32 kMessageMagicDanoSwapped = '2BOF';
-static const uint32 kMessageMagic4 = '4GSM';
-static const uint32 kMessageMagic4Swapped = 'MSG4';
+static const uint32 kMessageMagicHaiku = '1FMH';
+static const uint32 kMessageMagicHaikuSwapped = 'HMF1';
 
 
 const char *B_SPECIFIER_ENTRY = "specifiers";
@@ -182,7 +182,7 @@ BMessage::_InitHeader()
 	fHeader = (message_header *)malloc(sizeof(message_header));
 	memset(fHeader, 0, sizeof(message_header) - sizeof(message_header::hash_table));
 
-	fHeader->format = kMessageMagic4;
+	fHeader->format = kMessageMagicHaiku;
 	fHeader->flags = MESSAGE_FLAG_VALID;
 	fHeader->what = what;
 	fHeader->current_specifier = -1;
@@ -1026,7 +1026,7 @@ BMessage::Unflatten(const char *flatBuffer)
 		return B_BAD_VALUE;
 
 	uint32 format = *(uint32 *)flatBuffer;
-	if (format != kMessageMagic4) {
+	if (format != kMessageMagicHaiku) {
 		if (format == KMessage::kMessageHeaderMagic) {
 			KMessage message;
 			status_t result = message.SetTo(flatBuffer,
@@ -1060,7 +1060,7 @@ BMessage::Unflatten(const char *flatBuffer)
 	memcpy(fHeader, flatBuffer, sizeof(message_header));
 	flatBuffer += sizeof(message_header);
 
-	if (fHeader->format != kMessageMagic4
+	if (fHeader->format != kMessageMagicHaiku
 		|| !(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		free(fHeader);
 		fHeader = NULL;
@@ -1118,7 +1118,7 @@ BMessage::Unflatten(BDataIO *stream)
 
 	uint32 format = 0;
 	stream->Read(&format, sizeof(uint32));
-	if (format != kMessageMagic4) {
+	if (format != kMessageMagicHaiku) {
 		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
 			return BPrivate::unflatten_r5_message(format, this, stream);
 
@@ -1142,7 +1142,7 @@ BMessage::Unflatten(BDataIO *stream)
 		sizeof(message_header) - sizeof(uint32));
 	result -= sizeof(message_header) - sizeof(uint32);
 
-	if (result != B_OK || fHeader->format != kMessageMagic4
+	if (result != B_OK || fHeader->format != kMessageMagicHaiku
 		|| !(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		free(fHeader);
 		fHeader = NULL;
@@ -1985,7 +1985,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 	uint32 magic = *(uint32 *)data;
 
-	if (magic == kMessageMagic4 || magic == kMessageMagic4Swapped) {
+	if (magic == kMessageMagicHaiku || magic == kMessageMagicHaikuSwapped) {
 		message_header *header = (message_header *)data;
 		header->target = token;
 	} else if (magic == kMessageMagicR5) {
