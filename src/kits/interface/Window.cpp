@@ -326,6 +326,7 @@ BWindow::~BWindow()
 	}
 
 	// TODO: release other dynamically-allocated objects
+	free(fTitle);
 
 	// Deleting this semaphore will tell open menus to quit.
 	if (fMenuSem > 0)
@@ -960,7 +961,7 @@ FrameMoved(origin);
 		}
 
 		case B_PULSE:
-			if (target == this && fPulseEnabled) {
+			if (target == this && fPulseRunner) {
 				fTopView->_Pulse();
 				fLink->Flush();
 			} else
@@ -1332,28 +1333,23 @@ void
 BWindow::SetPulseRate(bigtime_t rate)
 {
 	// TODO: What about locking?!?
-	if (rate < 0)
+	if (rate < 0 || rate == fPulseRate)
 		return;
 
-	// ToDo: isn't fPulseRunner enough? Why fPulseEnabled?
-	if (fPulseRate == 0 && !fPulseEnabled) {
-		fPulseRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(B_PULSE), rate);
-		fPulseRate = rate;
-		fPulseEnabled = true;
-		return;
-	}
+	fPulseRate = rate;
 
-	if (rate == 0 && fPulseEnabled) {
+	if (rate > 0) {
+		if (fPulseRunner == NULL) {
+			fPulseRunner = new BMessageRunner(BMessenger(this),
+				new BMessage(B_PULSE), rate);
+		} else {
+			fPulseRunner->SetInterval(rate);
+		}
+	} else {
+		// rate == 0
 		delete fPulseRunner;
 		fPulseRunner = NULL;
-
-		fPulseRate = rate;
-		fPulseEnabled = false;
-		return;
 	}
-
-	fPulseRunner->SetInterval(rate);
 }
 
 
@@ -2199,7 +2195,6 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
 
-	fPulseEnabled = false;
 	fPulseRate = 0;
 	fPulseRunner = NULL;
 
@@ -2234,6 +2229,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, "w<app_server");
 	if (receivePort < B_OK) {
+		// TODO: huh?
 		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
 		delete this;
 		return;
@@ -3137,7 +3133,6 @@ BWindow::PrintToStream() const
 */	
 	printf("\
 		topViewToken	= %ld\
-		pluseEnabled	= %s\
 		isFilePanel		= %s\
 		MaskActivated	= %s\
 		pulseRate		= %lld\
@@ -3156,7 +3151,6 @@ BWindow::PrintToStream() const
 		lastViewToken	= %ld\
 		pulseRunner		= %s\n",
 		fTopViewToken,
-		fPulseEnabled==true?"Yes":"No",
 		fIsFilePanel==true?"Yes":"No",
 		fMaskActivated==true?"Yes":"No",
 		fPulseRate,

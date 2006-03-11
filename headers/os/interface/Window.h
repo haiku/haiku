@@ -318,7 +318,7 @@ private:
 	BButton			*fDefaultButton;
 	BList			fShortcuts;
 	int32			fTopViewToken;
-	bool			fPulseEnabled;
+	bool			_unused2;					// was fPulseEnabled
 	bool			fViewsNeedPulse;			// not yet used
 	bool			fIsFilePanel;				
 	bool			fMaskActivated;
@@ -326,7 +326,7 @@ private:
 	bool			fWaitingForMenu;
 	bool			fMinimized;
 	bool			fNoQuitShortcut;
-	bool			_unused2;
+	bool			_unused3;
 	sem_id			fMenuSem;
 	float			fMaxZoomHeight;
 	float			fMaxZoomWidth;

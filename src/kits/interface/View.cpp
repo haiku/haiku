@@ -565,6 +565,7 @@ BView::~BView()
 
 	SetName(NULL);
 
+	removeCommArray();
 	delete fState;
 }
 
@@ -809,7 +810,7 @@ BView::SetFlags(uint32 flags)
 	if (fOwner) {
 		if (flags & B_PULSE_NEEDED) {
 			check_lock_no_pick();
-			if (!fOwner->fPulseEnabled)
+			if (fOwner->fPulseRunner == NULL)
 				fOwner->SetPulseRate(500000);
 		}
 
@@ -2996,9 +2997,7 @@ BView::EndLineArray()
 
 	_FlushIfNotInTransaction();
 
-	delete [] comm->array;
-	delete comm;
-	comm = NULL;
+	removeCommArray();
 }
 
 
@@ -4120,7 +4119,7 @@ BView::_Attach()
 	if (fOwner) {
 		if (fFlags & B_PULSE_NEEDED) {
 			check_lock_no_pick();
-			if (!fOwner->fPulseEnabled)
+			if (fOwner->fPulseRunner == NULL)
 				fOwner->SetPulseRate(500000);
 		}
 	}
