@@ -206,6 +206,19 @@ BHandler::BHandler(const char *name)
 
 BHandler::~BHandler()
 {
+	// remove all filters
+	if (fFilters) {
+		int32 count = fFilters->CountItems();
+		for (int32 i = 0; i < count; i++)
+			delete (BMessageFilter*)fFilters->ItemAtFast(i);
+		delete fFilters;
+	}
+	// remove all observers
+	if (fObserverList) {
+		// TODO ... ?!?
+		delete fObserverList;
+	}
+	// free rest
 	free(fName);
 	gDefaultTokens.RemoveToken(fToken);
 }
