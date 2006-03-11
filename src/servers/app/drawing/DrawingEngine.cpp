@@ -1170,6 +1170,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 BRect
 DrawingEngine::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 {
+	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
 	BRect dst;
 	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
 	if (buffer) {
@@ -1210,6 +1211,7 @@ void
 DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 	uint32 bytesPerRow, int32 xOffset, int32 yOffset) const
 {
+	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
 	int32 xIncrement;
 	int32 yIncrement;
 
