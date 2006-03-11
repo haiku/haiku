@@ -24,7 +24,7 @@ Application Terminal :
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be tracker textencoding
-	: Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
+	: Terminal.rdef Terminal.icons.rdef
 	;
 
 if $(TARGET_PLATFORM) != libbe_test {
