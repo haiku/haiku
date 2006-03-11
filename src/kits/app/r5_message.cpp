@@ -5,7 +5,6 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-#ifdef USING_MESSAGE4
 
 #include <DataIO.h>
 #include <MessagePrivate.h>
@@ -408,5 +407,3 @@ unflatten_r5_message(uint32 format, BMessage *message, BDataIO *stream)
 }
 
 } // namespace BPrivate
-
-#endif	// USING_MESSAGE4

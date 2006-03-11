@@ -36,15 +36,13 @@
 #include <AppMisc.h>
 #include <ViewAux.h>
 #include <TokenSpace.h>
+#include <MessagePrivate.h>
 #include <MessageUtils.h>
 #include <ColorUtils.h>
 #include <AppServerLink.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
 
-#ifdef USING_MESSAGE4
-#include <MessagePrivate.h>
-#endif
 
 #include <math.h>
 #include <new>
@@ -1261,11 +1259,7 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 		message->AddInt32("buttons", buttons);		
 	}
 
-#ifndef USING_MESSAGE4
-	_set_message_reply_(message, BMessenger(replyTo, replyTo->Looper()));
-#else
 	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
-#endif
 
 	int32 bufferSize = message->FlattenedSize();
 	char* buffer = new (nothrow) char[bufferSize];
@@ -1322,11 +1316,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		message->AddInt32("buttons", buttons);		
 	}
 
-#ifndef USING_MESSAGE4
-	_set_message_reply_(message, BMessenger(replyTo, replyTo->Looper()));
-#else
 	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
-#endif
 
 	int32 bufferSize = message->FlattenedSize();
 	char* buffer = new (nothrow) char[bufferSize];

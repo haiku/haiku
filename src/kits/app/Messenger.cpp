@@ -12,15 +12,12 @@
 #include "ObjectLocker.h"
 #include "TokenSpace.h"
 
-#ifdef USING_MESSAGE4
-#	include <MessagePrivate.h>
-#endif
-
 #include <Application.h>
 #include <Handler.h>
 #include <Looper.h>
 #include <LooperList.h>
 #include <Message.h>
+#include <MessagePrivate.h>
 #include <Messenger.h>
 #include <OS.h>
 #include <Roster.h>
@@ -330,12 +327,8 @@ BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 	if (!message)
 		return B_BAD_VALUE;
 
-#ifndef USING_MESSAGE4
-	return message->_send_(fPort, fHandlerToken, timeout, false, replyTo);
-#else
 	return BMessage::Private(message).SendMessage(fPort, fHandlerToken,
 		timeout, false, replyTo);
-#endif
 }
 
 // SendMessage
@@ -394,13 +387,9 @@ BMessenger::SendMessage(BMessage *message, BMessage *reply,
 {
 	status_t error = (message && reply ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-#ifndef USING_MESSAGE4
-		error = message->send_message(fPort, fTeam, fHandlerToken,
-			reply, deliveryTimeout, replyTimeout);
-#else
 		error = BMessage::Private(message).SendMessage(fPort, fTeam,
 			fHandlerToken, reply, deliveryTimeout, replyTimeout);
-#endif
+
 		// Map this error for now:
 		if (error == B_BAD_TEAM_ID)
 			error = B_BAD_PORT_ID;

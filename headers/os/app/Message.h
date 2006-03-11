@@ -8,11 +8,6 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-// this should be defined in your UserBuildConfig only
-#ifndef USING_MESSAGE4
-#	define USING_MESSAGE4	1
-#endif
-
 #include <BeBuild.h>
 #include <DataIO.h>
 #include <Flattenable.h>

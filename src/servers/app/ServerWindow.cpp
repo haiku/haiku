@@ -2575,29 +2575,10 @@ ServerWindow::SendMessageToClient(const BMessage* msg, int32 target) const
 	if (target == B_NULL_TOKEN)
 		target = fClientToken;
 
-#ifndef USING_MESSAGE4
-	ssize_t size = msg->FlattenedSize();
-	char* buffer = new(nothrow) char[size];
-	status_t ret;
-
-	if ((ret = msg->Flatten(buffer, size)) == B_OK) {
-		ret = BMessage::Private::SendFlattenedMessage(buffer, size,
-			fClientLooperPort, target, 0);
-		if (ret < B_OK) {
-			fprintf(stderr, "ServerWindow(\"%s\")::SendMessageToClient('%.4s'): %s\n",
-				Title(), (char*)&msg->what, strerror(ret));
-		}
-	} else
-		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle);
-
-	delete[] buffer;
-	return ret;
-#else
 	BMessenger reply;
 	BMessage::Private messagePrivate((BMessage *)msg);
 	return messagePrivate.SendMessage(fClientLooperPort, target, 0,
 		false, reply);
-#endif
 }
 
 

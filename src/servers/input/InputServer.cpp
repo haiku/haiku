@@ -1707,7 +1707,7 @@ InputServer::_DispatchEvent(BMessage* event)
 			break;
 	}
 
-#if defined(HAIKU_TARGET_PLATFORM_HAIKU) && defined(USING_MESSAGE4)
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU)
 	BMessenger reply;
 	BMessage::Private messagePrivate(event);
 	return messagePrivate.SendMessage(fAppServerPort, 0, true, 0, reply);
