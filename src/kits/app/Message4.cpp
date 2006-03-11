@@ -55,6 +55,12 @@ static status_t		handle_reply(port_id replyPort, int32 *pCode,
 static status_t		convert_message(const KMessage *fromMessage,
 						BMessage *toMessage);
 
+extern "C" {
+		// private os function to set the owning team of an area
+		status_t	_kern_transfer_area(area_id area, void **_address,
+						uint32 addressSpec, team_id target);
+}
+
 
 BBlockCache *BMessage::sMsgCache = NULL;
 port_id BMessage::sReplyPorts[sNumReplyPorts];
@@ -174,7 +180,7 @@ BMessage::_InitHeader()
 {
 	DEBUG_FUNCTION_ENTER;
 	fHeader = (message_header *)malloc(sizeof(message_header));
-	memset(fHeader, 0, sizeof(message_header));
+	memset(fHeader, 0, sizeof(message_header) - sizeof(message_header::hash_table));
 
 	fHeader->format = kMessageMagic4;
 	fHeader->flags = MESSAGE_FLAG_VALID;
@@ -804,8 +810,8 @@ BMessage::_NativeFlatten(char *buffer, ssize_t size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
-	fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
-	fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
+	//fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
+	//fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	memcpy(buffer, fHeader, min_c(sizeof(message_header), (size_t)size));
 	buffer += sizeof(message_header);
@@ -835,8 +841,8 @@ BMessage::_NativeFlatten(BDataIO *stream, ssize_t *size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
-	fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
-	fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
+	//fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
+	//fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	ssize_t result1 = stream->Write(fHeader, sizeof(message_header));
 	if (result1 != sizeof(message_header))
@@ -1091,13 +1097,13 @@ BMessage::Unflatten(const char *flatBuffer)
 		}
 	}
 
-	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
+	/*if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
 		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
-		debug_printf("checksum mismatch 2\n");
+		debug_printf("checksum mismatch 1\n");
 		_Clear();
 		_InitHeader();
 		return B_BAD_VALUE;
-	}
+	}*/
 
 	return B_OK;
 }
@@ -1177,13 +1183,13 @@ BMessage::Unflatten(BDataIO *stream)
 			return B_BAD_VALUE;
 	}
 
-	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
+	/*if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
 		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
 		debug_printf("checksum mismatch 2\n");
 		_Clear();
 		_InitHeader();
 		return B_BAD_VALUE;
-	}
+	}*/
 
 	return B_OK;
 }
@@ -1855,6 +1861,12 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 		result = _FlattenToArea(&header);
 		buffer = (char *)header;
 		size = sizeof(message_header);
+
+		port_info info;
+		get_port_info(port, &info);
+		void *address = NULL;
+		_kern_transfer_area(header->shared_area, &address, B_ANY_ADDRESS, 
+			info.team);
 	} else {
 		size = _NativeFlattenedSize();
 		buffer = (char *)malloc(size);
