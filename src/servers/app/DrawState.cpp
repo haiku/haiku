@@ -369,10 +369,10 @@ DrawState::Transform(BRegion* region) const
 			rb.y++;
 			// add rect to converted region
 			// NOTE/TODO: the rect would not have to go
-			// through the whole interection test process,
+			// through the whole intersection test process,
 			// it is guaranteed not to overlap with any rect
 			// already contained in the region
-			converted.AddRect(BRect(lt, rb));
+			converted.Include(BRect(lt, rb));
 		}
 		*region = converted;
 	}
