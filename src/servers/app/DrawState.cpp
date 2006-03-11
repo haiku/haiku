@@ -367,12 +367,18 @@ DrawState::Transform(BRegion* region) const
 			// reset bottom right to pixel "index"
 			rb.x++;
 			rb.y++;
+			// add rect to converted region
+			// NOTE/TODO: the rect would not have to go
+			// through the whole interection test process,
+			// it is guaranteed not to overlap with any rect
+			// already contained in the region
+			converted.AddRect(BRect(lt, rb));
 		}
 		*region = converted;
 	}
 }
 
-// InverseTransform
+
 void
 DrawState::InverseTransform(BPoint* point) const
 {
