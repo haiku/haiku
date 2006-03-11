@@ -2598,17 +2598,22 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 	if (window != NULL) {
 		status = window->Init(frame, (window_look)look, (window_feel)feel,
 			flags, workspaces);
-		if (status == B_OK && !window->Run())
+		if (status == B_OK && !window->Run()) {
+fprintf(stderr, "ServerApp::_CreateWindow() - failed to run the window thread\n");
 			status = B_ERROR;
+		}
 
 		// add the window to the list
 		if (status == B_OK && fWindowListLock.Lock()) {
 			status = fWindowList.AddItem(window) ? B_OK : B_NO_MEMORY;
+if (status < B_OK)
+fprintf(stderr, "ServerApp::_CreateWindow() - no memory to add window to list\n");
 			fWindowListLock.Unlock();
 		}
 
-		if (status < B_OK)
+		if (status < B_OK) {
 			delete window;
+		}
 	}
 
 	return status;
