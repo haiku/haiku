@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src tests servers app stress_test ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application StressTest :
+	main.cpp
+	: be
+;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : StressTest
+		: tests!apps ;
+}
+

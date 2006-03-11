@@ -20,8 +20,8 @@ UseFreeTypeHeaders ;
 local defines = [ FDefines TEST_MODE=1 ] ;
 	# USE_DIRECT_WINDOW_TEST_MODE=1
 
-SubDirCcFlags $(defines) ; # -fcheck-memory-usage -D_NO_INLINE_ASM ;
-SubDirC++Flags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirCcFlags $(defines) ; # -fcheck-memory-usage -finstrument-functions -D_NO_INLINE_ASM ;
+SubDirC++Flags $(defines) ; #-fcheck-memory-usage -finstrument-functions -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
@@ -151,6 +151,7 @@ SubInclude HAIKU_TOP src tests servers app painter ;
 SubInclude HAIKU_TOP src tests servers app playground ;
 SubInclude HAIKU_TOP src tests servers app resize_limits ;
 SubInclude HAIKU_TOP src tests servers app scrolling ;
+SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app textview ;
 SubInclude HAIKU_TOP src tests servers app regularapps ;
 SubInclude HAIKU_TOP src tests servers app view_state ;
