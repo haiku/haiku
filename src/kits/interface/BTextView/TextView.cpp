@@ -72,14 +72,15 @@ struct flattened_text_run {
 	uint16	_reserved_;	/* 0 */
 };
 
-
 struct flattened_text_run_array {
-	uchar				magic[4];	/* 41 6c 69 21 */
-	uchar				version[4];	/* 00 00 00 00 */
+	uint32				magic;
+	uint32				version;
 	int32				count;
 	flattened_text_run	styles[1];
 };
 
+static const uint32 kFlattenedTextRunArrayMagic = 'Ali!';
+static const uint32 kFlattenedTextRunArrayVersion = 0;
 
 enum {
 	B_SEPARATOR_CHARACTER,
@@ -2492,17 +2493,18 @@ BTextView::AllocRunArray(int32 entryCount, int32 *outSize)
 			*outSize = 0;
 		return NULL;
 	}
-	
+
 	memset(runArray, 0, sizeof(size));
 
 	runArray->count = entryCount;
 
 	// Call constructors explicitly as the text_run_array
-	// was allocated with malloc
-	for (int32 i = 0; i < runArray->count; i++)
+	// was allocated with malloc (and has to, for backwards
+	// compatibility)
+	for (int32 i = 0; i < runArray->count; i++) {
 		new (&runArray->runs[i].font) BFont;
-		//runArray->runs[i].font = new BFont;
-		
+	}
+	
 	if (outSize != NULL)
 		*outSize = size;
 
@@ -2540,44 +2542,39 @@ BTextView::FreeRunArray(text_run_array *array)
 
 /* static */
 void *
-BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
+BTextView::FlattenRunArray(const text_run_array* runArray, int32* _size)
 {
 	CALLED();
-	int32 size = sizeof(flattened_text_run_array) + (inArray->count - 1) *
-		sizeof(flattened_text_run);
+	int32 size = sizeof(flattened_text_run_array) + (runArray->count - 1)
+		* sizeof(flattened_text_run);
 
 	flattened_text_run_array *array = (flattened_text_run_array *)malloc(size);
 	if (array == NULL) {
-		*outSize = 0;
+		if (_size)
+			*_size = 0;
 		return NULL;
 	}
 
-	array->magic[0] = 0x41;
-	array->magic[1] = 0x6c;
-	array->magic[2] = 0x69;
-	array->magic[3] = 0x21;
-	array->version[0] = 0x00;
-	array->version[1] = 0x00;
-	array->version[2] = 0x00;
-	array->version[3] = 0x00;
-	array->count = inArray->count;
+	array->magic = B_HOST_TO_BENDIAN_INT32(kFlattenedTextRunArrayMagic);
+	array->version = B_HOST_TO_BENDIAN_INT32(kFlattenedTextRunArrayVersion);
+	array->count = B_HOST_TO_BENDIAN_INT32(runArray->count);
 
-	for (int32 i = 0; i < inArray->count; i++) {
-		array->styles[i].offset = inArray->runs[i].offset;
-		inArray->runs[i].font.GetFamilyAndStyle(&array->styles[i].family,
+	for (int32 i = 0; i < runArray->count; i++) {
+		array->styles[i].offset = B_HOST_TO_BENDIAN_INT32(runArray->runs[i].offset);
+		runArray->runs[i].font.GetFamilyAndStyle(&array->styles[i].family,
 			&array->styles[i].style);
-		array->styles[i].size = inArray->runs[i].font.Size();
-		array->styles[i].shear = inArray->runs[i].font.Shear();
-		array->styles[i].face = inArray->runs[i].font.Face();
-		array->styles[i].red = inArray->runs[i].color.red;
-		array->styles[i].green = inArray->runs[i].color.green;
-		array->styles[i].blue = inArray->runs[i].color.blue;
+		array->styles[i].size = B_HOST_TO_BENDIAN_FLOAT(runArray->runs[i].font.Size());
+		array->styles[i].shear = B_HOST_TO_BENDIAN_FLOAT(runArray->runs[i].font.Shear());
+		array->styles[i].face = B_HOST_TO_BENDIAN_INT16(runArray->runs[i].font.Face());
+		array->styles[i].red = runArray->runs[i].color.red;
+		array->styles[i].green = runArray->runs[i].color.green;
+		array->styles[i].blue = runArray->runs[i].color.blue;
 		array->styles[i].alpha = 255;
 		array->styles[i]._reserved_ = 0;
 	}
 
-	if (outSize)
-		*outSize = size;
+	if (_size)
+		*_size = size;
 
 	return array;
 }
@@ -2585,43 +2582,49 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 
 /* static */
 text_run_array *
-BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
+BTextView::UnflattenRunArray(const void* data, int32* _size)
 {
 	CALLED();
 	flattened_text_run_array *array = (flattened_text_run_array *)data;
 
-	if (array->magic[0] != 0x41 || array->magic[1] != 0x6c ||
-		array->magic[2] != 0x69 || array->magic[3] != 0x21 ||
-		array->version[0] != 0x00 || array->version[1] != 0x00 ||
-		array->version[2] != 0x00 || array->version[3] != 0x00) {
-		
-		if (outSize)
-			*outSize = 0;
+	if (B_BENDIAN_TO_HOST_INT32(array->magic) != kFlattenedTextRunArrayMagic
+		|| B_BENDIAN_TO_HOST_INT32(array->version) != kFlattenedTextRunArrayVersion) {
+		if (_size)
+			*_size = 0;
 
 		return NULL;
 	}
-
 	
-	text_run_array *run_array = AllocRunArray(array->count, outSize);
-	if (run_array == NULL)
+	int32 count = B_BENDIAN_TO_HOST_INT32(array->count);
+
+	text_run_array *runArray = AllocRunArray(count, _size);
+	if (runArray == NULL)
 		return NULL;
 
-	for (int32 i = 0; i < array->count; i++) {
-		run_array->runs[i].offset = array->styles[i].offset;	
-		
-		run_array->runs[i].font.SetFamilyAndStyle(array->styles[i].family,
-			array->styles[i].style);
-		run_array->runs[i].font.SetSize(array->styles[i].size);
-		run_array->runs[i].font.SetShear(array->styles[i].shear);
-		run_array->runs[i].font.SetFace(array->styles[i].face);
+	for (int32 i = 0; i < count; i++) {
+		runArray->runs[i].offset = B_BENDIAN_TO_HOST_INT32(array->styles[i].offset);
 
-		run_array->runs[i].color.red = array->styles[i].red;
-		run_array->runs[i].color.green = array->styles[i].green;
-		run_array->runs[i].color.blue = array->styles[i].blue;
-		run_array->runs[i].color.alpha = array->styles[i].alpha;
+		// Set family and style independently from each other, so that
+		// even if the family doesn't exist, we try to preserve the style
+		runArray->runs[i].font.SetFamilyAndStyle(array->styles[i].family, NULL);
+		runArray->runs[i].font.SetFamilyAndStyle(NULL, array->styles[i].style);
+
+		runArray->runs[i].font.SetSize(B_BENDIAN_TO_HOST_FLOAT(array->styles[i].size));
+		runArray->runs[i].font.SetShear(B_BENDIAN_TO_HOST_FLOAT(array->styles[i].shear));
+
+		uint16 face = B_BENDIAN_TO_HOST_INT16(array->styles[i].face);
+		if (face != B_REGULAR_FACE) {
+			// Be's version doesn't seem to set this correctly
+			runArray->runs[i].font.SetFace(face);
+		}
+
+		runArray->runs[i].color.red = array->styles[i].red;
+		runArray->runs[i].color.green = array->styles[i].green;
+		runArray->runs[i].color.blue = array->styles[i].blue;
+		runArray->runs[i].color.alpha = array->styles[i].alpha;
 	}
 
-	return run_array;
+	return runArray;
 }
 
 
