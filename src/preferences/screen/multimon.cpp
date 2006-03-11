@@ -1,20 +1,20 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
-	
 
 	Part of Radeon driver
-		
 	Multi-Monitor Settings interface
 */
 
 
-#include <OS.h>
 #include "multimon.h"
 #include "accelerant_ext.h"
-#include <stdio.h>
-#include <string.h>
 
+#include <OS.h>
 #include <Screen.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 // prepare parameters so they recognized as tunneled settings
@@ -181,38 +181,39 @@ status_t SetTVStandard( BScreen *screen, uint32 standard )
 
 
 // Verify existence of Multi-Monitor Settings Tunnel
-status_t TestMultiMonSupport( BScreen *screen )
+status_t
+TestMultiMonSupport(BScreen *screen)
 {
-	display_mode *mode_list;
+	display_mode *modeList = NULL;
 	display_mode low, high;
 	uint32 count;
 	status_t result;
 
 	// take any valid mode	
-	result = screen->GetModeList( &mode_list, &count );
-	if( result != B_OK )
+	result = screen->GetModeList(&modeList, &count);
+	if (result != B_OK)
 		return result;
-	
-	if( count < 1 )
+
+	if (count < 1)
 		return B_ERROR;
-	
+
 	// set request bits		
-	mode_list[0].timing.flags |= RADEON_MODE_MULTIMON_REQUEST;
-	mode_list[0].timing.flags &= ~RADEON_MODE_MULTIMON_REPLY;
-	low = high = mode_list[0];
-	
-	result = screen->ProposeMode( &mode_list[0], &low, &high );
-	if( result != B_OK )
-		goto err;
-	
+	modeList[0].timing.flags |= RADEON_MODE_MULTIMON_REQUEST;
+	modeList[0].timing.flags &= ~RADEON_MODE_MULTIMON_REPLY;
+	low = high = modeList[0];
+
+	result = screen->ProposeMode(&modeList[0], &low, &high);
+	if (result != B_OK)
+		goto out;
+
 	// check reply bits	
-	if( (mode_list[0].timing.flags & RADEON_MODE_MULTIMON_REQUEST) == 0 &&
-		(mode_list[0].timing.flags & RADEON_MODE_MULTIMON_REPLY) != 0 )
+	if ((modeList[0].timing.flags & RADEON_MODE_MULTIMON_REQUEST) == 0
+		&& (modeList[0].timing.flags & RADEON_MODE_MULTIMON_REPLY) != 0)
 		result = B_OK;
 	else
 		result = B_ERROR;
-		
-err:
-	delete mode_list;
+
+out:
+	free(modeList);
 	return result;
 }
