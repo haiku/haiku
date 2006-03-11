@@ -7,35 +7,36 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	BRadioButton represents a single on/off button. 
- *	All sibling BRadioButton objects comprise a single
- *	"multiple choice" control.
- */
+/*!
+	BRadioButton represents a single on/off button. 
+	All sibling BRadioButton objects comprise a single
+	"multiple choice" control.
+*/
+
 
 #include <Box.h>
-#include <Errors.h>
+#include <RadioButton.h>
 #include <Window.h>
 
-#include <RadioButton.h>
 
 
 BRadioButton::BRadioButton(BRect frame, const char *name, const char *label,
 						   BMessage *message, uint32 resizMask, uint32 flags)
-	:	BControl(frame, name, label, message, resizMask, flags),
-		fOutlined(false)
+	: BControl(frame, name, label, message, resizMask, flags),
+	fOutlined(false)
 {
 	// Resize to minimum height if needed
-	font_height fh;
-	GetFontHeight(&fh);
-	float minHeight = (float)ceil(6.0f + fh.ascent + fh.descent);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float minHeight = ceilf(6.0f + fontHeight.ascent + fontHeight.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
 BRadioButton::BRadioButton(BMessage *archive)
-	:	BControl(archive),
-		fOutlined(false)
+	: BControl(archive),
+	fOutlined(false)
 {
 }
 
@@ -50,8 +51,8 @@ BRadioButton::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BRadioButton"))
 		return new BRadioButton(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -69,12 +70,12 @@ BRadioButton::Draw(BRect updateRect)
 	BRect rect = _KnobFrame();
 
 	// its size depends on the text height
-	font_height fh;
-	GetFontHeight(&fh);
-	float textHeight = floorf(fh.ascent + fh.descent + 0.5);
-	
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
+
 	BPoint labelPos(rect.right + floorf(textHeight / 2.0),
-					floorf((rect.top + rect.bottom + textHeight) / 2.0 - fh.descent + 0.5) + 1.0);
+		floorf((rect.top + rect.bottom + textHeight) / 2.0 - fontHeight.descent + 0.5) + 1.0);
 
 	// if the focus is changing, just redraw the focus indicator
 	if (IsFocusChanging()) {
@@ -84,7 +85,7 @@ BRadioButton::Draw(BRect updateRect)
 			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 		BPoint underLine = labelPos;
-		underLine.y += fh.descent;
+		underLine.y += fontHeight.descent;
 		StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
 
 		return;
@@ -182,7 +183,7 @@ BRadioButton::Draw(BRect updateRect)
 	if (IsFocus()) {
 		SetHighColor(naviColor);
 		BPoint underLine = labelPos;
-		underLine.y += fh.descent;
+		underLine.y += fontHeight.descent;
 		StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
 	}
 }
@@ -320,21 +321,22 @@ BRadioButton::SetValue(int32 value)
 void
 BRadioButton::GetPreferredSize(float* _width, float* _height)
 {
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
 	if (_width) {
-		float width = 22.0f; // TODO: check if ascent is included
+		BRect rect = _KnobFrame();
+		float width = rect.right + floorf(ceilf(fontHeight.ascent
+			+ fontHeight.descent) / 2.0);
 
 		if (Label())
 			width += StringWidth(Label());
 	
-		*_width = (float)ceil(width);
+		*_width = ceilf(width);
 	}
 
-	if (_height) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-
-		*_height = (float)ceil(fontHeight.ascent + fontHeight.descent) + 6.0f;
-	}
+	if (_height)
+		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f;
 }
 
 
@@ -479,14 +481,14 @@ BRadioButton::operator=(const BRadioButton &)
 BRect
 BRadioButton::_KnobFrame() const
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
 	// layout the rect for the dot
 	BRect rect(Bounds());
 
 	// its size depends on the text height
-	float textHeight = floorf(fh.ascent + fh.descent + 0.5);
+	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
 	float inset = -floorf(textHeight / 2 - 2);
 
 	rect.left -= (inset - 1);
