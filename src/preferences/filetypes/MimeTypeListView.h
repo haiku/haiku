@@ -79,6 +79,7 @@ class MimeTypeListView : public BOutlineListView {
 		void _CollectSubtypes(const char* supertype, MimeTypeItem* supertypeItem);
 		void _CollectTypes();
 		void _MakeTypesUnique(MimeTypeItem* underItem = NULL);
+		void _AddNewType(const char* type);
 
 		BMimeType	fSupertype;
 		BString		fSelectNewType;

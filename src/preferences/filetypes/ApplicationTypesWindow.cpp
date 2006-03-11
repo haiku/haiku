@@ -24,7 +24,9 @@
 #include <PopUpMenu.h>
 #include <Query.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <ScrollView.h>
+#include <StatusBar.h>
 #include <StringView.h>
 #include <TextView.h>
 #include <Volume.h>
@@ -33,7 +35,21 @@
 #include <stdio.h>
 
 
+class ProgressWindow : public BWindow {
+	public:
+		ProgressWindow(const char* message, int32 max, volatile bool* signalQuit);
+		virtual ~ProgressWindow();
+
+		virtual void MessageReceived(BMessage* message);
+
+	private:
+		BStatusBar*		fStatusBar;
+		BButton*		fAbortButton;
+		volatile bool*	fQuitListener;
+};
+
 const uint32 kMsgTypeSelected = 'typs';
+const uint32 kMsgTypeInvoked = 'typi';
 const uint32 kMsgRemoveUninstalled = 'runs';
 
 
@@ -71,6 +87,77 @@ variety_to_text(uint32 variety)
 //	#pragma mark -
 
 
+ProgressWindow::ProgressWindow(const char* message, int32 max, volatile bool* signalQuit)
+	: BWindow(BRect(0, 0, 300, 200), "Progress", B_MODAL_WINDOW_LOOK,
+		B_MODAL_SUBSET_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_V_RESIZABLE),
+	fQuitListener(signalQuit)
+{
+	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
+	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
+
+	char count[100];
+	snprintf(count, sizeof(count), "/%ld", max);
+
+	BRect rect = Bounds().InsetByCopy(8, 8);
+	fStatusBar = new BStatusBar(rect, "status", message, count);
+	fStatusBar->SetMaxValue(max);
+	fStatusBar->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
+	float width, height;
+	fStatusBar->GetPreferredSize(&width, &height);
+	fStatusBar->ResizeTo(rect.Width(), height);
+	topView->AddChild(fStatusBar);
+
+	fAbortButton = new BButton(rect, "abort", "Abort", new BMessage(B_CANCEL),
+		B_FOLLOW_H_CENTER | B_FOLLOW_TOP);
+	fAbortButton->ResizeToPreferred();
+	fAbortButton->MoveTo((Bounds().Width() - fAbortButton->Bounds().Width()) / 2,
+		fStatusBar->Frame().bottom + 10.0f);
+	topView->AddChild(fAbortButton);
+
+	ResizeTo(width * 1.4f, fAbortButton->Frame().bottom + 8.0f);
+	SetSizeLimits(width + 42.0f, 32767.0f,
+		Bounds().Height(), Bounds().Height());
+
+	// center on screen
+	BScreen screen(this);
+	MoveTo(screen.Frame().left + (screen.Frame().Width() - Bounds().Width()) / 2.0f,
+		screen.Frame().top + (screen.Frame().Height() - Bounds().Height()) / 2.0f);
+}
+
+
+ProgressWindow::~ProgressWindow()
+{
+}
+
+
+void
+ProgressWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_UPDATE_STATUS_BAR:
+			char count[100];
+			snprintf(count, sizeof(count), "%ld", (int32)fStatusBar->CurrentValue() + 1);
+
+			fStatusBar->Update(1, NULL, count);
+			break;
+
+		case B_CANCEL:
+			fAbortButton->SetEnabled(false);
+			if (fQuitListener != NULL)
+				*fQuitListener = true;
+			break;
+
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
+}
+
+
+//	#pragma mark -
+
+
 ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 	: BWindow(frame, "Application Types", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
@@ -96,6 +183,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 	fTypeListView = new MimeTypeListView(rect, "listview", "application", true, true,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
+	fTypeListView->SetInvocationMessage(new BMessage(kMsgTypeInvoked));
 
 	BScrollView* scrollView = new BScrollView("scrollview", fTypeListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
@@ -213,9 +301,17 @@ ApplicationTypesWindow::_RemoveUninstalled()
 	// Note: this runs in the looper's thread, which isn't that nice
 
 	int32 removed = 0;
+	volatile bool quit = false;
 
-	for (int32 i = fTypeListView->FullListCountItems(); i-- > 0;) {
+	BWindow* progressWindow = new ProgressWindow("Removing uninstalled application types",
+		fTypeListView->FullListCountItems(), &quit);
+	progressWindow->AddToSubset(this);
+	progressWindow->Show();
+
+	for (int32 i = fTypeListView->FullListCountItems(); i-- > 0 && !quit;) {
 		MimeTypeItem* item = dynamic_cast<MimeTypeItem*>(fTypeListView->FullListItemAt(i));
+		progressWindow->PostMessage(B_UPDATE_STATUS_BAR);
+
 		if (item == NULL)
 			continue;
 
@@ -256,6 +352,8 @@ ApplicationTypesWindow::_RemoveUninstalled()
 				UpdateIfNeeded();
 		}
 	}
+
+	progressWindow->PostMessage(B_QUIT_REQUESTED);
 
 	char message[512];
 	snprintf(message, sizeof(message), "%ld Application Type%s could be removed.",
@@ -366,7 +464,6 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 }
 
 
-
 void
 ApplicationTypesWindow::FrameResized(float width, float height)
 {
@@ -389,6 +486,25 @@ ApplicationTypesWindow::MessageReceived(BMessage* message)
 					_SetType(&type);
 				} else
 					_SetType(NULL);
+			}
+			break;
+		}
+
+		case kMsgTypeInvoked:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK) {
+				MimeTypeItem* item = (MimeTypeItem*)fTypeListView->ItemAt(index);
+				if (item != NULL) {
+					BMimeType type(item->Type());
+					entry_ref ref;
+					if (type.GetAppHint(&ref) == B_OK) {
+						BMessage refs(B_REFS_RECEIVED);
+						refs.AddRef("refs", &ref);
+
+						be_app->PostMessage(&refs);
+					}
+				}
 			}
 			break;
 		}

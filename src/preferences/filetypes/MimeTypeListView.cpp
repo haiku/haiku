@@ -7,9 +7,13 @@
 #include "MimeTypeListView.h"
 
 #include <Bitmap.h>
+#include <MessageRunner.h>
 
 
 // TODO: lazy type collecting (super types only at startup)
+
+
+const uint32 kMsgAddType = 'adtp';
 
 
 status_t
@@ -431,6 +435,51 @@ MimeTypeListView::_MakeTypesUnique(MimeTypeItem* underItem)
 
 
 void
+MimeTypeListView::_AddNewType(const char* type)
+{
+	MimeTypeItem* item = FindItem(type);
+
+	BMimeType mimeType(type);
+	bool isApp = mimetype_is_application_signature(mimeType);
+	if (fApplicationMode ^ isApp || !mimeType.IsInstalled()) {
+		if (item != NULL) {
+			// type doesn't belong here
+			RemoveItem(item);
+			delete item;
+		}
+		return;
+	}
+
+	if (item != NULL) {
+		// for some reason, the type already exists
+		return;
+	}
+
+	BMimeType superType;
+	MimeTypeItem* superItem = NULL;
+	if (mimeType.GetSupertype(&superType) == B_OK)
+		superItem = FindItem(superType.Type());
+
+	item = new MimeTypeItem(mimeType, fShowIcons, fSupertype.Type() != NULL);
+	item->SetApplicationMode(isApp);
+
+	if (superItem != NULL) {
+		AddUnder(item, superItem);
+		InvalidateItem(IndexOf(superItem));
+			// the super item is not picked up from the class (ie. bug)
+	} else
+		AddItem(item);
+
+	UpdateItem(item);
+
+	if (!fSelectNewType.ICompare(mimeType.Type())) {
+		SelectItem(item);
+		fSelectNewType = "";
+	}
+}
+
+
+void
 MimeTypeListView::AttachedToWindow()
 {
 	BOutlineListView::AttachedToWindow();
@@ -470,7 +519,7 @@ MimeTypeListView::MessageReceived(BMessage* message)
 				case B_SHORT_DESCRIPTION_CHANGED:
 				{
 					// update label
-	
+
 					MimeTypeItem* item = FindItem(type);
 					if (item != NULL)
 						UpdateItem(item);
@@ -478,33 +527,17 @@ MimeTypeListView::MessageReceived(BMessage* message)
 				}
 				case B_MIME_TYPE_CREATED:
 				{
-					// create new item
-					BMimeType created(type);
-					bool isApp = mimetype_is_application_signature(created);
-					if (fApplicationMode ^ isApp)
-						break;
+					// delay creation of new item a bit, until the type is fully installed
 
-					BMimeType superType;
-					MimeTypeItem* superItem = NULL;
-					if (created.GetSupertype(&superType) == B_OK)
-						superItem = FindItem(superType.Type());
+					BMessage addType(kMsgAddType);
+					addType.AddString("type", type);
 
-					MimeTypeItem* item = new MimeTypeItem(created, fShowIcons,
-						fSupertype.Type() != NULL);
-					item->SetApplicationMode(isApp);
-
-					if (superItem != NULL) {
-						AddUnder(item, superItem);
-						InvalidateItem(IndexOf(superItem));
-							// the super item is not picked up from the class (ie. bug)
-					} else
-						AddItem(item);
-
-					UpdateItem(item);
-
-					if (!fSelectNewType.ICompare(type)) {
-						SelectItem(item);
-						fSelectNewType = "";
+					// TODO: free runner again!
+					BMessageRunner* runner = new BMessageRunner(this, &addType,
+						200000ULL, 1);
+					if (runner->InitCheck() != B_OK) {
+						delete runner;
+						_AddNewType(type);
 					}
 					break;
 				}
@@ -519,19 +552,35 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					break;
 				}
 				case B_PREFERRED_APP_CHANGED:
+				{
+					// try to add or remove this type (changing the preferred app
+					// might change visibility in our list)
+					_AddNewType(type);
+
+					// supposed to fall through
+				}
 				case B_ICON_CHANGED:
 				// TODO: take B_ICON_FOR_TYPE_CHANGED into account, too
-					if (fShowIcons) {
+				{
+					MimeTypeItem* item = FindItem(type);
+					if (item != NULL && fShowIcons) {
 						// refresh item
-						MimeTypeItem* item = FindItem(type);
-						if (item != NULL)
-							InvalidateItem(IndexOf(item));
+						InvalidateItem(IndexOf(item));
 					}
 					break;
+				}
 
 				default:
 					break;
 			}
+			break;
+		}
+
+		case kMsgAddType:
+		{
+			const char* type;
+			if (message->FindString("type", &type) == B_OK)
+				_AddNewType(type);
 			break;
 		}
 
