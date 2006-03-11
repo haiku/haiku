@@ -151,7 +151,8 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 		float frequency;
 		if (fDesktop->ScreenAt(0)) {
 			fDesktop->ScreenAt(0)->GetMode(width, height, colorSpace, frequency);
-// TODO: MOVE THIS AWAY!!! RemoveBy contains calls to virtual methods! Also, there is not TopLayer()!
+// TODO: MOVE THIS AWAY!!! ResizeBy contains calls to virtual methods!
+// Also, there is no TopLayer()!
 			fFrame.OffsetTo(B_ORIGIN);
 //			ResizeBy(width - frame.Width(), height - frame.Height(), NULL);
 		}
@@ -166,7 +167,8 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 
 WindowLayer::~WindowLayer()
 {
-	fTopLayer->DetachedFromWindow();
+	if (fTopLayer)
+		fTopLayer->DetachedFromWindow();
 
 	delete fTopLayer;
 	delete fDecorator;
