@@ -28,8 +28,8 @@
 using namespace BPrivate;
 
 // Private helper functions
-bool isValidMimeChar(const char ch);
-status_t toLower(const char *str, char *result);
+static bool isValidMimeChar(const char ch);
+static status_t toLower(const char *str, char *result);
 
 using namespace BPrivate::Storage::Mime;
 using namespace std;
@@ -44,7 +44,7 @@ const char *B_FILE_MIME_TYPE		= "application/octet-stream";
 const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 
 
-bool
+static bool
 isValidMimeChar(const char ch)
 {
 	// Handles white space and most CTLs
@@ -72,7 +72,7 @@ isValidMimeChar(const char ch)
 	Returns a lowercase version of str in result. Result must
 	be preallocated and is assumed to be of adequate length.
 */
-status_t
+static status_t
 toLower(const char *str, char *result)
 {
 	if (!str || !result)
