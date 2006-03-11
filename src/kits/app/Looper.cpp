@@ -133,7 +133,7 @@ BLooper::~BLooper()
 	}
 
 	// Close the message port and read and reply to the remaining messages.
-	if (fMsgPort > 0)
+	if (fMsgPort >= 0)
 		close_port(fMsgPort);
 
 	BMessage *msg;
