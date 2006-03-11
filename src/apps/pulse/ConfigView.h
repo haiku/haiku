@@ -1,21 +1,25 @@
-//****************************************************************************************
-//
-//	File:		ConfigView.h
-//
-//	Written by:	Daniel Switkin
-//
-//	Copyright 1999, Be Incorporated
-//
-//****************************************************************************************
+/*
+ * Copyright 2002-2006 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Written by:	Daniel Switkin
+ */
+#ifndef CONFIG_VIEW_H
+#define CONFIG_VIEW_H
 
-#ifndef CONFIGVIEW_H
-#define CONFIGVIEW_H
 
-#include <interface/CheckBox.h>
-#include <interface/RadioButton.h>
-#include <interface/TextControl.h>
-#include <interface/ColorControl.h>
 #include "Prefs.h"
+
+#include <Box.h>
+#include <ColorControl.h>
+
+class BCheckBox;
+class BRadioButton;
+class BTextControl;
+
 
 class RTColorControl : public BColorControl {
 	public:
@@ -23,25 +27,35 @@ class RTColorControl : public BColorControl {
 		void SetValue(int32 color);
 };
 
-class ConfigView : public BView {
+class ConfigView : public BBox {
 	public:
-		ConfigView(BRect rect, const char *name, int mode, Prefs *prefs);
-		void AttachedToWindow();
-		void MessageReceived(BMessage *message);
+		ConfigView(BRect rect, const char *name, uint32 mode,
+			BMessenger& target, Prefs *prefs);
+
+		virtual void AttachedToWindow();
+		virtual void MessageReceived(BMessage *message);
+		virtual void GetPreferredSize(float* _width, float* _height);
+
 		void UpdateDeskbarIconWidth();
-		
+
 	private:
-		void ResetDefaults();
-		bool first_time_attached;
-		int mode;
-		
-		RTColorControl *colorcontrol;
+		void _ResetDefaults();
+
+		int32			fMode;
+		BMessenger		fTarget;
+		Prefs*			fPrefs;
+		RTColorControl* fColorControl;
+
+		bool			fFirstTimeAttached;
+
 		// For Normal
-		BCheckBox *fadecolors;
+		BCheckBox*		fFadeCheckBox;
 		// For Mini and Deskbar
-		BRadioButton *active, *idle, *frame;
+		BRadioButton*	fActiveButton;
+		BRadioButton*	fIdleButton;
+		BRadioButton*	fFrameButton;
 		// For Deskbar
-		BTextControl *iconwidth;
+		BTextControl*	fIconWidthControl;
 };
 
-#endif
+#endif	// CONFIG_VIEW_H

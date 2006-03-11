@@ -1,98 +1,133 @@
-//****************************************************************************************
-//
-//	File:		PrefsWindow.cpp
-//
-//	Written by:	Daniel Switkin
-//
-//	Copyright 1999, Be Incorporated
-//
-//****************************************************************************************
+/*
+ * Copyright 2002-2006 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Written by:	Daniel Switkin
+ */
+
 
 #include "PrefsWindow.h"
 #include "Common.h"
 #include "PulseApp.h"
-#include "BottomPrefsView.h"
 #include "ConfigView.h"
-#include <interface/TabView.h>
-#include <interface/TextControl.h>
-#include <interface/Box.h>
+
+//#include <Box.h>
+#include <Button.h>
+#include <TabView.h>
+#include <TextControl.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
-PrefsWindow::PrefsWindow(BRect rect, const char *name, BMessenger *messenger, Prefs *prefs) :
-	BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE |
-		B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS) {
 
-	this->messenger = messenger;
-	this->prefs = prefs;
-
+PrefsWindow::PrefsWindow(BRect rect, const char *name, BMessenger *messenger, Prefs *prefs)
+	: BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS),
+	fTarget(*messenger),
+	fPrefs(prefs)
+{
 	// This gives a nice look, and sets the background color correctly
 	BRect bounds = Bounds();
-	BBox *parent = new BBox(bounds, "ParentView", B_FOLLOW_NONE, B_PLAIN_BORDER);
-	AddChild(parent);
+	BView* topView = new BView(bounds, "ParentView", B_FOLLOW_ALL, B_WILL_DRAW);
+	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
 
 	bounds.top += 10;
 	bounds.bottom -= 45;
-	BTabView *tabview = new BTabView(bounds, "TabView");
-	tabview->SetFont(be_plain_font);
-	tabview->SetViewColor(parent->ViewColor());
-	tabview->ContainerView()->SetViewColor(parent->ViewColor());
-	parent->AddChild(tabview);
+	fTabView = new BTabView(bounds, "TabView", B_WIDTH_FROM_LABEL);
+	fTabView->SetFont(be_plain_font);
+	topView->AddChild(fTabView);
+
+	BRect rect = fTabView->ContainerView()->Bounds();
+	rect.InsetBy(5, 5);
+
+	ConfigView *normalView = new ConfigView(rect, "Normal Mode",
+		PRV_NORMAL_CHANGE_COLOR, fTarget, prefs);
+	fTabView->AddTab(normalView);
+
+	ConfigView *miniView = new ConfigView(rect, "Mini Mode", PRV_MINI_CHANGE_COLOR,
+		fTarget, prefs);
+	fTabView->AddTab(miniView);
 	
-	BRect viewsize = tabview->ContainerView()->Bounds();
-	viewsize.InsetBy(5, 5);
-	
-	ConfigView *normal = new ConfigView(viewsize, "Normal Mode", NORMAL_WINDOW_MODE, prefs);
-	normal->SetViewColor(tabview->ViewColor());
-	tabview->AddTab(normal);
-	
-	ConfigView *mini = new ConfigView(viewsize, "Mini Mode", MINI_WINDOW_MODE, prefs);
-	mini->SetViewColor(tabview->ViewColor());
-	tabview->AddTab(mini);
-	
-	ConfigView *deskbar = new ConfigView(viewsize, "Deskbar Mode", DESKBAR_MODE, prefs);
-	deskbar->SetViewColor(tabview->ViewColor());
-	tabview->AddTab(deskbar);
-	
-	tabview->Select(0);
-	
-	bounds.top = bounds.bottom + 1;
-	bounds.bottom += 45;
-	BottomPrefsView *bottomprefsview = new BottomPrefsView(bounds, "BottomPrefsView");
-	parent->AddChild(bottomprefsview);
+	ConfigView *deskbarView = new ConfigView(rect, "Deskbar Mode", PRV_DESKBAR_CHANGE_COLOR,
+		fTarget, prefs);
+	fTabView->AddTab(deskbarView);
+
+	float width, height;
+	deskbarView->GetPreferredSize(&width, &height);
+	normalView->ResizeTo(width, height);
+	miniView->ResizeTo(width, height);
+	deskbarView->ResizeTo(width, height);
+
+	fTabView->Select(0L);
+	fTabView->ResizeTo(deskbarView->Bounds().Width() + 16.0f, deskbarView->Bounds().Height()
+		+ fTabView->ContainerView()->Frame().top + 16.0f);
+
+	BButton *okButton = new BButton(rect, "ok", "OK", new BMessage(PRV_BOTTOM_OK),
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	okButton->ResizeToPreferred();
+	okButton->MoveTo(Bounds().Width() - 8.0f - okButton->Bounds().Width(),
+		Bounds().Height() - 8.0f - okButton->Bounds().Height());
+	topView->AddChild(okButton);
+
+	BButton *defaultsButton = new BButton(okButton->Frame(), "defaults", "Defaults",
+		new BMessage(PRV_BOTTOM_DEFAULTS), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	defaultsButton->ResizeToPreferred();
+	defaultsButton->MoveBy(-defaultsButton->Bounds().Width() - 10.0f, 0.0f);
+	topView->AddChild(defaultsButton);
+
+	okButton->MakeDefault(true);
+
+	fTabView->SetResizingMode(B_FOLLOW_NONE);
+	ResizeTo(fTabView->Frame().Width(), fTabView->Frame().bottom + 16.0f
+		+ okButton->Bounds().Height());
 }
 
-void PrefsWindow::MessageReceived(BMessage *message) {
+
+PrefsWindow::~PrefsWindow()
+{
+	fPrefs->prefs_window_rect = Frame();
+	fPrefs->Save();
+}
+
+
+void
+PrefsWindow::MessageReceived(BMessage *message)
+{
 	switch (message->what) {
-		case PRV_BOTTOM_OK: {
+		case PRV_BOTTOM_OK:
+		{
 			Hide();
-			BTabView *tabview = (BTabView *)FindView("TabView");
-			tabview->Select(2);
+
+			fTabView->Select(2);
 			ConfigView *deskbar = (ConfigView *)FindView("Deskbar Mode");
 			deskbar->UpdateDeskbarIconWidth();
-			if (Lock()) Quit();
+
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}
-		case PRV_BOTTOM_DEFAULTS: {
-			BTabView *tabview = (BTabView *)FindView("TabView");
-			BTab *tab = tabview->TabAt(tabview->Selection());
+
+		case PRV_BOTTOM_DEFAULTS:
+		{
+			BTab *tab = fTabView->TabAt(fTabView->Selection());
 			BView *view = tab->View();
 			view->MessageReceived(message);
 			break;
 		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
 }
 
-void PrefsWindow::Quit() {
-	messenger->SendMessage(new BMessage(PRV_QUIT));
-	BWindow::Quit();
-}
 
-PrefsWindow::~PrefsWindow() {
-	prefs->prefs_window_rect = Frame();
-	prefs->Save();
-	delete messenger;
+bool
+PrefsWindow::QuitRequested()
+{
+	fTarget.SendMessage(new BMessage(PRV_QUIT));
+	return true;
 }

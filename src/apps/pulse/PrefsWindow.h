@@ -1,29 +1,35 @@
-//****************************************************************************************
-//
-//	File:		PrefsWindow.h
-//
-//	Written by:	Daniel Switkin
-//
-//	Copyright 1999, Be Incorporated
-//
-//****************************************************************************************
+/*
+ * Copyright 2002-2006 Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Written by:	Daniel Switkin
+ */
+#ifndef PREFS_WINDOW_H
+#define PREFS_WINDOW_H
 
-#ifndef PREFSWINDOW_H
-#define PREFSWINDOW_H
 
-#include <interface/Window.h>
-#include <app/Messenger.h>
 #include "Prefs.h"
+
+#include <Messenger.h>
+#include <Window.h>
+
+class BTabView;
 
 class PrefsWindow : public BWindow {
 	public:
 		PrefsWindow(BRect rect, const char *name, BMessenger *messenger, Prefs *prefs);
-		void MessageReceived(BMessage *message);
-		~PrefsWindow();
-		void Quit();
+		virtual ~PrefsWindow();
 
-		Prefs *prefs;
-		BMessenger *messenger;
+		virtual void MessageReceived(BMessage *message);
+		virtual bool QuitRequested();
+
+	private:
+		BTabView*	fTabView;
+		BMessenger	fTarget;
+		Prefs*		fPrefs;
 };
 
-#endif
+#endif	// PREFS_WINDOW_H

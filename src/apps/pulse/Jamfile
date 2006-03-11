@@ -4,15 +4,14 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared ;
 if $(TARGET_PLATFORM) != haiku {
-        UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
 }
 
 if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
-Application Pulse : 
-	BottomPrefsView.cpp
+Application Pulse :
 	ConfigView.cpp
 	CPUButton.cpp
 	DeskbarPulseView.cpp
@@ -28,7 +27,3 @@ Application Pulse :
 	: be  
 	: Pulse.rdef 
 ;
-
-if $(HAIKU_COMPATIBLE) {
-	LinkAgainst Pulse : libroot.so ;
-}
