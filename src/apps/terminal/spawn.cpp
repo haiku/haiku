@@ -176,7 +176,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				break;
 			} else {
 				// B_BUSY is a normal case
-				if (master != B_BUSY) 
+				if (errno != B_BUSY) 
 					fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
 			}
 		}

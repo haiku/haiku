@@ -298,7 +298,7 @@ TermParse::EscParse(void *data)
 			}
 			parsestate = groundtable;
 			now_coding = gNowCoding;
-    	}
+    		}
 
 		switch (parsestate[c]) {
 			case CASE_PRINT:
