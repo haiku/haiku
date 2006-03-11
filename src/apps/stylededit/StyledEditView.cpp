@@ -93,6 +93,7 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 		bytesRead = node->ReadAttr("be:encoding", 0, 0, &encoding, sizeof(encoding));
 		if (bytesRead == (ssize_t)sizeof(encoding)) {
 			if (encoding == 65535) {
+				// UTF-8
 				fEncoding = 0;
 			} else {
 				const BCharacterSet* characterSet
@@ -103,10 +104,10 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 		}
 
 		// restore alignment
-		alignment align;
+		int32 align;
 		bytesRead = node->ReadAttr("alignment", 0, 0, &align, sizeof(align));
 		if (bytesRead == (ssize_t)sizeof(align))
-			SetAlignment(align);
+			SetAlignment((alignment)align);
 
 		// restore wrapping
 		bool wrap;
@@ -166,7 +167,7 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 
 		// ... and here we restore it
 		SetRunArray(0, length, runArray);
-		free(runArray);
+		FreeRunArray(runArray);
 	}
 
 	return result;
@@ -222,7 +223,7 @@ StyledEditView::WriteStyledEditFile(BFile* file)
 		}
 	}
 
-	alignment align = Alignment();
+	int32 align = Alignment();
 	bytes = file->WriteAttr("alignment", B_INT32_TYPE, 0, &align, sizeof(align));
 	if (bytes < 0)
 		return bytes;
