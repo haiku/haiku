@@ -1,32 +1,38 @@
 /*
-	
-	DataTranslationsView.cpp
-	
-*/
+ * Copyright 2002-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Oliver Siebenmarck
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Michael Wilber
+ */
 
-#ifndef _APPLICATION_H
+
+#include "TranslatorListView.h"
+
 #include <Application.h>
-#endif
-
-#include "DataTranslationsView.h"
 
 
-DataTranslationsView::DataTranslationsView(BRect rect, const char *name,
-	list_view_type type)
+
+TranslatorListView::TranslatorListView(BRect rect, const char *name,
+		list_view_type type)
 	: BListView(rect, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES) 
 {	
 }
 
-DataTranslationsView::~DataTranslationsView() 
+
+TranslatorListView::~TranslatorListView() 
 {
 }
 
+
 void
-DataTranslationsView::MessageReceived(BMessage *message) 
+TranslatorListView::MessageReceived(BMessage *message) 
 {
 	uint32 type; 
 	int32 count;
-	
+
 	switch (message->what) {
 		case B_SIMPLE_DATA:
 			// Tell the application object that a
@@ -38,26 +44,25 @@ DataTranslationsView::MessageReceived(BMessage *message)
 				Invalidate();
 			}
 			break;
-			
+
 		default:
 			BView::MessageReceived(message);
 			break;
 	}
 }
 
+
 void
-DataTranslationsView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
+TranslatorListView::MouseMoved(BPoint point, uint32 transit, const BMessage *dragMessage)
 {
-	if (msg && transit == B_ENTERED_VIEW) {
+	if (dragMessage != NULL && transit == B_ENTERED_VIEW) {
 		// Draw a red box around the inside of the view
 		// to tell the user that this view accepts drops
 		SetHighColor(220,0,0);
 	 	SetPenSize(4);
 		StrokeRect(Bounds());
 	 	SetHighColor(0,0,0);
-		 	
-	} else if (msg && transit == B_EXITED_VIEW)
+	} else if (dragMessage != NULL && transit == B_EXITED_VIEW)
 		Invalidate();
 }
-
 

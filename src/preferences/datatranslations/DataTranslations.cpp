@@ -1,39 +1,40 @@
 /*
- * DataTranslations.cpp
- * DataTranslations mccall@digitalparadise.co.uk
+ * Copyright 2002-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
  *
+ * Authors:
+ *		Oliver Siebenmarck
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Michael Wilber
  */
 
-#include <Alert.h>
-#include <Screen.h>
 
 #include "DataTranslations.h"
 #include "DataTranslationsWindow.h"
 #include "DataTranslationsSettings.h"
-#include "DataTranslationsMessages.h"
 
-const char DataTranslationsApplication::kDataTranslationsApplicationSig[] = "application/x-vnd.OpenBeOS-prefs-translations";
+#include <Alert.h>
+#include <Directory.h>
+#include <TranslatorRoster.h>
+#include <TextView.h>
 
-int main(int, char**)
-{
-	DataTranslationsApplication	myApplication;
 
-	myApplication.Run();
+const char* kApplicationSignature = "application/x-vnd.haiku-translations";
 
-	return(0);
-}
 
 DataTranslationsApplication::DataTranslationsApplication()
-					:BApplication(kDataTranslationsApplicationSig)
+	: BApplication(kApplicationSignature)
 {
-
-	DataTranslationsWindow		*window;
-	
 	fSettings = new DataTranslationsSettings();
-		
-	window = new DataTranslationsWindow();
-
+	new DataTranslationsWindow();
 }
+
+
+DataTranslationsApplication::~DataTranslationsApplication()
+{
+	delete fSettings;
+}
+
 
 void
 DataTranslationsApplication::SetWindowCorner(BPoint corner)
@@ -41,27 +42,39 @@ DataTranslationsApplication::SetWindowCorner(BPoint corner)
 	fSettings->SetWindowCorner(corner);
 }
 
+
 void
-DataTranslationsApplication::AboutRequested(void)
+DataTranslationsApplication::AboutRequested()
 {
-	(new BAlert("", "... written by Oliver Siebenmarck", "Cool!"))->Go();
-	return;
+	BAlert *alert = new BAlert("about", "DataTranslations\n"
+		"\twritten by Oliver Siebenmarck and others\n"
+		"\tCopyright 2002-2006, Haiku.\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE);
+	view->SetFontAndColor(0, 16, &font);
+
+	alert->Go();
 }
 
-DataTranslationsApplication::~DataTranslationsApplication()
-{
-	delete fSettings;
-}
 
-void DataTranslationsApplication::Install_Done()
+void
+DataTranslationsApplication::InstallDone()
 {
 	(new BAlert("",
 		"You have to quit and restart running applications\n"
-		"for the installed Translators to be available in them.",
+		"for the installed Translators to be available for them.",
 		"OK"))->Go();
 }
 
-void DataTranslationsApplication::RefsReceived(BMessage *message)
+
+void
+DataTranslationsApplication::RefsReceived(BMessage *message)
 {
 	uint32 type; 
 	int32 count;
@@ -94,15 +107,14 @@ void DataTranslationsApplication::RefsReceived(BMessage *message)
     			if (keep->Go() == 0)
     				moveit = true;
     			
-    			if (moveit) // Just a quick move 
-    			{
-    				if (dirt.Contains(newfile.String()))
-    				{
+    			if (moveit) {
+    				// Just a quick move 
+    				if (dirt.Contains(newfile.String())) {
     					string.SetTo("");
     					string << "An item named '" << e_name <<"' already is in the \nTranslators folder";
     					BAlert *myAlert = new BAlert("title",  string.String() , "Overwrite", "Stop");
     					myAlert->SetShortcut(1, B_ESCAPE); 
-					
+
 						if (myAlert->Go() != 0) 
 							return;
 						// File exists, we are still here. Kill it.
@@ -111,58 +123,70 @@ void DataTranslationsApplication::RefsReceived(BMessage *message)
 						dele.Remove();	
 					}
 					entry.MoveTo(&dirt); // Move it.
-    				Install_Done(); 	 // Installation done
+    				InstallDone(); 	 // Installation done
     				return;
     			}
-    			
-    			if (dirt.Contains(newfile.String()))
-    			{
+
+    			if (dirt.Contains(newfile.String())) {
     				// File exists, What are we supposed to do now (Overwrite/_Stopp_?)
     				string.SetTo("");
     				string << "An item named '" << e_name <<"' already is in the \nTranslators folder";
     				BAlert *myAlert = new BAlert("title",  string.String() , "Overwrite", "Stop");
     				myAlert->SetShortcut(1, B_ESCAPE); 
-					
+
 					if (myAlert->Go() != 0) 
 						return;
 				}
-    			
+
     			string.SetTo(path.Path()); // Fullpath+Filename 
-    			
-    			BString 
-				command	=	"copyattr -d -r ";
+
+    			BString command;
+#ifdef __HAIKU__
+				command	= "cp ";
+#else
+				command	= "copyattr -d -r ";
+#endif
 				command << string.String() << " " << newfile.String(); // Prepare Copy 
-				
+
 				system(command.String()); // Execute copy command
-    			
+
     			string.SetTo("");
     			string << "Filename: " << e_name << "\nPath: " << path.Path() ;
-    			
+
     			// The new Translator has been installed by now.
     			// And done we are
-    			Install_Done();
-    			return;
-    		}
-    		else
-    		{
+    			InstallDone();
+    		} else {
     			// Not a Translator
-    			no_trans(e_name);
+    			NoTranslatorError(e_name);
     		}
-    	}
-    	else
-    	{
+    	} else {
     		// Not even a file...
-    		no_trans(e_name);
+    		NoTranslatorError(e_name);
     	}	
     }
 }
 
-void DataTranslationsApplication::no_trans(char item_name[B_FILE_NAME_LENGTH])
+
+void
+DataTranslationsApplication::NoTranslatorError(const char* name)
 {
 	BString text;
 	text.SetTo("The item '");
-	text << item_name << "' does not appear to be a Translator and will not be installed";
+	text << name << "' does not appear to be a Translator and will not be installed.";
 	(new BAlert("", text.String(), "Stop"))->Go();
-	return;
+}
+
+
+//	#pragma mark -
+
+
+int
+main(int, char**)
+{
+	DataTranslationsApplication	app;
+	app.Run();
+
+	return 0;
 }
 

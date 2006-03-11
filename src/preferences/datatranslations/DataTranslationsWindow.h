@@ -1,61 +1,56 @@
-#ifndef DATATRANSLATIONS_WINDOW_H
-#define DATATRANSLATIONS_WINDOW_H
+/*
+ * Copyright 2002-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Oliver Siebenmarck
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Michael Wilber
+ */
+#ifndef DATA_TRANSLATIONS_WINDOW_H
+#define DATA_TRANSLATIONS_WINDOW_H
 
-#ifndef _WINDOW_H
-#include <Window.h>
-#endif
 
-#include <Box.h>
-#include <Button.h>
-#include <SupportDefs.h>
-#include <ListView.h>
-#include <TranslatorRoster.h>
-#include <TranslationDefs.h>
-#include <ScrollView.h>
-#include <Alert.h>
-#include <String.h>
-#include <StringView.h>
-#include <Bitmap.h>
-#include <storage/Path.h>
-#include <storage/Directory.h>
-#include <storage/Entry.h>
-#include "DataTranslationsSettings.h"
-#include "DataTranslationsView.h"
+//#include "DataTranslationsSettings.h"
 #include "IconView.h"
 
-class DataTranslationsWindow : public BWindow {
-public:
-	DataTranslationsWindow();
-	~DataTranslationsWindow();
-	
-	virtual	bool QuitRequested();
-	virtual void MessageReceived(BMessage* message);
-	
-private:
-	status_t GetTranInfo(int32 id, const char *&tranName, const char *&tranInfo,
-		int32 &tranVersion, BPath &tranPath);
-	
-	status_t ShowConfigView(int32 id);
-		
-	status_t PopulateListView();
-	void SetupViews();
-	
-	DataTranslationsView *fTranListView;
-		// List of Translators (left pane of window)
-	
-	BBox *fRightBox;
-		// Box hosting fConfigView, fIconView,
-		// fTranNameView and the Info button
-		
-	BView *fConfigView;
-		// the translator config view
-		
-	IconView *fIconView;
-		// icon in the info panel
+#include <Window.h>
 
-	BStringView *fTranNameView;
-		// the translator name, in the info panel
+class BBox;
+class BView;
+
+class IconView;
+class TranslatorListView;
+
+
+class DataTranslationsWindow : public BWindow {
+	public:
+		DataTranslationsWindow();
+		~DataTranslationsWindow();
+
+		virtual	bool QuitRequested();
+		virtual void MessageReceived(BMessage* message);
+
+	private:
+		status_t _GetTranslatorInfo(int32 id, const char *&name, const char *&info,
+			int32 &version, BPath &path);
+		void _ShowInfoAlert(int32 id);
+		status_t _ShowConfigView(int32 id);
+		status_t _PopulateListView();
+		void _SetupViews();
+
+		TranslatorListView *fTranslatorListView;
+
+		BBox *fRightBox;
+			// Box hosting fConfigView, fIconView,
+			// fTranNameView and the Info button
+
+		BView *fConfigView;
+			// the translator config view
+
+		IconView *fIconView;
+		BStringView *fTranslatorNameView;
 };
 
-#endif // DATATRANSLATIONS_WINDOW_H
+#endif	// DATA_TRANSLATIONS_WINDOW_H
 

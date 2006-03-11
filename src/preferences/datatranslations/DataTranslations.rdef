@@ -1,4 +1,6 @@
 
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.haiku-translations";
+
 resource(1, "BEOS:FILE_TYPES") message;
 
 resource(101, "BEOS:L:STD_ICON") #'ICON' array
@@ -56,8 +58,6 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 	$"FFFFFF00000E0EFF002B2F00FFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFF00000E0F0F0F0F"
 };
-
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.OpenBeOS-prefs-translations";
 
 resource(1, "BEOS:APP_VERSION") #'APPV' array
 {
