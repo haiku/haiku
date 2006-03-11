@@ -158,18 +158,6 @@ class BMimeType	{
 		/* Deprecated. Use SetTo() instead. */
 		status_t SetType(const char *mimeType);
 
-		/* Brand new Delete() methods */
-		status_t DeleteAppHint();
-		status_t DeleteAttrInfo();
-		status_t DeleteShortDescription();
-		status_t DeleteLongDescription();
-		status_t DeleteFileExtensions();
-		status_t DeleteIcon(icon_size size);
-		status_t DeleteIconForType(const char *type, icon_size which);
-		status_t DeletePreferredApp(app_verb verb = B_OPEN);
-		status_t DeleteSnifferRule();
-		status_t DeleteSupportedTypes(bool fullSync = true);
-
 	private:
 		BMimeType(const char *mimeType, const char *mimePath);
 			// if mimePath is NULL, defaults to "/boot/home/config/settings/beos_mime/"

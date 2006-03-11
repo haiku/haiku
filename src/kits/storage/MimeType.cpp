@@ -1,11 +1,14 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file MimeType.cpp
-	BMimeType implementation.
-*/
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
 #include "MimeType.h"
 
 #include <Bitmap.h>
@@ -13,22 +16,20 @@
 #include <sniffer/Rule.h>
 #include <sniffer/Parser.h>
 
-#include <ctype.h>			// For tolower()
-#include <new>			// For new(nothrow)
-#include <stdio.h>			// For printf()
-#include <string.h>			// For strncpy()
 #include <RegistrarDefs.h>
-#include <RosterPrivate.h>	// For SendTo()
+#include <RosterPrivate.h>
+
+#include <ctype.h>
+#include <new>
+#include <stdio.h>
+#include <string.h>
+
 
 using namespace BPrivate;
 
 // Private helper functions
 bool isValidMimeChar(const char ch);
 status_t toLower(const char *str, char *result);
-
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
 
 using namespace BPrivate::Storage::Mime;
 using namespace std;
@@ -42,7 +43,54 @@ const char *B_FILE_MIME_TYPE		= "application/octet-stream";
 // format for all platforms anyway.
 const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 
-// constructor
+
+bool
+isValidMimeChar(const char ch)
+{
+	// Handles white space and most CTLs
+	return ch > 32
+		&& ch != '/'
+		&& ch != '<'
+		&& ch != '>'
+		&& ch != '@'
+		&& ch != ','
+		&& ch != ';'
+		&& ch != ':'
+		&& ch != '"'
+		&& ch != '('
+		&& ch != ')'
+		&& ch != '['
+		&& ch != ']'
+		&& ch != '?'
+		&& ch != '='
+		&& ch != '\\'
+		&& ch != 127;	// DEL
+}
+
+
+/*!
+	Returns a lowercase version of str in result. Result must
+	be preallocated and is assumed to be of adequate length.
+*/
+status_t
+toLower(const char *str, char *result)
+{
+	if (!str || !result)
+		return B_BAD_VALUE;
+
+	int len = strlen(str);
+	int i;
+	for (i = 0; i < len; i++) {
+		result[i] = tolower(str[i]);
+	}
+	result[i] = 0;
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 /*!	\brief Creates an uninitialized BMimeType object.
 */
 BMimeType::BMimeType()
@@ -52,7 +100,7 @@ BMimeType::BMimeType()
 {
 }
 
-// constructor
+
 /*!	\brief Creates a BMimeType object and initializes it to the supplied
 	MIME type.
 	The supplied string must specify a valid MIME type or supertype.
@@ -67,7 +115,7 @@ BMimeType::BMimeType(const char *mimeType)
 	SetTo(mimeType);
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with this object.
 */
 BMimeType::~BMimeType()
@@ -693,7 +741,8 @@ BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 {
 	status_t err = InitCheck();	
 
-	BMessage msg(signature ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage msg(signature && signature[0]
+		? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
 	BMessage reply;
 	status_t result;
 	
@@ -868,7 +917,8 @@ BMimeType::SetShortDescription(const char *description)
 {
 	status_t err = InitCheck();	
 
-	BMessage msg(description ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage msg(description && description [0]
+		? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
 	BMessage reply;
 	status_t result;
 	
@@ -910,7 +960,8 @@ BMimeType::SetLongDescription(const char *description)
 {
 	status_t err = InitCheck();	
 
-	BMessage msg(description ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage msg(description && description[0]
+		? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
 	BMessage reply;
 	status_t result;
 	
@@ -1085,26 +1136,6 @@ BMimeType::IsValid(const char *string)
 	return true;
 }
 
-bool isValidMimeChar(const char ch)
-{
-	return    ch > 32		// Handles white space and most CTLs
-	       && ch != '/'
-	       && ch != '<'
-	       && ch != '>'
-	       && ch != '@'
-	       && ch != ','
-	       && ch != ';'
-	       && ch != ':'
-	       && ch != '"'
-	       && ch != '('
-	       && ch != ')'
-	       && ch != '['
-	       && ch != ']'
-	       && ch != '?'
-	       && ch != '='
-	       && ch != '\\'
-	       && ch != 127;	// DEL
-}
 
 // GetAppHint
 //! Fetches an \c entry_ref that serves as a hint as to where the MIME type's preferred application might live
@@ -1334,16 +1365,17 @@ status_t
 BMimeType::SetSnifferRule(const char *rule)
 {
 	status_t err = InitCheck();
-	if (!err && rule)
+	if (!err && rule && rule[0])
 		err = CheckSnifferRule(rule, NULL);
+	if (err != B_OK)
+		return err;
 
-	BMessage msg(rule ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage msg(rule && rule[0] ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
 	BMessage reply;
 	status_t result;
 	
 	// Build and send the message, read the reply
-	if (!err)
-		err = msg.AddString("type", Type());
+	err = msg.AddString("type", Type());
 	if (!err) 
 		err = msg.AddInt32("which", B_REG_MIME_SNIFFER_RULE);
 	if (!err && rule) 
@@ -1641,85 +1673,6 @@ BMimeType::SetType(const char *mimeType)
 	return SetTo(mimeType);
 }
 
-// DeleteAppHint
-//! Deletes the mime type's application hint
-status_t 
-BMimeType::DeleteAppHint()
-{
-	return SetAppHint(NULL);
-}
-
-// DeleteAttrInfo
-//! Deletes the mime type's attribute info
-status_t 
-BMimeType::DeleteAttrInfo()
-{
-	return SetAttrInfo(NULL);
-}
-
-// DeleteShortDescription
-//! Deletes the mime type's short description
-status_t 
-BMimeType::DeleteShortDescription()
-{
-	return SetShortDescription(NULL);
-}
-
-// DeleteLongDescription
-//! Deletes the mime type's long description
-status_t 
-BMimeType::DeleteLongDescription()
-{
-	return SetLongDescription(NULL);
-}
-
-// DeleteFileExtensions
-//! Deletes the mime type's associated file extensions
-status_t 
-BMimeType::DeleteFileExtensions()
-{
-	return SetFileExtensions(NULL);
-}
-
-// DeleteIcon
-//! Deletes the mime type's icon of given size
-status_t
-BMimeType::DeleteIcon(icon_size which)
-{
-	return SetIcon(NULL, which);
-}
-
-// DeleteIconForType
-//! Deletes the mime type's custom icon of given size for the given file type
-status_t 
-BMimeType::DeleteIconForType(const char *type, icon_size which)
-{
-	return SetIconForType(type, NULL, which);
-}
-
-// DeletePreferredApp
-//! Deletes the mime type's preferred app for the given verb
-status_t 
-BMimeType::DeletePreferredApp(app_verb verb)
-{
-	return SetPreferredApp(NULL, verb);
-}
-
-// DeleteSnifferRule
-//! Deletes the mime type's sniffer rule
-status_t 
-BMimeType::DeleteSnifferRule()
-{
-	return SetSnifferRule(NULL);
-}
-
-// DeleteSupportedTypes
-//! Deletes the mime type's supported types
-status_t
-BMimeType::DeleteSupportedTypes(bool fullSync)
-{
-	return SetSupportedTypes(NULL, fullSync);
-}
 
 void BMimeType::_ReservedMimeType1() {}
 void BMimeType::_ReservedMimeType2() {}
@@ -1847,21 +1800,4 @@ BMimeType::GetAssociatedTypes(const char *extension, BMessage *types)
 		err = result;
 	return err;	
 }
-
-
-// Returns a lowercase version of str in result. Result must
-// be preallocated and is assumed to be of adequate length.
-status_t
-toLower(const char *str, char *result) {
-	if (!str || !result)
-		return B_BAD_VALUE;
-	int len = strlen(str);
-	int i;
-	for (i = 0; i < len; i++)
-		result[i] = tolower(str[i]);
-	result[i] = 0;
-	return B_OK;
-}
-
-
 
