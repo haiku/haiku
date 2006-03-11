@@ -5,7 +5,7 @@
 if test -f ../../../../../generated/tests/apps/haiku_app_server; then
 	../../../../../generated/tests/apps/haiku_app_server &
 else
-	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
+	echo "You need to \"TARGET_PLATFORM=libbe_test jam install-test-apps\" first."
 fi
 
 sleep 1s
@@ -19,6 +19,6 @@ sleep 1s
 if test -f ../../../../../generated/tests/apps/Playground; then
 	../../../../../generated/tests/apps/Playground
 else
-	echo "You need to \"TARGET_PLATFORM=r5 jam install-test-apps\" first."
+	echo "You need to \"TARGET_PLATFORM=libbe_test jam install-test-apps\" first."
 fi
 
