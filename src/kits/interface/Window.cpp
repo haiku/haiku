@@ -2046,7 +2046,6 @@ BWindow::Show()
 		if (fLink->SenderPort() < B_OK) {
 			// We don't have valid app_server connection; there is no point
 			// in starting our looper
-			fRunCalled = true;
 			fTaskID = B_ERROR;
 			return;
 		} else
