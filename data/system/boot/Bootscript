@@ -105,10 +105,6 @@ fi
 #launch beos/bin/dstcheck
 
 if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/media_server
-else
-
-if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script
 	if [ -f $HOME/config/boot/UserBootscript ]; then
 		. $HOME/config/boot/UserBootscript
