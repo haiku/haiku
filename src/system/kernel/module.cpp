@@ -774,27 +774,25 @@ nextModuleImage:
 			goto nextModuleImage;
 
 		// build absolute path to current file
-		KPath pathBuffer;
-		if (pathBuffer.InitCheck() != B_OK)
+		KPath path(iterator->current_path);
+		if (path.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
-		char *path = pathBuffer.LockBuffer();
-		strlcpy(path, iterator->current_path, sizeof(path));
-		strlcat(path, "/", sizeof(path));
-		strlcat(path, dirent->d_name, sizeof(path));
+		if (path.Append(dirent->d_name) != B_OK)
+			return B_BUFFER_OVERFLOW;
 
 		// find out if it's a directory or a file
 		struct stat st;
-		if (stat(path, &st) < 0)
+		if (stat(path.Path(), &st) < 0)
 			return errno;
 
-		iterator->current_module_path = strdup(path);
+		iterator->current_module_path = strdup(path.Path());
 		if (iterator->current_module_path == NULL)
 			return B_NO_MEMORY;
 
 		if (S_ISDIR(st.st_mode)) {
 			status = iterator_push_path_on_stack(iterator, iterator->current_module_path,
-							iterator->path_base_length);
+				iterator->path_base_length);
 			if (status < B_OK)
 				return status;
 
@@ -805,9 +803,9 @@ nextModuleImage:
 		if (!S_ISREG(st.st_mode))
 			return B_BAD_TYPE;
 
-		TRACE(("open module at %s\n", path));
+		TRACE(("open module at %s\n", path.Path()));
 
-		status = get_module_image(path, &iterator->module_image);
+		status = get_module_image(path.Path(), &iterator->module_image);
 		if (status < B_OK) {
 			free((void *)iterator->current_module_path);
 			iterator->current_module_path = NULL;
@@ -1116,7 +1114,7 @@ open_module_list(const char *prefix)
 		path[length] = '/';
 		memcpy(path + length + 1, prefix, iterator->prefix_length + 1);
 
-		iterator_push_path_on_stack(iterator, path, strlen(path) + 1);
+		iterator_push_path_on_stack(iterator, path, length + 1);
 	}
 
 	return (void *)iterator;
