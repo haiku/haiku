@@ -55,7 +55,8 @@ BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
 	JPEGTranslator JPEG2000Translator GIFTranslator BMPTranslator
 ;
 BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
-	multi_audio.media_addon
+	multi_audio.media_addon tone_producer_demo.media_addon
+	video_producer_demo.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 	raw_decoder wav_reader mov_reader au_reader avi_reader mp3_reader ogg
