@@ -758,7 +758,6 @@ em_intr(void *arg)
 
         ifp = &adapter->interface_data.ac_if;  
 
-	
 	reg_icr = E1000_READ_REG(&adapter->hw, ICR);
 	if (!reg_icr) {
 		return B_UNHANDLED_INTERRUPT;
@@ -769,7 +768,6 @@ em_intr(void *arg)
 		atomic_or(&adapter->event_flags, EVENT_LINK_CHANGED);
 		release_event_sem = true;
 	}
-
 
         while (loop_cnt > 0) {
                 if (ifp->if_flags & IFF_RUNNING) {
@@ -1530,6 +1528,9 @@ em_allocate_pci_resources(struct adapter * adapter)
 		       adapter->unit);
 		return(ENXIO);
 	}
+
+	adapter->hw.back = &adapter->osdep;
+
 	if (bus_setup_intr(dev, adapter->res_interrupt, INTR_TYPE_NET,
 			   em_intr, adapter,
 			   &adapter->int_handler_tag)) {
@@ -1538,9 +1539,7 @@ em_allocate_pci_resources(struct adapter * adapter)
 		return(ENXIO);
 	}
 
-	adapter->hw.back = &adapter->osdep;
-
-	return(0);
+	return 0;
 }
 
 static void
