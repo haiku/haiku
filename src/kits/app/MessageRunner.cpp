@@ -23,7 +23,8 @@ using namespace BPrivate;
 	The target for replies to the delivered message(s) is \c be_app_messenger.
 
 	The success of the initialization can (and should) be asked for via
-	InitCheck().
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
 
 	\note As soon as the last message has been sent, the message runner
 		  becomes unusable. InitCheck() will still return \c B_OK, but
@@ -50,7 +51,8 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 	replies to the delivered message(s).
 
 	The success of the initialization can (and should) be asked for via
-	InitCheck().
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
 
 	\note As soon as the last message has been sent, the message runner
 		  becomes unusable. InitCheck() will still return \c B_OK, but
@@ -77,7 +79,8 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 	The target for replies to the delivered message(s) is \c be_app_messenger.
 
 	The success of the initialization can (and should) be asked for via
-	InitCheck().
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
 
 	\note As soon as the last message has been sent, the message runner
 		  becomes unusable. InitCheck() will still return \c B_OK, but
@@ -111,7 +114,8 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 	replies to the delivered message(s).
 
 	The success of the initialization can (and should) be asked for via
-	InitCheck().
+	InitCheck(). This object will not take ownership of the \a message, you
+	may freely change or delete it after creation.
 
 	\note As soon as the last message has been sent, the message runner
 		  becomes unusable. InitCheck() will still return \c B_OK, but

@@ -1340,8 +1340,9 @@ BWindow::SetPulseRate(bigtime_t rate)
 
 	if (rate > 0) {
 		if (fPulseRunner == NULL) {
+			BMessage message(B_PULSE);
 			fPulseRunner = new BMessageRunner(BMessenger(this),
-				new BMessage(B_PULSE), rate);
+				&message, rate);
 		} else {
 			fPulseRunner->SetInterval(rate);
 		}
