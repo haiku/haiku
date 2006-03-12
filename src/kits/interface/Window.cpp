@@ -2274,8 +2274,6 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	if (fLink->FlushWithReply(code) == B_OK
 		&& code == B_OK
 		&& fLink->Read<port_id>(&sendPort) == B_OK) {
-		fLink->SetSenderPort(sendPort);
-
 		// read the frame size and its limits that were really
 		// enforced on the server side
 
@@ -2289,6 +2287,9 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 		fMaxZoomHeight = fMaxHeight;
 	} else
 		sendPort = -1;
+
+	// Redirect our link to the new window connection
+	fLink->SetSenderPort(sendPort);
 
 	if (locked)
 		be_app->Unlock();
