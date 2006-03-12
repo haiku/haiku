@@ -1862,11 +1862,13 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 		buffer = (char *)header;
 		size = sizeof(message_header);
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 		port_info info;
 		get_port_info(port, &info);
 		void *address = NULL;
 		_kern_transfer_area(header->shared_area, &address, B_ANY_ADDRESS, 
 			info.team);
+#endif
 	} else {
 		size = _NativeFlattenedSize();
 		buffer = (char *)malloc(size);
