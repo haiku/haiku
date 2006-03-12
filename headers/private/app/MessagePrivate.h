@@ -116,6 +116,14 @@ class BMessage::Private {
 			fMessage->fHeader->reply_team = messengerPrivate.Team();
 		}
 
+		void
+		SetReply(team_id team, port_id port, int32 target)
+		{
+			fMessage->fHeader->reply_port = port;
+			fMessage->fHeader->reply_target = target;
+			fMessage->fHeader->reply_team = team;
+		}
+
 		int32
 		GetTarget()
 		{

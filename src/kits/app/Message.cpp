@@ -2055,6 +2055,11 @@ convert_message(const KMessage *fromMessage, BMessage *toMessage)
 	toMessage->MakeEmpty();
 	toMessage->what = fromMessage->What();
 
+	BMessage::Private toPrivate(toMessage);
+	toPrivate.SetTarget(fromMessage->TargetToken());
+	toPrivate.SetReply(B_SYSTEM_TEAM, fromMessage->ReplyPort(),
+		fromMessage->ReplyToken());
+
 	// iterate through the fields and import them in the target message
 	KMessageField field;
 	while (fromMessage->GetNextField(&field) == B_OK) {
