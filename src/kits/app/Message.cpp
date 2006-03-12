@@ -850,14 +850,14 @@ BMessage::_NativeFlatten(BDataIO *stream, ssize_t *size) const
 
 	ssize_t result2 = 0;
 	if (fHeader->fields_size > 0) {
-		stream->Write(fFields, fHeader->fields_size);
+		result2 = stream->Write(fFields, fHeader->fields_size);
 		if (result2 != fHeader->fields_size)
 			return (result2 >= 0 ? B_ERROR : result2);
 	}
 
 	ssize_t result3 = 0;
 	if (fHeader->data_size > 0) {
-		stream->Write(fData, fHeader->data_size);
+		result3 = stream->Write(fData, fHeader->data_size);
 		if (result3 != fHeader->data_size)
 			return (result3 >= 0 ? B_ERROR : result3);
 	}
@@ -1988,6 +1988,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	if (magic == kMessageMagicHaiku || magic == kMessageMagicHaikuSwapped) {
 		message_header *header = (message_header *)data;
 		header->target = token;
+		header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 	} else if (magic == kMessageMagicR5) {
 		uint8 *header = (uint8 *)data;
 		header += sizeof(uint32) /* magic */ + sizeof(uint32) /* checksum */
