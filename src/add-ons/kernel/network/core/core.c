@@ -726,13 +726,16 @@ static void domain_init(void)
  * system defined module_info structures
  */
 
-static void find_protocol_modules(void)
+static void
+find_protocol_modules(void)
 {
-	void *ml = open_module_list(NETWORK_PROTOCOLS);
-	size_t sz = B_PATH_NAME_LENGTH;
-	char name[sz];
+	void *ml;
+	char name[B_FILE_NAME_LENGTH];
+	size_t bufferSize = sizeof(name);
 	struct net_module *nm = NULL; 
 	int rv;
+
+	ml = open_module_list(NETWORK_PROTOCOLS);
 
 	if (ml == NULL) {
 		printf("failed to open the %s directory\n", 
@@ -740,7 +743,7 @@ static void find_protocol_modules(void)
 		return;
 	}
 
-	while (read_next_module_name(ml, name, &sz) == B_OK) {
+	while (read_next_module_name(ml, name, &bufferSize) == B_OK) {
 		nm = (struct net_module *)malloc(sizeof(struct net_module));
 		if (!nm)
 			return;
@@ -754,7 +757,7 @@ static void find_protocol_modules(void)
 		} else {
 			free(nm);
 		}
-		sz = B_PATH_NAME_LENGTH;
+		bufferSize = sizeof(name);
 	}
 
 	close_module_list(ml);
@@ -775,11 +778,12 @@ static void find_protocol_modules(void)
  * start_devices() they'll not do anything and other apps can use
  * them (AFAIK), so this shouldn't be an issue.
  */
-static void find_interface_modules(void)
+static void
+find_interface_modules(void)
 {
 	void *ml = open_module_list(NETWORK_INTERFACES);
-	size_t sz = B_PATH_NAME_LENGTH;
-	char name[sz];
+	char name[B_FILE_NAME_LENGTH];
+	size_t bufferSize = sizeof(name);
 	struct net_module *nm = NULL; 
 	int rv;
 
@@ -789,7 +793,7 @@ static void find_interface_modules(void)
 		return;
 	}
 
-	while (read_next_module_name(ml, name, &sz) == B_OK) {
+	while (read_next_module_name(ml, name, &bufferSize) == B_OK) {
 		nm = (struct net_module *)malloc(sizeof(struct net_module));
 		if (!nm)
 			return;
@@ -805,8 +809,8 @@ static void find_interface_modules(void)
 		} else {
 			free(nm);
 		}
-		
-		sz = B_PATH_NAME_LENGTH;
+
+		bufferSize = sizeof(name);
 	}
 
 	close_module_list(ml);

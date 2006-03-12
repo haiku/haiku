@@ -220,17 +220,22 @@ static void attach_device(int devid, char *driver, char *devno)
 	}
 }
 	
-static void open_device(char *driver, char *devno)
+
+static void
+open_device(char *driver, char *devno)
 {
-	char path[PATH_MAX];
+	status_t status;
 	int dev;
-	status_t status = -1;
+
+	char *path = malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return;
 	
 	sprintf(path, "%s/%s/%s", DRIVER_DIRECTORY, driver, devno);
 	dev = open(path, O_RDWR);
 	if (dev < B_OK) {
-		printf("Unable to open %s, %ld [%s]\n", path,
-			status, strerror(status));
+		printf("Unable to open %s\n", path);
+		free(path);
 		return;
 	}
 
@@ -239,6 +244,7 @@ static void open_device(char *driver, char *devno)
 		attach_device(dev, driver, devno);
 
 	close(dev);
+	free(path);
 };
 
 #if 0
@@ -283,24 +289,28 @@ static void find_devices(char *root)
 }
 #else
 
-static void find_devices(void)
+static void
+find_devices(void)
 {
 	DIR *dir, *driv_dir;
 	struct dirent *de, *dre;
-	char path[PATH_MAX];
+	char* path = malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return;
 
 	dir = opendir(DRIVER_DIRECTORY);
 	if (!dir) {
 		printf("Couldn't open the directory %s\n", DRIVER_DIRECTORY);
+		free(path);
 		return;
 	}
 
 	while ((de = readdir(dir)) != NULL) {
 		/* hmm, is it a driver? */
-		if (strcmp(de->d_name, ".") == 0 ||
-	    	strcmp(de->d_name, "..") == 0 ||
-	    	strcmp(de->d_name, "server") == 0 ||
-	    	strcmp(de->d_name, "stack") == 0)
+		if (!strcmp(de->d_name, ".")
+			|| !strcmp(de->d_name, "..")
+			|| !strcmp(de->d_name, "server")
+			|| !strcmp(de->d_name, "stack"))
 			continue;
 
 		/* OK we assume it's a driver...but skip the ether driver
@@ -308,7 +318,7 @@ static void find_devices(void)
 		 */
 		if (strcmp(de->d_name, "ether") == 0)
 			continue;
-                        
+
 		sprintf(path, "%s/%s", DRIVER_DIRECTORY, de->d_name);
 		driv_dir = opendir(path);
 		if (!driv_dir) {
@@ -327,8 +337,7 @@ static void find_devices(void)
 		}
 	}
 	closedir(dir);
-
-	return;
+	free(path);
 }
 #endif
 
