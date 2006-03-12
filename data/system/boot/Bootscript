@@ -89,9 +89,9 @@ fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
-	launch beos/apps/Terminal
-	#launch beos/system/Tracker
+	launch beos/system/Tracker
 	launch beos/system/Deskbar
+	launch beos/apps/Terminal
 else
 	launch beos/bin/consoled
 fi
