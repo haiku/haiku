@@ -813,7 +813,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
 				Title(), xResizeBy, yResizeBy));
 
-			fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
+			if (Window()->IsResizing()) {
+				// While the user resizes the window, we ignore
+				// pragmatically set window bounds
+				fLink.StartMessage(B_BUSY);
+			} else {
+				fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
+				fLink.StartMessage(B_OK);
+			}
+			fLink.Flush();
 			break;
 		}
 		case AS_WINDOW_MOVE:
@@ -827,7 +835,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
 				Title(), xMoveBy, yMoveBy));
 
-			fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
+			if (Window()->IsDragging()) {
+				// While the user moves the window, we ignore
+				// pragmatically set window positions
+				fLink.StartMessage(B_BUSY);
+			} else {
+				fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
+				fLink.StartMessage(B_OK);
+			}
+			fLink.Flush();
 			break;
 		}
 		case AS_SET_SIZE_LIMITS:

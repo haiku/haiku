@@ -146,7 +146,9 @@ class WindowLayer {
 									{ fCurrentWorkspace = index; }
 			bool				IsVisible() const;
 
-			// TODO: make this int32 stuff
+			bool				IsDragging() const { return fIsDragging; }
+			bool				IsResizing() const { return fIsResizing; }
+
 			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
 

@@ -1960,9 +1960,10 @@ BWindow::MoveBy(float dx, float dy)
 	fLink->StartMessage(AS_WINDOW_MOVE);
 	fLink->Attach<float>(dx);
 	fLink->Attach<float>(dy);
-	fLink->Flush();
 
-	fFrame.OffsetBy(dx, dy);
+	status_t status;
+	if (fLink->FlushWithReply(status) == B_OK && status == B_OK)
+		fFrame.OffsetBy(dx, dy);
 
 	Unlock();
 }
@@ -2016,10 +2017,12 @@ BWindow::ResizeBy(float dx, float dy)
 		fLink->StartMessage(AS_WINDOW_RESIZE);
 		fLink->Attach<float>(dx);
 		fLink->Attach<float>(dy);
-		fLink->Flush();
 
-		fFrame.SetRightBottom(fFrame.RightBottom() + BPoint(dx, dy));
-		_AdoptResize();
+		status_t status;
+		if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
+			fFrame.SetRightBottom(fFrame.RightBottom() + BPoint(dx, dy));
+			_AdoptResize();
+		}
 	}
 	Unlock();
 }
