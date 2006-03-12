@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,7 +40,7 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 							   bigtime_t interval, int32 count)
 	: fToken(-1)
 {
-	InitData(target, message, interval, count, be_app_messenger);
+	_InitData(target, message, interval, count, false, be_app_messenger);
 }
 
 // constructor
@@ -69,23 +69,94 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 							   BMessenger replyTo)
 	: fToken(-1)
 {
-	InitData(target, message, interval, count, replyTo);
+	_InitData(target, message, interval, count, false, replyTo);
 }
+
+/*!	\brief Creates and initializes a new BMessageRunner.
+
+	The target for replies to the delivered message(s) is \c be_app_messenger.
+
+	The success of the initialization can (and should) be asked for via
+	InitCheck().
+
+	\note As soon as the last message has been sent, the message runner
+		  becomes unusable. InitCheck() will still return \c B_OK, but
+		  SetInterval(), SetCount() and GetInfo() will fail.
+
+	\note You can't change a detached messenger after the object has been
+		created.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		In this form of the constructor, only counts greater than 0 are allowed
+		if \a detach is \c true.
+	\param detach Detaches the runner from this object; when you delete this
+		object, the runner will continue to work.
+*/
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
+							   bigtime_t interval, int32 count, bool detach)
+	: fToken(-1)
+{
+	_InitData(target, message, interval, count, detach, be_app_messenger);
+}
+
+
+/*!
+	\brief Creates and initializes a new BMessageRunner.
+
+	This constructor version additionally allows to specify the target for
+	replies to the delivered message(s).
+
+	The success of the initialization can (and should) be asked for via
+	InitCheck().
+
+	\note As soon as the last message has been sent, the message runner
+		  becomes unusable. InitCheck() will still return \c B_OK, but
+		  SetInterval(), SetCount() and GetInfo() will fail.
+
+	\note You can't change a detached messenger after the object has been
+		created.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		In this form of the constructor, only counts greater than 0 are allowed
+		if \a detach is \c true.
+	\param detach Detaches the runner from this object; when you delete this
+		object, the runner will continue to work.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+*/
+BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
+							   bigtime_t interval, int32 count, bool detach,
+							   BMessenger replyTo)
+	: fToken(-1)
+{
+	_InitData(target, message, interval, count, detach, replyTo);
+}
+
 
 // destructor
 /*!	\brief Frees all resources associated with the object.
 */
 BMessageRunner::~BMessageRunner()
 {
-	status_t error = B_OK;
+	if (fDetached || fToken < B_OK)
+		return;
+
 	// compose the request message
 	BMessage request(B_REG_UNREGISTER_MESSAGE_RUNNER);
-	if (error == B_OK)
-		error = request.AddInt32("token", fToken);
+	status_t error = request.AddInt32("token", fToken);
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = BRoster::Private().SendTo(&request, &reply, false);
+
 	// ignore the reply, we can't do anything anyway
 }
 
@@ -117,7 +188,7 @@ BMessageRunner::InitCheck() const
 status_t
 BMessageRunner::SetInterval(bigtime_t interval)
 {
-	return SetParams(true, interval, false, 0);
+	return _SetParams(true, interval, false, 0);
 }
 
 // SetCount
@@ -133,7 +204,7 @@ BMessageRunner::SetInterval(bigtime_t interval)
 status_t
 BMessageRunner::SetCount(int32 count)
 {
-	return SetParams(false, 0, true, count);
+	return _SetParams(false, 0, true, count);
 }
 
 // GetInfo
@@ -212,7 +283,7 @@ BMessageRunner::operator=(const BMessageRunner &)
 	return *this;
 }
 
-// InitData
+
 /*!	\brief Initializes the BMessageRunner.
 
 	The success of the initialization can (and should) be asked for via
@@ -231,12 +302,13 @@ BMessageRunner::operator=(const BMessageRunner &)
 	\param replyTo Target replies to the delivered message(s) shall be sent to.
 */
 void
-BMessageRunner::InitData(BMessenger target, const BMessage *message,
-						 bigtime_t interval, int32 count, BMessenger replyTo)
+BMessageRunner::_InitData(BMessenger target, const BMessage *message,
+	bigtime_t interval, int32 count, bool detach, BMessenger replyTo)
 {
-	status_t error = (message ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && count == 0)
-		error = B_ERROR;
+	status_t error = B_OK;
+	if (message == NULL || count == 0 || (count < 0 && detach))
+		error = B_BAD_VALUE;
+
 	// compose the request message
 	BMessage request(B_REG_REGISTER_MESSAGE_RUNNER);
 	if (error == B_OK)
@@ -251,23 +323,28 @@ BMessageRunner::InitData(BMessenger target, const BMessage *message,
 		error = request.AddInt32("count", count);
 	if (error == B_OK)
 		error = request.AddMessenger("reply_target", replyTo);
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = BRoster::Private().SendTo(&request, &reply, false);
+
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
 			if (reply.FindInt32("token", &fToken) != B_OK)
 				error = B_ERROR;
+			else
+				fDetached = detach;
 		} else
 			reply.FindInt32("error", &error);
 	}
+
 	if (error != B_OK)
 		fToken = error;
 }
 
-// SetParams
+
 /*!	\brief Sets the message runner's interval and count parameters.
 
 	The parameters \a resetInterval and \a resetCount specify whether
@@ -290,23 +367,25 @@ BMessageRunner::InitData(BMessenger target, const BMessage *message,
 	  \a resetInterval and \a resetCount are \c false.
 */
 status_t
-BMessageRunner::SetParams(bool resetInterval, bigtime_t interval,
-						  bool resetCount, int32 count)
+BMessageRunner::_SetParams(bool resetInterval, bigtime_t interval,
+	bool resetCount, int32 count)
 {
-	status_t error = ((resetInterval || resetCount) && fToken >= 0
-					  ? B_OK : B_BAD_VALUE);
+	if ((!resetInterval && !resetCount) || fToken < 0 || fDetached)
+		return B_BAD_VALUE;
+
 	// compose the request message
 	BMessage request(B_REG_SET_MESSAGE_RUNNER_PARAMS);
-	if (error == B_OK)
-		error = request.AddInt32("token", fToken);
+	status_t error = request.AddInt32("token", fToken);
 	if (error == B_OK && resetInterval)
 		error = request.AddInt64("interval", interval);
 	if (error == B_OK && resetCount)
 		error = request.AddInt32("count", count);
+
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
 		error = BRoster::Private().SendTo(&request, &reply, false);
+
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what != B_REG_SUCCESS)
