@@ -104,6 +104,9 @@ TestWindow::TestWindow(BRect frame)
 	BMessenger self(this);
 	BMessage message(B_QUIT_REQUESTED);
 	fPulse = new BMessageRunner(self, &message, 10000000, 1);
+
+	if (Thread() < B_OK)
+		Quit();
 }
 
 
