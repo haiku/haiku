@@ -32,7 +32,7 @@ MergeObject posix_gnu_wcsmbs.o :
 	wcschr.c
 	wcschrnul.c
 	wcscmp.c
-#	wcscoll.c
+	wcscoll.c
 	wcscpy.c
 	wcscspn.c
 	wcsdup.c
@@ -48,12 +48,16 @@ MergeObject posix_gnu_wcsmbs.o :
 	wcsrtombs.c
 	wcsspn.c
 	wcsstr.c
-#	wcstod.c
-#	wcstof.c
+	wcstod.c
+	wcstof.c
 	wcstok.c
-#	wcstold.c
+	wcstol.c
+	wcstoll.c
+	wcstold.c
+	wcstoul.c
+	wcstoull.c
 	wcswidth.c
-#	wcsxfrm.c
+	wcsxfrm.c
 	wctob.c
 	wcwidth.c
 	wmemchr.c

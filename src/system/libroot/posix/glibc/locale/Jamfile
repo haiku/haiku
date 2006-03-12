@@ -7,13 +7,35 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
+SubDirCcFlags -DLOCALEDIR=\'\"/share/locale\"\' ;
+
 MergeObject posix_gnu_locale.o :
+	C-address.c
+	C-collate.c
 	C-ctype.c
+	C-identification.c
+	C-measurement.c
+	C-messages.c
 	C-monetary.c
-	C_name.c
+	C-name.c
 	C-numeric.c
+	C-paper.c
+	C-telephone.c
+	C-time.c
+	C_name.c
+#	findlocale.c
+	lc-address.c
+	lc-collate.c
 	lc-ctype.c
+	lc-identification.c
+	lc-measurement.c
+	lc-messages.c
 	lc-monetary.c
+	lc-name.c
 	lc-numeric.c
+	lc-paper.c
+	lc-telephone.c
+#	lc-time.c
 	mb_cur_max.c
+#	setlocale.c
 ;

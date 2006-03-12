@@ -20,7 +20,9 @@ DEBUG = 0 ;
 SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 
 local genericSources =
-	cmp.c dbl2mpn.c divrem.c mpn2dbl.c mul.c mul_n.c
+	cmp.c dbl2mpn.c divrem.c 
+	mpn2dbl.c mpn2flt.c mpn2ldbl.c
+	mul.c mul_n.c
 	e_cosh.c e_coshf.c # e_coshl.c
 	e_sinh.c e_sinhf.c # e_sinhl.c
 	e_gamma_r.c e_gammaf_r.c
