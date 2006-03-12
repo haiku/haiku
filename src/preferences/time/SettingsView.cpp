@@ -136,7 +136,7 @@ TSettingsView::InitView()
 
 
 void
-TSettingsView::Draw(BRect updaterect)
+TSettingsView::Draw(BRect /*updateRect*/)
 {
 	//draw a separator line
 	BRect bounds(Bounds());
