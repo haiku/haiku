@@ -27,6 +27,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <typeinfo>
 
 #include "set_tools.h"
 
