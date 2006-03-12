@@ -1,28 +1,11 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		MessageRunnerManager.cpp
-//	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Manages the registrar side "shadows" of BMessageRunners.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold (bonefish@users.sf.net)
+ */
+
 
 #include <algorithm>
 #include <new>
@@ -280,9 +263,11 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 		&& request->FindMessenger("reply_target", &replyTarget) != B_OK) {
 		error = B_BAD_VALUE;
 	}
+
 	// check the parameters
 	if (error == B_OK && count == 0)
 		error = B_BAD_VALUE;
+
 	// add a new runner info
 	RunnerInfo *info = NULL;
 	if (error == B_OK) {
@@ -296,6 +281,7 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 		} else
 			error = B_NO_MEMORY;
 	}
+
 	// create a new event
 	RunnerEvent *event = NULL;
 	if (error == B_OK) {
@@ -307,6 +293,7 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 		} else
 			error = B_NO_MEMORY;
 	}
+
 	// cleanup on error
 	if (error != B_OK) {
 		if (info) {
@@ -315,6 +302,7 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 		}
 		delete message;
 	}
+
 	// reply to the request
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
@@ -387,13 +375,23 @@ MessageRunnerManager::HandleSetRunnerParams(BMessage *request)
 		setInterval = true;
 	if (error == B_OK && request->FindInt32("count", &count) == B_OK)
 		setCount = true;
+
 	// find the runner info
 	RunnerInfo *info = NULL;
 	if (error == B_OK) {
 		info = _InfoForToken(token);
-		if (!info)
+		if (!info) {
+			// TODO: At this point, the runner could have been deleted already.
+			//	Since setting its parameters at this point should still be
+			//	valid, we'd have to recreate it.
+			//	(Even though the documentation in *our* BMessageRunner
+			//	implementation specifically denies the possibility of setting
+			//	the runner's parameters at this point, it would still be nice
+			//	to allow this.)
 			error = B_BAD_VALUE;
+		}
 	}
+
 	// set the new values
 	if (error == B_OK) {
 		bool eventRemoved = false;
@@ -420,6 +418,7 @@ MessageRunnerManager::HandleSetRunnerParams(BMessage *request)
 		if (error != B_OK || deleteInfo)
 			_DeleteInfo(info, eventRemoved);
 	}
+
 	// reply to the request
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
@@ -687,7 +686,9 @@ MessageRunnerManager::_DoEvent(RunnerInfo *info)
 			// reschedule the event
 			if (success)
 				success = _ScheduleEvent(info);
+
 			// clean up, if the message delivery of the rescheduling failed
+			// (or the runner had already fulfilled its job)
 			if (!success) {
 				deleteEvent = true;
 				info->event = NULL;
