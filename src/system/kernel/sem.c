@@ -36,7 +36,7 @@
 #	define TRACE(x) ;
 #endif
 
-//#define DEBUG_LAST_ACQUIRER
+#define DEBUG_LAST_ACQUIRER
 
 struct sem_entry {
 	sem_id		id;
@@ -713,10 +713,9 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 		GRAB_THREAD_LOCK();
 		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
-			// temporarily place thread in a run queue with high priority to boost it up
-			// TODO: isn't realtime priority a bit too much??
+			// temporarily place thread in a run queue with a higher priority to boost it up
 			thread->next_priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
-				thread->priority : B_FIRST_REAL_TIME_PRIORITY - 1;
+				thread->priority : thread->priority + 1;
 			scheduler_enqueue_in_run_queue(thread);
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
