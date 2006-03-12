@@ -387,6 +387,7 @@ AboutView::AboutView(const BRect &rect)
 		"François Revol\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
+		"Reznikov Sergei\n"
 		"Zousar Shaker\n"
 		"Jonas Sundström\n"
 		"Daniel Switkin\n"
