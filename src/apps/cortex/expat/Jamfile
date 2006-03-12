@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src apps cortex expat ;
+
+SubInclude HAIKU_TOP src apps cortex expat xmlparse ;
+SubInclude HAIKU_TOP src apps cortex expat xmltok ;

@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src apps cortex InfoView ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) NodeManager ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_info_view.a :
+	AppNodeInfoView.cpp
+	ConnectionInfoView.cpp
+	DormantNodeInfoView.cpp
+	EndPointInfoView.cpp
+	FileNodeInfoView.cpp
+	InfoView.cpp
+	InfoWindow.cpp
+	InfoWindowManager.cpp
+	LiveNodeInfoView.cpp
+;

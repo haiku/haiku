@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src apps cortex support ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_support.a :
+	debug_tools.cpp
+	MediaIcon.cpp
+	MediaString.cpp
+	MouseTrackingHelpers.cpp
+	MultiInvoker.cpp
+	ObservableHandler.cpp
+	ObservableLooper.cpp
+	observe.cpp
+	SoundUtils.cpp
+	TextControlFloater.cpp
+;

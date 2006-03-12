@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps cortex ParameterView ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) NodeManager ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_parameter_view.a :
+	ParameterWindowManager.cpp
+	ParameterWindow.cpp
+	ParameterContainerView.cpp
+;

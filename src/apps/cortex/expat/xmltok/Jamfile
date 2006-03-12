@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src apps cortex expat xmltok ;
+
+# SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_expat_xmltok.a :
+	xmltok.c
+	xmlrole.c
+;

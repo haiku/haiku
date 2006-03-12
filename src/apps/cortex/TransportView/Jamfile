@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src apps cortex TransportView ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) NodeManager ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) Persistence ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) RouteApp ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ValControl ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_transport_view.a :
+	TransportView.cpp
+	TransportWindow.cpp
+;

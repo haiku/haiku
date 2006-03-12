@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src apps cortex Persistence Wrappers ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_persistence_wrappers.a :
+	MediaFormatIO.cpp
+	MessageIO.cpp
+;

@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps cortex ValControl ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_val_control.a :
+	ValControl.cpp
+	ValControlSegment.cpp
+	ValControlDigitSegment.cpp
+	ValCtrlLayoutEntry.cpp
+	NumericValControl.cpp
+;

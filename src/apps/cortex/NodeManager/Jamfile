@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src apps cortex NodeManager ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) Persistence ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_node_manager.a :
+	AddOnHost.cpp
+	Connection.cpp
+	NodeManager.cpp
+	NodeGroup.cpp
+	NodeRef.cpp
+	NodeSyncThread.cpp
+;

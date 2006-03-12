@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src apps cortex AddOnHost ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application CortexAddOnHost :
+	AddOnHostApp.cpp
+	: be media $(TARGET_LIBSTDC++) cortex_support.a
+	: AddOnHost_Resource.rsrc
+;

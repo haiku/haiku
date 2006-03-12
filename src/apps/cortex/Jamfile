@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src apps cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubInclude HAIKU_TOP src apps cortex RouteApp ;
+SubInclude HAIKU_TOP src apps cortex AddOnHost ;
+
+SubInclude HAIKU_TOP src apps cortex DiagramView ;
+SubInclude HAIKU_TOP src apps cortex DormantNodeView ;
+SubInclude HAIKU_TOP src apps cortex InfoView ;
+SubInclude HAIKU_TOP src apps cortex MediaRoutingView ;
+SubInclude HAIKU_TOP src apps cortex NodeManager ;
+SubInclude HAIKU_TOP src apps cortex ParameterView ;
+SubInclude HAIKU_TOP src apps cortex Persistence ;
+SubInclude HAIKU_TOP src apps cortex TipManager ;
+SubInclude HAIKU_TOP src apps cortex TransportView ;
+SubInclude HAIKU_TOP src apps cortex ValControl ;
+SubInclude HAIKU_TOP src apps cortex expat ;
+SubInclude HAIKU_TOP src apps cortex support ;

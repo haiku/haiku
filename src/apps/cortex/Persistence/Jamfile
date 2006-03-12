@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src apps cortex Persistence ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) expat xmlparse ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_persistence.a :
+	ExportContext.cpp
+	ImportContext.cpp
+	Importer.cpp
+	StringContent.cpp
+	XML.cpp
+;
+
+SubInclude HAIKU_TOP src apps cortex Persistence Wrappers ;

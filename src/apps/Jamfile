@@ -5,6 +5,7 @@ SubInclude HAIKU_TOP src apps bemail ;
 SubInclude HAIKU_TOP src apps cdplayer ;
 SubInclude HAIKU_TOP src apps clock ;
 SubInclude HAIKU_TOP src apps codycam ;
+SubInclude HAIKU_TOP src apps cortex ;
 SubInclude HAIKU_TOP src apps deskbar ;
 SubInclude HAIKU_TOP src apps diskprobe ;
 SubInclude HAIKU_TOP src apps expander ;

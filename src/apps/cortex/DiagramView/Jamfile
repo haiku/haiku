@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps cortex DiagramView ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary cortex_diagram_view.a :
+	DiagramBox.cpp
+	DiagramEndPoint.cpp
+	DiagramItem.cpp
+	DiagramItemGroup.cpp
+	DiagramView.cpp
+	DiagramWire.cpp
+;
