@@ -532,6 +532,11 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					BMessage addType(kMsgAddType);
 					addType.AddString("type", type);
 
+#ifdef __HAIKU
+					BMessageRunner runner(this, &addType, 200000ULL, 1, true);
+					if (runner.InitCheck() != B_OK)
+						_AddNewType(type);
+#else
 					// TODO: free runner again!
 					BMessageRunner* runner = new BMessageRunner(this, &addType,
 						200000ULL, 1);
@@ -539,6 +544,7 @@ MimeTypeListView::MessageReceived(BMessage* message)
 						delete runner;
 						_AddNewType(type);
 					}
+#endif
 					break;
 				}
 				case B_MIME_TYPE_DELETED:
