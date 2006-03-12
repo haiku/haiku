@@ -96,9 +96,17 @@ else
 	launch beos/bin/consoled
 fi
 
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/media_server
+fi
+
 # Check for daily saving time
 # TODO to be launched when tracker and deskbar are launched
 #launch beos/bin/dstcheck
+
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/media_server
+else
 
 if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script
