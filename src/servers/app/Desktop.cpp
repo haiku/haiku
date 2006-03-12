@@ -1270,6 +1270,8 @@ Desktop::HideWindow(WindowLayer* window)
 		return;
 
 	window->SetHidden(true);
+	if (fMouseEventWindow == window)
+		fMouseEventWindow = NULL;
 
 	if (window->InWorkspace(fCurrentWorkspace)) {
 		_UpdateSubsetWorkspaces(window);
