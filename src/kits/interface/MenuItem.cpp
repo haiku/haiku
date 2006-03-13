@@ -625,8 +625,7 @@ BMenuItem::Uninstall()
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	// TODO: I'm not sure about B_COMMAND_KEY
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow != NULL)
+	if (fShortcutChar != 0 && fModifiers != 0 && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
 	fWindow = NULL;
@@ -652,10 +651,7 @@ BMenuItem::Select(bool selected)
 	if (fSelected == selected)
 		return;
 
-	if (Submenu()) {
-		fSelected = selected;
-		Highlight(selected);
-	} else if (IsEnabled()) {
+	if (Submenu() || IsEnabled()) {
 		fSelected = selected;
 		Highlight(selected);
 	}	
