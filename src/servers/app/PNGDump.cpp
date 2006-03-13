@@ -70,36 +70,44 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	png_init_io(png, file);
 	png_set_bgr(png);
 
-	// TODO: Don't assume B_BGRA32!
-   	png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
-		PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-		PNG_FILTER_TYPE_DEFAULT);
-	png_set_strip_alpha(png);
+	// TODO: support other color spaces if needed
 
-	png_write_info(png, info);
+	switch (space) {
+		case B_RGB32:
+		case B_RGBA32:
+		{
+			// create file without alpha channel
+			png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				PNG_FILTER_TYPE_DEFAULT);
+			png_write_info(png, info);
 
-#if 1
-	png_byte* rowPointers[height];
-	png_byte* index = (png_byte*)bits;
-	for (int32 i = 0; i < height; i++) {
-		rowPointers[i] = index;
-		index += bytesPerRow;
+			// convert from 32 bit RGB to 24 bit RGB while saving
+			png_byte* src = (png_byte*)bits;
+			int srcRowBytes = width * 4;
+			int dstRowBytes = width * 3;
+			int srcRowOffset = bytesPerRow - srcRowBytes;
+			png_byte tempRow[dstRowBytes];
+			for (int row = 0; row < height; row++) {
+				for (int i = 0; i < dstRowBytes; i += 3, src += 4) {
+					tempRow[i]     = src[0];
+					tempRow[i + 1] = src[1];
+					tempRow[i + 2] = src[2];
+				}
+				src += srcRowOffset;
+				png_write_row(png, tempRow);
+			}
+			break;
+		}
+		
+		default:
+		{
+			TRACE(("Unsupported color space\n"));
+			png_destroy_write_struct(&png, NULL);
+			fclose(file);
+			return B_ERROR;
+		}
 	}
-
-	png_write_image(png, rowPointers);
-
-#else
-
-	png_byte* index = (png_byte*)bits;
-	int32 visibleBytes = width * 4;
-	png_byte tempRow[visibleBytes];
-	for (int32 i = 0; i < height; i++) {
-		gfxcpy32(tempRow, index, visibleBytes);
-		png_write_row(png, tempRow);
-		index += bytesPerRow;
-	}
-
-#endif
 
 	png_write_end(png, info);
 	png_destroy_write_struct(&png, NULL);
