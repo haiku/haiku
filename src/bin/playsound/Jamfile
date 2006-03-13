@@ -1,11 +1,16 @@
 SubDir HAIKU_TOP src bin playsound ;
 
+BinCommand playfile :
+	playfile.cpp
+	: be media
+;
+
 BinCommand playsound :
 	playsound.cpp
 	: be media
 ;
 
-BinCommand playfile :
-	playfile.cpp
+BinCommand playwav :
+	playwav.cpp
 	: be media
 ;
