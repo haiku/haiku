@@ -117,7 +117,8 @@ WorkspacesPreferences::WorkspacesPreferences()
 
 			// check if loaded values are valid
 			if (screen.Frame().right >= fWindowFrame.right
-				&& screen.Frame().bottom >= fWindowFrame.bottom) 
+				&& screen.Frame().bottom >= fWindowFrame.bottom
+				&& fWindowFrame.right > 0 && fWindowFrame.bottom > 0) 
 				settingsValid = true;	
 		}
 	}
