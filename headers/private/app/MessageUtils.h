@@ -63,7 +63,7 @@ public:
 								}
 
 								if (fError == 0)
-									throw B_ERROR;
+									fError = B_ERROR;
 								throw fError;
 							}
 
@@ -71,11 +71,9 @@ public:
 		inline void			operator()(T data, size_t len)
 							{
 								fError = fStream->Read((void *)data, len);
-								if (fError > B_OK)
+								if (fError >= B_OK)
 									return;
 
-								if (fError == 0)
-									throw B_ERROR;
 								throw fError;
 							}
 
