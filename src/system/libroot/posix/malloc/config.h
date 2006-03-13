@@ -59,6 +59,9 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 #define HEAP_STATS 0		// If non-zero, maintain blowup statistics.
 #define HEAP_FRAG_STATS 0	// If non-zero, maintain fragmentation statistics.
 
+// A simple (and slow) leak checker
+#define HEAP_LEAK_CHECK 0
+#define HEAP_CALL_STACK_SIZE 8
 
 // CACHE_LINE = The number of bytes in a cache line.
 

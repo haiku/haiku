@@ -110,6 +110,32 @@ class block {
 			return _next;
 		}
 
+#if HEAP_LEAK_CHECK
+		void
+		setCallStack(int index, void *address)
+		{
+			_callStack[index] = address;
+		}
+		
+		void *
+		getCallStack(int index)
+		{
+			return _callStack[index];
+		}
+		
+		void
+		setAllocatedSize(size_t size)
+		{
+			_allocatedSize = size;
+		}
+		
+		size_t
+		getAllocatedSize()
+		{
+			return _allocatedSize;
+		}
+#endif
+
 	private:
 #if USE_PRIVATE_HEAPS
 #if HEAP_DEBUG
@@ -138,6 +164,11 @@ class block {
 		block *_next;				// The next block in a linked-list of blocks.
 		superblock *_mySuperblock;	// A pointer to my superblock.
 #endif // USE_PRIVATE_HEAPS
+
+#if HEAP_LEAK_CHECK
+		void *_callStack[HEAP_CALL_STACK_SIZE];
+		size_t _allocatedSize;
+#endif
 
 #if HEAP_FRAG_STATS
 		union {
