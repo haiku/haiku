@@ -284,6 +284,8 @@ unflatten_r5_message(uint32 format, BMessage *message, const char *flatBuffer)
 status_t
 unflatten_r5_message(uint32 format, BMessage *message, BDataIO *stream)
 {
+	message->MakeEmpty();
+
 	TReadHelper reader(stream);
 	BMessage::Private messagePrivate(message);
 	BMessage::message_header *header = messagePrivate.GetMessageHeader();
@@ -359,6 +361,9 @@ unflatten_r5_message(uint32 format, BMessage *message, BDataIO *stream)
 			dataSize = miniSize;
 		} else
 			reader(dataSize);
+
+		if (dataSize <= 0)
+			return B_ERROR;
 
 		// name
 		uint8 nameLength;
