@@ -1,12 +1,6 @@
 #ifndef _MIXER_UTILS_H
 #define _MIXER_UTILS_H
 
-#if DEBUG > 0
-	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; StringForChannelMask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08lX %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
-#else
-	#define PRINT_CHANNEL_MASK(fmt) ((void)0)
-#endif
-
 #ifndef __SGI_STL_INTERNAL_ALGOBASE_H
 template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 template<class t> const t & min(const t &t1, const t &t2) { return (t1 < t2) ?  t1 : t2; }

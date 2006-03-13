@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src add-ons media media-add-ons mixer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders media ;
-
 Addon mixer.media_addon : media :
 	AudioMixer.cpp
 	ByteSwap.cpp
@@ -21,4 +19,3 @@ Addon mixer.media_addon : media :
 Package haiku-mixer-cvs
 	: mixer.media_addon
 	: boot home config add-ons media ;
-

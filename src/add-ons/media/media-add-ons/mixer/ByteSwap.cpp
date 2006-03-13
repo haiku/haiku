@@ -7,7 +7,7 @@
 #include <MediaDefs.h>
 #include <ByteOrder.h>
 #include "ByteSwap.h"
-#include "debug.h"
+#include "MixerDebug.h"
 
 static void swap_float(void *buffer, size_t bytecount);
 static void swap_int32(void *buffer, size_t bytecount);

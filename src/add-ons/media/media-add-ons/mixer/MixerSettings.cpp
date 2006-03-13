@@ -10,7 +10,7 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerSettings.h"
-#include "debug.h"
+#include "MixerDebug.h"
 
 #define SAVE_DELAY		5000000		// delay saving of settings for 5s
 #define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity

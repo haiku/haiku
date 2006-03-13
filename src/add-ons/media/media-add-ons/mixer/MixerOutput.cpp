@@ -2,7 +2,7 @@
 #include "MixerOutput.h"
 #include "MixerCore.h"
 #include "MixerUtils.h"
-#include "debug.h"
+#include "MixerDebug.h"
 
 MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
  :	fCore(core),

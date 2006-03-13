@@ -20,7 +20,6 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
-#include "debug.h"
 
 #define VERSION_STRING	"0.4"
 #define BUILD_STRING	__DATE__ " " __TIME__

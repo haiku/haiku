@@ -8,7 +8,7 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerCore.h"
-#include "debug.h"
+#include "MixerDebug.h"
 
 const char *StringForFormat(char *str, const media_format & format);
 

@@ -6,7 +6,6 @@
 #include "MixerUtils.h"
 #include "Resampler.h"
 #include "ByteSwap.h"
-#include "debug.h"
 
 MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount)
  :	fCore(core),

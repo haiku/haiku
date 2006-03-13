@@ -11,7 +11,7 @@
 
 #include <MediaDefs.h>
 #include "Resampler.h"
-#include "debug.h"
+#include "MixerDebug.h"
 
 Resampler::Resampler(uint32 src_format, uint32 dst_format, int16 dst_valid_bits)
  :	fFunc(0)

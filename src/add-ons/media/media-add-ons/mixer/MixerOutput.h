@@ -1,10 +1,10 @@
 #ifndef _MIXER_OUTPUT_H
 #define _MIXER_OUTPUT_H
 
-#include "debug.h"
+#include <Buffer.h>
+#include "MixerDebug.h"
 #include "ByteSwap.h"
 #include "MixerCore.h"
-#include <Buffer.h>
 
 /* The data storage for channel sources is optimized
  * for fast data retrieval by the MixerCore, which

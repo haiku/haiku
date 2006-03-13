@@ -5,7 +5,7 @@
 #include <MediaNode.h>
 #include "MixerCore.h"
 #include "MixerUtils.h" // DEBUG only
-#include "debug.h"
+#include "MixerDebug.h"
 
 class ByteSwap;
 class Resampler;
