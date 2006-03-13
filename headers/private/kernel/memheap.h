@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -14,8 +14,8 @@
 struct kernel_args;
 
 
-#define HEAP_SIZE	0x01000000
-	// 16 MB heap for the kernel
+#define HEAP_SIZE	0x02000000
+	// 32 MB heap for the kernel (!)
 
 
 #ifdef __cplusplus
