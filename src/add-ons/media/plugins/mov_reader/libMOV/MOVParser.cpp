@@ -177,6 +177,10 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('ftyp')) {
+		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -855,7 +859,7 @@ void STSDAtom::ReadSoundDescription()
 			memcpy(aSoundDescriptionV1->theVOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(),aSoundDescriptionV1->VOLSize);
 		}
 		
-		if (aAtomBase->getAtomSize() > 0) {
+		if ((aAtomBase->getAtomSize() > 0) && (descBytesLeft >= aAtomBase->getAtomSize())) {
 			descBytesLeft = descBytesLeft - aAtomBase->getAtomSize();
 		} else {
 			DEBUGGER("Invalid Atom found when reading Sound Description\n");
@@ -1422,4 +1426,21 @@ void SMHDAtom::OnProcessMetaData()
 char *SMHDAtom::OnGetAtomName()
 {
 	return "Quicktime Sound Media Header";
+}
+
+FTYPAtom::FTYPAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+FTYPAtom::~FTYPAtom()
+{
+}
+
+void FTYPAtom::OnProcessMetaData()
+{
+}
+
+char *FTYPAtom::OnGetAtomName()
+{
+	return "Quicktime File Type";
 }

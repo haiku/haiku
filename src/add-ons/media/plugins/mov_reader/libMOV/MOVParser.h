@@ -472,4 +472,13 @@ private:
 	hdlr	theHeader;
 };
 
+class FTYPAtom : public AtomBase {
+public:
+			FTYPAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~FTYPAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+
+};
+
 #endif
