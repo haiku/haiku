@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,8 +21,11 @@
 
 
 WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
-	int32 token, uint32 resizeMode, uint32 flags)
-	: ViewLayer(frame, name, token, resizeMode, flags)
+		int32 token, uint32 resizeMode, uint32 flags)
+	: ViewLayer(frame, name, token, resizeMode, flags),
+	fSelectedWindow(NULL),
+	fSelectedWorkspace(-1),
+	fHasMoved(false)
 {
 	fDrawState->SetLowColor(RGBColor(255, 255, 255));
 	fDrawState->SetHighColor(RGBColor(0, 0, 0));
@@ -50,6 +53,28 @@ WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 }
 
 
+/*!
+	\brief Returns the frame of the screen for the specified workspace.
+*/
+BRect
+WorkspacesLayer::_ScreenFrame(int32 i)
+{
+	// TODO: we don't need the current screen frame, but the one
+	//	from the workspace!
+	uint16 width, height;
+	uint32 colorSpace;
+	float frequency;
+	Window()->Desktop()->ScreenAt(0)->GetMode(width, height,
+		colorSpace, frequency);
+
+	return BRect(0, 0, width - 1, height - 1);
+}
+
+
+/*!
+	\brief Returns the frame of the specified workspace within the
+		workspaces layer.
+*/
 BRect
 WorkspacesLayer::_WorkspaceAt(int32 i)
 {
@@ -73,6 +98,30 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 		rect.bottom = Frame().bottom;
 
 	return rect;
+}
+
+
+/*!
+	\brief Returns the workspace frame and index of the workspace
+		under \a where.
+
+	If, for some reason, there is no workspace located under \where,
+	an empty rectangle is returned, and \a index is set to -1.
+*/
+BRect
+WorkspacesLayer::_WorkspaceAt(BPoint where, int32& index)
+{
+	int32 columns, rows;
+	_GetGrid(columns, rows);
+
+	for (index = columns * rows; index-- > 0;) {
+		BRect workspaceFrame = _WorkspaceAt(index);
+
+		if (workspaceFrame.Contains(where))
+			return workspaceFrame;
+	}
+
+	return BRect();
 }
 
 
@@ -115,6 +164,8 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 
 	tabFrame = _WindowFrame(workspaceFrame, screenFrame,
 		tabFrame, tabFrame.LeftTop() - offset);
+	if (!workspaceFrame.Intersects(frame) && !workspaceFrame.Intersects(tabFrame))
+		return;
 
 	// ToDo: let decorator do this!
 	RGBColor yellow;
@@ -202,12 +253,7 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 	// ToDo: would be nice to get the real update region here
 
-	uint16 width, height;
-	uint32 colorSpace;
-	float frequency;
-	Window()->Desktop()->ScreenAt(0)->GetMode(width, height,
-		colorSpace, frequency);
-	BRect screenFrame(0, 0, width - 1, height - 1);
+	BRect screenFrame = _ScreenFrame(index);
 
 	BRegion workspaceRegion(rect);
 	backgroundRegion.IntersectWith(&workspaceRegion);
@@ -295,19 +341,161 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 void
 WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 {
-	int32 columns, rows;
-	_GetGrid(columns, rows);
+	// reset tracking variables
+	fSelectedWorkspace = -1;
+	fSelectedWindow = NULL;
+	fHasMoved = false;
 
-	for (int32 i = columns * rows; i-- > 0;) {
-		BRect rect = _WorkspaceAt(i);
+	// check if the correct mouse button is pressed
+	int32 buttons;
+	if (message->FindInt32("buttons", &buttons) != B_OK
+		|| (buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
+		return;
 
-		if (rect.Contains(where)) {
-			Window()->Desktop()->SetWorkspace(i);
-			break;
+	int32 index;
+	BRect workspaceFrame = _WorkspaceAt(where, index);
+	if (index < 0)
+		return;
+
+	Workspace workspace(*Window()->Desktop(), index);
+	workspaceFrame.InsetBy(1, 1);
+
+	BRect screenFrame = _ScreenFrame(index);
+
+	WindowLayer* window;
+	BPoint leftTop;
+	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
+		BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
+			leftTop);
+		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel)
+			fSelectedWindow = window;
+	}
+
+	// Some special functionality (clicked with modifiers)
+
+	int32 modifiers;
+	if (fSelectedWindow != NULL
+		&& message->FindInt32("modifiers", &modifiers) == B_OK) {
+		if ((modifiers & B_CONTROL_KEY) != 0) {
+			// Activate window if clicked with the control key pressed,
+			// minimize it if control+shift - this mirrors Deskbar
+			// shortcuts (when pressing a team menu item).
+			if ((modifiers & B_SHIFT_KEY) != 0)
+				fSelectedWindow->ServerWindow()->NotifyMinimize(true);
+			else
+				Window()->Desktop()->ActivateWindow(fSelectedWindow);
+			fSelectedWindow = NULL;
+		} else if ((modifiers & B_OPTION_KEY) != 0) {
+			// Also, send window to back if clicked with the option
+			// key pressed.
+			Window()->Desktop()->SendWindowBehind(fSelectedWindow);
+			fSelectedWindow = NULL;
 		}
 	}
 
-	//ViewLayer::MouseDown(message, where, _viewToken);
+	// If this window is movable, we keep it selected
+
+	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0)
+		fSelectedWindow = NULL;
+
+	fSelectedWorkspace = index;
+	fLastMousePosition = where;
+}
+
+
+void
+WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
+{
+	if (!fHasMoved && fSelectedWorkspace >= 0)
+		Window()->Desktop()->SetWorkspace(fSelectedWorkspace);
+
+	fSelectedWindow = NULL;
+}
+
+
+void
+WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
+{
+	if (fSelectedWindow == NULL)
+		return;
+
+	// check if the correct mouse button is pressed
+	int32 buttons;
+	if (message->FindInt32("buttons", &buttons) != B_OK
+		|| (buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
+		return;
+
+	BPoint delta = where - fLastMousePosition;
+	if (delta.x == 0 && delta.y == 0)
+		return;
+
+	Window()->Desktop()->SetMouseEventWindow(Window());
+		// don't let us off the mouse
+
+	int32 index;
+	BRect workspaceFrame = _WorkspaceAt(where, index);
+	workspaceFrame.InsetBy(1, 1);
+
+	if (index != fSelectedWorkspace) {
+		return;
+// TODO: the code below doesn't work yet...
+#if 0
+		if (!fSelectedWindow->InWorkspace(index) && fSelectedWindow->IsNormal()) {
+			// move window to this new workspace
+			uint32 newWorkspaces = fSelectedWindow->Workspaces()
+				& ~(1UL << fSelectedWorkspace) | (1UL << index);
+
+			Window()->Desktop()->SetWindowWorkspaces(fSelectedWindow,
+				newWorkspaces);
+
+			// move window to the correct location on this new workspace
+			// (preserve offset to window relative to the mouse)
+
+			BRect screenFrame = _ScreenFrame(index);
+			BPoint leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
+			BRect windowFrame = _WindowFrame(workspaceFrame, screenFrame,
+				fSelectedWindow->Frame(), leftTop);
+
+			BPoint delta = fLastMousePosition - windowFrame.LeftTop();
+			delta.x = rintf(delta.x * screenFrame.Width() / workspaceFrame.Width());
+			delta.y = rintf(delta.y * screenFrame.Height() / workspaceFrame.Height());
+printf("delta: %g, %g\n", delta.x, delta.y);
+
+			// normalize position
+			// TODO: take the actual grid position into account!!!
+
+			float left = leftTop.x + delta.x;
+			if (delta.x < 0)
+				left += screenFrame.Width();
+			else if (screenFrame.Width() + delta.x > 0)
+				left -= screenFrame.Width();
+
+			float top = leftTop.y + delta.y;
+			if (delta.y < 0)
+				top += screenFrame.Height();
+			else if (delta.y > 0)
+				top -= screenFrame.Height();
+
+printf("new absolute position: %g, %g\n", left, top);
+			leftTop = fSelectedWindow->Anchor(index).position;
+			if (leftTop == kInvalidWindowPosition)
+				leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
+
+			Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x,
+				top - leftTop.y, index);
+		}
+		fSelectedWorkspace = index;
+#endif
+	}
+
+	BRect screenFrame = _ScreenFrame(index);
+	float deltaX = rintf(delta.x * screenFrame.Width() / workspaceFrame.Width());
+	float deltaY = rintf(delta.y * screenFrame.Height() / workspaceFrame.Height());
+
+	fHasMoved = true;
+	Window()->Desktop()->MoveWindowBy(fSelectedWindow, deltaX, deltaY);
+
+	fLastMousePosition += delta;
 }
 
 
@@ -317,5 +505,13 @@ WorkspacesLayer::WindowChanged(WindowLayer* window)
 	// TODO: be smarter about this!
 	BRegion region(Frame());
 	Window()->MarkContentDirty(region);
+}
+
+
+void
+WorkspacesLayer::WindowRemoved(WindowLayer* window)
+{
+	if (fSelectedWindow == window)
+		fSelectedWindow = NULL;
 }
 

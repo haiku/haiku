@@ -1205,7 +1205,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 
 	_UpdateFronts();
 	SetFocusWindow(FrontWindow());
-	//_WindowsChanged();
+	_WindowChanged(window);
 
 	UnlockAllWindows();
 }
@@ -1282,6 +1282,9 @@ Desktop::HideWindow(WindowLayer* window)
 			SetFocusWindow(FrontWindow());
 	}
 
+	if (fWorkspacesLayer != NULL)
+		fWorkspacesLayer->WindowRemoved(window);
+
 	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
 		fWorkspacesLayer = NULL;
 
@@ -1340,13 +1343,26 @@ Desktop::_HideWindow(WindowLayer* window)
 
 
 void
-Desktop::MoveWindowBy(WindowLayer* window, float x, float y)
+Desktop::MoveWindowBy(WindowLayer* window, float x, float y, int32 workspace)
 {
 	if (!LockAllWindows())
 		return;
 
-	if (!window->IsVisible()) {
-		window->MoveBy(x, y);
+	if (workspace == -1)
+		workspace = fCurrentWorkspace;
+
+	if (!window->IsVisible() || workspace != fCurrentWorkspace) {
+		if (workspace != fCurrentWorkspace) {
+			// move the window on another workspace - this doesn't change it's
+			// current position
+			if (window->Anchor(workspace).position == kInvalidWindowPosition)
+				window->Anchor(workspace).position = window->Frame().LeftTop();
+
+			window->Anchor(workspace).position += BPoint(x, y);
+			_WindowChanged(window);
+		} else
+			window->MoveBy(x, y);
+
 		UnlockAllWindows();
 		return;
 	}

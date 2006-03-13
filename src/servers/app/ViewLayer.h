@@ -165,6 +165,10 @@ class ViewLayer {
 								BRegion* windowContentClipping,
 								bool deep = false);
 
+			virtual void	MouseDown(BMessage* message, BPoint where);
+			virtual void	MouseUp(BMessage* message, BPoint where);
+			virtual void	MouseMoved(BMessage* message, BPoint where);
+
 			void			SetHidden(bool hidden);
 			bool			IsHidden() const;
 

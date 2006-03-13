@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc.
+ * Copyright 2005-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,13 +24,19 @@ class WorkspacesLayer : public ViewLayer {
 						BRegion* effectiveClipping,
 						BRegion* windowContentClipping,
 						bool deep = false);
+
 		virtual void MouseDown(BMessage* message, BPoint where);
+		virtual void MouseUp(BMessage* message, BPoint where);
+		virtual void MouseMoved(BMessage* message, BPoint where);
 
 		void WindowChanged(WindowLayer* window);
+		void WindowRemoved(WindowLayer* window);
 
 	private:
 		void _GetGrid(int32& columns, int32& rows);
-		BRect _WorkspaceAt(int32 i);
+		BRect _ScreenFrame(int32 index);
+		BRect _WorkspaceAt(int32 index);
+		BRect _WorkspaceAt(BPoint where, int32& index);
 		BRect _WindowFrame(const BRect& workspaceFrame,
 					const BRect& screenFrame, const BRect& windowFrame,
 					BPoint windowPosition);
@@ -43,6 +49,12 @@ class WorkspacesLayer : public ViewLayer {
 					int32 index);
 
 		void _DarkenColor(RGBColor& color) const;
+
+	private:
+		WindowLayer*	fSelectedWindow;
+		int32			fSelectedWorkspace;
+		bool			fHasMoved;
+		BPoint			fLastMousePosition;
 };
 
 #endif	// WORKSPACES_LAYER_H

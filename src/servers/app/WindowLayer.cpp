@@ -837,22 +837,18 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 			// fill out view token for the view under the mouse
 			*_viewToken = view->Token();
-
-			// TODO: that's not really a clean solution - maybe move that
-			//	functionality back into the ViewLayer class
-			if (WorkspacesLayer* layer = dynamic_cast<WorkspacesLayer*>(view))
-				layer->MouseDown(message, where);
+			view->MouseDown(message, where);
 		}
 	}
 }
 
 
 void
-WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
+WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 {
 	bool invalidate = false;
 	if (fDecorator) {
-		click_type action = _ActionFor(msg);
+		click_type action = _ActionFor(message);
 
 		// redraw decorator
 		BRegion visibleBorder;
@@ -893,13 +889,15 @@ WindowLayer::MouseUp(BMessage* msg, BPoint where, int32* _viewToken)
 	fIsResizing = false;
 	fIsSlidingTab = false;
 
-	if (ViewLayer* view = ViewAt(where))
+	if (ViewLayer* view = ViewAt(where)) {
 		*_viewToken = view->Token();
+		view->MouseUp(message, where);
+	}
 }
 
 
 void
-WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
+WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	bool isLatestMouseMoved)
 {
 	ViewLayer* view = ViewAt(where);
@@ -931,11 +929,11 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
 
 		if (fIsZooming) {
-			fDecorator->SetZoom(_ActionFor(msg) == DEC_ZOOM);
+			fDecorator->SetZoom(_ActionFor(message) == DEC_ZOOM);
 		} else if (fIsClosing) {
-			fDecorator->SetClose(_ActionFor(msg) == DEC_CLOSE);
+			fDecorator->SetClose(_ActionFor(message) == DEC_CLOSE);
 		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(_ActionFor(msg) == DEC_MINIMIZE);
+			fDecorator->SetMinimize(_ActionFor(message) == DEC_MINIMIZE);
 		}
 
 		fDrawingEngine->Unlock();
@@ -990,6 +988,8 @@ WindowLayer::MouseMoved(BMessage *msg, BPoint where, int32* _viewToken,
 	// mouse cursor
 
 	if (view != NULL) {
+		view->MouseMoved(message, where);
+
 		// TODO: there is more for real cursor support, ie. if a window is closed,
 		//		new app cursor shouldn't override view cursor, ...
 		ServerWindow()->App()->SetCurrentCursor(view->Cursor());

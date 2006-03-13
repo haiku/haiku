@@ -980,6 +980,27 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 }
 
 
+void
+ViewLayer::MouseDown(BMessage* message, BPoint where)
+{
+	// empty hook methods
+}
+
+
+void
+ViewLayer::MouseUp(BMessage* message, BPoint where)
+{
+	// empty hook methods
+}
+
+
+void
+ViewLayer::MouseMoved(BMessage* message, BPoint where)
+{
+	// empty hook methods
+}
+
+
 // #pragma mark -
 
 
