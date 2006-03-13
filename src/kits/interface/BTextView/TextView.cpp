@@ -384,6 +384,7 @@ BTextView::AttachedToWindow()
 		AutoResize(true);
 	
 	UpdateScrollbars();
+	ScrollToSelection();
 	
 	if (!fCursor)
 		SetViewCursor(B_CURSOR_I_BEAM);
@@ -1033,10 +1034,10 @@ BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inR
 	if (inText != NULL && inLength > 0)
 		InsertText(inText, inLength, 0, inRuns);
 	
-	fClickOffset = fSelStart = fSelEnd = 0;	
-
 	// recalc line breaks and draw the text
-	Refresh(0, inLength, true, true);
+	Refresh(0, inLength, true, false);
+	fClickOffset = fSelStart = fSelEnd = 0;	
+	ScrollToOffset(fSelStart);
 
 	// draw the caret
 	if (fActive) {
@@ -1077,10 +1078,10 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 							  fText->Length(), B_FONT_ALL, NULL, NULL);
 	}
 
-	fClickOffset = fSelStart = fSelEnd = 0;	
-
 	// recalc line breaks and draw the text
-	Refresh(0, inLength, true, true);
+	Refresh(0, inLength, true, false);
+	fClickOffset = fSelStart = fSelEnd = 0;
+	ScrollToOffset(fSelStart);
 
 	// draw the caret
 	if (fActive) {
@@ -2369,7 +2370,6 @@ BTextView::ColorSpace() const
 void
 BTextView::MakeResizable(bool resize, BView *resizeView)
 {
-	// TODO: I don't think this function is finished.
 	CALLED();
 	if (resize) {
 		fResizable = true;
@@ -3139,8 +3139,7 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 	\param scroll If true, function will scroll the view to the end offset.
 */
 void
-BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
-						bool scroll)
+BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 {
 	// TODO: Cleanup
 	float saveHeight = fTextRect.Height();
@@ -3285,8 +3284,7 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 
 
 int32
-BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
-							   float *outDescent, float	*ioWidth)
+BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, float *ioWidth)
 {
 	CALLED();
 	*outAscent = 0.0;
@@ -3889,7 +3887,6 @@ BTextView::InitiateDrag()
 	BHandler *dragHandler = NULL;
 	
 	GetDragParameters(message, &dragBitmap, &bitmapPoint, &dragHandler);
-	
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	
 	if (dragBitmap != NULL)
@@ -4015,6 +4012,7 @@ BTextView::UpdateScrollbars()
 void
 BTextView::AutoResize(bool redraw)
 {
+	// TODO: Review this
 	if (fResizable) {
 		float width = 0;
 		for (int32 i = 0; i < CountLines(); i++)
@@ -4022,9 +4020,10 @@ BTextView::AutoResize(bool redraw)
 		
 		float textRectPadding = Bounds().right - fTextRect.right;
 		width += fTextRect.left + textRectPadding;
-		
-		BView *viewToResize = fContainerView != NULL ? fContainerView : this;
-		viewToResize->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
+		width = ceilf(width);
+
+		if (fContainerView != NULL)
+			fContainerView->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
 		
 		fTextRect.right = Bounds().right - textRectPadding;
 		if (redraw)
@@ -4212,8 +4211,7 @@ BTextView::PreviousInitialByte(int32 offset) const
 
 
 bool
-BTextView::GetProperty(BMessage *specifier, int32 form,
-							const char *property, BMessage *reply)
+BTextView::GetProperty(BMessage *specifier, int32 form, const char *property, BMessage *reply)
 {
 	CALLED();
 	if (strcmp(property, "Selection") == 0) {
@@ -4248,8 +4246,7 @@ BTextView::GetProperty(BMessage *specifier, int32 form,
 
 
 bool
-BTextView::SetProperty(BMessage *specifier, int32 form,
-							const char *property, BMessage *reply)
+BTextView::SetProperty(BMessage *specifier, int32 form, const char *property, BMessage *reply)
 {
 	CALLED();
 	if (strcmp(property, "Selection") == 0) {
@@ -4291,8 +4288,7 @@ BTextView::SetProperty(BMessage *specifier, int32 form,
 
 
 bool
-BTextView::CountProperties(BMessage *specifier, int32 form,
-								const char *property, BMessage *reply)
+BTextView::CountProperties(BMessage *specifier, int32 form, const char *property, BMessage *reply)
 {
 	CALLED();
 	if (strcmp(property, "Text") == 0) {
