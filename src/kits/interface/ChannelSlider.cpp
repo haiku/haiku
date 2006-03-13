@@ -11,7 +11,6 @@
 #include <Screen.h>
 #include <Window.h>
 
-#define max(a,b) ((a)>(b)?(a):(b))
 
 const static unsigned char
 kVerticalKnobData[] = {
@@ -406,9 +405,9 @@ BChannelSlider::GetPreferredSize(float *width, float *height)
 	if (width) {
 		float _width = (float)ceil(StringWidth(Label()));
 		if (Vertical()) {
-			*width = max(_width, 2 + 12 * CountChannels());
+			*width = max_c(_width, 2 + 12 * CountChannels());
 		} else {
-			*width = max(_width, 64);
+			*width = max_c(_width, 64);
 		}
 	}
 	if (height) {
@@ -667,7 +666,7 @@ BChannelSlider::DrawThumbs()
 		else
 			bitmapFrame.right += ThumbRangeFor(0);
 	
-		fBacking = new BBitmap(bitmapFrame, 
+		fBacking = new BBitmap(bitmapFrame.OffsetToCopy(B_ORIGIN), 
 #ifdef __HAIKU__
 		BScreen(Window()).ColorSpace(),
 #else
