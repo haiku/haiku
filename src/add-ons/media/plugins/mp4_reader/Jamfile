@@ -1,6 +1,10 @@
 SubDir HAIKU_TOP src add-ons media plugins mp4_reader ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) libMP4 ] ;
 
 Addon mp4_reader : media plugins :
 	mp4_reader.cpp
@@ -9,8 +13,8 @@ Addon mp4_reader : media plugins :
 	:
 	libmp4reader.a
 	libz.a
+	be
+	libmedia.so
 ;
-
-LinkAgainst mp4_reader : be libmedia.so ;
 
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader libMP4 ;
