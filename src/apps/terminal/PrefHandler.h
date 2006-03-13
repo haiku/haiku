@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2003-2006, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -43,7 +44,7 @@ struct termprefs {
 	char unknown[3];
 };
 
-struct prefDefaults {
+struct pref_defaults {
 	const char *key;
 	char *item;
 };
@@ -60,8 +61,8 @@ class PrefHandler {
 		PrefHandler();
 		~PrefHandler();
 
-		status_t    Open(const char *name, const prefDefaults *defaults = NULL);
-		status_t    OpenText(const char *path, const prefDefaults *defaults = NULL);
+		status_t    Open(const char *name);
+		status_t    OpenText(const char *path);
 		status_t    Save(const char *name);
 		void        SaveAsText(const char *path, const char *minmtype = NULL,
 						const char *signature = NULL);
@@ -84,8 +85,8 @@ class PrefHandler {
 
 	private:
 		void		_ConfirmFont(const char *key, const BFont *fallback);
-		status_t    _LoadFromFile(BEntry *ent);
-		status_t    _LoadFromDefault(const prefDefaults* defaluts = NULL);
+		status_t    _LoadFromFile(const char* path);
+		status_t    _LoadFromDefault(const pref_defaults* defaults = NULL);
 		status_t    _LoadFromTextFile(const char * path);
 
 		BMessage    fContainer;

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2003-2006, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -29,7 +30,7 @@
 /*
  * Startup preference settings.
  */
-static const prefDefaults kTermDefaults[] = {
+static const pref_defaults kTermDefaults[] = {
 	{ PREF_COLS,				"80" },
 	{ PREF_ROWS,				"25" },
 
@@ -70,9 +71,11 @@ PrefHandler::PrefHandler()
 	:
 	fContainer('Pref')
 {
+	_LoadFromDefault(kTermDefaults);
+
 	BPath path;
 	GetDefaultPath(path);
-	OpenText(path.Path(), kTermDefaults);
+	OpenText(path.Path());
 
 	_ConfirmFont(PREF_HALF_FONT_FAMILY, be_fixed_font);
 	_ConfirmFont(PREF_FULL_FONT_FAMILY, be_fixed_font);
@@ -108,24 +111,16 @@ PrefHandler::GetDefaultPath(BPath& path)
 
 
 status_t
-PrefHandler::Open(const char *path, const prefDefaults *defaults)
+PrefHandler::Open(const char *path)
 {
-	BEntry entry(path);
-	if (entry.Exists())
-		return _LoadFromFile(&entry);
-
-	return _LoadFromDefault(defaults);
+	return _LoadFromFile(path);
 }
 
 
 status_t
-PrefHandler::OpenText(const char *path, const prefDefaults *defaults)
+PrefHandler::OpenText(const char *path)
 {
-	BEntry entry(path);
-	if (entry.Exists())
-		return _LoadFromTextFile(path);
-
-	return _LoadFromDefault(defaults);
+	return _LoadFromTextFile(path);
 }
 
 
@@ -341,12 +336,16 @@ PrefHandler::_ConfirmFont(const char *key, const BFont *fallback)
 
 
 status_t
-PrefHandler::_LoadFromFile(BEntry *entry)
+PrefHandler::_LoadFromFile(const char* path)
 {
 	// Future: It would be nice if we could simply use a flatened BMessage to
 	// save the settings. (Who cares about compatibility in this case anyway?)
 
-	BFile file(entry, B_READ_ONLY);
+	BFile file(path, B_READ_ONLY);
+	status_t status = file.InitCheck();
+	if (status != B_OK)
+		return status;
+
 	//fContainer.MakeEmpty();
 	//fContainer.Unflatten(&file);
 
@@ -384,7 +383,7 @@ PrefHandler::_LoadFromFile(BEntry *entry)
 
 
 status_t
-PrefHandler::_LoadFromDefault(const prefDefaults* defaults)
+PrefHandler::_LoadFromDefault(const pref_defaults* defaults)
 {
 	if (defaults == NULL)
 		return B_ERROR;
