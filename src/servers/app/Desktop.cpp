@@ -738,7 +738,12 @@ Desktop::SetWorkspace(int32 index)
 		}
 
 		if (!window->InWorkspace(previousIndex)) {
-			// this window was not visible before
+			// This window was not visible before, make sure its frame
+			// is up-to-date
+			if (window->Frame().LeftTop() != position) {
+				BPoint offset = position - window->Frame().LeftTop();
+				window->MoveBy(offset.x, offset.y);
+			}
 			continue;
 		}
 

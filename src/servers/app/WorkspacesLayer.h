@@ -54,7 +54,7 @@ class WorkspacesLayer : public ViewLayer {
 		WindowLayer*	fSelectedWindow;
 		int32			fSelectedWorkspace;
 		bool			fHasMoved;
-		BPoint			fLastMousePosition;
+		BPoint			fLeftTopOffset;
 };
 
 #endif	// WORKSPACES_LAYER_H

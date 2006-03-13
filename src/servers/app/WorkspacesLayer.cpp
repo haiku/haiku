@@ -363,12 +363,17 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 	BRect screenFrame = _ScreenFrame(index);
 
 	WindowLayer* window;
+	BRect windowFrame;
 	BPoint leftTop;
 	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
 		BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 			leftTop);
-		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel)
+		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel) {
+			// We can't exit the loop here, as we traverse the window
+			// list in the wrong direction...
 			fSelectedWindow = window;
+			windowFrame = frame;
+		}
 	}
 
 	// Some special functionality (clicked with modifiers)
@@ -398,16 +403,20 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0)
 		fSelectedWindow = NULL;
 
+	fLeftTopOffset = where - windowFrame.LeftTop();
 	fSelectedWorkspace = index;
-	fLastMousePosition = where;
 }
 
 
 void
 WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
 {
-	if (!fHasMoved && fSelectedWorkspace >= 0)
-		Window()->Desktop()->SetWorkspace(fSelectedWorkspace);
+	if (!fHasMoved && fSelectedWorkspace >= 0) {
+		int32 index;
+		_WorkspaceAt(where, index);
+		if (index >= 0)
+			Window()->Desktop()->SetWorkspace(index);
+	}
 
 	fSelectedWindow = NULL;
 }
@@ -425,21 +434,16 @@ WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 		|| (buttons & B_PRIMARY_MOUSE_BUTTON) == 0)
 		return;
 
-	BPoint delta = where - fLastMousePosition;
-	if (delta.x == 0 && delta.y == 0)
-		return;
-
-	Window()->Desktop()->SetMouseEventWindow(Window());
-		// don't let us off the mouse
+	if (!fHasMoved) {
+		Window()->Desktop()->SetMouseEventWindow(Window());
+			// don't let us off the mouse
+	}
 
 	int32 index;
 	BRect workspaceFrame = _WorkspaceAt(where, index);
 	workspaceFrame.InsetBy(1, 1);
 
 	if (index != fSelectedWorkspace) {
-		return;
-// TODO: the code below doesn't work yet...
-#if 0
 		if (!fSelectedWindow->InWorkspace(index) && fSelectedWindow->IsNormal()) {
 			// move window to this new workspace
 			uint32 newWorkspaces = fSelectedWindow->Workspaces()
@@ -447,55 +451,29 @@ WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 
 			Window()->Desktop()->SetWindowWorkspaces(fSelectedWindow,
 				newWorkspaces);
-
-			// move window to the correct location on this new workspace
-			// (preserve offset to window relative to the mouse)
-
-			BRect screenFrame = _ScreenFrame(index);
-			BPoint leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
-			BRect windowFrame = _WindowFrame(workspaceFrame, screenFrame,
-				fSelectedWindow->Frame(), leftTop);
-
-			BPoint delta = fLastMousePosition - windowFrame.LeftTop();
-			delta.x = rintf(delta.x * screenFrame.Width() / workspaceFrame.Width());
-			delta.y = rintf(delta.y * screenFrame.Height() / workspaceFrame.Height());
-printf("delta: %g, %g\n", delta.x, delta.y);
-
-			// normalize position
-			// TODO: take the actual grid position into account!!!
-
-			float left = leftTop.x + delta.x;
-			if (delta.x < 0)
-				left += screenFrame.Width();
-			else if (screenFrame.Width() + delta.x > 0)
-				left -= screenFrame.Width();
-
-			float top = leftTop.y + delta.y;
-			if (delta.y < 0)
-				top += screenFrame.Height();
-			else if (delta.y > 0)
-				top -= screenFrame.Height();
-
-printf("new absolute position: %g, %g\n", left, top);
-			leftTop = fSelectedWindow->Anchor(index).position;
-			if (leftTop == kInvalidWindowPosition)
-				leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
-
-			Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x,
-				top - leftTop.y, index);
 		}
 		fSelectedWorkspace = index;
-#endif
 	}
 
 	BRect screenFrame = _ScreenFrame(index);
-	float deltaX = rintf(delta.x * screenFrame.Width() / workspaceFrame.Width());
-	float deltaY = rintf(delta.y * screenFrame.Height() / workspaceFrame.Height());
+	float left = rintf((where.x - workspaceFrame.left - fLeftTopOffset.x)
+		* screenFrame.Width() / workspaceFrame.Width());
+	float top = rintf((where.y - workspaceFrame.top - fLeftTopOffset.y)
+		* screenFrame.Height() / workspaceFrame.Height());
+
+	BPoint leftTop;
+	if (fSelectedWorkspace == Window()->Desktop()->CurrentWorkspace())
+		leftTop = fSelectedWindow->Frame().LeftTop();
+	else {
+		if (fSelectedWindow->Anchor(fSelectedWorkspace).position == kInvalidWindowPosition)
+			fSelectedWindow->Anchor(fSelectedWorkspace).position = fSelectedWindow->Frame().LeftTop();
+		leftTop = fSelectedWindow->Anchor(fSelectedWorkspace).position;
+	}
+
+	Window()->Desktop()->MoveWindowBy(fSelectedWindow, left - leftTop.x, top - leftTop.y,
+		fSelectedWorkspace);
 
 	fHasMoved = true;
-	Window()->Desktop()->MoveWindowBy(fSelectedWindow, deltaX, deltaY);
-
-	fLastMousePosition += delta;
 }
 
 
