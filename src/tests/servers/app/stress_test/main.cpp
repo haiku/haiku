@@ -4,6 +4,11 @@
 #include <MessageRunner.h>
 #include <Window.h>
 
+#include <stdlib.h>
+
+
+int32 gMaxCount = 0;
+
 enum {
 	TEST_MANY_WINDOWS = 0,
 	TEST_SINGLE_WINDOW,
@@ -41,6 +46,7 @@ TestApp::TestApp(uint32 testMode)
 	  fPulse(NULL),
 	  fFrame(10.0, 30.0, 150.0, 100.0),
 	  fScreenFrame(0.0, 0.0, 640.0, 480.0),
+	  fWindow(NULL),
 	  fTestMode(testMode)
 {
 }
@@ -55,13 +61,18 @@ TestApp::~TestApp()
 void
 TestApp::ReadyToRun()
 {
-	fPulse = new BMessageRunner(be_app_messenger, new BMessage('tick'), 100L);
+	BMessage message('tick');
+	fPulse = new BMessageRunner(be_app_messenger, &message, 100L);
 }
 
 
 void
 TestApp::MessageReceived(BMessage* message)
 {
+	static int32 count = 0;
+	if (gMaxCount != 0 && ++count > gMaxCount)
+		PostMessage(B_QUIT_REQUESTED);
+
 	switch (message->what) {
 		case 'tick':
 			switch (fTestMode) {
@@ -128,6 +139,9 @@ main(int argc, char** argv)
 			testMode = TEST_MANY_WINDOWS;
 		else if (strcmp(argv[1], "-single") == 0)
 			testMode = TEST_SINGLE_WINDOW;
+	}
+	if (argc > 2) {
+		gMaxCount = atol(argv[2]);
 	}
 
 	TestApp app(testMode);
