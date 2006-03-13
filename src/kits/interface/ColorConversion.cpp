@@ -641,9 +641,30 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 	// Advance the buffers to reach their offsets
 	int32 srcOffsetX = (int32)srcOffset.x;
 	int32 dstOffsetX = (int32)dstOffset.x;
-	(char *)srcBits += ((int32)srcOffset.y * srcBitsPerRow + srcOffsetX
+	int32 srcOffsetY = (int32)srcOffset.y;
+	int32 dstOffsetY = (int32)dstOffset.y;
+	if (srcOffsetX < 0) {
+		dstOffsetX -= srcOffsetX;
+		srcOffsetX = 0;
+	}
+	if (srcOffsetY < 0) {
+		dstOffsetY -= srcOffsetY;
+		height += srcOffsetY;
+		srcOffsetY = 0;
+	}
+	if (dstOffsetX < 0) {
+		srcOffsetX -= dstOffsetX;
+		dstOffsetX = 0;
+	}
+	if (dstOffsetY < 0) {
+		srcOffsetY -= dstOffsetY;
+		height += dstOffsetY;
+		dstOffsetY = 0;
+	}
+
+	(char *)srcBits += (srcOffsetY * srcBitsPerRow + srcOffsetX
 		* srcBitsPerPixel) >> 3;
-	(char *)dstBits += ((int32)dstOffset.y * dstBitsPerRow + dstOffsetX
+	(char *)dstBits += (dstOffsetY * dstBitsPerRow + dstOffsetX
 		* dstBitsPerPixel) >> 3;
 
 	// Ensure that the width fits

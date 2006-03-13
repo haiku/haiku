@@ -8,6 +8,7 @@
 
 #include "DrawingEngine.h"
 
+#include <Bitmap.h>
 #include <stdio.h>
 #include <algo.h>
 #include <stack.h>
@@ -17,6 +18,7 @@
 #include "Painter.h"
 #include "PNGDump.h"
 #include "ServerBitmap.h"
+#include "ServerCursor.h"
 #include "RenderingBuffer.h"
 
 #include "frame_buffer_support.h"
@@ -1150,11 +1152,39 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 		status_t result = bitmap->ImportBits(buffer->Bits(),
 			buffer->BitsLength(), buffer->BytesPerRow(), buffer->ColorSpace(),
-			bounds.LeftTop(), BPoint(0, 0), bounds.IntegerWidth(),
-			bounds.IntegerHeight());
+			bounds.LeftTop(), BPoint(0, 0), bounds.IntegerWidth() + 1,
+			bounds.IntegerHeight() + 1);
 
 		if (drawCursor) {
-			// ToDo: blend the cursor
+			ServerCursor *cursor = fGraphicsCard->Cursor();
+			int32 cursorWidth = cursor->Bounds().IntegerWidth();
+			int32 cursorHeight = cursor->Bounds().IntegerHeight();
+
+			BPoint cursorPosition = fGraphicsCard->GetCursorPosition();
+			cursorPosition -= bounds.LeftTop() + cursor->GetHotSpot();
+
+			BBitmap cursorArea(BRect(0, 0, cursorWidth, cursorHeight),
+				B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+			cursorArea.ImportBits(bitmap->Bits(),  bitmap->BitsLength(),
+				bitmap->BytesPerRow(), bitmap->ColorSpace(), cursorPosition,
+				BPoint(0, 0), cursorWidth, cursorHeight);
+
+			uint8 *bits = (uint8 *)cursorArea.Bits();
+			uint8 *cursorBits = (uint8 *)cursor->Bits();
+			for (int32 i = 0; i < cursorHeight; i++) {
+				for (int32 j = 0; j < cursorWidth; j++) {
+					uint8 alpha = 255 - cursorBits[3];
+					bits[0] = ((bits[0] * alpha) >> 8) + cursorBits[0];
+					bits[1] = ((bits[1] * alpha) >> 8) + cursorBits[1];
+					bits[2] = ((bits[2] * alpha) >> 8) + cursorBits[2];
+					cursorBits += 4;
+					bits += 4;
+				}
+			}
+
+			bitmap->ImportBits(cursorArea.Bits(), cursorArea.BitsLength(),
+				cursorArea.BytesPerRow(), cursorArea.ColorSpace(),
+				BPoint(0, 0), cursorPosition, cursorWidth, cursorHeight);
 		}
 
 		fGraphicsCard->ShowSoftwareCursor();

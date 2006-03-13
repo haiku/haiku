@@ -266,8 +266,8 @@ ServerBitmap::ImportBits(const void *bits, int32 bitsLength, int32 bytesPerRow,
 		return B_BAD_VALUE;
 
 	return BPrivate::ConvertBits(bits, fBuffer, bitsLength, BitsLength(),
-		bytesPerRow, fBytesPerRow, colorSpace, fSpace, from, to, fWidth,
-		fHeight);
+		bytesPerRow, fBytesPerRow, colorSpace, fSpace, from, to, width,
+		height);
 }
 
 
