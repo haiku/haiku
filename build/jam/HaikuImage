@@ -64,7 +64,7 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 	# ac3_decoder avcodec theora
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku ;
-BEOS_ADD_ONS_DRIVERS_AUDIO = ich_ac97 auvia emuxki ;
+BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 	nm.driver mga.driver vesa
 ;
