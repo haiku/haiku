@@ -3855,9 +3855,8 @@ BTextView::TrackMouse(BPoint where, const BMessage *message, bool force)
 	
 	if (message && AcceptsDrop(message))
 		TrackDrag(where);
-	else if (!textRegion.Contains(where))
+	else if ((fSelectable || fEditable) && !textRegion.Contains(where))
 		SetViewCursor(B_CURSOR_I_BEAM, force);
-		// If we are within the selection, switch to the "hand" cursor,
 	else
 		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, force);
 }
