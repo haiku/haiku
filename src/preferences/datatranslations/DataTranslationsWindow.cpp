@@ -204,8 +204,8 @@ DataTranslationsWindow::_SetupViews()
 	mainView->AddChild(scrollView);
 
 	// Box around the config and info panels
-	fRightBox = new BBox(BRect(130 + B_V_SCROLL_BAR_WIDTH, 10, Bounds().Width() - 10,
-		Bounds().Height() - 10), "Right_Side", B_FOLLOW_ALL);
+	fRightBox = new BBox(BRect(130.0f + B_V_SCROLL_BAR_WIDTH, 8.0f, Bounds().Width() - 8.0f,
+		Bounds().Height() - 8.0f), "Right_Side", B_FOLLOW_ALL);
 	mainView->AddChild(fRightBox);
 
 	// Add the translator icon view
