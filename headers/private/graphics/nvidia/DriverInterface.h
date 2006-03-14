@@ -198,6 +198,8 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   dma_acc;
 	bool   vga_on_tv;
 	bool   force_sync;
+	uint32 gpu_clk;
+	uint32 ram_clk;
 } nv_settings;
 
 /* shared info */
