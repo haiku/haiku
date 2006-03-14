@@ -123,7 +123,10 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
 	float left, top, right, bottom;
 
 	GetItemMargins(&left, &top, &right, &bottom);
-	SetItemMargins(left, top, right, bottom); // TODO:
+	// give a bit more space to draw the small thumb
+	left -= 1;
+	right += 3;
+	SetItemMargins(left, top, right, bottom);
 
 	SetMaxContentWidth(frame.Width() - (left + right));
 }
@@ -153,15 +156,15 @@ _BMCMenuBar_::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "_BMCMenuBar_"))
 		return new _BMCMenuBar_(data);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
 void
 _BMCMenuBar_::AttachedToWindow()
 {
-	fMenuField = (BMenuField*)Parent();
+	fMenuField = static_cast<BMenuField *>(Parent());
 
 	BMenuBar *menuBar = Window()->KeyMenuBar();
 	BMenuBar::AttachedToWindow();

@@ -29,13 +29,12 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 	fMenu = menu;
 	InitMenu(menu);
 
-	frame.OffsetTo(0.0f, 0.0f);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1.0,
-		frame.top + kVMargin, frame.right - 2.0f, frame.bottom - kVMargin),
+	frame.OffsetTo(B_ORIGIN);
+	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
+		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
 		false, this);
 
 	AddChild(fMenuBar);
-//	fMenuBar->AddItem(new _BMCItem_(menu));
 	fMenuBar->AddItem(menu);
 
 	fMenuBar->SetFont(be_plain_font);
@@ -55,13 +54,12 @@ BMenuField::BMenuField(BRect frame, const char *name, const char *label,
 
 	fFixedSizeMB = fixedSize;
 
-	frame.OffsetTo(0.0f, 0.0f);
-	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1.0,
-		frame.top + kVMargin, frame.right - 2.0f, frame.bottom - kVMargin),
+	frame.OffsetTo(B_ORIGIN);
+	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
+		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
 		fixedSize, this);
 
 	AddChild(fMenuBar);
-//	fMenuBar->AddItem(new _BMCItem_(menu));
 	fMenuBar->AddItem(menu);
 
 	fMenuBar->SetFont(be_plain_font);
@@ -115,8 +113,9 @@ BMenuField::~BMenuField()
 {
 	free(fLabel);
 
+	status_t dummy;
 	if (fMenuTaskID >= 0)
-		kill_thread(fMenuTaskID);
+		wait_for_thread(fMenuTaskID, &dummy);
 }
 
 
