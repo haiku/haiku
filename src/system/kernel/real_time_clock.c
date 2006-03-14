@@ -117,8 +117,7 @@ rtc_init(kernel_args *args)
 }
 
 
-//	#pragma mark -
-//	public kernel API
+//	#pragma mark - public kernel API
 
 
 void
@@ -290,7 +289,23 @@ rtc_secs_to_tm(uint32 seconds, struct tm *t)
 
 
 //	#pragma mark -
-//	public userland API
+
+
+/**	This is called from the gettimeofday() implementation that's part of the
+ *	kernel.
+ */
+
+status_t
+_kern_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
+{
+	*_timezoneOffset = (time_t)(sTimezoneOffset / 1000000LL);
+	*_daylightSavingTime = sDaylightSavingTime;
+
+	return B_OK;
+}
+
+
+//	#pragma mark - syscalls
 
 
 bigtime_t
