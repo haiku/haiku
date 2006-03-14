@@ -828,8 +828,6 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 
 	CleanUp();
 
-	bounds.OffsetTo(B_ORIGIN);
-
 	// check params
 	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL)) {
 		error = B_BAD_VALUE;
