@@ -232,7 +232,8 @@ control_net_module(const char *name, uint32 op, void *data, size_t length)
 }
 
 
-static int32 if_thread(void *data)
+static int32
+if_thread(void *data)
 {
 	struct ifnet *i = (struct ifnet *)data;
 	status_t status;
@@ -243,8 +244,12 @@ static int32 if_thread(void *data)
 		struct mbuf *mb = m_devget(buffer, status, 0, i, NULL);
 		if (!(i->if_flags & IFF_UP))
 			break;
-		IFQ_ENQUEUE(i->devq, mb);
-		atomic_add(&i->if_ipackets, 1);
+
+		if (mb != NULL) {
+			IFQ_ENQUEUE(i->devq, mb);
+			atomic_add(&i->if_ipackets, 1);
+		}
+
 		len = ETHER_MAX_LEN;
 	}
 	printf("%s: terminating if_thread\n", i->if_name);
