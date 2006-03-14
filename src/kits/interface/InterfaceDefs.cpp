@@ -765,6 +765,16 @@ tint_color(rgb_color color, float tint)
 }
 
 
+rgb_color shift_color(rgb_color color, float shift);
+
+rgb_color
+shift_color(rgb_color color, float shift)
+{
+	// TODO: dunno what this is supposed to do, but BeIDE expects it to be there...
+	return color;
+}
+
+
 static status_t
 load_menu_settings(menu_info &into)
 {
