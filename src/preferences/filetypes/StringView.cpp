@@ -173,7 +173,7 @@ StringView::GetPreferredSize(float* _width, float* _height)
 	if (_height) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-		*_height = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 2.0f;
+		*_height = ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 2.0f;
 	}
 }
 

@@ -10,6 +10,7 @@
 #include <Mime.h>
 #include <Window.h>
 
+class BBox;
 class BButton;
 class BListView;
 class BMenuField;
@@ -34,6 +35,7 @@ class FileTypesWindow : public BWindow {
 		void PlaceSubWindow(BWindow* window);
 
 	private:
+		void _ShowSnifferRule(bool show);
 		void _UpdateExtensions(BMimeType* type);
 		void _AdoptPreferredApplication(BMessage* message, bool sameAs);
 		void _UpdatePreferredApps(BMimeType* type);
@@ -46,20 +48,27 @@ class FileTypesWindow : public BWindow {
 		MimeTypeListView* fTypeListView;
 		BButton*		fRemoveTypeButton;
 
+		BBox*			fIconBox;
 		TypeIconView*	fIconView;
 
+		BBox*			fRecognitionBox;
+		StringView*		fExtensionLabel;
 		BListView*		fExtensionListView;
 		BButton*		fAddExtensionButton;
 		BButton*		fRemoveExtensionButton;
+		BTextControl*	fRuleControl;
 
+		BBox*			fDescriptionBox;
 		StringView*		fInternalNameView;
 		BTextControl*	fTypeNameControl;
 		BTextControl*	fDescriptionControl;
 
+		BBox*			fPreferredBox;
 		BMenuField*		fPreferredField;
 		BButton*		fSelectButton;
 		BButton*		fSameAsButton;
 
+		BBox*			fAttributeBox;
 		AttributeListView* fAttributeListView;
 		BButton*		fAddAttributeButton;
 		BButton*		fRemoveAttributeButton;

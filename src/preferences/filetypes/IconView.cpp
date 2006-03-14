@@ -56,7 +56,6 @@ IconView::Draw(BRect updateRect)
 }
 
 
-
 void
 IconView::MouseDown(BPoint where)
 {
