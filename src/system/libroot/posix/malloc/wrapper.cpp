@@ -1,25 +1,22 @@
-///-*-C++-*-//////////////////////////////////////////////////////////////////
-//
-// Hoard: A Fast, Scalable, and Memory-Efficient Allocator
-//        for Shared-Memory Multiprocessors
-// Contact author: Emery Berger, http://www.cs.utexas.edu/users/emery
-//
-// Copyright (c) 1998-2000, The University of Texas at Austin.
-//
-// This library is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Library General Public License as
-// published by the Free Software Foundation, http://www.fsf.org.
-//
-// This library is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Library General Public License for more details.
-//
-//////////////////////////////////////////////////////////////////////////////
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 
-/* Implementations of malloc(), free(), etc. in terms of hoard.
- * This lets us link in hoard in place of the stock malloc
- * (useful to test fragmentation).
+/* Hoard: A Fast, Scalable, and Memory-Efficient Allocator
+ * 		for Shared-Memory Multiprocessors
+ * Contact author: Emery Berger, http://www.cs.utexas.edu/users/emery
+ *
+ * Copyright (c) 1998-2000, The University of Texas at Austin.
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Library General Public License as
+ * published by the Free Software Foundation, http://www.fsf.org.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Library General Public License for more details.
  */
 
 #include "config.h"
@@ -203,35 +200,8 @@ getAllocator(void)
 	return theAllocator;
 }
 
-#if 0
-void * operator new (size_t size)
-{
-  return HOARD_MALLOC (size);
-}
-/*
-void * operator new (size_t size, const std::nothrow_t&) throw() {
-  return HOARD_MALLOC (size);
-}
-*/
-void * operator new[] (size_t size)
-{
-  return HOARD_MALLOC (size);
-}
-/*
-void * operator new[] (size_t size, const std::nothrow_t&) throw() {
-  return HOARD_MALLOC (size);
-}
-*/
-void operator delete (void * ptr)
-{
-  HOARD_FREE (ptr);
-}
 
-void operator delete[] (void * ptr)
-{
-  HOARD_FREE (ptr);
-}
-#endif
+//	#pragma mark - public functions
 
 
 extern "C" void *
@@ -327,5 +297,52 @@ realloc(void *ptr, size_t size)
 
 	// Return a pointer to the new one.
 	return buffer;
+}
+
+
+//	#pragma mark - BeOS specific extensions
+
+
+struct mstats {
+	size_t bytes_total;
+	size_t chunks_used;
+	size_t bytes_used;
+	size_t chunks_free;
+	size_t bytes_free;
+};
+
+
+extern "C" struct mstats mstats(void);
+
+extern "C" struct mstats
+mstats(void)
+{
+	// Note, the stats structure is not thread-safe, but it doesn't
+	// matter that much either
+	processHeap *heap = getAllocator();
+	static struct mstats stats;
+
+	int allocated = 0;
+	int used = 0;
+	int chunks = 0;
+
+	for (int i = 0; i < hoardHeap::SIZE_CLASSES; i++) {
+		int classUsed, classAllocated;
+		heap->getStats(i, classUsed, classAllocated);
+
+		if (classUsed > 0)
+			chunks++;
+
+		allocated += classAllocated;
+		used += classUsed;
+	}
+
+	stats.bytes_total = allocated;
+	stats.chunks_used = chunks;
+	stats.bytes_used = used;
+	stats.chunks_free = hoardHeap::SIZE_CLASSES - chunks;
+	stats.bytes_free = allocated - used;
+
+	return stats;
 }
 

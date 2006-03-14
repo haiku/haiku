@@ -1,20 +1,12 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MALLOC_H
 #define _MALLOC_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #include <unistd.h> 
-
-// ToDo: there are some BeOS specific things missing, most
-//	things are only rarely or almost never used, though.
-//	The more important missing functionality *and* prototypes
-//	are mcheck(), mstats(), and malloc_find_object_address().
-//
-//	Also, MALLOC_DEBUG is currently not yet supported.
-//
-//	If you want to implement it, have a look at the BeOS header
-//	file malloc.h located in /boot/develop/headers/posix.
 
 
 #ifdef __cplusplus
