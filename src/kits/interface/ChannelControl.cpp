@@ -169,13 +169,6 @@ BChannelControl::DetachedFromWindow()
 
 
 void
-BChannelControl::GetPreferredSize(float *_width, float *_height)
-{
-	BControl::GetPreferredSize(_width, _height);
-}
-
-
-void
 BChannelControl::ResizeToPreferred()
 {
 	BControl::ResizeToPreferred();
