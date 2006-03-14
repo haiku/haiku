@@ -10,6 +10,7 @@
 
 
 typedef const int *wctrans_t;
+typedef unsigned long wctype_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +37,7 @@ extern wint_t	towupper(wint_t wc);
 extern wctrans_t wctrans(const char *charClass);
 extern wctype_t	wctype(const char *property);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
