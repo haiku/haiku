@@ -26,6 +26,8 @@ force_sync	false			# if true forces 3D rendering to be synchronized to the verti
 unhide_fw	false			# if true 'unhide' cards AGP fastwrite support on cards that hide it
 pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refreshrates)
 vga_on_tv	false			# if true enables VGA output on the head outputting to TV
+#gpu_clk	150			# in Mhz, (tries to) override default GPU clockspeed (be carefull!!!)
+#ram_clk	150			# in Mhz, (tries to) override default cardRAM clockspeed (be carefull!!!)
 
 #--------- that's all.
 

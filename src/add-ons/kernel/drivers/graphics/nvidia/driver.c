@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-2/2006.
+	Rudolf Cornelissen 3/2002-3/2006.
 */
 
 /* standard kernel driver stuff */
@@ -369,6 +369,8 @@ static nv_settings current_settings = { // see comments in nv.settings
 	true,					// dma_acc
 	false,					// vga_on_tv
 	false,					// force_sync
+	0,						// gpu_clk
+	0,						// ram_clk
 };
 
 static void dumprom (void *rom, uint32 size, pci_info pcii)
@@ -570,6 +572,14 @@ init_driver(void) {
 		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
 		current_settings.vga_on_tv = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
 		current_settings.force_sync = get_driver_boolean_parameter (settings_handle, "force_sync", false, false);
+
+		item = get_driver_parameter (settings_handle, "gpu_clk", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.gpu_clk = value;
+
+		item = get_driver_parameter (settings_handle, "ram_clk", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.ram_clk = value;
 
 		unload_driver_settings (settings_handle);
 	}
