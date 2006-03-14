@@ -4,6 +4,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 MergeObject posix_sys.o :
 	chmod.c
+	ftime.c
 	getrusage.c
  	gettimeofday.c
 	itimer.c

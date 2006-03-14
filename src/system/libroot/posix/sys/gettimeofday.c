@@ -1,25 +1,31 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <sys/time.h>
-#include <OS.h>
+#include <syscalls.h>
 
 
-int 
+int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
-	bigtime_t usecs;
+	if (tv != NULL) {
+		bigtime_t usecs = real_time_clock_usecs();
 
-	if (tv == NULL)
-		return 0;
+		tv->tv_sec = usecs / 1000000;
+		tv->tv_usec = usecs % 1000000;
+	}
 
-	usecs = real_time_clock_usecs();
+	if (tz != NULL) {
+		time_t timezoneOffset;
+		bool daylightSavingTime;
+		_kern_get_timezone(&timezoneOffset, &daylightSavingTime);
 
-	tv->tv_sec = usecs / 1000000;
-	tv->tv_usec = usecs % 1000000;
+		tz->tz_minuteswest = timezoneOffset;
+		tz->tz_dsttime = daylightSavingTime;
+	}
 
 	return 0;
 }
