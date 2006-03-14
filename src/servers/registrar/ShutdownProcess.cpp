@@ -1608,7 +1608,7 @@ ShutdownProcess::_QuitNonApps()
 			PRINT(("  killing team %ld\n", teamInfo.team));
 
 			#ifdef __HAIKU__
-				send_signal(teamInfo.team, SIGKILL);
+				kill_team(teamInfo.team);
 			#else
 				// We don't want to do this when testing under R5, since it
 				// would kill all teams besides our app server and registrar.
@@ -1676,7 +1676,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 	// kill the app
 	PRINT(("  killing team %ld\n", team));
 
-	send_signal(team, SIGKILL);
+	kill_team(team);
 
 	// remove the app (the roster will note eventually and send us
 	// a notification, but we want to be sure)

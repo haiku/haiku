@@ -1498,14 +1498,7 @@ exit_thread(status_t returnValue)
 status_t
 kill_thread(thread_id id)
 {
-	status_t status = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-	if (status < B_OK)
-		return status;
-
-	if (id != thread_get_current_thread()->id)
-		wait_for_thread(id, NULL);
-
-	return status;
+	return send_signal(id, SIGKILLTHR);
 }
 
 
