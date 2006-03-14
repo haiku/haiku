@@ -6565,14 +6565,10 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName,
 	int openMode, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
-	int status;
 
-	if (!IS_USER_ADDRESS(userName))
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status = user_strlcpy(name, userName, sizeof(name));
-	if (status < B_OK)
-		return status;
 
 	if (openMode & O_CREAT)
 		return file_create_entry_ref(device, inode, name, openMode, perms, false);
