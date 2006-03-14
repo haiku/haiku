@@ -654,7 +654,7 @@ make_device_names(
 	sprintf(card->midi.name, "midi/"DRIVER_NAME"/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
 #endif
-	sprintf(card->name, "audio/multi/"DRIVER_NAME"/%ld", card-cards+1);
+	sprintf(card->name, "audio/hmulti/"DRIVER_NAME"/%ld", card-cards+1);
 	names[num_names++] = card->name;
 
 	names[num_names] = NULL;
@@ -687,7 +687,7 @@ cardbus_device_added(pci_info *info, void **cookie) {
 	}
 	
 	// Format device name
-	sprintf(card->name, "audio/multi/" DRIVER_NAME "/%ld", card->index);
+	sprintf(card->name, "audio/hmulti/" DRIVER_NAME "/%ld", card->index);
 	// Lock the devices
 	acquire_sem(device_lock);
 	LIST_INSERT_HEAD((&devices), card, next);

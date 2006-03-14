@@ -76,7 +76,7 @@ MultiAudioAddOn::MultiAudioAddOn(image_id image) :
 	CALLED();
 	fInitCheckStatus = B_NO_INIT;
 	
-	if(RecursiveScan("/dev/audio/multi/")!=B_OK)
+	if(RecursiveScan("/dev/audio/hmulti/")!=B_OK)
 		return;
 		
 	LoadSettings();

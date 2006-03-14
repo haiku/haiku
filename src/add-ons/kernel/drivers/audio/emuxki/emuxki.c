@@ -2016,7 +2016,7 @@ make_device_names(
 	names[num_names++] = card->midi.name;
 #endif
 	
-	sprintf(card->name, "audio/multi/emuxki/%ld", card-cards+1);
+	sprintf(card->name, "audio/hmulti/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->name;
 
 	names[num_names] = NULL;

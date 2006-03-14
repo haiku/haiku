@@ -6,7 +6,7 @@ if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-Addon multi_audio.media_addon : media :
+Addon hmulti_audio.media_addon : media :
 	MultiAudioAddOn.cpp
 	MultiAudioDevice.cpp
 	MultiAudioNode.cpp
@@ -15,6 +15,6 @@ Addon multi_audio.media_addon : media :
 ;
 
 Package haiku-multi_audio-cvs
-	: multi_audio.media_addon
+	: hmulti_audio.media_addon
 	: boot home config add-ons media ;
 

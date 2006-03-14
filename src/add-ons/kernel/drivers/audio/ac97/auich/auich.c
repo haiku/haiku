@@ -545,7 +545,7 @@ static void
 make_device_names(
 	auich_dev * card)
 {
-	sprintf(card->name, "audio/multi/auich/%ld", card-cards+1);
+	sprintf(card->name, "audio/hmulti/auich/%ld", card-cards+1);
 	names[num_names++] = card->name;
 
 	names[num_names] = NULL;
