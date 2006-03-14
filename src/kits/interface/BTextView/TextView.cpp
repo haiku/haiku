@@ -2383,11 +2383,9 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 				if (fSelStart != fSelEnd && fSelectable)
 					Highlight(fSelStart, fSelEnd);
 
-				else if (fCaretVisible) {
+				else if (fCaretVisible)
 					InvertCaret();
-					Refresh(0, fText->Length(), true, false);
-				}		
-			}	
+			}
 		}
 	} else {
 		fResizable = false;
@@ -2396,6 +2394,8 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 			DeleteOffscreen();
 		NewOffscreen();
 	}
+
+	Refresh(0, fText->Length(), true, false);
 }
 
 
@@ -3181,7 +3181,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 	if (LineHeight(fromLine) != saveLineHeight || 
 		 newHeight < saveHeight || fromLine < saveFromLine || fAlignment != B_ALIGN_LEFT)
 		drawOffset = (*fLines)[fromLine]->offset;
-	
+
 	// TODO: Is it ok here ?
 	if (fResizable)
 		AutoResize(false);
