@@ -2074,8 +2074,11 @@ void set_pll(uint32 reg, uint32 req_clk)
 
 //fixme?
 	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-	if (si->ps.ext_pll) DACW(PIXPLLC2, 0x80000401);
+	if (si->ps.ext_pll)
+	{
+		if (reg == NV32_COREPLL) NV_REG32(NV32_COREPLL2) = 0x80000401;
+		if (reg == NV32_MEMPLL) NV_REG32(NV32_MEMPLL2) = 0x80000401;
+	}
 
 	log_pll(reg, req_clk);
 }
