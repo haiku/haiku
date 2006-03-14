@@ -208,6 +208,7 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
 // time functions
 extern status_t		_kern_set_real_time_clock(uint32 time);
 extern status_t		_kern_set_timezone(int32 timezoneOffset, bool daylightSavingTime);
+extern status_t		_kern_get_timezone(int32 *_timezoneOffset, bool *_daylightSavingTime);
 extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool isGMT);
 extern status_t		_kern_get_tzfilename(char *filename, size_t length, bool *_isGMT);
 

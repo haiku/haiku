@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -336,6 +336,20 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 
 	TRACE(("new system_time_offset %Ld\n",
 		arch_rtc_get_system_time_offset(sRealTimeData)));
+
+	return B_OK;
+}
+
+
+status_t
+_user_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
+{
+	time_t offset = (time_t)(sTimezoneOffset / 1000000LL);
+
+	if (!IS_USER_ADDRESS(_timezoneOffset) || !IS_USER_ADDRESS(_daylightSavingTime)
+		|| user_memcpy(_timezoneOffset, &offset, sizeof(time_t)) < B_OK
+		|| user_memcpy(_daylightSavingTime, &sDaylightSavingTime, sizeof(bool)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return B_OK;
 }
