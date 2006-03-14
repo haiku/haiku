@@ -280,13 +280,19 @@ BListView::MouseDown(BPoint point)
 	}
 
 	BMessage *message = Looper()->CurrentMessage();
+	int32 index = IndexOf(point);
+
+	// If the user double (or more) clicked within the current selection,
+	// we don't change the selection but invoke the selection.
 	int32 clicks;
+	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1
+		&& index >= fFirstSelected && index <= fLastSelected) {
+		Invoke();
+		return;
+	}
+
 	int32 modifiers;
-
-	message->FindInt32("clicks", &clicks);
 	message->FindInt32("modifiers", &modifiers);
-
-	int index = IndexOf(point);
 
 	fTrack->drag_start = point;
 	fTrack->item_index = index;
@@ -303,19 +309,17 @@ BListView::MouseDown(BPoint point)
 				if (modifiers & B_SHIFT_KEY) {
 					// toggle selection state of clicked item (like in Tracker)
 					// toggle selection state of clicked item
-					if (clicks == 1) {
-						if (ItemAt(index)->IsSelected())
-							Deselect(index);
-						else
-							Select(index, true);
-					}
+					if (ItemAt(index)->IsSelected())
+						Deselect(index);
+					else
+						Select(index, true);
 				} else {
 					Select(index);
 				}
 			}
 		} else {
 			// toggle selection state of clicked item
-			if ((modifiers & B_SHIFT_KEY) && ItemAt(index)->IsSelected() && clicks == 1)
+			if ((modifiers & B_SHIFT_KEY) && ItemAt(index)->IsSelected())
 				Deselect(index);
 			else
 				Select(index);
@@ -828,6 +832,9 @@ BListView::CurrentSelection(int32 index) const
 status_t
 BListView::Invoke(BMessage *message)
 {
+	// Note, this is more or less a copy of BControl::Invoke() and should
+	// stay that way (ie. changes done there should be adopted here)
+
 	bool notify = false;
 	uint32 kind = InvokeKind(&notify);
 
@@ -861,8 +868,7 @@ BListView::Invoke(BMessage *message)
 	if (message)
 		err = BInvoker::Invoke(&clone);
 
-//	TODO: assynchronous messaging
-//	SendNotices(kind, &clone);
+	SendNotices(kind, &clone);
 
 	return err;
 }
