@@ -37,6 +37,7 @@ status_t i2c_init(void);
 
 /* card info functions */
 status_t parse_pins(void);
+void set_pll(uint32 reg, uint32 clk);
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2);
 void fake_panel_start(void);
 void set_specs(void);

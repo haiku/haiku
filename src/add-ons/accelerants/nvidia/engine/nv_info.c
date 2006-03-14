@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-1/2006
+   Rudolf Cornelissen 7/2003-3/2006
 */
 
 #define MODULE_BIT 0x00002000
@@ -2058,6 +2058,26 @@ static status_t translate_ISA_PCI(uint32* reg)
 	}
 
 	return B_OK;
+}
+
+void set_pll(uint32 reg, uint32 req_clk)
+{
+	uint32 data;
+	float calced_clk;
+	uint8 m, n, p;
+	nv_dac_sys_pll_find(req_clk, &calced_clk, &m, &n, &p, 0);
+	/* programming the PLL needs to be done in steps! (confirmed NV28) */
+	data = NV_REG32(reg);
+	NV_REG32(reg) = ((data & 0xffff0000) | (n << 8) | m);
+	data = NV_REG32(reg);
+	NV_REG32(reg) = ((p << 16) | (n << 8) | m);
+
+//fixme?
+	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+	if (si->ps.ext_pll) DACW(PIXPLLC2, 0x80000401);
+
+	log_pll(reg, req_clk);
 }
 
 /* doing general fail-safe default setup here */

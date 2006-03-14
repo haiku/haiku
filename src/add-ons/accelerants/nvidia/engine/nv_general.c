@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-2/2006
+   Rudolf Cornelissen 10/2002-3/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.73 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.74 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1543,6 +1543,22 @@ static status_t nv_general_bios_to_powergraphics()
 	{
 		/* clear b15: some framebuffer config item (unknown) */
 		NV_REG32(NV32_PFB_CLS_PAGE2) &= 0xffff7fff;
+	}
+
+	/* tweak card GPU-core and RAM speeds if requested (hoping we'll survive)... */
+	if (si->settings.gpu_clk)
+	{
+		LOG(2,("INIT: tweaking GPU clock!\n"));
+
+		set_pll(NV32_COREPLL, si->settings.gpu_clk);
+		snooze(1000);
+	}
+	if (si->settings.ram_clk)
+	{
+		LOG(2,("INIT: tweaking cardRAM clock!\n"));
+
+		set_pll(NV32_MEMPLL, si->settings.ram_clk);
+		snooze(1000);
 	}
 
 	/* setup AGP:
