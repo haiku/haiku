@@ -685,8 +685,18 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 	if (srcColorSpace == dstColorSpace && srcBitsPerPixel % 8 == 0) {
 		int32 copyCount = (width * srcBitsPerPixel) >> 3;
 		for (int32 i = 0; i < height; i++) {
+			// make sure we don't write beyond the bits size
+			if (copyCount > srcBitsLength)
+				copyCount = srcBitsLength;
+			if (copyCount > dstBitsLength)
+				copyCount = dstBitsLength;
+			if (copyCount == 0)
+				break;
+
 			memcpy(dstBits, srcBits, copyCount);
 
+			srcBitsLength -= copyCount;
+			dstBitsLength -= copyCount;
 			(char *)srcBits += srcBytesPerRow;
 			(char *)dstBits += dstBytesPerRow;
 
