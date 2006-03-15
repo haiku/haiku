@@ -38,7 +38,6 @@
 #include <TokenSpace.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
-#include <ColorUtils.h>
 #include <AppServerLink.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
