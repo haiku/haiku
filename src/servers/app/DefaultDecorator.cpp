@@ -38,7 +38,7 @@
 static inline uint8
 blend_color_value(uint8 a, uint8 b, float position)
 {
-	int16 delta = (int16)a - b;
+	int16 delta = (int16)b - a;
 	int32 value = a + (int32)(position * delta);
 	if (value > 255)
 		return 255;
