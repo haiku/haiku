@@ -122,7 +122,7 @@ BMenu::BMenu(const char *name, menu_layout layout)
 		fExtraMenuData(NULL),
 		fTrigger(0),
 		fResizeToFit(true),
-		fUseCachedMenuLayout(true),
+		fUseCachedMenuLayout(false),
 		fEnabled(true),
 		fDynamicName(false),
 		fRadioMode(false),
@@ -155,7 +155,7 @@ BMenu::BMenu(const char *name, float width, float height)
 		fExtraMenuData(NULL),
 		fTrigger(0),
 		fResizeToFit(true),
-		fUseCachedMenuLayout(true),
+		fUseCachedMenuLayout(false),
 		fEnabled(true),
 		fDynamicName(false),
 		fRadioMode(false),
@@ -877,7 +877,7 @@ BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		fExtraMenuData(NULL),
 		fTrigger(0),
 		fResizeToFit(resizeToFit),
-		fUseCachedMenuLayout(true),
+		fUseCachedMenuLayout(false),
 		fEnabled(true),
 		fDynamicName(false),
 		fRadioMode(false),
@@ -1333,9 +1333,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			if (fMaxContentWidth > 0)
 				frame.right = min_c(frame.right, fMaxContentWidth);
 
-			for (int32 i = 0; i < fItems.CountItems(); i++)
-				ItemAt(i)->fBounds.right = frame.right;
-
+			if (moveItems) {
+				for (int32 i = 0; i < fItems.CountItems(); i++)
+					ItemAt(i)->fBounds.right = frame.right;
+			}
 			frame.right = ceilf(frame.right);
 			frame.bottom--;
 			break;
@@ -1360,10 +1361,12 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
 				}
 			}
-
-			for (int32 i = 0; i < fItems.CountItems(); i++)
-				ItemAt(i)->fBounds.bottom = frame.bottom;			
 			
+			if (moveItems) {
+				for (int32 i = 0; i < fItems.CountItems(); i++)
+					ItemAt(i)->fBounds.bottom = frame.bottom;			
+			}
+
 			frame.right = ceilf(frame.right);
 			break;
 		}
@@ -1517,7 +1520,8 @@ BMenu::ScrollIntoView(BMenuItem *item)
 void
 BMenu::DrawItems(BRect updateRect)
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++) {
+	int32 itemCount = fItems.CountItems();
+	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem *item = ItemAt(i);
 		if (item->Frame().Intersects(updateRect))
 			item->Draw();			
