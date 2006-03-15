@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -72,7 +72,7 @@ AppServer::AppServer()
 
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
-	if (LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME, &gGUIColorSet) != B_OK)
+	if (ColorSet::LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME, &gGUIColorSet) != B_OK)
 		gGUIColorSet.SetToDefaults();
 
 	gScreenManager = new ScreenManager();

@@ -12,7 +12,6 @@
 
 #include "DefaultDecorator.h"
 
-#include "ColorUtils.h"
 #include "DesktopSettings.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
@@ -36,9 +35,51 @@
 #endif
 
 
+static inline uint8
+blend_color_value(uint8 a, uint8 b, float position)
+{
+	int16 delta = (int16)a - b;
+	int32 value = a + (int32)(position * delta);
+	if (value > 255)
+		return 255;
+	if (value < 0)
+		return 0;
+
+	return (uint8)value;
+}
+
+
+/*!
+	\brief Function mostly for calculating gradient colors
+	\param col Start color
+	\param col2 End color
+	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
+		start color and 1.0 results in the end color.
+	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
+*/
+static rgb_color
+make_blend_color(rgb_color colorA, rgb_color colorB, float position)
+{
+	if (position < 0)
+		return colorA;
+	if (position > 1)
+		return colorB;
+
+	rgb_color blendColor;
+	blendColor.red = blend_color_value(colorA.red, colorB.red, position);
+	blendColor.green = blend_color_value(colorA.green, colorB.green, position);
+	blendColor.blue = blend_color_value(colorA.blue, colorB.blue, position);
+	blendColor.alpha = blend_color_value(colorA.alpha, colorB.alpha, position);
+
+	return blendColor;
+}
+
+
+//	#pragma mark -
+
+
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-
 
 DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
@@ -924,38 +965,38 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 	// Actually just draws a blended square
 	int32 w = r.IntegerWidth();
 	int32 h = r.IntegerHeight();
-	
+
 	RGBColor temprgbcol;
-	rgb_color halfcol, startcol, endcol;
+	rgb_color halfColor, startColor, endColor;
 	float rstep, gstep, bstep;
 
 	int steps = w < h ? w : h;
 
 	if (down) {
-		startcol = fButtonLowColor.GetColor32();
-		endcol = fButtonHighColor.GetColor32();
+		startColor = fButtonLowColor.GetColor32();
+		endColor = fButtonHighColor.GetColor32();
 	} else {
-		startcol = fButtonHighColor.GetColor32();
-		endcol = fButtonLowColor.GetColor32();
+		startColor = fButtonHighColor.GetColor32();
+		endColor = fButtonLowColor.GetColor32();
 	}
 
-	halfcol = MakeBlendColor(startcol,endcol,0.5);
+	halfColor = make_blend_color(startColor, endColor, 0.5);
 
-	rstep = float(startcol.red - halfcol.red) / steps;
-	gstep = float(startcol.green - halfcol.green) / steps;
-	bstep = float(startcol.blue - halfcol.blue) / steps;
+	rstep = float(startColor.red - halfColor.red) / steps;
+	gstep = float(startColor.green - halfColor.green) / steps;
+	bstep = float(startColor.blue - halfColor.blue) / steps;
 
 	for (int32 i = 0; i <= steps; i++) {
-		temprgbcol.SetColor(uint8(startcol.red - (i * rstep)),
-							uint8(startcol.green - (i * gstep)),
-							uint8(startcol.blue - (i * bstep)));
+		temprgbcol.SetColor(uint8(startColor.red - (i * rstep)),
+							uint8(startColor.green - (i * gstep)),
+							uint8(startColor.blue - (i * bstep)));
 		
 		_driver->StrokeLine(BPoint(r.left, r.top + i),
 							BPoint(r.left + i, r.top), temprgbcol);
 
-		temprgbcol.SetColor(uint8(halfcol.red - (i * rstep)),
-							uint8(halfcol.green - (i * gstep)),
-							uint8(halfcol.blue - (i * bstep)));
+		temprgbcol.SetColor(uint8(halfColor.red - (i * rstep)),
+							uint8(halfColor.green - (i * gstep)),
+							uint8(halfColor.blue - (i * bstep)));
 
 		_driver->StrokeLine(BPoint(r.left + steps, r.top + i),
 							BPoint(r.left + i, r.top + steps), temprgbcol);

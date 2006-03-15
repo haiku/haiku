@@ -19,7 +19,20 @@
 #include "ColorSet.h"
 #include "ServerConfig.h"
 
-//! Constructor which does nothing
+
+static void
+set_rgb_color(rgb_color& color, uint8 red, uint8 green, uint8 blue)
+{
+	color.red = red;
+	color.green = green;
+	color.blue = blue;
+	color.alpha = 255;
+}
+
+
+//	#pragma mark -
+
+
 ColorSet::ColorSet()
 {
 }
@@ -136,32 +149,31 @@ ColorSet::SetToDefaults(void)
 #ifdef DEBUG_COLORSET
 printf("Initializing color settings to defaults\n");
 #endif
-	SetRGBColor(&panel_background, 216, 216, 216);
-	SetRGBColor(&panel_text, 0, 0, 0);
-	SetRGBColor(&document_background, 255, 255, 255);
-	SetRGBColor(&document_text, 0, 0, 0);
-	SetRGBColor(&control_background, 245, 245, 245);
-	SetRGBColor(&control_text, 0, 0, 0);
-	SetRGBColor(&control_border, 0, 0, 0);
-	SetRGBColor(&control_highlight, 102, 152, 203);
-	SetRGBColor(&keyboard_navigation_base, 0, 0, 229);
-	SetRGBColor(&keyboard_navigation_pulse, 0, 0, 0);
-	SetRGBColor(&shine, 255, 255, 255);
-	SetRGBColor(&shadow, 0, 0, 0);
-	SetRGBColor(&menu_background, 216, 216, 216);
-	SetRGBColor(&menu_selected_background, 115, 120, 184);
-	SetRGBColor(&menu_text, 0, 0, 0);
-	SetRGBColor(&menu_selected_text, 255, 255, 255);
-	SetRGBColor(&menu_selected_border, 0, 0, 0);
-	SetRGBColor(&tooltip_background, 255, 255, 0);
-	SetRGBColor(&tooltip_text, 0, 0, 0);
-	SetRGBColor(&success, 0, 255, 0);
-	SetRGBColor(&failure, 255, 0, 0);
-	SetRGBColor(&window_tab, 255, 203, 0);
-
-	SetRGBColor(&window_tab_text, 0, 0, 0);
-	SetRGBColor(&inactive_window_tab, 232, 232, 232);
-	SetRGBColor(&inactive_window_tab_text, 80, 80, 80);
+	set_rgb_color(panel_background, 216, 216, 216);
+	set_rgb_color(panel_text, 0, 0, 0);
+	set_rgb_color(document_background, 255, 255, 255);
+	set_rgb_color(document_text, 0, 0, 0);
+	set_rgb_color(control_background, 245, 245, 245);
+	set_rgb_color(control_text, 0, 0, 0);
+	set_rgb_color(control_border, 0, 0, 0);
+	set_rgb_color(control_highlight, 102, 152, 203);
+	set_rgb_color(keyboard_navigation_base, 0, 0, 229);
+	set_rgb_color(keyboard_navigation_pulse, 0, 0, 0);
+	set_rgb_color(shine, 255, 255, 255);
+	set_rgb_color(shadow, 0, 0, 0);
+	set_rgb_color(menu_background, 216, 216, 216);
+	set_rgb_color(menu_selected_background, 115, 120, 184);
+	set_rgb_color(menu_text, 0, 0, 0);
+	set_rgb_color(menu_selected_text, 255, 255, 255);
+	set_rgb_color(menu_selected_border, 0, 0, 0);
+	set_rgb_color(tooltip_background, 255, 255, 0);
+	set_rgb_color(tooltip_text, 0, 0, 0);
+	set_rgb_color(success, 0, 255, 0);
+	set_rgb_color(failure, 255, 0, 0);
+	set_rgb_color(window_tab, 255, 203, 0);
+	set_rgb_color(window_tab_text, 0, 0, 0);
+	set_rgb_color(inactive_window_tab, 232, 232, 232);
+	set_rgb_color(inactive_window_tab_text, 80, 80, 80);
 }
 
 /*!
@@ -539,28 +551,28 @@ ColorSet::PrintMember(const rgb_color &color) const
 	printf("rgb_color(%d, %d, %d, %d)", color.red,color.green,color.blue,color.alpha);
 }
 
+
 /*!
 	\brief Loads the saved system colors into a ColorSet
 	\param set the set to receive the system colors
 	\return B_OK if successful. See BFile for other error codes
 */
 status_t
-LoadColorSet(const char *path, ColorSet *set)
+ColorSet::LoadColorSet(const char *path, ColorSet *set)
 {
 	BFile file(path,B_READ_ONLY);
-	if(file.InitCheck()!=B_OK)
+	if (file.InitCheck()!=B_OK)
 		return file.InitCheck();
-	
+
 	BMessage msg;
-	
-	status_t st=msg.Unflatten(&file);
-	if(st!=B_OK)
-		return st;
+	status_t status = msg.Unflatten(&file);
+	if (status != B_OK)
+		return status;
 
 	set->ConvertFromMessage(&msg);
-	
 	return B_OK;
 }
+
 
 /*!
 	\brief Saves the saved system colors into a flattened BMessage
@@ -568,21 +580,15 @@ LoadColorSet(const char *path, ColorSet *set)
 	\return B_OK if successful. See BFile for other error codes
 */
 status_t
-SaveColorSet(const char *path, const ColorSet &set)
+ColorSet::SaveColorSet(const char *path, const ColorSet &set)
 {
-	// TODO: Move this check to the app_server
-	BEntry entry(SERVER_SETTINGS_DIR);
-	if(!entry.Exists())
-		create_directory(SERVER_SETTINGS_DIR,0777);
-	
 	BFile file(path, B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
-	if(file.InitCheck()!=B_OK)
-		return file.InitCheck();
+	status_t status = file.InitCheck();
+	if (status != B_OK)
+		return status;
 
 	BMessage msg;
-	
 	set.ConvertToMessage(&msg);
 
-	msg.Flatten(&file);	
-	return B_OK;
+	return msg.Flatten(&file);	
 }

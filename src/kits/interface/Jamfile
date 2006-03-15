@@ -40,7 +40,6 @@ MergeObject <libbe>interface_kit.o :
 	CheckBox.cpp
 	ColorConversion.cpp
 	ColorControl.cpp
-	ColorUtils.cc
 	Control.cpp
 	Deskbar.cpp
 	Dragger.cpp

@@ -1,44 +1,26 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ColorSet.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for encapsulating GUI system colors
-//					
-//  
-//------------------------------------------------------------------------------
-#ifndef COLORSET_H_
-#define COLORSET_H_
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ */
+#ifndef COLOR_SET_H
+#define COLOR_SET_H
 
+
+#include <InterfaceDefs.h>
 #include <Locker.h>
 #include <Message.h>
 #include <String.h>
-#include <ColorUtils.h>
+
 
 /*!
 	\class ColorSet ColorSet.h
 	\brief Encapsulates GUI system colors
 */
 class ColorSet : public BLocker {
-public:
+	public:
 					ColorSet();
 					ColorSet(const ColorSet &cs);
 					ColorSet & operator=(const ColorSet &cs);
@@ -55,6 +37,9 @@ public:
 		rgb_color	AttributeToColor(int32 which);
 
 		status_t	SetColor(const char *string, rgb_color value);
+
+		static status_t LoadColorSet(const char *path, ColorSet *set);
+		static status_t SaveColorSet(const char *path, const ColorSet &set);
 
 		rgb_color	panel_background,
 					panel_text,
@@ -92,12 +77,9 @@ public:
 					inactive_window_tab,
 					inactive_window_tab_text;
 
-private:
+	private:
 		rgb_color	*StringToMember(const char *string);
 		void		PrintMember(const rgb_color &color) const;
 };
 
-status_t LoadColorSet(const char *path, ColorSet *set);
-status_t SaveColorSet(const char *path, const ColorSet &set);
-
-#endif
+#endif	// COLOR_SET_H
