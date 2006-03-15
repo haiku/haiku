@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Haiku, Inc.
+ * Copyright (c) 2005-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -47,6 +47,10 @@ WindowList::SetIndex(int32 index)
 }
 
 
+/*!
+	Adds the \a window to the end of the list. If \a before is
+	given, it will be inserted right before that window.
+*/
 void
 WindowList::AddWindow(WindowLayer* window, WindowLayer* before)
 {

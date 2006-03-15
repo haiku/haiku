@@ -897,7 +897,7 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace)
 
 /*!
 	Search the visible windows for a valid back window
-	(only normal windows can be back windows)
+	(only desktop windows can't be back windows)
 */
 void
 Desktop::_UpdateBack()
@@ -906,7 +906,7 @@ Desktop::_UpdateBack()
 
 	for (WindowLayer* window = _CurrentWindows().FirstWindow();
 			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
-		if (window->IsHidden() || !window->SupportsFront())
+		if (window->IsHidden() || window->Feel() == kDesktopWindowFeel)
 			continue;
 
 		fBack = window;
@@ -990,8 +990,8 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 
 	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
 
-	if (focus == fFocus && focus != NULL && (focus->Flags() & B_AVOID_FOCUS) == 0
-		&& !hasModal) {
+	if (focus == fFocus && focus != NULL && !focus->IsHidden()
+		&& (focus->Flags() & B_AVOID_FOCUS) == 0 && !hasModal) {
 		// the window that is supposed to get focus already has focus
 		UnlockAllWindows();
 		return;
@@ -1209,7 +1209,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	MarkDirty(dirty);
 
 	_UpdateFronts();
-	SetFocusWindow(FrontWindow());
+	SetFocusWindow(_CurrentWindows().LastWindow());
 	_WindowChanged(window);
 
 	UnlockAllWindows();
@@ -1284,7 +1284,7 @@ Desktop::HideWindow(WindowLayer* window)
 		_UpdateFronts();
 
 		if (FocusWindow() == window)
-			SetFocusWindow(FrontWindow());
+			SetFocusWindow(_CurrentWindows().LastWindow());
 	}
 
 	if (fWorkspacesLayer != NULL)
@@ -1707,7 +1707,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	_UpdateFronts();
 
 	if (window == FocusWindow() && !window->IsVisible())
-		SetFocusWindow(FrontWindow());
+		SetFocusWindow(_CurrentWindows().LastWindow());
 
 	UnlockAllWindows();
 }
