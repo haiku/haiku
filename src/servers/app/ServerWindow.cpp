@@ -1254,7 +1254,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				fCurrentLayer->Name()));
 
 			int32 token;
-			if (link.Read<int32>(&token) != B_OK)
+			bool sync;
+			link.Read<int32>(&token);
+			if (link.Read<bool>(&sync) != B_OK)
 				break;
 
 			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
@@ -1265,6 +1267,12 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				if (fDesktop->ViewUnderMouse(fWindowLayer) == fCurrentLayer->Token())
 					fServerApp->SetCurrentCursor(cursor);
 			}
+			if (sync) {
+				// sync the client (it can now delete the cursor)
+				fLink.StartMessage(B_OK);
+				fLink.Flush();
+			}
+
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:

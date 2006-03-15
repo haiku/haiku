@@ -1006,14 +1006,21 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 
 	fOwner->fLink->StartMessage(AS_LAYER_SET_CURSOR);
 	fOwner->fLink->Attach<int32>(cursor->fServerToken);
+	fOwner->fLink->Attach<bool>(sync);
 
 	if (!sync) {
 		cursor->fPendingViewCursor = true;
 			// this avoids a race condition in case the cursor is
 			// immediately deleted after this call, as the deletion
 			// is handled by the application, not the window
-	} else
-		fOwner->fLink->Flush();
+	} else {
+		// make sure the server has processed the
+		// message and "acquired" the cursor in
+		// the window thread before returning from
+		// this function
+		int32 code;
+		fOwner->fLink->FlushWithReply(code);
+	}
 }
 
 
