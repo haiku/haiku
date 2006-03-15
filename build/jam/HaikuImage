@@ -99,7 +99,7 @@ if $(TARGET_ARCH) = x86 {
 # drivers
 AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 									  random <driver>tty zero ;
-AddDriversToHaikuImage audio multi	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid ;
