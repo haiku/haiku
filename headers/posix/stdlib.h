@@ -153,6 +153,9 @@ extern int		wctomb(char *string, wchar_t wchar);
 extern size_t	mbstowcs(wchar_t *pwcs, const char *string, size_t maxSize);
 extern size_t	wcstombs(char *string, const wchar_t *pwcs, size_t maxSize);
 
+/* crypt */
+extern void 	setkey(const char *key);	
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

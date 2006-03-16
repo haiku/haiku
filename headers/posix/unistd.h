@@ -172,7 +172,9 @@ extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
 
 /* misc */
 extern char 	*crypt(const char *key, const char *salt);
+extern void 	encrypt(char block[64], int edflag);
 extern int		getopt(int argc, char *const *argv, const char *shortOpts);
+extern void 	swab(const void *src, void *dest, ssize_t nbytes);
 
 /* getopt() related external variables */
 extern char *optarg;

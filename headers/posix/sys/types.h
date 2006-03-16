@@ -45,6 +45,7 @@ typedef int          		daddr_t;
 typedef char *				caddr_t;
 
 typedef unsigned long		addr_t;
+typedef long 				key_t;
 
 #include <null.h>
 #include <size_t.h>
