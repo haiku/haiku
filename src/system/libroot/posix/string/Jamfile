@@ -25,7 +25,6 @@ MergeObject posix_string.o :
 	strerror.c
 	strlcat.c
 	strlcpy.c
-	strlen.c
 	strncat.c
 	strncmp.c
 	strncpy.c
