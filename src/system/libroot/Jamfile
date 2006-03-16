@@ -27,6 +27,7 @@ local librootObjects =
 	posix_gnu_regex.o
 	posix_gnu_stdio.o
 	posix_gnu_stdlib.o
+	posix_gnu_string.o
 	posix_gnu_wcsmbs.o
 	posix_gnu_wctype.o
 	posix_stdlib.o
