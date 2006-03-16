@@ -384,7 +384,6 @@ BTextView::AttachedToWindow()
 		AutoResize(true);
 	
 	UpdateScrollbars();
-	ScrollToSelection();
 	
 	if (!fCursor)
 		SetViewCursor(B_CURSOR_I_BEAM);
