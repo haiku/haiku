@@ -1,8 +1,9 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYS_TIMEB_H
 #define _SYS_TIMEB_H
-/*
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <time.h>
