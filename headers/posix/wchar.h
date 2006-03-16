@@ -8,14 +8,15 @@
 #define _WCHAR_H
 
 #include <wchar_t.h>
+#include <stdio.h>
 
 #define _WINT_T
 typedef unsigned int wint_t;
 typedef int wctype_t;
 
 typedef struct {
-        int             __count;
-        wint_t  __value;
+	int		__count;
+	wint_t	__value;
 } mbstate_t;
 
 #include <size_t.h>
@@ -23,7 +24,7 @@ typedef struct {
 extern wint_t	fgetwc(FILE *);
 extern wchar_t	*fgetws(wchar_t *, int, FILE *);
 extern wint_t	fputwc(wchar_t, FILE *);
-extern int	fputws(const wchar_t *, FILE *);
+extern int		fputws(const wchar_t *, FILE *);
 extern wint_t	getwc(FILE *);
 extern wint_t	getwchar(void);
 
