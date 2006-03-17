@@ -17,3 +17,12 @@ ObjectHdrs [ FGristFiles usb_midi$(SUFOBJ) ]
 
 Includes [ FGristFiles usb_midi.c ] :
 	<src!preferences!devices>usbdevs.h <src!preferences!devices>usbdevs_data.h ;
+
+Package haiku-usbmidi-cvs
+	:
+	usb_midi
+	:
+	boot home config add-ons kernel drivers bin ;
+
+PackageDriverSymLink haiku-usbmidi-cvs : midi usb_midi ;
+
