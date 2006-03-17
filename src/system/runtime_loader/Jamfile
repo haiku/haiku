@@ -39,7 +39,7 @@ StaticLibrary librld.a :
 	<src!system!libroot!posix!string>strerror.o
 	<src!system!libroot!posix!string>strlcat.o
 	<src!system!libroot!posix!string>strlcpy.o
-	<src!system!libroot!posix!string>strlen.o
+	<src!system!kernel!lib>strlen.o
 	<src!system!libroot!posix!string>strncmp.o
 	<src!system!libroot!posix!string>strnlen.o
 	<src!system!libroot!posix!string>strpbrk.o
