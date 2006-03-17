@@ -171,13 +171,17 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	RGBColor yellow;
 	if (decorator != NULL)
 		yellow = decorator->Colors().window_tab;
-	RGBColor gray(180, 180, 180);
+	RGBColor frameColor(180, 180, 180);
 	RGBColor white(255, 255, 255);
 
 	if (!active) {
 		_DarkenColor(yellow);
-		_DarkenColor(gray);
+		_DarkenColor(frameColor);
 		_DarkenColor(white);
+	}
+	if (window == fSelectedWindow) {
+		// TODO: what about standard navigation color here?
+		frameColor.SetColor(80, 80, 80);
 	}
 
 	if (tabFrame.left < frame.left)
@@ -194,7 +198,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	if (decorator != NULL)
 		drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
 
-	drawingEngine->StrokeRect(frame, gray);
+	drawingEngine->StrokeRect(frame, frameColor);
 
 	frame.InsetBy(1, 1);
 	drawingEngine->FillRect(frame, white);
@@ -239,6 +243,9 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 		// draw active frame
 		RGBColor black(0, 0, 0);
 		drawingEngine->StrokeRect(rect, black);
+	} else if (index == fSelectedWorkspace) {
+		RGBColor gray(80, 80, 80);
+		drawingEngine->StrokeRect(rect, gray);
 	}
 
 	rect.InsetBy(1, 1);
@@ -279,6 +286,14 @@ void
 WorkspacesLayer::_DarkenColor(RGBColor& color) const
 {
 	color = tint_color(color.GetColor32(), B_DARKEN_2_TINT);
+}
+
+
+void
+WorkspacesLayer::_Invalidate() const
+{
+	BRegion region(Frame());
+	Window()->MarkContentDirty(region);
 }
 
 
@@ -400,11 +415,17 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 
 	// If this window is movable, we keep it selected
 
-	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0)
+	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0
+		|| fSelectedWindow == Window()) {
 		fSelectedWindow = NULL;
+		index = -1;
+	}
 
 	fLeftTopOffset = where - windowFrame.LeftTop();
 	fSelectedWorkspace = index;
+
+	if (index >= 0)
+		_Invalidate();
 }
 
 
@@ -418,14 +439,20 @@ WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
 			Window()->Desktop()->SetWorkspace(index);
 	}
 
+	if (fSelectedWindow != NULL) {
+		// We need to hide the selection frame again
+		_Invalidate();
+	}
+
 	fSelectedWindow = NULL;
+	fSelectedWorkspace = -1;
 }
 
 
 void
 WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 {
-	if (fSelectedWindow == NULL)
+	if (fSelectedWindow == NULL && fSelectedWorkspace < 0)
 		return;
 
 	// check if the correct mouse button is pressed
@@ -441,6 +468,15 @@ WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 
 	int32 index;
 	BRect workspaceFrame = _WorkspaceAt(where, index);
+
+	if (fSelectedWindow == NULL) {
+		if (fSelectedWorkspace >= 0 && fSelectedWorkspace != index) {
+			fSelectedWorkspace = index;
+			_Invalidate();
+		}
+		return;
+	}
+
 	workspaceFrame.InsetBy(1, 1);
 
 	if (index != fSelectedWorkspace) {
@@ -481,8 +517,7 @@ void
 WorkspacesLayer::WindowChanged(WindowLayer* window)
 {
 	// TODO: be smarter about this!
-	BRegion region(Frame());
-	Window()->MarkContentDirty(region);
+	_Invalidate();
 }
 
 

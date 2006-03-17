@@ -49,6 +49,7 @@ class WorkspacesLayer : public ViewLayer {
 					int32 index);
 
 		void _DarkenColor(RGBColor& color) const;
+		void _Invalidate() const;
 
 	private:
 		WindowLayer*	fSelectedWindow;
