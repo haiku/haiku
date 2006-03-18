@@ -230,6 +230,8 @@ BApplication::~BApplication()
 	delete fServerLink;
 #endif	// RUN_WITHOUT_APP_SERVER
 
+	delete fServerAllocator;
+
 	// uninitialize be_app, the be_app_messenger is invalidated automatically
 	be_app = NULL;
 }
