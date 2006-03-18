@@ -110,7 +110,47 @@ ClientMemoryAllocator::Free(void *cookie)
 	if (cookie == NULL)
 		return;
 
-	// TODO: implement me!!!
+	struct block* freeBlock = (struct block*)cookie;
+
+	// search for an adjacent free block
+
+	block_iterator iterator = fFreeBlocks.GetIterator();
+	struct block* before = NULL;
+	struct block* after = NULL;
+	struct block* block;
+
+	// TODO: this could be done better if free blocks are sorted,
+	//	and if we had one free blocks list per chunk!
+	//	IOW this is a bit slow...
+
+	while ((block = iterator.Next()) != NULL) {
+		if (block->chunk != freeBlock->chunk)
+			continue;
+
+		if (block->base + block->size == freeBlock->base)
+			before = block;
+
+		if (block->base == freeBlock->base + freeBlock->size)
+			after = block;
+	}
+
+	if (before != NULL && after != NULL) {
+		// merge with adjacent blocks
+		before->size += after->size + freeBlock->size;
+		fFreeBlocks.Remove(after);
+		free(after);
+		free(freeBlock);
+	} else if (before != NULL) {
+		before->size += freeBlock->size;
+		free(freeBlock);
+	} else if (after != NULL) {
+		after->base -= freeBlock->size;
+		after->size += freeBlock->size;
+		free(freeBlock);
+	} else
+		fFreeBlocks.Add(freeBlock);
+
+	// TODO: check if the whole chunk is free now (we could delete it then)
 }
 
 
