@@ -193,8 +193,12 @@ ClientMemoryAllocator::_AllocateChunk(size_t size, bool& newArea)
 		}
 
 		char name[B_OS_NAME_LENGTH];
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+		strcpy(name, "client heap");
+#else
 		snprintf(name, sizeof(name), "heap:%ld:%s", fApplication->ClientTeam(),
 			fApplication->SignatureLeaf());
+#endif
 		area_id area = create_area(name, (void**)&address, B_ANY_ADDRESS, size,
 			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (area < B_OK) {

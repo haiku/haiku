@@ -29,7 +29,6 @@ SharedLibrary libhwinterface.so :
 	BBitmapBuffer.cpp
 	DWindowBuffer.cpp
 	HWInterface.cpp
-	MultiLocker.cpp
 	RGBColor.cpp
 
 	: libhaikuappserver.so be
@@ -45,6 +44,7 @@ LINKFLAGS on libhwinterfaceimpl.so += -lbe ;
 SharedLibrary libhwinterfaceimpl.so :
 	ViewHWInterface.cpp
 	DWindowHWInterface.cpp
+	MultiLocker.cpp
 
 	: be libhwinterface.so
 ;
@@ -60,20 +60,20 @@ SharedLibrary libhaikuappserver.so :
 	DesktopSettings.cpp
 	DrawState.cpp
 	FontFamily.cpp
+	FontManager.cpp
 	HashTable.cpp
+	MultiLocker.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
-	FontManager.cpp
 	SystemPalette.cpp
 
 	# drawing
 	PatternHandler.cpp
 
 	# libraries
-	:
-	be libtextencoding.so libfreetype.so
+	: be libtextencoding.so libfreetype.so
 ;
 
 AddResources haiku_app_server : app_server.rdef ;

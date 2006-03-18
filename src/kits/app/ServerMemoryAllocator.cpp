@@ -16,7 +16,9 @@
 
 #include "ServerMemoryAllocator.h"
 
-#include <syscalls.h>
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	include <syscalls.h>
+#endif
 
 #include <new>
 
@@ -64,10 +66,15 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base
 		return B_NO_MEMORY;
 	}
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	// reserve 128 MB of space for the area
 	void* base = (void*)0x60000000;
 	status_t status = _kern_reserve_heap_address_range((addr_t*)&base,
 		B_BASE_ADDRESS, 128 * 1024 * 1024);
+#else
+	void* base;
+	status_t status = B_ERROR;
+#endif
 
 	mapping->local_area = clone_area("server_memory", &base,
 		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,

@@ -17,7 +17,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders shared app interface ;
+UsePrivateHeaders shared app interface kernel ;
 UsePrivateHeaders [ FDirName servers app ] ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
