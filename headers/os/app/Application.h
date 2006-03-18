@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,15 +21,13 @@
 class BCursor;
 class BList;
 class BWindow;
-class _BSession_;
 class BResources;
 class BMessageRunner;
 class BServer;
-struct _server_heap_;
-struct _drag_data_;
 
 namespace BPrivate {
 	class PortLink;
+	class ServerMemoryAllocator;
 }
 
 
@@ -89,7 +87,7 @@ public:
 	virtual status_t		GetSupportedSuites(BMessage* data);
 
 
-// Private or reserved ---------------------------------------------------------
+	// Private or reserved
 	virtual status_t		Perform(perform_code d, void* arg);
 
 	class Private;
@@ -98,7 +96,6 @@ private:
 	typedef BLooper _inherited;
 
 	friend class Private;
-
 	friend class BServer;
 
 							BApplication(const char* signature, bool initGUI,
@@ -119,17 +116,14 @@ private:
 	virtual	bool			ScriptReceived(BMessage* msg, int32 index,
 								BMessage* specifier, int32 form,
 								const char* property);
-			void			InitData(const char* signature, bool initGUI,
+			void			_InitData(const char* signature, bool initGUI,
 								status_t* error);
 			void			BeginRectTracking(BRect r, bool trackWhole);
 			void			EndRectTracking();
-			status_t		setup_server_heaps();
-			void*			rw_offs_to_ptr(uint32 offset);
-			void*			ro_offs_to_ptr(uint32 offset);
-			void*			global_ro_offs_to_ptr(uint32 offset);
+			status_t		_SetupServerAllocator();
 			status_t		_InitGUIContext();
-			status_t		connect_to_app_server();
-			void			send_drag(	BMessage* msg,
+			status_t		_ConnectToServer();
+/*			void			send_drag(	BMessage* msg,
 										int32 vs_token,
 										BPoint offset,
 										BRect drag_rect,
@@ -141,31 +135,30 @@ private:
 										drawing_mode dragMode,
 										BHandler* reply_to);
 			void			write_drag(_BSession_* session, BMessage* a_message);
-			bool			quit_all_windows(bool force);
-			bool			window_quit_loop(bool, bool);
-			void			do_argv(BMessage* msg);
+*/			bool			_QuitAllWindows(bool force);
+			bool			_WindowQuitLoop(bool quitFilePanels, bool force);
+			void			_ArgvReceived(BMessage* message);
 			void			SetAppCursor();
 
 			uint32			InitialWorkspace();
-			int32			count_windows(bool incl_menus) const;
-			BWindow*		window_at(uint32 index, bool incl_menus) const;
-			status_t		get_window_list(BList* list, bool incl_menus) const;
-	static	int32			async_quit_entry(void*);
+			int32			_CountWindows(bool includeMenus) const;
+			BWindow*		_WindowAt(uint32 index, bool includeMenus) const;
+			status_t		_GetWindowList(BList* list, bool includeMenus) const;
+
 	static	BResources*		sAppResources;
 	static	BLocker			sAppResourcesLock;
 
 			const char*		fAppName;
 			BPrivate::PortLink* fServerLink;
-			uint32			_unused0;
+			BPrivate::ServerMemoryAllocator* fServerAllocator;
 
 			void*			fCursorData;
-			_server_heap_* 	fServerHeap;
 			bigtime_t		fPulseRate;
 			uint32			fInitialWorkspace;
-			_drag_data_*	fDraggedMessage;
+			//_drag_data_*	fDraggedMessage;
 			BMessageRunner*	fPulseRunner;
 			status_t		fInitError;
-			uint32			_reserved[11];
+			uint32			_reserved[13];
 
 			bool			fReadyToRunCalled;
 };
