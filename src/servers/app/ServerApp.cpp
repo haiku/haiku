@@ -33,7 +33,6 @@
 #include <ServerProtocol.h>
 
 #include "AppServer.h"
-#include "BGet++.h"
 #include "BitmapManager.h"
 #include "CursorManager.h"
 #include "CursorSet.h"
@@ -94,7 +93,6 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
-	fSharedMem("shared memory", 32768),
 	fMemoryAllocator(this)
 {
 	if (fSignature == "")
@@ -527,108 +525,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 			}
 */			break;
-		}
-		case AS_AREA_MESSAGE:
-		{
-			// This occurs in only one kind of case: a message is too big to send over a port. This
-			// is really an edge case, so this shouldn't happen *too* often
-			
-			// Attached Data:
-			// 1) area_id id of an area already owned by the server containing the message
-			// 2) size_t offset of the pointer in the area
-			// 3) size_t size of the message
-			
-			area_id area;
-			size_t offset;
-			size_t msgsize;
-			area_info ai;
-			int8 *msgpointer;
-
-			link.Read<area_id>(&area);
-			link.Read<size_t>(&offset);
-			link.Read<size_t>(&msgsize);
-
-			// Part sanity check, part get base pointer :)
-			if (get_area_info(area, &ai) < B_OK)
-				break;
-
-			msgpointer = (int8*)ai.address + offset;
-
-			RAMLinkMsgReader mlink(msgpointer);
-			_DispatchMessage(mlink.Code(), mlink);
-
-			// This is a very special case in the sense that when ServerMemIO is used for this 
-			// purpose, it will be set to NOT automatically free the memory which it had 
-			// requested. This is the server's job once the message has been dispatched.
-			fSharedMem.ReleaseBuffer(msgpointer);
-			break;
-		}
-		case AS_ACQUIRE_SERVERMEM:
-		{
-			// This particular call is more than a bit of a pain in the neck. We are given a
-			// size of a chunk of memory needed. We need to (1) allocate it, (2) get the area for
-			// this particular chunk, (3) find the offset in the area for this chunk, and (4)
-			// tell the client about it. Good thing this particular call isn't used much
-			
-			// Received from a ServerMemIO object requesting operating memory
-			// Attached Data:
-			// 1) size_t requested size
-			// 2) port_id reply_port
-
-			size_t memsize;
-			link.Read<size_t>(&memsize);
-
-			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
-
-			void *sharedmem = fSharedMem.GetBuffer(memsize);
-
-			if (memsize < 1 || sharedmem == NULL) {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
-				break;
-			}
-			
-			area_id owningArea = area_for(sharedmem);
-			area_info info;
-
-			if (owningArea == B_ERROR || get_area_info(owningArea, &info) < B_OK) {
-				fLink.StartMessage(B_ERROR);
-				fLink.Flush();
-				break;
-			}
-
-			int32 areaoffset = (addr_t)sharedmem - (addr_t)info.address;
-			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<area_id>(owningArea);
-			fLink.Attach<int32>(areaoffset);
-			fLink.Flush();
-			break;
-		}
-		case AS_RELEASE_SERVERMEM:
-		{
-			// Received when a ServerMemIO object on destruction
-			// Attached Data:
-			// 1) area_id owning area
-			// 2) int32 area offset
-			
-			area_id owningArea;
-			int32 areaoffset;
-				
-			link.Read<area_id>(&owningArea);
-			link.Read<int32>(&areaoffset);
-			
-			area_info areaInfo;
-			if (owningArea < 0 || get_area_info(owningArea, &areaInfo) != B_OK)
-				break;
-			
-			STRACE(("Successfully freed shared memory\n"));
-			void *sharedmem = ((int32*)areaInfo.address) + areaoffset;
-			
-			fSharedMem.ReleaseBuffer(sharedmem);
-			
-			break;
 		}
 		case AS_UPDATE_DECORATOR:
 		{

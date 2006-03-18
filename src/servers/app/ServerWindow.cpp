@@ -40,7 +40,6 @@
 #include <PictureProtocol.h>
 
 #include "AppServer.h"
-#include "BGet++.h"
 #include "DebugInfoManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
@@ -1716,42 +1715,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n", Title()));
 			// TODO: Implement AS_SET_FONT_SIZE?
-			break;
-		}
-		case AS_AREA_MESSAGE:
-		{
-			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n", Title()));
-			// This occurs in only one kind of case: a message is too big to send over a port. This
-			// is really an edge case, so this shouldn't happen *too* often
-			
-			// Attached Data:
-			// 1) area_id id of an area already owned by the server containing the message
-			// 2) size_t offset of the pointer in the area
-			// 3) size_t size of the message
-			
-			area_id area;
-			size_t offset;
-			size_t msgsize;
-			area_info ai;
-			int8 *msgpointer;
-			
-			link.Read<area_id>(&area);
-			link.Read<size_t>(&offset);
-			link.Read<size_t>(&msgsize);
-			
-			// Part sanity check, part get base pointer :)
-			if(get_area_info(area,&ai)!=B_OK)
-				break;
-
-			msgpointer = (int8*)ai.address + offset;
-
-			RAMLinkMsgReader mlink(msgpointer);
-			_DispatchMessage(mlink.Code(), mlink);
-
-			// This is a very special case in the sense that when ServerMemIO is used for this 
-			// purpose, it will be set to NOT automatically free the memory which it had 
-			// requested. This is the server's job once the message has been dispatched.
-			fServerApp->AppAreaPool()->ReleaseBuffer(msgpointer);
 			break;
 		}
 		case AS_SYNC:

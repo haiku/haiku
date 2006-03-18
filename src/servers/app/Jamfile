@@ -12,7 +12,6 @@ UseFreeTypeHeaders ;
 Server app_server :
 	Angle.cpp
 	AppServer.cpp
-	BGet++.cpp
 	BitmapManager.cpp
 	ClientMemoryAllocator.cpp
 	ColorSet.cpp

@@ -55,7 +55,6 @@ MergeObject <libbe>app_kit.o :
 	RosterPrivate.cpp
 	Server.cpp
 	ServerLink.cpp
-	ServerMemIO.cpp
 	ServerMemoryAllocator.cpp
 	TokenSpace.cpp
 	TypeConstants.cpp 

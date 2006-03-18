@@ -51,7 +51,6 @@ SharedLibrary libhwinterfaceimpl.so :
 
 SharedLibrary libhaikuappserver.so :
 	Angle.cpp
-	BGet++.cpp
 	ClientMemoryAllocator.cpp
 	ColorSet.cpp
 	CursorData.cpp

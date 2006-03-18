@@ -15,7 +15,6 @@
 
 #include "ClientMemoryAllocator.h"
 #include "MessageLooper.h"
-#include "BGet++.h"
 
 #include <ObjectList.h>
 #include <TokenSpace.h>
@@ -83,8 +82,6 @@ class ServerApp : public MessageLooper {
 			ServerPicture*		FindPicture(const int32& token) const;
 			bool				DeletePicture(const int32& token);
 
-			AreaPool*			AppAreaPool() { return &fSharedMem; }
-
 			Desktop*			GetDesktop() const { return fDesktop; }
 
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
@@ -134,7 +131,6 @@ class ServerApp : public MessageLooper {
 
 			bool				fIsActive;
 
-			AreaPool			fSharedMem;
 			ClientMemoryAllocator fMemoryAllocator;
 };
 
