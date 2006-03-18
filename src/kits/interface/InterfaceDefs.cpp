@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,11 +17,10 @@
 #include <Roster.h>
 #include <ScrollBar.h>
 #include <Screen.h>
+#include <String.h>
 #include <TextView.h>
 
 #include <stdlib.h>
-// TODO: remove this header
-#include <stdio.h>
 #include <string.h>
 
 #include <AppServerLink.h>
@@ -30,7 +29,6 @@
 #include <input_globals.h>
 #include <ServerProtocol.h>
 #include <WidthBuffer.h>
-#include <ColorSet.h>	// for private system colors stuff
 #include <ColorTools.h>
 
 #include "moreUTF8.h"
@@ -862,7 +860,7 @@ count_decorators(void)
 
 	int32 code;
 	int32 count = -1;
-	if (link.FlushWithReply(code) == B_OK)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<int32>(&count);
 	
 	return count;
@@ -882,9 +880,9 @@ get_decorator(void)
 
 	int32 code;
 	int32 index = -1;
-	if (link.FlushWithReply(code) == B_OK)
+	if (link.FlushWithReply(code) == B_OK && code == B_OK)
 		link.Read<int32>(&index);
-	
+
 	return index;
 }
 
@@ -899,22 +897,19 @@ status_t
 get_decorator_name(const int32 &index, BString &name)
 {
 	BPrivate::AppServerLink link;
-	int32 code;
-	
 	link.StartMessage(AS_GET_DECORATOR_NAME);
 	link.Attach<int32>(index);
-	
-	if (link.FlushWithReply(code) == B_OK)
-	{
+
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == B_OK) {
 		char *string;
-		if(link.ReadString(&string)==B_OK)
-		{
-			name=string;
-			delete [] string;
+		if (link.ReadString(&string) == B_OK) {
+			name = string;
+			free(string);
 			return B_OK;
 		}
 	}
-	
+
 	return B_ERROR;
 }
 
@@ -943,48 +938,16 @@ get_decorator_preview(const int32 &index, BBitmap *bitmap)
 status_t
 set_decorator(const int32 &index)
 {
-	if(index < 0)
+	if (index < 0)
 		return B_BAD_VALUE;
-	
+
 	BPrivate::AppServerLink link;
-	
+
 	link.StartMessage(AS_SET_DECORATOR);
 	link.Attach<int32>(index);
 	link.Flush();
-	
+
 	return B_OK;
-}
-
-/*!
-	\brief Private function to get the system's GUI colors as a set
-	\param colors The recipient color set
-*/
-void
-get_system_colors(ColorSet *colors)
-{
-	if (!colors)
-		return;
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_UI_COLORS);
-
-	int32 code;
-	if (link.FlushWithReply(code) == B_OK && code == B_OK)
-		link.Read<ColorSet>(colors);
-}
-
-/*!
-	\brief Private function to set the system's GUI colors all at once
-	\param colors The color set to use
-*/
-void
-set_system_colors(const ColorSet &colors)
-{
-	BPrivate::AppServerLink link;
-
-	link.StartMessage(AS_SET_UI_COLORS);
-	link.Attach<ColorSet>(colors);
-	link.Flush();
 }
 
 }	// namespace BPrivate

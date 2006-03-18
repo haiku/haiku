@@ -16,7 +16,6 @@
 #include "WindowLayer.h"
 #include "Workspace.h"
 
-#include <ColorSet.h>
 #include <WindowPrivate.h>
 
 

@@ -1,17 +1,14 @@
-// AGGTextRenderer.cpp
+/*
+ * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <math.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
 
-#include <Bitmap.h>
-#include <ByteOrder.h>
-#include <Entry.h>
-#include <FontManager.h>
-#include <Message.h>
-#include <ServerFont.h>
-#include <UTF8.h>
+#include "AGGTextRenderer.h"
+
+#include "FontManager.h"
+#include "moreUTF8.h"
+#include "ServerFont.h"
 
 #include <agg_basics.h>
 #include <agg_bounding_rect.h>
@@ -19,8 +16,16 @@
 #include <agg_conv_transform.h>
 #include <agg_trans_affine.h>
 
-#include "AGGTextRenderer.h"
-#include "moreUTF8.h"
+#include <Bitmap.h>
+#include <ByteOrder.h>
+#include <Entry.h>
+#include <Message.h>
+#include <UTF8.h>
+
+#include <math.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 
 #define FLIP_Y false
 

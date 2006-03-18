@@ -318,6 +318,22 @@ enum {
 	AS_LAST_CODE
 };
 
+// Cursor types, currently they are all private besides the first two
+enum cursor_which {
+	B_CURSOR_DEFAULT = 1,
+	B_CURSOR_TEXT,
+	B_CURSOR_MOVE,
+	B_CURSOR_DRAG,
+	B_CURSOR_RESIZE,
+	B_CURSOR_RESIZE_NWSE,
+	B_CURSOR_RESIZE_NESW,
+	B_CURSOR_RESIZE_NS,
+	B_CURSOR_RESIZE_EW,
+	B_CURSOR_OTHER,
+	B_CURSOR_APP,
+	B_CURSOR_INVALID
+};
+
 // bitmap allocation types
 enum {
 	kAllocator,

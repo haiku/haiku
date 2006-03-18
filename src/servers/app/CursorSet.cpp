@@ -7,10 +7,11 @@
  */
 
 
+#include "CursorSet.h"
+#include "ServerCursor.h"
+
 #include <AppServerLink.h>
-#include <CursorSet.h>
 #include <PortLink.h>
-#include <ServerCursor.h>
 #include <ServerProtocol.h>
 
 #include <OS.h>

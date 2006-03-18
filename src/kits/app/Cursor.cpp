@@ -18,7 +18,6 @@
 #include <AppDefs.h>
 #include <Cursor.h>
 
-#include <CursorSet.h>
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
 

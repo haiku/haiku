@@ -1,3 +1,13 @@
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
+
 #include "DrawingEngine.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
@@ -5,7 +15,6 @@
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
-#include <ServerBitmap.h>
 #include <ServerProtocol.h>
 #include <TPicture.h>
 

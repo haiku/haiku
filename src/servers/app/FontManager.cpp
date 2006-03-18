@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,10 +10,10 @@
 /**	Manages font families and styles */
 
 
-#include <FontFamily.h>
-#include <FontManager.h>
-#include <ServerConfig.h>
-#include <ServerFont.h>
+#include "FontFamily.h"
+#include "FontManager.h"
+#include "ServerConfig.h"
+#include "ServerFont.h"
 
 #include <Autolock.h>
 #include <Directory.h>

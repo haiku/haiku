@@ -16,17 +16,18 @@
 //----------------------------------------------------------------------------
 // modified to use family and style id as glyph cache lookup
 
-#include <stdio.h>
+
 #include "agg_font_freetype.h"
 #include "agg_bitset_iterator.h"
 #include "agg_renderer_scanline.h"
 
-#include <ServerFont.h>
-#include <FontFamily.h>
+#include "ServerFont.h"
+#include "FontFamily.h"
 
-namespace agg
-{
+#include <stdio.h>
 
+
+namespace agg {
     //------------------------------------------------------------------------------
     //
     // This code implements the AUTODIN II polynomial

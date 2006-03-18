@@ -16,24 +16,9 @@
 	\brief Counterpart to BApplication within the app_server
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <syslog.h>
-
-#include <AppDefs.h>
-#include <Autolock.h>
-#include <List.h>
-#include <ScrollBar.h>
-#include <Shape.h>
-#include <String.h>
-
-#include <ColorSet.h>
-#include <FontPrivate.h>
-#include <MessengerPrivate.h>
-#include <ServerProtocol.h>
-
 #include "AppServer.h"
 #include "BitmapManager.h"
+#include "ColorSet.h"
 #include "CursorManager.h"
 #include "CursorSet.h"
 #include "Desktop.h"
@@ -57,8 +42,23 @@
 #include "SystemPalette.h"
 #include "WindowLayer.h"
 
-//#define DEBUG_SERVERAPP
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <List.h>
+#include <ScrollBar.h>
+#include <Shape.h>
+#include <String.h>
 
+#include <FontPrivate.h>
+#include <MessengerPrivate.h>
+#include <ServerProtocol.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
+
+
+//#define DEBUG_SERVERAPP
 #ifdef DEBUG_SERVERAPP
 #	define STRACE(x) printf x
 #else

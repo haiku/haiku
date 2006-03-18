@@ -18,7 +18,6 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 }
 
 UsePrivateHeaders shared app interface kernel ;
-UsePrivateHeaders [ FDirName servers app ] ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;

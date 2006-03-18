@@ -1,18 +1,20 @@
-// AGGTextRenderer.h
-
+/*
+ * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef AGG_TEXT_RENDERER_H
 #define AGG_TEXT_RENDERER_H
+
+#include "agg_font_freetype.h"
+#include "defines.h"
+
+#include "ServerFont.h"
+#include "Transformable.h"
 
 #include <agg_conv_curve.h>
 #include <agg_conv_contour.h>
 #include <agg_scanline_u.h>
 
-#include "agg_font_freetype.h"
-#include "defines.h"
-
-#include "Transformable.h"
-
-class ServerFont;
 
 class AGGTextRenderer {
  public:
