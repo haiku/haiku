@@ -114,15 +114,13 @@ ScopeView::RenderLaunch(void *data)
 void
 ScopeView::RenderLoop()
 {
-
 	while (!fQuitting) {
-		
 		if (acquire_sem(fRenderSem)!=B_OK)
 			continue;
-			
+
 		fIsRendering = true;
-		
-		int32 frame_size = (fPlayFormat.u.raw_audio.format & 0xf) * fPlayFormat.u.raw_audio.channel_count;
+
+		//int32 frameSize = (fPlayFormat.u.raw_audio.format & 0xf) * fPlayFormat.u.raw_audio.channel_count;
 		int64 totalFrames = fMediaTrack->CountFrames();
 		int16 samples[fPlayFormat.u.raw_audio.buffer_size / (fPlayFormat.u.raw_audio.format & 0xf)];
 		int64 frames = 0;
@@ -130,17 +128,16 @@ ScopeView::RenderLoop()
 		int64 framesIndex = 0;
 		int32 sumCount = 0;
 		fMediaTrack->SeekToFrame(&frames);
-		
+
 		TRACE("begin computing\n");
-		
+
 		int32 previewIndex = 0;
-		
+
 		while (fMediaTrack->ReadFrames(samples, &frames) == B_OK) {
 			//TRACE("reading block\n");
 			framesIndex = 0;
-			
+
 			while (framesIndex < frames) {
-				
 				for (; framesIndex < frames && sumCount < totalFrames/20000; framesIndex++, sumCount++) {
 					sum += samples[2*framesIndex];
 					sum += samples[2*framesIndex+1];
