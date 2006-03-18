@@ -3468,10 +3468,33 @@ delete_area(area_id area)
 
 
 status_t
-_user_init_heap_address_range(addr_t base, addr_t size)
+_user_reserve_heap_address_range(addr_t* userAddress, uint32 addressSpec, addr_t size)
 {
-	return vm_reserve_address_range(vm_current_user_address_space_id(), (void **)&base,
-		B_EXACT_ADDRESS, size, RESERVED_AVOID_BASE);
+	// filter out some unavailable values (for userland)
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			return B_BAD_VALUE;
+	}
+
+	addr_t address;
+
+	if (!IS_USER_ADDRESS(userAddress)
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status_t status = vm_reserve_address_range(vm_current_user_address_space_id(),
+		(void **)&address, addressSpec, size, RESERVED_AVOID_BASE);
+	if (status < B_OK)
+		return status;
+
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
+		vm_unreserve_address_range(vm_current_user_address_space_id(),
+			(void *)address, size);
+		return B_BAD_ADDRESS;
+	}
+
+	return B_OK;
 }
 
 

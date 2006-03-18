@@ -83,7 +83,8 @@ __init_heap(void)
 	// for it. They may get reclaimed by other areas, though, but the maximum
 	// size of the heap is guaranteed until the space is really needed.
 	sHeapBase = (void *)0x18000000;
-	status_t status = _kern_init_heap_address_range((addr_t)sHeapBase, 0x48000000);
+	status_t status = _kern_reserve_heap_address_range((addr_t *)&sHeapBase,
+		B_EXACT_ADDRESS, 0x48000000);
 
 	sHeapArea = create_area("heap", (void **)&sHeapBase, 
 		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
