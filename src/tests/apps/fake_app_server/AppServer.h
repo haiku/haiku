@@ -13,7 +13,7 @@
 #include <Application.h>
 #include <Window.h>
 #include <String.h>
-#include "Decorator.h"
+
 #include "ServerConfig.h"
 
 class Layer;
@@ -58,18 +58,8 @@ private:
 	void LaunchCursorThread();
 	void LaunchInputServer();
 
-	friend	Decorator*	new_decorator(BRect rect, const char *title,
-				int32 wlook, int32 wfeel, int32 wflags, DisplayDriver *ddriver);
-
-	// global function pointer
-	create_decorator	*make_decorator;
-	
 	port_id	fMessagePort;
 	port_id	fServerInputPort;
-	
-	image_id fDecoratorID;
-	
-	BString fDecoratorName;
 	
 	volatile bool fQuittingServer;
 	
@@ -92,11 +82,7 @@ private:
 	DisplayDriver *fDriver;
 };
 
-Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
-	int32 wflags, DisplayDriver *ddriver);
-
 extern BitmapManager *bitmapmanager;
-extern ColorSet gui_colorset;
 extern AppServer *app_server;
 extern port_id gAppServerPort;
 

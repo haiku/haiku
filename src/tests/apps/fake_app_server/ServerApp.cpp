@@ -14,23 +14,13 @@
 #include <AppDefs.h>
 #include <List.h>
 #include <String.h>
-#include <ColorSet.h>
-#include <RGBColor.h>
 #include <stdio.h>
 #include <string.h>
-#include <ScrollBar.h>
-#include <Shape.h>
 #include <ServerProtocol.h>
 
 #include "AppServer.h"
-#include "BitmapManager.h"
-#include "BGet++.h"
 
 #include "ServerApp.h"
-#include "ServerCursor.h"
-#include "ServerBitmap.h"
-#include "ServerConfig.h"
-#include "SystemPalette.h"
 
 //#define DEBUG_SERVERAPP
 
@@ -67,15 +57,9 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	fMonitorThreadID(-1),
 	fClientTeamID(clientTeamID),
 	fLink(fClientAppPort, fMessagePort),
-	fSWindowList(new BList()),
-	fBitmapList(new BList()),
-	fPictureList(new BList()),
-	fAppCursor(NULL),
 	fLockSem(create_sem(1, "ServerApp sem")),
 	fCursorHidden(false),
 	fIsActive(false),
-	//fHandlerToken(handlerID),
-	fSharedMem(new AreaPool),
 	fQuitting(false)
 {
 	if (fSignature == "")
@@ -95,9 +79,6 @@ ServerApp::~ServerApp(void)
 	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
 	
 	fQuitting = true;
-	
-	delete fBitmapList;
-	delete fPictureList;
 
 	// This shouldn't be necessary -- all cursors owned by the app
 	// should be cleaned up by RemoveAppCursors	
@@ -116,8 +97,6 @@ ServerApp::~ServerApp(void)
 	
 	status_t dummyStatus;
 	wait_for_thread(fMonitorThreadID, &dummyStatus);
-	
-	delete fSharedMem;
 	
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", fSignature.String()));
 }
@@ -206,14 +185,6 @@ void
 ServerApp::Activate(bool value)
 {
 	fIsActive = value;
-	SetAppCursor();
-}
-
-
-//! Sets the cursor to the application cursor, if any.
-void
-ServerApp::SetAppCursor(void)
-{
 }
 
 
@@ -300,74 +271,6 @@ void
 ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 {
 	switch (code) {
-		case AS_ACQUIRE_SERVERMEM:
-		{
-			// This particular call is more than a bit of a pain in the neck. We are given a
-			// size of a chunk of memory needed. We need to (1) allocate it, (2) get the area for
-			// this particular chunk, (3) find the offset in the area for this chunk, and (4)
-			// tell the client about it. Good thing this particular call isn't used much
-			
-			// Received from a ServerMemIO object requesting operating memory
-			// Attached Data:
-			// 1) size_t requested size
-			// 2) port_id reply_port
-
-			size_t memsize;
-			link.Read<size_t>(&memsize);
-
-			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
-
-			void *sharedmem = fSharedMem->GetBuffer(memsize);
-
-			if (memsize < 1 || sharedmem == NULL) {
-				fLink.StartMessage(SERVER_FALSE);
-				fLink.Flush();
-				break;
-			}
-			
-			area_id owningArea = area_for(sharedmem);
-			area_info info;
-
-			if (owningArea == B_ERROR || get_area_info(owningArea, &info) < B_OK) {
-				fLink.StartMessage(SERVER_FALSE);
-				fLink.Flush();
-				break;
-			}
-
-			int32 areaoffset = (addr_t)sharedmem - (addr_t)info.address;
-			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
-
-			fLink.StartMessage(SERVER_TRUE);
-			fLink.Attach<area_id>(owningArea);
-			fLink.Attach<int32>(areaoffset);
-			fLink.Flush();
-			break;
-		}
-		case AS_RELEASE_SERVERMEM:
-		{
-			// Received when a ServerMemIO object on destruction
-			// Attached Data:
-			// 1) area_id owning area
-			// 2) int32 area offset
-			
-			area_id owningArea;
-			int32 areaoffset;
-				
-			link.Read<area_id>(&owningArea);
-			link.Read<int32>(&areaoffset);
-			
-			area_info areaInfo;
-			if (owningArea < 0 || get_area_info(owningArea, &areaInfo) != B_OK)
-				break;
-			
-			STRACE(("Successfully freed shared memory\n"));
-			void *sharedmem = ((int32*)areaInfo.address) + areaoffset;
-			
-			fSharedMem->ReleaseBuffer(sharedmem);
-			
-			break;
-		}
-
 		case AS_CURRENT_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
@@ -416,46 +319,6 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 }
 
 
-int32
-ServerApp::CountBitmaps() const
-{
-	return fBitmapList ? fBitmapList->CountItems() : 0;
-}
-
-
-/*!
-	\brief Looks up a ServerApp's ServerBitmap in its list
-	\param token ID token of the bitmap to find
-	\return The bitmap having that ID or NULL if not found
-*/
-ServerBitmap *
-ServerApp::FindBitmap(int32 token) const
-{
-	ServerBitmap *bitmap;
-	for (int32 i = 0; i < fBitmapList->CountItems(); i++) {
-		bitmap = static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
-		if (bitmap && bitmap->Token() == token)
-			return bitmap;
-	}
-	
-	return NULL;
-}
-
-
-int32
-ServerApp::CountPictures() const
-{
-	return fPictureList ? fPictureList->CountItems() : 0;
-}
-
-
-ServerPicture *
-ServerApp::FindPicture(int32 token) const
-{
-	return NULL;
-}
-
-	
 team_id
 ServerApp::ClientTeamID() const
 {

@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src tests apps fake_app_server ;
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app interface shared [ FDirName servers app ] ;
+UsePrivateHeaders app interface shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
@@ -11,6 +12,5 @@ UseFreeTypeHeaders ;
 Server fake_app_server :
 	AppServer.cpp
 	ServerApp.cpp
-	BGet++.cpp
-	: libroot.so libbe.so
+	: be
 	;

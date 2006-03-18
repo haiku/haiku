@@ -32,13 +32,9 @@
 #include <String.h>
 #include <PortLink.h>
 
-class AreaPool;
 class BMessage;
 class BList;
 class DisplayDriver;
-class ServerPicture;
-class ServerCursor;
-class ServerBitmap;
 
 namespace BPrivate {
 	class PortLink;
@@ -55,16 +51,7 @@ public:
 	virtual	~ServerApp(void);
 	
 	bool Run(void);
-	/*
-	TODO: These aren't even implemented...
-	void Lock(void);
-	void Unlock(void);
-	bool IsLocked(void);
-	*/
-	/*!
-		\brief Determines whether the application is the active one
-		\return true if active, false if not.
-	*/
+
 	bool IsActive(void) const { return fIsActive; }
 	void Activate(bool value);
 	
@@ -72,21 +59,11 @@ public:
 	
 	void PostMessage(int32 code);
 	void SendMessageToClient( const BMessage* msg ) const;
-	
-	void SetAppCursor(void);
-	
+
 	team_id	ClientTeamID() const;
 	thread_id MonitorThreadID() const;
 	
 	const char *Title() const { return fSignature.String(); }
-	
-	int32 CountBitmaps() const;
-	ServerBitmap *FindBitmap(int32 token) const;
-	
-	int32 CountPictures() const;
-	ServerPicture *FindPicture(int32 token) const;
-
-	AreaPool *AppAreaPool() { return fSharedMem; }
 	
 private:
 	void DispatchMessage(int32 code, BPrivate::LinkReceiver &link);
@@ -113,12 +90,8 @@ private:
 	// TODO:
 	// - Are really Bitmaps and Pictures stored per application and not globally ?
 	// - As we reference these stuff by token, what about putting them in hash tables ?
-	BList *fSWindowList,
-		  *fBitmapList,
-		  *fPictureList;
-		  
-	ServerCursor *fAppCursor;
-	
+	BList *fSWindowList;
+
 	// TODO: Not used.
 	sem_id fLockSem;
 	
@@ -129,8 +102,6 @@ private:
 	// Used for BMessage target specification
 	// TODO: Is it still needed ? We aren't using it.
 	//int32 fHandlerToken;
-	
-	AreaPool *fSharedMem;
 	
 	bool fQuitting;
 };

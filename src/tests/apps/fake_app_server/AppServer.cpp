@@ -24,6 +24,10 @@
 //	Description:	main manager object for the app_server
 //  
 //------------------------------------------------------------------------------
+#include "AppServer.h"
+#include "ServerApp.h"
+#include "ServerProtocol.h"
+
 #include <Accelerant.h>
 #include <AppDefs.h>
 #include <Directory.h>
@@ -34,29 +38,19 @@
 #include <PortLink.h>
 #include <StopWatch.h>
 
-#include "BitmapManager.h"
-#include "ColorSet.h"
-#include "RegistrarDefs.h"
-#include "RGBColor.h"
-#include "ServerApp.h"
-#include "ServerCursor.h"
-#include "ServerProtocol.h"
-#include "SystemPalette.h"
-
-#include "AppServer.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 //#define DEBUG_KEYHANDLING
 //#define DEBUG_SERVER
 
 #ifdef DEBUG_KEYHANDLING
-#	include <stdio.h>
 #	define KBTRACE(x) printf x
 #else
 #	define KBTRACE(x) ;
 #endif
 
 #ifdef DEBUG_SERVER
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
@@ -92,7 +86,6 @@ AppServer::AppServer(void)
 
 	fAppList = new BList();
 	fQuittingServer = false;
-	make_decorator = NULL;
 
 	// We need this in order for new_decorator to be able to instantiate new decorators
 	sAppServer = this;
@@ -103,19 +96,10 @@ AppServer::AppServer(void)
 	// This locker is for app_server and Picasso to vy for control of the ServerApp list
 	fAppListLock = create_sem(1,"app_server_applist_sem");
 
-	// This locker is to mediate access to the make_decorator pointer
-	fDecoratorLock = create_sem(1,"app_server_decor_sem");
-
 	// Spawn our thread-monitoring thread
 	fPicassoThreadID = spawn_thread(PicassoThread, "picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
 		resume_thread(fPicassoThreadID);
-
-	fDecoratorName ="Default";
-
-#if 0
-	LaunchCursorThread();
-#endif
 }
 
 /*!
@@ -124,38 +108,10 @@ AppServer::AppServer(void)
 	Reached only when the server is asked to shut down in Test mode. Kills all apps, shuts down the 
 	desktop, kills the housekeeping threads, etc.
 */
-AppServer::~AppServer(void)
+AppServer::~AppServer()
 {
-	debugger("We shouldn't be here! MainLoop()::B_QUIT_REQUESTED should see if we can exit the server.\n");
-/*
-	ServerApp *tempapp;
-	int32 i;
-	acquire_sem(fAppListLock);
-	for(i=0;i<fAppList->CountItems();i++)
-	{
-		tempapp=(ServerApp *)fAppList->ItemAt(i);
-		if(tempapp!=NULL)
-			delete tempapp;
-	}
-	delete fAppList;
-	release_sem(fAppListLock);
-
-	delete bitmapmanager;
-
-	delete gDesktop;
-
-	// If these threads are still running, kill them - after this, if exit_poller
-	// is deleted, who knows what will happen... These things will just return an
-	// error and fail if the threads have already exited.
-	kill_thread(fPicassoThreadID);
-	kill_thread(fCursorThreadID);
-	kill_thread(fISThreadID);
-
-	delete fontserver;
-	
-	make_decorator=NULL;
-*/
 }
+
 
 /*!
 	\brief Thread function for watching for dead apps
@@ -244,92 +200,6 @@ AppServer::MainLoop(void)
 			}
 		}
 	}
-}
-
-/*!
-	\brief Loads the specified decorator and sets the system's decorator to it.
-	\param path Path to the decorator to load
-	\return True if successful, false if not.
-	
-	If the server cannot load the specified decorator, nothing changes. Passing a 
-	NULL string to this function sets the decorator	to the internal one.
-*/
-bool
-AppServer::LoadDecorator(const char *path)
-{
-	// Loads a window decorator based on the supplied path and forces a decorator update.
-	// If it cannot load the specified decorator, it will retain the current one and
-	// return false. Note that passing a NULL string to this function sets the decorator
-	// to the internal one.
-
-	// passing the string "Default" will set the window decorator to the app_server's
-	// internal one
-	if(!path)
-	{
-		make_decorator= NULL;
-		return true;
-	}
-	
-	create_decorator	*pcreatefunc= NULL;
-	status_t			stat;
-	image_id			addon;
-	
-	addon = load_add_on(path);
-	if (addon < B_OK)
-		return false;
-
-	// As of now, we do nothing with decorator versions, but the possibility exists
-	// that the API will change even though I cannot forsee any reason to do so. If
-	// we *did* do anything with decorator versions, the assignment to a global would
-	// go here.
-
-	// Get the instantiation function
-	stat = get_image_symbol(addon, "instantiate_decorator",
-		B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
-	if (stat != B_OK) {
-		unload_add_on(addon);
-		return false;
-	}
-	
-	BPath temppath(path);
-	fDecoratorName=temppath.Leaf();
-	
-	acquire_sem(fDecoratorLock);
-	make_decorator=pcreatefunc;
-	fDecoratorID=addon;
-	release_sem(fDecoratorLock);
-	return true;
-}
-
-//! Loads decorator settings on disk or the default if settings are invalid
-void
-AppServer::InitDecorators(void)
-{
-	BMessage settings;
-
-	BDirectory dir;
-	if (dir.SetTo(SERVER_SETTINGS_DIR) == B_ENTRY_NOT_FOUND)
-		create_directory(SERVER_SETTINGS_DIR, 0777);
-
-	BString path(SERVER_SETTINGS_DIR);
-	path += "DecoratorSettings";
-	BFile file(path.String(), B_READ_ONLY);
-
-	if (file.InitCheck() == B_OK
-		&& settings.Unflatten(&file) == B_OK) {
-		BString itemtext;
-		if (settings.FindString("decorator", &itemtext) == B_OK) {
-			path.SetTo(DECORATORS_DIR);
-			path += itemtext;
-			if (LoadDecorator(path.String()))
-				return;
-		}
-	}
-
-	// We got this far, so something must have gone wrong. We set make_decorator
-	// to NULL so that the decorator allocation routine knows to utilize the included
-	// default decorator instead of an addon.
-	make_decorator = NULL;
 }
 
 /*!
@@ -533,7 +403,6 @@ main(int argc, char** argv)
 	if (find_port(SERVER_PORT_NAME) >= B_OK)
 		return -1;
 
-	srand(real_time_clock_usecs());
 	AppServer app_server;
 	app_server.Run();
 	return 0;
