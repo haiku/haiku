@@ -1331,7 +1331,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		message->Flatten(buffer, bufferSize);
 	
 		fOwner->fLink->StartMessage(AS_LAYER_DRAG_IMAGE);
-		fOwner->fLink->Attach<int32>(image->get_server_token());
+		fOwner->fLink->Attach<int32>(image->_ServerToken());
 		fOwner->fLink->Attach<int32>((int32)dragMode);
 		fOwner->fLink->Attach<BPoint>(offset);
 		fOwner->fLink->Attach<int32>(bufferSize);
@@ -2235,7 +2235,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 		check_lock();
 
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
-		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
+		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
 		fOwner->fLink->Attach<BRect>(dstRect);
 		fOwner->fLink->Attach<BRect>(srcRect);
 
@@ -2268,7 +2268,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
 		check_lock();
 
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
-		fOwner->fLink->Attach<int32>(bitmap->get_server_token());
+		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
 		BRect src = bitmap->Bounds();
 		BRect dst = src.OffsetToCopy(where);
 		fOwner->fLink->Attach<BRect>(dst);
@@ -4320,7 +4320,7 @@ BView::_SetViewBitmap(const BBitmap* bitmap, BRect srcRect,
 	if (!do_owner_check())
 		return B_ERROR;
 
-	int32 serverToken = bitmap ? bitmap->get_server_token() : -1;
+	int32 serverToken = bitmap ? bitmap->_ServerToken() : -1;
 
 	fOwner->fLink->StartMessage(AS_LAYER_SET_VIEW_BITMAP);
 	fOwner->fLink->Attach<int32>(serverToken);

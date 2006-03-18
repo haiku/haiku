@@ -18,8 +18,8 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 }
 
 UsePrivateHeaders shared app interface ;
-UsePrivateHeaders [ FDirName kernel util ] ;   # For KMessage.h
 UsePrivateHeaders [ FDirName servers app ] ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
@@ -56,6 +56,7 @@ MergeObject <libbe>app_kit.o :
 	Server.cpp
 	ServerLink.cpp
 	ServerMemIO.cpp
+	ServerMemoryAllocator.cpp
 	TokenSpace.cpp
 	TypeConstants.cpp 
 ;

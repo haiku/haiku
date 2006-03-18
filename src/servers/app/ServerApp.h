@@ -13,13 +13,15 @@
 #define SERVER_APP_H
 
 
+#include "ClientMemoryAllocator.h"
 #include "MessageLooper.h"
 #include "BGet++.h"
 
-#include <String.h>
-
 #include <ObjectList.h>
 #include <TokenSpace.h>
+
+#include <Messenger.h>
+#include <String.h>
 
 
 class AreaPool;
@@ -66,6 +68,7 @@ class ServerApp : public MessageLooper {
 
 			team_id				ClientTeam() const;
 			const char*			Signature() const { return fSignature.String(); }
+			const char*			SignatureLeaf() const { return fSignature.String() + 12; }
 
 			void				RemoveWindow(ServerWindow* window);
 			bool				InWorkspace(int32 index) const;
@@ -132,6 +135,7 @@ class ServerApp : public MessageLooper {
 			bool				fIsActive;
 
 			AreaPool			fSharedMem;
+			ClientMemoryAllocator fMemoryAllocator;
 };
 
 #endif	// SERVER_APP_H

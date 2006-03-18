@@ -318,4 +318,12 @@ enum {
 	AS_LAST_CODE
 };
 
+// bitmap allocation types
+enum {
+	kAllocator,
+	kNewAllocatorArea,
+	kArea,
+	kHeap
+};
+
 #endif	// APP_SERVER_PROTOCOL_H

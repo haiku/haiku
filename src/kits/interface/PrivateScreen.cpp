@@ -338,7 +338,7 @@ BPrivateScreen::ReadBitmap(BBitmap *bitmap, bool drawCursor, BRect *bounds)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_READ_BITMAP);
-	link.Attach<int32>(bitmap->get_server_token());
+	link.Attach<int32>(bitmap->_ServerToken());
 	link.Attach<bool>(drawCursor);
 	link.Attach<BRect>(rect);
 

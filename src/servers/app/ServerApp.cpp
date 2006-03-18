@@ -94,13 +94,14 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
-	fSharedMem("shared memory", 32768)
+	fSharedMem("shared memory", 32768),
+	fMemoryAllocator(this)
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
 
 	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "a<%s", Signature());
+	snprintf(name, sizeof(name), "a<%ld:%s", clientTeam, SignatureLeaf());
 
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
@@ -329,12 +330,7 @@ ServerApp::CurrentCursor() const
 void
 ServerApp::_GetLooperName(char* name, size_t length)
 {
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-	strlcpy(name, Signature(), length);
-#else
-	strncpy(name, Signature(), length);
-	name[length - 1] = '\0';
-#endif
+	snprintf(name, length, "a:%ld:%s", ClientTeam(), SignatureLeaf());
 }
 
 
@@ -729,6 +725,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			
 			// First, let's attempt to allocate the bitmap
 			ServerBitmap *bitmap = NULL;
+			int8 allocationType = kAllocator;
+
 			BRect frame;
 			color_space colorSpace;
 			int32 flags, bytesPerRow;
@@ -739,8 +737,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&flags);
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
-				bitmap = gBitmapManager->CreateBitmap(frame, colorSpace, flags,
-													  bytesPerRow, screenID);
+				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator, frame,
+					colorSpace, flags, bytesPerRow, screenID, &allocationType);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
@@ -749,8 +747,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (bitmap != NULL && fBitmapList.AddItem(bitmap)) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
-				fLink.Attach<area_id>(bitmap->Area());
-				fLink.Attach<int32>(bitmap->AreaOffset());
+				fLink.Attach<int8>(allocationType);
+
+				if (allocationType == kArea) {
+					// TODO: implement me!
+				} else {
+					fLink.Attach<area_id>(fMemoryAllocator.Area(bitmap->AllocationCookie()));
+					fLink.Attach<int32>(fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
+				}
 			} else
 				fLink.StartMessage(B_NO_MEMORY);
 

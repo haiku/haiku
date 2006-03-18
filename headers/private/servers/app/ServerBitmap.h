@@ -5,8 +5,8 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  */
-#ifndef _SERVER_BITMAP_H_
-#define _SERVER_BITMAP_H_
+#ifndef SERVER_BITMAP_H
+#define SERVER_BITMAP_H
 
 
 #include <GraphicsDefs.h>
@@ -15,6 +15,7 @@
 
 
 class BitmapManager;
+class ClientMemoryAllocator;
 
 /*!
 	\class ServerBitmap ServerBitmap.h
@@ -30,11 +31,6 @@ class ServerBitmap {
 								{ return fInitialized; }
 
 			void			Acquire();
-
-	inline	area_id			Area() const
-								{ return fArea; }
-	inline	int32			AreaOffset() const
-								{ return fOffset; }
 
 	inline	uint8*			Bits() const
 								{ return fBuffer; }
@@ -58,6 +54,12 @@ class ServerBitmap {
 	//! Returns the identifier token for the bitmap
 	inline	int32			Token() const
 								{ return fToken; }
+
+	inline	void*			AllocationCookie() const
+								{ return fAllocationCookie; }
+
+			area_id			Area() const;
+			uint32			AreaOffset() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -84,23 +86,19 @@ protected:
 	virtual					~ServerBitmap();
 
 	//! used by the BitmapManager
-	inline	void			_SetArea(area_id ID)
-								{ fArea = ID; }
-
-	//! used by the BitmapManager
-	inline	void			_SetBuffer(void *ptr)
-								{ fBuffer = (uint8*)ptr; }
+//	inline	void			_SetBuffer(void *ptr)
+//								{ fBuffer = (uint8*)ptr; }
 
 			bool			_Release();
 
 			void			_AllocateBuffer();
-			void			_FreeBuffer();
 
 			void			_HandleSpace(color_space space,
 										 int32 bytesperline = -1);
 
 			bool			fInitialized;
-			area_id			fArea;
+			ClientMemoryAllocator* fAllocator;
+			void*			fAllocationCookie;
 			uint8*			fBuffer;
 			int32			fReferenceCount;
 
@@ -111,7 +109,6 @@ protected:
 			int32			fFlags;
 			int				fBitsPerPixel;
 			int32			fToken;
-			int32			fOffset;
 };
 
 class UtilityBitmap : public ServerBitmap {
@@ -140,7 +137,6 @@ ServerBitmap::ShallowCopy(const ServerBitmap* from)
 		return;
 
 	fInitialized	= from->fInitialized;
-	fArea			= from->fArea;
 	fBuffer			= from->fBuffer;
 	fWidth			= from->fWidth;
 	fHeight			= from->fHeight;
@@ -149,8 +145,6 @@ ServerBitmap::ShallowCopy(const ServerBitmap* from)
 	fFlags			= from->fFlags;
 	fBitsPerPixel	= from->fBitsPerPixel;
 	fToken			= from->fToken;
-	fOffset			= from->fOffset;
 }
 
-
-#endif // _SERVER_BITMAP_H_
+#endif	// SERVER_BITMAP_H

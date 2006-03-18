@@ -1,22 +1,20 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold (bonefish@users.sf.net)
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/** BBitmap objects represent off-screen windows that
- *	contain bitmap data.
- */
+/*!
+	BBitmap objects represent off-screen windows that
+	contain bitmap data.
+*/
 
-#include <algorithm>
-#include <limits.h>
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
+#include "ColorConversion.h"
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -25,11 +23,16 @@
 #include <View.h>
 #include <Window.h>
 
-#include "ColorConversion.h"
-
-// Includes to be able to talk to the app_server
-#include <ServerProtocol.h>
+#include <ApplicationPrivate.h>
 #include <AppServerLink.h>
+#include <ServerMemoryAllocator.h>
+#include <ServerProtocol.h>
+
+#include <algorithm>
+#include <limits.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 // get_raw_bytes_per_row
@@ -112,7 +115,9 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 }
 
 
-// constructor
+//	#pragma mark -
+
+
 /*!	\brief Creates and initializes a BBitmap.
 	\param bounds The bitmap dimensions.
 	\param flags Creation flags.
@@ -124,7 +129,7 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 */
 BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 				 int32 bytesPerRow, screen_id screenID)
-	: fBasePtr(NULL),
+	: fBasePointer(NULL),
 	  fSize(0),
 	  fColorSpace(B_NO_COLOR_SPACE),
 	  fBounds(0, 0, -1, -1),
@@ -133,11 +138,11 @@ BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 	  fServerToken(-1),
 	  fAreaOffset(-1),
 	  fArea(-1),
-	  fOrigArea(-1),
+	  fServerArea(-1),
 	  fFlags(0),
 	  fInitError(B_NO_INIT)
 {
-	InitObject(bounds, colorSpace, flags, bytesPerRow, screenID);
+	_InitObject(bounds, colorSpace, flags, bytesPerRow, screenID);
 }
 
 // constructor
@@ -152,7 +157,7 @@ BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 */
 BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 				 bool needsContiguous)
-	: fBasePtr(NULL),
+	: fBasePointer(NULL),
 	  fSize(0),
 	  fColorSpace(B_NO_COLOR_SPACE),
 	  fBounds(0, 0, -1, -1),
@@ -161,13 +166,13 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 	  fServerToken(-1),
 	  fAreaOffset(-1),
 	  fArea(-1),
-	  fOrigArea(-1),
+	  fServerArea(-1),
 	  fFlags(0),
 	  fInitError(B_NO_INIT)
 {
 	int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
 				| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
-	InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
+	_InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
 			   B_MAIN_SCREEN_ID);
 
 }
@@ -183,7 +188,7 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 */
 BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 				 bool needsContiguous)
-	: fBasePtr(NULL),
+	: fBasePointer(NULL),
 	  fSize(0),
 	  fColorSpace(B_NO_COLOR_SPACE),
 	  fBounds(0, 0, -1, -1),
@@ -192,14 +197,14 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 	  fServerToken(-1),
 	  fAreaOffset(-1),
 	  fArea(-1),
-	  fOrigArea(-1),
+	  fServerArea(-1),
 	  fFlags(0),
 	  fInitError(B_NO_INIT)
 {
 	if (source && source->IsValid()) {
 		int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
 					| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
-		InitObject(source->Bounds(), source->ColorSpace(), flags,
+		_InitObject(source->Bounds(), source->ColorSpace(), flags,
 				   source->BytesPerRow(), B_MAIN_SCREEN_ID);
 		if (InitCheck() == B_OK)
 			memcpy(Bits(), source->Bits(), BytesPerRow());
@@ -212,7 +217,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 BBitmap::~BBitmap()
 {
 	delete fWindow;
-	CleanUp();
+	_CleanUp();
 }
 
 // unarchiving constructor
@@ -221,7 +226,7 @@ BBitmap::~BBitmap()
 */
 BBitmap::BBitmap(BMessage *data)
 	: BArchivable(data),
-	  fBasePtr(NULL),
+	  fBasePointer(NULL),
 	  fSize(0),
 	  fColorSpace(B_NO_COLOR_SPACE),
 	  fBounds(0, 0, -1, -1),
@@ -230,7 +235,7 @@ BBitmap::BBitmap(BMessage *data)
 	  fServerToken(-1),
 	  fAreaOffset(-1),
 	  fArea(-1),
-	  fOrigArea(-1),
+	  fServerArea(-1),
 	  fFlags(0),
 	  fInitError(B_NO_INIT)
 {
@@ -246,14 +251,14 @@ BBitmap::BBitmap(BMessage *data)
 	int32 rowBytes = 0;
 	data->FindInt32("_rowbytes", &rowBytes);
 
-	InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
+	_InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
 
 	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
-		AssertPtr();
+		_AssertPointer();
 		ssize_t size = 0;
 		const void *buffer;
 		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
-			memcpy(fBasePtr, buffer, size);
+			memcpy(fBasePointer, buffer, size);
 	}
 
 	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
@@ -311,8 +316,8 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		// true and it does save all formats as B_RAW_TYPE and it does save
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)
-		const_cast<BBitmap *>(this)->AssertPtr();
-		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
+		const_cast<BBitmap *>(this)->_AssertPointer();
+		data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
 	}
 	
 	return B_OK;
@@ -363,7 +368,7 @@ BBitmap::UnlockBits()
 area_id
 BBitmap::Area() const
 {
-	const_cast<BBitmap *>(this)->AssertPtr();
+	const_cast<BBitmap *>(this)->_AssertPointer();
 	return fArea;
 }
 
@@ -374,8 +379,8 @@ BBitmap::Area() const
 void *
 BBitmap::Bits() const
 {
-	const_cast<BBitmap *>(this)->AssertPtr();
-	return fBasePtr;
+	const_cast<BBitmap *>(this)->_AssertPointer();
+	return (void*)fBasePointer;
 }
 
 // BitsLength
@@ -501,7 +506,7 @@ status_t
 BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	color_space colorSpace)
 {
-	AssertPtr();
+	_AssertPointer();
 
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
@@ -513,7 +518,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	if (bpr < 0)
 		bpr = get_bytes_per_row(colorSpace, width);
 
-	return BPrivate::ConvertBits(data, (uint8*)fBasePtr + offset, length,
+	return BPrivate::ConvertBits(data, (uint8*)fBasePointer + offset, length,
 		fSize - offset, bpr, fBytesPerRow, colorSpace, fColorSpace, width,
 		fBounds.IntegerHeight() + 1);
 }
@@ -545,7 +550,7 @@ status_t
 BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
 	color_space colorSpace, BPoint from, BPoint to, int32 width, int32 height)
 {
-	AssertPtr();
+	_AssertPointer();
 
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
@@ -556,7 +561,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr,
 	if (bpr < 0)
 		bpr = get_bytes_per_row(colorSpace, fBounds.IntegerWidth() + 1);
 
-	return BPrivate::ConvertBits(data, fBasePtr, length, fSize, bpr,
+	return BPrivate::ConvertBits(data, fBasePointer, length, fSize, bpr,
 		fBytesPerRow, colorSpace, fColorSpace, from, to, width, height);
 }
 
@@ -783,6 +788,7 @@ BBitmap::operator=(const BBitmap &)
 	return *this;
 }
 
+#if 0
 // get_shared_pointer
 /*!	\brief ???
 */
@@ -791,17 +797,15 @@ BBitmap::get_shared_pointer() const
 {
 	return NULL;	// not implemented
 }
+#endif
 
-// get_server_token
-/*!	\brief ???
-*/
 int32
-BBitmap::get_server_token() const
+BBitmap::_ServerToken() const
 {
 	return fServerToken;
 }
 
-// InitObject
+
 /*!	\brief Initializes the bitmap.
 	\param bounds The bitmap dimensions.
 	\param colorSpace The bitmap's color space.
@@ -812,7 +816,7 @@ BBitmap::get_server_token() const
 	\param screenID ???
 */
 void
-BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
+BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	int32 bytesPerRow, screen_id screenID)
 {
 //printf("BBitmap::InitObject(bounds: BRect(%.1f, %.1f, %.1f, %.1f), format: %ld, flags: %ld, bpr: %ld\n",
@@ -826,7 +830,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	flags |= B_BITMAP_NO_SERVER_LINK;
 #endif	// RUN_WITHOUT_APP_SERVER
 
-	CleanUp();
+	_CleanUp();
 
 	// check params
 	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL)) {
@@ -857,8 +861,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
 
 		if (flags & B_BITMAP_NO_SERVER_LINK) {
-			fBasePtr = malloc(size);
-			if (fBasePtr) {
+			fBasePointer = (uint8*)malloc(size);
+			if (fBasePointer) {
 				fSize = size;
 				fColorSpace = colorSpace;
 				fBounds = bounds;
@@ -883,34 +887,51 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			link.Attach<int32>(bytesPerRow);
 			link.Attach<int32>(screenID.id);
 
-			// Reply Data:
-			//	1) int32 server token
-			//	2) area_id id of the area in which the bitmap data resides
-			//	3) int32 area pointer offset used to calculate fBasePtr
-
-			error = B_ERROR;
 			if (link.FlushWithReply(error) == B_OK && error == B_OK) {
 				// server side success
 				// Get token
 				link.Read<int32>(&fServerToken);
-				link.Read<area_id>(&fOrigArea);
-				link.Read<int32>(&fAreaOffset);
-				
-				if (fOrigArea >= B_OK) {
+
+				int8 allocationType;
+				link.Read<int8>(&allocationType);
+
+				if (allocationType == kArea) {
+					// TODO: implement me (server-side as well), needed for overlays
+					fServerArea = B_ERROR;
+					fAreaOffset = -1;
+						// that signals the cleanup code to delete our area
+					fBasePointer = NULL;
+				} else {
+					link.Read<area_id>(&fServerArea);
+					link.Read<int32>(&fAreaOffset);
+
+					BPrivate::ServerMemoryAllocator* allocator
+						= BApplication::Private::ServerAllocator();
+
+					if (allocationType == kNewAllocatorArea)
+						error = allocator->AddArea(fServerArea, fArea, fBasePointer);
+					else {
+						error = allocator->AreaAndBaseFor(fServerArea, fArea, fBasePointer);
+						if (error == B_OK)
+							fBasePointer += fAreaOffset;
+					}
+				}
+
+				if (fServerArea >= B_OK) {
 					fSize = size;
 					fColorSpace = colorSpace;
 					fBounds = bounds;
 					fBytesPerRow = bytesPerRow;
 					fFlags = flags;
 				} else
-					error = fOrigArea;
+					error = fServerArea;
 			}
 
 			if (error < B_OK) {
-				fBasePtr = NULL;
+				fBasePointer = NULL;
 				fServerToken = -1;
 				fArea = -1;
-				fOrigArea = -1;
+				fServerArea = -1;
 				fAreaOffset = -1;
 				// NOTE: why not "0" in case of error?
 				fFlags = flags;
@@ -940,13 +961,13 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		informs the server to do so as well (if needed).
 */
 void
-BBitmap::CleanUp()
+BBitmap::_CleanUp()
 {
-	if (fBasePtr == NULL)
+	if (fBasePointer == NULL)
 		return;
 
 	if (fFlags & B_BITMAP_NO_SERVER_LINK) {
-		free(fBasePtr);
+		free(fBasePointer);
 	} else {
 		BPrivate::AppServerLink link;
 		// AS_DELETE_BITMAP:
@@ -955,32 +976,31 @@ BBitmap::CleanUp()
 		link.StartMessage(AS_DELETE_BITMAP);
 		link.Attach<int32>(fServerToken);
 		link.Flush();
-		
-		if (fArea >= 0)
+
+		// TODO: we may want to delete parts of the server memory areas here!
+
+		if (fAreaOffset == -1) {
+			// we own that area, so we have to delete it
 			delete_area(fArea);
+		}
+
 		fArea = -1;
 		fServerToken = -1;
 		fAreaOffset = -1;
 	}
-	fBasePtr = NULL;
+	fBasePointer = NULL;
 }
 
 
 void
-BBitmap::AssertPtr()
+BBitmap::_AssertPointer()
 {
-	if (fBasePtr == NULL && fAreaOffset != -1 && InitCheck() == B_OK) {
-		// Offset was saved into "fArea" as we can't add
-		// any member variable due to Binary compatibility
-		// Get the area in which the data resides
-		fArea = clone_area("shared bitmap area", (void **)&fBasePtr, B_ANY_ADDRESS,
-								B_READ_AREA | B_WRITE_AREA, fOrigArea);
-		
-		if (fArea >= B_OK) {
-			// Jump to the location in the area
-			fBasePtr = (int8 *)fBasePtr + fAreaOffset;
-		} else
-			fBasePtr = NULL;
+	if (fBasePointer == NULL && fServerArea >= B_OK && fAreaOffset == -1) {
+		// We lazily clone our own areas - if the bitmap is part of the usual
+		// server memory area, or is a B_BITMAP_NO_SERVER_LINK bitmap, it already
+		// has its data.
+		fArea = clone_area("shared bitmap area", (void **)&fBasePointer, B_ANY_ADDRESS,
+			B_READ_AREA | B_WRITE_AREA, fServerArea);
 	}
 }
 

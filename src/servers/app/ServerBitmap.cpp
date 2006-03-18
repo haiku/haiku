@@ -8,6 +8,7 @@
 
 
 #include "ServerBitmap.h"
+#include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
 
 #include <new>
@@ -31,7 +32,8 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 						   int32 flags, int32 bytesPerRow,
 						   screen_id screen)
 	: fInitialized(false),
-	  fArea(B_ERROR),
+	  fAllocator(NULL),
+	  fAllocationCookie(NULL),
 	  fBuffer(NULL),
 	  fReferenceCount(1),
 	  // WARNING: '1' is added to the width and height.
@@ -53,10 +55,10 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 //! Copy constructor does not copy the buffer.
 ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	: fInitialized(false),
-	  fArea(B_ERROR),
+	  fAllocator(NULL),
+	  fAllocationCookie(NULL),
 	  fBuffer(NULL),
 	  fReferenceCount(1)
-	  // TODO: what about fToken and fOffset ?!?
 {
 	if (bmp) {
 		fInitialized	= bmp->fInitialized;
@@ -77,13 +79,14 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 }
 
 
-/*!
-	\brief Empty. Defined for subclasses.
-*/
 ServerBitmap::~ServerBitmap()
 {
-	// TODO: Maybe it would be wiser to free the buffer here,
-	// instead of do that in every subclass ?
+	if (fAllocator != NULL)
+		fAllocator->Free(AllocationCookie());
+	else if (fAllocationCookie != NULL)
+		delete_area((area_id)fAllocationCookie);
+	else
+		free(fBuffer);
 }
 
 
@@ -119,20 +122,6 @@ ServerBitmap::_AllocateBuffer(void)
 		fBuffer = new(nothrow) uint8[length];
 		fInitialized = fBuffer != NULL;
 	}
-}
-
-
-/*!
-	\brief Internal function used by subclasses
-	
-	Subclasses should call this to free the internal buffer.
-*/
-void
-ServerBitmap::_FreeBuffer()
-{
-	delete[] fBuffer;
-	fBuffer = NULL;
-	fInitialized = false;
 }
 
 
@@ -271,6 +260,29 @@ ServerBitmap::ImportBits(const void *bits, int32 bitsLength, int32 bytesPerRow,
 }
 
 
+area_id
+ServerBitmap::Area() const
+{
+	if (fAllocator != NULL)
+		return fAllocator->Area(AllocationCookie());
+
+	if (fAllocationCookie != NULL)
+		return (area_id)fAllocationCookie;
+
+	return B_ERROR;
+}
+
+
+uint32
+ServerBitmap::AreaOffset() const
+{
+	if (fAllocator != NULL)
+		return fAllocator->AreaOffset(AllocationCookie());
+
+	return 0;
+}
+
+
 void
 ServerBitmap::PrintToStream()
 {
@@ -291,12 +303,13 @@ UtilityBitmap::UtilityBitmap(BRect rect, color_space space,
 }
 
 
-UtilityBitmap::UtilityBitmap(const ServerBitmap* bmp)
-	: ServerBitmap(bmp)
+UtilityBitmap::UtilityBitmap(const ServerBitmap* bitmap)
+	: ServerBitmap(bitmap)
 {
 	_AllocateBuffer();
-	if (bmp->Bits())
-		memcpy(Bits(), bmp->Bits(), bmp->BitsLength());
+
+	if (bitmap->Bits())
+		memcpy(Bits(), bitmap->Bits(), bitmap->BitsLength());
 }
 
 
@@ -313,5 +326,4 @@ UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
 
 UtilityBitmap::~UtilityBitmap()
 {
-	_FreeBuffer();
 }

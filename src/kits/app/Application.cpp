@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@
 #include <MenuWindow.h>
 #include <ObjectLocker.h>
 #include <PortLink.h>
+#include <ServerMemoryAllocator.h>
 #include <ServerProtocol.h>
 
 using namespace BPrivate;
@@ -162,14 +163,14 @@ static void fill_argv_message(BMessage &message);
 BApplication::BApplication(const char *signature)
 	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, true, NULL);
+	_InitData(signature, true, NULL);
 }
 
 
 BApplication::BApplication(const char *signature, status_t *_error)
 	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, true, _error);
+	_InitData(signature, true, _error);
 }
 
 
@@ -177,7 +178,7 @@ BApplication::BApplication(const char *signature, bool initGUI,
 		status_t *_error)
 	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, initGUI, _error);
+	_InitData(signature, initGUI, _error);
 }
 
 
@@ -189,7 +190,7 @@ BApplication::BApplication(BMessage *data)
 	const char *signature = NULL;	
 	data->FindString("mime_sig", &signature);
 
-	InitData(signature, true, NULL);
+	_InitData(signature, true, NULL);
 
 	bigtime_t pulseRate;
 	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
@@ -213,7 +214,7 @@ BApplication::~BApplication()
 	Lock();
 
 	// tell all loopers(usually windows) to quit. Also, wait for them.
-	quit_all_windows(true);
+	_QuitAllWindows(true);
 
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
@@ -242,7 +243,7 @@ BApplication::operator=(const BApplication &rhs)
 
 
 void
-BApplication::InitData(const char *signature, bool initGUI, status_t *_error)
+BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 {
 	DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
@@ -250,9 +251,9 @@ BApplication::InitData(const char *signature, bool initGUI, status_t *_error)
 		debugger("2 BApplication objects were created. Only one is allowed.");
 
 	fServerLink = new BPrivate::PortLink(-1, -1);
-	fServerHeap = NULL;
+	fServerAllocator = NULL;
 	fInitialWorkspace = 0;
-	fDraggedMessage = NULL;
+	//fDraggedMessage = NULL;
 	fReadyToRunCalled = false;
 
 	// initially, there is no pulse
@@ -536,7 +537,7 @@ BApplication::Quit()
 bool
 BApplication::QuitRequested()
 {
-	return quit_all_windows(false);
+	return _QuitAllWindows(false);
 }
 
 
@@ -693,7 +694,7 @@ BApplication::SetCursor(const BCursor *cursor, bool sync)
 int32
 BApplication::CountWindows() const
 {
-	return count_windows(false);
+	return _CountWindows(false);
 		// we're ignoring menu windows
 }
 
@@ -701,7 +702,7 @@ BApplication::CountWindows() const
 BWindow *
 BApplication::WindowAt(int32 index) const
 {
-	return window_at(index, false);
+	return _WindowAt(index, false);
 		// we're ignoring menu windows
 }
 
@@ -794,7 +795,7 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 
 	switch (message->what) {
 		case B_ARGV_RECEIVED:
-			do_argv(message);
+			_ArgvReceived(message);
 			break;
 
 		case B_REFS_RECEIVED:
@@ -974,37 +975,13 @@ BApplication::EndRectTracking()
 
 
 status_t
-BApplication::setup_server_heaps()
+BApplication::_SetupServerAllocator()
 {
-	// TODO: implement?
+	fServerAllocator = new (std::nothrow) BPrivate::ServerMemoryAllocator();
+	if (fServerAllocator == NULL)
+		return B_NO_MEMORY;
 
-	// We may not need to implement this function or the XX_offs_to_ptr functions.
-	// R5 sets up a couple of areas for various tasks having to do with the
-	// app_server. Currently (7/29/04), the R1 app_server does not do this and
-	// may never do this unless a significant need is found for it. --DW
-
-	return B_OK;
-}
-
-
-void *
-BApplication::rw_offs_to_ptr(uint32 offset)
-{
-	return NULL;	// TODO: implement
-}
-
-
-void *
-BApplication::ro_offs_to_ptr(uint32 offset)
-{
-	return NULL;	// TODO: implement
-}
-
-
-void *
-BApplication::global_ro_offs_to_ptr(uint32 offset)
-{
-	return NULL;	// TODO: implement
+	return fServerAllocator->InitCheck();
 }
 
 
@@ -1012,11 +989,11 @@ status_t
 BApplication::_InitGUIContext()
 {
 	// An app_server connection is necessary for a lot of stuff, so get that first.
-	status_t error = connect_to_app_server();
+	status_t error = _ConnectToServer();
 	if (error != B_OK)
 		return error;
 
-	error = setup_server_heaps();
+	error = _SetupServerAllocator();
 	if (error != B_OK)
 		return error;
 
@@ -1030,6 +1007,7 @@ BApplication::_InitGUIContext()
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
 	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
 	
+	// TODO: would be nice to get the workspace at launch time from the registrar
 	fInitialWorkspace = current_workspace();
 
 	return B_OK;
@@ -1037,7 +1015,7 @@ BApplication::_InitGUIContext()
 
 
 status_t
-BApplication::connect_to_app_server()
+BApplication::_ConnectToServer()
 {
 	port_id serverPort = find_port(SERVER_PORT_NAME);
 	if (serverPort < B_OK)
@@ -1096,7 +1074,7 @@ BApplication::connect_to_app_server()
 	return B_OK;
 }
 
-
+#if 0
 void
 BApplication::send_drag(BMessage *message, int32 vs_token, BPoint offset,
 	BRect dragRect, BHandler *replyTo)
@@ -1118,10 +1096,10 @@ BApplication::write_drag(_BSession_ *session, BMessage *message)
 {
 	// TODO: implement
 }
-
+#endif
 
 bool
-BApplication::window_quit_loop(bool quitFilePanels, bool force)
+BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 {
 	BList looperList;
 	{
@@ -1173,7 +1151,7 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 
 
 bool
-BApplication::quit_all_windows(bool force)
+BApplication::_QuitAllWindows(bool force)
 {
 	AssertLocked();
 
@@ -1181,9 +1159,9 @@ BApplication::quit_all_windows(bool force)
 	// allowed to lock the application - which would cause a deadlock
 	Unlock();
 
-	bool quit = window_quit_loop(false, force);
+	bool quit = _WindowQuitLoop(false, force);
 	if (!quit)
-		quit = window_quit_loop(true, force);
+		quit = _WindowQuitLoop(true, force);
 
 	Lock();
 
@@ -1192,12 +1170,8 @@ BApplication::quit_all_windows(bool force)
 
 
 void
-BApplication::do_argv(BMessage *message)
+BApplication::_ArgvReceived(BMessage *message)
 {
-	// TODO: Consider renaming this function to something
-	// a bit more descriptive, like "handle_argv_message()",
-	// or "HandleArgvMessage()"
-
 	ASSERT(message != NULL);
 
 	// build the argv vector
@@ -1242,11 +1216,11 @@ BApplication::InitialWorkspace()
 
 
 int32
-BApplication::count_windows(bool includeMenus) const
+BApplication::_CountWindows(bool includeMenus) const
 {
 	int32 count = 0;
 	BList windowList;
-	if (get_window_list(&windowList, includeMenus) == B_OK)
+	if (_GetWindowList(&windowList, includeMenus) == B_OK)
 		count = windowList.CountItems();
 
 	return count;
@@ -1254,11 +1228,11 @@ BApplication::count_windows(bool includeMenus) const
 
 
 BWindow *
-BApplication::window_at(uint32 index, bool includeMenus) const
+BApplication::_WindowAt(uint32 index, bool includeMenus) const
 {
 	BList windowList;
 	BWindow *window = NULL;
-	if (get_window_list(&windowList, includeMenus) == B_OK) {
+	if (_GetWindowList(&windowList, includeMenus) == B_OK) {
 		if ((int32)index < windowList.CountItems())
 			window = static_cast<BWindow *>(windowList.ItemAt(index));
 	}
@@ -1268,7 +1242,7 @@ BApplication::window_at(uint32 index, bool includeMenus) const
 
 
 status_t
-BApplication::get_window_list(BList *list, bool includeMenus) const
+BApplication::_GetWindowList(BList *list, bool includeMenus) const
 {
 	ASSERT(list);
 
@@ -1291,15 +1265,11 @@ BApplication::get_window_list(BList *list, bool includeMenus) const
 }
 
 
-int32
-BApplication::async_quit_entry(void *data)
-{
-	return 0;	// TODO: implement? not implemented?
-}
+//	#pragma mark -
 
 
-// check_app_signature
-/*!	\brief Checks whether the supplied string is a valid application signature.
+/*!
+	\brief Checks whether the supplied string is a valid application signature.
 
 	An error message is printed, if the string is no valid app signature.
 
@@ -1308,9 +1278,7 @@ BApplication::async_quit_entry(void *data)
 	- \c B_OK: \a signature is a valid app signature.
 	- \c B_BAD_VALUE: \a signature is \c NULL or no valid app signature.
 */
-
-static
-status_t
+static status_t
 check_app_signature(const char *signature)
 {
 	bool isValid = false;
@@ -1328,17 +1296,15 @@ check_app_signature(const char *signature)
 }
 
 
-// looper_name_for
-/*!	\brief Returns the looper name for a given signature.
+/*!
+	\brief Returns the looper name for a given signature.
 
 	Normally this is "AppLooperPort", but in case of the registrar a
 	special name.
 
 	\return The looper name.
 */
-
-static
-const char *
+static const char *
 looper_name_for(const char *signature)
 {
 	if (signature && !strcasecmp(signature, kRegistrarSignature))
@@ -1347,12 +1313,10 @@ looper_name_for(const char *signature)
 }
 
 
-// fill_argv_message
-/*!	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
+/*!
+	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
 */
-
-static
-void
+static void
 fill_argv_message(BMessage &message)
 {
    	message.what = B_ARGV_RECEIVED;

@@ -6,7 +6,7 @@ SetSubDirSupportedPlatforms libbe_test ;
 if $(TARGET_PLATFORM) = libbe_test {
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app graphics input interface shared [ FDirName servers app ] ;
+UsePrivateHeaders app graphics input interface kernel shared [ FDirName servers app ] ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
@@ -52,6 +52,7 @@ SharedLibrary libhwinterfaceimpl.so :
 SharedLibrary libhaikuappserver.so :
 	Angle.cpp
 	BGet++.cpp
+	ClientMemoryAllocator.cpp
 	ColorSet.cpp
 	CursorData.cpp
 	CursorManager.cpp

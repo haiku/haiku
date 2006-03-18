@@ -1,18 +1,19 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  */
 
-/**	Handler for allocating and freeing area memory for BBitmaps 
- *	on the server side. Utilizes the BGET pool allocator.
- *
- *	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
- *	created or destroyed, the BitmapManager needs to handle it. It takes care of 
- *	all memory management related to them.
- */
+/*!
+	Handler for allocating and freeing area memory for BBitmaps 
+	on the server side. Utilizes the BGET pool allocator.
+
+	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
+	created or destroyed, the BitmapManager needs to handle it. It takes care of 
+	all memory management related to them.
+*/
 
 
 #include <new>
@@ -23,7 +24,9 @@
 #include <Bitmap.h>
 
 #include "BitmapManager.h"
+#include "ClientMemoryAllocator.h"
 #include "ServerBitmap.h"
+#include "ServerProtocol.h"
 #include "ServerTokenSpace.h"
 
 using std::nothrow;
@@ -40,9 +43,7 @@ BitmapManager *gBitmapManager = NULL;
 BitmapManager::BitmapManager()
 	:
 	fBitmapList(1024),
-	fBuffer(NULL),
-	fLock("BitmapManager Lock"),
-	fMemPool("bitmap pool", BITMAP_AREA_SIZE)
+	fLock("BitmapManager Lock")
 {
 }
 
@@ -53,7 +54,9 @@ BitmapManager::~BitmapManager()
 	int32 count = fBitmapList.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		if (ServerBitmap* bitmap = (ServerBitmap*)fBitmapList.ItemAt(i)) {
-			fMemPool.ReleaseBuffer(bitmap->fBuffer);
+			if (bitmap->AllocationCookie() != NULL)
+				debugger("We're not supposed to keep our cookies...");
+
 			delete bitmap;
 		}
 	}
@@ -70,8 +73,9 @@ BitmapManager::~BitmapManager()
 	\return A new ServerBitmap or NULL if unable to allocate one.
 */
 ServerBitmap*
-BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
-							int32 bytesPerRow, screen_id screen)
+BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, BRect bounds,
+	color_space space, int32 flags, int32 bytesPerRow, screen_id screen,
+	int8* _allocationType)
 {
 	BAutolock locker(fLock);
 
@@ -86,18 +90,34 @@ if (flags & B_BITMAP_WILL_OVERLAY)
 	if (bitmap == NULL)
 		return NULL;
 
-	uint8* buffer = (uint8*)fMemPool.GetBuffer(bitmap->BitsLength());
+	void* cookie = NULL;
+	uint8* buffer = NULL;
+
+	if (allocator != NULL) {
+		bool newArea;
+		cookie = allocator->Allocate(bitmap->BitsLength(), (void**)&buffer, newArea);
+		if (cookie != NULL) {
+			bitmap->fAllocator = allocator;
+			bitmap->fAllocationCookie = cookie;
+
+			if (_allocationType)
+				*_allocationType = newArea ? kNewAllocatorArea : kAllocator;
+		}
+	} else {
+		buffer = (uint8*)malloc(bitmap->BitsLength());
+		if (buffer != NULL) {
+			bitmap->fAllocator = NULL;
+			bitmap->fAllocationCookie = NULL;
+
+			if (_allocationType)
+				*_allocationType = kHeap;
+		}
+	}
 
 	if (buffer && fBitmapList.AddItem(bitmap)) {
-		bitmap->fArea = area_for(buffer);
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
 		bitmap->fInitialized = true;
-
-		// calculate area offset
-		area_info info;
-		get_area_info(bitmap->fArea, &info);
-		bitmap->fOffset = buffer - (uint8*)info.address;
 
 		if (flags & B_BITMAP_CLEAR_TO_WHITE) {
 			// should work for most colorspaces
@@ -105,7 +125,6 @@ if (flags & B_BITMAP_WILL_OVERLAY)
 		}
 	} else {
 		// Allocation failed for buffer or bitmap list
-		fMemPool.ReleaseBuffer(buffer);
 		delete bitmap;
 		bitmap = NULL;
 	}
@@ -119,7 +138,7 @@ if (flags & B_BITMAP_WILL_OVERLAY)
 	\param bitmap The bitmap to delete
 */
 void
-BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
+BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 {
 	if (bitmap == NULL || !bitmap->_Release()) {
 		// there are other references to this bitmap, we don't have to delete it yet
@@ -130,9 +149,6 @@ BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 	if (!locker.IsLocked())
 		return;
 
-	if (fBitmapList.RemoveItem(bitmap)) {
-		// Server code will require a check to ensure bitmap doesn't have its own area		
-		fMemPool.ReleaseBuffer(bitmap->fBuffer);
+	if (fBitmapList.RemoveItem(bitmap))
 		delete bitmap;
-	}
 }

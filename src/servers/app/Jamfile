@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src servers app ;
 AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders png zlib ;
-UsePrivateHeaders app graphics input interface shared [ FDirName servers app ] ;
+UsePrivateHeaders app graphics input interface kernel shared [ FDirName servers app ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseFreeTypeHeaders ;
@@ -14,6 +14,7 @@ Server app_server :
 	AppServer.cpp
 	BGet++.cpp
 	BitmapManager.cpp
+	ClientMemoryAllocator.cpp
 	ColorSet.cpp
 	CursorData.cpp
 	CursorManager.cpp

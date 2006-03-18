@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All rights reserved.
+ * Copyright 2005-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,7 +18,6 @@
 #include <AppMisc.h>
 #include <BlockCache.h>
 #include <Entry.h>
-#include <KMessage.h>
 #include <Messenger.h>
 #include <MessengerPrivate.h>
 #include <Path.h>
@@ -26,6 +25,7 @@
 #include <Rect.h>
 #include <String.h>
 #include <TokenSpace.h>
+#include <util/KMessage.h>
 
 #include <ctype.h>
 #include <malloc.h>
