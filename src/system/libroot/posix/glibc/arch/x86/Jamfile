@@ -94,6 +94,8 @@ local genericSources =
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 	add_n.S
 	addmul_1.S
+	fegetround.c
+	fesetround.c
 	fraiseexcpt.c
 	ldbl2mpn.c
 	mpa.c mpatan.c mpatan2.c mptan.c
