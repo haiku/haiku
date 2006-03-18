@@ -71,6 +71,7 @@ typedef struct vm_cache {
 	struct vm_cache		*source;
 	struct vm_store		*store;
 	off_t				virtual_size;
+	uint32				page_count;
 	uint32				temporary : 1;
 	uint32				scan_skip : 1;
 } vm_cache;

@@ -107,6 +107,7 @@ vm_cache_create(vm_store *store)
 	cache->virtual_size = 0;
 	cache->temporary = 0;
 	cache->scan_skip = 0;
+	cache->page_count = 0;
 
 	// connect the store to its cache
 	cache->store = store;
@@ -243,23 +244,24 @@ vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 
 
 void
-vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
+vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset)
 {
 	cpu_status state;
 
-	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cache_ref, page, offset));
-	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
+	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cacheRef, page, offset));
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
 
-	if (cache_ref->cache->page_list != NULL)
-		cache_ref->cache->page_list->cache_prev = page;
+	if (cacheRef->cache->page_list != NULL)
+		cacheRef->cache->page_list->cache_prev = page;
 
-	page->cache_next = cache_ref->cache->page_list;
+	page->cache_next = cacheRef->cache->page_list;
 	page->cache_prev = NULL;
-	cache_ref->cache->page_list = page;
+	cacheRef->cache->page_list = page;
+	cacheRef->cache->page_count++;
 
-	page->cache = cache_ref->cache;
+	page->cache = cacheRef->cache;
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
@@ -278,12 +280,12 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
  */
 
 void
-vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
+vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page)
 {
 	cpu_status state;
 
-	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache_ref, page));
-	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
+	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cacheRef, page));
+	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
@@ -293,16 +295,17 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 	release_spinlock(&page_cache_table_lock);
 	restore_interrupts(state);
 
-	if (cache_ref->cache->page_list == page) {
+	if (cacheRef->cache->page_list == page) {
 		if (page->cache_next != NULL)
 			page->cache_next->cache_prev = NULL;
-		cache_ref->cache->page_list = page->cache_next;
+		cacheRef->cache->page_list = page->cache_next;
 	} else {
 		if (page->cache_prev != NULL)
 			page->cache_prev->cache_next = page->cache_next;
 		if (page->cache_next != NULL)
 			page->cache_next->cache_prev = page->cache_prev;
 	}
+	cacheRef->cache->page_count--;
 	page->cache = NULL;
 }
 

@@ -3105,11 +3105,17 @@ fill_area_info(struct vm_area *area, area_info *info, size_t size)
 	info->protection = area->protection & B_USER_PROTECTION;
 	info->lock = B_FULL_LOCK;
 	info->team = area->address_space->id;
-	info->ram_size = area->size;
 	info->copy_count = 0;
 	info->in_count = 0;
 	info->out_count = 0;
 		// ToDo: retrieve real values here!
+
+	mutex_lock(&area->cache_ref->lock);
+
+	// Note, this is a simplification; the cache could be larger than this area
+	info->ram_size = area->cache_ref->cache->page_count * B_PAGE_SIZE;
+
+	mutex_unlock(&area->cache_ref->lock);
 }
 
 
