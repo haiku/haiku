@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -46,11 +46,11 @@ static page_queue page_clear_queue;
 static page_queue page_modified_queue;
 static page_queue page_active_queue;
 
-static vm_page *all_pages;
-static addr_t physical_page_offset;
-static unsigned int num_pages;
+static vm_page *sPages;
+static addr_t sPhysicalPageOffset;
+static size_t sNumPages;
 
-static spinlock page_lock;
+static spinlock sPageLock;
 
 static sem_id modified_pages_available;
 
@@ -178,7 +178,7 @@ vm_page_write_modified(vm_cache *cache)
 		vm_area *area;
 
 		cpu_status state = disable_interrupts();
-		acquire_spinlock(&page_lock);
+		acquire_spinlock(&sPageLock);
 
 		if (page->state == PAGE_STATE_MODIFIED) {
 			remove_page_from_queue(&page_modified_queue, page);
@@ -186,7 +186,7 @@ vm_page_write_modified(vm_cache *cache)
 			gotPage = true;
 		}
 
-		release_spinlock(&page_lock);
+		release_spinlock(&sPageLock);
 		restore_interrupts(state);
 
 		// We may have a modified page - however, while we're writing it back, the page
@@ -238,7 +238,7 @@ vm_page_write_modified(vm_cache *cache)
 				// put it into the active queue
 
 				state = disable_interrupts();
-				acquire_spinlock(&page_lock);
+				acquire_spinlock(&sPageLock);
 
 				if (page->ref_count > 0)
 					page->state = PAGE_STATE_ACTIVE;
@@ -247,7 +247,7 @@ vm_page_write_modified(vm_cache *cache)
 
 				enqueue_page(&page_active_queue, page);
 
-				release_spinlock(&page_lock);
+				release_spinlock(&sPageLock);
 				restore_interrupts(state);
 			}
 		} else {
@@ -277,11 +277,11 @@ static int pageout_daemon()
 		dprintf("here\n");
 
 		state = disable_interrupts();
-		acquire_spinlock(&page_lock);
+		acquire_spinlock(&sPageLock);
 		page = dequeue_page(&page_modified_queue);
 		page->state = PAGE_STATE_BUSY;
 		vm_cache_acquire_ref(page->cache_ref, true);
-		release_spinlock(&page_lock);
+		release_spinlock(&sPageLock);
 		restore_interrupts(state);
 
 		dprintf("got page %p\n", page);
@@ -290,10 +290,10 @@ static int pageout_daemon()
 			// unless we're in the trimming cycle, dont write out pages
 			// that back anonymous stores
 			state = disable_interrupts();
-			acquire_spinlock(&page_lock);
+			acquire_spinlock(&sPageLock);
 			enqueue_page(&page_modified_queue, page);
 			page->state = PAGE_STATE_MODIFIED;
-			release_spinlock(&page_lock);
+			release_spinlock(&sPageLock);
 			restore_interrupts(state);
 			vm_cache_release_ref(page->cache_ref);
 			continue;
@@ -323,14 +323,14 @@ static int pageout_daemon()
 		vm_put_physical_page((addr_t)vecs->vec[0].iov_base);
 
 		state = disable_interrupts();
-		acquire_spinlock(&page_lock);
+		acquire_spinlock(&sPageLock);
 		if(page->ref_count > 0) {
 			page->state = PAGE_STATE_ACTIVE;
 		} else {
 			page->state = PAGE_STATE_INACTIVE;
 		}
 		enqueue_page(&page_active_queue, page);
-		release_spinlock(&page_lock);
+		release_spinlock(&sPageLock);
 		restore_interrupts(state);
 
 		vm_cache_release_ref(page->cache_ref);
@@ -339,14 +339,35 @@ static int pageout_daemon()
 #endif
 
 
-status_t
-vm_page_init(kernel_args *ka)
+void
+vm_page_init_num_pages(kernel_args *args)
 {
-	unsigned int i;
+	uint32 i;
+
+	// calculate the size of memory by looking at the physical_memory_range array
+	addr_t physicalPagesEnd = 0;
+	sPhysicalPageOffset = args->physical_memory_range[0].start / B_PAGE_SIZE;
+
+	for (i = 0; i < args->num_physical_memory_ranges; i++) {
+		physicalPagesEnd = (args->physical_memory_range[i].start
+			+ args->physical_memory_range[i].size) / B_PAGE_SIZE;
+	}
+
+	TRACE(("first phys page = 0x%lx, end 0x%x\n", sPhysicalPageOffset,
+		physicalPagesEnd));
+
+	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
+}
+
+
+status_t
+vm_page_init(kernel_args *args)
+{
+	uint32 i;
 
 	TRACE(("vm_page_init: entry\n"));
 
-	page_lock = 0;
+	sPageLock = 0;
 
 	// initialize queues
 	page_free_queue.head = NULL;
@@ -362,42 +383,28 @@ vm_page_init(kernel_args *ka)
 	page_active_queue.tail = NULL;
 	page_active_queue.count = 0;
 
-	// calculate the size of memory by looking at the physical_memory_range array
-	{
-		unsigned int physicalPagesEnd = 0;
-
-		physical_page_offset = ka->physical_memory_range[0].start / B_PAGE_SIZE;
-		for (i = 0; i<ka->num_physical_memory_ranges; i++) {
-			physicalPagesEnd = (ka->physical_memory_range[i].start
-				+ ka->physical_memory_range[i].size) / B_PAGE_SIZE;
-		}
-		TRACE(("first phys page = 0x%lx, end 0x%x\n", physical_page_offset,
-			physicalPagesEnd));
-		num_pages = physicalPagesEnd - physical_page_offset;
-	}
-
 	// map in the new free page table
-	all_pages = (vm_page *)vm_alloc_from_kernel_args(ka, num_pages * sizeof(vm_page),
-					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	sPages = (vm_page *)vm_alloc_from_kernel_args(args, sNumPages * sizeof(vm_page),
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
-		all_pages, num_pages, (unsigned int)(num_pages * sizeof(vm_page))));
+		sPages, sNumPages, (unsigned int)(sNumPages * sizeof(vm_page))));
 
 	// initialize the free page table
-	for (i = 0; i < num_pages; i++) {
-		all_pages[i].physical_page_number = physical_page_offset + i;
-		all_pages[i].type = PAGE_TYPE_PHYSICAL;
-		all_pages[i].state = PAGE_STATE_FREE;
-		all_pages[i].ref_count = 0;
-		enqueue_page(&page_free_queue, &all_pages[i]);
+	for (i = 0; i < sNumPages; i++) {
+		sPages[i].physical_page_number = sPhysicalPageOffset + i;
+		sPages[i].type = PAGE_TYPE_PHYSICAL;
+		sPages[i].state = PAGE_STATE_FREE;
+		sPages[i].ref_count = 0;
+		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 
 	TRACE(("initialized table\n"));
 
 	// mark some of the page ranges inuse
-	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
-		vm_mark_page_range_inuse(ka->physical_allocated_range[i].start / B_PAGE_SIZE,
-			ka->physical_allocated_range[i].size / B_PAGE_SIZE);
+	for (i = 0; i < args->num_physical_allocated_ranges; i++) {
+		vm_mark_page_range_inuse(args->physical_allocated_range[i].start / B_PAGE_SIZE,
+			args->physical_allocated_range[i].size / B_PAGE_SIZE);
 	}
 
 	TRACE(("vm_page_init: exit\n"));
@@ -411,9 +418,9 @@ vm_page_init_post_area(kernel_args *args)
 {
 	void *dummy;
 
-	dummy = all_pages;
+	dummy = sPages;
 	create_area("page structures", &dummy, B_EXACT_ADDRESS,
-		PAGE_ALIGN(num_pages * sizeof(vm_page)), B_ALREADY_WIRED,
+		PAGE_ALIGN(sNumPages * sizeof(vm_page)), B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
@@ -468,7 +475,7 @@ page_scrubber(void *unused)
 			// get some pages from the free queue
 
 			state = disable_interrupts();
-			acquire_spinlock(&page_lock);
+			acquire_spinlock(&sPageLock);
 
 			for (i = 0; i < SCRUB_SIZE; i++) {
 				page[i] = dequeue_page(&page_free_queue);
@@ -476,7 +483,7 @@ page_scrubber(void *unused)
 					break;
 			}
 
-			release_spinlock(&page_lock);
+			release_spinlock(&sPageLock);
 			restore_interrupts(state);
 
 			// clear them
@@ -488,7 +495,7 @@ page_scrubber(void *unused)
 			}
 
 			state = disable_interrupts();
-			acquire_spinlock(&page_lock);
+			acquire_spinlock(&sPageLock);
 
 			// and put them into the clear queue
 
@@ -497,7 +504,7 @@ page_scrubber(void *unused)
 				enqueue_page(&page_clear_queue, page[i]);
 			}
 
-			release_spinlock(&page_lock);
+			release_spinlock(&sPageLock);
 			restore_interrupts(state);
 		}
 	}
@@ -537,21 +544,21 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 
 	TRACE(("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n", start_page, length));
 
-	if (physical_page_offset > start_page) {
+	if (sPhysicalPageOffset > start_page) {
 		dprintf("vm_mark_page_range_inuse: start page %ld is before free list\n", start_page);
 		return B_BAD_VALUE;
 	}
-	start_page -= physical_page_offset;
-	if (start_page + length > num_pages) {
+	start_page -= sPhysicalPageOffset;
+	if (start_page + length > sNumPages) {
 		dprintf("vm_mark_page_range_inuse: range would extend past free list\n");
 		return B_BAD_VALUE;
 	}
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_lock);
+	acquire_spinlock(&sPageLock);
 
 	for (i = 0; i < length; i++) {
-		page = &all_pages[start_page + i];
+		page = &sPages[start_page + i];
 		switch (page->state) {
 			case PAGE_STATE_FREE:
 			case PAGE_STATE_CLEAR:
@@ -570,7 +577,7 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 		}
 	}
 
-	release_spinlock(&page_lock);
+	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	return B_OK;
@@ -585,7 +592,7 @@ vm_page_allocate_specific_page(addr_t page_num, int page_state)
 	int state;
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_lock);
+	acquire_spinlock(&sPageLock);
 
 	p = vm_lookup_page(page_num);
 	if (p == NULL)
@@ -614,7 +621,7 @@ vm_page_allocate_specific_page(addr_t page_num, int page_state)
 		enqueue_page(&page_active_queue, p);
 
 out:
-	release_spinlock(&page_lock);
+	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	if (p != NULL && page_state == PAGE_STATE_CLEAR
@@ -648,7 +655,7 @@ vm_page_allocate_page(int page_state)
 	}
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_lock);
+	acquire_spinlock(&sPageLock);
 
 	p = dequeue_page(q);
 	if (p == NULL) {
@@ -676,7 +683,7 @@ vm_page_allocate_page(int page_state)
 
 	enqueue_page(&page_active_queue, p);
 
-	release_spinlock(&page_lock);
+	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	// if needed take the page from the free queue and zero it out
@@ -724,16 +731,16 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 	start = 0;
 
 	state = disable_interrupts();
-	acquire_spinlock(&page_lock);
+	acquire_spinlock(&sPageLock);
 
 	for (;;) {
 		bool foundit = true;
-		if (start + len > num_pages)
+		if (start + len > sNumPages)
 			break;
 
 		for (i = 0; i < len; i++) {
-			if (all_pages[start + i].state != PAGE_STATE_FREE
-				&& all_pages[start + i].state != PAGE_STATE_CLEAR) {
+			if (sPages[start + i].state != PAGE_STATE_FREE
+				&& sPages[start + i].state != PAGE_STATE_CLEAR) {
 				foundit = false;
 				i++;
 				break;
@@ -742,14 +749,14 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 		if (foundit) {
 			// pull the pages out of the appropriate queues
 			for (i = 0; i < len; i++)
-				vm_page_set_state_nolock(&all_pages[start + i], PAGE_STATE_BUSY);
-			first_page = &all_pages[start];
+				vm_page_set_state_nolock(&sPages[start + i], PAGE_STATE_BUSY);
+			first_page = &sPages[start];
 			break;
 		} else {
 			start += i;
 		}
 	}
-	release_spinlock(&page_lock);
+	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	return first_page;
@@ -759,14 +766,14 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 vm_page *
 vm_lookup_page(addr_t page_num)
 {
-	if (page_num < physical_page_offset)
+	if (page_num < sPhysicalPageOffset)
 		return NULL;
 
-	page_num -= physical_page_offset;
-	if (page_num >= num_pages)
+	page_num -= sPhysicalPageOffset;
+	if (page_num >= sNumPages)
 		return NULL;
 
-	return &all_pages[page_num];
+	return &sPages[page_num];
 }
 
 
@@ -830,11 +837,11 @@ vm_page_set_state(vm_page *page, int page_state)
 	status_t status;
 
 	cpu_status state = disable_interrupts();
-	acquire_spinlock(&page_lock);
+	acquire_spinlock(&sPageLock);
 
 	status = vm_page_set_state_nolock(page, page_state);
 
-	release_spinlock(&page_lock);
+	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	return status;
@@ -844,7 +851,7 @@ vm_page_set_state(vm_page *page, int page_state)
 size_t
 vm_page_num_pages(void)
 {
-	return num_pages;
+	return sNumPages;
 }
 
 
@@ -951,11 +958,11 @@ dump_page_stats(int argc, char **argv)
 
 	memset(counter, 0, sizeof(counter));
 
-	for (i = 0; i < num_pages; i++) {
-		if (all_pages[i].state > 7)
-			panic("page %i at %p has invalid state!\n", i, &all_pages[i]);
+	for (i = 0; i < sNumPages; i++) {
+		if (sPages[i].state > 7)
+			panic("page %i at %p has invalid state!\n", i, &sPages[i]);
 
-		counter[all_pages[i].state]++;
+		counter[sPages[i].state]++;
 	}
 
 	kprintf("page stats:\n");

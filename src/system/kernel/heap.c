@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -315,12 +315,12 @@ dump_bin_list(int argc, char **argv)
  */
 
 status_t
-heap_init(addr_t heapBase)
+heap_init(addr_t heapBase, size_t heapSize)
 {
 	const unsigned int page_entries = B_PAGE_SIZE / sizeof(struct heap_page);
 	// set some global pointers
 	heap_alloc_table = (struct heap_page *)heapBase;
-	heap_size = ((uint64)HEAP_SIZE * page_entries / (page_entries + 1)) & ~(B_PAGE_SIZE-1);
+	heap_size = ((uint64)heapSize * page_entries / (page_entries + 1)) & ~(B_PAGE_SIZE-1);
 	heap_base = (unsigned int)heap_alloc_table + PAGE_ALIGN(heap_size / page_entries);
 	heap_base_ptr = heap_base;
 	TRACE(("heap_alloc_table = %p, heap_base = 0x%lx, heap_size = 0x%lx\n",

@@ -24,7 +24,7 @@ extern "C" {
 
 void *memalign(size_t alignment, size_t size);
 
-status_t heap_init(addr_t heapBase);
+status_t heap_init(addr_t heapBase, size_t heapSize);
 status_t heap_init_post_sem(struct kernel_args *args);
 status_t heap_init_post_thread(struct kernel_args *args);
 

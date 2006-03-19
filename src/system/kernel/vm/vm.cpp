@@ -2228,7 +2228,6 @@ status_t
 vm_init(kernel_args *args)
 {
 	struct preloaded_image *image;
-	addr_t heap_base;
 	void *address;
 	status_t err = 0;
 	uint32 i;
@@ -2242,14 +2241,24 @@ vm_init(kernel_args *args)
 	sAreaHashLock = -1;
 	sAvailableMemoryLock.sem = -1;
 
+	vm_page_init_num_pages(args);
+	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
+
+	// reduce the heap size if we have not so much RAM
+	size_t heapSize = HEAP_SIZE;
+	if (sAvailableMemory < 100 * 1024 * 1024)
+		heapSize /= 4;
+	else if (sAvailableMemory < 200 * 1024 * 1024)
+		heapSize /= 2;
+
 	// map in the new heap and initialize it
-	heap_base = vm_alloc_from_kernel_args(args, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	TRACE(("heap at 0x%lx\n", heap_base));
-	heap_init(heap_base);
+	addr_t heapBase = vm_alloc_from_kernel_args(args, heapSize,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	TRACE(("heap at 0x%lx\n", heapBase));
+	heap_init(heapBase, heapSize);
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
-	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
 	// initialize the hash table that stores the pages mapped to caches
 	vm_cache_init(args);
@@ -2272,8 +2281,8 @@ vm_init(kernel_args *args)
 
 	// allocate areas to represent stuff that already exists
 
-	address = (void *)ROUNDOWN(heap_base, B_PAGE_SIZE);
-	create_area("kernel heap", &address, B_EXACT_ADDRESS, HEAP_SIZE,
+	address = (void *)ROUNDOWN(heapBase, B_PAGE_SIZE);
+	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	allocate_kernel_args(args);
