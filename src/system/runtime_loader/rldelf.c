@@ -509,9 +509,10 @@ remap_images(void)
 }
 
 
-static bool
+static status_t
 map_image(int fd, char const *path, image_t *image, bool fixed)
 {
+	status_t status = B_OK;
 	const char *baseName;
 	uint32 i;
 
@@ -559,8 +560,10 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				addressSpecifier, image->regions[i].vmsize, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA);
 
-			if (image->regions[i].id < 0)
+			if (image->regions[i].id < 0) {
+				status = image->regions[i].id;
 				goto error;
+			}
 
 			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
 			image->regions[i].vmstart = loadAddress;
@@ -569,8 +572,10 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				addressSpecifier, image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
 				REGION_PRIVATE_MAP, path, PAGE_BASE(image->regions[i].fdstart));
 
-			if (image->regions[i].id < 0)
+			if (image->regions[i].id < 0) {
+				status = image->regions[i].id;
 				goto error;
+			}
 
 			TRACE(("\"%s\" at %p, 0x%lx bytes (%s)\n", path,
 				(void *)loadAddress, image->regions[i].vmsize,
@@ -600,10 +605,10 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 	if (image->dynamic_ptr)
 		image->dynamic_ptr += image->regions[0].delta;
 
-	return true;
+	return B_OK;
 
 error:
-	return false;
+	return status;
 }
 
 
@@ -916,28 +921,28 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 
 	// ToDo: what to do about this restriction??
 	if (pheaderSize > (int)sizeof(ph_buff)) {
-		FATAL("cannot handle Program headers bigger than %lu\n", sizeof(ph_buff));
+		FATAL("Cannot handle program headers bigger than %lu\n", sizeof(ph_buff));
 		status = B_UNSUPPORTED;
 		goto err1;
 	}
 
 	length = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
 	if (length != pheaderSize) {
-		FATAL("troubles reading Program headers\n");
+		FATAL("Could not read program headers: %s\n", strerror(length));
 		status = B_BAD_DATA;
 		goto err1;
 	}
 
 	numRegions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
 	if (numRegions <= 0) {
-		FATAL("troubles parsing Program headers, numRegions = %ld\n", numRegions);
+		FATAL("Troubles parsing Program headers, numRegions = %ld\n", numRegions);
 		status = B_BAD_DATA;
 		goto err1;
 	}
 
 	image = create_image(name, path, numRegions);
 	if (image == NULL) {
-		FATAL("failed to allocate image_t object\n");
+		FATAL("Failed to allocate image_t object\n");
 		status = B_NO_MEMORY;
 		goto err1;
 	}
@@ -947,19 +952,20 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		goto err2;
 
 	if (!assert_dynamic_loadable(image)) {
-		FATAL("dynamic segment must be loadable (implementation restriction)\n");
+		FATAL("Dynamic segment must be loadable (implementation restriction)\n");
 		status = B_UNSUPPORTED;
 		goto err2;
 	}
 
-	if (!map_image(fd, path, image, type == B_APP_IMAGE)) {
-		FATAL("troubles reading image\n");
+	status = map_image(fd, path, image, type == B_APP_IMAGE);
+	if (status < B_OK) {
+		FATAL("Could not map image: %s\n", strerror(status));
 		status = B_ERROR;
 		goto err2;
 	}
 
 	if (!parse_dynamic_segment(image)) {
-		FATAL("troubles handling dynamic section\n");
+		FATAL("Troubles handling dynamic section\n");
 		status = B_BAD_DATA;
 		goto err3;
 	}
