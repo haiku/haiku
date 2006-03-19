@@ -92,48 +92,40 @@ public:
 								BRect bounds, const DrawState *d,
 								bool filled, bool closed);
 
-			// this version used by Decorator
+			// these RGBColor versions are used internally by the server
+			void			StrokePoint(const BPoint& pt,
+								const RGBColor& color);
 			void			StrokeRect(BRect r, const RGBColor &color);
 			void			FillRect(BRect r, const RGBColor &color);
+			void			FillRegion(BRegion& r, const RGBColor& color);
 
 			void			StrokeRect(BRect r, const DrawState *d);
 			void			FillRect(BRect r, const DrawState *d);
 
-			// for debugging purposes?
-//			void			StrokeRegion(BRegion &r, const DrawState *d);
-
-			void			FillRegion(BRegion &r, const DrawState *d);
-			void			FillRegion(BRegion &r, const RGBColor& color);
+			void			FillRegion(BRegion& r, const DrawState *d);
 
 			void			DrawRoundRect(BRect r, float xrad,
 								float yrad, const DrawState *d,
 								bool filled);
 
-			void			DrawShape(const BRect &bounds,
-								int32 opcount, const uint32 *oplist, 
-								int32 ptcount, const BPoint *ptlist,
-								const DrawState *d, bool filled);
+			void			DrawShape(const BRect& bounds,
+								int32 opcount, const uint32* oplist, 
+								int32 ptcount, const BPoint* ptlist,
+								const DrawState* d, bool filled);
 
-			void			DrawTriangle(BPoint *pts, const BRect &bounds,
-								const DrawState *d, bool filled);
+			void			DrawTriangle(BPoint* pts, const BRect& bounds,
+								const DrawState* d, bool filled);
 
 			// this version used by Decorator
-			void			StrokeLine(const BPoint &start,
-								const BPoint &end, const RGBColor &color);
+			void			StrokeLine(const BPoint& start,
+								const BPoint& end, const RGBColor& color);
 
-			void			StrokeLine(const BPoint &start,
-								const BPoint &end, DrawState *d);
+			void			StrokeLine(const BPoint& start,
+								const BPoint& end, DrawState* d);
 
 			void			StrokeLineArray(int32 numlines,
-								const LineArrayData *data,
-								const DrawState *d);
-
-			// this version used by Decorator
-			void			StrokePoint(const BPoint &pt,
-								const RGBColor &color);
-
-			void			StrokePoint(const BPoint &pt,
-								DrawState *d);
+								const LineArrayData* data,
+								const DrawState* d);
 
 			// -------- text related calls
 

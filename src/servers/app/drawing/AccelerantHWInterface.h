@@ -83,7 +83,6 @@ private:
 		status_t				_UpdateModeList();
 		status_t				_UpdateFrameBufferConfig();
 		void					_RegionToRectParams(/*const*/ BRegion* region,
-													fill_rect_params** params,
 													uint32* count) const;
 		uint32					_NativeColor(const RGBColor& color) const;
 
@@ -138,6 +137,11 @@ private:
 		AccelerantBuffer		*fFrontBuffer;
 
 		display_mode			fDisplayMode;
+
+mutable	fill_rect_params*		fRectParams;
+mutable	uint32					fRectParamsCount;
+mutable	blit_params*			fBlitParams;
+mutable	uint32					fBlitParamsCount;
 };
 
 #endif // ACCELERANT_HW_INTERFACE_H

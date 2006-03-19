@@ -88,7 +88,6 @@ class DWindowHWInterface : public HWInterface {
 			status_t			_UpdateFrameBufferConfig();
 
 			void				_RegionToRectParams(/*const*/ BRegion* region,
-													fill_rect_params** params,
 													uint32* count) const;
 			uint32				_NativeColor(const RGBColor& color) const;
 
@@ -124,6 +123,11 @@ class DWindowHWInterface : public HWInterface {
 		frame_buffer_config		fFrameBufferConfig;
 
 		BString					fCardNameInDevFS;
+
+mutable	fill_rect_params*		fRectParams;
+mutable	uint32					fRectParamsCount;
+mutable	blit_params*			fBlitParams;
+mutable	uint32					fBlitParamsCount;
 };
 
 #endif // D_WINDOW_HW_INTERACE_H

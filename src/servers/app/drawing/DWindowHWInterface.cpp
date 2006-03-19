@@ -283,6 +283,8 @@ DWindow::FrameMoved(BPoint newOffset)
 //	#pragma mark -
 
 
+const int32 kDefaultParamsCount = 64;
+
 DWindowHWInterface::DWindowHWInterface()
 	: HWInterface(),
 	  fFrontBuffer(new DWindowBuffer()),
@@ -316,7 +318,12 @@ DWindowHWInterface::DWindowHWInterface()
 	  fAccScreenBlit(NULL),
 	  fAccSetCursorShape(NULL),
 	  fAccMoveCursor(NULL),
-	  fAccShowCursor(NULL)
+	  fAccShowCursor(NULL),
+
+	  fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
+	  fRectParamsCount(kDefaultParamsCount),
+	  fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
+	  fBlitParamsCount(kDefaultParamsCount)
 {
 	fDisplayMode.virtual_width = 800;
 	fDisplayMode.virtual_height = 600;
@@ -333,6 +340,9 @@ DWindowHWInterface::~DWindowHWInterface()
 		fWindow->Quit();
 	}
 
+	delete[] fRectParams;
+	delete[] fBlitParams;
+
 	delete fFrontBuffer;
 
 	be_app->Lock();
@@ -345,6 +355,10 @@ status_t
 DWindowHWInterface::Initialize()
 {
 	status_t ret = HWInterface::Initialize();
+
+	if (!fRectParams || !fBlitParams)
+		return B_NO_MEMORY;
+
 	if (ret >= B_OK) {
 		for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
 			fCardFD = _OpenGraphicsDevice(i);
@@ -889,22 +903,33 @@ DWindowHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 	if (fAccScreenBlit && fAccAcquireEngine) {
 		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
 
+			// make sure the blit_params cache is large enough
+			if (fBlitParamsCount < count) {
+				fBlitParamsCount = (count / kDefaultParamsCount + 1) * kDefaultParamsCount;
+				// NOTE: realloc() could be used instead...
+				blit_params* params = new (nothrow) blit_params[fBlitParamsCount];
+				if (params) {
+					delete[] fBlitParams;
+					fBlitParams = params;
+				} else {
+					count = fBlitParamsCount;
+				}
+			}
 			// convert the rects
-			blit_params* params = new blit_params[count];
 			for (uint32 i = 0; i < count; i++) {
-				params[i].src_left = (uint16)sortedRectList[i].left + fXOffset;
-				params[i].src_top = (uint16)sortedRectList[i].top + fYOffset;
+				fBlitParams[i].src_left = (uint16)sortedRectList[i].left + fXOffset;
+				fBlitParams[i].src_top = (uint16)sortedRectList[i].top + fYOffset;
 
-				params[i].dest_left = (uint16)sortedRectList[i].left + xOffset + fXOffset;
-				params[i].dest_top = (uint16)sortedRectList[i].top + yOffset + fYOffset;
+				fBlitParams[i].dest_left = (uint16)sortedRectList[i].left + xOffset + fXOffset;
+				fBlitParams[i].dest_top = (uint16)sortedRectList[i].top + yOffset + fYOffset;
 
 				// NOTE: width and height are expressed as distance, not pixel count!
-				params[i].width = (uint16)(sortedRectList[i].right - sortedRectList[i].left);
-				params[i].height = (uint16)(sortedRectList[i].bottom - sortedRectList[i].top);
+				fBlitParams[i].width = (uint16)(sortedRectList[i].right - sortedRectList[i].left);
+				fBlitParams[i].height = (uint16)(sortedRectList[i].bottom - sortedRectList[i].top);
 			}
 
 			// go
-			fAccScreenBlit(fEngineToken, params, count);
+			fAccScreenBlit(fEngineToken, fBlitParams, count);
 
 			// done
 			if (fAccReleaseEngine)
@@ -913,8 +938,6 @@ DWindowHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 			// sync
 			if (fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
-
-			delete[] params;
 		}
 	}
 }
@@ -928,11 +951,10 @@ DWindowHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
 
 			// convert the region
 			uint32 count;
-			fill_rect_params* fillParams;
-			_RegionToRectParams(&region, &fillParams, &count);
+			_RegionToRectParams(&region, &count);
 
 			// go
-			fAccFillRect(fEngineToken, _NativeColor(color), fillParams, count);
+			fAccFillRect(fEngineToken, _NativeColor(color), fRectParams, count);
 
 			// done
 			if (fAccReleaseEngine)
@@ -941,8 +963,6 @@ DWindowHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
 			// sync
 			if (fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
-
-			delete[] fillParams;
 		}
 	}
 }
@@ -956,11 +976,10 @@ DWindowHWInterface::InvertRegion(/*const*/ BRegion& region)
 
 			// convert the region
 			uint32 count;
-			fill_rect_params* fillParams;
-			_RegionToRectParams(&region, &fillParams, &count);
+			_RegionToRectParams(&region, &count);
 
 			// go
-			fAccInvertRect(fEngineToken, fillParams, count);
+			fAccInvertRect(fEngineToken, fRectParams, count);
 
 			// done
 			if (fAccReleaseEngine)
@@ -970,7 +989,6 @@ DWindowHWInterface::InvertRegion(/*const*/ BRegion& region)
 			if (fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
 
-			delete[] fillParams;
 		} else {
 			fprintf(stderr, "AcquireEngine failed!\n");
 		}
@@ -1027,18 +1045,27 @@ DWindowHWInterface::SetOffset(int32 left, int32 top)
 // _RegionToRectParams
 void
 DWindowHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
-										fill_rect_params** params,
 										uint32* count) const
 {
 	*count = region->CountRects();
-	*params = new fill_rect_params[*count];
+	if (fRectParamsCount < *count) {
+		fRectParamsCount = (*count / kDefaultParamsCount + 1) * kDefaultParamsCount;
+		// NOTE: realloc() could be used instead...
+		fill_rect_params* params = new (nothrow) fill_rect_params[fRectParamsCount];
+		if (params) {
+			delete[] fRectParams;
+			fRectParams = params;
+		} else {
+			*count = fRectParamsCount;
+		}
+	}
 
 	for (uint32 i = 0; i < *count; i++) {
 		clipping_rect r = region->RectAtInt(i);
-		(*params)[i].left = (uint16)(r.left + fXOffset);
-		(*params)[i].top = (uint16)(r.top + fYOffset);
-		(*params)[i].right = (uint16)(r.right + fXOffset);
-		(*params)[i].bottom = (uint16)(r.bottom + fYOffset);
+		fRectParams[i].left = (uint16)r.left + fXOffset;
+		fRectParams[i].top = (uint16)r.top + fYOffset;
+		fRectParams[i].right = (uint16)r.right + fXOffset;
+		fRectParams[i].bottom = (uint16)r.bottom + fYOffset;
 	}
 }
 

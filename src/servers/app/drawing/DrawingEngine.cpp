@@ -549,8 +549,15 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 	}
 }
 
-// StrokeRect
-// 
+// #pragma mark - RGBColor
+
+void
+DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
+{
+	StrokeLine(pt, pt, color);
+}
+
+
 // this function is used to draw a one pixel wide rect
 void
 DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
@@ -578,7 +585,7 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 	}
 }
 
-// FillRect
+
 void
 DrawingEngine::FillRect(BRect r, const RGBColor& color)
 {
@@ -609,7 +616,42 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 	}
 }
 
-// StrokeRect
+
+void
+DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
+{
+	// NOTE: Write locking because we might use HW acceleration.
+	// This needs to be investigated, I'm doing this because of
+	// gut feeling.
+	// NOTE: region expected to be already clipped correctly!!
+	if (WriteLock()) {
+		fGraphicsCard->HideSoftwareCursor(r.Frame());
+
+		bool doInSoftware = true;
+		// try hardware optimized version first
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+			fGraphicsCard->FillRegion(r, color);
+			doInSoftware = false;
+		}
+
+		if (doInSoftware) {
+
+			int32 count = r.CountRects();
+			for (int32 i = 0; i < count; i++) {
+				fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
+			}
+
+			fGraphicsCard->Invalidate(r.Frame());
+		}
+
+		fGraphicsCard->ShowSoftwareCursor();
+
+		WriteUnlock();
+	}
+}
+
+// #pragma mark - DrawState
+
 void
 DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 {
@@ -634,7 +676,7 @@ DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 	}
 }
 
-// FillRect
+
 void
 DrawingEngine::FillRect(BRect r, const DrawState *d)
 {
@@ -648,20 +690,24 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 			fGraphicsCard->HideSoftwareCursor(r);
 
 			bool doInSoftware = true;
-			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
-				&& (d->GetDrawingMode() == B_OP_COPY
-					|| d->GetDrawingMode() == B_OP_OVER)) {
-				if (d->GetPattern() == B_SOLID_HIGH) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, d->HighColor());
-					doInSoftware = false;
-				} else if (d->GetPattern() == B_SOLID_LOW) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, d->LowColor());
-					doInSoftware = false;
+			if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
+				// try hardware optimized version first
+				// if the rect is large enough
+				if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+					if (d->GetPattern() == B_SOLID_HIGH
+						&& (d->GetDrawingMode() == B_OP_COPY
+							|| d->GetDrawingMode() == B_OP_OVER)) {
+						BRegion region(r);
+						region.IntersectWith(fPainter->ClippingRegion());
+						fGraphicsCard->FillRegion(region, d->HighColor());
+						doInSoftware = false;
+					} else if (d->GetPattern() == B_SOLID_LOW
+							   && d->GetDrawingMode() == B_OP_COPY) {
+						BRegion region(r);
+						region.IntersectWith(fPainter->ClippingRegion());
+						fGraphicsCard->FillRegion(region, d->LowColor());
+						doInSoftware = false;
+					}
 				}
 			}
 			if (doInSoftware) {
@@ -677,36 +723,8 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 		WriteUnlock();
 	}
 }
-/*
-// StrokeRegion
-void
-DrawingEngine::StrokeRegion(BRegion& r, const DrawState *d)
-{
-	if (Lock()) {
-		BRect clipped(r.Frame());
-		extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
 
-			fPainter->SetDrawState(d);
 
-			BRect touched = fPainter->StrokeRect(r.RectAt(0));
-
-			int32 count = r.CountRects();
-			for (int32 i = 1; i < count; i++) {
-				touched = touched | fPainter->StrokeRect(r.RectAt(i));
-			}
-
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-*/
-// FillRegion
 void
 DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 {
@@ -720,14 +738,15 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 
 			bool doInSoftware = true;
 			// try hardware optimized version first
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
-				&& (d->GetDrawingMode() == B_OP_COPY
-					|| d->GetDrawingMode() == B_OP_OVER)) {
-				if (d->GetPattern() == B_SOLID_HIGH) {
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+				if (d->GetPattern() == B_SOLID_HIGH
+					&& (d->GetDrawingMode() == B_OP_COPY
+						|| d->GetDrawingMode() == B_OP_OVER)) {
 					r.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(r, d->HighColor());
 					doInSoftware = false;
-				} else if (d->GetPattern() == B_SOLID_LOW) {
+				} else if (d->GetPattern() == B_SOLID_LOW
+						   && d->GetDrawingMode() == B_OP_COPY) {
 					r.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(r, d->LowColor());
 					doInSoftware = false;
@@ -749,42 +768,6 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 
 			fGraphicsCard->ShowSoftwareCursor();
 		}
-
-		WriteUnlock();
-	}
-}
-
-
-// FillRegion
-void
-DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
-{
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
-	// NOTE: region expected to be already clipped correctly!!
-	if (WriteLock()) {
-		fGraphicsCard->HideSoftwareCursor(r.Frame());
-
-		bool doInSoftware = true;
-		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-			fGraphicsCard->FillRegion(r, color);
-			doInSoftware = false;
-		}
-
-		if (doInSoftware) {
-
-			int32 count = r.CountRects();
-			for (int32 i = 0; i < count; i++) {
-				fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
-			}
-			BRect touched = r.Frame();
-
-			fGraphicsCard->Invalidate(touched);
-		}
-
-		fGraphicsCard->ShowSoftwareCursor();
 
 		WriteUnlock();
 	}
@@ -970,25 +953,8 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	}
 }
 
-// StrokePoint
-//
-// * this function is only used by Decorators
-void
-DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
-{
-	StrokeLine(pt, pt, color);
-}
-
-// StrokePoint
-void
-DrawingEngine::StrokePoint(const BPoint& pt, DrawState *context)
-{
-	StrokeLine(pt, pt, context);
-}
-
 // #pragma mark -
 
-// DrawString
 BPoint
 DrawingEngine::DrawString(const char* string, int32 length,
 						  const BPoint& pt, DrawState* d,
