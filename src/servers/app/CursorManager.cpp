@@ -418,11 +418,16 @@ CursorManager::SetDefaults()
 ServerCursor *
 CursorManager::FindCursor(int32 token)
 {
-	ServerCursor* cursor;
-	if (fTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) == B_OK)
-		return cursor;
+	if (!Lock())
+		return NULL;
 
-	return NULL;
+	ServerCursor* cursor;
+	if (fTokenSpace.GetToken(token, kCursorToken, (void**)&cursor) != B_OK)
+		cursor = NULL;
+
+	Unlock();
+
+	return cursor;
 }
 
 
@@ -435,6 +440,7 @@ CursorManager::_FindCursor(team_id clientTeam, const uint8* cursorData)
 		if (cursor->OwningTeam() == clientTeam
 			&& cursor->CursorData()
 			&& memcmp(cursor->CursorData(), cursorData, 68) == 0) {
+//printf("found already existing cursor\n");
 			return cursor;
 		}
 	}
