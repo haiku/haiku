@@ -85,7 +85,8 @@ offset_rect(clipping_rect &rect, int32 x, int32 y)
 static inline BRect
 to_BRect(const clipping_rect &rect)
 {
-	return BRect((float)rect.left, (float)rect.top, (float)rect.right, (float)rect.bottom);
+	return BRect((float)rect.left, (float)rect.top,
+				 (float)rect.right, (float)rect.bottom);
 }
 
 
@@ -94,11 +95,20 @@ static inline clipping_rect
 to_clipping_rect(const BRect &rect)
 {
 	clipping_rect clipRect;
-	
-	clipRect.left = (int32)floor(rect.left);
-	clipRect.top = (int32)floor(rect.top);
-	clipRect.right = (int32)ceil(rect.right);
-	clipRect.bottom = (int32)ceil(rect.bottom);
+
+// NOTE: test fractional coords BRects -> BRegion on R5
+// and compare with this implementation...
+//	clipRect.left = (int32)floorf(rect.left);
+//	clipRect.top = (int32)floorf(rect.top);
+//	clipRect.right = (int32)ceilf(rect.right);
+//	clipRect.bottom = (int32)ceilf(rect.bottom);
+
+	// NOTE: clipping_rects are used as "pixel indices"
+	// therefor, it should be ok to convert them like this:
+	clipRect.left = (int32)rect.left;
+	clipRect.top = (int32)rect.top;
+	clipRect.right = (int32)rect.right;
+	clipRect.bottom = (int32)rect.bottom;
 	
 	return clipRect;
 }
