@@ -14,6 +14,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Menu.h>
+#include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PropertyInfo.h>
@@ -275,8 +276,10 @@ BMenu::AttachedToWindow()
 		} while (AddDynamicItem(B_PROCESSING));
 	}
 
-	if (!fAttachAborted)
-		InvalidateLayout();
+	if (!fAttachAborted) {
+		LayoutItems(0);
+		UpdateWindowViewSize();
+	}
 }
 
 
@@ -567,6 +570,7 @@ void
 BMenu::SetMaxContentWidth(float width)
 {
 	fMaxContentWidth = width;
+	InvalidateLayout();
 }
 
 
@@ -731,6 +735,13 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 void
 BMenu::Draw(BRect updateRect)
 {
+	if (!fUseCachedMenuLayout) {
+		LayoutItems(0);
+		UpdateWindowViewSize(true);
+		Sync();
+		Invalidate();
+		return;
+	}
 	DrawBackground(updateRect);
 	DrawItems(updateRect);
 }
@@ -767,9 +778,10 @@ BMenu::FrameResized(float new_width, float new_height)
 void
 BMenu::InvalidateLayout()
 {
-	CacheFontInfo();
+	/*CacheFontInfo();
 	LayoutItems(0);
-	Invalidate();
+	Invalidate();*/
+	fUseCachedMenuLayout = false;
 }
 
 
@@ -1077,7 +1089,7 @@ BMenu::_show(bool selectFirstItem)
 	if (fSuper != NULL)
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 
-	UpdateWindowViewSize();
+	//UpdateWindowViewSize();
 	window->Show();
 
 	if (window->IsLocked())
@@ -1210,12 +1222,7 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 	item->SetSuper(this);
 
-	// Make sure we update the layout in case we are already attached.
-	if (fResizeToFit && locked && Window() != NULL /*&& !Window()->IsHidden()*/) {
-		LayoutItems(index);
-		//UpdateWindowViewSize();
-		Invalidate();
-	}
+	InvalidateLayout();
 
 	// Find the root menu window, so we can install this item.
 	// ToDo: this shouldn't be necessary - the first supermenu is
@@ -1283,7 +1290,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
 		}
 	}	
 	
-	if (invalidateLayout && Window() != NULL && fResizeToFit)
+	if (invalidateLayout)
 		InvalidateLayout();
 		
 	return success;
@@ -1293,13 +1300,17 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
 void
 BMenu::LayoutItems(int32 index)
 {
-	CalcTriggers();
-
-	float width, height;
-	ComputeLayout(index, true, true, &width, &height);
-
-	ResizeTo(width, height);
-
+	if (!fUseCachedMenuLayout && CountItems() > 0) {
+		fUseCachedMenuLayout = true;
+		if (fLayout != B_ITEMS_IN_MATRIX) {
+			CalcTriggers();
+		
+			float width, height;
+			ComputeLayout(index, fResizeToFit, true, &width, &height);
+			if (fResizeToFit)
+				ResizeTo(width, height);
+		}
+	}
 	// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
 	// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
 	// This is needed to be able to draw the frame around the BMenu.
@@ -1312,7 +1323,7 @@ void
 BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	float* _width, float* _height)
 {
-	// TODO: Take "bestFit", "moveItems", "index" into account,
+	// TODO: Take "bestFit", "index" into account,
 	// Recalculate only the needed items,
 	// not the whole layout every time
 
@@ -1397,8 +1408,6 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		default:
 			break;
 	}
-
-	// This is for BMenuBar
 
 	if (_width) {
 		if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
@@ -1821,6 +1830,12 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
+	// BMenuBar doesn't need to do anything.
+	// TODO: another not_so_great hack: BMenu shouldn't know
+	// about his inherited BMenuBar class.
+	if (dynamic_cast<BMenuBar *>(this) != NULL)
+		return;
+
 	BWindow *window = Window();
 	bool scroll;
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
