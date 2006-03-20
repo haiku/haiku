@@ -26,7 +26,7 @@
 #include <getopt.h>
 #include <string.h>
 
-bool interrupted = false;
+volatile bool interrupted = false;
 
 static void
 keyb_int(int)

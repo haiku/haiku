@@ -19,7 +19,7 @@ sem_id finished = -1;
 BMediaTrack *playTrack;
 media_format playFormat;
 BSoundPlayer *sp = 0;
-bool interrupt = false;
+volatile bool interrupt = false;
 
 void
 play_buffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)

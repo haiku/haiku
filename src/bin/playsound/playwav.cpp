@@ -17,7 +17,7 @@ thread_id reader = -1;
 sem_id finished = -1;
 int fd = -1;
 BSoundPlayer *sp = 0;
-bool interrupt = false;
+volatile bool interrupt = false;
 
 void
 play_buffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)
@@ -73,7 +73,7 @@ main(int argc, char *argv[])
 {
 	if (argc != 2) {
 		fprintf(stderr, "Usage:\n  %s <filename>\n", argv[0]);
-		fprintf(stderr, "This program only plays 44.1 kHz 16 bit stereo wav files.");
+		fprintf(stderr, "This program only plays 44.1 kHz 16 bit stereo wav files.\n");
 		return 1;
 	}
 	
