@@ -452,7 +452,10 @@ BFileGameSound::Load()
 {
 	int64 frames;
 	char * buffer = &fBuffer[fBufferSize + fAudioStream->position];
-	fAudioStream->stream->ReadFrames(buffer, &frames);
+	status_t err = fAudioStream->stream->ReadFrames(buffer, &frames);
+	if (err < B_OK) {
+		StopPlaying(); // XXX this is a hack, the whole class design is broken
+	}
 	
 	int32 frame = fAudioStream->stream->CurrentFrame();
 	
