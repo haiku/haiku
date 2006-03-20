@@ -703,21 +703,11 @@ BMenuItem::DrawShortcutSymbol()
 	
 	where -= BPoint(20, 10);
 
-	// TODO: Do this in a better way
-	bool altAsCommandKey = true;
-	key_map *keys = NULL; 
-	char *chars; 
-	get_key_map(&keys, &chars);
-	if (keys == NULL || keys->left_command_key != 0x5d || keys->right_command_key != 0x5f)
-		altAsCommandKey = false;
-	free(chars);
-	free(keys);
-
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_COLOR_8_BIT);
 
-		if (altAsCommandKey)
+		if (BMenu::sAltAsCommandKey)
 			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
 		else
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
@@ -730,7 +720,7 @@ BMenuItem::DrawShortcutSymbol()
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_COLOR_8_BIT);
 
-		if (altAsCommandKey)
+		if (BMenu::sAltAsCommandKey)
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
 		else	
 			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);

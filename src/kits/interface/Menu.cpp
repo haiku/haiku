@@ -39,7 +39,7 @@ public:
 
 
 menu_info BMenu::sMenuInfo;
-
+bool BMenu::sAltAsCommandKey;
 
 static property_info
 sPropList[] = {
@@ -255,6 +255,15 @@ void
 BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
+
+	sAltAsCommandKey = true;
+	key_map *keys = NULL; 
+	char *chars = NULL; 
+	get_key_map(&keys, &chars);
+	if (keys == NULL || keys->left_command_key != 0x5d || keys->right_command_key != 0x5f)
+		sAltAsCommandKey = false;
+	free(chars);
+	free(keys);
 
 	if (AddDynamicItem(B_INITIAL_ADD)) {
 		do {

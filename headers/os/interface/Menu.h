@@ -257,7 +257,7 @@ virtual	void			_ReservedMenu6();
 						BMessage *r, bool menu) const;
 
 static	menu_info	sMenuInfo;
-static	bool		sSwapped;
+static	bool		sAltAsCommandKey;
 
 		BMenuItem	*fChosenItem;
 		BList		fItems;
