@@ -1,132 +1,151 @@
 /*
- * Copyright 2005, Marcus Overhagen, marcus@overhagen.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * playsound - command line sound file player for Haiku
+ * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
  */
-#include <Application.h>
-#include <SoundPlayer.h>
+
+#include <FileGameSound.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <OS.h>
+#include <getopt.h>
+#include <string.h>
 
-#define SIZE	2048
+bool interrupted = false;
 
-port_id port = -1;
-thread_id reader = -1;
-sem_id finished = -1;
-int fd = -1;
-BSoundPlayer *sp = 0;
-bool interrupt = false;
-
-void
-play_buffer(void *cookie, void * buffer, size_t size, const media_raw_audio_format & format)
-{
-	size_t portsize = port_buffer_size(port);
-	int32 code;
-	
-	// Use your feeling, Obi-Wan, and find him you will. 
-	read_port(port, &code, buffer, portsize);
-
-	if (size != portsize) {
-		sp->SetHasData(false);
-		release_sem(finished);
-	}
-}
-
-
-int32
-filereader(void *arg)
-{
-	char buffer[SIZE];
-	int size;
-	
-	printf("file reader started\n");
-	
-	for (;;) {
-		// Only a Sith Lord deals in absolutes. I will do what I must. 
-		size = read(fd, buffer, SIZE);
-		write_port(port, 0, buffer, size);
-		if (size != SIZE)
-			break;
-	}
-
-	write_port(port, 0, buffer, 0);
-
-	printf("file reader finished\n");
-
-	return 0;
-}
-
-
-void
+static void
 keyb_int(int)
 {
-	// Are you threatening me, Master Jedi?
-	interrupt = true;
-	release_sem(finished);
+	interrupted = true;
+}
+
+
+static void
+usage()
+{
+	fprintf(stderr, "playsound - command line sound file player for Haiku\n");
+	fprintf(stderr, "Usage:\n");
+	fprintf(stderr, "  playsound [--loop] [--gain <value>] [--pan <value>] <filename>\n");
+	fprintf(stderr, "  gain value in percent, can be 0 (silence) to 100 (normal) or higher\n");
+	fprintf(stderr, "  pan value in percent, can be -100 (left) to 100 (right)\n");
 }
 
 
 int
 main(int argc, char *argv[])
 {
-	if (argc != 2) {
-		fprintf(stderr, "Usage:\n  %s <filename>\n", argv[0]);
+	const char *file;
+	bool loop = false;
+	int gain = 100;
+	int pan = 0;
+	
+	while (1) { 
+		int c;
+		int option_index = 0; 
+		static struct option long_options[] = 
+		{ 
+			{"loop", no_argument, 0, 'l'}, 
+			{"gain", required_argument, 0, 'g'}, 
+			{"pan", required_argument, 0, 'p'}, 
+			{0, 0, 0, 0} 
+		}; 
+		
+		c = getopt_long (argc, argv, "lgp:", long_options, &option_index); 
+		if (c == -1) 
+			break; 
+
+		switch (c) { 
+			case 'l': 
+				loop = true;
+		 		break; 
+
+			case 'g':
+				gain = atoi(optarg);
+				break; 
+
+			case 'p':
+				pan = atoi(optarg);
+				break; 
+
+			default:
+				usage();
+				return 1;
+		}
+	}
+
+	if (optind < argc) {
+		file = argv[optind];
+	} else {
+		usage();
 		return 1;
 	}
 	
-	fd = open(argv[1], O_RDONLY);
+	// test if file exists
+	int fd = open(file, O_RDONLY);
 	if (fd < 0) {
-		return 2;
+		fprintf(stderr, "Can't open file %s\n", file);
+		return 1;
 	}
-		
-	// I want more, and I know I shouldn't. 
-	lseek(fd, 44, SEEK_SET);
+	close(fd);
 
-	// Good relations with the Wookiees, I have. 
 	signal(SIGINT, keyb_int);
 
-	new BApplication("application/x-vnd.Haiku-playsound");
-	finished = create_sem(0, "finish wait");
-	port = create_port(64, "buffer");
+	BFileGameSound snd(file, loop);
+	status_t err;
 	
-	media_raw_audio_format format;
-	format = media_raw_audio_format::wildcard;
-	format.frame_rate = 44100;
-	format.channel_count = 2;
-	format.format = media_raw_audio_format::B_AUDIO_SHORT;
-	format.byte_order = B_MEDIA_LITTLE_ENDIAN;
-	format.buffer_size = SIZE;
-
-	printf("spawning reader thread...\n");
-
-	// Help me, Obi-Wan Kenobi; you're my only hope.
-	reader = spawn_thread(filereader, "filereader", 8, 0);
-	resume_thread(reader);
+	err = snd.InitCheck();
+	if (err < B_OK) {
+		fprintf(stderr, "Init failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
+	}
 	
-	printf("playing file...\n");
-	
-	// Execute Plan 66!
-	sp = new BSoundPlayer(&format, "playsound", play_buffer);
-	sp->SetVolume(1.0f);
-
-	// Join me, Padmé and together we can rule this galaxy. 
-	sp->SetHasData(true);
-	sp->Start();
-
-	acquire_sem(finished);
-
-	if (interrupt) {
-		// Once more, the Sith will rule the galaxy. 
-		printf("interrupted\n");
-		sp->Stop();
-		kill_thread(reader);
+	err = snd.SetGain(gain / 100.0);
+	if (err < B_OK) {
+		fprintf(stderr, "Setting gain failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
 	}
 
-	printf("playback finished\n");
+	err = snd.SetPan(pan / 100.0);
+	if (err < B_OK) {
+		fprintf(stderr, "Setting pan failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
+	}
 
-	delete sp;
+	err = snd.Preload();
+	if (err < B_OK) {
+		fprintf(stderr, "Preload failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
+	}
+
+	err = snd.StartPlaying();
+	if (err < B_OK) {
+		fprintf(stderr, "Start playing failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
+	}
 	
-	close(fd);
+	while (snd.IsPlaying() && !interrupted)
+		snooze(50000);
+
+	err = snd.StopPlaying();
+	if (err < B_OK) {
+		fprintf(stderr, "Stop playing failed, error 0x%08lx (%s)\n", err, strerror(err));
+		return 1;
+	}
+
+	return 0;
 }

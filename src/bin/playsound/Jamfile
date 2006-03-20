@@ -7,7 +7,7 @@ BinCommand playfile :
 
 BinCommand playsound :
 	playsound.cpp
-	: be media
+	: be media game
 ;
 
 BinCommand playwav :
