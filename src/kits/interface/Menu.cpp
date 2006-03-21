@@ -1069,20 +1069,18 @@ BMenu::_show(bool selectFirstItem)
 	if (window == NULL)
 		return false;
 
-	if (!window->IsLocked())
-		window->Lock();
-
+	window->Lock();
 	window->ChildAt(0)->AddChild(this);
 
 	if (fSuper != NULL)
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 
+	// TODO: for some reason, Window() can already be NULL at this point,
+	//		which causes a crash in one of the following functions...
 	UpdateWindowViewSize();
 	window->Show();
 
-	if (window->IsLocked())
-		window->Unlock();
-
+	window->Unlock();
 	return true;
 }
 
@@ -1104,7 +1102,7 @@ BMenu::_hide()
 	window->Hide();
 	window->ChildAt(0)->RemoveChild(this);
 		// we don't want to be deleted when the window is removed
-	
+
 	// Only quit if the window isn't cached. The cached menu window
 	// will be deleted at the end of BMenu::_track().
 	if (menuWindow != window)
@@ -1242,18 +1240,20 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 
 bool
-BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
+BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 {
 	bool success = false;
 	bool invalidateLayout = false;
-	 
+
+	bool locked = LockLooper();
+
 	// The plan is simple: If we're given a BMenuItem directly, we use it
 	// and ignore index and count. Otherwise, we use them instead.
 	if (item != NULL) {
 		if (fItems.RemoveItem(item)) {
 			item->SetSuper(NULL);
 			item->Uninstall();	
-			if (del)
+			if (deleteItems)
 				delete item;
 			success = invalidateLayout = true;
 		}
@@ -1270,7 +1270,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
 				if (fItems.RemoveItem(item)) {
 					item->SetSuper(NULL);
 					item->Uninstall();
-					if (del)
+					if (deleteItems)
 						delete item;
 					success = true;
 					invalidateLayout = true;
@@ -1281,11 +1281,14 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool del)
 				}
 			}
 		}
-	}	
-	
-	if (invalidateLayout && Window() != NULL && fResizeToFit)
+	}
+
+	if (invalidateLayout && locked && fResizeToFit)
 		InvalidateLayout();
-		
+
+	if (locked)
+		UnlockLooper();
+
 	return success;
 }
 
