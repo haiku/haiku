@@ -349,6 +349,7 @@ AboutView::AboutView(const BRect &rect)
 		"Thomas Kurschel\n"
 		"Adi Oanca\n"
 		"Niels Reedijk\n"
+		"Bryan Varner\n"
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
