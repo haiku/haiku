@@ -421,8 +421,11 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	}
 
 	if (window->Lock()) {
-		if (fSelected != NULL)
+		if (fSelected != NULL) {
+			if (fSelected->Submenu() == NULL)
+				resultItem = fSelected;
 			SelectItem(NULL);
+		}
 		if (resultItem != NULL)
 			resultItem->Invoke();
 		window->Unlock();
