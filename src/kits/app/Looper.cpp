@@ -552,13 +552,11 @@ PRINT(("  fOwnerCount now: %ld\n", fOwnerCount));
 		fOwner = -1;
 
 		//	Decrement requested lock count (using fAtomicCount for this)
-/*		int32 atomicCount =*/ atomic_add(&fAtomicCount, -1);
+		int32 atomicCount = atomic_add(&fAtomicCount, -1);
 PRINT(("  fAtomicCount now: %ld\n", fAtomicCount));
 
 		//	Check if anyone is waiting for a lock
-// bonefish: Currently _Lock() always acquires the semaphore.
-//		if (atomicCount > 0)
-		{
+		if (atomicCount > 1) {
 			//	release the lock
 			release_sem(fLockSem);
 		}
@@ -929,6 +927,7 @@ PRINT(("BLooper::_Lock() done 1\n"));
 			get deleted here (since ~BLooper() has to lock the list as
 			well to remove itself).
  */
+	int32 oldCount;
 	{
 		BObjectLocker<BLooperList> ListLock(gLooperList);
 		if (!ListLock.IsLocked())
@@ -982,7 +981,7 @@ PRINT(("BLooper::_Lock() done 6\n"));
 		}
 	
 		//	Bump the requested lock count (using fAtomicCount for this)
-		atomic_add(&loop->fAtomicCount, 1);
+		oldCount = atomic_add(&loop->fAtomicCount, 1);
 
 		// sLooperListLock automatically released here
 	}
@@ -996,32 +995,30 @@ PRINT(("BLooper::_Lock() done 6\n"));
 			instead of the easier-to-deal-with BLocker; you can't cache a
 			BLocker.
  */
-	//	acquire the lock
-	status_t err;
-	do
-	{
-		err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
-	} while (err == B_INTERRUPTED);
-
-	if (!err)
-	{
-		//		Assign current thread to fOwner
-		loop->fOwner = curThread;
-		//		Reset fOwnerCount to 1
-		loop->fOwnerCount = 1;
-	}
-
-	PRINT(("BLooper::_Lock() done: %lx\n", err));
-	return err;
+	//	acquire the lock for real
+	return _LockComplete(loop, oldCount, curThread, sem, timeout);
 }
 
 
 status_t
-BLooper::_LockComplete(BLooper *looper, int32 old, thread_id this_tid,
-	sem_id sem, bigtime_t timeout)
+BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread, sem_id sem, bigtime_t timeout)
 {
-	// What is this for?  Hope I'm not missing something conceptually here ...
-	return B_ERROR;
+	status_t err = B_OK;
+	
+	if (oldCount > 0) {
+		do {	
+			err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
+		} while (err == B_INTERRUPTED);
+	}
+	
+	if (err == B_OK) {
+		//		Assign current thread to fOwner
+		looper->fOwner = thread;
+		//		Reset fOwnerCount to 1
+		looper->fOwnerCount = 1;
+	}
+PRINT(("BLooper::_LockComplete() done: %lx\n", err));
+	return err;
 }
 
 
@@ -1037,6 +1034,7 @@ BLooper::InitData()
 	fTaskID = B_ERROR;
 	fTerminating = false;
 	fMsgPort = -1;
+	fAtomicCount = 0;
 
 	if (sTeamID == -1) {
 		thread_info info;
@@ -1054,7 +1052,7 @@ BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
 	if (name == NULL)
 		name = "anonymous looper";
 
-	fLockSem = create_sem(1, name);
+	fLockSem = create_sem(0, name);
 
 	if (portCapacity <= 0)
 		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
@@ -1496,12 +1494,9 @@ BLooper::UnlockFully()
 	// Nobody owns the lock now
 	fOwner = -1;
 	// There is now one less thread holding a lock on this looper
-// bonefish: Currently _Lock() always acquires the semaphore.
-/*	long atomicCount = */atomic_add(&fAtomicCount, -1);
-//	if (atomicCount > 0)
-	{
+	int32 atomicCount = atomic_add(&fAtomicCount, -1);
+	if (atomicCount > 1)
 		release_sem(fLockSem);
-	}
 }
 
 
