@@ -1081,6 +1081,16 @@ BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 	return _LaunchApp(NULL, ref, NULL, argc, args, appTeam);
 }
 
+// TODO: just here for providing binary compatibility
+// (for example "Guido" needs this)
+extern "C"
+status_t
+Launch__C7BRosterP9entry_refP8BMessagePl(BRoster *roster,
+										 entry_ref* ref,
+										 BMessage* initialMessage)
+{
+	return roster->BRoster::Launch(ref, initialMessage, NULL);
+}
 
 //	#pragma mark - Recent document and app support
 

@@ -760,6 +760,18 @@ BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size iconSiz
 	return error;
 }
 
+// TODO: just here for providing binary compatibility
+// (for example "Guido" needs this)
+extern "C"
+status_t
+GetTrackerIcon__9BNodeInfoP9entry_refP7BBitmap9icon_size(
+	BNodeInfo *nodeInfo, entry_ref* ref,
+	BBitmap* bitmap, icon_size iconSize)
+{
+	// NOTE: nodeInfo is ignored - maybe that's wrong!
+	return BNodeInfo::GetTrackerIcon(ref, bitmap, iconSize);
+}
+
 void 
 BNodeInfo::_ReservedNodeInfo1()
 {
