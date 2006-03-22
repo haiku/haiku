@@ -300,15 +300,15 @@ AboutView::AboutView(const BRect &rect)
 		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_PLAIN_BORDER);
 	AddChild(creditsScroller);
 
-	rgb_color darkgrey 		= { 100, 100, 100, 255 };
-	rgb_color haiku_green 	= {  42, 131,  36, 255 };
-	rgb_color haiku_orange 	= { 255,  69,   0, 255 };
-	rgb_color haiku_yellow  = { 255, 176,   0, 255 };
+	rgb_color darkgrey = { 100, 100, 100, 255 };
+	rgb_color haikuGreen = { 42, 131, 36, 255 };
+	rgb_color haikuOrange = { 255, 69, 0, 255 };
+	rgb_color haikuYellow = { 255, 176, 0, 255 };
 
 	BFont font(be_bold_font);
 	font.SetSize(font.Size() + 4);
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_green);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuGreen);
 	fCreditsView->Insert("Haiku\n");
 
 	font.SetSize(be_bold_font->Size());
@@ -317,7 +317,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT "2001-2006 Haiku, Inc.\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
@@ -334,7 +334,7 @@ AboutView::AboutView(const BRect &rect)
 		"Michael Wilber\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Developers:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
@@ -344,15 +344,14 @@ AboutView::AboutView(const BRect &rect)
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
 		"Jérôme Duval\n"
-		"Matthijs Hollemans\n"
 		"Waldemar Kornewald\n"
 		"Thomas Kurschel\n"
-		"Adi Oanca\n"
+		"Michael Lotz\n"
 		"Niels Reedijk\n"
 		"Bryan Varner\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Contributors:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
@@ -363,13 +362,13 @@ AboutView::AboutView(const BRect &rect)
 		"Cian Duffy\n"
 		"Marc Flerackers\n"
 		"Daniel Furrer\n"
+		"Matthijs Hollemans\n"
 		"Erik Jaesler\n"
 		"Marcin Konicki\n"
 		"Elad Lahav\n"
 		"Santiago Lema\n"
 		"Oscar Lesta\n"
 		"Jerome Leveque\n"
-		"Michael Lotz\n"
 		"Graham MacDonald\n"
 		"Brian Matzon\n"
 		"Christopher ML Zumwalt May\n"
@@ -379,6 +378,7 @@ AboutView::AboutView(const BRect &rect)
 		"MrSiggler\n"
 		"Alan Murta\n"
 		"Frans Van Nispen\n"
+		"Adi Oanca\n"
 		"Pahtz\n"
 		"Michael Paine\n"
 		"Michael Phipps\n"
@@ -402,26 +402,27 @@ AboutView::AboutView(const BRect &rect)
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
 		"\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_orange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
 	fCreditsView->Insert("Special Thanks To:\n");
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_green);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuGreen);
 	fCreditsView->Insert("\nCopyrights\n\n");
 
 	font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("AntiGrain Geometry\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Copyright (C) 2002-2006 Maxim Shemanarev (McSeem)\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("PDFLib\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
@@ -429,14 +430,14 @@ AboutView::AboutView(const BRect &rect)
 		"All rights reserved.\n"
 		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("FreeType2\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert("Portions of this software are copyright (C) 1996-2006 The FreeType"
 		" Project (www.freetype.org).  All rights reserved.\n\n");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Mesa\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
@@ -444,7 +445,7 @@ AboutView::AboutView(const BRect &rect)
 		"Mesa3D project (www.mesa3d.org).  All rights reserved.\n\n");
 
 	// SGI's GLU implementation copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("GLU\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
@@ -452,7 +453,7 @@ AboutView::AboutView(const BRect &rect)
 		"SGI's Software FreeB license.  All rights reserved.\n\n");
 
 	// GLUT implementation copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("GLUT\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
@@ -462,7 +463,7 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright (c) 1999 Jake Hamby. \n\n");
 
 	// Konatu font
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haiku_yellow);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Konatu font\n");
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
