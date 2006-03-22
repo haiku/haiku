@@ -38,7 +38,8 @@ BMenuWindow::BMenuWindow(const char *name, BMenu *menu)
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)
 {
-	SetMenu(menu);
+	if (menu != NULL)
+		SetMenu(menu);
 }
 
 

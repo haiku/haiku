@@ -1606,7 +1606,7 @@ BMenu::MenuWindow()
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menu", Name());
-		fCachedMenuWindow = new BMenuWindow(windowName, this);
+		fCachedMenuWindow = new BMenuWindow(windowName, NULL);
 	}
 
 	return fCachedMenuWindow;
