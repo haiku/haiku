@@ -7,7 +7,6 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-
 #include <string.h>
 
 #include <Debug.h>
@@ -1053,7 +1052,9 @@ BMenu::_show(bool selectFirstItem)
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
 	BMenuWindow *window = NULL;
+	
 	if (fSuper != NULL) {
+		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 		window = fSuper->MenuWindow();
 		if (window != NULL)
 			window->SetMenu(this);
@@ -1068,19 +1069,22 @@ BMenu::_show(bool selectFirstItem)
 
 	if (window == NULL)
 		return false;
-
-	window->Lock();
+	
+	if (!window->IsLocked())
+		window->Lock();
 	window->ChildAt(0)->AddChild(this);
-
-	if (fSuper != NULL)
-		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 
 	// TODO: for some reason, Window() can already be NULL at this point,
 	//		which causes a crash in one of the following functions...
 	UpdateWindowViewSize();
 	window->Show();
 
-	window->Unlock();
+	if (selectFirstItem)
+		SelectItem(ItemAt(0));
+	
+	if (window->IsLocked())
+		window->Unlock();
+		
 	return true;
 }
 
@@ -1091,7 +1095,8 @@ BMenu::_hide()
 	if (!LockLooper())
 		return;
 
-	BMenuWindow *menuWindow = fSuper ? fSuper->fCachedMenuWindow : NULL;
+	SelectItem(NULL);
+
 	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 	if (window == NULL) {
 		// Huh? What did happen here? - we're trying to be on the safe side
@@ -1103,10 +1108,13 @@ BMenu::_hide()
 	window->ChildAt(0)->RemoveChild(this);
 		// we don't want to be deleted when the window is removed
 
-	// Only quit if the window isn't cached. The cached menu window
-	// will be deleted at the end of BMenu::_track().
-	if (menuWindow != window)
+	// Delete the menu window used by our submenus
+	DeleteMenuWindow();
+
+	if (Supermenu() == NULL) {
+		// It's our window. Quit it.	
 		window->Quit();
+	}
 }
 
 
@@ -1251,6 +1259,8 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 	// and ignore index and count. Otherwise, we use them instead.
 	if (item != NULL) {
 		if (fItems.RemoveItem(item)) {
+			if (item == fSelected)
+				SelectItem(NULL);
 			item->SetSuper(NULL);
 			item->Uninstall();	
 			if (deleteItems)
@@ -1268,6 +1278,8 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 			item = static_cast<BMenuItem*>(fItems.ItemAt(i));
 			if (item != NULL) {
 				if (fItems.RemoveItem(item)) {
+					if (item == fSelected)
+						SelectItem(NULL);
 					item->SetSuper(NULL);
 					item->Uninstall();
 					if (deleteItems)
