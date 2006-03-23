@@ -1056,12 +1056,15 @@ BMenu::_show(bool selectFirstItem)
 	if (fSuper != NULL) {
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 		window = fSuper->MenuWindow();
-		if (window != NULL)
+		if (window != NULL && window->Lock()) {
 			window->SetMenu(this);
+			window->Unlock();
+		}
 	}
+	
 	// Otherwise, create a new one
-	// Actually, I think this can only happen for
-	// "stand alone" BPopUpMenus (i.e. not within a BMenuField)
+	// This happens for "stand alone" BPopUpMenus
+	// (i.e. not within a BMenuField)
 	if (window == NULL) {
 		// Menu windows get the BMenu's handler name
 		window = new BMenuWindow(Name(), this);
@@ -1070,20 +1073,19 @@ BMenu::_show(bool selectFirstItem)
 	if (window == NULL)
 		return false;
 	
-	if (!window->IsLocked())
-		window->Lock();
-	window->ChildAt(0)->AddChild(this);
+	if (window->Lock()) {
+		window->ChildAt(0)->AddChild(this);
 
-	// TODO: for some reason, Window() can already be NULL at this point,
-	//		which causes a crash in one of the following functions...
-	UpdateWindowViewSize();
-	window->Show();
+		// TODO: for some reason, Window() can already be NULL at this point,
+		//		which causes a crash in one of the following functions...
+		UpdateWindowViewSize();
+		window->Show();
 
-	if (selectFirstItem)
-		SelectItem(ItemAt(0));
-	
-	if (window->IsLocked())
+		if (selectFirstItem)
+			SelectItem(ItemAt(0));
+		
 		window->Unlock();
+	}
 		
 	return true;
 }
@@ -1114,6 +1116,10 @@ BMenu::_hide()
 	if (Supermenu() == NULL) {
 		// It's our window. Quit it.	
 		window->Quit();
+	} else {
+		// _show() expects the window to be unlocked
+		// (UnlockLooper() won't work as we are no longer attached)
+		window->Unlock();
 	}
 }
 
