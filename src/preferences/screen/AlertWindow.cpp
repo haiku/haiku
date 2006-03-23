@@ -30,8 +30,8 @@ AlertWindow::AlertWindow(BMessenger target)
 
 	// center window on screen
 	BScreen screen(this);
-	MoveTo((screen.Frame().Width() - Frame().Width()) / 2,
-		(screen.Frame().Height() - Frame().Height()) / 2);
+	MoveTo(screen.Frame().left + (screen.Frame().Width() - Frame().Width()) / 2,
+		screen.Frame().top + (screen.Frame().Height() - Frame().Height()) / 2);
 }
 
 

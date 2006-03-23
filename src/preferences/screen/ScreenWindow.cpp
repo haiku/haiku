@@ -902,6 +902,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 				fChangingAllWorkspaces = false;
 			}
 
+			fScreenMode.UpdateOriginalMode();
 			UpdateActiveMode();
 			break;
 		}
