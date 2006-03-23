@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Copyright 2002, Thomas Kurschel.
  * Distributed under the terms of the MIT License.
  *
@@ -45,7 +45,7 @@ MonitorView::AttachedToWindow()
 void
 MonitorView::MouseDown(BPoint point)
 {
-	be_roster->Launch("application/x-vnd.Be-BACK");
+	be_roster->Launch(kBackgroundsSignature);
 }
 
 

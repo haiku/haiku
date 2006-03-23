@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,9 @@
 #include "Constants.h"
 
 #include <Alert.h>
+
+
+static const char* kAppSignature = "application/x-vnd.Be-SCRN";
 
 
 ScreenApplication::ScreenApplication()

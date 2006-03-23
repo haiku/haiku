@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,7 +15,7 @@
 #include <Window.h>
 
 
-static const char *kSignature = "application/x-vnd.haiku.Backgrounds";
+static const char *kSignature = "application/x-vnd.haiku-backgrounds";
 
 
 class BackgroundsApplication : public BApplication {

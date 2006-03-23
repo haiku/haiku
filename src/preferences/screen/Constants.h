@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,7 +37,8 @@ static const uint32 DIM_COUNT_MSG = 'scrf';
 static const uint32 MAKE_INITIAL_MSG = 'mkin';
 
 // Constants
-static const char kAppSignature[] = "application/x-vnd.Be-SCRN";
+extern const char* kBackgroundsSignature;
+
 static const int32 gMinRefresh = 45;	// This is the minimum selectable refresh
 static const int32 gMaxRefresh = 140;	// This is the maximum selectable refresh
 

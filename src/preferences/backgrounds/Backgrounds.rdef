@@ -57,7 +57,7 @@ resource mini_icon
 	$"FFFF00000E0F0F0F0F0F0F000F0F0FFF"
 };
 
-resource app_signature "application/x-vnd.haiku.Backgrounds";
+resource app_signature "application/x-vnd.haiku-backgrounds";
 
 resource app_version
 {

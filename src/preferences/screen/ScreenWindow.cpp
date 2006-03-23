@@ -57,6 +57,8 @@
 	// undefine to get standard refresh rates from driver
 
 
+const char* kBackgroundsSignature = "application/x-vnd.haiku-backgrounds";
+
 // list of officially supported colour spaces
 static const struct {
 	color_space	space;
@@ -836,7 +838,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			break;
 
 		case BUTTON_LAUNCH_BACKGROUNDS_MSG:
-			be_roster->Launch("application/x-vnd.Be-BACK");
+			be_roster->Launch(kBackgroundsSignature);
 			break;
 
 		case BUTTON_DEFAULTS_MSG:
