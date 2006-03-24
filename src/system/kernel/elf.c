@@ -1258,7 +1258,7 @@ load_kernel_add_on(const char *path)
 
 	pheaders = (struct Elf32_Phdr *)malloc(eheader->e_phnum * eheader->e_phentsize);
 	if (pheaders == NULL) {
-		dprintf("error allocating space for program headers\n");
+		dprintf("%s: error allocating space for program headers\n", fileName);
 		err = B_NO_MEMORY;
 		goto error2;
 	}
@@ -1267,11 +1267,11 @@ load_kernel_add_on(const char *path)
 	len = _kern_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
-		TRACE(("error reading in program headers\n"));
+		TRACE(("%s: error reading in program headers\n", fileName));
 		goto error3;
 	}
 	if (len != eheader->e_phnum * eheader->e_phentsize) {
-		TRACE(("short read while reading in program headers\n"));
+		TRACE(("%s: short read while reading in program headers\n", fileName));
 		err = -1;
 		goto error3;
 	}
@@ -1284,7 +1284,8 @@ load_kernel_add_on(const char *path)
 		if (pheaders[i].p_type != PT_LOAD)
 			continue;
 
-		reservedSize += ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		reservedSize += ROUNDUP(pheaders[i].p_memsz
+			+ (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 	}
 
 	// reserve that space and allocate the areas from that one
@@ -1307,7 +1308,7 @@ load_kernel_add_on(const char *path)
 				image->dynamic_ptr = pheaders[i].p_vaddr;
 				continue;
 			default:
-				dprintf("unhandled pheader type 0x%lx\n", pheaders[i].p_type);
+				dprintf("%s: unhandled pheader type 0x%lx\n", fileName, pheaders[i].p_type);
 				continue;
 		}
 
@@ -1333,7 +1334,7 @@ load_kernel_add_on(const char *path)
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
-			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
+			dprintf("%s: weird program header flags 0x%lx\n", fileName, pheaders[i].p_flags);
 			continue;
 		}
 
@@ -1344,28 +1345,29 @@ load_kernel_add_on(const char *path)
 		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
 			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region->id < B_OK) {
-			dprintf("error allocating area: %s\n", strerror(region->id));
+			dprintf("%s: error allocating area: %s\n", fileName, strerror(region->id));
 			err = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
 		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
 		start += region->size;
 
-		TRACE(("elf_load_kspace: created area \"%s\" at %p\n", regionName, (void *)region->start));
+		TRACE(("elf_load_kspace: created area \"%s\" at %p\n",
+			regionName, (void *)region->start));
 
 		len = _kern_read(fd, pheaders[i].p_offset,
 			(void *)(region->start + (pheaders[i].p_vaddr % B_PAGE_SIZE)),
 			pheaders[i].p_filesz);
 		if (len < 0) {
 			err = len;
-			dprintf("error reading in seg %d\n", i);
+			dprintf("%s: error reading in seg %d\n", fileName, i);
 			goto error5;
 		}
 	}
 
 	if (image->data_region.start != 0
 		&& image->text_region.delta != image->data_region.delta) {
-		dprintf("deltas do not match!\n");
+		dprintf("%s: deltas do not match!\n", fileName);
 		dump_image_info(image);
 		err = B_ERROR;
 		goto error5;
