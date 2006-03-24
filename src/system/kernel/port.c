@@ -82,8 +82,8 @@ static spinlock sPortSpinlock = 0;
 status_t
 port_init(kernel_args *args)
 {
-	int i;
-	int size = sizeof(struct port_entry) * sMaxPorts;
+	size_t size = sizeof(struct port_entry) * sMaxPorts;
+	int32 i;
 
 	// create and initialize ports table
 	sPortArea = create_area("port_table", (void **)&sPorts, B_ANY_KERNEL_ADDRESS,
@@ -218,11 +218,29 @@ port_test_thread_func(void *arg)
 int
 dump_port_list(int argc, char **argv)
 {
-	int i;
+	const char *name = NULL;
+	team_id owner = -1;
+	int32 i;
+
+	if (argc > 2) {
+		if (!strcmp(argv[1], "team") || !strcmp(argv[1], "owner"))
+			owner = strtoul(argv[2], NULL, 0);
+		else if (!strcmp(argv[1], "name"))
+			name = argv[2];
+	} else if (argc > 1)
+		owner = strtoul(argv[1], NULL, 0);
+
+	kprintf("port           id  cap  r-sem  w-sem   team  name\n");
 
 	for (i = 0; i < sMaxPorts; i++) {
-		if (sPorts[i].id >= 0)
-			kprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sPorts[i], sPorts[i].id, sPorts[i].name);
+		struct port_entry *port = &sPorts[i];
+		if (port->id < 0
+			|| (owner != -1 && port->owner != owner)
+			|| (name != NULL && strstr(port->name, name) == NULL))
+			continue;
+
+		kprintf("%p %6lx %4ld %6lx %6lx %6lx  %s\n", port, port->id, port->capacity,
+			port->read_sem, port->write_sem, port->owner, port->name);
 	}
 	return 0;
 }
@@ -251,41 +269,45 @@ _dump_port_info(struct port_entry *port)
 static int
 dump_port_info(int argc, char **argv)
 {
+	const char *name = NULL;
+	sem_id sem = -1;
 	int i;
 
 	if (argc < 2) {
-		kprintf("usage: port [id|name|address]\n");
+		kprintf("usage: port [id|name|sem|address]\n");
 		return 0;
 	}
 
-	// if the argument looks like a number, treat it as such
-	if (isdigit(argv[1][0])) {
-		uint32 num = strtoul(argv[1], NULL, 0);
-
-		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
-			// XXX semi-hack
-			// one can use either address or a port_id, since KERNEL_BASE > sMaxPorts assumed
-			_dump_port_info((struct port_entry *)num);
+	if (argc > 2) {
+		if (!strcmp(argv[1], "address")) {
+			_dump_port_info((struct port_entry *)strtoul(argv[2], NULL, 0));
 			return 0;
-		} else {
-			unsigned slot = num % sMaxPorts;
-			if (sPorts[slot].id != (int)num) {
-				kprintf("port 0x%lx doesn't exist!\n", num);
-				return 0;
-			}
-			_dump_port_info(&sPorts[slot]);
+		} else if (!strcmp(argv[1], "sem"))
+			sem = strtoul(argv[2], NULL, 0);
+		else if (!strcmp(argv[1], "name"))
+			name = argv[2];
+	} else if (isdigit(argv[1][0])) {
+		// if the argument looks like a number, treat it as such
+		uint32 num = strtoul(argv[1], NULL, 0);
+		uint32 slot = num % sMaxPorts;
+		if (sPorts[slot].id != (int)num) {
+			kprintf("port 0x%lx doesn't exist!\n", num);
 			return 0;
 		}
-	}
+		_dump_port_info(&sPorts[slot]);
+		return 0;
+	} else
+		name = argv[1];
 
 	// walk through the ports list, trying to match name
 	for (i = 0; i < sMaxPorts; i++) {
-		if (sPorts[i].name != NULL
-			&& strcmp(argv[1], sPorts[i].name) == 0) {
+		if ((name != NULL && sPorts[i].name != NULL && !strcmp(name, sPorts[i].name))
+			|| (sem != -1 && (sPorts[i].read_sem == sem || sPorts[i].write_sem == sem))) {
 			_dump_port_info(&sPorts[i]);
 			return 0;
 		}
 	}
+
 	return 0;
 }
 

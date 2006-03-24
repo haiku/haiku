@@ -1946,16 +1946,21 @@ dump_area_list(int argc, char **argv)
 {
 	vm_area *area;
 	struct hash_iterator iter;
-	int32 id = -1;
+	const char *name = NULL;
+	int32 id = 0;
 
-	if (argc > 1)
+	if (argc > 1) {
 		id = strtoul(argv[1], NULL, 0);
+		if (id == 0)
+			name = argv[1];
+	}
 
 	kprintf("addr          id  base\t\tsize    protect lock  name\n");
 
 	hash_open(sAreaHash, &iter);
 	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
-		if (id != -1 && area->address_space->id != id)
+		if (id != 0 && area->address_space->id != id
+			|| name != NULL && strstr(area->name, name) == NULL)
 			continue;
 
 		kprintf("%p %5lx  %p\t%p %4lx\t%4d  %s\n", area, area->id, (void *)area->base,

@@ -44,7 +44,7 @@ struct sem_entry {
 	union {
 		// when slot in use
 		struct {
-			int					count;
+			int32				count;
 			struct thread_queue queue;
 			char				*name;
 			team_id				owner;	// if set to -1, means owned by a port
@@ -81,22 +81,62 @@ static int remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
 				struct thread_queue *queue, status_t acquireStatus);
 
 struct sem_timeout_args {
-	thread_id blocked_thread;
-	sem_id blocked_sem_id;
-	int sem_count;
+	thread_id	blocked_thread;
+	sem_id		blocked_sem_id;
+	int32		sem_count;
 };
 
 
 static int
 dump_sem_list(int argc, char **argv)
 {
-	int i;
+	const char *name = NULL;
+	team_id owner = -1;
+#ifdef DEBUG_LAST_ACQUIRER
+	thread_id last = -1;
+#endif
+	int32 i;
+
+	if (argc > 2) {
+		if (!strcmp(argv[1], "team") || !strcmp(argv[1], "owner"))
+			owner = strtoul(argv[2], NULL, 0);
+		else if (!strcmp(argv[1], "name"))
+			name = argv[2];
+#ifdef DEBUG_LAST_ACQUIRER
+		else if (!strcmp(argv[1], "last"))
+			last = strtoul(argv[2], NULL, 0);
+#endif
+	} else if (argc > 1)
+		owner = strtoul(argv[1], NULL, 0);
+
+	kprintf("sem            id count   team"
+#ifdef DEBUG_LAST_ACQUIRER
+		"   last"
+#endif
+		"  name\n");
 
 	for (i = 0; i < sMaxSems; i++) {
-		if (sSems[i].id >= 0)
-			kprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sSems[i], sSems[i].id,
-					sSems[i].u.used.name);
+		struct sem_entry *sem = &sSems[i];
+		if (sem->id < 0
+#ifdef DEBUG_LAST_ACQUIRER
+			|| (last != -1 && sem->u.used.last_acquirer != last)
+#endif
+			|| (name != NULL && strstr(sem->u.used.name, name) == NULL)
+			|| (owner != -1 && sem->u.used.owner != owner))
+			continue;
+
+		kprintf("%p %6lx %5ld %6lx "
+#ifdef DEBUG_LAST_ACQUIRER
+			"%6lx "
+#endif
+			" %s\n", sem, sem->id, sem->u.used.count,
+			sem->u.used.owner,
+#ifdef DEBUG_LAST_ACQUIRER
+			sem->u.used.last_acquirer > 0 ? sem->u.used.last_acquirer : 0,
+#endif
+			sem->u.used.name);
 	}
+
 	return 0;
 }
 
@@ -109,7 +149,7 @@ dump_sem(struct sem_entry *sem)
 	if (sem->id >= 0) {
 		kprintf("name:    '%s'\n", sem->u.used.name);
 		kprintf("owner:   0x%lx\n", sem->u.used.owner);
-		kprintf("count:   0x%x\n", sem->u.used.count);
+		kprintf("count:   0x%lx\n", sem->u.used.count);
 		kprintf("queue:   head %p tail %p\n", sem->u.used.queue.head,
 				sem->u.used.queue.tail);
 #ifdef DEBUG_LAST_ACQUIRER
