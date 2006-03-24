@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons accelerants intel_extreme ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+Addon intel_extreme.accelerant : accelerants :
+	accelerant.cpp
+	dpms.cpp
+	engine.cpp
+	hooks.cpp
+	mode.cpp
+	: false
+	: be
+;

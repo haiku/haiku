@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers graphics ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics common ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics et6x00 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics intel_extreme ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics matrox ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics neomagic ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics nvidia ;
