@@ -73,7 +73,7 @@ static const struct {
 static const int32 kColorSpaceCount = sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
 
 // list of standard refresh rates
-static const int32 kRefreshRates[] = { 60, 75, 80, 85, 95, 100 };
+static const int32 kRefreshRates[] = { 60, 70, 72, 75, 80, 85, 95, 100 };
 static const int32 kRefreshRateCount = sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
 
 
