@@ -70,7 +70,7 @@ PhysicalMemoryMapper::Keep()
 
 //	#pragma mark -
 
-
+#if 0
 #define DUMPED_BLOCK_SIZE 16
 
 void
@@ -86,7 +86,7 @@ dumpBlock(int file, const uint8 *buffer, int size)
 
 		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
-				pos += snprintf(line + pos, sizeof(line) - pos, " ");
+				pos += sprintf(line + pos, sizeof(line) - pos, " ");
 
 			if (i >= size)
 				break;
@@ -98,7 +98,7 @@ dumpBlock(int file, const uint8 *buffer, int size)
 		write(file, line, pos);
 	}
 }
-
+#endif
 
 status_t
 intel_extreme_init(intel_info &info)

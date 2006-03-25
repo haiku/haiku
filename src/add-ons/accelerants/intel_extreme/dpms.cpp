@@ -11,6 +11,15 @@
 #include "accelerant.h"
 
 
+//#define TRACE_DPMS
+#ifdef TRACE_DPMS
+extern "C" void _sPrintf(const char *format, ...);
+#	define TRACE(x) _sPrintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 void
 enable_display_plane(bool enable)
 {
@@ -84,6 +93,7 @@ set_display_power_mode(uint32 mode)
 uint32
 intel_dpms_capabilities(void)
 {
+	TRACE(("intel_dpms_capabilities()\n"));
 	return B_DPMS_ON | B_DPMS_SUSPEND | B_DPMS_STAND_BY | B_DPMS_OFF;
 }
 
@@ -91,6 +101,7 @@ intel_dpms_capabilities(void)
 uint32
 intel_dpms_mode(void)
 {
+	TRACE(("intel_dpms_mode()\n"));
 	return gInfo->shared_info->dpms_mode;
 }
 
@@ -98,6 +109,7 @@ intel_dpms_mode(void)
 status_t
 intel_set_dpms_mode(uint32 mode)
 {
+	TRACE(("intel_set_dpms_mode()\n"));
 	gInfo->shared_info->dpms_mode = mode;
 	set_display_power_mode(mode);
 

@@ -12,7 +12,7 @@
 #include "utility.h"
 
 
-#define TRACE_MODE
+//#define TRACE_MODE
 #ifdef TRACE_MODE
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -226,6 +226,8 @@ intel_propose_display_mode(display_mode *target, const display_mode *low,
 status_t
 intel_set_display_mode(display_mode *mode)
 {
+	TRACE(("intel_set_display_mode()\n"));
+
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
@@ -372,6 +374,7 @@ intel_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
+	TRACE(("intel_move_display()\n"));
 	return B_ERROR;
 }
 
@@ -379,6 +382,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 status_t
 intel_get_timing_constraints(display_timing_constraints *constraints)
 {
+	TRACE(("intel_get_timing_contraints()\n"));
 	return B_ERROR;
 }
 
@@ -386,5 +390,6 @@ intel_get_timing_constraints(display_timing_constraints *constraints)
 void
 intel_set_indexed_colors(uint count, uint8 first, uint8 *colorData, uint32 flags)
 {
+	TRACE(("intel_set_indexed_colors()\n"));
 }
 

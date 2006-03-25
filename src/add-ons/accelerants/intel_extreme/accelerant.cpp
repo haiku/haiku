@@ -16,7 +16,7 @@
 #include <syslog.h>
 
 
-#define TRACE_ACCELERANT
+//#define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -163,7 +163,7 @@ uninit_common(void)
 status_t
 intel_init_accelerant(int device)
 {
-	syslog(LOG_ERR, "intel_extreme.accelerant here!\n");
+	TRACE(("intel_init_accelerant()\n"));
 
 	status_t status = init_common(device, false);
 	if (status != B_OK) 
@@ -182,6 +182,7 @@ intel_init_accelerant(int device)
 ssize_t
 intel_accelerant_clone_info_size(void)
 {
+	TRACE(("intel_accelerant_clone_info_size()\n"));
 	// clone info is device name, so return its maximum size
 	return B_PATH_NAME_LENGTH;
 }
@@ -190,6 +191,7 @@ intel_accelerant_clone_info_size(void)
 void
 intel_get_accelerant_clone_info(void *info)
 {
+	TRACE(("intel_get_accelerant_clone_info()\n"));
 	ioctl(gInfo->device, INTEL_GET_DEVICE_NAME, info, B_PATH_NAME_LENGTH);
 }
 
@@ -253,6 +255,8 @@ intel_uninit_accelerant(void)
 status_t
 intel_get_accelerant_device_info(accelerant_device_info *info)
 {
+	TRACE(("intel_get_accelerant_device_info()\n"));
+
 	info->version = B_ACCELERANT_VERSION;
 	strcpy(info->name, "Intel Extreme Graphics 2");
 	strcpy(info->chipset, "i865G");
@@ -269,6 +273,7 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 sem_id
 intel_accelerant_retrace_semaphore()
 {
+	TRACE(("intel_accelerant_retrace_semaphore()\n"));
 	return -1;
 }
 
