@@ -175,7 +175,7 @@ if (file >= 0) {
 	info.shared_info->graphics_memory_size = memorySize;
 	info.shared_info->dpms_mode = B_DPMS_ON;
 	info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
-	info.shared_info->pll_info.min_frequency = 100000;		// 100 MHz (not tested)
+	info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz (not tested)
 	info.shared_info->pll_info.max_frequency = 350000;		// 350 MHz RAM DAC speed
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_PLL_DIVISOR_0;
 

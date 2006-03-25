@@ -356,9 +356,9 @@ intel_get_pixel_clock_limits(display_mode *mode, uint32 *_low, uint32 *_high)
 		// lower limit of about 48Hz vertical refresh
 		uint32 totalClocks = (uint32)mode->timing.h_total * (uint32)mode->timing.v_total;
 		uint32 low = (totalClocks * 48L) / 1000L;
-		if (low < gInfo->shared_info->pll_info.max_frequency)
-			low = gInfo->shared_info->pll_info.max_frequency;
-		else if (low > gInfo->shared_info->pll_info.max_frequency) 
+		if (low < gInfo->shared_info->pll_info.min_frequency)
+			low = gInfo->shared_info->pll_info.min_frequency;
+		else if (low > gInfo->shared_info->pll_info.max_frequency)
 			return B_ERROR;
 
 		*_low = low;
