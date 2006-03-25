@@ -173,7 +173,7 @@ ScreenMode::~ScreenMode()
 
 
 status_t
-ScreenMode::Set(screen_mode& mode)
+ScreenMode::Set(const screen_mode& mode)
 {
 	if (!fUpdatedMode)
 		UpdateOriginalMode();
@@ -243,16 +243,29 @@ ScreenMode::UpdateOriginalMode()
 
 
 bool
-ScreenMode::SupportsColorSpace(screen_mode& mode, color_space space)
+ScreenMode::SupportsColorSpace(const screen_mode& mode, color_space space)
 {
-	return false;
+	return true;
 }
 
 
 status_t
-ScreenMode::GetRefreshLimits(screen_mode& mode, float& min, float& max)
+ScreenMode::GetRefreshLimits(const screen_mode& mode, float& min, float& max)
 {
-	return B_ERROR;
+	uint32 minClock, maxClock;
+	display_mode displayMode;
+	if (!GetDisplayMode(mode, displayMode))
+		return B_ERROR;
+
+	BScreen screen(fWindow);
+	if (screen.GetPixelClockLimits(&displayMode, &minClock, &maxClock) < B_OK)
+		return B_ERROR;
+
+	uint32 total = displayMode.timing.h_total * displayMode.timing.v_total;
+	min = minClock * 1000.0 / total;
+	max = maxClock * 1000.0 / total;
+
+	return B_OK;
 }
 
 
@@ -279,7 +292,7 @@ ScreenMode::CountModes()
 
 
 bool
-ScreenMode::GetDisplayMode(screen_mode& mode, display_mode& displayMode)
+ScreenMode::GetDisplayMode(const screen_mode& mode, display_mode& displayMode)
 {
 	uint16 virtualWidth, virtualHeight;
 	int32 bestIndex = -1;

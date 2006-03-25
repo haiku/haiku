@@ -1,48 +1,64 @@
-#include <Alert.h>
-#include <Application.h>
-#include <Button.h>
-#include <String.h>
-#include <Window.h>
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
 
 #include "RefreshWindow.h"
 #include "RefreshView.h"
 #include "RefreshSlider.h"
 #include "Constants.h"
 
-RefreshWindow::RefreshWindow(BRect frame, int32 value)
-	: BWindow(frame, "Refresh Rate", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
+#include <Alert.h>
+#include <Application.h>
+#include <Button.h>
+#include <String.h>
+#include <Window.h>
+
+
+RefreshWindow::RefreshWindow(BRect frame, float current, float min, float max)
+	: BWindow(frame, "Refresh Rate", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
+		B_ALL_WORKSPACES)
 {
 	BRect bounds(Bounds());
 	bounds.InsetBy(-1, -1);
-	
+
 	fRefreshView = new RefreshView(bounds, "RefreshView");
 	AddChild(fRefreshView);
-	
+
+	min = ceilf(min);
+	max = floorf(max);
+
 	BRect sliderRect;
 	BString maxRefresh;
-	maxRefresh << gMaxRefresh;
+	maxRefresh << (uint32)min;
 	BString minRefresh;
-	minRefresh << gMinRefresh;
-	
+	minRefresh << (uint32)max;
+
 	sliderRect.Set(10.0, 35.0, 299.0, 60.0);
-	
+
 	fRefreshSlider = new RefreshSlider(sliderRect);
-	
+
 	fRefreshSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	fRefreshSlider->SetHashMarkCount((gMaxRefresh-gMinRefresh)/5+1);
+	fRefreshSlider->SetHashMarkCount(uint32(max - min) / 5 + 1);
 	fRefreshSlider->SetLimitLabels(minRefresh.String(), maxRefresh.String());
 	fRefreshSlider->SetKeyIncrementValue(1);
-	fRefreshSlider->SetValue(value);
+	fRefreshSlider->SetValue(rint(current * 10));
 	fRefreshSlider->SetSnoozeAmount(1);
 	fRefreshSlider->SetModificationMessage(new BMessage(SLIDER_MODIFICATION_MSG));
-	
+
 	fRefreshView->AddChild(fRefreshSlider);
-	
+
 	BRect ButtonRect(219.0, 97.0, 230.0, 120.0);
-	
+
 	fDoneButton = new BButton(ButtonRect, "DoneButton", "Done", 
 		new BMessage(BUTTON_DONE_MSG));
-	
+
 	fDoneButton->ResizeToPreferred();
 	fDoneButton->MakeDefault(true);
 	

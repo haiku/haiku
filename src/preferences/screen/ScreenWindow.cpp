@@ -52,11 +52,6 @@
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
 
 
-#define USE_FIXED_REFRESH
-	// define to use fixed standard refresh rates
-	// undefine to get standard refresh rates from driver
-
-
 const char* kBackgroundsSignature = "application/x-vnd.haiku-backgrounds";
 
 // list of officially supported colour spaces
@@ -76,7 +71,6 @@ static const int32 kColorSpaceCount = sizeof(kColorSpaces) / sizeof(kColorSpaces
 static const int32 kRefreshRates[] = { 60, 70, 72, 75, 80, 85, 95, 100 };
 static const int32 kRefreshRateCount = sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
 
-
 // list of combine modes
 static const struct {
 	combine_mode	mode;
@@ -87,6 +81,13 @@ static const struct {
 	{ kCombineVertically, "vertically" }
 };
 static const int32 kCombineModeCount = sizeof(kCombineModes) / sizeof(kCombineModes[0]);
+
+enum {
+	SHOW_COMBINE_FIELD		= 0x01,
+	SHOW_SWAP_FIELD			= 0x02,
+	SHOW_LAPTOP_PANEL_FIELD	= 0x04,
+	SHOW_TV_STANDARD_FIELD	= 0x08,
+};
 
 
 static BString
@@ -146,12 +147,59 @@ screen_errors(status_t status)
 	}
 }
 
-enum {
-	SHOW_COMBINE_FIELD		= 0x01,
-	SHOW_SWAP_FIELD			= 0x02,
-	SHOW_LAPTOP_PANEL_FIELD	= 0x04,
-	SHOW_TV_STANDARD_FIELD	= 0x08,
-};
+
+static float
+max_label_width(BMenuField* control, float widestLabel)
+{
+	float labelWidth = control->StringWidth(control->Label());
+	if (widestLabel < labelWidth)
+		return labelWidth;
+	return widestLabel;
+}
+
+
+static BRect
+stack_and_align_menu_fields(const BList& menuFields)
+{
+	float widestLabel = 0.0;
+	int32 count = menuFields.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
+		widestLabel = max_label_width(menuField, widestLabel);
+	}
+
+	// add some room (but only if there is text at all)
+	if (widestLabel > 0.0)
+		widestLabel += 5.0;
+
+	// make all controls the same width
+	float widestField = 0.0;
+	for (int32 i = 0; i < count; i++) {
+		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
+		menuField->SetAlignment(B_ALIGN_RIGHT);
+		menuField->SetDivider(widestLabel);
+		menuField->ResizeToPreferred();
+		widestField = max_c(menuField->Bounds().Width(), widestField);
+	}
+
+	// layout controls under each other, resize all to size
+	// of largest of them (they could still have different
+	// heights though)
+	BMenuField* topMenuField = (BMenuField*)menuFields.FirstItem();
+	BPoint leftTop = topMenuField->Frame().LeftTop();
+	BRect frame = topMenuField->Frame();
+
+	for (int32 i = 0; i < count; i++) {
+		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
+		menuField->MoveTo(leftTop);
+		float height = menuField->Bounds().Height();
+		menuField->ResizeTo(widestField, height);
+		frame = frame | menuField->Frame();
+		leftTop.y += height + 5.0;
+	}
+
+	return frame;
+}
 
 
 //	#pragma mark -
@@ -246,7 +294,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		fResolutionMenu->AddItem(new BMenuItem(name.String(), message));
 	}
 
-	BRect rect(0.0, 0.0, 30.0, 15.0);
+	BRect rect(0.0, 0.0, 200.0, 15.0);
 	// fResolutionField needs to be at the correct
 	// left-top offset, because all other menu fields
 	// will be layouted relative to it
@@ -271,22 +319,36 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 
 	fRefreshMenu = new BPopUpMenu("refresh rate", true, true);
 
-#ifdef USE_FIXED_REFRESH
-	for (int32 i = 0; i < kRefreshRateCount; ++i) {
+	BMessage *message;
+
+	float min, max;
+	if (fScreenMode.GetRefreshLimits(fActive, min, max) && min == max) {
+		// This is a special case for drivers that only support a single
+		// frequency, like the VESA driver
 		BString name;
-		name << kRefreshRates[i] << " Hz";
+		name << min << " Hz";
 
-		BMessage *message = new BMessage(POP_REFRESH_MSG);
-		message->AddFloat("refresh", kRefreshRates[i]);
+		message = new BMessage(POP_REFRESH_MSG);
+		message->AddFloat("refresh", min);
 
-		fRefreshMenu->AddItem(new BMenuItem(name.String(), message));
+		fRefreshMenu->AddItem(item = new BMenuItem(name.String(), message));
+		item->SetEnabled(false);
+	} else {
+		for (int32 i = 0; i < kRefreshRateCount; ++i) {
+			BString name;
+			name << kRefreshRates[i] << " Hz";
+
+			message = new BMessage(POP_REFRESH_MSG);
+			message->AddFloat("refresh", kRefreshRates[i]);
+
+			fRefreshMenu->AddItem(new BMenuItem(name.String(), message));
+		}
+
+		message = new BMessage(POP_OTHER_REFRESH_MSG);
+
+		fOtherRefresh = new BMenuItem("Other" B_UTF8_ELLIPSIS, message);
+		fRefreshMenu->AddItem(fOtherRefresh);
 	}
-#endif
-
-	BMessage *message = new BMessage(POP_OTHER_REFRESH_MSG);
-
-	fOtherRefresh = new BMenuItem("Other" B_UTF8_ELLIPSIS, message);
-	fRefreshMenu->AddItem(fOtherRefresh);
 
 	fRefreshField = new BMenuField(rect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
 	fControlsBox->AddChild(fRefreshField);
@@ -497,67 +559,26 @@ ScreenWindow::CheckColorMenu()
 }
 
 
-/**	Enable/disable refresh options according to current mode.
- *	Only needed when USE_FIXED_REFRESH is not defined.
- */
+/**	Enable/disable refresh options according to current mode. */
 
 void
 ScreenWindow::CheckRefreshMenu()
-{	
-#ifndef USE_FIXED_REFRESH
-	// ToDo: does currently not compile!
-	for (int32 i = fRefreshMenu->CountItems() - 2; i >= 0; --i) {
-		delete fRefreshMenu->RemoveItem(i);
+{
+	float min, max;
+	if (fScreenMode.GetRefreshLimits(fSelected, min, max) != B_OK || min == max)
+		return;
+
+	for (int32 i = fRefreshMenu->CountItems(); i-- > 0;) {
+		BMenuItem* item = fRefreshMenu->ItemAt(i);
+		BMessage* message = item->Message();
+		float refresh;
+		if (message != NULL && message->FindFloat("refresh", &refresh) == B_OK)
+			item->SetEnabled(refresh >= min && refresh <= max);
 	}
-
-	for (int32 i = 0; i < fModeListCount; ++i) {
-		if (virtualWidth == fModeList[i].virtual_width
-			&& virtualHeight == fModeList[i].virtual_height
-			&& combine == get_combine_mode(&fModeList[i])) {
-			BString name;
-			BMenuItem *item;
-
-			int32 refresh10 = get_refresh10(fModeList[i]);
-			refresh10_to_string(name, refresh10);
-
-			item = fRefreshMenu->FindItem(name.String());
-			if (item == NULL) {
-				BMessage *msg = new BMessage(POP_REFRESH_MSG);
-				msg->AddFloat("refresh", refresh);
-
-				fRefreshMenu->AddItem(new BMenuItem(name.String(), msg),
-					fRefreshMenu->CountItems() - 1);
-			}
-		}
-	}
-#endif			
-
-	// TBD: some drivers lack many refresh rates; still, they
-	// can be used by generating the mode manually
-/*
-	for( i = 0; i < sizeof( refresh_list ) / sizeof( refresh_list[0] ); ++i ) {
-		BMenuItem *item;
-		bool supported = false;
-		
-		for( j = 0; j < fModeListCount; ++j ) {
-			if( width == fModeList[j].virtual_width &&
-				height == fModeList[j].virtual_height &&
-				refresh_list[i].refresh * 10 == getModeRefresh10( &fModeList[j] ))
-			{
-				supported = true;
-				break;
-			}
-		}
-
-		item = fRefreshMenu->ItemAt( i );
-		if( item ) 
-			item->SetEnabled( supported );
-	}
-*/
 }
 
 
-/** activate appropriate menu item according to selected refresh rate */
+/** Activate appropriate menu item according to selected refresh rate */
 
 void
 ScreenWindow::UpdateRefreshControl()
@@ -569,6 +590,7 @@ ScreenWindow::UpdateRefreshControl()
 	if (item) {
 		if (!item->IsMarked())
 			item->SetMarked(true);
+
 		// "Other…" items only contains a refresh rate when active
 		fOtherRefresh->SetLabel("Other…");
 		return;
@@ -788,13 +810,20 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		case POP_OTHER_REFRESH_MSG:
 		{
-			// make sure menu shows something usefull
+			// make sure menu shows something useful
 			UpdateRefreshControl();
+
+			float min = 0, max = 999;
+			fScreenMode.GetRefreshLimits(fSelected, min, max);
+			if (min < gMinRefresh)
+				min = gMinRefresh;
+			if (max > gMaxRefresh)
+				max = gMaxRefresh;
 
 			BRect frame(Frame());
 			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect(frame.left + 201.0,
 				frame.top + 34.0, frame.left + 509.0, frame.top + 169.0),
-				int32(fSelected.refresh * 10));
+				fSelected.refresh, min, max);
 			fRefreshWindow->Show();
 			break;
 		}
@@ -988,7 +1017,11 @@ ScreenWindow::LayoutControls(uint32 flags)
 							+ backgroundsButtonHeight
 							+ 20.0;
 
+#ifdef __HAIKU__
 	fScreenBox->MoveTo(10.0, 10.0 + fControlsBox->TopBorderOffset());
+#else
+	fScreenBox->MoveTo(10.0, 10.0 + 3);
+#endif
 	fScreenBox->ResizeTo(screenBoxWidth, screenBoxHeight);
 
 	float leftOffset = 10.0;
@@ -1043,60 +1076,6 @@ ScreenWindow::LayoutControls(uint32 flags)
 						 fDefaultsButton->Frame().top);
 
 	ResizeTo(boxFrame.right + 10, fDefaultsButton->Frame().bottom + 10);
-}
-
-
-static float
-max_label_width(BMenuField* control, float widestLabel)
-{
-	float labelWidth = control->StringWidth(control->Label());
-	if (widestLabel < labelWidth)
-		return labelWidth;
-	return widestLabel;
-}
-
-
-static BRect
-stack_and_align_menu_fields(const BList& menuFields)
-{
-	float widestLabel = 0.0;
-	int32 count = menuFields.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		widestLabel = max_label_width(menuField, widestLabel);
-	}
-
-	// add some room (but only if there is text at all)
-	if (widestLabel > 0.0)
-		widestLabel += 5.0;
-
-	// make all controls the same width
-	float widestField = 0.0;
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		menuField->SetAlignment(B_ALIGN_RIGHT);
-		menuField->SetDivider(widestLabel);
-		menuField->ResizeToPreferred();
-		widestField = max_c(menuField->Bounds().Width(), widestField);
-	}
-
-	// layout controls under each other, resize all to size
-	// of largest of them (they could still have different
-	// heights though)
-	BMenuField* topMenuField = (BMenuField*)menuFields.FirstItem();
-	BPoint leftTop = topMenuField->Frame().LeftTop();
-	BRect frame = topMenuField->Frame();
-
-	for (int32 i = 0; i < count; i++) {
-		BMenuField* menuField = (BMenuField*)menuFields.ItemAtFast(i);
-		menuField->MoveTo(leftTop);
-		float height = menuField->Bounds().Height();
-		menuField->ResizeTo(widestField, height);
-		frame = frame | menuField->Frame();
-		leftTop.y += height + 5.0;
-	}
-
-	return frame;
 }
 
 
