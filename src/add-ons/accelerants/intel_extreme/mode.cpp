@@ -281,32 +281,6 @@ intel_set_display_mode(display_mode *mode)
 		| (((postDivisor - 2) << DISPLAY_PLL_POST_DIVISOR_SHIFT) & DISPLAY_PLL_POST_DIVISOR_MASK)
 		| (divisorRegister == INTEL_DISPLAY_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
 
-TRACE(("pll regs: %08lx, 0: %08lx, 1: %08lx\n", read32(INTEL_DISPLAY_PLL),
-	read32(INTEL_DISPLAY_PLL_DIVISOR_0), read32(INTEL_DISPLAY_PLL_DIVISOR_1)));
-uint32 divisor = read32(divisorRegister);
-TRACE(("  POST %ld\n",
-	(read32(INTEL_DISPLAY_PLL) & DISPLAY_PLL_POST_DIVISOR_MASK) >> DISPLAY_PLL_POST_DIVISOR_SHIFT));
-TRACE(("  0: N %ld, M1 %ld, M2 %ld\n",
-	(divisor & DISPLAY_PLL_N_DIVISOR_MASK) >> DISPLAY_PLL_N_DIVISOR_SHIFT,
-	(divisor & DISPLAY_PLL_M1_DIVISOR_MASK) >> DISPLAY_PLL_M1_DIVISOR_SHIFT,
-	(divisor & DISPLAY_PLL_M2_DIVISOR_MASK) >> DISPLAY_PLL_M2_DIVISOR_SHIFT));
-divisor = read32(INTEL_DISPLAY_PLL_DIVISOR_1);
-TRACE(("  1: N %ld, M1 %ld, M2 %ld\n",
-	(divisor & DISPLAY_PLL_N_DIVISOR_MASK) >> DISPLAY_PLL_N_DIVISOR_SHIFT,
-	(divisor & DISPLAY_PLL_M1_DIVISOR_MASK) >> DISPLAY_PLL_M1_DIVISOR_SHIFT,
-	(divisor & DISPLAY_PLL_M2_DIVISOR_MASK) >> DISPLAY_PLL_M2_DIVISOR_SHIFT));
-
-uint32 n = ((divisor & DISPLAY_PLL_N_DIVISOR_MASK) >> DISPLAY_PLL_N_DIVISOR_SHIFT) + 2;
-uint32 m1 = ((divisor & DISPLAY_PLL_M1_DIVISOR_MASK) >> DISPLAY_PLL_M1_DIVISOR_SHIFT) + 2;
-uint32 m2 = ((divisor & DISPLAY_PLL_M2_DIVISOR_MASK) >> DISPLAY_PLL_M2_DIVISOR_SHIFT) + 2;
-uint32 p = ((read32(INTEL_DISPLAY_PLL) & DISPLAY_PLL_POST_DIVISOR_MASK) >> DISPLAY_PLL_POST_DIVISOR_SHIFT) + 2;
-//uint32 p2 = (read32(INTEL_DISPLAY_PLL) & DISPLAY_PLL_DIVIDE_4X) ? 2 : 1;
-float clock = ((gInfo->shared_info->pll_info.reference_frequency / 1000.0f * (5*m1 + m2)) / n) / (p * 4);
-TRACE(("  n = %lu, m1 = %lu, m2 = %lu, p = %lu\n", n, m1, m2, p));
-TRACE(("  Clock frequency: %g MHz\n", clock));
-TRACE(("  h_total %ld, v_total %ld, refresh: %g\n", current.timing.h_total, current.timing.v_total,
-	clock * 1000000.0f / (current.timing.h_total * current.timing.v_total)));
-
 	write32(INTEL_DISPLAY_CONTROL, (read32(INTEL_DISPLAY_CONTROL)
 		& ~DISPLAY_CONTROL_COLOR_MASK) | colorMode);
 

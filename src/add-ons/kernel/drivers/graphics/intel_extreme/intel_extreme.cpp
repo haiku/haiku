@@ -70,35 +70,6 @@ PhysicalMemoryMapper::Keep()
 
 //	#pragma mark -
 
-#if 0
-#define DUMPED_BLOCK_SIZE 16
-
-void
-dumpBlock(int file, const uint8 *buffer, int size)
-{
-	int i;
-	
-	for (i = 0; i < size;) {
-		int start = i;
-		char line[512];
-
-		int pos = sprintf(line, "%06x: ", start);
-
-		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
-			if (!(i % 4))
-				pos += sprintf(line + pos, sizeof(line) - pos, " ");
-
-			if (i >= size)
-				break;
-
-			pos += snprintf(line + pos, sizeof(line) - pos, "%02x",
-				*(buffer + i));
-		}
-		pos += snprintf(line + pos, sizeof(line) - pos, "\n");
-		write(file, line, pos);
-	}
-}
-#endif
 
 status_t
 intel_extreme_init(intel_info &info)
@@ -151,17 +122,6 @@ intel_extreme_init(intel_info &info)
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		return info.registers_area;
 	}
-
-#if 0
-// dump registers to a file
-int file = open("/boot/home/intel_extreme_registers", O_CREAT | O_TRUNC | O_WRONLY, 0666);
-if (file >= 0) {
-	dumpBlock(file, info.registers, info.pci->u.h0.base_register_sizes[1]);
-	close(file);
-	sync();
-} else
-	dprintf("intel_extreme: could not log (%s)!!\n", strerror(errno));
-#endif
 
 	// no errors, so keep mappings
 	fbMapper.Keep();
