@@ -128,7 +128,7 @@ find_image_at_address(addr_t address)
 
 	// get image that may contain the address
 
-	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
 		if ((address >= image->text_region.start
 				&& address <= (image->text_region.start + image->text_region.size))
 			|| (address >= image->data_region.start
@@ -169,7 +169,7 @@ dump_address_info(int argc, char **argv)
 static struct elf_image_info *
 find_image(image_id id)
 {
-	return hash_lookup(sImagesHash, (void *)id);
+	return (elf_image_info *)hash_lookup(sImagesHash, (void *)id);
 }
 
 
@@ -182,7 +182,7 @@ find_image_by_vnode(void *vnode)
 	mutex_lock(&sImageMutex);
 	hash_open(sImagesHash, &iterator);
 
-	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
 		if (image->vnode == vnode)
 			break;
 	}
@@ -275,7 +275,7 @@ dump_symbols(int argc, char **argv)
 				// find image at address
 
 				hash_open(sImagesHash, &iterator);
-				while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+				while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
 					if (image->text_region.start <= num
 						&& image->text_region.start + image->text_region.size >= num)
 						break;
@@ -285,14 +285,14 @@ dump_symbols(int argc, char **argv)
 				if (image == NULL)
 					kprintf("No image covers 0x%lx in the kernel!\n", num);
 			} else {
-				image = hash_lookup(sImagesHash, (void *)num);
+				image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
 				if (image == NULL)
 					kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
 			}
 		} else {
 			// look for image by name
 			hash_open(sImagesHash, &iterator);
-			while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+			while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
 				if (!strcmp(image->name, argv[1]))
 					break;
 			}
@@ -367,7 +367,7 @@ dump_image_info(struct elf_image_info *image)
 	kprintf(" id 0x%lx\n", image->id);
 	dump_elf_region(&image->text_region, "text");
 	dump_elf_region(&image->data_region, "data");
-	kprintf(" dynamic_ptr 0x%lx\n", image->dynamic_ptr);
+	kprintf(" dynamic_section 0x%lx\n", image->dynamic_section);
 	kprintf(" needed %p\n", image->needed);
 	kprintf(" symhash %p\n", image->symhash);
 	kprintf(" syms %p\n", image->syms);
@@ -397,7 +397,7 @@ dump_image(int argc, char **argv)
 			// semi-hack
 			dump_image_info((struct elf_image_info *)num);
 		} else {
-			image = hash_lookup(sImagesHash, (void *)num);
+			image = (elf_image_info *)hash_lookup(sImagesHash, (void *)num);
 			if (image == NULL)
 				kprintf("image 0x%lx doesn't exist in the kernel!\n", num);
 			else
@@ -410,7 +410,7 @@ dump_image(int argc, char **argv)
 
 	hash_open(sImagesHash, &iterator);
 
-	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator)) != NULL) {
 		kprintf("%p (%ld) %s\n", image, image->id, image->name);
 	}
 
@@ -443,7 +443,7 @@ elf_find_symbol(struct elf_image_info *image, const char *name)
 	uint32 hash;
 	uint32 i;
 
-	if (!image->dynamic_ptr)
+	if (!image->dynamic_section)
 		return NULL;
 
 	hash = elf_hash(name) % HASHTABSIZE(image);
@@ -460,8 +460,7 @@ static status_t
 elf_parse_dynamic_section(struct elf_image_info *image)
 {
 	struct Elf32_Dyn *d;
-	int i;
-	int needed_offset = -1;
+	int32 neededOffset = -1;
 
 	TRACE(("top of elf_parse_dynamic_section\n"));
 
@@ -469,14 +468,14 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	image->syms = 0;
 	image->strtab = 0;
 
-	d = (struct Elf32_Dyn *)image->dynamic_ptr;
+	d = (struct Elf32_Dyn *)image->dynamic_section;
 	if (!d)
 		return B_ERROR;
 
-	for (i = 0; d[i].d_tag != DT_NULL; i++) {
+	for (int32 i = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				needed_offset = d[i].d_un.d_ptr + image->text_region.delta;
+				neededOffset = d[i].d_un.d_ptr + image->text_region.delta;
 				break;
 			case DT_HASH:
 				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->text_region.delta);
@@ -518,10 +517,10 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	if (!image->symhash || !image->syms || !image->strtab)
 		return B_ERROR;
 
-	TRACE(("needed_offset = %d\n", needed_offset));
+	TRACE(("needed_offset = %d\n", neededOffset));
 
-	if (needed_offset >= 0)
-		image->needed = STRING(image, needed_offset);
+	if (neededOffset >= 0)
+		image->needed = STRING(image, neededOffset);
 
 	return B_OK;
 }
@@ -621,18 +620,18 @@ elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 
 
 static int
-verify_eheader(struct Elf32_Ehdr *eheader)
+verify_eheader(struct Elf32_Ehdr *elfHeader)
 {
-	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (eheader->e_ident[4] != ELFCLASS32)
+	if (elfHeader->e_ident[4] != ELFCLASS32)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (eheader->e_phoff == 0)
+	if (elfHeader->e_phoff == 0)
 		return B_NOT_AN_EXECUTABLE;
 
-	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
+	if (elfHeader->e_phentsize < sizeof(struct Elf32_Phdr))
 		return B_NOT_AN_EXECUTABLE;
 
 	return 0;
@@ -673,7 +672,7 @@ unload_elf_image(struct elf_image_info *image)
 
 	unregister_elf_image(image);
 
-	free(image->eheader);
+	free(image->elf_header);
 	free(image->name);	
 	free(image);
 
@@ -684,7 +683,7 @@ unload_elf_image(struct elf_image_info *image)
 static status_t
 load_elf_symbol_table(int fd, struct elf_image_info *image)
 {
-	struct Elf32_Ehdr *elfHeader = image->eheader;
+	struct Elf32_Ehdr *elfHeader = image->elf_header;
 	struct Elf32_Sym *symbolTable = NULL;
 	struct Elf32_Shdr *stringHeader = NULL;
 	uint32 numSymbols = 0;
@@ -797,7 +796,7 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 		return B_NO_MEMORY;
 
 	image->name = strdup(preloadedImage->name);
-	image->dynamic_ptr = preloadedImage->dynamic_section.start;
+	image->dynamic_section = preloadedImage->dynamic_section.start;
 
 	image->text_region = preloadedImage->text_region;
 	image->data_region = preloadedImage->data_region;
@@ -1011,11 +1010,11 @@ symbol_found:
 status_t
 elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entry)
 {
-	struct Elf32_Ehdr eheader;
-	struct Elf32_Phdr *pheaders = NULL;
+	struct Elf32_Ehdr elfHeader;
+	struct Elf32_Phdr *programHeaders = NULL;
 	char baseName[B_OS_NAME_LENGTH];
-	status_t err;
-	ssize_t len;
+	status_t status;
+	ssize_t length;
 	int fd;
 	int i;
 
@@ -1027,40 +1026,40 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 	// read and verify the ELF header
 
-	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
-	if (len < 0) {
-		err = len;
+	length = _kern_read(fd, 0, &elfHeader, sizeof(elfHeader));
+	if (length < B_OK) {
+		status = length;
 		goto error;
 	}
 
-	if (len != sizeof(eheader)) {
+	if (length != sizeof(elfHeader)) {
 		// short read
-		err = B_NOT_AN_EXECUTABLE;
+		status = B_NOT_AN_EXECUTABLE;
 		goto error;
 	}
-	err = verify_eheader(&eheader);
-	if (err < 0)
+	status = verify_eheader(&elfHeader);
+	if (status < B_OK)
 		goto error;
 
 	// read program header
 
-	pheaders = (struct Elf32_Phdr *)malloc(eheader.e_phnum * eheader.e_phentsize);
-	if (pheaders == NULL) {
+	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader.e_phnum * elfHeader.e_phentsize);
+	if (programHeaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		err = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto error;
 	}
 
-	TRACE(("reading in program headers at 0x%lx, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize));
-	len = _kern_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
-	if (len < 0) {
-		err = len;
+	TRACE(("reading in program headers at 0x%lx, length 0x%x\n", elfHeader.e_phoff, elfHeader.e_phnum * elfHeader.e_phentsize));
+	length = _kern_read(fd, elfHeader.e_phoff, programHeaders, elfHeader.e_phnum * elfHeader.e_phentsize);
+	if (length < B_OK) {
+		status = length;
 		dprintf("error reading in program headers\n");
 		goto error;
 	}
-	if (len != eheader.e_phnum * eheader.e_phentsize) {
+	if (length != elfHeader.e_phnum * elfHeader.e_phentsize) {
 		dprintf("short read while reading in program headers\n");
-		err = -1;
+		status = -1;
 		goto error;
 	}
 
@@ -1083,21 +1082,21 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 	// map the program's segments into memory
 
-	for (i = 0; i < eheader.e_phnum; i++) {
+	for (i = 0; i < elfHeader.e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 		char *regionAddress;
 		area_id id;
 
-		if (pheaders[i].p_type != PT_LOAD)
+		if (programHeaders[i].p_type != PT_LOAD)
 			continue;
 
-		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
-		if (pheaders[i].p_flags & PF_WRITE) {
+		regionAddress = (char *)ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		if (programHeaders[i].p_flags & PF_WRITE) {
 			/*
 			 * rw/data segment
 			 */
-			uint32 memUpperBound = (pheaders[i].p_vaddr % B_PAGE_SIZE) + pheaders[i].p_memsz;
-			uint32 fileUpperBound = (pheaders[i].p_vaddr % B_PAGE_SIZE) + pheaders[i].p_filesz;
+			uint32 memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE) + programHeaders[i].p_memsz;
+			uint32 fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE) + programHeaders[i].p_filesz;
 
 			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
 			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
@@ -1109,10 +1108,10 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 				B_EXACT_ADDRESS,
 				fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
+				path, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
-				err = B_NOT_AN_EXECUTABLE;
+				status = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
 
@@ -1120,11 +1119,11 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 			// at least parts of it are the bss and have to be zeroed)
 			{
 				uint32 start = (uint32)regionAddress
-					+ (pheaders[i].p_vaddr % B_PAGE_SIZE)
-					+ pheaders[i].p_filesz;
+					+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+					+ programHeaders[i].p_filesz;
 				uint32 amount = fileUpperBound
-					- (pheaders[i].p_vaddr % B_PAGE_SIZE)
-					- (pheaders[i].p_filesz);
+					- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+					- (programHeaders[i].p_filesz);
 				memset((void *)start, 0, amount);
 			}
 
@@ -1141,7 +1140,7 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 					B_EXACT_ADDRESS, bss_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
-					err = B_NOT_AN_EXECUTABLE;
+					status = B_NOT_AN_EXECUTABLE;
 					goto error;
 				}
 			}
@@ -1154,12 +1153,12 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 			id = vm_map_file(team->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
-				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
+				ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
+				path, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
-				err = B_NOT_AN_EXECUTABLE;
+				status = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
 		}
@@ -1167,36 +1166,33 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 
 	TRACE(("elf_load: done!\n"));
 
-	*entry = eheader.e_entry;
+	*entry = elfHeader.e_entry;
 
-	err = B_OK;
+	status = B_OK;
 
 error:
-	if (pheaders)
-		free(pheaders);
+	if (programHeaders)
+		free(programHeaders);
 	_kern_close(fd);
 
-	return err;
+	return status;
 }
 
 
 image_id
 load_kernel_add_on(const char *path)
 {
-	bool ro_segment_handled = false;
-	bool rw_segment_handled = false;
-	struct Elf32_Ehdr *eheader;
-	struct Elf32_Phdr *pheaders;
+	struct Elf32_Phdr *programHeaders;
+	struct Elf32_Ehdr *elfHeader;
 	struct elf_image_info *image;
 	const char *fileName;
 	void *vnode = NULL;
 	void *reservedAddress;
 	addr_t start;
 	size_t reservedSize;
+	status_t status;
 	int fd;
-	int err;
-	int i;
-	ssize_t len;
+	ssize_t length;
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
@@ -1204,8 +1200,8 @@ load_kernel_add_on(const char *path)
 	if (fd < 0)
 		return fd;
 
-	err = vfs_get_vnode_from_fd(fd, true, &vnode);
-	if (err < 0)
+	status = vfs_get_vnode_from_fd(fd, true, &vnode);
+	if (status < B_OK)
 		goto error0;
 
 	// get the file name
@@ -1215,77 +1211,90 @@ load_kernel_add_on(const char *path)
 	else
 		fileName++;
 
-	// XXX awful hack to keep someone else from trying to load this image
-	// probably not a bad thing, shouldn't be too many races
+	// Prevent someone else from trying to load this image
 	mutex_lock(&sImageLoadMutex);
 
 	// make sure it's not loaded already. Search by vnode
 	image = find_image_by_vnode(vnode);
 	if (image) {
 		atomic_add(&image->ref_count, 1);
-		//err = ERR_NOT_ALLOWED;
 		goto done;
 	}
 
-	eheader = (struct Elf32_Ehdr *)malloc(sizeof(*eheader));
-	if (!eheader) {
-		err = B_NO_MEMORY;
+	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(*elfHeader));
+	if (!elfHeader) {
+		status = B_NO_MEMORY;
 		goto error;
 	}
 
-	len = _kern_read(fd, 0, eheader, sizeof(*eheader));
-	if (len < 0) {
-		err = len;
+	length = _kern_read(fd, 0, elfHeader, sizeof(*elfHeader));
+	if (length < B_OK) {
+		status = length;
 		goto error1;
 	}
-	if (len != sizeof(*eheader)) {
+	if (length != sizeof(*elfHeader)) {
 		// short read
-		err = B_NOT_AN_EXECUTABLE;
+		status = B_NOT_AN_EXECUTABLE;
 		goto error1;
 	}
-	err = verify_eheader(eheader);
-	if (err < 0)
+	status = verify_eheader(elfHeader);
+	if (status < B_OK)
 		goto error1;
 
 	image = create_image_struct();
 	if (!image) {
-		err = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto error1;
 	}
 	image->vnode = vnode;
-	image->eheader = eheader;
+	image->elf_header = elfHeader;
 	image->name = strdup(path);
 
-	pheaders = (struct Elf32_Phdr *)malloc(eheader->e_phnum * eheader->e_phentsize);
-	if (pheaders == NULL) {
+	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader->e_phnum * elfHeader->e_phentsize);
+	if (programHeaders == NULL) {
 		dprintf("%s: error allocating space for program headers\n", fileName);
-		err = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto error2;
 	}
 
-	TRACE(("reading in program headers at 0x%lx, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
-	len = _kern_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
-	if (len < 0) {
-		err = len;
+	TRACE(("reading in program headers at 0x%lx, length 0x%x\n", elfHeader->e_phoff, elfHeader->e_phnum * elfHeader->e_phentsize));
+	length = _kern_read(fd, elfHeader->e_phoff, programHeaders, elfHeader->e_phnum * elfHeader->e_phentsize);
+	if (length < B_OK) {
+		status = length;
 		TRACE(("%s: error reading in program headers\n", fileName));
 		goto error3;
 	}
-	if (len != eheader->e_phnum * eheader->e_phentsize) {
+	if (length != elfHeader->e_phnum * elfHeader->e_phentsize) {
 		TRACE(("%s: short read while reading in program headers\n", fileName));
-		err = -1;
+		status = B_ERROR;
 		goto error3;
 	}
 
 	// determine how much space we need for all loaded segments
 
 	reservedSize = 0;
+	length = 0;
 
-	for (i = 0; i < eheader->e_phnum; i++) {
-		if (pheaders[i].p_type != PT_LOAD)
+	for (int32 i = 0; i < elfHeader->e_phnum; i++) {
+		size_t end;
+
+		if (programHeaders[i].p_type != PT_LOAD)
 			continue;
 
-		reservedSize += ROUNDUP(pheaders[i].p_memsz
-			+ (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		length += ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+dprintf("[%ld] vaddr: %lx, memsz: %lx\n", i, programHeaders[i].p_vaddr,
+	programHeaders[i].p_memsz);
+		end = ROUNDUP(programHeaders[i].p_memsz + programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		if (end > reservedSize)
+			reservedSize = end;
+	}
+dprintf("-> reserved size %lx, length %lx\n", reservedSize, length);
+
+	// Check whether the segments have an unreasonable amount of unused space
+	// inbetween.
+	if ((ssize_t)reservedSize > length + 8 * 1024) {
+		status = B_BAD_DATA;
+		goto error1;
 	}
 
 	// reserve that space and allocate the areas from that one
@@ -1294,105 +1303,116 @@ load_kernel_add_on(const char *path)
 		goto error3;
 
 	start = (addr_t)reservedAddress;
+	image->data_region.size = 0;
+	image->text_region.size = 0;
 
-	for (i = 0; i < eheader->e_phnum; i++) {
+	for (int32 i = 0; i < elfHeader->e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 		elf_region *region;
 
 		TRACE(("looking at program header %d\n", i));
 
-		switch (pheaders[i].p_type) {
+		switch (programHeaders[i].p_type) {
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
-				image->dynamic_ptr = pheaders[i].p_vaddr;
+				image->dynamic_section = programHeaders[i].p_vaddr;
 				continue;
 			default:
-				dprintf("%s: unhandled pheader type 0x%lx\n", fileName, pheaders[i].p_type);
+				dprintf("%s: unhandled pheader type 0x%lx\n", fileName, programHeaders[i].p_type);
 				continue;
 		}
 
 		// we're here, so it must be a PT_LOAD segment
-		if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_WRITE)) {
+		if (programHeaders[i].IsReadWrite()) {
 			// this is the writable segment
-			if (rw_segment_handled) {
+			if (image->data_region.size != 0) {
 				// we've already created this segment
 				continue;
 			}
-			rw_segment_handled = true;
 			region = &image->data_region;
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", fileName);
-		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
+		} else if (programHeaders[i].IsExecutable()) {
 			// this is the non-writable segment
-			if (ro_segment_handled) {
+			if (image->text_region.size != 0) {
 				// we've already created this segment
 				continue;
 			}
-			ro_segment_handled = true;
 			region = &image->text_region;
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
-			dprintf("%s: weird program header flags 0x%lx\n", fileName, pheaders[i].p_flags);
+			dprintf("%s: weird program header flags 0x%lx\n", fileName,
+				programHeaders[i].p_flags);
 			continue;
 		}
 
-		// ToDo: this won't work if the on-disk order of the sections doesn't
-		//		fit the in-memory order...
-		region->start = start;
-		region->size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		region->start = (addr_t)reservedAddress + ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		region->size = ROUNDUP(programHeaders[i].p_memsz
+			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
 			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region->id < B_OK) {
 			dprintf("%s: error allocating area: %s\n", fileName, strerror(region->id));
-			err = B_NOT_AN_EXECUTABLE;
+			status = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
-		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
-		start += region->size;
+		region->delta = -ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
 
 		TRACE(("elf_load_kspace: created area \"%s\" at %p\n",
 			regionName, (void *)region->start));
 
-		len = _kern_read(fd, pheaders[i].p_offset,
-			(void *)(region->start + (pheaders[i].p_vaddr % B_PAGE_SIZE)),
-			pheaders[i].p_filesz);
-		if (len < 0) {
-			err = len;
-			dprintf("%s: error reading in seg %d\n", fileName, i);
+		length = _kern_read(fd, programHeaders[i].p_offset,
+			(void *)(region->start + (programHeaders[i].p_vaddr % B_PAGE_SIZE)),
+			programHeaders[i].p_filesz);
+		if (length < B_OK) {
+			status = length;
+			dprintf("%s: error reading in segment %ld\n", fileName, i);
 			goto error5;
 		}
 	}
 
-	if (image->data_region.start != 0
-		&& image->text_region.delta != image->data_region.delta) {
-		dprintf("%s: deltas do not match!\n", fileName);
-		dump_image_info(image);
-		err = B_ERROR;
-		goto error5;
+	// get the segment order
+	elf_region *firstRegion;
+	elf_region *secondRegion;
+	if (image->text_region.start < image->data_region.start) {
+		firstRegion = &image->text_region;
+		secondRegion = &image->data_region;
+	} else {
+		firstRegion = &image->data_region;
+		secondRegion = &image->text_region;
 	}
 
-	// modify the dynamic ptr by the delta of the regions
-	image->dynamic_ptr += image->text_region.delta;
+	image->data_region.delta += image->data_region.start;
+	image->text_region.delta += image->text_region.start;
 
-	err = elf_parse_dynamic_section(image);
-	if (err < 0)
+	// modify the dynamic ptr by the delta of the regions
+	image->dynamic_section += image->text_region.delta;
+
+dprintf("loaded: %s\n", path);
+dump_image_info(image);
+	status = elf_parse_dynamic_section(image);
+	if (status < B_OK)
 		goto error5;
 
-	err = elf_relocate(image, "");
-	if (err < 0)
+	status = elf_relocate(image, "");
+	if (status < B_OK)
 		goto error5;
 
 	// We needed to read in the contents of the "text" area, but
 	// now we can protect it read-only/execute
 	set_area_protection(image->text_region.id, B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
 
+	// There might be a hole between the two segments, and we don't need to
+	// reserve this any longer
+	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress, reservedSize);
+
 	// ToDo: this should be enabled by kernel settings!
 	if (1)
 		load_elf_symbol_table(fd, image);
 
-	free(pheaders);
+	free(programHeaders);
 	register_elf_image(image);
 
 done:
@@ -1407,11 +1427,11 @@ error5:
 error4:
 	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress, reservedSize);
 error3:
-	free(pheaders);
+	free(programHeaders);
 error2:
 	free(image);
 error1:
-	free(eheader);
+	free(elfHeader);
 error:
 	mutex_unlock(&sImageLoadMutex);
 error0:
@@ -1419,7 +1439,7 @@ error0:
 		vfs_put_vnode(vnode);
 	_kern_close(fd);
 
-	return err;
+	return status;
 }
 
 

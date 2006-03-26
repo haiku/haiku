@@ -1,7 +1,10 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ELF_PRIV_H
 #define _KERNEL_ELF_PRIV_H
 
@@ -25,10 +28,10 @@ struct elf_image_info {
 	void		*vnode;
 	elf_region	text_region;
 	elf_region	data_region;
-	addr_t		dynamic_ptr;		// pointer to the dynamic section
+	addr_t		dynamic_section;		// pointer to the dynamic section
 	struct elf_linked_image *linked_images;
 
-	struct Elf32_Ehdr *eheader;
+	struct Elf32_Ehdr *elf_header;
 
 	// pointer to symbol participation data structures
 	char		*needed;
