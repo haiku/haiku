@@ -40,9 +40,21 @@ extern "C" status_t _fini_interface_kit_();
 
 using namespace BPrivate;
 
+// some other weird struct exported by BeOS, it's not initialized, though
+struct general_ui_info {
+	rgb_color	background_color;
+	rgb_color	mark_color;
+	rgb_color	highlight_color;
+	bool		color_frame;
+	rgb_color	window_frame_color;
+};
+
+struct general_ui_info general_info;
+
 menu_info *_menu_info_ptr_;
 
 extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
+
 
 static status_t
 mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
@@ -845,6 +857,7 @@ __set_window_decor(int32 theme)
 	link.Attach<int32>(theme);
 	link.Flush();
 }
+
 
 namespace BPrivate {
 
