@@ -1390,8 +1390,6 @@ dprintf("-> reserved size %lx, length %lx\n", reservedSize, length);
 	// modify the dynamic ptr by the delta of the regions
 	image->dynamic_section += image->text_region.delta;
 
-dprintf("loaded: %s\n", path);
-dump_image_info(image);
 	status = elf_parse_dynamic_section(image);
 	if (status < B_OK)
 		goto error5;
