@@ -32,7 +32,12 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <string.h>
+
+#include "Attributes.h"
+#include "Bitmaps.h"
+#include "FSUtils.h"
+#include "Tracker.h"
+#include "TrashWatcher.h"
 
 #include <Debug.h>
 #include <Directory.h>
@@ -41,15 +46,12 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include "Attributes.h"
-#include "Bitmaps.h"
-#include "FSUtils.h"
-#include "Tracker.h"
-#include "TrashWatcher.h"
+#include <string.h>
+
 
 BTrashWatcher::BTrashWatcher()
-	:	BLooper("TrashWatcher", B_LOW_PRIORITY),
-		fTrashNodeList(20, true)
+	: BLooper("TrashWatcher", B_LOW_PRIORITY),
+	fTrashNodeList(20, true)
 {
 	FSCreateTrashDirs();
 	WatchTrashDirs();
@@ -60,10 +62,12 @@ BTrashWatcher::BTrashWatcher()
 	TTracker::WatchNode(0, B_WATCH_MOUNT, this);
 }
 
+
 BTrashWatcher::~BTrashWatcher()
 {
 	stop_watching(this);
 }
+
 
 bool
 BTrashWatcher::IsTrashNode(const node_ref *testNode) const
@@ -78,6 +82,7 @@ BTrashWatcher::IsTrashNode(const node_ref *testNode) const
 	return false;
 }
 
+
 void
 BTrashWatcher::MessageReceived(BMessage *message)
 {
@@ -85,7 +90,7 @@ BTrashWatcher::MessageReceived(BMessage *message)
 		_inherited::MessageReceived(message);
 		return;
 	}
-	
+
 	switch (message->FindInt32("opcode")) {
 		case B_ENTRY_CREATED:
 			if (!fTrashFull) {
@@ -95,58 +100,58 @@ BTrashWatcher::MessageReceived(BMessage *message)
 			break;
 
 		case B_ENTRY_MOVED:
-			{
-				// allow code to fall through if move is from/to trash
-				// but do nothing for moves in the same directory
-				ino_t toDir;
-				ino_t fromDir;
-				message->FindInt64("from directory", &fromDir);
-				message->FindInt64("to directory", &toDir);
-				if (fromDir == toDir)
-					break;
-			}			
+		{
+			// allow code to fall through if move is from/to trash
+			// but do nothing for moves in the same directory
+			ino_t toDir;
+			ino_t fromDir;
+			message->FindInt64("from directory", &fromDir);
+			message->FindInt64("to directory", &toDir);
+			if (fromDir == toDir)
+				break;
+		}			
 			// fall thru
 			
 		case B_DEVICE_UNMOUNTED:
 			// fall thru
 
 		case B_ENTRY_REMOVED:
-			{
-				bool full = CheckTrashDirs();
-				if (fTrashFull != full) {
-					fTrashFull = full;
-					UpdateTrashIcons();
-				}
-				break;
+		{
+			bool full = CheckTrashDirs();
+			if (fTrashFull != full) {
+				fTrashFull = full;
+				UpdateTrashIcons();
 			}
+			break;
+		}
 		// We should handle DEVICE_UNMOUNTED here too to remove trash
 
 		case B_DEVICE_MOUNTED:
-			{
-				dev_t device;
-				BDirectory trashDir;
-				if (message->FindInt32("new device", &device) == B_OK
-					&& FSGetTrashDir(&trashDir, device) == B_OK) {
-					node_ref trashNode;
-					trashDir.GetNodeRef(&trashNode);
-					TTracker::WatchNode(&trashNode, B_WATCH_DIRECTORY, this);
-					fTrashNodeList.AddItem(new node_ref(trashNode));
+		{
+			dev_t device;
+			BDirectory trashDir;
+			if (message->FindInt32("new device", &device) == B_OK
+				&& FSGetTrashDir(&trashDir, device) == B_OK) {
+				node_ref trashNode;
+				trashDir.GetNodeRef(&trashNode);
+				TTracker::WatchNode(&trashNode, B_WATCH_DIRECTORY, this);
+				fTrashNodeList.AddItem(new node_ref(trashNode));
 
-					// Check if the new volume has anything trashed.
-					if (CheckTrashDirs() && !fTrashFull) {
-						fTrashFull = true;
-						UpdateTrashIcons();
-					}
+				// Check if the new volume has anything trashed.
+				if (CheckTrashDirs() && !fTrashFull) {
+					fTrashFull = true;
+					UpdateTrashIcons();
 				}
-				break;
 			}
+			break;
+		}
 	}
 }
+
 
 void
 BTrashWatcher::UpdateTrashIcons()
 {
-	
 	BVolume	boot;
 	if (BVolumeRoster().GetBootVolume(&boot) != B_OK)
 		return;
@@ -164,18 +169,19 @@ BTrashWatcher::UpdateTrashIcons()
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon,  &smallSize);
 
 		if (largeData) 
-			trashDir.WriteAttr(kAttrLargeIcon, B_COLOR_8_BIT_TYPE, 0,
+			trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,
 				largeData, largeSize);
 		else
 			TRESPASS();
 
 		if (smallData)
-			trashDir.WriteAttr(kAttrMiniIcon, B_COLOR_8_BIT_TYPE, 0,
+			trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
 				smallData, smallSize);
 		else
 			TRESPASS();
 	}
 }
+
 
 void
 BTrashWatcher::WatchTrashDirs()
@@ -186,7 +192,7 @@ BTrashWatcher::WatchTrashDirs()
 	while (volRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
-		
+
 		BDirectory trashDir;
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
 			node_ref trash_node;
@@ -197,6 +203,7 @@ BTrashWatcher::WatchTrashDirs()
 	}
 }
 
+
 bool
 BTrashWatcher::CheckTrashDirs()
 {
@@ -206,7 +213,7 @@ BTrashWatcher::CheckTrashDirs()
 	while (volRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
-		
+
 		BDirectory trashDir;
 		FSGetTrashDir(&trashDir, volume.Device());
 		trashDir.Rewind();
