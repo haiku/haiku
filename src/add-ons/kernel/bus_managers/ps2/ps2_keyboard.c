@@ -169,14 +169,13 @@ probe_keyboard(void)
 {
 	uint8 data;
 	status_t status;
-	
-//	status = ps2_command(PS2_CTRL_KEYBOARD_ACTIVATE, const uint8 *out, int out_count, uint8 *in, int in_count)
 
-	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
-	if (status != B_OK || data != 0x00) {
-		dprintf("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
-		return B_ERROR;
-	}
+//  This test doesn't work relyable on some notebooks (it reports 0x03)
+//	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
+//	if (status != B_OK || data != 0x00) {
+//		dprintf("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
+//		return B_ERROR;
+//	}
 
 	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL, 0, &data, 1);
 	if (status != B_OK || data != 0xaa) {
