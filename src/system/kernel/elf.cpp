@@ -1282,13 +1282,11 @@ load_kernel_add_on(const char *path)
 			continue;
 
 		length += ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
-dprintf("[%ld] vaddr: %lx, memsz: %lx\n", i, programHeaders[i].p_vaddr,
-	programHeaders[i].p_memsz);
+
 		end = ROUNDUP(programHeaders[i].p_memsz + programHeaders[i].p_vaddr, B_PAGE_SIZE);
 		if (end > reservedSize)
 			reservedSize = end;
 	}
-dprintf("-> reserved size %lx, length %lx\n", reservedSize, length);
 
 	// Check whether the segments have an unreasonable amount of unused space
 	// inbetween.
