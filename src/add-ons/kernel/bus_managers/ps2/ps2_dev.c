@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Haiku, Inc.
+ * Copyright 2005-2006 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 hid device driver
@@ -95,7 +95,8 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
 			int cnt = 1;
 			if ((flags & PS2_FLAG_GETID) && (data == 0 || data == 3 || data == 4)) {
-				dprintf("ps2_dev_handle_int stupid mouse!\n");
+				// workaround for broken mice that don't ack the "get id" command
+				dprintf("ps2_dev_handle_int: mouse didn't ack the 'get id' command\n");
 				atomic_or(&dev->flags, PS2_FLAG_ACK);
 				if (dev->result_buf_cnt) {
 					dev->result_buf[dev->result_buf_idx] = data;
