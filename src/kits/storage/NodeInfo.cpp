@@ -1,11 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
-/*!
-	\file NodeInfo.cpp
-	BNodeInfo implementation.
-*/
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
 
 #include <NodeInfo.h>
 
@@ -808,12 +809,19 @@ BNodeInfo::BNodeInfo(const BNodeInfo &)
 
 namespace BPrivate {
 
+/*!
+	Private function used by Tracker. Should be moved into the Tracker sources.
+*/
 extern bool
-CheckNodeIconHintPrivate(const BNode *node, bool whatever)
+CheckNodeIconHintPrivate(const BNode *node, bool checkMiniIconOnly)
 {
-	// I've no idea what this is supposed to do exactly, but
-	// it seems to tell Tracker if there is an icon for the
-	// node. See kits/tracker/Model.cpp for details
+	attr_info info;
+	if (node->GetAttrInfo(kNIMiniIconAttribute, &info) != B_OK && checkMiniIconOnly)
+		return false;
+
+	if (node->GetAttrInfo(kNILargeIconAttribute, &info) != B_OK)
+		return false;
+
 	return true;
 }
 
