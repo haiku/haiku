@@ -13,6 +13,8 @@
 #include <util/AutoLock.h>
 #include <util/khash.h>
 
+#include <new>
+#include <stdlib.h>
 #include <string.h>
 
 

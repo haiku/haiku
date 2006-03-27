@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "RootFileSystem.h"
@@ -32,10 +32,10 @@ RootFileSystem::~RootFileSystem()
 status_t 
 RootFileSystem::Open(void **_cookie, int mode)
 {
-	EntryIterator *iterator = new EntryIterator(fList.Iterator());
+	EntryIterator *iterator = new (std::nothrow) EntryIterator(&fList);
 	if (iterator == NULL)
 		return B_NO_MEMORY;
-	
+
 	*_cookie = iterator;
 
 	return B_OK;
@@ -53,7 +53,7 @@ RootFileSystem::Close(void *cookie)
 Node *
 RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 {
-	EntryIterator iterator = fLinks.Iterator();
+	EntryIterator iterator = fLinks.GetIterator();
 	struct entry *entry;
 
 	// first check the links
@@ -67,7 +67,7 @@ RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 
 	// then all mounted file systems
 
-	iterator = fList.Iterator();
+	iterator = fList.GetIterator();
 
 	while ((entry = iterator.Next()) != NULL) {
 		char entryName[B_OS_NAME_LENGTH];
@@ -116,7 +116,9 @@ RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 status_t 
 RootFileSystem::Rewind(void *_cookie)
 {
-	// ToDo: implement
+	EntryIterator *iterator = (EntryIterator *)_cookie;
+
+	iterator->Rewind();
 	return B_OK;	
 }
 
@@ -131,7 +133,7 @@ RootFileSystem::IsEmpty()
 status_t 
 RootFileSystem::AddVolume(Directory *volume, Partition *partition)
 {
-	struct entry *entry = new RootFileSystem::entry();
+	struct entry *entry = new (std::nothrow) RootFileSystem::entry();
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
@@ -149,7 +151,7 @@ RootFileSystem::AddVolume(Directory *volume, Partition *partition)
 status_t
 RootFileSystem::AddLink(const char *name, Directory *target)
 {
-	struct entry *entry = new RootFileSystem::entry();
+	struct entry *entry = new (std::nothrow) RootFileSystem::entry();
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
@@ -166,7 +168,7 @@ RootFileSystem::AddLink(const char *name, Directory *target)
 status_t 
 RootFileSystem::GetPartitionFor(Directory *volume, Partition **_partition)
 {
-	EntryIterator iterator = fList.Iterator();
+	EntryIterator iterator = fList.GetIterator();
 	struct entry *entry;
 
 	while ((entry = iterator.Next()) != NULL) {

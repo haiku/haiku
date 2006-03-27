@@ -1,17 +1,20 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <KernelExport.h>
-#include <signal.h>
 
 #include <vm_low_memory.h>
 #include <vm_page.h>
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
+
+#include <new>
+#include <signal.h>
+#include <stdlib.h>
 
 
 //#define TRACE_LOW_MEMORY

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +11,7 @@
 #include "vfs_select.h"
 
 #include <sys/select.h>
+#include <new>
 #include <poll.h>
 #include <stdlib.h>
 #include <string.h>
@@ -340,7 +341,7 @@ add_select_sync_pool_entry(select_sync_pool *pool, selectsync *sync,
 	select_sync_pool_entry *entry = find_select_sync_pool_entry(pool, sync,
 		ref);
 	if (!entry) {
-		entry = new(nothrow) select_sync_pool_entry;
+		entry = new (std::nothrow) select_sync_pool_entry;
 		if (!entry)
 			return B_NO_MEMORY;
 
@@ -364,7 +365,7 @@ add_select_sync_pool_entry(select_sync_pool **_pool, selectsync *sync,
 	// create the pool, if necessary
 	select_sync_pool *pool = *_pool;
 	if (!pool) {
-		pool = new(nothrow) select_sync_pool;
+		pool = new (std::nothrow) select_sync_pool;
 		if (!pool)
 			return B_NO_MEMORY;
 

@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef ROOT_FILE_SYSTEM_H
 #define ROOT_FILE_SYSTEM_H
 
@@ -33,14 +33,13 @@ class RootFileSystem : public Directory {
 		status_t GetPartitionFor(Directory *volume, Partition **_partition);
 
 	private:
-		struct entry {
-			DoublyLinked::Link	link;
+		struct entry : public DoublyLinkedListLinkImpl<entry> {
 			const char	*name;
 			Directory	*root;
 			Partition	*partition;
 		};
-		typedef DoublyLinked::Iterator<entry, &entry::link> EntryIterator;
-		typedef DoublyLinked::List<entry, &entry::link> EntryList;
+		typedef DoublyLinkedList<entry>::Iterator EntryIterator;
+		typedef DoublyLinkedList<entry> EntryList;
 
 		EntryList fList;
 		EntryList fLinks;

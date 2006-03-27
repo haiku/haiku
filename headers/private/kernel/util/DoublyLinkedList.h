@@ -1,7 +1,7 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_UTIL_DOUBLY_LINKED_LIST_H
 #define KERNEL_UTIL_DOUBLY_LINKED_LIST_H
 
@@ -11,135 +11,6 @@
 
 
 #ifdef __cplusplus
-
-/* This header defines a doubly-linked list. It differentiates between a link
- * and an item.
- * It's the C++ version of <util/list.h> it's very small and efficient, but
- * has not been perfectly C++-ified yet.
- * The link must be part of the item, it cannot be allocated on demand yet.
- */
-
-namespace DoublyLinked {
-
-class Link {
-	public:
-		Link *next;
-		Link *prev;
-};
-
-template<class Item, Link Item::* LinkMember = &Item::fLink> class Iterator;
-
-template<class Item, Link Item::* LinkMember = &Item::fLink>
-class List {
-	public:
-		//typedef typename Item ValueType;
-		typedef Iterator<Item, LinkMember> IteratorType;
-
-		List()
-		{
-			fLink.next = fLink.prev = &fLink;
-		}
-
-		void Add(Item *item)
-		{
-			//Link *link = &item->*LinkMember;
-			(item->*LinkMember).next = &fLink;
-			(item->*LinkMember).prev = fLink.prev;
-
-			fLink.prev->next = &(item->*LinkMember);
-			fLink.prev = &(item->*LinkMember);
-		}
-
-		static void Remove(Item *item)
-		{
-			(item->*LinkMember).next->prev = (item->*LinkMember).prev;
-			(item->*LinkMember).prev->next = (item->*LinkMember).next;
-		}
-
-		Item *RemoveHead()
-		{
-			if (IsEmpty())
-				return NULL;
-
-			Item *item = GetItem(fLink.next);
-			Remove(item);
-
-			return item;
-		}
-
-		IteratorType Iterator()
-		{
-			return IteratorType(*this);
-		}
-
-		bool IsEmpty()
-		{
-			return fLink.next == &fLink;
-		}
-
-		Link *Head()
-		{
-			return fLink.next;
-		}
-
-		static inline size_t Offset()
-		{
-			return (size_t)&(((Item *)1)->*LinkMember) - 1;
-		}
-
-		static inline Item *GetItem(Link *link)
-		{
-			return (Item *)((uint8 *)link - Offset());
-		}
-
-	private:
-		friend class DoublyLinked::Iterator<Item, LinkMember>;
-		Link fLink;
-};
-
-template<class Item, Link Item::* LinkMember>
-class Iterator {
-	public:
-		typedef List<Item, LinkMember> ListType;
-
-		Iterator() : fCurrent(NULL) {}
-		Iterator(ListType &list) : fList(&list), fCurrent(list.Head()) {}
-
-		Item *Next()
-		{
-			if (fCurrent == &fList->fLink)
-				return NULL;
-
-			Link *current = fCurrent;
-			fCurrent = fCurrent->next;
-
-			return ListType::GetItem(current);
-		}
-
-	private:
-		ListType	*fList;
-		Link		*fCurrent;
-};
-
-}	// namespace DoublyLinked
-
-#endif	/* __cplusplus */
-
-#endif	/* KERNEL_UTIL_DOUBLY_LINKED_LIST_H */
-
-
-
-/* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
- * Distributed under the terms of the MIT License.
- */
-
-#ifndef _KERNEL_UTIL_DOUBLY_LINKED_LIST_H
-#define _KERNEL_UTIL_DOUBLY_LINKED_LIST_H
-
-#ifdef __cplusplus
-
-#include <SupportDefs.h>
 
 // DoublyLinkedListLink
 template<typename Element>
@@ -225,10 +96,10 @@ public:
 	class Iterator {
 	public:
 		Iterator(List *list)
-			: fList(list),
-			  fCurrent(NULL),
-			  fNext(fList->First())
+			:
+			fList(list)
 		{
+			Rewind();
 		}
 
 		Iterator(const Iterator &other)
@@ -240,7 +111,7 @@ public:
 		{
 			return fNext;
 		}
-		
+
 		Element *Next()
 		{
 			fCurrent = fNext;
@@ -248,7 +119,7 @@ public:
 				fNext = fList->GetNext(fNext);
 			return fCurrent;
 		}
-	
+
 		Element *Remove()
 		{
 			Element *element = fCurrent;
@@ -266,7 +137,13 @@ public:
 			fNext = other.fNext;
 			return *this;
 		}
-	
+
+		void Rewind()
+		{
+			fCurrent = NULL;
+			fNext = fList->First();
+		}
+
 	private:
 		List	*fList;
 		Element	*fCurrent;
@@ -276,9 +153,10 @@ public:
 	class ConstIterator {
 	public:
 		ConstIterator(const List *list)
-			: fList(list),
-			  fNext(list->First())
+			:
+			fList(list)
 		{
+			Rewind();
 		}
 
 		ConstIterator(const ConstIterator &other)
@@ -290,7 +168,7 @@ public:
 		{
 			return fNext;
 		}
-		
+
 		Element *Next()
 		{
 			Element *element = fNext;
@@ -298,14 +176,20 @@ public:
 				fNext = fList->GetNext(fNext);
 			return element;
 		}
-	
+
 		ConstIterator &operator=(const ConstIterator &other)
 		{
 			fList = other.fList;
 			fNext = other.fNext;
 			return *this;
 		}
-	
+
+		void Rewind()
+		{
+			fCurrent = NULL;
+			fNext = fList->First();
+		}
+
 	private:
 		const List	*fList;
 		Element		*fNext;
@@ -333,6 +217,8 @@ public:
 
 	inline Element *Head() const		{ return fFirst; }
 	inline Element *Tail() const		{ return fLast; }
+
+	inline Element *RemoveHead();
 
 	inline Element *GetPrevious(Element *element) const;
 	inline Element *GetNext(Element *element) const;
@@ -481,6 +367,16 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAll()
 	}
 	fFirst = NULL;
 	fLast = NULL;
+}
+
+// RemoveHead
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+Element *
+DOUBLY_LINKED_LIST_CLASS_NAME::RemoveHead()
+{
+	Element *element = Head();
+	Remove(element);
+	return element;
 }
 
 // GetPrevious
