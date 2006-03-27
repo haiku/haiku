@@ -131,6 +131,7 @@ public:
 	uint32 GetShowingImageSet() { return fShowingImageSet; }
 	
 	void Add(BackgroundImageInfo *);
+	void Remove(BackgroundImageInfo *);
 	void RemoveAll();
 
 private:

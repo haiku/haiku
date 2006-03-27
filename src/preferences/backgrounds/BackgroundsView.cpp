@@ -551,7 +551,7 @@ BackgroundsView::Save()
 		}
 	} else {
 		uint32 workspaceMask = 1;
-		uint32 workspace = current_workspace();
+		int32 workspace = current_workspace();
 		for (; workspace; workspace--)
 			workspaceMask *= 2;
 
@@ -560,21 +560,28 @@ BackgroundsView::Save()
 				if (fCurrentInfo->fWorkspace != workspaceMask) {
 					fCurrentInfo->fWorkspace = fCurrentInfo->fWorkspace 
 						^ workspaceMask;
-					fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
-						workspaceMask, fLastImageIndex, mode, offset, 
-						eraseTextWidgetBackground, fCurrentInfo->fImageSet, 
-						fCurrentInfo->fCacheMode);
-					fCurrent->Add(fCurrentInfo);
+					if (fLastImageIndex > -1) {
+						fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
+							workspaceMask, fLastImageIndex, mode, offset, 
+							eraseTextWidgetBackground, fCurrentInfo->fImageSet, 
+							fCurrentInfo->fCacheMode);
+						fCurrent->Add(fCurrentInfo);
+					}
 				} else {
-					fCurrentInfo->fEraseTextWidgetBackground =
-						eraseTextWidgetBackground;
-					fCurrentInfo->fMode = mode;
-					if (fCurrentInfo->fMode == BackgroundImage::kAtOffset)
-						fCurrentInfo->fOffset = offset;
-
-					fCurrentInfo->fImageIndex = fLastImageIndex;
+					if (fLastImageIndex > -1) {
+						fCurrentInfo->fEraseTextWidgetBackground =
+							eraseTextWidgetBackground;
+						fCurrentInfo->fMode = mode;
+						if (fCurrentInfo->fMode == BackgroundImage::kAtOffset)
+							fCurrentInfo->fOffset = offset;
+	
+						fCurrentInfo->fImageIndex = fLastImageIndex;
+					} else {
+						fCurrent->Remove(fCurrentInfo);
+						fCurrentInfo = NULL;
+					}
 				}
-			} else {
+			} else if (fLastImageIndex > -1) {
 				fCurrent->RemoveAll();
 				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 					B_ALL_WORKSPACES, fLastImageIndex, mode, offset, 
@@ -582,7 +589,7 @@ BackgroundsView::Save()
 					fCurrentInfo->fCacheMode);
 				fCurrent->Add(fCurrentInfo);
 			}
-		} else {
+		} else if (fLastImageIndex > -1) {
 			if (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()) {
 				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 					workspaceMask, fLastImageIndex, mode, offset, 
@@ -596,9 +603,9 @@ BackgroundsView::Save()
 			fCurrent->Add(fCurrentInfo);
 		}
 
-		if (fCurrentInfo->fWorkspace == B_ALL_WORKSPACES) {
+		if (!fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()) {
 			for (int32 i = 0; i < count_workspaces(); i++) {
-				BScreen().SetDesktopColor(fPicker->ValueAsColor(), i, true);
+					BScreen().SetDesktopColor(fPicker->ValueAsColor(), i, true);
 			}
 		} else
 			BScreen().SetDesktopColor(fPicker->ValueAsColor(), true);
@@ -814,7 +821,7 @@ BackgroundsView::UpdatePreview()
 	if (fYPlacementText->IsEnabled() ^ textEnabled)
 		fYPlacementText->SetEnabled(textEnabled);
 
-	if (textEnabled && fXPlacementText->TextView()->IsSelectable() != textEnabled) {
+	if (textEnabled && (strcmp(fXPlacementText->Text(), "") == 0)) {
 		fXPlacementText->SetText("0");
 		fYPlacementText->SetText("0");
 	}
@@ -892,29 +899,32 @@ BackgroundsView::UpdateButtons()
 		hasChanged = true;
 	} else if (fCurrentInfo) {
 		if ((fIconLabelBackground->Value() == B_CONTROL_ON) ^ 
-				fCurrentInfo->fEraseTextWidgetBackground)
+				fCurrentInfo->fEraseTextWidgetBackground) {
 			hasChanged = true;
-		else if (FindPlacementMode() != fCurrentInfo->fMode)
+		} else if (FindPlacementMode() != fCurrentInfo->fMode) {
 			hasChanged = true;
-		else if (fCurrentInfo->fImageIndex != 
-				((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex())
-			hasChanged = true;
-		else if (fCurrent->IsDesktop()
+		} else if (fCurrentInfo->fImageIndex != 
+				((BGImageMenuItem*)fImageMenu->FindMarked())->ImageIndex()) {
+			hasChanged = true; 
+		} else if (fCurrent->IsDesktop()
 			&& ((fCurrentInfo->fWorkspace != B_ALL_WORKSPACES)
-				^ (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked())))
+				^ (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()))) {
 			hasChanged = true;
-		else if (fCurrentInfo->fMode == BackgroundImage::kAtOffset) {
+		} else if (fCurrentInfo->fMode == BackgroundImage::kAtOffset) {
 			BString oldString, newString;
 			oldString << (int)fCurrentInfo->fOffset.x;
-			if (oldString != BString(fXPlacementText->Text()))
+			if (oldString != BString(fXPlacementText->Text())) {
 				hasChanged = true;
+			}
 			oldString = "";
 			oldString << (int)fCurrentInfo->fOffset.y;
-			if (oldString != BString(fYPlacementText->Text()))
+			if (oldString != BString(fYPlacementText->Text())) {
 				hasChanged = true;
+			}
 		}
-	} else if (fImageMenu->IndexOf(fImageMenu->FindMarked()) > 0)
+	} else if (fImageMenu->IndexOf(fImageMenu->FindMarked()) > 0) {
 		hasChanged = true;
+	}
 
 	fApply->SetEnabled(hasChanged);
 	fRevert->SetEnabled(hasChanged);

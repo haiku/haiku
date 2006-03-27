@@ -210,6 +210,13 @@ BackgroundImage::Add(BackgroundImageInfo *info)
 }
 
 
+void 
+BackgroundImage::Remove(BackgroundImageInfo *info)
+{
+	fBitmapForWorkspaceList.RemoveItem(info);
+}
+
+
 void
 BackgroundImage::RemoveAll()
 {
