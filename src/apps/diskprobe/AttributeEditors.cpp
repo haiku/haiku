@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "AttributeEditors.h"
@@ -20,6 +20,8 @@
 #include <Autolock.h>
 #include <Mime.h>
 #include <TranslationUtils.h>
+
+#include <stdlib.h>
 
 
 static const uint32 kMsgValueChanged = 'vlch';

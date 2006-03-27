@@ -1,13 +1,14 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "ProbeWindow.h"
 #include "DiskProbe.h"
 
 #include <Application.h>
+#include <View.h>
 
 
 ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref)

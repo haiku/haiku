@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -36,6 +36,7 @@
 #include <Beep.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
@@ -302,7 +303,7 @@ PositionSlider::DrawBar()
 	frame.top++;
 	frame.left++;
 	frame.right = ThumbFrame().left + ThumbFrame().Width() / 2;
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	if (IsEnabled())
 		view->SetHighColor(102, 152, 203);
 	else
@@ -320,7 +321,7 @@ PositionSlider::DrawBar()
 
 	rgb_color cornerColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	rgb_color darkColor = tint_color(ViewColor(), B_DARKEN_3_TINT);
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	rgb_color shineColor = {255, 255, 255};
 	rgb_color shadowColor = {0, 0, 0};
 #else
@@ -389,6 +390,7 @@ void
 PositionSlider::SetPosition(off_t position)
 {
 	position /= fBlockSize;
+	printf("value: %ld\n", int32(1.0 * kMaxSliderLimit * position / ((fSize - 1) / fBlockSize) + 0.5));
 	SetValue(int32(1.0 * kMaxSliderLimit * position / ((fSize - 1) / fBlockSize) + 0.5));
 }
 
@@ -611,7 +613,7 @@ HeaderView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	SetHighColor(255, 255, 255);
 #else
 	SetHighColor(ui_color(B_SHINE_COLOR));
@@ -900,7 +902,7 @@ TypeMenuItem::DrawContent()
 	point.x = Frame().right - 4 - Menu()->StringWidth(fType.String());
 	point.y += fontHeight.ascent;
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	Menu()->SetDrawingMode(B_OP_ALPHA);
 #endif
 
@@ -1105,7 +1107,8 @@ ProbeView::UpdateSizeLimits()
 	} else
 		Window()->SetSizeLimits(250, 32768, 200, 32768);
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
+	// In Haiku and Dano, the window is resized automatically
 	BRect bounds = Window()->Bounds();
 	float minWidth, maxWidth, minHeight, maxHeight;
 	Window()->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);

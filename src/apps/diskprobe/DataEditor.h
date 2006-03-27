@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DATA_EDITOR_H
@@ -11,9 +11,13 @@
 #include <Locker.h>
 #include <ObjectList.h>
 
+class BHandler;
+class BLooper;
+class BMessenger;
 
 class DataChange;
 class StateWatcher;
+
 
 class DataEditor : public BLocker {
 	public:

@@ -1,13 +1,14 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef OPEN_WINDOW_H
 #define OPEN_WINDOW_H
 
 
 #include <Window.h>
 
+class BEntry;
 class BMenu;
 
 

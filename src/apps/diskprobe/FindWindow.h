@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef FIND_WINDOW_H
 #define FIND_WINDOW_H
 
@@ -9,8 +9,10 @@
 #include <Window.h>
 #include <Messenger.h>
 
-class FindTextView;
 class BCheckBox;
+class BMenu;
+
+class FindTextView;
 
 
 enum find_mode {

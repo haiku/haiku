@@ -1,13 +1,8 @@
 SubDir HAIKU_TOP src apps diskprobe ;
 
-UsePrivateHeaders shared ;
+SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if ! $(DANO_COMPATIBLE) {
-	local defines = COMPILE_FOR_R5 ;
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-}
+UsePrivateHeaders shared ;
 
 Application DiskProbe :
 	DiskProbe.cpp
@@ -20,10 +15,6 @@ Application DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
-	: libbe.so libtracker.so libtranslation.so
+	: be tracker translation
 	: DiskProbe.rdef
 	;
-
-if $(HAIKU_COMPATIBLE) {
-	LinkAgainst DiskProbe : libroot.so ;
-}

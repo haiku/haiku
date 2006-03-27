@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -153,7 +153,7 @@ EditorTabView::SetTypeEditorTab(BView *view)
 
 	FrameResized(0, 0);
 
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	if (Window() != NULL) {
 		// With R5's BTabView, calling select without being
 		// attached to a window crashes...
@@ -176,7 +176,7 @@ AttributeWindow::AttributeWindow(BRect _rect, entry_ref *ref, const char *attrib
 	// Set alternative window title for devices
 
 	char name[B_FILE_NAME_LENGTH];
-#ifdef COMPILE_FOR_R5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 	strncpy(name, ref->name, sizeof(name));
 	name[sizeof(name) - 1] = '\0';
 #else

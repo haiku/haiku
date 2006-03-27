@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef PROBE_VIEW_H
 #define PROBE_VIEW_H
 
@@ -15,6 +15,7 @@
 
 class BScrollView;
 class BMenuItem;
+class BMenu;
 
 class HeaderView;
 class DataView;

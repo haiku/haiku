@@ -15,6 +15,10 @@
 #include <Beep.h>
 
 
+#ifndef __HAIKU__
+typedef uint32 addr_t;
+#endif
+
 static const uint32 kBlockSize = 16;
 static const uint32 kHorizontalSpace = 8;
 static const uint32 kVerticalSpace = 4;
@@ -1246,7 +1250,7 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 					c += 'A' - 'a';
 				const char *hexNumbers = "0123456789abcdef";
 				addr_t number;
-				if (data == NULL || (number = (addr_t)strchr(hexNumbers, c)) == NULL)
+				if (data == NULL || (number = (addr_t)strchr(hexNumbers, c)) == 0)
 					break;
 
 				SetSelection(fStart, fStart);
