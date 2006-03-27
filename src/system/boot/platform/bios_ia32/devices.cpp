@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-#define TRACE_DEVICES
+//#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
@@ -367,6 +367,7 @@ get_next_check_sum_offset(int32 index, off_t maxSize)
 /**	Computes a check sum for the specified block.
  *	The check sum is the sum of all data in that block interpreted as an
  *	array of uint32 values.
+ *	Note, this must use the same method as the one used in kernel/fs/vfs_boot.cpp.
  */
 
 static uint32
@@ -699,11 +700,21 @@ BIOSDrive::FillIdentifier()
 	if (HasParameters()) {
 		// try all drive_parameters versions, beginning from the most informative
 
+#if 0
 		if (fill_disk_identifier_v3(fIdentifier, fParameters) == B_OK)
 			return B_OK;
 
 		if (fill_disk_identifier_v2(fIdentifier, fParameters) == B_OK)
 			return B_OK;
+#else
+		// TODO: the above version is the correct one - it's currently
+		//		disabled, as the kernel boot code only supports the
+		//		UNKNOWN_BUS/UNKNOWN_DEVICE way to find the correct boot
+		//		device.
+		if (fill_disk_identifier_v3(fIdentifier, fParameters) != B_OK)
+			fill_disk_identifier_v2(fIdentifier, fParameters);
+
+#endif
 
 		// no interesting information, we have to fall back to the default
 		// unknown interface/device type identifier

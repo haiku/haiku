@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -27,11 +27,9 @@
 
 //#define TRACE_VFS
 #ifdef TRACE_VFS
-#	define PRINT(x) dprintf x
-#	define FUNCTION(x) dprintf x
+#	define TRACE(x) dprintf x
 #else
-#	define PRINT(x) ;
-#	define FUNCTION(x) ;
+#	define TRACE(x) ;
 #endif
 
 
@@ -109,10 +107,100 @@ compare_cd_boot(const void *_a, const void *_b)
 }
 
 
+/**	Computes a check sum for the specified block.
+ *	The check sum is the sum of all data in that block interpreted as an
+ *	array of uint32 values.
+ *	Note, this must use the same method as the one used in
+ *	boot/platform/bios_ia32/devices.cpp (or similar solutions).
+ */
+
+static uint32
+compute_check_sum(KDiskDevice *device, off_t offset)
+{
+	char buffer[512];
+	ssize_t bytesRead = read_pos(device->FD(), offset, buffer, sizeof(buffer));
+	if (bytesRead < B_OK)
+		return 0;
+
+	if (bytesRead < (ssize_t)sizeof(buffer))
+		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
+
+	uint32 *array = (uint32 *)buffer;
+	uint32 sum = 0;
+
+	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++) {
+		sum += array[i];
+	}
+
+	return sum;
+}
+
+
+/**	Checks if the device matches the boot device as specified by the
+ *	boot loader.
+ */
+
+static bool
+is_boot_device(kernel_args *args, KDiskDevice *device)
+{
+	disk_identifier &disk = args->boot_disk.identifier;
+
+	TRACE(("boot device: bus %ld, device %ld\n", disk.bus_type,
+		disk.device_type));
+
+	switch (disk.bus_type) {
+		case PCI_BUS:
+		case LEGACY_BUS:
+			// TODO: implement this! (and then enable this feature in the boot loader)
+			// (we need a way to get the device_node of a device, then)
+			break;
+
+		case UNKNOWN_BUS:
+			// nothing to do here
+			break;
+	}
+
+	switch (disk.device_type) {
+		case UNKNOWN_DEVICE:
+			// test if the size of the device matches
+			if (device->Size() != disk.device.unknown.size)
+				return false;
+
+			// check if the check sums match, too
+			for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
+				if (disk.device.unknown.check_sums[i].offset == -1)
+					continue;
+
+				if (compute_check_sum(device, disk.device.unknown.check_sums[i].offset)
+						!= disk.device.unknown.check_sums[i].sum)
+					return false;
+			}
+			break;
+
+		case ATA_DEVICE:
+		case ATAPI_DEVICE:
+		case SCSI_DEVICE:
+		case USB_DEVICE:
+		case FIREWIRE_DEVICE:
+		case FIBRE_DEVICE:
+			// TODO: implement me!
+			break;
+	}
+
+	return true;
+}
+
+
+/**	Make the boot partition (and probably others) available. 
+ *	The partitions that are a boot candidate a put into the /a partitions
+ *	stack. If the user selected a boot device, there is will only be one
+ *	entry in this stack; if not, the most likely is put up first.
+ *	The boot code should then just try them one by one.
+ */
+
 static status_t
 get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 {
-	// make the boot partition (and probably others) available
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
@@ -128,9 +216,6 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 		return status;
 	}
-
-	// ToDo: do this for real! It will currently only use the partition offset;
-	//	it does not yet use the disk_identifier information.
 
 	struct BootPartitionVisitor : KPartitionVisitor {
 		BootPartitionVisitor(kernel_args &args, PartitionStack &stack)
@@ -168,6 +253,9 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 	KDiskDevice *device;
 	int32 cookie = 0;
 	while ((device = manager->NextDevice(&cookie)) != NULL) {
+		if (!is_boot_device(args, device))
+			continue;
+
 		if (device->VisitEachDescendant(&visitor) != NULL)
 			break;
 	}
