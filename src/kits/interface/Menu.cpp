@@ -1881,8 +1881,7 @@ BMenu::OkToProceed(BMenuItem* item)
 	GetMouse(&where, &buttons, false);
 	// Quit if user releases the mouse button or moves
 	// the pointer over another item
-	// TODO: Something's wrong: I should use ConvertToScreen() here
-	if (buttons == 0 || HitTestItems(/*ConvertToScreen(*/where/*)*/) != item)
+	if (buttons == 0 || HitTestItems(where) != item)
 		proceed = false;
 	
 	return proceed;
