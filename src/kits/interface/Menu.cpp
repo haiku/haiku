@@ -7,7 +7,6 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-#include <stdio.h>
 #include <string.h>
 
 #include <Debug.h>
@@ -1880,12 +1879,10 @@ BMenu::OkToProceed(BMenuItem* item)
 	BPoint where;
 	ulong buttons;
 	GetMouse(&where, &buttons, false);
-	ConvertToScreen(&where);
-	
 	// Quit if user releases the mouse button or moves
 	// the pointer over another item
-	// TODO: For some reason, this doesn't work
-	if (buttons == 0 /*|| HitTestItems(where) != item*/)
+	// TODO: Something's wrong: I should use ConvertToScreen() here
+	if (buttons == 0 || HitTestItems(/*ConvertToScreen(*/where/*)*/) != item)
 		proceed = false;
 	
 	return proceed;
