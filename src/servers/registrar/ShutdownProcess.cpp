@@ -298,7 +298,7 @@ public:
 
 		// reboot system button
 		fRebootSystemButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"reboot", "Reboot System", NULL, B_FOLLOW_NONE);
+			"reboot", "Restart System", NULL, B_FOLLOW_NONE);
 		if (!fRebootSystemButton)
 			return B_NO_MEMORY;
 		fRebootSystemButton->Hide();
@@ -1243,11 +1243,11 @@ ShutdownProcess::_WorkerDoShutdown()
 	// ask the user to confirm the shutdown, if desired
 	bool askUser;
 	if (fHasGUI && fRequest->FindBool("confirm", &askUser) == B_OK && askUser) {
-		const char *title = (fReboot ? "Reboot?" : "Shut Down?");
+		const char *title = (fReboot ? "Restart?" : "Shut Down?");
 		const char *text = (fReboot
-			? "Do you really want to reboot the system?"
+			? "Do you really want to restart the system?"
 			: "Do you really want to shut down the system?");
-		const char *buttonText = (fReboot ? "Reboot" : "Shut Down");
+		const char *buttonText = (fReboot ? "Restart" : "Shut Down");
 		BAlert *alert = new BAlert(title, text, "Cancel", buttonText, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
@@ -1277,6 +1277,8 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// phase 3: terminate the background apps
 	_SetPhase(BACKGROUND_APP_TERMINATION_PHASE);
+// TODO: _QuitNonApps() and _QuitBackgroundApps() are called in reverse?
+// and don't match the phase
 	_QuitNonApps();
 
 	// phase 4: terminate the other processes
