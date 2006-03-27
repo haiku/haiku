@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,7 +23,7 @@ char sBootPath[192];
 
 
 status_t 
-platform_get_boot_device(struct stage2_args *args, Node **_device)
+platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	// print out the boot path (to be removed later?)
 
@@ -80,7 +80,7 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 	if (device == NULL)
 		return B_NO_MEMORY;
 
-	*_device = device;
+	devicesList->Add(device);
 	return B_OK;
 }
 
