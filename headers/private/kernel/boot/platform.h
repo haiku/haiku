@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PLATFORM_H
@@ -54,7 +54,7 @@ namespace boot {
 	class Partition;
 }
 
-extern status_t platform_get_boot_device(struct stage2_args *args, Node **_device);
+extern status_t platform_add_boot_device(struct stage2_args *args, NodeList *devicesList);
 extern status_t platform_add_block_devices(struct stage2_args *args, NodeList *devicesList);
 extern status_t platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 					NodeList *partitions, boot::Partition **_partition);

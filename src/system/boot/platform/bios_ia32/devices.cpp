@@ -160,6 +160,9 @@ class BIOSDrive : public Node {
 };
 
 
+static bool sBlockDevicesAdded = false;
+
+
 static void
 check_cd_boot(BIOSDrive *drive)
 {
@@ -473,41 +476,44 @@ find_unique_check_sums(NodeList *devices)
 }
 
 
-#define DUMPED_BLOCK_SIZE 16
-
-void
-dumpBlock(const char *buffer, int size, const char *prefix)
+static status_t
+add_block_devices(NodeList *devicesList, bool identifierMissing)
 {
-	int i;
-	
-	for (i = 0; i < size;) {
-		int start = i;
+	if (sBlockDevicesAdded)
+		return B_OK;
 
-		dprintf(prefix);
-		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
-			if (!(i % 4))
-				dprintf(" ");
+	uint8 driveCount;
+	if (get_number_of_drives(&driveCount) != B_OK)
+		return B_ERROR;
 
-			if (i >= size)
-				dprintf("  ");
-			else
-				dprintf("%02x", *(unsigned char *)(buffer + i));
+	dprintf("number of drives: %d\n", driveCount);
+
+	for (int32 i = 0; i < driveCount; i++) {
+		uint8 driveID = i + 0x80;
+		if (driveID == gBootDriveID)
+			continue;
+
+		BIOSDrive *drive = new BIOSDrive(driveID);
+		if (drive->InitCheck() != B_OK) {
+			dprintf("could not add drive %u\n", driveID);
+			delete drive;
+			continue;
 		}
-		dprintf("  ");
 
-		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
-			if (i < size) {
-				char c = buffer[i];
+		devicesList->Add(drive);
 
-				if (c < 30)
-					dprintf(".");
-				else
-					dprintf("%c", c);
-			} else
-				break;
-		}
-		dprintf("\n");
+		if (drive->FillIdentifier() != B_OK)
+			identifierMissing = true;
 	}
+
+	if (identifierMissing) {
+		// we cannot distinguish between all drives by identifier, we need
+		// compute checksums for them
+		find_unique_check_sums(devicesList);
+	}
+
+	sBlockDevicesAdded = true;
+	return B_OK; 
 }
 
 
@@ -720,7 +726,7 @@ BIOSDrive::FillIdentifier()
 
 
 status_t 
-platform_get_boot_device(struct stage2_args *args, Node **_device)
+platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	TRACE(("boot drive ID: %x\n", gBootDriveID));
 
@@ -730,14 +736,17 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 		return B_ERROR;
 	}
 
+	devicesList->Add(drive);
+
 	if (drive->FillIdentifier() != B_OK) {
-		// TODO: we need to add all block devices!
+		// We need to add all block devices to give the kernel the possibility
+		// to find the right boot volume
+		add_block_devices(devicesList, true);
 	}
 
-	TRACE(("drive size: %Ld bytes\n", drive->Size()));
+	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
 	gKernelArgs.boot_disk.booted_from_image = gBootedFromImage;
 
-	*_device = drive;
 	return B_OK;
 }
 
@@ -771,39 +780,7 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 status_t
 platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
-	uint8 driveCount;
-	if (get_number_of_drives(&driveCount) != B_OK)
-		return B_ERROR;
-
-	dprintf("number of drives: %d\n", driveCount);
-
-	bool identifierMissing = false;
-
-	for (int32 i = 0; i < driveCount; i++) {
-		uint8 driveID = i + 0x80;
-		if (driveID == gBootDriveID)
-			continue;
-
-		BIOSDrive *drive = new BIOSDrive(driveID);
-		if (drive->InitCheck() != B_OK) {
-			dprintf("could not add drive %u\n", driveID);
-			delete drive;
-			continue;
-		}
-
-		devicesList->Add(drive);
-
-		if (drive->FillIdentifier() != B_OK)
-			identifierMissing = true;
-	}
-
-	if (identifierMissing) {
-		// we cannot distinguish between all drives by identifier, we need
-		// compute checksums for them
-		find_unique_check_sums(devicesList);
-	}
-
-	return B_OK; 
+	return add_block_devices(devicesList, false);
 }
 
 

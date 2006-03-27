@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -328,11 +328,11 @@ Directory *
 get_boot_file_system(stage2_args *args)
 {
 	Node *device;
-	if (platform_get_boot_device(args, &device) < B_OK)
+	if (platform_add_boot_device(args, &gBootDevices) < B_OK)
 		return NULL;
 
-	// add the boot device to the list of devices
-	gBootDevices.Add(device);
+	// the boot device must be the first device in the list
+	device = gBootDevices.First();
 
 	if (add_partitions_for(device, false, true) < B_OK)
 		return NULL;

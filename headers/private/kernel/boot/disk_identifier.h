@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_DISK_IDENTIFIER_H
@@ -24,6 +24,8 @@ enum device_types {
 	FIREWIRE_DEVICE,
 	FIBRE_DEVICE,
 };
+
+#define NUM_DISK_CHECK_SUMS 5
 
 typedef struct disk_identifier {
 	int32				bus_type;
@@ -64,7 +66,7 @@ typedef struct disk_identifier {
 			struct {
 				off_t	offset;
 				uint32	sum;
-			} check_sums[5];
+			} check_sums[NUM_DISK_CHECK_SUMS];
 		} unknown;
 	} device;
 } disk_identifier;
