@@ -31,6 +31,7 @@ void *sys_mount(int kernel, const char *filesystem, int fd,
                 const char *where, const char *device, ulong flags,
                 void *parms, size_t len);
 int sys_unmount(int kernel, int fd, const char *where);
+int sys_write_fs_info(int kernel, dev_t device, struct fs_info *info, int mask);
 int sys_rstat(int kernel, int fd, const char *path, struct my_stat *st,
               int eatlink);
 int sys_wstat(int kernel, int fd, const char *path, struct my_stat *st,

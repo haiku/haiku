@@ -1670,6 +1670,31 @@ do_sync(int argc, char **argv)
 
 
 static int
+do_relabel(int argc, char **argv)
+{
+	if (argc < 2) {
+		printf("usage: relabel <volume name>\n");
+		return FS_EINVAL;
+	}
+
+	struct my_stat st;
+	status_t error = sys_rstat(true, -1, "/myfs", &st, true);
+	if (error == FS_OK) {
+		fs_info info;
+		strncpy(info.volume_name, argv[1], sizeof(info.volume_name));
+		info.volume_name[sizeof(info.volume_name) - 1] = '\0';
+
+		error = sys_write_fs_info(true, st.dev, &info, WFSSTAT_NAME);
+	}
+
+	if (error != FS_OK)
+		printf("Could not create index: %s\n", fs_strerror(error));
+
+	return error;
+}
+
+
+static int
 do_mkindex(int argc, char **argv)
 {
 	if (argc < 2) {
@@ -2038,6 +2063,7 @@ static cmd_entry builtin_commands[] =
     { "seek",    do_seek, "seek to the position specified" },
     { "mv",      do_rename, "rename a file or directory" },
     { "sync",    do_sync, "call sync" },
+    { "relabel", do_relabel, "rename the volume" },
     { "wrattr",  do_write_attr, "write attribute \"name\" to the current file (N bytes [256])." },
     { "rdattr",  do_read_attr, "read attribute \"name\" from the current file (N bytes [256])." },
     { "rmattr",  do_remove_attr, "remove attribute \"name\" from the current file." },

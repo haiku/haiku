@@ -2085,6 +2085,35 @@ error1:
 
 
 int
+sys_write_fs_info(int kernel, dev_t device, struct fs_info *info, int mask)
+{
+	int status = FS_EINVAL;
+	fsystem	*fs = NULL;
+	vnode *root = NULL;
+	nspace *ns;
+
+	LOCK(vnlock);
+	ns = nsidtons(device);
+	if (ns != NULL) {
+		fs = ns->fs;
+		if (fs->ops.wfsstat != NULL) {
+			status = FS_OK;
+			root = ns->root;
+			root->rcnt++;
+		}
+	}
+	UNLOCK(vnlock);
+
+	if (status == FS_OK) {
+		status = (*fs->ops.wfsstat)(ns->data, info, mask);
+		dec_vnode(root, FALSE);
+	}
+
+	return status;
+}
+
+
+int
 sys_mkindex(int kernel, dev_t device, const char *index, int type, int flags)
 {
 	int status = FS_EINVAL;
