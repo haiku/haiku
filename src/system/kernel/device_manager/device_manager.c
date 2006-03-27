@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -142,6 +142,7 @@ device_manager_init(struct kernel_args *args)
 
 	dm_init_root_node();
 
+#ifdef TRACE_DEVICE_MANAGER
 	{
 		// dump root node
 		device_node_info *node = gRootNode;
@@ -149,6 +150,7 @@ device_manager_init(struct kernel_args *args)
 			node = node->parent;
 		dm_dump_node(node, 0);
 	}
+#endif
 
 	// build initial device tree; register all root bus_managers
 
