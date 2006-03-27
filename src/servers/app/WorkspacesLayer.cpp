@@ -40,10 +40,12 @@ void
 WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 {
 	DesktopSettings settings(Window()->Desktop());
+
 	int32 count = settings.WorkspacesCount();
+	int32 squareRoot = sqrt(count);
 
 	rows = 1;
-	for (int32 i = 2; i <= sqrt(count); i++) {
+	for (int32 i = 2; i <= squareRoot; i++) {
 		if (count % i == 0)
 			rows = i;
 	}
