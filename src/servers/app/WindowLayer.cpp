@@ -429,8 +429,10 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 //fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 255, 255));
 //snooze(2000);
 
-		dirty.IntersectWith(&VisibleContentRegion());
-		_TriggerContentRedraw(dirty);
+		if (IsVisible() && view->IsVisible()) {
+			dirty.IntersectWith(&VisibleContentRegion());
+			_TriggerContentRedraw(dirty);
+		}
 
 		fDesktop->UnlockSingleWindow();
 	}
@@ -441,7 +443,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 void
 WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 {
-	if (!fHidden && fDesktop && fDesktop->LockSingleWindow()) {
+	if (IsVisible() && fDesktop && fDesktop->LockSingleWindow()) {
 		BRegion newDirty(*region);
 
 		// clip the region to the visible contents at the
