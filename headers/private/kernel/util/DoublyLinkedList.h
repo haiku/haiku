@@ -186,7 +186,6 @@ public:
 
 		void Rewind()
 		{
-			fCurrent = NULL;
 			fNext = fList->First();
 		}
 
