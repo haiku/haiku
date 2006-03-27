@@ -57,11 +57,10 @@ void
 ps2_dev_publish(ps2_dev *dev)
 {
 	status_t status;
+	TRACE(("ps2_dev_publish %s\n", dev->name));
 	
 	if (dev->active)
 		return;
-
-	TRACE(("ps2_dev_publish %s\n", dev->name));
 
 	dev->active = true;
 	
@@ -75,12 +74,17 @@ ps2_dev_publish(ps2_dev *dev)
 void
 ps2_dev_unpublish(ps2_dev *dev)
 {
+	status_t status;
+	TRACE(("ps2_dev_unpublish %s\n", dev->name));
+
 	if (!dev->active)
 		return;
-
-	TRACE(("ps2_dev_unpublish %s\n", dev->name));
 		
 	dev->active = false;
+	
+	status = -1;
+
+	dprintf("ps2: devfs_unpublish_device %s, status = 0x%08lx\n", dev->name, status);
 }
 
 
@@ -94,19 +98,27 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	if (flags & PS2_FLAG_CMD) {
 		if ((flags & (PS2_FLAG_ACK | PS2_FLAG_NACK)) == 0) {
 			int cnt = 1;
-			if ((flags & PS2_FLAG_GETID) && (data == 0 || data == 3 || data == 4)) {
+			if (data == PS2_REPLY_ACK) {
+				atomic_or(&dev->flags, PS2_FLAG_ACK);
+			} else if (data == PS2_REPLY_RESEND || data == PS2_REPLY_ERROR) {
+				atomic_or(&dev->flags, PS2_FLAG_NACK);
+			} else if ((flags & PS2_FLAG_GETID) && (data == 0 || data == 3 || data == 4)) {
 				// workaround for broken mice that don't ack the "get id" command
-				dprintf("ps2_dev_handle_int: mouse didn't ack the 'get id' command\n");
+				dprintf("ps2: ps2_dev_handle_int: mouse didn't ack the 'get id' command\n");
 				atomic_or(&dev->flags, PS2_FLAG_ACK);
 				if (dev->result_buf_cnt) {
 					dev->result_buf[dev->result_buf_idx] = data;
 					dev->result_buf_idx++;
 					dev->result_buf_cnt--;
-					if (dev->result_buf_cnt == 0)
+					if (dev->result_buf_cnt == 0) {
+						atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 						cnt++;
+					}
 				}
 			} else {
-				atomic_or(&dev->flags, data == 0xfa ? PS2_FLAG_ACK : PS2_FLAG_NACK);
+//				dprintf("ps2: ps2_dev_handle_int unexpected data 0x%02x while waiting for ack\n", data);
+				dprintf("ps2: int1 %02x\n", data);
+				goto pass_to_handler;
 			}
 			release_sem_etc(dev->result_sem, cnt, B_DO_NOT_RESCHEDULE);
 			return B_INVOKE_SCHEDULER;
@@ -115,30 +127,37 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 			dev->result_buf_idx++;
 			dev->result_buf_cnt--;
 			if (dev->result_buf_cnt == 0) {
+				atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 				release_sem_etc(dev->result_sem, 1, B_DO_NOT_RESCHEDULE);
 				return B_INVOKE_SCHEDULER;
 			}
 		} else {
-			dprintf("ps2_dev_handle_int can't handle\n");
+//			dprintf("ps2: ps2_dev_handle_int unexpected data 0x%02x during command processing\n", data);
+			dprintf("ps2: int2 %02x\n", data);
+			goto pass_to_handler;
 		}
 		return B_HANDLED_INTERRUPT;
 	}
 	
+pass_to_handler:
+
+	dev->last_data = system_time();
+	
 	if (!dev->active) {
 		ps2_service_notify_device_added(dev);
-		dprintf("not active, data dropped\n");
+		dprintf("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
 		return B_HANDLED_INTERRUPT;
 	}
 	
 	if ((flags & PS2_FLAG_ENABLED) == 0) {
-		dprintf("not enabled, data dropped\n");
+		dprintf("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
 		// TODO: remove me again; let us drop into the kernel debugger with F12
 		if ((flags & PS2_FLAG_KEYB) != 0 && data == 88)
 			panic("keyboard requested halt.\n");
 
 		return B_HANDLED_INTERRUPT;
 	}
-			
+
 	// temporary hack...
 	if (flags & PS2_FLAG_KEYB)
 		return keyboard_handle_int(data);
@@ -167,8 +186,6 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 		else
 			release_sem_etc(dev->result_sem, -sem_count, 0);
 	}
-		
-	atomic_or(&dev->flags, PS2_FLAG_CMD);
 
 	dev->result_buf_cnt = in_count;
 	dev->result_buf_idx = 0;
@@ -178,8 +195,6 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	for (i = -1; res == B_OK && i < out_count; i++) {
 
 		atomic_and(&dev->flags, ~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID));
-		if (i == -1 && cmd == PS2_CMD_GET_DEVICE_ID)
-			atomic_or(&dev->flags, PS2_FLAG_GETID);
 
 		acquire_sem(gControllerSem);
 
@@ -196,7 +211,15 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		res = ps2_wait_write();
 		if (res == B_OK) {
-			ps2_write_data(i == -1 ? cmd : out[i]);
+			if (i == -1) {
+				if (cmd == PS2_CMD_GET_DEVICE_ID)
+					atomic_or(&dev->flags, PS2_FLAG_CMD | PS2_FLAG_GETID);
+				else
+					atomic_or(&dev->flags, PS2_FLAG_CMD);
+				ps2_write_data(cmd);
+			} else {
+				ps2_write_data(out[i]);
+			}
 		}
 
 		release_sem(gControllerSem);

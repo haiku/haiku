@@ -54,8 +54,8 @@
 #define PS2_CMD_TEST_PASSED				0xaa
 #define PS2_CMD_GET_DEVICE_ID			0xf2
 #define PS2_CMD_SET_SAMPLE_RATE			0xf3
-#define PS2_CMD_ENABLE_MOUSE			0xf4
-#define PS2_CMD_DISABLE_MOUSE			0xf5
+#define PS2_CMD_ENABLE					0xf4
+#define PS2_CMD_DISABLE					0xf5
 #define PS2_CMD_RESET					0xff
 
 // reply codes

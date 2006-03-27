@@ -11,7 +11,7 @@
  */
 
 
-#include "ps2_common.h"
+#include "ps2_service.h"
 #include "kb_mouse_driver.h"
 #include "packet_buffer.h"
 
@@ -216,6 +216,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 	status = probe_keyboard();
 	if (status != B_OK) {
 		dprintf("ps2: keyboard probing failed\n");
+		ps2_service_notify_device_removed(&ps2_device[PS2_DEVICE_KEYB]);
 		goto err1;
 	}
 
@@ -245,7 +246,7 @@ err3:
 err2:
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
-
+	
 	dprintf("ps2: keyboard_open %s failed\n", name);
 	return status;
 }

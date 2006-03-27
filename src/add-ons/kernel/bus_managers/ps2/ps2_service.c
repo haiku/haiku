@@ -16,7 +16,13 @@ static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
 static packet_buffer *  sServiceCmdBuffer;
 
-#define PS2_SERVICE_INTERVAL 200000
+
+#ifdef DEBUG
+  #define PS2_SERVICE_INTERVAL 10000000
+#else
+  #define PS2_SERVICE_INTERVAL 1000000
+#endif
+
 
 typedef struct
 {
@@ -59,35 +65,74 @@ ps2_service_notify_device_removed(ps2_dev *dev)
 	
 	packet_buffer_write(sServiceCmdBuffer, (const uint8 *)&cmd, sizeof(cmd));
 	release_sem_etc(sServiceSem, 1, B_DO_NOT_RESCHEDULE);
+
+	TRACE(("ps2_service_notify_device_removed done\n"));
 }
 
 
 static status_t
 ps2_service_probe_device(ps2_dev *dev)
 {
-	uint8 d;
 	status_t res;
+	uint8 data[2];
 
 	TRACE(("ps2_service_probe_device %s\n", dev->name));
-/*
+
+	// assume device still exists if it sent data during last 500 ms
+	if (dev->active && (system_time() - dev->last_data) < 500000)
+		return B_OK;
+
 	if (dev->flags & PS2_FLAG_KEYB) {
+		
+		res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+		if (res == B_OK)
+			return B_OK;
 
-		res = ps2_command(0xae, NULL, 0, NULL, 0);
-		dprintf("KBD enable: res 0x%08x\n", res);
+//		snooze(25000);
+//		res = ps2_dev_command(dev, 0xee, NULL, 0, NULL, 0); // echo
+//		if (res == B_OK)
+//			return B_OK;
 
-		res = ps2_command(0xab, NULL, 0, &d, 1);
-		dprintf("KBD test: res 0x%08x, d 0x%02x\n", res, d);
+		snooze(25000);
+		res = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, data, 2);
+		if (res == B_OK)
+			return B_OK;
+			
+//		if (!dev->active) {
+//			snooze(25000);
+//			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds with "ack" (0xFA).
+//			res = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xfa, NULL, 0, NULL, 0);
+//			if (res == B_OK)
+//				return B_OK;
+//		}	
+
+		if (!dev->active) {
+			snooze(25000);
+			// 0xF3 (Set Typematic Rate/Delay) 
+			data[0] = 0x0b;
+			res = ps2_dev_command(dev, PS2_CMD_KEYBOARD_SET_TYPEMATIC, data, 1, NULL, 0);
+			if (res == B_OK)
+				return B_OK;
+		}	
 
 	} else {
+		
+		res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+		if (res == B_OK) {
+			if (!dev->active)
+				ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
+			return B_OK;
+		}
 
-		res = ps2_command(0xa8, NULL, 0, NULL, 0);
-		dprintf("AUX enable: res 0x%08x\n", res);
-
-		res = ps2_command(0xa9, NULL, 0, &d, 1);
-		dprintf("AUX test: res 0x%08x, d 0x%02x\n", res, d);
+		if (!dev->active) {
+			snooze(25000);
+			res = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, data, 1);
+			if (res == B_OK)
+				return B_OK;
+		}
 	}
-*/	
-	return B_OK;
+	
+	return B_ERROR;
 }
 
 
@@ -102,18 +147,14 @@ ps2_service_thread(void *arg)
 		if (sServiceTerminate)
 			break;
 		if (status == B_OK) {
+
 			// process service commands
-
 			ps2_service_cmd cmd;
-
-			TRACE(("ps2_service_thread: reading cmd\n"));
-			
 			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
 			switch (cmd.id) {
 				case PS2_SERVICE_NOTIFY_DEVICE_ADDED:
 					TRACE(("PS2_SERVICE_NOTIFY_DEVICE_ADDED %s\n", cmd.dev->name));
-					if (ps2_service_probe_device(cmd.dev) == B_OK)
-						ps2_dev_publish(cmd.dev);
+					ps2_dev_publish(cmd.dev);
 					break;
 					
 				case PS2_SERVICE_NOTIFY_DEVICE_REMOVED:
@@ -127,7 +168,18 @@ ps2_service_thread(void *arg)
 			}
 
 		} else if (status == B_TIMED_OUT) {
+
 			// do periodic processing
+			int i;
+			for (i = 0; i < (gActiveMultiplexingEnabled ? PS2_DEVICE_COUNT : 2); i++) {
+				ps2_dev *dev = &ps2_device[i];
+				status_t status = ps2_service_probe_device(dev);
+				if (dev->active && status != B_OK)
+					ps2_dev_unpublish(dev);
+				else if (!dev->active && status == B_OK)
+					ps2_dev_publish(dev);
+				snooze(50000);
+			}
 		
 		} else {
 			dprintf("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);

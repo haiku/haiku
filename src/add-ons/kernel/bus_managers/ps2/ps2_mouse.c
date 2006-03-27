@@ -64,8 +64,7 @@
 
 #include "kb_mouse_driver.h"
 #include "packet_buffer.h"
-#include "ps2_common.h"
-#include "ps2_dev.h"
+#include "ps2_service.h"
 
 
 #define MOUSE_HISTORY_SIZE	256
@@ -200,25 +199,6 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 }
 
 
-/** Enables or disables mouse reporting for the PS/2 port.
- */
-static status_t
-set_mouse_enabled(mouse_cookie *cookie, bool enable)
-{
-	int32 tries = 5;
-
-	while (true) {
-		if (ps2_dev_command(cookie->dev, enable ? PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE, NULL, 0, NULL, 0) == B_OK)
-			return B_OK;
-
-		if (--tries <= 0)
-			break;
-	}
-
-	return B_ERROR;
-}
-
-
 /** Interrupt handler for the mouse device. Called whenever the I/O
  *	controller generates an interrupt for the PS/2 mouse. Reads mouse
  *	information from the data port, and stores it, so it can be accessed
@@ -259,7 +239,7 @@ mouse_handle_int(ps2_dev *dev, uint8 data)
 //	#pragma mark -
 
 
-status_t
+static status_t
 probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 {
 	status_t status;
@@ -348,7 +328,8 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 		
 	status = probe_mouse(cookie, &cookie->packet_size);
 	if (status != B_OK) {
-		TRACE(("can't probe mouse\n"));
+		TRACE(("probing mouse failed\n"));
+		ps2_service_notify_device_removed(dev);
 		goto err1;
 	}
 
@@ -366,7 +347,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 		goto err3;
 	}
 
-	status = set_mouse_enabled(cookie, true);
+	status = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
 	if (status < B_OK) {
 		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
 		goto err4;
@@ -385,7 +366,7 @@ err2:
 	free(cookie);
 err1:
 	atomic_and(&dev->flags, ~PS2_FLAG_OPEN);
-
+	
 	dprintf("ps2: mouse_open %s failed\n", name);
 	return B_ERROR;
 }
@@ -398,7 +379,7 @@ mouse_close(void *_cookie)
 
 	TRACE(("mouse_close()\n"));
 
-	set_mouse_enabled(cookie, false);
+	ps2_dev_command(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
 
 	delete_packet_buffer(cookie->mouse_buffer);
 	delete_sem(cookie->mouse_sem);
