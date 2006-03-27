@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-//#define TRACE_DEVICES
+#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
@@ -141,8 +141,12 @@ class BIOSDrive : public Node {
 
 		uint32 BlockSize() const { return fBlockSize; }
 
+		status_t FillIdentifier();
+
 		bool HasParameters() const { return fHasParameters; }
 		const drive_parameters &Parameters() const { return fParameters; }
+
+		disk_identifier &Identifier() { return fIdentifier; }
 		uint8 DriveID() const { return fDriveID; }
 
 	protected:
@@ -152,6 +156,7 @@ class BIOSDrive : public Node {
 		uint32	fBlockSize;
 		bool	fHasParameters;
 		drive_parameters fParameters;
+		disk_identifier fIdentifier;
 };
 
 
@@ -280,6 +285,7 @@ fill_disk_identifier_v3(disk_identifier &disk, const drive_parameters &parameter
 		disk.bus_type = LEGACY_BUS;
 
 		disk.bus.legacy.base_address = parameters.interface.legacy.base_address;
+		dprintf("legacy base address %x\n", disk.bus.legacy.base_address);
 	} else {
 		dprintf("unknown host bus \"%s\"\n", parameters.host_bus);
 		return B_BAD_DATA;
@@ -290,6 +296,7 @@ fill_disk_identifier_v3(disk_identifier &disk, const drive_parameters &parameter
 	if (!strncmp(parameters.interface_type, "ATA", 3)) {
 		disk.device_type = ATA_DEVICE;
 		disk.device.ata.master = !parameters.device.ata.slave;
+		dprintf("ATA device, %s\n", disk.device.ata.master ? "master" : "slave");
 	} else if (!strncmp(parameters.interface_type, "ATAPI", 3)) {
 		disk.device_type = ATAPI_DEVICE;
 		disk.device.atapi.master = !parameters.device.ata.slave;
@@ -334,6 +341,135 @@ fill_disk_identifier_v2(disk_identifier &disk, const drive_parameters &parameter
 	disk.device.ata.master = !table->is_slave;
 
 	return B_OK;
+}
+
+
+static off_t
+get_next_check_sum_offset(int32 index, off_t maxSize)
+{
+	// The boot block often contains the disk super block, and should be
+	// unique enough for most cases
+	if (index < 2)
+		return index * 512;
+
+	// Try some data in the first part of the drive
+	if (index < 4)
+		return (maxSize >> 10) + index * 2048;
+
+	// Some random value might do
+	return ((system_time() + index) % (maxSize >> 9)) * 512;
+}
+
+
+/**	Computes a check sum for the specified block.
+ *	The check sum is the sum of all data in that block interpreted as an
+ *	array of uint32 values.
+ */
+
+static uint32
+compute_check_sum(BIOSDrive *drive, off_t offset)
+{
+	char buffer[512];
+	ssize_t bytesRead = drive->ReadAt(NULL, offset, buffer, sizeof(buffer));
+	if (bytesRead < B_OK)
+		return 0;
+
+	if (bytesRead < (ssize_t)sizeof(buffer))
+		memset(buffer + bytesRead, 0, sizeof(buffer) - bytesRead);
+
+	uint32 *array = (uint32 *)buffer;
+	uint32 sum = 0;
+
+	for (uint32 i = 0; i < (bytesRead + sizeof(uint32) - 1) / sizeof(uint32); i++) {
+		sum += array[i];
+	}
+
+	return sum;
+}
+
+
+static void
+find_unique_check_sums(NodeList *devices)
+{
+	NodeIterator iterator = devices->GetIterator();
+	Node *device;
+	int32 index = 0;
+	off_t minSize = 0;
+	const int32 kMaxTries = 200;
+
+	while (index < kMaxTries) {
+		bool clash = false;
+
+		iterator.Rewind();
+
+		while ((device = iterator.Next()) != NULL) {
+			BIOSDrive *drive = (BIOSDrive *)device;
+#if 0
+			// there is no RTTI in the boot loader...
+			BIOSDrive *drive = dynamic_cast<BIOSDrive *>(device);
+			if (drive == NULL)
+				continue;
+#endif
+
+			// TODO: currently, we assume that the BIOS provided us with unique
+			//	disk identifiers... hopefully this is a good idea
+			if (drive->Identifier().device_type != UNKNOWN_DEVICE)
+				continue;
+
+			if (minSize == 0 || drive->Size() < minSize)
+				minSize = drive->Size();
+
+			// check for clashes
+
+			NodeIterator compareIterator = devices->GetIterator();
+			while ((device = compareIterator.Next()) != NULL) {
+				BIOSDrive *compareDrive = (BIOSDrive *)device;
+
+				if (compareDrive == drive
+					|| compareDrive->Identifier().device_type != UNKNOWN_DEVICE)
+					continue;
+
+				if (!memcmp(&drive->Identifier(), &compareDrive->Identifier(),
+						sizeof(disk_identifier))) {
+					clash = true;
+					break;
+				}
+			}
+
+			if (clash)
+				break;
+		}
+
+		if (!clash) {
+			// our work here is done.
+			return;
+		}
+
+		// add a new block to the check sums
+
+		off_t offset = get_next_check_sum_offset(index, minSize);
+		int32 i = index % NUM_DISK_CHECK_SUMS;
+		iterator.Rewind();
+
+		while ((device = iterator.Next()) != NULL) {
+			BIOSDrive *drive = (BIOSDrive *)device;
+
+			disk_identifier& disk = drive->Identifier();
+			disk.device.unknown.check_sums[i].offset = offset;
+			disk.device.unknown.check_sums[i].sum = compute_check_sum(drive, offset);
+
+			TRACE(("disk %x, offset %Ld, sum %lu\n", drive->DriveID(), offset,
+				disk.device.unknown.check_sums[i].sum));
+		}
+
+		index++;
+	}
+
+	// If we get here, we couldn't find a way to differentiate all disks from each other.
+	// It's very likely that one disk is an exact copy of the other, so there is nothing
+	// we could do, anyway.
+
+	dprintf("Could not make BIOS drives unique! Might boot from the wrong disk...\n");
 }
 
 
@@ -440,8 +576,8 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
 
-	TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
-		blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
+	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
+	//	blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
 
 	uint32 scratchSize = 24 * 1024 / fBlockSize;
 		// maximum value allowed by Phoenix BIOS is 0x7f
@@ -551,6 +687,35 @@ BIOSDrive::Size() const
 }
 
 
+status_t
+BIOSDrive::FillIdentifier()
+{
+	if (HasParameters()) {
+		// try all drive_parameters versions, beginning from the most informative
+
+		if (fill_disk_identifier_v3(fIdentifier, fParameters) == B_OK)
+			return B_OK;
+
+		if (fill_disk_identifier_v2(fIdentifier, fParameters) == B_OK)
+			return B_OK;
+
+		// no interesting information, we have to fall back to the default
+		// unknown interface/device type identifier
+	}
+
+	fIdentifier.bus_type = UNKNOWN_BUS;
+	fIdentifier.device_type = UNKNOWN_DEVICE;
+	fIdentifier.device.unknown.size = Size();
+
+	for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
+		fIdentifier.device.unknown.check_sums[i].offset = -1;
+		fIdentifier.device.unknown.check_sums[i].sum = 0;
+	}
+
+	return B_ERROR;
+}
+
+
 //	#pragma mark -
 
 
@@ -563,6 +728,10 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 	if (drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
 		return B_ERROR;
+	}
+
+	if (drive->FillIdentifier() != B_OK) {
+		// TODO: we need to add all block devices!
 	}
 
 	TRACE(("drive size: %Ld bytes\n", drive->Size()));
@@ -608,6 +777,8 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 	dprintf("number of drives: %d\n", driveCount);
 
+	bool identifierMissing = false;
+
 	for (int32 i = 0; i < driveCount; i++) {
 		uint8 driveID = i + 0x80;
 		if (driveID == gBootDriveID)
@@ -621,6 +792,15 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 		}
 
 		devicesList->Add(drive);
+
+		if (drive->FillIdentifier() != B_OK)
+			identifierMissing = true;
+	}
+
+	if (identifierMissing) {
+		// we cannot distinguish between all drives by identifier, we need
+		// compute checksums for them
+		find_unique_check_sums(devicesList);
 	}
 
 	return B_OK; 
@@ -630,36 +810,12 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 status_t 
 platform_register_boot_device(Node *device)
 {
-	disk_identifier &disk = gKernelArgs.boot_disk.identifier;
 	BIOSDrive *drive = (BIOSDrive *)device;
 
-	gKernelArgs.platform_args.boot_drive_number = gBootDriveID;
 	check_cd_boot(drive);
 
-	if (drive->HasParameters()) {
-		const drive_parameters &parameters = drive->Parameters();
-
-		// try all drive_parameters versions, beginning from the most informative
-
-		if (fill_disk_identifier_v3(disk, parameters) == B_OK)
-			return B_OK;
-
-		if (fill_disk_identifier_v2(disk, parameters) == B_OK)
-			return B_OK;
-
-		// no interesting information, we have to fall back to the default
-		// unknown interface/device type identifier
-	}
-
-	// ToDo: register all other BIOS drives as well!
-
-	// not yet implemented correctly!!!
-
-	dprintf("legacy drive identification\n");
-
-	disk.bus_type = UNKNOWN_BUS;
-	disk.device_type = UNKNOWN_DEVICE;
-	disk.device.unknown.size = drive->Size();
+	gKernelArgs.platform_args.boot_drive_number = drive->DriveID();
+	gKernelArgs.boot_disk.identifier = drive->Identifier();
 
 	return B_OK;
 }
