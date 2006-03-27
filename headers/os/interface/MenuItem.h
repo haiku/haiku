@@ -90,9 +90,9 @@ private:
 		void		Uninstall();
 		void		SetSuper(BMenu *super);
 		void		Select(bool on);
-		void		DrawMarkSymbol();
+		void		DrawMarkSymbol(rgb_color bgColor);
 		void		DrawShortcutSymbol();
-		void		DrawSubmenuSymbol();
+		void		DrawSubmenuSymbol(rgb_color bgColor);
 		void		DrawControlChar(const char *control);
 		void		SetSysTrigger(char ch);
 		

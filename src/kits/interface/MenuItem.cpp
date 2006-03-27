@@ -13,6 +13,7 @@
 
 #include <Bitmap.h>
 #include <MenuItem.h>
+#include <Shape.h>
 #include <String.h>
 #include <Window.h>
 
@@ -82,6 +83,7 @@ const unsigned char kShiftBits [] = {
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff*/
 };
 
+const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
 
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 					 uint32 modifiers)
@@ -448,42 +450,45 @@ BMenuItem::DrawContent()
 void
 BMenuItem::Draw()
 {
-	// TODO: Cleanup
 	bool enabled = IsEnabled();
+	bool selected = IsSelected();
 
-	if (IsSelected() && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
-		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DARKEN_2_TINT));
-		fSuper->SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DARKEN_2_TINT));
-		fSuper->FillRect(Frame());
-	}
+	rgb_color noTint = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color bgColor = noTint;
 
-	if (IsEnabled())
+	// set low color and fill background if selected
+	if (selected && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
+		bgColor = tint_color(noTint, B_DARKEN_2_TINT);
+		fSuper->SetLowColor(bgColor);
+		fSuper->FillRect(Frame(), B_SOLID_LOW);
+	} else
+		fSuper->SetLowColor(bgColor);
+
+	// set high color
+	if (enabled)
 		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	else if (IsSelected())
-		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+	else if (selected)
+		fSuper->SetHighColor(tint_color(noTint,
 			B_LIGHTEN_1_TINT));
 	else
-		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		fSuper->SetHighColor(tint_color(noTint,
 			B_DISABLED_LABEL_TINT));
 
+	// draw content
 	fSuper->MovePenTo(ContentLocation());
-	
 	DrawContent();
-	
+
+	// draw extra symbols
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
-			DrawMarkSymbol();
+			DrawMarkSymbol(bgColor);
 
 		if (fShortcutChar)
 			DrawShortcutSymbol();
 
 		if (Submenu())
-			DrawSubmenuSymbol();
+			DrawSubmenuSymbol(bgColor);
 	}
-
-	fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));	
 }
 
 
@@ -659,32 +664,37 @@ BMenuItem::Select(bool selected)
 
 
 void
-BMenuItem::DrawMarkSymbol()
+BMenuItem::DrawMarkSymbol(rgb_color bgColor)
 {
+	fSuper->PushState();
+
+	BRect r(fBounds);
+	r.right = r.left + r.Height();
+	r.top += 2;
+	r.bottom -= 2;
+	r.left += 1;
+	r.right -= 5;
+
+	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
+	fSuper->FillRect(r);
+
+	BPoint center(floorf((r.left + r.right) / 2.0) + 0.5,
+				  floorf((r.top + r.bottom) / 2.0) + 0.5);
+		// NOTE: center is on X.5, Y.5 on purpose!
+	BShape arrowShape;
+	arrowShape.MoveTo(BPoint(center.x - 4, center.y - 1.5));
+	arrowShape.LineTo(BPoint(center.x - 1, center.y + 2.0));
+	arrowShape.LineTo(BPoint(center.x + 4, center.y - 3.5));
+
 	fSuper->SetDrawingMode(B_OP_OVER);
+	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
+	fSuper->SetPenSize(2.0);
+	// NOTE: StrokeShape() offsets the shape by the current pen position,
+	// it is not documented in the BeBook, but it is true!
+	fSuper->MovePenTo(B_ORIGIN);
+	fSuper->StrokeShape(&arrowShape);
 
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT));
-	fSuper->StrokeLine(BPoint(fBounds.left + 6.0f, fBounds.bottom - 3.0f),
-		BPoint(fBounds.left + 10.0f, fBounds.bottom - 12.0f));
-	fSuper->StrokeLine(BPoint(fBounds.left + 7.0f, fBounds.bottom - 3.0f),
-		BPoint(fBounds.left + 11.0f, fBounds.bottom - 12.0f));
-
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT));
-
-	fSuper->BeginLineArray(4);
-	fSuper->StrokeLine(BPoint(fBounds.left + 6.0f, fBounds.bottom - 4.0f),
-		BPoint(fBounds.left + 10.0f, fBounds.bottom - 13.0f));
-	fSuper->StrokeLine(BPoint(fBounds.left + 5.0f, fBounds.bottom - 4.0f),
-		BPoint(fBounds.left + 9.0f, fBounds.bottom - 13.0f));
-	fSuper->StrokeLine(BPoint(fBounds.left + 5.0f, fBounds.bottom - 3.0f),
-		BPoint(fBounds.left + 3.0f, fBounds.bottom - 9.0f));
-	fSuper->StrokeLine(BPoint(fBounds.left + 4.0f, fBounds.bottom - 4.0f),
-		BPoint(fBounds.left + 2.0f, fBounds.bottom - 9.0f));
-	fSuper->EndLineArray();	
-
-	fSuper->SetDrawingMode(B_OP_COPY);
+	fSuper->PopState();
 }
 
 
@@ -739,35 +749,34 @@ BMenuItem::DrawShortcutSymbol()
 
 
 void
-BMenuItem::DrawSubmenuSymbol()
+BMenuItem::DrawSubmenuSymbol(rgb_color bgColor)
 {
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_LIGHTEN_MAX_TINT));
-	fSuper->FillTriangle(BPoint(fBounds.right - 14.0f, fBounds.bottom - 4.0f),
-		BPoint(fBounds.right - 14.0f, fBounds.bottom - 12.0f),
-		BPoint(fBounds.right - 5.0f, fBounds.bottom - 8.0f));
+	fSuper->PushState();
 
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-	fSuper->StrokeLine(BPoint(fBounds.right - 14.0f, fBounds.bottom - 5),
-		BPoint(fBounds.right - 9.0f, fBounds.bottom - 7));
-	fSuper->StrokeLine(BPoint(fBounds.right - 7.0f, fBounds.bottom - 8),
-		BPoint(fBounds.right - 7.0f, fBounds.bottom - 8));
+	BRect r(fBounds);
+	r.left = r.right - r.Height();
+	r.InsetBy(2.0, 2.0);
 
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_3_TINT));
-	fSuper->StrokeTriangle(BPoint(fBounds.right - 14.0f, fBounds.bottom - 4.0f),
-		BPoint(fBounds.right - 14.0f, fBounds.bottom - 12.0f),
-		BPoint(fBounds.right - 5.0f, fBounds.bottom - 8.0f));
+	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
+	fSuper->FillRect(r);
 
-	fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_LIGHTEN_1_TINT));
-	fSuper->StrokeTriangle(BPoint(fBounds.right - 12.0f, fBounds.bottom - 7.0f),
-		BPoint(fBounds.right - 12.0f, fBounds.bottom - 9.0f),
-		BPoint(fBounds.right - 9.0f, fBounds.bottom - 8.0f));
-	fSuper->FillTriangle(BPoint(fBounds.right - 12.0f, fBounds.bottom - 7.0f),
-		BPoint(fBounds.right - 12.0f, fBounds.bottom - 9.0f),
-		BPoint(fBounds.right - 9.0f, fBounds.bottom - 8.0f));
+	BPoint center(floorf((r.left + r.right) / 2.0) + 0.5,
+				  floorf((r.top + r.bottom) / 2.0) + 0.5);
+		// NOTE: center is on X.5, Y.5 on purpose!
+	BShape arrowShape;
+	arrowShape.MoveTo(BPoint(center.x - 1.5, center.y - 3));
+	arrowShape.LineTo(BPoint(center.x + 2.0, center.y));
+	arrowShape.LineTo(BPoint(center.x - 1.5, center.y + 3));
+
+	fSuper->SetDrawingMode(B_OP_OVER);
+	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
+	fSuper->SetPenSize(2.0);
+	// NOTE: StrokeShape() offsets the shape by the current pen position,
+	// it is not documented in the BeBook, but it is true!
+	fSuper->MovePenTo(B_ORIGIN);
+	fSuper->StrokeShape(&arrowShape);
+
+	fSuper->PopState();
 }
 
 
