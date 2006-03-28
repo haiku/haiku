@@ -24,6 +24,7 @@ class BMenuFrame : public BView {
 		BMenuFrame(BMenu *menu);
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 		virtual void Draw(BRect updateRect);
 
 	private:
@@ -31,15 +32,13 @@ class BMenuFrame : public BView {
 };
 
 
-BMenuWindow::BMenuWindow(const char *name, BMenu *menu)
+BMenuWindow::BMenuWindow(const char *name)
 	// The window will be resized by BMenu, so just pass a dummy rect
 	: BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
 			B_NOT_ZOOMABLE | B_AVOID_FOCUS),
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)
 {
-	if (menu != NULL)
-		SetMenu(menu);
 }
 
 
@@ -49,12 +48,22 @@ BMenuWindow::~BMenuWindow()
 
 
 void
-BMenuWindow::SetMenu(BMenu *menu)
+BMenuWindow::AttachMenu(BMenu *menu)
 {
 	if (CountChildren() > 0)
-		RemoveChild(ChildAt(0));
-	BMenuFrame *menuFrame = new BMenuFrame(menu);
-	AddChild(menuFrame);
+		debugger("BMenuWindow (%s): a menu is already attached!");
+	if (menu != NULL) {
+		BMenuFrame *menuFrame = new BMenuFrame(menu);
+		AddChild(menuFrame);
+	}
+}
+
+
+void
+BMenuWindow::DetachMenu()
+{
+	if (CountChildren() > 0)
+		RemoveChild(ChildAt(0));	
 }
 
 
@@ -72,6 +81,10 @@ void
 BMenuFrame::AttachedToWindow()
 {
 	BView::AttachedToWindow();
+	
+	if (fMenu != NULL)
+		AddChild(fMenu);
+		
 	ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
 	if (fMenu != NULL) {
 		BFont font;
@@ -82,9 +95,17 @@ BMenuFrame::AttachedToWindow()
 	
 
 void
+BMenuFrame::DetachedFromWindow()
+{
+	if (fMenu != NULL)
+		RemoveChild(fMenu);
+}
+
+
+void
 BMenuFrame::Draw(BRect updateRect)
 {
-	if (fMenu->CountItems() == 0) {
+	if (fMenu != NULL && fMenu->CountItems() == 0) {
 		// TODO: Review this as it's a bit hacky.
 		// Menu has a size of 0, 0, since there are no items in it.
 		// So the BMenuFrame class has to fake it and draw an empty item.

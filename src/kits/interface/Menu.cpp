@@ -1060,10 +1060,6 @@ BMenu::_show(bool selectFirstItem)
 	if (fSuper != NULL) {
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 		window = fSuper->MenuWindow();
-		if (window != NULL && window->Lock()) {
-			window->SetMenu(this);
-			window->Unlock();
-		}
 	}
 	
 	// Otherwise, create a new one
@@ -1071,14 +1067,14 @@ BMenu::_show(bool selectFirstItem)
 	// (i.e. not within a BMenuField)
 	if (window == NULL) {
 		// Menu windows get the BMenu's handler name
-		window = new BMenuWindow(Name(), this);
+		window = new BMenuWindow(Name());
 	}
 
 	if (window == NULL)
 		return false;
 	
 	if (window->Lock()) {
-		window->ChildAt(0)->AddChild(this);
+		window->AttachMenu(this);
 
 		// TODO: for some reason, Window() can already be NULL at this point,
 		//		which causes a crash in one of the following functions...
@@ -1090,7 +1086,7 @@ BMenu::_show(bool selectFirstItem)
 		
 		window->Unlock();
 	}
-		
+	
 	return true;
 }
 
@@ -1098,20 +1094,14 @@ BMenu::_show(bool selectFirstItem)
 void
 BMenu::_hide()
 {
-	if (!LockLooper())
+	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
+	if (window == NULL || !window->Lock())
 		return;
-
+		
 	SelectItem(NULL);
 
-	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
-	if (window == NULL) {
-		// Huh? What did happen here? - we're trying to be on the safe side
-		UnlockLooper();
-		return;
-	}
-
 	window->Hide();
-	window->ChildAt(0)->RemoveChild(this);
+	window->DetachMenu();
 		// we don't want to be deleted when the window is removed
 
 	// Delete the menu window used by our submenus
@@ -1122,7 +1112,6 @@ BMenu::_hide()
 		window->Quit();
 	} else {
 		// _show() expects the window to be unlocked
-		// (UnlockLooper() won't work as we are no longer attached)
 		window->Unlock();
 	}
 }
@@ -1616,7 +1605,7 @@ BMenu::MenuWindow()
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menu", Name());
-		fCachedMenuWindow = new BMenuWindow(windowName, NULL);
+		fCachedMenuWindow = new BMenuWindow(windowName);
 	}
 
 	return fCachedMenuWindow;
