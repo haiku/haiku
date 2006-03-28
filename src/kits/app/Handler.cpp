@@ -389,25 +389,10 @@ BHandler::NextHandler() const
 void
 BHandler::AddFilter(BMessageFilter *filter)
 {
-	// NOTE:  Although the documentation states that the handler must belong to
-	// a looper and the looper must be locked in order to use this method,
-	// testing shows that this is not the case in the original implementation.
-	// We may want to investigate enforcing these rules; it would be interesting
-	// to see how many apps out there have violated the dictates of the docs.
-	// For now, though, we'll play nicely.
-#if 0
-	if (!fLooper)
-	{
-		// TODO: error handling
-		return false;
+	if (fLooper && !fLooper->IsLocked()) {
+		debugger("Owning Looper must be locked before calling SetFilterList");
+		return;
 	}
-
-	if (!fLooper->IsLocked())
-	{
-		// TODO: error handling
-		return false;
-	}
-#endif
 
 	if (fLooper != NULL)
 		filter->SetLooper(fLooper);
@@ -422,25 +407,10 @@ BHandler::AddFilter(BMessageFilter *filter)
 bool
 BHandler::RemoveFilter(BMessageFilter *filter)
 {
-	// NOTE:  Although the documentation states that the handler must belong to
-	// a looper and the looper must be locked in order to use this method,
-	// testing shows that this is not the case in the original implementation.
-	// We may want to investigate enforcing these rules; it would be interesting
-	// to see how many apps out there have violated the dictates of the docs.
-	// For now, though, we'll play nicely.
-#if 0
-	if (!fLooper)
-	{
-		// TODO: error handling
+	if (fLooper && !fLooper->IsLocked()) {
+		debugger("Owning Looper must be locked before calling SetFilterList");
 		return false;
 	}
-
-	if (!fLooper->IsLocked())
-	{
-		// TODO: error handling
-		return false;
-	}
-#endif
 
 	if (fFilters != NULL && fFilters->RemoveItem((void *)filter)) {
 		filter->SetLooper(NULL);
@@ -454,20 +424,6 @@ BHandler::RemoveFilter(BMessageFilter *filter)
 void
 BHandler::SetFilterList(BList* filters)
 {
-	/**
-		@note	Although the documentation states that the handler must belong to
-				a looper and the looper must be locked in order to use this method,
-				testing shows that this is not the case in the original implementation.
-	 */
-
-#if 0
-	if (!fLooper)
-	{
-		// TODO: error handling
-		return;
-	}
-#endif
-
 	if (fLooper && !fLooper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
@@ -509,31 +465,16 @@ BHandler::FilterList()
 bool
 BHandler::LockLooper()
 {
-	/**
-		@note	BeBook says that this function "retrieves the handler's looper and
-				unlocks it in a pseudo-atomic operation, thus avoiding a race
-				condition."  How "pseudo-atomic" would look completely escapes me,
-				so we'll go with the dumb version for now.  Maybe I should use a
-				benaphore?
-
-				BeBook mentions handling the case where the handler's looper
-				changes during this call.  I've attempted a "pseudo-atomic"
-				operation to check that.
-	 */
-
 	BLooper *looper = fLooper;
-	if (looper) {
-		bool result = looper->Lock();
-
-		// Are we still assigned to the same looper?
+	// Locking the looper also makes sure that the looper is valid
+	if (looper != NULL && looper->Lock()) {
+		// Have we locked the right looper? That's as far as the
+		// "pseudo-atomic" operation mentioned in the BeBook.
 		if (fLooper == looper)
-			return result;
+			return true;
 
-		if (result) {
-			// Our looper is different, and the lock was successful on the old
-			// one; undo the lock
-			looper->Unlock();
-		}
+		// we locked the wrong looper, bail out
+		looper->Unlock();
 	}
 
 	return false;
@@ -543,58 +484,30 @@ BHandler::LockLooper()
 status_t
 BHandler::LockLooperWithTimeout(bigtime_t timeout)
 {
-	/**
-		@note	BeBook says that this function "retrieves the handler's looper and
-				unlocks it in a pseudo-atomic operation, thus avoiding a race
-				condition."  How "pseudo-atomic" would look completely escapes me,
-				so we'll go with the dumb version for now.  Maybe I should use a
-				benaphore?
-
-				BeBook mentions handling the case where the handler's looper
-				changes during this call.  I've attempted a "pseudo-atomic"
-				operation to check for that.
-	 */
-
 	BLooper *looper = fLooper;
-	if (looper) {
-		status_t result = looper->LockWithTimeout(timeout);
+	if (looper == NULL)
+		return B_BAD_VALUE;
 
-		// Are we still assigned to the same looper?
-		if (fLooper == looper)
-			return result;
+	status_t status = looper->LockWithTimeout(timeout);
+	if (status != B_OK)
+		return status;
 
-		// Our looper changed during the lock attempt
-		if (result == B_OK) {
-			// The lock was successful on the old looper; undo the lock
-			looper->Unlock();
-		}
-
+	if (fLooper != looper) {
+		// we locked the wrong looper, bail out
+		looper->Unlock();
 		return B_MISMATCHED_VALUES;
 	}
 
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 
 void
 BHandler::UnlockLooper()
 {
-	/**
-		@note	BeBook says that this function "retrieves the handler's looper and
-				unlocks it in a pseudo-atomic operation, thus avoiding a race
-				condition."  How "pseudo-atomic" would look completely escapes me,
-				so we'll go with the dumb version for now.  Maybe I should use a
-				benaphore?
-
-				The solution I used for Lock() and LockWithTimeout() seems out of
-				place here; if our looper does change while attempting to unlock it,
-				re-Lock()ing the original looper just doesn't seem right.
-	 */
-
-	// TODO: implement correctly
-	BLooper *looper = fLooper;
-	if (looper)
-		looper->Unlock();
+	// The looper is locked at this point, and cannot change
+	if (fLooper != NULL)
+		fLooper->Unlock();
 }
 
 
