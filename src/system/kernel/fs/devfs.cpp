@@ -641,29 +641,35 @@ get_node_for_path(struct devfs *fs, const char *path, struct devfs_vnode **_node
 
 
 static status_t
-unpublish_node(struct devfs *fs, const char *path, int type)
+unpublish_node(struct devfs *fs, devfs_vnode *node, mode_t type)
+{
+	if ((node->stream.type & S_IFMT) != type)
+		return B_BAD_TYPE;
+
+	recursive_lock_lock(&fs->lock);
+
+	status_t status = devfs_remove_from_dir(node->parent, node);
+	if (status < B_OK)
+		goto out;
+
+	status = remove_vnode(fs->id, node->id);
+
+out:
+	recursive_lock_unlock(&fs->lock);
+	return status;
+}
+
+
+static status_t
+unpublish_node(struct devfs *fs, const char *path, mode_t type)
 {
 	devfs_vnode *node;
 	status_t status = get_node_for_path(fs, path, &node);
 	if (status != B_OK)
 		return status;
 
-	if ((type & S_IFMT) != type) {
-		status = B_BAD_TYPE;
-		goto err1;
-	}
+	status = unpublish_node(fs, node, type);
 
-	recursive_lock_lock(&fs->lock);
-
-	status = devfs_remove_from_dir(node->parent, node);
-	if (status < B_OK)
-		goto err2;
-
-	status = remove_vnode(fs->id, node->id);
-
-err2:
-	recursive_lock_unlock(&fs->lock);
-err1:
 	put_vnode(fs->id, node->id);
 	return status;
 }
@@ -2117,10 +2123,20 @@ devfs_publish_partition(const char *path, const partition_info *info)
 
 
 extern "C" status_t
-devfs_unpublish_device(const char *path)
+devfs_unpublish_device(const char *path, bool disconnect)
 {
-	// TODO: disconnect any open file handles!
-	return unpublish_node(sDeviceFileSystem, path, S_IFCHR);
+	devfs_vnode *node;
+	status_t status = get_node_for_path(sDeviceFileSystem, path, &node);
+	if (status != B_OK)
+		return status;
+
+	status = unpublish_node(sDeviceFileSystem, node, S_IFCHR);
+
+	if (status == B_OK && disconnect)
+		vfs_disconnect_vnode(sDeviceFileSystem->id, node->id);
+
+	put_vnode(sDeviceFileSystem->id, node->id);
+	return status;
 }
 
 

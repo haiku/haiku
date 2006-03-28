@@ -1236,6 +1236,102 @@ normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 }
 
 
+/**	Disconnects all file descriptors that go the \a vnodeToDisconnect, or
+ *	if this is NULL, all vnodes of the specified \a mount object.
+ *
+ *	Note, after you've called this function, there might still be ongoing
+ *	accesses - they won't be interrupted if they already happened before.
+ *	However, any subsequent access will fail.
+ *
+ *	This is not a cheap function and should be used with care and rarely.
+ *	TODO: there is currently no means to stop a blocking read/write!
+ */
+
+void
+disconnect_mount_or_vnode_fds(struct fs_mount *mount,
+	struct vnode *vnodeToDisconnect)
+{
+	// iterate over all teams and peek into their file descriptors
+	int32 nextTeamID = 0;
+
+	while (true) {
+		struct io_context *context = NULL;
+		sem_id contextMutex = -1;
+		struct team *team = NULL;
+		team_id lastTeamID;
+
+		cpu_status state = disable_interrupts();
+		GRAB_TEAM_LOCK();
+
+		lastTeamID = peek_next_thread_id();
+		if (nextTeamID < lastTeamID) {
+			// get next valid team
+			while (nextTeamID < lastTeamID
+				&& !(team = team_get_team_struct_locked(nextTeamID))) {
+				nextTeamID++;
+			}
+
+			if (team) {
+				context = (io_context *)team->io_context;
+				contextMutex = context->io_mutex.sem;
+				nextTeamID++;
+			}
+		}
+
+		RELEASE_TEAM_LOCK();
+		restore_interrupts(state);
+
+		if (context == NULL)
+			break;
+
+		// we now have a context - since we couldn't lock it while having
+		// safe access to the team structure, we now need to lock the mutex
+		// manually
+
+		if (acquire_sem(contextMutex) != B_OK) {
+			// team seems to be gone, go over to the next team
+			continue;
+		}
+
+		// the team cannot be deleted completely while we're owning its
+		// io_context mutex, so we can safely play with it now
+
+		context->io_mutex.holder = thread_get_current_thread_id();
+
+		if (context->cwd != NULL && context->cwd->mount == mount) {
+			put_vnode(context->cwd);
+
+			if (context->cwd == mount->root_vnode) {
+				// redirect the current working directory to the covered vnode
+				context->cwd = mount->covers_vnode;
+				inc_vnode_ref_count(context->cwd);
+			} else
+				context->cwd = NULL;
+		}
+
+		for (uint32 i = 0; i < context->table_size; i++) {
+			if (struct file_descriptor *descriptor = context->fds[i]) {
+				inc_fd_ref_count(descriptor);
+
+				// if this descriptor points at this mount, we
+				// need to disconnect it to be able to unmount
+				struct vnode *vnode = fd_vnode(descriptor);
+				if (vnodeToDisconnect != NULL) {
+					if (vnode == vnodeToDisconnect)
+						disconnect_fd(descriptor);
+				} else if (vnode != NULL && vnode->mount == mount
+					|| vnode == NULL && descriptor->u.mount == mount)
+					disconnect_fd(descriptor);
+
+				put_fd(descriptor);
+			}
+		}
+
+		mutex_unlock(&context->io_mutex);
+	}
+}
+
+
 /**	\brief Resolves a mount point vnode to the volume root vnode it is covered
  *		   by.
  *
@@ -2869,6 +2965,20 @@ vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID)
 
 	mutex_unlock(&context->io_mutex);
 	return status;
+}
+
+
+extern "C" status_t
+vfs_disconnect_vnode(mount_id mountID, vnode_id vnodeID)
+{
+	struct vnode *vnode;
+
+	status_t status = get_vnode(mountID, vnodeID, &vnode, true);
+	if (status < B_OK)
+		return status;
+
+	disconnect_mount_or_vnode_fds(vnode->mount, vnode);
+	return B_OK;
 }
 
 
@@ -5300,84 +5410,9 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 		mutex_unlock(&sVnodeMutex);
 
-		// iterate over all teams and peek into their file descriptors
-
-		int32 nextTeamID = 0;
-
-		while (true) {
-			struct io_context *context = NULL;
-			sem_id contextMutex = -1;
-			struct team *team = NULL;
-			team_id lastTeamID;
-
-			cpu_status state = disable_interrupts();
-			GRAB_TEAM_LOCK();
-
-			lastTeamID = peek_next_thread_id();
-			if (nextTeamID < lastTeamID) {
-				// get next valid team
-				while (nextTeamID < lastTeamID
-					&& !(team = team_get_team_struct_locked(nextTeamID))) {
-					nextTeamID++;
-				}
-
-				if (team) {
-					context = (io_context *)team->io_context;
-					contextMutex = context->io_mutex.sem;
-					nextTeamID++;
-				}
-			}
-
-			RELEASE_TEAM_LOCK();
-			restore_interrupts(state);
-
-			if (context == NULL)
-				break;
-
-			// we now have a context - since we couldn't lock it while having
-			// safe access to the team structure, we now need to lock the mutex
-			// manually
-
-			if (acquire_sem(contextMutex) != B_OK) {
-				// team seems to be gone, go over to the next team
-				continue;
-			}
-
-			// the team cannot be deleted completely while we're owning its
-			// io_context mutex, so we can safely play with it now
-
-			context->io_mutex.holder = thread_get_current_thread_id();
-
-			if (context->cwd != NULL && context->cwd->mount == mount) {
-				put_vnode(context->cwd);
-
-				if (context->cwd == mount->root_vnode) {
-					// redirect the current working directory to the covered vnode
-					context->cwd = mount->covers_vnode;
-					inc_vnode_ref_count(context->cwd);
-				} else
-					context->cwd = NULL;
-			}
-
-			for (uint32 i = 0; i < context->table_size; i++) {
-				if (struct file_descriptor *descriptor = context->fds[i]) {
-					inc_fd_ref_count(descriptor);
-
-					// if this descriptor points at this mount, we
-					// need to disconnect it to be able to unmount
-					vnode = fd_vnode(descriptor);
-					if (vnode != NULL && vnode->mount == mount
-						|| vnode == NULL && descriptor->u.mount == mount)
-						disconnect_fd(descriptor);
-
-					put_fd(descriptor);
-				}
-			}
-
-			mutex_unlock(&context->io_mutex);
-		}
-
+		disconnect_mount_or_vnode_fds(mount, NULL);
 		disconnectedDescriptors = true;
+
 		mutex_lock(&sVnodeMutex);
 	}
 

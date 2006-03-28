@@ -5,23 +5,25 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-
 #ifndef _KERNEL_VFS_H
 #define _KERNEL_VFS_H
 
+
 #include <kernel.h>
-#include <sys/stat.h>
-#include <sys/select.h>
-#include <signal.h>
-#include <dirent.h>
-#include <fs_interface.h>
 #include <lock.h>
 #include <util/list.h>
+
+#include <fs_interface.h>
+
+#include <dirent.h>
+#include <signal.h>
+#include <sys/stat.h>
+#include <sys/select.h>
+
 
 #define DEFAULT_FD_TABLE_SIZE	128
 #define MAX_FD_TABLE_SIZE		2048
 #define MAX_NODE_MONITORS		4096
-
 
 struct kernel_args;
 struct vm_cache_ref;
@@ -96,6 +98,7 @@ status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path,
 status_t vfs_stat_vnode(void *_vnode, struct stat *stat);
 status_t vfs_get_vnode_name(void *vnode, char *name, size_t nameSize);
 status_t vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID);
+status_t vfs_disconnect_vnode(mount_id mountID, vnode_id vnodeID);
 void vfs_free_unused_vnodes(int32 level);
 
 /* special module convenience call */
