@@ -13,6 +13,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Menu.h>
+#include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PropertyInfo.h>
@@ -263,8 +264,6 @@ BMenu::AttachedToWindow()
 		sAltAsCommandKey = false;
 	free(chars);
 	free(keys);
-
-	fAttachAborted = false;
 
 	BMenuItem *superItem = Superitem();
 	BMenu *superMenu = Supermenu();
@@ -1056,7 +1055,7 @@ BMenu::_show(bool selectFirstItem)
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
 	BMenuWindow *window = NULL;
-	
+	bool ourWindow = false;
 	if (fSuper != NULL) {
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
 		window = fSuper->MenuWindow();
@@ -1068,16 +1067,30 @@ BMenu::_show(bool selectFirstItem)
 	if (window == NULL) {
 		// Menu windows get the BMenu's handler name
 		window = new BMenuWindow(Name());
+		ourWindow = true;
 	}
 
 	if (window == NULL)
 		return false;
 	
 	if (window->Lock()) {
+		fAttachAborted = false;
 		window->AttachMenu(this);
 
+		// Menu didn't have the time to add its items: aborting...
+		if (fAttachAborted) {
+			window->DetachMenu();
+			// TODO: Probably not needed, we can just let _hide() quit the window
+			if (ourWindow)
+				window->Quit();
+			else
+				window->Unlock();
+			return false;
+		}
+		
 		// TODO: for some reason, Window() can already be NULL at this point,
 		//		which causes a crash in one of the following functions...
+		// Does this still happens ?
 		UpdateWindowViewSize();
 		window->Show();
 
@@ -1134,7 +1147,7 @@ BMenu::_track(int *action, long start)
 
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
-		GetMouse(&location, &buttons, true);
+		GetMouse(&location, &buttons, false);
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
