@@ -387,7 +387,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 	if (!force_delete
 		&& ((S_ISDIR(vnode->stream.type) && vnode->stream.u.dir.dir_head != NULL)
 			|| vnode->dir_next != NULL))
-		return EPERM;
+		return B_NOT_ALLOWED;
 
 	// remove it from the global hash table
 	hash_remove(fs->vnode_hash, vnode);
@@ -396,6 +396,8 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 		// for partitions, we have to release the raw device
 		if (vnode->stream.u.dev.partition)
 			put_vnode(fs->id, vnode->stream.u.dev.partition->raw_device->id);
+		else
+			delete vnode->stream.u.dev.scheduler;
 
 		// remove API conversion from old to new drivers
 		if (vnode->stream.u.dev.node == NULL)
@@ -2111,6 +2113,14 @@ devfs_publish_partition(const char *path, const partition_info *info)
 
 	put_vnode(sDeviceFileSystem->id, device->id);
 	return status;
+}
+
+
+extern "C" status_t
+devfs_unpublish_device(const char *path)
+{
+	// TODO: disconnect any open file handles!
+	return unpublish_node(sDeviceFileSystem, path, S_IFCHR);
 }
 
 
