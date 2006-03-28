@@ -112,7 +112,7 @@ vesa_init(vesa_info &info)
 	get_memory_map((void *)info.shared_info->frame_buffer, B_PAGE_SIZE, &mapping, 1);
 	info.shared_info->physical_frame_buffer = (uint8 *)mapping.address;
 
-	dprintf(DEVICE_NAME "vesa_init() completed successfully!\n");
+	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;
 }
 
