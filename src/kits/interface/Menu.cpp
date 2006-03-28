@@ -264,6 +264,8 @@ BMenu::AttachedToWindow()
 	free(chars);
 	free(keys);
 
+	fAttachAborted = false;
+
 	BMenuItem *superItem = Superitem();
 	BMenu *superMenu = Supermenu();
 	if (AddDynamicItem(B_INITIAL_ADD)) {
