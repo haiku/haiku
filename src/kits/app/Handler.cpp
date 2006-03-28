@@ -1,105 +1,12 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**
-	@note	Some musings on the member variable 'fToken'.  In searching a dump
-			of libbe.so, I found a struct/class called 'TokenSpace', which has
-			various member functions like 'new_token'.  More intriguing is a
-			dump of Dano's version of libbe.so:  there is BPrivate::BTokenSpace,
-			which also has functions like 'NewToken'.  There's more: one
-			version of BTokenSpace::NewToken takes a pointer to another new
-			class, BPrivate::BDirectMessageTarget.  Only a constructor,
-			destructor and vtable are listed for it, so I'm guessing it's an
-			abstract base class (or not very useful ;).  My guess is that
-			BDirectMessageTarget facilitates sending messages straight to an
-			associated BHandler.  Maybe from app_server?  Probably not, since
-			you'd have to do IPC anyway.  But maybe within the same team, or
-			even between teams?  It might save unnecessary trips to and from
-			app_server for messages which otherwise are entirely client-side.
-			
-			Back to tokens. There are also these functions in R5:
-				_safe_get_server_token_(const BLooper*, int32*)
-				BWindow::find_token_and_handler(BMessage*, int32*, BHandler**)
-				BWindow::get_server_token
-
-			and Dano adds a few more provocative sounding functions:
-				get_handler_token(short, void*) (listed 3 times, actually)
-				new_handler_token(short, void*)
-				remove_handler_token(short, void*)
-
-			Taken all together, I think there's a sound argument to be made that
-			each BHandler has an int32 token associated with it in app_server.
-
-			Furthermore, there is, in R5, a function set_token_type(long, short)
-			which leads me to think that although BHandler's have server tokens
-			associated with them, the tokening facility is, in fact, generic.
-			These functions would seem to support that theory:
-				BBitmap::get_server_token
-				BPicture::set_token
-
-			An important question is whether tokens are generated on the client
-			side and registered with the server or generated on the server and
-			given back to the client.  The exported functions of TokenSpace in
-			libbe's dump are:
-				~TokenSpace
-				TokenSpace
-				adjust_free(long, long)
-				dump()
-				find_free_entry(long*, long*)
-				full_search_adjust()
-				get_token(void**)
-				get_token(short*, void**)
-				new_token(long, short, void*)
-				new_token_array(long)
-				remove_token(long)
-				set_token_type(long, short)
-
-			TokenSpace functions are also exported from app_server:
-				~TokenSpace
-				TokenSpace
-				adjust_free(long, long)
-				cleanup_dead(long)
-				delete_atom(SAtom*)
-				dump_tokens()
-				find_free_entry(long*, long*)
-				full_search_adjust()
-				get_token(long, void**)
-				get_token(long, short*, void**)
-				get_token_by_type(int*, short, long, void**)
-				grab_atom(long, SAtom**)
-				iterate_tokens(long, short,
-							   unsigned long(*)(long, long, short, void*, void*),
-							   void*)
-				new_token(long, short, void*)
-				new_token_array(long)
-				remove_token(long)
-				set_token_type(long, short)
-
-			While there are common functions in both locations, the fact that
-			app_server exports TokenSpace functions which libbe.so does not
-			leads me to believe that libbe.so and app_server each have their own
-			versions of TokenSpace.  While it's possible that the libbe version
-			simply acts as a proxy for the app_server version, it seems not
-			only inefficient but unnecessary as well:  client-side objects
-			exists in a different "namespace" than server-side objects, so over-
-			lap between the two token sets shouldn't be an issue.
-
-			Obviously, I can't be entirely sure this is how R5 does it, but it
-			seems like a reasonable design to follow for our purposes.
- */
-
-/**
-	@note	Thought on "pseudo-atomic" operations in Lock(), LockWithTimeout(),
-			and Unlock().  Seems like avoiding the possibility of a looper
-			change during these functions would be the way to go, and having a
-			semaphore that protects SetLooper() would do the job very nicely.
-			Maybe that's too heavy-weight a solution, though.
- */
 
 #include <TokenSpace.h>
 
@@ -194,6 +101,9 @@ class _ObserverList {
 		THandlerObserverMap		fHandlerMap;
 		TMessengerObserverMap	fMessengerMap;
 };
+
+
+//	#pragma mark -
 
 
 BHandler::BHandler(const char *name)
