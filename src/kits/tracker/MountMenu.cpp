@@ -78,7 +78,7 @@ AddOnePartitionAsMenuItem(Partition *partition, void *castToParams)
 
 	AddOneAsMenuItemParams *params = (AddOneAsMenuItemParams *)castToParams;
 	BBitmap *icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
-		B_COLOR_8_BIT);
+		B_CMAP8);
 	get_device_icon(partition->GetDevice()->Name(), icon->Bits(), B_MINI_ICON);	
 
 
@@ -160,7 +160,7 @@ MountMenu::AddDynamicItem(add_state)
 	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsShared()) {
 			needSeparator = true;
-			BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
+			BBitmap *icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 			fs_info info;
 			if (fs_stat_dev(volume.Device(), &info) != B_OK) {
 				PRINT(("Cannot get mount menu item icon; bad device ID\n"));

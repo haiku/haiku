@@ -2126,7 +2126,7 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 	status_t result = volume.InitCheck();
 	if (result != B_OK)
 		return result;
-		
+
 	BPath path;
 	result = find_directory(B_DESKTOP_DIRECTORY, &path, true, &volume);
 	if (result != B_OK)
@@ -2147,14 +2147,14 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 		LoadResource('ICON', kResDeskIcon, &size);
 
 	if (data)
-		deskDir->WriteAttr(kAttrLargeIcon, B_COLOR_8_BIT_TYPE, 0, data, size);
+		deskDir->WriteAttr(kAttrLargeIcon, 'ICON', 0, data, size);
 
 	data = GetTrackerResources()->
 		LoadResource('MICN', kResDeskIcon, &size);
 
 	if (data)
-		deskDir->WriteAttr(kAttrMiniIcon, B_COLOR_8_BIT_TYPE, 0, data, size);
-	
+		deskDir->WriteAttr(kAttrMiniIcon, 'MICN', 0, data, size);
+
 	return B_OK;
 }
 
@@ -2631,10 +2631,9 @@ FSCreateTrashDirs()
 
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
-		
+
 		BPath path;
 		find_directory(B_DESKTOP_DIRECTORY, &path, true, &volume);
 		find_directory(B_TRASH_DIRECTORY, &path, true, &volume);
@@ -2645,13 +2644,13 @@ FSCreateTrashDirs()
 			const void* data = GetTrackerResources()->
 				LoadResource('ICON', kResTrashIcon, &size);
 			if (data) {
-				trashDir.WriteAttr(kAttrLargeIcon, B_COLOR_8_BIT_TYPE, 0,
+				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,
 					data, size);
 			}
 			data = GetTrackerResources()->
 				LoadResource('MICN', kResTrashIcon, &size);
 			if (data) {
-				trashDir.WriteAttr(kAttrMiniIcon, B_COLOR_8_BIT_TYPE, 0,
+				trashDir.WriteAttr(kAttrMiniIcon, 'MICN', 0,
 					data, size);
 			}
 		}

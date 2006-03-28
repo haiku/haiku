@@ -34,29 +34,29 @@ All rights reserved.
 
 // menu items with small icons.
 
+#include "IconCache.h"
+#include "IconMenuItem.h"
+
 #include <Debug.h>
 #include <Menu.h>
 #include <NodeInfo.h>
 
-#include "IconCache.h"
-#include "IconMenuItem.h"
-
 
 ModelMenuItem::ModelMenuItem(const Model *model, const char *title,
-	BMessage *message, char shortcut, uint32 modifiers,
-	bool drawText, bool extraPad)
-	:	BMenuItem(title, message, shortcut, modifiers),
-		fModel(*model),
-		fHeightDelta(0),
-		fDrawText(drawText),
-		fExtraPad(extraPad)
+		BMessage *message, char shortcut, uint32 modifiers,
+		bool drawText, bool extraPad)
+	: BMenuItem(title, message, shortcut, modifiers),
+	fModel(*model),
+	fHeightDelta(0),
+	fDrawText(drawText),
+	fExtraPad(extraPad)
 {
 	ThrowOnInitCheckError(&fModel);
-	//	The 'fExtraPad' field is used to when this menu item is added to
-	//	a menubar instead of a menu. Menus and MenuBars space out items
-	//	differently (more space around items in a menu). This class wants
-	//	to be able to space item the same, no matter where they are. The
-	//	fExtraPad field allows for that.
+	// The 'fExtraPad' field is used to when this menu item is added to
+	// a menubar instead of a menu. Menus and MenuBars space out items
+	// differently (more space around items in a menu). This class wants
+	// to be able to space item the same, no matter where they are. The
+	// fExtraPad field allows for that.
 
 	if (model->IsRoot())
 		SetLabel(model->Name());
@@ -189,10 +189,11 @@ ModelMenuItem::Invoke(BMessage *message)
 	clone.AddInt64("when", system_time());
 	clone.AddPointer("source", this);
 
-	if ((modifiers() & B_OPTION_KEY) == 0)
+	if ((modifiers() & B_OPTION_KEY) == 0) {
 		// if option not held, remove refs to close to prevent closing
 		// parent window
 		clone.RemoveData("nodeRefsToClose");
+	}
 
 	return BInvoker::Invoke(&clone);
 }
@@ -226,8 +227,8 @@ SpecialModelMenuItem::DrawContent()
 
 
 IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
-	:	PositionPassingMenuItem(label, message),
-		fDeviceIcon(icon)
+	: PositionPassingMenuItem(label, message),
+	fDeviceIcon(icon)
 {
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
@@ -236,18 +237,18 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message, BBitmap *icon)
 
 
 IconMenuItem::IconMenuItem(const char *label, BMessage *message,
-	const BNodeInfo *nodeInfo, icon_size which)
-	:	PositionPassingMenuItem(label, message),
-		fDeviceIcon(NULL)
+		const BNodeInfo *nodeInfo, icon_size which)
+	: PositionPassingMenuItem(label, message),
+	fDeviceIcon(NULL)
 {
 	if (nodeInfo) {
-		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_COLOR_8_BIT);
+		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON)) {
 			delete fDeviceIcon;
 			fDeviceIcon = NULL;
 		}
 	}
-	
+
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
 	SetTimeout(kSynchMenuInvokeTimeout);
@@ -255,18 +256,18 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 
 
 IconMenuItem::IconMenuItem(const char *label, BMessage *message,
-	const char *iconType, icon_size which)
-	:	PositionPassingMenuItem(label, message),
-		fDeviceIcon(NULL)
+		const char *iconType, icon_size which)
+	: PositionPassingMenuItem(label, message),
+	fDeviceIcon(NULL)
 {
 	BMimeType mime(iconType);
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_COLOR_8_BIT);
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		delete fDeviceIcon;
 		fDeviceIcon = NULL;
 	}
-	
+
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
 	SetTimeout(kSynchMenuInvokeTimeout);
@@ -274,18 +275,18 @@ IconMenuItem::IconMenuItem(const char *label, BMessage *message,
 
 
 IconMenuItem::IconMenuItem(BMenu *submenu, BMessage *message,
-	const char *iconType, icon_size which)
-	:	PositionPassingMenuItem(submenu, message),
-		fDeviceIcon(NULL)
+		const char *iconType, icon_size which)
+	: PositionPassingMenuItem(submenu, message),
+	fDeviceIcon(NULL)
 {
 	BMimeType mime(iconType);
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_COLOR_8_BIT);
+	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1), B_CMAP8);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
 		delete fDeviceIcon;
 		fDeviceIcon = NULL;
 	}
-	
+
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
 	SetTimeout(kSynchMenuInvokeTimeout);

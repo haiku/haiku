@@ -1049,8 +1049,8 @@ TDraggableIconButton::AttachedToWindow()
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fIcon = new BBitmap(BRect(0, 0, 31, 31), B_COLOR_8_BIT);
-	fIcon->SetBits(kLargeNewGroupIcon, fIcon->BitsLength(), 0, B_COLOR_8_BIT);
+	fIcon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
+	fIcon->SetBits(kLargeNewGroupIcon, fIcon->BitsLength(), 0, B_CMAP8);
 	//	calculate correct frame for icon and label
 	//	sets icon rect and label rect for drawing
 	ResizeToPreferred();	
@@ -1250,14 +1250,14 @@ TContentsMenu::AttachedToWindow()
 	fDownBtn->SetTarget(this, Window());
 
 	//	cache the new group icon
-	fSmallGroupIcon = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
+	fSmallGroupIcon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 	fSmallGroupIcon->SetBits(kSmallNewGroupIcon, fSmallGroupIcon->BitsLength(),
-		0, B_COLOR_8_BIT);
+		0, B_CMAP8);
 
 	//	cache the symlink icon
 	BMimeType symlink("application/x-vnd.Be-symlink");
 	if (symlink.InitCheck() == B_OK) {
-		fSymlinkIcon = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
+		fSymlinkIcon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 		if (symlink.GetIcon(fSymlinkIcon, B_MINI_ICON) != B_OK)
 			fSymlinkIcon = NULL;		
 	} else

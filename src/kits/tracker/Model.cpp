@@ -1327,7 +1327,7 @@ Model::TrackIconSource(icon_size size)
 	else
 		rect.Set(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
 
-	BBitmap bitmap(rect, B_COLOR_8_BIT);
+	BBitmap bitmap(rect, B_CMAP8);
 
 	BModelOpener opener(this);
 
