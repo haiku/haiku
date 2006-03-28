@@ -167,7 +167,7 @@ ps2_service_thread(void *arg)
 					break;
 			}
 
-		} else if (status == B_TIMED_OUT) {
+		} /*else if (status == B_TIMED_OUT) {
 
 			// do periodic processing
 			int i;
@@ -181,7 +181,7 @@ ps2_service_thread(void *arg)
 				snooze(50000);
 			}
 		
-		} else {
+		}*/ else {
 			dprintf("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
 			break;
 		}
