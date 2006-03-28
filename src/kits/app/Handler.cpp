@@ -90,6 +90,7 @@ class _ObserverList {
 	public:
 		_ObserverList(void);
 		~_ObserverList(void);
+
 		status_t SendNotices(unsigned long, BMessage const *);
 		status_t StartObserving(BHandler *, unsigned long);
 		status_t StartObserving(const BMessenger&, unsigned long);
@@ -123,11 +124,10 @@ BHandler::~BHandler()
 			delete (BMessageFilter*)fFilters->ItemAtFast(i);
 		delete fFilters;
 	}
-	// remove all observers
-	if (fObserverList) {
-		// TODO ... ?!?
-		delete fObserverList;
-	}
+
+	// remove all observers (the observer list manages itself)
+	delete fObserverList;
+
 	// free rest
 	free(fName);
 	gDefaultTokens.RemoveToken(fToken);
@@ -268,7 +268,6 @@ BHandler::SetNextHandler(BHandler *handler)
 {
 	if (!fLooper) {
 		debugger("handler must belong to looper before setting NextHandler");
-		fNextHandler = NULL;
 		return;
 	}
 
@@ -282,9 +281,6 @@ BHandler::SetNextHandler(BHandler *handler)
 		return;
 	}
 
-	// NOTE: I'm sure some sort of threading protection should happen here,
-	// hopefully the spec-mandated BLooper lock is sufficient.
-	// TODO: implement correctly
 	fNextHandler = handler;
 }
 
