@@ -702,16 +702,17 @@ void
 BMenuItem::DrawShortcutSymbol()
 {
 	// TODO: Review this
-	BPoint where(ContentLocation() + BPoint(fBounds.Width() - 28.0f, fBounds.Height() - 5.0f));
+	BPoint where = ContentLocation();
+	where.x += fBounds.Width() - 28;
 	if (fSubmenu)
 		where.x -= 12;
 
 	// TODO: If the shortcut is one of B_DOWN_ARROW, B_UP_ARROW, B_ENTER, etc.
 	// we can't just use DrawString(), as those aren't valid ascii/UTF8 charachters.
 	// In that case we need to build a BBitmap for the given shortcut and draw it using DrawBitmap()
-	fSuper->DrawChar(fShortcutChar, where);
+	fSuper->DrawChar(fShortcutChar, where + BPoint(0, fSuper->fAscent));
 	
-	where -= BPoint(20, 10);
+	where -= BPoint(20, -1);
 
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
