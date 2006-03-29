@@ -316,9 +316,10 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_READ:
 		{
 			at_kbd_io packet;
+			status_t status;
 			TRACE(("KB_READ\n"));
-			if (read_keyboard_packet(&packet) < B_OK)
-				return B_ERROR;
+			if ((status = read_keyboard_packet(&packet)) < B_OK)
+				return status;
 			return user_memcpy(buffer, &packet, sizeof(packet));
 		}
 

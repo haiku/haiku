@@ -174,10 +174,9 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 /** Read a mouse event from the mouse events chain buffer.
  */
 static status_t
-mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
+mouse_read_event(mouse_cookie *cookie, mouse_movement *movement)
 {
 	uint8 packet[PS2_MAX_PACKET_SIZE];
-	mouse_movement movement;
 	status_t status;
 
 	TRACE(("mouse_read_event()\n"));
@@ -198,9 +197,8 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 	if (!(packet[0] & 8))
 		panic("ps2_hid: got broken data from packet_buffer_read\n");
 
-	ps2_packet_to_movement(cookie, packet, &movement);
-
-	return user_memcpy(userMovement, &movement, sizeof(mouse_movement));
+	ps2_packet_to_movement(cookie, packet, movement);
+	return B_OK;
 }
 
 
@@ -447,8 +445,14 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case MS_READ:
-			TRACE(("MS_READ\n"));	
-			return mouse_read_event(cookie, (mouse_movement *)buffer);
+		{
+			mouse_movement movement;
+			status_t status;
+			TRACE(("MS_READ\n"));
+			if ((status = mouse_read_event(cookie, &movement)) < B_OK)
+				return status;
+			return user_memcpy(buffer, &movement, sizeof(movement));
+		}
 
 		case MS_SET_TYPE:
 			TRACE(("MS_SET_TYPE not implemented\n"));
