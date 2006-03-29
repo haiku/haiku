@@ -23,6 +23,8 @@ static packet_buffer *  sServiceCmdBuffer;
   #define PS2_SERVICE_INTERVAL 1000000
 #endif
 
+//#define PS2_PERIODIC_SERVICE
+
 
 typedef struct
 {
@@ -143,7 +145,11 @@ ps2_service_thread(void *arg)
 
 	for (;;) {
 		status_t status;
-		status = acquire_sem_etc(sServiceSem, 1, B_RELATIVE_TIMEOUT, PS2_SERVICE_INTERVAL);
+		#ifdef PS2_PERIODIC_SERVICE
+			status = acquire_sem_etc(sServiceSem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, PS2_SERVICE_INTERVAL);
+		#else
+			status = acquire_sem_etc(sServiceSem, 1, B_CAN_INTERRUPT, 0);
+		#endif
 		if (sServiceTerminate)
 			break;
 		if (status == B_OK) {
