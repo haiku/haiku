@@ -57,7 +57,7 @@ static void dump_geom(int dev, bool bios)
 	device_geometry geom;
 	
 	if (ioctl(dev, bios?B_GET_BIOS_GEOMETRY:B_GET_GEOMETRY, &geom, sizeof(geom)) < 0) {
-		perror("ioctl(B_GET_(BIOS_)GEOMETRY)");
+		perror(bios ? "ioctl(B_GET_BIOS_GEOMETRY)" : "ioctl(B_GET_GEOMETRY)");
 		return;
 	}
 	printf("%sgeometry:\n", bios?"bios ":"");
