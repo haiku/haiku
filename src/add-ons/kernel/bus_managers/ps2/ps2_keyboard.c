@@ -150,6 +150,11 @@ read_keyboard_packet(at_kbd_io *packet)
 	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
+		
+	if (!ps2_device[PS2_DEVICE_KEYB].active) {
+		dprintf("ps2: read_keyboard_packet, Error device no longer active\n");
+		return B_ERROR;
+	}
 
 	if (packet_buffer_read(sKeyBuffer, (uint8 *)packet, sizeof(*packet)) == 0) {
 		TRACE(("read_keyboard_packet(): error reading packet: %s\n", strerror(status)));
@@ -160,6 +165,15 @@ read_keyboard_packet(at_kbd_io *packet)
 	return B_OK;
 }
 
+
+static void
+ps2_keyboard_disconnect(ps2_dev *dev)
+{
+	// the keyboard might not be opened at this point
+	dprintf("ps2: ps2_keyboard_disconnect %s\n", dev->name);
+	if (sKeyboardOpenMask)
+		release_sem(sKeyboardSem);
+}
 
 //	#pragma mark -
 
@@ -235,6 +249,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
 
 	*_cookie = NULL;
+	ps2_device[PS2_DEVICE_KEYB].disconnect = &ps2_keyboard_disconnect;
 
 	dprintf("ps2: keyboard_open %s success\n", name);
 	return B_OK;

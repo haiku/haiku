@@ -82,7 +82,8 @@ ps2_dev_unpublish(ps2_dev *dev)
 		
 	dev->active = false;
 	
-	status = -1;
+	status = devfs_unpublish_device(dev->name, true);
+	dev->disconnect(dev);
 
 	dprintf("ps2: devfs_unpublish_device %s, status = 0x%08lx\n", dev->name, status);
 }

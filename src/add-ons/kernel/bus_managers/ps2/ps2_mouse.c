@@ -185,6 +185,11 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 	if (status < B_OK)
 		return status;
 
+	if (!cookie->dev->active) {
+		dprintf("ps2: mouse_read_event: Error device no longer active\n");
+		return B_ERROR;
+	}		
+
 	if (packet_buffer_read(cookie->mouse_buffer, packet, cookie->packet_size) != cookie->packet_size) {
 		TRACE(("error copying buffer\n"));
 		return B_ERROR;
@@ -196,6 +201,16 @@ mouse_read_event(mouse_cookie *cookie, mouse_movement *userMovement)
 	ps2_packet_to_movement(cookie, packet, &movement);
 
 	return user_memcpy(userMovement, &movement, sizeof(mouse_movement));
+}
+
+
+static void
+ps2_mouse_disconnect(ps2_dev *dev)
+{
+	// the mouse device might not be opened at this point
+	dprintf("ps2: ps2_mouse_disconnect %s\n", dev->name);
+	if (dev->flags & PS2_FLAG_OPEN)
+		release_sem(((mouse_cookie *)dev->cookie)->mouse_sem);
 }
 
 
@@ -325,6 +340,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 
 	cookie->dev = dev;
 	dev->cookie = cookie;
+	dev->disconnect = &ps2_mouse_disconnect;
 		
 	status = probe_mouse(cookie, &cookie->packet_size);
 	if (status != B_OK) {
@@ -377,7 +393,7 @@ mouse_close(void *_cookie)
 {
 	mouse_cookie *cookie = _cookie;
 
-	TRACE(("mouse_close()\n"));
+	dprintf("ps2: mouse_close %s\n", cookie->dev->name);
 
 	ps2_dev_command(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
 

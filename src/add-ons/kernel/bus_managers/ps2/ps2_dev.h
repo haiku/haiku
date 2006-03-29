@@ -28,6 +28,9 @@ struct ps2_dev
 	int				result_buf_cnt;
 	void *			cookie;
 	bigtime_t		last_data;
+
+// functions
+	void          (*disconnect)(ps2_dev *);
 };
 
 #define PS2_DEVICE_COUNT 5
