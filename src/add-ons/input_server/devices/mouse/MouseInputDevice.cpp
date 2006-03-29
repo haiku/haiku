@@ -69,7 +69,7 @@ struct mouse_device {
 	int fd;
 	thread_id device_watcher;
 	mouse_settings settings;
-	bool active;
+	volatile bool active;
 };
 
 
@@ -109,8 +109,9 @@ MouseInputDevice::~MouseInputDevice()
 	StopMonitoringDevice(kMouseDevicesDirectoryUSB);
 	StopMonitoringDevice(kMouseDevicesDirectoryPS2);
 	
-	for (int32 i = 0; i < fDevices.CountItems(); i++)
-		delete (mouse_device *)fDevices.ItemAt(i);
+	int count = fDevices.CountItems();
+	while (count-- > 0)
+		delete (mouse_device *)fDevices.RemoveItem((int32)0);
 	
 #if DEBUG
 	fclose(sLogFile);
@@ -179,12 +180,13 @@ MouseInputDevice::Start(const char *name, void *cookie)
 
 	device->fd = open(device->path, O_RDWR);
 	if (device->fd < 0)
-		return device->fd;
+		return B_ERROR;
 
 	status_t status = InitFromSettings(device);
 	if (status < B_OK) {
 		LOG_ERR("%s: can't initialize from settings: %s\n",
 			name, strerror(status));
+		close(device->fd);
 		return status;
 	}
 	
@@ -200,6 +202,7 @@ MouseInputDevice::Start(const char *name, void *cookie)
 	if (device->device_watcher < B_OK) {
 		LOG_ERR("%s: can't spawn watching thread: %s\n",
 			name, strerror(device->device_watcher));
+		close(device->fd);
 		return device->device_watcher;
 	}
 		
@@ -207,6 +210,8 @@ MouseInputDevice::Start(const char *name, void *cookie)
 	if (status < B_OK) {
 		LOG_ERR("%s: can't resume watching thread: %s\n",
 			name, strerror(status));
+		kill_thread(device->device_watcher);
+		close(device->fd);
 		return status;
 	}
 	
@@ -220,18 +225,17 @@ MouseInputDevice::Stop(const char *name, void *cookie)
 	mouse_device *device = (mouse_device *)cookie;
 	
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
-
-	close(device->fd);
 	
 	device->active = false;
 	if (device->device_watcher >= 0) {
-		// TODO: This is done to unblock the thread,
-		// which is waiting on a semaphore.
+		// unblock the thread, which is waiting on a semaphore.
 		suspend_thread(device->device_watcher);
 		resume_thread(device->device_watcher);
 		status_t dummy;
 		wait_for_thread(device->device_watcher, &dummy);
 	}
+
+	close(device->fd);
 	
 	return B_OK;
 }
@@ -321,11 +325,16 @@ status_t
 MouseInputDevice::RemoveDevice(const char *path)
 {
 	CALLED();
-	int32 i = 0;
-	mouse_device *device = NULL;
-	while ((device = (mouse_device *)fDevices.ItemAt(i)) != NULL) {
+	mouse_device *device;
+	for (int i = 0; (device = (mouse_device *)fDevices.ItemAt(i)) != NULL; i++) {
 		if (!strcmp(device->path, path)) {
 			fDevices.RemoveItem(device);
+
+			input_device_ref *devices[2];
+			devices[0] = &device->device_ref;
+			devices[1] = NULL;
+			UnregisterDevices(devices);
+
 			delete device;
 			return B_OK;
 		}	
@@ -352,8 +361,7 @@ MouseInputDevice::DeviceWatcher(mouse_device *dev)
 	while (dev->active) {
 		memset(&movements, 0, sizeof(movements));
 		if (ioctl(dev->fd, MS_READ, &movements) != B_OK) {
-			snooze(10000); // this is a realtime thread, and something is wrong...
-			continue;
+			return 0;
 		}
 		
 		uint32 buttons = buttons_state ^ movements.buttons;	
@@ -419,19 +427,14 @@ MouseInputDevice::RecursiveScan(const char *directory)
 {
 	CALLED();
 
-	bool found_ps2 = false;
 	BEntry entry;
 	BDirectory dir(directory);
 	while (dir.GetNextEntry(&entry) == B_OK) {
 		BPath path;
 		entry.GetPath(&path);
 
-		char name[B_FILE_NAME_LENGTH];
-		entry.GetName(name);
-		if (strcmp(name, "ps2") == 0)
-			found_ps2 = true;
-		if (strcmp(name,"serial") == 0 && found_ps2)
-			continue;
+		if (0 == strcmp(path.Leaf(), "serial"))
+			continue; // skip serial
 
 		if (entry.IsDirectory())
 			RecursiveScan(path.Path());
