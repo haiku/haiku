@@ -349,6 +349,10 @@ KeyboardInputDevice::~KeyboardInputDevice()
 	StopMonitoringDevice(kKeyboardDevicesDirectoryUSB);
 	StopMonitoringDevice(kKeyboardDevicesDirectoryPS2);
 	
+	int count = fDevices.CountItems();
+	while (count-- > 0)
+		delete (keyboard_device *)fDevices.RemoveItem((int32)0);
+	
 #if DEBUG	
 	fclose(sLogFile);
 #endif
@@ -529,17 +533,13 @@ status_t
 KeyboardInputDevice::AddDevice(const char *path)
 {
 	CALLED();
-	keyboard_device *device = new keyboard_device();
+	keyboard_device *device = new keyboard_device(path);
 	if (!device)
 		return B_NO_MEMORY;
 	
 	device->fd = -1;
 	device->device_watcher = -1;
 	device->active = false;
-	strcpy(device->path, path);
-	device->device_ref.name = GetShortName(path);
-	device->device_ref.type = B_KEYBOARD_DEVICE;
-	device->device_ref.cookie = device;
 	device->owner = this;
 	device->isAT = false;
 	if (strstr(device->path, "keyboard/at") != NULL)
@@ -559,12 +559,16 @@ status_t
 KeyboardInputDevice::RemoveDevice(const char *path)
 {
 	CALLED();
-	int32 i = 0;
-	keyboard_device *device = NULL;
-	while ((device = (keyboard_device *)fDevices.ItemAt(i)) != NULL) {
+	keyboard_device *device;
+	for (int i = 0; (device = (keyboard_device *)fDevices.ItemAt(i)) != NULL; i++) {
 		if (!strcmp(device->path, path)) {
-			free(device->device_ref.name);
 			fDevices.RemoveItem(device);
+			
+			input_device_ref *devices[2];
+			devices[0] = &device->device_ref;
+			devices[1] = NULL;
+			UnregisterDevices(devices);
+			
 			delete device;
 			return B_OK;
 		}	
@@ -593,8 +597,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 	while (dev->active) {
 		
 		if (ioctl(dev->fd, KB_READ, &buffer) != B_OK) {
-			snooze(10000); // this is a realtime thread, and something is wrong...
-			continue;
+			return 0;
 		}
 
 			uint32 keycode = 0;
@@ -754,8 +757,8 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 }
 
 
-char *
-KeyboardInputDevice::GetShortName(const char *longName)
+static char *
+GetShortName(const char *longName)
 {
 	CALLED();
 	BString string(longName);
@@ -815,3 +818,20 @@ KeyboardInputDevice::SetLeds(keyboard_device *device)
 	
 	ioctl(device->fd, KB_SET_LEDS, &lock_io);
 }
+
+
+keyboard_device::keyboard_device(const char *path)
+// todo: initialize other members
+{
+	strcpy(this->path, path);
+	device_ref.name = GetShortName(path);
+	device_ref.type = B_KEYBOARD_DEVICE;
+	device_ref.cookie = this;
+}
+
+
+keyboard_device::~keyboard_device()
+{
+	free(device_ref.name);
+}
+

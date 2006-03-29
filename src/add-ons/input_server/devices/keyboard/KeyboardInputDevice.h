@@ -37,13 +37,16 @@
 class KeyboardInputDevice;
 
 struct keyboard_device {
+	keyboard_device(const char *path);
+	~keyboard_device();	
+	
 	KeyboardInputDevice *owner;
 	input_device_ref device_ref;
 	char path[B_PATH_NAME_LENGTH];
 	int fd;
 	thread_id device_watcher;
 	kb_settings settings;
-	bool active;
+	volatile bool active;
 	bool isAT;
 	uint32 modifiers;
 };
@@ -75,7 +78,6 @@ private:
 	status_t RemoveDevice(const char *path);
 		
 	static int32 DeviceWatcher(void *arg);
-	static char *GetShortName(const char *longName);
 	
 	void SetLeds(keyboard_device *device);
 	
