@@ -84,16 +84,16 @@ ps2_service_probe_device(ps2_dev *dev)
 
 	if (dev->flags & PS2_FLAG_KEYB) {
 		
-		res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
-		if (res == B_OK)
-			return B_OK;
+//		res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+//		if (res == B_OK)
+//			return B_OK;
 
 //		snooze(25000);
 //		res = ps2_dev_command(dev, 0xee, NULL, 0, NULL, 0); // echo
 //		if (res == B_OK)
 //			return B_OK;
 
-		snooze(25000);
+//		snooze(25000);
 		res = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, data, 2);
 		if (res == B_OK)
 			return B_OK;
@@ -116,20 +116,20 @@ ps2_service_probe_device(ps2_dev *dev)
 		}	
 
 	} else {
-		
-		res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
-		if (res == B_OK) {
-			if (!dev->active)
-				ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
+
+		res = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, data, 1);
+		if (res == B_OK)
 			return B_OK;
-		}
 
 		if (!dev->active) {
-			snooze(25000);
-			res = ps2_dev_command(dev, PS2_CMD_GET_DEVICE_ID, NULL, 0, data, 1);
-			if (res == B_OK)
+			snooze(25000);			
+			res = ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0);
+			if (res == B_OK) {
+				ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
 				return B_OK;
+			}
 		}
+
 	}
 	
 	return B_ERROR;
@@ -167,7 +167,7 @@ ps2_service_thread(void *arg)
 					break;
 			}
 
-		} /*else if (status == B_TIMED_OUT) {
+		} else if (status == B_TIMED_OUT) {
 
 			// do periodic processing
 			int i;
@@ -181,7 +181,7 @@ ps2_service_thread(void *arg)
 				snooze(50000);
 			}
 		
-		}*/ else {
+		} else {
 			dprintf("ps2_service_thread: Error, status 0x%08lx, terminating\n", status);
 			break;
 		}
