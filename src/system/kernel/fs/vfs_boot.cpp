@@ -141,7 +141,7 @@ compute_check_sum(KDiskDevice *device, off_t offset)
  */
 
 static bool
-is_boot_device(kernel_args *args, KDiskDevice *device)
+is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
 {
 	disk_identifier &disk = args->boot_disk.identifier;
 
@@ -163,7 +163,8 @@ is_boot_device(kernel_args *args, KDiskDevice *device)
 	switch (disk.device_type) {
 		case UNKNOWN_DEVICE:
 			// test if the size of the device matches
-			if (device->Size() != disk.device.unknown.size)
+			// (the BIOS might have given us the wrong value here, though)
+			if (strict && device->Size() != disk.device.unknown.size)
 				return false;
 
 			// check if the check sums match, too
@@ -250,14 +251,24 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 			PartitionStack	&fPartitions;
 	} visitor(*args, partitions);
 
-	KDiskDevice *device;
-	int32 cookie = 0;
-	while ((device = manager->NextDevice(&cookie)) != NULL) {
-		if (!is_boot_device(args, device))
-			continue;
+	bool strict = true;
 
-		if (device->VisitEachDescendant(&visitor) != NULL)
+	while (true) {
+		KDiskDevice *device;
+		int32 cookie = 0;
+		while ((device = manager->NextDevice(&cookie)) != NULL) {
+			if (!is_boot_device(args, device, strict))
+				continue;
+
+			if (device->VisitEachDescendant(&visitor) != NULL)
+				break;
+		}
+
+		if (!partitions.IsEmpty() || !strict)
 			break;
+
+		// we couldn't find any potential boot devices, try again less strict
+		strict = false;
 	}
 
 	if (!args->boot_disk.user_selected) {
