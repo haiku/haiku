@@ -1266,15 +1266,16 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 	bool invalidateLayout = false;
 
 	bool locked = LockLooper();
+	BWindow *window = Window();
 
 	// The plan is simple: If we're given a BMenuItem directly, we use it
 	// and ignore index and count. Otherwise, we use them instead.
 	if (item != NULL) {
 		if (fItems.RemoveItem(item)) {
-			if (item == fSelected)
+			if (item == fSelected && window != NULL)
 				SelectItem(NULL);
-			item->SetSuper(NULL);
 			item->Uninstall();	
+			item->SetSuper(NULL);
 			if (deleteItems)
 				delete item;
 			success = invalidateLayout = true;
@@ -1290,10 +1291,10 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 			item = static_cast<BMenuItem*>(fItems.ItemAt(i));
 			if (item != NULL) {
 				if (fItems.RemoveItem(item)) {
-					if (item == fSelected)
+					if (item == fSelected && window != NULL)
 						SelectItem(NULL);
-					item->SetSuper(NULL);
 					item->Uninstall();
+					item->SetSuper(NULL);
 					if (deleteItems)
 						delete item;
 					success = true;
@@ -1307,8 +1308,10 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 		}
 	}
 
-	if (invalidateLayout && locked && fResizeToFit)
-		InvalidateLayout();
+	if (invalidateLayout && locked && fResizeToFit) {
+		LayoutItems(0);
+		Invalidate();
+	}
 
 	if (locked)
 		UnlockLooper();

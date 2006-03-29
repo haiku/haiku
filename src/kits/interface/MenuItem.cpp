@@ -630,7 +630,7 @@ BMenuItem::Uninstall()
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	if (fShortcutChar != 0 && fModifiers != 0 && fWindow != NULL)
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
 	fWindow = NULL;
