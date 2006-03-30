@@ -95,6 +95,7 @@ block_io_freecookie(block_io_handle_info *handle)
 	return B_OK;
 }
 
+// TODO: this assumes private R5 kernel functions to be present
 #if 0
 /** Verify a checksum that is part of BIOS drive identification.
  *	returns B_OK on success
@@ -133,7 +134,7 @@ err:
 	free(buffer);
 	return B_ERROR;
 }
-#endif
+
 
 /** store BIOS drive id in node's attribute */
 
@@ -177,8 +178,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 	if (pnp->get_attr_uint8(device->node, B_BLOCK_DEVICE_BIOS_ID, &bios_id, false) == B_OK) {
 		TRACE(("use previous BIOS ID 0x%x\n", bios_id));
 
-// ToDo: this assumes private R5 kernel functions to be present
-#if 0
 		// yes, so find the associated data structure
 		if (bios_id != 0) {
 			for (drive = bios_drive_info; drive->bios_id != 0; ++drive) {
@@ -186,7 +185,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 					break;
 			}
 		} else
-#endif
 			drive = NULL;
 
 		device->bios_drive = drive;
@@ -195,8 +193,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 
 	sprintf(name, "PnP %p", device->node);
 
-// ToDo: this assumes private R5 kernel functions to be present
-#if 0
 	// do it the hard way: find a BIOS drive with the same checksums
 	for (drive = bios_drive_info; drive->bios_id != 0; ++drive) {
 		uint32 i;
@@ -216,7 +212,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 		if (i == drive->num_chksums)
 			break;
 	}
-#endif
 
 	if (drive->bios_id == 0) {
 		TRACE(("this is no BIOS drive\n"));
@@ -226,8 +221,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 
 	TRACE(("this is BIOS drive 0x%x\n", drive->bios_id));
 
-// ToDo: this assumes private R5 kernel functions to be present
-#if 0
 	// the R5 boot loader assumes that two drives can be distinguished by
 	// - their checksums
 	// - their physical layout
@@ -265,7 +258,6 @@ find_bios_drive_info(block_io_handle_info *handle)
 		// but if the boot drive is affected, he cannot even boot.
 		goto no_bios_drive;
 	}
-#endif
 
 	TRACE(("store driver \"%s\" in system data\n", name));
 
@@ -284,14 +276,15 @@ no_bios_drive:
 	store_bios_drive_in_node(device);
 	return;
 }
+#endif
 
 
 static status_t
-block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buf, size_t len)
+block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buffer, size_t length)
 {
 	block_io_device_info *device = handle->device;
-	status_t res;
 
+#if 0
 	if (device->is_bios_drive) {
 		switch (op) {
 			case B_GET_BIOS_DRIVE_ID:
@@ -300,42 +293,37 @@ block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buf, size_t len)
 				if (device->bios_drive == NULL)
 					return B_ERROR;
 
-				*(char *)buf = device->bios_drive->bios_id;
+				*(char *)buffer = device->bios_drive->bios_id;
 				return B_OK;
 
 			case B_GET_BIOS_GEOMETRY:
-				if (!device->is_bios_drive)
-					break;
+			{
+				device_geometry *geometry = (device_geometry *)buffer;
+				status_t status;
 
-				{
-					device_geometry *geometry = (device_geometry *)buf;
+				find_bios_drive_info(handle);
+				if (device->bios_drive == NULL)
+					return B_ERROR;
 
-					find_bios_drive_info(handle);
-					if (device->bios_drive == NULL)
-						return B_ERROR;
+				TRACE(("GET_BIOS_GEOMETRY\n"));
 
-					TRACE(("GET_BIOS_GEOMETRY\n"));
+				// get real geometry from low level driver		
+				status = device->interface->ioctl(handle->cookie, B_GET_GEOMETRY, 
+					geometry, sizeof(*geometry));
+				if (status != B_OK)
+					return status;
 
-					// get real geometry from low level driver		
-					res = device->interface->ioctl(handle->cookie, B_GET_GEOMETRY, 
-						geometry, sizeof(*geometry));
-					if (res != B_OK)
-						return res;
-
-					// replace entries with bios info retrieved by boot loader
-					geometry->cylinder_count = device->bios_drive->cylinder_count;
-					geometry->head_count = device->bios_drive->head_count;
-					geometry->sectors_per_track = device->bios_drive->sectors_per_track;
-				}
+				// replace entries with bios info retrieved by boot loader
+				geometry->cylinder_count = device->bios_drive->cylinder_count;
+				geometry->head_count = device->bios_drive->head_count;
+				geometry->sectors_per_track = device->bios_drive->sectors_per_track;
 				return B_OK;
+			}
 		}
 	}
+#endif
 
-	res = device->interface->ioctl( handle->cookie, op, buf, len );
-	
-	//SHOW_FLOW( 0, "%s", strerror( res ));
-	
-	return res;
+	return device->interface->ioctl(handle->cookie, op, buffer, length);
 }
 
 
