@@ -220,7 +220,7 @@ NormalPulseView::Draw(BRect rect)
 	// Let's compute the best font size for the CPU speed string each time...
 	BFont font;
 	GetFont(&font);
-	SetFontSize(max_font_size(font, buffer, 11.0f, 46.0f));
+	SetFontSize(max_font_size(font, buffer, fProcessorFontSize, 46.0f));
 	width = StringWidth(buffer);
 	MovePenTo(10 + (32 - width / 2), 60);
 	DrawString(buffer);
