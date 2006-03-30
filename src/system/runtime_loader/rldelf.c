@@ -8,11 +8,6 @@
  */
 
 
-// ToDo: this should not really be built with the kernel build rules...
-#ifdef _KERNEL_MODE
-#	undef _KERNEL_MODE
-#endif
-
 #include <OS.h>
 
 #include <elf32.h>
@@ -970,7 +965,9 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		goto err3;
 	}
 
-	image->entry_point = eheader.e_entry + image->regions[0].delta;
+	if (eheader.e_entry != NULL)
+		image->entry_point = eheader.e_entry + image->regions[0].delta;
+
 	image->type = type;
 	register_image(image, fd, path);
 
@@ -1201,6 +1198,11 @@ load_program(char const *path, void **_entry)
 	init_dependencies(sLoadedImages.head, true);
 	remap_images();
 		// ToDo: once setup_system_time() is fixed, move this one line higher!
+
+	if (sProgramImage->entry_point == NULL) {
+		status = B_NOT_AN_EXECUTABLE;
+		goto err;
+	}
 
 	*_entry = (void *)(sProgramImage->entry_point);
 
