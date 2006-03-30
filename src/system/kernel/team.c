@@ -1067,7 +1067,7 @@ team_create_thread_start(void *args)
 		// the arguments are already on the user stack, we no longer need them in this form
 
 	// ToDo: don't use fixed paths!
-	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
+	err = elf_load_user_image("/boot/beos/system/runtime_loader", team, 0, &entry);
 	if (err < B_OK) {
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process

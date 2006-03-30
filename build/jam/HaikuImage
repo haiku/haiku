@@ -111,13 +111,13 @@ AddDriversToHaikuImage power		: $(BEOS_ADD_ONS_DRIVERS_ACPI) ;
 AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
 
 # libs
-AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) rld.so ;
+AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) ;
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToHaikuImage beos system		: Deskbar Tracker ;
+AddFilesToHaikuImage beos system		: runtime_loader Deskbar Tracker ;
 AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled <bin>route ;
 AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;

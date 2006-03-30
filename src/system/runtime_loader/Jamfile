@@ -65,7 +65,7 @@ Objects
 	arch_call_init_term.c
 ;
 
-Ld rld.so :
+Ld runtime_loader :
 	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o arch_relocate.o arch_call_init_term.o ]
 	libruntime_loader.a
 	$(TARGET_GCC_LIBGCC)
