@@ -29,7 +29,7 @@ class NormalPulseView : public PulseView {
 
 	private:
 		void DetermineVendorAndProcessor();
-		void CalculateFontSize();
+		void CalculateFontSizes();
 
 		char fVendor[32], fProcessor[32];
 		bigtime_t fPreviousTime;

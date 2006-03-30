@@ -112,7 +112,7 @@ NormalPulseView::~NormalPulseView()
 
 
 void
-NormalPulseView::CalculateFontSize()
+NormalPulseView::CalculateFontSizes()
 {
 	BFont font;
 	GetFont(&font);
@@ -201,20 +201,26 @@ NormalPulseView::Draw(BRect rect)
 #endif
 
 	// Draw processor type and speed
+	SetDrawingMode(B_OP_OVER);
+	SetHighColor(240, 240, 240);
+	
+	SetFontSize(fProcessorFontSize);
+	float width = StringWidth(fProcessor);
+	MovePenTo(10 + (32 - width / 2), 48);
+	DrawString(fProcessor);
+
 	char buffer[64];
 	int32 cpuSpeed = get_rounded_cpu_speed();
 	if (cpuSpeed > 1000 && (cpuSpeed % 10) == 0)
 		snprintf(buffer, sizeof(buffer), "%.2f GHz", cpuSpeed / 1000.0f);
 	else
 		snprintf(buffer, sizeof(buffer), "%ld MHz", cpuSpeed);
-	SetDrawingMode(B_OP_OVER);
-	SetHighColor(240, 240, 240);
-	SetFontSize(fProcessorFontSize);
-
-	float width = StringWidth(fProcessor);
-	MovePenTo(10 + (32 - width / 2), 48);
-	DrawString(fProcessor);
-
+	
+	// We can't assume anymore that a CPU clock speed is always static.
+	// Let's compute the best font size for the CPU speed string each time...
+	BFont font;
+	GetFont(&font);
+	SetFontSize(max_font_size(font, buffer, 11.0f, 46.0f));
 	width = StringWidth(buffer);
 	MovePenTo(10 + (32 - width / 2), 60);
 	DrawString(buffer);
@@ -246,7 +252,7 @@ void
 NormalPulseView::AttachedToWindow()
 {
 	SetFont(be_bold_font);
-	CalculateFontSize();
+	CalculateFontSizes();
 
 	fPreviousTime = system_time();
 
