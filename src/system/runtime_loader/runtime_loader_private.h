@@ -5,12 +5,13 @@
  * Copyright 2002, Manuel J. Petit. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef RUN_TIME_LINKER_H
-#define RUN_TIME_LINKER_H
+#ifndef RUNTIME_LOADER_H
+#define RUNTIME_LOADER_H
 
 
 #include <user_runtime.h>
 #include <runtime_loader.h>
+
 
 int runtime_loader(void *arg);
 int open_executable(char *name, image_type type, const char *rpath);
@@ -44,4 +45,4 @@ void arch_call_term(image_t *image);
 extern struct uspace_program_args *gProgramArgs;
 extern struct rld_export gRuntimeLoader;
 
-#endif	/* RUN_TIME_LINKER_H */
+#endif	/* RUNTIME_LOADER_H */

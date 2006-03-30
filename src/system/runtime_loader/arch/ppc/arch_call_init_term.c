@@ -8,7 +8,7 @@
  */ 
 
 
-#include "rld_priv.h"
+#include "runtime_loader_private.h"
 
 
 typedef void (*init_term_function)(image_id);

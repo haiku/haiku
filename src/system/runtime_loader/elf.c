@@ -8,6 +8,8 @@
  */
 
 
+#include "runtime_loader_private.h"
+
 #include <OS.h>
 
 #include <elf32.h>
@@ -21,8 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "rld_priv.h"
 
 
 //#define TRACE_RLD

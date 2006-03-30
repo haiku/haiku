@@ -8,13 +8,13 @@
  */
 
 
+#include "runtime_loader_private.h"
+
 #include <runtime_loader.h>
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "rld_priv.h"
 
 
 //#define TRACE_RLD

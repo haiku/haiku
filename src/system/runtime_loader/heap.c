@@ -1,12 +1,13 @@
 /*
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
+
+#include "runtime_loader_private.h"
 
 #include <string.h>
 #include <syscalls.h>
-#include "rld_priv.h"
 
 
 #define RLD_SCRATCH_SIZE 65536

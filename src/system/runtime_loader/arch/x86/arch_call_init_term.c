@@ -8,7 +8,7 @@
  */ 
 
 
-#include "rld_priv.h"
+#include "runtime_loader_private.h"
 
 
 void

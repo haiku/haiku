@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -7,12 +7,12 @@
  */
 
 
+#include "runtime_loader_private.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syscalls.h>
-
-#include "rld_priv.h"
 
 
 char *

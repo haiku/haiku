@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -7,7 +7,7 @@
  */
 
 
-#include "rld_priv.h"
+#include "runtime_loader_private.h"
 
 
 // exported via the rld_export structure in user space program arguments

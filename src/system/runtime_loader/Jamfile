@@ -9,7 +9,7 @@ SubDirCcFlags -fno-builtin ;
 SubDirC++Flags -fno-builtin ;
 
 # needed for rld.so only
-StaticLibrary librld.a :
+StaticLibrary libruntime_loader.a :
 	kernel_vsprintf.c
 	:
 	<src!system!libroot!os>syscalls.o
@@ -56,18 +56,18 @@ SEARCH on [ FGristFiles kernel_vsprintf.c ]
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 Objects
-	rld.c
-	rldexport.c
-	rldelf.c
-	rldheap.c
-	rldaux.c
+	runtime_loader.c
+	elf.c
+	export.c
+	heap.c
+	utility.c
 	arch_relocate.c
 	arch_call_init_term.c
 ;
 
 Ld rld.so :
-	[ FGristFiles rld.o rldelf.o rldexport.o rldheap.o rldaux.o arch_relocate.o arch_call_init_term.o ]
-	librld.a
+	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o arch_relocate.o arch_call_init_term.o ]
+	libruntime_loader.a
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/rld.ld
 ;
