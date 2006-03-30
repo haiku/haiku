@@ -1,4 +1,9 @@
-#include <BeBuild.h>
+/*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <SupportDefs.h>
 
 #include <errno.h>
@@ -6,8 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
-// This one comes from Thomas Kurschel's Open IDE bus manager.
-#include <ide_device_infoblock.h>
+// This one comes from Thomas Kurschel's IDE bus manager.
+#include "ide_device_infoblock.h"
 
 extern const char *__progname;
 
