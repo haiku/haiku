@@ -101,8 +101,7 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for daily saving time
-# TODO to be launched when tracker and deskbar are launched
-#launch beos/bin/dstcheck
+launch beos/bin/dstcheck
 
 if [ "$SAFEMODE" != "yes" ]; then
 	# Start user boot script
