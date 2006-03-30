@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-2/2006.
+   Rudolf Cornelissen 8/2003-3/2006.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -599,8 +599,9 @@ status_t nv_acc_init_dma()
 	{
 		/* init some function blocks */
 		ACCW(DEBUG1, 0x00118700);
-		/* DEBUG2 has a big influence on 3D speed for NV15 (confirmed) */
-		ACCW(DEBUG2, 0x24f82ad9);
+		/* DEBUG2 has a big influence on 3D speed for NV11 and NV15
+		 * (confirmed b3 and b18 should both be '1' on both cards!) */
+		ACCW(DEBUG2, 0x24fc2ad9);
 		ACCW(DEBUG3, 0x55de0030);
 
 		/* copy tile setup stuff from 'source' to acc engine */
