@@ -600,9 +600,14 @@ status_t nv_acc_init_dma()
 		/* init some function blocks */
 		ACCW(DEBUG1, 0x00118700);
 		/* DEBUG2 has a big influence on 3D speed for NV11 and NV15
-		 * (confirmed b3 and b18 should both be '1' on both cards!) */
-		ACCW(DEBUG2, 0x24fc2ad9);
+		 * (confirmed b3 and b18 should both be '1' on both cards!)
+		 * (b16 should also be '1', increases 3D speed on NV11 a bit more) */
+		ACCW(DEBUG2, 0x24fd2ad9);
 		ACCW(DEBUG3, 0x55de0030);
+		/* NV10_DEBUG4 has a big influence on 3D speed for NV11, NV15 and NV18
+		 * (confirmed b14 and b15 should both be '1' on these cards!)
+		 * (confirmed b8 should be '0' on NV18 to prevent complete engine crash!) */
+		ACCW(NV10_DEBUG4, 0x0000c000);
 
 		/* copy tile setup stuff from 'source' to acc engine */
 		for (cnt = 0; cnt < 32; cnt++)
