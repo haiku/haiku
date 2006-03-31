@@ -172,10 +172,10 @@ BMenu::BMenu(const char *name, float width, float height)
 
 BMenu::~BMenu()
 {
-	RemoveItems(0, CountItems(), true);
-	
 	DeleteMenuWindow();
-	
+
+	RemoveItems(0, CountItems(), true);
+		
 	delete fInitMatrixSize;
 	delete fExtraMenuData;
 }
@@ -193,8 +193,8 @@ BMenu::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenu"))
 		return new BMenu(data);
-	else
-		return NULL;
+	
+	return NULL;
 }
 
 
