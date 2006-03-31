@@ -1120,13 +1120,10 @@ BMenu::_hide()
 	// Delete the menu window used by our submenus
 	DeleteMenuWindow();
 
-	if (Supermenu() == NULL) {
-		// It's our window. Quit it.	
+	window->Unlock();
+
+	if (fSuper == NULL && window->Lock())
 		window->Quit();
-	} else {
-		// _show() expects the window to be unlocked
-		window->Unlock();
-	}
 }
 
 
@@ -1225,33 +1222,31 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 			UnlockLooper();
 		return false;
 	}
-
-	item->SetSuper(this);
-
-	// Make sure we update the layout in case we are already attached.
-	if (fResizeToFit && locked && Window() != NULL /*&& !Window()->IsHidden()*/) {
-		LayoutItems(index);
-		//UpdateWindowViewSize();
-		Invalidate();
-	}
-
-	// Find the root menu window, so we can install this item.
-	// ToDo: this shouldn't be necessary - the first supermenu is
-	//		already initialized to the same window
-	BMenu* root = this;
-	while (root->Supermenu())
-		root = root->Supermenu();
-
-	BWindow* window = root->Window();
+	
+	// install the item on the supermenu's window 
+	// or onto our window, if we are a root menu
+	BWindow* window = NULL;
+	if (Superitem() != NULL)
+		window = Superitem()->fWindow;
+	else
+		window = Window();
 
 	if (locked)
 		UnlockLooper();
 
+	item->SetSuper(this);
+
 	// if we need to install the item in another window, we don't
 	// want to keep our lock to prevent deadlocks
-
 	if (window && window->Lock()) {
 		item->Install(window);
+		
+		// Make sure we update the layout if needed.
+		if (fResizeToFit) {
+			LayoutItems(index);
+			//UpdateWindowViewSize();
+			Invalidate();
+		}
 		window->Unlock();
 	}
 
