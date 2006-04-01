@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open IDE bus manager
-
 	PIO data transmission
 
 	This file is more difficult then you might expect as the SCSI system
@@ -37,17 +37,18 @@
 */
 
 #include "ide_internal.h"
-#include "KernelExport_ext.h"
+#include "ide_sim.h"
+
+#include <vm.h>
 
 #include <string.h>
 
-#include "ide_sim.h"
 
 // internal error code if scatter gather table is too short
 #define ERR_TOO_BIG	(B_ERRORS_END + 1)
 
 
-/** prepare PIO transfer */
+/** Prepare PIO transfer */
 
 void
 prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest)
@@ -65,7 +66,7 @@ prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest)
 /** transfer virtually continuous data */
 
 static inline status_t
-transfer_PIO_virtcont(ide_device_info *device, char *virt_addr, int length,
+transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length,
 	bool write, int *transferred)
 {
 	ide_bus_info *bus = device->bus;
@@ -80,7 +81,7 @@ transfer_PIO_virtcont(ide_device_info *device, char *virt_addr, int length,
 			uint8 buffer[2];
 
 			buffer[0] = device->odd_byte;
-			buffer[1] = *virt_addr++;
+			buffer[1] = *virtualAddress++;
 
 			controller->write_pio(cookie, (uint16 *)buffer, 1, false);
 
@@ -88,30 +89,30 @@ transfer_PIO_virtcont(ide_device_info *device, char *virt_addr, int length,
 			*transferred += 2;
 		}
 
-		controller->write_pio(cookie, (uint16 *)virt_addr, length / 2, false);
+		controller->write_pio(cookie, (uint16 *)virtualAddress, length / 2, false);
 
 		// take care if chunk size was odd, which means that 1 byte remains		
-		virt_addr += length & ~1;
+		virtualAddress += length & ~1;
 		*transferred += length & ~1;
 
 		device->has_odd_byte = (length & 1) != 0;
 
 		if (device->has_odd_byte)
-			device->odd_byte = *virt_addr;
+			device->odd_byte = *virtualAddress;
 	} else {
 		// if we read one byte too much last time, push it into current chunk
 		if (device->has_odd_byte) {
-			*virt_addr++ = device->odd_byte;
+			*virtualAddress++ = device->odd_byte;
 			--length;
 		}
 
-		SHOW_FLOW(4, "Reading PIO to %p, %d bytes", virt_addr, length);
+		SHOW_FLOW(4, "Reading PIO to %p, %d bytes", virtualAddress, length);
 
-		controller->read_pio(cookie, (uint16 *)virt_addr, length / 2, false);
+		controller->read_pio(cookie, (uint16 *)virtualAddress, length / 2, false);
 
 		// take care of odd chunk size;
 		// in this case we read 1 byte to few!		
-		virt_addr += length & ~1;
+		virtualAddress += length & ~1;
 		*transferred += length & ~1;
 
 		device->has_odd_byte = (length & 1) != 0;
@@ -123,7 +124,7 @@ transfer_PIO_virtcont(ide_device_info *device, char *virt_addr, int length,
 			// we'll read one byte too much
 			controller->read_pio(cookie, (uint16 *)buffer, 1, false);
 
-			*virt_addr = buffer[0];
+			*virtualAddress = buffer[0];
 			device->odd_byte = buffer[1];
 
 			*transferred += 2;
@@ -137,20 +138,21 @@ transfer_PIO_virtcont(ide_device_info *device, char *virt_addr, int length,
 /** transmit physically continuous data */
 
 static inline status_t
-transfer_PIO_physcont(ide_device_info *device, addr_t phys_addr,
+transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 	int length, bool write, int *transferred)
 {
 	// we must split up chunk into B_PAGE_SIZE blocks as we can map only
 	// one page into address space at once
 	while (length > 0) {
-		void *virt_addr;
+		addr_t virtualAddress;
 		int page_left, cur_len;
 		status_t err;
 
-		SHOW_FLOW(4, "Transmitting to/from physical address %x, %d bytes left", (int)phys_addr,
-			length);
+		SHOW_FLOW(4, "Transmitting to/from physical address %lx, %d bytes left",
+			physicalAddress, length);
 
-		if (map_mainmemory(phys_addr, &virt_addr) != B_OK) {
+		if (vm_get_physical_page(physicalAddress, &virtualAddress,
+				PHYSICAL_PAGE_CAN_WAIT) != B_OK) {
 			// ouch: this should never ever happen
 			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
 			return B_ERROR;
@@ -158,7 +160,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t phys_addr,
 
 		// if chunks starts in the middle of a page, we have even less then
 		// a page left		
-		page_left = B_PAGE_SIZE - phys_addr % B_PAGE_SIZE;
+		page_left = B_PAGE_SIZE - physicalAddress % B_PAGE_SIZE;
 
 		SHOW_FLOW(4, "page_left=%d", page_left);
 
@@ -166,17 +168,16 @@ transfer_PIO_physcont(ide_device_info *device, addr_t phys_addr,
 
 		SHOW_FLOW(4, "cur_len=%d", cur_len);
 
-		err = transfer_PIO_virtcont(device, (char *)virt_addr,
+		err = transfer_PIO_virtcont(device, (char *)virtualAddress,
 			cur_len, write, transferred);
-		if (err != B_OK) {
-			unmap_mainmemory(virt_addr);
+
+		vm_put_physical_page(virtualAddress);
+
+		if (err != B_OK)
 			return err;
-		}
 
 		length -= cur_len;	
-		phys_addr += cur_len;
-
-		unmap_mainmemory(virt_addr);
+		physicalAddress += cur_len;
 	}
 
 	return B_OK;

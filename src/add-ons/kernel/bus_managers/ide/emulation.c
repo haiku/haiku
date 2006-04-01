@@ -1,23 +1,24 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of Open IDE bus manager
-
 	General SCSI emulation routines
 */
 
 
 #include "ide_internal.h"
 #include "ide_sim.h"
-#include "KernelExport_ext.h"
+
+#include <vm.h>
 
 #include <string.h>
 
 
-/** emulate REQUEST SENSE */
+/** Emulate REQUEST SENSE */
 
 void
 ide_request_sense(ide_device_info *device, ide_qrequest *qrequest)
@@ -89,24 +90,25 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 
 	// copy one S/G entry at a time
 	for (; size > 0 && req_size > 0 && sg_cnt > 0; ++sg_list, --sg_cnt) {
+		addr_t virtualAddress;
 		size_t bytes;
-		void *virt_addr;
 
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		if (map_mainmemory((addr_t)sg_list->address, &virt_addr) != B_OK) 
+		if (vm_get_physical_page((addr_t)sg_list->address, &virtualAddress,
+				PHYSICAL_PAGE_CAN_WAIT) != B_OK) 
 			return false;
 
 		SHOW_FLOW(4, "buffer=%p, virt_addr=%p, bytes=%d, to_buffer=%d",
-			buffer, (void *)((addr_t)virt_addr + offset), (int)bytes, to_buffer);
+			buffer, (void *)(virtualAddress + offset), (int)bytes, to_buffer);
 
 		if (to_buffer)
-			memcpy(buffer, (void *)((addr_t)virt_addr + offset), bytes);
+			memcpy(buffer, (void *)(virtualAddress + offset), bytes);
 		else
-			memcpy((void *)((addr_t)virt_addr + offset), buffer, bytes);
+			memcpy((void *)(virtualAddress + offset), buffer, bytes);
 
-		unmap_mainmemory(virt_addr);
+		vm_put_physical_page(virtualAddress);
 
 		buffer = (char *)buffer + bytes;
 		size -= bytes;
