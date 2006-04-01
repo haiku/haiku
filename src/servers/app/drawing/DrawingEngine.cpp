@@ -625,11 +625,13 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	// gut feeling.
 	// NOTE: region expected to be already clipped correctly!!
 	if (WriteLock()) {
-		fGraphicsCard->HideSoftwareCursor(r.Frame());
+		BRect frame = r.Frame();
+		fGraphicsCard->HideSoftwareCursor(frame);
 
 		bool doInSoftware = true;
 		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
+			&& frame.Width() * frame.Height() > 100) {
 			fGraphicsCard->FillRegion(r, color);
 			doInSoftware = false;
 		}
