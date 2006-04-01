@@ -70,7 +70,7 @@ scsi_controller_added(device_node_handle parent)
 		device_node_handle node;
 		uint32 channel;
 
-		if (pnp->get_attr_uint32(parent, "ide/channel_id", &channel, false) == B_OK) {
+		if (pnp->get_attr_uint32(parent, "ide/channel_id", &channel, true) == B_OK) {
 			// this is actually an IDE device, we don't need to publish
 			// a bus device for those
 			attrs[5].name = NULL;
