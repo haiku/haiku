@@ -5,17 +5,20 @@
  * Authors:
  *		Pahtz <pahtz@yahoo.com.au>
  *		Axel Dörfler
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /** Class for low-overhead port-based messaging */
+
+#include <LinkReceiver.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <new>
 
 #include <ServerProtocol.h>
-#include <LinkReceiver.h>
 #include <String.h>
+#include <Region.h>
 
 #include "link_message.h"
 
@@ -396,4 +399,22 @@ err:
 	return status;
 }
 
+status_t
+LinkReceiver::ReadRegion(BRegion* region)
+{
+	status_t status = Read(&region->count, sizeof(int32));
+	if (status >= B_OK)
+		status = Read(&region->bound, sizeof(clipping_rect));
+	if (status >= B_OK) {
+		region->set_size(region->count);
+		status = Read(region->data, region->count * sizeof(clipping_rect));
+		if (status < B_OK)
+			region->MakeEmpty();
+	}
+	return status;
+}
+
+
 }	// namespace BPrivate
+
+

@@ -1258,8 +1258,13 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			if (link.Read<bool>(&sync) != B_OK)
 				break;
 
+			if (!fDesktop->GetCursorManager().Lock())
+				break;
+
 			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
 			fCurrentLayer->SetCursor(cursor);
+
+			fDesktop->GetCursorManager().Unlock();
 
 			if (fWindowLayer->IsFocus()) {
 				// The cursor might need to be updated now
@@ -1603,6 +1608,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					status = link.Read<clipping_rect>(&r);
 					if (status < B_OK)
 						break;
+					// TODO: optimize (use AttachRegion()+ReadRegion())
 					region.Include(r);
 				}
 			} else
@@ -2096,30 +2102,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n", Title()));
 
-			int32 count;
-			link.Read<int32>(&count);
-
-			BRect* rects = new(nothrow) BRect[count];
-			if (link.Read(rects, sizeof(BRect) * count) < B_OK) {
-				delete[] rects;
-				break;
-			}
-
-			// Between the client-side conversion to BRects from clipping_rects to the overhead
-			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
-			// least it works for now. :)
 			BRegion region;
-			for (int32 i = 0; i < count; i++) {
-				region.Include(rects[i]);
-			}
+			if (link.ReadRegion(&region) < B_OK)
+				break;
 
 			fCurrentLayer->ConvertToScreenForDrawing(&region);
 			drawingEngine->FillRegion(region, fCurrentLayer->CurrentState());
 
-			delete[] rects;
-
-			// TODO: create support for clipping_rect usage for faster BRegion display.
-			// Tweaks to DrawingEngine are necessary along with conversion routines in ViewLayer
 			break;
 		}
 		case AS_STROKE_LINEARRAY:

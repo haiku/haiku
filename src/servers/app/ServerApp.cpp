@@ -871,6 +871,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<int32>(&token) != B_OK)
 				break;
 
+			if (!fDesktop->GetCursorManager().Lock())
+				break;
+
 			ServerCursor* oldCursor = fAppCursor;
 			fAppCursor = fDesktop->GetCursorManager().FindCursor(token);
 			if (fAppCursor != NULL)
@@ -881,6 +884,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (oldCursor != NULL)
 				oldCursor->Release();
+
+			fDesktop->GetCursorManager().Unlock();
 
 			if (sync) {
 				// The application is expecting a reply
@@ -944,6 +949,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.Read<bool>(&pendingViewCursor) != B_OK)
 				break;
 
+			if (!fDesktop->GetCursorManager().Lock())
+				break;
+
 			ServerCursor* cursor = fDesktop->GetCursorManager().FindCursor(token);
 			if (cursor) {
 				if (pendingViewCursor)
@@ -951,6 +959,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				cursor->Release();
 			}
+			fDesktop->GetCursorManager().Unlock();
+
 			break;
 		}
 

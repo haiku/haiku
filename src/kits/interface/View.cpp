@@ -2714,19 +2714,12 @@ BView::FillRegion(BRegion *region, ::pattern pattern)
 
 	_UpdatePattern(pattern);
 
-	int32 count = region->CountRects();
+	fOwner->fLink->StartMessage(AS_FILL_REGION);
+	fOwner->fLink->AttachRegion(*region);
+		// TODO: make this automatically chose
+		// to send over area or handle failure here?
 
-	if (count * sizeof(BRect) < MAX_ATTACHMENT_SIZE) {
-		fOwner->fLink->StartMessage(AS_FILL_REGION);
-		fOwner->fLink->Attach<int32>(count);
-
-		for (int32 i = 0; i < count; i++)
-			fOwner->fLink->Attach<BRect>(region->RectAt(i));
-
-		_FlushIfNotInTransaction();
-	} else {
-		// TODO: send via area
-	}
+	_FlushIfNotInTransaction();
 }
 
 

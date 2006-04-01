@@ -17,10 +17,10 @@
 
 namespace BPrivate {
 	class ServerLink;
+	class LinkReceiver;
 };
 
-
-/* Integer rect used to define a cliping rectangle. All bounds are included */
+/* Integer rect used to define a clipping rectangle. All bounds are inclusive. */
 /* Moved from DirectWindow.h */
 typedef struct {
 	int32	left;
@@ -71,6 +71,7 @@ private:
 	friend class BDirectWindow;
 	friend class Support;
 	friend class BPrivate::ServerLink;
+	friend class BPrivate::LinkReceiver;
 
 		void	_AddRect(clipping_rect r);
 		void	set_size(long new_size);

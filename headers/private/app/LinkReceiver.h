@@ -14,6 +14,7 @@
 #include <OS.h>
 
 class BString;
+class BRegion;
 
 
 namespace BPrivate {
@@ -26,15 +27,16 @@ class LinkReceiver {
 		void SetPort(port_id port);
 		port_id	Port(void) { return fReceivePort; }
 
-		status_t GetNextMessage(int32 &code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		status_t GetNextMessage(int32& code, bigtime_t timeout = B_INFINITE_TIMEOUT);
 		bool HasMessages() const;
 		bool NeedsReply() const;
 		int32 Code() const;
 
-		virtual status_t Read(void *data, ssize_t size);
+		virtual status_t Read(void* data, ssize_t size);
 		status_t ReadString(char** _string, size_t* _length = NULL);
 		status_t ReadString(BString& string, size_t* _length = NULL);
-		status_t ReadString(char *buffer, size_t bufferSize);
+		status_t ReadString(char* buffer, size_t bufferSize);
+		status_t ReadRegion(BRegion* region);
 
 		template <class Type> status_t Read(Type *data)
 			{ return Read(data, sizeof(Type)); }
@@ -46,7 +48,7 @@ class LinkReceiver {
 
 		port_id fReceivePort;
 
-		char	*fRecvBuffer;
+		char*	fRecvBuffer;
 		int32	fRecvPosition;	//current read position
 		int32	fRecvStart;	//start of current message
 		int32	fRecvBufferSize;
