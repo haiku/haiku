@@ -1,11 +1,11 @@
 /*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open SCSI Peripheral Driver
-
 	Basic handling of device.
 */
 
@@ -23,19 +23,34 @@
 char *
 periph_compose_device_name(device_node_handle node, const char *prefix)
 {
-	uint8 path_id, target_id, target_lun;
+	uint8 pathID, targetID, targetLUN, isPrimary, type;
+	char name[128];
+	uint32 channel;
 
-	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &path_id, true) != B_OK
-		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &target_id, true) != B_OK
-		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &target_lun, true) != B_OK)
+	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, true) != B_OK
+		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &targetID, true) != B_OK
+		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &targetLUN, true) != B_OK)
 		return NULL;	
 
-	{
-		char name_buffer[100];
-		sprintf(name_buffer, "%s/%d/%d/%d/raw", prefix, path_id, target_id, target_lun);
+	// IDE devices have a different naming scheme
 
-		return strdup(name_buffer);
+	if (pnp->get_attr_uint32(node, "ide/channel_id", &channel, true) == B_OK
+		&& pnp->get_attr_uint8(node, "ide_adapter/is_primary", &isPrimary, true) == B_OK
+		&& pnp->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM, &type, true) == B_OK) {
+		// this is actually an IDE device, so we ignore the prefix
+
+		// a bus device for those
+		snprintf(name, sizeof(name), "disk/ata%s/%ld/%s/raw",
+			type == scsi_dev_CDROM ? "pi" : "", channel,
+			targetID == 0 ? "master" : "slave");
+	} else {
+		// this is a real SCSI device
+
+		snprintf(name, sizeof(name), "%s/%d/%d/%d/raw",
+			prefix, pathID, targetID, targetLUN);
 	}
+
+	return strdup(name);
 }
 
 
