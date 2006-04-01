@@ -1,11 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
-	Part of Open SCSI bus manager
-
 	DMA buffer handling.
 
 	If the peripheral driver hasn't made sure that the data of a request 
@@ -26,6 +26,9 @@
 
 #include "scsi_internal.h"
 #include "KernelExport_ext.h"
+
+#include <vm.h>
+
 #include <string.h>
 
 
@@ -111,20 +114,21 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	// was allocated in kernel and is thus visible even if the thread
 	// was changed
 	for (; size > 0 && num_vecs > 0; ++sg_list, --num_vecs) {
+		addr_t virtualAddress;
 		size_t bytes;
-		void *virt_addr;
 		
 		bytes = min( size, sg_list->size );
 
-		if (map_mainmemory((addr_t)sg_list->address, &virt_addr) != B_OK)
+		if (vm_get_physical_page((addr_t)sg_list->address, &virtualAddress,
+				PHYSICAL_PAGE_CAN_WAIT) != B_OK)
 			return false;
 
 		if (to_buffer)
-			memcpy(buffer_data, virt_addr, bytes);
+			memcpy(buffer_data, (void *)virtualAddress, bytes);
 		else
-			memcpy(virt_addr, buffer_data, bytes);
+			memcpy((void *)virtualAddress, buffer_data, bytes);
 
-		unmap_mainmemory(virt_addr);
+		vm_put_physical_page(virtualAddress);
 
 		buffer_data += bytes;
 	}

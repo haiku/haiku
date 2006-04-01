@@ -1,7 +1,9 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Functions that are missing in kernel.
@@ -25,21 +27,5 @@ status_t get_iovec_memory_map(
 	size_t *num_entries, 		// actual number of map entries used
 	size_t *mapped_len 			// actual number of bytes described by map
 );
-
-// map main memory into virtual address space
-status_t map_mainmemory( 
-	addr_t physical_addr, 		// physical address to map
-	void **virtual_addr 		// receives corresponding virtual address
-);
-
-// unmap main memory from virtual address space
-status_t unmap_mainmemory( 
-	void *virtual_addr 			// virtual address to release
-);
-
-
-// this should be moved to SupportDefs.h
-int32	atomic_exchange(vint32 *value, int32 newValue);	
-
 
 #endif

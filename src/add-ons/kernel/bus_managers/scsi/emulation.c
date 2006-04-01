@@ -1,11 +1,11 @@
 /*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open SCSI bus manager
-
 	Emulation of SCSI commands that a device cannot handle.
 
 	Some SCSI devices don't support all SCSI commands, especially
@@ -15,7 +15,9 @@
 
 
 #include "scsi_internal.h"
-#include "KernelExport_ext.h"
+
+#include <vm.h>
+
 #include <string.h>
 
 
@@ -469,21 +471,22 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	// copy one S/G entry at a time
 	for (; size > 0 && req_size > 0 && sg_cnt > 0; ++sg_list, --sg_cnt) {
 		size_t bytes;
-		addr_t virt_addr;
+		addr_t virtualAddress;
 
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		if (map_mainmemory((addr_t)sg_list->address, (void *)&virt_addr) != B_OK) 
+		if (vm_get_physical_page((addr_t)sg_list->address, (void *)&virtualAddress,
+				PHYSICAL_PAGE_CAN_WAIT) != B_OK) 
 			return false;
 
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
-			buffer, virt_addr + offset, bytes, to_buffer);
+			buffer, virtualAddress + offset, bytes, to_buffer);
 
 		if (to_buffer)
-			memcpy(buffer, (void *)(virt_addr + offset), bytes);
+			memcpy(buffer, (void *)(virtualAddress + offset), bytes);
 		else
-			memcpy((void *)(virt_addr + offset), buffer, bytes);
+			memcpy((void *)(virtualAddress + offset), buffer, bytes);
 
 #if 0
 		{
@@ -493,7 +496,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 				char byte;
 
 				if (to_buffer)
-					byte = ((char *)virt_addr)[offset + i];
+					byte = ((char *)virtualAddress)[offset + i];
 				else
 					byte = ((char *)buffer)[i];
 
@@ -501,8 +504,8 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 			}
 		}
 #endif
-		
-		unmap_mainmemory((void *)virt_addr);
+
+		vm_put_physical_page(virtualAddress);
 
 		buffer = (char *)buffer + bytes;
 		size -= bytes;
