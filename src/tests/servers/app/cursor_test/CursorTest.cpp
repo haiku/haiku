@@ -24,7 +24,6 @@ class View : public BView {
 		virtual ~View();
 
 		virtual void AttachedToWindow();
-		virtual void Pulse();
 };
 
 
