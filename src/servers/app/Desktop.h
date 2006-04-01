@@ -184,6 +184,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					_BringWindowsToFront(WindowList& windows,
 									int32 list, bool wereVisible);
  		status_t				_ActivateApp(team_id team);
+ 		void					_SendFakeMouseMoved(WindowLayer* window = NULL);
 
 		void					_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen);
 		void					_TriggerWindowRedrawing(BRegion& newDirtyRegion);

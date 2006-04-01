@@ -218,6 +218,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 	if (!fDesktop->LockAllWindows())
 		return B_DISPATCH_MESSAGE;
 
+	int32 viewToken = B_NULL_TOKEN;
+
 	WindowLayer* window = fDesktop->MouseEventWindow();
 	if (window == NULL)
 		window = fDesktop->WindowAt(where);
@@ -226,30 +228,33 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		// dispatch event in the window layers
 		switch (message->what) {
 			case B_MOUSE_DOWN:
-				window->MouseDown(message, where, _viewToken);
+				window->MouseDown(message, where, &viewToken);
 				break;
 
 			case B_MOUSE_UP:
-				window->MouseUp(message, where, _viewToken);
+				window->MouseUp(message, where, &viewToken);
 				fDesktop->SetMouseEventWindow(NULL);
 				break;
 
 			case B_MOUSE_MOVED:
-				window->MouseMoved(message, where, _viewToken,
+				window->MouseMoved(message, where, &viewToken,
 					latestMouseMoved == NULL || latestMouseMoved == message);
 				break;
 		}
 
-		if (*_viewToken != B_NULL_TOKEN) {
-			fDesktop->SetViewUnderMouse(window, *_viewToken);
+		if (viewToken != B_NULL_TOKEN) {
+			fDesktop->SetViewUnderMouse(window, viewToken);
+
+			*_viewToken = viewToken;
 			*_target = &window->EventTarget();
-		} else {
-			fDesktop->SetViewUnderMouse(NULL, B_NULL_TOKEN);
-			*_target = NULL;
 		}
-	} else {
-		fDesktop->SetViewUnderMouse(NULL, B_NULL_TOKEN);
+	}
+
+	if (window == NULL || viewToken == B_NULL_TOKEN) {
+		// mouse is not over a window or over a decorator
+		fDesktop->SetViewUnderMouse(window, B_NULL_TOKEN);
 		fDesktop->SetCursor(NULL);
+
 		*_target = NULL;
 	}
 
@@ -784,6 +789,8 @@ Desktop::SetWorkspace(int32 index)
 	MarkDirty(dirty);
 
 	UnlockAllWindows();
+
+	_SendFakeMouseMoved();
 }
 
 
@@ -977,6 +984,51 @@ Desktop::_WindowChanged(WindowLayer* window)
 		return;
 
 	fWorkspacesLayer->WindowChanged(window);
+}
+
+
+/*!
+	\brief Sends a fake B_MOUSE_MOVED event to the window under the mouse,
+		and also updates the current view under the mouse.
+
+	This has only to be done in case the view changed without user interaction,
+	ie. because of a workspace change or a closing window.
+
+	Windows must not be locked when calling this method.
+*/
+void
+Desktop::_SendFakeMouseMoved(WindowLayer* window)
+{
+	BPoint where;
+	int32 buttons;
+	EventDispatcher().GetMouse(where, buttons);
+
+	int32 viewToken = B_NULL_TOKEN;
+	BMessenger target;
+
+	LockAllWindows();
+
+	if (window == NULL)
+		window = MouseEventWindow();
+	if (window == NULL)
+		window = WindowAt(where);
+
+	if (window != NULL) {
+		BMessage message;
+		window->MouseMoved(&message, where, &viewToken, true);
+	}
+
+	if (viewToken != B_NULL_TOKEN)
+		SetViewUnderMouse(window, viewToken);
+	else {
+		SetViewUnderMouse(NULL, B_NULL_TOKEN);
+		SetCursor(NULL);
+	}
+
+	UnlockAllWindows();
+
+	if (viewToken != B_NULL_TOKEN)
+		EventDispatcher().SendFakeMouseMoved(target, viewToken);
 }
 
 
@@ -1245,23 +1297,7 @@ Desktop::ShowWindow(WindowLayer* window)
 	// we'll send a fake mouse moved message to the window, so that
 	// it knows the mouse is over it.
 
-	BPoint where;
-	int32 buttons;
-	EventDispatcher().GetMouse(where, buttons);
-
-	int32 viewToken = B_NULL_TOKEN;
-
-	LockAllWindows();
-
-	if (WindowAt(where) == window) {
-		ViewLayer* view = window->ViewAt(where);
-		if (view != NULL)
-			viewToken = view->Token();
-	}
-	UnlockAllWindows();
-
-	if (viewToken != B_NULL_TOKEN)
-		EventDispatcher().SendFakeMouseMoved(window->EventTarget(), viewToken);
+	_SendFakeMouseMoved(window);
 }
 
 
@@ -1294,6 +1330,9 @@ Desktop::HideWindow(WindowLayer* window)
 		fWorkspacesLayer = NULL;
 
 	UnlockAllWindows();
+
+	if (window == fWindowUnderMouse)
+		_SendFakeMouseMoved();
 }
 
 

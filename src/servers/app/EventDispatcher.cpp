@@ -466,7 +466,7 @@ EventDispatcher::GetMouse(BPoint& where, int32& buttons)
 
 
 void
-EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
+EventDispatcher::SendFakeMouseMoved(BMessenger& target, int32 viewToken)
 {
 	BAutolock _(this);
 
@@ -482,7 +482,7 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 		moved.AddMessage("be:drag_message", &fDragMessage);
 	}
 
-	_SendMessage(target.Messenger(), &moved, kMouseTransitImportance);
+	_SendMessage(target, &moved, kMouseTransitImportance);
 }
 
 
