@@ -1,13 +1,11 @@
 /*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open SCSI bus manager
-
-	Interface for SIMs
-
 	Controllers use this interface to interact with bus manager.
 */
 
@@ -70,7 +68,14 @@ scsi_controller_added(device_node_handle parent)
 		};
 
 		device_node_handle node;
-	
+		uint32 channel;
+
+		if (pnp->get_attr_uint32(parent, "ide/channel_id", &channel, false) == B_OK) {
+			// this is actually an IDE device, we don't need to publish
+			// a bus device for those
+			attrs[5].name = NULL;
+		}
+
 		return pnp->register_device(parent, attrs, NULL, &node);
 	}
 }
