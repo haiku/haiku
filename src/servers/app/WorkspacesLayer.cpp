@@ -42,7 +42,7 @@ WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 	DesktopSettings settings(Window()->Desktop());
 
 	int32 count = settings.WorkspacesCount();
-	int32 squareRoot = sqrt(count);
+	int32 squareRoot = (int32)sqrt(count);
 
 	rows = 1;
 	for (int32 i = 2; i <= squareRoot; i++) {
