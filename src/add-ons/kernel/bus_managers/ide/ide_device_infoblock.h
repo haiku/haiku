@@ -1,23 +1,28 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _IDE_DEVICE_INFOBLOCK_H_
+#define _IDE_DEVICE_INFOBLOCK_H_
 
 /*
-	Part of Open IDE bus manager
-
 	Definition of response to IDE_CMD_IDENTIFY_DEVICE or 
 	IDE_CMD_IDENTIFY_PACKET_DEVICE
-	
+
 	When a new entry is inserted, add its offset in hex
 	and its index in decimal as a remark. Without that, you
 	have a rough time when you messed up the offsets.
 */
 
-#ifndef __IDE_DEVICE_INFOBLOCK_H__
-#define __IDE_DEVICE_INFOBLOCK_H__
 
 #include <lendian_bitfield.h>
+
+
+#define IDE_GET_INFO_BLOCK	0x2710
+#define IDE_GET_STATUS		0x2711
+
 
 // must be 512 bytes!!!
 typedef struct tagdevice_infoblock {
@@ -181,5 +186,11 @@ typedef struct tagdevice_infoblock {
 	uint16 dummy14[128];		// 100 (128)
 } ide_device_infoblock;
 
+typedef struct ide_status {
+	uint8 _reserved;
+	uint8 dma_status;
+	uint8 pio_mode;
+	uint8 dma_mode;
+} ide_status;
 
-#endif
+#endif	/* _IDE_DEVICE_INFOBLOCK_H_ */

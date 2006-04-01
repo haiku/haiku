@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -26,6 +26,8 @@
 #include "ide_sim.h"
 
 #include <bus/scsi/scsi_cmds.h>
+#include <safemode.h>
+
 #include <string.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -546,7 +548,8 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 {
 	device_node_handle parent;
 	ide_bus_info *bus;
-	int res;
+	bool dmaDisabled = false;
+	status_t status;
 
 	SHOW_FLOW0(3, "");
 
@@ -586,13 +589,13 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	bus->timer.bus = bus;
 	bus->synced_pc_list = NULL;
 
-	if ((res = scsi->alloc_dpc(&bus->irq_dpc)) < 0)
+	if ((status = scsi->alloc_dpc(&bus->irq_dpc)) < B_OK)
 		goto err1;
 
 	bus->active_device = NULL;
 	bus->sync_wait_sem = create_sem(0, "ide_sync_wait");
 	if (bus->sync_wait_sem < 0) {
-		res = bus->sync_wait_sem;
+		status = bus->sync_wait_sem;
 		goto err2;
 	}
 
@@ -600,28 +603,41 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 
 	bus->scan_device_sem = create_sem(0, "ide_scan_finished");
 	if (bus->scan_device_sem < 0) {
-		res = bus->scan_device_sem;
+		status = bus->scan_device_sem;
 		goto err3;
 	}
 
-	res = INIT_BEN(&bus->status_report_ben, "ide_status_report");
-	if (res < 0) 
+	status = INIT_BEN(&bus->status_report_ben, "ide_status_report");
+	if (status < B_OK) 
 		goto err4;
+
+	{
+		// check if safemode settings disable DMA
+		void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+		if (settings != NULL) {
+			dmaDisabled = get_driver_boolean_parameter(settings, B_SAFEMODE_DISABLE_IDE_DMA,
+				false, false);
+			unload_driver_settings(settings);
+		}
+	}
 
 	bus->first_device = NULL;
 
 	// read restrictions of controller
 
 	if (pnp->get_attr_uint8(node, IDE_CONTROLLER_MAX_DEVICES_ITEM,
-			&bus->max_devices, true) != B_OK)
+			&bus->max_devices, true) != B_OK) {
 		// per default, 2 devices are supported per node
 		bus->max_devices = 2;
+	}
 
 	bus->max_devices = min(bus->max_devices, 2);
 
-	if (pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_DMA_ITEM, &bus->can_DMA, true) != B_OK)
+	if (dmaDisabled
+		|| pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_DMA_ITEM, &bus->can_DMA, true) != B_OK) {
 		// per default, no dma support
 		bus->can_DMA = false;
+	}
 
 	SHOW_FLOW(2, "can_dma: %d", bus->can_DMA);
 
@@ -643,19 +659,17 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 
 	parent = pnp->get_parent(node);
 
-	res = pnp->init_driver(parent, bus, 
-			(driver_module_info **)&bus->controller, 
-			(void **)&bus->channel);
+	status = pnp->init_driver(parent, bus, (driver_module_info **)&bus->controller, 
+		(void **)&bus->channel);
 
 	pnp->put_device_node(parent);
-	if (res != B_OK)
+	if (status != B_OK)
 		goto err5;
 
 	*cookie = bus;
 
 	// detect devices
 	sim_scan_bus(bus);
-
 	return B_OK;
 
 err5:
@@ -675,7 +689,7 @@ err:
 #endif
 	free(bus);
 
-	return res;
+	return status;
 }
 
 
@@ -767,6 +781,47 @@ ide_sim_get_restrictions(ide_bus_info *bus, uchar target_id,
 
 
 static status_t
+ide_sim_ioctl(ide_bus_info *bus, uint8 targetID, uint32 op, void *buffer, size_t length)
+{
+	ide_device_info *device = bus->devices[targetID];
+
+	// We currently only support IDE_GET_INFO_BLOCK
+	switch (op) {
+		case IDE_GET_INFO_BLOCK:
+			// we already have the info block, just copy it
+			memcpy(buffer, &device->infoblock,
+				min(sizeof(device->infoblock), length));
+			return B_OK;
+
+		case IDE_GET_STATUS:
+		{
+			// TODO: have our own structure and fill it with some useful stuff
+			ide_status status;
+			if (device->DMA_enabled)
+				status.dma_status = 1;
+			else if (device->DMA_supported) {
+				if (device->DMA_failures > 0)
+					status.dma_status = 6;
+				else if (device->bus->can_DMA)
+					status.dma_status = 2;
+				else
+					status.dma_status = 4;
+			} else
+				status.dma_status = 2;
+
+			status.pio_mode = 0;
+			status.dma_mode = 0;
+
+			memcpy(buffer, &status, min(sizeof(status), length));
+			return B_OK;
+		}
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+static status_t
 std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -801,7 +856,7 @@ scsi_sim_interface ide_sim_module = {
 		(status_t (*)(void *)	) 					ide_sim_uninit_bus,
 		(void (*)(device_node_handle, void *))		ide_sim_bus_removed
 	},
-	
+
 	(void (*)(scsi_sim_cookie, scsi_ccb *))			sim_scsi_io,
 	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_abort,
 	(uchar (*)(scsi_sim_cookie, uchar, uchar)) 		sim_reset_device,
@@ -812,5 +867,7 @@ scsi_sim_interface ide_sim_module = {
 	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
 	
 	(void (*)(scsi_sim_cookie, uchar, 
-		bool*, bool *, uint32 *))					ide_sim_get_restrictions
+		bool*, bool *, uint32 *))					ide_sim_get_restrictions,
+
+	(status_t (*)(scsi_sim_cookie, uint8, uint32, void *, size_t))ide_sim_ioctl,
 };

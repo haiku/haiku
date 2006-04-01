@@ -1,13 +1,13 @@
 /*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
-#ifndef __SCSI_BUSMANAGER_H__
-#define __SCSI_BUSMANAGER_H__
+#ifndef _SCSI_BUSMANAGER_H_
+#define _SCSI_BUSMANAGER_H_
 
 /*
-	Part of Open SCSI bus manager
-
 	SCSI bus manager interface
 
 	The bus manager interface is _based_ on CAM, but I've modified it because :-
@@ -315,6 +315,8 @@ typedef struct scsi_device_interface {
 	uchar (*reset_device)(scsi_device device);
 	// terminate request
 	uchar (*term_io)(scsi_ccb *ccb_to_terminate);
+
+	status_t (*ioctl)(scsi_device device, uint32 op, void *buffer, size_t length);
 } scsi_device_interface;
 
 #define SCSI_DEVICE_MODULE_NAME "bus_managers/scsi/driver/v1"
@@ -439,8 +441,8 @@ typedef struct scsi_sim_interface {
 	
 	// get restrictions of one device 
 	// (used for non-SCSI transport protocols and bug fixes)
-	void (*get_restrictions)( 
-		scsi_sim_cookie 	cookie, 
+	void (*get_restrictions)(
+		scsi_sim_cookie 	cookie,
 		uchar				target_id,		// target id
 		bool				*is_atapi, 		// set to true if this is an ATAPI device that
 											// needs some commands emulated
@@ -450,7 +452,9 @@ typedef struct scsi_sim_interface {
 		uint32 				*max_blocks );	// maximum number of blocks per transfer if > 0;
 											// used for buggy devices that cannot handle
 											// large transfers (read: ATAPI ZIP drives)
+
+	status_t (*ioctl)(scsi_sim_cookie, uint8 targetID, uint32 op, void *buffer, size_t length);
 } scsi_sim_interface;
 
 
-#endif	/* __SCSI_BUSMANAGER_H__ */
+#endif	/* _SCSI_BUSMANAGER_H_ */

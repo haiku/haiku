@@ -1,11 +1,12 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Disk Driver
-
 	Everything doing the real input/output stuff.
 */
 
@@ -301,6 +302,11 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer, size_t lengt
 			return raw_command(handle->device, buffer);
 
 		default:
+			if (handle->device->scsi->ioctl != NULL) {
+				return handle->device->scsi->ioctl(handle->device->scsi_device,
+					op, buffer, length);
+			}
+
 			SHOW_ERROR(4, "Unknown ioctl: %x", op);
 			return B_BAD_VALUE;
 	}

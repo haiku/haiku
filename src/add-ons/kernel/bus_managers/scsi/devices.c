@@ -1,11 +1,11 @@
 /*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open SCSI bus manager
-
 	Device node layer. 
 
 	When a SCSI bus is registered, this layer scans for SCSI devices
@@ -517,6 +517,18 @@ scsi_reset_device(scsi_device_info *device)
 
 
 static status_t
+scsi_ioctl(scsi_device_info *device, uint32 op, void *buffer, size_t length)
+{
+	if (device->bus->interface->ioctl != NULL) {
+		return device->bus->interface->ioctl(device->bus->sim_cookie,
+			device->target_id, op, buffer, length);
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+static status_t
 std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -559,5 +571,6 @@ scsi_device_interface scsi_device_module = {
 	scsi_sync_io,
 	scsi_abort,
 	scsi_reset_device,
-	scsi_term_io
+	scsi_term_io,
+	scsi_ioctl,
 };
