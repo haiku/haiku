@@ -117,7 +117,46 @@ DesktopSettings::Private::_Load()
 		}
 	}
 
-	return B_ERROR;
+	// read font settings
+
+	path = basePath;
+	path.Append("fonts");
+	
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status == B_OK) {
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status == B_OK && gFontManager->Lock()) {
+			const char* family;
+			const char* style;
+			float size;
+			if (settings.FindString("plain family", &family) == B_OK
+				&& settings.FindString("plain style", &style) == B_OK
+				&& settings.FindFloat("plain size", &size) == B_OK) {
+				FontStyle* fontStyle = gFontManager->GetStyle(family, style);
+				fPlainFont.SetStyle(fontStyle);
+				fPlainFont.SetSize(size);
+			}
+			if (settings.FindString("bold family", &family) == B_OK
+				&& settings.FindString("bold style", &style) == B_OK
+				&& settings.FindFloat("bold size", &size) == B_OK) {
+				FontStyle* fontStyle = gFontManager->GetStyle(family, style);
+				fBoldFont.SetStyle(fontStyle);
+				fBoldFont.SetSize(size);
+			}
+			if (settings.FindString("fixed family", &family) == B_OK
+				&& settings.FindString("fixed style", &style) == B_OK
+				&& settings.FindFloat("fixed size", &size) == B_OK) {
+				FontStyle* fontStyle = gFontManager->GetStyle(family, style);
+				if (fontStyle->IsFixedWidth())
+					fFixedFont.SetStyle(fontStyle);
+				fFixedFont.SetSize(size);
+			}
+			gFontManager->Unlock();
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -147,6 +186,31 @@ DesktopSettings::Private::Save(uint32 mask)
 		}
 	}
 
+	if (mask & kFontSettings) {
+		BPath path(basePath);
+		if (path.Append("fonts") == B_OK) {
+			BMessage settings('asfn');
+
+			settings.AddString("plain family", fPlainFont.Family());
+			settings.AddString("plain style", fPlainFont.Style());
+			settings.AddFloat("plain size", fPlainFont.Size());
+
+			settings.AddString("bold family", fBoldFont.Family());
+			settings.AddString("bold style", fBoldFont.Style());
+			settings.AddFloat("bold size", fBoldFont.Size());
+
+			settings.AddString("fixed family", fFixedFont.Family());
+			settings.AddString("fixed style", fFixedFont.Style());
+			settings.AddFloat("fixed size", fFixedFont.Size());
+
+			BFile file;
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			if (status == B_OK) {
+				status = settings.Flatten(&file, NULL);
+			}
+		}
+	}
+
 	return status;
 }
 
@@ -155,6 +219,7 @@ void
 DesktopSettings::Private::SetDefaultPlainFont(const ServerFont &font)
 {
 	fPlainFont = font;
+	Save(kFontSettings);
 }
 
 
@@ -169,6 +234,7 @@ void
 DesktopSettings::Private::SetDefaultBoldFont(const ServerFont &font)
 {
 	fBoldFont = font;
+	Save(kFontSettings);
 }
 
 
@@ -183,6 +249,7 @@ void
 DesktopSettings::Private::SetDefaultFixedFont(const ServerFont &font)
 {
 	fFixedFont = font;
+	Save(kFontSettings);
 }
 
 
@@ -197,6 +264,7 @@ void
 DesktopSettings::Private::SetScrollBarInfo(const scroll_bar_info& info)
 {
 	fScrollBarInfo = info;
+	Save(kAppearanceSettings);
 }
 
 
@@ -211,6 +279,7 @@ void
 DesktopSettings::Private::SetMenuInfo(const menu_info& info)
 {
 	fMenuInfo = info;
+	Save(kAppearanceSettings);
 }
 
 
