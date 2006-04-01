@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,17 +11,16 @@
 
 #include "PNGDump.h"
 
+#include <NodeInfo.h>
+#include <Rect.h>
+
+#include <png.h>
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <png.h>
-
-#include <Rect.h>
-#include <OS.h>
-
-#include "frame_buffer_support.h"
 
 #define TRACE_PNGDUMP
 #ifdef TRACE_PNGDUMP
@@ -29,6 +28,7 @@
 #else
 #	define TRACE(x) ;
 #endif
+
 
 status_t
 SaveToPNG(const char* filename, const BRect& bounds, color_space space,
@@ -113,5 +113,13 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 	png_destroy_write_struct(&png, NULL);
 
 	fclose(file);
+
+	// Set the file type manually, so that it doesn't have to be
+	// picked up by the registrar or Tracker, first
+	BNode node(filename);
+	BNodeInfo nodeInfo(&node);
+	if (nodeInfo.InitCheck() == B_OK)
+		nodeInfo.SetType("image/png");
+
 	return B_OK;
 }
