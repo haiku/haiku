@@ -15,12 +15,14 @@
 	expands the R5 API.
 */
 
+#include "CursorManager.h"
 #include "ServerCursor.h"
+
+#include <ByteOrder.h>
 
 #include <new>
 #include <stdio.h>
 
-#include "CursorManager.h"
 
 using std::nothrow;
 
@@ -67,7 +69,9 @@ ServerCursor::ServerCursor(const uint8* data)
 	// This API has serious problems and should be deprecated(but supported) in R2
 
 	// Now that we have all the setup, we're going to map (for now) the cursor
-	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
+	// to RGBA32 (little endian). Eventually, there will be support for 16 and
+	// 8-bit depths
+	// NOTE: review this once we have working PPC graphics cards (big endian).
 	if (data) {	
 		_AllocateBuffer();
 		uint8* buffer = Bits();
@@ -75,39 +79,33 @@ ServerCursor::ServerCursor(const uint8* data)
 			return;
 
 		fInitialized = true;
-		uint32 black = 0xFF000000;
-		uint32 white = 0xFFFFFFFF;
+		uint32 black = 0xff000000;
+		uint32 white = 0xffffffff;
 
-		uint16* cursorpos = (uint16*)(data + 4);
-		uint16* maskpos = (uint16*)(data + 36);
+		uint16* cursorBits = (uint16*)(data + 4);
+		uint16* transparencyBits = (uint16*)(data + 36);
 		fHotSpot.Set(data[3], data[2]);
-				
-		uint32* bmppos;
-		uint16 cursorflip;
-		uint16 maskflip;
-		uint16 cursorval;
-		uint16 maskval;
-		uint16 powval;
-	
+
 		// for each row in the cursor data
 		for (int32 j = 0; j < 16; j++) {
-			bmppos = (uint32*)(buffer + (j * BytesPerRow()));
-	
+			uint32* bits = (uint32*)(buffer + (j * BytesPerRow()));
+
 			// On intel, our bytes end up swapped, so we must swap them back
-			cursorflip = (cursorpos[j] & 0xFF) << 8;
-			cursorflip |= (cursorpos[j] & 0xFF00) >> 8;
-			
-			maskflip = (maskpos[j] & 0xFF) << 8;
-			maskflip |= (maskpos[j] & 0xFF00) >> 8;
-	
+			uint16 cursorLine = __swap_int16(cursorBits[j]);
+			uint16 transparencyLine = __swap_int16(transparencyBits[j]);
+
+			uint16 mask = 1 << 15;
+
 			// for each column in each row of cursor data
-			for (int32 i = 0; i < 16; i++) {
+			for (int32 i = 0; i < 16; i++, mask >>= 1) {
 				// Get the values and dump them to the bitmap
-				powval = 1 << (15 - i);
-				cursorval = cursorflip & powval;
-				maskval = maskflip & powval;
-				bmppos[i] = maskval > 0 ? (cursorval != 0 ? black : white)
-										: 0x00000000;
+				uint16 cursorBit = cursorLine & mask;
+				if (cursorBit)
+					bits[i] = black;
+				else if (transparencyLine & mask)
+					bits[i] = white;
+				else
+					bits[i] = 0x00000000;
 			}
 		}
 
