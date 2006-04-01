@@ -516,6 +516,9 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 {
 	CHECK_CLIPPING
 
+	// TODO: if shapes are ever used more heavily in Haiku,
+	// it would be nice to use BShape data directly (write
+	// an AGG "VertexSource" adaptor)
 	agg::path_storage path;
 	for (int32 i = 0; i < opCount; i++) {
 		uint32 op = opList[i] & 0xFF000000;
