@@ -12,18 +12,13 @@
 	app_info structure provides info for a running app.
 */
 
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <AppMisc.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <fs_index.h>
 #include <fs_info.h>
 #include <image.h>
 #include <List.h>
@@ -40,6 +35,14 @@
 #include <RosterPrivate.h>
 #include <ServerProtocol.h>
 #include <Volume.h>
+#include <VolumeRoster.h>
+
+#include <ctype.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace BPrivate;
@@ -2509,7 +2512,7 @@ find_message_app_info(BMessage *message, app_info *info)
  }
 
 // query_for_app
-/*!	\brief Finds an app by signature on the boot volume.
+/*!	\brief Finds an app by signature on any mounted volume.
 	\param signature The app's signature.
 	\param appRef A pointer to a pre-allocated entry_ref to be filled with
 		   a reference to the found application's executable.
@@ -2524,42 +2527,89 @@ static
 status_t
 query_for_app(const char *signature, entry_ref *appRef)
 {
-	status_t error = (signature && appRef ? B_OK : B_BAD_VALUE);
-	BVolume volume;
-	BQuery query;
-	if (error == B_OK) {
-		// init the query
-		if (volume.SetTo(dev_for_path("/boot")) != B_OK
-			|| query.SetVolume(&volume) != B_OK
-			|| query.PushAttr("BEOS:APP_SIG") != B_OK
-			|| query.PushString(signature) != B_OK
-			|| query.PushOp(B_EQ) != B_OK
-			|| query.Fetch() != B_OK) {
-			error = B_LAUNCH_FAILED_APP_NOT_FOUND;
-		}
-	}
-	// walk through the query
-	bool appFound = false;
-	status_t foundAppError = B_OK;
-	if (error == B_OK) {
-		entry_ref ref;
-		while (query.GetNextRef(&ref) == B_OK) {
-			if ((!appFound || compare_app_versions(appRef, &ref) < 0)
-				&& (foundAppError = can_app_be_used(&ref)) == B_OK) {
-				*appRef = ref;
-				appFound = true;
+	if (signature == NULL || appRef == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = B_LAUNCH_FAILED_APP_NOT_FOUND;
+	bool caseInsensitive = false;
+
+	while (true) {
+		// search on all volumes
+		BVolumeRoster volumeRoster;
+		BVolume volume;
+		while (volumeRoster.GetNextVolume(&volume) == B_OK) {
+			if (!volume.KnowsQuery())
+				continue;
+
+			index_info info;
+			if (fs_stat_index(volume.Device(), "BEOS:APP_SIG", &info) != 0) {
+				// This volume doesn't seem to have the index we're looking for;
+				// querying it might need a long time, and we don't care *that*
+				// much...
+				continue;
 			}
+
+			BQuery query;
+			query.SetVolume(&volume);
+			query.PushAttr("BEOS:APP_SIG");
+			if (!caseInsensitive)
+				query.PushString(signature);
+			else {
+				// second pass, create a case insensitive query string
+				char string[B_MIME_TYPE_LENGTH * 4];
+				strcpy(string, "application/");
+
+				int32 length = strlen(string);
+				const char *from = signature + length;
+				char *to = string + length;
+
+				for (; from[0]; from++) {
+					if (isalpha(from[0])) {
+						*to++ = '[';
+						*to++ = tolower(from[0]);
+						*to++ = toupper(from[0]);
+						*to++ = ']';
+					} else
+						*to++ = from[0];
+				}
+
+				to[0] = '\0';
+				query.PushString(string);
+			}
+			query.PushOp(B_EQ);
+
+			query.Fetch();
+
+			// walk through the query
+			bool appFound = false;
+			status_t foundAppError = B_OK;
+			entry_ref ref;
+			while (query.GetNextRef(&ref) == B_OK) {
+				if ((!appFound || compare_app_versions(appRef, &ref) < 0)
+					&& (foundAppError = can_app_be_used(&ref)) == B_OK) {
+					*appRef = ref;
+					appFound = true;
+				}
+			}
+			if (!appFound) {
+				// If the query didn't return any hits, the error is
+				// B_LAUNCH_FAILED_APP_NOT_FOUND, otherwise we return the
+				// result of the last can_app_be_used().
+				error = foundAppError != B_OK
+					? foundAppError : B_LAUNCH_FAILED_APP_NOT_FOUND;
+			} else
+				return B_OK;
 		}
-		if (!appFound) {
-			// If the query didn't return any hits, the error is
-			// B_LAUNCH_FAILED_APP_NOT_FOUND, otherwise we return the
-			// result of the last can_app_be_used().
-			error = (foundAppError != B_OK ? foundAppError
-										   : B_LAUNCH_FAILED_APP_NOT_FOUND);
-		}
+
+		if (!caseInsensitive)
+			caseInsensitive = true;
+		else
+			break;
 	}
+
 	return error;
 }
+
 
 // can_app_be_used
 /*!	\brief Checks whether or not an application can be used.
