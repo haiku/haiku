@@ -17,6 +17,7 @@ MenuBar::MenuBar()
 	get_menu_info(&info);
 	build_menu();
 	set_menu();
+	SetItemMargins(14.0, 2.0, 20.0, 0.0);
 }
 
 
@@ -149,5 +150,6 @@ MenuBar::Update()
 void
 MenuBar::FrameResized(float width, float height)
 {
+	Window()->ResizeTo(width + 80, height + 55);
 	Window()->PostMessage(UPDATE_WINDOW);	
 }

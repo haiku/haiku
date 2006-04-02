@@ -30,18 +30,18 @@ MenuWindow::MenuWindow(BRect rect)
 	menuView->AddChild(menuBar);
 			
 	// resize the window according to the size of menuBar
-	ResizeTo((menuBar->Frame().right + 35), (menuBar->Frame().bottom + 45));
+	ResizeTo((menuBar->Frame().right + 40), (menuBar->Frame().bottom + 45));
 	
 	BRect menuBarFrame = menuBar->Frame();
 	BRect buttonFrame(menuBarFrame.left, menuBarFrame.bottom + 10, menuBarFrame.left + 75, menuBarFrame.bottom + 30);
 	
 	defaultButton = new BButton(buttonFrame, "Default", "Defaults", new BMessage(MENU_DEFAULT),
-					B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+					B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 	menuView->AddChild(defaultButton);
 	
 	buttonFrame.OffsetBy(buttonFrame.Width() + 20, 0);
 	revertButton = new BButton(buttonFrame, "Revert", "Revert", new BMessage(MENU_REVERT),
-					B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+					B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 	revertButton->SetEnabled(false);
 	menuView->AddChild(revertButton);
 	
@@ -152,8 +152,9 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 		
 		case MENU_COLOR:
-			set_menu_info(&info);
-			(new BAlert("test","we made it","cool"))->Go();
+			get_menu_info(&info);
+			revert = true;
+			Update();
 			break;
 		
 		default:

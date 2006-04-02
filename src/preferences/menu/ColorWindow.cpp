@@ -61,7 +61,7 @@ ColorWindow::MessageReceived(BMessage *msg)
 			get_menu_info(&info);
 			info.background_color = colorPicker->ValueAsColor();
 			set_menu_info(&info);
-			be_app->PostMessage(UPDATE_WINDOW);
+			be_app->PostMessage(MENU_COLOR);
 			break;
 		
 		default:
