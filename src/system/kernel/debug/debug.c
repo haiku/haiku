@@ -61,6 +61,14 @@ static struct debugger_command *sCommands;
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 
+static int64 hash_string(const char *string);
+static void flush_pending_repeats(void);
+static status_t check_pending_repeats(void *data);
+
+static int64 sLastMessageHash = 0;
+static int64 sMessageRepeatTime = 0;
+static int32 sMessageRepeatCount = 0;
+
 #define LINE_BUFFER_SIZE 1024
 #define MAX_ARGS 16
 #define HISTORY_SIZE 16
@@ -575,6 +583,7 @@ void
 debug_puts(const char *string)
 {
 	cpu_status state;
+	int64 newHash;
 
 	// we only need the length for syslog
 	size_t length = 0;
@@ -584,7 +593,15 @@ debug_puts(const char *string)
 	state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	kputs(string);
+	newHash = hash_string(string);
+	if (newHash == sLastMessageHash) {
+		sMessageRepeatCount++;
+		sMessageRepeatTime = system_time();
+	} else {
+		flush_pending_repeats();
+		kputs(string);
+		sLastMessageHash = newHash;
+	}
 
 	// kputs() doesn't output to syslog (as it's only used
 	// from the kernel debugger elsewhere)
@@ -663,6 +680,11 @@ debug_init_post_vm(kernel_args *args)
 status_t
 debug_init_post_modules(struct kernel_args *args)
 {
+	thread_id thread = spawn_kernel_thread(check_pending_repeats,
+		"check repeats", B_LOW_PRIORITY, NULL);
+	if (thread >= B_OK)
+		resume_thread(thread);
+
 	syslog_init_post_threads();
 
 	return frame_buffer_console_init_post_modules(args);
@@ -804,14 +826,68 @@ set_dprintf_enabled(bool newState)
 }
 
 
+static int64
+hash_string(const char *string)
+{
+	char ch;
+	int64 result = 0;
+
+	while ((ch = *string++) != 0) {
+		result = (result << 7) ^ (result >> 24);
+		result ^= ch;
+	}
+
+	result ^= result << 12;
+	return result;
+}
+
+
+static void
+flush_pending_repeats(void)
+{
+	if (sMessageRepeatCount > 0) {
+		char temp[128];
+		int32 length = snprintf(temp, sizeof(temp),
+			"Last message repeated %ld times.\n", sMessageRepeatCount);
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(temp);
+		if (sSyslogOutputEnabled)
+			syslog_write(temp, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(temp);
+
+		sMessageRepeatCount = 0;
+	}
+}
+
+
+static status_t
+check_pending_repeats(void *data)
+{
+	cpu_status state;
+
+	while (true) {
+		if (sMessageRepeatCount > 0
+			&& (system_time() - sMessageRepeatTime) > 1000000)
+			flush_pending_repeats();
+
+		snooze(1000000);
+	}
+
+	return B_OK;
+}
+
+
 void
 dprintf(const char *format, ...)
 {
 	cpu_status state;
 	va_list args;
+	int64 newHash;
 	int32 length;
 
-	if (!sSerialDebugEnabled && !sSyslogOutputEnabled)
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
 		return;
 
 	// ToDo: maybe add a non-interrupt buffer and path that only
@@ -825,12 +901,22 @@ dprintf(const char *format, ...)
 	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	if (sSerialDebugEnabled)
-		arch_debug_serial_puts(sOutputBuffer);
-	if (sSyslogOutputEnabled)
-		syslog_write(sOutputBuffer, length);
-	if (sBlueScreenEnabled || sDebugScreenEnabled)
-		blue_screen_puts(sOutputBuffer);
+	newHash = hash_string(sOutputBuffer);
+	if (newHash == sLastMessageHash) {
+		sMessageRepeatCount++;
+		sMessageRepeatTime = system_time();
+	} else {
+		flush_pending_repeats();
+
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(sOutputBuffer);
+		if (sSyslogOutputEnabled)
+			syslog_write(sOutputBuffer, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(sOutputBuffer);
+
+		sLastMessageHash = newHash;
+	}
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
