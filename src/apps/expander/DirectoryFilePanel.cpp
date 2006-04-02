@@ -1,33 +1,18 @@
-/*****************************************************************************/
-// Expander
-// Written by Jérôme Duval
-//
-// DirectoryFilePanel.cpp
-//
-// Copyright (c) 2004 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ */
+
 
 #include "DirectoryFilePanel.h"
+
 #include <Window.h>
+
 #include <stdio.h>
+
 
 DirectoryRefFilter::DirectoryRefFilter()
 	: BRefFilter()
@@ -39,16 +24,19 @@ bool
 DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st, 
 	const char *filetype)
 {
-	return (node->IsDirectory());
+	return node->IsDirectory();
 }
 
 
+//	#pragma mark -
+
+
 DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target, 
-	const entry_ref *start_directory, uint32 node_flavors, 
-	bool allow_multiple_selection, BMessage *message, BRefFilter *filter,	
-	bool modal,	bool hide_when_done)
-	:BFilePanel(mode,target,start_directory, node_flavors, 
-		allow_multiple_selection,message,filter,modal,hide_when_done),
+	const entry_ref *startDirectory, uint32 nodeFlavors, 
+	bool allowMultipleSelection, BMessage *message, BRefFilter *filter,	
+	bool modal,	bool hideWhenDone)
+	: BFilePanel(mode, target, startDirectory, nodeFlavors, 
+		allowMultipleSelection, message, filter, modal, hideWhenDone),
 		fCurrentButton(NULL)
 {
 }
@@ -57,33 +45,66 @@ DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target,
 void
 DirectoryFilePanel::Show()
 {
-	if (!fCurrentButton) {
-		entry_ref ref;
-		char label[50];
-		GetPanelDirectory(&ref);
-		sprintf(label, "Select '%s'", ref.name);
+	if (fCurrentButton == NULL) {
 		Window()->Lock();
-		BView *background = Window()->ChildAt(0); 
-		fCurrentButton = new BButton(
-			BRect(113, background->Bounds().bottom-35, 269, background->Bounds().bottom-10),
-			"directoryButton", label, new BMessage(MSG_DIRECTORY), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		BView* background = Window()->ChildAt(0); 
+		BView* cancel = background->FindView("cancel button");
+
+		BRect rect;
+		if (cancel != NULL)
+			rect = cancel->Frame();
+		else {
+			rect = background->Bounds();
+			rect.left = rect.right;
+			rect.top = rect.bottom - 35;
+			rect.bottom -= 10;
+		}
+
+		fCurrentButton = new BButton(rect, "directoryButton", "Select current",
+			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		fCurrentButton->ResizeToPreferred();
+		fCurrentButton->MoveBy(-fCurrentButton->Bounds().Width() - 8, 0);
 		background->AddChild(fCurrentButton);
-		SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 		fCurrentButton->SetTarget(Messenger());
+
+		SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 		Window()->Unlock();
+
+		SelectionChanged();
 	}
+
 	BFilePanel::Show();
 }
+
 
 void
 DirectoryFilePanel::SelectionChanged(void)
 {
-	entry_ref ref;
-	char label[50];
-	GetPanelDirectory(&ref);
 	Window()->Lock();
-	sprintf(label, "Select '%s'", ref.name);
+
+	char label[64];
+	entry_ref ref;
+	GetPanelDirectory(&ref);
+	if (snprintf(label, sizeof(label), "Select '%s'", ref.name) >= (int)sizeof(label))
+		strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
+
+	// Resize button so that the label fits
+	// maximum width is dictated by the window's size limits
+
+	float dummy, maxWidth;
+	Window()->GetSizeLimits(&maxWidth, &dummy, &dummy, &dummy);
+	maxWidth -= Window()->Bounds().Width() + 8 - fCurrentButton->Frame().right;
+
+	float oldWidth = fCurrentButton->Bounds().Width();
 	fCurrentButton->SetLabel(label);
+	float width, height;
+	fCurrentButton->GetPreferredSize(&width, &height);
+	if (width > maxWidth)
+		width = maxWidth;
+	fCurrentButton->ResizeTo(width, height);
+	fCurrentButton->MoveBy(oldWidth - width, 0);
+
 	Window()->Unlock();
+
 	BFilePanel::SelectionChanged();
 }
