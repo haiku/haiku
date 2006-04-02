@@ -60,12 +60,11 @@ static struct debugger_command *sCommands;
 #define SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
+static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
 
-static int64 hash_string(const char *string);
 static void flush_pending_repeats(void);
 static status_t check_pending_repeats(void *data);
 
-static int64 sLastMessageHash = 0;
 static int64 sMessageRepeatTime = 0;
 static int32 sMessageRepeatCount = 0;
 
@@ -593,14 +592,13 @@ debug_puts(const char *string)
 	state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	newHash = hash_string(string);
-	if (newHash == sLastMessageHash) {
+	if (strncmp(sOutputBuffer, sLastOutputBuffer, OUTPUT_BUFFER_SIZE) == 0) {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
 		flush_pending_repeats();
 		kputs(string);
-		sLastMessageHash = newHash;
+		memcpy(sLastOutputBuffer, sOutputBuffer, OUTPUT_BUFFER_SIZE);
 	}
 
 	// kputs() doesn't output to syslog (as it's only used
@@ -826,22 +824,6 @@ set_dprintf_enabled(bool newState)
 }
 
 
-static int64
-hash_string(const char *string)
-{
-	char ch;
-	int64 result = 0;
-
-	while ((ch = *string++) != 0) {
-		result = (result << 7) ^ (result >> 24);
-		result ^= ch;
-	}
-
-	result ^= result << 12;
-	return result;
-}
-
-
 static void
 flush_pending_repeats(void)
 {
@@ -901,8 +883,7 @@ dprintf(const char *format, ...)
 	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	newHash = hash_string(sOutputBuffer);
-	if (newHash == sLastMessageHash) {
+	if (strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0) {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
@@ -915,7 +896,7 @@ dprintf(const char *format, ...)
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sOutputBuffer);
 
-		sLastMessageHash = newHash;
+		memcpy(sLastOutputBuffer, sOutputBuffer, length);
 	}
 
 	release_spinlock(&sSpinlock);
