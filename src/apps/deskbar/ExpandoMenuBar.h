@@ -31,8 +31,8 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef EXPANDOMENUBAR_H
-#define EXPANDOMENUBAR_H
+#ifndef EXPANDO_MENU_BAR_H
+#define EXPANDO_MENU_BAR_H
 
 //	application list
 //	top level at window
@@ -70,8 +70,8 @@ class TExpandoMenuBar : public BMenuBar {
 		virtual void Draw(BRect update);
 		virtual void DrawBackground(BRect update);
 
+		TTeamMenuItem *TeamItemAtPoint(BPoint location, BMenuItem **_item = NULL);
 		bool InBeMenu(BPoint) const;
-		TTeamMenuItem *ItemAtPoint(BPoint loc);
 
 		void CheckItemSizes(int32 delta);
 
@@ -113,4 +113,4 @@ class TExpandoMenuBar : public BMenuBar {
 		static BLocker		sMonLocker;
 };
 
-#endif /* EXPANDOMENUBAR_H */
+#endif /* EXPANDO_MENU_BAR_H */

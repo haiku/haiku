@@ -589,8 +589,8 @@ TBarView::DragStart()
 
 	if (fExpando && fExpando->Frame().Contains(loc)) {
 		ConvertToScreen(&loc);
-		BPoint expandoloc = fExpando->ConvertFromScreen(loc);		
-		TTeamMenuItem *item = fExpando->ItemAtPoint(expandoloc);
+		BPoint expandoLocation = fExpando->ConvertFromScreen(loc);		
+		TTeamMenuItem *item = fExpando->TeamItemAtPoint(expandoLocation);
 
 		if (fLastDragItem)
 			init_tracking_hook(fLastDragItem, NULL, NULL);
@@ -623,14 +623,14 @@ TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
 	BPoint location;
 	menu->GetMouse(&location, &buttons);
 
-	bool returnvalue = true;
+	bool endMenu = true;
 	BRect frame(menu->Bounds());
 	frame.InsetBy(-kMenuTrackMargin, -kMenuTrackMargin);
 
 	if (frame.Contains(location)) {
 		// if current loc is still in the menu
 		// keep tracking
-		returnvalue = false;
+		endMenu = false;
 	} else {
 		// see if the mouse is in the team/be menu item
 		menu->ConvertToScreen(&location);
@@ -641,23 +641,23 @@ TBarView::MenuTrackingHook(BMenu *menu, void *castToThis)
 			if (bemenu && bemenu->LockLooper()) {
 				bemenu->ConvertFromScreen(&location);
 				if (bemenu->Frame().Contains(location)) 
-					returnvalue = false;
+					endMenu = false;
 
 				bemenu->UnlockLooper();
 			}
 
-			if (returnvalue && expando) {
+			if (endMenu && expando) {
 				expando->ConvertFromScreen(&location);
-				TTeamMenuItem *item = expando->ItemAtPoint(location);
+				BMenuItem *item = expando->TeamItemAtPoint(location);
 				if (item) 
-					returnvalue = false;
+					endMenu = false;
 			}
 			barview->UnlockLooper();
 		}
 	}
 
 	menu->UnlockLooper();
-	return returnvalue;
+	return endMenu;
 }
 
 

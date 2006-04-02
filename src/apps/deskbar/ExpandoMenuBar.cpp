@@ -278,8 +278,7 @@ TExpandoMenuBar::MessageReceived(BMessage *message)
 				break;
 
 			TShowHideMenuItem::TeamShowHideCommon(B_BRING_TO_FRONT,
-				item->Teams(), 
-				item->Menu()->ConvertToScreen(item->Frame()),
+				item->Teams(), item->Menu()->ConvertToScreen(item->Frame()),
 				true);
 			break;
 		}
@@ -305,9 +304,9 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			&& (modifiers & B_OPTION_KEY) != 0
 			&& (modifiers & B_SHIFT_KEY) != 0
 			&& !fBarView->Dragging()) {
+			TTeamMenuItem *item = TeamItemAtPoint(where);
 
-			TTeamMenuItem *item = ItemAtPoint(where);
-			if (item) {
+			if (item != NULL) {
 				const BList	*teams = item->Teams();
 				int32 teamCount = teams->CountItems();
 
@@ -324,8 +323,6 @@ TExpandoMenuBar::MouseDown(BPoint where)
 			}		
 		}
 	}
-
-	const int32 count = CountItems();
 
 // This feature is broken because the menu bar never receives
 // the second click
@@ -358,34 +355,22 @@ TExpandoMenuBar::MouseDown(BPoint where)
 		message->FindInt32("modifiers", &modifiers);
 		if ((modifiers & B_CONTROL_KEY) != 0
 			&& ! fBarView->Dragging()) {
-			int32 lastApp = -1;
-
-			// find the clicked item
-			for (int32 i = fFirstApp; i < count; i++) {
-				const TTeamMenuItem *item = (TTeamMenuItem *)ItemAt(i);
-
-				// check if this item is really a team item	(what a cruel way...)
-				// "lastApp" will always point to the last application in
-				// the list - the other entries might be windows (due to the team expander)
-				if (item->Submenu())
-					 lastApp = i;
-
-				if (item->Frame().Contains(where)) {
-					// show/hide item's teams
-					BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
-						? M_MINIMIZE_TEAM : M_BRING_TEAM_TO_FRONT);
-					showMessage.AddInt32("itemIndex", lastApp);
-					Window()->PostMessage(&showMessage, this);
-					return;
-				}
+			TTeamMenuItem *item = TeamItemAtPoint(where);
+			if (item != NULL) {
+				// show/hide item's teams
+				BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
+					? M_MINIMIZE_TEAM : M_BRING_TEAM_TO_FRONT);
+				showMessage.AddInt32("itemIndex", IndexOf(item));
+				Window()->PostMessage(&showMessage, this);
+				return;
 			}
 		}
 	}
 
 	// Check the bounds of the expand Team icon
 	if (fShowTeamExpander && fVertical && !fBarView->Dragging()) {
-		TTeamMenuItem *item = ItemAtPoint(where);
-		if (item->Submenu()) {
+		TTeamMenuItem *item = TeamItemAtPoint(where);
+		if (item != NULL) {
 			BRect expanderRect = item->ExpanderBounds();
 			if (expanderRect.Contains(where)) {
 				// Let the update thread wait...
@@ -429,7 +414,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 
 		case B_EXITED_VIEW:
 			if (fBarView->Dragging() && buttons != 0) {
-				if (!ItemAtPoint(where)
+				if (!TeamItemAtPoint(where)
 					&& !InBeMenu(where)
 					&& (fSeparatorItem && !fSeparatorItem->Frame().Contains(where))
 					&& !Frame().Contains(where))
@@ -461,17 +446,37 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 }
 
 
+/**	Returns the team menu item that belongs to the item under the
+ *	specified \a point.
+ *	If \a _item is given, it will return the exact menu item under
+ *	that point (which might be a window item when the expander is on).
+ */
+
 TTeamMenuItem *
-TExpandoMenuBar::ItemAtPoint(BPoint point)
+TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem **_item)
 {
-	TTeamMenuItem *item = NULL;
+	TTeamMenuItem *lastApp = NULL;
 	int32 count = CountItems();
 
 	for (int32 i = fFirstApp; i < count; i++) {
-		item = (TTeamMenuItem *)ItemAt(i);
-		if (item && item->Frame().Contains(point))
-			return item;
+		BMenuItem *item = ItemAt(i);
+
+		if (dynamic_cast<TTeamMenuItem *>(item) != NULL)
+			lastApp = (TTeamMenuItem *)item;
+
+		if (item && item->Frame().Contains(point)) {
+			if (_item != NULL)
+				*_item = item;
+
+			return lastApp;
+		}
 	}
+
+	// no item found
+
+	if (_item != NULL)
+		*_item = NULL;
+
 	return NULL;
 }
 
