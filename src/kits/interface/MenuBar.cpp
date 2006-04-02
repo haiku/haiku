@@ -298,6 +298,9 @@ BMenuBar::operator=(const BMenuBar &)
 void 
 BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *specialRect)
 {
+	if (fTracking)
+		return;
+
 	BWindow *window = Window();
 	if (window == NULL) 
 		debugger("MenuBar must be added to a window before it can be used.");
@@ -305,7 +308,7 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 	BAutolock lock(window);	
 	if (!lock.IsLocked())
 		return;
-		
+	
 	fPrevFocusToken = -1;
 	fTracking = true;
 		
@@ -329,6 +332,7 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 		send_data(fTrackingPID, 0, &data, sizeof(data));
 	
 	} else {
+		fTracking = false;
 		_set_menu_sem_(window, B_NO_MORE_SEMS);
 		delete_sem(fMenuSem);
 	}
