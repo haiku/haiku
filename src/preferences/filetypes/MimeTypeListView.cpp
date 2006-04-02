@@ -533,7 +533,7 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					addType.AddString("type", type);
 
 #ifdef __HAIKU
-					BMessageRunner runner(this, &addType, 200000ULL, 1, true);
+					BMessageRunner::StartSending(this, &addType, 200000ULL, 1);
 					if (runner.InitCheck() != B_OK)
 						_AddNewType(type);
 #else

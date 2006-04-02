@@ -41,7 +41,7 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 							   bigtime_t interval, int32 count)
 	: fToken(-1)
 {
-	_InitData(target, message, interval, count, false, be_app_messenger);
+	_InitData(target, message, interval, count, be_app_messenger);
 }
 
 // constructor
@@ -71,85 +71,15 @@ BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
 							   BMessenger replyTo)
 	: fToken(-1)
 {
-	_InitData(target, message, interval, count, false, replyTo);
-}
-
-/*!	\brief Creates and initializes a new BMessageRunner.
-
-	The target for replies to the delivered message(s) is \c be_app_messenger.
-
-	The success of the initialization can (and should) be asked for via
-	InitCheck(). This object will not take ownership of the \a message, you
-	may freely change or delete it after creation.
-
-	\note As soon as the last message has been sent, the message runner
-		  becomes unusable. InitCheck() will still return \c B_OK, but
-		  SetInterval(), SetCount() and GetInfo() will fail.
-
-	\note You can't change a detached messenger after the object has been
-		created.
-
-	\param target Target of the message(s).
-	\param message The message to be sent to the target.
-	\param interval Period of time before the first message is sent and
-		   between messages (if more than one shall be sent) in microseconds.
-	\param count Specifies how many times the message shall be sent.
-		In this form of the constructor, only counts greater than 0 are allowed
-		if \a detach is \c true.
-	\param detach Detaches the runner from this object; when you delete this
-		object, the runner will continue to work.
-*/
-BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
-							   bigtime_t interval, int32 count, bool detach)
-	: fToken(-1)
-{
-	_InitData(target, message, interval, count, detach, be_app_messenger);
+	_InitData(target, message, interval, count, replyTo);
 }
 
 
-/*!
-	\brief Creates and initializes a new BMessageRunner.
-
-	This constructor version additionally allows to specify the target for
-	replies to the delivered message(s).
-
-	The success of the initialization can (and should) be asked for via
-	InitCheck(). This object will not take ownership of the \a message, you
-	may freely change or delete it after creation.
-
-	\note As soon as the last message has been sent, the message runner
-		  becomes unusable. InitCheck() will still return \c B_OK, but
-		  SetInterval(), SetCount() and GetInfo() will fail.
-
-	\note You can't change a detached messenger after the object has been
-		created.
-
-	\param target Target of the message(s).
-	\param message The message to be sent to the target.
-	\param interval Period of time before the first message is sent and
-		between messages (if more than one shall be sent) in microseconds.
-	\param count Specifies how many times the message shall be sent.
-		In this form of the constructor, only counts greater than 0 are allowed
-		if \a detach is \c true.
-	\param detach Detaches the runner from this object; when you delete this
-		object, the runner will continue to work.
-	\param replyTo Target replies to the delivered message(s) shall be sent to.
-*/
-BMessageRunner::BMessageRunner(BMessenger target, const BMessage *message,
-							   bigtime_t interval, int32 count, bool detach,
-							   BMessenger replyTo)
-	: fToken(-1)
-{
-	_InitData(target, message, interval, count, detach, replyTo);
-}
-
-
-// destructor
 /*!	\brief Frees all resources associated with the object.
 */
 BMessageRunner::~BMessageRunner()
 {
-	if (fDetached || fToken < B_OK)
+	if (fToken < B_OK)
 		return;
 
 	// compose the request message
@@ -177,7 +107,7 @@ BMessageRunner::~BMessageRunner()
 status_t
 BMessageRunner::InitCheck() const
 {
-	return (fToken >= 0 ? B_OK : fToken);
+	return fToken >= 0 ? B_OK : fToken;
 }
 
 // SetInterval
@@ -262,6 +192,52 @@ BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
 	return error;
 }
 
+
+/*!	\brief Creates and initializes a detached BMessageRunner.
+
+	You cannot alter the runner after the creation, and it will be deleted
+	automatically once it is done.
+	The target for replies to the delivered message(s) is \c be_app_messenger.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+*/
+/*static*/ status_t
+BMessageRunner::StartSending(BMessenger target, const BMessage *message,
+	bigtime_t interval, int32 count)
+{
+	int32 token = _RegisterRunner(target, message, interval, count, true,
+		be_app_messenger);
+	return token >= B_OK ? B_OK : token;
+}
+
+
+/*!	\brief Creates and initializes a detached BMessageRunner.
+
+	You cannot alter the runner after the creation, and it will be deleted
+	automatically once it is done.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+*/
+/*static*/ status_t
+BMessageRunner::StartSending(BMessenger target, const BMessage *message,
+	bigtime_t interval, int32 count, BMessenger replyTo)
+{
+	int32 token = _RegisterRunner(target, message, interval, count, true, replyTo);
+	return token >= B_OK ? B_OK : token;
+}
+
+
 // FBC
 void BMessageRunner::_ReservedMessageRunner1() {}
 void BMessageRunner::_ReservedMessageRunner2() {}
@@ -307,6 +283,27 @@ BMessageRunner::operator=(const BMessageRunner &)
 */
 void
 BMessageRunner::_InitData(BMessenger target, const BMessage *message,
+	bigtime_t interval, int32 count, BMessenger replyTo)
+{
+	fToken = _RegisterRunner(target, message, interval, count, false, replyTo);
+}
+
+
+/*!	\brief Registers the BMessageRunner in the registrar.
+
+	\param target Target of the message(s).
+	\param message The message to be sent to the target.
+	\param interval Period of time before the first message is sent and
+		   between messages (if more than one shall be sent) in microseconds.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+	\param replyTo Target replies to the delivered message(s) shall be sent to.
+
+	\return The token the message runner is registered with, or the error code
+		while trying to register it.
+*/
+/*static*/ int32
+BMessageRunner::_RegisterRunner(BMessenger target, const BMessage *message,
 	bigtime_t interval, int32 count, bool detach, BMessenger replyTo)
 {
 	status_t error = B_OK;
@@ -333,19 +330,21 @@ BMessageRunner::_InitData(BMessenger target, const BMessage *message,
 	if (error == B_OK)
 		error = BRoster::Private().SendTo(&request, &reply, false);
 
+	int32 token;
+
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
-			if (reply.FindInt32("token", &fToken) != B_OK)
+			if (reply.FindInt32("token", &token) != B_OK)
 				error = B_ERROR;
-			else
-				fDetached = detach;
 		} else
 			reply.FindInt32("error", &error);
 	}
 
-	if (error != B_OK)
-		fToken = error;
+	if (error == B_OK)
+		return token;
+
+	return error;
 }
 
 
@@ -374,7 +373,7 @@ status_t
 BMessageRunner::_SetParams(bool resetInterval, bigtime_t interval,
 	bool resetCount, int32 count)
 {
-	if ((!resetInterval && !resetCount) || fToken < 0 || fDetached)
+	if ((!resetInterval && !resetCount) || fToken < 0)
 		return B_BAD_VALUE;
 
 	// compose the request message
