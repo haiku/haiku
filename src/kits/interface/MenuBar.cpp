@@ -70,7 +70,7 @@ BMenuBar::BMenuBar(BMessage *data)
 
 BMenuBar::~BMenuBar()
 {
-	if (fTrackingPID >= 0) {
+	if (fTracking) {
 		status_t dummy;
 		wait_for_thread(fTrackingPID, &dummy);
 	}
@@ -174,6 +174,9 @@ BMenuBar::MessageReceived(BMessage *msg)
 void 
 BMenuBar::MouseDown(BPoint where)
 {
+	if (fTracking)
+		return;
+
 	BWindow *window = Window();
 	if (!window->IsActive() || !window->IsFront()) {
 		window->Activate();

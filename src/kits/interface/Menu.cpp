@@ -961,7 +961,7 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 		
 	SetStickyMode(openAnyway);
 	
-	if (LockLooper()) {
+	if (openAnyway && LockLooper()) {
 		RedrawAfterSticky(Bounds());
 		UnlockLooper();
 	}
@@ -1242,11 +1242,11 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		item->Install(window);
 		
 		// Make sure we update the layout if needed.
-		if (fResizeToFit) {
+		//if (fResizeToFit) {
 			LayoutItems(index);
 			//UpdateWindowViewSize();
 			Invalidate();
-		}
+		//}
 		window->Unlock();
 	}
 
@@ -1303,7 +1303,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 		}
 	}
 
-	if (invalidateLayout && locked && fResizeToFit) {
+	if (invalidateLayout && locked /*&& fResizeToFit*/) {
 		LayoutItems(0);
 		Invalidate();
 	}
@@ -1321,7 +1321,7 @@ BMenu::LayoutItems(int32 index)
 	CalcTriggers();
 
 	float width, height;
-	ComputeLayout(index, true, true, &width, &height);
+	ComputeLayout(index, fResizeToFit, true, &width, &height);
 
 	ResizeTo(width, height);
 
