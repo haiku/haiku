@@ -106,7 +106,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	// TextControls
 
 	rect = fSourceButton->Frame();
-	rect.left = rect.right + 5;
+	rect.left = rect.right + 8;
 	rect.right = frame.Width() - 8;
 	fSourceText = new BTextControl(rect, "sourceText", "", NULL, 
 		new BMessage(MSG_SOURCETEXT), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
@@ -134,7 +134,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	topView->AddChild(fShowContents);
 	fShowContents->SetEnabled(false);
 
-	rect.left = fExpandButton->Frame().right + 5;
+	rect.left = fExpandButton->Frame().right + 8;
 	rect.right = fShowContents->Frame().left - 4;
 	fStatusView = new BStringView(rect, "statusView", "",
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
