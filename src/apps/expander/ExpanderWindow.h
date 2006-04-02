@@ -9,15 +9,17 @@
 #define EXPANDER_WINDOW_H
 
 
-#include <CheckBox.h>
-#include <Window.h>
-#include <FilePanel.h>
-#include <TextControl.h>
-#include <ScrollView.h>
 #include "DirectoryFilePanel.h"
 #include "ExpanderRules.h"
 
+#include <Window.h>
+
+class BCheckBox;
 class BMenu;
+class BScrollView;
+class BStringView;
+class BTextControl;
+class BTextView;
 
 class ExpanderThread;
 class ExpanderPreferences;
@@ -44,6 +46,7 @@ class ExpanderWindow : public BWindow {
 		void AutoExpand();
 		void StartExpanding();
 		void StopExpanding();
+		void _UpdateWindowSize(bool showContents);
 		void StartListing();
 		void StopListing();
 
@@ -60,7 +63,8 @@ class ExpanderWindow : public BWindow {
 			*fSourceItem, *fDestItem, *fPreferencesItem;
 		BCheckBox *fShowContents;
 		BTextControl *fSourceText, *fDestText;
-		BTextView *fExpandedText, *fListingText;
+		BStringView* fStatusView;
+		BTextView *fListingText;
 		BScrollView *fListingScroll;
 	
 		ExpanderThread *fListingThread;

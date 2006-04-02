@@ -2,36 +2,32 @@
  * Copyright 2004-2006, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
- 
-#include <Alert.h>
+
+
 #include "ExpanderApp.h"
 #include "ExpanderWindow.h"
 
-const char *APP_SIG		= "application/x-vnd.haiku-Expander";
+#include <Alert.h>
+#include <TextView.h>
 
-int main(int, char **)
-{
-	ExpanderApp theApp;
-	theApp.Run();
-	return 0;
-}
 
 ExpanderApp::ExpanderApp()
-	: BApplication(APP_SIG)
+	: BApplication("application/x-vnd.haiku-Expander")
 {
 	BPoint windowPosition = fSettings.Message().FindPoint("window_position");
-	BRect windowFrame(0,0,450,120);
+	BRect windowFrame(0, 0, 450, 120);
 	windowFrame.OffsetBy(windowPosition);
 	BMessage settings(fSettings.Message());
 	fWindow = new ExpanderWindow(windowFrame, NULL, &settings);
 }
+
 
 void
 ExpanderApp::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Expand-O-Matic\n"
 		"\twritten by Jérôme Duval\n"
-		"\tCopyright 2004, OpenBeOS.\n\n"
+		"\tCopyright 2004-2006, Haiku Inc.\n\n"
 		"original Be version by \n"
 		"Dominic, Hiroshi, Peter, Pavel and Robert\n", "Ok");
 	BTextView *view = alert->TextView();
@@ -45,14 +41,12 @@ ExpanderApp::AboutRequested()
 	view->SetFontAndColor(0, 14, &font);
 
 	alert->Go();
-
 }
 
 
 void
 ExpanderApp::ReadyToRun()
 {
-	
 }
 
 
@@ -89,4 +83,16 @@ void
 ExpanderApp::UpdateSettingsFrom(BMessage *message)
 {
 	fSettings.UpdateFrom(message);
+}
+
+
+//	#pragma mark -
+
+
+int
+main(int, char **)
+{
+	ExpanderApp theApp;
+	theApp.Run();
+	return 0;
 }
