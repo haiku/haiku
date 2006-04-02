@@ -298,10 +298,11 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	popup_menu_data *data = new popup_menu_data;
 	sem_id sem = create_sem(0, "window close lock");
 	
+	data->window = window;
+
 	// Asynchronous menu: we set the BWindow menu's semaphore
 	// and let BWindow block when needed
 	if (async) {
-		data->window = window;
 		_set_menu_sem_(window, sem);
 	} 
 	
@@ -313,7 +314,6 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	data->async = async;
 	data->where = where;
 	data->startOpened = startOpened;
-	data->window = NULL;
 	data->selected = selected;
 	data->lock = sem;
 	
@@ -326,7 +326,7 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
 		if (async)
-			_set_menu_sem_(window, B_NO_MORE_SEMS);
+			_set_menu_sem_(window, B_BAD_SEM_ID);
 		delete data;
 		return NULL;
 	}
@@ -339,7 +339,8 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 			// code. Though here we just want to wait till the semaphore is deleted
 			// (it will return B_BAD_SEM_ID in that case), not provide locking or whatever.
 			while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
-				window->UpdateIfNeeded();	
+				window->UpdateIfNeeded();
+
 		}
 		
 		status_t unused;
@@ -359,8 +360,7 @@ int32
 BPopUpMenu::entry(void *arg)
 {
 	popup_menu_data *data = static_cast<popup_menu_data *>(arg);
-	BPopUpMenu *menu = data->object;
-	
+	BPopUpMenu *menu = data->object;	
 	BPoint where = data->where;
 	BRect *rect = NULL;
 	bool autoInvoke = data->autoInvoke;
@@ -369,17 +369,13 @@ BPopUpMenu::entry(void *arg)
 	if (data->useRect)
 		rect = &data->rect;
 	
-	BMenuItem *selected = menu->start_track(where, autoInvoke,
-								startOpened, rect);
-	
-	// Put the selected item in the shared struct.
-	data->selected = selected;
+	data->selected = menu->start_track(where, autoInvoke, startOpened, rect);
 	
 	delete_sem(data->lock);
 	
 	// Reset the window menu semaphore	
-	if (data->window)
-		_set_menu_sem_(data->window, B_NO_MORE_SEMS);
+	if (data->async && data->window)
+		_set_menu_sem_(data->window, B_BAD_SEM_ID);
 	
 	// Commit suicide if needed	
 	if (menu->fAutoDestruct)
@@ -396,8 +392,6 @@ BMenuItem *
 BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 		bool startOpened, BRect *_specialRect)
 {
-	BMenuItem *result = NULL;
-	
 	fWhere = where;
 	
 	// I know, this doesn't look senseful, but don't be fooled,
@@ -410,7 +404,7 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 	
 	// Wait some time then track the menu
 	snooze(50000);
-	result = Track(startOpened, _specialRect);
+	BMenuItem *result = Track(startOpened, _specialRect);
 	if (result != NULL && autoInvoke)
 		result->Invoke();
 	
@@ -418,6 +412,8 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 	
 	Hide();
 	
+	be_app->ShowCursor();
+
 	return result;
 }
 
