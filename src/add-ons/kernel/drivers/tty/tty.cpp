@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -136,7 +136,7 @@ public:
 	{
 		MutexLocker _(gTTYCookieLock);
 
-		if (cookie->closed)
+		if (cookie->closed || cookie->other_tty->open_count == 0)
 			return false;
 
 		cookie->thread_count++;
@@ -915,11 +915,16 @@ tty_close_cookie(struct tty_cookie *cookie)
 		// We do this by first notifying all queued requests of the error
 		// condition. We then clear the line buffer for the TTY and queue
 		// an own request.
+
+		// Notify the other TTY first; it doesn't accept any read/writes
+		// while there is only one end.
+		cookie->other_tty->reader_queue.NotifyError(B_FILE_ERROR);
+		cookie->other_tty->writer_queue.NotifyError(B_FILE_ERROR);
+
 		RecursiveLocker requestLocker(gTTYRequestLock);
 
 		// we only need to do all this, if the writer queue is not empty
 		if (!cookie->tty->writer_queue.IsEmpty()) {
-
 	 		// notify the blocking writers
 			cookie->tty->writer_queue.NotifyError(B_FILE_ERROR);
 
