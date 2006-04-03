@@ -730,7 +730,7 @@ ui_color(color_which which)
 				case B_FAILURE_COLOR:
 					return make_color(255,0,0);
 				default:
-					fprintf(stderr, "ui_color(): unknown color_which\n");
+					fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
 					return make_color(0,0,0);
 			}
 	}
