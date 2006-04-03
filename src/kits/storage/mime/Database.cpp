@@ -7,12 +7,12 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/*!
-	\file Database.cpp
-	Database class implementation
-*/
 
-#include "mime/Database.h"
+#include <mime/Database.h>
+
+#include <mime/database_access.h>
+#include <mime/database_support.h>
+#include <storage_support.h>
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -21,13 +21,10 @@
 #include <Entry.h>
 #include <Locker.h>
 #include <Message.h>
-#include <mime/database_access.h>
-#include <mime/database_support.h>
 #include <MimeType.h>
 #include <Node.h>
 #include <Path.h>
 #include <String.h>
-#include <storage_support.h>
 #include <TypeConstants.h>
 
 #include <fs_attr.h>
@@ -171,15 +168,14 @@ Database::Delete(const char *type)
 
 	status = entry.Remove();
 
-	// Notify the installed types database
-	if (status != B_OK)
+	if (status == B_OK) {
+		// Notify the installed types database
 		fInstalledTypes.RemoveType(type);
-	// Notify the supporting apps database
-	if (status != B_OK)
+		// Notify the supporting apps database
 		fSupportingApps.DeleteSupportedTypes(type, true);
-	// Notify the monitor service
-	if (status != B_OK)
+		// Notify the monitor service
 		_SendDeleteNotification(type);
+	}
 
 	return status;
 }
