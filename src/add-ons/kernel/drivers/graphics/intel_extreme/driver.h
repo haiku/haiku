@@ -39,7 +39,6 @@
 
 extern char *gDeviceNames[];
 extern intel_info *gDeviceInfo[];
-extern pci_info *gPCIInfo[];
 extern pci_module_info *gPCI;
 extern struct lock gLock;
 

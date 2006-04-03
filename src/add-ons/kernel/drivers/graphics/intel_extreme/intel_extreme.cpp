@@ -139,6 +139,17 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->pll_info.max_frequency = 350000;		// 350 MHz RAM DAC speed
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_PLL_DIVISOR_0;
 
+	info.shared_info->device_type = info.device_type;
+#ifdef __HAIKU__
+	strlcpy(info.shared_info->device_identifier, info.device_identifier,
+		sizeof(info.shared_info->device_identifier));
+#else
+	strcpy(info.shared_info->device_identifier, info.device_identifier);
+#endif
+
+	info.cookie_magic = INTEL_COOKIE_MAGIC;
+		// this makes the cookie valid to be used
+
 	dprintf(DEVICE_NAME "intel_extreme_init() completed successfully!\n");
 
 	return B_OK;

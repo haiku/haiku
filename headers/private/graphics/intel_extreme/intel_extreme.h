@@ -14,8 +14,13 @@
 #include <PCI.h>
 
 
-#define VENDOR_ID_INTEL		0x8086
-#define DEVICE_ID_i865		0x2572
+#define VENDOR_ID_INTEL			0x8086
+
+enum {
+	INTEL_TYPE_7xx,
+	INTEL_TYPE_8xx,
+	INTEL_TYPE_9xx,
+};
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -46,6 +51,9 @@ struct intel_shared_info {
 	uint8			*physical_frame_buffer;
 
 	uint32			graphics_memory_size;
+
+	uint32			device_type;
+	char			device_identifier[32];
 	struct pll_info	pll_info;
 };
 
@@ -60,6 +68,9 @@ struct intel_info {
 	area_id		shared_area;
 	uint8		*frame_buffer;
 	area_id		frame_buffer_area;
+
+	const char	*device_identifier;
+	uint32		device_type;
 };
 
 //----------------- ioctl() interface ----------------

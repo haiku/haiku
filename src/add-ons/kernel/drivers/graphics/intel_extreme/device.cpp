@@ -97,12 +97,6 @@ device_open(const char *name, uint32 flags, void **_cookie)
 	if (info->open_count++ == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
-
-		info->cookie_magic = INTEL_COOKIE_MAGIC;
-		info->id = id;
-		info->pci = gPCIInfo[id];
-		info->registers = (uint8 *)gPCIInfo[id]->u.h0.base_registers[0];
-
 		status = intel_extreme_init(*info);
 	}
 
