@@ -68,6 +68,9 @@ scsi_controller_added(device_node_handle parent)
 		};
 
 		device_node_handle node;
+// TODO: this seems to cause a crash in some configurations, and needs to be investigated!
+//		see bug #389 and #393.
+#if 0
 		uint32 channel;
 
 		if (pnp->get_attr_uint32(parent, "ide/channel_id", &channel, true) == B_OK) {
@@ -75,6 +78,7 @@ scsi_controller_added(device_node_handle parent)
 			// a bus device for those
 			attrs[5].name = NULL;
 		}
+#endif
 
 		return pnp->register_device(parent, attrs, NULL, &node);
 	}
