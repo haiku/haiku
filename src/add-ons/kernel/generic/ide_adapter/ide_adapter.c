@@ -531,8 +531,10 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 			{}
 		};
 
-		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK)
+		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
+			SHOW_ERROR( 2, "Couldn't acquire channel resources %d and %d\n", command_block_base, control_block_base);
 			return B_ERROR;
+		}
 	}
 
 	return ide_adapter_publish_channel(controller_node, channel_module_name,
@@ -666,8 +668,10 @@ ide_adapter_detect_controller(pci_device_module_info *pci, pci_device pci_device
 			{}
 		};
 
-		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK)
+		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
+			SHOW_ERROR( 2, "Couldn't acquire controller resource %d\n", bus_master_base);
 			return B_ERROR;
+		}
 	}
 
 	return ide_adapter_publish_controller(parent, bus_master_base, resource_handles,
