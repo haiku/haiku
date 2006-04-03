@@ -989,32 +989,29 @@ BMimeType::SetLongDescription(const char *description)
 	The types are copied into the \c "super_types" field of the passed-in \c BMessage.
 	The \c BMessage must be pre-allocated.
 	
-	\param super_types Pointer to a pre-allocated \c BMessage into which the 
-	                   MIME supertypes will be copied.
+	\param supertypes Pointer to a pre-allocated \c BMessage into which the 
+	                  MIME supertypes will be copied.
 	\return
 	- \c B_OK: Success
 	- other error code: Failure
 */
-status_t
+/*static*/ status_t
 BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 {
-	status_t err = supertypes ? B_OK : B_BAD_VALUE;
+	if (supertypes == NULL)
+		return B_BAD_VALUE;
 
-	BMessage &msg = *supertypes;
-	BMessage &reply = *supertypes;
+	BMessage msg(B_REG_MIME_GET_INSTALLED_SUPERTYPES);
 	status_t result;
-	
-	// Build and send the message, read the reply
+
+	status_t err = BRoster::Private().SendTo(&msg, supertypes, true);
 	if (!err)
-		msg.what = B_REG_MIME_GET_INSTALLED_SUPERTYPES;
-	if (!err) 
-		err = BRoster::Private().SendTo(&msg, &reply, true);
+		err = supertypes->what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
-		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
+		err = supertypes->FindInt32("result", &result);
 	if (!err)
-		err = reply.FindInt32("result", &result);
-	if (!err) 
 		err = result;
+
 	return err;	
 }
 
@@ -1052,29 +1049,28 @@ BMimeType::GetInstalledTypes(BMessage *types)
 	- \c B_OK: Success
 	- other error code: Failure		
 */
-status_t
+/*static*/ status_t
 BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 {
-	status_t err = types ? B_OK : B_BAD_VALUE;
+	if (types == NULL)
+		return B_BAD_VALUE;
 
-	BMessage &msg = *types;
-	BMessage &reply = *types;
 	status_t result;
-	
+
 	// Build and send the message, read the reply
+
+	BMessage msg(B_REG_MIME_GET_INSTALLED_TYPES);
+	status_t err = msg.AddString("supertype", supertype);
 	if (!err)
-		msg.what = B_REG_MIME_GET_INSTALLED_TYPES;
-	if (!err && supertype)
-		err = msg.AddString("supertype", supertype);
-	if (!err) 
-		err = BRoster::Private().SendTo(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, types, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
+		err = types->what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
-		err = reply.FindInt32("result", &result);
-	if (!err) 
+		err = types->FindInt32("result", &result);
+	if (!err)
 		err = result;
-	return err;	
+
+	return err;
 }
 
 // GetWildcardApps
