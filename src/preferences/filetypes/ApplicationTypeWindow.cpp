@@ -133,7 +133,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fSignatureControl->TextView();
 	textView->SetMaxBytes(B_MIME_TYPE_LENGTH);
-	const char* disallowedCharacters = "/<>@,;:\"()[]?=";
+	const char* disallowedCharacters = "<>@,;:\"()[]?=";
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
