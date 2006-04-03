@@ -647,6 +647,9 @@ Desktop::RedrawBackground()
 		_SetBackground(redraw);
 	}
 
+	_WindowChanged(NULL);
+		// update workspaces view as well
+
 	UnlockAllWindows();
 }
 
@@ -672,6 +675,7 @@ Desktop::SetWorkspace(int32 index)
 	}
 
 	int32 previousIndex = fCurrentWorkspace;
+	RGBColor previousColor = fWorkspaces[fCurrentWorkspace].Color();
 
 	if (fMouseEventWindow != NULL) {
 		if (!fMouseEventWindow->InWorkspace(index)) {
@@ -787,6 +791,9 @@ Desktop::SetWorkspace(int32 index)
 
 	_WindowChanged(NULL);
 	MarkDirty(dirty);
+
+	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
+		RedrawBackground();
 
 	UnlockAllWindows();
 
