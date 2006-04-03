@@ -225,9 +225,9 @@ BOutlineListView::AddItem(BListItem* item, int32 fullListIndex)
 			return true;
 	}
 
-	int32 list_index = FindPreviousVisibleIndex(fullListIndex);
+	int32 listIndex = FindPreviousVisibleIndex(fullListIndex);
 
-	return BListView::AddItem(item, IndexOf(FullListItemAt(list_index)) + 1);
+	return BListView::AddItem(item, IndexOf(FullListItemAt(listIndex)) + 1);
 }
 
 

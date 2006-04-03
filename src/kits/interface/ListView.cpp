@@ -450,7 +450,7 @@ BListView::TargetedByScrollView(BScrollView *view)
 	fScrollView = view;
 }
 
-// ScrollTo
+
 void
 BListView::ScrollTo(BPoint point)
 {
@@ -458,17 +458,17 @@ BListView::ScrollTo(BPoint point)
 	fWidth = Bounds().right;
 }
 
-// AddItem
+
 bool
 BListView::AddItem(BListItem *item, int32 index)
 {
 	if (!fList.AddItem(item, index))
 		return false;
 
-	if (fFirstSelected != -1 && index < fFirstSelected)
+	if (fFirstSelected != -1 && index <= fFirstSelected)
 		fFirstSelected++;
 
-	if (fLastSelected != -1 && index < fLastSelected)
+	if (fLastSelected != -1 && index <= fLastSelected)
 		fLastSelected++;
 
 	if (Window()) {
@@ -484,12 +484,14 @@ BListView::AddItem(BListItem *item, int32 index)
 	return true;
 }
 
-// AddItem
+
 bool
 BListView::AddItem(BListItem* item)
 {
 	if (!fList.AddItem(item))
 		return false;
+
+	// No need to adapt selection, as this item is the last in the list
 
 	if (Window()) {
 		BFont font;
@@ -763,18 +765,18 @@ BListView::InvalidateItem(int32 index)
 void
 BListView::ScrollToSelection()
 {
-	BRect item_frame = ItemFrame ( CurrentSelection ( 0 ) );
+	BRect itemFrame = ItemFrame(CurrentSelection(0));
 
-	if ( Bounds ().Intersects ( item_frame.InsetByCopy ( 0.0f, 2.0f ) ) )
+	if (Bounds().Intersects(itemFrame.InsetByCopy(0.0f, 2.0f)))
 		return;
 
-	if ( item_frame.top < Bounds ().top )
-		ScrollTo ( 0, item_frame.top );
+	if (itemFrame.top < Bounds().top)
+		ScrollTo(0, itemFrame.top);
 	else
-		ScrollTo ( 0, item_frame.bottom - Bounds ().Height () );
+		ScrollTo(0, itemFrame.bottom - Bounds().Height());
 }
 
-// Select
+
 void
 BListView::Select(int32 index, bool extend)
 {
@@ -784,7 +786,7 @@ BListView::Select(int32 index, bool extend)
 	InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
 }
 
-// Select
+
 void
 BListView::Select(int32 start, int32 finish, bool extend)
 {
@@ -799,11 +801,10 @@ bool
 BListView::IsItemSelected(int32 index) const
 {
 	BListItem *item = ItemAt(index);
-
 	if (item)
 		return item->IsSelected();
-	else
-		return false;
+
+	return false;
 }
 
 // CurrentSelection
