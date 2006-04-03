@@ -669,27 +669,24 @@ BMimeType::GetLongDescription(char *description) const
 status_t
 BMimeType::GetSupportingApps(BMessage *signatures) const
 {
-	status_t err = signatures ? B_OK : B_BAD_VALUE;
+	if (signatures == NULL)
+		return B_BAD_VALUE;
 
-	BMessage &msg = *signatures;
-	BMessage &reply = *signatures;
+	BMessage msg(B_REG_MIME_GET_SUPPORTING_APPS);
 	status_t result;
-	
-	// Build and send the message, read the reply
-	if (!err)
-		msg.what = B_REG_MIME_GET_SUPPORTING_APPS;
+
+	status_t err = InitCheck();
 	if (!err)
 		err = msg.AddString("type", Type());
 	if (!err) 
-		err = BRoster::Private().SendTo(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, signatures, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
+		err = signatures->what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
-		err = reply.FindInt32("result", &result);
+		err = signatures->FindInt32("result", &result);
 	if (!err) 
 		err = result;
-//	if (!err)
-//		err = reply.FindMessage("signatures", signatures);
+
 	return err;	
 }
 

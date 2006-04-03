@@ -1,20 +1,24 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file SupportingApps.cpp
-	SupportingApps class implementation
-*/
+/*
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-#include "mime/SupportingApps.h"
+
+#include <mime/SupportingApps.h>
+#include <mime/database_support.h>
+
+#include <storage_support.h>
 
 #include <Directory.h>
 #include <Message.h>
-#include <mime/database_support.h>
 #include <MimeType.h>
 #include <Path.h>
-#include <storage_support.h>
+#include <String.h>
 
 #include <new>
 #include <stdio.h>
@@ -57,13 +61,13 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 {
 	status_t err = type && apps ? B_OK : B_BAD_VALUE;
 	// See if we need to do our initial build still
-	if (!err && !fHaveDoneFullBuild) {
+	if (!err && !fHaveDoneFullBuild)
 		err = BuildSupportingAppsTable();
-	}
+
 	if (!err) {
 		// Clear the message, as we're just going to add to it
 		apps->MakeEmpty();
-		
+
 		BMimeType mime(type);
 		err = mime.InitCheck();
 		if (!err) {
@@ -89,7 +93,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 				}
 				if (!err)
 					err = apps->AddInt32(kSupportingAppsSubCountField, count);
-				
+
 				// Now add any apps that support the supertype, but not the
 				// subtype (plus their count).
 				BMimeType superMime;
@@ -150,7 +154,7 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 	status_t err = app && types ? B_OK : B_BAD_VALUE;
 	if (!fHaveDoneFullBuild)
 		return err;
-		
+
 	std::set<std::string> oldTypes;
 	std::set<std::string> &newTypes = fSupportedTypes[app];
 	std::set<std::string> &strandedTypes = fStrandedTypes[app];
@@ -164,46 +168,39 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 		// each type.
 		newTypes.clear();
 		const char *type;
-		for (int32 i = 0;
-			 types->FindString(kTypesField, i, &type) == B_OK;
-			 i++) {
+		for (int32 i = 0; types->FindString(kTypesField, i, &type) == B_OK;
+				i++) {
 			newTypes.insert(type);
 			AddSupportingApp(type, app);
 		}
-		
+
 		// Update the list of stranded types by removing any types that are newly
 		// re-supported and adding any types that are newly un-supported
 		for (std::set<std::string>::const_iterator i = newTypes.begin();
-			   i != newTypes.end();
-			     i++)
-		{
+				i != newTypes.end(); i++) {
 			strandedTypes.erase(*i);
 		}
 		for (std::set<std::string>::const_iterator i = oldTypes.begin();
-			   i != oldTypes.end();
-			     i++)
-		{
+				i != oldTypes.end(); i++) {
 			if (newTypes.find(*i) == newTypes.end())
 				strandedTypes.insert(*i);
-		}					
-				
+		}
+
 		// Now, if we're doing a full sync, remove the app as a supporting
 		// app for any of its stranded types and then clear said list of
 		// stranded types.
-		if (fullSync) {		
+		if (fullSync) {
 			for (std::set<std::string>::const_iterator i = strandedTypes.begin();
-				   i != strandedTypes.end();
-				     i++)
-			{
+					i != strandedTypes.end(); i++) {
 				RemoveSupportingApp((*i).c_str(), app);
 			}
 			strandedTypes.clear();
-		} 			
-	}	
+		}
+	}
 	return err;
 }
 
-// DeleteSupportedTypes
+
 /*! \brief Clears the given application's supported types list and optionally
 	removes the application from each of said types' supporting apps list.
 	\param app The application whose supported types you are clearing
@@ -264,14 +261,14 @@ SupportingApps::BuildSupportingAppsTable()
 	fSupportedTypes.clear();
 	fSupportingApps.clear();
 	fStrandedTypes.clear();
-	
+
 	BDirectory dir;
 	status_t err = dir.SetTo(kApplicationDatabaseDir.c_str());
-	
+
 	// Build the supporting apps table based on the mime database
 	if (!err) {
 		dir.Rewind();
-		
+
 		// Handle each application type
 		while (true) {		
 			entry_ref ref;
@@ -296,11 +293,13 @@ SupportingApps::BuildSupportingAppsTable()
 						// Iterate through the supported types, adding them to the list of
 						// supported types for the application and adding the application's
 						// signature to the list of supporting apps for each type
-						const char *type;
+						BString type;
 						std::set<std::string> &supportedTypes = fSupportedTypes[appName];
 						for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
-							supportedTypes.insert(type);
-							AddSupportingApp(type, appSig);						
+							type.ToLower();
+								// MIME types are case insensitive, so we lowercase everything
+							supportedTypes.insert(type.String());
+							AddSupportingApp(type.String(), appSig);						
 						}
 					}
 				}				
