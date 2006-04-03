@@ -88,14 +88,14 @@ dprintf_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 				memcpy(localBuffer, str, chunkSize);
 				localBuffer[chunkSize] = '\0';
 
-				debug_puts(localBuffer);
+				debug_puts(localBuffer, chunkSize);
 
 				str += chunkSize;
 				bytesLeft -= chunkSize;
 			}
 		} else {
 			// null-terminated chunk -- just write it
-			debug_puts(str);
+			debug_puts(str, chunkSize);
 
 			str += chunkSize + 1;
 			bytesLeft -= chunkSize + 1;

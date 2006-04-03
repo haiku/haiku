@@ -579,32 +579,30 @@ debug_debugger_running(void)
 
 
 void
-debug_puts(const char *string)
+debug_puts(const char *string, int32 length)
 {
-	cpu_status state;
-	int64 newHash;
-
-	// we only need the length for syslog
-	size_t length = 0;
-	if (sSyslogOutputEnabled)
-		length = strlen(string);
-
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	if (strncmp(sOutputBuffer, sLastOutputBuffer, OUTPUT_BUFFER_SIZE) == 0) {
+	if (length >= OUTPUT_BUFFER_SIZE)
+		length = OUTPUT_BUFFER_SIZE - 1;
+
+	if (strncmp(string, sLastOutputBuffer, length) == 0
+		&& length > 0 && string[length - 1] == '\n') {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
 		flush_pending_repeats();
 		kputs(string);
-		memcpy(sLastOutputBuffer, sOutputBuffer, OUTPUT_BUFFER_SIZE);
-	}
 
-	// kputs() doesn't output to syslog (as it's only used
-	// from the kernel debugger elsewhere)
-	if (sSyslogOutputEnabled)
-		syslog_write(sOutputBuffer, length);
+		// kputs() doesn't output to syslog (as it's only used
+		// from the kernel debugger elsewhere)
+		if (sSyslogOutputEnabled)
+			syslog_write(string, length);
+
+		memcpy(sLastOutputBuffer, string, length);
+		sLastOutputBuffer[length] = 0;
+	}
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
@@ -866,7 +864,6 @@ dprintf(const char *format, ...)
 {
 	cpu_status state;
 	va_list args;
-	int64 newHash;
 	int32 length;
 
 	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
@@ -883,7 +880,11 @@ dprintf(const char *format, ...)
 	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
-	if (strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0) {
+	if (length >= OUTPUT_BUFFER_SIZE)
+		length = OUTPUT_BUFFER_SIZE - 1;
+
+	if (strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0
+		&& length > 0 && sOutputBuffer[length - 1] == '\n') {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
@@ -897,6 +898,7 @@ dprintf(const char *format, ...)
 			blue_screen_puts(sOutputBuffer);
 
 		memcpy(sLastOutputBuffer, sOutputBuffer, length);
+		sLastOutputBuffer[length] = 0;
 	}
 
 	release_spinlock(&sSpinlock);
@@ -919,6 +921,7 @@ kprintf(const char *format, ...)
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
 
+	flush_pending_repeats();
 	kputs(sOutputBuffer);
 }
 
@@ -941,7 +944,7 @@ _user_debug_output(const char *userString)
 
 	do {
 		length = user_strlcpy(string, userString, sizeof(string));
-		debug_puts(string);
+		debug_puts(string, length);
 		userString += sizeof(string) - 1;
 	} while (length >= (ssize_t)sizeof(string));
 }
