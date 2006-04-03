@@ -6,17 +6,15 @@
 bool
 isLeapYear(const int year)
 {
-	if ((year % 400 == 0)||(year % 4 == 0 && year % 100 == 0))
-		return true;
-	else
-		return false;
+	int realYear = year + 1900;
+	return ((realYear % 400 == 0)||(realYear % 4 == 0 && realYear % 100 != 0));
 }
 
 
 int
 getDaysInMonth(const int month, const int year)
 {
-	if (month == 2 && isLeapYear(year)) {
+	if (month == 1 && isLeapYear(year)) {
 		return 29;
 	}
 	
