@@ -87,7 +87,7 @@ AddFilesToHaikuImage beos system add-ons kernel busses ide
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage beos system add-ons kernel file_systems : $(BEOS_ADD_ONS_FILESYSTEMS) ;
 AddFilesToHaikuImage beos system add-ons kernel generic
-	: block_io fast_log ide_adapter locked_pool scsi_periph ;
+	: block_io fast_log ide_adapter locked_pool mpu401 scsi_periph ;
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel ;
 AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
