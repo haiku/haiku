@@ -106,7 +106,7 @@ NodeManager::UnregisterNode(media_addon_id *addonid, int32 *flavorid, media_node
 	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		ERROR("NodeManager::UnregisterNode: couldn't finde node %ld (team %ld)\n", nodeid, team);
+		ERROR("NodeManager::UnregisterNode: couldn't find node %ld (team %ld)\n", nodeid, team);
 		return B_ERROR;
 	}
 	if (rn->team != team) {
