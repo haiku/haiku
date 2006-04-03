@@ -1984,7 +1984,7 @@ init_hardware(void)
 	
 	LOG_CREATE();
 
-	PRINT(("emuxki: init_hardware()\n"));
+	PRINT(("init_hardware()\n"));
 
 	if (get_module(pci_name, (module_info **)&pci))
 		return ENOSYS;
