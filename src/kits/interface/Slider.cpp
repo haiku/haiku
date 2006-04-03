@@ -876,9 +876,11 @@ BSlider::DrawHashMarks()
 	}
 
 	float pos = _MinPosition();
-	float factor = (_MaxPosition() - pos) / (fHashMarkCount - 1);
+	float factor = 0.0f;
+	if (fHashMarkCount > 1)
+		factor = (_MaxPosition() - pos) / (fHashMarkCount - 1);
 
-	if (fHashMarks & B_HASH_MARKS_TOP) {
+	if (fHashMarks & B_HASH_MARKS_TOP && fHashMarkCount > 0) {
 
 		view->BeginLineArray(fHashMarkCount * 2);
 
@@ -907,7 +909,7 @@ BSlider::DrawHashMarks()
 
 	pos = _MinPosition();
 
-	if (fHashMarks & B_HASH_MARKS_BOTTOM) {
+	if (fHashMarks & B_HASH_MARKS_BOTTOM && fHashMarkCount > 0) {
 		view->BeginLineArray(fHashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
