@@ -493,52 +493,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_UPDATE_COLORS:
-		{
-			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
-			// system colors
-			
-/*			STRACE(("ServerApp %s: Received global UI color update notification\n", Signature()));
-			ServerWindow *win;
-			BMessage msg(_COLORS_UPDATED);
-			
-			for(int32 i = 0; i < fWindowList.CountItems(); i++) {
-				win=(ServerWindow*)fWindowList.ItemAt(i);
-				win->Window()->UpdateColors();
-				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
-			}
-*/			break;
-		}
-		case AS_UPDATE_FONTS:
-		{
-			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
-			// system fonts
-			
-/*			STRACE(("ServerApp %s: Received global font update notification\n", Signature()));
-			ServerWindow *win;
-			BMessage msg(_FONTS_UPDATED);
-			
-			for(int32 i=0; i<fSWindowList->CountItems(); i++)
-			{
-				win=(ServerWindow*)fSWindowList->ItemAt(i);
-				win->Window()->UpdateFont();
-				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
-			}
-*/			break;
-		}
-		case AS_UPDATE_DECORATOR:
-		{
-			STRACE(("ServerApp %s: Received decorator update notification\n", Signature()));
+		// Decorator commands
 
-			// TODO: implement or remove AS_UPDATE_DECORATOR
-/*			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
-				ServerWindow *window = fWindowList.ItemAt(i);
-				window->Lock();
-				const_cast<WindowLayer *>(window->Window())->UpdateDecorator();
-				window->Unlock();
-			}
-*/			break;
-		}
 		case AS_SET_DECORATOR:
 		{
 			// Received from an application when the user wants to set the window
