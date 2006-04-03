@@ -416,9 +416,10 @@ BMenu::RemoveItems(int32 index, int32 count, bool del)
 bool
 BMenu::RemoveItem(BMenu *submenu)
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++)
-		if (static_cast<BMenuItem *>(fItems.ItemAt(i))->Submenu() == submenu)
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		if (static_cast<BMenuItem *>(fItems.ItemAtFast(i))->Submenu() == submenu)
 			return RemoveItems(i, 1, NULL, false);
+	}
 
 	return false;
 }
@@ -456,9 +457,10 @@ BMenu::IndexOf(BMenuItem *item) const
 int32
 BMenu::IndexOf(BMenu *submenu) const
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++)
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		if (ItemAt(i)->Submenu() == submenu)
 			return i;
+	}
 
 	return -1;
 }
@@ -1087,7 +1089,13 @@ BMenu::_show(bool selectFirstItem)
 				window->Unlock();
 			return false;
 		}
-		
+	
+		// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
+		// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
+		// This is needed to be able to draw the frame around the BMenu.
+		if (dynamic_cast<BMenuWindow *>(window) != NULL)
+			MoveTo(1, 1);
+	
 		// TODO: for some reason, Window() can already be NULL at this point,
 		//		which causes a crash in one of the following functions...
 		// Does this still happens ?
@@ -1230,25 +1238,20 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		window = Superitem()->fWindow;
 	else
 		window = Window();
-
-	if (locked)
-		UnlockLooper();
+	if (window != NULL)
+		item->Install(window);
 
 	item->SetSuper(this);
 
-	// if we need to install the item in another window, we don't
-	// want to keep our lock to prevent deadlocks
-	if (window && window->Lock()) {
-		item->Install(window);
-		
+	if (locked && window != NULL && !window->IsHidden()) {	
 		// Make sure we update the layout if needed.
-		//if (fResizeToFit) {
-			LayoutItems(index);
-			//UpdateWindowViewSize();
-			Invalidate();
-		//}
-		window->Unlock();
+		LayoutItems(index);
+		//UpdateWindowViewSize();
+		Invalidate();		
 	}
+
+	if (locked)
+		UnlockLooper();
 
 	return true;
 }
@@ -1303,8 +1306,9 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 		}
 	}
 
-	if (invalidateLayout && locked /*&& fResizeToFit*/) {
+	if (invalidateLayout && locked && window != NULL && !window->IsHidden()) {
 		LayoutItems(0);
+		//UpdateWindowViewSize();
 		Invalidate();
 	}
 
@@ -1324,12 +1328,6 @@ BMenu::LayoutItems(int32 index)
 	ComputeLayout(index, fResizeToFit, true, &width, &height);
 
 	ResizeTo(width, height);
-
-	// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
-	// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
-	// This is needed to be able to draw the frame around the BMenu.
-	if (dynamic_cast<BMenuWindow *>(Window()) != NULL)
-		MoveTo(1, 1);
 }
 
 
@@ -1847,6 +1845,12 @@ void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
 	BWindow *window = Window();
+	
+	ASSERT(window != NULL);
+	
+	if (window == NULL)
+		return;
+
 	bool scroll;
 	BRect frame = CalcFrame(ScreenLocation(), &scroll);
 	ResizeTo(frame.Width(), frame.Height());
