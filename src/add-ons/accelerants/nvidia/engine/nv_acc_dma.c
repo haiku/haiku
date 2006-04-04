@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-3/2006.
+   Rudolf Cornelissen 8/2003-4/2006.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -542,8 +542,12 @@ status_t nv_acc_init_dma()
 		ACCW(DEBUG0, 0x000001ff);
 
 		/* init some function blocks */
+		/* DEBUG0, b20 and b21 should be high, this has a big influence on
+		 * 3D rendering speed! (on all cards, confirmed) */
 		ACCW(DEBUG0, 0x1230c000);
-		ACCW(DEBUG1, 0x72111101);
+		/* DEBUG1, b19 = 1 increases 3D rendering speed on TNT2 (M64) a bit,
+		 * TNT1 rendering speed stays the same (all cards confirmed) */
+		ACCW(DEBUG1, 0x72191101);
 		ACCW(DEBUG2, 0x11d5f071);
 		ACCW(DEBUG3, 0x0004ff31);
 		/* init OP methods */
