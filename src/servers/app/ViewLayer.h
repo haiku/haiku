@@ -33,8 +33,8 @@ class ServerPicture;
 
 class ViewLayer {
  public:
-							ViewLayer(BRect frame, const char* name,
-								int32 token, uint32 resizeMode,
+							ViewLayer(BRect frame, BPoint scrollingOffset,
+								const char* name, int32 token, uint32 resizeMode,
 								uint32 flags);
 
 	virtual					~ViewLayer();

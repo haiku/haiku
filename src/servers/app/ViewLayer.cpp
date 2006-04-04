@@ -34,14 +34,15 @@
 
 using std::nothrow;
 
-ViewLayer::ViewLayer(BRect frame, const char* name,
+
+ViewLayer::ViewLayer(BRect frame, BPoint scrollingOffset, const char* name,
 		int32 token, uint32 resizeMode, uint32 flags)
 	:
 	fName(name),
 	fToken(token),
 
 	fFrame(frame),
-	fScrollingOffset(0.0, 0.0),
+	fScrollingOffset(scrollingOffset),
 
 	fViewColor(RGBColor(255, 255, 255)),
 	fDrawState(new (nothrow) DrawState),

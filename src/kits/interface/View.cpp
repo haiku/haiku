@@ -3463,6 +3463,8 @@ BView::MoveTo(float x, float y)
 void
 BView::ResizeBy(float deltaWidth, float deltaHeight)
 {
+	// TODO: this doesn't look like it would work correctly with scrolled views
+
 	// NOTE: I think this check makes sense, but I didn't
 	// test what R5 does.
 	if (fBounds.right + deltaWidth < 0)
@@ -3972,6 +3974,7 @@ BView::_CreateSelf()
 	fOwner->fLink->Attach<int32>(_get_object_token_(this));
 	fOwner->fLink->AttachString(Name());
 	fOwner->fLink->Attach<BRect>(Frame());
+	fOwner->fLink->Attach<BPoint>(LeftTop());
 	fOwner->fLink->Attach<uint32>(ResizingMode());
 	fOwner->fLink->Attach<uint32>(fEventMask);
 	fOwner->fLink->Attach<uint32>(fEventOptions);

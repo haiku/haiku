@@ -19,9 +19,9 @@
 #include <WindowPrivate.h>
 
 
-WorkspacesLayer::WorkspacesLayer(BRect frame, const char* name,
-		int32 token, uint32 resizeMode, uint32 flags)
-	: ViewLayer(frame, name, token, resizeMode, flags),
+WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
+		const char* name, int32 token, uint32 resizeMode, uint32 flags)
+	: ViewLayer(frame, scrollingOffset, name, token, resizeMode, flags),
 	fSelectedWindow(NULL),
 	fSelectedWorkspace(-1),
 	fHasMoved(false)

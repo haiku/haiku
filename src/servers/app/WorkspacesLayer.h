@@ -16,8 +16,8 @@ class WindowLayer;
 
 class WorkspacesLayer : public ViewLayer {
 	public:
-		WorkspacesLayer(BRect frame, const char* name, int32 token,
-			uint32 resize, uint32 flags);
+		WorkspacesLayer(BRect frame, BPoint scrollingOffset, const char* name,
+			int32 token, uint32 resize, uint32 flags);
 		virtual ~WorkspacesLayer();
 
 		virtual	void Draw(DrawingEngine* drawingEngine,

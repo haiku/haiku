@@ -476,10 +476,12 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 	int32 parentToken;
 	char* name = NULL;
 	rgb_color viewColor;
+	BPoint scrollingOffset;
 
 	link.Read<int32>(&token);
 	link.ReadString(&name);
 	link.Read<BRect>(&frame);
+	link.Read<BPoint>(&scrollingOffset);
 	link.Read<uint32>(&resizeMask);
 	link.Read<uint32>(&eventMask);
 	link.Read<uint32>(&eventOptions);
@@ -496,10 +498,11 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 	if (link.Code() == AS_LAYER_CREATE_ROOT
 		&& (fWindowLayer->Flags() & kWorkspacesWindowFlag) != 0) {
 		// this is a workspaces window!
-		newLayer = new (nothrow) WorkspacesLayer(frame, name, token, resizeMask,
-			flags);
+		newLayer = new (nothrow) WorkspacesLayer(frame, scrollingOffset, name,
+			token, resizeMask, flags);
 	} else {
-		newLayer = new (nothrow) ViewLayer(frame, name, token, resizeMask, flags);
+		newLayer = new (nothrow) ViewLayer(frame, scrollingOffset, name, token,
+			resizeMask, flags);
 	}
 
 	free(name);
