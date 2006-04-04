@@ -1,124 +1,107 @@
-/*******************************************************************************
-/
-/	File:			MenuItem.h
-/
-/   Description:    BMenuItem represents a single item in a BMenu.
-/                   BSeparatorItem is a cosmetic menu item that demarcates
-/                   groups of other items.
-/
-/	Copyright 1994-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
-
+/*
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MENU_ITEM_H
 #define _MENU_ITEM_H
  
-#include <BeBuild.h>
-#include <InterfaceDefs.h>
+
 #include <Archivable.h>
+#include <InterfaceDefs.h>
 #include <Invoker.h>
-#include <Menu.h>			/* For convenience */
+#include <Menu.h>
 
 class BMessage;
 class BWindow;
 
-/*----------------------------------------------------------------*/
-/*----- BMenuItem class ------------------------------------------*/
 
 class BMenuItem : public BArchivable, public BInvoker {
-public:
-						BMenuItem(	const char *label,
-									BMessage *message,
-									char shortcut = 0,
-									uint32 modifiers = 0);
-						BMenuItem(BMenu *menu, BMessage *message = NULL);
-						BMenuItem(BMessage *data);
-virtual					~BMenuItem();
-static	BArchivable		*Instantiate(BMessage *data);
-virtual	status_t		Archive(BMessage *data, bool deep = true) const;
-	
-virtual	void			SetLabel(const char *name);
-virtual	void			SetEnabled(bool state);
-virtual	void			SetMarked(bool state);
-virtual void			SetTrigger(char ch);
-virtual void			SetShortcut(char ch, uint32 modifiers);
+	public:
+							BMenuItem(const char* label, BMessage* message,
+								char shortcut = 0, uint32 modifiers = 0);
+							BMenuItem(BMenu* menu, BMessage* message = NULL);
+							BMenuItem(BMessage* data);
+		virtual				~BMenuItem();
 
-		const char		*Label() const;
-		bool			IsEnabled() const;
-		bool			IsMarked() const;
-		char			Trigger() const;
-		char			Shortcut(uint32 *modifiers = NULL) const;
-		
-		BMenu			*Submenu() const;
-		BMenu			*Menu() const;
-		BRect			Frame() const;
+		static BArchivable*	Instantiate(BMessage* archive);
+		virtual	status_t	Archive(BMessage* archive, bool deep = true) const;
 
-protected:
+		virtual	void		SetLabel(const char* name);
+		virtual	void		SetEnabled(bool enabled);
+		virtual	void		SetMarked(bool marked);
+		virtual void		SetTrigger(char trigger);
+		virtual void		SetShortcut(char shortcut, uint32 modifiers);
 
-virtual	void			GetContentSize(float *width, float *height);
-virtual	void			TruncateLabel(float max, char *new_label);
-virtual	void			DrawContent();
-virtual	void			Draw();
-virtual	void			Highlight(bool on);
-		bool			IsSelected() const;
-		BPoint			ContentLocation() const;
+		const char*			Label() const;
+		bool				IsEnabled() const;
+		bool				IsMarked() const;
+		char				Trigger() const;
+		char				Shortcut(uint32* _modifiers = NULL) const;
 
-/*----- Private or reserved -----------------------------------------*/
-private:
-friend class BMenu;
-friend class BPopUpMenu;
-friend class BMenuBar;
+		BMenu*				Submenu() const;
+		BMenu*				Menu() const;
+		BRect				Frame() const;
 
-virtual	void		_ReservedMenuItem1();
-virtual	void		_ReservedMenuItem2();
-virtual	void		_ReservedMenuItem3();
-virtual	void		_ReservedMenuItem4();
+	protected:
+		virtual	void		GetContentSize(float* _width, float* _height);
+		virtual	void		TruncateLabel(float maxWidth, char* newLabel);
+		virtual	void		DrawContent();
+		virtual	void		Draw();
+		virtual	void		Highlight(bool enabled);
+		bool				IsSelected() const;
+		BPoint				ContentLocation() const;
 
-					BMenuItem(const BMenuItem &);
-		BMenuItem	&operator=(const BMenuItem &);
+	private:
+		friend class BMenu;
+		friend class BPopUpMenu;
+		friend class BMenuBar;
 
-		void		InitData();
-		void		InitMenuData(BMenu *menu);
-		void		Install(BWindow *window);
+		virtual	void		_ReservedMenuItem1();
+		virtual	void		_ReservedMenuItem2();
+		virtual	void		_ReservedMenuItem3();
+		virtual	void		_ReservedMenuItem4();
 
-/*----- Protected function -----------------------------------------*/
-protected:
-virtual	status_t	Invoke(BMessage *msg = NULL);
+		void				Install(BWindow* window);
+		void				Uninstall();
+		void				SetSuper(BMenu* superMenu);
+		void				Select(bool select);
+		void				SetAutomaticTrigger(char trigger);
 
-/*----- Private or reserved -----------------------------------------*/
-private:
-		void		Uninstall();
-		void		SetSuper(BMenu *super);
-		void		Select(bool on);
-		void		DrawMarkSymbol(rgb_color bgColor);
-		void		DrawShortcutSymbol();
-		void		DrawSubmenuSymbol(rgb_color bgColor);
-		void		_DrawControlChar(char shortcut, BPoint where);
-		void		SetSysTrigger(char ch);
+	protected:
+		virtual	status_t	Invoke(BMessage *msg = NULL);
 
-		char		*fLabel;
-		BMenu		*fSubmenu;
-		BWindow		*fWindow;
-		BMenu		*fSuper;
-		BRect		fBounds;
-		uint32		fModifiers;
-		float		fCachedWidth;
-		int16		fTriggerIndex;
-		char		fUserTrigger;
-		char		fSysTrigger;
-		char		fShortcutChar;
-		bool		fMark;
-		bool		fEnabled;
-		bool		fSelected;
+	private:
+							BMenuItem(const BMenuItem& other);
+		BMenuItem&			operator=(const BMenuItem& other);
 
-		uint32		_reserved[4];
+		void				_InitData();
+		void				_InitMenuData(BMenu* menu);
+
+		void				_DrawMarkSymbol(rgb_color backgroundColor);
+		void				_DrawShortcutSymbol();
+		void				_DrawSubmenuSymbol(rgb_color backgroundColor);
+		void				_DrawControlChar(char shortcut, BPoint where);
+
+		char*				fLabel;
+		BMenu*				fSubmenu;
+		BWindow*			fWindow;
+		BMenu*				fSuper;
+		BRect				fBounds;
+		uint32				fModifiers;
+		float				fCachedWidth;
+		int16				fTriggerIndex;
+		char				fUserTrigger;
+		char				fAutomaticTrigger;
+		char				fShortcutChar;
+		bool				fMark;
+		bool				fEnabled;
+		bool				fSelected;
+
+		uint32				_reserved[4];
 };
 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
-
-// We moved BSeparatorItem's declaration to its own file, but for source
-// compatibility we have to export that class from here too.
+// BSeparatorItem now has its own declaration file, but for source
+// compatibility we're exporting that class from here too.
 #include <SeparatorItem.h>
 
 #endif /* _MENU_ITEM_H */

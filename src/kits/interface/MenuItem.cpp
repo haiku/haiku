@@ -89,7 +89,7 @@ const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 					 uint32 modifiers)
 {
-	InitData();
+	_InitData();
 	if (label != NULL)
 		fLabel = strdup(label);
 		
@@ -106,15 +106,15 @@ BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 
 BMenuItem::BMenuItem(BMenu *menu, BMessage *message)
 {
-	InitData();
+	_InitData();
 	SetMessage(message);
-	InitMenuData(menu);
+	_InitMenuData(menu);
 }
 
 
 BMenuItem::BMenuItem(BMessage *data)
 {
-	InitData();
+	_InitData();
 
 	if (data->HasString("_label")) {
 		const char *string;
@@ -163,7 +163,7 @@ BMenuItem::BMenuItem(BMessage *data)
 			BMenu *menu = dynamic_cast<BMenu *>(object);
 
 			if (menu != NULL)
-				InitMenuData(menu);
+				_InitMenuData(menu);
 		}
 	}
 }
@@ -174,8 +174,8 @@ BMenuItem::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenuItem"))
 		return new BMenuItem(data);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -249,7 +249,7 @@ BMenuItem::SetEnabled(bool state)
 		return;
 
 	fEnabled = state;
-	
+
 	if (fSubmenu != NULL)
 		fSubmenu->SetEnabled(state);
 
@@ -272,14 +272,14 @@ BMenuItem::SetMarked(bool state)
 
 
 void
-BMenuItem::SetTrigger(char ch)
+BMenuItem::SetTrigger(char trigger)
 {
-	fUserTrigger = ch;
+	fUserTrigger = trigger;
 
-	if (strchr(fLabel, ch) != 0)
-		fSysTrigger = ch;
+	if (strchr(fLabel, trigger) != 0)
+		fAutomaticTrigger = trigger;
 	else
-		fSysTrigger = -1;
+		fAutomaticTrigger = -1;
 
 	if (fSuper != NULL)
 		fSuper->InvalidateLayout();
@@ -482,13 +482,13 @@ BMenuItem::Draw()
 	// draw extra symbols
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
-			DrawMarkSymbol(bgColor);
+			_DrawMarkSymbol(bgColor);
 
 		if (fShortcutChar)
-			DrawShortcutSymbol();
+			_DrawShortcutSymbol();
 
 		if (Submenu())
-			DrawSubmenuSymbol(bgColor);
+			_DrawSubmenuSymbol(bgColor);
 	}
 }
 
@@ -534,7 +534,7 @@ BMenuItem::operator=(const BMenuItem &)
 
 
 void
-BMenuItem::InitData()
+BMenuItem::_InitData()
 {
 	fLabel = NULL;
 	fSubmenu = NULL;
@@ -544,7 +544,7 @@ BMenuItem::InitData()
 	fCachedWidth = 0;
 	fTriggerIndex = -1;
 	fUserTrigger = 0;
-	fSysTrigger = 0;
+	fAutomaticTrigger = 0;
 	fShortcutChar = 0;
 	fMark = false;
 	fEnabled = true;
@@ -553,7 +553,7 @@ BMenuItem::InitData()
 
 
 void
-BMenuItem::InitMenuData(BMenu *menu)
+BMenuItem::_InitMenuData(BMenu *menu)
 {
 	fSubmenu = menu;
 	fSubmenu->fSuperitem = this;
@@ -665,7 +665,7 @@ BMenuItem::Select(bool selected)
 
 
 void
-BMenuItem::DrawMarkSymbol(rgb_color bgColor)
+BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 {
 	fSuper->PushState();
 
@@ -700,7 +700,7 @@ BMenuItem::DrawMarkSymbol(rgb_color bgColor)
 
 
 void
-BMenuItem::DrawShortcutSymbol()
+BMenuItem::_DrawShortcutSymbol()
 {
 	// TODO: Review this
 	BPoint where = ContentLocation();
@@ -760,7 +760,7 @@ BMenuItem::DrawShortcutSymbol()
 
 
 void
-BMenuItem::DrawSubmenuSymbol(rgb_color bgColor)
+BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 {
 	fSuper->PushState();
 
@@ -821,7 +821,7 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 
 
 void
-BMenuItem::SetSysTrigger(char ch)
+BMenuItem::SetAutomaticTrigger(char ch)
 {
-	fSysTrigger = ch;
+	fAutomaticTrigger = ch;
 }

@@ -1805,7 +1805,7 @@ BMenu::CalcTriggers()
 		if (item->Trigger() == 0) {
 			const char *newTrigger = ChooseTrigger(item->Label(), &triggersList);
 			if (newTrigger != NULL) {
-				item->SetSysTrigger(*newTrigger);			
+				item->SetAutomaticTrigger(*newTrigger);			
 				// TODO: This is crap. I'd prefer to have 
 				// BMenuItem::SetSysTrigger(const char *) update fTriggerIndex.
 				// This isn't the case on beos, but it will probably be like that on haiku.
