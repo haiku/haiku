@@ -3629,46 +3629,64 @@ BView::MessageReceived(BMessage *msg)
 	status_t err;
 
 	if (!msg->HasSpecifiers()) {
-		if (msg->what == B_MOUSE_WHEEL_CHANGED) {
-			float deltaX = 0.0f, deltaY = 0.0f;
+		switch (msg->what) {
+			case B_VIEW_RESIZED:
+				// By the time the message arrives, the bounds may have
+				// changed already, that's why we don't use the values
+				// in the message itself.
+				FrameResized(fBounds.Width(), fBounds.Height());
+				break;
 
-			BScrollBar *horizontal = ScrollBar(B_HORIZONTAL);
-			if (horizontal != NULL)
-				msg->FindFloat("be:wheel_delta_x", &deltaX);
+			case B_VIEW_MOVED:
+				FrameMoved(fParentOffset);
+				break;
 
-			BScrollBar *vertical = ScrollBar(B_VERTICAL);
-			if (vertical != NULL)
-				msg->FindFloat("be:wheel_delta_y", &deltaY);
-
-			if (deltaX == 0.0f && deltaY == 0.0f)
-				return;
-
-			float smallStep, largeStep;
-			if (horizontal != NULL) {
-				horizontal->GetSteps(&smallStep, &largeStep);
-
-				// pressing the option key scrolls faster
-				if (modifiers() & B_OPTION_KEY)
-					deltaX *= largeStep;
-				else
-					deltaX *= smallStep * 3;
-
-				horizontal->SetValue(horizontal->Value() + deltaX);
+			case B_MOUSE_WHEEL_CHANGED:
+			{
+				float deltaX = 0.0f, deltaY = 0.0f;
+		
+				BScrollBar *horizontal = ScrollBar(B_HORIZONTAL);
+				if (horizontal != NULL)
+					msg->FindFloat("be:wheel_delta_x", &deltaX);
+		
+				BScrollBar *vertical = ScrollBar(B_VERTICAL);
+				if (vertical != NULL)
+					msg->FindFloat("be:wheel_delta_y", &deltaY);
+		
+				if (deltaX == 0.0f && deltaY == 0.0f)
+					return;
+		
+				float smallStep, largeStep;
+				if (horizontal != NULL) {
+					horizontal->GetSteps(&smallStep, &largeStep);
+		
+					// pressing the option key scrolls faster
+					if (modifiers() & B_OPTION_KEY)
+						deltaX *= largeStep;
+					else
+						deltaX *= smallStep * 3;
+		
+					horizontal->SetValue(horizontal->Value() + deltaX);
+				}
+		
+				if (vertical != NULL) {
+					vertical->GetSteps(&smallStep, &largeStep);
+		
+					// pressing the option key scrolls faster
+					if (modifiers() & B_OPTION_KEY)
+						deltaY *= largeStep;
+					else
+						deltaY *= smallStep * 3;
+		
+					vertical->SetValue(vertical->Value() + deltaY);
+				}
+				break;
 			}
 
-			if (vertical != NULL) {
-				vertical->GetSteps(&smallStep, &largeStep);
-
-				// pressing the option key scrolls faster
-				if (modifiers() & B_OPTION_KEY)
-					deltaY *= largeStep;
-				else
-					deltaY *= smallStep * 3;
-
-				vertical->SetValue(vertical->Value() + deltaY);
-			}
-		} else
-			BHandler::MessageReceived(msg);
+			default:
+				BHandler::MessageReceived(msg);
+				break;
+		}
 
 		return;
 	}
@@ -4014,8 +4032,12 @@ BView::_MoveTo(int32 x, int32 y)
 	fParentOffset.Set(x, y);
 
 	if (Window() != NULL && fFlags & B_FRAME_EVENTS) {
-		// TODO: CurrentMessage() is not what it used to be!
-		FrameMoved(BPoint(x, y));
+		BMessage moved(B_VIEW_MOVED);
+		moved.AddInt64("when", system_time());
+		moved.AddPoint("where", BPoint(x, y));
+
+		BMessenger target(this);
+		target.SendMessage(&moved);
 	}
 }
 
@@ -4045,8 +4067,13 @@ BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
 		child->_ParentResizedBy(deltaWidth, deltaHeight);
 
 	if (fFlags & B_FRAME_EVENTS) {
-		// TODO: CurrentMessage() is not what it used to be!
-		FrameResized(fBounds.Width(), fBounds.Height());
+		BMessage resized(B_VIEW_RESIZED);
+		resized.AddInt64("when", system_time());
+		resized.AddFloat("width", fBounds.Width());
+		resized.AddFloat("height", fBounds.Height());
+
+		BMessenger target(this);
+		target.SendMessage(&resized);
 	}
 }
 
