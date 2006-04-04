@@ -806,7 +806,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		if (fIsZooming) {
 			fDecorator->SetZoom(true);
 		} else if (fIsClosing) {
-			//fDecorator->SetClose(true);
+			fDecorator->SetClose(true);
 		} else if (fIsMinimizing) {
 			fDecorator->SetMinimize(true);
 		}
@@ -861,7 +861,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
 
 		if (fIsZooming) {
-			fIsZooming	= false;
+			fIsZooming = false;
 			fDecorator->SetZoom(false);
 			if (action == DEC_ZOOM) {
 				invalidate = true;
@@ -869,7 +869,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 			}
 		}
 		if (fIsClosing) {
-			fIsClosing	= false;
+			fIsClosing = false;
 			fDecorator->SetClose(false);
 			if (action == DEC_CLOSE) {
 				invalidate = true;
