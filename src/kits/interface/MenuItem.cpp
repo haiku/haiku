@@ -276,10 +276,14 @@ BMenuItem::SetTrigger(char trigger)
 {
 	fUserTrigger = trigger;
 
-	if (strchr(fLabel, trigger) != 0)
+	const char* pos = strchr(Label(), trigger);
+	if (pos != NULL) {
 		fAutomaticTrigger = trigger;
-	else
-		fAutomaticTrigger = -1;
+		fTriggerIndex = pos - Label();
+	} else {
+		fAutomaticTrigger = 0;
+		fTriggerIndex = -1;
+	}
 
 	if (fSuper != NULL)
 		fSuper->InvalidateLayout();
@@ -821,7 +825,13 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 
 
 void
-BMenuItem::SetAutomaticTrigger(char ch)
+BMenuItem::SetAutomaticTrigger(char trigger)
 {
-	fAutomaticTrigger = ch;
+	fAutomaticTrigger = trigger;
+
+	const char* pos = strchr(Label(), trigger);
+	if (pos != NULL)
+		fTriggerIndex = pos - Label();
+	else
+		fTriggerIndex = -1;
 }
