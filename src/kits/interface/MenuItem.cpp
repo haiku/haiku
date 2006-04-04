@@ -794,6 +794,8 @@ BMenuItem::DrawSubmenuSymbol(rgb_color bgColor)
 void
 BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 {
+	// TODO: If needed, take another font for the control characters
+	//	(or have font overlays in the app_server!)
 	const char* symbol = " ";
 
 	switch (shortcut) {
@@ -810,9 +812,7 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 			symbol = "\xe2\x86\x92";
 			break;
 		case B_ENTER:
-			// TODO: find a better one for this!
-			// If needed, take another font for the control characters
-			symbol = "\xe2\x86\x99";
+			symbol = "\xe2\x86\xb5";
 			break;
 	}
 
