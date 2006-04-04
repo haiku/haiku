@@ -1,16 +1,13 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DISK_DEVICE_DEFS_H
 #define _DISK_DEVICE_DEFS_H
 
+
 #include <SupportDefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef int32 partition_id;
 typedef int32 disk_system_id;
@@ -155,9 +152,5 @@ enum {
 
 // max size of parameter string buffers, including NULL terminator
 #define B_DISK_DEVICE_MAX_PARAMETER_SIZE (32 * 1024)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif	// _DISK_DEVICE_DEFS_H

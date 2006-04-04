@@ -1,15 +1,14 @@
-// disk_device_manager.h
-//
-// C API exported by the disk device manager.
-// Currently only functions of interest for partition modules/FS add-ons
-// are considered.
-
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DISK_DEVICE_MANAGER_H
 #define _DISK_DEVICE_MANAGER_H
 
+
+#include <DiskDeviceDefs.h>
 #include <Drivers.h>
 
-#include <storage/DiskDeviceDefs.h>
 
 #ifdef __cplusplus
 extern "C" {
