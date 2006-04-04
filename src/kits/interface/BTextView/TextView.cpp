@@ -3541,6 +3541,9 @@ BTextView::DoDeleteText(int32 fromOffset, int32 toOffset, _BTextChangeResult_ *o
 void
 BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool erase)
 {
+	if (!Window())
+		return;
+
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
