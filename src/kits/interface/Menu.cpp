@@ -1243,7 +1243,7 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 
 	item->SetSuper(this);
 
-	if (locked && window != NULL && !window->IsHidden()) {	
+	if (locked && window != NULL) {	
 		// Make sure we update the layout if needed.
 		LayoutItems(index);
 		//UpdateWindowViewSize();
@@ -1306,7 +1306,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 		}
 	}
 
-	if (invalidateLayout && locked && window != NULL && !window->IsHidden()) {
+	if (invalidateLayout && locked && window != NULL) {
 		LayoutItems(0);
 		//UpdateWindowViewSize();
 		Invalidate();
