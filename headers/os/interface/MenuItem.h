@@ -93,9 +93,9 @@ private:
 		void		DrawMarkSymbol(rgb_color bgColor);
 		void		DrawShortcutSymbol();
 		void		DrawSubmenuSymbol(rgb_color bgColor);
-		void		DrawControlChar(const char *control);
+		void		_DrawControlChar(char shortcut, BPoint where);
 		void		SetSysTrigger(char ch);
-		
+
 		char		*fLabel;
 		BMenu		*fSubmenu;
 		BWindow		*fWindow;
