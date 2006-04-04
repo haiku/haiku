@@ -39,11 +39,6 @@
 #define DBG(x)
 #define OUT printf
 
-// icon types
-enum {
-	B_MINI_ICON_TYPE	= 'MICN',
-	B_LARGE_ICON_TYPE	= 'ICON',
-};
 
 namespace BPrivate {
 namespace Storage {

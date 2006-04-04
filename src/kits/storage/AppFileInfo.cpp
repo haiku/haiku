@@ -1,11 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
-/*!
-	\file AppFileInfo.cpp
-	BAppFileInfo and related structures' implementation.
-*/
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 
 #include <new>
 #include <set>
@@ -47,8 +47,6 @@ static const int32 kLargeIconForTypeResourceID	= 0;
 // type codes
 enum {
 	B_APP_FLAGS_TYPE	= 'APPF',
-	B_MINI_ICON_TYPE	= 'MICN',
-	B_LARGE_ICON_TYPE	= 'ICON',
 	B_VERSION_INFO_TYPE	= 'APPV',
 };
 
