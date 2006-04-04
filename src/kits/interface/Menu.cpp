@@ -1818,18 +1818,16 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 	
 	if (title == NULL)
 		return NULL;
-		
-	char *titlePtr = const_cast<char *>(title);
-	
+
 	char trigger;
 	// TODO: Oh great, reinterpret_cast all around
-	while ((trigger = *titlePtr) != '\0') {
+	while ((trigger = title[0]) != '\0') {
 		if (!chars->HasItem(reinterpret_cast<void *>((uint32)trigger)))	{
 			chars->AddItem(reinterpret_cast<void *>((uint32)trigger));
-			return titlePtr;
+			return title;
 		}
-				
-		titlePtr++;
+
+		title++;
 	}
 
 	return NULL;
