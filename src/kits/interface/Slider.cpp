@@ -716,24 +716,26 @@ BSlider::Draw(BRect updateRect)
 void
 BSlider::DrawSlider()
 {
+	if (LockLooper()) {
 #if USE_OFF_SCREEN_VIEW
-	if (!fOffScreenBits)
-		return;
-	if (fOffScreenBits->Lock()) {
+		if (!fOffScreenBits)
+			return;
+		if (fOffScreenBits->Lock()) {
 #endif
-		DrawBar();
-		DrawHashMarks();
-		DrawThumb();
-		DrawFocusMark();
-		DrawText();
+			DrawBar();
+			DrawHashMarks();
+			DrawThumb();
+			DrawFocusMark();
+			DrawText();
 
 #if USE_OFF_SCREEN_VIEW
-		fOffScreenView->Sync();
-		fOffScreenBits->Unlock();
-
-		DrawBitmap(fOffScreenBits, B_ORIGIN);
+			fOffScreenView->Sync();
+			fOffScreenBits->Unlock();
+	
+			DrawBitmap(fOffScreenBits, B_ORIGIN);
+		}
+#endif
 	}
-#endif
 }
 
 
