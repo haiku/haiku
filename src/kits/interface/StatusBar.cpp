@@ -616,7 +616,7 @@ BStatusBar::SetTextData(char **dest, const char *source)
 		*dest = NULL;
 	}
 
-	if (source != NULL && source != NULL)
+	if (source != NULL && source[0] != NULL)
 		*dest = strdup(source);
 }
 
