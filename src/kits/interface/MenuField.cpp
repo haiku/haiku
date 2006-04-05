@@ -632,38 +632,34 @@ BMenuField::InitMenu(BMenu *menu)
 long
 BMenuField::MenuTask(void *arg)
 {
-	BMenuField *menuField = (BMenuField*)arg;
+	BMenuField *menuField = static_cast<BMenuField *>(arg);
 
-	if (!menuField->LockLooper())
-		return 0;
-
-	menuField->fSelected = true;
-	menuField->fTransition = true;
-	menuField->Invalidate();
-
-	menuField->UnlockLooper();
+	if (menuField->LockLooper()) {
+		menuField->fSelected = true;
+		menuField->fTransition = true;
+		menuField->Invalidate();
+		menuField->UnlockLooper();
+	}
 
 	bool tracking;
-
 	do {
 		snooze(20000);
 
 		if (!menuField->LockLooper())
-			return 0;
+			break;
 
 		tracking = menuField->fMenuBar->fTracking;
 
 		menuField->UnlockLooper();
 	} while (tracking);
 
-	if (!menuField->LockLooper())
-		return 0;
+	if (menuField->LockLooper()) {
+		menuField->fSelected = false;
+		menuField->fTransition = true;
+		menuField->Invalidate();	
+		menuField->UnlockLooper();
+	}
 
-	menuField->fSelected = false;
-	menuField->fTransition = true;
-	menuField->Invalidate();
-
-	menuField->UnlockLooper();
 	return 0;
 }
 
