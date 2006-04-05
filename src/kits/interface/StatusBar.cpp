@@ -339,7 +339,7 @@ BStatusBar::SetBarHeight(float height)
 
 
 void
-BStatusBar::SetText (const char *string)
+BStatusBar::SetText(const char *string)
 {
 	SetTextData(&fText, string);
 
@@ -616,7 +616,7 @@ BStatusBar::SetTextData(char **dest, const char *source)
 		*dest = NULL;
 	}
 
-	if (source != NULL)
+	if (source != NULL && source != NULL)
 		*dest = strdup(source);
 }
 
