@@ -371,11 +371,11 @@ BPopUpMenu::entry(void *arg)
 	
 	data->selected = menu->start_track(where, autoInvoke, startOpened, rect);
 	
-	delete_sem(data->lock);
-	
 	// Reset the window menu semaphore	
 	if (data->async && data->window)
 		_set_menu_sem_(data->window, B_BAD_SEM_ID);
+	
+	delete_sem(data->lock);
 	
 	// Commit suicide if needed	
 	if (menu->fAutoDestruct)

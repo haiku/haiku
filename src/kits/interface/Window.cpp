@@ -316,6 +316,12 @@ BWindow::~BWindow()
 {
 	Lock();
 
+	// Wait if a menu is still tracking
+	if (fMenuSem > 0) {
+		while (acquire_sem(fMenuSem) == B_INTERRUPTED)
+			;
+	}
+
 	fTopView->RemoveSelf();
 	delete fTopView;
 
@@ -327,10 +333,6 @@ BWindow::~BWindow()
 
 	// TODO: release other dynamically-allocated objects
 	free(fTitle);
-
-	// Deleting this semaphore will tell open menus to quit.
-	if (fMenuSem > 0)
-		delete_sem(fMenuSem);
 
 	// disable pulsing
 	SetPulseRate(0);
