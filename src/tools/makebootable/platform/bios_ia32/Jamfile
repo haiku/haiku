@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tools makebootable platform bios_ia32 ;
 
+UsePrivateHeaders storage ;
+
 SEARCH_SOURCE
 	+= [ FDirName $(HAIKU_TOP) src bin makebootable platform bios_ia32 ] ;
 
