@@ -6,19 +6,19 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Michael Lotz <mmlr@mlotz.ch>
- *
- * Description:
- *		BShape encapsulates a Postscript-style "path"
  */
 
-#include <stdlib.h>
-#include <string.h>
+/*! BShape encapsulates a Postscript-style "path" */
 
 #include <Shape.h>
+
+#include <Message.h>
 #include <Point.h>
 #include <Rect.h>
-#include <Errors.h>
-#include <Message.h>
+
+#include <new>
+#include <stdlib.h>
+#include <string.h>
 
 
 // NOTE: changing these defines will break Painter,
@@ -491,11 +491,18 @@ BShape::AllocatePts(int32 count)
 }
 
 
-//	#pragma mark -
-//	R4.5 compatibility
+//	#pragma mark - R4.5 compatibility
 
 
 #if __GNUC__ < 3
+
+extern "C" BShape*
+__6BShapeR6BShape(void* self, BShape& copyFrom)
+{
+	return new (self) BShape(copyFrom);
+		// we need to instantiate the object in the provided memory
+}
+
 
 extern "C" BRect
 Bounds__6BShape(BShape *self)

@@ -1726,13 +1726,6 @@ BSlider::_MaxPosition() const
 }
 
 
-extern "C"
-void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
-{
-	slider->BSlider::SetLimits(minimum, maximum);
-}
-
-
 void BSlider::_ReservedSlider5() {}
 void BSlider::_ReservedSlider6() {}
 void BSlider::_ReservedSlider7() {}
@@ -1749,3 +1742,20 @@ BSlider::operator=(const BSlider &)
 	return *this;
 }
 
+
+//	#pragma mark - R4.5 compatibility
+
+
+#if __GNUC__ < 3
+
+extern "C"
+void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
+{
+	slider->BSlider::SetLimits(minimum, maximum);
+}
+
+extern "C" void _ReservedSlider1__7BSlider() {}
+extern "C" void _ReservedSlider2__7BSlider() {}
+extern "C" void _ReservedSlider3__7BSlider() {}
+
+#endif	// __GNUC__ < 3
