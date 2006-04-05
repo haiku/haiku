@@ -1,12 +1,7 @@
 
-resource app_signature "application/x-vnd.Be-SYSL";
+resource app_signature "application/x-vnd.Haiku-SystemLogger";
 
 resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
-
-resource file_types message {
-	"types" = "application/x-be-resource",
-	"types" = "application/octet-stream"
-};
 
 resource app_version {
 	major  = 1,

@@ -18,7 +18,7 @@
 #include <string.h>
 
 
-const char *kSignature = "application/x-vnd.Be-SYSL";
+const char *kSignature = "application/x-vnd.Haiku-SystemLogger";
 
 
 SyslogDaemon::SyslogDaemon()
