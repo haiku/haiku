@@ -2407,6 +2407,8 @@ static void detect_panels()
 		/* determine panel aspect ratio */
 		si->ps.panel1_aspect =
 			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
+		/* force widescreen type if requested */
+		if (si->settings.force_ws) si->ps.panel1_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p1_timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p1_timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
@@ -2431,6 +2433,8 @@ static void detect_panels()
 		/* determine panel aspect ratio */
 		si->ps.panel2_aspect =
 			(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
+		/* force widescreen type if requested */
+		if (si->settings.force_ws) si->ps.panel2_aspect = 1.60;
 		/* horizontal timing */
 		si->ps.p2_timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
 		si->ps.p2_timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;

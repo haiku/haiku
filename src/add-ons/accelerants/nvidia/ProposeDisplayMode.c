@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-2/2006
+	Rudolf Cornelissen 9/2002-4/2006
 */
 
 #define MODULE_BIT 0x00400000
@@ -230,7 +230,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			}
 			break;
 		default: /* at least one analog monitor is connected, or nothing detected at all */
-			if (target_aspect > 1.34)
+				 /* (if forcing widescreen type was requested don't block mode) */
+			if ((target_aspect > 1.34) && !(si->settings.force_ws))
 			{
 				LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
 				return B_ERROR;

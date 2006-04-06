@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2006.
+	Rudolf Cornelissen 10/2002-4/2006.
 */
 
 #define MODULE_BIT 0x00800000
@@ -42,8 +42,8 @@ static status_t init_common(int the_fd) {
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead, si->settings.force_pci));
 	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d, dma_acc %d, tv_output %d, vga_on_tv %d\n",
 		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel, si->settings.dma_acc, si->settings.tv_output, si->settings.vga_on_tv));
-	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz\n",
-		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk));
+	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz, force_ws %d\n",
+		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk, si->settings.force_ws));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
