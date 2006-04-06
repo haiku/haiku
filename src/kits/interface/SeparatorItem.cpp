@@ -10,18 +10,21 @@
 
 /*!	Display separator item for BMenu class */
 
-#include <MenuItem.h>
+
+#include <SeparatorItem.h>
 
 
 BSeparatorItem::BSeparatorItem()
-	: BMenuItem("", NULL, 0, 0)
+	: BMenuItem("", NULL)
 {
+	BMenuItem::SetEnabled(false);
 }
 
 
 BSeparatorItem::BSeparatorItem(BMessage* archive)
 	: BMenuItem(archive)
 {
+	BMenuItem::SetEnabled(false);
 }
 
 
@@ -50,7 +53,7 @@ BSeparatorItem::Instantiate(BMessage* archive)
 void
 BSeparatorItem::SetEnabled(bool state)
 {
-	// Don't do anything
+	// Don't do anything - we don't want to get enabled ever
 }
 
 
@@ -120,6 +123,9 @@ BSeparatorItem::Draw()
 
 	menu->SetHighColor(oldColor);
 }
+
+
+//	#pragma mark - private
 
 
 void BSeparatorItem::_ReservedSeparatorItem1() {}
