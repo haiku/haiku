@@ -173,6 +173,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
+	case 0x004910de: /* Nvidia unknown FX */
+		si->ps.card_type = NV40;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV40");
+		status = nvxx_general_powerup();
+		break;
 	case 0x004d10de: /* Nvidia Quadro FX 4400 */
 	case 0x004e10de: /* Nvidia Quadro FX 4000 */
 		si->ps.card_type = NV40;
@@ -281,6 +288,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
+	case 0x00f510de: /* Nvidia GeForce FX 7800 GS AGP */
+		si->ps.card_type = NV47;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7800 GS AGP");
+		sprintf(si->adi.chipset, "NV47");
+		status = nvxx_general_powerup();
+		break;
 	case 0x00f810de: /* Nvidia Quadro FX 3400/4400 PCIe */
 		si->ps.card_type = NV45;
 		si->ps.card_arch = NV40A;
@@ -385,6 +399,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
+	case 0x014310de: /* Nvidia unknown FX */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV43");
+		status = nvxx_general_powerup();
+		break;
 	case 0x014410de: /* Nvidia GeForce FX 6600 Go */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
@@ -414,6 +435,15 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia GeForce FX 6600Go/6200Go");
+		sprintf(si->adi.chipset, "NV43");
+		status = nvxx_general_powerup();
+		break;
+	case 0x014b10de: /* Nvidia unknown FX */
+	case 0x014c10de: /* Nvidia unknown FX */
+	case 0x014d10de: /* Nvidia unknown FX */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
 		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
@@ -520,6 +550,16 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia GeForce 6250 Go");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x016b10de: /* Nvidia unknown FX Go */
+	case 0x016c10de: /* Nvidia unknown FX Go */
+	case 0x016d10de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -665,10 +705,32 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV48");
 		status = nvxx_general_powerup();
 		break;
+	case 0x022010de: /* Nvidia unknown FX */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
 	case 0x022110de: /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 6200 AGP 256Mb");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x022210de: /* Nvidia unknown FX */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x022810de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -958,12 +1020,28 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
+	case 0x034510de: /* Nvidia unknown FX */
+		si->ps.card_type = NV36;
+		si->ps.card_arch = NV30A;
+		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.chipset, "NV36");
+		status = nvxx_general_powerup();
+		break;
 	case 0x034710de: /* Nvidia GeForce FX 5700 Go */
 	case 0x034810de: /* Nvidia GeForce FX 5700 Go */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia GeForce FX 5700 Go");
+		sprintf(si->adi.chipset, "NV36");
+		status = nvxx_general_powerup();
+		break;
+	case 0x034910de: /* Nvidia unknown FX Go */
+	case 0x034b10de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV36;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia unknown FX Go");
 		sprintf(si->adi.chipset, "NV36");
 		status = nvxx_general_powerup();
 		break;
