@@ -79,8 +79,6 @@ ServerCursor::ServerCursor(const uint8* data)
 			return;
 
 		fInitialized = true;
-		uint32 black = 0xff000000;
-		uint32 white = 0xffffffff;
 
 		uint16* cursorBits = (uint16*)(data + 4);
 		uint16* transparencyBits = (uint16*)(data + 36);
@@ -99,13 +97,12 @@ ServerCursor::ServerCursor(const uint8* data)
 			// for each column in each row of cursor data
 			for (int32 i = 0; i < 16; i++, mask >>= 1) {
 				// Get the values and dump them to the bitmap
-				uint16 cursorBit = cursorLine & mask;
-				if (cursorBit)
-					bits[i] = black;
+				if (cursorLine & mask)
+					bits[i] = 0xff000000; // black
 				else if (transparencyLine & mask)
-					bits[i] = white;
+					bits[i] = 0xffffffff; // white
 				else
-					bits[i] = 0x00000000;
+					bits[i] = 0x00000000; // transparent
 			}
 		}
 
