@@ -32,6 +32,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 <ul>
 	<li>Hardware cursor support (on both heads on dualhead cards);
 	<li>Full 2D acceleration;
+	<li>Basic 3D acceleration for older cards: see the seperately available 3D accelerant's documentation for details;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
 	<li>DPMS support for both DVI and most laptop panels, and for analog connected screens (on both heads on dualhead cards), <strong>but not (yet?)</strong> for external DVI panels on laptops;
 	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6200, 6600 and 7800. Overlay output 'follows head' in dualhead stretch/switch modes;
@@ -222,6 +223,13 @@ If you select <strong>force_sync false</strong> the driver's 3D accelerant will 
 <ul>
 <li>Forcing vertical retrace synchronisation using the force_sync option 'overrules' retrace sync settings done in your applications: all applications will be synchronized to the vertical retrace events.
 </ul>
+	<li><strong>force_ws:</strong><br>
+This option (if enabled) overrules the aspect ratio detection for screens inside the driver. When set to <strong>true</strong> it forces all monitors to be treated as widescreen types.
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+If you select <strong>force_ws false</strong> the driver will autodetect the screen's aspect ratio if it can, otherwise it will force 4:3 aspect. Screens that are connected with a DVI cable and screens inside a laptop are autodetected (according to the cardBIOS presets done), but analog connected screens will always make the driver block widescreen modes. Connected analog TV sets are always treated like widescreen devices though.
+		<li><strong>true:</strong> With this setting all monitors are treated as being widescreen types. This setting should only be used if you are having trouble using a widescreen monitor, because on non-widescreen monitors there's a (small) chance of destroying them if used with a widescreen mode. So use this setting with care.
+	</ul>
 <li><strong>primary:</strong> (set to disabled by default)<br>
 Primary lets you force a certain card to be used as primary card in your system if you have multiple graphics cards installed: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also set 'usebios false' as otherwise the card(s) aren't coldstarted by the driver.<br>
 <strong>Note please:</strong>
@@ -234,6 +242,6 @@ Primary lets you force a certain card to be used as primary card in your system 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on February 14, 2006)</p>
+<p>(Page last updated on April 6, 2006)</p>
 </body>
 </html>
