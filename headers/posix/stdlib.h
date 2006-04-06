@@ -1,15 +1,17 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STDLIB_H_
 #define _STDLIB_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
-#include <sys/types.h>
-#include <div_t.h>
-#include <wchar_t.h>
-#include <stddef.h>
-#include <limits.h>
+
 #include <alloca.h>
+#include <div_t.h>
+#include <limits.h>
+#include <stddef.h>
+#include <sys/types.h>
+#include <wchar_t.h>
 
 
 #define RAND_MAX      0x7fffffff
@@ -83,9 +85,6 @@ extern long				strtol(const char *string, char **end, int base);
 extern unsigned long	strtoul(const char *string, char **end, int base);
 extern long long		strtoll(const char *string, char **end, int base);
 extern unsigned long long strtoull(const char *string, char **end, int base);
-
-// ToDo: we will eventually need this
-//extern int __ctype_get_mb_cur_max(void);
 
 /* random number generation */
 extern void		srand(unsigned int seed);
