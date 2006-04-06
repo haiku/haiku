@@ -1118,24 +1118,26 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 		bounds = bounds & clip;
 		fGraphicsCard->HideSoftwareCursor(bounds);
 
-		status_t result = bitmap->ImportBits(buffer->Bits(),
-			buffer->BitsLength(), buffer->BytesPerRow(), buffer->ColorSpace(),
-			bounds.LeftTop(), BPoint(0, 0), bounds.IntegerWidth() + 1,
-			bounds.IntegerHeight() + 1);
+		status_t result = bitmap->ImportBits(buffer->Bits(), buffer->BitsLength(),
+			buffer->BytesPerRow(), buffer->ColorSpace(),
+			bounds.LeftTop(), BPoint(0, 0), 
+			bounds.IntegerWidth() + 1, bounds.IntegerHeight() + 1);
 
 		if (drawCursor) {
 			ServerCursor *cursor = fGraphicsCard->Cursor();
-			int32 cursorWidth = cursor->Bounds().IntegerWidth();
-			int32 cursorHeight = cursor->Bounds().IntegerHeight();
+			int32 cursorWidth = cursor->Width();
+			int32 cursorHeight = cursor->Height();
 
 			BPoint cursorPosition = fGraphicsCard->GetCursorPosition();
 			cursorPosition -= bounds.LeftTop() + cursor->GetHotSpot();
 
-			BBitmap cursorArea(BRect(0, 0, cursorWidth, cursorHeight),
+			BBitmap cursorArea(BRect(0, 0, cursorWidth - 1, cursorHeight - 1),
 				B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-			cursorArea.ImportBits(bitmap->Bits(),  bitmap->BitsLength(),
-				bitmap->BytesPerRow(), bitmap->ColorSpace(), cursorPosition,
-				BPoint(0, 0), cursorWidth, cursorHeight);
+				
+			cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
+				bitmap->BytesPerRow(), bitmap->ColorSpace(),
+				cursorPosition,	BPoint(0, 0),
+				cursorWidth, cursorHeight);
 
 			uint8 *bits = (uint8 *)cursorArea.Bits();
 			uint8 *cursorBits = (uint8 *)cursor->Bits();
@@ -1152,7 +1154,8 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 			bitmap->ImportBits(cursorArea.Bits(), cursorArea.BitsLength(),
 				cursorArea.BytesPerRow(), cursorArea.ColorSpace(),
-				BPoint(0, 0), cursorPosition, cursorWidth, cursorHeight);
+				BPoint(0, 0), cursorPosition, 
+				cursorWidth, cursorHeight);
 		}
 
 		fGraphicsCard->ShowSoftwareCursor();
