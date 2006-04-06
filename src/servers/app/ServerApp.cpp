@@ -2454,7 +2454,7 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 	} else {
 		window = new ServerWindow(title, this, clientReplyPort, looperPort, token);
 		STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",
-			fSignature(), title, frame.left, frame.top,
+			Signature(), title, frame.left, frame.top,
 			frame.right, frame.bottom));
 	}
 
