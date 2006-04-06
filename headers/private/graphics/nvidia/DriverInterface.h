@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-2/2006.
+	Rudolf Cornelissen 10/2002-4/2006.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -198,6 +198,7 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   dma_acc;
 	bool   vga_on_tv;
 	bool   force_sync;
+	bool   force_ws;
 	uint32 gpu_clk;
 	uint32 ram_clk;
 } nv_settings;
