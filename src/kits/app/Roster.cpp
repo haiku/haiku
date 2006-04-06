@@ -1809,7 +1809,7 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 			error = get_thread_info(appThread, &threadInfo);
 			if (error == B_OK)
 				team = threadInfo.team;
-		} else if (appThread == B_NOT_AN_EXECUTABLE) {
+		} else if (wasDocument) {
 			error = B_LAUNCH_FAILED_EXECUTABLE;
 		} else
 			error = appThread;
@@ -2024,8 +2024,7 @@ BRoster::_ResolveApp(const char *inType, entry_ref *ref,
 */
 status_t
 BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
-	entry_ref *appRef, BFile *appFile,
-	bool *wasDocument) const
+	entry_ref *appRef, BFile *appFile, bool *_wasDocument) const
 {
 	if (ref == NULL || appMeta == NULL || appRef == NULL || appFile == NULL)
 		return B_BAD_VALUE;
@@ -2055,21 +2054,28 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 			// node is executable and a file -- we're done
 			*appRef = *ref;
 			error = appFile->SetTo(appRef, B_READ_ONLY);
-			if (wasDocument)
-				*wasDocument = false;
+
 			// get the app's signature via a BAppFileInfo
 			BAppFileInfo appFileInfo;
 			if (error == B_OK)
 				error = appFileInfo.SetTo(appFile);
-			char signature[B_MIME_TYPE_LENGTH];
+
+			char type[B_MIME_TYPE_LENGTH];
+			bool isDocument = true;
+
 			if (error == B_OK) {
 				// don't worry, if the file doesn't have a signature, just
 				// unset the supplied object
-				if (appFileInfo.GetSignature(signature) == B_OK)
-					error = appMeta->SetTo(signature);
+				if (appFileInfo.GetSignature(type) == B_OK)
+					error = appMeta->SetTo(type);
 				else
 					appMeta->Unset();
+				if (appFileInfo.GetType(type) == B_OK
+					&& !strcasecmp(type, B_APP_MIME_TYPE))
+					isDocument = false;
 			}
+			if (_wasDocument)
+				*_wasDocument = isDocument;
 		} else {
 			// the node is not exectuable or not a file
 			// init a node info
@@ -2096,8 +2102,8 @@ BRoster::_TranslateRef(entry_ref *ref, BMimeType *appMeta,
 					}
 				}
 			}
-			if (wasDocument)
-				*wasDocument = true;
+			if (_wasDocument)
+				*_wasDocument = true;
 		}
 	}
 	return error;
