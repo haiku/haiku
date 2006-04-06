@@ -34,20 +34,11 @@
  *
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";
-#endif /* LIBC_SCCS and not lint */
-
-//#include <sys/time.h>          /* for srandomdev() */
-//#include <fcntl.h>             /* for srandomdev() */
 #include <stdio.h>
 #include <stdlib.h>
-//#include <unistd.h>            /* for srandomdev() */
 
-/*
- * random.c:
- *
- * An improved random number generation package.  In addition to the standard
+
+/* An improved random number generation package.  In addition to the standard
  * rand()/srand() like interface, this package also has a special state info
  * interface.  The initstate() routine is called with a seed, an array of
  * bytes, and a count of how many bytes are being passed in; this array is
@@ -141,8 +132,8 @@ static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";
  */
 #define	MAX_TYPES	5		/* max number of types above */
 
-//static long degrees[MAX_TYPES] =	{ DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 };
-//static long seps [MAX_TYPES] =	{ SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 };
+static long degrees[MAX_TYPES] = { DEG_0, DEG_1, DEG_2, DEG_3, DEG_4 };
+static long seps [MAX_TYPES] = { SEP_0, SEP_1, SEP_2, SEP_3, SEP_4 };
 
 /*
  * Initially, everything is set up as if from:
@@ -287,7 +278,6 @@ srandom(unsigned int x)
  * a fixed seed.
  */
 #if 0
-/* not yet supported by NewOS */
 void
 srandomdev()
 {
@@ -321,6 +311,7 @@ srandomdev()
 		rptr = &state[0];
 	}
 }
+#endif
 
 /*
  * initstate:
@@ -346,10 +337,7 @@ srandomdev()
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-initstate(seed, arg_state, n)
-	unsigned long seed;		/* seed for R.N.G. */
-	char *arg_state;		/* pointer to state array */
-	long n;				/* # bytes of state info */
+initstate(unsigned int seed, char *arg_state, size_t n)
 {
 	register char *ostate = (char *)(&state[-1]);
 	register long *long_arg_state = (long *) arg_state;
@@ -448,7 +436,7 @@ setstate(arg_state)
 	end_ptr = &state[rand_deg];		/* set end_ptr too */
 	return(ostate);
 }
-#endif
+
 
 /*
  * random:
