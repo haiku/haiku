@@ -190,26 +190,26 @@ status_t nv_general_powerup()
 		break;
 	case 0x009110de: /* Nvidia GeForce 7800 GTX PCIe */
 	case 0x009210de: /* Nvidia Geforce 7800 GT PCIe */
-		si->ps.card_type = NV47;
+		si->ps.card_type = G70;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia Geforce 7800 GT PCIe");
-		sprintf(si->adi.chipset, "NV47");
+		sprintf(si->adi.chipset, "G70");
 		status = nvxx_general_powerup();
 		break;
 	case 0x009810de: /* Nvidia Geforce 7800 Go PCIe */
 	case 0x009910de: /* Nvidia Geforce 7800 GTX Go PCIe */
-		si->ps.card_type = NV47;
+		si->ps.card_type = G70;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia Geforce 7800 GTX Go PCIe");
-		sprintf(si->adi.chipset, "NV47");
+		sprintf(si->adi.chipset, "G70");
 		status = nvxx_general_powerup();
 		break;
 	case 0x009d10de: /* Nvidia Quadro FX 4500 */
-		si->ps.card_type = NV47;
+		si->ps.card_type = G70;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia Quadro FX 4500");
-		sprintf(si->adi.chipset, "NV47");
+		sprintf(si->adi.chipset, "G70");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00a010de: /* Nvidia Aladdin TNT2 */
@@ -289,10 +289,10 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f510de: /* Nvidia GeForce FX 7800 GS AGP */
-		si->ps.card_type = NV47;
+		si->ps.card_type = G70;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 7800 GS AGP");
-		sprintf(si->adi.chipset, "NV47");
+		sprintf(si->adi.chipset, "G70");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f810de: /* Nvidia Quadro FX 3400/4400 PCIe */

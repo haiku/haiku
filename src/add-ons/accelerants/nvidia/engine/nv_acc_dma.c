@@ -147,7 +147,7 @@ status_t nv_acc_init_dma()
 		}
 		else
 		{
-			/* NV41, 43, 44, 47 */
+			/* NV41, 43, 44, G70 and up */
 			ACCW(NV41_FBTIL0AD, 0);
 			ACCW(NV41_FBTIL1AD, 0);
 			ACCW(NV41_FBTIL2AD, 0);
@@ -173,15 +173,15 @@ status_t nv_acc_init_dma()
 			ACCW(NV41_FBTILAED, (si->ps.memory_size - 1));
 			ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
 
-			if (si->ps.card_type == NV47)
-			/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
+			//fixme: still confirm G73...
+			if (si->ps.card_type >= G70)
 			{
-				ACCW(NV47_FBTILCAD, 0);
-				ACCW(NV47_FBTILDAD, 0);
-				ACCW(NV47_FBTILEAD, 0);
-				ACCW(NV47_FBTILCED, (si->ps.memory_size - 1));
-				ACCW(NV47_FBTILDED, (si->ps.memory_size - 1));
-				ACCW(NV47_FBTILEED, (si->ps.memory_size - 1));
+				ACCW(G70_FBTILCAD, 0);
+				ACCW(G70_FBTILDAD, 0);
+				ACCW(G70_FBTILEAD, 0);
+				ACCW(G70_FBTILCED, (si->ps.memory_size - 1));
+				ACCW(G70_FBTILDED, (si->ps.memory_size - 1));
+				ACCW(G70_FBTILEED, (si->ps.memory_size - 1));
 			}
 		}
 	}
@@ -679,7 +679,7 @@ status_t nv_acc_init_dma()
 				ACCW(NV40P_WHAT3, 0x00000108);
 				break;
 			case NV44:
-			/* and ID == 0x01dx: but no cards defined yet */
+			case G72:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 
@@ -699,13 +699,14 @@ status_t nv_acc_init_dma()
 				ACCW(NV44_WHAT2, 0x00000000);
 				ACCW(NV44_WHAT3, 0x00000000);
 				break;
-*/			case NV47:
-			/* and ID == 0x029x: but no cards defined yet */
+*/			case G70:
+			case G71:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 				ACCW(NV40P_WHAT2, 0x07830610);
 				ACCW(NV40P_WHAT3, 0x0000016a);
 				break;
+			//fixme: still confirm G73...
 			default:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
@@ -783,17 +784,16 @@ status_t nv_acc_init_dma()
 		}
 		else
 		{
-			/* NV41, 43, 44, 47 */
-			if (si->ps.card_type == NV47)
-			/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
+			/* NV41, 43, 44, G70 and later */
+			if (si->ps.card_type >= G70) //fixme: still confirm G73...
 			{
 				for (cnt = 0; cnt < 60; cnt++)
 				{
-					/* copy NV41_FBTIL0AD upto/including NV47_FBTILEST */
+					/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
 					NV_REG32(NVACC_NV41_WHAT0 + (cnt << 2)) =
 						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 
-					/* copy NV41_FBTIL0AD upto/including NV47_FBTILEST */
+					/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
 					NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
 						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 				}
@@ -836,14 +836,13 @@ status_t nv_acc_init_dma()
 			}
 			else
 			{
-				/* NV41, 43, 44, 47 */
+				/* NV41, 43, 44, G70 and later */
 
 				/* copy some RAM configuration info(?) */
-				if (si->ps.card_type == NV47)
-				/* or ID == 0x01dx or ID == 0x029x: but no cards defined yet */
+				if (si->ps.card_type >= G70) //fixme: still confirm G73...
 				{
-					ACCW(NV47_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-					ACCW(NV47_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+					ACCW(G70_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+					ACCW(G70_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
 				}
 				else
 				{
@@ -1238,7 +1237,7 @@ static void nv_init_for_3D_dma(void)
 		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
 		 * probably auto-incremented! */
 		/* (pipe adress = b2-16, pipe data = b0-31) */
-		/* note: pipe adresses IGRAPH registers? */
+		/* note: pipe adresses IGRAPH registers! */
 		ACCW(NV10_PIPEADR, 0x00006740);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
@@ -1322,6 +1321,7 @@ static void nv_init_for_3D_dma(void)
 		ACCW(NV10_PIPEDAT, 0x00000000);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 
+		/* select primitive type that will be drawn (tri's) */
 		ACCW(NV10_PIPEADR, 0x00000040);
 		ACCW(NV10_PIPEDAT, 0x00000005);
 
