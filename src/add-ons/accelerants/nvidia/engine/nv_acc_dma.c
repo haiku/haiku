@@ -173,7 +173,6 @@ status_t nv_acc_init_dma()
 			ACCW(NV41_FBTILAED, (si->ps.memory_size - 1));
 			ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
 
-			//fixme: still confirm G73...
 			if (si->ps.card_type >= G70)
 			{
 				ACCW(G70_FBTILCAD, 0);
@@ -691,7 +690,7 @@ status_t nv_acc_init_dma()
 				ACCW(NV44_WHAT2, 0x00000000);
 				ACCW(NV44_WHAT3, 0x00000000);
 				break;
-/*			case NV44 type 2:
+/*			case NV44 type 2: (cardID 0x022x)
 				//fixme if needed: doesn't seem to need the strapinfo thing..
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
@@ -701,12 +700,12 @@ status_t nv_acc_init_dma()
 				break;
 */			case G70:
 			case G71:
+			case G73:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 				ACCW(NV40P_WHAT2, 0x07830610);
 				ACCW(NV40P_WHAT3, 0x0000016a);
 				break;
-			//fixme: still confirm G73...
 			default:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
@@ -785,7 +784,7 @@ status_t nv_acc_init_dma()
 		else
 		{
 			/* NV41, 43, 44, G70 and later */
-			if (si->ps.card_type >= G70) //fixme: still confirm G73...
+			if (si->ps.card_type >= G70)
 			{
 				for (cnt = 0; cnt < 60; cnt++)
 				{
@@ -839,7 +838,7 @@ status_t nv_acc_init_dma()
 				/* NV41, 43, 44, G70 and later */
 
 				/* copy some RAM configuration info(?) */
-				if (si->ps.card_type >= G70) //fixme: still confirm G73...
+				if (si->ps.card_type >= G70)
 				{
 					ACCW(G70_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
 					ACCW(G70_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
