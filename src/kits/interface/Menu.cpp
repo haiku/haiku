@@ -1156,17 +1156,6 @@ BMenu::_track(int *action, long start)
 		BPoint location;
 		GetMouse(&location, &buttons, false);
 		
-		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode())) {
-			UnlockLooper();
-			break;
-		} else if (buttons == 0) {
-			if (IsStickyPrefOn())
-				SetStickyMode(true);
-			else {
-				UnlockLooper();
-				break;
-			}
-		}
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
@@ -1209,6 +1198,15 @@ BMenu::_track(int *action, long start)
 			UnlockLooper();
 		
 		snooze(snoozeAmount);
+		
+		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode()))
+			break;
+		else if (buttons == 0) {
+			if (IsStickyPrefOn())
+				SetStickyMode(true);
+			else
+				break;
+		}
 	}
 
 	if (localAction == MENU_ACT_NONE && okay) {
