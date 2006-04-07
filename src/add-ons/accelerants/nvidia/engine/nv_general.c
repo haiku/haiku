@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.78 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.79 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -739,6 +739,21 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia unknown FX Go");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x024010de: /* Nvidia GeForce 6150 (NFORCE4 Integr.GPU) */
+	case 0x024110de: /* Nvidia GeForce 6150 LE (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6150");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x024210de: /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6100");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
