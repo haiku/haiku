@@ -673,6 +673,14 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "CRUSH, NV11");
 		status = nvxx_general_powerup();
 		break;
+	case 0x01d110de: /* Nvidia GeForce 7300 LE */
+	case 0x01df10de: /* Nvidia GeForce 7300 GS */
+		si->ps.card_type = G72;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7300");
+		sprintf(si->adi.chipset, "G72");
+		status = nvxx_general_powerup();
+		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
@@ -790,6 +798,14 @@ status_t nv_general_powerup()
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia Quadro4 700 GoGL");
 		sprintf(si->adi.chipset, "NV28");
+		status = nvxx_general_powerup();
+		break;
+	case 0x029010de: /* Nvidia GeForce 7900 GTX */
+	case 0x029110de: /* Nvidia GeForce 7900 GT */
+		si->ps.card_type = G71;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7900 GT(X)");
+		sprintf(si->adi.chipset, "G71");
 		status = nvxx_general_powerup();
 		break;
 	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
@@ -1065,6 +1081,13 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV30A;
 		sprintf(si->adi.name, "Nvidia unknown FX");
 		sprintf(si->adi.chipset, "NV36(?)");
+		status = nvxx_general_powerup();
+		break;
+	case 0x039110de: /* Nvidia GeForce 7600 GT */
+		si->ps.card_type = G73;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7600 GT");
+		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Elsa GmbH */
