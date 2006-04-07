@@ -551,15 +551,16 @@ PRINT(("  fOwnerCount now: %ld\n", fOwnerCount));
 		//	Set fOwner to invalid thread_id (< 0)
 		fOwner = -1;
 
+#if DEBUG < 1
 		//	Decrement requested lock count (using fAtomicCount for this)
 		int32 atomicCount = atomic_add(&fAtomicCount, -1);
 PRINT(("  fAtomicCount now: %ld\n", fAtomicCount));
 
-		//	Check if anyone is waiting for a lock
-		if (atomicCount > 1) {
-			//	release the lock
-			release_sem(fLockSem);
-		}
+		// Check if anyone is waiting for a lock
+		// and release if it's the case
+		if (atomicCount > 1)
+#endif
+			release_sem(fLockSem); 
 	}
 PRINT(("BLooper::Unlock() done\n"));
 }
@@ -1004,13 +1005,16 @@ status_t
 BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread, sem_id sem, bigtime_t timeout)
 {
 	status_t err = B_OK;
-	
+
+#if DEBUG < 1	
 	if (oldCount > 0) {
+#endif
 		do {	
 			err = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
 		} while (err == B_INTERRUPTED);
+#if DEBUG < 1
 	}
-	
+#endif	
 	if (err == B_OK) {
 		//		Assign current thread to fOwner
 		looper->fOwner = thread;
@@ -1052,7 +1056,11 @@ BLooper::InitData(const char *name, int32 priority, int32 portCapacity)
 	if (name == NULL)
 		name = "anonymous looper";
 
+#if DEBUG
+	fLockSem = create_sem(1, name);
+#else
 	fLockSem = create_sem(0, name);
+#endif
 
 	if (portCapacity <= 0)
 		portCapacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
@@ -1493,9 +1501,11 @@ BLooper::UnlockFully()
 	fOwnerCount = 0;
 	// Nobody owns the lock now
 	fOwner = -1;
+#if DEBUG < 1
 	// There is now one less thread holding a lock on this looper
 	int32 atomicCount = atomic_add(&fAtomicCount, -1);
 	if (atomicCount > 1)
+#endif
 		release_sem(fLockSem);
 }
 
