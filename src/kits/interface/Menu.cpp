@@ -1199,21 +1199,17 @@ BMenu::_track(int *action, long start)
 		
 		snooze(snoozeAmount);
 		
-		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode()))
+		if (buttons != 0 && IsStickyMode()) {
+			localAction = MENU_ACT_CLOSE;
 			break;
-		else if (buttons == 0) {
+		} else if (buttons == 0) {
 			if (IsStickyPrefOn())
 				SetStickyMode(true);
-			else
+			else {
+				localAction = MENU_ACT_CLOSE;
 				break;
+			}
 		}
-	}
-
-	if (localAction == MENU_ACT_NONE && okay) {
-		if (buttons != 0)
-			localAction = MENU_ACT_NONE;
-		else 
-			localAction = MENU_ACT_CLOSE;
 	}
 
 	if (action != NULL)
