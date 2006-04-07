@@ -3011,7 +3011,7 @@ static void pinsnv30_arch_fake(void)
 	si->ps.max_dac1_clock_32 = 280;
 	si->ps.max_dac1_clock_32dh = 250;
 	/* secondary head */
-	/* GeForceFX cards have dual integrated DACs with identical capaability */
+	/* GeForceFX cards have dual integrated DACs with identical capability */
 	/* (called nview technology) */
 	si->ps.max_dac2_clock = 350;
 	si->ps.max_dac2_clock_8 = 350;
