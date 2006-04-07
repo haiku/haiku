@@ -13,6 +13,7 @@
 
 #include "Decorator.h"
 #include "ViewLayer.h"
+#include "RegionPool.h"
 #include "ServerWindow.h"
 #include "WindowList.h"
 
@@ -55,10 +56,6 @@ class WindowLayer {
 			::Decorator*		Decorator() const { return fDecorator; }
 			::ServerWindow*		ServerWindow() const { return fWindow; }
 			::EventTarget&		EventTarget() const { return fWindow->EventTarget(); }
-
-			// for convenience, handles window not attached to Desktop
-			bool				ReadLockWindows();
-			void				ReadUnlockWindows();
 
 			// setting and getting the "hard" clipping, you need to have
 			// WriteLock()ed the clipping!
@@ -115,6 +112,16 @@ class WindowLayer {
 
 			DrawingEngine*		GetDrawingEngine() const
 									{ return fDrawingEngine; }
+
+			// managing a region pool
+			::RegionPool*		RegionPool()
+									{ return &fRegionPool; }
+	inline	BRegion*			GetRegion()
+									{ return fRegionPool.GetRegion(); }
+	inline	BRegion*			GetRegion(const BRegion& copy)
+									{ return fRegionPool.GetRegion(copy); }
+	inline	void				RecycleRegion(BRegion* region)
+									{ fRegionPool.Recycle(region); }
 
 			void				CopyContents(BRegion* region,
 											 int32 xOffset, int32 yOffset);
@@ -248,6 +255,8 @@ class WindowLayer {
 			BRegion				fEffectiveDrawingRegion;
 			bool				fEffectiveDrawingRegionValid;
 
+			::RegionPool		fRegionPool;
+
 			BObjectList<WindowLayer> fSubsets;
 
 // TODO: remove those some day (let the decorator handle that stuff)
@@ -322,8 +331,6 @@ class WindowLayer {
 			int32				fMaxWidth;
 			int32				fMinHeight;
 			int32				fMaxHeight;
-
-	mutable	bool				fReadLocked;
 };
 
 #endif // WINDOW_LAYER_H

@@ -50,6 +50,9 @@
 #	define STRACE(a) ;
 #endif
 
+#if !USE_MULTI_LOCKER
+#	define AutoWriteLocker BAutolock
+#endif
 
 class KeyboardFilter : public EventFilter {
 	public:
@@ -1850,18 +1853,14 @@ Desktop::ViewUnderMouse(const WindowLayer* window)
 WindowLayer *
 Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 {
-	LockSingleWindow();
-
 	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientToken() == token
 			&& window->ServerWindow()->ClientTeam() == teamID) {
-			UnlockSingleWindow();
 			return window;
 		}
 	}
 
-	UnlockSingleWindow();
 	return NULL;
 }
 
@@ -1869,7 +1868,7 @@ Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
 void
 Desktop::MinimizeApplication(team_id team)
 {
-	BAutolock locker(fWindowLock);
+	AutoWriteLocker locker(fWindowLock);
 
 	// Just minimize all windows of that application
 
@@ -1886,7 +1885,7 @@ Desktop::MinimizeApplication(team_id team)
 void
 Desktop::BringApplicationToFront(team_id team)
 {
-	BAutolock locker(fWindowLock);
+	AutoWriteLocker locker(fWindowLock);
 
 	// TODO: for now, just maximize all windows of that application
 
@@ -1929,7 +1928,7 @@ Desktop::WindowAction(int32 windowToken, int32 action)
 void
 Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 {
-	BAutolock locker(fWindowLock);
+	AutoWriteLocker locker(fWindowLock);
 
 	// compute the number of windows
 
@@ -1961,7 +1960,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 void
 Desktop::WriteWindowInfo(int32 serverToken, BPrivate::LinkSender& sender)
 {
-	BAutolock locker(fWindowLock);
+	AutoWriteLocker locker(fWindowLock);
 	BAutolock tokenLocker(BPrivate::gDefaultTokens);
 
 	::ServerWindow* window;

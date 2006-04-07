@@ -198,8 +198,12 @@ ViewLayer::AddChild(ViewLayer* layer)
 			// trigger redraw
 			BRect clippedFrame = layer->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
-			BRegion dirty(clippedFrame);
-			fWindow->MarkContentDirty(dirty);
+			BRegion* dirty = fWindow->GetRegion();
+			if (dirty) {
+				dirty->Set(clippedFrame);
+				fWindow->MarkContentDirty(*dirty);
+				fWindow->RecycleRegion(dirty);
+			}
 		}
 	}
 }
@@ -244,8 +248,12 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 			// trigger redraw
 			BRect clippedFrame = layer->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
-			BRegion dirty(clippedFrame);
-			fWindow->MarkContentDirty(dirty);
+			BRegion* dirty = fWindow->GetRegion();
+			if (dirty) {
+				dirty->Set(clippedFrame);
+				fWindow->MarkContentDirty(*dirty);
+				fWindow->RecycleRegion(dirty);
+			}
 		}
 	}
 
@@ -642,13 +650,19 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 		// clipping oldVisibleBounds to newVisibleBounds
 		// makes sure we don't copy parts hidden under
 		// parent views
-		BRegion copyRegion(oldVisibleBounds & newVisibleBounds);
-		fWindow->CopyContents(&copyRegion, x, y);
+		BRegion* region = fWindow->GetRegion();
+		if (region) {
+			region->Set(oldVisibleBounds & newVisibleBounds);
+			fWindow->CopyContents(region, x, y);
 
-		BRegion dirty(oldVisibleBounds);
-		newVisibleBounds.OffsetBy(x, y);
-		dirty.Exclude(newVisibleBounds);
-		dirtyRegion->Include(&dirty);
+			region->Set(oldVisibleBounds);
+			newVisibleBounds.OffsetBy(x, y);
+			region->Exclude(newVisibleBounds);
+			dirtyRegion->Include(dirty);
+
+			fWindow->RecycleRegion(region);
+		}
+
 #endif
 	}
 
@@ -681,32 +695,37 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		oldBounds.right -= x;
 		oldBounds.bottom -= y;
 
-		BRegion dirty(Bounds());
-		dirty.Include(oldBounds);
+		BRegion* dirty = fWindow->GetRegion();
+		if (!dirty)
+			return;
+
+		dirty->Set(Bounds());
+		dirty->Include(oldBounds);
 
 		if (!(fFlags & B_FULL_UPDATE_ON_RESIZE)) {
 			// the dirty region is just the difference of
 			// old and new bounds
-			dirty.Exclude(oldBounds & Bounds());
+			dirty->Exclude(oldBounds & Bounds());
 		}
 
 		InvalidateScreenClipping(true);
 
-		if (dirty.CountRects() > 0) {
+		if (dirty->CountRects() > 0) {
 			// exclude children, they are expected to
 			// include their own dirty regions in ParentResized()
 			for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 				if (child->IsVisible()) {
 					BRect previousChildVisible(child->Frame() & oldBounds & Bounds());
-					if (dirty.Frame().Intersects(previousChildVisible)) {
-						dirty.Exclude(previousChildVisible);
+					if (dirty->Frame().Intersects(previousChildVisible)) {
+						dirty->Exclude(previousChildVisible);
 					}
 				}
 			}
 
-			ConvertToScreen(&dirty);
-			dirtyRegion->Include(&dirty);
+			ConvertToScreen(dirty);
+			dirtyRegion->Include(dirty);
 		}
+		fWindow->RecycleRegion(dirty);
 	}
 
 	// layout the children
@@ -795,10 +814,16 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 	// find the dirty region as far as we are
 	// concerned
-	BRegion dirty(oldBounds);
+	BRegion* dirty = fWindow->GetRegion();
+	if (!dirty)
+		return;
+
+	dirty->Set(oldBounds);
 	stillVisibleBounds.OffsetBy(-x, -y);
-	dirty.Exclude(stillVisibleBounds);
-	dirtyRegion->Include(&dirty);
+	dirty->Exclude(stillVisibleBounds);
+	dirtyRegion->Include(dirty);
+
+	fWindow->RecycleRegion(dirty);
 
 	// the screen clipping of this view and it's
 	// childs is no longer valid
@@ -843,12 +868,18 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	BRect dirtyDst(dst);
 	ConvertToVisibleInTopView(&dirtyDst);
 
-	BRegion dirty(dirtyDst);
+	BRegion* dirty = fWindow->GetRegion();
+	if (!dirty)
+		return;
+
+	dirty->Set(dirtyDst);
 	// exclude the part that we could copy
 	visibleSrc.OffsetBy(xOffset, yOffset);
-	dirty.Exclude(visibleSrc);
-	dirty.IntersectWith(&ScreenClipping(&windowContentClipping));
-	fWindow->MarkContentDirty(dirty);
+	dirty->Exclude(visibleSrc);
+	dirty->IntersectWith(&ScreenClipping(&windowContentClipping));
+	fWindow->MarkContentDirty(*dirty);
+
+	fWindow->RecycleRegion(dirty);
 }
 
 
@@ -1024,8 +1055,12 @@ ViewLayer::SetHidden(bool hidden)
 					// trigger a redraw
 					BRect clippedBounds = Bounds();
 					ConvertToVisibleInTopView(&clippedBounds);
-					BRegion dirty(clippedBounds);
-					fWindow->MarkContentDirty(dirty);
+					BRegion* dirty = fWindow->GetRegion();
+					if (!dirty)
+						return;
+					dirty->Set(clippedBounds);
+					fWindow->MarkContentDirty(*dirty);
+					fWindow->RecycleRegion(dirty);
 				}
 			}
 		} else {

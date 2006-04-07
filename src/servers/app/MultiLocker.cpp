@@ -11,7 +11,7 @@
 #include <OS.h>
 
 //#define TIMING 1
-#define DEBUG 1
+//#define DEBUG 1
 
 
 MultiLocker::MultiLocker(const char* semaphoreBaseName)
@@ -132,6 +132,11 @@ MultiLocker::ReadLock()
 	if (fInit == B_OK) {
 		if (IsWriteLocked()) {
 			//the writer simply increments the nesting
+			#if DEBUG
+			if (fWriterNest < 0)
+				debugger("ReadLock() - negative writer nest count\n");
+			#endif
+	
 			fWriterNest++;
 			locked = true;
 		} else {
@@ -174,10 +179,22 @@ MultiLocker::WriteLock()
 
 		if (IsWriteLocked(&stack_base, &thread)) {
 			//already the writer - increment the nesting count
+			#if DEBUG
+			if (fWriterNest < 0)
+				debugger("WriteLock() - negative nest count\n");
+			#endif
+
 			fWriterNest++;
 			locked = true;
 		} else {
 			//new writer acquiring the lock
+			#if DEBUG
+				// NOTE: IsReadLocked() tells you
+				// if this thread really holds the
+				// "read lock" only in DEBUG mode!
+				if (IsReadLocked())
+					debugger("Reader wants to become writer!");
+			#endif
 			if (atomic_add(&fLockCount, 1) >= 1) {
 				//another writer in the lock - acquire the semaphore
 				locked = (acquire_sem_etc(fWriterLock, 1, B_DO_NOT_RESCHEDULE,
@@ -227,6 +244,12 @@ MultiLocker::ReadUnlock()
 	if (IsWriteLocked()) {
 		//writers simply decrement the nesting count
 		fWriterNest--;
+
+		#if DEBUG
+		if (fWriterNest < 0)
+			debugger("ReadUnlock() - negative writer nest count\n");
+		#endif
+
 		unlocked = true;	
 	} else {
 		//decrement and retrieve the read counter
@@ -237,7 +260,7 @@ MultiLocker::ReadUnlock()
 										B_DO_NOT_RESCHEDULE) == B_OK);
 		} else unlocked = true;
 	
-		#ifdef DEBUG
+		#if DEBUG
 			//unregister if we released the lock
 			if (unlocked) unregister_thread();
 		#endif
@@ -265,6 +288,12 @@ MultiLocker::WriteUnlock()
 		//if this is a nested lock simply decrement the nest count
 		if (fWriterNest > 0) {
 			fWriterNest--;
+
+			#if DEBUG
+			if (fWriterNest < 0)
+				debugger("WriteUnlock(): nest count now negative\n");
+			#endif
+
 			unlocked = true;
 		} else {
 			//writer finally unlocking
@@ -416,14 +445,16 @@ MultiLocker::IsReadLocked()
 void 
 MultiLocker::register_thread()
 {
-	#ifdef DEBUG	
+	#if DEBUG	
 		#if TIMING
 			bigtime_t start = system_time();
 		#endif
 
 		thread_id thread = find_thread(NULL);
 		
-		ASSERT_WITH_MESSAGE(fDebugArray[thread%fMaxThreads] == 0,"Nested ReadLock!\n");
+		if (fDebugArray[thread%fMaxThreads] != 0)
+			debugger("Nested ReadLock!\n");
+
 		fDebugArray[thread%fMaxThreads]++;
 	
 		#if TIMING
@@ -439,7 +470,7 @@ MultiLocker::register_thread()
 void 
 MultiLocker::unregister_thread()
 {
-	#ifdef DEBUG	
+	#if DEBUG	
 		#if TIMING
 			bigtime_t start = system_time();
 		#endif

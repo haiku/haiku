@@ -1,10 +1,20 @@
 /* MultiLocker.h */
 /*
+	Copyright 2005-2006, Haiku.
+	Distributed under the terms of the MIT license.
+
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-/* multiple-reader single-writer locking class */
+/** multiple-reader single-writer locking class */
+
+// IMPORTANT:
+//             * nested read locks are not supported
+//             * a reader becomming the write is not supported
+//             * nested write locks are supported
+//             * a writer can do read locks, even nested ones
+//             * in case of problems, #define DEBUG 1 in the .cpp
 
 #ifndef MULTI_LOCKER_H
 #define MULTI_LOCKER_H
@@ -31,7 +41,8 @@ class MultiLocker {
 		bool					WriteUnlock();
 
 		//does the current thread hold a write lock ?
-		bool					IsWriteLocked(uint32 *stack_base = NULL, thread_id *thread = NULL);
+		bool					IsWriteLocked(uint32 *stack_base = NULL,
+											  thread_id *thread = NULL);
 		//in DEBUG mode returns whether the lock is held
 		//in non-debug mode returns true
 		bool					IsReadLocked();
@@ -82,31 +93,41 @@ class MultiLocker {
 class AutoWriteLocker {
  public:
 								AutoWriteLocker(MultiLocker* lock)
+									: fLock(*lock)
+								{
+									fLock.WriteLock();
+								}
+								AutoWriteLocker(MultiLocker& lock)
 									: fLock(lock)
 								{
-									fLock->WriteLock();
+									fLock.WriteLock();
 								}
 								~AutoWriteLocker()
 								{
-									fLock->WriteUnlock();
+									fLock.WriteUnlock();
 								}
  private:
-	 	MultiLocker*			fLock;
+	 	MultiLocker&			fLock;
 };
 
 class AutoReadLocker {
  public:
 								AutoReadLocker(MultiLocker* lock)
+									: fLock(*lock)
+								{
+									fLock.ReadLock();
+								}
+								AutoReadLocker(MultiLocker& lock)
 									: fLock(lock)
 								{
-									fLock->ReadLock();
+									fLock.ReadLock();
 								}
 								~AutoReadLocker()
 								{
-									fLock->ReadUnlock();
+									fLock.ReadUnlock();
 								}
  private:
-	 	MultiLocker*			fLock;
+	 	MultiLocker&			fLock;
 };
 
 

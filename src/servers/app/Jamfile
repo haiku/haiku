@@ -38,6 +38,7 @@ Server app_server :
 	PNGDump.cpp
 	RAMLinkMsgReader.cpp
 	RGBColor.cpp
+	RegionPool.cpp
 	ScreenManager.cpp
 	ServerApp.cpp
 	ServerBitmap.cpp

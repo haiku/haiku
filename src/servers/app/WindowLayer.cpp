@@ -88,6 +88,8 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fEffectiveDrawingRegion(),
 	fEffectiveDrawingRegionValid(false),
 
+	fRegionPool(),
+
 	fIsClosing(false),
 	fIsMinimizing(false),
 	fIsZooming(false),
@@ -122,9 +124,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fMinWidth(1),
 	fMaxWidth(32768),
 	fMinHeight(1),
-	fMaxHeight(32768),
-
-	fReadLocked(false)
+	fMaxHeight(32768)
 {
 	// make sure our arguments are valid 
 	if (!IsValidLook(fLook))
@@ -172,29 +172,6 @@ WindowLayer::~WindowLayer()
 
 	delete fTopLayer;
 	delete fDecorator;
-}
-
-
-bool
-WindowLayer::ReadLockWindows()
-{
-	if (fDesktop)
-		fReadLocked = fDesktop->LockSingleWindow();
-	else
-		fReadLocked = true;
-
-	return fReadLocked;
-}
-
-
-void
-WindowLayer::ReadUnlockWindows()
-{
-	if (fReadLocked) {
-		if (fDesktop)
-			fDesktop->UnlockSingleWindow();
-		fReadLocked = false;
-	}
 }
 
 
@@ -413,29 +390,27 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 void
 WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 {
-	// this can be executed from any thread, but if the
-	// desktop thread is executing this, it should have
-	// the write lock, otherwise it is not prevented
-	// from executing this at the same time as the window
-	// is doing something else here!
+	// this is executed in ServerWindow with the Readlock
+	// held
 
 	if (!view || view == fTopLayer || (dx == 0 && dy == 0))
 		return;
 
-	if (fDesktop && fDesktop->LockSingleWindow()) {
-		BRegion dirty;
-		view->ScrollBy(dx, dy, &dirty);
+	BRegion* dirty = fRegionPool.GetRegion();
+	if (!dirty)
+		return;
+
+	view->ScrollBy(dx, dy, dirty);
 
 //fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 255, 255));
 //snooze(2000);
 
-		if (IsVisible() && view->IsVisible()) {
-			dirty.IntersectWith(&VisibleContentRegion());
-			_TriggerContentRedraw(dirty);
-		}
-
-		fDesktop->UnlockSingleWindow();
+	if (IsVisible() && view->IsVisible()) {
+		dirty->IntersectWith(&VisibleContentRegion());
+		_TriggerContentRedraw(*dirty);
 	}
+
+	fRegionPool.Recycle(dirty);
 }
 
 
@@ -443,64 +418,67 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 void
 WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 {
-	if (IsVisible() && fDesktop && fDesktop->LockSingleWindow()) {
-		BRegion newDirty(*region);
+	// executed in ServerWindow thread with the read lock held
+	if (!IsVisible())
+		return;
 
-		// clip the region to the visible contents at the
-		// source and destination location (note that VisibleContentRegion()
-		// is used once to make sure it is valid, then fVisibleContentRegion
-		// is used directly)
-		region->IntersectWith(&VisibleContentRegion());
+	BRegion* newDirty = fRegionPool.GetRegion(*region);
+
+	// clip the region to the visible contents at the
+	// source and destination location (note that VisibleContentRegion()
+	// is used once to make sure it is valid, then fVisibleContentRegion
+	// is used directly)
+	region->IntersectWith(&VisibleContentRegion());
+	if (region->CountRects() > 0) {
+		region->OffsetBy(xOffset, yOffset);
+		region->IntersectWith(&fVisibleContentRegion);
 		if (region->CountRects() > 0) {
-			region->OffsetBy(xOffset, yOffset);
-			region->IntersectWith(&fVisibleContentRegion);
-			if (region->CountRects() > 0) {
-				// if the region still contains any rects
-				// offset to source location again
-				region->OffsetBy(-xOffset, -yOffset);
-				// the part which we can copy is not dirty
-				newDirty.Exclude(region);
-		
-				fDrawingEngine->CopyRegion(region, xOffset, yOffset);
+			// if the region still contains any rects
+			// offset to source location again
+			region->OffsetBy(-xOffset, -yOffset);
+			// the part which we can copy is not dirty
+			newDirty->Exclude(region);
+	
+			fDrawingEngine->CopyRegion(region, xOffset, yOffset);
 
-				// move along the already dirty regions that are common
-				// with the region that we could copy
-				_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
-				if (fPendingUpdateSession.IsUsed())
-					_ShiftPartOfRegion(&fPendingUpdateSession.DirtyRegion(), region, xOffset, yOffset);
+			// move along the already dirty regions that are common
+			// with the region that we could copy
+			_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
+			if (fPendingUpdateSession.IsUsed())
+				_ShiftPartOfRegion(&fPendingUpdateSession.DirtyRegion(), region, xOffset, yOffset);
 
-				if (fCurrentUpdateSession.IsUsed()) {
-					// if there are parts in the current update session
-					// that intersect with the copied region, we cannot
-					// simply shift them as with the other dirty regions
-					// - we cannot change the update rect already told to the
-					// client, that's why we transfer those parts to the
-					// new dirty region instead
-					BRegion common(*region);
-					// see if there is a common part at all
-					common.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
-					if (common.CountRects() > 0) {
-						// cut the common part from the region
-						fCurrentUpdateSession.DirtyRegion().Exclude(&common);
-						newDirty.Include(&common);
-					}
+			if (fCurrentUpdateSession.IsUsed()) {
+				// if there are parts in the current update session
+				// that intersect with the copied region, we cannot
+				// simply shift them as with the other dirty regions
+				// - we cannot change the update rect already told to the
+				// client, that's why we transfer those parts to the
+				// new dirty region instead
+				BRegion* common = fRegionPool.GetRegion(*region);
+				// see if there is a common part at all
+				common->IntersectWith(&fCurrentUpdateSession.DirtyRegion());
+				if (common->CountRects() > 0) {
+					// cut the common part from the region
+					fCurrentUpdateSession.DirtyRegion().Exclude(common);
+					newDirty->Include(common);
 				}
+				fRegionPool.Recycle(common);
 			}
 		}
-		// what is left visible from the original region
-		// at the destination after the region which could be
-		// copied has been excluded, is considered dirty
-		// NOTE: it may look like dirty regions are not moved
-		// if no region could be copied, but that's alright,
-		// since these parts will now be in newDirty anyways
-		// (with the right offset)
-		newDirty.OffsetBy(xOffset, yOffset);
-		newDirty.IntersectWith(&fVisibleContentRegion);
-		if (newDirty.CountRects() > 0)
-			ProcessDirtyRegion(newDirty);
-
-		fDesktop->UnlockSingleWindow();
 	}
+	// what is left visible from the original region
+	// at the destination after the region which could be
+	// copied has been excluded, is considered dirty
+	// NOTE: it may look like dirty regions are not moved
+	// if no region could be copied, but that's alright,
+	// since these parts will now be in newDirty anyways
+	// (with the right offset)
+	newDirty->OffsetBy(xOffset, yOffset);
+	newDirty->IntersectWith(&fVisibleContentRegion);
+	if (newDirty->CountRects() > 0)
+		ProcessDirtyRegion(*newDirty);
+
+	fRegionPool.Recycle(newDirty);
 }
 
 
@@ -537,14 +515,11 @@ WindowLayer::ViewAt(const BPoint& where)
 {
 	ViewLayer* view = NULL;
 
-	if (ReadLockWindows()) {
-		if (!fContentRegionValid)
-			_UpdateContentRegion();
+	if (!fContentRegionValid)
+		_UpdateContentRegion();
 
-		view = fTopLayer->ViewAt(where, &fContentRegion);
+	view = fTopLayer->ViewAt(where, &fContentRegion);
 
-		ReadUnlockWindows();
-	}
 	return view;
 }
 
@@ -641,16 +616,18 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 void
 WindowLayer::RedrawDirtyRegion()
 {
-	if (!fDesktop || !fDesktop->LockSingleWindow())
-		return;
+	// executed from ServerWindow with the read lock held
 
 	if (IsVisible()) {
 		_DrawBorder();
 
-		BRegion dirtyContentRegion(VisibleContentRegion());
-		dirtyContentRegion.IntersectWith(&fDirtyRegion);
+		BRegion* dirtyContentRegion = 
+			fRegionPool.GetRegion(VisibleContentRegion());
+		dirtyContentRegion->IntersectWith(&fDirtyRegion);
 
-		_TriggerContentRedraw(dirtyContentRegion);
+		_TriggerContentRedraw(*dirtyContentRegion);
+
+		fRegionPool.Recycle(dirtyContentRegion);
 	}
 
 	// reset the dirty region, since
@@ -658,11 +635,9 @@ WindowLayer::RedrawDirtyRegion()
 	// thread wanted to mark something
 	// dirty in the mean time, it was
 	// blocking on the global region lock to
-	// get write access, since we held the
-	// read lock for the whole time.
+	// get write access, since we're holding
+	// the read lock for the whole time.
 	fDirtyRegion.MakeEmpty();
-
-	fDesktop->UnlockSingleWindow();
 }
 
 
@@ -685,23 +660,19 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 	// since this won't affect other windows, read locking
 	// is sufficient. If there was no dirty region before,
 	// an update message is triggered
-	if (!fHidden && fDesktop && fDesktop->LockSingleWindow()) {
-		regionOnScreen.IntersectWith(&VisibleContentRegion());
-		_TriggerContentRedraw(regionOnScreen);
+	if (fHidden)
+		return;
 
-		fDesktop->UnlockSingleWindow();
-	}
+	regionOnScreen.IntersectWith(&VisibleContentRegion());
+	_TriggerContentRedraw(regionOnScreen);
 }
 
 
 void
 WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 {
-	if (layer && IsVisible() && fDesktop && fDesktop->LockSingleWindow()) {
-		if (!layer->IsVisible()) {
-			fDesktop->UnlockSingleWindow();
-			return;
-		}
+	if (layer && IsVisible() && layer->IsVisible()) {
+
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
@@ -715,8 +686,6 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 
 			_TriggerContentRedraw(layerRegion);
 		}
-
-		fDesktop->UnlockSingleWindow();
 	}
 }
 
@@ -796,12 +765,12 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 
 		// redraw decorator
-		BRegion visibleBorder;
-		GetBorderRegion(&visibleBorder);
-		visibleBorder.IntersectWith(&VisibleRegion());
+		BRegion* visibleBorder = fRegionPool.GetRegion();
+		GetBorderRegion(visibleBorder);
+		visibleBorder->IntersectWith(&VisibleRegion());
 
 		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fDecorator->SetZoom(true);
@@ -812,6 +781,8 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 
 		fDrawingEngine->Unlock();
+
+		fRegionPool.Recycle(visibleBorder);
 
 		// based on what the Decorator returned, properly place this window.
 		if (action == DEC_MOVETOBACK) {
@@ -853,12 +824,12 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		click_type action = _ActionFor(message);
 
 		// redraw decorator
-		BRegion visibleBorder;
-		GetBorderRegion(&visibleBorder);
-		visibleBorder.IntersectWith(&VisibleRegion());
+		BRegion* visibleBorder = fRegionPool.GetRegion();
+		GetBorderRegion(visibleBorder);
+		visibleBorder->IntersectWith(&VisibleRegion());
 
 		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fIsZooming = false;
@@ -886,6 +857,8 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 		}
 
 		fDrawingEngine->Unlock();
+
+		fRegionPool.Recycle(visibleBorder);
 	}
 	fIsDragging = false;
 	fIsResizing = false;
@@ -923,12 +896,12 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	}
 
 	if (fDecorator) {
-		BRegion visibleBorder;
-		GetBorderRegion(&visibleBorder);
-		visibleBorder.IntersectWith(&VisibleRegion());
+		BRegion* visibleBorder = fRegionPool.GetRegion();
+		GetBorderRegion(visibleBorder);
+		visibleBorder->IntersectWith(&VisibleRegion());
 
 		fDrawingEngine->Lock();
-		fDrawingEngine->ConstrainClippingRegion(&visibleBorder);
+		fDrawingEngine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fDecorator->SetZoom(_ActionFor(message) == DEC_ZOOM);
@@ -939,6 +912,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		}
 
 		fDrawingEngine->Unlock();
+		fRegionPool.Recycle(visibleBorder);
 	}
 
 	BPoint delta = where - fLastMousePosition;
@@ -1071,9 +1045,12 @@ WindowLayer::SetFocus(bool focus)
 	// so the window thread cannot be
 	// accessing fIsFocus
 
-	BRegion dirty(fBorderRegion);
-	dirty.IntersectWith(&fVisibleRegion);
-	fDesktop->MarkDirty(dirty);
+	BRegion* dirty = fRegionPool.GetRegion(fBorderRegion);
+	if (dirty) {
+		dirty->IntersectWith(&fVisibleRegion);
+		fDesktop->MarkDirty(*dirty);
+		fRegionPool.Recycle(dirty);
+	}
 
 	fIsFocus = focus;
 	if (fDecorator)
@@ -1602,16 +1579,19 @@ void
 WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 								int32 xOffset, int32 yOffset)
 {
-	BRegion common(*regionToShift);
+	BRegion* common = fRegionPool.GetRegion(*regionToShift);
+	if (!common)
+		return;
 	// see if there is a common part at all
-	common.IntersectWith(region);
-	if (common.CountRects() > 0) {
+	common->IntersectWith(region);
+	if (common->CountRects() > 0) {
 		// cut the common part from the region,
 		// offset that to destination and include again
-		region->Exclude(&common);
-		common.OffsetBy(xOffset, yOffset);
-		region->Include(&common);
+		region->Exclude(common);
+		common->OffsetBy(xOffset, yOffset);
+		region->Include(common);
 	}
+	fRegionPool.Recycle(common);
 }
 
 
@@ -1655,19 +1635,22 @@ WindowLayer::_DrawBorder()
 		return;
 
 	// construct the region of the border that needs redrawing
-	BRegion dirtyBorderRegion;
-	GetBorderRegion(&dirtyBorderRegion);
+	BRegion* dirtyBorderRegion = fRegionPool.GetRegion();
+	if (!dirtyBorderRegion)
+		return;
+	GetBorderRegion(dirtyBorderRegion);
 	// intersect with our visible region
-	dirtyBorderRegion.IntersectWith(&fVisibleRegion);
+	dirtyBorderRegion->IntersectWith(&fVisibleRegion);
 	// intersect with the dirty region
-	dirtyBorderRegion.IntersectWith(&fDirtyRegion);
+	dirtyBorderRegion->IntersectWith(&fDirtyRegion);
 
-	if (dirtyBorderRegion.CountRects() > 0 && fDrawingEngine->Lock()) {
-		fDrawingEngine->ConstrainClippingRegion(&dirtyBorderRegion);
-		fDecorator->Draw(dirtyBorderRegion.Frame());
+	if (dirtyBorderRegion->CountRects() > 0 && fDrawingEngine->Lock()) {
+		fDrawingEngine->ConstrainClippingRegion(dirtyBorderRegion);
+		fDecorator->Draw(dirtyBorderRegion->Frame());
 
 		fDrawingEngine->Unlock();
 	}
+	fRegionPool.Recycle(dirtyBorderRegion);
 }
 
 
@@ -1730,15 +1713,10 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 	// NOTE: since we might "shift" parts of the
 	// internal dirty regions from the desktop thread
 	// in response to WindowLayer::ResizeBy(), which
-	// might move arround views, this function needs to block
-	// on the global clipping lock so that the internal
+	// might move arround views, the user of this function
+	// needs to hold the global clipping lock so that the internal
 	// dirty regions are not messed with from the Desktop thread
 	// and ServerWindow thread at the same time.
-	if (!fDesktop->LockSingleWindow()) {
-		link.StartMessage(B_ERROR);
-		link.Flush();
-		return;
-	}
 
 	if (fUpdateRequested) {
 		// make the pending update session the current update session
@@ -1760,8 +1738,15 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
-		BRegion dirty(fCurrentUpdateSession.DirtyRegion());
-		dirty.IntersectWith(&VisibleContentRegion());
+		BRegion* dirty = fRegionPool.GetRegion(
+			fCurrentUpdateSession.DirtyRegion());
+		if (!dirty) {
+			link.StartMessage(B_ERROR);
+			link.Flush();
+			return;
+		}
+
+		dirty->IntersectWith(&VisibleContentRegion());
 
 //fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
 
@@ -1772,10 +1757,10 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		link.Attach<float>(fFrame.Width());
 		link.Attach<float>(fFrame.Height());
 		// append he update rect in screen coords
-		link.Attach<BRect>(dirty.Frame());
+		link.Attach<BRect>(dirty->Frame());
 		// find and attach all views that intersect with
 		// the dirty region
-		fTopLayer->AddTokensForLayersInRegion(link, dirty, &fContentRegion);
+		fTopLayer->AddTokensForLayersInRegion(link, *dirty, &fContentRegion);
 		// mark the end of the token "list"
 		link.Attach<int32>(B_NULL_TOKEN);
 		link.Flush();
@@ -1783,17 +1768,17 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 #if DELAYED_BACKGROUND_CLEARING
 // NOTE: turning off DELAYED_BACKGROUND_CLEARING will
 // need investigation if it even still works...
-		fTopLayer->Draw(fDrawingEngine, &dirty,
+		fTopLayer->Draw(fDrawingEngine, dirty,
 						&fContentRegion, true);
-#endif		
+
+		fRegionPool.Recycle(dirty);
+#endif
 	} else {
 printf("BeginUpdate() but no update requested!!\n");
 		link.StartMessage(B_ERROR);
 		link.Flush();
 		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");
 	}
-
-	fDesktop->UnlockSingleWindow();
 }
 
 
@@ -1801,8 +1786,6 @@ void
 WindowLayer::EndUpdate()
 {
 	// NOTE: see comment in _BeginUpdate()
-	if (!fDesktop->LockSingleWindow())
-		return;
 
 	if (fInUpdate) {
 		fCurrentUpdateSession.SetUsed(false);
@@ -1816,8 +1799,6 @@ WindowLayer::EndUpdate()
 	} else {
 		fUpdateRequested = false;
 	}
-
-	fDesktop->UnlockSingleWindow();
 }
 
 

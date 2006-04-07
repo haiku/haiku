@@ -20,8 +20,8 @@ UseFreeTypeHeaders ;
 local defines = [ FDefines TEST_MODE=1 ] ;
 	# USE_DIRECT_WINDOW_TEST_MODE=1
 
-SubDirCcFlags $(defines) -fcheck-memory-usage -D_NO_INLINE_ASM ;
-SubDirC++Flags $(defines) -fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirCcFlags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
+SubDirC++Flags $(defines) ; #-fcheck-memory-usage -D_NO_INLINE_ASM ;
 
 SEARCH_SOURCE += $(appServerDir) [ FDirName $(appServerDir) drawing ] ;
 
@@ -112,6 +112,7 @@ Server haiku_app_server :
 	DefaultDecorator.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindowLayer.cpp
+	RegionPool.cpp
 	ServerPicture.cpp
 	ServerScreen.cpp
 	ViewLayer.cpp

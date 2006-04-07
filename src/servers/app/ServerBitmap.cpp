@@ -194,6 +194,7 @@ ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 		case B_YCbCr422:
 		case B_YUV422:
 			minBPR = (fWidth + 3) / 4 * 8;
+				// TODO: huh? why not simply fWidth * 2 ?!?
 			fBitsPerPixel = 16;
 			break;
 

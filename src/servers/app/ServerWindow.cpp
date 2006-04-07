@@ -51,7 +51,6 @@
 #include "ServerPicture.h"
 #include "ServerProtocol.h"
 #include "WindowLayer.h"
-#include "Workspace.h"
 #include "WorkspacesLayer.h"
 
 #include "ServerWindow.h"
@@ -386,8 +385,11 @@ ServerWindow::SetTitle(const char* newTitle)
 		rename_thread(Thread(), name);
 	}
 
-	if (fWindowLayer != NULL)
+	if (fWindowLayer != NULL) {
+fDesktop->UnlockSingleWindow();
 		fDesktop->SetWindowTitle(fWindowLayer, newTitle);
+fDesktop->LockSingleWindow();
+	}
 }
 
 
@@ -584,10 +586,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<bool>(&activate);
 
+fDesktop->UnlockSingleWindow();
 			if (activate)
 				fDesktop->ActivateWindow(fWindowLayer);
 			else
 				fDesktop->SendWindowBehind(fWindowLayer, NULL);
+fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_SEND_BEHIND:
@@ -602,7 +606,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			WindowLayer *behindOf;
 			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
+fDesktop->UnlockSingleWindow();
 				fDesktop->SendWindowBehind(fWindowLayer, behindOf);
+fDesktop->LockSingleWindow();
 				status = B_OK;
 			} else
 				status = B_NAME_NOT_FOUND;
@@ -617,23 +623,6 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			NotifyQuitRequested();
 			break;
 
-		case AS_BEGIN_TRANSACTION:
-		{
-			STRACE(("ServerWindow %s: Message AS_BEGIN_TRANSACTION unimplemented\n",
-				Title()));
-			// TODO: we could probably do a bit more here...
-// TODO: AS_BEGIN_TRANSACTION
-			//fWindowLayer->DisableUpdateRequests();
-			break;
-		}
-		case AS_END_TRANSACTION:
-		{
-			STRACE(("ServerWindow %s: Message AS_END_TRANSACTION unimplemented\n",
-				Title()));
-// TODO: AS_END_TRANSACTION
-			//fWindowLayer->EnableUpdateRequests();
-			break;
-		}
 		case AS_ENABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
@@ -683,8 +672,10 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					|| windowLayer->Feel() != B_NORMAL_WINDOW_FEEL) {
 					status = B_BAD_VALUE;
 				} else {
+fDesktop->UnlockSingleWindow();
 					status = fDesktop->AddWindowToSubset(fWindowLayer, windowLayer)
 						? B_OK : B_NO_MEMORY;
+fDesktop->LockSingleWindow();
 				}
 			}
 
@@ -702,7 +693,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				WindowLayer* windowLayer = fDesktop->FindWindowLayerByClientToken(
 					token, App()->ClientTeam());
 				if (windowLayer != NULL) {
+fDesktop->UnlockSingleWindow();
 					fDesktop->RemoveWindowFromSubset(fWindowLayer, windowLayer);
+fDesktop->LockSingleWindow();
 					status = B_OK;
 				} else
 					status = B_BAD_VALUE;
@@ -725,8 +718,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
+fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowLook(fWindowLayer, (window_look)look);
+fDesktop->LockSingleWindow();
+			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -744,8 +740,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
+fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowFeel(fWindowLayer, (window_feel)feel);
+fDesktop->LockSingleWindow();
+			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -763,8 +762,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					? B_OK : B_BAD_VALUE;
 			}
 
-			if (status == B_OK && !fWindowLayer->IsOffscreenWindow())
+			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
+fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowFlags(fWindowLayer, flags);
+fDesktop->LockSingleWindow();
+			}
 
 			fLink.StartMessage(status);
 			fLink.Flush();
@@ -801,7 +803,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
 				Title(), newWorkspaces));
 
+fDesktop->UnlockSingleWindow();
 			fDesktop->SetWindowWorkspaces(fWindowLayer, newWorkspaces);
+fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_WINDOW_RESIZE:
@@ -820,7 +824,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				// pragmatically set window bounds
 				fLink.StartMessage(B_BUSY);
 			} else {
+fDesktop->UnlockSingleWindow();
 				fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
+fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}
 			fLink.Flush();
@@ -842,7 +848,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				// pragmatically set window positions
 				fLink.StartMessage(B_BUSY);
 			} else {
+fDesktop->UnlockSingleWindow();
 				fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
+fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}
 			fLink.Flush();
@@ -901,22 +909,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 		case AS_BEGIN_UPDATE:
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
-// NOTE: when line below is turned on, the behaviour starts to
-// be very much like on R5, but if the client crashes in
-// one of it's BView's Draw() functions, AS_END_UPDATE is
-// never received and the app_server is toast! Maybe R5
-// does something like this, but if the write lock cannot
-// be optained within a certain amount of time, it crashes
-// whoever holds the read lock on purpose.
-
-//fDesktop->LockSingleWindow();
 			fWindowLayer->BeginUpdate(fLink);
 			break;
 
 		case AS_END_UPDATE:
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
 			fWindowLayer->EndUpdate();
-//fDesktop->UnlockSingleWindow();
 			break;
 
 		case AS_GET_MOUSE:
@@ -2697,7 +2695,6 @@ ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 		fCurrentDrawingRegionValid = false;
 #if 0
 #if DELAYED_BACKGROUND_CLEARING
-fWindowLayer->ReadLockWindows();
 		if (fCurrentLayer && fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
 			DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
 			if (drawingEngine->Lock()) {
@@ -2714,7 +2711,6 @@ fWindowLayer->ReadLockWindows();
 				drawingEngine->Unlock();
 			}
 		}
-fWindowLayer->ReadUnlockWindows();
 #endif
 #endif // 0
 	}

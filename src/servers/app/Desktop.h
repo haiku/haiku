@@ -31,7 +31,7 @@
 #include <Region.h>
 #include <Window.h>
 
-#define USE_MULTI_LOCKER 0
+#define USE_MULTI_LOCKER 1
 
 #if USE_MULTI_LOCKER
 #  include "MultiLocker.h"
