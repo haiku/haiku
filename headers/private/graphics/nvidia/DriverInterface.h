@@ -102,7 +102,10 @@ enum {
 	NV43,
 	NV44,
 	NV45,
-	NV47
+	G70,
+	G71,
+	G72,
+	G73
 };
 
 /* card_arch in order of date of NV chip design */
