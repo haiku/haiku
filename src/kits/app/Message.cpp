@@ -74,6 +74,13 @@ BMessage::BMessage()
 	_InitHeader();
 }
 
+BMessage::BMessage(BMessage *other)
+{
+	DEBUG_FUNCTION_ENTER;
+	_InitCommon();
+	_InitHeader();
+	*this = *other;
+}
 
 BMessage::BMessage(uint32 _what)
 {
