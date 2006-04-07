@@ -390,7 +390,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		BPoint where;
 		ulong buttons;
 		GetMouse(&where, &buttons);
-
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL && menuItem != fSelected) {
 			// only select the item
@@ -408,7 +407,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
 				window->Unlock();
-				if (IsStickyPrefOn())
+				if (IsStickyMode())
 					menu->SetStickyMode(true);
 				snoozeAmount = 0;
 				resultItem = menu->_track(&localAction);
@@ -419,9 +418,15 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			SelectItem(NULL);
 
 		window->Unlock();
-
-		if (localAction == MENU_ACT_CLOSE || buttons == 0)
+		
+		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode()))
 			break;
+		else if (buttons == 0) {
+			if (IsStickyPrefOn())
+				SetStickyMode(true);
+			else
+				break;
+		}
 
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);

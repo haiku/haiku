@@ -1138,7 +1138,7 @@ BMenu::_hide()
 BMenuItem *
 BMenu::_track(int *action, long start)
 {
-	// TODO: Take Sticky mode into account, cleanup
+	// TODO: cleanup
 	ulong buttons;
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
@@ -1146,13 +1146,27 @@ BMenu::_track(int *action, long start)
 	bigtime_t startTime = system_time();
 	bigtime_t delay = 200000; // TODO: Test and reduce if needed.
 
-	do {
-		if (!LockLooper())
+	bool okay = true;
+	while (true) {
+		bool locked = LockLooper();
+		if (!locked)
 			break;
 
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		GetMouse(&location, &buttons, false);
+		
+		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode())) {
+			UnlockLooper();
+			break;
+		} else if (buttons == 0) {
+			if (IsStickyPrefOn())
+				SetStickyMode(true);
+			else {
+				UnlockLooper();
+				break;
+			}
+		}
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
@@ -1169,6 +1183,9 @@ BMenu::_track(int *action, long start)
 			}
 		} else {
 			if (OverSuper(screenLocation)) {
+				okay = false;
+				localAction = MENU_ACT_NONE;
+				item = NULL;
 				UnlockLooper();
 				break;
 			}
@@ -1178,7 +1195,7 @@ BMenu::_track(int *action, long start)
 
 		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
 			UnlockLooper();
-
+			locked = false;
 			int submenuAction = MENU_ACT_NONE;
 			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction);
 			if (submenuAction == MENU_ACT_CLOSE) {
@@ -1186,17 +1203,15 @@ BMenu::_track(int *action, long start)
 				localAction = submenuAction;
 				break;
 			}
-
-			if (!LockLooper())
-				break;
 		}
 
-		UnlockLooper();
-
+		if (locked)
+			UnlockLooper();
+		
 		snooze(snoozeAmount);
-	} while (buttons != 0);
+	}
 
-	if (localAction == MENU_ACT_NONE) {
+	if (localAction == MENU_ACT_NONE && okay) {
 		if (buttons != 0)
 			localAction = MENU_ACT_NONE;
 		else 
@@ -1878,9 +1893,12 @@ BMenu::OkToProceed(BMenuItem* item)
 	BPoint where;
 	ulong buttons;
 	GetMouse(&where, &buttons, false);
-	// Quit if user releases the mouse button or moves
-	// the pointer over another item
-	if (buttons == 0 || HitTestItems(where) != item)
+	// Quit if user releases the mouse button (in nonsticky mode)
+	// or click the mouse button (in sticky mode)
+	// or moves the pointer over another item
+	if ((buttons == 0 && !IsStickyMode())
+		|| (buttons != 0 && IsStickyMode())
+		|| HitTestItems(where) != item)
 		proceed = false;
 	
 	return proceed;
