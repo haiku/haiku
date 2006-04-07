@@ -120,6 +120,7 @@ static uint16 nvidia_device_list[] = {
 	0x0045, /* Nvidia GeForce FX 6800 GT */
 	0x0046, /* Nvidia GeForce FX 6800 GT */
 	0x0048, /* Nvidia GeForce FX 6800 XT */
+	0x0049, /* Nvidia unknown FX */
 	0x004d, /* Nvidia Quadro FX 4400 */
 	0x004e, /* Nvidia Quadro FX 4000 */
 	0x0091, /* Nvidia GeForce 7800 GTX PCIe */
@@ -141,6 +142,7 @@ static uint16 nvidia_device_list[] = {
 	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
 	0x00f2, /* Nvidia GeForce FX 6600 AGP */
 	0x00f3, /* Nvidia GeForce 6200 */
+	0x00f5, /* Nvidia GeForce FX 7800 GS AGP */
 	0x00f8, /* Nvidia Quadro FX 3400/4400 PCIe */
 	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
 	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
@@ -160,12 +162,16 @@ static uint16 nvidia_device_list[] = {
 	0x0140, /* Nvidia GeForce FX 6600 GT */
 	0x0141, /* Nvidia GeForce FX 6600 */
 	0x0142, /* Nvidia GeForce FX 6600LE */
+	0x0143, /* Nvidia unknown FX */
 	0x0144, /* Nvidia GeForce FX 6600 Go */
 	0x0145, /* Nvidia GeForce FX 6610 XL */
 	0x0146, /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
 	0x0147, /* Nvidia GeForce FX 6700 XL */
 	0x0148, /* Nvidia GeForce FX 6600 Go */
 	0x0149, /* Nvidia GeForce FX 6600 GT Go */
+	0x014b, /* Nvidia unknown FX */
+	0x014c, /* Nvidia unknown FX */
+	0x014d, /* Nvidia unknown FX */
 	0x014e, /* Nvidia Quadro FX 540 */
 	0x014f, /* Nvidia GeForce 6200 PCIe (128Mb) */
 	0x0150, /* Nvidia GeForce2 GTS/Pro */
@@ -182,6 +188,9 @@ static uint16 nvidia_device_list[] = {
 	0x0167, /* Nvidia GeForce 6200 Go */
 	0x0168, /* Nvidia GeForce 6400 Go */
 	0x0169, /* Nvidia GeForce 6250 Go */
+	0x016b, /* Nvidia unknown FX Go */
+	0x016c, /* Nvidia unknown FX Go */
+	0x016d, /* Nvidia unknown FX Go */
 	0x016e, /* Nvidia unknown FX */
 	0x0170, /* Nvidia GeForce4 MX 460 */
 	0x0171, /* Nvidia GeForce4 MX 440 */
@@ -209,6 +218,8 @@ static uint16 nvidia_device_list[] = {
 	0x018c, /* Nvidia Quadro4 NVS 50 PCI */
 	0x018d, /* Nvidia GeForce4 448 Go */
 	0x01a0, /* Nvidia GeForce2 Integrated GPU */
+	0x01d1, /* Nvidia GeForce 7300 LE */
+	0x01df, /* Nvidia GeForce 7300 GS */
 	0x01f0, /* Nvidia GeForce4 MX Integrated GPU */
 	0x0200, /* Nvidia GeForce3 */
 	0x0201, /* Nvidia GeForce3 Ti 200 */
@@ -217,7 +228,13 @@ static uint16 nvidia_device_list[] = {
 	0x0211, /* Nvidia GeForce FX 6800 */
 	0x0212, /* Nvidia GeForce FX 6800LE */
 	0x0215, /* Nvidia GeForce FX 6800 GT */
+	0x0220, /* Nvidia unknown FX */
 	0x0221, /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
+	0x0222, /* Nvidia unknown FX */
+	0x0228, /* Nvidia unknown FX Go */
+	0x0240, /* Nvidia GeForce 6150 (NFORCE4 Integr.GPU) */
+	0x0241, /* Nvidia GeForce 6150 LE (NFORCE4 Integr.GPU) */
+	0x0242, /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
 	0x0252, /* Nvidia GeForce4 Ti 4600 */
@@ -232,6 +249,8 @@ static uint16 nvidia_device_list[] = {
 	0x0288, /* Nvidia Quadro4 980 XGL */
 	0x0289, /* Nvidia Quadro4 780 XGL */
 	0x028c, /* Nvidia Quadro4 700 GoGL */
+	0x0290, /* Nvidia GeForce 7900 GTX */
+	0x0291, /* Nvidia GeForce 7900 GT */
 	0x02a0, /* Nvidia GeForce3 Integrated GPU */
 	0x0301, /* Nvidia GeForce FX 5800 Ultra */
 	0x0302, /* Nvidia GeForce FX 5800 */
@@ -276,43 +295,31 @@ static uint16 nvidia_device_list[] = {
 	0x0342, /* Nvidia GeForce FX 5700 */
 	0x0343, /* Nvidia GeForce FX 5700LE */
 	0x0344, /* Nvidia GeForce FX 5700VE */
+	0x0345, /* Nvidia unknown FX */
 	0x0347, /* Nvidia GeForce FX 5700 Go */
 	0x0348, /* Nvidia GeForce FX 5700 Go */
+	0x0349, /* Nvidia unknown FX Go */
+	0x034b, /* Nvidia unknown FX Go */
 	0x034c, /* Nvidia Quadro FX 1000 Go */
 	0x034e, /* Nvidia Quadro FX 1100 */
 	0x034f, /* Nvidia unknown FX */
+	0x0391, /* Nvidia GeForce 7600 GT */
 	0
 };
 /*
 	not yet included nVidia ID's that are unknown, but used according to nvidia:
-	0x0049 //nv40
-	0x0090 //nv47
-	0x0093 //nv47
-	0x0094 //nv47
-	0x009c //nv47
-	0x009e //nv47
-	0x0143 //nv43
-	0x014b //nv43
-	0x014c //nv43
-	0x014d //nv43
-	0x016b //nv44 go
-	0x016c //nv44 go
-	0x016d //nv44 go
+	0x0090 //g70
+	0x0093 //g70
+	0x0094 //g70
+	0x009c //g70
+	0x009e //g70
 	0x0210 //nv48
 	0x021d //nv48 (existing? not in nvidia list)
 	0x021e //nv48 (existing? not in nvidia list)
-	0x0220 //nv44
-	0x0222 //nv44
-	0x0228 //nv44 go
-	0x0345 //nv36
-	0x0349 //nv36 go
-	0x034b //nv36 go.
 
 	The following ranges seem to exist as well, but no cards are defined yet:
 	0x012x //nv41?
-	0x01dx //nv44?
 	0x023x //nv44 type 2? (0x022x is also type 2)
-	0x029x //nv47?
 */
 
 static uint16 elsa_device_list[] = {
