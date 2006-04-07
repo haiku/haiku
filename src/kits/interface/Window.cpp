@@ -561,7 +561,6 @@ BWindow::BeginViewTransaction()
 			Unlock();
 			return;
 		}
-		fLink->StartMessage(AS_BEGIN_TRANSACTION);
 		fInTransaction = true;
 
 		Unlock();
@@ -577,7 +576,6 @@ BWindow::EndViewTransaction()
 			Unlock();
 			return;
 		}
-		fLink->StartMessage(AS_END_TRANSACTION);
 		fLink->Flush();
 		fInTransaction = false;		
 
