@@ -421,7 +421,7 @@ BNavMenu::StartBuildingItemList()
 		fContainer = new EntryIteratorList();
 		
 		while (volRoster.GetNextVolume(&volume) == B_OK) {
-			if (!volume.IsPersistent())
+			if (volume.IsReadOnly() || !volume.IsPersistent())
 				continue;
 			
 			BDirectory trashDir;
