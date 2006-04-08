@@ -4,12 +4,13 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.78, Rudolf)</h1></p>
+<p><h1>head (SVN 0.79, Rudolf)</h1></p>
 <ul>
 <li>Improved 3D speed related initialisation programming for NV11 and NV15: NV11 just gained 44% rendering speed, NV15 gained 21% speed. The GeForce2Ti (NV15) is the new winner: Quake 2 timedemo 1 runs at 28.3fps in 1024x768x32 mode @ 75Hz refreshrate (P4 2.8Ghz, fsb 533Mhz, AGP4x), while on the GeForce4MX (NV18) it keeps running at 26.3fps. The GeForce2MX (NV11) now runs at 18.9fps.
 <li>Improved 3D speed related initialisation programming again. This time confirmed for NV11, NV15 and NV18 (so works on probably all NV1x cards): NV11 just gained another 43% rendering speed, NV15 gained another 60% speed, and NV18 gained 41% speed. The GeForce2Ti (NV15) is the definate winner: Quake 2 timedemo 1 runs at 45.4fps in 1024x768x32 mode @ 75Hz refreshrate (P4 2.8Ghz, fsb 533Mhz, AGP4x), while on the GeForce4MX (NV18) it now runs at 37.0fps. The GeForce2MX (NV11) now runs at 27.1fps.
 <li>Improved 3D speed related initialisation programming for TNT2 and TNT2-M64 card types, TNT1 speed remains unchanged. The speed improvement depends on colorspace and exact card type: there's a 1-4% gain. TNT2 runs Quake 2 timedemo 1 at about 17fps in 1024x768x32 mode @ 75Hz refreshrate, while TNT2-M64 is at 10.2fps (P4 2.8Ghz, fsb 533Mhz, AGP mode).
 <li>Added new nv.setting called 'force_ws' that forces all your connected screens to be treated as being widescreen types. This enables listing of the widescreen modes in most screen preference panels and the use of these modes. Only use this new option if appropriate of course, non-widescreen monitors might not like them!
+<li>Added support for 23 new cards in the GeForce 6xxx and 7xxx range (7300 - G72; 7600 - G73; 7900 - G71), along with support for nVidia's latest IGP Nforce4 (GeForce 6100/6150 - NV44). All new ID's come from nVidia's own March 2006 ID release, except for one which was reported by a BeOS user.
 </ul>
 <p><h1>nv_driver 0.74 (Rudolf)</h1></p>
 <ul>
