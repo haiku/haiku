@@ -50,7 +50,7 @@ BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 	// TODO: Move initializer list and other stuff to InitObject
 	InitObject(label, trailingLabel);
 	
-		fBarColor.red = 50;
+	fBarColor.red = 50;
 	fBarColor.green = 150;
 	fBarColor.blue = 255;
 	fBarColor.alpha = 255;
@@ -61,6 +61,11 @@ BStatusBar::BStatusBar(BMessage *archive)
 	:	BView(archive),
 		fLabel(NULL),
 		fTrailingLabel(NULL),
+		fText(NULL),
+		fTrailingText(NULL),
+		fMax(100.0f),
+		fCurrent(0.0f),
+		fBarHeight(-1.0f),
 		fTrailingWidth(-1.0f),
 		fEraseText(-1.0f),
 		fEraseTrailingText(-1.0f),
