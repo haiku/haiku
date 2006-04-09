@@ -1,15 +1,31 @@
 
-resource file_types message
-{
+resource app_signature "application/x-vnd.Be-TRAK";
+
+resource app_version {
+	major      = 5,
+	middle     = 2,
+	minor      = 1,
+	variety    = B_APPV_FINAL,
+	internal   = 0,
+	short_info = "OpenTracker",
+	long_info  = "OpenTracker 5.2.1 for BeOS © 1991-2001 Be Inc."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource file_types message {
 	"types" = "application/x-vnd.Be-symlink",
 	"types" = "application/x-vnd.Be-directory",
 	"types" = "application/x-vnd.Be-query",
 	"types" = "application/x-vnd.Be-volume",
-	"types" = "application/x-vnd.Be-queryTemplate"
+	"types" = "application/x-vnd.Be-queryTemplate",
+	"types" = "application/x-vnd.Be-root",
+	"types" = "application/x-vnd.Be-elfexecutable",
+	"types" = "application/x-vnd.Be.printer",
+	"types" = "application/octet-stream"
 };
 
-resource large_icon array
-{
+resource large_icon array {
 	$"FFFF000000FFFFFFFFFFFFFFFFFFFFFF0000000000000000000000FFFFFFFFFF"
 	$"FF00D9D9D900FFFFFFFFFFFFFFFF0000838383838383008383D9D900FFFFFFFF"
 	$"00D9D98383000000000000FFFF00838383838383838383010000D9D900FFFFFF"
@@ -44,8 +60,7 @@ resource large_icon array
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource mini_icon array
-{
+resource mini_icon array {
 	$"FF0000FFFFFFFFFF000000000000FFFF"
 	$"00D900000000FF008383D900838300FF"
 	$"00D98383838300D900D983AA00AA00FF"
@@ -64,17 +79,3 @@ resource mini_icon array
 	$"FFFFFFFFFFFFFF00000E0F0F0FFFFFFF"
 };
 
-resource app_signature "application/x-vnd.Be-TRAK";
-
-resource app_version
-{
-        major      = 5,
-        middle     = 2,
-        minor      = 1,
-        variety    = B_APPV_FINAL,
-        internal   = 0,
-        short_info = "OpenTracker",
-        long_info  = "OpenTracker 5.2.1 for BeOS © 1991-2001 Be Inc."
-};
-
-resource app_flags B_SINGLE_LAUNCH;
