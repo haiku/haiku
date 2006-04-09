@@ -8,7 +8,7 @@ resource app_version {
 	variety    = B_APPV_FINAL,
 	internal   = 0,
 	short_info = "OpenTracker",
-	long_info  = "OpenTracker 5.2.1 for BeOS © 1991-2001 Be Inc."
+	long_info  = "OpenTracker 5.2.1 for Haiku © 1991-2001 Be Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
