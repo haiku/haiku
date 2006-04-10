@@ -653,8 +653,8 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// if the vnode won't be deleted, in which case the changes
 	// will be discarded
 
-	if (vnode->cache && !vnode->remove)
-		vm_cache_write_modified(vnode->cache);
+	if (!vnode->remove && FS_CALL(vnode, fsync) != NULL)
+		FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
 
 	if (!vnode->unpublished) {
 		if (vnode->remove)
@@ -1236,8 +1236,9 @@ normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 }
 
 
-/**	Disconnects all file descriptors that go the \a vnodeToDisconnect, or
- *	if this is NULL, all vnodes of the specified \a mount object.
+/**	Disconnects all file descriptors that are associated with the 
+ *	\a vnodeToDisconnect, or if this is NULL, all vnodes of the specified
+ *	\a mount object.
  *
  *	Note, after you've called this function, there might still be ongoing
  *	accesses - they won't be interrupted if they already happened before.
@@ -5491,16 +5492,41 @@ fs_sync(dev_t device)
 
 	mutex_unlock(&sMountMutex);
 
-	// synchronize all vnodes
-	recursive_lock_lock(&mount->rlock);
-	
-	struct vnode *vnode = NULL;
-	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
-		if (vnode->cache)
-			vm_cache_write_modified(vnode->cache);
+	struct vnode *previousVnode = NULL;
+	while (true) {
+		// synchronize access to vnode list
+		recursive_lock_lock(&mount->rlock);
+
+		struct vnode *vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
+			previousVnode);
+
+		vnode_id id = -1;
+		if (vnode != NULL)
+			id = vnode->id;
+
+		recursive_lock_unlock(&mount->rlock);
+
+		if (vnode == NULL)
+			break;
+
+		// acquire a reference to the vnode
+
+		if (get_vnode(mount->id, id, &vnode, true) == B_OK) {
+			if (previousVnode != NULL)
+				put_vnode(previousVnode);
+
+			if (FS_CALL(vnode, fsync) != NULL)
+				FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+
+			// the next vnode might change until we lock the vnode list again,
+			// but this vnode won't go away since we keep a reference to it.
+			previousVnode = vnode;
+		}
 	}
 
-	recursive_lock_unlock(&mount->rlock);
+	if (previousVnode != NULL)
+		put_vnode(previousVnode);
+
 	put_mount(mount);
 	return status;
 }
