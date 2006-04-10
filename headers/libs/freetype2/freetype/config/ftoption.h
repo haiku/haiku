@@ -436,7 +436,7 @@ FT_BEGIN_HEADER
   /*   Do not #undef this macro here, since the build system might         */
   /*   define it for certain configurations only.                          */
   /*                                                                       */
-/* #define TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 
 
   /*************************************************************************/
@@ -448,7 +448,7 @@ FT_BEGIN_HEADER
   /* FT_PARAM_TAG_UNPATENTED_HINTING; or when the debug hook               */
   /* FT_DEBUG_HOOK_UNPATENTED_HINTING is globally activated.               */
   /*                                                                       */
-#define TT_CONFIG_OPTION_UNPATENTED_HINTING
+//#define TT_CONFIG_OPTION_UNPATENTED_HINTING
 
 
   /*************************************************************************/
