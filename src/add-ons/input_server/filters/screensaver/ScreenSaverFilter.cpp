@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Haiku.
+ * Copyright 2003-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,12 +47,12 @@ ScreenSaverController::ScreenSaverController(ScreenSaverFilter *filter)
 
 
 void
-ScreenSaverController::MessageReceived(BMessage *msg)
+ScreenSaverController::MessageReceived(BMessage *message)
 {
 	CALLED();
-	SERIAL_PRINT(("what %lx\n", msg->what));
+	SERIAL_PRINT(("what %lx\n", message->what));
 
-	switch (msg->what) {
+	switch (message->what) {
 		case B_NODE_MONITOR:
 			fFilter->ReloadSettings();
 			break;
@@ -60,9 +60,9 @@ ScreenSaverController::MessageReceived(BMessage *msg)
 		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
-			if (msg->FindString("be:signature", &signature) == B_OK 
+			if (message->FindString("be:signature", &signature) == B_OK 
 				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0) {
-				fFilter->SetEnabled(msg->what == B_SOME_APP_LAUNCHED);
+				fFilter->SetEnabled(message->what == B_SOME_APP_LAUNCHED);
 			}
 			SERIAL_PRINT(("mime_sig %s\n", signature));
 			break;
@@ -73,7 +73,7 @@ ScreenSaverController::MessageReceived(BMessage *msg)
 			break;
 
 		default:
-			BLooper::MessageReceived(msg);
+			BLooper::MessageReceived(message);
 	}
 }
 
@@ -255,30 +255,48 @@ ScreenSaverFilter::Cornered(arrowDirection pos)
 
 
 filter_result 
-ScreenSaverFilter::Filter(BMessage *msg, BList *outList)
+ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 {
 	fLastEventTime = system_time();
 
-	if (msg->what == B_MOUSE_MOVED) {
-		BPoint pos;
-		msg->FindPoint("where",&pos);
-		if ((fFrameNum++ % 32) == 0) // Every so many frames, update
-			UpdateRectangles();
-
-		if (fTopLeft.Contains(pos)) 
-			Cornered(UPLEFT);
-		else if (fTopRight.Contains(pos)) 
-			Cornered(UPRIGHT);
-		else if (fBottomLeft.Contains(pos)) 
-			Cornered(DOWNLEFT);
-		else if (fBottomRight.Contains(pos)) 
-			Cornered(DOWNRIGHT);
-		else {
-			Cornered(NONE);
-			Banish();
+	switch (message->what) {
+		case B_MOUSE_MOVED:
+		{
+			BPoint pos;
+			message->FindPoint("where", &pos);
+			if ((fFrameNum++ % 32) == 0) // Every so many frames, update
+				UpdateRectangles();
+	
+			if (fTopLeft.Contains(pos)) 
+				Cornered(UPLEFT);
+			else if (fTopRight.Contains(pos)) 
+				Cornered(UPRIGHT);
+			else if (fBottomLeft.Contains(pos)) 
+				Cornered(DOWNLEFT);
+			else if (fBottomRight.Contains(pos)) 
+				Cornered(DOWNRIGHT);
+			else {
+				Cornered(NONE);
+				Banish();
+			}
+			break;
 		}
-	} else 
-		Banish();
+
+		case B_KEY_UP:
+		case B_KEY_DOWN:
+		{
+			// we ignore the Print-Screen key to make screen shots of
+			// screen savers possible
+			int32 key;
+			if (fEnabled && message->FindInt32("key", &key) == B_OK && key == 0xe)
+				break;
+
+			// supposed to fall through
+		}
+		default:
+			Banish();
+			break;
+	}
 
 	return B_DISPATCH_MESSAGE;
 }
