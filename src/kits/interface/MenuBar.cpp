@@ -212,6 +212,7 @@ void
 BMenuBar::FrameResized(float newWidth, float newHeight)
 {
 	BMenu::FrameResized(newWidth, newHeight);
+	fLastBounds->Set(0, 0, newWidth, newHeight);
 }
 
 
@@ -407,14 +408,12 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
 				window->Unlock();
-				if (IsStickyMode())
-					menu->SetStickyMode(true);
 				snoozeAmount = 0;
 				resultItem = menu->_track(&localAction);
 				if (!window->Lock())//WithTimeout(200000) < B_OK)
 					break;
 			}
-		} else if (menuItem == NULL)
+		} else if (menuItem == NULL && !fLastBounds->Contains(where))
 			SelectItem(NULL);
 
 		window->Unlock();
@@ -443,6 +442,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		window->Unlock();
 	}
 
+	if (IsStickyMode())
+		SetStickyMode(false);
 	DeleteMenuWindow();
 
 	if (action != NULL)
