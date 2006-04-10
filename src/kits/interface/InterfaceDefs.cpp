@@ -729,6 +729,8 @@ ui_color(color_which which)
 					return make_color(0,255,0);
 				case B_FAILURE_COLOR:
 					return make_color(255,0,0);
+				case B_WINDOW_TAB_COLOR:
+					return make_color(255,0,203);
 				default:
 					fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
 					return make_color(0,0,0);
