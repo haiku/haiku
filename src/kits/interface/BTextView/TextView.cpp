@@ -4019,6 +4019,7 @@ BTextView::AutoResize(bool redraw)
 		for (int32 i = 0; i < CountLines(); i++)
 			width = max_c(width, LineWidth(i));
 		
+		float oldWidth = ceilf(Bounds().Width());
 		float textRectPadding = Bounds().right - fTextRect.right;
 		width += fTextRect.left + textRectPadding;
 		width = ceilf(width);
@@ -4026,6 +4027,15 @@ BTextView::AutoResize(bool redraw)
 		if (fContainerView != NULL)
 			fContainerView->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
 		
+		BView *view = fContainerView != NULL ? fContainerView : this;
+		if (fAlignment == B_ALIGN_CENTER)
+			view->MoveBy((oldWidth - width) / 2, 0);
+		else if (fAlignment == B_ALIGN_RIGHT)
+			view->MoveBy(oldWidth - width, 0);
+		
+		if (fContainerView)
+			fContainerView->Invalidate();
+
 		fTextRect.right = Bounds().right - textRectPadding;
 		if (redraw)
 			DrawLines(0, CountLines());
