@@ -637,7 +637,7 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	}
 
 	_RestoreCursorArea();
-	Invalidate(_CursorFrame());
+	BRect cursorFrame = _CursorFrame();
 
 	if (fCursorAndDragBitmap && fCursorAndDragBitmap != fCursor) {
 		delete fCursorAndDragBitmap;
@@ -763,6 +763,8 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	} else {
 		fCursorAndDragBitmap = fCursor;
 	}
+
+	Invalidate(cursorFrame);
 
 // NOTE: the EventDispatcher does the reference counting stuff for us
 // TODO: You can not simply call Release() on a ServerBitmap like you

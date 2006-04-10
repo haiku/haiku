@@ -897,57 +897,60 @@ FrameMoved(origin);
 
 		case B_MOUSE_DOWN:
 		{
-			BPoint where;
-			msg->FindPoint("be:view_where", &where);
-
-			if (BView *view = dynamic_cast<BView *>(target))
+			if (BView *view = dynamic_cast<BView *>(target)) {
+				BPoint where;
+				msg->FindPoint("be:view_where", &where);
 				view->MouseDown(where);
-			else
+			} else
 				target->MessageReceived(msg);
+
 			break;
 		}
 
 		case B_MOUSE_UP:
 		{
-			BPoint where;
-			msg->FindPoint("be:view_where", &where);
-
-			if (BView *view = dynamic_cast<BView *>(target))
+			if (BView *view = dynamic_cast<BView *>(target)) {
+				BPoint where;
+				msg->FindPoint("be:view_where", &where);
 				view->MouseUp(where);
-			else
+			} else
 				target->MessageReceived(msg);
+
 			break;
 		}
 
 		case B_MOUSE_MOVED:
 		{
-			BPoint where;
-			uint32 buttons;
-			uint32 transit;
-			msg->FindPoint("be:view_where", &where);
-			msg->FindInt32("buttons", (int32*)&buttons);
-			msg->FindInt32("be:transit", (int32*)&transit);
-//			bigtime_t when;
-//			if (msg->FindInt64("when", (int64*)&when) < B_OK)
-//				printf("BWindow B_MOUSE_MOVED no when\n");
-//			else if (system_time() - when > 5000) {
-//				printf("BWindow B_MOUSE_MOVED lagging behind\n");
-//			}
-			BMessage* dragMessage = NULL;
-			if (msg->HasMessage("be:drag_message")) {
-				dragMessage = new BMessage();
-				if (msg->FindMessage("be:drag_message", dragMessage) != B_OK) {
-					delete dragMessage;
-					dragMessage = NULL;
-				}
-			}
+			if (BView *view = dynamic_cast<BView *>(target)) {
+				BPoint where;
+				uint32 buttons;
+				uint32 transit;
+				msg->FindPoint("be:view_where", &where);
+				msg->FindInt32("buttons", (int32*)&buttons);
+				msg->FindInt32("be:transit", (int32*)&transit);
 
-			if (BView *view = dynamic_cast<BView *>(target))
+#if 0
+				bigtime_t when;
+				if (msg->FindInt64("when", (int64*)&when) < B_OK)
+					printf("BWindow B_MOUSE_MOVED no when\n");
+				else if (system_time() - when > 5000)
+					printf("BWindow B_MOUSE_MOVED lagging behind\n");
+#endif
+
+				BMessage* dragMessage = NULL;
+				if (msg->HasMessage("be:drag_message")) {
+					dragMessage = new BMessage();
+					if (msg->FindMessage("be:drag_message", dragMessage) != B_OK) {
+						delete dragMessage;
+						dragMessage = NULL;
+					}
+				}
+
 				view->MouseMoved(where, transit, dragMessage);
-			else
+				delete dragMessage;
+			} else
 				target->MessageReceived(msg);
 
-			delete dragMessage;
 			break;
 		}
 

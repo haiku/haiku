@@ -15,6 +15,7 @@
 #include "InputManager.h"
 #include "ServerBitmap.h"
 
+#include <MessagePrivate.h>
 #include <TokenSpace.h>
 
 #include <Autolock.h>
@@ -524,10 +525,9 @@ EventDispatcher::SetDragMessage(BMessage& message,
 
 	fHWInterface->SetDragBitmap(bitmap, offsetFromCursor);
 
-	BAutolock _(this);
-
 	fDragMessage = message;
 	fDraggingMessage = true;
+	fDragOffset = offsetFromCursor;
 }
 
 
@@ -630,12 +630,13 @@ EventDispatcher::_DeliverDragMessage()
 	ETRACE(("EventDispatcher::_DeliverDragMessage()\n"));
 
 	if (fDraggingMessage && fPreviousMouseTarget != NULL) {
+		BMessage::Private(fDragMessage).SetWasDropped(true);
 		fDragMessage.RemoveName("_original_what");
 		fDragMessage.AddInt32("_original_what", fDragMessage.what);
+		fDragMessage.AddPoint("_drop_point_", fLastCursorPosition);
+		fDragMessage.AddPoint("_drop_offset_", fDragOffset);
 		fDragMessage.what = _MESSAGE_DROPPED_;
 
-//		fDragMessage.AddBool("dropped", true);
-//printf("  sending message to previous mouse target\n");
 		_SendMessage(fPreviousMouseTarget->Messenger(), 
 			&fDragMessage, 100.0);
 	}

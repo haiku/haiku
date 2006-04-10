@@ -139,6 +139,7 @@ class EventDispatcher : public BLocker {
 
 		BMessage		fDragMessage;
 		bool			fDraggingMessage;
+		BPoint			fDragOffset;
 		ServerBitmap*	fDragBitmap;
 			// NOTE: unfortunately, the EventDispatcher
 			// has to know what a ServerBitmap is...

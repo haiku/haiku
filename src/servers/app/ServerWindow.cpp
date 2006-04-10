@@ -1782,8 +1782,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
-																   NULL, // should be dragRect
-																   offset);
+							NULL /* should be dragRect */, offset);
 				}
 				delete[] buffer;
 			}

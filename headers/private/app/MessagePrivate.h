@@ -136,6 +136,15 @@ class BMessage::Private {
 			return fMessage->fHeader->target == B_PREFERRED_TOKEN;
 		}
 
+		void
+		SetWasDropped(bool wasDropped)
+		{
+			if (wasDropped)
+				fMessage->fHeader->flags |= MESSAGE_FLAG_WAS_DROPPED;
+			else
+				fMessage->fHeader->flags &= ~MESSAGE_FLAG_WAS_DROPPED;
+		}
+
 		status_t
 		Clear()
 		{

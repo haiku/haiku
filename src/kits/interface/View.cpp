@@ -1266,20 +1266,21 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 		message->AddInt32("buttons", buttons);		
 	}
 
-	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
+	BMessage::Private privateMessage(message);
+	privateMessage.SetReply(BMessenger(replyTo, replyTo->Looper()));
 
-	int32 bufferSize = message->FlattenedSize();
+	int32 bufferSize = privateMessage.NativeFlattenedSize();
 	char* buffer = new (nothrow) char[bufferSize];
 	if (buffer) {
-		message->Flatten(buffer, bufferSize);
-	
+		privateMessage.NativeFlatten(buffer, bufferSize);
+
 		fOwner->fLink->StartMessage(AS_LAYER_DRAG_RECT);
 		fOwner->fLink->Attach<BRect>(dragRect);
 		fOwner->fLink->Attach<BPoint>(offset);	
 		fOwner->fLink->Attach<int32>(bufferSize);
 		fOwner->fLink->Attach(buffer, bufferSize);
 		fOwner->fLink->Flush();
-	
+
 		delete [] buffer;
 	} else {
 		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
@@ -1323,13 +1324,14 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		message->AddInt32("buttons", buttons);		
 	}
 
-	BMessage::Private(message).SetReply(BMessenger(replyTo, replyTo->Looper()));
+	BMessage::Private privateMessage(message);
+	privateMessage.SetReply(BMessenger(replyTo, replyTo->Looper()));
 
-	int32 bufferSize = message->FlattenedSize();
+	int32 bufferSize = privateMessage.NativeFlattenedSize();
 	char* buffer = new (nothrow) char[bufferSize];
 	if (buffer) {
-		message->Flatten(buffer, bufferSize);
-	
+		privateMessage.NativeFlatten(buffer, bufferSize);
+
 		fOwner->fLink->StartMessage(AS_LAYER_DRAG_IMAGE);
 		fOwner->fLink->Attach<int32>(image->_ServerToken());
 		fOwner->fLink->Attach<int32>((int32)dragMode);
@@ -1342,7 +1344,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 		// before we can delete the bitmap
 		int32 code;
 		fOwner->fLink->FlushWithReply(code);
-	
+
 		delete [] buffer;
 	} else {
 		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
