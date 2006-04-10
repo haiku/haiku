@@ -19,8 +19,8 @@
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 
-const int CORNER_SIZE = 10;
-const int32 SS_CHECK_TIME = 'SSCT';
+static const int kCornerSize = 10;
+static const int32 kMsgCheckTime = 'SSCT';
 
 
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
@@ -56,9 +56,6 @@ ScreenSaverController::MessageReceived(BMessage *msg)
 		case B_NODE_MONITOR:
 			fFilter->ReloadSettings();
 			break;
-		case SS_CHECK_TIME:
-			fFilter->CheckTime();
-			break;
 		case B_SOME_APP_LAUNCHED:
 		case B_SOME_APP_QUIT:
 		{
@@ -70,6 +67,11 @@ ScreenSaverController::MessageReceived(BMessage *msg)
 			SERIAL_PRINT(("mime_sig %s\n", signature));
 			break;
 		}
+
+		case kMsgCheckTime:
+			fFilter->CheckTime();
+			break;
+
 		default:
 			BLooper::MessageReceived(msg);
 	}
@@ -175,7 +177,7 @@ ScreenSaverFilter::ReloadSettings()
 
 	delete fRunner;
 	fRunner = new BMessageRunner(BMessenger(NULL, fController),
-		new BMessage(SS_CHECK_TIME), fSnoozeTime, -1);
+		new BMessage(kMsgCheckTime), fSnoozeTime, -1);
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
 	}
@@ -232,12 +234,12 @@ ScreenSaverFilter::UpdateRectangles()
 	BRect frame = BScreen().Frame();
 
 	fTopLeft.Set(frame.left, frame.top,
-		frame.left + CORNER_SIZE, frame.top + CORNER_SIZE);
-	fTopRight.Set(frame.right - CORNER_SIZE, frame.top,
-		frame.right, frame.top + CORNER_SIZE);
-	fBottomLeft.Set(frame.left, frame.bottom - CORNER_SIZE,
-		frame.left + CORNER_SIZE, frame.bottom);
-	fBottomRight.Set(frame.right - CORNER_SIZE, frame.bottom - CORNER_SIZE,
+		frame.left + kCornerSize, frame.top + kCornerSize);
+	fTopRight.Set(frame.right - kCornerSize, frame.top,
+		frame.right, frame.top + kCornerSize);
+	fBottomLeft.Set(frame.left, frame.bottom - kCornerSize,
+		frame.left + kCornerSize, frame.bottom);
+	fBottomRight.Set(frame.right - kCornerSize, frame.bottom - kCornerSize,
 		frame.right, frame.bottom);
 }
 

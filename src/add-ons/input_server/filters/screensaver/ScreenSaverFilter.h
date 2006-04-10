@@ -36,7 +36,7 @@ class ScreenSaverFilter : public BInputServerFilter {
 		ScreenSaverFilter();
 		virtual ~ScreenSaverFilter();
 
-		virtual filter_result Filter(BMessage *msg, BList *outList);
+		virtual filter_result Filter(BMessage *message, BList *outList);
 
 		void CheckTime();
 		uint32 SnoozeTime() {return fSnoozeTime;}
