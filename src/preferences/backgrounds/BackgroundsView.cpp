@@ -937,6 +937,9 @@ BackgroundsView::RefsReceived(BMessage *msg)
 	entry_ref ref;
 	int32 i = 0;
 	BMimeType imageType("image");
+	BPath desktopPath;
+	find_directory(B_DESKTOP_DIRECTORY, &desktopPath);
+	
 	while (msg->FindRef("refs", i++, &ref) == B_OK) {
 		BPath path;
 		BEntry entry(&ref, true);
@@ -968,9 +971,13 @@ BackgroundsView::RefsReceived(BMessage *msg)
 			}
 
 			item->SetMarked(true);
-			BMessenger messenger(this);
-			messenger.SendMessage(kMsgImageSelected);
+			BMessenger(this).SendMessage(kMsgImageSelected);
 		} else if (node.IsDirectory()) {
+			if (desktopPath == path) {
+				fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->SetMarked(true);
+				BMessenger(this).SendMessage(kMsgCurrentWorkspace);
+				break;
+			}
 			BMenuItem *item;
 			int32 index = AddPath(path);
 			if (index >= 0) {
@@ -988,8 +995,7 @@ BackgroundsView::RefsReceived(BMessage *msg)
 			}
 
 			item->SetMarked(true);
-			BMessenger messenger(this);
-			messenger.SendMessage(kMsgFolderSelected);
+			BMessenger(this).SendMessage(kMsgFolderSelected);
 		}
 	}
 }
