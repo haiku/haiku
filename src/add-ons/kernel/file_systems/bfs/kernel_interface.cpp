@@ -1,4 +1,4 @@
-/* kernel_interface - file system interface to BeOS' vnode layer
+/* kernel_interface - file system interface to Haiku's vnode layer
  *
  * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
@@ -657,6 +657,12 @@ bfs_fsync(void *_ns, void *_node)
 		return B_BAD_VALUE;
 
 	Inode *inode = (Inode *)_node;
+	ReadLocked locked(inode->Lock());
+
+	status_t status = locked.IsLocked();
+	if (status < B_OK)
+		RETURN_ERROR(status);
+
 	return inode->Sync();
 }
 

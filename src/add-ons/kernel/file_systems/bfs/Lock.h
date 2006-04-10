@@ -1,12 +1,11 @@
+/* Lock - simple semaphores, read/write lock implementation
+ * Roughly based on a Be sample code written by Nathan Schrenk.
+ *
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef LOCK_H
 #define LOCK_H
-/* Lock - simple semaphores, read/write lock implementation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** Roughly based on a Be sample code written by Nathan Schrenk.
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
@@ -444,6 +443,11 @@ class ReadLocked {
 				fLock.Unlock();
 		}
 	
+		status_t IsLocked()
+		{
+			return fStatus;
+		}
+
 	private:
 		ReadWriteLock	&fLock;
 		status_t		fStatus;
