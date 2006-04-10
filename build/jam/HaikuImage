@@ -29,7 +29,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit Chart Workspaces Cortex CortexAddOnHost
+	StyledEdit Chart Workspaces Cortex CortexAddOnHost GLTeapot
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
@@ -140,7 +140,7 @@ SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
 
 # TODO: Use data/etc/termcap or src/libs/termcap.src?
-local etcFiles = fortunes profile termcap ;
+local etcFiles = fortunes profile termcap teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 AddFilesToHaikuImage beos etc : $(etcFiles) ;
