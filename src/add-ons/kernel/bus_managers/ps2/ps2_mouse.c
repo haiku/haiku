@@ -218,10 +218,11 @@ ps2_mouse_disconnect(ps2_dev *dev)
  *	by read() operations. The full data is obtained using 3 consecutive
  *	calls to the handler, each holds a different byte on the data port.
  */
-int32
-mouse_handle_int(ps2_dev *dev, uint8 data)
+static int32
+mouse_handle_int(ps2_dev *dev)
 {
 	mouse_cookie *cookie = dev->cookie;
+	uint8 data = dev->history[0].data;
 	
 	if (cookie->packet_index == 0 && !(data & 8)) {
 		TRACE(("bad mouse data, trying resync\n"));
@@ -339,6 +340,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	cookie->dev = dev;
 	dev->cookie = cookie;
 	dev->disconnect = &ps2_mouse_disconnect;
+	dev->handle_int = &mouse_handle_int;
 		
 	status = probe_mouse(cookie, &cookie->packet_size);
 	if (status != B_OK) {

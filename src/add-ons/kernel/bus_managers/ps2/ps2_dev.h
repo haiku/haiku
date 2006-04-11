@@ -15,6 +15,11 @@ typedef struct ps2_dev ps2_dev;
 
 #include "ps2_common.h"
 
+typedef struct
+{
+	bigtime_t		time;
+	uint8			data;
+} data_history;
 
 struct ps2_dev
 {
@@ -27,10 +32,11 @@ struct ps2_dev
 	int				result_buf_idx;
 	int				result_buf_cnt;
 	void *			cookie;
-	bigtime_t		last_data;
+	data_history	history[5];
 
 // functions
 	void          (*disconnect)(ps2_dev *);
+	int32		  (*handle_int)(ps2_dev *);
 };
 
 #define PS2_DEVICE_COUNT 5

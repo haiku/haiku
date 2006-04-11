@@ -142,8 +142,6 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	
 pass_to_handler:
 
-	dev->last_data = system_time();
-	
 	if (!dev->active) {
 		ps2_service_notify_device_added(dev);
 		dprintf("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
@@ -158,12 +156,15 @@ pass_to_handler:
 
 		return B_HANDLED_INTERRUPT;
 	}
+	
+	dev->history[4] = dev->history[3];
+	dev->history[3] = dev->history[2];
+	dev->history[2] = dev->history[1];
+	dev->history[1] = dev->history[0];
+	dev->history[0].time = system_time();
+	dev->history[0].data = data;
 
-	// temporary hack...
-	if (flags & PS2_FLAG_KEYB)
-		return keyboard_handle_int(data);
-	else
-		return mouse_handle_int(dev, data);
+	return dev->handle_int(dev);
 }
 
 

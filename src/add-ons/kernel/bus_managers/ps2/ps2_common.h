@@ -58,7 +58,4 @@ extern status_t ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *i
 // prototypes from keyboard.c & mouse.c
 extern status_t probe_keyboard(void);
 
-extern int32 mouse_handle_int(ps2_dev *dev, uint8 data);
-extern int32 keyboard_handle_int(uint8 data);
-
 #endif /* __PS2_COMMON_H */

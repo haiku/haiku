@@ -89,23 +89,22 @@ set_typematic(int32 rate, bigtime_t delay)
 }
 
 
-int32 keyboard_handle_int(uint8 data)
+static int32
+keyboard_handle_int(ps2_dev *dev)
 {
 	at_kbd_io keyInfo;
-	uint8 scancode;
+	uint8 scancode = dev->history[0].data;
 
 	if (atomic_and(&sKeyboardOpenMask, 1) == 0)
 		return B_HANDLED_INTERRUPT;
 
 	// TODO: Handle braindead "pause" key special case
 
-	if (data == EXTENDED_KEY) {
+	if (scancode == EXTENDED_KEY) {
 		sIsExtended = true;
 		TRACE(("Extended key\n"));
 		return B_HANDLED_INTERRUPT;
 	} 
-
-	scancode = data;
 
 	TRACE(("scancode: %x\n", scancode));
 
@@ -125,7 +124,7 @@ int32 keyboard_handle_int(uint8 data)
 		sIsExtended = false;
 	}
 
-	keyInfo.timestamp = system_time();
+	keyInfo.timestamp = dev->history[0].time;
 	keyInfo.scancode = scancode;
 
 	if (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
@@ -250,6 +249,7 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	*_cookie = NULL;
 	ps2_device[PS2_DEVICE_KEYB].disconnect = &ps2_keyboard_disconnect;
+	ps2_device[PS2_DEVICE_KEYB].handle_int = &keyboard_handle_int;
 
 	dprintf("ps2: keyboard_open %s success\n", name);
 	return B_OK;
