@@ -1,5 +1,5 @@
 /*
-	written by Rudolf Cornelissen 7/2004
+	written by Rudolf Cornelissen 7/2004-4/2006
 */
 
 /*
@@ -343,36 +343,74 @@ void enable_agp (uint32 *command)
 	 * registers simultanously with the other bits if a single 32bit write
 	 * to each register is used. */
 
-	/* first program all bridges */
-	for (count = 0; count < pd->count; count++)
+	/* the order of programming differs for enabling/disabling AGP mode (see AGP specification) */
+	if (*command & AGP_enable)
 	{
-		if (pd->di[count].agpi.class_base == PCI_bridge)
+		/* first program all bridges */
+		for (count = 0; count < pd->count; count++)
 		{
-			pcii = &(pd->di[count].pcii);
-			/* program bridge, making sure not-implemented bits are written as zeros */
-			set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
-			/* update our agp_cmd info with read back setting from register just programmed */
-			pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			if (pd->di[count].agpi.class_base == PCI_bridge)
+			{
+				pcii = &(pd->di[count].pcii);
+				/* program bridge, making sure not-implemented bits are written as zeros */
+				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
+				/* update our agp_cmd info with read back setting from register just programmed */
+				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			}
+		}
+
+		/* wait 10mS for the bridges to recover (failsafe!) */
+		/* note:
+		 * some SiS bridge chipsets apparantly require 5mS to recover or the
+		 * master (graphics card) cannot be initialized correctly! */
+		snooze(10000);
+
+		/* _now_ program all graphicscards */
+		for (count = 0; count < pd->count; count++)
+		{
+			if (pd->di[count].agpi.class_base == PCI_display)
+			{
+				pci_info *pcii = &(pd->di[count].pcii);
+				/* program graphicscard, making sure not-implemented bits are written as zeros */
+				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
+				/* update our agp_cmd info with read back setting from register just programmed */
+				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			}
 		}
 	}
-
-	/* wait 10mS for the bridges to recover (failsafe!) */
-	/* note:
-	 * some SiS bridge chipsets apparantly require 5mS to recover or the
-	 * master (graphics card) cannot be initialized correctly! */
-	snooze(10000);
-
-	/* _now_ program all graphicscards */
-	for (count = 0; count < pd->count; count++)
+	else
 	{
-		if (pd->di[count].agpi.class_base == PCI_display)
+		/* first program all graphicscards */
+		for (count = 0; count < pd->count; count++)
 		{
-			pci_info *pcii = &(pd->di[count].pcii);
-			/* program graphicscard, making sure not-implemented bits are written as zeros */
-			set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
-			/* update our agp_cmd info with read back setting from register just programmed */
-			pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			if (pd->di[count].agpi.class_base == PCI_display)
+			{
+				pci_info *pcii = &(pd->di[count].pcii);
+				/* program graphicscard, making sure not-implemented bits are written as zeros */
+				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
+				/* update our agp_cmd info with read back setting from register just programmed */
+				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			}
 		}
+
+		/* _now_ program all bridges */
+		for (count = 0; count < pd->count; count++)
+		{
+			if (pd->di[count].agpi.class_base == PCI_bridge)
+			{
+				pcii = &(pd->di[count].pcii);
+				/* program bridge, making sure not-implemented bits are written as zeros */
+				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
+				/* update our agp_cmd info with read back setting from register just programmed */
+				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
+			}
+		}
+
+		/* wait 10mS for the bridges to recover (failsafe!) */
+		/* note:
+		 * some SiS bridge chipsets apparantly require 5mS to recover or the
+		 * master (graphics card) cannot be initialized correctly! */
+		snooze(10000);
 	}
 }
 
