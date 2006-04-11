@@ -396,7 +396,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	fRuleControl = new BTextControl(innerRect, "rule", "Rule:", "",
 		new BMessage(kMsgRuleEntered), B_FOLLOW_LEFT_RIGHT);
 	//fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fRuleControl->SetDivider(fRuleControl->StringWidth(fRuleControl->Label()) + 2.0f);
+	fRuleControl->SetDivider(fRuleControl->StringWidth(fRuleControl->Label()) + 6.0f);
 	fRuleControl->Hide();
 	fRecognitionBox->AddChild(fRuleControl);
 
