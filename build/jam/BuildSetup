@@ -251,7 +251,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 # init library name map
 {
 	local i ;
-	for i in be game mail media midi midi2 network netapi opengl screensaver root z
+	for i in be game GL mail media midi midi2 network netapi opengl screensaver root z
 			textencoding tracker translation {
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
