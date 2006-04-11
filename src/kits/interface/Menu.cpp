@@ -1186,6 +1186,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			UnlockLooper();
 			locked = false;
 			int submenuAction = MENU_ACT_NONE;
+			if (IsStickyMode())
+				fSelected->Submenu()->SetStickyMode(true);
 			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, startTime);
 			if (submenuAction == MENU_ACT_CLOSE) {
 				item = submenuItem;

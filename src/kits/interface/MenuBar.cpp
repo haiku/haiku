@@ -416,6 +416,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				window->Unlock();
 				locked = false;
 				snoozeAmount = 0;
+				if (IsStickyMode())
+					menu->SetStickyMode(true);
 				resultItem = menu->_track(&localAction, startTime);
 			}
 		} else if (menuItem == NULL && !IsStickyMode())
