@@ -36,14 +36,14 @@ bus_std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			TRACE("agp_man: bus module: init\n");
+			TRACE("agp_man: bus module V0.02: init\n");
 			if (init() != B_OK)
 			{
 				return ENODEV;
 			}
 			break;
 		case B_MODULE_UNINIT:
-			TRACE("agp_man: bus module: uninit\n");
+			TRACE("agp_man: bus module V0.02: uninit\n");
 			uninit();
 			break;
 		default:

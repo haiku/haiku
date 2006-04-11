@@ -80,7 +80,7 @@ static settings current_settings = { //see comments in agp.settings
 	0,          // max_speed
 	false,		// block_agp
 	false,      // block_sba
-	false,      // block_fw
+	true,       // block_fw
 };
 
 

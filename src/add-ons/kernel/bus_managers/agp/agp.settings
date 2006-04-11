@@ -9,4 +9,4 @@
 #max_speed	2		# max AGP speed that may be used (valid are 1,2,4 or 8)
 block_agp		false		# if true blocks use of AGP entirely: so fallback to PCI mode
 block_sba		false		# if true blocks use of 'sideband adressing' if possible
-block_fw		false		# if true blocks use of 'fastwrites'
+block_fw		true		# if true blocks use of 'fastwrites'
