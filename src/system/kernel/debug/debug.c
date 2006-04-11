@@ -588,7 +588,7 @@ debug_puts(const char *string, int32 length)
 		length = OUTPUT_BUFFER_SIZE - 1;
 
 	if (strncmp(string, sLastOutputBuffer, length) == 0
-		&& length > 0 && string[length - 1] == '\n') {
+		&& length > 1 && string[length - 1] == '\n') {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
@@ -826,22 +826,16 @@ static void
 flush_pending_repeats(void)
 {
 	if (sMessageRepeatCount > 0) {
-		int32 length;
-
-		if (sMessageRepeatCount > 1) {
-			length = snprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE,
-				"Last message repeated %ld times.\n", sMessageRepeatCount);
-		} else {
-			// if we only have one repeat just reprint the buffer
-			length = strlen(sOutputBuffer);
-		}
+		char temp[128];
+		int32 length = snprintf(temp, sizeof(temp),
+			"Last message repeated %ld times.\n", sMessageRepeatCount);
 
 		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(sOutputBuffer);
+			arch_debug_serial_puts(temp);
 		if (sSyslogOutputEnabled)
-			syslog_write(sOutputBuffer, length);
+			syslog_write(temp, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(sOutputBuffer);
+			blue_screen_puts(temp);
 
 		sMessageRepeatCount = 0;
 	}
