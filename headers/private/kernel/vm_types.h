@@ -35,6 +35,8 @@ typedef struct vm_page {
 
 	uint32				type : 2;
 	uint32				state : 3;
+	uint32				busy_reading : 1;
+	uint32				busy_writing : 1;
 } vm_page;
 
 enum {
