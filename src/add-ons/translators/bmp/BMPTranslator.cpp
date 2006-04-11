@@ -1190,8 +1190,6 @@ translate_from_bmpnpal_to_bits(BPositionIO *inSource,
 	int32 bmpBytesPerPixel = msheader.bitsperpixel / 8;
 	int32 bmpRowBytes =
 		get_rowbytes(msheader.width, msheader.bitsperpixel);
-printf("bitsRowBytes: %ld, bmpBytesPerPixel: %ld, bmpRowBytes: %ld\n",
-	bitsRowBytes, bmpBytesPerPixel, bmpRowBytes);
 
 	// Setup outDestination so that it can be written to
 	// from the end of the file to the beginning instead of
@@ -1226,7 +1224,6 @@ printf("bitsRowBytes: %ld, bmpBytesPerPixel: %ld, bmpRowBytes: %ld\n",
 
 	status_t ret = B_OK;
 
-printf("height: %ld\n", msheader.height);
 	for (uint32 y = 0; y < msheader.height; y++) {
 		ssize_t read = inSource->Read(bmpRowData, bmpRowBytes);
 		if (read != bmpRowBytes) {
@@ -1244,7 +1241,6 @@ printf("height: %ld\n", msheader.height);
 			uint8 *pBitsPixel = bitsRowData;
 			uint8 *pBmpPixel = bmpRowData;
 			for (uint32 i = 0; i < msheader.width; i++) {
-printf("24 bits\n");
 				pBitsPixel[0] = pBmpPixel[0];
 				pBitsPixel[1] = pBmpPixel[1];
 				pBitsPixel[2] = pBmpPixel[2];
