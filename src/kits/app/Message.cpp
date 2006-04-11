@@ -1379,8 +1379,8 @@ BMessage::_ResizeData(int32 offset, int32 change)
 	if (change > 0) {
 		if (fHeader->data_available >= change) {
 			if (offset < fHeader->data_size) {
-				ssize_t length = fHeader->data_size - offset;
-				memmove(fData + offset + change, fData + offset, length);
+				memmove(fData + offset + change, fData + offset,
+					fHeader->data_size - offset);
 			}
 
 			fHeader->data_available -= change;
@@ -1398,14 +1398,16 @@ BMessage::_ResizeData(int32 offset, int32 change)
 
 		if (offset < fHeader->data_size) {
 			memmove(fData + offset + change, fData + offset,
-				fHeader->data_size - offset - change);
+				fHeader->data_size - offset);
 		}
 
 		fHeader->data_size += change;
 		fHeader->data_available = size - fHeader->data_size;
 	} else {
-		ssize_t size = fHeader->data_size;
-		memmove(fData + offset, fData + offset - change, size - offset + change);
+		ssize_t length = fHeader->data_size - offset + change;
+		if (length > 0)
+			memmove(fData + offset, fData + offset - change, length);
+
 		fHeader->data_size += change;
 		fHeader->data_available -= change;
 
