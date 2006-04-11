@@ -82,14 +82,13 @@ enum {
 	B_MISSING_LIBRARY,
 	B_MISSING_SYMBOL,
 
-	B_DEBUGGER_ALREADY_INSTALLED = B_OS_ERROR_BASE + 0x400
+	B_DEBUGGER_ALREADY_INSTALLED = B_OS_ERROR_BASE + 0x400,
 };
 
 
 /*-------------------------------------------------------------*/
 /*----- Application Kit Errors --------------------------------*/
-enum
-{
+enum {
 	B_BAD_REPLY = B_APP_ERROR_BASE,
 	B_DUPLICATE_REPLY,
 	B_MESSAGE_TO_SELF,
@@ -235,20 +234,19 @@ enum {
 /*-------------------------------------------------------------*/
 /*----- Media Kit Errors --------------------------------------*/
 enum {
-  B_STREAM_NOT_FOUND = B_MEDIA_ERROR_BASE,
-  B_SERVER_NOT_FOUND,
-  B_RESOURCE_NOT_FOUND,
-  B_RESOURCE_UNAVAILABLE,
-  B_BAD_SUBSCRIBER,
-  B_SUBSCRIBER_NOT_ENTERED,
-  B_BUFFER_NOT_AVAILABLE,
-  B_LAST_BUFFER_ERROR
+	B_STREAM_NOT_FOUND = B_MEDIA_ERROR_BASE,
+	B_SERVER_NOT_FOUND,
+	B_RESOURCE_NOT_FOUND,
+	B_RESOURCE_UNAVAILABLE,
+	B_BAD_SUBSCRIBER,
+	B_SUBSCRIBER_NOT_ENTERED,
+	B_BUFFER_NOT_AVAILABLE,
+	B_LAST_BUFFER_ERROR
 };
 
 /*-------------------------------------------------------------*/
 /*----- Mail Kit Errors ---------------------------------------*/
-enum
-{
+enum {
 	B_MAIL_NO_DAEMON = B_MAIL_ERROR_BASE,
 	B_MAIL_UNKNOWN_USER,
 	B_MAIL_WRONG_PASSWORD,
@@ -261,15 +259,13 @@ enum
 
 /*-------------------------------------------------------------*/
 /*----- Printing Errors --------------------------------------*/
-enum
-{
+enum {
 	B_NO_PRINT_SERVER = B_PRINT_ERROR_BASE
 };
 
 /*-------------------------------------------------------------*/
 /*----- Device Kit Errors -------------------------------------*/
-enum
-{
+enum {
 	B_DEV_INVALID_IOCTL = B_DEVICE_ERROR_BASE,
 	B_DEV_NO_MEMORY,
 	B_DEV_BAD_DRIVE_NUM,
