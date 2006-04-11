@@ -46,6 +46,7 @@ class TMView : public BBox {
 	private:
 		BListView *fListView;
 		BButton *fKillButton;
+		BButton *fRestartButton;
 		TMDescView *fDescView;
 };
 

@@ -18,7 +18,10 @@
 #include "TMListItem.h"
 #include "KeyboardInputDevice.h"
 
+#include "tracker_private.h"
+
 #include <Message.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <Screen.h>
 #include <String.h>
@@ -27,6 +30,7 @@
 const uint32 TM_CANCEL = 'TMca';
 const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
+const uint32 TM_RESTART_DESKTOP = 'TMrd';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
 #ifndef __HAIKU__
@@ -165,6 +169,14 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 		new BMessage(TM_FORCE_REBOOT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(forceReboot);
 
+	BRect restartRect = rect;
+	restartRect.left = rect.right + 20;
+	restartRect.right = restartRect.left + font.StringWidth("Restart the Desktop") + 20;
+	BButton *fRestartButton = new BButton(restartRect, "restart", "Restart the Desktop",
+		new BMessage(TM_RESTART_DESKTOP), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(fRestartButton);
+	fRestartButton->Hide();
+
 	rect.left += 4;
 	rect.bottom = rect.top - 8;
 	rect.top = fKillButton->Frame().bottom + 8;
@@ -202,6 +214,14 @@ TMView::MessageReceived(BMessage *msg)
 				ListView()->CurrentSelection());
 			kill_team(item->GetInfo()->team);
 			UpdateList();
+			break;
+		}
+		case TM_RESTART_DESKTOP: {
+			fRestartButton->SetEnabled(false);
+			if (!be_roster->IsRunning(kTrackerSignature))
+				be_roster->Launch(kTrackerSignature);
+			if (!be_roster->IsRunning(kDeskbarSignature))
+				be_roster->Launch(kDeskbarSignature);
 			break;
 		}
 		case TM_SELECTED_TEAM: {
@@ -279,6 +299,13 @@ TMView::UpdateList()
 
 	if (changed)
 		fListView->Invalidate();
+
+	bool desktopRunning = be_roster->IsRunning(kTrackerSignature)
+		&&  be_roster->IsRunning(kDeskbarSignature);
+	if (desktopRunning ^ fRestartButton->IsHidden())
+		fRestartButton->Show();
+	if (!desktopRunning)
+		fRestartButton->SetEnabled(true);
 }
 
 
