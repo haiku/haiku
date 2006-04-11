@@ -826,16 +826,22 @@ static void
 flush_pending_repeats(void)
 {
 	if (sMessageRepeatCount > 0) {
-		char temp[128];
-		int32 length = snprintf(temp, sizeof(temp),
-			"Last message repeated %ld times.\n", sMessageRepeatCount);
+		int32 length;
+
+		if (sMessageRepeatCount > 1) {
+			length = snprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE,
+				"Last message repeated %ld times.\n", sMessageRepeatCount);
+		} else {
+			// if we only have one repeat just reprint the buffer
+			length = strlen(sOutputBuffer);
+		}
 
 		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(temp);
+			arch_debug_serial_puts(sOutputBuffer);
 		if (sSyslogOutputEnabled)
-			syslog_write(temp, length);
+			syslog_write(sOutputBuffer, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(temp);
+			blue_screen_puts(sOutputBuffer);
 
 		sMessageRepeatCount = 0;
 	}
@@ -845,12 +851,17 @@ flush_pending_repeats(void)
 static status_t
 check_pending_repeats(void *data)
 {
-	cpu_status state;
-
 	while (true) {
 		if (sMessageRepeatCount > 0
-			&& (system_time() - sMessageRepeatTime) > 1000000)
+			&& (system_time() - sMessageRepeatTime) > 1000000) {
+			cpu_status state = disable_interrupts();
+			acquire_spinlock(&sSpinlock);
+
 			flush_pending_repeats();
+
+			release_spinlock(&sSpinlock);
+			restore_interrupts(state);
+		}
 
 		snooze(1000000);
 	}
