@@ -2622,6 +2622,12 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			mutex_unlock(&cache_ref->lock);
 
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
+
+			dummy_page.queue_next = page;
+			dummy_page.busy_reading = true;
+				// we mark that page busy reading, so that the file cache can ignore
+				// us in case it works on the very same page
+
 			addressSpace->translation_map.ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
 			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cacheOffset, &vec, 1, &bytesRead);
@@ -2633,7 +2639,16 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 				vm_cache_remove_page(cache_ref, &dummy_page);
 				dummy_page.state = PAGE_STATE_INACTIVE;
 			}
-			vm_cache_insert_page(cache_ref, page, cacheOffset);
+
+			// We insert the queue_next here, because someone else could have
+			// replaced our page
+			vm_cache_insert_page(cache_ref, dummy_page.queue_next, cacheOffset);
+
+			if (dummy_page.queue_next != page) {
+				// Indeed, the page got replaced by someone else - we can safely
+				// throw our page away now
+				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
 			mutex_unlock(&cache_ref->lock);
 			break;
 		}

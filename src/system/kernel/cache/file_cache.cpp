@@ -726,6 +726,19 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 
 
 static status_t
+satisfy_cache_io(file_cache_ref *ref, off_t offset, addr_t buffer, addr_t lastBuffer,
+	bool doWrite)
+{
+	size_t requestSize = buffer - lastBuffer;
+
+	if (doWrite)
+		return write_to_cache(ref, offset, requestSize, lastBuffer, requestSize);
+
+	return read_into_cache(ref, offset, requestSize, lastBuffer, requestSize);
+}
+
+
+static status_t
 cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWrite)
 {
 	if (_cacheRef == NULL)
@@ -767,38 +780,74 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 
 	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
 		// check if this page is already in memory
-		addr_t virtualAddress;
 	restart:
 		vm_page *page = vm_cache_lookup_page(cache, offset);
-		if (page != NULL && page->state == PAGE_STATE_BUSY) {
-			// ToDo: don't wait forever!
-			mutex_unlock(&cache->lock);
-			snooze(20000);
-			mutex_lock(&cache->lock);
-			goto restart;
+		vm_page *dummyPage = NULL;
+		if (page != NULL) {
+			// The page is busy - since we need to unlock the cache sometime
+			// in the near future, we need to satisfy the request of the pages
+			// we didn't get yet (to make sure no one else interferes in the
+			// mean time).
+			status_t status = B_OK;
+
+			if (lastBuffer != buffer) {
+				status = satisfy_cache_io(ref, lastOffset + lastPageOffset,
+					buffer, lastBuffer, doWrite);
+				if (status == B_OK) {
+					lastBuffer = buffer;
+					lastLeft = bytesLeft;
+					lastOffset = offset;
+					lastPageOffset = 0;
+					pageOffset = 0;
+				}
+			}
+
+			if (status != B_OK) {
+				mutex_unlock(&cache->lock);
+				return status;
+			}
+
+			if (page->state == PAGE_STATE_BUSY) {
+				if (page->type == PAGE_TYPE_DUMMY) {
+					dummyPage = page;
+					page = vm_page_allocate_page(PAGE_STATE_FREE);
+					if (page == NULL) {
+						mutex_unlock(&cache->lock);
+						return B_NO_MEMORY;
+					}
+				} else {
+					mutex_unlock(&cache->lock);
+					// ToDo: don't wait forever!
+					snooze(20000);
+					mutex_lock(&cache->lock);
+					goto restart;
+				}
+			}
 		}
 
 		size_t bytesInPage = min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft);
+		addr_t virtualAddress;
 
 		TRACE(("lookup page from offset %Ld: %p, size = %lu, pageOffset = %lu\n", offset, page, bytesLeft, pageOffset));
-		if (page != NULL
-			&& vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
-			// it is, so let's satisfy the first part of the request, if we have to
-			if (lastBuffer != buffer) {
-				size_t requestSize = buffer - lastBuffer;
-				status_t status;
-				if (doWrite) {
-					status = write_to_cache(ref, lastOffset + lastPageOffset,
-						requestSize, lastBuffer, requestSize);
-				} else {
-					status = read_into_cache(ref, lastOffset + lastPageOffset,
-						requestSize, lastBuffer, requestSize);
-				}
+		if (page != NULL) {
+			vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
+				&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+
+			if (dummyPage != NULL && (!doWrite || bytesInPage != B_PAGE_SIZE)) {
+				// This page is currently in-use by someone else - since we cannot
+				// know if this someone does what we want, and if it even can do
+				// what we want (we may own a lock the blocks the other request),
+				// we need to handle this case specifically
+				iovec vec;
+				vec.iov_base = (void *)virtualAddress;
+				vec.iov_len = B_PAGE_SIZE;
+
+				size_t size = B_PAGE_SIZE;
+				status_t status = pages_io(ref, offset, &vec, 1, &size, false);
 				if (status != B_OK) {
 					vm_put_physical_page(virtualAddress);
 					mutex_unlock(&cache->lock);
-					return B_IO_ERROR;
+					return status;
 				}
 			}
 
@@ -813,6 +862,41 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), bytesInPage);
 
 			vm_put_physical_page(virtualAddress);
+
+			if (dummyPage != NULL) {
+				// check if the dummy page is still in place
+			restart_dummy_lookup:
+				vm_page *currentPage = vm_cache_lookup_page(cache, offset);
+				if (currentPage->state == PAGE_STATE_BUSY) {
+					if (currentPage->type == PAGE_TYPE_DUMMY) {
+						// we let the other party add our page
+						currentPage->queue_next = page;
+					} else {
+						mutex_unlock(&cache->lock);
+						// ToDo: don't wait forever!
+						snooze(20000);
+						mutex_lock(&cache->lock);
+						goto restart_dummy_lookup;
+					}
+				} else if (currentPage != NULL) {
+					// we need to copy our new page into the old one
+					addr_t destinationAddress;
+					vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
+						&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+					vm_get_physical_page(currentPage->physical_page_number * B_PAGE_SIZE,
+						&destinationAddress, PHYSICAL_PAGE_CAN_WAIT);
+
+					memcpy((void *)destinationAddress, (void *)virtualAddress, B_PAGE_SIZE);
+
+					vm_put_physical_page(destinationAddress);
+					vm_put_physical_page(virtualAddress);
+
+					vm_page_set_state(page, PAGE_STATE_FREE);
+				} else {
+					// there is no page in place anymore, we'll put ours into it
+					vm_cache_insert_page(cache, page, offset);
+				}
+			}
 
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
