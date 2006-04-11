@@ -890,7 +890,7 @@ dprintf(const char *format, ...)
 		length = OUTPUT_BUFFER_SIZE - 1;
 
 	if (strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0
-		&& length > 0 && sOutputBuffer[length - 1] == '\n') {
+		&& length > 1 && sOutputBuffer[length - 1] == '\n') {
 		sMessageRepeatCount++;
 		sMessageRepeatTime = system_time();
 	} else {
