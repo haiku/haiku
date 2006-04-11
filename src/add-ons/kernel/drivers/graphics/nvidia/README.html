@@ -36,13 +36,13 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>Basic 3D acceleration for older cards: see the seperately available 3D accelerant's documentation for details;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
 	<li>DPMS support for both DVI and most laptop panels, and for analog connected screens (on both heads on dualhead cards), <strong>but not (yet?)</strong> for external DVI panels on laptops;
-	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6200, 6600 and 7800. Overlay output 'follows head' in dualhead stretch/switch modes;
+	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, <strong>except</strong> for GeForce 6xxx and 7xxx series (GeForce 6800 works though). Overlay output 'follows head' in dualhead stretch/switch modes;
 	<li>Dualhead support on GeForce dualhead cards (use 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel support;
 	<li>Widescreen mode support (<strong>all</strong> screens must be widescreen type <strong>and</strong> they must all be digitally connected);
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Basic ('legacy') PCIe support;
-	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600, 6800 and 7800;
+	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6xxx and 7xxx series;
 	<li>TVout support on cards with Brooktree BT868/BT869 and Conexant CX25870/CX25871 encoders (use 'Dualhead Setup' <strong>0.04</strong> from BeBits for now).
 </ul>
 <strong>Known limitations:</strong> 
@@ -169,7 +169,7 @@ You can select one of two methods for (2D) acceleration here: PIO mode and DMA m
 		<li><strong>false:</strong><br>
 If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600, 6800 and 7800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
 		<li><strong>true:</strong> (default setting)<br>
-<strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600, 6800 and 7800 like types) currently.
+<strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6xxx and 7xxx series) currently.
 	</ul>
 	<li><strong>tv_output:</strong> (disabled by default: preceded by a '#')<br>
 		This option enables you to override the 'TV output signal cable autodetection' of the driver. If autodetection is working incorrect, you can manually select a signal type this way. Specify 0, 1 or 2 (if enabled).<br>
@@ -243,6 +243,6 @@ Primary lets you force a certain card to be used as primary card in your system 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on April 8, 2006)</p>
+<p>(Page last updated on April 11, 2006)</p>
 </body>
 </html>
