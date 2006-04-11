@@ -188,7 +188,7 @@ virtual	void			_ReservedMenu6();
 		void		InitData(BMessage *data = NULL);
 		bool		_show(bool selectFirstItem = false);
 		void		_hide();
-		BMenuItem	*_track(int *action, long start = -1);
+		BMenuItem	*_track(int *action, bigtime_t trackTime, long start = -1);
 		bool		_AddItem(BMenuItem *item, int32 index);
 		bool		RemoveItems(int32 index,
 								int32 count,

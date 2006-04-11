@@ -975,7 +975,7 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 	}
 
 	int action;
-	BMenuItem *menuItem = _track(&action, -1);
+	BMenuItem *menuItem = _track(&action, system_time());
 	
 	SetStickyMode(false);
 	fExtraRect = NULL;
@@ -1136,7 +1136,7 @@ BMenu::_hide()
 
 
 BMenuItem *
-BMenu::_track(int *action, long start)
+BMenu::_track(int *action, bigtime_t trackTime, long start)
 {
 	// TODO: cleanup
 	ulong buttons;
@@ -1186,7 +1186,7 @@ BMenu::_track(int *action, long start)
 			UnlockLooper();
 			locked = false;
 			int submenuAction = MENU_ACT_NONE;
-			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction);
+			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, startTime);
 			if (submenuAction == MENU_ACT_CLOSE) {
 				item = submenuItem;
 				localAction = submenuAction;
@@ -1202,8 +1202,8 @@ BMenu::_track(int *action, long start)
 		if (buttons != 0 && IsStickyMode()) {
 			localAction = MENU_ACT_CLOSE;
 			break;
-		} else if (buttons == 0) {
-			if (IsStickyPrefOn())
+		} else if (buttons == 0 && !IsStickyMode()) {
+			if (IsStickyPrefOn() && system_time() < trackTime + 2000000)
 				SetStickyMode(true);
 			else {
 				localAction = MENU_ACT_CLOSE;
@@ -1219,6 +1219,9 @@ BMenu::_track(int *action, long start)
 		SelectItem(NULL);
 		UnlockLooper();
 	}
+
+	if (IsStickyMode())
+		SetStickyMode(false);
 
 	// delete the menu window recycled for all the child menus
 	DeleteMenuWindow();
@@ -1785,6 +1788,11 @@ void
 BMenu::SetStickyMode(bool on)
 {
 	fStickyMode = on;
+	
+	// If we are switching to sticky mode, propagate the status
+	// back to the super menu
+	if (on && fSuper != NULL)
+		fSuper->SetStickyMode(on);
 }
 
 

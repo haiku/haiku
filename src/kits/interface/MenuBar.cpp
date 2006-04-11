@@ -376,16 +376,16 @@ BMenuBar::TrackTask(void *arg)
 
 BMenuItem *
 BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
-{
-	// TODO: This function is very incomplete and just partially working:
-	// For example, it doesn't respect the "sticky mode" setting.
+{	
+	// TODO: Cleanup, merge some "if" blocks if possible
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
 	int localAction = MENU_ACT_NONE;
-
+	bigtime_t startTime = system_time();
 	while (true) {
 		bigtime_t snoozeAmount = 30000;
-		if (!window->Lock())//WithTimeout(200000) < B_OK)
+		bool locked = window->Lock();//WithTimeout(200000)
+		if (!locked)
 			break;
 
 		BPoint where;
@@ -393,12 +393,18 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		GetMouse(&where, &buttons);
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL && menuItem != fSelected) {
-			// only select the item
-			SelectItem(menuItem, -1);
-			if (menuItem->Submenu() != NULL
-				&& menuItem->Submenu()->Window() == NULL) {
-				// open the menu if it's not opened yet
-				SelectItem(menuItem);
+			// Select item if:
+			// - clicked in sticky mode
+			// - nonsticky mode,
+			// - no previous selection 
+			if (fSelected == NULL || !IsStickyMode() || buttons != 0) {
+				// only select the item
+				SelectItem(menuItem, -1);
+				if (menuItem->Submenu() != NULL
+					&& menuItem->Submenu()->Window() == NULL) {
+					// open the menu if it's not opened yet
+					SelectItem(menuItem);
+				}
 			}
 		}
 
@@ -408,20 +414,22 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			BMenu *menu = fSelected->Submenu();
 			if (menu != NULL) {
 				window->Unlock();
+				locked = false;
 				snoozeAmount = 0;
-				resultItem = menu->_track(&localAction);
-				if (!window->Lock())//WithTimeout(200000) < B_OK)
-					break;
+				resultItem = menu->_track(&localAction, startTime);
 			}
-		} else if (menuItem == NULL && !fLastBounds->Contains(where))
+		} else if (menuItem == NULL && !IsStickyMode())
 			SelectItem(NULL);
-
-		window->Unlock();
 		
-		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode()))
+		if (locked)
+			window->Unlock();
+		
+		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
-		else if (buttons == 0) {
-			if (IsStickyPrefOn())
+		else if (buttons == 0 && !IsStickyMode()) {
+			// Don't switch to sticky mode if user kept the mouse pressed for too long
+			// TODO: Delay could be smaller, but then it wouldn't be noticeable on QEMU on my machine
+			if (IsStickyPrefOn() && system_time() < startTime + 2000000)
 				SetStickyMode(true);
 			else
 				break;
@@ -444,6 +452,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 	if (IsStickyMode())
 		SetStickyMode(false);
+
 	DeleteMenuWindow();
 
 	if (action != NULL)
