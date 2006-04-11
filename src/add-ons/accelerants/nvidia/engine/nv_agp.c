@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 6/2004-5/2005
+   Rudolf Cornelissen 6/2004-4/2006
 */
 
 #define MODULE_BIT 0x00000100
@@ -10,7 +10,7 @@
 static void nv_agp_list_info(agp_info ai);
 static void nv_agp_list_active(uint32 cmd);
 
-status_t nv_agp_setup(void)
+status_t nv_agp_setup(bool enable_agp)
 {
 	nv_nth_agp_info nai;
 	nv_cmd_agp nca;
@@ -105,10 +105,13 @@ status_t nv_agp_setup(void)
 		return B_ERROR;
 	}
 
-	if (si->settings.force_pci)
+	if (si->settings.force_pci || !enable_agp)
 	{
 		/* set PCI mode if specified by user in nv.settings */
-		LOG(4,("AGP: forcing PCI mode (specified in nv.settings)\n"));
+		if (enable_agp)
+			LOG(4,("AGP: forcing PCI mode (specified in nv.settings)\n"));
+		else
+			LOG(4,("AGP: forcing PCI mode during coldstart (required)\n"));
 
 		/* let the AGP busmanager setup PCI mode.
 		 * (the AGP speed scheme is of no consequence now) */

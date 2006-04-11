@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.79 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.80 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1392,6 +1392,15 @@ static status_t nvxx_general_powerup()
 	 * at system power-up POST time. */
 	if (!si->settings.usebios)
 	{
+		/* Make sure we are running in PCI (not AGP) mode:
+		 * This is a requirement for safely coldstarting cards!
+		 * (some cards reset their AGP PLL during startup which makes acceleration
+		 *  engine DMA fail later on. A reboot is needed to overcome that.)
+		 * Note:
+		 * This may only be done when no transfers are in progress on the bus, so now
+		 * is probably a good time.. */
+		nv_agp_setup(false);
+
 		LOG(2, ("INIT: Attempting card coldstart!\n"));
 		/* update the cardspecs in the shared_info PINS struct according to reported
 		 * specs as much as is possible;
@@ -1681,7 +1690,7 @@ static status_t nv_general_bios_to_powergraphics()
 	 * Note:
 	 * This may only be done when no transfers are in progress on the bus, so now
 	 * is probably a good time.. */
-	nv_agp_setup();
+	nv_agp_setup(true);
 
 	return B_OK;
 }
