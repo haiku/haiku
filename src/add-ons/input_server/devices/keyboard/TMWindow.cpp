@@ -172,7 +172,7 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	BRect restartRect = rect;
 	restartRect.left = rect.right + 20;
 	restartRect.right = restartRect.left + font.StringWidth("Restart the Desktop") + 20;
-	BButton *fRestartButton = new BButton(restartRect, "restart", "Restart the Desktop",
+	fRestartButton = new BButton(restartRect, "restart", "Restart the Desktop",
 		new BMessage(TM_RESTART_DESKTOP), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fRestartButton);
 	fRestartButton->Hide();
