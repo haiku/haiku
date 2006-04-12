@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 #include "SSAwindow.h"
 #include <View.h>

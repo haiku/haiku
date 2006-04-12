@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 
 #ifndef PASSWORDWINDOW_H
@@ -26,7 +26,7 @@ class PasswordWindow : public BWindow
 
 		void Setup(void);
 		const char *GetPassword(void) {return fPassword->Text();}
-		void SetPassword(const char* text) { Lock(); fPassword->SetText(text); fPassword->MakeFocus(true); Unlock(); }
+		void SetPassword(const char* text) { if (Lock()) { fPassword->SetText(text); fPassword->MakeFocus(true); Unlock();} }
 
 		bool fDie;
 	private:

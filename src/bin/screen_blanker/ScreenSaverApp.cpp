@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
 #include <Debug.h>
 #include <stdio.h>
@@ -36,6 +36,9 @@ int main(int, char**)
 ScreenSaverApp::ScreenSaverApp()
 	: BApplication(SCREEN_BLANKER_SIG),
 	fWin(NULL),
+	fSaver(NULL),
+	fThrd(NULL),
+	fPww(NULL),
 	fThreadID(-1),
 	fRunner(NULL)
 {
@@ -73,16 +76,17 @@ ScreenSaverApp::ReadyToRun()
 void 
 ScreenSaverApp::ShowPW() 
 {
-	fWin->Lock();
-	if (fThreadID > -1)
-		suspend_thread(fThreadID);
-	if (B_OK==fWin->SetFullScreen(false)) {
-		fWin->Sync();
-		ShowCursor();
-		fPww->Show();
-		fPww->Sync();
+	if (fWin->Lock()) {
+		if (fThreadID > -1)
+			suspend_thread(fThreadID);
+		if (B_OK==fWin->SetFullScreen(false)) {
+			fWin->Sync();
+			ShowCursor();
+			fPww->Show();
+			fPww->Sync();
+		}
+		fWin->Unlock();
 	}
-	fWin->Unlock();
 	delete fRunner;
 	fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER), fPref.BlankTime(), 1);
 	if (fRunner->InitCheck() != B_OK) {
@@ -112,14 +116,15 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 			break;
 		}
 		case RESUME_SAVER:
-			fWin->Lock();
-			if (B_OK==fWin->SetFullScreen(true)) {
-				HideCursor();
-				fPww->Hide();
+			if (fWin->Lock()) {
+				if (B_OK==fWin->SetFullScreen(true)) {
+					HideCursor();
+					fPww->Hide();
+				}
+				if (fThreadID > -1)
+					resume_thread(fThreadID);
+				fWin->Unlock();
 			}
-			if (fThreadID > -1)
-				resume_thread(fThreadID);
-			fWin->Unlock();
 		default:
 			BApplication::MessageReceived(message);
  			break;
