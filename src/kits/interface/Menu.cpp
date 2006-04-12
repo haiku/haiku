@@ -1146,7 +1146,6 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	bigtime_t startTime = system_time();
 	bigtime_t delay = 200000; // TODO: Test and reduce if needed.
 
-	bool okay = true;
 	while (true) {
 		bool locked = LockLooper();
 		if (!locked)
@@ -1172,7 +1171,6 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			}
 		} else {
 			if (OverSuper(screenLocation)) {
-				okay = false;
 				localAction = MENU_ACT_NONE;
 				item = NULL;
 				UnlockLooper();
@@ -1188,7 +1186,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			int submenuAction = MENU_ACT_NONE;
 			if (IsStickyMode())
 				fSelected->Submenu()->SetStickyMode(true);
-			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, startTime);
+			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, trackTime);
 			if (submenuAction == MENU_ACT_CLOSE) {
 				item = submenuItem;
 				localAction = submenuAction;

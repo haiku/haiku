@@ -392,18 +392,27 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		ulong buttons;
 		GetMouse(&where, &buttons);
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
-		if (menuItem != NULL && menuItem != fSelected) {
+		if (menuItem != NULL) {
 			// Select item if:
+			// - no previous selection
+			// - nonsticky mode and different selection,
 			// - clicked in sticky mode
-			// - nonsticky mode,
-			// - no previous selection 
-			if (fSelected == NULL || !IsStickyMode() || buttons != 0) {
-				// only select the item
-				SelectItem(menuItem, -1);
-				if (menuItem->Submenu() != NULL
-					&& menuItem->Submenu()->Window() == NULL) {
-					// open the menu if it's not opened yet
-					SelectItem(menuItem);
+			if (fSelected == NULL
+				|| (!IsStickyMode() && menuItem != fSelected)
+				|| (buttons != 0 && IsStickyMode())) {
+				if (menuItem->Submenu() != NULL) {
+					if (menuItem->Submenu()->Window() == NULL) {
+						// open the menu if it's not opened yet
+						SelectItem(menuItem);
+					} else {
+						// Menu was already opened, close it and bail
+						SelectItem(NULL);
+						localAction = MENU_ACT_CLOSE;
+						resultItem = NULL;
+					}
+				} else {
+					// No submenu, just select the item
+					SelectItem(menuItem);					
 				}
 			}
 		}
@@ -429,11 +438,15 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
-			// Don't switch to sticky mode if user kept the mouse pressed for too long
-			// TODO: Delay could be smaller, but then it wouldn't be noticeable on QEMU on my machine
-			if (IsStickyPrefOn() && system_time() < startTime + 2000000)
+			// On an item without a submenu
+			if (fSelected != NULL && fSelected->Submenu() == NULL) {
+				resultItem = fSelected;
+				break;
+			} else if (IsStickyPrefOn() && system_time() < startTime + 2000000) {
+				// Don't switch to sticky mode if user kept the mouse pressed for too long
+				// TODO: Delay could be smaller, but then it wouldn't be noticeable on QEMU on my machine
 				SetStickyMode(true);
-			else
+			} else
 				break;
 		}
 
@@ -442,11 +455,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	}
 
 	if (window->Lock()) {
-		if (fSelected != NULL) {
-			if (fSelected->Submenu() == NULL)
-				resultItem = fSelected;
+		if (fSelected != NULL)
 			SelectItem(NULL);
-		}
 		if (resultItem != NULL)
 			resultItem->Invoke();
 		window->Unlock();
