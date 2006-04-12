@@ -49,12 +49,13 @@ ScreenSaverThread::Quit()
 void 
 ScreenSaverThread::Thread() 
 {
-	fWin->Lock();
-	fView->SetViewColor(0,0,0);
-	fView->SetLowColor(0,0,0);
-	if (fSaver)
-		fSaver->StartSaver(fView,false);
-	fWin->Unlock();
+	if (fWin->Lock()) {
+		fView->SetViewColor(0,0,0);
+		fView->SetLowColor(0,0,0);
+		if (fSaver)
+			fSaver->StartSaver(fView,false);
+		fWin->Unlock();
+	}
 	while (1) {
 		snooze(fSaver->TickSize());
 		if (fSnoozeCount) { // If we are sleeping, do nothing
@@ -64,12 +65,13 @@ ScreenSaverThread::Thread()
 			fFrame = 0;
 			fSnoozeCount = fSaver->LoopOffCount();
 		} else {
-	   		fWin->Lock();
-			if (fDWin) 
-				fSaver->DirectDraw(fFrame);
-	    	fSaver->Draw(fView,fFrame);
-	    	fWin->Unlock();
-			fFrame++;
+			if (fWin->Lock()) {
+				if (fDWin) 
+					fSaver->DirectDraw(fFrame);
+				fSaver->Draw(fView,fFrame);
+				fWin->Unlock();
+				fFrame++;
+			}
 		}
 	}
 }
