@@ -105,9 +105,10 @@ Workspace::SetColor(const RGBColor& color, bool makeDefault)
 	if (color == Color())
 		return;
 
-	// TODO: support makeDefault
 	fWorkspace.SetColor(color);
 	fDesktop.RedrawBackground();
+	if (makeDefault)
+		fDesktop.StoreWorkspaceConfiguration(&fWorkspace);
 }
 
 

@@ -657,6 +657,27 @@ Desktop::RedrawBackground()
 }
 
 
+/*!
+	\brief Store the workspace configuration
+*/
+void
+Desktop::StoreWorkspaceConfiguration(Workspace::Private *workspace)
+{
+	// store settings
+	for (int32 index = 0; index < 32; index++) {
+		if (&fWorkspaces[index] == workspace) {
+			const BMessage *oldSettings = fSettings->WorkspacesMessage(index);
+			BMessage settings;
+			if (oldSettings)
+				settings = *oldSettings;
+			workspace->StoreConfiguration(settings);
+			fSettings->Save(kWorkspacesSettings);
+			break;
+		}
+	}
+}
+
+
 void
 Desktop::UpdateWorkspaces()
 {

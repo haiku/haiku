@@ -163,6 +163,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fBackgroundRegion; }
 
 		void					RedrawBackground();
+		void					StoreWorkspaceConfiguration(Workspace::Private *workspace);
 
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
