@@ -163,7 +163,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fBackgroundRegion; }
 
 		void					RedrawBackground();
-		void					StoreWorkspaceConfiguration(Workspace::Private *workspace);
+		void					StoreWorkspaceConfiguration(int32 index);
 
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
@@ -224,7 +224,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		sem_id					fShutdownSemaphore;
 		int32					fShutdownCount;
 
-		::Workspace::Private	fWorkspaces[32];
+		::Workspace::Private	fWorkspaces[kMaxWorkspaces];
 		int32					fCurrentWorkspace;
 
 		WindowList				fAllWindows;
