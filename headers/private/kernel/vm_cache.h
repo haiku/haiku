@@ -27,7 +27,7 @@ void vm_cache_release_ref(vm_cache_ref *cache_ref);
 vm_page *vm_cache_lookup_page(vm_cache_ref *cacheRef, off_t page);
 void vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset);
 void vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page);
-status_t vm_cache_write_modified(vm_cache_ref *ref);
+status_t vm_cache_write_modified(vm_cache_ref *ref, bool fsReenter);
 status_t vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment);
 status_t vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize);
 status_t vm_cache_insert_area(vm_cache_ref *cacheRef, vm_area *area);

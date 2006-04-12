@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -77,7 +77,8 @@ anonymous_has_page(struct vm_store *store, off_t offset)
 
 
 static status_t
-anonymous_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+anonymous_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	panic("anonymous_store: read called. Invalid!\n");
 	return B_ERROR;
@@ -85,7 +86,8 @@ anonymous_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t c
 
 
 static status_t
-anonymous_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+anonymous_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return 0;

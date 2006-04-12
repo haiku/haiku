@@ -1,6 +1,6 @@
 /* File System Interface Layer Definition
  *
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
@@ -87,8 +87,10 @@ typedef struct file_system_module_info {
 
 	/* VM file access */
 	bool (*can_page)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
-	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos,
+				const iovec *vecs, size_t count, size_t *_numBytes, bool reenter);
+	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos,
+				const iovec *vecs, size_t count, size_t *_numBytes, bool reenter);
 
 	/* cache file access */
 	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);

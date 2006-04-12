@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1571,14 +1571,16 @@ pipefs_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
 
 
 static status_t
-pipefs_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+pipefs_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return EPERM;
 }
 
 
 static status_t
-pipefs_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+pipefs_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return EPERM;
 }

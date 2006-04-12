@@ -311,14 +311,14 @@ vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page)
 
 
 status_t
-vm_cache_write_modified(vm_cache_ref *ref)
+vm_cache_write_modified(vm_cache_ref *ref, bool fsReenter)
 {
 	status_t status;
 
 	TRACE(("vm_cache_write_modified(ref = %p)\n", ref));
 
 	mutex_lock(&ref->lock);
-	status = vm_page_write_modified(ref->cache);
+	status = vm_page_write_modified(ref->cache, fsReenter);
 	mutex_unlock(&ref->lock);
 
 	return status;

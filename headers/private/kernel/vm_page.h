@@ -34,7 +34,7 @@ status_t vm_page_set_state(vm_page *page, int state);
 size_t vm_page_num_pages(void);
 size_t vm_page_num_free_pages(void);
 
-status_t vm_page_write_modified(vm_cache *cache);
+status_t vm_page_write_modified(vm_cache *cache, bool fsReenter);
 
 vm_page *vm_page_allocate_page(int state);
 status_t vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages);

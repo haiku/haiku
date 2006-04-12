@@ -134,7 +134,7 @@ move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *page)
 
 
 static status_t
-write_page(vm_page *page)
+write_page(vm_page *page, bool fsReenter)
 {
 	vm_store *store = page->cache->store;
 	size_t length = B_PAGE_SIZE;
@@ -150,7 +150,7 @@ write_page(vm_page *page)
 	vecs->iov_len = B_PAGE_SIZE;
 
 	status = store->ops->write(store, (off_t)page->cache_offset << PAGE_SHIFT,
-		vecs, 1, &length);
+		vecs, 1, &length, fsReenter);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
 
@@ -164,7 +164,7 @@ write_page(vm_page *page)
 
 
 status_t
-vm_page_write_modified(vm_cache *cache)
+vm_page_write_modified(vm_cache *cache, bool fsReenter)
 {
 	vm_page *page = cache->page_list;
 
@@ -230,7 +230,7 @@ vm_page_write_modified(vm_cache *cache)
 			continue;
 
 		mutex_unlock(&cache->ref->lock);
-		status = write_page(page);
+		status = write_page(page, fsReenter);
 		mutex_lock(&cache->ref->lock);
 
 		if (status == B_OK) {

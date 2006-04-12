@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -41,12 +41,14 @@ store_has_page(struct vm_store *_store, off_t offset)
 
 
 static status_t
-store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	vnode_store *store = (vnode_store *)_store;
 	size_t bytesUntouched = *_numBytes;
 
-	status_t status = vfs_read_pages(store->vnode, NULL, offset, vecs, count, _numBytes);
+	status_t status = vfs_read_pages(store->vnode, NULL, offset, vecs, count,
+		_numBytes, fsReenter);
 
 	bytesUntouched -= *_numBytes;
 
@@ -70,10 +72,11 @@ store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t coun
 
 
 static status_t
-store_write(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+store_write(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes);
+	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes, fsReenter);
 }
 
 

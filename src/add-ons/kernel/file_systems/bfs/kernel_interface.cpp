@@ -369,53 +369,45 @@ bfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 static status_t
 bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	Inode *inode = (Inode *)_node;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	ReadLocked locked(inode->Lock());
-	return file_cache_read_pages(inode->FileCache(), pos, vecs, count, _numBytes);
-#if 0
-	for (uint32 i = 0; i < count; i++) {
-		if (pos >= inode->Size()) {
-			memset(vecs[i].iov_base, 0, vecs[i].iov_len);
-			pos += vecs[i].iov_len;
-			*_numBytes -= vecs[i].iov_len;
-		} else {
-			uint32 length = vecs[i].iov_len;
-			if (length > inode->Size() - pos)
-				length = inode->Size() - pos;
+	if (!reenter)
+		inode->Lock().Lock();
 
-			inode->ReadAt(pos, (uint8 *)vecs[i].iov_base, &length);
+	status_t status = file_cache_read_pages(inode->FileCache(), pos, vecs, count,
+		_numBytes);
 
-			if (length < vecs[i].iov_len) {
-				memset((char *)vecs[i].iov_base + length, 0, vecs[i].iov_len - length);
-				*_numBytes -= vecs[i].iov_len - length;
-			}
+	if (!reenter)
+		inode->Lock().Unlock();
 
-			pos += vecs[i].iov_len;
-		}
-	}
-
-	return B_OK;
-#endif
+	return status;
 }
 
 
 static status_t
 bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	Inode *inode = (Inode *)_node;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	ReadLocked locked(inode->Lock());
-	return file_cache_write_pages(inode->FileCache(), pos, vecs, count, _numBytes);
+	if (!reenter)
+		inode->Lock().Lock();
+
+	status_t status = file_cache_write_pages(inode->FileCache(), pos, vecs, count,
+		_numBytes);
+
+	if (!reenter)
+		inode->Lock().Unlock();
+
+	return status;
 }
 
 

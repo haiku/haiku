@@ -1,7 +1,10 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include "vm_store_null.h"
@@ -32,14 +35,16 @@ null_has_page(struct vm_store *store, off_t offset)
 
 
 static status_t
-null_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+null_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	return -1;
 }
 
 
 static status_t
-null_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+null_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	return -1;
 }

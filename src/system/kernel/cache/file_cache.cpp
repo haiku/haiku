@@ -317,7 +317,8 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 		if (size > numBytes)
 			size = numBytes;
 
-		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
+		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs,
+			count, &size, false);
 		if (status < B_OK)
 			return status;
 
@@ -394,10 +395,13 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 		}
 
 		size_t bytes = size;
-		if (doWrite)
-			status = vfs_write_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
-		else
-			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
+		if (doWrite) {
+			status = vfs_write_pages(ref->device, ref->cookie, fileVec.offset, tempVecs,
+				tempCount, &bytes, false);
+		} else {
+			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs,
+				tempCount, &bytes, false);
+		}
 		if (status < B_OK)
 			return status;
 
@@ -1221,7 +1225,7 @@ file_cache_sync(void *_cacheRef)
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return vm_cache_write_modified(ref->cache);
+	return vm_cache_write_modified(ref->cache, true);
 }
 
 

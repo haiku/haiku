@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -769,14 +769,16 @@ rootfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie cookie)
 
 
 static status_t
-rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-rootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+rootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
 }

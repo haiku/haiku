@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -45,7 +45,8 @@ device_has_page(struct vm_store *store, off_t offset)
 
 
 static status_t
-device_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+device_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	panic("device_store: read called. Invalid!\n");
 	return B_ERROR;
@@ -53,7 +54,8 @@ device_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t coun
 
 
 static status_t
-device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	// no place to write, this will cause the page daemon to skip this store
 	return B_OK;

@@ -1382,7 +1382,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	addressSpace = area->address_space;
 
 	// ToDo: do that only for vnode stores
-	vm_cache_write_modified(area->cache_ref);
+	vm_cache_write_modified(area->cache_ref, false);
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_address_space(addressSpace, area, aspaceLocked);
@@ -2630,7 +2630,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 			addressSpace->translation_map.ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
-			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cacheOffset, &vec, 1, &bytesRead);
+			err = cache_ref->cache->store->ops->read(cache_ref->cache->store,
+				cacheOffset, &vec, 1, &bytesRead, false);
 			addressSpace->translation_map.ops->put_physical_page((addr_t)vec.iov_base);
 
 			mutex_lock(&cache_ref->lock);

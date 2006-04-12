@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -137,9 +137,12 @@ typedef struct vm_store_ops {
 	void (*destroy)(struct vm_store *backing_store);
 	status_t (*commit)(struct vm_store *backing_store, off_t size);
 	bool (*has_page)(struct vm_store *backing_store, off_t offset);
-	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
-	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
-	status_t (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace, off_t offset);
+	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs,
+				size_t count, size_t *_numBytes, bool fsReenter);
+	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs,
+				size_t count, size_t *_numBytes, bool fsReenter);
+	status_t (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace,
+				off_t offset);
 	void (*acquire_ref)(struct vm_store *backing_store);
 	void (*release_ref)(struct vm_store *backing_store);
 } vm_store_ops;

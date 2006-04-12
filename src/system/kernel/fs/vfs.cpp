@@ -3005,24 +3005,28 @@ vfs_can_page(void *_vnode, void *cookie)
 
 
 extern "C" status_t
-vfs_read_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+vfs_read_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node, cookie, pos, vecs, count, _numBytes);
+	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node,
+		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
 
 extern "C" status_t
-vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node, cookie, pos, vecs, count, _numBytes);
+	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node,
+		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
 
