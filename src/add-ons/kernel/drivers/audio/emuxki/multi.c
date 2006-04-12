@@ -814,16 +814,21 @@ emuxki_get_description(emuxki_dev *card, multi_description *data)
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
 	}
 
-	data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	//data->output_rates = B_SR_44100;
-	//data->input_rates = B_SR_44100;
+	switch (current_settings.sample_rate) {
+		case 192000: data->output_rates = data->input_rates = B_SR_192000; break;
+		case 96000: data->output_rates = data->input_rates = B_SR_96000; break;
+		case 48000: data->output_rates = data->input_rates = B_SR_48000; break;
+		case 44100: data->output_rates = data->input_rates = B_SR_44100; break;
+	}
 	data->min_cvsr_rate = 0;
 	data->max_cvsr_rate = 48000;
-	//data->max_cvsr_rate = 44100;
 
-	data->output_formats = B_FMT_16BIT;
-	data->input_formats = B_FMT_16BIT;
+	switch (current_settings.bitsPerSample) {
+		case 8: data->output_formats = data->input_formats = B_FMT_8BIT_U; break;
+		case 16: data->output_formats = data->input_formats = B_FMT_16BIT; break;
+		case 24: data->output_formats = data->input_formats = B_FMT_24BIT; break;
+		case 32: data->output_formats = data->input_formats = B_FMT_32BIT; break;
+	}
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
@@ -867,18 +872,19 @@ emuxki_get_global_format(emuxki_dev *card, multi_format_info *data)
 	data->output_latency = 0;
 	data->input_latency = 0;
 	data->timecode_kind = 0;
-	data->input.rate = B_SR_48000;
-	data->input.cvsr = 48000;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_48000;
-	data->output.cvsr = 48000;
-	data->output.format = B_FMT_16BIT;
-	/*data->input.rate = B_SR_44100;
-	data->input.cvsr = 44100;
-	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_44100;
-	data->output.cvsr = 44100;
-	data->output.format = B_FMT_16BIT;*/
+	switch (current_settings.sample_rate) {
+		case 192000: data->output.rate = data->input.rate = B_SR_192000; break;
+		case 96000: data->output.rate = data->input.rate = B_SR_96000; break;
+		case 48000: data->output.rate = data->input.rate = B_SR_48000; break;
+		case 44100: data->output.rate = data->input.rate = B_SR_44100; break;
+	}
+	switch (current_settings.bitsPerSample) {
+		case 8: data->input.format = data->output.format = B_FMT_8BIT_U; break;
+		case 16: data->input.format = data->output.format = B_FMT_16BIT; break;
+		case 24: data->input.format = data->output.format = B_FMT_24BIT; break;
+		case 32: data->input.format = data->output.format = B_FMT_32BIT; break;
+	}
+	data->input.cvsr = data->output.cvsr = current_settings.sample_rate;
 	return B_OK;
 }
 
@@ -900,44 +906,42 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	rchannels = card->rstream->nmono + card->rstream->nstereo * 2;
 	rchannels2 = card->rstream2->nmono + card->rstream2->nstereo * 2;
 	
-	if (data->request_playback_buffers < BUFFER_COUNT ||
+	if (data->request_playback_buffers < current_settings.buffer_count ||
 		data->request_playback_channels < (pchannels + pchannels2) ||
-		data->request_record_buffers < BUFFER_COUNT ||
+		data->request_record_buffers < current_settings.buffer_count ||
 		data->request_record_channels < (rchannels + rchannels2)) {
 		LOG(("not enough channels/buffers\n"));
 	}
 
-	ASSERT(BUFFER_COUNT == 2);
-	
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; 
 		
-	data->return_playback_buffers = BUFFER_COUNT;	/* playback_buffers[b][] */
+	data->return_playback_buffers = current_settings.buffer_count;	/* playback_buffers[b][] */
 	data->return_playback_channels = pchannels + pchannels2;		/* playback_buffers[][c] */
-	data->return_playback_buffer_size = BUFFER_FRAMES;		/* frames */
+	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i=0; i<current_settings.buffer_count; i++)
 		for(j=0; j<pchannels; j++)
 			emuxki_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
 				&data->playback_buffers[i][j].stride);
 		
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i=0; i<current_settings.buffer_count; i++)
 		for(j=0; j<pchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->pstream2, j, i, 
 				&data->playback_buffers[i][pchannels + j].base,
 				&data->playback_buffers[i][pchannels + j].stride);
 					
-	data->return_record_buffers = BUFFER_COUNT;
+	data->return_record_buffers = current_settings.buffer_count;
 	data->return_record_channels = rchannels + rchannels2;
-	data->return_record_buffer_size = BUFFER_FRAMES;	/* frames */
+	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i=0; i<current_settings.buffer_count; i++)
 		for(j=0; j<rchannels; j++)
 			emuxki_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,
 				&data->record_buffers[i][j].stride);
 		
-	for(i=0; i<BUFFER_COUNT; i++)
+	for(i=0; i<current_settings.buffer_count; i++)
 		for(j=0; j<rchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->rstream2, j, i, 
 				&data->record_buffers[i][rchannels + j].base,
@@ -955,7 +959,7 @@ emuxki_play_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = stream->first_voice->trigblk;
 	stream->update_needed = true;
 	release_spinlock(&slock);
@@ -975,7 +979,7 @@ emuxki_record_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = (stream->first_voice->trigblk 
 		+ stream->first_voice->blkmod -1) % stream->first_voice->blkmod;
 	stream->update_needed = true;
@@ -1195,28 +1199,32 @@ emuxki_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("voice_new\n"));
 		
-	card->rstream2 = emuxki_stream_new(card, EMU_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
-	card->rstream = emuxki_stream_new(card, EMU_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream2 = emuxki_stream_new(card, EMU_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream = emuxki_stream_new(card, EMU_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
+	card->rstream2 = emuxki_stream_new(card, EMU_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
+	card->rstream = emuxki_stream_new(card, EMU_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
+	card->pstream2 = emuxki_stream_new(card, EMU_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
+	card->pstream = emuxki_stream_new(card, EMU_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
 	
 	card->buffer_ready_sem = create_sem(0,"pbuffer ready");
 		
 	LOG(("voice_setaudio\n"));
 	
-	emuxki_stream_set_audioparms(card->pstream, true, 2, true, 48000);
-	emuxki_stream_set_audioparms(card->pstream2, false, 4, true, 48000);
-	emuxki_stream_set_audioparms(card->rstream, true, 2, true, 48000);
-	emuxki_stream_set_audioparms(card->rstream2, true, 2, true, 48000);
+	emuxki_stream_set_audioparms(card->pstream, true, current_settings.channels, 
+		current_settings.bitsPerSample == 16, current_settings.sample_rate);
+	emuxki_stream_set_audioparms(card->pstream2, false, 4, 
+		current_settings.bitsPerSample == 16, current_settings.sample_rate);
+	emuxki_stream_set_audioparms(card->rstream, true, current_settings.channels, 
+		current_settings.bitsPerSample == 16, current_settings.sample_rate);
+	emuxki_stream_set_audioparms(card->rstream2, true, current_settings.channels, 
+		current_settings.bitsPerSample == 16, current_settings.sample_rate);
 	recparams.efx_voices[0] = 3; // channels 1,2
 	recparams.efx_voices[1] = 0;
 	emuxki_stream_set_recparms(card->rstream, EMU_RECSRC_ADC, NULL);
 	emuxki_stream_set_recparms(card->rstream2, EMU_RECSRC_FX, &recparams);
 	
 	card->pstream->first_channel = 0;
-	card->pstream2->first_channel = 2;
-	card->rstream->first_channel = 6;
-	card->rstream2->first_channel = 8;
+	card->pstream2->first_channel = current_settings.channels;
+	card->rstream->first_channel = current_settings.channels + 4;
+	card->rstream2->first_channel = 2 * current_settings.channels + 4;
 	
 	emuxki_stream_commit_parms(card->pstream);
 	emuxki_stream_commit_parms(card->pstream2);

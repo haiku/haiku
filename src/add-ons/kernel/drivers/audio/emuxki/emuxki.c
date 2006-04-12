@@ -44,18 +44,19 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 #include <PCI.h>
-#include <string.h>
-#include <stdio.h>
+#include <driver_settings.h>
+#include <fcntl.h>
+#include <malloc.h>
 #include <math.h>
 #include <midi_driver.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "emuxki.h"
 #include "debug.h"
 #include "config.h"
 #include "util.h"
 #include "io.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include <malloc.h>
 #include "multi.h"
 #include "ac97.h"
 
@@ -75,6 +76,14 @@ int32 num_cards;
 emuxki_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
+
+emuxki_settings current_settings = {	
+		2,      // channels	
+		16,     // bits per sample	
+		48000,  // sample rate	
+		512,    // buffer frames	
+		2       // buffer count	
+};
 
 status_t emuxki_init(emuxki_dev * card);
 
@@ -2164,7 +2173,7 @@ emuxki_setup(emuxki_dev * card)
 			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
 	}
 	
-	PRINT(("init_driver done\n"));
+	PRINT(("setup_emuxki done\n"));
 
 	return err;
 }
@@ -2727,12 +2736,43 @@ status_t
 init_driver(void)
 {
 	int ix=0;
+	void *settings_handle;
 	
 	pci_info info;
 	num_cards = 0;
 	
 	PRINT(("init_driver()\n"));
 	load_driver_symbols("emuxki");
+	
+	// get driver settings
+	settings_handle  = load_driver_settings ("emuxki.settings");
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "channels", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.channels = value;
+
+		item = get_driver_parameter (settings_handle, "bitsPerSample", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.bitsPerSample = value;
+
+		item = get_driver_parameter (settings_handle, "sample_rate", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.sample_rate = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_frames", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_frames = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_count", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_count = value;
+
+		unload_driver_settings (settings_handle);
+	}
 
 	if (get_module(pci_name, (module_info **) &pci))
 		return ENOSYS;

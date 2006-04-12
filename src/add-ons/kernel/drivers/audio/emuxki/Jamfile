@@ -12,10 +12,14 @@ KernelAddon emuxki : kernel drivers bin :
 	util.c
 ;
 
+SEARCH on <emuxki!driver>emuxki.settings = $(SUBDIR) ;
+
 Package haiku-emuxki-cvs
 	:
 	emuxki
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-emuxki-cvs : audio multi emuxki ;
+PackageDriverSymLink haiku-emuxki-cvs : audio hmulti emuxki ;
+Package haiku-emuxki-cvs : <emuxki!driver>emuxki.settings
+        : boot home config settings kernel drivers ;

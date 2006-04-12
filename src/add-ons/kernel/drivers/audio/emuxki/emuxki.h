@@ -67,6 +67,20 @@
 #define AUTHOR "Jérôme Duval"
 
 /*
+ * Emuxki settings
+ */
+
+typedef struct {	
+	uint8   channels;	
+	uint8   bitsPerSample;	
+	uint32  sample_rate;	
+	uint32  buffer_frames;	
+	int32   buffer_count;	
+} emuxki_settings;	
+ 	 	
+extern emuxki_settings current_settings;
+
+/*
  * Emu10k1 midi
  */
 
