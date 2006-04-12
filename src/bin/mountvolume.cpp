@@ -1,5 +1,5 @@
-/* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+/*
+ * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -117,7 +117,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 			else if (!silent)
 				fprintf(stderr, "Volume `%s' already mounted.\n", name);
 		} else if (mountAll) {
-			mount = !partition->IsMounted();
+			mount = true;
 		} else if (mountBFS && type != NULL
 			&& strcmp(type, kPartitionTypeBFS) == 0) {
 			mount = true;
@@ -129,6 +129,10 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				|| strcmp(type, kPartitionTypeFAT32) == 0)) {
 			mount = true;
 		}
+
+		// don't try to mount a partition twice
+		if (partition->IsMounted())
+			mount = false;
 
 		// check whether to unmount
 		bool unmount = false;
