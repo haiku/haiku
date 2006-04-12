@@ -1972,7 +1972,7 @@ emuxki_int(void *arg)
 	}
 	
 	if(gotone)
-		return B_HANDLED_INTERRUPT;
+		return B_INVOKE_SCHEDULER;
 
 	TRACE(("Got unhandled interrupt\n"));
 	return B_UNHANDLED_INTERRUPT;
