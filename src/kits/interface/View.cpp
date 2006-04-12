@@ -1235,56 +1235,43 @@ BView::DragMessage(BMessage *message, BRect dragRect, BHandler *replyTo)
 	if (!message || !dragRect.IsValid())
 		return;
 
-	if (replyTo == NULL)
-		replyTo = this;
-	
-	if (replyTo->Looper() == NULL)
-		debugger("DragMessage: warning - the Handler needs a looper");
-
 	do_owner_check_no_pick();
 
+	// calculate the offset
 	BPoint offset;
+	uint32 buttons;
+	BMessage *current = fOwner->CurrentMessage();
+	if (!current || current->FindPoint("be:view_where", &offset) != B_OK)
+		GetMouse(&offset, &buttons, false);
+	offset -= dragRect.LeftTop();
 
-	if (!message->HasInt32("buttons")) {
-		BMessage *msg = fOwner->CurrentMessage();
-		uint32 buttons;
+	// create a drag bitmap for the rect
+	BBitmap *bitmap = new BBitmap(dragRect, B_RGBA32);
+	uint32 *bits = (uint32*)bitmap->Bits();
+	uint32 bytesPerRow = bitmap->BytesPerRow();
+	uint32 width = dragRect.IntegerWidth() + 1;
+	uint32 height = dragRect.IntegerHeight() + 1;
+	uint32 lastRow = (height - 1) * width;
 
-		if (msg) {
-			if (msg->FindInt32("buttons", (int32 *)&buttons) != B_OK) {
-				BPoint point;
-				GetMouse(&point, &buttons, false);
-			}
+	memset(bits, 0x00, height * bytesPerRow);
 
-			BPoint point;
-			if (msg->FindPoint("be:view_where", &point) == B_OK)
-				offset = point - dragRect.LeftTop();
-		} else {
-			BPoint point;
-			GetMouse(&point, &buttons, false);
-		}
+	// top
+	for (uint32 i = 0; i < width; i += 2)
+		bits[i] = 0xff000000;
 
-		message->AddInt32("buttons", buttons);		
-	}
+	// bottom
+	for (uint32 i = (height % 2 == 0 ? 1 : 0); i < width; i += 2)
+		bits[lastRow + i] = 0xff000000;
 
-	BMessage::Private privateMessage(message);
-	privateMessage.SetReply(BMessenger(replyTo, replyTo->Looper()));
+	// left
+	for (uint32 i = 0; i < lastRow; i += width * 2)
+		bits[i] = 0xff000000;
 
-	int32 bufferSize = privateMessage.NativeFlattenedSize();
-	char* buffer = new (nothrow) char[bufferSize];
-	if (buffer) {
-		privateMessage.NativeFlatten(buffer, bufferSize);
+	// right
+	for (uint32 i = (width % 2 == 0 ? width : 0); i < lastRow; i += width * 2)
+		bits[width - 1 + i] = 0xff000000;
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAG_RECT);
-		fOwner->fLink->Attach<BRect>(dragRect);
-		fOwner->fLink->Attach<BPoint>(offset);	
-		fOwner->fLink->Attach<int32>(bufferSize);
-		fOwner->fLink->Attach(buffer, bufferSize);
-		fOwner->fLink->Flush();
-
-		delete [] buffer;
-	} else {
-		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
-	}
+	DragMessage(message, bitmap, B_OP_BLEND, offset, replyTo);
 }
 
 
