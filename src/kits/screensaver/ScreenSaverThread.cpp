@@ -64,14 +64,12 @@ ScreenSaverThread::Thread()
 		} else if (fSaver->LoopOnCount() && (fFrame >= fSaver->LoopOnCount())) { // Time to nap
 			fFrame = 0;
 			fSnoozeCount = fSaver->LoopOffCount();
-		} else {
-			if (fWin->Lock()) {
-				if (fDWin) 
-					fSaver->DirectDraw(fFrame);
-				fSaver->Draw(fView,fFrame);
-				fWin->Unlock();
-				fFrame++;
-			}
+		} else if (fWin->Lock()) {
+			if (fDWin) 
+				fSaver->DirectDraw(fFrame);
+			fSaver->Draw(fView,fFrame);
+			fWin->Unlock();
+			fFrame++;
 		}
 	}
 }
