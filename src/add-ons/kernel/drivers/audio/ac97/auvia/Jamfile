@@ -17,4 +17,4 @@ Package haiku-auvia-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-auvia-cvs : audio multi auvia ;
+PackageDriverSymLink haiku-auvia-cvs : audio hmulti auvia ;

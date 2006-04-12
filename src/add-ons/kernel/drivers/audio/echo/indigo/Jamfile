@@ -77,7 +77,7 @@ Package haiku-echoindigo-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-echoindigo-cvs : audio multi echoindigo ;
+PackageDriverSymLink haiku-echoindigo-cvs : audio hmulti echoindigo ;
 
 Package haiku-echoindigo-cvs : <echo!driver>echo.settings
 	: boot home config settings kernel drivers ;

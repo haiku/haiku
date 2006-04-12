@@ -85,7 +85,7 @@ Package haiku-echo24-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-echo24-cvs : audio multi echo24 ;
+PackageDriverSymLink haiku-echo24-cvs : audio hmulti echo24 ;
 PackageDriverSymLink haiku-echo24-cvs : midi echo24 ;
 
 Package haiku-echo24-cvs : <echo!driver>echo.settings

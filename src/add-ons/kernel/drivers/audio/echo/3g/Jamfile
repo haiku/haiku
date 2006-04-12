@@ -78,7 +78,7 @@ Package haiku-echo3g-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-echo3g-cvs : audio multi echo3g ;
+PackageDriverSymLink haiku-echo3g-cvs : audio hmulti echo3g ;
 PackageDriverSymLink haiku-echo3g-cvs : midi echo3g ;
 
 Package haiku-echo3g-cvs : <echo!driver>echo.settings

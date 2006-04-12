@@ -17,4 +17,4 @@ Package haiku-auich-cvs
 	:
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-auich-cvs : audio multi auich ;
+PackageDriverSymLink haiku-auich-cvs : audio hmulti auich ;
