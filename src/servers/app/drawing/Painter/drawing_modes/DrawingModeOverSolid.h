@@ -36,7 +36,7 @@ blend_hline_over_solid(int x, int y, unsigned len,
 	if (pattern->IsSolidLow())
 		return;
 
-	if(cover == 255) {
+	if (cover == 255) {
 		uint32 v;
 		uint8* p8 = (uint8*)&v;
 		p8[0] = (uint8)c.b;

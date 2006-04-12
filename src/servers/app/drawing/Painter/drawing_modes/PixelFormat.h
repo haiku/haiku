@@ -19,9 +19,6 @@
 
 #include <GraphicsDefs.h>
 
-// TODO: remove (just DrawingMode)
-class DrawingMode;
-
 class PatternHandler;
 
 class PixelFormat {
@@ -59,14 +56,10 @@ class PixelFormat {
 								~PixelFormat();
 
 
-// TODO: remove set_drawing_mode
-void set_drawing_mode(DrawingMode* mode)
-{
-}
-
 			void				SetDrawingMode(drawing_mode mode,
 											   source_alpha alphaSrcMode,
-											   alpha_function alphaFncMode);
+											   alpha_function alphaFncMode,
+											   bool text);
 
 			// AGG "pixel format" interface
 			unsigned			width()  const { return fBuffer->width();  }

@@ -36,7 +36,6 @@
 
 	typedef agg::scanline_bin									scanline_unpacked_type;
 	typedef agg::scanline_bin									scanline_packed_type;
-	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 	typedef agg::renderer_scanline_bin_solid<renderer_base>		renderer_type;
 #else
 	typedef agg::renderer_outline_aa<renderer_base>				outline_renderer_type;
@@ -44,12 +43,12 @@
 
 	typedef agg::scanline_u8									scanline_unpacked_type;
 	typedef agg::scanline_p8									scanline_packed_type;
-	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 	typedef agg::renderer_scanline_aa_solid<renderer_base>		renderer_type;
 #endif
 
-	typedef agg::renderer_scanline_aa_solid<renderer_base>		font_renderer_solid_type;
-	typedef agg::renderer_scanline_bin_solid<renderer_base>		font_renderer_bin_type;
+	typedef agg::renderer_scanline_bin_solid<renderer_base>		renderer_bin_type;
+
+	typedef agg::rasterizer_scanline_aa<>						rasterizer_type;
 
 
 #endif // DEFINES_H

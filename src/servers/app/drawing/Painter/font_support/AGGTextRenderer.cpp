@@ -175,8 +175,8 @@ AGGTextRenderer::Unset()
 BRect
 AGGTextRenderer::RenderString(const char* string,
 							  uint32 length,
-							  font_renderer_solid_type* solidRenderer,
-							  font_renderer_bin_type* binRenderer,
+							  renderer_type* solidRenderer,
+							  renderer_bin_type* binRenderer,
 							  const BPoint& baseLine,
 							  const BRect& clippingFrame,
 							  bool dryRun,

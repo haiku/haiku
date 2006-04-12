@@ -24,6 +24,7 @@
 #include "DrawingModeBlend.h"
 #include "DrawingModeCopy.h"
 #include "DrawingModeCopySolid.h"
+#include "DrawingModeCopyText.h"
 #include "DrawingModeErase.h"
 #include "DrawingModeInvert.h"
 #include "DrawingModeMin.h"
@@ -126,7 +127,7 @@ PixelFormat::~PixelFormat()
 // SetDrawingMode
 void
 PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
-							alpha_function alphaFncMode)
+							alpha_function alphaFncMode, bool text)
 {
 	switch (mode) {
 		// these drawing modes discard source pixels
@@ -171,7 +172,13 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		// in these drawing modes, the current high
 		// and low color are treated equally
 		case B_OP_COPY:
-			if (fPatternHandler->IsSolid()) {
+			if (text) {
+				fBlendPixel = blend_pixel_copy_text;
+				fBlendHLine = blend_hline_copy_text;
+				fBlendSolidHSpan = blend_solid_hspan_copy_text;
+				fBlendSolidVSpan = blend_solid_vspan_copy_text;
+				fBlendColorHSpan = blend_color_hspan_copy_text;
+			} else if (fPatternHandler->IsSolid()) {
 				fBlendPixel = blend_pixel_copy_solid;
 				fBlendHLine = blend_hline_copy_solid;
 				fBlendSolidHSpan = blend_solid_hspan_copy_solid;

@@ -38,8 +38,8 @@ class AGGTextRenderer {
 
 			BRect				RenderString(const char* utf8String,
 											 uint32 length,
-											 font_renderer_solid_type* solidRenderer,
-											 font_renderer_bin_type* binRenderer,
+											 renderer_type* solidRenderer,
+											 renderer_bin_type* binRenderer,
 											 const BPoint& baseLine,
 											 const BRect& clippingFrame,
 											 bool dryRun = false,
@@ -67,8 +67,10 @@ class AGGTextRenderer {
 	conv_font_curve_type		fCurves;
 	conv_font_contour_type		fContour;
 
-	agg::scanline_u8			fScanline;
-	agg::rasterizer_scanline_aa<>	fRasterizer;
+	scanline_unpacked_type		fScanline;
+	rasterizer_type				fRasterizer;
+		// TODO: both of these are actually in Painter already
+		// and could be reused by this object
 
 	char*						fUnicodeBuffer;
 	int32						fUnicodeBufferSize;

@@ -9,7 +9,7 @@
 #ifndef DRAWING_MODE_COPY_SOLID_H
 #define DRAWING_MODE_COPY_SOLID_H
 
-#include "DrawingModeCopy.h"
+#include "DrawingModeOver.h"
 
 // blend_pixel_copy_solid
 void
@@ -18,11 +18,9 @@ blend_pixel_copy_solid(int x, int y, const color_type& c, uint8 cover,
 {
 	uint8* p = buffer->row(y) + (x << 2);
 	if (cover == 255) {
-		ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
+		ASSIGN_OVER(p, c.r, c.g, c.b);
 	} else {
-		rgb_color l = pattern->LowColor().GetColor32();
-		BLEND_COPY(p, c.r, c.g, c.b, cover,
-				   l.red, l.green, l.blue);
+		BLEND_OVER(p, c.r, c.g, c.b, cover);
 	}
 }
 
@@ -33,25 +31,23 @@ blend_hline_copy_solid(int x, int y, unsigned len,
 					   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	if (cover == 255) {
-		// cache the color as 32bit value
 		uint32 v;
 		uint8* p8 = (uint8*)&v;
 		p8[0] = (uint8)c.b;
 		p8[1] = (uint8)c.g;
 		p8[2] = (uint8)c.r;
 		p8[3] = 255;
-		// row offset as 32bit pointer
 		uint32* p32 = (uint32*)(buffer->row(y)) + x;
 		do {
 			*p32 = v;
 			p32++;
+			x++;
 		} while(--len);
 	} else {
 		uint8* p = buffer->row(y) + (x << 2);
-		rgb_color l = pattern->LowColor().GetColor32();
 		do {
-			BLEND_COPY(p, c.r, c.g, c.b, cover,
-					   l.red, l.green, l.blue);
+			BLEND_OVER(p, c.r, c.g, c.b, cover);
+			x++;
 			p += 4;
 		} while(--len);
 	}
@@ -65,18 +61,17 @@ blend_solid_hspan_copy_solid(int x, int y, unsigned len,
 							 const PatternHandler* pattern)
 {
 	uint8* p = buffer->row(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
 	do {
 		if (*covers) {
-			if(*covers == 255) {
-				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
+			if (*covers == 255) {
+				ASSIGN_OVER(p, c.r, c.g, c.b);
 			} else {
-				BLEND_COPY(p, c.r, c.g, c.b, *covers,
-						   l.red, l.green, l.blue);
+				BLEND_OVER(p, c.r, c.g, c.b, *covers);
 			}
 		}
 		covers++;
 		p += 4;
+		x++;
 	} while(--len);
 }
 
@@ -90,18 +85,17 @@ blend_solid_vspan_copy_solid(int x, int y, unsigned len,
 							 const PatternHandler* pattern)
 {
 	uint8* p = buffer->row(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
 	do {
 		if (*covers) {
 			if (*covers == 255) {
-				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
+				ASSIGN_OVER(p, c.r, c.g, c.b);
 			} else {
-				BLEND_COPY(p, c.r, c.g, c.b, *covers,
-						   l.red, l.green, l.blue);
+				BLEND_OVER(p, c.r, c.g, c.b, *covers);
 			}
 		}
 		covers++;
 		p += buffer->stride();
+		y++;
 	} while(--len);
 }
 
@@ -115,16 +109,14 @@ blend_color_hspan_copy_solid(int x, int y, unsigned len,
 							 const PatternHandler* pattern)
 {
 	uint8* p = buffer->row(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
 	if (covers) {
 		// non-solid opacity
 		do {
-			if(*covers) {
-				if(*covers == 255) {
-					ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
+				if (*covers) {
+				if (*covers == 255) {
+					ASSIGN_OVER(p, colors->r, colors->g, colors->b);
 				} else {
-					BLEND_COPY(p, colors->r, colors->g, colors->b, *covers,
-							   l.red, l.green, l.blue);
+					BLEND_OVER(p, colors->r, colors->g, colors->b, *covers);
 				}
 			}
 			covers++;
@@ -135,15 +127,14 @@ blend_color_hspan_copy_solid(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
+				ASSIGN_OVER(p, colors->r, colors->g, colors->b);
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_COPY(p, colors->r, colors->g, colors->b, cover,
-						   l.red, l.green, l.blue);
+				BLEND_OVER(p, colors->r, colors->g, colors->b, cover);
 				p += 4;
 				++colors;
 			} while(--len);

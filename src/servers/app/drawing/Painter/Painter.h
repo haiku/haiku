@@ -75,7 +75,8 @@ class Painter {
 									{ SetLowColor(color.GetColor32()); }
 
 			void				SetPenSize(float size);
-			void				SetPattern(const pattern& p);
+			void				SetPattern(const pattern& p,
+										   bool drawingText = false);
 
 			void				SetPenLocation(const BPoint& location);
 			BPoint				PenLocation() const
@@ -212,7 +213,7 @@ class Painter {
 
 			void				_UpdateFont();
 			void				_UpdateLineWidth();
-			void				_UpdateDrawingMode();
+			void				_UpdateDrawingMode(bool drawingText = false);
 			void				_SetRendererColor(const rgb_color& color) const;
 
 								// drawing functions stroke/fill
@@ -273,9 +274,7 @@ class Painter {
 	scanline_packed_type*		fPackedScanline;
 	rasterizer_type*			fRasterizer;
 	renderer_type*				fRenderer;
-
-	font_renderer_solid_type*	fFontRendererSolid;
-	font_renderer_bin_type*		fFontRendererBin;
+	renderer_bin_type*			fRendererBin;
 
 	agg::line_profile_aa		fLineProfile;
 
@@ -286,6 +285,7 @@ class Painter {
 	BRegion*					fClippingRegion;
 	bool						fValidClipping;
 	drawing_mode				fDrawingMode;
+	bool						fDrawingText;
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;
 	BPoint						fPenLocation;

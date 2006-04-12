@@ -70,8 +70,7 @@ Painter::Painter()
 	  fPackedScanline(NULL),
 	  fRasterizer(NULL),
 	  fRenderer(NULL),
-	  fFontRendererSolid(NULL),
-	  fFontRendererBin(NULL),
+	  fRendererBin(NULL),
 	  fLineProfile(),
 	  fSubpixelPrecise(false),
 
@@ -79,6 +78,7 @@ Painter::Painter()
 	  fClippingRegion(new BRegion()),
 	  fValidClipping(false),
 	  fDrawingMode(B_OP_COPY),
+	  fDrawingText(false),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
@@ -129,7 +129,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 						buffer->BytesPerRow());
 
 		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
-		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
+		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
 		// attach our clipping region to the renderer, it keeps a pointer
@@ -159,9 +159,9 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		fRasterizer->gamma(agg::gamma_threshold(0.5));
 #endif
 
-		// These are renderers needed for drawing text
-		fFontRendererSolid = new font_renderer_solid_type(*fBaseRenderer);
-		fFontRendererBin = new font_renderer_bin_type(*fBaseRenderer);
+		// possibly needed for drawing text (if the font is
+		// a one bit bitmap font, which is currently not supported yet)
+		fRendererBin = new renderer_bin_type(*fBaseRenderer);
 
 		_SetRendererColor(fPatternHandler->HighColor().GetColor32());
 	}
@@ -261,11 +261,12 @@ Painter::SetPenSize(float size)
 
 // SetPattern
 void
-Painter::SetPattern(const pattern& p)
+Painter::SetPattern(const pattern& p, bool drawingText)
 {
-	if (!(p == *fPatternHandler->GetR5Pattern())) {
+	if (!(p == *fPatternHandler->GetR5Pattern()) || drawingText != fDrawingText) {
 		fPatternHandler->SetPattern(p);
-		_UpdateDrawingMode();
+		fDrawingText = drawingText;
+		_UpdateDrawingMode(fDrawingText);
 
 		// update renderer color if necessary
 		if (fPatternHandler->IsSolidHigh()) {
@@ -925,13 +926,13 @@ Painter::DrawString(const char* utf8String, uint32 length,
 
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
-	SetPattern(B_SOLID_HIGH);
+	SetPattern(B_SOLID_HIGH, true);
 
 	if (fBuffer) {
 		bounds = fTextRenderer->RenderString(utf8String,
 											 length,
-											 fFontRendererSolid,
-											 fFontRendererBin,
+											 fRenderer,
+											 fRendererBin,
 											 baseLine,
 											 fClippingRegion->Frame(),
 											 false,
@@ -955,8 +956,8 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
-									   fFontRendererSolid,
-									   fFontRendererBin,
+									   fRenderer,
+									   fRendererBin,
 									   baseLine, dummy, true, penLocation,
 									   delta);
 }
@@ -1064,11 +1065,8 @@ Painter::_MakeEmpty()
 	delete fRenderer;
 	fRenderer = NULL;
 
-	delete fFontRendererSolid;
-	fFontRendererSolid = NULL;
-
-	delete fFontRendererBin;
-	fFontRendererBin = NULL;
+	delete fRendererBin;
+	fRendererBin = NULL;
 }
 
 // _Transform
@@ -1125,7 +1123,7 @@ Painter::_UpdateLineWidth()
 
 // _UpdateDrawingMode
 void
-Painter::_UpdateDrawingMode()
+Painter::_UpdateDrawingMode(bool drawingText)
 {
 	// The AGG renderers have their own color setting, however
 	// almost all drawing mode classes ignore the color given
@@ -1139,7 +1137,8 @@ Painter::_UpdateDrawingMode()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
 	if (fPixelFormat) {
-		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
+		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode,
+									 fAlphaFncMode, drawingText);
 	}
 		
 }
@@ -1167,16 +1166,12 @@ Painter::_SetRendererColor(const rgb_color& color) const
 								   color.green / 255.0,
 								   color.blue / 255.0,
 								   color.alpha / 255.0));
-	if (fFontRendererSolid)
-		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
-											color.green / 255.0,
-											color.blue / 255.0,
-											color.alpha / 255.0));
-	if (fFontRendererBin)
-		fFontRendererBin->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0,
-										  color.alpha / 255.0));
+// TODO: bitmap fonts not yet correctly setup in AGGTextRenderer
+//	if (RendererBin)
+//		RendererBin->color(agg::rgba(color.red / 255.0,
+//									 color.green / 255.0,
+//									 color.blue / 255.0,
+//									 color.alpha / 255.0));
 
 }
 
