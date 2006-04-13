@@ -67,6 +67,7 @@ using std::nothrow;
 // the update session, which tells us the cause of the update
 #define DELAYED_BACKGROUND_CLEARING 1
 
+
 WindowLayer::WindowLayer(const BRect& frame, const char *name,
 						 window_look look, window_feel feel,
 						 uint32 flags, uint32 workspaces,
@@ -1382,10 +1383,6 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 	if (fFeel == kDesktopWindowFeel)
 		return first ? first : NextWindow(workspace);
 
-	// menu windows are always on top
-	if (fFeel == kMenuWindowFeel)
-		return NULL;
-
 	if (first == NULL)
 		first = NextWindow(workspace);
 
@@ -1393,10 +1390,6 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 			window = window->NextWindow(workspace)) {
 		if (window->IsHidden() || window == this)
 			continue;
-
-		// no one can be in front of a menu window
-		if (window->Feel() == kMenuWindowFeel)
-			return window;
 
 		if (window->HasInSubset(this))
 			return window;
@@ -1426,20 +1419,17 @@ WindowLayer::HasInSubset(const WindowLayer* window) const
 	if (fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
 		return false;
 
-	if (fFeel == kMenuWindowFeel)
-		return true;
-	if (window->Feel() == kMenuWindowFeel)
-		return false;
+	// we have a few special feels that have a fixed order
 
-	if (fFeel == B_MODAL_ALL_WINDOW_FEEL)
-		return true;
-	if (window->Feel() == B_MODAL_ALL_WINDOW_FEEL)
-		return false;
+	const int32 feel[] = {kWindowScreenFeel, kMenuWindowFeel,
+		B_MODAL_ALL_WINDOW_FEEL, B_FLOATING_ALL_WINDOW_FEEL, 0};
 
-	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL)
-		return true;
-	if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
-		return false;
+	for (int32 order = 0; feel[order]; order++) {
+		if (fFeel == feel[order])
+			return true;
+		if (window->Feel() == feel[order])
+			return false;
+	}
 
 	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
 		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
