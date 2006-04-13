@@ -532,14 +532,14 @@ WindowLayer::Anchor(int32 index)
 
 
 WindowLayer*
-WindowLayer::NextWindow(int32 index)
+WindowLayer::NextWindow(int32 index) const
 {
 	return fAnchor[index].next;
 }
 
 
 WindowLayer*
-WindowLayer::PreviousWindow(int32 index)
+WindowLayer::PreviousWindow(int32 index) const
 {
 	return fAnchor[index].previous;
 }
@@ -793,6 +793,9 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 	} else {
 		if (ViewLayer* view = ViewAt(where)) {
+			if (HasModal())
+				return;
+
 			// clicking a simple ViewLayer
 			if (!IsFocus()) {
 				DesktopSettings desktopSettings(fDesktop);
@@ -865,6 +868,9 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 	fIsSlidingTab = false;
 
 	if (ViewLayer* view = ViewAt(where)) {
+		if (HasModal())
+			return;
+
 		*_viewToken = view->Token();
 		view->MouseUp(message, where);
 	}
@@ -1316,6 +1322,22 @@ WindowLayer::IsNormal() const
 }
 
 
+bool
+WindowLayer::HasModal() const
+{
+	for (WindowLayer* window = NextWindow(fCurrentWorkspace); window != NULL;
+			window = window->NextWindow(fCurrentWorkspace)) {
+		if (window->IsHidden() || !window->IsModal())
+			continue;
+
+		if (window->HasInSubset(this))
+			return true;
+	}
+
+	return false;
+}
+
+
 /*!
 	\brief Returns the windows that's in behind of the backmost position
 		this window can get.
@@ -1399,7 +1421,7 @@ WindowLayer::RemoveFromSubset(WindowLayer* window)
 
 
 bool
-WindowLayer::HasInSubset(WindowLayer* window)
+WindowLayer::HasInSubset(const WindowLayer* window) const
 {
 	if (fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
 		return false;

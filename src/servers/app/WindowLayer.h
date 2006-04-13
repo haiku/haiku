@@ -49,8 +49,8 @@ class WindowLayer {
 			const char*			Title() const { return fTitle.String(); }
 
 			window_anchor&		Anchor(int32 index);
-			WindowLayer*		NextWindow(int32 index);
-			WindowLayer*		PreviousWindow(int32 index);
+			WindowLayer*		NextWindow(int32 index) const;
+			WindowLayer*		PreviousWindow(int32 index) const;
 
 			::Desktop*			Desktop() const { return fDesktop; }
 			::Decorator*		Decorator() const { return fDecorator; }
@@ -188,12 +188,14 @@ class WindowLayer {
 			bool				IsFloating() const;
 			bool				IsNormal() const;
 
+			bool				HasModal() const;
+
 			WindowLayer*		Frontmost(WindowLayer* first = NULL, int32 workspace = -1);
 			WindowLayer*		Backmost(WindowLayer* first = NULL, int32 workspace = -1);
 
 			bool				AddToSubset(WindowLayer* window);
 			void				RemoveFromSubset(WindowLayer* window);
-			bool				HasInSubset(WindowLayer* window);
+			bool				HasInSubset(const WindowLayer* window) const;
 			bool				SameSubset(WindowLayer* window);
 			uint32				SubsetWorkspaces() const;
 
