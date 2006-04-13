@@ -48,27 +48,28 @@ TMWindow::TMWindow()
 		B_ALL_WORKSPACES),
 	fQuitting(false)
 {
-	Lock();
+	if (Lock()) {
 
-	// ToDo: make this font sensitive
-
-	fView = new TMView(Bounds(), "background", B_FOLLOW_ALL,
-		B_WILL_DRAW, B_NO_BORDER);
-	AddChild(fView);
-
-	float width, height;
-	fView->GetPreferredSize(&width, &height);
-	ResizeTo(width, height);
-
-	BRect screenFrame = BScreen(this).Frame();
-	BPoint point;
-	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
-	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
-
-	if (screenFrame.Contains(point))
+		// ToDo: make this font sensitive
+	
+		fView = new TMView(Bounds(), "background", B_FOLLOW_ALL,
+			B_WILL_DRAW, B_NO_BORDER);
+		AddChild(fView);
+	
+		float width, height;
+		fView->GetPreferredSize(&width, &height);
+		ResizeTo(width, height);
+	
+		BRect screenFrame = BScreen(this).Frame();
+		BPoint point;
+		point.x = (screenFrame.Width() - Bounds().Width()) / 2;
+		point.y = (screenFrame.Height() - Bounds().Height()) / 2;
+	
+		if (screenFrame.Contains(point))
 		MoveTo(point);
 
-	Unlock();
+		Unlock();
+	}
 }
 
 
@@ -102,11 +103,14 @@ TMWindow::QuitRequested()
 void
 TMWindow::Enable()
 {
-	SetPulseRate(1000000);
-
-	if (IsHidden()) {
-		fView->UpdateList();
-		Show();
+	if (Lock()) {
+		SetPulseRate(1000000);
+	
+		if (IsHidden()) {
+			fView->UpdateList();
+			Show();
+		}
+		Unlock();
 	}
 }
 
@@ -198,6 +202,7 @@ TMView::AttachedToWindow()
 		reboot->SetTarget(this);
 
 	fKillButton->SetTarget(this);
+	fRestartButton->SetTarget(this);
 	fListView->SetTarget(this);
 }
 
@@ -217,7 +222,6 @@ TMView::MessageReceived(BMessage *msg)
 			break;
 		}
 		case TM_RESTART_DESKTOP: {
-			fRestartButton->SetEnabled(false);
 			if (!be_roster->IsRunning(kTrackerSignature))
 				be_roster->Launch(kTrackerSignature);
 			if (!be_roster->IsRunning(kDeskbarSignature))
@@ -302,10 +306,9 @@ TMView::UpdateList()
 
 	bool desktopRunning = be_roster->IsRunning(kTrackerSignature)
 		&&  be_roster->IsRunning(kDeskbarSignature);
-	if (desktopRunning ^ fRestartButton->IsHidden())
+	if (!desktopRunning && fRestartButton->IsHidden())
 		fRestartButton->Show();
-	if (!desktopRunning)
-		fRestartButton->SetEnabled(true);
+	fRestartButton->SetEnabled(!desktopRunning);
 }
 
 

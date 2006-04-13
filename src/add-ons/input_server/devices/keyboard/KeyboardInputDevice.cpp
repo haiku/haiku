@@ -463,8 +463,10 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 		wait_for_thread(device->device_watcher, &dummy);
 	}
 	
-	if (fTMWindow)
+	if (fTMWindow) {
 		fTMWindow->PostMessage(B_QUIT_REQUESTED);
+		fTMWindow = NULL;
+	}
 	
 	return B_OK;
 }
