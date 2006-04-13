@@ -180,7 +180,8 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fXPlacementText->MoveBy(0, delta);
 	fYPlacementText->MoveBy(0, delta);
 
-	rect.Set(80, 76, 280, 96);
+	float offset = be_plain_font->StringWidth("Placement:") + 5;
+	rect.Set(offset + 10, 76, 280, 96);
 
 	fIconLabelBackground = new BCheckBox(rect, "iconLabelBackground", 
 		"Icon label background", new BMessage(kMsgIconLabelBackground));
@@ -202,10 +203,10 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fPlacementMenu->AddItem(new BMenuItem("Tile", 
 		new BMessage(kMsgTilePlacement)));
 
-	rect.OffsetBy(-70, -25);
+	rect.OffsetBy(-offset, -25);
 	BMenuField *placementMenuField = new BMenuField(rect, "placementMenuField",
 		"Placement:", fPlacementMenu);
-	placementMenuField->SetDivider(70.0);
+	placementMenuField->SetDivider(offset);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
 	rightbox->AddChild(placementMenuField);
 
@@ -213,7 +214,7 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	rect.right += 40;
 	BMenuField *imageMenuField = new BMenuField(rect, "imageMenuField", 
 		"Image:", fImageMenu);
-	imageMenuField->SetDivider(70.0);
+	imageMenuField->SetDivider(offset);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
 	rightbox->AddChild(imageMenuField);
 
