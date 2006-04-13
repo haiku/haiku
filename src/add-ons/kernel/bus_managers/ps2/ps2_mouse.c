@@ -222,8 +222,8 @@ static int32
 mouse_handle_int(ps2_dev *dev)
 {
 	mouse_cookie *cookie = dev->cookie;
-	uint8 data = dev->history[0].data;
-	
+	const uint8 data = dev->history[0].data;
+		
 	if (cookie->packet_index == 0 && !(data & 8)) {
 		TRACE(("bad mouse data, trying resync\n"));
 		return B_HANDLED_INTERRUPT;

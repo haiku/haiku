@@ -242,6 +242,7 @@ ps2_interrupt(void* cookie)
 {
 	uint8 ctrl;
 	uint8 data;
+	bool error;
 	ps2_dev *dev;
 	
 	ctrl = ps2_read_ctrl();
@@ -259,18 +260,30 @@ ps2_interrupt(void* cookie)
 		uint8 idx;
 		if (gActiveMultiplexingEnabled) {
 			idx = ctrl >> 6;
+			error = (ctrl & 0x04) != 0;
 			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx));
 		} else {
 			idx = 0;
+			error = (ctrl & 0xC0) != 0;
 			TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data));
 		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
 		TRACE(("ps2_interrupt: ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data));
 		dev = &ps2_device[PS2_DEVICE_KEYB];
+		error = (ctrl & 0xC0) != 0;
+
+		// TODO: remove me again; let us drop into the kernel debugger with F12
+		if (data == 88)
+			panic("keyboard requested halt.\n");
 	}
 	
-	return ps2_dev_handle_int(dev, data);
+	dev->history[1] = dev->history[0];
+	dev->history[0].time = system_time();
+	dev->history[0].data = data;
+	dev->history[0].error = error;
+
+	return ps2_dev_handle_int(dev);
 }
 
 

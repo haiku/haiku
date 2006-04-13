@@ -19,6 +19,7 @@ typedef struct
 {
 	bigtime_t		time;
 	uint8			data;
+	bool			error;
 } data_history;
 
 struct ps2_dev
@@ -32,7 +33,7 @@ struct ps2_dev
 	int				result_buf_idx;
 	int				result_buf_cnt;
 	void *			cookie;
-	data_history	history[5];
+	data_history	history[2];
 
 // functions
 	void          (*disconnect)(ps2_dev *);
@@ -63,6 +64,6 @@ status_t	ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_coun
 void		ps2_dev_publish(ps2_dev *dev);
 void		ps2_dev_unpublish(ps2_dev *dev);
 
-int32		ps2_dev_handle_int(ps2_dev *dev, uint8 data);
+int32		ps2_dev_handle_int(ps2_dev *dev);
 
 #endif

@@ -108,14 +108,9 @@ keyboard_handle_int(ps2_dev *dev)
 
 	TRACE(("scancode: %x\n", scancode));
 
-	// For now, F12 enters the kernel debugger
-	// ToDo: remove me later :-)
-	if (scancode == 88)
-		panic("keyboard requested halt.\n");
-
 	if (scancode & 0x80) {
 		keyInfo.is_keydown = false;
-		scancode -= 0x80;	
+		scancode &= 0x7f;	
 	} else
 		keyInfo.is_keydown = true;
 

@@ -90,8 +90,9 @@ ps2_dev_unpublish(ps2_dev *dev)
 
 
 int32
-ps2_dev_handle_int(ps2_dev *dev, uint8 data)
+ps2_dev_handle_int(ps2_dev *dev)
 {
+	const uint8 data = dev->history[0].data;
 	uint32 flags;
 	
 	flags = atomic_get(&dev->flags);
@@ -142,27 +143,33 @@ ps2_dev_handle_int(ps2_dev *dev, uint8 data)
 	
 pass_to_handler:
 
+	if ((flags & PS2_FLAG_KEYB) == 0) {
+		if (dev->history[0].error && data == 0xfd) {
+			dprintf("ps2: hot removal of %s\n", dev->name);
+			ps2_service_notify_device_removed(dev);
+			return B_INVOKE_SCHEDULER;
+		}
+		if (data == 0x00 && dev->history[1].data == 0xaa && (dev->history[0].time - dev->history[1].time) < 50000) {
+			dprintf("ps2: hot plugin of %s\n", dev->name);
+			ps2_service_notify_device_added(dev);
+			return B_INVOKE_SCHEDULER;
+		}
+	}
+
 	if (!dev->active) {
-		ps2_service_notify_device_added(dev);
 		dprintf("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
+		if (data != 0x00 && data != 0xaa) {
+			dprintf("ps2: possibly a hot plugin of %s\n", dev->name);
+			ps2_service_notify_device_added(dev);
+			return B_INVOKE_SCHEDULER;
+		}
 		return B_HANDLED_INTERRUPT;
 	}
 	
 	if ((flags & PS2_FLAG_ENABLED) == 0) {
 		dprintf("ps2: %s not enabled, data 0x%02x dropped\n", dev->name, data);
-		// TODO: remove me again; let us drop into the kernel debugger with F12
-		if ((flags & PS2_FLAG_KEYB) != 0 && data == 88)
-			panic("keyboard requested halt.\n");
-
 		return B_HANDLED_INTERRUPT;
 	}
-	
-	dev->history[4] = dev->history[3];
-	dev->history[3] = dev->history[2];
-	dev->history[2] = dev->history[1];
-	dev->history[1] = dev->history[0];
-	dev->history[0].time = system_time();
-	dev->history[0].data = data;
 
 	return dev->handle_int(dev);
 }
