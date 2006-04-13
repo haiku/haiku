@@ -1749,24 +1749,62 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 		if (!workspace_in_workspaces(i, window->Workspaces()))
 			continue;
 
-		WindowLayer* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
-		if (frontmost == NULL)
-			continue;
+		bool changed = false;
+		BRegion visibleBefore;
+		if (i == fCurrentWorkspace && window->IsVisible())
+			visibleBefore = window->VisibleRegion();
 
-		// check if the frontmost window is really in front of it
+		WindowLayer* backmost = window->Backmost(_Windows(i).LastWindow(), i);
+		if (backmost != NULL) {
+			// check if the backmost window is really behind it
+			WindowLayer* previous = window->PreviousWindow(i);
+			while (previous != NULL) {
+				if (previous == backmost)
+					break;
 
-		WindowLayer* next = window->NextWindow(i);
-		while (next != NULL) {
-			if (next == frontmost)
-				break;
+				previous = previous->PreviousWindow(i);
+			}
 
-			next = next->NextWindow(i);
+			if (previous == NULL) {
+				// need to reinsert window before its backmost window
+				_Windows(i).RemoveWindow(window);
+				_Windows(i).AddWindow(window, backmost->NextWindow(i));
+				changed = true;
+			}
 		}
 
-		if (next == NULL) {
-			// need to reinsert window behind its frontmost window
-			_Windows(i).RemoveWindow(window);
-			_Windows(i).AddWindow(window, frontmost);
+		WindowLayer* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
+		if (frontmost != NULL) {
+			// check if the frontmost window is really in front of it
+			WindowLayer* next = window->NextWindow(i);
+			while (next != NULL) {
+				if (next == frontmost)
+					break;
+
+				next = next->NextWindow(i);
+			}
+
+			if (next == NULL) {
+				// need to reinsert window behind its frontmost window
+				_Windows(i).RemoveWindow(window);
+				_Windows(i).AddWindow(window, frontmost);
+				changed = true;
+			}
+		}
+
+		if (i == fCurrentWorkspace && changed) {
+			BRegion dummy;
+			_RebuildClippingForAllWindows(dummy);
+
+			// mark everything dirty that is no longer visible, or
+			// is now visible and wasn't before
+			BRegion visibleAfter(window->VisibleRegion());
+			BRegion dirty(visibleAfter);
+			dirty.Exclude(&visibleBefore);
+			visibleBefore.Exclude(&visibleAfter);
+			dirty.Include(&visibleBefore);
+
+			MarkDirty(dirty);
 		}
 	}
 
