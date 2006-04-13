@@ -2,11 +2,11 @@ SubDir HAIKU_TOP src bin screen_blanker ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders screen_saver ;
+UsePrivateHeaders interface screen_saver ;
 
 BinCommand screen_blanker :
 	ScreenSaverApp.cpp
-	SSAwindow.cpp
+	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
 	ScreenSaver.cpp
 	: be game libscreensaver.so
