@@ -1327,10 +1327,9 @@ WindowLayer::Backmost(WindowLayer* window, int32 workspace)
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
 
+	// Desktop windows are always backmost
 	if (fFeel == kDesktopWindowFeel)
 		return NULL;
-	else if (fFeel == B_FLOATING_ALL_WINDOW_FEEL)
-		return window ? window : PreviousWindow(workspace);
 
 	if (window == NULL)
 		window = PreviousWindow(workspace);
@@ -1361,7 +1360,8 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 	if (fFeel == kDesktopWindowFeel)
 		return first ? first : NextWindow(workspace);
 
-	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL || fFeel == kMenuWindowFeel)
+	// menu windows are always on top
+	if (fFeel == kMenuWindowFeel)
 		return NULL;
 
 	if (first == NULL)
@@ -1372,9 +1372,8 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 		if (window->IsHidden() || window == this)
 			continue;
 
-		// no one can be in front of a floating all window
-		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL
-			|| window->Feel() == kMenuWindowFeel)
+		// no one can be in front of a menu window
+		if (window->Feel() == kMenuWindowFeel)
 			return window;
 
 		if (window->HasInSubset(this))
@@ -1402,14 +1401,23 @@ WindowLayer::RemoveFromSubset(WindowLayer* window)
 bool
 WindowLayer::HasInSubset(WindowLayer* window)
 {
-	if (fFeel == B_MODAL_APP_WINDOW_FEEL && window->Feel() == B_MODAL_ALL_WINDOW_FEEL
-		|| fFeel == B_NORMAL_WINDOW_FEEL
-		|| fFeel == window->Feel())
+	if (fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
 		return false;
 
-	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL
-		|| fFeel == B_MODAL_ALL_WINDOW_FEEL)
+	if (fFeel == kMenuWindowFeel)
 		return true;
+	if (window->Feel() == kMenuWindowFeel)
+		return false;
+
+	if (fFeel == B_MODAL_ALL_WINDOW_FEEL)
+		return true;
+	if (window->Feel() == B_MODAL_ALL_WINDOW_FEEL)
+		return false;
+
+	if (fFeel == B_FLOATING_ALL_WINDOW_FEEL)
+		return true;
+	if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+		return false;
 
 	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
 		|| fFeel == B_MODAL_APP_WINDOW_FEEL)

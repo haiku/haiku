@@ -987,7 +987,7 @@ Desktop::_UpdateFronts(bool updateFloating)
 bool
 Desktop::_WindowHasModal(WindowLayer* window)
 {
-	if (window == NULL || window->IsFloating())
+	if (window == NULL)
 		return false;
 
 	for (WindowLayer* modal = fSubsetWindows.FirstWindow(); modal != NULL;
