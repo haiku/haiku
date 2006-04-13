@@ -110,7 +110,7 @@ DesktopSettings::Private::_Load()
 			}
 
 			int32 i = 0;
-			while (i < 32
+			while (i < kMaxWorkspaces
 				&& settings.FindMessage("workspace", i, &fWorkspaceMessages[i]) == B_OK) {
 				i++;
 			}
