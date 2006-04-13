@@ -59,6 +59,7 @@ class BBitmap : public BArchivable {
 		int32 BytesPerRow() const;
 		color_space ColorSpace() const;
 		BRect Bounds() const;
+		uint32 Flags() const;
 
 		void SetBits(const void *data, int32 length, int32 offset,
 					 color_space colorSpace);

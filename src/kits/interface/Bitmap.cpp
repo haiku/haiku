@@ -350,6 +350,8 @@ BBitmap::IsValid() const
 status_t
 BBitmap::LockBits(uint32 *state)
 {
+	// NOTE: maybe this is used to prevent the app_server from
+	// drawing the bitmap yet?
 	return B_ERROR;
 }
 
@@ -421,6 +423,21 @@ BRect
 BBitmap::Bounds() const
 {
 	return fBounds;
+}
+
+// Flags
+/*!	\brief Returns the bitmap's creating flags.
+
+	This method informs about which flags have been used to create the
+	bitmap. It would for example tell you wether this is an overlay
+	bitmap. If bitmap creation succeeded, all flags are fulfilled.
+
+	\return The bitmap's creation flags.
+*/
+uint32
+BBitmap::Flags() const
+{
+	return fFlags;
 }
 
 
