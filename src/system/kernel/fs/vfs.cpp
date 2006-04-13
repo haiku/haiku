@@ -2750,11 +2750,21 @@ vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void 
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
+	fs_mount *mount;
+	status_t status = get_mount(mountID, &mount);
+	if (status < B_OK)
+		return status;
+
 	char *buffer = pathBuffer.LockBuffer();
 	strlcpy(buffer, path, pathBuffer.BufferSize());
 
-	struct vnode *vnode;
-	status_t status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
+	struct vnode *vnode = mount->root_vnode;
+	inc_vnode_ref_count(vnode);
+
+	status = vnode_path_to_vnode(vnode, buffer, true, 0, &vnode, NULL, NULL);
+
+	put_mount(mount);
+
 	if (status < B_OK)
 		return status;
 
