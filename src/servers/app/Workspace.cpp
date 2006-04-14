@@ -53,6 +53,9 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 }
 
 
+/*!
+        \brief Store the workspace configuration in an empty message
+*/
 void
 Workspace::Private::StoreConfiguration(BMessage& settings)
 {

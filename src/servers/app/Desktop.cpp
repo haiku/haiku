@@ -664,10 +664,7 @@ void
 Desktop::StoreWorkspaceConfiguration(int32 index)
 {
 	// store settings
-	const BMessage *oldSettings = fSettings->WorkspacesMessage(index);
 	BMessage settings;
-	if (oldSettings)
-		settings = *oldSettings;
 	fWorkspaces[index].StoreConfiguration(settings);
 	fSettings->SetWorkspacesMessage(index, settings);
 	fSettings->Save(kWorkspacesSettings);
