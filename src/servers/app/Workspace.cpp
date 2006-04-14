@@ -54,12 +54,13 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 
 
 /*!
-        \brief Store the workspace configuration in an empty message
+        \brief Store the workspace configuration in a message
 */
 void
 Workspace::Private::StoreConfiguration(BMessage& settings)
 {
 	rgb_color color = fColor.GetColor32();
+	settings.RemoveName("color");
 	settings.AddInt32("color", *(int32 *)&color);
 }
 

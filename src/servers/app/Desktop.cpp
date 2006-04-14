@@ -663,8 +663,11 @@ Desktop::RedrawBackground()
 void
 Desktop::StoreWorkspaceConfiguration(int32 index)
 {
+	const BMessage *oldSettings = fSettings->WorkspacesMessage(index);
 	// store settings
 	BMessage settings;
+	if (oldSettings)
+		settings = *oldSettings;
 	fWorkspaces[index].StoreConfiguration(settings);
 	fSettings->SetWorkspacesMessage(index, settings);
 	fSettings->Save(kWorkspacesSettings);
