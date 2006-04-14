@@ -829,19 +829,25 @@ flush_pending_repeats(void)
 		int32 length;
 
 		if (sMessageRepeatCount > 1) {
-			length = snprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE,
+			char temp[128];
+			length = snprintf(temp, OUTPUT_BUFFER_SIZE,
 				"Last message repeated %ld times.\n", sMessageRepeatCount);
-		} else {
-			// if we only have one repeat just reprint the buffer
-			length = strlen(sOutputBuffer);
-		}
 
-		if (sSerialDebugEnabled)
-			arch_debug_serial_puts(sOutputBuffer);
-		if (sSyslogOutputEnabled)
-			syslog_write(sOutputBuffer, length);
-		if (sBlueScreenEnabled || sDebugScreenEnabled)
-			blue_screen_puts(sOutputBuffer);
+			if (sSerialDebugEnabled)
+				arch_debug_serial_puts(temp);
+			if (sSyslogOutputEnabled)
+				syslog_write(temp, length);
+			if (sBlueScreenEnabled || sDebugScreenEnabled)
+				blue_screen_puts(temp);
+		} else {
+			// if we only have one repeat just reprint the last buffer
+			if (sSerialDebugEnabled)
+				arch_debug_serial_puts(sLastOutputBuffer);
+			if (sSyslogOutputEnabled)
+				syslog_write(sLastOutputBuffer, strlen(sLastOutputBuffer));
+			if (sBlueScreenEnabled || sDebugScreenEnabled)
+				blue_screen_puts(sLastOutputBuffer);
+		}
 
 		sMessageRepeatCount = 0;
 	}
