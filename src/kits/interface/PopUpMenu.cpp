@@ -267,6 +267,14 @@ BMenuItem *
 BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
+	if (fTrackThread >= 0) {
+		// Something bad happened: Go() was called on us twice, and we got here
+		// while the other instance hasn't finished yet.
+		// TODO: Maybe we should simply call debugger() ?
+		status_t unused;
+		wait_for_thread(fTrackThread, &unused);
+	}
+
 	BMenuItem *selected = NULL;
 	
 	// Can't use Window(), as the BPopUpMenu isn't attached

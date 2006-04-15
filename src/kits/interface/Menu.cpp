@@ -959,14 +959,9 @@ BMenu::Hide()
 
 
 BMenuItem *
-BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
-{
-	if (!IsStickyPrefOn())
-		openAnyway = false;
-		
-	SetStickyMode(openAnyway);
-	
-	if (openAnyway && LockLooper()) {
+BMenu::Track(bool sticky, BRect *clickToOpenRect)
+{	
+	if (sticky && LockLooper()) {
 		RedrawAfterSticky(Bounds());
 		UnlockLooper();
 	}
@@ -977,8 +972,12 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 		UnlockLooper();
 	}
 
+	// If sticky is false, pass 0 to the tracking function
+	// so the menu will stay in nonsticky mode, regardless
+	// of the "IsStickyPrefOn()" value
+	const bigtime_t trackTime = sticky ? system_time() : 0;
 	int action;
-	BMenuItem *menuItem = _track(&action, system_time());
+	BMenuItem *menuItem = _track(&action, trackTime);
 	
 	SetStickyMode(false);
 	fExtraRect = NULL;
