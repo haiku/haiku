@@ -128,8 +128,8 @@ status_t nv_agp_setup(bool enable_agp)
 		/* ..but we do need to select the right speed scheme fetched from our card */
 		if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
 		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
-		/* tell the engine in may use AGP transfers */
-		si->engine.agp_mode = true;
+		/* tell the engine in may use AGP transfers if AGP is up and running */
+		if (nca.cmd & AGP_enable) si->engine.agp_mode = true;
 	}
 
 	/* list mode now activated,
