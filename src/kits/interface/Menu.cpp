@@ -103,6 +103,9 @@ sPropList[] = {
 };
 
 
+const char *kEmptyMenuLabel = "<empty>";
+
+
 BMenu::BMenu(const char *name, menu_layout layout)
 	:	BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
 		fChosenItem(NULL),
@@ -1096,9 +1099,6 @@ BMenu::_show(bool selectFirstItem)
 		if (dynamic_cast<BMenuWindow *>(window) != NULL)
 			MoveTo(1, 1);
 	
-		// TODO: for some reason, Window() can already be NULL at this point,
-		//		which causes a crash in one of the following functions...
-		// Does this still happens ?
 		UpdateWindowViewSize();
 		window->Show();
 
@@ -1118,8 +1118,9 @@ BMenu::_hide()
 	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 	if (window == NULL || !window->Lock())
 		return;
-		
-	SelectItem(NULL);
+	
+	if (fSelected != NULL)
+		SelectItem(NULL);
 
 	window->Hide();
 	window->DetachMenu();
@@ -1135,17 +1136,20 @@ BMenu::_hide()
 }
 
 
+const bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
+	
+
 BMenuItem *
 BMenu::_track(int *action, bigtime_t trackTime, long start)
 {
 	// TODO: cleanup
-	ulong buttons;
 	BMenuItem *item = NULL;
 	int localAction = MENU_ACT_NONE;
 
-	bigtime_t startTime = system_time();
-	bigtime_t delay = 200000; // TODO: Test and reduce if needed.
-
+	bigtime_t openTime = system_time();
+	bigtime_t closeTime = openTime; 
+	
+	fState = MENU_ACT_NONE;
 	while (true) {
 		bool locked = LockLooper();
 		if (!locked)
@@ -1153,21 +1157,26 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
+		ulong buttons;
 		GetMouse(&location, &buttons, false);
 		
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
-			if (item != fSelected) {
+			if (item != fSelected
+				&& (fState != MENU_ACT_SUBMENU || system_time() > closeTime + kHysteresis)) {
 				SelectItem(item, -1);
-				startTime = system_time();
+				openTime = system_time();
+				fState = MENU_ACT_NONE;
 				snoozeAmount = 20000;
-			} else if (system_time() > delay + startTime && item->Submenu() 
+			} else if (system_time() > kHysteresis + openTime && item->Submenu() 
 				&& item->Submenu()->Window() == NULL) {
 				// Open the submenu if it's not opened yet, but only if
 				// the mouse pointer stayed over there for some time
 				// (hysteresis)
 				SelectItem(item);
+				fState = MENU_ACT_SUBMENU;
+				closeTime = system_time();
 			}
 		} else {
 			if (OverSuper(screenLocation)) {
@@ -1176,8 +1185,11 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 				UnlockLooper();
 				break;
 			}
-			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation))
+			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation)
+				&& (fState != MENU_ACT_SUBMENU || system_time() > closeTime + kHysteresis)) {
 				SelectItem(NULL);
+				fState = MENU_ACT_NONE;
+			}
 		}
 
 		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
@@ -1211,6 +1223,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			}
 		}
 	}
+
+	fState = MENU_ACT_CLOSE;
 
 	if (action != NULL)
 		*action = localAction;

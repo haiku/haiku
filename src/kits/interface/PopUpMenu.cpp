@@ -1,30 +1,12 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		PopUpMenu.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//					Stefano Ceccherini (burton666@libero.it)
-//	Description:	BPopUpMenu represents a menu that pops up when you
-//                  activate it.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Marc Flerackers (mflerackers@androme.be)
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
+
 #include <Application.h>
 #include <Looper.h>
 #include <MenuItem.h>
@@ -81,8 +63,7 @@ BPopUpMenu::~BPopUpMenu()
 	if (fTrackThread >= 0) {
 		status_t status;
 		while (wait_for_thread(fTrackThread, &status) == B_INTERRUPTED)
-			;
-		
+			;		
 	}
 }
 
@@ -318,10 +299,10 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	data->lock = sem;
 	
 	// Spawn the tracking thread
-	thread_id thread = spawn_thread(entry, "popup", B_NORMAL_PRIORITY, data); 
+	fTrackThread = spawn_thread(entry, "popup", B_NORMAL_PRIORITY, data); 
 	
-	if (thread >= 0)
-		resume_thread(thread);
+	if (fTrackThread >= 0)
+		resume_thread(fTrackThread);
 	else {
 		// Something went wrong. Cleanup and return NULL
 		delete_sem(sem);
@@ -344,12 +325,13 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		}
 		
 		status_t unused;
-		while (wait_for_thread(thread, &unused) == B_INTERRUPTED)
+		while (wait_for_thread(fTrackThread, &unused) == B_INTERRUPTED)
 			;
 		
 		selected = data->selected;
 		
 		delete data;
+
 	}
 		
 	return selected;
@@ -413,6 +395,8 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 	Hide();
 	
 	be_app->ShowCursor();
+
+	fTrackThread = -1;
 
 	return result;
 }

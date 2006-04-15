@@ -381,7 +381,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
 	int localAction = MENU_ACT_NONE;
-	bigtime_t startTime = system_time();
 	while (true) {
 		bigtime_t snoozeAmount = 30000;
 		bool locked = window->Lock();//WithTimeout(200000)
@@ -404,6 +403,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					if (menuItem->Submenu()->Window() == NULL) {
 						// open the menu if it's not opened yet
 						SelectItem(menuItem);
+						if (IsStickyMode())
+							SetStickyMode(false);
 					} else {
 						// Menu was already opened, close it and bail
 						SelectItem(NULL);
@@ -427,7 +428,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				snoozeAmount = 0;
 				if (IsStickyMode())
 					menu->SetStickyMode(true);
-				resultItem = menu->_track(&localAction, startTime);
+				resultItem = menu->_track(&localAction, system_time());
 			}
 		} else if (menuItem == NULL && !IsStickyMode())
 			SelectItem(NULL);
@@ -442,11 +443,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			if (fSelected != NULL && fSelected->Submenu() == NULL) {
 				resultItem = fSelected;
 				break;
-			} else if (IsStickyPrefOn() && system_time() < startTime + 2000000) {
-				// Don't switch to sticky mode if user kept the mouse pressed for too long
-				// TODO: Delay could be smaller, but then it wouldn't be noticeable on QEMU on my machine
+			} else if (IsStickyPrefOn())
 				SetStickyMode(true);
-			} else
+			else
 				break;
 		}
 
