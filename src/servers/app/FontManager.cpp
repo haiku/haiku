@@ -1039,14 +1039,13 @@ FontManager::AttachUser(uid_t userID)
 {
 	BAutolock locker(this);
 
-/*
+#if !TEST_MODE
 	BPath path;
-	status_t status = find_directory(B_USER_FONTS_DIRECTORY, &path);
-	if (status != B_OK)
-		return status;
+	if (find_directory(B_USER_FONTS_DIRECTORY, &path) != B_OK)
+		return;
 
 	_AddPath(path.Path());
-*/
+#endif
 }
 
 
@@ -1054,5 +1053,7 @@ void
 FontManager::DetachUser(uid_t userID)
 {
 	BAutolock locker(this);
+
+	// TODO!
 }
 
