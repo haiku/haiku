@@ -90,7 +90,8 @@ KPhysicalPartition::PublishDevice()
 		return B_NAME_TOO_LONG;
 	}
 
-	return devfs_publish_partition(path.Path(), &info);
+	return devfs_publish_partition(path.Path() + 5, &info);
+		// we need to remove the "/dev/" part from the path
 }
 
 // UnpublishDevice
@@ -103,7 +104,8 @@ KPhysicalPartition::UnpublishDevice()
 	if (error != B_OK)
 		return error;
 
-	return devfs_unpublish_partition(path.Path());
+	return devfs_unpublish_partition(path.Path() + 5);
+		// we need to remove the "/dev/" part from the path
 }
 
 // Mount

@@ -173,7 +173,8 @@ KFileDiskDevice::GetGeometry(device_geometry *geometry)
 status_t
 KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 {
-	return devfs_publish_file_device(device, file);
+	return devfs_publish_file_device(device + 5, file);
+		// we need to remove the "/dev/" part from the path
 
 	// TODO: For now we use the virtualdrive driver to register a file
 	// as a device and then simply symlink the assigned device to the
@@ -222,7 +223,8 @@ KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 status_t
 KFileDiskDevice::_UnregisterDevice(const char *_device)
 {
-	return devfs_unpublish_file_device(_device);
+	return devfs_unpublish_file_device(_device + 5);
+		// we need to remove the "/dev/" part from the path
 
 //	// read the symlink to get the path of the virtualdrive device
 //	char device[B_PATH_NAME_LENGTH];

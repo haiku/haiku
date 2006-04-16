@@ -2107,9 +2107,11 @@ devfs_publish_partition(const char *path, const partition_info *info)
 	// the partition and device paths must be the same until the leaves
 	const char *lastPath = strrchr(path, '/');
 	const char *lastDevice = strrchr(info->device, '/');
-	if (lastPath == NULL || lastDevice == NULL
-		|| lastPath - path != lastDevice - info->device
-		|| strncmp(path, info->device, lastPath - path))
+	if (lastPath == NULL || lastDevice == NULL)
+		return B_BAD_VALUE;
+
+	size_t length = lastDevice - (lastPath - path) - info->device;
+	if (strncmp(path, info->device + length, lastPath - path))
 		return B_BAD_VALUE;
 
 	devfs_vnode *device;
