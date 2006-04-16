@@ -60,6 +60,7 @@ class KeyboardFilter : public EventFilter {
 
 		virtual filter_result Filter(BMessage* message, EventTarget** _target,
 			int32* _viewToken, BMessage* latestMouseMoved);
+		virtual void RemoveTarget(EventTarget* target);
 
 	private:
 		void _UpdateFocus(int32 key, EventTarget** _target);
@@ -112,7 +113,7 @@ KeyboardFilter::_UpdateFocus(int32 key, EventTarget** _target)
 	//	be done differently, though (using something like B_LOCK_WINDOW_FOCUS)
 	//	(at least B_WINDOW_ACTIVATED must be postponed)
 
-	if (focus != fLastFocus && now - fTimestamp > 100000) {
+	if (fLastFocus == NULL || (focus != fLastFocus && now - fTimestamp > 100000)) {
 		// if the time span between the key presses is very short
 		// we keep our previous focus alive - this is save even
 		// if the target doesn't exist anymore, as we don't reset
@@ -197,6 +198,14 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		_UpdateFocus(key, _target);
 
 	return B_DISPATCH_MESSAGE;
+}
+
+
+void
+KeyboardFilter::RemoveTarget(EventTarget* target)
+{
+	if (target == fLastFocus)
+		fLastFocus = NULL;
 }
 
 

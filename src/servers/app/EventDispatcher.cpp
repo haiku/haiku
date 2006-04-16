@@ -214,6 +214,15 @@ EventTarget::AddListener(int32 token, uint32 eventMask,
 //	#pragma mark -
 
 
+void
+EventFilter::RemoveTarget(EventTarget* target)
+{
+}
+
+
+//	#pragma mark -
+
+
 EventDispatcher::EventDispatcher()
 	: BLocker("event dispatcher"),
 	fStream(NULL),
@@ -320,6 +329,11 @@ EventDispatcher::RemoveTarget(EventTarget& target)
 		fFocus = NULL;
 	if (fPreviousMouseTarget == &target)
 		fPreviousMouseTarget = NULL;
+
+	if (fKeyboardFilter != NULL)
+		fKeyboardFilter->RemoveTarget(&target);
+	if (fMouseFilter != NULL)
+		fMouseFilter->RemoveTarget(&target);
 
 	fTargets.RemoveItem(&target);
 }
