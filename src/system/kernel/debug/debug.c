@@ -829,8 +829,8 @@ flush_pending_repeats(void)
 		int32 length;
 
 		if (sMessageRepeatCount > 1) {
-			char temp[128];
-			length = snprintf(temp, OUTPUT_BUFFER_SIZE,
+			static char temp[40];
+			length = snprintf(temp, sizeof(temp),
 				"Last message repeated %ld times.\n", sMessageRepeatCount);
 
 			if (sSerialDebugEnabled)
