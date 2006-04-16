@@ -1261,7 +1261,12 @@ Desktop::ActivateWindow(WindowLayer* window)
 void
 Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 {
-	if (window == BackWindow() || !LockAllWindows())
+	// TODO: should the "not in current workspace" be handled anyway?
+	//	(the code below would have to be changed then, though)
+	if (window == BackWindow()
+		|| !window->InWorkspace(fCurrentWorkspace)
+		|| (behindOf != NULL && !behindOf->InWorkspace(fCurrentWorkspace))
+		|| !LockAllWindows())
 		return;
 
 	// Is this a valid behindOf window?
