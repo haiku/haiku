@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TIME_H_
@@ -11,8 +11,8 @@
 
 typedef long clock_t;
 typedef long time_t;
-typedef long long suseconds_t;
-typedef unsigned long long useconds_t;
+typedef long suseconds_t;
+typedef unsigned long useconds_t;
 
 #define CLOCKS_PER_SEC	1000
 #define CLK_TCK			CLOCKS_PER_SEC
