@@ -2366,47 +2366,42 @@ FSInTrashDir(const entry_ref *ref)
 void
 FSEmptyTrash()
 {
-	if (find_thread("_tracker_empty_trash_") == B_NAME_NOT_FOUND)
+	if (find_thread("_tracker_empty_trash_") != B_OK) {
 		resume_thread(spawn_thread(empty_trash, "_tracker_empty_trash_",
 			B_NORMAL_PRIORITY, NULL));
+	}
 }
 
 
 status_t
 empty_trash(void *)
 {
-	BVolumeRoster	roster;
-	BVolume			volume;
-	BEntry			entry;
-	BDirectory		trash_dir;
-	entry_ref		ref;
-	thread_id		tid;
-	status_t		err;
-	int32			totalCount;
-	off_t			totalSize;
-	BObjectList<entry_ref>	srcList;
-
 	// empty trash on all mounted volumes
-	err = B_OK;
+	status_t err = B_OK;
 
-	tid = find_thread(NULL);
+	thread_id thread = find_thread(NULL);
 	if (gStatusWindow)
-		gStatusWindow->CreateStatusItem(tid, kTrashState);
+		gStatusWindow->CreateStatusItem(thread, kTrashState);
 
 	// calculate the sum total of all items on all volumes in trash
-	totalCount = 0;
-	totalSize = 0;
+	BObjectList<entry_ref> srcList;
+	int32 totalCount = 0;
+	off_t totalSize = 0;
 
-	roster.Rewind();
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		
+	BVolumeRoster volumeRoster;
+	BVolume volume;
+	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
 
-		if (FSGetTrashDir(&trash_dir, volume.Device()) != B_OK)
+		BDirectory trashDirectory;
+		if (FSGetTrashDir(&trashDirectory, volume.Device()) != B_OK)
 			continue;
 
-		trash_dir.GetEntry(&entry);
+		BEntry entry;
+		trashDirectory.GetEntry(&entry);
+
+		entry_ref ref;
 		entry.GetRef(&ref);
 		srcList.AddItem(&ref);
 		err = CalcItemsAndSize(&srcList, &totalCount, &totalSize);
@@ -2421,26 +2416,29 @@ empty_trash(void *)
 
 	if (err == B_OK) {
 		if (gStatusWindow)
-			gStatusWindow->InitStatusItem(tid, totalCount, totalCount);
-	
-		roster.Rewind();
-		while (roster.GetNextVolume(&volume) == B_OK) {
-			TrackerCopyLoopControl loopControl(tid);
-			
+			gStatusWindow->InitStatusItem(thread, totalCount, totalCount);
+
+		volumeRoster.Rewind();
+		while (volumeRoster.GetNextVolume(&volume) == B_OK) {
+			TrackerCopyLoopControl loopControl(thread);
+
 			if (volume.IsReadOnly() || !volume.IsPersistent())
 				continue;
-	
-			if (FSGetTrashDir(&trash_dir, volume.Device()) != B_OK)
+
+			BDirectory trashDirectory;
+			if (FSGetTrashDir(&trashDirectory, volume.Device()) != B_OK)
 				continue;
-	
-			trash_dir.GetEntry(&entry);
+
+			BEntry entry;
+			trashDirectory.GetEntry(&entry);
 			err = FSDeleteFolder(&entry, &loopControl, true, false);
 		}
 	}
 
-	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) 
+	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) {
 		(new BAlert("", "Error emptying Trash!", "OK", NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+	}
 
 	if (gStatusWindow)
 		gStatusWindow->RemoveStatusItem(find_thread(NULL));
