@@ -1776,7 +1776,7 @@ find_thread(const char *name)
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	return B_ENTRY_NOT_FOUND;
+	return B_NAME_NOT_FOUND;
 }
 
 
