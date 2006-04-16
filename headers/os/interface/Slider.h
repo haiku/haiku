@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -171,8 +171,9 @@ class BSlider : public BControl {
 		rgb_color 			fFillColor;
 		bool				fUseFillColor;
 
-		char*				fMinLimitStr;
-		char*				fMaxLimitStr;
+		char*				fMinLimitLabel;
+		char*				fMaxLimitLabel;
+		char*				fUpdateText;
 
 		int32 				fMinValue;
 		int32 				fMaxValue;
@@ -195,9 +196,9 @@ class BSlider : public BControl {
 		float				fBarThickness;
 
 #if USE_OFF_SCREEN_VIEW
-		uint32				_reserved[8];
+		uint32				_reserved[7];
 #else
-		uint32				_reserved[10];
+		uint32				_reserved[9];
 #endif
 };
 

@@ -49,8 +49,8 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	fSnoozeAmount = 20000;
 	fOrientation = B_HORIZONTAL;
 	fBarThickness = 6.0f;
-	fMinLimitStr = NULL;
-	fMaxLimitStr = NULL;
+	fMinLimitLabel = NULL;
+	fMaxLimitLabel = NULL;
 	fMinValue = minValue;
 	fMaxValue = maxValue;
 
@@ -61,12 +61,13 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	fHashMarks = B_HASH_MARKS_NONE;
 	fStyle = thumbType;
 
-	if (Style() == B_BLOCK_THUMB)
+	if (Style() == B_BLOCK_THUMB) {
 		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_DARKEN_4_TINT));
-	else
+	} else {
 		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_DARKEN_4_TINT));
+	}
 
 	UseFillColor(false, NULL);
 
@@ -83,8 +84,8 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	fSnoozeAmount = 20000;
 	fOrientation = posture;
 	fBarThickness = 6.0f;
-	fMinLimitStr = NULL;
-	fMaxLimitStr = NULL;
+	fMinLimitLabel = NULL;
+	fMaxLimitLabel = NULL;
 	fMinValue = minValue;
 	fMaxValue = maxValue;
 
@@ -108,21 +109,8 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 }
 
 
-BSlider::~BSlider()
-{
-#if USE_OFF_SCREEN_VIEW
-	if (fOffScreenBits)
-		delete fOffScreenBits;
-#endif
-
-	delete fModificationMessage;
-	free(fMinLimitStr);
-	free(fMaxLimitStr);
-}
-
-
 BSlider::BSlider(BMessage *archive)
-	:	BControl (archive)
+	: BControl(archive)
 {
 	fModificationMessage = NULL;
 
@@ -152,8 +140,8 @@ BSlider::BSlider(BMessage *archive)
 	else
 		fOrientation = B_HORIZONTAL;
 
-	fMinLimitStr = NULL;
-	fMaxLimitStr = NULL;
+	fMinLimitLabel = NULL;
+	fMaxLimitLabel = NULL;
 
 	const char *minlbl = NULL, *maxlbl = NULL;
 
@@ -210,6 +198,19 @@ BSlider::BSlider(BMessage *archive)
 }
 
 
+BSlider::~BSlider()
+{
+#if USE_OFF_SCREEN_VIEW
+	if (fOffScreenBits)
+		delete fOffScreenBits;
+#endif
+
+	delete fModificationMessage;
+	free(fMinLimitLabel);
+	free(fMaxLimitLabel);
+}
+
+
 void
 BSlider::_InitObject()
 {
@@ -222,6 +223,8 @@ BSlider::_InitObject()
 	fOffScreenBits = NULL;
 	fOffScreenView = NULL;
 #endif
+
+	fUpdateText = NULL;
 }
 
 
@@ -250,11 +253,11 @@ BSlider::Archive(BMessage *archive, bool deep) const
 	if (FillColor(NULL))
 		archive->AddInt32("_fcolor", _color_to_long_(fFillColor));
 
-	if (fMinLimitStr)
-		archive->AddString("_minlbl", fMinLimitStr);
+	if (fMinLimitLabel)
+		archive->AddString("_minlbl", fMinLimitLabel);
 
-	if (fMaxLimitStr)
-		archive->AddString("_maxlbl", fMaxLimitStr);
+	if (fMaxLimitLabel)
+		archive->AddString("_maxlbl", fMaxLimitLabel);
 
 	archive->AddInt32("_min", fMinValue);
 	archive->AddInt32("_max", fMaxValue);
@@ -295,6 +298,7 @@ BSlider::AttachedToWindow()
 	ResizeToPreferred();
 
 	fLocation.Set(9.0f, 0.0f);
+	fUpdateText = UpdateText();
 
 #if USE_OFF_SCREEN_VIEW
 	BRect bounds(Bounds());
@@ -324,7 +328,6 @@ BSlider::AttachedToWindow()
 	BControl::AttachedToWindow();
 
 	if (view) {
-		
 		rgb_color color = ViewColor();
 		if (Parent() != NULL)
 			color = Parent()->ViewColor();
@@ -482,7 +485,7 @@ BSlider::MouseDown(BPoint point)
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
 		SetTracking(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 	} else {
 		// synchronous mouse tracking
 		BPoint prevPoint;
@@ -551,15 +554,13 @@ void
 BSlider::SetLimitLabels(const char *minLabel, const char *maxLabel)
 {
 	if (minLabel) {
-		if (fMinLimitStr)
-			free(fMinLimitStr);
-		fMinLimitStr = strdup(minLabel);
+		free(fMinLimitLabel);
+		fMinLimitLabel = strdup(minLabel);
 	}
 
 	if (maxLabel) {
-		if (fMaxLimitStr)
-			free(fMaxLimitStr);
-		fMaxLimitStr = strdup(maxLabel);
+		free(fMaxLimitLabel);
+		fMaxLimitLabel = strdup(maxLabel);
 	}
 
 	// TODO: Auto resizing?!? I would not want this as an app programmer!
@@ -571,14 +572,14 @@ BSlider::SetLimitLabels(const char *minLabel, const char *maxLabel)
 const char*
 BSlider::MinLimitLabel() const
 {
-	return fMinLimitStr;
+	return fMinLimitLabel;
 }
 
 
 const char*
 BSlider::MaxLimitLabel() const
 {
-	return fMaxLimitStr;
+	return fMaxLimitLabel;
 }
 
 
@@ -625,6 +626,26 @@ BSlider::SetValue(int32 value)
 
 		BControl::SetValueNoUpdate(value);
 		Invalidate(oldThumbFrame | ThumbFrame());
+
+		// update text label
+
+		float oldWidth = 0.0f, width = 0.0f;
+		if (fUpdateText != NULL)
+			oldWidth = StringWidth(fUpdateText);
+
+		fUpdateText = UpdateText();
+		if (fUpdateText != NULL)
+			width = StringWidth(fUpdateText);
+
+		width = ceilf(max_c(width, oldWidth)) + 2.0f;
+		if (width != 0) {
+			font_height fontHeight;
+			GetFontHeight(&fontHeight);
+
+			BRect rect(-width, 0, 0, ceilf(fontHeight.ascent + fontHeight.descent));
+			rect.OffsetBy(Bounds().Width(), 0);
+			Invalidate(rect);
+		}
 	}
 }
 
@@ -691,7 +712,6 @@ BSlider::Draw(BRect updateRect)
 	// thumb style - if possible this should be avoided.
 	if (Style() == B_BLOCK_THUMB)
 		background.Exclude(ThumbFrame());
-
 
 #if USE_OFF_SCREEN_VIEW
 	if (!fOffScreenBits)
@@ -989,40 +1009,49 @@ BSlider::DrawText()
 		view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
 	}
 
-	font_height fheight;
-
-	GetFontHeight(&fheight);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
 	if (Orientation() == B_HORIZONTAL) {
 		if (Label())
-			view->DrawString(Label(), BPoint(2.0f, (float)ceil(fheight.ascent)));
+			view->DrawString(Label(), BPoint(2.0f, ceilf(fontHeight.ascent)));
 
-		if (fMinLimitStr)
-			view->DrawString(fMinLimitStr, BPoint(2.0f, bounds.bottom - 4.0f));
+		// the update text is updated in SetValue() only
+		if (fUpdateText != NULL) {
+			view->DrawString(fUpdateText, BPoint(bounds.right - StringWidth(fUpdateText)
+				- 2.0f, ceilf(fontHeight.ascent)));
+		}
 
-		if (fMaxLimitStr)
-			view->DrawString(fMaxLimitStr, BPoint(bounds.right -
-												  StringWidth(fMaxLimitStr) - 2.0f,
-												  bounds.bottom - 4.0f));
+		if (fMinLimitLabel)
+			view->DrawString(fMinLimitLabel, BPoint(2.0f, bounds.bottom - 4.0f));
+
+		if (fMaxLimitLabel) {
+			view->DrawString(fMaxLimitLabel, BPoint(bounds.right
+				- StringWidth(fMaxLimitLabel) - 2.0f, bounds.bottom - 4.0f));
+		}
 	} else {
-		float ascent = (float)ceil(fheight.ascent);
-
-		if (Label())
+		if (Label()) {
 			view->DrawString(Label(), BPoint(bounds.Width() / 2.0f -
 											 StringWidth(Label()) / 2.0f,
-											 ascent));
+											 fontHeight.ascent));
+		}
 
-		if (fMaxLimitStr)
-			view->DrawString(fMaxLimitStr, BPoint(bounds.Width() / 2.0f -
-												  StringWidth(fMaxLimitStr) / 2.0f,
-												  ascent +
-												  (Label() ? (float)ceil(ascent + fheight.descent + 2.0f)
-												  		   : 0.0f)));
+		if (fUpdateText != NULL) {
+			view->DrawString(fUpdateText, BPoint(bounds.Width() / 2.0f -
+				StringWidth(fUpdateText) / 2.0f, bounds.bottom - fontHeight.descent - 4.0f));
+		}
 
-		if (fMinLimitStr)
-			view->DrawString(fMinLimitStr, BPoint(bounds.Width() / 2.0f -
-												  StringWidth(fMinLimitStr) / 2.0f,
-												  bounds.bottom - 2.0f));
+		if (fMaxLimitLabel) {
+			view->DrawString(fMaxLimitLabel, BPoint(bounds.Width() / 2.0f -
+				StringWidth(fMaxLimitLabel) / 2.0f, fontHeight.ascent + (Label()
+					? ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading + 2.0f)
+					: 0.0f)));
+		}
+
+		if (fMinLimitLabel) {
+			view->DrawString(fMinLimitLabel, BPoint(bounds.Width() / 2.0f
+				- StringWidth(fMinLimitLabel) / 2.0f, bounds.bottom - 2.0f));
+		}
 	}
 }
 
@@ -1053,10 +1082,10 @@ BSlider::BarFrame() const
 		} else {
 			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
 			frame.top = 12.0f + (Label() ? textHeight : 0.0f) +
-				(fMaxLimitStr ? textHeight : 0.0f);
+				(fMaxLimitLabel ? textHeight : 0.0f);
 			frame.right = frame.left + fBarThickness;
 			frame.bottom = frame.bottom - 8.0f -
-				(fMinLimitStr ? textHeight + 4 : 0.0f);
+				(fMinLimitLabel ? textHeight + 4 : 0.0f);
 		}
 	} else {
 		if (Orientation() == B_HORIZONTAL) {
@@ -1067,10 +1096,10 @@ BSlider::BarFrame() const
 		} else {
 			frame.left = floor((frame.Width() - fBarThickness) / 2.0f);
 			frame.top = 11.0f + (Label() ? textHeight : 0.0f) +
-				(fMaxLimitStr ? textHeight : 0.0f);
+				(fMaxLimitLabel ? textHeight : 0.0f);
 			frame.right = frame.left + fBarThickness;
 			frame.bottom = frame.bottom - 7.0f -
-				(fMinLimitStr ? textHeight + 4 : 0.0f);
+				(fMinLimitLabel ? textHeight + 4 : 0.0f);
 		}
 	}
 
@@ -1293,14 +1322,14 @@ BSlider::ModificationMessage() const
 
 
 void
-BSlider::SetSnoozeAmount(int32 snooze_time)
+BSlider::SetSnoozeAmount(int32 snoozeTime)
 {
-	if (snooze_time < 5000)
-		snooze_time = 5000;
-	if (snooze_time > 1000000)
-		snooze_time = 1000000;
+	if (snoozeTime < 10000)
+		snoozeTime = 10000;
+	else if (snoozeTime > 1000000)
+		snoozeTime = 1000000;
 
-	fSnoozeAmount = snooze_time;
+	fSnoozeAmount = snoozeTime;
 }
 
 
