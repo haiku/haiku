@@ -1,16 +1,40 @@
+/*
+ * Copyright 2001-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Rafael Romo
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+
 #include "RefreshSlider.h"
 #include "Constants.h"
 
+#include <String.h>
 #include <Window.h>
 
+#include <new>
 #include <stdio.h>
 
 
-RefreshSlider::RefreshSlider(BRect frame)
-	:BSlider(frame, "Screen", "Refresh Rate:", 
-		new BMessage(SLIDER_INVOKE_MSG), gMinRefresh * 10, gMaxRefresh * 10),
-	fStatus(new char[32])
-{	
+RefreshSlider::RefreshSlider(BRect frame, float min, float max, uint32 resizingMode)
+	: BSlider(frame, "Screen", "Refresh Rate:", 
+		new BMessage(SLIDER_INVOKE_MSG), rintf(min * 10), rintf(max * 10),
+		B_BLOCK_THUMB, resizingMode),
+	fStatus(new (std::nothrow) char[32])
+{
+	BString minRefresh;
+	minRefresh << (uint32)min;
+	BString maxRefresh;
+	maxRefresh << (uint32)max;
+	SetLimitLabels(minRefresh.String(), maxRefresh.String());
+
+	SetHashMarks(B_HASH_MARKS_BOTTOM);
+	SetHashMarkCount(uint32(max - min) / 5 + 1);
+
+	SetKeyIncrementValue(1);
 }
 
 
@@ -66,10 +90,8 @@ RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 char*
 RefreshSlider::UpdateText() const
 {
-	if (fStatus) {
-		sprintf(fStatus, "%.1f Hz", (float)Value() / 10);
-		return fStatus;
-	} else 
-		return NULL;
-}
+	if (fStatus != NULL)
+		snprintf(fStatus, 32, "%.1f Hz", (float)Value() / 10);
 
+	return fStatus;
+}

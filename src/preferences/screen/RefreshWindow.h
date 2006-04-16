@@ -13,21 +13,18 @@
 
 #include <Window.h>
 
-#include "RefreshView.h"
-#include "RefreshSlider.h"
+class BSlider;
+
 
 class RefreshWindow : public BWindow {
 	public:
-		RefreshWindow(BRect frame, float current, float min, float max);
+		RefreshWindow(BPoint position, float current, float min, float max);
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 		virtual void WindowActivated(bool active);
 
 	private:
-		RefreshView			*fRefreshView;
-		RefreshSlider		*fRefreshSlider;
-		BButton				*fDoneButton;
-		BButton				*fCancelButton;
+		BSlider* fRefreshSlider;
 };
 
 #endif	// REFRESH_WINDOW_H

@@ -820,10 +820,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (max > gMaxRefresh)
 				max = gMaxRefresh;
 
-			BRect frame(Frame());
-			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect(frame.left + 201.0,
-				frame.top + 34.0, frame.left + 509.0, frame.top + 169.0),
-				fSelected.refresh, min, max);
+			RefreshWindow *fRefreshWindow = new RefreshWindow(
+				fRefreshField->ConvertToScreen(B_ORIGIN), fSelected.refresh, min, max);
 			fRefreshWindow->Show();
 			break;
 		}

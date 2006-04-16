@@ -9,6 +9,10 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+
+#include <SupportDefs.h>
+
+
 // Messages
 static const uint32 WORKSPACE_CHECK_MSG = 'wchk';
 static const uint32 BUTTON_LAUNCH_BACKGROUNDS_MSG = 'blbk';
@@ -16,7 +20,6 @@ static const uint32 BUTTON_DEFAULTS_MSG = 'bdef';
 static const uint32 BUTTON_REVERT_MSG = 'brev';
 static const uint32 BUTTON_APPLY_MSG = 'bapl';
 static const uint32 BUTTON_DONE_MSG = 'bdon';
-static const uint32 BUTTON_CANCEL_MSG = 'bcnc';
 static const uint32 BUTTON_KEEP_MSG = 'bkep';
 static const uint32 POP_WORKSPACE_CHANGED_MSG = 'pwsc';
 static const uint32 POP_RESOLUTION_MSG = 'pres';
