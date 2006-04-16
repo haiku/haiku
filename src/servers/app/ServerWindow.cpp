@@ -607,6 +607,7 @@ fDesktop->LockSingleWindow();
 			WindowLayer *behindOf;
 			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
 fDesktop->UnlockSingleWindow();
+// TODO: there is a big race condition when we unlock here (window could be gone by now)!
 				fDesktop->SendWindowBehind(fWindowLayer, behindOf);
 fDesktop->LockSingleWindow();
 				status = B_OK;
@@ -673,6 +674,7 @@ fDesktop->LockSingleWindow();
 					status = B_BAD_VALUE;
 				} else {
 fDesktop->UnlockSingleWindow();
+// TODO: there is a big race condition when we unlock here (window could be gone by now)!
 					status = fDesktop->AddWindowToSubset(fWindowLayer, windowLayer)
 						? B_OK : B_NO_MEMORY;
 fDesktop->LockSingleWindow();
@@ -694,6 +696,7 @@ fDesktop->LockSingleWindow();
 					token, App()->ClientTeam());
 				if (windowLayer != NULL) {
 fDesktop->UnlockSingleWindow();
+// TODO: there is a big race condition when we unlock here (window could be gone by now)!
 					fDesktop->RemoveWindowFromSubset(fWindowLayer, windowLayer);
 fDesktop->LockSingleWindow();
 					status = B_OK;
