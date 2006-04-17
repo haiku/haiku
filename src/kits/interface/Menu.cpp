@@ -1214,7 +1214,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			localAction = MENU_ACT_CLOSE;
 			break;
 		} else if (buttons == 0 && !IsStickyMode()) {
-			if (IsStickyPrefOn() && system_time() < trackTime + 2000000)
+			if (IsStickyPrefOn() && system_time() < trackTime + 1000000)
 				SetStickyMode(true);
 			else {
 				localAction = MENU_ACT_CLOSE;
