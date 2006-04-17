@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,10 +23,9 @@ AlertWindow::AlertWindow(BMessenger target)
 	fTarget(target)
 {
 	fAlertView = new AlertView(Bounds(), "AlertView");
-	AddChild(fAlertView);
 
-	// the view displays a decrementing counter (until the user must take action)
-	SetPulseRate(1000000);	// every second
+	ResizeTo(fAlertView->Bounds().Width(), fAlertView->Bounds().Height());
+	AddChild(fAlertView);
 
 	// center window on screen
 	BScreen screen(this);

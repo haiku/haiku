@@ -20,7 +20,7 @@ class BStringView;
 
 class AlertView : public BView {
 	public:
-		AlertView(BRect frame, char *name);
+		AlertView(BRect frame, char* name);
 
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect updateRect);
@@ -29,11 +29,11 @@ class AlertView : public BView {
 
 	private:
 		void UpdateCountdownView();
-		BBitmap *InitIcon();
+		BBitmap* InitIcon();
 
-		BStringView	*fCountdownView;
-		BBitmap		*fBitmap;
-		int32		fSeconds;
+		BStringView*	fCountdownView;
+		BBitmap*		fBitmap;
+		int32			fSeconds;
 };
 
 #endif	/* ALERT_VIEW_H */
