@@ -207,7 +207,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 		_InitObject(source->Bounds(), source->ColorSpace(), flags,
 				   source->BytesPerRow(), B_MAIN_SCREEN_ID);
 		if (InitCheck() == B_OK)
-			memcpy(Bits(), source->Bits(), BytesPerRow());
+			memcpy(Bits(), source->Bits(), BitsLength());
 	}
 }
 
