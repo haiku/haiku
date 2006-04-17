@@ -600,8 +600,12 @@ BWindow::IsFront() const
 void 
 BWindow::MessageReceived(BMessage *msg)
 {
-	if (!msg->HasSpecifiers())
+	if (!msg->HasSpecifiers()) {
+		if (msg->what == B_KEY_DOWN)
+			_KeyboardNavigation();
+
 		return BLooper::MessageReceived(msg);
+	}
 
 	BMessage replyMsg(B_REPLY);
 	bool handled = false;
