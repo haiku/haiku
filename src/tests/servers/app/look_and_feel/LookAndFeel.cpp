@@ -96,6 +96,9 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 		{"Floating Subset", B_FLOATING_SUBSET_WINDOW_FEEL},
 		{"App Floating", B_FLOATING_APP_WINDOW_FEEL},
 		{"All Floating", B_FLOATING_ALL_WINDOW_FEEL},
+		{"Menu", kMenuWindowFeel},
+		{"WindowScreen", kWindowScreenFeel},
+		{"Desktop", kDesktopWindowFeel},
 	};
 	for (uint32 i = 0; i < sizeof(feels) / sizeof(feels[0]); i++) {
 		BMessage* message = new BMessage(kMsgUpdateFeel);
@@ -343,10 +346,12 @@ Window::TitleForFeel(window_feel feel)
 {
 	BString title = "Look&Feel - ";
 
-	switch (feel) {
+	switch ((uint32)feel) {
 		case B_NORMAL_WINDOW_FEEL:
 			title += "Normal";
 			break;
+
+		// modal feels
 
 		case B_MODAL_SUBSET_WINDOW_FEEL:
 			title += "Modal Subset";
@@ -358,6 +363,8 @@ Window::TitleForFeel(window_feel feel)
 			title += "All Modal";
 			break;
 
+		// floating feels
+
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
 			title += "Floating Subset";
 			break;
@@ -366,6 +373,18 @@ Window::TitleForFeel(window_feel feel)
 			break;
 		case B_FLOATING_ALL_WINDOW_FEEL:
 			title += "All Floating";
+			break;
+
+		// special/private feels
+
+		case kMenuWindowFeel:
+			title += "Menu";
+			break;
+		case kWindowScreenFeel:
+			title += "WindowScreen";
+			break;
+		case kDesktopWindowFeel:
+			title += "Desktop";
 			break;
 	}
 
