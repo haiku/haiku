@@ -755,6 +755,7 @@ BSlider::DrawSlider()
 			DrawBitmap(fOffScreenBits, B_ORIGIN);
 		}
 #endif
+		UnlockLooper();
 	}
 }
 
