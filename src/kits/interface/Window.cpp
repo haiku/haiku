@@ -536,20 +536,22 @@ BWindow::Sync() const
 void
 BWindow::DisableUpdates()
 {
-	Lock();
-	fLink->StartMessage(AS_DISABLE_UPDATES);
-	fLink->Flush();
-	Unlock();
+	if (Lock()) {
+		fLink->StartMessage(AS_DISABLE_UPDATES);
+		fLink->Flush();
+		Unlock();
+	}
 }
 
 
 void
 BWindow::EnableUpdates()
 {
-	Lock();
-	fLink->StartMessage(AS_ENABLE_UPDATES);
-	fLink->Flush();
-	Unlock();
+	if (Lock()) {
+		fLink->StartMessage(AS_ENABLE_UPDATES);
+		fLink->Flush();
+		Unlock();
+	}
 }
 
 
@@ -968,6 +970,7 @@ FrameMoved(origin);
 
 		case _UPDATE_:
 		{
+//bigtime_t now = system_time();
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
 			BRect updateRect;
 
@@ -1035,6 +1038,7 @@ FrameMoved(origin);
 			fLink->Flush();
 			fInTransaction = false;
 
+//printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
 			break;
 		}
 
@@ -1410,10 +1414,13 @@ BWindow::NeedsUpdate() const
 void
 BWindow::UpdateIfNeeded()
 {
-	// TODO: What about locking?!?
-	// works only from this thread
+	// works only from the window thread
 	if (find_thread(NULL) != Thread())
 		return;
+
+	// make sure all requests that would cause an update have
+	// arrived at the server
+	Sync();
 
 	// Since we're blocking the event loop, we need to retrieve 
 	// all messages that are pending on the port.
@@ -1423,7 +1430,7 @@ BWindow::UpdateIfNeeded()
 	queue->Lock();
 
 	// First process and remove any _UPDATE_ message in the queue
-	// According to Adi, there can only be one at a time
+	// With the current design, there can only be one at a time
 
 	BMessage *msg;
 	for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
@@ -1435,6 +1442,8 @@ BWindow::UpdateIfNeeded()
 			queue->RemoveMessage(msg);
 			delete msg;
 			break;
+			// NOTE: "i" would have to be decreased if there were
+			// multiple _UPDATE_ messages and we would not break!
 		}
 	}
 
