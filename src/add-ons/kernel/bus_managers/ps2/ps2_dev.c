@@ -151,6 +151,10 @@ pass_to_handler:
 		}
 		if (data == 0x00 && dev->history[1].data == 0xaa && (dev->history[0].time - dev->history[1].time) < 50000) {
 			dprintf("ps2: hot plugin of %s\n", dev->name);
+			if (dev->active) {
+				dprintf("ps2: device %s still active, removing...\n", dev->name);
+				ps2_service_notify_device_removed(dev);
+			}
 			ps2_service_notify_device_added(dev);
 			return B_INVOKE_SCHEDULER;
 		}
