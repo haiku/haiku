@@ -33,6 +33,9 @@ ColorWindow::ColorWindow()
 	
 	colView->AddChild(DefaultButton);
 	colView->AddChild(RevertButton);
+	
+	DefaultButton->SetEnabled(false);
+	RevertButton->SetEnabled(false);
 }
 
 
@@ -45,6 +48,7 @@ ColorWindow::MessageReceived(BMessage *msg)
 			info.background_color = colorPicker->ValueAsColor();
 			set_menu_info(&info);
 			be_app->PostMessage(UPDATE_WINDOW);
+			RevertButton->SetEnabled(false);
 			break;
 				
 		case MENU_COLOR_DEFAULT:
@@ -56,12 +60,20 @@ ColorWindow::MessageReceived(BMessage *msg)
 			color.green = 219;
 			color.alpha = 255;
 			colorPicker->SetValue(color);
-		
+			DefaultButton->SetEnabled(false);
+			get_menu_info(&info);
+			info.background_color = colorPicker->ValueAsColor();
+			set_menu_info(&info);
+			be_app->PostMessage(MENU_COLOR);
+			break;
+
 		case MENU_COLOR:
 			get_menu_info(&info);
 			info.background_color = colorPicker->ValueAsColor();
 			set_menu_info(&info);
 			be_app->PostMessage(MENU_COLOR);
+			DefaultButton->SetEnabled(true);
+			RevertButton->SetEnabled(true);
 			break;
 		
 		default:
