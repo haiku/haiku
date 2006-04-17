@@ -23,6 +23,8 @@
 #include <Slider.h>
 
 
+// Those two functions are also exported by BeOS' libbe.so
+
 rgb_color
 _long_to_color_(int32 color)
 {
@@ -54,8 +56,6 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	fMinValue = minValue;
 	fMaxValue = maxValue;
 
-	SetValue(0);
-
 	fKeyIncrementValue = 1;
 	fHashMarkCount = 0;
 	fHashMarks = B_HASH_MARKS_NONE;
@@ -72,6 +72,7 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	UseFillColor(false, NULL);
 
 	_InitObject();
+	SetValue(0);
 }
 
 
@@ -89,8 +90,6 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	fMinValue = minValue;
 	fMaxValue = maxValue;
 
-	SetValue(0);
-
 	fKeyIncrementValue = 1;
 	fHashMarkCount = 0;
 	fHashMarks = B_HASH_MARKS_NONE;
@@ -106,6 +105,7 @@ BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *mes
 	UseFillColor(false, NULL);
 
 	_InitObject();
+	SetValue(0);
 }
 
 
