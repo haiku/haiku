@@ -1223,7 +1223,8 @@ Desktop::ActivateWindow(WindowLayer* window)
 
 		if (avoidsFront == NULL) {
 			// we're already the frontmost window, we might just not have focus yet
-			SetFocusWindow(window);
+			if ((window->Flags() & B_AVOID_FOCUS) == 0)
+				SetFocusWindow(window);
 
 			UnlockAllWindows();
 			return;
@@ -1261,7 +1262,8 @@ Desktop::ActivateWindow(WindowLayer* window)
 	}
 
 	_BringWindowsToFront(windows, kWorkingList, true);
-	SetFocusWindow(window);
+	if ((window->Flags() & B_AVOID_FOCUS) == 0)
+		SetFocusWindow(window);
 
 	UnlockAllWindows();
 }
