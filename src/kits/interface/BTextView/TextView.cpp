@@ -4024,19 +4024,17 @@ BTextView::AutoResize(bool redraw)
 		width += fTextRect.left + textRectPadding;
 		width = ceilf(width);
 
-		if (fContainerView != NULL)
-			fContainerView->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));
-		
-		BView *view = fContainerView != NULL ? fContainerView : this;
-		if (fAlignment == B_ALIGN_CENTER)
-			view->MoveBy((oldWidth - width) / 2, 0);
-		else if (fAlignment == B_ALIGN_RIGHT)
-			view->MoveBy(oldWidth - width, 0);
-		
-		if (fContainerView)
+		if (fContainerView != NULL) {
+			fContainerView->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));	
+			if (fAlignment == B_ALIGN_CENTER)
+				fContainerView->MoveBy((oldWidth - width) / 2, 0);
+			else if (fAlignment == B_ALIGN_RIGHT)
+				fContainerView->MoveBy(oldWidth - width, 0);
 			fContainerView->Invalidate();
+		}
 
 		fTextRect.right = Bounds().right - textRectPadding;
+
 		if (redraw)
 			DrawLines(0, CountLines());
 	}
