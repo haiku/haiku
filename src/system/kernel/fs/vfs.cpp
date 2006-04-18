@@ -836,10 +836,9 @@ restart:
 		mutex_unlock(&sVnodeMutex);
 
 		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
-		if (status < B_OK || vnode->private_node == NULL) {
-			if (status == B_NO_ERROR)
-				status = B_BAD_VALUE;
-		}
+		if (status == B_OK && vnode->private_node == NULL)
+			status = B_BAD_VALUE;
+
 		mutex_lock(&sVnodeMutex);
 
 		if (status < B_OK)
@@ -3992,8 +3991,30 @@ dir_remove(int fd, char *path, bool kernel)
 	struct vnode *directory;
 	status_t status;
 
+	if (path != NULL) {
+		// we need to make sure our path name doesn't stop with "/", ".", or ".."
+		char *lastSlash = strrchr(path, '/');
+		if (lastSlash != NULL) {
+			char *leaf = lastSlash + 1;
+			if (!strcmp(leaf, ".."))
+				return B_NOT_ALLOWED;
+
+			// omit multiple slashes
+			while (lastSlash > path && lastSlash[-1] == '/') {
+				lastSlash--;
+			}
+
+			if (!leaf[0]		
+				|| !strcmp(leaf, ".")) {
+				// "name/" -> "name", or "name/." -> "name"
+				lastSlash[0] = '\0';
+			}
+		} else if (!strcmp(path, ".."))
+			return B_NOT_ALLOWED;
+	}
+
 	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
 	if (FS_CALL(directory, remove_dir)) {
