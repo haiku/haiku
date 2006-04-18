@@ -807,7 +807,7 @@ restart:
 		mutex_unlock(&sVnodeMutex);
 		if (--tries < 0) {
 			// vnode doesn't seem to become unbusy
-			panic("vnode %ld.%Ld is not becoming unbusy!\n", mountID, vnodeID);
+			panic("vnode %ld:%Ld is not becoming unbusy!\n", mountID, vnodeID);
 			return B_BUSY;
 		}
 		snooze(10000); // 10 ms
@@ -5545,6 +5545,9 @@ fs_sync(dev_t device)
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.
 			previousVnode = vnode;
+		} else {
+			dprintf("syncing of mount %ld stopped due to vnode %Ld.\n", mount->id, id);
+			break;
 		}
 	}
 
