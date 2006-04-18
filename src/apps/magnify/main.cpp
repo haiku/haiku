@@ -1723,7 +1723,7 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 		fColorSpace(space), fParent(parent)
 {
 	switch (space) {
-		case B_COLOR_8_BIT:
+		case B_CMAP8:
 			fBytesPerPixel = 1;
 			break;
 		case B_RGB15:

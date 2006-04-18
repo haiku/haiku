@@ -132,7 +132,7 @@ NormalPulseView::DetermineVendorAndProcessor()
 
 	// Initialize logo
 
-	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_COLOR_8_BIT);
+	fCpuLogo = new BBitmap(BRect(0, 0, 63, 62), B_CMAP8);
 	unsigned char *logo = BlankLogo;
 
 #if __POWERPC__
@@ -151,7 +151,7 @@ NormalPulseView::DetermineVendorAndProcessor()
 	};
 #endif
 
-	fCpuLogo->SetBits(logo, fCpuLogo->BitsLength(), 0, B_COLOR_8_BIT);
+	fCpuLogo->SetBits(logo, fCpuLogo->BitsLength(), 0, B_CMAP8);
 	fHasBrandLogo = (logo != BlankLogo);
 
 	get_cpu_type(fVendor, sizeof(fVendor), fProcessor, sizeof(fProcessor));

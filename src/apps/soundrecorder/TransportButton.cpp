@@ -300,9 +300,9 @@ TransportButton::BitsForMask(uint32 mask) const
 BBitmap *
 TransportButton::MakeBitmap(uint32 mask)
 {
-	BBitmap *result = new BBitmap(Bounds(), B_COLOR_8_BIT);
+	BBitmap *result = new BBitmap(Bounds(), B_CMAP8);
 	result->SetBits(BitsForMask(mask), (Bounds().Width() + 1) * (Bounds().Height() + 1),
-		0, B_COLOR_8_BIT);
+		0, B_CMAP8);
 
 	ReplaceTransparentColor(result, Parent()->ViewColor());
 	

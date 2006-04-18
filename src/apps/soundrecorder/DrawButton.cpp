@@ -11,12 +11,12 @@
 DrawButton::DrawButton(BRect frame, const char *name, const unsigned char *on, const unsigned char *off,
 						BMessage *msg, int32 resize, int32 flags)
 	: BControl(frame, name, "", msg, resize, flags | B_WILL_DRAW),
-		fOn(frame, B_COLOR_8_BIT),
-		fOff(frame, B_COLOR_8_BIT),
+		fOn(frame, B_CMAP8),
+		fOff(frame, B_CMAP8),
 		fButtonState(false)
 {
-	fOff.SetBits(off, (frame.Width() + 1) * (frame.Height() + 1), 0, B_COLOR_8_BIT);
-	fOn.SetBits(on, (frame.Width() + 1) * (frame.Height() + 1), 0, B_COLOR_8_BIT);
+	fOff.SetBits(off, (frame.Width() + 1) * (frame.Height() + 1), 0, B_CMAP8);
+	fOn.SetBits(on, (frame.Width() + 1) * (frame.Height() + 1), 0, B_CMAP8);
 }
 
 

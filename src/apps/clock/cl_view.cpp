@@ -68,23 +68,23 @@ dummy_label:
 			
 			for (loop = 0; loop <= 8; loop++) {
 				if ((picH = rsrcs.FindResource('PICT', loop+4, &len))) {
-					fClockFace[loop] = new BBitmap(theRect, B_COLOR_8_BIT);
-					fClockFace[loop]->SetBits(picH,len,0,B_COLOR_8_BIT);
+					fClockFace[loop] = new BBitmap(theRect, B_CMAP8);
+					fClockFace[loop]->SetBits(picH,len,0, B_CMAP8);
 					free(picH);
 				}
 			}
 
 			theRect.Set(0,0,15,15);
 			if ((picH = rsrcs.FindResource('MICN', "center", &len))) {
-				fCenter = new BBitmap(theRect, B_COLOR_8_BIT);
-				fCenter->SetBits(picH,len,0,B_COLOR_8_BIT);
+				fCenter = new BBitmap(theRect, B_CMAP8);
+				fCenter->SetBits(picH,len,0, B_CMAP8);
 				free(picH);
 			}
 
 			theRect.Set(0,0,2,2);
 			if ((picH = rsrcs.FindResource('PICT', 13, &len))) {
-				fInner = new BBitmap(theRect, B_COLOR_8_BIT);
-				fInner->SetBits(picH,len,0,B_COLOR_8_BIT);
+				fInner = new BBitmap(theRect, B_CMAP8);
+				fInner->SetBits(picH,len,0, B_CMAP8);
 				free(picH);
 			}
 		}
@@ -222,7 +222,7 @@ TOnscreenView::InitObject(BRect rect, short mRadius, short hRadius,
 	fOffscreen = NULL;
 
 	fOffscreenView = new TOffscreenView(rect, "freqd",mRadius,hRadius, offset, face, show);
-	fOffscreen = new BBitmap(rect, B_COLOR_8_BIT, true);
+	fOffscreen = new BBitmap(rect, B_CMAP8, true);
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
 		fOffscreen->AddChild(fOffscreenView);
 		fOffscreen->Unlock();

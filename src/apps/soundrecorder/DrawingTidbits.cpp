@@ -48,7 +48,7 @@ operator!=(const rgb_color &a, const rgb_color &b)
 void
 ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to)
 {
-	ASSERT(bitmap->ColorSpace() == B_COLOR_8_BIT); // other color spaces not implemented yet
+	ASSERT(bitmap->ColorSpace() == B_CMAP8); // other color spaces not implemented yet
 	
 	BScreen screen(B_MAIN_SCREEN_ID);
 	uint32 fromIndex = screen.IndexForColor(from);
@@ -64,7 +64,7 @@ ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to)
 void 
 ReplaceTransparentColor(BBitmap *bitmap, rgb_color with)
 {
-	ASSERT(bitmap->ColorSpace() == B_COLOR_8_BIT); // other color spaces not implemented yet
+	ASSERT(bitmap->ColorSpace() == B_CMAP8); // other color spaces not implemented yet
 	
 	BScreen screen(B_MAIN_SCREEN_ID);
 	uint8 withIndex = screen.IndexForColor(with); 
