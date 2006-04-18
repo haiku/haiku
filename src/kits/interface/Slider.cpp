@@ -494,16 +494,13 @@ BSlider::MouseDown(BPoint point)
 			prevPoint = point;
 
 			snooze(SnoozeAmount());
-			GetMouse(&point, &buttons, true);
+			GetMouse(&point, &buttons, false);
 
 			if (_ConstrainPoint(point, prevPoint)) {
 				SetValue(ValueForPoint(point));
 				InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
 			}
 		}
-	}
-
-	if ((Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) == 0) {
 		if (_Location() != fInitialLocation)
 			Invoke();
 	}
