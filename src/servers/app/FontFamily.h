@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
 #include <Locker.h>
 #include <Node.h>
 #include <ObjectList.h>
+#include <Path.h>
 #include <Rect.h>
 #include <String.h>
 
@@ -142,6 +143,8 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 		uint16			PreservedFace(uint16) const;
 
 		const char*		Path() const;
+		void			UpdatePath(const node_ref& parentNodeRef);
+
 		void			GetHeight(float size, font_height &heigth) const;
 		font_direction	Direction() const
 							{ return B_FONT_LEFT_TO_RIGHT; }
@@ -165,7 +168,7 @@ class FontStyle : public ReferenceCounting, public Hashable/*, public BLocker*/ 
 	private:
 		FT_Face			fFreeTypeFace;
 		BString			fName;
-		BString			fPath;
+		BPath			fPath;
 		node_ref		fNodeRef;
 
 		FontFamily*		fFamily;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,8 +15,9 @@
 #include "FontManager.h"
 
 #include <FontPrivate.h>
-
 #include FT_CACHE_H
+
+#include <Entry.h>
 
 
 const uint32 kInvalidFamilyFlags = ~0UL;
@@ -139,7 +140,23 @@ FontStyle::GetHeight(float size, font_height& height) const
 const char*
 FontStyle::Path() const
 {
-	return fPath.String();
+	return fPath.Path();
+}
+
+
+/*!
+	\brief Updates the path of the font style in case the style
+		has been moved around.
+*/
+void
+FontStyle::UpdatePath(const node_ref& parentNodeRef)
+{
+	entry_ref ref;
+	ref.device = parentNodeRef.device;
+	ref.directory = parentNodeRef.node;
+	ref.set_name(fPath.Leaf());
+
+	fPath.SetTo(&ref);
 }
 
 

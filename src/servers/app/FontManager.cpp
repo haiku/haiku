@@ -205,13 +205,32 @@ FontManager::MessageReceived(BMessage* message)
 
 					if (directory != NULL) {
 						// something has been added to our watched font directories
+
+						// test, if the source directory is one of ours as well
+						nodeRef.node = fromNode;
+						font_directory* fromDirectory = _FindDirectory(nodeRef);
+
 						if (entry.IsDirectory()) {
-							// there is a new directory to watch for us
-							_AddPath(entry);
+							if (fromDirectory == NULL) {
+								// there is a new directory to watch for us
+								_AddPath(entry);
+								FTRACE("new directory moved in");
+							} else {
+								// A directory from our watched directories has
+								// been renamed or moved within the watched
+								// directories - we only need to update the
+								// path names of the styles in that directory
+								nodeRef.node = node;
+								directory = _FindDirectory(nodeRef);
+								if (directory != NULL) {
+									for (int32 i = 0; i < directory->styles.CountItems(); i++) {
+										FontStyle* style = directory->styles.ItemAt(i);
+										style->UpdatePath(directory->directory);
+									}
+								}
+								FTRACE("directory renamed");
+							}
 						} else {
-							// test, if the source directory is one of ours as well
-							nodeRef.node = fromNode;
-							font_directory* fromDirectory = _FindDirectory(nodeRef);
 							if (fromDirectory != NULL) {
 								// find style in source and move it to the target
 								nodeRef.node = node;
@@ -219,6 +238,7 @@ FontManager::MessageReceived(BMessage* message)
 								if (style != NULL) {
 									fromDirectory->styles.RemoveItem(style, false);
 									directory->styles.AddItem(style);
+									style->UpdatePath(directory->directory);
 								}
 								FTRACE(("font moved"));
 							} else {
@@ -598,7 +618,8 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 
 	font_directory* directory = _FindDirectory(nodeRef);
 	if (directory != NULL) {
-		*_newDirectory = directory;
+		if (_newDirectory)
+			*_newDirectory = directory;
 		return B_OK;
 	}
 
