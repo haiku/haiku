@@ -80,6 +80,16 @@ typedef struct rgb_color {
 #if defined(__cplusplus)
 	// some convenient additions
 
+	inline rgb_color&
+	set_to(uint8 r, uint8 g, uint8 b, uint8 a = 255)
+	{
+		red = r;
+		green = g;
+		blue = b;
+		alpha = a;
+		return *this;
+	}
+
 	inline bool
 	operator==(const rgb_color& other) const
 	{
@@ -93,6 +103,15 @@ typedef struct rgb_color {
 	}
 #endif
 } rgb_color;
+
+#if defined(__cplusplus)
+inline rgb_color
+make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255)
+{
+	rgb_color color = {red, green, blue, alpha};
+	return color;
+}
+#endif
 
 //------------------------------------------------------------------------------
 

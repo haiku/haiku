@@ -29,7 +29,6 @@
 #include <input_globals.h>
 #include <ServerProtocol.h>
 #include <WidthBuffer.h>
-#include <ColorTools.h>
 
 #include "moreUTF8.h"
 #include "truncate_string.h"
@@ -687,20 +686,19 @@ mouse_mode()
 _IMPEXP_BE rgb_color
 ui_color(color_which which)
 {
-	if(be_app) {
-	
+	if (be_app) {
 		rgb_color color;
 		BPrivate::AppServerLink link;
 		link.StartMessage(AS_GET_UI_COLOR);
 		link.Attach<color_which>(which);
-	
+
 		int32 code;
 		if (link.FlushWithReply(code) == B_OK && code == B_OK) {
 			link.Read<rgb_color>(&color);
 			return color;
 		}
 	}
-	
+
 	switch (which) {
 		case B_PANEL_BACKGROUND_COLOR:
 			return make_color(216,216,216);
@@ -783,8 +781,7 @@ rgb_color shift_color(rgb_color color, float shift);
 rgb_color
 shift_color(rgb_color color, float shift)
 {
-	// TODO: dunno what this is supposed to do, but BeIDE expects it to be there...
-	return color;
+	return tint_color(color, shift);
 }
 
 
@@ -822,6 +819,12 @@ _init_interface_kit_()
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 	status_t status = load_menu_settings(BMenu::sMenuInfo);
+
+	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	general_info.mark_color.set_to(0, 0, 0);
+	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	general_info.window_frame_color = ui_color(B_WINDOW_TAB_COLOR);
+	general_info.color_frame = true;
 
 	// TODO: fill the other static members
 
