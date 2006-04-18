@@ -799,12 +799,17 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 	mutex_lock(&sVnodeMutex);
 
+	int32 tries = 300;
+		// try for 3 secs
 restart:
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode && vnode->busy) {
-		// ToDo: this is an endless loop if the vnode is not
-		//	becoming unbusy anymore (for whatever reason)
 		mutex_unlock(&sVnodeMutex);
+		if (--tries < 0) {
+			// vnode doesn't seem to become unbusy
+			panic("vnode %ld.%Ld is not becoming unbusy!\n", mountID, vnodeID);
+			return B_BUSY;
+		}
 		snooze(10000); // 10 ms
 		mutex_lock(&sVnodeMutex);
 		goto restart;
