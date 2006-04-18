@@ -1149,6 +1149,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	bigtime_t closeTime = openTime; 
 	
 	fState = MENU_ACT_NONE;
+	
 	while (true) {
 		bool locked = LockLooper();
 		if (!locked)
@@ -1168,7 +1169,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 				openTime = system_time();
 				fState = MENU_ACT_NONE;
 				snoozeAmount = 20000;
-			} else if (system_time() > kHysteresis + openTime && item->Submenu() 
+			} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
 				&& item->Submenu()->Window() == NULL) {
 				// Open the submenu if it's not opened yet, but only if
 				// the mouse pointer stayed over there for some time
@@ -1214,7 +1215,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			localAction = MENU_ACT_CLOSE;
 			break;
 		} else if (buttons == 0 && !IsStickyMode()) {
-			if (IsStickyPrefOn() && system_time() < trackTime + 1000000)
+			if (IsStickyPrefOn() && (system_time() < trackTime + 1000000
+				|| (fExtraRect != NULL && fExtraRect->Contains(location))))
 				SetStickyMode(true);
 			else {
 				localAction = MENU_ACT_CLOSE;
@@ -1445,8 +1447,6 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		default:
 			break;
 	}
-
-	// This is for BMenuBar
 
 	if (_width) {
 		if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
@@ -1724,17 +1724,22 @@ void
 BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 {
 	// TODO: make use of "selectFirstItem"
-	if (fSelected != NULL) {
-		fSelected->Select(false);
-		BMenu *subMenu = fSelected->Submenu();
-		if (subMenu != NULL && subMenu->Window() != NULL)
-			subMenu->_hide();
+		
+	// Avoid deselecting and then reselecting the same item
+	// which would cause flickering
+	if (menuItem != fSelected) {	
+		if (fSelected != NULL) {
+			fSelected->Select(false);
+			BMenu *subMenu = fSelected->Submenu();
+			if (subMenu != NULL && subMenu->Window() != NULL)
+				subMenu->_hide();
+		}
+		
+		fSelected = menuItem;
+		if (fSelected != NULL)
+			fSelected->Select(true);
 	}
 	
-	if (menuItem != NULL)
-		menuItem->Select(true);
-		
-	fSelected = menuItem;
 	if (fSelected != NULL && showSubmenu == 0) {
 		BMenu *subMenu = fSelected->Submenu();
 		if (subMenu != NULL && subMenu->Window() == NULL)
