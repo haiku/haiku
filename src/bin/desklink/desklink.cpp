@@ -106,8 +106,8 @@ MediaReplicant::MediaReplicant(BRect frame, const char *name,
 	:	BView(frame, name, resizeMask, flags)
 {
 	// Background Bitmap
-	segments = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1), B_COLOR_8_BIT);
-	segments->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, B_COLOR_8_BIT);
+	segments = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1), B_CMAP8);
+	segments->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, B_CMAP8);
 	// Background Color
 	SetViewColor(184,184,184);
 
@@ -127,8 +127,8 @@ MediaReplicant::MediaReplicant(BMessage *message)
 		volumeSlider(NULL)
 {
 	// Background Bitmap
-	segments = new BBitmap(BRect(0, 0, 16 - 1, 16 - 1), B_COLOR_8_BIT);
-	segments->SetBits(kSpeakerBits, 16*16, 0, B_COLOR_8_BIT);
+	segments = new BBitmap(BRect(0, 0, 16 - 1, 16 - 1), B_CMAP8);
+	segments->SetBits(kSpeakerBits, 16*16, 0, B_CMAP8);
 	LoadSettings();
 }
 

@@ -182,7 +182,7 @@ void
 TAnalogClock::_InitView(BRect rect)
 {
 	fClock = new OffscreenClock(kClockRect, "offscreen");
-	fBitmap = new BBitmap(kClockRect, B_COLOR_8_BIT, true);
+	fBitmap = new BBitmap(kClockRect, B_CMAP8, true);
 	fBitmap->Lock();
 	fBitmap->AddChild(fClock);
 	fBitmap->Unlock();

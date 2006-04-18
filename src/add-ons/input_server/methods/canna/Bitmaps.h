@@ -2,7 +2,7 @@
 
 const int32 kSmallIconWidth = 16;
 const int32 kSmallIconHeight = 16;
-const color_space kSmallIconColorSpace = B_COLOR_8_BIT;
+const color_space kSmallIconColorSpace = B_CMAP8;
 
 const unsigned char kCannaIcon [] = {
 	0xff,0xff,0xff,0xff,0x2b,0x2b,0x2b,0x2b,0x2b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
