@@ -30,6 +30,7 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
+#include <tracker_private.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -2804,6 +2805,20 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 	// (B_OPTION_KEY makes BTextViews and friends navigable, even in editing mode)
 	if (key == B_TAB && (modifiers & (B_COMMAND_KEY | B_OPTION_KEY)) != 0) {
 		_KeyboardNavigation();
+		return true;
+	}
+
+	// Deskbar's Switcher
+	if (key == B_TAB && (modifiers & B_CONTROL_KEY) != 0) {
+		BMessenger deskbar(kDeskbarSignature);
+		if (deskbar.IsValid()) {
+			BMessage message('TASK');
+			message.AddInt32("key", B_TAB);
+			message.AddInt32("modifiers", modifiers);
+			message.AddInt64("when", system_time());
+			message.AddInt32("team", Team());
+			deskbar.SendMessage(&message);
+		}
 		return true;
 	}
 
