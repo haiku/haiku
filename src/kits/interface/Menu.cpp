@@ -20,9 +20,11 @@
 #include <Screen.h>
 #include <Window.h>
 
+#include <AppServerLink.h>
 #include <BMCPrivate.h>
 #include <MenuPrivate.h>
 #include <MenuWindow.h>
+#include <ServerProtocol.h>
 
 
 class _ExtraMenuData_ {
@@ -973,8 +975,7 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 	}
 
 	// If sticky is false, pass 0 to the tracking function
-	// so the menu will stay in nonsticky mode, regardless
-	// of the "IsStickyPrefOn()" value
+	// so the menu will stay in nonsticky mode
 	const bigtime_t trackTime = sticky ? system_time() : 0;
 	int action;
 	BMenuItem *menuItem = _track(&action, trackTime);
@@ -1215,8 +1216,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			localAction = MENU_ACT_CLOSE;
 			break;
 		} else if (buttons == 0 && !IsStickyMode()) {
-			if (IsStickyPrefOn() && (system_time() < trackTime + 1000000
-				|| (fExtraRect != NULL && fExtraRect->Contains(location))))
+			if (system_time() < trackTime + 1000000
+				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
 				SetStickyMode(true);
 			else {
 				localAction = MENU_ACT_CLOSE;
@@ -1896,7 +1897,7 @@ BMenu::UpdateWindowViewSize(bool upWind)
 bool
 BMenu::IsStickyPrefOn()
 {
-	return sMenuInfo.click_to_open;
+	return true;
 }
 
 
@@ -1991,29 +1992,24 @@ BMenu::DoCreateMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
 }
 
 
+// TODO: Maybe the following two methods would fit better into InterfaceDefs.cpp
+// In R5, they do all the work client side, we let the app_server handle the details.
 status_t
 set_menu_info(menu_info *info)
 {
 	if (!info)
 		return B_BAD_VALUE;
-		
-	BPath path;
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return B_OK;
-
-	path.Append("menu_settings");
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-
-	if (file.InitCheck() != B_OK)
-		return B_OK;
-
-	file.Write(info, sizeof(menu_info));
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_MENU_INFO);
+	link.Attach<menu_info>(*info);
 	
-	BMenu::sMenuInfo = *info;
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
+		BMenu::sMenuInfo = *info;
+		// Update also the local copy, in case anyone relies on it
 
-	return B_OK;
+	return status;
 }
 
 
@@ -2023,7 +2019,12 @@ get_menu_info(menu_info *info)
 	if (!info)
 		return B_BAD_VALUE;
 	
-	*info = BMenu::sMenuInfo;
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_MENU_INFO);
 	
-	return B_OK;
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
+		link.Read<menu_info>(info);
+	
+	return status;
 }

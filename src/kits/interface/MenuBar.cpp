@@ -7,8 +7,6 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-// TODO: Finish this class
-
 #include <Application.h>
 #include <Autolock.h>
 #include <MenuBar.h>
@@ -443,10 +441,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			if (fSelected != NULL && fSelected->Submenu() == NULL) {
 				resultItem = fSelected;
 				break;
-			} else if (IsStickyPrefOn())
+			} else
 				SetStickyMode(true);
-			else
-				break;
 		}
 
 		if (snoozeAmount > 0)

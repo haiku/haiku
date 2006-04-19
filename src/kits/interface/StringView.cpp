@@ -29,7 +29,8 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 
 
 BStringView::BStringView(BMessage* data)
-	: BView(data)
+	: BView(data),
+	fText(NULL)
 {
 	int32 align;
 	if (data->FindInt32("_align", &align) == B_OK)

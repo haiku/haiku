@@ -52,14 +52,16 @@ DesktopSettings::Private::_SetDefaults()
 	fScrollBarInfo.min_knob_size = 15;
 
 	// init menu info
-	fMenuInfo.font_size = 12.0;
-// TODO: ...
-//	fMenuInfo.f_family;
-//	fMenuInfo.f_style;
-//	fMenuInfo.background_color = gColorSet->menu_background;
-	// look of the separator (R5: (0, 1, 2), default ?)
+	strlcpy(fMenuInfo.f_family, fPlainFont.Family(), B_FONT_FAMILY_LENGTH);
+	strlcpy(fMenuInfo.f_style, fPlainFont.Style(), B_FONT_STYLE_LENGTH);
+	fMenuInfo.font_size = fPlainFont.Size();
+	// TODO:
+	fMenuInfo.background_color.set_to(216, 216, 216); //gColorSet->menu_background;
+	
+	// look of the separator (R5: (0, 1, 2), default 0)
+	// TODO: we could just choose a nice one and remove the others
 	fMenuInfo.separator = 0;
-	fMenuInfo.click_to_open = true;
+	fMenuInfo.click_to_open = true; // always true
 	fMenuInfo.triggers_always_shown = false;
 
 	fWorkspacesCount = 4;

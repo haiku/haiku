@@ -785,26 +785,6 @@ shift_color(rgb_color color, float shift)
 }
 
 
-static status_t
-load_menu_settings(menu_info &into)
-{
-	// TODO: Load settings from the settings file,
-	// and only if it fails, fallback to the defaults
-
-	// TODO: shouldn't the server handle the details? It could broadcast
-	//	change messages to the applications, which could also relayout
-	//	there menus and menu bars then (as soon as we have a layout management)
-	into.font_size = be_plain_font->Size();
-	be_plain_font->GetFamilyAndStyle(&into.f_family, &into.f_style);
-	into.background_color = ui_color(B_MENU_BACKGROUND_COLOR);
-	into.separator = 0;
-	into.click_to_open = true;
-	into.triggers_always_shown = false;
-
-	return B_OK;
-}
-
-
 extern "C" status_t
 _init_interface_kit_()
 {
@@ -818,7 +798,7 @@ _init_interface_kit_()
 	_init_global_fonts_();
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
-	status_t status = load_menu_settings(BMenu::sMenuInfo);
+	status_t status = get_menu_info(&BMenu::sMenuInfo);
 
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
 	general_info.mark_color.set_to(0, 0, 0);
