@@ -101,17 +101,6 @@ MenuWindow::MessageReceived(BMessage *msg)
 			Update();
 			break;
 		
-		case CLICK_OPEN_MSG:
-			revert = true;
-			if (info.click_to_open != true)
-				info.click_to_open = true;
-			else
-				info.click_to_open = false;
-			set_menu_info(&info);
-			menuBar->set_menu();
-			Update();
-			break;
-		
 		case ALLWAYS_TRIGGERS_MSG:
 			revert = true;
 			if (info.triggers_always_shown != true)

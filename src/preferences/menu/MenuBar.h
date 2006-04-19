@@ -28,7 +28,6 @@ private:
 	//others
 	FontMenu		*fontMenu;
 	FontSizeMenu		*fontSizeMenu;
-	BMenuItem		*clickToOpenItem;
 	BMenuItem		*alwaysShowTriggersItem;
 	BMenuItem		*colorSchemeItem;
 	BMenuItem		*separatorStyleItem;

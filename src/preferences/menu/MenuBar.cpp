@@ -37,7 +37,6 @@ MenuBar::build_menu()
 	fontSizeMenu = new FontSizeMenu();
 	
 	// create the menu items
-	clickToOpenItem = new BMenuItem("Click To Open", new BMessage(CLICK_OPEN_MSG), 0, 0);
 	alwaysShowTriggersItem = new BMenuItem("Always Show Triggers", new BMessage(ALLWAYS_TRIGGERS_MSG), 0, 0);
 	separatorStyleItem = new BMenuItem("Separator Style", new BMessage(DEFAULT_MSG), 0, 0);
 	ctlAsShortcutItem = new BitmapMenuItem("as Shortcut Key",
@@ -73,7 +72,6 @@ MenuBar::build_menu()
 	AddItem(fontMenu, 0);
 	AddItem(fontSizeMenu, 1);
 	AddSeparatorItem();
-	AddItem(clickToOpenItem);
 	AddItem(alwaysShowTriggersItem);
 	AddSeparatorItem();
 	AddItem(colorSchemeItem);
@@ -94,9 +92,7 @@ MenuBar::set_menu()
 	get_menu_info(&info);
 	
 	alwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
-		clickToOpenItem->SetMarked(info.click_to_open);
-	alwaysShowTriggersItem->SetEnabled(info.click_to_open);
-	
+		
 	get_key_map(&keys, &chars); 
        
        	altAsShortcut = (keys->left_command_key == 0x5d) && (keys->right_command_key == 0x5f); 
