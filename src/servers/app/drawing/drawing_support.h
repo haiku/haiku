@@ -138,6 +138,9 @@ blend_line32(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b, uint8 a)
 	gfxcpy32(buffer, tempBuffer, pixels * 4);
 }
 
+void
+align_rect_to_pixels(BRect* rect);
+
 #endif // SUPPORT_H
 
 

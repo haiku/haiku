@@ -22,6 +22,8 @@
 #include "ServerWindow.h"
 #include "WindowLayer.h"
 
+#include "drawing_support.h"
+
 #include <List.h>
 #include <Message.h>
 #include <PortLink.h>
@@ -809,14 +811,16 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 	// do the blit, this will make sure
 	// that other more complex dirty regions
 	// are taken care of
-	BRegion copyRegion(stillVisibleBounds);
-	fWindow->CopyContents(&copyRegion, -x, -y);
+	BRegion* copyRegion = fWindow->GetRegion();
+	if (!copyRegion)
+		return;
+	copyRegion->Set(stillVisibleBounds);
+	fWindow->CopyContents(copyRegion, -x, -y);
 
 	// find the dirty region as far as we are
 	// concerned
-	BRegion* dirty = fWindow->GetRegion();
-	if (!dirty)
-		return;
+	BRegion* dirty = copyRegion;
+		// reuse copyRegion and call it dirty
 
 	dirty->Set(oldBounds);
 	stillVisibleBounds.OffsetBy(-x, -y);
@@ -860,17 +864,20 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	// do the blit, this will make sure
 	// that other more complex dirty regions
 	// are taken care of
-	BRegion copyRegion(visibleSrc);
-	copyRegion.IntersectWith(&ScreenClipping(&windowContentClipping));
-	fWindow->CopyContents(&copyRegion, xOffset, yOffset);
+	BRegion* copyRegion = fWindow->GetRegion();
+	if (!copyRegion)
+		return;
+
+	copyRegion->Set(visibleSrc);
+	copyRegion->IntersectWith(&ScreenClipping(&windowContentClipping));
+	fWindow->CopyContents(copyRegion, xOffset, yOffset);
 
 	// find the dirty region as far as we are concerned
 	BRect dirtyDst(dst);
 	ConvertToVisibleInTopView(&dirtyDst);
 
-	BRegion* dirty = fWindow->GetRegion();
-	if (!dirty)
-		return;
+	BRegion* dirty = copyRegion;
+		// reuse copyRegion and call it "dirty"
 
 	dirty->Set(dirtyDst);
 	// exclude the part that we could copy
@@ -965,9 +972,11 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 	if (fViewBitmap != NULL || !fViewColor.IsTransparentMagic()) {
 		// we can only draw within our own area
-		BRegion redraw(ScreenClipping(windowContentClipping));
+		BRegion* redraw = fWindow->GetRegion(ScreenClipping(windowContentClipping));
+		if (!redraw)
+			return;
 		// add the current clipping
-		redraw.IntersectWith(effectiveClipping);
+		redraw->IntersectWith(effectiveClipping);
 
 		if (fViewBitmap != NULL) {
 			// draw view bitmap
@@ -975,20 +984,79 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			BRect rect = fBitmapDestination;
 			ConvertToScreenForDrawing(&rect);
 
-			// lock the drawing engine for as long as we need the clipping
-			// to be valid
-			if (drawingEngine->Lock()) {
-				drawingEngine->ConstrainClippingRegion(&redraw);
+			align_rect_to_pixels(&rect);
 
-				DrawState defaultDrawState;
-				drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-					rect, &defaultDrawState);
-				// NOTE: It is ok not to reset the clipping, that
-				// would only waste time
-				drawingEngine->Unlock();
+			if (fBitmapOptions & B_TILE_BITMAP_Y) {
+				// move rect up as much as needed
+				while (rect.top > redraw->Frame().top)
+					rect.OffsetBy(0.0, -(rect.Height() + 1));
+			}
+			if (fBitmapOptions & B_TILE_BITMAP_X) {
+				// move rect left as much as needed
+				while (rect.left > redraw->Frame().left)
+					rect.OffsetBy(-(rect.Width() + 1), 0.0);
 			}
 
-			redraw.Exclude(rect);
+// XXX: locking removed because the WindowLayer keeps the engine locked
+// because it keeps track of syncing right now
+
+			// lock the drawing engine for as long as we need the clipping
+			// to be valid
+			if (rect.IsValid()/* && drawingEngine->Lock()*/) {
+				drawingEngine->ConstrainClippingRegion(redraw);
+
+				DrawState defaultDrawState;
+
+				if (fBitmapOptions & B_TILE_BITMAP) {
+					// tile across entire view
+					float start = rect.left;
+					while (rect.top < redraw->Frame().bottom) {
+						while (rect.left < redraw->Frame().right) {
+							drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+								rect, &defaultDrawState);
+							rect.OffsetBy(rect.Width() + 1, 0.0);
+						}
+						rect.OffsetBy(start - rect.left, rect.Height() + 1);
+					}
+					// nothing left to be drawn
+					redraw->MakeEmpty();
+
+				} else if (fBitmapOptions & B_TILE_BITMAP_X) {
+					// tile in x direction
+					while (rect.left < redraw->Frame().right) {
+						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+							rect, &defaultDrawState);
+						rect.OffsetBy(rect.Width() + 1, 0.0);
+					}
+					// remove horizontal stripe from clipping
+					rect.left = redraw->Frame().left;
+					rect.right = redraw->Frame().right;
+					redraw->Exclude(rect);
+
+				} else if (fBitmapOptions & B_TILE_BITMAP_Y) {
+					// tile in y direction
+					while (rect.top < redraw->Frame().bottom) {
+						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+							rect, &defaultDrawState);
+						rect.OffsetBy(0.0, rect.Height() + 1);
+					}
+					// remove vertical stripe from clipping
+					rect.top = redraw->Frame().top;
+					rect.bottom = redraw->Frame().bottom;
+					redraw->Exclude(rect);
+
+				} else {
+					// no tiling at all
+					drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
+						rect, &defaultDrawState);
+					redraw->Exclude(rect);
+				}
+
+				// NOTE: It is ok not to reset the clipping, that
+				// would only waste time
+//				drawingEngine->Unlock();
+			}
+
 		}
 
 		if (!fViewColor.IsTransparentMagic()) {
@@ -996,8 +1064,10 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			// this version of FillRegion ignores any
 			// clipping, that's why "redraw" needs to
 			// be correct
-			drawingEngine->FillRegion(redraw, fViewColor);
+			drawingEngine->FillRegion(*redraw, fViewColor);
 		}
+
+		fWindow->RecycleRegion(redraw);
 	}
 
 	fBackgroundDirty = false;
@@ -1176,9 +1246,12 @@ ViewLayer::RebuildClipping(bool deep)
 		// hand, views for which this feature is actually used will
 		// probably not have any children, so it is not that expensive
 		// after all
-		BRegion screenUserClipping(*userClipping);
-		fDrawState->Transform(&screenUserClipping);
-		fLocalClipping.IntersectWith(&screenUserClipping);
+		BRegion* screenUserClipping = fWindow->GetRegion(*userClipping);
+		if (!screenUserClipping)
+			return;
+		fDrawState->Transform(screenUserClipping);
+		fLocalClipping.IntersectWith(screenUserClipping);
+		fWindow->RecycleRegion(screenUserClipping);
 	}
 
 	fScreenClippingValid = false;
@@ -1198,8 +1271,12 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 		ConvertToVisibleInTopView(&clippedBounds);
 		if (clippedBounds.Width() < fScreenClipping.Frame().Width() ||
 			clippedBounds.Height() < fScreenClipping.Frame().Height()) {
-			BRegion temp(clippedBounds);
-			fScreenClipping.IntersectWith(&temp);
+			BRegion* temp = fWindow->GetRegion();
+			if (temp) {
+				temp->Set(clippedBounds);
+				fScreenClipping.IntersectWith(temp);
+				fWindow->RecycleRegion(temp);
+			}
 		}
 
 		fScreenClipping.IntersectWith(windowContentClipping);

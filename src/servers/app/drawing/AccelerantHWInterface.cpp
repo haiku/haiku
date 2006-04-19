@@ -733,7 +733,8 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 
 // FillRegion
 void
-AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
+AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color,
+								  bool autoSync)
 {
 	if (fAccFillRect && fAccAcquireEngine) {
 		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
@@ -750,7 +751,7 @@ AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& col
 				fAccReleaseEngine(fEngineToken, &fSyncToken);
 
 			// sync
-			if (fAccSyncToToken)
+			if (autoSync && fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
 		}
 	}
@@ -779,6 +780,14 @@ AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 				fAccSyncToToken(&fSyncToken);
 		}
 	}
+}
+
+// Sync
+void
+AccelerantHWInterface::Sync()
+{
+	if (fAccSyncToToken)
+		fAccSyncToToken(&fSyncToken);
 }
 
 // SetCursor

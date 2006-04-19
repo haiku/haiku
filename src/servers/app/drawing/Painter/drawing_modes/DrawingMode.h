@@ -9,7 +9,7 @@
 #ifndef DRAWING_MODE_H
 #define DRAWING_MODE_H
 
-#include "frame_buffer_support.h"
+#include "drawing_support.h"
 
 #include "PatternHandler.h"
 #include "PixelFormat.h"

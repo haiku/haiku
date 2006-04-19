@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "frame_buffer_support.h"
+#include "drawing_support.h"
 
 #include "RenderingBuffer.h"
 #include "ServerCursor.h"
@@ -302,7 +302,7 @@ HWInterface::CopyBackToFront(const BRect& frame)
 }
 
 // HideSoftwareCursor
-void
+bool
 HWInterface::HideSoftwareCursor(const BRect& area)
 {
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
@@ -312,8 +312,10 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
 			_RestoreCursorArea();
+			return true;
 		}
 	}
+	return false;
 }
 
 // HideSoftwareCursor
@@ -404,10 +406,11 @@ HWInterface::_DrawCursor(BRect area) const
 					*(uint32*)b = *(uint32*)s;
 					// assumes backbuffer alpha = 255
 					// assuming pre-multiplied cursor bitmap
-					uint8 a = 255 - c[3];
-					d[0] = ((b[0] * a) >> 8) + c[0];
-					d[1] = ((b[1] * a) >> 8) + c[1];
-					d[2] = ((b[2] * a) >> 8) + c[2];
+					int a = 255 - c[3];
+					d[0] = ((int)(b[0] * a + 255) >> 8) + c[0];
+					d[1] = ((int)(b[1] * a + 255) >> 8) + c[1];
+					d[2] = ((int)(b[2] * a + 255) >> 8) + c[2];
+
 					s += 4;
 					c += 4;
 					d += 4;
@@ -428,9 +431,10 @@ HWInterface::_DrawCursor(BRect area) const
 					// assumes backbuffer alpha = 255
 					// assuming pre-multiplied cursor bitmap
 					uint8 a = 255 - c[3];
-					d[0] = ((s[0] * a) >> 8) + c[0];
-					d[1] = ((s[1] * a) >> 8) + c[1];
-					d[2] = ((s[2] * a) >> 8) + c[2];
+					d[0] = ((s[0] * a + 255) >> 8) + c[0];
+					d[1] = ((s[1] * a + 255) >> 8) + c[1];
+					d[2] = ((s[2] * a + 255) >> 8) + c[2];
+
 					s += 4;
 					c += 4;
 					d += 4;

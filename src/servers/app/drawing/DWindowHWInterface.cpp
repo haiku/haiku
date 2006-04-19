@@ -944,7 +944,7 @@ DWindowHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 
 // FillRegion
 void
-DWindowHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
+DWindowHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color, bool autoSync)
 {
 	if (fAccFillRect && fAccAcquireEngine) {
 		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
@@ -961,7 +961,7 @@ DWindowHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
 				fAccReleaseEngine(fEngineToken, &fSyncToken);
 
 			// sync
-			if (fAccSyncToToken)
+			if (autoSync && fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
 		}
 	}
@@ -995,6 +995,14 @@ DWindowHWInterface::InvertRegion(/*const*/ BRegion& region)
 	} else {
 		fprintf(stderr, "AccelerantHWInterface::InvertRegion() called, but hook not available!\n");
 	}
+}
+
+// Sync
+void
+DWindowHWInterface::Sync()
+{
+	if (fAccSyncToToken)
+		fAccSyncToToken(&fSyncToken);
 }
 
 // FrontBuffer

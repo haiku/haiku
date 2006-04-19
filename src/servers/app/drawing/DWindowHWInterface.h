@@ -59,8 +59,11 @@ class DWindowHWInterface : public HWInterface {
 										   uint32 count,
 										   int32 xOffset, int32 yOffset);
 	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const RGBColor& color);
+										   const RGBColor& color,
+										   bool autoSync);
 	virtual	void				InvertRegion(/*const*/ BRegion& region);
+
+	virtual	void				Sync();
 
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;

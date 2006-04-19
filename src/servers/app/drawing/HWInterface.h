@@ -73,8 +73,11 @@ class HWInterface : public MultiLocker {
 										   uint32 count,
 										   int32 xOffset, int32 yOffset) {}
 	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const RGBColor& color) {}
+										   const RGBColor& color,
+										   bool autoSync) {}
 	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
+
+	virtual	void				Sync() {}
 
 	// cursor handling (these do their own Read/Write locking)
 			ServerCursor*		Cursor() const { return fCursor; }
@@ -115,7 +118,7 @@ class HWInterface : public MultiLocker {
 	// ---
 	// NOTE: Investigate locking for these! The client code should already hold a
 	// ReadLock, but maybe these functions should acquire a WriteLock!
-			void				HideSoftwareCursor(const BRect& area);
+			bool				HideSoftwareCursor(const BRect& area);
 			void				HideSoftwareCursor();
 			void				ShowSoftwareCursor();
 

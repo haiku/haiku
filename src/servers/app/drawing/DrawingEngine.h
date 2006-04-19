@@ -66,6 +66,9 @@ public:
 			// will remove any clipping (drawing allowed everywhere)
 			void			ConstrainClippingRegion(const BRegion* region);
 
+			void			SuspendAutoSync();
+			void			Sync();
+
 			// drawing functions
 			void			CopyRegion(/*const*/ BRegion* region,
 								int32 xOffset, int32 yOffset);
@@ -156,6 +159,7 @@ public:
 			Painter*		fPainter;
 			HWInterface*	fGraphicsCard;
 			uint32			fAvailableHWAccleration;
+			int32			fSuspendSyncLevel;
 };
 
 #endif // DRAWING_ENGINE_H_

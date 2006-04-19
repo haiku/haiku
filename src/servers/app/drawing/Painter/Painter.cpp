@@ -26,7 +26,7 @@
 #include <agg_span_image_filter_rgba32.h>
 #include <agg_span_interpolator_linear.h>
 
-#include "frame_buffer_support.h"
+#include "drawing_support.h"
 
 #include "DrawState.h"
 
@@ -210,6 +210,8 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 	fLineJoinMode	= data->LineJoinMode();
 	fMiterLimit		= data->MiterLimit();
 
+	// adopt the color *after* the pattern is set
+	// to set the renderers to the correct color
 	SetHighColor(data->HighColor().GetColor32());
 	SetLowColor(data->LowColor().GetColor32());
 
@@ -240,7 +242,7 @@ Painter::SetHighColor(const rgb_color& color)
 void
 Painter::SetLowColor(const rgb_color& color)
 {
-	fPatternHandler->SetLowColor(color);;
+	fPatternHandler->SetLowColor(color);
 	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_LOW)
 		_SetRendererColor(color);
 }
@@ -1356,12 +1358,8 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 		return;
 	}
 
-	if (!fSubpixelPrecise) {
-		// round off viewRect (in a way avoiding too much distortion)
-		viewRect.OffsetTo(roundf(viewRect.left), roundf(viewRect.top));
-		viewRect.right = roundf(viewRect.right);
-		viewRect.bottom = roundf(viewRect.bottom);
-	}
+	if (!fSubpixelPrecise)
+		align_rect_to_pixels(&viewRect);
 
 	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
 	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);

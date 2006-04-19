@@ -65,7 +65,6 @@ using std::nothrow;
 // its previous position though if the exposed parts are not
 // cleared right away. maybe there ought to be a flag in
 // the update session, which tells us the cause of the update
-#define DELAYED_BACKGROUND_CLEARING 1
 
 
 WindowLayer::WindowLayer(const BRect& frame, const char *name,
@@ -81,6 +80,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fVisibleContentRegion(),
 	fVisibleContentRegionValid(false),
 	fDirtyRegion(),
+	fDirtyCause(0),
 
 	fBorderRegion(),
 	fBorderRegionValid(false),
@@ -609,8 +609,8 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 		ServerWindow()->RequestRedraw();
 	}
 
-	// this is executed from the desktop thread
 	fDirtyRegion.Include(&region);
+	fDirtyCause |= UPDATE_EXPOSE;
 }
 
 
@@ -639,6 +639,7 @@ WindowLayer::RedrawDirtyRegion()
 	// get write access, since we're holding
 	// the read lock for the whole time.
 	fDirtyRegion.MakeEmpty();
+	fDirtyCause = 0;
 }
 
 
@@ -665,6 +666,7 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 		return;
 
 	regionOnScreen.IntersectWith(&VisibleContentRegion());
+	fDirtyCause |= UPDATE_REQUEST;
 	_TriggerContentRedraw(regionOnScreen);
 }
 
@@ -684,7 +686,7 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 
 //fDrawingEngine->FillRegion(layerRegion, RGBColor(0, 255, 0, 255));
 //snooze(10000);
-
+			fDirtyCause |= UPDATE_REQUEST;
 			_TriggerContentRedraw(layerRegion);
 		}
 	}
@@ -1621,25 +1623,32 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 	if (IsVisible() && dirtyContentRegion.CountRects() > 0) {
 		// put this into the pending dirty region
 		// to eventually trigger a client redraw
+		bool wasExpose = fPendingUpdateSession.IsExpose();
+		BRegion* backgroundClearingRegion = &dirtyContentRegion;
+
 		_TransferToUpdateSession(&dirtyContentRegion);
 
-#if DELAYED_BACKGROUND_CLEARING
-// NOTE: currently not used, might come in handy later though
-//		if (!fTopLayer->IsBackgroundDirty())
-//			fTopLayer->MarkBackgroundDirty();
-#else
-// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
-// need investigation if it even still works...
-		if (!fContentRegionValid)
-			_UpdateContentRegion();
+		if (fPendingUpdateSession.IsExpose()) {
+			if (!fContentRegionValid)
+				_UpdateContentRegion();
 
-		if (fDrawingEngine->Lock()) {
-			fDrawingEngine->ConstrainClippingRegion(&dirtyContentRegion);
-			fTopLayer->Draw(fDrawingEngine, &dirtyContentRegion,
-							&fContentRegion, true);
-			fDrawingEngine->Unlock();
+			if (!wasExpose) {
+				// there was suddenly added a dirty region
+				// caused by exposing content, we need to clear
+				// the entire background
+				backgroundClearingRegion = &fPendingUpdateSession.DirtyRegion();
+			}
+
+			if (fDrawingEngine->Lock()) {
+				fDrawingEngine->SuspendAutoSync();
+
+				fTopLayer->Draw(fDrawingEngine, backgroundClearingRegion,
+								&fContentRegion, true);
+
+				fDrawingEngine->Sync();
+				fDrawingEngine->Unlock();
+			}
 		}
-#endif
 	}
 }
 
@@ -1691,6 +1700,8 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 
 	// add to pending
 	fPendingUpdateSession.SetUsed(true);
+//	if (!fPendingUpdateSession.IsExpose())
+	fPendingUpdateSession.AddCause(fDirtyCause);
 	fPendingUpdateSession.Include(contentDirtyRegion);
 
 	// clip pending update session from current
@@ -1699,14 +1710,10 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// this could be done smarter (clip layers from pending
 	// that have not yet been redrawn in the current update
 	// session)
-#if !DELAYED_BACKGROUND_CLEARING
-// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
-// need investigation if it even still works...
-	if (fCurrentUpdateSession.IsUsed()) {
+	if (fCurrentUpdateSession.IsUsed() && fCurrentUpdateSession.IsExpose()) {
 		fCurrentUpdateSession.Exclude(contentDirtyRegion);
 		fEffectiveDrawingRegionValid = false;
 	}
-#endif
 
 	if (!fUpdateRequested) {
 		// send this to client
@@ -1768,8 +1775,6 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 
 		dirty->IntersectWith(&VisibleContentRegion());
 
-//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
-
 		link.StartMessage(B_OK);
 		// append the current window geometry to the
 		// message, the client will need it
@@ -1785,14 +1790,19 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		link.Attach<int32>(B_NULL_TOKEN);
 		link.Flush();
 
-#if DELAYED_BACKGROUND_CLEARING
-// NOTE: turning off DELAYED_BACKGROUND_CLEARING will
-// need investigation if it even still works...
-		fTopLayer->Draw(fDrawingEngine, dirty,
-						&fContentRegion, true);
+		if (!fCurrentUpdateSession.IsExpose() && fDrawingEngine->Lock()) {
+//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
+			fDrawingEngine->SuspendAutoSync();
+
+			fTopLayer->Draw(fDrawingEngine, dirty,
+							&fContentRegion, true);
+
+			fDrawingEngine->Sync();
+			fDrawingEngine->Unlock();
+		} // else the background was cleared already
 
 		fRegionPool.Recycle(dirty);
-#endif
+
 	} else {
 printf("BeginUpdate() but no update requested!!\n");
 		link.StartMessage(B_ERROR);
@@ -1908,7 +1918,8 @@ WindowLayer::_ObeySizeLimits()
 // constructor
 WindowLayer::UpdateSession::UpdateSession()
 	: fDirtyRegion(),
-	  fInUse(false)
+	  fInUse(false),
+	  fCause(0)
 {
 }
 
@@ -1943,8 +1954,17 @@ void
 WindowLayer::UpdateSession::SetUsed(bool used)
 {
 	fInUse = used;
-	if (!fInUse)
+	if (!fInUse) {
 		fDirtyRegion.MakeEmpty();
+		fCause = 0;
+	}
+}
+
+
+void
+WindowLayer::UpdateSession::AddCause(uint8 cause)
+{
+	fCause |= cause;
 }
 
 
@@ -1953,6 +1973,7 @@ WindowLayer::UpdateSession::operator=(const WindowLayer::UpdateSession& other)
 {
 	fDirtyRegion = other.fDirtyRegion;
 	fInUse = other.fInUse;
+	fCause = other.fCause;
 	return *this;
 }
 

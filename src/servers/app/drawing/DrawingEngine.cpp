@@ -21,7 +21,7 @@
 #include "ServerCursor.h"
 #include "RenderingBuffer.h"
 
-#include "frame_buffer_support.h"
+#include "drawing_support.h"
 
 // make_rect_valid
 static inline void
@@ -82,7 +82,8 @@ class FontLocker {
 DrawingEngine::DrawingEngine(HWInterface* interface)
 	: fPainter(new Painter()),
 	  fGraphicsCard(interface),
-	  fAvailableHWAccleration(0)
+	  fAvailableHWAccleration(0),
+	  fSuspendSyncLevel(0)
 {
 }
 
@@ -151,6 +152,24 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 		Unlock();
 	}
 }
+
+// SuspendAutoSync
+void
+DrawingEngine::SuspendAutoSync()
+{
+	fSuspendSyncLevel++;
+}
+
+// Sync
+void
+DrawingEngine::Sync()
+{
+	fSuspendSyncLevel--;
+	if (fSuspendSyncLevel == 0)
+		fGraphicsCard->Sync();
+}
+
+// #pragma mark -
 
 // CopyRegion() does a topological sort of the rects in the
 // region. The algorithm was suggested by Ingo Weinhold.
@@ -596,20 +615,23 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 		make_rect_valid(r);
 		r = fPainter->ClipRect(r);
 		if (r.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
+			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 	
 			// try hardware optimized version first
 			if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
 				BRegion region(r);
 				region.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(region, color);
+				fGraphicsCard->FillRegion(region, color,
+										  fSuspendSyncLevel == 0
+										  || cursorTouched);
 			} else {
 				fPainter->FillRect(r, color.GetColor32());
 		
 				fGraphicsCard->Invalidate(r);
 			}
-	
-			fGraphicsCard->ShowSoftwareCursor();
+
+			if (cursorTouched)
+				fGraphicsCard->ShowSoftwareCursor();
 		}
 
 		WriteUnlock();
@@ -626,13 +648,14 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	// NOTE: region expected to be already clipped correctly!!
 	if (WriteLock()) {
 		BRect frame = r.Frame();
-		fGraphicsCard->HideSoftwareCursor(frame);
+		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
 
 		bool doInSoftware = true;
 		// try hardware optimized version first
 		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
 			&& frame.Width() * frame.Height() > 100) {
-			fGraphicsCard->FillRegion(r, color);
+			fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
+												|| cursorTouched);
 			doInSoftware = false;
 		}
 
@@ -646,7 +669,8 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 			fGraphicsCard->Invalidate(r.Frame());
 		}
 
-		fGraphicsCard->ShowSoftwareCursor();
+		if (cursorTouched)
+			fGraphicsCard->ShowSoftwareCursor();
 
 		WriteUnlock();
 	}
@@ -689,7 +713,7 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 		make_rect_valid(r);
 		r = fPainter->ClipRect(r);
 		if (r.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
+			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 
 			bool doInSoftware = true;
 			if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
@@ -701,13 +725,17 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 							|| d->GetDrawingMode() == B_OP_OVER)) {
 						BRegion region(r);
 						region.IntersectWith(fPainter->ClippingRegion());
-						fGraphicsCard->FillRegion(region, d->HighColor());
+						fGraphicsCard->FillRegion(region, d->HighColor(),
+												  fSuspendSyncLevel == 0
+												  || cursorTouched);
 						doInSoftware = false;
 					} else if (d->GetPattern() == B_SOLID_LOW
 							   && d->GetDrawingMode() == B_OP_COPY) {
 						BRegion region(r);
 						region.IntersectWith(fPainter->ClippingRegion());
-						fGraphicsCard->FillRegion(region, d->LowColor());
+						fGraphicsCard->FillRegion(region, d->LowColor(),
+												  fSuspendSyncLevel == 0
+												  || cursorTouched);
 						doInSoftware = false;
 					}
 				}
@@ -719,7 +747,8 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 				fGraphicsCard->Invalidate(r);
 			}
 
-			fGraphicsCard->ShowSoftwareCursor();
+			if (cursorTouched)
+				fGraphicsCard->ShowSoftwareCursor();
 		}
 
 		WriteUnlock();
@@ -736,7 +765,7 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 	if (WriteLock()) {
 		BRect clipped = fPainter->ClipRect(r.Frame());
 		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
+			bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
 			bool doInSoftware = true;
 			// try hardware optimized version first
@@ -745,12 +774,16 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 					&& (d->GetDrawingMode() == B_OP_COPY
 						|| d->GetDrawingMode() == B_OP_OVER)) {
 					r.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(r, d->HighColor());
+					fGraphicsCard->FillRegion(r, d->HighColor(),
+											  fSuspendSyncLevel == 0
+											  || cursorTouched);
 					doInSoftware = false;
 				} else if (d->GetPattern() == B_SOLID_LOW
 						   && d->GetDrawingMode() == B_OP_COPY) {
 					r.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(r, d->LowColor());
+					fGraphicsCard->FillRegion(r, d->LowColor(),
+											  fSuspendSyncLevel == 0
+											  || cursorTouched);
 					doInSoftware = false;
 				}
 			}
@@ -768,7 +801,8 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 				fGraphicsCard->Invalidate(touched);
 			}
 
-			fGraphicsCard->ShowSoftwareCursor();
+			if (cursorTouched)
+				fGraphicsCard->ShowSoftwareCursor();
 		}
 
 		WriteUnlock();
@@ -1269,4 +1303,5 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 		}
 	}
 }
+
 

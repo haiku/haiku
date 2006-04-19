@@ -35,6 +35,11 @@ class WindowLayer;
 // TODO: move this into a proper place
 #define AS_REDRAW 'rdrw'
 
+enum {
+	UPDATE_REQUEST		= 0x01,
+	UPDATE_EXPOSE		= 0x02,
+};
+
 class WindowLayer {
  public:
 								WindowLayer(const BRect& frame,
@@ -248,6 +253,7 @@ class WindowLayer {
 			// the clipping, since it is local and the desktop
 			// thread is blocked
 			BRegion				fDirtyRegion;
+			uint32				fDirtyCause;
 
 			// caching local regions
 			BRegion				fBorderRegion;
@@ -301,12 +307,19 @@ class WindowLayer {
 				void				SetUsed(bool used);
 		inline	bool				IsUsed() const
 										{ return fInUse; }
+
+				void				AddCause(uint8 cause);
+		inline	bool				IsExpose() const
+										{ return fCause & UPDATE_EXPOSE; }
+		inline	bool				IsRequest() const
+										{ return fCause & UPDATE_REQUEST; }
 	
 				UpdateSession&		operator=(const UpdateSession& other);
 	
 	 private:
 				BRegion				fDirtyRegion;
 				bool				fInUse;
+				uint8				fCause;
 	};
 
 			BRegion				fDecoratorRegion;

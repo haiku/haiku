@@ -13,6 +13,7 @@ StaticLibrary libasdrawing.a :
 	AccelerantBuffer.cpp
 	AccelerantHWInterface.cpp
 	BitmapBuffer.cpp
+	drawing_support.cpp
 	DrawingEngine.cpp
 	MallocBuffer.cpp
 	UpdateQueue.cpp
