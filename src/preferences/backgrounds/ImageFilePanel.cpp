@@ -122,6 +122,14 @@ ImageFilePanel::SelectionChanged()
 					mimeType.GetShortDescription(type);
 						// if this fails, the MIME type will be displayed
 					fImageTypeView->SetText(type);
+				} else {
+					BMimeType refType;
+					if (BMimeType::GuessMimeType(&ref, &refType) == B_OK) {
+						refType.GetShortDescription(type);
+							// if this fails, the MIME type will be displayed
+						fImageTypeView->SetText(type);
+					} else
+						fImageTypeView->SetText("");
 				}
 			}
 		} else {
@@ -156,7 +164,8 @@ CustomRefFilter::Filter(const entry_ref *ref, BNode* node,
 	if (node->IsDirectory())
 		return true;
 
-	BMimeType imageType("image"), refType(filetype);
+	BMimeType imageType("image"), refType;
+	BMimeType::GuessMimeType(ref, &refType);
 	if (imageType.Contains(&refType))
 		return true;
 
