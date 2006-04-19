@@ -494,7 +494,7 @@ BSlider::MouseDown(BPoint point)
 			prevPoint = point;
 
 			snooze(SnoozeAmount());
-			GetMouse(&point, &buttons, false);
+			GetMouse(&point, &buttons, true);
 
 			if (_ConstrainPoint(point, prevPoint)) {
 				SetValue(ValueForPoint(point));
