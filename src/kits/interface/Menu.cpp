@@ -187,7 +187,34 @@ BMenu::~BMenu()
 
 
 BMenu::BMenu(BMessage *archive)
-	:	BView(archive)
+	:	BView(archive),
+		fChosenItem(NULL),
+		fPad(14.0f, 2.0f, 20.0f, 0.0f),
+		fSelected(NULL),
+		fCachedMenuWindow(NULL),
+		fSuper(NULL),
+		fSuperitem(NULL),
+		fAscent(-1.0f),
+		fDescent(-1.0f),
+		fFontHeight(-1.0f),
+		fState(0),
+		fLayout(B_ITEMS_IN_ROW),
+		fExtraRect(NULL),
+		fMaxContentWidth(0.0f),
+		fInitMatrixSize(NULL),
+		fExtraMenuData(NULL),
+		fTrigger(0),
+		fResizeToFit(true),
+		fUseCachedMenuLayout(false),
+		fEnabled(true),
+		fDynamicName(false),
+		fRadioMode(false),
+		fTrackNewBounds(false),
+		fStickyMode(false),
+		fIgnoreHidden(true),
+		fTriggerEnabled(true),
+		fRedrawAfterSticky(false),
+		fAttachAborted(false)
 {
 	InitData(archive);
 }
@@ -1144,8 +1171,6 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 {
 	// TODO: cleanup
 	BMenuItem *item = NULL;
-	int localAction = MENU_ACT_NONE;
-
 	bigtime_t openTime = system_time();
 	bigtime_t closeTime = openTime; 
 	
@@ -1159,7 +1184,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		ulong buttons;
-		GetMouse(&location, &buttons, false);
+		GetMouse(&location, &buttons, true);
 		
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
@@ -1179,10 +1204,30 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 				fState = MENU_ACT_SUBMENU;
 				closeTime = system_time();
 			}
-		} else {
+		}
+
+
+		// Track the submenu
+		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
+			UnlockLooper();
+			locked = false;
+			int submenuAction = MENU_ACT_NONE;
+			if (IsStickyMode())
+				fSelected->Submenu()->SetStickyMode(true);
+			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, trackTime);
+			if (submenuAction == MENU_ACT_CLOSE) {
+				item = submenuItem;
+				fState = submenuAction;
+				break;
+			}
+			locked = LockLooper();
+			if (!locked)
+				break;
+		}
+
+		if (item == NULL) {
 			if (OverSuper(screenLocation)) {
-				localAction = MENU_ACT_NONE;
-				item = NULL;
+				fState = MENU_ACT_NONE;
 				UnlockLooper();
 				break;
 			}
@@ -1193,43 +1238,27 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 			}
 		}
 
-		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
-			UnlockLooper();
-			locked = false;
-			int submenuAction = MENU_ACT_NONE;
-			if (IsStickyMode())
-				fSelected->Submenu()->SetStickyMode(true);
-			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, trackTime);
-			if (submenuAction == MENU_ACT_CLOSE) {
-				item = submenuItem;
-				localAction = submenuAction;
-				break;
-			}
-		}
-
 		if (locked)
 			UnlockLooper();
 		
 		snooze(snoozeAmount);
 		
 		if (buttons != 0 && IsStickyMode()) {
-			localAction = MENU_ACT_CLOSE;
+			fState = MENU_ACT_CLOSE;
 			break;
 		} else if (buttons == 0 && !IsStickyMode()) {
 			if (system_time() < trackTime + 1000000
 				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
 				SetStickyMode(true);
 			else {
-				localAction = MENU_ACT_CLOSE;
+				fState = MENU_ACT_CLOSE;
 				break;
 			}
 		}
 	}
 
-	fState = MENU_ACT_CLOSE;
-
 	if (action != NULL)
-		*action = localAction;
+		*action = fState;
 
 	if (LockLooper()) {
 		SelectItem(NULL);
@@ -1375,7 +1404,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		case B_ITEMS_IN_COLUMN:
 		{
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
-				item = ItemAt(i);			
+				item = ItemAt(i);	
 				if (item != NULL) {
 					item->GetContentSize(&iWidth, &iHeight);
 
@@ -1393,10 +1422,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			if (fMaxContentWidth > 0)
 				frame.right = min_c(frame.right, fMaxContentWidth);
 
-			if (moveItems) {
+			//if (moveItems) {
 				for (int32 i = 0; i < fItems.CountItems(); i++)
 					ItemAt(i)->fBounds.right = frame.right;
-			}
+			//}
 			frame.right = ceilf(frame.right);
 			frame.bottom--;
 			break;
@@ -1422,10 +1451,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				}
 			}
 			
-			if (moveItems) {
+			//if (moveItems) {
 				for (int32 i = 0; i < fItems.CountItems(); i++)
 					ItemAt(i)->fBounds.bottom = frame.bottom;			
-			}
+			//}
 
 			frame.right = ceilf(frame.right);
 			break;
