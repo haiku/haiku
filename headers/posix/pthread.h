@@ -4,8 +4,39 @@
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
-
 #include <time.h>
+
+struct pthread;
+struct pthread_attr;
+struct pthread_cond;
+struct pthread_cond_attr;
+struct pthread_mutex;
+struct pthread_mutex_attr;
+struct pthread_once;
+struct pthread_rwlock;
+struct pthread_rwlockattr;
+struct pthread_barrier;
+struct pthread_barrier_attr;
+struct pthread_spinlock;
+
+typedef struct  pthread				*pthread_t;
+typedef struct  pthread_attr		*pthread_attr_t;
+typedef struct  pthread_mutex		*pthread_mutex_t;
+typedef struct  pthread_mutex_attr	*pthread_mutexattr_t;
+typedef struct  pthread_cond		*pthread_cond_t;
+typedef struct  pthread_cond_attr	*pthread_condattr_t;
+typedef int							pthread_key_t;
+typedef struct  pthread_once		pthread_once_t;
+typedef struct  pthread_rwlock		*pthread_rwlock_t;
+typedef struct  pthread_rwlockattr	*pthread_rwlockattr_t;
+typedef struct  pthread_barrier		*pthread_barrier_t;
+typedef struct  pthread_barrierattr	*pthread_barrierattr_t;
+typedef struct  pthread_spinlock	*pthread_spinlock_t;
+
+struct pthread_once {
+	int	state;
+	pthread_mutex_t mutex;
+};
 
 
 enum pthread_mutex_type {
@@ -20,12 +51,38 @@ enum pthread_process_shared {
 	PTHREAD_PROCESS_SHARED,
 };
 
+/*
+ * Flags for threads and thread attributes.
+ */
+#define PTHREAD_DETACHED		0x1
+#define PTHREAD_SCOPE_SYSTEM		0x2
+#define PTHREAD_INHERIT_SCHED		0x4
+#define PTHREAD_NOFLOAT			0x8
 
-struct _pthread_mutex;
-struct _pthread_mutexattr;
+#define PTHREAD_CREATE_DETACHED		PTHREAD_DETACHED
+#define PTHREAD_CREATE_JOINABLE		0
+#define PTHREAD_SCOPE_PROCESS		0
+#define PTHREAD_EXPLICIT_SCHED		0
 
-typedef struct _pthread_mutex *pthread_mutex_t;
-typedef struct _pthread_mutexattr *pthread_mutexattr_t;
+/*
+ * Flags for cancelling threads
+ */
+#define PTHREAD_CANCEL_ENABLE		0
+#define PTHREAD_CANCEL_DISABLE		1
+#define PTHREAD_CANCEL_DEFERRED		0
+#define PTHREAD_CANCEL_ASYNCHRONOUS	2
+#define PTHREAD_CANCELED		((void *) 1)
+
+#define PTHREAD_COND_INITIALIZER	NULL
+
+#define PTHREAD_NEEDS_INIT	0
+#define PTHREAD_DONE_INIT	1
+#define PTHREAD_ONCE_INIT 	{ PTHREAD_NEEDS_INIT, NULL }
+
+#define PTHREAD_BARRIER_SERIAL_THREAD	-1
+#define PTHREAD_PRIO_NONE		0
+#define PTHREAD_PRIO_INHERIT		1
+#define PTHREAD_PRIO_PROTECT		2
 
 //extern pthread_mutexattr_t pthread_mutexattr_default;
 
@@ -65,6 +122,20 @@ extern int pthread_mutexattr_settype(pthread_mutexattr_t *mutexAttr, int type);
 
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
+/* thread attributes functions */
+extern int pthread_attr_destroy(pthread_attr_t *attr);
+extern int pthread_attr_init(pthread_attr_t *attr);
+extern int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
+extern int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+
+extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr, 
+	void *(*start_routine)(void*), void *arg);
+extern int pthread_detach(pthread_t thread);
+extern int pthread_equal(pthread_t t1, pthread_t t2);
+extern void pthread_exit(void *value_ptr);
+extern int pthread_join(pthread_t thread, void **value_ptr);
+extern pthread_t pthread_self(void);
 
 #ifdef __cplusplus
 }
