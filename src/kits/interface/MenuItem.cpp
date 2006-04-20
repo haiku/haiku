@@ -730,12 +730,12 @@ BMenuItem::_DrawShortcutSymbol()
 
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
-		BBitmap control(rect, B_COLOR_8_BIT);
+		BBitmap control(rect, B_CMAP8);
 
 		if (BMenu::sAltAsCommandKey)
-			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
+			control.SetBits(kAltBits, kAltLength, 0, B_CMAP8);
 		else
-			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
+			control.SetBits(kCtrlBits, kCtrlLength, 0, B_CMAP8);
 		fSuper->DrawBitmap(&control, where);
 
 		where.x -= rect.Width() + 1;
@@ -743,12 +743,12 @@ BMenuItem::_DrawShortcutSymbol()
 
 	if (fModifiers & B_CONTROL_KEY) {
 		BRect rect(0,0,16,10);
-		BBitmap control(rect, B_COLOR_8_BIT);
+		BBitmap control(rect, B_CMAP8);
 
 		if (BMenu::sAltAsCommandKey)
-			control.SetBits(kCtrlBits, kCtrlLength, 0, B_COLOR_8_BIT);
+			control.SetBits(kCtrlBits, kCtrlLength, 0, B_CMAP8);
 		else	
-			control.SetBits(kAltBits, kAltLength, 0, B_COLOR_8_BIT);
+			control.SetBits(kAltBits, kAltLength, 0, B_CMAP8);
 		fSuper->DrawBitmap(&control, where);
 
 		where.x -= rect.Width() + 1;
@@ -756,8 +756,8 @@ BMenuItem::_DrawShortcutSymbol()
 
 	if (fModifiers & B_SHIFT_KEY) {
 		BRect rect(0,0,21,10);
-		BBitmap shift(rect, B_COLOR_8_BIT);
-		shift.SetBits(kShiftBits, kShiftLength, 0, B_COLOR_8_BIT);
+		BBitmap shift(rect, B_CMAP8);
+		shift.SetBits(kShiftBits, kShiftLength, 0, B_CMAP8);
 		fSuper->DrawBitmap(&shift, where - BPoint(6, 0));
 	}
 }

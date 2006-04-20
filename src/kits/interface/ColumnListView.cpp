@@ -1641,11 +1641,11 @@ TitleView::TitleView(BRect rect, OutlineView *horizontalSlave, BList *visibleCol
 	fDrawBuffer->Unlock();
 #endif
 
-	fUpSortArrow = new BBitmap(BRect(0, 0, 7, 7), B_COLOR_8_BIT);
-	fDownSortArrow = new BBitmap(BRect(0, 0, 7, 7), B_COLOR_8_BIT);
+	fUpSortArrow = new BBitmap(BRect(0, 0, 7, 7), B_CMAP8);
+	fDownSortArrow = new BBitmap(BRect(0, 0, 7, 7), B_CMAP8);
 
-	fUpSortArrow->SetBits((const void*) kUpSortArrow8x8, 64, 0, B_COLOR_8_BIT);
-	fDownSortArrow->SetBits((const void*) kDownSortArrow8x8, 64, 0, B_COLOR_8_BIT);
+	fUpSortArrow->SetBits((const void*) kUpSortArrow8x8, 64, 0, B_CMAP8);
+	fDownSortArrow->SetBits((const void*) kDownSortArrow8x8, 64, 0, B_CMAP8);
 
 #if _INCLUDES_CLASS_CURSOR
 	fResizeCursor = new BCursor(kResizeCursorData);
