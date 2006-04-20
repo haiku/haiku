@@ -6,32 +6,32 @@
 
 #include <time.h>
 
-struct pthread;
-struct pthread_attr;
-struct pthread_cond;
-struct pthread_cond_attr;
-struct pthread_mutex;
-struct pthread_mutex_attr;
-struct pthread_once;
-struct pthread_rwlock;
-struct pthread_rwlockattr;
-struct pthread_barrier;
-struct pthread_barrier_attr;
-struct pthread_spinlock;
+struct _pthread;
+struct _pthread_attr;
+struct _pthread_cond;
+struct _pthread_cond_attr;
+struct _pthread_mutex;
+struct _pthread_mutexattr;
+struct _pthread_once;
+struct _pthread_rwlock;
+struct _pthread_rwlockattr;
+struct _pthread_barrier;
+struct _pthread_barrier_attr;
+struct _pthread_spinlock;
 
-typedef struct  pthread				*pthread_t;
-typedef struct  pthread_attr		*pthread_attr_t;
-typedef struct  pthread_mutex		*pthread_mutex_t;
-typedef struct  pthread_mutex_attr	*pthread_mutexattr_t;
-typedef struct  pthread_cond		*pthread_cond_t;
-typedef struct  pthread_cond_attr	*pthread_condattr_t;
+typedef struct  _pthread				*pthread_t;
+typedef struct  _pthread_attr		*pthread_attr_t;
+typedef struct  _pthread_mutex		*pthread_mutex_t;
+typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
+typedef struct  _pthread_cond		*pthread_cond_t;
+typedef struct  _pthread_cond_attr	*pthread_condattr_t;
 typedef int							pthread_key_t;
-typedef struct  pthread_once		pthread_once_t;
-typedef struct  pthread_rwlock		*pthread_rwlock_t;
-typedef struct  pthread_rwlockattr	*pthread_rwlockattr_t;
-typedef struct  pthread_barrier		*pthread_barrier_t;
-typedef struct  pthread_barrierattr	*pthread_barrierattr_t;
-typedef struct  pthread_spinlock	*pthread_spinlock_t;
+typedef struct  _pthread_once		pthread_once_t;
+typedef struct  _pthread_rwlock		*pthread_rwlock_t;
+typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
+typedef struct  _pthread_barrier		*pthread_barrier_t;
+typedef struct  _pthread_barrierattr	*pthread_barrierattr_t;
+typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 
 struct pthread_once {
 	int	state;
