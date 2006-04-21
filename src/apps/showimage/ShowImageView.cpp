@@ -497,18 +497,18 @@ ShowImageView::SetImage(const entry_ref *ref)
 				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
 				break;
 			case k0V:
-				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
 				break;
 			case k90V:
 				DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
 				break;
 			case k0H:
-				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorVertical, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipSideways, true);
 				break;
 			case k270V:
 				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kMirrorHorizontal, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
 				break;
 		}
 	}
@@ -740,6 +740,10 @@ ShowImageView::AlignBitmap()
 		// zoom image
 		rect.right = floorf(bitmapWidth * zoom) - 1; 
 		rect.bottom = floorf(bitmapHeight * zoom) - 1;
+
+		// update the bitmap size after the zoom
+		bitmapWidth = rect.Width() + 1.0;
+		bitmapHeight = rect.Height() + 1.0;
 
 		// align
 		switch (fHAlignment) {
@@ -2388,8 +2392,8 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 		// Note: If one of these fails, check its definition in class ImageProcessor.
 		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
 		ASSERT(ImageProcessor::kRotateAntiClockwise < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kMirrorVertical < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kMirrorHorizontal < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kFlipSideways < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kFlipUpsideDown < ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
 	} else {
 		fInverted = !fInverted;
@@ -2440,12 +2444,12 @@ ShowImageView::Rotate(int degree)
 
 
 void
-ShowImageView::Mirror(bool vertical) 
+ShowImageView::Flip(bool vertical) 
 {
 	if (vertical) {
-		UserDoImageOperation(ImageProcessor::kMirrorVertical);
+		UserDoImageOperation(ImageProcessor::kFlipSideways);
 	} else {
-		UserDoImageOperation(ImageProcessor::kMirrorHorizontal);
+		UserDoImageOperation(ImageProcessor::kFlipUpsideDown);
 	}
 }
 

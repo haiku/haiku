@@ -329,8 +329,8 @@ ShowImageWindow::AddMenus(BMenuBar *bar)
 	AddItemMenu(menu, "Rotate -90°", MSG_ROTATE_270, '[', 0, 'W', true);
 	AddItemMenu(menu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);
 	menu->AddSeparatorItem();
-	AddItemMenu(menu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
-	AddItemMenu(menu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
+	AddItemMenu(menu, "Flip Sideways", MSG_FLIP_SIDEWAYS, 0, 0, 'W', true);
+	AddItemMenu(menu, "Flip Upside Down", MSG_FLIP_UPSIDE_DOWN, 0, 0, 'W', true);
 	menu->AddSeparatorItem();
 	AddItemMenu(menu, "Invert", MSG_INVERT, 0, 0, 'W', true);
 	bar->AddItem(menu);
@@ -717,11 +717,11 @@ ShowImageWindow::MessageReceived(BMessage *message)
 		case MSG_ROTATE_270:
 			fImageView->Rotate(270);
 			break;
-		case MSG_MIRROR_VERTICAL:
-			fImageView->Mirror(true);
+		case MSG_FLIP_SIDEWAYS:
+			fImageView->Flip(true);
 			break;
-		case MSG_MIRROR_HORIZONTAL:
-			fImageView->Mirror(false);
+		case MSG_FLIP_UPSIDE_DOWN:
+			fImageView->Flip(false);
 			break;
 		case MSG_INVERT:
 			fImageView->Invert();

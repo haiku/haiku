@@ -101,7 +101,7 @@ class ShowImageView : public BView {
 
 		// Image manipulation
 		void Rotate(int degree); // 90 and 270 only
-		void Mirror(bool vertical);
+		void Flip(bool vertical);
 		void Invert();
 
 		void SetIcon(bool clear);

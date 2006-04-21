@@ -189,8 +189,8 @@ public:
 	enum operation {
 		kRotateClockwise,
 		kRotateAntiClockwise,
-		kMirrorVertical,
-		kMirrorHorizontal,
+		kFlipSideways,
+		kFlipUpsideDown,
 		kInvert,
 		kNumberOfAffineTransformations = 4
 	};
