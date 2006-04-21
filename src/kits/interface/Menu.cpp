@@ -43,6 +43,7 @@ public:
 menu_info BMenu::sMenuInfo;
 bool BMenu::sAltAsCommandKey;
 
+
 static property_info
 sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
@@ -1240,9 +1241,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 
 		if (locked)
 			UnlockLooper();
-		
-		snooze(snoozeAmount);
-		
+			
 		if (buttons != 0 && IsStickyMode()) {
 			fState = MENU_ACT_CLOSE;
 			break;
@@ -1255,6 +1254,8 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 				break;
 			}
 		}
+
+		snooze(snoozeAmount);
 	}
 
 	if (action != NULL)
