@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-1/2006.
+	Rudolf Cornelissen 5/2002-4/2006.
 */
 
 /* standard kernel driver stuff */
@@ -39,7 +39,7 @@
 
 #define MAX_DEVICES	  8
 
-#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
+#define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x" // apsed
 
 /* Tell the kernel what revision of the driver API we support */
 int32	api_version = B_CUR_DRIVER_API_VERSION; // apsed, was 2, is 2 in R5
