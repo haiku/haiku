@@ -402,30 +402,33 @@ BTabView::Archive(BMessage *archive, bool deep) const
 	if (CountTabs() > 0)
 		TabAt(Selection())->View()->RemoveSelf();
 
-	BView::Archive(archive, deep);
+	status_t ret = BView::Archive(archive, deep);
 
-	archive->AddInt16("_but_width", fTabWidthSetting);
-	archive->AddFloat("_high", fTabHeight);
-	archive->AddInt32("_sel", fSelection);
+	if (ret == B_OK)
+		ret = archive->AddInt16("_but_width", fTabWidthSetting);
+	if (ret == B_OK)
+		ret = archive->AddFloat("_high", fTabHeight);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_sel", fSelection);
 
-	if (deep) {
+	if (ret == B_OK && deep) {
 		for (int32 i = 0; i < CountTabs(); i++) {
 			BMessage tabArchive;
 			BTab *tab = TabAt(i);
 
 			if (!tab)
 				continue;
-
-			if (tab->Archive(&tabArchive, true) == B_OK)
-				archive->AddMessage("_l_items", &tabArchive);
+			ret = tab->Archive(&tabArchive, true);
+			if (ret == B_OK)
+				ret = archive->AddMessage("_l_items", &tabArchive);
 
 			if (!tab->View())
 				continue;
 
 			BMessage viewArchive;
-
-			if (tab->View()->Archive(&viewArchive, true) == B_OK)
-				archive->AddMessage("_view_list", &viewArchive);
+			ret = tab->View()->Archive(&viewArchive, true);
+			if (ret == B_OK)
+				ret = archive->AddMessage("_view_list", &viewArchive);
 		}
 	}
 
@@ -434,7 +437,7 @@ BTabView::Archive(BMessage *archive, bool deep) const
 			TabAt(Selection())->Select(ContainerView());
 	}
 
-	return B_OK;
+	return ret;
 }
 
 

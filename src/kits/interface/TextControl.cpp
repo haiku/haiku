@@ -86,20 +86,22 @@ BTextControl::Instantiate(BMessage *archive)
 status_t
 BTextControl::Archive(BMessage *data, bool deep) const
 {
-	BView::Archive(data, deep);
-
+	status_t ret = BView::Archive(data, deep);
 	alignment labelAlignment, textAlignment;
 
 	GetAlignment(&labelAlignment, &textAlignment);
 
-	data->AddInt32("_a_label", labelAlignment);
-	data->AddInt32("_a_text", textAlignment);
-	data->AddFloat("_divide", Divider());
+	if (ret == B_OK)
+		ret = data->AddInt32("_a_label", labelAlignment);
+	if (ret == B_OK)
+		ret = data->AddInt32("_a_text", textAlignment);
+	if (ret == B_OK)
+		ret = data->AddFloat("_divide", Divider());
 
-	if (ModificationMessage())
-		data->AddMessage("_mod_msg", ModificationMessage());
+	if (ModificationMessage() && (ret == B_OK))
+		ret = data->AddMessage("_mod_msg", ModificationMessage());
 
-	return B_OK;
+	return ret;
 }
 
 

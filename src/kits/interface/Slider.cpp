@@ -241,40 +241,44 @@ BSlider::Instantiate(BMessage *archive)
 status_t
 BSlider::Archive(BMessage *archive, bool deep) const
 {
-	BControl::Archive(archive, deep);
+	status_t ret = BControl::Archive(archive, deep);
 
-	if (ModificationMessage())
-		archive->AddMessage("_mod_msg", ModificationMessage());
+	if (ModificationMessage() && ret == B_OK)
+		ret = archive->AddMessage("_mod_msg", ModificationMessage());
 
-	archive->AddInt32("_sdelay", fSnoozeAmount);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_sdelay", fSnoozeAmount);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_bcolor", _color_to_long_(fBarColor));
 
-	archive->AddInt32("_bcolor", _color_to_long_(fBarColor));
+	if (FillColor(NULL) && ret == B_OK)
+		ret = archive->AddInt32("_fcolor", _color_to_long_(fFillColor));
 
-	if (FillColor(NULL))
-		archive->AddInt32("_fcolor", _color_to_long_(fFillColor));
+	if (ret == B_OK && fMinLimitLabel)
+		ret = archive->AddString("_minlbl", fMinLimitLabel);
 
-	if (fMinLimitLabel)
-		archive->AddString("_minlbl", fMinLimitLabel);
+	if (ret == B_OK && fMaxLimitLabel)
+		ret = archive->AddString("_maxlbl", fMaxLimitLabel);
 
-	if (fMaxLimitLabel)
-		archive->AddString("_maxlbl", fMaxLimitLabel);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_min", fMinValue);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_max", fMaxValue);
 
-	archive->AddInt32("_min", fMinValue);
-	archive->AddInt32("_max", fMaxValue);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_incrementvalue", fKeyIncrementValue);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_hashcount", fHashMarkCount);
+	if (ret == B_OK)
+		ret = archive->AddInt16("_hashloc", fHashMarks);
+	if (ret == B_OK)	
+		ret = archive->AddInt16("_sstyle", fStyle);
+	if (ret == B_OK)
+		ret = archive->AddInt32("_orient", fOrientation);
+	if (ret == B_OK)
+		ret = archive->AddFloat("_bthickness", fBarThickness);
 
-	archive->AddInt32("_incrementvalue", fKeyIncrementValue);
-
-	archive->AddInt32("_hashcount", fHashMarkCount);
-
-	archive->AddInt16("_hashloc", fHashMarks);
-	
-	archive->AddInt16("_sstyle", fStyle);
-
-	archive->AddInt32("_orient", fOrientation);
-
-	archive->AddFloat("_bthickness", fBarThickness);
-
-	return B_OK;
+	return ret;
 }
 
 
