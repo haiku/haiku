@@ -1314,6 +1314,8 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	BMessage::Private privateMessage(message);
 	privateMessage.SetReply(BMessenger(replyTo, replyTo->Looper()));
 
+	// TODO: create area and flatten message into that area!
+	// send area info over port, not the actual message!
 	int32 bufferSize = privateMessage.NativeFlattenedSize();
 	char* buffer = new (nothrow) char[bufferSize];
 	if (buffer) {
@@ -1336,9 +1338,6 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	} else {
 		fprintf(stderr, "BView::DragMessage() - no memory to flatten drag message\n");
 	}
-
-	// TODO: in app_server the bitmap refCount must be incremented
-	// WRITE this into specs!!!!
 
 	delete image;
 }
@@ -3443,6 +3442,8 @@ BView::MoveTo(float x, float y)
 		fOwner->fLink->Attach<float>(y);
 
 		fState->valid_flags |= B_VIEW_FRAME_BIT;
+
+		_FlushIfNotInTransaction();
 	}
 
 	_MoveTo(x, y);
@@ -3476,6 +3477,8 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 		fOwner->fLink->Attach<float>(fBounds.bottom + deltaHeight);
 
 		fState->valid_flags |= B_VIEW_FRAME_BIT;
+
+		_FlushIfNotInTransaction();
 	}
 
 	_ResizeBy(deltaWidth, deltaHeight);
