@@ -86,24 +86,24 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 	if (!locker.IsLocked())
 		return NULL;
 
-// TODO: create an overlay bitmap if graphics card supports it
-	if (flags & B_BITMAP_WILL_OVERLAY) {
-		if (!hwInterface.WriteLock()
-			|| !hwInterface.CheckOverlayRestrictions(bounds.IntegerWidth() + 1,
-					bounds.IntegerHeight() + 1, space)) {
-			hwInterface.WriteUnlock();
-			return NULL;
-		}
+	overlay_token overlayToken = NULL;
 
-		// We now hold the HWInterface write lock!
-		// Keeping the interface locked makes sure the overlay is still
-		// available when we allocate the buffer
+	if (flags & B_BITMAP_WILL_OVERLAY) {
+		if (!hwInterface.CheckOverlayRestrictions(bounds.IntegerWidth() + 1,
+				bounds.IntegerHeight() + 1, space))
+			return NULL;
+
+		if (flags & B_BITMAP_RESERVE_OVERLAY_CHANNEL) {
+			overlayToken = hwInterface.AcquireOverlayChannel();
+			if (overlayToken == NULL)
+				return NULL;
+		}
 	}
 
 	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags, bytesPerRow);
 	if (bitmap == NULL) {
-		if (flags & B_BITMAP_WILL_OVERLAY)
-			hwInterface.WriteUnlock();
+		if (overlayToken != NULL)
+			hwInterface.ReleaseOverlayChannel(overlayToken);
 
 		return NULL;
 	}
@@ -120,18 +120,20 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 				bitmap->Height(), space);
 		}
 
-		hwInterface.WriteUnlock();
-
 		if (overlayBuffer != NULL) {
 			overlayCookie->SetOverlayBuffer(overlayBuffer);
+			overlayCookie->SetOverlayToken(overlayToken);
+
 			bitmap->fAllocationCookie = overlayCookie;
 			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
 
 			buffer = (uint8*)overlayBuffer->buffer;
 			if (_allocationType)
 				*_allocationType = kFramebuffer;
-		} else
+		} else {
+			hwInterface.ReleaseOverlayChannel(overlayToken);			
 			delete overlayCookie;
+		}
 	} else if (allocator != NULL) {
 		bool newArea;
 		cookie = allocator->Allocate(bitmap->BitsLength(), (void**)&buffer, newArea);

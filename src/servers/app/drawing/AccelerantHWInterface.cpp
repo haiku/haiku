@@ -101,8 +101,6 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fBackBuffer(NULL),
 		fFrontBuffer(new (nothrow) AccelerantBuffer()),
 
-		fUsedOverlays(0),
-
 		fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
 		fRectParamsCount(kDefaultParamsCount),
 		fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
@@ -334,8 +332,8 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccReleaseOverlayBuffer = (release_overlay_buffer)fAccelerantHook(B_RELEASE_OVERLAY_BUFFER, NULL);
 	fAccGetOverlayConstraints = (get_overlay_constraints)fAccelerantHook(B_GET_OVERLAY_CONSTRAINTS, NULL);
 	fAccAllocateOverlay = (allocate_overlay)fAccelerantHook(B_ALLOCATE_OVERLAY, NULL);
-	fReleaseOverlay = (release_overlay)fAccelerantHook(B_RELEASE_OVERLAY, NULL);
-	fConfigureOverlay = (configure_overlay)fAccelerantHook(B_CONFIGURE_OVERLAY, NULL);
+	fAccReleaseOverlay = (release_overlay)fAccelerantHook(B_RELEASE_OVERLAY, NULL);
+	fAccConfigureOverlay = (configure_overlay)fAccelerantHook(B_CONFIGURE_OVERLAY, NULL);
 
 	return B_OK;
 }
@@ -687,24 +685,43 @@ AccelerantHWInterface::AvailableHWAcceleration() const
 }
 
 
+overlay_token
+AccelerantHWInterface::AcquireOverlayChannel()
+{
+	if (fAccAllocateOverlay == NULL
+		|| fAccReleaseOverlay == NULL)
+		return NULL;
+
+	// The current display mode only matters at the time we're planning on
+	// showing the overlay channel on screen - that's why we can't use
+	// the B_OVERLAY_COUNT hook.
+	// TODO: remove fAccOverlayCount if we're not going to need it at all.
+
+	return fAccAllocateOverlay();
+}
+
+
+void
+AccelerantHWInterface::ReleaseOverlayChannel(overlay_token token)
+{
+	if (token == NULL)
+		return;
+
+	fAccReleaseOverlay(token);
+}
+
+
 bool
 AccelerantHWInterface::CheckOverlayRestrictions(int32 width, int32 height,
 	color_space colorSpace)
 {
 	// check if the current display mode supports overlay
 	
-	if (fAccOverlayCount == NULL
-		|| fAccOverlaySupportedSpaces == NULL
+	if (fAccOverlaySupportedSpaces == NULL
 		|| fAccGetOverlayConstraints == NULL
 		|| fAccAllocateOverlayBuffer == NULL
 		|| fAccReleaseOverlayBuffer == NULL
 		|| (fDisplayMode.flags & B_SUPPORTS_OVERLAYS) == 0)
-		return false;
-
-	// check if there is an overlay buffer available
-
-	uint32 available = fAccOverlayCount(&fDisplayMode);
-	if ((int32)available <= fUsedOverlays)
 		return false;
 
 	// Note: we can't really check the size of the overlay upfront - we
@@ -733,11 +750,7 @@ AccelerantHWInterface::AllocateOverlayBuffer(int32 width, int32 height, color_sp
 	if (fAccAllocateOverlayBuffer == NULL)
 		return NULL;
 
-	const overlay_buffer* buffer = fAccAllocateOverlayBuffer(space, width, height);
-	if (buffer != NULL)
-		atomic_add(&fUsedOverlays, 1);
-
-	return buffer;
+	return fAccAllocateOverlayBuffer(space, width, height);
 }
 
 
@@ -747,7 +760,6 @@ AccelerantHWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 	if (buffer == NULL || fAccReleaseOverlayBuffer == NULL)
 		return;
 
-	atomic_add(&fUsedOverlays, -1);
 	fAccReleaseOverlayBuffer(buffer);
 }
 

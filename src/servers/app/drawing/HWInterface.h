@@ -97,6 +97,9 @@ class HWInterface : public MultiLocker {
 											  const BPoint& offsetFromCursor);
 
 	// overlay support
+	virtual overlay_token		AcquireOverlayChannel();
+	virtual void				ReleaseOverlayChannel(overlay_token token);
+
 	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
 									color_space colorSpace);
 	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,

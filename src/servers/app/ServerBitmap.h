@@ -141,11 +141,15 @@ class OverlayCookie {
 		~OverlayCookie();
 
 		void SetOverlayBuffer(const overlay_buffer* overlayBuffer);
-		const overlay_buffer* OverlayBuffer();
+		const overlay_buffer* OverlayBuffer() const;
+
+		void SetOverlayToken(overlay_token token);
+		overlay_token OverlayToken() const;
 
 	private:
-		HWInterface& fHWInterface;
-		const overlay_buffer* fOverlayBuffer;
+		HWInterface&			fHWInterface;
+		const overlay_buffer*	fOverlayBuffer;
+		overlay_token			fOverlayToken;
 };
 
 // ShallowCopy

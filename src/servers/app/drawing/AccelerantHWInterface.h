@@ -56,6 +56,9 @@ public:
 	virtual	uint32				AvailableHWAcceleration() const;
 
 	// overlay support
+	virtual overlay_token		AcquireOverlayChannel();
+	virtual void				ReleaseOverlayChannel(overlay_token token);
+
 	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
 									color_space colorSpace);
 	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
@@ -137,8 +140,8 @@ private:
 		release_overlay_buffer		fAccReleaseOverlayBuffer;
 		get_overlay_constraints		fAccGetOverlayConstraints;
 		allocate_overlay			fAccAllocateOverlay;
-		release_overlay				fReleaseOverlay;
-		configure_overlay			fConfigureOverlay;
+		release_overlay				fAccReleaseOverlay;
+		configure_overlay			fAccConfigureOverlay;
 
 		frame_buffer_config		fFrameBufferConfig;
 		int						fModeCount;
@@ -148,8 +151,6 @@ private:
 		AccelerantBuffer*		fFrontBuffer;
 
 		display_mode			fDisplayMode;
-
-		vint32					fUsedOverlays;
 
 mutable	fill_rect_params*		fRectParams;
 mutable	uint32					fRectParamsCount;

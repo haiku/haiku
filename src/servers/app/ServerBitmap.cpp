@@ -363,13 +363,15 @@ UtilityBitmap::~UtilityBitmap()
 OverlayCookie::OverlayCookie(HWInterface& interface)
 	:
 	fHWInterface(interface),
-	fOverlayBuffer(NULL)
+	fOverlayBuffer(NULL),
+	fOverlayToken(NULL)
 {
 }
 
 
 OverlayCookie::~OverlayCookie()
 {
+	fHWInterface.ReleaseOverlayChannel(fOverlayToken);
 	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
 }
 
@@ -382,8 +384,22 @@ OverlayCookie::SetOverlayBuffer(const overlay_buffer* overlayBuffer)
 
 
 const overlay_buffer*
-OverlayCookie::OverlayBuffer()
+OverlayCookie::OverlayBuffer() const
 {
 	return fOverlayBuffer;
+}
+
+
+void
+OverlayCookie::SetOverlayToken(overlay_token token)
+{
+	fOverlayToken = token;
+}
+
+
+overlay_token
+OverlayCookie::OverlayToken() const
+{
+	return fOverlayToken;
 }
 

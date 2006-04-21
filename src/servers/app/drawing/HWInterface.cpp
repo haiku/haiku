@@ -302,6 +302,19 @@ HWInterface::CopyBackToFront(const BRect& frame)
 }
 
 
+overlay_token
+HWInterface::AcquireOverlayChannel()
+{
+	return NULL;
+}
+
+
+void
+HWInterface::ReleaseOverlayChannel(overlay_token token)
+{
+}
+
+
 bool
 HWInterface::CheckOverlayRestrictions(int32 width, int32 height, color_space colorSpace)
 {
