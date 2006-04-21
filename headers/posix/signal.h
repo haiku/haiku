@@ -15,6 +15,12 @@ typedef void (*sig_func_t)(int);
 typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with BeOS only */
 
 
+typedef union sigval {
+	int	sival_int;
+	void	*sival_ptr;
+} sigval_t;
+
+
 // ToDo: actually make use of this structure!
 typedef struct {
 	int		si_signo;	/* signal number */
@@ -25,6 +31,7 @@ typedef struct {
 	void	*si_addr;	/* address of faulting instruction */
 	int		si_status;	/* exit value or signal */
 	long	si_band;	/* band event for SIGPOLL */
+	union sigval  	si_value;	/* signal value */
 } siginfo_t;
 
 
@@ -33,7 +40,8 @@ typedef struct {
  */
 #define SIG_DFL	((sig_func_t) 0)   /* the signal was treated in the "default" manner */
 #define SIG_IGN	((sig_func_t) 1)   /* the signal was ignored */
-#define SIG_ERR	((sig_func_t)-1)   /* an error ocurred during signal processing */
+#define SIG_ERR	((sig_func_t)-1)   /* an error occurred during signal processing */
+#define SIG_HOLD ((sig_func_t) 3)  /* the signal was hold */
 
 
 /*
@@ -59,8 +67,20 @@ struct sigaction {
 #define SA_NOMASK     0x04
 #define SA_NODEFER    SA_NOMASK
 #define SA_RESTART    0x08
-#define SA_STACK      0x10
+#define SA_STACK	0x10
+#define SA_ONSTACK      SA_STACK
+#define SA_RESETHAND	0x20
+#define SA_SIGINFO	0x40
+#define SA_NOCLDWAIT	0x80
 
+/*
+ * values for ss_flags
+ */
+#define SS_ONSTACK	0x1
+#define SS_DISABLE	0x2
+
+#define MINSIGSTKSZ	4096
+#define SIGSTKSZ	16384
 
 /*
  * for signals using an alternate stack
@@ -68,9 +88,13 @@ struct sigaction {
 typedef struct stack_t {
 	void	*ss_sp;
 	size_t	ss_size;
-	int		ss_flags;
+	int	ss_flags;
 } stack_t;
 
+typedef struct sigstack {
+	int 	ss_onstack;
+	void	*ss_sp;
+} sigstack;
 
 /*
  * for the 'how' arg of sigprocmask()
@@ -139,25 +163,31 @@ extern "C" {
 #endif
 
 sig_func_t signal(int sig, sig_func_t signal_handler);
-int        raise(int sig);
-int        kill(pid_t pid, int sig);
-int        send_signal(pid_t tid, uint sig);
+int     raise(int sig);
+int     kill(pid_t pid, int sig);
+int     send_signal(pid_t tid, uint sig);
 
-int        sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-int        sigprocmask(int how, const sigset_t *set, sigset_t *oset);
-int        sigpending(sigset_t *set);
-int        sigsuspend(const sigset_t *mask);
+int     sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int     sigprocmask(int how, const sigset_t *set, sigset_t *oset);
+int     sigpending(sigset_t *set);
+int     sigsuspend(const sigset_t *mask);
+int 	sigwait(const sigset_t *set, int *sig);
 
-int        sigemptyset(sigset_t *set);
-int        sigfillset(sigset_t *set);
-int sigaddset(sigset_t *set, int signo);
-int sigdelset(sigset_t *set, int signo);
-int sigismember(const sigset_t *set, int signo);
+int     sigemptyset(sigset_t *set);
+int     sigfillset(sigset_t *set);
+int 	sigaddset(sigset_t *set, int signo);
+int 	sigdelset(sigset_t *set, int signo);
+int 	sigismember(const sigset_t *set, int signo);
 
 const char *strsignal(int sig);
 
 void        set_signal_stack(void *ptr, size_t size);
 int         sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
+
+/* 
+ * pthread extension : equivalent of sigprocmask() 
+ */
+extern int pthread_sigmask(int how, const sigset_t *set, sigset_t *oset); 
 
 extern inline int
 sigismember(const sigset_t *set, int sig)

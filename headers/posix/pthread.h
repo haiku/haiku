@@ -6,19 +6,6 @@
 
 #include <time.h>
 
-struct _pthread;
-struct _pthread_attr;
-struct _pthread_cond;
-struct _pthread_cond_attr;
-struct _pthread_mutex;
-struct _pthread_mutexattr;
-struct _pthread_once;
-struct _pthread_rwlock;
-struct _pthread_rwlockattr;
-struct _pthread_barrier;
-struct _pthread_barrier_attr;
-struct _pthread_spinlock;
-
 typedef struct  _pthread				*pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
 typedef struct  _pthread_mutex		*pthread_mutex_t;
@@ -136,6 +123,8 @@ extern int pthread_equal(pthread_t t1, pthread_t t2);
 extern void pthread_exit(void *value_ptr);
 extern int pthread_join(pthread_t thread, void **value_ptr);
 extern pthread_t pthread_self(void);
+
+extern int pthread_kill(pthread_t thread, int sig);
 
 #ifdef __cplusplus
 }
