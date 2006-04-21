@@ -715,13 +715,10 @@ bool
 AccelerantHWInterface::CheckOverlayRestrictions(int32 width, int32 height,
 	color_space colorSpace)
 {
-	// check if the current display mode supports overlay
-	
 	if (fAccOverlaySupportedSpaces == NULL
 		|| fAccGetOverlayConstraints == NULL
 		|| fAccAllocateOverlayBuffer == NULL
-		|| fAccReleaseOverlayBuffer == NULL
-		|| (fDisplayMode.flags & B_SUPPORTS_OVERLAYS) == 0)
+		|| fAccReleaseOverlayBuffer == NULL)
 		return false;
 
 	// Note: we can't really check the size of the overlay upfront - we
