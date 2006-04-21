@@ -121,14 +121,18 @@ status_t
 BDragger::Archive(BMessage *data, bool deep) const
 {
 	BMessage popupMsg;
+	status_t ret = B_OK;
 
 	if (fPopUp) {
-		fPopUp->Archive(&popupMsg);
-		data->AddMessage("_popup", &popupMsg);
+		ret = fPopUp->Archive(&popupMsg);
+		if (ret == B_OK)
+			ret = data->AddMessage("_popup", &popupMsg);
 	}
 
-	data->AddInt32("_rel", fRelation);
-
+	if (ret == B_OK)
+		ret = data->AddInt32("_rel", fRelation);
+	if (ret != B_OK)
+		return ret;
 	return BView::Archive(data, deep);
 }
 

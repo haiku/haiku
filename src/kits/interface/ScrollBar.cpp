@@ -223,16 +223,30 @@ BScrollBar::Instantiate(BMessage *data)
 status_t
 BScrollBar::Archive(BMessage *data, bool deep) const
 {
-	BView::Archive(data,deep);
-	data->AddFloat("_range",fMin);
-	data->AddFloat("_range",fMax);
-	data->AddFloat("_steps",fSmallStep);
-	data->AddFloat("_steps",fLargeStep);
-	data->AddFloat("_val",fValue);
-	data->AddInt32("_orient",(int32)fOrientation);
-	data->AddInt32("_prop",fProportion);
+	status_t err = BView::Archive(data,deep);
+	if (err != B_OK)
+		return err;
+	err = data->AddFloat("_range",fMin);
+	if (err != B_OK)
+		return err;
+	err = data->AddFloat("_range",fMax);
+	if (err != B_OK)
+		return err;
+	err = data->AddFloat("_steps",fSmallStep);
+	if (err != B_OK)
+		return err;
+	err = data->AddFloat("_steps",fLargeStep);
+	if (err != B_OK)
+		return err;
+	err = data->AddFloat("_val",fValue);
+	if (err != B_OK)
+		return err;
+	err = data->AddInt32("_orient",(int32)fOrientation);
+	if (err != B_OK)
+		return err;
+	err = data->AddInt32("_prop",fProportion);
 	
-	return B_OK;
+	return err;
 }
 
 // AttachedToWindow

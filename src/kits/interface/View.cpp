@@ -443,96 +443,103 @@ BView::Instantiate(BMessage *data)
 status_t
 BView::Archive(BMessage *data, bool deep) const
 {
-	status_t retval = BHandler::Archive(data, deep);
-	if (retval != B_OK)
-		return retval;
+	status_t ret = BHandler::Archive(data, deep);
+	if (ret != B_OK)
+		return ret;
 
 	if (fState->archiving_flags & B_VIEW_FRAME_BIT)
-		data->AddRect("_frame", Bounds().OffsetToCopy(fParentOffset));
+		ret = data->AddRect("_frame", Bounds().OffsetToCopy(fParentOffset));
 
-	if (fState->archiving_flags & B_VIEW_RESIZE_BIT)
-		data->AddInt32("_resize_mode", ResizingMode());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_RESIZE_BIT)
+		ret = data->AddInt32("_resize_mode", ResizingMode());
 
-	if (fState->archiving_flags & B_VIEW_FLAGS_BIT)
-		data->AddInt32("_flags", Flags());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_FLAGS_BIT)
+		ret = data->AddInt32("_flags", Flags());
 
-	if (fState->archiving_flags & B_VIEW_EVENT_MASK_BIT) {
-		data->AddInt32("_evmask", fEventMask);
-		data->AddInt32("_evmask", fEventOptions);
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_EVENT_MASK_BIT) {
+		ret = data->AddInt32("_evmask", fEventMask);
+		if (ret == B_OK)
+			ret = data->AddInt32("_evmask", fEventOptions);
 	}
 
-	if (fState->archiving_flags & B_VIEW_FONT_BIT) {
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_FONT_BIT) {
 		BFont font;
 		GetFont(&font);
 
 		font_family family;
 		font_style style;
 		font.GetFamilyAndStyle(&family, &style);
-		data->AddString("_fname", family);
-		data->AddString("_fname", style);
-
-		data->AddFloat("_fflt", font.Size());
-		data->AddFloat("_fflt", font.Shear());
-		data->AddFloat("_fflt", font.Rotation());
+		ret = data->AddString("_fname", family);
+		if (ret == B_OK)
+			ret = data->AddString("_fname", style);
+		if (ret == B_OK)
+			ret = data->AddFloat("_fflt", font.Size());
+		if (ret == B_OK)
+			ret = data->AddFloat("_fflt", font.Shear());
+		if (ret == B_OK)
+			ret = data->AddFloat("_fflt", font.Rotation());
 	}
 
 	// colors
 
-	if (fState->archiving_flags & B_VIEW_HIGH_COLOR_BIT)
-		data->AddInt32("_color", get_uint32_color(HighColor()));
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_HIGH_COLOR_BIT)
+		ret = data->AddInt32("_color", get_uint32_color(HighColor()));
 
-	if (fState->archiving_flags & B_VIEW_LOW_COLOR_BIT)
-		data->AddInt32("_color", get_uint32_color(LowColor()));
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_LOW_COLOR_BIT)
+		ret = data->AddInt32("_color", get_uint32_color(LowColor()));
 
-	if (fState->archiving_flags & B_VIEW_VIEW_COLOR_BIT)
-		data->AddInt32("_color", get_uint32_color(ViewColor()));
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_VIEW_COLOR_BIT)
+		ret = data->AddInt32("_color", get_uint32_color(ViewColor()));
 
 //	NOTE: we do not use this flag any more
 //	if ( 1 ){
-//		data->AddInt32("_dbuf", 1);
+//		ret = data->AddInt32("_dbuf", 1);
 //	}
 
-	if (fState->archiving_flags & B_VIEW_ORIGIN_BIT)
-		data->AddPoint("_origin", Origin());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_ORIGIN_BIT)
+		ret = data->AddPoint("_origin", Origin());
 
-	if (fState->archiving_flags & B_VIEW_PEN_SIZE_BIT)
-		data->AddFloat("_psize", PenSize());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_PEN_SIZE_BIT)
+		ret = data->AddFloat("_psize", PenSize());
 
-	if (fState->archiving_flags & B_VIEW_PEN_LOCATION_BIT)
-		data->AddPoint("_ploc", PenLocation());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_PEN_LOCATION_BIT)
+		ret = data->AddPoint("_ploc", PenLocation());
 
-	if (fState->archiving_flags & B_VIEW_LINE_MODES_BIT) {
-		data->AddInt16("_lmcapjoin", (int16)LineCapMode());
-		data->AddInt16("_lmcapjoin", (int16)LineJoinMode());
-		data->AddFloat("_lmmiter", LineMiterLimit());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_LINE_MODES_BIT) {
+		ret = data->AddInt16("_lmcapjoin", (int16)LineCapMode());
+		if (ret == B_OK)
+			ret = data->AddInt16("_lmcapjoin", (int16)LineJoinMode());
+		if (ret == B_OK)
+			ret = data->AddFloat("_lmmiter", LineMiterLimit());
 	}
 
-	if (fState->archiving_flags & B_VIEW_BLENDING_BIT) {
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_BLENDING_BIT) {
 		source_alpha alphaSourceMode;
 		alpha_function alphaFunctionMode;
 		GetBlendingMode(&alphaSourceMode, &alphaFunctionMode);
 
-		data->AddInt16("_blend", (int16)alphaSourceMode);
-		data->AddInt16("_blend", (int16)alphaFunctionMode);
+		ret = data->AddInt16("_blend", (int16)alphaSourceMode);
+		if (ret == B_OK)
+			ret = data->AddInt16("_blend", (int16)alphaFunctionMode);
 	}
 
-	if (fState->archiving_flags & B_VIEW_DRAWING_MODE_BIT)
-		data->AddInt32("_dmod", DrawingMode());
+	if (ret == B_OK && fState->archiving_flags & B_VIEW_DRAWING_MODE_BIT)
+		ret = data->AddInt32("_dmod", DrawingMode());
 
 	if (deep) {
 		int32 i = 0;
 		BView *child;
 
-		while ((child = ChildAt(i++)) != NULL) {
+		while (ret == B_OK && (child = ChildAt(i++)) != NULL) {
 			BMessage childArchive;
 
-			retval = child->Archive(&childArchive, deep);
-			if (retval == B_OK)
-				data->AddMessage("_views", &childArchive);
+			ret = child->Archive(&childArchive, deep);
+			if (ret == B_OK)
+				ret = data->AddMessage("_views", &childArchive);
 		}
 	}
 
-	return retval;
+	return ret;
 }
 
 

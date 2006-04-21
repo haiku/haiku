@@ -236,12 +236,16 @@ BPicture::Archive(BMessage *archive, bool deep) const
 		return err;
 
 	err = archive->AddData("_data", B_RAW_TYPE, extent->Data(), extent->Size());
-
+	if (err != B_OK)
+		return err;
+	
 	for (int32 i = 0; i < extent->CountPictures(); i++) {
 		BMessage picMsg;
 
 		((BPicture*)extent->PictureAt(i))->Archive(&picMsg, deep);
-		archive->AddMessage("piclib", &picMsg);
+		err = archive->AddMessage("piclib", &picMsg);
+			if (err != B_OK)
+				break;
 	}
 
 	return err;

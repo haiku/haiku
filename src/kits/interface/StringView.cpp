@@ -59,14 +59,15 @@ BStringView::Instantiate(BMessage* data)
 status_t
 BStringView::Archive(BMessage* data, bool deep) const
 {
-	BView::Archive(data, deep);
+	status_t err = BView::Archive(data, deep);
 
-	if (fText)
-		data->AddString("_text", fText);
+	if (err == B_OK && fText)
+		err = data->AddString("_text", fText);
 
-	data->AddInt32("_align", fAlign);
+	if (err == B_OK)
+		err = data->AddInt32("_align", fAlign);
 
-	return B_OK;
+	return err;
 }
 
 

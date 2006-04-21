@@ -176,32 +176,35 @@ BShape::~BShape()
 status_t
 BShape::Archive(BMessage *archive, bool deep) const
 {
-	status_t error = BArchivable::Archive(archive, deep);
+	status_t err = BArchivable::Archive(archive, deep);
 
-	if (error != B_OK)
-		return error;
+	if (err != B_OK)
+		return err;
 
 	shape_data *data = (shape_data*)fPrivateData;
 
 	// If no valid shape data, return
 	if (data->opCount == 0 || data->ptCount == 0)
-		return error;
+		return err;
 
 	// Avoids allocation for each point
-	archive->AddData("pts", B_POINT_TYPE, data->ptList, sizeof(BPoint), true,
+	err = archive->AddData("pts", B_POINT_TYPE, data->ptList, sizeof(BPoint), true,
 		data->ptCount);
+	if (err != B_OK)
+		return err;
 
-	for (int32 i = 1; i < data->ptCount; i++)
-		archive->AddPoint("pts", data->ptList[i]);
+	for (int32 i = 1; i < data->ptCount && err == B_OK; i++)
+		err = archive->AddPoint("pts", data->ptList[i]);
 
 	// Avoids allocation for each op
-	archive->AddData("ops", B_INT32_TYPE, data->opList, sizeof(int32), true,
-		data->opCount);
+	if (err == B_OK)
+		err = archive->AddData("ops", B_INT32_TYPE, data->opList, sizeof(int32), true,
+			data->opCount);
 
-	for (int32 i = 1; i < data->opCount; i++)
-		archive->AddInt32("ops", data->opList[i]);
+	for (int32 i = 1; i < data->opCount && err == B_OK ; i++)
+		err = archive->AddInt32("ops", data->opList[i]);
 
-	return error;
+	return err;
 }
 
 

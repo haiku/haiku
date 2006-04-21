@@ -222,27 +222,33 @@ BAlert::Instantiate(BMessage* data)
 status_t
 BAlert::Archive(BMessage* data, bool deep) const
 {
-	BWindow::Archive(data, deep);
+	status_t ret = BWindow::Archive(data, deep);
 
 	// Stow the text
-	data->AddString("_text", fTextView->Text());
+	if (ret == B_OK)
+		ret = data->AddString("_text", fTextView->Text());
 
 	// Stow the alert type
-	data->AddInt32("_atype", fMsgType);
+	if (ret == B_OK)
+		ret = data->AddInt32("_atype", fMsgType);
 
 	// Stow the button width
-	data->AddInt32("_but_width", fButtonWidth);
+	if (ret == B_OK)
+		ret = data->AddInt32("_but_width", fButtonWidth);
 
 	// Stow the shortcut keys
 	if (fKeys[0] || fKeys[1] || fKeys[2]) {
 		// If we have any to save, we must save something for everyone so it
 		// doesn't get confusing on the unarchive.
-		data->AddInt8("_but_key", fKeys[0]);
-		data->AddInt8("_but_key", fKeys[1]);
-		data->AddInt8("_but_key", fKeys[2]);
+		if (ret == B_OK)
+			ret = data->AddInt8("_but_key", fKeys[0]);
+		if (ret == B_OK)
+			ret = data->AddInt8("_but_key", fKeys[1]);
+		if (ret == B_OK)
+			ret = data->AddInt8("_but_key", fKeys[2]);
 	}
 
-	return B_OK;
+	return ret;
 }
 
 

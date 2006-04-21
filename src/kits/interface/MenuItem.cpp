@@ -182,34 +182,36 @@ BMenuItem::Instantiate(BMessage *data)
 status_t
 BMenuItem::Archive(BMessage *data, bool deep) const
 {
+	status_t ret = B_OK;
 	if (fLabel)
-		data->AddString("_label", Label());
+		ret = data->AddString("_label", Label());
 
-	if (!IsEnabled())
-		data->AddBool("_disable", true);
+	if (ret == B_OK && !IsEnabled())
+		ret = data->AddBool("_disable", true);
 
-	if (IsMarked())
-		data->AddBool("_marked", true);
+	if (ret == B_OK && IsMarked())
+		ret = data->AddBool("_marked", true);
 
-	if (fUserTrigger)
-		data->AddInt32("_user_trig", fUserTrigger);
+	if (ret == B_OK && fUserTrigger)
+		ret = data->AddInt32("_user_trig", fUserTrigger);
 
-	if (fShortcutChar) {
-		data->AddInt32("_shortcut", fShortcutChar);
-		data->AddInt32("_mods", fModifiers);
+	if (ret == B_OK && fShortcutChar) {
+		ret = data->AddInt32("_shortcut", fShortcutChar);
+		if (ret == B_OK)
+			ret = data->AddInt32("_mods", fModifiers);
 	}
 
-	if (Message())
-		data->AddMessage("_msg", Message());
+	if (ret == B_OK && Message())
+		ret = data->AddMessage("_msg", Message());
 
-	if (deep && fSubmenu) {
+	if (ret == B_OK && deep && fSubmenu) {
 		BMessage submenu;
 
 		if (fSubmenu->Archive(&submenu, true) == B_OK)
-			data->AddMessage("_submenu", &submenu);
+			ret = data->AddMessage("_submenu", &submenu);
 	}
 
-	return B_OK;
+	return ret;
 }
 
 

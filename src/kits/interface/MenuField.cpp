@@ -132,19 +132,21 @@ BMenuField::Instantiate(BMessage *data)
 status_t
 BMenuField::Archive(BMessage *data, bool deep) const
 {
-	BView::Archive(data, deep);
+	status_t ret = BView::Archive(data, deep);
 
-	if (Label())
-		data->AddString("_label", Label());
+	if (ret == B_OK && Label())
+		ret = data->AddString("_label", Label());
 
-	if (!IsEnabled())
-		data->AddBool("_disable", true);
+	if (ret == B_OK && !IsEnabled())
+		ret = data->AddBool("_disable", true);
 
-	data->AddInt32("_align", Alignment());
-	data->AddFloat("_divide", Divider());
+	if (ret == B_OK)
+		ret = data->AddInt32("_align", Alignment());
+	if (ret == B_OK)
+		ret = data->AddFloat("_divide", Divider());
 
-	if (fFixedSizeMB)
-		data->AddBool("be:fixeds", true);
+	if (ret == B_OK && fFixedSizeMB)
+		ret = data->AddBool("be:fixeds", true);
 
 //	BMenuItem *item = fMenuBar->ItemAt(0);
 //	if (!item)
@@ -154,7 +156,7 @@ BMenuField::Archive(BMessage *data, bool deep) const
 //	if (bmcitem && !bmcitem->fShowPopUpMarker)
 //		data->AddBool("be:dmark", false);
 
-	return B_OK;
+	return ret;
 }
 
 

@@ -57,18 +57,18 @@ BBox::Instantiate(BMessage *archive)
 status_t
 BBox::Archive(BMessage *archive, bool deep) const
 {
-	BView::Archive(archive, deep);
+	status_t ret = BView::Archive(archive, deep);
 
-	if (fLabel)
-		 archive->AddString("_label", fLabel);
+	if (fLabel && ret == B_OK)
+		 ret = archive->AddString("_label", fLabel);
 
-	if (fLabelView)
-		 archive->AddBool("_lblview", true);
+	if (fLabelView && ret == B_OK)
+		 ret = archive->AddBool("_lblview", true);
 
-	if (fStyle != B_FANCY_BORDER)
-		archive->AddInt32("_style", fStyle);
+	if (fStyle != B_FANCY_BORDER && ret == B_OK)
+		ret = archive->AddInt32("_style", fStyle);
 
-	return B_OK;
+	return ret;
 }
 
 
