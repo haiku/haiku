@@ -49,7 +49,6 @@ sys_siglist[NSIG] = {
 	/* 27 - SIGVTALRM  */  "Virtual timer expired",
 	/* 28 - SIGXCPU    */  "CPU time limit exceeded",
 	/* 29 - SIGXFSZ    */  "File size limit exceeded",
-	NULL
 };
 
 
