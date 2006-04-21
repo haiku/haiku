@@ -32,8 +32,7 @@ BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	StyledEdit Chart Workspaces Cortex CortexAddOnHost GLTeapot
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
-	Mouse Keyboard Keymap Screen ScrollBar Sounds Time VirtualMemory
-	ScreenSaver
+	Mouse Keyboard Keymap Screen ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libbind.so libnetapi.so libsocket.so libdebug.so
