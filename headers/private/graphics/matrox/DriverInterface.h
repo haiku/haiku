@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-1/2006.
+	Rudolf Cornelissen 10/2002-4/2006.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -18,7 +18,7 @@
 #include <OS.h>
 
 #define DRIVER_PREFIX "mga" // apsed
-#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
+#define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x" // apsed
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)

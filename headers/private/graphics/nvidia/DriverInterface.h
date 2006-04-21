@@ -19,7 +19,7 @@
 #include "AGP.h"
 
 #define DRIVER_PREFIX "nv" // apsed
-#define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
+#define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x" // apsed
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)
