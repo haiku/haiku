@@ -194,6 +194,9 @@ ServerWindow::~ServerWindow()
 
 	delete fWindowLayer;
 
+	if (App() != NULL)
+		App()->RemoveWindow(this);
+
 	free(fTitle);
 	delete_port(fMessagePort);
 
@@ -220,6 +223,11 @@ status_t
 ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 	uint32 flags, uint32 workspace)
 {
+	if (!App()->AddWindow(this)) {
+		fServerApp = NULL;
+		return B_NO_MEMORY;
+	}
+
 	if (fTitle == NULL)
 		return B_NO_MEMORY;
 
@@ -278,8 +286,6 @@ ServerWindow::_PrepareQuit()
 		fDesktop->LockSingleWindow();
 		_Hide();
 		fDesktop->UnlockSingleWindow();
-
-		App()->RemoveWindow(this);
 	} else if (fThread >= B_OK)
 		PostMessage(AS_HIDE_WINDOW);
 }

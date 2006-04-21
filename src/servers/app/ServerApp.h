@@ -69,6 +69,7 @@ class ServerApp : public MessageLooper {
 			const char*			Signature() const { return fSignature.String(); }
 			const char*			SignatureLeaf() const { return fSignature.String() + 12; }
 
+			bool				AddWindow(ServerWindow* window);
 			void				RemoveWindow(ServerWindow* window);
 			bool				InWorkspace(int32 index) const;
 			uint32				Workspaces() const;
