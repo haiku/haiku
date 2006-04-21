@@ -207,7 +207,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 		_InitObject(source->Bounds(), source->ColorSpace(), flags,
 				   source->BytesPerRow(), B_MAIN_SCREEN_ID);
 		if (InitCheck() == B_OK)
-			memcpy(Bits(), source->Bits(), BitsLength());
+			memcpy(Bits(), source->Bits(), min_c(BitsLength(), source->BitsLength()));
 	}
 }
 
@@ -240,32 +240,33 @@ BBitmap::BBitmap(BMessage *data)
 	  fInitError(B_NO_INIT)
 {
 	BRect bounds;
-	data->FindRect("_frame", &bounds);
-
 	color_space cspace;
-	data->FindInt32("_cspace", (int32 *)&cspace);
+	int32 flags;
+	int32 rowBytes;
+	if (data->FindRect("_frame", &bounds) == B_OK
+		&& data->FindInt32("_cspace", (int32*)&cspace) == B_OK
+		&& data->FindInt32("_bmflags", &flags) == B_OK
+		&& data->FindInt32("_rowbytes", &rowBytes) == B_OK) {
 
-	int32 flags = 0;
-	data->FindInt32("_bmflags", &flags);
+		_InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
+	}
 
-	int32 rowBytes = 0;
-	data->FindInt32("_rowbytes", &rowBytes);
-
-	_InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
-
-	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
-		_AssertPointer();
-		ssize_t size = 0;
+	if (InitCheck() == B_OK) {
+		ssize_t size;
 		const void *buffer;
-		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
-			memcpy(fBasePointer, buffer, size);
+		if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK) {
+			if (size == BitsLength()) {
+				_AssertPointer();
+				memcpy(fBasePointer, buffer, size);
+			}
+		}
 	}
 
 	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
 		BMessage message;
 		int32 i = 0;
 
-		while (data->FindMessage("_view", i++, &message) == B_OK) {
+		while (data->FindMessage("_views", i++, &message) == B_OK) {
 			if (BView *view = dynamic_cast<BView *>(instantiate_object(&message)))
 				AddChild(view);
 		}
@@ -297,30 +298,45 @@ BBitmap::Instantiate(BMessage *data)
 status_t
 BBitmap::Archive(BMessage *data, bool deep) const
 {
-	BArchivable::Archive(data, deep);
+	status_t ret = BArchivable::Archive(data, deep);
+
+	if (ret == B_OK)
+		ret = data->AddRect("_frame", fBounds);
+
+	if (ret == B_OK)
+		ret = data->AddInt32("_cspace", (int32)fColorSpace);
+
+	if (ret == B_OK)
+		ret = data->AddInt32("_bmflags", fFlags);
+
+	if (ret == B_OK)
+		ret = data->AddInt32("_rowbytes", fBytesPerRow);
 	
-	data->AddRect("_frame", fBounds);
-	data->AddInt32("_cspace", (int32)fColorSpace);
-	data->AddInt32("_bmflags", fFlags);
-	data->AddInt32("_rowbytes", fBytesPerRow);
-	
-	if (deep) {
+	if (ret == B_OK && deep) {
 		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
 			BMessage views;
 			for (int32 i = 0; i < CountChildren(); i++) {
 				if (ChildAt(i)->Archive(&views, deep))
-					data->AddMessage("_views", &views);
+					ret = data->AddMessage("_views", &views);
+				views.MakeEmpty();
+				if (ret < B_OK)
+					break;
 			}
 		}
 		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGNUOUS is
 		// true and it does save all formats as B_RAW_TYPE and it does save
 		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
 		// the BeBook)
-		const_cast<BBitmap *>(this)->_AssertPointer();
-		data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
+		if (ret == B_OK) {
+			const_cast<BBitmap *>(this)->_AssertPointer();
+			ret = data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
+		}
 	}
+
+	if (ret == B_OK)
+		ret = data->AddString("class", "BBitmap");
 	
-	return B_OK;
+	return ret;
 }
 
 // InitCheck
