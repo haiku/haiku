@@ -10,12 +10,31 @@
 #include "ServerBitmap.h"
 #include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
+#include "HWInterface.h"
 
 #include <new>
 #include <stdio.h>
 #include <string.h>
 
 using std::nothrow;
+
+/*!
+	A word about memory housekeeping and why it's implemented this way:
+
+	The reason why this looks so complicated is to optimize the most common
+	path (bitmap creation from the application), and don't cause any further
+	memory allocations for maintaining memory in that case.
+	If a bitmap was allocated this way, both, the fAllocator and fAllocationCookie
+	members are used.
+
+	For overlays, the creation speed is not crucial, that's why we can easily live
+	with the overhead of some heap allocations. The fAllocationCookie will point
+	to an OverlayCookie object that will also free the buffer upon destruction.
+
+	If the memory was allocated on the app_server heap, neither fAllocator, nor
+	fAllocationCookie are used, and the buffer is just freed in that case when
+	the bitmap is destructed. This method is mainly used for cursors.
+*/
 
 
 /*!
@@ -46,7 +65,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	  fSpace(space),
 	  fFlags(flags),
 	  fBitsPerPixel(0)
-	  // TODO: what about fToken and fOffset ?!?
+	  // fToken is initialized (if used) by the BitmapManager
 {
 	_HandleSpace(space, bytesPerRow);
 }
@@ -83,9 +102,10 @@ ServerBitmap::~ServerBitmap()
 {
 	if (fAllocator != NULL)
 		fAllocator->Free(AllocationCookie());
-	else if (fAllocationCookie != NULL)
-		delete_area((area_id)fAllocationCookie);
-	else
+	else if (fAllocationCookie != NULL) {
+		delete (OverlayCookie *)fAllocationCookie;
+			// deleting the cookie will also free the buffer
+	} else
 		free(fBuffer);
 }
 
@@ -267,9 +287,6 @@ ServerBitmap::Area() const
 	if (fAllocator != NULL)
 		return fAllocator->Area(AllocationCookie());
 
-	if (fAllocationCookie != NULL)
-		return (area_id)fAllocationCookie;
-
 	return B_ERROR;
 }
 
@@ -281,6 +298,16 @@ ServerBitmap::AreaOffset() const
 		return fAllocator->AreaOffset(AllocationCookie());
 
 	return 0;
+}
+
+
+const overlay_buffer*
+ServerBitmap::OverlayBuffer() const
+{
+	if (fAllocator != NULL || fAllocationCookie == NULL)
+		return NULL;
+
+	return ((OverlayCookie*)fAllocationCookie)->OverlayBuffer();
 }
 
 
@@ -328,3 +355,35 @@ UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
 UtilityBitmap::~UtilityBitmap()
 {
 }
+
+
+//	#pragma mark -
+
+
+OverlayCookie::OverlayCookie(HWInterface& interface)
+	:
+	fHWInterface(interface),
+	fOverlayBuffer(NULL)
+{
+}
+
+
+OverlayCookie::~OverlayCookie()
+{
+	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
+}
+
+
+void
+OverlayCookie::SetOverlayBuffer(const overlay_buffer* overlayBuffer)
+{
+	fOverlayBuffer = overlayBuffer;
+}
+
+
+const overlay_buffer*
+OverlayCookie::OverlayBuffer()
+{
+	return fOverlayBuffer;
+}
+

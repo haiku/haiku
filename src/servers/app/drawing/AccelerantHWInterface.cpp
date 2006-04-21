@@ -101,6 +101,8 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fBackBuffer(NULL),
 		fFrontBuffer(new (nothrow) AccelerantBuffer()),
 
+		fUsedOverlays(0),
+
 		fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
 		fRectParamsCount(kDefaultParamsCount),
 		fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
@@ -683,6 +685,72 @@ AccelerantHWInterface::AvailableHWAcceleration() const
 
 	return flags;
 }
+
+
+bool
+AccelerantHWInterface::CheckOverlayRestrictions(int32 width, int32 height,
+	color_space colorSpace)
+{
+	// check if the current display mode supports overlay
+	
+	if (fAccOverlayCount == NULL
+		|| fAccOverlaySupportedSpaces == NULL
+		|| fAccGetOverlayConstraints == NULL
+		|| fAccAllocateOverlayBuffer == NULL
+		|| fAccReleaseOverlayBuffer == NULL
+		|| (fDisplayMode.flags & B_SUPPORTS_OVERLAYS) == 0)
+		return false;
+
+	// check if there is an overlay buffer available
+
+	uint32 available = fAccOverlayCount(&fDisplayMode);
+	if ((int32)available <= fUsedOverlays)
+		return false;
+
+	// Note: we can't really check the size of the overlay upfront - we
+	// must assume fAccAllocateOverlayBuffer() will fail in that case.
+	if (width < 0 || width > 65535 || height < 0 || height > 65535)
+		return false;
+
+	// check color space
+
+	const uint32* spaces = fAccOverlaySupportedSpaces(&fDisplayMode);
+	if (spaces == NULL)
+		return false;
+
+	for (int32 i = 0; spaces[i] != 0; i++) {
+		if (spaces[i] == (uint32)colorSpace)
+			return true;
+	}
+
+	return false;
+}
+
+
+const overlay_buffer*
+AccelerantHWInterface::AllocateOverlayBuffer(int32 width, int32 height, color_space space)
+{
+	if (fAccAllocateOverlayBuffer == NULL)
+		return NULL;
+
+	const overlay_buffer* buffer = fAccAllocateOverlayBuffer(space, width, height);
+	if (buffer != NULL)
+		atomic_add(&fUsedOverlays, 1);
+
+	return buffer;
+}
+
+
+void
+AccelerantHWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
+{
+	if (buffer == NULL || fAccReleaseOverlayBuffer == NULL)
+		return;
+
+	atomic_add(&fUsedOverlays, -1);
+	fAccReleaseOverlayBuffer(buffer);
+}
+
 
 // CopyRegion
 void

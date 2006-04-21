@@ -301,6 +301,27 @@ HWInterface::CopyBackToFront(const BRect& frame)
 	return B_BAD_VALUE;
 }
 
+
+bool
+HWInterface::CheckOverlayRestrictions(int32 width, int32 height, color_space colorSpace)
+{
+	return false;
+}
+
+
+const overlay_buffer*
+HWInterface::AllocateOverlayBuffer(int32 width, int32 height, color_space space)
+{
+	return NULL;
+}
+
+
+void
+HWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
+{
+}
+
+
 // HideSoftwareCursor
 bool
 HWInterface::HideSoftwareCursor(const BRect& area)

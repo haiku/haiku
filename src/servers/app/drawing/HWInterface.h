@@ -9,12 +9,15 @@
 #define HW_INTERFACE_H
 
 
+#include "MultiLocker.h"
+
+#include <video_overlay.h>
+
 #include <Accelerant.h>
 #include <GraphicsCard.h>
 #include <OS.h>
 #include <Region.h>
 
-#include "MultiLocker.h"
 
 class RenderingBuffer;
 class RGBColor;
@@ -22,6 +25,7 @@ class ServerBitmap;
 class ServerCursor;
 class UpdateQueue;
 class BString;
+struct overlay_buffer;
 
 enum {
 	HW_ACC_COPY_REGION					= 0x00000001,
@@ -91,6 +95,13 @@ class HWInterface : public MultiLocker {
 
 			void				SetDragBitmap(const ServerBitmap* bitmap,
 											  const BPoint& offsetFromCursor);
+
+	// overlay support
+	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
+									color_space colorSpace);
+	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
+									color_space space);
+	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
 
 	// frame buffer access (you need to ReadLock!)
 			RenderingBuffer*	DrawingBuffer() const;

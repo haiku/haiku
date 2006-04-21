@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,14 @@ public:
 	// query for available hardware accleration and perform it
 	virtual	uint32				AvailableHWAcceleration() const;
 
+	// overlay support
+	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
+									color_space colorSpace);
+	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
+									color_space space);
+	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
+
+	// accelerated drawing
 	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
 										   uint32 count,
 										   int32 xOffset, int32 yOffset);
@@ -66,18 +74,18 @@ public:
 	virtual	void				Sync();
 
 	// cursor handling
-virtual	void					SetCursor(ServerCursor* cursor);
-virtual	void					SetCursorVisible(bool visible);
-virtual	void					MoveCursorTo(const float& x,
+	virtual	void				SetCursor(ServerCursor* cursor);
+	virtual	void				SetCursorVisible(bool visible);
+	virtual	void				MoveCursorTo(const float& x,
 											 const float& y);
 
 	// frame buffer access
-virtual	RenderingBuffer*		FrontBuffer() const;
-virtual	RenderingBuffer*		BackBuffer() const;
-virtual	bool					IsDoubleBuffered() const;
+	virtual	RenderingBuffer*	FrontBuffer() const;
+	virtual	RenderingBuffer*	BackBuffer() const;
+	virtual	bool				IsDoubleBuffered() const;
 
 protected:
-virtual	void					_DrawCursor(BRect area) const;
+	virtual	void				_DrawCursor(BRect area) const;
 
 private:
 		int						_OpenGraphicsDevice(int deviceNumber);
@@ -134,12 +142,14 @@ private:
 
 		frame_buffer_config		fFrameBufferConfig;
 		int						fModeCount;
-		display_mode			*fModeList;
+		display_mode*			fModeList;
 
-		MallocBuffer			*fBackBuffer;
-		AccelerantBuffer		*fFrontBuffer;
+		MallocBuffer*			fBackBuffer;
+		AccelerantBuffer*		fFrontBuffer;
 
 		display_mode			fDisplayMode;
+
+		vint32					fUsedOverlays;
 
 mutable	fill_rect_params*		fRectParams;
 mutable	uint32					fRectParamsCount;

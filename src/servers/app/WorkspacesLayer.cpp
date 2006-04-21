@@ -192,17 +192,22 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 
 	tabFrame.top = frame.top - 1;
 	tabFrame.bottom = frame.top - 1;
+	tabFrame = tabFrame & workspaceFrame;
 
-	backgroundRegion.Exclude(tabFrame);
-	backgroundRegion.Exclude(frame);
-
-	if (decorator != NULL)
+	if (decorator != NULL && tabFrame.IsValid()) {
 		drawingEngine->StrokeLine(tabFrame.LeftTop(), tabFrame.RightBottom(), yellow);
+		backgroundRegion.Exclude(tabFrame);
+	}
 
 	drawingEngine->StrokeRect(frame, frameColor);
 
-	frame.InsetBy(1, 1);
-	drawingEngine->FillRect(frame, white);
+	frame = frame & workspaceFrame;
+	if (frame.IsValid()) {
+		backgroundRegion.Exclude(frame);
+
+		frame.InsetBy(1, 1);
+		drawingEngine->FillRect(frame, white);
+	}
 
 	// draw title
 

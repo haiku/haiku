@@ -16,18 +16,22 @@
 */
 
 
-#include <new>
-#include <stdio.h>
-#include <string.h>
+#include "BitmapManager.h"
+
+#include "ClientMemoryAllocator.h"
+#include "HWInterface.h"
+#include "ServerBitmap.h"
+#include "ServerProtocol.h"
+#include "ServerTokenSpace.h"
+
+#include <video_overlay.h>
 
 #include <Autolock.h>
 #include <Bitmap.h>
 
-#include "BitmapManager.h"
-#include "ClientMemoryAllocator.h"
-#include "ServerBitmap.h"
-#include "ServerProtocol.h"
-#include "ServerTokenSpace.h"
+#include <new>
+#include <stdio.h>
+#include <string.h>
 
 using std::nothrow;
 
@@ -73,8 +77,8 @@ BitmapManager::~BitmapManager()
 	\return A new ServerBitmap or NULL if unable to allocate one.
 */
 ServerBitmap*
-BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, BRect bounds,
-	color_space space, int32 flags, int32 bytesPerRow, screen_id screen,
+BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInterface,
+	BRect bounds, color_space space, int32 flags, int32 bytesPerRow, screen_id screen,
 	int8* _allocationType)
 {
 	BAutolock locker(fLock);
@@ -83,17 +87,52 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, BRect bounds,
 		return NULL;
 
 // TODO: create an overlay bitmap if graphics card supports it
-if (flags & B_BITMAP_WILL_OVERLAY)
-	return NULL;
+	if (flags & B_BITMAP_WILL_OVERLAY) {
+		if (!hwInterface.WriteLock()
+			|| !hwInterface.CheckOverlayRestrictions(bounds.IntegerWidth() + 1,
+					bounds.IntegerHeight() + 1, space)) {
+			hwInterface.WriteUnlock();
+			return NULL;
+		}
+
+		// We now hold the HWInterface write lock!
+		// Keeping the interface locked makes sure the overlay is still
+		// available when we allocate the buffer
+	}
 
 	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags, bytesPerRow);
-	if (bitmap == NULL)
+	if (bitmap == NULL) {
+		if (flags & B_BITMAP_WILL_OVERLAY)
+			hwInterface.WriteUnlock();
+
 		return NULL;
+	}
 
 	void* cookie = NULL;
 	uint8* buffer = NULL;
 
-	if (allocator != NULL) {
+	if (flags & B_BITMAP_WILL_OVERLAY) {
+		OverlayCookie* overlayCookie = new (std::nothrow) OverlayCookie(hwInterface);
+		const overlay_buffer* overlayBuffer = NULL;
+
+		if (overlayCookie != NULL) {
+			overlayBuffer = hwInterface.AllocateOverlayBuffer(bitmap->Width(),
+				bitmap->Height(), space);
+		}
+
+		hwInterface.WriteUnlock();
+
+		if (overlayBuffer != NULL) {
+			overlayCookie->SetOverlayBuffer(overlayBuffer);
+			bitmap->fAllocationCookie = overlayCookie;
+			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
+
+			buffer = (uint8*)overlayBuffer->buffer;
+			if (_allocationType)
+				*_allocationType = kFramebuffer;
+		} else
+			delete overlayCookie;
+	} else if (allocator != NULL) {
 		bool newArea;
 		cookie = allocator->Allocate(bitmap->BitsLength(), (void**)&buffer, newArea);
 		if (cookie != NULL) {

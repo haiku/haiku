@@ -16,6 +16,7 @@
 #include <Rect.h>
 
 class ClientMemoryAllocator;
+class HWInterface;
 class ServerBitmap;
 
 class BitmapManager {
@@ -23,7 +24,8 @@ class BitmapManager {
 						BitmapManager();
 		virtual			~BitmapManager();
 
-		ServerBitmap*	CreateBitmap(ClientMemoryAllocator* allocator, BRect bounds,
+		ServerBitmap*	CreateBitmap(ClientMemoryAllocator* allocator,
+							HWInterface& hwInterface, BRect bounds,
 							color_space space, int32 flags, int32 bytesPerRow = -1,
 							screen_id screen = B_MAIN_SCREEN_ID,
 							int8* _allocationType = NULL);

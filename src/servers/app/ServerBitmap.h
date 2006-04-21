@@ -13,9 +13,12 @@
 #include <Rect.h>
 #include <OS.h>
 
+#include <video_overlay.h>
+
 
 class BitmapManager;
 class ClientMemoryAllocator;
+class HWInterface;
 
 /*!
 	\class ServerBitmap ServerBitmap.h
@@ -60,6 +63,8 @@ class ServerBitmap {
 
 			area_id			Area() const;
 			uint32			AreaOffset() const;
+
+	const	overlay_buffer*	OverlayBuffer() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -127,6 +132,20 @@ class UtilityBitmap : public ServerBitmap {
 
 
 	virtual					~UtilityBitmap();
+};
+
+//! An allocation cookie for overlays
+class OverlayCookie {
+	public:
+		OverlayCookie(HWInterface& interface);
+		~OverlayCookie();
+
+		void SetOverlayBuffer(const overlay_buffer* overlayBuffer);
+		const overlay_buffer* OverlayBuffer();
+
+	private:
+		HWInterface& fHWInterface;
+		const overlay_buffer* fOverlayBuffer;
 };
 
 // ShallowCopy

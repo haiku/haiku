@@ -928,12 +928,12 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				int8 allocationType;
 				link.Read<int8>(&allocationType);
 
-				if (allocationType == kArea) {
-					// TODO: implement me (server-side as well), needed for overlays
+				if (allocationType == kFramebuffer) {
+					link.Read<addr_t>((addr_t*)&fBasePointer);
+					link.Read<int32>(&fBytesPerRow);
+
 					fServerArea = B_ERROR;
-					fAreaOffset = -1;
-						// that signals the cleanup code to delete our area
-					fBasePointer = NULL;
+					fAreaOffset = 0;
 				} else {
 					link.Read<area_id>(&fServerArea);
 					link.Read<int32>(&fAreaOffset);
@@ -1011,11 +1011,6 @@ BBitmap::_CleanUp()
 		link.Flush();
 
 		// TODO: we may want to delete parts of the server memory areas here!
-
-		if (fAreaOffset == -1) {
-			// we own that area, so we have to delete it
-			delete_area(fArea);
-		}
 
 		fArea = -1;
 		fServerToken = -1;

@@ -589,8 +589,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&flags);
 			link.Read<int32>(&bytesPerRow);
 			if (link.Read<screen_id>(&screenID) == B_OK) {
-				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator, frame,
-					colorSpace, flags, bytesPerRow, screenID, &allocationType);
+				// TODO: choose the right HWInterface with regards to the screenID
+				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator,
+					*fDesktop->HWInterface(), frame, colorSpace, flags, bytesPerRow,
+					screenID, &allocationType);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
@@ -601,8 +603,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<int8>(allocationType);
 
-				if (allocationType == kArea) {
-					// TODO: implement me!
+				if (allocationType == kFramebuffer) {
+					fLink.Attach<addr_t>((addr_t)bitmap->Bits());
+					fLink.Attach<int32>(bitmap->BytesPerRow());
 				} else {
 					fLink.Attach<area_id>(fMemoryAllocator.Area(bitmap->AllocationCookie()));
 					fLink.Attach<int32>(fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));

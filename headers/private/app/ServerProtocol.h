@@ -336,7 +336,7 @@ enum cursor_which {
 enum {
 	kAllocator,
 	kNewAllocatorArea,
-	kArea,
+	kFramebuffer,
 	kHeap
 };
 
