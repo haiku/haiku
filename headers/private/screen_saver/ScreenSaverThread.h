@@ -12,25 +12,32 @@ class BScreenSaver;
 class BView;
 class ScreenSaverPrefs;
 
-class ScreenSaverThread 
-{
-public:
-	ScreenSaverThread(BWindow *wnd, BView *vw, ScreenSaverPrefs *p);
-	void Thread();
-	BScreenSaver *LoadAddOn() ;
-	void Quit();
+class ScreenSaverThread  {
+ public:
+								ScreenSaverThread(BWindow* window,
+												  BView* view,
+												  ScreenSaverPrefs* prefs);
+								~ScreenSaverThread();
 
-	static int32 ThreadFunc(void *data);
-private:
-	BScreenSaver *fSaver;
-	BWindow *fWin;
-	BDirectWindow *fDWin;
-	BView *fView;
-	ScreenSaverPrefs *fPref;
+			void				Thread();
+			BScreenSaver*		LoadAddOn();
+			void				Quit(thread_id thread);
 
-	long fFrame;
-	int fSnoozeCount;
-	image_id fAddonImage;
+	static	int32				ThreadFunc(void* data);
+ private:
+			void				_CleanUp();
+
+			BScreenSaver*		fSaver;
+			BWindow*			fWin;
+			BDirectWindow*		fDWin;
+			BView*				fView;
+			ScreenSaverPrefs*	fPref;
+		
+			long				fFrame;
+			int					fSnoozeCount;
+			image_id			fAddonImage;
+
+	volatile bool				fQuitting;
 };
 
 #endif //SCREEN_SAVER_THREAD_H

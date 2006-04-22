@@ -17,32 +17,46 @@
 int32 
 ScreenSaverThread::ThreadFunc(void *data) 
 {
-	ScreenSaverThread *ss=(ScreenSaverThread *)data;
+	ScreenSaverThread* ss = (ScreenSaverThread*)data;
 	ss->Thread();
 	return B_OK;
 }
 
 
-ScreenSaverThread::ScreenSaverThread(BWindow *wnd, BView *vw, ScreenSaverPrefs *p) 
+ScreenSaverThread::ScreenSaverThread(BWindow* window,
+									 BView* view,
+									 ScreenSaverPrefs* prefs) 
 	:	fSaver(NULL),
-		fWin(wnd),
-		fView(vw), 
-		fPref(p),
+		fWin(window),
+		fView(view),
+		fPref(prefs),
 		fFrame(0),
 		fSnoozeCount(0),
-		fAddonImage(0) 
+		fAddonImage(-1),
+
+		fQuitting(false)
 {
-	fDWin = dynamic_cast<BDirectWindow *>(wnd);
+	fDWin = dynamic_cast<BDirectWindow *>(fWin);
+}
+
+
+ScreenSaverThread::~ScreenSaverThread()
+{
+	_CleanUp();
 }
 
 
 void 
-ScreenSaverThread::Quit() 
+ScreenSaverThread::Quit(thread_id id)
 {
+	fQuitting = true;
+	if (id >= 0) {
+		status_t threadRetValue;
+		wait_for_thread(id, &threadRetValue);
+	}
+
 	if (fSaver)
 		fSaver->StopSaver();
-	if (fWin)
-		fWin->Hide();
 }
 
 
@@ -53,21 +67,24 @@ ScreenSaverThread::Thread()
 		fView->SetViewColor(0,0,0);
 		fView->SetLowColor(0,0,0);
 		if (fSaver)
-			fSaver->StartSaver(fView,false);
+			fSaver->StartSaver(fView, false);
 		fWin->Unlock();
 	}
-	while (1) {
+	while (!fQuitting) {
 		snooze(fSaver->TickSize());
-		if (fSnoozeCount) { // If we are sleeping, do nothing
+		if (fSnoozeCount) {
+			// if we are sleeping, do nothing
 			fSnoozeCount--;
 			return;
 		} else if (fSaver->LoopOnCount() && (fFrame >= fSaver->LoopOnCount())) { // Time to nap
 			fFrame = 0;
 			fSnoozeCount = fSaver->LoopOffCount();
 		} else if (fWin->Lock()) {
-			if (fDWin) 
+			// NOTE: R5 really calls DirectDraw()
+			// and then Draw() for the same frame
+			if (fDWin)
 				fSaver->DirectDraw(fFrame);
-			fSaver->Draw(fView,fFrame);
+			fSaver->Draw(fView, fFrame);
 			fWin->Unlock();
 			fFrame++;
 		}
@@ -75,22 +92,23 @@ ScreenSaverThread::Thread()
 }
 
 
-BScreenSaver *
+BScreenSaver*
 ScreenSaverThread::LoadAddOn() 
 {
 	if (strcmp("", fPref->ModuleName()) == 0)
 		return NULL;
 
-	BScreenSaver *(*instantiate)(BMessage *, image_id );
-	if (fAddonImage) { // This is a new set of preferences. Free up what we did have 
-		unload_add_on(fAddonImage);
-	}
+	// This is a new set of preferences. Free up what we did have
+	_CleanUp();
+
+	BScreenSaver* (*instantiate)(BMessage*, image_id);
+
 	char temp[B_PATH_NAME_LENGTH]; 
 	if (B_OK==find_directory(B_BEOS_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
 		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 		fAddonImage = load_add_on(temp);
 	}
-	if (fAddonImage<0)  {
+	if (fAddonImage < 0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
 		sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 		if (B_OK==find_directory(B_COMMON_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
@@ -98,14 +116,14 @@ ScreenSaverThread::LoadAddOn()
 			fAddonImage = load_add_on(temp);
 		}
 	}
-	if (fAddonImage<0)  {
+	if (fAddonImage < 0)  {
 		//printf ("Unable to open add-on: %s\n",temp);
 		if (B_OK==find_directory(B_USER_ADDONS_DIRECTORY, 0, false, temp, B_PATH_NAME_LENGTH)) { 
 			sprintf (temp,"%s/Screen Savers/%s", temp, fPref->ModuleName());
 			fAddonImage = load_add_on(temp);
 		}
 	}
-	if (fAddonImage<0) {
+	if (fAddonImage < 0) {
 		printf ("Unable to open add-on: %s\n",temp);
 		printf ("add on image = %ld!\n", fAddonImage);
 		return NULL;
@@ -132,3 +150,14 @@ ScreenSaverThread::LoadAddOn()
 	return fSaver;
 }
 
+
+void
+ScreenSaverThread::_CleanUp()
+{
+	delete fSaver;
+	fSaver = NULL;
+	if (fAddonImage >= 0) {
+		unload_add_on(fAddonImage);
+		fAddonImage = -1;
+	}
+}

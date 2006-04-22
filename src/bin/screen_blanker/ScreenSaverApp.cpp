@@ -114,6 +114,7 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 			} else  {
 				PRINT(("Quitting!\n"));
 				_Shutdown();
+				Quit();
 			}
 			break;
 		}
@@ -144,26 +145,29 @@ ScreenSaverApp::QuitRequested()
 		&& (system_time() - fBlankTime > (fPrefs.PasswordTime() - fPrefs.BlankTime()))) {
 		_ShowPasswordWindow();
 		return false;
-	} else
-		_Shutdown();
+	}
 
+	_Shutdown();
 	return true;
 }
 
 
 void
-ScreenSaverApp::_Shutdown(void) 
+ScreenSaverApp::_Shutdown() 
 {
-	if (fWindow)
-		fWindow->Hide();
-	if (fThreadID > -1) {
-		// TODO: kill_thread()? How about doing this right??
+	if (fThread) {
+		fThread->Quit(fThreadID);
+		delete fThread;
+	} else if (fThreadID > -1) {
+		// ?!?
 		kill_thread(fThreadID);
 	}
-	if (fThread)
-		delete fThread;
 
-	Quit();
+	fThread = NULL;
+	fThreadID = -1;
+
+	if (fWindow)
+		fWindow->Hide();
 }
 
 
