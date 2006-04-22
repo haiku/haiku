@@ -78,8 +78,6 @@ ServerCursor::ServerCursor(const uint8* data)
 		if (!buffer)
 			return;
 
-		fInitialized = true;
-
 		uint16* cursorBits = (uint16*)(data + 4);
 		uint16* transparencyBits = (uint16*)(data + 36);
 		fHotSpot.Set(data[3], data[2]);
@@ -160,7 +158,6 @@ ServerCursor::ServerCursor(const ServerCursor* cursor)
 	_AllocateBuffer();
 
 	if (cursor) {	
-		fInitialized = true;
 		if (Bits() && cursor->Bits())
 			memcpy(Bits(), cursor->Bits(), BitsLength());
 		fHotSpot = cursor->fHotSpot;

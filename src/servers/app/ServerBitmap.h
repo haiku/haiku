@@ -4,10 +4,13 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef SERVER_BITMAP_H
 #define SERVER_BITMAP_H
 
+
+#include "RGBColor.h"
 
 #include <GraphicsDefs.h>
 #include <Rect.h>
@@ -19,6 +22,8 @@
 class BitmapManager;
 class ClientMemoryAllocator;
 class HWInterface;
+class OverlayCookie;
+struct overlay_client_data;
 
 /*!
 	\class ServerBitmap ServerBitmap.h
@@ -31,7 +36,7 @@ class HWInterface;
 class ServerBitmap {
  public:
 	inline	bool			IsValid() const
-								{ return fInitialized; }
+								{ return fBuffer != NULL; }
 
 			void			Acquire();
 
@@ -64,7 +69,8 @@ class ServerBitmap {
 			area_id			Area() const;
 			uint32			AreaOffset() const;
 
-	const	overlay_buffer*	OverlayBuffer() const;
+			void			SetOverlayCookie(::OverlayCookie* cookie);
+		::OverlayCookie*	OverlayCookie() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -101,9 +107,9 @@ protected:
 			void			_HandleSpace(color_space space,
 										 int32 bytesperline = -1);
 
-			bool			fInitialized;
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;
+			::OverlayCookie* fOverlayCookie;
 			uint8*			fBuffer;
 			int32			fReferenceCount;
 
@@ -140,26 +146,37 @@ class OverlayCookie {
 		OverlayCookie(HWInterface& interface);
 		~OverlayCookie();
 
-		void SetOverlayBuffer(const overlay_buffer* overlayBuffer);
-		const overlay_buffer* OverlayBuffer() const;
+		status_t InitCheck() const;
 
-		void SetOverlayToken(overlay_token token);
+		void SetOverlayData(const overlay_buffer* overlayBuffer,
+			overlay_token token, overlay_client_data* clientData);
+
+		const overlay_buffer* OverlayBuffer() const;
+		overlay_client_data* ClientData() const;
 		overlay_token OverlayToken() const;
+
+		sem_id Semaphore() const
+			{ return fSemaphore; }
+
+		const RGBColor& Color() const
+			{ return fColor; }
 
 	private:
 		HWInterface&			fHWInterface;
 		const overlay_buffer*	fOverlayBuffer;
+		overlay_client_data*	fClientData;
 		overlay_token			fOverlayToken;
+		sem_id					fSemaphore;
+		RGBColor				fColor;
 };
 
-// ShallowCopy
+// ShallowCopy (only for server bitmaps)
 void
 ServerBitmap::ShallowCopy(const ServerBitmap* from)
 {
 	if (!from)
 		return;
 
-	fInitialized	= from->fInitialized;
 	fBuffer			= from->fBuffer;
 	fWidth			= from->fWidth;
 	fHeight			= from->fHeight;

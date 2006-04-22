@@ -28,7 +28,7 @@ class BitmapManager {
 							HWInterface& hwInterface, BRect bounds,
 							color_space space, int32 flags, int32 bytesPerRow = -1,
 							screen_id screen = B_MAIN_SCREEN_ID,
-							int8* _allocationType = NULL);
+							uint8* _allocationFlags = NULL);
 		void			DeleteBitmap(ServerBitmap* bitmap);
 
 	protected:

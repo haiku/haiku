@@ -4,12 +4,10 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /*!
-	Handler for allocating and freeing area memory for BBitmaps 
-	on the server side. Utilizes the BGET pool allocator.
-
 	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
 	created or destroyed, the BitmapManager needs to handle it. It takes care of 
 	all memory management related to them.
@@ -24,6 +22,7 @@
 #include "ServerProtocol.h"
 #include "ServerTokenSpace.h"
 
+#include <BitmapPrivate.h>
 #include <video_overlay.h>
 
 #include <Autolock.h>
@@ -79,7 +78,7 @@ BitmapManager::~BitmapManager()
 ServerBitmap*
 BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInterface,
 	BRect bounds, color_space space, int32 flags, int32 bytesPerRow, screen_id screen,
-	int8* _allocationType)
+	uint8* _allocationFlags)
 {
 	BAutolock locker(fLock);
 
@@ -113,60 +112,73 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 
 	if (flags & B_BITMAP_WILL_OVERLAY) {
 		OverlayCookie* overlayCookie = new (std::nothrow) OverlayCookie(hwInterface);
-		const overlay_buffer* overlayBuffer = NULL;
 
-		if (overlayCookie != NULL) {
-			overlayBuffer = hwInterface.AllocateOverlayBuffer(bitmap->Width(),
-				bitmap->Height(), space);
+		const overlay_buffer* overlayBuffer = NULL;
+		overlay_client_data* clientData = NULL;
+		bool newArea = false;
+
+		if (overlayCookie != NULL && overlayCookie->InitCheck() == B_OK) {
+			// allocate client memory to communicate the overlay semaphore
+			// and buffer location to the BBitmap
+			cookie = allocator->Allocate(sizeof(overlay_client_data),
+				(void**)&clientData, newArea);
+			if (cookie != NULL) {
+				overlayBuffer = hwInterface.AllocateOverlayBuffer(bitmap->Width(),
+					bitmap->Height(), space);
+			}
 		}
 
 		if (overlayBuffer != NULL) {
-			overlayCookie->SetOverlayBuffer(overlayBuffer);
-			overlayCookie->SetOverlayToken(overlayToken);
+			overlayCookie->SetOverlayData(overlayBuffer, overlayToken, clientData);
 
-			bitmap->fAllocationCookie = overlayCookie;
+			bitmap->fAllocator = allocator;
+			bitmap->fAllocationCookie = cookie;
+			bitmap->SetOverlayCookie(overlayCookie);
 			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
 
 			buffer = (uint8*)overlayBuffer->buffer;
-			if (_allocationType)
-				*_allocationType = kFramebuffer;
+			if (_allocationFlags)
+				*_allocationFlags = kFramebuffer | (newArea ? kNewAllocatorArea : 0);
 		} else {
 			hwInterface.ReleaseOverlayChannel(overlayToken);			
 			delete overlayCookie;
+			allocator->Free(cookie);
 		}
 	} else if (allocator != NULL) {
+		// standard bitmaps
 		bool newArea;
 		cookie = allocator->Allocate(bitmap->BitsLength(), (void**)&buffer, newArea);
 		if (cookie != NULL) {
 			bitmap->fAllocator = allocator;
 			bitmap->fAllocationCookie = cookie;
 
-			if (_allocationType)
-				*_allocationType = newArea ? kNewAllocatorArea : kAllocator;
+			if (_allocationFlags)
+				*_allocationFlags = kAllocator | (newArea ? kNewAllocatorArea : 0);
 		}
 	} else {
+		// server side only bitmaps
 		buffer = (uint8*)malloc(bitmap->BitsLength());
 		if (buffer != NULL) {
 			bitmap->fAllocator = NULL;
 			bitmap->fAllocationCookie = NULL;
 
-			if (_allocationType)
-				*_allocationType = kHeap;
+			if (_allocationFlags)
+				*_allocationFlags = kHeap;
 		}
 	}
 
 	if (buffer && fBitmapList.AddItem(bitmap)) {
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
-		bitmap->fInitialized = true;
 
 		if (flags & B_BITMAP_CLEAR_TO_WHITE) {
-			if (space == B_CMAP8)
+			if (space == B_CMAP8) {
 				// "255" is the "transparent magic" index for B_CMAP8 bitmaps
 				memset(bitmap->Bits(), 65, bitmap->BitsLength());
-			else
+			} else {
 				// should work for most colorspaces
-				memset(bitmap->Bits(), 255, bitmap->BitsLength());
+				memset(bitmap->Bits(), 0xff, bitmap->BitsLength());
+			}
 		}
 	} else {
 		// Allocation failed for buffer or bitmap list

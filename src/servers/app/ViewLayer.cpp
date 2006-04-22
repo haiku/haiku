@@ -978,7 +978,11 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 		// add the current clipping
 		redraw->IntersectWith(effectiveClipping);
 
-		if (fViewBitmap != NULL) {
+		OverlayCookie* overlayCookie = NULL;
+		if (fViewBitmap != NULL)
+			overlayCookie = fViewBitmap->OverlayCookie();
+
+		if (fViewBitmap != NULL && overlayCookie == NULL) {
 			// draw view bitmap
 			// TODO: support other options!
 			BRect rect = fBitmapDestination;
@@ -1009,6 +1013,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 				if (fBitmapOptions & B_TILE_BITMAP) {
 					// tile across entire view
+
 					float start = rect.left;
 					while (rect.top < redraw->Frame().bottom) {
 						while (rect.left < redraw->Frame().right) {
@@ -1020,9 +1025,9 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 					}
 					// nothing left to be drawn
 					redraw->MakeEmpty();
-
 				} else if (fBitmapOptions & B_TILE_BITMAP_X) {
 					// tile in x direction
+
 					while (rect.left < redraw->Frame().right) {
 						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
 							rect, &defaultDrawState);
@@ -1032,9 +1037,9 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 					rect.left = redraw->Frame().left;
 					rect.right = redraw->Frame().right;
 					redraw->Exclude(rect);
-
 				} else if (fBitmapOptions & B_TILE_BITMAP_Y) {
 					// tile in y direction
+
 					while (rect.top < redraw->Frame().bottom) {
 						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
 							rect, &defaultDrawState);
@@ -1044,9 +1049,9 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 					rect.top = redraw->Frame().top;
 					rect.bottom = redraw->Frame().bottom;
 					redraw->Exclude(rect);
-
 				} else {
 					// no tiling at all
+
 					drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
 						rect, &defaultDrawState);
 					redraw->Exclude(rect);
@@ -1059,7 +1064,9 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 		}
 
-		if (!fViewColor.IsTransparentMagic()) {
+		if (overlayCookie != NULL) {
+			drawingEngine->FillRegion(*redraw, overlayCookie->Color());
+		} else if (!fViewColor.IsTransparentMagic()) {
 			// fill visible region with view color,
 			// this version of FillRegion ignores any
 			// clipping, that's why "redraw" needs to

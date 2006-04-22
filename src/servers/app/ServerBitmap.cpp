@@ -4,6 +4,7 @@
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -11,6 +12,8 @@
 #include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
 #include "HWInterface.h"
+
+#include <BitmapPrivate.h>
 
 #include <new>
 #include <stdio.h>
@@ -27,9 +30,9 @@ using std::nothrow;
 	If a bitmap was allocated this way, both, the fAllocator and fAllocationCookie
 	members are used.
 
-	For overlays, the creation speed is not crucial, that's why we can easily live
-	with the overhead of some heap allocations. The fAllocationCookie will point
-	to an OverlayCookie object that will also free the buffer upon destruction.
+	For overlays, the allocator only allocates a small piece of client memory
+	for use with the overlay_client_data structure - the actual buffer will be
+	placed in the graphics frame buffer and is allocated by the graphics driver.
 
 	If the memory was allocated on the app_server heap, neither fAllocator, nor
 	fAllocationCookie are used, and the buffer is just freed in that case when
@@ -50,22 +53,23 @@ using std::nothrow;
 ServerBitmap::ServerBitmap(BRect rect, color_space space,
 						   int32 flags, int32 bytesPerRow,
 						   screen_id screen)
-	: fInitialized(false),
-	  fAllocator(NULL),
-	  fAllocationCookie(NULL),
-	  fBuffer(NULL),
-	  fReferenceCount(1),
-	  // WARNING: '1' is added to the width and height.
-	  // Same is done in FBBitmap subclass, so if you
-	  // modify here make sure to do the same under
-	  // FBBitmap::SetSize(...)
-	  fWidth(rect.IntegerWidth() + 1),
-	  fHeight(rect.IntegerHeight() + 1),
-	  fBytesPerRow(0),
-	  fSpace(space),
-	  fFlags(flags),
-	  fBitsPerPixel(0)
-	  // fToken is initialized (if used) by the BitmapManager
+	:
+	fAllocator(NULL),
+	fAllocationCookie(NULL),
+	fOverlayCookie(NULL),
+	fBuffer(NULL),
+	fReferenceCount(1),
+	// WARNING: '1' is added to the width and height.
+	// Same is done in FBBitmap subclass, so if you
+	// modify here make sure to do the same under
+	// FBBitmap::SetSize(...)
+	fWidth(rect.IntegerWidth() + 1),
+	fHeight(rect.IntegerHeight() + 1),
+	fBytesPerRow(0),
+	fSpace(space),
+	fFlags(flags),
+	fBitsPerPixel(0)
+	// fToken is initialized (if used) by the BitmapManager
 {
 	_HandleSpace(space, bytesPerRow);
 }
@@ -73,14 +77,14 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 
 //! Copy constructor does not copy the buffer.
 ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
-	: fInitialized(false),
-	  fAllocator(NULL),
-	  fAllocationCookie(NULL),
-	  fBuffer(NULL),
-	  fReferenceCount(1)
+	:
+	fAllocator(NULL),
+	fAllocationCookie(NULL),
+	fOverlayCookie(NULL),
+	fBuffer(NULL),
+	fReferenceCount(1)
 {
 	if (bmp) {
-		fInitialized	= bmp->fInitialized;
 		fWidth			= bmp->fWidth;
 		fHeight			= bmp->fHeight;
 		fBytesPerRow	= bmp->fBytesPerRow;
@@ -102,11 +106,11 @@ ServerBitmap::~ServerBitmap()
 {
 	if (fAllocator != NULL)
 		fAllocator->Free(AllocationCookie());
-	else if (fAllocationCookie != NULL) {
-		delete (OverlayCookie *)fAllocationCookie;
-			// deleting the cookie will also free the buffer
-	} else
+	else
 		free(fBuffer);
+
+	delete fOverlayCookie;
+		// deleting the cookie will also free the overlay buffer
 }
 
 
@@ -140,7 +144,6 @@ ServerBitmap::_AllocateBuffer(void)
 	if (length > 0) {
 		delete[] fBuffer;
 		fBuffer = new(nothrow) uint8[length];
-		fInitialized = fBuffer != NULL;
 	}
 }
 
@@ -301,13 +304,17 @@ ServerBitmap::AreaOffset() const
 }
 
 
-const overlay_buffer*
-ServerBitmap::OverlayBuffer() const
+void
+ServerBitmap::SetOverlayCookie(::OverlayCookie* cookie)
 {
-	if (fAllocator != NULL || fAllocationCookie == NULL)
-		return NULL;
+	fOverlayCookie = cookie;
+}
 
-	return ((OverlayCookie*)fAllocationCookie)->OverlayBuffer();
+
+::OverlayCookie*
+ServerBitmap::OverlayCookie() const
+{
+	return fOverlayCookie;
 }
 
 
@@ -364,8 +371,12 @@ OverlayCookie::OverlayCookie(HWInterface& interface)
 	:
 	fHWInterface(interface),
 	fOverlayBuffer(NULL),
+	fClientData(NULL),
 	fOverlayToken(NULL)
 {
+	fSemaphore = create_sem(1, "overlay lock");
+	fColor.SetColor(255, 0, 255);
+		// that color is just for testing, of course!
 }
 
 
@@ -373,13 +384,28 @@ OverlayCookie::~OverlayCookie()
 {
 	fHWInterface.ReleaseOverlayChannel(fOverlayToken);
 	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
+
+	delete_sem(fSemaphore);
+}
+
+
+status_t
+OverlayCookie::InitCheck() const
+{
+	return fSemaphore >= B_OK ? B_OK : fSemaphore;
 }
 
 
 void
-OverlayCookie::SetOverlayBuffer(const overlay_buffer* overlayBuffer)
+OverlayCookie::SetOverlayData(const overlay_buffer* overlayBuffer,
+	overlay_token token, overlay_client_data* clientData)
 {
 	fOverlayBuffer = overlayBuffer;
+	fOverlayToken = token;
+
+	fClientData = clientData;
+	fClientData->lock = fSemaphore;
+	fClientData->buffer = (uint8*)fOverlayBuffer->buffer;
 }
 
 
@@ -390,10 +416,10 @@ OverlayCookie::OverlayBuffer() const
 }
 
 
-void
-OverlayCookie::SetOverlayToken(overlay_token token)
+overlay_client_data*
+OverlayCookie::ClientData() const
 {
-	fOverlayToken = token;
+	return fClientData;
 }
 
 

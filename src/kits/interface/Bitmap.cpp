@@ -15,6 +15,7 @@
 */
 
 #include "ColorConversion.h"
+#include "BitmapPrivate.h"
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -360,23 +361,50 @@ BBitmap::IsValid() const
 	return (InitCheck() == B_OK);
 }
 
-// LockBits
-/*! \brief ???
+
+/*!
+	\brief Locks the bitmap bits so that they cannot be relocated.
+
+	This is currently only used for overlay bitmaps - whenever you
+	need to access their Bits(), you have to lock them first.
+	On resolution change overlay bitmaps can be relocated in memory;
+	using this call prevents you from accessing an invalid pointer
+	and clobbering memory that doesn't belong you.
 */
 status_t
 BBitmap::LockBits(uint32 *state)
 {
+	if (fFlags & B_BITMAP_WILL_OVERLAY) {
+		overlay_client_data* data = (overlay_client_data*)fBasePointer;
+
+		status_t status;
+		do {
+			status = acquire_sem(data->lock);
+		} while (status == B_INTERRUPTED);
+
+		return status;
+	}
+
 	// NOTE: maybe this is used to prevent the app_server from
 	// drawing the bitmap yet?
+	// axeld: you mean for non overlays?
+
 	return B_ERROR;
 }
 
-// UnlockBits
-/*! \brief ???
+
+/*!
+	\brief Unlocks the bitmap's buffer again.
+	Counterpart to LockBits(), see there for comments.
 */
 void
 BBitmap::UnlockBits()
 {
+	if ((fFlags & B_BITMAP_WILL_OVERLAY) == 0)
+		return;
+
+	overlay_client_data* data = (overlay_client_data*)fBasePointer;
+	release_sem(data->lock);
 }
 
 // Area
@@ -390,7 +418,7 @@ BBitmap::Area() const
 	return fArea;
 }
 
-// Bits
+
 /*!	\brief Returns the pointer to the bitmap data.
 	\return The pointer to the bitmap data.
 */
@@ -398,6 +426,12 @@ void *
 BBitmap::Bits() const
 {
 	const_cast<BBitmap *>(this)->_AssertPointer();
+	
+	if (fFlags & B_BITMAP_WILL_OVERLAY) {
+		overlay_client_data* data = (overlay_client_data*)fBasePointer;
+		return data->buffer;
+	}
+
 	return (void*)fBasePointer;
 }
 
@@ -925,29 +959,26 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 				// Get token
 				link.Read<int32>(&fServerToken);
 
-				int8 allocationType;
-				link.Read<int8>(&allocationType);
+				uint8 allocationFlags;
+				link.Read<uint8>(&allocationFlags);
+				link.Read<area_id>(&fServerArea);
+				link.Read<int32>(&fAreaOffset);
 
-				if (allocationType == kFramebuffer) {
-					link.Read<addr_t>((addr_t*)&fBasePointer);
+				BPrivate::ServerMemoryAllocator* allocator
+					= BApplication::Private::ServerAllocator();
+
+				if (allocationFlags & kNewAllocatorArea)
+					error = allocator->AddArea(fServerArea, fArea, fBasePointer);
+				else {
+					error = allocator->AreaAndBaseFor(fServerArea, fArea, fBasePointer);
+					if (error == B_OK)
+						fBasePointer += fAreaOffset;
+				}
+
+				if (allocationFlags & kFramebuffer) {
+					// the base pointer will now point to an overlay_client_data structure
 					link.Read<int32>(&fBytesPerRow);
-
-					fServerArea = B_ERROR;
-					fAreaOffset = 0;
-				} else {
-					link.Read<area_id>(&fServerArea);
-					link.Read<int32>(&fAreaOffset);
-
-					BPrivate::ServerMemoryAllocator* allocator
-						= BApplication::Private::ServerAllocator();
-
-					if (allocationType == kNewAllocatorArea)
-						error = allocator->AddArea(fServerArea, fArea, fBasePointer);
-					else {
-						error = allocator->AreaAndBaseFor(fServerArea, fArea, fBasePointer);
-						if (error == B_OK)
-							fBasePointer += fAreaOffset;
-					}
+					size = fBytesPerRow * (bounds.IntegerHeight() + 1);
 				}
 
 				if (fServerArea >= B_OK) {

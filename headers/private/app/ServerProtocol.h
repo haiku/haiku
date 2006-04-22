@@ -332,12 +332,12 @@ enum cursor_which {
 	B_CURSOR_INVALID
 };
 
-// bitmap allocation types
+// bitmap allocation flags
 enum {
-	kAllocator,
-	kNewAllocatorArea,
-	kFramebuffer,
-	kHeap
+	kAllocator			= 0x1,
+	kFramebuffer		= 0x2,
+	kHeap				= 0x4,
+	kNewAllocatorArea	= 0x8,
 };
 
 #endif	// APP_SERVER_PROTOCOL_H

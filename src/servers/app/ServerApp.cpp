@@ -577,7 +577,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			
 			// First, let's attempt to allocate the bitmap
 			ServerBitmap *bitmap = NULL;
-			int8 allocationType = kAllocator;
+			uint8 allocationFlags = kAllocator;
 
 			BRect frame;
 			color_space colorSpace;
@@ -592,24 +592,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// TODO: choose the right HWInterface with regards to the screenID
 				bitmap = gBitmapManager->CreateBitmap(&fMemoryAllocator,
 					*fDesktop->HWInterface(), frame, colorSpace, flags, bytesPerRow,
-					screenID, &allocationType);
+					screenID, &allocationFlags);
 			}
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1fx%.1f)\n",
-						Signature(), frame.Width(), frame.Height()));
+				Signature(), frame.Width() + 1, frame.Height() + 1));
 
 			if (bitmap != NULL && fBitmapList.AddItem(bitmap)) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
-				fLink.Attach<int8>(allocationType);
+				fLink.Attach<uint8>(allocationFlags);
 
-				if (allocationType == kFramebuffer) {
-					fLink.Attach<addr_t>((addr_t)bitmap->Bits());
+				fLink.Attach<area_id>(fMemoryAllocator.Area(bitmap->AllocationCookie()));
+				fLink.Attach<int32>(fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
+
+				if (allocationFlags & kFramebuffer)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
-				} else {
-					fLink.Attach<area_id>(fMemoryAllocator.Area(bitmap->AllocationCookie()));
-					fLink.Attach<int32>(fMemoryAllocator.AreaOffset(bitmap->AllocationCookie()));
-				}
 			} else
 				fLink.StartMessage(B_NO_MEMORY);
 

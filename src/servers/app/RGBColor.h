@@ -14,8 +14,8 @@
 
 class RGBColor {
 	public:
-		RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255);
-		RGBColor(int r, int g, int b, int a=255);
+		RGBColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+		RGBColor(int r, int g, int b, int a = 255);
 		RGBColor(const rgb_color &col);
 		RGBColor(uint16 col);
 		RGBColor(uint8 col);
@@ -27,8 +27,8 @@ class RGBColor {
 		uint16 GetColor16() const;
 		rgb_color GetColor32() const;
 
-		void SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255);
-		void SetColor(int r, int g, int b, int a=255);
+		void SetColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+		void SetColor(int r, int g, int b, int a = 255);
 		void SetColor(uint16 color16);
 		void SetColor(uint8 color8);
 		void SetColor(const rgb_color &color);
