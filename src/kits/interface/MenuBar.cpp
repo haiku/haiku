@@ -378,16 +378,16 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	// TODO: Cleanup, merge some "if" blocks if possible
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
-	int localAction = MENU_ACT_NONE;
+	int localAction = MENU_STATE_TRACKING;
 	while (true) {
-		bigtime_t snoozeAmount = 30000;
+		bigtime_t snoozeAmount = 40000;
 		bool locked = window->Lock();//WithTimeout(200000)
 		if (!locked)
 			break;
 
 		BPoint where;
 		ulong buttons;
-		GetMouse(&where, &buttons);
+		GetMouse(&where, &buttons, true);
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
 			// Select item if:
@@ -406,7 +406,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					} else {
 						// Menu was already opened, close it and bail
 						SelectItem(NULL);
-						localAction = MENU_ACT_CLOSE;
+						localAction = MENU_STATE_CLOSED;
 						resultItem = NULL;
 					}
 				} else {
@@ -423,18 +423,20 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			if (menu != NULL) {
 				window->Unlock();
 				locked = false;
-				snoozeAmount = 0;
+				snoozeAmount = 30000;
 				if (IsStickyMode())
 					menu->SetStickyMode(true);
 				resultItem = menu->_track(&localAction, system_time());
 			}
-		} else if (menuItem == NULL && !IsStickyMode())
+		} else if (menuItem == NULL && !IsStickyMode()) {
 			SelectItem(NULL);
+			fState = MENU_STATE_TRACKING;
+		}
 		
 		if (locked)
 			window->Unlock();
 		
-		if (localAction == MENU_ACT_CLOSE || (buttons != 0 && IsStickyMode() && menuItem == NULL))
+		if (localAction == MENU_STATE_CLOSED || (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
 			// On an item without a submenu
@@ -446,7 +448,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		}
 
 		if (snoozeAmount > 0)
-			snooze(snoozeAmount);
+			snooze(snoozeAmount);		
 	}
 
 	if (window->Lock()) {

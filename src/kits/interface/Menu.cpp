@@ -236,47 +236,21 @@ BMenu::Archive(BMessage *data, bool deep) const
 {
 	status_t err = BView::Archive(data, deep);
 
-	if (err < B_OK)
-		return err;
-
-	if (Layout() != B_ITEMS_IN_ROW) {
+	if (err == B_OK && Layout() != B_ITEMS_IN_ROW)
 		err = data->AddInt32("_layout", Layout());
-
-		if (err < B_OK)
-			return err;
-	}
-
-	err = data->AddBool("_rsize_to_fit", fResizeToFit);
-
-	if (err < B_OK)
-		return err;
-
-	err = data->AddBool("_disable", !IsEnabled());
-
-	if (err < B_OK)
-		return err;
-
-	err = data->AddBool("_radio", IsRadioMode());
-
-	if (err < B_OK)
-		return err;
-
-	err = data->AddBool("_trig_disabled", AreTriggersEnabled());
-
-	if (err < B_OK)
-		return err;
-
-	err = data->AddBool("_dyn_label", fDynamicName);
-
-	if (err < B_OK)
-		return err;
-
-	err = data->AddFloat("_maxwidth", fMaxContentWidth);
-
-	if (err < B_OK)
-		return err;
-
-	if (deep) {
+	if (err == B_OK)
+		err = data->AddBool("_rsize_to_fit", fResizeToFit);
+	if (err == B_OK)
+		err = data->AddBool("_disable", !IsEnabled());
+	if (err ==  B_OK)
+		err = data->AddBool("_radio", IsRadioMode());
+	if (err == B_OK)
+		err = data->AddBool("_trig_disabled", AreTriggersEnabled());
+	if (err == B_OK)
+		err = data->AddBool("_dyn_label", fDynamicName);
+	if (err == B_OK)
+		err = data->AddFloat("_maxwidth", fMaxContentWidth);
+	if (err == B_OK && deep) {
 		// TODO store items and rects
 	}
 
@@ -1129,7 +1103,7 @@ BMenu::_show(bool selectFirstItem)
 	
 		UpdateWindowViewSize();
 		window->Show();
-
+		
 		if (selectFirstItem)
 			SelectItem(ItemAt(0));
 		
@@ -1175,9 +1149,17 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	bigtime_t openTime = system_time();
 	bigtime_t closeTime = openTime; 
 	
-	fState = MENU_ACT_NONE;
-	
+	fState = MENU_STATE_TRACKING;
+	if (fSuper != NULL)
+		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
+
 	while (true) {
+		if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
+			&& fExtraMenuData->trackingState != NULL) {
+			bool result = fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
+			//printf("tracking hook returned %s\n", result ? "true" : "false");
+		}
+		
 		bool locked = LockLooper();
 		if (!locked)
 			break;
@@ -1190,37 +1172,35 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
-			if (item != fSelected
-				&& (fState != MENU_ACT_SUBMENU || system_time() > closeTime + kHysteresis)) {
+			if (item != fSelected && system_time() > closeTime + kHysteresis) {
 				SelectItem(item, -1);
 				openTime = system_time();
-				fState = MENU_ACT_NONE;
-				snoozeAmount = 20000;
 			} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
 				&& item->Submenu()->Window() == NULL) {
 				// Open the submenu if it's not opened yet, but only if
 				// the mouse pointer stayed over there for some time
 				// (hysteresis)
 				SelectItem(item);
-				fState = MENU_ACT_SUBMENU;
 				closeTime = system_time();
 			}
+			fState = MENU_STATE_TRACKING;
 		}
-
 
 		// Track the submenu
 		if (fSelected != NULL && OverSubmenu(fSelected, screenLocation)) {
 			UnlockLooper();
 			locked = false;
-			int submenuAction = MENU_ACT_NONE;
+			int submenuAction = MENU_STATE_TRACKING;
+			BMenu *submenu = fSelected->Submenu();
 			if (IsStickyMode())
-				fSelected->Submenu()->SetStickyMode(true);
-			BMenuItem *submenuItem = fSelected->Submenu()->_track(&submenuAction, trackTime);
-			if (submenuAction == MENU_ACT_CLOSE) {
+				submenu->SetStickyMode(true);
+			BMenuItem *submenuItem = submenu->_track(&submenuAction, trackTime);
+			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = submenuAction;
 				break;
 			}
+
 			locked = LockLooper();
 			if (!locked)
 				break;
@@ -1228,29 +1208,38 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 
 		if (item == NULL) {
 			if (OverSuper(screenLocation)) {
-				fState = MENU_ACT_NONE;
+				fState = MENU_STATE_TRACKING;
 				UnlockLooper();
 				break;
 			}
+
 			if (fSelected != NULL && !OverSubmenu(fSelected, screenLocation)
-				&& (fState != MENU_ACT_SUBMENU || system_time() > closeTime + kHysteresis)) {
+				&& system_time() > closeTime + kHysteresis
+				&& fState != MENU_STATE_TRACKING_SUBMENU) {
 				SelectItem(NULL);
-				fState = MENU_ACT_NONE;
+				fState = MENU_STATE_TRACKING;
+			}
+
+			if (fSuper != NULL) {
+				if (locked)
+					UnlockLooper();
+				*action = fState;
+				return NULL;				
 			}
 		}
-
+		
 		if (locked)
 			UnlockLooper();
-			
+		
 		if (buttons != 0 && IsStickyMode()) {
-			fState = MENU_ACT_CLOSE;
+			fState = MENU_STATE_CLOSED;
 			break;
 		} else if (buttons == 0 && !IsStickyMode()) {
 			if (system_time() < trackTime + 1000000
 				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
 				SetStickyMode(true);
 			else {
-				fState = MENU_ACT_CLOSE;
+				fState = MENU_STATE_CLOSED;
 				break;
 			}
 		}
@@ -1261,7 +1250,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	if (action != NULL)
 		*action = fState;
 
-	if (LockLooper()) {
+	if (fSelected != NULL && LockLooper()) {
 		SelectItem(NULL);
 		UnlockLooper();
 	}
@@ -1918,7 +1907,8 @@ BMenu::UpdateWindowViewSize(bool upWind)
 		window->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
 	else {
 		CacheFontInfo();
-		window->ResizeTo(StringWidth(kEmptyMenuLabel) + 5, fFontHeight + 6);
+		window->ResizeTo(StringWidth(kEmptyMenuLabel) + fPad.left + fPad.right,
+						fFontHeight + fPad.top + fPad.bottom);
 	}
 	window->MoveTo(frame.LeftTop());
 }
