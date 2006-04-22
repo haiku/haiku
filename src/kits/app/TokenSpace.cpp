@@ -35,8 +35,7 @@ BTokenSpace::~BTokenSpace()
 
 
 int32
-BTokenSpace::NewToken(int16 type, void* object,
-	new_token_callback callback)
+BTokenSpace::NewToken(int16 type, void* object)
 {
 	BAutolock locker(this);
 
@@ -44,9 +43,6 @@ BTokenSpace::NewToken(int16 type, void* object,
 	int32 token = fTokenCount++;
 
 	fTokenMap[token] = tokenInfo;
-
-	if (callback)
-		callback(type, object);
 
 	return token;
 }
@@ -62,8 +58,8 @@ void
 BTokenSpace::SetToken(int32 token, int16 type, void* object)
 {
 	BAutolock locker(this);
-	token_info tokenInfo = { type, object };
 
+	token_info tokenInfo = { type, object };
 	fTokenMap[token] = tokenInfo;
 
 	// this makes sure SetToken() plays more or less nice with NewToken()
@@ -73,16 +69,13 @@ BTokenSpace::SetToken(int32 token, int16 type, void* object)
 
 
 bool
-BTokenSpace::RemoveToken(int32 token, remove_token_callback callback)
+BTokenSpace::RemoveToken(int32 token)
 {
 	BAutolock locker(this);
 
 	TokenMap::iterator iterator = fTokenMap.find(token);
 	if (iterator == fTokenMap.end())
 		return false;
-
-	if (callback)
-		callback(iterator->second.type, iterator->second.object);
 
 	fTokenMap.erase(iterator);
 	return true;
@@ -106,8 +99,7 @@ BTokenSpace::CheckToken(int32 token, int16 type) const
 
 
 status_t
-BTokenSpace::GetToken(int32 token, int16 type, void** _object,
-	get_token_callback callback) const
+BTokenSpace::GetToken(int32 token, int16 type, void** _object) const
 {
 	BAutolock locker(const_cast<BTokenSpace&>(*this));
 
@@ -117,9 +109,6 @@ BTokenSpace::GetToken(int32 token, int16 type, void** _object,
 	TokenMap::const_iterator iterator = fTokenMap.find(token);
 
 	if (iterator == fTokenMap.end() || iterator->second.type != type)
-		return B_ENTRY_NOT_FOUND;
-
-	if (callback && !callback(iterator->second.type, iterator->second.object))
 		return B_ENTRY_NOT_FOUND;
 
 	*_object = iterator->second.object;

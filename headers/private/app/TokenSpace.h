@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,23 +30,17 @@
 
 namespace BPrivate {
 
-typedef void (*new_token_callback)(int16, void*);
-typedef void (*remove_token_callback)(int16, void*);
-typedef bool (*get_token_callback)(int16, void*);
-
 class BTokenSpace : public BLocker {
 	public:
 		BTokenSpace();
 		~BTokenSpace();
 
-		int32		NewToken(int16 type, void* object,
-						new_token_callback callback = NULL);
+		int32		NewToken(int16 type, void* object);
 		void		SetToken(int32 token, int16 type, void* object);
 
-		bool		RemoveToken(int32 token, remove_token_callback callback = NULL);
+		bool		RemoveToken(int32 token);
 		bool		CheckToken(int32 token, int16 type) const;
-		status_t	GetToken(int32 token, int16 type, void** object,
-						get_token_callback callback = NULL) const;
+		status_t	GetToken(int32 token, int16 type, void** object) const;
 
 	private:
 		struct token_info {

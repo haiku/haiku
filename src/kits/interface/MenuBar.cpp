@@ -490,7 +490,7 @@ BMenuBar::RestoreFocus()
 	if (window != NULL && window->Lock()) {
 		BHandler *handler = NULL;
 		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
-				(void **)&handler, NULL) == B_OK) {
+				(void **)&handler) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
 			if (view != NULL && view->Window() == window)
 				view->MakeFocus();
