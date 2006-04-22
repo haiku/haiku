@@ -28,7 +28,7 @@ rule AddSharedObjectGlueCode
 			LINK_BEGIN_GLUE on $(1) = $(beginGlue) ;
 			LINK_END_GLUE on $(1) = $(endGlue) ;
 
-			NEEDLIBS on $(1) = $(stdLibs) [ on $(1) return $(NEEDLIBS) ] ;
+			NEEDLIBS on $(1) =  [ on $(1) return $(NEEDLIBS) ] $(stdLibs) ;
 			Depends $(1) : $(stdLibs) $(beginGlue) $(endGlue) ;
 			LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 		}
