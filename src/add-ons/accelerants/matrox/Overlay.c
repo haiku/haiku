@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/03-2003 */
+/* Written by Rudolf Cornelissen 05-2002/4-2006 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -47,7 +47,7 @@ const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm)
 	}
 
 	/* interlaced VGA is not supported by G200-G550 BES */
-	if (dm->timing.flags && B_TIMING_INTERLACED)
+	if (dm->timing.flags & B_TIMING_INTERLACED)
 	{
 		return NULL;
 	}

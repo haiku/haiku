@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-9/2005 */
+/* Written by Rudolf Cornelissen 05/2002-4/2006 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -43,7 +43,7 @@ const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm)
 	}
 
 	/* assuming interlaced VGA is not supported */
-	if (dm->timing.flags && B_TIMING_INTERLACED)
+	if (dm->timing.flags & B_TIMING_INTERLACED)
 	{
 		return NULL;
 	}
