@@ -56,7 +56,6 @@ enum
 	M_VIEW_200,
 	M_VIEW_300,
 	M_VIEW_400,
-	M_SCALE_TO_NATIVE_SIZE,
 	M_TOGGLE_FULLSCREEN,
 	M_TOGGLE_NO_BORDER,
 	M_TOGGLE_NO_MENU,
@@ -200,7 +199,6 @@ MainWin::SetupWindow()
 	fVideoMenu->ItemAt(0)->SetMarked(true);
 	
 	if (fHasVideo) {
-//		VideoFormatChange(int width, int height, float width_scale, float height_scale)
 		fSourceWidth = 320;
 		fSourceHeight = 240;
 		fWidthScale = 1.24;
@@ -212,23 +210,30 @@ MainWin::SetupWindow()
 		fHeightScale = 1.0;
 	}
 	
+	ResizeWindow(100);
+
+	fVideoView->MakeFocus();
+}
+
+
+void
+MainWin::ResizeWindow(float percent)
+{
 	int video_width;
 	int video_height;
 
-	// get required window size
+	// Get required window size
 	video_width = lround(fSourceWidth * fWidthScale);
 	video_height = lround(fSourceHeight * fHeightScale);
+	
+	video_width = (video_width * percent) / 100;
+	video_height = (video_height * percent) / 100;
 	
 	// Calculate and set the initial window size
 	int width = max_c(fControlsWidth, video_width);
 	int height = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight) + video_height;
 	SetWindowSizeLimits();
 	ResizeTo(width - 1, height - 1);
-	
-	fVideoView->MakeFocus();
-	
-//	VideoFormatChange(fSourceWidth, fSourceHeight, fWidthScale, fHeightScale);
-
 }
 
 
@@ -457,7 +462,6 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	printf("Show context menu\n");
 	BPopUpMenu *menu = new BPopUpMenu("context menu", false, false);
 	BMenuItem *item;
-	menu->AddItem(new BMenuItem("Scale to native size", new BMessage(M_SCALE_TO_NATIVE_SIZE), 'N', B_COMMAND_KEY));
 	menu->AddItem(item = new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
 	item->SetMarked(fIsFullscreen);
 	menu->AddSeparatorItem();
@@ -626,17 +630,17 @@ MainWin::ResizeVideoView(int x, int y, int width, int height)
 void
 MainWin::ToggleNoBorderNoMenu()
 {
-	if (!fNoMenu && fNoBorder) {
-		// if no border, switch of menu, too
+	if (!fNoMenu && !fNoBorder && !fNoControls) {
 		PostMessage(M_TOGGLE_NO_MENU);
-	} else
-	if (fNoMenu && !fNoBorder) {
-		// if no menu, switch of border, too
 		PostMessage(M_TOGGLE_NO_BORDER);
+		PostMessage(M_TOGGLE_NO_CONTROLS);
 	} else {
-		// both are either on or off, toggle both
-		PostMessage(M_TOGGLE_NO_MENU);
-		PostMessage(M_TOGGLE_NO_BORDER);
+		if (!fNoMenu)
+			PostMessage(M_TOGGLE_NO_MENU);
+		if (!fNoBorder)
+			PostMessage(M_TOGGLE_NO_BORDER);
+		if (!fNoControls)
+			PostMessage(M_TOGGLE_NO_CONTROLS);
 	}
 }
 
@@ -1016,6 +1020,45 @@ MainWin::MessageReceived(BMessage *msg)
 			ToggleNoBorderNoMenu();
 			break;
 
+		case M_VIEW_50:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				ToggleFullscreen();
+			ResizeWindow(50);
+			break;
+			
+		case M_VIEW_100:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				ToggleFullscreen();
+			ResizeWindow(100);
+			break;
+
+		case M_VIEW_200:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				ToggleFullscreen();
+			ResizeWindow(200);
+			break;
+
+		case M_VIEW_300:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				ToggleFullscreen();
+			ResizeWindow(300);
+			break;
+
+		case M_VIEW_400:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				ToggleFullscreen();
+			ResizeWindow(400);
+			break;
 
 /*
 		
@@ -1075,6 +1118,7 @@ MainWin::MessageReceived(BMessage *msg)
 			printf("M_VOLUME_DOWN\n");
 			fController->VolumeDown();
 			break;
+*/
 
 		case M_ASPECT_100000_1:
 			VideoFormatChange(fSourceWidth, fSourceHeight, 1.0, 1.0);
@@ -1103,18 +1147,7 @@ MainWin::MessageReceived(BMessage *msg)
 		case M_ASPECT_544_576:
 			VideoFormatChange(544, 576, 1.41176, 1.0);
 			break;
-
-		case M_SCALE_TO_NATIVE_SIZE:
-			printf("M_SCALE_TO_NATIVE_SIZE\n");
-			if (fIsFullscreen) {
-				ToggleFullscreen();
-			}
-			ResizeTo(int(fSourceWidth * fWidthScale), 
-					 int(fSourceHeight * fHeightScale) + (fNoMenu ? 0 : fMenuBarHeight));
-//			Sync();
-			break;
-
-		
+/*
 		case M_PREFERENCES:
 			break;
 			

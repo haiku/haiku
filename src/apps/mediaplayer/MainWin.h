@@ -52,6 +52,7 @@ public:
 	void				SetupWindow();
 	void				SetupTrackMenus();
 	void				SetWindowSizeLimits();
+	void				ResizeWindow(float percent);
 	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
@@ -59,9 +60,6 @@ public:
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
 
 	void				UpdateWindowTitle();
-	
-	void				AdjustFullscreenRenderer();
-	void 				AdjustWindowedRenderer(bool user_resized);
 	
 	void				ToggleFullscreen();
 	void				ToggleKeepAspectRatio();
