@@ -361,6 +361,12 @@ namespace agg
             m_prev_glyph = m_last_glyph = 0;
         }
 
+        //--------------------------------------------------------------------
+        void reset()
+        {
+        	m_prev_glyph = m_last_glyph = 0;
+        }
+
     private:
         //--------------------------------------------------------------------
         font_cache_manager(const self_type&);
