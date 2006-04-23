@@ -1501,14 +1501,21 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<int32>(&resizingMode);
 			status_t status = link.Read<int32>(&options);
 
+			rgb_color colorKey = {0};
+
 			if (status == B_OK) {
 				ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
 				if (bitmapToken == -1 || bitmap != NULL) {
+					// TODO: this is a race condition: the bitmap could have been
+					//	deleted in the mean time!!
 					fCurrentLayer->SetViewBitmap(bitmap, srcRect, dstRect,
 						resizingMode, options);
 
 					BRegion dirty(fCurrentLayer->Bounds());
 					fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+
+					if (bitmap != NULL && bitmap->OverlayCookie() != NULL)
+						colorKey = bitmap->OverlayCookie()->Color().GetColor32();
 				} else
 					status = B_BAD_VALUE;
 			}
@@ -1516,8 +1523,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fLink.StartMessage(status);
 			if (status == B_OK && (options & AS_REQUEST_COLOR_KEY) != 0) {
 				// Attach color key for the overlay bitmap
-				// TODO: get color key from the accelerant
-				rgb_color colorKey = {40, 40, 40, 255};
 				fLink.Attach<rgb_color>(colorKey);
 			}
 

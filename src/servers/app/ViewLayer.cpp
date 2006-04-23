@@ -37,6 +37,38 @@
 using std::nothrow;
 
 
+void
+resize_frame(BRect& frame, uint32 resizingMode, int32 x, int32 y)
+{
+	// follow with left side
+	if ((resizingMode & 0x0F00U) == _VIEW_RIGHT_ << 8)
+		frame.left += x;
+	else if ((resizingMode & 0x0F00U) == _VIEW_CENTER_ << 8)
+		frame.left += x / 2;
+
+	// follow with right side
+	if ((resizingMode & 0x000FU) == _VIEW_RIGHT_)
+		frame.right += x;
+	else if ((resizingMode & 0x000FU) == _VIEW_CENTER_)
+		frame.right += x / 2;
+
+	// follow with top side
+	if ((resizingMode & 0xF000U) == _VIEW_BOTTOM_ << 12)
+		frame.top += y;
+	else if ((resizingMode & 0xF000U) == _VIEW_CENTER_ << 12)
+		frame.top += y / 2;
+
+	// follow with bottom side
+	if ((resizingMode & 0x00F0U) == _VIEW_BOTTOM_ << 4)
+		frame.bottom += y;
+	else if ((resizingMode & 0x00F0U) == _VIEW_CENTER_ << 4)
+		frame.bottom += y / 2;
+}
+
+
+//	#pragma mark -
+
+
 ViewLayer::ViewLayer(BRect frame, BPoint scrollingOffset, const char* name,
 		int32 token, uint32 resizeMode, uint32 flags)
 	:
@@ -417,8 +449,18 @@ void
 ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 	BRect destRect, int32 resizingMode, int32 options)
 {
-	if (fViewBitmap != NULL)
+	if (fViewBitmap != NULL) {
+		if (bitmap != NULL) {
+			// take over overlay token from current overlay (if it has any)
+			OverlayCookie* oldOverlay = _Overlay();
+			OverlayCookie* newOverlay = bitmap->OverlayCookie();
+
+			if (oldOverlay != NULL && newOverlay != NULL)
+				newOverlay->TakeOverToken(oldOverlay);
+		}
+
 		gBitmapManager->DeleteBitmap(fViewBitmap);
+	}
 
 	// the caller is allowed to delete the bitmap after setting the background
 	if (bitmap != NULL)
@@ -436,6 +478,32 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 								roundf(fBitmapDestination.top));
 	fBitmapDestination.right = roundf(fBitmapDestination.right);
 	fBitmapDestination.bottom = roundf(fBitmapDestination.bottom);
+
+	_UpdateOverlayView();
+}
+
+
+OverlayCookie*
+ViewLayer::_Overlay() const
+{
+	if (fViewBitmap == NULL)
+		return NULL;
+
+	return fViewBitmap->OverlayCookie();
+}
+
+
+void
+ViewLayer::_UpdateOverlayView() const
+{
+	OverlayCookie* overlay = _Overlay();
+	if (overlay == NULL)
+		return;
+
+	BRect destination = fBitmapDestination;
+	ConvertToScreen(&destination);
+
+	overlay->SetView(fBitmapSource, destination);
 }
 
 
@@ -680,6 +748,9 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 		// the screen clipping
 		InvalidateScreenClipping(true);
 	}
+
+	// overlay handling
+	_UpdateOverlayView();
 }
 
 // ResizeBy
@@ -734,43 +805,26 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->ParentResized(x, y, dirtyRegion);
 
+	// view bitmap
+
+	resize_frame(fBitmapDestination, fBitmapResizingMode, x, y);
+
 	// at this point, children are at their new locations,
 	// so we can rebuild the clipping
 	// TODO: when the implementation of Hide() and Show() is
 	// complete, see if this should be avoided
 	RebuildClipping(false);
+
+	// overlay handling
+	_UpdateOverlayView();
 }
 
 // ParentResized
 void
 ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 {
-	uint16 rm = fResizeMode & 0x0000FFFF;
 	BRect newFrame = fFrame;
-
-	// follow with left side
-	if ((rm & 0x0F00U) == _VIEW_RIGHT_ << 8)
-		newFrame.left += x;
-	else if ((rm & 0x0F00U) == _VIEW_CENTER_ << 8)
-		newFrame.left += x / 2;
-
-	// follow with right side
-	if ((rm & 0x000FU) == _VIEW_RIGHT_)
-		newFrame.right += x;
-	else if ((rm & 0x000FU) == _VIEW_CENTER_)
-		newFrame.right += x / 2;
-
-	// follow with top side
-	if ((rm & 0xF000U) == _VIEW_BOTTOM_ << 12)
-		newFrame.top += y;
-	else if ((rm & 0xF000U) == _VIEW_CENTER_ << 12)
-		newFrame.top += y / 2;
-
-	// follow with bottom side
-	if ((rm & 0x00F0U) == _VIEW_BOTTOM_ << 4)
-		newFrame.bottom += y;
-	else if ((rm & 0x00F0U) == _VIEW_CENTER_ << 4)
-		newFrame.bottom += y / 2;
+	resize_frame(newFrame, fResizeMode & 0x0000ffff, x, y);
 
 	if (newFrame != fFrame) {
 		// careful, MoveBy will change fFrame
@@ -978,9 +1032,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 		// add the current clipping
 		redraw->IntersectWith(effectiveClipping);
 
-		OverlayCookie* overlayCookie = NULL;
-		if (fViewBitmap != NULL)
-			overlayCookie = fViewBitmap->OverlayCookie();
+		OverlayCookie* overlayCookie = _Overlay();
 
 		if (fViewBitmap != NULL && overlayCookie == NULL) {
 			// draw view bitmap
@@ -1064,14 +1116,13 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 		}
 
-		if (overlayCookie != NULL) {
-			drawingEngine->FillRegion(*redraw, overlayCookie->Color());
-		} else if (!fViewColor.IsTransparentMagic()) {
+		if (!fViewColor.IsTransparentMagic()) {
 			// fill visible region with view color,
 			// this version of FillRegion ignores any
 			// clipping, that's why "redraw" needs to
 			// be correct
-			drawingEngine->FillRegion(*redraw, fViewColor);
+			drawingEngine->FillRegion(*redraw, overlayCookie != NULL
+				? overlayCookie->Color() : fViewColor);
 		}
 
 		fWindow->RecycleRegion(redraw);
@@ -1160,6 +1211,17 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 	fVisible = parentVisible && !fHidden;
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->UpdateVisibleDeep(fVisible);
+
+	// overlay handling
+
+	OverlayCookie* overlay = _Overlay();
+	if (overlay == NULL)
+		return;
+
+	if (fVisible && !overlay->IsVisible())
+		overlay->Show();
+	else if (!fVisible && overlay->IsVisible())
+		overlay->Hide();
 }
 
 // MarkBackgroundDirty

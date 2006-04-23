@@ -2564,7 +2564,7 @@ ServerApp::FindBitmap(int32 token) const
 	ServerBitmap* bitmap;
 	if (gTokenSpace.GetToken(token, kBitmapToken, (void**)&bitmap) == B_OK)
 		return bitmap;
-	
+
 	return NULL;
 }
 

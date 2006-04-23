@@ -19,6 +19,7 @@
 #include <Region.h>
 
 
+class OverlayCookie;
 class RenderingBuffer;
 class RGBColor;
 class ServerBitmap;
@@ -105,6 +106,10 @@ class HWInterface : public MultiLocker {
 	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
 									color_space space);
 	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
+
+	virtual void				ShowOverlay(OverlayCookie* overlay);
+	virtual void				HideOverlay(OverlayCookie* overlay);
+	virtual void				UpdateOverlay(OverlayCookie* overlay);
 
 	// frame buffer access (you need to ReadLock!)
 			RenderingBuffer*	DrawingBuffer() const;

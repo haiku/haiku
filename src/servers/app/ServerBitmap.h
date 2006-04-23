@@ -150,6 +150,7 @@ class OverlayCookie {
 
 		void SetOverlayData(const overlay_buffer* overlayBuffer,
 			overlay_token token, overlay_client_data* clientData);
+		void TakeOverToken(OverlayCookie* other);
 
 		const overlay_buffer* OverlayBuffer() const;
 		overlay_client_data* ClientData() const;
@@ -161,6 +162,20 @@ class OverlayCookie {
 		const RGBColor& Color() const
 			{ return fColor; }
 
+		void SetVisible(bool visible)
+			{ fVisible = visible; }
+		bool IsVisible() const
+			{ return fVisible; }
+
+		void SetView(const BRect& source, const BRect& destination);
+		const BRect& Source() const
+			{ return fSource; }
+		const BRect& Destination() const
+			{ return fDestination; }
+
+		void Show();
+		void Hide();
+
 	private:
 		HWInterface&			fHWInterface;
 		const overlay_buffer*	fOverlayBuffer;
@@ -168,6 +183,9 @@ class OverlayCookie {
 		overlay_token			fOverlayToken;
 		sem_id					fSemaphore;
 		RGBColor				fColor;
+		BRect					fSource;
+		BRect					fDestination;
+		bool					fVisible;
 };
 
 // ShallowCopy (only for server bitmaps)

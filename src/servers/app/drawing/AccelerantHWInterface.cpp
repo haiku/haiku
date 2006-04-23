@@ -761,6 +761,57 @@ AccelerantHWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 }
 
 
+void
+AccelerantHWInterface::ShowOverlay(OverlayCookie* overlay)
+{
+	UpdateOverlay(overlay);
+}
+
+
+void
+AccelerantHWInterface::HideOverlay(OverlayCookie* overlay)
+{
+	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(), NULL, NULL);
+}
+
+
+void
+AccelerantHWInterface::UpdateOverlay(OverlayCookie* overlay)
+{
+	const overlay_buffer* buffer = overlay->OverlayBuffer();
+
+	overlay_view view;
+	view.h_start = (uint16)overlay->Source().left;
+	view.v_start = (uint16)overlay->Source().top;
+	view.width = (uint16)overlay->Source().IntegerWidth() + 1;
+	view.height = (uint16)overlay->Source().IntegerHeight() + 1;
+
+	overlay_window window;
+	window.h_start = (int16)overlay->Destination().left;
+	window.v_start = (int16)overlay->Destination().top;
+	window.width = (uint16)overlay->Destination().IntegerWidth() + 1;
+	window.height = (uint16)overlay->Destination().IntegerHeight() + 1;
+
+	window.offset_top = 0;
+	window.offset_left = 0;
+	window.offset_right = 0;
+	window.offset_bottom = 0;
+
+	// TODO: for now, this should be done somewhere else, ideally
+	rgb_color colorKey = overlay->Color().GetColor32();
+	window.red.value = colorKey.red;
+	window.green.value = colorKey.green;
+	window.blue.value = colorKey.blue;
+	window.alpha.value = colorKey.alpha;
+	window.red.mask = 0xff;
+	window.green.mask = 0xff;
+	window.blue.mask = 0xff;
+	window.alpha.mask = 0xff;
+
+	fAccConfigureOverlay(overlay->OverlayToken(), buffer, &window, &view);
+}
+
+
 // CopyRegion
 void
 AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,

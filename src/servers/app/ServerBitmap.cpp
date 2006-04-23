@@ -375,8 +375,8 @@ OverlayCookie::OverlayCookie(HWInterface& interface)
 	fOverlayToken(NULL)
 {
 	fSemaphore = create_sem(1, "overlay lock");
-	fColor.SetColor(255, 0, 255);
-		// that color is just for testing, of course!
+	fColor.SetColor(21, 16, 21, 16);
+		// TODO: whatever fine color we want to use here...
 }
 
 
@@ -409,6 +409,18 @@ OverlayCookie::SetOverlayData(const overlay_buffer* overlayBuffer,
 }
 
 
+void
+OverlayCookie::TakeOverToken(OverlayCookie* other)
+{
+	overlay_token token = other->OverlayToken();
+	if (token == NULL)
+		return;
+
+	fOverlayToken = token;
+	//other->fOverlayToken = NULL;
+}
+
+
 const overlay_buffer*
 OverlayCookie::OverlayBuffer() const
 {
@@ -427,5 +439,46 @@ overlay_token
 OverlayCookie::OverlayToken() const
 {
 	return fOverlayToken;
+}
+
+
+void
+OverlayCookie::Show()
+{
+	// TODO: acquire token!
+	if (fOverlayToken == NULL) {
+		printf("%p: no overlay token\n", this);
+		return;
+	}
+
+	fHWInterface.ShowOverlay(this);
+}
+
+
+void
+OverlayCookie::Hide()
+{
+	// TODO: acquire token!
+	if (fOverlayToken == NULL) {
+		printf("%p: no overlay token\n", this);
+		return;
+	}
+
+	fHWInterface.HideOverlay(this);
+}
+
+
+void
+OverlayCookie::SetView(const BRect& source, const BRect& destination)
+{
+	fSource = source;
+	fDestination = destination;
+
+	if (fOverlayToken == NULL) {
+		printf("%p: no overlay token\n", this);
+		return;
+	}
+
+	fHWInterface.UpdateOverlay(this);
 }
 

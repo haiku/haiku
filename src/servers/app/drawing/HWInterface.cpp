@@ -335,6 +335,24 @@ HWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 }
 
 
+void
+HWInterface::ShowOverlay(OverlayCookie* overlay)
+{
+}
+
+
+void
+HWInterface::HideOverlay(OverlayCookie* overlay)
+{
+}
+
+
+void
+HWInterface::UpdateOverlay(OverlayCookie* overlay)
+{
+}
+
+
 // HideSoftwareCursor
 bool
 HWInterface::HideSoftwareCursor(const BRect& area)

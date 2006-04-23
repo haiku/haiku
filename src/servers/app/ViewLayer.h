@@ -26,6 +26,7 @@ namespace BPrivate {
 
 class DrawState;
 class DrawingEngine;
+class OverlayCookie;
 class WindowLayer;
 class ServerBitmap;
 class ServerCursor;
@@ -208,6 +209,8 @@ class ViewLayer {
 	protected:
 			void			_MoveScreenClipping(int32 x, int32 y,
 												bool deep);
+			OverlayCookie*	_Overlay() const;
+			void			_UpdateOverlayView() const;
 
 			BString			fName;
 			int32			fToken;
