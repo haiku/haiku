@@ -8,40 +8,34 @@
  */
 
 
-#include <BeBuild.h>
-#include <InterfaceDefs.h>
-#include <PropertyInfo.h>
-#include <Handler.h>
-#include <View.h>
-#include <Window.h>
-#include <Message.h>
-#include <MessageQueue.h>
-#include <Rect.h>
-#include <Point.h>
-#include <Region.h>
-#include <Font.h>
-#include <ScrollBar.h>
-#include <Cursor.h>
-#include <Bitmap.h>
-#include <Picture.h>
-#include <Polygon.h>
-#include <Shape.h>
-#include <Button.h>
-#include <Shelf.h>
-#include <MenuBar.h>
-#include <String.h>
-#include <SupportDefs.h>
-#include <Application.h>
-
 #include <AppMisc.h>
-#include <ViewAux.h>
-#include <TokenSpace.h>
+#include <AppServerLink.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
-#include <AppServerLink.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
+#include <TokenSpace.h>
+#include <ViewPrivate.h>
 
+#include <Application.h>
+#include <Bitmap.h>
+#include <Button.h>
+#include <Cursor.h>
+#include <InterfaceDefs.h>
+#include <Message.h>
+#include <MessageQueue.h>
+#include <Picture.h>
+#include <Point.h>
+#include <Polygon.h>
+#include <PropertyInfo.h>
+#include <Region.h>
+#include <ScrollBar.h>
+#include <Shape.h>
+#include <Shelf.h>
+#include <String.h>
+#include <View.h>
+#include <Window.h>
+#include <MenuBar.h>
 
 #include <math.h>
 #include <new>

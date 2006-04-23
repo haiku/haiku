@@ -1,7 +1,17 @@
-#ifndef _VIEWAUX_H_
-#define _VIEWAUX_H_
+/*
+ * Copyright 2003-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrian Oanca <adioanca@cotty.iren.ro>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+#ifndef VIEW_PRIVATE_H
+#define VIEW_PRIVATE_H
 
-#include <BeBuild.h>
+
+#include <PortLink.h>
+
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
@@ -11,11 +21,11 @@
 const static uint32 kDeleteDragger = 'JAHA';
 
 struct shape_data {
-	uint32	*opList;
+	uint32*	opList;
 	int32	opCount;
 	int32	opSize;
 	int32	opBlockSize;
-	BPoint	*ptList;
+	BPoint*	ptList;
 	int32	ptCount;
 	int32	ptSize;
 	int32	ptBlockSize;
@@ -133,4 +143,4 @@ struct _array_data_{
 	_array_hdr_*	array;
 };
 
-#endif	/* _VIEWAUX_H_ */
+#endif	/* VIEW_PRIVATE_H */

@@ -44,7 +44,6 @@
 #include <MessagePrivate.h>
 #include <PictureProtocol.h>
 #include <PortLink.h>
-#include <ViewAux.h>
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
 
@@ -2130,7 +2129,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			// Attached Data:
 			// 1) int32 Number of lines in the array
-			// 2) array of struct _array_data_ objects, as defined in ViewAux.h
+			// 2) LineArrayData
 
 			int32 lineCount;
 
