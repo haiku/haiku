@@ -28,11 +28,15 @@ class MainApp : public BApplication
 public:
 					MainApp();
 					~MainApp();
-	status_t		InitPrefs();					
+
 	BWindow *		NewWindow();
 
-private:	
-	BWindow *		fMainWindow;
+private:
+	void			RefsReceived(BMessage *msg);
+	void			ArgvReceived(int32 argc, char **argv);
+
+private:
+	BWindow *		fFirstWindow;
 };
 
 extern MainApp *gMainApp;

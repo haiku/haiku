@@ -21,8 +21,7 @@
 #define __VIDEO_VIEW_H
 
 #include <View.h>
-
-class VideoNode;
+#include "Controller.h"
 
 class VideoView : public BView
 {
@@ -33,8 +32,6 @@ public:
 	void			RemoveVideoDisplay();
 	void			RemoveOverlay();
 					
-	VideoNode *		Node();
-
 	bool			IsOverlaySupported();
 
 	void			OverlayLockAcquire();
@@ -51,7 +48,7 @@ private:
 	void			Draw(BRect updateRect);
 	
 private:
-	VideoNode *		fVideoNode;
+	Controller *	fController;
 	bool			fOverlayActive;
 	rgb_color		fOverlayKeyColor;
 };

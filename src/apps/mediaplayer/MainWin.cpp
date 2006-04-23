@@ -19,9 +19,6 @@
  */
 #include "MainWin.h"
 #include "MainApp.h"
-#include "Controller.h"
-#include "config.h"
-#include "DeviceRoster.h"
 
 #include <View.h>
 #include <Screen.h>
@@ -36,12 +33,22 @@
 #include <PopUpMenu.h>
 #include <String.h>
 
+#define NAME "MediaPlayer"
+
 enum 
 {
 	M_DUMMY = 0x100,
-	M_CHECK_TB,
+	M_FILE_OPEN = 0x1000,
+	M_FILE_NEWPLAYER,
+	M_FILE_INFO,
 	M_FILE_ABOUT,
+	M_FILE_CLOSE,
 	M_FILE_QUIT,	
+	M_VIEW_50,
+	M_VIEW_100,
+	M_VIEW_200,
+	M_VIEW_300,
+	M_VIEW_400,
 	M_SCALE_TO_NATIVE_SIZE,
 	M_TOGGLE_FULLSCREEN,
 	M_TOGGLE_NO_BORDER,
@@ -50,10 +57,10 @@ enum
 	M_TOGGLE_ALWAYS_ON_TOP,
 	M_TOGGLE_KEEP_ASPECT_RATIO,
 	M_PREFERENCES,
-	M_CHANNEL_NEXT,
-	M_CHANNEL_PREV,
 	M_VOLUME_UP,
 	M_VOLUME_DOWN,
+	M_CHANNEL_NEXT,
+	M_CHANNEL_PREV,
 	M_ASPECT_100000_1,
 	M_ASPECT_106666_1,
 	M_ASPECT_109091_1,
@@ -61,17 +68,20 @@ enum
 	M_ASPECT_720_576,
 	M_ASPECT_704_576,
 	M_ASPECT_544_576,
-	M_SELECT_INTERFACE		= 0x00000800,
-	M_SELECT_INTERFACE_END	= 0x00000fff,
-	M_SELECT_CHANNEL		= 0x00010000,
-	M_SELECT_CHANNEL_END	= 0x000fffff, // this limits possible channel count to 0xeffff = 983039
+	M_SELECT_AUDIO_TRACK		= 0x00000800,
+	M_SELECT_AUDIO_TRACK_END	= 0x00000fff,
+	M_SELECT_VIDEO_TRACK		= 0x00010000,
+	M_SELECT_VIDEO_TRACK_END	= 0x000fffff,
 };
 
 //#define printf(a...)
 
 
-MainWin::MainWin(BRect frame_rect)
- :	BWindow(frame_rect, NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
+MainWin::MainWin()
+ :	BWindow(BRect(200,200,0,0), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
+ ,  fFilePanel(NULL)
+ ,	fHasFile(false)
+ ,	fHasVideo(false)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
  ,	fKeepAspectRatio(true)
@@ -117,25 +127,59 @@ MainWin::MainWin(BRect frame_rect)
 	SetSizeLimits(0, 32767, fMenuBarHeight - 1, 32767);
 	
 	fController->SetVideoView(fVideoView);
-	fController->SetVideoNode(fVideoView->Node());
 	
 	fVideoView->IsOverlaySupported();
 
-	SetupInterfaceMenu();
-	SelectInitialInterface();
-	SetInterfaceMenuMarker();
-	SetupChannelMenu();
-	SetChannelMenuMarker();
-
 	VideoFormatChange(fSourceWidth, fSourceHeight, fWidthScale, fHeightScale);
+	
+	Show();
 }
 
 
 MainWin::~MainWin()
 {
 	printf("MainWin::~MainWin\n");
-	fController->DisconnectInterface();
 	delete fController;
+	delete fFilePanel;
+}
+
+
+void
+MainWin::OpenFile(const entry_ref &ref)
+{
+	printf("MainWin::OpenFile\n");
+
+	status_t err = fController->SetTo(ref);
+	if (err != B_OK) {
+		char s[300];
+		sprintf(s, "Can't open file\n\n%s\n\nError 0x%08lx\n(%s)\n",
+			ref.name, err, strerror(err));
+		(new BAlert("error", s, "OK"))->Go();
+		fHasFile = false;
+		fHasVideo = false;
+		SetTitle(NAME);
+	} else {
+		fHasFile = true;
+		fHasVideo = fController->VideoTrackCount() != 0;
+		SetTitle(ref.name);
+	}
+	SetupWindow();
+}
+
+void
+MainWin::SetupWindow()
+{
+	printf("MainWin::SetupWindow\n");	
+
+	// Pupulate the track menus
+	SetupTrackMenus();
+	// Enable both if a file was loaded
+	fAudioMenu->SetEnabled(fHasFile);
+	fVideoMenu->SetEnabled(fHasFile);
+	// Select first track (might be "none") in both
+	fAudioMenu->ItemAt(0)->SetMarked(true);
+	fVideoMenu->ItemAt(0)->SetMarked(true);
+	
 }
 
 
@@ -143,22 +187,39 @@ void
 MainWin::CreateMenu()
 {
 	fFileMenu = new BMenu(NAME);
-	fChannelMenu = new BMenu("Channel");
-	fInterfaceMenu = new BMenu("Interface");
+	fViewMenu = new BMenu("View");
 	fSettingsMenu = new BMenu("Settings");
+	fAudioMenu = new BMenu("Audio Track");
+	fVideoMenu = new BMenu("Video Track");
 	fDebugMenu = new BMenu("Debug");
 
 	fMenuBar->AddItem(fFileMenu);
-	fMenuBar->AddItem(fChannelMenu);
-	fMenuBar->AddItem(fInterfaceMenu);
+	fMenuBar->AddItem(fViewMenu);
 	fMenuBar->AddItem(fSettingsMenu);
 	fMenuBar->AddItem(fDebugMenu);
 	
+	fFileMenu->AddItem(new BMenuItem("New Player", new BMessage(M_FILE_NEWPLAYER), 'N', B_COMMAND_KEY));
+	fFileMenu->AddSeparatorItem();
+	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS, new BMessage(M_FILE_OPEN), 'O', B_COMMAND_KEY));
+	fFileMenu->AddItem(new BMenuItem("File Info"B_UTF8_ELLIPSIS, new BMessage(M_FILE_INFO), 'I', B_COMMAND_KEY));
+	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("About", new BMessage(M_FILE_ABOUT), 'A', B_COMMAND_KEY));
 	fFileMenu->AddSeparatorItem();
+	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
+	fViewMenu->AddItem(new BMenuItem("50% scale", new BMessage(M_VIEW_50), '0', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("100% scale", new BMessage(M_VIEW_100), '1', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("200% scale", new BMessage(M_VIEW_200), '2', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("300% scale", new BMessage(M_VIEW_300), '3', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("400% scale", new BMessage(M_VIEW_400), '4', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
+	fViewMenu->SetRadioMode(true);
+	fViewMenu->AddSeparatorItem();
+	fViewMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 
+	fSettingsMenu->AddItem(fAudioMenu);
+	fSettingsMenu->AddItem(fVideoMenu);
 	fSettingsMenu->AddItem(new BMenuItem("Scale to native size", new BMessage(M_SCALE_TO_NATIVE_SIZE), 'N', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
 	fSettingsMenu->AddSeparatorItem();
@@ -177,14 +238,43 @@ MainWin::CreateMenu()
 	fDebugMenu->AddItem(new BMenuItem("force 704 x 576, display aspect 4:3", new BMessage(M_ASPECT_704_576)));
 	fDebugMenu->AddItem(new BMenuItem("force 544 x 576, display aspect 4:3", new BMessage(M_ASPECT_544_576)));
 
-	fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
-	fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
-	fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
-	fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
-	fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
-	fSettingsMenu->ItemAt(8)->SetEnabled(false); // XXX disable unused preference menu
+	fAudioMenu->SetRadioMode(true);
+	fVideoMenu->SetRadioMode(true);
+	
+	fSettingsMenu->ItemAt(3)->SetMarked(fIsFullscreen);
+	fSettingsMenu->ItemAt(5)->SetMarked(fNoMenu);
+	fSettingsMenu->ItemAt(6)->SetMarked(fNoBorder);
+	fSettingsMenu->ItemAt(7)->SetMarked(fAlwaysOnTop);
+	fSettingsMenu->ItemAt(8)->SetMarked(fKeepAspectRatio);
+	fSettingsMenu->ItemAt(10)->SetEnabled(false); // XXX disable unused preference menu
 }
 
+
+void
+MainWin::SetupTrackMenus()
+{
+	fAudioMenu->RemoveItems(0, fAudioMenu->CountItems(), true);
+	fVideoMenu->RemoveItems(0, fVideoMenu->CountItems(), true);
+	
+	int c, i;
+	char s[100];
+	
+	c = fController->AudioTrackCount();
+	for (i = 0; i < c; i++) {
+		sprintf(s, "Track %d", i + 1);
+		fAudioMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_AUDIO_TRACK + i)));
+	}
+	if (!c)
+		fAudioMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+
+	c = fController->VideoTrackCount();
+	for (i = 0; i < c; i++) {
+		sprintf(s, "Track %d", i + 1);
+		fVideoMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_VIDEO_TRACK + i)));
+	}
+	if (!c)
+		fVideoMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+}
 
 
 bool
@@ -666,6 +756,32 @@ MainWin::ToggleKeepAspectRatio()
 }
 
 
+void
+MainWin::RefsReceived(BMessage *msg)
+{
+	printf("MainWin::RefsReceived\n");
+	// the first file is played in this window,
+	// if additional files (refs) are included,
+	// more windows are launched
+	
+	entry_ref ref;
+	int n = 0;
+	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
+		BEntry entry(&ref, true);
+		if (!entry.Exists() || !entry.IsFile())
+			continue;
+		if (n == 0) {
+			OpenFile(ref);
+		} else {
+			BMessage m(B_REFS_RECEIVED);
+			m.AddRef("refs", &ref);
+			gMainApp->NewWindow()->PostMessage(&m);
+		}
+		n++;
+	}
+}
+
+
 /* Trap keys that are about to be send to background or renderer view.
  * Return B_OK if it shouldn't be passed to the view
  */
@@ -824,6 +940,27 @@ void
 MainWin::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case B_REFS_RECEIVED:
+			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
+			RefsReceived(msg);
+			break;
+		case B_SIMPLE_DATA:
+			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
+			if (msg->HasRef("refs"))
+				RefsReceived(msg);
+			break;
+		case M_FILE_OPEN:
+		{
+			if (!fFilePanel) {
+				fFilePanel = new BFilePanel();
+				fFilePanel->SetTarget(BMessenger(0, this));
+				fFilePanel->SetPanelDirectory("/boot/home/");
+			}
+			fFilePanel->Show();
+			break;
+		}
+/*
+		
 		case B_ACQUIRE_OVERLAY_LOCK:
 			printf("B_ACQUIRE_OVERLAY_LOCK\n");
 			fVideoView->OverlayLockAcquire();
@@ -990,5 +1127,6 @@ MainWin::MessageReceived(BMessage *msg)
 				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
 				break;
 			}
+*/			
 	}
 }

@@ -17,39 +17,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+#include <Message.h>
 #include <Bitmap.h>
-#include <MediaRoster.h>
 #include "VideoView.h"
-#include "VideoNode.h"
 
 #include <stdio.h>
 #include <string.h>
 
 VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
  :	BView(frame, name, resizeMask, flags)
- ,	fVideoNode(0)
+ ,	fController(NULL)
  ,	fOverlayActive(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-
-	status_t err = B_OK;
-	BMediaRoster *mroster = BMediaRoster::Roster(&err);
-	if (!mroster || err) {
-		printf("VideoView::VideoView: media_server is dead\n");
-		exit(1);
-	} else {
-		fVideoNode = new VideoNode("video in", this);
-		err = mroster->RegisterNode(fVideoNode);
-	}
 }
 
 
 VideoView::~VideoView()
 {	
-	if (fVideoNode) {
-		BMediaRoster::Roster()->UnregisterNode(fVideoNode);
-		delete fVideoNode;
-	}
 }
 
 
@@ -57,14 +42,6 @@ void
 VideoView::AttachedToWindow()
 {
 }	
-
-
-VideoNode *
-VideoView::Node()
-{
-	return fVideoNode;
-}
-
 
 void
 VideoView::OverlayLockAcquire()
@@ -86,9 +63,9 @@ VideoView::OverlayScreenshotPrepare()
 {
 	printf("OverlayScreenshotPrepare enter\n");
 /*
-	fVideoNode->LockBitmap();
+	fController->LockBitmap();
 	if (fOverlayActive) {
-		BBitmap *bmp = fVideoNode->Bitmap();
+		BBitmap *bmp = fController->Bitmap();
 		if (bmp) {
 //			Window()->UpdateIfNeeded();
 //			Sync();
@@ -100,7 +77,7 @@ VideoView::OverlayScreenshotPrepare()
 //			Sync();
 		}
 	}
-	fVideoNode->UnlockBitmap();
+	fController->UnlockBitmap();
 */
 	printf("OverlayScreenshotPrepare leave\n");
 }
@@ -112,9 +89,9 @@ VideoView::OverlayScreenshotCleanup()
 	printf("OverlayScreenshotCleanup enter\n");
 /*
 	snooze(50000); // give app server some time to take the screenshot
-	fVideoNode->LockBitmap();
+	fController->LockBitmap();
 	if (fOverlayActive) {
-		BBitmap *bmp = fVideoNode->Bitmap();
+		BBitmap *bmp = fController->Bitmap();
 		if (bmp) {
 			DrawBitmap(bmp, Bounds());
 			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &fOverlayKeyColor,
@@ -122,7 +99,7 @@ VideoView::OverlayScreenshotCleanup()
 			Invalidate();
 		}
 	}
-	fVideoNode->UnlockBitmap();
+	fController->UnlockBitmap();
 */
 	printf("OverlayScreenshotCleanup leave\n");
 }
@@ -160,11 +137,11 @@ VideoView::Draw(BRect updateRect)
 		SetHighColor(fOverlayKeyColor);
 		FillRect(updateRect);
 	} else {
-		fVideoNode->LockBitmap();
-		BBitmap *bmp = fVideoNode->Bitmap();
+		fController->LockBitmap();
+		BBitmap *bmp = fController->Bitmap();
 		if (bmp)
 			DrawBitmap(bmp, Bounds());
-		fVideoNode->UnlockBitmap();
+		fController->UnlockBitmap();
 	}
 }
 
@@ -174,7 +151,7 @@ VideoView::DrawFrame()
 {
 //	printf("VideoView::DrawFrame\n");
 	
-	bool want_overlay = fVideoNode->IsOverlayActive();
+	bool want_overlay = fController->IsOverlayActive();
 
 	if (!want_overlay && fOverlayActive) {
 		if (LockLooperWithTimeout(50000) == B_OK) {
@@ -186,8 +163,8 @@ VideoView::DrawFrame()
 		}
 	}
 	if (want_overlay && !fOverlayActive) {
-		fVideoNode->LockBitmap();
-		BBitmap *bmp = fVideoNode->Bitmap();
+		fController->LockBitmap();
+		BBitmap *bmp = 0; // fController->Bitmap();
 		if (bmp && LockLooperWithTimeout(50000) == B_OK) {
 			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &fOverlayKeyColor,
 				B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
@@ -196,7 +173,7 @@ VideoView::DrawFrame()
 			Invalidate();
 			UnlockLooper();
 		}
-		fVideoNode->UnlockBitmap();
+		fController->UnlockBitmap();
 	}
 	if (!fOverlayActive) {
 		if (LockLooperWithTimeout(50000) != B_OK)

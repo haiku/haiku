@@ -24,17 +24,20 @@
 #include <Menu.h>
 #include <Button.h>
 #include <Slider.h>
+#include <FilePanel.h>
 #include "Controller.h"
+#include "ControllerView.h"
 #include "VideoView.h"
 
 class MainWin : public BWindow
 {
 public:
-						MainWin(BRect rect);
+						MainWin();
 						~MainWin();
 
 	void				FrameResized(float new_width, float new_height);
 	void				Zoom(BPoint rec_position, float rec_width, float rec_height);
+	void				RefsReceived(BMessage *msg);
 	void				DispatchMessage(BMessage *message, BHandler *handler);
 	void				MessageReceived(BMessage *msg);
 	bool				QuitRequested();
@@ -45,6 +48,9 @@ public:
 	status_t			KeyDown(BMessage *msg);
 
 	void				CreateMenu();
+	void				OpenFile(const entry_ref &ref);
+	void				SetupWindow();
+	void				SetupTrackMenus();
 	
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
 
@@ -65,12 +71,18 @@ public:
 	BMenuBar *			fMenuBar;
 	BView *				fBackground;
 	VideoView *			fVideoView;
+	BFilePanel *		fFilePanel;
+	ControllerView *	fControllerView;
 
 	BMenu *				fFileMenu;
-	BMenu *				fChannelMenu;
-	BMenu *				fInterfaceMenu;
+	BMenu *				fViewMenu;
+	BMenu *				fAudioMenu;
+	BMenu *				fVideoMenu;
 	BMenu *				fSettingsMenu;
 	BMenu *				fDebugMenu;
+	
+	bool				fHasFile;
+	bool				fHasVideo;
 
 	Controller *		fController;
 	volatile bool		fIsFullscreen;

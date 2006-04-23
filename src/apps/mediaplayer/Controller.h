@@ -24,34 +24,33 @@
 #include <MediaNode.h>
 
 class VideoView;
-class VideoNode;
 
 class Controller
 {
 public:
 							Controller();
 	virtual 				~Controller();
+	
+	status_t				SetTo(const entry_ref &ref);
 
 	void					SetVideoView(VideoView *view);
-	void					SetVideoNode(VideoNode *node);
+	
+	bool					IsOverlayActive();
+
+	void					LockBitmap();
+	void					UnlockBitmap();
+	BBitmap *				Bitmap();
 	
 	void					VolumeUp();
 	void					VolumeDown();
+	
+	int						VideoTrackCount();
+	int						AudioTrackCount();
 
 private:
-	status_t				ConnectNodes();
-	status_t				DisconnectNodes();
 
 private:
-	int						fCurrentInterface;
-	int						fCurrentChannel;
 	VideoView *				fVideoView;
-	VideoNode *				fVideoNode;
-	BParameterWeb *			fWeb;
-	BDiscreteParameter *	fChannelParam;
-	bool					fConnected;
-	media_input				fInput;
-	media_output			fOutput;
 };
 
 
