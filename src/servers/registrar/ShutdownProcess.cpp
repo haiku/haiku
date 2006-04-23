@@ -1751,9 +1751,13 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 		if (event == ABORT_EVENT && phase == ABORTED_PHASE && eventTeam < 0)
 			break;
 
+// This doesn't give us anything; it will just prevent us to see which
+// app was responsible after all...
+#if 0
 		// also stop when the responsible app quit
 		if ((event == APP_QUIT_EVENT) && eventTeam == team)
 			break;
+#endif
 	}
 }
 
