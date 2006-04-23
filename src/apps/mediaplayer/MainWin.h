@@ -52,6 +52,7 @@ public:
 	void				SetupWindow();
 	void				SetupTrackMenus();
 	void				SetWindowSizeLimits();
+	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
 	

@@ -33,9 +33,14 @@
 #include <PopUpMenu.h>
 #include <String.h>
 #include <Debug.h>
+#include <math.h>
 
 #define NAME "MediaPlayer"
 #define MIN_WIDTH 250
+
+
+// XXX TODO: why is lround not defined?
+#define lround(a) ((int)(0.99999 + (a)))
 
 enum 
 {
@@ -81,7 +86,7 @@ enum
 
 
 MainWin::MainWin()
- :	BWindow(BRect(200,200,450,400), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
+ :	BWindow(BRect(100,100,350,300), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,  fFilePanel(NULL)
  ,	fHasFile(false)
  ,	fHasVideo(false)
@@ -101,6 +106,10 @@ MainWin::MainWin()
  ,	fIgnoreFrameResized(false)
  ,	fFrameResizedCalled(true)
 {
+	static int pos = 0;
+	MoveBy(pos * 25, pos * 25);
+	pos = (pos + 1) % 15;
+	
 	BRect rect = Bounds();
 
 	// background
@@ -114,11 +123,11 @@ MainWin::MainWin()
 	fBackground->AddChild(fMenuBar);
 	fMenuBar->ResizeToPreferred();
 	fMenuBarHeight = (int)fMenuBar->Frame().Height() + 1;
-	fMenuBar->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+	fMenuBar->SetResizingMode(B_FOLLOW_NONE);
 
 	// video view
 	rect = BRect(0, fMenuBarHeight, fBackground->Bounds().right, fMenuBarHeight + 10);
-	fVideoView = new VideoView(rect, "video display", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	fVideoView = new VideoView(rect, "video display", B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	fBackground->AddChild(fVideoView);
 	
 	// controls
@@ -128,10 +137,10 @@ MainWin::MainWin()
 	fControls->ResizeToPreferred();
 	fControlsHeight = (int)fControls->Frame().Height() + 1;
 	fControlsWidth = (int)fControls->Frame().Width() + 1;
-	fControls->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
-	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
+	fControls->SetResizingMode(B_FOLLOW_NONE);
+//	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
 	
-	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
+//	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
 	
 	fController->SetVideoView(fVideoView);
 	fVideoView->IsOverlaySupported();
@@ -197,23 +206,18 @@ MainWin::SetupWindow()
 		fWidthScale = 1.24;
 		fHeightScale = 1.35;
 	} else {
-		fSourceWidth = 320;
-		fSourceHeight = 240;
-		fWidthScale = 1.24;
-		fHeightScale = 1.35;
+		fSourceWidth = 0;
+		fSourceHeight = 0;
+		fWidthScale = 1.0;
+		fHeightScale = 1.0;
 	}
 	
 	int video_width;
 	int video_height;
 
 	// get required window size
-	if (fHasVideo) {
-		video_width = 400;
-		video_height = 300;
-	} else {
-		video_width = 0;
-		video_height = 0;
-	}
+	video_width = lround(fSourceWidth * fWidthScale);
+	video_height = lround(fSourceHeight * fHeightScale);
 	
 	// Calculate and set the initial window size
 	int width = max_c(fControlsWidth, video_width);
@@ -502,19 +506,10 @@ MainWin::VideoFormatChange(int width, int height, float width_scale, float heigh
  	fSourceHeight = height;
  	fWidthScale   = width_scale;
  	fHeightScale  = height_scale;
-	
-/*	
-//	ResizeWindow(Bounds().Width() + 1, Bounds().Height() + 1, true);
-
-	if (fIsFullscreen) {
-		AdjustFullscreenRenderer();
-	} else {
-		AdjustWindowedRenderer(false);
-	}
-*/
+ 	
+ 	FrameResized(Bounds().Width(), Bounds().Height());
 
 	printf("VideoFormatChange leave\n");
-
 }
 
 
@@ -532,63 +527,51 @@ MainWin::FrameResized(float new_width, float new_height)
 		debugger("size wrong\n");
 	}
 	
+	bool no_menu = fNoMenu || fIsFullscreen;
+	bool no_controls = fNoControls || fIsFullscreen;
+	
 	printf("FrameResized enter: new_width %.0f, new_height %.0f\n", new_width, new_height);
 	
-	int max_video_width  = new_width + 1;
-	int max_video_height = new_height + 1;
-	if (!fNoMenu)
-		max_video_height -= fMenuBarHeight;
-	if (!fNoControls)
-		max_video_height -= fControlsHeight;
+	int max_video_width  = int(new_width) + 1;
+	int max_video_height = int(new_height) + 1 - (no_menu  ? 0 : fMenuBarHeight) - (no_controls ? 0 : fControlsHeight);
 
 	ASSERT(max_video_height >= 0);
 	
-	if (max_video_height == 0 && !fVideoView->IsHidden())
-		fVideoView->Hide();
-	if (max_video_height != 0 && fVideoView->IsHidden())
-		fVideoView->Show();
+	int y = 0;
 	
-	fVideoViewBounds = BRect(0, fNoMenu ? 0 : fMenuBarHeight, max_video_width - 1, max_video_height - 1);
-
-
-/*		
-
-
-
-return;
-	
-	printf("FrameResized enter: new_width %.0f, new_height %.0f, bounds width %.0f, bounds height %.0f\n", new_width, new_height, Bounds().Width(), Bounds().Height());
-	
-	if (fIsFullscreen) {
-
-		printf("FrameResized in fullscreen mode\n");
-
-		fIgnoreFrameResized = false;
-		AdjustFullscreenRenderer();
-
+	if (no_menu) {
+		if (!fMenuBar->IsHidden())
+			fMenuBar->Hide();
 	} else {
-	
-		if (fFrameResizedTriggeredAutomatically) {
-			fFrameResizedTriggeredAutomatically = false;
-			printf("FrameResized triggered automatically\n");
-
-			fIgnoreFrameResized = false;
-		
-			AdjustWindowedRenderer(false);
-		} else {
-			printf("FrameResized by user in window mode\n");
-
-			if (fIgnoreFrameResized) {
-				fIgnoreFrameResized = false;
-				printf("FrameResized ignored\n");
-				return;
-			}
-
-			AdjustWindowedRenderer(true);
-		}
-
+//		fMenuBar->MoveTo(0, y);
+		fMenuBar->ResizeTo(new_width, fMenuBarHeight - 1);
+		if (fMenuBar->IsHidden())
+			fMenuBar->Show();
+		y += fMenuBarHeight;
 	}
-*/
+	
+	if (max_video_height == 0) {
+		if (!fVideoView->IsHidden())
+			fVideoView->Hide();
+	} else {
+//		fVideoView->MoveTo(0, y);
+//		fVideoView->ResizeTo(max_video_width - 1, max_video_height - 1);
+		ResizeVideoView(0, y, max_video_width, max_video_height);
+		if (fVideoView->IsHidden())
+			fVideoView->Show();
+		y += max_video_height;
+	}
+	
+	if (no_controls) {
+		if (!fControls->IsHidden())
+			fControls->Hide();
+	} else {
+		fControls->MoveTo(0, y);
+		fControls->ResizeTo(new_width, fControlsHeight - 1);
+		if (fControls->IsHidden())
+			fControls->Show();
+//		y += fControlsHeight;
+	}
 
 	printf("FrameResized leave\n");
 }
@@ -608,94 +591,37 @@ MainWin::UpdateWindowTitle()
 	SetTitle(buf);
 }
 
-/*
-void
-MainWin::AdjustFullscreenRenderer()
-{
-	// n.b. we don't have a menu in fullscreen mode!
 
+void
+MainWin::ResizeVideoView(int x, int y, int width, int height)
+{
+	printf("ResizeVideoView: %d,%d, width %d, height %d\n", x, y, width, height);
+	
 	if (fKeepAspectRatio) {
-			
-		// Keep aspect ratio, place render inside
+		// Keep aspect ratio, place video view inside
 		// the background area (may create black bars).
-		float max_width  = fBackground->Bounds().Width() + 1.0f;
-		float max_height = fBackground->Bounds().Height() + 1.0f;
 		float scaled_width  = fSourceWidth * fWidthScale;
 		float scaled_height = fSourceHeight * fHeightScale;
-		float factor = min_c(max_width / scaled_width, max_height / scaled_height);
-		int render_width = int(scaled_width * factor);
-		int render_height = int(scaled_height * factor);
-		int x_ofs = (int(max_width) - render_width) / 2;
-		int y_ofs = (int(max_height) - render_height) / 2;
+		float factor = min_c(width / scaled_width, height / scaled_height);
+		int render_width = lround(scaled_width * factor);
+		int render_height = lround(scaled_height * factor);
+		if (render_width > width)
+			render_width = width;
+		if (render_height > height)
+			render_height = height;
 
-		printf("AdjustFullscreenRenderer: background %.1f x %.1f, src video %d x %d, "
-			  "scaled video %.3f x %.3f, factor %.3f, render %d x %d, x-ofs %d, y-ofs %d\n", 
-			  max_width, max_height, fSourceWidth, fSourceHeight, scaled_width, scaled_height,
-			  factor, render_width, render_height, x_ofs, y_ofs);
-	
+		int x_ofs = x + (width - render_width) / 2;
+		int y_ofs = y + (height - render_height) / 2;
+
 		fVideoView->MoveTo(x_ofs, y_ofs);
 		fVideoView->ResizeTo(render_width - 1, render_height - 1);
 
 	} else {
-
-		printf("AdjustFullscreenRenderer: using whole background area\n");
-
-		// no need to keep aspect ratio, make
-		// render cover the whole background
-		fVideoView->MoveTo(0, 0);
-		fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height());
-
+		fVideoView->MoveTo(x, y);
+		fVideoView->ResizeTo(width - 1, height - 1);
 	}
 }
 
-
-void
-MainWin::AdjustWindowedRenderer(bool user_resized)
-{
-	printf("AdjustWindowedRenderer enter - user_resized %d\n", user_resized);
-
-	// In windowed mode, the renderer always covers the
-	// whole background, accounting for the menu
-	fVideoView->MoveTo(0, fNoMenu ? 0 : fMenuBarHeight);
-	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - (fNoMenu ? 0 : fMenuBarHeight));
-
-	if (fKeepAspectRatio) {
-		// To keep the aspect ratio correct, we
-		// do resize the window as required
-
-		float max_width  = Bounds().Width() + 1.0f;
-		float max_height = Bounds().Height() + 1.0f - (fNoMenu ? 0 : fMenuBarHeight);
-		float scaled_width  = fSourceWidth * fWidthScale;
-		float scaled_height = fSourceHeight * fHeightScale;
-		
-		if (!user_resized && (scaled_width > max_width || scaled_height > max_height)) {
-			// A format switch occured, and the window was
-			// smaller then the video source. As it was not
-			// initiated by the user resizing the window, we
-			// enlarge the window to fit the video.
-			fIgnoreFrameResized = true;
-			ResizeTo(scaled_width - 1, scaled_height - 1 + (fNoMenu ? 0 : fMenuBarHeight));
-//			Sync();
-			return;
-		}
-
-		float display_aspect_ratio = scaled_width / scaled_height;
-		int new_width  = int(max_width);
-		int new_height = int(max_width / display_aspect_ratio + 0.5);
-		
-		printf("AdjustWindowedRenderer: old display %d x %d, src video %d x %d, "
-			  "scaled video %.3f x %.3f, aspect ratio %.3f, new display %d x %d\n", 
-			  int(max_width), int(max_height), fSourceWidth, fSourceHeight, scaled_width, scaled_height,
-			  display_aspect_ratio, new_width, new_height);
-
-		fIgnoreFrameResized = true;
-		ResizeTo(new_width - 1, new_height - 1 + (fNoMenu ? 0 : fMenuBarHeight));
-//		Sync();
-	}
-
-	printf("AdjustWindowedRenderer leave\n");
-}
-*/
 
 void
 MainWin::ToggleNoBorderNoMenu()
@@ -725,13 +651,6 @@ MainWin::ToggleFullscreen()
 		return;
 	}
 
-	if (!fFrameResizedCalled) {
-		printf("ToggleFullscreen - ignoring, as FrameResized wasn't called since last switch\n");
-		return;
-	}
-	fFrameResizedCalled = false;
-	
-	
 	fIsFullscreen = !fIsFullscreen;
 	
 	if (fIsFullscreen) {
@@ -743,11 +662,6 @@ MainWin::ToggleFullscreen()
 		BRect rect(screen.Frame());
 
 		Hide();
-		if (!fNoMenu) {
-			// if we have a menu, remove it now
-			fMenuBar->Hide();
-		}
-		fFrameResizedTriggeredAutomatically = true;		
 		MoveTo(rect.left, rect.top);
 		ResizeTo(rect.Width(), rect.Height());
 		Show();
@@ -756,19 +670,11 @@ MainWin::ToggleFullscreen()
 		// switch back from full screen mode
 
 		Hide();
-		// if we need a menu, show it now
-		if (!fNoMenu) {
-			fMenuBar->Show();
-		}
-		fFrameResizedTriggeredAutomatically = true;		
 		MoveTo(fSavedFrame.left, fSavedFrame.top);
 		ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 		Show();
-		
 	}
 
-	// FrameResized() will do the required adjustments
-	
 	printf("ToggleFullscreen leave\n");
 }
 
@@ -787,10 +693,8 @@ MainWin::ToggleNoControls()
 	SetWindowSizeLimits();
 
 	if (fNoControls) {
-		fControls->Hide();
 		ResizeBy(0, - fControlsHeight);
 	} else {
-		fControls->Show();
 		ResizeBy(0, fControlsHeight);
 	}
 
@@ -812,15 +716,9 @@ MainWin::ToggleNoMenu()
 	SetWindowSizeLimits();
 
 	if (fNoMenu) {
-		fMenuBar->Hide();
-		fVideoView->MoveTo(0, 0);
-		fVideoView->ResizeBy(0, fMenuBarHeight);
 		MoveBy(0, fMenuBarHeight);
 		ResizeBy(0, - fMenuBarHeight);
 	} else {
-		fMenuBar->Show();
-		fVideoView->MoveTo(0, fMenuBarHeight);
-		fVideoView->ResizeBy(0, - fMenuBarHeight);
 		MoveBy(0, - fMenuBarHeight);
 		ResizeBy(0, fMenuBarHeight);
 	}
