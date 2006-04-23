@@ -52,14 +52,12 @@ public:
 	void				SetupWindow();
 	void				SetupTrackMenus();
 	void				SetWindowSizeLimits();
-	void				ResizeWindow(float percent);
+	void				ResizeWindow(int percent);
 	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
 	
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
-
-	void				UpdateWindowTitle();
 	
 	void				ToggleFullscreen();
 	void				ToggleKeepAspectRatio();
@@ -105,10 +103,6 @@ public:
 	bool				fMouseDownTracking;
 	BPoint				fMouseDownMousePos;
 	BPoint				fMouseDownWindowPos;
-	bool				fFrameResizedTriggeredAutomatically;
-	bool				fIgnoreFrameResized;
-	bool				fFrameResizedCalled;
-	BRect				fVideoViewBounds;
 };
 
 #endif

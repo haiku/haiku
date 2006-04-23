@@ -101,9 +101,6 @@ MainWin::MainWin()
  ,	fWidthScale(1.0)
  ,	fHeightScale(1.0)
  ,	fMouseDownTracking(false)
- ,	fFrameResizedTriggeredAutomatically(false)
- ,	fIgnoreFrameResized(false)
- ,	fFrameResizedCalled(true)
 {
 	static int pos = 0;
 	MoveBy(pos * 25, pos * 25);
@@ -217,7 +214,7 @@ MainWin::SetupWindow()
 
 
 void
-MainWin::ResizeWindow(float percent)
+MainWin::ResizeWindow(int percent)
 {
 	int video_width;
 	int video_height;
@@ -272,9 +269,6 @@ MainWin::CreateMenu()
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
-	fViewMenu->AddItem(fAudioMenu);
-	fViewMenu->AddItem(fVideoMenu);
-	fViewMenu->AddSeparatorItem();
 	fViewMenu->AddItem(new BMenuItem("50% scale", new BMessage(M_VIEW_50), '0', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("100% scale", new BMessage(M_VIEW_100), '1', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("200% scale", new BMessage(M_VIEW_200), '2', B_COMMAND_KEY));
@@ -286,7 +280,9 @@ MainWin::CreateMenu()
 //	fViewMenu->AddSeparatorItem();
 //	fViewMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 
-//	fSettingsMenu->AddSeparatorItem();
+	fSettingsMenu->AddItem(fAudioMenu);
+	fSettingsMenu->AddItem(fVideoMenu);
+	fSettingsMenu->AddSeparatorItem();
 	fSettingsMenu->AddItem(new BMenuItem("No Menu", new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("No Border", new BMessage(M_TOGGLE_NO_BORDER), 'B', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("No Controls", new BMessage(M_TOGGLE_NO_CONTROLS), 'C', B_COMMAND_KEY));
@@ -584,15 +580,6 @@ MainWin::FrameResized(float new_width, float new_height)
 void
 MainWin::ShowFileInfo()
 {
-}
-
-
-void
-MainWin::UpdateWindowTitle()
-{
-	char buf[100];
-	sprintf(buf, "%s - %d x %d, %.3f:%.3f => %.0f x %.0f", NAME, fSourceWidth, fSourceHeight, fWidthScale, fHeightScale, fVideoView->Bounds().Width() + 1, fVideoView->Bounds().Height() + 1);
-	SetTitle(buf);
 }
 
 
