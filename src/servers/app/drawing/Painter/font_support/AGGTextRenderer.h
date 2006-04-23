@@ -50,9 +50,6 @@ class AGGTextRenderer {
 											uint32 length);
 
  private:
-			void				_UpdateSizeAndHinting(float size, bool hinted,
-													  bool force = false);
-
 
 	typedef agg::font_engine_freetype_int32				font_engine_type;
 	typedef agg::font_cache_manager<font_engine_type>	font_cache_type;
@@ -79,12 +76,6 @@ class AGGTextRenderer {
 	bool						fAntialias;
 	bool						fKerning;
 	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
-
-	// caching to avoid loading a font unnecessarily
-	ServerFont					fFont;
-	uint32						fLastFamilyAndStyle;
-	float						fLastPointSize;
-	bool						fLastHinted;
 };
 
 #endif // AGG_TEXT_RENDERER_H

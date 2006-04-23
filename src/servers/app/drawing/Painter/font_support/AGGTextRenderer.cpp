@@ -83,12 +83,7 @@ AGGTextRenderer::AGGTextRenderer()
 	  fHinted(true),
 	  fAntialias(true),
 	  fKerning(true),
-	  fEmbeddedTransformation(),
-
-	  fFont(),
-	  fLastFamilyAndStyle(0xffffffff),
-	  fLastPointSize(-1.0),
-	  fLastHinted(false)
+	  fEmbeddedTransformation()
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -106,37 +101,19 @@ AGGTextRenderer::~AGGTextRenderer()
 bool
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
-	bool success = true;
 	// construct an embedded transformation (rotate & shear)
-	Transformable transform;
-	transform.ShearBy(B_ORIGIN, (90.0 - font.Shear()) * PI / 180.0, 0.0);
-	transform.RotateBy(B_ORIGIN, -font.Rotation() * PI / 180.0);
+	fEmbeddedTransformation.Reset();
+	fEmbeddedTransformation.ShearBy(B_ORIGIN,
+		(90.0 - font.Shear()) * PI / 180.0, 0.0);
+	fEmbeddedTransformation.RotateBy(B_ORIGIN,
+		-font.Rotation() * PI / 180.0);
 
-	bool load = font.GetFamilyAndStyle() != fLastFamilyAndStyle ||
-				transform != fEmbeddedTransformation;	
+	agg::glyph_rendering glyphType =
+		fHinted && fEmbeddedTransformation.IsIdentity() ?
+			agg::glyph_ren_native_gray8 :
+			agg::glyph_ren_outline;
 
-	if (load) {
-		if (transform.IsIdentity()) {
-			success = fFontEngine.load_font(font, agg::glyph_ren_native_gray8);
-//printf("AGGTextRenderer::SetFont() - native: %d\n", success);
-		} else {
-			success = fFontEngine.load_font(font, agg::glyph_ren_outline);
-//printf("AGGTextRenderer::SetFont() - outline: %d\n", success);
-		}
-//	} else {
-//printf("AGGTextRenderer::SetFont() - already loaded\n");
-	}
-
-	fLastFamilyAndStyle = font.GetFamilyAndStyle();
-	fEmbeddedTransformation = transform;
-	fFont = font;
-
-	_UpdateSizeAndHinting(font.Size(), fEmbeddedTransformation.IsIdentity() && fHinted, load);
-
-	if (!success) {
-		fprintf(stderr, "font could not be loaded\n");
-		return false;
-	}
+	fFontEngine.load_font(font, glyphType, font.Size());
 
 	return true;
 }
@@ -145,10 +122,8 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 void
 AGGTextRenderer::SetHinting(bool hinting)
 {
-	if (fHinted != hinting) {
-		fHinted = hinting;
-		_UpdateSizeAndHinting(fLastPointSize, fEmbeddedTransformation.IsIdentity() && fHinted);
-	}
+	fHinted = hinting;
+	fFontEngine.hinting(fEmbeddedTransformation.IsIdentity() && fHinted);
 }
 
 // SetAntialiasing
@@ -213,6 +188,8 @@ AGGTextRenderer::RenderString(const char* string,
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
+
+	fFontCache.reset();
 
 	uint32 charCode;
 	while ((charCode = UTF8ToCharCode(&string)) > 0) {
@@ -370,6 +347,8 @@ AGGTextRenderer::StringWidth(const char* string, uint32 length)
 	const agg::glyph_cache* glyph;
 	bool firstLoop = true;
 
+	fFontCache.reset();
+
 	while ((charCode = UTF8ToCharCode(&string)) > 0) {
 		glyph = fFontCache.glyph(charCode);
 		if (glyph) {
@@ -382,20 +361,5 @@ AGGTextRenderer::StringWidth(const char* string, uint32 length)
 	};
 
 	return width;
-}
-
-// _UpdateSizeAndHinting
-void
-AGGTextRenderer::_UpdateSizeAndHinting(float size, bool hinted, bool force)
-{
-	if (force || size != fLastPointSize || hinted != fLastHinted) {
-//printf("AGGTextRenderer::_UpdateSizeAndHinting(%.1f, %d, %d)\n", size, hinted, force);
-		fLastPointSize = size;
-		fLastHinted = hinted;
-
-		fFontEngine.height(size);
-		fFontEngine.width(size);
-		fFontEngine.hinting(hinted);
-	}
 }
 

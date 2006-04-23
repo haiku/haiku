@@ -113,19 +113,19 @@ namespace agg {
 
     //------------------------------------------------------------------------------
 
-    static unsigned calc_crc32(const unsigned char* buf, unsigned size)
-    {
-        unsigned crc = (unsigned)~0;
-        const unsigned char* p;
-        unsigned len = 0; 
-        unsigned nr = size;
-
-        for (len += nr, p = buf; nr--; ++p) 
-        {
-            crc = (crc >> 8) ^ crc32tab[(crc ^ *p) & 0xff];
-        }
-        return ~crc;
-    }
+//    static unsigned calc_crc32(const unsigned char* buf, unsigned size)
+//    {
+//        unsigned crc = (unsigned)~0;
+//        const unsigned char* p;
+//        unsigned len = 0; 
+//        unsigned nr = size;
+//
+//        for (len += nr, p = buf; nr--; ++p) 
+//        {
+//            crc = (crc >> 8) ^ crc32tab[(crc ^ *p) & 0xff];
+//        }
+//        return ~crc;
+//    }
 
 
     //------------------------------------------------------------------------
@@ -417,7 +417,7 @@ namespace agg {
     //------------------------------------------------------------------------
     font_engine_freetype_base::~font_engine_freetype_base()
     {
-        delete [] m_face_ids;
+//        delete [] m_face_ids;
         delete [] m_signature;
     }
 
@@ -432,14 +432,13 @@ namespace agg {
         m_face_index(0),
         m_char_map(FT_ENCODING_NONE),
         m_signature(new char [256+256-16]),
-        m_height(0),
-        m_width(0),
+        m_size(0),
         m_hinting(true),
         m_flip_y(false),
         m_library(library),
-        m_face_ids(new unsigned [max_faces]),
-        m_num_faces(0),
-        m_max_faces(max_faces),
+//        m_face_ids(new unsigned [max_faces]),
+//        m_num_faces(0),
+//        m_max_faces(max_faces),
         m_cur_face(0),
         m_resolution(0),
         m_glyph_rendering(glyph_ren_native_gray8),
@@ -480,95 +479,59 @@ namespace agg {
 
 
     //------------------------------------------------------------------------
-    int font_engine_freetype_base::find_face(unsigned face_id) const
-    {
-        unsigned i;
-        for(i = 0; i < m_num_faces; ++i)
-        {
-            if(m_face_ids[i] == face_id) return i;
-        }
-        return -1;
-    }
-
-
-    //------------------------------------------------------------------------
     bool font_engine_freetype_base::load_font(const ServerFont &font,
-                                              glyph_rendering ren_type)
+                                              glyph_rendering ren_type,
+                                              double size)
     {
-		bool ret = false;
+		if (m_cur_face == font.GetFTFace()
+			&& m_cur_id == font.GetFamilyAndStyle()
+			&& m_glyph_rendering == ren_type
+			&& m_size == unsigned(size * 64.0)) {
+			// make sure the freetype lib is in sync too
+            FT_Set_Pixel_Sizes(m_cur_face,    
+                               m_size >> 6,    // pixel_width
+                               m_size >> 6);  // pixel_height
+			return true;
+		}
 
-        m_last_error = 0;
+        m_cur_face = font.GetFTFace();
+		m_cur_id = font.GetFamilyAndStyle();
 
-        int idx = find_face(font.GetFamilyAndStyle());
-        if(idx >= 0)
-        {
-            m_cur_face = font.GetFTFace();
-            m_cur_id   = m_face_ids[idx];
+        m_size = unsigned(size * 64.0);
+
+        switch(ren_type) {
+	        case glyph_ren_native_mono:
+	            m_glyph_rendering = glyph_ren_native_mono;
+	            break;
+	        case glyph_ren_native_gray8:
+	        	m_hinting = true;
+	            m_glyph_rendering = glyph_ren_native_gray8;
+	            break;
+	        case glyph_ren_outline:
+	            if(FT_IS_SCALABLE(m_cur_face))
+	                m_glyph_rendering = glyph_ren_outline;
+	            else
+	                m_glyph_rendering = glyph_ren_native_gray8;
+	            break;
+	        case glyph_ren_agg_mono:
+	            if(FT_IS_SCALABLE(m_cur_face))
+	                m_glyph_rendering = glyph_ren_agg_mono;
+	            else
+	                m_glyph_rendering = glyph_ren_native_mono;
+	            break;
+	        case glyph_ren_agg_gray8:
+	            if(FT_IS_SCALABLE(m_cur_face))
+	                m_glyph_rendering = glyph_ren_agg_gray8;
+	            else
+	                m_glyph_rendering = glyph_ren_native_gray8;
+	            break;
         }
-        else
-        {
-            if(m_num_faces >= m_max_faces)
-            {
-                memcpy(m_face_ids, 
-                       m_face_ids + 1, 
-                       (m_max_faces - 1) * sizeof(unsigned));
-                m_num_faces = m_max_faces - 1;
-            }
 
-            m_face_ids[m_num_faces] = font.GetFamilyAndStyle();
-            m_cur_face = font.GetFTFace();
-            m_cur_id   = m_face_ids[m_num_faces];
-            ++m_num_faces;
-        }
-
-        if(m_last_error == 0)
-        {
-            ret = true;
-
-            switch(ren_type)
-            {
-            case glyph_ren_native_mono:
-                m_glyph_rendering = glyph_ren_native_mono;
-                break;
-            case glyph_ren_native_gray8:
-                m_glyph_rendering = glyph_ren_native_gray8;
-                break;
-            case glyph_ren_outline:
-                if(FT_IS_SCALABLE(m_cur_face))
-                {
-                    m_glyph_rendering = glyph_ren_outline;
-                }
-                else
-                {
-                    m_glyph_rendering = glyph_ren_native_gray8;
-                }
-                break;
-            case glyph_ren_agg_mono:
-                if(FT_IS_SCALABLE(m_cur_face))
-                {
-                    m_glyph_rendering = glyph_ren_agg_mono;
-                }
-                else
-                {
-                    m_glyph_rendering = glyph_ren_native_mono;
-                }
-                break;
-            case glyph_ren_agg_gray8:
-                if(FT_IS_SCALABLE(m_cur_face))
-                {
-                    m_glyph_rendering = glyph_ren_agg_gray8;
-                }
-                else
-                {
-                    m_glyph_rendering = glyph_ren_native_gray8;
-                }
-                break;
-            }
-
-            update_transform();
-            update_char_size();
-        }
-        return ret;
+// NOTE: Freetype (embedded) transformation not used
+// (and it would result in update_signature() being called twice
+//      update_transform();
+        update_char_size();
+        return true;
     }
 
 
@@ -609,21 +572,9 @@ namespace agg {
     }
 
     //------------------------------------------------------------------------
-    bool font_engine_freetype_base::height(double h)
+    bool font_engine_freetype_base::size(double size)
     {
-        m_height = int(h * 64.0);
-        if(m_cur_face)
-        {
-            update_char_size();
-            return true;
-        }
-        return false;
-    }
-
-    //------------------------------------------------------------------------
-    bool font_engine_freetype_base::width(double w)
-    {
-        m_width = int(w * 64.0);
+        m_size = int(size * 64.0);
         if(m_cur_face)
         {
             update_char_size();
@@ -684,11 +635,14 @@ namespace agg {
     //------------------------------------------------------------------------
     void font_engine_freetype_base::hinting(bool h)
     { 
-        m_hinting = h; 
-        if(m_cur_face)
-        {
-            update_signature();
-        }
+    	if(m_hinting != h)
+    	{
+	        m_hinting = h; 
+	        if(m_cur_face)
+	        {
+	            update_signature();
+	        }
+    	}
     }
 
     //------------------------------------------------------------------------
@@ -706,36 +660,46 @@ namespace agg {
     {
         if(m_cur_face)
         {
-            unsigned gamma_hash = 0;
-            if(m_glyph_rendering == glyph_ren_native_gray8 ||
-               m_glyph_rendering == glyph_ren_agg_mono || 
-               m_glyph_rendering == glyph_ren_agg_gray8)
-            {
-                unsigned char gamma_table[rasterizer_scanline_aa<>::aa_num];
-                unsigned i;
-                for(i = 0; i < rasterizer_scanline_aa<>::aa_num; ++i)
-                {
-                    gamma_table[i] = m_rasterizer.apply_gamma(i);
-                }
-                gamma_hash = calc_crc32(gamma_table, sizeof(gamma_table));
-            }
-
+// NOTE: gamma is fixed for now, so no need to switch
+// font cache based on gamma
+//            unsigned gamma_hash = 0;
+//            if(m_glyph_rendering == glyph_ren_native_gray8 ||
+//               m_glyph_rendering == glyph_ren_agg_mono || 
+//               m_glyph_rendering == glyph_ren_agg_gray8)
+//            {
+//                unsigned char gamma_table[rasterizer_scanline_aa<>::aa_num];
+//                unsigned i;
+//                for(i = 0; i < rasterizer_scanline_aa<>::aa_num; ++i)
+//                {
+//                    gamma_table[i] = m_rasterizer.apply_gamma(i);
+//                }
+//                gamma_hash = calc_crc32(gamma_table, sizeof(gamma_table));
+//            }
+//
+//            sprintf(m_signature, 
+//                    "%u,%u,%d,%d,%d:%dx%d,%d,%d,%d,%d,%d,%d,%08X", 
+//                    m_cur_id,
+//                    m_char_map,
+//                    m_face_index,
+//                    int(m_glyph_rendering),
+//                    m_resolution,
+//                    m_height,
+//                    m_width,
+//                    int(m_matrix.xx),
+//                    int(m_matrix.xy),
+//                    int(m_matrix.yx),
+//                    int(m_matrix.yy),
+//                    int(m_hinting),
+//                    int(m_flip_y),
+//                    gamma_hash);
             sprintf(m_signature, 
-                    "%u,%u,%d,%d,%d:%dx%d,%d,%d,%d,%d,%d,%d,%08X", 
+                    "%u,%u,%d,%d,%d,%d", 
                     m_cur_id,
                     m_char_map,
                     m_face_index,
                     int(m_glyph_rendering),
-                    m_resolution,
-                    m_height,
-                    m_width,
-                    int(m_matrix.xx),
-                    int(m_matrix.xy),
-                    int(m_matrix.yx),
-                    int(m_matrix.yy),
-                    int(m_hinting),
-                    int(m_flip_y),
-                    gamma_hash);
+                    m_size,
+                    int(m_hinting));
             ++m_change_stamp;
         }
     }
@@ -749,16 +713,16 @@ namespace agg {
             if(m_resolution)
             {
                 FT_Set_Char_Size(m_cur_face, 
-                                 m_width,       // char_width in 1/64th of points
-                                 m_height,      // char_height in 1/64th of points
+                                 m_size,       // char_width in 1/64th of points
+                                 m_size,      // char_height in 1/64th of points
                                  m_resolution,  // horizontal device resolution 
                                  m_resolution); // vertical device resolution 
             }
             else
             {
                 FT_Set_Pixel_Sizes(m_cur_face,    
-                                   m_width >> 6,    // pixel_width
-                                   m_height >> 6);  // pixel_height
+                                   m_size >> 6,    // pixel_width
+                                   m_size >> 6);  // pixel_height
             }
             update_signature();
         }

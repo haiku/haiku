@@ -57,11 +57,11 @@ namespace agg
         // Set font parameters
         //--------------------------------------------------------------------
         void resolution(unsigned dpi);
-        bool load_font(const ServerFont &font, glyph_rendering ren_type);
+        bool load_font(const ServerFont &font, glyph_rendering ren_type,
+        			   double size);
         bool attach(const char* file_name);
         bool char_map(FT_Encoding map);
-        bool height(double h);
-        bool width(double w);
+        bool size(double size);
 		void transform(const trans_affine& mtx);
         void transform(double xx, double xy, double yx, double yy);
         void hinting(bool h);
@@ -81,8 +81,7 @@ namespace agg
         unsigned    cur_id()       const { return m_cur_id;     }
         unsigned    num_faces()    const;
         FT_Encoding char_map()     const { return m_char_map;   }
-        double      height()       const { return double(m_height) / 64.0; }
-        double      width()        const { return double(m_width) / 64.0;  }
+        double      size()         const { return double(m_size) / 64.0; }
         bool        hinting()      const { return m_hinting;    }
         bool        flip_y()       const { return m_flip_y;     }
 
@@ -110,7 +109,6 @@ namespace agg
         void update_char_size();
         void update_signature();
         void update_transform();
-        int  find_face(unsigned face_id) const;
 
         bool            m_flag32;
         int             m_change_stamp;
@@ -119,16 +117,12 @@ namespace agg
         unsigned        m_face_index;
         FT_Encoding     m_char_map;
         char*           m_signature;
-        unsigned        m_height;
-        unsigned        m_width;
+        unsigned        m_size;
         FT_Matrix       m_matrix;
         bool            m_hinting;
         bool            m_flip_y;
         bool            m_library_initialized;
         FT_Library      m_library;    // handle to library    
-        unsigned*       m_face_ids; 
-        unsigned        m_num_faces;
-        unsigned        m_max_faces;
         FT_Face         m_cur_face;  // handle to the current face object
         int             m_resolution;
         glyph_rendering m_glyph_rendering;

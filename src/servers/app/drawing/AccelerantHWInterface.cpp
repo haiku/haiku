@@ -586,7 +586,8 @@ AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *
 sem_id
 AccelerantHWInterface::RetraceSemaphore()
 {
-	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
+	accelerant_retrace_semaphore AccelerantRetraceSemaphore =
+		(accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
 		

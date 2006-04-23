@@ -997,9 +997,10 @@ DrawingEngine::DrawString(const char* string, int32 length,
 						  escapement_delta* delta)
 {
 // TODO: use delta
+	FontLocker locker(d);
+
 	BPoint penLocation = pt;
 	if (Lock()) {
-		FontLocker locker(d);
 		fPainter->SetDrawState(d, true);
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
@@ -1034,6 +1035,8 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 						   const DrawState* d, escapement_delta* delta)
 {
 // TODO: use delta
+	FontLocker locker(d);
+
 	float width = 0.0;
 //	if (Lock()) {
 // NOTE: For now it is enough to block on the
@@ -1042,7 +1045,6 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 // deadlock in case another thread holds the font
 // lock already and then tries to lock the drawing
 // engine after it is already locked here (race condition)
-		FontLocker locker(d);
 		width = fPainter->StringWidth(string, length, d);
 //		Unlock();
 //	}
@@ -1054,7 +1056,6 @@ float
 DrawingEngine::StringWidth(const char* string, int32 length,
 						   const ServerFont& font, escapement_delta* delta)
 {
-	FontLocker locker(&font);
 	DrawState d;
 	d.SetFont(font);
 	return StringWidth(string, length, &d, delta);
@@ -1065,6 +1066,8 @@ float
 DrawingEngine::StringHeight(const char *string, int32 length,
 							const DrawState *d)
 {
+	FontLocker locker(d);
+
 	float height = 0.0;
 //	if (Lock()) {
 // NOTE: For now it is enough to block on the
@@ -1073,7 +1076,6 @@ DrawingEngine::StringHeight(const char *string, int32 length,
 // deadlock in case another thread holds the font
 // lock already and then tries to lock the drawing
 // engine after it is already locked here (race condition)
-		FontLocker locker(d);
 		fPainter->SetDrawState(d, true);
 		BPoint dummy1(0.0, 0.0);
 		BPoint dummy2(0.0, 0.0);
