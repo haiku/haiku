@@ -16,14 +16,11 @@
 #include <Rect.h>
 #include <OS.h>
 
-#include <video_overlay.h>
-
-
 class BitmapManager;
 class ClientMemoryAllocator;
 class HWInterface;
-class OverlayCookie;
-struct overlay_client_data;
+class Overlay;
+
 
 /*!
 	\class ServerBitmap ServerBitmap.h
@@ -69,8 +66,8 @@ class ServerBitmap {
 			area_id			Area() const;
 			uint32			AreaOffset() const;
 
-			void			SetOverlayCookie(::OverlayCookie* cookie);
-		::OverlayCookie*	OverlayCookie() const;
+			void			SetOverlay(::Overlay* cookie);
+		::Overlay*	Overlay() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -109,7 +106,7 @@ protected:
 
 			ClientMemoryAllocator* fAllocator;
 			void*			fAllocationCookie;
-			::OverlayCookie* fOverlayCookie;
+			::Overlay*		fOverlay;
 			uint8*			fBuffer;
 			int32			fReferenceCount;
 
@@ -138,54 +135,6 @@ class UtilityBitmap : public ServerBitmap {
 
 
 	virtual					~UtilityBitmap();
-};
-
-//! An allocation cookie for overlays
-class OverlayCookie {
-	public:
-		OverlayCookie(HWInterface& interface);
-		~OverlayCookie();
-
-		status_t InitCheck() const;
-
-		void SetOverlayData(const overlay_buffer* overlayBuffer,
-			overlay_token token, overlay_client_data* clientData);
-		void TakeOverToken(OverlayCookie* other);
-
-		const overlay_buffer* OverlayBuffer() const;
-		overlay_client_data* ClientData() const;
-		overlay_token OverlayToken() const;
-
-		sem_id Semaphore() const
-			{ return fSemaphore; }
-
-		const RGBColor& Color() const
-			{ return fColor; }
-
-		void SetVisible(bool visible)
-			{ fVisible = visible; }
-		bool IsVisible() const
-			{ return fVisible; }
-
-		void SetView(const BRect& source, const BRect& destination);
-		const BRect& Source() const
-			{ return fSource; }
-		const BRect& Destination() const
-			{ return fDestination; }
-
-		void Show();
-		void Hide();
-
-	private:
-		HWInterface&			fHWInterface;
-		const overlay_buffer*	fOverlayBuffer;
-		overlay_client_data*	fClientData;
-		overlay_token			fOverlayToken;
-		sem_id					fSemaphore;
-		RGBColor				fColor;
-		BRect					fSource;
-		BRect					fDestination;
-		bool					fVisible;
 };
 
 // ShallowCopy (only for server bitmaps)

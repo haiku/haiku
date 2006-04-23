@@ -12,8 +12,7 @@
 #include "ClientMemoryAllocator.h"
 #include "ColorConversion.h"
 #include "HWInterface.h"
-
-#include <BitmapPrivate.h>
+#include "Overlay.h"
 
 #include <new>
 #include <stdio.h>
@@ -56,7 +55,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	:
 	fAllocator(NULL),
 	fAllocationCookie(NULL),
-	fOverlayCookie(NULL),
+	fOverlay(NULL),
 	fBuffer(NULL),
 	fReferenceCount(1),
 	// WARNING: '1' is added to the width and height.
@@ -80,7 +79,7 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	:
 	fAllocator(NULL),
 	fAllocationCookie(NULL),
-	fOverlayCookie(NULL),
+	fOverlay(NULL),
 	fBuffer(NULL),
 	fReferenceCount(1)
 {
@@ -109,8 +108,8 @@ ServerBitmap::~ServerBitmap()
 	else
 		free(fBuffer);
 
-	delete fOverlayCookie;
-		// deleting the cookie will also free the overlay buffer
+	delete fOverlay;
+		// deleting the overlay will also free the overlay buffer
 }
 
 
@@ -305,16 +304,16 @@ ServerBitmap::AreaOffset() const
 
 
 void
-ServerBitmap::SetOverlayCookie(::OverlayCookie* cookie)
+ServerBitmap::SetOverlay(::Overlay* cookie)
 {
-	fOverlayCookie = cookie;
+	fOverlay = cookie;
 }
 
 
-::OverlayCookie*
-ServerBitmap::OverlayCookie() const
+::Overlay*
+ServerBitmap::Overlay() const
 {
-	return fOverlayCookie;
+	return fOverlay;
 }
 
 
@@ -362,123 +361,3 @@ UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
 UtilityBitmap::~UtilityBitmap()
 {
 }
-
-
-//	#pragma mark -
-
-
-OverlayCookie::OverlayCookie(HWInterface& interface)
-	:
-	fHWInterface(interface),
-	fOverlayBuffer(NULL),
-	fClientData(NULL),
-	fOverlayToken(NULL)
-{
-	fSemaphore = create_sem(1, "overlay lock");
-	fColor.SetColor(21, 16, 21, 16);
-		// TODO: whatever fine color we want to use here...
-}
-
-
-OverlayCookie::~OverlayCookie()
-{
-	fHWInterface.ReleaseOverlayChannel(fOverlayToken);
-	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
-
-	delete_sem(fSemaphore);
-}
-
-
-status_t
-OverlayCookie::InitCheck() const
-{
-	return fSemaphore >= B_OK ? B_OK : fSemaphore;
-}
-
-
-void
-OverlayCookie::SetOverlayData(const overlay_buffer* overlayBuffer,
-	overlay_token token, overlay_client_data* clientData)
-{
-	fOverlayBuffer = overlayBuffer;
-	fOverlayToken = token;
-
-	fClientData = clientData;
-	fClientData->lock = fSemaphore;
-	fClientData->buffer = (uint8*)fOverlayBuffer->buffer;
-}
-
-
-void
-OverlayCookie::TakeOverToken(OverlayCookie* other)
-{
-	overlay_token token = other->OverlayToken();
-	if (token == NULL)
-		return;
-
-	fOverlayToken = token;
-	//other->fOverlayToken = NULL;
-}
-
-
-const overlay_buffer*
-OverlayCookie::OverlayBuffer() const
-{
-	return fOverlayBuffer;
-}
-
-
-overlay_client_data*
-OverlayCookie::ClientData() const
-{
-	return fClientData;
-}
-
-
-overlay_token
-OverlayCookie::OverlayToken() const
-{
-	return fOverlayToken;
-}
-
-
-void
-OverlayCookie::Show()
-{
-	// TODO: acquire token!
-	if (fOverlayToken == NULL) {
-		printf("%p: no overlay token\n", this);
-		return;
-	}
-
-	fHWInterface.ShowOverlay(this);
-}
-
-
-void
-OverlayCookie::Hide()
-{
-	// TODO: acquire token!
-	if (fOverlayToken == NULL) {
-		printf("%p: no overlay token\n", this);
-		return;
-	}
-
-	fHWInterface.HideOverlay(this);
-}
-
-
-void
-OverlayCookie::SetView(const BRect& source, const BRect& destination)
-{
-	fSource = source;
-	fDestination = destination;
-
-	if (fOverlayToken == NULL) {
-		printf("%p: no overlay token\n", this);
-		return;
-	}
-
-	fHWInterface.UpdateOverlay(this);
-}
-

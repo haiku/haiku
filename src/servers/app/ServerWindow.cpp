@@ -20,30 +20,15 @@
 	mouse and key events from the server to its window, and other such things.
 */
 
-#include <new>
 
-#include <AppDefs.h>
-#include <DirectWindow.h>
-#include <GraphicsDefs.h>
-#include <Message.h>
-#include <PortLink.h>
-#include <Rect.h>
-#include <View.h>
-#include <ViewAux.h>
-#include <Autolock.h>
-#include <TokenSpace.h>
-#include <WindowInfo.h>
-#include <WindowPrivate.h>
-
-#include <DirectWindowPrivate.h>
-#include <MessagePrivate.h>
-#include <PictureProtocol.h>
+#include "ServerWindow.h"
 
 #include "AppServer.h"
 #include "DebugInfoManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
+#include "Overlay.h"
 #include "RAMLinkMsgReader.h"
 #include "RenderingBuffer.h"
 #include "ServerApp.h"
@@ -53,9 +38,23 @@
 #include "WindowLayer.h"
 #include "WorkspacesLayer.h"
 
-#include "ServerWindow.h"
-
 #include "clipping.h"
+
+#include <DirectWindowPrivate.h>
+#include <MessagePrivate.h>
+#include <PictureProtocol.h>
+#include <PortLink.h>
+#include <ViewAux.h>
+#include <WindowInfo.h>
+#include <WindowPrivate.h>
+
+#include <AppDefs.h>
+#include <Autolock.h>
+#include <DirectWindow.h>
+#include <TokenSpace.h>
+#include <View.h>
+
+#include <new>
 
 using std::nothrow;
 
@@ -1514,8 +1513,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					BRegion dirty(fCurrentLayer->Bounds());
 					fWindowLayer->InvalidateView(fCurrentLayer, dirty);
 
-					if (bitmap != NULL && bitmap->OverlayCookie() != NULL)
-						colorKey = bitmap->OverlayCookie()->Color().GetColor32();
+					if (bitmap != NULL && bitmap->Overlay() != NULL)
+						colorKey = bitmap->Overlay()->Color().GetColor32();
 				} else
 					status = B_BAD_VALUE;
 			}

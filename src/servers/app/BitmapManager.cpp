@@ -18,6 +18,7 @@
 
 #include "ClientMemoryAllocator.h"
 #include "HWInterface.h"
+#include "Overlay.h"
 #include "ServerBitmap.h"
 #include "ServerProtocol.h"
 #include "ServerTokenSpace.h"
@@ -111,13 +112,13 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 	uint8* buffer = NULL;
 
 	if (flags & B_BITMAP_WILL_OVERLAY) {
-		OverlayCookie* overlayCookie = new (std::nothrow) OverlayCookie(hwInterface);
+		Overlay* overlay = new (std::nothrow) Overlay(hwInterface);
 
 		const overlay_buffer* overlayBuffer = NULL;
 		overlay_client_data* clientData = NULL;
 		bool newArea = false;
 
-		if (overlayCookie != NULL && overlayCookie->InitCheck() == B_OK) {
+		if (overlay != NULL && overlay->InitCheck() == B_OK) {
 			// allocate client memory to communicate the overlay semaphore
 			// and buffer location to the BBitmap
 			cookie = allocator->Allocate(sizeof(overlay_client_data),
@@ -129,11 +130,11 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 		}
 
 		if (overlayBuffer != NULL) {
-			overlayCookie->SetOverlayData(overlayBuffer, overlayToken, clientData);
+			overlay->SetOverlayData(overlayBuffer, overlayToken, clientData);
 
 			bitmap->fAllocator = allocator;
 			bitmap->fAllocationCookie = cookie;
-			bitmap->SetOverlayCookie(overlayCookie);
+			bitmap->SetOverlay(overlay);
 			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
 
 			buffer = (uint8*)overlayBuffer->buffer;
@@ -141,7 +142,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 				*_allocationFlags = kFramebuffer | (newArea ? kNewAllocatorArea : 0);
 		} else {
 			hwInterface.ReleaseOverlayChannel(overlayToken);			
-			delete overlayCookie;
+			delete overlay;
 			allocator->Free(cookie);
 		}
 	} else if (allocator != NULL) {

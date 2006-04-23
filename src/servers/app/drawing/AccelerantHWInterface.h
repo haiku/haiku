@@ -65,9 +65,9 @@ public:
 									color_space space);
 	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
 
-	virtual void				ShowOverlay(OverlayCookie* overlay);
-	virtual void				HideOverlay(OverlayCookie* overlay);
-	virtual void				UpdateOverlay(OverlayCookie* overlay);
+	virtual void				ShowOverlay(Overlay* overlay);
+	virtual void				HideOverlay(Overlay* overlay);
+	virtual void				UpdateOverlay(Overlay* overlay);
 
 	// accelerated drawing
 	virtual	void				CopyRegion(const clipping_rect* sortedRectList,

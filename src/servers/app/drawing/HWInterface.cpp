@@ -336,19 +336,19 @@ HWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 
 
 void
-HWInterface::ShowOverlay(OverlayCookie* overlay)
+HWInterface::ShowOverlay(Overlay* overlay)
 {
 }
 
 
 void
-HWInterface::HideOverlay(OverlayCookie* overlay)
+HWInterface::HideOverlay(Overlay* overlay)
 {
 }
 
 
 void
-HWInterface::UpdateOverlay(OverlayCookie* overlay)
+HWInterface::UpdateOverlay(Overlay* overlay)
 {
 }
 

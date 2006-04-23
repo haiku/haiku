@@ -10,28 +10,29 @@
 
 /**	Accelerant based HWInterface implementation */
 
-#include <new>
-#include <stdio.h>
-#include <string.h>
 
-#include <Cursor.h>
+#include "AccelerantHWInterface.h"
 
-#include <Accelerant.h>
-#include <graphic_driver.h>
-#include <FindDirectory.h>
-#include <image.h>
-#include <dirent.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-
+#include "AccelerantBuffer.h"
+#include "MallocBuffer.h"
+#include "Overlay.h"
 #include "RGBColor.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
 
-#include "AccelerantHWInterface.h"
-#include "AccelerantBuffer.h"
-#include "MallocBuffer.h"
+#include <Accelerant.h>
+#include <Cursor.h>
+#include <FindDirectory.h>
+#include <graphic_driver.h>
+#include <image.h>
+
+#include <dirent.h>
+#include <new>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 using std::nothrow;
 
@@ -762,21 +763,21 @@ AccelerantHWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 
 
 void
-AccelerantHWInterface::ShowOverlay(OverlayCookie* overlay)
+AccelerantHWInterface::ShowOverlay(Overlay* overlay)
 {
 	UpdateOverlay(overlay);
 }
 
 
 void
-AccelerantHWInterface::HideOverlay(OverlayCookie* overlay)
+AccelerantHWInterface::HideOverlay(Overlay* overlay)
 {
 	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(), NULL, NULL);
 }
 
 
 void
-AccelerantHWInterface::UpdateOverlay(OverlayCookie* overlay)
+AccelerantHWInterface::UpdateOverlay(Overlay* overlay)
 {
 	const overlay_buffer* buffer = overlay->OverlayBuffer();
 

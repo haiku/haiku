@@ -15,6 +15,7 @@
 #include "BitmapManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
+#include "Overlay.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerCursor.h"
@@ -272,8 +273,13 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	layer->fPreviousSibling = NULL;
 	layer->fNextSibling = NULL;
 
-	if (layer->IsVisible())
+	if (layer->IsVisible()) {
+		Overlay* overlay = _Overlay();
+		if (overlay != NULL)
+			overlay->Hide();
+
 		RebuildClipping(false);
+	}
 
 	if (fWindow) {
 		layer->DetachedFromWindow();
@@ -452,8 +458,8 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 	if (fViewBitmap != NULL) {
 		if (bitmap != NULL) {
 			// take over overlay token from current overlay (if it has any)
-			OverlayCookie* oldOverlay = _Overlay();
-			OverlayCookie* newOverlay = bitmap->OverlayCookie();
+			Overlay* oldOverlay = _Overlay();
+			Overlay* newOverlay = bitmap->Overlay();
 
 			if (oldOverlay != NULL && newOverlay != NULL)
 				newOverlay->TakeOverToken(oldOverlay);
@@ -483,20 +489,20 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 }
 
 
-OverlayCookie*
+::Overlay*
 ViewLayer::_Overlay() const
 {
 	if (fViewBitmap == NULL)
 		return NULL;
 
-	return fViewBitmap->OverlayCookie();
+	return fViewBitmap->Overlay();
 }
 
 
 void
 ViewLayer::_UpdateOverlayView() const
 {
-	OverlayCookie* overlay = _Overlay();
+	Overlay* overlay = _Overlay();
 	if (overlay == NULL)
 		return;
 
@@ -1032,7 +1038,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 		// add the current clipping
 		redraw->IntersectWith(effectiveClipping);
 
-		OverlayCookie* overlayCookie = _Overlay();
+		Overlay* overlayCookie = _Overlay();
 
 		if (fViewBitmap != NULL && overlayCookie == NULL) {
 			// draw view bitmap
@@ -1214,7 +1220,7 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 
 	// overlay handling
 
-	OverlayCookie* overlay = _Overlay();
+	Overlay* overlay = _Overlay();
 	if (overlay == NULL)
 		return;
 
