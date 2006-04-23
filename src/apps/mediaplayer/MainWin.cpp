@@ -32,8 +32,10 @@
 #include <Messenger.h>
 #include <PopUpMenu.h>
 #include <String.h>
+#include <Debug.h>
 
 #define NAME "MediaPlayer"
+#define MIN_WIDTH 250
 
 enum 
 {
@@ -53,7 +55,8 @@ enum
 	M_TOGGLE_FULLSCREEN,
 	M_TOGGLE_NO_BORDER,
 	M_TOGGLE_NO_MENU,
-	M_TOGGLE_NO_BORDER_NO_MENU,
+	M_TOGGLE_NO_CONTROLS,
+	M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS,
 	M_TOGGLE_ALWAYS_ON_TOP,
 	M_TOGGLE_KEEP_ASPECT_RATIO,
 	M_PREFERENCES,
@@ -78,7 +81,7 @@ enum
 
 
 MainWin::MainWin()
- :	BWindow(BRect(200,200,0,0), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
+ :	BWindow(BRect(200,200,450,400), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,  fFilePanel(NULL)
  ,	fHasFile(false)
  ,	fHasVideo(false)
@@ -88,8 +91,9 @@ MainWin::MainWin()
  ,	fAlwaysOnTop(false)
  ,	fNoMenu(false)
  ,	fNoBorder(false)
- ,	fSourceWidth(720)
- ,	fSourceHeight(576)
+ ,	fNoControls(false)
+ ,	fSourceWidth(0)
+ ,	fSourceHeight(0)
  ,	fWidthScale(1.0)
  ,	fHeightScale(1.0)
  ,	fMouseDownTracking(false)
@@ -104,7 +108,7 @@ MainWin::MainWin()
 	fBackground->SetViewColor(0,0,0);
 	AddChild(fBackground);
 
-	// menu	
+	// menu
 	fMenuBar = new BMenuBar(fBackground->Bounds(), "menu");
 	CreateMenu();
 	fBackground->AddChild(fMenuBar);
@@ -113,24 +117,30 @@ MainWin::MainWin()
 	fMenuBar->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
 	// video view
-	BRect video_rect = BRect(0, fMenuBarHeight, rect.right, rect.bottom);
-	fVideoView = new VideoView(video_rect, "video display", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	rect = BRect(0, fMenuBarHeight, fBackground->Bounds().right, fMenuBarHeight + 10);
+	fVideoView = new VideoView(rect, "video display", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	fBackground->AddChild(fVideoView);
-
-	fVideoView->MakeFocus();
-
-//	SetSizeLimits(fControlViewMinWidth - 1, 32767, 
-//		fMenuBarHeight + fControlViewHeight - 1, fMenuBarHeight + fControlViewHeight - 1);
-
-//	SetSizeLimits(320 - 1, 32767, 240 + fMenuBarHeight - 1, 32767);
-
-	SetSizeLimits(0, 32767, fMenuBarHeight - 1, 32767);
+	
+	// controls
+	rect = BRect(0, fMenuBarHeight + 11, fBackground->Bounds().right, fBackground->Bounds().bottom);
+	fControls = new ControllerView(rect, fController);
+	fBackground->AddChild(fControls);
+	fControls->ResizeToPreferred();
+	fControlsHeight = (int)fControls->Frame().Height() + 1;
+	fControlsWidth = (int)fControls->Frame().Width() + 1;
+	fControls->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
+	
+	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
 	
 	fController->SetVideoView(fVideoView);
-	
 	fVideoView->IsOverlaySupported();
+	
+	printf("fMenuBarHeight %d\n", fMenuBarHeight);
+	printf("fControlsHeight %d\n", fControlsHeight);
+	printf("fControlsWidth %d\n", fControlsWidth);
 
-	VideoFormatChange(fSourceWidth, fSourceHeight, fWidthScale, fHeightScale);
+	SetupWindow();
 	
 	Show();
 }
@@ -180,6 +190,51 @@ MainWin::SetupWindow()
 	fAudioMenu->ItemAt(0)->SetMarked(true);
 	fVideoMenu->ItemAt(0)->SetMarked(true);
 	
+	if (fHasVideo) {
+//		VideoFormatChange(int width, int height, float width_scale, float height_scale)
+		fSourceWidth = 320;
+		fSourceHeight = 240;
+		fWidthScale = 1.24;
+		fHeightScale = 1.35;
+	} else {
+		fSourceWidth = 320;
+		fSourceHeight = 240;
+		fWidthScale = 1.24;
+		fHeightScale = 1.35;
+	}
+	
+	int video_width;
+	int video_height;
+
+	// get required window size
+	if (fHasVideo) {
+		video_width = 400;
+		video_height = 300;
+	} else {
+		video_width = 0;
+		video_height = 0;
+	}
+	
+	// Calculate and set the initial window size
+	int width = max_c(fControlsWidth, video_width);
+	int height = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight) + video_height;
+	SetWindowSizeLimits();
+	ResizeTo(width - 1, height - 1);
+	
+	fVideoView->MakeFocus();
+	
+//	VideoFormatChange(fSourceWidth, fSourceHeight, fWidthScale, fHeightScale);
+
+}
+
+
+void
+MainWin::SetWindowSizeLimits()
+{
+	int min_width = fNoControls  ? MIN_WIDTH : fControlsWidth;
+	int min_height = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight);
+	
+	SetSizeLimits(min_width - 1, 32000, min_height - 1, fHasVideo ? 32000 : min_height - 1);
 }
 
 
@@ -208,23 +263,24 @@ MainWin::CreateMenu()
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
+	fViewMenu->AddItem(fAudioMenu);
+	fViewMenu->AddItem(fVideoMenu);
+	fViewMenu->AddSeparatorItem();
 	fViewMenu->AddItem(new BMenuItem("50% scale", new BMessage(M_VIEW_50), '0', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("100% scale", new BMessage(M_VIEW_100), '1', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("200% scale", new BMessage(M_VIEW_200), '2', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("300% scale", new BMessage(M_VIEW_300), '3', B_COMMAND_KEY));
 	fViewMenu->AddItem(new BMenuItem("400% scale", new BMessage(M_VIEW_400), '4', B_COMMAND_KEY));
-	fViewMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
-	fViewMenu->SetRadioMode(true);
 	fViewMenu->AddSeparatorItem();
-	fViewMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
+	fViewMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
+//	fViewMenu->SetRadioMode(true);
+//	fViewMenu->AddSeparatorItem();
+//	fViewMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 
-	fSettingsMenu->AddItem(fAudioMenu);
-	fSettingsMenu->AddItem(fVideoMenu);
-	fSettingsMenu->AddItem(new BMenuItem("Scale to native size", new BMessage(M_SCALE_TO_NATIVE_SIZE), 'N', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
-	fSettingsMenu->AddSeparatorItem();
+//	fSettingsMenu->AddSeparatorItem();
 	fSettingsMenu->AddItem(new BMenuItem("No Menu", new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("No Border", new BMessage(M_TOGGLE_NO_BORDER), 'B', B_COMMAND_KEY));
+	fSettingsMenu->AddItem(new BMenuItem("No Controls", new BMessage(M_TOGGLE_NO_CONTROLS), 'C', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
 	fSettingsMenu->AddSeparatorItem();
@@ -240,13 +296,14 @@ MainWin::CreateMenu()
 
 	fAudioMenu->SetRadioMode(true);
 	fVideoMenu->SetRadioMode(true);
-	
+/*	
 	fSettingsMenu->ItemAt(3)->SetMarked(fIsFullscreen);
 	fSettingsMenu->ItemAt(5)->SetMarked(fNoMenu);
 	fSettingsMenu->ItemAt(6)->SetMarked(fNoBorder);
 	fSettingsMenu->ItemAt(7)->SetMarked(fAlwaysOnTop);
 	fSettingsMenu->ItemAt(8)->SetMarked(fKeepAspectRatio);
 	fSettingsMenu->ItemAt(10)->SetEnabled(false); // XXX disable unused preference menu
+*/
 }
 
 
@@ -313,7 +370,7 @@ MainWin::MouseDown(BMessage *msg)
 	if (2 == buttons && msg->FindInt32("clicks") % 2 == 0) {
 		BRect r(screen_where.x - 1, screen_where.y - 1, screen_where.x + 1, screen_where.y + 1);
 		if (r.Contains(fMouseDownMousePos)) {
-			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU);
+			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS);
 			return;
 		}
 	}
@@ -446,6 +503,7 @@ MainWin::VideoFormatChange(int width, int height, float width_scale, float heigh
  	fWidthScale   = width_scale;
  	fHeightScale  = height_scale;
 	
+/*	
 //	ResizeWindow(Bounds().Width() + 1, Bounds().Height() + 1, true);
 
 	if (fIsFullscreen) {
@@ -453,6 +511,7 @@ MainWin::VideoFormatChange(int width, int height, float width_scale, float heigh
 	} else {
 		AdjustWindowedRenderer(false);
 	}
+*/
 
 	printf("VideoFormatChange leave\n");
 
@@ -469,13 +528,34 @@ MainWin::Zoom(BPoint rec_position, float rec_width, float rec_height)
 void
 MainWin::FrameResized(float new_width, float new_height)
 {
-	// called when the window got resized
-	fFrameResizedCalled = true;
-
 	if (new_width != Bounds().Width() || new_height != Bounds().Height()) {
 		debugger("size wrong\n");
 	}
+	
+	printf("FrameResized enter: new_width %.0f, new_height %.0f\n", new_width, new_height);
+	
+	int max_video_width  = new_width + 1;
+	int max_video_height = new_height + 1;
+	if (!fNoMenu)
+		max_video_height -= fMenuBarHeight;
+	if (!fNoControls)
+		max_video_height -= fControlsHeight;
 
+	ASSERT(max_video_height >= 0);
+	
+	if (max_video_height == 0 && !fVideoView->IsHidden())
+		fVideoView->Hide();
+	if (max_video_height != 0 && fVideoView->IsHidden())
+		fVideoView->Show();
+	
+	fVideoViewBounds = BRect(0, fNoMenu ? 0 : fMenuBarHeight, max_video_width - 1, max_video_height - 1);
+
+
+/*		
+
+
+
+return;
 	
 	printf("FrameResized enter: new_width %.0f, new_height %.0f, bounds width %.0f, bounds height %.0f\n", new_width, new_height, Bounds().Width(), Bounds().Height());
 	
@@ -508,10 +588,16 @@ MainWin::FrameResized(float new_width, float new_height)
 		}
 
 	}
+*/
 
 	printf("FrameResized leave\n");
 }
 
+
+void
+MainWin::ShowFileInfo()
+{
+}
 
 
 void
@@ -522,7 +608,7 @@ MainWin::UpdateWindowTitle()
 	SetTitle(buf);
 }
 
-
+/*
 void
 MainWin::AdjustFullscreenRenderer()
 {
@@ -609,7 +695,7 @@ MainWin::AdjustWindowedRenderer(bool user_resized)
 
 	printf("AdjustWindowedRenderer leave\n");
 }
-		
+*/
 
 void
 MainWin::ToggleNoBorderNoMenu()
@@ -633,6 +719,11 @@ void
 MainWin::ToggleFullscreen()
 {
 	printf("ToggleFullscreen enter\n");
+
+	if (!fHasVideo) {
+		printf("ToggleFullscreen - ignoring, as we don't have a video\n");
+		return;
+	}
 
 	if (!fFrameResizedCalled) {
 		printf("ToggleFullscreen - ignoring, as FrameResized wasn't called since last switch\n");
@@ -681,22 +772,44 @@ MainWin::ToggleFullscreen()
 	printf("ToggleFullscreen leave\n");
 }
 
+void
+MainWin::ToggleNoControls()
+{
+	printf("ToggleNoControls enter\n");
+
+	if (fIsFullscreen) {
+		// fullscreen is always without menu	
+		printf("ToggleNoControls leave, doing nothing, we are fullscreen\n");
+		return;
+	}
+
+	fNoControls = !fNoControls;
+	SetWindowSizeLimits();
+
+	if (fNoControls) {
+		fControls->Hide();
+		ResizeBy(0, - fControlsHeight);
+	} else {
+		fControls->Show();
+		ResizeBy(0, fControlsHeight);
+	}
+
+	printf("ToggleNoControls leave\n");
+}
 
 void
 MainWin::ToggleNoMenu()
 {
 	printf("ToggleNoMenu enter\n");
 
-	fNoMenu = !fNoMenu;
-	
 	if (fIsFullscreen) {
 		// fullscreen is always without menu	
 		printf("ToggleNoMenu leave, doing nothing, we are fullscreen\n");
 		return;
 	}
 
-//	fFrameResizedTriggeredAutomatically = true;	
-	fIgnoreFrameResized = true;
+	fNoMenu = !fNoMenu;
+	SetWindowSizeLimits();
 
 	if (fNoMenu) {
 		fMenuBar->Hide();
@@ -704,14 +817,12 @@ MainWin::ToggleNoMenu()
 		fVideoView->ResizeBy(0, fMenuBarHeight);
 		MoveBy(0, fMenuBarHeight);
 		ResizeBy(0, - fMenuBarHeight);
-//		Sync();
 	} else {
 		fMenuBar->Show();
 		fVideoView->MoveTo(0, fMenuBarHeight);
-		fVideoView->ResizeBy(0, -fMenuBarHeight);
+		fVideoView->ResizeBy(0, - fMenuBarHeight);
 		MoveBy(0, - fMenuBarHeight);
 		ResizeBy(0, fMenuBarHeight);
-//		Sync();
 	}
 
 	printf("ToggleNoMenu leave\n");
@@ -723,7 +834,6 @@ MainWin::ToggleNoBorder()
 {
 	printf("ToggleNoBorder enter\n");
 	fNoBorder = !fNoBorder;
-//	SetLook(fNoBorder ? B_NO_BORDER_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
 	SetLook(fNoBorder ? B_BORDERED_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
 	printf("ToggleNoBorder leave\n");
 }
@@ -744,14 +854,7 @@ MainWin::ToggleKeepAspectRatio()
 {
 	printf("ToggleKeepAspectRatio enter\n");
 	fKeepAspectRatio = !fKeepAspectRatio;
-
-	fFrameResizedTriggeredAutomatically = true;	
 	FrameResized(Bounds().Width(), Bounds().Height());
-//	if (fIsFullscreen) {
-//		AdjustFullscreenRenderer();
-//	} else {
-//		AdjustWindowedRenderer(false);
-//	}
 	printf("ToggleKeepAspectRatio leave\n");
 }
 
@@ -798,7 +901,7 @@ MainWin::KeyDown(BMessage *msg)
 	
 	switch (raw_char) {
 		case B_SPACE:
-			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU);
+			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS);
 			return B_OK;
 
 		case B_ESCAPE:
@@ -949,8 +1052,10 @@ MainWin::MessageReceived(BMessage *msg)
 			if (msg->HasRef("refs"))
 				RefsReceived(msg);
 			break;
+		case M_FILE_NEWPLAYER:
+			gMainApp->NewWindow();
+			break;
 		case M_FILE_OPEN:
-		{
 			if (!fFilePanel) {
 				fFilePanel = new BFilePanel();
 				fFilePanel->SetTarget(BMessenger(0, this));
@@ -958,7 +1063,62 @@ MainWin::MessageReceived(BMessage *msg)
 			}
 			fFilePanel->Show();
 			break;
-		}
+		case M_FILE_INFO:
+			ShowFileInfo();
+			break;
+		case M_FILE_ABOUT:
+			BAlert *alert;
+			alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen","Thanks");
+			if (fAlwaysOnTop) {
+				ToggleAlwaysOnTop();
+				alert->Go();
+				ToggleAlwaysOnTop();
+			} else {
+				alert->Go();
+			}
+			break;
+		case M_FILE_CLOSE:
+			PostMessage(B_QUIT_REQUESTED);
+			break;
+		case M_FILE_QUIT:	
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		case M_TOGGLE_FULLSCREEN:
+			ToggleFullscreen();
+//			fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
+			break;
+
+		case M_TOGGLE_NO_MENU:
+			ToggleNoMenu();
+//			fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
+			break;
+			
+		case M_TOGGLE_NO_CONTROLS:
+			ToggleNoControls();
+//			fSettingsMenu->ItemAt(3)->SetMarked(fNoControls);
+			break;
+		
+		case M_TOGGLE_NO_BORDER:
+			ToggleNoBorder();
+//			fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
+			break;
+			
+		case M_TOGGLE_ALWAYS_ON_TOP:
+			ToggleAlwaysOnTop();
+//			fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
+			break;
+	
+		case M_TOGGLE_KEEP_ASPECT_RATIO:
+			ToggleKeepAspectRatio();
+//			fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
+			break;
+
+		case M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS:
+			ToggleNoBorderNoMenu();
+			break;
+
+
 /*
 		
 		case B_ACQUIRE_OVERLAY_LOCK:
@@ -1046,36 +1206,6 @@ MainWin::MessageReceived(BMessage *msg)
 			VideoFormatChange(544, 576, 1.41176, 1.0);
 			break;
 
-		case B_REFS_RECEIVED:
-			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
-//			RefsReceived(msg);
-			break;
-			
-		case B_SIMPLE_DATA:
-			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
-//			if (msg->HasRef("refs"))
-//				RefsReceived(msg);
-			break;
-
-		case M_FILE_ABOUT:
-			BAlert *alert;
-			alert = new BAlert("about", NAME"\n\n"
-			INFO1
-			"\n\nCopyright "COPYRIGHT"\n\nVersion "VERSION"\n\nRevision "REVISION"\n\nBuild "BUILD, "Thanks");
-			if (fAlwaysOnTop) {
-				ToggleAlwaysOnTop();
-				alert->Go();
-				ToggleAlwaysOnTop();
-			} else {
-				alert->Go();
-			}
-			break;
-
-		case M_FILE_QUIT:	
-//			be_app->PostMessage(B_QUIT_REQUESTED);
-			PostMessage(B_QUIT_REQUESTED);
-			break;
-
 		case M_SCALE_TO_NATIVE_SIZE:
 			printf("M_SCALE_TO_NATIVE_SIZE\n");
 			if (fIsFullscreen) {
@@ -1086,34 +1216,6 @@ MainWin::MessageReceived(BMessage *msg)
 //			Sync();
 			break;
 
-		case M_TOGGLE_FULLSCREEN:
-			ToggleFullscreen();
-			fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
-			break;
-
-		case M_TOGGLE_NO_MENU:
-			ToggleNoMenu();
-			fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
-			break;
-		
-		case M_TOGGLE_NO_BORDER:
-			ToggleNoBorder();
-			fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
-			break;
-			
-		case M_TOGGLE_ALWAYS_ON_TOP:
-			ToggleAlwaysOnTop();
-			fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
-			break;
-	
-		case M_TOGGLE_KEEP_ASPECT_RATIO:
-			ToggleKeepAspectRatio();
-			fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
-			break;
-
-		case M_TOGGLE_NO_BORDER_NO_MENU:
-			ToggleNoBorderNoMenu();
-			break;
 		
 		case M_PREFERENCES:
 			break;

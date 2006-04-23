@@ -51,6 +51,9 @@ public:
 	void				OpenFile(const entry_ref &ref);
 	void				SetupWindow();
 	void				SetupTrackMenus();
+	void				SetWindowSizeLimits();
+	
+	void				ShowFileInfo();
 	
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
 
@@ -64,6 +67,7 @@ public:
 	void				ToggleAlwaysOnTop();
 	void				ToggleNoBorder();
 	void				ToggleNoMenu();
+	void				ToggleNoControls();
 	void				ToggleNoBorderNoMenu();
 	
 	void				ShowContextMenu(const BPoint &screen_point);
@@ -72,7 +76,7 @@ public:
 	BView *				fBackground;
 	VideoView *			fVideoView;
 	BFilePanel *		fFilePanel;
-	ControllerView *	fControllerView;
+	ControllerView *	fControls;
 
 	BMenu *				fFileMenu;
 	BMenu *				fViewMenu;
@@ -90,11 +94,14 @@ public:
 	volatile bool		fAlwaysOnTop;
 	volatile bool		fNoMenu;
 	volatile bool		fNoBorder;
+	volatile bool		fNoControls;
 	int					fSourceWidth;
 	int					fSourceHeight;
 	float				fWidthScale;
 	float				fHeightScale;
 	int					fMenuBarHeight;
+	int					fControlsHeight;
+	int					fControlsWidth;
 	BRect				fSavedFrame;
 	bool				fMouseDownTracking;
 	BPoint				fMouseDownMousePos;
@@ -102,6 +109,7 @@ public:
 	bool				fFrameResizedTriggeredAutomatically;
 	bool				fIgnoreFrameResized;
 	bool				fFrameResizedCalled;
+	BRect				fVideoViewBounds;
 };
 
 #endif

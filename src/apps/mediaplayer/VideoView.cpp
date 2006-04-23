@@ -29,7 +29,8 @@ VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 fl
  ,	fController(NULL)
  ,	fOverlayActive(false)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
+//	SetViewColor(B_TRANSPARENT_COLOR);
+	SetViewColor(127,255,127);
 }
 
 
