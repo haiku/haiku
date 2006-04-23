@@ -1,0 +1,19 @@
+
+resource app_signature "application/x-vnd.Haiku.MediaPlayer";
+
+resource app_flags B_SINGLE_LAUNCH;
+
+resource file_types message {
+	"types" = "application/ogg",
+	"types" = "audio",
+	"types" = "audio/32kadpcm",
+	"types" = "audio/basic",
+	"types" = "audio/mpeg",
+	"types" = "audio/x-aiff",
+	"types" = "audio/x-riff",
+	"types" = "audio/x-wav",
+	"types" = "video",
+	"types" = "video/mpeg",
+	"types" = "video/quicktime",
+	"types" = "video/x-msvideo"
+};

@@ -12,7 +12,7 @@ SubInclude HAIKU_TOP src apps expander ;
 SubInclude HAIKU_TOP src apps glteapot ;
 SubInclude HAIKU_TOP src apps installer ;
 SubInclude HAIKU_TOP src apps magnify ;
-#SubInclude HAIKU_TOP src apps mediaplayer ;
+SubInclude HAIKU_TOP src apps mediaplayer ;
 SubInclude HAIKU_TOP src apps midiplayer ;
 SubInclude HAIKU_TOP src apps people ;
 SubInclude HAIKU_TOP src apps poorman ;

@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps mediaplayer ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application MediaPlayer :
+	Controller.cpp
+	ControllerView.cpp
+	MainApp.cpp
+	MainWin.cpp
+	VideoNode.cpp
+	VideoView.cpp
+	: be media tracker
+	: MediaPlayer.rdef
+;
+

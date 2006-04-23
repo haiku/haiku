@@ -28,7 +28,7 @@
 MainApp *gMainApp;
 
 MainApp::MainApp()
- :	BApplication("application/x-vnd.Haiku-MediaPlayer")
+ :	BApplication("application/x-vnd.Haiku.MediaPlayer")
  ,	fFirstWindow(NewWindow())
 {
 }
