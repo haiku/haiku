@@ -457,7 +457,7 @@ ScreenSaverWin::SetupTab2()
 	fTab2->AddChild( fEnableScreenSaverBox = new BBox(BRect(8,6,436,287),"EnableScreenSaverBox"));
 	commonLookAndFeel(fEnableScreenSaverBox,false,false);
 
-	fEnableCheckbox = new BCheckBox(BRect(0,0,90,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage(kEnableScreenSaverChanged));
+	fEnableCheckbox = new BCheckBox(BRect(0,0,be_plain_font->StringWidth("Enable Screen Saver")+25,stringHeight),"EnableCheckBox","Enable Screen Saver", new BMessage(kEnableScreenSaverChanged));
 	fEnableScreenSaverBox->SetLabel(fEnableCheckbox);
 	fEnableScreenSaverBox->SetBorder(B_FANCY_BORDER);
 
@@ -497,7 +497,7 @@ ScreenSaverWin::SetupTab2()
 	commonLookAndFeel(fPasswordSlider,true,true);
 
 	topEdge+=sliderHeight - 6;
-	fEnableScreenSaverBox->AddChild( fPasswordButton = new BButton(BRect(335,topEdge,410,topEdge+24),"PasswordButton","Password...",  new BMessage (kPwbutton)));
+	fEnableScreenSaverBox->AddChild( fPasswordButton = new BButton(BRect(390 - be_plain_font->StringWidth("Password..."),topEdge,410,topEdge+24),"PasswordButton","Password...",  new BMessage (kPwbutton)));
 	commonLookAndFeel(fPasswordButton,false,true);
 	fPasswordButton->SetLabel("Password...");
 
