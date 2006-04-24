@@ -6,10 +6,15 @@
 
 #include <Application.h>
 
+#include "KeyboardInputDevice.h"
 #include "TMWindow.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if DEBUG
+FILE *KeyboardInputDevice::sLogFile = NULL;
+#endif
 
 
 int

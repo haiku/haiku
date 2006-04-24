@@ -44,7 +44,7 @@ extern "C" void _kshutdown_(bool reboot);
 TMWindow::TMWindow()
 	: BWindow(BRect(0, 0, 350, 300), "Team Monitor", 
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, 
-		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_ALL_WORKSPACES),
 	fQuitting(false)
 {
@@ -66,8 +66,8 @@ TMWindow::TMWindow()
 		point.y = (screenFrame.Height() - Bounds().Height()) / 2;
 	
 		if (screenFrame.Contains(point))
-		MoveTo(point);
-
+			MoveTo(point);
+		SetSizeLimits(Bounds().Width(), Bounds().Width()*2, Bounds().Height(), Bounds().Height()*2);
 		Unlock();
 	}
 }
@@ -139,11 +139,11 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	BFont font = be_plain_font;
 
 	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
 
 	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, 0, false, true, B_FANCY_BORDER);
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
 	AddChild(scrollView);
 
 	rect.left = 10;
@@ -152,7 +152,7 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
 
 	fKillButton = new BButton(rect, "kill", "Kill Application",
-		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_TOP);
+		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fKillButton);
 	fKillButton->SetEnabled(false);
 
@@ -185,7 +185,7 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	rect.bottom = rect.top - 8;
 	rect.top = fKillButton->Frame().bottom + 8;
 	rect.right = bounds.right - 10;
-	fDescView = new TMDescView(rect, B_FOLLOW_ALL);
+	fDescView = new TMDescView(rect, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fDescView);
 }
 

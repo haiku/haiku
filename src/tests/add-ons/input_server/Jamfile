@@ -1,7 +1,9 @@
 SubDir HAIKU_TOP src tests add-ons input_server ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirHdrs $(HAIKU_TOP) src add-ons input_server devices keyboard ;
-UsePrivateHeaders input ;
+UsePrivateHeaders input tracker  ;
 
 SimpleTest TeamMonitorTest :
 	TeamMonitorTest.cpp
@@ -13,3 +15,4 @@ SimpleTest TeamMonitorTest :
 SEARCH on [ FGristFiles
 		TMWindow.cpp TMListItem.cpp
 	] = [ FDirName $(HAIKU_TOP) src add-ons input_server devices keyboard ] ;
+
