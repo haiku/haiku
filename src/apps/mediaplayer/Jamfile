@@ -10,6 +10,7 @@ Application MediaPlayer :
 	DrawingTidbits.cpp
 	MainApp.cpp
 	MainWin.cpp
+	Playlist.cpp
 	TransportButton.cpp
 	TransportControlGroup.cpp
 	VideoNode.cpp
