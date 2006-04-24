@@ -43,6 +43,9 @@ _IO_new_fclose (fp)
 {
   int status;
 
+  if (fp == NULL)
+    return -1;
+
   CHECK_FILE(fp, EOF);
 
 #if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
