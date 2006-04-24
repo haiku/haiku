@@ -1,17 +1,13 @@
 /*
-	Copyright (c) 2002-2004, Thomas Kurschel
-	
-
-	Part of Radeon kernel driver
-		
-	Common header file
-*/
-
+ * Copyright (c) 2002-2004, Thomas Kurschel
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef _RADEON_DRIVER_H
 #define _RADEON_DRIVER_H
 
+
 #include "radeon_interface.h"
-#include "memmgr.h"
+#include "memory_manager.h"
 
 #include <KernelExport.h>
 #include <GraphicsDefs.h>

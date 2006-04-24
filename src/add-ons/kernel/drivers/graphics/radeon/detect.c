@@ -1,16 +1,15 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
-	
+ * Copyright (c) 2002, Thomas Kurschel
+ * Distributed under the terms of the MIT license.
+ */
 
-	Part of Radeon kernel driver
-		
-	Graphics card detection
-*/
+/**	Graphics card detection */
 
 
 #include "radeon_driver.h"
 
 #include <stdio.h>
+#include <string.h>
 
 
 // this table is gathered from different sources

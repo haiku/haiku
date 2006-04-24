@@ -1,23 +1,25 @@
 /*
-	Copyright (c) 2002-2004, Thomas Kurschel
+ * Copyright (c) 2002-2004, Thomas Kurschel
+ * Distributed under the terms of the MIT license.
+ */
 
-
-	Part of Radeon kernel driver
-		
+/*
 	Init and clean-up of devices
-	
-	TBD: support for multiple virtual card per device is
+
+	TODO: support for multiple virtual card per device is
 	not implemented yet - there is only one per device;
 	apart from additional device names, we need proper
 	management of graphics mem to not interfere.
 */
 
+#include "dac_regs.h"
 #include "radeon_driver.h"
+#include "mmio.h"
 
 #include <PCI.h>
+
 #include <stdio.h>
-#include "dac_regs.h"
-#include "mmio.h"
+#include <string.h>
 
 // helper macros for easier PCI access
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
@@ -309,17 +311,17 @@ status_t Radeon_FirstOpen( device_info *di )
 	// resolution of 2D register is 1K, resolution of CRTC etc. is higher,
 	// so 1K is the minimum block size;
 	// (CP cannot use local mem)
-	di->memmgr[mt_local] = mem_init( 0, di->local_mem_size, 1024, 
-		di->local_mem_size / 1024 );
-	if( di->memmgr[mt_local] == NULL ) {
+	di->memmgr[mt_local] = mem_init("radeon local memory", 0, di->local_mem_size, 1024, 
+		di->local_mem_size / 1024);
+	if (di->memmgr[mt_local] == NULL) {
 		result = B_NO_MEMORY;
 		goto err3;
 	}
 
 	// CP requires 4K alignment, which is the most restrictive I found
-	di->memmgr[mt_PCI] = mem_init( 0, di->pci_gart.buffer.size, 4096, 
-		di->pci_gart.buffer.size / 4096 );
-	if( di->memmgr[mt_PCI] == NULL ) {
+	di->memmgr[mt_PCI] = mem_init("radeon PCI GART memory", 0, di->pci_gart.buffer.size, 4096, 
+		di->pci_gart.buffer.size / 4096);
+	if (di->memmgr[mt_PCI] == NULL) {
 		result = B_NO_MEMORY;
 		goto err2;
 	}

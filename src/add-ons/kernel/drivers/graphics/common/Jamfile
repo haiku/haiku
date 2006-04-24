@@ -9,5 +9,5 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 StaticLibrary libgraphicscommon.a :
 	log_coll.c
 	log_dump.c
-	memmgr.c
+	memory_manager.c
 ;
