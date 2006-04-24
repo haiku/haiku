@@ -23,7 +23,7 @@ extern "C" void _sPrintf(const char *format, ...);
 static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
 
 
-// public function: return number of hardware engine
+/** Return number of hardware engines */
 
 uint32
 intel_accelerant_engine_count(void) 

@@ -12,7 +12,7 @@
 #include "utility.h"
 
 
-//#define TRACE_MODE
+#define TRACE_MODE
 #ifdef TRACE_MODE
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -228,6 +228,8 @@ intel_set_display_mode(display_mode *mode)
 {
 	TRACE(("intel_set_display_mode()\n"));
 
+	// TODO: locking!
+
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
@@ -237,6 +239,26 @@ intel_set_display_mode(display_mode *mode)
 
 	uint32 colorMode, bytesPerRow;
 	get_color_space_format(current, colorMode, bytesPerRow);
+
+	// free old and allocate new frame buffer in graphics memory
+
+	intel_free_memory(gInfo->frame_buffer_handle);
+
+	uint32 offset;
+	if (intel_allocate_memory(bytesPerRow * current.timing.v_display,
+			gInfo->frame_buffer_handle, offset) < B_OK) {
+		// oh, how did that happen? Unfortunately, there is no really good way back
+		if (intel_allocate_memory(gInfo->shared_info->current_mode.timing.v_display
+				* gInfo->shared_info->bytes_per_row, gInfo->frame_buffer_handle,
+				offset) == B_OK) {
+			gInfo->shared_info->frame_buffer_offset = offset;
+			write32(INTEL_DISPLAY_BASE, offset);
+		}
+
+		return B_NO_MEMORY;
+	}
+
+	gInfo->shared_info->frame_buffer_offset = offset;
 
 	// update timing parameters
 
@@ -288,7 +310,7 @@ intel_set_display_mode(display_mode *mode)
 
 	// changing bytes per row seems to be ignored if the plane/pipe is turned off
 	write32(INTEL_DISPLAY_BYTES_PER_ROW, bytesPerRow);
-	write32(INTEL_DISPLAY_BASE, 0);
+	write32(INTEL_DISPLAY_BASE, gInfo->shared_info->frame_buffer_offset);
 		// triggers writing back double-buffered registers
 
 	// update shared info
@@ -313,8 +335,10 @@ intel_get_frame_buffer_config(frame_buffer_config *config)
 {
 	TRACE(("intel_get_frame_buffer_config()\n"));
 
-	config->frame_buffer = gInfo->shared_info->frame_buffer;
-	config->frame_buffer_dma = gInfo->shared_info->physical_frame_buffer;
+	uint32 offset = gInfo->shared_info->frame_buffer_offset;
+
+	config->frame_buffer = gInfo->shared_info->graphics_memory + offset;
+	config->frame_buffer_dma = gInfo->shared_info->physical_graphics_memory + offset;
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;

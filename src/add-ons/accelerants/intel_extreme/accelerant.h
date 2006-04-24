@@ -22,6 +22,8 @@ typedef struct accelerant_info {
 	display_mode	*mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
+	uint32			frame_buffer_handle;
+
 	int				device;
 	bool			is_clone;
 } accelerant_info;
@@ -49,5 +51,9 @@ extern void set_display_power_mode(uint32 mode);
 
 // modes.cpp
 extern status_t create_mode_list(void);
+
+// memory.cpp
+extern void intel_free_memory(uint32 handle);
+extern status_t intel_allocate_memory(size_t size, uint32& handle, uint32& offset);
 
 #endif	/* INTEL_EXTREME_ACCELERANT_H */

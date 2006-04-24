@@ -181,28 +181,48 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 #endif
 			return B_OK;
 
-/*
 		// graphics mem manager
-		case INTEL_ALLOC_LOCAL_MEMORY:
+		case INTEL_ALLOCATE_GRAPHICS_MEMORY:
 		{
-			intel_alloc_local_mem *allocMemory = (intel_alloc_local_mem *)buffer;
+			intel_allocate_graphics_memory allocMemory;
+#ifdef __HAIKU__
+			if (user_memcpy(&allocMemory, buffer, sizeof(intel_allocate_graphics_memory)) < B_OK)
+				return B_BAD_ADDRESS;
+#else
+			memcpy(&allocMemory, buffer, sizeof(intel_allocate_graphics_memory));
+#endif
 
-			if (allocMemory->magic == INTEL_PRIVATE_DATA_MAGIC) {
-				return mem_alloc(di->local_memmgr, allocMemory->size, dev,
-					&allocMemory->handle, &am->fb_offset);
+			if (allocMemory.magic != INTEL_PRIVATE_DATA_MAGIC)
+				return B_BAD_VALUE;
+
+			status_t status = mem_alloc(info->memory_manager, allocMemory.size, info,
+				&allocMemory.handle, &allocMemory.buffer_offset);
+			if (status == B_OK) {
+				// copy result
+#ifdef __HAIKU__
+				if (user_memcpy(buffer, &allocMemory, sizeof(intel_allocate_graphics_memory)) < B_OK)
+					return B_BAD_ADDRESS;
+#else
+				memcpy(buffer, &allocMemory, sizeof(intel_allocate_graphics_memory));
+#endif
 			}
-			break;
+			return status;
 		}
 
-		case INTEL_FREE_LOCAL_MEMORY:
+		case INTEL_FREE_GRAPHICS_MEMORY:
 		{
-			intel_free_local_mem *freeMemory = (intel_free_local_mem *)buffer;
+			intel_free_graphics_memory freeMemory;
+#ifdef __HAIKU__
+			if (user_memcpy(&freeMemory, buffer, sizeof(intel_free_graphics_memory)) < B_OK)
+				return B_BAD_ADDRESS;
+#else
+			memcpy(&freeMemory, buffer, sizeof(intel_free_graphics_memory));
+#endif
 
-			if (freeMemory->magic == INTEL_PRIVATE_DATA_MAGIC)
-				return mem_free(di->local_memmgr, freeMemory->handle, dev);
+			if (freeMemory.magic == INTEL_PRIVATE_DATA_MAGIC)
+				return mem_free(info->memory_manager, freeMemory.handle, info);
 			break;
 		}
-*/
 
 		default:
 			TRACE((DEVICE_NAME ": ioctl() unknown message %ld (length = %ld)\n",

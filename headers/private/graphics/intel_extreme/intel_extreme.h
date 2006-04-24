@@ -9,6 +9,8 @@
 #define INTEL_EXTREME_H
 
 
+#include <memory_manager.h>
+
 #include <Accelerant.h>
 #include <Drivers.h>
 #include <PCI.h>
@@ -45,12 +47,13 @@ struct intel_shared_info {
 	uint32			bytes_per_row;
 	uint32			dpms_mode;
 
-	area_id			registers_area;		// area of memory mapped registers
-	area_id			frame_buffer_area;	// area of frame buffer
-	uint8			*frame_buffer;		// pointer to frame buffer (visible by all apps!)
-	uint8			*physical_frame_buffer;
-
+	area_id			registers_area;			// area of memory mapped registers
+	area_id			graphics_memory_area;
+	uint8			*graphics_memory;
+	uint8			*physical_graphics_memory;
 	uint32			graphics_memory_size;
+
+	uint32			frame_buffer_offset;
 
 	uint32			device_type;
 	char			device_identifier[32];
@@ -66,8 +69,9 @@ struct intel_info {
 	area_id		registers_area;
 	struct intel_shared_info *shared_info;
 	area_id		shared_area;
-	uint8		*frame_buffer;
-	area_id		frame_buffer_area;
+	uint8		*graphics_memory;
+	area_id		graphics_memory_area;
+	mem_info	*memory_manager;
 
 	const char	*device_identifier;
 	uint32		device_type;
@@ -83,8 +87,8 @@ enum {
 	INTEL_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 
 	INTEL_GET_DEVICE_NAME,
-	INTEL_ALLOC_LOCAL_MEMORY,
-	INTEL_FREE_LOCAL_MEMORY
+	INTEL_ALLOCATE_GRAPHICS_MEMORY,
+	INTEL_FREE_GRAPHICS_MEMORY
 };
 
 // retrieve the area_id of the kernel/accelerant shared info
@@ -97,7 +101,7 @@ struct intel_get_private_data {
 struct intel_allocate_graphics_memory {
 	uint32	magic;
 	uint32	size;
-	uint32	fb_offset;
+	uint32	buffer_offset;
 	uint32	handle;
 };
 

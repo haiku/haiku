@@ -11,6 +11,7 @@ Addon intel_extreme.accelerant : accelerants :
 	dpms.cpp
 	engine.cpp
 	hooks.cpp
+	memory.cpp
 	mode.cpp
 	: false
 	: be

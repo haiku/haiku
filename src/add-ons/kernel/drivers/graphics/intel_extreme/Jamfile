@@ -12,6 +12,8 @@ KernelAddon intel_extreme : kernel drivers bin :
 	intel_extreme.cpp
 
 	kernel_cpp.cpp
+
+	: libgraphicscommon.a
 ;
 
 SEARCH on [ FGristFiles

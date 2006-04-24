@@ -137,8 +137,7 @@ init_driver(void)
 		// create device names & allocate device info structure
 
 		char name[64];
-		sprintf(name, "graphics/%04X_%04X_%02X%02X%02X",
-			 info->vendor_id, info->device_id,
+		sprintf(name, "graphics/intel_extreme_%02x%02x%02x",
 			 info->bus, info->device,
 			 info->function);
 

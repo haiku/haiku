@@ -32,7 +32,7 @@ enable_display_plane(bool enable)
 		// when disabling it, we have to trigger the update using a write to
 		// the display base address
 		write32(INTEL_DISPLAY_CONTROL, oldValue & ~DISPLAY_CONTROL_ENABLED);
-		write32(INTEL_DISPLAY_BASE, 0);
+		write32(INTEL_DISPLAY_BASE, gInfo->shared_info->frame_buffer_offset);
 	}
 }
 

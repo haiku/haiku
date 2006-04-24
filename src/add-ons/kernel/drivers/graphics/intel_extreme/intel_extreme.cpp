@@ -90,23 +90,23 @@ intel_extreme_init(intel_info &info)
 
 	// map frame buffer, try to map it write combined
 
-	PhysicalMemoryMapper fbMapper;
-	info.frame_buffer_area = fbMapper.Map("intel extreme frame buffer",
+	PhysicalMemoryMapper graphicsMapper;
+	info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 		(void *)info.pci->u.h0.base_registers[0],
 		memorySize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
-		B_READ_AREA | B_WRITE_AREA, (void **)&info.frame_buffer);
-	if (fbMapper.InitCheck() < B_OK) {
+		B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
+	if (graphicsMapper.InitCheck() < B_OK) {
 		// try again without write combining
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
-		info.frame_buffer_area = fbMapper.Map("intel extreme frame buffer",
+		info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 			(void *)info.pci->u.h0.base_registers[0],
 			memorySize/*info.pci->u.h0.base_register_sizes[0]*/, B_ANY_KERNEL_BLOCK_ADDRESS,
-			B_READ_AREA | B_WRITE_AREA, (void **)&info.frame_buffer);
+			B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	}
-	if (fbMapper.InitCheck() < B_OK) {
+	if (graphicsMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map frame buffer!\n");
-		return info.frame_buffer_area;
+		return info.graphics_memory_area;
 	}
 
 	// memory mapped I/O
@@ -123,16 +123,24 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
+	// init graphics memory manager
+
+	info.memory_manager = mem_init("intel extreme memory manager", 0, memorySize, 1024, 
+		min_c(memorySize / 1024, 512));
+	if (info.memory_manager == NULL)
+		return B_NO_MEMORY;
+
 	// no errors, so keep mappings
-	fbMapper.Keep();
+	graphicsMapper.Keep();
 	mmioMapper.Keep();
 
-	info.shared_info->frame_buffer_area = info.frame_buffer_area;
+	info.shared_info->graphics_memory_area = info.graphics_memory_area;
 	info.shared_info->registers_area = info.registers_area;
-	info.shared_info->frame_buffer = info.frame_buffer;
-	info.shared_info->physical_frame_buffer = (uint8 *)info.pci->u.h0.base_registers[0];
+	info.shared_info->graphics_memory = info.graphics_memory;
+	info.shared_info->physical_graphics_memory = (uint8 *)info.pci->u.h0.base_registers[0];
 
 	info.shared_info->graphics_memory_size = memorySize;
+	info.shared_info->frame_buffer_offset = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
 	info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
 	info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz (not tested)
@@ -161,7 +169,9 @@ intel_extreme_uninit(intel_info &info)
 {
 	dprintf(DEVICE_NAME": intel_extreme_uninit()\n");
 
-	delete_area(info.frame_buffer_area);
+	mem_destroy(info.memory_manager);
+
+	delete_area(info.graphics_memory_area);
 	delete_area(info.registers_area);
 	delete_area(info.shared_area);
 }
