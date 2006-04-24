@@ -475,10 +475,8 @@ BWindow::ChildAt(int32 index) const
 void
 BWindow::Minimize(bool minimize)
 {
-	if (IsModal() || IsFloating() || fMinimized == minimize)
+	if (IsModal() || IsFloating() || fMinimized == minimize || !Lock())
 		return;
-
-	Lock();
 
 	fMinimized = minimize;
 
@@ -494,10 +492,9 @@ BWindow::Minimize(bool minimize)
 status_t
 BWindow::SendBehind(const BWindow *window)
 {
-	if (!window)
+	if (!window || !Lock())
 		return B_ERROR;
 
-	Lock();
 	fLink->StartMessage(AS_SEND_BEHIND);
 	fLink->Attach<int32>(_get_object_token_(window));
 	fLink->Attach<team_id>(Team());
@@ -514,16 +511,19 @@ BWindow::SendBehind(const BWindow *window)
 void
 BWindow::Flush() const
 {
-	const_cast<BWindow *>(this)->Lock();
-	fLink->Flush();
-	const_cast<BWindow *>(this)->Unlock();
+	if (const_cast<BWindow *>(this)->Lock()) {
+		fLink->Flush();
+		const_cast<BWindow *>(this)->Unlock();
+	}
 }
 
 
 void
 BWindow::Sync() const
 {
-	const_cast<BWindow*>(this)->Lock();
+	if (!const_cast<BWindow*>(this)->Lock())
+		return;
+
 	fLink->StartMessage(AS_SYNC);
 
 	// waiting for the reply is the actual syncing
@@ -1398,9 +1398,9 @@ BWindow::SetDefaultButton(BButton *button)
 bool
 BWindow::NeedsUpdate() const
 {
-	// TODO: What about locking?!?
+	if (!const_cast<BWindow *>(this)->Lock())
+		return false;
 
-	const_cast<BWindow *>(this)->Lock();	
 	fLink->StartMessage(AS_NEEDS_UPDATE);
 
 	int32 code = B_ERROR;
@@ -1477,14 +1477,15 @@ BView *BWindow::CurrentFocus() const
 void
 BWindow::Activate(bool active)
 {
-	// TODO: What about locking?!?
-	if (IsHidden())
+	if (!Lock())
 		return;
 
-	Lock();
-	fLink->StartMessage(AS_ACTIVATE_WINDOW);
-	fLink->Attach<bool>(active);
-	fLink->Flush();
+	if (!IsHidden()) {
+		fLink->StartMessage(AS_ACTIVATE_WINDOW);
+		fLink->Attach<bool>(active);
+		fLink->Flush();
+	}
+
 	Unlock();
 }
 
@@ -1673,7 +1674,8 @@ BWindow::AddToSubset(BWindow *window)
 			&& fFeel != B_FLOATING_SUBSET_WINDOW_FEEL))
 		return B_BAD_VALUE;
 
-	Lock();
+	if (!Lock())
+		return B_ERROR;
 
 	status_t status = B_ERROR;
 	fLink->StartMessage(AS_ADD_TO_SUBSET);
@@ -1694,7 +1696,8 @@ BWindow::RemoveFromSubset(BWindow *window)
 			&& fFeel != B_FLOATING_SUBSET_WINDOW_FEEL))
 		return B_BAD_VALUE;
 
-	Lock();
+	if (!Lock())
+		return B_ERROR;
 
 	status_t status = B_ERROR;
 	fLink->StartMessage(AS_REMOVE_FROM_SUBSET);
@@ -1822,7 +1825,9 @@ BWindow::SetWindowAlignment(window_alignment mode,
 
 	// TODO: test if hOffset = 0 and set it to 1 if true.
 
-	Lock();
+	if (!Lock())
+		return B_ERROR;
+
 	fLink->StartMessage(AS_SET_ALIGNMENT);
 	fLink->Attach<int32>((int32)mode);
 	fLink->Attach<int32>(h);
@@ -1848,10 +1853,12 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 	int32 *h, int32 *hOffset, int32 *width, int32 *widthOffset,
 	int32 *v, int32 *vOffset, int32 *height, int32 *heightOffset) const
 {
-	const_cast<BWindow *>(this)->Lock();
+	if (!const_cast<BWindow *>(this)->Lock())
+		return B_ERROR;
+
 	fLink->StartMessage(AS_GET_ALIGNMENT);
 
-	status_t status = B_ERROR;
+	status_t status;
 	if (fLink->FlushWithReply(status) == B_OK && status == B_OK) {
 		fLink->Read<int32>((int32 *)mode);
 		fLink->Read<int32>(h);
@@ -1872,9 +1879,11 @@ BWindow::GetWindowAlignment(window_alignment *mode,
 uint32
 BWindow::Workspaces() const
 {
+	if (!const_cast<BWindow *>(this)->Lock())
+		return 0;
+
 	uint32 workspaces = 0;
 
-	const_cast<BWindow *>(this)->Lock();
 	fLink->StartMessage(AS_GET_WORKSPACES);
 
 	status_t status;
@@ -1893,11 +1902,12 @@ BWindow::SetWorkspaces(uint32 workspaces)
 	if (fFeel != B_NORMAL_WINDOW_FEEL)
 		return;
 
-	Lock();
-	fLink->StartMessage(AS_SET_WORKSPACES);
-	fLink->Attach<uint32>(workspaces);
-	fLink->Flush();
-	Unlock();
+	if (Lock()) {
+		fLink->StartMessage(AS_SET_WORKSPACES);
+		fLink->Attach<uint32>(workspaces);
+		fLink->Flush();
+		Unlock();
+	}
 }
 
 
@@ -1911,10 +1921,8 @@ BWindow::LastMouseMovedView() const
 void 
 BWindow::MoveBy(float dx, float dy)
 {
-	if (dx == 0.0 && dy == 0.0)
+	if ((dx == 0.0 && dy == 0.0) || !Lock())
 		return;
-
-	Lock();
 
 	fLink->StartMessage(AS_WINDOW_MOVE);
 	fLink->Attach<float>(dx);
@@ -1931,7 +1939,8 @@ BWindow::MoveBy(float dx, float dy)
 void
 BWindow::MoveTo(BPoint point)
 {
-	Lock();
+	if (!Lock())
+		return;
 
 	point.x = roundf(point.x);
 	point.y = roundf(point.y);
@@ -1957,7 +1966,8 @@ BWindow::MoveTo(float x, float y)
 void
 BWindow::ResizeBy(float dx, float dy)
 {
-	Lock();
+	if (!Lock())
+		return;
 
 	dx = roundf(dx);
 	dy = roundf(dy);
@@ -1990,9 +2000,10 @@ BWindow::ResizeBy(float dx, float dy)
 void
 BWindow::ResizeTo(float width, float height)
 {
-	Lock();
-	ResizeBy(width - fFrame.Width(), height - fFrame.Height());
-	Unlock();
+	if (Lock()) {
+		ResizeBy(width - fFrame.Width(), height - fFrame.Height());
+		Unlock();
+	}
 }
 
 
@@ -2337,7 +2348,9 @@ BWindow::task_looper()
 			fLastMessage = fQueue->NextMessage();
 
 			// Lock the looper
-			Lock();
+			if (!Lock())
+				break;
+
 			if (!fLastMessage) {
 				// No more messages: Unlock the looper and terminate the
 				// dispatch loop.
