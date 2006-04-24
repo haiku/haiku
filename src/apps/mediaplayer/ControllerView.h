@@ -21,23 +21,32 @@
 #ifndef __CONTROLLER_VIEW_H
 #define __CONTROLLER_VIEW_H
 
-#include <View.h>
+#include "TransportControlGroup.h"
 
 
 class Controller;
 
-class ControllerView : public BView
+class ControllerView : public TransportControlGroup
 {
 public:
 					ControllerView(BRect frame, Controller *ctrl);
 					~ControllerView();
 					
-	void			ResizeToPreferred();
-						
 private:
 	void			AttachedToWindow();
 	void			MessageReceived(BMessage *msg);
 	void			Draw(BRect updateRect);
+
+	// TransportControlGroup interface
+	virtual	uint32	EnabledButtons();
+	virtual	void	TogglePlaying();
+	virtual	void	Stop();
+	virtual	void	Rewind();
+	virtual	void	Forward();
+	virtual	void	SkipBackward();
+	virtual	void	SkipForward();
+	virtual	void	SetVolume(float value);
+	virtual	void	ToggleMute();
 	
 private:
 	Controller *	fController;

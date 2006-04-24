@@ -2,14 +2,24 @@ SubDir HAIKU_TOP src apps mediaplayer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 Application MediaPlayer :
 	Controller.cpp
 	ControllerView.cpp
+	DrawingTidbits.cpp
 	MainApp.cpp
 	MainWin.cpp
+	TransportButton.cpp
+	TransportControlGroup.cpp
 	VideoNode.cpp
 	VideoView.cpp
+	VolumeSlider.cpp
 	: be media tracker
 	: MediaPlayer.rdef
 ;
 
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : MediaPlayer
+		: tests!apps ;
+}

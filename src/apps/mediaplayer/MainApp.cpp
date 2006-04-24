@@ -20,6 +20,7 @@
 #include <Path.h>
 #include <Entry.h>
 #include <Alert.h>
+#include <Autolock.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -30,6 +31,7 @@ MainApp *gMainApp;
 MainApp::MainApp()
  :	BApplication("application/x-vnd.Haiku.MediaPlayer")
  ,	fFirstWindow(NewWindow())
+ ,	fPlayerCount(1)
 {
 }
 
@@ -42,6 +44,8 @@ MainApp::~MainApp()
 BWindow *
 MainApp::NewWindow()
 {
+	BAutolock _(this);
+	fPlayerCount++;
 	return new MainWin();
 }
 
@@ -97,6 +101,23 @@ MainApp::ArgvReceived(int32 argc, char **argv)
 	if (m.HasRef("refs")) {
 		printf("MainApp::ArgvReceived calling RefsReceived\n");
 		RefsReceived(&m);
+	}
+}
+
+
+void 
+MainApp::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case M_PLAYER_QUIT:
+			fPlayerCount--;
+			if (fPlayerCount == 0)
+				PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		default:
+			BApplication::MessageReceived(msg);
+			break;
 	}
 }
 

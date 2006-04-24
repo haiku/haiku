@@ -24,10 +24,9 @@
 #include "ControllerView.h"
 
 ControllerView::ControllerView(BRect frame, Controller *ctrl)
- :	BView(frame, "controller", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+ :	TransportControlGroup(frame)
  ,	fController(ctrl)
 {
-	SetViewColor(128,0,0);
 }
 
 
@@ -37,22 +36,16 @@ ControllerView::~ControllerView()
 
 
 void
-ControllerView::ResizeToPreferred()
-{
-	ResizeTo(300 - 1, 60 - 1);
-}
-
-
-void
 ControllerView::AttachedToWindow()
 {
-}	
+	TransportControlGroup::AttachedToWindow();
+}
 
 
 void
 ControllerView::Draw(BRect updateRect)
 {
-	BView::Draw(updateRect);
+	TransportControlGroup::Draw(updateRect);
 }
 
 
@@ -61,7 +54,74 @@ ControllerView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		default:
-			BView::MessageReceived(msg);
+			TransportControlGroup::MessageReceived(msg);
 	}
+}
+
+// #pragma mark -
+
+
+uint32
+ControllerView::EnabledButtons()
+{
+	return 0xffffffff;
+}
+
+
+void
+ControllerView::TogglePlaying()
+{
+	printf("ControllerView::TogglePlaying()\n");
+}
+
+
+void
+ControllerView::Stop()
+{
+	printf("ControllerView::Stop()\n");
+}
+
+
+void
+ControllerView::Rewind()
+{
+	// TODO: make it so this function is called repeatedly
+	printf("ControllerView::Rewind()\n");
+}
+
+
+void
+ControllerView::Forward()
+{
+	// TODO: make it so this function is called repeatedly
+	printf("ControllerView::Forward()\n");
+}
+
+
+void
+ControllerView::SkipBackward()
+{
+	printf("ControllerView::SkipBackward()\n");
+}
+
+
+void
+ControllerView::SkipForward()
+{
+	printf("ControllerView::SkipForward()\n");
+}
+
+
+void
+ControllerView::SetVolume(float value)
+{
+	printf("ControllerView::SetVolume(%.2f)\n", value);
+}
+
+
+void
+ControllerView::ToggleMute()
+{
+	printf("ControllerView::ToggleMute()\n");
 }
 

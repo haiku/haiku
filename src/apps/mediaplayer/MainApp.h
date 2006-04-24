@@ -23,6 +23,11 @@
 #include <Application.h>
 #include "MainWin.h"
 
+enum 
+{
+	M_PLAYER_QUIT = 'plqt',
+};
+
 class MainApp : public BApplication
 {
 public:
@@ -34,9 +39,11 @@ public:
 private:
 	void			RefsReceived(BMessage *msg);
 	void			ArgvReceived(int32 argc, char **argv);
+	void			MessageReceived(BMessage *msg);
 
 private:
 	BWindow *		fFirstWindow;
+	int32			fPlayerCount;
 };
 
 extern MainApp *gMainApp;

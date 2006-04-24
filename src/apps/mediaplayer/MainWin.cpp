@@ -342,7 +342,7 @@ MainWin::SetupTrackMenus()
 bool
 MainWin::QuitRequested()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
+	be_app->PostMessage(M_PLAYER_QUIT);
 	return true;
 }
 
