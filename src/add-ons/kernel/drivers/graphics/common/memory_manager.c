@@ -190,7 +190,7 @@ mem_alloc(mem_info *mem, uint32 size, void *tag, uint32 *blockID, uint32 *offset
 	mem_block *current, *newEntry;
 	status_t status;
 
-	TRACE(("mem_alloc(mem %p, size=%ld, tag=%p", mem, size, tag));
+	TRACE(("mem_alloc(mem %p, size=%lx, tag=%p)\n", mem, size, tag));
 
 	status = acquire_sem(mem->lock);
 	if (status != B_OK)
