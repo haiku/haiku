@@ -25,11 +25,13 @@
 
 
 class Controller;
+class Playlist;
+class Player;
 
 class ControllerView : public TransportControlGroup
 {
 public:
-					ControllerView(BRect frame, Controller *ctrl);
+					ControllerView(BRect frame, Controller *ctrl, Playlist *pl, Player *p);
 					~ControllerView();
 					
 private:
@@ -50,6 +52,8 @@ private:
 	
 private:
 	Controller *	fController;
+	Playlist *		fPlaylist;
+	Player *		fPlayer;
 };
 
 #endif

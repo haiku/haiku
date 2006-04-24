@@ -89,6 +89,7 @@ MainWin::MainWin()
  ,  fFilePanel(NULL)
  ,	fHasFile(false)
  ,	fHasVideo(false)
+ ,	fPlaylist(new Playlist)
  ,	fController(new Controller)
  ,	fIsFullscreen(false)
  ,	fKeepAspectRatio(true)
@@ -128,12 +129,12 @@ MainWin::MainWin()
 	
 	// controls
 	rect = BRect(0, fMenuBarHeight + 11, fBackground->Bounds().right, fBackground->Bounds().bottom);
-	fControls = new ControllerView(rect, fController);
+	fControls = new ControllerView(rect, fController, fPlaylist, this);
 	fBackground->AddChild(fControls);
 	fControls->ResizeToPreferred();
 	fControlsHeight = (int)fControls->Frame().Height() + 1;
 	fControlsWidth = (int)fControls->Frame().Width() + 1;
-	fControls->SetResizingMode(B_FOLLOW_NONE);
+	fControls->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
 //	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
 	
 //	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
@@ -154,6 +155,7 @@ MainWin::MainWin()
 MainWin::~MainWin()
 {
 	printf("MainWin::~MainWin\n");
+	delete fPlaylist;
 	delete fController;
 	delete fFilePanel;
 }
@@ -752,25 +754,25 @@ void
 MainWin::RefsReceived(BMessage *msg)
 {
 	printf("MainWin::RefsReceived\n");
-	// the first file is played in this window,
-	// if additional files (refs) are included,
-	// more windows are launched
+	
+	// the playlist ist replaced by dropped files
+	
+	fPlaylist->MakeEmpty();
 	
 	entry_ref ref;
-	int n = 0;
 	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
 		BEntry entry(&ref, true);
 		if (!entry.Exists() || !entry.IsFile())
 			continue;
-		if (n == 0) {
-			OpenFile(ref);
-		} else {
-			BMessage m(B_REFS_RECEIVED);
-			m.AddRef("refs", &ref);
-			gMainApp->NewWindow()->PostMessage(&m);
-		}
-		n++;
+		fPlaylist->AddRef(ref);
 	}
+	
+	fPlaylist->Sort();
+
+	// open first file
+	if (fPlaylist->NextRef(&ref) == B_OK)
+		OpenFile(ref);
+
 }
 
 

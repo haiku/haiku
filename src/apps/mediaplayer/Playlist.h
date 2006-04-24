@@ -1,5 +1,5 @@
 /*
- * Controller.h - Media Player for the Haiku Operating System
+ * Playlist.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  *
@@ -17,46 +17,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
-#ifndef __CONTROLLER_H
-#define __CONTROLLER_H
+#ifndef __PLAYLIST_H
+#define __PLAYLIST_H
 
-#include <MediaDefs.h>
-#include <MediaNode.h>
+#include <Entry.h>
+#include <List.h>
 
-class VideoView;
-
-class Controller
+class Playlist
 {
 public:
-							Controller();
-	virtual 				~Controller();
+					Playlist();
+					~Playlist();
+					
+	void			MakeEmpty();
+	int				CountItems();
 	
-	status_t				SetTo(const entry_ref &ref);
+	void			Sort();
+	
+	void			AddRef(const entry_ref &ref);
 
-	void					Stop();
-	void					Play();
-	void					Pause();
-	bool					IsPaused();
-
-	void					SetVideoView(VideoView *view);
-	
-	bool					IsOverlayActive();
-
-	void					LockBitmap();
-	void					UnlockBitmap();
-	BBitmap *				Bitmap();
-	
-	void					VolumeUp();
-	void					VolumeDown();
-	
-	int						VideoTrackCount();
-	int						AudioTrackCount();
+	status_t		NextRef(entry_ref *ref);
+	status_t		PrevRef(entry_ref *ref);
 
 private:
+	static int		playlist_cmp(const void *p1, const void *p2);
 
 private:
-	VideoView *				fVideoView;
+	BList			fList;
+	int				fCurrentIndex;
 };
-
 
 #endif

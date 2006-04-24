@@ -112,3 +112,26 @@ Controller::Bitmap()
 }
 
 
+void
+Controller::Stop()
+{
+}
+
+
+void
+Controller::Play()
+{
+}
+
+
+void
+Controller::Pause()
+{
+}
+
+
+bool
+Controller::IsPaused()
+{
+	return false;
+}

@@ -22,10 +22,15 @@
 #include <string.h>
 
 #include "ControllerView.h"
+#include "Controller.h"
+#include "Playlist.h"
+#include "Player.h"
 
-ControllerView::ControllerView(BRect frame, Controller *ctrl)
+ControllerView::ControllerView(BRect frame, Controller *ctrl, Playlist *pl, Player *p)
  :	TransportControlGroup(frame)
  ,	fController(ctrl)
+ ,	fPlaylist(pl)
+ ,	fPlayer(p)
 {
 }
 
@@ -72,6 +77,10 @@ void
 ControllerView::TogglePlaying()
 {
 	printf("ControllerView::TogglePlaying()\n");
+	if (fController->IsPaused())
+		fController->Play();
+	else
+		fController->Pause();
 }
 
 
@@ -79,6 +88,7 @@ void
 ControllerView::Stop()
 {
 	printf("ControllerView::Stop()\n");
+	fController->Stop();
 }
 
 
@@ -102,6 +112,11 @@ void
 ControllerView::SkipBackward()
 {
 	printf("ControllerView::SkipBackward()\n");
+	entry_ref ref;
+	if (fPlaylist->PrevRef(&ref) == B_OK) {
+		printf("prev ref: %s\n", ref.name);
+		fPlayer->OpenFile(ref);
+	}
 }
 
 
@@ -109,6 +124,11 @@ void
 ControllerView::SkipForward()
 {
 	printf("ControllerView::SkipForward()\n");
+	entry_ref ref;
+	if (fPlaylist->NextRef(&ref) == B_OK) {
+		printf("next ref: %s\n", ref.name);
+		fPlayer->OpenFile(ref);
+	}
 }
 
 

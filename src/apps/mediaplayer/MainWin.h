@@ -28,8 +28,10 @@
 #include "Controller.h"
 #include "ControllerView.h"
 #include "VideoView.h"
+#include "Player.h"
+#include "Playlist.h"
 
-class MainWin : public BWindow
+class MainWin : public BWindow, public Player
 {
 public:
 						MainWin();
@@ -48,7 +50,6 @@ public:
 	status_t			KeyDown(BMessage *msg);
 
 	void				CreateMenu();
-	void				OpenFile(const entry_ref &ref);
 	void				SetupWindow();
 	void				SetupTrackMenus();
 	void				SetWindowSizeLimits();
@@ -56,6 +57,9 @@ public:
 	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
+
+						// from Player
+	void				OpenFile(const entry_ref &ref);
 	
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
 	
@@ -85,6 +89,7 @@ public:
 	bool				fHasFile;
 	bool				fHasVideo;
 
+	Playlist *			fPlaylist;
 	Controller *		fController;
 	volatile bool		fIsFullscreen;
 	volatile bool		fKeepAspectRatio;
