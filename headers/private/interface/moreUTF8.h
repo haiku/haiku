@@ -1,7 +1,9 @@
 #ifndef __MOREUTF8
 #define __MOREUTF8
 
-#include <stdio.h>
+
+#include <SupportDefs.h>
+
 
 static inline bool
 IsInsideGlyph(uchar ch)
@@ -203,5 +205,4 @@ UTF8ToLength(const char *bytes)
 	return length;
 }
 
-
-#endif
+#endif	// __MOREUTF8

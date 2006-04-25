@@ -21,7 +21,8 @@ class ServerMemoryAllocator {
 
 		status_t InitCheck();
 
-		status_t AddArea(area_id serverArea, area_id& _localArea, uint8*& _base);
+		status_t AddArea(area_id serverArea, area_id& _localArea, uint8*& _base,
+					bool readOnly = false);
 		void RemoveArea(area_id serverArea);
 
 		status_t AreaAndBaseFor(area_id serverArea, area_id& area, uint8*& base);

@@ -11,6 +11,8 @@
 
 #include <Application.h>
 
+struct server_read_only_memory;
+
 
 class BApplication::Private {
 	public:
@@ -19,6 +21,9 @@ class BApplication::Private {
 
 		static inline BPrivate::ServerMemoryAllocator* ServerAllocator()
 			{ return be_app->fServerAllocator; }
+		
+		static inline server_read_only_memory* ServerReadOnlyMemory()
+			{ return (server_read_only_memory*)be_app->fServerReadOnlyMemory; }
 };
 
 #endif	// _APPLICATION_PRIVATE_H

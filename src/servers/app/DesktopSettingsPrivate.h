@@ -14,10 +14,12 @@
 
 #include <Locker.h>
 
+struct server_read_only_memory;
+
 
 class DesktopSettings::Private : public BLocker {
 	public:
-		Private();
+		Private(server_read_only_memory* shared);
 		~Private();
 
 		status_t		Save(uint32 mask = kAllSettings);
@@ -61,6 +63,8 @@ class DesktopSettings::Private : public BLocker {
 		mode_mouse		fMouseMode;
 		int32			fWorkspacesCount;
 		BMessage		fWorkspaceMessages[kMaxWorkspaces];
+
+		server_read_only_memory& fShared;
 };
 
 #endif	/* DESKTOP_SETTINGS_PRIVATE_H */

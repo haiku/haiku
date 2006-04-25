@@ -45,6 +45,7 @@ class DrawingEngine;
 class HWInterface;
 class ServerApp;
 class WorkspacesLayer;
+struct server_read_only_memory;
 
 namespace BPrivate {
 	class LinkSender;
@@ -55,10 +56,11 @@ class Desktop : public MessageLooper, public ScreenOwner {
 								Desktop(uid_t userID);
 		virtual					~Desktop();
 
-		void					Init();
+		status_t				Init();
 
 		uid_t					UserID() const { return fUserID; }
 		virtual port_id			MessagePort() const { return fMessagePort; }
+		area_id					SharedReadOnlyArea() const { return fSharedReadOnlyArea; }
 
 		::EventDispatcher&		EventDispatcher() { return fEventDispatcher; }
 
@@ -217,6 +219,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		port_id					fMessagePort;
 		::EventDispatcher		fEventDispatcher;
 		port_id					fInputPort;
+		area_id					fSharedReadOnlyArea;
+		server_read_only_memory* fServerReadOnlyMemory;
 
 		BLocker					fApplicationsLock;
 		BObjectList<ServerApp>	fApplications;

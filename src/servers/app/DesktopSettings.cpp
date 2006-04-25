@@ -14,15 +14,18 @@
 #include "FontManager.h"
 #include "ServerConfig.h"
 
+#include <DefaultColors.h>
+#include <ServerReadOnlyMemory.h>
+
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
-//#include <DataIO./h>
 #include <Path.h>
 
 
-DesktopSettings::Private::Private()
-	: BLocker("DesktopSettings_Private")
+DesktopSettings::Private::Private(server_read_only_memory* shared)
+	: BLocker("DesktopSettings_Private"),
+	fShared(*shared)
 {
 	// if the on-disk settings are not complete, the defaults will be kept
 	_SetDefaults();
@@ -65,6 +68,8 @@ DesktopSettings::Private::_SetDefaults()
 	fMenuInfo.triggers_always_shown = false;
 
 	fWorkspacesCount = 4;
+
+	memcpy(fShared.colors, BPrivate::kDefaultColors, sizeof(rgb_color) * kNumColors);
 }
 
 

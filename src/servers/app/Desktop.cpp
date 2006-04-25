@@ -300,7 +300,8 @@ Desktop::Desktop(uid_t userID)
 	: MessageLooper("desktop"),
 
 	fUserID(userID),
-	fSettings(new DesktopSettings::Private()),
+	fSettings(NULL),
+	fSharedReadOnlyArea(-1),
 	fApplicationsLock("application list"),
 	fShutdownSemaphore(-1),
 	fCurrentWorkspace(0),
@@ -317,17 +318,11 @@ Desktop::Desktop(uid_t userID)
 	char name[B_OS_NAME_LENGTH];
 	Desktop::_GetLooperName(name, sizeof(name));
 
-	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		_Windows(i).SetIndex(i);
-		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
-	}
-
 	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, name);
 	if (fMessagePort < B_OK)
 		return;
 
 	fLink.SetReceiverPort(fMessagePort);
-	gFontManager->AttachUser(fUserID);
 }
 
 
@@ -335,14 +330,32 @@ Desktop::~Desktop()
 {
 	delete fSettings;
 
+	delete_area(fSharedReadOnlyArea);
 	delete_port(fMessagePort);
 	gFontManager->DetachUser(fUserID);
 }
 
 
-void
+status_t
 Desktop::Init()
 {
+	if (fMessagePort < B_OK)
+		return fMessagePort;
+
+	char name[B_OS_NAME_LENGTH];
+	snprintf(name, sizeof(name), "d:%d:shared read only", /*id*/0);
+	fSharedReadOnlyArea = create_area(name, (void **)&fServerReadOnlyMemory,
+		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (fSharedReadOnlyArea < B_OK)
+		return fSharedReadOnlyArea;
+
+	fSettings = new DesktopSettings::Private(fServerReadOnlyMemory);
+
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		_Windows(i).SetIndex(i);
+		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
+	}
+
 	fVirtualScreen.RestoreConfiguration(*this, fSettings->WorkspacesMessage(0));
 
 	// TODO: temporary workaround, fActiveScreen will be removed
@@ -371,6 +384,10 @@ Desktop::Init()
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
+
+	gFontManager->AttachUser(fUserID);
+
+	return B_OK;
 }
 
 

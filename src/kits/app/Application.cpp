@@ -660,11 +660,11 @@ bool
 BApplication::IsCursorHidden() const
 {
 	BPrivate::AppServerLink link;
-	int32 code = SERVER_FALSE;
+	int32 status = B_ERROR;
 	link.StartMessage(AS_QUERY_CURSOR_HIDDEN);
-	link.FlushWithReply(code);
+	link.FlushWithReply(status);
 
-	return code == SERVER_TRUE;
+	return status == B_OK;
 }
 
 
@@ -995,10 +995,6 @@ BApplication::_InitGUIContext()
 	if (error != B_OK)
 		return error;
 
-	error = _SetupServerAllocator();
-	if (error != B_OK)
-		return error;
-
 	// Initialize the IK after we have set be_app because of a construction of a
 	// AppServerLink (which depends on be_app) nested inside the call to get_menu_info.
 	error = _init_interface_kit_();
@@ -1061,20 +1057,36 @@ BApplication::_ConnectToServer()
 	fServerLink->Attach<int32>(_get_object_token_(this));
 	fServerLink->AttachString(fAppName);
 
+	area_id sharedReadOnlyArea;
+
 	if (fServerLink->FlushWithReply(code) == B_OK
 		&& code == B_OK) {
 		// We don't need to contact the main app_server anymore
 		// directly; we now talk to our server alter ego only.
 		fServerLink->Read<port_id>(&serverPort);
-		fServerLink->SetSenderPort(serverPort);
+		fServerLink->Read<area_id>(&sharedReadOnlyArea);
 	} else {
 		fServerLink->SetSenderPort(-1);
 		debugger("BApplication: couldn't obtain new app_server comm port");
 		return B_ERROR;
 	}
 
+	fServerLink->SetSenderPort(serverPort);
+
+	status_t status = _SetupServerAllocator();
+	if (status != B_OK)
+		return status;
+
+	area_id area;
+	uint8* base;
+	status = fServerAllocator->AddArea(sharedReadOnlyArea, area, base, true);
+	if (status < B_OK)
+		return status;
+
+	fServerReadOnlyMemory = base;
 	return B_OK;
 }
+
 
 #if 0
 void

@@ -34,8 +34,7 @@ namespace BPrivate {
 class BApplication : public BLooper {
 public:
 							BApplication(const char* signature);
-							BApplication(const char* signature,
-										 status_t* error);
+							BApplication(const char* signature, status_t* error);
 	virtual					~BApplication();
 
 	// Archiving
@@ -138,7 +137,6 @@ private:
 */			bool			_QuitAllWindows(bool force);
 			bool			_WindowQuitLoop(bool quitFilePanels, bool force);
 			void			_ArgvReceived(BMessage* message);
-			void			SetAppCursor();
 
 			uint32			InitialWorkspace();
 			int32			_CountWindows(bool includeMenus) const;
@@ -158,7 +156,8 @@ private:
 			//_drag_data_*	fDraggedMessage;
 			BMessageRunner*	fPulseRunner;
 			status_t		fInitError;
-			uint32			_reserved[13];
+			void*			fServerReadOnlyMemory;
+			uint32			_reserved[12];
 
 			bool			fReadyToRunCalled;
 };

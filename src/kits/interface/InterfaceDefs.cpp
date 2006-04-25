@@ -10,7 +10,19 @@
 
 /**	Global functions and variables for the Interface Kit */
 
-#include <Application.h>
+#include "moreUTF8.h"
+#include "truncate_string.h"
+
+#include <ApplicationPrivate.h>
+#include <AppServerLink.h>
+#include <DefaultColors.h>
+#include <InputServerTypes.h>
+#include <input_globals.h>
+#include <ServerProtocol.h>
+#include <ServerReadOnlyMemory.h>
+#include <WidthBuffer.h>
+#include <WindowInfo.h>
+
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <Menu.h>
@@ -20,18 +32,10 @@
 #include <String.h>
 #include <TextView.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <AppServerLink.h>
-#include <WindowInfo.h>
-#include <InputServerTypes.h>
-#include <input_globals.h>
-#include <ServerProtocol.h>
-#include <WidthBuffer.h>
-
-#include "moreUTF8.h"
-#include "truncate_string.h"
 
 // Private definitions not placed in public headers
 void _init_global_fonts_();
@@ -53,6 +57,35 @@ struct general_ui_info general_info;
 menu_info *_menu_info_ptr_;
 
 extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
+
+static const rgb_color _kDefaultColors[kNumColors] = {
+	{216, 216, 216, 255},	// B_PANEL_BACKGROUND_COLOR
+	{216, 216, 216, 255},	// B_MENU_BACKGROUND_COLOR
+	{255, 0, 203, 255},		// B_WINDOW_TAB_COLOR
+	{0, 0, 229, 255},		// B_KEYBOARD_NAVIGATION_COLOR
+	{51, 102, 152, 255},	// B_DESKTOP_COLOR
+	{115, 120, 184, 255},	// B_MENU_SELECTED_BACKGROUND_COLOR
+	{0, 0, 0, 255},			// B_MENU_ITEM_TEXT_COLOR
+	{0, 0, 0, 255},			// B_MENU_SELECTED_ITEM_TEXT_COLOR
+	{0, 0, 0, 255},			// B_MENU_SELECTED_BORDER_COLOR
+	{0, 0, 0, 255},			// B_PANEL_TEXT_COLOR
+	{255, 255, 255, 255},	// B_DOCUMENT_BACKGROUND_COLOR
+	{0, 0, 0, 255},			// B_DOCUMENT_TEXT_COLOR
+	{245, 245, 245, 255},	// B_CONTROL_BACKGROUND_COLOR
+	{0, 0, 0, 255},			// B_CONTROL_TEXT_COLOR
+	{0, 0, 0, 255},			// B_CONTROL_BORDER_COLOR
+	{102, 152, 203, 255},	// B_CONTROL_HIGHLIGHT_COLOR
+	{0, 0, 0, 255},			// B_NAVIGATION_PULSE_COLOR
+	{255, 255, 255, 255},	// B_SHINE_COLOR
+	{0, 0, 0, 255},			// B_SHADOW_COLOR
+	{255, 255, 0, 255},		// B_TOOLTIP_BACKGROUND_COLOR
+	{0, 0, 0, 255},			// B_TOOLTIP_TEXT_COLOR
+	// 100...
+	{0, 255, 0, 255},		// B_SUCCESS_COLOR
+	{255, 0, 0, 255},		// B_FAILURE_COLOR
+	{}
+};
+const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
 
 
 static status_t
@@ -686,66 +719,18 @@ mouse_mode()
 _IMPEXP_BE rgb_color
 ui_color(color_which which)
 {
+	int32 index = color_which_to_index(which);
+	if (index < 0 || index >= kNumColors) {
+		fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
+		return make_color(0, 0, 0);
+	}
+
 	if (be_app) {
-		rgb_color color;
-		BPrivate::AppServerLink link;
-		link.StartMessage(AS_GET_UI_COLOR);
-		link.Attach<color_which>(which);
-
-		int32 code;
-		if (link.FlushWithReply(code) == B_OK && code == B_OK) {
-			link.Read<rgb_color>(&color);
-			return color;
-		}
+		server_read_only_memory* shared = BApplication::Private::ServerReadOnlyMemory();
+		return shared->colors[index];
 	}
 
-	switch (which) {
-		case B_PANEL_BACKGROUND_COLOR:
-			return make_color(216,216,216);
-		case B_PANEL_TEXT_COLOR:
-			return make_color(0,0,0);
-		case B_DOCUMENT_BACKGROUND_COLOR:
-			return make_color(255,255,255);
-		case B_DOCUMENT_TEXT_COLOR:
-			return make_color(0,0,0);
-		case B_CONTROL_BACKGROUND_COLOR:
-			return make_color(245,245,245);
-		case B_CONTROL_TEXT_COLOR:
-			return make_color(0,0,0);
-		case B_CONTROL_BORDER_COLOR:
-			return make_color(0,0,0);
-		case B_CONTROL_HIGHLIGHT_COLOR:
-			return make_color(102, 152, 203);
-		case B_NAVIGATION_BASE_COLOR:
-			return make_color(0,0,229);
-		case B_NAVIGATION_PULSE_COLOR:
-			return make_color(0,0,0);
-		case B_SHINE_COLOR:
-			return make_color(255,255,255);
-		case B_SHADOW_COLOR:
-			return make_color(0,0,0);
-		case B_MENU_BACKGROUND_COLOR:
-			return make_color(216,216,216);
-		case B_MENU_SELECTED_BACKGROUND_COLOR:
-			return make_color(115,120,184);
-		case B_MENU_ITEM_TEXT_COLOR:
-			return make_color(0,0,0);
-		case B_MENU_SELECTED_BORDER_COLOR:
-			return make_color(0,0,0);
-		case B_TOOLTIP_BACKGROUND_COLOR:
-			return make_color(255,255,0);
-		case B_TOOLTIP_TEXT_COLOR:
-			return make_color(0,0,0);
-		case B_SUCCESS_COLOR:
-			return make_color(0,255,0);
-		case B_FAILURE_COLOR:
-			return make_color(255,0,0);
-		case B_WINDOW_TAB_COLOR:
-			return make_color(255,0,203);
-		default:
-			fprintf(stderr, "ui_color(): unknown color_which %d\n", which);
-			return make_color(0,0,0);
-	}
+	return kDefaultColors[index];
 }
 
 

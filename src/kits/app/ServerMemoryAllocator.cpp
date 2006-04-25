@@ -58,7 +58,8 @@ ServerMemoryAllocator::InitCheck()
 
 
 status_t
-ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base)
+ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base,
+	bool readOnly)
 {
 	area_mapping* mapping = new (std::nothrow) area_mapping;
 	if (mapping == NULL || !fAreas.AddItem(mapping)) {
@@ -66,19 +67,20 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base
 		return B_NO_MEMORY;
 	}
 
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-	// reserve 128 MB of space for the area
-	void* base = (void*)0x60000000;
-	status_t status = _kern_reserve_heap_address_range((addr_t*)&base,
-		B_BASE_ADDRESS, 128 * 1024 * 1024);
-#else
-	void* base;
 	status_t status = B_ERROR;
+	void* base;
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+	if (!readOnly) {
+		// reserve 128 MB of space for the area
+		base = (void*)0x60000000;
+		status = _kern_reserve_heap_address_range((addr_t*)&base,
+			B_BASE_ADDRESS, 128 * 1024 * 1024);
+	}
 #endif
 
-	mapping->local_area = clone_area("server_memory", &base,
-		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA, serverArea);
+	mapping->local_area = clone_area(readOnly ? "server read-only memory" : "server_memory",
+		&base, status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
+		B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
 	if (mapping->local_area < B_OK) {
 		status = mapping->local_area;
 		delete mapping;

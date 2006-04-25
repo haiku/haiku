@@ -220,7 +220,8 @@ ServerApp::Run()
 
 	// Let's tell the client how to talk with us
 	fLink.StartMessage(B_OK);
-	fLink.Attach<int32>(fMessagePort);
+	fLink.Attach<port_id>(fMessagePort);
+	fLink.Attach<area_id>(fDesktop->SharedReadOnlyArea());
 	fLink.Flush();
 
 	return true;

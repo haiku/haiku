@@ -1,57 +1,22 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		InterfaceDefs.h
-//	Author:			Erik Jaesler (erik@cgsoftware.com)
-//	Description:	General Interface Kit definitions and global functions.
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright (c) 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Erik Jaesler (erik@cgsoftware.com)
+ */
 #ifndef	_INTERFACE_DEFS_H
 #define	_INTERFACE_DEFS_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <GraphicsDefs.h>
 #include <OS.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
 class BRect;
 
-/*----------------------------------------------------------------*/
 
-struct key_info {
-	uint32	modifiers;
-	uint8	key_states[16];
-};
-
-/*----------------------------------------------------------------*/
+// some handy UTF-8 characters
 
 #define B_UTF8_ELLIPSIS		"\xE2\x80\xA6"
 #define B_UTF8_OPEN_QUOTE	"\xE2\x80\x9C"
@@ -67,85 +32,96 @@ struct key_info {
 	#define B_MAX_MOUSE_BUTTONS 16
 #endif
 
-/*----------------------------------------------------------------*/
 
-enum {	B_BACKSPACE			= 0x08,
-		B_RETURN			= 0x0a,
-		B_ENTER				= 0x0a,
-		B_SPACE				= 0x20,
-		B_TAB				= 0x09,
-		B_ESCAPE			= 0x1b,
-		B_SUBSTITUTE		= 0x1a,
+// key definitions
 
-		B_LEFT_ARROW		= 0x1c,
-		B_RIGHT_ARROW		= 0x1d,
-		B_UP_ARROW			= 0x1e,
-		B_DOWN_ARROW		= 0x1f,
+struct key_info {
+	uint32	modifiers;
+	uint8	key_states[16];
+};
 
-		B_INSERT			= 0x05,
-		B_DELETE			= 0x7f,
-		B_HOME				= 0x01,
-		B_END				= 0x04,
-		B_PAGE_UP			= 0x0b,
-		B_PAGE_DOWN			= 0x0c,
+enum {
+	B_BACKSPACE			= 0x08,
+	B_RETURN			= 0x0a,
+	B_ENTER				= 0x0a,
+	B_SPACE				= 0x20,
+	B_TAB				= 0x09,
+	B_ESCAPE			= 0x1b,
+	B_SUBSTITUTE		= 0x1a,
 
-		B_FUNCTION_KEY		= 0x10 };
+	B_LEFT_ARROW		= 0x1c,
+	B_RIGHT_ARROW		= 0x1d,
+	B_UP_ARROW			= 0x1e,
+	B_DOWN_ARROW		= 0x1f,
 
-enum {	B_F1_KEY			= 0x02,
-		B_F2_KEY			= 0x03,
-		B_F3_KEY			= 0x04,
-		B_F4_KEY			= 0x05,
-		B_F5_KEY			= 0x06,
-		B_F6_KEY			= 0x07,
-		B_F7_KEY			= 0x08,
-		B_F8_KEY			= 0x09,
-		B_F9_KEY			= 0x0a,
-		B_F10_KEY			= 0x0b,
-		B_F11_KEY			= 0x0c,
-		B_F12_KEY			= 0x0d,
-		B_PRINT_KEY			= 0x0e,
-		B_SCROLL_KEY		= 0x0f,
-		B_PAUSE_KEY			= 0x10 };
+	B_INSERT			= 0x05,
+	B_DELETE			= 0x7f,
+	B_HOME				= 0x01,
+	B_END				= 0x04,
+	B_PAGE_UP			= 0x0b,
+	B_PAGE_DOWN			= 0x0c,
+
+	B_FUNCTION_KEY		= 0x10
+};
+
+enum {
+	B_F1_KEY			= 0x02,
+	B_F2_KEY			= 0x03,
+	B_F3_KEY			= 0x04,
+	B_F4_KEY			= 0x05,
+	B_F5_KEY			= 0x06,
+	B_F6_KEY			= 0x07,
+	B_F7_KEY			= 0x08,
+	B_F8_KEY			= 0x09,
+	B_F9_KEY			= 0x0a,
+	B_F10_KEY			= 0x0b,
+	B_F11_KEY			= 0x0c,
+	B_F12_KEY			= 0x0d,
+	B_PRINT_KEY			= 0x0e,
+	B_SCROLL_KEY		= 0x0f,
+	B_PAUSE_KEY			= 0x10
+};
 
 struct key_map {
-		uint32	version;
-		uint32	caps_key;
-		uint32	scroll_key;
-		uint32	num_key;
-		uint32	left_shift_key;
-		uint32	right_shift_key;
-		uint32	left_command_key;
-		uint32	right_command_key;
-		uint32	left_control_key;
-		uint32	right_control_key;
-		uint32	left_option_key;
-		uint32	right_option_key;
-		uint32	menu_key;
-		uint32	lock_settings;
-		int32	control_map[128];
-		int32	option_caps_shift_map[128];
-		int32	option_caps_map[128];
-		int32	option_shift_map[128];
-		int32	option_map[128];
-		int32	caps_shift_map[128];
-		int32	caps_map[128];
-		int32	shift_map[128];
-		int32	normal_map[128];
-		int32	acute_dead_key[32];
-		int32	grave_dead_key[32];
-		int32	circumflex_dead_key[32];
-		int32	dieresis_dead_key[32];
-		int32	tilde_dead_key[32];
-		uint32	acute_tables;
-		uint32	grave_tables;
-		uint32	circumflex_tables;
-		uint32	dieresis_tables;
-		uint32	tilde_tables;
+	uint32	version;
+	uint32	caps_key;
+	uint32	scroll_key;
+	uint32	num_key;
+	uint32	left_shift_key;
+	uint32	right_shift_key;
+	uint32	left_command_key;
+	uint32	right_command_key;
+	uint32	left_control_key;
+	uint32	right_control_key;
+	uint32	left_option_key;
+	uint32	right_option_key;
+	uint32	menu_key;
+	uint32	lock_settings;
+	int32	control_map[128];
+	int32	option_caps_shift_map[128];
+	int32	option_caps_map[128];
+	int32	option_shift_map[128];
+	int32	option_map[128];
+	int32	caps_shift_map[128];
+	int32	caps_map[128];
+	int32	shift_map[128];
+	int32	normal_map[128];
+	int32	acute_dead_key[32];
+	int32	grave_dead_key[32];
+	int32	circumflex_dead_key[32];
+	int32	dieresis_dead_key[32];
+	int32	tilde_dead_key[32];
+	uint32	acute_tables;
+	uint32	grave_tables;
+	uint32	circumflex_tables;
+	uint32	dieresis_tables;
+	uint32	tilde_tables;
 };
 
 struct mouse_map {
-		uint32	button[B_MAX_MOUSE_BUTTONS];
+	uint32	button[B_MAX_MOUSE_BUTTONS];
 };
+
 
 /*----------------------------------------------------------------*/
 
@@ -173,7 +149,7 @@ enum button_width {
 /*----------------------------------------------------------------*/
 
 enum join_mode {
-	B_ROUND_JOIN=0,
+	B_ROUND_JOIN = 0,
 	B_MITER_JOIN,
 	B_BEVEL_JOIN,
 	B_BUTT_JOIN,
@@ -357,12 +333,6 @@ enum color_which {
 	// the replacement for B_DESKTOP_COLOR.
 	B_DESKTOP_COLOR = 5,
 	B_WINDOW_TAB_COLOR = 3,
-
-	B_RANDOM_COLOR = 0x80000000,
-	B_MICHELANGELO_FAVORITE_COLOR,
-	B_DSANDLER_FAVORITE_SKY_COLOR,
-	B_DSANDLER_FAVORITE_INK_COLOR,
-	B_DSANDLER_FAVORITE_SHOES_COLOR
 };
 
 _IMPEXP_BE rgb_color	ui_color(color_which which);
@@ -385,8 +355,5 @@ const float B_DARKEN_MAX_TINT	= 2.0F;		/* 216 -->   0.0   (0) */
 const float B_DISABLED_LABEL_TINT		= B_DARKEN_3_TINT;
 const float B_HIGHLIGHT_BACKGROUND_TINT	= B_DARKEN_2_TINT;
 const float B_DISABLED_MARK_TINT		= B_LIGHTEN_2_TINT;
-
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
 
 #endif	// _INTERFACE_DEFS_H
