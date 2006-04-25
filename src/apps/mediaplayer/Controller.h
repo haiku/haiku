@@ -23,6 +23,7 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+class BBitmap;
 class VideoView;
 
 class Controller
