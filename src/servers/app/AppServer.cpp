@@ -189,10 +189,16 @@ AppServer::_CreateDesktop(uid_t userID)
 	try {
 		desktop = new Desktop(userID);
 
-		desktop->Init();
-		desktop->Run();
+		status_t status = desktop->Init();
+		if (status == B_OK) {
+			if (!desktop->Run())
+				status = B_ERROR;
+		}
+		if (status == B_OK && !fDesktops.AddItem(desktop))
+			status = B_NO_MEMORY;
 
-		if (!fDesktops.AddItem(desktop)) {
+		if (status < B_OK) {
+			fprintf(stderr, "Cannot initialize Desktop object: %s\n", strerror(status));
 			delete desktop;
 			return NULL;
 		}
