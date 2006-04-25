@@ -497,18 +497,18 @@ ShowImageView::SetImage(const entry_ref *ref)
 				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
 				break;
 			case k0V:
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 			case k90V:
 				DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 			case k0H:
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipSideways, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
 				break;
 			case k270V:
 				DoImageOperation(ImageProcessor::kRotateAntiClockwise, true);
-				DoImageOperation(ImageProcessor::ImageProcessor::kFlipUpsideDown, true);
+				DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
 				break;
 		}
 	}
@@ -1136,7 +1136,6 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		return;
 
 	SetMouseEventMask(B_POINTER_EVENTS);
-	BPoint leftTop(fSelectionRect.left, fSelectionRect.top);
 
 	// fill the drag message
 	BMessage drag(B_SIMPLE_DATA);
@@ -1150,12 +1149,25 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		AnimateSelection(false);
-		sourcePoint -= leftTop;
-		sourcePoint.x *= fScaleX;
-		sourcePoint.y *= fScaleY;
-		// DragMessage takes ownership of bitmap
-		DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
-		bitmap = NULL;
+		// only use a transparent bitmap on selections less than 400x400 (taking into account scaling)
+		if ((fSelectionRect.Width() * fScaleX) < 400.0 && (fSelectionRect.Height() * fScaleY) < 400.0)
+		{
+			sourcePoint -= fSelectionRect.LeftTop();
+			sourcePoint.x *= fScaleX;
+			sourcePoint.y *= fScaleY;
+			// DragMessage takes ownership of bitmap
+			DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
+			bitmap = NULL;
+		}
+		else
+		{
+			delete bitmap;
+			// Offset and scale the rect
+			BRect rect(fSelectionRect);
+			rect = ImageToView(rect);
+			rect.InsetBy(-1, -1);
+			DragMessage(&drag, rect);
+		}
 	}
 }
 
@@ -2392,8 +2404,8 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 		// Note: If one of these fails, check its definition in class ImageProcessor.
 		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
 		ASSERT(ImageProcessor::kRotateAntiClockwise < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kFlipSideways < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kFlipUpsideDown < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
+		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
 	} else {
 		fInverted = !fInverted;
@@ -2447,9 +2459,9 @@ void
 ShowImageView::Flip(bool vertical) 
 {
 	if (vertical) {
-		UserDoImageOperation(ImageProcessor::kFlipSideways);
+		UserDoImageOperation(ImageProcessor::kFlipLeftToRight);
 	} else {
-		UserDoImageOperation(ImageProcessor::kFlipUpsideDown);
+		UserDoImageOperation(ImageProcessor::kFlipTopToBottom);
 	}
 }
 

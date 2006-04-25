@@ -1068,7 +1068,7 @@ ImageProcessor::Run(int32 i, int32 n)
 				}
 			}
 			break;
-		case kFlipUpsideDown:
+		case kFlipTopToBottom:
 			for (y = from; y <= to; y ++) {
 				for (x = 0; x <= fWidth; x ++) {
 					destX = x;
@@ -1077,7 +1077,7 @@ ImageProcessor::Run(int32 i, int32 n)
 				}
 			}
 			break;
-		case kFlipSideways:
+		case kFlipLeftToRight:
 			for (y = from; y <= to; y ++) {
 				for (x = 0; x <= fWidth; x ++) {
 					destX = fWidth - x;
