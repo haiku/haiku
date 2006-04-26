@@ -168,8 +168,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref *ref,
 			B_WIDTH_AS_USUAL, B_INFO_ALERT);
 		alert->Go();
 
-		// exit if file could not be opened
-		PostMessage(B_QUIT_REQUESTED);
+		// quit if file could not be opened
+		Quit();
 		return;
 	}
 
