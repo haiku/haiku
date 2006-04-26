@@ -11,6 +11,7 @@
 #include "intel_extreme.h"
 
 #include <errno.h>
+#include <unistd.h>
 
 
 //#define TRACE_MEMORY
