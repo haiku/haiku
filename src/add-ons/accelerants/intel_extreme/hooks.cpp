@@ -89,16 +89,24 @@ get_accelerant_hook(uint32 feature, void *data)
 		HOOK(FILL_SPAN);
 */		
 		// overlay
-/*		HOOK(OVERLAY_COUNT);
-		HOOK(OVERLAY_SUPPORTED_SPACES);
-		HOOK(OVERLAY_SUPPORTED_FEATURES);
-		HOOK(ALLOCATE_OVERLAY_BUFFER);
-		HOOK(RELEASE_OVERLAY_BUFFER);
-		HOOK(GET_OVERLAY_CONSTRAINTS);
-		HOOK(ALLOCATE_OVERLAY);
-		HOOK(RELEASE_OVERLAY);
-		HOOK(CONFIGURE_OVERLAY);
-*/
+		case B_OVERLAY_COUNT:
+			return intel_overlay_supported_spaces;
+		case B_OVERLAY_SUPPORTED_SPACES:
+			return intel_overlay_supported_spaces;
+		case B_OVERLAY_SUPPORTED_FEATURES:
+			return intel_overlay_supported_features;
+		case B_ALLOCATE_OVERLAY_BUFFER:
+			return intel_allocate_overlay_buffer;
+		case B_RELEASE_OVERLAY_BUFFER:
+			return intel_release_overlay_buffer;
+		case B_GET_OVERLAY_CONSTRAINTS:
+			return intel_get_overlay_constraints;
+		case B_ALLOCATE_OVERLAY:
+			return intel_allocate_overlay;
+		case B_RELEASE_OVERLAY:
+			return intel_release_overlay;
+		case B_CONFIGURE_OVERLAY:
+			return intel_configure_overlay;
 	}
 
 	return NULL;

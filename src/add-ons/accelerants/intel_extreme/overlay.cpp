@@ -95,9 +95,6 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->buffer = gInfo->shared_info->graphics_memory + overlay->buffer_offset;
 	buffer->buffer_dma = gInfo->shared_info->physical_graphics_memory + overlay->buffer_offset;
 
-	// add to list of overlays
-
-
 	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, phys-address=%x", 
 		overlay->buffer_handle, overlay->buffer_offset, buffer->buffer, buffer->buffer_dma));
 
