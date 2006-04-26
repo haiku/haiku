@@ -194,8 +194,8 @@ AppServer::MainLoop(void)
 				break;
 			default:
 			{
-				STRACE(("Server::MainLoop received unexpected code %ld (offset %ld)\n",
-						code, code - SERVER_TRUE));
+				STRACE(("Server::MainLoop received unexpected code %ld\n",
+					code));
 				break;
 			}
 		}
@@ -278,7 +278,7 @@ AppServer::DispatchMessage(int32 code, BPrivate::PortLink &msg)
 			release_sem(fAppListLock);
 
 			BPrivate::PortLink replylink(clientReplyPort);
-			replylink.StartMessage(SERVER_TRUE);
+			replylink.StartMessage(B_OK);
 			replylink.Attach<int32>(serverListen);
 			replylink.Flush();
 

@@ -276,7 +276,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: get current workspace\n", fSignature.String()));
 
 			// TODO: Locking this way is not nice
-			fLink.StartMessage(SERVER_TRUE);
+			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(0);
 			fLink.Flush();
 			break;
@@ -299,7 +299,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerApp %s: Received IsCursorHidden request\n", fSignature.String()));
 			// Attached data
 			// 1) int32 port to reply to
-			fLink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
+			fLink.StartMessage(fCursorHidden ? B_OK : B_ERROR);
 			fLink.Flush();
 			break;
 		}
@@ -310,7 +310,7 @@ ServerApp::DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
-				fLink.StartMessage(SERVER_FALSE);
+				fLink.StartMessage(B_ERROR);
 				fLink.Flush();
 			} else
 				puts("message doesn't need a reply!");
