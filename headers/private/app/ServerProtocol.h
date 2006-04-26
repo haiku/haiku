@@ -26,10 +26,6 @@
 	// additional option for AS_LAYER_SET_VIEW_BITMAP
 
 enum {
-	// Used for quick replies from the app_server
-	SERVER_TRUE = B_OK,
-	SERVER_FALSE = B_ERROR,
-
 	// NOTE: all defines have to start with "AS_" to let the "code_to_name"
 	// utility work correctly
 
@@ -57,10 +53,6 @@ enum {
 	AS_CREATE_BITMAP,
 	AS_DELETE_BITMAP,
 	AS_GET_BITMAP_OVERLAY_RESTRICTIONS,
-
-	AS_ACQUIRE_SERVERMEM,
-	AS_RELEASE_SERVERMEM,
-	AS_AREA_MESSAGE,
 
 	// Cursor commands
 	AS_SET_CURSOR,
@@ -168,8 +160,7 @@ enum {
 
 	// Global function call defs
 	AS_SET_UI_COLORS,
-	AS_GET_UI_COLORS,
-	AS_GET_UI_COLOR,
+	AS_SET_UI_COLOR,
 	AS_SET_DECORATOR,
 	AS_GET_DECORATOR,
 	AS_R5_SET_DECORATOR,
@@ -191,12 +182,6 @@ enum {
 	AS_SET_MOUSE_MODE,
 	AS_GET_MOUSE_MODE,
 	AS_GET_MOUSE,
-
-	// Hook function messages
-	AS_WORKSPACE_ACTIVATED,
-	AS_WORKSPACES_CHANGED,
-	AS_WINDOW_ACTIVATED,
-	AS_SCREENMODE_CHANGED,
 
 	// Graphics calls
 	AS_SET_HIGH_COLOR,
@@ -231,24 +216,16 @@ enum {
 	AS_SET_FONT,
 	AS_SET_FONT_SIZE,
 
-	AS_FLUSH,
 	AS_SYNC,
 
 	AS_LAYER_CREATE,
 	AS_LAYER_DELETE,
 	AS_LAYER_CREATE_ROOT,
-	AS_LAYER_ADD_CHILD, 
-	AS_LAYER_REMOVE_CHILD,
-	AS_LAYER_REMOVE_SELF,
 	AS_LAYER_SHOW,
 	AS_LAYER_HIDE,
 	AS_LAYER_MOVE,
 	AS_LAYER_RESIZE,
 	AS_LAYER_DRAW,
-
-	AS_LAYER_GET_TOKEN,
-	AS_LAYER_ADD,
-	AS_LAYER_REMOVE,
 
 	// View/Layer definitions
 	AS_LAYER_GET_COORD,

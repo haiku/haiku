@@ -465,7 +465,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				// if everything went well, ServerApp::Run() will notify
 				// the client - but since it didn't, we do it here
 				BPrivate::LinkSender reply(clientReplyPort);
-				reply.StartMessage(SERVER_FALSE);
+				reply.StartMessage(B_ERROR);
 				reply.Flush();
 			}
 
