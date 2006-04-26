@@ -11,8 +11,16 @@
 
 #include "intel_extreme.h"
 
+#include <video_overlay.h>
 
-typedef struct accelerant_info {
+
+struct overlay {
+	overlay_buffer	buffer;
+	uint32			buffer_handle;
+	uint32			buffer_offset;
+};
+
+struct accelerant_info {
 	vuint8			*regs;
 	area_id			regs_area;
 
@@ -26,7 +34,7 @@ typedef struct accelerant_info {
 
 	int				device;
 	bool			is_clone;
-} accelerant_info;
+};
 
 extern accelerant_info *gInfo;
 

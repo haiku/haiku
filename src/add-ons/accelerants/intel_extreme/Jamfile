@@ -13,6 +13,7 @@ Addon intel_extreme.accelerant : accelerants :
 	hooks.cpp
 	memory.cpp
 	mode.cpp
+	overlay.cpp
 	: false
 	: be
 ;

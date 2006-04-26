@@ -67,9 +67,9 @@ void intel_invert_rectangle(engine_token *engineToken, fill_rect_params *list, u
 void intel_fill_span(engine_token *engineToken, uint32 color, uint16 *list, uint32 count);
 
 // overlay
-uint32 intel_overlay_count(const display_mode *dm);
-const uint32 *intel_overlay_supported_spaces(const display_mode *dm);
-uint32 intel_overlay_supported_features(uint32 a_color_space);
+uint32 intel_overlay_count(const display_mode *mode);
+const uint32 *intel_overlay_supported_spaces(const display_mode *mode);
+uint32 intel_overlay_supported_features(uint32 colorSpace);
 const overlay_buffer *intel_allocate_overlay_buffer(color_space space, uint16 width,
 			uint16 height);
 status_t intel_release_overlay_buffer(const overlay_buffer *buffer);

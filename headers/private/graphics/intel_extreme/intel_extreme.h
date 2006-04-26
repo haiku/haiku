@@ -55,6 +55,9 @@ struct intel_shared_info {
 
 	uint32			frame_buffer_offset;
 
+	int32			overlay_channel_used;
+	uint32			overlay_token;
+
 	uint32			device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
