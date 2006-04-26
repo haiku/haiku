@@ -220,7 +220,11 @@ StyledEditApp::ArgvReceived(int32 argc, const char* argv[], const char* cwd)
 			fprintf(stderr, "Entry not found: \"%s\".\n", path.Path());
 			continue;
 		}
-		OpenDocument(&ref);
+		BEntry entry(&ref);
+		if (entry.IsFile())
+			OpenDocument(&ref);
+		else if (fWindowCount == 0)
+			OpenDocument();
 	}
 }
 
