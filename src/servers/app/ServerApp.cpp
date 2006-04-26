@@ -18,7 +18,6 @@
 
 #include "AppServer.h"
 #include "BitmapManager.h"
-#include "ColorSet.h"
 #include "CursorManager.h"
 #include "CursorSet.h"
 #include "Desktop.h"
@@ -997,51 +996,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<mode_mouse>(settings.MouseMode());
-			fLink.Flush();
-			break;
-		}
-
-		case AS_GET_UI_COLORS:
-		{
-			// Client application is asking for all the system colors at once
-			// using a ColorSet object
-			gGUIColorSet.Lock();
-			
-			fLink.StartMessage(B_OK);
-			fLink.Attach<ColorSet>(gGUIColorSet);
-			fLink.Flush();
-			
-			gGUIColorSet.Unlock();
-			break;
-		}
-		case AS_SET_UI_COLORS:
-		{
-			// Client application is asking to set all the system colors at once
-			// using a ColorSet object
-
-			// Attached data:
-			// 1) ColorSet new colors to use
-			gGUIColorSet.Lock();
-			link.Read<ColorSet>(&gGUIColorSet);
-			gGUIColorSet.Unlock();
-
-			fDesktop->BroadcastToAllApps(AS_UPDATE_COLORS);
-			break;
-		}
-		case AS_GET_UI_COLOR:
-		{
-			STRACE(("ServerApp %s: Get UI color\n", Signature()));
-
-			RGBColor color;
-			int32 whichColor;
-			link.Read<int32>(&whichColor);
-
-			gGUIColorSet.Lock();
-			color = gGUIColorSet.AttributeToColor(whichColor);
-			gGUIColorSet.Unlock();
-
-			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(color.GetColor32());
 			fLink.Flush();
 			break;
 		}

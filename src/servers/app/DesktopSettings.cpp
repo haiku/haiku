@@ -59,7 +59,7 @@ DesktopSettings::Private::_SetDefaults()
 	strlcpy(fMenuInfo.f_style, fPlainFont.Style(), B_FONT_STYLE_LENGTH);
 	fMenuInfo.font_size = fPlainFont.Size();
 	// TODO:
-	fMenuInfo.background_color.set_to(216, 216, 216); //gColorSet->menu_background;
+	fMenuInfo.background_color.set_to(216, 216, 216);
 	
 	// look of the separator (R5: (0, 1, 2), default 0)
 	// TODO: we could just choose a nice one and remove the others

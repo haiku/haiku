@@ -15,7 +15,6 @@
 #include <String.h>
 #include <Window.h>
 
-#include "ColorSet.h"
 #include "DrawState.h"
 
 class DesktopSettings;
@@ -51,7 +50,6 @@ class Decorator {
 									window_look look, uint32 flags);
 	virtual						~Decorator();
 
-			void				SetColors(const ColorSet &cset);
 			void				SetDriver(DrawingEngine *driver);
 			void				SetFont(ServerFont *font);
 
@@ -86,8 +84,6 @@ class Decorator {
 			void				SetFocus(bool focussed);
 			bool				IsFocus()
 									{ return fIsFocused; };
-			ColorSet			Colors()
-									{ return (_colors) ? *_colors : ColorSet(); }
 
 	virtual	void				GetFootprint(BRegion *region);
 
@@ -111,7 +107,9 @@ class Decorator {
 	virtual	void				DrawTab();
 	virtual	void				DrawTitle();
 	virtual	void				DrawZoom();
-	
+
+			RGBColor			UIColor(color_which which);
+
  protected:
 			int32				_ClipTitle(float width);
 
@@ -133,9 +131,7 @@ class Decorator {
 	virtual	void				_DrawMinimize(BRect r);
 
 	virtual	void				_SetFocus();
-	virtual	void				_SetColors();
 
-			ColorSet*			_colors;
 			DrawingEngine*		_driver;
 			DrawState			fDrawState;
 

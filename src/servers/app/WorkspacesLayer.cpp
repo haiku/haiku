@@ -171,7 +171,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	// ToDo: let decorator do this!
 	RGBColor yellow;
 	if (decorator != NULL)
-		yellow = decorator->Colors().window_tab;
+		yellow = decorator->UIColor(B_WINDOW_TAB_COLOR);
 	RGBColor frameColor(180, 180, 180);
 	RGBColor white(255, 255, 255);
 

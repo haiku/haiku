@@ -14,7 +14,6 @@ Server app_server :
 	AppServer.cpp
 	BitmapManager.cpp
 	ClientMemoryAllocator.cpp
-	ColorSet.cpp
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp

@@ -14,7 +14,6 @@
 #include <Rect.h>
 
 #include "AppServer.h"
-#include "ColorSet.h"
 #include "DefaultDecorator.h"
 #include "Desktop.h"
 #include "DesktopSettings.h"
@@ -88,13 +87,8 @@ DecorInfo::Instantiate(Desktop* desktop, BRect rect, const char *title,
 	}
 
 	decorator->SetDriver(desktop->GetDrawingEngine());
-
-	gGUIColorSet.Lock();
-	decorator->SetColors(gGUIColorSet);
-	gGUIColorSet.Unlock();
-	
 	decorator->SetTitle(title);
-	
+
 	return decorator;
 }
 
@@ -111,6 +105,7 @@ DecorManager::DecorManager()
 	DecorInfo *defaultDecor = new DecorInfo(-1, "Default", NULL);
 	fDecorList.AddItem(defaultDecor);
 
+#if 0
 	// Add any on disk
 	RescanDecorators();
 
@@ -129,7 +124,7 @@ DecorManager::DecorManager()
 			fCurrentDecor = _FindDecor(itemtext.String());
 		}
 	}
-
+#endif
 	if (!fCurrentDecor)
 		fCurrentDecor = (DecorInfo*)fDecorList.ItemAt(0L);
 }

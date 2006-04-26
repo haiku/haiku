@@ -396,7 +396,7 @@ CursorManager::SetDefaults()
 	cursorSet.AddCursor(B_CURSOR_RESIZE_NESW, default_resize_nesw_data);
 	cursorSet.AddCursor(B_CURSOR_RESIZE_NS, default_resize_ns_data);
 	cursorSet.AddCursor(B_CURSOR_RESIZE_EW, default_resize_ew_data);
-
+#if 0
 	BDirectory dir;
 	if (dir.SetTo(CURSOR_SET_DIR) == B_ENTRY_NOT_FOUND)
 		create_directory(CURSOR_SET_DIR, 0777);
@@ -406,6 +406,7 @@ CursorManager::SetDefaults()
 	cursorSet.Save(string.String(), B_CREATE_FILE | B_FAIL_IF_EXISTS);
 
 	SetCursorSet(string.String());
+#endif
 	Unlock();
 }
 

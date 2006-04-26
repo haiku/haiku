@@ -9,7 +9,6 @@
 
 /**	Base class for window decorators */
 
-#include "ColorSet.h"
 #include "Decorator.h"
 #include "DrawingEngine.h"
 
@@ -31,7 +30,6 @@
 Decorator::Decorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	:
-	_colors(new ColorSet()),
 	_driver(NULL),
 	fDrawState(),
 
@@ -62,19 +60,6 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect,
 */
 Decorator::~Decorator()
 {
-	delete _colors;
-}
-
-
-/*!
-	\brief Updates the decorator's color set
-	\param cset The color set to update from
-*/
-void
-Decorator::SetColors(const ColorSet &cset)
-{
-	_colors->SetColors(cset);
-	_SetColors();
 }
 
 
@@ -481,6 +466,16 @@ Decorator::DrawZoom(void)
 	_DrawZoom(_zoomrect);
 }
 
+
+RGBColor
+Decorator::UIColor(color_which which)
+{
+	// TODO: for now - calling ui_color() from within the app_server
+	//	will always return the default colors (as there is no be_app)
+	return ui_color(which);
+}
+
+
 /*!
 	\brief Provides the number of characters that will fit in the given width
 	\param width Maximum number of pixels the title can be
@@ -588,16 +583,3 @@ void
 Decorator::_SetFocus()
 {
 }
-
-/*!
-	\brief Hook function for when the color set is updated
-	
-	This function is called after the decorator's color set is updated. Quite useful 
-	if the decorator uses colors based on those in the system.
-*/
-void
-Decorator::_SetColors()
-{
-}
-
-

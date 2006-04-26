@@ -23,10 +23,11 @@ struct server_read_only_memory {
 static inline int32
 color_which_to_index(color_which which)
 {
-	if (which <= B_TOOLTIP_TEXT_COLOR)
+	// NOTE: this must be kept in sync with InterfaceDefs.h color_which!
+	if (which <= B_WINDOW_INACTIVE_TEXT_COLOR)
 		return which - 1;
 	if (which >= B_SUCCESS_COLOR && which <= B_FAILURE_COLOR)
-		return which - B_SUCCESS_COLOR + B_TOOLTIP_TEXT_COLOR;
+		return which - B_SUCCESS_COLOR + B_WINDOW_INACTIVE_TEXT_COLOR;
 
 	return -1;
 }

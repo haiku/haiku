@@ -22,7 +22,6 @@
 
 class ServerApp;
 class BitmapManager;
-class ColorSet;
 class Desktop;
 
 using BPrivate::BTokenSpace;
@@ -56,7 +55,6 @@ class AppServer : public MessageLooper  {
 };
 
 extern BitmapManager *gBitmapManager;
-extern ColorSet gGUIColorSet;
 extern port_id gAppServerPort;
 
 #endif	/* APP_SERVER_H */

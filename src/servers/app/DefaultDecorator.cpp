@@ -921,10 +921,10 @@ DefaultDecorator::_SetFocus()
 	
 	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 			&& (fFlags & B_AVOID_FOCUS) != 0)) {
-		fButtonHighColor.SetColor(tint_color(_colors->window_tab,B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(_colors->window_tab,B_DARKEN_1_TINT));
-		fTextColor = _colors->window_tab_text;
-		fTabColor = _colors->window_tab;
+		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
+		fTextColor = UIColor(B_WINDOW_TEXT_COLOR);
+		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
 
 //		fFrameColors[0].SetColor(152, 152, 152);
 //		fFrameColors[1].SetColor(255, 255, 255);
@@ -933,10 +933,10 @@ DefaultDecorator::_SetFocus()
 //		fFrameColors[4].SetColor(152, 152, 152);
 //		fFrameColors[5].SetColor(96, 96, 96);
 	} else {
-		fButtonHighColor.SetColor(tint_color(_colors->inactive_window_tab,B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(_colors->inactive_window_tab,B_DARKEN_1_TINT));
-		fTextColor = _colors->inactive_window_tab_text;
-		fTabColor = _colors->inactive_window_tab;
+		fTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+		fTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
+		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
+		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
 
 //		fFrameColors[0].SetColor(152, 152, 152);
 //		fFrameColors[1].SetColor(255, 255, 255);

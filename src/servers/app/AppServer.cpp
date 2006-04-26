@@ -12,7 +12,6 @@
 #include "AppServer.h"
 
 #include "BitmapManager.h"
-#include "ColorSet.h"
 #include "Desktop.h"
 #include "FontManager.h"
 #include "InputManager.h"
@@ -36,9 +35,6 @@
 port_id gAppServerPort;
 static AppServer *sAppServer;
 BTokenSpace gTokenSpace;
-
-//! System-wide GUI color object
-ColorSet gGUIColorSet;
 
 
 /*!
@@ -69,11 +65,6 @@ AppServer::AppServer()
 		debugger("font manager could not be initialized!");
 
 	gFontManager->Run();
-
-	// Load the GUI colors here and set the global set to the values contained therein. If this
-	// is not possible, set colors to the defaults
-	if (ColorSet::LoadColorSet(SERVER_SETTINGS_DIR COLOR_SETTINGS_NAME, &gGUIColorSet) != B_OK)
-		gGUIColorSet.SetToDefaults();
 
 	gScreenManager = new ScreenManager();
 	gScreenManager->Run();
