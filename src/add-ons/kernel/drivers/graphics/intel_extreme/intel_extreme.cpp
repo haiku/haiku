@@ -76,7 +76,7 @@ intel_extreme_init(intel_info &info)
 {
 	info.shared_area = create_area("intel extreme shared info",
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
-		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)),
+		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + B_PAGE_SIZE,
 		B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK)
 		return info.shared_area;
@@ -154,6 +154,13 @@ intel_extreme_init(intel_info &info)
 #else
 	strcpy(info.shared_info->device_identifier, info.device_identifier);
 #endif
+
+	// setup overlay registers
+	info.overlay_registers = (overlay_registers *)((addr_t)info.shared_info + B_PAGE_SIZE);
+
+	physical_entry physicalEntry;
+	get_memory_map(info.overlay_registers, sizeof(overlay_registers), &physicalEntry, 1);
+	info.shared_info->physical_overlay_registers = (uint8 *)physicalEntry.address;
 
 	info.cookie_magic = INTEL_COOKIE_MAGIC;
 		// this makes the cookie valid to be used
