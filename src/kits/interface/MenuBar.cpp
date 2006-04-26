@@ -428,7 +428,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					menu->SetStickyMode(true);
 				resultItem = menu->_track(&localAction, system_time());
 			}
-		} else if (menuItem == NULL && !IsStickyMode()) {
+		} else if (menuItem == NULL && !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
 			SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
