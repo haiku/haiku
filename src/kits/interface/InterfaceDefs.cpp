@@ -10,8 +10,8 @@
 
 /**	Global functions and variables for the Interface Kit */
 
-#include "moreUTF8.h"
 #include "truncate_string.h"
+#include "utf8_functions.h"
 
 #include <ApplicationPrivate.h>
 #include <AppServerLink.h>

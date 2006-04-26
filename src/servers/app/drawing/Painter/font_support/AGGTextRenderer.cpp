@@ -7,8 +7,8 @@
 #include "AGGTextRenderer.h"
 
 #include "FontManager.h"
-#include "moreUTF8.h"
 #include "ServerFont.h"
+#include "utf8_functions.h"
 
 #include <agg_basics.h>
 #include <agg_bounding_rect.h>

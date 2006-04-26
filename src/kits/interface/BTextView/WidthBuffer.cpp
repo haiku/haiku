@@ -1,47 +1,34 @@
 /*
- * Copyright (c) 2003-2004 Haiku, Inc.
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Copyright 2003-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
  *
- * File:			WidthBuffer.cpp
- * Author:			Stefano Ceccherini (burton666@libero.it)
- * Description:		Caches string widths in a hash table, to avoid a trip to
- *					the app server.
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
  */
-#include <Debug.h>
-#include <Font.h>
 
-#include "moreUTF8.h"
+//!	Caches string widths in a hash table, to avoid a trip to the app server.
+
+
+#include "utf8_functions.h"
 #include "TextGapBuffer.h"
 #include "WidthBuffer.h"
 
-#include <cstdio>
+#include <Debug.h>
+#include <Font.h>
+
+#include <stdio.h>
+
 
 const static uint32 kTableCount = 128;
 const static uint32 kInvalidCode = 0xFFFFFFFF;
 
 
-struct hashed_escapement
-{
+struct hashed_escapement {
 	uint32 code;
 	float escapement;
-	hashed_escapement() {
+
+	hashed_escapement()
+	{
 		code = kInvalidCode;
 		escapement = 0;
 	}

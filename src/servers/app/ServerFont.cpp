@@ -9,20 +9,20 @@
  */
 
 
-#include <Shape.h>
-#include <String.h>
-#include <UTF8.h>
+#include "ServerFont.h"
 
 #include "Angle.h"
 #include "FontManager.h"
-#include "moreUTF8.h"
 #include "truncate_string.h"
+#include "utf8_functions.h"
 
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
 
-#include "ServerFont.h"
+#include <Shape.h>
+#include <String.h>
+#include <UTF8.h>
 
 
 // functions needed to convert a freetype vector graphics to a BShape

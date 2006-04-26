@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,12 @@
  */
 
 
-#include <new>
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <AppServerLink.h>
+#include <FontPrivate.h>
+#include <ObjectList.h>
+#include <ServerProtocol.h>
+#include <truncate_string.h>
+#include <utf8_functions.h>
 
 #include <Autolock.h>
 #include <Font.h>
@@ -20,15 +22,12 @@
 #include <Message.h>
 #include <PortLink.h>
 #include <Rect.h>
-#include <ServerProtocol.h>
 #include <Shape.h>
 #include <String.h>
 
-#include <AppServerLink.h>
-#include <moreUTF8.h>
-#include <truncate_string.h>
-#include <FontPrivate.h>
-#include <ObjectList.h>
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 

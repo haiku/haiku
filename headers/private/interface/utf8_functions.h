@@ -1,5 +1,9 @@
-#ifndef __MOREUTF8
-#define __MOREUTF8
+/*
+ * Copyright 2004-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _UTF8_FUNCTIONS_H
+#define _UTF8_FUNCTIONS_H
 
 
 #include <SupportDefs.h>
@@ -205,4 +209,4 @@ UTF8ToLength(const char *bytes)
 	return length;
 }
 
-#endif	// __MOREUTF8
+#endif	// _UTF8_FUNCTIONS_H

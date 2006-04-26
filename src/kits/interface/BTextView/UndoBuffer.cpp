@@ -1,46 +1,30 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2003, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		UndoBuffer.cpp
-//	Author:			Stefano Ceccherini (burton666@libero.it)
-//	Description:	_BUndoBuffer_ and its subclasses 
-//					handle different types of Undo operations.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2003-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
+ */
 
-// Standard Includes -----------------------------------------------------------
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+//!	_BUndoBuffer_ and its subclasses handle different types of Undo operations.
 
-// System Includes -------------------------------------------------------------
+
+#include "UndoBuffer.h"
+#include "utf8_functions.h"
+
 #include <Clipboard.h>
 
-// Local Includes --------------------------------------------------------------
-#include "moreUTF8.h"
-#include "UndoBuffer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
-// TODO: document properly this file
+// TODO: properly document this file
 
-//  ******** _BUndoBuffer_ *******
+
+//	#pragma mark - _BUndoBuffer_
+
+
 _BUndoBuffer_::_BUndoBuffer_(BTextView *textView, undo_state state)
 	:
 	fTextView(textView),
@@ -101,10 +85,11 @@ _BUndoBuffer_::RedoSelf(BClipboard *clipboard)
 }
 
 
-//  ******** _BCutUndoBuffer_ *******
+//	#pragma mark - _BCutUndoBuffer_
+
+
 _BCutUndoBuffer_::_BCutUndoBuffer_(BTextView *textView)
-	:
-	_BUndoBuffer_(textView, B_UNDO_CUT)
+	: _BUndoBuffer_(textView, B_UNDO_CUT)
 {
 }
 
@@ -135,11 +120,12 @@ _BCutUndoBuffer_::RedoSelf(BClipboard *clipboard)
 }
 
 
-//  ******** _BPasteUndoBuffer_ *******
+//	#pragma mark - _BPasteUndoBuffer_
+
+
 _BPasteUndoBuffer_::_BPasteUndoBuffer_(BTextView *textView, const char *text,
-										int32 textLen, text_run_array *runArray, int32 runArrayLen)
-	:
-	_BUndoBuffer_(textView, B_UNDO_PASTE),
+		int32 textLen, text_run_array *runArray, int32 runArrayLen)
+	: _BUndoBuffer_(textView, B_UNDO_PASTE),
 	fPasteText(NULL),
 	fPasteTextLength(textLen),
 	fPasteRunArray(NULL),
@@ -183,10 +169,11 @@ _BPasteUndoBuffer_::RedoSelf(BClipboard *clipboard)
 }
 
 
-//  ******** _BClearUndoBuffer_ *******
+//	#pragma mark - _BClearUndoBuffer_
+
+
 _BClearUndoBuffer_::_BClearUndoBuffer_(BTextView *textView)
-	:
-	_BUndoBuffer_(textView, B_UNDO_CLEAR)
+	: _BUndoBuffer_(textView, B_UNDO_CLEAR)
 {
 }
 
@@ -204,12 +191,13 @@ _BClearUndoBuffer_::RedoSelf(BClipboard *clipboard)
 }
 
 
-//  ******** _BDropUndoBuffer_ ********
-_BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text, int32 textLen,
-									text_run_array *runArray, int32 runArrayLen, int32 location,
-									bool internalDrop)
-	:
-	_BUndoBuffer_(textView, B_UNDO_DROP),
+//	#pragma mark - _BDropUndoBuffer_
+
+
+_BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text,
+		int32 textLen, text_run_array *runArray, int32 runArrayLen,
+		int32 location, bool internalDrop)
+	: _BUndoBuffer_(textView, B_UNDO_DROP),
 	fDropText(NULL),
 	fDropTextLength(textLen),
 	fDropRunArray(NULL)
@@ -264,10 +252,11 @@ _BDropUndoBuffer_::RedoSelf(BClipboard *)
 }
 
 
-//  ******** _BTypingUndoBuffer_ ********
+//	#pragma mark - _BTypingUndoBuffer_
+
+
 _BTypingUndoBuffer_::_BTypingUndoBuffer_(BTextView *textView)
-	:
-	_BUndoBuffer_(textView, B_UNDO_TYPING),
+	: _BUndoBuffer_(textView, B_UNDO_TYPING),
 	fTypedText(NULL),
 	fTypedStart(fStart),
 	fTypedEnd(fEnd),
