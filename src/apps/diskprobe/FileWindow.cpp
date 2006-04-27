@@ -43,7 +43,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add the menu
 
-	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
+	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, Bounds().Width(), 8), "menu bar");
 	AddChild(menuBar);
 
 	BMenu *menu = new BMenu("File");

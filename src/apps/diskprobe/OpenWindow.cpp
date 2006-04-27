@@ -20,11 +20,10 @@
 
 static const uint32 kMsgProbeFile = 'prDv';
 static const uint32 kMsgProbeDevice = 'prFl';
-static const uint32 kMsgCancel = 'Canc';
 
 
 OpenWindow::OpenWindow()
-	: BWindow(BRect(0, 0, 350, 100), "DiskProbe", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 35, 10), "DiskProbe", B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView *view = new BView(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW);
@@ -38,29 +37,46 @@ OpenWindow::OpenWindow()
 
 	BRect rect = Bounds().InsetByCopy(8, 8);
 	BMenuField *field = new BMenuField(rect, "devices", "Examine Device:", fDevicesMenu);
-	field->SetDivider(field->StringWidth(field->Label()) + 8);
 	field->ResizeToPreferred();
+	field->SetDivider(field->StringWidth(field->Label()) + 8);
 	view->AddChild(field);
 
-	BButton *button = new BButton(BRect(10, 10, 20, 20), "file", "Probe Device", new BMessage(kMsgProbeDevice));
-	button->ResizeToPreferred();
-	rect = button->Bounds();
-	button->MoveTo(Bounds().Width() - 8 - rect.Width(), Bounds().Height() - 8 - rect.Height());
-	view->AddChild(button);
+	BButton *probeDeviceButton = new BButton(BRect(10, 10, 20, 20), "file", "Probe Device",
+		new BMessage(kMsgProbeDevice), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	probeDeviceButton->ResizeToPreferred();
+	rect = probeDeviceButton->Bounds();
+	probeDeviceButton->MoveTo(Bounds().Width() - 8 - rect.Width(),
+		Bounds().Height() - 8 - rect.Height());
+	view->AddChild(probeDeviceButton);
 
 	// MakeDefault() may change the size and location of the button
-	rect = button->Frame();
-	button->MakeDefault(true);
+	rect = probeDeviceButton->Frame();
+	float width = rect.Width() + 58.0f;
+	probeDeviceButton->MakeDefault(true);
 
-	button = new BButton(rect, "file", "Probe File" B_UTF8_ELLIPSIS, new BMessage(kMsgProbeFile));
+	BButton *button = new BButton(rect, "file", "Probe File" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgProbeFile), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(-button->Bounds().Width() - 8, 0);
 	view->AddChild(button);
+	width += button->Bounds().Width();
 
-	button = new BButton(button->Frame(), "cancel", "Cancel", new BMessage(kMsgCancel));
+	button = new BButton(button->Frame(), "cancel", "Cancel",
+		new BMessage(B_QUIT_REQUESTED), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(-button->Bounds().Width() - 8, 0);
 	view->AddChild(button);
+	width += button->Bounds().Width();
+
+	// make sure the window is large enough
+
+	if (width < Bounds().Width())
+		width = Bounds().Width();
+	float height = button->Bounds().Height() + 24.0f + field->Frame().bottom;
+	if (height < Bounds().Height())
+		height = Bounds().Height();
+
+	ResizeTo(width, height);
 
 	BScreen screen(this);
 	MoveTo(screen.Frame().left + (screen.Frame().Width() - Frame().Width()) / 2,
@@ -90,11 +106,6 @@ OpenWindow::MessageReceived(BMessage *message)
 		case kMsgProbeFile:
 			be_app_messenger.SendMessage(kMsgOpenFilePanel);
 			PostMessage(B_QUIT_REQUESTED);
-			break;
-
-		case kMsgCancel:
-			if (QuitRequested())
-				Quit();
 			break;
 
 		case B_SIMPLE_DATA: {

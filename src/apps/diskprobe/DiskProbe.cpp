@@ -96,7 +96,9 @@ Settings::Settings()
 	fMessage(kMsgDiskProbeSettings),
 	fUpdated(false)
 {
-	fMessage.AddRect("window_frame", BRect(50, 50, 550, 500));
+	BScreen screen;
+	fMessage.AddRect("window_frame", BRect(50, 50, screen.Frame().Width() - 50,
+		screen.Frame().Height() - 50));
 	fMessage.AddInt32("base_type", kHexBase);
 	fMessage.AddFloat("font_size", 12.0f);
 	fMessage.AddBool("case_sensitive", true);
