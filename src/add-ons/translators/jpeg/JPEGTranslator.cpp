@@ -44,7 +44,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap image"
 
 // Translation Kit required globals
-char translatorName[] = "JPEG translator";
+char translatorName[] = "JPEG Images";
 char translatorInfo[] = "© 2002-2003, Shard\n"
 "\n"
 "Based on IJG library © 1991-1998, Thomas G. Lane\"\n"

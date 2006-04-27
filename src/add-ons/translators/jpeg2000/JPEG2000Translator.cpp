@@ -56,7 +56,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap image"
 
 // Translation Kit required globals
-char translatorName[] = "JPEG2000 translator";
+char translatorName[] = "JPEG2000 Images";
 char translatorInfo[] = "© 2002-2003, Shard
 
 Based on JasPer library:
