@@ -6,6 +6,7 @@
  */
 
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
@@ -776,10 +777,38 @@ TermParse::EscParse(void *data)
 					break;
 
 				case CASE_OSC:
+				{
 					/* Operating System Command: ESC ] */
-					//      do_osc(finput);
+					char string[512];
+					uint32 len = 0;
+					char mode_char = theObj->GetReaderBuf();
+					if (mode_char != '0'
+						&& mode_char != '1' 
+						&& mode_char != '2') {
+						parsestate = groundtable;
+						break;
+					}
+					char current_char = theObj->GetReaderBuf();
+					while ((current_char = theObj->GetReaderBuf()) != 0x7) {
+						if (!isprint(current_char & 0x7f)
+							|| len+2 >= sizeof(string))
+							break;
+						string[len++] = current_char;
+					}
+					if (current_char == 0x7) {
+						string[len] = '\0';
+						switch (mode_char) {
+							case '0':
+							case '2':
+								theObj->fWinObj->SetTitle(string);
+								break;
+							case '1':
+								break;
+						}
+					}
 					parsestate = groundtable;
 					break;
+				}
 
 				case CASE_RIS:		// ESC c ... Reset terminal.
 					break;
