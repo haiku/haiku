@@ -20,7 +20,7 @@ static char rcsid[] = "$NetBSD: e_jn.c,v 1.9 1995/05/10 20:45:34 jtc Exp $";
  * of order n
  *
  * Special cases:
- *	y0(0)=y1(0)=yn(n,0) = -inf with division by zero signal;
+ *	y0(0)=y1(0)=yn(n,0) = -inf with overflow signal;
  *	y0(-ve)=y1(-ve)=yn(n,-ve) are NaN with invalid signal.
  * Note 2. About jn(n,x), yn(n,x)
  *	For n=0, j0(x) is called,
@@ -236,8 +236,12 @@ static double zero  =  0.00000000000000000000e+00;
 	ix = 0x7fffffff&hx;
     /* if Y(n,NaN) is NaN */
 	if((ix|((u_int32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
-	if((ix|lx)==0) return -one/zero;
-	if(hx<0) return zero/zero;
+	if((ix|lx)==0) return -HUGE_VAL+x; /* -inf and overflow exception.  */;
+#ifdef __BEOS__
+	if(hx<0) return -HUGE_VAL+x;
+#else
+	if(hx<0) return zero/(zero*x);
+#endif
 	sign = 1;
 	if(n<0){
 		n = -n;

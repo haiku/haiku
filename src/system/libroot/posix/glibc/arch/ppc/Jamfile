@@ -70,6 +70,7 @@ local genericSources =
 	s_floor.c s_floorf.c # s_floorl.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
 	s_frexp.c s_frexpf.c # s_frexpl.c
+	s_ilogb.c s_ilogbf.c
 	s_isinf.c s_isinff.c # s_isinfl.c
 	s_ldexp.c s_ldexpf.c # s_ldexpl.c
 	s_log1p.c s_log1pf.c
@@ -79,6 +80,7 @@ local genericSources =
 	s_round.c s_roundf.c # s_roundl.c
 	s_scalbn.c s_scalbnf.c # s_scalbnl.c
 	s_signbit.c s_signbitf.c # s_signbitl.c
+	s_significand.c s_significandf.c
 	s_signgam.c
 	s_sin.c s_sinf.c # s_sinl.c
 	s_sincos.c s_sincosf.c

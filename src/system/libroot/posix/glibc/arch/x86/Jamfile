@@ -143,6 +143,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_finite.S s_finitef.S s_finitel.S
 	s_floor.S s_floorf.S s_floorl.S
 	s_frexp.S s_frexpf.S s_frexpl.S
+	s_ilogb.S s_ilogbf.S
 	s_isinfl.c
 	s_isnanl.c
 	s_llrint.S s_llrintf.S s_llrintl.S
@@ -151,6 +152,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_lrint.S s_lrintf.S s_lrintl.S
 	s_rint.S s_rintf.S s_rintl.c
 	s_scalbn.S s_scalbnf.S s_scalbnl.S
+	s_significand.S s_significandf.S
 	s_sin.S s_sinf.S s_sinl.S
 	s_sincos.S s_sincosf.S s_sincosl.S
 	s_tan.S s_tanf.S s_tanl.S

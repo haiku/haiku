@@ -185,10 +185,14 @@ V[]  =  {1.27304834834123699328e-02, /* 0x3F8A1270, 0x91C9C71A */
 
 	EXTRACT_WORDS(hx,lx,x);
         ix = 0x7fffffff&hx;
-    /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0  */
+    /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0, y0(0) is -inf.  */
 	if(ix>=0x7ff00000) return  one/(x+x*x);
-        if((ix|lx)==0) return -one/zero;
-        if(hx<0) return zero/zero;
+        if((ix|lx)==0) return -HUGE_VAL+x; /* -inf and overflow exception.  */
+#ifdef __BEOS__
+        if(hx<0) return -HUGE_VAL+x;  // also valid says the spec
+#else
+	if(hx<0) return zero/(zero*x);
+#endif
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
         /* y0(x) = sqrt(2/(pi*x))*(p0(x)*sin(x0)+q0(x)*cos(x0))
          * where x0 = x-pi/4
