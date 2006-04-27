@@ -15,8 +15,8 @@ SharedLibrary libtranslation.so :
 	TranslationUtils.cpp
 	Translator.cpp
 	TranslatorRoster.cpp
-	:
-	be
+
+	: be
 ;
 
 Package haiku-translationkit-cvs :
