@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -200,7 +200,17 @@ vm_kernel_address_space_id(void)
 vm_address_space *
 vm_get_current_user_address_space(void)
 {
-	return vm_get_address_space_by_id(vm_current_user_address_space_id());
+	struct thread *thread = thread_get_current_thread();
+
+	if (thread != NULL) {
+		vm_address_space *addressSpace = thread->team->address_space;
+		if (addressSpace != NULL) {
+			atomic_add(&addressSpace->ref_count, 1);
+			return addressSpace;
+		}
+	}
+
+	return NULL;
 }
 
 
