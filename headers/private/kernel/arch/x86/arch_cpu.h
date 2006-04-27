@@ -104,12 +104,10 @@ void i386_enter_uspace(addr_t entry, void *args1, void *args2, addr_t ustack_top
 void i386_set_tss_and_kstack(addr_t kstack);
 void i386_switch_stack_and_call(addr_t stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr_t new_pgdir);
-void i386_fsave(void *fpu_state);
+void i386_fnsave(void *fpu_state);
 void i386_fxsave(void *fpu_state);
 void i386_frstor(const void *fpu_state);
 void i386_fxrstor(const void *fpu_state);
-void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state);
-void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
 uint32 x86_read_ebp();
 uint32 x86_read_cr0();
 void x86_write_cr0(uint32 value);

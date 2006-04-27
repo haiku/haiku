@@ -872,6 +872,12 @@ thread_exit2(void *_args)
 		user_debug_thread_deleted(args.original_team_id, args.thread->id);
 	}
 
+	// remove us as the fpu state owner if we are one
+	if (args.thread->fpu_cpu) {
+		args.thread->fpu_cpu->info.fpu_state_thread = NULL;
+		args.thread->fpu_cpu = NULL;
+	}
+
 	// return the death stack and reschedule one last time
 	put_death_stack_and_reschedule(args.death_stack);
 

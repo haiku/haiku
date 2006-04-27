@@ -43,7 +43,8 @@ struct set_mtrr_parameter {
 extern void reboot(void);
 	// from arch_x86.S
 
-void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
+void (*gX86SaveFPUFunc)(void *state);
+void (*gX86RestoreFPUFunc)(const void *state);
 bool gHasSSE = false;
 
 static struct tss **sTSS;
@@ -65,7 +66,6 @@ struct tss *
 x86_get_main_tss(void)
 {
 	int cpuNum = smp_get_current_cpu();
-	
 	return sTSS[cpuNum];
 }
 
@@ -184,9 +184,9 @@ init_sse(void)
 
 	// enable OS support for SSE
 	x86_write_cr4(x86_read_cr4() | CR4_OS_FXSR | CR4_OS_XMM_EXCEPTION);
-	x86_write_cr0(x86_read_cr0() & ~(CR0_FPU_EMULATION | CR0_MONITOR_FPU));
 
-	gX86SwapFPUFunc = i386_fxsave_swap;
+	gX86SaveFPUFunc = i386_fxsave;
+	gX86RestoreFPUFunc = i386_fxrstor;
 	gHasSSE = true;
 }
 
@@ -237,7 +237,8 @@ status_t
 arch_cpu_preboot_init(kernel_args *args)
 {
 	write_dr3(0);
-	gX86SwapFPUFunc = i386_fsave_swap;
+	gX86SaveFPUFunc = i386_fnsave;
+	gX86RestoreFPUFunc = i386_frstor;
 
 	return B_OK;
 }
@@ -331,6 +332,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
+
+	// enable lazy FPU state
+	x86_write_cr0((x86_read_cr0() & ~CR0_FPU_EMULATION) | CR0_MONITOR_FPU);
 
 	// setup SSE2/3 support
 	init_sse();

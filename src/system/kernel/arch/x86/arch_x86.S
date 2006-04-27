@@ -21,10 +21,10 @@ FUNCTION(arch_cpu_user_TLB_invalidate):
 	movl	%eax,%cr3
 	ret
 
-/* void i386_fsave(void *fpu_state); */
-FUNCTION(i386_fsave):
+/* void i386_fnsave(void *fpu_state); */
+FUNCTION(i386_fnsave):
 	movl	4(%esp), %eax
-	fsave	(%eax)
+	fnsave	(%eax)
 	ret
 
 /* void i386_fxsave(void *fpu_state); */
@@ -42,22 +42,6 @@ FUNCTION(i386_frstor):
 /* void i386_fxrstor(const void *fpu_state); */
 FUNCTION(i386_fxrstor):
 	movl	4(%esp), %eax
-	fxrstor	(%eax)
-	ret
-
-/* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
-FUNCTION(i386_fsave_swap):
-	movl	4(%esp),%eax
-	fsave	(%eax)
-	movl	8(%esp),%eax
-	frstor	(%eax)
-	ret
-
-/* void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
-FUNCTION(i386_fxsave_swap):
-	movl	4(%esp),%eax
-	fxsave	(%eax)
-	movl	8(%esp),%eax
 	fxrstor	(%eax)
 	ret
 

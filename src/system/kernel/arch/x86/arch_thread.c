@@ -28,12 +28,13 @@
 #endif
 
 
+#define CR0_TASK_SWITCHED		(1UL << 3)
+
 // from arch_interrupts.S
 extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
 extern void i386_restore_frame_from_syscall(struct iframe frame);
 
 // from arch_cpu.c
-extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
 extern bool gHasSSE;
 
 static struct arch_thread sInitialState _ALIGNED(16);
@@ -46,11 +47,11 @@ arch_thread_init(struct kernel_args *args)
 	// save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread
 
-	asm("fninit");
+	asm volatile ("clts; fninit; fnclex;");
 	if (gHasSSE)
 		i386_fxsave(sInitialState.fpu_state);
 	else
-		i386_fsave(sInitialState.fpu_state);
+		i386_fnsave(sInitialState.fpu_state);
 
 	// let the asm function know the offset to the interrupt stack within struct thread
 	// I know no better ( = static) way to tell the asm function the offset
@@ -285,7 +286,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if (to->team->address_space != NULL)
 		i386_reinit_user_debug_after_context_switch(to);
 
-	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
+	x86_write_cr0(x86_read_cr0() | CR0_TASK_SWITCHED);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
 }
 
@@ -366,7 +367,7 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 	regs._reserved_2[0] = frame->edi;
 	regs._reserved_2[1] = frame->esi;
 	regs._reserved_2[2] = frame->ebp;
-	i386_fsave((void *)(&regs.xregs));
+	i386_fnsave((void *)(&regs.xregs));
 	
 	status = user_memcpy(stack_ptr, &regs, sizeof(regs));
 	if (status < B_OK)
