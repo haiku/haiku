@@ -630,7 +630,7 @@ emuxki_list_mix_controls(emuxki_dev *card, multi_mix_control_info * MMCI)
 	uint32 i;
 	
 	MMC = MMCI->controls;
-	if(MMCI->control_count < 24)
+	if(MMCI->control_count < EMU_MULTICONTROLSNUM)
 		return B_ERROR;
 			
 	if(emuxki_create_controls_list(&card->multi) < B_OK)

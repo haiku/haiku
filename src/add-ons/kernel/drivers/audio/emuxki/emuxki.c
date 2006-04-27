@@ -663,7 +663,7 @@ emuxki_voice_channel_create(emuxki_voice *voice)
 	uint8	        i, stereo = voice->stereo;
 	//int             s;
 
-	for (i = 0; i < EMU_NUMCHAN; i += stereo + 1) {
+	for (i = 0; i < EMU_NUMCHAN - stereo; i += stereo + 1) {
 		if ((stereo && (channel[i + 1] != NULL)) ||
 		    (channel[i] != NULL))	/* Looking for free channels */
 			continue;
