@@ -5,9 +5,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-/**	Interrupt handling. Currently, none of this is used
- *	as I haven't got the HW spec.
- */
 
 #include "mmio.h"
 #include "radeon_driver.h"
@@ -68,7 +65,7 @@ Radeon_ThreadInterruptWork(vuint8 *regs, device_info *di, uint32 int_status)
 }
 
 
-#if 0
+#ifndef __HAIKU__
 /** Capture interrupt handler */
 
 static int32
@@ -284,8 +281,9 @@ Radeon_SetupIRQ(device_info *di, char *buffer)
 			goto err5;
 	} else {
 		/* otherwise install our interrupt handler */
+#ifdef __HAIKU__
 		dprintf("radeon: real interrupt handling disabled\n");
-#if 0
+#else
 		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, 
 			Radeon_Interrupt, (void *)di, 0);
 		if (result != B_OK)
@@ -329,7 +327,7 @@ Radeon_CleanupIRQ(device_info *di)
 		cancel_timer((timer *)&di->ti_a);
 		cancel_timer((timer *)&di->ti_b);
 	} else {
-#if 0
+#ifndef __HAIKU__
 		/* remove interrupt handler */
 		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, Radeon_Interrupt, di);
 #endif
