@@ -22,6 +22,15 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
+static void
+hide_overlay(void)
+{
+}
+
+
+//	#pragma mark -
+
+
 uint32
 intel_overlay_count(const display_mode *mode)
 {
@@ -33,7 +42,8 @@ intel_overlay_count(const display_mode *mode)
 const uint32 *
 intel_overlay_supported_spaces(const display_mode *mode)
 {
-	static const uint32 kSupportedSpaces[] = {B_YCbCr422, 0};
+	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
+		/*B_YCbCr411,*/ B_YCbCr422, 0};
 
 	return kSupportedSpaces;
 }
@@ -52,20 +62,20 @@ const overlay_buffer *
 intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	uint16 height)
 {
-	uint32 bpp;
+	uint32 bytesPerPixel;
 
 	switch (colorSpace) {
 		case B_RGB15:
-			bpp = 2;
+			bytesPerPixel = 2;
 			break;
 		case B_RGB16:
-			bpp = 2; 
+			bytesPerPixel = 2; 
 			break;
 		case B_RGB32:
-			bpp = 4; 
+			bytesPerPixel = 4; 
 			break;
 		case B_YCbCr422:
-			bpp = 2;
+			bytesPerPixel = 2;
 			break;
 		default:
 			return NULL;
@@ -83,7 +93,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->space = colorSpace;
 	buffer->width = width;
 	buffer->height = height;
-	buffer->bytes_per_row = (width * bpp + 0xf) & ~0xf;
+	buffer->bytes_per_row = (width * bytesPerPixel + 0xf) & ~0xf;
 
 	status_t status = intel_allocate_memory(buffer->bytes_per_row * height,
 		overlay->buffer_handle, overlay->buffer_offset);
@@ -204,6 +214,15 @@ status_t
 intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
 	const overlay_window *window, const overlay_view *view)
 {
+	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
+		return B_BAD_VALUE;
+
+	if (window == NULL && view == NULL) {
+		hide_overlay();
+		return B_OK;
+	}
+
+	
 	return B_OK;
 }
 

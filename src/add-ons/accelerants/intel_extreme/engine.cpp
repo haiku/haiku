@@ -7,11 +7,11 @@
  */
 
 
+#include "accelerant.h"
 #include "accelerant_protos.h"
-#include "intel_extreme.h"
 
 
-//#define TRACE_ENGINE
+#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -21,6 +21,56 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
+
+
+/**	The ring buffer must be locked when calling this function */
+
+static inline void
+write_to_ring(ring_buffer &ring, uint32 value)
+{
+	uint32 *target = (uint32 *)(ring.base + ring.position);
+	*target = value;
+
+	ring.position = (ring.position + sizeof(uint32)) & (ring.size - 1);
+}
+
+
+/**	The ring buffer must be locked when calling this function */
+
+static inline void
+ring_command_complete(ring_buffer &ring)
+{
+	if (ring.position & 0x07) {
+		// make sure the command is properly aligned
+		write_to_ring(ring, COMMAND_NOOP);
+	}
+
+	write32(ring.register_base + RING_BUFFER_TAIL, ring.position);
+}
+
+
+void
+setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
+{
+	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name, ringBuffer.offset,
+		ringBuffer.size));
+
+	if (init_lock(&ringBuffer.lock, name) < B_OK) {
+		// disable ring buffer
+		ringBuffer.size = 0;
+		return;
+	}
+
+	uint32 ring = ringBuffer.register_base;
+	write32(ring + RING_BUFFER_TAIL, 0);
+	write32(ring + RING_BUFFER_START, ringBuffer.offset);
+	write32(ring + RING_BUFFER_CONTROL,
+		((ringBuffer.size - B_PAGE_SIZE) & INTEL_RING_BUFFER_SIZE_MASK)
+		| INTEL_RING_BUFFER_ENABLED);
+}
+
+
+//	#pragma mark -
 
 
 /** Return number of hardware engines */

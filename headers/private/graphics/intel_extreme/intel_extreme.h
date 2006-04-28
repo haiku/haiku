@@ -9,6 +9,8 @@
 #define INTEL_EXTREME_H
 
 
+#include "lock.h"
+
 #include <memory_manager.h>
 
 #include <Accelerant.h>
@@ -38,6 +40,16 @@ struct pll_info {
 	uint32 divisor_register;
 };
 
+struct ring_buffer {
+	struct lock	lock;
+	uint32	register_base;
+	uint32	handle;
+	uint32	offset;
+	uint32	size;
+	uint32	position;
+	uint8	*base;
+};
+
 struct overlay_registers;
 
 struct intel_shared_info {
@@ -56,6 +68,8 @@ struct intel_shared_info {
 	uint32			graphics_memory_size;
 
 	uint32			frame_buffer_offset;
+
+	ring_buffer		primary_ring_buffer;
 
 	int32			overlay_channel_used;
 	uint32			overlay_token;
@@ -124,6 +138,21 @@ struct intel_free_graphics_memory {
 //----------------------------------------------------------
 // Register definitions, taken from X driver
 
+#define INTEL_PAGE_TABLE_CONTROL		0x02020
+#define INTEL_PAGE_TABLE_ERROR			0x02024
+#define INTEL_HARDWARE_STATUS_PAGE		0x02080
+
+#define INTEL_PRIMARY_RING_BUFFER		0x02030
+#define INTEL_SECONDARY_RING_BUFFER_0	0x02100
+#define INTEL_SECONDARY_RING_BUFFER_1	0x02110
+// offsets for the ring buffer base registers above
+#define RING_BUFFER_TAIL				0x0
+#define RING_BUFFER_HEAD				0x4
+#define RING_BUFFER_START				0x8
+#define RING_BUFFER_CONTROL				0xc
+#define INTEL_RING_BUFFER_SIZE_MASK		0x000ff800
+#define INTEL_RING_BUFFER_ENABLED		1
+
 #define INTEL_DISPLAY_HTOTAL			0x60000
 #define INTEL_DISPLAY_HBLANK			0x60004
 #define INTEL_DISPLAY_HSYNC				0x60008
@@ -174,6 +203,22 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
+
+// ring buffer commands
+
+#define COMMAND_NOOP					0x00
+#define COMMAND_WAIT_FOR_EVENT			(0x03 << 23)
+#define COMMAND_WAIT_FOR_OVERLAY_FLIP	(1 << 16)
+
+#define COMMAND_FLUSH					(0x04 << 23)
+
+// overlay flip
+#define COMMAND_OVERLAY_FLIP			(0x11 << 23)
+#define COMMAND_OVERLAY_CONTINUE		(0 << 21)
+#define COMMAND_OVERLAY_ON				(1 << 21)
+#define COMMAND_OVERLAY_OFF				(2 << 21)
+
+// overlay
 
 #define INTEL_OVERLAY_UPDATE			0x30000
 #define INTEL_OVERLAY_TEST				0x30004
@@ -232,14 +277,14 @@ struct overlay_registers {
 	overlay_scale scale_uv;
 	// (0x48) OCLRC0 - overlay color correction 0
 	uint32 _reserved1 : 5;
-	uint32 contrast_correction : 9;
+	uint32 contrast_correction : 9;			// fixed point: 3.6 bits
 	uint32 _reserved2 : 10;
-	uint32 brightness_correction : 8;
+	uint32 brightness_correction : 8;		// signed, -128 to 127
 	// (0x4c) OCLRC1 - overlay color correction 1
 	uint32 _reserved3 : 5;
-	uint32 saturation_sin_correction : 11;
+	uint32 saturation_sin_correction : 11;	// signed fixed point: 3.7 bits
 	uint32 _reserved4 : 6;
-	uint32 saturation_cos_correction : 10;
+	uint32 saturation_cos_correction : 10;	// fixed point: 3.7 bits
 	// (0x50) DCLRKV - destination color key value
 	uint32 _reserved5 : 8;
 	uint32 color_key_red : 8;

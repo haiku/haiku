@@ -71,6 +71,20 @@ PhysicalMemoryMapper::Keep()
 //	#pragma mark -
 
 
+static void
+init_overlay_registers(overlay_registers *registers)
+{
+	memset(registers, 0, B_PAGE_SIZE);
+
+	registers->contrast_correction = 0x20;
+	registers->saturation_cos_correction = 0x40;
+		// this by-passes contrast and saturation correction
+}
+
+
+//	#pragma mark -
+
+
 status_t
 intel_extreme_init(intel_info &info)
 {
@@ -130,6 +144,17 @@ intel_extreme_init(intel_info &info)
 	if (info.memory_manager == NULL)
 		return B_NO_MEMORY;
 
+	// reserve ring buffer memory (currently, this memory is placed in
+	// the graphics memory), but this could bring us problems with
+	// write combining...
+	ring_buffer &primary = info.shared_info->primary_ring_buffer;
+	if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
+			&primary.handle, &primary.offset) == B_OK) {
+		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
+		primary.size = B_PAGE_SIZE;
+		primary.base = info.shared_info->graphics_memory + primary.offset;
+	}
+
 	// no errors, so keep mappings
 	graphicsMapper.Keep();
 	mmioMapper.Keep();
@@ -156,7 +181,10 @@ intel_extreme_init(intel_info &info)
 #endif
 
 	// setup overlay registers
-	info.overlay_registers = (overlay_registers *)((addr_t)info.shared_info + B_PAGE_SIZE);
+	
+	info.overlay_registers = (overlay_registers *)((uint8 *)info.shared_info
+		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
+	init_overlay_registers(info.overlay_registers);
 
 	physical_entry physicalEntry;
 	get_memory_map(info.overlay_registers, sizeof(overlay_registers), &physicalEntry, 1);
