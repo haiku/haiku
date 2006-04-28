@@ -79,6 +79,8 @@ BTranslatorRoster::Private::~Private()
 
 		images.insert(iterator->second.image);
 		translator->Release();
+
+		iterator++;
 	}
 
 	// Unload all images
@@ -212,6 +214,7 @@ BTranslatorRoster::Private::AddTranslator(BTranslator* translator,
 	BAutolock locker(this);
 
 	translator_item item;
+	item.translator = translator;
 	item.image = image;
 	if (ref != NULL)
 		item.ref = *ref;
@@ -357,6 +360,8 @@ BTranslatorRoster::Private::StopWatching(BMessenger target)
 			fMessengers.erase(iterator);
 			return B_OK;
 		}
+
+		iterator++;
 	}
 
 	return B_BAD_VALUE;
@@ -415,6 +420,8 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 				memcpy(_info, &info, sizeof(translator_info));
 			}
 		}
+
+		iterator++;
 	}
 
 	if (bestWeight > 0.0f)
@@ -458,6 +465,8 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 			info.translator = iterator->first;
 			array[count++] = info;
 		}
+
+		iterator++;
 	}
 
 	*_info = array;
@@ -484,6 +493,7 @@ BTranslatorRoster::Private::GetAllTranslators(translator_id** _ids, int32* _coun
 
 	while (iterator != fTranslators.end()) {
 		array[count++] = iterator->first;
+		iterator++;
 	} 
 
 	*_ids = array;
@@ -546,7 +556,7 @@ const translation_format*
 BTranslatorRoster::Private::_CheckHints(const translation_format* formats,
 	int32 formatsCount, uint32 hintType, const char* hintMIME)
 {
-	if (!formats || formatsCount <= 0 || (!hintType && !hintMIME))
+	if (formats == NULL || formatsCount <= 0 || (!hintType && hintMIME == NULL))
 		return NULL;
 
 	// The provided MIME type hint may be a super type
@@ -606,7 +616,7 @@ BTranslatorRoster::BTranslatorRoster()
 }
 
 
-BTranslatorRoster::BTranslatorRoster(BMessage *model)
+BTranslatorRoster::BTranslatorRoster(BMessage* model)
 {
 	_Initialize();
 
@@ -773,7 +783,7 @@ BTranslatorRoster::Identify(BPositionIO* source, BMessage* ioExtension,
 	translator_info* _info, uint32 hintType, const char* hintMIME,
 	uint32 wantType)
 {
-	if (!source || !_info)
+	if (source == NULL || _info == NULL)
 		return B_BAD_VALUE;
 
 	return fPrivate->Identify(source, ioExtension, hintType, hintMIME, wantType, _info);
@@ -966,8 +976,8 @@ BTranslatorRoster::Translate(BPositionIO* source, const translator_info* info,
 
 	if (info == NULL) {
 		// look for a suitable translator
-		status_t status = Identify(source, ioExtension, &infoBuffer,
-			hintType, hintMIME, wantOutType);
+		status_t status = fPrivate->Identify(source, ioExtension, hintType,
+			hintMIME, wantOutType, &infoBuffer);
 		if (status < B_OK)
 			return status;
 
