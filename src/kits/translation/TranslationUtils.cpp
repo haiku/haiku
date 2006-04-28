@@ -25,6 +25,7 @@
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 
