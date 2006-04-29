@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2006, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -291,6 +291,7 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
+//printf("BScrollBar::SetValue(%.1f)\n", value);
 	if (value == fValue)
 		return;
 
@@ -299,6 +300,12 @@ BScrollBar::SetValue(float value)
 	if (value < fMin)
 		value = fMin;
 
+	fValue = value;
+
+	_UpdateThumbFrame();
+	_UpdateArrowButtons();
+
+//printf(" -> calling ValueChanged()\n");
 	ValueChanged(value);
 }
 
@@ -313,6 +320,7 @@ BScrollBar::Value() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
+printf("BScrollBar::ValueChanged(%.1f)\n", newValue);
 	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
@@ -326,10 +334,7 @@ BScrollBar::ValueChanged(float newValue)
 		}
 	}
 
-	fValue = newValue;
-
-	_UpdateThumbFrame();
-	_UpdateArrowButtons();
+	SetValue(newValue);
 }
 
 // SetProportion
