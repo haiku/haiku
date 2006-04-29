@@ -28,13 +28,12 @@
 #endif
 
 
-#define CR0_TASK_SWITCHED		(1UL << 3)
-
 // from arch_interrupts.S
 extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
 extern void i386_restore_frame_from_syscall(struct iframe frame);
 
 // from arch_cpu.c
+extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
 extern bool gHasSSE;
 
 static struct arch_thread sInitialState _ALIGNED(16);
@@ -286,7 +285,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if (to->team->address_space != NULL)
 		i386_reinit_user_debug_after_context_switch(to);
 
-	x86_write_cr0(x86_read_cr0() | CR0_TASK_SWITCHED);
+	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
 }
 

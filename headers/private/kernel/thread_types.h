@@ -139,7 +139,6 @@ struct thread {
 	int32			state;
 	int32			next_state;
 	union cpu_ent	*cpu;
-	union cpu_ent	*fpu_cpu;		/* this cpu holds our fpu state */
 
 	sigset_t		sig_pending;
 	sigset_t		sig_block_mask;

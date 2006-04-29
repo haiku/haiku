@@ -6,7 +6,6 @@
  * Distributed under the terms of the NewOS License.
  */
 
-#include <cpu.h>
 #include <int.h>
 #include <kscheduler.h>
 #include <ksyscalls.h>
@@ -36,10 +35,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-// from arch_cpu.c
-extern void (*gX86SaveFPUFunc)(void *state);
-extern void (*gX86RestoreFPUFunc)(const void *state);
 
 // Definitions for the PIC 8259 controller
 // (this is not a complete list, only what we're actually using)
@@ -360,31 +355,13 @@ i386_handle_trap(struct iframe frame)
 
 		case 2:		// NMI Interrupt			
 		case 9:		// Coprocessor Segment Overrun
+		case 7:		// Device Not Available Exception (#NM)
 		case 10:	// Invalid TSS Exception (#TS)
 		case 11: 	// Segment Not Present (#NP)
 		case 12: 	// Stack Fault Exception (#SS)
 		case 18: 	// Machine-Check Exception (#MC)
 			fatal_exception(&frame);
 			break;
-
-		case 7:		// Device Not Available Exception (#NM)
-		{
-			// raised to lazily save and restore FPU states
-			cpu_ent *cpu = get_cpu_struct();
-
-			asm volatile ("clts;");
-			if (cpu->info.fpu_state_thread != thread) {
-				if (cpu->info.fpu_state_thread) {
-					gX86SaveFPUFunc(cpu->info.fpu_state_thread->arch_info.fpu_state);
-					cpu->info.fpu_state_thread->fpu_cpu = NULL;
-				}
-
-				gX86RestoreFPUFunc(thread->arch_info.fpu_state);
-				cpu->info.fpu_state_thread = thread;
-				thread->fpu_cpu = cpu;
-			}
-			break;
-		}
 
 		case 8:		// Double Fault Exception (#DF)
 		{

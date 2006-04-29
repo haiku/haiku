@@ -10,7 +10,6 @@
 
 
 #include <smp.h>
-#include <thread.h>
 #include <timer.h>
 #include <boot/kernel_args.h>
 
@@ -24,9 +23,6 @@ typedef union cpu_ent {
 		// thread.c: used to force a reschedule at quantum expiration time
 		int preempted;
 		timer quantum_timer;
-
-		// tells which thread's fpu state we hold
-		struct thread *fpu_state_thread;
 
 		// keeping track of CPU activity
 		bigtime_t active_time;

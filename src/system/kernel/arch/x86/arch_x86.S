@@ -45,6 +45,22 @@ FUNCTION(i386_fxrstor):
 	fxrstor	(%eax)
 	ret
 
+/* void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(i386_fnsave_swap):
+	movl	4(%esp),%eax
+	fnsave	(%eax)
+	movl	8(%esp),%eax
+	frstor	(%eax)
+	ret
+
+/* void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state); */
+FUNCTION(i386_fxsave_swap):
+	movl	4(%esp),%eax
+	fxsave	(%eax)
+	movl	8(%esp),%eax
+	fxrstor	(%eax)
+	ret
+
 /* uint32 x86_read_ebp(); */
 FUNCTION(x86_read_ebp):
 	movl	%ebp, %eax
