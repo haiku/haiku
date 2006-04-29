@@ -546,7 +546,7 @@ _dump_thread_info(struct thread *thread)
 	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
 	if (thread->cpu)
-		kprintf("(%d)\n", thread->cpu->info.cpu_num);
+		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
 	kprintf("sig_pending:        0x%lx\n", thread->sig_pending);
@@ -671,7 +671,7 @@ dump_thread_list(int argc, char **argv)
 
 		// on which CPU does it run?
 		if (thread->cpu)
-			kprintf("%2d", thread->cpu->info.cpu_num);
+			kprintf("%2d", thread->cpu->cpu_num);
 		else
 			kprintf(" -");
 

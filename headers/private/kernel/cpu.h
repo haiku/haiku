@@ -16,21 +16,19 @@
 
 /* CPU local data structure */
 
-typedef union cpu_ent {
-	struct {
-		int cpu_num;
+typedef struct cpu_ent {
+	int cpu_num;
 
-		// thread.c: used to force a reschedule at quantum expiration time
-		int preempted;
-		timer quantum_timer;
+	// thread.c: used to force a reschedule at quantum expiration time
+	int preempted;
+	timer quantum_timer;
 
-		// keeping track of CPU activity
-		bigtime_t active_time;
-		bigtime_t last_kernel_time;
-		bigtime_t last_user_time;
+	// keeping track of CPU activity
+	bigtime_t active_time;
+	bigtime_t last_kernel_time;
+	bigtime_t last_user_time;
 
-		bool disabled;
-	} info;
+	bool disabled;
 } cpu_ent __attribute__((aligned(64)));
 
 

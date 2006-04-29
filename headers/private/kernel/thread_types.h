@@ -138,7 +138,7 @@ struct thread {
 	int32			next_priority;
 	int32			state;
 	int32			next_state;
-	union cpu_ent	*cpu;
+	struct cpu_ent	*cpu;
 
 	sigset_t		sig_pending;
 	sigset_t		sig_block_mask;

@@ -30,7 +30,7 @@ cpu_init(kernel_args *args)
 
 	memset(gCPU, 0, sizeof(gCPU));
 	for (i = 0; i < MAX_BOOT_CPUS; i++) {
-		gCPU[i].info.cpu_num = i;
+		gCPU[i].cpu_num = i;
 	}
 
 	return arch_cpu_init(args);
@@ -73,7 +73,7 @@ cpu_get_active_time(int32 cpu)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	activeTime = gCPU[cpu].info.active_time;
+	activeTime = gCPU[cpu].active_time;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -105,7 +105,7 @@ _user_cpu_enabled(int32 cpu)
 	if (cpu < 0 || cpu >= smp_get_num_cpus())
 		return B_BAD_VALUE;
 
-	return !gCPU[cpu].info.disabled;
+	return !gCPU[cpu].disabled;
 }
 
 
@@ -128,7 +128,7 @@ _user_set_cpu_enabled(int32 cpu, bool enabled)
 	if (!enabled) {
 		// check if this is the last CPU to be disabled
 		for (i = 0, count = 0; i < smp_get_num_cpus(); i++) {
-			if (!gCPU[i].info.disabled)
+			if (!gCPU[i].disabled)
 				count++;
 		}
 
@@ -137,7 +137,7 @@ _user_set_cpu_enabled(int32 cpu, bool enabled)
 	}
 
 	if (status == B_OK)
-		gCPU[cpu].info.disabled = !enabled;
+		gCPU[cpu].disabled = !enabled;
 
 	release_spinlock(&sSetCpuLock);
 	restore_interrupts(state);

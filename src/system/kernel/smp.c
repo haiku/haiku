@@ -653,9 +653,9 @@ smp_get_current_cpu(void)
 {
 	struct thread *thread = thread_get_current_thread();
 	if (thread)
-		return thread->cpu->info.cpu_num;
+		return thread->cpu->cpu_num;
 
-	// this is not always correct during early boot, but it's okay for
+	// this is not always correct during early boot, but it's okay
 	// for the boot process
 	return 0;
 }

@@ -140,7 +140,7 @@ reschedule_event(timer *unused)
 {
 	// this function is called as a result of the timer event set by the scheduler
 	// returning this causes a reschedule on the timer event
-	thread_get_current_thread()->cpu->info.preempted = 1;
+	thread_get_current_thread()->cpu->preempted = 1;
 	return B_INVOKE_SCHEDULER;
 }
 
@@ -180,7 +180,7 @@ scheduler_reschedule(void)
 	nextThread = sRunQueue;
 	prevThread = NULL;
 
-	if (oldThread->cpu->info.disabled) {
+	if (oldThread->cpu->disabled) {
 		// just select an idle thread
 		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 			prevThread = nextThread;
@@ -225,24 +225,24 @@ scheduler_reschedule(void)
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		oldThread->cpu->info.active_time +=
-			(oldThread->kernel_time - oldThread->cpu->info.last_kernel_time)
-			+ (oldThread->user_time - oldThread->cpu->info.last_user_time);
+		oldThread->cpu->active_time +=
+			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
+			+ (oldThread->user_time - oldThread->cpu->last_user_time);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
-		oldThread->cpu->info.last_kernel_time = nextThread->kernel_time;
-		oldThread->cpu->info.last_user_time = nextThread->user_time;
+		oldThread->cpu->last_kernel_time = nextThread->kernel_time;
+		oldThread->cpu->last_user_time = nextThread->user_time;
 	}
 
-	if (nextThread != oldThread || oldThread->cpu->info.preempted) {
+	if (nextThread != oldThread || oldThread->cpu->preempted) {
 		bigtime_t quantum = 3000;	// ToDo: calculate quantum!
-		timer *quantumTimer = &oldThread->cpu->info.quantum_timer;
+		timer *quantumTimer = &oldThread->cpu->quantum_timer;
 
-		if (!oldThread->cpu->info.preempted)
-			_local_timer_cancel_event(oldThread->cpu->info.cpu_num, quantumTimer);
+		if (!oldThread->cpu->preempted)
+			_local_timer_cancel_event(oldThread->cpu->cpu_num, quantumTimer);
 
-		oldThread->cpu->info.preempted = 0;
+		oldThread->cpu->preempted = 0;
 		add_timer(quantumTimer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
 
 		if (nextThread != oldThread)
