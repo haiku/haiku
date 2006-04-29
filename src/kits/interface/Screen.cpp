@@ -119,9 +119,7 @@ BScreen::ID()
 status_t
 BScreen::WaitForRetrace()
 {
-	if (fScreen != NULL)
-		return fScreen->WaitForRetrace(B_INFINITE_TIMEOUT);
-	return B_ERROR;
+	return WaitForRetrace(B_INFINITE_TIMEOUT);
 }
 
 
