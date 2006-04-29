@@ -4,8 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (svn 0.28, Rudolf)</h1></p>
+<p><h1>head (svn 0.29, Rudolf)</h1></p>
 <ul>
+<li><strong>G100-G200:</strong>
+<ul>
+<li>Cards that have a MAVEN (connected) for TVout are now correctly identified as being singlehead cards. This fixes the colorpalette trouble on these cards, resulting in just the upper three colorbits working in 32bit mode, while the rest was totally unusable.
+</ul>
 <li><strong>G200-G550:</strong>
 <ul>
 <li>The overlay engine code now respects the B_OVERLAY_COLOR_KEY flag instead of forcing keying ON.
