@@ -5,6 +5,7 @@
  * Authors:
  *		Adrian Oanca <adioanca@cotty.iren.ro>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
