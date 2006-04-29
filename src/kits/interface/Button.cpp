@@ -19,7 +19,7 @@
 
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode, flags |= B_WILL_DRAW),
+	:	BControl(frame, name, label, message, resizingMode, flags | B_WILL_DRAW),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
