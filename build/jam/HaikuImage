@@ -29,7 +29,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit Chart Workspaces Cortex CortexAddOnHost GLTeapot
+	StyledEdit Installer Chart Workspaces Cortex CortexAddOnHost GLTeapot
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScreenSaver Sounds Time VirtualMemory
@@ -51,8 +51,9 @@ BEOS_NETWORK_PROTOCOLS = icmp ipv4 raw route tcp udp ;
 BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
 	mga.accelerant nm.accelerant vesa.accelerant
 ;
-BEOS_ADD_ONS_TRANSLATORS = STXTTranslator RTF-Translator PNGTranslator
-	JPEGTranslator JPEG2000Translator GIFTranslator BMPTranslator
+BEOS_ADD_ONS_TRANSLATORS = BMPTranslator GIFTranslator JPEGTranslator
+	JPEG2000Translator TIFFTranslator PNGTranslator PPMTranslator 
+	RTF-Translator SGITranslator STXTTranslator TGATranslator
 ;
 BEOS_ADD_ONS_MEDIA = mixer.media_addon legacy.media_addon
 	hmulti_audio.media_addon tone_producer_demo.media_addon
@@ -63,7 +64,7 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 	speex vorbis matroska mp4_reader
 	# ac3_decoder avcodec theora
 ;
-BEOS_ADD_ONS_SCREENSAVERS = Haiku ;
+BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 	nm.driver mga.driver vesa
