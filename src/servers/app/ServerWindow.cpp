@@ -950,8 +950,9 @@ fDesktop->LockSingleWindow();
 		case AS_DIRECT_WINDOW_GET_SYNC_DATA:
 		{
 			status_t status = _EnableDirectWindowMode();
+
+			fLink.StartMessage(status);
 			if (status == B_OK) {
-				fLink.StartMessage(B_OK);
 				struct direct_window_sync_data syncData = { 
 					fDirectWindowData->area,
 					fDirectWindowData->sem,
@@ -959,10 +960,19 @@ fDesktop->LockSingleWindow();
 				};
 
 				fLink.Attach(&syncData, sizeof(syncData));
-			} else
-				fLink.StartMessage(status);
+			}
 
 			fLink.Flush();
+			break;
+		}
+		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
+		{
+			bool enable;
+			link.Read<bool>(&enable);
+
+			fLink.StartMessage(B_ERROR);
+			fLink.Flush();
+
 			break;
 		}
 
