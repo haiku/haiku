@@ -2,7 +2,7 @@
 /* some bits are hacks, where PINS is not known */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-1/2004
+   Rudolf Cornelissen 10/2002-4/2006
 */
 
 #define MODULE_BIT 0x00002000
@@ -244,8 +244,10 @@ status_t pins3_read(uint8 *pins, uint8 length)
 	si->ps.v3_option2_reg = pins[58];
 
 	/* for cards using this version of PINS both functions are in maven */
-	si->ps.secondary_head = !(pins[59] & 0x01);
 	si->ps.secondary_tvout = !(pins[59] & 0x01);
+	/* G200 and earlier cards are always singlehead cards */
+	si->ps.secondary_head = false;
+	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[59] & 0x01);
 
 	/* setup via gathered info from pins */
 	si->ps.option_reg = 0;
@@ -398,8 +400,10 @@ status_t pins4_read(uint8 *pins, uint8 length)
 	si->ps.option_reg |= (rfhcnt << 15);
 
 	/* for cards using this version of PINS both functions are in maven */
-	si->ps.secondary_head = !(pins[91] & 0x01);
 	si->ps.secondary_tvout = !(pins[91] & 0x01);
+	/* G200 and earlier cards are always singlehead cards */
+	si->ps.secondary_head = false;
+	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[91] & 0x01);
 
 	/* assuming the only possible panellink will be on the first head */
 	si->ps.primary_dvi = !(pins[91] & 0x40);
@@ -577,7 +581,8 @@ void fake_pins(void)
 		if (i2c_maven_probe() == B_OK)
 		{
 			si->ps.secondary_tvout = true;
-			si->ps.secondary_head = true;
+			/* G200 and earlier cards are always singlehead cards */
+			if (si->ps.card_type >= G400) si->ps.secondary_head = true;
 		}
 	}
 
