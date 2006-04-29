@@ -16,6 +16,7 @@
 #include <TranslatorRoster.h>
 
 #include <map>
+#include <set>
 #include <vector>
 
 struct translator_data;
@@ -24,11 +25,14 @@ struct translator_data;
 struct translator_item {
 	BTranslator*	translator;
 	entry_ref		ref;
+	ino_t			node;
 	image_id		image;
 };
 
 typedef std::map<translator_id, translator_item> TranslatorMap;
 typedef std::vector<BMessenger> MessengerList;
+typedef std::vector<node_ref> NodeRefList;
+typedef std::set<entry_ref> EntryRefSet;
 
 class BTranslatorRoster::Private : public BHandler, public BLocker {
 	public:
@@ -41,7 +45,9 @@ class BTranslatorRoster::Private : public BHandler, public BLocker {
 		status_t AddPaths(const char* paths);
 		status_t AddPath(const char* path, int32* _added = NULL);
 		status_t AddTranslator(BTranslator* translator, image_id image = -1,
-					const entry_ref* ref = NULL);
+					const entry_ref* ref = NULL, ino_t node = 0);
+
+		void RemoveTranslators(entry_ref& ref);
 
 		BTranslator* FindTranslator(translator_id id);
 
@@ -58,7 +64,8 @@ class BTranslatorRoster::Private : public BHandler, public BLocker {
 
 		bool IsActive() const { return Looper(); }
 
-		status_t CreateTranslators(const entry_ref& ref, int32& count);
+		status_t CreateTranslators(const entry_ref& ref, int32& count,
+					BMessage* update = NULL);
 		status_t GetTranslatorData(image_id image, translator_data& data);
 
 		status_t StartWatching(BMessenger target);
@@ -69,14 +76,31 @@ class BTranslatorRoster::Private : public BHandler, public BLocker {
 	private:
 		static int _CompareSupport(const void* _a, const void* _b);
 
+		void _RescanChanged();
+
 		const translation_format* _CheckHints(const translation_format* formats,
 					int32 formatsCount, uint32 hintType, const char* hintMIME);
+
 		const translator_item* _FindTranslator(translator_id id) const;
 		const translator_item* _FindTranslator(const char* name) const;
+		const translator_item* _FindTranslator(entry_ref& ref) const;
+		translator_item* _FindTranslator(node_ref& nodeRef);
 
+		int32 _CompareTranslatorDirectoryPriority(const entry_ref& a,
+					const entry_ref& b) const;
+		bool _IsKnownDirectory(const node_ref& nodeRef) const;
+
+		void _RemoveTranslators(const node_ref* nodeRef, const entry_ref* ref = NULL);
+		void _EntryAdded(const node_ref& nodeRef, const char* name);
+		void _EntryAdded(const entry_ref& ref);
+		void _NotifyListeners(BMessage& update) const;
+
+		NodeRefList		fDirectories;
 		TranslatorMap	fTranslators;
 		MessengerList	fMessengers;
+		EntryRefSet		fRescanEntries;
 		int32			fNextID;
+		bool			fLazyScanning;
 };
 
 #endif	// TRANSLATOR_ROSTER_PRIVATE_H

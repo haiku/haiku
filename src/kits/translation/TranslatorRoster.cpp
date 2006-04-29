@@ -27,10 +27,27 @@
 #include <String.h>
 #include <TranslatorRoster.h>
 
-#include <set>
 #include <new>
 #include <string.h>
 
+
+namespace BPrivate {
+
+class QuarantineTranslatorImage {
+	public:
+		QuarantineTranslatorImage(BTranslatorRoster::Private& privateRoster);
+		~QuarantineTranslatorImage();
+
+		void Put(const entry_ref& ref);
+		void Remove();
+
+	private:
+		BTranslatorRoster::Private& fRoster;
+		entry_ref	fRef;
+		bool		fRemove;
+};
+
+}	// namespace BPrivate
 
 // Extensions used in the extension BMessage, defined in TranslatorFormats.h
 char B_TRANSLATOR_EXT_HEADER_ONLY[]			= "/headerOnly";
@@ -49,9 +66,57 @@ char B_TRANSLATOR_EXT_SOUND_LOOP[]			= "nois/loop";
 BTranslatorRoster* BTranslatorRoster::sDefaultRoster = NULL;
 
 
+namespace BPrivate {
+
+/*!
+	The purpose of this class is to put a translator entry_ref into - and remove
+	it from the list of translators on destruction (if Remove() was called before).
+
+	This is used in Private::CreateTranslators() in case a translator hides a
+	previous one (ie. if you install a translator in the user's translators directory
+	that has the same name as one in the system's directory, it will hide this
+	entry).
+*/
+QuarantineTranslatorImage::QuarantineTranslatorImage(BTranslatorRoster::Private& privateRoster)
+	:
+	fRoster(privateRoster),
+	fRemove(false)
+{
+}
+
+
+QuarantineTranslatorImage::~QuarantineTranslatorImage()
+{
+	if (fRef.device == -1 || !fRemove)
+		return;
+
+	fRoster.RemoveTranslators(fRef);
+}
+
+
+void
+QuarantineTranslatorImage::Put(const entry_ref& ref)
+{
+	fRef = ref;
+}
+
+
+void
+QuarantineTranslatorImage::Remove()
+{
+	fRemove = true;
+}
+
+}	// namespace BPrivate
+
+
+//	#pragma mark -
+
+
 BTranslatorRoster::Private::Private()
 	: BHandler("translator roster"), BLocker("translator list"),
-	fNextID(1)
+	fNextID(1),
+	fLazyScanning(true)
 {
 	// we're sneaking us into the BApplication
 	if (be_app != NULL)
@@ -99,9 +164,99 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_NODE_MONITOR:
+		{
+			BAutolock locker(this);
+
 			printf("translator roster node monitor: ");
 			message->PrintToStream();
+
+			int32 opcode;
+			if (message->FindInt32("opcode", &opcode) != B_OK)
+				return;
+
+			switch (opcode) {
+				case B_ENTRY_CREATED:
+				{
+					const char* name;
+					node_ref nodeRef;
+					if (message->FindInt32("device", &nodeRef.device) != B_OK
+						|| message->FindInt64("directory", &nodeRef.node) != B_OK
+						|| message->FindString("name", &name) != B_OK)
+						break;
+
+					// TODO: make this better (possible under Haiku)
+					snooze(100000);
+						// let the font be written completely before trying to open it
+
+					_EntryAdded(nodeRef, name);
+					break;
+				}
+
+				case B_ENTRY_MOVED:
+				{
+					// has the entry been moved into a monitored directory or has
+					// it been removed from one?
+					const char* name;
+					node_ref toNodeRef;
+					node_ref fromNodeRef;
+					node_ref nodeRef;
+
+					if (message->FindInt32("device", &nodeRef.device) != B_OK
+						|| message->FindInt64("to directory", &toNodeRef.node) != B_OK
+						|| message->FindInt64("from directory", (int64 *)&fromNodeRef.node) != B_OK
+						|| message->FindInt64("node", (int64 *)&nodeRef.node) != B_OK
+						|| message->FindString("name", &name) != B_OK)
+						break;
+
+					fromNodeRef.device = nodeRef.device;
+					toNodeRef.device = nodeRef.device;
+
+					// Do we know this one yet?
+					translator_item* item = _FindTranslator(nodeRef);
+					if (item == NULL) {
+						// it's a new one!
+						if (_IsKnownDirectory(toNodeRef))
+							_EntryAdded(nodeRef, name);
+						break;
+					}
+
+					if (!_IsKnownDirectory(toNodeRef)) {
+						// translator got removed
+						_RemoveTranslators(&nodeRef);
+						break;
+					}
+
+					// the name may have changed
+					item->ref.set_name(name);
+					item->ref.directory = toNodeRef.node;
+
+					if (_IsKnownDirectory(fromNodeRef)
+						&& _IsKnownDirectory(toNodeRef)) {
+						// TODO: we should rescan for the name, there might be name
+						//	clashes with translators in other directories
+						//	(as well as old ones revealed)
+						break;
+					}
+					break;
+				}
+
+				case B_ENTRY_REMOVED:
+				{
+					node_ref nodeRef;
+					uint64 directoryNode;
+					if (message->FindInt32("device", &nodeRef.device) != B_OK
+						|| message->FindInt64("directory", (int64 *)&directoryNode) != B_OK
+						|| message->FindInt64("node", &nodeRef.node) != B_OK)
+						break;
+
+					translator_item* item = _FindTranslator(nodeRef);
+					if (item != NULL)
+						_RemoveTranslators(&nodeRef);
+					break;
+				}
+			}
 			break;
+		}
 
 		default:
 			BHandler::MessageReceived(message);
@@ -129,6 +284,13 @@ BTranslatorRoster::Private::AddDefaultPaths()
 }
 
 
+/*!
+	Adds the colon separated list of directories to the roster.
+
+	Note, the order in which these directories are added to actually matters,
+	translators with the same name will be taken from the earlier directory
+	first. See _CompareTranslatorDirectoryPriority().
+*/
 status_t
 BTranslatorRoster::Private::AddPaths(const char* paths)
 {
@@ -168,6 +330,12 @@ BTranslatorRoster::Private::AddPaths(const char* paths)
 }
 
 
+/*!
+	Adds a new directory to the roster.
+
+	Note, the order in which these directories are added to actually matters,
+	see AddPaths().
+*/
 status_t
 BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 {
@@ -181,8 +349,12 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 	if (status < B_OK)
 		return status;
 
+	// do we know this directory already?
+	if (_IsKnownDirectory(nodeRef))
+		return B_OK;
+
 	if (Looper() != NULL) {
-		// watch these directories
+		// watch that directory
 		watch_node(&nodeRef, B_WATCH_DIRECTORY, this);
 	}
 
@@ -209,13 +381,14 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 
 status_t
 BTranslatorRoster::Private::AddTranslator(BTranslator* translator,
-	image_id image = -1, const entry_ref* ref = NULL)
+	image_id image = -1, const entry_ref* ref = NULL, ino_t node = 0)
 {
 	BAutolock locker(this);
 
 	translator_item item;
 	item.translator = translator;
 	item.image = image;
+	item.node = node;
 	if (ref != NULL)
 		item.ref = *ref;
 
@@ -228,6 +401,13 @@ BTranslatorRoster::Private::AddTranslator(BTranslator* translator,
 	translator->fOwningRoster = this;
 	translator->fID = fNextID++;
 	return B_OK;
+}
+
+
+void
+BTranslatorRoster::Private::RemoveTranslators(entry_ref& ref)
+{
+	_RemoveTranslators(NULL, &ref);
 }
 
 
@@ -262,25 +442,44 @@ BTranslatorRoster::Private::GetTranslatorData(image_id image, translator_data& d
 		|| get_image_symbol(image, "inputFormats", B_SYMBOL_TYPE_DATA, (void**)&data.input_formats) < B_OK
 		|| get_image_symbol(image, "outputFormats", B_SYMBOL_TYPE_DATA, (void**)&data.output_formats) < B_OK
 		|| get_image_symbol(image, "Identify", B_SYMBOL_TYPE_TEXT, (void**)&data.identify_hook) < B_OK
-		|| get_image_symbol(image, "Translate", B_SYMBOL_TYPE_TEXT, (void**)&data.translate_hook) < B_OK
-		|| get_image_symbol(image, "MakeConfig", B_SYMBOL_TYPE_TEXT, (void**)&data.make_config_hook) < B_OK
-		|| get_image_symbol(image, "GetConfigMessage", B_SYMBOL_TYPE_TEXT, (void**)&data.get_config_message_hook) < B_OK)
+		|| get_image_symbol(image, "Translate", B_SYMBOL_TYPE_TEXT, (void**)&data.translate_hook) < B_OK)
 		return B_BAD_TYPE;
 
 	data.version = *version;
+
+	// those calls are optional
+	get_image_symbol(image, "MakeConfig", B_SYMBOL_TYPE_TEXT, (void**)&data.make_config_hook);
+	get_image_symbol(image, "GetConfigMessage", B_SYMBOL_TYPE_TEXT, (void**)&data.get_config_message_hook);
+
 	return B_OK;
 }
 
 
 status_t
-BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count)
+BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count,
+	BMessage* update)
 {
 	BAutolock locker(this);
 
-	if (_FindTranslator(ref.name) != NULL) {
-		// keep the existing add-on
-		return B_OK;
+	BPrivate::QuarantineTranslatorImage quarantine(*this);
+
+	const translator_item* item = _FindTranslator(ref.name);
+	if (item != NULL) {
+		// check if the known translator has a higher priority
+		if (_CompareTranslatorDirectoryPriority(item->ref, ref) <= 0) {
+			// keep the existing add-on
+			return B_OK;
+		}
+
+		// replace existing translator(s) if the new translator succeeds
+		quarantine.Put(item->ref);
 	}
+
+	BEntry entry(&ref);
+	node_ref nodeRef;
+	status_t status = entry.GetNodeRef(&nodeRef);
+	if (status < B_OK)
+		return status;
 
 	BPath path(&ref);
 	image_id image = load_add_on(path.Path());
@@ -290,7 +489,7 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 	// Function pointer used to create post R4.5 style translators
 	BTranslator *(*makeNthTranslator)(int32 n, image_id you, uint32 flags, ...);
 
-	status_t status = get_image_symbol(image, "make_nth_translator",
+	status = get_image_symbol(image, "make_nth_translator",
 		B_SYMBOL_TYPE_TEXT, (void**)&makeNthTranslator);
 	if (status == B_OK) {
 		// If the translator add-on supports the post R4.5
@@ -299,7 +498,9 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 		BTranslator* translator = NULL;
 		int32 created = 0;
 		for (int32 n = 0; (translator = makeNthTranslator(n, image, 0)) != NULL; n++) {
-			if (AddTranslator(translator, image, &ref) == B_OK) {
+			if (AddTranslator(translator, image, &ref, nodeRef.node) == B_OK) {
+				if (update)
+					update->AddInt32("translator_id", translator->fID);
 				count++;
 				created++;
 			} else {
@@ -310,6 +511,8 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 
 		if (created == 0)
 			unload_add_on(image);
+
+		quarantine.Remove();
 		return B_OK;
 	}
 
@@ -326,11 +529,14 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref, int32& count
 	}
 
 	if (status == B_OK)
-		status = AddTranslator(translator, image, &ref);
+		status = AddTranslator(translator, image, &ref, nodeRef.node);
 
-	if (status == B_OK)
+	if (status == B_OK) {
+		if (update)
+			update->AddInt32("translator_id", translator->fID);
+		quarantine.Remove();
 		count++;
-	else
+	} else
 		unload_add_on(image);
 
 	return status;
@@ -346,6 +552,14 @@ BTranslatorRoster::Private::StartWatching(BMessenger target)
 		return B_NO_MEMORY;
 	}
 
+	if (fLazyScanning) {
+		fLazyScanning = false;
+			// Since we now have someone to report to, we cannot lazily
+			// adopt changes to the translator any longer
+
+		_RescanChanged();
+	}
+
 	return B_OK;
 }
 
@@ -358,6 +572,9 @@ BTranslatorRoster::Private::StopWatching(BMessenger target)
 	while (iterator != fMessengers.end()) {
 		if (*iterator == target) {
 			fMessengers.erase(iterator);
+			if (fMessengers.empty())
+				fLazyScanning = true;
+
 			return B_OK;
 		}
 
@@ -394,6 +611,8 @@ BTranslatorRoster::Private::Identify(BPositionIO* source,
 	uint32 wantType, translator_info* _info)
 {
 	BAutolock locker(this);
+
+	_RescanChanged();
 
 	TranslatorMap::const_iterator iterator = fTranslators.begin();
 	float bestWeight = 0.0f;
@@ -437,6 +656,8 @@ BTranslatorRoster::Private::GetTranslators(BPositionIO* source,
 	uint32 wantType, translator_info** _info, int32* _numInfo)
 {
 	BAutolock locker(this);
+
+	_RescanChanged();
 
 	int32 arraySize = fTranslators.size();
 	translator_info* array = new (std::nothrow) translator_info[arraySize];
@@ -482,6 +703,8 @@ status_t
 BTranslatorRoster::Private::GetAllTranslators(translator_id** _ids, int32* _count)
 {
 	BAutolock locker(this);
+
+	_RescanChanged();
 
 	int32 arraySize = fTranslators.size();
 	translator_id* array = new (std::nothrow) translator_id[arraySize];
@@ -552,6 +775,34 @@ BTranslatorRoster::Private::_CompareSupport(const void* _a, const void* _b)
 }
 
 
+/*!
+	In lazy mode, freshly installed translator are not scanned immediately
+	when they become available. Instead, they are put into a set.
+
+	When a method is called that may be interested in these new translators,
+	they are scanned on the fly. Since lazy mode also means that this roster
+	does not have any listeners, we don't need to notify anyone about those
+	changes.
+*/
+void
+BTranslatorRoster::Private::_RescanChanged()
+{
+	EntryRefSet::iterator iterator = fRescanEntries.begin();
+
+	while (iterator != fRescanEntries.end()) {
+		int32 count;
+		CreateTranslators(*iterator, count);
+
+		fRescanEntries.erase(iterator);
+		iterator++;
+	}
+}
+
+
+/*!
+	Tests if the hints provided for a source stream are compatible to
+	the formats the translator exports.
+*/
 const translation_format*
 BTranslatorRoster::Private::_CheckHints(const translation_format* formats,
 	int32 formatsCount, uint32 hintType, const char* hintMIME)
@@ -604,6 +855,187 @@ BTranslatorRoster::Private::_FindTranslator(const char* name) const
 	}
 
 	return NULL;
+}
+
+
+const translator_item*
+BTranslatorRoster::Private::_FindTranslator(entry_ref& ref) const
+{
+	if (ref.name == NULL)
+		return NULL;
+
+	TranslatorMap::const_iterator iterator = fTranslators.begin();
+
+	while (iterator != fTranslators.end()) {
+		const translator_item& item = iterator->second;
+		if (item.ref == ref)
+			return &item;
+
+		iterator++;
+	}
+
+	return NULL;
+}
+
+
+translator_item*
+BTranslatorRoster::Private::_FindTranslator(node_ref& nodeRef)
+{
+	if (nodeRef.device < 0)
+		return NULL;
+
+	TranslatorMap::iterator iterator = fTranslators.begin();
+
+	while (iterator != fTranslators.end()) {
+		translator_item& item = iterator->second;
+		if (item.ref.device == nodeRef.device
+			&& item.node == nodeRef.node)
+			return &item;
+
+		iterator++;
+	}
+
+	return NULL;
+}
+
+
+/*!
+	Directories added to the roster have a certain priority - the first entry
+	to be added has the highest priority; if a translator with the same name
+	is to be found in two directories, the one with the higher priority is
+	chosen.
+*/
+int32
+BTranslatorRoster::Private::_CompareTranslatorDirectoryPriority(const entry_ref& a,
+	const entry_ref& b) const
+{
+	// priority is determined by the order in the list
+
+	node_ref nodeRefA;
+	nodeRefA.device = a.device;
+	nodeRefA.node = a.directory;
+
+	node_ref nodeRefB;
+	nodeRefB.device = b.device;
+	nodeRefB.node = b.directory;
+
+	NodeRefList::const_iterator iterator = fDirectories.begin();
+
+	while (iterator != fDirectories.end()) {
+		if (*iterator == nodeRefA)
+			return -1;
+		if (*iterator == nodeRefB)
+			return 1;
+
+		iterator++;
+	}
+
+	return 0;
+}
+
+
+bool
+BTranslatorRoster::Private::_IsKnownDirectory(const node_ref& nodeRef) const
+{
+	NodeRefList::const_iterator iterator = fDirectories.begin();
+
+	while (iterator != fDirectories.end()) {
+		if (*iterator == nodeRef)
+			return true;
+
+		iterator++;
+	}
+
+	return false;
+}
+
+
+void
+BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef, const entry_ref* ref)
+{
+	if (ref == NULL && nodeRef == NULL)
+		return;
+
+	TranslatorMap::iterator iterator = fTranslators.begin();
+	BMessage update(B_TRANSLATOR_REMOVED);
+	image_id image = -1;
+
+	while (iterator != fTranslators.end()) {
+		const translator_item& item = iterator->second;
+		if ((ref != NULL && item.ref == *ref)
+			|| (nodeRef != NULL && item.ref.device == nodeRef->device
+				&& item.node == nodeRef->node)) {
+			item.translator->fOwningRoster = NULL;
+				// if the translator is busy, we don't want to be notified
+				// about the removal later on
+			item.translator->Release();
+			image = item.image;
+			update.AddInt32("translator_id", iterator->first);
+
+			fTranslators.erase(iterator);
+		}
+
+		iterator++;
+	}
+
+	// Unload image from the removed translator
+
+	if (image >= B_OK)
+		unload_add_on(image);
+
+	_NotifyListeners(update);
+}
+
+
+void
+BTranslatorRoster::Private::_EntryAdded(const node_ref& nodeRef, const char* name)
+{
+	entry_ref ref;
+	ref.device = nodeRef.device;
+	ref.directory = nodeRef.node;
+	ref.set_name(name);
+
+	_EntryAdded(ref);
+}
+
+
+/*!
+	In lazy mode, the entry is marked to be rescanned on next use of any
+	translation method (that could make use of it).
+	In non-lazy mode, the translators for this entry are created directly
+	and listeners notified.
+
+	Called by the node monitor handling.
+*/
+void
+BTranslatorRoster::Private::_EntryAdded(const entry_ref& ref)
+{
+	BEntry entry;
+	if (entry.SetTo(&ref) != B_OK || !entry.IsFile())
+		return;
+
+	if (fLazyScanning) {
+		fRescanEntries.insert(ref);
+		return;
+	}
+
+	BMessage update(B_TRANSLATOR_ADDED);
+	int32 count = 0;
+	CreateTranslators(ref, count, &update);
+
+	_NotifyListeners(update);
+}
+
+
+void
+BTranslatorRoster::Private::_NotifyListeners(BMessage& update) const
+{
+	MessengerList::const_iterator iterator = fMessengers.begin();
+
+	while (iterator != fMessengers.end()) {
+		(*iterator).SendMessage(&update);
+		iterator++;
+	}
 }
 
 
@@ -677,14 +1109,32 @@ BTranslatorRoster::Instantiate(BMessage* from)
 BTranslatorRoster *
 BTranslatorRoster::Default()
 {
-// TODO: This code isn't thread safe
+	static int32 lock = 0;
+
+	if (sDefaultRoster != NULL)
+		return sDefaultRoster;
+
+	if (atomic_add(&lock, 1) != 0) {
+		// Just wait for the default translator to be instantiated
+		while (sDefaultRoster == NULL)
+			snooze(10000);
+
+		atomic_add(&lock, -1);
+		return sDefaultRoster;
+	}
+
 	// If the default translators have not been loaded,
 	// create a new BTranslatorRoster for them, and load them.
 	if (sDefaultRoster == NULL) {
-		sDefaultRoster = new BTranslatorRoster();
-		sDefaultRoster->AddTranslators(NULL);
+		BTranslatorRoster* roster = new BTranslatorRoster();
+		roster->AddTranslators(NULL);
+
+		sDefaultRoster = roster;
+			// this will unlock any other threads waiting for
+			// the default roster to become available
 	}
 
+	atomic_add(&lock, -1);
 	return sDefaultRoster;
 }
 
