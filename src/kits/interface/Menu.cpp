@@ -1156,7 +1156,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	while (true) {
 		if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
 			&& fExtraMenuData->trackingState != NULL) {
-			bool result = fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
+			/*bool result =*/ fExtraMenuData->trackingHook(this, fExtraMenuData->trackingState);
 			//printf("tracking hook returned %s\n", result ? "true" : "false");
 		}
 		
