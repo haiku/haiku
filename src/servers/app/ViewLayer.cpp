@@ -928,25 +928,48 @@ ViewLayer::CopyBits(BRect src, BRect dst, BRegion& windowContentClipping)
 	if (!copyRegion)
 		return;
 
+	// move src rect to destination here for efficiency reasons
+	visibleSrc.OffsetBy(xOffset, yOffset);
+
+	// we need to interstect the copyRegion too times, onces
+	// at the source and once at the destination (here done
+	// the other way arround but it doesn't matter)
+	// the reason for this is that we are not supposed to visually
+	// copy children in the source rect and neither to copy onto
+	// children in the destination rect...
 	copyRegion->Set(visibleSrc);
 	copyRegion->IntersectWith(&ScreenClipping(&windowContentClipping));
+		// note that fScreenClipping is used directly from hereon
+		// because it is now up to date
+
+	copyRegion->OffsetBy(-xOffset, -yOffset);
+	copyRegion->IntersectWith(&fScreenClipping);
+
+	// do the actual blit
 	fWindow->CopyContents(copyRegion, xOffset, yOffset);
 
 	// find the dirty region as far as we are concerned
 	BRect dirtyDst(dst);
 	ConvertToVisibleInTopView(&dirtyDst);
 
-	BRegion* dirty = copyRegion;
-		// reuse copyRegion and call it "dirty"
+	BRegion* dirty = fWindow->GetRegion();
+	if (!dirty) {
+		fWindow->RecycleRegion(copyRegion);
+		return;
+	}
 
+	// offset copyRegion to destination again
+	copyRegion->OffsetBy(xOffset, yOffset);
+	// start with destination given by user
 	dirty->Set(dirtyDst);
 	// exclude the part that we could copy
-	visibleSrc.OffsetBy(xOffset, yOffset);
-	dirty->Exclude(visibleSrc);
-	dirty->IntersectWith(&ScreenClipping(&windowContentClipping));
+	dirty->Exclude(copyRegion);
+
+	dirty->IntersectWith(&fScreenClipping);
 	fWindow->MarkContentDirty(*dirty);
 
 	fWindow->RecycleRegion(dirty);
+	fWindow->RecycleRegion(copyRegion);
 }
 
 
