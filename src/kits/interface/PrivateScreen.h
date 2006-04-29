@@ -89,6 +89,7 @@ class BPrivateScreen {
 		int32		fRefCount;
 		color_map*	fColorMap;
 		sem_id		fRetraceSem;
+		bool		fRetraceSemValid;
 		bool		fOwnsColorMap;
 		BRect		fFrame;
 		bigtime_t	fLastUpdate;

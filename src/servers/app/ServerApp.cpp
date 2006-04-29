@@ -2188,8 +2188,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			screen_id id;
 			link.Read<screen_id>(&id);
 
-			sem_id semaphore = fDesktop->HWInterface()->RetraceSemaphore();
-			fLink.StartMessage(semaphore);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<sem_id>(fDesktop->HWInterface()->RetraceSemaphore());
 			fLink.Flush();
 			break;
 		}

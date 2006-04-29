@@ -213,12 +213,19 @@ BPrivateScreen::GetNextID(screen_id& id)
 status_t
 BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 {
+// TODO: remove when interrupts are enabled again in the ATI driver
+return B_ERROR;
 	// Get the retrace semaphore if it's the first time 
 	// we are called. Cache the value then.
-	status_t status;
-	if (fRetraceSem < 0)
+	if (!fRetraceSemValid)
 		fRetraceSem = _RetraceSemaphore();
 
+	if (fRetraceSem < 0) {
+		// syncing to retrace is not supported by the accelerant
+		return fRetraceSem;
+	}
+
+	status_t status;
 	do {
 		status = acquire_sem_etc(fRetraceSem, 1, B_RELATIVE_TIMEOUT, timeout);
 	} while (status == B_INTERRUPTED);
@@ -633,7 +640,11 @@ BPrivateScreen::_RetraceSemaphore()
 	link.Attach<screen_id>(ID());
 
 	sem_id id = B_BAD_SEM_ID;
-	link.FlushWithReply(id); 
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<sem_id>(&id);
+		fRetraceSemValid = true;
+	}
 
 	return id;
 }
@@ -661,6 +672,7 @@ BPrivateScreen::BPrivateScreen(screen_id id)
 	fID(id),
 	fColorMap(NULL),
 	fRetraceSem(-1),
+	fRetraceSemValid(false),
 	fOwnsColorMap(false),
 	fFrame(0, 0, 0, 0),
 	fLastUpdate(0)
