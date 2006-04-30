@@ -119,8 +119,10 @@ BTranslatorRoster::Private::Private()
 	fLazyScanning(true)
 {
 	// we're sneaking us into the BApplication
-	if (be_app != NULL)
+	if (be_app != NULL && be_app->Lock()) {
 		be_app->AddHandler(this);
+		be_app->Unlock();
+	}
 }
 
 
@@ -128,8 +130,11 @@ BTranslatorRoster::Private::~Private()
 {
 	stop_watching(this);
 
-	if (Looper())
+	if (Looper() && LockLooper()) {
+		BLooper* looper = Looper();
 		Looper()->RemoveHandler(this);
+		looper->Unlock();
+	}
 
 	// Release all translators, so that they can delete themselves
 
