@@ -337,6 +337,23 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 
 
 static status_t
+query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_outPhysical)
+{
+	page_table_entry *entry;
+
+	// default the flags to not present
+	*_outPhysical = 0;
+
+	entry = lookup_page_table_entry(map, va);
+	if (entry == NULL)
+		return B_ERROR;
+
+	*_outPhysical = entry->physical_page_number * B_PAGE_SIZE;
+	return B_OK;
+}
+
+
+static status_t
 query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
 {
 	page_table_entry *entry;
@@ -456,6 +473,7 @@ static vm_translation_map_ops tmap_ops = {
 	map_tmap,
 	unmap_tmap,
 	query_tmap,
+	query_tmap_interrupt,
 	get_mapped_size_tmap,
 	protect_tmap,
 	clear_flags_tmap,

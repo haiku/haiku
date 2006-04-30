@@ -3023,7 +3023,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	status_t status = B_OK;
 	int32 index = -1;
 	addr_t offset = 0;
-	uint32 flags;
+	bool interrupts = are_interrupts_enabled();
 
 	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes, numEntries));
 
@@ -3039,14 +3039,23 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	(*addressSpace->translation_map.ops->lock)(&addressSpace->translation_map);
+	vm_translation_map *map = &addressSpace->translation_map;
+
+	if (interrupts)
+		map->ops->lock(map);
 
 	while (offset < numBytes) {
 		addr_t bytes = min_c(numBytes - offset, B_PAGE_SIZE);
 
-		status = (*addressSpace->translation_map.ops->query)(&addressSpace->translation_map,
-					(addr_t)address + offset, &physicalAddress, &flags);
-		if (status < 0)
+		if (interrupts) {
+			uint32 flags;
+			status = map->ops->query(map, (addr_t)address + offset, &physicalAddress,
+				&flags);
+		} else {
+			status = map->ops->query_interrupt(map, (addr_t)address + offset,
+				&physicalAddress);
+		}
+		if (status < B_OK)
 			break;
 
 		if (index < 0 && pageOffset > 0) {
@@ -3071,7 +3080,9 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 
 		offset += bytes;
 	}
-	(*addressSpace->translation_map.ops->unlock)(&addressSpace->translation_map);
+
+	if (interrupts)
+		map->ops->unlock(map);
 
 	// close the entry list
 
