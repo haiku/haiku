@@ -530,9 +530,13 @@ i386_handle_trap(struct iframe frame)
 					break;
 				}
 
-				pic_end_of_interrupt(frame.vector);
+				if (!pic_is_level_triggered(frame.vector))
+					pic_end_of_interrupt(frame.vector);
 
 				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
+
+				if (pic_is_level_triggered(frame.vector))
+					pic_end_of_interrupt(frame.vector);
 			} else {
 				char name[32];
 				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, "
