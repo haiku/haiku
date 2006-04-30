@@ -105,6 +105,9 @@ typedef struct {
 } desc_table;
 static desc_table *sIDT = NULL;
 
+static uint16 sLevelTriggeredInterrupts;
+	// binary mask: 1 level, 0 edge
+
 
 static void
 set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
@@ -186,6 +189,13 @@ pic_end_of_interrupt(int32 num)
 }
 
 
+static inline bool
+pic_is_level_triggered(int32 num)
+{
+	return sLevelTriggeredInterrupts & (1U << (num - PIC_INT_BASE));
+}
+
+
 static void
 pic_init(void)
 {
@@ -208,10 +218,12 @@ pic_init(void)
 	out8(0xfb, PIC_MASTER_MASK);	// Mask off all interrupts (except slave pic line IRQ 2).
 	out8(0xff, PIC_SLAVE_MASK); 	// Mask off interrupts on the slave.
 
-	// dump which interrupts are level or edge triggered
+	// determine which interrupts are level or edge triggered
 
-	TRACE(("PIC level trigger mode: %04x\n", in8(PIC_MASTER_TRIGGER_MODE)
-		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8)));
+	sLevelTriggeredInterrupts = in8(PIC_MASTER_TRIGGER_MODE)
+		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8);
+
+	TRACE(("PIC level trigger mode: %04x\n", sLevelTriggeredInterrupts));
 }
 
 
