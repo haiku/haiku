@@ -52,6 +52,10 @@
 #define PIC_SLAVE_INIT3			PIC_SLAVE_MASK
 #define PIC_SLAVE_INIT4			PIC_SLAVE_MASK
 
+// the edge/level trigger control registers
+#define PIC_MASTER_TRIGGER_MODE	0x4d0
+#define PIC_SLAVE_TRIGGER_MODE	0x4d1
+
 #define PIC_INIT1				0x10
 #define PIC_INIT1_SEND_INIT4	0x01
 #define PIC_INIT3_IR2_IS_SLAVE	0x04
@@ -64,8 +68,8 @@
 
 #define PIC_NON_SPECIFIC_EOI	0x20
 
-#define PIC_INT_BASE			0x20
-#define PIC_SLAVE_INT_BASE		0x28
+#define PIC_INT_BASE			ARCH_INTERRUPT_BASE
+#define PIC_SLAVE_INT_BASE		(ARCH_INTERRUPT_BASE + 8)
 #define PIC_NUM_INTS			0x0f
 
 static const char *kInterruptNames[] = {
@@ -94,12 +98,12 @@ static const int kInterruptNameCount = 20;
 
 #define MAX_ARGS 16
 
+struct iframe_stack gBootFrameStack;
+
 typedef struct {
 	uint32 a, b;
 } desc_table;
 static desc_table *sIDT = NULL;
-
-struct iframe_stack gBootFrameStack;
 
 
 static void
@@ -143,21 +147,21 @@ x86_set_task_gate(int32 n, int32 segment)
  *	it must assume it's a spurious interrupt.
  */
 
-static bool
+static inline bool
 pic_is_spurious_interrupt(int32 num)
 {
-	int32 port, isr;
+	int32 isr;
 
-	if (num == 7)
-		port = PIC_MASTER_CONTROL;
-	else if (num == 15)
-		port = PIC_SLAVE_CONTROL;
-	else
+	if (num != 7)
 		return false;
 
-	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_ISR, port);
-	isr = in8(port);
-	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_IRR, port);
+	// Note, detecting spurious interrupts on line 15 obviously doesn't
+	// work correctly - and since those are extremely rare, anyway, we
+	// just ignore them
+
+	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_ISR, PIC_MASTER_CONTROL);
+	isr = in8(PIC_MASTER_CONTROL);
+	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_IRR, PIC_MASTER_CONTROL);
 
 	return (isr & 0x80) == 0;
 }
@@ -203,6 +207,11 @@ pic_init(void)
 
 	out8(0xfb, PIC_MASTER_MASK);	// Mask off all interrupts (except slave pic line IRQ 2).
 	out8(0xff, PIC_SLAVE_MASK); 	// Mask off interrupts on the slave.
+
+	// dump which interrupts are level or edge triggered
+
+	TRACE(("PIC level trigger mode: %04x\n", in8(PIC_MASTER_TRIGGER_MODE)
+		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8)));
 }
 
 
@@ -504,8 +513,10 @@ i386_handle_trap(struct iframe frame)
 			if (frame.vector >= ARCH_INTERRUPT_BASE) {
 				// This is a workaround for spurious assertions of interrupts 7/15
 				// which seems to be an often seen problem on the PC platform
-				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE))
+				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE)) {
+					TRACE(("got spurious interrupt at vector %ld\n", frame.vector));
 					break;
+				}
 
 				pic_end_of_interrupt(frame.vector);
 
