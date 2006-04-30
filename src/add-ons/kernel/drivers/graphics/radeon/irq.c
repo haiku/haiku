@@ -65,7 +65,6 @@ Radeon_ThreadInterruptWork(vuint8 *regs, device_info *di, uint32 int_status)
 }
 
 
-#ifndef __HAIKU__
 /** Capture interrupt handler */
 
 static int32
@@ -143,7 +142,6 @@ Radeon_Interrupt(void *data)
 
 	return handled;			
 }
-#endif
 
 
 static int32
@@ -281,16 +279,12 @@ Radeon_SetupIRQ(device_info *di, char *buffer)
 			goto err5;
 	} else {
 		/* otherwise install our interrupt handler */
-#ifdef __HAIKU__
-		dprintf("radeon: real interrupt handling disabled\n");
-#else
 		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, 
 			Radeon_Interrupt, (void *)di, 0);
 		if (result != B_OK)
 			goto err5;
 
 		SHOW_INFO(3, "installed IRQ @ %d", di->pcii.u.h0.interrupt_line);
-#endif
 	}
 
 	return B_OK;
@@ -327,10 +321,8 @@ Radeon_CleanupIRQ(device_info *di)
 		cancel_timer((timer *)&di->ti_a);
 		cancel_timer((timer *)&di->ti_b);
 	} else {
-#ifndef __HAIKU__
 		/* remove interrupt handler */
 		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, Radeon_Interrupt, di);
-#endif
 	}
 
 	delete_sem(si->crtc[0].vblank);
