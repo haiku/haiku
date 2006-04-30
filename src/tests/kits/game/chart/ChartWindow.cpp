@@ -2219,10 +2219,9 @@ ChartWindow::Animation2(void *data)
 		status_t status;
 		do {
 			status = acquire_sem_etc(w->second_thread_lock, 1, B_TIMEOUT, 500000);
-
+			if (w->fKillThread)
+				return 0;
 		} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
-		if (w->fKillThread)
-			return 0;
 		
 		/* the duration of the processing is needed to control the
 		   dynamic load split (see RefreshStar) */
