@@ -119,7 +119,8 @@ BMenuFrame::Draw(BRect updateRect)
 		font_height height;
 		GetFontHeight(&height);
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
-		DrawString(kEmptyMenuLabel, BPoint(3, ceilf(height.ascent + 2)));
+		BPoint where((Bounds().Width() - fMenu->StringWidth(kEmptyMenuLabel)) / 2, ceilf(height.ascent + 1));
+		DrawString(kEmptyMenuLabel, where);
 	}
 
 	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));	

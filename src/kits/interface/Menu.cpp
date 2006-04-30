@@ -1400,22 +1400,24 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 
 					if (item->fModifiers && item->fShortcutChar)
 						iWidth += 25.0f;
+					if (item->fSubmenu != NULL)
+						iWidth += 20.0f;
 
 					item->fBounds.left = 0.0f;
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right + 20);
+					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
 			}
 			if (fMaxContentWidth > 0)
 				frame.right = min_c(frame.right, fMaxContentWidth);
 
-			//if (moveItems) {
+			if (moveItems) {
 				for (int32 i = 0; i < fItems.CountItems(); i++)
 					ItemAt(i)->fBounds.right = frame.right;
-			//}
+			}
 			frame.right = ceilf(frame.right);
 			frame.bottom--;
 			break;
@@ -1441,10 +1443,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				}
 			}
 			
-			//if (moveItems) {
+			if (moveItems) {
 				for (int32 i = 0; i < fItems.CountItems(); i++)
 					ItemAt(i)->fBounds.bottom = frame.bottom;			
-			//}
+			}
 
 			frame.right = ceilf(frame.right);
 			break;
