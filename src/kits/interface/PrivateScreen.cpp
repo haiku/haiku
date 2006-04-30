@@ -213,8 +213,6 @@ BPrivateScreen::GetNextID(screen_id& id)
 status_t
 BPrivateScreen::WaitForRetrace(bigtime_t timeout)
 {
-// TODO: remove when interrupts are enabled again in the ATI driver
-return B_ERROR;
 	// Get the retrace semaphore if it's the first time 
 	// we are called. Cache the value then.
 	if (!fRetraceSemValid)
