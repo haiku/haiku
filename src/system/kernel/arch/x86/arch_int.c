@@ -523,6 +523,8 @@ i386_handle_trap(struct iframe frame)
 
 		default:
 			if (frame.vector >= ARCH_INTERRUPT_BASE) {
+				bool levelTriggered = pic_is_level_triggered(frame.vector);
+
 				// This is a workaround for spurious assertions of interrupts 7/15
 				// which seems to be an often seen problem on the PC platform
 				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE)) {
@@ -530,12 +532,13 @@ i386_handle_trap(struct iframe frame)
 					break;
 				}
 
-				if (!pic_is_level_triggered(frame.vector))
+				if (!levelTriggered)
 					pic_end_of_interrupt(frame.vector);
 
-				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
+				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE,
+					levelTriggered);
 
-				if (pic_is_level_triggered(frame.vector))
+				if (levelTriggered)
 					pic_end_of_interrupt(frame.vector);
 			} else {
 				char name[32];

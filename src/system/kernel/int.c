@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -227,27 +227,12 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
  */
 
 int
-int_io_interrupt_handler(int vector)
+int_io_interrupt_handler(int vector, bool levelTriggered)
 {
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler *io;
+	bool invokeScheduler = false, handled = false;
 
-#if 0
-{
-	static int low[2];
-	static int high[2];
-	static int counter;
-	int32 cpu = smp_get_current_cpu();
-
-	if (vector > 0xf0 - 32)
-		high[cpu]++;
-	else
-		low[cpu]++;
-	dprintf("got vector %d at CPU %ld\n", vector, cpu);
-	//if ((counter++ % 10) == 0)
-		dprintf("ints: %d/%d (high: %d/%d)\n", low[0], low[1], high[0], high[1]);
-}
-#endif
 	acquire_spinlock(&io_vectors[vector].vector_lock);
 
 	// The list can be empty at this place
@@ -257,36 +242,27 @@ int_io_interrupt_handler(int vector)
 		return B_UNHANDLED_INTERRUPT;
 	}
 
-	/* Loop through the list of handlers. 
-	 * each handler returns as follows...
-	 * - B_UNHANDLED_INTERRUPT, the interrupt wasn't processed by the
-	 *                          fucntion, so try the next available.
-	 * - B_HANDLED_INTERRUPT, the interrupt has been handled and no further
-	 *                        attention is required
-	 * - B_INVOKE_SCHEDULER, the interrupt has been handled, but the function wants
-	 *                       the scheduler to be invoked
-	 *
-	 * This is a change of behaviour from newos where every handler registered
-	 * be called, even if the interrupt had been "handled" by a previous
-	 * function.
-	 * The logic now is that if there are no handlers then we return
-	 * B_UNHANDLED_INTERRUPT and let the system do as it will.
-	 * When we have the first function that claims to have "handled" the
-	 * interrupt, by returning B_HANDLED_... or B_INVOKE_SCHEDULER we simply
-	 * stop calling further handlers and return the value from that
-	 * handler.
-	 * This may not be correct but appears to be what BeOS did and seems
-	 * right.
-	 *
-	 *	ToDo: we might want to reenable calling all registered handlers depending
-	 *		on a flag somewhere, so that we can deal with buggy drivers
+	/* For level-triggered interrupts, we actually handle the return
+	 * value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
+	 * want to call another interrupt handler.
+	 * For edge-triggered interrupts, however, we always need to call
+	 * all handlers, as multiple interrupts cannot be identified. We
+	 * still make sure the return code of this function will issue
+	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
 	 */
 
 	for (io = io_vectors[vector].handler_list.next;
-		io != &io_vectors[vector].handler_list; // Are we already at the end of the list?
-		io = io->next) {
-		if ((status = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
+			io != &io_vectors[vector].handler_list; // Are we already at the end of the list?
+			io = io->next) {
+		status = io->func(io->data);
+
+		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
 			break;
+
+		if (status == B_HANDLED_INTERRUPT)
+			handled = true;
+		else if (status == B_INVOKE_SCHEDULER)
+			invokeScheduler = true;
 	}
 
 #ifdef DEBUG_INT
@@ -298,6 +274,16 @@ int_io_interrupt_handler(int vector)
 
 	release_spinlock(&io_vectors[vector].vector_lock);
 
-	return status;
+	if (levelTriggered)
+		return status;
+
+	// edge triggered return value
+
+	if (invokeScheduler)
+		return B_INVOKE_SCHEDULER;
+	if (handled)
+		return B_HANDLED_INTERRUPT;
+
+	return B_UNHANDLED_INTERRUPT;
 }
 

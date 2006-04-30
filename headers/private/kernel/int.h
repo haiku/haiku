@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -22,7 +22,7 @@ extern "C" {
 status_t int_init(struct kernel_args *args);
 status_t int_init_post_vm(struct kernel_args *args);
 status_t int_init_post_device_manager(struct kernel_args *args);
-int int_io_interrupt_handler(int vector);
+int int_io_interrupt_handler(int vector, bool levelTriggered);
 
 bool interrupts_enabled(void);
 
