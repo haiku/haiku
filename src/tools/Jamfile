@@ -7,6 +7,7 @@ local tools =
 	<build>copyattr
 	<build>listattr
 	<build>mimeset
+	<build>mkindex
 	<build>rmattr
 	<build>settype
 	<build>setversion
@@ -26,6 +27,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	AddResources <build>mimeset : mimeset.rdef ;
 }
 BuildPlatformMain <build>mimeset : mimeset.cpp : $(HOST_LIBBE) ;
+
+BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 
