@@ -1212,23 +1212,46 @@ Desktop::ActivateWindow(WindowLayer* window)
 {
 	STRACE(("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>"));
 
-	// TODO: handle this case correctly! (ie. honour B_NOT_ANCHORED_ON_ACTIVATE,
-	//		B_NO_WORKSPACE_ACTIVATION, switch workspaces, ...)
-	if (!window->InWorkspace(fCurrentWorkspace))
-		return;
-
 	if (window == NULL) {
 		fBack = NULL;
 		fFront = NULL;
 		return;
 	}
 
-	// TODO: support B_NO_WORKSPACE_ACTIVATION
-	// TODO: support B_NOT_ANCHORED_ON_ACTIVATE
+	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
+
+	if (windowOnOtherWorkspace
+		&& (window->Flags() & B_NO_WORKSPACE_ACTIVATION)
+		&& !(window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE))
+		return;
+
 	// TODO: take care about floating windows
 
 	if (!LockAllWindows())
 		return;
+
+	if (windowOnOtherWorkspace) {
+		// if the window wants to come to the current workspace,
+		// do so here - else activate the workspace on which this
+		// window is
+		if (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) {
+			// bring the window to the current workspace
+			// TODO: what if this window is on multiple workspaces?!?
+			uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
+			SetWindowWorkspaces(window, workspaces);
+		} else {
+			// switch to the workspace on which this window is
+			// (we'll take the first one that the window is on)
+			uint32 workspaces = window->Workspaces();
+			for (int32 i = 0; i < 32; i++) {
+				uint32 workspace = workspace_to_workspaces(i);
+				if (workspaces & workspace) {
+					SetWorkspace(i);
+					break;
+				}
+			}
+		}
+	}
 
 	if (window == FrontWindow()) {
 		// see if there is a normal B_AVOID_FRONT window still in front of us
