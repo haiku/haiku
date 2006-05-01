@@ -566,5 +566,11 @@ BDragger::ShowPopUp(BView *target, BPoint where)
 
 	fPopUp->SetTargetForItems(fTarget);
 
-	fPopUp->Go(point, true, false, /*BRect(), */true);
+	float menuWidth, menuHeight;
+	fPopUp->GetPreferredSize(&menuWidth, &menuHeight);
+	BRect rect(0, 0, menuWidth, menuHeight);
+	rect.InsetBy(-0.5, -0.5);
+	rect.OffsetTo(point);
+	
+	fPopUp->Go(point, true, false, rect, true);
 }
