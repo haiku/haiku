@@ -1,14 +1,17 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file Directory.cpp
-	BDirectory implementation.	
-*/
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
-#include <fcntl.h>
-#include <string.h>
+
+#include "storage_support.h"
+
+#include <syscalls.h>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -17,20 +20,15 @@
 #include <Path.h>
 #include <SymLink.h>
 
-#include <syscalls.h>
+#include <fcntl.h>
+#include <string.h>
 
-#include "storage_support.h"
-
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 // constructor
 //! Creates an uninitialized BDirectory object.
 BDirectory::BDirectory()
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 }
 
@@ -39,9 +37,8 @@ BDirectory::BDirectory()
 /*!	\param dir the BDirectory object to be copied
 */
 BDirectory::BDirectory(const BDirectory &dir)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	*this = dir;
 }
@@ -52,9 +49,8 @@ BDirectory::BDirectory(const BDirectory &dir)
 	\param ref the entry_ref referring to the directory
 */
 BDirectory::BDirectory(const entry_ref *ref)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	SetTo(ref);
 }
@@ -65,9 +61,8 @@ BDirectory::BDirectory(const entry_ref *ref)
 	\param nref the node_ref referring to the directory
 */
 BDirectory::BDirectory(const node_ref *nref)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	SetTo(nref);
 }
@@ -78,9 +73,8 @@ BDirectory::BDirectory(const node_ref *nref)
 	\param entry the BEntry referring to the directory
 */
 BDirectory::BDirectory(const BEntry *entry)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	SetTo(entry);
 }
@@ -91,9 +85,8 @@ BDirectory::BDirectory(const BEntry *entry)
 	\param path the directory's path name 
 */
 BDirectory::BDirectory(const char *path)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	SetTo(path);
 }
@@ -106,9 +99,8 @@ BDirectory::BDirectory(const char *path)
 	\param path the directory's path name relative to \a dir
 */
 BDirectory::BDirectory(const BDirectory *dir, const char *path)
-		  : BNode(),
-			BEntryList(),
-			fDirFd(-1)
+	:
+	fDirFd(-1)
 {
 	SetTo(dir, path);
 }
@@ -301,17 +293,28 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 		return (fCStatus = B_BAD_VALUE);
 	}
 
+	int dirFD = dir->fDirFd;
+	if (dir == this) {
+		// prevent that our file descriptor goes away in _SetTo()
+		fDirFd = -1;
+	}
+
 	// open node
-	status_t error = _SetTo(dir->fDirFd, path, true);
+	status_t error = _SetTo(dirFD, path, true);
 	if (error != B_OK)
 		return error;
 
 	// open dir
-	fDirFd = _kern_open_dir(dir->fDirFd, path);
+	fDirFd = _kern_open_dir(dirFD, path);
 	if (fDirFd < 0) {
 		status_t error = fDirFd;
 		Unset();
 		return (fCStatus = error);
+	}
+
+	if (dir == this) {
+		// cleanup after _SetTo()
+		close(dirFD);
 	}
 
 	// set close on exec flag on dir FD
@@ -957,9 +960,4 @@ create_directory(const char *path, mode_t mode)
 	} while (nextComponent != 0);
 	return B_OK;
 }
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
 

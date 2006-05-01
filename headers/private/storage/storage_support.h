@@ -1,18 +1,25 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+#ifndef _STORAGE_SUPPORT_H
+#define _STORAGE_SUPPORT_H
+
 /*!
 	\file storage_support.h
 	Interface declarations for miscellaneous internal
 	Storage Kit support functions.
 */
 
-#ifndef _STORAGE_SUPPORT_H
-#define _STORAGE_SUPPORT_H
+#include <StorageDefs.h>
+#include <SupportDefs.h>
 
 #include <dirent.h>
 #include <string>
+
 
 namespace BPrivate {
 namespace Storage {
