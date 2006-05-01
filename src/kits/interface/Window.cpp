@@ -2979,84 +2979,96 @@ BWindow::_FindView(BView *view, BPoint point) const
 
 
 BView *
-BWindow::_FindNextNavigable(BView *focus, uint32 flags)
+BWindow::_FindNextNavigable(BView* focus, uint32 flags)
 {
 	if (focus == NULL)
 		focus = fTopView;
 
-	BView *nextFocus = focus;
+	BView* nextFocus = focus;
 
-	// Search the tree for views that accept focus
+	// Search the tree for views that accept focus (depth search)
 	while (true) {
 		if (nextFocus->fFirstChild)
 			nextFocus = nextFocus->fFirstChild;
 		else if (nextFocus->fNextSibling)
 			nextFocus = nextFocus->fNextSibling;
 		else {
-			while (!nextFocus->fNextSibling && nextFocus->fParent)
+			// go to the nearest parent with a next sibling
+			while (!nextFocus->fNextSibling && nextFocus->fParent) {
 				nextFocus = nextFocus->fParent;
+			}
 
-			if (nextFocus == fTopView)
+			if (nextFocus == fTopView) {
+				// if we started with the top view, we traversed the whole tree already
+				if (nextFocus == focus)
+					return NULL;
+
 				nextFocus = nextFocus->fFirstChild;
-			else
+			} else
 				nextFocus = nextFocus->fNextSibling;
 		}
 
-		// It means that the hole tree has been searched and there is no
-		// view with B_NAVIGABLE_JUMP flag set!
-		if (nextFocus == focus)
+		if (nextFocus == focus || nextFocus == NULL) {
+			// When we get here it means that the hole tree has been
+			// searched and there is no view with B_NAVIGABLE(_JUMP) flag set!
 			return NULL;
+		}
 
-		if (nextFocus->Flags() & flags)
+		if (!nextFocus->IsHidden() && (nextFocus->Flags() & flags) != 0)
 			return nextFocus;
 	}
 }
 
 
 BView *
-BWindow::_FindPreviousNavigable(BView *focus, uint32 flags)
+BWindow::_FindPreviousNavigable(BView* focus, uint32 flags)
 {
-	BView *prevFocus = focus;
+	if (focus == NULL)
+		focus = fTopView;
 
-	// Search the tree for views that accept focus
+	BView* previousFocus = focus;
+
+	// Search the tree for the previous view that accept focus
 	while (true) {
-		BView *view;
-		if ((view = _LastViewChild(prevFocus)) != NULL)
-			prevFocus = view;
-		else if (prevFocus->fPreviousSibling)
-			prevFocus = prevFocus->fPreviousSibling;
-		else {
-			while (!prevFocus->fPreviousSibling && prevFocus->fParent)
-				prevFocus = prevFocus->fParent;
-
-			if (prevFocus == fTopView)
-				prevFocus = _LastViewChild(prevFocus);
-			else
-				prevFocus = prevFocus->fPreviousSibling;
+		if (previousFocus->fPreviousSibling) {
+			// find the last child in the previous sibling
+			previousFocus = _LastViewChild(previousFocus->fPreviousSibling);
+		} else {
+			previousFocus = previousFocus->fParent;
+			if (previousFocus == fTopView)
+				previousFocus = _LastViewChild(fTopView);
 		}
 
-		// It means that the hole tree has been searched and there is no
-		// view with B_NAVIGABLE_JUMP flag set!
-		if (prevFocus == focus)
+		if (previousFocus == focus || previousFocus == NULL) {
+			// When we get here it means that the hole tree has been
+			// searched and there is no view with B_NAVIGABLE(_JUMP) flag set!
 			return NULL;
+		}
 
-		if (prevFocus->Flags() & flags)
-			return prevFocus;
+		if (!previousFocus->IsHidden() && (previousFocus->Flags() & flags) != 0)
+			return previousFocus;
 	}
 }
 
 
+/*!
+	Returns the last child in a view hierarchy.
+	Needed only by _FindPreviousNavigable().
+*/
 BView *
 BWindow::_LastViewChild(BView *parent)
 {
-	BView *last = parent->fFirstChild;
-	if (last == NULL)
-		return NULL;
+	while (true) {
+		BView *last = parent->fFirstChild;
+		if (last == NULL)
+			return parent;
 
-	while (last->fNextSibling)
-		last = last->fNextSibling;
+		while (last->fNextSibling) {
+			last = last->fNextSibling;
+		}
 
-	return last;
+		parent = last;
+	}
 }
 
 
