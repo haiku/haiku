@@ -97,6 +97,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fIsResizing(false),
 	fIsSlidingTab(false),
 	fIsDragging(false),
+	fActivateOnMouseUp(false),
 
 	fDecorator(NULL),
 	fTopLayer(NULL),
@@ -723,7 +724,8 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		if (fDecorator)
 			action = _ActionFor(message);
 
-		// deactivate border buttons on first click (select)
+		// ignore clicks on decorator buttons if the
+		// window doesn't have focus
 		if (!IsFocus() && action != DEC_MOVETOBACK
 			&& action != DEC_RESIZE && action != DEC_SLIDETAB)
 			action = DEC_DRAG;
@@ -792,7 +794,21 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			fDesktop->SendWindowBehind(this);
 		} else {
 			fDesktop->SetMouseEventWindow(this);
-			fDesktop->ActivateWindow(this);
+
+			// activate window if not in FFM mode
+			DesktopSettings desktopSettings(fDesktop);
+			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
+				fDesktop->ActivateWindow(this);
+			} else {
+				// actually, the window should already be
+				// focused since the mouse would have to
+				// be over it, but just for completeness...
+				fDesktop->SetFocusWindow(this);
+				if (action == DEC_DRAG) {
+					fActivateOnMouseUp = true;
+					fLastMoveTime = system_time();
+				}
+			}
 		}
 	} else {
 		if (ViewLayer* view = ViewAt(where)) {
@@ -866,6 +882,18 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 
 		fRegionPool.Recycle(visibleBorder);
 	}
+
+	// in FFM mode, activate the window and bring it
+	// to front in case this was a drag click but the
+	// mouse was not moved
+	if (fActivateOnMouseUp) {
+		fActivateOnMouseUp = false;
+		// on R5, there is a time window for this feature
+		// ie, click and press too long, nothing will happen
+		if (system_time() - fLastMoveTime < 500000)
+			fDesktop->ActivateWindow(this);
+	}
+
 	fIsDragging = false;
 	fIsResizing = false;
 	fIsSlidingTab = false;
@@ -896,7 +924,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	// are handled that move or resize the window
 	if (fIsDragging || fIsResizing) {
 		bigtime_t now = system_time();
-		if (now - fLastMoveTime < 20000) {
+		if (now - fLastMoveTime < 13333) {
 			// TODO: add a "timed event" to query for
 			// the then current mouse position
 			return;
@@ -962,6 +990,10 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	// NOTE: fLastMousePosition is currently only
 	// used for window moving/resizing/sliding the tab
 	fLastMousePosition += delta;
+
+	// the window was moved, it doesn't come to
+	// the front in FFM mode when the mouse is released
+	fActivateOnMouseUp = false;
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);

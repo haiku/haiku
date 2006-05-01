@@ -274,6 +274,7 @@ class WindowLayer {
 			bool				fIsResizing;
 			bool				fIsSlidingTab;
 			bool				fIsDragging;
+			bool				fActivateOnMouseUp;
 
 			::Decorator*		fDecorator;
 			ViewLayer*			fTopLayer;
