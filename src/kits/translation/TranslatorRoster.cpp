@@ -221,7 +221,7 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 					if (item == NULL) {
 						// it's a new one!
 						if (_IsKnownDirectory(toNodeRef))
-							_EntryAdded(nodeRef, name);
+							_EntryAdded(toNodeRef, name);
 						break;
 					}
 
@@ -283,8 +283,11 @@ BTranslatorRoster::Private::AddDefaultPaths()
 	for (uint32 i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
 		BPath path;
 		status_t status = find_directory(paths[i], &path, true);
-		if (status == B_OK && path.Append("Translators") == B_OK)
+		if (status == B_OK && path.Append("Translators") == B_OK) {
+			mkdir(path.Path(), 0755);
+				// make sure the directory exists before we add it
 			AddPath(path.Path());
+		}
 	}
 }
 
@@ -361,6 +364,7 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 	if (Looper() != NULL) {
 		// watch that directory
 		watch_node(&nodeRef, B_WATCH_DIRECTORY, this);
+		fDirectories.push_back(nodeRef);
 	}
 
 	int32 count = 0;
