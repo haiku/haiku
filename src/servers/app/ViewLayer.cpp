@@ -456,14 +456,16 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 	BRect destRect, int32 resizingMode, int32 options)
 {
 	if (fViewBitmap != NULL) {
+		Overlay* overlay = _Overlay();
+
 		if (bitmap != NULL) {
 			// take over overlay token from current overlay (if it has any)
-			Overlay* oldOverlay = _Overlay();
 			Overlay* newOverlay = bitmap->Overlay();
 
-			if (oldOverlay != NULL && newOverlay != NULL)
-				newOverlay->TakeOverToken(oldOverlay);
-		}
+			if (overlay != NULL && newOverlay != NULL)
+				newOverlay->TakeOverToken(overlay);
+		} else if (overlay != NULL)
+			overlay->Hide();
 
 		gBitmapManager->DeleteBitmap(fViewBitmap);
 	}
