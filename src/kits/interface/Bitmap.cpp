@@ -977,10 +977,9 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 
 				if (allocationFlags & kFramebuffer) {
 					// the base pointer will now point to an overlay_client_data structure
-					link.Read<int32>(&fBytesPerRow);
-					size = fBytesPerRow * (bounds.IntegerHeight() + 1);
-					// bytes_per_row might be modified to match hardware constraints
-					bytesPerRow = fBytesPerRow;
+					// bytes per row might be modified to match hardware constraints
+					link.Read<int32>(&bytesPerRow);
+					size = bytesPerRow * (bounds.IntegerHeight() + 1);
 				}
 
 				if (fServerArea >= B_OK) {
