@@ -14,6 +14,33 @@
 #include <Application.h>
 
 
+static int
+compare_items(const void* a, const void* b)
+{
+	const BStringItem* stringA = *(const BStringItem**)a;
+	const BStringItem* stringB = *(const BStringItem**)b;
+
+	return strcmp(stringA->Text(), stringB->Text());
+}
+
+
+//	#pragma mark -
+
+
+TranslatorItem::TranslatorItem(translator_id id, const char* name)
+	: BStringItem(name),
+	fID(id)
+{
+}
+
+
+TranslatorItem::~TranslatorItem()
+{
+}
+
+
+//	#pragma mark -
+
 
 TranslatorListView::TranslatorListView(BRect rect, const char *name,
 		list_view_type type)
@@ -64,5 +91,12 @@ TranslatorListView::MouseMoved(BPoint point, uint32 transit, const BMessage *dra
 	 	SetHighColor(0,0,0);
 	} else if (dragMessage != NULL && transit == B_EXITED_VIEW)
 		Invalidate();
+}
+
+
+void
+TranslatorListView::SortItems()
+{
+	BListView::SortItems(&compare_items);
 }
 

@@ -12,7 +12,19 @@
 
 
 #include <ListView.h>
+#include <TranslationDefs.h>
 
+
+class TranslatorItem : public BStringItem {
+	public:
+		TranslatorItem(translator_id id, const char* name);
+		virtual ~TranslatorItem();
+
+		translator_id ID() const { return fID; }
+
+	private:
+		translator_id	fID;
+};
 
 class TranslatorListView : public BListView {
 	public:
@@ -22,6 +34,8 @@ class TranslatorListView : public BListView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
+
+		void SortItems();
 };
 
 #endif	// TRANSLATOR_LIST_VIEW_H

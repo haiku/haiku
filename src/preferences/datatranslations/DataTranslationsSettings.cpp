@@ -1,67 +1,63 @@
 /*
- * DataTranslationsSettings.cpp
- * DataTranslations Oliver Siebenmarck
+ * Copyright 2002-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
  *
+ * Authors:
+ *		Oliver Siebenmarck
+ *		Axel Dörfler
  */
- 
+
+
+#include "DataTranslationsSettings.h"
+
 #include <Application.h>
-#include <Debug.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <Path.h>
-#include <String.h>
+#include <Message.h>
+
 #include <stdio.h>
 
-#include "DataTranslationsSettings.h"
-#include "DataTranslationsMessages.h"
-
-const char DataTranslationsSettings::kDataTranslationsSettingsFile[] = "Translation Settings";
 
 DataTranslationsSettings::DataTranslationsSettings()
 {
 	BPath path;
-	
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK) {
-		path.Append(kDataTranslationsSettingsFile);
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			// Now read in the data
-			file.Seek(-8,SEEK_END); // Skip over the first 497 bytes to just the window
-									// position.
-			if (file.Read(&fCorner, sizeof(BPoint)) != sizeof(BPoint)) {
-					fCorner.x=50;
-					fCorner.y=50;
-				};
-		}
-		else {
-			fCorner.x=50;
-			fCorner.y=50;
-		}
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	fCorner = BPoint(50, 50);
+
+	path.Append("system/DataTranslations settings");
+	BFile file(path.Path(), B_READ_ONLY);
+	BMessage settings;
+
+	if (file.InitCheck() == B_OK
+		&& settings.Unflatten(&file) == B_OK) {
+		BPoint corner;
+		if (settings.FindPoint("window corner", &corner) == B_OK)
+			fCorner = corner;
 	}
-	else
-		be_app->PostMessage(ERROR_DETECTED);
 }
+
 
 DataTranslationsSettings::~DataTranslationsSettings()
 {	
 	BPath path;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
 		return;
 
-	path.Append(kDataTranslationsSettingsFile);
+	BMessage settings;
+	settings.AddPoint("window corner", fCorner);
 
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK) {
-		file.Seek(-8,SEEK_END); // Skip over the first 497 bytes to just the window
-								// position.
-		PRINT_OBJECT(fCorner);
-		file.Write(&fCorner, sizeof(BPoint));
-	}
+	path.Append("system/DataTranslations settings");
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (file.InitCheck() == B_OK)
+		settings.Flatten(&file);
 }
+
 
 void
 DataTranslationsSettings::SetWindowCorner(BPoint corner)
 {
-	fCorner=corner;
+	fCorner = corner;
 }

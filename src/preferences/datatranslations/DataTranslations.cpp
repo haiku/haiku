@@ -15,8 +15,14 @@
 
 #include <Alert.h>
 #include <Directory.h>
+#include <FindDirectory.h>
+#include <String.h>
 #include <TranslatorRoster.h>
 #include <TextView.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 const char* kApplicationSignature = "application/x-vnd.haiku-translations";
@@ -64,117 +70,106 @@ DataTranslationsApplication::AboutRequested()
 
 
 void
-DataTranslationsApplication::InstallDone()
+DataTranslationsApplication::_InstallError(const char* name, status_t status)
 {
-	(new BAlert("",
-		"You have to quit and restart running applications\n"
-		"for the installed Translators to be available for them.",
-		"OK"))->Go();
+	BString text;
+	text << "Could not install " << name << ":\n" << strerror(status);
+	(new BAlert("DataTranslations - Error", text.String(), "Stop"))->Go();
+}
+
+
+/*!
+	Installs the given entry in the target directory either by moving
+	or copying the entry.
+*/
+status_t
+DataTranslationsApplication::_Install(BDirectory& target, BEntry& entry)
+{
+	// Find out wether we need to copy it
+	status_t status = entry.MoveTo(&target, NULL, true);
+
+	if (status == B_OK)
+		return B_OK;
+
+	// we need to copy the file
+
+	// TODO!
+	return B_ERROR;
 }
 
 
 void
-DataTranslationsApplication::RefsReceived(BMessage *message)
-{
-	uint32 type; 
-	int32 count;
-	entry_ref ref;
-	BPath path;
-	BString newfile;
-	
-	char e_name[B_FILE_NAME_LENGTH];
-		
-	message->GetInfo("refs", &type, &count); 
-	if (type != B_REF_TYPE)
-		return; 
-	
-    if (message->FindRef("refs", &ref) == B_OK) {
-    	BEntry entry(&ref, true);
-    	entry.GetName(e_name);
-    	
-    	if (entry.IsFile() && entry.GetPath(&path) == B_OK) {
-    		BTranslatorRoster *roster = BTranslatorRoster::Default();
-			if (roster->AddTranslators(path.Path()) == B_OK) {
-    			BDirectory dirt("/boot/home/config/add-ons/Translators/");
-    			newfile.SetTo("/boot/home/config/add-ons/Translators/");
-    			newfile << e_name; // Newfile with full path.
-    			
-    			// Find out wether we need to copy it
-    			string.SetTo("");
-    			string << "The item '" << e_name << "' is now copied into the right place.\nWhat do you want to do with the original?";
-    			BAlert *keep = new BAlert("keep",  string.String() , "Remove", "Keep");
-    			keep->SetShortcut(1, B_ESCAPE);
-    			if (keep->Go() == 0)
-    				moveit = true;
-    			
-    			if (moveit) {
-    				// Just a quick move 
-    				if (dirt.Contains(newfile.String())) {
-    					string.SetTo("");
-    					string << "An item named '" << e_name <<"' already is in the \nTranslators folder";
-    					BAlert *myAlert = new BAlert("title",  string.String() , "Overwrite", "Stop");
-    					myAlert->SetShortcut(1, B_ESCAPE); 
-
-						if (myAlert->Go() != 0) 
-							return;
-						// File exists, we are still here. Kill it.
-						BEntry dele;
-						dirt.FindEntry(e_name, &dele);
-						dele.Remove();	
-					}
-					entry.MoveTo(&dirt); // Move it.
-    				InstallDone(); 	 // Installation done
-    				return;
-    			}
-
-    			if (dirt.Contains(newfile.String())) {
-    				// File exists, What are we supposed to do now (Overwrite/_Stopp_?)
-    				string.SetTo("");
-    				string << "An item named '" << e_name <<"' already is in the \nTranslators folder";
-    				BAlert *myAlert = new BAlert("title",  string.String() , "Overwrite", "Stop");
-    				myAlert->SetShortcut(1, B_ESCAPE); 
-
-					if (myAlert->Go() != 0) 
-						return;
-				}
-
-    			string.SetTo(path.Path()); // Fullpath+Filename 
-
-    			BString command;
-#ifdef __HAIKU__
-				command	= "cp ";
-#else
-				command	= "copyattr -d -r ";
-#endif
-				command << string.String() << " " << newfile.String(); // Prepare Copy 
-
-				system(command.String()); // Execute copy command
-
-    			string.SetTo("");
-    			string << "Filename: " << e_name << "\nPath: " << path.Path() ;
-
-    			// The new Translator has been installed by now.
-    			// And done we are
-    			InstallDone();
-    		} else {
-    			// Not a Translator
-    			NoTranslatorError(e_name);
-    		}
-    	} else {
-    		// Not even a file...
-    		NoTranslatorError(e_name);
-    	}	
-    }
-}
-
-
-void
-DataTranslationsApplication::NoTranslatorError(const char* name)
+DataTranslationsApplication::_NoTranslatorError(const char* name)
 {
 	BString text;
 	text.SetTo("The item '");
 	text << name << "' does not appear to be a Translator and will not be installed.";
 	(new BAlert("", text.String(), "Stop"))->Go();
+}
+
+
+void
+DataTranslationsApplication::RefsReceived(BMessage* message)
+{
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+
+	BPath path;
+	status_t status = find_directory(B_USER_ADDONS_DIRECTORY, &path, true);
+	if (status != B_OK) {
+		_InstallError("translator", status);
+		return;
+	}
+
+	BDirectory target;
+	status = target.SetTo(path.Path());
+	if (status == B_OK) {
+		if (!target.Contains("Translators"))
+			status = target.CreateDirectory("Translators", &target);
+		else
+			status = target.SetTo(&target, "Translators");
+	}
+	if (status != B_OK) {
+		_InstallError("translator", status);
+		return;
+	}
+
+	entry_ref ref;
+	int32 i = 0;
+	while (message->FindRef("refs", i++, &ref) == B_OK) {
+		if (!roster->IsTranslator(&ref))
+			_NoTranslatorError(ref.name);
+
+    	BEntry entry(&ref, true);
+    	status = entry.InitCheck();
+    	if (status != B_OK) {
+			_InstallError(ref.name, status);
+    		continue;
+    	}
+
+		if (target.Contains(ref.name)) {
+			BString string;
+			string << "An item named '" << ref.name
+				<< "' already exists in the Translators folder";
+
+			BAlert* alert = new BAlert("DataTranslations - Note", string.String(),
+				"Overwrite", "Stop");
+			alert->SetShortcut(1, B_ESCAPE);
+			if (alert->Go() != 0)
+				continue;
+
+			// the original file will be replaced
+		}
+
+		// find out wether we need to copy it or not
+
+		status = _Install(target, entry);
+		if (status == B_OK) {
+			(new BAlert("DataTranslations - Note",
+				"The new translator has been installed successfully",
+				"OK"))->Go(NULL);
+		} else
+			_InstallError(ref.name, status);
+	}
 }
 
 

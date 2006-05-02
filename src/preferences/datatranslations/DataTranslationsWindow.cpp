@@ -10,8 +10,6 @@
 
 
 #include "DataTranslations.h"
-#include "DataTranslationsMessages.h"
-#include "DataTranslationsSettings.h"
 #include "DataTranslationsWindow.h"
 #include "IconView.h"
 #include "TranslatorListView.h"
@@ -33,6 +31,10 @@
 
 #define DTW_RIGHT	400
 #define DTW_BOTTOM	300
+
+
+const uint32 kMsgTranslatorInfo = 'trin';
+const uint32 kMsgSelectedTranslator = 'trsl';
 
 
 DataTranslationsWindow::DataTranslationsWindow()
@@ -61,12 +63,18 @@ DataTranslationsWindow::DataTranslationsWindow()
 		MoveTo(x, y);
 
 	_SetupViews();
+
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	roster->StartWatching(this);
+
 	Show();
 }
 
 
 DataTranslationsWindow::~DataTranslationsWindow()
 {
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	roster->StopWatching(this);
 }
 
 
@@ -87,7 +95,7 @@ DataTranslationsWindow::_PopulateListView()
 		int32 version;
 		const char *name, *info;
 		roster->GetTranslatorInfo(translators[i], &name, &info, &version);
-		fTranslatorListView->AddItem(new BStringItem(name));
+		fTranslatorListView->AddItem(new TranslatorItem(translators[i], name));
 	}
 
 	delete[] translators;
@@ -96,33 +104,26 @@ DataTranslationsWindow::_PopulateListView()
 
 
 status_t
-DataTranslationsWindow::_GetTranslatorInfo(int32 id, const char *&tranName,
-	const char *&tranInfo, int32 &tranVersion, BPath &tranPath)
+DataTranslationsWindow::_GetTranslatorInfo(int32 id, const char*& name,
+	const char*& info, int32& version, BPath& path)
 {
 	// Returns information about the translator with the given id
 
 	if (id < 0)
 		return B_BAD_VALUE;
 
-	int32 numTranslators = 0;
-	translator_id tid = 0, *translators = NULL;
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	roster->GetAllTranslators(&translators, &numTranslators);
-	tid = ((id < numTranslators) ? translators[id] : 0);
-	delete[] translators;
+	if (roster->GetTranslatorInfo(id, &name, &info, &version) != B_OK)
+		return B_ERROR;
 
-	if (id >= numTranslators)
-		return B_BAD_VALUE;
-
-	// Getting the first three Infos: Name, Info & Version
-	roster->GetTranslatorInfo(tid, &tranName, &tranInfo, &tranVersion);
-	
 	// Get the translator's path
-	entry_ref tranRef;
-	roster->GetRefFor(tid, &tranRef);
-	BEntry tmpEntry(&tranRef);
-	tranPath.SetTo(&tmpEntry);
-	
+	entry_ref ref;
+	if (roster->GetRefFor(id, &ref) == B_OK) {
+		BEntry entry(&ref);
+		path.SetTo(&entry);
+	} else
+		path.Unset();
+
 	return B_OK;
 }
 
@@ -135,23 +136,16 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	if (id < 0)
 		return B_BAD_VALUE;
 
-	int32 numTranslators = 0;
-	translator_id tid = 0, *translators = NULL;
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	roster->GetAllTranslators(&translators, &numTranslators);
-	tid = ((id < numTranslators) ? translators[id] : 0);
-	delete[] translators;
 
-	if (id >= numTranslators)
-		return B_BAD_VALUE;
-	
 	// fConfigView is NULL the first time this function
 	// is called, prevent a segment fault
 	if (fConfigView)
 		fRightBox->RemoveChild(fConfigView);
+
 	BMessage emptyMsg;
 	BRect rect(0, 0, 200, 233);
-	status_t ret = roster->MakeConfigurationView(tid, &emptyMsg, &fConfigView, &rect);
+	status_t ret = roster->MakeConfigurationView(id, &emptyMsg, &fConfigView, &rect);
 	if (ret != B_OK) {
 		fRightBox->RemoveChild(fConfigView);
 		return ret;
@@ -174,9 +168,7 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	fConfigView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
-	
-	UpdateIfNeeded();
-	
+
 	return B_OK;
 }
 
@@ -196,7 +188,7 @@ DataTranslationsWindow::_SetupViews()
 	// Add the translators list view
 	fTranslatorListView = new TranslatorListView(BRect(10, 10, 120, Bounds().Height() - 10),
 		"TransList", B_SINGLE_SELECTION_LIST); 
-	fTranslatorListView->SetSelectionMessage(new BMessage(SEL_CHANGE));
+	fTranslatorListView->SetSelectionMessage(new BMessage(kMsgSelectedTranslator));
 
 	BScrollView *scrollView = new BScrollView("scroll_trans", fTranslatorListView,
     		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
@@ -219,7 +211,7 @@ DataTranslationsWindow::_SetupViews()
 	// Add the translator info button
 	BRect infoRect(0, 0, 80, 20);
 	BButton *button = new BButton(infoRect, "STD", "Info...",
-		new BMessage(BUTTON_MSG), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
+		new BMessage(kMsgTranslatorInfo), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 	button->ResizeToPreferred();
 	button->MoveTo(fRightBox->Bounds().Width() - button->Bounds().Width() - 10.0f,
@@ -262,13 +254,13 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	_GetTranslatorInfo(id, name, info, version, path);
 
 	BString message;
-	message << "Name:\t" << name << "\nVersion:\t";
+	message << "Name: " << name << "\nVersion: ";
 
 	// Convert the version number into a readable format
 	message << (int)B_TRANSLATION_MAJOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_MINOR_VERSION(version)
 		<< '.' << (int)B_TRANSLATION_REVISION_VERSION(version);
-	message << "\nInfo:\t\t" << info <<
+	message << "\nInfo: " << info <<
 		"\n\nPath:\n" << path.Path() << "\n";
 
 	BAlert *alert = new BAlert("info", message.String(), "OK");
@@ -294,7 +286,7 @@ void
 DataTranslationsWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case BUTTON_MSG:
+		case kMsgTranslatorInfo:
 		{
 			int32 selected = fTranslatorListView->CurrentSelection(0);
 			if (selected < 0) {
@@ -309,11 +301,13 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 				break;
 			}
 
-			_ShowInfoAlert(selected);
+			TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(selected));
+			if (item != NULL)
+				_ShowInfoAlert(item->ID());
 			break;
 		}
 
-		case SEL_CHANGE:
+		case kMsgSelectedTranslator:
 		{
 			// Update the icon and translator info panel
 			// to match the new selection
@@ -327,15 +321,54 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 				break;
 			}
 
-			_ShowConfigView(selected);
+			TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(selected));
+			if (item == NULL)
+				break;
+
+			_ShowConfigView(item->ID());
 
 			const char* name = NULL;
 			const char* info = NULL;
 			int32 version = 0;
 			BPath path;
-			_GetTranslatorInfo(selected, name, info, version, path);
+			_GetTranslatorInfo(item->ID(), name, info, version, path);
 			fTranslatorNameView->SetText(path.Leaf());
 			fIconView->SetIcon(path);
+			break;
+		}
+
+		case B_TRANSLATOR_ADDED:
+		{
+			int32 index = 0, id;
+			while (message->FindInt32("translator_id", index++, &id) == B_OK) {
+				const char* name;
+				const char* info;
+				int32 version;
+				BPath path;
+				if (_GetTranslatorInfo(id, name, info, version, path) == B_OK)
+					fTranslatorListView->AddItem(new TranslatorItem(id, name));
+			}
+
+			fTranslatorListView->SortItems();
+			break;
+		}
+
+		case B_TRANSLATOR_REMOVED:
+		{
+			int32 index = 0, id;
+			while (message->FindInt32("translator_id", index++, &id) == B_OK) {
+				for (int32 i = 0; i < fTranslatorListView->CountItems(); i++) {
+					TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(i));
+					if (item == NULL)
+						continue;
+
+					if (item->ID() == (translator_id)id) {
+						fTranslatorListView->RemoveItem(i);
+						delete item;
+						break;
+					}
+				}
+			}
 			break;
 		}
 

@@ -11,7 +11,6 @@
 #define DATA_TRANSLATIONS_WINDOW_H
 
 
-//#include "DataTranslationsSettings.h"
 #include "IconView.h"
 
 #include <Window.h>

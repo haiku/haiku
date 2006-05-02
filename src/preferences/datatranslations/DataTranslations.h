@@ -15,10 +15,6 @@
 #include "DataTranslationsSettings.h"
 
 #include <Application.h>
-#include <String.h>
-#include <Alert.h>
-
-#include <stdlib.h>
 
 
 class DataTranslationsApplication : public BApplication {
@@ -33,13 +29,11 @@ class DataTranslationsApplication : public BApplication {
 		void SetWindowCorner(BPoint corner);
 
 	private:
-		void InstallDone();
-		void NoTranslatorError(const char* name); 
+		void _InstallError(const char* name, status_t status); 
+		status_t _Install(BDirectory& target, BEntry& entry);
+		void _NoTranslatorError(const char* name); 
 
 		DataTranslationsSettings* fSettings;
-
-		bool 	overwrite, moveit;
-		BString string;	
 };
 
 #endif	// DATA_TRANSLATIONS_H
