@@ -2325,13 +2325,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			int32 index;
 			fLink.Read<int32>(&index);
-			
+
 			BString path;
 			status_t status = fDesktop->HWInterface()->GetDriverPath(path);
 			fLink.StartMessage(status);
 			if (status == B_OK)
 				fLink.AttachString(path.String());
-			
+
 			fLink.Flush();
 			break;
 		}

@@ -187,21 +187,21 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	//	removed.
 	int count = 0;
 	struct dirent *entry;
-	int current_card_fd = -1;
+	int device = -1;
 	char path[PATH_MAX];
 	while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
 		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
 			!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
 			continue;
 
-		if (current_card_fd >= 0) {
-			close(current_card_fd);
-			current_card_fd = -1;
+		if (device >= 0) {
+			close(device);
+			device = -1;
 		}
 
 		sprintf(path, "/dev/graphics/%s", entry->d_name);
-		current_card_fd = open(path, B_READ_WRITE);
-		if (current_card_fd >= 0)
+		device = open(path, B_READ_WRITE);
+		if (device >= 0)
 			count++;
 	}
 
@@ -209,14 +209,14 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
 			sprintf(path, "/dev/graphics/vesa");
-			current_card_fd = open(path, B_READ_WRITE);
+			device = open(path, B_READ_WRITE);
 		} else {
-			close(current_card_fd);
-			current_card_fd = B_ENTRY_NOT_FOUND;
+			close(device);
+			device = B_ENTRY_NOT_FOUND;
 		}
 	}
 
-	return current_card_fd;
+	return device;
 }
 
 
@@ -662,8 +662,18 @@ AccelerantHWInterface::GetAccelerantPath(BString &string)
 status_t
 AccelerantHWInterface::GetDriverPath(BString &string)
 {
-	// TODO: hardcoded to vesa for now. Fix me
-	string = "graphics/vesa";
+	// TODO: this currently assumes that the accelerant's clone info
+	//	is always the path name of its driver (that's the case for
+	//	all of our drivers)
+	char path[B_PATH_NAME_LENGTH];
+	get_accelerant_clone_info getCloneInfo;
+	getCloneInfo = (get_accelerant_clone_info)fAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
+	
+	if (getCloneInfo == NULL)
+		return B_NOT_SUPPORTED;
+
+	getCloneInfo((void *)path);
+	string.SetTo(path);
 	return B_OK;
 }
 
