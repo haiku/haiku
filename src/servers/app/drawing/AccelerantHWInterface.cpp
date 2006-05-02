@@ -809,6 +809,10 @@ AccelerantHWInterface::UpdateOverlay(Overlay* overlay)
 	window.green.mask = 0xff;
 	window.blue.mask = 0xff;
 	window.alpha.mask = 0xff;
+	// TODO: we need the 'uint32 options' from BView::SetViewOverlay() here
+	//       for now using commonly used settings (should be 'safe')
+	window.flags =
+		B_OVERLAY_COLOR_KEY | B_OVERLAY_VERTICAL_FILTERING | B_OVERLAY_HORIZONTAL_FILTERING;
 
 	fAccConfigureOverlay(overlay->OverlayToken(), buffer, &window, &view);
 }
