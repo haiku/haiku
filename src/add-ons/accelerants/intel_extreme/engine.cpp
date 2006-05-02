@@ -25,7 +25,7 @@ static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
 
 /**	The ring buffer must be locked when calling this function */
 
-static inline void
+void
 write_to_ring(ring_buffer &ring, uint32 value)
 {
 	uint32 *target = (uint32 *)(ring.base + ring.position);
@@ -37,7 +37,7 @@ write_to_ring(ring_buffer &ring, uint32 value)
 
 /**	The ring buffer must be locked when calling this function */
 
-static inline void
+void
 ring_command_complete(ring_buffer &ring)
 {
 	if (ring.position & 0x07) {
@@ -46,6 +46,11 @@ ring_command_complete(ring_buffer &ring)
 	}
 
 	write32(ring.register_base + RING_BUFFER_TAIL, ring.position);
+
+	// make sure memory is written back in case the ring buffer
+	// is in write combining mode
+	int32 test;
+	atomic_add(&test, 1);
 }
 
 

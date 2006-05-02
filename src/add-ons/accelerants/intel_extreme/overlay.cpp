@@ -23,8 +23,95 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 static void
+set_color_key(overlay_registers *registers, uint8 red, uint8 green, uint8 blue,
+	uint8 redMask, uint8 greenMask, uint8 blueMask)
+{
+	registers->color_key_red = red;
+	registers->color_key_green = green;
+	registers->color_key_blue = blue;
+	registers->color_key_mask_red = redMask;
+	registers->color_key_mask_green = greenMask;
+	registers->color_key_mask_blue = blueMask;
+	registers->color_key_enabled = true;
+}
+
+
+static void
+update_overlay(void)
+{
+	if (!gInfo->shared_info->overlay_active)
+		return;
+
+	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+	write_to_ring(ringBuffer, COMMAND_FLUSH);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	ring_command_complete(ringBuffer);
+
+	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
+		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
+		read32(INTEL_OVERLAY_EXTENDED_STATUS)));
+}
+
+
+static void
+show_overlay(void)
+{
+	if (gInfo->shared_info->overlay_active)
+		return;
+
+	overlay_registers *registers = gInfo->overlay_registers;
+
+	gInfo->shared_info->overlay_active = true;
+	registers->overlay_enabled = true;
+
+	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+	write_to_ring(ringBuffer, COMMAND_FLUSH);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_ON);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	ring_command_complete(ringBuffer);
+}
+
+
+static void
 hide_overlay(void)
 {
+	if (!gInfo->shared_info->overlay_active)
+		return;
+
+	overlay_registers *registers = gInfo->overlay_registers;
+
+	gInfo->shared_info->overlay_active = false;
+	registers->overlay_enabled = false;
+
+	update_overlay();
+
+	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+
+	// flush pending commands
+	write_to_ring(ringBuffer, COMMAND_FLUSH);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+
+	// clear overlay enabled bit
+	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+
+	// turn off overlay engine
+	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_OFF);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	write_to_ring(ringBuffer, COMMAND_NOOP);
+	ring_command_complete(ringBuffer);
+
+	gInfo->current_overlay = NULL;
 }
 
 
@@ -42,8 +129,8 @@ intel_overlay_count(const display_mode *mode)
 const uint32 *
 intel_overlay_supported_spaces(const display_mode *mode)
 {
-	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
-		/*B_YCbCr411,*/ B_YCbCr422, 0};
+	static const uint32 kSupportedSpaces[] = {/*B_RGB15, B_RGB16,*/ B_RGB32,
+		/*B_YCbCr411,*/ /*B_YCbCr422,*/ 0};
 
 	return kSupportedSpaces;
 }
@@ -62,6 +149,9 @@ const overlay_buffer *
 intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	uint16 height)
 {
+	TRACE(("intel_allocate_overlay_buffer(width %u, height %u, colorSpace %lu)\n",
+		width, height, colorSpace));
+
 	uint32 bytesPerPixel;
 
 	switch (colorSpace) {
@@ -105,7 +195,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->buffer = gInfo->shared_info->graphics_memory + overlay->buffer_offset;
 	buffer->buffer_dma = gInfo->shared_info->physical_graphics_memory + overlay->buffer_offset;
 
-	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, phys-address=%x", 
+	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, physical address=%x\n", 
 		overlay->buffer_handle, overlay->buffer_offset, buffer->buffer, buffer->buffer_dma));
 
 	return buffer;
@@ -115,10 +205,14 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 status_t
 intel_release_overlay_buffer(const overlay_buffer *buffer)
 {
+	TRACE(("intel_release_overlay_buffer(buffer %p)\n", buffer));
+
 	struct overlay *overlay = (struct overlay *)buffer;
 
 	// TODO: locking!
 	// TODO: if overlay is still active, hide it
+	if (gInfo->current_overlay == overlay)
+		hide_overlay();
 
 	intel_free_memory(overlay->buffer_handle);
 	free(overlay);
@@ -131,6 +225,8 @@ status_t
 intel_get_overlay_constraints(const display_mode *mode, const overlay_buffer *buffer,
 	overlay_constraints *constraints)
 {
+	TRACE(("intel_get_overlay_constraints(buffer %p)\n", buffer));
+
 	// taken from the Radeon driver...
 
 	// scaler input restrictions
@@ -190,6 +286,8 @@ intel_get_overlay_constraints(const display_mode *mode, const overlay_buffer *bu
 overlay_token
 intel_allocate_overlay(void)
 {
+	TRACE(("intel_allocate_overlay()\n"));
+
 	// we only have a single overlay channel
 	if (atomic_or(&gInfo->shared_info->overlay_channel_used, 1) != 0)
 		return NULL;
@@ -201,11 +299,14 @@ intel_allocate_overlay(void)
 status_t
 intel_release_overlay(overlay_token overlayToken)
 {
+	TRACE(("intel_allocate_overlay(token %ld)\n", (uint32)overlayToken));
+
 	// we only have a single token, which simplifies this
 	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
 		return B_BAD_VALUE;
 
 	atomic_and(&gInfo->shared_info->overlay_channel_used, 0);
+
 	return B_OK;
 }
 
@@ -214,6 +315,9 @@ status_t
 intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer,
 	const overlay_window *window, const overlay_view *view)
 {
+	TRACE(("intel_configure_overlay: buffer %p, window %p, view %p\n",
+		buffer, window, view));
+
 	if (overlayToken != (overlay_token)gInfo->shared_info->overlay_token)
 		return B_BAD_VALUE;
 
@@ -222,7 +326,62 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		return B_OK;
 	}
 
+	struct overlay *overlay = (struct overlay *)buffer;
+	overlay_registers *registers = gInfo->overlay_registers;
+
+	switch (gInfo->shared_info->current_mode.space) {
+		case B_CMAP8:
+			set_color_key(registers, 0, 0, 0, 0xff, 0xff, 0xff);
+			break;
+		case B_RGB15:
+			set_color_key(registers, window->red.value, window->green.value,
+				window->blue.value, 0x07, 0x07, 0x07);
+			break;
+		case B_RGB16:
+			set_color_key(registers, window->red.value, window->green.value,
+				window->blue.value, 0x07, 0x03, 0x07);
+			break;
+		default:
+			set_color_key(registers, window->red.value, window->green.value,
+				window->blue.value, window->red.mask, window->green.mask, window->blue.mask);
+			break;
+	}
+
+	// program window and scaling factor
+
+	registers->window_left = 0;
+	registers->window_top = 0;
+	registers->window_width = view->width;//window->width;
+	registers->window_height = view->height;//window->height;
 	
+	registers->source_width_rgb = buffer->width;
+	registers->source_width_uv = buffer->width;
+	registers->source_height_rgb = buffer->height;
+	registers->source_height_uv = buffer->height;
+	registers->source_bytes_per_row_rgb = buffer->bytes_per_row;
+	registers->source_bytes_per_row_uv = buffer->bytes_per_row;
+	registers->scale_rgb.horizontal_downscale_factor = 1;
+	registers->scale_uv.horizontal_downscale_factor = 1;
+
+	// program buffer
+
+	registers->buffer_rgb0 = overlay->buffer_offset;
+	registers->buffer_rgb1 = overlay->buffer_offset;
+	registers->buffer_u0 = overlay->buffer_offset;
+	registers->buffer_u1 = overlay->buffer_offset;
+	registers->buffer_v0 = overlay->buffer_offset;
+	registers->buffer_v1 = overlay->buffer_offset;
+	registers->stride_rgb = buffer->bytes_per_row;
+	registers->stride_uv = buffer->bytes_per_row;
+
+	registers->ycbcr422_order = 1;
+
+	if (!gInfo->shared_info->overlay_active)
+		show_overlay();
+	else
+		update_overlay();
+
+	gInfo->current_overlay = overlay;
 	return B_OK;
 }
 

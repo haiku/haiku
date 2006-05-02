@@ -72,6 +72,7 @@ struct intel_shared_info {
 	ring_buffer		primary_ring_buffer;
 
 	int32			overlay_channel_used;
+	bool			overlay_active;
 	uint32			overlay_token;
 	uint8*			physical_overlay_registers;
 
@@ -256,13 +257,13 @@ struct overlay_registers {
 	uint16 vertical_phase1_uv;
 	uint16 horizontal_phase_rgb;
 	uint16 horizontal_phase_uv;
-	uint32 _reserved0 : 8;
 	uint32 initial_vertical_phase0_shift_rgb0 : 4;
 	uint32 initial_vertical_phase1_shift_rgb0 : 4;
 	uint32 initial_horizontal_phase_shift_rgb0 : 4;
 	uint32 initial_vertical_phase0_shift_uv : 4;
 	uint32 initial_vertical_phase1_shift_uv : 4;
 	uint32 initial_horizontal_phase_shift_uv : 4;
+	uint32 _reserved0 : 8;
 	uint16 window_left;
 	uint16 window_top;
 	uint16 window_width;
@@ -276,66 +277,66 @@ struct overlay_registers {
 	overlay_scale scale_rgb;
 	overlay_scale scale_uv;
 	// (0x48) OCLRC0 - overlay color correction 0
-	uint32 _reserved1 : 5;
-	uint32 contrast_correction : 9;			// fixed point: 3.6 bits
-	uint32 _reserved2 : 10;
 	uint32 brightness_correction : 8;		// signed, -128 to 127
+	uint32 _reserved1 : 10;
+	uint32 contrast_correction : 9;			// fixed point: 3.6 bits
+	uint32 _reserved2 : 5;
 	// (0x4c) OCLRC1 - overlay color correction 1
-	uint32 _reserved3 : 5;
-	uint32 saturation_sin_correction : 11;	// signed fixed point: 3.7 bits
-	uint32 _reserved4 : 6;
 	uint32 saturation_cos_correction : 10;	// fixed point: 3.7 bits
+	uint32 _reserved3 : 6;
+	uint32 saturation_sin_correction : 11;	// signed fixed point: 3.7 bits
+	uint32 _reserved4 : 5;
 	// (0x50) DCLRKV - destination color key value
-	uint32 _reserved5 : 8;
-	uint32 color_key_red : 8;
-	uint32 color_key_green : 8;
 	uint32 color_key_blue : 8;
+	uint32 color_key_green : 8;
+	uint32 color_key_red : 8;
+	uint32 _reserved5 : 8;
 	// (0x54) DCLRKM - destination color key mask
-	uint32 color_key_enabled : 1;
-	uint32 _reserved6 : 7;
-	uint32 color_key_mask_red : 8;
-	uint32 color_key_mask_green : 8;
 	uint32 color_key_mask_blue : 8;
+	uint32 color_key_mask_green : 8;
+	uint32 color_key_mask_red : 8;
+	uint32 _reserved6 : 7;
+	uint32 color_key_enabled : 1;
 	// (0x58) SCHRKVH - source chroma key high value
-	uint32 _reserved7 : 8;
-	uint32 source_chroma_key_high_green : 8;
-	uint32 source_chroma_key_high_blue : 8;
 	uint32 source_chroma_key_high_red : 8;
+	uint32 source_chroma_key_high_blue : 8;
+	uint32 source_chroma_key_high_green : 8;
+	uint32 _reserved7 : 8;
 	// (0x5c) SCHRKVL - source chroma key low value
-	uint32 _reserved8 : 8;
-	uint32 source_chroma_key_low_green : 8;
-	uint32 source_chroma_key_low_blue : 8;
 	uint32 source_chroma_key_low_red : 8;
+	uint32 source_chroma_key_low_blue : 8;
+	uint32 source_chroma_key_low_green : 8;
+	uint32 _reserved8 : 8;
 	// (0x60) SCHRKEN - source chroma key enable
-	uint32 _reserved9 : 5;
-	uint32 source_chroma_key_green_enabled : 1;
-	uint32 source_chroma_key_blue_enabled : 1;
+	uint32 _reserved9 : 24;
 	uint32 source_chroma_key_red_enabled : 1;
-	uint32 _reserved10 : 24;
+	uint32 source_chroma_key_blue_enabled : 1;
+	uint32 source_chroma_key_green_enabled : 1;
+	uint32 _reserved10 : 5;
 	// (0x64) OCONFIG - overlay configuration
-	uint32 _reserved11 : 5;
-	uint32 slot_time : 8;
-	uint32 _reserved12 : 2;
-	uint32 gamma2_enabled : 1;
-	uint32 _reserved13 : 11;
-	uint32 yuv_to_rgb_bypass : 1;
+	uint32 _reserved11 : 3;
 	uint32 color_control_output_mode : 1;
-	uint32 _reserved14 : 3;
+	uint32 yuv_to_rgb_bypass : 1;
+	uint32 _reserved12 : 11;
+	uint32 gamma2_enabled : 1;
+	uint32 _reserved13 : 2;
+	uint32 slot_time : 8;
+	uint32 _reserved14 : 5;
 	// (0x68) OCOMD - overlay command
-	uint32 _reserved15 : 13;
-	uint32 mirroring_mode : 2;
-	uint32 _reserved16 : 1;
-	uint32 ycbcr422_order : 2;
-	uint32 _reserved17 : 4;
-	uint32 tv_flip_field_parity : 1;
-	uint32 _reserved18 : 1;
-	uint32 tv_flip_field_enabled : 1;
-	uint32 _reserved19 : 1;
-	uint32 buffer_field_mode : 1;
-	uint32 test_mode : 1;
-	uint32 active_buffer : 2;
-	uint32 active_field : 1;
 	uint32 overlay_enabled : 1;
+	uint32 active_field : 1;
+	uint32 active_buffer : 2;
+	uint32 test_mode : 1;
+	uint32 buffer_field_mode : 1;
+	uint32 _reserved15 : 1;
+	uint32 tv_flip_field_enabled : 1;
+	uint32 _reserved16 : 1;
+	uint32 tv_flip_field_parity : 1;
+	uint32 _reserved17 : 4;
+	uint32 ycbcr422_order : 2;
+	uint32 _reserved18 : 1;
+	uint32 mirroring_mode : 2;
+	uint32 _reserved19 : 13;
 
 	uint32 _reserved20;
 
@@ -349,6 +350,7 @@ struct overlay_registers {
 	// (0xa0) FASTHSCALE - fast horizontal downscale
 	uint16 horizontal_scale_rgb;
 	uint16 horizontal_scale_uv;
+	// (0xa4) UVSCALEV - vertical downscale
 	uint16 vertical_scale_rgb;
 	uint16 vertical_scale_uv;
 };

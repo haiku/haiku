@@ -10,6 +10,8 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 
+#include "utility.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -128,6 +130,9 @@ init_common(int device, bool isClone)
 
 	sharedCloner.Keep();
 	regsCloner.Keep();
+
+	gInfo->overlay_registers = (struct overlay_registers *)((uint8 *)gInfo->shared_info
+		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
 
 	return B_OK;
 }

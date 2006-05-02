@@ -32,6 +32,9 @@ struct accelerant_info {
 
 	uint32			frame_buffer_handle;
 
+	struct overlay_registers *overlay_registers;
+	overlay			*current_overlay;
+
 	int				device;
 	bool			is_clone;
 };
@@ -59,6 +62,8 @@ extern void set_display_power_mode(uint32 mode);
 
 // engine.cpp
 extern void setup_ring_buffer(ring_buffer &ringBuffer, const char *name);
+extern void write_to_ring(ring_buffer &ring, uint32 value);
+extern void ring_command_complete(ring_buffer &ring);
 
 // modes.cpp
 extern status_t create_mode_list(void);
