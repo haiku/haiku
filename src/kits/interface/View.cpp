@@ -1351,10 +1351,9 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	do_owner_check();
 
 	if (checkMessageQueue) {
+		Window()->UpdateIfNeeded();
 		BMessageQueue *queue = Window()->MessageQueue();
 		queue->Lock();
-
-		Window()->UpdateIfNeeded();
 
 		// Look out for mouse update messages
 

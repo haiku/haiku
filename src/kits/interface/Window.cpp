@@ -1419,6 +1419,11 @@ BWindow::UpdateIfNeeded()
 	if (find_thread(NULL) != Thread())
 		return;
 
+	// if the queue is already locked we are called recursivly
+	// from our own dispatched update message
+	if (((const BMessageQueue *)MessageQueue())->IsLocked())
+		return;
+
 	// make sure all requests that would cause an update have
 	// arrived at the server
 	Sync();
