@@ -2002,7 +2002,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<float>(&span);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&r);
-			drawingEngine->DrawArc(r, angle, span, fCurrentLayer->CurrentState(), code == AS_FILL_ARC);
+			drawingEngine->DrawArc(r, angle, span, fCurrentLayer->CurrentState(),
+								   code == AS_FILL_ARC);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -2016,7 +2017,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
 			}
 
-			drawingEngine->DrawBezier(pts, fCurrentLayer->CurrentState(), code == AS_FILL_BEZIER);
+			drawingEngine->DrawBezier(pts, fCurrentLayer->CurrentState(),
+									  code == AS_FILL_BEZIER);
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
@@ -2083,6 +2085,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
 				for (int32 i = 0; i < pointCount; i++)
 					fCurrentLayer->ConvertToScreenForDrawing(&pointList[i]);
+				fCurrentLayer->ConvertToScreenForDrawing(&polyFrame);
 
 				drawingEngine->DrawPolygon(pointList, pointCount, polyFrame,
 					fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
