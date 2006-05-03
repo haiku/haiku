@@ -71,14 +71,12 @@ BMessage::BMessage()
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
-	_InitHeader();
 }
 
 BMessage::BMessage(BMessage *other)
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
-	_InitHeader();
 	*this = *other;
 }
 
@@ -86,7 +84,6 @@ BMessage::BMessage(uint32 _what)
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
-	_InitHeader();
 	fHeader->what = what = _what;
 }
 
@@ -95,7 +92,6 @@ BMessage::BMessage(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
-	_InitHeader();
 	*this = other;
 }
 
@@ -134,7 +130,7 @@ BMessage::operator=(const BMessage &other)
 	fHeader->fields_available = 0;
 	fHeader->data_available = 0;
 	fHeader->what = what = other.what;
-	fQueueLink = other.fQueueLink;
+
 	return *this;
 }
 
@@ -178,7 +174,8 @@ BMessage::_InitCommon()
 
 	fOriginal = NULL;
 	fQueueLink = NULL;
-	return B_OK;
+
+	return _InitHeader();
 }
 
 
@@ -223,7 +220,6 @@ BMessage::_Clear()
 
 	delete fOriginal;
 	fOriginal = NULL;
-	fQueueLink = NULL;
 
 	return B_OK;
 }
