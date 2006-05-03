@@ -8,9 +8,7 @@
 
 #include <wchar.h>
 
-
 typedef const int *wctrans_t;
-typedef unsigned long wctype_t;
 
 #ifdef __cplusplus
 extern "C" {
