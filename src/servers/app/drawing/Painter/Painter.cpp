@@ -466,9 +466,9 @@ Painter::StrokeBezier(const BPoint* controlPoints) const
 	_Transform(&p4);
 
 	curve.move_to(p1.x, p1.y);
-	curve.curve4(p1.x, p1.y,
-				 p2.x, p2.y,
-				 p3.x, p3.y);
+	curve.curve4(p2.x, p2.y,
+				 p3.x, p3.y,
+				 p4.x, p4.y);
 
 
 	agg::conv_curve<agg::path_storage> path(curve);
@@ -494,9 +494,9 @@ Painter::FillBezier(const BPoint* controlPoints) const
 	_Transform(&p4);
 
 	curve.move_to(p1.x, p1.y);
-	curve.curve4(p1.x, p1.y,
-				 p2.x, p2.y,
-				 p3.x, p3.y);
+	curve.curve4(p2.x, p2.y,
+				 p3.x, p3.y,
+				 p4.x, p4.y);
 	curve.close_polygon();
 
 	agg::conv_curve<agg::path_storage> path(curve);
