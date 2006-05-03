@@ -291,7 +291,6 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
-//printf("BScrollBar::SetValue(%.1f)\n", value);
 	if (value == fValue)
 		return;
 
@@ -305,7 +304,6 @@ BScrollBar::SetValue(float value)
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
 
-//printf(" -> calling ValueChanged()\n");
 	ValueChanged(value);
 }
 
@@ -320,7 +318,6 @@ BScrollBar::Value() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
-printf("BScrollBar::ValueChanged(%.1f)\n", newValue);
 	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
