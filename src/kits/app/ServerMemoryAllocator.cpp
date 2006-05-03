@@ -68,6 +68,7 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base
 	}
 
 	status_t status = B_ERROR;
+	uint32 addressSpec = B_ANY_ADDRESS;
 	void* base;
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	if (!readOnly) {
@@ -75,15 +76,18 @@ ServerMemoryAllocator::AddArea(area_id serverArea, area_id& _area, uint8*& _base
 		base = (void*)0x60000000;
 		status = _kern_reserve_heap_address_range((addr_t*)&base,
 			B_BASE_ADDRESS, 128 * 1024 * 1024);
+		addressSpec = status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS;
 	}
 #endif
 
 	mapping->local_area = clone_area(readOnly ? "server read-only memory" : "server_memory",
-		&base, status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
-		B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
+		&base, addressSpec, B_READ_AREA | (readOnly ? 0 : B_WRITE_AREA), serverArea);
 	if (mapping->local_area < B_OK) {
 		status = mapping->local_area;
+
+		fAreas.RemoveItem(mapping);
 		delete mapping;
+
 		return status;
 	}
 
