@@ -314,7 +314,7 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 
 	if (dir == this) {
 		// cleanup after _SetTo()
-		close(dirFD);
+		_kern_close(dirFD);
 	}
 
 	// set close on exec flag on dir FD
