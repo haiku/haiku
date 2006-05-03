@@ -1,5 +1,5 @@
 /* sum -- checksum and count the blocks in a file
-   Copyright (C) 86, 89, 91, 1995-2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 91, 1995-2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Like BSD sum or SysV sum -r, except like SysV sum if -s option is given. */
 
@@ -86,28 +86,29 @@ With no FILE, or when FILE is -, read standard input.\n\
 static bool
 bsd_sum_file (const char *file, int print_name)
 {
-  register FILE *fp;
-  register int checksum = 0;	/* The checksum mod 2^16. */
-  register uintmax_t total_bytes = 0;	/* The number of bytes. */
-  register int ch;		/* Each character read. */
+  FILE *fp;
+  int checksum = 0;	/* The checksum mod 2^16. */
+  uintmax_t total_bytes = 0;	/* The number of bytes. */
+  int ch;		/* Each character read. */
   char hbuf[LONGEST_HUMAN_READABLE + 1];
+  bool is_stdin = STREQ (file, "-");
 
-  if (STREQ (file, "-"))
+  if (is_stdin)
     {
       fp = stdin;
       have_read_stdin = true;
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
     {
-      fp = fopen (file, "r");
+      fp = fopen (file, (O_BINARY ? "rb" : "r"));
       if (fp == NULL)
 	{
 	  error (0, errno, "%s", file);
 	  return false;
 	}
     }
-  /* Need binary I/O, or else byte counts and checksums are incorrect.  */
-  SET_BINARY (fileno(fp));
 
   while ((ch = getc (fp)) != EOF)
     {
@@ -120,12 +121,12 @@ bsd_sum_file (const char *file, int print_name)
   if (ferror (fp))
     {
       error (0, errno, "%s", file);
-      if (!STREQ (file, "-"))
+      if (!is_stdin)
 	fclose (fp);
       return false;
     }
 
-  if (!STREQ (file, "-") && fclose (fp) == EOF)
+  if (!is_stdin && fclose (fp) != 0)
     {
       error (0, errno, "%s", file);
       return false;
@@ -158,22 +159,24 @@ sysv_sum_file (const char *file, int print_name)
   /* The sum of all the input bytes, modulo (UINT_MAX + 1).  */
   unsigned int s = 0;
 
-  if (STREQ (file, "-"))
+  bool is_stdin = STREQ (file, "-");
+
+  if (is_stdin)
     {
-      fd = 0;
+      fd = STDIN_FILENO;
       have_read_stdin = true;
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
     {
-      fd = open (file, O_RDONLY);
+      fd = open (file, O_RDONLY | O_BINARY);
       if (fd == -1)
 	{
 	  error (0, errno, "%s", file);
 	  return false;
 	}
     }
-  /* Need binary I/O, or else byte counts and checksums are incorrect.  */
-  SET_BINARY (fd);
 
   while (1)
     {
@@ -186,7 +189,7 @@ sysv_sum_file (const char *file, int print_name)
       if (bytes_read == SAFE_READ_ERROR)
 	{
 	  error (0, errno, "%s", file);
-	  if (!STREQ (file, "-"))
+	  if (!is_stdin)
 	    close (fd);
 	  return false;
 	}
@@ -196,7 +199,7 @@ sysv_sum_file (const char *file, int print_name)
       total_bytes += bytes_read;
     }
 
-  if (!STREQ (file, "-") && close (fd) == -1)
+  if (!is_stdin && close (fd) != 0)
     {
       error (0, errno, "%s", file);
       return false;

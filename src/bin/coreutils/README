@@ -58,6 +58,7 @@ If you run the tests on a SunOS4.1.4 system, expect the ctime-part of
 the ls `time-1' test to fail.  I believe that is due to a bug in the
 way Sun implemented link(2) and chmod(2).
 
+
 ***********************
 HPUX 11.x build failure
 -----------------------
@@ -113,6 +114,11 @@ if the test that fails is tests/mv/hard-link-1, then you
 would run this command:
 
   env VERBOSE=yes make check -C tests/mv TESTS=hard-link-1 >> log 2>&1
+
+For some tests, you can get even more detail by including
+DEBUG=yes in the environment:
+
+  env DEBUG=yes VERBOSE=yes make check -C tests/mv TESTS=hard-link-1 >> log 2>&1
 
 and then include the contents of the file `log' in your bug report.
 

@@ -15,11 +15,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert and Larry McVoy.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -35,6 +35,7 @@
 
 #include <argmatch.h>
 #include <error.h>
+#include <intprops.h>
 #include <xstrtol.h>
 
 #ifndef SIZE_MAX
@@ -99,10 +100,8 @@ group_number (char *number, size_t numberlen,
   size_t i = numberlen;
 
   /* The maximum possible value for NUMBERLEN is the number of digits
-     in the square of the largest uintmax_t, so double the size of
-     uintmax_t before converting to a bound.  302 / 1000 is ceil
-     (log10 (2.0)).  Add 1 for integer division truncation.  */
-  char buf[2 * sizeof (uintmax_t) * CHAR_BIT * 302 / 1000 + 1];
+     in the square of the largest uintmax_t, so double the size needed.  */
+  char buf[2 * INT_STRLEN_BOUND (uintmax_t) + 1];
 
   memcpy (buf, number, numberlen);
   d = number + numberlen;
@@ -452,7 +451,10 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
 	  strtol_error e = xstrtoumax (spec, &ptr, 0, block_size,
 				       "eEgGkKmMpPtTyYzZ0");
 	  if (e != LONGINT_OK)
-	    return e;
+	    {
+	      *options = 0;
+	      return e;
+	    }
 	  for (; ! ('0' <= *spec && *spec <= '9'); spec++)
 	    if (spec == ptr)
 	      {

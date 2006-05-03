@@ -1,5 +1,5 @@
 /* printf - format and print data
-   Copyright (C) 1990-2004 Free Software Foundation, Inc.
+   Copyright (C) 1990-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Usage: printf format [argument...]
 
@@ -53,8 +53,9 @@
 
 #include "system.h"
 #include "c-strtod.h"
-#include "long-options.h"
 #include "error.h"
+#include "long-options.h"
+#include "quote.h"
 #include "unicodeio.h"
 
 #if ! (HAVE_DECL_STRTOIMAX || defined strtoimax)
@@ -140,13 +141,14 @@ FORMAT controls the output as in C printf.  Interpreted sequences are:\n\
 and all C format specifications ending with one of diouxXfeEgGcs, with\n\
 ARGUMENTs converted to proper type first.  Variable widths are handled.\n\
 "), stdout);
+      printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
 }
 
 static void
-verify (const char *s, const char *end)
+verify_numeric (const char *s, const char *end)
 {
   if (errno)
     {
@@ -185,7 +187,7 @@ FUNC_NAME (char const *s)						 \
     {									 \
       errno = 0;							 \
       val = (LIB_FUNC_EXPR);						 \
-      verify (s, end);							 \
+      verify_numeric (s, end);						 \
     }									 \
   return val;								 \
 }									 \
@@ -240,7 +242,7 @@ print_esc_char (char c)
 static int
 print_esc (const char *escstart, bool octal_0)
 {
-  register const char *p = escstart + 1;
+  const char *p = escstart + 1;
   int esc_value = 0;		/* Value of \nnn escape. */
   int esc_length;		/* Length of \nnn escape. */
 
@@ -682,8 +684,8 @@ main (int argc, char **argv)
 
   if (argc > 0)
     error (0, 0,
-	   _("warning: ignoring excess arguments, starting with `%s'"),
-	   argv[0]);
+	   _("warning: ignoring excess arguments, starting with %s"),
+	   quote (argv[0]));
 
   exit (exit_status);
 }

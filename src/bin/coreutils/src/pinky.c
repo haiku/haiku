@@ -1,5 +1,5 @@
 /* GNU's pinky.
-   Copyright (C) 1992-1997, 1999-2004 Free Software Foundation, Inc.
+   Copyright (C) 1992-1997, 1999-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Created by hacking who.c by Kaveh Ghazi ghazi@caip.rutgers.edu */
 
@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include "system.h"
 
+#include "canon-host.h"
 #include "error.h"
 #include "hard-locale.h"
 #include "inttostr.h"
@@ -219,8 +220,8 @@ print_entry (const STRUCT_UTMP *utmp_ent)
   char line[sizeof (utmp_ent->ut_line) + DEV_DIR_LEN + 1];
 
   /* Copy ut_line into LINE, prepending `/dev/' if ut_line is not
-     already an absolute pathname.  Some system may put the full,
-     absolute pathname in ut_line.  */
+     already an absolute file name.  Some system may put the full,
+     absolute file name in ut_line.  */
   if (utmp_ent->ut_line[0] == '/')
     {
       strncpy (line, utmp_ent->ut_line, sizeof (utmp_ent->ut_line));
@@ -286,9 +287,9 @@ print_entry (const STRUCT_UTMP *utmp_ent)
 #ifdef HAVE_UT_HOST
   if (include_where && utmp_ent->ut_host[0])
     {
-      extern char *canon_host ();
       char ut_host[sizeof (utmp_ent->ut_host) + 1];
-      char *host = 0, *display = 0;
+      char *host = NULL;
+      char *display = NULL;
 
       /* Copy the host name into UT_HOST, and ensure it's nul terminated. */
       strncpy (ut_host, utmp_ent->ut_host, (int) sizeof (utmp_ent->ut_host));
@@ -487,7 +488,7 @@ short_pinky (const char *filename,
   size_t n_users;
   STRUCT_UTMP *utmp_buf;
 
-  if (read_utmp (filename, &n_users, &utmp_buf) != 0)
+  if (read_utmp (filename, &n_users, &utmp_buf, 0) != 0)
     error (EXIT_FAILURE, errno, "%s", filename);
 
   scan_entries (n_users, utmp_buf, argc_names, argv_names);

@@ -1,5 +1,5 @@
 /* sort - sort lines of text (with all kinds of options).
-   Copyright (C) 88, 1991-2004 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1991-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,8 +12,8 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
    Written December 1988 by Mike Haertel.
    The author may be reached (Email) at the address mike@gnu.ai.mit.edu,
@@ -26,7 +26,6 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <stdio.h>
 #include "system.h"
 #include "error.h"
 #include "hard-locale.h"
@@ -34,7 +33,9 @@
 #include "physmem.h"
 #include "posixver.h"
 #include "quote.h"
-#include "stdio-safer.h"
+#include "stdlib--.h"
+#include "stdio--.h"
+#include "strnumcmp.h"
 #include "xmemcoll.h"
 #include "xstrtol.h"
 
@@ -55,9 +56,15 @@ struct rlimit { size_t rlim_cur; };
 # include <langinfo.h>
 #endif
 
+/* Use SA_NOCLDSTOP as a proxy for whether the sigaction machinery is
+   present.  */
 #ifndef SA_NOCLDSTOP
+# define SA_NOCLDSTOP 0
 # define sigprocmask(How, Set, Oset) /* empty */
 # define sigset_t int
+# if ! HAVE_SIGINTERRUPT
+#  define siginterrupt(sig, flag) /* empty */
+# endif
 #endif
 
 #ifndef STDC_HEADERS
@@ -82,13 +89,10 @@ enum
     SORT_FAILURE = 2
   };
 
-#define NEGATION_SIGN   '-'
-#define NUMERIC_ZERO    '0'
-
 /* The representation of the decimal point in the current locale.  */
-static char decimal_point;
+static int decimal_point;
 
-/* Thousands separator; if CHAR_MAX + 1, then there isn't one.  */
+/* Thousands separator; if -1, then there isn't one.  */
 static int thousands_sep;
 
 /* Nonzero if the corresponding locales are hard.  */
@@ -281,14 +285,16 @@ Usage: %s [OPTION]... [FILE]...\n\
       fputs (_("\
 Write sorted concatenation of all FILE(s) to standard output.\n\
 \n\
-Ordering options:\n\
-\n\
 "), stdout);
       fputs (_("\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -b, --ignore-leading-blanks ignore leading blanks\n\
+Ordering options:\n\
+\n\
+"), stdout);
+      fputs (_("\
+  -b, --ignore-leading-blanks  ignore leading blanks\n\
   -d, --dictionary-order      consider only blanks and alphanumeric characters\n\
   -f, --ignore-case           fold lower case to upper case characters\n\
 "), stdout);
@@ -304,14 +310,14 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 Other options:\n\
 \n\
   -c, --check               check whether input is sorted; do not sort\n\
-  -k, --key=POS1[,POS2]     start a key at POS1, end it at POS 2 (origin 1)\n\
+  -k, --key=POS1[,POS2]     start a key at POS1, end it at POS2 (origin 1)\n\
   -m, --merge               merge already sorted files; do not sort\n\
   -o, --output=FILE         write result to FILE instead of standard output\n\
   -s, --stable              stabilize sort by disabling last-resort comparison\n\
   -S, --buffer-size=SIZE    use SIZE for main memory buffer\n\
 "), stdout);
       printf (_("\
-  -t, --field-separator=SEP use SEP instead of non-blank to blank transition\n\
+  -t, --field-separator=SEP  use SEP instead of non-blank to blank transition\n\
   -T, --temporary-directory=DIR  use DIR for temporaries, not $TMPDIR or %s;\n\
                               multiple options specify multiple directories\n\
   -u, --unique              with -c, check for strict ordering;\n\
@@ -347,7 +353,7 @@ native byte values.\n\
   exit (status);
 }
 
-#define COMMON_SHORT_OPTIONS "-bcdfgik:mMno:rsS:t:T:uz"
+static char const short_options[] = "-bcdfgik:mMno:rsS:t:T:uy:z";
 
 static struct option const long_options[] =
 {
@@ -371,7 +377,7 @@ static struct option const long_options[] =
   {"zero-terminated", no_argument, NULL, 'z'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0},
+  {NULL, 0, NULL, 0},
 };
 
 /* The set of signals that are caught.  */
@@ -441,7 +447,8 @@ create_temp_file (FILE **pfp)
 /* Return a stream for FILE, opened with mode HOW.  A null FILE means
    standard output; HOW should be "w".  When opening for input, "-"
    means standard input.  To avoid confusion, do not return file
-   descriptors 0, 1, or 2.  */
+   descriptors STDIN_FILENO, STDOUT_FILENO, or STDERR_FILENO when
+   opening an ordinary FILE.  */
 
 static FILE *
 xfopen (const char *file, const char *how)
@@ -457,7 +464,8 @@ xfopen (const char *file, const char *how)
     }
   else
     {
-      if ((fp = fopen_safer (file, how)) == NULL)
+      fp = fopen (file, how);
+      if (! fp)
 	die (_("open failed"), file);
     }
 
@@ -469,22 +477,24 @@ xfopen (const char *file, const char *how)
 static void
 xfclose (FILE *fp, char const *file)
 {
-  if (fp == stdin)
+  switch (fileno (fp))
     {
-      /* Allow reading stdin from tty more than once. */
+    case STDIN_FILENO:
+      /* Allow reading stdin from tty more than once.  */
       if (feof (fp))
 	clearerr (fp);
-    }
-  else if (fp == stdout)
-    {
+      break;
+
+    case STDOUT_FILENO:
       /* Don't close stdout just yet.  close_stdout does that.  */
       if (fflush (fp) != 0)
 	die (_("fflush failed"), file);
-    }
-  else
-    {
+      break;
+
+    default:
       if (fclose (fp) != 0)
 	die (_("close failed"), file);
+      break;
     }
 }
 
@@ -500,7 +510,7 @@ static void
 add_temp_dir (char const *dir)
 {
   if (temp_dir_count == temp_dir_alloc)
-    temp_dirs = x2nrealloc (temp_dirs, &temp_dir_alloc, sizeof *temp_dirs);
+    temp_dirs = X2NREALLOC (temp_dirs, &temp_dir_alloc);
 
   temp_dirs[temp_dir_count++] = dir;
 }
@@ -691,11 +701,11 @@ default_sort_size (void)
 }
 
 /* Return the sort buffer size to use with the input files identified
-   by FPS and FILES, which are alternate paths to the same files.
+   by FPS and FILES, which are alternate names of the same files.
    NFILES gives the number of input files; NFPS may be less.  Assume
    that each input line requires LINE_BYTES extra bytes' worth of line
-   information.  Do not exceed a bound on the size: if the bound is
-   not specified by the user, use a default.  */
+   information.  Do not exceed the size bound specified by the user
+   (or a default size bound, if the user does not specify one).  */
 
 static size_t
 sort_buffer_size (FILE *const *fps, size_t nfps,
@@ -800,10 +810,10 @@ buffer_linelim (struct buffer const *buf)
 static char *
 begfield (const struct line *line, const struct keyfield *key)
 {
-  register char *ptr = line->text, *lim = ptr + line->length - 1;
-  register size_t sword = key->sword;
-  register size_t schar = key->schar;
-  register size_t remaining_bytes;
+  char *ptr = line->text, *lim = ptr + line->length - 1;
+  size_t sword = key->sword;
+  size_t schar = key->schar;
+  size_t remaining_bytes;
 
   /* The leading field separator itself is included in a field when -t
      is absent.  */
@@ -845,9 +855,9 @@ begfield (const struct line *line, const struct keyfield *key)
 static char *
 limfield (const struct line *line, const struct keyfield *key)
 {
-  register char *ptr = line->text, *lim = ptr + line->length - 1;
-  register size_t eword = key->eword, echar = key->echar;
-  register size_t remaining_bytes;
+  char *ptr = line->text, *lim = ptr + line->length - 1;
+  size_t eword = key->eword, echar = key->echar;
+  size_t remaining_bytes;
 
   /* Move PTR past EWORD fields or to one past the last byte on LINE,
      whichever comes first.  If there are more than EWORD fields, leave
@@ -948,7 +958,7 @@ limfield (const struct line *line, const struct keyfield *key)
    Return true if some input was read.  */
 
 static bool
-fillbuf (struct buffer *buf, register FILE *fp, char const *file)
+fillbuf (struct buffer *buf, FILE *fp, char const *file)
 {
   struct keyfield const *key = keylist;
   char eol = eolchar;
@@ -1048,73 +1058,8 @@ fillbuf (struct buffer *buf, register FILE *fp, char const *file)
 
       /* The current input line is too long to fit in the buffer.
 	 Double the buffer size and try again.  */
-      buf->buf = x2nrealloc (buf->buf, &buf->alloc, sizeof *(buf->buf));
+      buf->buf = X2REALLOC (buf->buf, &buf->alloc);
     }
-}
-
-/* Compare strings A and B containing decimal fractions < 1.  Each string
-   should begin with a decimal point followed immediately by the digits
-   of the fraction.  Strings not of this form are considered to be zero. */
-
-/* The goal here, is to take two numbers a and b... compare these
-   in parallel.  Instead of converting each, and then comparing the
-   outcome.  Most likely stopping the comparison before the conversion
-   is complete.  The algorithm used, in the old sort:
-
-   Algorithm: fraccompare
-   Action   : compare two decimal fractions
-   accepts  : char *a, char *b
-   returns  : -1 if a<b, 0 if a=b, 1 if a>b.
-   implement:
-
-   if *a == decimal_point AND *b == decimal_point
-     find first character different in a and b.
-     if both are digits, return the difference *a - *b.
-     if *a is a digit
-       skip past zeros
-       if digit return 1, else 0
-     if *b is a digit
-       skip past zeros
-       if digit return -1, else 0
-   if *a is a decimal_point
-     skip past decimal_point and zeros
-     if digit return 1, else 0
-   if *b is a decimal_point
-     skip past decimal_point and zeros
-     if digit return -1, else 0
-   return 0 */
-
-static int
-fraccompare (register const char *a, register const char *b)
-{
-  if (*a == decimal_point && *b == decimal_point)
-    {
-      while (*++a == *++b)
-	if (! ISDIGIT (*a))
-	  return 0;
-      if (ISDIGIT (*a) && ISDIGIT (*b))
-	return *a - *b;
-      if (ISDIGIT (*a))
-	goto a_trailing_nonzero;
-      if (ISDIGIT (*b))
-	goto b_trailing_nonzero;
-      return 0;
-    }
-  else if (*a++ == decimal_point)
-    {
-    a_trailing_nonzero:
-      while (*a == NUMERIC_ZERO)
-	a++;
-      return ISDIGIT (*a);
-    }
-  else if (*b++ == decimal_point)
-    {
-    b_trailing_nonzero:
-      while (*b == NUMERIC_ZERO)
-	b++;
-      return - ISDIGIT (*b);
-    }
-  return 0;
 }
 
 /* Compare strings A and B as numbers without explicitly converting them to
@@ -1122,138 +1067,14 @@ fraccompare (register const char *a, register const char *b)
    hideously fast. */
 
 static int
-numcompare (register const char *a, register const char *b)
+numcompare (const char *a, const char *b)
 {
-  char tmpa;
-  char tmpb;
-  int tmp;
-  size_t log_a;
-  size_t log_b;
-
-  while (blanks[to_uchar (tmpa = *a)])
+  while (blanks[to_uchar (*a)])
     a++;
-  while (blanks[to_uchar (tmpb = *b)])
+  while (blanks[to_uchar (*b)])
     b++;
 
-  if (tmpa == NEGATION_SIGN)
-    {
-      do
-	tmpa = *++a;
-      while (tmpa == NUMERIC_ZERO || tmpa == thousands_sep);
-      if (tmpb != NEGATION_SIGN)
-	{
-	  if (tmpa == decimal_point)
-	    do
-	      tmpa = *++a;
-	    while (tmpa == NUMERIC_ZERO);
-	  if (ISDIGIT (tmpa))
-	    return -1;
-	  while (tmpb == NUMERIC_ZERO || tmpb == thousands_sep)
-	    tmpb = *++b;
-	  if (tmpb == decimal_point)
-	    do
-	      tmpb = *++b;
-	    while (tmpb == NUMERIC_ZERO);
-	  return - ISDIGIT (tmpb);
-	}
-      do
-	tmpb = *++b;
-      while (tmpb == NUMERIC_ZERO || tmpb == thousands_sep);
-
-      while (tmpa == tmpb && ISDIGIT (tmpa))
-	{
-	  do
-	    tmpa = *++a;
-	  while (tmpa == thousands_sep);
-	  do
-	    tmpb = *++b;
-	  while (tmpb == thousands_sep);
-	}
-
-      if ((tmpa == decimal_point && !ISDIGIT (tmpb))
-	  || (tmpb == decimal_point && !ISDIGIT (tmpa)))
-	return fraccompare (b, a);
-
-      tmp = tmpb - tmpa;
-
-      for (log_a = 0; ISDIGIT (tmpa); ++log_a)
-	do
-	  tmpa = *++a;
-	while (tmpa == thousands_sep);
-
-      for (log_b = 0; ISDIGIT (tmpb); ++log_b)
-	do
-	  tmpb = *++b;
-	while (tmpb == thousands_sep);
-
-      if (log_a != log_b)
-	return log_a < log_b ? 1 : -1;
-
-      if (!log_a)
-	return 0;
-
-      return tmp;
-    }
-  else if (tmpb == NEGATION_SIGN)
-    {
-      do
-	tmpb = *++b;
-      while (tmpb == NUMERIC_ZERO || tmpb == thousands_sep);
-      if (tmpb == decimal_point)
-	do
-	  tmpb = *++b;
-	while (tmpb == NUMERIC_ZERO);
-      if (ISDIGIT (tmpb))
-	return 1;
-      while (tmpa == NUMERIC_ZERO || tmpa == thousands_sep)
-	tmpa = *++a;
-      if (tmpa == decimal_point)
-	do
-	  tmpa = *++a;
-	while (tmpa == NUMERIC_ZERO);
-      return ISDIGIT (tmpa);
-    }
-  else
-    {
-      while (tmpa == NUMERIC_ZERO || tmpa == thousands_sep)
-	tmpa = *++a;
-      while (tmpb == NUMERIC_ZERO || tmpb == thousands_sep)
-	tmpb = *++b;
-
-      while (tmpa == tmpb && ISDIGIT (tmpa))
-	{
-	  do
-	    tmpa = *++a;
-	  while (tmpa == thousands_sep);
-	  do
-	    tmpb = *++b;
-	  while (tmpb == thousands_sep);
-	}
-
-      if ((tmpa == decimal_point && !ISDIGIT (tmpb))
-	  || (tmpb == decimal_point && !ISDIGIT (tmpa)))
-	return fraccompare (a, b);
-
-      tmp = tmpa - tmpb;
-
-      for (log_a = 0; ISDIGIT (tmpa); ++log_a)
-	do
-	  tmpa = *++a;
-	while (tmpa == thousands_sep);
-
-      for (log_b = 0; ISDIGIT (tmpb); ++log_b)
-	do
-	  tmpb = *++b;
-	while (tmpb == thousands_sep);
-
-      if (log_a != log_b)
-	return log_a < log_b ? -1 : 1;
-
-      if (!log_a)
-	return 0;
-
-      return tmp;
-    }
+  return strnumcmp (a, b, decimal_point, thousands_sep);
 }
 
 static int
@@ -1341,17 +1162,17 @@ keycompare (const struct line *a, const struct line *b)
 
   /* For the first iteration only, the key positions have been
      precomputed for us. */
-  register char *texta = a->keybeg;
-  register char *textb = b->keybeg;
-  register char *lima = a->keylim;
-  register char *limb = b->keylim;
+  char *texta = a->keybeg;
+  char *textb = b->keybeg;
+  char *lima = a->keylim;
+  char *limb = b->keylim;
 
   int diff;
 
   for (;;)
     {
-      register char const *translate = key->translate;
-      register bool const *ignore = key->ignore;
+      char const *translate = key->translate;
+      bool const *ignore = key->ignore;
 
       /* Find the lengths. */
       size_t lena = lima <= texta ? 0 : lima - texta;
@@ -1509,7 +1330,7 @@ keycompare (const struct line *a, const struct line *b)
    depending on whether A compares less than, equal to, or greater than B. */
 
 static int
-compare (register const struct line *a, register const struct line *b)
+compare (const struct line *a, const struct line *b)
 {
   int diff;
   size_t alen, blen;
@@ -1620,8 +1441,7 @@ check (char const *file_name)
 
   xfclose (fp, file_name);
   free (buf.buf);
-  if (temp.text)
-    free (temp.text);
+  free (temp.text);
   return ordered;
 }
 
@@ -1706,7 +1526,7 @@ mergefps (char **files, size_t ntemps, size_t nfiles,
 	{
 	  if (savedline && compare (savedline, smallest))
 	    {
-	      savedline = 0;
+	      savedline = NULL;
 	      write_bytes (saved.text, saved.length, ofp, output_file);
 	    }
 	  if (!savedline)
@@ -1778,18 +1598,31 @@ mergefps (char **files, size_t ntemps, size_t nfiles,
 	}
 
       /* The new line just read in may be larger than other lines
-	 already in core; push it back in the queue until we encounter
-	 a line larger than it. */
-      for (i = 1; i < nfiles; ++i)
-	{
-	  int cmp = compare (cur[ord[0]], cur[ord[i]]);
-	  if (cmp < 0 || (cmp == 0 && ord[0] < ord[i]))
-	    break;
-	}
-      t = ord[0];
-      for (j = 1; j < i; ++j)
-	ord[j - 1] = ord[j];
-      ord[i - 1] = t;
+	 already in main memory; push it back in the queue until we
+	 encounter a line larger than it.  Optimize for the common
+	 case where the new line is smallest.  */
+      {
+	size_t lo = 1;
+	size_t hi = nfiles;
+	size_t probe = lo;
+	size_t ord0 = ord[0];
+	size_t count_of_smaller_lines;
+
+	while (lo < hi)
+	  {
+	    int cmp = compare (cur[ord0], cur[ord[probe]]);
+	    if (cmp < 0 || (cmp == 0 && ord0 < ord[probe]))
+	      hi = probe;
+	    else
+	      lo = probe + 1;
+	    probe = (lo + hi) / 2;
+	  }
+
+	count_of_smaller_lines = lo - 1;
+	for (j = 0; j < count_of_smaller_lines; j++)
+	  ord[j] = ord[j + 1];
+	ord[count_of_smaller_lines] = ord0;
+      }
     }
 
   if (unique && savedline)
@@ -1887,7 +1720,10 @@ sortlines_temp (struct line *lines, size_t nlines, struct line *temp)
 {
   if (nlines == 2)
     {
-      bool swap = (0 < compare (&lines[-1], &lines[-2]));
+      /* Declare `swap' as int, not bool, to work around a bug
+	 <http://lists.gnu.org/archive/html/bug-coreutils/2005-10/msg00086.html>
+	 in the IBM xlc 6.0.0.0 compiler in 64-bit mode.  */
+      int swap = (0 < compare (&lines[-1], &lines[-2]));
       temp[-1] = lines[-1 - swap];
       temp[-2] = lines[-2 + swap];
     }
@@ -1934,11 +1770,11 @@ avoid_trashing_input (char **files, size_t ntemps, size_t nfiles,
 
   for (i = ntemps; i < nfiles; i++)
     {
-      bool standard_input = STREQ (files[i], "-");
+      bool is_stdin = STREQ (files[i], "-");
       bool same;
       struct stat instat;
 
-      if (outfile && STREQ (outfile, files[i]) && ! standard_input)
+      if (outfile && STREQ (outfile, files[i]) && !is_stdin)
 	same = true;
       else
 	{
@@ -1952,7 +1788,7 @@ avoid_trashing_input (char **files, size_t ntemps, size_t nfiles,
 	      got_outstat = true;
 	    }
 
-	  same = (((standard_input
+	  same = (((is_stdin
 		    ? fstat (STDIN_FILENO, &instat)
 		    : stat (files[i], &instat))
 		   == 0)
@@ -2151,8 +1987,8 @@ static void badfieldspec (char const *, char const *)
 static void
 badfieldspec (char const *spec, char const *msgid)
 {
-  error (SORT_FAILURE, 0, _("%s: invalid field specification `%s'"),
-	 _(msgid), spec);
+  error (SORT_FAILURE, 0, _("%s: invalid field specification %s"),
+	 _(msgid), quote (spec));
   abort ();
 }
 
@@ -2184,8 +2020,8 @@ parse_field_count (char const *string, size_t *val, char const *msgid)
 
     case LONGINT_INVALID:
       if (msgid)
-	error (SORT_FAILURE, 0, _("%s: invalid count at start of `%s'"),
-	       _(msgid), string);
+	error (SORT_FAILURE, 0, _("%s: invalid count at start of %s"),
+	       _(msgid), quote (string));
       return NULL;
     }
 
@@ -2197,9 +2033,8 @@ parse_field_count (char const *string, size_t *val, char const *msgid)
 static void
 sighandler (int sig)
 {
-#ifndef SA_NOCLDSTOP
-  signal (sig, SIG_IGN);
-#endif
+  if (! SA_NOCLDSTOP)
+    signal (sig, SIG_IGN);
 
   cleanup ();
 
@@ -2213,8 +2048,7 @@ sighandler (int sig)
    BLANKTYPE is the kind of blanks that 'b' should skip. */
 
 static char *
-set_ordering (register const char *s, struct keyfield *key,
-	      enum blanktype blanktype)
+set_ordering (const char *s, struct keyfield *key, enum blanktype blanktype)
 {
   while (*s)
     {
@@ -2278,9 +2112,6 @@ main (int argc, char **argv)
   size_t nfiles = 0;
   bool posixly_correct = (getenv ("POSIXLY_CORRECT") != NULL);
   bool obsolete_usage = (posix2_version () < 200112);
-  char const *short_options = (obsolete_usage
-			       ? COMMON_SHORT_OPTIONS "y::"
-			       : COMMON_SHORT_OPTIONS "y:");
   char *minus = "-", **files;
   char const *outfile = NULL;
 
@@ -2307,14 +2138,14 @@ main (int argc, char **argv)
     /* If the locale doesn't define a decimal point, or if the decimal
        point is multibyte, use the C locale's decimal point.  FIXME:
        add support for multibyte decimal points.  */
-    decimal_point = locale->decimal_point[0];
+    decimal_point = to_uchar (locale->decimal_point[0]);
     if (! decimal_point || locale->decimal_point[1])
       decimal_point = '.';
 
     /* FIXME: add support for multibyte thousands separators.  */
-    thousands_sep = *locale->thousands_sep;
+    thousands_sep = to_uchar (*locale->thousands_sep);
     if (! thousands_sep || locale->thousands_sep[1])
-      thousands_sep = CHAR_MAX + 1;
+      thousands_sep = -1;
   }
 
   have_read_stdin = false;
@@ -2325,7 +2156,7 @@ main (int argc, char **argv)
     static int const sig[] = { SIGHUP, SIGINT, SIGPIPE, SIGTERM };
     enum { nsigs = sizeof sig / sizeof sig[0] };
 
-#ifdef SA_NOCLDSTOP
+#if SA_NOCLDSTOP
     struct sigaction act;
 
     sigemptyset (&caught_signals);
@@ -2346,7 +2177,10 @@ main (int argc, char **argv)
 #else
     for (i = 0; i < nsigs; i++)
       if (signal (sig[i], SIG_IGN) != SIG_IGN)
-	signal (sig[i], sighandler);
+	{
+	  signal (sig[i], sighandler);
+	  siginterrupt (sig[i], 1);
+	}
 #endif
   }
 
@@ -2528,8 +2362,8 @@ main (int argc, char **argv)
 		       "multi-character tab" instead of "multibyte tab", so
 		       that the diagnostic's wording does not need to be
 		       changed once multibyte characters are supported.  */
-		    error (SORT_FAILURE, 0, _("multi-character tab `%s'"),
-			   optarg);
+		    error (SORT_FAILURE, 0, _("multi-character tab %s"),
+			   quote (optarg));
 		  }
 	      }
 	    if (tab != TAB_DEFAULT && tab != newtab)
@@ -2557,12 +2391,12 @@ main (int argc, char **argv)
 	     emulate Solaris 8 and 9 "sort -y 100" which ignores the "100",
 	     and which in general ignores the argument after "-y" if it
 	     consists entirely of digits (it can even be empty).  */
-	  if (!optarg && optind != argc)
+	  if (optarg == argv[optind - 1])
 	    {
 	      char const *p;
-	      for (p = argv[optind]; ISDIGIT (*p); p++)
+	      for (p = optarg; ISDIGIT (*p); p++)
 		continue;
-	      optind += !*p;
+	      optind -= (*p != '\0');
 	    }
 	  break;
 

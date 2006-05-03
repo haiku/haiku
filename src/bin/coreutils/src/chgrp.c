@@ -1,5 +1,5 @@
 /* chgrp -- change group ownership of files
-   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>. */
 
@@ -37,10 +37,6 @@
 
 #define AUTHORS "David MacKenzie", "Jim Meyering"
 
-#ifndef _POSIX_VERSION
-struct group *getgrnam ();
-#endif
-
 #if ! HAVE_ENDGRENT
 # define endgrent() ((void) 0)
 #endif
@@ -62,17 +58,17 @@ enum
 
 static struct option const long_options[] =
 {
-  {"recursive", no_argument, 0, 'R'},
-  {"changes", no_argument, 0, 'c'},
-  {"dereference", no_argument, 0, DEREFERENCE_OPTION},
-  {"no-dereference", no_argument, 0, 'h'},
-  {"quiet", no_argument, 0, 'f'},
-  {"silent", no_argument, 0, 'f'},
-  {"reference", required_argument, 0, REFERENCE_FILE_OPTION},
-  {"verbose", no_argument, 0, 'v'},
+  {"recursive", no_argument, NULL, 'R'},
+  {"changes", no_argument, NULL, 'c'},
+  {"dereference", no_argument, NULL, DEREFERENCE_OPTION},
+  {"no-dereference", no_argument, NULL, 'h'},
+  {"quiet", no_argument, NULL, 'f'},
+  {"silent", no_argument, NULL, 'f'},
+  {"reference", required_argument, NULL, REFERENCE_FILE_OPTION},
+  {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 /* Return the group ID of NAME, or -1 if no name was specified.  */
@@ -153,6 +149,13 @@ one takes effect.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      printf (_("\
+\n\
+Examples:\n\
+  %s staff /u      Change the group of /u to \"staff\".\n\
+  %s -hR staff /u  Change the group of /u and subfiles to \"staff\".\n\
+"),
+	      program_name, program_name);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);

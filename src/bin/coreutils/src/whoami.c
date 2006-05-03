@@ -1,6 +1,6 @@
 /* whoami -- print effective userid
 
-   Copyright (C) 89,90, 1991-1997, 1999-2002, 2004 Free Software
+   Copyright (C) 89,90, 1991-1997, 1999-2002, 2004, 2005 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Equivalent to `id -un'. */
 /* Written by Richard Mlynarik. */
@@ -49,7 +49,7 @@ usage (int status)
     {
       printf (_("Usage: %s [OPTION]...\n"), program_name);
       fputs (_("\
-Print the user name associated with the current effective user id.\n\
+Print the user name associated with the current effective user ID.\n\
 Same as id -un.\n\
 \n\
 "), stdout);
@@ -63,8 +63,8 @@ Same as id -un.\n\
 int
 main (int argc, char **argv)
 {
-  register struct passwd *pw;
-  register uid_t uid;
+  struct passwd *pw;
+  uid_t uid;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -92,7 +92,7 @@ main (int argc, char **argv)
       puts (pw->pw_name);
       exit (EXIT_SUCCESS);
     }
-  fprintf (stderr, _("%s: cannot find username for UID %lu\n"),
+  fprintf (stderr, _("%s: cannot find name for user ID %lu\n"),
 	   program_name, (unsigned long int) uid);
   exit (EXIT_FAILURE);
 }

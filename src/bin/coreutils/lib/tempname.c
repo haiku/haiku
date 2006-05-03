@@ -1,7 +1,7 @@
 /* tempname.c - generate the name of a temporary file.
 
    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   2000, 2001, 2002, 2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -47,9 +47,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_FCNTL_H || _LIBC
-# include <fcntl.h>
-#endif
+#include <fcntl.h>
 
 #if HAVE_SYS_TIME_H || _LIBC
 # include <sys/time.h>
@@ -62,47 +60,22 @@
 # include <inttypes.h>
 #endif
 
-#if HAVE_UNISTD_H || _LIBC
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include <sys/stat.h>
-#if STAT_MACROS_BROKEN
-# undef S_ISDIR
-#endif
-#if !defined S_ISDIR && defined S_IFDIR
-# define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
-#endif
-#if !S_IRUSR && S_IREAD
-# define S_IRUSR S_IREAD
-#endif
-#if !S_IRUSR
-# define S_IRUSR 00400
-#endif
-#if !S_IWUSR && S_IWRITE
-# define S_IWUSR S_IWRITE
-#endif
-#if !S_IWUSR
-# define S_IWUSR 00200
-#endif
-#if !S_IXUSR && S_IEXEC
-# define S_IXUSR S_IEXEC
-#endif
-#if !S_IXUSR
-# define S_IXUSR 00100
-#endif
 
 #if _LIBC
 # define struct_stat64 struct stat64
 #else
+# include "stat-macros.h"
 # define struct_stat64 struct stat
 # define __getpid getpid
 # define __gettimeofday gettimeofday
 # define __mkdir mkdir
 # define __open open
 # define __open64 open
-# define __lxstat64(version, path, buf) lstat (path, buf)
-# define __xstat64(version, path, buf) stat (path, buf)
+# define __lxstat64(version, file, buf) lstat (file, buf)
+# define __xstat64(version, file, buf) stat (file, buf)
 #endif
 
 #if ! (HAVE___SECURE_GETENV || _LIBC)
@@ -208,7 +181,7 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
   return 0;
 }
 
-/* These are the characters used in temporary filenames.  */
+/* These are the characters used in temporary file names.  */
 static const char letters[] =
 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 

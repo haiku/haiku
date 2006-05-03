@@ -1,5 +1,5 @@
 /* id -- print real and effective UIDs and GIDs
-   Copyright (C) 1989-2004 Free Software Foundation, Inc.
+   Copyright (C) 1989-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Arnold Robbins.
    Major rewrite by David MacKenzie, djm@gnu.ai.mit.edu. */
@@ -34,15 +34,6 @@
 #define PROGRAM_NAME "id"
 
 #define AUTHORS "Arnold Robbins", "David MacKenzie"
-
-#ifndef _POSIX_VERSION
-struct passwd *getpwuid ();
-struct group *getgrgid ();
-uid_t getuid ();
-gid_t getgid ();
-uid_t geteuid ();
-gid_t getegid ();
-#endif /* not _POSIX_VERSION */
 
 int getugroups ();
 
@@ -211,7 +202,8 @@ print_user (uid_t uid)
       pwd = getpwuid (uid);
       if (pwd == NULL)
 	{
-	  error (0, 0, _("cannot find name for user ID %u"), uid);
+	  error (0, 0, _("cannot find name for user ID %lu"),
+		 (unsigned long int) uid);
 	  ok = false;
 	}
     }
@@ -234,7 +226,8 @@ print_group (gid_t gid)
       grp = getgrgid (gid);
       if (grp == NULL)
 	{
-	  error (0, 0, _("cannot find name for group ID %u"), gid);
+	  error (0, 0, _("cannot find name for group ID %lu"),
+		 (unsigned long int) gid);
 	  ok = false;
 	}
     }
@@ -311,7 +304,7 @@ print_group_list (const char *username)
   {
     int n_groups;
     GETGROUPS_T *groups;
-    register int i;
+    int i;
 
     if (! xgetgroups (username, (pwd ? pwd->pw_gid : (gid_t) -1),
 		      &n_groups, &groups))
@@ -369,7 +362,7 @@ print_full_info (const char *username)
   {
     int n_groups;
     GETGROUPS_T *groups;
-    register int i;
+    int i;
 
     if (! xgetgroups (username, (pwd ? pwd->pw_gid : (gid_t) -1),
 		      &n_groups, &groups))

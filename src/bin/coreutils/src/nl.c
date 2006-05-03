@@ -1,5 +1,5 @@
 /* nl -- number lines of files
-   Copyright (C) 89, 92, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 92, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Scott Bartram (nancy!scott@uunet.uu.net)
    Revised by David MacKenzie (djm@gnu.ai.mit.edu) */
@@ -247,7 +247,7 @@ build_type_arg (char **typep, struct re_pattern_buffer *regexp)
       *typep = optarg++;
       optlen = strlen (optarg);
       regexp->allocated = optlen * 2;
-      regexp->buffer = xmalloc (regexp->allocated);
+      regexp->buffer = xnmalloc (optlen, 2);
       regexp->translate = NULL;
       regexp->fastmap = xmalloc (256);
       regexp->fastmap_accurate = 0;
@@ -342,12 +342,20 @@ proc_text (void)
       fputs (print_no_line_fmt, stdout);
       break;
     case 'p':
-      if (re_search (current_regex, line_buf.buffer, line_buf.length - 1,
-		     0, line_buf.length - 1, (struct re_registers *) 0) < 0)
-	fputs (print_no_line_fmt, stdout);
-      else
-	print_lineno ();
-      break;
+      switch (re_search (current_regex, line_buf.buffer, line_buf.length - 1,
+			 0, line_buf.length - 1, (struct re_registers *) 0))
+	{
+	case -2:
+	  error (EXIT_FAILURE, errno, _("error in regular expression search"));
+
+	case -1:
+	  fputs (print_no_line_fmt, stdout);
+	  break;
+
+	default:
+	  print_lineno ();
+	  break;
+	}
     }
   fwrite (line_buf.buffer, sizeof (char), line_buf.length, stdout);
 }

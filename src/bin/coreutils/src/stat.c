@@ -1,5 +1,5 @@
 /* stat.c -- display file or file system status
-   Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
    Written by Michael Meskes.  */
 
@@ -52,6 +52,7 @@
 #include "inttostr.h"
 #include "quote.h"
 #include "quotearg.h"
+#include "stat-time.h"
 #include "strftime.h"
 #include "xreadlink.h"
 
@@ -65,6 +66,7 @@
 # endif
 # if STAT_STATVFS
 #  define STATFS statvfs
+#  define STATFS_FRSIZE(S) ((S)->f_frsize)
 # endif
 #else
 # define STRUCT_STATVFS struct statfs
@@ -76,6 +78,7 @@
 
 #ifndef STATFS
 # define STATFS statfs
+# define STATFS_FRSIZE(S) 0
 #endif
 
 #ifndef SB_F_NAMEMAX
@@ -93,23 +96,42 @@
 # endif
 #endif
 
+/* FIXME: these are used by printf.c, too */
+#define isodigit(c) ('0' <= (c) && (c) <= '7')
+#define octtobin(c) ((c) - '0')
+#define hextobin(c) ((c) >= 'a' && (c) <= 'f' ? (c) - 'a' + 10 : \
+		     (c) >= 'A' && (c) <= 'F' ? (c) - 'A' + 10 : (c) - '0')
+
 #define PROGRAM_NAME "stat"
 
 #define AUTHORS "Michael Meskes"
 
+enum
+{
+  PRINTF_OPTION = CHAR_MAX + 1,
+};
+
 static struct option const long_options[] = {
-  {"link", no_argument, 0, 'l'}, /* deprecated.  FIXME: remove in 2003 */
-  {"dereference", no_argument, 0, 'L'},
-  {"file-system", no_argument, 0, 'f'},
-  {"filesystem", no_argument, 0, 'f'}, /* obsolete and undocumented alias */
-  {"format", required_argument, 0, 'c'},
-  {"terse", no_argument, 0, 't'},
+  {"dereference", no_argument, NULL, 'L'},
+  {"file-system", no_argument, NULL, 'f'},
+  {"filesystem", no_argument, NULL, 'f'}, /* obsolete and undocumented alias */
+  {"format", required_argument, NULL, 'c'},
+  {"printf", required_argument, NULL, PRINTF_OPTION},
+  {"terse", no_argument, NULL, 't'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
 };
 
 char *program_name;
+
+/* Whether to interpret backslash-escape sequences.
+   True for --printf=FMT, not for --format=FMT (-c).  */
+static bool interpret_backslash_escapes;
+
+/* The trailing delimiter string:
+   "" for --printf=FMT, "\n" for --format=FMT (-c).  */
+static char const *trailing_delim = "";
 
 /* Return the type of the specified file system.
    Some systems have statfvs.f_basetype[FSTYPSZ]. (AIX, HP-UX, and Solaris)
@@ -140,6 +162,10 @@ human_fstype (STRUCT_STATVFS const *statfsbuf)
       return "ext2";
     case S_MAGIC_EXT2: /* 0xEF53 */
       return "ext2/ext3";
+    case S_MAGIC_JFS: /* 0x3153464a */
+      return "jfs";
+    case S_MAGIC_XFS: /* 0x58465342 */
+      return "xfs";
     case S_MAGIC_HPFS: /* 0xF995E849 */
       return "hpfs";
     case S_MAGIC_ISOFS: /* 0x9660 */
@@ -274,24 +300,37 @@ human_access (struct stat const *statbuf)
 }
 
 static char *
-human_time (time_t t, int t_ns)
+human_time (struct timespec t)
 {
   static char str[MAX (INT_BUFSIZE_BOUND (intmax_t),
 		       (INT_STRLEN_BOUND (int) /* YYYY */
 			+ 1 /* because YYYY might equal INT_MAX + 1900 */
 			+ sizeof "-MM-DD HH:MM:SS.NNNNNNNNN +ZZZZ"))];
-  struct tm const *tm = localtime (&t);
+  struct tm const *tm = localtime (&t.tv_sec);
   if (tm == NULL)
     return (TYPE_SIGNED (time_t)
-	    ? imaxtostr (t, str)
-	    : umaxtostr (t, str));
-  nstrftime (str, sizeof str, "%Y-%m-%d %H:%M:%S.%N %z", tm, 0, t_ns);
+	    ? imaxtostr (t.tv_sec, str)
+	    : umaxtostr (t.tv_sec, str));
+  nstrftime (str, sizeof str, "%Y-%m-%d %H:%M:%S.%N %z", tm, 0, t.tv_nsec);
   return str;
+}
+
+/* Like strcat, but don't return anything and do check that
+   DEST_BUFSIZE is at least a long as strlen (DEST) + strlen (SRC) + 1.
+   The signature is deliberately different from that of strncat.  */
+static void
+xstrcat (char *dest, size_t dest_bufsize, char const *src)
+{
+  size_t dest_len = strlen (dest);
+  size_t src_len = strlen (src);
+  if (dest_bufsize < dest_len + src_len + 1)
+    abort ();
+  memcpy (dest + dest_len, src, src_len + 1);
 }
 
 /* print statfs info */
 static void
-print_statfs (char *pformat, char m, char const *filename,
+print_statfs (char *pformat, size_t buf_len, char m, char const *filename,
 	      void const *data)
 {
   STRUCT_STATVFS const *statfsbuf = data;
@@ -299,28 +338,28 @@ print_statfs (char *pformat, char m, char const *filename,
   switch (m)
     {
     case 'n':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       printf (pformat, filename);
       break;
 
     case 'i':
 #if HAVE_STRUCT_STATXFS_F_FSID___VAL
-      strcat (pformat, "x %-8x");
+      xstrcat (pformat, buf_len, "x %-8x");
       printf (pformat, statfsbuf->f_fsid.__val[0], /* u_long */
 	      statfsbuf->f_fsid.__val[1]);
 #else
-      strcat (pformat, "Lx");
+      xstrcat (pformat, buf_len, "Lx");
       printf (pformat, statfsbuf->f_fsid);
 #endif
       break;
 
     case 'l':
-      strcat (pformat, NAMEMAX_FORMAT);
+      xstrcat (pformat, buf_len, NAMEMAX_FORMAT);
       printf (pformat, SB_F_NAMEMAX (statfsbuf));
       break;
     case 't':
 #if HAVE_STRUCT_STATXFS_F_TYPE
-      strcat (pformat, "lx");
+      xstrcat (pformat, buf_len, "lx");
       printf (pformat,
 	      (unsigned long int) (statfsbuf->f_type));  /* no equiv. */
 #else
@@ -328,36 +367,45 @@ print_statfs (char *pformat, char m, char const *filename,
 #endif
       break;
     case 'T':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       printf (pformat, human_fstype (statfsbuf));
       break;
     case 'b':
-      strcat (pformat, PRIdMAX);
+      xstrcat (pformat, buf_len, PRIdMAX);
       printf (pformat, (intmax_t) (statfsbuf->f_blocks));
       break;
     case 'f':
-      strcat (pformat, PRIdMAX);
+      xstrcat (pformat, buf_len, PRIdMAX);
       printf (pformat, (intmax_t) (statfsbuf->f_bfree));
       break;
     case 'a':
-      strcat (pformat, PRIdMAX);
+      xstrcat (pformat, buf_len, PRIdMAX);
       printf (pformat, (intmax_t) (statfsbuf->f_bavail));
       break;
     case 's':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) (statfsbuf->f_bsize));
       break;
+    case 'S':
+      {
+	unsigned long int frsize = STATFS_FRSIZE (statfsbuf);
+	if (! frsize)
+	  frsize = statfsbuf->f_bsize;
+	xstrcat (pformat, buf_len, "lu");
+	printf (pformat, frsize);
+      }
+      break;
     case 'c':
-      strcat (pformat, PRIdMAX);
+      xstrcat (pformat, buf_len, PRIdMAX);
       printf (pformat, (intmax_t) (statfsbuf->f_files));
       break;
     case 'd':
-      strcat (pformat, PRIdMAX);
+      xstrcat (pformat, buf_len, PRIdMAX);
       printf (pformat, (intmax_t) (statfsbuf->f_ffree));
       break;
 
     default:
-      strcat (pformat, "c");
+      xstrcat (pformat, buf_len, "c");
       printf (pformat, m);
       break;
     }
@@ -365,7 +413,8 @@ print_statfs (char *pformat, char m, char const *filename,
 
 /* print stat info */
 static void
-print_stat (char *pformat, char m, char const *filename, void const *data)
+print_stat (char *pformat, size_t buf_len, char m,
+	    char const *filename, void const *data)
 {
   struct stat *statbuf = (struct stat *) data;
   struct passwd *pw_ent;
@@ -374,11 +423,11 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
   switch (m)
     {
     case 'n':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       printf (pformat, filename);
       break;
     case 'N':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       if (S_ISLNK (statbuf->st_mode))
 	{
 	  char *linkname = xreadlink (filename, statbuf->st_size);
@@ -399,166 +448,244 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
 	}
       break;
     case 'd':
-      strcat (pformat, PRIuMAX);
+      xstrcat (pformat, buf_len, PRIuMAX);
       printf (pformat, (uintmax_t) statbuf->st_dev);
       break;
     case 'D':
-      strcat (pformat, PRIxMAX);
+      xstrcat (pformat, buf_len, PRIxMAX);
       printf (pformat, (uintmax_t) statbuf->st_dev);
       break;
     case 'i':
-      strcat (pformat, PRIuMAX);
+      xstrcat (pformat, buf_len, PRIuMAX);
       printf (pformat, (uintmax_t) statbuf->st_ino);
       break;
     case 'a':
-      strcat (pformat, "lo");
+      xstrcat (pformat, buf_len, "lo");
       printf (pformat,
 	      (unsigned long int) (statbuf->st_mode & CHMOD_MODE_BITS));
       break;
     case 'A':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       printf (pformat, human_access (statbuf));
       break;
     case 'f':
-      strcat (pformat, "lx");
+      xstrcat (pformat, buf_len, "lx");
       printf (pformat, (unsigned long int) statbuf->st_mode);
       break;
     case 'F':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       printf (pformat, file_type (statbuf));
       break;
     case 'h':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) statbuf->st_nlink);
       break;
     case 'u':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) statbuf->st_uid);
       break;
     case 'U':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       setpwent ();
       pw_ent = getpwuid (statbuf->st_uid);
       printf (pformat, (pw_ent != 0L) ? pw_ent->pw_name : "UNKNOWN");
       break;
     case 'g':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) statbuf->st_gid);
       break;
     case 'G':
-      strcat (pformat, "s");
+      xstrcat (pformat, buf_len, "s");
       setgrent ();
       gw_ent = getgrgid (statbuf->st_gid);
       printf (pformat, (gw_ent != 0L) ? gw_ent->gr_name : "UNKNOWN");
       break;
     case 't':
-      strcat (pformat, "lx");
+      xstrcat (pformat, buf_len, "lx");
       printf (pformat, (unsigned long int) major (statbuf->st_rdev));
       break;
     case 'T':
-      strcat (pformat, "lx");
+      xstrcat (pformat, buf_len, "lx");
       printf (pformat, (unsigned long int) minor (statbuf->st_rdev));
       break;
     case 's':
-      strcat (pformat, PRIuMAX);
+      xstrcat (pformat, buf_len, PRIuMAX);
       printf (pformat, (uintmax_t) (statbuf->st_size));
       break;
     case 'B':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) ST_NBLOCKSIZE);
       break;
     case 'b':
-      strcat (pformat, PRIuMAX);
+      xstrcat (pformat, buf_len, PRIuMAX);
       printf (pformat, (uintmax_t) ST_NBLOCKS (*statbuf));
       break;
     case 'o':
-      strcat (pformat, "lu");
+      xstrcat (pformat, buf_len, "lu");
       printf (pformat, (unsigned long int) statbuf->st_blksize);
       break;
     case 'x':
-      strcat (pformat, "s");
-      printf (pformat, human_time (statbuf->st_atime,
-				   TIMESPEC_NS (statbuf->st_atim)));
+      xstrcat (pformat, buf_len, "s");
+      printf (pformat, human_time (get_stat_atime (statbuf)));
       break;
     case 'X':
-      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
       printf (pformat, (unsigned long int) statbuf->st_atime);
       break;
     case 'y':
-      strcat (pformat, "s");
-      printf (pformat, human_time (statbuf->st_mtime,
-				   TIMESPEC_NS (statbuf->st_mtim)));
+      xstrcat (pformat, buf_len, "s");
+      printf (pformat, human_time (get_stat_mtime (statbuf)));
       break;
     case 'Y':
-      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
       printf (pformat, (unsigned long int) statbuf->st_mtime);
       break;
     case 'z':
-      strcat (pformat, "s");
-      printf (pformat, human_time (statbuf->st_ctime,
-				   TIMESPEC_NS (statbuf->st_ctim)));
+      xstrcat (pformat, buf_len, "s");
+      printf (pformat, human_time (get_stat_ctime (statbuf)));
       break;
     case 'Z':
-      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      xstrcat (pformat, buf_len, TYPE_SIGNED (time_t) ? "ld" : "lu");
       printf (pformat, (unsigned long int) statbuf->st_ctime);
       break;
     default:
-      strcat (pformat, "c");
+      xstrcat (pformat, buf_len, "c");
       printf (pformat, m);
       break;
     }
 }
 
+/* Output a single-character \ escape.  */
+
 static void
-print_it (char const *masterformat, char const *filename,
-	  void (*print_func) (char *, char, char const *, void const *),
+print_esc_char (char c)
+{
+  switch (c)
+    {
+    case 'a':			/* Alert. */
+      c ='\a';
+      break;
+    case 'b':			/* Backspace. */
+      c ='\b';
+      break;
+    case 'f':			/* Form feed. */
+      c ='\f';
+      break;
+    case 'n':			/* New line. */
+      c ='\n';
+      break;
+    case 'r':			/* Carriage return. */
+      c ='\r';
+      break;
+    case 't':			/* Horizontal tab. */
+      c ='\t';
+      break;
+    case 'v':			/* Vertical tab. */
+      c ='\v';
+      break;
+    case '"':
+    case '\\':
+      break;
+    default:
+      error (0, 0, _("warning: unrecognized escape `\\%c'"), c);
+      break;
+    }
+  putchar (c);
+}
+
+static void
+print_it (char const *format, char const *filename,
+	  void (*print_func) (char *, size_t, char, char const *, void const *),
 	  void const *data)
 {
-  char *b;
-
-  /* create a working copy of the format string */
-  char *format = xstrdup (masterformat);
-
-  char *dest = xmalloc (strlen (format) + 1);
-
-  b = format;
-  while (b)
+  /* Add 2 to accommodate our conversion of the stat `%s' format string
+     to the longer printf `%llu' one.  */
+  size_t n_alloc = strlen (format) + 2 + 1;
+  char *dest = xmalloc (n_alloc);
+  char const *b;
+  for (b = format; *b; b++)
     {
-      char *p = strchr (b, '%');
-      if (p != NULL)
+      switch (*b)
 	{
-	  size_t len;
-	  *p++ = '\0';
-	  fputs (b, stdout);
+	case '%':
+	  {
+	    size_t len = strspn (b + 1, "#-+.I 0123456789");
+	    char const *fmt_char = b + 1 + len;
+	    memcpy (dest, b, 1 + len);
+	    dest[1 + len] = 0;
 
-	  len = strspn (p, "#-+.I 0123456789");
-	  dest[0] = '%';
-	  memcpy (dest + 1, p, len);
-	  dest[1 + len] = 0;
-	  p += len;
+	    b = fmt_char;
+	    switch (*fmt_char)
+	      {
+	      case '\0':
+		--b;
+		/* fall through */
+	      case '%':
+		if (0 < len)
+		  error (EXIT_FAILURE, 0, _("%s%s: invalid directive"),
+			 quotearg_colon (dest), *fmt_char ? "%" : "");
+		putchar ('%');
+		break;
+	      default:
+		print_func (dest, n_alloc, *fmt_char, filename, data);
+		break;
+	      }
+	    break;
+	  }
 
-	  b = p + 1;
-	  switch (*p)
+	case '\\':
+	  if ( ! interpret_backslash_escapes)
 	    {
-	    case '\0':
-	      b = NULL;
-	      /* fall through */
-	    case '%':
-	      putchar ('%');
-	      break;
-	    default:
-	      print_func (dest, *p, filename, data);
+	      putchar ('\\');
 	      break;
 	    }
-	}
-      else
-	{
-	  fputs (b, stdout);
-	  b = NULL;
+	  ++b;
+	  if (isodigit (*b))
+	    {
+	      int esc_value = octtobin (*b);
+	      int esc_length = 1;	/* number of octal digits */
+	      for (++b; esc_length < 3 && isodigit (*b);
+		   ++esc_length, ++b)
+		{
+		  esc_value = esc_value * 8 + octtobin (*b);
+		}
+	      putchar (esc_value);
+	      --b;
+	    }
+	  else if (*b == 'x' && ISXDIGIT (b[1]))
+	    {
+	      int esc_value = hextobin (b[1]);	/* Value of \xhh escape. */
+	      /* A hexadecimal \xhh escape sequence must have
+		 1 or 2 hex. digits.  */
+	      ++b;
+	      if (ISXDIGIT (b[1]))
+		{
+		  ++b;
+		  esc_value = esc_value * 16 + hextobin (*b);
+		}
+	      putchar (esc_value);
+	    }
+	  else if (*b == '\0')
+	    {
+	      error (0, 0, _("warning: backslash at end of format"));
+	      putchar ('\\');
+	      /* Arrange to exit the loop.  */
+	      --b;
+	    }
+	  else
+	    {
+	      print_esc_char (*b);
+	    }
+	  break;
+
+	default:
+	  putchar (*b);
+	  break;
 	}
     }
-  free (format);
   free (dest);
+
+  fputs (trailing_delim, stdout);
 }
 
 /* Stat the file system and print what we find.  */
@@ -577,11 +704,12 @@ do_statfs (char const *filename, bool terse, char const *format)
   if (format == NULL)
     {
       format = (terse
-		? "%n %i %l %t %b %f %a %s %c %d\n"
+		? "%n %i %l %t %s %S %b %f %a %c %d\n"
 		: "  File: \"%n\"\n"
 		"    ID: %-8i Namelen: %-7l Type: %T\n"
-		"Blocks: Total: %-10b Free: %-10f Available: %-10a Size: %s\n"
-		"Inodes: Total: %-10c Free: %-10d\n");
+		"Block size: %-10s Fundamental block size: %S\n"
+		"Blocks: Total: %-10b Free: %-10f Available: %a\n"
+		"Inodes: Total: %-10c Free: %d\n");
     }
 
   print_it (format, filename, print_statfs, &statfsbuf);
@@ -648,9 +776,15 @@ usage (int status)
       fputs (_("\
 Display file or file system status.\n\
 \n\
-  -f, --file-system     display file system status instead of file status\n\
-  -c  --format=FORMAT   use the specified FORMAT instead of the default\n\
   -L, --dereference     follow links\n\
+  -f, --file-system     display file system status instead of file status\n\
+"), stdout);
+      fputs (_("\
+  -c  --format=FORMAT   use the specified FORMAT instead of the default;\n\
+                          output a newline after each use of FORMAT\n\
+      --printf=FORMAT   like --format, but interpret backslash escapes,\n\
+                          and do not output a mandatory trailing newline.\n\
+                          If you want a newline, include \\n in FORMAT.\n\
   -t, --terse           print the information in terse form\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -659,38 +793,38 @@ Display file or file system status.\n\
       fputs (_("\n\
 The valid format sequences for files (without --file-system):\n\
 \n\
-  %A   Access rights in human readable form\n\
   %a   Access rights in octal\n\
-  %B   The size in bytes of each block reported by `%b'\n\
+  %A   Access rights in human readable form\n\
   %b   Number of blocks allocated (see %B)\n\
+  %B   The size in bytes of each block reported by %b\n\
 "), stdout);
       fputs (_("\
-  %D   Device number in hex\n\
   %d   Device number in decimal\n\
-  %F   File type\n\
+  %D   Device number in hex\n\
   %f   Raw mode in hex\n\
-  %G   Group name of owner\n\
+  %F   File type\n\
   %g   Group ID of owner\n\
+  %G   Group name of owner\n\
 "), stdout);
       fputs (_("\
   %h   Number of hard links\n\
   %i   Inode number\n\
-  %N   Quoted File name with dereference if symbolic link\n\
   %n   File name\n\
-  %o   IO block size\n\
+  %N   Quoted file name with dereference if symbolic link\n\
+  %o   I/O block size\n\
   %s   Total size, in bytes\n\
-  %T   Minor device type in hex\n\
   %t   Major device type in hex\n\
+  %T   Minor device type in hex\n\
 "), stdout);
       fputs (_("\
-  %U   User name of owner\n\
   %u   User ID of owner\n\
-  %X   Time of last access as seconds since Epoch\n\
+  %U   User name of owner\n\
   %x   Time of last access\n\
-  %Y   Time of last modification as seconds since Epoch\n\
+  %X   Time of last access as seconds since Epoch\n\
   %y   Time of last modification\n\
-  %Z   Time of last change as seconds since Epoch\n\
+  %Y   Time of last modification as seconds since Epoch\n\
   %z   Time of last change\n\
+  %Z   Time of last change as seconds since Epoch\n\
 \n\
 "), stdout);
 
@@ -704,13 +838,15 @@ Valid format sequences for file systems:\n\
   %f   Free blocks in file system\n\
 "), stdout);
       fputs (_("\
-  %i   File System id in hex\n\
+  %i   File System ID in hex\n\
   %l   Maximum length of filenames\n\
   %n   File name\n\
-  %s   Optimal transfer block size\n\
-  %T   Type in human readable form\n\
+  %s   Block size (for faster transfers)\n\
+  %S   Fundamental block size (for block counts)\n\
   %t   Type in hex\n\
+  %T   Type in human readable form\n\
 "), stdout);
+      printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
@@ -735,17 +871,22 @@ main (int argc, char *argv[])
 
   atexit (close_stdout);
 
-  while ((c = getopt_long (argc, argv, "c:fLlt", long_options, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "c:fLt", long_options, NULL)) != -1)
     {
       switch (c)
 	{
-	case 'c':
+	case PRINTF_OPTION:
 	  format = optarg;
+	  interpret_backslash_escapes = true;
+	  trailing_delim = "";
 	  break;
 
-	case 'l': /* deprecated */
-	  error (0, 0, _("Warning: `-l' is deprecated; use `-L' instead"));
-	  /* fall through */
+	case 'c':
+	  format = optarg;
+	  interpret_backslash_escapes = false;
+	  trailing_delim = "\n";
+	  break;
+
 	case 'L':
 	  follow_links = true;
 	  break;

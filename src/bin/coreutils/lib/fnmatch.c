@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,1992,1993,1996,1997,1998,1999,2000,2001,2002,2003,2004
+/* Copyright (C) 1991,1992,1993,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005
 	Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -13,9 +13,9 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -319,54 +319,51 @@ fnmatch (const char *pattern, const char *string, int flags)
 	 wide characters.  */
       memset (&ps, '\0', sizeof (ps));
       patsize = mbsrtowcs (NULL, &pattern, 0, &ps) + 1;
-      if (__builtin_expect (patsize == 0, 0))
-	/* Something wrong.
-	   XXX Do we have to set `errno' to something which mbsrtows hasn't
-	   already done?  */
-	return -1;
-      assert (mbsinit (&ps));
-      strsize = mbsrtowcs (NULL, &string, 0, &ps) + 1;
-      if (__builtin_expect (strsize == 0, 0))
-	/* Something wrong.
-	   XXX Do we have to set `errno' to something which mbsrtows hasn't
-	   already done?  */
-	return -1;
-      assert (mbsinit (&ps));
-      totsize = patsize + strsize;
-      if (__builtin_expect (! (patsize <= totsize
-			       && totsize <= SIZE_MAX / sizeof (wchar_t)),
-			    0))
+      if (__builtin_expect (patsize != 0, 1))
 	{
-	  errno = ENOMEM;
-	  return -1;
-	}
-
-      /* Allocate room for the wide characters.  */
-      if (__builtin_expect (totsize < ALLOCA_LIMIT, 1))
-	wpattern = (wchar_t *) alloca (totsize * sizeof (wchar_t));
-      else
-	{
-	  wpattern = malloc (totsize * sizeof (wchar_t));
-	  if (__builtin_expect (! wpattern, 0))
+	  assert (mbsinit (&ps));
+	  strsize = mbsrtowcs (NULL, &string, 0, &ps) + 1;
+	  if (__builtin_expect (strsize != 0, 1))
 	    {
-	      errno = ENOMEM;
-	      return -1;
+	      assert (mbsinit (&ps));
+	      totsize = patsize + strsize;
+	      if (__builtin_expect (! (patsize <= totsize
+				       && totsize <= SIZE_MAX / sizeof (wchar_t)),
+				    0))
+		{
+		  errno = ENOMEM;
+		  return -1;
+		}
+
+	      /* Allocate room for the wide characters.  */
+	      if (__builtin_expect (totsize < ALLOCA_LIMIT, 1))
+		wpattern = (wchar_t *) alloca (totsize * sizeof (wchar_t));
+	      else
+		{
+		  wpattern = malloc (totsize * sizeof (wchar_t));
+		  if (__builtin_expect (! wpattern, 0))
+		    {
+		      errno = ENOMEM;
+		      return -1;
+		    }
+		}
+	      wstring = wpattern + patsize;
+
+	      /* Convert the strings into wide characters.  */
+	      mbsrtowcs (wpattern, &pattern, patsize, &ps);
+	      assert (mbsinit (&ps));
+	      mbsrtowcs (wstring, &string, strsize, &ps);
+
+	      res = internal_fnwmatch (wpattern, wstring, wstring + strsize - 1,
+				       flags & FNM_PERIOD, flags);
+
+	      if (__builtin_expect (! (totsize < ALLOCA_LIMIT), 0))
+		free (wpattern);
+	      return res;
 	    }
 	}
-      wstring = wpattern + patsize;
-
-      /* Convert the strings into wide characters.  */
-      mbsrtowcs (wpattern, &pattern, patsize, &ps);
-      assert (mbsinit (&ps));
-      mbsrtowcs (wstring, &string, strsize, &ps);
-
-      res = internal_fnwmatch (wpattern, wstring, wstring + strsize - 1,
-			       flags & FNM_PERIOD, flags);
-
-      if (__builtin_expect (! (totsize < ALLOCA_LIMIT), 0))
-	free (wpattern);
-      return res;
     }
+
 # endif /* HANDLE_MULTIBYTE */
 
   return internal_fnmatch (pattern, string, string + strlen (string),

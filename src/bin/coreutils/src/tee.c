@@ -1,5 +1,5 @@
 /* tee - read from standard input and write to standard output and files.
-   Copyright (C) 85,1990-2004 Free Software Foundation, Inc.
+   Copyright (C) 85,1990-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,18 +13,18 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Mike Parker, Richard M. Stallman, and David MacKenzie */
 
 #include <config.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <getopt.h>
 
 #include "system.h"
 #include "error.h"
+#include "stdio--.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tee"
@@ -140,7 +140,10 @@ tee (int nfiles, const char **files)
   ssize_t bytes_read;
   int i;
   bool ok = true;
-  const char *mode_string = (append ? "a" : "w");
+  char const *mode_string =
+    (O_BINARY
+     ? (append ? "ab" : "wb")
+     : (append ? "a" : "w"));
 
   descriptors = xnmalloc (nfiles + 1, sizeof *descriptors);
 
@@ -149,7 +152,10 @@ tee (int nfiles, const char **files)
   for (i = nfiles; i >= 1; i--)
     files[i] = files[i - 1];
 
-  SET_BINARY2 (0, 1);
+  if (O_BINARY && ! isatty (STDIN_FILENO))
+    freopen (NULL, "rb", stdin);
+  if (O_BINARY && ! isatty (STDOUT_FILENO))
+    freopen (NULL, "wb", stdout);
 
   /* In the array of NFILES + 1 descriptors, make
      the first one correspond to standard output.   */
@@ -168,10 +174,7 @@ tee (int nfiles, const char **files)
 	  ok = false;
 	}
       else
-	{
-	  SETVBUF (descriptors[i], NULL, _IONBF, 0);
-	  SET_BINARY (fileno (descriptors[i]));
-	}
+	SETVBUF (descriptors[i], NULL, _IONBF, 0);
     }
 
   while (1)
@@ -204,7 +207,8 @@ tee (int nfiles, const char **files)
 
   /* Close the files, but not standard output.  */
   for (i = 1; i <= nfiles; i++)
-    if (descriptors[i] && fclose (descriptors[i]) != 0)
+    if (!STREQ (files[i], "-")
+	&& descriptors[i] && fclose (descriptors[i]) != 0)
       {
 	error (0, errno, "%s", files[i]);
 	ok = false;

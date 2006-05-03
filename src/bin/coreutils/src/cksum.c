@@ -1,5 +1,5 @@
 /* cksum -- calculate and print POSIX checksums and sizes of files
-   Copyright (C) 92, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 92, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Q. Frank Xia, qx@math.columbia.edu.
    Cosmetic changes and reorganization by David MacKenzie, djm@gnu.ai.mit.edu.
@@ -191,7 +191,7 @@ cksum (const char *file, bool print_name)
   uint_fast32_t crc = 0;
   uintmax_t length = 0;
   size_t bytes_read;
-  register FILE *fp;
+  FILE *fp;
   char length_buf[INT_BUFSIZE_BOUND (uintmax_t)];
   char const *hp;
 
@@ -199,19 +199,18 @@ cksum (const char *file, bool print_name)
     {
       fp = stdin;
       have_read_stdin = true;
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
     {
-      fp = fopen (file, "r");
+      fp = fopen (file, (O_BINARY ? "rb" : "r"));
       if (fp == NULL)
 	{
 	  error (0, errno, "%s", file);
 	  return false;
 	}
     }
-
-  /* Read input in BINARY mode, unless it is a console device.  */
-  SET_BINARY (fileno (fp));
 
   while ((bytes_read = fread (buf, 1, BUFLEN, fp)) > 0)
     {

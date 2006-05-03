@@ -1,7 +1,7 @@
 /* uname -- print system information
 
    Copyright 1989, 1992, 1993, 1996, 1997, 1999, 2000, 2001, 2002,
-   2003, 2004 Free Software Foundation, Inc.
+   2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu> */
 
@@ -47,8 +47,8 @@
 #endif
 
 #ifdef __APPLE__
-#include <mach/machine.h>
-#include <mach-o/arch.h>
+# include <mach/machine.h>
+# include <mach-o/arch.h>
 #endif
 
 #include "system.h"
@@ -118,7 +118,8 @@ usage (int status)
       fputs (_("\
 Print certain system information.  With no OPTION, same as -s.\n\
 \n\
-  -a, --all                print all information, in the following order:\n\
+  -a, --all                print all information, in the following order,\n\
+                             except omit -p and -i if unknown:\n\
   -s, --kernel-name        print the kernel name\n\
   -n, --nodename           print the network node hostname\n\
   -r, --kernel-release     print the kernel release\n\
@@ -126,8 +127,8 @@ Print certain system information.  With no OPTION, same as -s.\n\
       fputs (_("\
   -v, --kernel-version     print the kernel version\n\
   -m, --machine            print the machine hardware name\n\
-  -p, --processor          print the processor type\n\
-  -i, --hardware-platform  print the hardware platform\n\
+  -p, --processor          print the processor type or \"unknown\"\n\
+  -i, --hardware-platform  print the hardware platform or \"unknown\"\n\
   -o, --operating-system   print the operating system\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -172,7 +173,7 @@ main (int argc, char **argv)
       switch (c)
 	{
 	case 'a':
-	  toprint = -1;
+	  toprint = UINT_MAX;
 	  break;
 
 	case 's':
@@ -286,7 +287,8 @@ main (int argc, char **argv)
 # endif
 	}
 #endif
-      print_element (element);
+      if (! (toprint == UINT_MAX && element == unknown))
+	print_element (element);
     }
 
   if (toprint & PRINT_HARDWARE_PLATFORM)
@@ -310,7 +312,8 @@ main (int argc, char **argv)
 	    element = hardware_platform;
 	}
 #endif
-      print_element (element);
+      if (! (toprint == UINT_MAX && element == unknown))
+	print_element (element);
     }
 
   if (toprint & PRINT_OPERATING_SYSTEM)

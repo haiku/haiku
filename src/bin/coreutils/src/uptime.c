@@ -1,5 +1,5 @@
 /* GNU's uptime.
-   Copyright (C) 1992-2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1992-2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Created by hacking who.c by Kaveh Ghazi ghazi@caip.rutgers.edu.  */
 
@@ -100,7 +100,7 @@ print_uptime (size_t n, const STRUCT_UTMP *this)
 	boot_time = UT_TIME_MEMBER (this);
       ++this;
     }
-  time_now = time (0);
+  time_now = time (NULL);
 #if defined HAVE_PROC_UPTIME
   if (uptime == 0)
 #endif
@@ -132,7 +132,7 @@ print_uptime (size_t n, const STRUCT_UTMP *this)
   printf (ngettext ("%lu user", "%lu users", entries),
 	  (unsigned long int) entries);
 
-#if defined (HAVE_GETLOADAVG) || defined (C_GETLOADAVG)
+#if defined HAVE_GETLOADAVG || defined C_GETLOADAVG
   loads = getloadavg (avg, 3);
 #else
   loads = -1;
@@ -154,15 +154,16 @@ print_uptime (size_t n, const STRUCT_UTMP *this)
 }
 
 /* Display the system uptime and the number of users on the system,
-   according to utmp file FILENAME. */
+   according to utmp file FILENAME.  Use read_utmp OPTIONS to read the
+   utmp file.  */
 
 static void
-uptime (const char *filename)
+uptime (const char *filename, int options)
 {
   size_t n_users;
   STRUCT_UTMP *utmp_buf;
 
-  if (read_utmp (filename, &n_users, &utmp_buf) != 0)
+  if (read_utmp (filename, &n_users, &utmp_buf, options) != 0)
     error (EXIT_FAILURE, errno, "%s", filename);
 
   print_uptime (n_users, utmp_buf);
@@ -211,11 +212,11 @@ main (int argc, char **argv)
   switch (argc - optind)
     {
     case 0:			/* uptime */
-      uptime (UTMP_FILE);
+      uptime (UTMP_FILE, READ_UTMP_CHECK_PIDS);
       break;
 
     case 1:			/* uptime <utmp file> */
-      uptime (argv[optind]);
+      uptime (argv[optind], 0);
       break;
 
     default:			/* lose */

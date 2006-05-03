@@ -1,3 +1,1447 @@
+2006-01-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* fts.c (diropen): Open with O_NOCTTY | O_NONBLOCK too.
+	Don't attempt to open for write; this always fails, at
+	least on POSIX hosts.
+
+2006-01-21  Jim Meyering  <jim@meyering.net>
+
+	* fts.c (fts_children): Don't let close() clobber errno from
+	failed fchdir().
+
+2006-01-11  Jim Meyering  <jim@meyering.net>
+
+	* fts.c (fts_stat): When following a symlink-to-directory,
+	don't necessarily interpret stat-fails+lstat-succeeds as indicating
+	a dangling symlink.  That can also happen at least for ELOOP.
+	The fix: return FTS_SLNONE only when the stat errno is ENOENT.
+	FYI, this bug predates the inclusion of fts.c in coreutils.
+
+2006-01-10  Jim Meyering  <jim@meyering.net>
+
+	Avoid the double-free (first in fts_read, second in fts_close) that
+	would occur when an `active' directory is made inaccessible (e.g.,
+	via chmod a-x) during a traversal.
+	* fts.c (fts_read): After a failed fchdir, update sp->fts_cur
+	before returning.  Reproduce this failure by
+	mkdir -p a/b; cd a; chmod a-x . b
+	Reported by Stavros Passas.
+
+2006-01-06  Jim Meyering  <jim@meyering.net>
+
+	* version-etc.c (COPYRIGHT_YEAR): Update to 2006.
+
+2006-01-04  Jim Meyering  <jim@meyering.net>
+
+	Merge from glibc.
+	* fts.c (fts_open): Avoid function call in MAX macro use.
+
+2005-12-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* stat-time.h (STATE_TIMESPEC, STAT_TIMESPEC_NS): Add check for
+	TYPEOF_STRUCT_STAT_ST_ATIM_IS_STRUCT_TIMESPEC, to fix IRIX 5.3
+	porting problem reported by Georg Schwarz in
+	<http://lists.gnu.org/archive/html/bug-coreutils/2005-12/msg00083.html>.
+
+2005-11-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mountlist.c (ME_DUMMY): "none" and "proc" file systems are dummies
+	too.  Problem with "none" reported by Bob Proulx.  Problem with
+	"proc" reported by n0dalus.
+
+	* stdbool_.h: Simplify greatly, under the assumption that these
+	days most people use C99-compatible compilers to debug, so it's
+	not worth worrying about catering to older compilers for that.
+	This works around some porting problems with HP-UX compilers.
+	(false, true) [defined __BEOS__]: Don't #undef; no longer needed.
+	(_Bool): typedef to bool if C++ or BeOS and _Bool is not already
+	defined.  #define to signed char if neither C++ nor BeOS.
+
+2005-11-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* xstrtod.c: Don't bother with #pragma STDC FENV_ACCESS ON, as
+	coreutils no longer futzes with rounding modes.
+
+2005-11-14  Jim Meyering  <jim@meyering.net>
+
+	* mkstemp-safer.c: Include <config.h>, required for possible
+	replacement of mkstemp.
+
+2005-11-08  Eric Blake  <ebb9@byu.net>
+
+	* getaddrinfo.h: Use #if !, not #ifndef, for AC_CHECK_DECLS.
+
+2005-11-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* posixtm.h (PDS_PRE_2000): New macro.
+	* posixtm.c (year): Arg is now syntax_bits rather than allow_century.
+	All usages changed.  Reject dates outside the range 1969-1999 if
+	PDS_PRE_2000 is used.
+
+2005-10-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix porting problems reported by Theodoros V. Kalamatianos.
+	* fd-reopen.c [defined HAVE_CONFIG_H]: Include <config.h>,
+	so that large files can be opened.
+	* utimens.c (futimens) [HAVE_WORKING_UTIMES && HAVE_FUTIMES]:
+	Don't assume that futimes failing means we must fail.
+
+2005-10-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getcwd.c (__getcwd): Don't assume that system calls after readdir
+	leave errno alone.  Problem reported by Dmitry V. Levin.
+
+2005-10-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* savedir.c (savedir): Don't assume that xrealloc etc. leave
+	errno alone.  Problem reported by Frederic Jolliton.
+
+2005-10-24  Jim Meyering  <jim@meyering.net>
+
+	* mkdir-p.c (make_dir_parents): Like the code above, don't rely
+	on mkdir failing with a particular errno value (EEXIST).
+	Based on a patch by Dmitry V. Levin.
+
+	* mkdir-p.c (make_dir_parents): Make the preceding fix a little
+	more robust, e.g., when the final component is created as a non-
+	directory by another process just before `mkdir -p's final mkdir.
+
+	A command like `mkdir -p nonexistent/.' would create the
+	directory but exit nonzero with a diagnostic.  This could also be
+	triggered with a non-`.' component, e.g., in a race with another
+	process running the same `mkdir -p nonexistent/sub' command.
+
+	* mkdir-p.c (make_dir_parents): Handle the case of an
+	existing final component.
+	Reported by Matthias Andree here:
+	http://savannah.gnu.org/bugs/?func=detailitem&item_id=14848
+
+2005-10-20  Jim Meyering  <jim@meyering.net>
+
+	* modechange.c (mode_compile): Reject an invalid mode string
+	that starts with an octal digit.  From Andreas Gruenbacher.
+
+2005-10-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mkdir-p.c (make_dir_parents): Don't report an error if an
+	intermediate directory is in a read-only file system.  Problem
+	reported by Eric Blake.
+
+2005-10-08  Jim Meyering  <jim@meyering.net>
+
+	* openat.c (rpl_openat): Use the promoted type (int), not mode_t,
+	as second argument to va_arg.  Otherwise, some versions of gcc
+	warn that `if this code is reached, the program will abort'.
+
+	Update from gnulib.
+	* getdelim.c: (SIZE_MAX): New macro, if not already defined.
+
+2005-10-05  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libcoreutils_a_DEPENDENCIES): Remove definition.
+	Once it's gone, automake generates an equivalent one.
+	Suggestion from Stepan Kasal.
+
+	* getaddrinfo.h: Merge from gnulib.
+
+2005-10-04  Jim Meyering  <jim@meyering.net>
+
+	Merge from gnulib.
+	* getaddrinfo.h: Include sys/types.h before other headers.
+
+2005-10-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdelim.c: Import from gnulib (to fix unused var warnings) then
+	apply the following fixes:
+	Include getdelim.h first.  Include <limits.h>.
+	(SSIZE_MAX): New macro, if not already defined.
+	(getdelim): Fix buffer overrun on 64-bit hosts with lines longer
+	than 2 GiB.
+
+2005-10-01  Simon Josefsson  <jas@extundo.com>
+
+	* getaddrinfo.h: Protect #include's of sys/socket.h and netdb.h.
+	Only define struct addrinfo if !HAVE_STRUCT_ADDRINFO.  Protect
+	AI_* and EAI_* definitions.  Protect function declarations.
+
+2005-09-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* openat.c (fdopendir): Do not define if HAVE_FDOPENDIR.
+	Remove AT_FDCWD test.
+	Do not consume the fd unless successful.
+	* openat.h (fdopendir): Do not define if HAVE_FDOPENDIR.
+
+2005-09-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* xtime.h (XTIME_PRECISION): Now of type int, not long long int,
+	so that the code works even with ancient cpp.  Portability problem
+	with GCC 2.7.2.1 reported by Thomas M.Ott.
+
+	* settime.c (settime): Fix { typo in previous patch.  Also, don't
+	bother returning ENOSYS if settimeofday or stime fails; just let
+	them return whatever errno they want to return.
+
+2005-09-29  Jim Meyering  <jim@meyering.net>
+
+	* settime.c (settime): Move the HAVE_STIME block `up' into an #elif
+	block, so that we don't even try to compile it if settimeofday is
+	available.  This works around a compilation failure on OSF1 V5.1,
+	due to stime requiring a `long int*' while tv_sec is `int'.
+
+2005-09-27  Jim Meyering  <jim@meyering.net>
+
+	* fprintftime.c [HAVE_CONFIG_H]: Include <config.h> conditionally,
+	to be consistent with gnulib.
+	* getcwd.c: Change #ifdef<TAB>HAVE_CONFIG_H to #ifdef HAVE_CONFIG_H.
+	* fts-cycle.c [HAVE_CONFIG_H]: Include <config.h>.
+	* strnumcmp.c [HAVE_CONFIG_H]: Include <config.h> here, now that
+	strnumcmp-in.h no longer includes it.
+
+2005-09-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* utimens.c: Include unistd.h, for dup2.
+	(futimens): Fix typo: HAVE_FUTIMESAT was misspelled in an #if.
+	(futimens) [! HAVE_FUTIMESAT]: If !file, set errno before returning -1.
+
+2005-09-25  Jim Meyering  <jim@meyering.net>
+
+	* strnumcmp-in.h: Protect against multiple inclusion.
+
+2005-09-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* utimens.c (ENOSYS): Define if not already defined.
+	(futimens): Support having a null PATH if the file descriptor
+	is nonnegative.
+
+	* Makefile.am (libcoreutils_a_SOURCES): Remove mbchar.c, since
+	it doesn't build in OpenBSD 3.4.  See
+	<http://lists.gnu.org/archive/html/bug-gnulib/2005-09/msg00242.html>.
+
+	* regex_internal.h (__GNUC_PREREQ, always_inline, inline, pure):
+	Remove.
+	(__attribute): Define to empty unless GCC 3.1 or later.
+	This works around a core dump on OpenBSD 3.4, which has GCC
+	2.95.3, which dumps core when given __attribute__(()).  It also
+	simplifies other tests, since we really don't want to bother with
+	worrying about which ancient version of GCC supported what.
+	Original problem reported by Yoann Vandoorselaere, with part of
+	the fix suggested by Derek Price.
+
+2005-09-24  Jim Meyering  <jim@meyering.net>
+
+	* openat-die.c, root-dev-ino.c, setenv.c, stdopen.c:
+	* tsearch.c, unsetenv.c, xfts.c: Use `#ifdef HAVE_CONFIG_H',
+	not `#if HAVE_CONFIG_H', for consistency with gnulib.
+
+	* strintcmp.c: Include <config.h> here, ...
+	* strnumcmp-in.h: ..., not here.
+
+	Sync from gnulib.
+
+	* verify.h (verify_type__): Use `unsigned int' as the bitfield type
+	so we can once again use a positive bitfield width of 1 -- now we
+	don't have to explain why we were using a bitfield width of 2.
+
+2005-09-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* utimens.c (futimens): Use futimesat if available.
+	Prefer it to futimes since it doesn't have the futimes bug.
+
+	* verify.h (GL_CONCAT0, GL_CONCAT): Remove.
+	(verify): Don't use the __LINE__ trick, as it doesn't work in general.
+	Instead, declare a function that returns a pointer to an array,
+	and use verify_type__ to declare the size of the array.
+	Problem and germ of a solution reported by Bruno Haible.
+	(verify_type__): Use 2, not 1, for bitfield size, to avoid
+	a warning with Irix 6.5 cc.  Problem reported by Bruno Haible.
+
+2005-09-23  Jim Meyering  <jim@meyering.net>
+
+	* strnumcmp-in.h: Include <config.h>.  Otherwise builds with strict
+	C89 (e.g., Sun's /opt/SUNWspro/bin/c89) would fail due to the use
+	of `inline'.
+
+2005-09-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getaddrinfo.c [HAVE_NETINET_IN_H]: Include <netinet/in.h>.
+	Problem reported by Eric Blake.
+	(getaddrinfo): Initialize se so that it's not garbage.
+	Redo internal storage allocation so that it doesn't make unportable
+	assumptions about alignment.
+	Fix a memory leak.
+
+2005-09-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Sync from gnulib.
+
+	* Makefile.am (libcoreutils_a_SOURCES): Add getaddrinfo.h,
+	mbchar.c, mbchar.h, mbuiter.h, strcase.h, strlen1.c, strnlen1.h,
+	strstr.h.
+
+	* argmatch.h (GL_CONCAT): Remove.
+	Include "verify.h" instead.
+	(ARGMATCH_CONSTRAINT, ARGMATCH_ASSERT): Remove.
+	(ARGMATCH_VERIFY): Rewrite in terms of new verify macros.
+
+	* xalloc.h (VERIFY_EXPR, X2NREALLOC, X2REALLOC): Remove.
+	The latter two macros are moving to ../src/system.h for now.
+	This reverts this file to the gnulib version.
+
+	* xanstrftime.c, xanstrftime.h: Remove; no longer used.
+
+	* .cppi-disable: Add getaddrinfo.h, getdelim.h, mbchar.h,
+	mbuiter.h, strcase.h, strnlen.h, strnlen1.h.
+
+	* canon-host.h, gai_strerror.c, getaddrinfo.c, getaddrinfo.h:
+	* getdelim.c, getdelim.h, mbchar.c, mbchar.h, mbuiter.h:
+	* strcase.h, strnlen.h, strnlen1.c, strnlen1.h, strstr.h:
+	New files, from gnulib.
+
+	* __fpending.c, __fpending.h, acl.c, argmatch.c, atexit.c:
+	* backupfile.c, basename.c, calloc.c, canonicalize.c:
+	* chdir-long.c, chown.c, cloexec.c, closeout.c, creat-safer.c:
+	* cycle-check.c, dirfd.c, dirfd.h, dirname.c, dup-safer.c:
+	* dup2.c, euidaccess.c, exclude.c, exitfail.c, fchown-stub.c:
+	* fd-safer.c, file-type.c, fileblocks.c, filemode.c:
+	* filenamecat.c, fnmatch.c, fopen-safer.c, free.c, fsusage.c:
+	* ftruncate.c, full-write.c, getcwd.c, getcwd.h, getdate.h:
+	* getgroups.c, getndelim2.c, getopt1.c, getopt_.h:
+	* gettimeofday.c, getugroups.c, group-member.c, hard-locale.c:
+	* hash-pjw.c, hash.c, human.c, human.h, idcache.c, inttostr.c:
+	* inttostr.h, lchown.c, long-options.c, lstat.c, malloc.c:
+	* memcasecmp.c, memchr.c, memcmp.c, memcoll.c, memcpy.c:
+	* memmove.c, mkdir.c, mkstemp.c, mktime.c, modechange.c:
+	* mountlist.c, nanosleep.c, open-safer.c, openat.c, physmem.c:
+	* pipe-safer.c, posixtm.c, posixver.c, putenv.c, quote.c:
+	* quotearg.c, raise.c, readlink.c, readtokens0.c, readutmp.c:
+	* realloc.c, regex.c, regex_internal.h, rename.c, rmdir.c:
+	* rpmatch.c, safe-read.c, same.c, save-cwd.c, savedir.c:
+	* settime.c, sig2str.c, strcspn.c, stripslash.c, strndup.c:
+	* strnlen.c, strtod.c, strtoimax.c, strtol.c, strverscmp.c:
+	* tempname.c, time_r.c, time_r.h, timespec.h, unicodeio.h:
+	* unistd--.h, unlinkdir.c, userspec.c, utimecmp.c:
+	* version-etc-fsf.c, version-etc.c, xalloc-die.c, xgetcwd.c:
+	* xgethostname.c, xmalloc.c, xmemcoll.c, xnanosleep.c:
+	* xreadlink.c, xstrndup.c, xstrtoimax.c, xstrtol.c:
+	* xstrtoumax.c, yesno.c:
+	Sync from gnulib.
+
+	* canon-host.c, getline.c, getline.h, getpass.c, strcasecmp.c:
+	* strncasecmp.c, strstr.c:
+	Nontrivial sync from gnulib.
+
+	* .cvsignore: Sort entries.
+
+	* mkdir-p.c (ENOSYS): Define to EEXIST if not defined.
+	(make_dir_parents): Treat ENOSYS like EEXIST.
+
+2005-09-20  Jim Meyering  <jim@meyering.net>
+
+	* openat.c (fdopendir): Be sure to close the supplied
+	file descriptor before returning.  This makes our replacement
+	implementation a little closer to Solaris's, where fdopendir
+	ties the file descriptor to the returned DIR* pointer.
+
+2005-09-19  Jim Meyering  <jim@meyering.net>
+
+	* openat.c (unlinkat): New function.
+	* openat.h (unlinkat): Add prototype.
+
+2005-09-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Import from gnulib.
+	* stat-time.h: New file.
+	* timespec.h (ST_TIME_CMP_NS, ST_TIME_CMP, ATIME_CMP, CTIME_CMP):
+	(MTIME_CMP, TIMESPEC_NS): Remove.  Now done by stat-time.h,
+	in a different way.
+	(timespec_cmp): New function.
+	* utimecmp.c: Include stat-time.h.
+	(SYSCALL_RESOLUTION): Depend on whether various struct stat
+	members exist, not on the obsolescent ST_MTIM_NSEC.
+	(utimecmp): Use the new stat-time functions rater than TIMESPEC_NS.
+
+	* .cppi-disable: Add stat-time.h.
+
+2005-09-16  Jim Meyering  <jim@meyering.net>
+
+	* strftime.c [FPRINTFTIME] (fprintftime): Provide a new interface:
+	size_t fprintftime (FILE *fp, char const *fmt, struct tm const *tm,
+			    int utc, int nanoseconds);
+	Background:
+	date should not have to allocate a megabyte of virtual memory to
+	handle a format argument like +%1048575T.  When implemented with
+	strftime, it must allocate such a buffer, use strftime to fill it
+	in, print it, then free it.
+	With fprintftime, it simply prints everything and exits.
+	With no need for memory allocation, that's one fewer way to fail.
+
+	* fprintftime.c, fprintftime.h: New files.
+	* Makefile.am (libcoreutils_a_SOURCES):
+	Add fprintftime.c and fprintftime.h.
+
+2005-09-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* strftime.c (my_strftime): Rewrite the previous change slightly,
+	to make it a bit faster and (I hope) clearer.
+
+2005-09-14  Jim Meyering  <jim@meyering.net>
+
+	* strftime.c (my_strftime): Parse the colons of %:::z *after* the
+	optional field width, not before, so we accept %9:z, not %:9z.
+	(my_strftime): Be sure to use L_('x') for literals.
+
+2005-09-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Merge md5 from libc, and clean up some sha1 glitches.
+	* md5.h (__GNUC_PREREQ, __THROW, __attribute__): New macros.
+	(__md5_buffer): Renamed from md5_buffer.  Add a macro undoing this
+	if _LIBC is not defined.  Add __THROW.
+	(__md5_finish_ctx, __md5_init_ctx, __md5_process_block):
+	(__md5_process_bytes, __md5_read_ctx, __md5_stream): Likewise.
+	(struct md5_ctx): Mark buffer as being aligned.
+	(rol): Remove; all uses changed to CYCLIC.
+	* md5.c (CYCLIC): New macro.  All uses of rol changed to use CYCLIC.
+	Redo comment to minimize changes from libc.
+	* sha1.h (struct sha1_ctx): Mark buffer as being aligned.
+	* sha1.c (SWAP): Renamed from NOTSWAP, to avoid a horrible misnaming.
+	All uses changed.  Remove the old SWAP.
+	Remove obvious comment about BLOCKSIZE.
+	(rol): New macro, moved here from md5.h.
+	(sha1_process_block): Remove an incoherent FIXME comment.
+
+	* strftime.c (my_strftime): Add support for %:z, %::z, %:::z.
+	Fix bug in formats like %2N.
+
+2005-09-13  Jim Meyering  <jim@meyering.net>
+
+	* xalloc.h: Revert unintended change that removed definitions
+	of X2REALLOC and X2NREALLOC.
+
+	* backupfile.c: Use ARGMATCH_VERIFY, just in case.
+
+2005-09-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* regcomp.c, regex.c, regex.h, regex_internal.c, regex_internal.h:
+	* regexec.c: Import from gnulib, to fix some 64-bit bugs.
+
+2005-09-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* verify.h (__builtin_constant_p): Remove, undoing previous change.
+	(verify_type__): Solve the problem by using a bit-field rather
+	than an array.
+
+2005-09-05  Jim Meyering  <jim@meyering.net>
+
+	* verify.h (__builtin_constant_p) [__GNUC__ <= 2]: Define to 1.
+	(verify_type__) [verify_error_if_non_const__]: New member/test,
+	to help detect when verify or verify_expr is mistakenly passed
+	a non-constant argument within a function.
+
+2005-08-31  Jim Meyering  <jim@meyering.net>
+
+	* quotearg.c (quotearg_n_options): Change code to be suboptimal, in
+	order to avoid an unsuppressible warning from gcc on 64-bit systems.
+
+	* localcharset.c (get_charset_aliases): Add `void' in parameter list
+	to placate gcc's -Wstrict-prototypes.
+
+2005-08-27  Jim Meyering  <jim@meyering.net>
+
+	* md5.c: Use `#error' rather than a string literal to provoke failure.
+	* sha1.c: Likewise.
+
+2005-08-25  Jim Meyering  <jim@meyering.net>
+
+	* open-safer.c: Include <config.h>.
+	Otherwise, we'd lose LARGEFILE support in any file using
+	e.g. "fcntl--.h"
+
+2005-08-24  Jim Meyering  <jim@meyering.net>
+
+	* stdopen.c (stdopen): Revert to iterating over descriptors, but
+	rather than using fstat, use fcntl with its F_GETFD flag, which
+	is more efficient.  Unlike the 2-syscall dup-close approach,
+	this one doesn't apply any unnecessary pressure on the file
+	descriptor pool -- thus there is one fewer way to fail.
+
+2005-08-23  Jim Meyering  <jim@meyering.net>
+
+	* regcomp.c, regex.c, regex.h, regex_internal.c: Update from gnulib.
+	* regex_internal.h, regexec.c: Likewise.
+
+2005-08-19  Jim Meyering  <jim@meyering.net>
+
+	* stdopen.c (stdopen): Return `bool' so caller can detect failure.
+
+2005-08-17  Jim Meyering  <jim@meyering.net>
+
+	Make the %s format (seconds since the epoch) work for a negative
+	number and when used with a zero-padded field width, e.g. %015s.
+
+	* strftime.c (my_strftime): Move the `do_number_sign_and_padding'
+	label so that it precedes the code to set `digits'.  Otherwise,
+	%0Ns wouldn't work.  Before this change, `date -d @-22 +%05s' would
+	print `00-22'.  Now, it prints `-0022', as it should.
+
+2005-08-15  Bruno Haible  <bruno@clisp.org>
+
+	Import from gnulib.
+	* regex.h (__restrict_arr): Don't define to __restrict if __cplusplus
+	is defined.
+
+2005-08-13  Jim Meyering  <jim@meyering.net>
+
+	* getdate.y (get_date): Undo part of the 2005-04-04 change, so that
+	the command "date -d'2005-03-27 +1 day'" succeeds once again, even
+	when run in a time zone for which daylight savings time is in effect
+	for the starting date.
+
+2005-08-12  Jim Meyering  <jim@meyering.net>
+
+	* regcomp.c (duplicate_node) [lint]: Set *new_idx to -1, to avoid
+	warnings (unfounded) in caller that it may be used uninitialized.
+
+	* regex.c (IF_LINT): Define.
+
+	* regex_internal.c (re_string_realloc_buffers): Rename local-shadowed
+	variable: s/new_array/offsets/.
+	(re_acquire_state) [lint]: Set *err, to avoid warnings in caller.
+
+	* regexec.c (regexec, re_search_stub) [!_LIBC]: Omit declaration
+	of unused local, dfa.
+	(proceed_next_node): Remove outer declaration and
+	unnecessary initialization of local-shadowed `dest_node'.
+	Declare it in inner scopes, nearer its uses instead.
+
+	* regex.h (RE_SYNTAX_POSIX_AWK): Remove useless space-before-TAB.
+
+	* fts-cycle.c (setup_dir, enter_dir, leave_dir, free_dir):
+	Use the hash-table-based cycle-detection code not just when
+	FTS_TIGHT_CYCLE_CHECK if specified, but also with FTS_LOGICAL.
+	Reported by James Youngman in
+	<http://lists.gnu.org/archive/html/bug-gnulib/2005-08/msg00011.html>.
+	* fts_.h: Mention that with FTS_LOGICAL, we use FTS_TIGHT_CYCLE_CHECK.
+
+	* fts.c (fts_cross_check) [FTS_DEBUG]: s/active_dir_ht/fts_cycle.ht/.
+	This lets us compile with -DFTS_DEBUG, once again.
+
+2005-08-02  Jim Meyering  <jim@meyering.net>
+
+	* xanstrftime.c, xanstrftime.h: New files.
+
+2005-07-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdate.y (relative_time): New type.
+	(RELATIVE_TIME_0): New constant.
+	(parser_control): Use relative_time instead of doing it ourselves.
+	(%union): Add new relative_time rel member.
+	(tYEAR_UNIT, tMONTH_UNIT, tHOUR_UNIT, tMINUTE_UNIT, tSEC_UNIT):
+	Now typeless.
+	(relunit, relunit_snumber): Now of type rel.
+	(zone, rel, relunit, get_date): Adjust to above changes.
+
+2005-07-12  Jim Meyering  <jim@meyering.net>
+
+	* xalloc.h (X2NREALLOC): Define.
+
+2005-07-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* verify.h (verify_expr): Use ((verify_type__ (R) *) 0), not
+	sizeof (verify_type__ (R)), to pacify C++ compilers.  Problem
+	reported by Bruno Haible.
+
+	* version-etc-fsf.c (version_etc_copyright): Parameterize the
+	copyright symbol and the year.
+	* version-etc.c (COPYRIGHT_YEAR): New constant.
+	(version_etc_va): Use parameterized copyright notice.
+	Reword to conform to the current GNU coding standards.
+
+2005-07-08  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* getloadavg.c (getloadavg) [__CYGWIN__]: Port to cygwin.
+	[__linux__]: Allocate a big enough buffer for /proc/loadavg.
+	[!LDAV_DONE]: Avoid unused variable warning.
+
+2005-07-08  Eric Blake  <ebb9@byu.net>  (tiny change)
+	and  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* regcomp.c (init_dfa, build_range_exp): Store __btowc value
+	in wint_t, not wchar_t.  Remove now-unnecessary cast.
+
+2005-07-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Switch to Isamu Hasegawa's implementation of regex, which is
+	now in gnulib.
+	* regcomp.c, regex_internal.c, regex_internal.h, regexec.c:
+	New files, from gnulib.
+	* regex.h, regex.c: Sync from gnulib.
+	* Makefile.am (libcoreutils_a_SOURCES): Remove regex.h; gnulib
+	now does this automatically for us.
+	* .cppi-disable: Add regcomp.c, regex_internal.c, regex_internal.h.
+
+2005-07-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* verify.h (GL_CONCAT0, GL_CONCAT): Define unconditionally; don't
+	depend on whether verify_decl is defined.
+	(verify): Renamed from verify_decl.  All uses changed.
+	Use an extern function decl, as it can't possibly collide with other
+	decls.
+	(verify_expr): Renamed from verify.  All uses changed.
+	(verify_type__): New private macro.
+	(verify, verify_expr): Use it.
+
+2005-07-04  Jim Meyering  <jim@meyering.net>
+
+	* verify.h (verify, verify_decl): New file/macros.
+	* Makefile.am (libcoreutils_a_SOURCES): Add verify.h here, temporarily.
+	Eventually, it'll be pulled in via AC_LIBSOURCES.
+
+	* argmatch.h (verify_dcl): Rename from VERIFY.  Update use.
+
+2005-07-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Remove the dependency of the strftime module on the tzset module.
+	* strftime.c (my_strftime) [! defined _LIBC && ! HAVE_RUN_TZSET_TEST]:
+	Copy the input structure, to work around some of the bug with
+	Solaris 2.5.1 and Solaris 2.6.
+
+2005-07-03  Jim Meyering  <jim@meyering.net>
+
+	* posixtm.c (posixtime) [lint]: Initialize *all* of tm0, not just
+	the .tm_year member, since otherwise gcc-4.0 would now warn about
+	tm_zone, tm_gmtoff, tm_isdst, tm_yday, tm_wday.
+
+2005-07-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (libcoreutils_a_SOURCES): Undo previous change.
+
+	* Makefile.am (libcoreutils_a_SOURCES): Add fcntl--.h, stdio--h,
+	stdlib--.h, unistd--.h.
+	* fts.c [! _LIBC]: Include "lstat.h" rather than rolling our own.
+	* lstat.c: Sync from gnulib.
+	* lstat.h: New file, from gnulib.
+	* stat.c: Remove.
+
+2005-07-03  Jim Meyering  <jim@meyering.net>
+
+	* fd-reopen.c: Include <unistd.h> for declaration of close.
+
+2005-07-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Cleanup to isolate "safer" functions to a small part of the code.
+	* fcntl--.h, stdio--.h, stdlib--.h, unistd--.h, fcntl-safer.h:
+	* open-safer.c, stdlib-safer.h, mkstemp-safer.c, fd-reopen.h:
+	* fd-reopen.c: New files.
+	* fopen-safer.c: Include stdio-safer.h first, to check interface.
+	Don't bother including stdio.h, since stdio-safer.h does.
+	* fts.c (fd_safer): Remove decl.
+	Include fcntl--.h rather than unistd-safer.h
+	(fts_safe_changedir): Don't call fd_safer; no longer needed
+	now that we include fcntl--.h.
+	* getloadavg.c: Include fcntl--.h rather than fcntl.h.
+	Do not include unistd-safer.h.
+	(getloadavg): Don't call fd_safer; no longer needed
+	now that we include fcntl--.h.
+	* getusershell.c: Include stdio--.h rather than stdio.h
+	and stdio-safer.h.
+	(getusershell): Call fopen, not fopen_safer.
+	* save-cwd.c: Include fcntl--.h rather than fcntl.h.
+	Do not include unistd-safer.h.
+	(save_cwd): Don't call fd_safer; no longer needed
+	now that we include fcntl--.h.
+
+2005-07-02  Jim Meyering  <jim@meyering.net>
+
+	* getopt_.h: Assume HAVE_UNISTD_H, i.e., include <unistd.h>
+	unconditionally.
+
+	* fnmatch.c: Update from gnulib.
+
+	* backupfile.c, canon-host.c, canonicalize.c, chown.c, cloexec.c:
+	* dup-safer.c, dup2.c, euidaccess.c, fd-safer.c, fileblocks.c:
+	* fopen-safer.c, fsusage.c, ftruncate.c, getcwd.c, getcwd.h:
+	* getloadavg.c, getopt_.h, getpagesize.h, getugroups.c, group-member.c:
+	* human.h, idcache.c, mkdir-p.c, mountlist.c, nanosleep.c, pathmax.h:
+	* physmem.c, posixver.c, putenv.c, raise.c, safe-read.c, same.c:
+	* save-cwd.c, setenv.c, settime.c, tempname.c, unlinkdir.c:
+	* unsetenv.c, userspec.c, xgethostname.c, xreadlink.c:
+	Assume HAVE_UNISTD_H, i.e., include <unistd.h> unconditionally.
+
+2005-07-01  Jim Meyering  <jim@meyering.net>
+
+	* chown.c, cloexec.c, dup-safer.c, dup2.c, fsusage.c, getcwd.c:
+	* getloadavg.c, mountlist.c, openat.h, save-cwd.c, tempname.c:
+	Assume HAVE_FCNTL_H (i.e., include <fcntl.h> unconditionally,
+	and don't include <sys/file.h>).
+
+2005-07-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* xnanosleep.c: Include timespec.h, since OpenBSD 3.4 <time.h>
+	declares only 'struct timespec;' (!).
+
+2005-06-30  Jim Meyering  <jim@meyering.net>
+
+	* stdopen.c: Add copyright.
+	Include <fcntl.h> and <unistd.h> unconditionally --
+	it seems to be ok to do this, these days.
+
+	* stdopen.c: Rewritten by Paul Eggert.
+	Now, the minimum overhead is just two system calls: dup and close.
+
+	* stdopen.c: New file.  As yet unused.
+	The minimum overhead is three fstat calls.
+	* stdopen.h: New file.
+
+	* argmatch.h [!VERIFY] (VERIFY): Define.
+	(ARGMATCH_VERIFY): Use it, so this macro may be used more than
+	once in any given scope.
+
+	* xalloc.h (VERIFY_EXPR): Undef before defining, and add a comment.
+
+2005-06-29  Jim Meyering  <jim@meyering.net>
+
+	* mkdir-p.c (make_dir_parents): Don't apply sizeof to a hard-coded
+	type name.  Use the variable name instead.
+	* idcache.c (getuser, getuidbyname, getgroup, getgidbyname): Likewise.
+
+	* xalloc.h (VERIFY_EXPR): Define.
+	(X2REALLOC): New macro, to make using x2realloc a little safer.
+
+2005-06-26  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libcoreutils_a_SOURCES): Remove diacrit.c and diacrit.h.
+
+2005-06-25  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libcoreutils_a_SOURCES): Remove
+	root-dev-ino.c and root-dev-ino.h.
+	(libcoreutils_a_SOURCES): Remove dev-ino.h too, now that we
+	get it via root-dev-ino.m4
+	(libcoreutils_a_SOURCES): Remove version-etc.c version-etc.h
+	and version-etc-fsf.c.
+
+2005-06-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* canon-host.c (canon_host) [HAVE_GETADDRINFO]: Use `= { 0, };' to
+	initialize local `hint'.  This undoes the previous change, and
+	syncs with gnulib.
+
+2005-06-23  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libcoreutils_a_SOURCES): Remove xreadlink.c
+	and xreadlink.h.
+	(libcoreutils_a_SOURCES): Remove xstrtod.c and xstrtod.h.
+
+	* backupfile.c (backup_args): Change a `0' to NULL.
+
+2005-06-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mktime.c: Include <string.h> even if !DEBUG.  (From glibc.)
+	(ranged_convert): Don't save conversion in a temporary struct.
+	This causes a warning with GCC 4.0.0, and anyway in the typical
+	case it's not worth the extra 100 bytes or so of code.
+	(ranged_convert, __mktime_internal): When calling a function via a
+	pointer P, use P () rather than (*P) (), as we now assume C89 or better.
+
+	* readutmp.c (desirable_utmp_entry): Fix bug where "who -b" and
+	"who -r" failed to give output.  Problem reported by Tim Waugh.
+
+2005-06-22  Jim Meyering  <jim@meyering.net>
+
+	* xmalloc.c: Update from gnulib.
+
+2005-06-19  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libcoreutils_a_SOURCES): Remove xgetcwd.c, xgetcwd.h,
+	xfts.c and xfts.h.
+
+2005-06-16  Jim Meyering  <jim@meyering.net>
+
+	* calloc.c (rpl_calloc): Allocate a 1-byte buffer (not 1xS or Nx1)
+	when either N or S is zero.
+
+2005-06-15  Jim Meyering  <jim@meyering.net>
+
+	* mkdir-p.c (make_dir_parents): Don't let a failed chdir($PWD)
+	stop us from restricting permissions of just-created absolute-named
+	directories.
+
+2005-06-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Improve quality of diagnostics on restore_cwd failure.
+	* mkdir-p.h (make_dir): Remove.  All uses replaced by mkdir.
+	(make_dir_parents): Last arg is now int * (for errno), not bool *.
+	* mkdir-p.c (make_dir, make_dir_parents): Likewise.
+	Rewrite "mkdir -p" algorithm to avoid the need for "stat"
+	each time through the loop.  Do not diagnose restore_cwd failure;
+	that is the caller's job (and perhaps the caller does not care).
+
+	* mkdir-p.c (CLEANUP_CWD, CLEANUP): Remove.
+	(make_dir_parents): Revamp to avoid need for CLEANUP_CWD, CLEANUP.
+	If the file already exists but is not a directory, don't bother
+	to try to make its parents.
+	Close potential file descriptor leak if we can't chdir("/") (!).
+	Don't always return true if chdir($PWD) fails; return true only
+	if the requested action was done successfully (except for the
+	chdir($PWD)).
+	Don't log final directory unless we actually made it.
+	Refactor to avoid duplicate code to fix up permissions.
+	Don't attempt to fix up parent permissions if chdir($PWD) fails.
+
+2005-06-14  Jim Meyering  <jim@meyering.net>
+
+	* openat-die.c (openat_save_fail): Rename from openat_save_die.
+	(openat_restore_fail): Rename from openat_restore_die.
+	* openat.c, openat.h: Reflect s/_die/_fail/ renaming.
+
+	* mkdir-p.c (CLEANUP_CWD): Return *true*, not false when failing
+	to restore initial working directory.
+
+	Provide an alternative to exiting immediately upon save_cwd or
+	restore_cwd failure.  Now, an application can arrange e.g.,
+	to perform a longjump in that case.
+	* openat.c: Include dirname.h.
+	Use IS_ABSOLUTE_FILE_NAME rather than testing for leading slash.
+	(rpl_openat, fdopendir, fstatat): Call openat_save_die
+	and openat_restore_die rather than calling error directly.
+	Don't include "error.h" or "exitfail.h"; they're no longer needed.
+
+	* openat-die.c (openat_save_die, openat_restore_die): New file.
+	* openat.h (openat_save_die, openat_restore_die): Declare and define.
+
+2005-06-13  Jim Meyering  <jim@meyering.net>
+
+	* mkdir-p.c (make_dir_parents): New parameter: different_working_dir,
+	to tell caller if/when we change the working directory and are
+	unable to return to the initial one.
+	* mkdir-p.h (make_dir_parents): Update prototype.
+
+2005-06-12  Jim Meyering  <jim@meyering.net>
+
+	* mkdir-p.c (CLEANUP_CWD): Change one more `return 1' to
+	`return false'.  This fixes a bug introduced on 2004-07-30.
+
+2005-06-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use "file name" when talking about file names, instead of "filename"
+	or "path", as per the GNU coding standards.
+	* mkdir-p.c: Renamed from makepath.c.
+	(make_dir_parents): Renamed from make_path.  All callers changed.
+	* mkdir-p.h: Likewise.  All includers changed.
+	* filenamecat.c: Renamed from path-concat.c.
+	(file_name_concat): Renamed from path_concat.  All callers changed.
+	[TEST_FILE_NAME_CONCAT]: Renamed from TEST_PATH_CONCAT.
+	* filenamecat.h: Likewise.  All includers changed.
+	* acl.c: Don't use "path" or "filename" to mean "file name"
+	in comments or local variable names.
+	* basename.c: Likewise.
+	* canonicalize.c, canonicalize.h: Likewise.
+	* dirname.c, dirname.h: Likewise.
+	* euidaccess.c: Likewise.
+	* exclude.c: Likewise
+	* fnmatch_.h, fnmatch_loop.c: Likewise.
+	* fsusage.c, fsuage.h: Likewise.
+	* fts.c, fts_.h: Likewise.
+	* getcwd.c: Likewise.
+	* getloadavg.c: Likewise.
+	* mkstemp.c: Likewise.
+	* mountlist.c, mountlist.h: Likewise.
+	* openat.c, openat.h: Likewise.
+	* readlink-stub.c: Likewise.
+	* readutmp.c, readutmp.h: Likewise.
+	* rename.c: Likewise.
+	* rmdir.c: Likewise.
+	* same.c: Likewise.
+	* savedir.c: Likewise.
+	* stripslash.c: Likewise.
+	* tempname.c: Likewise.
+	* xreadlink.c: Likewise.
+	* exclude.c (excluded_file_name): Renamed from excluded_filename.
+	All uses changed.
+	* exclude.h: Likewise.
+
+2005-05-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* euidaccess.c (getuid, getgid, getuid, getegid)
+	[!defined _POSIX_VERSION]: Remove decls; not needed these days.
+	* idcache.c (getpwuid, getpwnam, getgrgid, getgrnam)
+	[!defined _POSIX_VERSION]: Remove decls; not needed these days.
+	* pathmax.h: Include <limits.h> unconditionally, since other
+	files have been getting away with it for years (MORE/BSD 4.3
+	is extinct now).
+	* userspec.c (getpwnam, getgrnam, getgrgid)
+	[!defined _POSIX_VERSION]: Remove decls; not needed these days.
+
+2005-05-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* pathmax.h (_POSIX_PATH_MAX) [!defined _POSIX_PATH_MAX]:
+	Define to 256, not 255, as per modern POSIX.
+
+2005-05-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* fts.c: Don't worry about debugging on pre-C99-comopatible hosts;
+	the configuration hassle isn't worth it.
+	Include inttypes.h and stdint.h unconditionally if FTS_DEBUG.
+	(LONGEST_MODIFIER, PRIuMAX): Remove.
+
+	* strnumcmp.c, strnumcmp.h, strnumcmp-in.h, strintcmp.c:
+	New files.
+
+2005-05-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* fts.c (fd_safer) [_LGPL_PACKAGE]: New static function,
+	so that unistd-safer.h (GPL'ed code) need not be included.
+
+2005-05-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Split the fts code into GPL'ed and LGPL'ed parts, and fix some
+	minor memory-allocation bugs.
+
+	* fts.c: Don't include "cycle-check.h" or "hash.h".
+	(setup_dir, free_dir): New functions.
+	(enter_dir, leave_dir): Define trivial
+	alternatives of _LGPL_PACKAGE.  Move to fts-cycle.c if !_LGPL_PACKAGE.
+	(HT_INITIAL_SIZE, ENTER_DIR): Remove.  All uses removed.
+	(LEAVE_DIR): Fix typo: pass Fts and Ent to leave_dir.
+	(struct Active_dir, AD_compare, AD_hash, enter_dir, leave_dir):
+	Move to fts-cycle.c.
+	(fts_open): Use setup_dir.
+	(fts_close): Use free_dir.
+	(fts_read): Have just one copy of the ENTER_DIR code rather than three.
+	This adds a label and some gotos, but the alternatives were messier.
+	Check for memory allocation failure when entering a dir.
+	(fts_stat) [_LGPL_PACKAGE]: Bring back glibc cycle detection code.
+	* fts_.h (_LGPL_PACKAGE) [defined _LIBC]: New macro.
+	(FTS): New member fts_cycle, that is a union that contains the
+	old active_dir_ht and cycle_state.  All uses changed to mention
+	fts_cycle.ht and fts_cycle.state.
+	* fts-cycle.c: New file, containing GPL'ed code migrated out of
+	fts.c, with the following changes:
+	(setup_dir, free_dir): New functions.
+	(enter_dir): Now returns bool.  Return true if successful, false
+	if memory exhausted.  All callers changed.
+	Do not bother partly cleaning up on
+	memory allocation failure; that is free_dir's job.
+	However, free ad if hash_insert fails, to avoid memory leak.
+	(enter_dir, leave_dir): Accommodate change to FTS by inspecting
+	fts->fts_options to see which union member to use.
+
+2005-05-20  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* chown.c (rpl_chown): Return -1 on failure.
+
+2005-05-20  Jim Meyering  <jim@meyering.net>
+
+	* fts.c (fts_open): Remove useless but otherwise harmless malloc call.
+	Spotted by Paul Eggert.
+
+2005-05-19  Jim Meyering  <jim@meyering.net>
+
+	* unlinkdir.h (cannot_unlink_dir) [UNLINK_CANNOT_UNLINK_DIR]:
+	Use #define rather than a static function, to avoid a warning
+	when the function was not used.
+
+2005-05-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* canonicalize.c: Include canonicalize.h first, to test interface.
+	Include <stddef.h> unconditionally, since we assume C89 now.
+	All uses of PTR_INT_TYPE replaced by ptrdiff_t.
+	* fts.c: Include fts_.h first, to check interface.
+	Do not include intprops.h; no longer needed.
+	Include cycle-check.h and hash.h, since fts_.h no longer does.
+	Remove unnecessary casts of closedir to void.
+	(fts_build): Use a simpler method (not involving TYPE_SIGNED) to
+	decide whether to decrement nlinks.
+	* fts_.h: Do not include hash.h or cycle-check.h; no longer needed.
+	(FTS): Use struct hash_table * instead of Hash_table, so that
+	we no longer need to include hash.h here.
+
+2005-05-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* unlinkdir.c, unlinkdir.h: New files.
+
+2005-05-14  Jim Meyering  <jim@meyering.net>
+
+	* unlocked-io.h, gethrxtime.c, gethrxtime.h, mountlist.h,
+	* xtime.h, path-concat.c: Correct cpp indentation.
+
+2005-05-14  Jim Meyering  <jim@meyering.net>
+
+	Update FSF postal mail address everywhere.
+
+2005-05-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* fts_.h (FTS): Use correct type for fts_compar member.
+	(FTSENT): New member fts_fts.  Remove members fts_ino, fts_dev,
+	fts_nlink; no longer needed now that fts_statp is always there.
+	All uses changed to use fts_statp instead.
+	* fts.c (__P): Remove.  All uses rewritten to assume C89 or better.
+	(fts_open): Don't cast a function value in a possibly-unsafe way.
+	(fts_compar): New function.
+	(fts_sort): Use it.  But optimize the common case where all
+	pointers smell the same.
+
+2005-05-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* yesno.c: Include getline.h, not ctype.h.
+	(yesno): Don't remove leading white space; POSIX doesn't allow it.
+	Use getline to remove arbitrary restriction on response length.
+
+2005-05-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* makepath.c (make_path): chdir to "//", not "/", if the file name
+	starts with exactly two slashes.  This doesn't solve the problem
+	in general but it's better than nothing.  Problem reported by
+	Pierre A. Humblet via Eric Blake.
+
+2005-05-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* modechange.h (mode_free): Remove; all callers changed to invoke
+	'free'.
+	* modechange.c: Likewise.
+	xstrtol.h, stdbool.h, stddef.h: Don't include; no longer needed.
+	(MODE_DONE): New constant.
+	(struct mode_change): Remove 'next' member.
+	(make_node_op_equals): New function; like the old one of the
+	same name, except it allocates an array.
+	(mode_compile, mode_create_from_ref): Use it.
+	(mode_compile): Allocate result as an array, not a linked list.
+	Parse octal string ourself, so that we catch mistakes like "+0".
+	(mode_adjust): Arg is an array, not a linked list.
+
+	* mbswidth.c, regex.c, strtol.c: Sync from gnulib.
+
+2005-04-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tempname.c (S_ISDIR, S_IRUSR, S_IRUSR, S_IWUSR, S_IXUSR): Remove.
+	[!_LIBC] Include "stat-macros.h" instead.
+
+	* file-type.c: Include file-type.h first.
+	* filetype.h: Don't assume <sys/stat.h> was included first.
+
+	* modechange.c: Include stat-macros.h, xalloc.h.
+	(S_ISDIR, S_ISUID, S_ISGID, S_ISVTX, S_IRUSR, S_IWUSR, S_IXUSR):
+	(S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH, S_IRXWU):
+	(S_IRWXG, S_IRWXO, CHMOD_MODE_BITS):
+	Remove.  This is now stat-macros.h's job.
+	(talloc): Remove.  All callers replaced by xalloc, so that
+	our invokers don't have to worry about reporting memory failures.
+	(make_node_op_equals): Remove.
+	(MODE_ORDINARY_CHAGE, MODE_X_IF_ANY_X, MODE_COPY_EXISTING):
+	New constants.
+	(struct mode_change): Moved here from modechange.h.
+	(mode_append_entry): Remove.
+	(mode_compile): Remove MASKED_OPS arg, since it encouraged
+	apps to have incorrect behavior.  Use simpler algorithm for head
+	and tail.  Don't futz with umask; that's now the job of mode_adjust.
+	Detect more invalid usages rather than having somewhat-random behavior.
+	Don't insert an "a=" action, as that leads to incorrect behavior.
+	(mode_compile, mode_create_from_ref): Return NULL on error instead
+	of an enum, since now there's only one way to have an error.  All
+	callers changed.
+	(mode_adjust): Accept new arg UMASK_VALUE, and interpret it
+	at the correct time.  Simplify calculation of "+u" and its ilk.
+	Don't mishandle "+X".
+	(mode_free): Remove "register" and localize decls.
+	* modechange.h (MODE_X_IF_ANY_X, MODE_COPY_EXISTING):
+	(struct mode_change): Move to modechange.c; callers don't
+	need to see this stuff.
+	(MODE_MASK_EQUALS, MODE_MASK_PLUS, MODE_MASK_MINUS, MODE_MASK_ALL):
+	(MODE_INVALID, MODE_MEMORY_EXHAUSTED, MODE_BAD_REFERENCE): Remove.
+	(mode_change, mode_adjust): Reflect the new signatures noted above.
+
+2005-04-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (noinst_LIBRARIES): fetish -> coreutils.
+	(libcoreutils_a_SOURCES): Renamed from libfetish_a_SOURCES.
+	All uses changed.
+	(libcoreutils_a_LIBADD): Renamed from libfetish_a_LIBADD.
+	All uses changed.
+	(libcoreutils_a_DEPENDENCIES): Renamed from libfetish_a_DEPENDENCIES.
+	All uses changed.
+	* chdir-long.c: fetish->coreutils in comment.
+	* t-chdir-long: fetish->coreutils in compilation command.
+
+2005-04-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdate.y (zone): Allow relunit_snumber after tZONE, so
+	that "UTC +1 second" continues to work.  Problem reported
+	by Dmitry V. Levin.
+	(relunit_snumber): New rule.
+	(relunit): Use it.
+
+2005-04-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdate.y (universal_time_zone_table): New constant.
+	(time_zone_table): Remove GMT, UT, UTC entries; they're now in
+	universal_time_zone_table.
+	(lookup_zone): Prefer universal_time_zone_table to
+	local_time_zone_table, so that "GMT" time stamps are allowed in
+	London during the summer.  Problem reported by Ian Abbott.
+
+2005-04-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Add bulletproofing for cases where stdin, stdout, or stderr are closed.
+	* fcntl-safer.h, open-safer.c: Remove.
+	* fd-safer.c: New file.
+	* dup-safer.c: Include unistd-safer.h first, to test interface.
+	(dup_safer) [!deefined F_DUPD]: Use new fd_safer function instead of
+	rolling our own code.
+	* fts.c: Include unistd-safer.h.
+	(fts_safe_changedir): Use fd_safer.
+	* getloadavg.c: Include unistd-safer.h.
+	(getloadavg): Use fd_safer.
+	* getusershell.c: Include stdio-safer.h.
+	(getusershell): Use fopen_safer.
+	* save-cwd.c: Include unistd-safer.h.
+	(save_cwd): Use fd_safer.
+	* unistd-safer.h (fd_safer): New decl.
+	* Makefile.am (libfetish_a_SOURCES): Remove dup-safer.c,
+	fcntl-safer.h, fopen-safer.c, open-safer.c, stdio-safer.h,
+	unistd-safer.h.
+
+2005-04-09  Jim Meyering  <jim@meyering.net>
+
+	* fts.c (__attribute__, ATTRIBUTE_UNUSED): Define.
+	Mark parameter `sp' with ATTRIBUTE_UNUSED.
+
+	Avoid warnings from gcc-4.
+	* canon-host.c (canon_host) [HAVE_GETADDRINFO]: Use memset
+	rather than `= { 0 };' to initialize local `hint'.
+	* unicodeio.c (__attribute__, ATTRIBUTE_UNUSED): Define.
+	(exit_failure_callback, fallback_failure_callback): Mark unused
+	parameters with ATTRIBUTE_UNUSED.
+
+	* posixtm.c (posixtime) [lint]: Avoid spurious warning from gcc-4's
+	-Wuninitialized: initialize tm0.tm_year.
+
+	* human.c (humblock): Set *options even when returning due to
+	xstrtoumax conversion failure.  Thanks to a used-uninitialized
+	warning from gcc-4.
+
+2005-04-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* nanosleep.c (rpl_nanosleep): Include "timespec.h" before macros
+	that might redefine system include files.
+	(siginterrupt) [!HAVE_SIGINTERRUPT]: New macro.
+	(my_usleep): Use NULL rather than (void *) 0.
+	(rpl_nanosleep) [!defined SA_NOCLDSTOP]:
+	Use siginterrupt to specify that system calls should be interrupted.
+	(rpl_nanosleep): Move initialization of suspended closer to call of
+	my_usleep.
+
+2005-04-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdate.y (parser_control): rels_seen is now a boolean, not a
+	count, since there's no maximum.  All uses changed.
+	Add member dsts_seen.
+	(local_zone): Accumulate dsts_seen rather than relying on tm_isdst
+	not being INT_MAX.
+	(get_date): Initialize dsts_seen, and check that it doesn't go over 1.
+	Use pc_rels_seen to decide whther a date is absolute.
+
+	* getdate.y (number): Don't overwrite year.
+	(get_date): Initialize pc.year.digits to 0, not 4, to enable above
+	check.
+
+2005-03-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* readutmp.h (read_utmp): New arg OPTIONS.  All uses changed.
+	* readutmp.c: Likewise.  Include signal.h, stdbool.h.
+	(desirable_utmp_entry): New function.
+	(read_utmp) [defined UTMP_NAME_FUNCTION]: Redo memory allocation
+	using x2nrealloc, to simplify logic.
+	(read_utmp) [!defined UTMP_NAME_FUNCTION]: Check for overflow in
+	size calculation.  Do not assume utmp file is a regular file.
+	* readutmp.h (UT_PID): Moved here from ../src/who.c.
+	(READ_UTMP_CHECK_PIDS): New constant.
+
+2005-03-29  Jim Meyering  <jim@meyering.net>
+
+	* long-options.c (long_options): Use NULL, not `0'.
+
+2005-03-27  Jim Meyering  <jim@meyering.net>
+
+	* argmatch.c: Clarify comment: null-terminated -> NULL-terminated.
+
+2005-03-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* intprops.h (INT_STRLEN_BOUND, INT_BUFSIZE_BOUND):
+	"one's complement" -> "ones' complement" in comment, as per Knuth.
+	"value of type" -> "type or expression" in comment.
+	* mktime.c, strftime.c: Propagate intprops.h comment nits.
+
+2005-03-26  Jim Meyering  <jim@meyering.net>
+
+	Comment nits.
+	* intprops.h: Add the apostrophe in `(one|two)'s complement'.
+	Correct typos: s/or/of/.
+
+2005-03-23  Jim Meyering  <jim@meyering.net>
+
+	* canonicalize.c: Remove duplicate `#include "stat-macros.h"'.
+
+2005-03-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (libfetish_a_SOURCES): Remove stat-macros.h, xstrtoul.c,
+	as they are now done by Autoconf macros.
+
+2005-03-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* gettext.h, regex.c, setenv.c, vasprintf.c: Sync from gnulib.
+	* vasnprintf.c (EOVERFLOW): Define if not already defined.
+	This merges a change from gnulib.
+
+2005-03-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* strftime.c (my_strftime): If the underlying strftime returns 0
+	(which shouldn't happen), generate nothing instead of returning 0
+	immediately, so that nstrftime (NULL, ...) doesn't return 0.
+
+2005-03-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* strftime.c (my_strftime): Prepend space to format so that we can
+	reliably distinguish strftime failure from empty output on POSIX
+	hosts.
+
+2005-03-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mktime.c (TYPE_TWOS_COMPLEMENT, TYPE_ONES_COMPLEMENT,
+	TYPE_SIGNED_MAGNITUDE, TYPE_MINIMUM, TYPE_MAXIMUM): Sync from
+	intprops.h.
+	* strtol.c: Likewise.
+
+2005-03-14  Jim Meyering  <jim@meyering.net>
+
+	* strftime.c (my_strftime) [HAVE_STRFTIME && ! (_NL_CURRENT
+	&& HAVE_STRUCT_ERA_ENTRY)]: Initialize the first byte of ubuf[]
+	to be nonzero so that we (and caller) can detect the difference
+	between a valid zero-length expansion and an error return, even
+	when the underlying strftime fails before writing anything into
+	that location.
+
+2005-03-11  Jim Meyering  <jim@meyering.net>
+
+	* getdate.c: Regenerate using bison-2.0.
+
+2005-03-10  Jim Meyering  <jim@meyering.net>
+
+	* save-cwd.c [!HAVE_FCHDIR]: Define open, fchdir, and chdir_long
+	so that this module works on systems without fchdir.
+
+	* Makefile.am (libfetish_a_SOURCES): Remove xstrtol.c and xstrtol.h.
+
+2005-03-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Factor int-properties macros into a single file, except for
+	glibc-related files.
+	* intprops.h: New file.
+	* getloadavg.c: Include it instead of limits.h.
+	(INT_STRLEN_BOUND): Remove.
+	* human.c: Include intprops.h.
+	(group_number): Use INT_STRLEN_BOUND instead of rolling it ourself.
+	* human.h (LONGEST_HUMAN_READABLE): Use 146/485 rather than 302/1000.
+	* inttostr.h: Include intprops.h instead of limits.h.
+	(INT_STRLEN_BOUND, INT_BUFSIZE_BOUND): Remove.
+	* mktime.c (TYPE_IS_INTEGER, TYPE_TWOS_COMPLEMENT): New macros,
+	for consistency with intprops.h.
+	(time_t_is_integer, twos_complement_arithmetic): Use them.
+	* sig2str.h: Include <signal.h>, intprops.h.
+	(INT_STRLEN_BOUND): Remove.
+	* strftime.c (TYPE_SIGNED): Remove.
+	(INT_STRLEN_BOUND): Switch to same implementation as intprops.h.
+	* strtol.c: Adjust comments to match intprops.h.
+	* userspec.c: Include intprops.h.
+	(TYPE_SIGNED, TYPE_MINIMUM, TYPE_MAXIMUM): Remove.
+	* utimecmp.c, xnanosleep.c, xstrtol.c: Likewise.
+	* utimecmp.c (utimecmp): Use TYPE_IS_INTEGER, TYPE_TWOS_COMPLEMENT
+	instead of rolling our own expressions.
+	* xstrtol.c: Include xstrtol.h first, to test interface.
+	* fts.c: Include intprops.h.
+	(TYPE_SIGNED): Remove.
+
+2005-03-09  Jim Meyering  <jim@meyering.net>
+
+	More migration to AC_LIBSOURCES/AC_LIBOBJ.
+	* Makefile.am (libfetish_a_SOURCES): Remove two more pairs of files:
+	cycle-check.c, cycle-check.h and argmatch.c, argmatch.h.
+
+	* cycle-check.c: Don't include "xalloc.h".  It's not used.
+
+2005-03-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Remove workaround for bug in Linux kernel 2.6.8 or thereabouts.
+	The workaround isn't strictly needed for POSIX conformance, and
+	it's too much of a pain to configure and maintain.  We'll ask
+	people to fix their kernels instead.
+	* xnanosleep.c: Don't include gethrxtime.h or xtime.h.
+	(NANOSLEEP_BUG_WORKAROUND): Remove.
+	(xnanosleep): Remove the workaround.
+
+2005-02-27  Jim Meyering  <jim@meyering.net>
+
+	* xnanosleep.c (xnanosleep): Work around bug in Linux-2.6.8.1's
+	nanosleep whereby it fails without setting errno upon being resumed
+	after being suspended.
+
+2005-02-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* vasnprintf.c (VASNPRINTF) [!USE_SNPRINTF]: Correct the test for
+	integer overflow again.  Actually, neither this nor the 2005-01-23
+	change fixes any bug on any plausible platform; it's more of a
+	code-clarity thing.
+
+	* config.charset, gettext.h, localcharset.c: Sync from gnulib.
+
+2005-02-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* strftime.c: Include <stdbool.h>.  Use bool where appropriate,
+	instead of int.
+	(my_strftime): Do not mishandle years close to INT_MAX, by doing
+	the right thing even if adding 1900 would overflow.  Similarly
+	for tm_mon + 1 and tm_yday + 1.
+	Make %Y always equivalent to %C%y, and similarly for %G and %g.
+	(DO_NUMBER, DO_NUMBER_SPACEPAD): Set digits to d, not a conditional.
+	(DO_SIGNED_NUMBER): New macro.
+	(my_strftime) [HAVE_TZNAME]: Don't dump core if tp->tm_dst > 1.
+
+2005-02-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (libfetish_a_SOURCES): Remove xnanosleep.c,
+	xnanosleep.h; now done by ../m4/xnanosleep.m4 automatically.
+
+2005-02-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* gethrxtime.h, gethrxtime.c, xtime.h: New files.
+	* timespec.h (gettime): Return void, since it always
+	succeeds now.  All uses changed.
+	* gettime.c (gettime) Likewise.
+	[HAVE_NANOTIME]: Prefer nanotime.
+	Assume gettimeofday succeeds, as POSIX requires.
+	Assime time () succeeds, since other code already does.
+	* xnanosleep.c: Include xtime.h and gethrxtime.h, not xalloc.h.
+	(timespec_subtract): Remove.
+	(NANOSLEEP_BUG_WORKAROUND): New constant.
+	(xnanosleep): Use gethrxtime rather than gettime; this simplifies
+	things considerably.  Use it only on GNU/Linux hosts, since the
+	workaround shouldn't be needed elsewhere.
+
+2005-02-20  Neil Conway  <neilc@samurai.com>
+
+	* xgethostname.c (xgethostname): Check for ENOMEM, which is
+	returned by OSX/Darwin if the specified buffer is not large
+	enough for the hostname.
+
+2005-02-20  Jim Meyering  <jim@meyering.net>
+
+	More of the same.
+	* Makefile.am (libfetish_a_SOURCES): Remove
+	linebuffer.[ch] and stripslash.c.
+
+2005-02-11  Jim Meyering  <jim@meyering.net>
+
+	Remove names of files that are now mentioned in AC_LIBSOURCES
+	and AC_LIBOBJ uses in inttostr.m4.
+	* Makefile.am (libfetish_a_SOURCES): Remove imaxtostr.c,
+	offtostr.c, and umaxtostr.c.
+	(EXTRA_DIST): Remove inttostr.c and inttostr.h.
+
+2005-02-08  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libfetish_a_SOURCES): Remove memcasecmp.c
+	and memcasecmp.h.
+
+2005-02-07  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libfetish_a_SOURCES): Remove fts.c, fts_.h, and
+	getcwd.h now that they're mentioned in AC_LIBSOURCES and AC_LIBOBJ
+	uses in the corresponding ../m4/*.m4.
+
+2005-02-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* memrchr.h: New file.
+	* chdir-long.c: Include it.
+	* memrchr.c [!defined _LIBC]: Include it rather than <string.h>.
+	Don't bother including stddef.h.
+
+2005-02-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mountlist.h (MOUNTLIST_H_): New macro, to protect against double
+	inclusion.
+	Include <sys/types.h>, for dev_t.
+	(ME_DUMMY, ME_REMOTE): Move from here....
+	* mountlist.c (ME_DUMMY, ME_REMOTE): To here.
+	(ME_DUMMY): Count "subfs" as a dummy.  Problem reported by
+	Dmitry V. Levin.
+	Include mountlist.h first, to test the interface.
+
+2005-01-29  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.am (libfetish_a_SOURCES): Remove many files from this
+	list, now that automake determines their names automatically,
+	thanks to the new AC_LIBSOURCES and AC_LIBOBJ uses in the
+	corresponding ../m4/*.m4 files.
+	(EXTRA_DIST): Add getdate.c here, so that we continue to distribute it.
+
+2005-01-25  Jim Meyering  <jim@meyering.net>
+
+	* path-concat.c: Don't include assert.h.
+	(path_concat): Remove assertion that would have triggered
+	for ABASE starting with more than one slash.
+	Reported by Andreas Schwab.
+
+	* path-concat.c (path_concat): Set *BASE_IN_RESULT
+	properly when ABASE is an absolute file name.
+	Correct the description of this function.
+	Include <assert.h>.
+	Add an assertion and a test driver.
+	This fixes a bug introduced on 2004-07-02.
+	Andreas Schwab reported the resulting failure of cp --parents:
+	http://lists.gnu.org/archive/html/bug-coreutils/2005-01/msg00130.html
+
+2005-01-23  Jim Meyering  <jim@meyering.net>
+
+	* vasnprintf.c (VASNPRINTF) [!USE_SNPRINTF]: Correct the test for
+	integer overflow.
+
+2005-01-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Sync from gnulib.
+	* error.c [!_LIBC && !ENABLE_NLS]: Do not include "gettext.h";
+	not needed.  This removes a dependency on the gettext module.
+	[defined _LIBC]: Do not include <libintl.h>; not needed.
+
+2005-01-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* save-cwd.c (save_cwd): Remove code to support the case
+	where fchdir is missing or flaky.
+
+	* Makefile.am (libfetish_a_SOURCES): Add version-etc-fsf.c.
+
+2005-01-20  Simon Josefsson  <jas@extundo.com>
+
+	* version-etc-fsf.c: New file, with version_etc_copyright.
+	* version-etc.c: Remove version_etc_copyright.
+	* version-etc.h (version_etc_copyright): Use [] instead of * in
+	prototype, suggested by Paul Eggert.
+
+2005-01-19  Jim Meyering  <jim@meyering.net>
+
+	* openat.h (AT_SYMLINK_NOFOLLOW): Define to 4096, so it's the
+	same value as for Solaris 9.
+
+	* chdir-long.c (chdir_long): Rewrite to remove limitation on
+	component length.  This included changing the parameter to be
+	of type `char *' rather than `char const *'.
+	* chdir-long.h (chdir_long): Update prototype.
+	* t-chdir-long: A test harness to exercize chdir-long.c's
+	sample main program.
+
+	* openat.c (fdopendir, fstatat): New functions.
+	* openat.h: Include headers required for use of DIR and struct stat.
+	[AT_SYMLINK_NOFOLLOW]: Define.
+	(fdopendir, fstatat): Add prototypes.
+
 2005-01-04  Paul Eggert  <eggert@cs.ucla.edu>
 
 	* human.c (SIZE_MAX, UINTMAX_MAX): Move these conditional
@@ -4165,7 +5609,7 @@
 	* exclude.c (bool): Declare, perhaps by including stdbool.h.
 	(<sys/types.h>): Include only if HAVE_SYS_TYPES_H.
 	(<stdlib.h>, <string.h>, <strings.h>, <inttypes.h>, <stdint.h>):
-	Include	if available.
+	Include if available.
 	(<xalloc.h>): Include
 	(SIZE_MAX): Define if <stdint.h> or <inttypes.h> doesn't.
 	(verify): New macro.  Use it to verify that EXCLUDE macros do not

@@ -1,5 +1,5 @@
 /* mkdir -- make directories
-   Copyright (C) 90, 1995-2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 90, 1995-2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* David MacKenzie <djm@ai.mit.edu>  */
 
@@ -25,7 +25,7 @@
 #include "system.h"
 #include "dirname.h"
 #include "error.h"
-#include "makepath.h"
+#include "mkdir-p.h"
 #include "modechange.h"
 #include "quote.h"
 
@@ -36,9 +36,6 @@
 
 /* The name this program was run with. */
 char *program_name;
-
-/* If true, ensure that all parents of the specified directory exist.  */
-static bool create_parents;
 
 static struct option const longopts[] =
 {
@@ -82,11 +79,13 @@ int
 main (int argc, char **argv)
 {
   mode_t newmode;
-  mode_t parent_mode;
+  mode_t parent_mode IF_LINT (= 0);
   const char *specified_mode = NULL;
   const char *verbose_fmt_string = NULL;
+  bool create_parents = false;
   int exit_status = EXIT_SUCCESS;
   int optc;
+  int cwd_errno = 0;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -95,8 +94,6 @@ main (int argc, char **argv)
   textdomain (PACKAGE);
 
   atexit (close_stdout);
-
-  create_parents = false;
 
   while ((optc = getopt_long (argc, argv, "pm:v", longopts, NULL)) != -1)
     {
@@ -125,51 +122,49 @@ main (int argc, char **argv)
     }
 
   newmode = S_IRWXUGO;
-  {
-    mode_t umask_value = umask (0);
-    umask (umask_value);		/* Restore the old value. */
-    parent_mode = (newmode & (~ umask_value)) | S_IWUSR | S_IXUSR;
-  }
 
-  if (specified_mode)
+  if (specified_mode || create_parents)
     {
-      struct mode_change *change = mode_compile (specified_mode, 0);
-      newmode &= ~ umask (0);
-      if (change == MODE_INVALID)
-	error (EXIT_FAILURE, 0, _("invalid mode %s"), quote (specified_mode));
-      else if (change == MODE_MEMORY_EXHAUSTED)
-	xalloc_die ();
-      newmode = mode_adjust (newmode, change);
+      mode_t umask_value = umask (0);
+
+      parent_mode = (S_IRWXUGO & ~umask_value) | (S_IWUSR | S_IXUSR);
+
+      if (specified_mode)
+	{
+	  struct mode_change *change = mode_compile (specified_mode);
+	  if (!change)
+	    error (EXIT_FAILURE, 0, _("invalid mode %s"),
+		   quote (specified_mode));
+	  newmode = mode_adjust (S_IRWXUGO, change, umask_value);
+	  free (change);
+	}
+      else
+	umask (umask_value);
     }
 
   for (; optind < argc; ++optind)
     {
+      char *dir = argv[optind];
       bool ok;
 
       if (create_parents)
 	{
-	  char *dir = argv[optind];
-	  ok = make_path (dir, newmode, parent_mode,
-			  -1, -1, true, verbose_fmt_string);
+	  if (cwd_errno != 0 && IS_RELATIVE_FILE_NAME (dir))
+	    {
+	      error (0, cwd_errno, _("cannot return to working directory"));
+	      ok = false;
+	    }
+	  else
+	    ok = make_dir_parents (dir, newmode, parent_mode,
+				   -1, -1, true, verbose_fmt_string,
+				   &cwd_errno);
 	}
       else
 	{
-	  const char *dir = argv[optind];
-	  bool dir_created;
-	  ok = make_dir (dir, dir, newmode, &dir_created);
+	  ok = (mkdir (dir, newmode) == 0);
+
 	  if (! ok)
-	    {
-	      /* make_dir already gave a diagnostic.  */
-	    }
-	  else if (!create_parents && !dir_created)
-	    {
-	      /* make_dir `succeeds' when DIR already exists.
-		 In that case, mkdir must fail, unless --parents (-p)
-		 was specified.  */
-	      error (0, EEXIST, _("cannot create directory %s"),
-		     quote (dir));
-	      ok = false;
-	    }
+	    error (0, errno, _("cannot create directory %s"), quote (dir));
 	  else if (verbose_fmt_string)
 	    error (0, 0, verbose_fmt_string, quote (dir));
 
@@ -182,7 +177,7 @@ main (int argc, char **argv)
 	  /* Set the permissions only if this directory has just
 	     been created.  */
 
-	  if (ok && specified_mode && dir_created
+	  if (ok && specified_mode
 	      && chmod (dir, newmode) != 0)
 	    {
 	      error (0, errno, _("cannot set permissions of directory %s"),

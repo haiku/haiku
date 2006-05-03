@@ -66,7 +66,7 @@
 * head: (coreutils)head invocation.             Output the first part of files.
 * hostid: (coreutils)hostid invocation.         Print numeric host identifier.
 * hostname: (coreutils)hostname invocation.     Print or set system name.
-* id: (coreutils)id invocation.                 Print real/effective uid/gid.
+* id: (coreutils)id invocation.                 Print user identity.
 * install: (coreutils)install invocation.       Copy and change attributes.
 * join: (coreutils)join invocation.             Join lines on a common field.
 * kill: (coreutils)kill invocation.             Send a signal to processes.
@@ -79,7 +79,7 @@
 * mkfifo: (coreutils)mkfifo invocation.         Create FIFOs (named pipes).
 * mknod: (coreutils)mknod invocation.           Create special files.
 * mv: (coreutils)mv invocation.                 Rename files.
-* nice: (coreutils)nice invocation.             Modify scheduling priority.
+* nice: (coreutils)nice invocation.             Modify niceness.
 * nl: (coreutils)nl invocation.                 Number lines and write files.
 * nohup: (coreutils)nohup invocation.           Immunize to hangups.
 * od: (coreutils)od invocation.                 Dump files in octal, etc.
@@ -100,7 +100,7 @@
 * split: (coreutils)split invocation.           Split into fixed-size pieces.
 * stat: (coreutils)stat invocation.             Report file(system) status.
 * stty: (coreutils)stty invocation.             Print/change terminal settings.
-* su: (coreutils)su invocation.                 Modify user and group id.
+* su: (coreutils)su invocation.                 Modify user and group ID.
 * sum: (coreutils)sum invocation.               Print traditional checksum.
 * sync: (coreutils)sync invocation.             Synchronize memory and disk.
 * tac: (coreutils)tac invocation.               Reverse files.
@@ -120,7 +120,7 @@
 * vdir: (coreutils)vdir invocation.             List directories verbosely.
 * wc: (coreutils)wc invocation.                 Line, word, and byte counts.
 * who: (coreutils)who invocation.               Print who is logged in.
-* whoami: (coreutils)whoami invocation.         Print effective user id.
+* whoami: (coreutils)whoami invocation.         Print effective user ID.
 * yes: (coreutils)yes invocation.               Print a string indefinitely.
 @end direntry
 
@@ -128,7 +128,7 @@
 This manual documents version @value{VERSION} of the @sc{gnu} core
 utilities, including the standard programs for text and file manipulation.
 
-Copyright @copyright{} 1994, 1995, 1996, 2000, 2001, 2002, 2003, 2004
+Copyright @copyright{} 1994, 1995, 1996, 2000, 2001, 2002, 2003, 2004, 2005
 Free Software Foundation, Inc.
 
 @quotation
@@ -175,7 +175,7 @@ Free Documentation License''.
 * Operating on sorted files::          sort uniq comm ptx tsort
 * Operating on fields within a line::  cut paste join
 * Operating on characters::            tr expand unexpand
-* Directory listing::                  ls dir vdir d v dircolors
+* Directory listing::                  ls dir vdir dircolors
 * Basic operations::                   cp dd install mv rm shred
 * Special file types::                 ln mkdir rmdir mkfifo mknod
 * Changing file attributes::           chgrp chmod chown touch
@@ -379,9 +379,9 @@ Working context
 
 User information
 
-* id invocation::                Print real and effective uid and gid
+* id invocation::                Print user identity
 * logname invocation::           Print current login name
-* whoami invocation::            Print effective user id
+* whoami invocation::            Print effective user ID
 * groups invocation::            Print group names a user is in
 * users invocation::             Print login names of users currently logged in
 * who invocation::               Print who is currently logged in
@@ -395,21 +395,21 @@ System context
 
 @command{date}: Print or set system date and time
 
-* Time directives::              Time directives
-* Date directives::              Date directives
-* Literal directives::           Literal directives
-* Padding::                      Padding
-* Setting the time::             Setting the time
-* Options for date::             Options for @command{date}
-* Examples of date::             Examples of @command{date}
+* Time conversion specifiers::   %[HIklMNpPrRsSTXzZ]
+* Date conversion specifiers::   %[aAbBcCdDeFgGhjmuUVwWxyY]
+* Literal conversion specifiers:: %[%nt]
+* Padding and other flags::      Pad with zeroes, spaces, etc.
+* Setting the time::             Changing the system clock.
+* Options for date::             Instead of the current time.
+* Examples of date::             Examples.
 
 Modified command invocation
 
 * chroot invocation::            Run a command with a different root directory
 * env invocation::               Run a command in a modified environment
-* nice invocation::              Run a command with modified scheduling priority
+* nice invocation::              Run a command with modified niceness
 * nohup invocation::             Run a command immune to hangups
-* su invocation::                Run a command with substitute user and group id
+* su invocation::                Run a command with substitute user and group ID
 
 Process control
 
@@ -575,17 +575,6 @@ Remove any trailing slashes from each @var{source} argument.
 @xref{Trailing slashes}.
 @end macro
 
-@macro optVersionControl
-@item -V @var{method}
-@itemx --version-control=@var{method}
-@opindex -V
-@opindex --version-control
-Change the type of backups made with @option{-b}.  The @var{method}
-argument can be @samp{none} (or @samp{off}), @samp{numbered} (or
-@samp{t}), @samp{existing} (or @samp{nil}), or @samp{never} (or
-@samp{simple}).  @xref{Backup options}.
-@end macro
-
 @cindex common options
 
 Certain options are available in all of these programs.  Rather than
@@ -644,7 +633,7 @@ name.
 
 @menu
 * Exit status::                 Indicating program success or failure.
-* Backup options::              -b -S -V, in some programs.
+* Backup options::              -b -S, in some programs.
 * Block size::                  BLOCK_SIZE and --block-size, in some programs.
 * Target directory::            Specifying a target directory, in some programs.
 * Trailing slashes::            --strip-trailing-slashes, in some programs.
@@ -750,13 +739,6 @@ Append @var{suffix} to each backup file made with @option{-b}.  If this
 option is not specified, the value of the @env{SIMPLE_BACKUP_SUFFIX}
 environment variable is used.  And if @env{SIMPLE_BACKUP_SUFFIX} is not
 set, the default is @samp{~}, just as in Emacs.
-
-@itemx --version-control=@var{method}
-@opindex --version-control
-@c FIXME: remove this block one or two releases after the actual
-@c removal from the code.
-This option is obsolete and will be removed in a future release.
-It has been replaced with @w{@kbd{--backup}}.
 
 @end table
 
@@ -1182,10 +1164,9 @@ environment variable to a value of the form @var{yyyymm} specifying
 the year and month the standard was adopted.  Two values are currently
 supported for @env{_POSIX2_VERSION}: @samp{199209} stands for
 @acronym{POSIX} 1003.2-1992, and @samp{200112} stands for @acronym{POSIX}
-1003.1-2001.  For example, if you are running older software that
-assumes an older version of @acronym{POSIX} and uses @samp{sort +1},
-@samp{head -10}, or @samp{tail +10}, you
-can work around the compatibility problems by setting
+1003.1-2001.  For example, if you have a newer system but are running software
+that assumes an older version of @acronym{POSIX} and uses @samp{sort +1}
+or @samp{tail +10}, you can work around any compatibility problems by setting
 @samp{_POSIX2_VERSION=199209} in your environment.
 
 @node Output of entire files
@@ -1228,32 +1209,11 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex --show-all
 Equivalent to @option{-vET}.
 
-@item -B
-@itemx --binary
-@opindex -B
-@opindex --binary
-@cindex binary and text I/O in cat
-On MS-DOS and MS-Windows only, read and write the files in binary mode.
-By default, @command{cat} on MS-DOS/MS-Windows uses binary mode only when
-standard output is redirected to a file or a pipe; this option overrides
-that.  Binary file I/O is used so that the files retain their format
-(Unix text as opposed to DOS text and binary), because @command{cat} is
-frequently used as a file-copying program.  Some options (see below)
-cause @command{cat} to read and write files in text mode because in those
-cases the original file contents aren't important (e.g., when lines are
-numbered by @command{cat}, or when line endings should be marked).  This is
-so these options work as DOS/Windows users would expect; for example,
-DOS-style text files have their lines end with the CR-LF pair of
-characters, which won't be processed as an empty line by @option{-b} unless
-the file is read in text mode.
-
 @item -b
 @itemx --number-nonblank
 @opindex -b
 @opindex --number-nonblank
-Number all nonblank output lines, starting with 1.  On MS-DOS and
-MS-Windows, this option causes @command{cat} to read and write files in
-text mode.
+Number all nonblank output lines, starting with 1.
 
 @item -e
 @opindex -e
@@ -1263,25 +1223,20 @@ Equivalent to @option{-vE}.
 @itemx --show-ends
 @opindex -E
 @opindex --show-ends
-Display a @samp{$} after the end of each line.  On MS-DOS and
-MS-Windows, this option causes @command{cat} to read and write files in
-text mode.
+Display a @samp{$} after the end of each line.
 
 @item -n
 @itemx --number
 @opindex -n
 @opindex --number
-Number all output lines, starting with 1.  On MS-DOS and MS-Windows,
-this option causes @command{cat} to read and write files in text mode.
+Number all output lines, starting with 1.
 
 @item -s
 @itemx --squeeze-blank
 @opindex -s
 @opindex --squeeze-blank
 @cindex squeezing blank lines
-Replace multiple adjacent blank lines with a single blank line.  On
-MS-DOS and MS-Windows, this option causes @command{cat} to read and write
-files in text mode.
+Replace multiple adjacent blank lines with a single blank line.
 
 @item -t
 @opindex -t
@@ -1295,7 +1250,7 @@ Display TAB characters as @samp{^I}.
 
 @item -u
 @opindex -u
-Ignored; for Unix compatibility.
+Ignored; for @acronym{POSIX} compatibility.
 
 @item -v
 @itemx --show-nonprinting
@@ -1303,13 +1258,29 @@ Ignored; for Unix compatibility.
 @opindex --show-nonprinting
 Display control characters except for LFD and TAB using
 @samp{^} notation and precede characters that have the high bit set with
-@samp{M-}.  On MS-DOS and MS-Windows, this option causes @command{cat} to
-read files and standard input in DOS binary mode, so the CR
-characters at the end of each line are also visible.
+@samp{M-}.
 
 @end table
 
+On systems like MS-DOS that distinguish between text and binary files,
+@command{cat} normally reads and writes in binary mode.  However,
+@command{cat} reads in text mode if one of the options
+@option{-bensAE} is used or if @command{cat} is reading from standard
+input and standard input is a terminal.  Similarly, @command{cat}
+writes in text mode if one of the options @option{-bensAE} is used or
+if standard output is a terminal.
+
 @exitstatus
+
+Examples:
+
+@smallexample
+# Output f's contents, then standard input, then g's contents.
+cat f - g
+
+# Copy standard input to standard output.
+cat
+@end smallexample
 
 
 @node tac invocation
@@ -1692,7 +1663,7 @@ more consecutive output lines would be identical, @command{od} outputs only
 the first line, and puts just an asterisk on the following line to
 indicate the elision.
 
-@item -w @var{n}
+@item -w[@var{n}]
 @itemx --width[=@var{n}]
 @opindex -w
 @opindex --width
@@ -1701,11 +1672,7 @@ the least common multiple of the sizes associated with the specified
 output types.
 
 If this option is not given at all, the default is 16.  If @var{n} is
-omitted with @option{--width}, the default is 32.  On older systems,
-@sc{gnu} @command{od} instead supports an obsolete option
-@option{-w[@var{n}]}, where @var{n} also defaults to 32.  @acronym{POSIX}
-1003.1-2001 (@pxref{Standards conformance}) does not allow @option{-w}
-without an argument; use @option{--width} instead.
+omitted, the default is 32.
 
 @end table
 
@@ -2193,7 +2160,7 @@ three column options (@option{-COLUMN}|@option{-a -COLUMN}|@option{-m}) unless
 @option{-w} is set.  This is a @acronym{POSIX}-compliant formulation.
 
 
-@item -S @var{string}
+@item -S@var{string}
 @itemx --sep-string[=@var{string}]
 @opindex -S
 @opindex --sep-string
@@ -2203,15 +2170,8 @@ does not affect line truncation or column alignment.
 Without @option{-S}, and with @option{-J}, @command{pr} uses the default output
 separator, TAB@.
 Without @option{-S} or @option{-J}, @command{pr} uses a @samp{space}
-(same as @option{-S"@w{ }"}).  With @option{-S@var{string}},
-@var{string} must be nonempty; @option{--sep-string} with no
-@var{string} is equivalent to @option{--sep-string=""}.
-
-On older systems, @command{pr} instead supports an obsolete option
-@option{-S[@var{string}]}, where @var{string} is optional.  @acronym{POSIX}
-1003.1-2001 (@pxref{Standards conformance}) does not allow this older
-usage.  To specify an empty @var{string} portably, use
-@option{--sep-string}.
+(same as @option{-S"@w{ }"}).  @option{--sep-string} with no
+@samp{=@var{string}} is equivalent to @option{--sep-string=""}.
 
 @item -t
 @itemx --omit-header
@@ -2318,9 +2278,8 @@ is broken at the maximum line length as usual.
 @opindex --width
 Use a maximum line length of @var{width} columns instead of 80.
 
-On older systems, @command{fold} supports an obsolete option
-@option{-@var{width}}.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards
-conformance}) does not allow this; use @option{-w @var{width}}
+For compatibility @command{fold} supports an obsolete option syntax
+@option{-@var{width}}.  New scripts should use @option{-w @var{width}}
 instead.
 
 @end table
@@ -2406,13 +2365,13 @@ Always print file name headers.
 
 @end table
 
-On older systems, @command{head} supports an obsolete option
+For compatibility @command{head} also supports an obsolete option syntax
 @option{-@var{count}@var{options}}, which is recognized only if it is
 specified first.  @var{count} is a decimal number optionally followed
 by a size letter (@samp{b}, @samp{k}, @samp{m}) as in @option{-c}, or
 @samp{l} to mean count by lines, or other option letters (@samp{cqv}).
-@acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance}) does not allow
-this; use @option{-c @var{count}} or @option{-n @var{count}} instead.
+New scripts should use @option{-c @var{count}} or @option{-n
+@var{count}} instead.
 
 @exitstatus
 
@@ -2587,21 +2546,28 @@ Always print file name headers.
 
 @end table
 
-On older systems, @command{tail} supports an obsolete option
-@option{-@var{count}[bcl][f]}, which is recognized only if it is
-specified first.  @var{count} is an optional decimal number optionally
+For compatibility @command{tail} also supports an obsolete usage
+@samp{tail -@var{count}[bcl][f] [@var{file}]}, which is recognized
+only if it does not conflict with the usage described
+above.  @var{count} is an optional decimal number optionally
 followed by a size letter (@samp{b}, @samp{c}, @samp{l}) to mean count
 by 512-byte blocks, bytes, or lines, optionally followed by @samp{f}
-which has the same meaning as @option{-f}.  Also, the leading @samp{-}
-can be replaced by @samp{+} with the same meaning as in counts.
-@acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance}) does not
-allow most of these obsolete usages; use @option{-c @var{count}[b]},
+which has the same meaning as @option{-f}.
+New scripts should use @option{-c @var{count}[b]},
 @option{-n @var{count}}, and/or @option{-f} instead.
 
-On older systems, obsolete usage overrides normal usage, so portable
-shell scripts should avoid commands that can be interpreted either
-way.  For example, use @samp{tail -- - file} rather than @samp{tail -
-file}, and use @samp{tail -c4} rather than @samp{tail -c 4}.
+@vindex _POSIX2_VERSION
+On older systems, the leading @samp{-} can be replaced by @samp{+} in
+the obsolete option syntax with the same meaning as in counts, and
+obsolete usage overrides normal usage when the two conflict.
+This obsolete behavior can be enabled or disabled with the
+@env{_POSIX2_VERSION} environment variable (@pxref{Standards
+conformance}), but portable scripts should avoid commands whose
+behavior depends on this variable.
+For example, use @samp{tail -- - main.c} or @samp{tail main.c} rather than
+the ambiguous @samp{tail - main.c}, @samp{tail -c4} or @samp{tail -c 10
+4} rather than the ambiguous @samp{tail -c 4}, and @samp{tail ./+4}
+or @samp{tail -n +4} rather than the ambiguous @samp{tail +4}.
 
 @exitstatus
 
@@ -2649,10 +2615,9 @@ Use suffixes of length @var{length}.  The default @var{length} is 2.
 @opindex --lines
 Put @var{lines} lines of @var{input} into each output file.
 
-On older systems, @command{split} supports an obsolete option
-@option{-@var{lines}}.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards
-conformance}) does not allow this; use @option{-l @var{lines}}
-instead.
+For compatibility @command{split} also supports an obsolete
+option syntax @option{-@var{lines}}.  New scripts should use @option{-l
+@var{lines}} instead.
 
 @item -b @var{bytes}
 @itemx --bytes=@var{bytes}
@@ -3018,11 +2983,10 @@ options}.
 If a @var{file} is specified as @samp{-} or if no files are given
 @command{md5sum} computes the checksum for the standard input.
 @command{md5sum} can also determine whether a file and checksum are
-consistent.  Synopses:
+consistent.  Synopsis:
 
 @example
 md5sum [@var{option}]@dots{} [@var{file}]@dots{}
-md5sum [@var{option}]@dots{} --check [@var{file}]
 @end example
 
 For each @var{file}, @samp{md5sum} outputs the MD5 checksum, a flag
@@ -3038,17 +3002,19 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex -b
 @opindex --binary
 @cindex binary input files
-Treat all input files as binary.  This option has no effect on Unix
-systems, since they don't distinguish between binary and text files.
-This option is useful on systems that have different internal and
-external character representations.  On MS-DOS and MS-Windows, this is
-the default.
+Treat each input file as binary, by reading it in binary mode and
+outputting a @samp{*} flag.  This is the inverse of @option{--text}.
+On systems like @acronym{GNU} that do not distinguish between binary
+and text files, this option merely flags each input file as binary:
+the MD5 checksum is unaffected.  This option is the default on systems
+like MS-DOS that distinguish between binary and text files, except
+for reading standard input when standard input is a terminal.
 
 @item -c
 @itemx --check
-Read file names and checksum information from the single @var{file}
-(or from stdin if no @var{file} was specified) and report whether
-each named file and the corresponding checksum data are consistent.
+Read file names and checksum information (not data) from each
+@var{file} (or from stdin if no @var{file} was specified) and report
+whether the checksums match the contents of the named files.
 The input to this mode of @command{md5sum} is usually the output of
 a prior, checksum-generating run of @samp{md5sum}.
 Each valid line of input consists of an MD5 checksum, a binary/text
@@ -3085,8 +3051,12 @@ indicating there was a failure.
 @opindex -t
 @opindex --text
 @cindex text input files
-Treat all input files as text files.  This is the reverse of
-@option{--binary}.
+Treat each input file as text, by reading it in text mode and
+outputting a @samp{ } flag.  This is the inverse of @option{--binary}.
+This option is the default on systems like @acronym{GNU} that do not
+distinguish between binary and text files.  On other systems, it is
+the default for reading standard input when standard input is a
+terminal.
 
 @item -w
 @itemx --warn
@@ -3433,7 +3403,7 @@ However, fields that extend to the end of the line,
 as @option{-k 2}, or fields consisting of a range, as @option{-k 2,3},
 retain the field separators present between the endpoints of the range.
 
-To specify a zero byte (@acronym{ASCII} @sc{nul} (Null) character) as
+To specify a null character (@acronym{ASCII} @sc{nul}) as
 the field separator, use the two-character string @samp{\0}, e.g.,
 @samp{sort -t '\0'}.
 
@@ -3473,9 +3443,9 @@ uniq} inspects the entire line.  @xref{uniq invocation}.
 @opindex -z
 @opindex --zero-terminated
 @cindex sort zero-terminated lines
-Treat the input as a set of lines, each terminated by a zero byte
-(@acronym{ASCII} @sc{nul} (Null) character) instead of an
-@acronym{ASCII} @sc{lf} (Line Feed).
+Treat the input as a set of lines, each terminated by a null character
+(@acronym{ASCII} @sc{nul}) instead of a line feed
+(@acronym{ASCII} @sc{lf}).
 This option can be useful in conjunction with @samp{perl -0} or
 @samp{find -print0} and @samp{xargs -0} which do the same in order to
 reliably handle arbitrary file names (even those containing blanks
@@ -3516,10 +3486,15 @@ numbers of leading blanks in fields can cause confusing results.
 
 Keys can span multiple fields.
 
+@vindex _POSIX2_VERSION
 On older systems, @command{sort} supports an obsolete origin-zero
 syntax @samp{+@var{pos1} [-@var{pos2}]} for specifying sort keys.
-@acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance}) does not allow
-this; use @option{-k} instead.
+This obsolete behavior can be enabled or disabled with the
+@env{_POSIX2_VERSION} environment variable (@pxref{Standards
+conformance}), but portable scripts should avoid commands whose
+behavior depends on this variable.
+For example, use @samp{sort ./+2} or @samp{sort -k 3} rather than
+the ambiguous @samp{sort +2}.
 
 Here are some examples to illustrate various combinations of options.
 
@@ -3689,9 +3664,8 @@ a null string for comparison if a line has fewer than @var{n} fields.  Fields
 are sequences of non-space non-tab characters that are separated from
 each other by at least one space or tab.
 
-On older systems, @command{uniq} supports an obsolete option
-@option{-@var{n}}.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance})
-does not allow this; use @option{-f @var{n}} instead.
+For compatibility @command{uniq} supports an obsolete option syntax
+@option{-@var{n}}.  New scripts should use @option{-f @var{n}} instead.
 
 @item -s @var{n}
 @itemx --skip-chars=@var{n}
@@ -3701,9 +3675,15 @@ Skip @var{n} characters before checking for uniqueness.  Use a null string
 for comparison if a line has fewer than @var{n} characters.  If you use both
 the field and character skipping options, fields are skipped over first.
 
-On older systems, @command{uniq} supports an obsolete option
-@option{+@var{n}}.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance})
-does not allow this; use @option{-s @var{n}} instead.
+@vindex _POSIX2_VERSION
+On older systems, @command{uniq} supports an obsolete option syntax
+@option{+@var{n}}.
+This obsolete behavior can be enabled or disabled with the
+@env{_POSIX2_VERSION} environment variable (@pxref{Standards
+conformance}), but portable scripts should avoid commands whose
+behavior depends on this variable.
+For example, use @samp{uniq ./+10} or @samp{uniq -s 10} rather than
+the ambiguous @samp{uniq +10}.
 
 @item -c
 @itemx --count
@@ -4416,7 +4396,7 @@ disabled, width of references is not taken into account in the output
 line width computations.
 
 @item
-All 256 characters, even @sc{nul}s, are always read and processed from
+All 256 bytes, even null bytes, are always read and processed from
 input file with no adverse effect, even if @sc{gnu} extensions are disabled.
 However, System V @command{ptx} does not accept 8-bit characters, a few
 control characters are rejected, and the tilde @kbd{~} is also rejected.
@@ -4517,8 +4497,8 @@ line that contains no delimiter character, unless the
 @itemx --delimiter=@var{input_delim_byte}
 @opindex -d
 @opindex --delimiter
-For @option{-f}, fields are separated in the input by the first character
-in @var{input_delim_byte} (default is TAB).
+With @option{-f}, use the first byte of @var{input_delim_byte} as
+the input fields separator (default is TAB).
 
 @item -n
 @opindex -n
@@ -4669,11 +4649,15 @@ c c1 c2
 b b1 b2
 @end example
 
-The defaults are: the join field is the first field in each line;
-fields in the input are separated by one or more blanks, with leading
-blanks on the line ignored; fields in the output are separated by a
-space; each output line consists of the join field, the remaining
+The defaults are:
+@itemize
+@item the join field is the first field in each line;
+@item fields in the input are separated by one or more blanks, with leading
+      blanks on the line ignored;
+@item fields in the output are separated by a space;
+@item each output line consists of the join field, the remaining
 fields from @var{file1}, then the remaining fields from @var{file2}.
+@end itemize
 
 The program accepts the following options.  Also see @ref{Common options}.
 
@@ -4742,10 +4726,6 @@ Print a line for each unpairable line in file @var{file-number}
 (either @samp{1} or @samp{2}), instead of the normal output.
 
 @end table
-
-In addition, when @sc{gnu} @command{join} is invoked with exactly one argument,
-the @option{--help} and @option{--version} options are recognized.
-@xref{Common options}.
 
 @exitstatus
 
@@ -5173,11 +5153,9 @@ If only one tab stop is given, set the tabs @var{tab1} spaces apart
 last tab stop given with single spaces.  Tab stops can be separated by
 blanks as well as by commas.
 
-On older systems, @command{expand} supports an obsolete option
-@option{-@var{tab1}[,@var{tab2}]@dots{}}, where tab stops must be
-separated by commas.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards
-conformance}) does not allow this; use @option{-t
-@var{tab1}[,@var{tab2}]@dots{}} instead.
+For compatibility, GNU @command{expand} also accepts the obsolete
+option syntax, @option{-@var{t1}[,@var{t2}]@dots{}}.  New scripts
+should use @option{-t @var{t1}[,@var{t2}]@dots{}} instead.
 
 @item -i
 @itemx --initial
@@ -5228,11 +5206,10 @@ instead of the default 8.  Otherwise, set the tabs at columns
 beyond the tab stops given unchanged.  Tab stops can be separated by
 blanks as well as by commas.  This option implies the @option{-a} option.
 
-On older systems, @command{unexpand} supports an obsolete option
+For compatibility, GNU @command{unexpand} supports the obsolete option syntax,
 @option{-@var{tab1}[,@var{tab2}]@dots{}}, where tab stops must be
 separated by commas.  (Unlike @option{-t}, this obsolete option does
-not imply @option{-a}.)  @acronym{POSIX} 1003.1-2001 (@pxref{Standards
-conformance}) does not allow this; use @option{--first-only -t
+not imply @option{-a}.)  New scripts should use @option{--first-only -t
 @var{tab1}[,@var{tab2}]@dots{}} instead.
 
 @item -a
@@ -5494,23 +5471,23 @@ $ touch a/sub/deeper/file
 $ ls -gloRF --dired a
   a:
   total 8
-  -rw-r--r--  1    0 Dec  3 00:50 f1
-  -rw-r--r--  1    0 Dec  3 00:50 f2
-  drwxr-xr-x  3 4096 Dec  3 00:50 sub/
-  drwxr-xr-x  2 4096 Dec  3 00:50 sub2/
+  -rw-r--r-- 1    0 Jun 10 12:27 f1
+  -rw-r--r-- 1    0 Jun 10 12:27 f2
+  drwxr-xr-x 3 4096 Jun 10 12:27 sub/
+  drwxr-xr-x 2 4096 Jun 10 12:27 sub2/
 
   a/sub:
   total 4
-  drwxr-xr-x  2 4096 Dec  3 00:50 deeper/
+  drwxr-xr-x 2 4096 Jun 10 12:27 deeper/
 
   a/sub/deeper:
   total 0
-  -rw-r--r--  1 0 Dec  3 00:50 file
+  -rw-r--r-- 1 0 Jun 10 12:27 file
 
   a/sub2:
   total 0
-//DIRED// 49 51 86 88 123 126 162 166 222 228 288 292
-//SUBDIRED// 2 3 171 176 233 245 296 302
+//DIRED// 48 50 84 86 120 123 158 162 217 223 282 286
+//SUBDIRED// 2 3 167 172 228 240 290 296
 //DIRED-OPTIONS// --quoting-style=literal
 @end example
 
@@ -5539,8 +5516,8 @@ on a file whose name contains special characters, notice that the backslash
 @example
 $ touch 'a b'
 $ ls -blog --dired 'a b'
-  -rw-r--r--  1 0 Dec  3 00:52 a\ b
-//DIRED// 31 35
+  -rw-r--r-- 1 0 Jun 10 12:28 a\ b
+//DIRED// 30 34
 //DIRED-OPTIONS// --quoting-style=escape
 @end example
 
@@ -5642,8 +5619,9 @@ is a printing character (e.g., @samp{+}), then there is such a method.
 @opindex -n
 @opindex --numeric-uid-gid
 @cindex numeric uid and gid
+@cindex numeric user and group IDs
 Produce long format directory listings, but
-display numeric UIDs and GIDs instead of the owner and group names.
+display numeric user and group IDs instead of the owner and group names.
 
 @item -o
 @opindex -o
@@ -5688,7 +5666,6 @@ it outputs.  By default, sorting is done by character code
 @item -c
 @itemx --time=ctime
 @itemx --time=status
-@itemx --time=use
 @opindex -c
 @opindex --time
 @opindex ctime@r{, printing or sorting by}
@@ -5735,6 +5712,7 @@ Sort by modification time (the @samp{mtime} in the inode), newest first.
 @item -u
 @itemx --time=atime
 @itemx --time=access
+@itemx --time=use
 @opindex -u
 @opindex --time
 @opindex use time@r{, printing or sorting files by}
@@ -5835,7 +5813,7 @@ output is not a terminal.
 @opindex vertical @r{sorted files in columns}
 List files in columns, sorted vertically.  This is the default for
 @command{ls} if standard output is a terminal.  It is always the default
-for the @command{dir} and @command{d} programs.
+for the @command{dir} program.
 @sc{gnu} @command{ls} uses variable width columns to display as many files as
 possible in the fewest lines.
 
@@ -5873,12 +5851,21 @@ Piping a colorized listing through a pager like @command{more} or
 Append a character to each file name indicating the file type.  Also,
 for regular files that are executable, append @samp{*}.  The file type
 indicators are @samp{/} for directories, @samp{@@} for symbolic links,
-@samp{|} for FIFOs, @samp{=} for sockets, and nothing for regular files.
+@samp{|} for FIFOs, @samp{=} for sockets, @samp{>} for doors,
+and nothing for regular files.
 @c The following sentence is the same as the one for -d.
 Do not follow symbolic links listed on the
 command line unless the @option{--dereference-command-line} (@option{-H}),
 @option{--dereference} (@option{-L}), or
 @option{--dereference-command-line-symlink-to-dir} options are specified.
+
+@item --file-type
+@itemx --indicator-style=file-type
+@opindex --file-type
+@opindex --indicator-style
+@cindex file type, marking
+Append a character to each file name indicating the file type.  This is
+like @option{-F}, except that executables are not marked.
 
 @item --indicator-style=@var{word}
 @opindex --indicator-style
@@ -5887,10 +5874,13 @@ as follows:
 @table @samp
 @item none
 Do not append any character indicator; this is the default.
+@item slash
+Append @samp{/} for directories.  This is the same as the @option{-p}
+option.
 @item file-type
 Append @samp{/} for directories, @samp{@@} for symbolic links, @samp{|}
 for FIFOs, @samp{=} for sockets, and nothing for regular files.  This is
-the same as the @option{-p} or @option{--file-type} option.
+the same as the @option{--file-type} option.
 @item classify
 Append @samp{*} for executable regular files, otherwise behave as for
 @samp{file-type}.  This is the same as the @option{-F} or
@@ -5912,13 +5902,11 @@ List files horizontally, with as many as will fit on each line,
 separated by @samp{, } (a comma and a space).
 
 @item -p
-@itemx --file-type
-@itemx --indicator-style=file-type
-@opindex --file-type
+@itemx --indicator-style=slash
+@opindex -p
 @opindex --indicator-style
 @cindex file type, marking
-Append a character to each file name indicating the file type.  This is
-like @option{-F}, except that executables are not marked.
+Append a @samp{/} to directory names.
 
 @item -x
 @itemx --format=across
@@ -6010,7 +5998,7 @@ uses the full timestamp to determine whether a file is out of date.
 List @acronym{ISO} 8601 date and time in minutes, e.g.,
 @samp{2002-03-30 23:45}.  These timestamps are shorter than
 @samp{full-iso} timestamps, and are usually good enough for everyday
-work.  This style is equivalent to @samp{%Y-%m-%d %H:%M}.
+work.  This style is equivalent to @samp{+%Y-%m-%d %H:%M}.
 
 @item iso
 List @acronym{ISO} 8601 dates for non-recent timestamps (e.g.,
@@ -6072,6 +6060,9 @@ the default style is @samp{posix-long-iso}.  @acronym{GNU} Emacs 21 and
 later can parse @acronym{ISO} dates, but older Emacs versions do not, so if
 you are using an older version of Emacs and specify a non-@acronym{POSIX}
 locale, you may need to set @samp{TIME_STYLE="locale"}.
+
+To avoid certain denial-of-service attacks, timestamps that would be
+longer than 1000 bytes may be treated as errors.
 
 
 @node Formatting the file names
@@ -6177,7 +6168,7 @@ This is the default unless the output is a terminal and the program is
 @pindex dir
 @cindex directory listing, brief
 
-@command{dir} (also installed as @command{d}) is equivalent to @code{ls -C
+@command{dir} is equivalent to @code{ls -C
 -b}; that is, by default files are listed in columns, sorted vertically,
 and special characters are represented by backslash escape sequences.
 
@@ -6190,7 +6181,7 @@ and special characters are represented by backslash escape sequences.
 @pindex vdir
 @cindex directory listing, verbose
 
-@command{vdir} (also installed as @command{v}) is equivalent to @code{ls -l
+@command{vdir} is equivalent to @code{ls -l
 -b}; that is, by default files are listed in long format and special
 characters are represented by backslash escape sequences.
 
@@ -6481,7 +6472,8 @@ to @option{--preserve=mode,ownership,timestamps}.
 
 In the absence of this option, each destination file is created with the
 permissions of the corresponding source file, minus the bits set in the
-umask and minus the set-user-id and set-group-id bits.  @xref{File permissions}.
+umask and minus the set-user-ID and set-group-ID bits.
+@xref{File permissions}.
 
 @itemx @w{@kbd{--no-preserve}=@var{attribute_list}}
 @cindex file information, preserving
@@ -6504,9 +6496,11 @@ cp --parents a/b/c existing_dir
 copies the file @file{a/b/c} to @file{existing_dir/a/b/c}, creating
 any missing intermediate directories.
 
-@itemx @w{@kbd{--reply}[=@var{how}]}
+@itemx @w{@kbd{--reply}=@var{how}}
 @opindex --reply
 @cindex interactivity
+@c FIXME: remove in 2008
+@strong{Deprecated: to be removed in 2008.}@*
 Using @option{--reply=yes} makes @command{cp} act as if @samp{yes} were
 given as a response to every prompt about a destination file.  That effectively
 cancels any preceding @option{--interactive} or @option{-i} option.
@@ -6616,8 +6610,6 @@ destination.
 @opindex -v
 @opindex --verbose
 Print the name of each file before copying it.
-
-@optVersionControl
 
 @item -x
 @itemx --one-file-system
@@ -6860,6 +6852,18 @@ This has no effect when the file is not a terminal.
 On many hosts (e.g., @acronym{GNU}/Linux hosts), this option has no effect
 at all.
 
+@item binary
+@opindex binary
+@cindex binary I/O
+Use binary I/O.  This option has an effect only on nonstandard
+platforms that distinguish binary from text I/O.
+
+@item text
+@opindex text
+@cindex text I/O
+Use text I/O.  Like @samp{binary}, this option has no effect on
+standard platforms.
+
 @end table
 
 These flags are not supported on all systems, and @samp{dd} rejects
@@ -6893,16 +6897,16 @@ tape=/dev/rmt/0
 (dd bs=4k seek=1 count=0 && dd bs=512k) <$tape >$disk
 @end example
 
-Note that sending a @samp{SIGUSR1} signal to a running @command{dd}
-process makes it print I/O statistics to standard error,
-then to resume copying.  In the example below,
+Sending an @samp{INFO} signal to a running @command{dd}
+process makes it print I/O statistics to standard error
+and then resume copying.  In the example below,
 @command{dd} is run in the background to copy 10 million blocks.
 The @command{kill} command makes it output intermediate I/O statistics,
 and when @command{dd} completes, it outputs the final statistics.
 
 @example
 $ dd if=/dev/zero of=/dev/null count=10MB & pid=$!
-$ kill -s USR1 $pid; wait $pid
+$ kill -s INFO $pid; wait $pid
 3385223+0 records in
 3385223+0 records out
 1733234176 bytes (1.7 GB) copied, 6.42173 seconds, 270 MB/s
@@ -6910,6 +6914,11 @@ $ kill -s USR1 $pid; wait $pid
 10000000+0 records out
 5120000000 bytes (5.1 GB) copied, 18.913 seconds, 271 MB/s
 @end example
+
+@vindex POSIXLY_CORRECT
+On systems lacking the @samp{INFO} signal @command{dd} responds to the
+@samp{USR1} signal instead, unless the @env{POSIXLY_CORRECT}
+environment variable is set.
 
 @exitstatus
 
@@ -6984,7 +6993,7 @@ gives directories that it creates the default attributes.)
 @cindex group ownership of installed files, setting
 Set the group ownership of installed files or directories to
 @var{group}.  The default is the process's current group.  @var{group}
-may be either a group name or a numeric group id.
+may be either a group name or a numeric group ID.
 
 @item -m @var{mode}
 @itemx --mode=@var{mode}
@@ -6993,8 +7002,9 @@ may be either a group name or a numeric group id.
 @cindex permissions of installed files, setting
 Set the permissions for the installed file or directory to @var{mode},
 which can be either an octal number, or a symbolic mode as in
-@command{chmod}, with 0 as the point of departure (@pxref{File
-permissions}).  The default mode is @samp{u=rwx,go=rx}---read, write,
+@command{chmod}, with @samp{a=} (no access allowed to anyone) as the
+point of departure (@pxref{File permissions}).
+The default mode is @samp{u=rwx,go=rx}---read, write,
 and execute for the owner, and read and execute for group and other.
 
 @item -o @var{owner}
@@ -7041,8 +7051,6 @@ Strip the symbol tables from installed binary executables.
 @opindex -v
 @opindex --verbose
 Print the name of each file before copying it.
-
-@optVersionControl
 
 @end table
 
@@ -7123,14 +7131,20 @@ Prompt whether to overwrite each existing destination file, regardless
 of its permissions.
 If the response is not affirmative, the file is skipped.
 
-@itemx @w{@kbd{--reply}[=@var{how}]}
+@itemx @w{@kbd{--reply}=@var{how}}
 @opindex --reply
 @cindex interactivity
+@c FIXME: remove in 2008
+@strong{Deprecated: to be removed in 2008.}@*
 Specifying @option{--reply=yes} is equivalent to using @option{--force}.
 Specify @option{--reply=no} to make @command{mv} act as if @samp{no} were
 given as a response to every prompt about a destination file.
 Specify @option{--reply=query} to make @command{mv} prompt the user
 about each existing destination file.
+Note that @option{--reply=no} has an effect only when @command{mv} would prompt
+without @option{-i} or equivalent, i.e., when a destination file exists and is
+not writable, standard input is a terminal, and no @option{-f} (or equivalent)
+option is specified.
 
 @item -u
 @itemx --update
@@ -7158,8 +7172,6 @@ Print the name of each file before moving it.
 @optTargetDirectory
 
 @optNoTargetDirectory
-
-@optVersionControl
 
 @end table
 
@@ -7247,7 +7259,7 @@ Cancel the effect of any preceding @option{--preserve-root} option.
 @opindex -R
 @opindex --recursive
 @cindex directories, removing (recursively)
-Remove the contents of directories recursively.
+Remove the listed directories and their contents recursively.
 
 @item -v
 @itemx --verbose
@@ -7334,8 +7346,8 @@ assumption.  Exceptions include:
 
 @item
 Log-structured or journaled file systems, such as those supplied with
-AIX and Solaris, and JFS, ReiserFS, XFS, Ext3, BFS, NTFS etc.@: when
-they are configured to journal @emph{data}.
+AIX and Solaris, and JFS, ReiserFS, XFS, Ext3 (in @code{data=journal} mode),
+BFS, NTFS, etc.@: when they are configured to journal @emph{data}.
 
 @item
 File systems that write redundant data and carry on even if some writes
@@ -7351,6 +7363,15 @@ clients.
 @item
 Compressed file systems.
 @end itemize
+
+In the particular case of ext3 file systems, the above disclaimer applies (and
+@command{shred} is thus of limited effectiveness) only in @code{data=journal}
+mode, which journals file data in addition to just metadata. In both
+the @code{data=ordered} (default) and @code{data=writeback} modes,
+@command{shred} works as usual.  Ext3 journaling modes can be changed
+by adding the @code{data=something} option to the mount options for a
+particular file system in the @file{/etc/fstab} file, as documented in
+the mount man page (man mount).
 
 If you are not sure how your file system operates, then you should assume
 that it does not overwrite data in place, which means that shred cannot
@@ -7693,19 +7714,37 @@ an error message on systems that do not support symbolic links.
 @opindex --verbose
 Print the name of each file before linking it.
 
-@optVersionControl
-
 @end table
+
+@exitstatus
 
 Examples:
 
 @smallexample
-ln -s /some/name  # creates link ./name pointing to /some/name
-ln -s /some/name myname  # creates link ./myname pointing to /some/name
-ln -s a b ..      # creates links ../a and ../b pointing to ./a and ./b
-@end smallexample
+Bad Example:
 
-@exitstatus
+# Create link ../a pointing to a in that directory.
+# Not really useful because it points to itself.
+ln -s a ..
+
+Better Example:
+
+# Change to the target before creating symlinks to avoid being confused.
+cd ..
+ln -s adir/a .
+
+Bad Example:
+
+# Hard coded file names don't move well.
+ln -s $(pwd)/a /some/dir/
+
+Better Example:
+
+# Relative file names survive directory moves and also
+# work across networked file systems.
+ln -s afile anotherfile
+ln -s ../adir/afile yetanotherfile
+@end smallexample
 
 
 @node mkdir invocation
@@ -7741,8 +7780,7 @@ The program accepts the following options.  Also see @ref{Common options}.
 @cindex modes of created directories, setting
 Set the mode of created directories to @var{mode}, which is symbolic as
 in @command{chmod} and uses @samp{a=rwx} (read, write and execute allowed for
-everyone) minus the bits set in the umask for the point of the
-departure.  @xref{File permissions}.
+everyone) for the point of the departure.  @xref{File permissions}.
 
 @item -p
 @itemx --parents
@@ -7794,8 +7832,8 @@ The program accepts the following option.  Also see @ref{Common options}.
 @opindex --mode
 @cindex modes of created FIFOs, setting
 Set the mode of created FIFOs to @var{mode}, which is symbolic as in
-@command{chmod} and uses @samp{a=rw} (read and write allowed for everyone) minus
-the bits set in the umask for the point of departure.  @xref{File permissions}.
+@command{chmod} and uses @samp{a=rw} (read and write allowed for everyone)
+for the point of departure.  @xref{File permissions}.
 
 @end table
 
@@ -7865,8 +7903,8 @@ The program accepts the following option.  Also see @ref{Common options}.
 @opindex -m
 @opindex --mode
 Set the mode of created files to @var{mode}, which is symbolic as in
-@command{chmod} and uses @samp{a=rw} minus the bits set in the umask as the point
-of departure.  @xref{File permissions}.
+@command{chmod} and uses @samp{a=rw} as the point of departure.
+@xref{File permissions}.
 
 @end table
 
@@ -7912,7 +7950,7 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex -f
 @opindex --canonicalize
 Activate canonicalize mode.
-If any path component except the last one is missing or unavailable,
+If any component of the file name except the last one is missing or unavailable,
 @command{readlink} produces no output and exits with a nonzero exit code.
 
 @item -e
@@ -7920,7 +7958,7 @@ If any path component except the last one is missing or unavailable,
 @opindex -e
 @opindex --canonicalize-existing
 Activate canonicalize mode.
-If any path component is missing or unavailable, @command{readlink} produces
+If any component is missing or unavailable, @command{readlink} produces
 no output and exits with a nonzero exit code.
 
 @item -m
@@ -7928,7 +7966,7 @@ no output and exits with a nonzero exit code.
 @opindex -m
 @opindex --canonicalize-missing
 Activate canonicalize mode.
-If any path component is missing or unavailable, @command{readlink} treats it
+If any component is missing or unavailable, @command{readlink} treats it
 as a directory.
 
 @item -n
@@ -8049,8 +8087,8 @@ The @command{unlink} command honors the @option{--help} and
 @cindex attributes, file
 
 A file is not merely its contents, a name, and a file type
-(@pxref{Special file types}).  A file also has an owner (a userid), a
-group (a group id), permissions (what the owner can do with the file,
+(@pxref{Special file types}).  A file also has an owner (a user ID), a
+group (a group ID), permissions (what the owner can do with the file,
 what people in the group can do, and what everyone else can do), various
 timestamps, and other information.  Collectively, we call these a file's
 @dfn{attributes}.
@@ -8093,13 +8131,13 @@ Specifically:
 
 @table @var
 @item owner
-If only an @var{owner} (a user name or numeric user id) is given, that
+If only an @var{owner} (a user name or numeric user ID) is given, that
 user is made the owner of each given file, and the files' group is not
 changed.
 
 @item owner@samp{:}group
 If the @var{owner} is followed by a colon and a @var{group} (a
-group name or numeric group id), with no spaces between them, the group
+group name or numeric group ID), with no spaces between them, the group
 ownership of the files is changed as well (to @var{group}).
 
 @item owner@samp{:}
@@ -8167,7 +8205,7 @@ by @var{old-owner}.  @var{old-owner} has the same form as @var{new-owner}
 described above.
 This option is useful primarily from a security standpoint in that
 it narrows considerably the window of potential abuse.
-For example, to reflect a UID numbering change for one user's files
+For example, to reflect a user ID numbering change for one user's files
 without an option like this, @code{root} might run
 
 @smallexample
@@ -8263,6 +8301,19 @@ Recursively change ownership of directories and their contents.
 
 @exitstatus
 
+Examples:
+
+@smallexample
+# Change the owner of /u to "root".
+chown root /u
+
+# Likewise, but also change its group to "staff".
+chown root:staff /u
+
+# Change the owner of /u and subfiles to "root".
+chown -hR root /u
+@end smallexample
+
 
 @node chgrp invocation
 @section @command{chgrp}: Change group ownership
@@ -8272,7 +8323,7 @@ Recursively change ownership of directories and their contents.
 @cindex changing group ownership
 
 @command{chgrp} changes the group ownership of each given @var{file}
-to @var{group} (which can be either a group name or a numeric group id)
+to @var{group} (which can be either a group name or a numeric group ID)
 or to the group of an existing reference file.  Synopsis:
 
 @example
@@ -8371,6 +8422,16 @@ Recursively change the group ownership of directories and their contents.
 
 @exitstatus
 
+Examples:
+
+@smallexample
+# Change the group of /u to "staff".
+chgrp staff /u
+
+# Change the group of /u and subfiles to "staff".
+chgrp -hR staff /u
+@end smallexample
+
 
 @node chmod invocation
 @section @command{chmod}: Change access permissions
@@ -8397,9 +8458,11 @@ recursive directory traversals.
 
 If used, @var{mode} specifies the new permissions.
 For details, see the section on @ref{File permissions}.
-In the extremely rare cases where @var{mode} has leading @samp{-}, a
-portable script should use @option{--} first, e.g., @samp{chmod -- -w
-file}.  Typically, though, @samp{chmod a-w file} is preferable.
+If you really want @var{mode} to have a leading @samp{-}, you should
+use @option{--} first, e.g., @samp{chmod -- -w file}.  Typically,
+though, @samp{chmod a-w file} is preferable, and @command{chmod -w
+file} (without the @option{--}) complains if it behaves differently
+from what @samp{chmod a-w file} would do.
 
 The program accepts the following options.  Also see @ref{Common options}.
 
@@ -8475,16 +8538,11 @@ specified files.  Synopsis:
 touch [@var{option}]@dots{} @var{file}@dots{}
 @end example
 
-On older systems, @command{touch} supports an obsolete syntax, as follows.
-If the first @var{file} would be a valid argument to the @option{-t}
-option and no timestamp is given with any of the @option{-d}, @option{-r},
-or @option{-t} options and the @samp{--} argument is not given, that
-argument is interpreted as the time for the other files instead of
-as a file name.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance})
-does not allow this; use @option{-t} instead.
-
 @cindex empty files, creating
 Any @var{file} that does not exist is created empty.
+
+A @var{file} of @samp{-} causes @command{touch} to change the
+times of the file associated with standard output.
 
 @cindex permissions, for changing file timestamps
 If changing both the access and modification times to the current
@@ -8575,7 +8633,7 @@ the origin for any relative @var{time}s given, but is otherwise ignored.
 For example, @samp{-r foo -d '-5 seconds'} specifies a time stamp
 equal to five seconds before the corresponding time stamp for @file{foo}.
 
-@item -t [[CC]YY]MMDDhhmm[.ss]
+@item -t [[@var{CC}]@var{YY}]@var{MMDDhhmm}[.@var{ss}]
 Use the argument (optional four-digit or two-digit years, months,
 days, hours, minutes, optional seconds) instead of the current time.
 If the year is specified with only two digits, then @var{CC}
@@ -8584,6 +8642,22 @@ is 20 for years in the range 0 @dots{} 68, and 19 for years in
 the argument is interpreted as a date in the current year.
 
 @end table
+
+@vindex _POSIX2_VERSION
+On older systems, @command{touch} supports an obsolete syntax, as follows.
+If no timestamp is given with any of the @option{-d}, @option{-r}, or
+@option{-t} options, and if there are two or more @var{file}s and the
+first @var{file} is of the form @samp{@var{MMDDhhmm}[@var{YY}]} and this
+would be a valid argument to the @option{-t} option (if the @var{YY}, if
+any, were moved to the front), and if the represented year
+is in the range 1969--1999, that argument is interpreted as the time
+for the other files instead of as a file name.
+This obsolete behavior can be enabled or disabled with the
+@env{_POSIX2_VERSION} environment variable (@pxref{Standards
+conformance}), but portable scripts should avoid commands whose
+behavior depends on this variable.
+For example, use @samp{touch ./12312359 main.c} or @samp{touch -t
+12312359 main.c} rather than the ambiguous @samp{touch 12312359 main.c}.
 
 @exitstatus
 
@@ -8649,11 +8723,9 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex --all
 @cindex automounter file systems
 @cindex ignore file systems
-Include in the listing file systems that have a size of 0 blocks, which
+Include in the listing dummy file systems, which
 are omitted by default.  Such file systems are typically special-purpose
-pseudo-file-systems, such as automounter entries.  Also, file systems of
-type ``ignore'' or ``auto'', supported by some operating systems, are
-only included if this option is specified.
+pseudo-file-systems, such as automounter entries.
 
 @item -B @var{size}
 @itemx --block-size=@var{size}
@@ -8887,14 +8959,14 @@ are often symbolic links.
 @opindex --files0-from=@var{FILE}
 @cindex including files from @command{du}
 Rather than processing files named on the command line, process those
-in the @sc{nul}-terminated list in file @var{FILE}.
+named in file @var{FILE}; each name is terminated by a null byte.
 This is useful with the @option{--total} (@option{-c}) option when
 the list of file names is so long that it may exceed a command line
 length limitation.
 In such cases, running @command{du} via @command{xargs} is undesirable
 because it splits the list into pieces and makes @command{du} print a
 total for each sublist rather than for the entire list.
-One way to produce a list of @sc{nul}-terminated file names is with @sc{gnu}
+One way to produce a list of null-byte-terminated file names is with @sc{gnu}
 @command{find}, using its @option{-print0} predicate.
 Do not specify any @var{FILE} on the command line when using this option.
 
@@ -8931,6 +9003,13 @@ Dereference symbolic links (show the disk space used by the file
 or directory that the link points to instead of the space used by
 the link).
 
+@item -m
+@opindex -m
+@cindex mebibytes for file sizes
+Print sizes in 1,048,576-byte blocks, overriding the default block size
+(@pxref{Block size}).
+This option is equivalent to @option{--block-size=1M}.
+
 @item -P
 @itemx --no-dereference
 @opindex -P
@@ -8950,8 +9029,8 @@ is at level 0, so @code{du --max-depth=0} is equivalent to @code{du -s}.
 @opindex -0
 @itemx --null
 @opindex --null
-@cindex output @sc{nul}-terminated lines
-Output the zero byte (@sc{nul}) at the end of each line, rather than a newline.
+@cindex output null-byte-terminated lines
+Output a null byte at the end of each line, rather than a newline.
 This option enables other programs to parse the output of @command{du}
 even when that output would contain file names with embedded newlines.
 
@@ -8975,6 +9054,73 @@ Display only a total for each argument.
 @opindex --separate-dirs
 Report the size of each directory separately, not including the sizes
 of subdirectories.
+
+@itemx --time
+@opindex --time
+@cindex last modified dates, displaying in @command{du}
+Show time of the most recent modification of any file in the directory,
+or any of its subdirectories.
+
+@itemx --time=ctime
+@itemx --time=status
+@itemx --time=use
+@opindex --time
+@opindex ctime@r{, show the most recent}
+@opindex status time@r{, show the most recent}
+@opindex use time@r{, show the most recent}
+Show the most recent status change time (the @samp{ctime} in the inode) of
+any file in the directory, instead of the modification time.
+
+@itemx --time=atime
+@itemx --time=access
+@opindex --time
+@opindex atime@r{, show the most recent}
+@opindex access time@r{, show the most recent}
+Show the most recent access time (the @samp{atime} in the inode) of
+any file in the directory, instead of the modification time.
+
+@item --time-style=@var{style}
+@opindex --time-style
+@cindex time style
+List timestamps in style @var{style}.  This option has an effect only if
+the @option{--time} option is also specified.  The @var{style} should
+be one of the following:
+
+@table @samp
+@item +@var{format}
+@vindex LC_TIME
+List timestamps using @var{format}, where @var{format} is interpreted
+like the format argument of @command{date} (@pxref{date invocation}).
+For example, @option{--time-style="+%Y-%m-%d %H:%M:%S"} causes
+@command{du} to list timestamps like @samp{2002-03-30 23:45:56}.  As
+with @command{date}, @var{format}'s interpretation is affected by the
+@env{LC_TIME} locale category.
+
+@item full-iso
+List timestamps in full using @acronym{ISO} 8601 date, time, and time zone
+format with nanosecond precision, e.g., @samp{2002-03-30
+23:45:56.477817180 -0700}.  This style is equivalent to
+@samp{+%Y-%m-%d %H:%M:%S.%N %z}.
+
+@item long-iso
+List @acronym{ISO} 8601 date and time in minutes, e.g.,
+@samp{2002-03-30 23:45}.  These timestamps are shorter than
+@samp{full-iso} timestamps, and are usually good enough for everyday
+work.  This style is equivalent to @samp{+%Y-%m-%d %H:%M}.
+
+@item iso
+List @acronym{ISO} 8601 dates for timestamps, e.g., @samp{2002-03-30}.
+This style is equivalent to @samp{+%Y-%m-%d}.
+@end table
+
+@vindex TIME_STYLE
+You can specify the default value of the @option{--time-style} option
+with the environment variable @env{TIME_STYLE}; if @env{TIME_STYLE} is not set
+the default style is @samp{long-iso}.  For compatibility with @command{ls},
+if @env{TIME_STYLE} begins with @samp{+} and contains a newline,
+the newline and any later characters are ignored; if @env{TIME_STYLE}
+begins with @samp{posix-} the @samp{posix-} is ignored; and if
+@env{TIME_STYLE} is @samp{locale} it is ignored.
 
 @item -x
 @itemx --one-file-system
@@ -9033,14 +9179,6 @@ also give information about the files the links point to.
 
 @table @samp
 
-@item -f
-@itemx --file-system
-@opindex -f
-@opindex --file-system
-@cindex file systems
-Report information about the file systems where the given files are located
-instead of information about the files themselves.
-
 @item -L
 @itemx --dereference
 @opindex -L
@@ -9051,12 +9189,13 @@ With this option, @command{stat} acts on the file referenced
 by each symbolic link argument.
 Without it, @command{stat} acts on any symbolic link argument directly.
 
-@item -t
-@itemx --terse
-@opindex -t
-@opindex --terse
-@cindex terse output
-Print the information in terse form, suitable for parsing by other programs.
+@item -f
+@itemx --file-system
+@opindex -f
+@opindex --file-system
+@cindex file systems
+Report information about the file systems where the given files are located
+instead of information about the files themselves.
 
 @item -c
 @itemx --format=@var{format}
@@ -9064,8 +9203,38 @@ Print the information in terse form, suitable for parsing by other programs.
 @opindex --format=@var{format}
 @cindex output format
 Use @var{format} rather than the default format.
+@var{format} is automatically newline-terminated, so
+running a command like the following with two or more @var{file}
+operands produces a line of output for each operand:
+@example
+$ stat --format=%d:%i / /usr
+2050:2
+2057:2
+@end example
 
-Interpreted sequences for file stat are:
+@itemx --printf=@var{format}
+@opindex --printf=@var{format}
+@cindex output format
+Use @var{format} rather than the default format.
+Like like @option{--format}, but interpret backslash escapes,
+and do not output a mandatory trailing newline.
+If you want a newline, include @samp{\n} in the @var{format}.
+Here's how you would use @option{--printf} to print the device
+and inode numbers of @file{/} and @file{/usr}:
+@example
+$ stat --printf='%d:%i\n' / /usr
+2050:2
+2057:2
+@end example
+
+@item -t
+@itemx --terse
+@opindex -t
+@opindex --terse
+@cindex terse output
+Print the information in terse form, suitable for parsing by other programs.
+
+The valid format sequences for files are:
 
 @itemize @bullet
 @item %a - Access rights in octal
@@ -9074,19 +9243,19 @@ Interpreted sequences for file stat are:
 @item %B - The size in bytes of each block reported by @samp{%b}
 @item %d - Device number in decimal
 @item %D - Device number in hex
-@item %f - raw mode in hex
+@item %f - Raw mode in hex
 @item %F - File type
-@item %g - Group Id of owner
+@item %g - Group ID of owner
 @item %G - Group name of owner
 @item %h - Number of hard links
 @item %i - Inode number
 @item %n - File name
-@item %N - Quoted File name with dereference if symbolic link
+@item %N - Quoted file name with dereference if symbolic link
 @item %o - I/O block size
 @item %s - Total size, in bytes
 @item %t - Major device type in hex
 @item %T - Minor device type in hex
-@item %u - User Id of owner
+@item %u - User ID of owner
 @item %U - User name of owner
 @item %x - Time of last access
 @item %X - Time of last access as seconds since Epoch
@@ -9096,19 +9265,21 @@ Interpreted sequences for file stat are:
 @item %Z - Time of last change as seconds since Epoch
 @end itemize
 
-Interpreted sequences for file system stat are:
+The valid format sequences for file systems are:
 
 @itemize @bullet
-@item %n - File name
-@item %i - File System id in hex
+@item %a - Free blocks available to non-superuser
+@item %b - Total data blocks in file system
+@item %c - Total file nodes in file system
+@item %d - Free file nodes in file system
+@item %f - Free blocks in file system
+@item %i - File System ID in hex
 @item %l - Maximum length of file names
+@item %n - File name
+@item %s - Block size (for faster transfers)
+@item %S - Fundamental block size (for block counts)
 @item %t - Type in hex
 @item %T - Type in human readable form
-@item %b - Total data blocks in file system
-@item %f - Free blocks in file system
-@item %a - Free blocks available to non-superuser
-@item %s - Optimal transfer block size
-@item %c - Total file nodes in file system
 @end itemize
 
 @vindex TZ
@@ -9441,6 +9612,9 @@ pipeline.
 @command{false} does nothing except return an exit status of 1, meaning
 @dfn{failure}.  It can be used as a place holder in shell scripts
 where an unsuccessful command is needed.
+In most modern shells, @command{false} is a built-in command, so when
+you use @samp{false} in a script, you're probably using the built-in
+command, not the one documented here.
 
 @command{false} honors the @option{--help} and @option{--version} options.
 
@@ -9451,6 +9625,10 @@ be used as a dummy shell for the purpose of disabling accounts.
 Note that @command{false} (unlike all other programs documented herein)
 exits unsuccessfully, even when invoked with
 @option{--help} or @option{--version}.
+
+Portable programs should not assume that the exit status of
+@command{false} is 1, as it is greater than 1 on some
+non-@acronym{GNU} hosts.
 
 
 @node true invocation
@@ -9473,8 +9651,8 @@ command, not the one documented here.
 @command{true} honors the @option{--help} and @option{--version} options.
 
 Note, however, that it is possible to cause @command{true}
-to exit with nonzero status: when invoked in non-@acronym{POSIX} mode,
-with the @option{--help} or @option{--version} option, and with standard
+to exit with nonzero status: with the @option{--help} or @option{--version}
+option, and with standard
 output already closed or redirected to a file that evokes an I/O error.
 For example, using a Bourne-compatible shell:
 
@@ -9626,8 +9804,8 @@ These options test for particular access permissions.
 
 @item -g @var{file}
 @opindex -g
-@cindex set-group-id check
-True if @var{file} exists and has its set-group-id bit set.
+@cindex set-group-ID check
+True if @var{file} exists and has its set-group-ID bit set.
 
 @item -k @var{file}
 @opindex -k
@@ -9641,8 +9819,8 @@ True if @var{file} exists and read permission is granted.
 
 @item -u @var{file}
 @opindex -u
-@cindex set-user-id check
-True if @var{file} exists and has its set-user-id bit set.
+@cindex set-user-ID check
+True if @var{file} exists and has its set-user-ID bit set.
 
 @item -w @var{file}
 @opindex -w
@@ -9657,13 +9835,13 @@ True if @var{file} exists and execute permission is granted
 
 @item -O @var{file}
 @opindex -O
-@cindex owned by effective uid check
-True if @var{file} exists and is owned by the current effective user id.
+@cindex owned by effective user ID check
+True if @var{file} exists and is owned by the current effective user ID.
 
 @item -G @var{file}
 @opindex -G
-@cindex owned by effective gid check
-True if @var{file} exists and is owned by the current effective group id.
+@cindex owned by effective group ID check
+True if @var{file} exists and is owned by the current effective group ID.
 
 @end table
 
@@ -10183,6 +10361,16 @@ options}.  Options must precede operands.
 
 @exitstatus
 
+Examples:
+
+@smallexample
+# Output "sort".
+basename /usr/bin/sort
+
+# Output "stdio".
+basename include/stdio.h .h
+@end smallexample
+
 
 @node dirname invocation
 @section @command{dirname}: Strip non-directory suffix from a file name
@@ -10206,6 +10394,16 @@ The only options are @option{--help} and @option{--version}.  @xref{Common
 options}.
 
 @exitstatus
+
+Examples:
+
+@smallexample
+# Output "/usr/bin".
+dirname /usr/bin/sort
+
+# Output ".".
+dirname stdio.h
+@end smallexample
 
 
 @node pathchk invocation
@@ -10240,21 +10438,39 @@ its file system's maximum.
 A nonexistent @var{name} is not an error, so long a file with that
 name could be created under the above conditions.
 
-The program accepts the following option.  Also see @ref{Common options}.
+The program accepts the following options.  Also see @ref{Common options}.
 Options must precede operands.
 
 @table @samp
 
 @item -p
-@itemx --portability
 @opindex -p
-@opindex --portability
-Do not perform checks based on the underlying file system.  Instead,
-check the length of each file name and its components against the
-@acronym{POSIX} minimum limits for portability.  Also check that the file
-name contains only characters that are in the portable file name
+Instead of performing checks based on the underlying file system,
+print a message if any of these conditions is true:
+
+@enumerate
+@item
+A file name is empty.
+
+@item
+The length of a file name or one of its components exceeds the
+@acronym{POSIX} minimum limits for portability.
+
+@item
+A file name contains a character outside the portable file name
 character set, namely, the ASCII letters and digits, @samp{-},
 @samp{.}, @samp{/}, and @samp{_}.
+@end enumerate
+
+@item -P
+@opindex -P
+Print a message if a file name is empty, or if it contains a component
+that begins with @samp{-}.
+
+@item --portability
+@opindex --portability
+Print a message if a file name is not portable to all @acronym{POSIX}
+hosts.  This option is equivalent to @samp{-p -P}.
 
 @end table
 
@@ -11049,9 +11265,9 @@ This section describes commands that print user-related information:
 logins, groups, and so forth.
 
 @menu
-* id invocation::               Print real and effective uid and gid.
+* id invocation::               Print user identity.
 * logname invocation::          Print current login name.
-* whoami invocation::           Print effective user id.
+* whoami invocation::           Print effective user ID.
 * groups invocation::           Print group names a user is in.
 * users invocation::            Print login names of users currently logged in.
 * who invocation::              Print who is currently logged in.
@@ -11059,12 +11275,12 @@ logins, groups, and so forth.
 
 
 @node id invocation
-@section @command{id}: Print real and effective uid and gid
+@section @command{id}: Print user identity
 
 @pindex id
-@cindex real uid and gid, printing
-@cindex effective uid and gid, printing
-@cindex printing real and effective uid and gid
+@cindex real user and group IDs, printing
+@cindex effective user and group IDs, printing
+@cindex printing real and effective user and group IDs
 
 @command{id} prints information about the given user, or the process
 running it if no user is specified.  Synopsis:
@@ -11073,9 +11289,9 @@ running it if no user is specified.  Synopsis:
 id [@var{option}]@dots{} [@var{username}]
 @end example
 
-By default, it prints the real user id, real group id, effective user id
-if different from the real user id, effective group id if different from
-the real group id, and supplemental group ids.
+By default, it prints the real user ID, real group ID, effective user ID
+if different from the real user ID, effective group ID if different from
+the real group ID, and supplemental group IDs.
 
 Each of these numeric values is preceded by an identifying string and
 followed by the corresponding user or group name in parentheses.
@@ -11088,13 +11304,13 @@ Also see @ref{Common options}.
 @itemx --group
 @opindex -g
 @opindex --group
-Print only the group id.
+Print only the group ID.
 
 @item -G
 @itemx --groups
 @opindex -G
 @opindex --groups
-Print only the group id and the supplementary groups.
+Print only the group ID and the supplementary groups.
 
 @item -n
 @itemx --name
@@ -11107,14 +11323,14 @@ Print the user or group name instead of the ID number.  Requires
 @itemx --real
 @opindex -r
 @opindex --real
-Print the real, instead of effective, user or group id.  Requires
+Print the real, instead of effective, user or group ID.  Requires
 @option{-u}, @option{-g}, or @option{-G}.
 
 @item -u
 @itemx --user
 @opindex -u
 @opindex --user
-Print only the user id.
+Print only the user ID.
 
 @end table
 
@@ -11143,14 +11359,14 @@ options}.
 
 
 @node whoami invocation
-@section @command{whoami}: Print effective user id
+@section @command{whoami}: Print effective user ID
 
 @pindex whoami
-@cindex effective UID, printing
-@cindex printing the effective UID
+@cindex effective user ID, printing
+@cindex printing the effective user ID
 
 @command{whoami} prints the user name associated with the current
-effective user id.  It is equivalent to the command @samp{id -un}.
+effective user ID.  It is equivalent to the command @samp{id -un}.
 
 The only options are @option{--help} and @option{--version}.  @xref{Common
 options}.
@@ -11238,7 +11454,7 @@ line, login time, and remote hostname or X display.
 @flindex wtmp
 If given one non-option argument, @command{who} uses that instead of
 a default system-maintained file (often @file{/var/run/utmp} or
-+@file{/etc/utmp}) as the name of the file containing the record of
+@file{/etc/utmp}) as the name of the file containing the record of
 users logged on.  @file{/var/log/wtmp} is commonly given as an argument
 to @command{who} to look at who has previously logged on.
 
@@ -11283,13 +11499,6 @@ Print information corresponding to dead processes.
 @opindex --heading
 Print column headings.
 
-@item -i
-@itemx --idle
-@opindex -i
-@opindex --idle
-Include idle time in HOURS:MINUTES, @samp{.} (to indicate
-current process), or @samp{old}.
-
 @item -m
 @opindex -m
 Same as @samp{who am i}.
@@ -11305,16 +11514,12 @@ Overrides all other options.
 @opindex -s
 Ignored; for compatibility with other versions of @command{who}.
 
-@item -i
 @itemx -u
-@itemx --idle
-@opindex -i
 @opindex -u
-@opindex --idle
 @cindex idle time
 After the login time, print the number of hours and minutes that the
-user has been idle.  @samp{.} means the user was active in last minute.
-@samp{old} means the user was idle for more than 24 hours.
+user has been idle.  @samp{.} means the user was active in the last minute.
+@samp{old} means the user has been idle for more than 24 hours.
 
 @item -l
 @itemx --login
@@ -11397,7 +11602,7 @@ date [-u|--utc|--universal] @c this avoids a newline in the output
 Invoking @command{date} with no @var{format} argument is equivalent to invoking
 it with a default format that depends on the @env{LC_TIME} locale category.
 In the default C locale, this format is @samp{'+%a %b %e %H:%M:%S %Z %Y'},
-so the output looks like @samp{Fri Feb 27 13:47:51 PST 2004}.
+so the output looks like @samp{Thu Mar @ 3 13:47:51 PST 2005}.
 
 @vindex TZ
 Normally, @command{date} uses the time zone rules indicated by the
@@ -11409,157 +11614,197 @@ is not set.  @xref{TZ Variable,, Specifying the Time Zone with
 @cindex time formats
 @cindex formatting times
 If given an argument that starts with a @samp{+}, @command{date} prints the
-current time and date (or the time and date specified by the
+current date and time (or the date and time specified by the
 @option{--date} option, see below) in the format defined by that argument,
 which is similar to that of the @code{strftime} function.  Except for
-directives, which start with @samp{%}, characters in the format string
-are printed unchanged.  The directives are described below.
+conversion specifiers, which start with @samp{%}, characters in the
+format string are printed unchanged.  The conversion specifiers are
+described below.
 
 @exitstatus
 
 @menu
-* Time directives::             %[HIklMprsSTXzZ]
-* Date directives::             %[aAbBcCdDhjmUwWxyY]
-* Literal directives::          %[%nt]
-* Padding::                     Pad with zeroes, spaces (%_), or nothing (%-).
-* Setting the time::            Changing the system clock.
-* Options for date::            Instead of the current time.
-* Examples of date::            Examples.
+* Time conversion specifiers::     %[HIklMNpPrRsSTXzZ]
+* Date conversion specifiers::     %[aAbBcCdDeFgGhjmuUVwWxyY]
+* Literal conversion specifiers::  %[%nt]
+* Padding and other flags::        Pad with zeroes, spaces, etc.
+* Setting the time::               Changing the system clock.
+* Options for date::               Instead of the current time.
+* Examples of date::               Examples.
 @end menu
 
-@node Time directives
-@subsection Time directives
+@node Time conversion specifiers
+@subsection Time conversion specifiers
 
-@cindex time directives
-@cindex directives, time
+@cindex time conversion specifiers
+@cindex conversion specifiers, time
 
-@command{date} directives related to times.
+@command{date} conversion specifiers related to times.
 
 @table @samp
 @item %H
-hour (00@dots{}23)
+hour (@samp{00}@dots{}@samp{23})
 @item %I
-hour (01@dots{}12)
+hour (@samp{01}@dots{}@samp{12})
 @item %k
-hour ( 0@dots{}23)
+hour (@samp{ 0}@dots{}@samp{23}).
+This is a @acronym{GNU} extension.
 @item %l
-hour ( 1@dots{}12)
+hour (@samp{ 1}@dots{}@samp{12}).
+This is a @acronym{GNU} extension.
 @item %M
-minute (00@dots{}59)
+minute (@samp{00}@dots{}@samp{59})
 @item %N
-nanoseconds (000000000@dots{}999999999)
+nanoseconds (@samp{000000000}@dots{}@samp{999999999}).
+This is a @acronym{GNU} extension.
 @item %p
-locale's upper case @samp{AM} or @samp{PM} (blank in many locales)
+locale's equivalent of either @samp{AM} or @samp{PM};
+blank in many locales.
+Noon is treated as @samp{PM} and midnight as @samp{AM}.
 @item %P
-locale's lower case @samp{am} or @samp{pm} (blank in many locales)
+like @samp{%p}, except lower case.
+This is a @acronym{GNU} extension.
 @item %r
-time, 12-hour (hh:mm:ss [AP]M)
+locale's 12-hour clock time (e.g., @samp{11:11:04 PM})
 @item %R
-time, 24-hour (hh:mm).  Same as @code{%H:%M}.
+24-hour hour and minute.  Same as @samp{%H:%M}.
+This is a @acronym{GNU} extension.
 @item %s
 @cindex epoch, seconds since
 @cindex seconds since the epoch
 @cindex beginning of time
-seconds since the epoch, i.e., 1 January 1970 00:00:00 UTC (a GNU extension).
-For examples, @xref{%s-examples}.
+seconds since the epoch, i.e., since 1970-01-01 00:00:00 UTC.
+Leap seconds are not counted unless leap second support is available.
+@xref{%s-examples}, for examples.
+This is a @acronym{GNU} extension.
 @item %S
-second (00@dots{}60).  The range is [00@dots{}60], and not [00@dots{}59],
-in order to accommodate the occasional positive leap second.
+second (@samp{00}@dots{}@samp{60}).
+This may be @samp{60} if leap seconds are supported.
 @item %T
-time, 24-hour (hh:mm:ss)
+24-hour hour, minute, and second.  Same as @samp{%H:%M:%S}.
 @item %X
-locale's time representation (%H:%M:%S)
+locale's time representation (e.g., @samp{23:13:48})
 @item %z
-RFC-2822 style numeric time zone (e.g., @samp{-0600} or @samp{+0100}),
-or nothing if no
-time zone is determinable.  This value reflects the @emph{current} time
-zone.  It isn't changed by the @option{--date} option.
-@item %Z
-time zone (e.g., EDT), or nothing if no time zone is
+@w{@acronym{RFC} 2822/@acronym{ISO} 8601} style numeric time zone
+(e.g., @samp{-0600} or @samp{+0530}), or nothing if no
+time zone is determinable.  This value reflects the numeric time zone
+appropriate for the current time, using the time zone rules specified
+by the @env{TZ} environment variable.
+The time (and optionally, the time zone rules) can be overridden
+by the @option{--date} option.
+This is a @acronym{GNU} extension.
+@item %:z
+@w{@acronym{RFC} 3339/@acronym{ISO} 8601} style numeric time zone with
+@samp{:} (e.g., @samp{-06:00} or @samp{+05:30}), or nothing if no time
+zone is determinable.
+This is a @acronym{GNU} extension.
+@item %::z
+Numeric time zone to the nearest second with @samp{:} (e.g.,
+@samp{-06:00:00} or @samp{+05:30:00}), or nothing if no time zone is
 determinable.
-Note that this value reflects the @emph{current} time zone.
-It isn't changed by the @option{--date} option.
+This is a @acronym{GNU} extension.
+@item %:::z
+Numeric time zone with @samp{:} using the minimum necessary precision
+(e.g., @samp{-06}, @samp{+05:30}, or @samp{-04:56:02}), or nothing if
+no time zone is determinable.
+This is a @acronym{GNU} extension.
+@item %Z
+alphabetic time zone abbreviation (e.g., @samp{EDT}), or nothing if no
+time zone is determinable.  See @samp{%z} for how it is determined.
 @end table
 
 
-@node Date directives
-@subsection Date directives
+@node Date conversion specifiers
+@subsection Date conversion specifiers
 
-@cindex date directives
-@cindex directives, date
+@cindex date conversion specifiers
+@cindex conversion specifiers, date
 
-@command{date} directives related to dates.
+@command{date} conversion specifiers related to dates.
 
 @table @samp
 @item %a
-locale's abbreviated weekday name (Sun@dots{}Sat)
+locale's abbreviated weekday name (e.g., @samp{Sun})
 @item %A
-locale's full weekday name, variable length (Sunday@dots{}Saturday)
+locale's full weekday name, variable length (e.g., @samp{Sunday})
 @item %b
-locale's abbreviated month name (Jan@dots{}Dec)
+locale's abbreviated month name (e.g., @samp{Jan})
 @item %B
-locale's full month name, variable length (January@dots{}December)
+locale's full month name, variable length (e.g., @samp{January})
 @item %c
-locale's date and time (Sat Nov 04 12:02:33 EST 1989)
+locale's date and time (e.g., @samp{Thu Mar @ 3 23:05:25 2005})
 @item %C
-century (year divided by 100 and truncated to an integer) (00@dots{}99)
+century.  This is like @samp{%Y}, except the last two digits are omitted.
+For example, it is @samp{20} if @samp{%Y} is @samp{2000},
+and is @samp{-0} if @samp{%Y} is @samp{-001}.
+It is normally at least two characters, but it may be more.
 @item %d
-day of month (01@dots{}31)
+day of month (e.g., @samp{01})
 @item %D
-date (mm/dd/yy)
+date; same as @samp{%m/%d/%y}
 @item %e
-blank-padded day of month (1@dots{}31)
+day of month, space padded; same as @samp{%_d}
 @item %F
-the @w{ISO 8601} standard date format: @code{%Y-%m-%d}.
-This is the preferred form for all uses.
+full date in @w{ISO 8601} format; same as @samp{%Y-%m-%d}.
+This is a good choice for a date format, as it is standard and
+is easy to sort in the usual case where years are in the range
+0000@dots{}9999.
+This is a @acronym{GNU} extension.
 @item %g
 The year corresponding to the ISO week number, but without the century
-(range @code{00} through @code{99}).  This has the same format and value
-as @code{%y}, except that if the ISO week number (see @code{%V}) belongs
+(range @samp{00} through @samp{99}).  This has the same format and value
+as @samp{%y}, except that if the ISO week number (see @samp{%V}) belongs
 to the previous or next year, that year is used instead.
+This is a @acronym{GNU} extension.
 @item %G
 The year corresponding to the ISO week number.  This has the same format
-and value as @code{%Y}, except that if the ISO week number (see
-@code{%V}) belongs to the previous or next year, that year is used
+and value as @samp{%Y}, except that if the ISO week number (see
+@samp{%V}) belongs to the previous or next year, that year is used
 instead.
+This is a @acronym{GNU} extension.
 @item %h
-same as %b
+same as @samp{%b}
 @item %j
-day of year (001@dots{}366)
+day of year (@samp{001}@dots{}@samp{366})
 @item %m
-month (01@dots{}12)
+month (@samp{01}@dots{}@samp{12})
 @item %u
-day of week (1@dots{}7) with 1 corresponding to Monday
+day of week (@samp{1}@dots{}@samp{7}) with @samp{1} corresponding to Monday
 @item %U
-week number of year with Sunday as first day of week (00@dots{}53).
+week number of year with Sunday as first day of week
+(@samp{00}@dots{}@samp{53}).
 Days in a new year preceding the first Sunday are in week zero.
 @item %V
 week number of year with Monday as first day of the week as a decimal
-(01@dots{}53).  If the week containing January 1 has four or more days in
+(@samp{01}@dots{}@samp{53}).
+If the week containing January 1 has four or more days in
 the new year, then it is considered week 1; otherwise, it is week 53 of
 the previous year, and the next week is week 1.  (See the @acronym{ISO} 8601
 standard.)
 @item %w
-day of week (0@dots{}6) with 0 corresponding to Sunday
+day of week (@samp{0}@dots{}@samp{6}) with 0 corresponding to Sunday
 @item %W
-week number of year with Monday as first day of week (00@dots{}53).
+week number of year with Monday as first day of week
+(@samp{00}@dots{}@samp{53}).
 Days in a new year preceding the first Monday are in week zero.
 @item %x
-locale's date representation (mm/dd/yy)
+locale's date representation (e.g., @samp{12/31/99})
 @item %y
-last two digits of year (00@dots{}99)
+last two digits of year (@samp{00}@dots{}@samp{99})
 @item %Y
-year (1970@dots{}.)
+year.  This is normally at least four characters, but it may be more.
+Year @samp{0000} precedes year @samp{0001}, and year @samp{-001}
+precedes year @samp{0000}.
 @end table
 
 
-@node Literal directives
-@subsection Literal directives
+@node Literal conversion specifiers
+@subsection Literal conversion specifiers
 
-@cindex literal directives
-@cindex directives, literal
+@cindex literal conversion specifiers
+@cindex conversion specifiers, literal
 
-@command{date} directives that produce literal strings.
+@command{date} conversion specifiers that produce literal strings.
 
 @table @samp
 @item %%
@@ -11571,32 +11816,41 @@ a horizontal tab
 @end table
 
 
-@node Padding
-@subsection Padding
+@node Padding and other flags
+@subsection Padding and other flags
 
 @cindex numeric field padding
 @cindex padding of numeric fields
 @cindex fields, padding numeric
 
-By default, @command{date} pads numeric fields with zeroes, so that, for
+Unless otherwise specified, @command{date} normally pads numeric fields
+with zeroes, so that, for
 example, numeric months are always output as two digits.
-@acronym{GNU} @command{date}
-recognizes the following numeric modifiers between the @samp{%} and the
-directive.
+Seconds since the epoch are not padded, though,
+since there is no natural width for them.
+
+As a @acronym{GNU} extension, @command{date} recognizes any of the
+following optional flags after the @samp{%}:
 
 @table @samp
 @item -
-(hyphen) do not pad the field; useful if the output is intended for
+(hyphen) Do not pad the field; useful if the output is intended for
 human consumption.
 @item _
-(underscore) pad the field with spaces; useful if you need a fixed
+(underscore) Pad with spaces; useful if you need a fixed
 number of characters in the output, but zeroes are too distracting.
+@item 0
+(zero) Pad with zeros even if the conversion specifier
+would normally pad with spaces.
+@item ^
+Use upper case characters if possible.
+@item #
+Use opposite case characters if possible.
+A field that is normally upper case becomes lower case, and vice versa.
 @end table
 
 @noindent
-These are GNU extensions.
-
-Here is an example illustrating the differences:
+Here are some examples of padding:
 
 @example
 date +%d/%m -d "Feb 1"
@@ -11607,6 +11861,32 @@ date +%_d/%_m -d "Feb 1"
 @result{}  1/ 2
 @end example
 
+As a @acronym{GNU} extension, you can specify the field width
+(after any flag, if present) as a decimal number.  If the natural size of the
+output is of the field has less than the specified number of characters,
+the result is written right adjusted and padded to the given
+size.  For example, @samp{%9B} prints the right adjusted month name in
+a field of width 9.
+
+An optional modifier can follow the optional flag and width
+specification.  The modifiers are:
+
+@table @samp
+@item E
+Use the locale's alternate representation for date and time.  This
+modifier applies to the @samp{%c}, @samp{%C}, @samp{%x}, @samp{%X},
+@samp{%y} and @samp{%Y} conversion specifiers.  In a Japanese locale, for
+example, @samp{%Ex} might yield a date format based on the Japanese
+Emperors' reigns.
+
+@item O
+Use the locale's alternate numeric symbols for numbers.  This modifier
+applies only to numeric conversion specifiers.
+@end table
+
+If the format supports the modifier but no alternate representation
+is available, it is ignored.
+
 
 @node Setting the time
 @subsection Setting the time
@@ -11616,11 +11896,11 @@ date +%_d/%_m -d "Feb 1"
 @cindex appropriate privileges
 
 If given an argument that does not start with @samp{+}, @command{date} sets
-the system clock to the time and date specified by that argument (as
+the system clock to the date and time specified by that argument (as
 described below).  You must have appropriate privileges to set the
 system clock.  The @option{--date} and @option{--set} options may not be
 used with such an argument.  The @option{--universal} option may be used
-with such an argument to indicate that the specified time and date are
+with such an argument to indicate that the specified date and time are
 relative to Coordinated Universal Time rather than to the local time
 zone.
 
@@ -11668,8 +11948,8 @@ The program accepts the following options.  Also see @ref{Common options}.
 @opindex tomorrow
 @opindex next @var{day}
 @opindex last @var{day}
-Display the time and date specified in @var{datestr} instead of the
-current time and date.  @var{datestr} can be in almost any common
+Display the date and time specified in @var{datestr} instead of the
+current date and time.  @var{datestr} can be in almost any common
 format.  It can contain month names, time zones, @samp{am} and @samp{pm},
 @samp{yesterday}, etc.  For example, @option{--date="2004-02-27
 14:19:13.489392193 +0530"} specifies the instant of time that is
@@ -11682,45 +11962,17 @@ time zone that is 5 hours and 30 minutes east of @acronym{UTC}.
 @opindex -f
 @opindex --file
 Parse each line in @var{datefile} as with @option{-d} and display the
-resulting time and date.  If @var{datefile} is @samp{-}, use standard
+resulting date and time.  If @var{datefile} is @samp{-}, use standard
 input.  This is useful when you have many dates to process, because the
 system overhead of starting up the @command{date} executable many times can
 be considerable.
 
-@item -I @var{timespec}
-@itemx --iso-8601[=@var{timespec}]
-@opindex -I @var{timespec}
-@opindex --iso-8601[=@var{timespec}]
-Display the date using the @acronym{ISO} 8601 format, @samp{%Y-%m-%d}.
-
-The argument @var{timespec} specifies the number of additional
-terms of the time to include.  It can be one of the following:
-@table @samp
-@item auto
-The default behavior: print just the date.
-
-@item hours
-Append the hour of the day to the date.
-
-@item minutes
-Append the hours and minutes.
-
-@item seconds
-Append the hours, minutes, and seconds.
-
-@item ns
-Append the hours, minutes, seconds, and nanoseconds.
-@end table
-
-If showing any time terms, then include the time zone using the format
-@samp{%z}.
-
-If @var{timespec} is omitted with @option{--iso-8601}, the default is
-@samp{auto}.  On older systems, @sc{gnu} @command{date} instead
-supports an obsolete option @option{-I[@var{timespec}]}, where
-@var{timespec} defaults to @samp{auto}.  @acronym{POSIX} 1003.1-2001
-(@pxref{Standards conformance}) does not allow @option{-I} without an
-argument; use @option{--iso-8601} instead.
+@item -r @var{file}
+@itemx --reference=@var{file}
+@opindex -r
+@opindex --reference
+Display the date and time of the last modification of @var{file},
+instead of the current date and time.
 
 @item -R
 @itemx --rfc-822
@@ -11728,31 +11980,58 @@ argument; use @option{--iso-8601} instead.
 @opindex -R
 @opindex --rfc-822
 @opindex --rfc-2822
-Display the time and date using the format @samp{%a, %d %b %Y %H:%M:%S
+Display the date and time using the format @samp{%a, %d %b %Y %H:%M:%S
 %z}, evaluated in the C locale so abbreviations are always in English.
 For example:
 
 @example
-Fri,@ @ 1 Aug 2003 23:05:56 -0700
+Fri, 09 Sep 2005 13:51:39 -0700
 @end example
 
 This format conforms to
-@uref{ftp://ftp.rfc-editor.org/in-notes/rfc2822.txt, RFC 2822} and
-@uref{ftp://ftp.rfc-editor.org/in-notes/rfc822.txt, RFC 822}, the
+@uref{ftp://ftp.rfc-editor.org/in-notes/rfc2822.txt, Internet
+@acronym{RFCs} 2822} and
+@uref{ftp://ftp.rfc-editor.org/in-notes/rfc822.txt, 822}, the
 current and previous standards for Internet email.
 
-@item -r @var{file}
-@itemx --reference=@var{file}
-@opindex -r
-@opindex --reference
-Display the time and date reference according to the last modification
-time of @var{file}, instead of the current time and date.
+@item --rfc-3339=@var{timespec}
+@opindex --rfc-3339=@var{timespec}
+Display the date using a format specified by
+@uref{ftp://ftp.rfc-editor.org/in-notes/rfc3339.txt, Internet
+@acronym{RFC} 3339}.  This is a subset of the @acronym{ISO} 8601
+format, except that it also permits applications to use a space rather
+than a @samp{T} to separate dates from times.  Unlike the other
+standard formats, @acronym{RFC} 3339 format is always suitable as
+input for the @option{--date} (@option{-d}) and @option{--file}
+(@option{-f}) options, regardless of the current locale.
+
+The argument @var{timespec} specifies how much of the time to include.
+It can be one of the following:
+
+@table @samp
+@item date
+Print just the full-date, e.g., @samp{2005-09-14}.
+This is equivalent to the format @samp{%Y-%m-%d}.
+
+@item seconds
+Print the full-date and full-time separated by a space, e.g.,
+@samp{2005-09-14 00:56:06+05:30}.  The output ends with a numeric
+time-offset; here the @samp{+05:30} means that local time is five
+hours and thirty minutes east of @acronym{UTC}.  This is equivalent to
+the format @samp{%Y-%m-%d %H:%M:%S%:z}.
+
+@item ns
+Like @samp{seconds}, but also print nanoseconds, e.g.,
+@samp{2005-09-14 00:56:06.998458565+05:30}.
+This is equivalent to the format @samp{%Y-%m-%d %H:%M:%S.%N%:z}.
+
+@end table
 
 @item -s @var{datestr}
 @itemx --set=@var{datestr}
 @opindex -s
 @opindex --set
-Set the time and date to @var{datestr}.  See @option{-d} above.
+Set the date and time to @var{datestr}.  See @option{-d} above.
 
 @item -u
 @itemx --utc
@@ -11817,7 +12096,8 @@ for example @samp{date -d 1may '+%B %d'} will print @samp{May 01}.
 
 @item
 To print a date without the leading zero for one-digit days
-of the month, you can use the (GNU extension) @code{-} modifier to suppress
+of the month, you can use the (@acronym{GNU} extension)
+@samp{-} flag to suppress
 the padding altogether:
 
 @example
@@ -11826,7 +12106,7 @@ date -d 1may '+%B %-d
 
 @item
 To print the current date and time in the format required by many
-non-GNU versions of @command{date} when setting the system clock:
+non-@acronym{GNU} versions of @command{date} when setting the system clock:
 
 @example
 date +%m%d%H%M%Y.%S
@@ -11840,11 +12120,11 @@ date --set='+2 minutes'
 @end example
 
 @item
-To print the date in the format specified by RFC-2822,
-use @samp{date --rfc-2822}.  I just did and saw this:
+To print the date in @acronym{RFC} 2822 format,
+use @samp{date --rfc-2822}.  Here is some example output:
 
 @example
-Thu, 31 Jul 2003 13:13:05 -0700
+Fri, 09 Sep 2005 13:51:39 -0700
 @end example
 
 @anchor{%s-examples}
@@ -11955,7 +12235,8 @@ The program accepts the following options.  Also see @ref{Common options}.
 @itemx --all
 @opindex -a
 @opindex --all
-Print all of the below information.
+Print all of the below information, except omit the processor type
+and the hardware platform name if they are unknown.
 
 @item -i
 @itemx --hardware-platform
@@ -11966,6 +12247,8 @@ Print all of the below information.
 @cindex platform, hardware
 Print the hardware platform name
 (sometimes called the hardware implementation).
+Print @samp{unknown} if the kernel does not make this information
+easily available, as is the case with Linux kernels.
 
 @item -m
 @itemx --machine
@@ -11993,6 +12276,8 @@ Print the network node hostname.
 @cindex host processor type
 Print the processor type (sometimes called the instruction set
 architecture or ISA).
+Print @samp{unknown} if the kernel does not make this information
+easily available, as is the case with Linux kernels.
 
 @item -o
 @itemx --operating-system
@@ -12101,9 +12386,9 @@ user, etc.
 @menu
 * chroot invocation::           Modify the root directory.
 * env invocation::              Modify environment variables.
-* nice invocation::             Modify scheduling priority.
+* nice invocation::             Modify niceness.
 * nohup invocation::            Immunize to hangups.
-* su invocation::               Modify user and group id.
+* su invocation::               Modify user and group ID.
 @end menu
 
 
@@ -12153,7 +12438,7 @@ Then you'll see output like this:
 @example
 /:
 total 1023
--rwxr-xr-x  1 0 0 1041745 Aug 16 11:17 ls
+-rwxr-xr-x 1 0 0 1041745 Aug 16 11:17 ls
 @end example
 
 If you want to use a dynamically linked executable, say @command{bash},
@@ -12253,34 +12538,41 @@ the exit status of @var{command} otherwise
 
 
 @node nice invocation
-@section @command{nice}: Run a command with modified scheduling priority
+@section @command{nice}: Run a command with modified niceness
 
 @pindex nice
-@cindex nice value
-@cindex modifying scheduling priority
-@cindex scheduling priority, modifying
-@cindex priority, modifying
+@cindex niceness
+@cindex scheduling, affecting
 @cindex appropriate privileges
 
-@command{nice} prints or modifies a process's @dfn{nice value},
-a parameter that affects the process's scheduling priority.
+@command{nice} prints or modifies a process's @dfn{niceness},
+a parameter that affects whether the process is scheduled favorably.
 Synopsis:
 
 @example
 nice [@var{option}]@dots{} [@var{command} [@var{arg}]@dots{}]
 @end example
 
-If no arguments are given, @command{nice} prints the current nice
-value, which it inherited.  Otherwise, @command{nice} runs the given
-@var{command} with its nice value adjusted.  By default, its nice
-value is incremented by 10.
+If no arguments are given, @command{nice} prints the current niceness.
+Otherwise, @command{nice} runs the given @var{command} with its
+niceness adjusted.  By default, its niceness is incremented by 10.
 
-Nice values range at least from @minus{}20 (resulting in the most
+Nicenesses range at least from @minus{}20 (resulting in the most
 favorable scheduling) through 19 (the least favorable).  Some systems
-may have a wider range of nice values; conversely, other systems may
-enforce more restrictive limits.  An attempt to set the nice value
+may have a wider range of nicenesses; conversely, other systems may
+enforce more restrictive limits.  An attempt to set the niceness
 outside the supported range is treated as an attempt to use the
 minimum or maximum supported value.
+
+A niceness should not be confused with a scheduling priority, which
+lets applications determine the order in which threads are scheduled
+to run.  Unlike a priority, a niceness is merely advice to the
+scheduler, which the scheduler is free to ignore.  Also, as a point of
+terminology, @acronym{POSIX} defines the behavior of @command{nice} in
+terms of a @dfn{nice value}, which is the nonnegative difference
+between a niceness and the minimum niceness.  Though @command{nice}
+conforms to @acronym{POSIX}, its documentation and diagnostics use the
+term ``niceness'' for compatibility with historical practice.
 
 @var{command} must not be a special built-in utility (@pxref{Special
 built-in utilities}).
@@ -12299,15 +12591,14 @@ Options must precede operands.
 @itemx --adjustment=@var{adjustment}
 @opindex -n
 @opindex --adjustment
-Add @var{adjustment} instead of 10 to the command's nice value.  If
+Add @var{adjustment} instead of 10 to the command's niceness.  If
 @var{adjustment} is negative and you lack appropriate privileges,
 @command{nice} issues a warning but otherwise acts as if you specified
 a zero adjustment.
 
-On older systems, @command{nice} supports an obsolete option
-@option{-@var{adjustment}}.  @acronym{POSIX} 1003.1-2001 (@pxref{Standards
-conformance}) does not allow this; use @option{-n @var{adjustment}}
-instead.
+For compatibility @command{nice} also supports an obsolete
+option syntax @option{-@var{adjustment}}.  New scripts should use
+@option{-n @var{adjustment}} instead.
 
 @end table
 
@@ -12315,23 +12606,23 @@ instead.
 Exit status:
 
 @display
-0   if no @var{command} is specified and the current priority is output
+0   if no @var{command} is specified and the niceness is output
 1   if @command{nice} itself fails
 126 if @var{command} is found but cannot be invoked
 127 if @var{command} cannot be found
 the exit status of @var{command} otherwise
 @end display
 
-It is sometimes useful to run non-interactive programs with reduced priority.
+It is sometimes useful to run a non-interactive program with reduced niceness.
 
 @example
 $ nice factor 4611686018427387903
 @end example
 
-Since @command{nice} prints the current priority,
+Since @command{nice} prints the current niceness,
 you can invoke it through itself to demonstrate how it works.
 
-The default behavior is to increase the nice value by @samp{10}:
+The default behavior is to increase the niceness by @samp{10}:
 
 @example
 $ nice
@@ -12342,17 +12633,17 @@ $ nice -n 10 nice
 10
 @end example
 
-The @var{adjustment} is relative to the current nice value.  In the
+The @var{adjustment} is relative to the current niceness.  In the
 next example, the first @command{nice} invocation runs the second one
-with nice value 10, and it in turn runs the final one with a nice
-value that is 3 more:
+with niceness 10, and it in turn runs the final one with a niceness
+that is 3 more:
 
 @example
 $ nice nice -n 3 nice
 13
 @end example
 
-Specifying a nice value larger than the supported range
+Specifying a niceness larger than the supported range
 is the same as specifying the maximum supported value:
 
 @example
@@ -12360,11 +12651,11 @@ $ nice -n 10000000000 nice
 19
 @end example
 
-Only a privileged user may run a process with higher priority:
+Only a privileged user may run a process with lower niceness:
 
 @example
 $ nice -n -1 nice
-nice: cannot set priority: Permission denied
+nice: cannot set niceness: Permission denied
 0
 $ sudo nice -n -1 nice
 -1
@@ -12388,26 +12679,29 @@ out.  Synopsis:
 nohup @var{command} [@var{arg}]@dots{}
 @end example
 
-@flindex nohup.out
-If standard output is a terminal, it is redirected so that it is appended
-to the file @file{nohup.out}; if that cannot be written to, it is appended
-to the file @file{$HOME/nohup.out}.  If that cannot be written to, the
-command is not run.
-If standard output is not a terminal, then the standard output of
-@var{command} will be the same as that of @command{nohup}.
+If standard input is a terminal, it is redirected from
+@file{/dev/null} so that terminal sessions do not mistakenly consider
+the terminal to be used by the command.  This is a @acronym{GNU}
+extension; programs intended to be portable to non-@acronym{GNU} hosts
+should use @samp{nohup @var{command} [@var{arg}]@dots{} </dev/null}
+instead.
 
-If @command{nohup} creates either @file{nohup.out} or
-@file{$HOME/nohup.out}, it creates it with no ``group'' or ``other''
-access permissions.  It does not change the permissions if the output
-file already existed.
+@flindex nohup.out
+If standard output is a terminal, the command's standard output is appended
+to the file @file{nohup.out}; if that cannot be written to, it is appended
+to the file @file{$HOME/nohup.out}; and if that cannot be written to, the
+command is not run.
+Any @file{nohup.out} or @file{$HOME/nohup.out} file created by
+@command{nohup} is made readable and writable only to the user,
+regardless of the current umask settings.
 
 If standard error is a terminal, it is redirected to the same file
-descriptor as the standard output.
+descriptor as the (possibly-redirected) standard output.
 
 @command{nohup} does not automatically put the command it runs in the
 background; you must do that explicitly, by ending the command line
-with an @samp{&}.  Also, @command{nohup} does not change the
-scheduling priority of @var{command}; use @command{nice} for that,
+with an @samp{&}.  Also, @command{nohup} does not alter the
+niceness of @var{command}; use @command{nice} for that,
 e.g., @samp{nohup nice @var{command}}.
 
 @var{command} must not be a special built-in utility (@pxref{Special
@@ -12427,17 +12721,17 @@ the exit status of @var{command} otherwise
 
 
 @node su invocation
-@section @command{su}: Run a command with substitute user and group id
+@section @command{su}: Run a command with substitute user and group ID
 
 @pindex su
-@cindex substitute user and group ids
-@cindex user id, switching
+@cindex substitute user and group IDs
+@cindex user ID, switching
 @cindex super-user, becoming
 @cindex root, becoming
 
 @command{su} allows one user to temporarily become another user.  It runs a
 command (often an interactive shell) with the real and effective user
-id, group id, and supplemental groups of a given @var{user}.  Synopsis:
+ID, group ID, and supplemental groups of a given @var{user}.  Synopsis:
 
 @example
 su [@var{option}]@dots{} [@var{user} [@var{arg}]@dots{}]
@@ -12450,7 +12744,7 @@ If no @var{user} is given, the default is @code{root}, the super-user.
 The shell to use is taken from @var{user}'s @code{passwd} entry, or
 @file{/bin/sh} if none is specified there.  If @var{user} has a
 password, @command{su} prompts for the password unless run by a user with
-effective user id of zero (the super-user).
+effective user ID of zero (the super-user).
 
 @vindex HOME
 @vindex SHELL
@@ -12616,7 +12910,7 @@ valid signal, but can be used to test whether the @var{pid} arguments
 specify processes to which a signal could be sent.
 
 If @var{pid} is positive, the signal is sent to the process with the
-process id @var{pid}.  If @var{pid} is zero, the signal is sent to all
+process ID @var{pid}.  If @var{pid} is zero, the signal is sent to all
 processes in the process group of the current process.  If @var{pid}
 is @minus{}1, the signal is sent to all processes for which the user has
 permission to send a signal.  If @var{pid} is less than @minus{}1, the signal

@@ -1,6 +1,6 @@
 /* xgethostname.c -- return current hostname with unlimited length
 
-   Copyright (C) 1992, 1996, 2000, 2001, 2003, 2004 Free Software
+   Copyright (C) 1992, 1996, 2000, 2001, 2003, 2004, 2005 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* written by Jim Meyering */
 
@@ -28,10 +28,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
-
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include "xalloc.h"
 
@@ -69,7 +66,9 @@ xgethostname (void)
 	  if (! hostname[size_1 - 1])
 	    break;
 	}
-      else if (errno != 0 && errno != ENAMETOOLONG && errno != EINVAL)
+      else if (errno != 0 && errno != ENAMETOOLONG && errno != EINVAL
+	       /* OSX/Darwin does this when the buffer is not large enough */
+	       && errno != ENOMEM)
 	{
 	  int saved_errno = errno;
 	  free (hostname);

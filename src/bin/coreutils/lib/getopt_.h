@@ -1,5 +1,5 @@
 /* Declarations for getopt.
-   Copyright (C) 1989-1994,1996-1999,2001,2003,2004
+   Copyright (C) 1989-1994,1996-1999,2001,2003,2004,2005
    Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _GETOPT_H
 
@@ -34,9 +34,7 @@
 #if defined __GETOPT_PREFIX && !defined __need_getopt
 # include <stdlib.h>
 # include <stdio.h>
-# if HAVE_UNISTD_H
-#  include <unistd.h>
-# endif
+# include <unistd.h>
 # undef __need_getopt
 # undef getopt
 # undef getopt_long

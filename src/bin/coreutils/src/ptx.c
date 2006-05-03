@@ -1,5 +1,5 @@
 /* Permuted index for GNU, with keywords in their context.
-   Copyright (C) 1990, 1991, 1993, 1998-2004 Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1993, 1998-2005 Free Software Foundation, Inc.
    François Pinard <pinard@iro.umontreal.ca>, 1988.
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
    François Pinard <pinard@iro.umontreal.ca> */
 
@@ -190,9 +190,11 @@ static BLOCK text_buffer;	/* file to study */
 #define SKIP_SOMETHING(cursor, limit) \
   if (word_regex_string)						\
     {									\
-      int count;							\
+      regoff_t count;							\
       count = re_match (word_regex, cursor, limit - cursor, 0, NULL);	\
-      cursor += count <= 0 ? 1 : count;					\
+      if (count == -2)							\
+        matcher_error ();						\
+      cursor += count == -1 ? 1 : count;				\
     }									\
   else if (word_fastmap[to_uchar (*cursor)])				\
     while (cursor < limit && word_fastmap[to_uchar (*cursor)])		\
@@ -277,6 +279,15 @@ static int head_truncation;	/* flag truncation before the head field */
 static BLOCK reference;		/* reference field for input reference mode */
 
 /* Miscellaneous routines.  */
+
+/* Diagnose an error in the regular expression matcher.  Then exit.  */
+
+static void ATTRIBUTE_NORETURN
+matcher_error (void)
+{
+  error (0, errno, _("error in regular expression matcher"));
+  exit (EXIT_FAILURE);
+}
 
 /*------------------------------------------------------.
 | Duplicate string STRING, while evaluating \-escapes.  |
@@ -398,7 +409,7 @@ alloc_and_compile_regex (const char *string)
   const char *message;		/* error message returned by regex.c */
 
   pattern = xmalloc (sizeof *pattern);
-  memset (pattern, 0, sizeof (struct re_pattern_buffer));
+  memset (pattern, 0, sizeof *pattern);
 
   pattern->buffer = NULL;
   pattern->allocated = 0;
@@ -407,7 +418,7 @@ alloc_and_compile_regex (const char *string)
 
   message = re_compile_pattern (string, (int) strlen (string), pattern);
   if (message)
-    error (EXIT_FAILURE, 0, _("%s (for regexp `%s')"), message, string);
+    error (EXIT_FAILURE, 0, _("%s (for regexp %s)"), message, quote (string));
 
   /* The fastmap should be compiled before `re_match'.  The following
      call is not mandatory, because `re_search' is always called sooner,
@@ -417,12 +428,8 @@ alloc_and_compile_regex (const char *string)
 
   /* Do not waste extra allocated space.  */
 
-  if (pattern->allocated > pattern->used)
-    {
-      pattern->buffer
-	= xrealloc (pattern->buffer, (size_t) pattern->used);
-      pattern->allocated = pattern->used;
-    }
+  pattern->buffer = xrealloc (pattern->buffer, pattern->used);
+  pattern->allocated = pattern->used;
 
   return pattern;
 }
@@ -698,7 +705,7 @@ sort_found_occurs (void)
 
   /* Only one language for the time being.  */
 
-  qsort (occurs_table[0], number_of_occurs[0], sizeof (OCCURS),
+  qsort (occurs_table[0], number_of_occurs[0], sizeof **occurs_table,
 	 compare_occurs);
 }
 
@@ -801,7 +808,7 @@ digest_word_file (const char *file_name, WORD_TABLE *table)
 
   /* Finally, sort all the words read.  */
 
-  qsort (table->start, table->length, (size_t) sizeof (WORD), compare_words);
+  qsort (table->start, table->length, sizeof table->start[0], compare_words);
 }
 
 /* Keyword recognition and selection.  */
@@ -872,14 +879,21 @@ find_occurs_in_text (void)
 	 This test also accounts for the case of an incomplete line or
 	 sentence at the end of the buffer.  */
 
-      if (context_regex_string
-	  && (re_search (context_regex, cursor, text_buffer.end - cursor,
-			 0, text_buffer.end - cursor, &context_regs)
-	      >= 0))
-	next_context_start = cursor + context_regs.end[0];
+      next_context_start = text_buffer.end;
+      if (context_regex_string)
+	switch (re_search (context_regex, cursor, text_buffer.end - cursor,
+			   0, text_buffer.end - cursor, &context_regs))
+	  {
+	  case -2:
+	    matcher_error ();
 
-      else
-	next_context_start = text_buffer.end;
+	  case -1:
+	    break;
+
+	  default:
+	    next_context_start = cursor + context_regs.end[0];
+	    break;
+	  }
 
       /* Include the separator into the right context, but not any suffix
 	 white space in this separator; this insures it will be seen in
@@ -900,9 +914,11 @@ find_occurs_in_text (void)
 	       the loop.  */
 
 	    {
-	      if (re_search (word_regex, cursor, context_end - cursor,
-			     0, context_end - cursor, &word_regs)
-		  < 0)
+	      regoff_t r = re_search (word_regex, cursor, context_end - cursor,
+				      0, context_end - cursor, &word_regs);
+	      if (r == -2)
+		matcher_error ();
+	      if (r == -1)
 		break;
 	      word_start = cursor + word_regs.start[0];
 	      word_end = cursor + word_regs.end[0];
@@ -1943,12 +1959,12 @@ static const struct option long_options[] =
   {"word-regexp", required_argument, NULL, 'W'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0},
+  {NULL, 0, NULL, 0},
 };
 
 static char const* const format_args[] =
 {
-  "roff", "tex", 0
+  "roff", "tex", NULL
 };
 
 static enum Format const format_vals[] =
@@ -2003,7 +2019,7 @@ GNU General Public License for more details.\n\
 	  fputs (_("\
 You should have received a copy of the GNU General Public License\n\
 along with this program; if not, write to the Free Software Foundation,\n\
-Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.\n"),
+Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n"),
 		 stdout);
 
 	  exit (EXIT_SUCCESS);
@@ -2154,9 +2170,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.\n"),
 
       if (optind < argc)
 	{
-	  /* FIXME: don't fclose here? */
-	  fclose (stdout);
-	  if (fopen (argv[optind], "w") == NULL)
+	  if (! freopen (argv[optind], "w", stdout))
 	    error (EXIT_FAILURE, errno, "%s", argv[optind]);
 	  optind++;
 	}

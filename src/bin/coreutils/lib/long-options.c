@@ -1,6 +1,6 @@
 /* Utility to accept --help and --version options as unobtrusively as possible.
 
-   Copyright (C) 1993, 1994, 1998, 1999, 2000, 2002, 2003, 2004 Free
+   Copyright (C) 1993, 1994, 1998, 1999, 2000, 2002, 2003, 2004, 2005 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,11 +15,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -35,9 +35,9 @@
 
 static struct option const long_options[] =
 {
-  {"help", no_argument, 0, 'h'},
-  {"version", no_argument, 0, 'v'},
-  {0, 0, 0, 0}
+  {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
+  {NULL, 0, NULL, 0}
 };
 
 /* Process long options --help and --version, but only if argc == 2.

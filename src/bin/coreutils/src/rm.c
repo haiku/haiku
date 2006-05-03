@@ -1,5 +1,5 @@
 /* `rm' file deletion utility for GNU.
-   Copyright (C) 88, 90, 91, 1994-2004 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Rubin, David MacKenzie, and Richard Stallman.
    Reworked to use chdir and avoid recursion by Jim Meyering.  */
@@ -51,7 +51,9 @@
 #include "system.h"
 #include "dirname.h"
 #include "error.h"
+#include "lstat.h"
 #include "quote.h"
+#include "quotearg.h"
 #include "remove.h"
 #include "root-dev-ino.h"
 
@@ -95,6 +97,33 @@ static struct option const long_opts[] =
   {NULL, 0, NULL, 0}
 };
 
+/* Advise the user about invalid usages like "rm -foo" if the file
+   "-foo" exists, assuming ARGC and ARGV are as with `main'.  */
+
+static void
+diagnose_leading_hyphen (int argc, char **argv)
+{
+  /* OPTIND is unreliable, so iterate through the arguments looking
+     for a file name that looks like an option.  */
+  int i;
+
+  for (i = 1; i < argc; i++)
+    {
+      char const *arg = argv[i];
+      struct stat st;
+
+      if (arg[0] == '-' && arg[1] && lstat (arg, &st) == 0)
+	{
+	  fprintf (stderr,
+		   _("Try `%s ./%s' to remove the file %s.\n"),
+		   argv[0],
+		   quotearg_n_style (1, shell_quoting_style, arg),
+		   quote (arg));
+	  break;
+	}
+    }
+}
+
 void
 usage (int status)
 {
@@ -117,11 +146,16 @@ Remove (unlink) the FILE(s).\n\
       fputs (_("\
       --no-preserve-root do not treat `/' specially (the default)\n\
       --preserve-root   fail to operate recursively on `/'\n\
-  -r, -R, --recursive   remove the contents of directories recursively\n\
+  -r, -R, --recursive   remove directories and their contents recursively\n\
   -v, --verbose         explain what is being done\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      fputs (_("\
+\n\
+By default, rm does not remove directories.  Use the --recursive (-r or -R)\n\
+option to remove each listed directory, too, along with all of its contents.\n\
+"), stdout);
       printf (_("\
 \n\
 To remove a file whose name starts with a `-', for example `-foo',\n\
@@ -217,6 +251,7 @@ main (int argc, char **argv)
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	default:
+	  diagnose_leading_hyphen (argc, argv);
 	  usage (EXIT_FAILURE);
 	}
     }

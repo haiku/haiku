@@ -1,5 +1,5 @@
 /* userspec.c -- Parse a user and group string.
-   Copyright (C) 1989-1992, 1997-1998, 2000, 2002-2004 Free Software
+   Copyright (C) 1989-1992, 1997-1998, 2000, 2002-2005 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -14,11 +14,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -39,10 +39,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
+#include "intprops.h"
 #include "inttostr.h"
 #include "strdup.h"
 #include "xalloc.h"
@@ -52,12 +51,6 @@
 #define _(msgid) gettext (msgid)
 #define N_(msgid) msgid
 
-#ifndef _POSIX_VERSION
-struct passwd *getpwnam ();
-struct group *getgrnam ();
-struct group *getgrgid ();
-#endif
-
 #ifndef HAVE_ENDGRENT
 # define endgrent() ((void) 0)
 #endif
@@ -65,14 +58,6 @@ struct group *getgrgid ();
 #ifndef HAVE_ENDPWENT
 # define endpwent() ((void) 0)
 #endif
-
-/* The extra casts work around common compiler bugs.  */
-#define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-/* The outer cast is needed to work around a bug in Cray C 5.0.3.0.
-   It is necessary at least when t == time_t.  */
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
 
 #ifndef UID_T_MAX
 # define UID_T_MAX TYPE_MAXIMUM (uid_t)

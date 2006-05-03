@@ -2,7 +2,7 @@
 # This Makefile fragment is shared between the coreutils,
 # CPPI, Bison, and Autoconf.
 
-## Copyright (C) 2001-2005 Free Software Foundation, Inc.
+## Copyright (C) 2001-2006 Free Software Foundation, Inc.
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 # This is reported not to work with make-3.79.1
 # ME := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 ME := Makefile.maint
 
 # Do not save the original name or timestamp in the .tar.gz file.
-GZIP_ENV = '--no-name --best'
+GZIP_ENV = '--no-name --best --rsyncable'
 
 CVS = cvs
 
@@ -35,6 +35,7 @@ ifeq ($(origin prev_version_file), undefined)
 endif
 
 PREV_VERSION := $(shell cat $(prev_version_file))
+VERSION_REGEXP = $(subst .,\.,$(VERSION))
 
 tag-package = $(shell echo "$(PACKAGE)" | tr '[:lower:]' '[:upper:]')
 tag-this-version = $(subst .,_,$(VERSION))
@@ -71,10 +72,11 @@ syntax-check-rules = \
   sc_cast_of_argument_to_free \
   sc_cast_of_x_alloc_return_value \
   sc_cast_of_alloca_return_value \
-  sc_changelog \
   sc_dd_max_sym_length \
   sc_error_exit_success \
   sc_file_system \
+  sc_no_if_have_config_h \
+  sc_obsolete_symbols \
   sc_prohibit_atoi_atof \
   sc_prohibit_jm_in_m4 \
   sc_root_tests \
@@ -83,7 +85,8 @@ syntax-check-rules = \
   sc_system_h_headers \
   sc_tight_scope \
   sc_trailing_blank \
-  sc_unmarked_diagnostics
+  sc_unmarked_diagnostics \
+  sc_useless_cpp_parens
 
 syntax-check: $(syntax-check-rules)
 #	@grep -E '#  *include <(limits|std(def|arg|bool))\.h>'		\
@@ -96,6 +99,12 @@ syntax-check: $(syntax-check-rules)
 #	  { echo '$(ME): FIXME' 1>&2;					\
 #	    exit 1; } || :
 # FIXME: don't allow `#include .strings\.h' anywhere
+
+# FIXME: add a check for this.
+# Nearly every lib/*.c file must include config.h, like this:
+#  #ifdef HAVE_CONFIG_H
+#  # include <config.h>
+#  #endif
 
 sc_cast_of_argument_to_free:
 	@grep -E '\<free \(\(' $(srcdir)/{lib,src}/*.[chly] &&		\
@@ -147,6 +156,20 @@ sc_file_system:
 	    'rewrite to use "file system"' 1>&2;			\
 	    exit 1; } || :
 
+sc_no_if_have_config_h:
+	@( $(CVS_LIST) ) > /dev/null 2>&1 || : &&			\
+	  grep '^# *if HAVE_CONFIG_H'					\
+	     $$($(CVS_LIST) | grep -vEf .x-$@ ) &&			\
+	  { echo '$(ME): found use of #if HAVE_CONFIG_H; use #ifdef'	\
+		1>&2; exit 1; } || :
+
+sc_obsolete_symbols:
+	@( $(CVS_LIST) ) > /dev/null 2>&1 || : &&			\
+	  grep -E '\<(HAVE_FCNTL_H)\>'					\
+	     $$($(CVS_LIST) | grep -vEf .x-$@ ) &&			\
+	  { echo '$(ME): do not use HAVE_FCNTL_H'			\
+		1>&2; exit 1; } || :
+
 # FIXME: warn about definitions of EXIT_FAILURE, EXIT_SUCCESS, STREQ
 
 # Each nonempty line must start with a year number, or a TAB.
@@ -159,7 +182,8 @@ sc_changelog:
 # with the strings from the two affected variables.
 dd_c = $(srcdir)/src/dd.c
 sc_dd_max_sym_length:
-	@len=$$( (sed -n '/conversions\[\] =$$/,/^};/p' $(dd_c);\
+	@test -f $(dd_c) || exit 0;				\
+	len=$$( (sed -n '/conversions\[\] =$$/,/^};/p' $(dd_c);	\
 		 sed -n '/flags\[\] =$$/,/^};/p' $(dd_c) )	\
 		|sed -n '/"/s/^[^"]*"\([^"]*\)".*/\1/p'		\
               | wc --max-line-length);				\
@@ -206,7 +230,7 @@ sc_root_tests:
 sc_system_h_headers: .re-list
 	@if test -f $(srcdir)/src/system.h; then			\
 	  ( $(CVS_LIST) ) > /dev/null 2>&1 || exit 0;			\
-	  trap 'rm -f .re-list' 0 1 2 3 15;				\
+	  trap 'rc=$$?; rm -f .re-list; exit $$rc' 0 1 2 3 15;		\
 	  grep -E -f .re-list						\
 	      $$($(CVS_LIST) src | grep -Ev '(copy|system)\.h$$')	\
 	    && { echo '$(ME): the above are already included via system.h'\
@@ -234,11 +258,22 @@ sc_trailing_blank:
 # Look for diagnostics that aren't marked for translation.
 # This won't find any for which error's format string is on a separate line.
 sc_unmarked_diagnostics:
-	@grep -E							\
-	    '\<error \([^"]*"[^"]*[a-z]{3}' $(srcdir)/{lib,src}/*.c	\
+	@( $(CVS_LIST) ) > /dev/null 2>&1 || : &&			\
+	  grep -E							\
+	    '\<error \([^"]*"[^"]*[a-z]{3}'				\
+	     $$($(CVS_LIST) | grep -vEf .x-$@ )				\
 	  | grep -v '_(' &&						\
 	  { echo '$(ME): found unmarked diagnostic(s)' 1>&2;		\
 	    exit 1; } || :
+
+# Avoid useless parentheses like those in this example:
+# #if defined (SYMBOL) || defined (SYM2)
+sc_useless_cpp_parens:
+	@( $(CVS_LIST) ) > /dev/null 2>&1 || : &&			\
+	  grep '^# *if .*defined *('					\
+	     $$($(CVS_LIST) | grep -vEf .x-$@ ) &&			\
+	  { echo '$(ME): found useless parentheses in cpp directive'	\
+		1>&2; exit 1; } || :
 
 # Ensure that date's --help output stays in sync with the info
 # documentation for GNU strftime.  The only exception is %N,
@@ -260,19 +295,21 @@ strftime-check:
 # to emit a definition for each substituted variable.
 makefile-check:
 	grep -E '@[A-Z_0-9]+@' `find . -name Makefile.am` \
-	  && { echo 'Makefile.maint: use $(...), not @...@' 1>&2; exit 1; } || :
+	  && { echo 'Makefile.maint: use $$(...), not @...@' 1>&2; exit 1; } || :
 
 news-date-check: NEWS
 	today=`date +%Y-%m-%d`;	\
-	if head NEWS | grep '^\*.*'$$today >/dev/null; then \
+	if head NEWS | grep '^\*.* $(VERSION_REGEXP) ('$$today')' \
+	    >/dev/null; then \
 	  :; \
 	else \
-	  echo "today's date is not in NEWS" 1>&2; \
+	  echo "version or today's date is not in NEWS" 1>&2; \
 	  exit 1; \
 	fi
 
 changelog-check:
-	if head ChangeLog | grep 'Version $(VERSION)' >/dev/null; then \
+	if head ChangeLog | grep 'Version $(VERSION_REGEXP)\.$$' \
+	    >/dev/null; then \
 	  :; \
 	else \
 	  echo "$(VERSION) not in ChangeLog" 1>&2; \
@@ -342,7 +379,7 @@ v_etc_file = lib/version-etc.c
 # Make sure that the copyright date in $(v_etc_file) is up to date.
 copyright-check:
 	@if test -f $(v_etc_file); then \
-	  grep '"Copyright (C) $(shell date +%Y) Free' $(v_etc_file) \
+	  grep 'enum { COPYRIGHT_YEAR = '$$(date +%Y)' };' $(v_etc_file) \
 	    >/dev/null \
 	  || { echo 'out of date copyright in $(v_etc_file); update it' 1>&2; \
 	       exit 1; }; \
@@ -394,15 +431,17 @@ null_AM_MAKEFLAGS = \
 # by the use of _().  The --disable-nls effectively defines away that macro,
 # and building with CFLAGS='-Wformat -Werror' causes any format warning to be
 # treated as a failure.  Also, check for shadowing problems with -Wshadow.
+# These CFLAGS are pretty strict.  If you build this target, you probably
+# have to have a recent version of gcc and glibc headers.
 TMPDIR ?= /tmp
 t=$(TMPDIR)/$(PACKAGE)/test
-my-distcheck: $(local-check)
+my-distcheck: $(local-check) $(release_archive_dir)/$(prev-tgz)
 	-rm -rf $(t)
 	mkdir -p $(t)
 	GZIP=$(GZIP_ENV) $(AMTAR) -C $(t) -zxf $(distdir).tar.gz
 	cd $(t)/$(distdir)				\
 	  && ./configure --disable-nls			\
-	  && $(MAKE) CFLAGS='-Wformat -Werror -Wshadow'	\
+	  && $(MAKE) CFLAGS='-Werror -Wall -Wformat -Wshadow' \
 	      AM_MAKEFLAGS='$(null_AM_MAKEFLAGS)'	\
 	  && $(MAKE) dvi				\
 	  && $(MAKE) check				\
@@ -448,6 +487,7 @@ announcement: NEWS ChangeLog $(rel-files)
 	    --prev=$(PREV_VERSION)					\
 	    --curr=$(VERSION)						\
 	    --release-archive-directory=$(release_archive_dir)		\
+	    --gpg-key-id=$(gpg_key_ID)					\
 	    --news=NEWS							\
 	    $(addprefix --url-dir=, $(url_dir_list))			\
 
@@ -501,15 +541,15 @@ po-update:
 # with each of the files that belongs to some other package and is
 # regularly updated from the specified URL.
 wget_files ?= \
-  $(srcdir)/config/config.guess \
-  $(srcdir)/config/config.sub \
-  $(srcdir)/config/texinfo.tex \
+  $(srcdir)/build-aux/config.guess \
+  $(srcdir)/build-aux/config.sub \
+  $(srcdir)/build-aux/texinfo.tex \
   $(srcdir)/src/ansi2knr.c
 
 get-targets = $(patsubst %, get-%, $(wget_files))
 
-config.guess-url_prefix = $(ftp-gnu)/config/
-config.sub-url_prefix = $(ftp-gnu)/config/
+config.guess-url_prefix = $(ftp-gnu)/build-aux/
+config.sub-url_prefix = $(ftp-gnu)/build-aux/
 
 ansi2knr.c-url_prefix = ftp://ftp.cs.wisc.edu/ghost/
 
@@ -527,10 +567,10 @@ $(get-targets):
 	  && $(move_if_change) $(target).t $(target)
 
 cvs_files ?= \
-  $(srcdir)/config/depcomp \
-  $(srcdir)/config/install-sh \
-  $(srcdir)/config/missing \
-  $(srcdir)/config/mkinstalldirs \
+  $(srcdir)/build-aux/depcomp \
+  $(srcdir)/build-aux/install-sh \
+  $(srcdir)/build-aux/missing \
+  $(srcdir)/build-aux/mkinstalldirs \
   $(srcdir)/src/ansi2knr.c
 automake_repo=:pserver:anoncvs:anoncvs@sources.redhat.com:/cvs/automake
 .PHONY: wget-update
@@ -555,7 +595,6 @@ emit_upload_commands:
 	@echo =====================================
 	@echo =====================================
 	@echo "$(srcdir)/gnupload $(GNUPLOADFLAGS) \\"
-	@echo "    --to fetish.sf.net:fetish-ftp \\"
 	@echo "    --to $(gnu_rel_host):coreutils \\"
 	@echo "  $(rel-files)"
 	@echo '# send the /tmp/announcement e-mail'
@@ -567,6 +606,8 @@ $(xd-delta): $(release_archive_dir)/$(prev-tgz) $(distdir).tar.gz
 
 .PHONY: alpha beta major
 alpha beta major: news-date-check $(local-check)
+	test $@ = major && case $(VERSION) in *-cvs*) \
+	  echo "invalid version string: $(VERSION)" 1>&2; exit 1;; esac
 	$(MAKE) cvs-dist
 	$(MAKE) $(xd-delta)
 	$(MAKE) -s announcement RELEASE_TYPE=$@ > /tmp/announce-$(my_distdir)

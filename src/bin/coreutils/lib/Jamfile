@@ -38,11 +38,15 @@ StaticLibrary libfetish.a :
 	exitfail.c
 #	fchdir-stub.c
 #	fchown-stub.c
+	fd-reopen.c
+	fd-safer.c
 	file-type.c
 #	fileblocks.c
 	filemode.c
+	filenamecat.c
 	fnmatch.c
 	fopen-safer.c
+	fprintftime.c
 #	fsusage.c
 #	ftruncate.c
 	fts.c
@@ -52,6 +56,7 @@ StaticLibrary libfetish.a :
 	getdate.c
 #	getgroups.c
 #	gethostname.c
+	gethrxtime.c
 #	getline.c
 #	getloadavg.c
 	getndelim2.c
@@ -75,7 +80,6 @@ StaticLibrary libfetish.a :
 	long-options.c
 #	lstat-stub.c
 #	lstat.c
-	makepath.c
 #	malloc.c
 	mbswidth.c
 	md5.c
@@ -89,7 +93,9 @@ StaticLibrary libfetish.a :
 	memrchr.c
 #	memset.c
 	mkdir.c
+	mkdir-p.c
 #	mkstemp.c
+	mkstemp-safer.c
 	mktime.c
 	modechange.c
 #	mountlist.c
@@ -98,7 +104,6 @@ StaticLibrary libfetish.a :
 	offtostr.c
 	openat.c
 	open-safer.c
-	path-concat.c
 	physmem.c
 	posixtm.c
 	posixver.c
@@ -124,16 +129,17 @@ StaticLibrary libfetish.a :
 	settime.c
 	sha1.c
 	sig2str.c
-#	stat.c
 #	stpcpy.c
-#	strcasecmp.c
+	strcasecmp.c
 #	strcspn.c
 #	strdup.c
 	strftime.c
+	strintcmp.c
 	stripslash.c
 #	strncasecmp.c
 	strndup.c
 	strnlen.c
+	strnumcmp.c
 #	strpbrk.c
 #	strstr.c
 #	strtod.c
@@ -148,12 +154,14 @@ StaticLibrary libfetish.a :
 	time_r.c
 	umaxtostr.c
 	unicodeio.c
+	unlinkdir.c
 	unsetenv.c
 	userspec.c
 #	utime.c
 	utimecmp.c
 	utimens.c
 	version-etc.c
+	version-etc-fsf.c
 	xalloc-die.c
 	xfts.c
 	xgetcwd.c

@@ -1,5 +1,5 @@
 /* cat -- concatenate files and print on the standard output.
-   Copyright (C) 88, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Differences from the Unix cat:
    * Always unbuffered, -u is ignored.
@@ -27,13 +27,19 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
-#ifndef _POSIX_SOURCE
+
+#if HAVE_STROPTS_H
+# include <stropts.h>
+#endif
+#if HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
+
 #include "system.h"
 #include "error.h"
 #include "full-write.h"
 #include "getpagesize.h"
+#include "quote.h"
 #include "safe-read.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -112,12 +118,13 @@ Concatenate FILE(s), or standard input, to standard output.\n\
 \n\
 With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
-#if O_BINARY
-      fputs (_("\
+      printf (_("\
 \n\
-  -B, --binary             use binary writes to the console device.\n\n\
-"), stdout);
-#endif
+Examples:\n\
+  %s f - g  Output f's contents, then standard input, then g's contents.\n\
+  %s        Copy standard input to standard output.\n\
+"),
+	      program_name, program_name);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
@@ -306,7 +313,7 @@ cat (
 		    use_fionread = false;
 		  else
 		    {
-		      error (0, errno, _("cannot do ioctl on `%s'"), infile);
+		      error (0, errno, _("cannot do ioctl on %s"), quote (infile));
 		      newlines2 = newlines;
 		      return false;
 		    }
@@ -481,17 +488,6 @@ cat (
     }
 }
 
-/* This is gross, but necessary, because of the way close_stdout
-   works and because this program closes STDOUT_FILENO directly.  */
-static void (*closeout_func) (void) = close_stdout;
-
-static void
-close_stdout_wrapper (void)
-{
-  if (closeout_func)
-    (*closeout_func) ();
-}
-
 int
 main (int argc, char **argv)
 {
@@ -536,10 +532,6 @@ main (int argc, char **argv)
   bool show_ends = false;
   bool show_nonprinting = false;
   bool show_tabs = false;
-#if O_BINARY
-  bool binary = false;
-  bool binary_output = false;
-#endif
   int file_open_mode = O_RDONLY;
 
   static struct option const long_options[] =
@@ -551,9 +543,6 @@ main (int argc, char **argv)
     {"show-ends", no_argument, NULL, 'E'},
     {"show-tabs", no_argument, NULL, 'T'},
     {"show-all", no_argument, NULL, 'A'},
-#if O_BINARY
-    {"binary", no_argument, NULL, 'B'},
-#endif
     {GETOPT_HELP_OPTION_DECL},
     {GETOPT_VERSION_OPTION_DECL},
     {NULL, 0, NULL, 0}
@@ -567,17 +556,12 @@ main (int argc, char **argv)
 
   /* Arrange to close stdout if we exit via the
      case_GETOPT_HELP_CHAR or case_GETOPT_VERSION_CHAR code.  */
-  atexit (close_stdout_wrapper);
+  atexit (close_stdout);
 
   /* Parse command line options.  */
 
-  while ((c = getopt_long (argc, argv,
-#if O_BINARY
-			   "benstuvABET"
-#else
-			   "benstuvAET"
-#endif
-			   , long_options, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "benstuvAET", long_options, NULL))
+	 != -1)
     {
       switch (c)
 	{
@@ -618,12 +602,6 @@ main (int argc, char **argv)
 	  show_tabs = true;
 	  break;
 
-#if O_BINARY
-	case 'B':
-	  binary = true;
-	  break;
-#endif
-
 	case 'E':
 	  show_ends = true;
 	  break;
@@ -640,9 +618,6 @@ main (int argc, char **argv)
 	  usage (EXIT_FAILURE);
 	}
     }
-
-  /* Don't close stdout on exit from here on.  */
-  closeout_func = NULL;
 
   /* Get device, i-node number, and optimal blocksize of output.  */
 
@@ -670,41 +645,12 @@ main (int argc, char **argv)
 #endif
     }
 
-#if O_BINARY
-  /* We always read and write in BINARY mode, since this is the
-     best way to copy the files verbatim.  Exceptions are when
-     they request line numbering, squeezing of empty lines or
-     marking lines' ends: then we use text I/O, because otherwise
-     -b, -s and -E would surprise users on DOS/Windows where a line
-     with only CR-LF is an empty line.  (Besides, if they ask for
-     one of these options, they don't care much about the original
-     file contents anyway).  */
-  if (binary
-      || ! ((number | squeeze_blank | show_ends)
-	    || isatty (STDOUT_FILENO)))
+  if (! (number | show_ends | squeeze_blank))
     {
-      /* Switch stdout to BINARY mode.  */
-      binary_output = true;
-      SET_BINARY (STDOUT_FILENO);
-      /* When stdout is in binary mode, make sure all input files are
-	 also read in binary mode.  */
       file_open_mode |= O_BINARY;
+      if (O_BINARY && ! isatty (STDOUT_FILENO))
+	freopen (NULL, "wb", stdout);
     }
-  else if (show_nonprinting)
-    {
-      /* If they want to see the non-printables, let's show them
-	 those CR characters as well, so make the input binary.
-	 But keep console output in text mode, so that LF causes
-	 both CR and LF on output, and the output is readable.  */
-      file_open_mode |= O_BINARY;
-      SET_BINARY (0);
-
-      /* Setting stdin to binary switches the console device to
-	 raw I/O, which also affects stdout to console.  Undo that.  */
-      if (isatty (STDOUT_FILENO))
-	setmode (STDOUT_FILENO, O_TEXT);
-    }
-#endif
 
   /* Check if any of the input files are the same as the output file.  */
 
@@ -718,37 +664,12 @@ main (int argc, char **argv)
       if (argind < argc)
 	infile = argv[argind];
 
-      if (infile[0] == '-' && infile[1] == 0)
+      if (STREQ (infile, "-"))
 	{
 	  have_read_stdin = true;
-	  input_desc = 0;
-
-#if O_BINARY
-	  /* Switch stdin to BINARY mode if needed.  */
-	  if (binary_output)
-	    {
-	      bool tty_in = isatty (input_desc);
-
-	      /* If stdin is a terminal device, and it is the ONLY
-		 input file (i.e. we didn't write anything to the
-		 output yet), switch the output back to TEXT mode.
-		 This is so "cat > xyzzy" creates a DOS-style text
-		 file, like people expect.  */
-	      if (tty_in && optind <= argc)
-		setmode (STDOUT_FILENO, O_TEXT);
-	      else
-		{
-		  SET_BINARY (input_desc);
-# ifdef __DJGPP__
-		  /* This is DJGPP-specific.  By default, switching console
-		     to binary mode disables SIGINT.  But we want terminal
-		     reads to be interruptible.  */
-		  if (tty_in)
-		    __djgpp_set_ctrl_c (1);
-# endif
-		}
-	    }
-#endif
+	  input_desc = STDIN_FILENO;
+	  if ((file_open_mode & O_BINARY) && ! isatty (STDIN_FILENO))
+	    freopen (NULL, "rb", stdin);
 	}
       else
 	{
@@ -844,9 +765,6 @@ main (int argc, char **argv)
 
   if (have_read_stdin && close (STDIN_FILENO) < 0)
     error (EXIT_FAILURE, errno, _("closing standard input"));
-
-  if (close (STDOUT_FILENO) < 0)
-    error (EXIT_FAILURE, errno, _("closing standard output"));
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

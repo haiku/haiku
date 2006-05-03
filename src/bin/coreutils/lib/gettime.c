@@ -1,5 +1,5 @@
 /* gettime -- get the system clock
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert.  */
 
@@ -23,37 +23,31 @@
 
 #include "timespec.h"
 
-/* Get the system time.  */
+/* Get the system time into *TS.  */
 
-int
+void
 gettime (struct timespec *ts)
 {
-#if defined CLOCK_REALTIME && HAVE_CLOCK_GETTIME
-  if (clock_gettime (CLOCK_REALTIME, ts) == 0)
-    return 0;
-#endif
+#if HAVE_NANOTIME
+  nanotime (ts);
+#else
 
-#if HAVE_GETTIMEOFDAY
+# if defined CLOCK_REALTIME && HAVE_CLOCK_GETTIME
+  if (clock_gettime (CLOCK_REALTIME, ts) == 0)
+    return;
+# endif
+
+# if HAVE_GETTIMEOFDAY
   {
     struct timeval tv;
-    if (gettimeofday (&tv, 0) == 0)
-      {
-	ts->tv_sec = tv.tv_sec;
-	ts->tv_nsec = tv.tv_usec * 1000;
-	return 0;
-      }
+    gettimeofday (&tv, NULL);
+    ts->tv_sec = tv.tv_sec;
+    ts->tv_nsec = tv.tv_usec * 1000;
   }
+# else
+  ts->tv_sec = time (NULL);
+  ts->tv_nsec = 0;
+# endif
+
 #endif
-
-  {
-    time_t t = time (0);
-    if (t != (time_t) -1)
-      {
-	ts->tv_sec = t;
-	ts->tv_nsec = 0;
-	return 0;
-      }
-  }
-
-  return -1;
 }

@@ -1,5 +1,5 @@
 /* fold -- wrap each input line to fit in specified width.
-   Copyright (C) 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie, djm@gnu.ai.mit.edu. */
 
@@ -25,7 +25,7 @@
 
 #include "system.h"
 #include "error.h"
-#include "posixver.h"
+#include "quote.h"
 #include "xstrtol.h"
 
 #define TAB_WIDTH 8
@@ -46,6 +46,8 @@ static bool count_bytes;
 
 /* If nonzero, at least one of the files we read was standard input. */
 static bool have_read_stdin;
+
+static char const shortopts[] = "bsw:0::1::2::3::4::5::6::7::8::9::";
 
 static struct option const longopts[] =
 {
@@ -123,7 +125,7 @@ static bool
 fold_file (char *filename, size_t width)
 {
   FILE *istream;
-  register int c;
+  int c;
   size_t column = 0;		/* Screen column where next char will go. */
   size_t offset_out = 0;	/* Index in `line_out' for next char. */
   static char *line_out = NULL;
@@ -147,7 +149,7 @@ fold_file (char *filename, size_t width)
   while ((c = getc (istream)) != EOF)
     {
       if (offset_out + 1 >= allocated_out)
-	line_out = x2nrealloc (line_out, &allocated_out, sizeof *line_out);
+	line_out = X2REALLOC (line_out, &allocated_out);
 
       if (c == '\n')
 	{
@@ -255,33 +257,10 @@ main (int argc, char **argv)
 
   break_spaces = count_bytes = have_read_stdin = false;
 
-  /* Turn any numeric options into -w options.  */
-  for (i = 1; i < argc; i++)
+  while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
     {
-      char const *a = argv[i];
-      if (a[0] == '-')
-	{
-	  if (a[1] == '-' && ! a[2])
-	    break;
-	  if (ISDIGIT (a[1]))
-	    {
-	      size_t len_a = strlen (a);
-	      char *s = xmalloc (len_a + 2);
-	      s[0] = '-';
-	      s[1] = 'w';
-	      memcpy (s + 2, a + 1, len_a);
-	      argv[i] = s;
-	      if (200112 <= posix2_version ())
-		{
-		  error (0, 0, _("`%s' option is obsolete; use `%s'"), a, s);
-		  usage (EXIT_FAILURE);
-		}
-	    }
-	}
-    }
+      char optargbuf[2];
 
-  while ((optc = getopt_long (argc, argv, "bsw:", longopts, NULL)) != -1)
-    {
       switch (optc)
 	{
 	case 'b':		/* Count bytes rather than columns. */
@@ -292,13 +271,24 @@ main (int argc, char **argv)
 	  break_spaces = true;
 	  break;
 
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+	  if (optarg)
+	    optarg--;
+	  else
+	    {
+	      optargbuf[0] = optc;
+	      optargbuf[1] = '\0';
+	      optarg = optargbuf;
+	    }
+	  /* Fall through.  */
 	case 'w':		/* Line width. */
 	  {
 	    unsigned long int tmp_ulong;
 	    if (! (xstrtoul (optarg, NULL, 10, &tmp_ulong, "") == LONGINT_OK
 		   && 0 < tmp_ulong && tmp_ulong < SIZE_MAX - TAB_WIDTH))
 	      error (EXIT_FAILURE, 0,
-		     _("invalid number of columns: `%s'"), optarg);
+		     _("invalid number of columns: %s"), quote (optarg));
 	    width = tmp_ulong;
 	  }
 	  break;

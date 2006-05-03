@@ -1,5 +1,5 @@
 /* paste - merge lines of files
-   Copyright (C) 1997-2004 Free Software Foundation, Inc.
+   Copyright (C) 1997-2005 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David Ihnat.  */
 
@@ -70,11 +70,11 @@ static char const *delim_end;
 
 static struct option const longopts[] =
 {
-  {"serial", no_argument, 0, 's'},
-  {"delimiters", required_argument, 0, 'd'},
+  {"serial", no_argument, NULL, 's'},
+  {"delimiters", required_argument, NULL, 'd'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 /* Set globals delims and delim_end.  Copy STRPTR to DELIMS, converting
@@ -336,7 +336,8 @@ paste_serial (size_t nfiles, char **fnamptr)
   for (; nfiles; nfiles--, fnamptr++)
     {
       int saved_errno;
-      if (STREQ (*fnamptr, "-"))
+      bool is_stdin = STREQ (*fnamptr, "-");
+      if (is_stdin)
 	{
 	  have_read_stdin = true;
 	  fileptr = stdin;
@@ -394,7 +395,7 @@ paste_serial (size_t nfiles, char **fnamptr)
 	  error (0, saved_errno, "%s", *fnamptr);
 	  ok = false;
 	}
-      if (fileptr == stdin)
+      if (is_stdin)
 	clearerr (fileptr);	/* Also clear EOF. */
       else if (fclose (fileptr) == EOF)
 	{

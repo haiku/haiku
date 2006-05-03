@@ -1,3 +1,298 @@
+2005-12-16  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (stat invocation) [--printf]: Describe new option.
+	[--format]: Add example.  Distinguish from --printf.
+	Sort option descriptions.
+
+2005-12-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi: Remove documentation of SHA-1 and SHA-2
+	utilities that slipped in by accident in the b5_9x branch.
+
+2005-11-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (df invocation): Document treatment of dummy file
+	systems better.
+
+2005-11-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (tail invocation): Describe obsolete usages
+	like "tail -2" more precisely.
+	(touch invocation): The old usage works only for 1969-1999 now.
+
+2005-08-28  David Madore  <david.madore@ens.fr>
+
+	* coreutils.texi: Document SHA-1 and SHA-2 utilities.
+
+2005-10-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/coreutils.texi (Top, General output formatting, dir invocation):
+	(vdir invocation): Don't document the old v and d commands.
+
+2005-10-15  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (du invocation): Document du's -m option,
+	now that we've decided to keep it.
+	(who invocation): Remove documentation for deprecated --idle (-i).
+
+2005-10-13  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi: Avoid a few overfull/underfull hboxes.
+
+2005-09-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (touch invocation):
+	"touch -" now touches standard output.
+
+2005-09-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (who invocation): Remove a stray '+'.
+
+2005-09-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (uname invocation): uname -a no longer generates
+	the -p and -i outputs if they are unknown.
+
+2005-09-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (Time conversion specifiers, Options for date):
+	Document date --rfc-3339 and new specifiers %:z, %::z, %:::z.  Use
+	"date and time" consistently; the old version sometimes said "time
+	and date".  Fix a minor bug in the documentation for --rfc-2822:
+	it claimed day-of-month < 10 had leading space, not leading zero.
+	Use a consistent format for terms like "RFC".
+	(uname invocation): Mention that Linux outputs "unknown" for
+	-i and -p.
+
+2005-09-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (nice invocation): Document "niceness" versus
+	"nice value" versus "scheduling priority".
+
+2005-09-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (nice invocation): Use "niceness", not "nice value"
+	to talk about nice values offset by -20.  Don't use the word
+	"priority" when niceness is intended.
+
+2005-08-15  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (join invocation): Itemize the defaults.
+	From Karl Berry.
+
+2005-08-12  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (cp invocation, mv invocation): Remove square
+	brackets in --reply=[HOW].  Reported by Oscar Liljeblad.
+
+2005-07-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (md5sum invocation): --check now allows multiple
+	FILE inputs.
+
+2005-07-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (false invocation):
+	Mention that false is often built-in, and that it exits
+	with status >1 on some hosts.
+	(true invocation): Remove now-incorrect "non-POSIX mode" reference.
+
+2005-07-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (nohup invocation): POSIXLY_CORRECT no longer
+	affects nohup's behavior.  Input is redirected from /dev/null.
+
+2005-07-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (cat invocation): Remove -B or --binary option
+	(available on MS-DOS-like platforms only).  Explain when text and
+	binary mode are used now.
+	(md5sum invocation): -b actually does have an effect on Unix: it
+	causes "*" to be output.  Explain when text and binary mode are
+	used now.
+
+2005-07-03  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (cp invocation): Mark --reply as deprecated.
+	(mv invocation): Likewise.
+
+2005-06-24  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (cp invocation): Clarify how --reply=no works.
+
+2005-06-14  William Brendling  <wbrendling@gmail.com>
+
+	* coreutils.texi (du invocation): New options --last-time and
+	--time-style.
+
+2005-06-19  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (ln invocation): Change a few `paths' to `file names'.
+	* Makefile.am (check-texinfo): Also catch uses of path, pathname.
+
+2005-06-17  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (shred invocation): Clarify that shred
+	works on ext3 as long as it's not in data=journal mode.
+	Patch from Mark Melahn.
+
+2005-06-16  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (Backup options): Undocument --version-control=S (-V).
+
+2005-06-07  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (ln invocation): Examples, from Bob Proulx.
+
+2005-06-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use "file name" when talking about file names, instead of "filename"
+	or "path", as per the GNU coding standards.
+	* coreutils.texi (readlink invocation): "path component" ->
+	"component", since we don't use the POSIX "path" nomenclature.
+
+2005-05-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* getdate.texi (General date syntax): Don't say that date
+	date --iso-8601=ns generates acceptable dates; it doesn't yet.
+	Problem reported by Nic Ferrier.
+
+2005-05-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (dd invocation): New flags "binary" and "text".
+
+2005-05-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (chmod invocation): chmod -w complains if its
+	behavior differs from what chmod a-w would do.
+
+2005-05-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (ls invocation): ls --indicator-style=directory
+	renamed to ls --indicator-style=slash, to avoid confusion with ls
+	--directory.
+
+2005-04-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* perm.texi (Mode Structure, Changing Special Permissions):
+	(Conditional Executability, Numeric Modes):
+	These days the sticky bit is more often uses as the restricted
+	deletion flag, so modernize the discussion about this.
+	(Mode Structure): Linux/GNU -> GNU/Linux.
+	(Symbolic Modes): Don't imply that "+ur" or "u" is valid.
+	(Setting Permissions): Don't imply that "+t" is invalid.
+	Use "rwx" rather than the less-common "rxw" in an example.
+	(Copying Permissions): Say that ugo is a replacement for
+	a string of the other letters.  Add spaces around examples.
+	Use "set-user-ID" rather than "set user ID" to avoid ambiguity.
+	Use "+t" rather than "o+t", since POSIX doesn't specify the latter.
+	Mention which combinations are portable and which are GNU.
+	(Numeric Modes): Don't imply they aren't portable; they are
+	nowadays.
+
+2005-04-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (Standards conformance): Do not mention head -10,
+	since it now works the same regardless of POSIX version.
+	(od invocation): -w N -> -w[N].
+	(pr invocation): -S STRING -> -SSTRING.
+	(fold invocation): -WIDTH works even when conforming to POSIX
+	1003.1-2001.
+	(head invocation, tail invocation): Likewise for -NUM.
+	(split invocation): Likewise for -LINES.
+	(uniq invocation): Likewise for -N.
+	(expand invocation, unexpand invocation): Likewise for -TAB.
+	(nice invocation): Likewise for -ADJUSTMENT.
+	(sort invocation): Clarify explanation of +N option.
+	(uniq invocation): Likewise.
+	(join invocation): Remove special case for --help, --version.
+	(touch invocation): Clarify explanation of date options.
+	(Options for date): -I timespec -> -I[timespec].
+
+2005-04-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (install invocation): Use a= instead of 0 for
+	the point of departure for -m, and explain what it meeams.
+	(mkdir invocation, mkfifo invocation, mknod invocation):
+	The umask does not affect the point of departure.
+	Problem reported by Mike Stone.
+
+2005-04-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi: For consistency, standardize on "user ID" rather
+	than "uid" or "UID" or "user id".  Similarly for "group ID".
+
+2005-04-09  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (rm invocation): Say that --recursive removes
+	listed directories too, not just their contents.
+
+2005-04-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (dd invocation): Document the distinction between
+	INFO and USR1 for dd, and the effect of POSIXLY_CORRECT here.
+
+2005-04-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (cat invocation, chown invocation)
+	(chgrp invocation, basename invocation, dirname invocation):
+	Add examples, which are copies of the examples newly added
+	to the usage messages.
+	(ln invocation): Use same format as other examples above,
+	for consistency.
+
+2005-03-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi: Clarify NUL vs null byte vs null character.
+
+2005-03-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (nohup invocation): Clarify nohup.out creation.
+
+2005-03-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (Formatting file timestamps): Very long timestamps
+	may be treated as errors.
+
+2005-03-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (date invocation): Use an example that makes it
+	clear tha the default date use space-padded day of month.
+	Replace "directive" with "conversion specifier" to be consistent
+	with POSIX.  All uses changed.
+	Fix menu RHS to match actual directive lists.
+	(Time conversion specifiers): Renamed from Time directives.
+	Use @samp consistently, sometimes instead of @code.
+	Consistently ention which specifiers are GNU extensions.
+	Give more examples (in some cases, instead of ranges).
+	Say why %F is preferred for dates.
+	(Date conversion specifiers): Renamed from Date directives.
+	Likewise for other changes.
+	(Padding and other flags): Correct the description.
+	Document #.  Give an example for %9B.
+
+2005-02-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi: Adjust to match current strftime.c.
+	(Time directives): Say that %k, %l, and %P are GNU extensions.
+	For %p and %P, mention handling of noon and midnight.
+	For %s, use ISO 8601, and mention handling of leap seconds.
+	For %S, clarify mention of leap seconds.
+	For %T, say that it's the same as %H:%M:%S.
+	For %X, don't say that it must be the same as %H:%M:%S.
+	For %z and %Z, clarify which time zones are used.  These options
+	are now affected by --date, so don't claim that they're not.
+	(Date directives): %C is now all but the last two chars of %Y.
+	For %D, say that it's equivalent to %m/%d/%y.
+	For %e, use blank in example.
+	For %h, use @code for %b.
+	For %Y, mention what happens with outlandish years.
+	(Padding and other flags): Renamed from Padding.
+	Mention that the flags are GNU extensions.
+	Mention the 0 and ^ flags.
+	Mention field widths an modifiers.
+	(Examples of date): - is a flag, not a modifier.
+
 2005-01-07  Jim Meyering  <jim@meyering.net>
 
 	* coreutils.texi (sort invocation): Specify that a string

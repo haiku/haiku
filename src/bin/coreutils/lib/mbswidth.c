@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2004 Free Software Foundation, Inc.
+   Copyright (C) 2000-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Bruno Haible <haible@clisp.cons.org>.  */
 
@@ -91,7 +91,8 @@ int wcwidth ();
    character string pointed to by STRING.  If a non-printable character
    occurs, and MBSW_REJECT_UNPRINTABLE is specified, -1 is returned.
    With flags = MBSW_REJECT_INVALID | MBSW_REJECT_UNPRINTABLE, this is
-   the multibyte analogue of the wcswidth function.  */
+   the multibyte analogue of the wcswidth function.
+   If STRING is not of length < INT_MAX / 2, integer overflow can occur.  */
 int
 mbswidth (const char *string, int flags)
 {
@@ -101,7 +102,8 @@ mbswidth (const char *string, int flags)
 /* Returns the number of columns needed to represent the multibyte
    character string pointed to by STRING of length NBYTES.  If a
    non-printable character occurs, and MBSW_REJECT_UNPRINTABLE is
-   specified, -1 is returned.  */
+   specified, -1 is returned.
+   If NBYTES is not < INT_MAX / 2, integer overflow can occur.  */
 int
 mbsnwidth (const char *string, size_t nbytes, int flags)
 {

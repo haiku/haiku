@@ -1,5 +1,5 @@
 /* comm -- compare two sorted files line by line.
-   Copyright (C) 86, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,13 +13,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Richard Stallman and David MacKenzie. */
 
 #include <config.h>
 
-#include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 #include "system.h"
@@ -27,6 +26,7 @@
 #include "error.h"
 #include "hard-locale.h"
 #include "quote.h"
+#include "stdio--.h"
 #include "xmemcoll.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -57,7 +57,7 @@ static struct option const long_options[] =
 {
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 
@@ -137,10 +137,9 @@ writeline (const struct linebuffer *line, FILE *stream, int class)
 /* Compare INFILES[0] and INFILES[1].
    If either is "-", use the standard input for that file.
    Assume that each input file is sorted;
-   merge them and output the result.
-   Return true if successful.  */
+   merge them and output the result.  */
 
-static bool
+static void
 compare_files (char **infiles)
 {
   /* For each file, we have one linebuffer in lb1.  */
@@ -153,11 +152,7 @@ compare_files (char **infiles)
   /* streams[i] holds the input stream for file i.  */
   FILE *streams[2];
 
-  /* errno values for each stream.  */
-  int saved_errno[2];
-
   int i;
-  bool ret = true;
 
   /* Initialize the storage. */
   for (i = 0; i < 2; i++)
@@ -166,13 +161,11 @@ compare_files (char **infiles)
       thisline[i] = &lb1[i];
       streams[i] = (STREQ (infiles[i], "-") ? stdin : fopen (infiles[i], "r"));
       if (!streams[i])
-	{
-	  error (0, errno, "%s", infiles[i]);
-	  return false;
-	}
+	error (EXIT_FAILURE, errno, "%s", infiles[i]);
 
       thisline[i] = readlinebuffer (thisline[i], streams[i]);
-      saved_errno[i] = errno;
+      if (ferror (streams[i]))
+	error (EXIT_FAILURE, errno, "%s", infiles[i]);
     }
 
   while (thisline[0] || thisline[1])
@@ -214,31 +207,20 @@ compare_files (char **infiles)
       if (order >= 0)
 	{
 	  thisline[1] = readlinebuffer (thisline[1], streams[1]);
-	  saved_errno[1] = errno;
+	  if (ferror (streams[1]))
+	    error (EXIT_FAILURE, errno, "%s", infiles[1]);
 	}
       if (order <= 0)
 	{
 	  thisline[0] = readlinebuffer (thisline[0], streams[0]);
-	  saved_errno[0] = errno;
+	  if (ferror (streams[0]))
+	    error (EXIT_FAILURE, errno, "%s", infiles[0]);
 	}
     }
 
-  /* Free all storage and close all input streams. */
   for (i = 0; i < 2; i++)
-    {
-      free (lb1[i].buffer);
-      if (ferror (streams[i]))
-	{
-	  error (0, saved_errno[i], "%s", infiles[i]);
-	  ret = false;
-	}
-      if (fclose (streams[i]) != 0)
-	{
-	  error (0, errno, "%s", infiles[i]);
-	  ret = false;
-	}
-    }
-  return ret;
+    if (fclose (streams[i]) != 0)
+      error (EXIT_FAILURE, errno, "%s", infiles[i]);
 }
 
 int
@@ -297,6 +279,7 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
-  exit (compare_files (argv + optind)
-	? EXIT_SUCCESS : EXIT_FAILURE);
+  compare_files (argv + optind);
+
+  exit (EXIT_SUCCESS);
 }

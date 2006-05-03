@@ -1,5 +1,5 @@
 /* factor -- print prime factors of n.
-   Copyright (C) 86, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Rubin <phr@ocf.berkeley.edu>.
    Adapted for GNU, fixed to factor UINT_MAX by Jim Meyering.  */
@@ -30,6 +30,7 @@
 #include "error.h"
 #include "inttostr.h"
 #include "long-options.h"
+#include "quote.h"
 #include "readtokens.h"
 #include "xstrtol.h"
 
@@ -41,9 +42,8 @@
 /* Token delimiters when reading from a file.  */
 #define DELIM "\n\t "
 
-/* FIXME: if this program is ever modified to factor integers larger
-   than 2^128, this constant (and the algorithm :-) will have to change.  */
-#define MAX_N_FACTORS 128
+/* The maximum number of factors, including -1, for negative numbers.  */
+#define MAX_N_FACTORS (sizeof (uintmax_t) * CHAR_BIT)
 
 /* The trial divisor increment wheel.  Use it to skip over divisors that
    are composites of 2, 3, 5, 7, or 11.  The part from WHEEL_START up to
@@ -84,8 +84,8 @@ Print the prime factors of each NUMBER.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
-  Print the prime factors of all specified integer NUMBERs.  If no arguments\n\
-  are specified on the command line, they are read from standard input.\n\
+Print the prime factors of all specified integer NUMBERs.  If no arguments\n\
+are specified on the command line, they are read from standard input.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
@@ -97,7 +97,7 @@ Print the prime factors of each NUMBER.\n\
 static size_t
 factor (uintmax_t n0, size_t max_n_factors, uintmax_t *factors)
 {
-  register uintmax_t n = n0, d, q;
+  uintmax_t n = n0, d, q;
   size_t n_factors = 0;
   unsigned char const *w = wheel_tab;
 
@@ -153,9 +153,9 @@ print_factors (const char *s)
   if ((err = xstrtoumax (s, NULL, 10, &n, "")) != LONGINT_OK)
     {
       if (err == LONGINT_OVERFLOW)
-	error (0, 0, _("`%s' is too large"), s);
+	error (0, 0, _("%s is too large"), quote (s));
       else
-	error (0, 0, _("`%s' is not a valid positive integer"), s);
+	error (0, 0, _("%s is not a valid positive integer"), quote (s));
       return false;
     }
   n_factors = factor (n, MAX_N_FACTORS, factors);
@@ -210,10 +210,10 @@ main (int argc, char **argv)
   else
     {
       int i;
+      ok = true;
       for (i = optind; i < argc; i++)
 	if (! print_factors (argv[i]))
-	  usage (EXIT_FAILURE);
-      ok = true;
+	  ok = false;
     }
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);

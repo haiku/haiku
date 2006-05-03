@@ -1,5 +1,5 @@
 /* readlink -- display value of a symbolic link.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Dmitry V. Levin */
 
@@ -44,13 +44,13 @@ static bool verbose;
 
 static struct option const longopts[] =
 {
-  {"canonicalize", no_argument, 0, 'f'},
-  {"canonicalize-existing", no_argument, 0, 'e'},
-  {"canonicalize-missing", no_argument, 0, 'm'},
-  {"no-newline", no_argument, 0, 'n'},
-  {"quiet", no_argument, 0, 'q'},
-  {"silent", no_argument, 0, 's'},
-  {"verbose", no_argument, 0, 'v'},
+  {"canonicalize", no_argument, NULL, 'f'},
+  {"canonicalize-existing", no_argument, NULL, 'e'},
+  {"canonicalize-missing", no_argument, NULL, 'm'},
+  {"no-newline", no_argument, NULL, 'n'},
+  {"quiet", no_argument, NULL, 'q'},
+  {"silent", no_argument, NULL, 's'},
+  {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -69,13 +69,13 @@ usage (int status)
 	     stdout);
       fputs (_("\
   -f, --canonicalize            canonicalize by following every symlink in\n\
-                                every component of the given path recursively;\n\
-                                all but the last path component must exist\n\
+                                every component of the given name recursively;\n\
+                                all but the last component must exist\n\
   -e, --canonicalize-existing   canonicalize by following every symlink in\n\
-                                every component of the given path recursively,\n\
-                                all path components must exist\n\
+                                every component of the given name recursively,\n\
+                                all components must exist\n\
   -m, --canonicalize-missing    canonicalize by following every symlink in\n\
-                                every component of the given path recursively,\n\
+                                every component of the given name recursively,\n\
                                 without requirements on components existence\n\
   -n, --no-newline              do not output the trailing newline\n\
   -q, --quiet,\n\

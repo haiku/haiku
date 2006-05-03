@@ -1,5 +1,5 @@
 /* Provide a replacement for the POSIX nanosleep function.
-   Copyright (C) 1999, 2000, 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2000, 2002, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,11 +13,13 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* written by Jim Meyering */
 
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 /* Undefine nanosleep here so any prototype is not redefined to be a
    prototype for rpl_nanosleep. (they'd conflict e.g., on alpha-dec-osf3.2)  */
@@ -30,9 +32,9 @@
 
 #include <errno.h>
 
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
+
+#include "timespec.h"
 
 /* Some systems (MSDOS) don't have SIGCONT.
    Using SIGTERM here turns the signal-handling code below
@@ -41,7 +43,9 @@
 # define SIGCONT SIGTERM
 #endif
 
-#include "timespec.h"
+#if ! HAVE_SIGINTERRUPT
+# define siginterrupt(sig, flag) /* empty */
+#endif
 
 static sig_atomic_t volatile suspended;
 
@@ -66,7 +70,7 @@ my_usleep (const struct timespec *ts_delay)
       tv_delay.tv_sec++;
       tv_delay.tv_usec = 0;
     }
-  select (0, (void *) 0, (void *) 0, (void *) 0, &tv_delay);
+  select (0, NULL, NULL, NULL, &tv_delay);
 }
 
 /* FIXME: comment */
@@ -77,16 +81,11 @@ rpl_nanosleep (const struct timespec *requested_delay,
 {
   static bool initialized;
 
-#ifdef SA_NOCLDSTOP
-  struct sigaction oldact, newact;
-#endif
-
-  suspended = 0;
-
   /* set up sig handler */
   if (! initialized)
     {
 #ifdef SA_NOCLDSTOP
+      struct sigaction oldact, newact;
       newact.sa_handler = sighandler;
       sigemptyset (&newact.sa_mask);
       newact.sa_flags = 0;
@@ -96,10 +95,15 @@ rpl_nanosleep (const struct timespec *requested_delay,
 	sigaction (SIGCONT, &newact, NULL);
 #else
       if (signal (SIGCONT, SIG_IGN) != SIG_IGN)
-	signal (SIGCONT, sighandler);
+	{
+	  signal (SIGCONT, sighandler);
+	  siginterrupt (SIGCONT, 1);
+	}
 #endif
       initialized = true;
     }
+
+  suspended = 0;
 
   my_usleep (requested_delay);
 

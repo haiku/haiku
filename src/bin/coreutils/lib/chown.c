@@ -1,6 +1,6 @@
 /* provide consistent interface to chown for systems that don't interpret
    an ID of -1 as meaning `don't change the corresponding ID'.
-   Copyright (C) 1997, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,11 +14,13 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* written by Jim Meyering */
 
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 /* Disable the definition of chown to rpl_chown (from config.h) in this
    file.  Otherwise, we'd get conflicting prototypes for rpl_chown on
@@ -27,14 +29,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-#if HAVE_FCNTL_H
-# include <fcntl.h>
-#else
-# include <sys/file.h>
-#endif
+#include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 
 /* Provide a more-closely POSIX-conforming version of chown on
@@ -53,7 +49,7 @@ rpl_chown (const char *file, uid_t uid, gid_t gid)
 
       /* Stat file to get id(s) that should remain unchanged.  */
       if (stat (file, &file_stats))
-	return 1;
+	return -1;
 
       if (gid == (gid_t) -1)
 	gid = file_stats.st_gid;

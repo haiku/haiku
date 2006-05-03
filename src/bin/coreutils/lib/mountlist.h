@@ -1,7 +1,7 @@
 /* mountlist.h -- declarations for list of mounted file systems
 
-   Copyright (C) 1991, 1992, 1998, 2000, 2001, 2002, 2003, 2004 Free
-   Software Foundation, Inc.
+   Copyright (C) 1991, 1992, 1998, 2000, 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,15 +15,19 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include <stdbool.h>
+#ifndef MOUNTLIST_H_
+# define MOUNTLIST_H_
+
+# include <stdbool.h>
+# include <sys/types.h>
 
 /* A mount table entry. */
 struct mount_entry
 {
-  char *me_devname;		/* Device node pathname, including "/dev/". */
-  char *me_mountdir;		/* Mount point directory pathname. */
+  char *me_devname;		/* Device node name, including "/dev/". */
+  char *me_mountdir;		/* Mount point directory name. */
   char *me_type;		/* "nfs", "4.2", etc. */
   dev_t me_dev;			/* Device number of me_mountdir. */
   unsigned int me_dummy : 1;	/* Nonzero for dummy file systems. */
@@ -34,22 +38,4 @@ struct mount_entry
 
 struct mount_entry *read_file_system_list (bool need_fs_type);
 
-#ifndef ME_DUMMY
-# define ME_DUMMY(Fs_name, Fs_type) \
-    (!strcmp (Fs_type, "autofs") \
-     /* for Irix 6.5 */ \
-     || !strcmp (Fs_type, "ignore"))
-#endif
-
-#undef STREQ
-#define STREQ(a, b) (strcmp ((a), (b)) == 0)
-
-#ifndef ME_REMOTE
-/* A file system is `remote' if its Fs_name contains a `:'
-   or if (it is of type smbfs and its Fs_name starts with `//').  */
-# define ME_REMOTE(Fs_name, Fs_type)	\
-    (strchr ((Fs_name), ':') != 0	\
-     || ((Fs_name)[0] == '/'		\
-	 && (Fs_name)[1] == '/'		\
-	 && STREQ (Fs_type, "smbfs")))
 #endif

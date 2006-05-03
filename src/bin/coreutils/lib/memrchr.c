@@ -1,7 +1,7 @@
 /* memrchr -- find the last occurrence of a byte in a memory block
 
-   Copyright (C) 1991, 1993, 1996, 1997, 1999, 2000, 2003, 2004 Free
-   Software Foundation, Inc.
+   Copyright (C) 1991, 1993, 1996, 1997, 1999, 2000, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
    Based on strlen implementation by Torbjorn Granlund (tege@sics.se),
    with help from Dan Sahlin (dan@sics.se) and
@@ -21,19 +21,17 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
-#include <string.h>
-
-#include <stddef.h>
-
 #if defined _LIBC
+# include <string.h>
 # include <memcopy.h>
 #else
+# include "memrchr.h"
 # define reg_char char
 #endif
 

@@ -46,6 +46,8 @@ check-texinfo:
 	  '/\bPOSIX\b/ && !/\@acronym{POSIX}/ && !/^\* / || /{posix}/ and print,exit 1' \
 	  $(srcdir)/*.texi 2> /dev/null || fail=1; }; \
 	grep -iwE 'builtins?' $(srcdir)/*.texi && fail=1; \
+	grep -iwE 'path(name)?s?' $(srcdir)/*.texi \
+	  | grep -vE '@vindex PATH$$|@env{PATH}' && fail=1; \
 	exit $$fail
 
 check: check-texinfo

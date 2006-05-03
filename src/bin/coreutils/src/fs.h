@@ -1,5 +1,5 @@
 /* Define the magic numbers as given by statfs(2).
-   Please send additions to meskes@debian.org.
+   Please send additions to bug-coreutils@gnu.org and meskes@debian.org.
    This file is generated automatically from ./stat.c. */
 
 #if defined __linux__
@@ -8,6 +8,8 @@
 # define S_MAGIC_EXT 0x137D
 # define S_MAGIC_EXT2_OLD 0xEF51
 # define S_MAGIC_EXT2 0xEF53
+# define S_MAGIC_JFS 0x3153464a
+# define S_MAGIC_XFS 0x58465342
 # define S_MAGIC_HPFS 0xF995E849
 # define S_MAGIC_ISOFS 0x9660
 # define S_MAGIC_ISOFS_WIN 0x4000

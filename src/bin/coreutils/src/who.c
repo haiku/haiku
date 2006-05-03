@@ -1,5 +1,5 @@
 /* GNU's who.
-   Copyright (C) 1992-2004 Free Software Foundation, Inc.
+   Copyright (C) 1992-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by jla; revised by djm; revised again by mstone */
 
@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include "system.h"
 
+#include "canon-host.h"
 #include "readutmp.h"
 #include "error.h"
 #include "hard-locale.h"
@@ -84,12 +85,10 @@
 #define IDLESTR_LEN 6
 
 #if HAVE_STRUCT_XTMP_UT_PID
-# define UT_PID(U) ((U)->ut_pid)
 # define PIDSTR_DECL_AND_INIT(Var, Utmp_ent) \
   char Var[INT_STRLEN_BOUND (Utmp_ent->ut_pid) + 1]; \
   sprintf (Var, "%ld", (long int) (Utmp_ent->ut_pid))
 #else
-# define UT_PID(U) 0
 # define PIDSTR_DECL_AND_INIT(Var, Utmp_ent) \
   const char *Var = ""
 #endif
@@ -101,7 +100,6 @@
 #endif
 
 char *ttyname ();
-char *canon_host ();
 
 /* The name this program was run with. */
 char *program_name;
@@ -173,7 +171,7 @@ static struct option const longopts[] = {
   {"count", no_argument, NULL, 'q'},
   {"dead", no_argument, NULL, 'd'},
   {"heading", no_argument, NULL, 'H'},
-  {"idle", no_argument, NULL, 'i'},
+  {"idle", no_argument, NULL, 'i'}, /* FIXME: deprecated: remove in late 2006 */
   {"login", no_argument, NULL, 'l'},
   {"lookup", no_argument, NULL, LOOKUP_OPTION},
   {"message", no_argument, NULL, 'T'},
@@ -335,8 +333,8 @@ print_user (const STRUCT_UTMP *utmp_ent, time_t boottime)
   PIDSTR_DECL_AND_INIT (pidstr, utmp_ent);
 
   /* Copy ut_line into LINE, prepending `/dev/' if ut_line is not
-     already an absolute pathname.  Some system may put the full,
-     absolute pathname in ut_line.  */
+     already an absolute file name.  Some systems may put the full,
+     absolute file name in ut_line.  */
   if (utmp_ent->ut_line[0] == '/')
     {
       strncpy (line, utmp_ent->ut_line, sizeof (utmp_ent->ut_line));
@@ -370,7 +368,8 @@ print_user (const STRUCT_UTMP *utmp_ent, time_t boottime)
   if (utmp_ent->ut_host[0])
     {
       char ut_host[sizeof (utmp_ent->ut_host) + 1];
-      char *host = 0, *display = 0;
+      char *host = NULL;
+      char *display = NULL;
 
       /* Copy the host name into UT_HOST, and ensure it's nul terminated. */
       strncpy (ut_host, utmp_ent->ut_host, sizeof (utmp_ent->ut_host));
@@ -606,14 +605,15 @@ scan_entries (size_t n, const STRUCT_UTMP *utmp_buf)
     }
 }
 
-/* Display a list of who is on the system, according to utmp file filename. */
+/* Display a list of who is on the system, according to utmp file FILENAME.
+   Use read_utmp OPTIONS to read the file.  */
 static void
-who (const char *filename)
+who (const char *filename, int options)
 {
   size_t n_users;
   STRUCT_UTMP *utmp_buf;
 
-  if (read_utmp (filename, &n_users, &utmp_buf) != 0)
+  if (read_utmp (filename, &n_users, &utmp_buf, options) != 0)
     error (EXIT_FAILURE, errno, "%s", filename);
 
   if (short_list)
@@ -641,8 +641,6 @@ usage (int status)
   -H, --heading     print line of column headings\n\
 "), stdout);
       fputs (_("\
-  -i, --idle        add idle time as HOURS:MINUTES, . or old\n\
-                    (deprecated, use -u)\n\
   -l, --login       print system login processes\n\
 "), stdout);
       fputs (_("\
@@ -810,18 +808,16 @@ main (int argc, char **argv)
 
   switch (argc - optind)
     {
+    case 2:			/* who <blurf> <glop> */
+      my_line_only = true;
+      /* Fall through.  */
     case -1:
     case 0:			/* who */
-      who (UTMP_FILE);
+      who (UTMP_FILE, READ_UTMP_CHECK_PIDS);
       break;
 
     case 1:			/* who <utmp file> */
-      who (argv[optind]);
-      break;
-
-    case 2:			/* who <blurf> <glop> */
-      my_line_only = true;
-      who (UTMP_FILE);
+      who (argv[optind], 0);
       break;
 
     default:			/* lose */

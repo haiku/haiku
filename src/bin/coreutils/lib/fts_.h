@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /*
  * Copyright (c) 1989, 1993
@@ -52,6 +52,7 @@
 
 # ifdef _LIBC
 #  include <features.h>
+#  define _LGPL_PACKAGE 1
 # else
 #  undef __THROW
 #  define __THROW
@@ -63,19 +64,19 @@
 
 # include <stddef.h>
 # include <sys/types.h>
-# include "hash.h"
-# include "cycle-check.h"
+# include <sys/stat.h>
 
 typedef struct {
 	struct _ftsent *fts_cur;	/* current node */
 	struct _ftsent *fts_child;	/* linked list of children */
 	struct _ftsent **fts_array;	/* sort array */
 	dev_t fts_dev;			/* starting device # */
-	char *fts_path;			/* path for this descent */
+	char *fts_path;			/* file name for this descent */
 	int fts_rfd;			/* fd for root */
 	size_t fts_pathlen;		/* sizeof(path) */
 	size_t fts_nitems;			/* elements in the sort array */
-	int (*fts_compar) (const void *, const void *); /* compare fn */
+	int (*fts_compar) (struct _ftsent const **, struct _ftsent const **);
+					/* compare fn */
 
 # define FTS_COMFOLLOW	0x0001		/* follow command line symlinks */
 # define FTS_LOGICAL	0x0002		/* logical walk */
@@ -87,7 +88,8 @@ typedef struct {
 # define FTS_WHITEOUT	0x0080		/* return whiteout information */
 
   /* There are two ways to detect cycles.
-     The lazy way, with which one may process a directory that is a
+     The lazy way (which works only with FTS_PHYSICAL),
+     with which one may process a directory that is a
      part of the cycle several times before detecting the cycle.
      The `tight' way, whereby fts uses more memory (proportional
      to number of `active' directories, aka distance from root
@@ -95,7 +97,19 @@ typedef struct {
      to detect any cycle right away.  For example, du must use
      this option to avoid counting disk space in a cycle multiple
      times, but chown -R need not.
-     The default is to use the constant-memory lazy way. */
+     The default is to use the constant-memory lazy way, when possible
+     (see below).
+
+     However, with FTS_LOGICAL (when following symlinks, e.g., chown -L)
+     using lazy cycle detection is inadequate.  For example, traversing
+     a directory containing a symbolic link to a peer directory, it is
+     possible to encounter the same directory twice even though there
+     is no cycle:
+     dir
+     ...
+     slink -> dir
+     So, when FTS_LOGICAL is selected, we have to use a different
+     mode of cycle detection: FTS_TIGHT_CYCLE_CHECK.  */
 # define FTS_TIGHT_CYCLE_CHECK	0x0100
 
 # define FTS_OPTIONMASK	0x01ff		/* valid user option mask */
@@ -104,19 +118,28 @@ typedef struct {
 # define FTS_STOP	0x2000		/* (private) unrecoverable error */
 	int fts_options;		/* fts_open options, global flags */
 
-	/* This data structure records the directories between a starting
-	   point and the current directory.  I.e., a directory is recorded
-	   here IFF we have visited it once, but we have not yet completed
-	   processing of all its entries.  Every time we visit a new directory,
-	   we add that directory to this set.  When we finish with a directory
-	   (usually by visiting it a second time), we remove it from this
-	   set.  Each entry in this data structure is a device/inode pair.
-	   This data structure is used to detect directory cycles efficiently
-	   and promptly even when the depth of a hierarchy is in the tens
-	   of thousands.  Lazy checking, as done by GNU rm via cycle-check.c,
-	   wouldn't be appropriate for du.  */
-	Hash_table *active_dir_ht;
-	struct cycle_check_state *cycle_state;
+# if !_LGPL_PACKAGE
+	union {
+		/* This data structure is used if FTS_TIGHT_CYCLE_CHECK is
+		   specified.  It records the directories between a starting
+		   point and the current directory.  I.e., a directory is
+		   recorded here IFF we have visited it once, but we have not
+		   yet completed processing of all its entries.  Every time we
+		   visit a new directory, we add that directory to this set.
+		   When we finish with a directory (usually by visiting it a
+		   second time), we remove it from this set.  Each entry in
+		   this data structure is a device/inode pair.  This data
+		   structure is used to detect directory cycles efficiently and
+		   promptly even when the depth of a hierarchy is in the tens
+		   of thousands.  */
+		struct hash_table *ht;
+
+		/* This data structure uses lazy checking, as done by rm via
+	           cycle-check.c.  It's the default, but it's not appropriate
+	           for programs like du.  */
+		struct cycle_check_state *state;
+	} fts_cycle;
+# endif
 } FTS;
 
 typedef struct _ftsent {
@@ -125,15 +148,13 @@ typedef struct _ftsent {
 	struct _ftsent *fts_link;	/* next file in directory */
 	long fts_number;	        /* local numeric value */
 	void *fts_pointer;	        /* local address value */
-	char *fts_accpath;		/* access path */
-	char *fts_path;			/* root path */
+	char *fts_accpath;		/* access file name */
+	char *fts_path;			/* root name; == fts_fts->fts_path */
 	int fts_errno;			/* errno for this node */
 	int fts_symfd;			/* fd for symlink */
 	size_t fts_pathlen;		/* strlen(fts_path) */
 
-	ino_t fts_ino;			/* inode */
-	dev_t fts_dev;			/* device */
-	nlink_t fts_nlink;		/* link count */
+	FTS *fts_fts;			/* the file hierarchy itself */
 
 # define FTS_ROOTPARENTLEVEL	(-1)
 # define FTS_ROOTLEVEL		 0

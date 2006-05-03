@@ -1,5 +1,5 @@
 /* Convert a `struct tm' to a time_t value.
-   Copyright (C) 1993-1999, 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 1993-1999, 2002-2004, 2005 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Eggert (eggert@twinsun.com).
 
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
 
 /* Define this to have a standalone program to test this implementation of
    mktime.  */
@@ -37,10 +37,11 @@
 
 #include <limits.h>
 
+#include <string.h>		/* For the real memcpy prototype.  */
+
 #if DEBUG
 # include <stdio.h>
 # include <stdlib.h>
-# include <string.h>
 /* Make it work even if the system's libc has its own mktime routine.  */
 # define mktime my_mktime
 #endif /* DEBUG */
@@ -60,13 +61,38 @@
    ? (a) >> (b)		\
    : (a) / (1 << (b)) - ((a) % (1 << (b)) < 0))
 
-/* The extra casts work around common compiler bugs.  */
+/* The extra casts in the following macros work around compiler bugs,
+   e.g., in Cray C 5.0.3.0.  */
+
+/* True if the arithmetic type T is an integer type.  bool counts as
+   an integer.  */
+#define TYPE_IS_INTEGER(t) ((t) 1.5 == 1)
+
+/* True if negative values of the signed integer type T use two's
+   complement, ones' complement, or signed magnitude representation,
+   respectively.  Much GNU code assumes two's complement, but some
+   people like to be portable to all possible C hosts.  */
+#define TYPE_TWOS_COMPLEMENT(t) ((t) ~ (t) 0 == (t) -1)
+#define TYPE_ONES_COMPLEMENT(t) ((t) ~ (t) 0 == 0)
+#define TYPE_SIGNED_MAGNITUDE(t) ((t) ~ (t) 0 < (t) -1)
+
+/* True if the arithmetic type T is signed.  */
 #define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-/* The outer cast is needed to work around a bug in Cray C 5.0.3.0.
-   It is necessary at least when t == time_t.  */
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
+
+/* The maximum and minimum values for the integer type T.  These
+   macros have undefined behavior if T is signed and has padding bits.
+   If this is a problem for you, please let us know how to fix it for
+   your host.  */
+#define TYPE_MINIMUM(t) \
+  ((t) (! TYPE_SIGNED (t) \
+	? (t) 0 \
+	: TYPE_SIGNED_MAGNITUDE (t) \
+	? ~ (t) 0 \
+	: ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1)))
+#define TYPE_MAXIMUM(t) \
+  ((t) (! TYPE_SIGNED (t) \
+	? (t) -1 \
+	: ~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
 
 #ifndef TIME_T_MIN
 # define TIME_T_MIN TYPE_MINIMUM (time_t)
@@ -79,8 +105,8 @@
 /* Verify a requirement at compile-time (unlike assert, which is runtime).  */
 #define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
 
-verify (time_t_is_integer, (time_t) 0.5 == 0);
-verify (twos_complement_arithmetic, -1 == ~1 + 1);
+verify (time_t_is_integer, TYPE_IS_INTEGER (time_t));
+verify (twos_complement_arithmetic, TYPE_TWOS_COMPLEMENT (int));
 /* The code also assumes that signed integer overflow silently wraps
    around, but this assumption can't be stated without causing a
    diagnostic on some hosts.  */
@@ -202,13 +228,12 @@ static struct tm *
 ranged_convert (struct tm *(*convert) (const time_t *, struct tm *),
 		time_t *t, struct tm *tp)
 {
-  struct tm *r;
+  struct tm *r = convert (t, tp);
 
-  if (! (r = (*convert) (t, tp)) && *t)
+  if (!r && *t)
     {
       time_t bad = *t;
       time_t ok = 0;
-      struct tm tm;
 
       /* BAD is a known unconvertible time_t, and OK is a known good one.
 	 Use binary search to narrow the range between BAD and OK until
@@ -218,11 +243,9 @@ ranged_convert (struct tm *(*convert) (const time_t *, struct tm *),
 	  time_t mid = *t = (bad < 0
 			     ? bad + ((ok - bad) >> 1)
 			     : ok + ((bad - ok) >> 1));
-	  if ((r = (*convert) (t, tp)))
-	    {
-	      tm = *r;
-	      ok = mid;
-	    }
+	  r = convert (t, tp);
+	  if (r)
+	    ok = mid;
 	  else
 	    bad = mid;
 	}
@@ -232,8 +255,7 @@ ranged_convert (struct tm *(*convert) (const time_t *, struct tm *),
 	  /* The last conversion attempt failed;
 	     revert to the most recent successful attempt.  */
 	  *t = ok;
-	  *tp = tm;
-	  r = tp;
+	  r = convert (t, tp);
 	}
     }
 
@@ -462,7 +484,7 @@ __mktime_internal (struct tm *tp,
       t2 = t1 + sec_adjustment;
       if (((t1 < t) != (sec_requested < 0))
 	  | ((t2 < t1) != (sec_adjustment < 0))
-	  | ! (*convert) (&t2, &tm))
+	  | ! convert (&t2, &tm))
 	return -1;
       t = t2;
     }

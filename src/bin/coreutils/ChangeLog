@@ -1,3 +1,2599 @@
+2006-02-13  Jim Meyering  <jim@meyering.net>
+
+	* Version 5.94.
+
+	* Makefile.maint (alpha beta major): Add code to abort `make major'
+	if I ever forget to remove the `-cvs' part of the version string again.
+
+	* configure.ac: Remove `-cvs'.
+	Put all copyright dates (was split w/duplicate years) back on one line.
+
+2006-02-07  Jim Meyering  <jim@meyering.net>
+
+	* tests/help-version (expected_failure_status_vdir):
+	Redirect an expected disk-full diagnostic to /dev/null.
+
+	* announce-gen: Accept new option, --gpg-key-id=ID and
+	emit a blurb telling how to use the .sig files.
+	* Makefile.cfg (gpg_key_ID): Define.
+	* Makefile.maint (announcement): Use new option and key.
+
+2006-02-04  Jim Meyering  <jim@meyering.net>
+
+	* src/copy.c (copy_internal): cp -RL would fail when encountering
+	the same directory more than once in the hierarchy beneath a single
+	command-line argument.  That is legitimate, e.g. when there are
+	two or more symbolic links, each pointing to some directory that
+	would not otherwise be copied.  Reported by Christophe LYON.
+	* tests/cp/cp-deref: New file.  Test for today's fix.
+	* tests/cp/Makefile.am (TESTS): Add cp-deref.
+	* NEWS: Document this.
+
+2006-01-24  Jim Meyering  <jim@meyering.net>
+
+	* src/tail.c (tail_forever): Don't exit-nonzero when an attempt
+	to put a regular file in O_NONBLOCK mode fails with EPERM.
+	That happens on Linux when using tail -f on a file with the
+	append-only attribute.  Reported by Dean Gaudet.  For details,
+	see http://savannah.gnu.org/bugs/?func=detailitem&item_id=15473.
+	* NEWS: Mention this fix.
+
+2006-01-10  Jim Meyering  <jim@meyering.net>  (tiny change)
+
+	* src/ls.c (gobble_file): Use DTTOIF only if it's defined.
+	This is necessary for Dragonfly.  Patch by Joerg Sonnenberger.
+
+2006-01-10  Jim Meyering  <jim@meyering.net>
+
+	* tests/chmod/no-x: Add a test for today's fts.c fix.
+
+2006-01-08  Jim Meyering  <jim@meyering.net>
+
+	* src/date.c (usage): Adjust the formatting of the entries for
+	%::z and %:::z (separate with two spaces, not one) so that help2man
+	formats them properly.  Reported by Philip Rowlands.
+
+2006-01-06  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (copyright-check): Use date +%Y in place of
+	hard-coded 2005.
+
+2006-01-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/date.c (usage): Explain %g, %G, and %V a bit better.
+
+2005-12-16  Jim Meyering  <jim@meyering.net>
+
+	stat: revert behavior of --format=FMT (-c)
+	stat: add new option: --printf=FMT
+	* NEWS: Mention this.
+	* src/stat.c (isodigit, octtobin, hextobin): Define.
+	(PRINTF_OPTION): Define.
+	(interpret_backslash_escapes, trailing_delim): New globals.
+	(usage): Document them.  Alphabetize on long option names.
+	(print_esc_char): New function.
+	(print_it): Rewrite, in order to handle backslash escapes.
+	(main): Handle new option.  Set globals for --format, too.
+
+	* tests/misc/stat-printf: Test --printf and --format.
+	* tests/misc/Makefile.am (TESTS): Add stat-printf.
+
+2005-11-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: df updates for "none", "proc", inaccessible file systems.
+	* src/df.c (show_point): Ignore inaccessible file systems.
+	(usage): -a includes dummy file systems, not size-0 file systems.
+
+	* src/od.c (unsigned_long_long_int): Renamed from ulonglong_t,
+	to avoid collision with POSIX name space.  All uses changed.
+
+2005-11-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* configure.ac (AM_PROG_CC_C_O): Add.  Needed for CVS Automake.
+	Problem reported by Eric Blake.
+	(AC_PROG_CC_STDC): Use this instead of AC_PROG_CC, so that
+	we get a standard-conforming compiler.  This relies on the new
+	m4/c.m4 file.  Note that it's a bit tricky, since c.m4 doesn't
+	define AC_PROG_CC_STDC; we are relying on Autoconf 2.59 internals.
+	m4/c.m4 can go away with Autoconf 2.60 comes out.
+
+2005-11-14  Jim Meyering  <jim@meyering.net>
+
+	* NEWS (sort): Mention consequences of today's mkstemp-safer.c fix.
+
+	* configure.ac: Use 5.94-cvs as the version string.
+	* NEWS: Adjust accordingly.
+
+2005-11-06  Jim Meyering  <jim@meyering.net>
+
+	* Version 5.93.
+
+	Merge this change from the trunk (Paul Eggert noticed that it
+	was missing).
+	* src/dircolors.c (ls_codes): Add missing comma.
+	Anonymous report and patch from
+	http://savannah.gnu.org/bugs/?func=detailitem&item_id=14849
+	* src/dircolors.c: Add compile-time assertion that the slack_codes
+	and ls_codes arrays have the same number of elements.  This would
+	have prevented the above-fixed bug.
+
+2005-11-05  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Remove -cvs suffix from version string.
+	* NEWS: Add tomorrow's date.
+
+2005-11-04  Jim Meyering  <jim@meyering.net>
+
+	* src/du.c (process_file): Don't overflow for files of size >= 2^31
+	on systems with stat.st_blocks of a signed 32-bit type.
+	This bug causes trouble on some AIX 5.1 systems.
+	Report and trivial patch from Paul Townsend:
+	<http://lists.gnu.org/archive/html/bug-coreutils/2005-11/msg00033.html>
+	* NEWS: Mention this.
+
+2005-11-02  Jim Meyering  <jim@meyering.net>
+
+	* src/remove.c (remove_entry): Emit a better diagnostic when rm
+	(without -r) fails to remove a directory on a non-Linux system.
+	This change affects only newer Solaris systems (with priv_*
+	functions like priv_allocset).  Reported by Keith Thompson.
+
+2005-11-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: "tail -c 2 FILE" and "touch 0101000000" now operate as
+	POSIX 1002.1-2001 requires.
+	* src/tail.c (parse_obsolete_option): Implement this.
+	Problem reported by Vincent Lefevre.
+	* src/touch.c (main): Pass PDS_PRE_2000 to posixtime.
+	* tests/tail/Test.pm (c-2, c-2-minus, c2, c2-minus): New tests.
+	(test_vector): Add special cases for _POSIX2_VERSION, and
+	regularize the old ones a bit.
+	* tests/touch/obsolescent: Add y2000 test.
+
+2005-10-31  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dd.c (skip): Fix off-by-one error reported by
+	Theodoros V. Kalamatianos.
+
+2005-10-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/mkdir/p-3: Require that the test be run as non-root.
+	Problem and trivial fix reported by Theodoros V. Kalamatianos.
+
+2005-10-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/ln.c (FILE_BASENAME_CONCAT): Omit unnecessary slashes in the
+	boundary between DEST and SOURCE in the result.
+
+2005-10-26  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* src/md5sum.c (main) [!O_BINARY]: Changed default read mode
+	back to text, to sync with documentation and for backwards
+	compatibility.
+
+2005-10-24  Jim Meyering  <jim@meyering.net>
+
+	* src/tac.c (tac_file): When determining whether a file is seekable,
+	also test whether it is a tty.  Using only the lseek-based test would
+	give a false positive on Solaris.  Reported by Peter Fales.
+
+2005-10-24  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* tests/install/d-slashdot: New test, for "install -d" failure.
+	* tests/install/Makefile.am (TESTS): Add d-slashdot.
+	* tests/mkdir/p-slashdot: New test, for "mkdir -p" failure.
+	* tests/mkdir/Makefile.am (TESTS): Add p-slashdot.
+
+2005-10-24  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Use 5.93-cvs as the version string.
+	* NEWS: Adjust accordingly.
+
+2005-10-22  Jim Meyering  <jim@meyering.net>
+
+	* Version 5.92.
+
+	* configure.ac: Remove -cvs suffix from version string.
+	* NEWS: Add today's date.
+
+	* tests/mkdir/writable-under-readonly: New test, neither run
+	nor distributed via tarballs.
+
+2005-10-20  Jim Meyering  <jim@meyering.net>
+
+	* tests/chmod/octal: New file/test, to exercise today's
+	lib/modechange.c fix.
+	* tests/chmod/Makefile.am (TESTS): Add octal.
+	* NEWS: Mention this chmod fix as well as the dircolors one.
+
+2005-10-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dircolors.c (append_quoted): Quote ' correctly.
+	Problem reported by Eric Blake.
+
+2005-10-19  Jim Meyering  <jim@meyering.net>
+
+	* tests/dircolors/simple (quote): Add test for the above fix.
+
+2005-10-18  Jim Meyering  <jim@meyering.net>
+
+	* tests/chgrp/basic: Add a comment explaining (probably) why this
+	test fails on OpenBSD 3.2 when run in an NFS-mounted directory.
+
+2005-10-17  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Use 5.92-cvs as the version string.
+	* NEWS: Adjust accordingly.
+
+	* Makefile.maint (my-distcheck): Depend on
+	$(release_archive_dir)/$(prev-tgz) here, so that if it's missing
+	we fail earlier.
+
+2005-10-16  Jim Meyering  <jim@meyering.net>
+
+	* Version 5.91.
+
+	* Makefile.maint (VERSION_REGEXP): New variable.
+	(news-date-check, changelog-check): Use tighter regular expressions.
+
+	* configure.ac: Remove -cvs suffix from version string.
+	* NEWS: Add today's date.
+
+	* NEWS: Mention the `mkdir -p' bug fix.
+
+2005-10-15  Jim Meyering  <jim@meyering.net>
+
+	* src/who.c (usage): Undocument deprecated --idle (-i) option.
+
+	* src/df.c (main): Warn about the deprecated --kilobytes option.
+	* src/ls.c (decode_switches): Likewise.
+
+	* src/du.c (usage): Document -m, once again.
+	(main): Warn about use of deprecated long options:
+	--kilobytes and --megabytes.
+	* src/tail.c (parse_options): Remove --allow-missing option.
+	You can use --retry instead.
+	* src/stat.c (main): Remove --link -l options.
+	You can use --dereference (-L) instead.
+
+2005-09-30  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* man/Makefile.am (.x.1): Remove temp directory first.
+	* NEWS: Document dircolors change of 2005-09-05.
+
+2005-10-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/sort.c (sortlines_temp): Redo previous change, since I'm
+	no longer confident that the m4/stdbool.m4 patch suffices.
+
+2005-10-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/sort.c (sortlines_temp): Undo previous change, since
+	today's change to m4/stdbool.m4 should catch it.
+
+2005-10-06  Jim Meyering  <jim@meyering.net>
+
+	* TODO: rm: add support for a -I option, like that from FreeBSD's.
+
+2005-10-05  Jim Meyering  <jim@meyering.net>
+
+	* src/sort.c (sortlines_temp): Declare temporary as `int' rather
+	than `bool' to work around AIX 5.3 compiler bug in 64-bit mode.
+	From James Lemley.
+
+2005-10-03  Jim Meyering  <jim@meyering.net>
+
+	* src/factor.c (MAX_N_FACTORS): Define in terms of sizeof (uintmax_t)
+	rather than hard-coding to 128.  From Thomas M.Ott.
+
+2005-10-02  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (sc_unmarked_diagnostics):
+	Search only cvs-controlled files.
+	* .x-sc_unmarked_diagnostics: New file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+2005-10-01  Jim Meyering  <jim@meyering.net>
+
+	* src/factor.c (main): Don't stop processing arguments upon
+	the first invalid one.  Suggestion from Eric Blake
+	* tests/factor/basic: Add a test for this.
+
+2005-09-30  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Use 5.91-cvs as the version string.
+	* NEWS: Adjust accordingly.
+
+2005-09-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dd.c (main): Don't assume size_t has the same width
+	as unsigned long.  Problem reported by Eric Blake.
+
+	* NEWS: Clarify "tail - f" example.
+
+2005-09-29  Jim Meyering  <jim@meyering.net>
+
+	* Version 5.90.
+
+	* configure.ac: Remove -cvs suffix from version string.
+	* NEWS: Add today's date.
+
+	* NEWS: Mention this bug fix:
+	stat now exits nonzero if a file operand does not exist
+
+2005-09-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/system.h (LONGEST_MODIFIER): Use ULONG_MAX_LT_ULLONG_MAX
+	instead of ULLONG_MAX, as the latter doesn't work with GCC 2.7.2.1.
+
+2005-09-28  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Use 5.90-cvs as the version string, not 5.3.1-cvs.
+	* NEWS: Adjust accordingly.
+
+	* README: Remove note about FreeBSD make test failure.
+
+2005-09-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/install/trap: Work around a bug in FreeBSD 5.0.
+
+2005-09-28  Jim Meyering  <jim@meyering.net>
+
+	* README: Warn about a (now-)known problem on FreeBSD 5.0:
+
+2005-09-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/touch.c (touch): Handle "touch -c - >&-" by checking for EBADF
+	and ENOSYS.
+	Do not pass "-" to futimens; pass NULL instead.
+	If close (STDIN_FILENO) fails, report the error separately instead
+	of letting the 'close' pollute errno.
+	* tests/touch/empty-file: Test "touch -" too.
+	* tests/touch/no-create-missing: Likewise.
+	* tests/touch/read-only: Likewise.
+
+2005-09-26  Jim Meyering  <jim@meyering.net>
+
+	* tests/touch/read-only: New test, for root of chmod/usage failure.
+	* tests/touch/Makefile.am (TESTS): Add read-only.
+
+	Work around the root cause of alpha-linux-1.sf.net test failure.
+	* tests/chmod/usage: Remove *all* files before each inner loop
+	iteration.  Otherwise, with a touch program that fails on unwritable
+	files, (this happens at least on linux-2.2.20) a -w file left behind
+	from a previous iteration could cause a spurious test failure.
+
+2005-09-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/chmod/usage: Undo the s/files/file/ change, but add
+	comments about why the old version was desired.
+
+2005-09-25  Jim Meyering  <jim@meyering.net>
+
+	* tests/ls-2/tests (setuid-etc): Work around output mismatch when
+	a just-created test file cannot be made set-group-ID.
+
+	Avoid test failures on alpha-linux-1.sf.net.
+	* tests/chmod/usage: Use newer trap and tmpdir-creation framework.
+	Fix apparent typos (s/files/file/) in inner loop.
+
+2005-09-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: "touch -" now touches standard output.
+	* src/touch.c (touch): Implement this.
+	(usage): Document this.
+
+	* src/copy.c (HAVE_FCHMOD, HAVE_FCHOWN): Define to 0 if not defined.
+	(copy_reg): New args CHOWN_SUCCEDED and DST_SB.  All callers changed.
+	Add a "goto close_src_and_dst_desc;" that was missing in the
+	previous patch.
+	(copy_reg) [HAVE_FCHOWN]: Prefer fchown to chown.
+	(copy_reg) [HAVE_FCHMOD]: Prefer fchmod to chmod.
+	(copy_internal): Don't invoke chown if fchown worked,
+	and likewise for chmod and fchmod.
+
+2005-09-24  Jim Meyering  <jim@meyering.net>
+
+	* src/shred.c: Use `#ifdef HAVE_CONFIG_H', not `#if HAVE_CONFIG_H',
+	for consistency with gnulib.
+	* src/dircolors.c: Likewise.
+
+	* Makefile.maint (sc_no_if_have_config_h): New rule.
+	(syntax-check-rules): Add it.
+	.x-sc_no_if_have_config_h: New file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+	* tests/seq/basic (eq-wid-1, eq-wid-2): Disable these tests for now.
+	They fail with non-gcc compilers and some combinations
+	of options and libraries on Solaris systems.
+
+	* tests/misc/date (uninit-64): Restore this test.
+	Add start-up code to detect, and work around, the cases in
+	which the test might fail.
+
+2005-09-24  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/misc/date (uninit-64): Remove this test.  It wasn't
+	portable in theory (it doesn't work on hosts where 'int' is 64
+	bits, example) or in practice (Solaris 8 localtime returns garbage
+	in tm_year for the specified date, but that's not coreutils's
+	fault).
+
+2005-09-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/copy.c (copy_reg): Preserve time stamps if
+	x->preserve_timestamps is set, using futimens so that
+	we needn't resolve the path again.
+	(copy_internal): Don't preserve time stamps if copy_reg did it
+	already.
+	* src/install.c (change_timestamps): First arg is source
+	struct stat, not file name.  All uses changed.
+	(install_file_in_file): Stat the source file.
+	Don't try to change time stamps if copy_file did it.
+	* src/system.h: Don't include utime.h; not needed.
+	(struct utimbuf) [!defined HAVE_STRUCT_UTIMBUF]: Remove; not needed.
+
+2005-09-23  Jim Meyering  <jim@meyering.net>
+
+	* src/od.c: Use `verify' to ensure that our hard-coded
+	bytes_to_*_digits arrays are long enough.  Of course, 17+-byte
+	integral types aren't on the near horizon, but just in case...
+	(MAX_INTEGRAL_TYPE_SIZE): Move definition to precede new first use.
+	(bytes_to_oct_digits, bytes_to_signed_dec_digits):
+	(bytes_to_unsigned_dec_digits, bytes_to_hex_digits): Change base
+	type from `char' to the clearer `unsigned int'.
+
+2005-09-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/rmdir.c (EEXIST, ENOTEMPTY): Remove unused macros.
+
+	Sync from gnulib.
+
+	* src/dircolors.c: Include strcase.h.
+	* src/pinky.c: Include canon-host.h rather than declaring
+	canon_host ourselves.
+	* src/who.c: Likewise.
+
+	* src/system.h (X2NREALLOC, X2REALLOC): Moved here from
+	../lib/xalloc.h, with args properly parenthesized, and using
+	verify_expr rather than the old VERIFY_EXPR.
+
+2005-09-21  Jim Meyering  <jim@meyering.net>
+
+	* tests/install/basic-1: Require that this test be run as non-root.
+	Otherwise, it fails due to the fact that the chmod 0 . doesn't
+	affect root.
+
+2005-09-20  Jim Meyering  <jim@meyering.net>
+
+	* src/remove.c (write_protected_non_symlink): Change comment to
+	agree with the code.
+
+2005-09-19  Jim Meyering  <jim@meyering.net>
+
+	* src/remove.c (remove_dir): Return RM_ERROR, not `1',
+	when attempting to remove `/' with --preserve-root.
+
+	* src/remove.c (remove_cwd_entries): Syntactic tweak: move an
+	assignment out of an if-expression.
+
+2005-09-17  Jim Meyering  <jim@meyering.net>
+
+	* src/extract-magic (usage): Request that additions be sent to
+	bug-coreutils@gnu.org, too.
+
+2005-09-16  Jim Meyering  <jim@meyering.net>
+
+	* tests/misc/date (rfc822-1): Compensate for Solaris 5.9's /bin/sh,
+	which emits a diagnostic to stderr when this test's LC_ALL=de_DE
+	setting cannot be honored.
+
+	* tests/misc/date (subfmt-up1): Put quotes around format string
+	to protect `^' from interpretation by some shells.
+	Add a use of OUT_SUBST to compensate for Solaris strftime's slightly
+	different formatting of %c.
+
+	* src/dd.c (main): When failing to truncate, mention both the seek
+	block count and the block size, in case the block size is very large.
+	Now `make distcheck' should pass, once again.
+
+2005-09-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/copy.c: Include stat-time.h.
+	(copy_internal): Use its functions instead of the obsolete
+	TIMESPEC_NS macro.
+	* src/cp.c (re_protect): Likewise.
+	* src/date.c (main): Likewise.
+	* src/du.c (struct duinfo, duinfo_init, duinfo_set, duinfo_add):
+	(show_date, print_size, process_file): Likewise.
+	* src/install.c (change_timestamps): Likewise.
+	* src/ls.c (cmp_ctime, cmp_mtime, cmp_atime, print_long_format):
+	Likewise.
+	* src/pr.c (init_header): Likewise.
+	* src/stat.c (human_time, print_stat): Likewise.
+	* src/tail.c (record_open_fd, tail_forever): Likewise.
+	* src/test.c (get_mtime, binary_operator): Likewise.
+	* src/touch.c (touch, main): Likewise.
+	* src/test.c (get_mtime): Renamed from age_of.  All uses changed.
+
+2005-09-16  Jim Meyering  <jim@meyering.net>
+
+	Date no longer needs to allocate virtual memory to do its job,
+	so it can no longer fail due to an out-of-memory condition.
+
+	* src/date.c: Include fprintftime.h.
+	Don't include strftime.h or xanstrftime.h -- no longer needed.
+	(show_date): Use new fprintftime function rather than xanstrftime.
+	Correct comment: this function no longer handles a NULL format string.
+	* src/du.c: Likewise.
+	* NEWS: Mention this.
+
+	* tests/misc/date (subfmt-up1): Test the combination of the
+	to-upper-case modifier (^) and a conversion specifier that
+	expands to a string containing lower case characters.
+
+2005-09-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: uname -a no longer generates the -p and -i outputs if they
+	are unknown.
+	* src/uname.c (usage): Document this.
+	(main): Implement this.
+
+2005-09-14  Jim Meyering  <jim@meyering.net>
+
+	* tests/misc/date (tz-5w, tz-5wf): Test new %:z format with
+	a field width.
+
+2005-09-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dd.c: Detect some very unlikely buffer overflows.
+	(INPUT_BLOCK_SLOP, OUTPUT_BLOCK_SLOP): New macros.
+	(MAX_BLOCKSIZE): Now accepts an arg.  All uses changed.
+	(page_size): New var.
+	(scanargs, skip, main): Use more-straightforward way to detect overflow.
+	(dd_copy): Use page_size rather than invoking getpagesize.
+	Use INPUT_BLOCK_SLOP, OUTPUT_BLOCK_SLOP.
+	(main): Set page_size.
+	Avoid a call to stat in the usual case where ftruncate succeeds.
+
+	* src/expr.c (docolon): Add IF_LINT check to avoid GCC warning.
+
+	* configure.ac: Don't invoke AC_CONFIGURE_HOST directly; AB_INIT
+	does it for us, and our invocation evokes a diagnostic from
+	Autoconf 2.59.
+
+	* NEWS: date has a new --rfc-3339 option, and the old --iso-8601
+	option is deprecated.  date, du, ls, and pr also have new time format
+	specifiers %:z, %::z, %:::z.
+	* src/date.c (TIME_SPEC_DATE): No longer needs to be nonzero, so
+	remove the "=1".
+	(TIME_SPEC_HOURS, TIME_SPEC_MINUTES): Must be at end now, so put
+	them there.
+	(time_spec_string, time_spec): Hours and minutes must be at
+	start now, so put them there.
+	(rfc_2822_format): Now a string constant, not a boolean.  All uses
+	changed.
+	(iso_8601_format, rfc_format): Remove.
+	(RFC_3339_OPTION): New constant.
+	(long_options): Add --rfc-3339.
+	(usage): Add --rfc-3339.  Don't mention --iso-8601.
+	Mention %:z, %::z, %:::z.
+	(main): Simplify calculation of 'format'; it was getting too hairy
+	to follow.  Add --rfc-3339.
+	(show_date): Assume format arg is not NULL, which is the case
+	now.  The default code is moved to 'main'.  This simplifies things
+	and allows the default to be calculated just once.
+	* tests/misc/date: Add tests for --rfc-3339, %:z, %::z, %:::z.
+
+2005-09-13  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (GZIP_ENV): Add --rsyncable option.
+	(makefile-check): Escape a `$' in a diagnostic.
+
+	* configure.ac: Use AB_INIT (from autobuild).
+
+2005-09-11  Jim Meyering  <jim@meyering.net>
+
+	* src/factor.c (usage): Remove leading spaces in 2-line
+	description, so that help2man doesn't mangle it.
+	Reported by Justin Pryzby.
+
+2005-09-10  Jim Meyering  <jim@meyering.net>
+
+	csplit could produce corrupt output, given input lines longer than 8KB
+
+	* src/csplit.c (load_buffer): Don't read from free'd memory
+	when handling lines longer than the initial buffer length.
+	(save_to_hold_area): Don't leak the previous hold_area buffer.
+	Reported by Tristan Miller and Luke Kendall.
+	* NEWS: Mention this.
+	* tests/misc/csplit: New test for this.
+
+	* src/csplit.c (load_buffer): Avoid integer overflow in buffer
+	size calculations for very long lines.
+
+2005-09-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Support regular expressions in 64-bit code correctly, by
+	importing the latest gnulib regexp code, and not assuming
+	that sizes fit in 32 bits.
+	* src/csplit.c (process_regexp): Store match length in regoff_t,
+	not int.  Assume that negative return values less than -2
+	represent regoff_t overflow.
+	* src/expr.c (docolon): Likewise.
+	* src/nl.c (proc_text): Likewise.
+	* src/ptx.c (SKIP_SOMETHING, find_occurs_in_text): Likewise.
+	* src/tac.c (tac_seekable): Likewise.
+	* src/expr.c (docolon) Check for size calculation overflow.
+	* src/nl.c (build_type_arg): Likewise.
+	* src/ptx.c (matcher_error): New function.
+	(SKIP_SOMETHING): Use it to report matcher errors.
+	(alloc_and_compile_regex): No longer any need to worry about
+	int versus size_t mismatch.
+
+	* NEWS: Document "niceness" vs "nice value".
+	* configure.ac (utils_cv_func_setpriority): Simplify the tests.
+	Define HAVE_NICE rather than NICE_PRIORITY (since a niceness is
+	not a priority); all uses changed.
+	* src/nice.c (main): Hoist errno=0 outside the ifdef.
+
+2005-09-09  Jim Meyering  <jim@meyering.net>
+
+	* tests/misc/date (neg-secs2, fill-1, fill-2): Add new tests.
+
+2005-09-07  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use the phrase "niceness" instead of "nice value" to describe
+	the biased nice value that can go negative.  This corrects
+	a discrepancy with POSIX, which states that nice values are
+	nonnegative.
+	* src/nice.c (GET_NICENESS): Renamed from GET_NICE_VALUE.
+	All uses changed.
+	(usage): Say "niceness" rather than "nice value".
+	(main): Say "niceness" rather than "priority" (which is something else
+	entirely nowadays).
+
+2005-09-07  Jim Meyering  <jim@meyering.net>
+
+	* src/du.c (time_args): Use NULL in place of 0.
+
+2005-09-05  Jim Meyering  <jim@meyering.net>
+
+	* src/dcgen: Don't omit comments until there is better documentation.
+
+	Colorize set-user-ID and set-group-ID files and sticky,
+	other-writable, and sticky-and-other-writable directories.
+	* src/dircolors.c (slack_codes): Add new dircolors mode names.
+	(ls_codes): Add corresponding two-letter ls mode strings.
+	* src/ls.c (indicator_no[]): Add new symbols.
+	(indicator_name[]): Add corresponding mode strings.
+	(color_indicator[]): Add an entry for each new mode string.
+	(print_color_indicator): Honor new types.
+	* src/dircolors.hin: Document the default colors for the new strings.
+	From Mike Frysinger, based on a patch from Fedora.
+	* tests/ls-2/tests (setuid-etc): New test, for the above.
+
+2005-08-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: "rm -FOO" now suggests "rm ./-FOO" if the file "-FOO"
+	exists and "-FOO" is not a valid option.
+	* src/rm.c: Include lstat.h, quotearg.h.
+	(diagnose_leading_hyphen): New function.
+	(main): Use it.
+
+2005-08-27  Jim Meyering  <jim@meyering.net>
+
+	* src/du.c: Go ahead and leave the patch in (i.e., revert
+	today's change).  It doesn't cause a problem after all, since
+	--exclude-from=- is always handled before --files0-from=F.
+
+	* src/du.c: Revert the du.c part of the change from 2005-07-02:
+	That change (to reopen stdin on F for --files0-from=F) made it so
+	--exclude-from=- and --files0-from=F would not work together.
+
+2005-08-23  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Use `5.3.1-cvs' as the version string.
+	* NEWS: Adjust accordingly.
+
+	* Makefile.maint (sc_useless_cpp_parens): New rule.
+	(syntax-check-rules): Add it.
+	* .x-sc_useless_cpp_parens: New file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+	* src/od.c: Include <float.h> unconditionally.
+	* src/uptime.c (print_uptime): Remove unnecessary parens in
+	`#if defined (SYMBOL)' expressions.
+	* src/system.h: Likewise.
+	* src/hostname.c: Likewise.
+	* src/su.c: Likewise.
+	* src/test.c: Likewise.
+
+2005-08-22  Jim Meyering  <jim@meyering.net>
+
+	* src/tail.c (xwrite_stdout): Rename from xwrite.  Remove always-
+	equal-to-STDOUT_FILENO parameter and associated assertion.
+	Adjust all callers.
+
+2005-08-21  Jim Meyering  <jim@meyering.net>
+
+	* src/ln.c (do_link): If ln is invoked with --interactive (-i),
+	encounters an existing destination file, and gets an affirmative
+	response, then first try to unlink the destination file rather
+	than simply failing.  Suggestion from Karl Berry.
+	FIXME: add test for this
+
+	* src/ln.c (main): Declare `target_directory' with const attribute.
+	* src/du.c (time_style): Add `const' attribute.
+	(tot_dui): Remove unnecessary (and too-short) initializer list.
+
+2005-08-19  Jim Meyering  <jim@meyering.net>
+
+	* src/sort.c (usage) [-b,-t]: Ensure that there are at least two
+	spaces between each option and the corresponding description -- this
+	lets help2man format entries properly.  Reported by Edward Welbourne.
+
+2005-08-17  Jim Meyering  <jim@meyering.net>
+
+	* src/sort.c (usage): Fix typo s/POS 2/POS2/.
+	Reported by Edward Welbourne.
+
+	* tests/misc/date [neg-secs]: New test for today's strftime.c bug fix.
+	* tests/misc/date: Remove terminating "\n"s once again.
+	Automatically add them whenever EXIT != 0.
+
+2005-08-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/df.c (show_dev): New arg STAT_FILE.  All uses changed.
+	This sometimes gives better results on networked file systems
+	that do not respect POSIX semantics.  Problem reported by
+	Bruno Haible.
+
+2005-08-15  Jim Meyering  <jim@meyering.net>
+
+	Don't print uninitialized data (or anything else) to stdout
+	upon localtime failure.
+	* src/date.c (show_date): Remove stray `puts (buf);' (debugging?)
+	from the 2004-02-02 change.
+	* tests/misc/date (uninit-64): New test for the above.
+	Rewrite all other OUT strings to include the terminating "\n".
+
+2005-08-14  Jim Meyering  <jim@meyering.net>
+
+	* src/md5sum.c (usage): Fix typo s/formated/formatted/ reported
+	by Norbert Kiesel.
+
+	Use one fewer file descriptor in a common case.
+	* src/touch.c: Include "fd-reopen.h", rather than "fcntl--.h".
+	Use fd_reopen rather than open.
+
+2005-08-14  James Youngman  <jay@gnu.org>
+
+	* src/test.c (age_of): Return the nanoseconds part of the timestamp,
+	if available.
+	(binary_operator) [-nt, -ot]: Use nanosecond values to break ties.
+
+2005-08-14  Jim Meyering  <jim@meyering.net>
+
+	* src/ls.c (long_time_expected_width): Revert last change, just to
+	be paranoid, and add a comment explaining why.  Paul Eggert mentioned
+	the possibility.
+
+	* src/wc.c: Don't define mbrtowc at all.
+	If mbstate_t is not defined, then AC_TYPE_MBSTATE_T will define
+	it to `int' for us.  Now wc.c really does compile on HP-UX 11.23.
+
+2005-08-13  Jim Meyering  <jim@meyering.net>
+
+	* tests/date: Remove directory
+	* tests/Makefile.am (SUBDIRS): Remove date.
+	* configure.ac (AC_CONFIG_FILES): Remove tests/date/Makefile.
+
+	* tests/Coreutils.pm: New keywords, ENV and ENV_DEL, to support
+	tests/misc/date.
+
+	With todays additions, the generated shell script,
+	tests/date/date-tests had becoming far too large (over 350KB),
+	so use the superior-but-perl-requiring framework instead.
+	* tests/date/Test.pm: Move all tests from here...
+	* tests/misc/date: ...to this new file.
+	* tests/misc/Makefile.am (TESTS): Add date.
+
+	* tests/date/Test.pm (test_vector) [cross-dst]: New test for
+	just-fixed getdate.y bug.
+	* tests/date/Test.pm (test_vector): Add 364 more tests like the above.
+	Remove unused $sunos4 variable.
+
+2005-08-12  Jim Meyering  <jim@meyering.net>
+
+	* src/nohup.c (main): Explain why we reopen stdin for write-only access.
+
+	* src/ls.c (long_time_expected_width): Don't test for failed localtime.
+	That cannot happen when the result date's year is in range.
+	Add an assertion instead.
+
+	* src/ls.c (sort_files): Use cleaner `sizeof *VAR_NAME'
+	rather than `sizeof (TYPE_NAME)'.
+	* src/ptx.c (sort_found_occurs, digest_word_file): Likewise.
+	(alloc_and_compile_regex): Likewise.
+
+	* src/wc.c: Test `!defined HAVE_MBSTATE_T' rather than
+	`defined mbstate_t' to detect missing support for mbstate_t.
+	The latter didn't work for HP-UX 11.23.
+
+	Add bulletproofing in case stdin is closed.
+	* src/dircolors.c (have_read_stdin): Remove global variable.
+	(dc_parse_stream): Always use stdin (freopen, if needed) rather
+	than sometimes using fopen to get a new file descriptor.
+	Call fclose unconditionally.
+	(main): Don't close stdin here.  If needed, now it's already done
+	by dc_parse_stream.
+
+	* src/dircolors.c (dc_parse_file): Remove comment about
+	now-removed OPENOPTS.
+
+	* src/fold.c (fold_file): Cosmetic: use X2REALLOC rather than x2realloc.
+	* src/pr.c (main): Likewise.
+
+	* src/csplit.c (new_control_record): Cosmetic: use X2NREALLOC (only
+	two arguments) rather than x2nrealloc (with three).
+	* src/cut.c (ADD_RANGE_PAIR): Likewise.
+	* src/expand.c (add_tab_stop): Likewise.
+	* src/join.c (extract_field, getseq): Likewise.
+	* src/od.c (decode_format_string): Likewise.
+	* src/sort.c (add_temp_dir): Likewise.
+	* src/unexpand.c (add_tab_stop): Likewise.
+
+	* src/pr.c (main): Cosmetic: use '\0' in place of 0.
+
+2005-08-02  Jim Meyering  <jim@meyering.net>
+
+	* src/date.c: Include "xanstrftime.h".
+	(show_date): Use xanstrftime instead of open-coding it.
+	* src/du.c: Likewise.
+
+2005-07-29  Jim Meyering  <jim@meyering.net>
+
+	* src/date.c (show_date): Remove now-unnecessary code that
+	treated an empty format string as a special case.
+	* tests/date/Test.pm (empty-format): New test, for this case.
+
+2005-07-19  Jim Meyering  <jim@meyering.net>
+
+	* src/md5sum.c (usage): Adjust printf argument list to match
+	new format string.
+
+2005-07-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: md5sum --check now accepts multiple input files, and
+	similarly for sha1sum.  Extension suggested by Chris Girling.
+	* src/md5sum.c (usage, main): Support this new usage.
+
+2005-07-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix a problem noted by James Youngman: VPATH-style builds don't
+	work because of po file problems.
+	* src/Makefile.am (BUILT_SOURCES): Remove false.c.
+	(false.c): Remove; it's now a source file.
+	* src/false.c: New file.
+	* src/true.c (EXIT_STATUS): New macro.
+	(PROGRAM_NAME, usage): Behave like "false" if EXIT_STATUS indicates.
+	(usage): Remove "These option names may not be abbreviated."
+
+2005-07-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/nohup.c (main): Don't worry about POSIXLY_CORRECT.  Today's
+	Austin Group Minutes says that the GNU behavior will be put
+	forward as proposed text for a future revision.
+
+2005-07-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/Makefile.am (nanosec_libs): Remove $(FESETROUND_LIBM); no longer
+	needed.  Problem reported by Jeff Bailey.
+
+2005-07-12  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (copyright-check): Reflect rearrangement in
+	version-etc files.
+
+2005-07-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Binary input and output are now implemented more consistently.
+	These changes affect only platforms like MS-DOS that distinguish
+	between binary and text files.
+	* src/cat.c (usage, main, long_options) [O_BINARY]:
+	Remove support for -B.  Use same rules as other programs to decide
+	whether to use binary I/O, except that the -bensAE options always
+	select text mode.
+	* src/cat.c (main): Avoid setmode; use POSIX-specified routines instead.
+	* src/cksum.c (cksum): Likewise.
+	* src/head.c (head_lines, head_file): Likewise.
+	* src/od.c (open_next_file): Likewise.
+	* src/split.c (main): Likewise.
+	* src/sum.c (bsd_sum_file, sysv_sym_file): Likewise.
+	* src/tac.c (copy_to_temp, tac_file, main): Likewise.
+	* src/tail.c (tail_bytes, tail_lines, tail_file, main): Likewise.
+	* src/tee.c (tee): Likewise.
+	* src/tr.c (main): Likewise.
+	* src/wc.c (wc): Likewise.
+	* src/copy.c (copy_reg): Always copy in binary mode.
+	* src/expand.c (expand): Always copy in text mode.  POSIX says
+	the input and output must be text.
+	* src/unexpand.c (unexpand): Likewise.
+	* src/head.c (elide_tail_bytes_file, elide_tail_lines_file, head_bytes):
+	(head_lines, head_file): Always use binary mode except for std tty.
+	* src/md5sum.c (usage): Clarify whether text or binary is the default.
+	(split_3, main): BINARY is now a 3-way value.  All uses changed.
+	(digest_file): Likewise.  Clear *BINARY if we determine the file
+	to be text.  All uses changed.
+	(main): Don't report a file to be binary if we actually read it
+	as text in MS-DOS, because it was a terminal.
+	* src/shred.c (wipefile): Always use binary mode.  Clearly this
+	never worked right on DOS!
+	* src/system.h (setmode, fileno): Remove; no longer needed, we think.
+	(SET_MODE, SET_BINARY, SET_BINARY2): Remove.
+	[defined __DJGPP__]: Don't include <io.h> or <sys/exceptn.h>.
+	* src/wc.c (wc_file): FILE might be null now.
+	(main): Simplify code a bit, so that fewer places need the
+	setmode fixes.
+
+2005-07-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/comm.c, src/csplit.c, src/dd.c, src/join.c, src/md5sum.c:
+	* src/pr.c, src/sort.c, src/tee.c:
+	Don't include stdio.h; no longer needed.
+
+2005-07-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix porting problems reported by Eric Blake.
+
+	* configure.ac: Remove check for AC_HEADER_TIOCGWINSZ.
+	* src/cat.c, src/ls.c, src/stty.c: Include stropts.h if available,
+	because POSIX says that's where ioctl is declared.
+	* src/cat.c: Use HAVE_SYS_IOCTL_H instead of _POSIX_SOURCE
+	to decide whether to include <sys/ioctl.h>.
+	* src/stty.c: Use only HAVE_SYS_IOCTL_H to decide whether
+	to include <sys/ioctl.h>.
+
+	* src/id.c (print_user): Don't assume uid fits in unsigned int.
+	(print_group): Likewise, for gid.
+
+2005-07-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/system.h (DECIMAL_DIGIT_ACCUMULATE): Generate a hard error
+	(not just a warning) if GCC is used and the types don't match.
+
+2005-07-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/system.h (VERIFY_W_TYPEOF): Remove; no longer needed.
+	(DECIMAL_DIGIT_ACCUMULATE): Change last arg from T's maximum value
+	to T itself.  All callers changed.  Check that T is unsigned, and
+	that Accum is of type T.  This fixes a bug in the unlikely case
+	where SIZE_MAX <= INT_MAX, and it no longer requires typeof to do
+	the proper validity checks.
+
+	* src/od.c: Adjust to verify.h change.
+	* src/system.h (VERIFY_W_TYPEOF): Likewise.
+
+2005-07-04  Jim Meyering  <jim@meyering.net>
+
+	* src/system.h: Include "verify.h".
+
+	* src/system.h (verify): Rename from VERIFY_EXPR, to be lower case,
+	like assert.  Use sizeof, rather than equivalent ((...)0), for
+	it's slightly simpler syntax.  Suggestions from Paul Eggert.
+	(verify_decl): Rename from VERIFY.
+	* src/od.c: Reflect name change.
+
+2005-07-03  Jim Meyering  <jim@meyering.net>
+
+	* NEWS: cp and mv: the --reply=X option is deprecated
+	Suggested by Bob Proulx, after numerous user complaints
+	about how --reply=no appeared not to work.
+	* src/mv.c (main): Using --reply now evokes a warning.
+	(usage): Remove description of --reply.
+	* src/cp.c (main): Using --reply now evokes a warning.
+	(usage): Remove description of --reply.
+	* tests/mv/i-link-no: Adjust for new diagnostic.
+	* tests/mv/reply-no: Likewise.
+
+	* src/printf.c (verify_numeric): Rename from verify.
+	Update caller.
+
+2005-07-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/copy.h: Include "lstat.h" rather than rolling our own.
+	* src/ls.c: Likewise.
+	* src/remove.c: Likewise.
+
+2005-07-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Cleanup to isolate "safer" functions to a small part of the code.
+	* src/comm.c: Include stdio--.h, not stdio-safer.h.
+	(compare_files): Use fopen, not fopen_safer.
+	* src/copy.c: Include fcntl--.h, not unistd-safer.h.
+	(copy_reg): Don't call fd_safer; no longer needed
+	now that we include fcntl--.h.
+	* src/csplit.c: Include fd-reopen.h.
+	Include stdio--.h, not stdio-safer.h.
+	(input_desc): Remove.  All uses changed to STDIN_FILENO.
+	(set_input_file): Reopen stdin, to simplify code.
+	(create_output_file): Use fopen, not fopen_safer.
+	* src/dd.c: Include fd-reopen.h.
+	(open_fd): Remove.  All callers changed to use fd_reopen instead.
+	* src/join.c: Include stdio--.h, not stdio-safer.h.
+	(main): Use fopen, not fopen_safer.
+	* src/md5sum.c: Include stdio--.h.
+	(digest_check): Don't try to read both checksums and data from stdin.
+	* src/nohup.c: Include fd-reopen.h.
+	Include unistd--.h, not unistd-safer.h.
+	(main): Use fd_reopen to simplify code.  When replacing stdin,
+	use "/dev/null" not "/", as that's less likely to go wrong these days.
+	(main): Use dup, not dup_safer.
+	* src/pr.c: Include stdio--.h, not stdio-safer.h.
+	(open_file): Invoke fopen, not fopen_safer.
+	* src/shred.c: Include fcntl--.h, not unistd-safer.h.
+	(wipename, wipe_file): Don't use fd_safer; no longer needed
+	now that we include fcntl--.h.
+	* src/sort.c: Include stdio--.h rather than stdio-safer.h.
+	Include stdlib--.h.  Do not include unistd-safer.h.
+	(create_temp_file): Don't call fd_safer; no longer needed
+	now that we include *--.h files.
+	(xfopen): Don't call fopen_safer, for similar reasons.
+	* src/split.c: Include fcntl--.h rather than unistd-safer.h.
+	Include fd-reopen.h.
+	(input_desc): Remove.  All uses replaced by STDIN_FILENO.
+	(cwrite): Don't call fd_safer; no longer needed now that
+	we include fcntl--.h.
+	(main): Reuse stdin rather than opening a new one.  This
+	saves a file descriptor.
+	* src/stty.c: Include fd-reopen.h.
+	(display_all, display_settings, display_window_size, set_window_size):
+	Remove fd arg, since we now assume stdin.  All callers changed.
+	(main): Reuse stdin rather than opening a new one.  This
+	saves a file descriptor.
+	* src/tac.c: Include stdlib--.h rather than unistd-safer.h.
+	(copy_to_temp): Don't call fd_safer; no longer needed now
+	that we include stdlib--.h.
+	* src/tail.c: Include fcntl--.h, not unistd-safer.h.
+	(recheck, tail_file): Don't call fd_safer; no longer needed
+	now that we include fcntl--.h.
+	* src/tee.c: Include stdio--.h, not stdio-safer.h.
+	(tee): Don't call fopen_safer; no longer needed now that we
+	include stdio--.h.
+	* src/touch.c: Include fcntl--.h, not unistd-safer.h.
+	(touch): Don't call fd_safer; no longer needed now that
+	we include fcntl--.h.
+
+	* src/du.c (main): Reuse stdin rather than opening a new stream.
+	This saves a file descriptor.
+	* src/uniq.c: Don't include stdio-safer.h; no longer needed.
+	(writeline): Remove stream arg; we now always output to stdout.
+	All callers changed.
+	(check_file): Reuse stdout rather than opening a new stream.
+	This saves a file descriptor.
+
+2005-07-02  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (sc_obsolete_symbols): New rule.
+	(syntax-check-rules): Add it to the list.
+	* Makefile.am (EXTRA_DIST): Add .x-sc_obsolete_symbols.
+	* .x-sc_obsolete_symbols: New file.
+
+2005-07-01  Jim Meyering  <jim@meyering.net>
+
+	* src/system.h: Assume HAVE_FCNTL_H (i.e., include <fcntl.h>
+	unconditionally, and don't include <sys/file.h>).
+	* src/system.h: Likewise for HAVE_UNISTD_H.
+
+2005-06-30  Jim Meyering  <jim@meyering.net>
+
+	* src/cp.c: Add uses of ARGMATCH_VERIFY to ensure that
+	corresponding option string and value arrays are consistent.
+	* src/date.c: Likewise.
+	* src/du.c: Likewise.
+	* src/ls.c: Likewise.
+	cp.c and date.c each had a harmless trailing `, 0' (now-removed)
+	in a value list.
+
+	* src/system.h (VERIFY): Guard definition with #ifndef.
+	(VERIFY_EXPR): Undef before defining.
+
+2005-06-29  Jim Meyering  <jim@meyering.net>
+
+	* src/pr.c (main, store_char): Use X2REALLOC rather than x2realloc.
+	* src/du.c (show_date): Likewise.
+	* src/date.c (show_date): Likewise.
+	* src/od.c (dump_strings): Likewise.
+	* src/sort.c (fillbuf): Likewise.
+	* src/chmod.c (main): Likewise.
+
+	* src/system.h (VERIFY): Rewrite to use string-concatenation
+	and __LINE__ so as not to require a struct name parameter.
+	(GL_CONCAT, GL_CONCAT2): Define helper macros.
+	* src/od.c: Update sole use.
+
+	* src/ls.c (gobble_file): Use stat.st_author, not stat.st_uid
+	when computing the --author column width.  This bug might have
+	resulted in misaligned columns when using the --author option
+	on the Hurd.  Spotted by Arnold Robbins.
+
+2005-06-28  Jim Meyering  <jim@meyering.net>
+
+	* src/pr.c (main, store_char): Use x2realloc on 1-byte base types,
+	not x2nrealloc.  The former is a little more concise and readable.
+	N.B. this sort of transformation is ok only when the base type is
+	unlikely ever to change to a multibyte type.
+	* src/du.c (show_date): Likewise.
+	* src/date.c (show_date): Likewise.
+	* src/od.c (dump_strings): Likewise.
+	* src/sort.c (fillbuf): Likewise.
+
+2005-06-24  Jim Meyering  <jim@meyering.net>
+
+	* src/mv.c (usage): Clarify how --reply=no works.
+
+2005-06-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Address the following "du" issues:
+
+	- The option name "--last-time=TYPE" is different from the ls's option
+	  "--time=TYPE" with a similar meaning.  I assume this wasn't intended.
+
+	- --time-style implies --time, but this is not true for "ls".  It's
+	  better to be consistent.
+
+	- Since we don't have POSIX compatibility concerns, there's no need
+	  for the "posix-" styles, or for support of styles with newlines, or
+	  for the "locale" style, except for parsing the TIME_STYLE
+	  environment variable.
+
+	- It's cleaner (and these days, no less efficient) to use functions
+	  rather than macros when possible.
+
+	- struct duinfo doesn't need a 'valid' flag; you can simply use a time
+	  stamp that is less than all valid time stamps.
+
+	- The code needs a bit of reformatting to fit the usual GNU style.
+
+	* NEWS: du's --last-time option is now --time.
+	* doc/coreutils.texi (ls invocation): Fix typo: --time=use is
+	equivalent to --time=atime, not --time=ctime.
+	(ls invocation, du invocation): Fix typo: --time-style=long-iso
+	is equivalent to a time style with a leading "+".
+	(du invocation): --last-time is now --time.
+	--time-style no longer implies --time.
+	The locale and posix- stuff now works only for TIME_STYLE, not
+	for --time-style.  Give equivalent format for --time-style=iso.
+	* src/du.c: Do not include hard-locale.h.
+	(struct duinfo): Remove 'valid' member.  All uses changed to use
+	negative nsec instead.
+	(DUIINFO_INI, DUINFO_SET, DUINFO_ADD): Remove.
+	(duinfo_init, duinfo_set, duinfo_add): New functions, taking the
+	role of the removed macros.
+	(opt_time): Renamed from opt_last_time.  All uses changed.
+	(TIME_OPTION): Renamed from LAST_TIME_OPTION.  All uses changed.
+	(long_options, usage): Rename --last-time to --time.
+	(locale_time_style): Remove.
+	(time_style_args, time_style_types, usage): Remove support for
+	--time-style=locale.
+	(show_date): Now returns void, since nobody looked at the result.
+	Assume FORMAT is not null.  An empty FORMAT now outputs an empty time.
+	Simplify nstrftime invocation.
+	(main): Put in ls compatibility workarounds only for TIME_STYLE,
+	not for --time-style.  Omit unnecessary space in iso time style.
+
+2005-06-23  Jim Meyering  <jim@meyering.net>
+
+	* src/du.c (time_format): Add `const' attribute.
+
+	* src/date.c (show_date): Use puts rather than printf ("%s\n",.
+
+	* src/du.c (show_date): Rename local `time_format' so as not to
+	shadow the file-scoped global by that name.
+	(show_date): Add a FIXME comment.
+
+	* src/du.c: Include hard-locale.h and strftime.h.
+	(DUINFO_INI, DUINFO_SET, DUINFO_ADD):
+	Enclose body in `do {...} while (0)', not just `{...}'.
+	Adjust uses (add semicolons).
+	Adjust formatting, indentation.
+	(usage): Tweak formatting to maintain more or less constant indentation.
+
+2005-06-14  William Brendling  <wbrendling@gmail.com>
+
+	* src/du.c: Add --last-time and --time-style options.
+
+2005-06-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/umask-check: New file.
+	* tests/Makefile.am (EXTRA_DIST): Add umask-check.
+	* tests/mkdir/perm: Use umask-check.
+	* tests/cp/cp-parents: Likewise, instead of using chmod
+	as described below.  Problem reported by Kevin Mudrick.
+
+2005-06-22  Jim Meyering  <jim@meyering.net>
+
+	Make rmdir produce diagnostics like this:
+	rmdir: /tmp: Permission denied
+	not like this:
+	rmdir: `/tmp': Permission denied
+
+	* src/rmdir.c: Include "quotearg.h", not "quote.h".
+	(remove_parents, main): Use quotearg_colon, not quote.
+
+2005-06-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/cp/cp-parents: Use chmod to work around some hosts with
+	ACL problems.  Problem reported by Kevin Mudrick.
+
+2005-06-21  Jim Meyering  <jim@meyering.net>
+
+	* tests/du/deref-args: Use --apparent-size to avoid the vagaries
+	of counting blocks.  Kevin Mudrick reported that this test would
+	fail on an nfs-mounted directory where attribute-caching is
+	turned on.
+
+2005-06-19  Jim Meyering  <jim@meyering.net>
+
+	* src/tac.c (tac_mem, tac_stdin_to_mem): Remove #if-0'd functions.
+
+	* src/shred.c (usage): Use `file system', not `filesystem'.
+
+2005-06-18  Jim Meyering  <jim@meyering.net>
+
+	* src/tr.c (unquote): Remove unnecessary `' quotes from a diagnostic.
+
+2005-06-17  Jim Meyering  <jim@meyering.net>
+
+	* src/shred.c (usage): Clarify that shred works on an ext3 file
+	system as long as it's not in data=journal mode.
+	Tiny change by Mark Melahn.
+
+2005-06-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/hostid.c (main): Don't print fewer than 8 digits, or spurious
+	leading "f"s.  "f" problem reported by Tim Waugh.
+	* NEWS: Document this.
+
+2005-06-16  Jim Meyering  <jim@meyering.net>
+
+	Don't embed `this'-style quotes in format strings.
+	* src/tr.c: Rather than this: error (..., "...`%s'...", arg);
+	do this:                      error (..., "...%s...", quote (arg));
+	* src/od.c, src/tr.c, src/csplit.c, src/date.c, src/hostname.c:
+	* src/join.c, src/ptx.c, src/seq.c, src/sort.c, src/split.c:
+	* src/split.c, src/tail.c: Likewise.
+
+	* src/sleep.c: Include "quote.h".  Remove hard-coded quotes, as above.
+	* src/nice.c, src/printf.c, src/fold.c, src/pr.c: Likewise.
+	* src/factor.c, src/cat.c, src/expr.c, src/stty.c: Likewise.
+
+	* src/mv.c: Finally remove support for --version-control=S (-V).
+	It was deprecated nearly 6 years ago and has been warning
+	users to switch to --backup=S since fileutils-4.0j.
+	* src/cp.c, src/install.c, src/ln.c: Likewise.
+
+2005-06-15  Jim Meyering  <jim@meyering.net>
+
+	* src/install.c (main): Fix my typo: s/argv[optind]/file[i]/.
+	* tests/install/basic-1: Ensure that each `-d'-specified directory
+	is created.  Ensure that rel-named dirs are not created when
+	chdir($PWD) fails.
+
+	* tests/mkdir/p-3: Add a test for just-fixed bug in mkdir-p.c.
+
+2005-06-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Improve diagnostics for restore_cwd failure.
+	* src/install.c (main): Standardize on a diagnostic for
+	restore_cwd failure, and report errno.
+	(install_file_in_file_parents): Fail if restore_cwd fails and
+	one of the files is relative.  This fixes a bug (albeit unlikely).
+	* src/mkdir.c (create_parents): Remove static var (now local to 'main').
+	(main): Standardize on a diagnostic for restore_cwd failure,
+	and report errno.
+	Don't bother to check cwd_errno unless create_parents.
+	Use mkdir rather than make_dir; it's simpler.
+
+	* src/install.c (main): Adjust to new make_dir_parents convention.
+	* src/mkdir.c (main): Likewise.
+
+2005-06-14  Jim Meyering  <jim@meyering.net>
+
+	* tests/mkdir/p-3: Ensure mkdir succeeds if the following argument
+	is an absolute directory name.
+
+	* Makefile.maint (my-distcheck): Add -Wall to the list of options that
+	are used with -Werror.  This target is not intended for general use.
+
+2005-06-13  Jim Meyering  <jim@meyering.net>
+
+	* src/mkdir.c (main): Give a diagnostic for -- and skip -- each
+	relative directory name after make_dir_parents fails to restore
+	the working directory.  Before, `mkdir -p' could create directories
+	in the wrong place in unusual circumstances.
+	* src/install.c (main): Likewise.
+	(install_file_in_file_parents): Update make_dir_parents caller.
+	* tests/mkdir/p-3: New test for today's mkdir.c/mkdir-p.c bug fixes.
+	* tests/mkdir/Makefile.am (TESTS): Add p-3.
+
+2005-06-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Act on the Austin Group's response yesterday to XCU ERN 63; see
+	<http://www.opengroup.org/austin/docs/austin_260.txt>.
+	* NEWS: ls no longer outputs an extra space between mode and link count.
+	* doc/coreutils.texi: Remove the extra spaces in "ls -l" output.
+	* src/ls.c (any_has_acl): New var.
+	(clear_files): Clear it.
+	(gobble_file): Set it if a file has an ACL.
+	(print_long_format): Omit needless space unless some file has an ACL.
+
+2005-06-10  Jim Meyering  <jim@meyering.net>
+
+	* src/system.h (VERIFY_W_TYPEOF): Add parentheses.
+
+2005-06-02  Jim Meyering  <jim@meyering.net>
+
+	* src/sort.c (usage): Put `Ordering options:' line where it belongs.
+
+2005-06-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Use "file name" when talking about file names, instead of "filename"
+	or "path", as per the GNU coding standards.
+	* src/basename.c: Don't use "path" or "filename".
+	* src/copy.c: Likewise.
+	* src/copy.h: Likewise.
+	* src/cp-hash.c: Likewise.
+	* src/cp.c: Likewise.
+	* src/df.c: Likewise.
+	* src/install.c: Likewise.
+	* src/ls.c: Likewise.
+	* src/pinky.c: Likewise.
+	* src/pr.c: Likewise.
+	* src/pwd.c: Likewise.
+	* src/remove.c: Likewise.
+	* src/rmdir.c: Likewise.
+	* src/sort.c: Likewise.
+	* src/system.h: Likewise.
+	* src/tty.c: Likewise.
+	* src/who.c: Likewise.
+	* src/cp.c (parents_option): Renamed from flag_path.  All uses changed.
+	(make_dir_parents_private): Renamed from make_path_private.
+	All uses changed.
+	* src/cp.c (usage): Don't use "path" to describe a file name.
+	* src/readlink.c (usage): Likewise.
+	* src/rmdir.c (usage): Likewise.
+	* src/df.c: Don't include "path-concat.h"; not needed.
+	* src/install.c (install_file_in_file_parents): Renamed from
+	install_file_to_path.  All uses changed.
+	* src/ln.c (FILE_BASENAME_CONCAT): Renamed from PATH_BASENAME_CONCAT.
+	All uses changed.
+	* src/ls.c (make_link_name): Renamed from make_link_path.
+	All uses changed.
+	* src/pwd.c (struct file_name): Renamed from struct Path.
+	All uses changed.
+	(file_name_free): Renamed from path_free.  All uses changed.
+	(file_name_init): Renamed from path_init.  All uses changed.
+	(file_name_prepend): Renamed from path_prepend.  All uses changed.
+	* src/rmdir.c (remove_empty_parents): Renamed from empty_paths.
+	All uses changed.
+	(longopts): Add comment that --path is deprecated.
+
+2005-05-31  Jim Meyering  <jim@meyering.net>
+
+	* src/copy.c (chown_privileges, chown_failure_ok): Mark as `extern'.
+	This is a crutch so that `make distcheck's sc_tight_scope rule
+	knows that they really are deliberately declared that way.
+
+2005-05-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Port to Solaris 10's rules for whether programs can chown files.
+	* src/copy.c [HAVE_PRIV_H]: Include <priv.h>.
+	(DO_CHOWN): Remove.  Replaced by chown_failure_ok.  All callers
+	changed.
+	(copy_internal): If chown failed, don't worry about what happened
+	to the mode bits; they can't have changed.
+	(chown_privileges, chown_failure_ok): New functions.
+	* src/copy.h: Add copyright notice.
+	(struct cp_options): Remove myeuid member.  Add chown_privileges
+	member.
+	(chown_privileges, chown_failure_ok): New function decls.
+	* src/cp.c (re_protect): Remove unnecessary call to geteuid.
+	Use chown_failure_ok rather than our own code.
+	* src/cp.c (cp_options_init): Use chown_privileges rather than geteuid.
+	* src/install.c (cp_option_init): Likewise.
+	* src/mv.c (cp_option_init): Likewise.
+
+2005-05-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/chgrp.c (getgrnam) [!defined _POSIX_VERSION]: Remove decl.
+	* src/chown-core.c (getgrnam, getgrgid) [!defined _POSIX_VERSION]:
+	Remove decls.
+	* src/cp.c (geteuid) [!defined _POSIX_VERSION]: Remove decl.
+	* src/id.c (getpwuid, getgrgid, getuid, getgid, geteuid, getegid)
+	[!defined _POSIX_VERSION]: Remove decls.
+	* src/install.c (getpwnam, getgrnam): Remove decl.
+	(getuid, getgid) [!defined _POSIX_VERSION]: Remove decls.
+	* src/md5sum.c (OPENOPTS, TEXT1T01, TEXTCNVT): Remove.
+	(digest_file): Use O_BINARY-using expr instead of OPENOPTS.
+	* src/system.h: Don't bother mentioning _POSIX_VERSION in comment.
+	* src/test.c: Include sys/param.h if it exists, not if _POSIX_VERSION
+	isn't defined.
+	Don't include <sys/file.h>; no longer needed.
+	(getegid, geteuid): Remove no-longer-necessary decls.
+
+	* src/pathchk.c (_POSIX_PATH_MAX) [!defined _POSIX_PATH_MAX]:
+	Define to 256, not 255, as per modern POSIX.
+
+2005-05-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: dd seek=N now conforms to POSIX if the output isn't seekable.
+	* src/dd.c (skip): Return the number of records that were not
+	skipped due to encountering EOF.
+	(dd_copy): If the file wasn't seekable and EOF was encountered,
+	write zeros past EOF until the desired offset is reached.
+
+	* NEWS: expr and test now correctly compare integers of unlimited size.
+	(Also, correct a comment that claimed that expr detects integer
+	overflow; it does so only when converting from strings.)
+	* src/expr.c: Include strnumcmp.h, xstrtol.h.
+	(looks_like_integer): New function.
+	(toarith): Use it.  Also, use xstrtoimax rather than rolling our
+	own diagnostics.
+	(eval2): Don't look for trouble if !evaluate; this simplifies things.
+	Compare numbers using string comparison, so that overflow is
+	not possible.
+	* src/sort.c: Refactor so that others can use large-integer
+	comparison functions.
+	Include "strnumcmp.h".
+	(NEGATION_SIGN, NUMERIC_ZERO, fraccompare):
+	Remove; moved to strnumcmp.
+	(decimal_point): Now int, to simplify converison overhead with
+	new API.  All uses changed.
+	(thousands_sep): Now -1 if there isn't one, as per new API.
+	All uses changed.
+	(numcompare): Move contents to strnumcmp module, except for
+	skipping blanks.
+	* src/test.c: Include inttostr.h, strnumcmp.h.
+	(whitespace, digit, digit_value, integer_expected_error): Remove.
+	(is_int): Remove; replaced by...
+	(find_int): New function.
+	(binary_operator): Don't let integers overflow in comparisons;
+	return the correct answer instead.  Simplify the code.
+	(unary_operator): Convert the integer ourself, since find_int
+	no longer does so.
+	* tests/expr/basic (bigcmp): New test.
+	* tests/test/Test.pm (eq-6, gt-5, lt-5): New tests.
+
+2005-05-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: nohup now redirects a tty stdin to an unreadable fd
+	instead of closing it.
+	* doc/coreutils.texi (nohup invocation): Document this.
+	* src/nohup.c (main): Implement this.
+
+2005-05-26  Jim Meyering  <jim@meyering.net>
+
+	* src/expr.c (toarith): Fix a sign error introduced on 2005-01-14.
+	Reported by David Alan Gilbert.
+	* tests/expr/basic: Add tests using arithmetic on negative integers.
+
+2005-05-19  Jim Meyering  <jim@meyering.net>
+
+	* src/remove.c (AD_mark_helper, AD_mark_current_as_unremovable):
+	Remove inaccurate-but-harmless `const' attributes.
+
+	* src/join.c (decode_field_spec): Add an abort after
+	`error (EXIT_FAILURE, ...' to avoid a gcc warning in caller,
+	about variables being used uninitialized.
+
+2005-05-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* configure.ac: Add copyright notice.  gl_LIB_CHECK -> cu_LIB_CHECK.
+	* src/Makefile.am: Add copyright notice.
+	(factor_LDADD): Remove, as factor no longer needs sqrt.
+	* src/hostname.c: Remove test for HAVE_LIMITS_H; we can assume
+	it's always true now.
+
+2005-05-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix Cygwin porting problem reported by Eric Blake.
+	* src/remove.c (DT_IS_DIR): Remove.
+	(DT_IS_KNOWN, DT_MUST_BE): New macros.
+	(remove_entry): Use them.
+
+2005-05-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/remove.c: Include unlinkdir.h.
+	(UNLINK_CAN_UNLINK_DIRS): Remove.
+	(remove_entry): Use cannot_unlink_dirs () rather than
+	UNLINK_CAN_UNLINK_DIRS.
+
+2005-05-14  Jim Meyering  <jim@meyering.net>
+
+	Update FSF postal mail address.
+	* Makefile.maint, Makefile.cfg, gnupload
+	* src/basename.c, src/cat.c, src/checksum.h, src/chgrp.c
+	* src/chmod.c, src/chown-core.c, src/chown-core.h, src/chown.c
+	* src/chroot.c, src/cksum.c, src/comm.c, src/copy.c, src/copy.h
+	* src/cp-hash.c, src/cp-hash.h, src/cp.c, src/csplit.c, src/cut.c
+	* src/date.c, src/dcgen, src/dd.c, src/df.c, src/dircolors.c
+	* src/dirname.c, src/du.c, src/echo.c, src/env.c, src/expand.c
+	* src/expr.c, src/factor.c, src/fmt.c, src/fold.c, src/fs.h
+	* src/groups.sh, src/head.c, src/hostid.c, src/hostname.c, src/id.c
+	* src/install.c, src/join.c, src/kill.c, src/lbracket.c, src/link.c
+	* src/ln.c, src/logname.c, src/ls-dir.c, src/ls-ls.c, src/ls-vdir.c
+	* src/ls.c, src/ls.h, src/md5.c, src/md5sum.c, src/mkdir.c
+	* src/mkfifo.c, src/mknod.c, src/mv.c, src/nice.c, src/nl.c
+	* src/nohup.c, src/od.c, src/paste.c, src/pathchk.c, src/pinky.c
+	* src/pr.c, src/printenv.c, src/printf.c, src/ptx.c, src/pwd.c
+	* src/readlink.c, src/remove.c, src/remove.h, src/rm.c, src/rmdir.c
+	* src/seq.c, src/setuidgid.c, src/sha1sum.c, src/shred.c
+	* src/sleep.c, src/sort.c, src/split.c, src/stat.c, src/stty.c
+	* src/su.c, src/sum.c, src/sync.c, src/system.h, src/tac-pipe.c
+	* src/tac.c, src/tail.c, src/tee.c, src/test.c, src/touch.c
+	* src/tr.c, src/true.c, src/tsort.c, src/tty.c, src/uname.c
+	* src/unexpand.c, src/uniq.c, src/unlink.c, src/uptime.c
+	* src/users.c, src/wc.c, src/who.c, src/whoami.c, src/yes.c
+
+2005-05-13  Jim Meyering  <jim@meyering.net>
+
+	* NEWS: `rm -r' now removes all of the files it should, even on
+	systems with a buggy readdir affecting file systems inaccessible
+	at configure time.
+
+	In some unusual circumstances `rm -r' would fail to remove --
+	or even consider -- all entries in a directory with more than 254
+	(SunOS) or 338 (Darwin) entries.  This could cause trouble even on
+	other types of systems when using an affected file system via e.g.,
+	NFS.  The underlying cause was a bug in readdir on those systems.
+	Coreutils-5.2.1 and earlier used a configure-time test designed
+	to detect precisely those problem systems, but it would detect
+	the problem and enable remove.c's work-around code only when its
+	configure-time test was run on a losing file system.  Obviously,
+	it couldn't detect a problem if the offending file system wasn't
+	tested or even mounted at coreutils configure time.  Now, rm itself
+	performs a minimal-cost run-time test to detect the problem.
+
+	* src/remove.c (CONSECUTIVE_READDIR_UNLINK_THRESHOLD): Define.
+	(remove_cwd_entries):  When readdir returns NULL for a directory from
+	which we've removed more than CONSECUTIVE_READDIR_UNLINK_THRESHOLD
+	entries, call rewinddir and then resume the readdir/unlink loop.
+	(UNLINK_CAN_UNLINK_DIRS): Rename from ROOT_CAN_UNLINK_DIRS.
+
+2005-05-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: nohup now closes stdin if it is a terminal, unless
+	POSIXLY_CORRECT is set.  This fixes a glitch noted by Wayne Pollock in
+	<https://www.opengroup.org/sophocles/show_mail.tpl?
+	source=L&listname=austin-group-l&id=8341>.
+	* doc/coreutils.texi (nohup invocation): Document this.
+	* src/nohup.c (main): Implement this.
+
+2005-05-12  Jim Meyering  <jim@meyering.net>
+
+	* src/date.c: Assume `free (NULL)' works.
+	* src/dd.c: Likewise.
+	* src/df.c:Likewise.
+	* src/dircolors.c:Likewise.
+	* src/head.c: Likewise.
+	* src/ls.c: Likewise.
+	* src/md5sum.c: Likewise.
+	* src/pr.c: Likewise.
+	* src/sort.c: Likewise.
+
+2005-05-10  Jim Meyering  <jim@meyering.net>
+
+	* tests/touch/not-owner: Skip this test if the user running it
+	owns `/' or has write access to it.
+
+	* src/copy.c (abandon_move): Remove erroneous UNWRITABLE check.
+	This makes `mv -i --reply=no f1 f2' work as expected (in not
+	performing the move operation).  But note that specifying `-i'
+	after `--reply=no' does *not* work.
+	Tiny patch from Vlada Macek.
+	Correct a comment.
+	* tests/mv/reply-no: New file.  Test for the above fix.
+	* tests/mv/Makefile.am (TESTS): Add reply-no.
+
+	* tests/ls-2/tests: Don't print PATH to stderr.
+
+2005-05-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: cp, ln, mv, rm no longer discard white space when intepreting
+	responses.
+
+2005-05-06  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: dd has new iflag= and oflag= flags "binary" and "text".
+	* src/dd.c (flags, usage): Add support for "binary" and "text".
+
+2005-05-04  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: chmod -w now complains if it differs from chmod a-w.
+	* src/chmod.c: Include quotearg.h.
+	(diagnose_surprises): New var.
+	(process_file): Diagnose surprises.  Simplify the logic a bit,
+	while we're at it.
+	(main): Prepare to diagnose surprises.  Remove useless code for
+	'-' option.
+	* tests/chmod/Makefile.am (TESTS): Add umask-x.
+	* tests/chmod/umask-x: New file.
+
+2005-05-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: ls --indicator-style=directory renamed to ls
+	--indicator-style=slash, to avoid confusion with ls --directory.
+	* src/ls.c (usage): Likewise.
+	(slash): Renamed from directory_only.  All uses changed.
+
+2005-05-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: "chmod +1 foo" is now diagnosed.
+
+2005-04-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: ls -p now marks only directories.  New option
+	--indicator-style=directory equivalent to -p.
+	* doc/coreutils.texi (ls invocation): Document this.
+	Also, mention ">" is for doors.
+	* src/ls.c (enum indicator_style): New constant directory_only,
+	for -p.
+	(indicator_style_args, indicator_style_types): Set it appropriately.
+	(decode_switches, gobble_file, print_type_indicator):
+	(length_of_file_name_and_frills):
+	Implement the change described in NEWS.
+	(decode_switches): Quote ">", too.
+	(usage): Update to match the new behavior.  Describe ">".
+	* tests/ls/file-type: Test for new behavior.  Omit -1 option.
+	The "ls --color" test wasn't being checked; add a check for
+	"ls --color=auto" instead.
+
+	* tests/head/Test.pm: Don't set _POSIX2_VERSION; no longer needed.
+	* tests/misc/split-fail: Likewise.
+	* tests/pr/Test.pm: Likewise.
+	* tests/sort/Test.pm: Fix comment to match new behavior of "sort".
+	* tests/tail/Test.pm (tv): Rename tests from obs to obs-plus
+	if they use file names starting with +.
+	(test_vector): Don't set _POSIX2_VERSION if obs but not obs-plus.
+	* tests/uniq/Test.pm (tv, test_vector): Likewise.
+
+	The following was partly derived from a tiny change by Eric Blake:
+	* tests/misc/nice: Don't use 'set -'.  It's not portable to strict
+	POSIX 1003.1-2001 hosts.  Also, don't set _POSIX2_VERSION.
+	* tests/mkdir/perm: Don't use 'set -'.  Simplify test construction.
+	Work even if the underyling system attaches ACLs to new dirs.
+	* tests/mv/part-hardlink: Don't use 'set -'.
+	* tests/stty/row-col-1: Don't use 'set -'.
+
+2005-04-28  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Document fixes described below.
+	* src/chmod.c (change, umask_value): New static vars.
+	(reference_file): Move this static var to inside "main".
+	(process_file, process_files): Remove CHANGES arg; now taken from
+	static var.  All uses changed.
+	(usage): Fix incorrect description of MODE operand.
+	(main): For invalid mode usages, output a brief usage message.
+	Adjust to new modechange API.
+	* install.c (main): Adjust to new modechange API.
+	Also, free the mode_change object when done.
+	* mkdir.c (main): Likewise.
+	* mkfifo.c (main): Likewise.
+	* mknod.c (main): Likewise.
+	* tests/chmod/equal-X: Check for =xX bug.
+	* tests/chmod/equals: Check for =u bug.
+	* tests/chmod/usage: Check for u+gr and ug,+x bugs.
+
+2005-04-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Restore support for usages like "head -1" and "tail -1",
+	even when conforming to POSIX 1003.1-2001.
+	Fix bug with "POSIXLY_CORRECT=1 fold file -3".
+	join now supports a NUL field separator, e.g., "join -t '\0'".
+	join now detects and reports incompatible options, e.g.,
+	"join -t x -t y",
+	* NEWS: Document this.
+	* src/date.c: Remove posixver.h and its uses.
+	(COMMON_SHORT_OPTIONS): Remove.
+	(short_options): New constant.
+	(short_options, usage): -I now always takes an optional arg.
+	* src/expand.c: Remove posixver.h and its uses.
+	(shortopts): New constant.  -DIGIT now always takes an optional arg.
+	(main): Revamp parsing of -DIGIT to let parse_tab_stops handle it.
+	Don't complain about -DIGIT.
+	* src/fold.c: Remove posixver.h and its uses.
+	(shortopts): New constant.  -DIGIT now always takes an optional arg.
+	(main): Don't preprocess arg list; that was buggy.  Use method
+	similar to expand.
+	* src/head.c: Remove posixver.h and its uses.
+	(header_mode_option): Remove.
+	(main): Don't complain about obsolete -NUM args.
+	* src/join.c: Remove posixver.h and its uses.
+	(obsolete_usage): Remove.
+	(join_field_1, join_field_2): Initialize to SIZE_MAX to indicate
+	they haven't been set yet.
+	(tab): Now int, not char.  Initialize to -1 to indicate white space
+	separates columns, so that we can use NUL as a separator.
+	All uses changed.
+	(OBSOLETE_LONG_OPTIONS, get_option): Remove.
+	(string_to_join_field): Remove ERR_MSG_FMT arg; a single format
+	suffices.  Use xstrtoul for sizes; it suffices.
+	(decode_field_spec): Report an error and exit on failure.  Return void,
+	not bool.
+	(add_field_list): Likewise.
+	(set_join_field): New function.
+	(enum operand_status): New enum.
+	(add_file_name): New args OPERAND_STATUS, JOPTION_COUNT,
+	PREV_OPTC_STATUS, OPTC_STATUS to handle the bewildering array of
+	possibilities with obsolete option parsing.
+	(main): Use it.  Do not depend on POSIX version.
+	Check for conflicting options.  Parse obsolete options -j1 and -j2
+	so that it is a pure extension to POSIX 1003.1-2001.
+	Allow '-t\0' to specify a NUL tab, stealing the code from 'sort'.
+	* src/nice.c: Remove posixver.h and its uses.
+	(main): Always support -NUM option.
+	* src/od.c: Remove posixver.h and its uses.
+	(short_options): New constant, which always supports -w[num].
+	(COMMON_SHORT_OPTIONS): Remove.
+	* src/pr.c: Remove posixver.h and its uses.
+	(short_options): New constant, which always supports -S[string].
+	(COMMON_SHORT_OPTIONS): Remove.
+	* src/sort.c: Remove posixver.h and its uses.
+	(short_options): New constant, which always supports -y arg.
+	(COMMON_SHORT_OPTIONS): Remove.
+	(main): Redo workaround for Solaris compatibility with -y.
+	This change isn't visible to the user; it just cleans up the
+	code so that we don't need posixver.h.
+	* src/split.c: Remove posixver.h and its uses.
+	(main): Don't complain about -NUM option.
+	* src/tail.c (parse_obsolete_option): Don't complain about -NUM.
+	* src/unexpand.c: Remove posixver.h and its uses.
+	(main): Don't complain about -TAB.
+	* src/uniq.c (main): Don't complain about -NUM.
+
+2005-04-22  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/nohup.c (main): If getopt fails, exit with status 127,
+	not status 1.  POSIX requires this.
+	* NEWS: Document this.
+
+	* src/nice.c (main): Report proper program name when getopt finds
+	trouble.  Problem reported by Behdad Esfahbod.
+
+	* NEWS: Fix bug with "mkdir -m =+x dir"; the umask was being ignored
+	when the "+x" was being evaluated.
+	* mkdir.c (main): Compile mode with MODE_MASK_ALL and initial umask.
+	* mkfifo.c (main): Likewise.
+	* mknod.c (main): Likewise.
+	* tests/mkdir/perm: Test for the above bug.
+
+2005-04-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Port test cases to Microsoft-Windows-related environments,
+	following suggestions from Eric Blake.
+	* tests/install/Makefile.am (TESTS_ENVIRONMENT): Add EXEEXT.
+	* tests/install/basic-1: Undo previous change.
+	(dd, dd2): New vars, which use $EXEEXT.  All uses of dd and dd2 changed.
+	* tests/install/trap: Undo previous change.
+	(sig): New var.  Use it insted of "trap '' CHLD".
+	Append $EXEEXT to executable name.
+
+	"fetish" -> "coreutils" in more places.
+	* tests/Coreutils.pm: Renamed from tests/Fetish.pm.
+	(package Coreutils): Renamed from package Fetish.  All uses changed.
+	* tests/Makefile.am (EXTRA_DIST): Add Coreutils.pm and
+	remove Fetish.pm.
+
+2005-04-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/mv/setup (dot_mount_point): Use stat -L, in case the
+	directory is actually a symbolic link.  Problem reported by
+	Eric Blake.
+
+	* tests/mv/mv-special-1: Use test -p to test for fifos, rather
+	than the (incorrect) test -f and the (inadequate) ls.  ls is
+	inadequate because on some hosts a buggy mv will create a file of
+	the wrong type (problem reported by Eric Blake).  Skip this test
+	if test -p doesn't work.
+
+	* tests/chmod/setgid: Use numeric group ids, not symbolic group names,
+	since the latter can have shell metacharacters in them (e.g., spaces).
+	This follows up to the 2005-01-17 patch, which missed this occurrence.
+
+2005-04-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	"fetish" -> "coreutils" in several places.
+	* Makefile.cfg (ftp): Remove fetish.sf.net.
+	* Makefile.maint (emit_upload_commands): Likewise.
+	* src/Makefile.am (LDADD, $(PROGRAMS)): fetish -> coreutils.
+	* tests/group-names (COREUTILS_GROUPS): Renamed from FETISH_GROUPS.
+	* tests/chmod/setgid (FETISH_GROUP): Renamed from COREUTILS_GROUP.
+
+	* tests/install/basic-1: Use "cat", not "test", to test for
+	../../src/dd.  Problem reported by Eric Blake.
+
+2005-04-18  Jim Meyering  <jim@meyering.net>
+
+	* src/dd.c: Don't include stat-macros.h directly.  system.h does that.
+
+2005-04-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Work around a couple of "make check" failures reported for Cygwin
+	and ash by Eric Blake.
+	* tests/install/basic-1: Skip this test if ../../src/dd isn't readable.
+	* tests/install/trap: Skip this test if "trap '' CHLD" doesn't work.
+
+2005-04-16  Jim Meyering  <jim@meyering.net>
+
+	* src/dd.c (S_TYPEISSHM): Remove definition.
+	Get the definition by including "stat-macros.h", instead.
+
+2005-04-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix test suite problems reported by Eric Blake on Cygwin.
+	* tests/mv/mv-special-1: Ignore chatter about when files are removed,
+	since POSIX doesn't require rename to fail across file systems.
+	* tests/mv/setup (dot_mount_point): Use stat rather than df, as
+	it's more reliable.
+	(other_partition_tmpdir): Remove df from name as that would be
+	misleading now.
+
+2005-04-14  Jim Meyering  <jim@meyering.net>
+
+	* src/chown-core.c: Correct typo, fchmod -> fchown, in a comment.
+
+2005-04-12  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/ls.c (usage): "uid" -> "user ID".
+
+2005-04-12  Jim Meyering  <jim@meyering.net>
+
+	* src/tsort.c (tsort): Use "%s" as the format string,
+	rather than a diagnostic or a file name.
+
+	* src/comm.c (compare_files): Remove declaration of unused local.
+
+	* src/chown-core.c (chopt_free): Mark parameter as unused.
+
+2005-04-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* man/chown.x: Reword to match user manual.
+	* man/id.x: Likewise.
+	* src/setuidgid.c (usage): Use "user ID", not "UID", and similarly
+	for "group ID".
+	* src/whoami.c (usage, main): Likewise.
+
+	Add bulletproofing for cases where stdin, stdout, or stderr are closed.
+	* src/comm.c: Include stdio-safer.h.
+	(compare_files): Exit right away on I/O error rather than continuing
+	and producing confusing output and error messages.
+	Return void, not int; all callers changed.
+	Use fopen_safer to avoid confusion with file descriptors.
+	* src/copy.c: Include unistd-safer.h.
+	(copy_reg): Use fd_safer.
+	* src/csplit.c: Include stdio-safer.h.
+	(input_desc): Remove unnecessary static initialization.
+	(set_input_file): Use STDIN_FILENO, not 0.
+	(create_output_file): Use fopen_safer.
+	* src/dircolors.c (dc_parse_file): Don't assume fopen does not
+	return stdin.
+	* src/head.c (head_file): Don't assume open does not return 0.
+	* src/join.c: Include stdio-safer.h.
+	(main): Use fopen_safer.  Simplify the resulting code.
+	* src/md5sum.c (digest_file, digest_check):
+	Don't assume that fopen does not return stdin.
+	* src/nohup.c: Include unistd-safer.h.
+	(main): Don't dup stderr to stdin or stdout by mistake.
+	* src/od.c (check_and_close): Don't assume fopen does not return stdin.
+	* src/paste.c (paste_serial): Likewise.
+	* src/pr.c: Include stdio-safer.h.
+	(open_file): Use fopen_safer.
+	(close_file): Don't assume fopen does not return stdin.
+	* src/ptx.c (main): Don't assume fopen returns stdout after closing
+	stdout.  Use freopen instead.
+	* src/shred.c: Include unistd-safer.h.
+	(wipename): Use fd_safer on directory file descriptor.
+	(wipefile): Remove special case for /dev/fd/* on older hosts.
+	It didn't work in general, and wasn't documented.
+	Use fd_safer.
+	* src/sort.c: Include unistd-safer.h.
+	(create_temp_file): Use fd_safer.
+	(xfclose): Don't assume fileno (stdin) == STDIN_FILENO, etc.
+	* src/split.c: Include unistd-safer.h.
+	(cwrite): Use fd_safer.  Replace mystery constant 0666 with symbolic
+	version, as POSIX requires.
+	* src/sum.c (bsd_sum_file, sysv_sym_file):
+	Use same pattern as elsewhere for checking for stdin.
+	* src/tac.c: Include unistd-safer.h.
+	(copy_to_temp): Use fd_safer.
+	(tac_file): Don't assume fopen cannot return stdin.
+	* src/tail.c: Include unistd-safer.h rather than fcntl-safer.h.
+	(recheck, tail_file): Use fd_safer rather than open_safer.
+	* src/tee.c: Include stdio-safer.h.
+	(tee): Use fopen_safer.
+	* src/touch.c: Include unistd-safer.h.
+	(touch): Use fd_safer.
+	* src/tsort.c (have_read_stdin): Remove; no longer needed.  All uses
+	removed.
+	(tsort): Do not assume fopen can't return stdin.
+	Close stdin before returning.  All uses changed.
+	* src/unexpand.c (next_file): Don't assume fopen cannot return stdin.
+	* src/uniq.c: Include stdio_safer.h.
+	(check_file): Don't assume fopen cannot return stdin or stdout.
+
+2005-04-09  Jim Meyering  <jim@meyering.net>
+
+	* src/dd.c (quit): Define with ATTRIBUTE_NORETURN.
+
+	Now that close_stdout closes standard output unconditionally,
+	these workarounds for dd and cat are no longer necessary.
+	* src/dd.c (close_stdout_wrapper): Remove function.
+	(main): Call atexit with close_stdout, instead.
+	* src/cat.c (close_stdout_wrapper): Likewise.
+	Don't close STDOUT_FILENO explicitly; close_stdout does it.
+
+	* src/system.h (__attribute__): Readability nit:
+	Change this:
+	#  define __attribute__(x)
+	to this:
+	#  define __attribute__(x) /* empty */
+
+2005-04-09  Jim Meyering  <jim@meyering.net>
+
+	* src/rm.c (usage): Mention that --recursive removes listed
+	directories too, not just their contents.
+	Say that by default, rm does not remove directories.
+
+	* src/pr.c: Don't include "timespec.h".  system.h does that.
+	* Makefile.maint (sc_system_h_headers): Propagate exit status
+	through trap.
+
+2005-04-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Document that dd no longer treats QUIT or PIPE specially,
+	and when conforming to POSIX no longer treats USR1 specially.
+	Document that dd no longer dumps core when handling signals.
+	* src/system.h (RETSIGTYPE): Remove; no longer needed.  All uses
+	replaced with void.
+	* src/csplit.c (SA_NOCLDSTOP): Define to 0 if not defined.
+	All uses changed.
+	(siginterrupt) [!HAVE_SIGINTERRUPT]: New macro.
+	(delete_all_files): New arg IN_SIGNAL_HANDLER, to avoid undefined
+	behavior when called from a signal handler.  All uses changed.
+	(main) [!defined SA_NOCLDSTOP]:
+	Use siginterrupt to specify that system calls should be interrupted.
+	* src/dd.c: Do not include safe-read.h or full-write.h; no longer needed.
+	(process_signals): Add forward decl.
+	(SA_NOCLDSTOP, sigprocmask, sigset_t) [!defined SA_NOCLDSTOP]:
+	New macros.
+	(siginterrupt) [! HAVE_SIGINTERRUPT]: New macro.
+	(SA_NODEFER) [!defined SA_NODEFER]: New macro.
+	(SA_RESETHAND) [!defined SA_RESETHAND]: New macro.
+	(caught_signals, interrupt_signal, info_signal_count, catch_siginfo):
+	New vars.
+	(usage): Mention -USR1 versus -INFO.
+	(cleanup): Don't invoke print_stats; the caller must do it now.
+	All callers changed.
+	(quit): Process signals just before exiting.
+	(interrupt_handler): Simply record the signal and return.
+	(siginfo_handler): Simply increment the signal counter and return.
+	(install_handler): Remove, replacing with:
+	(install_signal_handlers, process_signals, iread, iwrite):
+	New functions.  All callers to safe_read and full_write replaced
+	by iread and iwrite.  All callers to install_handler replaced by
+	install_handlers.
+	* src/ls.c (SA_NOCLDSTOP): Define to 0 if not defined.
+	All uses changed.
+	(siginterrupt) [! HAVE_SIGINTERRUPT]: New macro.
+	(main) [! SA_NOCLDSTOP]: Use it.
+	* src/shred.c: Remove all uses of signals; modern hosts have
+	/dev/random and don't need this gorp.
+	Do not include signal.h.
+	(env, sigill_handler, isaac_seed_machdep): Remove.  All uses removed.
+	* src/sort.c (SA_NOCLDSTOP): Define to 0 if not defined.
+	All uses changed.
+	(siginterrupt) [! HAVE_SIGINTERRUPT]: New macro.
+	(main) [! SA_NOCLDSTOP]: Use it.
+
+	* src/dd.c: Do not include inttostr.h, no longer needed.
+	(print_stats, main): Rewrite and simplify formats to use PRIuMAX
+	instead of umaxtostr.
+	(print_stats): Work even in languages that have special
+	forms for two of things, for r_truncate and w_bytes.  We can't
+	fix delta_s in this way, since ngettext doesn't support floating-point.
+	(main): Rewrite to avoid casts.
+
+2005-04-07  Jim Meyering  <jim@meyering.net>
+
+	Placate gcc-4's -Wuninitialized.
+	* src/md5sum.c (digest_check) [lint]: Initialize hex_digest to NULL.
+	* src/test.c (binary_operator) [lint]: Initialize lt and rt to 0.
+
+	* src/test.c (is_int, age_of, binop): Declare `char *' parameters to
+	be `const'.
+	(binop): Move function definition to precede first use so we can...
+	(binop): ...remove prototype.
+
+2005-04-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* man/Makefile.am (.x.1): Remove "COMMAND.td/" from examples.
+	* src/basename.c (usage): Add examples.
+	* src/cat.c (usage): Likewise.
+	* src/chgrp.c (usage): Likewise.
+	* src/chown.c (usage): Likewise.
+	* src/dirname.c (usage): Likewise.
+
+2005-04-05  Jim Meyering  <jim@meyering.net>
+
+	* src/nice.c (usage): Mention that some shells provide a
+	built-in function by the same name.
+	* src/nohup.c (usage): Likewise.
+	* src/printenv.c (usage):Likewise.
+
+2005-04-04  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* src/tee.c (tee): When closing files, do not close stdout,
+	leave this job to close_stdout() instead.
+	* configure.ac (AC_CONFIG_FILES): Add tests/tee/Makefile.
+	* tests/Makefile.am (SUBDIRS): Add tee.
+	* tests/tee/Makefile.am: New file.
+	* tests/tee/.cvsignore: Likewise.
+	* tests/tee/{basic,dash}: New tee tests.
+
+2005-04-04  Jim Meyering  <jim@meyering.net>
+
+	* src/echo.c (usage): Mention that some shells provide a
+	built-in function by the same name.
+	* src/kill.c (usage): Likewise
+	* src/printf.c (usage): Likewise.
+	* src/pwd.c (usage): Likewise.
+	* src/stat.c (usage): Likewise.
+	* src/test.c (usage): Likewise.
+	* src/true.c (usage):
+	* src/system.h (USAGE_BUILTIN_WARNING): New macro.
+
+	* man/echo.x: Remove `DESCRIPTION' section, now that --help includes it.
+	* man/printf.x: Likewise.
+	* man/pwd.x: Likewise.
+
+2005-04-03  Jim Meyering  <jim@meyering.net>
+
+	* src/pr.c (main): Fix off-by-one error.
+	pr -$(perl -e 'print "0"x63 . 1') would write one byte beyond the
+	end of a malloc'd buffer.
+
+2005-04-01  Jim Meyering  <jim@meyering.net>
+
+	* src/pr.c (main): Free column_count_string when done with it.
+
+	Don't let pr treat +1:-1 like +1:18446744073709551615.
+	* src/pr.c (strtoumax): Remove declaration.
+	(first_last_page): Use xstrtoumax in place of strtoumax,
+	so we don't interpret a negative page number (e.g., in an option
+	like --pages=1:-1) as valid.
+	* tests/pr/Test.pm (neg-page): Add a test for this.
+
+2005-03-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/pinky.c (short_pinky): Adjust to read_utmp signature change.
+	* src/uptime.c (uptime): New arg OPTIONS.  All uses changed.
+	* src/users.c (users): Likewise.
+	* src/who.c (who): Likewise.
+	* src/uptime.c (main): Check PIDs when invoked with zero arguments.
+	* src/users.c (main): Likewise.
+	* src/who.c (main): Likewise.  Also with two arguments.
+	Omit duplicate code in 2-arg case.
+	(UT_PID): Moved to ../lib/readutmp.h.
+
+2005-03-29  Jim Meyering  <jim@meyering.net>
+
+	* src/system.h (ptr_align): Declare `ptr' parameter to be a
+	`const' pointer, since this function never writes through it.
+
+	* src/uname.c: Indent cpp directives to reflect nesting.
+
+2005-03-28  Jim Meyering  <jim@meyering.net>
+
+	* src/seq.c (get_width_format) [HAVE_RINT && HAVE_MODF && HAVE_FLOOR]:
+	Add `void' to make this an ANSI-style function declaration.
+	* src/remove.c (ds_init): Likewise.
+	* src/pr.c (print_sep_string): Likewise.
+
+	* src/stty.c (speeds): Declare this array to be static.
+	* src/Makefile.am (sc_tight_scope): Adjust to catch any
+	new declarations like that of stty.c's `speeds'.
+
+	* src/system.h (GETOPT_HELP_OPTION_DECL): Use NULL, not `0'.
+	(GETOPT_VERSION_OPTION_DECL): Likewise.
+	* src/chown.c (long_options): Likewise.
+	* src/chgrp.c (long_options): Likewise.
+	* src/chmod.c (long_options): Likewise.
+	* src/cp.c (sparse_type_string, reply_args, decode_preserve_arg):
+	Likewise.
+	* src/chown-core.c (chopt_init): Likewise.
+	* src/comm.c (long_options): Likewise.
+	* src/copy.c (copy_reg): Likewise.
+	* src/csplit.c (extract_regexp): Likewise.
+	* src/cut.c (longopts): Likewise.
+	* src/date.c (time_spec_string): Likewise.
+	* src/df.c (find_mount_point, show_point): Likewise.
+	* src/expr.c (docolon): Likewise.
+	* src/fmt.c (long_options): Likewise.
+	* src/ls.c (time_style_args, indicator_style_args, long_options)
+	(format_args, sort_args, time_args, decode_switches)
+	(gobble_file): Likewise.
+	* src/md5sum.c (long_options): Likewise.
+	* src/mv.c (reply_args): Likewise.
+	* src/paste.c (longopts): Likewise.
+	* src/pinky.c (print_entry): Likewise.
+	* src/pr.c (long_options): Likewise.
+	* src/ptx.c (long_options, format_args): Likewise.
+	* src/readlink.c (longopts): Likewise.
+	* src/sort.c (long_options, mergefps): Likewise.
+	* src/stat.c (long_options): Likewise.
+	* src/tac.c (main): Likewise.
+	* src/tail.c (follow_mode_string): Likewise.
+	* src/touch.c (longopts, time_args): Likewise.
+	* src/uniq.c (delimit_method_string): Likewise.
+	* src/uptime.c (print_uptime): Likewise.
+	* src/who.c (print_user): Likewise.
+
+2005-03-27  Jim Meyering  <jim@meyering.net>
+
+	* src/dcgen: Simplify further, clean up.
+	Add a standard-output-closing global destructor.
+	Require perl-5.002.
+	* src/wheel-gen.pl: Use the same global destructor as dcgen.
+
+2005-03-26  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dcgen: Squeeze multiple blanks into one.  Output a simple
+	array of adjacent strings rather than a more complicated data
+	structure; this saves space in the dircolors executable.
+	* src/dircolors.c (parse_line): Use char *, not unsigned char *.
+	This avoids casts.
+	(dc_parse_stream, main): Avoid casts.
+	Adjust to simpler data structure generated by new dcgen.
+
+2005-03-25  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* src/ls.c (usage): Document usage of LS_COLORS.
+
+2005-03-25  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/dircolors.hin: Add "TERM cygwin".
+
+2005-03-25  Jim Meyering  <jim@meyering.net>
+
+	* src/system.h (DECIMAL_DIGIT_ACCUMULATE): Reverse the sense of
+	the return value, and update callers:
+	* src/cut.c (set_fields): Update use of DECIMAL_DIGIT_ACCUMULATE.
+	* src/expand.c (parse_tab_stops, main): Likewise.
+	* src/split.c (main): Likewise.
+	* src/unexpand.c (parse_tab_stops, main): Likewise.
+	* src/uniq.c (main): Likewise.
+
+2005-03-22  Jim Meyering  <jim@meyering.net>
+
+	* build-aux: New directory.  Renamed from config.
+	* configure.ac: Reflect renaming: config -> build-aux.
+	* Makefile.am (dist-hook): Likewise.
+	* Makefile.maint: Likewise.
+	* Makefile.cfg (cvs_files): Likewise.
+	* .x-sc_sun_os_names: Likewise.
+	* .x-sc_trailing_blank: Likewise.
+
+	* src/ls.c (get_funky_string): Use '\a', rather than 7, for
+	portability to EBCDIC hosts.
+
+2005-03-20  Jim Meyering  <jim@meyering.net>
+
+	* src/pr.c (init_header): Add missing `%' in new format string.
+	(init_header): Use zero-filled `.%09d' format, not space-filled `.%9d'.
+
+2005-03-19  Jim Meyering  <jim@meyering.net>
+
+	* src/Makefile.am (pr_LDADD): Now that pr uses gettime, add
+	$(LIB_CLOCK_GETTIME) to get the required -lrt on newer Linux systems.
+
+2005-03-18  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: pr -D "FORMAT" now accepts the same formats that
+	date +"FORMAT" does.
+	* src/pr.c: Include strftime.h, timespec.h.
+	(init_header): Obtain and format nanosecond part of time stamp.
+
+	* NEWS: nohup now ignores the umask when creating nohup.out.
+	nohup now closes stderr if it is a terminal and stdout is closed.
+	* src/nohup.c (main): Likewise.  Be a little more paranoid about
+	return values; e.g., check for any negative return from open.
+	Assume free (NULL) works.
+	Close file descriptor leak when redirecting standard output to a file.
+
+2005-03-17  Jim Meyering  <jim@meyering.net>
+
+	* src/cut.c (set_fields): Use DECIMAL_DIGIT_ACCUMULATE macro,
+	in place of functionally-equivalent code.
+	* src/expand.c (parse_tab_stops, main): Likewise.
+	* src/split.c (main): Likewise.
+	* src/unexpand.c (parse_tab_stops, main): Likewise.
+	* src/uniq.c (main): Likewise.
+	* src/od.c: Use VERIFY macro in place of an equivalent open-coded
+	declaration.
+	* src/system.h (VERIFY, VERIFY_EXPR, DECIMAL_DIGIT_ACCUMULATE):
+	New macros.
+
+	Before, this command would make uniq skip 11 fields and print
+	only the first line:
+	$ _POSIX2_VERSION=1 ./uniq -f1 -1 <(seq --format='1 %g' 2)
+	1 1
+	1 2
+	* src/uniq.c (main): Interpret `uniq -f1 -1' like `uniq -f1',
+	not like `uniq -f11'.
+
+2005-03-15  Jim Meyering  <jim@meyering.net>
+
+	Both `pr -0' and e.g., `pr -03' would evoke `column count too large'.
+	`pr -0' should give a better diagnostic and `pr -03' should be
+	equivalent to `pr -3'.
+	* src/pr.c (parse_column_count): Change return type to void.
+	Call error (EXIT_FAILURE, ... for an invalid string.
+	(main): Allocate space for column_count_string using malloc.
+	Accumulate all old-style column-count digits before converting.
+	When the number of columns is specified via both old-style,
+	(e.g., -3), and a long option (--columns=5), ensure that only
+	the last one specified takes effect.
+	* tests/pr/Test.pm: Add tests for the above.
+
+2005-03-15  Corinna Vinschen  <corinna@vinschen.de>  (tiny change)
+
+	* src/copy.c (copy_reg): Copy regular files in binary mode.
+
+2005-03-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Restate why ls limits time stamp lengths.
+
+2005-03-12  Jim Meyering  <jim@meyering.net>
+
+	Add a little infrastructure to help prevent future bugs like the
+	one fixed below.
+	* src/stat.c (xstrcat): New function.
+	(print_statfs, print_stat): Add buf_len parameter and convert all
+	uses of strcat to xstrcat.  Update callers.
+	(print_it): Call print_func with buf_len parameter.
+
+	Invoking stat -c FMT with a lone format directive of %s, %f, %h, %s,
+	could cause a buffer overrun error.
+	* src/stat.c (print_it): Allocate 2 more bytes, to accommodate our
+	conversion of the stat %s format string to the longer printf %llu one.
+	Patch from Guochun Shi.
+
+2005-03-11  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/ls.c (TIME_STAMP_LEN_MAXIMUM): New constant.
+	(long_time_expected_width, print_long_format): Use it, to avoid
+	some possible denial-of-service attacks.
+	* NEWS: Document this.
+
+2005-03-11  Jim Meyering  <jim@meyering.net>
+
+	Prompt once again for `mv -i A B' when A and B are hard links
+	to the same file.  This fixes a bug introduced by my 2003-04-04
+	(coreutils-5.0.1) change.  Reported by Thomas Wolff via Eric Blake.
+	* src/copy.c (abandon_move): New function, factored out of
+	copy_internal, now that this code is being used from two places.
+	(copy_internal): Perform the same interactive-related test for
+	whether it's alright to proceed and (usually) overwrite the
+	destination file.
+	* tests/mv/i-4: Add tests for the above.
+
+	Don't segfault for a very long date format string, e.g.,
+	ls -ld --time-style=+%99999999H .
+	* src/ls.c (long_time_expected_width): Use x2nrealloc, not alloca,
+	so format string abuse cannot provoke stack overflow.
+	(print_long_format): Likewise.
+
+	Don't segfault for a long header date string, e.g.,
+	echo a|pr -D +%9999999A
+	* src/pr.c (init_header): Use x2nrealloc, rather than alloca.
+	Don't bother with fixed-sized initial buffer;  always use x*alloc.
+
+	* src/pr.c (init_header): Use slightly clearer INT_BUFSIZE_BOUND
+	in place of equivalent INT_STRLEN_BOUND + 1.
+	* src/expr.c (tostring, printv): Likewise.
+
+2005-03-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/system.h: Include intprops.h.
+	(TYPE_SIGNED, TYPE_MINIMUM, TYPE_MAXIMUM, INT_STRLEN_BOUND): Remove;
+	they are now defined in intprops.h.
+
+2005-03-09  Jim Meyering  <jim@meyering.net>
+
+	* TODO: Remove entry about named pipes.  It was fixed in 5.3.0.
+
+2005-03-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/date.c (usage): Redo to match recent documentation changes.
+	Don't bother documenting which usages are GNU extensions; the list
+	wasn't correct, and is better left to the printed manual anyway.
+
+2005-03-06  Jim Meyering  <jim@meyering.net>
+
+	Factor out column-count processing.
+	* src/pr.c: Include "inttostr.h".
+	(parse_column_count): New function.
+	(main): Use the new function for both old-style, -9, and long,
+	--columns=-9, options.
+
+	* src/cksum.c: Remove `register' keyword.
+	* src/cut.c: Likewise.
+	* src/dd.c: Likewise.
+	* src/env.c: Likewise.
+	* src/factor.c: Likewise.
+	* src/fmt.c: Likewise.
+	* src/fold.c: Likewise.
+	* src/id.c: Likewise.
+	* src/logname.c: Likewise.
+	* src/ls.c: Likewise.
+	* src/pr.c: Likewise.
+	* src/printf.c: Likewise.
+	* src/shred.c: Likewise.
+	* src/sort.c: Likewise.
+	* src/sum.c: Likewise.
+	* src/test.c: Likewise.
+	* src/tsort.c: Likewise.
+	* src/uniq.c: Likewise.
+	* src/wc.c: Likewise.
+	* src/whoami.c: Likewise.
+
+2005-03-01  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/Makefile.am (nanosec_libs): Remove $(LIB_XANOSLEEP); no
+	longer needed.
+
+2005-03-01  Jim Meyering  <jim@meyering.net>
+
+	* src/copy.c (copy_internal): Change test of source type from
+	!S_ISREG to S_ISLNK.  Reported by Paul Eggert in
+	http://lists.gnu.org/archive/html/bug-coreutils/2004-10/msg00050.html.
+
+2005-02-28  Jim Meyering  <jim@meyering.net>
+
+	* NEWS: Mention that xnanosleep fixes sleep failure on linux-2.6.8.1.
+
+2005-02-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/Makefile.am (dd_LDADD, shred_LDADD): Add $(LIB_GETHRXTIME).
+	(nanosec_libs): Add $(LIB_XNANOSLEEP).  Needed for newer GNU/Linux
+	hosts with clock_gettime.
+
+2005-02-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Describe user-visible change to dd.
+	* src/Makefile.am (dd_LDADD, shred_LDADD, nanosec_libs):
+	Remove $(LIB_CLOCK_GETTIME).  These functions now use
+	gethrxtime instead.
+	* src/dd.c: Include gethrxtime.h, xtime.h.
+	(start_time): Now of type xtime_t, not struct timespec.
+	(print_stats, main): Use gethrxtime rather than gettime.
+	* src/ls.c (time): Remove obsolete decl.
+	(get_current_time): gettimeofday always returns 0, so don't
+	check its result.
+	* src/shred.c: Include gethrxtime.h.
+	(isaac_seed): Use gethrxtime rather than a mishmash.
+	* src/touch.c (time): Remove obsolete decl.
+
+	* tests/misc/split-fail: Don't assume that the current host
+	supports integers wider than 32 bits.  Fix comment typo.
+	* tests/od/x8: Likewise.
+
+	* src/chown-core.c (enum RCH_status): Remove trailing comma,
+	as it's not valid in standard C89.
+
+2005-02-15  Jim Meyering  <jim@meyering.net>
+
+	* src/stat.c (human_fstype): Add case/definition for S_MAGIC_XFS
+	so that file systems of type `xfs' are recognized as such.
+	* src/fs.h: Regenerate.
+	Reported by Bernd Eckenfels.
+	* src/stat.c (human_fstype): Likewise for S_MAGIC_JFS/jfs.
+	* src/fs.h: Regenerate.
+	Reported by Andreas Schwab.
+
+	* src/nice.c (NZERO) [NZERO == 0]: Undefine and define to 20,
+	to work around the invalid definition from Darwin 7.7.0.
+	Test failure reported by Sébastien Maret.
+
+2005-02-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/sort.c (mergefps): Use binary search rather than linear one
+	when comparing new line to lines already in main memory.
+	Idea suggested by James Lemley.
+
+2005-02-09  Jim Meyering  <jim@meyering.net>
+
+	* src/copy.c (valid_options): Add an assertion that
+	not both hard_link and symbolic_link are set.
+
+2005-02-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* NEWS: Document stat -f -c %S, plus changes to default formats.
+	* doc/coreutils.texi (stat invocation): Normalize terminology,
+	capitalization, and sort order to match --help output.  Mention %c
+	for file systems.  Add new -f -c format %S, and document %s versus %S;
+	problem reported by Jeroen van Wolffelaar.
+	* src/stat.c (usage): Likewise.
+	(STATFS_FRSIZE): New macro.
+	(print_statfs): Use it, for stat -f -c %S.
+	(do_statfs): Change default formats to output %S.
+
+2005-02-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* src/system.h: Include "memrchr.h".
+	(memrchr) [!HAVE_DECL_MEMRCHR]: Remove decl.
+
+2005-02-02  Jim Meyering  <jim@meyering.net>
+
+	* tests/du/8gb: Also adjust the test (s/64/128/) to detect
+	systems that don't support sparse files.
+	Check for $2 -ge 128, rather than $2 = 128, in case
+	there is a file system type that doesn't support sparse files,
+	yet for which metadata takes up additional space.
+	Both reported by Andreas Schwab.
+
+2005-02-01  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* tests/du/8gb: Create a larger test file, so we properly
+	detect that sparse files can be created on NTFS under cygwin.
+
+2005-01-30  Jim Meyering  <jim@meyering.net>
+
+	* src/head.c (elide_tail_bytes_pipe): Correct wording in diagnostic.
+
+	* src/stty.c: Remove unnecessary parentheses in all #if directives.
+
+2005-01-29  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* .cvsignore: Ignore config.cache and config.status.lineno.
+	* src/stty.c [VSWTCH]: Some systems, like Cygwin, use VSWTC
+	instead of VSWTCH, for use with CSWTCH.
+
+2005-01-29  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* tests/Makefile.am (.PHONY): Add check-root and root-hint.
+	* tests/rwx-to-mode: Ignore ACL designation.
+	* tests/setgid-check: Likewise.
+	* tests/chown/separator: Quote user and group names.
+
+2005-01-24  Jim Meyering  <jim@meyering.net>
+
+	* src/cp.c (usage): Merge the descriptions of --no-dereference and -P.
+	Suggestion from Johan Boule.
+
+2005-01-17  Eric Blake  <ebb9@byu.net>  (tiny change)
+
+	* src/Makefile.am (all_programs.list): Strip $(EXEEXT) and remove
+	duplicates.
+	* man/Makefile.am (all_programs): Revert previous patch; updated
+	all_programs.list fixes this.
+	(.x.1): No need to add $(EXEEXT).
+
+2005-01-03  Corinna Vinschen  <corinna@vinschen.de>  (tiny change)
+
+	* src/system.h: Use S_BLKSIZE value for ST_NBLOCKSIZE where
+	available.
+
+2005-01-22  Jim Meyering  <jim@meyering.net>
+
+	* Makefile.maint (v_etc_file): The version string has moved to
+	version-etc-fsf.c, search that new file, not version-etc.c.
+
+2005-01-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* tests/group-names: Use numeric group ids, not symbolic group names,
+	since the latter can have shell metacharacters in them (e.g., spaces).
+	Problem reported by Eric Blake.
+	* tests/chgrp/basic: Assume groups are numeric, not symbolic.
+	* tests/chgrp/deref: Likewise.
+	* tests/chgrp/posix-H: Likewise.
+	* tests/chgrp/recurse: Likewise.
+
+2005-01-15  Jim Meyering  <jim@meyering.net>
+
+	* src/shred.c (isaac_seed) [HAVE_GETHRTIME]: #if-0 this block,
+	because just calling gethrtime evokes an `illegal instruction'
+	failure when compiled with Sun's c89 on Solaris 8 and 9.
+	Reported by Nelson Beebe.
+
+	* src/shred.c (isaac_seed) [HAVE_GETHRTIME]: Don't call ISAAC_SEED
+	twice with the same value of `t'.
+	Replace nested #if-#else blocks with #if-#elif-#elif chain.
+
+2005-01-14  Jim Meyering  <jim@meyering.net>
+
+	The test, tests/tail/f-1, failed on powerpc-apple-darwin7.7.0.
+	* src/tail.c (IS_TAILABLE_FILE_TYPE): Adjust definition also to include
+	sockets, since that's what you get when reading from a command-line-
+	supplied pipe on Darwin 7.7.
+	(IS_PIPE_LIKE_FILE_TYPE): Define.
+	(main): Use new IS_PIPE_LIKE_FILE_TYPE rather than simply S_ISFIFO.
+	Reported by Nelson Beebe.
+	This same change is also required on NetBSD/sparc-1.5.
+	Reported by Adrian Bunk.
+
+	* src/expr.c (toarith): Rewrite to detect/diagnose integer overflow,
+	rather than suffering silently.
+	Before, expr would silently overflow and wrap around:
+	  $ expr 9223372036854775808 = 0   # $(echo 2^63|bc)
+	  1
+	Now it detects the problem and exits nonzero:
+	  $ ./expr $(echo 2^63|bc) = 0
+	  ./expr: 9223372036854775808: integer is too large
+
+	* tests/chown/separator (id_gn): Exit 77, not 1, for a test-framework
+	failure, so that doesn't cause `make check' to stop.  Nelson Beebe
+	reported that this test would fail with the diagnostic,
+	`cannot find name for group ID 10', on one of his systems.
+
+2005-01-13  Jim Meyering  <jim@meyering.net>
+
+	* src/test.c (is_int): Don't overflow when evaluating integer
+	constants.  Before, ./test $(echo 2^64|bc) -eq 0 && echo FAIL
+	would print `FAIL'.
+
+	* tests/Fetish.pm (run_tests): Add code (if-0'd out) to detect
+	names of temporary files that would clash on 8.3 file systems.
+	* tests/mk-script (validate): Likewise.
+
+2005-01-12  Jim Meyering  <jim@meyering.net>
+
+	* tests/dd/skip-seek: Shorten test names to accommodate 8.3 systems.
+
+	* tests/tr/Test.pm (repeat-xC): Change test name from
+	`repeat-Compl', to avoid 8.3 conflict with `repeat-compl'.
+	Reported by Eric Blake.
+	(repeat-000): Rename to `repeat-zeros' for the same reason.
+
+2005-01-11  Jim Meyering  <jim@meyering.net>
+
+	* configure.ac: Update version to 5.3.1.
+
+2005-01-11  Eric Blake  <ebb9@byu.net>
+
+	* src/Makefile.am (check-README, check-AUTHORS): Account for $(EXEEXT).
+	* man/Makefile.am (all_programs): Account for $(EXEEXT).
+
+2005-01-11  Jim Meyering  <jim@meyering.net>
+
+	* src/unexpand.c (add_tab_stop): Properly diagnose a tabstop list
+	with decreasing values.
+
+	* src/expand.c (main): Likewise.
+	* src/unexpand.c (main): Check for overflow in tabstop values
+	specified via the obsolete form.  E.g., now this command fails:
+	_POSIX2_VERSION=1 ./unexpand -$(echo '2^64+1'|bc)
+	Before it would act like `_POSIX2_VERSION=1 ./unexpand -1'.
+	* tests/unexpand/basic-1 (obs-ovflo): New test for this.
+
+2005-01-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Respond to POSIX interpretations about pathchk -p dated 2005-01-06.
+	* NEWS: Document the changes.
+	* doc/coreutils.texi (pathchk invocation): Likewise.
+	* src/pathchk.c (PORTABILITY_OPTION): New constant.
+	(longopts, usage, main, validate_file_name):
+	Add support for new -P option.
+	Reject empty file names (unless -p is not specified and the
+	current system allows empty file names).
+	Change --portability so that is now equivalent to -p -P.
+	Don't test whether file name is too long, if it is known to exist.
+	(no_leading_hyphen): New function.
+	* tests/misc/pathchk1: Add tests for empty file names and
+	pathchk -P.
+
 2005-01-08  Jim Meyering  <jim@meyering.net>
 
 	* Version 5.3.0.

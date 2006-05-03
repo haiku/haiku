@@ -1,5 +1,5 @@
 /* remove.c -- core functions for removing files and directories
-   Copyright (C) 88, 90, 91, 1994-2004 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Extracted from rm.c and librarified, then rewritten by Jim Meyering.  */
 
@@ -32,10 +32,12 @@
 #include "file-type.h"
 #include "hash.h"
 #include "hash-pjw.h"
+#include "lstat.h"
 #include "obstack.h"
 #include "quote.h"
 #include "remove.h"
 #include "root-dev-ino.h"
+#include "unlinkdir.h"
 #include "yesno.h"
 
 /* Avoid shadowing warnings because these are functions declared
@@ -46,16 +48,19 @@
 #define obstack_chunk_alloc malloc
 #define obstack_chunk_free free
 
-/* FIXME: if possible, use autoconf...  */
-#ifdef __GLIBC__
-# define ROOT_CAN_UNLINK_DIRS 0
-#else
-# define ROOT_CAN_UNLINK_DIRS 1
-#endif
-
-#ifndef HAVE_WORKING_READDIR
-# define HAVE_WORKING_READDIR 0
-#endif
+/* This is the maximum number of consecutive readdir/unlink calls that
+   can be made (with no intervening rewinddir or closedir/opendir)
+   before triggering a bug that makes readdir return NULL even though
+   some directory entries have not been processed.  The bug afflicts
+   SunOS's readdir when applied to ufs file systems and Darwin 6.5's
+   (and OSX v.10.3.8's) HFS+.  This maximum is conservative in that
+   demonstrating the problem seems to require a directory containing
+   at least 254 deletable entries (which doesn't count . and ..), so
+   we could conceivably increase the maximum value to 254.  */
+enum
+  {
+    CONSECUTIVE_READDIR_UNLINK_THRESHOLD = 200
+  };
 
 enum Ternary
   {
@@ -73,13 +78,6 @@ enum Prompt_action
     PA_DESCEND_INTO_DIR = 2,
     PA_REMOVE_DIR
   };
-
-/* On systems with an lstat function that accepts the empty string,
-   arrange to make lstat calls go through the wrapper function.  */
-#if HAVE_LSTAT_EMPTY_STRING_BUG
-int rpl_lstat (const char *, struct stat *);
-# define lstat(Name, Stat_buf) rpl_lstat(Name, Stat_buf)
-#endif
 
 /* Initial capacity of per-directory hash table of entries that have
    been processed but not been deleted.  */
@@ -153,7 +151,7 @@ struct cwd_state
 };
 
 static Dirstack_state *
-ds_init ()
+ds_init (void)
 {
   Dirstack_state *ds = xmalloc (sizeof *ds);
   obstack_init (&ds->dir_stack);
@@ -227,7 +225,7 @@ pop_dir (Dirstack_state *ds)
   top_len = length[n_lengths - 1];
   assert (top_len >= 2);
 
-  /* Pop off the specified length of pathname.  */
+  /* Pop the specified length of file name.  */
   assert (obstack_object_size (&ds->dir_stack) >= top_len);
   obstack_blank (&ds->dir_stack, -top_len);
 
@@ -267,7 +265,7 @@ right_justify (char *dst, size_t dst_len, const char *src, size_t src_len,
   return dst_len - src_len;
 }
 
-/* Using the global directory name obstack, create the full path to FILENAME.
+/* Using the global directory name obstack, create the full name FILENAME.
    Return it in sometimes-realloc'd space that should not be freed by the
    caller.  Realloc as necessary.  If realloc fails, use a static buffer
    and put as long a suffix in that buffer as possible.  */
@@ -430,7 +428,7 @@ AD_pop_and_chdir (Dirstack_state *ds, char **prev_dir,
 /* Initialize *HT if it is NULL.
    Insert FILENAME into HT.  */
 static void
-AD_mark_helper (Hash_table **ht, char const *filename)
+AD_mark_helper (Hash_table **ht, char *filename)
 {
   if (*ht == NULL)
     {
@@ -458,7 +456,7 @@ static void
 AD_mark_current_as_unremovable (Dirstack_state *ds)
 {
   struct AD_ent *top = AD_stack_top (ds);
-  const char *curr = top_dir (ds);
+  char *curr = top_dir (ds);
 
   assert (1 < AD_stack_height (ds));
 
@@ -546,8 +544,8 @@ is_empty_dir (char const *dir)
   return saved_errno == 0 ? true : false;
 }
 
-/* Return true if FILE is not a symbolic link and it is not writable.
-   Also return true if FILE cannot be lstat'ed.  Otherwise, return false.
+/* Return true if FILE is determined to be an unwritable non-symlink.
+   Otherwise, return false (including when lstat'ing it fails).
    If lstat succeeds, set *BUF_P to BUF.
    This is to avoid calling euidaccess when FILE is a symlink.  */
 static bool
@@ -659,11 +657,30 @@ prompt (Dirstack_state const *ds, char const *filename,
   return RM_OK;
 }
 
+/* Return true if FILENAME is a directory (and not a symlink to a directory).
+   Otherwise, including the case in which lstat fails, return false.
+   Do not modify errno.  */
+static inline bool
+is_dir_lstat (char const *filename)
+{
+  struct stat sbuf;
+  int saved_errno = errno;
+  bool is_dir = lstat (filename, &sbuf) == 0 && S_ISDIR (sbuf.st_mode);
+  errno = saved_errno;
+  return is_dir;
+}
+
 #if HAVE_STRUCT_DIRENT_D_TYPE
-# define DT_IS_DIR(D) ((D)->d_type == DT_DIR)
+
+/* True if the type of the directory entry D is known.  */
+# define DT_IS_KNOWN(d) ((d)->d_type != DT_UNKNOWN)
+
+/* True if the type of the directory entry D must be T.  */
+# define DT_MUST_BE(d, t) ((d)->d_type == (t))
+
 #else
-/* Use this only if the member exists -- i.e., don't return 0.  */
-# define DT_IS_DIR(D) do_not_use_this_macro
+# define DT_IS_KNOWN(d) false
+# define DT_MUST_BE(d, t) false
 #endif
 
 #define DO_UNLINK(Filename, X)						\
@@ -716,107 +733,114 @@ remove_entry (Dirstack_state const *ds, char const *filename,
   if (s != RM_OK)
     return s;
 
-  /* Why bother with the following #if/#else block?  Because on systems with
+  /* Why bother with the following if/else block?  Because on systems with
      an unlink function that *can* unlink directories, we must determine the
-     type of each entry before removing it.  Otherwise, we'd risk unlinking an
-     entire directory tree simply by unlinking a single directory;  then all
-     the storage associated with that hierarchy would not be freed until the
-     next reboot.  Not nice.  To avoid that, on such slightly losing systems, we
-     need to call lstat to determine the type of each entry, and that represents
-     extra overhead that -- it turns out -- we can avoid on GNU-libc-based
-     systems, since there, unlink will never remove a directory.  */
+     type of each entry before removing it.  Otherwise, we'd risk unlinking
+     an entire directory tree simply by unlinking a single directory;  then
+     all the storage associated with that hierarchy would not be freed until
+     the next fsck.  Not nice.  To avoid that, on such slightly losing
+     systems, we need to call lstat to determine the type of each entry,
+     and that represents extra overhead that -- it turns out -- we can
+     avoid on non-losing systems, since there, unlink will never remove
+     a directory.  Also, on systems where unlink may unlink directories,
+     we're forced to allow a race condition: we lstat a non-directory, then
+     go to unlink it, but in the mean time, a malicious someone has replaced
+     it with a directory.  */
 
-#if ROOT_CAN_UNLINK_DIRS
-
-  /* If we don't already know whether FILENAME is a directory, find out now.
-     Then, if it's a non-directory, we can use unlink on it.  */
-  if (is_dir == T_UNKNOWN)
+  if (cannot_unlink_dir ())
     {
-# if HAVE_STRUCT_DIRENT_D_TYPE
-      if (dp && dp->d_type != DT_UNKNOWN)
-	is_dir = DT_IS_DIR (dp) ? T_YES : T_NO;
-      else
-# endif
+      if (is_dir == T_YES && ! x->recursive)
 	{
-	  struct stat sbuf;
-	  if (lstat (filename, &sbuf))
-	    {
-	      if (errno == ENOENT && x->ignore_missing_files)
-		return RM_OK;
-
-	      error (0, errno,
-		     _("cannot lstat %s"), quote (full_filename (filename)));
-	      return RM_ERROR;
-	    }
-
-	  is_dir = S_ISDIR (sbuf.st_mode) ? T_YES : T_NO;
+	  error (0, EISDIR, _("cannot remove directory %s"),
+		 quote (full_filename (filename)));
+	  return RM_ERROR;
 	}
-    }
 
-  if (is_dir == T_NO)
-    {
-      /* At this point, barring race conditions, FILENAME is known
-	 to be a non-directory, so it's ok to try to unlink it.  */
+      /* is_empty_directory is set iff it's ok to use rmdir.
+	 Note that it's set only in interactive mode -- in which case it's
+	 an optimization that arranges so that the user is asked just
+	 once whether to remove the directory.  */
+      if (is_empty_directory == T_YES)
+	DO_RMDIR (filename, x);
+
+      /* If we happen to know that FILENAME is a directory, return now
+	 and let the caller remove it -- this saves the overhead of a failed
+	 unlink call.  If FILENAME is a command-line argument, then dp is NULL,
+	 so we'll first try to unlink it.  Using unlink here is ok, because it
+	 cannot remove a directory.  */
+      if ((dp && DT_MUST_BE (dp, DT_DIR)) || is_dir == T_YES)
+	return RM_NONEMPTY_DIR;
+
       DO_UNLINK (filename, x);
 
-      /* unlink failed with some other error code.  report it.  */
-      error (0, errno, _("cannot remove %s"),
-	     quote (full_filename (filename)));
-      return RM_ERROR;
-    }
+      /* Upon a failed attempt to unlink a directory, most non-Linux systems
+	 set errno to the POSIX-required value EPERM.  In that case, change
+	 errno to EISDIR so that we emit a better diagnostic.  */
+      if (! x->recursive && errno == EPERM && is_dir_lstat (filename))
+	errno = EISDIR;
 
-  if (! x->recursive)
+      if (! x->recursive
+	  || errno == ENOENT || errno == ENOTDIR
+	  || errno == ELOOP || errno == ENAMETOOLONG)
+	{
+	  /* Either --recursive is not in effect, or the file cannot be a
+	     directory.  Report the unlink problem and fail.  */
+	  error (0, errno, _("cannot remove %s"),
+		 quote (full_filename (filename)));
+	  return RM_ERROR;
+	}
+    }
+  else
     {
-      error (0, EISDIR, _("cannot remove directory %s"),
-	     quote (full_filename (filename)));
-      return RM_ERROR;
+      /* If we don't already know whether FILENAME is a directory, find out now.
+	 Then, if it's a non-directory, we can use unlink on it.  */
+      if (is_dir == T_UNKNOWN)
+	{
+	  if (dp && DT_IS_KNOWN (dp))
+	    is_dir = DT_MUST_BE (dp, DT_DIR) ? T_YES : T_NO;
+	  else
+	    {
+	      struct stat sbuf;
+	      if (lstat (filename, &sbuf))
+		{
+		  if (errno == ENOENT && x->ignore_missing_files)
+		    return RM_OK;
+
+		  error (0, errno, _("cannot lstat %s"),
+			 quote (full_filename (filename)));
+		  return RM_ERROR;
+		}
+
+	      is_dir = S_ISDIR (sbuf.st_mode) ? T_YES : T_NO;
+	    }
+	}
+
+      if (is_dir == T_NO)
+	{
+	  /* At this point, barring race conditions, FILENAME is known
+	     to be a non-directory, so it's ok to try to unlink it.  */
+	  DO_UNLINK (filename, x);
+
+	  /* unlink failed with some other error code.  report it.  */
+	  error (0, errno, _("cannot remove %s"),
+		 quote (full_filename (filename)));
+	  return RM_ERROR;
+	}
+
+      if (! x->recursive)
+	{
+	  error (0, EISDIR, _("cannot remove directory %s"),
+		 quote (full_filename (filename)));
+	  return RM_ERROR;
+	}
+
+      if (is_empty_directory == T_YES)
+	{
+	  DO_RMDIR (filename, x);
+	  /* Don't diagnose any failure here.
+	     It'll be detected when the caller tries another way.  */
+	}
     }
-
-  if (is_empty_directory == T_YES)
-    {
-      DO_RMDIR (filename, x);
-      /* Don't diagnose any failure here.
-	 It'll be detected when the caller tries another way.  */
-    }
-
-
-#else /* ! ROOT_CAN_UNLINK_DIRS */
-
-  if (is_dir == T_YES && ! x->recursive)
-    {
-      error (0, EISDIR, _("cannot remove directory %s"),
-	     quote (full_filename (filename)));
-      return RM_ERROR;
-    }
-
-  /* is_empty_directory is set iff it's ok to use rmdir.
-     Note that it's set only in interactive mode -- in which case it's
-     an optimization that arranges so that the user is asked just
-     once whether to remove the directory.  */
-  if (is_empty_directory == T_YES)
-    DO_RMDIR (filename, x);
-
-  /* If we happen to know that FILENAME is a directory, return now
-     and let the caller remove it -- this saves the overhead of a failed
-     unlink call.  If FILENAME is a command-line argument, then dp is NULL,
-     so we'll first try to unlink it.  Using unlink here is ok, because it
-     cannot remove a directory.  */
-  if ((dp && DT_IS_DIR (dp)) || is_dir == T_YES)
-    return RM_NONEMPTY_DIR;
-
-  DO_UNLINK (filename, x);
-
-  if (! x->recursive
-      || errno == ENOENT || errno == ENOTDIR
-      || errno == ELOOP || errno == ENAMETOOLONG)
-    {
-      /* Either --recursive is not in effect, or the file cannot be a
-	 directory.  Report the unlink problem and fail.  */
-      error (0, errno, _("cannot remove %s"),
-	     quote (full_filename (filename)));
-      return RM_ERROR;
-    }
-#endif
 
   return RM_NONEMPTY_DIR;
 }
@@ -838,7 +862,7 @@ remove_cwd_entries (Dirstack_state *ds, char **subdir, struct stat *subdir_sb,
   DIR *dirp = opendir (".");
   struct AD_ent *top = AD_stack_top (ds);
   enum RM_status status = top->status;
-  bool need_rewinddir = false;
+  size_t n_unlinked_since_opendir_or_last_rewind = 0;
 
   assert (VALID_STATUS (status));
   *subdir = NULL;
@@ -862,7 +886,8 @@ remove_cwd_entries (Dirstack_state *ds, char **subdir, struct stat *subdir_sb,
       /* Set errno to zero so we can distinguish between a readdir failure
 	 and when readdir simply finds that there are no more entries.  */
       errno = 0;
-      if ((dp = readdir_ignoring_dot_and_dotdot (dirp)) == NULL)
+      dp = readdir_ignoring_dot_and_dotdot (dirp);
+      if (dp == NULL)
 	{
 	  if (errno)
 	    {
@@ -874,12 +899,14 @@ remove_cwd_entries (Dirstack_state *ds, char **subdir, struct stat *subdir_sb,
 	      /* Arrange to give a diagnostic after exiting this loop.  */
 	      dirp = NULL;
 	    }
-	  else if (need_rewinddir)
+	  else if (CONSECUTIVE_READDIR_UNLINK_THRESHOLD
+		   < n_unlinked_since_opendir_or_last_rewind)
 	    {
-	      /* On buggy systems, call rewinddir if we've called unlink
-		 or rmdir since the opendir or a previous rewinddir.  */
+	      /* Call rewinddir if we've called unlink or rmdir so many times
+		 (since the opendir or the previous rewinddir) that this
+		 NULL-return may be the symptom of a buggy readdir.  */
 	      rewinddir (dirp);
-	      need_rewinddir = false;
+	      n_unlinked_since_opendir_or_last_rewind = 0;
 	      continue;
 	    }
 	  break;
@@ -899,9 +926,11 @@ remove_cwd_entries (Dirstack_state *ds, char **subdir, struct stat *subdir_sb,
       switch (tmp_status)
 	{
 	case RM_OK:
-	  /* On buggy systems, record the fact that we've just
-	     removed a directory entry.  */
-	  need_rewinddir = ! HAVE_WORKING_READDIR;
+	  /* Count how many files we've unlinked since the initial
+	     opendir or the last rewinddir.  On buggy systems, if you
+	     remove too many, readdir returns NULL even though there
+	     remain unprocessed directory entries.  */
+	  ++n_unlinked_since_opendir_or_last_rewind;
 	  break;
 
 	case RM_ERROR:
@@ -929,7 +958,7 @@ remove_cwd_entries (Dirstack_state *ds, char **subdir, struct stat *subdir_sb,
 		/* It is much more common that we reach this point for an
 		   inaccessible directory.  Hence the second diagnostic, below.
 		   However it is also possible that F is a non-directory.
-		   That can happen when we use the `! ROOT_CAN_UNLINK_DIRS'
+		   That can happen when we use the `! UNLINK_CAN_UNLINK_DIRS'
 		   block of code and when DO_UNLINK fails due to EPERM.
 		   In that case, give a better diagnostic.  */
 		if (errno == ENOTDIR)
@@ -1074,7 +1103,7 @@ remove_dir (Dirstack_state *ds, char const *dir, struct cwd_state **cwd_state,
   if (ROOT_DEV_INO_CHECK (x->root_dev_ino, &dir_sb))
     {
       ROOT_DEV_INO_WARN (full_filename (dir));
-      return 1;
+      return RM_ERROR;
     }
 
   AD_push (ds, dir, &dir_sb);

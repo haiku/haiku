@@ -1,5 +1,5 @@
 /* xnanosleep.c -- a more convenient interface to nanosleep
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,12 +13,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Mostly written (for sleep.c) by Paul Eggert.
    Factored out (creating this file) by Jim Meyering.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -32,56 +32,12 @@
 #include <sys/types.h>
 #include <time.h>
 
-/* The extra casts work around common compiler bugs.  */
-#define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-/* The outer cast is needed to work around a bug in Cray C 5.0.3.0.
-   It is necessary at least when t == time_t.  */
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
+#include "intprops.h"
+#include "timespec.h"
 
 #ifndef TIME_T_MAX
 # define TIME_T_MAX TYPE_MAXIMUM (time_t)
 #endif
-
-#include "timespec.h"
-#include "xalloc.h"
-
-/* Subtract the `struct timespec' values X and Y by computing X - Y.
-   If the difference is negative or zero, return false.
-   Otherwise, return true and store the difference in DIFF.
-   X and Y must have valid ts_nsec values, in the range 0 to 999999999.
-   If the difference would overflow, store the maximum possible difference.  */
-
-static bool
-timespec_subtract (struct timespec *diff,
-		   struct timespec const *x, struct timespec const *y)
-{
-  time_t sec = x->tv_sec - y->tv_sec;
-  long int nsec = x->tv_nsec - y->tv_nsec;
-
-  if (x->tv_sec < y->tv_sec)
-    return false;
-
-  if (sec < 0)
-    {
-      /* The difference has overflowed.  */
-      sec = TIME_T_MAX;
-      nsec = 999999999;
-    }
-  else if (sec == 0 && nsec <= 0)
-    return false;
-
-  if (nsec < 0)
-    {
-      sec--;
-      nsec += 1000000000;
-    }
-
-  diff->tv_sec = sec;
-  diff->tv_nsec = nsec;
-  return true;
-}
 
 /* Sleep until the time (call it WAKE_UP_TIME) specified as
    SECONDS seconds after the time this function is called.
@@ -93,22 +49,19 @@ timespec_subtract (struct timespec *diff,
 int
 xnanosleep (double seconds)
 {
-  bool overflow;
+  enum { BILLION = 1000000000 };
+
+  bool overflow = false;
   double ns;
-  struct timespec ts_start;
   struct timespec ts_sleep;
-  struct timespec ts_stop;
 
   assert (0 <= seconds);
-
-  if (gettime (&ts_start) != 0)
-    return -1;
 
   /* Separate whole seconds from nanoseconds.
      Be careful to detect any overflow.  */
   ts_sleep.tv_sec = seconds;
-  ns = 1e9 * (seconds - ts_sleep.tv_sec);
-  overflow = ! (ts_sleep.tv_sec <= seconds && 0 <= ns && ns <= 1e9);
+  ns = BILLION * (seconds - ts_sleep.tv_sec);
+  overflow |= ! (ts_sleep.tv_sec <= seconds && 0 <= ns && ns <= BILLION);
   ts_sleep.tv_nsec = ns;
 
   /* Round up to the next whole number, if necessary, so that we
@@ -119,7 +72,7 @@ xnanosleep (double seconds)
   ts_sleep.tv_nsec += (ts_sleep.tv_nsec < ns);
 
   /* Normalize the interval length.  nanosleep requires this.  */
-  if (1000000000 <= ts_sleep.tv_nsec)
+  if (BILLION <= ts_sleep.tv_nsec)
     {
       time_t t = ts_sleep.tv_sec + 1;
 
@@ -127,45 +80,28 @@ xnanosleep (double seconds)
       overflow |= (t < ts_sleep.tv_sec);
 
       ts_sleep.tv_sec = t;
-      ts_sleep.tv_nsec -= 1000000000;
+      ts_sleep.tv_nsec -= BILLION;
     }
 
-  /* Compute the time until which we should sleep.  */
-  ts_stop.tv_sec = ts_start.tv_sec + ts_sleep.tv_sec;
-  ts_stop.tv_nsec = ts_start.tv_nsec + ts_sleep.tv_nsec;
-  if (1000000000 <= ts_stop.tv_nsec)
+  for (;;)
     {
-      ++ts_stop.tv_sec;
-      ts_stop.tv_nsec -= 1000000000;
-    }
+      if (overflow)
+	{
+	  ts_sleep.tv_sec = TIME_T_MAX;
+	  ts_sleep.tv_nsec = BILLION - 1;
+	}
 
-  /* Detect integer overflow.  */
-  overflow |= (ts_stop.tv_sec < ts_start.tv_sec
-	       || (ts_stop.tv_sec == ts_start.tv_sec
-		   && ts_stop.tv_nsec < ts_start.tv_nsec));
-
-  if (overflow)
-    {
-      /* Fix ts_sleep and ts_stop, which may be garbage due to overflow.  */
-      ts_sleep.tv_sec = ts_stop.tv_sec = TIME_T_MAX;
-      ts_sleep.tv_nsec = ts_stop.tv_nsec = 999999999;
-    }
-
-  while (nanosleep (&ts_sleep, NULL) != 0)
-    {
-      if (errno != EINTR || gettime (&ts_start) != 0)
-	return -1;
-
-      /* POSIX.1-2001 requires that when a process is suspended, then
-	 resumed, nanosleep (A, B) returns -1, sets errno to EINTR,
-	 and sets *B to the time remaining at the point of resumption.
-	 However, some versions of the Linux kernel incorrectly return
-	 the time remaining at the point of suspension.  Work around
-	 this bug by computing the remaining time here, rather than by
-	 relying on nanosleep's computation.  */
-
-      if (! timespec_subtract (&ts_sleep, &ts_stop, &ts_start))
+      /* Linux-2.6.8.1's nanosleep returns -1, but doesn't set errno
+	 when resumed after being suspended.  Earlier versions would
+	 set errno to EINTR.  nanosleep from linux-2.6.10, as well as
+	 implementations by (all?) other vendors, doesn't return -1
+	 in that case;  either it continues sleeping (if time remains)
+	 or it returns zero (if the wake-up time has passed).  */
+      errno = 0;
+      if (nanosleep (&ts_sleep, NULL) == 0)
 	break;
+      if (errno != EINTR && errno != 0)
+	return -1;
     }
 
   return 0;

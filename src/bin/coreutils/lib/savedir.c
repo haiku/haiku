@@ -1,6 +1,6 @@
 /* savedir.c -- save the list of files in a directory in a string
 
-   Copyright 1990, 1997, 1998, 1999, 2000, 2001, 2003, 2004 Free
+   Copyright 1990, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,11 +15,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>. */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -57,7 +57,7 @@
 
 #include "xalloc.h"
 
-/* Return a freshly allocated string containing the filenames
+/* Return a freshly allocated string containing the file names
    in directory DIR, separated by '\0' characters;
    the end is marked by two '\0' characters in a row.
    Return NULL (setting errno) if DIR cannot be opened, read, or closed.  */
@@ -70,7 +70,6 @@ char *
 savedir (const char *dir)
 {
   DIR *dirp;
-  struct dirent *dp;
   char *name_space;
   size_t allocated = NAME_SIZE_DEFAULT;
   size_t used = 0;
@@ -82,12 +81,19 @@ savedir (const char *dir)
 
   name_space = xmalloc (allocated);
 
-  errno = 0;
-  while ((dp = readdir (dirp)) != NULL)
+  for (;;)
     {
+      struct dirent const *dp;
+      char const *entry;
+
+      errno = 0;
+      dp = readdir (dirp);
+      if (! dp)
+	break;
+
       /* Skip "", ".", and "..".  "" is returned by at least one buggy
          implementation: Solaris 2.4 readdir on NFS file systems.  */
-      char const *entry = dp->d_name;
+      entry = dp->d_name;
       if (entry[entry[0] != '.' ? 0 : entry[1] != '.' ? 1 : 2] != '\0')
 	{
 	  size_t entry_size = strlen (entry) + 1;

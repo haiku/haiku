@@ -1,5 +1,5 @@
 /* mv -- move or rename files
-   Copyright (C) 86, 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Mike Parker, David MacKenzie, and Jim Meyering */
 
@@ -30,7 +30,7 @@
 #include "cp-hash.h"
 #include "dirname.h"
 #include "error.h"
-#include "path-concat.h"
+#include "filenamecat.h"
 #include "quote.h"
 #include "remove.h"
 
@@ -62,7 +62,7 @@ static bool remove_trailing_slashes;
 /* Valid arguments to the `--reply' option. */
 static char const* const reply_args[] =
 {
-  "yes", "no", "query", 0
+  "yes", "no", "query", NULL
 };
 
 /* The values that correspond to the above strings. */
@@ -77,13 +77,13 @@ static struct option const long_options[] =
   {"force", no_argument, NULL, 'f'},
   {"interactive", no_argument, NULL, 'i'},
   {"no-target-directory", no_argument, NULL, 'T'},
-  {"reply", required_argument, NULL, REPLY_OPTION},
+  {"reply", required_argument, NULL, REPLY_OPTION}, /* Deprecated 2005-07-03,
+						       remove in 2008. */
   {"strip-trailing-slashes", no_argument, NULL, STRIP_TRAILING_SLASHES_OPTION},
   {"suffix", required_argument, NULL, 'S'},
   {"target-directory", required_argument, NULL, 't'},
   {"update", no_argument, NULL, 'u'},
   {"verbose", no_argument, NULL, 'v'},
-  {"version-control", required_argument, NULL, 'V'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -121,7 +121,7 @@ cp_option_init (struct cp_options *x)
   x->hard_link = false;
   x->interactive = I_UNSPECIFIED;
   x->move_mode = true;
-  x->myeuid = geteuid ();
+  x->chown_privileges = chown_privileges ();
   x->one_file_system = false;
   x->preserve_ownership = true;
   x->preserve_links = true;
@@ -275,7 +275,7 @@ movefile (char *source, char *dest, bool dest_is_dir,
     {
       /* Treat DEST as a directory; build the full filename.  */
       char const *src_basename = base_name (source);
-      char *new_dest = path_concat (dest, src_basename, NULL);
+      char *new_dest = file_name_concat (dest, src_basename, NULL);
       strip_trailing_slashes (new_dest);
       ok = do_move (source, new_dest, x);
       free (new_dest);
@@ -313,13 +313,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       --backup[=CONTROL]       make a backup of each existing destination file\n\
   -b                           like --backup but does not accept an argument\n\
   -f, --force                  do not prompt before overwriting\n\
-                                 (equivalent to --reply=yes)\n\
   -i, --interactive            prompt before overwrite\n\
-                                 (equivalent to --reply=query)\n\
 "), stdout);
       fputs (_("\
-      --reply={yes,no,query}   specify how to handle the prompt about an\n\
-                                 existing destination file\n\
       --strip-trailing-slashes remove any trailing slashes from each SOURCE\n\
                                  argument\n\
   -S, --suffix=SUFFIX          override the usual backup suffix\n\
@@ -380,18 +376,11 @@ main (int argc, char **argv)
      we'll actually use backup_suffix_string.  */
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
-  while ((c = getopt_long (argc, argv, "bfit:uvS:TV:", long_options, NULL))
+  while ((c = getopt_long (argc, argv, "bfit:uvS:T", long_options, NULL))
 	 != -1)
     {
       switch (c)
 	{
-	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
-	  error (0, 0,
-		 _("warning: --version-control (-V) is obsolete;  support for\
- it\nwill be removed in some future release.  Use --backup=%s instead."
-		   ), optarg);
-	  /* Fall through.  */
-
 	case 'b':
 	  make_backups = true;
 	  if (optarg)
@@ -403,9 +392,11 @@ main (int argc, char **argv)
 	case 'i':
 	  x.interactive = I_ASK_USER;
 	  break;
-	case REPLY_OPTION:
+	case REPLY_OPTION: /* Deprecated */
 	  x.interactive = XARGMATCH ("--reply", optarg,
 				     reply_args, reply_vals);
+	  error (0, 0,
+		 _("the --reply option is deprecated; use -i or -f instead"));
 	  break;
 	case STRIP_TRAILING_SLASHES_OPTION:
 	  remove_trailing_slashes = true;

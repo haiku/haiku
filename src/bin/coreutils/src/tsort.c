@@ -1,5 +1,5 @@
 /* tsort - topological sort.
-   Copyright (C) 1998-2004 Free Software Foundation, Inc.
+   Copyright (C) 1998-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Mark Kettenis <kettenis@phys.uva.nl>.  */
 
@@ -62,9 +62,6 @@ struct item
 
 /* The name this program was run with. */
 char *program_name;
-
-/* True if any of the input files are the standard input. */
-static bool have_read_stdin;
 
 /* The head of the sorted list.  */
 static struct item *head = NULL;
@@ -442,30 +439,21 @@ tsort (const char *file)
   struct item *root;
   struct item *j = NULL;
   struct item *k = NULL;
-  register FILE *fp;
   token_buffer tokenbuffer;
+  bool is_stdin = STREQ (file, "-");
 
   /* Intialize the head of the tree will hold the strings we're sorting.  */
   root = new_item (NULL);
 
-  if (STREQ (file, "-"))
-    {
-      fp = stdin;
-      have_read_stdin = true;
-    }
-  else
-    {
-      fp = fopen (file, "r");
-      if (fp == NULL)
-	error (EXIT_FAILURE, errno, "%s", file);
-    }
+  if (!is_stdin && ! freopen (file, "r", stdin))
+    error (EXIT_FAILURE, errno, "%s", file);
 
   init_tokenbuffer (&tokenbuffer);
 
   while (1)
     {
       /* T2. Next Relation.  */
-      size_t len = readtoken (fp, DELIM, sizeof (DELIM) - 1, &tokenbuffer);
+      size_t len = readtoken (stdin, DELIM, sizeof (DELIM) - 1, &tokenbuffer);
       if (len == (size_t) -1)
 	break;
 
@@ -534,6 +522,10 @@ tsort (const char *file)
 	}
     }
 
+  if (fclose (stdin) != 0)
+    error (EXIT_FAILURE, errno, "%s",
+	   is_stdin ? _("standard input") : quote (file));
+
   return ok;
 }
 
@@ -555,8 +547,6 @@ main (int argc, char **argv)
   if (getopt_long (argc, argv, "", NULL, NULL) != -1)
     usage (EXIT_FAILURE);
 
-  have_read_stdin = false;
-
   if (1 < argc - optind)
     {
       error (0, 0, _("extra operand %s"), quote (argv[optind + 1]));
@@ -564,9 +554,6 @@ main (int argc, char **argv)
     }
 
   ok = tsort (optind == argc ? "-" : argv[optind]);
-
-  if (have_read_stdin && fclose (stdin) == EOF)
-    error (EXIT_FAILURE, errno, _("standard input"));
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

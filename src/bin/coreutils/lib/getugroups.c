@@ -1,6 +1,6 @@
 /* getugroups.c -- return a list of the groups a user is in
 
-   Copyright (C) 1990, 1991, 1998, 1999, 2000, 2003, 2004 Free
+   Copyright (C) 1990, 1991, 1998, 1999, 2000, 2003, 2004, 2005 Free
    Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie. */
 
@@ -27,9 +27,7 @@
 #include <stdio.h> /* grp.h on alpha OSF1 V2.0 uses "FILE *". */
 #include <grp.h>
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include <errno.h>
 #ifndef EOVERFLOW

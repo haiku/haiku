@@ -1,5 +1,5 @@
-/* nohup -- run a command immume to hangups, with output to a non-tty
-   Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+/* nohup -- run a command immune to hangups, with output to a non-tty
+   Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering  */
 
@@ -25,11 +25,13 @@
 
 #include "system.h"
 
-#include "error.h"
-#include "long-options.h"
-#include "path-concat.h"
-#include "quote.h"
 #include "cloexec.h"
+#include "error.h"
+#include "filenamecat.h"
+#include "fd-reopen.h"
+#include "long-options.h"
+#include "quote.h"
+#include "unistd--.h"
 
 #define PROGRAM_NAME "nohup"
 
@@ -64,6 +66,7 @@ Run COMMAND, ignoring hangup signals.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
@@ -72,9 +75,7 @@ Run COMMAND, ignoring hangup signals.\n\
 int
 main (int argc, char **argv)
 {
-  int fd;
-  int saved_stderr_fd = -1;
-  bool stderr_isatty;
+  int saved_stderr_fd = STDERR_FILENO;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -88,13 +89,19 @@ main (int argc, char **argv)
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
 		      usage, AUTHORS, (char const *) NULL);
   if (getopt_long (argc, argv, "+", NULL, NULL) != -1)
-    usage (EXIT_FAILURE);
+    usage (NOHUP_FAILURE);
 
   if (argc <= optind)
     {
       error (0, 0, _("missing operand"));
       usage (NOHUP_FAILURE);
     }
+
+  /* If standard input is a tty, replace it with /dev/null.
+     Note that it is deliberately opened for *writing*,
+     to ensure any read evokes an error.  */
+  if (isatty (STDIN_FILENO))
+    fd_reopen (STDIN_FILENO, "/dev/null", O_WRONLY, 0);
 
   /* If standard output is a tty, redirect it (appending) to a file.
      First try nohup.out, then $HOME/nohup.out.  */
@@ -104,18 +111,19 @@ main (int argc, char **argv)
       char const *file = "nohup.out";
       int flags = O_CREAT | O_WRONLY | O_APPEND;
       mode_t mode = S_IRUSR | S_IWUSR;
+      mode_t umask_value = umask (~mode);
+      int fd = fd_reopen (STDOUT_FILENO, file, flags, mode);
 
-      fd = open (file, flags, mode);
-      if (fd == -1)
+      if (fd < 0)
 	{
 	  int saved_errno = errno;
 	  char const *home = getenv ("HOME");
 	  if (home)
 	    {
-	      in_home = path_concat (home, file, NULL);
-	      fd = open (in_home, flags, mode);
+	      in_home = file_name_concat (home, file, NULL);
+	      fd = fd_reopen (STDOUT_FILENO, in_home, flags, mode);
 	    }
-	  if (fd == -1)
+	  if (fd < 0)
 	    {
 	      int saved_errno2 = errno;
 	      error (0, saved_errno, _("failed to open %s"), quote (file));
@@ -127,21 +135,13 @@ main (int argc, char **argv)
 	  file = in_home;
 	}
 
-      /* Redirect standard output to the file.  */
-      if (dup2 (fd, STDOUT_FILENO) == -1)
-	error (NOHUP_FAILURE, errno, _("failed to redirect standard output"));
-
+      umask (umask_value);
       error (0, 0, _("appending output to %s"), quote (file));
-      if (in_home)
-	free (in_home);
-    }
-  else
-    {
-      fd = STDOUT_FILENO;
+      free (in_home);
     }
 
-  /* If stderr is on a tty, redirect it to stdout.  */
-  if ((stderr_isatty = isatty (STDERR_FILENO)))
+  /* If standard error is a tty, redirect it to stdout.  */
+  if (isatty (STDERR_FILENO))
     {
       /* Save a copy of stderr before redirecting, so we can use the original
 	 if execve fails.  It's no big deal if this dup fails.  It might
@@ -149,13 +149,18 @@ main (int argc, char **argv)
 	 the post-failed-execve diagnostic.  */
       saved_stderr_fd = dup (STDERR_FILENO);
 
-      if (saved_stderr_fd != -1
+      if (0 <= saved_stderr_fd
 	  && set_cloexec_flag (saved_stderr_fd, true) != 0)
 	error (NOHUP_FAILURE, errno,
 	       _("failed to set the copy of stderr to close on exec"));
 
-      if (dup2 (fd, STDERR_FILENO) == -1)
-	error (NOHUP_FAILURE, errno, _("failed to redirect standard error"));
+      if (dup2 (STDOUT_FILENO, STDERR_FILENO) < 0)
+	{
+	  if (errno != EBADF)
+	    error (NOHUP_FAILURE, errno,
+		   _("failed to redirect standard error"));
+	  close (STDERR_FILENO);
+	}
     }
 
   signal (SIGHUP, SIG_IGN);
@@ -171,13 +176,11 @@ main (int argc, char **argv)
 
     /* The execve failed.  Output a diagnostic to stderr only if:
        - stderr was initially redirected to a non-tty, or
-       - stderr was initially directed to a tty, and we've
-	 just dup2'd it to point back to that same tty.
-       In other words, output the diagnostic if possible, but not if
-       it'd go to nohup.out.  */
-    if ( ! stderr_isatty
-	|| (saved_stderr_fd != -1
-	    && dup2 (saved_stderr_fd, STDERR_FILENO) != -1))
+       - stderr was initially directed to a tty, and we
+	 can dup2 it to point back to that same tty.
+       In other words, output the diagnostic if possible, but only if
+       it will go to the original stderr.  */
+    if (dup2 (saved_stderr_fd, STDERR_FILENO) == STDERR_FILENO)
       error (0, saved_errno, _("cannot run command %s"), quote (*cmd));
 
     exit (exit_status);

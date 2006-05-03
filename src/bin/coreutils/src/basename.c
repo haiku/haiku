@@ -1,5 +1,5 @@
-/* basename -- strip directory and suffix from filenames
-   Copyright (C) 1990-1997, 1999-2004 Free Software Foundation, Inc.
+/* basename -- strip directory and suffix from file names
+   Copyright (C) 1990-1997, 1999-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,10 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Usage: basename name [suffix]
-   NAME is a pathname; SUFFIX is a suffix to strip from it.
+   NAME is a file name; SUFFIX is a suffix to strip from it.
 
    basename /usr/foo/lossage/functions.l
    => functions.l
@@ -64,6 +64,13 @@ If specified, also remove a trailing SUFFIX.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      printf (_("\
+\n\
+Examples:\n\
+  %s /usr/bin/sort       Output \"sort\".\n\
+  %s include/stdio.h .h  Output \"stdio\".\n\
+"),
+	      program_name, program_name);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);

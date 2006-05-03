@@ -1,5 +1,5 @@
 /* split.c -- split a file into pieces.
-   Copyright (C) 88, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 88, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* By tege@sics.se, with rms.
 
@@ -30,11 +30,12 @@
 #include "system.h"
 #include "dirname.h"
 #include "error.h"
+#include "fd-reopen.h"
+#include "fcntl--.h"
 #include "getpagesize.h"
 #include "full-read.h"
 #include "full-write.h"
 #include "inttostr.h"
-#include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
 #include "xstrtol.h"
@@ -67,9 +68,6 @@ static char const *suffix_alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 /* Name of input file.  May be "-".  */
 static char *infile;
-
-/* Descriptor on which input file is open.  */
-static int input_desc;
 
 /* Descriptor on which output file is open.  */
 static int output_desc;
@@ -211,9 +209,11 @@ cwrite (bool new_file_flag, const char *bp, size_t bytes)
 
       next_file_name ();
       if (verbose)
-	fprintf (stderr, _("creating file `%s'\n"), outfile);
+	fprintf (stderr, _("creating file %s\n"), quote (outfile));
       output_desc = open (outfile,
-			  O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+			  O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
+			  (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
+			   | S_IROTH | S_IWOTH));
       if (output_desc < 0)
 	error (EXIT_FAILURE, errno, "%s", outfile);
     }
@@ -235,7 +235,7 @@ bytes_split (uintmax_t n_bytes, char *buf, size_t bufsize)
 
   do
     {
-      n_read = full_read (input_desc, buf, bufsize);
+      n_read = full_read (STDIN_FILENO, buf, bufsize);
       if (n_read == SAFE_READ_ERROR)
         error (EXIT_FAILURE, errno, "%s", infile);
       bp_out = buf;
@@ -279,7 +279,7 @@ lines_split (uintmax_t n_lines, char *buf, size_t bufsize)
 
   do
     {
-      n_read = full_read (input_desc, buf, bufsize);
+      n_read = full_read (STDIN_FILENO, buf, bufsize);
       if (n_read == SAFE_READ_ERROR)
 	error (EXIT_FAILURE, errno, "%s", infile);
       bp = bp_out = buf;
@@ -331,7 +331,7 @@ line_bytes_split (size_t n_bytes)
     {
       /* Fill up the full buffer size from the input file.  */
 
-      n_read = full_read (input_desc, buf + n_buffered, n_bytes - n_buffered);
+      n_read = full_read (STDIN_FILENO, buf + n_buffered, n_bytes - n_buffered);
       if (n_read == SAFE_READ_ERROR)
 	error (EXIT_FAILURE, errno, "%s", infile);
 
@@ -481,15 +481,13 @@ main (int argc, char **argv)
 	  if (digits_optind != 0 && digits_optind != this_optind)
 	    n_units = 0;	/* More than one number given; ignore other. */
 	  digits_optind = this_optind;
-	  if (UINTMAX_MAX / 10 < n_units
-	      || n_units * 10 + c - '0' < n_units * 10)
+	  if (!DECIMAL_DIGIT_ACCUMULATE (n_units, c - '0', uintmax_t))
 	    {
 	      char buffer[INT_BUFSIZE_BOUND (uintmax_t)];
 	      error (EXIT_FAILURE, 0,
 		     _("line count option -%s%c... is too large"),
 		     umaxtostr (n_units, buffer), c);
 	    }
-	  n_units = n_units * 10 + c - '0';
 	  break;
 
 	case 'd':
@@ -509,14 +507,6 @@ main (int argc, char **argv)
 	}
     }
 
-  if (digits_optind && 200112 <= posix2_version ())
-    {
-      char buffer[INT_BUFSIZE_BOUND (uintmax_t)];
-      char const *a = umaxtostr (n_units, buffer);
-      error (0, 0, _("`-%s' option is obsolete; use `-l %s'"), a, a);
-      usage (EXIT_FAILURE);
-    }
-
   /* Handle default case.  */
   if (split_type == type_undef)
     {
@@ -526,8 +516,6 @@ main (int argc, char **argv)
 
   if (n_units == 0)
     {
-      /* FIXME: be sure to remove this block when removing
-	 support for obsolete options like `-10'.  */
       error (0, 0, _("invalid number of lines: 0"));
       usage (EXIT_FAILURE);
     }
@@ -547,23 +535,21 @@ main (int argc, char **argv)
     }
 
   /* Open the input file.  */
-  if (STREQ (infile, "-"))
-    input_desc = STDIN_FILENO;
-  else
-    {
-      input_desc = open (infile, O_RDONLY);
-      if (input_desc < 0)
-	error (EXIT_FAILURE, errno, "%s", infile);
-    }
+  if (! STREQ (infile, "-")
+      && fd_reopen (STDIN_FILENO, infile, O_RDONLY, 0) < 0)
+    error (EXIT_FAILURE, errno, _("cannot open %s for reading"),
+	   quote (infile));
+
   /* Binary I/O is safer when bytecounts are used.  */
-  SET_BINARY (input_desc);
+  if (O_BINARY && ! isatty (STDIN_FILENO))
+    freopen (NULL, "rb", stdin);
 
   /* No output file is open now.  */
   output_desc = -1;
 
   /* Get the optimal block size of input device and make a buffer.  */
 
-  if (fstat (input_desc, &stat_buf) < 0)
+  if (fstat (STDIN_FILENO, &stat_buf) != 0)
     error (EXIT_FAILURE, errno, "%s", infile);
   in_blk_size = ST_BLKSIZE (stat_buf);
 
@@ -588,7 +574,7 @@ main (int argc, char **argv)
       abort ();
     }
 
-  if (close (input_desc) < 0)
+  if (close (STDIN_FILENO) != 0)
     error (EXIT_FAILURE, errno, "%s", infile);
   if (output_desc >= 0 && close (output_desc) < 0)
     error (EXIT_FAILURE, errno, "%s", outfile);

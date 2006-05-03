@@ -1,6 +1,6 @@
 /* utimecmp.c -- compare file time stamps
 
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,11 +14,11 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -35,6 +35,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "hash.h"
+#include "intprops.h"
+#include "stat-time.h"
 #include "timespec.h"
 #include "utimens.h"
 #include "xalloc.h"
@@ -50,20 +52,17 @@
 # define SIZE_MAX ((size_t) -1)
 #endif
 
-/* The extra casts work around common compiler bugs.  */
-#define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-/* The outer cast is needed to work around a bug in Cray C 5.0.3.0.
-   It is necessary at least when t == time_t.  */
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
-
 enum { BILLION = 1000 * 1000 * 1000 };
 
 /* Best possible resolution that utimens can set and stat can return,
    due to system-call limitations.  It must be a power of 10 that is
    no greater than 1 billion.  */
-#if HAVE_WORKING_UTIMES && defined ST_MTIM_NSEC
+#if (HAVE_WORKING_UTIMES					\
+     && (defined HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC		\
+	 || defined HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC	\
+	 || defined HAVE_STRUCT_STAT_ST_ATIMENSEC		\
+	 || defined HAVE_STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC	\
+	 || defined HAVE_STRUCT_STAT_ST_SPARE1))
 enum { SYSCALL_RESOLUTION = 1000 };
 #else
 enum { SYSCALL_RESOLUTION = BILLION };
@@ -140,14 +139,14 @@ utimecmp (char const *dst_name,
 
      time_t might be unsigned.  */
 
-  verify (time_t_is_integer, (time_t) 0.5 == 0);
-  verify (twos_complement_arithmetic, -1 == ~1 + 1);
+  verify (time_t_is_integer, TYPE_IS_INTEGER (time_t));
+  verify (twos_complement_arithmetic, TYPE_TWOS_COMPLEMENT (int));
 
   /* Destination and source time stamps.  */
   time_t dst_s = dst_stat->st_mtime;
   time_t src_s = src_stat->st_mtime;
-  int dst_ns = TIMESPEC_NS (dst_stat->st_mtim);
-  int src_ns = TIMESPEC_NS (src_stat->st_mtim);
+  int dst_ns = get_stat_mtime_ns (dst_stat);
+  int src_ns = get_stat_mtime_ns (src_stat);
 
   if (options & UTIMECMP_TRUNCATE_SOURCE)
     {
@@ -193,8 +192,8 @@ utimecmp (char const *dst_name,
 	  time_t dst_a_s = dst_stat->st_atime;
 	  time_t dst_c_s = dst_stat->st_ctime;
 	  time_t dst_m_s = dst_s;
-	  int dst_a_ns = TIMESPEC_NS (dst_stat->st_atim);
-	  int dst_c_ns = TIMESPEC_NS (dst_stat->st_ctim);
+	  int dst_a_ns = get_stat_atime_ns (dst_stat);
+	  int dst_c_ns = get_stat_ctime_ns (dst_stat);
 	  int dst_m_ns = dst_ns;
 
 	  /* Set RES to an upper bound on the file system resolution
@@ -287,7 +286,7 @@ utimecmp (char const *dst_name,
 
 		if (stat_result
 		    | (dst_status.st_mtime ^ dst_m_s)
-		    | (TIMESPEC_NS (dst_status.st_mtim) ^ dst_m_ns))
+		    | (get_stat_mtime_ns (&dst_status) ^ dst_m_ns))
 		  {
 		    /* The modification time changed, or we can't tell whether
 		       it changed.  Change it back as best we can.  */
@@ -305,7 +304,7 @@ utimecmp (char const *dst_name,
 	      {
 		int old_res = res;
 		int a = (BILLION * (dst_status.st_mtime & 1)
-			 + TIMESPEC_NS (dst_status.st_mtim));
+			 + get_stat_mtime_ns (&dst_status));
 
 		res = SYSCALL_RESOLUTION;
 

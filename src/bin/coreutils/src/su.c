@@ -1,5 +1,5 @@
 /* su for GNU.  Run a shell with substitute user and group IDs.
-   Copyright (C) 1992-2004 Free Software Foundation, Inc.
+   Copyright (C) 1992-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Run a shell with the real and effective UID and GID and groups
    of USER, default `root'.
@@ -191,7 +191,7 @@ xsetenv (char const *name, char const *val)
     xalloc_die ();
 }
 
-#if defined (SYSLOG_SUCCESS) || defined (SYSLOG_FAILURE)
+#if defined SYSLOG_SUCCESS || defined SYSLOG_FAILURE
 /* Log the fact that someone has run su to the user given by PW;
    if SUCCESSFUL is true, they gave the correct password, etc.  */
 

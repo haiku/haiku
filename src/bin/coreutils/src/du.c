@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Differences from the Unix du:
    * Doesn't simply ignore the names of regular files given as arguments
@@ -29,17 +29,20 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <assert.h>
-
 #include "system.h"
+#include "argmatch.h"
 #include "dirname.h" /* for strip_trailing_slashes */
 #include "error.h"
 #include "exclude.h"
+#include "fprintftime.h"
 #include "hash.h"
 #include "human.h"
+#include "inttostr.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "readtokens0.h"
 #include "same.h"
+#include "stat-time.h"
 #include "xfts.h"
 #include "xstrtol.h"
 
@@ -74,6 +77,54 @@ struct entry
 /* A set of dev/ino pairs.  */
 static Hash_table *htab;
 
+/* Define a class for collecting directory information. */
+
+struct duinfo
+{
+  /* Size of files in directory.  */
+  uintmax_t size;
+
+  /* Latest time stamp found.  If tmax.tv_sec == TYPE_MINIMUM (time_t)
+     && tmax.tv_nsec < 0, no time stamp has been found.  */
+  struct timespec tmax;
+};
+
+/* Initialize directory data.  */
+static inline void
+duinfo_init (struct duinfo *a)
+{
+  a->size = 0;
+  a->tmax.tv_sec = TYPE_MINIMUM (time_t);
+  a->tmax.tv_nsec = -1;
+}
+
+/* Set directory data.  */
+static inline void
+duinfo_set (struct duinfo *a, uintmax_t size, struct timespec tmax)
+{
+  a->size = size;
+  a->tmax = tmax;
+}
+
+/* Accumulate directory data.  */
+static inline void
+duinfo_add (struct duinfo *a, struct duinfo const *b)
+{
+  a->size += b->size;
+  if (timespec_cmp (a->tmax, b->tmax) < 0)
+    a->tmax = b->tmax;
+}
+
+/* A structure for per-directory level information.  */
+struct dulevel
+{
+  /* Entries in this directory.  */
+  struct duinfo ent;
+
+  /* Total for subdirectories.  */
+  struct duinfo subdir;
+};
+
 /* Name under which this program was invoked.  */
 char *program_name;
 
@@ -104,14 +155,34 @@ static size_t max_depth = SIZE_MAX;
 /* Human-readable options for output.  */
 static int human_output_opts;
 
+/* If true, print most recently modified date, using the specified format.  */
+static bool opt_time = false;
+
+/* Type of time to display. controlled by --time.  */
+
+enum time_type
+  {
+    time_mtime,			/* default */
+    time_ctime,
+    time_atime
+  };
+
+static enum time_type time_type = time_mtime;
+
+/* User specified date / time style */
+static char const *time_style = NULL;
+
+/* Format used to display date / time. Controlled by --time-style */
+static char const *time_format = NULL;
+
 /* The units to use when printing sizes.  */
 static uintmax_t output_block_size;
 
 /* File name patterns to exclude.  */
 static struct exclude *exclude;
 
-/* Grand total size of all args, in bytes. */
-static uintmax_t tot_size = 0;
+/* Grand total size of all args, in bytes. Also latest modified date. */
+static struct duinfo tot_dui;
 
 #define IS_DIR_TYPE(Type)	\
   ((Type) == FTS_DP		\
@@ -125,7 +196,17 @@ enum
   EXCLUDE_OPTION,
   FILES0_FROM_OPTION,
   HUMAN_SI_OPTION,
-  MAX_DEPTH_OPTION
+
+  /* FIXME: --kilobytes is deprecated (but not -k); remove in late 2006 */
+  KILOBYTES_LONG_OPTION,
+
+  MAX_DEPTH_OPTION,
+
+  /* FIXME: --megabytes is deprecated (but not -m); remove in late 2006 */
+  MEGABYTES_LONG_OPTION,
+
+  TIME_OPTION,
+  TIME_STYLE_OPTION
 };
 
 static struct option const long_options[] =
@@ -142,19 +223,51 @@ static struct option const long_options[] =
   {"files0-from", required_argument, NULL, FILES0_FROM_OPTION},
   {"human-readable", no_argument, NULL, 'h'},
   {"si", no_argument, NULL, HUMAN_SI_OPTION},
-  {"kilobytes", no_argument, NULL, 'k'}, /* long form is obsolescent */
+  {"kilobytes", no_argument, NULL, KILOBYTES_LONG_OPTION},
   {"max-depth", required_argument, NULL, MAX_DEPTH_OPTION},
   {"null", no_argument, NULL, '0'},
-  {"megabytes", no_argument, NULL, 'm'}, /* obsolescent */
+  {"megabytes", no_argument, NULL, MEGABYTES_LONG_OPTION},
   {"no-dereference", no_argument, NULL, 'P'},
   {"one-file-system", no_argument, NULL, 'x'},
   {"separate-dirs", no_argument, NULL, 'S'},
   {"summarize", no_argument, NULL, 's'},
   {"total", no_argument, NULL, 'c'},
+  {"time", optional_argument, NULL, TIME_OPTION},
+  {"time-style", required_argument, NULL, TIME_STYLE_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
 };
+
+static char const *const time_args[] =
+{
+  "atime", "access", "use", "ctime", "status", NULL
+};
+static enum time_type const time_types[] =
+{
+  time_atime, time_atime, time_atime, time_ctime, time_ctime
+};
+ARGMATCH_VERIFY (time_args, time_types);
+
+/* `full-iso' uses full ISO-style dates and times.  `long-iso' uses longer
+   ISO-style time stamps, though shorter than `full-iso'.  `iso' uses shorter
+   ISO-style time stamps.  */
+enum time_style
+  {
+    full_iso_time_style,       /* --time-style=full-iso */
+    long_iso_time_style,       /* --time-style=long-iso */
+    iso_time_style	       /* --time-style=iso */
+  };
+
+static char const *const time_style_args[] =
+{
+  "full-iso", "long-iso", "iso", NULL
+};
+static enum time_style const time_style_types[] =
+{
+  full_iso_time_style, long_iso_time_style, iso_time_style
+};
+ARGMATCH_VERIFY (time_style_args, time_style_types);
 
 void
 usage (int status)
@@ -195,6 +308,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       --si              like -h, but use powers of 1000 not 1024\n\
   -k                    like --block-size=1K\n\
   -l, --count-links     count sizes many times if hard linked\n\
+  -m                    like --block-size=1M\n\
 "), stdout);
       fputs (_("\
   -L, --dereference     dereference all symbolic links\n\
@@ -211,6 +325,15 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                           only if it is N or fewer levels below the command\n\
                           line argument;  --max-depth=0 is the same as\n\
                           --summarize\n\
+"), stdout);
+      fputs (_("\
+      --time            show time of the last modification of any file in the\n\
+                          directory, or any of its subdirectories\n\
+      --time=WORD       show time as WORD instead of modification time:\n\
+                          atime, access, use, ctime or status\n\
+      --time-style=STYLE show times using style STYLE:\n\
+                          full-iso, long-iso, iso, +FORMAT\n\
+                          FORMAT is interpreted like `date'\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -285,6 +408,28 @@ hash_init (void)
     xalloc_die ();
 }
 
+/* FIXME: this code is nearly identical to code in date.c  */
+/* Display the date and time in WHEN according to the format specified
+   in FORMAT.  */
+
+static void
+show_date (const char *format, struct timespec when)
+{
+  struct tm *tm = localtime (&when.tv_sec);
+  if (! tm)
+    {
+      char buf[INT_BUFSIZE_BOUND (intmax_t)];
+      error (0, 0, _("time %s is out of range"),
+	     (TYPE_SIGNED (time_t)
+	      ? imaxtostr (when.tv_sec, buf)
+	      : umaxtostr (when.tv_sec, buf)));
+      fputs (buf, stdout);
+      return;
+    }
+
+  fprintftime (stdout, format, tm, 0, when.tv_nsec);
+}
+
 /* Print N_BYTES.  Convert it to a readable value before printing.  */
 
 static void
@@ -295,13 +440,17 @@ print_only_size (uintmax_t n_bytes)
 			 1, output_block_size), stdout);
 }
 
-/* Print N_BYTES followed by STRING on a line.
-   Convert N_BYTES to a readable value before printing.  */
+/* Print size (and optionally time) indicated by *PDUI, followed by STRING.  */
 
 static void
-print_size (uintmax_t n_bytes, const char *string)
+print_size (const struct duinfo *pdui, const char *string)
 {
-  print_only_size (n_bytes);
+  print_only_size (pdui->size);
+  if (opt_time)
+    {
+      putchar ('\t');
+      show_date (time_format, pdui->tmax);
+    }
   printf ("\t%s%c", string, opt_nul_terminate_output ? '\0' : '\n');
   fflush (stdout);
 }
@@ -315,20 +464,20 @@ static bool
 process_file (FTS *fts, FTSENT *ent)
 {
   bool ok;
-  uintmax_t size;
-  uintmax_t size_to_print;
+  struct duinfo dui;
+  struct duinfo dui_to_print;
   size_t level;
   static size_t prev_level;
   static size_t n_alloc;
-  /* The sum of the st_size values of all entries in the single directory
+  /* First element of the structure contains:
+     The sum of the st_size values of all entries in the single directory
      at the corresponding level.  Although this does include the st_size
      corresponding to each subdirectory, it does not include the size of
-     any file in a subdirectory.  */
-  static uintmax_t *sum_ent;
-
-  /* The sum of the sizes of all entries in the hierarchy at or below the
+     any file in a subdirectory. Also corresponding last modified date.
+     Second element of the structure contains:
+     The sum of the sizes of all entries in the hierarchy at or below the
      directory at the specified level.  */
-  static uintmax_t *sum_subdir;
+  static struct dulevel *dulvl;
   bool print = true;
 
   const char *file = ent->fts_path;
@@ -336,7 +485,7 @@ process_file (FTS *fts, FTSENT *ent)
   bool skip;
 
   /* If necessary, set FTS_SKIP before returning.  */
-  skip = excluded_filename (exclude, ent->fts_path);
+  skip = excluded_file_name (exclude, ent->fts_path);
   if (skip)
     fts_set (fts, ent, FTS_SKIP);
 
@@ -380,24 +529,27 @@ process_file (FTS *fts, FTSENT *ent)
       /* Note that we must not simply return here.
 	 We still have to update prev_level and maybe propagate
 	 some sums up the hierarchy.  */
-      size = 0;
+      duinfo_init (&dui);
       print = false;
     }
   else
     {
-      size = (apparent_size
-	      ? sb->st_size
-	      : ST_NBLOCKS (*sb) * ST_NBLOCKSIZE);
+      duinfo_set (&dui,
+		  (apparent_size
+		   ? sb->st_size
+		   : (uintmax_t) ST_NBLOCKS (*sb) * ST_NBLOCKSIZE),
+		  (time_type == time_mtime ? get_stat_mtime (sb)
+		   : time_type == time_atime ? get_stat_atime (sb)
+		   : get_stat_ctime (sb)));
     }
 
   level = ent->fts_level;
-  size_to_print = size;
+  dui_to_print = dui;
 
   if (n_alloc == 0)
     {
       n_alloc = level + 10;
-      sum_ent = xcalloc (n_alloc, sizeof *sum_ent);
-      sum_subdir = xcalloc (n_alloc, sizeof *sum_subdir);
+      dulvl = xcalloc (n_alloc, sizeof *dulvl);
     }
   else
     {
@@ -415,16 +567,14 @@ process_file (FTS *fts, FTSENT *ent)
 
 	  if (n_alloc <= level)
 	    {
-	      sum_ent = xnrealloc (sum_ent, level, 2 * sizeof *sum_ent);
-	      sum_subdir = xnrealloc (sum_subdir, level,
-				      2 * sizeof *sum_subdir);
+	      dulvl = xnrealloc (dulvl, level, 2 * sizeof *dulvl);
 	      n_alloc = level * 2;
 	    }
 
 	  for (i = prev_level + 1; i <= level; i++)
 	    {
-	      sum_ent[i] = 0;
-	      sum_subdir[i] = 0;
+	      duinfo_init (&dulvl[i].ent);
+	      duinfo_init (&dulvl[i].subdir);
 	    }
 	}
       else /* level < prev_level */
@@ -436,10 +586,11 @@ process_file (FTS *fts, FTSENT *ent)
 	     Here, the current level is always one smaller than the
 	     previous one.  */
 	  assert (level == prev_level - 1);
-	  size_to_print += sum_ent[prev_level];
+	  duinfo_add (&dui_to_print, &dulvl[prev_level].ent);
 	  if (!opt_separate_dirs)
-	    size_to_print += sum_subdir[prev_level];
-	  sum_subdir[level] += sum_ent[prev_level] + sum_subdir[prev_level];
+	    duinfo_add (&dui_to_print, &dulvl[prev_level].subdir);
+	  duinfo_add (&dulvl[level].subdir, &dulvl[prev_level].ent);
+	  duinfo_add (&dulvl[level].subdir, &dulvl[prev_level].subdir);
 	}
     }
 
@@ -448,11 +599,11 @@ process_file (FTS *fts, FTSENT *ent)
   /* Let the size of a directory entry contribute to the total for the
      containing directory, unless --separate-dirs (-S) is specified.  */
   if ( ! (opt_separate_dirs && IS_DIR_TYPE (ent->fts_info)))
-    sum_ent[level] += size;
+    duinfo_add (&dulvl[level].ent, &dui);
 
   /* Even if this directory is unreadable or we can't chdir into it,
      do let its size contribute to the total, ... */
-  tot_size += size;
+  duinfo_add (&tot_dui, &dui);
 
   /* ... but don't print out a total for it, since without the size(s)
      of any potential entries, it could be very misleading.  */
@@ -467,13 +618,7 @@ process_file (FTS *fts, FTSENT *ent)
 
   if ((IS_DIR_TYPE (ent->fts_info) && level <= max_depth)
       || ((opt_all && level <= max_depth) || level == 0))
-    {
-      print_only_size (size_to_print);
-      fputc ('\t', stdout);
-      fputs (file, stdout);
-      fputc (opt_nul_terminate_output ? '\0' : '\n', stdout);
-      fflush (stdout);
-    }
+    print_size (&dui_to_print, file);
 
   return ok;
 }
@@ -519,7 +664,7 @@ du_files (char **files, int bit_flags)
     }
 
   if (print_grand_total)
-    print_size (tot_size, _("total"));
+    print_size (&tot_dui, _("total"));
 
   return ok;
 }
@@ -595,7 +740,8 @@ main (int argc, char **argv)
 	  output_block_size = 1;
 	  break;
 
-	case 'H':
+	case 'H':  /* FIXME: remove warning and move this "case 'H'" to
+		      precede --dereference-args in late 2006.  */
 	  error (0, 0, _("WARNING: use --si, not -H; the meaning of the -H\
  option will soon\nchange to be the same as that of --dereference-args (-D)"));
 	  /* fall through */
@@ -604,6 +750,10 @@ main (int argc, char **argv)
 	  output_block_size = 1;
 	  break;
 
+	case KILOBYTES_LONG_OPTION:
+	  error (0, 0,
+		 _("the --kilobytes option is deprecated; use -k instead"));
+	  /* fall through */
 	case 'k':
 	  human_output_opts = 0;
 	  output_block_size = 1024;
@@ -627,7 +777,11 @@ main (int argc, char **argv)
 	  }
 	  break;
 
-	case 'm': /* obsolescent: FIXME: remove in 2005. */
+	case MEGABYTES_LONG_OPTION:
+	  error (0, 0,
+		 _("the --megabytes option is deprecated; use -m instead"));
+	  /* fall through */
+	case 'm':
 	  human_output_opts = 0;
 	  output_block_size = 1024 * 1024;
 	  break;
@@ -681,6 +835,18 @@ main (int argc, char **argv)
 	  add_exclude (exclude, optarg, EXCLUDE_WILDCARDS);
 	  break;
 
+	case TIME_OPTION:
+	  opt_time = true;
+	  time_type =
+	    (optarg
+	     ? XARGMATCH ("--time", optarg, time_args, time_types)
+	     : time_mtime);
+	  break;
+
+	case TIME_STYLE_OPTION:
+	  time_style = optarg;
+	  break;
+
 	case_GETOPT_HELP_CHAR;
 
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -715,10 +881,58 @@ main (int argc, char **argv)
   if (opt_summarize_only)
     max_depth = 0;
 
+  /* Process time style if printing last times.  */
+  if (opt_time)
+    {
+      if (! time_style)
+	{
+	  time_style = getenv ("TIME_STYLE");
+
+	  /* Ignore TIMESTYLE="locale", for compatibility with ls.  */
+	  if (! time_style || STREQ (time_style, "locale"))
+	    time_style = "long-iso";
+	  else if (*time_style == '+')
+	    {
+	      /* Ignore anything after a newline, for compatibility
+		 with ls.  */
+	      char *p = strchr (time_style, '\n');
+	      if (p)
+		*p = '\0';
+	    }
+	  else
+	    {
+	      /* Ignore "posix-" prefix, for compatibility with ls.  */
+	      static char const posix_prefix[] = "posix-";
+	      while (strncmp (time_style, posix_prefix, sizeof posix_prefix - 1)
+		     == 0)
+		time_style += sizeof posix_prefix - 1;
+	    }
+	}
+
+      if (*time_style == '+')
+	time_format = time_style + 1;
+      else
+        {
+          switch (XARGMATCH ("time style", time_style,
+                             time_style_args, time_style_types))
+            {
+	    case full_iso_time_style:
+	      time_format = "%Y-%m-%d %H:%M:%S.%N %z";
+	      break;
+
+	    case long_iso_time_style:
+	      time_format = "%Y-%m-%d %H:%M";
+	      break;
+
+	    case iso_time_style:
+	      time_format = "%Y-%m-%d";
+	      break;
+            }
+        }
+    }
+
   if (files_from)
     {
-      FILE *istream;
-
       /* When using --files0-from=F, you may not specify any files
 	 on the command-line.  */
       if (optind < argc)
@@ -729,14 +943,13 @@ main (int argc, char **argv)
 	  usage (EXIT_FAILURE);
 	}
 
-      istream = (STREQ (files_from, "-") ? stdin : fopen (files_from, "r"));
-      if (istream == NULL)
+      if (! (STREQ (files_from, "-") || freopen (files_from, "r", stdin)))
 	error (EXIT_FAILURE, errno, _("cannot open %s for reading"),
 	       quote (files_from));
 
       readtokens0_init (&tok);
 
-      if (! readtokens0 (istream, &tok) || fclose (istream) != 0)
+      if (! readtokens0 (stdin, &tok) || fclose (stdin) != 0)
 	error (EXIT_FAILURE, 0, _("cannot read file names from %s"),
 	       quote (files_from));
 

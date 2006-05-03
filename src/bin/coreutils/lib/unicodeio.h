@@ -1,6 +1,6 @@
 /* Unicode character output to streams with locale dependent encoding.
 
-   Copyright (C) 2000-2003 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,26 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef UNICODEIO_H
 # define UNICODEIO_H
 
 # include <stddef.h>
 # include <stdio.h>
+
+/* Converts the Unicode character CODE to its multibyte representation
+   in the current locale and calls the SUCCESS callback on the resulting
+   byte sequence.  If an error occurs, invokes the FAILURE callback instead,
+   passing it CODE and an English error string.
+   Returns whatever the callback returned.
+   Assumes that the locale doesn't change between two calls.  */
+extern long unicode_to_mb (unsigned int code,
+			   long (*success) (const char *buf, size_t buflen,
+					    void *callback_arg),
+			   long (*failure) (unsigned int code, const char *msg,
+					    void *callback_arg),
+			   void *callback_arg);
 
 /* Outputs the Unicode character CODE to the output stream STREAM.
    Upon failure, exit if exit_on_error is true, otherwise output a fallback

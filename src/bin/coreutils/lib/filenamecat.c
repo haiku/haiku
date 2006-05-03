@@ -1,6 +1,6 @@
-/* path-concat.c -- concatenate two arbitrary pathnames
+/* Concatenate two arbitrary file names.
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Free
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,16 +15,16 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
 /* Specification.  */
-#include "path-concat.h"
+#include "filenamecat.h"
 
 #include <string.h>
 
@@ -46,7 +46,7 @@ longest_relative_suffix (char const *f)
   return f;
 }
 
-/* Concatenate two pathname components, DIR and ABASE, in
+/* Concatenate two file name components, DIR and ABASE, in
    newly-allocated storage and return the result.
    The resulting file name F is such that the commands "ls F" and "(cd
    DIR; ls BASE)" refer to the same file, where BASE is ABASE with any
@@ -54,13 +54,15 @@ longest_relative_suffix (char const *f)
    Arrange for a directory separator if necessary between DIR and BASE
    in the result, removing any redundant separators.
    In any case, if BASE_IN_RESULT is non-NULL, set
-   *BASE_IN_RESULT to point to the copy of BASE in the returned
-   concatenation.
+   *BASE_IN_RESULT to point to the copy of ABASE in the returned
+   concatenation.  However, if ABASE begins with more than one slash,
+   set *BASE_IN_RESULT to point to the sole corresponding slash that
+   is copied into the result buffer.
 
    Report an error if memory is exhausted.  */
 
 char *
-path_concat (char const *dir, char const *abase, char **base_in_result)
+file_name_concat (char const *dir, char const *abase, char **base_in_result)
 {
   char const *dirbase = base_name (dir);
   size_t dirbaselen = base_len (dirbase);
@@ -78,10 +80,47 @@ path_concat (char const *dir, char const *abase, char **base_in_result)
   p += needs_separator;
 
   if (base_in_result)
-    *base_in_result = p;
+    *base_in_result = p - IS_ABSOLUTE_FILE_NAME (abase);
 
   p = mempcpy (p, base, baselen);
   *p = '\0';
 
   return p_concat;
 }
+
+#ifdef TEST_FILE_NAME_CONCAT
+# include <stdlib.h>
+# include <stdio.h>
+int
+main ()
+{
+  static char const *const tests[][3] =
+    {
+      {"a", "b",   "a/b"},
+      {"a/", "b",  "a/b"},
+      {"a/", "/b", "a/b"},
+      {"a", "/b",  "a/b"},
+
+      {"/", "b",  "/b"},
+      {"/", "/b", "/b"},
+      {"/", "/",  "/"},
+      {"a", "/",  "a/"},   /* this might deserve a diagnostic */
+      {"/a", "/", "/a/"},  /* this might deserve a diagnostic */
+      {"a", "//b",  "a/b"},
+    };
+  size_t i;
+  bool fail = false;
+  for (i = 0; i < sizeof tests / sizeof tests[0]; i++)
+    {
+      char *base_in_result;
+      char const *const *t = tests[i];
+      char *res = file_name_concat (t[0], t[1], &base_in_result);
+      if (strcmp (res, t[2]) != 0)
+	{
+	  printf ("got %s, expected %s\n", res, t[2]);
+	  fail = true;
+	}
+    }
+  exit (fail ? EXIT_FAILURE : EXIT_SUCCESS);
+}
+#endif

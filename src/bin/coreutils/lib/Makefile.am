@@ -1,6 +1,6 @@
 ## Makefile for gnulib/lib				-*-Makefile-*-
 
-# Copyright (C) 1995-2004 Free Software Foundation, Inc.
+# Copyright (C) 1995-2005 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -14,10 +14,10 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
-noinst_LIBRARIES = libfetish.a
+noinst_LIBRARIES = libcoreutils.a
 
 noinst_PROGRAMS = t-fpending
 LDADD = $(noinst_LIBRARIES)
@@ -25,132 +25,42 @@ LDADD = $(noinst_LIBRARIES)
 AM_CPPFLAGS = -I.. -I$(srcdir)
 DEFS += -DLIBDIR=\"$(libdir)\"
 
-## Put relatively complex files at the beginning of the list so
-## that parallel compiles finish a tiny bit sooner.  I don't see
-## a way to make regex.c appear earlier in the list, since it's
-## added by automake, but on systems with an up to date GNU libc,
-## regex.c isn't even compiled.
-libfetish_a_SOURCES = \
-  acl.h acl.c \
-  getdate.h getdate.y \
-  posixtm.c posixtm.h \
-  posixver.c posixver.h \
-  strftime.c strftime.h \
-  hash.c hash.h \
-  hash-pjw.c hash-pjw.h \
-  __fpending.h \
+libcoreutils_a_SOURCES = \
   allocsa.c allocsa.h \
-  argmatch.c argmatch.h \
-  backupfile.c backupfile.h \
-  basename.c \
-  c-strtod.c c-strtod.h c-strtold.c \
-  canon-host.c \
-  canonicalize.c canonicalize.h \
-  cloexec.c cloexec.h \
-  closeout.c closeout.h \
-  cycle-check.c cycle-check.h \
-  dev-ino.h \
-  diacrit.c diacrit.h \
-  dirname.c dirname.h \
-  dirfd.h \
-  dup-safer.c \
   euidaccess.h \
-  exclude.c exclude.h \
   exit.h \
-  exitfail.c exitfail.h \
-  fcntl-safer.h \
-  filemode.c filemode.h \
-  file-type.c file-type.h \
-  fopen-safer.c \
-  fsusage.h \
-  fts.c fts_.h \
+  fprintftime.c fprintftime.h \
   full-read.c full-read.h \
   full-write.c full-write.h \
-  getcwd.h \
-  getline.h \
-  getpagesize.h \
-  getpass.h \
-  gettime.c \
+  getaddrinfo.h \
   gettext.h \
-  getugroups.c \
-  group-member.h \
-  hard-locale.c hard-locale.h \
-  human.c human.h \
-  idcache.c \
-  imaxtostr.c \
-  linebuffer.c linebuffer.h \
   localcharset.c localcharset.h \
-  long-options.c long-options.h \
-  makepath.c makepath.h \
+  mbchar.h \
   mbswidth.c mbswidth.h \
-  md5.c md5.h \
-  memcasecmp.c memcasecmp.h \
-  memcoll.c memcoll.h \
-  modechange.c modechange.h \
-  mountlist.h \
-  offtostr.c \
-  open-safer.c \
-  path-concat.c path-concat.h \
-  pathmax.h \
-  physmem.c physmem.h \
-  quote.c quote.h \
-  quotearg.c quotearg.h \
+  mbuiter.h \
   readtokens0.c readtokens0.h \
-  readtokens.c readtokens.h \
-  readutmp.h \
-  regex.h \
-  root-dev-ino.c root-dev-ino.h \
-  safe-read.c safe-read.h \
-  safe-write.c safe-write.h \
-  same.c same.h \
-  savedir.c savedir.h \
-  setenv.h \
-  settime.c \
-  sha1.c sha1.h \
-  sig2str.h \
-  stat-macros.h \
-  stdio-safer.h \
-  stripslash.c \
-  strdup.h \
-  strndup.h \
-  strverscmp.h \
+  strcase.h \
+  strnlen1.c strnlen1.h \
+  strstr.h \
   time_r.c time_r.h \
-  timespec.h \
-  umaxtostr.c \
   unicodeio.c unicodeio.h \
-  unistd-safer.h \
-  unlocked-io.h \
-  userspec.c userspec.h \
-  utimecmp.c utimecmp.h \
-  utimens.c utimens.h \
-  version-etc.c version-etc.h \
-  xalloc.h \
+  verify.h \
   xalloc-die.c \
-  xfts.c xfts.h \
-  xgetcwd.c xgetcwd.h \
   xgethostname.c xgethostname.h \
-  xmalloc.c \
   xmemcoll.c xmemcoll.h \
-  xnanosleep.c xnanosleep.h \
-  xreadlink.c xreadlink.h \
   xstrndup.c xstrndup.h \
-  xstrtod.c xstrtod.h \
   xstrtoimax.c \
-  xstrtol.c xstrtol.h \
-  xstrtoul.c \
-  xstrtoumax.c \
-  yesno.c yesno.h
+  xstrtoumax.c
 
-libfetish_a_SOURCES += \
+libcoreutils_a_SOURCES += \
   printf-args.h \
   printf-parse.h \
   vasprintf.h \
   vasnprintf.h
 
-libfetish_a_LIBADD = $(LIBOBJS) $(ALLOCA)
-libfetish_a_DEPENDENCIES = $(libfetish_a_LIBADD)
+libcoreutils_a_LIBADD = $(LIBOBJS) $(ALLOCA)
 
-lib_OBJECTS = $(libfetish_a_OBJECTS)
+lib_OBJECTS = $(libcoreutils_a_OBJECTS)
 
 
 BUILT_SOURCES = getdate.c
@@ -159,9 +69,8 @@ MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 MOSTLYCLEANFILES =
 SUFFIXES =
 
-EXTRA_DIST = config.charset ref-add.sin ref-del.sin \
-  getndelim2.c getndelim2.h \
-  inttostr.c inttostr.h
+EXTRA_DIST = getdate.c config.charset ref-add.sin ref-del.sin \
+  getndelim2.c getndelim2.h
 
 # We need the following in order to install a simple file in $(libdir)
 # which is shared with other installed packages. We use a list of referencing

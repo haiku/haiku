@@ -1,7 +1,7 @@
 /* Get the system load averages.
 
    Copyright (C) 1985, 1986, 1987, 1988, 1989, 1991, 1992, 1993, 1994,
-   1995, 1997, 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
+   1995, 1997, 1999, 2000, 2003, 2004, 2005 Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with gnulib.
    Bugs can be reported to bug-gnulib@gnu.org.
@@ -18,7 +18,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
    USA.  */
 
 /* Compile-time symbols that this file uses:
@@ -32,7 +32,7 @@
 				AC_CHECK_FUNCS(pstat_getdynamic) in your
 				configure.in file.
    FIXUP_KERNEL_SYMBOL_ADDR()	Adjust address in returned struct nlist.
-   KERNEL_FILE			Pathname of the kernel to nlist.
+   KERNEL_FILE			Name of the kernel file to nlist.
    LDAV_CVT()			Scale the load average from the kernel.
 				Returns a double.
    LDAV_SYMBOL			Name of kernel symbol giving load average.
@@ -47,7 +47,8 @@
 				the nlist n_name element is a pointer,
 				not an array.
    HAVE_STRUCT_NLIST_N_UN_N_NAME `n_un.n_name' is member of `struct nlist'.
-   LINUX_LDAV_FILE		[__linux__]: File containing load averages.
+   LINUX_LDAV_FILE		[__linux__, __CYGWIN__]: File containing
+				load averages.
 
    Specific system predefines this file uses, aside from setting
    default values if not emacs:
@@ -70,6 +71,7 @@
    WINDOWS32			No-op for Windows95/NT.
    __linux__			Linux: assumes /proc file system mounted.
 				Support from Michael K. Johnson.
+   __CYGWIN__			Cygwin emulates linux /proc/loadavg.
    __NetBSD__			NetBSD: assumes /kern file system mounted.
 
    In addition, to avoid nesting many #ifdefs, we internally set
@@ -104,6 +106,7 @@
 
 # include "c-strtod.h"
 # include "cloexec.h"
+# include "intprops.h"
 # include "xalloc.h"
 
 /* The existing Emacs configuration files define a macro called
@@ -345,11 +348,7 @@
 #  define LDAV_SYMBOL "avenrun"
 # endif
 
-# ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-# endif
-
-# include <limits.h>
+# include <unistd.h>
 
 /* LOAD_AVE_TYPE should only get defined if we're going to use the
    nlist method.  */
@@ -448,11 +447,7 @@
 #  include <sys/dg_sys_info.h>
 # endif
 
-# if defined (HAVE_FCNTL_H) || defined (_POSIX_VERSION)
-#  include <fcntl.h>
-# else
-#  include <sys/file.h>
-# endif
+# include "fcntl--.h"
 
 /* Avoid static vars inside a function since in HPUX they dump as pure.  */
 
@@ -570,7 +565,7 @@ getloadavg (double loadavg[], int nelem)
 
 # endif /* hpux && HAVE_PSTAT_GETDYNAMIC */
 
-# if !defined (LDAV_DONE) && defined (__linux__)
+# if !defined (LDAV_DONE) && (defined (__linux__) || defined (__CYGWIN__))
 #  define LDAV_DONE
 #  undef LOAD_AVE_TYPE
 
@@ -578,12 +573,7 @@ getloadavg (double loadavg[], int nelem)
 #   define LINUX_LDAV_FILE "/proc/loadavg"
 #  endif
 
-/* Upper bound on the string length of an integer converted to string.
-   302 / 1000 is ceil (log10 (2.0)).  Subtract 1 for the sign bit;
-   add 1 for integer division truncation; add 1 more for a minus sign.  */
-#  define INT_STRLEN_BOUND(t) ((sizeof (t) * CHAR_BIT - 1) * 302 / 1000 + 2)
-
-  char ldavgbuf[3 * (INT_STRLEN_BOUND (long int) + sizeof ".00")];
+  char ldavgbuf[3 * (INT_STRLEN_BOUND (int) + sizeof ".00 ")];
   char const *ptr = ldavgbuf;
   int fd, count;
 
@@ -612,7 +602,7 @@ getloadavg (double loadavg[], int nelem)
 
   return elem;
 
-# endif /* __linux__ */
+# endif /* __linux__ || __CYGWIN__ */
 
 # if !defined (LDAV_DONE) && defined (__NetBSD__)
 #  define LDAV_DONE
@@ -917,7 +907,7 @@ getloadavg (double loadavg[], int nelem)
   if (!getloadavg_initialized)
     {
 #  ifndef SUNOS_5
-      channel = open ("/dev/kmem", 0);
+      channel = open ("/dev/kmem", O_RDONLY);
       if (channel >= 0)
 	{
 	  /* Set the channel to close on exec, so it does not
@@ -976,14 +966,13 @@ getloadavg (double loadavg[], int nelem)
 #  define LDAV_DONE
 # endif /* !LDAV_DONE && LOAD_AVE_TYPE */
 
-# ifdef LDAV_DONE
-  return elem;
-# else
+# if !defined LDAV_DONE
   /* Set errno to zero to indicate that there was no particular error;
      this function just can't work at all on this system.  */
   errno = 0;
-  return -1;
+  elem = -1;
 # endif
+  return elem;
 }
 
 #endif /* ! HAVE_GETLOADAVG */

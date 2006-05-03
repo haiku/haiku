@@ -1,6 +1,7 @@
 /* idcache.c -- map user and group IDs, cached for speed
-   Copyright (C) 1985, 1988, 1989, 1990, 1997, 1998, 2003 Free Software
-   Foundation, Inc.
+
+   Copyright (C) 1985, 1988, 1989, 1990, 1997, 1998, 2003, 2005 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,9 +15,9 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -26,18 +27,9 @@
 #include <pwd.h>
 #include <grp.h>
 
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #include "xalloc.h"
-
-#ifndef _POSIX_VERSION
-struct passwd *getpwuid ();
-struct passwd *getpwnam ();
-struct group *getgrgid ();
-struct group *getgrnam ();
-#endif
 
 #ifdef __DJGPP__
 static char digits[] = "0123456789";
@@ -72,7 +64,7 @@ getuser (uid_t uid)
       return tail->name;
 
   pwent = getpwuid (uid);
-  tail = xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof *tail);
   tail->id.u = uid;
   tail->name = pwent ? xstrdup (pwent->pw_name) : NULL;
 
@@ -114,7 +106,7 @@ getuidbyname (const char *user)
     }
 #endif
 
-  tail = xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof *tail);
   tail->name = xstrdup (user);
 
   /* Add to the head of the list, so most recently used is first.  */
@@ -148,7 +140,7 @@ getgroup (gid_t gid)
       return tail->name;
 
   grent = getgrgid (gid);
-  tail = xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof *tail);
   tail->id.g = gid;
   tail->name = grent ? xstrdup (grent->gr_name) : NULL;
 
@@ -190,7 +182,7 @@ getgidbyname (const char *group)
     }
 #endif
 
-  tail = xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof *tail);
   tail->name = xstrdup (group);
 
   /* Add to the head of the list, so most recently used is first.  */

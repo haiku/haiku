@@ -1,8 +1,28 @@
+/* core functions for copying files and directories
+   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+
+/* Extracted from cp.c and librarified by Jim Meyering.  */
+
 #ifndef COPY_H
 # define COPY_H
 
 # include <stdbool.h>
 # include "hash.h"
+# include "lstat.h"
 
 /* Control creation of sparse files (files with holes).  */
 enum Sparse_type
@@ -94,8 +114,9 @@ struct cp_options
      If that fails, then resort to copying.  */
   bool move_mode;
 
-  /* This process's effective user ID.  */
-  uid_t myeuid;
+  /* Whether this process has appropriate privileges to chown a file
+     whose owner is not the effective user ID.  */
+  bool chown_privileges;
 
   /* If true, when copying recursively, skip any subdirectories that are
      on different file systems from the one we started on.  */
@@ -175,22 +196,13 @@ struct cp_options
   Hash_table *src_info;
 };
 
-# define XSTAT(X, Src_path, Src_sb) \
+# define XSTAT(X, Src_name, Src_sb) \
   ((X)->dereference == DEREF_NEVER \
-   ? lstat (Src_path, Src_sb) \
-   : stat (Src_path, Src_sb))
-
-/* Arrange to make lstat calls go through the wrapper function
-   on systems with an lstat function that does not dereference symlinks
-   that are specified with a trailing slash.  */
-# if ! LSTAT_FOLLOWS_SLASHED_SYMLINK
-int rpl_lstat (const char *, struct stat *);
-#  undef lstat
-#  define lstat rpl_lstat
-# endif
+   ? lstat (Src_name, Src_sb) \
+   : stat (Src_name, Src_sb))
 
 /* Arrange to make rename calls go through the wrapper function
-   on systems with a rename function that fails for a source path
+   on systems with a rename function that fails for a source file name
    specified with a trailing slash.  */
 # if RENAME_TRAILING_SLASH_BUG
 int rpl_rename (const char *, const char *);
@@ -198,14 +210,14 @@ int rpl_rename (const char *, const char *);
 #  define rename rpl_rename
 # endif
 
-bool
-copy (const char *src_path, const char *dst_path,
-      bool nonexistent_dst, const struct cp_options *options,
-      bool *copy_into_self, bool *rename_succeeded);
+bool copy (char const *src_name, char const *dst_name,
+	   bool nonexistent_dst, const struct cp_options *options,
+	   bool *copy_into_self, bool *rename_succeeded);
 
-void
-dest_info_init (struct cp_options *);
-void
-src_info_init (struct cp_options *);
+void dest_info_init (struct cp_options *);
+void src_info_init (struct cp_options *);
+
+bool chown_privileges (void);
+bool chown_failure_ok (struct cp_options const *);
 
 #endif

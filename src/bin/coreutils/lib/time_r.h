@@ -1,6 +1,6 @@
 /* Reentrant time functions like localtime_r.
 
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert.  */
 
@@ -37,9 +37,20 @@
 # define gmtime_r rpl_gmtime_r
 # define localtime_r rpl_localtime_r
 
+/* See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/asctime.html>.  */
 char *asctime_r (struct tm const * restrict, char * restrict);
+
+/* See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/ctime.html>.  */
 char *ctime_r (time_t const *, char *);
+
+/* See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/gmtime.html>.  */
 struct tm *gmtime_r (time_t const * restrict, struct tm * restrict);
+
+/* See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/localtime.html>.  */
 struct tm *localtime_r (time_t const * restrict, struct tm * restrict);
 #endif
 

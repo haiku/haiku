@@ -1,5 +1,5 @@
 /* od -- dump files in octal and other formats
-   Copyright (C) 92, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 92, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering.  */
 
@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include "system.h"
 #include "error.h"
-#include "posixver.h"
 #include "quote.h"
 #include "xstrtol.h"
 
@@ -34,9 +33,7 @@
 
 #define AUTHORS "Jim Meyering"
 
-#if defined(__GNUC__) || defined(STDC_HEADERS)
-# include <float.h>
-#endif
+#include <float.h>
 
 #ifdef HAVE_LONG_DOUBLE
 typedef long double LONG_DOUBLE;
@@ -63,11 +60,11 @@ typedef double LONG_DOUBLE;
 #endif
 
 #if HAVE_UNSIGNED_LONG_LONG
-typedef unsigned long long int ulonglong_t;
+typedef unsigned long long int unsigned_long_long_int;
 #else
 /* This is just a place-holder to avoid a few `#if' directives.
    In this case, the type isn't actually used.  */
-typedef unsigned long int ulonglong_t;
+typedef unsigned long int unsigned_long_long_int;
 #endif
 
 enum size_spec
@@ -135,17 +132,30 @@ char *program_name;
    10	unsigned decimal
    8	unsigned hexadecimal  */
 
-static char const bytes_to_oct_digits[] =
+static unsigned int const bytes_to_oct_digits[] =
 {0, 3, 6, 8, 11, 14, 16, 19, 22, 25, 27, 30, 32, 35, 38, 41, 43};
 
-static char const bytes_to_signed_dec_digits[] =
+static unsigned int const bytes_to_signed_dec_digits[] =
 {1, 4, 6, 8, 11, 13, 16, 18, 20, 23, 25, 28, 30, 33, 35, 37, 40};
 
-static char const bytes_to_unsigned_dec_digits[] =
+static unsigned int const bytes_to_unsigned_dec_digits[] =
 {0, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25, 27, 29, 32, 34, 37, 39};
 
-static char const bytes_to_hex_digits[] =
+static unsigned int const bytes_to_hex_digits[] =
 {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32};
+
+#define MAX_INTEGRAL_TYPE_SIZE sizeof (unsigned_long_long_int)
+
+/* It'll be a while before we see integral types wider than 16 bytes,
+   but if/when it happens, this check will catch it.  Without this check,
+   a wider type would provoke a buffer overrun.  */
+verify (MAX_INTEGRAL_TYPE_SIZE
+	< sizeof bytes_to_hex_digits / sizeof *bytes_to_hex_digits);
+
+/* Make sure the other arrays have the same length.  */
+verify (sizeof bytes_to_oct_digits == sizeof bytes_to_signed_dec_digits);
+verify (sizeof bytes_to_oct_digits == sizeof bytes_to_unsigned_dec_digits);
+verify (sizeof bytes_to_oct_digits == sizeof bytes_to_hex_digits);
 
 /* Convert enum size_spec to the size of the named type.  */
 static const int width_bytes[] =
@@ -155,7 +165,7 @@ static const int width_bytes[] =
   sizeof (short int),
   sizeof (int),
   sizeof (long int),
-  sizeof (ulonglong_t),
+  sizeof (unsigned_long_long_int),
   sizeof (float),
   sizeof (double),
   sizeof (LONG_DOUBLE)
@@ -163,11 +173,7 @@ static const int width_bytes[] =
 
 /* Ensure that for each member of `enum size_spec' there is an
    initializer in the width_bytes array.  */
-struct dummy
-{
-  int assert_width_bytes_matches_size_spec_decl
-    [sizeof width_bytes / sizeof width_bytes[0] == N_SIZE_SPECS ? 1 : -1];
-};
+verify (sizeof width_bytes / sizeof width_bytes[0] == N_SIZE_SPECS);
 
 /* Names for some non-printing characters.  */
 static const char *const charname[33] =
@@ -243,7 +249,7 @@ static size_t n_specs_allocated;
 static size_t bytes_per_block;
 
 /* Human-readable representation of *file_list (for error messages).
-   It differs from *file_list only when *file_list is "-".  */
+   It differs from file_list[-1] only when file_list[-1] is "-".  */
 static char const *input_filename;
 
 /* A NULL-terminated list of the file-arguments from the command line.  */
@@ -259,13 +265,13 @@ static FILE *in_stream;
 /* If true, at least one of the files we read was standard input.  */
 static bool have_read_stdin;
 
-#define MAX_INTEGRAL_TYPE_SIZE sizeof (ulonglong_t)
+/* Map the size in bytes to a type identifier.  */
 static enum size_spec integral_type_size[MAX_INTEGRAL_TYPE_SIZE + 1];
 
 #define MAX_FP_TYPE_SIZE sizeof (LONG_DOUBLE)
 static enum size_spec fp_type_size[MAX_FP_TYPE_SIZE + 1];
 
-#define COMMON_SHORT_OPTIONS "A:aBbcDdeFfHhIij:LlN:OoS:st:vXx"
+static char const short_options[] = "A:aBbcDdeFfHhIij:LlN:OoS:st:vw::Xx";
 
 /* For long options that have no equivalent short option, use a
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
@@ -448,7 +454,7 @@ print_long (size_t n_bytes, void const *block, char const *fmt_string)
 static void
 print_long_long (size_t n_bytes, void const *block, char const *fmt_string)
 {
-  ulonglong_t const *p = block;
+  unsigned_long_long_int const *p = block;
   size_t i;
   for (i = n_bytes / sizeof *p; i != 0; i--)
     printf (fmt_string, *p++);
@@ -672,7 +678,7 @@ decode_one_format (const char *s_orig, const char *s, const char **next,
 	      /* The integer at P in S would overflow an unsigned long int.
 		 A digit string that long is sufficiently odd looking
 		 that the following diagnostic is sufficient.  */
-	      error (0, 0, _("invalid type string `%s'"), s_orig);
+	      error (0, 0, _("invalid type string %s"), quote (s_orig));
 	      return false;
 	    }
 	  if (p == s)
@@ -682,8 +688,8 @@ decode_one_format (const char *s_orig, const char *s, const char **next,
 	      if (MAX_INTEGRAL_TYPE_SIZE < size
 		  || integral_type_size[size] == NO_SIZE)
 		{
-		  error (0, 0, _("invalid type string `%s';\n\
-this system doesn't provide a %lu-byte integral type"), s_orig, size);
+		  error (0, 0, _("invalid type string %s;\n\
+this system doesn't provide a %lu-byte integral type"), quote (s_orig), size);
 		  return false;
 		}
 	      s = p;
@@ -791,7 +797,7 @@ this system doesn't provide a %lu-byte integral type"), s_orig, size);
 	      /* The integer at P in S would overflow an unsigned long int.
 		 A digit string that long is sufficiently odd looking
 		 that the following diagnostic is sufficient.  */
-	      error (0, 0, _("invalid type string `%s'"), s_orig);
+	      error (0, 0, _("invalid type string %s"), quote (s_orig));
 	      return false;
 	    }
 	  if (p == s)
@@ -801,8 +807,9 @@ this system doesn't provide a %lu-byte integral type"), s_orig, size);
 	      if (size > MAX_FP_TYPE_SIZE
 		  || fp_type_size[size] == NO_SIZE)
 		{
-		  error (0, 0, _("invalid type string `%s';\n\
-this system doesn't provide a %lu-byte floating point type"), s_orig, size);
+		  error (0, 0, _("invalid type string %s;\n\
+this system doesn't provide a %lu-byte floating point type"),
+			 quote (s_orig), size);
 		  return false;
 		}
 	      s = p;
@@ -859,8 +866,8 @@ this system doesn't provide a %lu-byte floating point type"), s_orig, size);
       break;
 
     default:
-      error (0, 0, _("invalid character `%c' in type string `%s'"),
-	     *s, s_orig);
+      error (0, 0, _("invalid character `%c' in type string %s"),
+	     *s, quote (s_orig));
       return false;
     }
 
@@ -903,10 +910,12 @@ open_next_file (void)
 	  input_filename = _("standard input");
 	  in_stream = stdin;
 	  have_read_stdin = true;
+	  if (O_BINARY && ! isatty (STDIN_FILENO))
+	    freopen (NULL, "rb", stdin);
 	}
       else
 	{
-	  in_stream = fopen (input_filename, "r");
+	  in_stream = fopen (input_filename, (O_BINARY ? "rb" : "r"));
 	  if (in_stream == NULL)
 	    {
 	      error (0, errno, "%s", input_filename);
@@ -918,7 +927,6 @@ open_next_file (void)
 
   if (limit_bytes_to_format & !flag_dump_strings)
     SETVBUF (in_stream, NULL, _IONBF, 0);
-  SET_BINARY (fileno (in_stream));
 
   return ok;
 }
@@ -940,11 +948,11 @@ check_and_close (int in_errno)
       if (ferror (in_stream))
 	{
 	  error (0, in_errno, _("%s: read error"), input_filename);
-	  if (in_stream != stdin)
+	  if (! STREQ (file_list[-1], "-"))
 	    fclose (in_stream);
 	  ok = false;
 	}
-      else if (in_stream != stdin && fclose (in_stream) == EOF)
+      else if (! STREQ (file_list[-1], "-") && fclose (in_stream) != 0)
 	{
 	  error (0, errno, "%s", input_filename);
 	  ok = false;
@@ -977,7 +985,7 @@ decode_format_string (const char *s)
       const char *next;
 
       if (n_specs_allocated <= n_specs)
-	spec = x2nrealloc (spec, &n_specs_allocated, sizeof *spec);
+	spec = X2NREALLOC (spec, &n_specs_allocated);
 
       if (! decode_one_format (s_orig, s, &next, &spec[n_specs]))
 	return false;
@@ -1473,7 +1481,7 @@ dump_strings (void)
 	{
 	  if (i == bufsize)
 	    {
-	      buf = x2nrealloc (buf, &bufsize, sizeof *buf);
+	      buf = X2REALLOC (buf, &bufsize);
 	    }
 	  ok &= read_char (&c);
 	  address++;
@@ -1553,9 +1561,6 @@ main (int argc, char **argv)
   bool modern = false;
   bool width_specified = false;
   bool ok = true;
-  char const *short_options = (posix2_version () < 200112
-			       ? COMMON_SHORT_OPTIONS "w::"
-			       : COMMON_SHORT_OPTIONS "w:");
 
   /* The old-style `pseudo starting address' to be printed in parentheses
      after any true address.  */
@@ -1579,7 +1584,7 @@ main (int argc, char **argv)
 #if HAVE_UNSIGNED_LONG_LONG
   /* If `long int' and `long long int' have the same size, it's fine
      to overwrite the entry for `long' with this one.  */
-  integral_type_size[sizeof (ulonglong_t)] = LONG_LONG;
+  integral_type_size[sizeof (unsigned_long_long_int)] = LONG_LONG;
 #endif
 
   for (i = 0; i <= MAX_FP_TYPE_SIZE; i++)

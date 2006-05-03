@@ -14,10 +14,13 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 #include "inttostr.h"
 
 /* Convert I to a printable string in BUF, which must be at least

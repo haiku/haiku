@@ -1,5 +1,5 @@
 /* `ln' program to create links between files.
-   Copyright (C) 86, 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Mike Parker and David MacKenzie. */
 
@@ -54,23 +54,29 @@
 #endif
 
 /* Construct a string NEW_DEST by concatenating DEST, a slash, and
-   basename(SOURCE) in alloca'd memory.  Don't modify DEST or SOURCE.  */
+   basename (SOURCE) in alloca'd memory.  Don't modify DEST or SOURCE.
+   Omit unnecessary slashes in the boundary between DEST and SOURCE in
+   the result; they can cause harm if "/" and "//" denote different
+   directories.  */
 
-#define PATH_BASENAME_CONCAT(new_dest, dest, source)			\
+#define FILE_BASENAME_CONCAT(new_dest, dest, source)			\
     do									\
       {									\
 	const char *source_base;					\
 	char *tmp_source;						\
 	size_t buf_len = strlen (source) + 1;				\
+	size_t dest_len = strlen (dest);				\
 									\
 	tmp_source = alloca (buf_len);					\
 	memcpy (tmp_source, (source), buf_len);				\
 	strip_trailing_slashes (tmp_source);				\
 	source_base = base_name (tmp_source);				\
-									\
-	(new_dest) = alloca (strlen ((dest)) + 1			\
-				      + strlen (source_base) + 1);	\
-	stpcpy (stpcpy (stpcpy ((new_dest), (dest)), "/"), source_base);\
+	source_base += (source_base[0] == '/');				\
+	dest_len -= (dest_len != 0 && (dest)[dest_len - 1] == '/');	\
+	(new_dest) = alloca (dest_len + 1 + strlen (source_base) + 1);	\
+	memcpy (new_dest, dest, dest_len);				\
+	(new_dest)[dest_len] = '/';					\
+	strcpy ((new_dest) + dest_len + 1, source_base);		\
       }									\
     while (0)
 
@@ -120,7 +126,6 @@ static struct option const long_options[] =
   {"target-directory", required_argument, NULL, 't'},
   {"symbolic", no_argument, NULL, 's'},
   {"verbose", no_argument, NULL, 'v'},
-  {"version-control", required_argument, NULL, 'V'}, /* Deprecated. FIXME. */
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
@@ -193,7 +198,7 @@ do_link (const char *source, const char *dest, bool dest_is_dir)
     {
       /* Treat DEST as a directory; build the full filename.  */
       char *new_dest;
-      PATH_BASENAME_CONCAT (new_dest, dest, source);
+      FILE_BASENAME_CONCAT (new_dest, dest, source);
       dest = new_dest;
     }
 
@@ -245,6 +250,7 @@ do_link (const char *source, const char *dest, bool dest_is_dir)
 	  fprintf (stderr, _("%s: replace %s? "), program_name, quote (dest));
 	  if (!yesno ())
 	    return true;
+	  remove_existing_files = true;
 	}
 
       if (backup_type != no_backups)
@@ -400,7 +406,7 @@ main (int argc, char **argv)
   bool make_backups = false;
   char *backup_suffix_string;
   char *version_control_string = NULL;
-  char *target_directory = NULL;
+  char const *target_directory = NULL;
   bool no_target_directory = false;
   int n_files;
   char **file;
@@ -420,18 +426,11 @@ main (int argc, char **argv)
   symbolic_link = remove_existing_files = interactive = verbose
     = hard_dir_link = false;
 
-  while ((c = getopt_long (argc, argv, "bdfinst:vFS:TV:", long_options, NULL))
+  while ((c = getopt_long (argc, argv, "bdfinst:vFS:T", long_options, NULL))
 	 != -1)
     {
       switch (c)
 	{
-	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
-	  error (0, 0,
-		 _("warning: --version-control (-V) is obsolete;  support for\
- it\nwill be removed in some future release.  Use --backup=%s instead."
-		   ), optarg);
-	  /* Fall through.  */
-
 	case 'b':
 	  make_backups = true;
 	  if (optarg)

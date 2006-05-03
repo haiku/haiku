@@ -1,5 +1,5 @@
 /* tac - concatenate and print files in reverse
-   Copyright (C) 1988-1991, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 1988-1991, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jay Lepreau (lepreau@cs.utah.edu).
    GNU enhancements by David MacKenzie (djm@gnu.ai.mit.edu). */
@@ -48,6 +48,7 @@ tac -r -s '.\|
 #include "quote.h"
 #include "quotearg.h"
 #include "safe-read.h"
+#include "stdlib--.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tac"
@@ -254,14 +255,18 @@ tac_seekable (int input_fd, const char *file)
 	 Otherwise, make `match_start' < `G_buffer'. */
       if (sentinel_length == 0)
 	{
-	  ptrdiff_t i = match_start - G_buffer;
-	  int ret;
+	  size_t i = match_start - G_buffer;
+	  regoff_t ri = i;
+	  regoff_t range = 1 - ri;
+	  regoff_t ret;
 
-	  if (! (INT_MIN < i && i <= INT_MAX))
+	  if (1 < range)
 	    error (EXIT_FAILURE, 0, _("record too large"));
 
-	  ret = re_search (&compiled_separator, G_buffer, i, i - 1, -i, &regs);
-	  if (ret == -1)
+	  if (range == 1
+	      || ((ret = re_search (&compiled_separator, G_buffer,
+				    i, i - 1, range, &regs))
+		  == -1))
 	    match_start = G_buffer - 1;
 	  else if (ret == -2)
 	    {
@@ -448,14 +453,14 @@ copy_to_temp (FILE **g_tmp, char **g_tempfile, int input_fd, char const *file)
 
   tempfile = template;
   fd = mkstemp (template);
-  if (fd == -1)
+  if (fd < 0)
     {
       error (0, errno, _("cannot create temporary file %s"), quote (tempfile));
       return false;
     }
 
-  tmp = fdopen (fd, "w+");
-  if (tmp == NULL)
+  tmp = fdopen (fd, (O_BINARY ? "w+b" : "w+"));
+  if (! tmp)
     {
       error (0, errno, _("cannot open %s for writing"), quote (tempfile));
       close (fd);
@@ -489,7 +494,6 @@ copy_to_temp (FILE **g_tmp, char **g_tempfile, int input_fd, char const *file)
       goto Fail;
     }
 
-  SET_BINARY (fileno (tmp));
   *g_tmp = tmp;
   *g_tempfile = tempfile;
   return true;
@@ -521,16 +525,19 @@ tac_file (const char *filename)
   bool ok;
   off_t file_size;
   int fd;
+  bool is_stdin = STREQ (filename, "-");
 
-  if (STREQ (filename, "-"))
+  if (is_stdin)
     {
       have_read_stdin = true;
       fd = STDIN_FILENO;
       filename = _("standard input");
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
     {
-      fd = open (filename, O_RDONLY);
+      fd = open (filename, O_RDONLY | O_BINARY);
       if (fd < 0)
 	{
 	  error (0, errno, _("cannot open %s for reading"), quote (filename));
@@ -538,120 +545,19 @@ tac_file (const char *filename)
 	}
     }
 
-  /* We need binary I/O, since `tac' relies
-     on `lseek' and byte counts.
-
-     Binary output will leave the lines' ends (NL or
-     CR/LF) intact when the output is a disk file.
-     Writing a file with CR/LF pairs at end of lines in
-     text mode has no visible effect on console output,
-     since two CRs in a row are just like one CR.  */
-  SET_BINARY2 (fd, STDOUT_FILENO);
-
   file_size = lseek (fd, (off_t) 0, SEEK_END);
 
-  ok = (0 <= file_size
-	? tac_seekable (fd, filename)
-	: tac_nonseekable (fd, filename));
+  ok = (file_size < 0 || isatty (fd)
+	? tac_nonseekable (fd, filename)
+	: tac_seekable (fd, filename));
 
-  if (fd != STDIN_FILENO && close (fd) == -1)
+  if (!is_stdin && close (fd) != 0)
     {
       error (0, errno, _("%s: read error"), quotearg_colon (filename));
       ok = false;
     }
   return ok;
 }
-
-#if 0
-/* BUF_END points one byte past the end of the buffer to be searched.  */
-
-/* FIXME: describe */
-
-static void
-tac_mem (const char *buf, size_t n_bytes, FILE *out)
-{
-  const char *nl;
-  const char *bol;
-
-  if (n_bytes == 0)
-    return;
-
-  nl = memrchr (buf, buf + n_bytes, '\n');
-  bol = (nl == NULL ? buf : nl + 1);
-
-  /* If the last line of the input file has no terminating newline,
-     treat it as a special case.  */
-  if (bol < buf + n_bytes)
-    {
-      /* Print out the line from bol to end of input.  */
-      fwrite (bol, 1, (buf + n_bytes) - bol, out);
-
-      /* Add a newline here.  Otherwise, the first and second lines
-	 of output would appear to have been joined.  */
-      fputc ('\n', out);
-    }
-
-  while ((nl = memrchr (buf, bol - 1, '\n')) != NULL)
-    {
-      /* Output the line (which includes a trailing newline)
-	 from NL+1 to BOL-1.  */
-      fwrite (nl + 1, 1, bol - (nl + 1), out);
-
-      bol = nl + 1;
-    }
-
-  /* If there's anything left, output the last line: BUF .. BOL-1.
-     When the first byte of the input is a newline, there is nothing
-     left to do here.  */
-  if (buf < bol)
-    fwrite (buf, 1, bol - buf, out);
-
-  /* FIXME: this is work in progress.... */
-}
-
-/* FIXME: describe */
-
-static bool
-tac_stdin_to_mem (void)
-{
-  char *buf = NULL;
-  size_t bufsiz = 8 * BUFSIZ;
-  size_t delta = 8 * BUFSIZ;
-  size_t n_bytes = 0;
-
-  while (1)
-    {
-      size_t bytes_read;
-      char *new_buf = realloc (buf, bufsiz);
-
-      if (new_buf == NULL)
-	{
-	  /* Write contents of buf to a temporary file, ... */
-	  /* FIXME */
-
-	  /* Free the buffer and fall back on the code that relies on a
-	     temporary file.  */
-	  free (buf);
-	  /* FIXME */
-	  abort ();
-	}
-
-      buf = new_buf;
-      bytes_read = safe_read (STDIN_FILENO, buf + n_bytes, bufsiz - n_bytes);
-      if (bytes_read == 0)
-	break;
-      if (bytes_read == SAFE_READ_ERROR)
-	error (EXIT_FAILURE, errno, _("stdin: read error"));
-      n_bytes += bytes_read;
-
-      bufsiz += delta;
-    }
-
-  tac_mem (buf, n_bytes, stdout);
-
-  return true;
-}
-#endif
 
 int
 main (int argc, char **argv)
@@ -705,7 +611,7 @@ main (int argc, char **argv)
       compiled_separator.allocated = 100;
       compiled_separator.buffer = xmalloc (compiled_separator.allocated);
       compiled_separator.fastmap = xmalloc (256);
-      compiled_separator.translate = 0;
+      compiled_separator.translate = NULL;
       error_message = re_compile_pattern (separator, strlen (separator),
 					  &compiled_separator);
       if (error_message)
@@ -739,6 +645,9 @@ main (int argc, char **argv)
   file = (optind < argc
 	  ? (char const *const *) &argv[optind]
 	  : default_file_list);
+
+  if (O_BINARY && ! isatty (STDOUT_FILENO))
+    freopen (NULL, "wb", stdout);
 
   {
     size_t i;

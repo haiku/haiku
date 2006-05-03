@@ -1,6 +1,6 @@
 /* shred.c - overwrite files and devices to make it harder to recover data
 
-   Copyright (C) 1999-2004 Free Software Foundation, Inc.
+   Copyright (C) 1999-2005 Free Software Foundation, Inc.
    Copyright (C) 1997, 1998, 1999 Colin Plumb.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
    Written by Colin Plumb.  */
 
@@ -27,9 +27,6 @@
   - Add -i/--interactive
   - Reserve -d
   - Add -L
-  - Deal with the amazing variety of gettimeofday() implementation bugs.
-    (Some systems use a one-arg form; still others insist that the timezone
-    either be NULL or be non-NULL.  Whee.)
   - Add an unlink-all option to emulate rm.
  */
 
@@ -91,7 +88,7 @@
 
 #define AUTHORS "Colin Plumb"
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -99,13 +96,14 @@
 #include <stdio.h>
 #include <assert.h>
 #include <setjmp.h>
-#include <signal.h>
 #include <sys/types.h>
 
 #include "system.h"
 #include "xstrtol.h"
 #include "dirname.h"
 #include "error.h"
+#include "fcntl--.h"
+#include "gethrxtime.h"
 #include "getpagesize.h"
 #include "human.h"
 #include "inttostr.h"
@@ -192,7 +190,7 @@ CAUTION: Note that shred relies on a very important assumption:\n\
 that the file system overwrites data in place.  This is the traditional\n\
 way to do things, but many modern file system designs do not satisfy this\n\
 assumption.  The following are examples of file systems on which shred is\n\
-not effective:\n\
+not effective, or is not guaranteed to be effective in all file system modes:\n\
 \n\
 "), stdout);
       fputs (_("\
@@ -210,6 +208,14 @@ not effective:\n\
   version 3 clients\n\
 \n\
 * compressed file systems\n\
+\n\
+In the case of ext3 file systems, the above disclaimer applies\n\
+(and shred is thus of limited effectiveness) only in data=journal mode,\n\
+which journals file data in addition to just metadata.  In both the\n\
+data=ordered (default) and data=writeback modes, shred works as usual.\n\
+Ext3 journaling modes can be changed by adding the data=something option\n\
+to the mount options for a particular file system in the /etc/fstab file,\n\
+as documented in the mount man page (man mount).\n\
 \n\
 In addition, file system backups and remote mirrors may contain copies\n\
 of the file that cannot be removed, and that will allow a shredded file\n\
@@ -274,9 +280,9 @@ struct isaac_state
 static void
 isaac_refill (struct isaac_state *s, uint32_t r[/* ISAAC_WORDS */])
 {
-  register uint32_t a, b;		/* Caches of a and b */
-  register uint32_t x, y;		/* Temps needed by isaac_step macro */
-  register uint32_t *m = s->mm;	/* Pointer into state array */
+  uint32_t a, b;		/* Caches of a and b */
+  uint32_t x, y;		/* Temps needed by isaac_step macro */
+  uint32_t *m = s->mm;	/* Pointer into state array */
 
   a = s->a;
   b = s->b + (++s->c);
@@ -497,81 +503,6 @@ isaac_seed_finish (struct isaac_state *s)
 }
 #define ISAAC_SEED(s,x) isaac_seed_data (s, &(x), sizeof (x))
 
-
-#if __GNUC__ >= 2 && (__i386__ || __alpha__)
-/*
- * Many processors have very-high-resolution timer registers,
- * The timer registers can be made inaccessible, so we have to deal with the
- * possibility of SIGILL while we're working.
- */
-static jmp_buf env;
-static void
-sigill_handler (int signum)
-{
-  (void) signum;
-  longjmp (env, 1);  /* Trivial, just return an indication that it happened */
-}
-
-/* FIXME: find a better way.
-   This signal-handling code may well end up being ripped out eventually.
-   An example of how fragile it is, on an i586-sco-sysv5uw7.0.1 system, with
-   gcc-2.95.3pl1, the "rdtsc" instruction causes a segmentation violation.
-   So now, the code catches SIGSEGV.  It'd probably be better to remove all
-   of that mess and find a better source of random data.  Patches welcome.  */
-
-static void
-isaac_seed_machdep (struct isaac_state *s)
-{
-  void (* volatile old_handler[2]) (int);
-
-  /* This is how one does try/except in C */
-  old_handler[0] = signal (SIGILL, sigill_handler);
-  old_handler[1] = signal (SIGSEGV, sigill_handler);
-  if (setjmp (env))  /* ANSI: Must be entire controlling expression */
-    {
-      signal (SIGILL, old_handler[0]);
-      signal (SIGSEGV, old_handler[1]);
-    }
-  else
-    {
-# if __i386__
-      uint32_t t[2];
-      __asm__ __volatile__ ("rdtsc" : "=a" (t[0]), "=d" (t[1]));
-# endif
-# if __alpha__
-      unsigned long int t;
-      __asm__ __volatile__ ("rpcc %0" : "=r" (t));
-# endif
-# if _ARCH_PPC
-      /* Code not used because this instruction is available only on first-
-	 generation PPCs and evokes a SIGBUS on some Linux 2.4 kernels.  */
-      uint32_t t;
-      __asm__ __volatile__ ("mfspr %0,22" : "=r" (t));
-# endif
-# if __mips
-      /* Code not used because this is not accessible from userland */
-      uint32_t t;
-      __asm__ __volatile__ ("mfc0\t%0,$9" : "=r" (t));
-# endif
-# if __sparc__
-      /* This doesn't compile on all platforms yet.  How to fix? */
-      unsigned long int t;
-      __asm__ __volatile__ ("rd	%%tick, %0" : "=r" (t));
-# endif
-     signal (SIGILL, old_handler[0]);
-     signal (SIGSEGV, old_handler[1]);
-     isaac_seed_data (s, &t, sizeof t);
-  }
-}
-
-#else /* !(__i386__ || __alpha__) */
-
-/* Do-nothing stub */
-# define isaac_seed_machdep(s) (void) 0
-
-#endif /* !(__i386__ || __alpha__) */
-
-
 /*
  * Get seed material.  16 bytes (128 bits) is plenty, but if we have
  * /dev/urandom, we get 32 bytes = 256 bits for complete overkill.
@@ -587,27 +518,9 @@ isaac_seed (struct isaac_state *s)
   { gid_t t = getgid ();   ISAAC_SEED (s, t); }
 
   {
-#if HAVE_GETHRTIME
-    hrtime_t t = gethrtime ();
-    ISAAC_SEED (s, t);
-#else
-# if HAVE_CLOCK_GETTIME		/* POSIX ns-resolution */
-    struct timespec t;
-    clock_gettime (CLOCK_REALTIME, &t);
-# else
-#  if HAVE_GETTIMEOFDAY
-    struct timeval t;
-    gettimeofday (&t, (struct timezone *) 0);
-#  else
-    time_t t;
-    t = time (NULL);
-#  endif
-# endif
-#endif
+    xtime_t t = gethrxtime ();
     ISAAC_SEED (s, t);
   }
-
-  isaac_seed_machdep (s);
 
   {
     char buf[32];
@@ -1529,33 +1442,11 @@ wipefile (char *name, char const *qname,
   bool ok;
   int fd;
 
-  fd = open (name, O_WRONLY | O_NOCTTY);
-  if (fd < 0)
-    {
-      if (errno == EACCES && flags->force)
-	{
-	  if (chmod (name, S_IWUSR) >= 0) /* 0200, user-write-only */
-	    fd = open (name, O_WRONLY | O_NOCTTY);
-	}
-      else if ((errno == ENOENT || errno == ENOTDIR)
-	       && strncmp (name, "/dev/fd/", 8) == 0)
-	{
-	  /* We accept /dev/fd/# even if the OS doesn't support it */
-	  int errnum = errno;
-	  unsigned long int num;
-	  char *p;
-	  errno = 0;
-	  num = strtoul (name + 8, &p, 10);
-	  /* If it's completely decimal with no leading zeros... */
-	  if (errno == 0 && !*p && num <= INT_MAX &&
-	      (('1' <= name[8] && name[8] <= '9')
-	       || (name[8] == '0' && !name[9])))
-	    {
-	      return wipefd (num, qname, s, flags);
-	    }
-	  errno = errnum;
-	}
-    }
+  fd = open (name, O_WRONLY | O_NOCTTY | O_BINARY);
+  if (fd < 0
+      && (errno == EACCES && flags->force)
+      && chmod (name, S_IWUSR) == 0)
+    fd = open (name, O_WRONLY | O_NOCTTY | O_BINARY);
   if (fd < 0)
     {
       error (0, errno, _("%s: failed to open for writing"), qname);

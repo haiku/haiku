@@ -1,5 +1,5 @@
 /* unexpand - convert blanks to tabs
-   Copyright (C) 89, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* By default, convert only maximal strings of initial blanks and tabs
    into tabs.
@@ -41,7 +41,6 @@
 #include <sys/types.h>
 #include "system.h"
 #include "error.h"
-#include "posixver.h"
 #include "quote.h"
 #include "xstrndup.h"
 
@@ -149,11 +148,11 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 static void
 add_tab_stop (uintmax_t tabval)
 {
-  uintmax_t column_width =
-    tabval - (first_free_tab ? tab_list[first_free_tab - 1] : 0);
+  uintmax_t prev_column = first_free_tab ? tab_list[first_free_tab - 1] : 0;
+  uintmax_t column_width = prev_column <= tabval ? tabval - prev_column : 0;
 
   if (first_free_tab == n_tabs_allocated)
-    tab_list = x2nrealloc (tab_list, &n_tabs_allocated, sizeof *tab_list);
+    tab_list = X2NREALLOC (tab_list, &n_tabs_allocated);
   tab_list[first_free_tab++] = tabval;
 
   if (max_column_width < column_width)
@@ -193,8 +192,7 @@ parse_tab_stops (char const *stops)
 	    }
 	  {
 	    /* Detect overflow.  */
-	    uintmax_t new_t = 10 * tabval + *stops - '0';
-	    if (UINTMAX_MAX / 10 < tabval || new_t < tabval * 10)
+	    if (!DECIMAL_DIGIT_ACCUMULATE (tabval, *stops - '0', uintmax_t))
 	      {
 		size_t len = strspn (num_start, "0123456789");
 		char *bad_num = xstrndup (num_start, len);
@@ -203,7 +201,6 @@ parse_tab_stops (char const *stops)
 		ok = false;
 		stops = num_start + len - 1;
 	      }
-	    tabval = new_t;
 	  }
 	}
       else
@@ -259,7 +256,7 @@ next_file (FILE *fp)
 	  error (0, errno, "%s", prev_file);
 	  exit_status = EXIT_FAILURE;
 	}
-      if (fp == stdin)
+      if (STREQ (prev_file, "-"))
 	clearerr (fp);		/* Also clear EOF.  */
       else if (fclose (fp) != 0)
 	{
@@ -270,7 +267,7 @@ next_file (FILE *fp)
 
   while ((file = *file_list++) != NULL)
     {
-      if (file[0] == '-' && file[1] == '\0')
+      if (STREQ (file, "-"))
 	{
 	  have_read_stdin = true;
 	  prev_file = file;
@@ -304,9 +301,6 @@ unexpand (void)
 
   if (!fp)
     return;
-
-  /* Binary I/O will preserve the original EOL style (DOS/Unix) of files.  */
-  SET_BINARY2 (fileno (fp), STDOUT_FILENO);
 
   /* The worst case is a non-blank character, then one blank, then a
      tab stop, then MAX_COLUMN_WIDTH - 1 blanks, then a non-blank; so
@@ -351,7 +345,7 @@ unexpand (void)
       do
 	{
 	  while ((c = getc (fp)) < 0 && (fp = next_file (fp)))
-	    SET_BINARY2 (fileno (fp), STDOUT_FILENO);
+	    continue;
 
 	  if (convert)
 	    {
@@ -471,8 +465,6 @@ main (int argc, char **argv)
      so that only leading blanks will be considered.  */
   bool convert_first_only = false;
 
-  bool obsolete_tablist = false;
-
   initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
@@ -508,7 +500,6 @@ main (int argc, char **argv)
 	  if (have_tabval)
 	    add_tab_stop (tabval);
 	  have_tabval = false;
-	  obsolete_tablist = true;
 	  break;
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -518,17 +509,10 @@ main (int argc, char **argv)
 	      tabval = 0;
 	      have_tabval = true;
 	    }
-	  tabval = tabval * 10 + c - '0';
-	  obsolete_tablist = true;
+	  if (!DECIMAL_DIGIT_ACCUMULATE (tabval, c - '0', uintmax_t))
+	    error (EXIT_FAILURE, 0, _("tab stop value is too large"));
 	  break;
 	}
-    }
-
-  if (obsolete_tablist && 200112 <= posix2_version ())
-    {
-      error (0, 0,
-	     _("`-LIST' option is obsolete; use `--first-only -t LIST'"));
-      usage (EXIT_FAILURE);
     }
 
   if (convert_first_only)

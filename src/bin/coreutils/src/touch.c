@@ -1,5 +1,5 @@
 /* touch -- change modification and access times of files
-   Copyright (C) 87, 1989-1991, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 87, 1989-1991, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Rubin, Arnold Robbins, Jim Kingdon, David MacKenzie,
    and Randy Smith. */
@@ -26,11 +26,13 @@
 #include "system.h"
 #include "argmatch.h"
 #include "error.h"
+#include "fd-reopen.h"
 #include "getdate.h"
 #include "posixtm.h"
 #include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
+#include "stat-time.h"
 #include "utimens.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -38,10 +40,6 @@
 
 #define AUTHORS \
 "Paul Rubin", "Arnold Robbins, Jim Kingdon, David MacKenzie", "Randy Smith"
-
-#ifndef STDC_HEADERS
-time_t time ();
-#endif
 
 /* Bitmasks for `change_times'. */
 #define CH_ATIME 1
@@ -81,20 +79,20 @@ enum
 
 static struct option const longopts[] =
 {
-  {"time", required_argument, 0, TIME_OPTION},
-  {"no-create", no_argument, 0, 'c'},
-  {"date", required_argument, 0, 'd'},
-  {"file", required_argument, 0, 'r'}, /* FIXME: phase out --file */
-  {"reference", required_argument, 0, 'r'},
+  {"time", required_argument, NULL, TIME_OPTION},
+  {"no-create", no_argument, NULL, 'c'},
+  {"date", required_argument, NULL, 'd'},
+  {"file", required_argument, NULL, 'r'}, /* FIXME: remove --file in 2006 */
+  {"reference", required_argument, NULL, 'r'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 /* Valid arguments to the `--time' option. */
 static char const* const time_args[] =
 {
-  "atime", "access", "use", "mtime", "modify", 0
+  "atime", "access", "use", "mtime", "modify", NULL
 };
 
 /* The bits in `change_times' that those arguments set. */
@@ -127,11 +125,14 @@ touch (const char *file)
   struct timespec timespec[2];
   struct timespec const *t;
 
-  if (! no_create)
+  if (STREQ (file, "-"))
+    fd = STDOUT_FILENO;
+  else if (! no_create)
     {
       /* Try to open FILE, creating it if necessary.  */
-      fd = open (file, O_WRONLY | O_CREAT | O_NONBLOCK | O_NOCTTY,
-		 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+      fd = fd_reopen (STDIN_FILENO, file,
+		      O_WRONLY | O_CREAT | O_NONBLOCK | O_NOCTTY,
+		      S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
       /* Don't save a copy of errno if it's EISDIR, since that would lead
 	 touch to give a bogus diagnostic for e.g., `touch /' (assuming
@@ -153,12 +154,12 @@ touch (const char *file)
 	    error (0, open_errno, _("creating %s"), quote (file));
 	  else
 	    {
-	      if (no_create && errno == ENOENT)
+	      if (no_create && (errno == ENOENT || errno == EBADF))
 		return true;
 	      error (0, errno, _("failed to get attributes of %s"),
 		     quote (file));
 	    }
-	  if (fd != -1)
+	  if (fd == STDIN_FILENO)
 	    close (fd);
 	  return false;
 	}
@@ -172,28 +173,32 @@ touch (const char *file)
     }
   else
     {
-      if (change_times & CH_ATIME)
-	timespec[0] = newtime[0];
-      else
-	{
-	  timespec[0].tv_sec = sbuf.st_atime;
-	  timespec[0].tv_nsec = TIMESPEC_NS (sbuf.st_atim);
-	}
-
-      if (change_times & CH_MTIME)
-	timespec[1] = newtime[1];
-      else
-	{
-	  timespec[1].tv_sec = sbuf.st_mtime;
-	  timespec[1].tv_nsec = TIMESPEC_NS (sbuf.st_mtim);
-	}
-
+      timespec[0] = (change_times & CH_ATIME
+		     ? newtime[0]
+		     : get_stat_atime (&sbuf));
+      timespec[1] = (change_times & CH_MTIME
+		     ? newtime[1]
+		     : get_stat_mtime (&sbuf));
       t = timespec;
     }
 
-  ok = (futimens (fd, file, t) == 0);
-  if (fd != -1)
-    ok &= (close (fd) == 0);
+  ok = (futimens (fd, (fd == STDOUT_FILENO ? NULL : file), t) == 0);
+
+  if (fd == STDIN_FILENO)
+    {
+      if (close (STDIN_FILENO) != 0)
+	{
+	  error (0, errno, _("closing %s"), quote (file));
+	  return false;
+	}
+    }
+  else if (fd == STDOUT_FILENO)
+    {
+      /* Do not diagnose "touch -c - >&-".  */
+      if (!ok && errno == EBADF && no_create
+	  && change_times == (CH_ATIME | CH_MTIME))
+	return true;
+    }
 
   if (!ok)
     {
@@ -252,6 +257,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
 \n\
 Note that the -d and -t options accept different time-date formats.\n\
+\n\
+If a FILE is -, touch standard output.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
@@ -344,10 +351,8 @@ main (int argc, char **argv)
       if (stat (ref_file, &ref_stats))
 	error (EXIT_FAILURE, errno,
 	       _("failed to get attributes of %s"), quote (ref_file));
-      newtime[0].tv_sec = ref_stats.st_atime;
-      newtime[0].tv_nsec = TIMESPEC_NS (ref_stats.st_atim);
-      newtime[1].tv_sec = ref_stats.st_mtime;
-      newtime[1].tv_nsec = TIMESPEC_NS (ref_stats.st_mtim);
+      newtime[0] = get_stat_atime (&ref_stats);
+      newtime[1] = get_stat_mtime (&ref_stats);
       date_set = true;
       if (flex_date)
 	{
@@ -370,7 +375,8 @@ main (int argc, char **argv)
   /* The obsolete `MMDDhhmm[YY]' form is valid IFF there are
      two or more non-option arguments.  */
   if (!date_set && 2 <= argc - optind && posix2_version () < 200112
-      && posixtime (&newtime[0].tv_sec, argv[optind], PDS_TRAILING_YEAR))
+      && posixtime (&newtime[0].tv_sec, argv[optind],
+		    PDS_TRAILING_YEAR | PDS_PRE_2000))
     {
       newtime[0].tv_nsec = 0;
       newtime[1] = newtime[0];
@@ -396,8 +402,7 @@ main (int argc, char **argv)
 	amtime_now = true;
       else
 	{
-	  if (gettime (&newtime[0]) != 0)
-	    error (EXIT_FAILURE, errno, _("cannot get time of day"));
+	  gettime (&newtime[0]);
 	  newtime[1] = newtime[0];
 	}
     }

@@ -1,5 +1,7 @@
 /* mountlist.c -- return a list of mounted file systems
-   Copyright (C) 1991, 1992, 1997-2004 Free Software Foundation, Inc.
+
+   Copyright (C) 1991, 1992, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,14 +15,15 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
+#include "mountlist.h"
+
 #include <stdio.h>
-#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -32,13 +35,9 @@ char *strstr ();
 
 #include <errno.h>
 
-#ifdef HAVE_FCNTL_H
-# include <fcntl.h>
-#endif
+#include <fcntl.h>
 
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #if HAVE_SYS_PARAM_H
 # include <sys/param.h>
@@ -133,14 +132,32 @@ char *strstr ();
 # define MNT_IGNORE(M) 0
 #endif
 
-#include "mountlist.h"
-
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
 
 #ifndef SIZE_MAX
 # define SIZE_MAX ((size_t) -1)
+#endif
+
+#ifndef ME_DUMMY
+# define ME_DUMMY(Fs_name, Fs_type)		\
+    (strcmp (Fs_type, "autofs") == 0		\
+     || strcmp (Fs_type, "none") == 0		\
+     || strcmp (Fs_type, "proc") == 0		\
+     || strcmp (Fs_type, "subfs") == 0		\
+     /* for Irix 6.5 */				\
+     || strcmp (Fs_type, "ignore") == 0)
+#endif
+
+#ifndef ME_REMOTE
+/* A file system is `remote' if its Fs_name contains a `:'
+   or if (it is of type smbfs and its Fs_name starts with `//').  */
+# define ME_REMOTE(Fs_name, Fs_type)		\
+    (strchr (Fs_name, ':') != 0			\
+     || ((Fs_name)[0] == '/'			\
+	 && (Fs_name)[1] == '/'			\
+	 && strcmp (Fs_type, "smbfs") == 0))
 #endif
 
 #if MOUNTED_GETMNTINFO
@@ -736,16 +753,16 @@ read_file_system_list (bool need_fs_type)
 	me = xmalloc (sizeof *me);
 	if (vmp->vmt_flags & MNT_REMOTE)
 	  {
-	    char *host, *path;
+	    char *host, *dir;
 
 	    me->me_remote = 1;
-	    /* Prepend the remote pathname.  */
+	    /* Prepend the remote dirname.  */
 	    host = thisent + vmp->vmt_data[VMT_HOSTNAME].vmt_off;
-	    path = thisent + vmp->vmt_data[VMT_OBJECT].vmt_off;
-	    me->me_devname = xmalloc (strlen (host) + strlen (path) + 2);
+	    dir = thisent + vmp->vmt_data[VMT_OBJECT].vmt_off;
+	    me->me_devname = xmalloc (strlen (host) + strlen (dir) + 2);
 	    strcpy (me->me_devname, host);
 	    strcat (me->me_devname, ":");
-	    strcat (me->me_devname, path);
+	    strcat (me->me_devname, dir);
 	  }
 	else
 	  {

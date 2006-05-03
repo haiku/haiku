@@ -1,5 +1,5 @@
 /* chown-core.c -- core functions for changing ownership.
-   Copyright (C) 2000, 2002, 2003, 2004 Free Software Foundation.
+   Copyright (C) 2000, 2002, 2003, 2004, 2005 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Extracted from chown.c/chgrp.c and librarified by Jim Meyering.  */
 
@@ -32,11 +32,6 @@
 #include "root-dev-ino.h"
 #include "xfts.h"
 
-#ifndef _POSIX_VERSION
-struct group *getgrnam ();
-struct group *getgrgid ();
-#endif
-
 enum RCH_status
   {
     /* we called fchown and close, and both succeeded */
@@ -49,7 +44,7 @@ enum RCH_status
     RC_inode_changed,
 
     /* open, fstat, fchown, or close failed */
-    RC_error,
+    RC_error
   };
 
 extern void
@@ -60,12 +55,12 @@ chopt_init (struct Chown_option *chopt)
   chopt->affect_symlink_referent = true;
   chopt->recurse = false;
   chopt->force_silent = false;
-  chopt->user_name = 0;
-  chopt->group_name = 0;
+  chopt->user_name = NULL;
+  chopt->group_name = NULL;
 }
 
 extern void
-chopt_free (struct Chown_option *chopt)
+chopt_free (struct Chown_option *chopt ATTRIBUTE_UNUSED)
 {
   /* Deliberately do not free chopt->user_name or ->group_name.
      They're not always allocated.  */
@@ -175,7 +170,7 @@ describe_change (const char *file, enum Change_status changed,
    FILE and do everything else via the resulting file descriptor.
    We first call fstat and verify that the dev/inode match those from
    the preceding stat call, and only then, if appropriate (given the
-   required_uid and required_gid constraints) do we call fchmod.
+   required_uid and required_gid constraints) do we call fchown.
 
    A minor problem:
    This function fails when FILE cannot be opened, but chown/lchown have

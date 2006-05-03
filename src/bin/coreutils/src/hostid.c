@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering.  */
 
@@ -62,7 +62,7 @@ Print the numeric identifier (in hexadecimal) for the current host.\n\
 int
 main (int argc, char **argv)
 {
-  long int id;
+  unsigned int id;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -84,7 +84,13 @@ main (int argc, char **argv)
     }
 
   id = gethostid ();
-  printf ("%lx\n", id);
+
+  /* POSIX says gethostid returns a "32-bit identifier" but is silent
+     whether it's sign-extended.  Turn off any sign-extension.  This
+     is a no-op unless unsigned int is wider than 32 bits.  */
+  id &= 0xffffffff;
+
+  printf ("%08x\n", id);
 
   exit (EXIT_SUCCESS);
 }

@@ -1,5 +1,5 @@
 /* install - copy files and set attributes
-   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu> */
 
@@ -31,10 +31,11 @@
 #include "cp-hash.h"
 #include "copy.h"
 #include "dirname.h"
-#include "makepath.h"
+#include "filenamecat.h"
+#include "mkdir-p.h"
 #include "modechange.h"
-#include "path-concat.h"
 #include "quote.h"
+#include "stat-time.h"
 #include "utimens.h"
 #include "xstrtol.h"
 
@@ -45,14 +46,6 @@
 
 #if HAVE_SYS_WAIT_H
 # include <sys/wait.h>
-#endif
-
-struct passwd *getpwnam ();
-struct group *getgrnam ();
-
-#ifndef _POSIX_VERSION
-uid_t getuid ();
-gid_t getgid ();
 #endif
 
 #if ! HAVE_ENDGRENT
@@ -72,18 +65,18 @@ gid_t getgid ();
 /* Number of bytes of a file to copy at a time. */
 #define READ_SIZE (32 * 1024)
 
-static bool change_timestamps (const char *from, const char *to);
-static bool change_attributes (const char *path);
+static bool change_timestamps (struct stat const *from_sb, char const *to);
+static bool change_attributes (char const *name);
 static bool copy_file (const char *from, const char *to,
 		       const struct cp_options *x);
-static bool install_file_to_path (const char *from, const char *to,
-				  const struct cp_options *x);
+static bool install_file_in_file_parents (char const *from, char const *to,
+					  struct cp_options const *x);
 static bool install_file_in_dir (const char *from, const char *to_dir,
 				 const struct cp_options *x);
 static bool install_file_in_file (const char *from, const char *to,
 				  const struct cp_options *x);
 static void get_ids (void);
-static void strip (const char *path);
+static void strip (char const *name);
 void usage (int status);
 
 /* The name this program was run with, for error messages. */
@@ -125,7 +118,6 @@ static struct option const long_options[] =
   {"strip", no_argument, NULL, 's'},
   {"suffix", required_argument, NULL, 'S'},
   {"target-directory", required_argument, NULL, 't'},
-  {"version-control", required_argument, NULL, 'V'}, /* Deprecated. FIXME. */
   {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
@@ -142,7 +134,7 @@ cp_option_init (struct cp_options *x)
   x->hard_link = false;
   x->interactive = I_UNSPECIFIED;
   x->move_mode = false;
-  x->myeuid = geteuid ();
+  x->chown_privileges = chown_privileges ();
   x->one_file_system = false;
   x->preserve_ownership = false;
   x->preserve_links = false;
@@ -225,18 +217,11 @@ main (int argc, char **argv)
      we'll actually use backup_suffix_string.  */
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
-  while ((optc = getopt_long (argc, argv, "bcsDdg:m:o:pt:TvV:S:", long_options,
+  while ((optc = getopt_long (argc, argv, "bcsDdg:m:o:pt:TvS:", long_options,
 			      NULL)) != -1)
     {
       switch (optc)
 	{
-	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
-	  error (0, 0,
-		 _("warning: --version-control (-V) is obsolete;  support for\
- it\nwill be removed in some future release.  Use --backup=%s instead."
-		   ), optarg);
-	  /* Fall through.  */
-
 	case 'b':
 	  make_backups = true;
 	  if (optarg)
@@ -353,12 +338,11 @@ main (int argc, char **argv)
 
   if (specified_mode)
     {
-      struct mode_change *change = mode_compile (specified_mode, 0);
-      if (change == MODE_INVALID)
+      struct mode_change *change = mode_compile (specified_mode);
+      if (!change)
 	error (EXIT_FAILURE, 0, _("invalid mode %s"), quote (specified_mode));
-      else if (change == MODE_MEMORY_EXHAUSTED)
-	xalloc_die ();
-      mode = mode_adjust (0, change);
+      mode = mode_adjust (0, change, 0);
+      free (change);
     }
 
   get_ids ();
@@ -366,11 +350,19 @@ main (int argc, char **argv)
   if (dir_arg)
     {
       int i;
+      int cwd_errno = 0;
       for (i = 0; i < n_files; i++)
 	{
-	  ok &=
-	    make_path (file[i], mode, mode, owner_id, group_id, false,
-		       (x.verbose ? _("creating directory %s") : NULL));
+	  if (cwd_errno != 0 && IS_RELATIVE_FILE_NAME (file[i]))
+	    {
+	      error (0, cwd_errno, _("cannot return to working directory"));
+	      ok = false;
+	    }
+	  else
+	    ok &=
+	      make_dir_parents (file[i], mode, mode, owner_id, group_id, false,
+				(x.verbose ? _("creating directory %s") : NULL),
+				&cwd_errno);
 	}
     }
   else
@@ -382,7 +374,7 @@ main (int argc, char **argv)
       if (!target_directory)
         {
           if (mkdir_and_install)
-	    ok = install_file_to_path (file[0], file[1], &x);
+	    ok = install_file_in_file_parents (file[0], file[1], &x);
 	  else
 	    ok = install_file_in_file (file[0], file[1], &x);
 	}
@@ -404,8 +396,8 @@ main (int argc, char **argv)
    Return true if successful.  */
 
 static bool
-install_file_to_path (const char *from, const char *to,
-		      const struct cp_options *x)
+install_file_in_file_parents (char const *from, char const *to,
+			      struct cp_options const *x)
 {
   char *dest_dir = dir_name (to);
   bool ok = true;
@@ -417,9 +409,18 @@ install_file_to_path (const char *from, const char *to,
 	 owner, group, and permissions for parent directories.  Remember
 	 that this option is intended mainly to help installers when the
 	 distribution doesn't provide proper install rules.  */
-#define DIR_MODE (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
-      ok = make_path (dest_dir, DIR_MODE, DIR_MODE, owner_id, group_id, true,
-		      (x->verbose ? _("creating directory %s") : NULL));
+      mode_t dir_mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+      int cwd_errno = 0;
+      ok = make_dir_parents (dest_dir, dir_mode, dir_mode,
+			     owner_id, group_id, true,
+			     (x->verbose ? _("creating directory %s") : NULL),
+			     &cwd_errno);
+      if (ok && cwd_errno != 0
+	  && (IS_RELATIVE_FILE_NAME (from) || IS_RELATIVE_FILE_NAME (to)))
+	{
+	  error (0, cwd_errno, _("cannot return to current directory"));
+	  ok = false;
+	}
     }
 
   free (dest_dir);
@@ -438,14 +439,20 @@ static bool
 install_file_in_file (const char *from, const char *to,
 		      const struct cp_options *x)
 {
+  struct stat from_sb;
+  if (x->preserve_timestamps && stat (from, &from_sb) != 0)
+    {
+      error (0, errno, _("cannot stat %s"), quote (from));
+      return false;
+    }
   if (! copy_file (from, to, x))
     return false;
   if (strip_files)
     strip (to);
   if (! change_attributes (to))
     return false;
-  if (x->preserve_timestamps)
-    return change_timestamps (from, to);
+  if (x->preserve_timestamps && (strip_files || ! S_ISREG (from_sb.st_mode)))
+    return change_timestamps (&from_sb, to);
   return true;
 }
 
@@ -458,7 +465,7 @@ install_file_in_dir (const char *from, const char *to_dir,
 		     const struct cp_options *x)
 {
   const char *from_base = base_name (from);
-  char *to = path_concat (to_dir, from_base, NULL);
+  char *to = file_name_concat (to_dir, from_base, NULL);
   bool ret = install_file_in_file (from, to, x);
   free (to);
   return ret;
@@ -481,11 +488,11 @@ copy_file (const char *from, const char *to, const struct cp_options *x)
   return copy (from, to, false, x, &copy_into_self, NULL);
 }
 
-/* Set the attributes of file or directory PATH.
+/* Set the attributes of file or directory NAME.
    Return true if successful.  */
 
 static bool
-change_attributes (const char *path)
+change_attributes (char const *name)
 {
   bool ok = true;
 
@@ -502,19 +509,19 @@ change_attributes (const char *path)
      want to know.  But AFS returns EPERM when you try to change a
      file's group; thus the kludge.  */
 
-  if (chown (path, owner_id, group_id)
+  if (chown (name, owner_id, group_id) != 0
 #ifdef AFS
       && errno != EPERM
 #endif
       )
     {
-      error (0, errno, _("cannot change ownership of %s"), quote (path));
+      error (0, errno, _("cannot change ownership of %s"), quote (name));
       ok = false;
     }
 
-  if (ok && chmod (path, mode))
+  if (ok && chmod (name, mode) != 0)
     {
-      error (0, errno, _("cannot change permissions of %s"), quote (path));
+      error (0, errno, _("cannot change permissions of %s"), quote (name));
       ok = false;
     }
 
@@ -525,21 +532,12 @@ change_attributes (const char *path)
    Return true if successful.  */
 
 static bool
-change_timestamps (const char *from, const char *to)
+change_timestamps (struct stat const *from_sb, char const *to)
 {
-  struct stat stb;
   struct timespec timespec[2];
+  timespec[0] = get_stat_atime (from_sb);
+  timespec[1] = get_stat_mtime (from_sb);
 
-  if (stat (from, &stb))
-    {
-      error (0, errno, _("cannot obtain time stamps for %s"), quote (from));
-      return false;
-    }
-
-  timespec[0].tv_sec = stb.st_atime;
-  timespec[0].tv_nsec = TIMESPEC_NS (stb.st_atim);
-  timespec[1].tv_sec = stb.st_mtime;
-  timespec[1].tv_nsec = TIMESPEC_NS (stb.st_mtim);
   if (utimens (to, timespec))
     {
       error (0, errno, _("cannot set time stamps for %s"), quote (to));
@@ -548,14 +546,14 @@ change_timestamps (const char *from, const char *to)
   return true;
 }
 
-/* Strip the symbol table from the file PATH.
+/* Strip the symbol table from the file NAME.
    We could dig the magic number out of the file first to
    determine whether to strip it, but the header files and
    magic numbers vary so much from system to system that making
    it portable would be very difficult.  Not worth the effort. */
 
 static void
-strip (const char *path)
+strip (char const *name)
 {
   int status;
   pid_t pid = fork ();
@@ -566,7 +564,7 @@ strip (const char *path)
       error (EXIT_FAILURE, errno, _("fork system call failed"));
       break;
     case 0:			/* Child. */
-      execlp ("strip", "strip", path, NULL);
+      execlp ("strip", "strip", name, NULL);
       error (EXIT_FAILURE, errno, _("cannot run strip"));
       break;
     default:			/* Parent. */

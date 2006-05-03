@@ -1,5 +1,5 @@
 /* cut - remove parts of lines of files
-   Copyright (C) 1997-2004 Free Software Foundation, Inc.
+   Copyright (C) 1997-2005 Free Software Foundation, Inc.
    Copyright (C) 1984 David M. Ihnat
 
    This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David Ihnat.  */
 
@@ -54,17 +54,17 @@
    space if necessary.  Update local variable N_RP.  When allocating,
    update global variable N_RP_ALLOCATED.  */
 
-#define ADD_RANGE_PAIR(rp, low, high)					\
-  do									\
-    {									\
-      if (n_rp >= n_rp_allocated)					\
-	{								\
-	  (rp) = x2nrealloc (rp, &n_rp_allocated, sizeof *(rp));	\
-	}								\
-      rp[n_rp].lo = (low);						\
-      rp[n_rp].hi = (high);						\
-      ++n_rp;								\
-    }									\
+#define ADD_RANGE_PAIR(rp, low, high)			\
+  do							\
+    {							\
+      if (n_rp >= n_rp_allocated)			\
+	{						\
+	  (rp) = X2NREALLOC (rp, &n_rp_allocated);	\
+	}						\
+      rp[n_rp].lo = (low);				\
+      rp[n_rp].hi = (high);				\
+      ++n_rp;						\
+    }							\
   while (0)
 
 struct range_pair
@@ -165,16 +165,16 @@ enum
 
 static struct option const longopts[] =
 {
-  {"bytes", required_argument, 0, 'b'},
-  {"characters", required_argument, 0, 'c'},
-  {"fields", required_argument, 0, 'f'},
-  {"delimiter", required_argument, 0, 'd'},
-  {"only-delimited", no_argument, 0, 's'},
-  {"output-delimiter", required_argument, 0, OUTPUT_DELIMITER_OPTION},
-  {"complement", no_argument, 0, COMPLEMENT_OPTION},
+  {"bytes", required_argument, NULL, 'b'},
+  {"characters", required_argument, NULL, 'c'},
+  {"fields", required_argument, NULL, 'f'},
+  {"delimiter", required_argument, NULL, 'd'},
+  {"only-delimited", no_argument, NULL, 's'},
+  {"output-delimiter", required_argument, NULL, OUTPUT_DELIMITER_OPTION},
+  {"complement", no_argument, NULL, COMPLEMENT_OPTION},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 void
@@ -447,7 +447,6 @@ set_fields (const char *fieldstr)
 	}
       else if (ISDIGIT (*fieldstr))
 	{
-	  size_t new_v;
 	  /* Record beginning of digit string, in case we have to
 	     complain about it.  */
 	  static char const *num_start;
@@ -456,10 +455,9 @@ set_fields (const char *fieldstr)
 	  in_digits = true;
 
 	  /* Detect overflow.  */
-	  new_v = 10 * value + *fieldstr - '0';
-	  if (SIZE_MAX / 10 < value || new_v < value * 10)
+	  if (!DECIMAL_DIGIT_ACCUMULATE (value, *fieldstr - '0', size_t))
 	    {
-	      /* In case the user specified -c4294967296-22,
+	      /* In case the user specified -c4294967296,22,
 		 complain only about the first number.  */
 	      /* Determine the length of the offending number.  */
 	      size_t len = strspn (num_start, "0123456789");
@@ -473,7 +471,6 @@ set_fields (const char *fieldstr)
 	      free (bad_num);
 	      exit (EXIT_FAILURE);
 	    }
-	  value = new_v;
 
 	  fieldstr++;
 	}
@@ -537,7 +534,7 @@ cut_bytes (FILE *stream)
   print_delimiter = false;
   while (1)
     {
-      register int c;		/* Each character from the file. */
+      int c;		/* Each character from the file. */
 
       c = getc (stream);
 

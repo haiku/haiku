@@ -2,7 +2,7 @@
 
 /* Modified to run with the GNU shell by bfox. */
 
-/* Copyright (C) 1987-2004 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2005 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -18,7 +18,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Define TEST_STANDALONE to get the /bin/test version.  Otherwise, you get
    the shell builtin version. */
@@ -43,28 +43,21 @@
 #include "system.h"
 #include "error.h"
 #include "euidaccess.h"
+#include "inttostr.h"
 #include "quote.h"
+#include "stat-time.h"
+#include "strnumcmp.h"
 
-#ifndef _POSIX_VERSION
+#if HAVE_SYS_PARAM_H
 # include <sys/param.h>
-#endif /* _POSIX_VERSION */
-#define whitespace(c) (((c) == ' ') || ((c) == '\t'))
-#define digit(c)  ((c) >= '0' && (c) <= '9')
-#define digit_value(c) ((c) - '0')
+#endif
 
 char *program_name;
-
-#if !defined (_POSIX_VERSION)
-# include <sys/file.h>
-#endif /* !_POSIX_VERSION */
-
-extern gid_t getegid ();
-extern uid_t geteuid ();
 
 /* Exit status for syntax errors, etc.  */
 enum { TEST_TRUE, TEST_FALSE, TEST_FAILURE };
 
-#if defined (TEST_STANDALONE)
+#if defined TEST_STANDALONE
 # define test_exit(val) exit (val)
 #else
    static jmp_buf test_exit_buf;
@@ -77,7 +70,6 @@ static int argc;	/* The number of arguments present in ARGV. */
 static char **argv;	/* The argument list. */
 
 static bool test_unop (char const *s);
-static bool binop (char *s);
 static bool unary_operator (void);
 static bool binary_operator (bool);
 static bool two_arguments (void);
@@ -132,82 +124,66 @@ beyond (void)
   test_syntax_error (_("missing argument after %s"), quote (argv[argc - 1]));
 }
 
-/* Syntax error for when an integer argument was expected, but
-   something else was found. */
-static void
-integer_expected_error (char const *pch)
+/* If the characters pointed to by STRING constitute a valid number,
+   return a pointer to the start of the number, skipping any blanks or
+   leading '+'.  Otherwise, report an error and exit.  */
+static char const *
+find_int (char const *string)
 {
-  test_syntax_error (_("%s: integer expression expected\n"), pch);
+  char const *p;
+  char const *number_start;
+
+  for (p = string; ISBLANK (to_uchar (*p)); p++)
+    continue;
+
+  if (*p == '+')
+    {
+      p++;
+      number_start = p;
+    }
+  else
+    {
+      number_start = p;
+      p += (*p == '-');
+    }
+
+  if (ISDIGIT (*p++))
+    {
+      while (ISDIGIT (*p))
+	p++;
+      while (ISBLANK (to_uchar (*p)))
+	p++;
+      if (!*p)
+	return number_start;
+    }
+
+  test_syntax_error (_("invalid integer %s\n"), quote (string));
 }
 
-/* Return true if the characters pointed to by STRING constitute a
-   valid number.  Stuff the converted number into RESULT if RESULT is
-   not null.  */
-static bool
-is_int (register char *string, intmax_t *result)
-{
-  int sign;
-  intmax_t value;
-
-  sign = 1;
-  value = 0;
-
-  if (result)
-    *result = 0;
-
-  /* Skip leading whitespace characters. */
-  while (whitespace (*string))
-    string++;
-
-  if (!*string)
-    return false;
-
-  /* We allow leading `-' or `+'. */
-  if (*string == '-' || *string == '+')
-    {
-      if (!digit (string[1]))
-	return false;
-
-      if (*string == '-')
-	sign = -1;
-
-      string++;
-    }
-
-  while (digit (*string))
-    {
-      if (result)
-	value = (value * 10) + digit_value (*string);
-      string++;
-    }
-
-  /* Skip trailing whitespace, if any. */
-  while (whitespace (*string))
-    string++;
-
-  /* Error if not at end of string. */
-  if (*string)
-    return false;
-
-  if (result)
-    {
-      value *= sign;
-      *result = value;
-    }
-
-  return true;
-}
-
-/* Find the modification time of FILE, and stuff it into *AGE.
+/* Find the modification time of FILE, and stuff it into *MTIME.
    Return true if successful.  */
 static bool
-age_of (char *filename, time_t *age)
+get_mtime (char const *filename, struct timespec *mtime)
 {
   struct stat finfo;
   bool ok = (stat (filename, &finfo) == 0);
+#ifdef lint
+  static struct timespec const zero;
+  *mtime = zero;
+#endif
   if (ok)
-    *age = finfo.st_mtime;
+    *mtime = get_stat_mtime (&finfo);
   return ok;
+}
+
+/* Return true if S is one of the test command's binary operators.  */
+static bool
+binop (char const *s)
+{
+  return ((STREQ (s,   "=")) || (STREQ (s,  "!=")) || (STREQ (s, "-nt")) ||
+	  (STREQ (s, "-ot")) || (STREQ (s, "-ef")) || (STREQ (s, "-eq")) ||
+	  (STREQ (s, "-ne")) || (STREQ (s, "-lt")) || (STREQ (s, "-le")) ||
+	  (STREQ (s, "-gt")) || (STREQ (s, "-ge")));
 }
 
 /*
@@ -295,9 +271,8 @@ term (void)
 static bool
 binary_operator (bool l_is_l)
 {
-  register int op;
+  int op;
   struct stat stat_buf, stat_spare;
-  intmax_t l, r;
   /* Is the right integer expression of the form '-l string'? */
   bool r_is_l;
 
@@ -316,158 +291,49 @@ binary_operator (bool l_is_l)
   if (argv[op][0] == '-')
     {
       /* check for eq, nt, and stuff */
+      if ((((argv[op][1] == 'l' || argv[op][1] == 'g')
+	    && (argv[op][2] == 'e' || argv[op][2] == 't'))
+	   || (argv[op][1] == 'e' && argv[op][2] == 'q')
+	   || (argv[op][1] == 'n' && argv[op][2] == 'e'))
+	  && !argv[op][3])
+	{
+	  char lbuf[INT_BUFSIZE_BOUND (uintmax_t)];
+	  char rbuf[INT_BUFSIZE_BOUND (uintmax_t)];
+	  char const *l = (l_is_l
+			   ? umaxtostr (strlen (argv[op - 1]), lbuf)
+			   : find_int (argv[op - 1]));
+	  char const *r = (r_is_l
+			   ? umaxtostr (strlen (argv[op + 2]), rbuf)
+			   : find_int (argv[op + 1]));
+	  int cmp = strintcmp (l, r);
+	  bool xe_operator = (argv[op][2] == 'e');
+	  pos += 3;
+	  return (argv[op][1] == 'l' ? cmp < xe_operator
+		  : argv[op][1] == 'g' ? cmp > - xe_operator
+		  : (cmp != 0) == xe_operator);
+	}
+
       switch (argv[op][1])
 	{
 	default:
-	  break;
-
-	case 'l':
-	  if (argv[op][2] == 't' && !argv[op][3])
-	    {
-	      /* lt */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -lt"));
-		}
-
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -lt"));
-		}
-	      pos += 3;
-	      return l < r;
-	    }
-
-	  if (argv[op][2] == 'e' && !argv[op][3])
-	    {
-	      /* le */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -le"));
-		}
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -le"));
-		}
-	      pos += 3;
-	      return l <= r;
-	    }
-	  break;
-
-	case 'g':
-	  if (argv[op][2] == 't' && !argv[op][3])
-	    {
-	      /* gt integer greater than */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -gt"));
-		}
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -gt"));
-		}
-	      pos += 3;
-	      return l > r;
-	    }
-
-	  if (argv[op][2] == 'e' && !argv[op][3])
-	    {
-	      /* ge - integer greater than or equal to */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -ge"));
-		}
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -ge"));
-		}
-	      pos += 3;
-	      return l >= r;
-	    }
 	  break;
 
 	case 'n':
 	  if (argv[op][2] == 't' && !argv[op][3])
 	    {
 	      /* nt - newer than */
-	      time_t lt, rt;
+	      struct timespec lt, rt;
 	      bool le, re;
 	      pos += 3;
 	      if (l_is_l | r_is_l)
 		test_syntax_error (_("-nt does not accept -l\n"), NULL);
-	      le = age_of (argv[op - 1], &lt);
-	      re = age_of (argv[op + 1], &rt);
-	      return le > re || (le && lt > rt);
-	    }
-
-	  if (argv[op][2] == 'e' && !argv[op][3])
-	    {
-	      /* ne - integer not equal */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -ne"));
-		}
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -ne"));
-		}
-	      pos += 3;
-	      return l != r;
+	      le = get_mtime (argv[op - 1], &lt);
+	      re = get_mtime (argv[op + 1], &rt);
+	      return le && (!re || timespec_cmp (lt, rt) > 0);
 	    }
 	  break;
 
 	case 'e':
-	  if (argv[op][2] == 'q' && !argv[op][3])
-	    {
-	      /* eq - integer equal */
-	      if (l_is_l)
-		l = strlen (argv[op - 1]);
-	      else
-		{
-		  if (!is_int (argv[op - 1], &l))
-		    integer_expected_error (_("before -eq"));
-		}
-	      if (r_is_l)
-		r = strlen (argv[op + 2]);
-	      else
-		{
-		  if (!is_int (argv[op + 1], &r))
-		    integer_expected_error (_("after -eq"));
-		}
-	      pos += 3;
-	      return l == r;
-	    }
-
 	  if (argv[op][2] == 'f' && !argv[op][3])
 	    {
 	      /* ef - hard link? */
@@ -485,14 +351,14 @@ binary_operator (bool l_is_l)
 	  if ('t' == argv[op][2] && '\000' == argv[op][3])
 	    {
 	      /* ot - older than */
-	      time_t lt, rt;
+	      struct timespec lt, rt;
 	      bool le, re;
 	      pos += 3;
 	      if (l_is_l | r_is_l)
 		test_syntax_error (_("-ot does not accept -l\n"), NULL);
-	      le = age_of (argv[op - 1], &lt);
-	      re = age_of (argv[op + 1], &rt);
-	      return le < re || (re && lt < rt);
+	      le = get_mtime (argv[op - 1], &lt);
+	      re = get_mtime (argv[op + 1], &rt);
+	      return re && (!le || timespec_cmp (lt, rt) < 0);
 	    }
 	  break;
 	}
@@ -623,11 +489,13 @@ unary_operator (void)
 
     case 't':			/* File (fd) is a terminal? */
       {
-	intmax_t fd;
+	long int fd;
+	char const *arg;
 	unary_advance ();
-	if (!is_int (argv[pos - 1], &fd))
-	  integer_expected_error (_("after -t"));
-	return INT_MIN <= fd && fd <= INT_MAX && isatty (fd);
+	arg = find_int (argv[pos - 1]);
+	errno = 0;
+	fd = strtol (arg, NULL, 10);
+	return (errno != ERANGE && 0 <= fd && fd <= INT_MAX && isatty (fd));
       }
 
     case 'n':			/* True if arg has some length. */
@@ -689,16 +557,6 @@ expr (void)
     beyond ();
 
   return or ();		/* Same with this. */
-}
-
-/* Return true if S is one of the test command's binary operators.  */
-static bool
-binop (char *s)
-{
-  return ((STREQ (s,   "=")) || (STREQ (s,  "!=")) || (STREQ (s, "-nt")) ||
-	  (STREQ (s, "-ot")) || (STREQ (s, "-ef")) || (STREQ (s, "-eq")) ||
-	  (STREQ (s, "-ne")) || (STREQ (s, "-lt")) || (STREQ (s, "-le")) ||
-	  (STREQ (s, "-gt")) || (STREQ (s, "-ge")));
 }
 
 /* Return true if OP is one of the test command's unary operators. */
@@ -821,7 +679,7 @@ posixtest (int nargs)
   return (value);
 }
 
-#if defined (TEST_STANDALONE)
+#if defined TEST_STANDALONE
 # include "long-options.h"
 
 void
@@ -838,6 +696,8 @@ Usage: test EXPRESSION\n\
   or:  [ EXPRESSION ]\n\
   or:  [ ]\n\
   or:  [ OPTION\n\
+"), stdout);
+      fputs (_("\
 Exit with the status determined by EXPRESSION.\n\
 \n\
 "), stdout);
@@ -912,13 +772,14 @@ Except for -h and -L, all FILE-related tests dereference symbolic links.\n\
 Beware that parentheses need to be escaped (e.g., by backslashes) for shells.\n\
 INTEGER may also be -l STRING, which evaluates to the length of STRING.\n\
 "), stdout);
+      printf (USAGE_BUILTIN_WARNING, _("test and/or ["));
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
 }
 #endif /* TEST_STANDALONE */
 
-#if !defined (TEST_STANDALONE)
+#if !defined TEST_STANDALONE
 # define main test_command
 #endif
 
@@ -935,7 +796,7 @@ main (int margc, char **margv)
 {
   bool value;
 
-#if !defined (TEST_STANDALONE)
+#if !defined TEST_STANDALONE
   int code;
 
   code = setjmp (test_exit_buf);

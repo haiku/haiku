@@ -1,5 +1,5 @@
 /* tail -- output the last part of file(s)
-   Copyright (C) 1989, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 1989, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Can display any amount of data, unlike the Unix version, which uses
    a fixed size buffer and therefore can only deliver a limited number
@@ -35,11 +35,12 @@
 #include "argmatch.h"
 #include "c-strtod.h"
 #include "error.h"
-#include "fcntl-safer.h"
+#include "fcntl--.h"
 #include "inttostr.h"
 #include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
+#include "stat-time.h"
 #include "xnanosleep.h"
 #include "xstrtol.h"
 #include "xstrtod.h"
@@ -79,13 +80,18 @@ enum Follow_mode
   Follow_descriptor = 2
 };
 
+/* On Darwin 7.7, when reading from a command-line pipe, standard
+   input is of type S_ISSOCK.  Everywhere else it's S_ISFIFO.  */
+#define IS_PIPE_LIKE_FILE_TYPE(Mode) \
+  (S_ISFIFO (Mode) || S_ISSOCK (Mode))
+
 /* The types of files for which tail works.  */
 #define IS_TAILABLE_FILE_TYPE(Mode) \
-  (S_ISREG (Mode) || S_ISFIFO (Mode) || S_ISCHR (Mode))
+  (S_ISREG (Mode) || IS_PIPE_LIKE_FILE_TYPE (Mode) || S_ISCHR (Mode))
 
 static char const *const follow_mode_string[] =
 {
-  "descriptor", "name", 0
+  "descriptor", "name", NULL
 };
 
 static enum Follow_mode const follow_mode_map[] =
@@ -184,7 +190,6 @@ static bool presume_input_pipe;
 enum
 {
   RETRY_OPTION = CHAR_MAX + 1,
-  ALLOW_MISSING_OPTION,   /* deprecated, FIXME: remove in late 2004 */
   MAX_UNCHANGED_STATS_OPTION,
   PID_OPTION,
   PRESUME_INPUT_PIPE_OPTION,
@@ -193,8 +198,6 @@ enum
 
 static struct option const long_options[] =
 {
-  /* FIXME: remove in 2005 --allow-missing is deprecated; use --retry instead */
-  {"allow-missing", no_argument, NULL, ALLOW_MISSING_OPTION},
   {"bytes", required_argument, NULL, 'c'},
   {"follow", optional_argument, NULL, LONG_FOLLOW_OPTION},
   {"lines", required_argument, NULL, 'n'},
@@ -306,9 +309,8 @@ pretty_name (struct File_spec const *f)
 }
 
 static void
-xwrite (int fd, char const *buffer, size_t n_bytes)
+xwrite_stdout (char const *buffer, size_t n_bytes)
 {
-  assert (fd == STDOUT_FILENO);
   if (n_bytes > 0 && fwrite (buffer, 1, n_bytes, stdout) == 0)
     error (EXIT_FAILURE, errno, _("write error"));
 }
@@ -323,8 +325,7 @@ record_open_fd (struct File_spec *f, int fd,
 {
   f->fd = fd;
   f->size = size;
-  f->mtime.tv_sec = st->st_mtime;
-  f->mtime.tv_nsec = TIMESPEC_NS (st->st_mtim);
+  f->mtime = get_stat_mtime (st);
   f->dev = st->st_dev;
   f->ino = st->st_ino;
   f->mode = st->st_mode;
@@ -379,7 +380,7 @@ dump_remainder (const char *pretty_filename, int fd, uintmax_t n_bytes)
 	}
       if (bytes_read == 0)
 	break;
-      xwrite (STDOUT_FILENO, buffer, bytes_read);
+      xwrite_stdout (buffer, bytes_read);
       n_written += bytes_read;
       if (n_bytes != COPY_TO_EOF)
 	{
@@ -487,7 +488,7 @@ file_lines (const char *pretty_filename, int fd, uintmax_t n_lines,
 	      /* If this newline isn't the last character in the buffer,
 	         output the part that is after it.  */
 	      if (n != bytes_read - 1)
-		xwrite (STDOUT_FILENO, nl + 1, bytes_read - (n + 1));
+		xwrite_stdout (nl + 1, bytes_read - (n + 1));
 	      *read_pos += dump_remainder (pretty_filename, fd,
 					   end_pos - (pos + bytes_read));
 	      return true;
@@ -645,11 +646,11 @@ pipe_lines (const char *pretty_filename, int fd, uintmax_t n_lines,
 	  }
       }
 
-    xwrite (STDOUT_FILENO, beg, buffer_end - beg);
+    xwrite_stdout (beg, buffer_end - beg);
   }
 
   for (tmp = tmp->next; tmp; tmp = tmp->next)
-    xwrite (STDOUT_FILENO, tmp->buffer, tmp->nbytes);
+    xwrite_stdout (tmp->buffer, tmp->nbytes);
 
 free_lbuffers:
   while (first)
@@ -747,10 +748,10 @@ pipe_bytes (const char *pretty_filename, int fd, uintmax_t n_bytes,
     i = total_bytes - n_bytes;
   else
     i = 0;
-  xwrite (STDOUT_FILENO, &tmp->buffer[i], tmp->nbytes - i);
+  xwrite_stdout (&tmp->buffer[i], tmp->nbytes - i);
 
   for (tmp = tmp->next; tmp; tmp = tmp->next)
-    xwrite (STDOUT_FILENO, tmp->buffer, tmp->nbytes);
+    xwrite_stdout (tmp->buffer, tmp->nbytes);
 
 free_cbuffers:
   while (first)
@@ -789,7 +790,7 @@ start_bytes (const char *pretty_filename, int fd, uintmax_t n_bytes,
 	{
 	  size_t n_remaining = bytes_read - n_bytes;
 	  if (n_remaining)
-	    xwrite (STDOUT_FILENO, &buffer[n_bytes], n_remaining);
+	    xwrite_stdout (&buffer[n_bytes], n_remaining);
 	  break;
 	}
     }
@@ -830,7 +831,7 @@ start_lines (const char *pretty_filename, int fd, uintmax_t n_lines,
 	  if (--n_lines == 0)
 	    {
 	      if (p < buffer_end)
-		xwrite (STDOUT_FILENO, p, buffer_end - p);
+		xwrite_stdout (p, buffer_end - p);
 	      return 0;
 	    }
 	}
@@ -851,7 +852,7 @@ recheck (struct File_spec *f, bool blocking)
   bool new_file;
   int fd = (is_stdin
 	    ? STDIN_FILENO
-	    : open_safer (f->name, O_RDONLY | (blocking ? 0 : O_NONBLOCK)));
+	    : open (f->name, O_RDONLY | (blocking ? 0 : O_NONBLOCK)));
 
   assert (valid_file_spec (f));
 
@@ -871,8 +872,8 @@ recheck (struct File_spec *f, bool blocking)
 		 unreadable (perms), and later becomes readable again and can
 		 be seen to be the same file (dev/ino).  Otherwise, tail prints
 		 the entire contents of the file when it becomes readable.  */
-	      error (0, f->errnum, _("`%s' has become inaccessible"),
-		     pretty_name (f));
+	      error (0, f->errnum, _("%s has become inaccessible"),
+		     quote (pretty_name (f)));
 	    }
 	  else
 	    {
@@ -888,9 +889,9 @@ recheck (struct File_spec *f, bool blocking)
     {
       ok = false;
       f->errnum = -1;
-      error (0, 0, _("`%s' has been replaced with an untailable file;\
+      error (0, 0, _("%s has been replaced with an untailable file;\
  giving up on this name"),
-	     pretty_name (f));
+	     quote (pretty_name (f)));
       f->ignore = true;
     }
   else
@@ -909,7 +910,7 @@ recheck (struct File_spec *f, bool blocking)
     {
       new_file = true;
       assert (f->fd == -1);
-      error (0, 0, _("`%s' has become accessible"), pretty_name (f));
+      error (0, 0, _("%s has become accessible"), quote (pretty_name (f)));
     }
   else if (f->ino != new_stats.st_ino || f->dev != new_stats.st_dev)
     {
@@ -917,8 +918,8 @@ recheck (struct File_spec *f, bool blocking)
       if (f->fd == -1)
 	{
 	  error (0, 0,
-		 _("`%s' has appeared;  following end of new file"),
-		 pretty_name (f));
+		 _("%s has appeared;  following end of new file"),
+		 quote (pretty_name (f)));
 	}
       else
 	{
@@ -928,8 +929,8 @@ recheck (struct File_spec *f, bool blocking)
 	  /* File has been replaced (e.g., via log rotation) --
 	     tail the new one.  */
 	  error (0, 0,
-		 _("`%s' has been replaced;  following end of new file"),
-		 pretty_name (f));
+		 _("%s has been replaced;  following end of new file"),
+		 quote (pretty_name (f)));
 	}
     }
   else
@@ -1020,12 +1021,22 @@ tail_forever (struct File_spec *f, int nfiles, double sleep_interval)
 	      if (old_flags < 0
 		  || (new_flags != old_flags
 		      && fcntl (fd, F_SETFL, new_flags) == -1))
-		error (EXIT_FAILURE, errno,
-		       _("%s: cannot change nonblocking mode"), name);
-	      f[i].blocking = blocking;
+		{
+		  /* Don't update f[i].blocking if fcntl fails.  */
+		  if (S_ISREG (f[i].mode) && errno == EPERM)
+		    {
+		      /* This happens when using tail -f on a file with
+			 the append-only attribute.  */
+		    }
+		  else
+		    error (EXIT_FAILURE, errno,
+			   _("%s: cannot change nonblocking mode"), name);
+		}
+	      else
+		f[i].blocking = blocking;
 	    }
 
-	  if (!blocking)
+	  if (!f[i].blocking)
 	    {
 	      if (fstat (fd, &stats) != 0)
 		{
@@ -1035,16 +1046,15 @@ tail_forever (struct File_spec *f, int nfiles, double sleep_interval)
 		  continue;
 		}
 
-	      if ((! S_ISREG (stats.st_mode) || f[i].size == stats.st_size)
-		  && f[i].mtime.tv_sec == stats.st_mtime
-		  && f[i].mtime.tv_nsec == TIMESPEC_NS (stats.st_mtim)
-		  && f[i].mode == stats.st_mode)
+	      if (f[i].mode == stats.st_mode
+		  && (! S_ISREG (stats.st_mode) || f[i].size == stats.st_size)
+		  && timespec_cmp (f[i].mtime, get_stat_mtime (&stats)) == 0)
 		{
 		  if ((max_n_unchanged_stats_between_opens
 		       <= f[i].n_unchanged_stats++)
 		      && follow_mode == Follow_name)
 		    {
-		      recheck (&f[i], blocking);
+		      recheck (&f[i], f[i].blocking);
 		      f[i].n_unchanged_stats = 0;
 		    }
 		  continue;
@@ -1053,8 +1063,7 @@ tail_forever (struct File_spec *f, int nfiles, double sleep_interval)
 	      /* This file has changed.  Print out what we can, and
 		 then keep looping.  */
 
-	      f[i].mtime.tv_sec = stats.st_mtime;
-	      f[i].mtime.tv_nsec = TIMESPEC_NS (stats.st_mtim);
+	      f[i].mtime = get_stat_mtime (&stats);
 	      f[i].mode = stats.st_mode;
 
 	      /* reset counter */
@@ -1078,7 +1087,8 @@ tail_forever (struct File_spec *f, int nfiles, double sleep_interval)
 	    }
 
 	  bytes_read = dump_remainder (name, fd,
-				       blocking ? COPY_A_BUFFER : COPY_TO_EOF);
+				       (f[i].blocking
+					? COPY_A_BUFFER : COPY_TO_EOF));
 	  any_input |= (bytes_read != 0);
 	  f[i].size += bytes_read;
 	}
@@ -1121,10 +1131,6 @@ tail_bytes (const char *pretty_filename, int fd, uintmax_t n_bytes,
 	    uintmax_t *read_pos)
 {
   struct stat stats;
-
-  /* We need binary input, since `tail' relies on `lseek' and byte counts,
-     while binary output will preserve the style (Unix/DOS) of text file.  */
-  SET_BINARY2 (fd, STDOUT_FILENO);
 
   if (fstat (fd, &stats))
     {
@@ -1191,10 +1197,6 @@ tail_lines (const char *pretty_filename, int fd, uintmax_t n_lines,
 	    uintmax_t *read_pos)
 {
   struct stat stats;
-
-  /* We need binary input, since `tail' relies on `lseek' and byte counts,
-     while binary output will preserve the style (Unix/DOS) of text file.  */
-  SET_BINARY2 (fd, STDOUT_FILENO);
 
   if (fstat (fd, &stats))
     {
@@ -1278,11 +1280,11 @@ tail_file (struct File_spec *f, uintmax_t n_units)
     {
       have_read_stdin = true;
       fd = STDIN_FILENO;
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
-    {
-      fd = open_safer (f->name, O_RDONLY);
-    }
+    fd = open (f->name, O_RDONLY | O_BINARY);
 
   f->tailable = !(reopen_inaccessible_files && fd == -1);
 
@@ -1372,7 +1374,7 @@ tail_file (struct File_spec *f, uintmax_t n_units)
 static bool
 parse_obsolete_option (int argc, char * const *argv, uintmax_t *n_units)
 {
-  const char *p = argv[1];
+  const char *p;
   const char *n_string;
   const char *n_string_end;
   bool obsolete_usage;
@@ -1381,13 +1383,15 @@ parse_obsolete_option (int argc, char * const *argv, uintmax_t *n_units)
   bool t_count_lines = true;
   bool t_forever = false;
 
-  /* With the obsolete form, there is one option string and
-     (technically) at most one file argument.  But we allow two or more
-     by default.  */
-  if (argc < 2)
+  /* With the obsolete form, there is one option string and at most
+     one file argument.  Watch out for "-" and "--", though.  */
+  if (! (argc == 2
+	 || (argc == 3 && ! (argv[2][0] == '-' && argv[2][1]))
+	 || (3 <= argc && argc <= 4 && STREQ (argv[2], "--"))))
     return false;
 
   obsolete_usage = (posix2_version () < 200112);
+  p = argv[1];
 
   switch (*p++)
     {
@@ -1405,8 +1409,8 @@ parse_obsolete_option (int argc, char * const *argv, uintmax_t *n_units)
     case '-':
       /* In the non-obsolete form, "-" is standard input and "-c"
 	 requires an option-argument.  The obsolete multidigit options
-	 are diagnosed more nicely below than they would be if we
-	 simply returned false here.  */
+	 are supported as a GNU extension even when conforming to
+	 POSIX 1003.1-2001, so don't complain about them.  */
       if (!obsolete_usage && !p[p[0] == 'c'])
 	return false;
 
@@ -1437,21 +1441,10 @@ parse_obsolete_option (int argc, char * const *argv, uintmax_t *n_units)
 
   if (n_string == n_string_end)
     *n_units = default_count;
-  else
-    {
-      if ((xstrtoumax (n_string, NULL, 10, n_units, "b")
-	   & ~LONGINT_INVALID_SUFFIX_CHAR)
-	  != LONGINT_OK)
-	error (EXIT_FAILURE, 0, _("number in `%s' is too large"), argv[1]);
-
-      if (!obsolete_usage)
-	{
-	  error (0, 0, _("`%s' option is obsolete; use `%s-%c %"PRIuMAX"'"),
-		 argv[1], t_forever ? "-f " : "", t_count_lines ? 'n' : 'c',
-		 *n_units);
-	  usage (EXIT_FAILURE);
-	}
-    }
+  else if ((xstrtoumax (n_string, NULL, 10, n_units, "b")
+	    & ~LONGINT_INVALID_SUFFIX_CHAR)
+	   != LONGINT_OK)
+    error (EXIT_FAILURE, 0, _("number in %s is too large"), quote (argv[1]));
 
   /* Set globals.  */
   from_start = t_from_start;
@@ -1510,10 +1503,6 @@ parse_options (int argc, char **argv,
 				     follow_mode_string, follow_mode_map);
 	  break;
 
-	case ALLOW_MISSING_OPTION:
-	  error (0, 0,
-	   _("the --allow-missing option is deprecated; use --retry instead"));
-	  /* fall through */
 	case RETRY_OPTION:
 	  reopen_inaccessible_files = true;
 	  break;
@@ -1650,7 +1639,8 @@ main (int argc, char **argv)
       if (forever)
 	{
 	  struct stat stats;
-	  if (fstat (STDIN_FILENO, &stats) == 0 && S_ISFIFO (stats.st_mode))
+	  if (fstat (STDIN_FILENO, &stats) == 0
+	      && IS_PIPE_LIKE_FILE_TYPE (stats.st_mode))
 	    forever = false;
 	}
     }
@@ -1681,6 +1671,9 @@ main (int argc, char **argv)
   if (header_mode == always
       || (header_mode == multiple_files && n_files > 1))
     print_headers = true;
+
+  if (O_BINARY && ! isatty (STDOUT_FILENO))
+    freopen (NULL, "wb", stdout);
 
   for (i = 0; i < n_files; i++)
     ok &= tail_file (&F[i], n_units);

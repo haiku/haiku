@@ -1,6 +1,6 @@
 /* Declarations of functions and data types used for SHA1 sum
    library functions.
-   Copyright (C) 2000, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef SHA1_H
 # define SHA1_H 1
@@ -33,7 +33,7 @@ struct sha1_ctx
 
   md5_uint32 total[2];
   md5_uint32 buflen;
-  char buffer[128];
+  char buffer[128] __attribute__ ((__aligned__ (__alignof__ (md5_uint32))));
 };
 
 

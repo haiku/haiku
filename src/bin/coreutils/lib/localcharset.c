@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>.  */
 
@@ -106,7 +106,7 @@ static const char * volatile charset_aliases;
 
 /* Return a pointer to the contents of the charset.alias file.  */
 static const char *
-get_charset_aliases ()
+get_charset_aliases (void)
 {
   const char *cp;
 
@@ -115,9 +115,15 @@ get_charset_aliases ()
     {
 #if !(defined VMS || defined WIN32 || defined __BEOS__)
       FILE *fp;
-      const char *dir = relocate (LIBDIR);
+      const char *dir;
       const char *base = "charset.alias";
       char *file_name;
+
+      /* Make it possible to override the charset.alias location.  This is
+	 necessary for running the testsuite before "make install".  */
+      dir = getenv ("CHARSETALIASDIR");
+      if (dir == NULL || dir[0] == '\0')
+	dir = relocate (LIBDIR);
 
       /* Concatenate dir and base into freshly allocated file_name.  */
       {

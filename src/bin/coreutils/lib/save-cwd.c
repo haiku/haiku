@@ -1,5 +1,7 @@
 /* save-cwd.c -- Save and restore current working directory.
-   Copyright (C) 1995, 1997, 1998, 2003, 2004 Free Software Foundation, Inc.
+
+   Copyright (C) 1995, 1997, 1998, 2003, 2004, 2005 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,34 +15,37 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering.  */
 
-#if HAVE_CONFIG_H
-# include "config.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
 #endif
 
 #include "save-cwd.h"
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-
-#if HAVE_FCNTL_H
-# include <fcntl.h>
-#else
-# include <sys/file.h>
-#endif
-
-#include <errno.h>
+#include <unistd.h>
 
 #include "chdir-long.h"
+#include "fcntl--.h"
 #include "xgetcwd.h"
+
+/* On systems without the fchdir function (WOE), pretend that open
+   always returns -1 so that save_cwd resorts to using xgetcwd.
+   Since chdir_long requires fchdir, use chdir instead.  */
+#if !HAVE_FCHDIR
+# undef open
+# define open(File, Flags) (-1)
+# undef fchdir
+# define fchdir(Fd) (abort (), -1)
+# undef chdir_long
+# define chdir_long(Dir) chdir (Dir)
+#endif
 
 /* Record the location of the current working directory in CWD so that
    the program may change to other directories and later use restore_cwd
@@ -51,68 +56,33 @@
    closed;  return non-zero -- in that case, free_cwd need not be
    called, but doing so is ok.  Otherwise, return zero.
 
-   The `raison d'etre' for this interface is that some systems lack
-   support for fchdir, and getcwd is not robust or as efficient.
+   The `raison d'etre' for this interface is that the working directory
+   is sometimes inaccessible, and getcwd is not robust or as efficient.
    So, we prefer to use the open/fchdir approach, but fall back on
-   getcwd if necessary.  Some systems lack fchdir altogether: OS/2,
-   Cygwin (as of March 2003), SCO Xenix.  At least SunOS 4 and Irix 5.3
-   provide the function, yet it doesn't work for partitions on which
-   auditing is enabled.  */
+   getcwd if necessary.
+
+   Some systems lack fchdir altogether: e.g., OS/2, pre-2001 Cygwin,
+   SCO Xenix.  Also, SunOS 4 and Irix 5.3 provide the function, yet it
+   doesn't work for partitions on which auditing is enabled.  If
+   you're still using an obsolete system with these problems, please
+   send email to the maintainer of this code.  */
 
 int
 save_cwd (struct saved_cwd *cwd)
 {
-#if !HAVE_FCHDIR
-# undef fchdir
-# define fchdir(x) (abort (), 0)
-  bool have_working_fchdir = false;
-  bool fchdir_needs_testing = false;
-#elif (__sgi || __sun)
-  static bool have_working_fchdir = true;
-  bool fchdir_needs_testing = true;
-#else
-  bool have_working_fchdir = true;
-  bool fchdir_needs_testing = false;
-#endif
-
-  cwd->desc = -1;
   cwd->name = NULL;
 
-  if (have_working_fchdir)
+  cwd->desc = open (".", O_RDONLY);
+  if (cwd->desc < 0)
     {
-      cwd->desc = open (".", O_RDONLY);
+      cwd->desc = open (".", O_WRONLY);
       if (cwd->desc < 0)
 	{
-	  cwd->desc = open (".", O_WRONLY);
-	  if (cwd->desc < 0)
-	    {
-	      cwd->name = xgetcwd ();
-	      return cwd->name ? 0 : -1;
-	    }
-	}
-
-      /* On SunOS 4 and IRIX 5.3, fchdir returns EINVAL when auditing
-	 is enabled, so we have to fall back to chdir.  */
-      if (fchdir_needs_testing && fchdir (cwd->desc) != 0)
-	{
-	  int saved_errno = errno;
-	  close (cwd->desc);
-	  cwd->desc = -1;
-	  if (saved_errno != EINVAL)
-	    {
-	      errno = saved_errno;
-	      return -1;
-	    }
-	  have_working_fchdir = false;
+	  cwd->name = xgetcwd ();
+	  return cwd->name ? 0 : -1;
 	}
     }
 
-  if (!have_working_fchdir)
-    {
-      cwd->name = xgetcwd ();
-      if (cwd->name == NULL)
-	return -1;
-    }
   return 0;
 }
 

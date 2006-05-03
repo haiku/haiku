@@ -1,5 +1,5 @@
 /* head -- output first part of file(s)
-   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Options: (see usage)
    Reads from standard input if no files are given or when a filename of
@@ -36,7 +36,6 @@
 #include "full-write.h"
 #include "full-read.h"
 #include "inttostr.h"
-#include "posixver.h"
 #include "quote.h"
 #include "safe-read.h"
 #include "xstrtol.h"
@@ -63,9 +62,6 @@ enum header_mode
 {
   multiple_files, always, never
 };
-
-/* Options corresponding to header_mode values.  */
-static char const header_mode_option[][4] = { "", " -v", " -q" };
 
 /* The name this program was run with. */
 char *program_name;
@@ -231,7 +227,7 @@ elide_tail_bytes_pipe (const char *filename, int fd, uintmax_t n_elide_0)
   if (SIZE_MAX < n_elide_0 + READ_BUFSIZE)
     {
       char umax_buf[INT_BUFSIZE_BOUND (uintmax_t)];
-      error (EXIT_FAILURE, 0, _("%s: number of bytes is large"),
+      error (EXIT_FAILURE, 0, _("%s: number of bytes is too large"),
 	     umaxtostr (n_elide_0, umax_buf));
     }
 
@@ -396,8 +392,7 @@ elide_tail_bytes_pipe (const char *filename, int fd, uintmax_t n_elide_0)
 
     free_mem:;
       for (i = 0; i < n_bufs; i++)
-	if (b[i])
-	  free (b[i]);
+	free (b[i]);
       free (b);
 
       return ok;
@@ -415,10 +410,6 @@ static bool
 elide_tail_bytes_file (const char *filename, int fd, uintmax_t n_elide)
 {
   struct stat stats;
-
-  /* We need binary input, since `head' relies on `lseek' and byte counts,
-     while binary output will preserve the style (Unix/DOS) of text file.  */
-  SET_BINARY2 (fd, STDOUT_FILENO);
 
   if (presume_input_pipe || fstat (fd, &stats) || ! S_ISREG (stats.st_mode))
     {
@@ -718,10 +709,6 @@ elide_tail_lines_seekable (const char *pretty_filename, int fd,
 static bool
 elide_tail_lines_file (const char *filename, int fd, uintmax_t n_elide)
 {
-  /* We need binary input, since `head' relies on `lseek' and byte counts,
-     while binary output will preserve the style (Unix/DOS) of text file.  */
-  SET_BINARY2 (fd, STDOUT_FILENO);
-
   if (!presume_input_pipe)
     {
       /* Find the offset, OFF, of the Nth newline from the end,
@@ -754,9 +741,6 @@ head_bytes (const char *filename, int fd, uintmax_t bytes_to_write)
   char buffer[BUFSIZ];
   size_t bytes_to_read = BUFSIZ;
 
-  /* Need BINARY I/O for the byte counts to be accurate.  */
-  SET_BINARY2 (fd, fileno (stdout));
-
   while (bytes_to_write)
     {
       size_t bytes_read;
@@ -781,10 +765,6 @@ static bool
 head_lines (const char *filename, int fd, uintmax_t lines_to_write)
 {
   char buffer[BUFSIZ];
-
-  /* Need BINARY I/O for the byte counts to be accurate.  */
-  /* FIXME: do we really need this when counting *lines*?  */
-  SET_BINARY2 (fd, fileno (stdout));
 
   while (lines_to_write)
     {
@@ -851,16 +831,19 @@ head_file (const char *filename, uintmax_t n_units, bool count_lines,
 {
   int fd;
   bool ok;
+  bool is_stdin = STREQ (filename, "-");
 
-  if (STREQ (filename, "-"))
+  if (is_stdin)
     {
       have_read_stdin = true;
       fd = STDIN_FILENO;
       filename = _("standard input");
+      if (O_BINARY && ! isatty (STDIN_FILENO))
+	freopen (NULL, "rb", stdin);
     }
   else
     {
-      fd = open (filename, O_RDONLY);
+      fd = open (filename, O_RDONLY | O_BINARY);
       if (fd < 0)
 	{
 	  error (0, errno, _("cannot open %s for reading"), quote (filename));
@@ -869,7 +852,7 @@ head_file (const char *filename, uintmax_t n_units, bool count_lines,
     }
 
   ok = head (filename, fd, n_units, count_lines, elide_from_end);
-  if (fd != STDIN_FILENO && close (fd) == -1)
+  if (!is_stdin && close (fd) != 0)
     {
       error (0, errno, _("closing %s"), quote (filename));
       return false;
@@ -995,17 +978,6 @@ main (int argc, char **argv)
 	    }
 	}
 
-      if (200112 <= posix2_version ())
-	{
-	  int n_string_prefix_len = end_n_string - n_string;
-	  error (0, 0, _("`-%s' option is obsolete; use `-%c %.*s%.*s%s'"),
-		 n_string, count_lines ? 'n' : 'c',
-		 n_string_prefix_len, n_string,
-		 multiplier_char != 0, &multiplier_char,
-		 header_mode_option[header_mode]);
-	  usage (EXIT_FAILURE);
-	}
-
       /* Append the multiplier character (if any) onto the end of
 	 the digit string.  Then add NUL byte if necessary.  */
       *end_n_string = multiplier_char;
@@ -1018,9 +990,6 @@ main (int argc, char **argv)
       argv[1] = argv[0];
       argv++;
       argc--;
-
-      /* FIXME: allow POSIX options if there were obsolescent ones?  */
-
     }
 
   while ((c = getopt_long (argc, argv, "c:n:qv", long_options, NULL)) != -1)
@@ -1078,6 +1047,9 @@ main (int argc, char **argv)
   file_list = (optind < argc
 	       ? (char const *const *) &argv[optind]
 	       : default_file_list);
+
+  if (O_BINARY && ! isatty (STDOUT_FILENO))
+    freopen (NULL, "wb", stdout);
 
   for (i = 0; file_list[i]; ++i)
     ok &= head_file (file_list[i], n_units, count_lines, elide_from_end);

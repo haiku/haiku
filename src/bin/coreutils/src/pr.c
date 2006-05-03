@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /*  By Pete TerMaat, with considerable refinement by Roland Huebner.  */
 
@@ -29,7 +29,7 @@
 
    Improve the printing of control prefixes.
 
-   Expand the filename in the centered header line to a full pathname.
+   Expand the file name in the centered header line to a full file name.
 
 
    Concept:
@@ -311,19 +311,18 @@
 
 #include <config.h>
 
-#include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 #include "system.h"
 #include "error.h"
 #include "hard-locale.h"
+#include "inttostr.h"
 #include "mbswidth.h"
-#include "posixver.h"
+#include "quote.h"
+#include "stat-time.h"
+#include "stdio--.h"
+#include "strftime.h"
 #include "xstrtol.h"
-
-#if ! (HAVE_DECL_STRTOUMAX || defined strtoumax)
-uintmax_t strtoumax ();
-#endif
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "pr"
@@ -741,8 +740,8 @@ enum
   PAGES_OPTION
 };
 
-#define COMMON_SHORT_OPTIONS \
-	"-0123456789D:FJN:TW:abcde::fh:i::l:mn::o:rs::tvw:"
+static char const short_options[] =
+  "-0123456789D:FJN:S::TW:abcde::fh:i::l:mn::o:rs::tvw:";
 
 static struct option const long_options[] =
 {
@@ -772,7 +771,7 @@ static struct option const long_options[] =
   {"page-width", required_argument, NULL, 'W'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 /* Return the number of columns that have either an open file or
@@ -803,20 +802,19 @@ first_last_page (char const *pages)
   char *p;
   uintmax_t first;
   uintmax_t last = UINTMAX_MAX;
-  int err;
+  strtol_error err = xstrtoumax (pages, &p, 10, &first, "");
+  if (err != LONGINT_OK && err != LONGINT_INVALID_SUFFIX_CHAR)
+    _STRTOL_ERROR (EXIT_FAILURE, pages, _("page range"), err);
 
-  errno = 0;
-  first = strtoumax (pages, &p, 10);
-  err = errno;
   if (p == pages || !first)
     return false;
 
   if (*p == ':')
     {
       char const *p1 = p + 1;
-      errno = 0;
-      last = strtoumax (p1, &p, 10);
-      err |= errno;
+      err = xstrtoumax (p1, &p, 10, &last, "");
+      if (err != LONGINT_OK)
+	_STRTOL_ERROR (EXIT_FAILURE, pages, _("page range"), err);
       if (p1 == p || last < first)
 	return false;
     }
@@ -824,12 +822,26 @@ first_last_page (char const *pages)
   if (*p)
     return false;
 
-  if (err)
-    error (EXIT_FAILURE, err, _("Page range `%s'"), pages);
-
   first_page_number = first;
   last_page_number = last;
   return true;
+}
+
+/* Parse column count string S, and if it's valid (1 or larger and
+   within range of the type of `columns') set the global variables
+   columns and explicit_columns and return true.
+   Otherwise, exit with a diagnostic.  */
+static void
+parse_column_count (char const *s)
+{
+  long int tmp_long;
+  if (xstrtol (s, NULL, 10, &tmp_long, "") != LONGINT_OK
+      || !(1 <= tmp_long && tmp_long <= INT_MAX))
+    error (EXIT_FAILURE, 0,
+	   _("invalid number of columns: %s"), quote (s));
+
+  columns = tmp_long;
+  explicit_columns = true;
 }
 
 /* Estimate length of col_sep_string with option -S.  */
@@ -846,15 +858,16 @@ int
 main (int argc, char **argv)
 {
   int c;
-  int accum = 0;
   int n_files;
   bool old_options = false;
   bool old_w = false;
   bool old_s = false;
   char **file_names;
-  char const *short_options = (posix2_version () < 200112
-			       ? COMMON_SHORT_OPTIONS "S::"
-			       : COMMON_SHORT_OPTIONS "S:");
+
+  /* Accumulate the digits of old-style options like -99.  */
+  char *column_count_string = NULL;
+  size_t n_digits = 0;
+  size_t n_alloc = 0;
 
   initialize_main (&argc, &argv);
   program_name = argv[0];
@@ -874,17 +887,16 @@ main (int argc, char **argv)
     {
       if (ISDIGIT (c))
 	{
-	  int new_c = accum * 10 + c - '0';
-	  if (INT_MAX / 10 < accum || new_c < 0)
-	    error (EXIT_FAILURE, 0, _("column count too large"));
-	  accum = new_c;
-	  columns = accum;
-	  explicit_columns = true;
+	  /* Accumulate column-count digits specified via old-style options. */
+	  if (n_digits + 1 >= n_alloc)
+	    column_count_string
+	      = X2REALLOC (column_count_string, &n_alloc);
+	  column_count_string[n_digits++] = c;
+	  column_count_string[n_digits] = '\0';
 	  continue;
 	}
 
-      if (accum > 0)            /* reset for subsequent params */
-	accum = 0;
+      n_digits = 0;
 
       switch (c)
 	{
@@ -901,22 +913,21 @@ main (int argc, char **argv)
 	      error (EXIT_FAILURE, 0,
 		     _("`--pages=FIRST_PAGE[:LAST_PAGE]' missing argument"));
 	    else if (! first_last_page (optarg))
-	      error (EXIT_FAILURE, 0, _("Invalid page range `%s'"), optarg);
+	      error (EXIT_FAILURE, 0, _("Invalid page range %s"),
+		     quote (optarg));
 	    break;
 	  }
 
 	case COLUMNS_OPTION:	/* --columns=COLUMN */
 	  {
-	    long int tmp_long;
-	    if (xstrtol (optarg, NULL, 10, &tmp_long, "") != LONGINT_OK
-		|| tmp_long <= 0 || tmp_long > INT_MAX)
-	      {
-		error (EXIT_FAILURE, 0,
-		       _("`--columns=COLUMN' invalid number of columns: `%s'"),
-		       optarg);
-	      }
-	    columns = tmp_long;
-	    explicit_columns = true;
+	    parse_column_count (optarg);
+
+	    /* If there was a prior column count specified via the
+	       short-named option syntax, e.g., -9, ensure that this
+	       long-name-specified value overrides it.  */
+	    free (column_count_string);
+	    column_count_string = NULL;
+	    n_alloc = 0;
 	    break;
 	  }
 
@@ -967,8 +978,8 @@ main (int argc, char **argv)
 		|| tmp_long <= 0 || tmp_long > INT_MAX)
 	      {
 		error (EXIT_FAILURE, 0,
-		       _("`-l PAGE_LENGTH' invalid number of lines: `%s'"),
-		       optarg);
+		       _("`-l PAGE_LENGTH' invalid number of lines: %s"),
+		       quote (optarg));
 	      }
 	    lines_per_page = tmp_long;
 	    break;
@@ -991,8 +1002,8 @@ main (int argc, char **argv)
 		|| tmp_long > INT_MAX)
 	      {
 		error (EXIT_FAILURE, 0,
-		       _("`-N NUMBER' invalid starting line number: `%s'"),
-		       optarg);
+		       _("`-N NUMBER' invalid starting line number: %s"),
+		       quote (optarg));
 	      }
 	    start_line_num = tmp_long;
 	    break;
@@ -1003,7 +1014,7 @@ main (int argc, char **argv)
 	    if (xstrtol (optarg, NULL, 10, &tmp_long, "") != LONGINT_OK
 		|| tmp_long < 0 || tmp_long > INT_MAX)
 	      error (EXIT_FAILURE, 0,
-		     _("`-o MARGIN' invalid line offset: `%s'"), optarg);
+		     _("`-o MARGIN' invalid line offset: %s"), quote (optarg));
 	    chars_per_margin = tmp_long;
 	    break;
 	  }
@@ -1044,7 +1055,8 @@ main (int argc, char **argv)
 	    if (xstrtol (optarg, NULL, 10, &tmp_long, "") != LONGINT_OK
 	        || tmp_long <= 0 || tmp_long > INT_MAX)
 	      error (EXIT_FAILURE, 0,
-	         _("`-w PAGE_WIDTH' invalid number of characters: `%s'"), optarg);
+		     _("`-w PAGE_WIDTH' invalid number of characters: %s"),
+		     quote (optarg));
 	    if (!truncate_lines)
 	      chars_per_line = tmp_long;
 	    break;
@@ -1057,7 +1069,8 @@ main (int argc, char **argv)
 	    if (xstrtol (optarg, NULL, 10, &tmp_long, "") != LONGINT_OK
 		|| tmp_long <= 0 || tmp_long > INT_MAX)
 	      error (EXIT_FAILURE, 0,
-		 _("`-W PAGE_WIDTH' invalid number of characters: `%s'"), optarg);
+		     _("`-W PAGE_WIDTH' invalid number of characters: %s"),
+		     quote (optarg));
 	    chars_per_line = tmp_long;
 	    break;
 	  }
@@ -1067,6 +1080,12 @@ main (int argc, char **argv)
 	  usage (EXIT_FAILURE);
 	  break;
 	}
+    }
+
+  if (column_count_string)
+    {
+      parse_column_count (column_count_string);
+      free (column_count_string);
     }
 
   if (! date_format)
@@ -1180,8 +1199,8 @@ getoptarg (char *arg, char switch_char, char *character, int *number)
 	  || tmp_long <= 0 || tmp_long > INT_MAX)
 	{
 	  error (0, 0,
-		 _("`-%c' extra characters or invalid number in the argument: `%s'"),
-		 switch_char, arg);
+	     _("`-%c' extra characters or invalid number in the argument: %s"),
+		 switch_char, quote (arg));
 	  usage (EXIT_FAILURE);
 	}
       *number = tmp_long;
@@ -1295,8 +1314,7 @@ init_parameters (int number_of_files)
 
   if (numbered_lines)
     {
-      if (number_buff != NULL)
-	free (number_buff);
+      free (number_buff);
       number_buff = xmalloc (2 * chars_per_number);
     }
 
@@ -1305,8 +1323,7 @@ init_parameters (int number_of_files)
      The width of an escape sequence (4) isn't the lower limit any longer.
      We've to use 8 as the lower limit, if we use chars_per_default_tab = 8
      to expand a tab which is not an input_tab-char. */
-  if (clump_buff != NULL)
-    free (clump_buff);
+  free (clump_buff);
   clump_buff = xmalloc (MAX (8, chars_per_input_tab));
 }
 
@@ -1331,8 +1348,7 @@ init_fps (int number_of_files, char **av)
 
   total_files = 0;
 
-  if (column_vector != NULLCOL)
-    free (column_vector);
+  free (column_vector);
   column_vector = xnmalloc (columns, sizeof (COLUMN));
 
   if (parallel_files)
@@ -1521,7 +1537,7 @@ close_file (COLUMN *p)
     return;
   if (ferror (p->fp))
     error (EXIT_FAILURE, errno, "%s", p->name);
-  if (p->fp != stdin && fclose (p->fp) == EOF)
+  if (fileno (p->fp) != STDIN_FILENO && fclose (p->fp) != 0)
     error (EXIT_FAILURE, errno, "%s", p->name);
 
   if (!parallel_files)
@@ -1639,36 +1655,42 @@ print_files (int number_of_files, char **av)
 static void
 init_header (char *filename, int desc)
 {
-  char *buf;
-  char initbuf[MAX (256, INT_STRLEN_BOUND (long int) + 1)];
+  char *buf = NULL;
   struct stat st;
+  struct timespec t;
+  int ns;
   struct tm *tm;
 
   /* If parallel files or standard input, use current date. */
   if (STREQ (filename, "-"))
     desc = -1;
-  if (desc < 0 || fstat (desc, &st) != 0)
-    st.st_mtime = time (NULL);
-
-  buf = initbuf;
-  tm = localtime (&st.st_mtime);
-  if (! tm)
-    sprintf (buf, "%ld", (long int) st.st_mtime);
+  if (0 <= desc && fstat (desc, &st) == 0)
+    t = get_stat_mtime (&st);
   else
     {
-      size_t bufsize = sizeof initbuf;
-      for (;;)
-	{
-	  *buf = '\1';
-	  if (strftime (buf, bufsize, date_format, tm) || ! *buf)
-	    break;
-	  buf = alloca (bufsize *= 2);
-	}
+      static struct timespec timespec;
+      if (! timespec.tv_sec)
+	gettime (&timespec);
+      t = timespec;
     }
 
-  if (date_text)
-    free (date_text);
-  date_text = xstrdup (buf);
+  ns = t.tv_nsec;
+  tm = localtime (&t.tv_sec);
+  if (tm == NULL)
+    {
+      buf = xmalloc (INT_BUFSIZE_BOUND (long int)
+		     + MAX (10, INT_BUFSIZE_BOUND (int)));
+      sprintf (buf, "%ld.%09d", (long int) t.tv_sec, ns);
+    }
+  else
+    {
+      size_t bufsize = nstrftime (NULL, SIZE_MAX, date_format, tm, 0, ns) + 1;
+      buf = xmalloc (bufsize);
+      nstrftime (buf, bufsize, date_format, tm, 0, ns);
+    }
+
+  free (date_text);
+  date_text = buf;
   file_text = custom_header ? custom_header : desc < 0 ? "" : filename;
   header_width_available = (chars_per_line
 			    - mbswidth (date_text, 0)
@@ -1900,17 +1922,14 @@ init_store_cols (void)
   int total_lines = lines_per_body * columns;
   int chars_if_truncate = total_lines * (chars_per_column + 1);
 
-  if (line_vector != NULL)
-    free (line_vector);
+  free (line_vector);
   /* FIXME: here's where it was allocated.  */
   line_vector = xmalloc ((total_lines + 1) * sizeof (int *));
 
-  if (end_vector != NULL)
-    free (end_vector);
+  free (end_vector);
   end_vector = xmalloc (total_lines * sizeof (int *));
 
-  if (buff != NULL)
-    free (buff);
+  free (buff);
   buff_allocated = (use_col_separator
 		    ? 2 * chars_if_truncate
 		    : chars_if_truncate);	/* Tune this. */
@@ -2008,7 +2027,7 @@ store_char (char c)
   if (buff_current >= buff_allocated)
     {
       /* May be too generous. */
-      buff = x2nrealloc (buff, &buff_allocated, sizeof *buff);
+      buff = X2REALLOC (buff, &buff_allocated);
     }
   buff[buff_current++] = c;
 }
@@ -2069,7 +2088,7 @@ add_line_number (COLUMN *p)
 static void
 pad_across_to (int position)
 {
-  register int h = output_position;
+  int h = output_position;
 
   if (tabify_output)
     spaces_not_printed = position - output_position;
@@ -2089,7 +2108,7 @@ pad_across_to (int position)
 static void
 pad_down (int lines)
 {
-  register int i;
+  int i;
 
   if (use_form_feed)
     putchar ('\f');
@@ -2107,7 +2126,7 @@ pad_down (int lines)
 static void
 read_rest_of_line (COLUMN *p)
 {
-  register int c;
+  int c;
   FILE *f = p->fp;
 
   while ((c = getc (f)) != '\n')
@@ -2141,7 +2160,7 @@ read_rest_of_line (COLUMN *p)
 static void
 skip_read (COLUMN *p, int column_number)
 {
-  register int c;
+  int c;
   FILE *f = p->fp;
   int i;
   bool single_ff = false;
@@ -2208,9 +2227,9 @@ skip_read (COLUMN *p, int column_number)
 static void
 print_white_space (void)
 {
-  register int h_new;
-  register int h_old = output_position;
-  register int goal = h_old + spaces_not_printed;
+  int h_new;
+  int h_old = output_position;
+  int goal = h_old + spaces_not_printed;
 
   while (goal - h_old > 1
 	 && (h_new = POS_AFTER_TAB (chars_per_output_tab, h_old)) <= goal)
@@ -2231,7 +2250,7 @@ print_white_space (void)
    then print_sep_string() is called. */
 
 static void
-print_sep_string ()
+print_sep_string (void)
 {
   char *s;
   int l = col_sep_length;
@@ -2570,7 +2589,7 @@ print_stored (COLUMN *p)
   int i;
 
   int line = p->current_line++;
-  register char *first = &buff[line_vector[line]];
+  char *first = &buff[line_vector[line]];
   /* FIXME
      UMR: Uninitialized memory read:
      * This is occurring while in:
@@ -2582,7 +2601,7 @@ print_stored (COLUMN *p)
      xmalloc        [xmalloc.c:94]
      init_store_cols [pr.c:1648]
      */
-  register char *last = &buff[line_vector[line + 1]];
+  char *last = &buff[line_vector[line + 1]];
 
   pad_vertically = true;
 
@@ -2639,8 +2658,8 @@ static int
 char_to_clump (char c)
 {
   unsigned char uc = c;
-  register char *s = clump_buff;
-  register int i;
+  char *s = clump_buff;
+  int i;
   char esc_buff[4];
   int width;
   int chars;
@@ -2728,18 +2747,12 @@ char_to_clump (char c)
 static void
 cleanup (void)
 {
-  if (number_buff)
-    free (number_buff);
-  if (clump_buff)
-    free (clump_buff);
-  if (column_vector)
-    free (column_vector);
-  if (line_vector)
-    free (line_vector);
-  if (end_vector)
-    free (end_vector);
-  if (buff)
-    free (buff);
+  free (number_buff);
+  free (clump_buff);
+  free (column_vector);
+  free (line_vector);
+  free (end_vector);
+  free (buff);
 }
 
 /* Complain, print a usage message, and die. */

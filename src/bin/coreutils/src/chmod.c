@@ -1,5 +1,5 @@
 /* chmod -- change permission modes of files
-   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu> */
 
@@ -29,6 +29,7 @@
 #include "filemode.h"
 #include "modechange.h"
 #include "quote.h"
+#include "quotearg.h"
 #include "root-dev-ino.h"
 #include "xfts.h"
 
@@ -60,18 +61,25 @@ enum Verbosity
 /* The name the program was run with. */
 char *program_name;
 
+/* The desired change to the mode.  */
+static struct mode_change *change;
+
+/* The initial umask value, if it might be needed.  */
+static mode_t umask_value;
+
 /* If true, change the modes of directories recursively. */
 static bool recurse;
 
 /* If true, force silence (no error messages). */
 static bool force_silent;
 
+/* If true, diagnose surprises from naive misuses like "chmod -r file".
+   POSIX allows diagnostics here, as portable code is supposed to use
+   "chmod -- -r file".  */
+static bool diagnose_surprises;
+
 /* Level of verbosity.  */
 static enum Verbosity verbosity = V_off;
-
-/* The argument to the --reference option.  Use the owner and group IDs
-   of this file.  This file must exist.  */
-static char *reference_file;
 
 /* Pointer to the device and inode numbers of `/', when --recursive.
    Otherwise NULL.  */
@@ -88,17 +96,17 @@ enum
 
 static struct option const long_options[] =
 {
-  {"changes", no_argument, 0, 'c'},
-  {"recursive", no_argument, 0, 'R'},
-  {"no-preserve-root", no_argument, 0, NO_PRESERVE_ROOT},
-  {"preserve-root", no_argument, 0, PRESERVE_ROOT},
-  {"quiet", no_argument, 0, 'f'},
-  {"reference", required_argument, 0, REFERENCE_FILE_OPTION},
-  {"silent", no_argument, 0, 'f'},
-  {"verbose", no_argument, 0, 'v'},
+  {"changes", no_argument, NULL, 'c'},
+  {"recursive", no_argument, NULL, 'R'},
+  {"no-preserve-root", no_argument, NULL, NO_PRESERVE_ROOT},
+  {"preserve-root", no_argument, NULL, PRESERVE_ROOT},
+  {"quiet", no_argument, NULL, 'f'},
+  {"reference", required_argument, NULL, REFERENCE_FILE_OPTION},
+  {"silent", no_argument, NULL, 'f'},
+  {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
-  {0, 0, 0, 0}
+  {NULL, 0, NULL, 0}
 };
 
 /* Return true if the chmodable permission bits of FILE changed.
@@ -164,20 +172,20 @@ describe_change (const char *file, mode_t mode,
 	  (unsigned long int) (mode & CHMOD_MODE_BITS), &perms[1]);
 }
 
-/* Change the mode of FILE according to the list of operations CHANGES.
+/* Change the mode of FILE.
    Return true if successful.  This function is called
    once for every file system object that fts encounters.  */
 
 static bool
-process_file (FTS *fts, FTSENT *ent, const struct mode_change *changes)
+process_file (FTS *fts, FTSENT *ent)
 {
   char const *file_full_name = ent->fts_path;
   char const *file = ent->fts_accpath;
   const struct stat *file_stats = ent->fts_statp;
+  mode_t old_mode IF_LINT (= 0);
   mode_t new_mode IF_LINT (= 0);
   bool ok = true;
-  bool do_chmod;
-  bool symlink_changed = true;
+  bool chmod_succeeded = false;
 
   switch (ent->fts_info)
     {
@@ -204,45 +212,62 @@ process_file (FTS *fts, FTSENT *ent, const struct mode_change *changes)
       break;
     }
 
-  do_chmod = ok;
-
-  if (do_chmod && ROOT_DEV_INO_CHECK (root_dev_ino, file_stats))
+  if (ok && ROOT_DEV_INO_CHECK (root_dev_ino, file_stats))
     {
       ROOT_DEV_INO_WARN (file_full_name);
       ok = false;
-      do_chmod = false;
     }
 
-  if (do_chmod)
+  if (ok)
     {
-      new_mode = mode_adjust (file_stats->st_mode, changes);
+      old_mode = file_stats->st_mode;
+      new_mode = mode_adjust (old_mode, change, umask_value);
 
-      if (S_ISLNK (file_stats->st_mode))
-	symlink_changed = false;
-      else
+      if (! S_ISLNK (old_mode))
 	{
-	  ok = (chmod (file, new_mode) == 0);
-
-	  if (! (ok | force_silent))
-	    error (0, errno, _("changing permissions of %s"),
-		   quote (file_full_name));
+	  if (chmod (file, new_mode) == 0)
+	    chmod_succeeded = true;
+	  else
+	    {
+	      if (! force_silent)
+		error (0, errno, _("changing permissions of %s"),
+		       quote (file_full_name));
+	      ok = false;
+	    }
 	}
     }
 
   if (verbosity != V_off)
     {
-      bool changed =
-	(ok && symlink_changed
-	 && mode_changed (file, file_stats->st_mode, new_mode));
+      bool changed = (chmod_succeeded
+		      && mode_changed (file, old_mode, new_mode));
 
       if (changed || verbosity == V_high)
 	{
 	  enum Change_status ch_status =
 	    (!ok ? CH_FAILED
-	     : !symlink_changed ? CH_NOT_APPLIED
+	     : !chmod_succeeded ? CH_NOT_APPLIED
 	     : !changed ? CH_NO_CHANGE_REQUESTED
 	     : CH_SUCCEEDED);
 	  describe_change (file_full_name, new_mode, ch_status);
+	}
+    }
+
+  if (chmod_succeeded & diagnose_surprises)
+    {
+      mode_t naively_expected_mode = mode_adjust (old_mode, change, 0);
+      if (new_mode & ~naively_expected_mode)
+	{
+	  char new_perms[11];
+	  char naively_expected_perms[11];
+	  mode_string (new_mode, new_perms);
+	  mode_string (naively_expected_mode, naively_expected_perms);
+	  new_perms[10] = naively_expected_perms[10] = '\0';
+	  error (0, 0,
+		 _("%s: new permissions are %s, not %s"),
+		 quotearg_colon (file_full_name),
+		 new_perms + 1, naively_expected_perms + 1);
+	  ok = false;
 	}
     }
 
@@ -253,12 +278,11 @@ process_file (FTS *fts, FTSENT *ent, const struct mode_change *changes)
 }
 
 /* Recursively change the modes of the specified FILES (the last entry
-   of which is NULL) according to the list of operations CHANGES.
-   BIT_FLAGS controls how fts works.
+   of which is NULL).  BIT_FLAGS controls how fts works.
    Return true if successful.  */
 
 static bool
-process_files (char **files, int bit_flags, const struct mode_change *changes)
+process_files (char **files, int bit_flags)
 {
   bool ok = true;
 
@@ -280,7 +304,7 @@ process_files (char **files, int bit_flags, const struct mode_change *changes)
 	  break;
 	}
 
-      ok &= process_file (fts, ent, changes);
+      ok &= process_file (fts, ent);
     }
 
   /* Ignore failure, since the only way it can do so is in failing to
@@ -324,8 +348,7 @@ Change the mode of each FILE to MODE.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
-Each MODE is one or more of the letters ugoa, one of the symbols +-= and\n\
-one or more of the letters rwxXstugo.\n\
+Each MODE is of the form `[ugoa]*([-+=]([rwxXst]*|[ugo]))+'.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
@@ -338,12 +361,12 @@ one or more of the letters rwxXstugo.\n\
 int
 main (int argc, char **argv)
 {
-  struct mode_change *changes;
   char *mode = NULL;
   size_t mode_len = 0;
   size_t mode_alloc = 0;
   bool ok;
   bool preserve_root = false;
+  char const *reference_file = NULL;
   int c;
 
   initialize_main (&argc, &argv);
@@ -354,10 +377,10 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  recurse = force_silent = false;
+  recurse = force_silent = diagnose_surprises = false;
 
   while ((c = getopt_long (argc, argv,
-			   "Rcfvr::w::x::X::s::t::u::g::o::a::,::+::-::=::",
+			   "Rcfvr::w::x::X::s::t::u::g::o::a::,::+::=::",
 			   long_options, NULL))
 	 != -1)
     {
@@ -375,8 +398,11 @@ main (int argc, char **argv)
 	case 'a':
 	case ',':
 	case '+':
-	case '-':
 	case '=':
+	  /* Support nonportable uses like "chmod -w", but diagnose
+	     surprises due to umask confusion.  Even though "--", "--r",
+	     etc., are valid modes, there is no "case '-'" here since
+	     getopt_long reserves leading "--" for long options.  */
 	  {
 	    /* Allocate a mode string (e.g., "-rwx") by concatenating
 	       the argument containing this option.  If a previous mode
@@ -390,11 +416,13 @@ main (int argc, char **argv)
 	    if (mode_alloc <= new_mode_len)
 	      {
 		mode_alloc = new_mode_len + 1;
-		mode = x2realloc (mode, &mode_alloc);
+		mode = X2REALLOC (mode, &mode_alloc);
 	      }
 	    mode[mode_len] = ',';
 	    strcpy (mode + mode_comma_len, arg);
 	    mode_len = new_mode_len;
+
+	    diagnose_surprises = true;
 	  }
 	  break;
 	case NO_PRESERVE_ROOT:
@@ -428,8 +456,10 @@ main (int argc, char **argv)
   if (reference_file)
     {
       if (mode)
-	error (EXIT_FAILURE, 0,
-	       _("cannot combine mode and --reference options"));
+	{
+	  error (0, 0, _("cannot combine mode and --reference options"));
+	  usage (EXIT_FAILURE);
+	}
     }
   else
     {
@@ -446,16 +476,23 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
-  changes = (reference_file ? mode_create_from_ref (reference_file)
-	     : mode_compile (mode, MODE_MASK_ALL));
-
-  if (changes == MODE_INVALID)
-    error (EXIT_FAILURE, 0, _("invalid mode: %s"), quote (mode));
-  else if (changes == MODE_MEMORY_EXHAUSTED)
-    xalloc_die ();
-  else if (changes == MODE_BAD_REFERENCE)
-    error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
-	   quote (reference_file));
+  if (reference_file)
+    {
+      change = mode_create_from_ref (reference_file);
+      if (!change)
+	error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
+	       quote (reference_file));
+    }
+  else
+    {
+      change = mode_compile (mode);
+      if (!change)
+	{
+	  error (0, 0, _("invalid mode: %s"), quote (mode));
+	  usage (EXIT_FAILURE);
+	}
+      umask_value = umask (0);
+    }
 
   if (recurse & preserve_root)
     {
@@ -470,7 +507,7 @@ main (int argc, char **argv)
       root_dev_ino = NULL;
     }
 
-  ok = process_files (argv + optind, FTS_COMFOLLOW, changes);
+  ok = process_files (argv + optind, FTS_COMFOLLOW);
 
   exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

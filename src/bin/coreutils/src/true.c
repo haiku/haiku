@@ -1,5 +1,5 @@
 /* Exit with a status code indicating success.
-   Copyright (C) 1999-2003 Free Software Foundation, Inc.
+   Copyright (C) 1999-2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,14 +13,24 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include "system.h"
 
-#define PROGRAM_NAME "true"
+/* Act like "true" by default; false.c overrides this.  */
+#ifndef EXIT_STATUS
+# define EXIT_STATUS EXIT_SUCCESS
+#endif
+
+#if EXIT_STATUS == EXIT_SUCCESS
+# define PROGRAM_NAME "true"
+#else
+# define PROGRAM_NAME "false"
+#endif
+
 #define AUTHORS "Jim Meyering"
 
 /* The name this program was run with. */
@@ -32,14 +42,15 @@ usage (int status)
   printf (_("\
 Usage: %s [ignored command line arguments]\n\
   or:  %s OPTION\n\
-Exit with a status code indicating success.\n\
-\n\
-These option names may not be abbreviated.\n\
-\n\
 "),
 	  program_name, program_name);
-      fputs (HELP_OPTION_DESCRIPTION, stdout);
-      fputs (VERSION_OPTION_DESCRIPTION, stdout);
+  printf ("%s\n\n",
+	  _(EXIT_STATUS == EXIT_SUCCESS
+	    ? "Exit with a status code indicating success."
+	    : "Exit with a status code indicating failure."));
+  fputs (HELP_OPTION_DESCRIPTION, stdout);
+  fputs (VERSION_OPTION_DESCRIPTION, stdout);
+  printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
   printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
   exit (status);
 }
@@ -60,12 +71,12 @@ main (int argc, char **argv)
   if (argc == 2)
     {
       if (STREQ (argv[1], "--help"))
-	usage (EXIT_SUCCESS);
+	usage (EXIT_STATUS);
 
       if (STREQ (argv[1], "--version"))
 	version_etc (stdout, PROGRAM_NAME, GNU_PACKAGE, VERSION, AUTHORS,
 		     (char *) NULL);
     }
 
-  exit (EXIT_SUCCESS);
+  exit (EXIT_STATUS);
 }

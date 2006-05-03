@@ -1,6 +1,6 @@
-/* Concatenate two arbitrary pathnames.
+/* Compare integer strings.
 
-   Copyright (C) 1996, 1997, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,22 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* Written by Jim Meyering.  */
+/* Written by Paul Eggert.  */
 
-#if ! defined PATH_CONCAT_H_
-# define PATH_CONCAT_H_
-
-char *path_concat (const char *dir, const char *base, char **base_in_result);
-
+#ifdef HAVE_CONFIG_H
+# include <config.h>
 #endif
+
+#include "strnumcmp-in.h"
+
+/* Compare strings A and B as integers without explicitly converting
+   them to machine numbers, to avoid overflow problems and perhaps
+   improve performance.  */
+
+int
+strintcmp (char const *a, char const *b)
+{
+  return numcompare (a, b, -1, -1);
+}

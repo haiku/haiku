@@ -1,5 +1,5 @@
 /* df - summarize free disk space
-   Copyright (C) 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu>.
    --human-readable and --megabyte options added by lm@sgi.com.
@@ -33,7 +33,6 @@
 #include "human.h"
 #include "inttostr.h"
 #include "mountlist.h"
-#include "path-concat.h"
 #include "quote.h"
 #include "save-cwd.h"
 #include "xgetcwd.h"
@@ -115,8 +114,10 @@ static bool print_type;
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
-  SYNC_OPTION = CHAR_MAX + 1,
-  NO_SYNC_OPTION
+  NO_SYNC_OPTION = CHAR_MAX + 1,
+  /* FIXME: --kilobytes is deprecated (but not -k); remove in late 2006 */
+  KILOBYTES_LONG_OPTION,
+  SYNC_OPTION
 };
 
 static struct option const long_options[] =
@@ -126,7 +127,7 @@ static struct option const long_options[] =
   {"inodes", no_argument, NULL, 'i'},
   {"human-readable", no_argument, NULL, 'h'},
   {"si", no_argument, NULL, 'H'},
-  {"kilobytes", no_argument, NULL, 'k'}, /* long form is obsolescent */
+  {"kilobytes", no_argument, NULL, KILOBYTES_LONG_OPTION},
   {"local", no_argument, NULL, 'l'},
   {"megabytes", no_argument, NULL, 'm'}, /* obsolescent */
   {"portability", no_argument, NULL, 'P'},
@@ -251,20 +252,25 @@ df_readable (bool negative, uintmax_t n, char *buf,
     }
 }
 
-/* Display a space listing for the disk device with absolute path DISK.
-   If MOUNT_POINT is non-NULL, it is the path of the root of the
+/* Display a space listing for the disk device with absolute file name DISK.
+   If MOUNT_POINT is non-NULL, it is the name of the root of the
    file system on DISK.
+   If STAT_FILE is non-null, it is the name of a file within the file
+   system that the user originally asked for; this provides better
+   diagnostics, and sometimes it provides better results on networked
+   file systems that give different free-space results depending on
+   where in the file system you probe.
    If FSTYPE is non-NULL, it is the type of the file system on DISK.
    If MOUNT_POINT is non-NULL, then DISK may be NULL -- certain systems may
    not be able to produce statistics in this case.
    ME_DUMMY and ME_REMOTE are the mount entry flags.  */
 
 static void
-show_dev (const char *disk, const char *mount_point, const char *fstype,
+show_dev (char const *disk, char const *mount_point,
+	  char const *stat_file, char const *fstype,
 	  bool me_dummy, bool me_remote)
 {
   struct fs_usage fsu;
-  const char *stat_file;
   char buf[3][LONGEST_HUMAN_READABLE + 2];
   int width;
   int use_width;
@@ -291,7 +297,8 @@ show_dev (const char *disk, const char *mount_point, const char *fstype,
      program reports on the file system that the special file is on.
      It would be better to report on the unmounted file system,
      but statfs doesn't do that on most systems.  */
-  stat_file = mount_point ? mount_point : disk;
+  if (!stat_file)
+    stat_file = mount_point ? mount_point : disk;
 
   if (get_fs_usage (stat_file, disk, &fsu))
     {
@@ -438,7 +445,7 @@ find_mount_point (const char *file, const struct stat *file_stat)
 {
   struct saved_cwd cwd;
   struct stat last_stat;
-  char *mp = 0;			/* The malloced mount point path.  */
+  char *mp = NULL;		/* The malloced mount point.  */
 
   if (save_cwd (&cwd) != 0)
     {
@@ -531,7 +538,7 @@ show_disk (char const *disk)
 
   if (best_match)
     {
-      show_dev (best_match->me_devname, best_match->me_mountdir,
+      show_dev (best_match->me_devname, best_match->me_mountdir, NULL,
 		best_match->me_type, best_match->me_dummy,
 		best_match->me_remote);
       return true;
@@ -550,7 +557,7 @@ show_point (const char *point, const struct stat *statp)
   struct mount_entry *me;
   struct mount_entry const *best_match = NULL;
 
-  /* If POINT is an absolute path name, see if we can find the
+  /* If POINT is an absolute file name, see if we can find the
      mount point without performing any extra stat calls at all.  */
   if (*point == '/')
     {
@@ -563,7 +570,7 @@ show_point (const char *point, const struct stat *statp)
 	  best_match = me;
     }
 
-  /* Calculate the real absolute path for POINT, and use that to find
+  /* Calculate the real absolute file name for POINT, and use that to find
      the mount point.  This avoids statting unavailable mount points,
      which can hang df.  */
   if (! best_match)
@@ -591,8 +598,7 @@ show_point (const char *point, const struct stat *statp)
 	      }
 	}
 
-      if (resolved)
-	free (resolved);
+      free (resolved);
 
       if (best_match
 	  && (stat (best_match->me_mountdir, &disk_stats) != 0
@@ -609,8 +615,15 @@ show_point (const char *point, const struct stat *statp)
 	      me->me_dev = disk_stats.st_dev;
 	    else
 	      {
-		error (0, errno, "%s", quote (me->me_mountdir));
-		exit_status = EXIT_FAILURE;
+		/* Report only I/O errors.  Other errors might be
+		   caused by shadowed mount points, which means POINT
+		   can't possibly be on this file system.  */
+		if (errno == EIO)
+		  {
+		    error (0, errno, "%s", quote (me->me_mountdir));
+		    exit_status = EXIT_FAILURE;
+		  }
+
 		/* So we won't try and fail repeatedly. */
 		me->me_dev = (dev_t) -2;
 	      }
@@ -630,7 +643,7 @@ show_point (const char *point, const struct stat *statp)
       }
 
   if (best_match)
-    show_dev (best_match->me_devname, best_match->me_mountdir,
+    show_dev (best_match->me_devname, best_match->me_mountdir, point,
 	      best_match->me_type, best_match->me_dummy, best_match->me_remote);
   else
     {
@@ -642,23 +655,23 @@ show_point (const char *point, const struct stat *statp)
       char *mp = find_mount_point (point, statp);
       if (mp)
 	{
-	  show_dev (0, mp, 0, false, false);
+	  show_dev (NULL, mp, NULL, NULL, false, false);
 	  free (mp);
 	}
     }
 }
 
-/* Determine what kind of node PATH is and show the disk usage
-   for it.  STATP is the results of `stat' on PATH.  */
+/* Determine what kind of node NAME is and show the disk usage
+   for it.  STATP is the results of `stat' on NAME.  */
 
 static void
-show_entry (const char *path, const struct stat *statp)
+show_entry (char const *name, struct stat const *statp)
 {
   if ((S_ISBLK (statp->st_mode) || S_ISCHR (statp->st_mode))
-      && show_disk (path))
+      && show_disk (name))
     return;
 
-  show_point (path, statp);
+  show_point (name, statp);
 }
 
 /* Show all mounted file systems, except perhaps those that are of
@@ -670,7 +683,7 @@ show_all_entries (void)
   struct mount_entry *me;
 
   for (me = mount_list; me; me = me->me_next)
-    show_dev (me->me_devname, me->me_mountdir, me->me_type,
+    show_dev (me->me_devname, me->me_mountdir, NULL, me->me_type,
 	      me->me_dummy, me->me_remote);
 }
 
@@ -718,7 +731,7 @@ or all file systems by default.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -a, --all             include file systems having 0 blocks\n\
+  -a, --all             include dummy file systems\n\
   -B, --block-size=SIZE use SIZE-byte blocks\n\
   -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n\
   -H, --si              likewise, but use powers of 1000 not 1024\n\
@@ -798,6 +811,10 @@ main (int argc, char **argv)
 	  human_output_opts = human_autoscale | human_SI;
 	  output_block_size = 1;
 	  break;
+	case KILOBYTES_LONG_OPTION:
+	  error (0, 0,
+		 _("the --kilobytes option is deprecated; use -k instead"));
+	  /* fall through */
 	case 'k':
 	  human_output_opts = 0;
 	  output_block_size = 1024;

@@ -1,5 +1,5 @@
-/* system-dependent definitions for fileutils, textutils, and sh-utils packages.
-   Copyright (C) 1989, 1991-2004 Free Software Foundation, Inc.
+/* system-dependent definitions for coreutils
+   Copyright (C) 1989, 1991-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include <alloca.h>
 
@@ -28,18 +28,14 @@ you must include <sys/types.h> before including this file
 #include <sys/stat.h>
 
 #if !defined HAVE_MKFIFO
-# define mkfifo(path, mode) (mknod ((path), (mode) | S_IFIFO, 0))
+# define mkfifo(name, mode) mknod (name, (mode) | S_IFIFO, 0)
 #endif
 
 #if HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
 
-/* <unistd.h> should be included before any preprocessor test
-   of _POSIX_VERSION.  */
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <unistd.h>
 
 #ifndef STDIN_FILENO
 # define STDIN_FILENO 0
@@ -96,27 +92,11 @@ you must include <sys/types.h> before including this file
 # define makedev(maj, min)  mkdev (maj, min)
 #endif
 
-#if HAVE_UTIME_H
-# include <utime.h>
-#endif
-
-/* Some systems (even some that do have <utime.h>) don't declare this
-   structure anywhere.  */
-#ifndef HAVE_STRUCT_UTIMBUF
-struct utimbuf
-{
-  long actime;
-  long modtime;
-};
-#endif
-
 /* Don't use bcopy!  Use memmove if source and destination may overlap,
    memcpy otherwise.  */
 
 #include <string.h>
-#if ! HAVE_DECL_MEMRCHR
-void *memrchr (const void *, int, size_t);
-#endif
+#include "memrchr.h"
 
 #include <errno.h>
 
@@ -162,11 +142,7 @@ initialize_exit_failure (int status)
     exit_failure = status;
 }
 
-#if HAVE_FCNTL_H
-# include <fcntl.h>
-#else
-# include <sys/file.h>
-#endif
+#include <fcntl.h>
 
 #if !defined SEEK_SET
 # define SEEK_SET 0
@@ -178,14 +154,6 @@ initialize_exit_failure (int status)
 # define X_OK 1
 # define W_OK 2
 # define R_OK 4
-#endif
-
-/* For systems that distinguish between text and binary I/O.
-   O_BINARY is usually declared in fcntl.h  */
-#if !defined O_BINARY && defined _O_BINARY
-  /* For MSC-compatible compilers.  */
-# define O_BINARY _O_BINARY
-# define O_TEXT _O_TEXT
 #endif
 
 #if !defined O_DIRECT
@@ -220,37 +188,24 @@ initialize_exit_failure (int status)
 # define O_SYNC 0
 #endif
 
+/* For systems that distinguish between text and binary I/O.
+   O_BINARY is usually declared in fcntl.h  */
+#if !defined O_BINARY && defined _O_BINARY
+  /* For MSC-compatible compilers.  */
+# define O_BINARY _O_BINARY
+# define O_TEXT _O_TEXT
+#endif
+
 #ifdef __BEOS__
   /* BeOS 5 has O_BINARY and O_TEXT, but they have no effect.  */
 # undef O_BINARY
 # undef O_TEXT
 #endif
 
-#if O_BINARY
-# ifndef __DJGPP__
-#  define setmode _setmode
-#  define fileno(_fp) _fileno (_fp)
-# endif /* not DJGPP */
-# define SET_MODE(_f, _m) setmode (_f, _m)
-# define SET_BINARY(_f) do {if (!isatty(_f)) setmode (_f, O_BINARY);} while (0)
-# define SET_BINARY2(_f1, _f2)		\
-  do {					\
-    if (!isatty (_f1))			\
-      {					\
-        setmode (_f1, O_BINARY);	\
-	if (!isatty (_f2))		\
-	  setmode (_f2, O_BINARY);	\
-      }					\
-  } while(0)
-#else
-# define SET_MODE(_f, _m) (void)0
-# define SET_BINARY(f) (void)0
-# define SET_BINARY2(f1,f2) (void)0
-# ifndef O_BINARY
-#  define O_BINARY 0
-# endif
+#ifndef O_BINARY
+# define O_BINARY 0
 # define O_TEXT 0
-#endif /* O_BINARY */
+#endif
 
 #if HAVE_DIRENT_H
 # include <dirent.h>
@@ -337,7 +292,11 @@ initialize_exit_failure (int status)
 #endif
 
 #ifndef ST_NBLOCKSIZE
-# define ST_NBLOCKSIZE 512
+# ifdef S_BLKSIZE
+#  define ST_NBLOCKSIZE S_BLKSIZE
+# else
+#  define ST_NBLOCKSIZE 512
+# endif
 #endif
 
 /* Redirection and wildcarding when done by the utility itself.
@@ -350,17 +309,6 @@ initialize_exit_failure (int status)
 
 #include "timespec.h"
 
-#ifndef RETSIGTYPE
-# define RETSIGTYPE void
-#endif
-
-#ifdef __DJGPP__
-  /* We need the declaration of setmode.  */
-# include <io.h>
-  /* We need the declaration of __djgpp_set_ctrl_c.  */
-# include <sys/exceptn.h>
-#endif
-
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif
@@ -368,7 +316,7 @@ initialize_exit_failure (int status)
 # include <stdint.h>
 #endif
 
-#if ULONG_MAX < ULLONG_MAX
+#if ULONG_MAX_LT_ULLONG_MAX
 # define LONGEST_MODIFIER "ll"
 #else
 # define LONGEST_MODIFIER "l"
@@ -413,7 +361,7 @@ initialize_exit_failure (int status)
    character >= 128 which gets sign-extended to a negative value.
    The macro ISUPPER protects against this as well."  */
 
-#if STDC_HEADERS || (!defined (isascii) && !HAVE_ISASCII)
+#if STDC_HEADERS || (!defined isascii && !HAVE_ISASCII)
 # define IN_CTYPE_DOMAIN(c) 1
 #else
 # define IN_CTYPE_DOMAIN(c) isascii(c)
@@ -551,6 +499,20 @@ uid_t getuid ();
 #endif
 
 #include "xalloc.h"
+#include "verify.h"
+
+/* This is simply a shorthand for the common case in which
+   the third argument to x2nrealloc would be `sizeof *(P)'.
+   Ensure that sizeof *(P) is *not* 1.  In that case, it'd be
+   better to use X2REALLOC, although not strictly necessary.  */
+#define X2NREALLOC(P, PN) (verify_expr (sizeof *(P) != 1), \
+			   x2nrealloc (P, PN, sizeof *(P)))
+
+/* Using x2realloc (when appropriate) usually makes your code more
+   readable than using x2nrealloc, but it also makes it so your
+   code will malfunction if sizeof *(P) ever becomes 2 or greater.
+   So use this macro instead of using x2realloc directly.  */
+#define X2REALLOC(P, PN) (verify_expr (sizeof *(P) == 1), x2realloc (P, PN))
 
 #if ! defined HAVE_MEMPCPY && ! defined mempcpy
 /* Be CAREFUL that there are no side effects in N.  */
@@ -600,14 +562,22 @@ enum
 };
 
 #define GETOPT_HELP_OPTION_DECL \
-  "help", no_argument, 0, GETOPT_HELP_CHAR
+  "help", no_argument, NULL, GETOPT_HELP_CHAR
 #define GETOPT_VERSION_OPTION_DECL \
-  "version", no_argument, 0, GETOPT_VERSION_CHAR
+  "version", no_argument, NULL, GETOPT_VERSION_CHAR
 
 #define case_GETOPT_HELP_CHAR			\
   case GETOPT_HELP_CHAR:			\
     usage (EXIT_SUCCESS);			\
     break;
+
+/* Program_name must be a literal string.
+   Usually it is just PROGRAM_NAME.  */
+#define USAGE_BUILTIN_WARNING \
+  _("\n" \
+"NOTE: your shell may have its own version of %s, which usually supersedes\n" \
+"the version described here.  Please refer to your shell's documentation\n" \
+"for details about the options it supports.\n")
 
 #define HELP_OPTION_DESCRIPTION \
   _("      --help     display this help and exit\n")
@@ -632,18 +602,7 @@ enum
 # define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-/* The extra casts work around common compiler bugs.  */
-#define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-/* The outer cast is needed to work around a bug in Cray C 5.0.3.0.
-   It is necessary at least when t == time_t.  */
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
-
-/* Upper bound on the string length of an integer converted to string.
-   302 / 1000 is ceil (log10 (2.0)).  Subtract 1 for the sign bit;
-   add 1 for integer division truncation; add 1 more for a minus sign.  */
-#define INT_STRLEN_BOUND(t) ((sizeof (t) * CHAR_BIT - 1) * 302 / 1000 + 2)
+#include "intprops.h"
 
 #ifndef CHAR_MIN
 # define CHAR_MIN TYPE_MINIMUM (char)
@@ -742,7 +701,7 @@ enum
 
 #ifndef __attribute__
 # if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8) || __STRICT_ANSI__
-#  define __attribute__(x)
+#  define __attribute__(x) /* empty */
 # endif
 #endif
 
@@ -812,9 +771,30 @@ lcm (size_t u, size_t v)
    locations.  */
 
 static inline void *
-ptr_align (void *ptr, size_t alignment)
+ptr_align (void const *ptr, size_t alignment)
 {
-  char *p0 = ptr;
-  char *p1 = p0 + alignment - 1;
-  return p1 - (size_t) p1 % alignment;
+  char const *p0 = ptr;
+  char const *p1 = p0 + alignment - 1;
+  return (void *) (p1 - (size_t) p1 % alignment);
 }
+
+/* If 10*Accum + Digit_val is larger than the maximum value for Type,
+   then don't update Accum and return false to indicate it would
+   overflow.  Otherwise, set Accum to that new value and return true.
+   Verify at compile-time that Type is Accum's type, and that Type is
+   unsigned.  Accum must be an object, so that we can take its
+   address.  Accum and Digit_val may be evaluated multiple times.
+
+   The "Added check" below is not strictly required, but it causes GCC
+   to return a nonzero exit status instead of merely a warning
+   diagnostic, and that is more useful.  */
+
+#define DECIMAL_DIGIT_ACCUMULATE(Accum, Digit_val, Type)		\
+  (									\
+   (void) (&(Accum) == (Type *) NULL),  /* The type matches.  */	\
+   verify_expr (! TYPE_SIGNED (Type)),  /* The type is unsigned.  */	\
+   verify_expr (sizeof (Accum) == sizeof (Type)),  /* Added check.  */	\
+   (((Type) -1 / 10 < (Accum)						\
+     || (Type) ((Accum) * 10 + (Digit_val)) < (Accum))			\
+    ? false : (((Accum) = (Accum) * 10 + (Digit_val)), true))		\
+  )

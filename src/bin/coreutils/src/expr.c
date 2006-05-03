@@ -1,5 +1,5 @@
 /* expr -- evaluate expressions.
-   Copyright (C) 86, 1991-1997, 1999-2004 Free Software Foundation, Inc.
+   Copyright (C) 86, 1991-1997, 1999-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Author: Mike Parker.
 
@@ -37,7 +37,10 @@
 #include "long-options.h"
 #include "error.h"
 #include "inttostr.h"
+#include "quote.h"
 #include "quotearg.h"
+#include "strnumcmp.h"
+#include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "expr"
@@ -249,7 +252,7 @@ static void
 printv (VALUE *v)
 {
   char *p;
-  char buf[INT_STRLEN_BOUND (intmax_t) + 1];
+  char buf[INT_BUFSIZE_BOUND (intmax_t)];
 
   switch (v->type)
     {
@@ -297,12 +300,27 @@ null (VALUE *v)
     }
 }
 
+/* Return true if CP takes the form of an integer.  */
+
+static bool
+looks_like_integer (char const *cp)
+{
+  cp += (*cp == '-');
+
+  do
+    if (! ISDIGIT (*cp))
+      return false;
+  while (*++cp);
+
+  return true;
+}
+
 /* Coerce V to a string value (can't fail).  */
 
 static void
 tostring (VALUE *v)
 {
-  char buf[INT_STRLEN_BOUND (intmax_t) + 1];
+  char buf[INT_BUFSIZE_BOUND (intmax_t)];
 
   switch (v->type)
     {
@@ -322,34 +340,23 @@ tostring (VALUE *v)
 static bool
 toarith (VALUE *v)
 {
-  intmax_t i;
-  bool neg;
-  char *cp;
-
   switch (v->type)
     {
     case integer:
       return true;
     case string:
-      i = 0;
-      cp = v->u.s;
-      neg = (*cp == '-');
-      if (neg)
-	cp++;
+      {
+	intmax_t value;
 
-      do
-	{
-	  if (ISDIGIT (*cp))
-	    i = i * 10 + *cp - '0';
-	  else
-	    return false;
-	}
-      while (*++cp);
-
-      free (v->u.s);
-      v->u.i = i * (neg ? -1 : 1);
-      v->type = integer;
-      return true;
+	if (! looks_like_integer (v->u.s))
+	  return false;
+	if (xstrtoimax (v->u.s, NULL, 10, &value, NULL) != LONGINT_OK)
+	  error (EXPR_FAILURE, ERANGE, "%s", v->u.s);
+	free (v->u.s);
+	v->u.i = value;
+	v->type = integer;
+	return true;
+      }
     default:
       abort ();
     }
@@ -402,12 +409,12 @@ trace (fxn)
 static VALUE *
 docolon (VALUE *sv, VALUE *pv)
 {
-  VALUE *v;
+  VALUE *v IF_LINT (= NULL);
   const char *errmsg;
   struct re_pattern_buffer re_buffer;
   struct re_registers re_regs;
   size_t len;
-  int matchlen;
+  regoff_t matchlen;
 
   tostring (sv);
   tostring (pv);
@@ -415,19 +422,17 @@ docolon (VALUE *sv, VALUE *pv)
   if (pv->u.s[0] == '^')
     {
       error (0, 0, _("\
-warning: unportable BRE: `%s': using `^' as the first character\n\
+warning: unportable BRE: %s: using `^' as the first character\n\
 of the basic regular expression is not portable; it is being ignored"),
-	     pv->u.s);
+	     quote (pv->u.s));
     }
 
   len = strlen (pv->u.s);
   memset (&re_buffer, 0, sizeof (re_buffer));
   memset (&re_regs, 0, sizeof (re_regs));
+  re_buffer.buffer = xnmalloc (len, 2);
   re_buffer.allocated = 2 * len;
-  if (re_buffer.allocated < len)
-    xalloc_die ();
-  re_buffer.buffer = xmalloc (re_buffer.allocated);
-  re_buffer.translate = 0;
+  re_buffer.translate = NULL;
   re_syntax_options = RE_SYNTAX_POSIX_BASIC;
   errmsg = re_compile_pattern (pv->u.s, len, &re_buffer);
   if (errmsg)
@@ -445,7 +450,7 @@ of the basic regular expression is not portable; it is being ignored"),
       else
 	v = int_value (matchlen);
     }
-  else
+  else if (matchlen == -1)
     {
       /* Match failed -- return the right kind of null.  */
       if (re_buffer.re_nsub > 0)
@@ -453,6 +458,11 @@ of the basic regular expression is not portable; it is being ignored"),
       else
 	v = int_value (0);
     }
+  else
+    error (EXPR_FAILURE,
+	   (matchlen == -2 ? errno : EOVERFLOW),
+	   _("error in regular expression matcher"));
+
   free (re_buffer.buffer);
   return v;
 }
@@ -683,16 +693,6 @@ static VALUE *
 eval2 (bool evaluate)
 {
   VALUE *l;
-  VALUE *r;
-  enum
-  {
-    less_than, less_equal, equal, not_equal, greater_equal, greater_than
-  } fxn;
-  bool val;
-  intmax_t lval;
-  intmax_t rval;
-  int collation_errno;
-  char *collation_arg1;
 
 #ifdef EVAL_TRACE
   trace ("eval2");
@@ -700,6 +700,13 @@ eval2 (bool evaluate)
   l = eval3 (evaluate);
   while (1)
     {
+      VALUE *r;
+      enum
+	{
+	  less_than, less_equal, equal, not_equal, greater_equal, greater_than
+	} fxn;
+      bool val = false;
+
       if (nextarg ("<"))
 	fxn = less_than;
       else if (nextarg ("<="))
@@ -715,46 +722,45 @@ eval2 (bool evaluate)
       else
 	return l;
       r = eval3 (evaluate);
-      tostring (l);
-      tostring (r);
 
-      /* Save the first arg to strcoll, in case we need its value for
-	 a diagnostic later.  This is needed because 'toarith' might
-	 free the first arg.  */
-      collation_arg1 = xstrdup (l->u.s);
+      if (evaluate)
+	{
+	  int cmp;
+	  tostring (l);
+	  tostring (r);
 
-      errno = 0;
-      lval = strcoll (collation_arg1, r->u.s);
-      collation_errno = errno;
-      rval = 0;
-      if (toarith (l) && toarith (r))
-	{
-	  lval = l->u.i;
-	  rval = r->u.i;
-	}
-      else if (collation_errno && evaluate)
-	{
-	  error (0, collation_errno, _("string comparison failed"));
-	  error (0, 0, _("Set LC_ALL='C' to work around the problem."));
-	  error (EXPR_FAILURE, 0,
-		 _("The strings compared were %s and %s."),
-		 quotearg_n_style (0, locale_quoting_style, collation_arg1),
-		 quotearg_n_style (1, locale_quoting_style, r->u.s));
+	  if (looks_like_integer (l->u.s) && looks_like_integer (r->u.s))
+	    cmp = strintcmp (l->u.s, r->u.s);
+	  else
+	    {
+	      errno = 0;
+	      cmp = strcoll (l->u.s, r->u.s);
+
+	      if (errno)
+		{
+		  error (0, errno, _("string comparison failed"));
+		  error (0, 0, _("Set LC_ALL='C' to work around the problem."));
+		  error (EXPR_FAILURE, 0,
+			 _("The strings compared were %s and %s."),
+			 quotearg_n_style (0, locale_quoting_style, l->u.s),
+			 quotearg_n_style (1, locale_quoting_style, r->u.s));
+		}
+	    }
+
+	  switch (fxn)
+	    {
+	    case less_than:     val = (cmp <  0); break;
+	    case less_equal:    val = (cmp <= 0); break;
+	    case equal:         val = (cmp == 0); break;
+	    case not_equal:     val = (cmp != 0); break;
+	    case greater_equal: val = (cmp >= 0); break;
+	    case greater_than:  val = (cmp >  0); break;
+	    default: abort ();
+	    }
 	}
 
-      switch (fxn)
-	{
-	case less_than:     val = (lval <  rval); break;
-	case less_equal:    val = (lval <= rval); break;
-	case equal:         val = (lval == rval); break;
-	case not_equal:     val = (lval != rval); break;
-	case greater_equal: val = (lval >= rval); break;
-	case greater_than:  val = (lval >  rval); break;
-	default: abort ();
-	}
       freev (l);
       freev (r);
-      free (collation_arg1);
       l = int_value (val);
     }
 }

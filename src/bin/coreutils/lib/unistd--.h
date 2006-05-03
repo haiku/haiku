@@ -1,7 +1,6 @@
-/* makepath.c -- Ensure that a directory path exists.
+/* Like unistd.h, but redefine some names to avoid glitches.
 
-   Copyright (C) 1994, 1995, 1996, 1997, 2000, 2003, 2004 Free
-   Software Foundation, Inc.
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,22 +14,15 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* Written by David MacKenzie <djm@gnu.ai.mit.edu> and Jim Meyering.  */
+/* Written by Paul Eggert.  */
 
-#include <stdbool.h>
-#include <sys/types.h>
+#include <unistd.h>
+#include "unistd-safer.h"
 
-bool make_path (const char *argpath,
-		mode_t mode,
-		mode_t parent_mode,
-		uid_t owner,
-		gid_t group,
-		bool preserve_existing,
-		const char *verbose_fmt_string);
+#undef dup
+#define dup dup_safer
 
-bool make_dir (const char *dir,
-	       const char *dirpath,
-	       mode_t mode,
-	       bool *created_dir_p);
+#undef pipe
+#define pipe pipe_safer

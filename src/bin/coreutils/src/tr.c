@@ -1,5 +1,5 @@
 /* tr -- a filter to translate characters
-   Copyright (C) 91, 1995-2004 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering */
 
@@ -516,7 +516,7 @@ unquote (char const *s, struct E_string *es)
 			     is undefined, which means we're allowed to issue
 			     a warning.  */
 			  error (0, 0, _("warning: the ambiguous octal escape \
-\\%c%c%c is being\n\tinterpreted as the 2-byte sequence \\0%c%c, `%c'"),
+\\%c%c%c is being\n\tinterpreted as the 2-byte sequence \\0%c%c, %c"),
 				 s[i], s[i + 1], s[i + 2],
 				 s[i], s[i + 1], s[i + 2]);
 			}
@@ -834,8 +834,8 @@ find_bracketed_repeat (const struct E_string *es, size_t start_idx,
 		{
 		  char *tmp = make_printable_str (digit_str, digit_str_len);
 		  error (0, 0,
-			 _("invalid repeat count `%s' in [c*n] construct"),
-			 tmp);
+			 _("invalid repeat count %s in [c*n] construct"),
+			 quote (tmp));
 		  free (tmp);
 		  return -2;
 		}
@@ -933,8 +933,8 @@ build_spec_list (const struct E_string *es, struct Spec_list *result)
 			    {
 			      char *tmp = make_printable_str (opnd_str,
 							      opnd_str_len);
-			      error (0, 0, _("invalid character class `%s'"),
-				     tmp);
+			      error (0, 0, _("invalid character class %s"),
+				     quote (tmp));
 			      free (tmp);
 			      return false;
 			    }
@@ -1761,7 +1761,10 @@ main (int argc, char **argv)
   /* Use binary I/O, since `tr' is sometimes used to transliterate
      non-printable characters, or characters which are stripped away
      by text-mode reads (like CR and ^Z).  */
-  SET_BINARY2 (STDIN_FILENO, STDOUT_FILENO);
+  if (O_BINARY && ! isatty (STDIN_FILENO))
+    freopen (NULL, "rb", stdin);
+  if (O_BINARY && ! isatty (STDOUT_FILENO))
+    freopen (NULL, "wb", stdout);
 
   if (squeeze_repeats && non_option_args == 1)
     {

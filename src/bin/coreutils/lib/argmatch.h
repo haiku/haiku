@@ -1,6 +1,6 @@
 /* argmatch.h -- definitions and prototypes for argmatch.c
 
-   Copyright (C) 1990, 1998, 1999, 2001, 2002, 2004 Free Software
+   Copyright (C) 1990, 1998, 1999, 2001, 2002, 2004, 2005 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by David MacKenzie <djm@ai.mit.edu>
    Modified by Akim Demaille <demaille@inf.enst.fr> */
@@ -25,24 +25,15 @@
 
 # include <stddef.h>
 
+# include "verify.h"
+
 # define ARRAY_CARDINALITY(Array) (sizeof (Array) / sizeof *(Array))
 
-# define ARGMATCH_CONSTRAINT(Arglist, Vallist) \
-  (ARRAY_CARDINALITY (Arglist) == ARRAY_CARDINALITY (Vallist) + 1)
-
 /* Assert there are as many real arguments as there are values
-   (argument list ends with a NULL guard).  ARGMATCH_VERIFY is
-   preferred, since it is guaranteed to be checked at compile-time.
-   ARGMATCH_ASSERT is for backward compatibility only.  */
+   (argument list ends with a NULL guard).  */
 
-# define ARGMATCH_VERIFY(Arglist, Vallist)				  \
-  struct argmatch_verify						  \
-  {									  \
-    char argmatch_verify[ARGMATCH_CONSTRAINT(Arglist, Vallist) ? 1 : -1]; \
-  }
-
-# define ARGMATCH_ASSERT(Arglist, Vallist) \
-  assert (ARGMATCH_CONSTRAINT (Arglist, Vallist))
+# define ARGMATCH_VERIFY(Arglist, Vallist) \
+    verify (ARRAY_CARDINALITY (Arglist) == ARRAY_CARDINALITY (Vallist) + 1)
 
 /* Return the index of the element of ARGLIST (NULL terminated) that
    matches with ARG.  If VALLIST is not NULL, then use it to resolve

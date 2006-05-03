@@ -1,5 +1,5 @@
 /* stty -- change and print terminal line settings
-   Copyright (C) 1990-2004 Free Software Foundation, Inc.
+   Copyright (C) 1990-2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Usage: stty [-ag] [--all] [--save] [-F device] [--file=device] [setting...]
 
@@ -36,18 +36,22 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+
 #if HAVE_TERMIOS_H
 # include <termios.h>
 #endif
-#ifdef GWINSZ_IN_SYS_IOCTL
+#if HAVE_STROPTS_H
+# include <stropts.h>
+#endif
+#ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
+
 #ifdef WINSIZE_IN_PTEM
 # include <sys/stream.h>
 # include <sys/ptem.h>
 #endif
 #ifdef GWINSZ_IN_SYS_PTY
-# include <sys/ioctl.h>
 # include <sys/tty.h>
 # include <sys/pty.h>
 #endif
@@ -56,6 +60,8 @@
 
 #include "system.h"
 #include "error.h"
+#include "fd-reopen.h"
+#include "quote.h"
 #include "vasprintf.h"
 #include "xstrtol.h"
 
@@ -97,65 +103,72 @@
 #ifndef CSUSP
 # define CSUSP Control ('z')
 #endif
-#if defined(VEOL2) && !defined(CEOL2)
+#if defined VEOL2 && !defined CEOL2
 # define CEOL2 _POSIX_VDISABLE
 #endif
-/* ISC renamed swtch to susp for termios, but we'll accept either name.  */
-#if defined(VSUSP) && !defined(VSWTCH)
-# define VSWTCH VSUSP
-# define CSWTCH CSUSP
+/* Some platforms have VSWTC, others VSWTCH.  In both cases, this control
+   character is initialized by CSWTCH, if present.  */
+#if defined VSWTC && !defined VSWTCH
+# define VSWTCH VSWTC
 #endif
-#if defined(VSWTCH) && !defined(CSWTCH)
+/* ISC renamed swtch to susp for termios, but we'll accept either name.  */
+#if defined VSUSP && !defined VSWTCH
+# define VSWTCH VSUSP
+# if defined CSUSP && !defined CSWTCH
+#  define CSWTCH CSUSP
+# endif
+#endif
+#if defined VSWTCH && !defined CSWTCH
 # define CSWTCH _POSIX_VDISABLE
 #endif
 
 /* SunOS 5.3 loses (^Z doesn't work) if `swtch' is the same as `susp'.
    So the default is to disable `swtch.'  */
-#if defined (__sparc__) && defined (__svr4__)
+#if defined __sparc__ && defined __svr4__
 # undef CSWTCH
 # define CSWTCH _POSIX_VDISABLE
 #endif
 
-#if defined(VWERSE) && !defined (VWERASE)	/* AIX-3.2.5 */
+#if defined VWERSE && !defined VWERASE	/* AIX-3.2.5 */
 # define VWERASE VWERSE
 #endif
-#if defined(VDSUSP) && !defined (CDSUSP)
+#if defined VDSUSP && !defined CDSUSP
 # define CDSUSP Control ('y')
 #endif
-#if !defined(VREPRINT) && defined(VRPRNT)	/* Irix 4.0.5 */
+#if !defined VREPRINT && defined VRPRNT /* Irix 4.0.5 */
 # define VREPRINT VRPRNT
 #endif
-#if defined(VREPRINT) && !defined(CRPRNT)
+#if defined VREPRINT && !defined CRPRNT
 # define CRPRNT Control ('r')
 #endif
-#if defined(CREPRINT) && !defined(CRPRNT)
+#if defined CREPRINT && !defined CRPRNT
 # define CRPRNT Control ('r')
 #endif
-#if defined(VWERASE) && !defined(CWERASE)
+#if defined VWERASE && !defined CWERASE
 # define CWERASE Control ('w')
 #endif
-#if defined(VLNEXT) && !defined(CLNEXT)
+#if defined VLNEXT && !defined CLNEXT
 # define CLNEXT Control ('v')
 #endif
-#if defined(VDISCARD) && !defined(VFLUSHO)
+#if defined VDISCARD && !defined VFLUSHO
 # define VFLUSHO VDISCARD
 #endif
-#if defined(VFLUSH) && !defined(VFLUSHO)	/* Ultrix 4.2 */
+#if defined VFLUSH && !defined VFLUSHO	/* Ultrix 4.2 */
 # define VFLUSHO VFLUSH
 #endif
-#if defined(CTLECH) && !defined(ECHOCTL)	/* Ultrix 4.3 */
+#if defined CTLECH && !defined ECHOCTL	/* Ultrix 4.3 */
 # define ECHOCTL CTLECH
 #endif
-#if defined(TCTLECH) && !defined(ECHOCTL)	/* Ultrix 4.2 */
+#if defined TCTLECH && !defined ECHOCTL	/* Ultrix 4.2 */
 # define ECHOCTL TCTLECH
 #endif
-#if defined(CRTKIL) && !defined(ECHOKE)		/* Ultrix 4.2 and 4.3 */
+#if defined CRTKIL && !defined ECHOKE	/* Ultrix 4.2 and 4.3 */
 # define ECHOKE CRTKIL
 #endif
-#if defined(VFLUSHO) && !defined(CFLUSHO)
+#if defined VFLUSHO && !defined CFLUSHO
 # define CFLUSHO Control ('o')
 #endif
-#if defined(VSTATUS) && !defined(CSTATUS)
+#if defined VSTATUS && !defined CSTATUS
 # define CSTATUS Control ('t')
 #endif
 
@@ -334,10 +347,10 @@ static struct mode_info mode_info[] =
 #ifdef IXANY
   {"decctlq", combination, REV | OMIT, 0, 0},
 #endif
-#if defined (TABDLY) || defined (OXTABS)
+#if defined TABDLY || defined OXTABS
   {"tabs", combination, REV | OMIT, 0, 0},
 #endif
-#if defined(XCASE) && defined(IUCLC) && defined(OLCUC)
+#if defined XCASE && defined IUCLC && defined OLCUC
   {"lcase", combination, REV | OMIT, 0, 0},
   {"LCASE", combination, REV | OMIT, 0, 0},
 #endif
@@ -412,22 +425,21 @@ static bool set_mode (struct mode_info *info, bool reversed,
 static unsigned long int integer_arg (const char *s, unsigned long int max);
 static speed_t string_to_baud (const char *arg);
 static tcflag_t *mode_type_flag (enum mode_type type, struct termios *mode);
-static void display_all (struct termios *mode, int fd, const char *device_name);
+static void display_all (struct termios *mode, char const *device_name);
 static void display_changed (struct termios *mode);
 static void display_recoverable (struct termios *mode);
 static void display_settings (enum output_type output_type,
-			      struct termios *mode, int fd,
+			      struct termios *mode,
 			      const char *device_name);
 static void display_speed (struct termios *mode, bool fancy);
-static void display_window_size (bool fancy, int fd, const char *device_name);
+static void display_window_size (bool fancy, char const *device_name);
 static void sane_mode (struct termios *mode);
 static void set_control_char (struct control_info *info,
 			      const char *arg,
 			      struct termios *mode);
 static void set_speed (enum speed_setting type, const char *arg,
 		       struct termios *mode);
-static void set_window_size (int rows, int cols, int fd,
-			     const char *device_name);
+static void set_window_size (int rows, int cols, char const *device_name);
 
 /* The width of the screen, for output wrapping. */
 static int max_col;
@@ -729,7 +741,6 @@ main (int argc, char **argv)
   int k;
   bool noargs = true;
   char *file_name = NULL;
-  int fd;
   const char *device_name;
 
   initialize_main (&argc, &argv);
@@ -819,31 +830,27 @@ main (int argc, char **argv)
     {
       int fdflags;
       device_name = file_name;
-      fd = open (device_name, O_RDONLY | O_NONBLOCK);
-      if (fd < 0)
+      if (fd_reopen (STDIN_FILENO, device_name, O_RDONLY | O_NONBLOCK, 0) < 0)
 	error (EXIT_FAILURE, errno, "%s", device_name);
-      if ((fdflags = fcntl (fd, F_GETFL)) == -1
-	  || fcntl (fd, F_SETFL, fdflags & ~O_NONBLOCK) < 0)
+      if ((fdflags = fcntl (STDIN_FILENO, F_GETFL)) == -1
+	  || fcntl (STDIN_FILENO, F_SETFL, fdflags & ~O_NONBLOCK) < 0)
 	error (EXIT_FAILURE, errno, _("%s: couldn't reset non-blocking mode"),
 	       device_name);
     }
   else
-    {
-      fd = STDIN_FILENO;
-      device_name = _("standard input");
-    }
+    device_name = _("standard input");
 
   /* Initialize to all zeroes so there is no risk memcmp will report a
      spurious difference in an uninitialized portion of the structure.  */
   memset (&mode, 0, sizeof (mode));
-  if (tcgetattr (fd, &mode))
+  if (tcgetattr (STDIN_FILENO, &mode))
     error (EXIT_FAILURE, errno, "%s", device_name);
 
   if (verbose_output | recoverable_output | noargs)
     {
       max_col = screen_columns ();
       current_col = 0;
-      display_settings (output_type, &mode, fd, device_name);
+      display_settings (output_type, &mode, device_name);
       exit (EXIT_SUCCESS);
     }
 
@@ -875,7 +882,7 @@ main (int argc, char **argv)
 	}
       if (!match_found & reversed)
 	{
-	  error (0, 0, _("invalid argument `%s'"), arg - 1);
+	  error (0, 0, _("invalid argument %s"), quote (arg - 1));
 	  usage (EXIT_FAILURE);
 	}
       if (!match_found)
@@ -886,7 +893,7 @@ main (int argc, char **argv)
 		{
 		  if (k == argc - 1)
 		    {
-		      error (0, 0, _("missing argument to `%s'"), arg);
+		      error (0, 0, _("missing argument to %s"), quote (arg));
 		      usage (EXIT_FAILURE);
 		    }
 		  match_found = true;
@@ -903,7 +910,7 @@ main (int argc, char **argv)
 	    {
 	      if (k == argc - 1)
 		{
-		  error (0, 0, _("missing argument to `%s'"), arg);
+		  error (0, 0, _("missing argument to %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      ++k;
@@ -915,7 +922,7 @@ main (int argc, char **argv)
 	    {
 	      if (k == argc - 1)
 		{
-		  error (0, 0, _("missing argument to `%s'"), arg);
+		  error (0, 0, _("missing argument to %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      ++k;
@@ -928,30 +935,30 @@ main (int argc, char **argv)
 	    {
 	      if (k == argc - 1)
 		{
-		  error (0, 0, _("missing argument to `%s'"), arg);
+		  error (0, 0, _("missing argument to %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      ++k;
 	      set_window_size (integer_arg (argv[k], INT_MAX), -1,
-			       fd, device_name);
+			       device_name);
 	    }
 	  else if (STREQ (arg, "cols")
 		   || STREQ (arg, "columns"))
 	    {
 	      if (k == argc - 1)
 		{
-		  error (0, 0, _("missing argument to `%s'"), arg);
+		  error (0, 0, _("missing argument to %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      ++k;
 	      set_window_size (-1, integer_arg (argv[k], INT_MAX),
-			       fd, device_name);
+			       device_name);
 	    }
 	  else if (STREQ (arg, "size"))
 	    {
 	      max_col = screen_columns ();
 	      current_col = 0;
-	      display_window_size (false, fd, device_name);
+	      display_window_size (false, device_name);
 	    }
 #endif
 #ifdef HAVE_C_LINE
@@ -960,13 +967,13 @@ main (int argc, char **argv)
 	      unsigned long int value;
 	      if (k == argc - 1)
 		{
-		  error (0, 0, _("missing argument to `%s'"), arg);
+		  error (0, 0, _("missing argument to %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      ++k;
 	      mode.c_line = value = integer_arg (argv[k], ULONG_MAX);
 	      if (mode.c_line != value)
-		error (0, 0, _("invalid line discipline `%s'"), argv[k]);
+		error (0, 0, _("invalid line discipline %s"), quote (argv[k]));
 	      require_set_attr = true;
 	    }
 #endif
@@ -985,7 +992,7 @@ main (int argc, char **argv)
 	    {
 	      if (! recover_mode (arg, &mode))
 		{
-		  error (0, 0, _("invalid argument `%s'"), arg);
+		  error (0, 0, _("invalid argument %s"), quote (arg));
 		  usage (EXIT_FAILURE);
 		}
 	      require_set_attr = true;
@@ -997,7 +1004,7 @@ main (int argc, char **argv)
     {
       struct termios new_mode;
 
-      if (tcsetattr (fd, TCSADRAIN, &mode))
+      if (tcsetattr (STDIN_FILENO, TCSADRAIN, &mode))
 	error (EXIT_FAILURE, errno, "%s", device_name);
 
       /* POSIX (according to Zlotnick's book) tcsetattr returns zero if
@@ -1010,7 +1017,7 @@ main (int argc, char **argv)
       /* Initialize to all zeroes so there is no risk memcmp will report a
 	 spurious difference in an uninitialized portion of the structure.  */
       memset (&new_mode, 0, sizeof (new_mode));
-      if (tcgetattr (fd, &new_mode))
+      if (tcgetattr (STDIN_FILENO, &new_mode))
 	error (EXIT_FAILURE, errno, "%s", device_name);
 
       /* Normally, one shouldn't use memcmp to compare structures that
@@ -1212,7 +1219,7 @@ set_mode (struct mode_info *info, bool reversed, struct termios *mode)
 	}
 # endif
 #endif
-#if defined(XCASE) && defined(IUCLC) && defined(OLCUC)
+#if defined XCASE && defined IUCLC && defined OLCUC
       else if (STREQ (info->name, "lcase")
 	       || STREQ (info->name, "LCASE"))
 	{
@@ -1311,11 +1318,11 @@ get_win_size (int fd, struct winsize *win)
 }
 
 static void
-set_window_size (int rows, int cols, int fd, const char *device_name)
+set_window_size (int rows, int cols, char const *device_name)
 {
   struct winsize win;
 
-  if (get_win_size (fd, &win))
+  if (get_win_size (STDIN_FILENO, &win))
     {
       if (errno != EINVAL)
 	error (EXIT_FAILURE, errno, "%s", device_name);
@@ -1359,25 +1366,25 @@ set_window_size (int rows, int cols, int fd, const char *device_name)
       win.ws_row = 1;
       win.ws_col = 1;
 
-      if (ioctl (fd, TIOCSWINSZ, (char *) &win))
+      if (ioctl (STDIN_FILENO, TIOCSWINSZ, (char *) &win))
 	error (EXIT_FAILURE, errno, "%s", device_name);
 
-      if (ioctl (fd, TIOCSSIZE, (char *) &ttysz))
+      if (ioctl (STDIN_FILENO, TIOCSSIZE, (char *) &ttysz))
 	error (EXIT_FAILURE, errno, "%s", device_name);
       return;
     }
 # endif
 
-  if (ioctl (fd, TIOCSWINSZ, (char *) &win))
+  if (ioctl (STDIN_FILENO, TIOCSWINSZ, (char *) &win))
     error (EXIT_FAILURE, errno, "%s", device_name);
 }
 
 static void
-display_window_size (bool fancy, int fd, const char *device_name)
+display_window_size (bool fancy, char const *device_name)
 {
   struct winsize win;
 
-  if (get_win_size (fd, &win))
+  if (get_win_size (STDIN_FILENO, &win))
     {
       if (errno != EINVAL)
 	error (EXIT_FAILURE, errno, "%s", device_name);
@@ -1411,7 +1418,7 @@ screen_columns (void)
     return win.ws_col;
 #endif
   {
-    /* Use $COLUMNS if it's in [1..INT_MAX-1].  */
+    /* Use $COLUMNS if it's in [1..INT_MAX].  */
     char *col_string = getenv ("COLUMNS");
     long int n_columns;
     if (!(col_string != NULL
@@ -1450,7 +1457,7 @@ mode_type_flag (enum mode_type type, struct termios *mode)
 
 static void
 display_settings (enum output_type output_type, struct termios *mode,
-		  int fd, const char *device_name)
+		  char const *device_name)
 {
   switch (output_type)
     {
@@ -1459,7 +1466,7 @@ display_settings (enum output_type output_type, struct termios *mode,
       break;
 
     case all:
-      display_all (mode, fd, device_name);
+      display_all (mode, device_name);
       break;
 
     case recoverable:
@@ -1554,7 +1561,7 @@ display_changed (struct termios *mode)
 }
 
 static void
-display_all (struct termios *mode, int fd, const char *device_name)
+display_all (struct termios *mode, char const *device_name)
 {
   int i;
   tcflag_t *bitsp;
@@ -1563,7 +1570,7 @@ display_all (struct termios *mode, int fd, const char *device_name)
 
   display_speed (mode, true);
 #ifdef TIOCGWINSZ
-  display_window_size (true, fd, device_name);
+  display_window_size (true, device_name);
 #endif
 #ifdef HAVE_C_LINE
   wrapf ("line = %d;", mode->c_line);
@@ -1696,7 +1703,7 @@ struct speed_map
   unsigned long int value;	/* Numeric value. */
 };
 
-struct speed_map speeds[] =
+static struct speed_map speeds[] =
 {
   {"0", B0, 0},
   {"50", B50, 50},
@@ -1879,7 +1886,7 @@ integer_arg (const char *s, unsigned long int maxval)
   if (xstrtoul (s, NULL, 0, &value, "bB") != LONGINT_OK
       || maxval < value)
     {
-      error (0, 0, _("invalid integer argument `%s'"), s);
+      error (0, 0, _("invalid integer argument %s"), quote (s));
       usage (EXIT_FAILURE);
     }
   return value;

@@ -1,6 +1,6 @@
 /* Parse dates for touch and date.
 
-   Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004
+   Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Yacc-based version written by Jim Kingdon and David MacKenzie.
    Rewritten by Jim Meyering.  */
@@ -62,8 +62,8 @@ time_t mktime ();
     (PDS_LEADING_YEAR | PDS_CENTURY | PDS_SECONDS)
 
   touch mmddhhmm[YY] FILE... (obsoleted by POSIX 1003.1-2001)
-    8 or 10 digits
-    (PDS_TRAILING_YEAR)
+    8 or 10 digits, YY (if present) must be in the range 69-99
+    (PDS_TRAILING_YEAR | PDS_PRE_2000)
 
   date mmddhhmm[[CC]YY]
     8, 10, or 12 digits
@@ -72,7 +72,7 @@ time_t mktime ();
 */
 
 static int
-year (struct tm *tm, const int *digit_pair, size_t n, int allow_century)
+year (struct tm *tm, const int *digit_pair, size_t n, unsigned int syntax_bits)
 {
   switch (n)
     {
@@ -82,11 +82,15 @@ year (struct tm *tm, const int *digit_pair, size_t n, int allow_century)
 	 POSIX requires that 00-68 be interpreted as 2000-2068,
 	 and that 69-99 be interpreted as 1969-1999.  */
       if (digit_pair[0] <= 68)
-	tm->tm_year += 100;
+	{
+	  if (syntax_bits & PDS_PRE_2000)
+	    return 1;
+	  tm->tm_year += 100;
+	}
       break;
 
     case 2:
-      if (!allow_century)
+      if (! (syntax_bits & PDS_CENTURY))
 	return 1;
       tm->tm_year = digit_pair[0] * 100 + digit_pair[1] - 1900;
       break;
@@ -148,7 +152,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
   p = pair;
   if (syntax_bits & PDS_LEADING_YEAR)
     {
-      if (year (tm, p, len - 4, syntax_bits & PDS_CENTURY))
+      if (year (tm, p, len - 4, syntax_bits))
 	return 1;
       p += len - 4;
       len = 4;
@@ -164,7 +168,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
   /* Handle any trailing year.  */
   if (syntax_bits & PDS_TRAILING_YEAR)
     {
-      if (year (tm, p, len, syntax_bits & PDS_CENTURY))
+      if (year (tm, p, len, syntax_bits))
 	return 1;
     }
 
@@ -193,7 +197,15 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
 bool
 posixtime (time_t *p, const char *s, unsigned int syntax_bits)
 {
-  struct tm tm0;
+  struct tm tm0
+#ifdef lint
+  /* Placate gcc-4's -Wuninitialized.
+     posix_time_parse fails to set all of tm0 only when it returns
+     nonzero (due to year() returning nonzero), and in that case,
+     this code doesn't use the tm0 at all.  */
+    = { 0, }
+#endif
+    ;
   struct tm tm1;
   struct tm const *tm;
   time_t t;

@@ -1,6 +1,6 @@
 /* Convert string representation of a number into an integer value.
 
-   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003
+   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005
    Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -18,9 +18,9 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
@@ -124,19 +124,34 @@ extern int errno;
 # define STRTOL_LONG_MAX LONG_LONG_MAX
 # define STRTOL_ULONG_MAX ULONG_LONG_MAX
 
-/* The extra casts work around common compiler bugs,
-   e.g. Cray C 5.0.3.0 when t == time_t.  */
-# ifndef TYPE_SIGNED
-#  define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-# endif
-# ifndef TYPE_MINIMUM
-#  define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-				? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) \
-				: (t) 0))
-# endif
-# ifndef TYPE_MAXIMUM
-#  define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
-# endif
+/* The extra casts in the following macros work around compiler bugs,
+   e.g., in Cray C 5.0.3.0.  */
+
+/* True if negative values of the signed integer type T use two's
+   complement, ones' complement, or signed magnitude representation,
+   respectively.  Much GNU code assumes two's complement, but some
+   people like to be portable to all possible C hosts.  */
+# define TYPE_TWOS_COMPLEMENT(t) ((t) ~ (t) 0 == (t) -1)
+# define TYPE_ONES_COMPLEMENT(t) ((t) ~ (t) 0 == 0)
+# define TYPE_SIGNED_MAGNITUDE(t) ((t) ~ (t) 0 < (t) -1)
+
+/* True if the arithmetic type T is signed.  */
+# define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
+
+/* The maximum and minimum values for the integer type T.  These
+   macros have undefined behavior if T is signed and has padding bits.
+   If this is a problem for you, please let us know how to fix it for
+   your host.  */
+# define TYPE_MINIMUM(t) \
+   ((t) (! TYPE_SIGNED (t) \
+	 ? (t) 0 \
+	 : TYPE_SIGNED_MAGNITUDE (t) \
+	 ? ~ (t) 0 \
+	 : ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1)))
+# define TYPE_MAXIMUM(t) \
+   ((t) (! TYPE_SIGNED (t) \
+	 ? (t) -1 \
+	 : ~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
 
 # ifndef ULONG_LONG_MAX
 #  define ULONG_LONG_MAX TYPE_MAXIMUM (unsigned long long)
