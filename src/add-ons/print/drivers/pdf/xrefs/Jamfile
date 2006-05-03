@@ -2,12 +2,8 @@ SubDir HAIKU_TOP src add-ons print drivers pdf xrefs ;
 
 Package haiku-pdf_writer-cvs :
 	English Deutsch :
-# Don't work, create a PDF folder + a jam local Driver folder!...
-#	boot home config settings PDF\ Writer bookmarks ;	
-	boot home config settings PDF_Writer xrefs ;
+	boot home config settings PDF\ Writer xrefs ;	
 
 Package haiku-printingkit-cvs :
 	English Deutsch :
-# Don't work, create a PDF folder + a jam local Driver folder!...
-#	boot home config settings PDF\ Writer bookmarks ;	
-	boot home config settings PDF_Writer xrefs ;
+	boot home config settings PDF\ Writer xrefs ;	
