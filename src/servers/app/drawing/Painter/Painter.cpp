@@ -432,76 +432,63 @@ Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 	return _DrawTriangle(pt1, pt2, pt3, true);
 }
 
-// StrokePolygon
+// DrawPolygon
 BRect
-Painter::StrokePolygon(const BPoint* ptArray, int32 numPts,
-					   bool closed) const
+Painter::DrawPolygon(BPoint* p, int32 numPts,
+					 bool filled, bool closed) const
 {
-	return _DrawPolygon(ptArray, numPts, closed, false);
+	CHECK_CLIPPING
+
+	if (numPts > 0) {
+
+		agg::path_storage path;
+		_Transform(p);
+		path.move_to(p->x, p->y);
+
+		for (int32 i = 1; i < numPts; i++) {
+			p++;
+			_Transform(p);
+			path.line_to(p->x, p->y);
+		}
+
+		if (closed)
+			path.close_polygon();
+
+		if (filled)
+			return _FillPath(path);
+		else
+			return _StrokePath(path);
+	}
+	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
-// FillPolygon
+// DrawBezier
 BRect
-Painter::FillPolygon(const BPoint* ptArray, int32 numPts,
-					   bool closed) const
-{
-	return _DrawPolygon(ptArray, numPts, closed, true);
-}
-
-// StrokeBezier
-BRect
-Painter::StrokeBezier(const BPoint* controlPoints) const
+Painter::DrawBezier(BPoint* p, bool filled) const
 {
 	CHECK_CLIPPING
 
 	agg::path_storage curve;
 
-	BPoint p1(controlPoints[0]);
-	BPoint p2(controlPoints[1]);
-	BPoint p3(controlPoints[2]);
-	BPoint p4(controlPoints[3]);
-	_Transform(&p1);
-	_Transform(&p2);
-	_Transform(&p3);
-	_Transform(&p4);
+	_Transform(&(p[0]));
+	_Transform(&(p[1]));
+	_Transform(&(p[2]));
+	_Transform(&(p[3]));
 
-	curve.move_to(p1.x, p1.y);
-	curve.curve4(p2.x, p2.y,
-				 p3.x, p3.y,
-				 p4.x, p4.y);
+	curve.move_to(p[0].x, p[0].y);
+	curve.curve4(p[1].x, p[1].y,
+				 p[2].x, p[2].y,
+				 p[3].x, p[3].y);
 
 
 	agg::conv_curve<agg::path_storage> path(curve);
 
-	return _StrokePath(path);
-}
-
-// FillBezier
-BRect
-Painter::FillBezier(const BPoint* controlPoints) const
-{
-	CHECK_CLIPPING
-
-	agg::path_storage curve;
-
-	BPoint p1(controlPoints[0]);
-	BPoint p2(controlPoints[1]);
-	BPoint p3(controlPoints[2]);
-	BPoint p4(controlPoints[3]);
-	_Transform(&p1);
-	_Transform(&p2);
-	_Transform(&p3);
-	_Transform(&p4);
-
-	curve.move_to(p1.x, p1.y);
-	curve.curve4(p2.x, p2.y,
-				 p3.x, p3.y,
-				 p4.x, p4.y);
-	curve.close_polygon();
-
-	agg::conv_curve<agg::path_storage> path(curve);
-
-	return _FillPath(path);
+	if (filled) {
+		curve.close_polygon();
+		return _FillPath(path);
+	} else {
+		return _StrokePath(path);
+	}
 }
 
 // this comes from Shape.cpp
@@ -1254,36 +1241,6 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 
 		return _Clipped(_BoundingBox(outer));
 	}
-}
-
-// _DrawPolygon
-inline BRect
-Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
-					  bool closed, bool fill) const
-{
-	CHECK_CLIPPING
-
-	if (numPts > 0) {
-
-		agg::path_storage path;
-		BPoint point = _Transform(*ptArray);
-		path.move_to(point.x, point.y);
-
-		for (int32 i = 1; i < numPts; i++) {
-			ptArray++;
-			point = _Transform(*ptArray);
-			path.line_to(point.x, point.y);
-		}
-
-		if (closed)
-			path.close_polygon();
-
-		if (fill)
-			return _FillPath(path);
-		else
-			return _StrokePath(path);
-	}
-	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
 // copy_bitmap_row_cmap8_copy

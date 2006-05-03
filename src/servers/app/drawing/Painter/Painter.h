@@ -105,18 +105,14 @@ class Painter {
 												BPoint pt3) const;
 
 								// polygons
-			BRect				StrokePolygon(	const BPoint* ptArray,
+			BRect				DrawPolygon(	BPoint* ptArray,
 												int32 numPts,
-											    bool  closed = true) const;
-
-			BRect				FillPolygon(	const BPoint* ptArray,
-												int32 numPts,
-											    bool  closed = true) const;
+											    bool filled,
+											    bool closed) const;
 
 								// bezier curves
-			BRect				StrokeBezier(	const BPoint* controlPoints) const;
-
-			BRect				FillBezier(		const BPoint* controlPoints) const;
+			BRect				DrawBezier(		BPoint* controlPoints,
+												bool filled) const;
 	
 								// shapes
 			BRect				DrawShape(		const int32& opCount,
@@ -224,10 +220,6 @@ class Painter {
 			BRect				_DrawEllipse(	BPoint center,
 												float xRadius,
 												float yRadius,
-												bool fill) const;
-			BRect				_DrawPolygon(	const BPoint* ptArray,
-												int32 numPts,
-											    bool  closed,
 												bool fill) const;
 
 			void				_DrawBitmap(	const agg::rendering_buffer& srcBuffer,

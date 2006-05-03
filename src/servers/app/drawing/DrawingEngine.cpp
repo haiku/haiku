@@ -494,11 +494,11 @@ void
 DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
 {
 	if (Lock()) {
+		// TODO: figure out bounds and hide cursor depending on that
 		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawState(d);
-		BRect touched = filled ? fPainter->FillBezier(pts)
-							   : fPainter->StrokeBezier(pts);
+		BRect touched = fPainter->DrawBezier(pts, filled);
 
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
@@ -555,10 +555,7 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 			fGraphicsCard->HideSoftwareCursor(bounds);
 	
 			fPainter->SetDrawState(d);
-			if (filled)
-				fPainter->FillPolygon(ptlist, numpts);
-			else
-				fPainter->StrokePolygon(ptlist, numpts, closed);
+			fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 	
 			fGraphicsCard->Invalidate(bounds);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -589,14 +586,7 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 	
 			fPainter->StrokeRect(r, color.GetColor32());
 	
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top,
-															   r.right, r.top)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top + 1,
-															   r.left, r.bottom - 1)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.right, r.top + 1,
-															   r.right, r.bottom - 1)));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.bottom,
-															   r.right, r.bottom)));
+			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
 		}
 
