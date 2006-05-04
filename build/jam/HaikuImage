@@ -49,7 +49,8 @@ BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
 BEOS_NETWORK_PROTOCOLS = icmp ipv4 raw route tcp udp ;
 
 BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
-	$(X86_ONLY)mga.accelerant $(X86_ONLY)nm.accelerant vesa.accelerant
+	$(X86_ONLY)mga.accelerant $(X86_ONLY)nm.accelerant $(X86_ONLY)intel_extreme.accelerant
+	vesa.accelerant
 ;
 BEOS_ADD_ONS_TRANSLATORS = BMPTranslator GIFTranslator JPEGTranslator
 	JPEG2000Translator TIFFTranslator PNGTranslator PPMTranslator 
@@ -67,7 +68,7 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
-	$(X86_ONLY)nm.driver $(X86_ONLY)mga.driver vesa
+	$(X86_ONLY)nm.driver $(X86_ONLY)mga.driver $(X86_ONLY)intel_extreme vesa
 ;
 BEOS_ADD_ONS_DRIVERS_NET = ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack_driver
