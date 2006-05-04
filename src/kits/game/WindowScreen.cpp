@@ -469,7 +469,7 @@ BWindowScreen::SetSpace(uint32 space)
 bool
 BWindowScreen::CanControlFrameBuffer()
 {
-	return (fAddonImage >= 0 && (fCardInfo.flags & B_FRAME_BUFFER_CONTROL));
+	return (fCardInfo.flags & B_FRAME_BUFFER_CONTROL) != 0;
 }
 
 
@@ -805,7 +805,7 @@ BWindowScreen::SetupAccelerantHooks(bool enable)
 				scaled_filtered_blit_rect = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
 			}
 		}
-		
+
 		if (status == B_OK) {
 			sFillRectHook = fill_rect;
 			sBlitRectHook = blit_rect;
