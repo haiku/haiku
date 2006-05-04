@@ -1514,13 +1514,23 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			if (status == B_OK) {
 				ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
 				if (bitmapToken == -1 || bitmap != NULL) {
+					bool wasOverlay = fCurrentLayer->ViewBitmap() != NULL
+						&& fCurrentLayer->ViewBitmap()->Overlay() != NULL;
+
 					// TODO: this is a race condition: the bitmap could have been
 					//	deleted in the mean time!!
 					fCurrentLayer->SetViewBitmap(bitmap, srcRect, dstRect,
 						resizingMode, options);
 
-					BRegion dirty(fCurrentLayer->Bounds());
-					fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+					// TODO: if we revert the view color overlay handling
+					//	in ViewLayer::Draw() to the R5 version, we never
+					//	need to invalidate the view for overlays.
+
+					// invalidate view - but only if this is a non-overlay switch
+					if (bitmap == NULL || bitmap->Overlay() == NULL || !wasOverlay) {
+						BRegion dirty(fCurrentLayer->Bounds());
+						fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+					}
 
 					if (bitmap != NULL && bitmap->Overlay() != NULL)
 						colorKey = bitmap->Overlay()->Color().GetColor32();

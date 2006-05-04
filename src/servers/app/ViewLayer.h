@@ -141,6 +141,9 @@ class ViewLayer {
 								{ return fViewColor; }
 			void			SetViewColor(const RGBColor& color)
 								{ fViewColor = color; }
+
+			ServerBitmap*	ViewBitmap() const
+								{ return fViewBitmap; }
 			void			SetViewBitmap(ServerBitmap* bitmap, BRect sourceRect,
 								BRect destRect, int32 resizingMode, int32 options);
 

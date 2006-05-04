@@ -67,7 +67,7 @@ class ServerBitmap {
 			uint32			AreaOffset() const;
 
 			void			SetOverlay(::Overlay* cookie);
-		::Overlay*	Overlay() const;
+			::Overlay*		Overlay() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
