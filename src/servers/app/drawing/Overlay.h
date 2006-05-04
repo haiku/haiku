@@ -13,10 +13,6 @@
 
 #include <video_overlay.h>
 
-//#include <GraphicsDefs.h>
-//#include <Rect.h>
-//#include <OS.h>
-
 
 class HWInterface;
 struct overlay_client_data;
@@ -31,11 +27,19 @@ class Overlay {
 
 		void SetOverlayData(const overlay_buffer* overlayBuffer,
 			overlay_token token, overlay_client_data* clientData);
+		void SetFlags(uint32 flags);
 		void TakeOverToken(Overlay* other);
 
 		const overlay_buffer* OverlayBuffer() const;
 		overlay_client_data* ClientData() const;
 		overlay_token OverlayToken() const;
+
+		void SetColorSpace(uint32 colorSpace);
+
+		const overlay_window* OverlayWindow() const
+			{ return &fWindow; }
+		const overlay_view* OverlayView() const
+			{ return &fView; }
 
 		sem_id Semaphore() const
 			{ return fSemaphore; }
@@ -49,10 +53,6 @@ class Overlay {
 			{ return fVisible; }
 
 		void SetView(const BRect& source, const BRect& destination);
-		const BRect& Source() const
-			{ return fSource; }
-		const BRect& Destination() const
-			{ return fDestination; }
 
 		void Show();
 		void Hide();
@@ -62,10 +62,10 @@ class Overlay {
 		const overlay_buffer*	fOverlayBuffer;
 		overlay_client_data*	fClientData;
 		overlay_token			fOverlayToken;
+		overlay_view			fView;
+		overlay_window			fWindow;
 		sem_id					fSemaphore;
 		RGBColor				fColor;
-		BRect					fSource;
-		BRect					fDestination;
 		bool					fVisible;
 };
 

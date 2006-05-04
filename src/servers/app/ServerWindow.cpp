@@ -1532,8 +1532,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 						fWindowLayer->InvalidateView(fCurrentLayer, dirty);
 					}
 
-					if (bitmap != NULL && bitmap->Overlay() != NULL)
+					if (bitmap != NULL && bitmap->Overlay() != NULL) {
+						bitmap->Overlay()->SetFlags(options);
 						colorKey = bitmap->Overlay()->Color().GetColor32();
+					}
 				} else
 					status = B_BAD_VALUE;
 			}

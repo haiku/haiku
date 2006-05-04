@@ -374,6 +374,12 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		return B_OK;
 	}
 
+	// some safety checks
+	// TODO: more of those!
+	if (fDisplayMode.virtual_width < 320
+		|| fDisplayMode.virtual_height < 200)
+		return B_BAD_VALUE;
+
 	// just try to set the mode - we let the graphics driver
 	// approve or deny the request, as it should know best
 
@@ -790,59 +796,11 @@ AccelerantHWInterface::HideOverlay(Overlay* overlay)
 void
 AccelerantHWInterface::UpdateOverlay(Overlay* overlay)
 {
-	const overlay_buffer* buffer = overlay->OverlayBuffer();
+	// TODO: this only needs to be done on mode changes!
+	overlay->SetColorSpace(fDisplayMode.space);
 
-	overlay_view view;
-	view.h_start = (uint16)overlay->Source().left;
-	view.v_start = (uint16)overlay->Source().top;
-	view.width = (uint16)overlay->Source().IntegerWidth() + 1;
-	view.height = (uint16)overlay->Source().IntegerHeight() + 1;
-
-	overlay_window window;
-	window.h_start = (int16)overlay->Destination().left;
-	window.v_start = (int16)overlay->Destination().top;
-	window.width = (uint16)overlay->Destination().IntegerWidth() + 1;
-	window.height = (uint16)overlay->Destination().IntegerHeight() + 1;
-
-	window.offset_top = 0;
-	window.offset_left = 0;
-	window.offset_right = 0;
-	window.offset_bottom = 0;
-
-	// TODO: for now, this should be done somewhere else, ideally
-	rgb_color colorKey = overlay->Color().GetColor32();
-	uint8 colorShift = 0, greenShift = 0, alphaShift = 0;
-	switch (fDisplayMode.space) {
-		case B_CMAP8:
-			colorKey.red = 0xff;
-			colorKey.green = 0xff;
-			colorKey.blue = 0xff;
-			colorKey.alpha = 0xff;
-			break;
-		case B_RGB15:
-			greenShift = colorShift = 3;
-			alphaShift = 7;
-			break;
-		case B_RGB16:
-			colorShift = 3;
-			greenShift = 2;
-			alphaShift = 8;
-			break;
-	}
-	window.red.value = colorKey.red >> colorShift;
-	window.green.value = colorKey.green >> greenShift;
-	window.blue.value = colorKey.blue >> colorShift;
-	window.alpha.value = colorKey.alpha >> alphaShift;
-	window.red.mask = 0xff >> colorShift;
-	window.green.mask = 0xff >> greenShift;
-	window.blue.mask = 0xff >> colorShift;
-	window.alpha.mask = 0xff >> alphaShift;
-	// TODO: we need the 'uint32 options' from BView::SetViewOverlay() here
-	//       for now using commonly used settings (should be 'safe')
-	window.flags =
-		B_OVERLAY_COLOR_KEY | B_OVERLAY_VERTICAL_FILTERING | B_OVERLAY_HORIZONTAL_FILTERING;
-
-	fAccConfigureOverlay(overlay->OverlayToken(), buffer, &window, &view);
+	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(),
+		overlay->OverlayWindow(), overlay->OverlayView());
 }
 
 
