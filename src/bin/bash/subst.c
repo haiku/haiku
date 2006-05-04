@@ -1638,11 +1638,10 @@ string_list_dollar_at (list, quoted)
 
 /* This performs word splitting and quoted null character removal on
    STRING. */
-#if 0
-#define issep(c)	((separators)[1] ? (member ((c), separators)) : (c) == (separators)[0])
-#else
-#define issep(c)	((separators)[1] ? isifs(c) : (c) == (separators)[0])
-#endif
+#define issep(c) \
+	(((separators)[0]) ? ((separators)[1] ? isifs(c) \
+					      : (c) == (separators)[0]) \
+			   : 0)
 
 WORD_LIST *
 list_string (string, separators, quoted)
