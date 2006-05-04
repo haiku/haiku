@@ -286,7 +286,7 @@ set_mouse_position(int32 x, int32 y)
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 				status_t *error, bool debug_enable)
-	: BWindow(BScreen().Frame().InsetByCopy(200, 200), title, B_TITLED_WINDOW,
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
@@ -303,7 +303,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
 				uint32 attributes, status_t *error)
-	: BWindow(BScreen().Frame().InsetByCopy(200, 200), title, B_TITLED_WINDOW, 
+	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
@@ -673,35 +673,48 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	fAddonImage = -1;
 	fWindowState = 0;
 
-	BScreen screen(this);	
+	// TODO: free resources upon failure!
+
+	BScreen screen(this);
 	status_t status = screen.GetModeList(&fModeList, &fModeCount);
 	if (status < B_OK)
 		return status;
-	
-	display_mode newMode;
-	status = GetModeFromSpace(space, &newMode);
+
+	fDisplayMode = (display_mode *)malloc(sizeof(display_mode));
+	if (fDisplayMode == NULL)
+		return B_NO_MEMORY;
+
+	status = GetModeFromSpace(space, fDisplayMode);
 	if (status < B_OK)
 		return status;
 
 	space_mode = 1;
 	space0 = 0;
-	
+
 	memcpy(fColorList, screen.ColorMap()->color_list, 256);
-	
+
 	status = GetCardInfo();
 	if (status < B_OK)
 		return status;
-	
+
 	fActivateSem = create_sem(0, "WindowScreen start lock");
+	if (fActivateSem < B_OK)
+		return fActivateSem;
+
 	fActivateState = 0;
-	
+
 	fDebugSem = create_sem(1, "WindowScreen debug sem");
-	fOldDisplayMode = (display_mode *)calloc(1, sizeof(display_mode));
-	fDisplayMode = (display_mode *)calloc(1, sizeof(display_mode));
-	memcpy(fDisplayMode, &newMode, sizeof(display_mode));
+	if (fDebugSem < B_OK)
+		return fDebugSem;
 
 	fWorkState = 1;
 		
+	fOldDisplayMode = (display_mode *)malloc(sizeof(display_mode));
+	if (fOldDisplayMode == NULL)
+		return B_NO_MEMORY;
+
+	screen.GetMode(fOldDisplayMode);
+
 	return B_OK;
 }
 
