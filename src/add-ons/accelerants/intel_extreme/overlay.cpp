@@ -23,9 +23,11 @@ extern "C" void _sPrintf(const char *format, ...);
 
 
 static void
-set_color_key(overlay_registers *registers, uint8 red, uint8 green, uint8 blue,
+set_color_key(uint8 red, uint8 green, uint8 blue,
 	uint8 redMask, uint8 greenMask, uint8 blueMask)
 {
+	overlay_registers *registers = gInfo->overlay_registers;
+
 	registers->color_key_red = red;
 	registers->color_key_green = green;
 	registers->color_key_blue = blue;
@@ -33,6 +35,33 @@ set_color_key(overlay_registers *registers, uint8 red, uint8 green, uint8 blue,
 	registers->color_key_mask_green = ~greenMask;
 	registers->color_key_mask_blue = ~blueMask;
 	registers->color_key_enabled = true;
+}
+
+
+static void
+set_color_key(const overlay_window *window)
+{
+	switch (gInfo->shared_info->current_mode.space) {
+		case B_CMAP8:
+			set_color_key(0, 0, window->blue.value, 0x0, 0x0, 0xff);
+			break;
+		case B_RGB15:
+			set_color_key(window->red.value << 3, window->green.value << 3,
+				window->blue.value << 3, window->red.mask << 3, window->green.mask << 3,
+				window->blue.mask << 3);
+			break;
+		case B_RGB16:
+			set_color_key(window->red.value << 3, window->green.value << 2,
+				window->blue.value << 3, window->red.mask << 3, window->green.mask << 2,
+				window->blue.mask << 3);
+			break;
+
+		default:
+			set_color_key(window->red.value, window->green.value,
+				window->blue.value, window->red.mask, window->green.mask,
+				window->blue.mask);
+			break;
+	}
 }
 
 
@@ -362,7 +391,7 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 		TRACE(("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
 			horizontalScale & 0xfff, verticalScale >> 12, verticalScale & 0xfff));
-		
+
 		if (verticalScale != gInfo->last_vertical_overlay_scale
 			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {
 			// TODO: recompute phase coefficients
@@ -375,17 +404,17 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		gInfo->last_overlay_frame = *(overlay_frame *)window;
 	}
 
-	registers->color_control_output_mode = true;
+	//registers->color_control_output_mode = true;
 	registers->select_pipe = 0;
 
 	// program buffer
 
 	registers->buffer_rgb0 = overlay->buffer_offset;
-	registers->buffer_rgb1 = overlay->buffer_offset;
-	registers->buffer_u0 = overlay->buffer_offset;
-	registers->buffer_u1 = overlay->buffer_offset;
-	registers->buffer_v0 = overlay->buffer_offset;
-	registers->buffer_v1 = overlay->buffer_offset;
+//	registers->buffer_rgb1 = overlay->buffer_offset;
+//	registers->buffer_u0 = overlay->buffer_offset;
+//	registers->buffer_u1 = overlay->buffer_offset;
+//	registers->buffer_v0 = overlay->buffer_offset;
+//	registers->buffer_v1 = overlay->buffer_offset;
 	registers->stride_rgb = buffer->bytes_per_row;
 	registers->stride_uv = buffer->bytes_per_row;
 
@@ -408,25 +437,7 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 	if (!gInfo->shared_info->overlay_active) {
 		// overlay is shown for the first time
-
-		switch (gInfo->shared_info->current_mode.space) {
-			case B_CMAP8:
-				set_color_key(registers, 0, 0, 0, 0xff, 0xff, 0xff);
-				break;
-			case B_RGB15:
-				set_color_key(registers, window->red.value, window->green.value,
-					window->blue.value, 0xf8, 0xf8, 0xf8);
-				break;
-			case B_RGB16:
-				set_color_key(registers, window->red.value, window->green.value,
-					window->blue.value, 0xf8, 0xfc, 0xf8);
-				break;
-			default:
-				set_color_key(registers, window->red.value, window->green.value,
-					window->blue.value, window->red.mask, window->green.mask, window->blue.mask);
-				break;
-		}
-
+		set_color_key(window);
 		show_overlay();
 	} else
 		update_overlay(updateCoefficients);
