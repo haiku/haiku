@@ -2271,10 +2271,10 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 	copying an extra buffer. Functions can be added that return a direct
 	pointer into the message. */
 
-	ssize_t size = message->_NativeFlattenedSize();
+	ssize_t size = message->FlattenedSize();
 	char buffer[size];
 
-	status_t error = message->_NativeFlatten(buffer, size);
+	status_t error = message->Flatten(buffer, size);
 
 	if (error >= B_OK)
 		error = AddData(name, B_MESSAGE_TYPE, &buffer, size, false);
@@ -2552,10 +2552,10 @@ BMessage::ReplaceMessage(const char *name, const BMessage *message)
 status_t
 BMessage::ReplaceMessage(const char *name, int32 index, const BMessage *message)
 {
-	ssize_t size = message->_NativeFlattenedSize();
+	ssize_t size = message->FlattenedSize();
 	char buffer[size];
 
-	status_t error = message->_NativeFlatten(buffer, size);
+	status_t error = message->Flatten(buffer, size);
 
 	if (error >= B_OK)
 		error = ReplaceData(name, B_MESSAGE_TYPE, index, &buffer, size);
