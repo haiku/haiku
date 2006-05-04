@@ -29,15 +29,15 @@ set_color_key(overlay_registers *registers, uint8 red, uint8 green, uint8 blue,
 	registers->color_key_red = red;
 	registers->color_key_green = green;
 	registers->color_key_blue = blue;
-	registers->color_key_mask_red = redMask;
-	registers->color_key_mask_green = greenMask;
-	registers->color_key_mask_blue = blueMask;
+	registers->color_key_mask_red = ~redMask;
+	registers->color_key_mask_green = ~greenMask;
+	registers->color_key_mask_blue = ~blueMask;
 	registers->color_key_enabled = true;
 }
 
 
 static void
-update_overlay(void)
+update_overlay(bool updateCoefficients)
 {
 	if (!gInfo->shared_info->overlay_active)
 		return;
@@ -48,7 +48,8 @@ update_overlay(void)
 	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
+		/* | (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0)*/);
 	ring_command_complete(ringBuffer);
 
 	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
@@ -72,7 +73,8 @@ show_overlay(void)
 	write_to_ring(ringBuffer, COMMAND_FLUSH);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_ON);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
+		/*| OVERLAY_UPDATE_COEFFICIENTS*/);
 	ring_command_complete(ringBuffer);
 }
 
@@ -88,8 +90,6 @@ hide_overlay(void)
 	gInfo->shared_info->overlay_active = false;
 	registers->overlay_enabled = false;
 
-	update_overlay();
-
 	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
 
 	// flush pending commands
@@ -100,13 +100,13 @@ hide_overlay(void)
 
 	// clear overlay enabled bit
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers);
 	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 
 	// turn off overlay engine
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_OFF);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers | 0x01);
+	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers);
 	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	ring_command_complete(ringBuffer);
@@ -129,8 +129,10 @@ intel_overlay_count(const display_mode *mode)
 const uint32 *
 intel_overlay_supported_spaces(const display_mode *mode)
 {
-	static const uint32 kSupportedSpaces[] = {/*B_RGB15, B_RGB16,*/ B_RGB32,
-		/*B_YCbCr411,*/ /*B_YCbCr422,*/ 0};
+	// Maybe I'm doing something wrong, but the chip is doing very strange
+	// stuff with anything but this color space (even though the docs/register
+	// definitions pretend to support other modes)
+	static const uint32 kSupportedSpaces[] = {B_YCbCr422, 0};
 
 	return kSupportedSpaces;
 }
@@ -183,7 +185,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->space = colorSpace;
 	buffer->width = width;
 	buffer->height = height;
-	buffer->bytes_per_row = (width * bytesPerPixel + 0xf) & ~0xf;
+	buffer->bytes_per_row = (width * bytesPerPixel + 0x3f) & ~0x3f;
 
 	status_t status = intel_allocate_memory(buffer->bytes_per_row * height,
 		overlay->buffer_handle, overlay->buffer_offset);
@@ -210,7 +212,7 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 	struct overlay *overlay = (struct overlay *)buffer;
 
 	// TODO: locking!
-	// TODO: if overlay is still active, hide it
+
 	if (gInfo->current_overlay == overlay)
 		hide_overlay();
 
@@ -273,11 +275,11 @@ intel_get_overlay_constraints(const display_mode *mode, const overlay_buffer *bu
 	constraints->window.height.min = 2;
 	constraints->window.height.max = mode->virtual_height;
 
-	// TODO: these values need to be checked
+	// TODO: the minimum values are not tested
 	constraints->h_scale.min = 1.0f / (1 << 4);
-	constraints->h_scale.max = 1 << 12;
+	constraints->h_scale.max = buffer->width * 7;
 	constraints->v_scale.min = 1.0f / (1 << 4);
-	constraints->v_scale.max = 1 << 12;
+	constraints->v_scale.max = buffer->height * 7;
 
 	return B_OK;
 }
@@ -328,40 +330,53 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 	struct overlay *overlay = (struct overlay *)buffer;
 	overlay_registers *registers = gInfo->overlay_registers;
+	bool updateCoefficients = false;
 
-	switch (gInfo->shared_info->current_mode.space) {
-		case B_CMAP8:
-			set_color_key(registers, 0, 0, 0, 0xff, 0xff, 0xff);
-			break;
-		case B_RGB15:
-			set_color_key(registers, window->red.value, window->green.value,
-				window->blue.value, 0x07, 0x07, 0x07);
-			break;
-		case B_RGB16:
-			set_color_key(registers, window->red.value, window->green.value,
-				window->blue.value, 0x07, 0x03, 0x07);
-			break;
-		default:
-			set_color_key(registers, window->red.value, window->green.value,
-				window->blue.value, window->red.mask, window->green.mask, window->blue.mask);
-			break;
+	if (!gInfo->shared_info->overlay_active
+		|| memcmp(&gInfo->last_overlay_view, view, sizeof(overlay_view))
+		|| memcmp(&gInfo->last_overlay_frame, window, sizeof(overlay_frame))) {
+		// scaling has changed, program window and scaling factor
+
+		registers->window_left = window->h_start;
+		registers->window_top = window->v_start;
+		registers->window_width = window->width;
+		registers->window_height = window->height;
+
+		registers->source_width_rgb = view->width;
+		registers->source_width_uv = view->width;
+		registers->source_height_rgb = view->height;
+		registers->source_height_uv = view->height;
+		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + buffer->width + 0x1f) >> 5)
+			- (overlay->buffer_offset >> 5) - 1);
+		registers->source_bytes_per_row_uv = (((overlay->buffer_offset + buffer->width + 0x1f) >> 5)
+			- (overlay->buffer_offset >> 5) - 1);
+
+		uint32 horizontalScale = (view->width << 12) / window->width;
+		registers->scale_rgb.horizontal_downscale_factor = horizontalScale >> 12;
+		registers->scale_rgb.horizontal_scale_fraction = horizontalScale & 0xfff;
+
+		uint32 verticalScale = (view->height << 12) / window->height;
+		registers->scale_rgb.vertical_scale_fraction = verticalScale & 0xfff;
+		registers->vertical_scale_rgb = verticalScale >> 12;
+		registers->vertical_scale_uv = verticalScale >> 12;
+
+		TRACE(("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
+			horizontalScale & 0xfff, verticalScale >> 12, verticalScale & 0xfff));
+		
+		if (verticalScale != gInfo->last_vertical_overlay_scale
+			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {
+			// TODO: recompute phase coefficients
+			updateCoefficients = true;
+			gInfo->last_vertical_overlay_scale = verticalScale;
+			gInfo->last_horizontal_overlay_scale = horizontalScale;
+		}
+
+		gInfo->last_overlay_view = *view;
+		gInfo->last_overlay_frame = *(overlay_frame *)window;
 	}
 
-	// program window and scaling factor
-
-	registers->window_left = 0;
-	registers->window_top = 0;
-	registers->window_width = view->width;//window->width;
-	registers->window_height = view->height;//window->height;
-	
-	registers->source_width_rgb = buffer->width;
-	registers->source_width_uv = buffer->width;
-	registers->source_height_rgb = buffer->height;
-	registers->source_height_uv = buffer->height;
-	registers->source_bytes_per_row_rgb = buffer->bytes_per_row;
-	registers->source_bytes_per_row_uv = buffer->bytes_per_row;
-	registers->scale_rgb.horizontal_downscale_factor = 1;
-	registers->scale_uv.horizontal_downscale_factor = 1;
+	registers->color_control_output_mode = true;
+	registers->select_pipe = 0;
 
 	// program buffer
 
@@ -374,12 +389,47 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 	registers->stride_rgb = buffer->bytes_per_row;
 	registers->stride_uv = buffer->bytes_per_row;
 
-	registers->ycbcr422_order = 1;
+	switch (buffer->space) {
+		case B_RGB15:
+			registers->source_format = OVERLAY_FORMAT_RGB15;
+			break;
+		case B_RGB16:
+			registers->source_format = OVERLAY_FORMAT_RGB16;
+			break;
+		case B_RGB32:
+			registers->source_format = OVERLAY_FORMAT_RGB32;
+			break;
+		case B_YCbCr422:
+			registers->source_format = OVERLAY_FORMAT_YCbCr422;
+			break;
+	}
 
-	if (!gInfo->shared_info->overlay_active)
+	registers->ycbcr422_order = 0;
+
+	if (!gInfo->shared_info->overlay_active) {
+		// overlay is shown for the first time
+
+		switch (gInfo->shared_info->current_mode.space) {
+			case B_CMAP8:
+				set_color_key(registers, 0, 0, 0, 0xff, 0xff, 0xff);
+				break;
+			case B_RGB15:
+				set_color_key(registers, window->red.value, window->green.value,
+					window->blue.value, 0xf8, 0xf8, 0xf8);
+				break;
+			case B_RGB16:
+				set_color_key(registers, window->red.value, window->green.value,
+					window->blue.value, 0xf8, 0xfc, 0xf8);
+				break;
+			default:
+				set_color_key(registers, window->red.value, window->green.value,
+					window->blue.value, window->red.mask, window->green.mask, window->blue.mask);
+				break;
+		}
+
 		show_overlay();
-	else
-		update_overlay();
+	} else
+		update_overlay(updateCoefficients);
 
 	gInfo->current_overlay = overlay;
 	return B_OK;

@@ -20,6 +20,13 @@ struct overlay {
 	uint32			buffer_offset;
 };
 
+struct overlay_frame {
+	int16			h_start;
+	int16			v_start;
+	uint16			width;
+	uint16			height;
+};
+
 struct accelerant_info {
 	vuint8			*regs;
 	area_id			regs_area;
@@ -34,6 +41,10 @@ struct accelerant_info {
 
 	struct overlay_registers *overlay_registers;
 	overlay			*current_overlay;
+	overlay_view	last_overlay_view;
+	overlay_frame	last_overlay_frame;
+	uint32			last_horizontal_overlay_scale;
+	uint32			last_vertical_overlay_scale;
 
 	int				device;
 	bool			is_clone;

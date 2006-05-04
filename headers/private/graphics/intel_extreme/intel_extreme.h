@@ -218,6 +218,7 @@ struct intel_free_graphics_memory {
 #define COMMAND_OVERLAY_CONTINUE		(0 << 21)
 #define COMMAND_OVERLAY_ON				(1 << 21)
 #define COMMAND_OVERLAY_OFF				(2 << 21)
+#define OVERLAY_UPDATE_COEFFICIENTS		0x1
 
 // overlay
 
@@ -233,12 +234,20 @@ struct intel_free_graphics_memory {
 #define INTEL_OVERLAY_GAMMA_0			0x30024
 
 struct overlay_scale {
-	uint32 vertical_scale_fraction : 12;
-	uint32 _reserved0 : 1;
-	uint32 horizontal_downscale_factor : 3;
-	uint32 _reserved1 : 1;
+	uint32 _reserved0 : 3;
 	uint32 horizontal_scale_fraction : 12;
+	uint32 _reserved1 : 1;
+	uint32 horizontal_downscale_factor : 3;
+	uint32 _reserved2 : 1;
+	uint32 vertical_scale_fraction : 12;
 };
+
+#define OVERLAY_FORMAT_RGB15			0x2
+#define OVERLAY_FORMAT_RGB16			0x3
+#define OVERLAY_FORMAT_RGB32			0x1
+#define OVERLAY_FORMAT_YCbCr422			0x8
+#define OVERLAY_FORMAT_YCbCr411			0x9
+#define OVERLAY_FORMAT_YCbCr420			0xc
 
 // The real overlay registers are written to using an update buffer
 
@@ -249,14 +258,19 @@ struct overlay_registers {
 	uint32 buffer_v0;
 	uint32 buffer_u1;
 	uint32 buffer_v1;
+	// (0x18) OSTRIDE - overlay stride
 	uint16 stride_rgb;
 	uint16 stride_uv;
+	// (0x1c) YRGB_VPH - Y/RGB vertical phase
 	uint16 vertical_phase0_rgb;
 	uint16 vertical_phase1_rgb;
+	// (0x20) UV_VPH - UV vertical phase
 	uint16 vertical_phase0_uv;
 	uint16 vertical_phase1_uv;
+	// (0x24) HORZ_PH - horizontal phase
 	uint16 horizontal_phase_rgb;
 	uint16 horizontal_phase_uv;
+	// (0x28) INIT_PHS - initial phase shift
 	uint32 initial_vertical_phase0_shift_rgb0 : 4;
 	uint32 initial_vertical_phase1_shift_rgb0 : 4;
 	uint32 initial_horizontal_phase_shift_rgb0 : 4;
@@ -264,12 +278,16 @@ struct overlay_registers {
 	uint32 initial_vertical_phase1_shift_uv : 4;
 	uint32 initial_horizontal_phase_shift_uv : 4;
 	uint32 _reserved0 : 8;
+	// (0x2c) DWINPOS - destination window position
 	uint16 window_left;
 	uint16 window_top;
+	// (0x30) DWINSZ - destination window size
 	uint16 window_width;
 	uint16 window_height;
+	// (0x34) SWIDTH - source width
 	uint16 source_width_rgb;
 	uint16 source_width_uv;
+	// (0x38) SWITDHSW - source width in 8 byte steps
 	uint16 source_bytes_per_row_rgb;
 	uint16 source_bytes_per_row_uv;
 	uint16 source_height_rgb;
@@ -319,7 +337,8 @@ struct overlay_registers {
 	uint32 yuv_to_rgb_bypass : 1;
 	uint32 _reserved12 : 11;
 	uint32 gamma2_enabled : 1;
-	uint32 _reserved13 : 2;
+	uint32 _reserved13 : 1;
+	uint32 select_pipe : 1;
 	uint32 slot_time : 8;
 	uint32 _reserved14 : 5;
 	// (0x68) OCOMD - overlay command
@@ -332,7 +351,7 @@ struct overlay_registers {
 	uint32 tv_flip_field_enabled : 1;
 	uint32 _reserved16 : 1;
 	uint32 tv_flip_field_parity : 1;
-	uint32 _reserved17 : 4;
+	uint32 source_format : 4;
 	uint32 ycbcr422_order : 2;
 	uint32 _reserved18 : 1;
 	uint32 mirroring_mode : 2;
@@ -353,6 +372,18 @@ struct overlay_registers {
 	// (0xa4) UVSCALEV - vertical downscale
 	uint16 vertical_scale_rgb;
 	uint16 vertical_scale_uv;
+
+	uint32 _reserved22[86];
+
+	// (0x200) polyphase filter coefficients
+	uint16 vertical_coefficients_rgb[128];
+	uint16 horizontal_coefficients_rgb[128];
+
+	uint32	_reserved23[64];
+
+	// (0x500)
+	uint16 vertical_coefficients_uv[128];
+	uint16 horizontal_coefficients_uv[128];
 };
 
 //----------------------------------------------------------
