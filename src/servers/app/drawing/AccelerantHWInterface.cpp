@@ -811,14 +811,32 @@ AccelerantHWInterface::UpdateOverlay(Overlay* overlay)
 
 	// TODO: for now, this should be done somewhere else, ideally
 	rgb_color colorKey = overlay->Color().GetColor32();
-	window.red.value = colorKey.red;
-	window.green.value = colorKey.green;
-	window.blue.value = colorKey.blue;
-	window.alpha.value = colorKey.alpha;
-	window.red.mask = 0xff;
-	window.green.mask = 0xff;
-	window.blue.mask = 0xff;
-	window.alpha.mask = 0xff;
+	uint8 colorShift = 0, greenShift = 0, alphaShift = 0;
+	switch (fDisplayMode.space) {
+		case B_CMAP8:
+			colorKey.red = 0xff;
+			colorKey.green = 0xff;
+			colorKey.blue = 0xff;
+			colorKey.alpha = 0xff;
+			break;
+		case B_RGB15:
+			greenShift = colorShift = 3;
+			alphaShift = 7;
+			break;
+		case B_RGB16:
+			colorShift = 3;
+			greenShift = 2;
+			alphaShift = 8;
+			break;
+	}
+	window.red.value = colorKey.red >> colorShift;
+	window.green.value = colorKey.green >> greenShift;
+	window.blue.value = colorKey.blue >> colorShift;
+	window.alpha.value = colorKey.alpha >> alphaShift;
+	window.red.mask = 0xff >> colorShift;
+	window.green.mask = 0xff >> greenShift;
+	window.blue.mask = 0xff >> colorShift;
+	window.alpha.mask = 0xff >> alphaShift;
 	// TODO: we need the 'uint32 options' from BView::SetViewOverlay() here
 	//       for now using commonly used settings (should be 'safe')
 	window.flags =
