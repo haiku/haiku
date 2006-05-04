@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin bash lib tilde ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # filter warnings we don't want here
 TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare ] ;

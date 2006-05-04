@@ -1,5 +1,11 @@
 SubDir HAIKU_TOP src bin bash ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+}
+
 SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"sh\"' -DCONF_HOSTTYPE='\"i586\"' -DCONF_OSTYPE='\"beos\"' -DCONF_MACHTYPE='\"i586-pc-beos\"' -DCONF_VENDOR='\"pc\"' -DSHELL ;
 
 # filter warnings we don't want here
