@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-7/2005
+   Rudolf Cornelissen 7/2003-5/2006
 */
 
 #define MODULE_BIT 0x00002000
@@ -625,11 +625,17 @@ static void setup_output_matrix()
 	}
 	else /* singlehead cards */
 	{
+//temporary (VIA)
+	si->ps.tmds1_active = false;
+	si->ps.tmds2_active = false;
+
+
 		/* presetup by the card's BIOS, we can't change this (lack of info) */
 		if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
 		/* detect analog monitor (confirmed working OK on all cards): */
 		/* sense analog monitor on primary connector */
-		if (eng_dac_crt_connected()) si->ps.monitors |= 0x02;
+//temporary (VIA)
+		if (1/*eng_dac_crt_connected()*/) si->ps.monitors |= 0x02;
 
 		//fixme? add TVout (only, so no CRT connected) support...
 	}
