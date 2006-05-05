@@ -5152,13 +5152,12 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			// Partition not found: This either means, the user supplied
 			// an invalid path, or the path refers to an image file. We try
 			// to let the DDM create a file device for the path.
-			partition_id deviceID = ddm->CreateFileDevice(
-				normalizedDevice.Path(), &newlyCreatedFileDevice);
+			partition_id deviceID = ddm->CreateFileDevice(normalizedDevice.Path(),
+				&newlyCreatedFileDevice, false);
 			if (deviceID >= 0) {
 				partition = ddm->RegisterPartition(deviceID, true);
 				if (newlyCreatedFileDevice)
 					fileDeviceDeleter.id = deviceID;
-// TODO: We must wait here, until the partition scan job is done.
 			}
 		}
 
@@ -5182,7 +5181,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			return B_ERROR;
 		}
 	}
+
 	DeviceWriteLocker writeLocker(diskDevice, true);
+		// this takes over the write lock acquired before
 
 	if (partition) {
 		// make sure, that the partition is not busy

@@ -1,22 +1,10 @@
-/* 
-** Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#include <KernelExport.h>
-#include <util/kernel_cpp.h>
-
-#include <dirent.h>
-#include <errno.h>
-#include <module.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-
-#include <VectorMap.h>
-#include <VectorSet.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceJob.h"
@@ -32,6 +20,20 @@
 #include "KPartitionVisitor.h"
 #include "KPath.h"
 #include "KShadowPartition.h"
+
+#include <VectorMap.h>
+#include <VectorSet.h>
+
+#include <KernelExport.h>
+#include <util/kernel_cpp.h>
+
+#include <dirent.h>
+#include <errno.h>
+#include <module.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
 // debugging
 //#define DBG(x)
@@ -515,7 +517,7 @@ KDiskDeviceManager::WriteLockPartition(partition_id id)
 
 // CreateFileDevice
 partition_id
-KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated)
+KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated, bool async)
 {
 	if (!filePath)
 		return B_BAD_VALUE;
@@ -543,6 +545,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated)
 
 		// initialize and add the device
 		error = device->SetTo(filePath);
+
 		// Note: Here we are allowed to lock a device although already having
 		// the manager locked, since it is not yet added to the manager.
 		DeviceWriteLocker deviceLocker(device);
@@ -553,7 +556,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated)
 
 		// scan device
 		if (error == B_OK) {
-			_ScanPartition(device);
+			_ScanPartition(device, async);
 
 			if (newlyCreated)
 				*newlyCreated = true;
@@ -901,19 +904,21 @@ status_t
 KDiskDeviceManager::InitialDeviceScan()
 {
 	status_t error = B_ERROR;
+
 	// scan for devices
 	if (ManagerLocker locker = this) {
 		error = _Scan("/dev/disk");
 		if (error != B_OK)
 			return error;
 	}
+
 	// scan the devices for partitions
 	int32 cookie = 0;
 	while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceWriteLocker deviceLocker = device) {
 			if (ManagerLocker locker = this) {
-				error = _ScanPartition(device);
+				error = _ScanPartition(device, false);
 				if (error != B_OK)
 					break;
 			} else
@@ -1152,30 +1157,43 @@ DBG(OUT("  found device: %s\n", path));
 	The device must be write locked, the manager must be locked.
 */
 status_t
-KDiskDeviceManager::_ScanPartition(KPartition *partition)
+KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 {
 	if (!partition)
 		return B_BAD_VALUE;
-	// create a new job queue for the device
-	KDiskDeviceJobQueue *jobQueue = new(nothrow) KDiskDeviceJobQueue;
-	if (!jobQueue)
-		return B_NO_MEMORY;
-	jobQueue->SetDevice(partition->Device());
-	// create a job for scanning the device and add it to the job queue
+
+	if (async) {
+		// create a new job queue for the device
+		KDiskDeviceJobQueue *jobQueue = new(nothrow) KDiskDeviceJobQueue;
+		if (!jobQueue)
+			return B_NO_MEMORY;
+		jobQueue->SetDevice(partition->Device());
+		// create a job for scanning the device and add it to the job queue
+		KDiskDeviceJob *job = fJobFactory->CreateScanPartitionJob(partition->ID());
+		if (!job) {
+			delete jobQueue;
+			return B_NO_MEMORY;
+		}
+		if (!jobQueue->AddJob(job)) {
+			delete jobQueue;
+			delete job;
+			return B_NO_MEMORY;
+		}
+		// add the job queue
+		status_t error = AddJobQueue(jobQueue);
+		if (error != B_OK)
+			delete jobQueue;
+		return error;
+	}
+
 	KDiskDeviceJob *job = fJobFactory->CreateScanPartitionJob(partition->ID());
-	if (!job) {
-		delete jobQueue;
+	if (job == NULL)
 		return B_NO_MEMORY;
-	}
-	if (!jobQueue->AddJob(job)) {
-		delete jobQueue;
-		delete job;
-		return B_NO_MEMORY;
-	}
-	// add the job queue
-	status_t error = AddJobQueue(jobQueue);
-	if (error != B_OK)
-		delete jobQueue;
-	return error;
+
+	status_t status = job->Do();
+	UpdateBusyPartitions(partition->Device());
+
+	delete job;
+	return status;
 }
 

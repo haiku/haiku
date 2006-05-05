@@ -1,10 +1,16 @@
-// KDiskDeviceManager.h
-
+/*
+ * Copyright 2004-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _K_DISK_DEVICE_MANAGER_H
 #define _K_DISK_DEVICE_MANAGER_H
 
+
 #include "disk_device_manager.h"
 #include "Locker.h"
+
 
 namespace BPrivate {
 namespace DiskDevice {
@@ -61,7 +67,7 @@ public:
 		// unregistered by the caller.
 
 	partition_id CreateFileDevice(const char *filePath,
-		bool *newlyCreated = NULL);
+		bool *newlyCreated = NULL, bool async = true);
 	status_t DeleteFileDevice(const char *filePath);
 	status_t DeleteFileDevice(partition_id id);
 
@@ -130,7 +136,7 @@ private:
 							  bool updateBusyPartitions);
 
 	status_t _Scan(const char *path);
-	status_t _ScanPartition(KPartition *partition);
+	status_t _ScanPartition(KPartition *partition, bool async);
 		// the manager must be locked and the device write locked
 
 	struct DeviceMap;

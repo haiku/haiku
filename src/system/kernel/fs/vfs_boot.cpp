@@ -206,14 +206,7 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
 	status_t status = manager->InitialDeviceScan();
-	if (status == B_OK) {
-		// ToDo: do this for real... (no hacks allowed :))
-		for (;;) {
-			snooze(500000);
-			if (manager->CountJobs() == 0)
-				break;
-		}
-	} else {
+	if (status != B_OK) {
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 		return status;
 	}
