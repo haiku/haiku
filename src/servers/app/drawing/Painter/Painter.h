@@ -57,7 +57,7 @@ class Painter {
 			void				AttachToBuffer(RenderingBuffer* buffer);
 			void				DetachFromBuffer();
 
-			void				ConstrainClipping(const BRegion& region);
+			void				ConstrainClipping(const BRegion* region);
 			const BRegion*		ClippingRegion() const
 									{ return fClippingRegion; }
 
@@ -147,13 +147,8 @@ class Painter {
 												float yRadius) const;
 
 								// ellipses
-			BRect				StrokeEllipse(	BPoint center,
-												float xRadius,
-												float yRadius) const;
-
-			BRect				FillEllipse(	BPoint center,
-												float xRadius,
-												float yRadius) const;
+			BRect				DrawEllipse(	BRect r,
+												bool filled) const;
 
 								// arcs
 			BRect				StrokeArc(		BPoint center,
@@ -216,10 +211,6 @@ class Painter {
 			BRect				_DrawTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3,
-												bool fill) const;
-			BRect				_DrawEllipse(	BPoint center,
-												float xRadius,
-												float yRadius,
 												bool fill) const;
 
 			void				_DrawBitmap(	const agg::rendering_buffer& srcBuffer,

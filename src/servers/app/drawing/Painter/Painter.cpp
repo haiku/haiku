@@ -215,7 +215,7 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 	SetHighColor(data->HighColor().GetColor32());
 	SetLowColor(data->LowColor().GetColor32());
 
-	if (updateDrawingMode)
+	if (updateDrawingMode || fPixelFormat->UsesOpCopyForText())
 		_UpdateDrawingMode();
 }
 
@@ -223,10 +223,14 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 
 // ConstrainClipping
 void
-Painter::ConstrainClipping(const BRegion& region)
+Painter::ConstrainClipping(const BRegion* region)
 {
-	*fClippingRegion = region;
+	*fClippingRegion = *region;
 	fValidClipping = fClippingRegion->Frame().IsValid();
+// TODO: would be nice if we didn't need to copy a region
+// for *each* drawing command...
+//fBaseRenderer->set_clipping_region(const_cast<BRegion*>(region));
+//fValidClipping = region->Frame().IsValid();
 }
 
 // SetHighColor
@@ -829,18 +833,67 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 	return _FillPath(rect);
 }
 									
-// StrokeEllipse
+// DrawEllipse
 BRect
-Painter::StrokeEllipse(BPoint center, float xRadius, float yRadius) const
+Painter::DrawEllipse(BRect r, bool fill) const
 {
-	return _DrawEllipse(center, xRadius, yRadius, false);
-}
+	CHECK_CLIPPING
 
-// FillEllipse
-BRect
-Painter::FillEllipse(BPoint center, float xRadius, float yRadius) const
-{
-	return _DrawEllipse(center, xRadius, yRadius, true);
+	if (!fSubpixelPrecise) {
+		// align rect to pixels
+		align_rect_to_pixels(&r);
+		// account for "pixel index" versus "pixel area"
+		r.right++;
+		r.bottom++;
+		if (!fill && fmodf(fPenSize, 2.0) != 0.0) {
+			// align the stroke
+			r.InsetBy(0.5, 0.5);
+		}
+	}
+
+	float xRadius = r.Width() / 2.0;
+	float yRadius = r.Height() / 2.0;
+	BPoint center(r.left + xRadius,
+				  r.top + yRadius);
+
+	int32 divisions = (int32)max_c(12, (xRadius + yRadius + 2 * fPenSize) * PI / 2);
+
+	if (fill) {
+		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
+
+		return _FillPath(path);
+	} else {
+		// NOTE: This implementation might seem a little strange, but it makes
+		// stroked ellipses look like on R5. A more correct way would be to use
+		// _StrokePath(), but it currently has its own set of problems with narrow
+		// ellipses (for small xRadii or yRadii).
+		float inset = fPenSize / 2.0;
+		agg::ellipse inner(center.x, center.y,
+						   max_c(0.0, xRadius - inset),
+						   max_c(0.0, yRadius - inset),
+						   divisions);
+		agg::ellipse outer(center.x, center.y,
+						   xRadius + inset,
+						   yRadius + inset,
+						   divisions);
+
+		fRasterizer->reset();
+		fRasterizer->add_path(outer);
+		fRasterizer->add_path(inner);
+
+		// make the inner ellipse work as a hole
+		fRasterizer->filling_rule(agg::fill_even_odd);
+
+		if (fPenSize > 4)
+			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+		else
+			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
+
+		// reset to default
+		fRasterizer->filling_rule(agg::fill_non_zero);
+
+		return _Clipped(_BoundingBox(outer));
+	}
 }
 
 // StrokeArc
@@ -1120,16 +1173,20 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// instead. If we have a B_SOLID_* pattern, we can actually use
 	// the color in the renderer and special versions of drawing modes
 	// that don't use PatternHandler and are more efficient. This
-	// has been implemented for B_OP_COPY as of now, the last parameter
-	// to DrawingModeFor() is a flag if a special "solid" drawing mode
-	// should be used if available. In this case, _SetRendererColor()
+	// has been implemented for B_OP_COPY and a couple others (the
+	// DrawingMode*Solid ones) as of now. The PixelFormat knows the
+	// PatternHandler and makes its decision based on the pattern.
+	// The last parameter to SetDrawingMode() is a flag if a special
+	// for when Painter is used to draw text. In this case, another
+	// special version of B_OP_COPY is used that acts like R5 in that
+	// anti-aliased pixel are not rendered against the actual background
+	// but the current low color instead. This way, the frame buffer
+	// doesn't need to be read.
+	// When a solid pattern is used, _SetRendererColor()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
-	if (fPixelFormat) {
-		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode,
-									 fAlphaFncMode, drawingText);
-	}
-		
+	fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode,
+								 fAlphaFncMode, drawingText);
 }
 
 // _SetRendererColor
@@ -1156,11 +1213,11 @@ Painter::_SetRendererColor(const rgb_color& color) const
 								   color.blue / 255.0,
 								   color.alpha / 255.0));
 // TODO: bitmap fonts not yet correctly setup in AGGTextRenderer
-//	if (RendererBin)
-//		RendererBin->color(agg::rgba(color.red / 255.0,
-//									 color.green / 255.0,
-//									 color.blue / 255.0,
-//									 color.alpha / 255.0));
+//	if (fRendererBin)
+//		fRendererBin->color(agg::rgba(color.red / 255.0,
+//									  color.green / 255.0,
+//									  color.blue / 255.0,
+//									  color.alpha / 255.0));
 
 }
 
@@ -1188,59 +1245,6 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 		return _FillPath(path);
 	else
 		return _StrokePath(path);
-}
-
-// _DrawEllipse
-inline BRect
-Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
-					  bool fill) const
-{
-	CHECK_CLIPPING
-
-	// TODO: I think the conversion and the offset of
-	// pixel centers might not be correct here, and it
-	// might even be necessary to treat Fill and Stroke
-	// differently, as with Fill-/StrokeRect().
-	_Transform(&center);
-
-	int32 divisions = (int32)max_c(12, (xRadius + yRadius + 2 * fPenSize) * PI / 2);
-
-	if (fill) {
-		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
-
-		return _FillPath(path);
-	} else {
-		// NOTE: This implementation might seem a little strange, but it makes
-		// stroked ellipses look like on R5. A more correct way would be to use
-		// _StrokePath(), but it currently has its own set of problems with narrow
-		// ellipses (for small xRadii or yRadii).
-		float inset = fPenSize / 2.0;
-		agg::ellipse inner(center.x, center.y,
-						   max_c(0.0, xRadius - inset),
-						   max_c(0.0, yRadius - inset),
-						   divisions);
-		agg::ellipse outer(center.x, center.y,
-						   xRadius + inset,
-						   yRadius + inset,
-						   divisions);
-
-		fRasterizer->reset();
-		fRasterizer->add_path(outer);
-		fRasterizer->add_path(inner);
-
-		// make the inner ellipse work as a hole
-		fRasterizer->filling_rule(agg::fill_even_odd);
-
-		if (fPenSize > 4)
-			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
-		else
-			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
-
-		// reset to default
-		fRasterizer->filling_rule(agg::fill_non_zero);
-
-		return _Clipped(_BoundingBox(outer));
-	}
 }
 
 // copy_bitmap_row_cmap8_copy

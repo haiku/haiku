@@ -134,23 +134,11 @@ DrawingEngine::SetHWInterface(HWInterface* interface)
 
 // #pragma mark -
 
+//! the DrawingEngine needs to be locked!
 void
 DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 {
-	if (Lock()) {
-		if (!region) {
-//			BRegion empty;
-//			fPainter->ConstrainClipping(empty);
-			if (RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer()) {
-				BRegion all;
-				all.Include(BRect(0, 0, buffer->Width() - 1, buffer->Height() - 1));
-				fPainter->ConstrainClipping(all);
-			}
-		} else {
-			fPainter->ConstrainClipping(*region);
-		}
-		Unlock();
-	}
+	fPainter->ConstrainClipping(region);
 }
 
 // SuspendAutoSync
@@ -518,19 +506,10 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 			extend_by_stroke_width(clipped, d);
 		clipped = fPainter->ClipRect(clipped);
 		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(r);
+			fGraphicsCard->HideSoftwareCursor(clipped);
 	
 			fPainter->SetDrawState(d);
-	
-			float xRadius = r.Width() / 2.0;
-			float yRadius = r.Height() / 2.0;
-			BPoint center(r.left + xRadius,
-						  r.top + yRadius);
-
-			if (filled)
-				fPainter->FillEllipse(center, xRadius, yRadius);
-			else
-				fPainter->StrokeEllipse(center, xRadius, yRadius);
+			fPainter->DrawEllipse(r, filled);
 	
 			fGraphicsCard->Invalidate(clipped);
 			fGraphicsCard->ShowSoftwareCursor();
@@ -573,6 +552,31 @@ DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
 	StrokeLine(pt, pt, color);
 }
 
+// StrokeLine
+//
+// * this function is only used by Decorators
+// * it assumes a one pixel wide line
+void
+DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
+{
+	if (Lock()) {
+		BRect touched(start, end);
+		make_rect_valid(touched);
+		touched = fPainter->ClipRect(touched);
+		fGraphicsCard->HideSoftwareCursor(touched);
+
+		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
+			DrawState context;
+			context.SetHighColor(color);
+			context.SetDrawingMode(B_OP_OVER);
+			StrokeLine(start, end, &context);
+		} else {
+			fGraphicsCard->Invalidate(touched);
+		}
+		fGraphicsCard->ShowSoftwareCursor();
+		Unlock();
+	}
+}
 
 // this function is used to draw a one pixel wide rect
 void
@@ -671,24 +675,20 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 void
 DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 {
-	if (Lock()) {
-		// support invalid rects
-		make_rect_valid(r);
-		BRect clipped(r);
-		extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-	
-			fGraphicsCard->HideSoftwareCursor(clipped);
-	
-			fPainter->SetDrawState(d);
-			fPainter->StrokeRect(r);
-	
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
+	// support invalid rects
+	make_rect_valid(r);
+	BRect clipped(r);
+	extend_by_stroke_width(clipped, d);
+	clipped = fPainter->ClipRect(clipped);
+	if (clipped.IsValid()) {
 
-		Unlock();
+		fGraphicsCard->HideSoftwareCursor(clipped);
+
+		fPainter->SetDrawState(d);
+		fPainter->StrokeRect(r);
+
+		fGraphicsCard->Invalidate(clipped);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -804,9 +804,6 @@ void
 DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	const DrawState* d, bool filled)
 {
-	if (!Lock())
-		return;
-
 	// NOTE: the stroke does not extend past "r" in R5,
 	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
@@ -821,8 +818,6 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
 	}
-
-	Unlock();
 }
 
 
@@ -831,9 +826,6 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	const uint32* opList, int32 ptCount, const BPoint* ptList,
 	const DrawState* d, bool filled)
 {
-	if (!Lock())
-		return;
-
 	fGraphicsCard->HideSoftwareCursor();
 
 	fPainter->SetDrawState(d);
@@ -843,8 +835,6 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 	fGraphicsCard->Invalidate(touched);
 	fGraphicsCard->ShowSoftwareCursor();
-
-	Unlock();
 }
 
 
@@ -852,51 +842,21 @@ void
 DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 	const DrawState* d, bool filled)
 {
-	if (Lock()) {
-		BRect clipped(bounds);
-		if (!filled)
-			extend_by_stroke_width(clipped, d);
-		clipped = fPainter->ClipRect(clipped);
-		if (clipped.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(clipped);
+	BRect clipped(bounds);
+	if (!filled)
+		extend_by_stroke_width(clipped, d);
+	clipped = fPainter->ClipRect(clipped);
+	if (clipped.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(clipped);
 
-			fPainter->SetDrawState(d);
-			if (filled)
-				fPainter->FillTriangle(pts[0], pts[1], pts[2]);
-			else
-				fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
+		fPainter->SetDrawState(d);
+		if (filled)
+			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
+		else
+			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
-			fGraphicsCard->Invalidate(clipped);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
-	}
-}
-
-// StrokeLine
-//
-// * this function is only used by Decorators
-// * it assumes a one pixel wide line
-void
-DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
-{
-	if (Lock()) {
-		BRect touched(start, end);
-		make_rect_valid(touched);
-		touched = fPainter->ClipRect(touched);
-		fGraphicsCard->HideSoftwareCursor(touched);
-
-		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-			DrawState context;
-			context.SetHighColor(color);
-			context.SetDrawingMode(B_OP_OVER);
-			StrokeLine(start, end, &context);
-		} else {
-			fGraphicsCard->Invalidate(touched);
-		}
+		fGraphicsCard->Invalidate(clipped);
 		fGraphicsCard->ShowSoftwareCursor();
-		Unlock();
 	}
 }
 
@@ -904,22 +864,18 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor
 void
 DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* context)
 {
-	if (Lock()) {
-		BRect touched(start, end);
-		make_rect_valid(touched);
-		extend_by_stroke_width(touched, context);
-		touched = fPainter->ClipRect(touched);
-		if (touched.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(touched);
+	BRect touched(start, end);
+	make_rect_valid(touched);
+	extend_by_stroke_width(touched, context);
+	touched = fPainter->ClipRect(touched);
+	if (touched.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(touched);
 
-			fPainter->SetDrawState(context);
-			touched = fPainter->StrokeLine(start, end);
+		fPainter->SetDrawState(context);
+		touched = fPainter->StrokeLine(start, end);
 
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-
-		Unlock();
+		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -931,51 +887,47 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	if (!d || !linedata || numLines <= 0)
 		return;
 
-	if (Lock()) {
-		// figure out bounding box for line array
-		const LineArrayData *data = (const LineArrayData *)&(linedata[0]);
-		BRect touched(min_c(data->pt1.x, data->pt2.x),
-					  min_c(data->pt1.y, data->pt2.y),
-					  max_c(data->pt1.x, data->pt2.x),
-					  max_c(data->pt1.y, data->pt2.y));
+	// figure out bounding box for line array
+	const LineArrayData *data = (const LineArrayData *)&(linedata[0]);
+	BRect touched(min_c(data->pt1.x, data->pt2.x),
+				  min_c(data->pt1.y, data->pt2.y),
+				  max_c(data->pt1.x, data->pt2.x),
+				  max_c(data->pt1.y, data->pt2.y));
+
+	for (int32 i = 1; i < numLines; i++) {
+		data = (const LineArrayData *)&(linedata[i]);
+		BRect box(min_c(data->pt1.x, data->pt2.x),
+				  min_c(data->pt1.y, data->pt2.y),
+				  max_c(data->pt1.x, data->pt2.x),
+				  max_c(data->pt1.y, data->pt2.y));
+		touched = touched | box;
+	}
+	extend_by_stroke_width(touched, d);
+	touched = fPainter->ClipRect(touched);
+	if (touched.IsValid()) {
+		fGraphicsCard->HideSoftwareCursor(touched);
+
+		data = (const LineArrayData *)&(linedata[0]);
+
+		DrawState context;
+		context.SetDrawingMode(d->GetDrawingMode());
+		context.SetLowColor(d->LowColor());
+		context.SetHighColor(data->color);
+		context.SetPenSize(d->PenSize());
+			// pen size is already correctly scaled
+
+		fPainter->SetDrawState(&context);
+
+		fPainter->StrokeLine(data->pt1, data->pt2);
 
 		for (int32 i = 1; i < numLines; i++) {
 			data = (const LineArrayData *)&(linedata[i]);
-			BRect box(min_c(data->pt1.x, data->pt2.x),
-					  min_c(data->pt1.y, data->pt2.y),
-					  max_c(data->pt1.x, data->pt2.x),
-					  max_c(data->pt1.y, data->pt2.y));
-			touched = touched | box;
-		}
-		extend_by_stroke_width(touched, d);
-		touched = fPainter->ClipRect(touched);
-		if (touched.IsValid()) {
-			fGraphicsCard->HideSoftwareCursor(touched);
-
-			data = (const LineArrayData *)&(linedata[0]);
-
-			DrawState context;
-			context.SetDrawingMode(d->GetDrawingMode());
-			context.SetLowColor(d->LowColor());
-			context.SetHighColor(data->color);
-			context.SetPenSize(d->PenSize());
-				// pen size is already correctly scaled
-
-			fPainter->SetDrawState(&context);
-
+			fPainter->SetHighColor(data->color);
 			fPainter->StrokeLine(data->pt1, data->pt2);
-
-			for (int32 i = 1; i < numLines; i++) {
-				data = (const LineArrayData *)&(linedata[i]);
-				fPainter->SetHighColor(data->color);
-				fPainter->StrokeLine(data->pt1, data->pt2);
-			}
-
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
 		}
 
-		Unlock();
+		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -990,8 +942,8 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	FontLocker locker(d);
 
 	BPoint penLocation = pt;
-	if (Lock()) {
-		fPainter->SetDrawState(d, true);
+
+	fPainter->SetDrawState(d, true);
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!
@@ -1000,22 +952,21 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // in case we don't have one.
 // TODO: Watch out about penLocation and use Painter::PenLocation() when
 // not using BoundindBox anymore.
-		BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta);
-		// stop here if we're supposed to render outside of the clipping
-		b = fPainter->ClipRect(b);
-		if (b.IsValid()) {
+	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta);
+	// stop here if we're supposed to render outside of the clipping
+	b = fPainter->ClipRect(b);
+	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-			fGraphicsCard->HideSoftwareCursor(b);
+		fGraphicsCard->HideSoftwareCursor(b);
 
 //now = system_time();
-			BRect touched = fPainter->DrawString(string, length, pt, delta);
+		BRect touched = fPainter->DrawString(string, length, pt, delta);
 //printf("drawing string: %lld µs\n", system_time() - now);
 
-			fGraphicsCard->Invalidate(touched);
-			fGraphicsCard->ShowSoftwareCursor();
-		}
-		Unlock();
+		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 	}
+
 	return penLocation;
 }
 
