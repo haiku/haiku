@@ -725,8 +725,8 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			action = _ActionFor(message);
 
 		// ignore clicks on decorator buttons if the
-		// window doesn't have focus
-		if (!IsFocus() && action != DEC_MOVETOBACK
+		// non-floating window doesn't have focus
+		if (!IsFocus() && !IsFloating() && action != DEC_MOVETOBACK
 			&& action != DEC_RESIZE && action != DEC_SLIDETAB)
 			action = DEC_DRAG;
 
