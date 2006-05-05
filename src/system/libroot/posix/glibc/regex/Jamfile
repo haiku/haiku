@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix glibc regex ;
 
 SubDirHdrs $(HAIKU_TOP) headers ;
+SubDirCcFlags -D_REGEX_RE_COMP ;
 
 KernelMergeObject posix_gnu_regex.o :
 	regex.c
