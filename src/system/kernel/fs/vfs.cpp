@@ -5137,10 +5137,11 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	// get the partition
 	KDiskDeviceManager *ddm = KDiskDeviceManager::Default();
 	KPartition *partition = NULL;
+	KPath normalizedDevice;
 	bool newlyCreatedFileDevice = false;
+
 	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device) {
 		// normalize the device path
-		KPath normalizedDevice;
 		status = normalizedDevice.SetTo(device, true);
 		if (status != B_OK)
 			return status;
@@ -5166,6 +5167,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 				normalizedDevice.Path()));
 			return B_ENTRY_NOT_FOUND;
 		}
+
+		device = normalizedDevice.Path();
+			// correct path to file device
 	}
 	PartitionRegistrar partitionRegistrar(partition, true);
 
