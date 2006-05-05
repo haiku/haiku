@@ -256,7 +256,7 @@ Inode::InitCheck(bool checkNode)
 		status_t status = Node().InitCheck(fVolume);
 		if (status == B_BUSY)
 			return B_BUSY;
-	
+
 		if (status < B_OK) {
 			FATAL(("inode at block %Ld corrupt!\n", BlockNumber()));
 			RETURN_ERROR(B_BAD_DATA);

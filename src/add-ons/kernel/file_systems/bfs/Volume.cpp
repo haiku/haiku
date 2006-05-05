@@ -301,8 +301,10 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (fstat(fDevice, &stat) < 0)
 		RETURN_ERROR(B_ERROR);
 
+// TODO: allow turning off caching of the underlying file (once O_NOCACHE works)
+#if 0
 #ifndef NO_FILE_UNCACHED_IO
-	if (stat.st_mode & S_FILE && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
+	if ((stat.st_mode & S_FILE) != 0 && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
 		// mount read-only if the cache couldn't be disabled
 #	ifdef DEBUG
 		FATAL(("couldn't disable cache for image file - system may dead-lock!\n"));
@@ -311,6 +313,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		Panic();
 #	endif
 	}
+#endif
 #endif
 
 	// read the super block
