@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1648,7 +1648,6 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
  *	to the reason why a thread has died than waitpid() can be.
  */
 
-
 static thread_id
 wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode)
 {
@@ -1715,7 +1714,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	// when we got here, we have a valid death entry, and
 	// already got unregistered from the team or group
 	*_returnCode = death.status;
-	*_reason = death.reason;
+	*_reason = (death.signal << 16) | death.reason;
 
 	return death.thread;
 

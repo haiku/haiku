@@ -207,6 +207,7 @@ create_thread_struct(const char *name, thread_id threadID)
 	thread->last_time = 0;
 	thread->exit.status = 0;
 	thread->exit.reason = 0;
+	thread->exit.signal = 0;
 	list_init(&thread->exit.waiters);
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", thread->id);
@@ -957,6 +958,7 @@ thread_exit(void)
 				death->thread = thread->id;
 				death->status = thread->exit.status;
 				death->reason = thread->exit.reason;
+				death->signal = thread->exit.signal;
 			}
 		}
 
@@ -1038,6 +1040,7 @@ thread_exit(void)
 		while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
 			death->status = thread->exit.status;
 			death->reason = thread->exit.reason;
+			death->signal = thread->exit.signal;
 		}
 
 		RELEASE_THREAD_LOCK();

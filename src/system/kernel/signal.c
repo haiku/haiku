@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  *
  * Distributed under the terms of the MIT License.
@@ -161,8 +161,11 @@ handle_signals(struct thread *thread)
 				case SIGKILL:
 				case SIGKILLTHR:
 				default:
-					if (thread->exit.reason != THREAD_RETURN_EXIT)
+					// if the thread exited normally, the exit reason is already set
+					if (thread->exit.reason != THREAD_RETURN_EXIT) {
 						thread->exit.reason = THREAD_RETURN_INTERRUPTED;
+						thread->exit.signal = (uint16)signal;
+					}
 
 					// notify the debugger
 					if (debugSignal && signal != SIGKILL && signal != SIGKILLTHR

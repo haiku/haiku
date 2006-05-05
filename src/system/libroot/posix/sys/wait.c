@@ -1,10 +1,11 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syscalls.h>
+#include <thread_types.h>
 
 #include <sys/wait.h>
 #include <stdio.h>
@@ -30,8 +31,14 @@ waitpid(pid_t pid, int *_status, int options)
 	thread_id thread = _kern_wait_for_child(pid, options, &reason, &returnCode);
 
 	if (_status != NULL) {
-		// ToDo: fill in _status!
-		*_status = 0;
+		int status = returnCode & 0xff;
+
+		// ToDo: fill in _status correctly!
+		// See kernel's wait_for_child() for how the return information is encoded
+		if (reason & THREAD_RETURN_INTERRUPTED)
+			status = (reason >> 8) & 0xff00;
+
+		*_status = status;
 	}
 
 	if (thread < B_OK) {

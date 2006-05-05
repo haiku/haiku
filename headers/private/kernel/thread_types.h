@@ -30,10 +30,6 @@ extern spinlock team_spinlock;
 #define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
 
 enum additional_thread_state {
-//	THREAD_STATE_READY = 0,   // ready to run
-//	THREAD_STATE_RUNNING, // running right now somewhere
-//	THREAD_STATE_WAITING, // blocked on something
-//	THREAD_STATE_SUSPENDED, // suspended, not in queue
 	THREAD_STATE_FREE_ON_RESCHED = 7, // free the thread structure upon reschedule
 //	THREAD_STATE_BIRTH	// thread is being created
 };
@@ -55,7 +51,8 @@ struct death_entry {
 	team_id				team;
 	thread_id			thread;
 	status_t			status;
-	uint32				reason;
+	uint16				reason;
+	uint16				signal;
 };
 
 struct process_session {
@@ -174,7 +171,8 @@ struct thread {
 	struct {
 		sem_id		sem;
 		status_t	status;
-		uint32		reason;
+		uint16		reason;
+		uint16		signal;
 		struct list	waiters;
 	} exit;
 
