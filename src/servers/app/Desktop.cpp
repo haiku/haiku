@@ -2163,7 +2163,6 @@ Desktop::_SetBackground(BRegion& background)
 	fBackgroundRegion = background;
 	if (dirtyBackground.Frame().IsValid()) {
 		if (GetDrawingEngine()->Lock()) {
-			GetDrawingEngine()->ConstrainClippingRegion(NULL);
 			GetDrawingEngine()->FillRegion(dirtyBackground,
 				fWorkspaces[fCurrentWorkspace].Color());
 
