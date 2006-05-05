@@ -46,7 +46,7 @@ else
 	ln=ln
 	mkdir=mkdir
 	rm=rm
-	mkindex="$mkindex"
+	mkindex=
 fi
 
 # create the image and mount it
