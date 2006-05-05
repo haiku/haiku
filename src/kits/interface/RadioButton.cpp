@@ -129,10 +129,6 @@ BRadioButton::Draw(BRect updateRect)
 		knobLight	= tint_color(naviColor, (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2.0);
 	}
 
-	// NOTE: this improves drawing a lot because of
-	// anti-aliased circles and arcs in Haiku
-	SetDrawingMode(B_OP_OVER);
-
 	// dot
 	if (Value() == B_CONTROL_ON) {
 		// full
@@ -140,10 +136,10 @@ BRadioButton::Draw(BRect updateRect)
 		FillEllipse(rect);
 
 		SetHighColor(knob);
-		FillEllipse(BRect(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2));
+		FillEllipse(BRect(rect.left + 2, rect.top + 2, rect.right - 3, rect.bottom - 3));
 
 		SetHighColor(knobLight);
-		FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 4, rect.bottom - 4));
+		FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 5, rect.bottom - 5));
 	} else {
 		// empty
 		SetHighColor(lightenmax);
