@@ -15,30 +15,26 @@ struct RWLocker::ReadLockInfo {
 
 // constructor
 RWLocker::RWLocker()
-	: fLock(),
-	  fMutex(),
-	  fQueue(),
-	  fReaderCount(0),
-	  fWriterCount(0),
-	  fReadLockInfos(8),
-	  fWriter(B_ERROR),
-	  fWriterWriterCount(0),
-	  fWriterReaderCount(0)
+	:
+	fReaderCount(0),
+	fWriterCount(0),
+	fReadLockInfos(8),
+	fWriter(B_ERROR),
+	fWriterWriterCount(0),
+	fWriterReaderCount(0)
 {
 	_Init(NULL);
 }
 
 // constructor
 RWLocker::RWLocker(const char* name)
-	: fLock(),
-	  fMutex(),
-	  fQueue(),
-	  fReaderCount(0),
-	  fWriterCount(0),
-	  fReadLockInfos(8),
-	  fWriter(B_ERROR),
-	  fWriterWriterCount(0),
-	  fWriterReaderCount(0)
+	:
+	fReaderCount(0),
+	fWriterCount(0),
+	fReadLockInfos(8),
+	fWriter(B_ERROR),
+	fWriterWriterCount(0),
+	fWriterReaderCount(0)
 {
 	_Init(name);
 }
@@ -49,8 +45,10 @@ RWLocker::~RWLocker()
 	_AcquireBenaphore(fLock);
 	delete_sem(fMutex.semaphore);
 	delete_sem(fQueue.semaphore);
-	for (int32 i = 0; ReadLockInfo* info = _ReadLockInfoAt(i); i++)
+	for (int32 i = 0; ReadLockInfo* info = _ReadLockInfoAt(i); i++) {
 		delete info;
+	}
+
 	delete_sem(fLock.semaphore);
 }
 
@@ -64,6 +62,7 @@ RWLocker::InitCheck() const
 		return fMutex.semaphore;
 	if (fQueue.semaphore < 0)
 		return fQueue.semaphore;
+
 	return B_OK;
 }
 
@@ -116,10 +115,11 @@ RWLocker::ReadUnlock()
 	}	// else: we are probably going to be destroyed
 }
 
-// IsReadLocked
-//
-// Returns whether or not the calling thread owns a read lock or, if
-// orWriteLock is true, at least a write lock.
+
+/**	Returns whether or not the calling thread owns a read lock or, if
+ *	orWriteLock is true, at least a write lock.
+ */
+
 bool
 RWLocker::IsReadLocked(bool orWriteLock) const
 {
@@ -166,10 +166,13 @@ RWLocker::WriteUnlock()
 				if (fWriterReaderCount > 0) {
 					// We still own read locks.
 					_NewReadLockInfo(thread, fWriterReaderCount);
+						// TODO: if the creation fails, there is nothing we can do about it!
+
 					// A reader that expects to be the first reader may wait
 					// at the mutex semaphore. We need to wake it up.
 					if (fReaderCount > 0)
 						_ReleaseBenaphore(fMutex);
+
 					fReaderCount += fWriterReaderCount;
 					fWriterReaderCount = 0;
 				} else {
@@ -183,9 +186,9 @@ RWLocker::WriteUnlock()
 	}	// else: We're probably going to die.
 }
 
-// IsWriteLocked
-//
-// Returns whether or not the calling thread owns a write lock.
+
+/** Returns whether or not the calling thread owns a write lock. */
+
 bool
 RWLocker::IsWriteLocked() const
 {
@@ -193,8 +196,7 @@ RWLocker::IsWriteLocked() const
 }
 
 // make_sem_name
-static
-void
+static void
 make_sem_name(char *buffer, const char *name, const char *suffix)
 {
 	if (!name)
@@ -252,8 +254,11 @@ RWLocker::_ReadLock(bigtime_t timeout)
 			locked = true;
 		}
 		_ReleaseBenaphore(fLock);
-	} else	// failed to lock the data
+	} else {
+		// failed to lock the data
 		error = B_ERROR;
+	}
+
 	// Usual locking, i.e. we do not already own a read or write lock.
 	if (error == B_OK && !locked) {
 		error = _AcquireBenaphore(fQueue, timeout);
@@ -262,11 +267,18 @@ RWLocker::_ReadLock(bigtime_t timeout)
 				bool firstReader = false;
 				if (++fReaderCount == 1) {
 					// We are the first reader.
-					_NewReadLockInfo(thread);
 					firstReader = true;
-				} else
-					_NewReadLockInfo(thread);
+				}
+
+				int32 index = _NewReadLockInfo(thread);
 				_ReleaseBenaphore(fLock);
+				
+				if (index < 0) {
+					// creating a ReadLockInfo object failed
+					_ReleaseBenaphore(fQueue);
+					return B_NO_MEMORY;
+				}
+
 				// The first reader needs to lock the mutex.
 				if (firstReader) {
 					error = _AcquireBenaphore(fMutex, timeout);
@@ -399,6 +411,7 @@ RWLocker::_WriteLock(bigtime_t timeout)
 					break;
 			}
 		}
+
 		// Second step: acquire the mutex benaphore.
 		if (!locked && error == B_OK) {
 			error = _AcquireBenaphore(fMutex, timeout);
@@ -440,14 +453,19 @@ RWLocker::_AddReadLockInfo(ReadLockInfo* info)
 	return index;
 }
 
-// _NewReadLockInfo
-//
-// Create a new read lock info for the supplied thread and add it to the
-// list. Returns the index of the info.
+
+/**	Create a new read lock info for the supplied thread and add it to
+ *	the list. Returns the index of the info, or -1 to indicate an out
+ *	of memory situation.
+ */
+
 int32
 RWLocker::_NewReadLockInfo(thread_id thread, int32 count)
 {
 	ReadLockInfo* info = new(nothrow) ReadLockInfo;
+	if (info == NULL)
+		return -1;
+
 	info->reader = thread;
 	info->count = count;
 	return _AddReadLockInfo(info);
