@@ -61,6 +61,9 @@ class PixelFormat {
 											   alpha_function alphaFncMode,
 											   bool text);
 
+	inline	bool				UsesOpCopyForText() const
+									{ return fUsesOpCopyForText; }
+
 			// AGG "pixel format" interface
 			unsigned			width()  const { return fBuffer->width();  }
 			unsigned			height() const { return fBuffer->height(); }
@@ -105,6 +108,7 @@ class PixelFormat {
  private:
 	agg::rendering_buffer*		fBuffer;
 	const PatternHandler*		fPatternHandler;
+	bool						fUsesOpCopyForText;
 
 	blend_pixel_f				fBlendPixel;
 	blend_line					fBlendHLine;

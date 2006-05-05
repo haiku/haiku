@@ -108,6 +108,7 @@ PixelFormat::PixelFormat(agg::rendering_buffer& rb,
 						 const PatternHandler* handler)
 	: fBuffer(&rb),
 	  fPatternHandler(handler),
+	  fUsesOpCopyForText(false),
 
 	  fBlendPixel(blend_pixel_empty),
 	  fBlendHLine(blend_hline_empty),
@@ -129,6 +130,7 @@ void
 PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 							alpha_function alphaFncMode, bool text)
 {
+	fUsesOpCopyForText = false;
 	switch (mode) {
 		// these drawing modes discard source pixels
 		// which have the current low color
@@ -178,6 +180,10 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 				fBlendSolidHSpan = blend_solid_hspan_copy_text;
 				fBlendSolidVSpan = blend_solid_vspan_copy_text;
 				fBlendColorHSpan = blend_color_hspan_copy_text;
+				// set the special flag so that Painter
+				// knows if an update is needed even though
+				// "nothing changed"
+				fUsesOpCopyForText = true;
 			} else if (fPatternHandler->IsSolid()) {
 				fBlendPixel = blend_pixel_copy_solid;
 				fBlendHLine = blend_hline_copy_solid;
