@@ -20,6 +20,7 @@
 #include "ServerConfig.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
+#include "SystemPalette.h"
 
 #include <Accelerant.h>
 #include <Cursor.h>
@@ -423,8 +424,8 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
 		bool doubleBuffered = HWInterface::IsDoubleBuffered();
-		if ((color_space)fDisplayMode.space != B_RGB32 &&
-			(color_space)fDisplayMode.space != B_RGBA32)
+		if ((color_space)fDisplayMode.space != B_RGB32
+			&& (color_space)fDisplayMode.space != B_RGBA32)
 			doubleBuffered = true;
 
 		if (doubleBuffered) {
@@ -441,6 +442,9 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 		}
 	}
+
+	if (fDisplayMode.space == B_CMAP8)
+		_SetSystemPalette();
 
 	// update acceleration hooks
 	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, (void *)&fDisplayMode);
@@ -1049,4 +1053,27 @@ AccelerantHWInterface::_NativeColor(const RGBColor& color) const
 		}
 	}
 	return 0;
+}
+
+
+void
+AccelerantHWInterface::_SetSystemPalette()
+{
+	set_indexed_colors setIndexedColors = (set_indexed_colors)fAccelerantHook(
+		B_SET_INDEXED_COLORS, NULL);
+	if (setIndexedColors == NULL)
+		return;
+
+	const rgb_color* palette = SystemPalette();
+	uint8 colors[3 * 256];
+		// the color table is an array with 3 bytes per color
+	uint32 j = 0;
+
+	for (int32 i = 0; i < 256; i++) {
+		colors[j++] = palette[i].red;
+		colors[j++] = palette[i].green;
+		colors[j++] = palette[i].blue;
+	}
+
+	setIndexedColors(256, 0, colors, 0);
 }

@@ -103,6 +103,7 @@ private:
 		void					_RegionToRectParams(/*const*/ BRegion* region,
 													uint32* count) const;
 		uint32					_NativeColor(const RGBColor& color) const;
+		void					_SetSystemPalette();
 
 		int						fCardFD;
 		image_id				fAccelerantImage;
