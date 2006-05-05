@@ -659,7 +659,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 					bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
-		frame.InsetBy(4.0, 3.0);
+		frame.InsetBy(2.0, 3.0);
 		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
 		fText = new _BTextInput_(frame, textRect,
