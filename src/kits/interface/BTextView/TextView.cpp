@@ -413,7 +413,11 @@ BTextView::Draw(BRect updateRect)
 	int32 startLine = LineAt(BPoint(0.0f, updateRect.top));
 	int32 endLine = LineAt(BPoint(0.0f, updateRect.bottom));
 
-	DrawLines(startLine, endLine);
+	// TODO: DrawLines draw the text over and over, causing the text to
+	// antialias against itself. In theory we should use an offscreen bitmap
+	// to draw the text which would eliminate the problem.
+	//DrawLines(startLine, endLine);
+	Refresh(OffsetAt(startLine), OffsetAt(endLine + 1), false, false);
 }
 
 
@@ -1997,13 +2001,13 @@ BTextView::ScrollToOffset(int32 inOffset)
 {
 	BRect bounds = Bounds();
 	float lineHeight = 0.0;
-	BPoint point = PointAt(inOffset, &lineHeight);
-	
+        BPoint point = PointAt(inOffset, &lineHeight);
+
 	if (ScrollBar(B_HORIZONTAL) != NULL) {
 		if (point.x < bounds.left || point.x >= bounds.right)
 			ScrollBar(B_HORIZONTAL)->SetValue(point.x - (bounds.IntegerWidth() / 2));
 	}
-	
+
 	if (ScrollBar(B_VERTICAL) != NULL) {
 		if (point.y < bounds.top || (point.y + lineHeight) >= bounds.bottom)
 			ScrollBar(B_VERTICAL)->SetValue(point.y - (bounds.IntegerHeight() / 2));
@@ -2828,7 +2832,7 @@ BTextView::HandleBackspace()
 	DeleteText(fSelStart, fSelEnd);
 	fClickOffset = fSelEnd = fSelStart;
 	
-	Refresh(fSelStart, fSelEnd, true, false);
+	Refresh(fSelStart, fSelEnd, true, true);
 }
 
 
@@ -3201,7 +3205,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 		UpdateScrollbars();
 		
 	if (scroll)
-		ScrollToOffset(fSelEnd);
+		ScrollToSelection();
 
 	Flush();
 }
@@ -4015,28 +4019,30 @@ BTextView::AutoResize(bool redraw)
 {
 	// TODO: Review this
 	if (fResizable) {
-		float width = 0;
+		float oldWidth = Bounds().Width() + 1;
+		float newWidth = 0;
 		for (int32 i = 0; i < CountLines(); i++)
-			width = max_c(width, LineWidth(i));
+			newWidth += LineWidth(i);
+			
+		BRect newRect(0, 0, ceilf(newWidth), ceilf(TextHeight(0, 0)) + 1);
 		
-		float oldWidth = ceilf(Bounds().Width());
-		float textRectPadding = Bounds().right - fTextRect.right;
-		width += fTextRect.left + textRectPadding;
-		width = ceilf(width);
-
 		if (fContainerView != NULL) {
-			fContainerView->ResizeTo(width, max_c(Bounds().Height(), TextHeight(0, CountLines())));	
+			fContainerView->ResizeTo(newRect.Width(), newRect.Height());	
 			if (fAlignment == B_ALIGN_CENTER)
-				fContainerView->MoveBy((oldWidth - width) / 2, 0);
+				fContainerView->MoveBy((oldWidth - newRect.Width()) / 2, 0);
 			else if (fAlignment == B_ALIGN_RIGHT)
-				fContainerView->MoveBy(oldWidth - width, 0);
+				fContainerView->MoveBy(oldWidth - newRect.Width(), 0);
 			fContainerView->Invalidate();
 		}
-
-		fTextRect.right = Bounds().right - textRectPadding;
-
+	
+		fTextRect = newRect.InsetBySelf(1, 1);
+		
 		if (redraw)
-			DrawLines(0, CountLines());
+			DrawLines(0, 0);
+		
+		// Erase the old text (TODO: Might not work for alignments different than B_ALIGN_LEFT)
+		SetLowColor(ViewColor());
+		FillRect(BRect(fTextRect.right, fTextRect.top, Bounds().right, fTextRect.bottom), B_SOLID_LOW);
 	}
 }
 

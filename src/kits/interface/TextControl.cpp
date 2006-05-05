@@ -272,17 +272,6 @@ BTextControl::Draw(BRect updateRect)
 		StrokeLine(BPoint(rect.right, rect.top + 1.0f));
 	}
 
-	// area around text view
-	
-	SetHighColor(fText->ViewColor());
-	rect.InsetBy(1, 1);
-	BRegion region(rect);
-	BRegion updateRegion(updateRect);
-		// why is there no IntersectWith(BRect &) version?
-	region.IntersectWith(&updateRegion);
-	region.Exclude(fText->Frame());
-	FillRegion(&region);
-
 	// label
 
 	if (Label()) {
