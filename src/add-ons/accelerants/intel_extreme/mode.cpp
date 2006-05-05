@@ -386,8 +386,18 @@ intel_get_timing_constraints(display_timing_constraints *constraints)
 
 
 void
-intel_set_indexed_colors(uint count, uint8 first, uint8 *colorData, uint32 flags)
+intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 {
-	TRACE(("intel_set_indexed_colors()\n"));
+	TRACE(("intel_set_indexed_colors(colors = %p, first = %u)\n", colors, first));
+
+	if (colors == NULL)
+		return;
+
+	for (; count-- > 0; first++) {
+		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];
+		colors += 3;
+
+		write32(INTEL_DISPLAY_PALETTE + first * sizeof(uint32), color);
+	}
 }
 
