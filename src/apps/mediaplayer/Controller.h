@@ -34,6 +34,17 @@ public:
 	
 	status_t				SetTo(const entry_ref &ref);
 
+	int						AudioTrackCount();
+	int						VideoTrackCount();
+	
+	status_t				SelectAudioTrack(int n);
+	status_t				SelectVideoTrack(int n);
+
+	bigtime_t				Duration();
+	bigtime_t				Position();
+
+	status_t				Seek(bigtime_t pos);
+
 	void					Stop();
 	void					Play();
 	void					Pause();
@@ -49,14 +60,24 @@ public:
 	
 	void					VolumeUp();
 	void					VolumeDown();
-	
-	int						VideoTrackCount();
-	int						AudioTrackCount();
 
 private:
 
 private:
 	VideoView *				fVideoView;
+
+	bool					fPaused;
+	bool					fStopped;
+	BMediaFile *			fMediaFile;
+	BMediaTrack *			fAudioTrack;
+	BMediaTrack *			fVideoTrack;
+	BList *					fAudioTrackList;
+	BList *					fVideoTrackList;
+	bigtime_t				fPosition;
+	media_format			fAudioFormat;
+	media_format			fVideoFormat;
+	sem_id					fAudioPlaySem;
+	sem_id					fVideoPlaySem;
 };
 
 
