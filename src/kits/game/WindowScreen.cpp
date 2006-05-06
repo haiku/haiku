@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2005,
+ * Copyright 2002-2006,
  * Marcus Overhagen, 
  * Stefano Ceccherini (burton666@libero.it),
  * Carwyn Jones (turok2@currantbun.com)
@@ -163,107 +163,100 @@ draw_rect_32(int32 sx, int32 sy, int32 sw, int32 sh, uint32 color)
 }
 
 
-static void
-mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
+/*!
+	Fills the \a width, \a height, and \a colorSpace parameters according
+	to the window screen's mode.
+	Returns \c true if the mode is known.
+*/
+static bool
+get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 {
-	switch (space) {
+	switch (mode) {
 		case B_8_BIT_640x480:
-			*out_space = B_CMAP8;
-			*width = 640; *height = 480;
-			break;
 		case B_8_BIT_800x600:
-			*out_space = B_CMAP8;
-			*width = 800; *height = 600;
-			break;
 		case B_8_BIT_1024x768:
-			*out_space = B_CMAP8;
-			*width = 1024; *height = 768;
-			break;
+   		case B_8_BIT_1152x900:
 		case B_8_BIT_1280x1024:
-			*out_space = B_CMAP8;
-			*width = 1280; *height = 1024;
-			break;
 		case B_8_BIT_1600x1200:
-			*out_space = B_CMAP8;
-			*width = 1600; *height = 1200;
+			colorSpace = B_CMAP8;
 			break;
-		case B_16_BIT_640x480:
-			*out_space = B_RGB16;
-			*width = 640; *height = 480;
-			break;
-		case B_16_BIT_800x600:
-			*out_space = B_RGB16;
-			*width = 800; *height = 600;
-			break;
-		case B_16_BIT_1024x768:
-			*out_space = B_RGB16;
-			*width = 1024; *height = 768;
-			break;
-		case B_16_BIT_1280x1024:
-			*out_space = B_RGB16;
-			*width = 1280; *height = 1024;
-			break;
-		case B_16_BIT_1600x1200:
-			*out_space = B_RGB16;
-			*width = 1600; *height = 1200;
-			break;
-		case B_32_BIT_640x480:
-			*out_space = B_RGB32;
-			*width = 640; *height = 480;
-			break;
-		case B_32_BIT_800x600:
-			*out_space = B_RGB32;
-			*width = 800; *height = 600;
-			break;
-		case B_32_BIT_1024x768:
-			*out_space = B_RGB32;
-			*width = 1024; *height = 768;
-			break;
-		case B_32_BIT_1280x1024:
-			*out_space = B_RGB32;
-			*width = 1280; *height = 1024;
-			break;
-		case B_32_BIT_1600x1200:
-			*out_space = B_RGB32;
-			*width = 1600; *height = 1200;
-			break;
-    		case B_8_BIT_1152x900:
-    			*out_space = B_CMAP8;
-    			*width = 1152; *height = 900;
-    			break;
-    		case B_16_BIT_1152x900:
-    			*out_space = B_RGB16;
-    			*width = 1152; *height = 900;
-    			break;
-    		case B_32_BIT_1152x900:
-    			*out_space = B_RGB32;
-    			*width = 1152; *height = 900;
-    			break;
+
 		case B_15_BIT_640x480:
-			*out_space = B_RGB15;
-			*width = 640; *height = 480;
-			break;
 		case B_15_BIT_800x600:
-			*out_space = B_RGB15;
-			*width = 800; *height = 600;
-			break;
 		case B_15_BIT_1024x768:
-			*out_space = B_RGB15;
-			*width = 1024; *height = 768;
-			break;
+   		case B_15_BIT_1152x900:
 		case B_15_BIT_1280x1024:
-			*out_space = B_RGB15;
-			*width = 1280; *height = 1024;
-			break;
 		case B_15_BIT_1600x1200:
-			*out_space = B_RGB15;
-			*width = 1600; *height = 1200;
+   			colorSpace = B_RGB15;
+   			break;
+
+		case B_16_BIT_640x480:
+		case B_16_BIT_800x600:
+		case B_16_BIT_1024x768:
+   		case B_16_BIT_1152x900:
+		case B_16_BIT_1280x1024:
+		case B_16_BIT_1600x1200:
+			colorSpace = B_RGB16;
 			break;
-    		case B_15_BIT_1152x900:
-    			*out_space = B_RGB15;
-    			*width = 1152; *height = 900;
-    			break;
+
+		case B_32_BIT_640x480:
+		case B_32_BIT_800x600:
+		case B_32_BIT_1024x768:
+   		case B_32_BIT_1152x900:
+		case B_32_BIT_1280x1024:
+		case B_32_BIT_1600x1200:
+			colorSpace = B_RGB32;
+			break;
+
+		default:
+			return false;
 	}
+
+	switch (mode) {
+		case B_8_BIT_640x480:
+		case B_15_BIT_640x480:
+		case B_16_BIT_640x480:
+		case B_32_BIT_640x480:
+			width = 640; height = 480;
+			break;
+
+		case B_8_BIT_800x600:
+		case B_15_BIT_800x600:
+		case B_16_BIT_800x600:
+		case B_32_BIT_800x600:
+			width = 800; height = 600;
+			break;
+
+		case B_8_BIT_1024x768:
+		case B_15_BIT_1024x768:
+		case B_16_BIT_1024x768:
+		case B_32_BIT_1024x768:
+			width = 1024; height = 768;
+			break;
+
+   		case B_8_BIT_1152x900:
+   		case B_15_BIT_1152x900:
+   		case B_16_BIT_1152x900:
+   		case B_32_BIT_1152x900:
+   			width = 1152; height = 900;
+   			break;
+
+		case B_8_BIT_1280x1024:
+		case B_15_BIT_1280x1024:
+		case B_16_BIT_1280x1024:
+		case B_32_BIT_1280x1024:
+			width = 1280; height = 1024;
+			break;
+
+		case B_8_BIT_1600x1200:
+		case B_15_BIT_1600x1200:
+		case B_16_BIT_1600x1200:
+		case B_32_BIT_1600x1200:
+			width = 1600; height = 1200;
+			break;
+	}
+
+	return true;
 }
 
 
@@ -285,7 +278,7 @@ set_mouse_position(int32 x, int32 y)
 
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
-				status_t *error, bool debug_enable)
+		status_t *error, bool debug_enable)
 	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
@@ -302,7 +295,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 
 
 BWindowScreen::BWindowScreen(const char *title, uint32 space,
-				uint32 attributes, status_t *error)
+		uint32 attributes, status_t *error)
 	: BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
 		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
@@ -418,37 +411,45 @@ BWindowScreen::Show()
 
 
 void
-BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index)
+BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 {
 	CALLED();
-	if (first_index < 0 || last_index > 255 || first_index > last_index)
+	if (firstIndex < 0 || lastIndex > 255 || firstIndex > lastIndex)
 		return;
 
 	if (Lock()) {
 		if (!fActivateState) { 
-			//If we aren't active, we just change our local palette
-			for (int32 x = first_index; x <= last_index; x++)
+			// If we aren't active, we just change our local palette
+			for (int32 x = firstIndex; x <= lastIndex; x++) {
 				fColorList[x] = list[x];
-		} else {
-			uint32 colorCount = last_index - first_index + 1;
-			if (fAddonImage >= 0) {
-				set_indexed_colors sic = (set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS, NULL);
-				if (sic != NULL)
-					sic(colorCount, first_index, (uint8 *)fColorList, 0);
 			}
-	
-			BScreen screen(this);
-			screen.WaitForRetrace();	
-			// Update our local palette too. We're doing this between two 
-			// WaitForRetrace() calls so nobody will notice.
-			for (int32 x = first_index; x <= last_index; x++)
+		} else {
+			uint8 colors[3 * 256];
+				// the color table has 3 bytes per color
+			int32 j = 0;
+
+			for (int32 x = firstIndex; x <= lastIndex; x++) {
 				fColorList[x] = list[x];
-		
+					// update our local palette as well
+
+				colors[j++] = list[x].red;
+				colors[j++] = list[x].green;
+				colors[j++] = list[x].blue;
+			}
+
+			if (fAddonImage >= 0) {
+				set_indexed_colors setIndexedColors =
+					(set_indexed_colors)fGetAccelerantHook(B_SET_INDEXED_COLORS, NULL);
+				if (setIndexedColors != NULL)
+					setIndexedColors(lastIndex - firstIndex + 1, firstIndex, colors, 0);
+			}
+
 			// TODO: Tell the app_server about our changes
 
+			BScreen screen(this);
 			screen.WaitForRetrace();
 		}
-	
+
 		Unlock();
 	}
 }
@@ -479,7 +480,7 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 	CALLED();
 	display_mode highMode = *fDisplayMode;
 	highMode.flags |= B_SCROLL;
-	
+
 	highMode.virtual_height = (int16)height;
 	highMode.virtual_width = (int16)width;
 
@@ -541,9 +542,9 @@ BWindowScreen::CardHookAt(int32 index)
 	CALLED();
 	if (fAddonImage < 0)
 		return NULL;
-	
+
 	graphics_card_hook hook = NULL;
-	
+
 	switch (index) {
 		case 5: // 8 bit fill rect
 			hook = (graphics_card_hook)draw_rect_8;
@@ -566,7 +567,7 @@ BWindowScreen::CardHookAt(int32 index)
 		default:
 			break;
 	}
-	
+
 	return hook;
 }
 
@@ -583,8 +584,15 @@ void
 BWindowScreen::RegisterThread(thread_id id)
 {
 	CALLED();
-	while (acquire_sem(fDebugSem) == B_INTERRUPTED)
-		;
+
+	status_t status;
+	do {
+		status = acquire_sem(fDebugSem);
+	} while (status == B_INTERRUPTED);
+
+	if (status < B_OK)
+		return;
+
 	void *newDebugList = realloc(fDebugList, (fDebugListCount + 1) * sizeof(thread_id));
 	if (newDebugList != NULL) {
 		fDebugList = (thread_id *)newDebugList;	
@@ -646,12 +654,13 @@ void BWindowScreen::_ReservedWindowScreen4() {}
 
 
 BRect
-BWindowScreen::CalcFrame(int32 index, int32 space, display_mode *dmode)
+BWindowScreen::CalcFrame(int32 index, int32 space, display_mode* mode)
 {
 	CALLED();
-	BScreen screen;	
-	if (dmode)
-		screen.GetMode(dmode);
+
+	BScreen screen;
+	if (mode != NULL)
+		screen.GetMode(mode);
 
 	return screen.Frame();
 }
@@ -729,10 +738,14 @@ BWindowScreen::SetActiveState(int32 state)
 		status = AssertDisplayMode(fDisplayMode);
 		if (status == B_OK && (status = SetupAccelerantHooks(true)) == B_OK) {			
 			if (!fActivateState) {
-				while (acquire_sem(fActivateSem) == B_INTERRUPTED)
-					;
+				do {
+					status = acquire_sem(fActivateSem);
+				} while (status == B_INTERRUPTED);
+
+				if (status < B_OK)
+					return status;
 			}
-			
+
 			SetColorList(fColorList);
 			if (fDebugState && !fDebugFirst) {
 				SuspensionHook(true);
@@ -741,13 +754,12 @@ BWindowScreen::SetActiveState(int32 state)
 				fDebugFirst = true;
 				ScreenConnected(true);
 			}
-			
+
 			if (status == B_OK)
 				return status;
-			
 		} else
 			SetupAccelerantHooks(false);	
-				
+
 		be_app->ShowCursor();				
 	} else {
 		AssertDisplayMode(fOldDisplayMode);
@@ -756,7 +768,7 @@ BWindowScreen::SetActiveState(int32 state)
 			SuspensionHook(false);
 		} else
 			ScreenConnected(false);
-			
+
 		status = SetupAccelerantHooks(false);
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
@@ -765,7 +777,7 @@ BWindowScreen::SetActiveState(int32 state)
 			}
 		}
 	}
-	
+
 	return status;
 }
 
@@ -786,11 +798,8 @@ BWindowScreen::SetupAccelerantHooks(bool enable)
 		sReleaseEngineHook = NULL;
 	}
 
-	if (enable)
-		fLockState = 1;
-	else
-		fLockState = 0;
-	
+	fLockState = enable ? 1 : 0;
+
 	status_t status = B_OK;
 	if (enable) {
 		if (fAddonImage < 0) {
@@ -826,17 +835,20 @@ status_t
 BWindowScreen::GetCardInfo()
 {
 	CALLED();
-	
+
 	BScreen screen(this);
 	display_mode mode;
 	status_t status = screen.GetMode(&mode);
 	if (status < B_OK)
 		return status;
-	
+
 	uint32 bitsPerPixel;
 	switch(mode.space & 0x0fff) {
 		case B_CMAP8:
 			bitsPerPixel = 8;
+			break;
+		case B_RGB15:
+			bitsPerPixel = 15;
 			break;
 		case B_RGB16:
 			bitsPerPixel = 16;
@@ -848,32 +860,32 @@ BWindowScreen::GetCardInfo()
 			bitsPerPixel = 0;
 			break;
 	}
-	
+
 	fCardInfo.version = 2;
 	fCardInfo.id = screen.ID().id;
 	fCardInfo.bits_per_pixel = bitsPerPixel;
 	fCardInfo.width = mode.virtual_width;
 	fCardInfo.height = mode.virtual_height;
-	
+
 	if (mode.space & 0x10)
 		strncpy(fCardInfo.rgba_order, "rgba", 4);
 	else
 		strncpy(fCardInfo.rgba_order, "bgra", 4);
-	
+
 	fCardInfo.flags = 0;
 	if (mode.flags & B_SCROLL)
 		fCardInfo.flags |= B_FRAME_BUFFER_CONTROL;
 	if (mode.flags & B_PARALLEL_ACCESS)
 		fCardInfo.flags |= B_PARALLEL_BUFFER_ACCESS;
-	
+
 	AppServerLink link;
 	link.StartMessage(AS_GET_FRAME_BUFFER_CONFIG);
 	link.Attach<screen_id>(screen.ID());
-	
+
 	status_t result = B_ERROR;
 	if (link.FlushWithReply(result) < B_OK || result < B_OK)
 		return result;
-	
+
 	frame_buffer_config config;	
 	link.Read<frame_buffer_config>(&config);
 	
@@ -888,9 +900,14 @@ void
 BWindowScreen::Suspend()
 {
 	CALLED();
-	
-	while (acquire_sem(fDebugSem) == B_INTERRUPTED)
-		;
+
+	status_t status;
+	do {
+		status = acquire_sem(fDebugSem);
+	} while (status == B_INTERRUPTED);
+
+	if (status < B_OK)
+		return;
 
 	// Suspend all the registered threads
 	for (int32 i = 0; i < fDebugListCount; i++) {
@@ -912,14 +929,15 @@ BWindowScreen::Resume()
 {
 	CALLED();
 	graphics_card_info *info = CardInfo();
-	
+
 	// Copy the content of the debug_buffer back into the frame buffer.
 	memcpy(info->frame_buffer, fDebugBuffer, info->bytes_per_row * info->height);
 	free(fDebugBuffer);
 
 	// Resume all the registered threads
-	for (int32 i = 0; i < fDebugListCount; i++)
+	for (int32 i = 0; i < fDebugListCount; i++) {
 		resume_thread(fDebugList[i]);
+	}
 
 	release_sem(fDebugSem);
 }
@@ -929,25 +947,21 @@ status_t
 BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 {
 	CALLED();
-	
-	uint32 destSpace;
+
 	int32 width, height;
-	status_t status = B_ERROR;
-	
-	mode2parms(space, &destSpace, &width, &height);
-	// mode2parms converts the space to actual width, height and color_space, e.g B_8_BIT_640x480
-	
+	uint32 colorSpace;
+	if (!get_mode_parameter(space, width, height, colorSpace))
+		return B_BAD_VALUE;
+
 	for (uint32 i = 0; i < fModeCount; i++) {
-		if (fModeList[i].space == destSpace && fModeList[i].virtual_width == width
+		if (fModeList[i].space == colorSpace && fModeList[i].virtual_width == width
 			&& fModeList[i].virtual_height == height) {
-			
 			memcpy(dmode, &fModeList[i], sizeof(display_mode));
-			status = B_OK;
-			break;
+			return B_OK;
 		}
 	}
-	
-	return status;
+
+	return B_ERROR;
 }
 
 
@@ -976,7 +990,7 @@ BWindowScreen::InitClone()
 	}
 
 	status = get_image_symbol(fAddonImage, B_ACCELERANT_ENTRY_POINT,
-					B_SYMBOL_TYPE_TEXT, (void **)&fGetAccelerantHook);
+		B_SYMBOL_TYPE_TEXT, (void **)&fGetAccelerantHook);
 	if (status < B_OK) {
 		printf("InitClone: cannot get accelerant entry point\n");
 		unload_add_on(fAddonImage);
@@ -1012,24 +1026,28 @@ BWindowScreen::InitClone()
 
 
 status_t
-BWindowScreen::AssertDisplayMode(display_mode *dmode)
+BWindowScreen::AssertDisplayMode(display_mode* displayMode)
 {
 	CALLED();
 
-	status_t status = B_ERROR;
 	BScreen screen(this);
-	display_mode mode;
-	status = screen.GetMode(&mode);
+
+	display_mode currentMode;
+	status_t status = screen.GetMode(&currentMode);
 	if (status < B_OK)
 		return status;
-	if (mode.virtual_height != dmode->virtual_height || mode.virtual_width != dmode->virtual_width
-			|| mode.space != dmode->space || mode.flags != dmode->flags) {
-		status = screen.SetMode(dmode);
+
+	if (currentMode.virtual_height != displayMode->virtual_height
+		|| currentMode.virtual_width != displayMode->virtual_width
+		|| currentMode.space != displayMode->space
+		|| currentMode.flags != displayMode->flags) {
+		status = screen.SetMode(displayMode);
 		if (status < B_OK) {
 			printf("AssertDisplayMode: Setting mode failed: %s\n", strerror(status));
 			return status;
 		}
-		memcpy(fDisplayMode, dmode, sizeof(display_mode));
+
+		memcpy(fDisplayMode, displayMode, sizeof(display_mode));
 		space_mode = 1;
 	}
 
@@ -1045,6 +1063,6 @@ BWindowScreen::AssertDisplayMode(display_mode *dmode)
 	fFrameBufferInfo.display_height = fCardInfo.height;
 	fFrameBufferInfo.display_x = 0;
 	fFrameBufferInfo.display_y = 0;
-	
-	return status;
+
+	return B_OK;
 }
