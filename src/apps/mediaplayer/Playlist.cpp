@@ -17,6 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+#include <string.h>
+
 #include "Playlist.h"
 
 // TODO: using BList for objects is bad, replace it with a template
@@ -56,7 +58,7 @@ Playlist::CountItems()
 int 
 Playlist::playlist_cmp(const void *p1, const void *p2)
 {
-	return strcmp((*(const entry_ref **)p1)->name, (*(const entry_ref **)p2)->name);
+	return strcasecmp((*(const entry_ref **)p1)->name, (*(const entry_ref **)p2)->name);
 }
 
 
