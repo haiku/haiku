@@ -1,22 +1,25 @@
 /*
- *	Copyright (c) 2001-2006, Haiku, Inc.
- *  Distributed under the terms of the MIT license.
+ * Copyright (c) 2001-2006, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
  *
- *	Authors:	
+ * Authors:	
  *		Ulrich Wimboeck
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Assmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
-#include <stdio.h>
-
 #include <ListView.h>
+
+#include <Autolock.h>
+#include <PropertyInfo.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
-#include <support/Errors.h>
-#include <PropertyInfo.h>
 #include <Window.h>
+
+#include <stdio.h>
+
 
 struct track_data {
 	BPoint		drag_start;
@@ -25,9 +28,7 @@ struct track_data {
 	bool		try_drag;
 };
 
-
-static property_info prop_list[] =
-{
+static property_info sProperties[] = {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
 		"Returns the number of BListItems currently in the list." },
 	{ "Item", { B_EXECUTE_PROPERTY, 0 }, { B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER,
@@ -48,16 +49,17 @@ static property_info prop_list[] =
 		"selection or deselection." },
 };
 
-//------------------------------------------------------------------------------
-BListView::BListView(BRect frame, const char *name, list_view_type type,
-					 uint32 resizingMode, uint32 flags)
-	:	BView(frame, name, resizingMode, flags)
+
+BListView::BListView(BRect frame, const char* name, list_view_type type,
+		uint32 resizingMode, uint32 flags)
+	: BView(frame, name, resizingMode, flags)
 {
 	_InitObject(type);
 }
-//------------------------------------------------------------------------------
-BListView::BListView(BMessage *archive)
-	:	BView(archive)
+
+
+BListView::BListView(BMessage* archive)
+	: BView(archive)
 {
 	int32 listType;
 
@@ -77,86 +79,84 @@ BListView::BListView(BMessage *archive)
 	int32 i = 0;
 	BMessage subData;
 	
-	while (archive->FindMessage("_l_items", i++, &subData))
-	{
+	while (archive->FindMessage("_l_items", i++, &subData)) {
 		BArchivable *object = instantiate_object(&subData);
-
 		if (!object)
 			continue;
 
 		BListItem *item = dynamic_cast<BListItem*>(object);
-
 		if (!item)
 			continue;
-		
+
 		AddItem(item);
 	}
-	
-	if (archive->HasMessage("_msg"))
-	{
+
+	if (archive->HasMessage("_msg")) {
 		BMessage *invokationMessage = new BMessage;
 
 		archive->FindMessage("_msg", invokationMessage);
 		SetInvocationMessage(invokationMessage);
 	}
 
-	if (archive->HasMessage("_2nd_msg"))
-	{
+	if (archive->HasMessage("_2nd_msg")) {
 		BMessage *selectionMessage = new BMessage;
 
 		archive->FindMessage("_2nd_msg", selectionMessage);
 		SetSelectionMessage(selectionMessage);
 	}
 }
-//------------------------------------------------------------------------------
+
+
 BListView::~BListView()
 {
 	SetSelectionMessage(NULL);
-
-	if (fSelectMessage)
-		delete fSelectMessage;
+	delete fSelectMessage;
 }
-//------------------------------------------------------------------------------
-BArchivable *BListView::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BListView::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BListView"))
 		return new BListView(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BListView::Archive(BMessage *archive, bool deep) const
+
+
+status_t
+BListView::Archive(BMessage *archive, bool deep) const
 {
-	BView::Archive ( archive, deep );
+	status_t status = BView::Archive(archive, deep);
+	if (status < B_OK)
+		return status;
 
-	archive->AddInt32("_lv_type", fListType);
-	
-	if (deep)
-	{
-		int32 i = 0;
+	status = archive->AddInt32("_lv_type", fListType);
+	if (status == B_OK && deep) {
 		BListItem *item;
+		int32 i = 0;
 
-		while ((item = ItemAt(i++)))
-		{
+		while ((item = ItemAt(i++))) {
 			BMessage subData;
+			status = item->Archive(&subData, true);
+			if (status >= B_OK)
+				status = archive->AddMessage("_l_items", &subData);
 
-			if (item->Archive(&subData, true) != B_OK)
-				continue;
-
-			archive->AddMessage("_l_items", &subData);
+			if (status < B_OK)
+				break;
 		}
 	}
 
-	if (InvocationMessage())
-		archive->AddMessage("_msg", InvocationMessage());
-	
-	if (fSelectMessage)
-		archive->AddMessage("_2nd_msg", fSelectMessage);
+	if (status >= B_OK && InvocationMessage() != NULL)
+		status = archive->AddMessage("_msg", InvocationMessage());
 
-	return B_OK;
+	if (status == B_OK && fSelectMessage != NULL)
+		status = archive->AddMessage("_2nd_msg", fSelectMessage);
+
+	return status;
 }
 
-// Draw
+
 void
 BListView::Draw(BRect updateRect)
 {
@@ -168,7 +168,7 @@ BListView::Draw(BRect updateRect)
 	}
 }
 
-// MessageReceived
+
 void
 BListView::MessageReceived(BMessage* msg)
 {
@@ -178,98 +178,99 @@ BListView::MessageReceived(BMessage* msg)
 		case B_GET_PROPERTY:
 		case B_SET_PROPERTY:
 		{
-			BPropertyInfo propInfo ( prop_list );
+			BPropertyInfo propInfo(sProperties);
 			BMessage specifier;
 			const char *property;
 
-			if ( msg->GetCurrentSpecifier ( NULL, &specifier ) != B_OK ||
-				specifier.FindString ( "property", &property ) != B_OK )
+			if (msg->GetCurrentSpecifier(NULL, &specifier) != B_OK
+				|| specifier.FindString("property", &property) != B_OK)
 				return;
 
-			switch ( propInfo.FindMatch ( msg, 0, &specifier, msg->what, property ) )
-			{
+			switch (propInfo.FindMatch(msg, 0, &specifier, msg->what, property)) {
 				case B_ERROR:
-					BView::MessageReceived ( msg );
+					BView::MessageReceived(msg);
 					break;
 
 				case 0:
 				{
-					BMessage reply ( B_REPLY );
+					BMessage reply(B_REPLY);
+					reply.AddInt32("result", CountItems());
+					reply.AddInt32("error", B_OK);
 
-					reply.AddInt32 ( "result", CountItems () );
-					reply.AddInt32 ( "error", B_OK );
-
-					msg->SendReply ( &reply );
+					msg->SendReply(&reply);
 					break;
 				}
+
 				case 1:
 					break;
+
 				case 2:
 				{
-					BMessage reply ( B_REPLY );
-
 					int32 count = 0;
 
-					for ( int32 i = 0; i < CountItems (); i++ )
-						if ( ItemAt ( i )->IsSelected () )
+					for (int32 i = 0; i < CountItems(); i++) {
+						if (ItemAt(i)->IsSelected())
 							count++;
+					}
 
-					reply.AddInt32 ( "result", count );
-					reply.AddInt32 ( "error", B_OK );
+					BMessage reply(B_REPLY);
+					reply.AddInt32("result", count);
+					reply.AddInt32("error", B_OK);
 
-					msg->SendReply ( &reply );
+					msg->SendReply(&reply);
 					break;
 				}
+
 				case 3:
 					break;
+
 				case 4:
 				{
-					BMessage reply ( B_REPLY );
+					BMessage reply (B_REPLY);
 
-					for ( int32 i = 0; i < CountItems (); i++ )
-						if ( ItemAt ( i )->IsSelected () )
-							reply.AddInt32 ( "result", i );
+					for (int32 i = 0; i < CountItems(); i++) {
+						if (ItemAt(i)->IsSelected())
+							reply.AddInt32("result", i);
+					}
 
-					reply.AddInt32 ( "error", B_OK );
+					reply.AddInt32("error", B_OK);
 
-					msg->SendReply ( &reply );
+					msg->SendReply(&reply);
 					break;
 				}
+
 				case 5:
 					break;
+
 				case 6:
 				{
-					BMessage reply ( B_REPLY );
+					BMessage reply(B_REPLY);
 
 					bool select;
-
-					msg->FindBool ( "data", &select );
-
-					if ( select )
-						Select ( 0, CountItems () - 1, false );
+					if (msg->FindBool("data", &select) == B_OK && select)
+						Select(0, CountItems() - 1, false);
 					else
-						DeselectAll ();
+						DeselectAll();
 
-					reply.AddInt32 ( "error", B_OK );
+					reply.AddInt32("error", B_OK);
 
-					msg->SendReply ( &reply );
+					msg->SendReply(&reply);
 					break;
 				}
 			}
-
 			break;
 		}
+
 		case B_SELECT_ALL:
-		{
 			Select(0, CountItems() - 1, false);
 			break;
-		}
+
 		default:
 			BView::MessageReceived(msg);
 	}
 }
 
-// MouseDown
+
 void
 BListView::MouseDown(BPoint point)
 {
@@ -780,23 +781,23 @@ BListView::ScrollToSelection()
 void
 BListView::Select(int32 index, bool extend)
 {
-	_Select(index, extend);
-
-	SelectionChanged();
-	InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
+	if (_Select(index, extend)) {
+		SelectionChanged();
+		InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
+	}
 }
 
 
 void
 BListView::Select(int32 start, int32 finish, bool extend)
 {
-	_Select(start, finish, extend);
-
-	SelectionChanged();
-	InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
+	if (_Select(start, finish, extend)) {
+		SelectionChanged();
+		InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
+	}
 }
 
-// IsItemSelected
+
 bool
 BListView::IsItemSelected(int32 index) const
 {
@@ -874,59 +875,30 @@ BListView::Invoke(BMessage *message)
 	return err;
 }
 
-// DeselectAll
+
 void
 BListView::DeselectAll()
 {
-	if (fFirstSelected == -1)
-		return;
-
-	for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
-		BListItem *item = ItemAt(index);
-		if (item && item->IsSelected()) {
-			item->Deselect();
-			InvalidateItem(index);
-		}
+	if (_DeselectAll(-1, -1)) {
+		SelectionChanged();
+		InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
 	}
-	fFirstSelected = fLastSelected = -1;
-
-	SelectionChanged();
-	InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
 }
 
-// DeselectExcept
+
 void
-BListView::DeselectExcept(int32 start, int32 finish)
+BListView::DeselectExcept(int32 exceptFrom, int32 exceptTo)
 {
-	if (fFirstSelected == -1 || finish < start)
+	if (exceptFrom > exceptTo || exceptFrom < 0 || exceptTo < 0)
 		return;
-		
-	int32 index;
 
-	// TODO: check if the items from start to finish are
-	// supposed to be selected if not already
-    	for (index = fFirstSelected; index < start; index++) {
-		BListItem *item = ItemAt(index);
-		if (item && item->IsSelected()) {
-			item->Deselect();
-			InvalidateItem(index);
-		}
-    	}
-    	for (index = finish + 1; index <= fLastSelected; index++) {
-		BListItem *item = ItemAt(index);
-		if (item && item->IsSelected()) {
-			item->Deselect();
-			InvalidateItem(index);
-		}
+	if (_DeselectAll(exceptFrom, exceptTo)) {
+		SelectionChanged();
+		InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
 	}
-	fFirstSelected = max_c(fFirstSelected, start);
-	fLastSelected = min_c(fLastSelected, finish);
-
-	SelectionChanged();
-	InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
 }
 
-// Deselect
+
 void
 BListView::Deselect(int32 index)
 {
@@ -936,12 +908,14 @@ BListView::Deselect(int32 index)
 	}
 }
 
-// SelectionChanged
-void BListView::SelectionChanged()
+
+void
+BListView::SelectionChanged()
 {
+	// Hook method to be implemented by subclasses
 }
 
-// SortItems
+
 void
 BListView::SortItems(int (*cmp)(const void *, const void *)) 
 {
@@ -1028,27 +1002,26 @@ BListView::ItemFrame(int32 index)
 	return frame;
 }
 
-// ResolveSpecifier
-BHandler*
-BListView::ResolveSpecifier(BMessage *msg, int32 index,
-									  BMessage *specifier, int32 form,
-									  const char *property)
-{
-	BPropertyInfo propInfo(prop_list);
 
-	if (propInfo.FindMatch(msg, 0, specifier, form, property) < 0)
-		return BView::ResolveSpecifier(msg, index, specifier, form, property);
+BHandler*
+BListView::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char* property)
+{
+	BPropertyInfo propInfo(sProperties);
+
+	if (propInfo.FindMatch(message, 0, specifier, form, property) < 0)
+		return BView::ResolveSpecifier(message, index, specifier, form, property);
 
 	// TODO: msg->AddInt32("_match_code_", );
 
 	return this;
 }
 
-// GetSupportedSuites
+
 status_t
-BListView::GetSupportedSuites(BMessage *data )
+BListView::GetSupportedSuites(BMessage* data)
 {
-	BPropertyInfo propertyInfo(prop_list);
+	BPropertyInfo propertyInfo(sProperties);
 	
 	data->AddString("suites", "suite/vnd.Be-list-view");
 	data->AddFlat("messages", &propertyInfo);
@@ -1234,64 +1207,74 @@ BListView::_FontChanged()
 		ItemAt(i)->Update(this, &font);
 }
 
-// _Select
+
+/*!
+	Selects the item at the specified \a index, and returns \c true in
+	case the selection was changed because of this method.
+	If \a extend is \c false, all previously selected items are deselected.
+*/
 bool
 BListView::_Select(int32 index, bool extend)
 {
 	if (index < 0 || index >= CountItems())
 		return false;
 
-	if ((fFirstSelected != -1) && (!extend)) {
-		for (int32 i = fFirstSelected; i <= fLastSelected; ++i) {
-			BListItem *item = ItemAt(i);
-			if (item && item->IsSelected() && (i != index)) {
-				item->Deselect();
-				InvalidateItem(i);
-			}
-		}
-		fFirstSelected = -1;
+	// only lock the window when there is one
+	BAutolock locker(Window());
+	if (Window() && !locker.IsLocked())
+		return false;
+
+	bool changed = false;
+
+	if (fFirstSelected != -1 && !extend)
+		changed = _DeselectAll(index, index);
+
+	BListItem* item = ItemAt(index);
+	if (!item->IsEnabled() || item->IsSelected()) {
+		// if the item is already selected, or can't be selected, we're done here
+		return changed;
 	}
 
 	if (fFirstSelected == -1) {
 		fFirstSelected = index;
 		fLastSelected = index;
-	}
-	else if (index < fFirstSelected)
+	} else if (index < fFirstSelected)
 		fFirstSelected = index;
 	else if (index > fLastSelected)
 		fLastSelected = index;
 
-	if (ItemAt(index) && !ItemAt(index)->IsSelected()) {
-		ItemAt(index)->Select();
+	ItemAt(index)->Select();
+	if (Window())
 		InvalidateItem(index);
-	}
 
 	return true;
 }
 
-// _Select
+
+/*!
+	Selects the items between \a from and \a to, and returns \c true in
+	case the selection was changed because of this method.
+	If \a extend is \c false, all previously selected items are deselected.
+*/
 bool
 BListView::_Select(int32 from, int32 to, bool extend)
 {
 	if (to < from)
 		return false;
 
-	if ((fFirstSelected != -1) && (!extend)) {
-		for (int32 i = fFirstSelected; i <= fLastSelected; ++i) {
-			BListItem *item = ItemAt(i);
-			if (item && item->IsSelected() && (i < from || i > to)) {
-				item->Deselect();
-				InvalidateItem(i);
-			}
-		}
-		fFirstSelected = -1;
-	}
+	BAutolock locker(Window());
+	if (Window() && !locker.IsLocked())
+		return false;
+
+	bool changed = false;
+
+	if (fFirstSelected != -1 && !extend)
+		changed = _DeselectAll(from, to);
 
 	if (fFirstSelected == -1) {
 		fFirstSelected = from;
 		fLastSelected = to;
-	}
-	else if (from < fFirstSelected)
+	} else if (from < fFirstSelected)
 		fFirstSelected = from;
 	else if (to > fLastSelected)
 		fLastSelected = to;
@@ -1300,21 +1283,24 @@ BListView::_Select(int32 from, int32 to, bool extend)
 		BListItem *item = ItemAt(i);
 		if (item && !item->IsSelected()) {
 			item->Select();
-			InvalidateItem(i);
+			if (Window())
+				InvalidateItem(i);
+			changed = true;
 		}
 	}
 
-	return true;
+	return changed;
 }
 
-// _Deselect
+
 bool
 BListView::_Deselect(int32 index)
 {
 	if (index < 0 || index >= CountItems())
 		return false;
 
-	if (!Window()->Lock())
+	BAutolock locker(Window());
+	if (Window() && !locker.IsLocked())
 		return false;
 
 	BListItem *item = ItemAt(index);
@@ -1340,40 +1326,43 @@ BListView::_Deselect(int32 index)
 			DrawItem(ItemAt(index), frame, true);
 	}
 
-	Window()->Unlock();
-
 	return true;
 }
-/*
-// _Deselect
-void
-BListView::_Deselect(int32 from, int32 to)
+
+
+bool
+BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 {
-	if (from < 0 || from >= CountItems() || to < 0 || to >= CountItems())
-		return;
+	if (fFirstSelected == -1)
+		return false;
+
+	BAutolock locker(Window());
+	if (Window() && !locker.IsLocked())
+		return false;
 
 	bool changed = false;
 
-	for (int32 i = from; i <= to; i++)
-	{
-		if (_Deselect(i))
+	for (int32 index = fFirstSelected; index <= fLastSelected; index++) {
+		// don't deselect the items we shouldn't deselect
+		if (exceptFrom != -1 && exceptFrom <= index && exceptTo >= index)
+			continue;
+
+		BListItem *item = ItemAt(index);
+		if (item && item->IsSelected()) {
+			item->Deselect();
+			InvalidateItem(index);
 			changed = true;
+		}
 	}
 
-	if (changed)
-	{
-		SelectionChanged();
-		InvokeNotify(fSelectMessage, B_CONTROL_MODIFIED);
-	}
-}
-*/
-// _DeselectAll
-bool
-BListView::_DeselectAll(int32 except_from, int32 except_to)
-{
-	if (fFirstSelected == -1)
-		return true;
-	// TODO...
+	if (!changed)
+		return false;
+
+	if (exceptFrom != -1) {
+		fFirstSelected = _CalcFirstSelected(fFirstSelected);
+		fLastSelected = _CalcLastSelected(fLastSelected);
+	} else
+		fFirstSelected = fLastSelected = -1;
 
 	return true;
 }
