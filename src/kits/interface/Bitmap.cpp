@@ -240,15 +240,30 @@ BBitmap::BBitmap(BMessage *data)
 	  fFlags(0),
 	  fInitError(B_NO_INIT)
 {
+	int32 flags;
+	if (data->FindInt32("_bmflags", &flags) != B_OK) {
+		// this bitmap is archived in some archaic format
+		flags = 0;
+
+		bool acceptsViews;
+		if (data->FindBool("_view_ok", &acceptsViews) == B_OK && acceptsViews)
+			flags |= B_BITMAP_ACCEPTS_VIEWS;
+
+		bool contiguous;
+		if (data->FindBool("_contiguous", &contiguous) == B_OK && contiguous)
+			flags |= B_BITMAP_IS_CONTIGUOUS;
+	}
+
+	int32 rowBytes;
+	if (data->FindInt32("_rowbytes", &rowBytes) != B_OK) {
+		rowBytes = -1;
+			// bytes per row are computed in InitObject(), then
+	}
+
 	BRect bounds;
 	color_space cspace;
-	int32 flags;
-	int32 rowBytes;
 	if (data->FindRect("_frame", &bounds) == B_OK
-		&& data->FindInt32("_cspace", (int32*)&cspace) == B_OK
-		&& data->FindInt32("_bmflags", &flags) == B_OK
-		&& data->FindInt32("_rowbytes", &rowBytes) == B_OK) {
-
+		&& data->FindInt32("_cspace", (int32*)&cspace) == B_OK) {
 		_InitObject(bounds, cspace, flags, rowBytes, B_MAIN_SCREEN_ID);
 	}
 
