@@ -1,9 +1,11 @@
-/* 
- * Copyright 2002-2006,
- * Marcus Overhagen, 
- * Stefano Ceccherini (burton666@libero.it),
- * Carwyn Jones (turok2@currantbun.com)
- * All rights reserved.
+/*
+ * Copyright 2002-2006, Haiku. All Rights Reserved.
+ * Copyright 2002-2005,
+ *		Marcus Overhagen, 
+ *		Stefano Ceccherini (burton666@libero.it),
+ *		Carwyn Jones (turok2@currantbun.com)
+ *		All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -288,7 +290,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 	if (debug_enable)
 		attributes |= B_ENABLE_DEBUGGER;
 
-	status_t status = InitData(space, attributes);	
+	status_t status = _InitData(space, attributes);	
 	if (error)
 		*error = status;
 }
@@ -301,7 +303,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 			| B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE, B_CURRENT_WORKSPACE)
 {
 	CALLED();
-	status_t status = InitData(space, attributes);	
+	status_t status = _InitData(space, attributes);	
 	if (error)
 		*error = status;
 }
@@ -321,7 +323,7 @@ BWindowScreen::~BWindowScreen()
 		activate_workspace(fDebugWorkspace);
 	
 	free(fDisplayMode);
-	free(fOldDisplayMode);
+	free(fOriginalDisplayMode);
 	free(fModeList);
 }
 
@@ -349,8 +351,10 @@ BWindowScreen::Disconnect()
 	if (fLockState == 1) {
 		if (fDebugState)
 			fDebugFirst = true;
-		SetActiveState(0);
+		_SetActiveState(0);
 	}
+
+	be_app->ShowCursor();
 }
 
 
@@ -359,8 +363,8 @@ BWindowScreen::WindowActivated(bool active)
 {
 	CALLED();
 	fWindowState = active;
-	if(active && fLockState == 0 && fWorkState)
-		SetActiveState(1);
+	if (active && fLockState == 0 && fWorkState)
+		_SetActiveState(1);
 }
 
 
@@ -371,14 +375,14 @@ BWindowScreen::WorkspaceActivated(int32 ws, bool state)
 	fWorkState = state;
 	if (state) {
 		if (fLockState == 0 && fWindowState) {
-			SetActiveState(1);
+			_SetActiveState(1);
 			if (!IsHidden()) {
 				Activate(true);
 				WindowActivated(true);
 			}
 		}
 	} else if (fLockState)
-		SetActiveState(0);
+		_SetActiveState(0);
 }
 
 
@@ -393,6 +397,7 @@ void
 BWindowScreen::Hide()
 {
 	CALLED();
+
 	Disconnect();	
 	BWindow::Hide();
 }
@@ -402,10 +407,13 @@ void
 BWindowScreen::Show()
 {
 	CALLED();
+
 	BWindow::Show();
+
 	if (!fActivateState) {
 		release_sem(fActivateSem);
 		fActivateState = true;
+		be_app->HideCursor();
 	}
 }
 
@@ -421,7 +429,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 		if (!fActivateState) { 
 			// If we aren't active, we just change our local palette
 			for (int32 x = firstIndex; x <= lastIndex; x++) {
-				fColorList[x] = list[x];
+				fPalette[x] = list[x];
 			}
 		} else {
 			uint8 colors[3 * 256];
@@ -429,7 +437,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 firstIndex, int32 lastIndex)
 			int32 j = 0;
 
 			for (int32 x = firstIndex; x <= lastIndex; x++) {
-				fColorList[x] = list[x];
+				fPalette[x] = list[x];
 					// update our local palette as well
 
 				colors[j++] = list[x].red;
@@ -459,10 +467,12 @@ status_t
 BWindowScreen::SetSpace(uint32 space)
 {
 	CALLED();
+
 	display_mode mode;
-	status_t status = GetModeFromSpace(space, &mode);
+	status_t status = _GetModeFromSpace(space, &mode);
 	if (status == B_OK)
-		status = AssertDisplayMode(&mode);
+		status = _AssertDisplayMode(&mode);
+
 	return status;
 }
 
@@ -490,7 +500,7 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 	BScreen screen(this);
 	status_t status = screen.ProposeMode(&mode, &lowMode, &highMode);
 	if (status == B_OK)
-		status = AssertDisplayMode(&mode);
+		status = _AssertDisplayMode(&mode);
 
 	return status;
 }
@@ -512,19 +522,21 @@ BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 }
 
 
+#if 0
 void *
 BWindowScreen::IOBase()
 {
 	// Not supported
 	return NULL;
 }
+#endif
 
 
 rgb_color *
 BWindowScreen::ColorList()
 {
 	CALLED();
-	return fColorList;
+	return fPalette;
 }
 
 
@@ -581,7 +593,7 @@ BWindowScreen::CardInfo()
 
 
 void
-BWindowScreen::RegisterThread(thread_id id)
+BWindowScreen::RegisterThread(thread_id thread)
 {
 	CALLED();
 
@@ -593,11 +605,11 @@ BWindowScreen::RegisterThread(thread_id id)
 	if (status < B_OK)
 		return;
 
-	void *newDebugList = realloc(fDebugList, (fDebugListCount + 1) * sizeof(thread_id));
+	void *newDebugList = realloc(fDebugThreads, (fDebugThreadCount + 1) * sizeof(thread_id));
 	if (newDebugList != NULL) {
-		fDebugList = (thread_id *)newDebugList;	
-		fDebugList[fDebugListCount] = id;
-		fDebugListCount++;
+		fDebugThreads = (thread_id *)newDebugList;	
+		fDebugThreads[fDebugThreadCount] = thread;
+		fDebugThreadCount++;
 	}
 	release_sem(fDebugSem);
 }
@@ -611,12 +623,13 @@ BWindowScreen::SuspensionHook(bool active)
 
 
 void
-BWindowScreen::Suspend(char *label)
+BWindowScreen::Suspend(char* label)
 {
 	CALLED();
 	if (fDebugState) {		
 		fprintf(stderr, "## Debugger(\"%s\").", label);
-		fprintf(stderr, " Press Alt-F%ld or Cmd-F%ld to resume.\n", space0 + 1, space0 + 1);
+		fprintf(stderr, " Press Alt-F%ld or Cmd-F%ld to resume.\n", fWorkspaceIndex + 1,
+			fWorkspaceIndex + 1);
 		
 		if (IsLocked())
 			Unlock();
@@ -632,7 +645,7 @@ BWindowScreen::Suspend(char *label)
 
 
 status_t
-BWindowScreen::Perform(perform_code d, void *arg)
+BWindowScreen::Perform(perform_code d, void* arg)
 {
 	return inherited::Perform(d, arg);
 }
@@ -653,31 +666,20 @@ void BWindowScreen::_ReservedWindowScreen4() {}
  */
 
 
-BRect
-BWindowScreen::CalcFrame(int32 index, int32 space, display_mode* mode)
-{
-	CALLED();
-
-	BScreen screen;
-	if (mode != NULL)
-		screen.GetMode(mode);
-
-	return screen.Frame();
-}
-
-
 status_t
-BWindowScreen::InitData(uint32 space, uint32 attributes)
+BWindowScreen::_InitData(uint32 space, uint32 attributes)
 {
 	CALLED();
 	
 	fDebugState = attributes & B_ENABLE_DEBUGGER;
-	fDebugListCount = 0;
-	fDebugList = NULL;
+	fDebugThreadCount = 0;
+	fDebugThreads = NULL;
 	fDebugFirst = true;
-	
-	fAttributes = attributes;	
-	fScreenIndex = fDebugWorkspace = current_workspace();
+
+	fAttributes = attributes;
+		// TODO: not really used right now, but should probably be known by the app_server
+
+	fWorkspaceIndex = fDebugWorkspace = current_workspace();
 	fLockState = 0;
 	fAddonImage = -1;
 	fWindowState = 0;
@@ -693,16 +695,13 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	if (fDisplayMode == NULL)
 		return B_NO_MEMORY;
 
-	status = GetModeFromSpace(space, fDisplayMode);
+	status = _GetModeFromSpace(space, fDisplayMode);
 	if (status < B_OK)
 		return status;
 
-	space_mode = 1;
-	space0 = 0;
+	memcpy(fPalette, screen.ColorMap()->color_list, 256);
 
-	memcpy(fColorList, screen.ColorMap()->color_list, 256);
-
-	status = GetCardInfo();
+	status = _GetCardInfo();
 	if (status < B_OK)
 		return status;
 
@@ -718,25 +717,25 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 
 	fWorkState = 1;
 		
-	fOldDisplayMode = (display_mode *)malloc(sizeof(display_mode));
-	if (fOldDisplayMode == NULL)
+	fOriginalDisplayMode = (display_mode *)malloc(sizeof(display_mode));
+	if (fOriginalDisplayMode == NULL)
 		return B_NO_MEMORY;
 
-	screen.GetMode(fOldDisplayMode);
+	screen.GetMode(fOriginalDisplayMode);
 
 	return B_OK;
 }
 
 
 status_t
-BWindowScreen::SetActiveState(int32 state)
+BWindowScreen::_SetActiveState(int32 state)
 {
 	CALLED();
 	status_t status = B_ERROR;
 	if (state == 1) {
 		//be_app->HideCursor();
-		status = AssertDisplayMode(fDisplayMode);
-		if (status == B_OK && (status = SetupAccelerantHooks(true)) == B_OK) {			
+		status = _AssertDisplayMode(fDisplayMode);
+		if (status == B_OK && (status = _SetupAccelerantHooks(true)) == B_OK) {			
 			if (!fActivateState) {
 				do {
 					status = acquire_sem(fActivateSem);
@@ -746,10 +745,10 @@ BWindowScreen::SetActiveState(int32 state)
 					return status;
 			}
 
-			SetColorList(fColorList);
+			SetColorList(fPalette);
 			if (fDebugState && !fDebugFirst) {
 				SuspensionHook(true);
-				Resume();					
+				_Resume();					
 			} else {
 				fDebugFirst = true;
 				ScreenConnected(true);
@@ -758,18 +757,17 @@ BWindowScreen::SetActiveState(int32 state)
 			if (status == B_OK)
 				return status;
 		} else
-			SetupAccelerantHooks(false);	
-
-		be_app->ShowCursor();				
+			_SetupAccelerantHooks(false);	
 	} else {
-		AssertDisplayMode(fOldDisplayMode);
+		_AssertDisplayMode(fOriginalDisplayMode);
+
 		if (fDebugState && !fDebugFirst) {
-			Suspend();
+			_Suspend();
 			SuspensionHook(false);
 		} else
 			ScreenConnected(false);
 
-		status = SetupAccelerantHooks(false);
+		status = _SetupAccelerantHooks(false);
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
 			if (fActivateState) {
@@ -783,11 +781,11 @@ BWindowScreen::SetActiveState(int32 state)
 
 
 status_t
-BWindowScreen::SetupAccelerantHooks(bool enable)
+BWindowScreen::_SetupAccelerantHooks(bool enable)
 {
 	CALLED();
 	if (fAddonImage >= 0) {
-		m_wei();
+		fWaitEngineIdle();
 		sFillRectHook = NULL;
 		sBlitRectHook = NULL;
 		sTransparentBlitHook = NULL;
@@ -802,28 +800,37 @@ BWindowScreen::SetupAccelerantHooks(bool enable)
 
 	status_t status = B_OK;
 	if (enable) {
+		acquire_engine aquireEngine = NULL;
+		release_engine releaseEngine = NULL;
+		fill_rectangle fillRectangle = NULL;
+		screen_to_screen_blit blit = NULL;
+		screen_to_screen_transparent_blit transparentBlit = NULL;
+		screen_to_screen_scaled_filtered_blit scaledFilteredBlit = NULL;
+
 		if (fAddonImage < 0) {
-			status = InitClone();
+			status = _InitClone();
 			if (status == B_OK) {
-				m_wei = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
-				m_re = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
-				m_ae = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, NULL);
-				fill_rect = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, NULL);
-				blit_rect = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
-				trans_blit_rect = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
-				scaled_filtered_blit_rect = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
+				fWaitEngineIdle = (wait_engine_idle)fGetAccelerantHook(B_WAIT_ENGINE_IDLE, NULL);
+
+				releaseEngine = (release_engine)fGetAccelerantHook(B_RELEASE_ENGINE, NULL);
+				aquireEngine = (acquire_engine)fGetAccelerantHook(B_ACQUIRE_ENGINE, NULL);
+				fillRectangle = (fill_rectangle)fGetAccelerantHook(B_FILL_RECTANGLE, NULL);
+				blit = (screen_to_screen_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
+				transparentBlit = (screen_to_screen_transparent_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT, NULL);
+				scaledFilteredBlit = (screen_to_screen_scaled_filtered_blit)fGetAccelerantHook(B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT, NULL);
 			}
 		}
 
 		if (status == B_OK) {
-			sFillRectHook = fill_rect;
-			sBlitRectHook = blit_rect;
-			sTransparentBlitHook = trans_blit_rect;
-			sScaledFilteredBlitHook = scaled_filtered_blit_rect;
-			sWaitIdleHook = m_wei;
-			sAcquireEngineHook = m_ae;
-			sReleaseEngineHook = m_re;
-			m_wei();
+			sFillRectHook = fillRectangle;
+			sBlitRectHook = blit;
+			sTransparentBlitHook = transparentBlit;
+			sScaledFilteredBlitHook = scaledFilteredBlit;
+			sWaitIdleHook = fWaitEngineIdle;
+			sAcquireEngineHook = aquireEngine;
+			sReleaseEngineHook = releaseEngine;
+
+			fWaitEngineIdle();
 		}
 	}
 	
@@ -832,7 +839,7 @@ BWindowScreen::SetupAccelerantHooks(bool enable)
 
 
 status_t
-BWindowScreen::GetCardInfo()
+BWindowScreen::_GetCardInfo()
 {
 	CALLED();
 
@@ -897,7 +904,7 @@ BWindowScreen::GetCardInfo()
 
 
 void
-BWindowScreen::Suspend()
+BWindowScreen::_Suspend()
 {
 	CALLED();
 
@@ -910,33 +917,34 @@ BWindowScreen::Suspend()
 		return;
 
 	// Suspend all the registered threads
-	for (int32 i = 0; i < fDebugListCount; i++) {
+	for (int32 i = 0; i < fDebugThreadCount; i++) {
 		snooze(10000);
-		suspend_thread(fDebugList[i]);
+		suspend_thread(fDebugThreads[i]);
 	}
 
 	graphics_card_info *info = CardInfo();
 	size_t fbSize = info->bytes_per_row * info->height; 
 
 	// Save the content of the frame buffer into the local buffer
-	fDebugBuffer = (char *)malloc(fbSize);
-	memcpy(fDebugBuffer, info->frame_buffer, fbSize);
+	fDebugFrameBuffer = (char *)malloc(fbSize);
+	memcpy(fDebugFrameBuffer, info->frame_buffer, fbSize);
 }
 
 
 void
-BWindowScreen::Resume()
+BWindowScreen::_Resume()
 {
 	CALLED();
 	graphics_card_info *info = CardInfo();
 
 	// Copy the content of the debug_buffer back into the frame buffer.
-	memcpy(info->frame_buffer, fDebugBuffer, info->bytes_per_row * info->height);
-	free(fDebugBuffer);
+	memcpy(info->frame_buffer, fDebugFrameBuffer, info->bytes_per_row * info->height);
+	free(fDebugFrameBuffer);
+	fDebugFrameBuffer = NULL;
 
 	// Resume all the registered threads
-	for (int32 i = 0; i < fDebugListCount; i++) {
-		resume_thread(fDebugList[i]);
+	for (int32 i = 0; i < fDebugThreadCount; i++) {
+		resume_thread(fDebugThreads[i]);
 	}
 
 	release_sem(fDebugSem);
@@ -944,7 +952,7 @@ BWindowScreen::Resume()
 
 
 status_t
-BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
+BWindowScreen::_GetModeFromSpace(uint32 space, display_mode *dmode)
 {
 	CALLED();
 
@@ -966,7 +974,7 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 
 
 status_t
-BWindowScreen::InitClone()
+BWindowScreen::_InitClone()
 {
 	CALLED();
 	
@@ -975,7 +983,7 @@ BWindowScreen::InitClone()
 
 	AppServerLink link;
 	link.StartMessage(AS_GET_ACCELERANT_PATH);
-	link.Attach<int32>(fScreenIndex);
+	link.Attach<int32>(fWorkspaceIndex);
 	
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) < B_OK || status < B_OK)
@@ -1008,7 +1016,7 @@ BWindowScreen::InitClone()
 	}
 
 	link.StartMessage(AS_GET_DRIVER_PATH);
-	link.Attach<int32>(fScreenIndex);
+	link.Attach<int32>(fWorkspaceIndex);
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
 		BString driverPath;
 		link.ReadString(driverPath);
@@ -1026,7 +1034,7 @@ BWindowScreen::InitClone()
 
 
 status_t
-BWindowScreen::AssertDisplayMode(display_mode* displayMode)
+BWindowScreen::_AssertDisplayMode(display_mode* displayMode)
 {
 	CALLED();
 
@@ -1048,10 +1056,9 @@ BWindowScreen::AssertDisplayMode(display_mode* displayMode)
 		}
 
 		memcpy(fDisplayMode, displayMode, sizeof(display_mode));
-		space_mode = 1;
 	}
 
-	status = GetCardInfo();
+	status = _GetCardInfo();
 	if (status < B_OK)
 		return status;
 
