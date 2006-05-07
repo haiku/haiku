@@ -11,6 +11,7 @@ Application MediaPlayer :
 	MainApp.cpp
 	MainWin.cpp
 	Playlist.cpp
+	SoundOutput.cpp
 	TransportButton.cpp
 	TransportControlGroup.cpp
 	VideoNode.cpp

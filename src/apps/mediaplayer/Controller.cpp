@@ -300,3 +300,31 @@ Controller::IsPaused()
 {
 	return fPaused;
 }
+
+
+int32
+Controller::audio_play_thread(void *self)
+{
+	static_cast<Controller *>(self)->AudioPlayThread();
+	return 0;
+}
+
+
+int32
+Controller::video_play_thread(void *self)
+{
+	static_cast<Controller *>(self)->VideoPlayThread();
+	return 0;
+}
+
+
+void
+Controller::AudioPlayThread()
+{
+}
+
+
+void
+Controller::VideoPlayThread()
+{
+}

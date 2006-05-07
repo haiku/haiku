@@ -62,6 +62,11 @@ public:
 	void					VolumeDown();
 
 private:
+	static int32			audio_play_thread(void *self);
+	static int32			video_play_thread(void *self);
+
+	void					AudioPlayThread();
+	void					VideoPlayThread();
 
 private:
 	VideoView *				fVideoView;
@@ -78,6 +83,8 @@ private:
 	media_format			fVideoFormat;
 	sem_id					fAudioPlaySem;
 	sem_id					fVideoPlaySem;
+	thread_id				fAudioPlayThread;
+	thread_id				fVideoPlayThread;
 };
 
 
