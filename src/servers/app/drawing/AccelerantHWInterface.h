@@ -103,6 +103,7 @@ private:
 		void					_RegionToRectParams(/*const*/ BRegion* region,
 													uint32* count) const;
 		uint32					_NativeColor(const RGBColor& color) const;
+		status_t				_SetFallbackMode(display_mode& mode) const;
 		void					_SetSystemPalette();
 
 		int						fCardFD;
@@ -156,6 +157,7 @@ private:
 		AccelerantBuffer*		fFrontBuffer;
 
 		display_mode			fDisplayMode;
+		bool					fInitialModeSwitch;
 
 mutable	fill_rect_params*		fRectParams;
 mutable	uint32					fRectParamsCount;

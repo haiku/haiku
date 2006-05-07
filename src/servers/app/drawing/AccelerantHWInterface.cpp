@@ -103,6 +103,8 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fBackBuffer(NULL),
 		fFrontBuffer(new (nothrow) AccelerantBuffer()),
 
+		fInitialModeSwitch(true),
+
 		fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
 		fRectParamsCount(kDefaultParamsCount),
 		fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
@@ -359,9 +361,65 @@ AccelerantHWInterface::Shutdown()
 	return B_OK;
 }
 
-// SetMode
+
+/*!
+	This method is used for the initial mode set only - because that one
+	should really not fail.
+	Basically we try to set all modes as found in the mode list the driver
+	returned, but we start with the one that best fits the originally
+	desired mode.
+*/
 status_t
-AccelerantHWInterface::SetMode(const display_mode &mode)
+AccelerantHWInterface::_SetFallbackMode(display_mode& newMode) const
+{
+	if (fModeList == NULL)
+		return B_ERROR;
+
+	// At first, we search the closest display mode from the list of
+	// supported modes - if that fails, we just take one
+
+	int32 bestDiff = 0;
+	int32 bestIndex = -1;
+	for (int32 i = 0; i < fModeCount; i++) {
+		display_mode& mode = fModeList[i];
+
+		// compute some random equality score
+		int32 diff = abs(mode.virtual_width - newMode.virtual_width)
+			+ abs(mode.virtual_height - newMode.virtual_height)
+			+ 10 * abs(mode.space - newMode.space);
+
+		if (bestIndex == -1 || diff < bestDiff) {
+			bestDiff = diff;
+			bestIndex = i;
+		}
+	}
+
+	if (bestIndex < 0)
+		return B_ERROR;
+
+	newMode = fModeList[bestIndex];
+	status_t status = fAccSetDisplayMode(&newMode);
+	if (status == B_OK)
+		return B_OK;
+
+	// That failed as well, this looks like a bug in the graphics
+	// driver, but we have to try to be as forgiving as possible
+	// here - just take the first mode that fits!
+
+	for (int32 i = 0; i < fModeCount; i++) {
+		newMode = fModeList[i];
+		status = fAccSetDisplayMode(&newMode);
+		if (status == B_OK)
+			return B_OK;
+	}
+
+	// Well, we tried.
+	return B_ERROR;
+}
+
+
+status_t
+AccelerantHWInterface::SetMode(const display_mode& mode)
 {
 	AutoWriteLocker _(this);
 	// TODO: There are places this function can fail,
@@ -386,21 +444,41 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 
 	display_mode newMode = mode;
 
-	if (fAccSetDisplayMode(&newMode) != B_OK) {
+	status_t status = fAccSetDisplayMode(&newMode);
+	if (status != B_OK) {
 		ATRACE(("setting display mode failed\n"));
-		// We just keep the current mode and continue.
-		// Note, on startup, this may be different from
-		// what we think is the current display mode
-		if (fAccGetDisplayMode(&newMode) != B_OK)
-			return B_ERROR;
+		if (!fInitialModeSwitch)
+			return status;
+
+		// If this is the initial mode switch, we try a number of fallback
+		// modes first, before we have to fail
+
+		status = _SetFallbackMode(newMode);
+		if (status != B_OK) {
+			// The driver doesn't allow us the mode switch - this usually
+			// means we have a driver that doesn't allow mode switches at
+			// all.
+			// All we can do now is to ask the driver which mode we can
+			// use - this is always necessary for VESA mode, for example.
+			if (fAccGetDisplayMode(&newMode) != B_OK)
+				return B_ERROR;
+
+			// TODO: if the mode switch before fails as well, we must forbid
+			//	any uses of this class!
+			status = B_OK;
+		}
 	}
 
 	fDisplayMode = newMode;
+	fInitialModeSwitch = false;
 
 	// update frontbuffer
 	fFrontBuffer->SetDisplayMode(fDisplayMode);
-	if (_UpdateFrameBufferConfig() != B_OK)
+	if (_UpdateFrameBufferConfig() != B_OK) {
+		// TODO: if this fails, we're basically toasted - we need to handle this
+		//	differently to crashing later on!
 		return B_ERROR;
+	}
 
 	// Update the frame buffer used by the on-screen KDL
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
@@ -435,11 +513,11 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 			fBackBuffer = new(nothrow) MallocBuffer(fDisplayMode.virtual_width,
 													fDisplayMode.virtual_height);
 
-			status_t ret = fBackBuffer ? fBackBuffer->InitCheck() : B_NO_MEMORY;
-			if (ret < B_OK) {
+			status = fBackBuffer ? fBackBuffer->InitCheck() : B_NO_MEMORY;
+			if (status < B_OK) {
 				delete fBackBuffer;
 				fBackBuffer = NULL;
-				return ret;
+				return status;
 			}
 			// clear out backbuffer, alpha is 255 this way
 			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
@@ -456,7 +534,7 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT,
 		(void *)&fDisplayMode);
 
-	return B_OK;
+	return status;
 }
 
 
