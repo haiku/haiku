@@ -147,7 +147,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes);
 			hasSupportedTypes = true;
 		} else if (err == B_ENTRY_NOT_FOUND)
-			err = appFileInfoWrite.SetSignature(NULL);
+			err = appFileInfoWrite.SetSupportedTypes(NULL);
 		if (err != B_OK)
 			return err;
 
