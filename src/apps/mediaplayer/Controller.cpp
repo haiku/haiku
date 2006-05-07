@@ -91,6 +91,9 @@ Controller::SetTo(const entry_ref &ref)
 {
 	acquire_sem(fAudioPlaySem);
 	acquire_sem(fVideoPlaySem);
+	
+	StopAudioPlayback();
+	StopVideoPlayback();
 
 	fAudioTrackList->MakeEmpty();
 	fVideoTrackList->MakeEmpty();
