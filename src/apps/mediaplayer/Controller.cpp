@@ -20,11 +20,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <Debug.h>
+#include <Entry.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
 #include "Controller.h"
 #include "VideoView.h"
+#include "SoundOutput.h"
 
 
 #define AUDIO_PRIORITY 10
@@ -43,6 +45,7 @@ HandleError(const char *text, status_t err)
 
 Controller::Controller()
  :	fVideoView(NULL)
+ ,	fName()
  ,	fPaused(false)
  ,	fStopped(true)
  ,	fMediaFile(0)
@@ -100,6 +103,7 @@ Controller::SetTo(const entry_ref &ref)
 	fPosition = 0;
 	fPaused = false;
 	fStopped = true;
+	fName = ref.name;
 	
 	status_t err;
 	
@@ -181,11 +185,14 @@ Controller::AudioTrackCount()
 status_t
 Controller::SelectAudioTrack(int n)
 {
+	StopAudioPlayback();
+	
 	BMediaTrack *t = (BMediaTrack *)fAudioTrackList->ItemAt(n);
 	if (!t)
 		return B_ERROR;
 	fAudioTrack = t;
 	
+	StartAudioPlayback();
 	return B_OK;
 }
 
@@ -193,11 +200,14 @@ Controller::SelectAudioTrack(int n)
 status_t
 Controller::SelectVideoTrack(int n)
 {
+	StopVideoPlayback();
+
 	BMediaTrack *t = (BMediaTrack *)fVideoTrackList->ItemAt(n);
 	if (!t)
 		return B_ERROR;
 	fVideoTrack = t;
 
+	StartVideoPlayback();
 	return B_OK;
 }
 
@@ -332,6 +342,24 @@ Controller::video_play_thread(void *self)
 void
 Controller::AudioPlayThread()
 {
+	// this is a test...
+	media_format fmt;
+	fmt.type = B_MEDIA_RAW_AUDIO;
+	fmt.u.raw_audio = media_multi_audio_format::wildcard;
+	fmt.u.raw_audio.format = media_multi_audio_format::B_AUDIO_FLOAT;
+
+	fAudioTrack->DecodedFormat(&fmt);
+	
+	SoundOutput out(fName.String(), fmt.u.raw_audio);
+	
+	int frame_size = (fmt.u.raw_audio.format & 0xf) * fmt.u.raw_audio.channel_count;
+	uint8 buffer[fmt.u.raw_audio.buffer_size];
+	int64 frames;
+	media_header mh;
+	
+	while (!fStopAudioPlayback && B_OK == fAudioTrack->ReadFrames(buffer, &frames, &mh)) {
+		out.Play(buffer, frames * frame_size);
+	}
 }
 
 

@@ -22,6 +22,7 @@
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <String.h>
 
 class BBitmap;
 class BMediaFile;
@@ -77,7 +78,7 @@ private:
 
 private:
 	VideoView *				fVideoView;
-
+	BString					fName;
 	bool					fPaused;
 	bool					fStopped;
 	BMediaFile *			fMediaFile;
