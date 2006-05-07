@@ -24,6 +24,8 @@
 #include <MediaNode.h>
 
 class BBitmap;
+class BMediaFile;
+class BMediaTrack;
 class VideoView;
 
 class Controller
