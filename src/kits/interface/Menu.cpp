@@ -284,8 +284,10 @@ BMenu::AttachedToWindow()
 		} while (AddDynamicItem(B_PROCESSING));
 	}
 
-	if (!fAttachAborted)
-		InvalidateLayout();
+	if (!fAttachAborted) {
+		CacheFontInfo();
+		LayoutItems(0);	
+	}
 }
 
 
@@ -742,6 +744,14 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 void
 BMenu::Draw(BRect updateRect)
 {
+	if (!fUseCachedMenuLayout) {
+		fUseCachedMenuLayout = true;
+		CacheFontInfo();
+		LayoutItems(0);
+		Invalidate();
+		return;
+	}
+
 	DrawBackground(updateRect);
 	DrawItems(updateRect);
 }
@@ -778,9 +788,7 @@ BMenu::FrameResized(float new_width, float new_height)
 void
 BMenu::InvalidateLayout()
 {
-	CacheFontInfo();
-	LayoutItems(0);
-	Invalidate();
+	fUseCachedMenuLayout = false;
 }
 
 
