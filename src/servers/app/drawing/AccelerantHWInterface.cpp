@@ -383,12 +383,19 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 
 	// just try to set the mode - we let the graphics driver
 	// approve or deny the request, as it should know best
-	display_mode new_mode = mode;
-	if (fAccSetDisplayMode(&new_mode) != B_OK) {
+
+	display_mode newMode = mode;
+
+	if (fAccSetDisplayMode(&newMode) != B_OK) {
 		ATRACE(("setting display mode failed\n"));
-		return B_ERROR;
+		// We just keep the current mode and continue.
+		// Note, on startup, this may be different from
+		// what we think is the current display mode
+		if (fAccGetDisplayMode(&newMode) != B_OK)
+			return B_ERROR;
 	}
-	fDisplayMode = new_mode;
+
+	fDisplayMode = newMode;
 
 	// update frontbuffer
 	fFrontBuffer->SetDisplayMode(fDisplayMode);
