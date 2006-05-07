@@ -67,6 +67,11 @@ private:
 
 	void					AudioPlayThread();
 	void					VideoPlayThread();
+	
+	void					StartAudioPlayback();
+	void					StartVideoPlayback();
+	void					StopAudioPlayback();
+	void					StopVideoPlayback();
 
 private:
 	VideoView *				fVideoView;
@@ -85,6 +90,8 @@ private:
 	sem_id					fVideoPlaySem;
 	thread_id				fAudioPlayThread;
 	thread_id				fVideoPlayThread;
+	volatile bool			fStopAudioPlayback;
+	volatile bool			fStopVideoPlayback;
 };
 
 

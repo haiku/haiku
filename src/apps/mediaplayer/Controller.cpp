@@ -26,6 +26,10 @@
 #include "Controller.h"
 #include "VideoView.h"
 
+
+#define AUDIO_PRIORITY 10
+#define VIDEO_PRIORITY 10
+
 void 
 HandleError(const char *text, status_t err)
 {
@@ -49,12 +53,19 @@ Controller::Controller()
  ,	fPosition(0)
  ,	fAudioPlaySem(create_sem(1, "audio playing"))
  ,	fVideoPlaySem(create_sem(1, "video playing"))
+ ,	fAudioPlayThread(-1)
+ ,	fVideoPlayThread(-1)
+ ,	fStopAudioPlayback(false)
+ ,	fStopVideoPlayback(false)
 {
 }
 
 
 Controller::~Controller()
 {
+	StopAudioPlayback();
+	StopVideoPlayback();
+	
 	if (fMediaFile)
 		fMediaFile->ReleaseAllTracks();
 	delete fMediaFile;
@@ -327,4 +338,50 @@ Controller::AudioPlayThread()
 void
 Controller::VideoPlayThread()
 {
+}
+
+
+void
+Controller::StartAudioPlayback()
+{
+	if (fAudioPlayThread > 0)
+		return;
+	fStopAudioPlayback = false;
+	fAudioPlayThread = spawn_thread(audio_play_thread, "audio playback", AUDIO_PRIORITY, this);
+	resume_thread(fAudioPlayThread);
+}
+
+
+void
+Controller::StartVideoPlayback()
+{
+	if (fVideoPlayThread > 0)
+		return;
+	fStopVideoPlayback = false;
+	fVideoPlayThread = spawn_thread(video_play_thread, "video playback", VIDEO_PRIORITY, this);
+	resume_thread(fVideoPlayThread);
+}
+
+
+void
+Controller::StopAudioPlayback()
+{
+	if (fAudioPlayThread < 0)
+		return;
+	fStopAudioPlayback = true;
+	status_t dummy;
+	wait_for_thread(fAudioPlayThread, &dummy);
+	fAudioPlayThread = -1;
+}
+
+
+void
+Controller::StopVideoPlayback()
+{
+	if (fVideoPlayThread < 0)
+		return;
+	fStopVideoPlayback = true;
+	status_t dummy;
+	wait_for_thread(fVideoPlayThread, &dummy);
+	fVideoPlayThread = -1;
 }
