@@ -136,6 +136,7 @@ void
 ControllerView::SetVolume(float value)
 {
 	printf("ControllerView::SetVolume(%.2f)\n", value);
+	// 0.0 ... 1.0
 }
 
 
@@ -143,5 +144,13 @@ void
 ControllerView::ToggleMute()
 {
 	printf("ControllerView::ToggleMute()\n");
+}
+
+
+void
+ControllerView::SetPosition(float value)
+{
+	printf("ControllerView::SetPosition(%.2f)\n", value);
+	// 0.0 ... 1.0
 }
 

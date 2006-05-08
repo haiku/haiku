@@ -19,9 +19,11 @@
 
 #include "ButtonBitmaps.h"
 #include "TransportButton.h"
+#include "SeekSlider.h"
 #include "VolumeSlider.h"
 
 enum {
+	MSG_SEEK				= 'seek',
 	MSG_PLAY				= 'play',
 	MSG_STOP				= 'stop',
 	MSG_REWIND				= 'rwnd',
@@ -38,6 +40,9 @@ enum {
 #define VOLUME_MIN_WIDTH 70.0
 #define VOLUME_SLIDER_LAYOUT_WEIGHT 2.0
 
+#define kMaxVolume 1024
+#define kMaxSeekPos 65535
+
 // constructor
 TransportControlGroup::TransportControlGroup(BRect frame)
 	: BView(frame, "transport control group",
@@ -48,7 +53,14 @@ TransportControlGroup::TransportControlGroup(BRect frame)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BRect frame(0.0, 0.0, 10.0, 10.0);
-	
+
+    // Seek Slider
+	fSeekSlider = new SeekSlider(frame, "seek slider",
+								 new BMessage(MSG_SEEK),
+								 0, kMaxSeekPos);
+	fSeekSlider->ResizeToPreferred();
+	AddChild(fSeekSlider);
+
     // Buttons
     // Skip Back
     frame.right = kRewindBitmapWidth - 1;
@@ -130,7 +142,7 @@ TransportControlGroup::TransportControlGroup(BRect frame)
     // Volume Slider
 	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
 										   kVolumeSliderBitmapHeight - 1.0),
-									 "volume slider", 0, 255,
+									 "volume slider", 0, kMaxVolume,
 									 new BMessage(MSG_SET_VOLUME));
 	fVolumeSlider->SetValue(128);
 	AddChild(fVolumeSlider);
@@ -148,6 +160,7 @@ TransportControlGroup::AttachedToWindow()
 	SetEnabled(EnabledButtons());
 
 	// we are now a valid BHandler
+	fSeekSlider->SetTarget(this);
 	fVolumeSlider->SetTarget(this);
 	fSkipBack->SetTarget(this);
 	fSkipForward->SetTarget(this);
@@ -215,27 +228,38 @@ TransportControlGroup::MessageReceived(BMessage* message)
 			_ToggleMute();
 			break;
 
+		case MSG_SEEK:
+			_UpdatePosition();
+			break;
+
 		default:
 		    BView::MessageReceived(message);
 		    break;
 	}
 }
 
+// #pragma mark -
+
 // default implementation for the virtuals
-uint32 TransportControlGroup::EnabledButtons()		{ return 0; }
-void TransportControlGroup::TogglePlaying()			{}
-void TransportControlGroup::Stop()					{}
-void TransportControlGroup::Rewind()				{}
-void TransportControlGroup::Forward()				{}
-void TransportControlGroup::SkipBackward()			{}
-void TransportControlGroup::SkipForward()			{}
-void TransportControlGroup::SetVolume(float value)	{}
-void TransportControlGroup::ToggleMute()			{}
+uint32 TransportControlGroup::EnabledButtons()			{ return 0; }
+void TransportControlGroup::TogglePlaying()				{}
+void TransportControlGroup::Stop()						{}
+void TransportControlGroup::Rewind()					{}
+void TransportControlGroup::Forward()					{}
+void TransportControlGroup::SkipBackward()				{}
+void TransportControlGroup::SkipForward()				{}
+void TransportControlGroup::SetVolume(float value)		{}
+void TransportControlGroup::ToggleMute()				{}
+void TransportControlGroup::SetPosition(float value)	{}
+
+// #pragma mark -
 
 // SetEnabled
 void
 TransportControlGroup::SetEnabled(uint32 buttons)
 {
+	fSeekSlider->SetEnabled(buttons & SEEK_ENABLED);
+
 	fVolumeSlider->SetEnabled(buttons & VOLUME_ENABLED);
 	fMute->SetEnabled(buttons & VOLUME_ENABLED);
 
@@ -316,13 +340,17 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	minWidth += fMute->Bounds().Width();
 	minWidth += VOLUME_MIN_WIDTH;
 
+	// layout seek slider
+	r.bottom = r.top + fSeekSlider->Bounds().Height();
+	_LayoutControl(fSeekSlider, r, true);
+
 	float currentWidth = frame.Width();
 	float space = (currentWidth - minWidth) / 6.0;
 	// apply weighting
 	space = MIN_SPACE + (space - MIN_SPACE) / VOLUME_SLIDER_LAYOUT_WEIGHT;
 	// layout controls with "space" inbetween
 	r.left = frame.left;
-	r.top = r.top + MIN_SPACE;
+	r.top = r.bottom + MIN_SPACE + 1.0;
 	r.bottom = frame.bottom;
 	// skip back
 	r.right = r.left + fSkipBack->Bounds().Width();
@@ -375,6 +403,7 @@ TransportControlGroup::_MinFrame() const
 
 	// add up height of seek slider and heighest control on bottom
 	float minHeight = 2 * BORDER_INSET;
+	minHeight += fSeekSlider->Bounds().Height() + MIN_SPACE + MIN_SPACE / 2.0;
 	minHeight += fBottomControlHeight;
 	return BRect(0.0, 0.0, minWidth - 1.0, minHeight - 1.0);
 }
@@ -453,6 +482,13 @@ TransportControlGroup::_ToggleMute()
 {
 	fVolumeSlider->SetMuted(!fVolumeSlider->IsMuted());
 	ToggleMute();
+}
+
+// _UpdatePosition
+void
+TransportControlGroup::_UpdatePosition()
+{
+	SetPosition((float)(fSeekSlider->Value() / (float)kMaxSeekPos));
 }
 
 

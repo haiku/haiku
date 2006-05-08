@@ -14,6 +14,7 @@ Application MediaPlayer :
 	SoundOutput.cpp
 	TransportButton.cpp
 	TransportControlGroup.cpp
+	SeekSlider.cpp
 	VideoNode.cpp
 	VideoView.cpp
 	VolumeSlider.cpp

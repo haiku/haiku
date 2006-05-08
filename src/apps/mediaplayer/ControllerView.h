@@ -49,6 +49,7 @@ private:
 	virtual	void	SkipForward();
 	virtual	void	SetVolume(float value);
 	virtual	void	ToggleMute();
+	virtual	void	SetPosition(float value);
 	
 private:
 	Controller *	fController;

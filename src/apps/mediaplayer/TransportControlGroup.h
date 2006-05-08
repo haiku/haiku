@@ -17,6 +17,7 @@
 
 class PlayPauseButton;
 class TransportButton;
+class SeekSlider;
 class VolumeSlider;
 
 enum {
@@ -32,6 +33,7 @@ enum {
 	SEEK_FORWARD_ENABLED	= 1 << 3,
 	SKIP_FORWARD_ENABLED	= 1 << 4,
 	VOLUME_ENABLED			= 1 << 5,
+	SEEK_ENABLED			= 1 << 6,
 };
 
 class TransportControlGroup : public BView {
@@ -55,6 +57,7 @@ class TransportControlGroup : public BView {
 	virtual	void				SkipForward();
 	virtual	void				SetVolume(float value);
 	virtual	void				ToggleMute();
+	virtual	void				SetPosition(float value);
 
 			void				SetEnabled(uint32 whichButtons);
 
@@ -82,7 +85,9 @@ class TransportControlGroup : public BView {
 			void				_SkipForward();
 			void				_SetVolume();
 			void				_ToggleMute();
+			void				_UpdatePosition();
 
+			SeekSlider*			fSeekSlider;
 
 			VolumeSlider*		fVolumeSlider;
 
