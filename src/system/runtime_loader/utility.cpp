@@ -9,17 +9,26 @@
 
 #include "runtime_loader_private.h"
 
+#include <syscalls.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <syscalls.h>
+#include <unistd.h>
 
 
-char *
+char *(*gGetEnv)(const char *name) = NULL;
+
+
+extern "C" char *
 getenv(const char *name)
 {
-	// ToDo: this should use the real environ pointer once available!
-	//	(or else, any updates to the search paths while the app is running are ignored)
+	if (gGetEnv != NULL) {
+		// Use libroot's getenv() as soon as it is available to us - the environment
+		// in gProgramArgs is static.
+		return gGetEnv(name);
+	}
+
 	char **environ = gProgramArgs->envp;
 	int32 length = strlen(name);
 	int32 i;
@@ -33,18 +42,17 @@ getenv(const char *name)
 }
 
 
-int
-printf(const char *fmt, ...)
+extern "C" int
+printf(const char *format, ...)
 {
+	char buffer[1024];
 	va_list args;
-	char buf[1024];
-	int i;
 
-	va_start(args, fmt);
-	i = vsprintf(buf, fmt, args);
+	va_start(args, format);
+	int length = vsprintf(buffer, format, args);
 	va_end(args);
 
-	_kern_write(2, 0, buf, strlen(buf));
+	_kern_write(STDERR_FILENO, 0, buffer, length);
 
-	return i;
+	return length;
 }

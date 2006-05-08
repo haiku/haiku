@@ -60,7 +60,7 @@ Objects
 	elf.c
 	export.c
 	heap.c
-	utility.c
+	utility.cpp
 	arch_relocate.c
 	arch_call_init_term.c
 ;

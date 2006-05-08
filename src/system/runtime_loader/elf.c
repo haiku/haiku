@@ -1199,6 +1199,14 @@ load_program(char const *path, void **_entry)
 	remap_images();
 		// ToDo: once setup_system_time() is fixed, move this one line higher!
 
+	// Since the images are initialized now, we no longer should use our
+	// getenv(), but use the one from libroot.so
+	{
+		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(&image, "getenv");
+		if (symbol != NULL)
+			gGetEnv = (void *)(symbol->st_value + image->regions[0].delta);
+	}
+
 	if (sProgramImage->entry_point == NULL) {
 		status = B_NOT_AN_EXECUTABLE;
 		goto err;

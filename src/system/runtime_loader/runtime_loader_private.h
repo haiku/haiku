@@ -13,6 +13,15 @@
 #include <runtime_loader.h>
 
 
+extern struct uspace_program_args *gProgramArgs;
+extern struct rld_export gRuntimeLoader;
+extern char *(*gGetEnv)(const char *name);
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int runtime_loader(void *arg);
 int open_executable(char *name, image_type type, const char *rpath);
 status_t test_executable(const char *path, uid_t user, gid_t group, char *starter);
@@ -42,7 +51,8 @@ status_t arch_relocate_image(image_t *image);
 void arch_call_init(image_t *image);
 void arch_call_term(image_t *image);
 
-extern struct uspace_program_args *gProgramArgs;
-extern struct rld_export gRuntimeLoader;
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* RUNTIME_LOADER_H */
