@@ -9,6 +9,7 @@
 
 #include <SupportDefs.h>
 #include <translation/TranslationErrors.h>
+#include <media/MediaDefs.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -23,9 +24,7 @@ static const struct error_base {
 	{B_APP_ERROR_BASE, "Application Kit "},
 	{B_INTERFACE_ERROR_BASE, "Interface Kit "},
 	{B_MEDIA_ERROR_BASE, "Media Kit "},
-	{B_MEDIA_ERROR_BASE + 0x200, ""},
 	{B_TRANSLATION_ERROR_BASE, "Translation Kit "},
-	{B_MEDIA_ERROR_BASE + 0x100, ""},
 	{B_MIDI_ERROR_BASE, "Midi Kit "},
 	{B_STORAGE_ERROR_BASE, "Storage Kit "},
 	{B_POSIX_ERROR_BASE, "POSIX "},
@@ -238,6 +237,68 @@ error_description(int error)
 			return "Buffer not available";
 		case B_LAST_BUFFER_ERROR:
 			return "Last buffer";
+		case B_MEDIA_SYSTEM_FAILURE:
+			return "Systen failure";
+		case B_MEDIA_BAD_NODE:
+			return "Bad media node";
+		case B_MEDIA_NODE_BUSY:
+			return "Media node busy";
+		case B_MEDIA_BAD_FORMAT:
+			return "Bad media format";
+		case B_MEDIA_BAD_BUFFER:
+			return "Bad buffer";
+		case B_MEDIA_TOO_MANY_NODES:
+			return "Too many nodes";
+		case B_MEDIA_TOO_MANY_BUFFERS:
+			return "Too many buffers";
+		case B_MEDIA_NODE_ALREADY_EXISTS:
+			return "Media node already exists";
+		case B_MEDIA_BUFFER_ALREADY_EXISTS:
+			return "Buffer already exists";
+		case B_MEDIA_CANNOT_SEEK:
+			return "Cannot seek";
+		case B_MEDIA_CANNOT_CHANGE_RUN_MODE:
+			return "CAnnot change run mode";
+		case B_MEDIA_APP_ALREADY_REGISTERED:
+			return "Application already registered";
+		case B_MEDIA_APP_NOT_REGISTERED:
+			return "Application not registered";
+		case B_MEDIA_CANNOT_RECLAIM_BUFFERS:
+			return "Cannot reclaim buffers";
+		case B_MEDIA_BUFFERS_NOT_RECLAIMED:
+			return "Buffers not reclaimed";
+		case B_MEDIA_TIME_SOURCE_STOPPED:
+			return "Time source stopped";
+		case B_MEDIA_TIME_SOURCE_BUSY:
+			return "Time source busy";
+		case B_MEDIA_BAD_SOURCE:
+			return "Bad source";
+		case B_MEDIA_BAD_DESTINATION:
+			return "Bad destination";
+		case B_MEDIA_ALREADY_CONNECTED:
+			return "Already connected";
+		case B_MEDIA_NOT_CONNECTED:
+			return "Not connected";
+		case B_MEDIA_BAD_CLIP_FORMAT:
+			return "Bad clipping format";
+		case B_MEDIA_ADDON_FAILED:
+			return "Media addon failed";
+		case B_MEDIA_ADDON_DISABLED:
+			return "Media addon disabled";
+		case B_MEDIA_CHANGE_IN_PROGRESS:
+			return "Change in progress";
+		case B_MEDIA_STALE_CHANGE_COUNT:
+			return "Stale change count";
+		case B_MEDIA_ADDON_RESTRICTED:
+			return "Media addon restricted";
+		case B_MEDIA_NO_HANDLER:
+			return "No handler";
+		case B_MEDIA_DUPLICATE_FORMAT:
+			return "Duplicate format";
+		case B_MEDIA_REALTIME_DISABLED:
+			return "Realtime disabled";
+		case B_MEDIA_REALTIME_UNAVAILABLE:
+			return "Realtime unavailable";
 
 		// Mail Kit Errors
 
