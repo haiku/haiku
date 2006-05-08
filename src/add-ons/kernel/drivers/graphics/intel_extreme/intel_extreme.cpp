@@ -76,7 +76,7 @@ init_overlay_registers(overlay_registers *registers)
 {
 	memset(registers, 0, B_PAGE_SIZE);
 
-	registers->contrast_correction = 0x20;
+	registers->contrast_correction = 0x40;
 	registers->saturation_cos_correction = 0x40;
 		// this by-passes contrast and saturation correction
 }
