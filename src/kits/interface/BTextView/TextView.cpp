@@ -309,8 +309,7 @@ BTextView::Instantiate(BMessage *archive)
 	CALLED();
 	if (validate_instantiation(archive, "BTextView"))
 		return new BTextView(archive);
-	else
-		return NULL;
+	return NULL;
 }
 
 
@@ -324,36 +323,50 @@ BTextView::Archive(BMessage *data, bool deep) const
 {
 	CALLED();
 	status_t err = BView::Archive(data, deep);
-		
-	data->AddString("_text", Text());
-	data->AddInt32("_align", fAlignment);
-	data->AddFloat("_tab", fTabWidth);
-	data->AddInt32("_col_sp", fColorSpace);
-	data->AddRect("_trect", fTextRect);
-	data->AddInt32("_max", fMaxBytes);
-	data->AddInt32("_sel", fSelStart);
-	data->AddInt32("_sel", fSelEnd);	
-	data->AddBool("_stylable", fStylable);
-	data->AddBool("_auto_in", fAutoindent);
-	data->AddBool("_wrap", fWrap);
-	data->AddBool("_nsel", !fSelectable);
-	data->AddBool("_nedit", !fEditable);
+	if (err == B_OK)
+		err = data->AddString("_text", Text());
+	if (err == B_OK)
+		err = data->AddInt32("_align", fAlignment);
+	if (err == B_OK)
+		err = data->AddFloat("_tab", fTabWidth);
+	if (err == B_OK)
+		err = data->AddInt32("_col_sp", fColorSpace);
+	if (err == B_OK)
+		err = data->AddRect("_trect", fTextRect);
+	if (err == B_OK)
+		err = data->AddInt32("_max", fMaxBytes);
+	if (err == B_OK)
+		err = data->AddInt32("_sel", fSelStart);
+	if (err == B_OK)
+		err = data->AddInt32("_sel", fSelEnd);	
+	if (err == B_OK)
+		err = data->AddBool("_stylable", fStylable);
+	if (err == B_OK)
+		err = data->AddBool("_auto_in", fAutoindent);
+	if (err == B_OK)
+		err = data->AddBool("_wrap", fWrap);
+	if (err == B_OK)
+		err = data->AddBool("_nsel", !fSelectable);
+	if (err == B_OK)
+		err = data->AddBool("_nedit", !fEditable);
 	
-	if (fDisallowedChars != NULL)
-		data->AddData("_dis_ch", B_RAW_TYPE, fDisallowedChars->Items(),
+	if (err == B_OK && fDisallowedChars != NULL)
+		err = data->AddData("_dis_ch", B_RAW_TYPE, fDisallowedChars->Items(),
 			fDisallowedChars->CountItems() * sizeof(int32));
 
-	int32 runSize = 0;
-	text_run_array *runArray = RunArray(0, TextLength());
+	if (err == B_OK) {
+		int32 runSize = 0;
+		text_run_array *runArray = RunArray(0, TextLength());
+		
+		void *flattened = FlattenRunArray(runArray, &runSize);	
+		if (flattened != NULL) {
+			data->AddData("_runs", B_RAW_TYPE, flattened, runSize);	
+			free(flattened);
+		} else
+			err = B_NO_MEMORY;
 	
-	void *flattened = FlattenRunArray(runArray, &runSize);	
-	if (flattened != NULL) {
-		data->AddData("_runs", B_RAW_TYPE, flattened, runSize);	
-		free(flattened);
-	} else
-		err = B_NO_MEMORY;
-
-	FreeRunArray(runArray);
+		FreeRunArray(runArray);
+	}
 	
 	return err;
 }
@@ -385,10 +398,7 @@ BTextView::AttachedToWindow()
 	
 	UpdateScrollbars();
 	
-	if (!fCursor)
-		SetViewCursor(B_CURSOR_I_BEAM);
-	else
-		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
+	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
 
 
@@ -606,7 +616,6 @@ BTextView::MouseDown(BPoint where)
 void
 BTextView::MouseUp(BPoint where)
 {
-	CALLED();
 	PerformMouseUp(where);
 }
 
@@ -786,9 +795,7 @@ BTextView::Pulse()
 void
 BTextView::FrameResized(float width, float height)
 {
-	CALLED();
 	BView::FrameResized(width, height);
-
 	UpdateScrollbars();
 }
 
@@ -801,7 +808,6 @@ BTextView::FrameResized(float width, float height)
 void
 BTextView::MakeFocus(bool focusState)
 {
-	CALLED();
 	BView::MakeFocus(focusState);
 	
 	if (focusState && Window() && Window()->IsActive()) {
@@ -821,7 +827,7 @@ void
 BTextView::MessageReceived(BMessage *message)
 {
 	// TODO: block input if not editable (Andrew)
-	CALLED();
+	
 	// was this message dropped?
 	if (message->WasDropped()) {	
 		BPoint dropOffset;	
@@ -980,13 +986,10 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 status_t
 BTextView::GetSupportedSuites(BMessage *data)
 {
-	CALLED();
-	status_t err;
-
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	err = data->AddString("suites", "suite/vnd.Be-text-view");
+	status_t err = data->AddString("suites", "suite/vnd.Be-text-view");
 
 	if (err < B_OK)
 		return err;
@@ -1097,7 +1100,6 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 void
 BTextView::Insert(const char *inText, const text_run_array *inRuns)
 {
-	CALLED();
 	Insert(fSelStart, inText, strlen(inText), inRuns);
 }
 
@@ -1106,7 +1108,6 @@ void
 BTextView::Insert(const char *inText, int32 inLength,
 					   const text_run_array *inRuns)
 {
-	CALLED();
 	Insert(fSelStart, inText, inLength, inRuns);
 }
 
@@ -1144,7 +1145,6 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 void
 BTextView::Delete()
 {
-	CALLED();
 	Delete(fSelStart, fSelEnd);
 }
 
@@ -1275,7 +1275,6 @@ BTextView::GoToLine(int32 index)
 void
 BTextView::Cut(BClipboard *clipboard)
 {
-	CALLED();
 	CancelInputMethod();
 	if (fUndo) {
 		delete fUndo;
@@ -1292,8 +1291,6 @@ BTextView::Cut(BClipboard *clipboard)
 void
 BTextView::Copy(BClipboard *clipboard)
 {
-	CALLED();
-	
 	CancelInputMethod();
 
 	if (clipboard->Lock()) {
@@ -1364,8 +1361,6 @@ BTextView::Paste(BClipboard *clipboard)
 void
 BTextView::Clear()
 {
-	CALLED();
-	
 	// We always check for fUndo != NULL (not only here),
 	// because when fUndo is NULL, undo is deactivated.
 	if (fUndo) {
@@ -1380,7 +1375,6 @@ BTextView::Clear()
 bool
 BTextView::AcceptsPaste(BClipboard *clipboard)
 {
-	CALLED();		
 	bool result = false;
 	
 	if (fEditable && clipboard && clipboard->Lock()) {
@@ -1396,7 +1390,6 @@ BTextView::AcceptsPaste(BClipboard *clipboard)
 bool
 BTextView::AcceptsDrop(const BMessage *inMessage)
 {
-	CALLED();
 	if (fEditable && inMessage && inMessage->HasData("text/plain", B_MIME_TYPE))
 		return true;
 			
@@ -1482,7 +1475,6 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 void
 BTextView::SelectAll()
 {
-	CALLED();
 	Select(0, fText->Length());
 }
 
@@ -1494,7 +1486,6 @@ BTextView::SelectAll()
 void
 BTextView::GetSelection(int32 *outStart, int32 *outEnd) const
 {
-	CALLED();
 	int32 start = 0, end = 0;
 	
 	if (fSelectable) {
@@ -1552,7 +1543,6 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset, const BFont* font
 void
 BTextView::GetFontAndColor(int32 inOffset, BFont *outFont, rgb_color *outColor) const
 {
-	CALLED();
 	fStyles->GetStyle(inOffset, outFont, outColor);
 }
 
@@ -1560,7 +1550,6 @@ BTextView::GetFontAndColor(int32 inOffset, BFont *outFont, rgb_color *outColor) 
 void
 BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode, rgb_color *outColor, bool *outEqColor) const
 {
-	CALLED();	
 	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor, fSelStart, fSelEnd);
 }
 
@@ -2192,7 +2181,6 @@ BTextView::IsEditable() const
 void
 BTextView::SetWordWrap(bool wrap)
 {
-	CALLED();
 	if (wrap == fWrap)
 		return;
 		
@@ -2266,7 +2254,6 @@ BTextView::MaxBytes() const
 void
 BTextView::DisallowChar(uint32 aChar)
 {
-	CALLED();
 	if (fDisallowedChars == NULL)
 		fDisallowedChars = new BList;
 	if (!fDisallowedChars->HasItem(reinterpret_cast<void *>(aChar)))
@@ -2280,7 +2267,6 @@ BTextView::DisallowChar(uint32 aChar)
 void
 BTextView::AllowChar(uint32 aChar)
 {
-	CALLED();
 	if (fDisallowedChars != NULL)
 		fDisallowedChars->RemoveItem(reinterpret_cast<void *>(aChar));
 }
@@ -2373,7 +2359,6 @@ BTextView::ColorSpace() const
 void
 BTextView::MakeResizable(bool resize, BView *resizeView)
 {
-	CALLED();
 	if (resize) {
 		fResizable = true;
 		fContainerView = resizeView;
@@ -2690,7 +2675,6 @@ BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 void
 BTextView::Undo(BClipboard *clipboard)
 {
-	CALLED();
 	if (fUndo)
 		fUndo->Undo(clipboard);
 }
@@ -3214,7 +3198,6 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 void
 BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 {
-	CALLED();
 	// are we insane?
 	*startLine = (*startLine < 0) ? 0 : *startLine;
 	*endLine = (*endLine > fLines->NumLines() - 1) ? fLines->NumLines() - 1 : *endLine;
@@ -3289,7 +3272,6 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 int32
 BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, float *ioWidth)
 {
-	CALLED();
 	*outAscent = 0.0;
 	*outDescent = 0.0;
 	
@@ -3552,18 +3534,23 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
 
-	BView *view = this;
-	if (fOffscreen && fOffscreen->Lock()) {
-		view = fOffscreen->ChildAt(0);
-	} else {
-		BRegion newClip;
-		newClip.Set(clipRect);
-		ConstrainClippingRegion(&newClip);	
-	}
+	BRegion newClip;
+	newClip.Set(clipRect);
+	ConstrainClippingRegion(&newClip);
 
 	// set the low color to the view color so that 
 	// drawing to a non-white background will work	
-	view->SetLowColor(view->ViewColor());
+	SetLowColor(ViewColor());
+
+	BView *view = NULL;
+	if (fOffscreen == NULL)
+		view = this;
+	else {
+		fOffscreen->Lock();	
+		view = fOffscreen->ChildAt(0);
+		view->SetLowColor(ViewColor());
+		view->FillRect(view->Bounds(), B_SOLID_LOW);
+	}
 
 	long maxLine = fLines->NumLines() - 1;
 	startLine = (startLine < 0) ? 0 : startLine;
@@ -3602,7 +3589,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	if (fInline != NULL && fInline->IsActive())
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
 
-	float startLeft = fTextRect.left;	
+	float startLeft = fTextRect.left;
+	BPoint leftTop(startLeft, line->origin);
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset - line->offset;
 		// DrawString() chokes if you draw a newline
@@ -3712,13 +3700,15 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		}
 	}
 		
-	if (view == this)
-		ConstrainClippingRegion(NULL);
-	else {
+	if (fOffscreen != NULL) {
 		view->Sync();
+		BPoint penLocation = view->PenLocation();
+		BRect drawRect(leftTop.x, leftTop.y, penLocation.x, penLocation.y);
+		DrawBitmap(fOffscreen, drawRect, drawRect);
 		fOffscreen->Unlock();
-		DrawBitmap(fOffscreen, B_ORIGIN);
 	}
+
+	ConstrainClippingRegion(NULL);
 }
 
 
@@ -3785,7 +3775,6 @@ BTextView::DragCaret(int32 offset)
 void
 BTextView::StopMouseTracking()
 {
-	CALLED();
 	delete fTrackingMouse;
 	fTrackingMouse = NULL;
 
@@ -3800,7 +3789,6 @@ BTextView::StopMouseTracking()
 bool
 BTextView::PerformMouseUp(BPoint where)
 {
-	CALLED();
 	if (fClickRunner == NULL)
 		return false;
 	
@@ -3815,7 +3803,6 @@ BTextView::PerformMouseUp(BPoint where)
 bool
 BTextView::PerformMouseMoved(BPoint where, uint32 code)
 {
-	CALLED();
 	if (fClickRunner == NULL)
 		return false;
 
@@ -3885,7 +3872,6 @@ BTextView::TrackDrag(BPoint where)
 void
 BTextView::InitiateDrag()
 {
-	CALLED();
 	BMessage *message = new BMessage(B_MIME_DATA);
 	BBitmap *dragBitmap = NULL;
 	BPoint bitmapPoint;
@@ -3918,7 +3904,6 @@ BTextView::InitiateDrag()
 bool
 BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 {
-	CALLED();
 	ASSERT(inMessage);
 
 	void *from = NULL;
@@ -4088,7 +4073,6 @@ BTextView::DeleteOffscreen()
 void
 BTextView::Activate()
 {
-	CALLED();
 	fActive = true;
 	
 	// Create a new offscreen BBitmap
@@ -4106,7 +4090,7 @@ BTextView::Activate()
 	ulong buttons;
 	GetMouse(&where, &buttons, false);
 	if (Bounds().Contains(where))
-		SetViewCursor(B_CURSOR_I_BEAM);
+		TrackMouse(where, NULL);
 }
 
 
@@ -4115,7 +4099,6 @@ BTextView::Activate()
 void
 BTextView::Deactivate()
 {
-	CALLED();
 	fActive = false;
 	
 	CancelInputMethod();
@@ -4311,9 +4294,9 @@ BTextView::CountProperties(BMessage *specifier, int32 form, const char *property
 		reply->AddInt32("result", TextLength());
 		reply->AddInt32("error", B_OK);
 		return true;
+	}
 
-	} else
-		return false;
+	return false;
 }
 
 
