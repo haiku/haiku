@@ -48,7 +48,7 @@ enum {
 #define kVolumeDbExpNegative 1.9	// for dB values < 0
 
 #define kVolumeFactor	1000
-#define kPositionFactor	65535
+#define kPositionFactor	3000
 
 // constructor
 TransportControlGroup::TransportControlGroup(BRect frame)
@@ -320,6 +320,9 @@ TransportControlGroup::_GainToDb(float gain)
 void
 TransportControlGroup::SetEnabled(uint32 buttons)
 {
+//	if (B_OK != LockLooperWithTimeout(50000))
+	if (!LockLooper())
+		return;
 	fSeekSlider->SetEnabled(buttons & SEEK_ENABLED);
 
 	fVolumeSlider->SetEnabled(buttons & VOLUME_ENABLED);
@@ -332,6 +335,7 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 
 	fPlayPause->SetEnabled(buttons & PLAYBACK_ENABLED);
 	fStop->SetEnabled(buttons & PLAYBACK_ENABLED);
+	UnlockLooper();
 }
 
 // #pragma mark -
@@ -340,6 +344,9 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 void
 TransportControlGroup::SetPlaybackState(uint32 state)
 {
+//	if (B_OK != LockLooperWithTimeout(50000))
+	if (!LockLooper())
+		return;
 	switch (state) {
 		case PLAYBACK_STATE_PLAYING:
 			fPlayPause->SetPlaying();
@@ -351,14 +358,19 @@ TransportControlGroup::SetPlaybackState(uint32 state)
 			fPlayPause->SetStopped();
 			break;
 	}
+	UnlockLooper();
 }
 
 // SetSkippable
 void
 TransportControlGroup::SetSkippable(bool backward, bool forward)
 {
+//	if (B_OK != LockLooperWithTimeout(50000))
+	if (!LockLooper())
+		return;
 	fSkipBack->SetEnabled(backward);
 	fSkipForward->SetEnabled(forward);
+	UnlockLooper();
 }
 
 // #pragma mark -
@@ -367,29 +379,43 @@ TransportControlGroup::SetSkippable(bool backward, bool forward)
 void
 TransportControlGroup::SetAudioEnabled(bool enabled)
 {
+//	if (B_OK != LockLooperWithTimeout(50000))
+	if (!LockLooper())
+		return;
 	fMute->SetEnabled(enabled);
 	fVolumeSlider->SetEnabled(enabled);
+	UnlockLooper();
 }
 
 // SetMuted
 void
 TransportControlGroup::SetMuted(bool mute)
 {
+//	if (B_OK != LockLooperWithTimeout(50000))
+	if (!LockLooper())
+		return;
 	fVolumeSlider->SetMuted(mute);
+	UnlockLooper();
 }
 
 
 void
 TransportControlGroup::SetVolume(float value)
 {
+	if (B_OK != LockLooperWithTimeout(50000))
+		return;
 	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(_GainToDb(value))) * kVolumeFactor);
+	UnlockLooper();
 }
 
 
 void
 TransportControlGroup::SetPosition(float value)
 {
+	if (B_OK != LockLooperWithTimeout(50000))
+		return;
 	fSeekSlider->SetPosition(value);
+	UnlockLooper();
 }
 
 

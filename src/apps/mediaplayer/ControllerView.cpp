@@ -152,5 +152,6 @@ ControllerView::PositionChanged(float value)
 {
 	printf("ControllerView::PositionChanged(%.2f)\n", value);
 	// 0.0 ... 1.0
+	fController->SetPosition(value);
 }
 

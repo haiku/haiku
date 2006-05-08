@@ -25,6 +25,7 @@
 #include <MediaTrack.h>
 
 #include "Controller.h"
+#include "ControllerView.h"
 #include "VideoView.h"
 #include "SoundOutput.h"
 
@@ -45,6 +46,7 @@ HandleError(const char *text, status_t err)
 
 Controller::Controller()
  :	fVideoView(NULL)
+ ,	fControllerView(NULL)
  ,	fName()
  ,	fPaused(false)
  ,	fStopped(true)
@@ -61,6 +63,9 @@ Controller::Controller()
  ,	fStopAudioPlayback(false)
  ,	fStopVideoPlayback(false)
  ,	fSoundOutput(NULL)
+ ,	fSeekAudio(false)
+ ,	fSeekVideo(false)
+ ,	fSeekPosition(0)
 {
 }
 
@@ -84,6 +89,13 @@ void
 Controller::SetVideoView(VideoView *view)
 {
 	fVideoView = view;
+}
+
+
+void
+Controller::SetControllerView(ControllerView *view)
+{
+	fControllerView = view;
 }
 
 
@@ -221,7 +233,7 @@ Controller::Duration()
 {
 	bigtime_t a = fAudioTrack ? fAudioTrack->Duration() : 0;
 	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
-	printf("Controller::Duration: audio %.6f, video %.6f", a / 1000000.0, v / 1000000.0);
+//	printf("Controller::Duration: audio %.6f, video %.6f\n", a / 1000000.0, v / 1000000.0);
 	return max_c(a, v);
 }
 
@@ -255,8 +267,33 @@ Controller::VolumeDown()
 void
 Controller::SetVolume(float value)
 {
+	printf("Controller::SetVolume %.4f\n", value);
 	if (fSoundOutput) // hack...
 		fSoundOutput->SetVolume(value);
+}
+
+
+void
+Controller::SetPosition(float value)
+{
+	printf("Controller::SetPosition %.4f\n", value);
+	fSeekPosition = bigtime_t(value * Duration());
+	fSeekAudio = true;
+	fSeekVideo = true;
+}
+
+
+void
+Controller::UpdateVolume(float value)
+{
+	fControllerView->SetVolume(value);
+}
+
+
+void
+Controller::UpdatePosition(float value)
+{
+	fControllerView->SetPosition(value);
 }
 
 
@@ -365,14 +402,28 @@ Controller::AudioPlayThread()
 	
 	SoundOutput out(fName.String(), fmt.u.raw_audio);
 	
+	out.SetVolume(1.0);
+	UpdateVolume(1.0);
+	
+	
 	int frame_size = (fmt.u.raw_audio.format & 0xf) * fmt.u.raw_audio.channel_count;
 	uint8 buffer[fmt.u.raw_audio.buffer_size];
 	int64 frames;
 	media_header mh;
 	
 	fSoundOutput = &out;
-	while (!fStopAudioPlayback && B_OK == fAudioTrack->ReadFrames(buffer, &frames, &mh)) {
-		out.Play(buffer, frames * frame_size);
+	while (!fStopAudioPlayback) {
+		if (B_OK == fAudioTrack->ReadFrames(buffer, &frames, &mh)) {
+			out.Play(buffer, frames * frame_size);
+			UpdatePosition(mh.start_time / (float)Duration());
+		} else {
+			snooze(50000);
+		}
+		if (fSeekAudio) {
+			bigtime_t pos = fSeekPosition;
+			fAudioTrack->SeekToTime(&pos);
+			fSeekAudio = false;
+		}
 	}
 	fSoundOutput = NULL;
 }

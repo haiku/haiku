@@ -29,6 +29,7 @@ class BMediaFile;
 class BMediaTrack;
 class SoundOutput;
 class VideoView;
+class ControllerView;
 
 class Controller
 {
@@ -55,6 +56,7 @@ public:
 	bool					IsPaused();
 
 	void					SetVideoView(VideoView *view);
+	void					SetControllerView(ControllerView *view);
 	
 	bool					IsOverlayActive();
 
@@ -66,6 +68,11 @@ public:
 	void					VolumeDown();
 	
 	void					SetVolume(float value);
+	
+	void					SetPosition(float value);
+	
+	void					UpdateVolume(float value);
+	void					UpdatePosition(float value);
 
 private:
 	static int32			audio_play_thread(void *self);
@@ -81,6 +88,7 @@ private:
 
 private:
 	VideoView *				fVideoView;
+	ControllerView *		fControllerView;
 	BString					fName;
 	bool					fPaused;
 	bool					fStopped;
@@ -99,6 +107,9 @@ private:
 	volatile bool			fStopAudioPlayback;
 	volatile bool			fStopVideoPlayback;
 	SoundOutput	*			fSoundOutput;
+	volatile bool			fSeekAudio;
+	volatile bool			fSeekVideo;
+	volatile bigtime_t		fSeekPosition;
 };
 
 

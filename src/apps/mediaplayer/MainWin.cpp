@@ -140,6 +140,7 @@ MainWin::MainWin()
 //	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
 	
 	fController->SetVideoView(fVideoView);
+	fController->SetControllerView(fControls);
 	fVideoView->IsOverlaySupported();
 	
 	printf("fMenuBarHeight %d\n", fMenuBarHeight);
