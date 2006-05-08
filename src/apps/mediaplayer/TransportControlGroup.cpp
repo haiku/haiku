@@ -40,8 +40,15 @@ enum {
 #define VOLUME_MIN_WIDTH 70.0
 #define VOLUME_SLIDER_LAYOUT_WEIGHT 2.0
 
-#define kMaxVolume 1024
-#define kMaxSeekPos 65535
+// the range of the volume sliders (in dB)
+#define kVolumeDbMax	6.0
+#define kVolumeDbMin	-60.0
+// a power function for non linear sliders
+#define kVolumeDbExpPositive 1.4	// for dB values > 0
+#define kVolumeDbExpNegative 1.9	// for dB values < 0
+
+#define kVolumeFactor	1000
+#define kPositionFactor	65535
 
 // constructor
 TransportControlGroup::TransportControlGroup(BRect frame)
@@ -57,7 +64,7 @@ TransportControlGroup::TransportControlGroup(BRect frame)
     // Seek Slider
 	fSeekSlider = new SeekSlider(frame, "seek slider",
 								 new BMessage(MSG_SEEK),
-								 0, kMaxSeekPos);
+								 0, kPositionFactor);
 	fSeekSlider->ResizeToPreferred();
 	AddChild(fSeekSlider);
 
@@ -142,9 +149,11 @@ TransportControlGroup::TransportControlGroup(BRect frame)
     // Volume Slider
 	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
 										   kVolumeSliderBitmapHeight - 1.0),
-									 "volume slider", 0, kMaxVolume,
+									 "volume slider", 
+									 _DbToGain(_ExponentialToLinear(kVolumeDbMin)) * kVolumeFactor, 
+									 _DbToGain(_ExponentialToLinear(kVolumeDbMax)) * kVolumeFactor,
 									 new BMessage(MSG_SET_VOLUME));
-	fVolumeSlider->SetValue(128);
+	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(0.0)) * kVolumeFactor);
 	AddChild(fVolumeSlider);
 }
 
@@ -254,6 +263,59 @@ void TransportControlGroup::SetPosition(float value)	{}
 
 // #pragma mark -
 
+
+float
+TransportControlGroup::_LinearToExponential(float db_in)
+{
+	float db = db_in;
+	if (db >= 0) {
+		db = db * (pow(fabs(kVolumeDbMax), (1.0 / kVolumeDbExpPositive)) / fabs(kVolumeDbMax));
+		db = pow(db, kVolumeDbExpPositive);
+	} else {
+		db = -db;
+		db = db * (pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative)) / fabs(kVolumeDbMin));
+		db = pow(db, kVolumeDbExpNegative);
+		db = -db;
+	}
+	printf("_LinearToExponential %.4f => %.4f\n", db_in, db);
+	return db;
+}
+
+
+float
+TransportControlGroup::_ExponentialToLinear(float db_in)
+{
+	float db = db_in;
+	if (db >= 0) {
+		db = pow(db, (1.0 / kVolumeDbExpPositive));
+		db = db * (fabs(kVolumeDbMax) / pow(fabs(kVolumeDbMax), (1.0 / kVolumeDbExpPositive)));
+	} else {
+		db = -db;
+		db = pow(db, (1.0 / kVolumeDbExpNegative));
+		db = db * (fabs(kVolumeDbMin) / pow(fabs(kVolumeDbMin), (1.0 / kVolumeDbExpNegative)));
+		db = -db;
+	}
+	printf("_ExponentialToLinear %.4f => %.4f\n", db_in, db);
+	return db;
+}
+
+
+float
+TransportControlGroup::_DbToGain(float db)
+{
+	return pow(10.0, db / 20.0);
+}
+
+
+float
+TransportControlGroup::_GainToDb(float gain)
+{
+	return 20.0 * log10(gain);
+}
+
+
+// #pragma mark -
+
 // SetEnabled
 void
 TransportControlGroup::SetEnabled(uint32 buttons)
@@ -316,12 +378,6 @@ TransportControlGroup::SetMuted(bool mute)
 	fVolumeSlider->SetMuted(mute);
 }
 
-// Volume
-uint32
-TransportControlGroup::Volume() const
-{
-	return fVolumeSlider->Value();
-}
 
 // #pragma mark -
 
@@ -473,7 +529,11 @@ TransportControlGroup::_SkipForward()
 void
 TransportControlGroup::_SetVolume()
 {
-	SetVolume((float)(fVolumeSlider->Value() / 255.0));
+	float pos = fVolumeSlider->Value() / (float)kVolumeFactor;
+	float db = _ExponentialToLinear(_GainToDb(pos));
+	float gain = _DbToGain(db);
+	printf("_SetVolume: pos %.4f, db %.4f, gain %.4f\n", pos, db, gain);
+	SetVolume(gain);
 }
 
 // _ToggleMute
@@ -488,7 +548,7 @@ TransportControlGroup::_ToggleMute()
 void
 TransportControlGroup::_UpdatePosition()
 {
-	SetPosition((float)(fSeekSlider->Value() / (float)kMaxSeekPos));
+	SetPosition(fSeekSlider->Value() / (float)kPositionFactor);
 }
 
 

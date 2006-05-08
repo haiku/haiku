@@ -67,7 +67,6 @@ class TransportControlGroup : public BView {
 
 			void				SetAudioEnabled(bool enable);
 			void				SetMuted(bool mute);
-			uint32				Volume() const;
 
  private:
 			void				_LayoutControls(BRect frame) const;
@@ -86,6 +85,11 @@ class TransportControlGroup : public BView {
 			void				_SetVolume();
 			void				_ToggleMute();
 			void				_UpdatePosition();
+
+			float				_LinearToExponential(float db);
+			float				_ExponentialToLinear(float db);
+			float				_DbToGain(float db);
+			float				_GainToDb(float gain);
 
 			SeekSlider*			fSeekSlider;
 

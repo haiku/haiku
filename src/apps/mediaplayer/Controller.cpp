@@ -60,6 +60,7 @@ Controller::Controller()
  ,	fVideoPlayThread(-1)
  ,	fStopAudioPlayback(false)
  ,	fStopVideoPlayback(false)
+ ,	fSoundOutput(NULL)
 {
 }
 
@@ -251,6 +252,14 @@ Controller::VolumeDown()
 }
 
 
+void
+Controller::SetVolume(float value)
+{
+	if (fSoundOutput) // hack...
+		fSoundOutput->SetVolume(value);
+}
+
+
 bool
 Controller::IsOverlayActive()
 {
@@ -349,8 +358,9 @@ Controller::AudioPlayThread()
 	media_format fmt;
 	fmt.type = B_MEDIA_RAW_AUDIO;
 	fmt.u.raw_audio = media_multi_audio_format::wildcard;
+#ifdef __HAIKU__
 	fmt.u.raw_audio.format = media_multi_audio_format::B_AUDIO_FLOAT;
-
+#endif
 	fAudioTrack->DecodedFormat(&fmt);
 	
 	SoundOutput out(fName.String(), fmt.u.raw_audio);
@@ -360,9 +370,11 @@ Controller::AudioPlayThread()
 	int64 frames;
 	media_header mh;
 	
+	fSoundOutput = &out;
 	while (!fStopAudioPlayback && B_OK == fAudioTrack->ReadFrames(buffer, &frames, &mh)) {
 		out.Play(buffer, frames * frame_size);
 	}
+	fSoundOutput = NULL;
 }
 
 

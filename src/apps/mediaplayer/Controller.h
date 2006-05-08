@@ -27,6 +27,7 @@
 class BBitmap;
 class BMediaFile;
 class BMediaTrack;
+class SoundOutput;
 class VideoView;
 
 class Controller
@@ -63,6 +64,8 @@ public:
 	
 	void					VolumeUp();
 	void					VolumeDown();
+	
+	void					SetVolume(float value);
 
 private:
 	static int32			audio_play_thread(void *self);
@@ -95,6 +98,7 @@ private:
 	thread_id				fVideoPlayThread;
 	volatile bool			fStopAudioPlayback;
 	volatile bool			fStopVideoPlayback;
+	SoundOutput	*			fSoundOutput;
 };
 
 
