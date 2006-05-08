@@ -22,7 +22,9 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <Cursor.h>
+#include <File.h>
 #include <InterfaceDefs.h>
+#include <MenuBar.h>
 #include <Message.h>
 #include <MessageQueue.h>
 #include <Picture.h>
@@ -36,7 +38,6 @@
 #include <String.h>
 #include <View.h>
 #include <Window.h>
-#include <MenuBar.h>
 
 #include <math.h>
 #include <new>
@@ -3193,7 +3194,18 @@ BView::DrawPictureAsync(const char *filename, long offset, BPoint where)
 	if (!filename)
 		return;
 
-	// TODO: test and implement
+	// TODO: Test
+	BFile file(filename, B_READ_ONLY);
+	if (file.InitCheck() < B_OK)
+		return;
+
+	file.Seek(offset, SEEK_SET);
+
+	BPicture picture;
+	if (picture.Unflatten(&file) < B_OK)
+		return;
+
+	DrawPictureAsync(&picture, where);
 }
 
 
