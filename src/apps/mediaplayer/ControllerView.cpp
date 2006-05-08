@@ -133,9 +133,9 @@ ControllerView::SkipForward()
 
 
 void
-ControllerView::SetVolume(float value)
+ControllerView::VolumeChanged(float value)
 {
-	printf("ControllerView::SetVolume(%.4f)\n", value);
+	printf("ControllerView::VolumeChanged(%.4f)\n", value);
 	fController->SetVolume(value);
 }
 
@@ -148,9 +148,9 @@ ControllerView::ToggleMute()
 
 
 void
-ControllerView::SetPosition(float value)
+ControllerView::PositionChanged(float value)
 {
-	printf("ControllerView::SetPosition(%.2f)\n", value);
+	printf("ControllerView::PositionChanged(%.2f)\n", value);
 	// 0.0 ... 1.0
 }
 

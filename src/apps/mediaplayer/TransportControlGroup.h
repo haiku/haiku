@@ -55,9 +55,9 @@ class TransportControlGroup : public BView {
 	virtual	void				Forward();
 	virtual	void				SkipBackward();
 	virtual	void				SkipForward();
-	virtual	void				SetVolume(float value);
+	virtual	void				VolumeChanged(float value);
 	virtual	void				ToggleMute();
-	virtual	void				SetPosition(float value);
+	virtual	void				PositionChanged(float value);
 
 			void				SetEnabled(uint32 whichButtons);
 
@@ -67,6 +67,9 @@ class TransportControlGroup : public BView {
 
 			void				SetAudioEnabled(bool enable);
 			void				SetMuted(bool mute);
+
+			void				SetVolume(float value);
+			void				SetPosition(float value);
 
  private:
 			void				_LayoutControls(BRect frame) const;
@@ -82,7 +85,7 @@ class TransportControlGroup : public BView {
 			void				_Forward();
 			void				_SkipBackward();
 			void				_SkipForward();
-			void				_SetVolume();
+			void				_UpdateVolume();
 			void				_ToggleMute();
 			void				_UpdatePosition();
 

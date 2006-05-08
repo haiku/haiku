@@ -231,7 +231,7 @@ TransportControlGroup::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_SET_VOLUME:
-			_SetVolume();
+			_UpdateVolume();
 			break;
 		case MSG_SET_MUTE:
 			_ToggleMute();
@@ -257,9 +257,9 @@ void TransportControlGroup::Rewind()					{}
 void TransportControlGroup::Forward()					{}
 void TransportControlGroup::SkipBackward()				{}
 void TransportControlGroup::SkipForward()				{}
-void TransportControlGroup::SetVolume(float value)		{}
+void TransportControlGroup::VolumeChanged(float value)	{}
 void TransportControlGroup::ToggleMute()				{}
-void TransportControlGroup::SetPosition(float value)	{}
+void TransportControlGroup::PositionChanged(float value){}
 
 // #pragma mark -
 
@@ -376,6 +376,20 @@ void
 TransportControlGroup::SetMuted(bool mute)
 {
 	fVolumeSlider->SetMuted(mute);
+}
+
+
+void
+TransportControlGroup::SetVolume(float value)
+{
+	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(_GainToDb(value))) * kVolumeFactor);
+}
+
+
+void
+TransportControlGroup::SetPosition(float value)
+{
+	fSeekSlider->SetPosition(value);
 }
 
 
@@ -525,15 +539,14 @@ TransportControlGroup::_SkipForward()
 	SkipForward();
 }
 
-// _SetVolume
 void
-TransportControlGroup::_SetVolume()
+TransportControlGroup::_UpdateVolume()
 {
 	float pos = fVolumeSlider->Value() / (float)kVolumeFactor;
 	float db = _ExponentialToLinear(_GainToDb(pos));
 	float gain = _DbToGain(db);
 	printf("_SetVolume: pos %.4f, db %.4f, gain %.4f\n", pos, db, gain);
-	SetVolume(gain);
+	VolumeChanged(gain);
 }
 
 // _ToggleMute
@@ -544,11 +557,11 @@ TransportControlGroup::_ToggleMute()
 	ToggleMute();
 }
 
-// _UpdatePosition
+
 void
 TransportControlGroup::_UpdatePosition()
 {
-	SetPosition(fSeekSlider->Value() / (float)kPositionFactor);
+	PositionChanged(fSeekSlider->Value() / (float)kPositionFactor);
 }
 
 
