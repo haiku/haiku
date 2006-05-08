@@ -158,10 +158,7 @@ intel_overlay_count(const display_mode *mode)
 const uint32 *
 intel_overlay_supported_spaces(const display_mode *mode)
 {
-	// Maybe I'm doing something wrong, but the chip is doing very strange
-	// stuff with anything but this color space (even though the docs/register
-	// definitions pretend to support other modes)
-	static const uint32 kSupportedSpaces[] = {B_YCbCr422, 0};
+	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32, B_YCbCr422, 0};
 
 	return kSupportedSpaces;
 }
@@ -172,7 +169,8 @@ intel_overlay_supported_features(uint32 colorSpace)
 {
 	return B_OVERLAY_COLOR_KEY
 		| B_OVERLAY_HORIZONTAL_FILTERING
-		| B_OVERLAY_VERTICAL_FILTERING;
+		| B_OVERLAY_VERTICAL_FILTERING
+		| B_OVERLAY_HORIZONTAL_MIRRORING;
 }
 
 
