@@ -225,7 +225,7 @@ BMediaTrack::CountFrames() const
 {
 	CALLED();
 	int64 frames = fExtractor ? fExtractor->CountFrames(fStream) : 0;
-	printf("BMediaTrack::CountFrames: %Ld\n", frames);
+//	printf("BMediaTrack::CountFrames: %Ld\n", frames);
 	return frames;
 }
 
@@ -235,7 +235,7 @@ BMediaTrack::Duration() const
 {
 	CALLED();
 	bigtime_t duration = fExtractor ? fExtractor->Duration(fStream) : 0;
-	printf("BMediaTrack::Duration: %Ld\n", duration);
+//	printf("BMediaTrack::Duration: %Ld\n", duration);
 	return duration;
 }
 
@@ -294,7 +294,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	if (mh)
 		*mh = header;
 		
-	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
+//	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
 
 	return result;
 }
