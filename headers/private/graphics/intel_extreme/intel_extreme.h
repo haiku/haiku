@@ -251,6 +251,10 @@ struct overlay_scale {
 #define OVERLAY_FORMAT_YCbCr411			0x9
 #define OVERLAY_FORMAT_YCbCr420			0xc
 
+#define OVERLAY_MIRROR_NORMAL			0x0
+#define OVERLAY_MIRROR_HORIZONTAL		0x1
+#define OVERLAY_MIRROR_VERTICAL			0x2
+
 // The real overlay registers are written to using an update buffer
 
 struct overlay_registers {

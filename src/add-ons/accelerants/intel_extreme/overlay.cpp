@@ -78,7 +78,7 @@ update_overlay(bool updateCoefficients)
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
 	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
-		/* | (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0)*/);
+		/*| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0)*/);
 	ring_command_complete(ringBuffer);
 
 	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
@@ -371,31 +371,42 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		registers->window_width = window->width;
 		registers->window_height = window->height;
 
+		// Note: in non-planar mode, you *must* not program the source width/height
+		// UV registers - they must stay cleared, or the chip is doing strange stuff.
+		// On the other hand, you have to program the UV scaling registers, or the
+		// result will be wrong, too.
 		registers->source_width_rgb = view->width;
-		registers->source_width_uv = view->width;
 		registers->source_height_rgb = view->height;
-		registers->source_height_uv = view->height;
-		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + buffer->width + 0x1f) >> 5)
-			- (overlay->buffer_offset >> 5) - 1);
-		registers->source_bytes_per_row_uv = (((overlay->buffer_offset + buffer->width + 0x1f) >> 5)
-			- (overlay->buffer_offset >> 5) - 1);
+		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
+			+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
 
-		uint32 horizontalScale = (view->width << 12) / window->width;
+		uint32 horizontalScale = ((view->width - 1) << 12) / window->width;
+		uint32 verticalScale = ((view->height - 1) << 12) / window->height;
+		uint32 horizontalScaleUV = horizontalScale >> 1;
+		uint32 verticalScaleUV = verticalScale >> 1;
+		horizontalScale = horizontalScaleUV << 1;
+		verticalScale = verticalScaleUV << 1;
+
+		// horizontal scaling
 		registers->scale_rgb.horizontal_downscale_factor = horizontalScale >> 12;
 		registers->scale_rgb.horizontal_scale_fraction = horizontalScale & 0xfff;
+		registers->scale_uv.horizontal_downscale_factor = horizontalScaleUV >> 12;
+		registers->scale_uv.horizontal_scale_fraction = horizontalScaleUV & 0xfff;
 
-		uint32 verticalScale = (view->height << 12) / window->height;
+		// vertical scaling
 		registers->scale_rgb.vertical_scale_fraction = verticalScale & 0xfff;
+		registers->scale_uv.vertical_scale_fraction = verticalScaleUV & 0xfff;
 		registers->vertical_scale_rgb = verticalScale >> 12;
-		registers->vertical_scale_uv = verticalScale >> 12;
+		registers->vertical_scale_uv = verticalScaleUV >> 12;
 
 		TRACE(("scale: h = %ld.%ld, v = %ld.%ld\n", horizontalScale >> 12,
 			horizontalScale & 0xfff, verticalScale >> 12, verticalScale & 0xfff));
 
 		if (verticalScale != gInfo->last_vertical_overlay_scale
 			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {
-			// TODO: recompute phase coefficients
+			// TODO: recompute phase coefficients (take from X driver)
 			updateCoefficients = true;
+
 			gInfo->last_vertical_overlay_scale = verticalScale;
 			gInfo->last_horizontal_overlay_scale = horizontalScale;
 		}
@@ -404,19 +415,13 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		gInfo->last_overlay_frame = *(overlay_frame *)window;
 	}
 
-	//registers->color_control_output_mode = true;
+	registers->color_control_output_mode = true;
 	registers->select_pipe = 0;
 
 	// program buffer
 
 	registers->buffer_rgb0 = overlay->buffer_offset;
-//	registers->buffer_rgb1 = overlay->buffer_offset;
-//	registers->buffer_u0 = overlay->buffer_offset;
-//	registers->buffer_u1 = overlay->buffer_offset;
-//	registers->buffer_v0 = overlay->buffer_offset;
-//	registers->buffer_v1 = overlay->buffer_offset;
 	registers->stride_rgb = buffer->bytes_per_row;
-	registers->stride_uv = buffer->bytes_per_row;
 
 	switch (buffer->space) {
 		case B_RGB15:
@@ -433,6 +438,8 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 			break;
 	}
 
+	registers->mirroring_mode = (window->flags & B_OVERLAY_HORIZONTAL_MIRRORING) != 0
+		? OVERLAY_MIRROR_HORIZONTAL : OVERLAY_MIRROR_NORMAL;
 	registers->ycbcr422_order = 0;
 
 	if (!gInfo->shared_info->overlay_active) {
