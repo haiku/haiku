@@ -364,10 +364,27 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		|| memcmp(&gInfo->last_overlay_frame, window, sizeof(overlay_frame))) {
 		// scaling has changed, program window and scaling factor
 
-		registers->window_left = window->h_start;
-		registers->window_top = window->v_start;
-		registers->window_width = window->width;
-		registers->window_height = window->height;
+		// clip the window to on screen bounds
+		// TODO: this is not yet complete or correct - especially if we start
+		// to support moving the display!
+		int32 left, top, right, bottom;
+		left = window->h_start;
+		right = window->h_start + window->width;
+		top = window->v_start;
+		bottom = window->v_start + window->height;
+		if (left < 0)
+			left = 0;
+		if (top < 0)
+			top = 0;
+		if (right > gInfo->shared_info->current_mode.timing.h_display)
+			right = gInfo->shared_info->current_mode.timing.h_display;
+		if (bottom > gInfo->shared_info->current_mode.timing.v_display)
+			bottom = gInfo->shared_info->current_mode.timing.v_display;
+
+		registers->window_left = left;
+		registers->window_top = top;
+		registers->window_width = right - left;
+		registers->window_height = bottom - top;
 
 		// Note: in non-planar mode, you *must* not program the source width/height
 		// UV registers - they must stay cleared, or the chip is doing strange stuff.
