@@ -273,7 +273,9 @@ SeekSlider::ResizeToPreferred()
 void
 SeekSlider::SetPosition(float position)
 {
-	SetValue(fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5));
+	int32 value = fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5);
+	if (value != Value())
+		BControl::SetValue(value);
 }
 
 
