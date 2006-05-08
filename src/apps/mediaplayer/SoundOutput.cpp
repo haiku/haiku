@@ -61,7 +61,9 @@ SoundOutput::InitCheck()
 bigtime_t
 SoundOutput::Latency()
 {
-	return fSoundPlayer->Latency() + fBufferDuration;
+	// Because of buffering, latency of SoundOutput is
+	// slightly higher then the BSoundPlayer latency.
+	return fSoundPlayer->Latency() + min_c(1000, fBufferDuration / 4);
 }
 
 
