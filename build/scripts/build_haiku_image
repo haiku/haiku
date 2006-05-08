@@ -80,6 +80,11 @@ echo "Deleting old MIME database ..."
 $rm -rf $mimeDBDest
 $mkdir -p $mimeDBDest
 mkdir -p $tmpDir
+mimeTmpDir=$tmpDir/mime
+mimeTmpIndex=0
+
+# create tmp dir for the MIME conversion stuff
+mkdir -p $mimeTmpDir
 
 echo "Installing MIME database ..."
 
@@ -88,13 +93,13 @@ for inSuperFile in $mimeDBSource/*.super; do
 	outSuperDir=$mimeDBDest/$superType
 
 	# compile rdef to rsrc file and the rsrc file to attributes
-	tmpFile=$tmpDir/mimedb$$.rsrc
-	tmpFile2=$tmpDir/mimedb$$.mime
+	mimeTmpIndex=$[$mimeTmpIndex + 1]
+	tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
+	tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
 	$rc -o $tmpFile $inSuperFile
 	mkdir -p $tmpFile2
 	$resattr -O -o $tmpFile2 $tmpFile
 	$cp -r ${sPrefix}$tmpFile2 $outSuperDir
-	rm -rf $tmpFile $tmpFile2
 
 	# iterate through the sub types
 	for inSubFile in $mimeDBSource/$superType/*; do
@@ -104,16 +109,18 @@ for inSuperFile in $mimeDBSource/*.super; do
 			outSubFile=$outSuperDir/$subType
 
 			# compile rdef to rsrc file and the rsrc file to attributes
-			tmpFile=$tmpDir/mimedb$$.rsrc
-			tmpFile2=$tmpDir/mimedb$$.mime
+			mimeTmpIndex=$[$mimeTmpIndex + 1]
+			tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
+			tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
 			$rc -o $tmpFile $inSubFile
 			$resattr -O -o $tmpFile2 $tmpFile
 			$cp ${sPrefix}$tmpFile2 $outSubFile
-			rm -f $tmpFile $tmpFile2
 		fi
 	done
 done
 
+# cleanup tmp dir
+rm -rf $mimeTmpDir
 
 # unmount
 if [ $isImage ]; then
