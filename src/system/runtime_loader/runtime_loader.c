@@ -125,6 +125,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 	int pathListLen, char *pathBuffer, int pathBufferLen)
 {
 	const char *pathListEnd = pathList + pathListLen;
+	status_t status = B_ENTRY_NOT_FOUND;
 
 	//TRACE(("rld.so: search_container_in_path_list() %s in %.*s\n", name,
 	//	pathListLen, pathList));
@@ -139,14 +140,23 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 		fd = try_open_executable(pathList, pathEnd - pathList, name, pathBuffer,
 			pathBufferLen);
-		if (fd >= 0)
-			return fd;
-
+		if (fd >= 0) {
+			// see if it's a dir
+			struct stat stat;
+			status = _kern_read_stat(fd, NULL, true, &stat, sizeof(struct stat));
+			if (status == B_OK) {
+				if (!S_ISDIR(stat.st_mode))
+					return fd;
+				status = B_IS_A_DIRECTORY;
+			}
+			_kern_close(fd);
+		}
+		
 		pathListLen = pathListEnd - pathEnd - 1;
 		pathList = pathEnd + 1;
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	return status;
 }
 
 
@@ -155,7 +165,7 @@ open_executable(char *name, image_type type, const char *rpath)
 {
 	const char *paths;
 	char buffer[PATH_MAX];
-	int fd = -1;
+	int fd = B_ENTRY_NOT_FOUND;
 
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
@@ -194,10 +204,9 @@ open_executable(char *name, image_type type, const char *rpath)
 		// we found it, copy path!
 		//TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
 		strlcpy(name, buffer, PATH_MAX);
-		return fd;
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	return fd;
 }
 
 
