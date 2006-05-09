@@ -512,6 +512,23 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 	struct overlay *overlay = (struct overlay *)buffer;
 	overlay_registers *registers = gInfo->overlay_registers;
 	bool updateCoefficients = false;
+	uint32 bytesPerPixel = 2;
+
+	switch (buffer->space) {
+		case B_RGB15:
+			registers->source_format = OVERLAY_FORMAT_RGB15;
+			break;
+		case B_RGB16:
+			registers->source_format = OVERLAY_FORMAT_RGB16;
+			break;
+		case B_RGB32:
+			registers->source_format = OVERLAY_FORMAT_RGB32;
+			bytesPerPixel = 4;
+			break;
+		case B_YCbCr422:
+			registers->source_format = OVERLAY_FORMAT_YCbCr422;
+			break;
+	}
 
 	if (!gInfo->shared_info->overlay_active
 		|| memcmp(&gInfo->last_overlay_view, view, sizeof(overlay_view))
@@ -540,21 +557,31 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		registers->window_width = right - left;
 		registers->window_height = bottom - top;
 
-		// Note: in non-planar mode, you *must* not program the source width/height
-		// UV registers - they must stay cleared, or the chip is doing strange stuff.
-		// On the other hand, you have to program the UV scaling registers, or the
-		// result will be wrong, too.
-		registers->source_width_rgb = view->width;
-		registers->source_height_rgb = view->height;
-		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
-			+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
-
 		uint32 horizontalScale = ((view->width - 1) << 12) / window->width;
 		uint32 verticalScale = ((view->height - 1) << 12) / window->height;
 		uint32 horizontalScaleUV = horizontalScale >> 1;
 		uint32 verticalScaleUV = verticalScale >> 1;
 		horizontalScale = horizontalScaleUV << 1;
 		verticalScale = verticalScaleUV << 1;
+
+		// we need to offset the overlay view to adapt it to the clipping
+		// (in addition to whatever offset is desired already)
+		left = view->h_start - (int32)((window->h_start - left) * (horizontalScale / 4096.0) + 0.5);
+		top = view->v_start - (int32)((window->v_start - top) * (verticalScale / 4096.0) + 0.5);
+		right = view->h_start + view->width;
+		bottom = view->v_start + view->height;
+
+		gInfo->overlay_position_buffer_offset = buffer->bytes_per_row * top
+			+ left * bytesPerPixel;
+
+		// Note: in non-planar mode, you *must* not program the source width/height
+		// UV registers - they must stay cleared, or the chip is doing strange stuff.
+		// On the other hand, you have to program the UV scaling registers, or the
+		// result will be wrong, too.
+		registers->source_width_rgb = right - left;
+		registers->source_height_rgb = bottom - top;
+		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
+			+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
 
 		// horizontal scaling
 		registers->scale_rgb.horizontal_downscale_factor = horizontalScale >> 12;
@@ -617,23 +644,8 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 	// program buffer
 
-	registers->buffer_rgb0 = overlay->buffer_offset;
+	registers->buffer_rgb0 = overlay->buffer_offset + gInfo->overlay_position_buffer_offset;
 	registers->stride_rgb = buffer->bytes_per_row;
-
-	switch (buffer->space) {
-		case B_RGB15:
-			registers->source_format = OVERLAY_FORMAT_RGB15;
-			break;
-		case B_RGB16:
-			registers->source_format = OVERLAY_FORMAT_RGB16;
-			break;
-		case B_RGB32:
-			registers->source_format = OVERLAY_FORMAT_RGB32;
-			break;
-		case B_YCbCr422:
-			registers->source_format = OVERLAY_FORMAT_YCbCr422;
-			break;
-	}
 
 	registers->mirroring_mode = (window->flags & B_OVERLAY_HORIZONTAL_MIRRORING) != 0
 		? OVERLAY_MIRROR_HORIZONTAL : OVERLAY_MIRROR_NORMAL;

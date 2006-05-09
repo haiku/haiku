@@ -45,6 +45,7 @@ struct accelerant_info {
 	overlay_frame	last_overlay_frame;
 	uint32			last_horizontal_overlay_scale;
 	uint32			last_vertical_overlay_scale;
+	uint32			overlay_position_buffer_offset;
 
 	int				device;
 	bool			is_clone;
