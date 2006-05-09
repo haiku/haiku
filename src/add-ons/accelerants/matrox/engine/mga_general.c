@@ -792,34 +792,33 @@ status_t gx50_general_output_select()
 	return B_OK;
 }
 
-/*connect CRTC1 to the specified DAC*/
+/* connect CRTC(s) to the specified DAC(s) */
 status_t gx00_general_dac_select(int dac)
 {
-	if (!si->ps.secondary_head)
-		return B_ERROR;
-
 	/*MISCCTRL, clock src,...*/
 	switch(dac)
 	{
-		/* G400 */
+		/* G100 - G400 */
+		case DS_CRTC1DAC:
 		case DS_CRTC1DAC_CRTC2MAVEN:
 			/* connect CRTC1 to pixPLL */
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
 			/* connect CRTC2 to vidPLL, connect CRTC1 to internal DAC and
 			 * enable CRTC2 external video timing reset signal.
 			 * (Setting for MAVEN 'master mode' TVout signal generation.) */
-			CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002);
+			if (si->ps.secondary_head) CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002);
 			/* disable CRTC1 external video timing reset signal */
 			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77));
 			/* select CRTC2 RGB24 MAFC mode: connects CRTC2 to MAVEN DAC */ 
 			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x82);
 			break;
+		case DS_CRTC1MAVEN:
 		case DS_CRTC1MAVEN_CRTC2DAC:
 			/* connect CRTC1 to vidPLL */
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x2);
 			/* connect CRTC2 to pixPLL and internal DAC and
 			 * disable CRTC2 external video timing reset signal */
-			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20));
+			if (si->ps.secondary_head) CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20));
 			/* enable CRTC1 external video timing reset signal.
 			 * note: this is nolonger used as G450/G550 cannot do TVout on CRTC1 */
 			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)|0x88));
@@ -828,6 +827,7 @@ status_t gx00_general_dac_select(int dac)
 			break;
 		/* G450/G550 */
 		case DS_CRTC1CON1_CRTC2CON2:
+			if (si->ps.card_type < G450) return B_ERROR;
 			/* connect CRTC1 to pixPLL */
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
 			/* connect CRTC2 to vidPLL, connect CRTC1 to DAC1, disable CRTC2
@@ -848,6 +848,7 @@ status_t gx00_general_dac_select(int dac)
 		//fixme: toggle PLL's below if possible: 
 		//       otherwise toggle PLL's for G400 2nd case?
 		case DS_CRTC1CON2_CRTC2CON1:
+			if (si->ps.card_type < G450) return B_ERROR;
 			/* connect CRTC1 to pixPLL */
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
 			/* connect CRTC2 to vidPLL and DAC1, disable CRTC2 external

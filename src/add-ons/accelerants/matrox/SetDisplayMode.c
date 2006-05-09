@@ -357,7 +357,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		case G200: 
 		case G400:
 		case G400MAX: 
-			gx00_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
+			if (!si->ps.secondary_head && si->ps.tvout && (target.flags & TV_BITS))
+				gx00_general_dac_select(DS_CRTC1MAVEN);
+			else
+				gx00_general_dac_select(DS_CRTC1DAC);
 			break;
 		case G450:
 		case G550: 
