@@ -172,7 +172,7 @@ intel_extreme_init(intel_info &info)
 			&primary.handle, &primary.offset) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
 		primary.size = B_PAGE_SIZE;
-		primary.base = info.shared_info->graphics_memory + primary.offset;
+		primary.base = info.graphics_memory + primary.offset;
 	}
 
 	// no errors, so keep mappings
