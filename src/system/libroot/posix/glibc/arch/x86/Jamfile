@@ -55,6 +55,7 @@ local genericSources =
 	s_isinf.c s_isinff.c
 	s_isnan.c s_isnanf.c
 	s_ldexp.c s_ldexpf.c #s_ldexpl.c
+	s_lround.c s_lroundf.c
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c
 	s_nextafter.c

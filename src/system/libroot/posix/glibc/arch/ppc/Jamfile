@@ -75,6 +75,7 @@ local genericSources =
 	s_ldexp.c s_ldexpf.c # s_ldexpl.c
 	s_log1p.c s_log1pf.c
 	s_logb.c s_logbf.c # s_logbl.c
+	s_lround.c s_lroundf.c
 	s_modf.c s_modff.c # s_modfl.c
 	s_nan.c s_nanf.c # s_nanl.c
 	s_round.c s_roundf.c # s_roundl.c
