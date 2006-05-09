@@ -652,7 +652,9 @@ int maventv_init(display_mode target)
 	/* used in G450/G550 to calculate TVout signal timing dependant on pixelclock;
 	 * <= G400MAX use fixed settings because base-clock here is the fixed crystal
 	 * frequency. */
-	//fixme: if <=G400 cards with MAVEN and crystal of 14.31818Mhz exist, modify!?!
+	//fixme:
+	//if <=G400 cards with MAVEN and crystal of 14.31818Mhz exist, modify!?!
+	//only saw 27Mhz versions of G100 and G200 that (can) hold a MAVEN upto now...
 	gx50_maven_timing m_timing;
 
 	/* preset new TVout mode */
