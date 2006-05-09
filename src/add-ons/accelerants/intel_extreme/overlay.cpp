@@ -4,12 +4,16 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *
+ * The phase coefficient computation was taken from the X driver written by
+ * Alan Hourihane and David Dawes.
  */
 
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 
@@ -20,6 +24,156 @@ extern "C" void _sPrintf(const char *format, ...);
 #else
 #	define TRACE(x) ;
 #endif
+
+
+#define NUM_HORIZONTAL_TAPS		5
+#define NUM_VERTICAL_TAPS		3
+#define NUM_HORIZONTAL_UV_TAPS	3
+#define NUM_VERTICAL_UV_TAPS	3
+#define NUM_PHASES				17
+#define MAX_TAPS				5
+
+struct phase_coefficient {
+	uint8	sign;
+	uint8	exponent;
+	uint16	mantissa;
+};
+
+
+/*!
+	Splits the coefficient floating point value into the 3 components
+	sign, mantissa, and exponent.
+*/
+static bool
+split_coefficient(double &coefficient, int32 mantissaSize,
+	phase_coefficient &splitCoefficient)
+{
+	double absCoefficient = fabs(coefficient);
+
+	int sign;
+	if (coefficient < 0.0)
+		sign = 1;
+	else
+		sign = 0;
+
+	int32 intCoefficient, res;
+	int32 maxValue = 1 << mantissaSize;
+	res = 12 - mantissaSize;
+
+	if ((intCoefficient = (int)(absCoefficient * 4 * maxValue + 0.5)) < maxValue) {
+		splitCoefficient.exponent = 3;
+		splitCoefficient.mantissa = intCoefficient << res;
+		coefficient = (double)intCoefficient / (double)(4 * maxValue);
+	} else if ((intCoefficient = (int)(absCoefficient * 2 * maxValue + 0.5)) < maxValue) {
+		splitCoefficient.exponent = 2;
+		splitCoefficient.mantissa = intCoefficient << res;
+		coefficient = (double)intCoefficient / (double)(2 * maxValue);
+	} else if ((intCoefficient = (int)(absCoefficient * maxValue + 0.5)) < maxValue) {
+		splitCoefficient.exponent = 1;
+		splitCoefficient.mantissa = intCoefficient << res;
+		coefficient = (double)intCoefficient / (double)maxValue;
+	} else if ((intCoefficient = (int)(absCoefficient * maxValue * 0.5 + 0.5)) < maxValue) {
+		splitCoefficient.exponent = 0;
+		splitCoefficient.mantissa = intCoefficient << res;
+		coefficient = (double)intCoefficient / (double)(maxValue / 2);
+	} else {
+		// coefficient out of range
+		return false;
+	}
+
+	splitCoefficient.sign = sign;
+	if (sign)
+		coefficient = -coefficient;
+
+	return true;
+}
+
+
+static void
+update_coefficients(int32 taps, double filterCutOff, bool horizontal, bool isY,
+	phase_coefficient *splitCoefficients)
+{
+	if (filterCutOff < 1)
+		filterCutOff = 1;
+	if (filterCutOff > 3)
+		filterCutOff = 3;
+
+	bool isVerticalUV = !horizontal && !isY;
+	int32 mantissaSize = horizontal ? 7 : 6;
+
+	double rawCoefficients[MAX_TAPS * 32], coefficients[NUM_PHASES][MAX_TAPS];
+
+	int32 num = taps * 16;
+	for (int32 i = 0; i < num * 2; i++) {
+		double sinc;
+		double value = (1.0 / filterCutOff) * taps * PI * (i - num) / (2 * num);
+		if (value == 0.0)
+			sinc = 1.0;
+		else
+			sinc = sin(value) / value;
+
+		// Hamming window
+		double window = (0.5 - 0.5 * cos(i * PI / num));
+		rawCoefficients[i] = sinc * window;
+	}
+
+	for (int32 i = 0; i < NUM_PHASES; i++) {
+		// Normalise the coefficients
+		double sum = 0.0;
+		int32 pos;
+		for (int32 j = 0; j < taps; j++) {
+			pos = i + j * 32;
+			sum += rawCoefficients[pos];
+		}
+		for (int32 j = 0; j < taps; j++) {
+			pos = i + j * 32;
+			coefficients[i][j] = rawCoefficients[pos] / sum;
+		}
+
+		// split them into sign/mantissa/exponent
+		for (int32 j = 0; j < taps; j++) {
+			pos = j + i * taps;
+
+			split_coefficient(coefficients[i][j], mantissaSize
+				+ (((j == (taps - 1) / 2) && !isVerticalUV) ? 2 : 0),
+				splitCoefficients[pos]);
+		}
+
+		int32 tapAdjust[MAX_TAPS];
+		tapAdjust[0] = (taps - 1) / 2;
+		for (int32 j = 1, k = 1; j <= tapAdjust[0]; j++, k++) {
+			tapAdjust[k] = tapAdjust[0] - j;
+			tapAdjust[++k] = tapAdjust[0] + j;
+		}
+
+		// Adjust the coefficients
+		sum = 0.0;
+		for (int32 j = 0; j < taps; j++) {
+			sum += coefficients[i][j];
+		}
+
+		if (sum != 1.0) {
+			for (int32 k = 0; k < taps; k++) {
+				int32 tap2Fix = tapAdjust[k];
+				double diff = 1.0 - sum;
+
+				coefficients[i][tap2Fix] += diff;
+				pos = tap2Fix + i * taps;
+
+				split_coefficient(coefficients[i][tap2Fix], mantissaSize
+					+ (((tap2Fix == (taps - 1) / 2) && !isVerticalUV) ? 2 : 0),
+					splitCoefficients[pos]);
+
+				sum = 0.0;
+				for (int32 j = 0; j < taps; j++) {
+					sum += coefficients[i][j];
+				}
+				if (sum == 1.0)
+					break;
+			}
+		}
+	}
+}
 
 
 static void
@@ -78,7 +232,7 @@ update_overlay(bool updateCoefficients)
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
 	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
-		/*| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0)*/);
+		| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
 	ring_command_complete(ringBuffer);
 
 	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
@@ -103,7 +257,7 @@ show_overlay(void)
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_ON);
 	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
-		/*| OVERLAY_UPDATE_COEFFICIENTS*/);
+		| OVERLAY_UPDATE_COEFFICIENTS);
 	ring_command_complete(ringBuffer);
 }
 
@@ -419,8 +573,36 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 
 		if (verticalScale != gInfo->last_vertical_overlay_scale
 			|| horizontalScale != gInfo->last_horizontal_overlay_scale) {
-			// TODO: recompute phase coefficients (take from X driver)
+			// Recompute phase coefficients (taken from X driver)
 			updateCoefficients = true;
+
+			phase_coefficient coefficients[NUM_HORIZONTAL_TAPS * NUM_PHASES];
+			update_coefficients(NUM_HORIZONTAL_TAPS, horizontalScale / 4096.0,
+				true, true, coefficients);
+
+			phase_coefficient coefficientsUV[NUM_HORIZONTAL_UV_TAPS * NUM_PHASES];
+			update_coefficients(NUM_HORIZONTAL_UV_TAPS, horizontalScaleUV / 4096.0,
+				true, false, coefficientsUV);
+
+			int32 pos = 0;
+			for (int32 i = 0; i < NUM_PHASES; i++) {
+				for (int32 j = 0; j < NUM_HORIZONTAL_TAPS; j++) {
+					registers->horizontal_coefficients_rgb[pos] = coefficients[pos].sign << 15
+						| coefficients[pos].exponent << 12
+						| coefficients[pos].mantissa;
+					pos++;
+				}
+			}
+
+			pos = 0;
+			for (int32 i = 0; i < NUM_PHASES; i++) {
+				for (int32 j = 0; j < NUM_HORIZONTAL_UV_TAPS; j++) {
+					registers->horizontal_coefficients_uv[pos] = coefficientsUV[pos].sign << 15
+						| coefficientsUV[pos].exponent << 12
+						| coefficientsUV[pos].mantissa;
+					pos++;
+				}
+			}
 
 			gInfo->last_vertical_overlay_scale = verticalScale;
 			gInfo->last_horizontal_overlay_scale = horizontalScale;
