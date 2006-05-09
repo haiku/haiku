@@ -214,8 +214,10 @@ BMenuBar::FrameMoved(BPoint newPosition)
 void 
 BMenuBar::FrameResized(float newWidth, float newHeight)
 {
-	BMenu::FrameResized(newWidth, newHeight);
 	fLastBounds->Set(0, 0, newWidth, newHeight);
+	if (Window())
+		Invalidate(Bounds());
+	BMenu::FrameResized(newWidth, newHeight);
 }
 
 
