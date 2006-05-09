@@ -744,10 +744,7 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 void
 BMenu::Draw(BRect updateRect)
 {
-	if (!fUseCachedMenuLayout) {
-		fUseCachedMenuLayout = true;
-		CacheFontInfo();
-		LayoutItems(0);
+	if (RelayoutIfNeeded()) {
 		Invalidate();
 		return;
 	}
@@ -1374,6 +1371,19 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 }
 
 
+bool
+BMenu::RelayoutIfNeeded()
+{
+	if (!fUseCachedMenuLayout) {
+		fUseCachedMenuLayout = true;
+		CacheFontInfo();
+		LayoutItems(0);
+		return true;
+	}
+	return false;
+}
+
+
 void
 BMenu::LayoutItems(int32 index)
 {
@@ -1725,10 +1735,12 @@ BMenu::ItemMarked(BMenuItem *item)
 {
 	if (IsRadioMode()) {
 		for (int32 i = 0; i < CountItems(); i++)
-			if (ItemAt(i) != item)
+			if (ItemAt(i) != item) 
 				ItemAt(i)->SetMarked(false);
+		InvalidateLayout();
 	}
 
+	
 	if (IsLabelFromMarked() && Superitem())
 		Superitem()->SetLabel(item->Label());
 }

@@ -194,6 +194,7 @@ virtual	void			_ReservedMenu6();
 								int32 count,
 								BMenuItem *item,
 								bool del = false);
+		bool		RelayoutIfNeeded();
 		void		LayoutItems(int32 index);
 		void		ComputeLayout(int32 index, bool bestFit, bool moveItems,
 								  float* width, float* height);

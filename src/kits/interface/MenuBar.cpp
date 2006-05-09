@@ -119,6 +119,11 @@ BMenuBar::Border() const
 void
 BMenuBar::Draw(BRect updateRect)
 {
+	if (RelayoutIfNeeded()) {
+		Invalidate();
+		return;
+	}
+
 	// TODO: implement additional border styles
 	rgb_color color = HighColor();
 	
