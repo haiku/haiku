@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2006, Haiku.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MATH_H_
@@ -102,6 +102,7 @@ extern float	log10f(float x);
 extern float	log1pf(float x);
 extern float	logbf(float x);
 extern float	logf(float x);
+extern long		lroundf(float x);
 extern float	modff(float x, float *y);
 extern float	powf(float x, float y);
 extern float	roundf(float x);
@@ -128,6 +129,7 @@ extern double	gamma(double x);
 extern double	ldexp(double x, int exponent);
 extern double	log(double x);
 extern double	log10(double x);
+extern long		lround(double x);
 extern double	modf(double x, double *y);
 extern double	pow(double x, double y);
 extern double	round(double x);
@@ -139,6 +141,8 @@ extern double	tanh(double x);
 
 /* long double math functions */
 extern long double	roundl(long double x);
+extern long		lroundl(long double x);
+
 // TODO: add and fix those!
 extern /*long*/ double	lgamma(/*long*/ double x);
 
