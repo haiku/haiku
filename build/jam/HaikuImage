@@ -12,6 +12,12 @@ if $(TARGET_ARCH) = x86 {
 	PPC_ONLY = "" ;
 }
 
+if $(INCLUDE_GPL_ADDONS) = 1 {
+	GPL_ONLY = "" ;
+} else {
+	GPL_ONLY = ;
+}
+
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
 	dstcheck du echo eject env error factor false ffm find finddir fortune funzip gawk
@@ -62,10 +68,14 @@ BEOS_ADD_ONS_MEDIA = mixer.media_addon
 	video_producer_demo.media_addon
 	#legacy.media_addon
 ;
-BEOS_ADD_ONS_MEDIA_PLUGINS = aiff_reader mp3_decoder musepack
-	raw_decoder wav_reader mov_reader au_reader avi_reader mp3_reader ogg
-	speex vorbis matroska mp4_reader
-	# ac3_decoder avcodec theora
+BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
+	aiff_reader au_reader avcodec avi_reader
+	matroska mov_reader
+	mp3_decoder mp3_reader
+	mp4_reader musepack
+	ogg raw_decoder speex 
+	# theora
+	vorbis wav_reader
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
@@ -74,7 +84,7 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 ;
 BEOS_ADD_ONS_DRIVERS_NET = ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack_driver
-	# bcm440x bcm570x (only available with GPLd add-ons)
+	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button $(X86_ONLY)acpi_ns_dump ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi config_manager 
