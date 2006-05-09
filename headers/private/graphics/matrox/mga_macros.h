@@ -295,6 +295,7 @@
 #define MGAMAV_VSOMETHINGL    0xAE
 #define MGAMAV_VSOMETHINGH    0xAF
 #define MGAMAV_OUTMODE        0xB0
+#define MGAMAV_VERSION        0xB2
 #define MGAMAV_LOCK           0xB3
 #define MGAMAV_LUMA           0xB9
 #define MGAMAV_VDISPLAYTV     0xBE
