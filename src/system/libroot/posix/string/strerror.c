@@ -238,7 +238,7 @@ error_description(int error)
 		case B_LAST_BUFFER_ERROR:
 			return "Last buffer";
 		case B_MEDIA_SYSTEM_FAILURE:
-			return "Systen failure";
+			return "System failure";
 		case B_MEDIA_BAD_NODE:
 			return "Bad media node";
 		case B_MEDIA_NODE_BUSY:
@@ -258,7 +258,7 @@ error_description(int error)
 		case B_MEDIA_CANNOT_SEEK:
 			return "Cannot seek";
 		case B_MEDIA_CANNOT_CHANGE_RUN_MODE:
-			return "CAnnot change run mode";
+			return "Cannot change run mode";
 		case B_MEDIA_APP_ALREADY_REGISTERED:
 			return "Application already registered";
 		case B_MEDIA_APP_NOT_REGISTERED:
@@ -317,7 +317,7 @@ error_description(int error)
 		case B_MAIL_NO_RECIPIENT:
 			return "No mail recipient";
 		case B_MAIL_INVALID_MAIL:
-			return "Invaild mail";
+			return "Invalid mail";
 
 		// Printing Errors
 
