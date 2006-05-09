@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 #include <GLView.h>
-#include "GLRenderersManager.h"
+// #include "GLRenderersManager.h"
 #include "GLRenderer.h"
 
 BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong options)
