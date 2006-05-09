@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-1/2006
+	Rudolf Cornelissen 11/2002-5/2006
 */
 
 #define MODULE_BIT 0x00200000
@@ -319,7 +319,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the pixel clock PLL */
-		if (si->ps.card_type >= G100) 
+		if (si->ps.card_type >= G100)
+			//fixme: how about when TVout is enabled???
 			status = gx00_dac_set_pix_pll(target);
 		else
 		{
@@ -332,6 +333,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		gx00_dac_mode(colour_mode,1.0);
 		gx00_crtc_depth(colour_mode);
 		
+		/* if we do TVout mode, its non-interlaced (as we are on <= G400MAX for sure) */
+		si->interlaced_tv_mode = false;
+
 		/* set the display pitch */
 		gx00_crtc_set_display_pitch();
 
@@ -357,9 +361,17 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the timing */
-		gx00_crtc_set_timing(target);
+		if (!si->ps.secondary_head && si->ps.tvout && (target.flags & TV_BITS))
+		{
+			/* TVout support: setup CRTC1 and it's pixelclock */
+			maventv_init(target);
+		}
+		else
+		{
+			gx00_crtc_set_timing(target);
+		}
 
-		//fixme: shut-off the videoPLL if it exists...
+		//fixme: shut-off the videoPLL when applicable, if it exists...
 	}
 	
 	/* update driver's mode store */
@@ -372,7 +384,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	SET_DPMS_MODE(si->dpms_flags);
 
 	/* clear line at bottom of screen if dualhead mode:
-	 * MAVEN hardware design fault 'fix'. */
+	 * MAVEN hardware design fault 'fix'.
+	 * Note:
+	 * Not applicable for singlehead cards with a MAVEN, since it's only used
+	 * for TVout there. */
 	if ((target.flags & DUALHEAD_BITS) && (si->ps.card_type <= G400MAX))
 		gx00_maven_clrline();
 

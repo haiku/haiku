@@ -1,6 +1,6 @@
 /* Authors:
    Mark Watson 2000,
-   Rudolf Cornelissen 1/2003-12/2003
+   Rudolf Cornelissen 1/2003-5/2006
 
    Thanx to Petr Vandrovec for writing matroxfb.
 */
@@ -700,7 +700,10 @@ int maventv_init(display_mode target)
 		 * by one! */
 		MAVW(LUMA, 0x78);
 		/* We just made a sync polarity programming step for monitor modes, so:
-		 * note the offset from 'reset position' we will have now */
+		 * note the offset from 'reset position' we will have now.
+		 * Note:
+		 * Not applicable for singlehead cards with a MAVEN, since it's only used
+		 * for TVout there. */
 		si->maven_syncpol_offset += 1;
 		if (si->maven_syncpol_offset > 3) si->maven_syncpol_offset = 0;
 
@@ -1385,8 +1388,17 @@ int maventv_init(display_mode target)
 		DXIW(GENIODATA, 0x00);
 	}
 
-	/* setup CRTC2 timing */
-	g400_crtc2_set_timing(tv_target);
+	/* setup CRTC timing */
+	if (si->ps.secondary_head)
+	{
+		/* on dualhead cards TVout is always used on CRTC2 */
+		g400_crtc2_set_timing(tv_target);
+	}
+	else
+	{
+		/* on singlehead cards TVout is always used on CRTC1 */
+		gx00_crtc_set_timing(tv_target);
+	}
 
 	/* start whole thing if needed */
 	if (si->ps.card_type <= G400MAX) MAVW(RESYNC, 0x20);
