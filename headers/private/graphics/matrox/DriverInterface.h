@@ -221,7 +221,7 @@ typedef struct {
 		uint32 max_dac2_clock_32;
 		uint32 max_dac2_clock_32dh;
 		bool secondary_head;		/* presence of functions */
-		bool secondary_tvout;
+		bool tvout;
 		bool primary_dvi;
 		bool secondary_dvi;
 		uint32 memory_size;			/* memory (Mb) */
