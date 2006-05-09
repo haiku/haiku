@@ -27,33 +27,31 @@
 #include <stdio.h>
 
 #include <GLView.h>
+#include "GLRenderersManager.h"
+#include "GLRenderer.h"
 
-//
-// Input:  rect - initial rectangle
-//         name - window name
-//         resizingMode - example: B_FOLLOW_NONE
-//         mode - usually 0 ?
-//         options - Bitwise-OR of BGL_* tokens
-//
-
-BGLView::BGLView(BRect rect, char *name,
-                 ulong resizingMode, ulong mode,
-                 ulong options)
-   : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS) //  | B_FULL_UPDATE_ON_RESIZE)
+BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong options)
+   : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
+		fRenderer(NULL)
 {
 }
 
 
 BGLView::~BGLView()
 {
+	delete fRenderer;
 }
 
 void BGLView::LockGL()
 {
+	if (fRenderer)
+		fRenderer->LockGL();
 }
 
 void BGLView::UnlockGL()
 {
+	if (fRenderer)
+		fRenderer->UnlockGL();
 }
 
 void BGLView::SwapBuffers()
@@ -63,6 +61,8 @@ void BGLView::SwapBuffers()
 
 void BGLView::SwapBuffers(bool vSync)
 {
+	if (fRenderer)
+		fRenderer->SwapBuffers(vSync);
 }
 
 BView *	BGLView::EmbeddedView()
@@ -75,6 +75,9 @@ status_t BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 	if (! dest || ! dest->Bounds().IsValid())
 		return B_BAD_VALUE;
 
+	if (fRenderer)
+		return fRenderer->CopyPixelsOut(source, dest);
+
 	return B_ERROR;
 }
 
@@ -82,6 +85,9 @@ status_t BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 {
 	if (! source || ! source->Bounds().IsValid())
 		return B_BAD_VALUE;
+
+	if (fRenderer)
+		return fRenderer->CopyPixelsIn(source, dest);
 
 	return B_ERROR;
 }
@@ -98,81 +104,100 @@ void BGLView::ErrorCallback(unsigned long errorCode) // Mesa's GLenum is not ulo
 
 void BGLView::Draw(BRect updateRect)
 {
+	if (fRenderer)
+		return fRenderer->Draw(updateRect);
+	
+	// TODO: auto-size and center the string
+	MovePenTo(8, 32);
+	DrawString("No OpenGL renderer available!");
 }
 
 void BGLView::AttachedToWindow()
 {
-   BView::AttachedToWindow();
+	BView::AttachedToWindow();
 
-   // don't paint window background white when resized
-   SetViewColor(B_TRANSPARENT_32_BIT);
+	if (fRenderer) {
+		// Don't paint white window background when resized
+		SetViewColor(B_TRANSPARENT_32_BIT);
+		return fRenderer->AttachedToWindow();
+	}
+	
+	// No Renderer, no rendering. Setup a minimal "No Renderer" string drawing context
+	SetFont(be_bold_font);
+	// SetFontSize(16);
 }
 
 void BGLView::AllAttached()
 {
-   BView::AllAttached();
+	BView::AllAttached();
 }
 
 void BGLView::DetachedFromWindow()
 {
-   BView::DetachedFromWindow();
+	BView::DetachedFromWindow();
 }
 
 void BGLView::AllDetached()
 {
-   BView::AllDetached();
+	BView::AllDetached();
 }
 
 void BGLView::FrameResized(float width, float height)
 {
-   return BView::FrameResized(width, height);
+   	return BView::FrameResized(width, height);
 }
 
 status_t BGLView::Perform(perform_code d, void *arg)
 {
-   return BView::Perform(d, arg);
+   	return BView::Perform(d, arg);
 }
 
 
 status_t BGLView::Archive(BMessage *data, bool deep) const
 {
-   return BView::Archive(data, deep);
+	return BView::Archive(data, deep);
 }
 
 void BGLView::MessageReceived(BMessage *msg)
 {
-   BView::MessageReceived(msg);
+	BView::MessageReceived(msg);
 }
 
 void BGLView::SetResizingMode(uint32 mode)
 {
-   BView::SetResizingMode(mode);
+	BView::SetResizingMode(mode);
 }
 
 void BGLView::Show()
 {
-   BView::Show();
+	BView::Show();
 }
 
 void BGLView::Hide()
 {
-   BView::Hide();
+	BView::Hide();
 }
 
 BHandler *BGLView::ResolveSpecifier(BMessage *msg, int32 index,
                                     BMessage *specifier, int32 form,
                                     const char *property)
 {
-   return BView::ResolveSpecifier(msg, index, specifier, form, property);
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 status_t BGLView::GetSupportedSuites(BMessage *data)
 {
-   return BView::GetSupportedSuites(data);
+	return BView::GetSupportedSuites(data);
 }
 
 void BGLView::DirectConnected( direct_buffer_info *info )
 {
+	/* TODO:
+         - update local copy of caller's BDirectWindow's direct_buffer_info
+         - clip it against BGLView's visible region
+         - pass the view's clipped direct_buffer_info to renderer's DirectConnect()  
+	 */
+	
 #if 0
 	if (! m_direct_connected && m_direct_connection_disabled) 
 		return; 
@@ -202,10 +227,15 @@ void BGLView::DirectConnected( direct_buffer_info *info )
 	} 
 	direct_info_locker->Unlock(); 
 #endif
+
+	if (fRenderer)
+		return fRenderer->DirectConnected(info);
 }
 
 void BGLView::EnableDirectMode( bool enabled )
 {
+	if (fRenderer)
+		return fRenderer->EnableDirectMode(enabled);
 }
 
 

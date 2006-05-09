@@ -39,6 +39,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) mesa $(TARGET_ARCH) ] ;
 SharedLibrary libGL.so :
 	GLView.cpp
 	GLDispatcher.cpp
+	GLRenderer.cpp
 
 	# mesa/$(TARGET_ARCH)
 	glapi_$(TARGET_ARCH).S

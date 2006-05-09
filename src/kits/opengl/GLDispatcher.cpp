@@ -79,23 +79,23 @@ extern "C" {
 
 #include "GLDispatcher.h"
 
-GLDispatcher::GLDispatcher()
+BGLDispatcher::BGLDispatcher()
 {
 }
 
-GLDispatcher::~GLDispatcher()
+BGLDispatcher::~BGLDispatcher()
 {
 }
 
 status_t
-GLDispatcher::CheckTable(const struct _glapi_table *table)
+BGLDispatcher::CheckTable(const struct _glapi_table *table)
 {
 	_glapi_check_table(table ? table : _glapi_get_dispatch());
 	return B_OK;
 }
 
 status_t
-GLDispatcher::SetTable(struct _glapi_table *table)
+BGLDispatcher::SetTable(struct _glapi_table *table)
 {
 	_glapi_set_dispatch(table);
 	return B_OK;

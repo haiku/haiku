@@ -9,15 +9,15 @@ extern "C" {
 #include "glapi.h"
 }
 
-class GLDispatcher
+class BGLDispatcher
 {
 		// Private unimplemented copy constructors
-		GLDispatcher(const GLDispatcher &);
-		GLDispatcher & operator=(const GLDispatcher &);
+		BGLDispatcher(const BGLDispatcher &);
+		BGLDispatcher & operator=(const BGLDispatcher &);
 	
 	public:
-		GLDispatcher();
-		~GLDispatcher();
+		BGLDispatcher();
+		~BGLDispatcher();
 		
 		const char *			Version();
 		
@@ -36,49 +36,49 @@ class GLDispatcher
 };
 
 // Inlines methods
-inline const char * GLDispatcher::Version()
+inline const char * BGLDispatcher::Version()
 {
 	return _glapi_get_version();
 }
 
 
-inline void GLDispatcher::SetCurrentContext(void * context)
+inline void BGLDispatcher::SetCurrentContext(void * context)
 {
 	_glapi_set_context(context);
 }
 
 
-inline void * GLDispatcher::CurrentContext()
+inline void * BGLDispatcher::CurrentContext()
 {
 	return _glapi_get_context();
 }
 
 
-inline struct _glapi_table * GLDispatcher::Table()
+inline struct _glapi_table * BGLDispatcher::Table()
 {
 	return _glapi_get_dispatch();
 }
 
 
-inline uint32 GLDispatcher::TableSize()
+inline uint32 BGLDispatcher::TableSize()
 {
 	return _glapi_get_dispatch_table_size();
 }
 
 
-inline const _glapi_proc GLDispatcher::operator[](const char *function_name)
+inline const _glapi_proc BGLDispatcher::operator[](const char *function_name)
 {
 	return _glapi_get_proc_address(function_name);
 }
 
 
-inline const char * GLDispatcher::operator[](uint32 offset)
+inline const char * BGLDispatcher::operator[](uint32 offset)
 {
 	return _glapi_get_proc_name((GLuint) offset);
 }
 
 
-inline uint32 GLDispatcher::OffsetOf(const char *function_name)
+inline uint32 BGLDispatcher::OffsetOf(const char *function_name)
 {
 	return (uint32) _glapi_get_proc_offset(function_name);
 }
