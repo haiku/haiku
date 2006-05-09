@@ -2,7 +2,7 @@
 /* some bits are hacks, where PINS is not known */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-4/2006
+   Rudolf Cornelissen 10/2002-5/2006
 */
 
 #define MODULE_BIT 0x00002000
@@ -951,6 +951,14 @@ void dump_pins(void)
 	if (si->ps.secondary_head) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("tvout: "));
 	if (si->ps.tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
+	if ((si->ps.tvout) && (si->ps.card_type < G450))
+	{
+		LOG(2,("MAVEN version: "));
+		if ((MAVR(VERSION)) < 20)
+			LOG(2,("rev. B\n"));
+		else
+			LOG(2,("rev. C\n"));
+	}
 	LOG(2,("primary_dvi: "));
 	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("secondary_dvi: "));
