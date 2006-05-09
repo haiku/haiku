@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsaccess - Top-level functions for accessing ACPI namespace
- *              $Revision: 187 $
+ *              $Revision: 1.198 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -141,7 +141,8 @@
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsRootInitialize (void)
+AcpiNsRootInitialize (
+    void)
 {
     ACPI_STATUS                 Status;
     const ACPI_PREDEFINED_NAMES *InitVal = NULL;
@@ -150,7 +151,7 @@ AcpiNsRootInitialize (void)
     ACPI_STRING                 Val = NULL;
 
 
-    ACPI_FUNCTION_TRACE ("NsRootInitialize");
+    ACPI_FUNCTION_TRACE (NsRootInitialize);
 
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
@@ -195,9 +196,9 @@ AcpiNsRootInitialize (void)
 
         if (ACPI_FAILURE (Status) || (!NewNode)) /* Must be on same line for code converter */
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                "Could not create predefined name %s, %s\n",
-                InitVal->Name, AcpiFormatException (Status)));
+            ACPI_EXCEPTION ((AE_INFO, Status,
+                "Could not create predefined name %s",
+                InitVal->Name));
         }
 
         /*
@@ -210,8 +211,8 @@ AcpiNsRootInitialize (void)
             Status = AcpiOsPredefinedOverride (InitVal, &Val);
             if (ACPI_FAILURE (Status))
             {
-                ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                    "Could not override predefined %s\n",
+                ACPI_ERROR ((AE_INFO,
+                    "Could not override predefined %s",
                     InitVal->Name));
             }
 
@@ -242,18 +243,19 @@ AcpiNsRootInitialize (void)
                 ObjDesc->Method.ParamCount = (UINT8) ACPI_TO_INTEGER (Val);
                 ObjDesc->Common.Flags |= AOPOBJ_DATA_VALID;
 
-#if defined (_ACPI_ASL_COMPILER) || defined (_ACPI_DUMP_APP)
+#if defined (ACPI_ASL_COMPILER)
 
-                /*
-                 * iASL Compiler cheats by putting parameter count
-                 * in the OwnerID
-                 */
-                NewNode->OwnerId = ObjDesc->Method.ParamCount;
+                /* Save the parameter count for the iASL compiler */
+
+                NewNode->Value = ObjDesc->Method.ParamCount;
 #else
                 /* Mark this as a very SPECIAL method */
 
                 ObjDesc->Method.MethodFlags = AML_METHOD_INTERNAL_ONLY;
+
+#ifndef ACPI_DUMP_APP
                 ObjDesc->Method.Implementation = AcpiUtOsiImplementation;
+#endif
 #endif
                 break;
 
@@ -316,7 +318,7 @@ AcpiNsRootInitialize (void)
 
             default:
 
-                ACPI_REPORT_ERROR (("Unsupported initial type value %X\n",
+                ACPI_ERROR ((AE_INFO, "Unsupported initial type value %X",
                     InitVal->Type));
                 AcpiUtRemoveReference (ObjDesc);
                 ObjDesc = NULL;
@@ -354,7 +356,7 @@ UnlockAndExit:
  *
  * FUNCTION:    AcpiNsLookup
  *
- * PARAMETERS:  PrefixNode      - Search scope if name is not fully qualified
+ * PARAMETERS:  ScopeInfo       - Current scope info block
  *              Pathname        - Search pathname, in internal format
  *                                (as represented in the AML stream)
  *              Type            - Type associated with name
@@ -398,7 +400,7 @@ AcpiNsLookup (
                                                    ACPI_NS_SEARCH_PARENT);
 
 
-    ACPI_FUNCTION_TRACE ("NsLookup");
+    ACPI_FUNCTION_TRACE (NsLookup);
 
 
     if (!ReturnNode)
@@ -432,20 +434,23 @@ AcpiNsLookup (
         PrefixNode = ScopeInfo->Scope.Node;
         if (ACPI_GET_DESCRIPTOR_TYPE (PrefixNode) != ACPI_DESC_TYPE_NAMED)
         {
-            ACPI_REPORT_ERROR (("NsLookup: %p is not a namespace node [%s]\n",
-                    PrefixNode, AcpiUtGetDescriptorName (PrefixNode)));
+            ACPI_ERROR ((AE_INFO, "%p is not a namespace node [%s]",
+                PrefixNode, AcpiUtGetDescriptorName (PrefixNode)));
             return_ACPI_STATUS (AE_AML_INTERNAL);
         }
 
-        /*
-         * This node might not be a actual "scope" node (such as a
-         * Device/Method, etc.)  It could be a Package or other object node.
-         * Backup up the tree to find the containing scope node.
-         */
-        while (!AcpiNsOpensScope (PrefixNode->Type) &&
-                PrefixNode->Type != ACPI_TYPE_ANY)
+        if (!(Flags & ACPI_NS_PREFIX_IS_SCOPE))
         {
-            PrefixNode = AcpiNsGetParentNode (PrefixNode);
+            /*
+             * This node might not be a actual "scope" node (such as a
+             * Device/Method, etc.)  It could be a Package or other object node.
+             * Backup up the tree to find the containing scope node.
+             */
+            while (!AcpiNsOpensScope (PrefixNode->Type) &&
+                    PrefixNode->Type != ACPI_TYPE_ANY)
+            {
+                PrefixNode = AcpiNsGetParentNode (PrefixNode);
+            }
         }
     }
 
@@ -460,9 +465,9 @@ AcpiNsLookup (
     {
         /* A Null NamePath is allowed and refers to the root */
 
-        NumSegments  = 0;
-        ThisNode     = AcpiGbl_RootNode;
-        Path     = "";
+        NumSegments = 0;
+        ThisNode = AcpiGbl_RootNode;
+        Path = "";
 
         ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
             "Null Pathname (Zero segments), Flags=%X\n", Flags));
@@ -529,8 +534,8 @@ AcpiNsLookup (
                 {
                     /* Current scope has no parent scope */
 
-                    ACPI_REPORT_ERROR (
-                        ("ACPI path has too many parent prefixes (^) - reached beyond root node\n"));
+                    ACPI_ERROR ((AE_INFO,
+                        "ACPI path has too many parent prefixes (^) - reached beyond root node"));
                     return_ACPI_STATUS (AE_NOT_FOUND);
                 }
             }
@@ -599,7 +604,7 @@ AcpiNsLookup (
             Path++;
 
             ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
-                "Multi Pathname (%d Segments, Flags=%X) \n",
+                "Multi Pathname (%d Segments, Flags=%X)\n",
                 NumSegments, Flags));
             break;
 
@@ -694,19 +699,20 @@ AcpiNsLookup (
          *
          * Then we have a type mismatch.  Just warn and ignore it.
          */
-        if ((NumSegments        == 0)                               &&
-            (TypeToCheckFor     != ACPI_TYPE_ANY)                   &&
-            (TypeToCheckFor     != ACPI_TYPE_LOCAL_ALIAS)           &&
-            (TypeToCheckFor     != ACPI_TYPE_LOCAL_METHOD_ALIAS)    &&
-            (TypeToCheckFor     != ACPI_TYPE_LOCAL_SCOPE)           &&
-            (ThisNode->Type     != ACPI_TYPE_ANY)                   &&
-            (ThisNode->Type     != TypeToCheckFor))
+        if ((NumSegments == 0)                                  &&
+            (TypeToCheckFor != ACPI_TYPE_ANY)                   &&
+            (TypeToCheckFor != ACPI_TYPE_LOCAL_ALIAS)           &&
+            (TypeToCheckFor != ACPI_TYPE_LOCAL_METHOD_ALIAS)    &&
+            (TypeToCheckFor != ACPI_TYPE_LOCAL_SCOPE)           &&
+            (ThisNode->Type != ACPI_TYPE_ANY)                   &&
+            (ThisNode->Type != TypeToCheckFor))
         {
             /* Complain about a type mismatch */
 
-            ACPI_REPORT_WARNING (
-                ("NsLookup: Type mismatch on %4.4s (%s), searching for (%s)\n",
-                (char *) &SimpleName, AcpiUtGetTypeName (ThisNode->Type),
+            ACPI_WARNING ((AE_INFO,
+                "NsLookup: Type mismatch on %4.4s (%s), searching for (%s)",
+                ACPI_CAST_PTR (char, &SimpleName),
+                AcpiUtGetTypeName (ThisNode->Type),
                 AcpiUtGetTypeName (TypeToCheckFor)));
         }
 

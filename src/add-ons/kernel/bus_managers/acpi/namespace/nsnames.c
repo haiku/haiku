@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsnames - Name manipulation and search
- *              $Revision: 87 $
+ *              $Revision: 1.97 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -150,7 +150,7 @@ AcpiNsBuildExternalPath (
     ACPI_NAMESPACE_NODE     *ParentNode;
 
 
-    ACPI_FUNCTION_NAME ("NsBuildExternalPath");
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Special case for root */
@@ -189,8 +189,8 @@ AcpiNsBuildExternalPath (
 
     if (Index != 0)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-            "Could not construct pathname; index=%X, size=%X, Path=%s\n",
+        ACPI_ERROR ((AE_INFO,
+            "Could not construct pathname; index=%X, size=%X, Path=%s",
             (UINT32) Index, (UINT32) Size, &NameBuffer[Size]));
     }
 
@@ -203,7 +203,7 @@ AcpiNsBuildExternalPath (
  *
  * FUNCTION:    AcpiNsGetExternalPathname
  *
- * PARAMETERS:  Node            - NS node whose pathname is needed
+ * PARAMETERS:  Node            - Namespace node whose pathname is needed
  *
  * RETURN:      Pointer to storage containing the fully qualified name of
  *              the node, In external format (name segments separated by path
@@ -221,7 +221,7 @@ AcpiNsGetExternalPathname (
     ACPI_SIZE               Size;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("NsGetExternalPathname", Node);
+    ACPI_FUNCTION_TRACE_PTR (NsGetExternalPathname, Node);
 
 
     /* Calculate required buffer size based on depth below root */
@@ -230,10 +230,10 @@ AcpiNsGetExternalPathname (
 
     /* Allocate a buffer to be returned to caller */
 
-    NameBuffer = ACPI_MEM_CALLOCATE (Size);
+    NameBuffer = ACPI_ALLOCATE_ZEROED (Size);
     if (!NameBuffer)
     {
-        ACPI_REPORT_ERROR (("NsGetTablePathname: allocation failure\n"));
+        ACPI_ERROR ((AE_INFO, "Allocation failure"));
         return_PTR (NULL);
     }
 
@@ -314,7 +314,7 @@ AcpiNsHandleToPathname (
     ACPI_SIZE               RequiredSize;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("NsHandleToPathname", TargetHandle);
+    ACPI_FUNCTION_TRACE_PTR (NsHandleToPathname, TargetHandle);
 
 
     Node = AcpiNsMapHandleToNode (TargetHandle);
@@ -339,7 +339,7 @@ AcpiNsHandleToPathname (
 
     AcpiNsBuildExternalPath (Node, RequiredSize, Buffer->Pointer);
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%s [%X] \n",
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "%s [%X]\n",
         (char *) Buffer->Pointer, (UINT32) RequiredSize));
     return_ACPI_STATUS (AE_OK);
 }

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evxface - External interfaces for ACPI events
- *              $Revision: 148 $
+ *              $Revision: 1.160 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -41,7 +41,7 @@
  * 3. Conditions
  *
  * 3.1. Redistribution of Source with Rights to Further Distribute Source.
- * Redistribution of source code of any substantial prton of the Covered
+ * Redistribution of source code of any substantial portion of the Covered
  * Code or modification with rights to further distribute source must include
  * the above Copyright Notice, the above License, this list of Conditions,
  * and the following Disclaimer and Export Compliance provision.  In addition,
@@ -146,7 +146,7 @@ AcpiInstallExceptionHandler (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiInstallExceptionHandler");
+    ACPI_FUNCTION_TRACE (AcpiInstallExceptionHandler);
 
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_EVENTS);
@@ -171,6 +171,8 @@ Cleanup:
     (void) AcpiUtReleaseMutex (ACPI_MTX_EVENTS);
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiInstallExceptionHandler)
 
 
 /*******************************************************************************
@@ -198,7 +200,7 @@ AcpiInstallFixedEventHandler (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiInstallFixedEventHandler");
+    ACPI_FUNCTION_TRACE (AcpiInstallFixedEventHandler);
 
 
     /* Parameter validation */
@@ -230,7 +232,7 @@ AcpiInstallFixedEventHandler (
     Status = AcpiEnableEvent (Event, 0);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_WARN, "Could not enable fixed event.\n"));
+        ACPI_WARNING ((AE_INFO, "Could not enable fixed event %X", Event));
 
         /* Remove the handler */
 
@@ -248,6 +250,8 @@ Cleanup:
     (void) AcpiUtReleaseMutex (ACPI_MTX_EVENTS);
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiInstallFixedEventHandler)
 
 
 /*******************************************************************************
@@ -271,7 +275,7 @@ AcpiRemoveFixedEventHandler (
     ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiRemoveFixedEventHandler");
+    ACPI_FUNCTION_TRACE (AcpiRemoveFixedEventHandler);
 
 
     /* Parameter validation */
@@ -298,17 +302,19 @@ AcpiRemoveFixedEventHandler (
 
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_WARN,
-            "Could not write to fixed event enable register.\n"));
+        ACPI_WARNING ((AE_INFO,
+            "Could not write to fixed event enable register %X", Event));
     }
     else
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Disabled fixed event %X.\n", Event));
+        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Disabled fixed event %X\n", Event));
     }
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_EVENTS);
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiRemoveFixedEventHandler)
 
 
 /*******************************************************************************
@@ -342,7 +348,7 @@ AcpiInstallNotifyHandler (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiInstallNotifyHandler");
+    ACPI_FUNCTION_TRACE (AcpiInstallNotifyHandler);
 
 
     /* Parameter validation */
@@ -497,6 +503,8 @@ UnlockAndExit:
     return_ACPI_STATUS (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiInstallNotifyHandler)
+
 
 /*******************************************************************************
  *
@@ -527,7 +535,7 @@ AcpiRemoveNotifyHandler (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiRemoveNotifyHandler");
+    ACPI_FUNCTION_TRACE (AcpiRemoveNotifyHandler);
 
 
     /* Parameter validation */
@@ -558,7 +566,8 @@ AcpiRemoveNotifyHandler (
 
     if (Device == ACPI_ROOT_OBJECT)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Removing notify handler for ROOT object.\n"));
+        ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+            "Removing notify handler for namespace root object\n"));
 
         if (((HandlerType & ACPI_SYSTEM_NOTIFY) &&
               !AcpiGbl_SystemNotify.Handler)        ||
@@ -646,13 +655,16 @@ UnlockAndExit:
     return_ACPI_STATUS (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiRemoveNotifyHandler)
+
 
 /*******************************************************************************
  *
  * FUNCTION:    AcpiInstallGpeHandler
  *
- * PARAMETERS:  GpeNumber       - The GPE number within the GPE block
- *              GpeBlock        - GPE block (NULL == FADT GPEs)
+ * PARAMETERS:  GpeDevice       - Namespace node for the GPE (NULL for FADT
+ *                                defined GPEs)
+ *              GpeNumber       - The GPE number within the GPE block
  *              Type            - Whether this GPE should be treated as an
  *                                edge- or level-triggered interrupt.
  *              Address         - Address of the handler
@@ -675,9 +687,10 @@ AcpiInstallGpeHandler (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo;
     ACPI_HANDLER_INFO       *Handler;
     ACPI_STATUS             Status;
+    ACPI_CPU_FLAGS          Flags;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiInstallGpeHandler");
+    ACPI_FUNCTION_TRACE (AcpiInstallGpeHandler);
 
 
     /* Parameter validation */
@@ -712,7 +725,7 @@ AcpiInstallGpeHandler (
 
     /* Allocate and init handler object */
 
-    Handler = ACPI_MEM_CALLOCATE (sizeof (ACPI_HANDLER_INFO));
+    Handler = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_HANDLER_INFO));
     if (!Handler)
     {
         Status = AE_NO_MEMORY;
@@ -733,7 +746,7 @@ AcpiInstallGpeHandler (
 
     /* Install the handler */
 
-    AcpiOsAcquireLock (AcpiGbl_GpeLock, ACPI_NOT_ISR);
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
     GpeEventInfo->Dispatch.Handler = Handler;
 
     /* Setup up dispatch flags to indicate handler (vs. method) */
@@ -741,7 +754,7 @@ AcpiInstallGpeHandler (
     GpeEventInfo->Flags &= ~(ACPI_GPE_XRUPT_TYPE_MASK | ACPI_GPE_DISPATCH_MASK);  /* Clear bits */
     GpeEventInfo->Flags |= (UINT8) (Type | ACPI_GPE_DISPATCH_HANDLER);
 
-    AcpiOsReleaseLock (AcpiGbl_GpeLock, ACPI_NOT_ISR);
+    AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
 
 
 UnlockAndExit:
@@ -749,13 +762,16 @@ UnlockAndExit:
     return_ACPI_STATUS (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiInstallGpeHandler)
+
 
 /*******************************************************************************
  *
  * FUNCTION:    AcpiRemoveGpeHandler
  *
- * PARAMETERS:  GpeNumber       - The event to remove a handler
- *              GpeBlock        - GPE block (NULL == FADT GPEs)
+ * PARAMETERS:  GpeDevice       - Namespace node for the GPE (NULL for FADT
+ *                                defined GPEs)
+ *              GpeNumber       - The event to remove a handler
  *              Address         - Address of the handler
  *
  * RETURN:      Status
@@ -773,9 +789,10 @@ AcpiRemoveGpeHandler (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo;
     ACPI_HANDLER_INFO       *Handler;
     ACPI_STATUS             Status;
+    ACPI_CPU_FLAGS          Flags;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiRemoveGpeHandler");
+    ACPI_FUNCTION_TRACE (AcpiRemoveGpeHandler);
 
 
     /* Parameter validation */
@@ -826,7 +843,7 @@ AcpiRemoveGpeHandler (
 
     /* Remove the handler */
 
-    AcpiOsAcquireLock (AcpiGbl_GpeLock, ACPI_NOT_ISR);
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
     Handler = GpeEventInfo->Dispatch.Handler;
 
     /* Restore Method node (if any), set dispatch flags */
@@ -837,11 +854,11 @@ AcpiRemoveGpeHandler (
     {
         GpeEventInfo->Flags |= ACPI_GPE_DISPATCH_METHOD;
     }
-    AcpiOsReleaseLock (AcpiGbl_GpeLock, ACPI_NOT_ISR);
+    AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
 
     /* Now we can free the handler object */
 
-    ACPI_MEM_FREE (Handler);
+    ACPI_FREE (Handler);
 
 
 UnlockAndExit:
@@ -849,13 +866,16 @@ UnlockAndExit:
     return_ACPI_STATUS (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiRemoveGpeHandler)
+
 
 /*******************************************************************************
  *
  * FUNCTION:    AcpiAcquireGlobalLock
  *
  * PARAMETERS:  Timeout         - How long the caller is willing to wait
- *              OutHandle       - A handle to the lock if acquired
+ *              Handle          - Where the handle to the lock is returned
+ *                                (if acquired)
  *
  * RETURN:      Status
  *
@@ -894,6 +914,8 @@ AcpiAcquireGlobalLock (
     return (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiAcquireGlobalLock)
+
 
 /*******************************************************************************
  *
@@ -903,7 +925,7 @@ AcpiAcquireGlobalLock (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Release the ACPI Global Lock
+ * DESCRIPTION: Release the ACPI Global Lock. The handle must be valid.
  *
  ******************************************************************************/
 
@@ -923,4 +945,5 @@ AcpiReleaseGlobalLock (
     return (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiReleaseGlobalLock)
 

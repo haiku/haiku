@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Name: hwsleep.c - ACPI Hardware Sleep/Wake Interface
- *              $Revision: 71 $
+ *              $Revision: 1.82 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -121,20 +121,7 @@
         ACPI_MODULE_NAME    ("hwsleep")
 
 
-#define METHOD_NAME__BFS        "\\_BFS"
-#define METHOD_NAME__GTS        "\\_GTS"
-#define METHOD_NAME__PTS        "\\_PTS"
-#define METHOD_NAME__SST        "\\_SI._SST"
-#define METHOD_NAME__WAK        "\\_WAK"
-
-#define ACPI_SST_INDICATOR_OFF  0
-#define ACPI_SST_WORKING        1
-#define ACPI_SST_WAKING         2
-#define ACPI_SST_SLEEPING       3
-#define ACPI_SST_SLEEP_CONTEXT  4
-
-
-/******************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiSetFirmwareWakingVector
  *
@@ -143,7 +130,7 @@
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Access function for dFirmwareWakingVector field in FACS
+ * DESCRIPTION: Access function for the FirmwareWakingVector field in FACS
  *
  ******************************************************************************/
 
@@ -152,7 +139,7 @@ AcpiSetFirmwareWakingVector (
     ACPI_PHYSICAL_ADDRESS PhysicalAddress)
 {
 
-    ACPI_FUNCTION_TRACE ("AcpiSetFirmwareWakingVector");
+    ACPI_FUNCTION_TRACE (AcpiSetFirmwareWakingVector);
 
 
     /* Set the vector */
@@ -171,18 +158,20 @@ AcpiSetFirmwareWakingVector (
     return_ACPI_STATUS (AE_OK);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiSetFirmwareWakingVector)
 
-/******************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiGetFirmwareWakingVector
  *
- * PARAMETERS:  *PhysicalAddress    - Output buffer where contents of
+ * PARAMETERS:  *PhysicalAddress    - Where the contents of
  *                                    the FirmwareWakingVector field of
- *                                    the FACS will be stored.
+ *                                    the FACS will be returned.
  *
- * RETURN:      Status
+ * RETURN:      Status, vector
  *
- * DESCRIPTION: Access function for FirmwareWakingVector field in FACS
+ * DESCRIPTION: Access function for the FirmwareWakingVector field in FACS
  *
  ******************************************************************************/
 
@@ -191,7 +180,7 @@ AcpiGetFirmwareWakingVector (
     ACPI_PHYSICAL_ADDRESS *PhysicalAddress)
 {
 
-    ACPI_FUNCTION_TRACE ("AcpiGetFirmwareWakingVector");
+    ACPI_FUNCTION_TRACE (AcpiGetFirmwareWakingVector);
 
 
     if (!PhysicalAddress)
@@ -215,8 +204,10 @@ AcpiGetFirmwareWakingVector (
     return_ACPI_STATUS (AE_OK);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiGetFirmwareWakingVector)
 
-/******************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiEnterSleepStatePrep
  *
@@ -240,7 +231,7 @@ AcpiEnterSleepStatePrep (
     ACPI_OBJECT         Arg;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiEnterSleepStatePrep");
+    ACPI_FUNCTION_TRACE (AcpiEnterSleepStatePrep);
 
 
     /*
@@ -294,7 +285,7 @@ AcpiEnterSleepStatePrep (
         break;
 
     default:
-        Arg.Integer.Value = ACPI_SST_INDICATOR_OFF; /* Default is indicator off */
+        Arg.Integer.Value = ACPI_SST_INDICATOR_OFF; /* Default is off */
         break;
     }
 
@@ -303,14 +294,16 @@ AcpiEnterSleepStatePrep (
     Status = AcpiEvaluateObject (NULL, METHOD_NAME__SST, &ArgList, NULL);
     if (ACPI_FAILURE (Status) && Status != AE_NOT_FOUND)
     {
-         ACPI_REPORT_ERROR (("Method _SST failed, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "While executing method _SST"));
     }
 
     return_ACPI_STATUS (AE_OK);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiEnterSleepStatePrep)
 
-/******************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiEnterSleepState
  *
@@ -335,13 +328,13 @@ AcpiEnterSleepState (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiEnterSleepState");
+    ACPI_FUNCTION_TRACE (AcpiEnterSleepState);
 
 
     if ((AcpiGbl_SleepTypeA > ACPI_SLEEP_TYPE_MAX) ||
         (AcpiGbl_SleepTypeB > ACPI_SLEEP_TYPE_MAX))
     {
-        ACPI_REPORT_ERROR (("Sleep values out of range: A=%X B=%X\n",
+        ACPI_ERROR ((AE_INFO, "Sleep values out of range: A=%X B=%X",
             AcpiGbl_SleepTypeA, AcpiGbl_SleepTypeB));
         return_ACPI_STATUS (AE_AML_OPERAND_VALUE);
     }
@@ -369,7 +362,8 @@ AcpiEnterSleepState (
     {
         /* Disable BM arbitration */
 
-        Status = AcpiSetRegister (ACPI_BITREG_ARB_DISABLE, 1, ACPI_MTX_DO_NOT_LOCK);
+        Status = AcpiSetRegister (ACPI_BITREG_ARB_DISABLE,
+                    1, ACPI_MTX_DO_NOT_LOCK);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -380,14 +374,14 @@ AcpiEnterSleepState (
      * 1) Disable/Clear all GPEs
      * 2) Enable all wakeup GPEs
      */
-    Status = AcpiHwDisableAllGpes (ACPI_ISR);
+    Status = AcpiHwDisableAllGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
     AcpiGbl_SystemAwakeAndRunning = FALSE;
 
-    Status = AcpiHwEnableAllWakeupGpes (ACPI_ISR);
+    Status = AcpiHwEnableAllWakeupGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -395,16 +389,19 @@ AcpiEnterSleepState (
 
     /* Get current value of PM1A control */
 
-    Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1_CONTROL, &PM1AControl);
+    Status = AcpiHwRegisterRead (ACPI_MTX_DO_NOT_LOCK,
+                ACPI_REGISTER_PM1_CONTROL, &PM1AControl);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
-    ACPI_DEBUG_PRINT ((ACPI_DB_INIT, "Entering sleep state [S%d]\n", SleepState));
+    ACPI_DEBUG_PRINT ((ACPI_DB_INIT,
+        "Entering sleep state [S%d]\n", SleepState));
 
     /* Clear SLP_EN and SLP_TYP fields */
 
-    PM1AControl &= ~(SleepTypeRegInfo->AccessBitMask | SleepEnableRegInfo->AccessBitMask);
+    PM1AControl &= ~(SleepTypeRegInfo->AccessBitMask |
+                     SleepEnableRegInfo->AccessBitMask);
     PM1BControl = PM1AControl;
 
     /* Insert SLP_TYP bits */
@@ -419,13 +416,15 @@ AcpiEnterSleepState (
 
     /* Write #1: fill in SLP_TYP data */
 
-    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1A_CONTROL, PM1AControl);
+    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
+                ACPI_REGISTER_PM1A_CONTROL, PM1AControl);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1B_CONTROL, PM1BControl);
+    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
+                ACPI_REGISTER_PM1B_CONTROL, PM1BControl);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -440,13 +439,15 @@ AcpiEnterSleepState (
 
     ACPI_FLUSH_CPU_CACHE ();
 
-    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1A_CONTROL, PM1AControl);
+    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
+                ACPI_REGISTER_PM1A_CONTROL, PM1AControl);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1B_CONTROL, PM1BControl);
+    Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
+                ACPI_REGISTER_PM1B_CONTROL, PM1BControl);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -455,10 +456,11 @@ AcpiEnterSleepState (
     if (SleepState > ACPI_STATE_S3)
     {
         /*
-         * We wanted to sleep > S3, but it didn't happen (by virtue of the fact that
-         * we are still executing!)
+         * We wanted to sleep > S3, but it didn't happen (by virtue of the
+         * fact that we are still executing!)
          *
-         * Wait ten seconds, then try again. This is to get S4/S5 to work on all machines.
+         * Wait ten seconds, then try again. This is to get S4/S5 to work on
+         * all machines.
          *
          * We wait so long to allow chipsets that poll this reg very slowly to
          * still read the right value. Ideally, this block would go
@@ -466,7 +468,8 @@ AcpiEnterSleepState (
          */
         AcpiOsStall (10000000);
 
-        Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK, ACPI_REGISTER_PM1_CONTROL,
+        Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
+                    ACPI_REGISTER_PM1_CONTROL,
                     SleepEnableRegInfo->AccessBitMask);
         if (ACPI_FAILURE (Status))
         {
@@ -478,7 +481,8 @@ AcpiEnterSleepState (
 
     do
     {
-        Status = AcpiGetRegister (ACPI_BITREG_WAKE_STATUS, &InValue, ACPI_MTX_DO_NOT_LOCK);
+        Status = AcpiGetRegister (ACPI_BITREG_WAKE_STATUS, &InValue,
+            ACPI_MTX_DO_NOT_LOCK);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -491,8 +495,10 @@ AcpiEnterSleepState (
     return_ACPI_STATUS (AE_OK);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiEnterSleepState)
 
-/******************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiEnterSleepStateS4bios
  *
@@ -513,7 +519,7 @@ AcpiEnterSleepStateS4bios (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiEnterSleepStateS4bios");
+    ACPI_FUNCTION_TRACE (AcpiEnterSleepStateS4bios);
 
 
     Status = AcpiSetRegister (ACPI_BITREG_WAKE_STATUS, 1, ACPI_MTX_DO_NOT_LOCK);
@@ -532,14 +538,14 @@ AcpiEnterSleepStateS4bios (
      * 1) Disable/Clear all GPEs
      * 2) Enable all wakeup GPEs
      */
-    Status = AcpiHwDisableAllGpes (ACPI_ISR);
+    Status = AcpiHwDisableAllGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
     AcpiGbl_SystemAwakeAndRunning = FALSE;
 
-    Status = AcpiHwEnableAllWakeupGpes (ACPI_ISR);
+    Status = AcpiHwEnableAllWakeupGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -547,11 +553,13 @@ AcpiEnterSleepStateS4bios (
 
     ACPI_FLUSH_CPU_CACHE ();
 
-    Status = AcpiOsWritePort (AcpiGbl_FADT->SmiCmd, (UINT32) AcpiGbl_FADT->S4BiosReq, 8);
+    Status = AcpiOsWritePort (AcpiGbl_FADT->SmiCmd,
+                (UINT32) AcpiGbl_FADT->S4BiosReq, 8);
 
     do {
         AcpiOsStall(1000);
-        Status = AcpiGetRegister (ACPI_BITREG_WAKE_STATUS, &InValue, ACPI_MTX_DO_NOT_LOCK);
+        Status = AcpiGetRegister (ACPI_BITREG_WAKE_STATUS, &InValue,
+            ACPI_MTX_DO_NOT_LOCK);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -561,8 +569,10 @@ AcpiEnterSleepStateS4bios (
     return_ACPI_STATUS (AE_OK);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiEnterSleepStateS4bios)
 
-/******************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiLeaveSleepState
  *
@@ -588,7 +598,7 @@ AcpiLeaveSleepState (
     UINT32                  PM1BControl;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiLeaveSleepState");
+    ACPI_FUNCTION_TRACE (AcpiLeaveSleepState);
 
 
     /*
@@ -645,20 +655,20 @@ AcpiLeaveSleepState (
     Status = AcpiEvaluateObject (NULL, METHOD_NAME__SST, &ArgList, NULL);
     if (ACPI_FAILURE (Status) && Status != AE_NOT_FOUND)
     {
-        ACPI_REPORT_ERROR (("Method _SST failed, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Method _SST"));
     }
 
     Arg.Integer.Value = SleepState;
     Status = AcpiEvaluateObject (NULL, METHOD_NAME__BFS, &ArgList, NULL);
     if (ACPI_FAILURE (Status) && Status != AE_NOT_FOUND)
     {
-        ACPI_REPORT_ERROR (("Method _BFS failed, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Method _BFS"));
     }
 
     Status = AcpiEvaluateObject (NULL, METHOD_NAME__WAK, &ArgList, NULL);
     if (ACPI_FAILURE (Status) && Status != AE_NOT_FOUND)
     {
-        ACPI_REPORT_ERROR (("Method _WAK failed, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Method _WAK"));
     }
     /* TBD: _WAK "sometimes" returns stuff - do we want to look at it? */
 
@@ -667,14 +677,14 @@ AcpiLeaveSleepState (
      * 1) Disable/Clear all GPEs
      * 2) Enable all runtime GPEs
      */
-    Status = AcpiHwDisableAllGpes (ACPI_NOT_ISR);
+    Status = AcpiHwDisableAllGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
     }
     AcpiGbl_SystemAwakeAndRunning = TRUE;
 
-    Status = AcpiHwEnableAllRuntimeGpes (ACPI_NOT_ISR);
+    Status = AcpiHwEnableAllRuntimeGpes ();
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -682,9 +692,12 @@ AcpiLeaveSleepState (
 
     /* Enable power button */
 
-    (void) AcpiSetRegister(AcpiGbl_FixedEventInfo[ACPI_EVENT_POWER_BUTTON].EnableRegisterId,
+    (void) AcpiSetRegister(
+            AcpiGbl_FixedEventInfo[ACPI_EVENT_POWER_BUTTON].EnableRegisterId,
             1, ACPI_MTX_DO_NOT_LOCK);
-    (void) AcpiSetRegister(AcpiGbl_FixedEventInfo[ACPI_EVENT_POWER_BUTTON].StatusRegisterId,
+
+    (void) AcpiSetRegister(
+            AcpiGbl_FixedEventInfo[ACPI_EVENT_POWER_BUTTON].StatusRegisterId,
             1, ACPI_MTX_DO_NOT_LOCK);
 
     /* Enable BM arbitration */
@@ -699,8 +712,11 @@ AcpiLeaveSleepState (
     Status = AcpiEvaluateObject (NULL, METHOD_NAME__SST, &ArgList, NULL);
     if (ACPI_FAILURE (Status) && Status != AE_NOT_FOUND)
     {
-        ACPI_REPORT_ERROR (("Method _SST failed, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During Method _SST"));
     }
 
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiLeaveSleepState)
+

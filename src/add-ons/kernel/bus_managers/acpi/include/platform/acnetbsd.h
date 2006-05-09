@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acnetbsd.h - OS specific defines, etc.
- *       $Revision: 6 $
+ *       $Revision: 1.8 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -188,15 +188,4 @@ isprint(int ch)
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_NATIVE_DIVIDE
 
-/* NetBSD doesn't have strupr, should be fixed. (move to libkern) */
-static __inline char *
-strupr(char *str)
-{
-    char *c = str;
-    while(*c) {
-        *c = toupper(*c);
-        c++;
-    }
-    return(str);
-}
 #endif /* __ACNETBSD_H__ */

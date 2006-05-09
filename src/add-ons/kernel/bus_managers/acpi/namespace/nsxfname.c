@@ -2,7 +2,7 @@
  *
  * Module Name: nsxfname - Public interfaces to the ACPI subsystem
  *                         ACPI Namespace oriented interfaces
- *              $Revision: 103 $
+ *              $Revision: 1.108 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -130,9 +130,9 @@
  * FUNCTION:    AcpiGetHandle
  *
  * PARAMETERS:  Parent          - Object to search under (search scope).
- *              PathName        - Pointer to an asciiz string containing the
- *                                  name
- *              RetHandle       - Where the return handle is placed
+ *              Pathname        - Pointer to an asciiz string containing the
+ *                                name
+ *              RetHandle       - Where the return handle is returned
  *
  * RETURN:      Status
  *
@@ -210,6 +210,8 @@ AcpiGetHandle (
 
     return (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiGetHandle)
 
 
 /******************************************************************************
@@ -298,13 +300,15 @@ UnlockAndExit:
     return (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiGetName)
+
 
 /******************************************************************************
  *
  * FUNCTION:    AcpiGetObjectInfo
  *
  * PARAMETERS:  Handle          - Object Handle
- *              Info            - Where the info is returned
+ *              Buffer          - Where the info is returned
  *
  * RETURN:      Status
  *
@@ -340,7 +344,7 @@ AcpiGetObjectInfo (
         return (Status);
     }
 
-    Info = ACPI_MEM_CALLOCATE (sizeof (ACPI_DEVICE_INFO));
+    Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_DEVICE_INFO));
     if (!Info)
     {
         return (AE_NO_MEMORY);
@@ -407,8 +411,7 @@ AcpiGetObjectInfo (
         Status = AcpiUtExecute_CID (Node, &CidList);
         if (ACPI_SUCCESS (Status))
         {
-            Size += ((ACPI_SIZE) CidList->Count - 1) *
-                                 sizeof (ACPI_COMPATIBLE_ID);
+            Size += CidList->Size;
             Info->Valid |= ACPI_VALID_CID;
         }
 
@@ -458,11 +461,13 @@ AcpiGetObjectInfo (
 
 
 Cleanup:
-    ACPI_MEM_FREE (Info);
+    ACPI_FREE (Info);
     if (CidList)
     {
-        ACPI_MEM_FREE (CidList);
+        ACPI_FREE (CidList);
     }
     return (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiGetObjectInfo)
 

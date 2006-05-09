@@ -3,7 +3,7 @@
  *
  * Module Name: exstoren - AML Interpreter object store support,
  *                        Store to Node (namespace object)
- *              $Revision: 62 $
+ *              $Revision: 1.70 $
  *
  *****************************************************************************/
 
@@ -11,7 +11,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -152,12 +152,11 @@ AcpiExResolveObject (
     ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE ("ExResolveObject");
+    ACPI_FUNCTION_TRACE (ExResolveObject);
 
 
-    /*
-     * Ensure we have a Target that can be stored to
-     */
+    /* Ensure we have a Target that can be stored to */
+
     switch (TargetType)
     {
     case ACPI_TYPE_BUFFER_FIELD:
@@ -196,19 +195,17 @@ AcpiExResolveObject (
             break;
         }
 
-        /*
-         * Must have a Integer, Buffer, or String
-         */
+        /* Must have a Integer, Buffer, or String */
+
         if ((ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_INTEGER)    &&
             (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_BUFFER)     &&
             (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_TYPE_STRING)     &&
             !((ACPI_GET_OBJECT_TYPE (SourceDesc) == ACPI_TYPE_LOCAL_REFERENCE) && (SourceDesc->Reference.Opcode == AML_LOAD_OP)))
         {
-            /*
-             * Conversion successful but still not a valid type
-             */
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                "Cannot assign type %s to %s (must be type Int/Str/Buf)\n",
+            /* Conversion successful but still not a valid type */
+
+            ACPI_ERROR ((AE_INFO,
+                "Cannot assign type %s to %s (must be type Int/Str/Buf)",
                 AcpiUtGetObjectTypeName (SourceDesc),
                 AcpiUtGetTypeName (TargetType)));
             Status = AE_AML_OPERAND_TYPE;
@@ -220,9 +217,10 @@ AcpiExResolveObject (
     case ACPI_TYPE_LOCAL_METHOD_ALIAS:
 
         /*
-         * Aliases are resolved by AcpiExPrepOperands
+         * All aliases should have been resolved earlier, during the
+         * operand resolution phase.
          */
-        ACPI_REPORT_ERROR (("Store into Alias - should never happen\n"));
+        ACPI_ERROR ((AE_INFO, "Store into an unresolved Alias object"));
         Status = AE_AML_INTERNAL;
         break;
 
@@ -287,7 +285,7 @@ AcpiExStoreObjectToObject (
     ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("ExStoreObjectToObject", SourceDesc);
+    ACPI_FUNCTION_TRACE_PTR (ExStoreObjectToObject, SourceDesc);
 
 
     ActualSrcDesc = SourceDesc;
@@ -353,10 +351,6 @@ AcpiExStoreObjectToObject (
 
     case ACPI_TYPE_BUFFER:
 
-        /*
-         * Note: There is different store behavior depending on the original
-         * source type
-         */
         Status = AcpiExStoreBufferToBuffer (ActualSrcDesc, DestDesc);
         break;
 
@@ -370,7 +364,7 @@ AcpiExStoreObjectToObject (
         /*
          * All other types come here.
          */
-        ACPI_DEBUG_PRINT ((ACPI_DB_WARN, "Store into type %s not implemented\n",
+        ACPI_WARNING ((AE_INFO, "Store into type %s not implemented",
             AcpiUtGetObjectTypeName (DestDesc)));
 
         Status = AE_NOT_IMPLEMENTED;

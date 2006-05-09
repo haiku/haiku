@@ -2,7 +2,7 @@
  *
  * Module Name: nsxfeval - Public interfaces to the ACPI subsystem
  *                         ACPI Object evaluation interfaces
- *              $Revision: 15 $
+ *              $Revision: 1.27 $
  *
  ******************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -132,11 +132,11 @@
  * FUNCTION:    AcpiEvaluateObjectTyped
  *
  * PARAMETERS:  Handle              - Object handle (optional)
- *              *Pathname           - Object pathname (optional)
- *              **ExternalParams    - List of parameters to pass to method,
+ *              Pathname            - Object pathname (optional)
+ *              ExternalParams      - List of parameters to pass to method,
  *                                    terminated by NULL.  May be NULL
  *                                    if no parameters are being passed.
- *              *ReturnBuffer       - Where to put method's return value (if
+ *              ReturnBuffer        - Where to put method's return value (if
  *                                    any).  If NULL, no value is returned.
  *              ReturnType          - Expected type of return object
  *
@@ -160,7 +160,7 @@ AcpiEvaluateObjectTyped (
     BOOLEAN                 MustFree = FALSE;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiEvaluateObjectTyped");
+    ACPI_FUNCTION_TRACE (AcpiEvaluateObjectTyped);
 
 
     /* Return buffer must be valid */
@@ -194,9 +194,7 @@ AcpiEvaluateObjectTyped (
     {
         /* Error because caller specifically asked for a return value */
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-            "No return value\n"));
-
+        ACPI_ERROR ((AE_INFO, "No return value"));
         return_ACPI_STATUS (AE_NULL_OBJECT);
     }
 
@@ -209,8 +207,8 @@ AcpiEvaluateObjectTyped (
 
     /* Return object type does not match requested type */
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-        "Incorrect return type [%s] requested [%s]\n",
+    ACPI_ERROR ((AE_INFO,
+        "Incorrect return type [%s] requested [%s]",
         AcpiUtGetTypeName (((ACPI_OBJECT *) ReturnBuffer->Pointer)->Type),
         AcpiUtGetTypeName (ReturnType)));
 
@@ -225,6 +223,8 @@ AcpiEvaluateObjectTyped (
     ReturnBuffer->Length = 0;
     return_ACPI_STATUS (AE_TYPE);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiEvaluateObjectTyped)
 
 
 /*******************************************************************************
@@ -261,7 +261,7 @@ AcpiEvaluateObject (
     UINT32                  i;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiEvaluateObject");
+    ACPI_FUNCTION_TRACE (AcpiEvaluateObject);
 
 
     Info.Node = Handle;
@@ -280,7 +280,7 @@ AcpiEvaluateObject (
          * Allocate a new parameter block for the internal objects
          * Add 1 to count to allow for null terminated internal list
          */
-        Info.Parameters = ACPI_MEM_CALLOCATE (
+        Info.Parameters = ACPI_ALLOCATE_ZEROED (
                                 ((ACPI_SIZE) ExternalParams->Count + 1) *
                                 sizeof (void *));
         if (!Info.Parameters)
@@ -305,7 +305,6 @@ AcpiEvaluateObject (
         Info.Parameters[ExternalParams->Count] = NULL;
     }
 
-
     /*
      * Three major cases:
      * 1) Fully qualified pathname
@@ -315,9 +314,8 @@ AcpiEvaluateObject (
     if ((Pathname) &&
         (AcpiNsValidRootPrefix (Pathname[0])))
     {
-        /*
-         *  The path is fully qualified, just evaluate by name
-         */
+        /* The path is fully qualified, just evaluate by name */
+
         Status = AcpiNsEvaluateByName (Pathname, &Info);
     }
     else if (!Handle)
@@ -329,13 +327,13 @@ AcpiEvaluateObject (
          */
         if (!Pathname)
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                "Both Handle and Pathname are NULL\n"));
+            ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+                "Both Handle and Pathname are NULL"));
         }
         else
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                "Handle is NULL and Pathname is relative\n"));
+            ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+                "Null Handle with relative pathname [%s]", Pathname));
         }
 
         Status = AE_BAD_PARAMETER;
@@ -357,9 +355,8 @@ AcpiEvaluateObject (
         }
         else
         {
-           /*
-            * Both a Handle and a relative Pathname
-            */
+            /* Both a Handle and a relative Pathname */
+
             Status = AcpiNsEvaluateRelative (Pathname, &Info);
         }
     }
@@ -404,11 +401,13 @@ AcpiEvaluateObject (
                 {
                     /* Validate/Allocate/Clear caller buffer */
 
-                    Status = AcpiUtInitializeBuffer (ReturnBuffer, BufferSpaceNeeded);
+                    Status = AcpiUtInitializeBuffer (ReturnBuffer,
+                                    BufferSpaceNeeded);
                     if (ACPI_FAILURE (Status))
                     {
                         /*
-                         * Caller's buffer is too small or a new one can't be allocated
+                         * Caller's buffer is too small or a new one can't
+                         * be allocated
                          */
                         ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
                             "Needed buffer size %X, %s\n",
@@ -417,9 +416,8 @@ AcpiEvaluateObject (
                     }
                     else
                     {
-                        /*
-                         *  We have enough space for the object, build it
-                         */
+                        /* We have enough space for the object, build it */
+
                         Status = AcpiUtCopyIobjectToEobject (Info.ReturnObject,
                                         ReturnBuffer);
                     }
@@ -446,9 +444,8 @@ AcpiEvaluateObject (
         }
     }
 
-    /*
-     * Free the input parameter list (if we created one),
-     */
+    /* Free the input parameter list (if we created one) */
+
     if (Info.Parameters)
     {
         /* Free the allocated parameter block */
@@ -458,6 +455,8 @@ AcpiEvaluateObject (
 
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiEvaluateObject)
 
 
 /*******************************************************************************
@@ -502,12 +501,12 @@ AcpiWalkNamespace (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiWalkNamespace");
+    ACPI_FUNCTION_TRACE (AcpiWalkNamespace);
 
 
     /* Parameter validation */
 
-    if ((Type > ACPI_TYPE_EXTERNAL_MAX) ||
+    if ((Type > ACPI_TYPE_LOCAL_MAX) ||
         (!MaxDepth)                     ||
         (!UserFunction))
     {
@@ -526,12 +525,15 @@ AcpiWalkNamespace (
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiNsWalkNamespace (Type, StartObject, MaxDepth, ACPI_NS_WALK_UNLOCK,
+    Status = AcpiNsWalkNamespace (Type, StartObject, MaxDepth,
+                    ACPI_NS_WALK_UNLOCK,
                     UserFunction, Context, ReturnValue);
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiWalkNamespace)
 
 
 /*******************************************************************************
@@ -590,9 +592,9 @@ AcpiNsGetDeviceCallback (
         return (AE_CTRL_DEPTH);
     }
 
-    if (!(Flags & 0x01))
+    if (!(Flags & ACPI_STA_DEVICE_PRESENT))
     {
-        /* Don't return at the device or children of the device if not there */
+        /* Don't examine children of the device if not present */
 
         return (AE_CTRL_DEPTH);
     }
@@ -632,15 +634,16 @@ AcpiNsGetDeviceCallback (
                 if (ACPI_STRNCMP (Cid->Id[i].Value, Info->Hid,
                                         sizeof (ACPI_COMPATIBLE_ID)) != 0)
                 {
-                    ACPI_MEM_FREE (Cid);
+                    ACPI_FREE (Cid);
                     return (AE_OK);
                 }
             }
-            ACPI_MEM_FREE (Cid);
+            ACPI_FREE (Cid);
         }
     }
 
-    Status = Info->UserFunction (ObjHandle, NestingLevel, Info->Context, ReturnValue);
+    Status = Info->UserFunction (ObjHandle, NestingLevel, Info->Context,
+                ReturnValue);
     return (Status);
 }
 
@@ -681,7 +684,7 @@ AcpiGetDevices (
     ACPI_GET_DEVICES_INFO   Info;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiGetDevices");
+    ACPI_FUNCTION_TRACE (AcpiGetDevices);
 
 
     /* Parameter validation */
@@ -695,9 +698,9 @@ AcpiGetDevices (
      * We're going to call their callback from OUR callback, so we need
      * to know what it is, and their context parameter.
      */
+    Info.Hid          = HID;
     Info.Context      = Context;
     Info.UserFunction = UserFunction;
-    Info.Hid          = HID;
 
     /*
      * Lock the namespace around the walk.
@@ -711,15 +714,15 @@ AcpiGetDevices (
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiNsWalkNamespace (ACPI_TYPE_DEVICE,
-                                    ACPI_ROOT_OBJECT, ACPI_UINT32_MAX,
-                                    ACPI_NS_WALK_UNLOCK,
-                                    AcpiNsGetDeviceCallback, &Info,
-                                    ReturnValue);
+    Status = AcpiNsWalkNamespace (ACPI_TYPE_DEVICE, ACPI_ROOT_OBJECT,
+                ACPI_UINT32_MAX, ACPI_NS_WALK_UNLOCK,
+                AcpiNsGetDeviceCallback, &Info, ReturnValue);
 
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return_ACPI_STATUS (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiGetDevices)
 
 
 /*******************************************************************************
@@ -777,6 +780,8 @@ UnlockAndExit:
     return (Status);
 }
 
+ACPI_EXPORT_SYMBOL (AcpiAttachData)
+
 
 /*******************************************************************************
  *
@@ -829,6 +834,8 @@ UnlockAndExit:
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiDetachData)
 
 
 /*******************************************************************************
@@ -885,5 +892,7 @@ UnlockAndExit:
     (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return (Status);
 }
+
+ACPI_EXPORT_SYMBOL (AcpiGetData)
 
 

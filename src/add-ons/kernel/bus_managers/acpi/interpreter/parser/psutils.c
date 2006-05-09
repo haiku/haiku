@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psutils - Parser miscellaneous utilities (Parser only)
- *              $Revision: 60 $
+ *              $Revision: 1.69 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,7 +118,6 @@
 #include "acpi.h"
 #include "acparser.h"
 #include "amlcode.h"
-#include "acnamesp.h"
 
 #define _COMPONENT          ACPI_PARSER
         ACPI_MODULE_NAME    ("psutils")
@@ -130,7 +129,7 @@
  *
  * PARAMETERS:  None
  *
- * RETURN:      ScopeOp
+ * RETURN:      A new Scope object, null on failure
  *
  * DESCRIPTION: Create a Scope and associated namepath op with the root name
  *
@@ -149,7 +148,6 @@ AcpiPsCreateScopeOp (
         return (NULL);
     }
 
-
     ScopeOp->Named.Name = ACPI_ROOT_NAME;
     return (ScopeOp);
 }
@@ -162,10 +160,9 @@ AcpiPsCreateScopeOp (
  * PARAMETERS:  Op              - A newly allocated Op object
  *              Opcode          - Opcode to store in the Op
  *
- * RETURN:      Status
+ * RETURN:      None
  *
- * DESCRIPTION: Allocate an acpi_op, choose op type (and thus size) based on
- *              opcode
+ * DESCRIPTION: Initialize a parse (Op) object
  *
  ******************************************************************************/
 
@@ -177,11 +174,12 @@ AcpiPsInitOp (
     ACPI_FUNCTION_ENTRY ();
 
 
-    Op->Common.DataType = ACPI_DESC_TYPE_PARSER;
+    Op->Common.DescriptorType = ACPI_DESC_TYPE_PARSER;
     Op->Common.AmlOpcode = Opcode;
 
     ACPI_DISASM_ONLY_MEMBERS (ACPI_STRNCPY (Op->Common.AmlOpName,
-            (AcpiPsGetOpcodeInfo (Opcode))->Name, sizeof (Op->Common.AmlOpName)));
+            (AcpiPsGetOpcodeInfo (Opcode))->Name,
+                sizeof (Op->Common.AmlOpName)));
 }
 
 
@@ -191,7 +189,7 @@ AcpiPsInitOp (
  *
  * PARAMETERS:  Opcode          - Opcode that will be stored in the new Op
  *
- * RETURN:      Pointer to the new Op.
+ * RETURN:      Pointer to the new Op, null on failure
  *
  * DESCRIPTION: Allocate an acpi_op, choose op type (and thus size) based on
  *              opcode.  A cache of opcodes is available for the pure
@@ -234,13 +232,13 @@ AcpiPsAllocOp (
     {
         /* The generic op (default) is by far the most common (16 to 1) */
 
-        Op = AcpiUtAcquireFromCache (ACPI_MEM_LIST_PSNODE);
+        Op = AcpiOsAcquireObject (AcpiGbl_PsNodeCache);
     }
     else
     {
         /* Extended parseop */
 
-        Op = AcpiUtAcquireFromCache (ACPI_MEM_LIST_PSNODE_EXT);
+        Op = AcpiOsAcquireObject (AcpiGbl_PsNodeExtCache);
     }
 
     /* Initialize the Op */
@@ -272,7 +270,7 @@ void
 AcpiPsFreeOp (
     ACPI_PARSE_OBJECT       *Op)
 {
-    ACPI_FUNCTION_NAME ("PsFreeOp");
+    ACPI_FUNCTION_NAME (PsFreeOp);
 
 
     if (Op->Common.AmlOpcode == AML_INT_RETURN_VALUE_OP)
@@ -282,40 +280,13 @@ AcpiPsFreeOp (
 
     if (Op->Common.Flags & ACPI_PARSEOP_GENERIC)
     {
-        AcpiUtReleaseToCache (ACPI_MEM_LIST_PSNODE, Op);
+        (void) AcpiOsReleaseObject (AcpiGbl_PsNodeCache, Op);
     }
     else
     {
-        AcpiUtReleaseToCache (ACPI_MEM_LIST_PSNODE_EXT, Op);
+        (void) AcpiOsReleaseObject (AcpiGbl_PsNodeExtCache, Op);
     }
 }
-
-
-#ifdef ACPI_ENABLE_OBJECT_CACHE
-/*******************************************************************************
- *
- * FUNCTION:    AcpiPsDeleteParseCache
- *
- * PARAMETERS:  None
- *
- * RETURN:      None
- *
- * DESCRIPTION: Free all objects that are on the parse cache list.
- *
- ******************************************************************************/
-
-void
-AcpiPsDeleteParseCache (
-    void)
-{
-    ACPI_FUNCTION_TRACE ("PsDeleteParseCache");
-
-
-    AcpiUtDeleteGenericCache (ACPI_MEM_LIST_PSNODE);
-    AcpiUtDeleteGenericCache (ACPI_MEM_LIST_PSNODE_EXT);
-    return_VOID;
-}
-#endif
 
 
 /*******************************************************************************
@@ -356,7 +327,6 @@ UINT32
 AcpiPsGetName (
     ACPI_PARSE_OBJECT       *Op)
 {
-
 
     /* The "generic" object has no name associated with it */
 

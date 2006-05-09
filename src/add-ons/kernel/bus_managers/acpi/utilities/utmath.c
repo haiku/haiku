@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utmath - Integer math support routines
- *              $Revision: 15 $
+ *              $Revision: 1.21 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -159,14 +159,14 @@ AcpiUtShortDivide (
     UINT32                  Remainder32;
 
 
-    ACPI_FUNCTION_TRACE ("UtShortDivide");
+    ACPI_FUNCTION_TRACE (UtShortDivide);
 
 
     /* Always check for a zero divisor */
 
     if (Divisor == 0)
     {
-        ACPI_REPORT_ERROR (("AcpiUtShortDivide: Divide by zero\n"));
+        ACPI_ERROR ((AE_INFO, "Divide by zero"));
         return_ACPI_STATUS (AE_AML_DIVIDE_BY_ZERO);
     }
 
@@ -229,14 +229,14 @@ AcpiUtDivide (
     UINT64_OVERLAY          Partial3;
 
 
-    ACPI_FUNCTION_TRACE ("UtDivide");
+    ACPI_FUNCTION_TRACE (UtDivide);
 
 
     /* Always check for a zero divisor */
 
     if (InDivisor == 0)
     {
-        ACPI_REPORT_ERROR (("AcpiUtDivide: Divide by zero\n"));
+        ACPI_ERROR ((AE_INFO, "Divide by zero"));
         return_ACPI_STATUS (AE_AML_DIVIDE_BY_ZERO);
     }
 
@@ -349,6 +349,8 @@ AcpiUtDivide (
  *
  * FUNCTION:    AcpiUtShortDivide, AcpiUtDivide
  *
+ * PARAMETERS:  See function headers above
+ *
  * DESCRIPTION: Native versions of the UtDivide functions. Use these if either
  *              1) The target is a 64-bit platform and therefore 64-bit
  *                 integer math is supported directly by the machine.
@@ -366,14 +368,14 @@ AcpiUtShortDivide (
     UINT32                  *OutRemainder)
 {
 
-    ACPI_FUNCTION_TRACE ("UtShortDivide");
+    ACPI_FUNCTION_TRACE (UtShortDivide);
 
 
     /* Always check for a zero divisor */
 
     if (Divisor == 0)
     {
-        ACPI_REPORT_ERROR (("AcpiUtShortDivide: Divide by zero\n"));
+        ACPI_ERROR ((AE_INFO, "Divide by zero"));
         return_ACPI_STATUS (AE_AML_DIVIDE_BY_ZERO);
     }
 
@@ -398,14 +400,14 @@ AcpiUtDivide (
     ACPI_INTEGER            *OutQuotient,
     ACPI_INTEGER            *OutRemainder)
 {
-    ACPI_FUNCTION_TRACE ("UtDivide");
+    ACPI_FUNCTION_TRACE (UtDivide);
 
 
     /* Always check for a zero divisor */
 
     if (InDivisor == 0)
     {
-        ACPI_REPORT_ERROR (("AcpiUtDivide: Divide by zero\n"));
+        ACPI_ERROR ((AE_INFO, "Divide by zero"));
         return_ACPI_STATUS (AE_AML_DIVIDE_BY_ZERO);
     }
 

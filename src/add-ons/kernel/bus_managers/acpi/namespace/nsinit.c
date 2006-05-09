@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsinit - namespace initialization
- *              $Revision: 64 $
+ *              $Revision: 1.80 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -125,6 +125,29 @@
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsinit")
 
+/* Local prototypes */
+
+static ACPI_STATUS
+AcpiNsInitOneObject (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue);
+
+static ACPI_STATUS
+AcpiNsInitOneDevice (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  NestingLevel,
+    void                    *Context,
+    void                    **ReturnValue);
+
+static ACPI_STATUS
+AcpiNsFindIniMethods (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  NestingLevel,
+    void                    *Context,
+    void                    **ReturnValue);
+
 
 /*******************************************************************************
  *
@@ -147,7 +170,7 @@ AcpiNsInitializeObjects (
     ACPI_INIT_WALK_INFO     Info;
 
 
-    ACPI_FUNCTION_TRACE ("NsInitializeObjects");
+    ACPI_FUNCTION_TRACE (NsInitializeObjects);
 
 
     ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
@@ -166,8 +189,7 @@ AcpiNsInitializeObjects (
                                 &Info, NULL);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "WalkNamespace failed! %s\n",
-            AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
     }
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
@@ -210,7 +232,7 @@ AcpiNsInitializeDevices (
     ACPI_DEVICE_WALK_INFO   Info;
 
 
-    ACPI_FUNCTION_TRACE ("NsInitializeDevices");
+    ACPI_FUNCTION_TRACE (NsInitializeDevices);
 
 
     /* Init counters */
@@ -220,30 +242,29 @@ AcpiNsInitializeDevices (
     Info.Num_INI = 0;
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "Executing all Device _STA and_INI methods:"));
+        "Initializing Device/Processor/Thermal objects by executing _INI methods:"));
 
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Walk namespace for all objects */
+    /* Tree analysis: find all subtrees that contain _INI methods */
 
     Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
-                    ACPI_UINT32_MAX, TRUE, AcpiNsInitOneDevice, &Info, NULL);
-
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-
+                ACPI_UINT32_MAX, FALSE, AcpiNsFindIniMethods, &Info, NULL);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "WalkNamespace failed! %s\n",
-            AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
+    }
+
+    /* Walk namespace to execute all _INIs on present devices */
+
+    Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
+                ACPI_UINT32_MAX, FALSE, AcpiNsInitOneDevice, &Info, NULL);
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
     }
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "\n%hd Devices found containing: %hd _STA, %hd _INI methods\n",
-        Info.DeviceCount, Info.Num_STA, Info.Num_INI));
+        "\nExecuted %hd _INI methods requiring %hd _STA executions (examined %hd objects)\n",
+        Info.Num_INI, Info.Num_STA, Info.DeviceCount));
 
     return_ACPI_STATUS (Status);
 }
@@ -269,7 +290,7 @@ AcpiNsInitializeDevices (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiNsInitOneObject (
     ACPI_HANDLE             ObjHandle,
     UINT32                  Level,
@@ -283,7 +304,7 @@ AcpiNsInitOneObject (
     ACPI_OPERAND_OBJECT     *ObjDesc;
 
 
-    ACPI_FUNCTION_NAME ("NsInitOneObject");
+    ACPI_FUNCTION_NAME (NsInitOneObject);
 
 
     Info->ObjectCount++;
@@ -377,11 +398,9 @@ AcpiNsInitOneObject (
 
     if (ACPI_FAILURE (Status))
     {
-        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_ERROR, "\n"));
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-                "Could not execute arguments for [%4.4s] (%s), %s\n",
-                AcpiUtGetNodeName (Node), AcpiUtGetTypeName (Type),
-                AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not execute arguments for [%4.4s] (%s)",
+            AcpiUtGetNodeName (Node), AcpiUtGetTypeName (Type)));
     }
 
     /*
@@ -404,6 +423,80 @@ AcpiNsInitOneObject (
 
 /*******************************************************************************
  *
+ * FUNCTION:    AcpiNsFindIniMethods
+ *
+ * PARAMETERS:  ACPI_WALK_CALLBACK
+ *
+ * RETURN:      ACPI_STATUS
+ *
+ * DESCRIPTION: Called during namespace walk. Finds objects named _INI under
+ *              device/processor/thermal objects, and marks the entire subtree
+ *              with a SUBTREE_HAS_INI flag. This flag is used during the
+ *              subsequent device initialization walk to avoid entire subtrees
+ *              that do not contain an _INI.
+ *
+ ******************************************************************************/
+
+static ACPI_STATUS
+AcpiNsFindIniMethods (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  NestingLevel,
+    void                    *Context,
+    void                    **ReturnValue)
+{
+    ACPI_DEVICE_WALK_INFO   *Info = ACPI_CAST_PTR (ACPI_DEVICE_WALK_INFO, Context);
+    ACPI_NAMESPACE_NODE     *Node;
+    ACPI_NAMESPACE_NODE     *ParentNode;
+
+
+    /* Keep count of device/processor/thermal objects */
+
+    Node = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, ObjHandle);
+    if ((Node->Type == ACPI_TYPE_DEVICE)    ||
+        (Node->Type == ACPI_TYPE_PROCESSOR) ||
+        (Node->Type == ACPI_TYPE_THERMAL))
+    {
+        Info->DeviceCount++;
+        return (AE_OK);
+    }
+
+    /* We are only looking for methods named _INI */
+
+    if (!ACPI_COMPARE_NAME (Node->Name.Ascii, METHOD_NAME__INI))
+    {
+        return (AE_OK);
+    }
+
+    /*
+     * The only _INI methods that we care about are those that are
+     * present under Device, Processor, and Thermal objects.
+     */
+    ParentNode = AcpiNsGetParentNode (Node);
+    switch (ParentNode->Type)
+    {
+    case ACPI_TYPE_DEVICE:
+    case ACPI_TYPE_PROCESSOR:
+    case ACPI_TYPE_THERMAL:
+
+        /* Mark parent and bubble up the INI present flag to the root */
+
+        while (ParentNode)
+        {
+            ParentNode->Flags |= ANOBJ_SUBTREE_HAS_INI;
+            ParentNode = AcpiNsGetParentNode (ParentNode);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return (AE_OK);
+}
+
+
+/*******************************************************************************
+ *
  * FUNCTION:    AcpiNsInitOneDevice
  *
  * PARAMETERS:  ACPI_WALK_CALLBACK
@@ -416,104 +509,144 @@ AcpiNsInitOneObject (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiNsInitOneDevice (
     ACPI_HANDLE             ObjHandle,
     UINT32                  NestingLevel,
     void                    *Context,
     void                    **ReturnValue)
 {
-    ACPI_DEVICE_WALK_INFO  *Info = (ACPI_DEVICE_WALK_INFO *) Context;
+    ACPI_DEVICE_WALK_INFO   *Info = ACPI_CAST_PTR (ACPI_DEVICE_WALK_INFO, Context);
     ACPI_PARAMETER_INFO     Pinfo;
     UINT32                  Flags;
     ACPI_STATUS             Status;
+    ACPI_NAMESPACE_NODE     *DeviceNode;
 
 
-    ACPI_FUNCTION_TRACE ("NsInitOneDevice");
+    ACPI_FUNCTION_TRACE (NsInitOneDevice);
 
 
-    Pinfo.Parameters = NULL;
-    Pinfo.ParameterType = ACPI_PARAM_ARGS;
+    /* We are interested in Devices, Processors and ThermalZones only */
 
-    Pinfo.Node = AcpiNsMapHandleToNode (ObjHandle);
-    if (!Pinfo.Node)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    /*
-     * We will run _STA/_INI on Devices, Processors and ThermalZones only
-     */
-    if ((Pinfo.Node->Type != ACPI_TYPE_DEVICE)      &&
-        (Pinfo.Node->Type != ACPI_TYPE_PROCESSOR)   &&
-        (Pinfo.Node->Type != ACPI_TYPE_THERMAL))
+    DeviceNode = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, ObjHandle);
+    if ((DeviceNode->Type != ACPI_TYPE_DEVICE)    &&
+        (DeviceNode->Type != ACPI_TYPE_PROCESSOR) &&
+        (DeviceNode->Type != ACPI_TYPE_THERMAL))
     {
         return_ACPI_STATUS (AE_OK);
     }
 
-    if ((AcpiDbgLevel <= ACPI_LV_ALL_EXCEPTIONS) &&
-        (!(AcpiDbgLevel & ACPI_LV_INFO)))
+    /*
+     * Because of an earlier namespace analysis, all subtrees that contain an
+     * _INI method are tagged.
+     *
+     * If this device subtree does not contain any _INI methods, we
+     * can exit now and stop traversing this entire subtree.
+     */
+    if (!(DeviceNode->Flags & ANOBJ_SUBTREE_HAS_INI))
     {
-        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT, "."));
+        return_ACPI_STATUS (AE_CTRL_DEPTH);
     }
-
-    Info->DeviceCount++;
 
     /*
-     * Run _STA to determine if we can run _INI on the device.
+     * Run _STA to determine if this device is present and functioning. We
+     * must know this information for two important reasons (from ACPI spec):
+     *
+     * 1) We can only run _INI if the device is present.
+     * 2) We must abort the device tree walk on this subtree if the device is
+     *    not present and is not functional (we will not examine the children)
+     *
+     * The _STA method is not required to be present under the device, we
+     * assume the device is present if _STA does not exist.
      */
-    ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (ACPI_TYPE_METHOD, Pinfo.Node, "_STA"));
-    Status = AcpiUtExecute_STA (Pinfo.Node, &Flags);
+    ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (
+        ACPI_TYPE_METHOD, DeviceNode, METHOD_NAME__STA));
 
+    Status = AcpiUtExecute_STA (DeviceNode, &Flags);
     if (ACPI_FAILURE (Status))
     {
-        if (Pinfo.Node->Type == ACPI_TYPE_DEVICE)
-        {
-            /* Ignore error and move on to next device */
+        /* Ignore error and move on to next device */
 
-            return_ACPI_STATUS (AE_OK);
-        }
-
-        /* _STA is not required for Processor or ThermalZone objects */
+        return_ACPI_STATUS (AE_OK);
     }
-    else
+
+    /*
+     * Flags == -1 means that _STA was not found. In this case, we assume that
+     * the device is both present and functional.
+     *
+     * From the ACPI spec, description of _STA:
+     *
+     * "If a device object (including the processor object) does not have an
+     * _STA object, then OSPM assumes that all of the above bits are set (in
+     * other words, the device is present, ..., and functioning)"
+     */
+    if (Flags != ACPI_UINT32_MAX)
     {
         Info->Num_STA++;
+    }
 
-        if (!(Flags & 0x01))
+    /*
+     * Examine the PRESENT and FUNCTIONING status bits
+     *
+     * Note: ACPI spec does not seem to specify behavior for the present but
+     * not functioning case, so we assume functioning if present.
+     */
+    if (!(Flags & ACPI_STA_DEVICE_PRESENT))
+    {
+        /* Device is not present, we must examine the Functioning bit */
+
+        if (Flags & ACPI_STA_DEVICE_FUNCTIONING)
         {
-            /* Don't look at children of a not present device */
-
-            return_ACPI_STATUS(AE_CTRL_DEPTH);
+            /*
+             * Device is not present but is "functioning". In this case,
+             * we will not run _INI, but we continue to examine the children
+             * of this device.
+             *
+             * From the ACPI spec, description of _STA: (Note - no mention
+             * of whether to run _INI or not on the device in question)
+             *
+             * "_STA may return bit 0 clear (not present) with bit 3 set
+             * (device is functional). This case is used to indicate a valid
+             * device for which no device driver should be loaded (for example,
+             * a bridge device.) Children of this device may be present and
+             * valid. OSPM should continue enumeration below a device whose
+             * _STA returns this bit combination"
+             */
+            return_ACPI_STATUS (AE_OK);
+        }
+        else
+        {
+            /*
+             * Device is not present and is not functioning. We must abort the
+             * walk of this subtree immediately -- don't look at the children
+             * of such a device.
+             *
+             * From the ACPI spec, description of _INI:
+             *
+             * "If the _STA method indicates that the device is not present,
+             * OSPM will not run the _INI and will not examine the children
+             * of the device for _INI methods"
+             */
+            return_ACPI_STATUS (AE_CTRL_DEPTH);
         }
     }
 
     /*
-     * The device is present. Run _INI.
+     * The device is present or is assumed present if no _STA exists.
+     * Run the _INI if it exists (not required to exist)
+     *
+     * Note: We know there is an _INI within this subtree, but it may not be
+     * under this particular device, it may be lower in the branch.
      */
-    ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (ACPI_TYPE_METHOD, Pinfo.Node, "_INI"));
-    Status = AcpiNsEvaluateRelative ("_INI", &Pinfo);
-    if (ACPI_FAILURE (Status))
-    {
-        /* No _INI (AE_NOT_FOUND) means device requires no initialization */
+    ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (
+        ACPI_TYPE_METHOD, DeviceNode, METHOD_NAME__INI));
 
-        if (Status != AE_NOT_FOUND)
-        {
-            /* Ignore error and move on to next device */
+    Pinfo.Node = DeviceNode;
+    Pinfo.Parameters = NULL;
+    Pinfo.ParameterType = ACPI_PARAM_ARGS;
 
-#ifdef ACPI_DEBUG_OUTPUT
-            char        *ScopeName = AcpiNsGetExternalPathname (Pinfo.Node);
-
-            ACPI_DEBUG_PRINT ((ACPI_DB_WARN, "%s._INI failed: %s\n",
-                    ScopeName, AcpiFormatException (Status)));
-
-            ACPI_MEM_FREE (ScopeName);
-#endif
-        }
-
-        Status = AE_OK;
-    }
-    else
+    Status = AcpiNsEvaluateRelative (METHOD_NAME__INI, &Pinfo);
+    if (ACPI_SUCCESS (Status))
     {
         /* Delete any return object (especially if ImplicitReturn is enabled) */
 
@@ -522,17 +655,33 @@ AcpiNsInitOneDevice (
             AcpiUtRemoveReference (Pinfo.ReturnObject);
         }
 
-        /* Count of successful INIs */
-
         Info->Num_INI++;
+        if ((AcpiDbgLevel <= ACPI_LV_ALL_EXCEPTIONS) &&
+            (!(AcpiDbgLevel & ACPI_LV_INFO)))
+        {
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT, "."));
+        }
     }
+
+#ifdef ACPI_DEBUG_OUTPUT
+    else if (Status != AE_NOT_FOUND)
+    {
+        /* Ignore error and move on to next device */
+
+        char *ScopeName = AcpiNsGetExternalPathname (Pinfo.Node);
+
+        ACPI_EXCEPTION ((AE_INFO, Status, "during %s._INI execution",
+            ScopeName));
+        ACPI_FREE (ScopeName);
+    }
+#endif
+
+    /* If an external initialization handler is present, call it */
 
     if (AcpiGbl_InitHandler)
     {
-        /* External initialization handler is present, call it */
-
         Status = AcpiGbl_InitHandler (Pinfo.Node, ACPI_INIT_DEVICE_INI);
     }
 
-    return_ACPI_STATUS (Status);
+    return_ACPI_STATUS (AE_OK);
 }

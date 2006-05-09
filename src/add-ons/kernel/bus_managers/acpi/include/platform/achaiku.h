@@ -141,6 +141,7 @@
 
 #define asm         __asm
 
+#define ACPI_USE_LOCAL_CACHE
 #define ACPI_USE_NATIVE_DIVIDE
 
 #define ACPI_ASM_MACROS         /* tell acenv.h */

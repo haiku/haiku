@@ -500,7 +500,7 @@ AcpiOsMapMemory (
 
 #ifdef _KERNEL_MODE
 	int page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
-	void *map_base = ACPI_PTR_ADD(void,where,0L - page_offset);
+	void *map_base = ACPI_ADD_PTR(void,where,0L - page_offset);
 	area_id area;
 
     area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
@@ -714,10 +714,9 @@ AcpiOsDeleteLock (
 }
 
 
-void
+ACPI_CPU_FLAGS
 AcpiOsAcquireLock (
-    ACPI_HANDLE             Handle,
-    UINT32                  Flags)
+    ACPI_HANDLE             Handle)
 {
 	/*cpu_status cpu;
 	
@@ -737,13 +736,14 @@ AcpiOsAcquireLock (
        though. Anyway, this works, even if it's stupid. */
     	
     while (_atomic_test_and_set(((spinlock *)(Handle)),0,1) <= 0);
+    return (0);
 }
 
 
 void
 AcpiOsReleaseLock (
     ACPI_HANDLE             Handle,
-    UINT32                  Flags)
+    ACPI_CPU_FLAGS          Flags)
 {
     /*cpu_status cpu;
 		
@@ -970,6 +970,55 @@ AcpiOsGetTimer (void)
     /* Seconds * 10^7 = 100ns(10^-7), Microseconds(10^-6) * 10^1 = 100ns */
 
     return (((UINT64) time.tv_sec * 10000000) + ((UINT64) time.tv_usec * 10));
+}
+
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiOsValidateInterface
+ *
+ * PARAMETERS:  Interface           - Requested interface to be validated
+ *
+ * RETURN:      AE_OK if interface is supported, AE_SUPPORT otherwise
+ *
+ * DESCRIPTION: Match an interface string to the interfaces supported by the
+ *              host. Strings originate from an AML call to the _OSI method.
+ *
+ *****************************************************************************/
+
+ACPI_STATUS
+AcpiOsValidateInterface (
+    char                    *Interface)
+{
+
+    return (AE_SUPPORT);
+}
+
+
+/******************************************************************************
+ *
+ * FUNCTION:    AcpiOsValidateAddress
+ *
+ * PARAMETERS:  SpaceId             - ACPI space ID
+ *              Address             - Physical address
+ *              Length              - Address length
+ *
+ * RETURN:      AE_OK if Address/Length is valid for the SpaceId. Otherwise,
+ *              should return AE_AML_ILLEGAL_ADDRESS.
+ *
+ * DESCRIPTION: Validate a system address via the host OS. Used to validate
+ *              the addresses accessed by AML operation regions.
+ *
+ *****************************************************************************/
+
+ACPI_STATUS
+AcpiOsValidateAddress (
+    UINT8                   SpaceId,
+    ACPI_PHYSICAL_ADDRESS   Address,
+    ACPI_SIZE               Length)
+{
+
+    return (AE_OK);
 }
 
 

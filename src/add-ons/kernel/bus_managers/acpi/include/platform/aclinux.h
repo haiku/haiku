@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclinux.h - OS specific defines, etc.
- *       $Revision: 36 $
+ *       $Revision: 1.40 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -131,9 +131,12 @@
 #include <asm/div64.h>
 #include <asm/acpi.h>
 
-#define strtoul simple_strtoul
+/* Host-dependent types and defines */
 
-#define ACPI_MACHINE_WIDTH  BITS_PER_LONG
+#define ACPI_MACHINE_WIDTH          BITS_PER_LONG
+#define ACPI_CACHE_T                kmem_cache_t
+#define ACPI_EXPORT_SYMBOL(Symbol)  EXPORT_SYMBOL(Symbol);
+#define strtoul                     simple_strtoul
 
 #else /* !__KERNEL__ */
 

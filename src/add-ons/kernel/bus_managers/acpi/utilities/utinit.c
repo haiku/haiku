@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utinit - Common ACPI subsystem initialization
- *              $Revision: 119 $
+ *              $Revision: 1.129 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,19 +124,29 @@
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utinit")
 
+/* Local prototypes */
+
+static void
+AcpiUtFadtRegisterError (
+    char                    *RegisterName,
+    UINT32                  Value,
+    UINT8                   Offset);
+
+static void AcpiUtTerminate (
+    void);
+
 
 /*******************************************************************************
  *
  * FUNCTION:    AcpiUtFadtRegisterError
  *
- * PARAMETERS:  *RegisterName           - Pointer to string identifying register
+ * PARAMETERS:  RegisterName            - Pointer to string identifying register
  *              Value                   - Actual register contents value
- *              AcpiTestSpecSection     - TDS section containing assertion
- *              AcpiAssertion           - Assertion number being tested
+ *              Offset                  - Byte offset in the FADT
  *
  * RETURN:      AE_BAD_VALUE
  *
- * DESCRIPTION: Display failure message and link failure to TDS assertion
+ * DESCRIPTION: Display failure message
  *
  ******************************************************************************/
 
@@ -144,12 +154,12 @@ static void
 AcpiUtFadtRegisterError (
     char                    *RegisterName,
     UINT32                  Value,
-    ACPI_SIZE               Offset)
+    UINT8                   Offset)
 {
 
-    ACPI_REPORT_WARNING (
-        ("Invalid FADT value %s=%X at offset %X FADT=%p\n",
-        RegisterName, Value, (UINT32) Offset, AcpiGbl_FADT));
+    ACPI_WARNING ((AE_INFO,
+        "Invalid FADT value %s=%X at offset %X FADT=%p",
+        RegisterName, Value, Offset, AcpiGbl_FADT));
 }
 
 
@@ -250,12 +260,13 @@ AcpiUtValidateFadt (
  *
  * RETURN:      none
  *
- * DESCRIPTION: free global memory
+ * DESCRIPTION: Free global memory
  *
  ******************************************************************************/
 
-void
-AcpiUtTerminate (void)
+static void
+AcpiUtTerminate (
+    void)
 {
     ACPI_GPE_BLOCK_INFO     *GpeBlock;
     ACPI_GPE_BLOCK_INFO     *NextGpeBlock;
@@ -263,12 +274,10 @@ AcpiUtTerminate (void)
     ACPI_GPE_XRUPT_INFO     *NextGpeXruptInfo;
 
 
-    ACPI_FUNCTION_TRACE ("UtTerminate");
+    ACPI_FUNCTION_TRACE (UtTerminate);
 
 
     /* Free global tables, etc. */
-
-
     /* Free global GPE blocks and related info structures */
 
     GpeXruptInfo = AcpiGbl_GpeXruptListHead;
@@ -278,14 +287,14 @@ AcpiUtTerminate (void)
         while (GpeBlock)
         {
             NextGpeBlock = GpeBlock->Next;
-            ACPI_MEM_FREE (GpeBlock->EventInfo);
-            ACPI_MEM_FREE (GpeBlock->RegisterInfo);
-            ACPI_MEM_FREE (GpeBlock);
+            ACPI_FREE (GpeBlock->EventInfo);
+            ACPI_FREE (GpeBlock->RegisterInfo);
+            ACPI_FREE (GpeBlock);
 
             GpeBlock = NextGpeBlock;
         }
         NextGpeXruptInfo = GpeXruptInfo->Next;
-        ACPI_MEM_FREE (GpeXruptInfo);
+        ACPI_FREE (GpeXruptInfo);
         GpeXruptInfo = NextGpeXruptInfo;
     }
 
@@ -307,23 +316,26 @@ AcpiUtTerminate (void)
  ******************************************************************************/
 
 void
-AcpiUtSubsystemShutdown (void)
+AcpiUtSubsystemShutdown (
+    void)
 {
 
-    ACPI_FUNCTION_TRACE ("UtSubsystemShutdown");
+    ACPI_FUNCTION_TRACE (UtSubsystemShutdown);
 
     /* Just exit if subsystem is already shutdown */
 
     if (AcpiGbl_Shutdown)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "ACPI Subsystem is already terminated\n"));
+        ACPI_ERROR ((AE_INFO,
+            "ACPI Subsystem is already terminated"));
         return_VOID;
     }
 
     /* Subsystem appears active, go ahead and shut it down */
 
     AcpiGbl_Shutdown = TRUE;
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Shutting down ACPI Subsystem...\n"));
+    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
+        "Shutting down ACPI Subsystem\n"));
 
     /* Close the AcpiEvent Handling */
 
@@ -339,7 +351,7 @@ AcpiUtSubsystemShutdown (void)
 
     /* Purge the local caches */
 
-    (void) AcpiPurgeCachedObjects ();
+    (void) AcpiUtDeleteCaches ();
 
     /* Debug only - display leftover memory allocation, if any */
 

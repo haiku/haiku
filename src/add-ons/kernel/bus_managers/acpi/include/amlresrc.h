@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: amlresrc.h - AML resource descriptors
- *              $Revision: 29 $
+ *              $Revision: 1.37 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -115,41 +115,49 @@
  *
  *****************************************************************************/
 
+/* acpisrc:StructDefs -- for acpisrc conversion */
 
 #ifndef __AMLRESRC_H
 #define __AMLRESRC_H
 
 
-#define ASL_RESNAME_ADDRESS                     "_ADR"
-#define ASL_RESNAME_ALIGNMENT                   "_ALN"
-#define ASL_RESNAME_ADDRESSSPACE                "_ASI"
-#define ASL_RESNAME_ACCESSSIZE                  "_ASZ"
-#define ASL_RESNAME_TYPESPECIFICATTRIBUTES      "_ATT"
-#define ASL_RESNAME_BASEADDRESS                 "_BAS"
-#define ASL_RESNAME_BUSMASTER                   "_BM_"  /* Master(1), Slave(0) */
-#define ASL_RESNAME_DECODE                      "_DEC"
-#define ASL_RESNAME_DMA                         "_DMA"
-#define ASL_RESNAME_DMATYPE                     "_TYP"  /* Compatible(0), A(1), B(2), F(3) */
-#define ASL_RESNAME_GRANULARITY                 "_GRA"
-#define ASL_RESNAME_INTERRUPT                   "_INT"
-#define ASL_RESNAME_INTERRUPTLEVEL              "_LL_"  /* ActiveLo(1), ActiveHi(0) */
-#define ASL_RESNAME_INTERRUPTSHARE              "_SHR"  /* Shareable(1), NoShare(0) */
-#define ASL_RESNAME_INTERRUPTTYPE               "_HE_"  /* Edge(1), Level(0) */
-#define ASL_RESNAME_LENGTH                      "_LEN"
-#define ASL_RESNAME_MEMATTRIBUTES               "_MTP"  /* Memory(0), Reserved(1), ACPI(2), NVS(3) */
-#define ASL_RESNAME_MEMTYPE                     "_MEM"  /* NonCache(0), Cacheable(1) Cache+combine(2), Cache+prefetch(3) */
-#define ASL_RESNAME_MAXADDR                     "_MAX"
-#define ASL_RESNAME_MINADDR                     "_MIN"
-#define ASL_RESNAME_MAXTYPE                     "_MAF"
-#define ASL_RESNAME_MINTYPE                     "_MIF"
-#define ASL_RESNAME_REGISTERBITOFFSET           "_RBO"
-#define ASL_RESNAME_REGISTERBITWIDTH            "_RBW"
-#define ASL_RESNAME_RANGETYPE                   "_RNG"
-#define ASL_RESNAME_READWRITETYPE               "_RW_"  /* ReadOnly(0), Writeable (1) */
-#define ASL_RESNAME_TRANSLATION                 "_TRA"
-#define ASL_RESNAME_TRANSTYPE                   "_TRS"  /* Sparse(1), Dense(0) */
-#define ASL_RESNAME_TYPE                        "_TTP"  /* Translation(1), Static (0) */
-#define ASL_RESNAME_XFERTYPE                    "_SIZ"  /* 8(0), 8And16(1), 16(2) */
+/*! [Begin] no source code translation */
+
+/*
+ * Resource descriptor tags, as defined in the ACPI specification.
+ * Used to symbolically reference fields within a descriptor.
+ */
+#define ACPI_RESTAG_ADDRESS                     "_ADR"
+#define ACPI_RESTAG_ALIGNMENT                   "_ALN"
+#define ACPI_RESTAG_ADDRESSSPACE                "_ASI"
+#define ACPI_RESTAG_ACCESSSIZE                  "_ASZ"
+#define ACPI_RESTAG_TYPESPECIFICATTRIBUTES      "_ATT"
+#define ACPI_RESTAG_BASEADDRESS                 "_BAS"
+#define ACPI_RESTAG_BUSMASTER                   "_BM_"  /* Master(1), Slave(0) */
+#define ACPI_RESTAG_DECODE                      "_DEC"
+#define ACPI_RESTAG_DMA                         "_DMA"
+#define ACPI_RESTAG_DMATYPE                     "_TYP"  /* Compatible(0), A(1), B(2), F(3) */
+#define ACPI_RESTAG_GRANULARITY                 "_GRA"
+#define ACPI_RESTAG_INTERRUPT                   "_INT"
+#define ACPI_RESTAG_INTERRUPTLEVEL              "_LL_"  /* ActiveLo(1), ActiveHi(0) */
+#define ACPI_RESTAG_INTERRUPTSHARE              "_SHR"  /* Shareable(1), NoShare(0) */
+#define ACPI_RESTAG_INTERRUPTTYPE               "_HE_"  /* Edge(1), Level(0) */
+#define ACPI_RESTAG_LENGTH                      "_LEN"
+#define ACPI_RESTAG_MEMATTRIBUTES               "_MTP"  /* Memory(0), Reserved(1), ACPI(2), NVS(3) */
+#define ACPI_RESTAG_MEMTYPE                     "_MEM"  /* NonCache(0), Cacheable(1) Cache+combine(2), Cache+prefetch(3) */
+#define ACPI_RESTAG_MAXADDR                     "_MAX"
+#define ACPI_RESTAG_MINADDR                     "_MIN"
+#define ACPI_RESTAG_MAXTYPE                     "_MAF"
+#define ACPI_RESTAG_MINTYPE                     "_MIF"
+#define ACPI_RESTAG_REGISTERBITOFFSET           "_RBO"
+#define ACPI_RESTAG_REGISTERBITWIDTH            "_RBW"
+#define ACPI_RESTAG_RANGETYPE                   "_RNG"
+#define ACPI_RESTAG_READWRITETYPE               "_RW_"  /* ReadOnly(0), Writeable (1) */
+#define ACPI_RESTAG_TRANSLATION                 "_TRA"
+#define ACPI_RESTAG_TRANSTYPE                   "_TRS"  /* Sparse(1), Dense(0) */
+#define ACPI_RESTAG_TYPE                        "_TTP"  /* Translation(1), Static (0) */
+#define ACPI_RESTAG_XFERTYPE                    "_SIZ"  /* 8(0), 8And16(1), 16(2) */
+/*! [End] no source code translation !*/
 
 
 /* Default sizes for "small" resource descriptors */
@@ -165,250 +173,270 @@
 
 typedef struct asl_resource_node
 {
-    UINT32                      BufferLength;
-    void                        *Buffer;
-    struct asl_resource_node    *Next;
+    UINT32                          BufferLength;
+    void                            *Buffer;
+    struct asl_resource_node        *Next;
 
 } ASL_RESOURCE_NODE;
 
+
+/* Macros used to generate AML resource length fields */
+
+#define ACPI_AML_SIZE_LARGE(r)      (sizeof (r) - sizeof (AML_RESOURCE_LARGE_HEADER))
+#define ACPI_AML_SIZE_SMALL(r)      (sizeof (r) - sizeof (AML_RESOURCE_SMALL_HEADER))
 
 /*
  * Resource descriptors defined in the ACPI specification.
  *
  * Packing/alignment must be BYTE because these descriptors
- * are used to overlay the AML byte stream.
+ * are used to overlay the raw AML byte stream.
  */
 #pragma pack(1)
 
-typedef struct asl_irq_format_desc
+/*
+ * SMALL descriptors
+ */
+#define AML_RESOURCE_SMALL_HEADER_COMMON \
+    UINT8                           DescriptorType;
+
+typedef struct aml_resource_small_header
 {
-    UINT8                       DescriptorType;
-    UINT16                      IrqMask;
-    UINT8                       Flags;
+    AML_RESOURCE_SMALL_HEADER_COMMON
 
-} ASL_IRQ_FORMAT_DESC;
+} AML_RESOURCE_SMALL_HEADER;
 
 
-typedef struct asl_irq_noflags_desc
+typedef struct aml_resource_irq
 {
-    UINT8                       DescriptorType;
-    UINT16                      IrqMask;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT16                          IrqMask;
+    UINT8                           Flags;
 
-} ASL_IRQ_NOFLAGS_DESC;
+} AML_RESOURCE_IRQ;
 
 
-typedef struct asl_dma_format_desc
+typedef struct aml_resource_irq_noflags
 {
-    UINT8                       DescriptorType;
-    UINT8                       DmaChannelMask;
-    UINT8                       Flags;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT16                          IrqMask;
 
-} ASL_DMA_FORMAT_DESC;
+} AML_RESOURCE_IRQ_NOFLAGS;
 
 
-typedef struct asl_start_dependent_desc
+typedef struct aml_resource_dma
 {
-    UINT8                       DescriptorType;
-    UINT8                       Flags;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT8                           DmaChannelMask;
+    UINT8                           Flags;
 
-} ASL_START_DEPENDENT_DESC;
+} AML_RESOURCE_DMA;
 
 
-typedef struct asl_start_dependent_noprio_desc
+typedef struct aml_resource_start_dependent
 {
-    UINT8                       DescriptorType;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT8                           Flags;
 
-} ASL_START_DEPENDENT_NOPRIO_DESC;
+} AML_RESOURCE_START_DEPENDENT;
 
 
-typedef struct asl_end_dependent_desc
+typedef struct aml_resource_start_dependent_noprio
 {
-    UINT8                       DescriptorType;
+    AML_RESOURCE_SMALL_HEADER_COMMON
 
-} ASL_END_DEPENDENT_DESC;
+} AML_RESOURCE_START_DEPENDENT_NOPRIO;
 
 
-typedef struct asl_io_port_desc
+typedef struct aml_resource_end_dependent
 {
-    UINT8                       DescriptorType;
-    UINT8                       Information;
-    UINT16                      AddressMin;
-    UINT16                      AddressMax;
-    UINT8                       Alignment;
-    UINT8                       Length;
+    AML_RESOURCE_SMALL_HEADER_COMMON
 
-} ASL_IO_PORT_DESC;
+} AML_RESOURCE_END_DEPENDENT;
 
 
-typedef struct asl_fixed_io_port_desc
+typedef struct aml_resource_io
 {
-    UINT8                       DescriptorType;
-    UINT16                      BaseAddress;
-    UINT8                       Length;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT8                           Flags;
+    UINT16                          Minimum;
+    UINT16                          Maximum;
+    UINT8                           Alignment;
+    UINT8                           AddressLength;
 
-} ASL_FIXED_IO_PORT_DESC;
+} AML_RESOURCE_IO;
 
 
-typedef struct asl_small_vendor_desc
+typedef struct aml_resource_fixed_io
 {
-    UINT8                       DescriptorType;
-    UINT8                       VendorDefined[7];
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT16                          Address;
+    UINT8                           AddressLength;
 
-} ASL_SMALL_VENDOR_DESC;
+} AML_RESOURCE_FIXED_IO;
 
 
-typedef struct asl_end_tag_desc
+typedef struct aml_resource_vendor_small
 {
-    UINT8                       DescriptorType;
-    UINT8                       Checksum;
+    AML_RESOURCE_SMALL_HEADER_COMMON
 
-} ASL_END_TAG_DESC;
+} AML_RESOURCE_VENDOR_SMALL;
 
 
-/* LARGE descriptors */
-
-typedef struct asl_memory_24_desc
+typedef struct aml_resource_end_tag
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       Information;
-    UINT16                      AddressMin;
-    UINT16                      AddressMax;
-    UINT16                      Alignment;
-    UINT16                      RangeLength;
+    AML_RESOURCE_SMALL_HEADER_COMMON
+    UINT8                           Checksum;
 
-} ASL_MEMORY_24_DESC;
+} AML_RESOURCE_END_TAG;
 
 
-typedef struct asl_large_vendor_desc
+/*
+ * LARGE descriptors
+ */
+#define AML_RESOURCE_LARGE_HEADER_COMMON \
+    UINT8                           DescriptorType;\
+    UINT16                          ResourceLength;
+
+typedef struct aml_resource_large_header
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       VendorDefined[1];
+    AML_RESOURCE_LARGE_HEADER_COMMON
 
-} ASL_LARGE_VENDOR_DESC;
+} AML_RESOURCE_LARGE_HEADER;
 
 
-typedef struct asl_memory_32_desc
+typedef struct aml_resource_memory24
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       Information;
-    UINT32                      AddressMin;
-    UINT32                      AddressMax;
-    UINT32                      Alignment;
-    UINT32                      RangeLength;
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           Flags;
+    UINT16                          Minimum;
+    UINT16                          Maximum;
+    UINT16                          Alignment;
+    UINT16                          AddressLength;
 
-} ASL_MEMORY_32_DESC;
+} AML_RESOURCE_MEMORY24;
 
 
-typedef struct asl_fixed_memory_32_desc
+typedef struct aml_resource_vendor_large
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       Information;
-    UINT32                      BaseAddress;
-    UINT32                      RangeLength;
+    AML_RESOURCE_LARGE_HEADER_COMMON
 
-} ASL_FIXED_MEMORY_32_DESC;
+} AML_RESOURCE_VENDOR_LARGE;
 
 
-typedef struct asl_extended_address_desc
+typedef struct aml_resource_memory32
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       ResourceType;
-    UINT8                       Flags;
-    UINT8                       SpecificFlags;
-    UINT8                       RevisionID;
-    UINT8                       Reserved;
-    UINT64                      Granularity;
-    UINT64                      AddressMin;
-    UINT64                      AddressMax;
-    UINT64                      TranslationOffset;
-    UINT64                      AddressLength;
-    UINT64                      TypeSpecificAttributes;
-    UINT8                       OptionalFields[2];  /* Used for length calculation only */
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           Flags;
+    UINT32                          Minimum;
+    UINT32                          Maximum;
+    UINT32                          Alignment;
+    UINT32                          AddressLength;
 
-} ASL_EXTENDED_ADDRESS_DESC;
-
-#define ASL_EXTENDED_ADDRESS_DESC_REVISION          1       /* ACPI 3.0 */
+} AML_RESOURCE_MEMORY32;
 
 
-typedef struct asl_qword_address_desc
+typedef struct aml_resource_fixed_memory32
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       ResourceType;
-    UINT8                       Flags;
-    UINT8                       SpecificFlags;
-    UINT64                      Granularity;
-    UINT64                      AddressMin;
-    UINT64                      AddressMax;
-    UINT64                      TranslationOffset;
-    UINT64                      AddressLength;
-    UINT8                       OptionalFields[2];
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           Flags;
+    UINT32                          Address;
+    UINT32                          AddressLength;
 
-} ASL_QWORD_ADDRESS_DESC;
+} AML_RESOURCE_FIXED_MEMORY32;
 
 
-typedef struct asl_dword_address_desc
+#define AML_RESOURCE_ADDRESS_COMMON \
+    UINT8                           ResourceType; \
+    UINT8                           Flags; \
+    UINT8                           SpecificFlags;
+
+
+typedef struct aml_resource_address
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       ResourceType;
-    UINT8                       Flags;
-    UINT8                       SpecificFlags;
-    UINT32                      Granularity;
-    UINT32                      AddressMin;
-    UINT32                      AddressMax;
-    UINT32                      TranslationOffset;
-    UINT32                      AddressLength;
-    UINT8                       OptionalFields[2];
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    AML_RESOURCE_ADDRESS_COMMON
 
-} ASL_DWORD_ADDRESS_DESC;
+} AML_RESOURCE_ADDRESS;
 
 
-typedef struct asl_word_address_desc
+typedef struct aml_resource_extended_address64
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       ResourceType;
-    UINT8                       Flags;
-    UINT8                       SpecificFlags;
-    UINT16                      Granularity;
-    UINT16                      AddressMin;
-    UINT16                      AddressMax;
-    UINT16                      TranslationOffset;
-    UINT16                      AddressLength;
-    UINT8                       OptionalFields[2];
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    AML_RESOURCE_ADDRESS_COMMON
+    UINT8                           RevisionID;
+    UINT8                           Reserved;
+    UINT64                          Granularity;
+    UINT64                          Minimum;
+    UINT64                          Maximum;
+    UINT64                          TranslationOffset;
+    UINT64                          AddressLength;
+    UINT64                          TypeSpecific;
 
-} ASL_WORD_ADDRESS_DESC;
+} AML_RESOURCE_EXTENDED_ADDRESS64;
+
+#define AML_RESOURCE_EXTENDED_ADDRESS_REVISION          1       /* ACPI 3.0 */
 
 
-typedef struct asl_extended_xrupt_desc
+typedef struct aml_resource_address64
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       Flags;
-    UINT8                       TableLength;
-    UINT32                      InterruptNumber[1];
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    AML_RESOURCE_ADDRESS_COMMON
+    UINT64                          Granularity;
+    UINT64                          Minimum;
+    UINT64                          Maximum;
+    UINT64                          TranslationOffset;
+    UINT64                          AddressLength;
+
+} AML_RESOURCE_ADDRESS64;
+
+
+typedef struct aml_resource_address32
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    AML_RESOURCE_ADDRESS_COMMON
+    UINT32                          Granularity;
+    UINT32                          Minimum;
+    UINT32                          Maximum;
+    UINT32                          TranslationOffset;
+    UINT32                          AddressLength;
+
+} AML_RESOURCE_ADDRESS32;
+
+
+typedef struct aml_resource_address16
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    AML_RESOURCE_ADDRESS_COMMON
+    UINT16                          Granularity;
+    UINT16                          Minimum;
+    UINT16                          Maximum;
+    UINT16                          TranslationOffset;
+    UINT16                          AddressLength;
+
+} AML_RESOURCE_ADDRESS16;
+
+
+typedef struct aml_resource_extended_irq
+{
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           Flags;
+    UINT8                           InterruptCount;
+    UINT32                          Interrupts[1];
     /* ResSourceIndex, ResSource optional fields follow */
 
-} ASL_EXTENDED_XRUPT_DESC;
+} AML_RESOURCE_EXTENDED_IRQ;
 
 
-typedef struct asl_general_register_desc
+typedef struct aml_resource_generic_register
 {
-    UINT8                       DescriptorType;
-    UINT16                      Length;
-    UINT8                       AddressSpaceId;
-    UINT8                       BitWidth;
-    UINT8                       BitOffset;
-    UINT8                       AccessSize; /* ACPI 3.0, was Reserved */
-    UINT64                      Address;
+    AML_RESOURCE_LARGE_HEADER_COMMON
+    UINT8                           AddressSpaceId;
+    UINT8                           BitWidth;
+    UINT8                           BitOffset;
+    UINT8                           AccessSize; /* ACPI 3.0, was previously Reserved */
+    UINT64                          Address;
 
-} ASL_GENERAL_REGISTER_DESC;
+} AML_RESOURCE_GENERIC_REGISTER;
 
 /* restore default alignment */
 
@@ -416,33 +444,46 @@ typedef struct asl_general_register_desc
 
 /* Union of all resource descriptors, so we can allocate the worst case */
 
-typedef union asl_resource_desc
+typedef union aml_resource
 {
-    ASL_IRQ_FORMAT_DESC         Irq;
-    ASL_DMA_FORMAT_DESC         Dma;
-    ASL_START_DEPENDENT_DESC    Std;
-    ASL_END_DEPENDENT_DESC      End;
-    ASL_IO_PORT_DESC            Iop;
-    ASL_FIXED_IO_PORT_DESC      Fio;
-    ASL_SMALL_VENDOR_DESC       Smv;
-    ASL_END_TAG_DESC            Et;
+    /* Descriptor headers */
 
-    ASL_MEMORY_24_DESC          M24;
-    ASL_LARGE_VENDOR_DESC       Lgv;
-    ASL_MEMORY_32_DESC          M32;
-    ASL_FIXED_MEMORY_32_DESC    F32;
-    ASL_QWORD_ADDRESS_DESC      Qas;
-    ASL_DWORD_ADDRESS_DESC      Das;
-    ASL_WORD_ADDRESS_DESC       Was;
-    ASL_EXTENDED_ADDRESS_DESC   Eas;
-    ASL_EXTENDED_XRUPT_DESC     Exx;
-    ASL_GENERAL_REGISTER_DESC   Grg;
-    UINT32                      U32Item;
-    UINT16                      U16Item;
-    UINT8                       U8Item;
+    UINT8                                   DescriptorType;
+    AML_RESOURCE_SMALL_HEADER               SmallHeader;
+    AML_RESOURCE_LARGE_HEADER               LargeHeader;
 
-} ASL_RESOURCE_DESC;
+    /* Small resource descriptors */
 
+    AML_RESOURCE_IRQ                        Irq;
+    AML_RESOURCE_DMA                        Dma;
+    AML_RESOURCE_START_DEPENDENT            StartDpf;
+    AML_RESOURCE_END_DEPENDENT              EndDpf;
+    AML_RESOURCE_IO                         Io;
+    AML_RESOURCE_FIXED_IO                   FixedIo;
+    AML_RESOURCE_VENDOR_SMALL               VendorSmall;
+    AML_RESOURCE_END_TAG                    EndTag;
+
+    /* Large resource descriptors */
+
+    AML_RESOURCE_MEMORY24                   Memory24;
+    AML_RESOURCE_GENERIC_REGISTER           GenericReg;
+    AML_RESOURCE_VENDOR_LARGE               VendorLarge;
+    AML_RESOURCE_MEMORY32                   Memory32;
+    AML_RESOURCE_FIXED_MEMORY32             FixedMemory32;
+    AML_RESOURCE_ADDRESS16                  Address16;
+    AML_RESOURCE_ADDRESS32                  Address32;
+    AML_RESOURCE_ADDRESS64                  Address64;
+    AML_RESOURCE_EXTENDED_ADDRESS64         ExtAddress64;
+    AML_RESOURCE_EXTENDED_IRQ               ExtendedIrq;
+
+    /* Utility overlays */
+
+    AML_RESOURCE_ADDRESS                    Address;
+    UINT32                                  U32Item;
+    UINT16                                  U16Item;
+    UINT8                                   U8Item;
+
+} AML_RESOURCE;
 
 #endif
 

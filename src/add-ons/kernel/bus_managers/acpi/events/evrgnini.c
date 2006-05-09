@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evrgnini- ACPI AddressSpace (OpRegion) init
- *              $Revision: 75 $
+ *              $Revision: 1.83 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -136,7 +136,7 @@
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling, a nop for now
+ * DESCRIPTION: Setup a SystemMemory operation region
  *
  ******************************************************************************/
 
@@ -151,14 +151,23 @@ AcpiEvSystemMemoryRegionSetup (
     ACPI_MEM_SPACE_CONTEXT  *LocalRegionContext;
 
 
-    ACPI_FUNCTION_TRACE ("EvSystemMemoryRegionSetup");
+    ACPI_FUNCTION_TRACE (EvSystemMemoryRegionSetup);
 
 
     if (Function == ACPI_REGION_DEACTIVATE)
     {
         if (*RegionContext)
         {
-            ACPI_MEM_FREE (*RegionContext);
+            LocalRegionContext = (ACPI_MEM_SPACE_CONTEXT *) *RegionContext;
+
+            /* Delete a cached mapping if present */
+
+            if (LocalRegionContext->MappedLength)
+            {
+                AcpiOsUnmapMemory (LocalRegionContext->MappedLogicalAddress,
+                    LocalRegionContext->MappedLength);
+            }
+            ACPI_FREE (LocalRegionContext);
             *RegionContext = NULL;
         }
         return_ACPI_STATUS (AE_OK);
@@ -166,7 +175,7 @@ AcpiEvSystemMemoryRegionSetup (
 
     /* Create a new context */
 
-    LocalRegionContext = ACPI_MEM_CALLOCATE (sizeof (ACPI_MEM_SPACE_CONTEXT));
+    LocalRegionContext = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_MEM_SPACE_CONTEXT));
     if (!(LocalRegionContext))
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
@@ -193,7 +202,7 @@ AcpiEvSystemMemoryRegionSetup (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling
+ * DESCRIPTION: Setup a IO operation region
  *
  ******************************************************************************/
 
@@ -204,7 +213,7 @@ AcpiEvIoSpaceRegionSetup (
     void                    *HandlerContext,
     void                    **RegionContext)
 {
-    ACPI_FUNCTION_TRACE ("EvIoSpaceRegionSetup");
+    ACPI_FUNCTION_TRACE (EvIoSpaceRegionSetup);
 
 
     if (Function == ACPI_REGION_DEACTIVATE)
@@ -224,14 +233,14 @@ AcpiEvIoSpaceRegionSetup (
  *
  * FUNCTION:    AcpiEvPciConfigRegionSetup
  *
- * PARAMETERS:  Handle             - Region we are interested in
+ * PARAMETERS:  Handle              - Region we are interested in
  *              Function            - Start or stop
  *              HandlerContext      - Address space handler context
  *              RegionContext       - Region specific context
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling
+ * DESCRIPTION: Setup a PCI_Config operation region
  *
  * MUTEX:       Assumes namespace is not locked
  *
@@ -254,7 +263,7 @@ AcpiEvPciConfigRegionSetup (
     ACPI_DEVICE_ID          ObjectHID;
 
 
-    ACPI_FUNCTION_TRACE ("EvPciConfigRegionSetup");
+    ACPI_FUNCTION_TRACE (EvPciConfigRegionSetup);
 
 
     HandlerObj = RegionObj->Region.Handler;
@@ -274,7 +283,7 @@ AcpiEvPciConfigRegionSetup (
     {
         if (PciId)
         {
-            ACPI_MEM_FREE (PciId);
+            ACPI_FREE (PciId);
         }
         return_ACPI_STATUS (Status);
     }
@@ -304,10 +313,14 @@ AcpiEvPciConfigRegionSetup (
             Status = AcpiUtExecute_HID (PciRootNode, &ObjectHID);
             if (ACPI_SUCCESS (Status))
             {
-                /* Got a valid _HID, check if this is a PCI root */
-
+                /*
+                 * Got a valid _HID string, check if this is a PCI root.
+                 * New for ACPI 3.0: check for a PCI Express root also.
+                 */
                 if (!(ACPI_STRNCMP (ObjectHID.Value, PCI_ROOT_HID_STRING,
-                                    sizeof (PCI_ROOT_HID_STRING))))
+                                    sizeof (PCI_ROOT_HID_STRING))           ||
+                    !(ACPI_STRNCMP (ObjectHID.Value, PCI_EXPRESS_ROOT_HID_STRING,
+                                    sizeof (PCI_EXPRESS_ROOT_HID_STRING)))))
                 {
                     /* Install a handler for this PCI root bridge */
 
@@ -327,9 +340,9 @@ AcpiEvPciConfigRegionSetup (
                         }
                         else
                         {
-                            ACPI_REPORT_ERROR ((
-                                "Could not install PciConfig handler for Root Bridge %4.4s, %s\n",
-                                AcpiUtGetNodeName (PciRootNode), AcpiFormatException (Status)));
+                            ACPI_EXCEPTION ((AE_INFO, Status,
+                                "Could not install PciConfig handler for Root Bridge %4.4s",
+                                AcpiUtGetNodeName (PciRootNode)));
                         }
                     }
                     break;
@@ -357,7 +370,7 @@ AcpiEvPciConfigRegionSetup (
 
     /* Region is still not initialized. Create a new context */
 
-    PciId = ACPI_MEM_CALLOCATE (sizeof (ACPI_PCI_ID));
+    PciId = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_PCI_ID));
     if (!PciId)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
@@ -420,7 +433,7 @@ AcpiEvPciConfigRegionSetup (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling
+ * DESCRIPTION: Setup a PciBAR operation region
  *
  * MUTEX:       Assumes namespace is not locked
  *
@@ -433,7 +446,7 @@ AcpiEvPciBarRegionSetup (
     void                    *HandlerContext,
     void                    **RegionContext)
 {
-    ACPI_FUNCTION_TRACE ("EvPciBarRegionSetup");
+    ACPI_FUNCTION_TRACE (EvPciBarRegionSetup);
 
 
     return_ACPI_STATUS (AE_OK);
@@ -451,7 +464,7 @@ AcpiEvPciBarRegionSetup (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling
+ * DESCRIPTION: Setup a CMOS operation region
  *
  * MUTEX:       Assumes namespace is not locked
  *
@@ -464,7 +477,7 @@ AcpiEvCmosRegionSetup (
     void                    *HandlerContext,
     void                    **RegionContext)
 {
-    ACPI_FUNCTION_TRACE ("EvCmosRegionSetup");
+    ACPI_FUNCTION_TRACE (EvCmosRegionSetup);
 
 
     return_ACPI_STATUS (AE_OK);
@@ -482,7 +495,7 @@ AcpiEvCmosRegionSetup (
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Do any prep work for region handling
+ * DESCRIPTION: Default region initialization
  *
  ******************************************************************************/
 
@@ -493,7 +506,7 @@ AcpiEvDefaultRegionSetup (
     void                    *HandlerContext,
     void                    **RegionContext)
 {
-    ACPI_FUNCTION_TRACE ("EvDefaultRegionSetup");
+    ACPI_FUNCTION_TRACE (EvDefaultRegionSetup);
 
 
     if (Function == ACPI_REGION_DEACTIVATE)
@@ -546,7 +559,7 @@ AcpiEvInitializeRegion (
     ACPI_OPERAND_OBJECT     *RegionObj2;
 
 
-    ACPI_FUNCTION_TRACE_U32 ("EvInitializeRegion", AcpiNsLocked);
+    ACPI_FUNCTION_TRACE_U32 (EvInitializeRegion, AcpiNsLocked);
 
 
     if (!RegionObj)

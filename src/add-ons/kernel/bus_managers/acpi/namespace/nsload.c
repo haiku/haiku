@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsload - namespace loading/expanding/contracting procedures
- *              $Revision: 70 $
+ *              $Revision: 1.78 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,9 +124,24 @@
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsload")
 
+/* Local prototypes */
+
+static ACPI_STATUS
+AcpiNsLoadTableByType (
+    ACPI_TABLE_TYPE         TableType);
+
+#ifdef ACPI_FUTURE_IMPLEMENTATION
+ACPI_STATUS
+AcpiNsUnloadNamespace (
+    ACPI_HANDLE             Handle);
+
+static ACPI_STATUS
+AcpiNsDeleteSubtree (
+    ACPI_HANDLE             StartHandle);
+#endif
+
 
 #ifndef ACPI_NO_METHOD_EXECUTION
-
 /*******************************************************************************
  *
  * FUNCTION:    AcpiNsLoadTable
@@ -148,7 +163,7 @@ AcpiNsLoadTable (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("NsLoadTable");
+    ACPI_FUNCTION_TRACE (NsLoadTable);
 
 
     /* Check if table contains valid AML (must be DSDT, PSDT, SSDT, etc.) */
@@ -164,7 +179,7 @@ AcpiNsLoadTable (
 
     if (!TableDesc->AmlStart)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Null AML pointer\n"));
+        ACPI_ERROR ((AE_INFO, "Null AML pointer"));
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
@@ -175,7 +190,7 @@ AcpiNsLoadTable (
 
     if (!TableDesc->AmlLength)
     {
-        ACPI_REPORT_WARNING (("Zero-length AML block in table [%4.4s]\n",
+        ACPI_WARNING ((AE_INFO, "Zero-length AML block in table [%4.4s]",
             TableDesc->Pointer->Signature));
         return_ACPI_STATUS (AE_OK);
     }
@@ -238,7 +253,7 @@ AcpiNsLoadTable (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiNsLoadTableByType (
     ACPI_TABLE_TYPE         TableType)
 {
@@ -247,7 +262,7 @@ AcpiNsLoadTableByType (
     ACPI_TABLE_DESC         *TableDesc;
 
 
-    ACPI_FUNCTION_TRACE ("NsLoadTableByType");
+    ACPI_FUNCTION_TRACE (NsLoadTableByType);
 
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_TABLES);
@@ -262,11 +277,11 @@ AcpiNsLoadTableByType (
      */
     switch (TableType)
     {
-    case ACPI_TABLE_DSDT:
+    case ACPI_TABLE_ID_DSDT:
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Loading DSDT\n"));
+        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Namespace load: DSDT\n"));
 
-        TableDesc = AcpiGbl_TableLists[ACPI_TABLE_DSDT].Next;
+        TableDesc = AcpiGbl_TableLists[ACPI_TABLE_ID_DSDT].Next;
 
         /* If table already loaded into namespace, just return */
 
@@ -285,51 +300,22 @@ AcpiNsLoadTableByType (
         break;
 
 
-    case ACPI_TABLE_SSDT:
+    case ACPI_TABLE_ID_SSDT:
+    case ACPI_TABLE_ID_PSDT:
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Loading %d SSDTs\n",
-            AcpiGbl_TableLists[ACPI_TABLE_SSDT].Count));
+        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Namespace load: %d SSDT or PSDTs\n",
+            AcpiGbl_TableLists[TableType].Count));
 
         /*
-         * Traverse list of SSDT tables
+         * Traverse list of SSDT or PSDT tables
          */
-        TableDesc = AcpiGbl_TableLists[ACPI_TABLE_SSDT].Next;
-        for (i = 0; i < AcpiGbl_TableLists[ACPI_TABLE_SSDT].Count; i++)
+        TableDesc = AcpiGbl_TableLists[TableType].Next;
+        for (i = 0; i < AcpiGbl_TableLists[TableType].Count; i++)
         {
             /*
-             * Only attempt to load table if it is not
+             * Only attempt to load table into namespace if it is not
              * already loaded!
              */
-            if (!TableDesc->LoadedIntoNamespace)
-            {
-                Status = AcpiNsLoadTable (TableDesc, AcpiGbl_RootNode);
-                if (ACPI_FAILURE (Status))
-                {
-                    break;
-                }
-
-                TableDesc->LoadedIntoNamespace = TRUE;
-            }
-
-            TableDesc = TableDesc->Next;
-        }
-        break;
-
-
-    case ACPI_TABLE_PSDT:
-
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Loading %d PSDTs\n",
-            AcpiGbl_TableLists[ACPI_TABLE_PSDT].Count));
-
-        /*
-         * Traverse list of PSDT tables
-         */
-        TableDesc = AcpiGbl_TableLists[ACPI_TABLE_PSDT].Next;
-
-        for (i = 0; i < AcpiGbl_TableLists[ACPI_TABLE_PSDT].Count; i++)
-        {
-            /* Only attempt to load table if it is not already loaded! */
-
             if (!TableDesc->LoadedIntoNamespace)
             {
                 Status = AcpiNsLoadTable (TableDesc, AcpiGbl_RootNode);
@@ -378,14 +364,14 @@ AcpiNsLoadNamespace (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("AcpiLoadNameSpace");
+    ACPI_FUNCTION_TRACE (AcpiLoadNameSpace);
 
 
     /* There must be at least a DSDT installed */
 
     if (AcpiGbl_DSDT == NULL)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "DSDT is not in memory\n"));
+        ACPI_ERROR ((AE_INFO, "DSDT is not in memory"));
         return_ACPI_STATUS (AE_NO_ACPI_TABLES);
     }
 
@@ -393,7 +379,7 @@ AcpiNsLoadNamespace (
      * Load the namespace.  The DSDT is required,
      * but the SSDT and PSDT tables are optional.
      */
-    Status = AcpiNsLoadTableByType (ACPI_TABLE_DSDT);
+    Status = AcpiNsLoadTableByType (ACPI_TABLE_ID_DSDT);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -401,8 +387,8 @@ AcpiNsLoadNamespace (
 
     /* Ignore exceptions from these */
 
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_SSDT);
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_PSDT);
+    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_SSDT);
+    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_PSDT);
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
         "ACPI Namespace successfully loaded at root %p\n",
@@ -412,6 +398,7 @@ AcpiNsLoadNamespace (
 }
 
 
+#ifdef ACPI_FUTURE_IMPLEMENTATION
 /*******************************************************************************
  *
  * FUNCTION:    AcpiNsDeleteSubtree
@@ -428,7 +415,7 @@ AcpiNsLoadNamespace (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiNsDeleteSubtree (
     ACPI_HANDLE             StartHandle)
 {
@@ -440,7 +427,7 @@ AcpiNsDeleteSubtree (
     UINT32                  Level;
 
 
-    ACPI_FUNCTION_TRACE ("NsDeleteSubtree");
+    ACPI_FUNCTION_TRACE (NsDeleteSubtree);
 
 
     ParentHandle = StartHandle;
@@ -528,7 +515,7 @@ AcpiNsUnloadNamespace (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("NsUnloadNameSpace");
+    ACPI_FUNCTION_TRACE (NsUnloadNameSpace);
 
 
     /* Parameter validation */
@@ -549,6 +536,6 @@ AcpiNsUnloadNamespace (
 
     return_ACPI_STATUS (Status);
 }
-
+#endif
 #endif
 

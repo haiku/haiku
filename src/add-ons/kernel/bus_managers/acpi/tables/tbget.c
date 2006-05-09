@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbget - ACPI Table get* routines
- *              $Revision: 91 $
+ *              $Revision: 1.101 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -123,6 +123,19 @@
 #define _COMPONENT          ACPI_TABLES
         ACPI_MODULE_NAME    ("tbget")
 
+/* Local prototypes */
+
+static ACPI_STATUS
+AcpiTbGetThisTable (
+    ACPI_POINTER            *Address,
+    ACPI_TABLE_HEADER       *Header,
+    ACPI_TABLE_DESC         *TableInfo);
+
+static ACPI_STATUS
+AcpiTbTableOverride (
+    ACPI_TABLE_HEADER       *Header,
+    ACPI_TABLE_DESC         *TableInfo);
+
 
 /*******************************************************************************
  *
@@ -147,12 +160,11 @@ AcpiTbGetTable (
     ACPI_TABLE_HEADER       Header;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetTable");
+    ACPI_FUNCTION_TRACE (TbGetTable);
 
 
-    /*
-     * Get the header in order to get signature and table size
-     */
+    /* Get the header in order to get signature and table size */
+
     Status = AcpiTbGetTableHeader (Address, &Header);
     if (ACPI_FAILURE (Status))
     {
@@ -164,8 +176,8 @@ AcpiTbGetTable (
     Status = AcpiTbGetTableBody (Address, &Header, TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not get ACPI table (size %X), %s\n",
-            Header.Length, AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not get ACPI table (size %X)", Header.Length));
         return_ACPI_STATUS (Status);
     }
 
@@ -199,12 +211,12 @@ AcpiTbGetTableHeader (
     ACPI_TABLE_HEADER       *Header = NULL;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetTableHeader");
+    ACPI_FUNCTION_TRACE (TbGetTableHeader);
 
 
     /*
-     * Flags contains the current processor mode (Virtual or Physical addressing)
-     * The PointerType is either Logical or Physical
+     * Flags contains the current processor mode (Virtual or Physical
+     * addressing) The PointerType is either Logical or Physical
      */
     switch (Address->PointerType)
     {
@@ -213,7 +225,8 @@ AcpiTbGetTableHeader (
 
         /* Pointer matches processor mode, copy the header */
 
-        ACPI_MEMCPY (ReturnHeader, Address->Pointer.Logical, sizeof (ACPI_TABLE_HEADER));
+        ACPI_MEMCPY (ReturnHeader, Address->Pointer.Logical,
+            sizeof (ACPI_TABLE_HEADER));
         break;
 
 
@@ -221,13 +234,13 @@ AcpiTbGetTableHeader (
 
         /* Create a logical address for the physical pointer*/
 
-        Status = AcpiOsMapMemory (Address->Pointer.Physical, sizeof (ACPI_TABLE_HEADER),
-                                    (void *) &Header);
+        Status = AcpiOsMapMemory (Address->Pointer.Physical,
+                    sizeof (ACPI_TABLE_HEADER), (void *) &Header);
         if (ACPI_FAILURE (Status))
         {
-            ACPI_REPORT_ERROR (("Could not map memory at %8.8X%8.8X for length %X\n",
-                ACPI_FORMAT_UINT64 (Address->Pointer.Physical),
-                sizeof (ACPI_TABLE_HEADER)));
+            ACPI_ERROR ((AE_INFO,
+                "Could not map memory at %8.8X%8.8X for table header",
+                ACPI_FORMAT_UINT64 (Address->Pointer.Physical)));
             return_ACPI_STATUS (Status);
         }
 
@@ -240,7 +253,7 @@ AcpiTbGetTableHeader (
 
     default:
 
-        ACPI_REPORT_ERROR (("Invalid address flags %X\n",
+        ACPI_ERROR ((AE_INFO, "Invalid address flags %X",
             Address->PointerType));
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
@@ -281,7 +294,7 @@ AcpiTbGetTableBody (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetTableBody");
+    ACPI_FUNCTION_TRACE (TbGetTableBody);
 
 
     if (!TableInfo || !Address)
@@ -289,9 +302,8 @@ AcpiTbGetTableBody (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    /*
-     * Attempt table override.
-     */
+    /* Attempt table override. */
+
     Status = AcpiTbTableOverride (Header, TableInfo);
     if (ACPI_SUCCESS (Status))
     {
@@ -321,7 +333,7 @@ AcpiTbGetTableBody (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiTbTableOverride (
     ACPI_TABLE_HEADER       *Header,
     ACPI_TABLE_DESC         *TableInfo)
@@ -331,7 +343,7 @@ AcpiTbTableOverride (
     ACPI_POINTER            Address;
 
 
-    ACPI_FUNCTION_TRACE ("TbTableOverride");
+    ACPI_FUNCTION_TRACE (TbTableOverride);
 
 
     /*
@@ -344,8 +356,7 @@ AcpiTbTableOverride (
     {
         /* Some severe error from the OSL, but we basically ignore it */
 
-        ACPI_REPORT_ERROR (("Could not override ACPI table, %s\n",
-            AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "Could not override ACPI table"));
         return_ACPI_STATUS (Status);
     }
 
@@ -366,14 +377,13 @@ AcpiTbTableOverride (
     Status = AcpiTbGetThisTable (&Address, NewTable, TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not copy override ACPI table, %s\n",
-            AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status, "Could not copy ACPI table"));
         return_ACPI_STATUS (Status);
     }
 
     /* Copy the table info */
 
-    ACPI_REPORT_INFO (("Table [%4.4s] replaced by host OS\n",
+    ACPI_INFO ((AE_INFO, "Table [%4.4s] replaced by host OS",
         TableInfo->Pointer->Signature));
 
     return_ACPI_STATUS (AE_OK);
@@ -398,7 +408,7 @@ AcpiTbTableOverride (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiTbGetThisTable (
     ACPI_POINTER            *Address,
     ACPI_TABLE_HEADER       *Header,
@@ -409,12 +419,12 @@ AcpiTbGetThisTable (
     ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetThisTable");
+    ACPI_FUNCTION_TRACE (TbGetThisTable);
 
 
     /*
-     * Flags contains the current processor mode (Virtual or Physical addressing)
-     * The PointerType is either Logical or Physical
+     * Flags contains the current processor mode (Virtual or Physical
+     * addressing) The PointerType is either Logical or Physical
      */
     switch (Address->PointerType)
     {
@@ -423,10 +433,11 @@ AcpiTbGetThisTable (
 
         /* Pointer matches processor mode, copy the table to a new buffer */
 
-        FullTable = ACPI_MEM_ALLOCATE (Header->Length);
+        FullTable = ACPI_ALLOCATE (Header->Length);
         if (!FullTable)
         {
-            ACPI_REPORT_ERROR (("Could not allocate table memory for [%4.4s] length %X\n",
+            ACPI_ERROR ((AE_INFO,
+                "Could not allocate table memory for [%4.4s] length %X",
                 Header->Signature, Header->Length));
             return_ACPI_STATUS (AE_NO_MEMORY);
         }
@@ -447,13 +458,15 @@ AcpiTbGetThisTable (
          * Just map the table's physical memory
          * into our address space.
          */
-        Status = AcpiOsMapMemory (Address->Pointer.Physical, (ACPI_SIZE) Header->Length,
-                                    (void *) &FullTable);
+        Status = AcpiOsMapMemory (Address->Pointer.Physical,
+                    (ACPI_SIZE) Header->Length, (void *) &FullTable);
         if (ACPI_FAILURE (Status))
         {
-            ACPI_REPORT_ERROR (("Could not map memory for table [%4.4s] at %8.8X%8.8X for length %X\n",
+            ACPI_ERROR ((AE_INFO,
+                "Could not map memory for table [%4.4s] at %8.8X%8.8X for length %X",
                 Header->Signature,
-                ACPI_FORMAT_UINT64 (Address->Pointer.Physical), Header->Length));
+                ACPI_FORMAT_UINT64 (Address->Pointer.Physical),
+                Header->Length));
             return (Status);
         }
 
@@ -465,7 +478,7 @@ AcpiTbGetThisTable (
 
     default:
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Invalid address flags %X\n",
+        ACPI_ERROR ((AE_INFO, "Invalid address flags %X",
             Address->PointerType));
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
@@ -474,7 +487,7 @@ AcpiTbGetThisTable (
      * Validate checksum for _most_ tables,
      * even the ones whose signature we don't recognize
      */
-    if (TableInfo->Type != ACPI_TABLE_FACS)
+    if (TableInfo->Type != ACPI_TABLE_ID_FACS)
     {
         Status = AcpiTbVerifyTableChecksum (FullTable);
 
@@ -528,7 +541,7 @@ AcpiTbGetTablePtr (
     UINT32                  i;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetTablePtr");
+    ACPI_FUNCTION_TRACE (TbGetTablePtr);
 
 
     if (!AcpiGbl_DSDT)
@@ -536,7 +549,7 @@ AcpiTbGetTablePtr (
         return_ACPI_STATUS (AE_NO_ACPI_TABLES);
     }
 
-    if (TableType > ACPI_TABLE_MAX)
+    if (TableType > ACPI_TABLE_ID_MAX)
     {
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
@@ -557,9 +570,8 @@ AcpiTbGetTablePtr (
         return_ACPI_STATUS (AE_OK);
     }
 
-    /*
-     * Check for instance out of range
-     */
+    /* Check for instance out of range */
+
     if (Instance > AcpiGbl_TableLists[TableType].Count)
     {
         return_ACPI_STATUS (AE_NOT_EXIST);

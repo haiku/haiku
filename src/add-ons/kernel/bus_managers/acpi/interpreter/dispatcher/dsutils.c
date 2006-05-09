@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dsutils - Dispatcher utilities
- *              $Revision: 111 $
+ *              $Revision: 1.121 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -147,7 +147,7 @@ void
 AcpiDsClearImplicitReturn (
     ACPI_WALK_STATE         *WalkState)
 {
-    ACPI_FUNCTION_NAME ("DsClearImplicitReturn");
+    ACPI_FUNCTION_NAME (DsClearImplicitReturn);
 
 
     /*
@@ -176,7 +176,6 @@ AcpiDsClearImplicitReturn (
 
 
 #ifndef ACPI_NO_METHOD_EXECUTION
-
 /*******************************************************************************
  *
  * FUNCTION:    AcpiDsDoImplicitReturn
@@ -201,7 +200,7 @@ AcpiDsDoImplicitReturn (
     ACPI_WALK_STATE         *WalkState,
     BOOLEAN                 AddReference)
 {
-    ACPI_FUNCTION_NAME ("DsDoImplicitReturn");
+    ACPI_FUNCTION_NAME (DsDoImplicitReturn);
 
 
     /*
@@ -266,15 +265,15 @@ AcpiDsIsResultUsed (
 {
     const ACPI_OPCODE_INFO  *ParentInfo;
 
-    ACPI_FUNCTION_TRACE_PTR ("DsIsResultUsed", Op);
+    ACPI_FUNCTION_TRACE_PTR (DsIsResultUsed, Op);
 
 
     /* Must have both an Op and a Result Object */
 
     if (!Op)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Null Op\n"));
-        return_VALUE (TRUE);
+        ACPI_ERROR ((AE_INFO, "Null Op"));
+        return_UINT8 (TRUE);
     }
 
     /*
@@ -286,13 +285,13 @@ AcpiDsIsResultUsed (
      * NOTE: this is optional because the ASL language does not actually
      * support this behavior.
      */
-    AcpiDsDoImplicitReturn (WalkState->ResultObj, WalkState, TRUE);
+    (void) AcpiDsDoImplicitReturn (WalkState->ResultObj, WalkState, TRUE);
 
-    /* 
+    /*
      * Now determine if the parent will use the result
      *
      * If there is no parent, or the parent is a ScopeOp, we are executing
-     * at the method level. An executing method typically has no parent, 
+     * at the method level. An executing method typically has no parent,
      * since each method is parsed separately.  A method invoked externally
      * via ExecuteControlMethod has a ScopeOp as the parent.
      */
@@ -301,9 +300,10 @@ AcpiDsIsResultUsed (
     {
         /* No parent, the return value cannot possibly be used */
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "At Method level, result of [%s] not used\n",
-                AcpiPsGetOpcodeName (Op->Common.AmlOpcode)));
-        return_VALUE (FALSE);
+        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+            "At Method level, result of [%s] not used\n",
+            AcpiPsGetOpcodeName (Op->Common.AmlOpcode)));
+        return_UINT8 (FALSE);
     }
 
     /* Get info on the parent. The RootOp is AML_SCOPE */
@@ -311,8 +311,9 @@ AcpiDsIsResultUsed (
     ParentInfo = AcpiPsGetOpcodeInfo (Op->Common.Parent->Common.AmlOpcode);
     if (ParentInfo->Class == AML_CLASS_UNKNOWN)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Unknown parent opcode. Op=%p\n", Op));
-        return_VALUE (FALSE);
+        ACPI_ERROR ((AE_INFO,
+            "Unknown parent opcode Op=%p", Op));
+        return_UINT8 (FALSE);
     }
 
     /*
@@ -396,19 +397,21 @@ AcpiDsIsResultUsed (
 
 
 ResultUsed:
-    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Result of [%s] used by Parent [%s] Op=%p\n",
-            AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-            AcpiPsGetOpcodeName (Op->Common.Parent->Common.AmlOpcode), Op));
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+        "Result of [%s] used by Parent [%s] Op=%p\n",
+        AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
+        AcpiPsGetOpcodeName (Op->Common.Parent->Common.AmlOpcode), Op));
 
-    return_VALUE (TRUE);
+    return_UINT8 (TRUE);
 
 
 ResultNotUsed:
-    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Result of [%s] not used by Parent [%s] Op=%p\n",
-            AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
-            AcpiPsGetOpcodeName (Op->Common.Parent->Common.AmlOpcode), Op));
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+        "Result of [%s] not used by Parent [%s] Op=%p\n",
+        AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
+        AcpiPsGetOpcodeName (Op->Common.Parent->Common.AmlOpcode), Op));
 
-    return_VALUE (FALSE);
+    return_UINT8 (FALSE);
 }
 
 
@@ -439,12 +442,12 @@ AcpiDsDeleteResultIfNotUsed (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("DsDeleteResultIfNotUsed", ResultObj);
+    ACPI_FUNCTION_TRACE_PTR (DsDeleteResultIfNotUsed, ResultObj);
 
 
     if (!Op)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Null Op\n"));
+        ACPI_ERROR ((AE_INFO, "Null Op"));
         return_VOID;
     }
 
@@ -490,7 +493,7 @@ AcpiDsResolveOperands (
     ACPI_STATUS             Status = AE_OK;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("DsResolveOperands", WalkState);
+    ACPI_FUNCTION_TRACE_PTR (DsResolveOperands, WalkState);
 
 
     /*
@@ -530,7 +533,7 @@ AcpiDsClearOperands (
     UINT32                  i;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("DsClearOperands", WalkState);
+    ACPI_FUNCTION_TRACE_PTR (DsClearOperands, WalkState);
 
 
     /* Remove a reference on each operand on the stack */
@@ -584,7 +587,7 @@ AcpiDsCreateOperand (
     const ACPI_OPCODE_INFO  *OpInfo;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("DsCreateOperand", Arg);
+    ACPI_FUNCTION_TRACE_PTR (DsCreateOperand, Arg);
 
 
     /* A valid name must be looked up in the namespace */
@@ -617,9 +620,10 @@ AcpiDsCreateOperand (
          */
         if ((WalkState->DeferredNode) &&
             (WalkState->DeferredNode->Type == ACPI_TYPE_BUFFER_FIELD) &&
-            (ArgIndex != 0))
+            (ArgIndex == (UINT32) ((WalkState->Opcode == AML_CREATE_FIELD_OP) ? 3 : 2)))
         {
-            ObjDesc = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, WalkState->DeferredNode);
+            ObjDesc = ACPI_CAST_PTR (
+                        ACPI_OPERAND_OBJECT, WalkState->DeferredNode);
             Status = AE_OK;
         }
         else    /* All other opcodes */
@@ -649,10 +653,10 @@ AcpiDsCreateOperand (
             }
 
             Status = AcpiNsLookup (WalkState->ScopeInfo, NameString,
-                                    ACPI_TYPE_ANY, InterpreterMode,
-                                    ACPI_NS_SEARCH_PARENT | ACPI_NS_DONT_OPEN_SCOPE,
-                                    WalkState,
-                                    ACPI_CAST_INDIRECT_PTR (ACPI_NAMESPACE_NODE, &ObjDesc));
+                        ACPI_TYPE_ANY, InterpreterMode,
+                        ACPI_NS_SEARCH_PARENT | ACPI_NS_DONT_OPEN_SCOPE,
+                        WalkState,
+                        ACPI_CAST_INDIRECT_PTR (ACPI_NAMESPACE_NODE, &ObjDesc));
             /*
              * The only case where we pass through (ignore) a NOT_FOUND
              * error is for the CondRefOf opcode.
@@ -667,7 +671,8 @@ AcpiDsCreateOperand (
                      * indicate this to the interpreter, set the
                      * object to the root
                      */
-                    ObjDesc = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT, AcpiGbl_RootNode);
+                    ObjDesc = ACPI_CAST_PTR (
+                                ACPI_OPERAND_OBJECT, AcpiGbl_RootNode);
                     Status = AE_OK;
                 }
                 else
@@ -682,13 +687,13 @@ AcpiDsCreateOperand (
 
             if (ACPI_FAILURE (Status))
             {
-                ACPI_REPORT_NSERROR (NameString, Status);
+                ACPI_ERROR_NAMESPACE (NameString, Status);
             }
         }
 
         /* Free the namestring created above */
 
-        ACPI_MEM_FREE (NameString);
+        ACPI_FREE (NameString);
 
         /* Check status from the lookup */
 
@@ -720,7 +725,8 @@ AcpiDsCreateOperand (
              */
             Opcode = AML_ZERO_OP;       /* Has no arguments! */
 
-            ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Null namepath: Arg=%p\n", Arg));
+            ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+                "Null namepath: Arg=%p\n", Arg));
         }
         else
         {
@@ -738,7 +744,7 @@ AcpiDsCreateOperand (
         if (OpInfo->Flags & AML_HAS_RETVAL)
         {
             ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
-                "Argument previously created, already stacked \n"));
+                "Argument previously created, already stacked\n"));
 
             ACPI_DEBUGGER_EXEC (AcpiDbDisplayArgumentObject (
                 WalkState->Operands [WalkState->NumOperands - 1], WalkState));
@@ -754,8 +760,8 @@ AcpiDsCreateOperand (
                  * Only error is underflow, and this indicates
                  * a missing or null operand!
                  */
-                ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Missing or null operand, %s\n",
-                    AcpiFormatException (Status)));
+                ACPI_EXCEPTION ((AE_INFO, Status,
+                    "Missing or null operand"));
                 return_ACPI_STATUS (Status);
             }
         }
@@ -771,8 +777,8 @@ AcpiDsCreateOperand (
 
             /* Initialize the new object */
 
-            Status = AcpiDsInitObjectFromOp (WalkState, Arg,
-                                                Opcode, &ObjDesc);
+            Status = AcpiDsInitObjectFromOp (
+                        WalkState, Arg, Opcode, &ObjDesc);
             if (ACPI_FAILURE (Status))
             {
                 AcpiUtDeleteObjectDesc (ObjDesc);
@@ -799,7 +805,7 @@ AcpiDsCreateOperand (
  *
  * FUNCTION:    AcpiDsCreateOperands
  *
- * PARAMETERS:  WalkState           - Current state  
+ * PARAMETERS:  WalkState           - Current state
  *              FirstArg            - First argument of a parser argument tree
  *
  * RETURN:      Status
@@ -820,7 +826,7 @@ AcpiDsCreateOperands (
     UINT32                  ArgCount = 0;
 
 
-    ACPI_FUNCTION_TRACE_PTR ("DsCreateOperands", FirstArg);
+    ACPI_FUNCTION_TRACE_PTR (DsCreateOperands, FirstArg);
 
 
     /* For all arguments in the list... */
@@ -854,8 +860,8 @@ Cleanup:
      */
     (void) AcpiDsObjStackPopAndDelete (ArgCount, WalkState);
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "While creating Arg %d - %s\n",
-        (ArgCount + 1), AcpiFormatException (Status)));
+    ACPI_EXCEPTION ((AE_INFO, Status, "While creating Arg %d",
+        (ArgCount + 1)));
     return_ACPI_STATUS (Status);
 }
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acdisasm.h - AML disassembler
- *       $Revision: 15 $
+ *       $Revision: 1.34 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,6 +124,7 @@
 #define BLOCK_PAREN             1
 #define BLOCK_BRACE             2
 #define BLOCK_COMMA_LIST        4
+#define ACPI_DEFAULT_RESNAME    *(UINT32 *) "__RD"
 
 typedef struct acpi_external_list
 {
@@ -133,39 +134,65 @@ typedef struct acpi_external_list
 } ACPI_EXTERNAL_LIST;
 
 extern ACPI_EXTERNAL_LIST       *AcpiGbl_ExternalList;
-extern const char               *AcpiGbl_IoDecode[2];
-extern const char               *AcpiGbl_WordDecode[4];
-extern const char               *AcpiGbl_ConsumeDecode[2];
-extern const char               *AcpiGbl_MinDecode[2];
-extern const char               *AcpiGbl_MaxDecode[2];
-extern const char               *AcpiGbl_DECDecode[2];
-extern const char               *AcpiGbl_RNGDecode[4];
-extern const char               *AcpiGbl_MEMDecode[4];
-extern const char               *AcpiGbl_RWDecode[2];
-extern const char               *AcpiGbl_IrqDecode[2];
-extern const char               *AcpiGbl_HEDecode[2];
-extern const char               *AcpiGbl_LLDecode[2];
-extern const char               *AcpiGbl_SHRDecode[2];
-extern const char               *AcpiGbl_TYPDecode[4];
-extern const char               *AcpiGbl_BMDecode[2];
-extern const char               *AcpiGbl_SIZDecode[4];
-extern const char               *AcpiGbl_TTPDecode[2];
-extern const char               *AcpiGbl_MTPDecode[4];
-extern const char               *AcpiGbl_TRSDecode[2];
 
+typedef const struct acpi_dmtable_info
+{
+    UINT8                       Opcode;
+    UINT8                       Offset;
+    char                        *Name;
 
+} ACPI_DMTABLE_INFO;
 
+/*
+ * Values for Opcode above.
+ * Note: 0-7 must not change, used as a flag shift value
+ */
+#define ACPI_DMT_FLAG0                  0
+#define ACPI_DMT_FLAG1                  1
+#define ACPI_DMT_FLAG2                  2
+#define ACPI_DMT_FLAG3                  3
+#define ACPI_DMT_FLAG4                  4
+#define ACPI_DMT_FLAG5                  5
+#define ACPI_DMT_FLAG6                  6
+#define ACPI_DMT_FLAG7                  7
+#define ACPI_DMT_FLAGS0                 8
+#define ACPI_DMT_FLAGS2                 9
+#define ACPI_DMT_UINT8                  10
+#define ACPI_DMT_UINT16                 11
+#define ACPI_DMT_UINT24                 12
+#define ACPI_DMT_UINT32                 13
+#define ACPI_DMT_UINT56                 14
+#define ACPI_DMT_UINT64                 15
+#define ACPI_DMT_STRING                 16
+#define ACPI_DMT_NAME4                  17
+#define ACPI_DMT_NAME6                  18
+#define ACPI_DMT_NAME8                  19
+#define ACPI_DMT_CHKSUM                 20
+#define ACPI_DMT_SPACEID                21
+#define ACPI_DMT_GAS                    22
+#define ACPI_DMT_MADT                   23
+#define ACPI_DMT_SRAT                   24
+#define ACPI_DMT_EXIT                   25
 
-extern const char               *AcpiGbl_LockRule[ACPI_NUM_LOCK_RULES];
-extern const char               *AcpiGbl_AccessTypes[ACPI_NUM_ACCESS_TYPES];
-extern const char               *AcpiGbl_UpdateRules[ACPI_NUM_UPDATE_RULES];
-extern const char               *AcpiGbl_MatchOps[ACPI_NUM_MATCH_OPS];
+typedef
+void (*ACPI_TABLE_HANDLER) (
+    ACPI_TABLE_HEADER       *Table);
+
+typedef struct acpi_dmtable_data
+{
+    char                    *Signature;
+    ACPI_DMTABLE_INFO        *TableInfo;
+    ACPI_TABLE_HANDLER      TableHandler;
+
+} ACPI_DMTABLE_DATA;
 
 
 typedef struct acpi_op_walk_info
 {
     UINT32                  Level;
     UINT32                  BitOffset;
+    UINT32                  Flags;
+    ACPI_WALK_STATE         *WalkState;
 
 } ACPI_OP_WALK_INFO;
 
@@ -175,10 +202,146 @@ ACPI_STATUS (*ASL_WALK_CALLBACK) (
     UINT32                      Level,
     void                        *Context);
 
+typedef struct acpi_resource_tag
+{
+    UINT32                  BitIndex;
+    char                    *Tag;
+
+} ACPI_RESOURCE_TAG;
+
+/* Strings used for decoding flags to ASL keywords */
+
+extern const char               *AcpiGbl_WordDecode[];
+extern const char               *AcpiGbl_IrqDecode[];
+extern const char               *AcpiGbl_LockRule[];
+extern const char               *AcpiGbl_AccessTypes[];
+extern const char               *AcpiGbl_UpdateRules[];
+extern const char               *AcpiGbl_MatchOps[];
+
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf2[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf3[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsf4[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoAsfHdr[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoBoot[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoCpep[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoCpep0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoDbgp[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoEcdt[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoFacs[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoFadt1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoFadt2[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoGas[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoHeader[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoHpet[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt2[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt3[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt4[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt5[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt6[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt7[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadt8[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMadtHdr[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMcfg[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoMcfg0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoRsdp1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoRsdp2[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSbst[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSlit[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSpcr[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSpmi[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSrat[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSrat0[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoSrat1[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoTcpa[];
+extern ACPI_DMTABLE_INFO        AcpiDmTableInfoWdrt[];
+
+
+/*
+ * dmtable
+ */
+void
+AcpiDmDumpDataTable (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpTable (
+    UINT32                  TableLength,
+    UINT32                  TableOffset,
+    void                    *Table,
+    UINT32                  SubTableLength,
+    ACPI_DMTABLE_INFO        *Info);
+
+void
+AcpiDmLineHeader (
+    UINT32                  Offset,
+    UINT32                  ByteLength,
+    char                    *Name);
+
+void
+AcpiDmLineHeader2 (
+    UINT32                  Offset,
+    UINT32                  ByteLength,
+    char                    *Name,
+    UINT32                  Value);
+
+
+/*
+ * dmtbdump
+ */
+void
+AcpiDmDumpAsf (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpCpep (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpFadt (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpSrat (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpMcfg (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpMadt (
+    ACPI_TABLE_HEADER       *Table);
+
+UINT32
+AcpiDmDumpRsdp (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpRsdt (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpSlit (
+    ACPI_TABLE_HEADER       *Table);
+
+void
+AcpiDmDumpXsdt (
+    ACPI_TABLE_HEADER       *Table);
+
 
 /*
  * dmwalk
  */
+void
+AcpiDmDisassemble (
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Origin,
+    UINT32                  NumOpcodes);
 
 void
 AcpiDmWalkParseTree (
@@ -187,50 +350,10 @@ AcpiDmWalkParseTree (
     ASL_WALK_CALLBACK       AscendingCallback,
     void                    *Context);
 
-ACPI_STATUS
-AcpiDmDescendingOp (
-    ACPI_PARSE_OBJECT       *Op,
-    UINT32                  Level,
-    void                    *Context);
-
-ACPI_STATUS
-AcpiDmAscendingOp (
-    ACPI_PARSE_OBJECT       *Op,
-    UINT32                  Level,
-    void                    *Context);
-
 
 /*
  * dmopcode
  */
-
-void
-AcpiDmValidateName (
-    char                    *Name,
-    ACPI_PARSE_OBJECT       *Op);
-
-UINT32
-AcpiDmDumpName (
-    char                    *Name);
-
-void
-AcpiDmUnicode (
-    ACPI_PARSE_OBJECT       *Op);
-
-void
-AcpiDmDisassemble (
-    ACPI_WALK_STATE         *WalkState,
-    ACPI_PARSE_OBJECT       *Origin,
-    UINT32                  NumOpcodes);
-
-void
-AcpiDmNamestring (
-    char                    *Name);
-
-void
-AcpiDmDisplayPath (
-    ACPI_PARSE_OBJECT       *Op);
-
 void
 AcpiDmDisassembleOneOp (
     ACPI_WALK_STATE         *WalkState,
@@ -242,16 +365,7 @@ AcpiDmDecodeInternalObject (
     ACPI_OPERAND_OBJECT     *ObjDesc);
 
 UINT32
-AcpiDmBlockType (
-    ACPI_PARSE_OBJECT       *Op);
-
-UINT32
 AcpiDmListType (
-    ACPI_PARSE_OBJECT       *Op);
-
-ACPI_STATUS
-AcpiPsDisplayObjectPathname (
-    ACPI_WALK_STATE         *WalkState,
     ACPI_PARSE_OBJECT       *Op);
 
 void
@@ -274,10 +388,6 @@ void
 AcpiDmMatchOp (
     ACPI_PARSE_OBJECT       *Op);
 
-void
-AcpiDmMatchKeyword (
-    ACPI_PARSE_OBJECT       *Op);
-
 BOOLEAN
 AcpiDmCommaIfListMember (
     ACPI_PARSE_OBJECT       *Op);
@@ -288,13 +398,25 @@ AcpiDmCommaIfFieldMember (
 
 
 /*
- * dmobject
+ * dmnames
  */
+UINT32
+AcpiDmDumpName (
+    char                    *Name);
+
+ACPI_STATUS
+AcpiPsDisplayObjectPathname (
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Op);
 
 void
-AcpiDmDecodeNode (
-    ACPI_NAMESPACE_NODE     *Node);
+AcpiDmNamestring (
+    char                    *Name);
 
+
+/*
+ * dmobject
+ */
 void
 AcpiDmDisplayInternalObject (
     ACPI_OPERAND_OBJECT     *ObjDesc,
@@ -318,9 +440,19 @@ AcpiDmDumpMethodInfo (
 /*
  * dmbuffer
  */
+void
+AcpiDmDisasmByteList (
+    UINT32                  Level,
+    UINT8                   *ByteData,
+    UINT32                  ByteCount);
 
 void
-AcpiIsEisaId (
+AcpiDmByteList (
+    ACPI_OP_WALK_INFO       *Info,
+    ACPI_PARSE_OBJECT       *Op);
+
+void
+AcpiDmIsEisaId (
     ACPI_PARSE_OBJECT       *Op);
 
 void
@@ -339,26 +471,35 @@ AcpiDmIsStringBuffer (
 /*
  * dmresrc
  */
+void
+AcpiDmDumpInteger8 (
+    UINT8                   Value,
+    char                    *Name);
 
 void
-AcpiDmDisasmByteList (
-    UINT32                  Level,
-    UINT8                   *ByteData,
-    UINT32                  ByteCount);
+AcpiDmDumpInteger16 (
+    UINT16                  Value,
+    char                    *Name);
 
 void
-AcpiDmByteList (
+AcpiDmDumpInteger32 (
+    UINT32                  Value,
+    char                    *Name);
+
+void
+AcpiDmDumpInteger64 (
+    UINT64                  Value,
+    char                    *Name);
+
+void
+AcpiDmResourceTemplate (
     ACPI_OP_WALK_INFO       *Info,
-    ACPI_PARSE_OBJECT       *Op);
-
-void
-AcpiDmResourceDescriptor (
-    ACPI_OP_WALK_INFO       *Info,
+    ACPI_PARSE_OBJECT       *Op,
     UINT8                   *ByteData,
     UINT32                  ByteCount);
 
 BOOLEAN
-AcpiDmIsResourceDescriptor (
+AcpiDmIsResourceTemplate (
     ACPI_PARSE_OBJECT       *Op);
 
 void
@@ -373,76 +514,78 @@ void
 AcpiDmDecodeAttribute (
     UINT8                   Attribute);
 
+void
+AcpiDmDescriptorName (
+    void);
+
+
 /*
  * dmresrcl
  */
-
-void
-AcpiDmIoFlags (
-        UINT8               Flags);
-
-void
-AcpiDmMemoryFlags (
-    UINT8                   Flags,
-    UINT8                   SpecificFlags);
-
 void
 AcpiDmWordDescriptor (
-    ASL_WORD_ADDRESS_DESC   *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmDwordDescriptor (
-    ASL_DWORD_ADDRESS_DESC  *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmExtendedDescriptor (
-    ASL_EXTENDED_ADDRESS_DESC  *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmQwordDescriptor (
-    ASL_QWORD_ADDRESS_DESC  *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmMemory24Descriptor (
-    ASL_MEMORY_24_DESC      *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmMemory32Descriptor (
-    ASL_MEMORY_32_DESC      *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
-AcpiDmFixedMem32Descriptor (
-    ASL_FIXED_MEMORY_32_DESC *Resource,
+AcpiDmFixedMemory32Descriptor (
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmGenericRegisterDescriptor (
-    ASL_GENERAL_REGISTER_DESC *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmInterruptDescriptor (
-    ASL_EXTENDED_XRUPT_DESC *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmVendorLargeDescriptor (
-    ASL_LARGE_VENDOR_DESC   *Resource,
+    AML_RESOURCE            *Resource,
+    UINT32                  Length,
+    UINT32                  Level);
+
+void
+AcpiDmVendorCommon (
+    char                    *Name,
+    UINT8                   *ByteData,
     UINT32                  Length,
     UINT32                  Level);
 
@@ -450,46 +593,45 @@ AcpiDmVendorLargeDescriptor (
 /*
  * dmresrcs
  */
-
 void
 AcpiDmIrqDescriptor (
-    ASL_IRQ_FORMAT_DESC     *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmDmaDescriptor (
-    ASL_DMA_FORMAT_DESC     *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmIoDescriptor (
-    ASL_IO_PORT_DESC        *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmFixedIoDescriptor (
-    ASL_FIXED_IO_PORT_DESC  *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmStartDependentDescriptor (
-    ASL_START_DEPENDENT_DESC *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmEndDependentDescriptor (
-    ASL_START_DEPENDENT_DESC *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
 void
 AcpiDmVendorSmallDescriptor (
-    ASL_SMALL_VENDOR_DESC   *Resource,
+    AML_RESOURCE            *Resource,
     UINT32                  Length,
     UINT32                  Level);
 
@@ -497,9 +639,20 @@ AcpiDmVendorSmallDescriptor (
 /*
  * dmutils
  */
-
 void
 AcpiDmAddToExternalList (
     char                    *Path);
+
+/*
+ * dmrestag
+ */
+void
+AcpiDmFindResources (
+    ACPI_PARSE_OBJECT       *Root);
+
+void
+AcpiDmCheckResourceReference (
+    ACPI_PARSE_OBJECT       *Op,
+    ACPI_WALK_STATE         *WalkState);
 
 #endif  /* __ACDISASM_H__ */

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acgcc.h - GCC specific defines, etc.
- *       $Revision: 27 $
+ *       $Revision: 1.31 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,16 +117,23 @@
 #ifndef __ACGCC_H__
 #define __ACGCC_H__
 
-/* This macro is used to tag functions as "printf-like" because
+/* Function name is used for debug output. Non-ANSI, compiler-dependent */
+
+#define ACPI_GET_FUNCTION_NAME          __FUNCTION__
+
+/*
+ * This macro is used to tag functions as "printf-like" because
  * some compilers (like GCC) can catch printf format string problems.
  */
-#define ACPI_PRINTF_LIKE_FUNC __attribute__ ((__format__ (__printf__, 4, 5)))
+#define ACPI_PRINTF_LIKE(c) __attribute__ ((__format__ (__printf__, c, c+1)))
 
-/* Some compilers complain about unused variables. Sometimes we don't want to
- * use all the variables (most specifically for _THIS_MODULE). This allow us
+/*
+ * Some compilers complain about unused variables. Sometimes we don't want to
+ * use all the variables (for example, _AcpiModuleName). This allows us
  * to to tell the compiler warning in a per-variable manner that a variable
  * is unused.
  */
 #define ACPI_UNUSED_VAR __attribute__ ((unused))
+
 
 #endif /* __ACGCC_H__ */

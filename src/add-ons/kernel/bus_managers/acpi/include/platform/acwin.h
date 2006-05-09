@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acwin.h - OS specific defines, etc.
- *       $Revision: 20 $
+ *       $Revision: 1.24 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -127,10 +127,23 @@
 
 #define ACPI_MACHINE_WIDTH      32
 
-#define strupr                  _strupr
 #define isascii                 __isascii
 
 #define ACPI_USE_STANDARD_HEADERS
+
+#ifdef ACPI_DEFINE_ALTERNATE_TYPES
+/*
+ * Types used only in (Linux) translated source, defined here to enable
+ * cross-platform compilation (i.e., generate the Linux code on Windows,
+ * for test purposes only)
+ */
+typedef int                             s32;
+typedef unsigned char                   u8;
+typedef unsigned short                  u16;
+typedef unsigned int                    u32;
+typedef COMPILER_DEPENDENT_UINT64       u64;
+#endif
+
 
 /*
  * Handle platform- and compiler-specific assembly language differences.
@@ -155,6 +168,9 @@
 #define ACPI_FLUSH_CPU_CACHE()  __asm {WBINVD}
 #endif
 
+#ifdef _DEBUG
+#define ACPI_SIMPLE_RETURN_MACROS
+#endif
 
 /*
  * For Acpi applications, we don't want to try to access the global lock

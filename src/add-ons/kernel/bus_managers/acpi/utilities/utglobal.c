@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utglobal - Global variables for the ACPI subsystem
- *              $Revision: 210 $
+ *              $Revision: 1.238 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,13 +124,14 @@
         ACPI_MODULE_NAME    ("utglobal")
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiFormatException
  *
  * PARAMETERS:  Status       - The ACPI_STATUS code to be formatted
  *
- * RETURN:      A string containing the exception  text
+ * RETURN:      A string containing the exception text. A valid pointer is
+ *              always returned.
  *
  * DESCRIPTION: This function translates an ACPI exception into an ASCII string.
  *
@@ -140,13 +141,16 @@ const char *
 AcpiFormatException (
     ACPI_STATUS             Status)
 {
-    const char              *Exception = "UNKNOWN_STATUS_CODE";
     ACPI_STATUS             SubStatus;
+    const char              *Exception = NULL;
 
 
-    ACPI_FUNCTION_NAME ("FormatException");
+    ACPI_FUNCTION_ENTRY ();
 
 
+    /*
+     * Status is composed of two parts, a "type" and an actual code
+     */
     SubStatus = (Status & ~AE_CODE_MASK);
 
     switch (Status & AE_CODE_MASK)
@@ -156,61 +160,60 @@ AcpiFormatException (
         if (SubStatus <= AE_CODE_ENV_MAX)
         {
             Exception = AcpiGbl_ExceptionNames_Env [SubStatus];
-            break;
         }
-        goto Unknown;
+        break;
 
     case AE_CODE_PROGRAMMER:
 
         if (SubStatus <= AE_CODE_PGM_MAX)
         {
             Exception = AcpiGbl_ExceptionNames_Pgm [SubStatus -1];
-            break;
         }
-        goto Unknown;
+        break;
 
     case AE_CODE_ACPI_TABLES:
 
         if (SubStatus <= AE_CODE_TBL_MAX)
         {
             Exception = AcpiGbl_ExceptionNames_Tbl [SubStatus -1];
-            break;
         }
-        goto Unknown;
+        break;
 
     case AE_CODE_AML:
 
         if (SubStatus <= AE_CODE_AML_MAX)
         {
             Exception = AcpiGbl_ExceptionNames_Aml [SubStatus -1];
-            break;
         }
-        goto Unknown;
+        break;
 
     case AE_CODE_CONTROL:
 
         if (SubStatus <= AE_CODE_CTRL_MAX)
         {
             Exception = AcpiGbl_ExceptionNames_Ctrl [SubStatus -1];
-            break;
         }
-        goto Unknown;
+        break;
 
     default:
-        goto Unknown;
+        break;
     }
 
+    if (!Exception)
+    {
+        /* Exception code was not recognized */
 
-    return ((const char *) Exception);
+        ACPI_ERROR ((AE_INFO,
+            "Unknown exception code: 0x%8.8X", Status));
 
-Unknown:
+        Exception = "UNKNOWN_STATUS_CODE";
+    }
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Unknown exception code: 0x%8.8X\n", Status));
-    return ((const char *) Exception);
+    return (ACPI_CAST_PTR (const char, Exception));
 }
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * Static global variable initialization.
  *
@@ -233,7 +236,6 @@ UINT32                      AcpiDbgLevel = ACPI_NORMAL_DEFAULT;
 
 UINT32                      AcpiDbgLayer = ACPI_COMPONENT_DEFAULT;
 UINT32                      AcpiGbl_NestingLevel = 0;
-
 
 /* Debugger globals */
 
@@ -269,36 +271,12 @@ const char                  *AcpiGbl_HighestDstateNames[4] =
     "_S4D"
 };
 
-/*
- * Strings supported by the _OSI predefined (internal) method.
- * When adding strings, be sure to update ACPI_NUM_OSI_STRINGS.
- */
-const char                  *AcpiGbl_ValidOsiStrings[ACPI_NUM_OSI_STRINGS] =
-{
-    /* Operating System Vendor Strings */
 
-    "Linux",
-    "Windows 2000",
-    "Windows 2001",
-    "Windows 2001.1",
-    "Windows 2001 SP0",
-    "Windows 2001 SP1",
-    "Windows 2001 SP2",
-    "Windows 2001 SP3",
-    "Windows 2001 SP4",
-
-    /* Feature Group Strings */
-
-    "Extended Address Space Descriptor"
-};
-
-
-/******************************************************************************
+/*******************************************************************************
  *
  * Namespace globals
  *
  ******************************************************************************/
-
 
 /*
  * Predefined ACPI Names (Built-in to the Interpreter)
@@ -323,9 +301,11 @@ const ACPI_PREDEFINED_NAMES     AcpiGbl_PreDefinedNames[] =
 #if !defined (ACPI_NO_METHOD_EXECUTION) || defined (ACPI_CONSTANT_EVAL_ONLY)
     {"_OSI",    ACPI_TYPE_METHOD,           (char *) 1},
 #endif
-    {NULL,      ACPI_TYPE_ANY,              NULL}              /* Table terminator */
-};
 
+    /* Table terminator */
+
+    {NULL,      ACPI_TYPE_ANY,              NULL}
+};
 
 /*
  * Properties of the ACPI Object Types, both internal and external.
@@ -370,22 +350,25 @@ const UINT8                     AcpiGbl_NsProperties[] =
 /* Hex to ASCII conversion table */
 
 static const char           AcpiGbl_HexToAscii[] =
-                                {'0','1','2','3','4','5','6','7',
-                                 '8','9','A','B','C','D','E','F'};
+{
+    '0','1','2','3','4','5','6','7',
+    '8','9','A','B','C','D','E','F'
+};
 
-/*****************************************************************************
+
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtHexToAsciiChar
  *
  * PARAMETERS:  Integer             - Contains the hex digit
  *              Position            - bit position of the digit within the
- *                                    integer
+ *                                    integer (multiple of 4)
  *
- * RETURN:      Ascii character
+ * RETURN:      The converted Ascii character
  *
- * DESCRIPTION: Convert a hex digit to an ascii character
+ * DESCRIPTION: Convert a hex digit to an Ascii character
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 char
 AcpiUtHexToAsciiChar (
@@ -397,7 +380,7 @@ AcpiUtHexToAsciiChar (
 }
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * Table name globals
  *
@@ -406,13 +389,13 @@ AcpiUtHexToAsciiChar (
  * that are not used by the subsystem are simply ignored.
  *
  * Do NOT add any table to this list that is not consumed directly by this
- * subsystem.
+ * subsystem (No MADT, ECDT, SBST, etc.)
  *
  ******************************************************************************/
 
-ACPI_TABLE_LIST             AcpiGbl_TableLists[NUM_ACPI_TABLE_TYPES];
+ACPI_TABLE_LIST             AcpiGbl_TableLists[ACPI_TABLE_ID_MAX+1];
 
-ACPI_TABLE_SUPPORT          AcpiGbl_TableData[NUM_ACPI_TABLE_TYPES] =
+ACPI_TABLE_SUPPORT          AcpiGbl_TableData[ACPI_TABLE_ID_MAX+1] =
 {
     /***********    Name,   Signature, Global typed pointer     Signature size,      Type                  How many allowed?,    Contains valid AML? */
 
@@ -473,7 +456,7 @@ ACPI_FIXED_EVENT_INFO       AcpiGbl_FixedEventInfo[ACPI_NUM_FIXED_EVENTS] =
     /* ACPI_EVENT_RTC           */  {ACPI_BITREG_RT_CLOCK_STATUS,       ACPI_BITREG_RT_CLOCK_ENABLE,     ACPI_BITMASK_RT_CLOCK_STATUS,       ACPI_BITMASK_RT_CLOCK_ENABLE},
 };
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetRegionName
  *
@@ -483,7 +466,7 @@ ACPI_FIXED_EVENT_INFO       AcpiGbl_FixedEventInfo[ACPI_NUM_FIXED_EVENTS] =
  *
  * DESCRIPTION: Translate a Space ID into a name string (Debug only)
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 /* Region type decoding */
 
@@ -511,17 +494,16 @@ AcpiUtGetRegionName (
     {
         return ("UserDefinedRegion");
     }
-
     else if (SpaceId >= ACPI_NUM_PREDEFINED_REGIONS)
     {
         return ("InvalidSpaceId");
     }
 
-    return ((char *) AcpiGbl_RegionTypes[SpaceId]);
+    return (ACPI_CAST_PTR (char, AcpiGbl_RegionTypes[SpaceId]));
 }
 
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetEventName
  *
@@ -531,17 +513,19 @@ AcpiUtGetRegionName (
  *
  * DESCRIPTION: Translate a Event ID into a name string (Debug only)
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 /* Event type decoding */
 
 static const char        *AcpiGbl_EventTypes[ACPI_NUM_FIXED_EVENTS] =
 {
+/*! [Begin] no source code translation (keep these strings as-is) */
     "PM_Timer",
     "GlobalLock",
     "PowerButton",
     "SleepButton",
     "RealTimeClock",
+/*! [End] no source code translation !*/
 };
 
 
@@ -555,11 +539,11 @@ AcpiUtGetEventName (
         return ("InvalidEventID");
     }
 
-    return ((char *) AcpiGbl_EventTypes[EventId]);
+    return (ACPI_CAST_PTR (char, AcpiGbl_EventTypes[EventId]));
 }
 
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetTypeName
  *
@@ -569,21 +553,23 @@ AcpiUtGetEventName (
  *
  * DESCRIPTION: Translate a Type ID into a name string (Debug only)
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 /*
  * Elements of AcpiGbl_NsTypeNames below must match
  * one-to-one with values of ACPI_OBJECT_TYPE
  *
- * The type ACPI_TYPE_ANY (Untyped) is used as a "don't care" when searching; when
- * stored in a table it really means that we have thus far seen no evidence to
- * indicate what type is actually going to be stored for this entry.
+ * The type ACPI_TYPE_ANY (Untyped) is used as a "don't care" when searching;
+ * when stored in a table it really means that we have thus far seen no
+ * evidence to indicate what type is actually going to be stored for this entry.
  */
 static const char           AcpiGbl_BadType[] = "UNDEFINED";
-#define TYPE_NAME_LENGTH    12                           /* Maximum length of each string */
 
-static const char           *AcpiGbl_NsTypeNames[] =    /* printable names of ACPI types */
+/* Printable names of the ACPI object types */
+
+static const char           *AcpiGbl_NsTypeNames[] =
 {
+/*! [Begin] no source code translation (keep these strings as-is) */
     /* 00 */ "Untyped",
     /* 01 */ "Integer",
     /* 02 */ "String",
@@ -615,6 +601,7 @@ static const char           *AcpiGbl_NsTypeNames[] =    /* printable names of AC
     /* 28 */ "Extra",
     /* 29 */ "Data",
     /* 30 */ "Invalid"
+/*! [End] no source code translation !*/
 };
 
 
@@ -625,10 +612,10 @@ AcpiUtGetTypeName (
 
     if (Type > ACPI_TYPE_INVALID)
     {
-        return ((char *) AcpiGbl_BadType);
+        return (ACPI_CAST_PTR (char, AcpiGbl_BadType));
     }
 
-    return ((char *) AcpiGbl_NsTypeNames[Type]);
+    return (ACPI_CAST_PTR (char, AcpiGbl_NsTypeNames[Type]));
 }
 
 
@@ -646,7 +633,7 @@ AcpiUtGetObjectTypeName (
 }
 
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetNodeName
  *
@@ -656,7 +643,7 @@ AcpiUtGetObjectTypeName (
  *
  * DESCRIPTION: Validate the node and return the node's ACPI name.
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 char *
 AcpiUtGetNodeName (
@@ -682,16 +669,16 @@ AcpiUtGetNodeName (
 
     /* Descriptor must be a namespace node */
 
-    if (Node->Descriptor != ACPI_DESC_TYPE_NAMED)
+    if (ACPI_GET_DESCRIPTOR_TYPE (Node) != ACPI_DESC_TYPE_NAMED)
     {
         return ("####");
     }
 
     /* Name must be a valid ACPI name */
 
-    if (!AcpiUtValidAcpiName (* (UINT32 *) Node->Name.Ascii))
+    if (!AcpiUtValidAcpiName (Node->Name.Integer))
     {
-        return ("????");
+        Node->Name.Integer = AcpiUtRepairName (Node->Name.Integer);
     }
 
     /* Return the name */
@@ -700,7 +687,7 @@ AcpiUtGetNodeName (
 }
 
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetDescriptorName
  *
@@ -710,10 +697,13 @@ AcpiUtGetNodeName (
  *
  * DESCRIPTION: Validate object and return the descriptor type
  *
- ****************************************************************************/
+ ******************************************************************************/
 
-static const char           *AcpiGbl_DescTypeNames[] =    /* printable names of descriptor types */
+/* Printable names of object descriptor types */
+
+static const char           *AcpiGbl_DescTypeNames[] =
 {
+/*! [Begin] no source code translation (keep these ASL Keywords as-is) */
     /* 00 */ "Invalid",
     /* 01 */ "Cached",
     /* 02 */ "State-Generic",
@@ -730,6 +720,7 @@ static const char           *AcpiGbl_DescTypeNames[] =    /* printable names of 
     /* 13 */ "Parser",
     /* 14 */ "Operand",
     /* 15 */ "Node"
+/*! [End] no source code translation !*/
 };
 
 
@@ -745,10 +736,11 @@ AcpiUtGetDescriptorName (
 
     if (ACPI_GET_DESCRIPTOR_TYPE (Object) > ACPI_DESC_TYPE_MAX)
     {
-        return ((char *) AcpiGbl_BadType);
+        return (ACPI_CAST_PTR (char, AcpiGbl_BadType));
     }
 
-    return ((char *) AcpiGbl_DescTypeNames[ACPI_GET_DESCRIPTOR_TYPE (Object)]);
+    return (ACPI_CAST_PTR (char,
+        AcpiGbl_DescTypeNames[ACPI_GET_DESCRIPTOR_TYPE (Object)]));
 
 }
 
@@ -758,17 +750,18 @@ AcpiUtGetDescriptorName (
  * Strings and procedures used for debug only
  */
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtGetMutexName
  *
- * PARAMETERS:  None.
+ * PARAMETERS:  MutexId         - The predefined ID for this mutex.
  *
- * RETURN:      Status
+ * RETURN:      String containing the name of the mutex. Always returns a valid
+ *              pointer.
  *
  * DESCRIPTION: Translate a mutex ID into a name string (Debug only)
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 char *
 AcpiUtGetMutexName (
@@ -782,21 +775,20 @@ AcpiUtGetMutexName (
 
     return (AcpiGbl_MutexNames[MutexId]);
 }
-
 #endif
 
 
-/*****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtValidObjectType
  *
  * PARAMETERS:  Type            - Object type to be validated
  *
- * RETURN:      TRUE if valid object type
+ * RETURN:      TRUE if valid object type, FALSE otherwise
  *
  * DESCRIPTION: Validate an object type
  *
- ****************************************************************************/
+ ******************************************************************************/
 
 BOOLEAN
 AcpiUtValidObjectType (
@@ -814,125 +806,41 @@ AcpiUtValidObjectType (
 }
 
 
-/****************************************************************************
- *
- * FUNCTION:    AcpiUtAllocateOwnerId
- *
- * PARAMETERS:  IdType          - Type of ID (method or table)
- *
- * DESCRIPTION: Allocate a table or method owner id
- *
- ***************************************************************************/
-
-ACPI_OWNER_ID
-AcpiUtAllocateOwnerId (
-    UINT32                  IdType)
-{
-    ACPI_OWNER_ID           OwnerId = 0xFFFF;
-
-
-    ACPI_FUNCTION_TRACE ("UtAllocateOwnerId");
-
-
-    if (ACPI_FAILURE (AcpiUtAcquireMutex (ACPI_MTX_CACHES)))
-    {
-        return (0);
-    }
-
-    switch (IdType)
-    {
-    case ACPI_OWNER_TYPE_TABLE:
-
-        OwnerId = AcpiGbl_NextTableOwnerId;
-        AcpiGbl_NextTableOwnerId++;
-
-        /* Check for wraparound */
-
-        if (AcpiGbl_NextTableOwnerId == ACPI_FIRST_METHOD_ID)
-        {
-            AcpiGbl_NextTableOwnerId = ACPI_FIRST_TABLE_ID;
-            ACPI_REPORT_WARNING (("Table owner ID wraparound\n"));
-        }
-        break;
-
-
-    case ACPI_OWNER_TYPE_METHOD:
-
-        OwnerId = AcpiGbl_NextMethodOwnerId;
-        AcpiGbl_NextMethodOwnerId++;
-
-        if (AcpiGbl_NextMethodOwnerId == ACPI_FIRST_TABLE_ID)
-        {
-            /* Check for wraparound */
-
-            AcpiGbl_NextMethodOwnerId = ACPI_FIRST_METHOD_ID;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    (void) AcpiUtReleaseMutex (ACPI_MTX_CACHES);
-    return_VALUE (OwnerId);
-}
-
-
-/****************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiUtInitGlobals
  *
- * PARAMETERS:  none
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
  *
  * DESCRIPTION: Init library globals.  All globals that require specific
  *              initialization should be initialized here!
  *
- ***************************************************************************/
+ ******************************************************************************/
 
 void
 AcpiUtInitGlobals (
     void)
 {
+    ACPI_STATUS             Status;
     UINT32                  i;
 
 
-    ACPI_FUNCTION_TRACE ("UtInitGlobals");
+    ACPI_FUNCTION_TRACE (UtInitGlobals);
 
 
-    /* Memory allocation and cache lists */
+    /* Create all memory caches */
 
-    ACPI_MEMSET (AcpiGbl_MemoryLists, 0, sizeof (ACPI_MEMORY_LIST) * ACPI_NUM_MEM_LISTS);
-
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_STATE].LinkOffset         = (UINT16) ACPI_PTR_DIFF (&(((ACPI_GENERIC_STATE *) NULL)->Common.Next), NULL);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE].LinkOffset        = (UINT16) ACPI_PTR_DIFF (&(((ACPI_PARSE_OBJECT *) NULL)->Common.Next), NULL);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE_EXT].LinkOffset    = (UINT16) ACPI_PTR_DIFF (&(((ACPI_PARSE_OBJECT *) NULL)->Common.Next), NULL);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_OPERAND].LinkOffset       = (UINT16) ACPI_PTR_DIFF (&(((ACPI_OPERAND_OBJECT *) NULL)->Cache.Next), NULL);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_WALK].LinkOffset          = (UINT16) ACPI_PTR_DIFF (&(((ACPI_WALK_STATE *) NULL)->Next), NULL);
-
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_NSNODE].ObjectSize        = sizeof (ACPI_NAMESPACE_NODE);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_STATE].ObjectSize         = sizeof (ACPI_GENERIC_STATE);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE].ObjectSize        = sizeof (ACPI_PARSE_OBJ_COMMON);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE_EXT].ObjectSize    = sizeof (ACPI_PARSE_OBJ_NAMED);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_OPERAND].ObjectSize       = sizeof (ACPI_OPERAND_OBJECT);
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_WALK].ObjectSize          = sizeof (ACPI_WALK_STATE);
-
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_STATE].MaxCacheDepth      = ACPI_MAX_STATE_CACHE_DEPTH;
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE].MaxCacheDepth     = ACPI_MAX_PARSE_CACHE_DEPTH;
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE_EXT].MaxCacheDepth = ACPI_MAX_EXTPARSE_CACHE_DEPTH;
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_OPERAND].MaxCacheDepth    = ACPI_MAX_OBJECT_CACHE_DEPTH;
-    AcpiGbl_MemoryLists[ACPI_MEM_LIST_WALK].MaxCacheDepth       = ACPI_MAX_WALK_CACHE_DEPTH;
-
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_GLOBAL].ListName       = "Global Memory Allocation");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_NSNODE].ListName       = "Namespace Nodes");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_STATE].ListName        = "State Object Cache");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE].ListName       = "Parse Node Cache");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_PSNODE_EXT].ListName   = "Extended Parse Node Cache");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_OPERAND].ListName      = "Operand Object Cache");
-    ACPI_MEM_TRACKING (AcpiGbl_MemoryLists[ACPI_MEM_LIST_WALK].ListName         = "Tree Walk Node Cache");
+    Status = AcpiUtCreateCaches ();
+    if (ACPI_FAILURE (Status))
+    {
+        return;
+    }
 
     /* ACPI table structure */
 
-    for (i = 0; i < NUM_ACPI_TABLE_TYPES; i++)
+    for (i = 0; i < (ACPI_TABLE_ID_MAX+1); i++)
     {
         AcpiGbl_TableLists[i].Next          = NULL;
         AcpiGbl_TableLists[i].Count         = 0;
@@ -943,9 +851,15 @@ AcpiUtInitGlobals (
     for (i = 0; i < NUM_MUTEX; i++)
     {
         AcpiGbl_MutexInfo[i].Mutex          = NULL;
-        AcpiGbl_MutexInfo[i].OwnerId        = ACPI_MUTEX_NOT_ACQUIRED;
+        AcpiGbl_MutexInfo[i].ThreadId       = ACPI_MUTEX_NOT_ACQUIRED;
         AcpiGbl_MutexInfo[i].UseCount       = 0;
     }
+
+    for (i = 0; i < ACPI_NUM_OWNERID_MASKS; i++)
+    {
+        AcpiGbl_OwnerIdMask[i]              = 0;
+    }
+    AcpiGbl_OwnerIdMask[ACPI_NUM_OWNERID_MASKS - 1] = 0x80000000; /* Last ID is never valid */
 
     /* GPE support */
 
@@ -984,8 +898,11 @@ AcpiUtInitGlobals (
     AcpiGbl_NsLookupCount               = 0;
     AcpiGbl_PsFindCount                 = 0;
     AcpiGbl_AcpiHardwarePresent         = TRUE;
-    AcpiGbl_NextTableOwnerId            = ACPI_FIRST_TABLE_ID;
-    AcpiGbl_NextMethodOwnerId           = ACPI_FIRST_METHOD_ID;
+    AcpiGbl_LastOwnerIdIndex            = 0;
+    AcpiGbl_NextOwnerIdOffset           = 0;
+    AcpiGbl_TraceMethodName             = 0;
+    AcpiGbl_TraceDbgLevel               = 0;
+    AcpiGbl_TraceDbgLayer               = 0;
     AcpiGbl_DebuggerConfiguration       = DEBUGGER_THREADING;
     AcpiGbl_DbOutputFlags               = ACPI_DB_CONSOLE_OUTPUT;
 
@@ -997,9 +914,8 @@ AcpiUtInitGlobals (
     /* Namespace */
 
     AcpiGbl_RootNode                    = NULL;
-
     AcpiGbl_RootNodeStruct.Name.Integer = ACPI_ROOT_NAME;
-    AcpiGbl_RootNodeStruct.Descriptor   = ACPI_DESC_TYPE_NAMED;
+    AcpiGbl_RootNodeStruct.DescriptorType = ACPI_DESC_TYPE_NAMED;
     AcpiGbl_RootNodeStruct.Type         = ACPI_TYPE_DEVICE;
     AcpiGbl_RootNodeStruct.Child        = NULL;
     AcpiGbl_RootNodeStruct.Peer         = NULL;
@@ -1013,5 +929,10 @@ AcpiUtInitGlobals (
 
     return_VOID;
 }
+
+/* Public globals */
+
+ACPI_EXPORT_SYMBOL (AcpiDbgLevel)
+ACPI_EXPORT_SYMBOL (AcpiDbgLayer)
 
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nswalk - Functions for walking the ACPI namespace
- *              $Revision: 38 $
+ *              $Revision: 1.41 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -131,7 +131,7 @@
  *
  * PARAMETERS:  Type                - Type of node to be searched for
  *              ParentNode          - Parent node whose children we are
- *                                     getting
+ *                                    getting
  *              ChildNode           - Previous child that was found.
  *                                    The NEXT child will be returned
  *
@@ -252,7 +252,7 @@ AcpiNsWalkNamespace (
     UINT32                  Level;
 
 
-    ACPI_FUNCTION_TRACE ("NsWalkNamespace");
+    ACPI_FUNCTION_TRACE (NsWalkNamespace);
 
 
     /* Special case for the namespace Root Node */

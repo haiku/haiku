@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbgetall - Get all required ACPI tables
- *              $Revision: 10 $
+ *              $Revision: 1.21 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -123,6 +123,19 @@
 #define _COMPONENT          ACPI_TABLES
         ACPI_MODULE_NAME    ("tbgetall")
 
+/* Local prototypes */
+
+static ACPI_STATUS
+AcpiTbGetPrimaryTable (
+    ACPI_POINTER            *Address,
+    ACPI_TABLE_DESC         *TableInfo);
+
+static ACPI_STATUS
+AcpiTbGetSecondaryTable (
+    ACPI_POINTER            *Address,
+    ACPI_STRING             Signature,
+    ACPI_TABLE_DESC         *TableInfo);
+
 
 /*******************************************************************************
  *
@@ -137,7 +150,7 @@
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiTbGetPrimaryTable (
     ACPI_POINTER            *Address,
     ACPI_TABLE_DESC         *TableInfo)
@@ -146,7 +159,7 @@ AcpiTbGetPrimaryTable (
     ACPI_TABLE_HEADER       Header;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetPrimaryTable");
+    ACPI_FUNCTION_TRACE (TbGetPrimaryTable);
 
 
     /* Ignore a NULL address in the RSDT */
@@ -156,9 +169,8 @@ AcpiTbGetPrimaryTable (
         return_ACPI_STATUS (AE_OK);
     }
 
-    /*
-     * Get the header in order to get signature and table size
-     */
+    /* Get the header in order to get signature and table size */
+
     Status = AcpiTbGetTableHeader (Address, &Header);
     if (ACPI_FAILURE (Status))
     {
@@ -208,7 +220,7 @@ AcpiTbGetPrimaryTable (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiTbGetSecondaryTable (
     ACPI_POINTER            *Address,
     ACPI_STRING             Signature,
@@ -218,7 +230,7 @@ AcpiTbGetSecondaryTable (
     ACPI_TABLE_HEADER       Header;
 
 
-    ACPI_FUNCTION_TRACE_STR ("TbGetSecondaryTable", Signature);
+    ACPI_FUNCTION_TRACE_STR (TbGetSecondaryTable, Signature);
 
 
     /* Get the header in order to match the signature */
@@ -231,9 +243,10 @@ AcpiTbGetSecondaryTable (
 
     /* Signature must match request */
 
-    if (ACPI_STRNCMP (Header.Signature, Signature, ACPI_NAME_SIZE))
+    if (!ACPI_COMPARE_NAME (Header.Signature, Signature))
     {
-        ACPI_REPORT_ERROR (("Incorrect table signature - wanted [%s] found [%4.4s]\n",
+        ACPI_ERROR ((AE_INFO,
+            "Incorrect table signature - wanted [%s] found [%4.4s]",
             Signature, Header.Signature));
         return_ACPI_STATUS (AE_BAD_SIGNATURE);
     }
@@ -293,7 +306,7 @@ AcpiTbGetRequiredTables (
     ACPI_POINTER            Address;
 
 
-    ACPI_FUNCTION_TRACE ("TbGetRequiredTables");
+    ACPI_FUNCTION_TRACE (TbGetRequiredTables);
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "%d ACPI tables in RSDT\n",
         AcpiGbl_RsdtTableCount));
@@ -313,7 +326,8 @@ AcpiTbGetRequiredTables (
     {
         /* Get the table address from the common internal XSDT */
 
-        Address.Pointer.Value = ACPI_GET_ADDRESS (AcpiGbl_XSDT->TableOffsetEntry[i]);
+        Address.Pointer.Value = ACPI_GET_ADDRESS (
+                                    AcpiGbl_XSDT->TableOffsetEntry[i]);
 
         /*
          * Get the tables needed by this subsystem (FADT and any SSDTs).
@@ -322,7 +336,7 @@ AcpiTbGetRequiredTables (
         Status = AcpiTbGetPrimaryTable (&Address, &TableInfo);
         if ((Status != AE_OK) && (Status != AE_TABLE_NOT_SUPPORTED))
         {
-            ACPI_REPORT_WARNING (("%s, while getting table at %8.8X%8.8X\n",
+            ACPI_WARNING ((AE_INFO, "%s, while getting table at %8.8X%8.8X",
                 AcpiFormatException (Status),
                 ACPI_FORMAT_UINT64 (Address.Pointer.Value)));
         }
@@ -332,31 +346,31 @@ AcpiTbGetRequiredTables (
 
     if (!AcpiGbl_FADT)
     {
-        ACPI_REPORT_ERROR (("No FADT present in RSDT/XSDT\n"));
+        ACPI_ERROR ((AE_INFO, "No FADT present in RSDT/XSDT"));
         return_ACPI_STATUS (AE_NO_ACPI_TABLES);
     }
 
     /*
-     * Convert the FADT to a common format.  This allows earlier revisions of the
-     * table to coexist with newer versions, using common access code.
+     * Convert the FADT to a common format.  This allows earlier revisions of
+     * the table to coexist with newer versions, using common access code.
      */
     Status = AcpiTbConvertTableFadt ();
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not convert FADT to internal common format\n"));
+        ACPI_ERROR ((AE_INFO,
+            "Could not convert FADT to internal common format"));
         return_ACPI_STATUS (Status);
     }
 
-    /*
-     * Get the FACS (Pointed to by the FADT)
-     */
+    /* Get the FACS (Pointed to by the FADT) */
+
     Address.Pointer.Value = ACPI_GET_ADDRESS (AcpiGbl_FADT->XFirmwareCtrl);
 
     Status = AcpiTbGetSecondaryTable (&Address, FACS_SIG, &TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not get/install the FACS, %s\n",
-            AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not get/install the FACS"));
         return_ACPI_STATUS (Status);
     }
 
@@ -370,15 +384,14 @@ AcpiTbGetRequiredTables (
         return_ACPI_STATUS (Status);
     }
 
-    /*
-     * Get/install the DSDT (Pointed to by the FADT)
-     */
+    /* Get/install the DSDT (Pointed to by the FADT) */
+
     Address.Pointer.Value = ACPI_GET_ADDRESS (AcpiGbl_FADT->XDsdt);
 
     Status = AcpiTbGetSecondaryTable (&Address, DSDT_SIG, &TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not get/install the DSDT\n"));
+        ACPI_ERROR ((AE_INFO, "Could not get/install the DSDT"));
         return_ACPI_STATUS (Status);
     }
 
@@ -391,11 +404,13 @@ AcpiTbGetRequiredTables (
     ACPI_DEBUG_PRINT ((ACPI_DB_TABLES,
         "Hex dump of entire DSDT, size %d (0x%X), Integer width = %d\n",
         AcpiGbl_DSDT->Length, AcpiGbl_DSDT->Length, AcpiGbl_IntegerBitWidth));
-    ACPI_DUMP_BUFFER ((UINT8 *) AcpiGbl_DSDT, AcpiGbl_DSDT->Length);
+
+    ACPI_DUMP_BUFFER (ACPI_CAST_PTR (UINT8, AcpiGbl_DSDT),
+        AcpiGbl_DSDT->Length);
 
     /* Always delete the RSDP mapping, we are done with it */
 
-    AcpiTbDeleteTablesByType (ACPI_TABLE_RSDP);
+    AcpiTbDeleteTablesByType (ACPI_TABLE_ID_RSDP);
     return_ACPI_STATUS (Status);
 }
 

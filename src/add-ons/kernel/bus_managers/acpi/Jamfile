@@ -75,6 +75,7 @@ local executer_src =
 
 local parser_src =
 	psargs.c
+	psloop.c
 	psopcode.c
 	psparse.c
 	psscope.c
@@ -108,6 +109,7 @@ local resources_src =
 	rscalc.c
 	rscreate.c
 	rsdump.c
+	rsinfo.c
 	rsio.c
 	rsirq.c
 	rslist.c
@@ -130,6 +132,7 @@ local tables_src =
 
 local utilities_src =
 	utalloc.c
+	utcache.c
 	utclib.c
 	utcopy.c
 	utdebug.c
@@ -139,7 +142,11 @@ local utilities_src =
 	utinit.c
 	utmath.c
 	utmisc.c
+	utmutex.c
 	utobject.c
+	utresrc.c
+	utstate.c
+	uttrack.c
 	utxface.c 
 	;
 

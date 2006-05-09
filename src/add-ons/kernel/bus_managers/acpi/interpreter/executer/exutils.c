@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exutils - interpreter/scanner utilities
- *              $Revision: 113 $
+ *              $Revision: 1.122 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -141,14 +141,22 @@
 #define _COMPONENT          ACPI_EXECUTER
         ACPI_MODULE_NAME    ("exutils")
 
+/* Local prototypes */
+
+static UINT32
+AcpiExDigitsNeeded (
+    ACPI_INTEGER            Value,
+    UINT32                  Base);
+
 
 #ifndef ACPI_NO_METHOD_EXECUTION
-
 /*******************************************************************************
  *
  * FUNCTION:    AcpiExEnterInterpreter
  *
  * PARAMETERS:  None
+ *
+ * RETURN:      Status
  *
  * DESCRIPTION: Enter the interpreter execution region.  Failure to enter
  *              the interpreter region is a fatal system error
@@ -156,17 +164,18 @@
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiExEnterInterpreter (void)
+AcpiExEnterInterpreter (
+    void)
 {
     ACPI_STATUS             Status;
 
-    ACPI_FUNCTION_TRACE ("ExEnterInterpreter");
+    ACPI_FUNCTION_TRACE (ExEnterInterpreter);
 
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_EXECUTE);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not acquire interpreter mutex\n"));
+        ACPI_ERROR ((AE_INFO, "Could not acquire interpreter mutex"));
     }
 
     return_ACPI_STATUS (Status);
@@ -178,6 +187,8 @@ AcpiExEnterInterpreter (void)
  * FUNCTION:    AcpiExExitInterpreter
  *
  * PARAMETERS:  None
+ *
+ * RETURN:      None
  *
  * DESCRIPTION: Exit the interpreter execution region
  *
@@ -194,18 +205,19 @@ AcpiExEnterInterpreter (void)
  ******************************************************************************/
 
 void
-AcpiExExitInterpreter (void)
+AcpiExExitInterpreter (
+    void)
 {
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("ExExitInterpreter");
+    ACPI_FUNCTION_TRACE (ExExitInterpreter);
 
 
     Status = AcpiUtReleaseMutex (ACPI_MTX_EXECUTE);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not release interpreter mutex\n"));
+        ACPI_ERROR ((AE_INFO, "Could not release interpreter mutex"));
     }
 
     return_VOID;
@@ -277,7 +289,7 @@ AcpiExAcquireGlobalLock (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("ExAcquireGlobalLock");
+    ACPI_FUNCTION_TRACE (ExAcquireGlobalLock);
 
 
     /* Only attempt lock if the AlwaysLock bit is set */
@@ -293,12 +305,12 @@ AcpiExAcquireGlobalLock (
         }
         else
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Could not acquire Global Lock, %s\n",
-                AcpiFormatException (Status)));
+            ACPI_EXCEPTION ((AE_INFO, Status,
+                "Could not acquire Global Lock"));
         }
     }
 
-    return_VALUE (Locked);
+    return_UINT8 (Locked);
 }
 
 
@@ -309,7 +321,7 @@ AcpiExAcquireGlobalLock (
  * PARAMETERS:  LockedByMe      - Return value from corresponding call to
  *                                AcquireGlobalLock.
  *
- * RETURN:      Status
+ * RETURN:      None
  *
  * DESCRIPTION: Release the global lock if it is locked.
  *
@@ -322,7 +334,7 @@ AcpiExReleaseGlobalLock (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("ExReleaseGlobalLock");
+    ACPI_FUNCTION_TRACE (ExReleaseGlobalLock);
 
 
     /* Only attempt unlock if the caller locked it */
@@ -336,8 +348,8 @@ AcpiExReleaseGlobalLock (
         {
             /* Report the error, but there isn't much else we can do */
 
-            ACPI_REPORT_ERROR (("Could not release ACPI Global Lock, %s\n",
-                AcpiFormatException (Status)));
+            ACPI_EXCEPTION ((AE_INFO, Status,
+                "Could not release ACPI Global Lock"));
         }
     }
 
@@ -352,11 +364,14 @@ AcpiExReleaseGlobalLock (
  * PARAMETERS:  Value           - Value to be represented
  *              Base            - Base of representation
  *
- * RETURN:      the number of digits needed to represent Value in Base
+ * RETURN:      The number of digits.
+ *
+ * DESCRIPTION: Calculate the number of digits needed to represent the Value
+ *              in the given Base (Radix)
  *
  ******************************************************************************/
 
-UINT32
+static UINT32
 AcpiExDigitsNeeded (
     ACPI_INTEGER            Value,
     UINT32                  Base)
@@ -365,14 +380,14 @@ AcpiExDigitsNeeded (
     ACPI_INTEGER            CurrentValue;
 
 
-    ACPI_FUNCTION_TRACE ("ExDigitsNeeded");
+    ACPI_FUNCTION_TRACE (ExDigitsNeeded);
 
 
     /* ACPI_INTEGER is unsigned, so we don't worry about a '-' prefix */
 
     if (Value == 0)
     {
-        return_VALUE (1);
+        return_UINT32 (1);
     }
 
     CurrentValue = Value;
@@ -386,7 +401,7 @@ AcpiExDigitsNeeded (
         NumDigits++;
     }
 
-    return_VALUE (NumDigits);
+    return_UINT32 (NumDigits);
 }
 
 
@@ -396,6 +411,8 @@ AcpiExDigitsNeeded (
  *
  * PARAMETERS:  NumericId       - EISA ID to be converted
  *              OutString       - Where to put the converted string (8 bytes)
+ *
+ * RETURN:      None
  *
  * DESCRIPTION: Convert a numeric EISA ID to string representation
  *
@@ -434,7 +451,10 @@ AcpiExEisaIdToString (
  * PARAMETERS:  Value           - Value to be converted
  *              OutString       - Where to put the converted string (8 bytes)
  *
- * RETURN:      Convert a number to string representation
+ * RETURN:      None, string
+ *
+ * DESCRIPTION: Convert a number to string representation. Assumes string
+ *              buffer is large enough to hold the string.
  *
  ******************************************************************************/
 

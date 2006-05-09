@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exoparg6 - AML execution - opcodes with 6 arguments
- *              $Revision: 18 $
+ *              $Revision: 1.27 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -150,6 +150,14 @@
  * fully resolved operands.
 !*/
 
+/* Local prototypes */
+
+static BOOLEAN
+AcpiExDoMatch (
+    UINT32                  MatchOp,
+    ACPI_OPERAND_OBJECT     *PackageObj,
+    ACPI_OPERAND_OBJECT     *MatchObj);
+
 
 /*******************************************************************************
  *
@@ -167,7 +175,7 @@
  *
  ******************************************************************************/
 
-BOOLEAN
+static BOOLEAN
 AcpiExDoMatch (
     UINT32                  MatchOp,
     ACPI_OPERAND_OBJECT     *PackageObj,
@@ -297,11 +305,12 @@ AcpiExOpcode_6A_0T_1R (
     ACPI_OPERAND_OBJECT     **Operand = &WalkState->Operands[0];
     ACPI_OPERAND_OBJECT     *ReturnDesc = NULL;
     ACPI_STATUS             Status = AE_OK;
-    UINT32                  Index;
+    ACPI_INTEGER            Index;
     ACPI_OPERAND_OBJECT     *ThisElement;
 
 
-    ACPI_FUNCTION_TRACE_STR ("ExOpcode_6A_0T_1R", AcpiPsGetOpcodeName (WalkState->Opcode));
+    ACPI_FUNCTION_TRACE_STR (ExOpcode_6A_0T_1R,
+        AcpiPsGetOpcodeName (WalkState->Opcode));
 
 
     switch (WalkState->Opcode)
@@ -317,17 +326,19 @@ AcpiExOpcode_6A_0T_1R (
         if ((Operand[1]->Integer.Value > MAX_MATCH_OPERATOR) ||
             (Operand[3]->Integer.Value > MAX_MATCH_OPERATOR))
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Match operator out of range\n"));
+            ACPI_ERROR ((AE_INFO, "Match operator out of range"));
             Status = AE_AML_OPERAND_VALUE;
             goto Cleanup;
         }
 
         /* Get the package StartIndex, validate against the package length */
 
-        Index = (UINT32) Operand[5]->Integer.Value;
-        if (Index >= (UINT32) Operand[0]->Package.Count)
+        Index = Operand[5]->Integer.Value;
+        if (Index >= Operand[0]->Package.Count)
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "Index beyond package end\n"));
+            ACPI_ERROR ((AE_INFO,
+                "Index (%X%8.8X) beyond package end (%X)",
+                ACPI_FORMAT_UINT64 (Index), Operand[0]->Package.Count));
             Status = AE_AML_PACKAGE_LIMIT;
             goto Cleanup;
         }
@@ -403,12 +414,11 @@ AcpiExOpcode_6A_0T_1R (
 
     default:
 
-        ACPI_REPORT_ERROR (("AcpiExOpcode_3A_0T_0R: Unknown opcode %X\n",
-                WalkState->Opcode));
+        ACPI_ERROR ((AE_INFO, "Unknown AML opcode %X",
+            WalkState->Opcode));
         Status = AE_AML_BAD_OPCODE;
         goto Cleanup;
     }
-
 
     WalkState->ResultObj = ReturnDesc;
 

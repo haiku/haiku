@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: hwacpi - ACPI Hardware Initialization/Mode Interface
- *              $Revision: 67 $
+ *              $Revision: 1.74 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -132,7 +132,8 @@
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initialize and validate various ACPI registers
+ * DESCRIPTION: Initialize and validate the various ACPI registers defined in
+ *              the FADT.
  *
  ******************************************************************************/
 
@@ -143,15 +144,14 @@ AcpiHwInitialize (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE ("HwInitialize");
+    ACPI_FUNCTION_TRACE (HwInitialize);
 
 
     /* We must have the ACPI tables by the time we get here */
 
     if (!AcpiGbl_FADT)
     {
-        ACPI_DEBUG_PRINT ((ACPI_DB_ERROR, "A FADT is not loaded\n"));
-
+        ACPI_ERROR ((AE_INFO, "No FADT is present"));
         return_ACPI_STATUS (AE_NO_ACPI_TABLES);
     }
 
@@ -188,7 +188,7 @@ AcpiHwSetMode (
     UINT32                  Retry;
 
 
-    ACPI_FUNCTION_TRACE ("HwSetMode");
+    ACPI_FUNCTION_TRACE (HwSetMode);
 
     /*
      * ACPI 2.0 clarified that if SMI_CMD in FADT is zero,
@@ -196,7 +196,7 @@ AcpiHwSetMode (
      */
     if (!AcpiGbl_FADT->SmiCmd)
     {
-        ACPI_REPORT_ERROR (("No SMI_CMD in FADT, mode transition failed.\n"));
+        ACPI_ERROR ((AE_INFO, "No SMI_CMD in FADT, mode transition failed"));
         return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
     }
 
@@ -209,7 +209,8 @@ AcpiHwSetMode (
      */
     if (!AcpiGbl_FADT->AcpiEnable && !AcpiGbl_FADT->AcpiDisable)
     {
-        ACPI_REPORT_ERROR (("No ACPI mode transition supported in this system (enable/disable both zero)\n"));
+        ACPI_ERROR ((AE_INFO,
+            "No ACPI mode transition supported in this system (enable/disable both zero)"));
         return_ACPI_STATUS (AE_OK);
     }
 
@@ -242,7 +243,8 @@ AcpiHwSetMode (
 
     if (ACPI_FAILURE (Status))
     {
-        ACPI_REPORT_ERROR (("Could not write mode change, %s\n", AcpiFormatException (Status)));
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not write ACPI mode change"));
         return_ACPI_STATUS (Status);
     }
 
@@ -255,19 +257,20 @@ AcpiHwSetMode (
     {
         if (AcpiHwGetMode() == Mode)
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Mode %X successfully enabled\n", Mode));
+            ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Mode %X successfully enabled\n",
+                Mode));
             return_ACPI_STATUS (AE_OK);
         }
         AcpiOsStall(1000);
         Retry--;
     }
 
-    ACPI_REPORT_ERROR (("Hardware never changed modes\n"));
+    ACPI_ERROR ((AE_INFO, "Hardware did not change modes"));
     return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
 }
 
 
-/******************************************************************************
+/*******************************************************************************
  *
  * FUNCTION:    AcpiHwGetMode
  *
@@ -281,13 +284,14 @@ AcpiHwSetMode (
  ******************************************************************************/
 
 UINT32
-AcpiHwGetMode (void)
+AcpiHwGetMode (
+    void)
 {
     ACPI_STATUS             Status;
     UINT32                  Value;
 
 
-    ACPI_FUNCTION_TRACE ("HwGetMode");
+    ACPI_FUNCTION_TRACE (HwGetMode);
 
 
     /*
@@ -296,21 +300,21 @@ AcpiHwGetMode (void)
      */
     if (!AcpiGbl_FADT->SmiCmd)
     {
-        return_VALUE (ACPI_SYS_MODE_ACPI);
+        return_UINT32 (ACPI_SYS_MODE_ACPI);
     }
 
     Status = AcpiGetRegister (ACPI_BITREG_SCI_ENABLE, &Value, ACPI_MTX_LOCK);
     if (ACPI_FAILURE (Status))
     {
-        return_VALUE (ACPI_SYS_MODE_LEGACY);
+        return_UINT32 (ACPI_SYS_MODE_LEGACY);
     }
 
     if (Value)
     {
-        return_VALUE (ACPI_SYS_MODE_ACPI);
+        return_UINT32 (ACPI_SYS_MODE_ACPI);
     }
     else
     {
-        return_VALUE (ACPI_SYS_MODE_LEGACY);
+        return_UINT32 (ACPI_SYS_MODE_LEGACY);
     }
 }

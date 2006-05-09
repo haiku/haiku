@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsdump - table dumping routines for debug
- *              $Revision: 13 $
+ *              $Revision: 1.19 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2005, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,14 +118,17 @@
 #define __NSDUMPDV_C__
 
 #include "acpi.h"
-#include "acnamesp.h"
 
+
+/* TBD: This entire module is apparently obsolete and should be removed */
 
 #define _COMPONENT          ACPI_NAMESPACE
         ACPI_MODULE_NAME    ("nsdumpdv")
 
-
+#ifdef ACPI_OBSOLETE_FUNCTIONS
 #if defined(ACPI_DEBUG_OUTPUT) || defined(ACPI_DEBUGGER)
+
+#include "acnamesp.h"
 
 /*******************************************************************************
  *
@@ -134,13 +137,16 @@
  * PARAMETERS:  Handle              - Node to be dumped
  *              Level               - Nesting level of the handle
  *              Context             - Passed into WalkNamespace
+ *              ReturnValue         - Not used
+ *
+ * RETURN:      Status
  *
  * DESCRIPTION: Dump a single Node that represents a device
  *              This procedure is a UserFunction called by AcpiNsWalkNamespace.
  *
  ******************************************************************************/
 
-ACPI_STATUS
+static ACPI_STATUS
 AcpiNsDumpOneDevice (
     ACPI_HANDLE             ObjHandle,
     UINT32                  Level,
@@ -153,7 +159,7 @@ AcpiNsDumpOneDevice (
     UINT32                  i;
 
 
-    ACPI_FUNCTION_NAME ("NsDumpOneDevice");
+    ACPI_FUNCTION_NAME (NsDumpOneDevice);
 
 
     Status = AcpiNsDumpOneObject (ObjHandle, Level, Context, ReturnValue);
@@ -172,7 +178,7 @@ AcpiNsDumpOneDevice (
             "    HID: %s, ADR: %8.8X%8.8X, Status: %X\n",
             Info->HardwareId.Value, ACPI_FORMAT_UINT64 (Info->Address),
             Info->CurrentStatus));
-        ACPI_MEM_FREE (Info);
+        ACPI_FREE (Info);
     }
 
     return (Status);
@@ -185,18 +191,21 @@ AcpiNsDumpOneDevice (
  *
  * PARAMETERS:  None
  *
+ * RETURN:      None
+ *
  * DESCRIPTION: Dump all objects of type "device"
  *
  ******************************************************************************/
 
 void
-AcpiNsDumpRootDevices (void)
+AcpiNsDumpRootDevices (
+    void)
 {
     ACPI_HANDLE             SysBusHandle;
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_NAME ("NsDumpRootDevices");
+    ACPI_FUNCTION_NAME (NsDumpRootDevices);
 
 
     /* Only dump the table if tracing is enabled */
@@ -220,6 +229,7 @@ AcpiNsDumpRootDevices (void)
                 AcpiNsDumpOneDevice, NULL, NULL);
 }
 
+#endif
 #endif
 
 
