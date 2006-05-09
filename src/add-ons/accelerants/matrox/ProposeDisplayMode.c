@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-1/2006
+	Rudolf Cornelissen 9/2002-5/2006
 */
 
 #define MODULE_BIT 0x00400000
@@ -387,17 +387,22 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
 	switch (si->ps.card_type)
 	{
+	case G100:
+	case G200:
+		if (si->ps.tvout &&
+			(target->timing.h_display <= 1024) &&
+			(target->timing.v_display <= 768))
+		{
+			target->flags |= TV_CAPABLE;
+		}
+		break;
 	case G400:
 	case G400MAX:
-		//fixme: in theory singlehead cards can do TVout as well (if MAVEN mounted)
-		if (target->flags & DUALHEAD_CAPABLE)
+		if (si->ps.tvout &&
+			(target->timing.h_display <= 1024) &&
+			(target->timing.v_display <= 768))
 		{
-			if (si->ps.tvout &&
-				(target->timing.h_display <= 1024) &&
-				(target->timing.v_display <= 768))
-			{
-				target->flags |= TV_CAPABLE;
-			}
+			target->flags |= TV_CAPABLE;
 		}
 		break;
 	case G450:
@@ -414,12 +419,11 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		}
 		break;
 	default:
-		//fixme: setup for G100 and G200 TVout later on...
 		break;
 	}
 
-	/* TVout can only be done if the interface cable is connected */
-	if ((i2c_sec_tv_adapter() != B_OK) && (target->flags & TV_CAPABLE))
+	/* TVout can only be done if the interface cable is connected on dualhead cards */
+	if (si->ps.secondary_head && (i2c_sec_tv_adapter() != B_OK))
 	{
 		target->flags &= ~TV_CAPABLE;
 		LOG(1, ("PROPOSEMODE: blocking TVout: no TVout cable connected!\n"));
@@ -431,8 +435,15 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		target->flags &= ~TV_BITS;
 	}
 
-	/* fixme: currently the matrox driver can only do secondary TVout */
-	target->flags &= ~TV_PRIMARY;
+	/* the matrox driver can only do secondary TVout on dualhead cards */
+	if ((target->flags & TV_BITS) && !si->ps.secondary_head)
+	{
+		target->flags |= TV_PRIMARY;
+	}
+	else
+	{
+		target->flags &= ~TV_PRIMARY;
+	}
 
 	/* set HARDWARE_CURSOR mode if suitable */
 	if (si->settings.hardcursor)
