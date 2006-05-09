@@ -300,7 +300,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (!(target2.flags & TV_BITS))	result = g400_crtc2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
-		if (si->ps.secondary_tvout && (target2.flags & TV_BITS)) maventv_init(target2);
+		if (si->ps.tvout && (target2.flags & TV_BITS)) maventv_init(target2);
 	}
 	else /* single head mode */
 	{

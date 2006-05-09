@@ -142,7 +142,7 @@ status_t pins1_read(uint8 *pins, uint8 length)
 	si->ps.v5_mem_type = 0;
 //bools:
 	si->ps.secondary_head = false;
-	si->ps.secondary_tvout = false;
+	si->ps.tvout = false;
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	si->ps.sdram = true;
@@ -244,7 +244,7 @@ status_t pins3_read(uint8 *pins, uint8 length)
 	si->ps.v3_option2_reg = pins[58];
 
 	/* for cards using this version of PINS both functions are in maven */
-	si->ps.secondary_tvout = !(pins[59] & 0x01);
+	si->ps.tvout = !(pins[59] & 0x01);
 	/* G200 and earlier cards are always singlehead cards */
 	si->ps.secondary_head = false;
 	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[59] & 0x01);
@@ -400,7 +400,7 @@ status_t pins4_read(uint8 *pins, uint8 length)
 	si->ps.option_reg |= (rfhcnt << 15);
 
 	/* for cards using this version of PINS both functions are in maven */
-	si->ps.secondary_tvout = !(pins[91] & 0x01);
+	si->ps.tvout = !(pins[91] & 0x01);
 	/* G200 and earlier cards are always singlehead cards */
 	si->ps.secondary_head = false;
 	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[91] & 0x01);
@@ -524,7 +524,7 @@ status_t pins5_read(uint8 *pins, uint8 length)
 	si->ps.memrdbk_reg = (pins[91] << 24) | (pins[90] << 16) | (pins[89] << 8) | pins [88];
 
 	si->ps.secondary_head = (pins[117] & 0x70);
-	si->ps.secondary_tvout = (pins[117] & 0x40);	
+	si->ps.tvout = (pins[117] & 0x40);	
 	si->ps.primary_dvi = (pins[117] & 0x02);
 	si->ps.secondary_dvi = (pins[117] & 0x20);
 
@@ -573,14 +573,14 @@ void fake_pins(void)
 	}
 
 	/* find out if the card has a maven */
-	si->ps.secondary_tvout = false;
+	si->ps.tvout = false;
 	si->ps.secondary_head = false;
 	/* only do I2C probe if the card has a chance */
 	if (si->ps.card_type >= G100)
 	{
 		if (i2c_maven_probe() == B_OK)
 		{
-			si->ps.secondary_tvout = true;
+			si->ps.tvout = true;
 			/* G200 and earlier cards are always singlehead cards */
 			if (si->ps.card_type >= G400) si->ps.secondary_head = true;
 		}
@@ -949,8 +949,8 @@ void dump_pins(void)
 	LOG(2,("max_dac2_clock_32dh: %dMhz\n", si->ps.max_dac2_clock_32dh));
 	LOG(2,("secondary_head: "));
 	if (si->ps.secondary_head) LOG(2,("present\n")); else LOG(2,("absent\n"));
-	LOG(2,("secondary_tvout: "));
-	if (si->ps.secondary_tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
+	LOG(2,("tvout: "));
+	if (si->ps.tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("primary_dvi: "));
 	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("secondary_dvi: "));

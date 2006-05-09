@@ -392,7 +392,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		//fixme: in theory singlehead cards can do TVout as well (if MAVEN mounted)
 		if (target->flags & DUALHEAD_CAPABLE)
 		{
-			if (si->ps.secondary_tvout &&
+			if (si->ps.tvout &&
 				(target->timing.h_display <= 1024) &&
 				(target->timing.v_display <= 768))
 			{
@@ -405,7 +405,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		/* G450/G550 can only do secondary TVout in Video modes (no Desktop modes!) */
 		if ((target->flags & DUALHEAD_CAPABLE) && (target->flags & TV_VIDEO))
 		{
-			if (si->ps.secondary_tvout &&
+			if (si->ps.tvout &&
 				(target->timing.h_display <= 1024) &&	/* Hscaling option exists */
 				(target->timing.v_display <= 576))		/* Vscaling option lacks */
 			{

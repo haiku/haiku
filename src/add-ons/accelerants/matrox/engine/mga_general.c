@@ -506,7 +506,7 @@ status_t g400_general_powerup()
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
 	/* reset MAVEN so we know the sync polarity is at reset situation (Hpos, Vpos) */
-	if (si->ps.secondary_tvout)
+	if (si->ps.tvout)
 	{
 		ACCW(RST, 0x00000002);
 		snooze(1000);
@@ -619,7 +619,7 @@ status_t g450_general_powerup()
 
 	/* check output connector setup */
 	if (si->ps.primary_dvi && si->ps.secondary_head &&
-		si->ps.secondary_tvout && (i2c_sec_tv_adapter() != B_OK))
+		si->ps.tvout && (i2c_sec_tv_adapter() != B_OK))
 	{
 		/* signal CRTC2 DPMS which connector to program or readout */
 		si->crossed_conns = true;
@@ -761,7 +761,7 @@ status_t gx50_general_output_select()
 	if ((si->ps.card_type != G450) && (si->ps.card_type != G550)) return B_ERROR;
 
 	/* choose primary analog outputconnector */
-	if (si->ps.primary_dvi && si->ps.secondary_head && si->ps.secondary_tvout)
+	if (si->ps.primary_dvi && si->ps.secondary_head && si->ps.tvout)
 	{
 		if (i2c_sec_tv_adapter() == B_OK)
 		{
@@ -888,7 +888,7 @@ status_t gx00_general_bios_to_powergraphics()
 		case G400:
 		case G400MAX:
 			/* reset MAVEN so we know the sync polarity is at reset situation (Hpos, Vpos) */
-			if (si->ps.secondary_tvout)
+			if (si->ps.tvout)
 			{
 				ACCW(RST, 0x00000002);
 				snooze(1000);
