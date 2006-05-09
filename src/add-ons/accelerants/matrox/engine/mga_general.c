@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-1/2006
+   Rudolf Cornelissen 10/2002-5/2006
 */
 
 #define MODULE_BIT 0x00008000
@@ -311,6 +311,8 @@ status_t g100_general_powerup()
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	gx00_crtc_dpms(false, false, false);
+	/* on singlehead cards with TVout program the MAVEN as well */
+	if (si->ps.tvout) gx00_maven_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 	/* G100 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
@@ -411,6 +413,8 @@ status_t g200_general_powerup()
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	gx00_crtc_dpms(false, false, false);
+	/* on singlehead cards with TVout program the MAVEN as well */
+	if (si->ps.tvout) gx00_maven_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,

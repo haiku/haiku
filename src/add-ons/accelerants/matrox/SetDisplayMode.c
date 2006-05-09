@@ -75,7 +75,15 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* then turn off screen(s) */
 	gx00_crtc_dpms(false, false, false);
-	if (si->ps.secondary_head) g400_crtc2_dpms(false, false, false);
+	if (si->ps.secondary_head)
+	{
+		g400_crtc2_dpms(false, false, false);
+	}
+	else
+	{
+		/* on singlehead cards with TVout program the MAVEN as well */
+		if (si->ps.tvout) gx00_maven_dpms(false, false, false);
+	}
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
@@ -636,10 +644,12 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	}
 	else /* singlehead */
 	{
-		switch(dpms_flags) 
+		switch(dpms_flags)
 		{
 		case B_DPMS_ON:	/* H: on, V: on */
 			gx00_crtc_dpms(true, true, true);
+			/* on singlehead cards with TVout program the MAVEN as well */
+			if (si->dm.flags & TV_BITS) gx00_maven_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
 			if (si->settings.greensync)
@@ -651,6 +661,8 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 			{
 				gx00_crtc_dpms(false, false, true);
 			}
+			/* on singlehead cards with TVout program the MAVEN as well */
+			if (si->dm.flags & TV_BITS) gx00_maven_dpms(false, false, true);
 			break;
 		case B_DPMS_SUSPEND:
 			if (si->settings.greensync)
@@ -662,6 +674,8 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 			{
 				gx00_crtc_dpms(false, true, false);
 			}
+			/* on singlehead cards with TVout program the MAVEN as well */
+			if (si->dm.flags & TV_BITS) gx00_maven_dpms(false, true, false);
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
 			if (si->settings.greensync)
@@ -673,6 +687,8 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 			{
 				gx00_crtc_dpms(false, false, false);
 			}
+			/* on singlehead cards with TVout program the MAVEN as well */
+			if (si->dm.flags & TV_BITS) gx00_maven_dpms(false, false, false);
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (SH) 0x%08x\n", dpms_flags));
