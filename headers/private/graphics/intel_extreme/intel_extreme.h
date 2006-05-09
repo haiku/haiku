@@ -139,6 +139,26 @@ struct intel_free_graphics_memory {
 //----------------------------------------------------------
 // Register definitions, taken from X driver
 
+// PCI bridge memory management
+#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+#define STOLEN_MEMORY_MASK				0x70
+
+// models i830 and up
+#define i830_LOCAL_MEMORY_ONLY			0x10
+#define i830_STOLEN_512K				0x20
+#define i830_STOLEN_1M					0x30
+#define i830_STOLEN_8M					0x40
+
+// models i855 and up
+#define i855_STOLEN_MEMORY_1M			0x10
+#define i855_STOLEN_MEMORY_4M			0x20
+#define i855_STOLEN_MEMORY_8M			0x30
+#define i855_STOLEN_MEMORY_16M			0x40
+#define i855_STOLEN_MEMORY_32M			0x50
+#define i855_STOLEN_MEMORY_48M			0x60
+#define i855_STOLEN_MEMORY_64M			0x70
+
+
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define INTEL_PAGE_TABLE_ERROR			0x02024
 #define INTEL_HARDWARE_STATUS_PAGE		0x02080

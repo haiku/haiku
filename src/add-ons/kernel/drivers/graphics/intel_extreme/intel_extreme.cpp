@@ -18,10 +18,6 @@
 #include <string.h>
 #include <errno.h>
 
-// ToDo: do this correctly
-extern "C" void write_isa_io(uchar bus, uchar port, uchar offset);
-extern "C" uchar read_isa_io(uchar bus, uchar port, uchar offset);
-
 
 class PhysicalMemoryMapper {
 	public:
@@ -99,8 +95,32 @@ intel_extreme_init(intel_info &info)
 
 	// get chipset info
 
-	// TODO: read this out of the PCI configuration of the PCI bridge
-	size_t memorySize = 8 * 1024 * 1024;
+	// read stolen memory from the PCI configuration of the PCI bridge
+	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
+	size_t memorySize = 1024 * 1024;
+
+	// TODO: this doesn't work like this on anything older than i855
+	switch (memoryConfig & STOLEN_MEMORY_MASK) {
+		case i855_STOLEN_MEMORY_4M:
+			memorySize *= 4;
+			break;
+		case i855_STOLEN_MEMORY_8M:
+			memorySize *= 8;
+			break;
+		case i855_STOLEN_MEMORY_16M:
+			memorySize *= 16;
+			break;
+		case i855_STOLEN_MEMORY_32M:
+			memorySize *= 32;
+			break;
+		case i855_STOLEN_MEMORY_48M:
+			memorySize *= 48;
+			break;
+		case i855_STOLEN_MEMORY_64M:
+			memorySize *= 64;
+			break;
+	}
+	dprintf("detected %ld MB of stolen memory\n", memorySize / 1024 / 1024);
 
 	// map frame buffer, try to map it write combined
 
