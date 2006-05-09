@@ -158,7 +158,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		startadd_right=startadd+(target.timing.h_display * (colour_depth1 >> 3));
 
 		/* calculate needed MAVEN-CRTC delay: formula valid for straight-through CRTC's */
-		si->crtc_delay = 44 + 0 * (colour_depth2 == 16);
+		si->crtc_delay = 44;
+		if (colour_depth2 == 16) si->crtc_delay += 0;
 
 		/* set the outputs */
 		switch (si->ps.card_type)
@@ -194,7 +195,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 					gx00_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
 					si->switched_crtcs = false;
 					/* re-calculate MAVEN-CRTC delay: formula valid for crossed CRTC's */
-					si->crtc_delay = 17 + 4 * (colour_depth1 == 16);
+					si->crtc_delay = 17;
+					if (colour_depth1 == 16) si->crtc_delay += 4;
 					/* re-setup vertical timing adjust for crtc connected to the MAVEN:
 					 * cross connected. */
 					/* (extra "blanking" line for MAVEN hardware design fault) */
@@ -317,10 +319,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		
 		switch(target.space)
 		{
-		case B_CMAP8:        colour_depth1 =  8; colour_mode = BPP8;  break;
-		case B_RGB15_LITTLE: colour_depth1 = 16; colour_mode = BPP15; break;
-		case B_RGB16_LITTLE: colour_depth1 = 16; colour_mode = BPP16; break;
-		case B_RGB32_LITTLE: colour_depth1 = 32; colour_mode = BPP32; break;
+		case B_CMAP8:
+			colour_depth1 =  8;
+			colour_mode = BPP8;
+			break;
+		case B_RGB15_LITTLE:
+			colour_depth1 = 16;
+			colour_mode = BPP15;
+			break;
+		case B_RGB16_LITTLE:
+			colour_depth1 = 16;
+			colour_mode = BPP16;
+			break;
+		case B_RGB32_LITTLE:
+			colour_depth1 = 32;
+			colour_mode = BPP32;
+			break;
 		default:
 			LOG(8,("SETMODE: Invalid singlehead colour depth 0x%08x\n", target.space));
 			return B_ERROR;
@@ -340,7 +354,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the colour depth for CRTC1 and the DAC */
 		gx00_dac_mode(colour_mode,1.0);
 		gx00_crtc_depth(colour_mode);
-		
+
 		/* if we do TVout mode, its non-interlaced (as we are on <= G400MAX for sure) */
 		si->interlaced_tv_mode = false;
 
@@ -374,7 +388,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the timing */
 		if (!si->ps.secondary_head && si->ps.tvout && (target.flags & TV_BITS))
 		{
-			/* TVout support: setup CRTC1 and it's pixelclock */
+			/* calculate MAVEN-CRTC delay: only used during TVout */
+			si->crtc_delay = 17;
+			if (colour_depth1 <= 16) si->crtc_delay += 4;
+			/* setup CRTC1 and it's pixelclock for TVout */
 			maventv_init(target);
 		}
 		else
