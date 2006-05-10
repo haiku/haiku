@@ -12,6 +12,7 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
+#include "commands.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -225,19 +226,14 @@ update_overlay(bool updateCoefficients)
 	if (!gInfo->shared_info->overlay_active)
 		return;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
-	write_to_ring(ringBuffer, COMMAND_FLUSH);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
-	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
-	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
-		| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
-	ring_command_complete(ringBuffer);
+	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
+	queue.PutFlush();
+	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	queue.PutOverlayFlip(COMMAND_OVERLAY_CONTINUE, updateCoefficients);
 
-	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
-		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
-		read32(INTEL_OVERLAY_EXTENDED_STATUS)));
+//	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
+//		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
+//		read32(INTEL_OVERLAY_EXTENDED_STATUS)));
 }
 
 
@@ -252,13 +248,9 @@ show_overlay(void)
 	gInfo->shared_info->overlay_active = true;
 	registers->overlay_enabled = true;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
-	write_to_ring(ringBuffer, COMMAND_FLUSH);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
-	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_ON);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers
-		| OVERLAY_UPDATE_COEFFICIENTS);
-	ring_command_complete(ringBuffer);
+	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
+	queue.PutFlush();
+	queue.PutOverlayFlip(COMMAND_OVERLAY_ON, true);
 }
 
 
@@ -273,26 +265,19 @@ hide_overlay(void)
 	gInfo->shared_info->overlay_active = false;
 	registers->overlay_enabled = false;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
+	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
 
 	// flush pending commands
-	write_to_ring(ringBuffer, COMMAND_FLUSH);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
-	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
+	queue.PutFlush();
+	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 
 	// clear overlay enabled bit
-	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_CONTINUE);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers);
-	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
+	queue.PutOverlayFlip(COMMAND_OVERLAY_CONTINUE, false);
+	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 
 	// turn off overlay engine
-	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_OFF);
-	write_to_ring(ringBuffer, (uint32)gInfo->shared_info->physical_overlay_registers);
-	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
-	write_to_ring(ringBuffer, COMMAND_NOOP);
-	ring_command_complete(ringBuffer);
+	queue.PutOverlayFlip(COMMAND_OVERLAY_OFF, false);
+	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 
 	gInfo->current_overlay = NULL;
 }

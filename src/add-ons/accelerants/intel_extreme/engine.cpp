@@ -9,6 +9,7 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
+#include "commands.h"
 
 
 #define TRACE_ENGINE
@@ -23,35 +24,94 @@ extern "C" void _sPrintf(const char *format, ...);
 static engine_token sEngineToken = {1, 0 /*B_2D_ACCELERATION*/, NULL};
 
 
-/**	The ring buffer must be locked when calling this function */
-
-void
-write_to_ring(ring_buffer &ring, uint32 value)
+QueueCommands::QueueCommands(ring_buffer &ring)
+	:
+	fRingBuffer(ring)
 {
-	uint32 *target = (uint32 *)(ring.base + ring.position);
-	*target = value;
-
-	ring.position = (ring.position + sizeof(uint32)) & (ring.size - 1);
+	acquire_lock(&fRingBuffer.lock);
 }
 
 
-/**	The ring buffer must be locked when calling this function */
-
-void
-ring_command_complete(ring_buffer &ring)
+QueueCommands::~QueueCommands()
 {
-	if (ring.position & 0x07) {
+	if (fRingBuffer.position & 0x07) {
 		// make sure the command is properly aligned
-		write_to_ring(ring, COMMAND_NOOP);
+		_Write(COMMAND_NOOP);
 	}
 
-	write32(ring.register_base + RING_BUFFER_TAIL, ring.position);
+	write32(fRingBuffer.register_base + RING_BUFFER_TAIL, fRingBuffer.position);
 
-	// make sure memory is written back in case the ring buffer
-	// is in write combining mode
-	int32 test;
-	atomic_add(&test, 1);
+	// We must make sure memory is written back in case the ring buffer
+	// is in write combining mode - releasing the lock does this, as the
+	// buffer is flushed on a locked memory operation (which is what this
+	// benaphore does)
+	release_lock(&fRingBuffer.lock);
 }
+
+
+void
+QueueCommands::Put(struct command &command)
+{
+	uint32 count = command.Length();
+	uint32 *data = command.Data();
+
+	_MakeSpace(count);
+
+	for (uint32 i = 0; i < count; i++) {
+		_Write(data[i]);
+	}
+}
+
+
+void
+QueueCommands::PutFlush()
+{
+	_MakeSpace(2);
+
+	_Write(COMMAND_FLUSH);
+	_Write(COMMAND_NOOP);
+}
+
+
+void
+QueueCommands::PutWaitFor(uint32 event)
+{
+	_MakeSpace(2);
+
+	_Write(COMMAND_WAIT_FOR_EVENT | event);
+	_Write(COMMAND_NOOP);
+}
+
+
+void
+QueueCommands::PutOverlayFlip(uint32 mode, bool updateCoefficients)
+{
+	_MakeSpace(2);
+
+	_Write(COMMAND_OVERLAY_FLIP | mode);
+	_Write((uint32)gInfo->shared_info->physical_overlay_registers
+		| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
+}
+
+
+void
+QueueCommands::_MakeSpace(uint32 size)
+{
+	// TODO: make sure there is enough room to write the command!
+}
+
+
+void
+QueueCommands::_Write(uint32 data)
+{
+	uint32 *target = (uint32 *)(fRingBuffer.base + fRingBuffer.position);
+	*target = data;
+
+	fRingBuffer.position = (fRingBuffer.position + sizeof(uint32)) & (fRingBuffer.size - 1);
+}
+
+
+//	#pragma mark -
 
 
 void
@@ -75,7 +135,7 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - engine management
 
 
 /** Return number of hardware engines */
@@ -131,4 +191,7 @@ intel_sync_to_token(sync_token *syncToken)
 	TRACE(("intel_sync_to_token()\n"));
 	return B_OK;
 }
+
+
+//	#pragma mark - engine acceleration
 
