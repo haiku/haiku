@@ -48,6 +48,7 @@ FontMenu::GetFonts()
 	}
 }
 
+
 void
 FontMenu::Update()
 {
@@ -55,22 +56,27 @@ FontMenu::Update()
 	// related stuff out of the FontMenu class
 	// so it can be easily reused in other apps
 	get_menu_info(&info);
-		
+	
 	// font menu
 	BFont font;
 	font.SetFamilyAndStyle(info.f_family, info.f_style);
 	font.SetSize(info.font_size);
-	SetFont(&font);
-	SetViewColor(info.background_color);
-	InvalidateLayout();
-	// font style menus 		
-	for (int i = 0; i < CountItems(); i++) {
-		ItemAt(i)->Submenu()->SetFont(&font);
-	}	
-	 
+		
+	if (LockLooper()) {	
+		SetFont(&font);
+		SetViewColor(info.background_color);
+		// font style menus 		
+		for (int i = 0; i < CountItems(); i++)
+			ItemAt(i)->Submenu()->SetFont(&font);
+		InvalidateLayout();
+		Invalidate();
+		UnlockLooper();
+	}
+
 	ClearAllMarkedItems();
 	PlaceCheckMarkOnFont(info.f_family, info.f_style);
 }
+
 
 status_t 
 FontMenu::PlaceCheckMarkOnFont(font_family family, font_style style)
@@ -80,24 +86,18 @@ FontMenu::PlaceCheckMarkOnFont(font_family family, font_style style)
 	BMenu *styleMenu;
 
 	fontFamilyItem = FindItem(family);
-	if ((fontFamilyItem != NULL) && (family != NULL))
-	{
+	if ((fontFamilyItem != NULL) && (family != NULL)) {
 		fontFamilyItem->SetMarked(true);
 		styleMenu = fontFamilyItem->Submenu();
 	
-		if ((styleMenu != NULL) && (style != NULL))
-		{
+		if ((styleMenu != NULL) && (style != NULL)) {
 			fontStyleItem = styleMenu->FindItem(style);
 			if (fontStyleItem != NULL)
-			{
 				fontStyleItem->SetMarked(true);
-			}
 		
-		}
-		else
+		} else
 			return B_ERROR;
-	}
-	else
+	} else
 		return B_ERROR;
 		
 	return B_OK;

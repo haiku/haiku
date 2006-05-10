@@ -57,15 +57,15 @@ FontSizeMenu::Update()
 	get_menu_info(&info);
 	BFont font;
 		
-	Supermenu()->Window()->Lock();
-	font.SetFamilyAndStyle(info.f_family, info.f_style);
-	font.SetSize(info.font_size);
-	SetFont(&font);
-	SetViewColor(info.background_color);
-	Supermenu()->Window()->Unlock();
-	set_menu_info(&info);
-		
-	InvalidateLayout();
-	Invalidate();
+	if (LockLooper()) {
+		font.SetFamilyAndStyle(info.f_family, info.f_style);
+		font.SetSize(info.font_size);
+		SetFont(&font);
+		SetViewColor(info.background_color);
+		InvalidateLayout();
+		Invalidate();
+		UnlockLooper();
+	}
+	
 	SetEnabled(true);
 }

@@ -131,15 +131,17 @@ MenuBar::Update()
 	set_menu();
 	
 	BFont font;
-	Window()->Lock();
-	font.SetFamilyAndStyle(info.f_family, info.f_style);
-	font.SetSize(info.font_size);
-	SetFont(&font);
-	SetViewColor(info.background_color);
-	Window()->Unlock();
-
-	// force the menu to redraw
-	InvalidateLayout();
+	if (LockLooper()) {
+		font.SetFamilyAndStyle(info.f_family, info.f_style);
+		font.SetSize(info.font_size);
+		SetFont(&font);
+		SetViewColor(info.background_color);
+	
+		// force the menu to redraw
+		InvalidateLayout();
+		Invalidate();
+		UnlockLooper();
+	}
 }
 
 
@@ -147,5 +149,6 @@ void
 MenuBar::FrameResized(float width, float height)
 {
 	Window()->ResizeTo(width + 80, height + 55);
-	Window()->PostMessage(UPDATE_WINDOW);	
+	Window()->PostMessage(UPDATE_WINDOW);
+	BMenuBar::FrameResized(width, height);
 }
