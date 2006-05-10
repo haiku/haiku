@@ -395,12 +395,13 @@ struct overlay_registers {
 
 	uint32 _reserved21[10];
 
-	// (0xa0) FASTHSCALE - fast horizontal downscale
-	uint16 horizontal_scale_rgb;
+	// (0xa0) FASTHSCALE - fast horizontal downscale (strangely enough,
+	// the next two registers switch the usual Y/RGB vs. UV order)
 	uint16 horizontal_scale_uv;
+	uint16 horizontal_scale_rgb;
 	// (0xa4) UVSCALEV - vertical downscale
-	uint16 vertical_scale_rgb;
 	uint16 vertical_scale_uv;
+	uint16 vertical_scale_rgb;
 
 	uint32 _reserved22[86];
 

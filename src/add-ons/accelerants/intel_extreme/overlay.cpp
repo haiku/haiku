@@ -562,8 +562,8 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		registers->window_width = right - left;
 		registers->window_height = bottom - top;
 
-		uint32 horizontalScale = ((view->width - 1) << 12) / window->width;
-		uint32 verticalScale = ((view->height - 1) << 12) / window->height;
+		uint32 horizontalScale = (view->width << 12) / window->width;
+		uint32 verticalScale = (view->height << 12) / window->height;
 		uint32 horizontalScaleUV = horizontalScale >> 1;
 		uint32 verticalScaleUV = verticalScale >> 1;
 		horizontalScale = horizontalScaleUV << 1;
