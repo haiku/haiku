@@ -59,6 +59,7 @@ struct intel_shared_info {
 
 	display_mode	current_mode;
 	uint32			bytes_per_row;
+	uint32			bits_per_pixel;
 	uint32			dpms_mode;
 
 	area_id			registers_area;			// area of memory mapped registers
@@ -244,6 +245,9 @@ struct intel_free_graphics_memory {
 #define COMMAND_OVERLAY_ON				(1 << 21)
 #define COMMAND_OVERLAY_OFF				(2 << 21)
 #define OVERLAY_UPDATE_COEFFICIENTS		0x1
+
+// 2D acceleration
+#define COMMAND_BLIT					0x54c00006
 
 // overlay
 

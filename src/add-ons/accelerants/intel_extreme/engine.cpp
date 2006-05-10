@@ -195,3 +195,22 @@ intel_sync_to_token(sync_token *syncToken)
 
 //	#pragma mark - engine acceleration
 
+
+void
+intel_screen_to_screen_blit(engine_token *token, blit_params *params, uint32 count)
+{
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
+
+	for (uint32 i = 0; i < count; i++) {
+		blit_command blit;
+		blit.source_left = params[i].src_left;
+		blit.source_top = params[i].src_top;
+		blit.dest_left = params[i].dest_left;
+		blit.dest_top = params[i].dest_top;
+		blit.dest_right = params[i].dest_left + params[i].width;
+		blit.dest_bottom = params[i].dest_top + params[i].height;
+
+		queue.Put(blit);
+	}
+}
+

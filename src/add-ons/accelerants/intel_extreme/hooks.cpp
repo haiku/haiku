@@ -83,11 +83,16 @@ get_accelerant_hook(uint32 feature, void *data)
 			return intel_sync_to_token;
 
 		/* 2D acceleration */
-/*		HOOK(SCREEN_TO_SCREEN_BLIT);
-		HOOK(FILL_RECTANGLE);
-		HOOK(INVERT_RECTANGLE);
-		HOOK(FILL_SPAN);
-*/		
+/*
+		case B_SCREEN_TO_SCREEN_BLIT:
+			return intel_screen_to_screen_blit;
+		case B_FILL_RECTANGLE:
+			return intel_fill_rectangle;
+		case B_INVERT_RECTANGLE:
+			return intel_invert_rectangle;
+		case B_FILL_SPAN:
+			return intel_fill_span;
+*/
 		// overlay
 		case B_OVERLAY_COUNT:
 			return intel_overlay_supported_spaces;

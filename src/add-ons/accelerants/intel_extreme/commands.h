@@ -39,5 +39,44 @@ class QueueCommands {
 
 // commands
 
+struct blit_command : command {
+	uint8	flags;
+	uint8	raster_operation;
+	uint16	dest_bytes_per_row;
+	uint16	dest_left;
+	uint16	dest_top;
+	uint16	dest_right;
+	uint16	dest_bottom;
+	uint32	dest_base;
+	uint16	source_left;
+	uint16	source_top;
+	uint16	source_bytes_per_row;
+	uint16	reserved;
+	uint32	source_base;
+
+	blit_command()
+	{
+		opcode = COMMAND_BLIT;
+		switch (gInfo->shared_info->bits_per_pixel) {
+			case 8:
+				flags = 0;
+				break;
+			case 15:
+				flags = 2;
+				break;
+			case 16:
+				flags = 1;
+				break;
+			case 32:
+				flags = 3;
+				break;
+		}
+		dest_base = source_base = gInfo->shared_info->frame_buffer_offset;
+		dest_bytes_per_row = source_bytes_per_row = gInfo->shared_info->bytes_per_row;
+		reserved = 0;
+	}
+
+	virtual size_t Length() { return 6; }
+};
 
 #endif	// COMMANDS_H

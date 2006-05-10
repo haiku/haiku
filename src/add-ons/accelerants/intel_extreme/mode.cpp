@@ -150,7 +150,8 @@ compute_pll_divisors(const display_mode &current, uint32 &postDivisor,
 
 
 static void
-get_color_space_format(const display_mode &mode, uint32 &colorMode, uint32 &bytesPerRow)
+get_color_space_format(const display_mode &mode, uint32 &colorMode,
+	uint32 &bytesPerRow, uint32 &bitsPerPixel)
 {
 	uint32 bytesPerPixel;
 
@@ -158,19 +159,23 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode, uint32 &byte
 		case B_RGB32_LITTLE:
 			colorMode = DISPLAY_CONTROL_RGB32;
 			bytesPerPixel = 4;
+			bitsPerPixel = 32;
 			break;
 		case B_RGB16_LITTLE:
 			colorMode = DISPLAY_CONTROL_RGB16;
 			bytesPerPixel = 2;
+			bitsPerPixel = 16;
 			break;
 		case B_RGB15_LITTLE:
 			colorMode = DISPLAY_CONTROL_RGB15;
 			bytesPerPixel = 2;
+			bitsPerPixel = 15;
 			break;
 		case B_CMAP8:
 		default:
 			colorMode = DISPLAY_CONTROL_CMAP8;
 			bytesPerPixel = 1;
+			bitsPerPixel = 8;
 			break;
 	}
 
@@ -237,8 +242,8 @@ intel_set_display_mode(display_mode *mode)
 
 	set_display_power_mode(B_DPMS_OFF);
 
-	uint32 colorMode, bytesPerRow;
-	get_color_space_format(current, colorMode, bytesPerRow);
+	uint32 colorMode, bytesPerRow, bitsPerPixel;
+	get_color_space_format(current, colorMode, bytesPerRow, bitsPerPixel);
 
 	// free old and allocate new frame buffer in graphics memory
 
@@ -316,6 +321,7 @@ intel_set_display_mode(display_mode *mode)
 	// update shared info
 	gInfo->shared_info->bytes_per_row = bytesPerRow;
 	gInfo->shared_info->current_mode = current;
+	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
 
 	return B_OK;
 }
