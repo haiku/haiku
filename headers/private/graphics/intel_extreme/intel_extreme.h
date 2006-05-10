@@ -70,6 +70,7 @@ struct intel_shared_info {
 	uint32			frame_buffer_offset;
 
 	ring_buffer		primary_ring_buffer;
+	ring_buffer		secondary_ring_buffer;
 
 	int32			overlay_channel_used;
 	bool			overlay_active;

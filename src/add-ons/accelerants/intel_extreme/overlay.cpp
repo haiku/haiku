@@ -225,7 +225,7 @@ update_overlay(bool updateCoefficients)
 	if (!gInfo->shared_info->overlay_active)
 		return;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
 	write_to_ring(ringBuffer, COMMAND_FLUSH);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_WAIT_FOR_EVENT | COMMAND_WAIT_FOR_OVERLAY_FLIP);
@@ -252,7 +252,7 @@ show_overlay(void)
 	gInfo->shared_info->overlay_active = true;
 	registers->overlay_enabled = true;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
 	write_to_ring(ringBuffer, COMMAND_FLUSH);
 	write_to_ring(ringBuffer, COMMAND_NOOP);
 	write_to_ring(ringBuffer, COMMAND_OVERLAY_FLIP | COMMAND_OVERLAY_ON);
@@ -273,7 +273,7 @@ hide_overlay(void)
 	gInfo->shared_info->overlay_active = false;
 	registers->overlay_enabled = false;
 
-	ring_buffer &ringBuffer = gInfo->shared_info->primary_ring_buffer;
+	ring_buffer &ringBuffer = gInfo->shared_info->secondary_ring_buffer;
 
 	// flush pending commands
 	write_to_ring(ringBuffer, COMMAND_FLUSH);

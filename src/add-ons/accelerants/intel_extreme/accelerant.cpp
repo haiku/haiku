@@ -175,6 +175,7 @@ intel_init_accelerant(int device)
 		return status;
 
 	setup_ring_buffer(gInfo->shared_info->primary_ring_buffer, "intel primary ring buffer");
+	setup_ring_buffer(gInfo->shared_info->secondary_ring_buffer, "intel secondary ring buffer");
 
 	status = create_mode_list();
 	if (status != B_OK) {

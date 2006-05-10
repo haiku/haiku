@@ -167,12 +167,21 @@ intel_extreme_init(intel_info &info)
 	// reserve ring buffer memory (currently, this memory is placed in
 	// the graphics memory), but this could bring us problems with
 	// write combining...
+
 	ring_buffer &primary = info.shared_info->primary_ring_buffer;
 	if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
 			&primary.handle, &primary.offset) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
 		primary.size = B_PAGE_SIZE;
 		primary.base = info.graphics_memory + primary.offset;
+	}
+
+	ring_buffer &secondary = info.shared_info->secondary_ring_buffer;
+	if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
+			&secondary.handle, &secondary.offset) == B_OK) {
+		secondary.register_base = INTEL_SECONDARY_RING_BUFFER_0;
+		secondary.size = B_PAGE_SIZE;
+		secondary.base = info.graphics_memory + secondary.offset;
 	}
 
 	// no errors, so keep mappings
