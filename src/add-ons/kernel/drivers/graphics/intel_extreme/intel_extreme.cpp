@@ -171,8 +171,6 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
-	dprintf(DEVICE_NAME ": page table control %08lx\n", read32(INTEL_PAGE_TABLE_CONTROL));
-
 	// init graphics memory manager
 
 	info.memory_manager = mem_init("intel extreme memory manager", 0, memorySize, 1024, 
