@@ -16,75 +16,6 @@
 #include <Region.h>
 #include <Window.h>
 
-_BMCItem_::_BMCItem_(BMenu *menu)
-	:	BMenuItem(menu),
-		fShowPopUpMarker(true)
-{
-	printf("_BMCItem_::_BMCItem_()\n");
-}
-
-
-_BMCItem_::_BMCItem_(BMessage *message)
-	:	BMenuItem(message),
-		fShowPopUpMarker(true)
-{
-}
-
-
-_BMCItem_::~_BMCItem_()
-{
-}
-
-
-BArchivable *
-_BMCItem_::Instantiate(BMessage *data)
-{
-	if (validate_instantiation(data, "_BMCItem_"))
-		return new _BMCItem_(data);
-	else
-		return NULL;
-}
-
-
-void
-_BMCItem_::Draw()
-{
-	BMenu *menu = Menu();
-	
-	BMenuItem::Draw();
-
-	if (!fShowPopUpMarker)
-		return;
-return;
-	BRect rect(menu->Bounds());
-
-	rect.right -= 4;
-	rect.bottom -= 5;
-	rect.left = rect.right - 4;
-	rect.top = rect.bottom - 2;
-
-	if (IsEnabled())
-		menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-	else
-		menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-
-	menu->StrokeLine(BPoint(rect.left, rect.top), BPoint(rect.right, rect.top));
-	menu->StrokeLine(BPoint(rect.left + 1.0f, rect.top + 1.0f),
-		BPoint(rect.right - 1.0f, rect.top + 1.0f));
-	menu->StrokeLine(BPoint(rect.left + 2.0f, rect.bottom),
-		BPoint(rect.left + 2.0f, rect.bottom));
-}
-
-
-void
-_BMCItem_::GetContentSize(float *width, float *height)
-{
-	BMenuItem::GetContentSize(width, height);
-}
-
-
 /*
 _BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32)
 {
@@ -278,12 +209,18 @@ _BMCMenuBar_::FrameResized(float width, float height)
 	float diff = Frame().right - fMenuField->Bounds().right;
 	if (Window()) {
 		if (diff > 0) {
-			// clean up the dirty right top corner of
+			// clean up the dirty right border of
 			// the menu field when enlarging
 			BRect dirty(fMenuField->Bounds());
 			dirty.left = dirty.right - 2;
-			dirty.bottom = Frame().top - 1;
 			fMenuField->Invalidate(dirty);
+			
+			// clean up the arrow part
+			dirty = Bounds();
+			dirty.right -= diff;
+			dirty.left = dirty.right - 12;
+			Invalidate(dirty);
+
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
@@ -291,8 +228,14 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			dirty.left = dirty.right + diff + 1;
 			dirty.right = dirty.left + 1;
 			fMenuField->Invalidate(dirty);
+			
+			// clean up the arrow part
+			dirty = Bounds();
+			dirty.left = dirty.right - 12;
+			Invalidate(dirty);
 		}
 	}
+
 	// we have been shrinked or enlarged and need to take
 	// of the size of the parent menu field as well
 	// NOTE: no worries about follow mode, we follow left and top

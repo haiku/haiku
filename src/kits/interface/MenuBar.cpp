@@ -214,9 +214,13 @@ BMenuBar::FrameMoved(BPoint newPosition)
 void 
 BMenuBar::FrameResized(float newWidth, float newHeight)
 {
+	BRect bounds(Bounds());
+	BRect rect(fLastBounds->right - 2, fLastBounds->top, bounds.right, bounds.bottom);
 	fLastBounds->Set(0, 0, newWidth, newHeight);
-	if (Window())
-		Invalidate(Bounds());
+	
+	if (rect.IsValid() && Window() != NULL)
+		Invalidate(rect);
+
 	BMenu::FrameResized(newWidth, newHeight);
 }
 

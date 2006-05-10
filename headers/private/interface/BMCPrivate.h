@@ -34,33 +34,6 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-class _BMCItem_ : public BMenuItem {
-	
-public:
-					_BMCItem_(BMenu *menu);
-					_BMCItem_(BMessage *message);
-virtual				~_BMCItem_();
-
-static	BArchivable	*Instantiate(BMessage *data);
-
-		void		Draw();
-		void		GetContentSize(float *width, float *height);
-
-private:
-friend class BMenuField;
-
-			bool	fShowPopUpMarker;
-};
-//------------------------------------------------------------------------------
 
 /*//------------------------------------------------------------------------------
 _BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32)
@@ -101,9 +74,9 @@ virtual void		MouseDown(BPoint where);
 
 private:
 		_BMCMenuBar_&operator=(const _BMCMenuBar_ &);
-
-		BMenuField		*fMenuField;
-		bool			fFixedSize;	
+		
+		BMenuField	*fMenuField;
+		bool		fFixedSize;	
 		BMessageRunner	*fRunner;
 };
 //------------------------------------------------------------------------------
