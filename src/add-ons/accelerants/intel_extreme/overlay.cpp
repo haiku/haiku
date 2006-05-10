@@ -551,6 +551,11 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 			right = gInfo->shared_info->current_mode.timing.h_display;
 		if (bottom > gInfo->shared_info->current_mode.timing.v_display)
 			bottom = gInfo->shared_info->current_mode.timing.v_display;
+		if (left >= right || top >= bottom) {
+			// overlay is not within visible bounds
+			hide_overlay();
+			return B_OK;
+		}
 
 		registers->window_left = left;
 		registers->window_top = top;
