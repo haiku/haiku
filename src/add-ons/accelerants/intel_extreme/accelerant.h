@@ -47,6 +47,9 @@ struct accelerant_info {
 	uint32			last_vertical_overlay_scale;
 	uint32			overlay_position_buffer_offset;
 
+	hardware_status	*status;
+	uint8			*cursor_memory;
+
 	int				device;
 	bool			is_clone;
 };

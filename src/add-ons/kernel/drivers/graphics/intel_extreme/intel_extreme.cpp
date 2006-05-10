@@ -19,46 +19,59 @@
 #include <errno.h>
 
 
-class PhysicalMemoryMapper {
+class AreaKeeper {
 	public:
-		PhysicalMemoryMapper();
-		~PhysicalMemoryMapper();
+		AreaKeeper();
+		~AreaKeeper();
 
+		area_id Create(const char *name, void **_virtualAddress, uint32 spec,
+			size_t size, uint32 lock, uint32 protection);
 		area_id Map(const char *name, void *physicalAddress, size_t numBytes,
-			uint32 spec, uint32 protection, void **virtualAddress);
+			uint32 spec, uint32 protection, void **_virtualAddress);
+
 		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
-		void Keep();
+		void Detach();
 
 	private:
 		area_id	fArea;
 };
 
 
-PhysicalMemoryMapper::PhysicalMemoryMapper()
+AreaKeeper::AreaKeeper()
 	:
 	fArea(-1)
 {
 }
 
 
-PhysicalMemoryMapper::~PhysicalMemoryMapper()
+AreaKeeper::~AreaKeeper()
 {
 	if (fArea >= B_OK)
 		delete_area(fArea);
 }
 
 
-area_id 
-PhysicalMemoryMapper::Map(const char *name, void *physicalAddress, size_t numBytes,
-	uint32 spec, uint32 protection, void **virtualAddress)
+area_id
+AreaKeeper::Create(const char *name, void **_virtualAddress, uint32 spec,
+	size_t size, uint32 lock, uint32 protection)
 {
-	fArea = map_physical_memory(name, physicalAddress, numBytes, spec, protection, virtualAddress);
+	fArea = create_area(name, _virtualAddress, spec, size, lock, protection);
 	return fArea;
 }
 
 
-void 
-PhysicalMemoryMapper::Keep()
+area_id
+AreaKeeper::Map(const char *name, void *physicalAddress, size_t numBytes,
+	uint32 spec, uint32 protection, void **_virtualAddress)
+{
+	fArea = map_physical_memory(name, physicalAddress, numBytes, spec, protection,
+		_virtualAddress);
+	return fArea;
+}
+
+
+void
+AreaKeeper::Detach()
 {
 	fArea = -1;
 }
@@ -84,9 +97,10 @@ init_overlay_registers(overlay_registers *registers)
 status_t
 intel_extreme_init(intel_info &info)
 {
-	info.shared_area = create_area("intel extreme shared info",
+	AreaKeeper sharedCreator;
+	info.shared_area = sharedCreator.Create("intel extreme shared info",
 		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
-		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + B_PAGE_SIZE,
+		ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)) + 3 * B_PAGE_SIZE,
 		B_FULL_LOCK, 0);
 	if (info.shared_area < B_OK)
 		return info.shared_area;
@@ -120,11 +134,11 @@ intel_extreme_init(intel_info &info)
 			memorySize *= 64;
 			break;
 	}
-	dprintf("detected %ld MB of stolen memory\n", memorySize / 1024 / 1024);
+	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory\n", memorySize / 1024 / 1024);
 
 	// map frame buffer, try to map it write combined
 
-	PhysicalMemoryMapper graphicsMapper;
+	AreaKeeper graphicsMapper;
 	info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 		(void *)info.pci->u.h0.base_registers[0],
 		memorySize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
@@ -145,7 +159,7 @@ intel_extreme_init(intel_info &info)
 
 	// memory mapped I/O
 
-	PhysicalMemoryMapper mmioMapper;
+	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
 		(void *)info.pci->u.h0.base_registers[1],
 		info.pci->u.h0.base_register_sizes[1],
@@ -156,6 +170,8 @@ intel_extreme_init(intel_info &info)
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		return info.registers_area;
 	}
+
+	dprintf(DEVICE_NAME ": page table control %08lx\n", read32(INTEL_PAGE_TABLE_CONTROL));
 
 	// init graphics memory manager
 
@@ -184,9 +200,10 @@ intel_extreme_init(intel_info &info)
 		secondary.base = info.graphics_memory + secondary.offset;
 	}
 
-	// no errors, so keep mappings
-	graphicsMapper.Keep();
-	mmioMapper.Keep();
+	// no errors, so keep areas and mappings
+	sharedCreator.Detach();
+	graphicsMapper.Detach();
+	mmioMapper.Detach();
 
 	info.shared_info->graphics_memory_area = info.graphics_memory_area;
 	info.shared_info->registers_area = info.registers_area;
@@ -210,7 +227,7 @@ intel_extreme_init(intel_info &info)
 #endif
 
 	// setup overlay registers
-	
+
 	info.overlay_registers = (overlay_registers *)((uint8 *)info.shared_info
 		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
 	init_overlay_registers(info.overlay_registers);
@@ -218,6 +235,17 @@ intel_extreme_init(intel_info &info)
 	physical_entry physicalEntry;
 	get_memory_map(info.overlay_registers, sizeof(overlay_registers), &physicalEntry, 1);
 	info.shared_info->physical_overlay_registers = (uint8 *)physicalEntry.address;
+
+	// The hardware status page and the cursor memory share one area with
+	// the overlay registers and the shared info
+
+	get_memory_map((uint8 *)info.overlay_registers + B_PAGE_SIZE,
+		B_PAGE_SIZE, &physicalEntry, 1);
+	info.shared_info->physical_status_page = (uint8 *)physicalEntry.address;
+
+	get_memory_map((uint8 *)info.overlay_registers + 2 * B_PAGE_SIZE,
+		B_PAGE_SIZE, &physicalEntry, 1);
+	info.shared_info->physical_cursor_memory = (uint8 *)physicalEntry.address;
 
 	info.cookie_magic = INTEL_COOKIE_MAGIC;
 		// this makes the cookie valid to be used

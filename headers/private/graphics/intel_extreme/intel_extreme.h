@@ -34,20 +34,20 @@ enum {
 
 // info about PLL on graphics card
 struct pll_info {
-	uint32 reference_frequency;
-	uint32 max_frequency;
-	uint32 min_frequency;
-	uint32 divisor_register;
+	uint32			reference_frequency;
+	uint32			max_frequency;
+	uint32			min_frequency;
+	uint32			divisor_register;
 };
 
 struct ring_buffer {
-	struct lock	lock;
-	uint32	register_base;
-	uint32	handle;
-	uint32	offset;
-	uint32	size;
-	uint32	position;
-	uint8	*base;
+	struct lock		lock;
+	uint32			register_base;
+	uint32			handle;
+	uint32			offset;
+	uint32			size;
+	uint32			position;
+	uint8			*base;
 };
 
 struct overlay_registers;
@@ -62,6 +62,8 @@ struct intel_shared_info {
 	uint32			dpms_mode;
 
 	area_id			registers_area;			// area of memory mapped registers
+	uint8			*physical_status_page;
+	uint8			*physical_cursor_memory;
 	area_id			graphics_memory_area;
 	uint8			*graphics_memory;
 	uint8			*physical_graphics_memory;
@@ -83,24 +85,24 @@ struct intel_shared_info {
 };
 
 struct intel_info {
-	uint32		cookie_magic;
-	int32		open_count;
-	int32		id;
-	pci_info	*pci;
-	uint8		*registers;
-	area_id		registers_area;
+	uint32			cookie_magic;
+	int32			open_count;
+	int32			id;
+	pci_info		*pci;
+	uint8			*registers;
+	area_id			registers_area;
 	struct intel_shared_info *shared_info;
-	area_id		shared_area;
+	area_id			shared_area;
 
 	struct overlay_registers *overlay_registers;
 		// update buffer, shares an area with shared_info
 
-	uint8		*graphics_memory;
-	area_id		graphics_memory_area;
-	mem_info	*memory_manager;
+	uint8			*graphics_memory;
+	area_id			graphics_memory_area;
+	mem_info		*memory_manager;
 
-	const char	*device_identifier;
-	uint32		device_type;
+	const char		*device_identifier;
+	uint32			device_type;
 };
 
 //----------------- ioctl() interface ----------------
@@ -411,6 +413,19 @@ struct overlay_registers {
 	// (0x500)
 	uint16 vertical_coefficients_uv[128];
 	uint16 horizontal_coefficients_uv[128];
+};
+
+struct hardware_status {
+	uint32	interrupt_status_register;
+	uint32	_reserved0[3];
+	void	*primary_ring_head_storage;
+	uint32	_reserved1[3];
+	void	*secondary_ring_0_head_storage;
+	void	*secondary_ring_1_head_storage;
+	uint32	_reserved2[2];
+	void	*binning_head_storage;
+	uint32	_reserved3[3];
+	uint32	store[1008];
 };
 
 //----------------------------------------------------------
