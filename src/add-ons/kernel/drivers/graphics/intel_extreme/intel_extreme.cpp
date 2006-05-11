@@ -183,10 +183,10 @@ intel_extreme_init(intel_info &info)
 	// write combining...
 
 	ring_buffer &primary = info.shared_info->primary_ring_buffer;
-	if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
+	if (mem_alloc(info.memory_manager, 4 * B_PAGE_SIZE, &info,
 			&primary.handle, &primary.offset) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
-		primary.size = B_PAGE_SIZE;
+		primary.size = 4 * B_PAGE_SIZE;
 		primary.base = info.graphics_memory + primary.offset;
 	}
 
