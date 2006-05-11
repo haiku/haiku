@@ -85,11 +85,11 @@ get_accelerant_hook(uint32 feature, void *data)
 		/* 2D acceleration */
 		case B_SCREEN_TO_SCREEN_BLIT:
 			return intel_screen_to_screen_blit;
-/*
 		case B_FILL_RECTANGLE:
 			return intel_fill_rectangle;
 		case B_INVERT_RECTANGLE:
 			return intel_invert_rectangle;
+/*
 		case B_FILL_SPAN:
 			return intel_fill_span;
 */

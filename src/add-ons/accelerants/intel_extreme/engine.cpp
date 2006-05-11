@@ -178,6 +178,11 @@ intel_wait_engine_idle(void)
 {
 	TRACE(("intel_wait_engine_idle()\n"));
 
+	{
+		QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
+		queue.PutFlush();
+	}
+
 	// TODO: this should only be a temporary solution!
 	// a better way to do this would be to acquire the engine's lock and
 	// sync to the latest token
@@ -220,13 +225,50 @@ intel_screen_to_screen_blit(engine_token *token, blit_params *params, uint32 cou
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
 	for (uint32 i = 0; i < count; i++) {
-		blit_command blit;
+		xy_source_blit_command blit;
 		blit.source_left = params[i].src_left;
 		blit.source_top = params[i].src_top;
 		blit.dest_left = params[i].dest_left;
 		blit.dest_top = params[i].dest_top;
 		blit.dest_right = params[i].dest_left + params[i].width + 1;
 		blit.dest_bottom = params[i].dest_top + params[i].height + 1;
+
+		queue.Put(blit, sizeof(blit));
+	}
+}
+
+
+void
+intel_fill_rectangle(engine_token *token, uint32 color, fill_rect_params *params,
+	uint32 count)
+{
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
+
+	for (uint32 i = 0; i < count; i++) {
+		xy_color_blit_command blit(false);
+		blit.dest_left = params[i].left;
+		blit.dest_top = params[i].top;
+		blit.dest_right = params[i].right + 1;
+		blit.dest_bottom = params[i].bottom + 1;
+		blit.color = color;
+
+		queue.Put(blit, sizeof(blit));
+	}
+}
+
+
+void
+intel_invert_rectangle(engine_token *token, fill_rect_params *params, uint32 count)
+{
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
+
+	for (uint32 i = 0; i < count; i++) {
+		xy_color_blit_command blit(true);
+		blit.dest_left = params[i].left;
+		blit.dest_top = params[i].top;
+		blit.dest_right = params[i].right + 1;
+		blit.dest_bottom = params[i].bottom + 1;
+		blit.color = 0xffffffff;
 
 		queue.Put(blit, sizeof(blit));
 	}

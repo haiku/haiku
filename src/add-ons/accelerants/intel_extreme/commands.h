@@ -38,7 +38,7 @@ class QueueCommands {
 
 // commands
 
-struct blit_command : command {
+struct xy_command : command {
 	uint16	dest_bytes_per_row;
 	uint8	raster_operation;
 	uint8	flags;
@@ -47,15 +47,10 @@ struct blit_command : command {
 	uint16	dest_right;
 	uint16	dest_bottom;
 	uint32	dest_base;
-	uint16	source_left;
-	uint16	source_top;
-	uint16	source_bytes_per_row;
-	uint16	reserved;
-	uint32	source_base;
 
-	blit_command()
+	xy_command(uint32 command, uint16 rop)
 	{
-		opcode = COMMAND_BLIT;
+		opcode = command;
 		switch (gInfo->shared_info->bits_per_pixel) {
 			case 8:
 				flags = 0;
@@ -71,10 +66,35 @@ struct blit_command : command {
 				opcode |= COMMAND_BLIT_RGBA;
 				break;
 		}
-		dest_base = source_base = gInfo->shared_info->frame_buffer_offset;
-		dest_bytes_per_row = source_bytes_per_row = gInfo->shared_info->bytes_per_row;
+
+		dest_bytes_per_row = gInfo->shared_info->bytes_per_row;
+		dest_base = gInfo->shared_info->frame_buffer_offset;
+		raster_operation = rop;
+	}
+};
+
+struct xy_source_blit_command : xy_command {
+	uint16	source_left;
+	uint16	source_top;
+	uint16	source_bytes_per_row;
+	uint16	reserved;
+	uint32	source_base;
+
+	xy_source_blit_command()
+		: xy_command(XY_COMMAND_SOURCE_BLIT, 0xcc)
+	{
+		source_bytes_per_row = dest_bytes_per_row;
+		source_base = dest_base;
 		reserved = 0;
-		raster_operation = 0xcc;
+	}
+};
+
+struct xy_color_blit_command : xy_command {
+	uint32	color;
+
+	xy_color_blit_command(bool invert)
+		: xy_command(XY_COMMAND_COLOR_BLIT, invert ? 0x55 : 0xf0)
+	{
 	}
 };
 

@@ -248,7 +248,9 @@ struct intel_free_graphics_memory {
 #define OVERLAY_UPDATE_COEFFICIENTS		0x1
 
 // 2D acceleration
-#define COMMAND_BLIT					0x54c00006
+#define XY_COMMAND_SOURCE_BLIT			0x54c00006
+#define XY_COMMAND_COLOR_BLIT			0x54000004
+#define COMMAND_COLOR_BLIT				0x50000003
 #define COMMAND_BLIT_RGBA				0x00300000
 
 // overlay
