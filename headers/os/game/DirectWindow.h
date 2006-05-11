@@ -133,7 +133,7 @@ virtual void        	_ReservedDirectWindow4();
 		BDirectWindow(BDirectWindow &);
 		BDirectWindow &operator=(BDirectWindow &);
 
-		bool				deamon_killer;
+		bool				daemon_killer;
 		bool				connection_enable;
 		bool				full_screen_enable;
 		bool				direct_driver_ready;
@@ -151,13 +151,13 @@ virtual void        	_ReservedDirectWindow4();
 		uint32				direct_driver_token;
 		area_id				cloned_clipping_area;
 		area_id				source_clipping_area;
-		thread_id			direct_deamon_id;
+		thread_id			direct_daemon_id;
 		direct_buffer_info	*buffer_desc;
 		BDirectDriver		*direct_driver;
 		struct priv_ext		*extension;
 		uint32				_reserved_[15];
 
-static	int32				DirectDeamonFunc(void *arg);
+static	int32				DirectDaemonFunc(void *arg);
 		bool				LockDirect() const;
 		void				UnlockDirect() const;
 		void				InitData();

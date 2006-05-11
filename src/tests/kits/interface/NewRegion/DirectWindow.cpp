@@ -18,7 +18,7 @@
 #include <ServerProtocol.h>
 
 
-// We don't need this kind of locking, since the directDeamonFunc 
+// We don't need this kind of locking, since the directDaemonFunc 
 // doesn't access critical shared data.
 #define DW_NEEDS_LOCKING 0
 
@@ -301,11 +301,11 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 
 
 int32
-BDirectWindow::DirectDeamonFunc(void *arg)
+BDirectWindow::DirectDaemonFunc(void *arg)
 {
 	BDirectWindow *object = static_cast<BDirectWindow *>(arg);
 
-	while (!object->deamon_killer) {
+	while (!object->daemon_killer) {
 		// This sem is released by the app_server when our
 		// clipping region changes, or when our window is moved,
 		// resized, etc. etc.
@@ -347,7 +347,7 @@ BDirectWindow::DirectDeamonFunc(void *arg)
 // I implemented them anyway, as they were the first methods I wrote
 // in this class (As you can see, I even needed to cast away their constness
 // to make them do something useful). 
-// They're not needed though, as the direct_deamon_thread doesn't change
+// They're not needed though, as the direct_daemon_thread doesn't change
 // any shared data. They are probably here for future enhancements (see also the 
 // comment in DriverSetup()
 bool
@@ -440,15 +440,15 @@ BDirectWindow::InitData()
 	if (cloned_clipping_area > 0) {			
 		dw_init_status |= DW_STATUS_AREA_CLONED;
 
-		direct_deamon_id = spawn_thread(DirectDeamonFunc, "direct deamon",
+		direct_daemon_id = spawn_thread(DirectDaemonFunc, "direct daemon",
 				B_DISPLAY_PRIORITY, this);
 
-		if (direct_deamon_id > 0) {
-			deamon_killer = false;
-			if (resume_thread(direct_deamon_id) == B_OK)
+		if (direct_daemon_id > 0) {
+			daemon_killer = false;
+			if (resume_thread(direct_daemon_id) == B_OK)
 				dw_init_status |= DW_STATUS_THREAD_STARTED;
 			else
-				kill_thread(direct_deamon_id);
+				kill_thread(direct_daemon_id);
 		}
 	}
 }
@@ -466,12 +466,12 @@ BDirectWindow::DisposeData()
 	LockDirect();
 	
 	if (dw_init_status & DW_STATUS_THREAD_STARTED) {
-		deamon_killer = true;
-		// Release this sem, otherwise the Direct deamon thread
+		daemon_killer = true;
+		// Release this sem, otherwise the Direct daemon thread
 		// will wait forever on it
 		release_sem(disable_sem);
 		status_t retVal;
-		wait_for_thread(direct_deamon_id, &retVal);
+		wait_for_thread(direct_daemon_id, &retVal);
 	}
 	
 #if DW_NEEDS_LOCKING
