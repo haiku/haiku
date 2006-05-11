@@ -12,7 +12,7 @@
 #include "commands.h"
 
 
-#define TRACE_ENGINE
+//#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -39,20 +39,23 @@ QueueCommands::~QueueCommands()
 		_Write(COMMAND_NOOP);
 	}
 
-	write32(fRingBuffer.register_base + RING_BUFFER_TAIL, fRingBuffer.position);
-
 	// We must make sure memory is written back in case the ring buffer
 	// is in write combining mode - releasing the lock does this, as the
 	// buffer is flushed on a locked memory operation (which is what this
-	// benaphore does)
+	// benaphore does), but it must happen before writing the new tail...
+	int32 flush;
+	atomic_add(&flush, 1);
+
+	write32(fRingBuffer.register_base + RING_BUFFER_TAIL, fRingBuffer.position);
+
 	release_lock(&fRingBuffer.lock);
 }
 
 
 void
-QueueCommands::Put(struct command &command)
+QueueCommands::Put(struct command &command, size_t size)
 {
-	uint32 count = command.Length();
+	uint32 count = size / sizeof(uint32);
 	uint32 *data = command.Data();
 
 	_MakeSpace(count);
@@ -174,6 +177,20 @@ void
 intel_wait_engine_idle(void)
 {
 	TRACE(("intel_wait_engine_idle()\n"));
+
+	// TODO: this should only be a temporary solution!
+	// a better way to do this would be to acquire the engine's lock and
+	// sync to the latest token
+
+	ring_buffer &ring = gInfo->shared_info->primary_ring_buffer;
+	uint32 head, tail;
+	do {
+		head = read32(ring.register_base + RING_BUFFER_HEAD) & INTEL_RING_BUFFER_HEAD_MASK;
+		tail = read32(ring.register_base + RING_BUFFER_TAIL) & INTEL_RING_BUFFER_HEAD_MASK;
+
+		//snooze(100);
+		// Isn't a snooze() a bit too slow? At least it's called *very* often in Haiku...
+	} while (head != tail);
 }
 
 
@@ -189,6 +206,7 @@ status_t
 intel_sync_to_token(sync_token *syncToken)
 {
 	TRACE(("intel_sync_to_token()\n"));
+	intel_wait_engine_idle();
 	return B_OK;
 }
 
@@ -207,10 +225,10 @@ intel_screen_to_screen_blit(engine_token *token, blit_params *params, uint32 cou
 		blit.source_top = params[i].src_top;
 		blit.dest_left = params[i].dest_left;
 		blit.dest_top = params[i].dest_top;
-		blit.dest_right = params[i].dest_left + params[i].width;
-		blit.dest_bottom = params[i].dest_top + params[i].height;
+		blit.dest_right = params[i].dest_left + params[i].width + 1;
+		blit.dest_bottom = params[i].dest_top + params[i].height + 1;
 
-		queue.Put(blit);
+		queue.Put(blit, sizeof(blit));
 	}
 }
 

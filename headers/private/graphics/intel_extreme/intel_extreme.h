@@ -176,6 +176,7 @@ struct intel_free_graphics_memory {
 #define RING_BUFFER_START				0x8
 #define RING_BUFFER_CONTROL				0xc
 #define INTEL_RING_BUFFER_SIZE_MASK		0x000ff800
+#define INTEL_RING_BUFFER_HEAD_MASK		0x001ffffc
 #define INTEL_RING_BUFFER_ENABLED		1
 
 #define INTEL_DISPLAY_HTOTAL			0x60000
@@ -248,6 +249,7 @@ struct intel_free_graphics_memory {
 
 // 2D acceleration
 #define COMMAND_BLIT					0x54c00006
+#define COMMAND_BLIT_RGBA				0x00300000
 
 // overlay
 

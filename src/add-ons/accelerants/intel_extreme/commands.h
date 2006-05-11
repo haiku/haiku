@@ -16,7 +16,6 @@ struct command {
 	uint32	opcode;
 
 	uint32 *Data() { return &opcode; }
-	virtual size_t Length() = 0;
 };
 
 class QueueCommands {
@@ -24,7 +23,7 @@ class QueueCommands {
 		QueueCommands(ring_buffer &ring);
 		~QueueCommands();
 
-		void Put(struct command &command);
+		void Put(struct command &command, size_t size);
 		void PutFlush();
 		void PutWaitFor(uint32 event);
 		void PutOverlayFlip(uint32 code, bool updateCoefficients);
@@ -40,9 +39,9 @@ class QueueCommands {
 // commands
 
 struct blit_command : command {
-	uint8	flags;
-	uint8	raster_operation;
 	uint16	dest_bytes_per_row;
+	uint8	raster_operation;
+	uint8	flags;
 	uint16	dest_left;
 	uint16	dest_top;
 	uint16	dest_right;
@@ -69,14 +68,14 @@ struct blit_command : command {
 				break;
 			case 32:
 				flags = 3;
+				opcode |= COMMAND_BLIT_RGBA;
 				break;
 		}
 		dest_base = source_base = gInfo->shared_info->frame_buffer_offset;
 		dest_bytes_per_row = source_bytes_per_row = gInfo->shared_info->bytes_per_row;
 		reserved = 0;
+		raster_operation = 0xcc;
 	}
-
-	virtual size_t Length() { return 6; }
 };
 
 #endif	// COMMANDS_H
