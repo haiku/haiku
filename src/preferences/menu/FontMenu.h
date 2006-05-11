@@ -6,6 +6,7 @@
 class FontSizeMenu : public AutoSettingsMenu {
 public:
 			FontSizeMenu();
+	virtual void	AttachedToWindow();
 };
 	
 
