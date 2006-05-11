@@ -82,8 +82,8 @@ TrackSlider::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_OVER);
 	
 	SetHighColor(216,216,216);
-	FillRect(BRect(0,1,fPositionX < 18 ? 18 : fPositionX-26,SLIDER_BASE));
-	FillRect(BRect(fPositionX < 18 ? 65 : fPositionX > fRight - 3 ? fRight : fPositionX+26,0,Bounds().right,SLIDER_BASE));
+	FillRect(BRect(0,1,fPositionX < 18 ? 18 : fPositionX-22,SLIDER_BASE));
+	FillRect(BRect(fPositionX < 18 ? 65 : fPositionX > fRight - 3 ? fRight : fPositionX+22,0,Bounds().right,SLIDER_BASE));
 	FillRect(BRect(0,0,Bounds().right,0));
 	FillRect(BRect(0,SLIDER_BASE+18,Bounds().right,SLIDER_BASE+21));
 	FillRect(BRect(0,0,10,SLIDER_BASE+21));
@@ -234,27 +234,32 @@ TrackSlider::DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 	rgb_color blue2 = {146,146,214};
 	rgb_color white = {255,255,255};
 	
+	char string[12];
+	TimeToString(timestamp, string);
+	int32 halfwidth = ((int32)fFont.StringWidth(string)) / 2;
+	
 	float counterX = position;
 	if (counterX < 39)
 		counterX = 39;
 	if (counterX > fRight - 23)
 		counterX = fRight - 23;
-	BeginLineArray(30);
+	
+	BeginLineArray(4);
 	if (!isTracking) {
-		AddLine(BPoint(counterX-24,SLIDER_BASE+1), BPoint(counterX+24,SLIDER_BASE+1), gray);
-		AddLine(BPoint(counterX+25,SLIDER_BASE+1), BPoint(counterX+25,SLIDER_BASE-8), gray);
-		AddLine(BPoint(counterX-25,SLIDER_BASE+1), BPoint(counterX-25,SLIDER_BASE-9), white);
-		AddLine(BPoint(counterX-24,SLIDER_BASE-9), BPoint(counterX+25,SLIDER_BASE-9), white);
+		AddLine(BPoint(counterX-halfwidth-3,SLIDER_BASE+1), BPoint(counterX+halfwidth+3,SLIDER_BASE+1), gray);
+		AddLine(BPoint(counterX+halfwidth+4,SLIDER_BASE+1), BPoint(counterX+halfwidth+4,SLIDER_BASE-8), gray);
+		AddLine(BPoint(counterX-halfwidth-4,SLIDER_BASE+1), BPoint(counterX-halfwidth-4,SLIDER_BASE-9), white);
+		AddLine(BPoint(counterX-halfwidth-3,SLIDER_BASE-9), BPoint(counterX+halfwidth+4,SLIDER_BASE-9), white);
 		SetHighColor(216,216,216);
 	} else {
-		AddLine(BPoint(counterX-24,SLIDER_BASE+1), BPoint(counterX+24,SLIDER_BASE+1), blue);
-		AddLine(BPoint(counterX+25,SLIDER_BASE+1), BPoint(counterX+25,SLIDER_BASE-9), blue2);
-		AddLine(BPoint(counterX-25,SLIDER_BASE+1), BPoint(counterX-25,SLIDER_BASE-9), blue2);
-		AddLine(BPoint(counterX-24,SLIDER_BASE-9), BPoint(counterX+24,SLIDER_BASE-9), blue2);
+		AddLine(BPoint(counterX-halfwidth-3,SLIDER_BASE+1), BPoint(counterX+halfwidth+3,SLIDER_BASE+1), blue);
+		AddLine(BPoint(counterX+halfwidth+4,SLIDER_BASE+1), BPoint(counterX+halfwidth+4,SLIDER_BASE-9), blue2);
+		AddLine(BPoint(counterX-halfwidth-4,SLIDER_BASE+1), BPoint(counterX-halfwidth-4,SLIDER_BASE-9), blue2);
+		AddLine(BPoint(counterX-halfwidth-3,SLIDER_BASE-9), BPoint(counterX+halfwidth+3,SLIDER_BASE-9), blue2);
 		SetHighColor(48,48,241);
 	}
 	EndLineArray();
-	FillRect(BRect(counterX-24,SLIDER_BASE-8,counterX+24,SLIDER_BASE));
+	FillRect(BRect(counterX-halfwidth-3,SLIDER_BASE-8,counterX+halfwidth+3,SLIDER_BASE));
 
 	SetDrawingMode(B_OP_COPY);
 	if (isTracking)
@@ -264,9 +269,7 @@ TrackSlider::DrawCounter(bigtime_t timestamp, float position, bool isTracking)
 	SetLowColor(ViewColor());
 	
 	SetFont(&fFont);
-	char string[12];
-	TimeToString(timestamp, string);
-	DrawString(string, BPoint(counterX-22, SLIDER_BASE-1));
+	DrawString(string, BPoint(counterX-halfwidth, SLIDER_BASE-1));
 
 }
 
