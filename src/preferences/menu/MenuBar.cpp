@@ -116,9 +116,6 @@ MenuBar::Update()
 {
 	// get up-to-date menu info
 	get_menu_info(&info);
-		// update submenus
-	fontMenu->Update();
-	fontSizeMenu->Update();
 		// this needs to be updated in case the Defaults
 	// were requested.
 	if (info.separator == 0)

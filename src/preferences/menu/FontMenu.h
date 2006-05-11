@@ -1,12 +1,11 @@
 #ifndef __FONTMENU_H
 #define __FONTMENU_H
 
-#include <Menu.h>
+#include "AutoSettingsMenu.h"
 
-class FontSizeMenu : public BMenu {
+class FontSizeMenu : public AutoSettingsMenu {
 public:
 			FontSizeMenu();
-	virtual void	Update();
 
 private:	
 	menu_info 	info;
@@ -19,19 +18,16 @@ private:
 };
 	
 
-class FontMenu : public BMenu {
+class FontMenu : public AutoSettingsMenu {
 public:
 			FontMenu();
-	virtual void	GetFonts();
-	virtual void	Update();
-	virtual status_t PlaceCheckMarkOnFont(font_family family, font_style style);
-	virtual void	ClearAllMarkedItems();
-
+	virtual void	AttachedToWindow();
+	void		GetFonts();
+	
+	status_t	PlaceCheckMarkOnFont(font_family family, font_style style);
+	void		ClearAllMarkedItems();
 private:
 	menu_info	info;
-	BMenuItem	*fontFamily;
-	BMenu		*fontStyleMenu;
-	BMenuItem	*fontStyleItem;
 };
 
 #endif

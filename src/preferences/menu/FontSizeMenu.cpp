@@ -6,7 +6,7 @@
 #include <Window.h>
 
 FontSizeMenu::FontSizeMenu()
-	:BMenu("Font Size", B_ITEMS_IN_COLUMN)
+	:AutoSettingsMenu("Font Size", B_ITEMS_IN_COLUMN)
 {		
 	get_menu_info(&info);
 	
@@ -48,24 +48,4 @@ FontSizeMenu::FontSizeMenu()
 	
 	SetTargetForItems(Window());
 	SetRadioMode(true);
-}
-
-
-void
-FontSizeMenu::Update()
-{
-	get_menu_info(&info);
-	BFont font;
-		
-	if (LockLooper()) {
-		font.SetFamilyAndStyle(info.f_family, info.f_style);
-		font.SetSize(info.font_size);
-		SetFont(&font);
-		SetViewColor(info.background_color);
-		InvalidateLayout();
-		Invalidate();
-		UnlockLooper();
-	}
-	
-	SetEnabled(true);
 }

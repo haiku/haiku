@@ -7,13 +7,33 @@
 #include <MenuItem.h>
 
 FontMenu::FontMenu()
-	: BMenu("Font", B_ITEMS_IN_COLUMN)
+	: AutoSettingsMenu("Font", B_ITEMS_IN_COLUMN)
 {
 	get_menu_info(&info);
 	SetRadioMode(true);
 	GetFonts();
 }
+
+
+void
+FontMenu::AttachedToWindow()
+{
+	AutoSettingsMenu::AttachedToWindow();
 	
+	BFont font;
+	GetFont(&font);
+
+	// font style menus 		
+	for (int i = 0; i < CountItems(); i++)
+		ItemAt(i)->Submenu()->SetFont(&font);
+	
+	ClearAllMarkedItems();
+	menu_info info;
+	get_menu_info(&info);
+	PlaceCheckMarkOnFont(info.f_family, info.f_style);
+}
+
+
 void
 FontMenu::GetFonts()
 {
@@ -22,7 +42,7 @@ FontMenu::GetFonts()
 		font_family *family = (font_family*)malloc(sizeof(font_family));
 		uint32 flags;
 		if ( get_font_family(i, family, &flags) == B_OK ) {
-			fontStyleMenu = new BMenu(*family, B_ITEMS_IN_COLUMN);
+			BMenu *fontStyleMenu = new BMenu(*family, B_ITEMS_IN_COLUMN);
 			fontStyleMenu->SetRadioMode(true);
 			int32 numStyles = count_font_styles(*family);
 			for ( int32 j = 0; j < numStyles; j++ ) {
@@ -31,7 +51,7 @@ FontMenu::GetFonts()
 					BMessage *msg = new BMessage(MENU_FONT_STYLE);
 					msg->AddPointer("family", family);
 					msg->AddPointer("style", style);
-					fontStyleItem = new BMenuItem(*style, msg, 0, 0);
+					BMenuItem *fontStyleItem = new BMenuItem(*style, msg, 0, 0);
 					fontStyleMenu->AddItem(fontStyleItem);
 				}
 			}
@@ -42,56 +62,25 @@ FontMenu::GetFonts()
 			// first style
 			if ( get_font_style(*family, 0, style, &flags) == B_OK )
 				msg->AddPointer("style", style);
-			fontFamily = new BMenuItem(fontStyleMenu, msg);
+			BMenuItem *fontFamily = new BMenuItem(fontStyleMenu, msg);
 			AddItem(fontFamily);
 		}
 	}
 }
 
 
-void
-FontMenu::Update()
-{
-	// it may be better to pull all menu prefs
-	// related stuff out of the FontMenu class
-	// so it can be easily reused in other apps
-	get_menu_info(&info);
-	
-	// font menu
-	BFont font;
-	font.SetFamilyAndStyle(info.f_family, info.f_style);
-	font.SetSize(info.font_size);
-		
-	if (LockLooper()) {	
-		SetFont(&font);
-		SetViewColor(info.background_color);
-		// font style menus 		
-		for (int i = 0; i < CountItems(); i++)
-			ItemAt(i)->Submenu()->SetFont(&font);
-		InvalidateLayout();
-		Invalidate();
-		UnlockLooper();
-	}
-
-	ClearAllMarkedItems();
-	PlaceCheckMarkOnFont(info.f_family, info.f_style);
-}
 
 
 status_t 
 FontMenu::PlaceCheckMarkOnFont(font_family family, font_style style)
 {
-	BMenuItem *fontFamilyItem;
-	BMenuItem *fontStyleItem;
-	BMenu *styleMenu;
-
-	fontFamilyItem = FindItem(family);
-	if ((fontFamilyItem != NULL) && (family != NULL)) {
+	BMenuItem *fontFamilyItem = FindItem(family);
+	if (fontFamilyItem != NULL && family != NULL) {
 		fontFamilyItem->SetMarked(true);
-		styleMenu = fontFamilyItem->Submenu();
+		BMenu *styleMenu = fontFamilyItem->Submenu();
 	
-		if ((styleMenu != NULL) && (style != NULL)) {
-			fontStyleItem = styleMenu->FindItem(style);
+		if (styleMenu != NULL && style != NULL) {
+			BMenuItem *fontStyleItem = styleMenu->FindItem(style);
 			if (fontStyleItem != NULL)
 				fontStyleItem->SetMarked(true);
 		
