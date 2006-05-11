@@ -493,7 +493,8 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	// update backbuffer if neccessary
 	if (!fBackBuffer || fBackBuffer->Width() != fDisplayMode.virtual_width
-		|| fBackBuffer->Height() != fDisplayMode.virtual_height) {
+		|| fBackBuffer->Height() != fDisplayMode.virtual_height
+		|| (fDisplayMode.space == B_RGB32 && fBackBuffer != NULL && !HWInterface::IsDoubleBuffered())) {
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
