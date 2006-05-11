@@ -1,6 +1,7 @@
 #include "ColorWindow.h"
 #include "MenuApp.h"
 #include "MenuBar.h"
+#include "MenuSettings.h"
 #include "MenuWindow.h"
 #include "msg.h"
 
@@ -17,9 +18,6 @@ MenuWindow::MenuWindow(BRect rect)
 	: BWindow(rect, "Menu", B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
- 	get_menu_info(&revert_info);
- 	get_menu_info(&info);
- 	
  	revert = false;
  	
 	menuView = new BBox(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
@@ -54,15 +52,19 @@ MenuWindow::MenuWindow(BRect rect)
 void
 MenuWindow::MessageReceived(BMessage *msg)
 {
+	MenuSettings *settings = MenuSettings::GetInstance();
+	menu_info info;
 	switch(msg->what) {
 		case MENU_REVERT:
-			set_menu_info(&revert_info);
 			revert = false;
+			settings->Revert();
 			Update();
 			break;
 			
 		case MENU_DEFAULT:
-			Defaults();
+			revert = true;
+			settings->ResetToDefaults();
+			Update();
 			break;
 			
 		case UPDATE_WINDOW:
@@ -72,42 +74,40 @@ MenuWindow::MessageReceived(BMessage *msg)
 		case MENU_FONT_FAMILY:
 		case MENU_FONT_STYLE:
 		{
+			revert = true;
 			font_family *family;
 			msg->FindPointer("family", (void**)&family);
 			font_style *style;
 			msg->FindPointer("style", (void**)&style);
+			settings->Get(info);
 			memcpy(info.f_family, family, sizeof(info.f_family));
 			memcpy(info.f_style, style, sizeof(info.f_style));
-			set_menu_info(&info);
+			settings->Set(info);
 			Update();
 			break;
 		}
 		
 		case MENU_FONT_SIZE:
 			revert = true;
-			float fontSize;
-			msg->FindFloat("size", &fontSize);
-			info.font_size = fontSize;
-			set_menu_info(&info);
+			settings->Get(info);
+			msg->FindFloat("size", &info.font_size);
+			settings->Set(info);
 			Update();
 			break;
 				
 		case MENU_SEP_TYPE:
 			revert = true;
-			int32 i;
-			msg->FindInt32("sep", &i);
-			info.separator = i;
-			set_menu_info(&info);
+			settings->Get(info);
+			msg->FindInt32("sep", &info.separator);
+			settings->Set(info);
 			Update();
 			break;
 		
 		case ALLWAYS_TRIGGERS_MSG:
 			revert = true;
-			if (info.triggers_always_shown != true)
-				info.triggers_always_shown = true;
-			else
-				info.triggers_always_shown = false;
-			set_menu_info(&info);
+			settings->Get(info);
+			info.triggers_always_shown = !info.triggers_always_shown;
+			settings->Set(info);
 			menuBar->set_menu();
 			Update();
 			break;
@@ -141,7 +141,6 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 		
 		case MENU_COLOR:
-			get_menu_info(&info);
 			revert = true;
 			Update();
 			break;
@@ -160,31 +159,4 @@ MenuWindow::Update()
    
 	// alert the rest of the application to update	
 	menuBar->Update();
-}
-
-
-void
-MenuWindow::Defaults()
-{
-	// to set the default color. this should be changed 
-	// to the system color for system wide compatability.
-	rgb_color color;
-	color.red = 219;
-	color.blue = 219;
-	color.green = 219;
-	color.alpha = 255;
-
-	// the default settings. possibly a call to the app_server
-	// would provide and execute this information, as it does
-	// for get_menu_info and set_menu_info (or is this information
-	// coming from libbe.so? or else where?). 
-	info.font_size = 12;
-	//info.f_family = "test";
-	//info.f_style = "test";
-	info.background_color = color;
-	info.separator = 0;
-	info.click_to_open = true;
-	info.triggers_always_shown = false;
-	set_menu_info(&info);
-	Update();
 }

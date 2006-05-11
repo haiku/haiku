@@ -7,7 +7,8 @@ Preference Menu :
 	FontMenu.cpp 
 	FontSizeMenu.cpp 
 	MenuApp.cpp 
-	MenuBar.cpp 
+	MenuBar.cpp
+	MenuSettings.cpp
 	MenuWindow.cpp 
 	: libtranslation.so libbe.so
 	: Menu.rdef

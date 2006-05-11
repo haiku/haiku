@@ -1,4 +1,5 @@
 #include "FontMenu.h"
+#include "MenuSettings.h"
 #include "msg.h"
 
 #include <stdlib.h>
@@ -9,7 +10,6 @@
 FontMenu::FontMenu()
 	: AutoSettingsMenu("Font", B_ITEMS_IN_COLUMN)
 {
-	get_menu_info(&info);
 	SetRadioMode(true);
 	GetFonts();
 }
@@ -29,7 +29,7 @@ FontMenu::AttachedToWindow()
 	
 	ClearAllMarkedItems();
 	menu_info info;
-	get_menu_info(&info);
+	MenuSettings::GetInstance()->Get(info);
 	PlaceCheckMarkOnFont(info.f_family, info.f_style);
 }
 

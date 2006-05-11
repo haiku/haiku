@@ -13,12 +13,10 @@ public:
 	virtual	void	AttachedToWindow();
 		void	set_menu();
 		void	build_menu();
-	virtual void	Update();
+		void	Update();
 	virtual void 	FrameResized(float width, float height);
 
 private:	
-	menu_info 		info;
-	
 	//seperator submenu
 	BMenu			*separatorStyleMenu;
 	BMenuItem		*separatorStyleZero;

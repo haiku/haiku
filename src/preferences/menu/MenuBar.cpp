@@ -1,6 +1,7 @@
 #include "BitmapMenuItem.h"
 #include "FontMenu.h"
 #include "MenuBar.h"
+#include "MenuSettings.h"
 #include "msg.h"
 
 #include <Application.h>
@@ -14,7 +15,6 @@
 MenuBar::MenuBar()
 	:BMenuBar(BRect(40,10,10,10), "menu", B_FOLLOW_TOP|B_FRAME_EVENTS, B_ITEMS_IN_COLUMN, true)
 {
-	get_menu_info(&info);
 	build_menu();
 	set_menu();
 	SetItemMargins(14.0, 2.0, 20.0, 0.0);
@@ -88,8 +88,8 @@ MenuBar::set_menu()
        	char *chars; 
        	bool altAsShortcut;
 	
-	// get up-to-date menu info
-	get_menu_info(&info);
+	menu_info info;
+	MenuSettings::GetInstance()->Get(info);
 	
 	alwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
 		
@@ -114,8 +114,8 @@ MenuBar::set_menu()
 void
 MenuBar::Update()
 {
-	// get up-to-date menu info
-	get_menu_info(&info);
+	menu_info info;
+	MenuSettings::GetInstance()->Get(info);
 		// this needs to be updated in case the Defaults
 	// were requested.
 	if (info.separator == 0)

@@ -20,8 +20,6 @@ private:
 	bool		revert;
 	ColorWindow	*colorWindow;
 	BMenuItem 	*toggleItem;
-	menu_info	info;
-	menu_info	revert_info;
 	BMenu		*menu;
 	MenuBar		*menuBar;
 	BBox		*menuView;
