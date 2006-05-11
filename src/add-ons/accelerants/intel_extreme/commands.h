@@ -41,7 +41,7 @@ class QueueCommands {
 struct xy_command : command {
 	uint16	dest_bytes_per_row;
 	uint8	raster_operation;
-	uint8	flags;
+	uint8	mode;
 	uint16	dest_left;
 	uint16	dest_top;
 	uint16	dest_right;
@@ -53,16 +53,16 @@ struct xy_command : command {
 		opcode = command;
 		switch (gInfo->shared_info->bits_per_pixel) {
 			case 8:
-				flags = 0;
+				mode = COMMAND_MODE_CMAP8;
 				break;
 			case 15:
-				flags = 2;
+				mode = COMMAND_MODE_RGB15;
 				break;
 			case 16:
-				flags = 1;
+				mode = COMMAND_MODE_RGB16;
 				break;
 			case 32:
-				flags = 3;
+				mode = COMMAND_MODE_RGB32;
 				opcode |= COMMAND_BLIT_RGBA;
 				break;
 		}
@@ -95,6 +95,36 @@ struct xy_color_blit_command : xy_command {
 	xy_color_blit_command(bool invert)
 		: xy_command(XY_COMMAND_COLOR_BLIT, invert ? 0x55 : 0xf0)
 	{
+	}
+};
+
+struct xy_setup_mono_pattern_command : xy_command {
+	uint32	background_color;
+	uint32	foreground_color;
+	uint64	pattern;
+
+	xy_setup_mono_pattern_command()
+		: xy_command(XY_COMMAND_SETUP_MONO_PATTERN, 0xf0)
+	{
+		mode |= COMMAND_MODE_SOLID_PATTERN;
+
+		// this defines the clipping window (but clipping is disabled)
+		dest_left = 0;
+		dest_top = 0;
+		dest_right = 0;
+		dest_bottom = 0;
+	}
+};
+
+struct xy_scanline_blit_command : command {
+	uint16	dest_left;
+	uint16	dest_top;
+	uint16	dest_right;
+	uint16	dest_bottom;
+
+	xy_scanline_blit_command()
+	{
+		opcode = XY_COMMAND_SCANLINE_BLIT;
 	}
 };
 

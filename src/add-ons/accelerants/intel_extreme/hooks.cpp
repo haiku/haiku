@@ -89,10 +89,9 @@ get_accelerant_hook(uint32 feature, void *data)
 			return intel_fill_rectangle;
 		case B_INVERT_RECTANGLE:
 			return intel_invert_rectangle;
-/*
 		case B_FILL_SPAN:
 			return intel_fill_span;
-*/
+
 		// overlay
 		case B_OVERLAY_COUNT:
 			return intel_overlay_supported_spaces;

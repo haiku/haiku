@@ -274,3 +274,28 @@ intel_invert_rectangle(engine_token *token, fill_rect_params *params, uint32 cou
 	}
 }
 
+
+void
+intel_fill_span(engine_token *token, uint32 color, uint16* _params, uint32 count)
+{
+	struct params {
+		uint16	top;
+		uint16	left;
+		uint16	right;
+	} *params = (struct params *)_params;
+
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
+
+	xy_setup_mono_pattern_command setup;
+	setup.background_color = color;
+	setup.pattern = 0;
+	queue.Put(setup, sizeof(setup));
+
+	for (uint32 i = 0; i < count; i++) {
+		xy_scanline_blit_command blit;
+		blit.dest_left = params[i].left;
+		blit.dest_top = params[i].top;
+		blit.dest_right = params[i].right;
+		blit.dest_bottom = params[i].top;
+	}
+}
