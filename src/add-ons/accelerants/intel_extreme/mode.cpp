@@ -250,10 +250,10 @@ intel_set_display_mode(display_mode *mode)
 	intel_free_memory(gInfo->frame_buffer_handle);
 
 	uint32 offset;
-	if (intel_allocate_memory(bytesPerRow * current.timing.v_display,
+	if (intel_allocate_memory(bytesPerRow * current.virtual_height,
 			gInfo->frame_buffer_handle, offset) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way back
-		if (intel_allocate_memory(gInfo->shared_info->current_mode.timing.v_display
+		if (intel_allocate_memory(gInfo->shared_info->current_mode.virtual_height
 				* gInfo->shared_info->bytes_per_row, gInfo->frame_buffer_handle,
 				offset) == B_OK) {
 			gInfo->shared_info->frame_buffer_offset = offset;
@@ -379,7 +379,20 @@ status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
 	TRACE(("intel_move_display()\n"));
-	return B_ERROR;
+	display_mode &mode = gInfo->shared_info->current_mode;
+
+	if (horizontalStart + mode.timing.h_display > mode.virtual_width
+		|| verticalStart + mode.timing.v_display > mode.virtual_height)
+		return B_BAD_VALUE;
+
+	mode.h_display_start = horizontalStart;
+	mode.v_display_start = verticalStart;
+
+	write32(INTEL_DISPLAY_BASE, gInfo->shared_info->frame_buffer_offset
+		+ verticalStart * gInfo->shared_info->bytes_per_row
+		+ horizontalStart * (gInfo->shared_info->bits_per_pixel + 7) / 8);
+
+	return B_OK;
 }
 
 
