@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 
-#define TRACE_OVERLAY
+//#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
