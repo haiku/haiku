@@ -617,7 +617,7 @@
 //#define HAVE_SIGINTERRUPT 1
 
 /* Define if you have the POSIX.1-style sigsetjmp function.  */
-#define HAVE_POSIX_SIGSETJMP 1
+//#define HAVE_POSIX_SIGSETJMP 1
 
 /* Define if you have the snprintf function.  */
 #define HAVE_SNPRINTF 1
