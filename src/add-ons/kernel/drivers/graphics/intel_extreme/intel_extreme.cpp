@@ -166,7 +166,7 @@ intel_interrupt_handler(void *data)
 {
 	intel_info &info = *(intel_info *)data;
 
-	uint32 identity = read32(info.registers + INTEL_INTERRUPT_IDENTITY);
+	uint32 identity = read16(info.registers + INTEL_INTERRUPT_IDENTITY);
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
@@ -176,9 +176,11 @@ intel_interrupt_handler(void *data)
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_PIPE_STATUS, DISPLAY_PIPE_VBLANK_ENABLED);
-		write32(info.registers + INTEL_INTERRUPT_IDENTITY, 0);
+		write32(info.registers + INTEL_DISPLAY_PIPE_STATUS, DISPLAY_PIPE_VBLANK_STATUS);
 	}
+
+	// setting the bit clears it!
+	write16(info.registers + INTEL_INTERRUPT_IDENTITY, identity);
 
 	return handled;
 }
@@ -209,15 +211,16 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = false;
 
 		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
-			intel_interrupt_handler, (void *)&info, 0);
+			&intel_interrupt_handler, (void *)&info, 0);
 		if (status == B_OK) {
 			// enable interrupts - we only want VBLANK interrupts
-			write32(info.registers + INTEL_INTERRUPT_ENABLED, INTERRUPT_VBLANK);
-			write32(info.registers + INTEL_INTERRUPT_MASK, ~INTERRUPT_VBLANK);
+			write16(info.registers + INTEL_INTERRUPT_ENABLED,
+				read16(info.registers + INTEL_INTERRUPT_ENABLED) | INTERRUPT_VBLANK);
+			write16(info.registers + INTEL_INTERRUPT_MASK, ~INTERRUPT_VBLANK);
 
 			write32(info.registers + INTEL_DISPLAY_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_ENABLED);
-			write32(info.registers + INTEL_INTERRUPT_IDENTITY, 0);
+				DISPLAY_PIPE_VBLANK_STATUS);
+			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
 		}
 	}
 	if (status < B_OK) {
@@ -412,9 +415,10 @@ intel_extreme_init(intel_info &info)
 	set_gtt_entry(info, totalSize, info.shared_info->physical_cursor_memory);
 
 	AreaKeeper cursorMapper;
+	void *cursorMemory;
 	info.cursor_area = cursorMapper.Map("intel extreme cursor",
 		(void *)(info.shared_info->physical_graphics_memory + totalSize),
-		B_PAGE_SIZE, B_ANY_KERNEL_ADDRESS, 0, (void **)&info.registers);
+		B_PAGE_SIZE, B_ANY_KERNEL_ADDRESS, 0, &cursorMemory);
 	if (cursorMapper.InitCheck() < B_OK) {
 		// we can't do a hardware cursor, then...
 	}
@@ -438,8 +442,8 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write32(info.registers + INTEL_INTERRUPT_ENABLED, 0);
-		write32(info.registers + INTEL_INTERRUPT_MASK, ~0);
+		write16(info.registers + INTEL_INTERRUPT_ENABLED, 0);
+		write16(info.registers + INTEL_INTERRUPT_MASK, ~0);
 
 		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
 			intel_interrupt_handler, &info);
