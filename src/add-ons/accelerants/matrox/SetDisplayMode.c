@@ -390,7 +390,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 			/* calculate MAVEN-CRTC delay: only used during TVout */
 			si->crtc_delay = 17;
-			if (colour_depth1 <= 16) si->crtc_delay += 4;
+			if (colour_depth1 == 16) si->crtc_delay += 4;
 			/* setup CRTC1 and it's pixelclock for TVout */
 			maventv_init(target);
 		}

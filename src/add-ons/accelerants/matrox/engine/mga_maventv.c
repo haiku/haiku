@@ -783,6 +783,8 @@ int maventv_init(display_mode target)
 				case ((TV_NTSC << (14 - 9)) | 720): /* NTSC DVD mode */
 					/* horizontal: adhere to CRTC granularity (8) */
 					tv_target.timing.h_total = 784;
+					/* MGA_TVOs need additional tweaking */
+					if (!si->ps.secondary_head) si->crtc_delay += 12;
 					break;
 				case ((TV_PAL << (14 - 9)) | 768): /* PAL VCD mode */
 					/* horizontal: adhere to CRTC granularity (8) */

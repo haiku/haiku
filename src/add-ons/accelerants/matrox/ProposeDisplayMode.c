@@ -389,7 +389,9 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	{
 	case G100:
 	case G200:
+		/* confirmed most 8-bit modes to be troublesome for TVout (data fetch errors). */
 		if (si->ps.tvout &&
+			((target->space == B_RGB16_LITTLE) || (target->space == B_RGB32_LITTLE)) &&
 			(target->timing.h_display <= 1024) &&
 			(target->timing.v_display <= 768))
 		{
@@ -399,6 +401,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	case G400:
 	case G400MAX:
 		if (si->ps.tvout &&
+			((target->space == B_RGB16_LITTLE) || (target->space == B_RGB32_LITTLE)) &&
 			(target->timing.h_display <= 1024) &&
 			(target->timing.v_display <= 768))
 		{
