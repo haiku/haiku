@@ -38,7 +38,7 @@ rtc_system_to_hw(void)
 	uint32 seconds;
 
 	seconds = (arch_rtc_get_system_time_offset(sRealTimeData) + system_time() 
-		- (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
+		+ (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
 	
 	arch_rtc_set_hw_time(seconds);
 }
