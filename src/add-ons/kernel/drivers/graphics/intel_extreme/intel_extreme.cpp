@@ -11,6 +11,7 @@
 #include "driver.h"
 #include "utility.h"
 
+#include <driver_settings.h>
 #include <util/kernel_cpp.h>
 
 #include <unistd.h>
@@ -88,6 +89,36 @@ init_overlay_registers(overlay_registers *registers)
 	registers->contrast_correction = 0x40;
 	registers->saturation_cos_correction = 0x40;
 		// this by-passes contrast and saturation correction
+}
+
+
+static size_t
+determine_desired_memory_size()
+{
+	size_t size = 8; // 8 MB
+
+	void *settings = load_driver_settings("intel_extreme");
+	if (settings != NULL) {
+		size_t specified = 0;
+		const char *string = get_driver_parameter(settings, "graphics_memory_size", "0", "0");
+		if (string != NULL)
+			specified = atoi(string);
+
+		unload_driver_settings(settings);
+
+		if (specified != 0) {
+			// take the next power of two
+			size_t desired = 1;
+			while (desired < specified) {
+				desired *= 2;
+			}
+
+			if (desired < 128)
+				size = desired;
+		}
+	}
+
+	return size << 20;
 }
 
 
@@ -258,14 +289,17 @@ intel_extreme_init(intel_info &info)
 
 	// Determine the amount of "stolen" (ie. reserved by the BIOS) graphics memory
 	// and see if we need to allocate some more.
-	// TODO: introduce a settings value which you can use to cut down the memory
-	//	requirements, or make it allocate the memory on demand!
+	// TODO: make it allocate the memory on demand!
+
+	size_t totalSize = determine_desired_memory_size();
 
 	size_t stolenSize = determine_stolen_memory_size(info);
-	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory\n", stolenSize / 1024 / 1024);
+	totalSize = max_c(totalSize, stolenSize);
+
+	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory, reserving %ld MB total\n",
+		stolenSize / 1024 / 1024, totalSize / 1024 / 1024);
 
 	AreaKeeper additionalMemoryCreator;
-	size_t totalSize = max_c(8 * 1024 * 1024, stolenSize);
 	uint8 *additionalMemory;
 
 	if (stolenSize < totalSize) {
