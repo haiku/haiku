@@ -91,6 +91,62 @@ init_overlay_registers(overlay_registers *registers)
 }
 
 
+static size_t
+determine_stolen_memory_size(intel_info &info)
+{
+	// read stolen memory from the PCI configuration of the PCI bridge
+	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
+	size_t memorySize = 1024 * 1024;
+
+	// TODO: test with different models!
+
+	if (info.device_type & INTEL_TYPE_83x) {
+		switch (memoryConfig & STOLEN_MEMORY_MASK) {
+			case i830_LOCAL_MEMORY_ONLY:
+				// TODO: determine its size!
+				break;
+			case i830_STOLEN_512K:
+				memorySize >>= 1;
+				break;
+			case i830_STOLEN_8M:
+				memorySize *= 8;
+				break;
+		}
+	} else if (info.device_type & INTEL_TYPE_85x) {
+		switch (memoryConfig & STOLEN_MEMORY_MASK) {
+			case i855_STOLEN_MEMORY_4M:
+				memorySize *= 4;
+				break;
+			case i855_STOLEN_MEMORY_8M:
+				memorySize *= 8;
+				break;
+			case i855_STOLEN_MEMORY_16M:
+				memorySize *= 16;
+				break;
+			case i855_STOLEN_MEMORY_32M:
+				memorySize *= 32;
+				break;
+			case i855_STOLEN_MEMORY_48M:
+				memorySize *= 48;
+				break;
+			case i855_STOLEN_MEMORY_64M:
+				memorySize *= 64;
+				break;
+		}
+	}
+
+	return memorySize;
+}
+
+
+static void
+set_gtt_entry(intel_info &info, uint32 offset, uint8 *physicalAddress)
+{
+	write32(info.registers + INTEL_GTT_BASE + (offset >> 10),
+		(uint32)physicalAddress | GTT_ENTRY_VALID);
+}
+
+
 //	#pragma mark -
 
 
@@ -107,41 +163,35 @@ intel_extreme_init(intel_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(intel_shared_info));
 
-	// get chipset info
+	// Determine the amount of "stolen" (ie. reserved by the BIOS) graphics memory
+	// and see if we need to allocate some more.
+	// TODO: introduce a settings value which you can use to cut down the memory
+	//	requirements, or make it allocate the memory on demand!
 
-	// read stolen memory from the PCI configuration of the PCI bridge
-	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
-	size_t memorySize = 1024 * 1024;
+	size_t stolenSize = determine_stolen_memory_size(info);
+	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory\n", stolenSize / 1024 / 1024);
 
-	// TODO: this doesn't work like this on anything older than i855
-	switch (memoryConfig & STOLEN_MEMORY_MASK) {
-		case i855_STOLEN_MEMORY_4M:
-			memorySize *= 4;
-			break;
-		case i855_STOLEN_MEMORY_8M:
-			memorySize *= 8;
-			break;
-		case i855_STOLEN_MEMORY_16M:
-			memorySize *= 16;
-			break;
-		case i855_STOLEN_MEMORY_32M:
-			memorySize *= 32;
-			break;
-		case i855_STOLEN_MEMORY_48M:
-			memorySize *= 48;
-			break;
-		case i855_STOLEN_MEMORY_64M:
-			memorySize *= 64;
-			break;
-	}
-	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory\n", memorySize / 1024 / 1024);
+	AreaKeeper additionalMemoryCreator;
+	size_t totalSize = max_c(8 * 1024 * 1024, stolenSize);
+	uint8 *additionalMemory;
+
+	if (stolenSize < totalSize) {
+		// Every device should have at least 8 MB - we could also allocate them
+		// on demand only, but we're lazy here...
+		info.additional_memory_area = additionalMemoryCreator.Create("intel additional memory",
+			(void **)&additionalMemory, B_ANY_KERNEL_ADDRESS,
+			totalSize - stolenSize, B_FULL_LOCK, 0);
+		if (info.additional_memory_area < B_OK)
+			return info.additional_memory_area;
+	} else
+		info.additional_memory_area = B_ERROR;
 
 	// map frame buffer, try to map it write combined
 
 	AreaKeeper graphicsMapper;
 	info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 		(void *)info.pci->u.h0.base_registers[0],
-		memorySize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		totalSize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	if (graphicsMapper.InitCheck() < B_OK) {
 		// try again without write combining
@@ -149,7 +199,7 @@ intel_extreme_init(intel_info &info)
 
 		info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 			(void *)info.pci->u.h0.base_registers[0],
-			memorySize/*info.pci->u.h0.base_register_sizes[0]*/, B_ANY_KERNEL_BLOCK_ADDRESS,
+			totalSize/*info.pci->u.h0.base_register_sizes[0]*/, B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	}
 	if (graphicsMapper.InitCheck() < B_OK) {
@@ -163,9 +213,7 @@ intel_extreme_init(intel_info &info)
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
 		(void *)info.pci->u.h0.base_registers[1],
 		info.pci->u.h0.base_register_sizes[1],
-		B_ANY_KERNEL_BLOCK_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA,
-		(void **)&info.registers);
+		B_ANY_KERNEL_ADDRESS, 0, (void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		return info.registers_area;
@@ -173,8 +221,8 @@ intel_extreme_init(intel_info &info)
 
 	// init graphics memory manager
 
-	info.memory_manager = mem_init("intel extreme memory manager", 0, memorySize, 1024, 
-		min_c(memorySize / 1024, 512));
+	info.memory_manager = mem_init("intel extreme memory manager", 0, totalSize, 1024, 
+		min_c(totalSize / 1024, 512));
 	if (info.memory_manager == NULL)
 		return B_NO_MEMORY;
 
@@ -208,7 +256,7 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->graphics_memory = info.graphics_memory;
 	info.shared_info->physical_graphics_memory = (uint8 *)info.pci->u.h0.base_registers[0];
 
-	info.shared_info->graphics_memory_size = memorySize;
+	info.shared_info->graphics_memory_size = totalSize;
 	info.shared_info->frame_buffer_offset = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
 	info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
@@ -245,6 +293,43 @@ intel_extreme_init(intel_info &info)
 		B_PAGE_SIZE, &physicalEntry, 1);
 	info.shared_info->physical_cursor_memory = (uint8 *)physicalEntry.address;
 
+	// setup the GTT to point to include the additional memory
+
+	if (stolenSize < totalSize) {
+		for (size_t offset = stolenSize; offset < totalSize;) {
+			physical_entry physicalEntry;
+			get_memory_map(additionalMemory + offset - stolenSize,
+				totalSize - offset, &physicalEntry, 1);
+	
+			for (size_t i = 0; i < physicalEntry.size; i += B_PAGE_SIZE) {
+				set_gtt_entry(info, offset + i, (uint8 *)physicalEntry.address + i);
+			}
+	
+			offset += physicalEntry.size;
+		}
+	}
+
+	// We also need to map the cursor memory into the GTT
+
+	// This could also be part of the usual graphics memory, but for some
+	// reason we need its physical address, too - and we only know that of
+	// the additional memory we allocated.
+	// Unfortunately, the GTT is not readable - we would need to compute
+	// the physical location of stolen memory with some heuristics (as it
+	// should be taken from the top of system memory), and hope that the
+	// BIOS adhered to this specification.
+
+	set_gtt_entry(info, totalSize, info.shared_info->physical_cursor_memory);
+
+	AreaKeeper cursorMapper;
+	info.cursor_area = cursorMapper.Map("intel extreme cursor",
+		(void *)(info.shared_info->physical_graphics_memory + totalSize),
+		B_PAGE_SIZE, B_ANY_KERNEL_ADDRESS, 0, (void **)&info.registers);
+	if (cursorMapper.InitCheck() < B_OK) {
+		// we can't do a hardware cursor, then...
+	}
+	info.shared_info->cursor_area = info.cursor_area;
+
 	info.cookie_magic = INTEL_COOKIE_MAGIC;
 		// this makes the cookie valid to be used
 
@@ -264,5 +349,10 @@ intel_extreme_uninit(intel_info &info)
 	delete_area(info.graphics_memory_area);
 	delete_area(info.registers_area);
 	delete_area(info.shared_area);
+	delete_area(info.cursor_area);
+
+	// we may or may not have allocated additional graphics memory
+	if (info.additional_memory_area >= B_OK)
+		delete_area(info.additional_memory_area);
 }
 

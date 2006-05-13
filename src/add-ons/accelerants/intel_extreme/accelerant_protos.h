@@ -45,7 +45,7 @@ uint32 intel_dpms_mode(void);
 status_t intel_set_dpms_mode(uint32 flags);
 
 // cursor
-status_t intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotX,
+status_t intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 			uint8 *andMask, uint8 *xorMask);
 void intel_move_cursor(uint16 x, uint16 y);
 void intel_show_cursor(bool isVisible);

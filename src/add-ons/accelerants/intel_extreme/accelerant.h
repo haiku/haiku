@@ -49,6 +49,7 @@ struct accelerant_info {
 
 	hardware_status	*status;
 	uint8			*cursor_memory;
+	area_id			cursor_area;
 
 	int				device;
 	bool			is_clone;

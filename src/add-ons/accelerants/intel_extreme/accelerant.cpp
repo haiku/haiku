@@ -18,7 +18,7 @@
 #include <syslog.h>
 
 
-//#define TRACE_ACCELERANT
+#define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
 extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
@@ -128,8 +128,19 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
+	AreaCloner cursorCloner;
+	gInfo->cursor_area = cursorCloner.Clone("intel extreme cursor",
+		(void **)&gInfo->cursor_memory, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA,
+		gInfo->shared_info->cursor_area);
+	if (cursorCloner.InitCheck() < B_OK) {
+		// we can't do a hardware cursor then...
+		gInfo->cursor_memory = NULL;
+	}
+
 	sharedCloner.Keep();
 	regsCloner.Keep();
+	cursorCloner.Keep();
 
 	// The overlay registers, hardware status, and cursor memory share
 	// a single area with the shared_info
@@ -148,6 +159,7 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
+	delete_area(gInfo->cursor_area);
 	delete_area(gInfo->regs_area);
 	delete_area(gInfo->shared_info_area);
 
@@ -157,7 +169,6 @@ uninit_common(void)
 	gInfo->shared_info = NULL;
 
 	// close the file handle ONLY if we're the clone
-	// (this is what Be tells us ;)
 	if (gInfo->is_clone)
 		close(gInfo->device);
 

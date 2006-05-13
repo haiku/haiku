@@ -20,11 +20,11 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
-enum {
-	INTEL_TYPE_7xx,
-	INTEL_TYPE_8xx,
-	INTEL_TYPE_9xx,
-};
+#define INTEL_TYPE_7xx			0x01
+#define INTEL_TYPE_8xx			0x02
+#define INTEL_TYPE_9xx			0x03
+#define INTEL_TYPE_83x			0x10
+#define INTEL_TYPE_85x			0x20
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -64,6 +64,7 @@ struct intel_shared_info {
 
 	area_id			registers_area;			// area of memory mapped registers
 	uint8			*physical_status_page;
+	area_id			cursor_area;
 	uint8			*physical_cursor_memory;
 	area_id			graphics_memory_area;
 	uint8			*graphics_memory;
@@ -94,12 +95,15 @@ struct intel_info {
 	area_id			registers_area;
 	struct intel_shared_info *shared_info;
 	area_id			shared_area;
+	area_id			cursor_area;
 
 	struct overlay_registers *overlay_registers;
 		// update buffer, shares an area with shared_info
 
 	uint8			*graphics_memory;
 	area_id			graphics_memory_area;
+	area_id			additional_memory_area;
+		// allocated memory beyond the "stolen" amount
 	mem_info		*memory_manager;
 
 	const char		*device_identifier;
@@ -162,10 +166,12 @@ struct intel_free_graphics_memory {
 #define i855_STOLEN_MEMORY_48M			0x60
 #define i855_STOLEN_MEMORY_64M			0x70
 
-
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define INTEL_PAGE_TABLE_ERROR			0x02024
 #define INTEL_HARDWARE_STATUS_PAGE		0x02080
+#define INTEL_GTT_BASE					0x10000	// (- 0x2ffff)
+#define GTT_ENTRY_VALID					0x01
+#define GTT_ENTRY_LOCAL_MEMORY			0x02
 
 #define INTEL_PRIMARY_RING_BUFFER		0x02030
 #define INTEL_SECONDARY_RING_BUFFER_0	0x02100
@@ -231,6 +237,12 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
+
+#define INTEL_CURSOR_CONTROL			0x70080
+#define INTEL_CURSOR_BASE				0x70084
+#define INTEL_CURSOR_POSITION			0x70088
+#define INTEL_CURSOR_PALETTE			0x70090 // (- 0x7009f)
+#define INTEL_CURSOR_SIZE				0x700a0
 
 // ring buffer commands
 

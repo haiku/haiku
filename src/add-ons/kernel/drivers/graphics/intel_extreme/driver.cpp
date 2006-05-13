@@ -36,8 +36,8 @@ const struct supported_device {
 	int32		type;
 	const char	*name;
 } kSupportedDevices[] = {
-	{0x2572, INTEL_TYPE_8xx, "i865G"},
-	{0x3582, INTEL_TYPE_8xx, "i855G"},
+	{0x2572, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i865G"},
+	{0x3582, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i855G"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
