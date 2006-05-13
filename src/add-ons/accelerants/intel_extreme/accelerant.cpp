@@ -298,6 +298,6 @@ sem_id
 intel_accelerant_retrace_semaphore()
 {
 	TRACE(("intel_accelerant_retrace_semaphore()\n"));
-	return -1;
+	return gInfo->shared_info->vblank_sem;
 }
 

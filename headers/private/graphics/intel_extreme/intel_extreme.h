@@ -81,6 +81,8 @@ struct intel_shared_info {
 	uint32			overlay_token;
 	uint8*			physical_overlay_registers;
 
+	sem_id			vblank_sem;
+
 	uint32			device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
@@ -105,6 +107,8 @@ struct intel_info {
 	area_id			additional_memory_area;
 		// allocated memory beyond the "stolen" amount
 	mem_info		*memory_manager;
+
+	bool			fake_interrupts;
 
 	const char		*device_identifier;
 	uint32			device_type;
@@ -166,6 +170,7 @@ struct intel_free_graphics_memory {
 #define i855_STOLEN_MEMORY_48M			0x60
 #define i855_STOLEN_MEMORY_64M			0x70
 
+// graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define INTEL_PAGE_TABLE_ERROR			0x02024
 #define INTEL_HARDWARE_STATUS_PAGE		0x02080
@@ -173,6 +178,14 @@ struct intel_free_graphics_memory {
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
 
+// interrupts
+#define INTEL_INTERRUPT_ENABLED			0x020a0
+#define INTEL_INTERRUPT_IDENTITY		0x020a4
+#define INTEL_INTERRUPT_MASK			0x020a8
+#define INTEL_INTERRUPT_STATUS			0x020ac
+#define INTERRUPT_VBLANK				(1 << 7)
+
+// ring buffer
 #define INTEL_PRIMARY_RING_BUFFER		0x02030
 #define INTEL_SECONDARY_RING_BUFFER_0	0x02100
 #define INTEL_SECONDARY_RING_BUFFER_1	0x02110
@@ -185,6 +198,7 @@ struct intel_free_graphics_memory {
 #define INTEL_RING_BUFFER_HEAD_MASK		0x001ffffc
 #define INTEL_RING_BUFFER_ENABLED		1
 
+// display
 #define INTEL_DISPLAY_HTOTAL			0x60000
 #define INTEL_DISPLAY_HBLANK			0x60004
 #define INTEL_DISPLAY_HSYNC				0x60008
@@ -207,6 +221,8 @@ struct intel_free_graphics_memory {
 
 #define INTEL_DISPLAY_PIPE_CONTROL		0x70008
 #define DISPLAY_PIPE_ENABLED			(1UL << 31)
+#define INTEL_DISPLAY_PIPE_STATUS		0x70024
+#define DISPLAY_PIPE_VBLANK_ENABLED		(1UL << 17)
 
 #define INTEL_DISPLAY_PLL				0x06014
 #define INTEL_DISPLAY_PLL_DIVISOR_0		0x06040
@@ -238,11 +254,18 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
 
+// cursor
 #define INTEL_CURSOR_CONTROL			0x70080
 #define INTEL_CURSOR_BASE				0x70084
 #define INTEL_CURSOR_POSITION			0x70088
 #define INTEL_CURSOR_PALETTE			0x70090 // (- 0x7009f)
 #define INTEL_CURSOR_SIZE				0x700a0
+#define CURSOR_ENABLED					(1UL << 31)
+#define CURSOR_FORMAT_2_COLORS			(0UL << 24)
+#define CURSOR_FORMAT_3_COLORS			(1UL << 24)
+#define CURSOR_FORMAT_4_COLORS			(2UL << 24)
+#define CURSOR_FORMAT_ARGB				(4UL << 24)
+#define CURSOR_FORMAT_XRGB				(5UL << 24)
 
 // ring buffer commands
 

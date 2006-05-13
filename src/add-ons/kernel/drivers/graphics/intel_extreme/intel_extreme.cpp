@@ -147,6 +147,96 @@ set_gtt_entry(intel_info &info, uint32 offset, uint8 *physicalAddress)
 }
 
 
+static int32
+release_vblank_sem(intel_info &info)
+{
+	int32 count;
+	if (get_sem_count(info.shared_info->vblank_sem, &count) == B_OK
+		&& count < 0) {
+		release_sem_etc(info.shared_info->vblank_sem, -count, B_DO_NOT_RESCHEDULE);
+		return B_INVOKE_SCHEDULER;
+	}
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
+static int32
+intel_interrupt_handler(void *data)
+{
+	intel_info &info = *(intel_info *)data;
+
+	uint32 identity = read32(info.registers + INTEL_INTERRUPT_IDENTITY);
+	if (identity == 0)
+		return B_UNHANDLED_INTERRUPT;
+
+	int32 handled = B_HANDLED_INTERRUPT;
+
+	if ((identity & INTERRUPT_VBLANK) != 0) {
+		handled = release_vblank_sem(info);
+
+		// make sure we'll get another one of those
+		write32(info.registers + INTEL_DISPLAY_PIPE_STATUS, DISPLAY_PIPE_VBLANK_ENABLED);
+		write32(info.registers + INTEL_INTERRUPT_IDENTITY, 0);
+	}
+
+	return handled;
+}
+
+
+static void
+init_interrupt_handler(intel_info &info)
+{
+	info.shared_info->vblank_sem = create_sem(0, "intel extreme vblank");
+	if (info.shared_info->vblank_sem < B_OK)
+		return;
+
+	status_t status = B_OK;
+
+	// We need to change the owner of the sem to the calling team (usually the
+	// app_server), because userland apps cannot acquire kernel semaphores
+	thread_id thread = find_thread(NULL);
+	thread_info threadInfo;
+	if (get_thread_info(thread, &threadInfo) != B_OK
+		|| set_sem_owner(info.shared_info->vblank_sem, threadInfo.team) != B_OK) {
+		status = B_ERROR;
+	}
+
+	if (status == B_OK
+		&& info.pci->u.h0.interrupt_pin != 0x00 && info.pci->u.h0.interrupt_line != 0xff) {
+		// we've gotten an interrupt line for us to use
+
+		info.fake_interrupts = false;
+
+		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
+			intel_interrupt_handler, (void *)&info, 0);
+		if (status == B_OK) {
+			// enable interrupts - we only want VBLANK interrupts
+			write32(info.registers + INTEL_INTERRUPT_ENABLED, INTERRUPT_VBLANK);
+			write32(info.registers + INTEL_INTERRUPT_MASK, ~INTERRUPT_VBLANK);
+
+			write32(info.registers + INTEL_DISPLAY_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_ENABLED);
+			write32(info.registers + INTEL_INTERRUPT_IDENTITY, 0);
+		}
+	}
+	if (status < B_OK) {
+		// there is no interrupt reserved for us, or we couldn't install our interrupt
+		// handler, let's fake the vblank interrupt for our clients using a timer
+		// interrupt
+		info.fake_interrupts = true;
+
+		// TODO: fake interrupts!
+		status = B_ERROR;
+	}
+
+	if (status < B_OK) {
+		delete_sem(info.shared_info->vblank_sem);
+		info.shared_info->vblank_sem = B_ERROR;
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -330,6 +420,8 @@ intel_extreme_init(intel_info &info)
 	}
 	info.shared_info->cursor_area = info.cursor_area;
 
+	init_interrupt_handler(info);
+
 	info.cookie_magic = INTEL_COOKIE_MAGIC;
 		// this makes the cookie valid to be used
 
@@ -343,6 +435,15 @@ void
 intel_extreme_uninit(intel_info &info)
 {
 	dprintf(DEVICE_NAME": intel_extreme_uninit()\n");
+
+	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
+		// disable interrupt generation
+		write32(info.registers + INTEL_INTERRUPT_ENABLED, 0);
+		write32(info.registers + INTEL_INTERRUPT_MASK, ~0);
+
+		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
+			intel_interrupt_handler, &info);
+	}
 
 	mem_destroy(info.memory_manager);
 
