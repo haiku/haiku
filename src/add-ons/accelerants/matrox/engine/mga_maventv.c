@@ -854,10 +854,20 @@ int maventv_init(display_mode target)
 			if ((tv_target.flags & TV_BITS) == TV_PAL)
 			{
 				diff = tv_target.timing.h_total - tv_target.timing.h_display;
-				tv_target.timing.h_sync_start = tv_target.timing.h_display - 0 + (diff / 2);
-				/* keep adhering to CRTC constraints */
-				tv_target.timing.h_sync_start &= ~0x0007;
-				tv_target.timing.h_sync_end = tv_target.timing.h_sync_start + 16;
+				if (!si->ps.secondary_head)
+				{
+					tv_target.timing.h_sync_start = tv_target.timing.h_display - 16 + (diff / 2);
+					/* keep adhering to CRTC constraints */
+					tv_target.timing.h_sync_start &= ~0x0007;
+					tv_target.timing.h_sync_end = tv_target.timing.h_sync_start + 32;
+				}
+				else
+				{
+					tv_target.timing.h_sync_start = tv_target.timing.h_display - 0 + (diff / 2);
+					/* keep adhering to CRTC constraints */
+					tv_target.timing.h_sync_start &= ~0x0007;
+					tv_target.timing.h_sync_end = tv_target.timing.h_sync_start + 16;
+				}
 			}
 			else
 			{
