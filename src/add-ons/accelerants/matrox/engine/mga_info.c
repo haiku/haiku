@@ -245,6 +245,12 @@ status_t pins3_read(uint8 *pins, uint8 length)
 
 	/* for cards using this version of PINS both functions are in maven */
 	si->ps.tvout = !(pins[59] & 0x01);
+	/* beware of TVout add-on boards: test for the MAVEN ourself! */
+	if (i2c_maven_probe() == B_OK)
+	{
+		si->ps.tvout = true;
+	}
+
 	/* G200 and earlier cards are always singlehead cards */
 	si->ps.secondary_head = false;
 	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[59] & 0x01);
@@ -401,6 +407,12 @@ status_t pins4_read(uint8 *pins, uint8 length)
 
 	/* for cards using this version of PINS both functions are in maven */
 	si->ps.tvout = !(pins[91] & 0x01);
+	/* beware of TVout add-on boards: test for the MAVEN ourself! */
+	if (i2c_maven_probe() == B_OK)
+	{
+		si->ps.tvout = true;
+	}
+
 	/* G200 and earlier cards are always singlehead cards */
 	si->ps.secondary_head = false;
 	if (si->ps.card_type >= G400) si->ps.secondary_head = !(pins[91] & 0x01);
@@ -523,8 +535,10 @@ status_t pins5_read(uint8 *pins, uint8 length)
 	si->ps.mctlwtst_reg = (pins[83] << 24) | (pins[82] << 16) | (pins[81] << 8) | pins [80];
 	si->ps.memrdbk_reg = (pins[91] << 24) | (pins[90] << 16) | (pins[89] << 8) | pins [88];
 
+	/* both the secondary head and MAVEN are on die, (so) no add-on boards exist */
 	si->ps.secondary_head = (pins[117] & 0x70);
-	si->ps.tvout = (pins[117] & 0x40);	
+	si->ps.tvout = (pins[117] & 0x40);
+
 	si->ps.primary_dvi = (pins[117] & 0x02);
 	si->ps.secondary_dvi = (pins[117] & 0x20);
 
@@ -951,9 +965,13 @@ void dump_pins(void)
 	if (si->ps.secondary_head) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("tvout: "));
 	if (si->ps.tvout) LOG(2,("present\n")); else LOG(2,("absent\n"));
+	//fixme: probably only valid for pre-G400 cards...(?)
 	if ((si->ps.tvout) && (si->ps.card_type < G450))
 	{
-		LOG(2,("MAVEN version: "));
+		if (si->ps.card_type < G400)
+			LOG(2,("MGA_TVO version: "));
+		else
+			LOG(2,("MAVEN version: "));
 		if ((MAVR(VERSION)) < 20)
 			LOG(2,("rev. B\n"));
 		else
