@@ -70,6 +70,7 @@ status_t g100_g400max_maven_vid_pll_find(display_mode target,float * calc_pclk,
 				uint8 * m_result,uint8 * n_result,uint8 * p_result);
 status_t g450_g550_maven_vid_pll_find(display_mode target,float * calc_pclk,
 				uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
+void gx00_maven_shutoff_vid_pll(void);
 status_t gx00_maven_set_vid_pll(display_mode target);
 
 /*MAVENTV functions*/

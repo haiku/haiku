@@ -396,12 +396,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 		else
 		{
+			gx00_maven_shutoff_vid_pll();
 			gx00_crtc_set_timing(target);
 		}
-
-		//fixme: shut-off the videoPLL when applicable, if it exists...
 	}
-	
+
 	/* update driver's mode store */
 	si->dm = target;
 

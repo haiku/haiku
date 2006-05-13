@@ -2,7 +2,7 @@
 
 /* Authors:
    Mark Watson 6/2000,
-   Rudolf Cornelissen 1/2003-12/2003
+   Rudolf Cornelissen 1/2003-5/2006
 
    Thanx to Petr Vandrovec for writing matroxfb.
 */
@@ -224,6 +224,21 @@ status_t gx00_maven_mode(int mode,float brightness)
 	LOG(4,("MAVEN: LUMA setting - %x\n", luma));
 
 	return B_OK;
+}
+
+void gx00_maven_shutoff_vid_pll()
+{
+	switch (si->ps.card_type)
+	{
+		case G100:
+		case G200:
+		case G400:
+		case G400MAX:
+			MAVW(PIXPLLP, ((MAVR(PIXPLLP)) & ~0x80));
+			break;
+		default:
+			break;
+	}
 }
 
 status_t gx00_maven_set_vid_pll(display_mode target)
