@@ -1057,7 +1057,7 @@ tzset P((void))
 
 	name = getenv("TZ");
 	if (name == NULL) {
-		_kern_get_tzfilename(tzfilename, B_PATH_NAME_LENGTH, &is_gmt);
+		_kern_get_tzfilename(tzfilename, sizeof(tzfilename), &is_gmt);
 		if (tzfilename[0] == '\0') {
 			tzsetwall();
 			return;

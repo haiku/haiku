@@ -4,8 +4,10 @@
  */
 
 
+#include <FindDirectory.h>
 #include <OS.h>
 
+#include <stdio.h>
 #include <string.h>
 #include <syslog.h>
 
@@ -62,10 +64,33 @@ set_real_time_clock(uint32 secs)
 status_t
 set_timezone(char *timezone)
 {
-	// ToDo: set_timezone()
+	char path[B_PATH_NAME_LENGTH];
+	char tzfilename[B_PATH_NAME_LENGTH];
+	bool isGMT;
+
 	status_t err;
 	struct tm *tm;
 	time_t t;
+	
+	if ((err = find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path, B_PATH_NAME_LENGTH)) != B_OK) {
+		fprintf(stderr, "can't find settings directory: %s\n", strerror(err));
+		return err;
+	}
+	strcat(path, "/timezone");
+
+	err = unlink(path);
+	if (err != B_OK) {
+		fprintf(stderr, "can't unlink: %s\n", strerror(err));
+		return err;
+	}
+	err = symlink(timezone, path);
+	if (err != B_OK) {
+		fprintf(stderr, "can't symlink: %s\n", strerror(err));
+		return err;
+	}
+	_kern_get_tzfilename(tzfilename, sizeof(tzfilename), &isGMT);
+	_kern_set_tzfilename(timezone, strlen(timezone), isGMT);
+	tzset();
 
 	time(&t);
 	tm = localtime(&t);
