@@ -127,7 +127,7 @@ determine_stolen_memory_size(intel_info &info)
 {
 	// read stolen memory from the PCI configuration of the PCI bridge
 	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
-	size_t memorySize = 1024 * 1024;
+	size_t memorySize = 1 << 20; // 1 MB
 
 	// TODO: test with different models!
 
@@ -297,7 +297,7 @@ intel_extreme_init(intel_info &info)
 	totalSize = max_c(totalSize, stolenSize);
 
 	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory, reserving %ld MB total\n",
-		stolenSize / 1024 / 1024, totalSize / 1024 / 1024);
+		stolenSize >> 20, totalSize >> 20);
 
 	AreaKeeper additionalMemoryCreator;
 	uint8 *additionalMemory;
