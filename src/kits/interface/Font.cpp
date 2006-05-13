@@ -342,13 +342,19 @@ _init_global_fonts_()
 }
 
 
-// TODO: the following functions are private Be API functions - if no problems
-//	arise by not exporting these symbols, we can just remove them
-#if 0
-void _font_control_(BFont *font, int32 cmd, void *data) {}
-status_t get_font_cache_info(uint32 id, void *set) { return B_ERROR; }
-status_t set_font_cache_info(uint32 id, void *set) { return B_ERROR; }
-#endif
+void _font_control_(BFont *font, int32 cmd, void *data)
+{
+}
+
+status_t get_font_cache_info(uint32 id, void *set)
+{
+	return B_ERROR;
+}
+
+status_t set_font_cache_info(uint32 id, void *set)
+{
+	return B_ERROR;
+}
 
 
 /*!
