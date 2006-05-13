@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004, J��e Duval, jerome.duval@free.fr.
+ * Copyright 2004, Jérôme Duval, jerome.duval@free.fr.
  * Distributed under the terms of the MIT License.
  */
 
