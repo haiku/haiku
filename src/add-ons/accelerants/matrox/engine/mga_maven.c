@@ -234,7 +234,8 @@ void gx00_maven_shutoff_vid_pll()
 		case G200:
 		case G400:
 		case G400MAX:
-			MAVW(PIXPLLP, ((MAVR(PIXPLLP)) & ~0x80));
+//unfortunately doesn't work as expected :-/
+//			MAVW(PIXPLLP, ((MAVR(PIXPLLP)) & ~0x80));
 			break;
 		default:
 			break;
