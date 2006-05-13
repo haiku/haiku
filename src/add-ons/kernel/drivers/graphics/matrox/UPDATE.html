@@ -4,11 +4,13 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (svn 0.29, Rudolf)</h1></p>
+<p><h1>head (svn 0.31, Rudolf)</h1></p>
 <ul>
 <li><strong>G100-G200:</strong>
 <ul>
-<li>Cards that have a MAVEN (connected) for TVout are now correctly identified as being singlehead cards. This fixes the colorpalette trouble on these cards, resulting in just the upper three colorbits working in 32bit mode, while the rest was totally unusable.
+<li>Cards that have a MAVEN (connected) for TVout are now correctly identified as being singlehead cards. This fixes the colorpalette trouble on these cards, resulting in just the upper three colorbits working in 32bit mode, while the rest was totally unusable;
+<li>Added TVout support for cards with a MAVEN (MGA_TVO) factory mounted on the 'main' graphics board (note: MGA_TVO rev B works badly still, rev C works much better: in progress);
+<li>Added TVout support for cards with a MAVEN (MGA_TVO) daughter add-on board (note: MGA_TVO rev B works badly still, rev C works much better: in progress).
 </ul>
 <li><strong>G200-G550:</strong>
 <ul>
