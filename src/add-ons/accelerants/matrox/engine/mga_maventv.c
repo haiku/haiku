@@ -727,7 +727,7 @@ int maventv_init(display_mode target)
 				if ((tv_target.timing.h_display < 704) && ((tv_target.flags & TV_BITS) == TV_PAL))
 				{
 					/* can't be higher because of scaling limitations in MAVEN! */
-					uscan_fact = 0.77;
+					uscan_fact = 0.76;
 				}
 				else
 				{
