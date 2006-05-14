@@ -118,6 +118,14 @@ QueueCommands::_Write(uint32 data)
 
 
 void
+uninit_ring_buffer(ring_buffer &ringBuffer)
+{
+	uninit_lock(&ringBuffer.lock);
+	write32(ringBuffer.register_base + RING_BUFFER_CONTROL, 0);
+}
+
+
+void
 setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
 {
 	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name, ringBuffer.offset,
@@ -158,6 +166,12 @@ intel_acquire_engine(uint32 capabilities, uint32 maxWait, sync_token *syncToken,
 	TRACE(("intel_acquire_engine()\n"));
 	*_engineToken = &sEngineToken;
 
+	if (acquire_lock(&gInfo->shared_info->engine_lock) != B_OK)
+		return B_ERROR;
+
+	if (syncToken)
+		intel_sync_to_token(syncToken);
+
 	return B_OK;
 }
 
@@ -169,6 +183,7 @@ intel_release_engine(engine_token *engineToken, sync_token *syncToken)
 	if (syncToken != NULL)
 		syncToken->engine_id = engineToken->engine_id;
 
+	release_lock(&gInfo->shared_info->engine_lock);
 	return B_OK;
 }
 

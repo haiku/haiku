@@ -76,6 +76,7 @@ extern void enable_display_plane(bool enable);
 extern void set_display_power_mode(uint32 mode);
 
 // engine.cpp
+extern void uninit_ring_buffer(ring_buffer &ringBuffer);
 extern void setup_ring_buffer(ring_buffer &ringBuffer, const char *name);
 
 // modes.cpp

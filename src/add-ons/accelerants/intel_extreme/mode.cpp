@@ -235,11 +235,12 @@ intel_set_display_mode(display_mode *mode)
 {
 	TRACE(("intel_set_display_mode()\n"));
 
-	// TODO: locking!
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
 
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
+	Autolock locker(sharedInfo.accelerant_lock);
 	display_mode current = *mode;
 
 	set_display_power_mode(B_DPMS_OFF);
@@ -255,17 +256,17 @@ intel_set_display_mode(display_mode *mode)
 	if (intel_allocate_memory(bytesPerRow * current.virtual_height,
 			gInfo->frame_buffer_handle, offset) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way back
-		if (intel_allocate_memory(gInfo->shared_info->current_mode.virtual_height
-				* gInfo->shared_info->bytes_per_row, gInfo->frame_buffer_handle,
+		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
+				* sharedInfo.bytes_per_row, gInfo->frame_buffer_handle,
 				offset) == B_OK) {
-			gInfo->shared_info->frame_buffer_offset = offset;
+			sharedInfo.frame_buffer_offset = offset;
 			write32(INTEL_DISPLAY_BASE, offset);
 		}
 
 		return B_NO_MEMORY;
 	}
 
-	gInfo->shared_info->frame_buffer_offset = offset;
+	sharedInfo.frame_buffer_offset = offset;
 
 	// update timing parameters
 
@@ -313,17 +314,17 @@ intel_set_display_mode(display_mode *mode)
 	write32(INTEL_DISPLAY_CONTROL, (read32(INTEL_DISPLAY_CONTROL)
 		& ~DISPLAY_CONTROL_COLOR_MASK) | colorMode);
 
-	set_display_power_mode(gInfo->shared_info->dpms_mode);
+	set_display_power_mode(sharedInfo.dpms_mode);
 
 	// changing bytes per row seems to be ignored if the plane/pipe is turned off
 	write32(INTEL_DISPLAY_BYTES_PER_ROW, bytesPerRow);
-	write32(INTEL_DISPLAY_BASE, gInfo->shared_info->frame_buffer_offset);
+	write32(INTEL_DISPLAY_BASE, sharedInfo.frame_buffer_offset);
 		// triggers writing back double-buffered registers
 
 	// update shared info
-	gInfo->shared_info->bytes_per_row = bytesPerRow;
-	gInfo->shared_info->current_mode = current;
-	gInfo->shared_info->bits_per_pixel = bitsPerPixel;
+	sharedInfo.bytes_per_row = bytesPerRow;
+	sharedInfo.current_mode = current;
+	sharedInfo.bits_per_pixel = bitsPerPixel;
 
 	return B_OK;
 }
@@ -381,7 +382,11 @@ status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
 	TRACE(("intel_move_display()\n"));
-	display_mode &mode = gInfo->shared_info->current_mode;
+
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
+	Autolock locker(sharedInfo.accelerant_lock);
+
+	display_mode &mode = sharedInfo.current_mode;
 
 	if (horizontalStart + mode.timing.h_display > mode.virtual_width
 		|| verticalStart + mode.timing.v_display > mode.virtual_height)
@@ -390,9 +395,9 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 	mode.h_display_start = horizontalStart;
 	mode.v_display_start = verticalStart;
 
-	write32(INTEL_DISPLAY_BASE, gInfo->shared_info->frame_buffer_offset
-		+ verticalStart * gInfo->shared_info->bytes_per_row
-		+ horizontalStart * (gInfo->shared_info->bits_per_pixel + 7) / 8);
+	write32(INTEL_DISPLAY_BASE, sharedInfo.frame_buffer_offset
+		+ verticalStart * sharedInfo.bytes_per_row
+		+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
 
 	return B_OK;
 }
@@ -413,6 +418,8 @@ intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 
 	if (colors == NULL)
 		return;
+
+	Autolock locker(gInfo->shared_info->accelerant_lock);
 
 	for (; count-- > 0; first++) {
 		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];

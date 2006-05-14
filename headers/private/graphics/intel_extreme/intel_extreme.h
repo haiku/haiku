@@ -72,6 +72,9 @@ struct intel_shared_info {
 
 	uint32			frame_buffer_offset;
 
+	struct lock		accelerant_lock;
+	struct lock		engine_lock;
+
 	ring_buffer		primary_ring_buffer;
 	ring_buffer		secondary_ring_buffer;
 

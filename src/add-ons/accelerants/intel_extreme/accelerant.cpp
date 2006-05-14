@@ -153,9 +153,6 @@ uninit_common(void)
 
 	gInfo->regs_area = gInfo->shared_info_area = -1;
 
-	gInfo->regs = NULL;
-	gInfo->shared_info = NULL;
-
 	// close the file handle ONLY if we're the clone
 	if (gInfo->is_clone)
 		close(gInfo->device);
@@ -178,8 +175,13 @@ intel_init_accelerant(int device)
 	if (status != B_OK) 
 		return status;
 
-	setup_ring_buffer(gInfo->shared_info->primary_ring_buffer, "intel primary ring buffer");
-	setup_ring_buffer(gInfo->shared_info->secondary_ring_buffer, "intel secondary ring buffer");
+	intel_shared_info &info = *gInfo->shared_info;
+
+	init_lock(&info.accelerant_lock, "intel extreme accelerant");
+	init_lock(&info.engine_lock, "intel extreme engine");
+
+	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
+	setup_ring_buffer(info.secondary_ring_buffer, "intel secondary ring buffer");
 
 	status = create_mode_list();
 	if (status != B_OK) {
@@ -259,6 +261,14 @@ intel_uninit_accelerant(void)
 	// delete accelerant instance data
 	delete_area(gInfo->mode_list_area);
 	gInfo->mode_list = NULL;
+
+	intel_shared_info &info = *gInfo->shared_info;
+
+	uninit_lock(&info.accelerant_lock);
+	uninit_lock(&info.engine_lock);
+
+	uninit_ring_buffer(info.primary_ring_buffer);
+	uninit_ring_buffer(info.secondary_ring_buffer);
 
 	uninit_common();
 }
