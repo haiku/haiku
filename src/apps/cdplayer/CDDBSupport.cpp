@@ -890,10 +890,19 @@ CDDBQuery::ReadLine(BString &buffer)
 status_t 
 CDDBQuery::IdentifySelf()
 {
-	// TODO: Figure out a better way to do this for Zeta
-#ifdef B_ZETA_VERSION
+	BString username,hostname;
+	
+	username = getenv("USER");
+	hostname = getenv("HOSTNAME");
+	
+	if(username.Length() < 1)
+		username = "baron";
+	
+	if(hostname.Length() < 1)
+		hostname = "haiku";
+	
 	BString tmp;
-	tmp << "cddb hello simplyvorbis svhost SimplyVorbis v0.1\n";
+	tmp << "cddb hello " << username << " " << hostname << " HaikuCDPlayer 1.0\n";
 
 	STRACE((">%s", tmp.String()));
 	if(fSocket.Send(tmp.String(), tmp.Length())==-1)
@@ -903,27 +912,7 @@ CDDBQuery::IdentifySelf()
 	}
 	
 	ReadLine(tmp);
-#else
-	char username[256];
-	if (!getusername(username,256))
-		strcpy(username, "unknown");
 	
-	char hostname[MAXHOSTNAMELEN + 1];
-	if (gethostname(hostname, MAXHOSTNAMELEN) == -1)
-		strcpy(hostname, "unknown");
-	
-	BString tmp;
-	tmp << "cddb hello " << username << " " << hostname << " SimplyVorbis v0.1\n";
-
-	STRACE((">%s", tmp.String()));
-	if(fSocket.Send(tmp.String(), tmp.Length())==-1)
-	{
-		Disconnect();
-		return B_ERROR;
-	}
-	
-	ReadLine(tmp);
-#endif
 	return B_OK;
 }
 
