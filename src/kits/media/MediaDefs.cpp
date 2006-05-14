@@ -9,7 +9,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include "MediaMisc.h"
 #include "debug.h"
+
+#define META_DATA_MAX_SIZE			(16 << 20)
+#define META_DATA_AREA_MIN_SIZE		32000
 
 /*************************************************************
  * media_destination
@@ -627,29 +631,37 @@ status_t
 media_format::SetMetaData(const void *data,
 						  size_t size)
 {
-	// TODO: create_area / delete_area for this should be done by the media server?
-	if (meta_data_area > 0) {
-		delete_area(meta_data_area);
-	}
-	uchar * addr = 0;
-	uint32 area_size = ((size - 1) / B_PAGE_SIZE + 1) * B_PAGE_SIZE ;
-	area_id area = create_area("meta_data_area", (void**)&addr, B_ANY_ADDRESS, area_size,
+	if (!data || size < 0 || size > META_DATA_MAX_SIZE)
+		return B_BAD_VALUE;
+	
+	void *new_addr;
+	area_id new_area;
+	if (size < META_DATA_AREA_MIN_SIZE) {
+		new_area = B_BAD_VALUE;
+		new_addr = malloc(size);
+		if (!new_addr)
+			return B_NO_MEMORY;
+	} else {
+		new_area = create_area("meta_data_area", &new_addr, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(size),
 	                           B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (area < 0) {
-		return area;
+		if (new_area < 0)
+			return (status_t)new_area;
 	}
-	memcpy(addr, data, size);
-	set_area_protection(area,B_READ_AREA);
-	meta_data = addr;
+
+	if (meta_data_area > 0)
+		delete_area(meta_data_area);
+	else
+		free(meta_data);
+
+	meta_data = new_addr;
 	meta_data_size = size;
-	meta_data_area = area;
-	use_area = area;
-	thread_id thread = find_thread(NULL);
-	thread_info info;
-	if (get_thread_info(thread, &info) == B_OK) {
-		team = info.team;
-	}
-	thisPtr = this;
+	meta_data_area = new_area;
+	
+	memcpy(meta_data, data, size);
+	
+	if (meta_data_area > 0)
+		set_area_protection(meta_data_area, B_READ_AREA);
+
 	return B_OK;
 }
 
@@ -667,31 +679,28 @@ media_format::MetaDataSize() const
 	return meta_data_size;
 }
 
-// final
+
 media_format::media_format()
 {
 	memset(this, 0x00, sizeof(*this));
 	meta_data_area = B_BAD_VALUE;
-	use_area = B_BAD_VALUE;
-	team = B_BAD_VALUE;
-	//meta_data, meta_data_size, meta_data_area, use_area, 
-	//team, and thisPtr are currently only used by decoders
-	//when communicating with the file reader; they're not
-	//currently for public use.
-	
-	//If any field is 0, it's treated as a wildcard
 }
 
 
-// final
 media_format::media_format(const media_format &other)
 {
+	memset(this, 0x00, sizeof(*this));
+	meta_data_area = B_BAD_VALUE;
 	*this = other;
 }
 
-// final
+
 media_format::~media_format()
 {
+	if (meta_data_area > 0)
+		delete_area(meta_data_area);
+	else
+		free(meta_data);
 }
 
 
@@ -699,21 +708,34 @@ media_format::~media_format()
 media_format &
 media_format::operator=(const media_format &clone)
 {
+	// get rid of this format's meta data
+	this->~media_format(); // danger: using only ~media_format() would call the constructor
+
+	// make a binary copy
 	memcpy(this, &clone, sizeof(*this));
-	// these things only happen when a meta_data_area is defined:
-	if (meta_data_area > 0) {
-		thread_id thread = find_thread(NULL);
-		thread_info info;
-		if (get_thread_info(thread,&info) == B_OK) {
-			team = info.team;
+	// some binary copies are invalid:
+	meta_data = NULL;
+	meta_data_area = B_BAD_VALUE;
+
+	// clone or copy the meta data
+	if (clone.meta_data) {
+		if (clone.meta_data_area) {
+			meta_data_area = clone_area("meta_data_clone_area", &meta_data, 
+										B_ANY_ADDRESS, B_READ_AREA, clone.meta_data_area);
+			if (meta_data_area < 0) {
+				// whoops, we just lost our meta data
+				meta_data = NULL;
+				meta_data_size = NULL;
+			}
+		} else {
+			meta_data = malloc(meta_data_size);
+			if (meta_data) {
+				memcpy(meta_data, clone.meta_data, meta_data_size);
+			} else {
+				// whoops, we just lost our meta data
+				meta_data_size = NULL;
+			}
 		}
-		thisPtr = this;
-		// TODO: start _Media_Roster_
-		// TODO: request the _Media_Roster_ to give us the
-		// use_area for this team, or to create a
-		// clone for our team if our team doesn't have one yet
-		// TODO: set meta_data to point to the clone's address
-		UNIMPLEMENTED();
 	}
 	return *this;
 }

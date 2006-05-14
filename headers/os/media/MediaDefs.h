@@ -475,9 +475,9 @@ struct media_format {	/* no more than 192 bytes */
 	void *							meta_data;
 	int32							meta_data_size;
 	area_id							meta_data_area;
-	area_id							use_area;
-	team_id							team;
-	void *							thisPtr;
+	area_id							__unused_was_use_area;
+	team_id							__unused_was_team;
+	void *							__unused_was_thisPtr;
 
 	public:
 
