@@ -396,7 +396,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 		else
 		{
-			gx00_maven_shutoff_vid_pll();
+			gx00_maven_shutoff();
 			gx00_crtc_set_timing(target);
 		}
 	}

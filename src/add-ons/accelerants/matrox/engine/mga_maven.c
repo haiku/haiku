@@ -101,7 +101,6 @@ status_t gx00_maven_dpms(bool display, bool h, bool v)
 	{
 		/* turn off screen using a few methods! */
 		MAVW(STABLE, 0x6a);
-//		MAVW(TEST, 0x03);
 		MAVW(OUTMODE, 0x00);
 	}
 
@@ -226,16 +225,19 @@ status_t gx00_maven_mode(int mode,float brightness)
 	return B_OK;
 }
 
-void gx00_maven_shutoff_vid_pll()
+void gx00_maven_shutoff()
 {
 	switch (si->ps.card_type)
 	{
 		case G100:
 		case G200:
-		case G400:
-		case G400MAX:
-//unfortunately doesn't work as expected :-/
-//			MAVW(PIXPLLP, ((MAVR(PIXPLLP)) & ~0x80));
+		//fixme: see if this works on G400 too:
+		//case G400:
+		//case G400MAX:
+			/* prevents distortions on CRTC1... */
+			MAVW(TEST, 0x03);
+			MAVW(MONEN, 0x00);
+			MAVW(MONSET, 0x00);
 			break;
 		default:
 			break;
