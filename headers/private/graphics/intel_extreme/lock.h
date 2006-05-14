@@ -54,4 +54,31 @@ release_lock(struct lock *lock)
 	return B_OK;
 }
 
+
+class Autolock {
+	public:
+		Autolock(struct lock &lock)
+			:
+			fLock(&lock)
+		{
+			fStatus = acquire_lock(fLock);
+		}
+
+		~Autolock()
+		{
+			if (fStatus == B_OK)
+				release_lock(fLock);
+		}
+
+		bool
+		IsLocked()
+		{
+			return fStatus == B_OK;
+		}
+
+	private:
+		status_t	fStatus;
+		struct lock	*fLock;
+};
+
 #endif	/* LOCK_H */
