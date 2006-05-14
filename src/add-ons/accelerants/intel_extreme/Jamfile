@@ -8,6 +8,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 
 Addon intel_extreme.accelerant : accelerants :
 	accelerant.cpp
+	cursor.cpp
 	dpms.cpp
 	engine.cpp
 	hooks.cpp

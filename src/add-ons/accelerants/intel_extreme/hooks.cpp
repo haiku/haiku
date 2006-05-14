@@ -8,6 +8,7 @@
 
 
 #include "accelerant_protos.h"
+#include "accelerant.h"
 
 
 extern "C" void *
@@ -61,13 +62,18 @@ get_accelerant_hook(uint32 feature, void *data)
 			return intel_set_dpms_mode;
 
 		/* cursor managment */
-/*		case B_SET_CURSOR_SHAPE:
-			return intel_set_cursor_shape;
+		case B_SET_CURSOR_SHAPE:
+			if (gInfo->cursor_memory != NULL)
+				return intel_set_cursor_shape;
 		case B_MOVE_CURSOR:
-			return intel_move_cursor;
+			if (gInfo->cursor_memory != NULL)
+				return intel_move_cursor;
 		case B_SHOW_CURSOR:
-			return intel_show_cursor;
-*/
+			if (gInfo->cursor_memory != NULL)
+				return intel_show_cursor;
+
+			return NULL;
+
 		/* engine/synchronization */
 		case B_ACCELERANT_ENGINE_COUNT:
 			return intel_accelerant_engine_count;

@@ -64,7 +64,6 @@ struct intel_shared_info {
 
 	area_id			registers_area;			// area of memory mapped registers
 	uint8			*physical_status_page;
-	area_id			cursor_area;
 	uint8			*physical_cursor_memory;
 	area_id			graphics_memory_area;
 	uint8			*graphics_memory;
@@ -83,6 +82,12 @@ struct intel_shared_info {
 
 	sem_id			vblank_sem;
 
+	uint32			cursor_buffer_offset;
+	uint32			cursor_format;
+	bool			cursor_visible;
+	uint16			cursor_hot_x;
+	uint16			cursor_hot_y;
+
 	uint32			device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
@@ -97,7 +102,6 @@ struct intel_info {
 	area_id			registers_area;
 	struct intel_shared_info *shared_info;
 	area_id			shared_area;
-	area_id			cursor_area;
 
 	struct overlay_registers *overlay_registers;
 		// update buffer, shares an area with shared_info
@@ -267,6 +271,8 @@ struct intel_free_graphics_memory {
 #define CURSOR_FORMAT_4_COLORS			(2UL << 24)
 #define CURSOR_FORMAT_ARGB				(4UL << 24)
 #define CURSOR_FORMAT_XRGB				(5UL << 24)
+#define CURSOR_POSITION_NEGATIVE		0x8000
+#define CURSOR_POSITION_MASK			0x3fff
 
 // ring buffer commands
 

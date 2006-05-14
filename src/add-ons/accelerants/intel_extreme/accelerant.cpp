@@ -128,19 +128,8 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
-	AreaCloner cursorCloner;
-	gInfo->cursor_area = cursorCloner.Clone("intel extreme cursor",
-		(void **)&gInfo->cursor_memory, B_ANY_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA,
-		gInfo->shared_info->cursor_area);
-	if (cursorCloner.InitCheck() < B_OK) {
-		// we can't do a hardware cursor then...
-		gInfo->cursor_memory = NULL;
-	}
-
 	sharedCloner.Keep();
 	regsCloner.Keep();
-	cursorCloner.Keep();
 
 	// The overlay registers, hardware status, and cursor memory share
 	// a single area with the shared_info
@@ -159,7 +148,6 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
-	delete_area(gInfo->cursor_area);
 	delete_area(gInfo->regs_area);
 	delete_area(gInfo->shared_info_area);
 

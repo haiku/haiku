@@ -438,25 +438,15 @@ intel_extreme_init(intel_info &info)
 
 	// We also need to map the cursor memory into the GTT
 
-	// This could also be part of the usual graphics memory, but for some
-	// reason we need its physical address, too - and we only know that of
-	// the additional memory we allocated.
-	// Unfortunately, the GTT is not readable - we would need to compute
-	// the physical location of stolen memory with some heuristics (as it
-	// should be taken from the top of system memory), and hope that the
-	// BIOS adhered to this specification.
+	// This could also be part of the usual graphics memory, but since we
+	// need to make sure it's not in the graphics local memory (and I don't
+	// even know yet how to determine that a chip has local memory...), we
+	// keep the current strategy and put it into the shared area.
+	// Unfortunately, the GTT is not readable until it has been written into
+	// the double buffered register set; we cannot get its original contents.
 
 	set_gtt_entry(info, totalSize, info.shared_info->physical_cursor_memory);
-
-	AreaKeeper cursorMapper;
-	void *cursorMemory;
-	info.cursor_area = cursorMapper.Map("intel extreme cursor",
-		(void *)(info.shared_info->physical_graphics_memory + totalSize),
-		B_PAGE_SIZE, B_ANY_KERNEL_ADDRESS, 0, &cursorMemory);
-	if (cursorMapper.InitCheck() < B_OK) {
-		// we can't do a hardware cursor, then...
-	}
-	info.shared_info->cursor_area = info.cursor_area;
+	info.shared_info->cursor_buffer_offset = totalSize;
 
 	init_interrupt_handler(info);
 
@@ -488,7 +478,6 @@ intel_extreme_uninit(intel_info &info)
 	delete_area(info.graphics_memory_area);
 	delete_area(info.registers_area);
 	delete_area(info.shared_area);
-	delete_area(info.cursor_area);
 
 	// we may or may not have allocated additional graphics memory
 	if (info.additional_memory_area >= B_OK)
