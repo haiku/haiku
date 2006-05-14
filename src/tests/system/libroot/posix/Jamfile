@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests system libroot posix ;
 
-SetSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders syslog_daemon ;
 
 SimpleTest SyslogTest
@@ -13,6 +12,10 @@ SimpleTest flock_test
 
 SimpleTest setjmp_test
 	: setjmp_test.c
+	;
+
+SimpleTest sigsetjmp_test
+	: sigsetjmp_test.c
 	;
 
 # Tell Jam where to find these sources

@@ -1,13 +1,14 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <stdio.h>
 #include <setjmp.h>
+#include <stdio.h>
 
-void
+
+static void
 jump_to_top_level(jmp_buf *state, int value)
 {
 	siglongjmp(*state, value);
@@ -20,7 +21,7 @@ main(int argc, char **argv)
 	jmp_buf state;
 	int value;
 
-	if (value = sigsetjmp(state, 1)) {
+	if ((value = sigsetjmp(state, 1)) != 0) {
 		printf("failed with: %d!\n", value);
 	} else {
 		printf("here I am: %d\n", value);
