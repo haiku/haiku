@@ -13,7 +13,7 @@ local styled_edit_rsrc =
 	[ FGristFiles StyledEdit.rsrc ]
 	;
 ResComp $(styled_edit_rsrc) :
-	[ FGristFiles StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef ]
+	[ FGristFiles StyledEdit.rdef StyledEdit.icons.rdef ]
 	;
 
 local styled_edit_files = 
