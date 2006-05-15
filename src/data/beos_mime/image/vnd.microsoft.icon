@@ -1,7 +1,7 @@
 
 resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
-resource(1, "META:TYPE") "image/x-icon";
+resource(1, "META:TYPE") "image/vnd.microsoft.icon";
 
 resource(2, "META:SNIFF_RULE") "0.50 (\"\\000\\000\\001\\000\" | \"\\000\\000\\002\\000\")";
 
@@ -9,5 +9,5 @@ resource(3, "META:S:DESC") #'MSDC' "Windows Icon";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "ico",
-	"type" = "image/x-icon"
+	"type" = "image/vnd.microsoft.icon"
 };

@@ -44,7 +44,7 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2005 Haiku Inc.");
+	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 	

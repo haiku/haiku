@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,12 +9,7 @@
 
 #include "TranslatorWindow.h"
 #include <Application.h>
-/*
-#include <TranslatorRoster.h>
 
-#include <stdio.h>
-#include <string.h>
-*/
 
 int
 main(int /*argc*/, char **/*argv*/)

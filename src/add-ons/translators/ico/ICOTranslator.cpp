@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +16,7 @@
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
 
-#define kICOMimeType "image/x-icon"
+#define kICOMimeType "image/vnd.microsoft.icon"
 	// I'm lazy - structure initializers don't like const variables...
 
 
