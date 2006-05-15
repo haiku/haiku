@@ -1,0 +1,14 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/tiff";
+
+resource(2, "META:SNIFF_RULE") "0.50 (\"MM\\000\\052\" | \"II\\052\\000\" | \"IIN1\")";
+
+resource(3, "META:S:DESC") #'MSDC' "TIFF Image";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "tif",
+	"extensions" = "tiff",
+	"type" = "image/tiff"
+};

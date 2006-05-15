@@ -1,0 +1,11 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/svg+xml";
+
+resource(2, "META:S:DESC") #'MSDC' "SVG Image";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "svg",
+	"type" = "image/svg+xml"
+};

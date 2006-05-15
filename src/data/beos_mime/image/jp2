@@ -1,0 +1,12 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/jp2";
+
+resource(2, "META:S:DESC") #'MSDC' "JPEG2000 Image";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "jp2",
+	"extensions" = "jpg2",
+	"type" = "image/jp2"
+};
