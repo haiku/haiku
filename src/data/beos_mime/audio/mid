@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "audio/mid";
+
+resource(2, "META:S:DESC") #'MSDC' "MIDI File";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "mid",
+	"extensions" = "midi",
+	"extensions" = "rmi",
+	"type" = "audio/mid"
+};
+
