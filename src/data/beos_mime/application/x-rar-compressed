@@ -1,0 +1,13 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/rar-compressed";
+
+resource(2, "META:S:DESC") #'MSDC' "RAR Archive";
+
+resource(3, "META:SNIFF_RULE") "0.50 (\"Rar!\")";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "rar",
+	"type" = "application/x-rar-compressed"
+};

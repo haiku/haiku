@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/ogg";
+
+resource(2, "META:SNIFF_RULE") "0.50 (\"OggS\";
+
+resource(3, "META:S:DESC") #'MSDC' "OGG Movie";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "ogg",
+	"extensions" = "ogm",
+	"type" = "application/ogg"
+};
+
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";

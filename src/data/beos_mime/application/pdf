@@ -9,3 +9,7 @@ resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.mp-xpdf";
 
 resource(4, "META:S:DESC") #'MSDC' "PDF Document";
 
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "pdf",
+	"type" = "application/pdf"
+};

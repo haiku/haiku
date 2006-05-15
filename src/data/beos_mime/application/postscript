@@ -1,0 +1,15 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/postscript";
+
+resource(2, "META:S:DESC") #'MSDC' "Postscript File";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "ai",
+	"extensions" = "ps",
+	"extensions" = "eps",
+	"type" = "application/postscript"
+};
+
+resource(4, "META:SNIFF_RULE") "0.50 (\"%!PS\")";
