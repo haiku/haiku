@@ -214,46 +214,46 @@ intel_propose_display_mode(display_mode *target, const display_mode *low,
 	// just search for the specified mode in the list
 
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *current = &gInfo->mode_list[i];
+		display_mode *mode = &gInfo->mode_list[i];
 
 		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
 
-		if (target->virtual_width != current->virtual_width
-			|| target->virtual_height != current->virtual_height
-			|| target->space != current->space)
+		if (target->virtual_width != mode->virtual_width
+			|| target->virtual_height != mode->virtual_height
+			|| target->space != mode->space)
 			continue;
 
-		*target = *current;
+		*target = *mode;
 		return B_OK;
 	}
 	return B_BAD_VALUE;
 }
 
-
+#include <stdio.h>
 status_t
 intel_set_display_mode(display_mode *mode)
 {
 	TRACE(("intel_set_display_mode()\n"));
 
-	intel_shared_info &sharedInfo = *gInfo->shared_info;
+	display_mode target = *mode;
 
-	if (mode == NULL)
+	if (mode == NULL || intel_propose_display_mode(&target, mode, mode))
 		return B_BAD_VALUE;
 
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
-	display_mode current = *mode;
 
 	set_display_power_mode(B_DPMS_OFF);
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
-	get_color_space_format(current, colorMode, bytesPerRow, bitsPerPixel);
+	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
 
 	// free old and allocate new frame buffer in graphics memory
 
 	intel_free_memory(gInfo->frame_buffer_handle);
 
 	uint32 offset;
-	if (intel_allocate_memory(bytesPerRow * current.virtual_height,
+	if (intel_allocate_memory(bytesPerRow * target.virtual_height,
 			gInfo->frame_buffer_handle, offset) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way back
 		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
@@ -268,32 +268,36 @@ intel_set_display_mode(display_mode *mode)
 
 	sharedInfo.frame_buffer_offset = offset;
 
+	// make sure VGA display is disabled
+	write32(DISPLAY_VGA_DISPLAY_CONTROL, read32(DISPLAY_VGA_DISPLAY_CONTROL)
+		| VGA_DISPLAY_DISABLED);
+
 	// update timing parameters
 
-	write32(INTEL_DISPLAY_HTOTAL, ((uint32)(current.timing.h_total - 1) << 16)
-		| ((uint32)current.timing.h_display - 1));
-	write32(INTEL_DISPLAY_HBLANK, ((uint32)(current.timing.h_total - 1) << 16)
-		| ((uint32)current.timing.h_display - 1));
-	write32(INTEL_DISPLAY_HSYNC, ((uint32)(current.timing.h_sync_end - 1) << 16)
-		| ((uint32)current.timing.h_sync_start - 1));
+	write32(INTEL_DISPLAY_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+		| ((uint32)target.timing.h_display - 1));
+	write32(INTEL_DISPLAY_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+		| ((uint32)target.timing.h_display - 1));
+	write32(INTEL_DISPLAY_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+		| ((uint32)target.timing.h_sync_start - 1));
 
-	write32(INTEL_DISPLAY_VTOTAL, ((uint32)(current.timing.v_total - 1) << 16)
-		| ((uint32)current.timing.v_display - 1));
-	write32(INTEL_DISPLAY_VBLANK, ((uint32)(current.timing.v_total - 1) << 16)
-		| ((uint32)current.timing.v_display - 1));
-	write32(INTEL_DISPLAY_VSYNC, ((uint32)(current.timing.v_sync_end - 1) << 16)
-		| ((uint32)current.timing.v_sync_start - 1));
+	write32(INTEL_DISPLAY_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+		| ((uint32)target.timing.v_display - 1));
+	write32(INTEL_DISPLAY_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+		| ((uint32)target.timing.v_display - 1));
+	write32(INTEL_DISPLAY_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+		| ((uint32)target.timing.v_sync_start - 1));
 
-	write32(INTEL_DISPLAY_IMAGE_SIZE, ((uint32)(current.timing.h_display - 1) << 16)
-		| ((uint32)current.timing.v_display - 1));
+	write32(INTEL_DISPLAY_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+		| ((uint32)target.timing.v_display - 1));
 
 	write32(INTEL_DISPLAY_ANALOG_PORT, (read32(INTEL_DISPLAY_ANALOG_PORT)
 		& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
-		| ((current.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
-		| ((current.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
+		| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
+		| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 
 	uint32 postDivisor, nDivisor, m1Divisor, m2Divisor;
-	compute_pll_divisors(current, postDivisor, nDivisor, m1Divisor, m2Divisor);
+	compute_pll_divisors(target, postDivisor, nDivisor, m1Divisor, m2Divisor);
 
 	// switch divisor register with every mode change (not required)
 	uint32 divisorRegister;
@@ -323,7 +327,7 @@ intel_set_display_mode(display_mode *mode)
 
 	// update shared info
 	sharedInfo.bytes_per_row = bytesPerRow;
-	sharedInfo.current_mode = current;
+	sharedInfo.current_mode = target;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
 
 	return B_OK;

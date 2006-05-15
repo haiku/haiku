@@ -199,6 +199,9 @@ struct intel_free_graphics_memory {
 #define DISPLAY_CONTROL_RGB16			(5UL << 26)
 #define DISPLAY_CONTROL_RGB32			(7UL << 26)
 
+#define DISPLAY_VGA_DISPLAY_CONTROL		0x71400
+#define VGA_DISPLAY_DISABLED			(1UL << 31)
+
 #define INTEL_DISPLAY_PALETTE			0x0a000
 
 #define INTEL_DISPLAY_PIPE_CONTROL		0x70008
