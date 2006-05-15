@@ -474,18 +474,17 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	// determine the count of byte to compare when checking for a name with(out) wildcard
 	if (name) {
 		namelen = strlen(name);
-		if (name[namelen] == '*')
+		if (namelen > 0 && name[namelen - 1] == '*')
 			namelen--; // compares without the '*'
-		else
-			namelen++; // also compares the terminating NULL
-	} else
+	} else {
 		namelen = 0;
+	}
 
 	for (fRegisteredNodeMap->Rewind(); (maxcount > 0) && fRegisteredNodeMap->GetNext(&rn); ) {
 		if ((rn->kinds & require_kinds) != require_kinds)
 			continue;
 		if (namelen) {
-			if (0 != memcmp(name, rn->name, namelen))
+			if (0 != strncmp(name, rn->name, namelen))
 				continue;
 		}
 		if (inputformat) {
@@ -746,12 +745,11 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 	// determine the count of byte to compare when checking for a name with(out) wildcard
 	if (name) {
 		namelen = strlen(name);
-		if (name[namelen] == '*')
+		if (namelen > 0 && name[namelen - 1] == '*')
 			namelen--; // compares without the '*'
-		else
-			namelen++; // also compares the terminating NULL
-	} else
+	} else {
 		namelen = 0;
+	}
 
 	maxcount = *io_count;	
 	*io_count = 0;
@@ -767,7 +765,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 		if ((dfi->kinds & deny_kinds) != 0)
 			continue;
 		if (namelen) {
-			if (0 != memcmp(name, dfi->name, namelen))
+			if (0 != strncmp(name, dfi->name, namelen))
 				continue;
 		}
 		if (has_input) {
