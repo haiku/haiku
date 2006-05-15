@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "video/quicktime";
+
+resource(2, "META:S:DESC") #'MSDC' "Quicktime Movie";
+
+resource(3, "META:SNIFF_RULE") "0.50 (\"[4]\"mdat\" | [4]\"moov\"\")";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "mov",
+	"extensions" = "qt",
+	"type" = "video/quicktime"
+};
+
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";

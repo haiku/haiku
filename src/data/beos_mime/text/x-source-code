@@ -3,24 +3,25 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "text/x-source-code";
 
-resource(2, "META:SNIFF_RULE") #'CSTR' array
-{
+resource(2, "META:SNIFF_RULE") #'CSTR' array {
 	"0.20          ([0]\"//\" | [0]\"/*\" | [0:32]\"#include\" | [0:3"
 	"2]\"#ifndef\" | [0:32]\"#ifdef\")"
 };
 
 resource(3, "META:S:DESC") #'MSDC' "Source Code";
 
-resource(4, "META:EXTENS") message(234)
-{
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "asm",
 	"extensions" = "c",
 	"extensions" = "cc",
 	"extensions" = "cpp",
 	"extensions" = "h",
 	"extensions" = "h++",
+	"extensions" = "java",
 	"extensions" = "pl",
 	"extensions" = "py",
+	"extensions" = "S",
 	"type" = "text/x-source-code"
 };
 
-resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.obos.styled-edit";
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku.styled-edit";

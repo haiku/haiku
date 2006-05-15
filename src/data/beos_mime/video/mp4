@@ -1,0 +1,13 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "video/mp4";
+
+resource(2, "META:S:DESC") #'MSDC' "MP4 Movie";
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "mp4",
+	"type" = "video/mp4"
+};
+
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";

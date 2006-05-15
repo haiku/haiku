@@ -3,9 +3,8 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "text/html";
 
-resource(2, "META:SNIFF_RULE") #'CSTR' array
-{
-	"0.40          [0:64]( -i \"<HTML\" | \"<HEAD\" | \"<TITLE\" | \""
+resource(2, "META:SNIFF_RULE") #'CSTR' array {
+	"0.40  [0:64]( -i \"<HTML\" | \"<HEAD\" | \"<TITLE\" | \""
 	"<BODY\" | \"<TABLE\" | \"<!--\" | \"<META\" | \"<CENTER\")"
 };
 
@@ -13,8 +12,7 @@ resource(3, "META:S:DESC") #'MSDC' "HTML File";
 
 resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Be-NPOS";
 
-resource(5, "META:EXTENS") message(234)
-{
+resource(5, "META:EXTENS") message(234) {
 	"extensions" = "htm",
 	"extensions" = "html",
 	"type" = "text/html"

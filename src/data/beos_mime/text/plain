@@ -10,7 +10,7 @@ resource(3, "META:EXTENS") message(234) {
 	"type" = "text/plain"
 };
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.obos.styled-edit";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.haiku.styled-edit";
 
 resource(5, "META:L:STD_ICON") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
