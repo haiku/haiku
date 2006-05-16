@@ -47,7 +47,7 @@ runprog() {
 # Set up stdin/out/err to nirvana
 
 exec </dev/null
-exec >/dev/dprintf 2>&1
+exec >/dev/null 2>&1
 
 # Standard locations of boot files
 SCRIPTS=beos/system/boot
@@ -63,8 +63,7 @@ launchscript $SCRIPTS/SetupEnvironment
 runprog beos/bin/clockconfig
 
 # Init Network
-if [ "$SAFEMODE" != "yes" ]
-then
+if [ "$SAFEMODE" != "yes" ]; then
 	launchscript $SCRIPTS/Netscript
 fi
 
