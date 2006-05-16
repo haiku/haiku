@@ -110,6 +110,7 @@ private:
 	volatile bool			fSeekAudio;
 	volatile bool			fSeekVideo;
 	volatile bigtime_t		fSeekPosition;
+	bigtime_t				fDuration;
 };
 
 

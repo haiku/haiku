@@ -66,6 +66,7 @@ Controller::Controller()
  ,	fSeekAudio(false)
  ,	fSeekVideo(false)
  ,	fSeekPosition(0)
+ ,	fDuration(0)
 {
 }
 
@@ -119,6 +120,7 @@ Controller::SetTo(const entry_ref &ref)
 	fPosition = 0;
 	fPaused = false;
 	fStopped = true;
+	fDuration = 0;
 	fName = ref.name;
 	
 	status_t err;
@@ -207,6 +209,10 @@ Controller::SelectAudioTrack(int n)
 	if (!t)
 		return B_ERROR;
 	fAudioTrack = t;
+
+	bigtime_t a = fAudioTrack ? fAudioTrack->Duration() : 0;
+	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
+	fDuration = max_c(a, v);
 	
 	StartAudioPlayback();
 	return B_OK;
@@ -223,6 +229,10 @@ Controller::SelectVideoTrack(int n)
 		return B_ERROR;
 	fVideoTrack = t;
 
+	bigtime_t a = fAudioTrack ? fAudioTrack->Duration() : 0;
+	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
+	fDuration = max_c(a, v);
+
 	StartVideoPlayback();
 	return B_OK;
 }
@@ -231,10 +241,7 @@ Controller::SelectVideoTrack(int n)
 bigtime_t
 Controller::Duration()
 {
-	bigtime_t a = fAudioTrack ? fAudioTrack->Duration() : 0;
-	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
-//	printf("Controller::Duration: audio %.6f, video %.6f\n", a / 1000000.0, v / 1000000.0);
-	return max_c(a, v);
+	return fDuration;
 }
 
 
