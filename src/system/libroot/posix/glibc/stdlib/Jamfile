@@ -15,6 +15,7 @@ MergeObject posix_gnu_stdlib.o :
 	fpioconst.c
 	jrand48.c
 	jrand48_r.c
+	inlines.c
 	lcong48.c
 	lcong48_r.c
 	lrand48.c
