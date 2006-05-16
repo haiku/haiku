@@ -1245,7 +1245,10 @@ tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer, size_t *_length,
 				// If we can't write both '\r' and '\n', we won't write either,
 				// or we would write the '\r' again.
 				if (writable < 2) {
+					// try acquiring the writer again, when enough space is available
 					bytesNeeded = 2;
+					writable = 0;
+						// make sure we're breaking out of this loop
 					continue;
 				}
 
