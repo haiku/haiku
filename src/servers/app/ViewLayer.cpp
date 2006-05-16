@@ -515,6 +515,28 @@ ViewLayer::_UpdateOverlayView() const
 }
 
 
+/*!
+	This method is called whenever the window is resized or moved - would
+	be nice to have a better solution for this, though.
+*/
+void
+ViewLayer::UpdateOverlay()
+{
+	if (!IsVisible())
+		return;
+
+	if (_Overlay() != NULL) {
+		_UpdateOverlayView();
+	} else {
+		// recursively ask children of this view
+
+		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+			child->UpdateOverlay();
+		}
+	}
+}
+
+
 void
 ViewLayer::ConvertToParent(BPoint* point) const
 {
@@ -756,9 +778,6 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 		// the screen clipping
 		InvalidateScreenClipping(true);
 	}
-
-	// overlay handling
-	_UpdateOverlayView();
 }
 
 // ResizeBy
@@ -822,9 +841,6 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	// TODO: when the implementation of Hide() and Show() is
 	// complete, see if this should be avoided
 	RebuildClipping(false);
-
-	// overlay handling
-	_UpdateOverlayView();
 }
 
 // ParentResized

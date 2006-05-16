@@ -316,8 +316,10 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (fDecorator)
 		fDecorator->MoveBy(x, y);
 
-	if (fTopLayer != NULL)
+	if (fTopLayer != NULL) {
 		fTopLayer->MoveBy(x, y, NULL);
+		fTopLayer->UpdateOverlay();
+	}
 
 	// the desktop will take care of dirty regions
 
@@ -373,8 +375,10 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 //}
 	}
 
-	if (fTopLayer != NULL)
+	if (fTopLayer != NULL) {
 		fTopLayer->ResizeBy(x, y, dirtyRegion);
+		fTopLayer->UpdateOverlay();
+	}
 
 //if (dirtyRegion)
 //fDrawingEngine->FillRegion(*dirtyRegion, RGBColor(0, 255, 255, 255));

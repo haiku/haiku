@@ -183,6 +183,8 @@ class ViewLayer {
 			// according to the parents visibility
 			void			UpdateVisibleDeep(bool parentVisible);
 
+			void			UpdateOverlay();
+
 			void			MarkBackgroundDirty();
 			bool			IsBackgroundDirty() const
 								{ return fBackgroundDirty; }
