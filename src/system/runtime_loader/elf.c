@@ -1414,7 +1414,7 @@ elf_verify_header(void *header, int32 length)
 	int32 programSize, sectionSize;
 
 	if (length < (int32)sizeof(struct Elf32_Ehdr))
-		return B_BAD_VALUE;
+		return B_NOT_AN_EXECUTABLE;
 
 	return parse_elf_header((struct Elf32_Ehdr *)header, &programSize, &sectionSize);
 }
