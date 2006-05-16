@@ -1,5 +1,16 @@
 #include "GLRenderer.h"
 
+void BGLRenderer::Acquire()
+{
+	atomic_add(&fRefCount, 1);
+}
+
+void BGLRenderer::Release()
+{
+	if (atomic_add(&fRefCount, -1) < 1)
+		delete this;
+}
+
 void BGLRenderer::LockGL()
 {
 }

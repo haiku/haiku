@@ -34,16 +34,20 @@ BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong o
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
 		fRenderer(NULL)
 {
+	// TODO: get a renderer instance!
 }
 
 
 BGLView::~BGLView()
 {
-	delete fRenderer;
+	if (fRenderer)
+		fRenderer->Release();
 }
 
 void BGLView::LockGL()
 {
+	// TODO: acquire the OpenGL API lock it on this glview
+
 	if (fRenderer)
 		fRenderer->LockGL();
 }
@@ -52,6 +56,8 @@ void BGLView::UnlockGL()
 {
 	if (fRenderer)
 		fRenderer->UnlockGL();
+
+	// TODO: release the GL API lock to others glviews
 }
 
 void BGLView::SwapBuffers()
@@ -72,34 +78,37 @@ BView *	BGLView::EmbeddedView()
 
 status_t BGLView::CopyPixelsOut(BPoint source, BBitmap *dest)
 {
+	if (!fRenderer)
+		return B_ERROR;
+	
 	if (! dest || ! dest->Bounds().IsValid())
 		return B_BAD_VALUE;
 
-	if (fRenderer)
-		return fRenderer->CopyPixelsOut(source, dest);
-
-	return B_ERROR;
+	return fRenderer->CopyPixelsOut(source, dest);
 }
 
 status_t BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 {
+	if (!fRenderer)
+		return B_ERROR;
+	
 	if (! source || ! source->Bounds().IsValid())
 		return B_BAD_VALUE;
 
-	if (fRenderer)
-		return fRenderer->CopyPixelsIn(source, dest);
-
-	return B_ERROR;
+	return fRenderer->CopyPixelsIn(source, dest);
 }
 
-
-void BGLView::ErrorCallback(unsigned long errorCode) // Mesa's GLenum is not ulong but uint!
+/* Mesa's GLenum is not ulong but uint, so we can't use GLenum
+   without breaking this method signature.
+   Instead, we have to use the effective BeOS's SGI OpenGL GLenum type:
+   unsigned long.
+ */
+void BGLView::ErrorCallback(unsigned long errorCode) 
 {
 	char msg[32];
 	sprintf(msg, "GL: Error code $%04lx.", errorCode);
-	// debugger(msg);
+	// TODO: under BeOS R5, it call debugger(msg);
 	fprintf(stderr, "%s\n", msg);
-	return;
 }
 
 void BGLView::Draw(BRect updateRect)
@@ -130,21 +139,33 @@ void BGLView::AttachedToWindow()
 void BGLView::AllAttached()
 {
 	BView::AllAttached();
+
+	if (fRenderer)
+		fRenderer->AllAttached();
 }
 
 void BGLView::DetachedFromWindow()
 {
+	if (fRenderer)
+		fRenderer->DetachedFromWindow();
+
 	BView::DetachedFromWindow();
 }
 
 void BGLView::AllDetached()
 {
+	if (fRenderer)
+		fRenderer->AllDetached();
+
 	BView::AllDetached();
 }
 
 void BGLView::FrameResized(float width, float height)
 {
-   	return BView::FrameResized(width, height);
+	if (fRenderer)
+		fRenderer->FrameResized(width, height);
+
+   	BView::FrameResized(width, height);
 }
 
 status_t BGLView::Perform(perform_code d, void *arg)
@@ -229,13 +250,13 @@ void BGLView::DirectConnected( direct_buffer_info *info )
 #endif
 
 	if (fRenderer)
-		return fRenderer->DirectConnected(info);
+		fRenderer->DirectConnected(info);
 }
 
 void BGLView::EnableDirectMode( bool enabled )
 {
 	if (fRenderer)
-		return fRenderer->EnableDirectMode(enabled);
+		fRenderer->EnableDirectMode(enabled);
 }
 
 

@@ -14,11 +14,11 @@ class BGLRenderer
 						BGLRenderer & operator=(const BGLRenderer &);
 	
 public:
-						BGLRenderer(BGLView *view, BGLDispatcher *dispatcher);
+						BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher);
 	virtual				~BGLRenderer();
 
-	status_t 			Acquire();
-	status_t 			Release();
+	void 				Acquire();
+	void	 			Release();
 
 	void 				LockGL();
 	void 				UnlockGL();
@@ -39,8 +39,17 @@ public:
 	void				DirectConnected( direct_buffer_info *info );
 	void				EnableDirectMode( bool enabled );
 
+	inline	int32			ReferenceCount()	{ return fRefCount; };			
+	inline	ulong			Options() 			{ return fOptions; };
+	inline	BGLView *		GLView()			{ return fView; };
+	inline	BGLDispatcher *	GLDispatcher()		{ return fDispatcher; };
+
 private:
-	uint32	fRefCount;
+	volatile int32		fRefCount;		// How much we're still usefull?
+	BGLView *			fView;			// Never forget who is the boss!
+	ulong				fOptions;		// Keep that tune in memory
+	BGLDispatcher *		fDispatcher;	// Our personal OpenGL API call dispatcher
+
 };
 
 extern "C" _EXPORT BGLRenderer * instanciate_gl_renderer(BGLView *view, BGLDispatcher *dispatcher);
