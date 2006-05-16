@@ -1777,7 +1777,7 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 
 	// pre-register the app (but ignore scipts)
 	app_info appInfo;
-	bool isScript = wasDocument && *docRef == appRef;
+	bool isScript = wasDocument && docRef != NULL && *docRef == appRef;
 	bool alreadyRunning = false;
 	uint32 appToken = 0;
 	team_id team = -1;
