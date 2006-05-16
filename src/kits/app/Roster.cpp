@@ -1775,13 +1775,14 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 	}
 	DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
 
-	// pre-register the app
+	// pre-register the app (but ignore scipts)
 	app_info appInfo;
+	bool isScript = wasDocument && *docRef == appRef;
 	bool alreadyRunning = false;
 	uint32 appToken = 0;
 	team_id team = -1;
 	uint32 otherAppFlags = B_REG_DEFAULT_APP_FLAGS;
-	if (error == B_OK && !alreadyRunning) {
+	if (error == B_OK && !isScript) {
 		error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
 			&appToken, &team);
 		if (error == B_ALREADY_RUNNING) {
