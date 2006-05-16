@@ -299,7 +299,14 @@ VideoNode::HandleBuffer(BBuffer *buffer)
 	LockBitmap();
 	if (fBitmap) {
 //		bigtime_t start = system_time();
-		memcpy(fBitmap->Bits(), buffer->Data(), fBitmap->BitsLength());
+		if (fOverlayActive) {
+			if (B_OK == fBitmap->LockBits()) {
+				memcpy(fBitmap->Bits(), buffer->Data(), fBitmap->BitsLength());
+				fBitmap->UnlockBits();
+			}
+		} else {
+			memcpy(fBitmap->Bits(), buffer->Data(), fBitmap->BitsLength());
+		}
 //		printf("overlay copy: %Ld usec\n", system_time() - start);
 	}
 	UnlockBitmap();
