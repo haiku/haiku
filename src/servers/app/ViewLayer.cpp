@@ -522,9 +522,6 @@ ViewLayer::_UpdateOverlayView() const
 void
 ViewLayer::UpdateOverlay()
 {
-	if (!IsVisible())
-		return;
-
 	if (_Overlay() != NULL) {
 		_UpdateOverlayView();
 	} else {
