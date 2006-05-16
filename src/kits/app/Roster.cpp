@@ -1793,8 +1793,8 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 			if (GetRunningAppInfo(team, &appInfo) == B_OK)
 				otherAppFlags = appInfo.flags;
 		}
+		DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
 	}
-	DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
 
 	// launch the app
 	if (error == B_OK && !alreadyRunning) {
@@ -1817,7 +1817,7 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 
 		DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
 		// finish the registration
-		if (error == B_OK)
+		if (error == B_OK && !isScript)
 			error = _SetThreadAndTeam(appToken, appThread, team);
 
 		DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
@@ -1830,7 +1830,8 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 		if (error != B_OK) {
 			if (appThread >= 0)
 				kill_thread(appThread);
-			_RemovePreRegApp(appToken);
+			if (!isScript)
+				_RemovePreRegApp(appToken);
 		}
 	}
 
