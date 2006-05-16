@@ -122,31 +122,46 @@ BAppFileInfo::SetTo(BFile *file)
 		delete fResources;
 		fResources = NULL;
 	}
+
 	// check param
 	status_t error = (file && file->InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+
+	info_location where = B_USE_BOTH_LOCATIONS;
+
 	// create resources
 	if (error == B_OK) {
 		fResources = new(nothrow) BResources();
-		if (fResources)
+		if (fResources) {
 			error = fResources->SetTo(file);
-		else
+			if (error != B_OK) {
+				// no resources - this is no critical error, we'll just use
+				// attributes only, then
+				where = B_USE_ATTRIBUTES;
+				error = B_OK;
+			}
+		} else
 			error = B_NO_MEMORY;
 	}
+
 	// set node info
 	if (error == B_OK)
 		error = BNodeInfo::SetTo(file);
+
+	if (error != B_OK || (where & B_USE_RESOURCES) == 0) {
+		delete fResources;
+		fResources = NULL;
+	}
+
 	// clean up on error
 	if (error != B_OK) {
-		if (fResources) {
-			delete fResources;
-			fResources = NULL;
-		}
 		if (InitCheck() == B_OK)
 			BNodeInfo::SetTo(NULL);
 	}
+
 	// set data location
 	if (error == B_OK)
-		SetInfoLocation(B_USE_BOTH_LOCATIONS);
+		SetInfoLocation(where);
+
 	// set error
 	fCStatus = error;
 	return error;
