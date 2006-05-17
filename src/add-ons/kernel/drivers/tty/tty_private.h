@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef TTY_PRIVATE_H
 #define TTY_PRIVATE_H
 
@@ -34,75 +34,75 @@ struct tty;
 struct tty_cookie;
 
 class Request : public DoublyLinkedListLinkImpl<Request> {
-public:
-	Request();
+	public:
+		Request();
 
-	void Init(RequestOwner *owner, tty_cookie *cookie, int32 bytesNeeded);
+		void Init(RequestOwner *owner, tty_cookie *cookie, size_t bytesNeeded);
 
-	tty_cookie *TTYCookie() const	{ return fCookie; }
+		tty_cookie *TTYCookie() const	{ return fCookie; }
 
-	void Notify(int32 bytesAvailable);
-	void NotifyError(status_t error);
+		void Notify(size_t bytesAvailable);
+		void NotifyError(status_t error);
 
-	bool WasNotified() const		{ return fNotified; }
-	bool HasError() const			{ return fError; }
+		bool WasNotified() const		{ return fNotified; }
+		bool HasError() const			{ return fError; }
 
-private:
-	RequestOwner	*fOwner;
-	tty_cookie		*fCookie;
-	int32			fBytesNeeded;
-	bool			fNotified;
-	bool			fError;
+	private:
+		RequestOwner	*fOwner;
+		tty_cookie		*fCookie;
+		size_t			fBytesNeeded;
+		bool			fNotified;
+		bool			fError;
 };
 
 class RequestQueue {
-public:
-	RequestQueue();
-	~RequestQueue()	{}
+	public:
+		RequestQueue();
+		~RequestQueue()	{}
 
-	void Add(Request *request);
-	void Remove(Request *request);
+		void Add(Request *request);
+		void Remove(Request *request);
 
-	Request *First() const				{ return fRequests.First(); }
-	bool IsEmpty() const				{ return fRequests.IsEmpty(); }
+		Request *First() const				{ return fRequests.First(); }
+		bool IsEmpty() const				{ return fRequests.IsEmpty(); }
 
-	void NotifyFirst(int32 bytesAvailable);
-	void NotifyError(status_t error);
-	void NotifyError(tty_cookie *cookie, status_t error);
+		void NotifyFirst(size_t bytesAvailable);
+		void NotifyError(status_t error);
+		void NotifyError(tty_cookie *cookie, status_t error);
 
-private:
-	typedef DoublyLinkedList<Request> RequestList;
+	private:
+		typedef DoublyLinkedList<Request> RequestList;
 
-	RequestList	fRequests;
+		RequestList	fRequests;
 };
 
 class RequestOwner {
-public:
-	RequestOwner();
+	public:
+		RequestOwner();
 
-	void Enqueue(tty_cookie *cookie, RequestQueue *queue1, 
-		RequestQueue *queue2 = NULL);
-	void Dequeue();
+		void Enqueue(tty_cookie *cookie, RequestQueue *queue1, 
+			RequestQueue *queue2 = NULL);
+		void Dequeue();
 
-	void SetBytesNeeded(int32 bytesNeeded);
-	int32 BytesNeeded() const	{ return fBytesNeeded; }
+		void SetBytesNeeded(size_t bytesNeeded);
+		size_t BytesNeeded() const	{ return fBytesNeeded; }
 
-	status_t Wait(bool interruptable, Semaphore *sem = NULL);
+		status_t Wait(bool interruptable, Semaphore *sem = NULL);
 
-	bool IsFirstInQueues();
+		bool IsFirstInQueues();
 
-	void Notify(Request *request);
-	void NotifyError(Request *request, status_t error);
+		void Notify(Request *request);
+		void NotifyError(Request *request, status_t error);
 
-	status_t Error() const	{ return fError; }
+		status_t Error() const	{ return fError; }
 
-private:
-	Semaphore		*fSemaphore;
-	tty_cookie		*fCookie;
-	status_t		fError;
-	RequestQueue	*fRequestQueues[2];
-	Request			fRequests[2];
-	int32			fBytesNeeded;
+	private:
+		Semaphore		*fSemaphore;
+		tty_cookie		*fCookie;
+		status_t		fError;
+		RequestQueue	*fRequestQueues[2];
+		Request			fRequests[2];
+		size_t			fBytesNeeded;
 };
 
 

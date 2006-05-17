@@ -85,27 +85,26 @@ static void tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
 
 
 class AbstractLocker {
-public:
-	AbstractLocker(tty_cookie *cookie)	: fCookie(cookie), fBytes(0) {}
+	public:
+		AbstractLocker(tty_cookie *cookie)	: fCookie(cookie), fBytes(0) {}
 
-	size_t AvailableBytes() const	{ return fBytes; }
+		size_t AvailableBytes() const	{ return fBytes; }
 
-protected:
-	void Lock()		{ mutex_lock(fCookie->tty->lock); }
-	void Unlock()	{ mutex_unlock(fCookie->tty->lock); }
+	protected:
+		void Lock()		{ mutex_lock(fCookie->tty->lock); }
+		void Unlock()	{ mutex_unlock(fCookie->tty->lock); }
 
-	tty_cookie	*fCookie;
-	size_t		fBytes;
+		tty_cookie	*fCookie;
+		size_t		fBytes;
 };
 
 
 class WriterLocker : public AbstractLocker {
 	public:
 		WriterLocker(tty_cookie *sourceCookie);
-
 		~WriterLocker();
 
-		status_t AcquireWriter(bool dontBlock, int32 bytesNeeded);
+		status_t AcquireWriter(bool dontBlock, size_t bytesNeeded);
 
 	private:
 		size_t _CheckAvailableBytes() const;
@@ -131,37 +130,36 @@ class ReaderLocker : public AbstractLocker {
 
 
 class TTYReferenceLocking {
-public:
-	inline bool Lock(tty_cookie *cookie)
-	{
-		MutexLocker _(gTTYCookieLock);
+	public:
+		inline bool Lock(tty_cookie *cookie)
+		{
+			MutexLocker _(gTTYCookieLock);
 
-		if (cookie->closed || cookie->other_tty->open_count == 0)
-			return false;
+			if (cookie->closed || cookie->other_tty->open_count == 0)
+				return false;
 
-		cookie->thread_count++;
+			cookie->thread_count++;
 
-		return true;
-	}
-
-	inline void Unlock(tty_cookie *cookie)
-	{
-		MutexLocker locker(gTTYCookieLock);
-
-		sem_id semaphore = -1;
-		if (--cookie->thread_count == 0 && cookie->closed)
-			semaphore = cookie->blocking_semaphore;
-
-
-		locker.Unlock();
-
-		if (semaphore >= 0) {
-			TRACE(("TTYReference: cookie %p closed, last operation done, "
-				"releasing blocking sem %ld\n", cookie, semaphore));
-
-			release_sem(semaphore);
+			return true;
 		}
-	}
+
+		inline void Unlock(tty_cookie *cookie)
+		{
+			MutexLocker locker(gTTYCookieLock);
+
+			sem_id semaphore = -1;
+			if (--cookie->thread_count == 0 && cookie->closed)
+				semaphore = cookie->blocking_semaphore;
+
+			locker.Unlock();
+
+			if (semaphore >= 0) {
+				TRACE(("TTYReference: cookie %p closed, last operation done, "
+					"releasing blocking sem %ld\n", cookie, semaphore));
+
+				release_sem(semaphore);
+			}
+		}
 };
 
 typedef AutoLocker<tty_cookie, TTYReferenceLocking> TTYReference;
@@ -169,18 +167,20 @@ typedef AutoLocker<tty_cookie, TTYReferenceLocking> TTYReference;
 
 // #pragma mark -
 
+
 Request::Request()
-	: fOwner(NULL),
-	  fCookie(NULL),
-	  fBytesNeeded(0),
-	  fNotified(false),
-	  fError(false)
+	:
+	fOwner(NULL),
+	fCookie(NULL),
+	fBytesNeeded(0),
+	fNotified(false),
+	fError(false)
 {
 }
 
 
 void
-Request::Init(RequestOwner *owner, tty_cookie *cookie, int32 bytesNeeded)
+Request::Init(RequestOwner *owner, tty_cookie *cookie, size_t bytesNeeded)
 {
 	fOwner = owner;
 	fCookie = cookie;
@@ -191,7 +191,7 @@ Request::Init(RequestOwner *owner, tty_cookie *cookie, int32 bytesNeeded)
 
 
 void
-Request::Notify(int32 bytesAvailable)
+Request::Notify(size_t bytesAvailable)
 {
 	if (!fNotified && bytesAvailable >= fBytesNeeded && fOwner) {
 		fOwner->Notify(this);
@@ -213,8 +213,10 @@ Request::NotifyError(status_t error)
 
 // #pragma mark -
 
+
 RequestQueue::RequestQueue()
-	: fRequests()
+	:
+	fRequests()
 {
 }
 
@@ -242,7 +244,7 @@ RequestQueue::Remove(Request *request)
 
 
 void
-RequestQueue::NotifyFirst(int32 bytesAvailable)
+RequestQueue::NotifyFirst(size_t bytesAvailable)
 {
 	RecursiveLocker _(gTTYRequestLock);
 
@@ -276,11 +278,13 @@ RequestQueue::NotifyError(tty_cookie *cookie, status_t error)
 
 // #pragma mark -
 
+
 RequestOwner::RequestOwner()
-	: fSemaphore(NULL),
-	  fCookie(NULL),
-	  fError(B_OK),
-	  fBytesNeeded(1)
+	:
+	fSemaphore(NULL),
+	fCookie(NULL),
+	fError(B_OK),
+	fBytesNeeded(1)
 {
 	fRequestQueues[0] = NULL;
 	fRequestQueues[1] = NULL;
@@ -332,7 +336,7 @@ RequestOwner::Dequeue()
 
 
 void
-RequestOwner::SetBytesNeeded(int32 bytesNeeded)
+RequestOwner::SetBytesNeeded(size_t bytesNeeded)
 {
 	if (fRequestQueues[0])
 		fRequests[0].Init(this, fCookie, bytesNeeded);
@@ -455,9 +459,9 @@ RequestOwner::NotifyError(Request *request, status_t error)
 
 // #pragma mark -
 
+
 WriterLocker::WriterLocker(tty_cookie *sourceCookie)
-	:
-	AbstractLocker(sourceCookie),
+	: AbstractLocker(sourceCookie),
 	fSource(fCookie->tty),
 	fTarget(fCookie->other_tty),
 	fRequestOwner(),
@@ -522,7 +526,7 @@ WriterLocker::_CheckAvailableBytes() const
 
 
 status_t 
-WriterLocker::AcquireWriter(bool dontBlock, int32 bytesNeeded)
+WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 {
 	if (!fTarget)
 		return B_FILE_ERROR;
@@ -583,8 +587,7 @@ WriterLocker::AcquireWriter(bool dontBlock, int32 bytesNeeded)
 
 
 ReaderLocker::ReaderLocker(tty_cookie *cookie)
-	:
-	AbstractLocker(cookie),
+	: AbstractLocker(cookie),
 	fTTY(cookie->tty),
 	fRequestOwner()
 {
@@ -1219,7 +1222,7 @@ tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer, size_t *_length,
 
 	// ToDo: "buffer" is not yet copied or accessed in a safe way!
 
-	int32 bytesNeeded = 1;
+	size_t bytesNeeded = 1;
 
 	while (bytesWritten < length) {
 		status_t status = locker.AcquireWriter(dontBlock, bytesNeeded);
