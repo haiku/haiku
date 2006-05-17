@@ -144,9 +144,16 @@ TBarWindow::MenusEnded()
 {
 	BWindow::MenusEnded();
 
+ 	if (!sBeMenu->LockLooper()) {
+ 		// TODO: is this ok?
+ 		return;
+ 	}
+
 	BMenuItem *item = NULL;
 	while ((item = sBeMenu->RemoveItem((int32)0)) != NULL)
 		delete item;
+
+	sBeMenu->UnlockLooper();
 }
 
 
