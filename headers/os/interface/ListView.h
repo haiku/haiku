@@ -165,12 +165,10 @@ class BListView : public BView, public BInvoker
 			int32			_CalcLastSelected(int32 before);
 		virtual void		DrawItem(BListItem *item, BRect itemRect, bool complete = false);
 	
-			bool			DoSwapItems(int32 a, int32 b);
-			bool			DoMoveItem(int32 from, int32 to);
-			bool			DoReplaceItem(int32 index, BListItem *item);
-			void			RescanSelection(int32 from, int32 to);
-			void			DoMouseUp(BPoint where);
-			void			DoMouseMoved(BPoint where);
+			bool			_SwapItems(int32 a, int32 b);
+			bool			_MoveItem(int32 from, int32 to);
+			bool			_ReplaceItem(int32 index, BListItem *item);
+			void			_RescanSelection(int32 from, int32 to);
 	
 		BList				fList;
 		list_view_type		fListType;

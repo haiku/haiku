@@ -335,12 +335,6 @@ BListView::MouseDown(BPoint point)
 void
 BListView::MouseUp(BPoint pt)
 {
-	if (fWidth == 0)
-		return;
-
-	DoMouseMoved(pt);
-	DoMouseUp(pt);
-
 	fTrack->item_index = -1;
 	fTrack->try_drag = false;
 }
@@ -349,13 +343,14 @@ BListView::MouseUp(BPoint pt)
 void
 BListView::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
 {
-	if (fTrack->item_index == -1)
+	if (fTrack->item_index == -1) {
+		// mouse was not clicked above any item
+		// or no mouse button pressed
 		return;
+	}
 
 	if (_TryInitiateDrag(pt))
 		return;
-
-	DoMouseMoved(pt);
 }
 
 // KeyDown
@@ -440,7 +435,7 @@ BListView::MakeFocus(bool focused)
 void
 BListView::FrameResized(float width, float height)
 {
-	// TODO
+	fWidth = Bounds().right;
 	_FixupScrollBar();
 }
 
@@ -1096,24 +1091,18 @@ BListView::DoMiscellaneous(MiscCode code, MiscData *data)
 	if (code > B_SWAP_OP)
 		return false;
 
-	switch (code)
-	{
+	switch (code) {
 		case B_NO_OP:
-		{
 			break;
-		}
+
 		case B_REPLACE_OP:
-		{
-			return ReplaceItem(data->replace.index, data->replace.item);
-		}
+			return _ReplaceItem(data->replace.index, data->replace.item);
+
 		case B_MOVE_OP:
-		{
-			return MoveItem(data->move.from, data->move.to);
-		}
+			return _MoveItem(data->move.from, data->move.to);
+
 		case B_SWAP_OP:
-		{
-			return SwapItems(data->swap.a, data->swap.b);
-		}
+			return _SwapItems(data->swap.a, data->swap.b);
 	}
 
 	return false;
@@ -1162,13 +1151,17 @@ BListView::_FixupScrollBar()
 	}
 
 	if (bounds.Height() > itemHeight) {
+		// no scrolling
 		vertScroller->SetRange(0.0, 0.0);
 		vertScroller->SetValue(0.0);
+			// also scrolls ListView to the top
 	} else {
-		// TODO: what about removing items from a scrolled
-		// list view? Doesn't "value" have to be adjusted?
 		vertScroller->SetRange(0.0, itemHeight - bounds.Height() - 1.0);
 		vertScroller->SetProportion(bounds.Height () / itemHeight);
+		// scroll up if there is empty room on bottom
+		if (itemHeight < bounds.bottom) {
+			ScrollBy(0.0, bounds.bottom - itemHeight);
+		}
 	}
 
 	if (count != 0) {
@@ -1231,17 +1224,21 @@ BListView::_Select(int32 index, bool extend)
 
 	BListItem* item = ItemAt(index);
 	if (!item->IsEnabled() || item->IsSelected()) {
-		// if the item is already selected, or can't be selected, we're done here
+		// if the item is already selected, or can't be selected,
+		// we're done here
 		return changed;
 	}
 
+	// keep track of first and last selected item
 	if (fFirstSelected == -1) {
+		// no previous selection
 		fFirstSelected = index;
 		fLastSelected = index;
-	} else if (index < fFirstSelected)
+	} else if (index < fFirstSelected) {
 		fFirstSelected = index;
-	else if (index > fLastSelected)
+	} else if (index > fLastSelected) {
 		fLastSelected = index;
+	}
 
 	ItemAt(index)->Select();
 	if (Window())
@@ -1359,8 +1356,8 @@ BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 		return false;
 
 	if (exceptFrom != -1) {
-		fFirstSelected = _CalcFirstSelected(fFirstSelected);
-		fLastSelected = _CalcLastSelected(fLastSelected);
+		fFirstSelected = _CalcFirstSelected(exceptFrom);
+		fLastSelected = _CalcLastSelected(exceptTo);
 	} else
 		fFirstSelected = fLastSelected = -1;
 
@@ -1391,7 +1388,8 @@ BListView::_CalcFirstSelected(int32 after)
 	if (after >= CountItems())
 		return -1;
 
-	for (int32 i = after; i < CountItems(); i++) {
+	int32 count = CountItems();
+	for (int32 i = after; i < count; i++) {
 		if (ItemAt(i)->IsSelected())
 			return i;
 	}
@@ -1406,8 +1404,9 @@ BListView::_CalcLastSelected(int32 before)
 	if (before < 0)
 		return -1;
 
-	for (int32 i = before; i >= 0; i--)
-	{
+	before = min_c(CountItems() - 1, before);
+
+	for (int32 i = before; i >= 0; i--) {
 		if (ItemAt(i)->IsSelected())
 			return i;
 	}
@@ -1424,111 +1423,168 @@ BListView::DrawItem(BListItem *item, BRect itemRect, bool complete)
 
 
 bool
-BListView::DoSwapItems(int32 a, int32 b)
+BListView::_SwapItems(int32 a, int32 b)
 {
+	// remember frames of items before anyhing happens,
+	// the tricky situation is when the two items have
+	// a different height
+	BRect aFrame = ItemFrame(a);
+	BRect bFrame = ItemFrame(b);
+
 	if (!fList.SwapItems(a, b))
 		return false;
 
-	Invalidate(ItemFrame(a));
-	Invalidate(ItemFrame(b));
+	if (a == b) {
+		// nothing to do, but success nevertheless
+		return true;
+	}
 
+	// track anchor item
 	if (fAnchorIndex == a)
 		fAnchorIndex = b;
 	else if (fAnchorIndex == b)
 		fAnchorIndex = a;
 
-	RescanSelection(a, b);
+	// track selection
+	// NOTE: this is only important if the selection status
+	// of both items is not the same
+	if (ItemAt(a)->IsSelected() != ItemAt(b)->IsSelected()) {
+		int32 first = min_c(a, b);
+		int32 last = max_c(a, b);
+		if (first < fFirstSelected || last > fLastSelected) {
+			first = min_c(first, fFirstSelected);
+			last = max_c(last, fLastSelected);
+			_RescanSelection(first, last);
+		}
+		// though the actually selected items stayed the
+		// same, the selection has still changed
+		SelectionChanged();
+	}
+
+	// take care of invalidation
+	if (Window()) {
+		// NOTE: window looper is assumed to be locked!
+		if (aFrame.Height() != bFrame.Height()) {
+			// items in between shifted visually
+			Invalidate(aFrame | bFrame);
+		} else {
+			Invalidate(aFrame);
+			Invalidate(bFrame);
+		}
+	}
 
 	return true;
 }
 
 
 bool
-BListView::DoMoveItem(int32 from, int32 to)
+BListView::_MoveItem(int32 from, int32 to)
 {
+	// remember item frames before doing anything
 	BRect frameFrom = ItemFrame(from);
 	BRect frameTo = ItemFrame(to);
 
 	if (!fList.MoveItem(from, to))
 		return false;
 
-	RescanSelection(from, to);
+	// track anchor item
+	if (fAnchorIndex == from)
+		fAnchorIndex = to;
 
-	BRect frame = frameFrom | frameTo;
+	// track selection
+	if (ItemAt(to)->IsSelected()) {
+		_RescanSelection(from, to);
+		// though the actually selected items stayed the
+		// same, the selection has still changed
+		SelectionChanged();
+	}
 
-	if (Bounds().Intersects(frame))
-		Invalidate(Bounds() & frame);
+	// take care of invalidation
+	if (Window()) {
+		// NOTE: window looper is assumed to be locked!
+		Invalidate(frameFrom | frameTo);
+	}
 
 	return true;
 }
 
 
 bool
-BListView::DoReplaceItem(int32 index, BListItem *item)
+BListView::_ReplaceItem(int32 index, BListItem *item)
 {
+	if (!item)
+		return false;
+
+	BListItem* old = ItemAt(index);
+	if (!old)
+		return false;
+
 	BRect frame = ItemFrame(index);
 
+	bool selectionChanged = old->IsSelected() != item->IsSelected();
+
+	// replace item
 	if (!fList.ReplaceItem(index, item))
 		return false;
 
-	if (frame != ItemFrame(index))
-		_InvalidateFrom(index);
-	else
-		Invalidate(frame);
+	// tack selection
+	if (selectionChanged) {
+		int32 start = min_c(fFirstSelected, index);
+		int32 end = max_c(fLastSelected, index);
+		_RescanSelection(start, end);
+		SelectionChanged();
+	}
+
+	bool itemHeightChanged = frame != ItemFrame(index);
+
+	// take care of invalidation
+	if (Window()) {
+		// NOTE: window looper is assumed to be locked!
+		if (itemHeightChanged)
+			_InvalidateFrom(index);
+		else
+			Invalidate(frame);
+	}
+
+	if (itemHeightChanged)
+		_FixupScrollBar();
 
 	return true;
 }
 
 
 void
-BListView::RescanSelection(int32 from, int32 to)
+BListView::_RescanSelection(int32 from, int32 to)
 {
-	if (from > to)
-	{
+	if (from > to) {
 		int32 tmp = from;
 		from = to;
 		to = tmp;
 	}
 
-	if (fAnchorIndex != -1)
-	{
+	from = max_c(0, from);
+	to = min_c(to, CountItems() - 1);
+
+	if (fAnchorIndex != -1) {
 		if (fAnchorIndex == from)
 			fAnchorIndex = to;
 		else if (fAnchorIndex == to)
 			fAnchorIndex = from;
 	}
 
-/*	if (from < fFirstSelected && from < fLastSelected)
-		return;
-
-	if (to > fFirstSelected && to > fLastSelected)
-		return;*/
-		
-	int32 i;
-
-	for (i = from; i <= to; i++)
-	{
-		if (ItemAt(i)->IsSelected())
-		{
+	for (int32 i = from; i <= to; i++) {
+		if (ItemAt(i)->IsSelected()) {
 			fFirstSelected = i;
 			break;
 		}
 	}
 
-	for (i = from; i <= to; i++)
+	if (fFirstSelected > from)
+		from = fFirstSelected;
+	for (int32 i = from; i <= to; i++) {
 		if (ItemAt(i)->IsSelected())
 			fLastSelected = i;
+	}
 }
 
-
-void
-BListView::DoMouseUp(BPoint where)
-{
-}
-
-
-void
-BListView::DoMouseMoved(BPoint where)
-{
-}
 
