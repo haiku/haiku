@@ -91,7 +91,7 @@ class TBarView : public BView {
 		void ShowClock(bool);
 		bool ShowingClock() const;
 
-		void CacheDragData(BMessage *incoming);
+		void CacheDragData(const BMessage *incoming);
 		status_t DragStart();
 		static bool MenuTrackingHook(BMenu *menu, void *castToThis);
 		void DragStop(bool full=false);

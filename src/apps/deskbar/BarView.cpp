@@ -540,7 +540,7 @@ TBarView::ShowingClock() const
 //	#pragma mark - Drag and Drop
 
 void
-TBarView::CacheDragData(BMessage *incoming)
+TBarView::CacheDragData(const BMessage *incoming)
 {
 	if (!incoming)
 		return;	
