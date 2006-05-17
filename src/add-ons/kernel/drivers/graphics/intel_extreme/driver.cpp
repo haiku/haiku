@@ -36,6 +36,8 @@ const struct supported_device {
 	int32		type;
 	const char	*name;
 } kSupportedDevices[] = {
+	{0x3577, INTEL_TYPE_8xx | INTEL_TYPE_83x, "i830GM"},
+
 	{0x2572, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i865G"},
 	{0x3582, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i855G"},
 };

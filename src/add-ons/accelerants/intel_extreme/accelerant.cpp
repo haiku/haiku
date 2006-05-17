@@ -137,7 +137,9 @@ init_common(int device, bool isClone)
 	gInfo->overlay_registers = (struct overlay_registers *)((uint8 *)gInfo->shared_info
 		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
 	gInfo->status = (hardware_status *)((uint8 *)gInfo->overlay_registers + B_PAGE_SIZE);
-	gInfo->cursor_memory = (uint8 *)gInfo->overlay_registers + 2 * B_PAGE_SIZE;
+
+	if (gInfo->shared_info->hardware_cursor_enabled)
+		gInfo->cursor_memory = (uint8 *)gInfo->overlay_registers + 2 * B_PAGE_SIZE;
 
 	return B_OK;
 }

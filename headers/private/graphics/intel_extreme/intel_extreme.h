@@ -53,7 +53,6 @@ struct ring_buffer {
 struct overlay_registers;
 
 struct intel_shared_info {
-	int32			type;
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
@@ -83,6 +82,7 @@ struct intel_shared_info {
 	uint32			overlay_token;
 	uint8*			physical_overlay_registers;
 
+	bool			hardware_cursor_enabled;
 	sem_id			vblank_sem;
 
 	uint32			cursor_buffer_offset;

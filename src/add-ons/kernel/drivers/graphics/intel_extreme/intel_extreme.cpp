@@ -92,10 +92,11 @@ init_overlay_registers(overlay_registers *registers)
 }
 
 
-static size_t
-determine_desired_memory_size()
+static void
+read_settings(size_t &memorySize, bool &hardwareCursor)
 {
 	size_t size = 8; // 8 MB
+	hardwareCursor = true;
 
 	void *settings = load_driver_settings("intel_extreme");
 	if (settings != NULL) {
@@ -103,6 +104,9 @@ determine_desired_memory_size()
 		const char *string = get_driver_parameter(settings, "graphics_memory_size", "0", "0");
 		if (string != NULL)
 			specified = atoi(string);
+
+		hardwareCursor = get_driver_boolean_parameter(settings, "hardware_cursor",
+			true, true);
 
 		unload_driver_settings(settings);
 
@@ -118,7 +122,7 @@ determine_desired_memory_size()
 		}
 	}
 
-	return size << 20;
+	memorySize = size << 20;
 }
 
 
@@ -287,11 +291,15 @@ intel_extreme_init(intel_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(intel_shared_info));
 
+	// evaluate driver settings, if any
+
+	bool hardwareCursor;
+	size_t totalSize;
+	read_settings(totalSize, hardwareCursor);
+
 	// Determine the amount of "stolen" (ie. reserved by the BIOS) graphics memory
 	// and see if we need to allocate some more.
 	// TODO: make it allocate the memory on demand!
-
-	size_t totalSize = determine_desired_memory_size();
 
 	size_t stolenSize = determine_stolen_memory_size(info);
 	totalSize = max_c(totalSize, stolenSize);
@@ -438,15 +446,18 @@ intel_extreme_init(intel_info &info)
 
 	// We also need to map the cursor memory into the GTT
 
-	// This could also be part of the usual graphics memory, but since we
-	// need to make sure it's not in the graphics local memory (and I don't
-	// even know yet how to determine that a chip has local memory...), we
-	// keep the current strategy and put it into the shared area.
-	// Unfortunately, the GTT is not readable until it has been written into
-	// the double buffered register set; we cannot get its original contents.
-
-	set_gtt_entry(info, totalSize, info.shared_info->physical_cursor_memory);
-	info.shared_info->cursor_buffer_offset = totalSize;
+	info.shared_info->hardware_cursor_enabled = hardwareCursor;
+	if (hardwareCursor) {
+		// This could also be part of the usual graphics memory, but since we
+		// need to make sure it's not in the graphics local memory (and I don't
+		// even know yet how to determine that a chip has local memory...), we
+		// keep the current strategy and put it into the shared area.
+		// Unfortunately, the GTT is not readable until it has been written into
+		// the double buffered register set; we cannot get its original contents.
+	
+		set_gtt_entry(info, totalSize, info.shared_info->physical_cursor_memory);
+		info.shared_info->cursor_buffer_offset = totalSize;
+	}
 
 	init_interrupt_handler(info);
 
