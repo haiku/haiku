@@ -47,8 +47,6 @@ class Overlay {
 		const RGBColor& Color() const
 			{ return fColor; }
 
-		void SetVisible(bool visible)
-			{ fVisible = visible; }
 		bool IsVisible() const
 			{ return fVisible; }
 

@@ -522,6 +522,9 @@ ViewLayer::_UpdateOverlayView() const
 void
 ViewLayer::UpdateOverlay()
 {
+	if (!IsVisible())
+		return;
+
 	if (_Overlay() != NULL) {
 		_UpdateOverlayView();
 	} else {
@@ -1262,9 +1265,10 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 	if (overlay == NULL)
 		return;
 
-	if (fVisible && !overlay->IsVisible())
+	if (fVisible && !overlay->IsVisible()) {
+		_UpdateOverlayView();
 		overlay->Show();
-	else if (!fVisible && overlay->IsVisible())
+	} else if (!fVisible && overlay->IsVisible())
 		overlay->Hide();
 }
 
