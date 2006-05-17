@@ -534,7 +534,7 @@ WriterLocker::AcquireWriter(bool dontBlock, int32 bytesNeeded)
 	// check, if we're first in queue, and if there is space to write
 	if (fRequestOwner.IsFirstInQueues()) {
 		fBytes = _CheckAvailableBytes();
-		if (fBytes > 0)
+		if (fBytes >= bytesNeeded)
 			return B_OK;
 	}
 
