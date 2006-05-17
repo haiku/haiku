@@ -95,8 +95,8 @@ class _PointerList_ : public BList {
 public:
 	_PointerList_(const _PointerList_ &list);
 	_PointerList_(int32 itemsPerBlock = 20, bool owning = false);
-	~_PointerList_();
-	
+	virtual ~_PointerList_();
+
 	typedef void *(* GenericEachFunction)(void *, void *);
 	typedef int (* GenericCompareFunction)(const void *, const void *);
 	typedef int (* GenericCompareFunctionWithState)(const void *, const void *,

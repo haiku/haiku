@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file ResourceFile.cpp
 	ResourceFile implementation.
@@ -19,9 +24,7 @@
 #include "ResourceItem.h"
 #include "ResourcesContainer.h"
 #include "ResourcesDefs.h"
-//#include "Warnings.h"
 
-using namespace std;
 
 namespace BPrivate {
 namespace Storage {
@@ -117,7 +120,7 @@ calculate_checksum(const void *data, uint32 size)
 	const uint8 *current = csData;
 	for (; current < dataEnd; current += 4) {
 		uint32 word = 0;
-		int32 bytes = min(4L, (int32)(dataEnd - current));
+		int32 bytes = min_c(4L, (int32)(dataEnd - current));
 		for (int32 i = 0; i < bytes; i++)
 			word = (word << 8) + current[i];
 		checkSum += word;
@@ -520,8 +523,8 @@ ResourceFile::_InitELFFile(BFile &file)
 							"table exceeds file: %lu.",
 							programHeaderTableOffset + programHeaderTableSize);
 		}
-		resourceOffset = max(resourceOffset, programHeaderTableOffset
-											 + programHeaderTableSize);
+		resourceOffset = max_c(resourceOffset, programHeaderTableOffset
+			+ programHeaderTableSize);
 		// iterate through the program headers
 		for (int32 i = 0; i < (int32)programHeaderCount; i++) {
 			uint32 shOffset = programHeaderTableOffset + i * programHeaderSize;
@@ -545,8 +548,8 @@ ResourceFile::_InitELFFile(BFile &file)
 					throw Exception(B_IO_ERROR, "Invalid ELF section header: "
 									"segment exceeds file: %lu.", segmentEnd);
 				}
-				resourceOffset = max(resourceOffset, segmentEnd);
-				resourceAlignment = max(resourceAlignment, alignment);
+				resourceOffset = max_c(resourceOffset, segmentEnd);
+				resourceAlignment = max_c(resourceAlignment, alignment);
 			}
 		}
 	}
@@ -566,8 +569,8 @@ ResourceFile::_InitELFFile(BFile &file)
 							"table exceeds file: %lu.",
 							sectionHeaderTableOffset + sectionHeaderTableSize);
 		}
-		resourceOffset = max(resourceOffset, sectionHeaderTableOffset
-											 + sectionHeaderTableSize);
+		resourceOffset = max_c(resourceOffset, sectionHeaderTableOffset
+			+ sectionHeaderTableSize);
 		// iterate through the section headers
 		for (int32 i = 0; i < (int32)sectionHeaderCount; i++) {
 			uint32 shOffset = sectionHeaderTableOffset + i * sectionHeaderSize;
@@ -591,7 +594,7 @@ ResourceFile::_InitELFFile(BFile &file)
 					throw Exception(B_IO_ERROR, "Invalid ELF section header: "
 									"section exceeds file: %lu.", sectionEnd);
 				}
-				resourceOffset = max(resourceOffset, sectionEnd);
+				resourceOffset = max_c(resourceOffset, sectionEnd);
 			}
 		}
 	}
@@ -651,7 +654,7 @@ ResourceFile::_InitPEFFile(BFile &file, const PEFContainerHeader &pefHeader)
 			throw Exception(B_IO_ERROR, "Invalid PEF section header: section "
 							"exceeds file: %lu.", sectionEnd);
 		}
-		resourceOffset = max(resourceOffset, sectionEnd);
+		resourceOffset = max_c(resourceOffset, sectionEnd);
 	}
 	if (resourceOffset >= fileSize) {
 //		throw Exception("The PEF object file does not contain resources.");
@@ -829,7 +832,7 @@ ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
 	}
 	// add the entry
 	if (result) {
-		ResourceItem *item = new(nothrow) ResourceItem;
+		ResourceItem *item = new(std::nothrow) ResourceItem;
 		if (!item)
 			throw Exception(B_NO_MEMORY);
 		item->SetLocation(offset, size);
@@ -848,7 +851,7 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	int32 &resourceCount = parseInfo.resource_count;
 	// read the info table
 	// alloc memory for the table
-	char *tableData = new(nothrow) char[parseInfo.info_table_size];
+	char *tableData = new(std::nothrow) char[parseInfo.info_table_size];
 	if (!tableData)
 		throw Exception(B_NO_MEMORY);
 	int32 dataSize = parseInfo.info_table_size;
@@ -856,7 +859,7 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	read_exactly(fFile, parseInfo.info_table_offset, tableData, dataSize,
 				 "Failed to read resource info table.");
 	//
-	bool *readIndices = new(nothrow) bool[resourceCount + 1];
+	bool *readIndices = new(std::nothrow) bool[resourceCount + 1];
 		// + 1 => always > 0
 	if (!readIndices)
 		throw Exception(B_NO_MEMORY);
@@ -1040,12 +1043,12 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		indexSectionSize = align_value(indexSectionSize,
 									   kResourceIndexSectionAlignment);
 		size += indexSectionSize;
-		bufferSize = max((uint32)bufferSize, indexSectionSize);
+		bufferSize = max_c((uint32)bufferSize, indexSectionSize);
 		// unknown section
 		uint32 unknownSectionOffset = size;
 		uint32 unknownSectionSize = kUnknownResourceSectionSize;
 		size += unknownSectionSize;
-		bufferSize = max((uint32)bufferSize, unknownSectionSize);
+		bufferSize = max_c((uint32)bufferSize, unknownSectionSize);
 		// data
 		uint32 dataOffset = size;
 		uint32 dataSize = 0;
@@ -1054,7 +1057,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 			if (!item->IsLoaded())
 				throw Exception(B_IO_ERROR, "Resource is not loaded.");
 			dataSize += item->DataSize();
-			bufferSize = max(bufferSize, item->DataSize());
+			bufferSize = max_c(bufferSize, item->DataSize());
 		}
 		size += dataSize;
 		// info table
@@ -1078,12 +1081,12 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		infoTableSize += kResourceInfoSeparatorSize
 						 + kResourceInfoTableEndSize;
 		size += infoTableSize;
-		bufferSize = max((uint32)bufferSize, infoTableSize);
+		bufferSize = max_c((uint32)bufferSize, infoTableSize);
 
 		// write...
 		// set the file size
 		fFile.SetSize(size);
-		buffer = new(nothrow) char[bufferSize];
+		buffer = new(std::nothrow) char[bufferSize];
 		if (!buffer)
 			throw Exception(B_NO_MEMORY);
 		void *data = buffer;

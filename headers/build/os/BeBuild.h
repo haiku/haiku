@@ -80,28 +80,6 @@
 
 /* cpp kit */
 
-/* -- <typeinfo> */
-class _IMPEXP_ROOT bad_cast;
-class _IMPEXP_ROOT bad_typeid;
-class _IMPEXP_ROOT type_info;
-
-/* -- <exception> */
-class _IMPEXP_ROOT exception;
-class _IMPEXP_ROOT bad_exception;
-
-/* -- <new.h> */
-class _IMPEXP_ROOT bad_alloc;
-
-/* -- <mexcept.h> */
-class _IMPEXP_ROOT logic_error;
-class _IMPEXP_ROOT domain_error;
-class _IMPEXP_ROOT invalid_argument;
-class _IMPEXP_ROOT length_error;
-class _IMPEXP_ROOT out_of_range;
-class _IMPEXP_ROOT runtime_error;
-class _IMPEXP_ROOT range_error;
-class _IMPEXP_ROOT overflow_error;
-
 /* support kit */
 class _IMPEXP_BE BArchivable;
 class _IMPEXP_BE BAutolock;

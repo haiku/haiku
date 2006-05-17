@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//----------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file storage_support.cpp
 	Implementations of miscellaneous internal Storage Kit support functions.
@@ -17,8 +22,6 @@
 #include <syscalls.h>
 
 #include "storage_support.h"
-
-using namespace std;
 
 namespace BPrivate {
 namespace Storage {
@@ -333,7 +336,7 @@ parse_first_path_component(const char *path, char *&component,
 	int32 length;
 	status_t error = parse_first_path_component(path, length, nextComponent);
 	if (error == B_OK) {
-		component = new(nothrow) char[length + 1];
+		component = new(std::nothrow) char[length + 1];
 		if (component) {
 			strncpy(component, path, length);
 			component[length] = '\0';
@@ -477,7 +480,7 @@ void escape_path(const char *str, char *result)
 void escape_path(char *str)
 {
 	if (str) {
-		char *copy = new(nothrow) char[strlen(str)+1];
+		char *copy = new(std::nothrow) char[strlen(str)+1];
 		if (copy) {
 			strcpy(copy, str);
 			escape_path(copy, str);
