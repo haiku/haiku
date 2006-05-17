@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2002-2004, Haiku Project. All rights reserved.
+ *  Copyright (c) 2002-2006, Haiku Project. All rights reserved.
  *  Distributed under the terms of the Haiku license.
  *
  *  Author(s):
@@ -14,6 +14,6 @@
 int
 raise(int sig)
 {
-	return send_signal(find_thread(NULL), sig);
+	return kill(find_thread(NULL), sig);
 }
 
