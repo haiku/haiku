@@ -50,7 +50,8 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			RemoteDisk *remoteDisk = RemoteDisk::FindAnyRemoteDisk();
 			if (!remoteDisk)
 				return B_ENTRY_NOT_FOUND;
-			*_device = remoteDisk;
+
+			devicesList->Add(remoteDisk);
 			return B_OK;
 		}
 
