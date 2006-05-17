@@ -400,15 +400,16 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 		return;
 	}
 
-	BPoint loc;
 	uint32 buttons;
-	GetMouse(&loc, &buttons);
+	if (!(Window()->CurrentMessage())
+ 		|| Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) < B_OK)
+ 		buttons = 0;
 
 	switch (code) {
 		case B_ENTERED_VIEW:
 			if (message && buttons != 0) {
-				fBarView->CacheDragData((BMessage *)message);
-				MouseDown(loc);
+				fBarView->CacheDragData(message);
+				MouseDown(where);
 			}
 			break;
 
@@ -417,9 +418,9 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 				if (!TeamItemAtPoint(where)
 					&& !InBeMenu(where)
 					&& (fSeparatorItem && !fSeparatorItem->Frame().Contains(where))
-					&& !Frame().Contains(where))
+					&& !Frame().Contains(where)) {
 					fBarView->DragStop();
-	
+				}
 			}
 			break;
 	}
@@ -436,9 +437,14 @@ TExpandoMenuBar::InBeMenu(BPoint loc) const
 	} else {
 		TBarWindow *window = dynamic_cast<TBarWindow*>(Window());
 		if (window) {
-			TBeMenu *bemenu = window->BeMenu();
-			if (bemenu && bemenu->Frame().Contains(loc))
-				return true;
+			if (TBeMenu *bemenu = window->BeMenu()) {
+ 				bool inBeMenu = false;
+ 				if (bemenu->LockLooper()) {
+ 					inBeMenu = bemenu->Frame().Contains(loc);
+ 					bemenu->UnlockLooper();
+ 				}
+ 				return inBeMenu;
+ 			}
 		}					
 	}
 
