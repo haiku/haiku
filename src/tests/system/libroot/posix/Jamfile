@@ -25,3 +25,4 @@ SEARCH on [ FGristFiles
 
 SubInclude HAIKU_TOP src tests system libroot posix bonnie ;
 SubInclude HAIKU_TOP src tests system libroot posix math ;
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite ;
