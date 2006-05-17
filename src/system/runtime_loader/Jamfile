@@ -6,7 +6,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 # Don't let gcc inject built-in function code. This will cause dependencies
 # to libroot, which we don't link against.
 SubDirCcFlags -fno-builtin ;
-SubDirC++Flags -fno-builtin ;
+SubDirC++Flags -fno-builtin -fno-exceptions ;
 
 # needed for rld.so only
 StaticLibrary libruntime_loader.a :
