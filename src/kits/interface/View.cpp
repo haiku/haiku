@@ -4156,6 +4156,9 @@ BView::_Attach()
 			if (fOwner->fPulseRunner == NULL)
 				fOwner->SetPulseRate(500000);
 		}
+
+		if (!fOwner->IsHidden())
+			Invalidate();
 	}
 
 	for (BView* child = fFirstChild; child != NULL; child = child->fNextSibling) {
@@ -4183,6 +4186,9 @@ BView::_Detach()
 
 	if (fOwner) {
 		check_lock_no_pick();
+
+		if (!fOwner->IsHidden())
+			Invalidate();
 
 		// make sure our owner doesn't need us anymore
 
