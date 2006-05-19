@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <new>
 #include <string.h>
 
 #include <Debug.h>
@@ -26,6 +27,7 @@
 #include <MenuWindow.h>
 #include <ServerProtocol.h>
 
+using std::nothrow;
 
 class _ExtraMenuData_ {
 public:
@@ -225,7 +227,7 @@ BArchivable *
 BMenu::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenu"))
-		return new BMenu(data);
+		return new (nothrow) BMenu(data);
 	
 	return NULL;
 }
@@ -344,11 +346,17 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 bool 
 BMenu::AddItem(BMenu *submenu)
 {
-	BMenuItem *item = new BMenuItem(submenu);
+	BMenuItem *item = new (nothrow) BMenuItem(submenu);
 	if (!item)
 		return false;
 	
-	return AddItem(item, CountItems());
+	if (!AddItem(item, CountItems())) {
+		item->fSubmenu = NULL;
+		delete item;
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -359,11 +367,17 @@ BMenu::AddItem(BMenu *submenu, int32 index)
 		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
-	BMenuItem *item = new BMenuItem(submenu);
+	BMenuItem *item = new (nothrow) BMenuItem(submenu);
 	if (!item)
 		return false;
 		
-	return AddItem(item, index);
+	if (!AddItem(item, index)) {
+		item->fSubmenu = NULL;
+		delete item;
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -374,10 +388,19 @@ BMenu::AddItem(BMenu *submenu, BRect frame)
 		debugger("BMenu::AddItem(BMenu *, BRect) this method can only "
 			"be called if the menu layout is B_ITEMS_IN_MATRIX");
 	
-	BMenuItem *item = new BMenuItem(submenu);
+	BMenuItem *item = new (nothrow) BMenuItem(submenu);
+	if (!item)
+		return false;
+
 	item->fBounds = frame;
 	
-	return AddItem(item, CountItems());
+	if (!AddItem(item, CountItems())) {
+		item->fSubmenu = NULL;
+		delete item;
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -416,8 +439,13 @@ BMenu::AddList(BList *list, int32 index)
 bool
 BMenu::AddSeparatorItem()
 {
-	BMenuItem *item = new BSeparatorItem();	
-	return AddItem(item, CountItems());
+	BMenuItem *item = new (nothrow) BSeparatorItem();
+	if (!item || !AddItem(item, CountItems())) {
+		delete item;
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -1040,7 +1068,7 @@ void
 BMenu::SetTrackingHook(menu_tracking_hook func, void *state)
 {
 	delete fExtraMenuData;
-	fExtraMenuData = new _ExtraMenuData_(func, state);
+	fExtraMenuData = new (nothrow) _ExtraMenuData_(func, state);
 }
 
 
@@ -1102,7 +1130,7 @@ BMenu::_show(bool selectFirstItem)
 	// (i.e. not within a BMenuField)
 	if (window == NULL) {
 		// Menu windows get the BMenu's handler name
-		window = new BMenuWindow(Name());
+		window = new (nothrow) BMenuWindow(Name());
 		ourWindow = true;
 	}
 
@@ -1690,7 +1718,7 @@ BMenu::MenuWindow()
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menu", Name());
-		fCachedMenuWindow = new BMenuWindow(windowName);
+		fCachedMenuWindow = new (nothrow) BMenuWindow(windowName);
 	}
 
 	return fCachedMenuWindow;
