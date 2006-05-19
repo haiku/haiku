@@ -336,19 +336,13 @@ HWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 
 
 void
-HWInterface::ShowOverlay(Overlay* overlay)
+HWInterface::ConfigureOverlay(Overlay* overlay)
 {
 }
 
 
 void
 HWInterface::HideOverlay(Overlay* overlay)
-{
-}
-
-
-void
-HWInterface::UpdateOverlay(Overlay* overlay)
 {
 }
 

@@ -20,8 +20,7 @@ Overlay::Overlay(HWInterface& interface)
 	fHWInterface(interface),
 	fOverlayBuffer(NULL),
 	fClientData(NULL),
-	fOverlayToken(NULL),
-	fVisible(false)
+	fOverlayToken(NULL)
 {
 	fSemaphore = create_sem(1, "overlay lock");
 	fColor.SetColor(21, 16, 21, 16);
@@ -111,26 +110,11 @@ Overlay::OverlayToken() const
 
 
 void
-Overlay::Show()
-{
-	if (fOverlayToken == NULL) {
-		fOverlayToken = fHWInterface.AcquireOverlayChannel();
-		if (fOverlayToken == NULL)
-			return;
-	}
-
-	fVisible = true;
-	fHWInterface.ShowOverlay(this);
-}
-
-
-void
 Overlay::Hide()
 {
 	if (fOverlayToken == NULL)
 		return;
 
-	fVisible = false;
 	fHWInterface.HideOverlay(this);
 }
 
@@ -174,10 +158,13 @@ Overlay::SetColorSpace(uint32 colorSpace)
 
 
 void
-Overlay::SetView(const BRect& source, const BRect& destination)
+Overlay::Configure(const BRect& source, const BRect& destination)
 {
-	if (fOverlayToken == NULL)
-		return;
+	if (fOverlayToken == NULL) {
+		fOverlayToken = fHWInterface.AcquireOverlayChannel();
+		if (fOverlayToken == NULL)
+			return;
+	}
 
 	fView.h_start = (uint16)source.left;
 	fView.v_start = (uint16)source.top;
@@ -189,7 +176,6 @@ Overlay::SetView(const BRect& source, const BRect& destination)
 	fWindow.width = (uint16)destination.IntegerWidth() + 1;
 	fWindow.height = (uint16)destination.IntegerHeight() + 1;
 
-	if (fVisible)
-		fHWInterface.UpdateOverlay(this);
+	fHWInterface.ConfigureOverlay(this);
 }
 

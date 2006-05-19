@@ -866,9 +866,13 @@ AccelerantHWInterface::FreeOverlayBuffer(const overlay_buffer* buffer)
 
 
 void
-AccelerantHWInterface::ShowOverlay(Overlay* overlay)
+AccelerantHWInterface::ConfigureOverlay(Overlay* overlay)
 {
-	UpdateOverlay(overlay);
+	// TODO: this only needs to be done on mode changes!
+	overlay->SetColorSpace(fDisplayMode.space);
+
+	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(),
+		overlay->OverlayWindow(), overlay->OverlayView());
 }
 
 
@@ -879,17 +883,6 @@ AccelerantHWInterface::HideOverlay(Overlay* overlay)
 }
 
 
-void
-AccelerantHWInterface::UpdateOverlay(Overlay* overlay)
-{
-	// TODO: this only needs to be done on mode changes!
-	overlay->SetColorSpace(fDisplayMode.space);
-
-	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(),
-		overlay->OverlayWindow(), overlay->OverlayView());
-}
-
-
 // CopyRegion
 void
 AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
@@ -897,7 +890,6 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 {
 	if (fAccScreenBlit && fAccAcquireEngine) {
 		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
-
 			// make sure the blit_params cache is large enough
 			if (fBlitParamsCount < count) {
 				fBlitParamsCount = (count / kDefaultParamsCount + 1) * kDefaultParamsCount;

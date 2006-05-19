@@ -251,13 +251,13 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 		printf("ViewLayer::RemoveChild(%p - %s) - ViewLayer is not child of this (%p) layer!\n", layer, layer ? layer->Name() : NULL, this);
 		return false;
 	}
-	
+
 	layer->fParent = NULL;
-	
+
 	if (fLastChild == layer)
 		fLastChild = layer->fPreviousSibling;
 		// layer->fNextSibling would be NULL
-	
+
 	if (fFirstChild == layer )
 		fFirstChild = layer->fNextSibling;
 		// layer->fPreviousSibling would be NULL
@@ -265,7 +265,7 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	// connect child before and after layer
 	if (layer->fPreviousSibling)
 		layer->fPreviousSibling->fNextSibling = layer->fNextSibling;
-	
+
 	if (layer->fNextSibling)
 		layer->fNextSibling->fPreviousSibling = layer->fPreviousSibling;
 
@@ -511,7 +511,7 @@ ViewLayer::_UpdateOverlayView() const
 	BRect destination = fBitmapDestination;
 	ConvertToScreen(&destination);
 
-	overlay->SetView(fBitmapSource, destination);
+	overlay->Configure(fBitmapSource, destination);
 }
 
 
@@ -1255,6 +1255,8 @@ ViewLayer::IsHidden() const
 void
 ViewLayer::UpdateVisibleDeep(bool parentVisible)
 {
+	bool wasVisible = fVisible;
+
 	fVisible = parentVisible && !fHidden;
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
 		child->UpdateVisibleDeep(fVisible);
@@ -1265,10 +1267,9 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 	if (overlay == NULL)
 		return;
 
-	if (fVisible && !overlay->IsVisible()) {
+	if (fVisible && !wasVisible)
 		_UpdateOverlayView();
-		overlay->Show();
-	} else if (!fVisible && overlay->IsVisible())
+	else if (!fVisible && wasVisible)
 		overlay->Hide();
 }
 

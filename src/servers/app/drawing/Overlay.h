@@ -47,12 +47,7 @@ class Overlay {
 		const RGBColor& Color() const
 			{ return fColor; }
 
-		bool IsVisible() const
-			{ return fVisible; }
-
-		void SetView(const BRect& source, const BRect& destination);
-
-		void Show();
+		void Configure(const BRect& source, const BRect& destination);
 		void Hide();
 
 	private:
@@ -64,7 +59,6 @@ class Overlay {
 		overlay_window			fWindow;
 		sem_id					fSemaphore;
 		RGBColor				fColor;
-		bool					fVisible;
 };
 
 #endif	// OVERLAY_H

@@ -107,9 +107,8 @@ class HWInterface : public MultiLocker {
 									color_space space);
 	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
 
-	virtual void				ShowOverlay(Overlay* overlay);
+	virtual void				ConfigureOverlay(Overlay* overlay);
 	virtual void				HideOverlay(Overlay* overlay);
-	virtual void				UpdateOverlay(Overlay* overlay);
 
 	// frame buffer access (you need to ReadLock!)
 			RenderingBuffer*	DrawingBuffer() const;
