@@ -7,8 +7,7 @@
  */
 
 
-#include <stdio.h>
-#include <string.h>
+#include "HWInterface.h"
 
 #include "drawing_support.h"
 
@@ -17,7 +16,9 @@
 #include "SystemPalette.h"
 #include "UpdateQueue.h"
 
-#include "HWInterface.h"
+#include <stdio.h>
+#include <string.h>
+
 
 // constructor
 HWInterface::HWInterface(bool doubleBuffered)

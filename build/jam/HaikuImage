@@ -35,7 +35,7 @@ BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown cl
 
 BEOS_APPS = Terminal Expander People ShowImage Clock Pulse
 	Playground SoundRecorder BitmapDrawing Magnify DiskProbe AboutHaiku
-	StyledEdit Installer Chart Workspaces Cortex CortexAddOnHost GLTeapot
+	StyledEdit Installer Chart Workspaces $(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost $(X86_ONLY)GLTeapot
 	MediaPlayer
 ;
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
@@ -44,7 +44,7 @@ BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libbind.so libnetapi.so libsocket.so libdebug.so
 	libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so libmidi2.so
-	libdevice.so libgame.so libscreensaver.so libroot.so libmail.so libGL.so
+	libdevice.so libgame.so libscreensaver.so libroot.so libmail.so $(X86_ONLY)libGL.so
 ;
 BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	media_addon_server input_server app_server fake_app_server midi_server
@@ -69,7 +69,7 @@ BEOS_ADD_ONS_MEDIA = mixer.media_addon
 	#legacy.media_addon
 ;
 BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
-	aiff_reader au_reader avcodec avi_reader
+	aiff_reader au_reader $(X86_ONLY)avcodec avi_reader
 	matroska mov_reader
 	mp3_decoder mp3_reader
 	mp4_reader musepack

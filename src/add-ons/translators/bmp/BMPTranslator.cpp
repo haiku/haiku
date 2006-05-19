@@ -7,12 +7,13 @@
  */
 
 #include "BMPTranslator.h"
+#include "BMPView.h"
 
 #include <new>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "BMPView.h"
 
 using std::nothrow;
 

@@ -12,13 +12,15 @@
 
 #include "VolumeSlider.h"
 
-#include <stdio.h>
+#include "ButtonBitmaps.h"
+#include "DrawingTidbits.h"
 
 #include <Bitmap.h>
 #include <Screen.h>
 
-#include "ButtonBitmaps.h"
-#include "DrawingTidbits.h"
+#include <stdio.h>
+#include <string.h>
+
 
 // slider colors are hardcoded here, because that's just
 // what they currently are within those bitmaps

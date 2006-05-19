@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Haiku. All Rights Reserved.
+ * Copyright 2003-2006, Haiku. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -18,6 +18,7 @@
 #include <NodeInfo.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 

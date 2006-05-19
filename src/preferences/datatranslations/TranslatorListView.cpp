@@ -13,6 +13,8 @@
 
 #include <Application.h>
 
+#include <string.h>
+
 
 static int
 compare_items(const void* a, const void* b)

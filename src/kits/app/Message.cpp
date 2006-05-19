@@ -184,7 +184,7 @@ BMessage::_InitHeader()
 {
 	DEBUG_FUNCTION_ENTER;
 	fHeader = (message_header *)malloc(sizeof(message_header));
-	memset(fHeader, 0, sizeof(message_header) - sizeof(message_header::hash_table));
+	memset(fHeader, 0, sizeof(message_header) - sizeof(fHeader->hash_table));
 
 	fHeader->format = kMessageMagicHaiku;
 	fHeader->flags = MESSAGE_FLAG_VALID;
@@ -227,7 +227,7 @@ BMessage::_Clear()
 
 status_t
 BMessage::GetInfo(type_code typeRequested, int32 index, char **nameFound,
-	type_code *typeFound, int32 *countFound = NULL) const
+	type_code *typeFound, int32 *countFound) const
 {
 	DEBUG_FUNCTION_ENTER;
 	if (typeRequested == B_ANY_TYPE) {
@@ -647,7 +647,7 @@ BMessage::WasDropped() const
 
 
 BPoint
-BMessage::DropPoint(BPoint *offset = NULL) const
+BMessage::DropPoint(BPoint *offset) const
 {
 	DEBUG_FUNCTION_ENTER;
 	if (offset)

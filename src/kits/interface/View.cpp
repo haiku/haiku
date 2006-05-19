@@ -3459,7 +3459,7 @@ BView::MoveTo(float x, float y)
 		_FlushIfNotInTransaction();
 	}
 
-	_MoveTo(x, y);
+	_MoveTo((int32)x, (int32)y);
 }
 
 
@@ -3494,7 +3494,7 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 		_FlushIfNotInTransaction();
 	}
 
-	_ResizeBy(deltaWidth, deltaHeight);
+	_ResizeBy((int32)deltaWidth, (int32)deltaHeight);
 }
 
 
@@ -4118,7 +4118,7 @@ BView::_ParentResizedBy(int32 x, int32 y)
 
 	if (newFrame.LeftTop() != fParentOffset) {
 		// move view
-		_MoveTo(roundf(newFrame.left), roundf(newFrame.top));
+		_MoveTo(lroundf(newFrame.left), lroundf(newFrame.top));
 	}
 
 	if (newFrame != Frame()) {

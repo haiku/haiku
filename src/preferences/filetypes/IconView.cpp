@@ -14,6 +14,8 @@
 #include <PopUpMenu.h>
 #include <Resources.h>
 
+#include <string.h>
+
 
 IconView::IconView(BRect rect, const char* name, uint32 resizeMode)
 	: BView(rect, name, resizeMode, B_WILL_DRAW),

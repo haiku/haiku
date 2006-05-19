@@ -36,6 +36,7 @@ All rights reserved.
 #define __FUNCTION_OBJECT__
 
 #include <Message.h>
+#include <Messenger.h>
 #include <MessageFilter.h>
 
 #include <Entry.h>

@@ -359,7 +359,10 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	fShortDescriptionControl->SetDivider(labelWidth);
 	fShortDescriptionControl->GetPreferredSize(&width, &height);
 	fShortDescriptionControl->ResizeTo(rect.Width(), height);
-	fShortDescriptionControl->TextView()->SetMaxBytes(sizeof(version_info::short_info));
+
+	// TODO: workaround for a GCC 4.1.0 bug? Or is that really what the standard says?
+	version_info versionInfo;
+	fShortDescriptionControl->TextView()->SetMaxBytes(sizeof(versionInfo.short_info));
 	box->AddChild(fShortDescriptionControl);
 
 	rect.OffsetBy(0.0f, fShortDescriptionControl->Bounds().Height() + 5.0f);
@@ -374,7 +377,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, const BEntry& entr
 	rect.bottom = rect.top + fShortDescriptionControl->Bounds().Height() * 3.0f - 1.0f;
 	fLongDescriptionView = new BTextView(rect, "long desc",
 		rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
-	fLongDescriptionView->SetMaxBytes(sizeof(version_info::long_info));
+	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
 //	box->AddChild(fLongDescriptionView);
 
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,

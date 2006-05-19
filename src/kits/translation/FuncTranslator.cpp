@@ -21,6 +21,8 @@
 
 #include "FuncTranslator.h"
 
+#include <string.h>
+
 
 namespace BPrivate {
 

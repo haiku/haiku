@@ -12,6 +12,7 @@
 #include <Window.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 DirectoryRefFilter::DirectoryRefFilter()

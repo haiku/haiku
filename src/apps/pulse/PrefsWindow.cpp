@@ -14,7 +14,6 @@
 #include "PulseApp.h"
 #include "ConfigView.h"
 
-//#include <Box.h>
 #include <Button.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -23,8 +22,8 @@
 #include <stdio.h>
 
 
-PrefsWindow::PrefsWindow(BRect rect, const char *name, BMessenger *messenger, Prefs *prefs)
-	: BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+PrefsWindow::PrefsWindow(BRect frame, const char *name, BMessenger *messenger, Prefs *prefs)
+	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(*messenger),
 	fPrefs(prefs)

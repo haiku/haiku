@@ -13,11 +13,13 @@
 
 #include "DrawingTidbits.h"
 
-#include <math.h>
-
 #include <Bitmap.h>
 #include <Debug.h>
 #include <Screen.h>
+
+#include <math.h>
+#include <string.h>
+
 
 // ShiftComponent
 inline uchar

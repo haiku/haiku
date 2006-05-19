@@ -12,9 +12,16 @@
  */
 
 #include "ColorConversion.h"
+
 #include <Locker.h>
-#include <new.h>
 #include <Point.h>
+
+#include <new>
+#include <string.h>
+
+
+using std::nothrow;
+
 
 namespace BPrivate {
 
@@ -632,8 +639,8 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 	BPoint dstOffset, int32 width, int32 height, bool srcSwap, bool dstSwap,
 	readFunc *srcFunc, writeFunc *dstFunc)
 {
-	char *srcBitsEnd = (char *)srcBits + srcBitsLength;
-	char *dstBitsEnd = (char *)dstBits + dstBitsLength;
+	uint8* srcBitsEnd = (uint8*)srcBits + srcBitsLength;
+	uint8* dstBitsEnd = (uint8*)dstBits + dstBitsLength;
 
 	int32 srcBitsPerRow = srcBytesPerRow << 3;
 	int32 dstBitsPerRow = dstBytesPerRow << 3;
@@ -662,10 +669,10 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 		dstOffsetY = 0;
 	}
 
-	(char *)srcBits += (srcOffsetY * srcBitsPerRow + srcOffsetX
-		* srcBitsPerPixel) >> 3;
-	(char *)dstBits += (dstOffsetY * dstBitsPerRow + dstOffsetX
-		* dstBitsPerPixel) >> 3;
+	srcBits = (srcByte*)((uint8*)srcBits + (srcOffsetY * srcBitsPerRow + srcOffsetX
+		* srcBitsPerPixel >> 3));
+	dstBits = (dstByte*)((uint8*)dstBits + (dstOffsetY * dstBitsPerRow + dstOffsetX
+		* dstBitsPerPixel >> 3));
 
 	// Ensure that the width fits
 	int32 srcWidth = (srcBitsPerRow - srcOffsetX * srcBitsPerPixel)
@@ -697,10 +704,10 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 
 			srcBitsLength -= copyCount;
 			dstBitsLength -= copyCount;
-			(char *)srcBits += srcBytesPerRow;
-			(char *)dstBits += dstBytesPerRow;
+			srcBits = (srcByte*)((uint8*)srcBits + srcBytesPerRow);
+			dstBits = (dstByte*)((uint8*)dstBits + dstBytesPerRow);
 
-			if ((char *)srcBits > srcBitsEnd || (char *)dstBits > dstBitsEnd)
+			if ((uint8 *)srcBits > srcBitsEnd || (uint8 *)dstBits > dstBitsEnd)
 				return B_OK;
 		}
 
@@ -709,9 +716,9 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 
 	int32 srcLinePad = (srcBitsPerRow - width * srcBitsPerPixel) >> 3;
 	int32 dstLinePad = (dstBitsPerRow - width * dstBitsPerPixel) >> 3;
+	uint32 result;
+	uint32 source;
 
-	register uint32 result;
-	register uint32 source;
 	for (int32 i = 0; i < height; i++) {
 		for (int32 j = 0; j < width; j++) {
 			if (srcFunc)
@@ -771,12 +778,12 @@ ConvertBits(const srcByte *srcBits, dstByte *dstBits, int32 srcBitsLength,
 				dstBits++;
 			}
 
-			if ((char *)srcBits > srcBitsEnd || (char *)dstBits > dstBitsEnd)
+			if ((uint8*)srcBits > srcBitsEnd || (uint8*)dstBits > dstBitsEnd)
 				return B_OK;
 		}
 
-		(char *)srcBits += srcLinePad;
-		(char *)dstBits += dstLinePad;
+		srcBits = (srcByte*)((uint8*)srcBits + srcLinePad);
+		dstBits = (dstByte*)((uint8*)dstBits + dstLinePad);
 		dstOffsetX -= width;
 		srcOffsetX -= width;
 	}
@@ -901,7 +908,7 @@ ConvertBits(const srcByte *srcBits, void *dstBits, int32 srcBitsLength,
 			break;
 
 		case B_CMAP8:
-			palette_converter();
+			BPrivate::palette_converter();
 			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
 				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
 				0, 0, 0x7c00, 0x03e0, 0x001f, 0x0000, srcBytesPerRow,

@@ -34,10 +34,12 @@ class RGBColor {
 		void SetColor(const rgb_color &color);
 		void SetColor(const RGBColor &col);
 
-		const RGBColor & operator=(const RGBColor &col);
-		const RGBColor & operator=(const rgb_color &col);
-		bool operator==(const rgb_color &col) const;
-		bool operator==(const RGBColor &col) const;
+		const RGBColor & operator=(const RGBColor &color);
+		const RGBColor & operator=(const rgb_color &color);
+		bool operator==(const rgb_color &color) const;
+		bool operator==(const RGBColor &color) const;
+		bool operator!=(const rgb_color &color) const;
+		bool operator!=(const RGBColor &color) const;
 
 		bool IsTransparentMagic() const;
 

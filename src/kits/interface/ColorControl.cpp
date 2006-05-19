@@ -292,6 +292,7 @@ BColorControl::MessageReceived(BMessage *message)
 			color.red = strtol(fRedText->Text(), NULL, 10);
 			color.green = strtol(fGreenText->Text(), NULL, 10);
 			color.blue = strtol(fBlueText->Text(), NULL, 10);
+			color.alpha = 255;
 
 			SetValue(color);
 			Invoke();
@@ -415,8 +416,9 @@ BColorControl::_ColorRamp(BRect rect, BView* target,
 {
 	float width = rect.Width()+1;
 	rgb_color color;
+	color.alpha = 255;
 
-	target->BeginLineArray(width);
+	target->BeginLineArray((int32)width);
 
 	for (float i = 0; i <= width; i++) {
 		color.red = (uint8)(i * baseColor.red / width);

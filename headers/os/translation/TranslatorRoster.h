@@ -74,6 +74,8 @@ class BTranslatorRoster : public BArchivable {
 		status_t StartWatching(BMessenger target);
 		status_t StopWatching(BMessenger target);
 
+		class Private;
+
 	private:
 		// unimplemented
 		BTranslatorRoster(const BTranslatorRoster& other);
@@ -89,7 +91,7 @@ class BTranslatorRoster : public BArchivable {
 		void _Initialize();
 
 	private:
-		class Private;
+		friend class Private;
 
 		Private*	fPrivate;
 		int32		fUnused[6];

@@ -18,12 +18,17 @@
  *
  */
 
+#include "SoundOutput.h"
+
 #include <OS.h>
 #include <SoundPlayer.h>
 #include <Debug.h>
+
+#include <new>
 #include <string.h>
 
-#include "SoundOutput.h"
+using std::nothrow;
+
 
 SoundOutput::SoundOutput(const char *name, const media_multi_audio_format &format)
  :	fSoundPlayer(new(nothrow) BSoundPlayer(static_cast<const media_raw_audio_format *>(&format), name, play_buffer, NULL, this))

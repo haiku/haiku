@@ -59,7 +59,7 @@ TransportControlGroup::TransportControlGroup(BRect frame)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BRect frame(0.0, 0.0, 10.0, 10.0);
+	frame.Set(0.0, 0.0, 10.0, 10.0);
 
     // Seek Slider
 	fSeekSlider = new SeekSlider(frame, "seek slider",

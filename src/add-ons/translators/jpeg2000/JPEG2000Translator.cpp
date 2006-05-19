@@ -57,17 +57,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Translation Kit required globals
 char translatorName[] = "JPEG2000 Images";
-char translatorInfo[] = "© 2002-2003, Shard
+char translatorInfo[] = "© 2002-2003, Shard\n"
+	"\n"
+	"Based on JasPer library:\n"
+	"© 1999-2000, Image Power, Inc. and\n"
+	"the University of British Columbia, Canada.\n"
+	"© 2001-2003 Michael David Adams.\n"
+	"          http://www.ece.uvic.ca/~mdadams/jasper/\n"
+	"\n"
+	"ImageMagick's jp2 codec was used as \"tutorial\".\n"
+	"          http://www.imagemagick.org/\n";
 
-Based on JasPer library:
-© 1999-2000, Image Power, Inc. and
-the University of British Columbia, Canada.
-© 2001-2003 Michael David Adams.
-          http://www.ece.uvic.ca/~mdadams/jasper/
-
-ImageMagick's jp2 codec was used as \"tutorial\".
-          http://www.imagemagick.org/
-";
 int32 translatorVersion = 256;	// 256 = v1.0.0
 
 // Define the formats we know how to read

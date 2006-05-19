@@ -11,6 +11,7 @@
 #include "SystemPalette.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 /*!
@@ -454,6 +455,26 @@ RGBColor::operator==(const RGBColor &color) const
 		&& fColor32.green == color.fColor32.green
 		&& fColor32.blue == color.fColor32.blue
 		&& fColor32.alpha == color.fColor32.alpha;
+}
+
+
+bool
+RGBColor::operator!=(const rgb_color &color) const
+{
+	return fColor32.red != color.red
+		|| fColor32.green != color.green
+		|| fColor32.blue != color.blue
+		|| fColor32.alpha != color.alpha;
+}
+
+
+bool
+RGBColor::operator!=(const RGBColor &color) const
+{
+	return fColor32.red != color.fColor32.red
+		|| fColor32.green != color.fColor32.green
+		|| fColor32.blue != color.fColor32.blue
+		|| fColor32.alpha != color.fColor32.alpha;
 }
 
 

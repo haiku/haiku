@@ -390,7 +390,7 @@ BTranslatorRoster::Private::AddPath(const char* path, int32* _added)
 
 status_t
 BTranslatorRoster::Private::AddTranslator(BTranslator* translator,
-	image_id image = -1, const entry_ref* ref = NULL, ino_t node = 0)
+	image_id image, const entry_ref* ref, ino_t node)
 {
 	BAutolock locker(this);
 

@@ -26,7 +26,6 @@ class ServerBitmap;
 class ServerCursor;
 class UpdateQueue;
 class BString;
-struct overlay_buffer;
 
 enum {
 	HW_ACC_COPY_REGION					= 0x00000001,

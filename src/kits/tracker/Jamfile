@@ -8,7 +8,6 @@ UsePrivateHeaders tracker ;
 AddResources libtracker.so : TrackerIcons.rdef ;
 
 SubDirC++Flags 
-	-fmultiple-symbol-spaces
 	-D_BUILDING_tracker=1 -DOPEN_TRACKER=1
 #	-D_INCLUDES_CLASS_DEVICE_MAP=1
 	-D_SUPPORTS_RESOURCES=1
