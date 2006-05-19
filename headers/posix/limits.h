@@ -7,39 +7,9 @@
 /* _GCC_LIMITS_H_ is defined by GCC's internal limits.h to avoid
  * collisions with any defines in this file.
  */
-#if __INTEL__
-# ifndef _GCC_LIMITS_H_
-#  include_next <limits.h>
-# endif
-#else
-
-#define CHAR_BIT		(8)
-
-#define SCHAR_MIN		(-127-1)
-#define SCHAR_MAX		(127)
-
-#define	UCHAR_MAX		(255U)
-
-#define CHAR_MIN		SCHAR_MIN
-#define CHAR_MAX		SCHAR_MAX
-
-#define MB_LEN_MAX		(1)
-
-#define SHRT_MIN		(-32767-1)
-#define SHRT_MAX		(32767)
-
-#define USHRT_MAX		(65535U)
-
-#define LONG_MIN		(-2147483647L-1)
-#define LONG_MAX	  	(2147483647L)
-
-#define ULONG_MAX		(4294967295U)
-
-#define	INT_MIN			LONG_MIN
-#define INT_MAX			LONG_MAX
-#define UINT_MAX		ULONG_MAX
-
-#endif /* else not INTEL */
+#ifndef _GCC_LIMITS_H_
+#	include_next <limits.h>
+#endif
 
 #define LONGLONG_MIN    (-9223372036854775807LL - 1)  /* these are Be specific */
 #define LONGLONG_MAX    (9223372036854775807LL)
