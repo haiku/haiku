@@ -28,7 +28,8 @@ local genericSources =
 	cmp.c dbl2mpn.c divrem.c
 	doasin.c dosincos.c
 	halfulp.c
-	mpa.c mpatan.c mpatan2.c mpexp.c mplog.c mpn2dbl.c mpsqrt.c mptan.c
+	mpa.c mpatan.c mpatan2.c mpexp.c mplog.c mpn2dbl.c
+	mpn2flt.c mpn2ldbl.c mpsqrt.c mptan.c
 	mul.c mul_n.c
 	sincos32.c
 	slowexp.c
