@@ -157,6 +157,8 @@ BMenuBar::AttachedToWindow()
 	Window()->SetKeyMenuBar(this);
 
 	BMenu::AttachedToWindow();
+
+	*fLastBounds = Bounds();
 }
 
 
@@ -218,8 +220,7 @@ BMenuBar::FrameResized(float newWidth, float newHeight)
 	BRect rect(fLastBounds->right - 2, fLastBounds->top, bounds.right, bounds.bottom);
 	fLastBounds->Set(0, 0, newWidth, newHeight);
 	
-	if (rect.IsValid() && Window() != NULL)
-		Invalidate(rect);
+	Invalidate(rect);
 
 	BMenu::FrameResized(newWidth, newHeight);
 }
