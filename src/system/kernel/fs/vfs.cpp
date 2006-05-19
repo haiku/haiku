@@ -4191,7 +4191,8 @@ static status_t
 common_lock_node(int fd, bool kernel)
 {
 	// TODO: Implement!
-	return EOPNOTSUPP;
+	//return EOPNOTSUPP;
+	return B_OK;
 }
 
 
@@ -4199,7 +4200,8 @@ static status_t
 common_unlock_node(int fd, bool kernel)
 {
 	// TODO: Implement!
-	return EOPNOTSUPP;
+	//return EOPNOTSUPP;
+	return B_OK;
 }
 
 
