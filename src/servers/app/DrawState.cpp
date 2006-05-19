@@ -232,9 +232,6 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 void
 DrawState::WriteToLink(BPrivate::LinkSender& link) const
 {
-	rgb_color hc = fHighColor.GetColor32();
-	rgb_color lc = fLowColor.GetColor32();
-	
 	// Attach font state
 	link.Attach<uint32>(fFont.GetFamilyAndStyle());
 	link.Attach<float>(fFont.Size());
@@ -248,8 +245,8 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	// Attach view state
 	link.Attach<BPoint>(fPenLocation);
 	link.Attach<float>(fPenSize);
-	link.Attach(&hc, sizeof(rgb_color));
-	link.Attach(&lc, sizeof(rgb_color));
+	link.Attach<rgb_color>(fHighColor.GetColor32());
+	link.Attach<rgb_color>(fLowColor.GetColor32());
 	link.Attach<uint64>(fPattern.GetInt64());
 	link.Attach<BPoint>(fOrigin);
 	link.Attach<uint8>((uint8)fDrawingMode);
