@@ -1206,6 +1206,8 @@ WindowLayer::SetLook(window_look look, BRegion* updateRegion)
 		// we need a new decorator
 		fDecorator = gDecorManager.AllocateDecorator(fDesktop, Frame(),
 			Title(), fLook, fFlags);
+		if (IsFocus())
+			fDecorator->SetFocus(true);
 	}
 
 	fLook = look;
