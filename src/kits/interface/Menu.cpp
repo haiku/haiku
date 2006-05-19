@@ -312,7 +312,16 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
-	return _AddItem(item, index);
+	bool locked = LockLooper();
+	bool added = _AddItem(item, index);
+	if (locked) {
+		if (added && Window() != NULL && !Window()->IsHidden()) {
+			LayoutItems(index);
+			Invalidate();
+		} 
+		UnlockLooper();
+	}
+	return added;
 }
 
 
@@ -328,7 +337,7 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 	
 	item->fBounds = frame;
 	
-	return _AddItem(item, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
@@ -339,7 +348,7 @@ BMenu::AddItem(BMenu *submenu)
 	if (!item)
 		return false;
 	
-	return _AddItem(item, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
@@ -354,7 +363,7 @@ BMenu::AddItem(BMenu *submenu, int32 index)
 	if (!item)
 		return false;
 		
-	return _AddItem(item, index);
+	return AddItem(item, index);
 }
 
 
@@ -368,7 +377,7 @@ BMenu::AddItem(BMenu *submenu, BRect frame)
 	BMenuItem *item = new BMenuItem(submenu);
 	item->fBounds = frame;
 	
-	return _AddItem(item, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
@@ -379,13 +388,27 @@ BMenu::AddList(BList *list, int32 index)
 	if (list == NULL)
 		return false;
 	
+	bool locked = LockLooper();
+
 	int32 numItems = list->CountItems();
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = static_cast<BMenuItem *>(list->ItemAt(i));
-		if (item != NULL)
-			_AddItem(item, index + i);
+		if (item != NULL) {
+			if (!_AddItem(item, index + i))
+				break;
+		}
 	}	
 	
+	if (locked && Window() != NULL && !Window()->IsHidden()) {	
+		// Make sure we update the layout if needed.
+		LayoutItems(index);
+		//UpdateWindowViewSize();
+		Invalidate();		
+	}
+
+	if (locked)
+		UnlockLooper();
+
 	return true;
 }
 
@@ -394,7 +417,7 @@ bool
 BMenu::AddSeparatorItem()
 {
 	BMenuItem *item = new BSeparatorItem();	
-	return _AddItem(item, CountItems());
+	return AddItem(item, CountItems());
 }
 
 
@@ -410,7 +433,8 @@ BMenuItem *
 BMenu::RemoveItem(int32 index)
 {
 	BMenuItem *item = ItemAt(index);
-	RemoveItems(0, 0, item, false);
+	if (item != NULL)
+		RemoveItems(0, 0, item, false);
 	return item;
 }
 
@@ -1274,14 +1298,11 @@ bool
 BMenu::_AddItem(BMenuItem *item, int32 index)
 {
 	ASSERT(item != NULL);
-
-	bool locked = LockLooper();
-
-	if (!fItems.AddItem(item, index)) {
-		if (locked)
-			UnlockLooper();
+	if (index < 0 || index > CountItems())
 		return false;
-	}
+	
+	if (!fItems.AddItem(item, index))
+		return false;
 	
 	// install the item on the supermenu's window 
 	// or onto our window, if we are a root menu
@@ -1294,16 +1315,6 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		item->Install(window);
 
 	item->SetSuper(this);
-
-	if (locked && window != NULL) {	
-		// Make sure we update the layout if needed.
-		LayoutItems(index);
-		//UpdateWindowViewSize();
-		Invalidate();		
-	}
-
-	if (locked)
-		UnlockLooper();
 
 	return true;
 }
