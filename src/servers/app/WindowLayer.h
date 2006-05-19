@@ -99,8 +99,9 @@ class WindowLayer {
 			// can be used from inside classes that don't
 			// need to know about Desktop (first version uses Desktop)
 			void				MarkDirty(BRegion& regionOnScreen);
-			// this version does not use the Desktop
+			// these versions do not use the Desktop
 			void				MarkContentDirty(BRegion& regionOnScreen);
+			void				MarkContentDirtyAsync(BRegion& regionOnScreen);
 			// shortcut for invalidating just one view
 			void				InvalidateView(ViewLayer* view, BRegion& layerRegion);
 

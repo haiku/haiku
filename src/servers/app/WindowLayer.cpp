@@ -677,6 +677,24 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 
 
 void
+WindowLayer::MarkContentDirtyAsync(BRegion& regionOnScreen)
+{
+	// NOTE: see comments in ProcessDirtyRegion()
+	if (fHidden)
+		return;
+
+	regionOnScreen.IntersectWith(&VisibleContentRegion());
+
+	if (fDirtyRegion.CountRects() == 0) {
+		ServerWindow()->RequestRedraw();
+	}
+
+	fDirtyRegion.Include(&regionOnScreen);
+	fDirtyCause |= UPDATE_REQUEST;
+}
+
+
+void
 WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 {
 	if (layer && IsVisible() && layer->IsVisible()) {
