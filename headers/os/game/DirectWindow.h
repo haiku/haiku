@@ -133,31 +133,38 @@ virtual void        	_ReservedDirectWindow4();
 		BDirectWindow(BDirectWindow &);
 		BDirectWindow &operator=(BDirectWindow &);
 
-		bool				daemon_killer;
-		bool				connection_enable;
-		bool				full_screen_enable;
-		bool				direct_driver_ready;
-		bool				in_direct_connect;
-		int32				direct_lock;				
-		sem_id				direct_sem;
-		uint32				direct_lock_count;
-		thread_id			direct_lock_owner;
-		char				*direct_lock_stack;
-		sem_id				disable_sem;
-		sem_id				disable_sem_ack;
-		uint32				dw_init_status;
-		uint32				info_area_size;
-		uint32				direct_driver_type;
-		uint32				direct_driver_token;
-		area_id				cloned_clipping_area;
-		area_id				source_clipping_area;
-		thread_id			direct_daemon_id;
-		direct_buffer_info	*buffer_desc;
-		BDirectDriver		*direct_driver;
-		struct priv_ext		*extension;
+		bool				fDaemonKiller;
+		bool				fConnectionEnable;
+		bool				fIsFullScreen;
+		bool				fDirectDriverReady;
+		bool				fInDirectConnect;
+		
+		int32				fDirectLock;				
+		sem_id				fDirectSem;
+		uint32				fDirectLockCount;
+		thread_id			fDirectLockOwner;
+		char				*fDirectLockStack;
+		
+		sem_id				fDisableSem;
+		sem_id				fDisableSemAck;
+		
+		uint32				fInitStatus;
+		uint32				fInfoAreaSize;
+		
+		uint32				fDirectDriverType;
+		uint32				fDirectDriverToken;
+		
+		area_id				fClonedClippingArea;
+		area_id				fSourceClippingArea;
+		thread_id			fDirectDaemonId;
+		direct_buffer_info		*fBufferDesc;
+		
+		BDirectDriver			*direct_driver;
+		struct priv_ext			*extension;
 		uint32				_reserved_[15];
 
-static	int32				DirectDaemonFunc(void *arg);
+	static	int32				_DaemonStarter(void *arg);
+		int32				DirectDaemonFunc();
 		bool				LockDirect() const;
 		void				UnlockDirect() const;
 		void				InitData();

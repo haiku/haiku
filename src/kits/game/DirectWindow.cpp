@@ -225,13 +225,13 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	if (IsLocked() || !LockDirect())
 		return B_ERROR;
 	
-	if (in_direct_connect) {
+	if (fInDirectConnect) {
 		UnlockDirect();
 		return B_ERROR;
 	}
 		
 	// BPoint's coordinates are floats. We can only work
-	// with integers.
+	// with integers._DaemonStarter
 	int32 originX, originY;
 	if (origin == NULL) {
 		originX = 0;
@@ -246,11 +246,11 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	// Otherwise, we would need to call BRegion::Include(clipping_rect)
 	// for every clipping_rect in our clip_list, and that would be much
 	// more overkill than this (tested ).
-	region->set_size(buffer_desc->clip_list_count);
-	region->count = buffer_desc->clip_list_count;		
-	region->bound = buffer_desc->clip_bounds;
-	for (uint32 c = 0; c < buffer_desc->clip_list_count; c++)
-		region->data[c] = buffer_desc->clip_list[c];
+	region->set_size(fBufferDesc->clip_list_count);
+	region->count = fBufferDesc->clip_list_count;		
+	region->bound = fBufferDesc->clip_bounds;
+	for (uint32 c = 0; c < fBufferDesc->clip_list_count; c++)
+		region->data[c] = fBufferDesc->clip_list[c];
 
 	// adjust bounds by the given origin point 
 	region->OffsetBy(-originX, -originY);		
@@ -266,6 +266,9 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 status_t
 BDirectWindow::SetFullScreen(bool enable)
 {
+	if (fIsFullScreen == enable)
+		return B_OK;
+
 	status_t status = B_ERROR;
 	if (Lock()) {
 		fLink->StartMessage(AS_DIRECT_WINDOW_SET_FULLSCREEN);
@@ -273,7 +276,7 @@ BDirectWindow::SetFullScreen(bool enable)
 
 		if (fLink->FlushWithReply(status) == B_OK
 			&& status == B_OK)
-			full_screen_enable = enable;
+			fIsFullScreen = enable;
 		Unlock();
 	}
 	return status;
@@ -283,7 +286,7 @@ BDirectWindow::SetFullScreen(bool enable)
 bool
 BDirectWindow::IsFullScreen() const
 {
-	return full_screen_enable;
+	return fIsFullScreen;
 }
 
 
@@ -306,42 +309,47 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 
 //	#pragma mark - Private methods
 
+/* static */
+int32
+BDirectWindow::_DaemonStarter(void *arg)
+{
+	return static_cast<BDirectWindow *>(arg)->DirectDaemonFunc();
+}
+
 
 int32
-BDirectWindow::DirectDaemonFunc(void *arg)
+BDirectWindow::DirectDaemonFunc()
 {
-	BDirectWindow *object = static_cast<BDirectWindow *>(arg);
-
-	while (!object->daemon_killer) {
+	while (!fDaemonKiller) {
 		// This sem is released by the app_server when our
 		// clipping region changes, or when our window is moved,
 		// resized, etc. etc.
 		status_t status;
 		do {
-			status = acquire_sem(object->disable_sem);
+			status = acquire_sem(fDisableSem);
 		} while (status == B_INTERRUPTED);
 
 		if (status < B_OK)
 			return -1;
 
-		if (object->LockDirect()) {
-			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
-				object->connection_enable = true;
+		if (LockDirect()) {
+			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+				fConnectionEnable = true;
 
-			object->in_direct_connect = true;
-			object->DirectConnected(object->buffer_desc);	
-			object->in_direct_connect = false;
+			fInDirectConnect = true;
+			DirectConnected(fBufferDesc);	
+			fInDirectConnect = false;
 
-			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
-				object->connection_enable = false;
+			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+				fConnectionEnable = false;
 
-			object->UnlockDirect();	
+			UnlockDirect();	
 		}
 
 		// The app_server then waits (with a timeout) on this sem.
 		// If we aren't quick enough to release this sem, our app
 		// will be terminated by the app_server
-		if (release_sem(object->disable_sem_ack) != B_OK)
+		if (release_sem(fDisableSemAck) != B_OK)
 			return -1;
 	}
 
@@ -365,15 +373,15 @@ BDirectWindow::LockDirect() const
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
 	
-	if (atomic_add(&casted->direct_lock, 1) > 0) {
+	if (atomic_add(&casted->fDirectLock, 1) > 0) {
 		do {
-			status = acquire_sem(direct_sem);
+			status = acquire_sem(fDirectSem);
 		} while (status == B_INTERRUPTED);
 	}
 		
 	if (status == B_OK) {
-		casted->direct_lock_owner = find_thread(NULL);
-		casted->direct_lock_count++;
+		casted->fDirectLockOwner = find_thread(NULL);
+		casted->fDirectLockCount++;
 	}
 #endif
 
@@ -387,10 +395,10 @@ BDirectWindow::UnlockDirect() const
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
 	
-	if (atomic_add(&casted->direct_lock, -1) > 1)
-		release_sem(direct_sem);
+	if (atomic_add(&casted->fDirectLock, -1) > 1)
+		release_sem(casted->fDirectSem);
 	
-	casted->direct_lock_count--;
+	casted->fDirectLockCount--;
 #endif
 }
 
@@ -398,64 +406,59 @@ BDirectWindow::UnlockDirect() const
 void
 BDirectWindow::InitData()
 {
-	connection_enable = false;
-	full_screen_enable = false;
-	in_direct_connect = false;
+	fConnectionEnable = false;
+	fIsFullScreen = false;
+	fInDirectConnect = false;
 	
-	dw_init_status = 0;
+	fInitStatus = 0;
 	
-	direct_driver_ready = false;
-	direct_driver_type = 0;
-	direct_driver_token = 0;	
+	fDirectDriverReady = false;
+	fDirectDriverType = 0;
+	fDirectDriverToken = 0;	
 	direct_driver = NULL;
 
-	if (!Lock())
-		return;
-
-	struct direct_window_sync_data syncData;
-	
-	fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
-
 	status_t status = B_ERROR;
-	if (fLink->FlushWithReply(status) == B_OK
-		&& status == B_OK) {
-		fLink->Read<direct_window_sync_data>(&syncData);
+	struct direct_window_sync_data syncData;
+	if (Lock()) {
+		fLink->StartMessage(AS_DIRECT_WINDOW_GET_SYNC_DATA);
+		if (fLink->FlushWithReply(status) == B_OK
+			&& status == B_OK) {
+			fLink->Read<direct_window_sync_data>(&syncData);
+		}	
+		Unlock();
 	}
-
-	Unlock();
-
 	if (status < B_OK)
 		return;
 
 #if DW_NEEDS_LOCKING	
-	direct_lock = 0;
-	direct_lock_count = 0;
-	direct_lock_owner = -1;
-	direct_lock_stack = NULL;
-	direct_sem = create_sem(1, "direct sem");
-	if (direct_sem > 0)
-		dw_init_status |= DW_STATUS_SEM_CREATED;
+	fDirectLock = 0;
+	fDirectLockCount = 0;
+	fDirectLockOwner = -1;
+	fDirectLockStack = NULL;
+	fDirectSem = create_sem(1, "direct sem");
+	if (fDirectSem > 0)
+		fInitStatus |= DW_STATUS_SEM_CREATED;
 #endif		
 
-	source_clipping_area = syncData.area;
-	disable_sem = syncData.disable_sem;
-	disable_sem_ack = syncData.disable_sem_ack;
+	fSourceClippingArea = syncData.area;
+	fDisableSem = syncData.disable_sem;
+	fDisableSemAck = syncData.disable_sem_ack;
 
-	cloned_clipping_area = clone_area("Clone direct area", (void**)&buffer_desc,
-		B_ANY_ADDRESS, B_READ_AREA, source_clipping_area);		
+	fClonedClippingArea = clone_area("Clone direct area", (void**)&fBufferDesc,
+		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);		
 
-	if (cloned_clipping_area > 0) {			
-		dw_init_status |= DW_STATUS_AREA_CLONED;
+	if (fSourceClippingArea > 0) {			
+		fInitStatus |= DW_STATUS_AREA_CLONED;
 
-		direct_daemon_id = spawn_thread(DirectDaemonFunc, "direct daemon",
+		fDirectDaemonId = spawn_thread(_DaemonStarter, "direct daemon",
 				B_DISPLAY_PRIORITY, this);
 
-		if (direct_daemon_id > 0) {
-			daemon_killer = false;
-			if (resume_thread(direct_daemon_id) == B_OK)
-				dw_init_status |= DW_STATUS_THREAD_STARTED;
+		if (fDirectDaemonId > 0) {
+			fDaemonKiller = false;
+			if (resume_thread(fDirectDaemonId) == B_OK)
+				fInitStatus |= DW_STATUS_THREAD_STARTED;
 			else
-				kill_thread(direct_daemon_id);
+				kill_thread(fDirectDaemonId);
 		}
 	}
 }
@@ -467,27 +470,27 @@ BDirectWindow::DisposeData()
 	// wait until the connection terminates: we can't destroy
 	// the object until the client receives the B_DIRECT_STOP
 	// notification, or bad things will happen
-	while (connection_enable)
+	while (fConnectionEnable)
 		snooze(50000);
 	
 	LockDirect();
 	
-	if (dw_init_status & DW_STATUS_THREAD_STARTED) {
-		daemon_killer = true;
+	if (fInitStatus & DW_STATUS_THREAD_STARTED) {
+		fDaemonKiller = true;
 		// Release this sem, otherwise the Direct daemon thread
 		// will wait forever on it
-		release_sem(disable_sem);
+		release_sem(fDisableSem);
 		status_t retVal;
-		wait_for_thread(direct_daemon_id, &retVal);
+		wait_for_thread(fDirectDaemonId, &retVal);
 	}
 	
 #if DW_NEEDS_LOCKING
-	if (dw_init_status & DW_STATUS_SEM_CREATED)
-		delete_sem(direct_sem);
+	if (fInitStatus & DW_STATUS_SEM_CREATED)
+		delete_sem(fDirectSem);
 #endif	
 
-	if (dw_init_status & DW_STATUS_AREA_CLONED)
-		delete_area(cloned_clipping_area);
+	if (fInitStatus & DW_STATUS_AREA_CLONED)
+		delete_area(fClonedClippingArea);
 }
 
 
