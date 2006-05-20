@@ -1204,7 +1204,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 	// TODO: cleanup
 	BMenuItem *item = NULL;
 	bigtime_t openTime = system_time();
-	bigtime_t closeTime = openTime; 
+	bigtime_t closeTime = 0; 
 	
 	fState = MENU_STATE_TRACKING;
 	if (fSuper != NULL)
@@ -1675,11 +1675,26 @@ BMenu::State(BMenuItem **item) const
 void
 BMenu::InvokeItem(BMenuItem *item, bool now)
 {
-	if (item->Submenu())
-		item->Submenu()->Show();
-	else if (IsRadioMode())
-		item->SetMarked(true);
-
+	if (!item->IsEnabled())
+		return;
+	
+	// Do the "selected" animation
+	if (!item->Submenu() && LockLooper()) {
+		snooze(50000);
+		item->Select(true);
+		Sync();
+		snooze(50000);
+		item->Select(false);
+		Sync();
+		snooze(50000);	
+		item->Select(true);
+		Sync();
+		snooze(50000);	
+		item->Select(false);
+		Sync();
+		UnlockLooper();
+	}
+	
 	item->Invoke();
 }
 
@@ -1740,6 +1755,12 @@ BMenuItem *
 BMenu::HitTestItems(BPoint where, BPoint slop) const
 {
 	// TODO: Take "slop" into account ?
+	
+	// if the point doesn't lie within the menu's
+	// bounds, bail out immediately
+	if (!Bounds().Contains(where))
+		return NULL;
+	
 	int32 itemCount = CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem *item = ItemAt(i);
@@ -1778,7 +1799,6 @@ BMenu::ItemMarked(BMenuItem *item)
 				ItemAt(i)->SetMarked(false);
 		InvalidateLayout();
 	}
-
 	
 	if (IsLabelFromMarked() && Superitem())
 		Superitem()->SetLabel(item->Label());
