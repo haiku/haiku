@@ -233,8 +233,8 @@ BCheckBox::MouseDown(BPoint point)
 		BRect bounds = Bounds();
 		uint32 buttons;
 
-		Draw(Bounds());
-		Flush();
+		Invalidate();
+		Window()->UpdateIfNeeded();
 
 		do {
 			snooze(40000);
@@ -245,8 +245,8 @@ BCheckBox::MouseDown(BPoint point)
 
 			if (fOutlined != inside) {
 				fOutlined = inside;
-				Draw(Bounds());
-				Flush();
+				Invalidate();
+				Window()->UpdateIfNeeded();
 			}
 		} while (buttons != 0);
 
@@ -255,8 +255,8 @@ BCheckBox::MouseDown(BPoint point)
 			SetValue(!Value());
 			Invoke();
 		} else {
-			Draw(Bounds());
-			Flush();
+			Invalidate();
+			Window()->UpdateIfNeeded();
 		}
 	}	
 }
