@@ -452,25 +452,17 @@ BChannelControl::SetLimits(int32 minimum, int32 maximum)
 		return B_BAD_VALUE;
 	
 	int32 numChannels = CountChannels();
-	int32 *newMinLimits = new int32[numChannels];
-	int32 *newMaxLimits = new int32[numChannels];
 
 	for (int32 c = 0; c < numChannels; c++) {
-		newMinLimits[c] = minimum;
-		newMaxLimits[c] = maximum;
-		if (fChannelValues[c] < newMinLimits[c])
-			fChannelValues[c] = newMinLimits[c];
-		else if (fChannelValues[c] > newMaxLimits[c])
-			fChannelValues[c] = newMaxLimits[c];
+		fChannelMin[c] = minimum;
+		fChannelMax[c] = maximum;
+		if (fChannelValues[c] < minimum)
+			fChannelValues[c] = minimum;
+		else if (fChannelValues[c] > maximum)
+			fChannelValues[c] = maximum;
 	}
 
-	delete[] fChannelMin;
-	delete[] fChannelMax;
-
-	fChannelMin = newMinLimits;
-	fChannelMax = newMaxLimits;
-
-	return B_ERROR;
+	return B_OK;
 }
 
 
