@@ -1,6 +1,6 @@
 /* Journal - transaction and logging
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 
@@ -97,7 +97,7 @@ LogEntry::InsertBlock(off_t blockNumber)
 	block_run run = fJournal->GetVolume()->ToBlockRun(blockNumber);
 
 	fArray->runs[CountRuns()] = run;
-	fArray->count = HOST_ENDIAN_TO_BFS_INT16(CountRuns() + 1);
+	fArray->count = HOST_ENDIAN_TO_BFS_INT32(CountRuns() + 1);
 	fLength++;
 	fCachedBlocks++;
 	return true;
