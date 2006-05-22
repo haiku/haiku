@@ -108,7 +108,7 @@ ViewState::ViewState()
 	clipping_region_used = false;
 
 	high_color = (rgb_color){ 0, 0, 0, 255 };
-	low_color = (rgb_color){ 255, 255, 255 };
+	low_color = (rgb_color){ 255, 255, 255, 255 };
 	view_color = low_color;
 
 	pattern = B_SOLID_HIGH;
