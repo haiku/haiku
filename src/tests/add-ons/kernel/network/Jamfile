@@ -1,12 +1,14 @@
 SubDir HAIKU_TOP src tests add-ons kernel network ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders net ;
 
 # the network stack tester app
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
-SimpleTest net_stack_tester : 
+SimpleTest <installed>net_stack_tester : 
 	net_stack_tester.cpp 
 	userland_ipc.c
 	userland_modules.cpp

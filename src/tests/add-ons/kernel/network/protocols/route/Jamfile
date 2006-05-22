@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel network protocols route ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols route ] ;

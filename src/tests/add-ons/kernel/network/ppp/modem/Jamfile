@@ -1,10 +1,11 @@
 SubDir HAIKU_TOP src tests add-ons kernel network ppp modem ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp modem ] ;
-
 
 Addon <userland>modem : userland obos_network ppp :
 	modem.cpp
@@ -13,3 +14,4 @@ Addon <userland>modem : userland obos_network ppp :
 ;
 
 LinkAgainst <userland>modem : <userland>libkernelppp.a <installed>net_stack_tester be ;
+

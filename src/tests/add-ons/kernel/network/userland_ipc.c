@@ -48,7 +48,7 @@ commands_info g_commands_info[] = {
 	C2N(NET_STACK_SELECT),
 	C2N(NET_STACK_DESELECT),
 	C2N(NET_STACK_GET_COOKIE),
-	C2N(NET_STACK_STOP),
+//	C2N(NET_STACK_STOP),
 	C2N(NET_STACK_NOTIFY_SOCKET_EVENT),
 	C2N(NET_STACK_CONTROL_NET_MODULE),
 
@@ -394,11 +394,11 @@ connection_runner(void *_cookie)
 					args->u.sysctl.newlen);
 				break;
 			}
-
+/*
 			case NET_STACK_STOP:
 				core->stop();
 				break;
-				
+*/				
 			case NET_STACK_CONTROL_NET_MODULE:
 				// TODO!
 				break;

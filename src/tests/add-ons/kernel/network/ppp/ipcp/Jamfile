@@ -1,10 +1,11 @@
 SubDir HAIKU_TOP src tests add-ons kernel network ppp ipcp ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders net ;
-UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp ipcp ] ;
-
 
 Addon <userland>ipcp : userland obos_network ppp :
 	ipcp.cpp
@@ -17,3 +18,4 @@ LinkAgainst <userland>ipcp :
 	be 
 	libbind.so 
 ;
+
