@@ -27,7 +27,6 @@ class TAnalogClock: public BView {
 	private:
 		void _InitView(BRect frame);
 
-		BPoint fClockLeftTop;
 		BBitmap *fBitmap;
 		OffscreenClock *fClock;
 };

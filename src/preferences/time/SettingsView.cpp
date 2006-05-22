@@ -9,6 +9,7 @@
 #include <String.h>
 #include <StringView.h>
 
+#include "Bitmaps.h"
 #include "SettingsView.h"
 #include "TimeMessages.h"
 
@@ -98,13 +99,14 @@ TSettingsView::InitView()
 	frame.bottom = frame.top +text_height +6;
 	frame.right += 4;
 	f_timeedit = new TTimeEdit(frame, "time_edit", 4);
+	AddChild(f_timeedit);
 	
 	frame.top = f_timeedit->Frame().bottom;
 	frame.bottom = bounds.bottom -(text_height *3);
-	frame.InsetBy(10, 10);
+	frame.InsetBy((frame.Width() - kClockFaceWidth + 1)/2.0, (frame.Height() - kClockFaceHeight + 1)/2.0);
 	f_clock = new TAnalogClock(frame, "analog clock", 
 			B_FOLLOW_NONE, B_WILL_DRAW);
-	AddChild(f_timeedit);
+	AddChild(f_clock);
 	
 	// clock radio buttons
 	frame = bounds.InsetByCopy(6, 10);
@@ -114,6 +116,7 @@ TSettingsView::InitView()
 	float width = be_plain_font->StringWidth(label.String());
 	frame.right = frame.left +width;
 	BStringView *text = new BStringView(frame, "clockis", "Clock set to:");
+	AddChild(text);
 	
 	frame.OffsetBy(frame.Width() +9, -1);
 	frame.right = bounds.right-2;
@@ -124,9 +127,6 @@ TSettingsView::InitView()
 	frame.OffsetBy(0, text_height +4);
 	f_gmt = new BRadioButton(frame, "gmt", "GMT", new BMessage(H_RTC_CHANGE));
 	AddChild(f_gmt);
-	
-	AddChild(text);	
-	AddChild(f_clock);
 	
 	if (f_islocal)
 		f_local->SetValue(1);

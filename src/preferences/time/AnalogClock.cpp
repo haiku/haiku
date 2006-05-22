@@ -186,21 +186,13 @@ TAnalogClock::_InitView(BRect rect)
 	fBitmap->Lock();
 	fBitmap->AddChild(fClock);
 	fBitmap->Unlock();
-
-	// offscreen clock is kClockFaceWidth by kClockFaceHeight
-	// which might be smaller then TAnalogClock frame so "center" it.
-	fClockLeftTop = BPoint((rect.Width() - kClockFaceWidth) / 2.0,
-		(rect.Height() - kClockFaceHeight) / 2.0);	
 }
 
 
 void
 TAnalogClock::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -242,7 +234,7 @@ TAnalogClock::Draw(BRect /*updateRect*/)
 
 	if (fBitmap->Lock()) {
 		fClock->DrawClock();
-		DrawBitmap(fBitmap, fClockLeftTop);
+		DrawBitmap(fBitmap, BPoint(0, 0));
 		fBitmap->Unlock();
 	}
 }
