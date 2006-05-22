@@ -6,6 +6,6 @@ ScreenSaver IFS :
 	IFS.cpp
 	IFSSaver.cpp
 
-	: libbe.so libscreensaver.so
+	: be libscreensaver.so
 ;
 

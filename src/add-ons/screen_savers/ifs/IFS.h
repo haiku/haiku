@@ -7,6 +7,7 @@
 #include <Point.h>
 #include <Rect.h>
 #include <Region.h>
+#include <View.h>
 
 typedef struct Similitude_Struct	SIMI;
 typedef struct Fractal_Struct		FRACTAL;
