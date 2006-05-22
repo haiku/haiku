@@ -25,15 +25,15 @@
 #ifndef _MP4_ATOM_H
 #define _MP4_ATOM_H
 
+#include "MP4Structs.h"
+
 #include <File.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <SupportDefs.h>
 
-// Std Headers
-#include <map.h>
+#include <map>
 
-#include "MP4Structs.h"
 
 /*
 AtomBase

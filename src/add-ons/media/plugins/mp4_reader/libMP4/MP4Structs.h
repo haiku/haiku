@@ -22,6 +22,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef MP4_STRUCTS_H
+#define MP4_STRUCTS_H
+
+
+#include <SupportDefs.h>
+
 
 #define AUDIO_NONE			'NONE'
 #define AUDIO_RAW			'raw '
@@ -33,8 +39,7 @@
 #define AUDIO_MPEG3_CBR		0x6D730055
 
 // this is all from the avi reader.  we rework it for mp4
-struct mp4_main_header
-{
+struct mp4_main_header {
 	uint32 micro_sec_per_frame;
 	uint32 max_bytes_per_sec;
 	uint32 padding_granularity;
@@ -273,3 +278,5 @@ struct VideoDescription {
 	uint8				*theVOL;
 	size_t				VOLSize;
 };
+
+#endif	// MP4_STRUCTS_H

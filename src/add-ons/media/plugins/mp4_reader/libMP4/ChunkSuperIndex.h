@@ -27,8 +27,8 @@
 
 #include <SupportDefs.h>
 
-// Std Headers
-#include <map.h>
+#include <map>
+
 
 struct ChunkIndex {
 	uint32	stream;

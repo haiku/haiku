@@ -22,29 +22,33 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
-#include <string.h>
-#include <malloc.h>
-#include <DataIO.h>
-#include <StopWatch.h>
-#include <ByteOrder.h>
-#include <InterfaceDefs.h>
-#include <MediaFormats.h>
-#include "RawFormats.h"
+
 
 #include "mp4_reader.h"
+#include "RawFormats.h"
+
+#include <ByteOrder.h>
+#include <DataIO.h>
+#include <InterfaceDefs.h>
+#include <MediaFormats.h>
+#include <StopWatch.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
-  #define TRACE printf
+#	define TRACE printf
 #else
-  #define TRACE(a...)
+#	define TRACE(a...)
 #endif
 
 #define ERROR(a...) fprintf(stderr, a)
 
-struct mp4_cookie
-{
+
+struct mp4_cookie {
 	unsigned	stream;
 	char *		buffer;
 	unsigned	buffer_size;
@@ -77,10 +81,12 @@ mp4Reader::mp4Reader()
 	TRACE("mp4Reader::mp4Reader\n");
 }
 
+
 mp4Reader::~mp4Reader()
 {
  	delete theFileReader;
 }
+
 
 const char *
 mp4Reader::Copyright()
@@ -88,6 +94,7 @@ mp4Reader::Copyright()
 	return "MPEG4 & libMP4, " B_UTF8_COPYRIGHT " by David McPaul";
 }
 	
+
 status_t
 mp4Reader::Sniff(int32 *streamCount)
 {
@@ -118,13 +125,14 @@ mp4Reader::Sniff(int32 *streamCount)
 	return B_OK;
 }
 
+
 void
 mp4Reader::GetFileFormatInfo(media_file_format *mff)
 {
-	mff->capabilities =   media_file_format::B_READABLE
-						| media_file_format::B_KNOWS_ENCODED_VIDEO
-						| media_file_format::B_KNOWS_ENCODED_AUDIO
-						| media_file_format::B_IMPERFECTLY_SEEKABLE;
+	mff->capabilities = media_file_format::B_READABLE
+		| media_file_format::B_KNOWS_ENCODED_VIDEO
+		| media_file_format::B_KNOWS_ENCODED_AUDIO
+		| media_file_format::B_IMPERFECTLY_SEEKABLE;
 	mff->family = B_QUICKTIME_FORMAT_FAMILY;
 	mff->version = 100;
 	strcpy(mff->mime_type, "video/quicktime");
@@ -132,6 +140,7 @@ mp4Reader::GetFileFormatInfo(media_file_format *mff)
 	strcpy(mff->short_name,  "MP4");
 	strcpy(mff->pretty_name, "MPEG-4 (MP4) file format");
 }
+
 
 status_t
 mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
@@ -180,40 +189,46 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->chunk_pos = 1;
 
 		if (stream_header->scale && stream_header->rate) {
-			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize * audio_format->NoOfChannels / 8;
+			cookie->bytes_per_sec_rate = stream_header->rate *
+				audio_format->SampleSize * audio_format->NoOfChannels / 8;
 			cookie->bytes_per_sec_scale = stream_header->scale;
 			cookie->frames_per_sec_rate = stream_header->rate;
 			cookie->frames_per_sec_scale = stream_header->scale;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n",
+				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else if (stream_header->rate) {
-			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize * audio_format->NoOfChannels / 8;
+			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize
+				* audio_format->NoOfChannels / 8;
 			cookie->bytes_per_sec_scale = 1;
 			cookie->frames_per_sec_rate = stream_header->rate;
 			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n",
+				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else if (audio_format->PacketSize) {
 			cookie->bytes_per_sec_rate = audio_format->PacketSize;
 			cookie->bytes_per_sec_scale = 1;
-			cookie->frames_per_sec_rate = audio_format->PacketSize * 8 / audio_format->SampleSize / audio_format->NoOfChannels;
+			cookie->frames_per_sec_rate = audio_format->PacketSize * 8
+				/ audio_format->SampleSize / audio_format->NoOfChannels;
 			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using PacketSize)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using PacketSize)\n",
+				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else {
 			cookie->bytes_per_sec_rate = 128000;
 			cookie->bytes_per_sec_scale = 8;
 			cookie->frames_per_sec_rate = 16000;
 			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using fallback)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using fallback)\n",
+				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		}
 
-		if ((audio_format->compression == AUDIO_NONE) ||
-			(audio_format->compression == AUDIO_RAW) ||
-			(audio_format->compression == AUDIO_TWOS1) ||
-			(audio_format->compression == AUDIO_TWOS2)) {
+		if (audio_format->compression == AUDIO_NONE
+			|| audio_format->compression == AUDIO_RAW
+			|| audio_format->compression == AUDIO_TWOS1
+			|| audio_format->compression == AUDIO_TWOS2) {
 			description.family = B_BEOS_FORMAT_FAMILY;
 			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-			if (B_OK != formats.GetFormatFor(description, format)) {
+			if (B_OK != formats.GetFormatFor(description, format))
 				format->type = B_MEDIA_RAW_AUDIO;
-			}
 
 			format->u.raw_audio.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 			format->u.raw_audio.channel_count = audio_format->NoOfChannels;
@@ -463,7 +478,7 @@ mp4Reader::FreeCookie(void *_cookie)
 
 status_t
 mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, const void **infoBuffer, size_t *infoSize)
+	media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	mp4_cookie *cookie = (mp4_cookie *)_cookie;
 
@@ -477,9 +492,7 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mp4Reader::Seek(void *cookie,
-				uint32 seekTo,
-				int64 *frame, bigtime_t *time)
+mp4Reader::Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 {
 
 // We should seek to nearest keyframe requested
@@ -515,21 +528,23 @@ mp4Reader::Seek(void *cookie,
 
 
 status_t
-mp4Reader::GetNextChunk(void *_cookie,
-						const void **chunkBuffer, size_t *chunkSize,
-						media_header *mediaHeader)
+mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
+	size_t *chunkSize, media_header *mediaHeader)
 {
 	mp4_cookie *cookie = (mp4_cookie *)_cookie;
-
-	int64 start; uint32 size; bool keyframe;
+	int64 start;
+	uint32 size;
+	bool keyframe;
 
 	if (cookie->audio) {
 		// use chunk position
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos, &start, &size, &keyframe))
+		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos,
+				&start, &size, &keyframe))
 			return B_LAST_BUFFER_ERROR;
 	} else {
 		// use frame position
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos, &start, &size, &keyframe))
+		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos,
+				&start, &size, &keyframe))
 			return B_LAST_BUFFER_ERROR;
 	}
 
@@ -571,7 +586,15 @@ mp4Reader::GetNextChunk(void *_cookie,
 
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;
-	return (int)size == theFileReader->Source()->ReadAt(start, cookie->buffer, size) ? B_OK : B_LAST_BUFFER_ERROR;
+
+	ssize_t bytesRead = theFileReader->Source()->ReadAt(start, cookie->buffer, size);
+	if (bytesRead < B_OK)
+		return bytesRead;
+
+	if (bytesRead < (ssize_t)size)
+		return B_LAST_BUFFER_ERROR;
+
+	return B_OK;
 }
 
 
