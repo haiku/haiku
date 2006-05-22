@@ -403,16 +403,12 @@ public:
 		rootView->ResizeTo(width - 1, height - 1);
 		ResizeTo(width - 1, height - 1);
 
-		// center the window on screen
-		BScreen screen;
-		if (screen.IsValid()) {
-			BRect screenFrame = screen.Frame();
-			int screenWidth = screenFrame.IntegerWidth() + 1;
-			int screenHeight = screenFrame.IntegerHeight() + 1;
-			MoveTo((screenWidth - width) / 2, (screenHeight - height) / 2);
-		} else {
-			MoveTo(20, 20);
-		}
+		// move the window to the same position as BAlerts
+		BScreen screen(this);
+	 	BRect screenFrame = screen.Frame();
+
+		MoveTo(screenFrame.left + (screenFrame.Width() - width) / 2.0,
+			screenFrame.top + screenFrame.Height() / 4.0 - ceilf(height / 3.0));
 
 		return B_OK;
 	}
