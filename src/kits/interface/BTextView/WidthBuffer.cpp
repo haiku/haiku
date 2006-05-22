@@ -85,30 +85,30 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 {
 	if (inText == NULL)
 		return 0;
-	
+
 	int32 index = 0;
 	if (!FindTable(inStyle, &index))
 		index = InsertTable(inStyle);
-	
+
 	char *text = NULL;	
 	int32 numChars = 0;
 	int32 textLen = 0;
-	
+
 	const float fontSize = inStyle->Size();
 	float stringWidth = 0;
 	if (length > 0) {		
 		for (int32 charLen = 0, currentOffset = fromOffset;
-								currentOffset < fromOffset + length;
-								currentOffset += charLen) {
-			
+				currentOffset < fromOffset + length;
+				currentOffset += charLen) {
 			charLen = UTF8NextCharLen(inText + currentOffset);
+
 			// End of string, bail out
 			if (charLen == 0)
 				break;
-			
+
 			// Some magic, to uniquely identify this charachter	
 			const uint32 value = CharToCode(inText + currentOffset, charLen);
-			
+
 			float escapement;
 			if (GetEscapement(value, index, &escapement)) {
 				// Well, we've got a match for this charachter
@@ -125,7 +125,7 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 			}			
 		}		
 	}
-	
+
 	if (text != NULL) {
 		// We've found some charachters which aren't yet in the hash table.
 		// Get their width via HashEscapements()
@@ -172,11 +172,12 @@ _BWidthBuffer_::FindTable(const BFont *inStyle, int32 *outIndex)
 	for (int32 i = 0; i < fItemCount; i++) {
 	
 #if USE_DANO_WIDTHBUFFER
-		if (*inStyle == fBuffer[i].font) {
+		if (*inStyle == fBuffer[i].font)
 #else
 		if (fontSize == fBuffer[i].fontSize 
-				&& fontCode == fBuffer[i].fontCode) {
+			&& fontCode == fBuffer[i].fontCode)
 #endif
+		{
 			tableIndex = i;
 			break;
 		}
@@ -283,24 +284,24 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 {
 	float *escapements = new float[numChars];
 	inStyle->GetEscapements(inText, numChars, escapements);
-	
+
 	_width_table_ &table = fBuffer[tableIndex];	
 	hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
-	
+
 	int32 offset = 0;
 	int32 charCount = 0;
-	
+
 	// Insert the escapements into the hash table
 	do {
 		const int32 charLen = UTF8NextCharLen(inText + offset);
 		if (charLen == 0)
 			break;
-			
+
 		const uint32 value = CharToCode(inText + offset, charLen);
-				
+
 		uint32 hashed = Hash(value) & (table.tableCount - 1);
 		uint32 found = widths[hashed].code;
-		
+
 		// Check if the value is already in the table
 		if (found != value) {
 			while ((found = widths[hashed].code) != kInvalidCode) {
@@ -309,13 +310,13 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 				if (++hashed >= (uint32)table.tableCount)
 					hashed = 0;
 			}
-			
+
 			if (found == kInvalidCode) {
 				// The value is not in the table. Add it.
 				widths[hashed].code = value;
 				widths[hashed].escapement = escapements[charCount];
 				table.hashCount++;
-			
+
 				// We always keep some free space in the hash table
 				// TODO: Not sure how much space, currently we double
 				// the current size when hashCount is at least 2/3 of
@@ -323,7 +324,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 				if (table.tableCount * 2 / 3 <= table.hashCount) {
 					table.hashCount = 0;
 					const int32 newSize = table.tableCount * 2;
-					
+
 					// Create and initialize a new hash table
 					hashed_escapement *newWidths = new hashed_escapement[newSize];
 
@@ -341,7 +342,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 						}
 					}
 					table.tableCount = newSize;
-					
+
 					// Delete the old table, and put the new pointer into the _width_table_
 					delete[] widths;
 					widths = newWidths;
@@ -351,7 +352,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 		charCount++;
 		offset += charLen;
 	} while (offset < textLen);
-	
+
 	// Calculate the width of the string
 	float width = 0;
 	for (int32 x = 0; x < numChars; x++)
