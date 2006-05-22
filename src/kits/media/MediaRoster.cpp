@@ -2482,7 +2482,7 @@ BMediaRoster::GetLatencyFor(const media_node & producer,
 	
 	*out_latency = reply.latency;
 	
-	printf("BMediaRoster::GetLatencyFor producer %ld has maximum latency %Ld\n", producer.node, *out_latency);
+//	printf("BMediaRoster::GetLatencyFor producer %ld has maximum latency %Ld\n", producer.node, *out_latency);
 	return B_OK;
 }
 
