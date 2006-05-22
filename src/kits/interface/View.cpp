@@ -102,16 +102,6 @@ get_uint32_color(rgb_color color)
 }
 
 
-static inline void
-set_rgb_color(rgb_color &color, uint8 r, uint8 g, uint8 b, uint8 a = 255)
-{
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
-}
-
-
 //	#pragma mark -
 
 
@@ -128,8 +118,8 @@ ViewState::ViewState()
 	// this flag
 	clipping_region_used = false;
 
-	set_rgb_color(high_color, 0, 0, 0);
-	set_rgb_color(low_color, 255, 255, 255);
+	high_color = (rgb_color){ 0, 0, 0, 255 };
+	low_color = (rgb_color){ 255, 255, 255 };
 	view_color = low_color;
 
 	pattern = B_SOLID_HIGH;
@@ -1898,8 +1888,7 @@ BView::SetHighColor(rgb_color color)
 		fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;	
 	}
 
-	set_rgb_color(fState->high_color, color.red, color.green,
-		color.blue, color.alpha);
+	fState->high_color = color;
 
 	fState->archiving_flags |= B_VIEW_HIGH_COLOR_BIT;
 }
@@ -1942,8 +1931,7 @@ BView::SetLowColor(rgb_color color)
 		fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
 	}
 
-	set_rgb_color(fState->low_color, color.red, color.green,
-		color.blue, color.alpha);
+	fState->low_color = color;
 
 	fState->archiving_flags |= B_VIEW_LOW_COLOR_BIT;
 }
@@ -1985,8 +1973,7 @@ BView::SetViewColor(rgb_color color)
 		fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
 	}
 
-	set_rgb_color(fState->view_color, color.red, color.green,
-		color.blue, color.alpha);
+	fState->view_color = color;
 
 	fState->archiving_flags |= B_VIEW_VIEW_COLOR_BIT;
 }
@@ -2960,9 +2947,7 @@ BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
 		comm->array[comm->count].startY = pt0.y;
 		comm->array[comm->count].endX = pt1.x;
 		comm->array[comm->count].endY = pt1.y;
-
-		set_rgb_color(comm->array[comm->count].color,
-			col.red, col.green, col.blue, col.alpha);
+		comm->array[comm->count].color = col;
 
 		comm->count++;
 	}
