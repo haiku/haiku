@@ -113,6 +113,7 @@ public:
   void	SetMouseCursor (void);
  // void  SetIMAware (bool);
   void	SetScrollBar (BScrollBar *scrbar);
+  BScrollBar  *ScrollBar () const { return fScrollBar; };
 
   //
   // Output Charactor.

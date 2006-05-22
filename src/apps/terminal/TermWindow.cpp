@@ -13,6 +13,7 @@
 #include <Path.h>
 #include <PrintJob.h>
 #include <PropertyInfo.h>
+#include <Screen.h>
 #include <ScrollBar.h>
 #include <TextControl.h>
 #include <WindowScreen.h>
@@ -197,7 +198,7 @@ TermWindow::SetupMenu(void)
   fMenubar = new BMenuBar(Bounds(), "mbar");
 
   /*
-   * Make Fiile Menu.
+   * Make File Menu.
    */
   fFilemenu = new BMenu("Terminal");
   fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
@@ -240,6 +241,7 @@ TermWindow::SetupMenu(void)
    	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
  	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
  	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
+ 	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), '\n')); 
  	
  	// Considering we have this in the preferences window, this menu is not
  	// needed and should not be shown if we are to not confuse the user
@@ -435,6 +437,33 @@ TermWindow::MessageReceived(BMessage *message)
 		gTermPref->setString(PREF_ROWS, "25");
 	   	this->PostMessage (MSG_ROWS_CHANGED);
 	   	this->PostMessage (MSG_COLS_CHANGED);
+	break;	
+	
+	case FULLSCREEN:
+		if (!fSavedFrame.IsValid()) { // go fullscreen
+			float mbHeight = fMenubar->Bounds().Height() + 1;
+			fSavedFrame = Frame();
+			BScreen screen(this);
+			fTermView->ScrollBar()->Hide();
+			fMenubar->Hide();
+			fBaseView->MoveTo(0,0);
+			fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+			fSavedLook = Look();
+			// done before ResizeTo to work around a Dano bug (not erasing the decor)
+			SetLook(B_NO_BORDER_WINDOW_LOOK);
+			ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
+			MoveTo(screen.Frame().left, screen.Frame().top);
+		} else { // exit fullscreen
+			float mbHeight = fMenubar->Bounds().Height() + 1;
+			fMenubar->Show();
+			fTermView->ScrollBar()->Show();
+			ResizeTo(fSavedFrame.Width()+1, fSavedFrame.Height()+1);
+			MoveTo(fSavedFrame.left, fSavedFrame.top);
+			fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+			fBaseView->MoveTo(0,mbHeight);
+			SetLook(fSavedLook);
+			fSavedFrame = BRect(0,0,-1,-1);
+		}
 	break;	
 	
 	case MSG_FONT_CHANGED:

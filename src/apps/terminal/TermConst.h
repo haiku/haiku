@@ -91,6 +91,7 @@ const uint32 EIGHTYTWENTYFIVE 		= 'etfv';
 const uint32 EIGHTYFORTY 			= 'efor';
 const uint32 ONETHREETWOTWENTYFOUR 	= 'hunf';
 const uint32 ONETHREETWOTWENTYFIVE 	= 'hunv';
+const uint32 FULLSCREEN			= 'fscr';
 
 const uint32 MSG_FONT_CHANGED		= 'fntc';
 

@@ -85,6 +85,8 @@ private:
   FindDlg	*fFindPanel;
   BMessageRunner *fWindowUpdate;
   BMenuItem *item;
+  BRect		fSavedFrame;
+  window_look	fSavedLook;
 };
 
 #endif // TERMWIN_H
