@@ -110,7 +110,6 @@ BListView::BListView(BMessage* archive)
 BListView::~BListView()
 {
 	SetSelectionMessage(NULL);
-	delete fSelectMessage;
 }
 
 
