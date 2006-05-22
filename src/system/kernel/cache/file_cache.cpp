@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -48,7 +48,7 @@ struct file_map {
 
 	file_extent *operator[](uint32 index);
 	file_extent *ExtentAt(uint32 index);
-	status_t Add(file_io_vec *vecs, size_t vecCount);
+	status_t Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset);
 	void Free();
 
 	union {
@@ -104,20 +104,18 @@ file_map::ExtentAt(uint32 index)
 
 
 status_t
-file_map::Add(file_io_vec *vecs, size_t vecCount)
+file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 {
-	off_t offset = 0;
+	TRACE(("file_map::Add(vecCount = %ld)\n", vecCount));
 
-#if 0
-for (uint32 i = 0; i < vecCount; i++) {
-	dprintf("[%ld] vecs offset %Ld, length %Ld\n",
-		i, vecs[i].offset, vecs[i].length);
-}
-#endif
+	off_t offset = 0;
 
 	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
 		// just use the reserved area in the file_cache_ref structure
 	} else {
+		// TODO: once we can invalidate only parts of the file map,
+		//	we might need to copy the previously cached file extends
+		//	from the direct range
 		file_extent *newMap = (file_extent *)realloc(array,
 			(count + vecCount) * sizeof(file_extent));
 		if (newMap == NULL)
@@ -131,10 +129,11 @@ for (uint32 i = 0; i < vecCount; i++) {
 		}
 	}
 
+	int32 start = count;
 	count += vecCount;
 
 	for (uint32 i = 0; i < vecCount; i++) {
-		file_extent *extent = ExtentAt(i);
+		file_extent *extent = ExtentAt(start + i);
 
 		extent->offset = offset;
 		extent->disk = vecs[i];
@@ -142,6 +141,15 @@ for (uint32 i = 0; i < vecCount; i++) {
 		offset += extent->disk.length;
 	}
 
+#ifdef TRACE_FILE_CACHE
+	for (uint32 i = 0; i < count; i++) {
+		file_extent *extent = ExtentAt(i);
+		dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
+			i, extent->offset, extent->disk.offset, extent->disk.length);
+	}
+#endif
+
+	lastOffset = offset;
 	return B_OK;
 }
 
@@ -224,15 +232,17 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 					return status;
 				}
 
-				status = ref->map.Add(vecs, vecCount);
-//dprintf("map.Add() status %s\n", strerror(status));
+				status_t addStatus = ref->map.Add(vecs, vecCount, mapOffset);
+				if (addStatus != B_OK) {
+					// only clobber the status in case of failure
+					status = addStatus;
+				}
+
 				if (status != B_BUFFER_OVERFLOW)
 					break;
 
 				// when we are here, the map has been stored in the array, and
 				// the array size was still too small to cover the whole file
-				file_io_vec *last = &vecs[vecCount - 1];
-				mapOffset += last->length;
 				vecCount = maxVecs;
 			}
 		}
@@ -319,6 +329,13 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	for (size_t i = 0; i < fileVecCount; i++)
 		dprintf("[%lu] offset = %Ld, size = %Ld\n", i, fileVecs[i].offset, fileVecs[i].length);
 #endif
+
+	if (fileVecCount == 0) {
+		// There are no file vecs at this offset, so we're obviously trying
+		// to access the file outside of its bounds
+		TRACE(("pages_io: access outside of vnode %p at offset %Ld\n", ref->vnode, offset));
+		return B_BAD_VALUE;
+	}
 
 	uint32 fileVecIndex;
 	size_t size;
