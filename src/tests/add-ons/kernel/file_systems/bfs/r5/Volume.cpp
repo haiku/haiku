@@ -181,8 +181,10 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 
 	strlcpy(name, diskName, sizeof(name));
 
-	int32 blockShift;
-	for (blockShift = 9; (1UL << blockShift) < blockSize; blockShift++);
+	int32 blockShift = 9;
+	while ((1UL << blockShift) < blockSize) {
+		blockShift++;
+	}
 
 	block_size = inode_size = HOST_ENDIAN_TO_BFS_INT32(blockSize);
 	block_shift = HOST_ENDIAN_TO_BFS_INT32(blockShift);
