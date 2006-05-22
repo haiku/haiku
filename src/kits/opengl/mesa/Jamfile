@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
-		# We need the public GL headers also when not compiling for Haiku.
+		# We need our not platform one, public GL headers also when not compiling for Haiku.
 }
 
 UsePrivateHeaders opengl ;
@@ -26,49 +26,72 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast_setup ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) x86 ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) sparc ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) ppc ] ;
+{
+       local defines ;
+	defines = BEOS_THREADS GNU_ASSEMBLER ;
 
+	if $(TARGET_ARCH) = x86 {
+		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
+	} else {
+		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
+                # defines += USE_PPC_ASM ;
+	}
 
-SubDirCcFlags 
-	-DBEOS_THREADS 
-	-DGNU_ASSEMBLER 
-	-DUSE_X86_ASM 
-	-DUSE_MMX_ASM 
-	-DUSE_3DNOW_ASM 
-	-DUSE_SSE_ASM ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
 
-local archSources ;
-
+local arch_sources ;
 if $(TARGET_ARCH) = x86 {
-	archSources =
+
+	arch_sources = 
+		common_x86.c
 		common_x86_asm.S
-		x86_xform2.S	
-		x86_xform3.S	
-		x86_xform4.S	
-		x86_cliptest.S	
-		mmx_blend.S		
-		3dnow_xform1.S	
-		3dnow_xform2.S	
-		3dnow_xform3.S	
-		3dnow_xform4.S	
-		3dnow_normal.S	
-		sse_xform1.S	
-		sse_xform2.S	
-		sse_xform3.S	
-		sse_xform4.S	
+
+		x86.c
+		x86_xform2.S
+		x86_xform3.S
+		x86_xform4.S
+		x86_cliptest.S
+		mmx_blend.S
+		3dnow.c
+		3dnow_xform1.S
+		3dnow_xform2.S
+		3dnow_xform3.S
+		3dnow_xform4.S
+		3dnow_normal.S
+		sse.c
+		sse_xform1.S
+		sse_xform2.S
+		sse_xform3.S
+		sse_xform4.S
 		sse_normal.S
 		read_rgba_span_x86.S
 
-		# tnl
 		t_vtx_x86_gcc.S
-	;
-} else {
-	archSources =
+		;
+
+} else if $(TARGET_ARCH) = ppc {
+
+	arch_sources = 
+		common_ppc.c
 		t_vtx_generic.c
-	;
+		;
+
+} else if $(TARGET_ARCH) = sparc {
+
+	arch_sources = 
+		sparc.c 
+		t_vtx_generic.c 
+		;
+
+} else {
+	arch_sources = t_vtx_generic.c ;
 }
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
+
 
 StaticLibrary libmesa.a : 
 
@@ -217,20 +240,8 @@ StaticLibrary libmesa.a :
 	program.c
 	shaderobjects.c
 
-	# x86
-	common_x86.c
-	x86.c
-	3dnow.c
-	sse.c
+	$(arch_sources)
 
-	# sparc
-	sparc.c
-
-	# ppc	
-	common_ppc.c
-
-	$(archSources)
-	
 	# glapi
 	glapi.c
 	glthread.c

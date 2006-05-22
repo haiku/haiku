@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
-		# We need the public GL headers also when not compiling for Haiku.
+		# We need our public GL headers also when not compiling for Haiku.
 }
 
 UseHeaders [ FDirName $(SUBDIR) include ] ;

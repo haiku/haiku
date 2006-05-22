@@ -6,7 +6,7 @@ UsePrivateHeaders opengl ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
-		# We need the public GL headers also when not compiling for Haiku.
+		# We need our public GL headers also when not compiling for Haiku.
 }
 
 
@@ -19,20 +19,30 @@ UseHeaders [ FDirName $(SUBDIR) mesa shader ] ;
 UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
 UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 
-SubDirCcFlags 
-	-DBEOS_THREADS 
-	-DGNU_ASSEMBLER 
-	-DUSE_X86_ASM 
-	-DUSE_MMX_ASM 
-	-DUSE_3DNOW_ASM 
-	-DUSE_SSE_ASM ;
-SubDirC++Flags 
-	-DBEOS_THREADS 
-	-DGNU_ASSEMBLER 
-	-DUSE_X86_ASM 
-	-DUSE_MMX_ASM 
-	-DUSE_3DNOW_ASM 
-	-DUSE_SSE_ASM ;
+{
+       local defines ;
+       defines = BEOS_THREADS GNU_ASSEMBLER ;
+
+	if $(TARGET_ARCH) = x86 {
+		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
+	} else if $(TARGET_ARCH) = ppc {
+		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
+		# defines += USE_PPC_ASM ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+        SubDirCcFlags $(defines) ;
+        SubDirC++Flags $(defines) ;
+}
+
+local arch_sources ;
+if $(TARGET_ARCH) = x86 {
+	# On x86 platform, use the faster GL API dispatching assembly code!
+	arch_sources = glapi_x86.S ;
+} else {
+	# For non-X86 platforms, no assembly code yet.
+	arch_sources = ;
+}
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mesa $(TARGET_ARCH) ] ;
 
@@ -41,8 +51,8 @@ SharedLibrary libGL.so :
 	GLDispatcher.cpp
 	GLRenderer.cpp
 
-	# mesa/$(TARGET_ARCH)
-	glapi_$(TARGET_ARCH).S
+	# Mesa optimized GL dispatching code (if any) for this target architecture 
+	$(arch_sources)
 	: 
 	# GLU API is included in libGL.so under BeOS R5, not a separate libglu.so library
 	<opengl>sgi-glu.o
