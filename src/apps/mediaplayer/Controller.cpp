@@ -33,10 +33,10 @@
 #include "SoundOutput.h"
 
 
-#define AUDIO_PLAY_PRIORITY 10
-#define VIDEO_PLAY_PRIORITY 10
-#define AUDIO_DECODE_PRIORITY 10
-#define VIDEO_DECODE_PRIORITY 10
+#define AUDIO_PLAY_PRIORITY		110
+#define VIDEO_PLAY_PRIORITY		20
+#define AUDIO_DECODE_PRIORITY	13
+#define VIDEO_DECODE_PRIORITY	13
 
 void 
 HandleError(const char *text, status_t err)
