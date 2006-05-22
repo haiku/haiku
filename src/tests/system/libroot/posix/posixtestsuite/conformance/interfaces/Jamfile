@@ -1,3 +1,6 @@
 SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces ;
 
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces difftime ;
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces kill ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigprocmask ;
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigsuspend ;
