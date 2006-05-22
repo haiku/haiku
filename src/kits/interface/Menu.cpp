@@ -314,16 +314,17 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
-	bool locked = LockLooper();
-	bool added = _AddItem(item, index);
-	if (locked) {
-		if (added && Window() != NULL && !Window()->IsHidden()) {
+	if (!_AddItem(item, index))
+		return false;
+
+	if (LockLooper()) {
+		if (!Window()->IsHidden()) {
 			LayoutItems(index);
 			Invalidate();
 		} 
 		UnlockLooper();
 	}
-	return added;
+	return true;
 }
 
 
@@ -338,8 +339,21 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 		return false;
 	
 	item->fBounds = frame;
-	
-	return AddItem(item, CountItems());
+
+	int32 index = CountItems();
+	if (!_AddItem(item, index)) {
+		return false;
+	}
+
+	if (LockLooper()) {
+		if (!Window()->IsHidden()) {
+			LayoutItems(index);
+			Invalidate();
+		} 
+		UnlockLooper();
+	}
+
+	return true;
 }
 
 
@@ -392,9 +406,7 @@ BMenu::AddItem(BMenu *submenu, BRect frame)
 	if (!item)
 		return false;
 
-	item->fBounds = frame;
-	
-	if (!AddItem(item, CountItems())) {
+	if (!AddItem(item, frame)) {
 		item->fSubmenu = NULL;
 		delete item;
 		return false;
