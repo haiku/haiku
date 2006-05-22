@@ -119,7 +119,7 @@ ViewLayer::ViewLayer(BRect frame, BPoint scrollingOffset, const char* name,
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 }
 
-// destructor
+
 ViewLayer::~ViewLayer()
 {
 	if (fViewBitmap != NULL)
@@ -144,7 +144,7 @@ ViewLayer::~ViewLayer()
 	}
 }
 
-// Bounds
+
 BRect
 ViewLayer::Bounds() const
 {
@@ -154,7 +154,7 @@ ViewLayer::Bounds() const
 	return bounds;
 }
 
-// ConvertToVisibleInTopView
+
 void
 ViewLayer::ConvertToVisibleInTopView(BRect* bounds) const
 {
@@ -166,7 +166,7 @@ ViewLayer::ConvertToVisibleInTopView(BRect* bounds) const
 		fParent->ConvertToVisibleInTopView(bounds);
 }
 
-// AttachedToWindow
+
 void
 ViewLayer::AttachedToWindow(WindowLayer* window)
 {
@@ -186,7 +186,6 @@ ViewLayer::AttachedToWindow(WindowLayer* window)
 }
 
 
-// DetachedFromWindow
 void
 ViewLayer::DetachedFromWindow()
 {
@@ -200,7 +199,10 @@ ViewLayer::DetachedFromWindow()
 		child->DetachedFromWindow();
 }
 
-// AddChild
+
+// #pragma mark -
+
+
 void
 ViewLayer::AddChild(ViewLayer* layer)
 {
@@ -341,7 +343,7 @@ ViewLayer::TopLayer()
 	return this;
 }
 
-// CountChildren
+
 uint32
 ViewLayer::CountChildren(bool deep) const
 {
@@ -355,7 +357,7 @@ ViewLayer::CountChildren(bool deep) const
 	return count;	
 }
 
-// CollectTokensForChildren
+
 void
 ViewLayer::CollectTokensForChildren(BList* tokenMap) const
 {
@@ -365,7 +367,7 @@ ViewLayer::CollectTokensForChildren(BList* tokenMap) const
 	}
 }
 
-// ViewAt
+
 ViewLayer*
 ViewLayer::ViewAt(const BPoint& where, BRegion* windowContentClipping)
 {
@@ -381,6 +383,16 @@ ViewLayer::ViewAt(const BPoint& where, BRegion* windowContentClipping)
 			return layer;
 	}
 	return NULL;
+}
+
+
+// #pragma mark -
+
+
+void
+ViewLayer::SetName(const char* string)
+{
+	fName.SetTo(string);
 }
 
 
@@ -537,6 +549,9 @@ ViewLayer::UpdateOverlay()
 }
 
 
+// #pragma mark -
+
+
 void
 ViewLayer::ConvertToParent(BPoint* point) const
 {
@@ -545,7 +560,7 @@ ViewLayer::ConvertToParent(BPoint* point) const
 	point->y += fFrame.top - fScrollingOffset.y;
 }
 
-// ConvertToParent
+
 void
 ViewLayer::ConvertToParent(BRect* rect) const
 {
@@ -554,7 +569,7 @@ ViewLayer::ConvertToParent(BRect* rect) const
 				   fFrame.top - fScrollingOffset.y);
 }
 
-// ConvertToParent
+
 void
 ViewLayer::ConvertToParent(BRegion* region) const
 {
@@ -563,7 +578,7 @@ ViewLayer::ConvertToParent(BRegion* region) const
 					 fFrame.top - fScrollingOffset.y);
 }
 
-// ConvertFromParent
+
 void
 ViewLayer::ConvertFromParent(BPoint* point) const
 {
@@ -572,7 +587,7 @@ ViewLayer::ConvertFromParent(BPoint* point) const
 	point->y += fScrollingOffset.y - fFrame.top;
 }
 
-// ConvertFromParent
+
 void
 ViewLayer::ConvertFromParent(BRect* rect) const
 {
@@ -581,7 +596,7 @@ ViewLayer::ConvertFromParent(BRect* rect) const
 				   fScrollingOffset.y - fFrame.top);
 }
 
-// ConvertFromParent
+
 void
 ViewLayer::ConvertFromParent(BRegion* region) const
 {
@@ -698,13 +713,6 @@ ViewLayer::ConvertFromScreenForDrawing(BPoint* point) const
 }
 
 
-void
-ViewLayer::SetName(const char* string)
-{
-	fName.SetTo(string);
-}
-
-
 // #pragma mark -
 
 
@@ -780,7 +788,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 	}
 }
 
-// ResizeBy
+
 void
 ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
@@ -843,7 +851,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	RebuildClipping(false);
 }
 
-// ParentResized
+
 void
 ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 {
@@ -862,7 +870,7 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 	}
 }
 
-// ScrollBy
+
 void
 ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
@@ -1190,21 +1198,21 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 void
 ViewLayer::MouseDown(BMessage* message, BPoint where)
 {
-	// empty hook methods
+	// empty hook method
 }
 
 
 void
 ViewLayer::MouseUp(BMessage* message, BPoint where)
 {
-	// empty hook methods
+	// empty hook method
 }
 
 
 void
 ViewLayer::MouseMoved(BMessage* message, BPoint where)
 {
-	// empty hook methods
+	// empty hook method
 }
 
 
@@ -1218,40 +1226,39 @@ ViewLayer::SetHidden(bool hidden)
 		fHidden = hidden;
 
 		// recurse into children and update their visible flag
-		if (fParent) {
-			bool oldVisible = fVisible;
-			UpdateVisibleDeep(fParent->IsVisible());
-			if (oldVisible != fVisible) {
-				// Include or exclude us from the parent area, and update the
-				// children's clipping as well when the view will be visible
-				fParent->RebuildClipping(!hidden);
+		bool oldVisible = fVisible;
+		UpdateVisibleDeep(fParent ? fParent->IsVisible() : !fHidden);
+		if (oldVisible != fVisible) {
+			// Include or exclude us from the parent area, and update the
+			// children's clipping as well when the view will be visible
+			if (fParent)
+				fParent->RebuildClipping(fVisible);
+			else
+				RebuildClipping(fVisible);
 
-				if (fWindow) {
-					// trigger a redraw
-					BRect clippedBounds = Bounds();
-					ConvertToVisibleInTopView(&clippedBounds);
-					BRegion* dirty = fWindow->GetRegion();
-					if (!dirty)
-						return;
-					dirty->Set(clippedBounds);
-					fWindow->MarkContentDirty(*dirty);
-					fWindow->RecycleRegion(dirty);
-				}
+			if (fWindow) {
+				// trigger a redraw
+				BRect clippedBounds = Bounds();
+				ConvertToVisibleInTopView(&clippedBounds);
+				BRegion* dirty = fWindow->GetRegion();
+				if (!dirty)
+					return;
+				dirty->Set(clippedBounds);
+				fWindow->MarkContentDirty(*dirty);
+				fWindow->RecycleRegion(dirty);
 			}
-		} else {
-			UpdateVisibleDeep(true);
 		}
 	}
 }
 
-// IsHidden
+
 bool
 ViewLayer::IsHidden() const
 {
 	return fHidden;
 }
 
-// UpdateVisibleDeep
+
 void
 ViewLayer::UpdateVisibleDeep(bool parentVisible)
 {
@@ -1273,7 +1280,10 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 		overlay->Hide();
 }
 
-// MarkBackgroundDirty
+
+// #pragma mark -
+
+
 void
 ViewLayer::MarkBackgroundDirty()
 {
@@ -1282,7 +1292,7 @@ ViewLayer::MarkBackgroundDirty()
 		child->MarkBackgroundDirty();
 }
 
-// AddTokensForLayersInRegion
+
 void
 ViewLayer::AddTokensForLayersInRegion(BMessage* message,
 									  BRegion& region,
@@ -1299,7 +1309,7 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message,
 										  windowContentClipping);
 }
 
-// AddTokensForLayersInRegion
+
 void
 ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 									  BRegion& region,
@@ -1316,7 +1326,7 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 										  windowContentClipping);
 }
 
-// PrintToStream
+
 void
 ViewLayer::PrintToStream() const
 {
@@ -1340,7 +1350,7 @@ ViewLayer::PrintToStream() const
 	printf("\n");
 }
 
-// RebuildClipping
+
 void
 ViewLayer::RebuildClipping(bool deep)
 {
@@ -1375,7 +1385,7 @@ ViewLayer::RebuildClipping(bool deep)
 	fScreenClippingValid = false;
 }
 
-// ScreenClipping
+
 BRegion&
 ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 {
@@ -1405,7 +1415,7 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 	return fScreenClipping;
 }
 
-// InvalidateScreenClipping
+
 void
 ViewLayer::InvalidateScreenClipping(bool deep)
 {
@@ -1418,7 +1428,7 @@ ViewLayer::InvalidateScreenClipping(bool deep)
 	}
 }
 
-// _MoveScreenClipping
+
 void
 ViewLayer::_MoveScreenClipping(int32 x, int32 y, bool deep)
 {

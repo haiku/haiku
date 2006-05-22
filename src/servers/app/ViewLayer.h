@@ -40,10 +40,6 @@ class ViewLayer {
 
 	virtual					~ViewLayer();
 
-			void			SetName(const char* string);
-			const char*		Name() const
-								{ return fName.String(); }
-
 			int32			Token() const
 								{ return fToken; }
 
@@ -53,9 +49,14 @@ class ViewLayer {
 
 			void			SetResizeMode(uint32 resizeMode)
 								{ fResizeMode = resizeMode; }
+
+			void			SetName(const char* string);
+			const char*		Name() const
+								{ return fName.String(); }
+
+			void			SetFlags(uint32 flags);
 			uint32			Flags() const
 								{ return fFlags; }
-			void			SetFlags(uint32 flags);
 
 			BPoint			ScrollingOffset() const;
 
@@ -140,6 +141,8 @@ class ViewLayer {
 			const RGBColor&	ViewColor() const
 								{ return fViewColor; }
 			void			SetViewColor(const RGBColor& color)
+								{ fViewColor = color; }
+			void			SetViewColor(const rgb_color& color)
 								{ fViewColor = color; }
 
 			ServerBitmap*	ViewBitmap() const
