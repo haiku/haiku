@@ -1,9 +1,9 @@
 /* BPlusTree - BFS B+Tree implementation
  *
- * Initial version by Axel Dörfler, axeld@pinc-software.de
- * Roughly based on 'btlib' written by Marcus J. Ranum
+ * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
+ * no code but achieves binary compatibility with the on disk format.
  *
- * Copyright (c) 2001-2006 pinc Software. All Rights Reserved.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1422,8 +1422,10 @@ BPlusTree::RemoveKey(bplustree_node *node, uint16 index)
 	// move and update key lengths
 	if (index > 0 && newKeyLengths != keyLengths)
 		memmove(newKeyLengths, keyLengths, index * sizeof(uint16));
-	for (uint16 i = index; i < node->NumKeys(); i++)
-		newKeyLengths[i] = keyLengths[i + 1] - length;
+	for (uint16 i = index; i < node->NumKeys(); i++) {
+		newKeyLengths[i] = HOST_ENDIAN_TO_BFS_INT16(
+			BFS_ENDIAN_TO_HOST_INT16(keyLengths[i + 1]) - length);
+	}
 
 	// move values
 	if (index > 0)

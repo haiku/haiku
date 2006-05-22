@@ -3,7 +3,7 @@
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
  * no code but achieves binary compatibility with the on disk format.
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -950,17 +950,21 @@ BPlusTree::InsertKey(bplustree_node *node, uint16 index, uint8 *key, uint16 keyL
 	newValues[index] = HOST_ENDIAN_TO_BFS_INT64(value);
 
 	// move and update key length index
-	for (uint16 i = node->NumKeys(); i-- > index + 1;)
-		newKeyLengths[i] = keyLengths[i - 1] + keyLength;
+	for (uint16 i = node->NumKeys(); i-- > index + 1;) {
+		newKeyLengths[i] = HOST_ENDIAN_TO_BFS_INT16(
+			BFS_ENDIAN_TO_HOST_INT16(keyLengths[i - 1]) + keyLength);
+	}
 	memmove(newKeyLengths, keyLengths, sizeof(uint16) * index);
 
 	int32 keyStart;
-	newKeyLengths[index] = keyLength + (keyStart = index > 0 ? newKeyLengths[index - 1] : 0);
+	newKeyLengths[index] = HOST_ENDIAN_TO_BFS_INT16(keyLength
+		+ (keyStart = index > 0 ? BFS_ENDIAN_TO_HOST_INT16(newKeyLengths[index - 1]) : 0));
 
 	// move keys and copy new key into them
-	int32 size = node->AllKeyLength() - newKeyLengths[index];
+	uint16 length = BFS_ENDIAN_TO_HOST_INT16(newKeyLengths[index]);
+	int32 size = node->AllKeyLength() - length;
 	if (size > 0)
-		memmove(keys + newKeyLengths[index], keys + newKeyLengths[index] - keyLength, size);
+		memmove(keys + length, keys + length - keyLength, size);
 
 	memcpy(keys + keyStart, key, keyLength);
 }
@@ -997,13 +1001,13 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 	int32 out, in;
 	for (in = out = 0; in < node->NumKeys() + 1;) {
 		if (!bytes)
-			bytesBefore = in > 0 ? inKeyLengths[in - 1] : 0;
+			bytesBefore = in > 0 ? BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]) : 0;
 
 		if (in == keyIndex && !bytes) {
 			bytes = *_keyLength;
 		} else {
 			if (keyIndex < out)
-				bytesAfter = inKeyLengths[in] - bytesBefore;
+				bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in]) - bytesBefore;
 
 			in++;
 		}
@@ -1019,7 +1023,7 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 	// if the new key was not inserted, set the length of the keys
 	// that can be copied directly
 	if (keyIndex >= out && in > 0)
-		bytesBefore = inKeyLengths[in - 1];
+		bytesBefore = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]);
 
 	if (bytesBefore < 0 || bytesAfter < 0)
 		return B_BAD_DATA;
@@ -1042,15 +1046,17 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 	if (bytes) {
 		// copy the newly inserted key
 		memcpy(outKeys + bytesBefore, key, bytes);
-		outKeyLengths[keyIndex] = bytes + bytesBefore;
+		outKeyLengths[keyIndex] = HOST_ENDIAN_TO_BFS_INT16(bytes + bytesBefore);
 		outKeyValues[keyIndex] = HOST_ENDIAN_TO_BFS_INT64(*_value);
 
 		if (bytesAfter) {
 			// copy the keys after the new key
 			memcpy(outKeys + bytesBefore + bytes, inKeys + bytesBefore, bytesAfter);
 			keys = out - keyIndex - 1;
-			for (int32 i = 0;i < keys;i++)
-				outKeyLengths[keyIndex + i + 1] = inKeyLengths[keyIndex + i] + bytes;
+			for (int32 i = 0;i < keys;i++) {
+				outKeyLengths[keyIndex + i + 1] = HOST_ENDIAN_TO_BFS_INT16(
+					BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[keyIndex + i]) + bytes);
+			}
 			memcpy(outKeyValues + keyIndex + 1, inKeyValues + keyIndex, keys * sizeof(off_t));
 		}
 	}
@@ -1093,7 +1099,7 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 			memcpy(newKey, droppedKey, newLength);
 
 			other->overflow_link = inKeyValues[in];
-			total = inKeyLengths[in++];
+			total = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in++]);
 		}
 	}
 
@@ -1108,14 +1114,19 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 			// it's enough to set bytesBefore once here, because we do
 			// not need to know the exact length of all keys in this
 			// loop
-			bytesBefore = in > skip ? inKeyLengths[in - 1] : 0;
+			bytesBefore = in > skip ? BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]) : 0;
 			bytes = *_keyLength;
 		} else {
 			if (in < node->NumKeys()) {
-				inKeyLengths[in] -= total;
+				inKeyLengths[in] = HOST_ENDIAN_TO_BFS_INT16(
+					BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in]) - total);
+
 				if (bytes) {
-					inKeyLengths[in] += bytes;
-					bytesAfter = inKeyLengths[in] - bytesBefore - bytes;
+					inKeyLengths[in] = HOST_ENDIAN_TO_BFS_INT16(
+						BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in]) + bytes);
+
+					bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in])
+						- bytesBefore - bytes;
 				}
 			}
 			in++;
@@ -1130,7 +1141,7 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 
 	// adjust the byte counts (since we were a bit lazy in the loop)
 	if (keyIndex >= in && keyIndex - skip < out)
-		bytesAfter = inKeyLengths[in] - bytesBefore - total;
+		bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in]) - bytesBefore - total;
 	else if (keyIndex < skip)
 		bytesBefore = node->AllKeyLength() - total;
 
@@ -1171,7 +1182,7 @@ BPlusTree::SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *oth
 	if (bytes) {
 		// finally, copy the newly inserted key (don't overwrite anything)
 		memcpy(inKeys + bytesBefore, key, bytes);
-		outKeyLengths[keyIndex] = bytes + bytesBefore;
+		outKeyLengths[keyIndex] = HOST_ENDIAN_TO_BFS_INT16(bytes + bytesBefore);
 		outKeyValues[keyIndex] = HOST_ENDIAN_TO_BFS_INT64(*_value);
 	}
 
@@ -1559,8 +1570,10 @@ BPlusTree::RemoveKey(bplustree_node *node, uint16 index)
 	// move and update key lengths
 	if (index > 0 && newKeyLengths != keyLengths)
 		memmove(newKeyLengths, keyLengths, index * sizeof(uint16));
-	for (uint16 i = index; i < node->NumKeys(); i++)
-		newKeyLengths[i] = keyLengths[i + 1] - length;
+	for (uint16 i = index; i < node->NumKeys(); i++) {
+		newKeyLengths[i] = HOST_ENDIAN_TO_BFS_INT16(
+			BFS_ENDIAN_TO_HOST_INT16(keyLengths[i + 1]) - length);
+	}
 
 	// move values
 	if (index > 0)
