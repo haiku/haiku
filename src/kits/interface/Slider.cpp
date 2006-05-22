@@ -23,25 +23,6 @@
 #include <Slider.h>
 
 
-// Those two functions are also exported by BeOS' libbe.so
-
-rgb_color
-_long_to_color_(int32 color)
-{
-	return *((rgb_color*)&color);
-}
-
-
-int32
-_color_to_long_(rgb_color color)
-{
-	return *((int32*)&color);
-}
-
-
-//	#pragma mark -
-
-
 BSlider::BSlider(BRect frame, const char *name, const char *label, BMessage *message, 
 				 int32 minValue, int32 maxValue, thumb_style thumbType, 
 				 uint32 resizingMode, uint32 flags)
@@ -125,11 +106,10 @@ BSlider::BSlider(BMessage *archive)
 	if (archive->FindInt32("_sdelay", &fSnoozeAmount) != B_OK)
 		SetSnoozeAmount(20000);
 
-	int32 color;
-
-	if (archive->FindInt32("_fcolor", &color) == B_OK) {
-		rgb_color fillColor = _long_to_color_(color);
-		UseFillColor(true, &fillColor);
+	rgb_color color;
+	
+	if (archive->FindInt32("_fcolor", (int32 *)&color) == B_OK) {
+		UseFillColor(true, &color);
 	} else
 		UseFillColor(false);
 
@@ -176,8 +156,8 @@ BSlider::BSlider(BMessage *archive)
 	else
 		fStyle = B_BLOCK_THUMB;
 
-	if (archive->FindInt32("_bcolor", &color) == B_OK)
-		SetBarColor(_long_to_color_(color));
+	if (archive->FindInt32("_bcolor", (int32 *)&color) == B_OK)
+		SetBarColor(color);
 	else {
 		if (Style() == B_BLOCK_THUMB)
 			SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -249,10 +229,10 @@ BSlider::Archive(BMessage *archive, bool deep) const
 	if (ret == B_OK)
 		ret = archive->AddInt32("_sdelay", fSnoozeAmount);
 	if (ret == B_OK)
-		ret = archive->AddInt32("_bcolor", _color_to_long_(fBarColor));
+		ret = archive->AddInt32("_bcolor", (const uint32 &)fBarColor);
 
 	if (FillColor(NULL) && ret == B_OK)
-		ret = archive->AddInt32("_fcolor", _color_to_long_(fFillColor));
+		ret = archive->AddInt32("_fcolor", (const uint32 &)fFillColor);
 
 	if (ret == B_OK && fMinLimitLabel)
 		ret = archive->AddString("_minlbl", fMinLimitLabel);
