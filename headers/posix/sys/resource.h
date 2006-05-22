@@ -25,6 +25,10 @@ struct rlimit {
 #define RLIMIT_NOFILE	4	/* number of open files */
 #define RLIMIT_STACK	5	/* stack size */
 #define RLIMIT_AS		6	/* address space size */
+/* Haiku-specifics */
+#define RLIMIT_NOVMON	7	/* number of open vnode monitors */
+
+#define	RLIM_NLIMITS	8	/* number of resource limits */
 
 #define RLIM_INFINITY	(0xffffffffUL)
 #define RLIM_SAVED_MAX	RLIM_INFINITY

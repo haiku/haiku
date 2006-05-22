@@ -10,7 +10,9 @@
 
 #include <SupportDefs.h>
 
+#include <sys/resource.h>
 #include <syscalls.h>
+#include <errno.h>
 
 
 int _kset_mon_limit_(int num);
@@ -23,14 +25,26 @@ int _kset_cpu_state_(int cpuNum, int state);
 int
 _kset_mon_limit_(int num)
 {
-	return B_ERROR;
+	struct rlimit rl;
+	if (num < 1)
+		return EINVAL;
+	rl.rlim_cur = num;
+	if (setrlimit(RLIMIT_NOVMON, &rl) < 0)
+		return errno;
+	return B_OK;
 }
 
 
 int
 _kset_fd_limit_(int num)
 {
-	return B_ERROR;
+	struct rlimit rl;
+	if (num < 1)
+		return EINVAL;
+	rl.rlim_cur = num;
+	if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
+		return errno;
+	return B_OK;
 }
 
 
