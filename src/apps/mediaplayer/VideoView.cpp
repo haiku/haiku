@@ -29,13 +29,22 @@ VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 fl
  ,	fController(NULL)
  ,	fOverlayActive(false)
 {
-//	SetViewColor(B_TRANSPARENT_COLOR);
-	SetViewColor(127,255,127);
+	SetViewColor(B_TRANSPARENT_COLOR);
+//	SetViewColor(127,255,127);
+	rgb_color r = {255, 0, 0, 255};
+	fOverlayKeyColor = r;
 }
 
 
 VideoView::~VideoView()
 {	
+}
+
+
+void
+VideoView::SetController(Controller *controller)
+{	
+	fController = controller;
 }
 
 
@@ -163,12 +172,13 @@ VideoView::DrawFrame()
 			printf("can't ClearViewOverlay, as LockLooperWithTimeout failed\n");
 		}
 	}
-	if (want_overlay && !fOverlayActive) {
+	if (want_overlay && !fOverlayActive ) {
 		fController->LockBitmap();
-		BBitmap *bmp = 0; // fController->Bitmap();
+		BBitmap *bmp = fController->Bitmap();
 		if (bmp && LockLooperWithTimeout(50000) == B_OK) {
 			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &fOverlayKeyColor,
-				B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
+				B_FOLLOW_ALL, 
+				/*B_OVERLAY_TRANSFER_CHANNEL |  */B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL );
 			fOverlayActive = true;
 
 			Invalidate();
@@ -228,7 +238,7 @@ VideoView::IsOverlaySupported()
 	
 	bool supported = false;
 	for (int i = 0; colspace[i].name; i++) {
-		BBitmap *test = new BBitmap(BRect(0,0,320,240),	B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL, colspace[i].colspace);
+		BBitmap *test = new BBitmap(BRect(0,0,319,239),	B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL, colspace[i].colspace);
 		if (test->InitCheck() == B_OK) {
 			printf("Display supports %s (0x%08x) overlay\n", colspace[i].name, colspace[i].colspace);
 			supported = true;

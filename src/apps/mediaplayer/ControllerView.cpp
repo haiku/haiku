@@ -77,7 +77,7 @@ void
 ControllerView::TogglePlaying()
 {
 	printf("ControllerView::TogglePlaying()\n");
-	if (fController->IsPaused())
+	if (fController->IsPaused() || fController->IsStopped())
 		fController->Play();
 	else
 		fController->Pause();

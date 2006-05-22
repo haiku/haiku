@@ -22,6 +22,7 @@
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <Locker.h>
 #include <String.h>
 
 class BBitmap;
@@ -38,6 +39,7 @@ public:
 	virtual 				~Controller();
 	
 	status_t				SetTo(const entry_ref &ref);
+	void					GetSize(int *width, int *height);
 
 	int						AudioTrackCount();
 	int						VideoTrackCount();
@@ -54,6 +56,7 @@ public:
 	void					Play();
 	void					Pause();
 	bool					IsPaused();
+	bool					IsStopped();
 
 	void					SetVideoView(VideoView *view);
 	void					SetControllerView(ControllerView *view);
@@ -75,43 +78,89 @@ public:
 	void					UpdatePosition(float value);
 
 private:
+	static int32			audio_decode_thread(void *self);
+	static int32			video_decode_thread(void *self);
 	static int32			audio_play_thread(void *self);
 	static int32			video_play_thread(void *self);
 
+	void					AudioDecodeThread();
+	void					VideoDecodeThread();
 	void					AudioPlayThread();
 	void					VideoPlayThread();
+		
+	void					StartThreads();
+	void					StopThreads();
 	
-	void					StartAudioPlayback();
-	void					StartVideoPlayback();
-	void					StopAudioPlayback();
-	void					StopVideoPlayback();
-
 private:
+
+	enum {
+		MAX_AUDIO_BUFFERS = 8,
+		MAX_VIDEO_BUFFERS = 3,
+	};
+	
+	struct buffer_info {
+		char *	 		buffer;
+		BBitmap *		bitmap;
+		size_t			sizeUsed;
+		size_t			sizeMax;
+		bigtime_t		startTime;
+		bool			formatChanged;
+		media_format	mediaFormat;
+	};
+
 	VideoView *				fVideoView;
 	ControllerView *		fControllerView;
 	BString					fName;
-	bool					fPaused;
-	bool					fStopped;
+	volatile bool			fPaused;
+	volatile bool			fStopped;
 	BMediaFile *			fMediaFile;
 	BMediaTrack *			fAudioTrack;
 	BMediaTrack *			fVideoTrack;
+	
+	BLocker					fAudioTrackLock;
+	BLocker					fVideoTrackLock;
+	
 	BList *					fAudioTrackList;
 	BList *					fVideoTrackList;
 	bigtime_t				fPosition;
 	media_format			fAudioFormat;
 	media_format			fVideoFormat;
+
+	sem_id					fAudioDecodeSem;
+	sem_id					fVideoDecodeSem;
 	sem_id					fAudioPlaySem;
 	sem_id					fVideoPlaySem;
+	sem_id					fThreadWaitSem;
+	thread_id				fAudioDecodeThread;
+	thread_id				fVideoDecodeThread;
 	thread_id				fAudioPlayThread;
 	thread_id				fVideoPlayThread;
-	volatile bool			fStopAudioPlayback;
-	volatile bool			fStopVideoPlayback;
+
 	SoundOutput	*			fSoundOutput;
 	volatile bool			fSeekAudio;
 	volatile bool			fSeekVideo;
 	volatile bigtime_t		fSeekPosition;
 	bigtime_t				fDuration;
+
+	int32					fAudioBufferCount;
+	int32					fAudioBufferReadIndex;
+	int32					fAudioBufferWriteIndex;
+	int32					fVideoBufferCount;
+	int32					fVideoBufferReadIndex;
+	int32					fVideoBufferWriteIndex;
+	
+	buffer_info				fAudioBuffer[MAX_AUDIO_BUFFERS];
+	buffer_info				fVideoBuffer[MAX_VIDEO_BUFFERS];
+
+	BLocker					fTimeSourceLock;
+	bigtime_t				fTimeSourceSysTime;
+	bigtime_t				fTimeSourcePerfTime;
+	bool 					fAutoplay;
+	
+	BBitmap *				fCurrentBitmap;
+
 };
 
 
 #endif
+

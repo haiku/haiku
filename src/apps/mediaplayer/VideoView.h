@@ -28,6 +28,8 @@ class VideoView : public BView
 public:
 					VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags);
 					~VideoView();
+
+	void			SetController(Controller *controller);
 	
 	void			RemoveVideoDisplay();
 	void			RemoveOverlay();

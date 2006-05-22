@@ -199,10 +199,9 @@ MainWin::SetupWindow()
 	fVideoMenu->ItemAt(0)->SetMarked(true);
 	
 	if (fHasVideo) {
-		fSourceWidth = 320;
-		fSourceHeight = 240;
-		fWidthScale = 1.24;
-		fHeightScale = 1.35;
+		fController->GetSize(&fSourceWidth, &fSourceHeight);
+		fWidthScale = 1.0;
+		fHeightScale = 1.0;
 	} else {
 		fSourceWidth = 0;
 		fSourceHeight = 0;

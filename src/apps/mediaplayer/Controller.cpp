@@ -21,6 +21,9 @@
 #include <string.h>
 #include <Debug.h>
 #include <Entry.h>
+#include <Window.h>
+#include <Bitmap.h>
+#include <Autolock.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
@@ -30,8 +33,10 @@
 #include "SoundOutput.h"
 
 
-#define AUDIO_PRIORITY 10
-#define VIDEO_PRIORITY 10
+#define AUDIO_PLAY_PRIORITY 10
+#define VIDEO_PLAY_PRIORITY 10
+#define AUDIO_DECODE_PRIORITY 10
+#define VIDEO_DECODE_PRIORITY 10
 
 void 
 HandleError(const char *text, status_t err)
@@ -53,36 +58,61 @@ Controller::Controller()
  ,	fMediaFile(0)
  ,	fAudioTrack(0)
  ,	fVideoTrack(0)
+ ,	fAudioTrackLock("audio track lock")
+ ,	fVideoTrackLock("video track lock")
  ,	fAudioTrackList(new BList)
  ,	fVideoTrackList(new BList)
  ,	fPosition(0)
- ,	fAudioPlaySem(create_sem(1, "audio playing"))
- ,	fVideoPlaySem(create_sem(1, "video playing"))
+ ,	fAudioDecodeSem(-1)
+ ,	fVideoDecodeSem(-1)
+ ,	fAudioPlaySem(-1)
+ ,	fVideoPlaySem(-1)
+ ,	fAudioDecodeThread(-1)
+ ,	fVideoDecodeThread(-1)
  ,	fAudioPlayThread(-1)
  ,	fVideoPlayThread(-1)
- ,	fStopAudioPlayback(false)
- ,	fStopVideoPlayback(false)
  ,	fSoundOutput(NULL)
  ,	fSeekAudio(false)
  ,	fSeekVideo(false)
  ,	fSeekPosition(0)
  ,	fDuration(0)
+ ,	fAudioBufferCount(MAX_AUDIO_BUFFERS)
+ ,	fAudioBufferReadIndex(0)
+ ,	fAudioBufferWriteIndex(0)
+ ,	fVideoBufferCount(MAX_VIDEO_BUFFERS)
+ ,	fVideoBufferReadIndex(0)
+ ,	fVideoBufferWriteIndex(0)
+ ,	fTimeSourceLock("time source lock")
+ ,	fTimeSourceSysTime(0)
+ ,	fTimeSourcePerfTime(0)
+ ,	fAutoplay(true)
+ ,	fCurrentBitmap(NULL)
 {
+	for (int i = 0; i < MAX_AUDIO_BUFFERS; i++) {
+		fAudioBuffer[i].bitmap = NULL;
+		fAudioBuffer[i].buffer = NULL;
+		fAudioBuffer[i].sizeMax = 0;
+	}
+	for (int i = 0; i < MAX_VIDEO_BUFFERS; i++) {
+		fVideoBuffer[i].bitmap = NULL;
+		fVideoBuffer[i].buffer = NULL;
+		fVideoBuffer[i].sizeMax = 0;
+	}
+
+	fStopped = fAutoplay ? false : true;
+
 }
 
 
 Controller::~Controller()
 {
-	StopAudioPlayback();
-	StopVideoPlayback();
+	StopThreads();
 	
 	if (fMediaFile)
 		fMediaFile->ReleaseAllTracks();
 	delete fMediaFile;
 	delete fAudioTrackList;
 	delete fVideoTrackList;
-	delete_sem(fVideoPlaySem);
-	delete_sem(fAudioPlaySem);
 }
 
 
@@ -90,6 +120,7 @@ void
 Controller::SetVideoView(VideoView *view)
 {
 	fVideoView = view;
+	fVideoView->SetController(this);
 }
 
 
@@ -103,11 +134,12 @@ Controller::SetControllerView(ControllerView *view)
 status_t
 Controller::SetTo(const entry_ref &ref)
 {
-	acquire_sem(fAudioPlaySem);
-	acquire_sem(fVideoPlaySem);
-	
-	StopAudioPlayback();
-	StopVideoPlayback();
+	StopThreads();
+
+	UpdatePosition(0);
+
+	BAutolock al(fAudioTrackLock);
+	BAutolock vl(fVideoTrackLock);
 
 	fAudioTrackList->MakeEmpty();
 	fVideoTrackList->MakeEmpty();
@@ -118,11 +150,13 @@ Controller::SetTo(const entry_ref &ref)
 	fVideoTrack = 0;
 	fMediaFile = 0;
 	fPosition = 0;
+	fSeekAudio = false;
+	fSeekVideo = false;
 	fPaused = false;
-	fStopped = true;
+	fStopped = fAutoplay ? false : true;
 	fDuration = 0;
 	fName = ref.name;
-	
+
 	status_t err;
 	
 	BMediaFile *mf = new BMediaFile(&ref);
@@ -130,8 +164,6 @@ Controller::SetTo(const entry_ref &ref)
 	if (err != B_OK) {
 		printf("Controller::SetTo: initcheck failed\n");
 		delete mf;
-		release_sem(fAudioPlaySem);
-		release_sem(fVideoPlaySem);
 		return err;
 	}
 	
@@ -139,8 +171,6 @@ Controller::SetTo(const entry_ref &ref)
 	if (trackcount <= 0) {
 		printf("Controller::SetTo: trackcount %d\n", trackcount);
 		delete mf;
-		release_sem(fAudioPlaySem);
-		release_sem(fVideoPlaySem);
 		return B_MEDIA_NO_HANDLER;
 	}
 	
@@ -167,8 +197,6 @@ Controller::SetTo(const entry_ref &ref)
 	if (AudioTrackCount() == 0 && VideoTrackCount() == 0) {
 		printf("Controller::SetTo: no audio or video tracks found\n");
 		delete mf;
-		release_sem(fAudioPlaySem);
-		release_sem(fVideoPlaySem);
 		return B_MEDIA_NO_HANDLER;
 	}
 
@@ -178,11 +206,31 @@ Controller::SetTo(const entry_ref &ref)
 
 	SelectAudioTrack(0);
 	SelectVideoTrack(0);
-
-	release_sem(fAudioPlaySem);
-	release_sem(fVideoPlaySem);
+	
+	StartThreads();
 	
 	return B_OK;
+}
+
+
+void
+Controller::GetSize(int *width, int *height)
+{
+/*
+	media_format fmt;
+			buffer->mediaFormat.type = B_MEDIA_RAW_VIDEO;
+			buffer->mediaFormat.u.raw_video = media_raw_video_format::wildcard;
+			buffer->mediaFormat.u.raw_video.display.format = IsOverlayActive() ? B_YCbCr422 : B_RGB32;
+	if (fVideoTrack || B_OK != fVideoTrack->DecodedFormat(&fmt)) {
+*/
+		*height = 480;
+		*width = 640;
+/*
+	} else {
+		*height = fmt.u.raw_video.display.line_count;
+		*width = fmt.u.raw_video.display.line_width;
+	}
+*/
 }
 
 
@@ -202,9 +250,9 @@ Controller::AudioTrackCount()
 
 status_t
 Controller::SelectAudioTrack(int n)
-{
-	StopAudioPlayback();
-	
+{	
+	BAutolock al(fAudioTrackLock);
+
 	BMediaTrack *t = (BMediaTrack *)fAudioTrackList->ItemAt(n);
 	if (!t)
 		return B_ERROR;
@@ -214,7 +262,6 @@ Controller::SelectAudioTrack(int n)
 	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
 	fDuration = max_c(a, v);
 	
-	StartAudioPlayback();
 	return B_OK;
 }
 
@@ -222,7 +269,7 @@ Controller::SelectAudioTrack(int n)
 status_t
 Controller::SelectVideoTrack(int n)
 {
-	StopVideoPlayback();
+	BAutolock vl(fVideoTrackLock);
 
 	BMediaTrack *t = (BMediaTrack *)fVideoTrackList->ItemAt(n);
 	if (!t)
@@ -233,7 +280,6 @@ Controller::SelectVideoTrack(int n)
 	bigtime_t v = fVideoTrack ? fVideoTrack->Duration() : 0;
 	fDuration = max_c(a, v);
 
-	StartVideoPlayback();
 	return B_OK;
 }
 
@@ -307,7 +353,8 @@ Controller::UpdatePosition(float value)
 bool
 Controller::IsOverlayActive()
 {
-	return true;
+//	return true;
+	return false;
 }
 
 
@@ -326,47 +373,51 @@ Controller::UnlockBitmap()
 BBitmap *
 Controller::Bitmap()
 {
-	return NULL;
+	return fCurrentBitmap;
 }
 
 
 void
 Controller::Stop()
 {
+	printf("Controller::Stop\n");
+
 	if (fStopped)
 		return;
-
-	acquire_sem(fAudioPlaySem);
-	acquire_sem(fVideoPlaySem);
 	
 	fPaused = false;
 	fStopped = true;
-	fPosition = 0;
+	
+	// böse...
+	snooze(30000);
+	fSeekAudio = true;
+	fSeekVideo = true;
+	fSeekPosition = 0;
+	snooze(30000);
+	UpdatePosition(0);
 }
 
 
 void
 Controller::Play()
 {
+	printf("Controller::Play\n");
+	
 	if (!fPaused && !fStopped)
 		return;
 
 	fStopped =
 	fPaused = false;
-
-	release_sem(fAudioPlaySem);
-	release_sem(fVideoPlaySem);
 }
 
 
 void
 Controller::Pause()
 {
+	printf("Controller::Pause\n");
+
 	if (fStopped || fPaused)
 		return;
-		
-	acquire_sem(fAudioPlaySem);
-	acquire_sem(fVideoPlaySem);
 
 	fPaused = true;
 }
@@ -376,6 +427,351 @@ bool
 Controller::IsPaused()
 {
 	return fPaused;
+}
+
+
+bool
+Controller::IsStopped()
+{
+	return fStopped;
+}
+
+
+void
+Controller::AudioDecodeThread()
+{
+	BMediaTrack *lastTrack = 0;
+	size_t bufferSize = 0;
+	size_t frameSize = 0;
+	bool decodeError = false;
+	status_t status;
+	
+printf("audio decode start\n");	
+	if (fAudioTrack == 0) {
+		return;
+	}
+
+
+	while (acquire_sem(fAudioDecodeSem) == B_OK) {
+//printf("audio decoding..\n");	
+		buffer_info *buffer = &fAudioBuffer[fAudioBufferWriteIndex];
+		fAudioBufferWriteIndex = (fAudioBufferWriteIndex + 1) % fAudioBufferCount;
+		BAutolock lock(fAudioTrackLock);
+		if (lastTrack != fAudioTrack) {
+//printf("audio track changed\n");
+			lastTrack = fAudioTrack;
+			buffer->formatChanged = true;
+			buffer->mediaFormat.type = B_MEDIA_RAW_AUDIO;
+			buffer->mediaFormat.u.raw_audio = media_multi_audio_format::wildcard;
+			#ifdef __HAIKU__
+			  buffer->mediaFormat.u.raw_audio.format = media_multi_audio_format::B_AUDIO_FLOAT;
+			#endif
+			status = fAudioTrack->DecodedFormat(&buffer->mediaFormat);
+			if (status != B_OK) {
+				printf("audio decoded format status %08x %s\n", status, strerror(status));
+				return;
+			}
+			bufferSize = buffer->mediaFormat.u.raw_audio.buffer_size;
+			frameSize = (buffer->mediaFormat.u.raw_audio.format & 0xf) * buffer->mediaFormat.u.raw_audio.channel_count;
+		} else {
+			buffer->formatChanged = false;
+		}
+		if (buffer->sizeMax < bufferSize) {
+			delete buffer->buffer;
+			buffer->buffer = new char [bufferSize];
+			buffer->sizeMax = bufferSize;;
+		}
+
+		if (fSeekAudio) {
+			bigtime_t pos = fSeekPosition;
+			fAudioTrack->SeekToTime(&pos);
+			fSeekAudio = false;
+			decodeError = false;
+		}
+
+		int64 frames;
+		media_header mh;
+		if (!decodeError) {
+			decodeError = B_OK != fAudioTrack->ReadFrames(buffer->buffer, &frames, &mh);
+		}
+		if (!decodeError) {
+			buffer->sizeUsed = frames * frameSize;
+			buffer->startTime = mh.start_time;
+		} else {
+			buffer->sizeUsed = 0;
+			buffer->startTime = 0;
+		}
+		
+		release_sem(fAudioPlaySem);
+	}
+}
+
+
+void
+Controller::AudioPlayThread()
+{
+	SoundOutput *output = NULL;
+	bigtime_t bufferDuration = 0;
+	status_t status;
+
+	
+printf("audio play start\n");	
+	if (fAudioTrack == 0) {
+		fTimeSourceSysTime = 0;
+		fTimeSourcePerfTime = 0;
+		return;
+	}
+
+	while (acquire_sem(fAudioPlaySem) == B_OK) {
+//printf("audio playing..\n");	
+		buffer_info *buffer = &fAudioBuffer[fAudioBufferReadIndex];
+		fAudioBufferReadIndex = (fAudioBufferReadIndex + 1) % fAudioBufferCount;
+		wait:
+		if (fPaused || fStopped) {
+//printf("waiting..\n");	
+			status = acquire_sem_etc(fThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
+			if (status != B_TIMED_OUT)
+				break;
+			goto wait;
+		}
+		if (buffer->formatChanged) {
+//printf("format changed..\n");	
+			delete output;
+			output = new SoundOutput(fName.String(), buffer->mediaFormat.u.raw_audio);
+			bufferDuration = bigtime_t(1000000.0 * (buffer->mediaFormat.u.raw_audio.buffer_size / (buffer->mediaFormat.u.raw_audio.channel_count * (buffer->mediaFormat.u.raw_audio.format & 0xf))) / buffer->mediaFormat.u.raw_audio.frame_rate);
+			printf("audio format changed, new buffer duration %Ld\n", bufferDuration);
+			fSoundOutput = output; // hack...
+		}
+		if (output) {
+			if (buffer->sizeUsed)
+				output->Play(buffer->buffer, buffer->sizeUsed);
+			BAutolock lock(fTimeSourceLock);
+			fTimeSourceSysTime = system_time() + output->Latency() - bufferDuration;
+			fTimeSourcePerfTime = buffer->startTime;
+//			printf("timesource: sys: %Ld perf: %Ld\n", fTimeSourceSysTime, fTimeSourcePerfTime);	
+			UpdatePosition(buffer->startTime / (float)Duration());
+		} else {
+			debugger("kein SoundOutput");
+		}
+		release_sem(fAudioDecodeSem);
+	}
+	delete output;
+	fSoundOutput = NULL; // hack...
+}
+
+
+void
+Controller::VideoDecodeThread()
+{
+	BMediaTrack *lastTrack = 0;
+	size_t bufferSize = 0;
+	size_t bytePerRow = 0;
+	int lineWidth = 0;
+	int lineCount = 0;
+	bool decodeError = false;
+	status_t status;
+
+printf("video decode start\n");	
+	if (fVideoTrack == 0) {
+		return;
+	}
+
+	while (acquire_sem(fVideoDecodeSem) == B_OK) {
+		buffer_info *buffer = &fVideoBuffer[fVideoBufferWriteIndex];
+		fVideoBufferWriteIndex = (fVideoBufferWriteIndex + 1) % fVideoBufferCount;
+		BAutolock lock(fVideoTrackLock);
+		if (lastTrack != fVideoTrack) {
+//printf("Video track changed\n");
+			lastTrack = fVideoTrack;
+			buffer->formatChanged = true;
+			buffer->mediaFormat.type = B_MEDIA_RAW_VIDEO;
+			buffer->mediaFormat.u.raw_video = media_raw_video_format::wildcard;
+			buffer->mediaFormat.u.raw_video.display.format = IsOverlayActive() ? B_YCbCr422 : B_RGB32;
+			status = fVideoTrack->DecodedFormat(&buffer->mediaFormat);
+			if (status != B_OK) {
+				printf("video decoded format status %08x %s\n", status, strerror(status));
+				return;
+			}
+			bytePerRow = buffer->mediaFormat.u.raw_video.display.bytes_per_row;
+			lineWidth = buffer->mediaFormat.u.raw_video.display.line_width;
+			lineCount = buffer->mediaFormat.u.raw_video.display.line_count;
+			bufferSize = lineCount * bytePerRow;
+		} else {
+			buffer->formatChanged = false;
+		}
+		if (buffer->sizeMax != bufferSize) {
+			BRect r(0, 0, lineWidth - 1, lineCount - 1);
+			delete buffer->bitmap;
+			printf("allocating bitmap %d %d %d\n", lineWidth, lineCount, bytePerRow);
+			if (IsOverlayActive())
+				buffer->bitmap = new BBitmap(r, B_BITMAP_WILL_OVERLAY | (fVideoBufferWriteIndex == 1) ? B_BITMAP_RESERVE_OVERLAY_CHANNEL : 0, IsOverlayActive() ? B_YCbCr422 : B_RGB32, bytePerRow);
+			else
+				buffer->bitmap = new BBitmap(r, 0, B_RGB32, bytePerRow);
+			status = buffer->bitmap->InitCheck();
+			if (status != B_OK) {
+				printf("video decoded format status %08x %s\n", status, strerror(status));
+				return;
+			}
+			buffer->buffer = (char *)buffer->bitmap->Bits();
+			buffer->sizeMax = bufferSize;
+		}
+
+		if (fSeekVideo) {
+			bigtime_t pos = fSeekPosition;
+			fVideoTrack->SeekToTime(&pos);
+			fSeekVideo = false;
+			decodeError = false;
+		}
+
+		int64 frames;
+		media_header mh;
+		if (!decodeError) {
+//			printf("reading video frame...\n");
+			decodeError = B_OK != fVideoTrack->ReadFrames(buffer->buffer, &frames, &mh);
+		}
+		if (!decodeError) {
+			buffer->sizeUsed = buffer->sizeMax;
+			buffer->startTime = mh.start_time;
+		} else {
+			buffer->sizeUsed = 0;
+			buffer->startTime = 0;
+		}
+		
+		release_sem(fVideoPlaySem);
+	}
+}
+
+
+void
+Controller::VideoPlayThread()
+{
+	status_t status;
+printf("video decode start\n");	
+	if (fVideoTrack == 0) {
+		return;
+	}
+
+	while (acquire_sem(fVideoPlaySem) == B_OK) {
+		
+		buffer_info *buffer = &fVideoBuffer[fVideoBufferReadIndex];
+		fVideoBufferReadIndex = (fVideoBufferReadIndex + 1) % fVideoBufferCount;
+		wait:
+		if (fPaused || fStopped) {
+//printf("waiting..\n");	
+			status = acquire_sem_etc(fThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
+			if (status != B_TIMED_OUT)
+				break;
+			goto wait;
+		}
+				
+		bigtime_t waituntil;
+		bigtime_t waitdelta;
+		char test[100];
+		{
+			BAutolock lock(fTimeSourceLock);
+
+			waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
+			waitdelta = waituntil - system_time();
+/*
+			sprintf(test, "sys %.6f perf %.6f, vid %.6f, waituntil %.6f, waitdelta %.6f",
+			 fTimeSourceSysTime / 1000000.0f,
+			 fTimeSourcePerfTime / 1000000.0f,
+			 buffer->startTime / 1000000.0f,
+			 waituntil / 1000000.0f,
+			 waitdelta / 1000000.0f);
+			 */
+//		if (status != B_TIMED_OUT)
+		}
+/*
+		if (fVideoView->LockLooperWithTimeout(5000) == B_OK) {
+			fVideoView->Window()->SetTitle(test);
+			fVideoView->UnlockLooper();
+		}
+*/
+		status = acquire_sem_etc(fThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, waituntil);
+		if (status != B_TIMED_OUT)
+			break;
+			
+		fCurrentBitmap = buffer->bitmap;
+		fVideoView->DrawFrame();
+
+	//	snooze(60000);
+		release_sem(fVideoDecodeSem);
+	}
+		
+//		status_t status = acquire_sem_etc(fThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, buffer->startTime);
+//		if (status != B_TIMED_OUT)
+//			return;
+}
+
+
+void
+Controller::StartThreads()
+{
+	if (fAudioDecodeSem > 0)
+		return;
+
+	fAudioBufferReadIndex = 0;
+	fAudioBufferWriteIndex = 0;
+	fVideoBufferReadIndex = 0;
+	fVideoBufferWriteIndex = 0;
+	fAudioDecodeSem = create_sem(fAudioBufferCount, "audio decode sem");
+	fVideoDecodeSem = create_sem(fVideoBufferCount - 2, "video decode sem");
+	fAudioPlaySem = create_sem(0, "audio play sem");
+	fVideoPlaySem = create_sem(0, "video play sem");
+	fThreadWaitSem = create_sem(0, "thread wait sem");
+	fAudioDecodeThread = spawn_thread(audio_decode_thread, "audio decode", AUDIO_DECODE_PRIORITY, this);
+	fVideoDecodeThread = spawn_thread(video_decode_thread, "video decode", VIDEO_DECODE_PRIORITY, this);
+	fAudioPlayThread = spawn_thread(audio_play_thread, "audio play", AUDIO_PLAY_PRIORITY, this);
+	fVideoPlayThread = spawn_thread(video_play_thread, "video play", VIDEO_PLAY_PRIORITY, this);
+	resume_thread(fAudioDecodeThread);
+	resume_thread(fVideoDecodeThread);
+	resume_thread(fAudioPlayThread);
+	resume_thread(fVideoPlayThread);
+}
+
+
+void
+Controller::StopThreads()
+{
+	if (fAudioDecodeSem < 0)
+		return;
+		
+	delete_sem(fAudioDecodeSem);
+	delete_sem(fVideoDecodeSem);
+	delete_sem(fAudioPlaySem);
+	delete_sem(fVideoPlaySem);
+	delete_sem(fThreadWaitSem);
+
+	status_t dummy;
+	wait_for_thread(fAudioDecodeThread, &dummy);
+	wait_for_thread(fVideoDecodeThread, &dummy);
+	wait_for_thread(fAudioPlayThread, &dummy);
+	wait_for_thread(fVideoPlayThread, &dummy);
+	fAudioDecodeThread = -1;
+	fVideoDecodeThread = -1;
+	fAudioPlayThread = -1;
+	fVideoPlayThread = -1;
+	fThreadWaitSem = -1;
+	fAudioDecodeSem = -1;
+	fVideoDecodeSem = -1;
+	fAudioPlaySem = -1;
+	fVideoPlaySem = -1;
+}
+
+int32
+Controller::audio_decode_thread(void *self)
+{
+	static_cast<Controller *>(self)->AudioDecodeThread();
+	return 0;
+}
+
+
+int32
+Controller::video_decode_thread(void *self)
+{
+	static_cast<Controller *>(self)->VideoDecodeThread();
+	return 0;
 }
 
 
@@ -392,97 +788,4 @@ Controller::video_play_thread(void *self)
 {
 	static_cast<Controller *>(self)->VideoPlayThread();
 	return 0;
-}
-
-
-void
-Controller::AudioPlayThread()
-{
-	// this is a test...
-	media_format fmt;
-	fmt.type = B_MEDIA_RAW_AUDIO;
-	fmt.u.raw_audio = media_multi_audio_format::wildcard;
-#ifdef __HAIKU__
-	fmt.u.raw_audio.format = media_multi_audio_format::B_AUDIO_FLOAT;
-#endif
-	fAudioTrack->DecodedFormat(&fmt);
-	
-	SoundOutput out(fName.String(), fmt.u.raw_audio);
-	
-	out.SetVolume(1.0);
-	UpdateVolume(1.0);
-	
-	
-	int frame_size = (fmt.u.raw_audio.format & 0xf) * fmt.u.raw_audio.channel_count;
-	uint8 buffer[fmt.u.raw_audio.buffer_size];
-	int64 frames;
-	media_header mh;
-	
-	fSoundOutput = &out;
-	while (!fStopAudioPlayback) {
-		if (B_OK == fAudioTrack->ReadFrames(buffer, &frames, &mh)) {
-			out.Play(buffer, frames * frame_size);
-			UpdatePosition(mh.start_time / (float)Duration());
-		} else {
-			snooze(50000);
-		}
-		if (fSeekAudio) {
-			bigtime_t pos = fSeekPosition;
-			fAudioTrack->SeekToTime(&pos);
-			fSeekAudio = false;
-		}
-	}
-	fSoundOutput = NULL;
-}
-
-
-void
-Controller::VideoPlayThread()
-{
-}
-
-
-void
-Controller::StartAudioPlayback()
-{
-	if (fAudioPlayThread > 0)
-		return;
-	fStopAudioPlayback = false;
-	fAudioPlayThread = spawn_thread(audio_play_thread, "audio playback", AUDIO_PRIORITY, this);
-	resume_thread(fAudioPlayThread);
-}
-
-
-void
-Controller::StartVideoPlayback()
-{
-	if (fVideoPlayThread > 0)
-		return;
-	fStopVideoPlayback = false;
-	fVideoPlayThread = spawn_thread(video_play_thread, "video playback", VIDEO_PRIORITY, this);
-	resume_thread(fVideoPlayThread);
-}
-
-
-void
-Controller::StopAudioPlayback()
-{
-	if (fAudioPlayThread < 0)
-		return;
-	fStopAudioPlayback = true;
-	status_t dummy;
-	wait_for_thread(fAudioPlayThread, &dummy);
-	fAudioPlayThread = -1;
-}
-
-
-void
-Controller::StopVideoPlayback()
-{
-	if (fVideoPlayThread < 0)
-		return;
-	fStopVideoPlayback = true;
-	status_t dummy;
-	wait_for_thread(fVideoPlayThread, &dummy);
-	fVideoPlayThread = -1;
 }

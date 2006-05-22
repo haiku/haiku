@@ -108,7 +108,7 @@ void
 SoundOutput::PlayBuffer(void *buffer)
 {
 	if (acquire_sem_etc(fBufferReadable, 1, B_RELATIVE_TIMEOUT, fBufferDuration / 2) != B_OK) {
-		printf("SoundOutput: buffer not ready, playing silence\n");
+//		printf("SoundOutput: buffer not ready, playing silence\n");
 		memset(buffer, 0, fBufferSize);
 		return;
 	}
