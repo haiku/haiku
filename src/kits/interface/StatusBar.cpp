@@ -35,10 +35,7 @@ BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 	// TODO: Move initializer list and other stuff to InitObject
 	InitObject(label, trailingLabel);
 	
-	fBarColor.red = 50;
-	fBarColor.green = 150;
-	fBarColor.blue = 255;
-	fBarColor.alpha = 255;
+	fBarColor.set_to(50, 150, 255, 255);
 }
 
 
@@ -66,15 +63,8 @@ BStatusBar::BStatusBar(BMessage *archive)
 	if (archive->FindFloat("_high", &fBarHeight) != B_OK)
 		fBarHeight = -1.0f;
 
-	const void *ptr;
-
-	if (archive->FindData("_bcolor", B_INT32_TYPE, &ptr, NULL ) < B_OK) {
-		fBarColor.red = 50;
-		fBarColor.green = 150;
-		fBarColor.blue = 255;
-		fBarColor.alpha = 255;
-	} else
-		memcpy(&fBarColor, ptr, sizeof(rgb_color));
+	if (archive->FindInt32("_bcolor", (int32 *)&fBarColor) < B_OK)
+		fBarColor.set_to(50, 150, 255, 255);
 	
 	if (archive->FindFloat("_val", &fCurrent) < B_OK)
 		fCurrent = 0.0f;
@@ -131,7 +121,7 @@ BStatusBar::Archive(BMessage *archive, bool deep) const
 		return err;
 
 	// DW: I'm pretty sure we don't need to compare the color with (50, 150, 255) ?
-	err = archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
+	err = archive->AddInt32("_bcolor", (const uint32 &)fBarColor);
 
 	if (err < B_OK)
 		return err;
@@ -311,7 +301,7 @@ BStatusBar::Draw(BRect updateRect)
 void
 BStatusBar::SetBarColor(rgb_color color)
 {
-	memcpy(&fBarColor, &color, sizeof(rgb_color));
+	fBarColor = color;
 
 	Invalidate();
 }
