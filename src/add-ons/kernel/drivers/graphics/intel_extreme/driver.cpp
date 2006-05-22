@@ -59,7 +59,9 @@ get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
 
 	for (; gPCI->get_nth_pci_info(index, &info) == B_OK; index++) {
 		// check vendor
-		if (info.vendor_id != VENDOR_ID_INTEL)
+		if (info.vendor_id != VENDOR_ID_INTEL
+			|| info.class_base != PCI_display
+			|| info.class_sub != 0)
 			continue;
 
 		// check device
