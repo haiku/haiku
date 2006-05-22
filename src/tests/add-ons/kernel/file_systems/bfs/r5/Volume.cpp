@@ -1,8 +1,8 @@
 /* Volume - BFS super block, mounting, etc.
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -176,27 +176,29 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 	magic1 = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_MAGIC1);
 	magic2 = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_MAGIC2);
 	magic3 = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_MAGIC3);
-	fs_byte_order = SUPER_BLOCK_FS_LENDIAN;
-	flags = SUPER_BLOCK_DISK_CLEAN;
+	fs_byte_order = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_FS_LENDIAN);
+	flags = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_DISK_CLEAN);
 
 	strlcpy(name, diskName, sizeof(name));
 
-	block_size = inode_size = HOST_ENDIAN_TO_BFS_INT32(blockSize);
-	for (block_shift = 9; (1UL << block_shift) < blockSize; block_shift++);
+	int32 blockShift;
+	for (blockShift = 9; (1UL << blockShift) < blockSize; blockShift++);
 
-	num_blocks = numBlocks;
+	block_size = inode_size = HOST_ENDIAN_TO_BFS_INT32(blockSize);
+	block_shift = HOST_ENDIAN_TO_BFS_INT32(blockShift);
+
+	num_blocks = HOST_ENDIAN_TO_BFS_INT64(numBlocks);
 	used_blocks = 0;
 
 	// Get the minimum ag_shift (that's determined by the block size)
 
-	blocks_per_ag = 1;
-	ag_shift = 13;
-
 	int32 bitsPerBlock = blockSize << 3;
 	off_t bitmapBlocks = (numBlocks + bitsPerBlock - 1) / bitsPerBlock;
+	int32 blocksPerGroup = 1;
+	int32 groupShift = 13;
 
 	for (int32 i = 8192; i < bitsPerBlock; i *= 2) {
-		ag_shift++;
+		groupShift++;
 	}
 
 	// Many allocation groups help applying allocation policies, but if
@@ -204,17 +206,23 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 	// files (see above to get an explanation of the kDesiredAllocationGroups
 	// constant).
 
+	int32 numGroups;
+
 	while (true) {
-		num_ags = (bitmapBlocks + blocks_per_ag - 1) / blocks_per_ag;
-		if (num_ags > kDesiredAllocationGroups) {
-			if (ag_shift == 16)
+		numGroups = (bitmapBlocks + blocksPerGroup - 1) / blocksPerGroup;
+		if (numGroups > kDesiredAllocationGroups) {
+			if (groupShift == 16)
 				break;
 
-			ag_shift++;
-			blocks_per_ag *= 2;
+			groupShift++;
+			blocksPerGroup *= 2;
 		} else
 			break;
 	}
+
+	num_ags = HOST_ENDIAN_TO_BFS_INT32(numGroups);
+	blocks_per_ag = HOST_ENDIAN_TO_BFS_INT32(1);
+	ag_shift = HOST_ENDIAN_TO_BFS_INT32(groupShift);
 }
 
 
