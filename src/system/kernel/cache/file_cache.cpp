@@ -108,6 +108,13 @@ file_map::Add(file_io_vec *vecs, size_t vecCount)
 {
 	off_t offset = 0;
 
+#if 0
+for (uint32 i = 0; i < vecCount; i++) {
+	dprintf("[%ld] vecs offset %Ld, length %Ld\n",
+		i, vecs[i].offset, vecs[i].length);
+}
+#endif
+
 	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
 		// just use the reserved area in the file_cache_ref structure
 	} else {
@@ -197,6 +204,7 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 	file_io_vec *vecs, size_t *_count)
 {
 	size_t maxVecs = *_count;
+	status_t status = B_OK;
 
 	if (ref->map.count == 0) {
 		// we don't yet have the map of this file, so let's grab it
@@ -207,9 +215,8 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 		// the file map could have been requested in the mean time
 		if (ref->map.count == 0) {
 			size_t vecCount = maxVecs;
-			status_t status;
 			off_t mapOffset = 0;
-	
+
 			while (true) {
 				status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs, &vecCount);
 				if (status < B_OK && status != B_BUFFER_OVERFLOW) {
@@ -217,8 +224,8 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 					return status;
 				}
 
-				ref->map.Add(vecs, vecCount);
-
+				status = ref->map.Add(vecs, vecCount);
+//dprintf("map.Add() status %s\n", strerror(status));
 				if (status != B_BUFFER_OVERFLOW)
 					break;
 
@@ -231,6 +238,13 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 		}
 
 		mutex_unlock(&ref->cache->lock);
+	}
+
+	if (status != B_OK) {
+		// We must invalidate the (part of the) map we already
+		// have, as we cannot know if it's complete or not
+		ref->map.Free();
+		return status;
 	}
 
 	// We now have cached the map of this file, we now need to
