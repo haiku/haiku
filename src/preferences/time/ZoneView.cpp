@@ -496,7 +496,7 @@ TZoneView::SetTimeZone()
 	// create new
 	BDirectory dir(target.Path());
 	if (dir.CreateSymLink(path.Path(), target.Path(), NULL) != B_OK)
-		printf("timezone not linked\n");
+		fprintf(stderr, "timezone not linked\n");
 
 	// update environment
 	
