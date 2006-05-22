@@ -91,17 +91,6 @@ static property_info sViewPropInfo[] = {
 }; 
 
 
-// General Functions
-//------------------------------------------------------------------------------
-
-
-static inline uint32
-get_uint32_color(rgb_color color)
-{
-	return *(uint32 *)&color;
-}
-
-
 //	#pragma mark -
 
 
@@ -469,13 +458,13 @@ BView::Archive(BMessage *data, bool deep) const
 	// colors
 
 	if (ret == B_OK && fState->archiving_flags & B_VIEW_HIGH_COLOR_BIT)
-		ret = data->AddInt32("_color", get_uint32_color(HighColor()));
+		ret = data->AddInt32("_color", (const uint32 &)HighColor());
 
 	if (ret == B_OK && fState->archiving_flags & B_VIEW_LOW_COLOR_BIT)
-		ret = data->AddInt32("_color", get_uint32_color(LowColor()));
+		ret = data->AddInt32("_color", (const uint32 &)LowColor());
 
 	if (ret == B_OK && fState->archiving_flags & B_VIEW_VIEW_COLOR_BIT)
-		ret = data->AddInt32("_color", get_uint32_color(ViewColor()));
+		ret = data->AddInt32("_color", (const uint32 &)ViewColor());
 
 //	NOTE: we do not use this flag any more
 //	if ( 1 ){
