@@ -166,6 +166,7 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 	}
 	
 	menu->AddItem(newItem, index);
+	newItem->SetTarget(this);
 	
 	// We didnt' have any items before, so select the newly added one
 	if (numItems == 0)
@@ -185,6 +186,7 @@ BOptionPopUp::AllAttached()
 	if (menu != NULL) {
 		float labelWidth = _mField->StringWidth(_mField->Label());
 		_mField->SetDivider(labelWidth + kLabelSpace);
+		menu->SetTargetForItems(this);
 	}
 }
 
