@@ -221,6 +221,9 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 	if (flags & B_CHECK_PERMISSION) {
 		// ToDo: introduce euid & uid fields to the team and check permission
 	}
+	
+	if (signal == 0)
+		return B_OK;
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
@@ -284,7 +287,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 	struct thread *thread;
 	cpu_status state;
 
-	if (signal < 1 || signal > MAX_SIGNO)
+	if (signal < 0 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
 
 	if (id == 0) {
