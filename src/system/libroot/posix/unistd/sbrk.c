@@ -7,10 +7,13 @@
 #include <unistd.h>
 #include <errno.h>
 
+/* in hoard wrapper */
+extern void *(*sbrk_hook)(long);
 
 void *
 sbrk(long increment)
 {
-	// this function is no longer supported
+	if (sbrk_hook)
+		return (*sbrk_hook)(increment);
 	return NULL;
 }

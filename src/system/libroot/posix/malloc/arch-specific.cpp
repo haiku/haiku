@@ -34,6 +34,8 @@
 #	define CTRACE(x) ;
 #endif
 
+extern "C" void *(*sbrk_hook)(long);
+void *(*sbrk_hook)(long) = &BPrivate::hoardSbrk;
 
 using namespace BPrivate;
 
