@@ -1,0 +1,34 @@
+SubDir HAIKU_TOP src apps processcontroller ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+#UsePrivateHeaders shared ;
+
+Application ProcessController :
+	AboutPC.cpp
+	AutoIcon.cpp
+	IconMenuItem.cpp
+	KernelMemoryBarMenuItem.cpp
+	MemoryBarMenu.cpp
+	MemoryBarMenuItem.cpp
+	MemorySpyWindow.cpp
+	NoiseBarMenuItem.cpp
+	PCUtils.cpp
+	PCView.cpp
+	PCView2.cpp
+	PCWindow.cpp
+	PCWorld.cpp
+	Preferences.cpp
+	PrintMessage.cpp
+	PriorityMenu.cpp
+	QuitMenu.cpp
+	ReadableLong.cpp
+	TeamBarMenu.cpp
+	TeamBarMenuItem.cpp
+	ThreadBarMenu.cpp
+	ThreadBarMenuItem.cpp
+	URLView.cpp
+	WindowsTools.cpp
+	: be #tracker translation
+	: #ProcessController.rdef
+	;
