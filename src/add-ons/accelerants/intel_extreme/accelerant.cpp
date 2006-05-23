@@ -192,7 +192,7 @@ intel_init_accelerant(int device)
 	gInfo->head_mode = 0;
 	if (read32(INTEL_DISPLAY_B_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
 		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-	if (read32(INTEL_DISPLAY_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
+	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
 		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
 
 	status = create_mode_list();

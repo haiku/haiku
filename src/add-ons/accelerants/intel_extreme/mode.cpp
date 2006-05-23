@@ -267,7 +267,7 @@ intel_set_display_mode(display_mode *mode)
 				* sharedInfo.bytes_per_row, gInfo->frame_buffer_handle,
 				offset) == B_OK) {
 			sharedInfo.frame_buffer_offset = offset;
-			write32(INTEL_DISPLAY_BASE, offset);
+			write32(INTEL_DISPLAY_A_BASE, offset);
 		}
 
 		return B_NO_MEMORY;
@@ -276,29 +276,29 @@ intel_set_display_mode(display_mode *mode)
 	sharedInfo.frame_buffer_offset = offset;
 
 	// make sure VGA display is disabled
-	write32(DISPLAY_VGA_DISPLAY_CONTROL, read32(DISPLAY_VGA_DISPLAY_CONTROL)
+	write32(INTEL_VGA_DISPLAY_CONTROL, read32(INTEL_VGA_DISPLAY_CONTROL)
 		| VGA_DISPLAY_DISABLED);
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
 		// update timing parameters
-		write32(INTEL_DISPLAY_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+		write32(INTEL_DISPLAY_A_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
 			| ((uint32)target.timing.h_sync_start - 1));
 
-		write32(INTEL_DISPLAY_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+		write32(INTEL_DISPLAY_A_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
 			| ((uint32)target.timing.v_sync_start - 1));
 
-		write32(INTEL_DISPLAY_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+		write32(INTEL_DISPLAY_A_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
 
-		write32(INTEL_DISPLAY_ANALOG_PORT, (read32(INTEL_DISPLAY_ANALOG_PORT)
+		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
 			& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
 			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
@@ -308,25 +308,25 @@ intel_set_display_mode(display_mode *mode)
 
 		// switch divisor register with every mode change (not required)
 		uint32 divisorRegister;
-		if (gInfo->shared_info->pll_info.divisor_register == INTEL_DISPLAY_PLL_DIVISOR_0)
-			divisorRegister = INTEL_DISPLAY_PLL_DIVISOR_1;
+		if (gInfo->shared_info->pll_info.divisor_register == INTEL_DISPLAY_A_PLL_DIVISOR_0)
+			divisorRegister = INTEL_DISPLAY_A_PLL_DIVISOR_1;
 		else
-			divisorRegister = INTEL_DISPLAY_PLL_DIVISOR_0;
+			divisorRegister = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
 		write32(divisorRegister,
 			(((nDivisor - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
 			| (((m1Divisor - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
 			| (((m2Divisor - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
-		write32(INTEL_DISPLAY_PLL, DISPLAY_PLL_ENABLED | DISPLAY_PLL_2X_CLOCK
+		write32(INTEL_DISPLAY_A_PLL, DISPLAY_PLL_ENABLED | DISPLAY_PLL_2X_CLOCK
 			| DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_DIVIDE_4X
 			| (((postDivisor - 2) << DISPLAY_PLL_POST_DIVISOR_SHIFT) & DISPLAY_PLL_POST_DIVISOR_MASK)
-			| (divisorRegister == INTEL_DISPLAY_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
+			| (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
 	}
 
 	// These two have to be set for display B, too - this obviously means
 	// that the second head always must adopt the color space of the first
 	// head.
-	write32(INTEL_DISPLAY_CONTROL, (read32(INTEL_DISPLAY_CONTROL)
+	write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
 		& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
 
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
@@ -342,8 +342,8 @@ intel_set_display_mode(display_mode *mode)
 	// changing bytes per row seems to be ignored if the plane/pipe is turned off
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		write32(INTEL_DISPLAY_BYTES_PER_ROW, bytesPerRow);
-		write32(INTEL_DISPLAY_BASE, sharedInfo.frame_buffer_offset);
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
+		write32(INTEL_DISPLAY_A_BASE, sharedInfo.frame_buffer_offset);
 			// triggers writing back double-buffered registers
 	}
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
@@ -440,9 +440,16 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 	mode.h_display_start = horizontalStart;
 	mode.v_display_start = verticalStart;
 
-	write32(INTEL_DISPLAY_BASE, sharedInfo.frame_buffer_offset
-		+ verticalStart * sharedInfo.bytes_per_row
-		+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
+	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+		write32(INTEL_DISPLAY_A_BASE, sharedInfo.frame_buffer_offset
+			+ verticalStart * sharedInfo.bytes_per_row
+			+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
+	}
+	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+		write32(INTEL_DISPLAY_B_BASE, sharedInfo.frame_buffer_offset
+			+ verticalStart * sharedInfo.bytes_per_row
+			+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
+	}
 
 	return B_OK;
 }
@@ -470,7 +477,10 @@ intel_set_indexed_colors(uint count, uint8 first, uint8 *colors, uint32 flags)
 		uint32 color = colors[0] << 16 | colors[1] << 8 | colors[2];
 		colors += 3;
 
-		write32(INTEL_DISPLAY_PALETTE + first * sizeof(uint32), color);
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
+			write32(INTEL_DISPLAY_A_PALETTE + first * sizeof(uint32), color);
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
+			write32(INTEL_DISPLAY_B_PALETTE + first * sizeof(uint32), color);
 	}
 }
 

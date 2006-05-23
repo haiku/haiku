@@ -211,7 +211,7 @@ intel_interrupt_handler(void *data)
 		handled = release_vblank_sem(info);
 
 		// make sure we'll get another one of those
-		write32(info.registers + INTEL_DISPLAY_PIPE_STATUS, DISPLAY_PIPE_VBLANK_STATUS);
+		write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS, DISPLAY_PIPE_VBLANK_STATUS);
 	}
 
 	// setting the bit clears it!
@@ -253,7 +253,7 @@ init_interrupt_handler(intel_info &info)
 				read16(info.registers + INTEL_INTERRUPT_ENABLED) | INTERRUPT_VBLANK);
 			write16(info.registers + INTEL_INTERRUPT_MASK, ~INTERRUPT_VBLANK);
 
-			write32(info.registers + INTEL_DISPLAY_PIPE_STATUS,
+			write32(info.registers + INTEL_DISPLAY_A_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS);
 			write16(info.registers + INTEL_INTERRUPT_IDENTITY, ~0);
 		}
@@ -397,7 +397,7 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
 	info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz (not tested)
 	info.shared_info->pll_info.max_frequency = 350000;		// 350 MHz RAM DAC speed
-	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_PLL_DIVISOR_0;
+	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
 	info.shared_info->device_type = info.device_type;
 #ifdef __HAIKU__
