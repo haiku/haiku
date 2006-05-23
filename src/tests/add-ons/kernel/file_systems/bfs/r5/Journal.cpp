@@ -121,7 +121,7 @@ Journal::Journal(Volume *volume)
 	fLock("bfs journal"),
 	fOwner(NULL),
 	fArray(volume->BlockSize()),
-	fLogSize(volume->Log().length),
+	fLogSize(volume->Log().Length()),
 	fMaxTransactionSize(fLogSize / 4 - 5),
 	fUsed(0),
 	fTransactionsInEntry(0)
@@ -259,9 +259,9 @@ Journal::ReplayLog()
 	}
 	
 	PRINT(("replaying worked fine!\n"));
-	fVolume->SuperBlock().log_start = fVolume->LogEnd();
+	fVolume->SuperBlock().log_start = HOST_ENDIAN_TO_BFS_INT64(fVolume->LogEnd());
 	fVolume->LogStart() = fVolume->LogEnd();
-	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_CLEAN;
+	fVolume->SuperBlock().flags = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_DISK_CLEAN);
 
 	return fVolume->WriteSuperBlock();
 }
@@ -295,9 +295,9 @@ Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
 		LogEntry *next = journal->fEntries.GetNext(logEntry);
 		if (next != NULL) {
 			int32 length = next->Start() - logEntry->Start();
-			superBlock.log_start = (superBlock.log_start + length) % journal->fLogSize;
+			superBlock.log_start = HOST_ENDIAN_TO_BFS_INT64((superBlock.LogStart() + length) % journal->fLogSize);
 		} else
-			superBlock.log_start = journal->fVolume->LogEnd();
+			superBlock.log_start = HOST_ENDIAN_TO_BFS_INT64(journal->fVolume->LogEnd());
 
 		update = true;
 	}
@@ -354,7 +354,7 @@ Journal::WriteLogEntry()
 
 	LogEntry *logEntry = NULL, *firstEntry = NULL, *lastAdded = NULL;
 
-	for (int32 i = 0; i < array->count; i++) {
+	for (int32 i = 0; i < array->CountItems(); i++) {
 	retry:
 		if (logEntry == NULL) {
 			logEntry = new LogEntry(this, logStart);
@@ -370,7 +370,7 @@ Journal::WriteLogEntry()
 			logStart++;
 		}
 
-		if (!logEntry->InsertBlock(array->values[i])) {
+		if (!logEntry->InsertBlock(array->ValueAt(i))) {
 			// log entry is full - start a new one
 			fEntriesLock.Lock();
 			fEntries.Add(logEntry);
@@ -410,7 +410,7 @@ Journal::WriteLogEntry()
 			if (block == NULL)
 				return B_IO_ERROR;
 
-			// write blocks			
+			// write blocks
 			write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
 				block, fVolume->BlockSize());
 
@@ -420,11 +420,11 @@ Journal::WriteLogEntry()
 
 	fEntriesLock.Unlock();
 
-	fUsed += array->count;
+	fUsed += array->CountItems();
 
 	// Update the log end pointer in the super block
-	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
-	fVolume->SuperBlock().log_end = logPosition;
+	fVolume->SuperBlock().flags = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_DISK_DIRTY);
+	fVolume->SuperBlock().log_end = HOST_ENDIAN_TO_BFS_INT64(logPosition);
 	fVolume->LogEnd() = logPosition;
 
 	status_t status = fVolume->WriteSuperBlock();
@@ -543,8 +543,8 @@ Journal::TransactionDone(bool success)
 		if (array != NULL) {
 			// release the lock for all blocks in the array (we don't need
 			// to be notified when they are actually written to disk)
-			for (int32 i = 0; i < array->count; i++)
-				release_block(fVolume->Device(), array->values[i]);
+			for (int32 i = 0; i < array->CountItems(); i++)
+				release_block(fVolume->Device(), array->ValueAt(i));
 		}
 
 		return B_OK;

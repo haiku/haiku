@@ -1,13 +1,13 @@
 /* Utility - some helper classes
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef UTILITY_H
 #define UTILITY_H
 
 
-#include <SupportDefs.h>
+#include "bfs_endian.h"
 
 
 // Simple array, used for the duplicate handling in the B+Tree,
@@ -17,18 +17,20 @@ struct sorted_array {
 	public:
 		off_t	count;
 		
-		#if __MWERKS__
-			off_t	values[1];
-		#else
-			off_t	values[0];
-		#endif
+#if __MWERKS__
+		off_t	values[1];
+#else
+		off_t	values[0];
+#endif
 
+		off_t CountItems() const { return BFS_ENDIAN_TO_HOST_INT64(count); }
+		off_t ValueAt(int32 index) const { return BFS_ENDIAN_TO_HOST_INT64(values[index]); }
 		inline int32 Find(off_t value) const;
 		void Insert(off_t value);
 		bool Remove(off_t value);
 
 	private:
-		bool FindInternal(off_t value,int32 &index) const;
+		bool _FindInternal(off_t value, int32 &index) const;
 };
 
 
@@ -36,7 +38,7 @@ inline int32
 sorted_array::Find(off_t value) const
 {
 	int32 i;
-	return FindInternal(value,i) ? i : -1;
+	return _FindInternal(value, i) ? i : -1;
 }
 
 
@@ -56,8 +58,8 @@ class BlockArray {
 
 		void MakeEmpty();
 
-		int32 CountItems() const { return fArray != NULL ? fArray->count : 0; }
-		int32 BlocksUsed() const { return fArray != NULL ? ((fArray->count + 1) * sizeof(off_t) + fBlockSize - 1) / fBlockSize : 0; }
+		int32 CountItems() const { return fArray != NULL ? fArray->CountItems() : 0; }
+		int32 BlocksUsed() const { return fArray != NULL ? ((fArray->CountItems() + 1) * sizeof(off_t) + fBlockSize - 1) / fBlockSize : 0; }
 		sorted_array *Array() const { return fArray; }
 		int32 Size() const { return fSize; }
 
