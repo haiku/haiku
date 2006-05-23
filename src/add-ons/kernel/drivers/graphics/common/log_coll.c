@@ -1,21 +1,21 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
 
-
 	Part of Radeon driver
-		
+
 	Both kernel and user space part.
 	(init and clean-up must be done in
 	kernel space).
 */
 
 
+#include "log_coll.h"
+
 #include <KernelExport.h>
+#include <OS.h>
+
 #include <stdlib.h>
 #include <stdarg.h>
-#include <perfmon_kernel.h>
-#include "log_coll.h"
-#include <OS.h>
 #include <string.h>
 
 typedef struct log_info_t {
@@ -47,7 +47,7 @@ void log( log_info *li, uint16 what, const uint8 num_args, ... )
 	
 	entry = (log_entry *)&li->log_buffer[pos];
 	
-	entry->tsc = read_tsc();
+	entry->tsc = system_time();
 	entry->what = what;
 	entry->num_args = num_args;
 	
