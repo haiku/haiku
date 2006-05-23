@@ -58,6 +58,7 @@ class TMDescView : public BBox {
 
 		virtual void Draw(BRect bounds);
 		virtual void GetPreferredSize(float *_width, float *_height);
+		virtual void ResizeToPreferred();
 
 		void SetItem(TMListItem *item);
 		TMListItem *Item() { return fItem; }

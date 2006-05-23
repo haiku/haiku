@@ -131,32 +131,8 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 	uint32 flags, border_style border)
 	: BBox(bounds, name, resizeFlags, flags | B_PULSE_NEEDED, border)
 {
-	BRect rect = bounds;
-	rect.InsetBy(12, 12);
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom = rect.top + TMListItem::MinimalHeight() * 8 + 6;
-
 	BFont font = be_plain_font;
-
-	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
-	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
-
-	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
-	AddChild(scrollView);
-
-	rect.left = 10;
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top + 20;
-	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
-
-	fKillButton = new BButton(rect, "kill", "Kill Application",
-		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fKillButton);
-	fKillButton->SetEnabled(false);
-
-	rect = bounds;
+	BRect rect = bounds;
 	rect.right -= 10;
 	rect.left = rect.right - font.StringWidth("Cancel") - 40;
 	rect.bottom -= 14;
@@ -183,10 +159,37 @@ TMView::TMView(BRect bounds, const char* name, uint32 resizeFlags,
 
 	rect.left += 4;
 	rect.bottom = rect.top - 8;
-	rect.top = fKillButton->Frame().bottom + 8;
+	rect.top = rect.bottom - 30;
 	rect.right = bounds.right - 10;
 	fDescView = new TMDescView(rect, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fDescView);
+	fDescView->ResizeToPreferred();
+	
+	rect = fDescView->Frame();
+	rect.left = 10;
+	rect.right = rect.left + font.StringWidth("Kill Application") + 20;
+	rect.bottom = rect.top - 8;
+	rect.top = rect.bottom - 20;
+
+	fKillButton = new BButton(rect, "kill", "Kill Application",
+		new BMessage(TM_KILL_APPLICATION), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(fKillButton);
+	fKillButton->SetEnabled(false);
+
+	rect = bounds;
+	rect.InsetBy(12, 12);
+	rect.right -= B_V_SCROLL_BAR_WIDTH;
+	rect.bottom = fKillButton->Frame().top - 10;
+
+	fListView = new BListView(rect, "teams", B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM);
+	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
+
+	BScrollView *scrollView = new BScrollView("scroll_teams", fListView, 
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
+	AddChild(scrollView);
+
+	
 }
 
 
@@ -326,6 +329,14 @@ TMView::GetPreferredSize(float *_width, float *_height)
 	}
 }
 
+
+void
+TMDescView::ResizeToPreferred()
+{
+	float bottom = Bounds().bottom;
+	BView::ResizeToPreferred();
+	MoveBy(0, bottom - Bounds().bottom);
+}
 
 //	#pragma mark -
 
