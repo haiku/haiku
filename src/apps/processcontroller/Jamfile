@@ -27,5 +27,5 @@ Application ProcessController :
 	URLView.cpp
 	WindowsTools.cpp
 	: be
-	: #ProcessController.rdef
+	: ProcessController.rdef
 	;
