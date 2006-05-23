@@ -20,8 +20,8 @@ UseHeaders [ FDirName $(SUBDIR) mesa swrast ] ;
 UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 
 {
-       local defines ;
-       defines = BEOS_THREADS GNU_ASSEMBLER ;
+	local defines ;
+	defines = BEOS_THREADS GNU_ASSEMBLER ;
 
 	if $(TARGET_ARCH) = x86 {
 		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
@@ -31,8 +31,8 @@ UseHeaders [ FDirName $(SUBDIR) mesa swrast_setup ] ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
-        SubDirCcFlags $(defines) ;
-        SubDirC++Flags $(defines) ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 local arch_sources ;
