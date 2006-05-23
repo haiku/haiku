@@ -185,6 +185,16 @@ intel_init_accelerant(int device)
 	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
 	setup_ring_buffer(info.secondary_ring_buffer, "intel secondary ring buffer");
 
+	// determine head depending on what's already enabled from the BIOS
+	// TODO: it would be nicer to retrieve this data via DDC - else the
+	//	display is gone for good if the BIOS decides to only show the
+	//	picture on the connected analog monitor!
+	gInfo->head_mode = 0;
+	if (read32(INTEL_DISPLAY_B_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
+		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+	if (read32(INTEL_DISPLAY_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
+		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+
 	status = create_mode_list();
 	if (status != B_OK) {
 		uninit_common();
