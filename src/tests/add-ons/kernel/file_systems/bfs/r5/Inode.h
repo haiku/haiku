@@ -1,6 +1,6 @@
 /* Inode - inode access functions
  *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -293,6 +293,7 @@ inline
 CachedBlock::CachedBlock(Volume *volume)
 	:
 	fVolume(volume),
+	fBlockNumber(-1),
 	fBlock(NULL)
 {
 }
