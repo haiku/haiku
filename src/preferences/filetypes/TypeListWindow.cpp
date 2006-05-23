@@ -35,13 +35,14 @@ TypeListWindow::TypeListWindow(const char* currentType, uint32 what, BWindow* ta
 		topView->Bounds().bottom - 8.0f - fSelectButton->Bounds().Height());
 	fSelectButton->SetEnabled(false);
 	topView->AddChild(fSelectButton);
-	fSelectButton->MakeDefault(true);
 
 	BButton* button = new BButton(fSelectButton->Frame(), "cancel", "Cancel",
 		new BMessage(B_CANCEL), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(-button->Bounds().Width() - 8.0f, 0.0f);
 	topView->AddChild(button);
+
+	fSelectButton->MakeDefault(true);
 
 	rect.bottom = button->Frame().top - 10.0f;
 	rect.top = 10.0f;
@@ -57,6 +58,8 @@ TypeListWindow::TypeListWindow(const char* currentType, uint32 what, BWindow* ta
 	topView->AddChild(scrollView);
 
 	MoveTo(target->Frame().LeftTop() + BPoint(15.0f, 15.0f));
+	SetSizeLimits(button->Bounds().Width() + fSelectButton->Bounds().Width() + 64.0f, 32767.0f,
+		fSelectButton->Bounds().Height() * 5.0f, 32767.0f);
 }
 
 
