@@ -644,6 +644,8 @@ LINK = bad-link ;
 # Allow compiling unit tests on Zeta. Instead of fixing the PostMessage() 
 # issues, they deprecated that nice function. This will enable it again:
 C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
+# Same for buggy find_directory threadsafety fixes
+C++FLAGS += -D_ZETA_TS_FIND_DIR_=1 ;
 	# TODO: Doesn't really belong here.
 
 
