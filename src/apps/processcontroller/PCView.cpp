@@ -1,9 +1,7 @@
 /*
-	
 	PCView.cpp
-	
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,7 +17,6 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-	
 */
 
 #include "PCView.h"
@@ -29,18 +26,21 @@
 #include "Preferences.h"
 #include "PCUtils.h"
 #include "Colors.h"
-#include <Dragger.h>
+
 #include <Alert.h>
-#include <Screen.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <Roster.h>
 #include <Deskbar.h>
+#include <Directory.h>
+#include <Dragger.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <MessageRunner.h>
 #include <Path.h>
-#include <FindDirectory.h>
-#include <Directory.h>
+#include <Roster.h>
+#include <Screen.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 const char* kDeskbarItemName = "ProcessController";
 const char* kClassName = "ProcessController";

@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src apps processcontroller ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-#UsePrivateHeaders shared ;
-
 Application ProcessController :
 	AboutPC.cpp
 	AutoIcon.cpp
@@ -11,7 +9,6 @@ Application ProcessController :
 	KernelMemoryBarMenuItem.cpp
 	MemoryBarMenu.cpp
 	MemoryBarMenuItem.cpp
-	MemorySpyWindow.cpp
 	NoiseBarMenuItem.cpp
 	PCUtils.cpp
 	PCView.cpp
@@ -29,6 +26,6 @@ Application ProcessController :
 	ThreadBarMenuItem.cpp
 	URLView.cpp
 	WindowsTools.cpp
-	: be #tracker translation
+	: be
 	: #ProcessController.rdef
 	;
