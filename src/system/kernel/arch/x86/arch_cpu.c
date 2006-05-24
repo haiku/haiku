@@ -359,7 +359,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 	close_module_list(cookie);
 
 	// initialize MTRRs if available
-	if (x86_count_mtrrs > 0)
+	if (x86_count_mtrrs() > 0)
 		call_all_cpus(&init_mtrrs, NULL);
 
 	return B_OK;
