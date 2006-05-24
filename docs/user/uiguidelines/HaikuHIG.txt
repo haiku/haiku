@@ -137,6 +137,8 @@ Chapter 1: How to Design an Application Well
 
 
 
+
+
 Chapter 2: Qualities of a Good Application
 
 	When it comes to software, the proof is in the usage. If a piece of software requires significant time to learn, the user will only invest the time in learning it if (a) the user has no other choice but to use that particular software and (b) the importance of the need filled by the software is much greater than the importance of the user's time.
@@ -185,7 +187,6 @@ Summary
 
 
 
-
 Chapter 3: OS Conventions
 
 When Be Inc. was still developing BeOS, it set precedents which were copied by other operating systems for years to come. Along with innovation came certain ways of performing tasks, some of which developed out of deliberate choice, some out of necessity, and some out of sheer accident. In this chapter we will take a look at some of these conventions.
@@ -207,23 +208,27 @@ Avoid Hardcoded File Paths
 
 Whenever your application needs to specify a particular area on the system, make use of the find_directory() function to generate it. If and when the day comes that Haiku supports multiple users, your application will make a smooth transition to the new architecture. This will also allow for backward compatibility with older versions of BeOS, such as the change in locations for B_COMMON_FONTS_DIRECTORY being in a different place for Haiku than on R5. find_directory() is supported in both C and C++ environments.
 
-	ui_color
-	font sensitivity
-
 Make Your App's Look Fit in with Others
 
-Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, utilize ui_color() and the constants which go with it to set colors for the views in your application. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accomodate weaker visual acuity.
+Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, utilize ui_color() and the constants which go with it to set colors for the views in your application. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accomodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.
 
 Live Updates
 
+One way to make sure that your application communicates effectively with the user is to provide "live" updates to information in it. This mostly relates to files in the system. A good example of live updates is an address book program which automatically removes and adds entries when new People files are added to the People folder. The information doesn't even have to be data that is outside your program -- it could just be as simple as updating an entry in a list of items as the user types makes changes to it in a form in a different part of the GUI. Responsiveness like this in a program helps the user feel more in control of the work he is doing.
+
 Translators
+
+Haiku comes with quite a bit of technology that allows lazy programmers to be lazy and still have their programs be good ones. One of those ways is with the Translation Kit. Merely by including the library and making use of even something as simple as the BTranslationUtils class will help to ensure that at least this portion of your code is free of bugs.
+
+Squeezing the Most out of BFS: Queries, Attributes, and File Types
+
+The filesystem that Be created was nothing short of amazing at the time. Even with the gradual evolution of other operating systems having progressed since then, it is still one of the most powerful around. Attributes are one means
+
 Queries
 Attributes
+File extensions
+
 System Tray
 MIME handling
 File picker
 Message Handling
-File extensions
-ui_color
-font sensitivity
-
