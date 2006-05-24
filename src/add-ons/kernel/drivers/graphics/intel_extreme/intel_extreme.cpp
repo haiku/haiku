@@ -348,7 +348,7 @@ intel_extreme_init(intel_info &info)
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
 		(void *)info.pci->u.h0.base_registers[1],
 		info.pci->u.h0.base_register_sizes[1],
-		B_ANY_KERNEL_ADDRESS, 0, (void **)&info.registers);
+		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA /*0*/, (void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");
 		return info.registers_area;
