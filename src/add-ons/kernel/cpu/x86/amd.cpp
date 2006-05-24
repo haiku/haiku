@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc.
+ * Copyright 2005-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,6 +28,11 @@ amd_init(void)
 		return B_ERROR;
 
 	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
+		return B_ERROR;
+
+	// The K6-2 doesn't seem to support write-combining (before model 9),
+	// so we ignore anything before that one.
+	if (info.cpu_type <= B_CPU_AMD_K6_2)
 		return B_ERROR;
 
 	generic_mtrr_compute_physical_mask();
