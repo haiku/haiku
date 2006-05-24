@@ -36,9 +36,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "glheader.h"
 
 extern "C" {
-#include "glapi.h"
-}
 
+#include "glapi.h"
 #include "glapitable.h"
 
 /*
@@ -47,7 +46,6 @@ extern "C" {
  * This code IS NOT USED if we're compiling on an x86 system and using
  * the glapi_x86.S assembly code.
  */
-
 
 #if !(defined(USE_X86_ASM) || defined(USE_SPARC_ASM))
 
@@ -72,6 +70,7 @@ extern "C" {
 
 #endif /* USE_X86_ASM */
 
+}
 
 /* NOTE: this file portion implement a thin OpenGL entrypoints dispatching
 	C++ wrapper class
