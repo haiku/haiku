@@ -60,6 +60,9 @@ generic_count_mtrrs(void)
 void
 generic_init_mtrrs(uint32 count)
 {
+	if (count == 0)
+		return;
+
 	// disable and clear all MTRRs
 	// (we leave the fixed MTRRs as is)
 	// TODO: check if the fixed MTRRs are set on all CPUs identically?
