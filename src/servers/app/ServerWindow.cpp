@@ -1828,6 +1828,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_PICTURE\n", Title()));
 			ServerPicture *picture = App()->CreatePicture();
+			picture->SyncState(fCurrentLayer);
 			fCurrentLayer->SetPicture(picture);
 			break;
 		}
@@ -1838,8 +1839,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			
 			int32 pictureToken;
 			link.Read<int32>(&pictureToken);
-			
-			fCurrentLayer->SetPicture(App()->FindPicture(pictureToken));
+			ServerPicture *picture = App()->FindPicture(pictureToken);
+			if (picture)
+				picture->SyncState(fCurrentLayer);
+			fCurrentLayer->SetPicture(picture);
 				// we don't care if it's NULL
 			break;
 		}
@@ -2362,6 +2365,9 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (lineCount <= 0)
 				break;
 
+			picture->BeginOp(B_PIC_PUSH_STATE);
+			picture->EndOp();
+
 			for (int32 i = 0; i < lineCount; i++) {
 				float x1, y1, x2, y2;
 				link.Read<float>(&x1);
@@ -2382,9 +2388,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				picture->EndOp();
 			}
 			
-			// reset the color to the previous one
-			picture->BeginOp(B_PIC_SET_FORE_COLOR);
-			picture->AddColor(fCurrentLayer->CurrentState()->HighColor().GetColor32());
+			picture->BeginOp(B_PIC_POP_STATE);
 			picture->EndOp();
 			break;
 		}
@@ -2441,7 +2445,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			ServerBitmap *bitmap = App()->FindBitmap(token);
 			if (bitmap == NULL)
 				break;
-			
+
 			picture->BeginOp(B_PIC_DRAW_PIXELS);
 			picture->AddRect(sourceRect);
 			picture->AddRect(destRect);
@@ -2452,6 +2456,22 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			picture->AddInt32(/*bitmap->Flags()*/0);
 			picture->AddData((void *)bitmap->Bits(), bitmap->BitsLength());
 			picture->EndOp();
+
+			break;
+		}
+
+		case AS_LAYER_SET_BLENDING_MODE:
+		{
+			int8 srcAlpha, alphaFunc;
+			
+			link.Read<int8>(&srcAlpha);
+			link.Read<int8>(&alphaFunc);
+			
+			picture->BeginOp(B_PIC_SET_BLENDING_MODE);
+			picture->AddInt16((int16)srcAlpha);
+			picture->AddInt16((int16)alphaFunc);
+			picture->EndOp();
+			
 			break;
 		}
 		default:

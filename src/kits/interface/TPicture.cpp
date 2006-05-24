@@ -32,6 +32,7 @@ typedef void (*fnc_ssf)(void*, int16, int16, float);
 typedef void (*fnc_f)(void*, float);
 typedef void (*fnc_Color)(void*, rgb_color);
 typedef void (*fnc_Pattern)(void*, pattern);
+typedef void (*fnc_ss)(void *, int16, int16);
 typedef void (*fnc_PBRecti)(void*, BRect*, int32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, void*);
@@ -147,7 +148,7 @@ PicturePlayer::GetData(void *data, int32 size)
 status_t
 PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 {
-	// TODO: we should probably check if the functions in the table are not 0
+	// TODO: we should probably check if the functions in the table are not NULL
 	//       before calling them.
 
 	// lenght of the stream
@@ -213,6 +214,44 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_PBPoint)callBackTable[8])(userData, control);
 				break;
 			}
+case B_PIC_STROKE_ARC:
+			{
+				BPoint center = GetCoord();
+				BPoint radii = GetCoord();
+				float startTheta = GetFloat();
+				float arcTheta = GetFloat();
+				((fnc_BPointBPointff)callBackTable[9])(userData, center, radii,
+					startTheta, arcTheta);
+				break;
+			}
+			case B_PIC_FILL_ARC:
+			{
+				BPoint center = GetCoord();
+				BPoint radii = GetCoord();
+				float startTheta = GetFloat();
+				float arcTheta = GetFloat();
+				((fnc_BPointBPointff)callBackTable[10])(userData, center, radii,
+					startTheta, arcTheta);
+				break;
+			}
+			case B_PIC_STROKE_ELLIPSE:
+			{
+				BRect rect = GetRect();
+				BPoint center;
+				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
+				center = rect.LeftTop() + radii;
+				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
+				break;
+			}
+			case B_PIC_FILL_ELLIPSE:
+			{
+				BRect rect = GetRect();
+				BPoint center;
+				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
+				center = rect.LeftTop() + radii;
+				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
+				break;
+			}
 			case B_PIC_STROKE_POLYGON:
 			{
 				int32 numPoints = GetInt32();
@@ -267,50 +306,18 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			{
 				break;
 			}
-			case B_PIC_STROKE_ARC:
-			{
-				BPoint center = GetCoord();
-				BPoint radii = GetCoord();
-				float startTheta = GetFloat();
-				float arcTheta = GetFloat();
-				((fnc_BPointBPointff)callBackTable[9])(userData, center, radii,
-					startTheta, arcTheta);
-				break;
-			}
-			case B_PIC_FILL_ARC:
-			{
-				BPoint center = GetCoord();
-				BPoint radii = GetCoord();
-				float startTheta = GetFloat();
-				float arcTheta = GetFloat();
-				((fnc_BPointBPointff)callBackTable[10])(userData, center, radii,
-					startTheta, arcTheta);
-				break;
-			}
-			case B_PIC_STROKE_ELLIPSE:
-			{
-				BRect rect = GetRect();
-				BPoint center;
-				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				center = rect.LeftTop() + radii;
-				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
-				break;
-			}
-			case B_PIC_FILL_ELLIPSE:
-			{
-				BRect rect = GetRect();
-				BPoint center;
-				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
-				center = rect.LeftTop() + radii;
-				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
-				break;
-			}
+			
 			case B_PIC_ENTER_STATE_CHANGE:
 			{
 				break;
 			}
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
+				break;
+			}
+			case B_PIC_CLEAR_CLIPPING_RECTS:
+			{
+				((fnc_PBRecti)callBackTable[20])(userData, NULL, 0);
 				break;
 			}
 			case B_PIC_CLIP_TO_PICTURE:
@@ -327,9 +334,9 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc)callBackTable[23])(userData);
 				break;
 			}
-			case B_PIC_CLEAR_CLIPPING_RECTS:
+			case B_PIC_ENTER_FONT_STATE:
 			{
-				((fnc_PBRecti)callBackTable[20])(userData, NULL, 0);
+				((fnc)callBackTable[26])(userData);
 				break;
 			}
 			case B_PIC_SET_ORIGIN:
@@ -364,12 +371,6 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_f)callBackTable[32])(userData, size);
 				break;
 			}
-			case B_PIC_SET_SCALE:
-			{
-				float scale = GetFloat();
-				((fnc_f)callBackTable[36])(userData, scale);
-				break;
-			}
 			case B_PIC_SET_FORE_COLOR:
 			{			
 				rgb_color color = GetColor();
@@ -389,17 +390,10 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_Pattern)callBackTable[35])(userData, p);
 				break;
 			}
-			case B_PIC_ENTER_FONT_STATE:
+			case B_PIC_SET_SCALE:
 			{
-				((fnc)callBackTable[26])(userData);
-				break;
-			}
-			case B_PIC_SET_BLENDING_MODE:
-			{
-				//int16 alphaSrcMode = GetInt16();
-				//int16 alphaFncMode = GetInt16();
-				//((fnc_Pattern)callBackTable[??])(userData, alphaSrcMode,
-				//	alphaFncMode);
+				float scale = GetFloat();
+				((fnc_f)callBackTable[36])(userData, scale);
 				break;
 			}
 			case B_PIC_SET_FONT_FAMILY:
@@ -428,18 +422,6 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_i)callBackTable[39])(userData, spacing);
 				break;
 			}
-			case B_PIC_SET_FONT_ENCODING:
-			{
-				int32 encoding = GetInt32();
-				((fnc_i)callBackTable[42])(userData, encoding);
-				break;
-			}
-			case B_PIC_SET_FONT_FLAGS:
-			{
-				int32 flags = GetInt32();
-				((fnc_i)callBackTable[43])(userData, flags);
-				break;
-			}
 			case B_PIC_SET_FONT_SIZE:
 			{
 				float size = GetFloat();
@@ -452,6 +434,19 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_f)callBackTable[41])(userData, rotation);
 				break;
 			}
+			case B_PIC_SET_FONT_ENCODING:
+			{
+				int32 encoding = GetInt32();
+				((fnc_i)callBackTable[42])(userData, encoding);
+				break;
+			}
+			case B_PIC_SET_FONT_FLAGS:
+			{
+				int32 flags = GetInt32();
+				((fnc_i)callBackTable[43])(userData, flags);
+				break;
+			}
+			
 			case B_PIC_SET_FONT_SHEAR:
 			{
 				float shear = GetFloat();
@@ -462,6 +457,16 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			{
 				int32 flags = GetInt32();
 				((fnc_i)callBackTable[46])(userData, flags);
+				break;
+			}
+			// TODO: Looks like R5 function table only exports 47 functions...
+			// I added this here as a temporary workaround, because there seems to be
+			// no room for this op, although it's obviously implemented in some way...
+			case B_PIC_SET_BLENDING_MODE:
+			{
+				int16 alphaSrcMode = GetInt16();
+				int16 alphaFncMode = GetInt16();
+				((fnc_ss)callBackTable[47])(userData, alphaSrcMode, alphaFncMode);
 				break;
 			}
 			default:

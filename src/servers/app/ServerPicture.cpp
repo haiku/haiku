@@ -15,6 +15,7 @@
 #include "ViewLayer.h"
 #include "WindowLayer.h"
 
+#include <PictureProtocol.h>
 #include <ServerProtocol.h>
 #include <TPicture.h>
 
@@ -431,6 +432,13 @@ set_font_face(ViewLayer *view, int32 flags)
 
 
 static void
+set_blending_mode(ViewLayer *view, int16 alphaSrcMode, int16 alphaFncMode)
+{
+	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode, (alpha_function)alphaFncMode);
+}
+
+
+static void
 reserved()
 {
 }
@@ -456,7 +464,7 @@ const void *tableEntries[] = {
 	(const void *)fill_shape,
 	(const void *)draw_string,
 	(const void *)draw_pixels,
-	(const void *)reserved,
+	(const void *)reserved,	// TODO: This is probably "draw_picture". Investigate
 	(const void *)set_clipping_rects,
 	(const void *)clip_to_picture,
 	(const void *)push_state,
@@ -482,8 +490,9 @@ const void *tableEntries[] = {
 	(const void *)set_font_encoding,
 	(const void *)set_font_flags,
 	(const void *)set_font_shear,
-	(const void *)reserved,
-	(const void *)set_font_face,
+	(const void *)reserved,		// TODO: Marc Flerackers calls this "set_font_bpp". Investigate
+	(const void *)set_font_face, // TODO: R5 function table ends here... how is set blending mode implemented there ?
+	(const void *)set_blending_mode 
 };
 
 
@@ -642,7 +651,44 @@ ServerPicture::AddData(const void *data, int32 size)
 void
 ServerPicture::SyncState(ViewLayer *view)
 {
-	// TODO:
+	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+
+	BeginOp(B_PIC_SET_PEN_LOCATION);
+	AddCoord(view->CurrentState()->PenLocation());
+	EndOp();
+
+	BeginOp(B_PIC_SET_PEN_SIZE);
+	AddFloat(view->CurrentState()->PenSize());
+	EndOp();
+
+	BeginOp(B_PIC_SET_LINE_MODE);
+	AddInt16((int16)view->CurrentState()->LineCapMode());
+	AddInt16((int16)view->CurrentState()->LineJoinMode());
+	AddFloat(view->CurrentState()->MiterLimit());
+	EndOp();
+
+	BeginOp(B_PIC_SET_STIPLE_PATTERN);
+	AddData(view->CurrentState()->GetPattern().GetInt8(), sizeof(pattern));
+	EndOp();
+
+	BeginOp(B_PIC_SET_DRAWING_MODE);
+	AddInt16((int16)view->CurrentState()->GetDrawingMode());
+	EndOp();
+	
+	BeginOp(B_PIC_SET_BLENDING_MODE);
+	AddInt16((int16)view->CurrentState()->AlphaSrcMode());
+	AddInt16((int16)view->CurrentState()->AlphaFncMode());
+	EndOp();
+
+	BeginOp(B_PIC_SET_FORE_COLOR);
+	AddColor(view->CurrentState()->HighColor().GetColor32());
+	EndOp();
+	
+	BeginOp(B_PIC_SET_BACK_COLOR);
+	AddColor(view->CurrentState()->LowColor().GetColor32());
+	EndOp();
+
+	EndOp();
 }
 
 
