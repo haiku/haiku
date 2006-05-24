@@ -1575,16 +1575,16 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	UnlockAllWindows();
 }
 
-void
+bool
 Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 {
 	if (!LockAllWindows())
-		return;
+		return false;
 
 	BRegion dirty;
-	window->SetTabLocation(location, dirty);
+	bool changed = window->SetTabLocation(location, dirty);
 
-	if (window->IsVisible() && dirty.CountRects() > 0) {
+	if (changed && window->IsVisible() && dirty.CountRects() > 0) {
 		BRegion stillAvailableOnScreen;
 		_RebuildClippingForAllWindows(stillAvailableOnScreen);
 		_SetBackground(stillAvailableOnScreen);
@@ -1593,6 +1593,8 @@ Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 	}
 
 	UnlockAllWindows();
+
+	return changed;
 }
 
 

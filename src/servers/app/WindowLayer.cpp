@@ -975,6 +975,14 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	}
 
 	BPoint delta = where - fLastMousePosition;
+	// NOTE: "delta" is later used to change fLastMousePosition.
+	// If for some reason no change should take effect, delta
+	// is to be set to (0, 0) so that fLastMousePosition is not
+	// adjusted. This way the relative mouse position to the
+	// item being changed (border during resizing, tab during
+	// sliding...) stays fixed when the mouse is moved so that
+	// changes are taking effect again.
+
 	// moving
 	if (fIsDragging) {
 		if (!(Flags() & B_NOT_MOVABLE)) {
@@ -1009,8 +1017,10 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 		float loc = TabLocation();
 		// TODO: change to [0:1]
 		loc += delta.x;
-		fDesktop->SetWindowTabLocation(this, loc);
-		delta.y = 0;
+		if (fDesktop->SetWindowTabLocation(this, loc))
+			delta.y = 0;
+		else
+			delta = BPoint(0, 0);
 	}
 
 	// NOTE: fLastMousePosition is currently only
@@ -1210,7 +1220,7 @@ WindowLayer::SetTabLocation(float location, BRegion& dirty)
 	bool ret = false;
 	if (fDecorator) {
 		ret = fDecorator->SetTabLocation(location, &dirty);
-		fBorderRegionValid = false;
+		fBorderRegionValid = fBorderRegionValid && !ret;
 		// the border very likely changed
 	}
 	return ret;

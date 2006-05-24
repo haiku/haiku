@@ -343,11 +343,16 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
 	if (!_tabrect.IsValid())
 		return false;
+
 	if (location < 0)
 		location = 0;
 	if (location > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
 		location = (fRightBorder.right - fLeftBorder.left - _tabrect.Width());
+
 	float delta = location - fTabOffset;
+	if (delta == 0.0)
+		return false;
+
 	// redraw old rect (1 pix on the border also must be updated)
 	BRect trect(_tabrect);
 	trect.bottom++;
