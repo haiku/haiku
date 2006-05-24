@@ -1575,6 +1575,26 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	UnlockAllWindows();
 }
 
+void
+Desktop::SetWindowTabLocation(WindowLayer* window, float location)
+{
+	if (!LockAllWindows())
+		return;
+
+	BRegion dirty;
+	window->SetTabLocation(location, dirty);
+
+	if (window->IsVisible() && dirty.CountRects() > 0) {
+		BRegion stillAvailableOnScreen;
+		_RebuildClippingForAllWindows(stillAvailableOnScreen);
+		_SetBackground(stillAvailableOnScreen);
+	
+		_TriggerWindowRedrawing(dirty);
+	}
+
+	UnlockAllWindows();
+}
+
 
 /*!
 	Updates the workspaces of all subset windows with regard to the

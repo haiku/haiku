@@ -1006,7 +1006,11 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	}
 	// sliding tab
 	if (fIsSlidingTab) {
-		// TODO: implement
+		float loc = TabLocation();
+		// TODO: change to [0:1]
+		loc += delta.x;
+		fDesktop->SetWindowTabLocation(this, loc);
+		delta.y = 0;
 	}
 
 	// NOTE: fLastMousePosition is currently only
@@ -1200,11 +1204,16 @@ WindowLayer::GetSizeLimits(int32* minWidth, int32* maxWidth,
 }
 
 
-void
-WindowLayer::SetTabLocation(float location)
+bool
+WindowLayer::SetTabLocation(float location, BRegion& dirty)
 {
-	if (fDecorator)
-		fDecorator->SetTabLocation(location);
+	bool ret = false;
+	if (fDecorator) {
+		ret = fDecorator->SetTabLocation(location, &dirty);
+		fBorderRegionValid = false;
+		// the border very likely changed
+	}
+	return ret;
 }
 
 

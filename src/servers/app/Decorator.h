@@ -95,7 +95,9 @@ class Decorator {
 			void				ResizeBy(float x, float y, BRegion* dirty);
 	virtual	void				ResizeBy(BPoint pt, BRegion* dirty) = 0;
 
-	virtual	void				SetTabLocation(float location) {}
+	/*! \return true if tab location updated, false if out of bounds or unsupported */
+	virtual	bool				SetTabLocation(float location, BRegion* updateRegion = NULL)
+									{ (void)updateRegion; return false; }
 	virtual	float				TabLocation() const
 									{ return 0.0; }
 

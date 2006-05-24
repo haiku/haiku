@@ -29,6 +29,8 @@ class DefaultDecorator: public Decorator {
 
 		virtual	void	MoveBy(BPoint pt);
 		virtual	void	ResizeBy(BPoint pt, BRegion* dirty);
+		virtual bool	SetTabLocation(float location, BRegion* updateRegion = NULL);
+		virtual float	TabLocation() const { return (float)fTabOffset;; }
 
 		virtual	void	Draw(BRect r);
 		virtual	void	Draw();

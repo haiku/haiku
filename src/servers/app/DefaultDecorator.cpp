@@ -337,6 +337,31 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 	}
 }
 
+bool
+DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
+{
+	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
+	if (!_tabrect.IsValid())
+		return false;
+	if (location < 0)
+		location = 0;
+	if (location > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
+		location = (fRightBorder.right - fLeftBorder.left - _tabrect.Width());
+	float delta = location - fTabOffset;
+	// redraw old rect (1 pix on the border also must be updated)
+	BRect trect(_tabrect);
+	trect.bottom++;
+	updateRegion->Include(trect);
+	_tabrect.OffsetBy(delta, 0);
+	fTabOffset = (int32)location;
+	_LayoutTabItems(_tabrect);
+	// redraw new rect as well
+	trect = _tabrect;
+	trect.bottom++;
+	updateRegion->Include(trect);
+	return true;
+}
+
 // Draw
 void
 DefaultDecorator::Draw(BRect update)
@@ -439,7 +464,8 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	// Clicking in the tab?
 	if (_tabrect.Contains(pt)) {
 		// tab sliding in any case if either shift key is held down
-		if (modifiers & B_SHIFT_KEY)
+		// except sliding up-down by moving mouse left-right would look strange
+		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
 			return DEC_SLIDETAB;
 
 		clicked = true;

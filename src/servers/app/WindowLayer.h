@@ -169,7 +169,7 @@ class WindowLayer {
 									int32* minHeight, int32* maxHeight) const;
 
 								// 0.0 -> left .... 1.0 -> right
-			void				SetTabLocation(float location);
+			bool				SetTabLocation(float location, BRegion& dirty);
 			float				TabLocation() const;
 
 			void				HighlightDecorator(bool active);
