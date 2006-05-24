@@ -27,14 +27,14 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast_setup ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
 
 {
-       local defines ;
+	local defines ;
 	defines = BEOS_THREADS GNU_ASSEMBLER ;
 
 	if $(TARGET_ARCH) = x86 {
 		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM USE_SSE_ASM ;
 	} else {
 		# Not yet supported, as current Mesa3D PPC assembly is Linux-dependent!
-                # defines += USE_PPC_ASM ;
+		# defines += USE_PPC_ASM ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
@@ -111,7 +111,6 @@ StaticLibrary libmesa.a :
 	convolve.c
 	debug.c
 	depth.c
-	dispatch.c
 	dlist.c
 	drawpix.c
 	enable.c
