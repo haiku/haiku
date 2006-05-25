@@ -15,8 +15,12 @@ extern void *(*sbrk_hook)(long);
 void *
 sbrk(long increment)
 {
-// TODO: disabled for now - let's GDB crash, so it obviously doesn't work yet
-//	if (sbrk_hook)
-//		return (*sbrk_hook)(increment);
+	// TODO: we only support extending the heap for now using this method
+	if (increment <= 0)
+		return NULL;
+
+	if (sbrk_hook)
+		return (*sbrk_hook)(increment);
+
 	return NULL;
 }
