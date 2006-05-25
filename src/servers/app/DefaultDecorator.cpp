@@ -337,6 +337,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 	}
 }
 
+
 bool
 DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 {
@@ -367,7 +368,31 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 	return true;
 }
 
-// Draw
+
+bool
+DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
+{
+	float tabLocation;
+	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
+		return SetTabLocation(tabLocation, updateRegion);
+
+	return false;
+}
+
+
+bool
+DefaultDecorator::GetSettings(BMessage* settings) const
+{
+	if (!_tabrect.IsValid())
+		return false;
+
+	return settings->AddFloat("tab location", (float)fTabOffset) == B_OK;
+}
+
+
+// #pragma mark -
+
+
 void
 DefaultDecorator::Draw(BRect update)
 {

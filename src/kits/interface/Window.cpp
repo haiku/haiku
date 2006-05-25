@@ -1146,31 +1146,32 @@ BWindow::SetSizeLimits(float minWidth, float maxWidth,
 	if (minWidth > maxWidth || minHeight > maxHeight)
 		return;
 
-	if (Lock()) {
-		fLink->StartMessage(AS_SET_SIZE_LIMITS);
-		fLink->Attach<float>(minWidth);
-		fLink->Attach<float>(maxWidth);
-		fLink->Attach<float>(minHeight);
-		fLink->Attach<float>(maxHeight);
+	if (!Lock())
+		return;
 
-		int32 code;
-		if (fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
-			// read the values that were really enforced on
-			// the server side (the window frame could have
-			// been changed, too)
-			fLink->Read<BRect>(&fFrame);
-			fLink->Read<float>(&fMinWidth);
-			fLink->Read<float>(&fMaxWidth);
-			fLink->Read<float>(&fMinHeight);
-			fLink->Read<float>(&fMaxHeight);
+	fLink->StartMessage(AS_SET_SIZE_LIMITS);
+	fLink->Attach<float>(minWidth);
+	fLink->Attach<float>(maxWidth);
+	fLink->Attach<float>(minHeight);
+	fLink->Attach<float>(maxHeight);
 
-			_AdoptResize();
-				// TODO: the same has to be done for SetLook() (that can alter
-				//		the size limits, and hence, the size of the window
-		}
-		Unlock();
+	int32 code;
+	if (fLink->FlushWithReply(code) == B_OK
+		&& code == B_OK) {
+		// read the values that were really enforced on
+		// the server side (the window frame could have
+		// been changed, too)
+		fLink->Read<BRect>(&fFrame);
+		fLink->Read<float>(&fMinWidth);
+		fLink->Read<float>(&fMaxWidth);
+		fLink->Read<float>(&fMinHeight);
+		fLink->Read<float>(&fMaxHeight);
+
+		_AdoptResize();
+			// TODO: the same has to be done for SetLook() (that can alter
+			//		the size limits, and hence, the size of the window
 	}
+	Unlock();
 }
 
 
@@ -1183,6 +1184,76 @@ BWindow::GetSizeLimits(float *minWidth, float *maxWidth,
 	*minWidth = fMinWidth;
 	*maxHeight = fMaxHeight;
 	*maxWidth = fMaxWidth;
+}
+
+
+status_t
+BWindow::SetDecoratorSettings(const BMessage& settings)
+{
+	// flatten the given settings into a buffer and send
+	// it to the app_server to apply the settings to the
+	// decorator
+
+	int32 size = settings.FlattenedSize();
+	char buffer[size];
+	status_t ret = settings.Flatten(buffer, size);
+
+	if (ret < B_OK)
+		return ret;
+
+	if (!Lock())
+		return B_ERROR;
+
+	ret = fLink->StartMessage(AS_SET_DECORATOR_SETTINGS);
+
+	if (ret == B_OK)
+		ret = fLink->Attach<int32>(size);
+
+	if (ret == B_OK)
+		ret = fLink->Attach(buffer, size);
+
+	if (ret == B_OK)
+		ret = fLink->Flush();
+
+	Unlock();
+
+	return ret;
+}
+
+
+status_t
+BWindow::GetDecoratorSettings(BMessage* settings)
+{
+	// read a flattened settings message from the app_server
+	// and put it into settings
+
+	if (!Lock())
+		return B_ERROR;
+
+	status_t ret = fLink->StartMessage(AS_GET_DECORATOR_SETTINGS);
+
+	if (ret == B_OK) {
+		int32 code;
+		ret = fLink->FlushWithReply(code);
+		if (ret == B_OK && code != B_OK)
+			ret = code;
+	}
+
+	if (ret == B_OK) {
+		int32 size;
+		ret = fLink->Read<int32>(&size);
+		if (ret == B_OK) {
+			char buffer[size];
+			ret = fLink->Read(buffer, size);
+			if (ret == B_OK) {
+				ret = settings->Unflatten(buffer);
+			}
+		}
+	}
+
+	Unlock();
+
+	return ret;
 }
 
 

@@ -101,6 +101,10 @@ class Decorator {
 	virtual	float				TabLocation() const
 									{ return 0.0; }
 
+	virtual	bool				SetSettings(const BMessage& settings,
+											BRegion* updateRegion = NULL);
+	virtual	bool				GetSettings(BMessage* settings) const;
+
 	virtual	void				Draw(BRect r);
 	virtual	void				Draw();
 	virtual	void				DrawClose();

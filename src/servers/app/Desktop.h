@@ -112,6 +112,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									int32 workspace = -1);
 		void					ResizeWindowBy(WindowLayer* window, float x, float y);
 		bool					SetWindowTabLocation(WindowLayer* window, float location);
+		bool					SetWindowDecoratorSettings(WindowLayer* window,
+														   const BMessage& settings);
 
 		void					SetWindowWorkspaces(WindowLayer* window,
 									uint32 workspaces);

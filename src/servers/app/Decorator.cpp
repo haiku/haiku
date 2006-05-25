@@ -399,6 +399,21 @@ Decorator::ResizeBy(float x, float y, BRegion* dirty)
 	ResizeBy(BPoint(x, y), dirty);
 }
 
+
+bool
+Decorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
+{
+	return false;
+}
+
+
+bool
+Decorator::GetSettings(BMessage* settings) const
+{
+	return false;
+}
+
+
 /*!
 	\brief Updates the decorator's look in the area r
 	\param r The area to update.

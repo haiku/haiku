@@ -1220,8 +1220,8 @@ WindowLayer::SetTabLocation(float location, BRegion& dirty)
 	bool ret = false;
 	if (fDecorator) {
 		ret = fDecorator->SetTabLocation(location, &dirty);
+		// the border region changed if ret is true
 		fBorderRegionValid = fBorderRegionValid && !ret;
-		// the border very likely changed
 	}
 	return ret;
 }
@@ -1233,6 +1233,29 @@ WindowLayer::TabLocation() const
 	if (fDecorator)
 		return fDecorator->TabLocation();
 	return 0.0;
+}
+
+
+bool
+WindowLayer::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
+{
+	bool ret = false;
+	if (fDecorator) {
+		ret = fDecorator->SetSettings(settings, &dirty);
+		// the border region changed if ret is true
+		fBorderRegionValid = fBorderRegionValid && !ret;
+	}
+	return ret;
+}
+
+
+bool
+WindowLayer::GetDecoratorSettings(BMessage* settings)
+{
+	if (fDecorator)
+		return fDecorator->GetSettings(settings);
+
+	return false;
 }
 
 

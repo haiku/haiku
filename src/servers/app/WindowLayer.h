@@ -172,6 +172,10 @@ class WindowLayer {
 			bool				SetTabLocation(float location, BRegion& dirty);
 			float				TabLocation() const;
 
+			bool				SetDecoratorSettings(const BMessage& settings,
+													 BRegion& dirty);
+			bool				GetDecoratorSettings(BMessage* settings);
+
 			void				HighlightDecorator(bool active);
 
 			void				SetLook(window_look look, BRegion* updateRegion);

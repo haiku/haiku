@@ -1575,6 +1575,7 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	UnlockAllWindows();
 }
 
+
 bool
 Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 {
@@ -1583,6 +1584,32 @@ Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 
 	BRegion dirty;
 	bool changed = window->SetTabLocation(location, dirty);
+
+	if (changed && window->IsVisible() && dirty.CountRects() > 0) {
+		BRegion stillAvailableOnScreen;
+		_RebuildClippingForAllWindows(stillAvailableOnScreen);
+		_SetBackground(stillAvailableOnScreen);
+	
+		_TriggerWindowRedrawing(dirty);
+	}
+
+	UnlockAllWindows();
+
+	return changed;
+}
+
+
+bool
+Desktop::SetWindowDecoratorSettings(WindowLayer* window,
+									const BMessage& settings)
+{
+	// TODO: almost exact code duplication to above function...
+
+	if (!LockAllWindows())
+		return false;
+
+	BRegion dirty;
+	bool changed = window->SetDecoratorSettings(settings, dirty);
 
 	if (changed && window->IsVisible() && dirty.CountRects() > 0) {
 		BRegion stillAvailableOnScreen;

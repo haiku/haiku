@@ -909,6 +909,50 @@ fDesktop->LockSingleWindow();
 			break;
 		}
 
+		case AS_SET_DECORATOR_SETTINGS:
+		{
+			STRACE(("ServerWindow %s: Message AS_SET_DECORATOR_SETTINGS\n"));
+
+			int32 size;
+			if (fWindowLayer && link.Read<int32>(&size) == B_OK) {
+				char buffer[size];
+				if (link.Read(buffer, size) == B_OK) {
+					BMessage settings;
+					if (settings.Unflatten(buffer) == B_OK) {
+fDesktop->UnlockSingleWindow();
+						fDesktop->SetWindowDecoratorSettings(fWindowLayer, settings);
+fDesktop->LockSingleWindow();
+					}
+				}
+			}
+			break;
+		}
+	
+		case AS_GET_DECORATOR_SETTINGS:
+		{
+			STRACE(("ServerWindow %s: Message AS_GET_DECORATOR_SETTINGS\n"));
+
+			bool success = false;
+
+			BMessage settings;
+			if (fWindowLayer->GetDecoratorSettings(&settings)) {
+				int32 size = settings.FlattenedSize();
+				char buffer[size];
+				if (settings.Flatten(buffer, size) == B_OK) {
+					success = true;
+					fLink.StartMessage(B_OK);
+					fLink.Attach<int32>(size);
+					fLink.Attach(buffer, size);
+				}
+			}
+			
+			if (!success)
+				fLink.StartMessage(B_ERROR);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_REDRAW:
 			// Nothing to do here - the redraws are actually handled by looking
 			// at the fRedrawRequested member variable in _MessageLooper().
@@ -936,12 +980,12 @@ fDesktop->LockSingleWindow();
 			BPoint where;
 			int32 buttons;
 			fDesktop->EventDispatcher().GetMouse(where, buttons);
+			fDesktop->LockSingleWindow();
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<BPoint>(where);
 			fLink.Attach<int32>(buttons);
 			fLink.Flush();
-			fDesktop->LockSingleWindow();
 			break;
 		}
 

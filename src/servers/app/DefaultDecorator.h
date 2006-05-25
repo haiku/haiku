@@ -17,77 +17,92 @@ class Desktop;
 
 
 class DefaultDecorator: public Decorator {
-	public:
-						DefaultDecorator(DesktopSettings& settings, BRect frame,
-							window_look look, uint32 flags);
-		virtual			~DefaultDecorator();
+ public:
+								DefaultDecorator(DesktopSettings& settings,
+												 BRect frame,
+												 window_look look,
+												 uint32 flags);
+	virtual						~DefaultDecorator();
 
-		virtual	void	SetTitle(const char* string, BRegion* updateRegion = NULL);
-		virtual void	SetLook(DesktopSettings& settings,
-							window_look look, BRegion* updateRegion = NULL);
-		virtual void	SetFlags(uint32 flags, BRegion* updateRegion = NULL);
+	virtual	void				SetTitle(const char* string,
+										 BRegion* updateRegion = NULL);
+	virtual void				SetLook(DesktopSettings& settings,
+										window_look look,
+										BRegion* updateRegion = NULL);
+	virtual void				SetFlags(uint32 flags,
+										 BRegion* updateRegion = NULL);
 
-		virtual	void	MoveBy(BPoint pt);
-		virtual	void	ResizeBy(BPoint pt, BRegion* dirty);
-		virtual bool	SetTabLocation(float location, BRegion* updateRegion = NULL);
-		virtual float	TabLocation() const { return (float)fTabOffset;; }
+	virtual	void				MoveBy(BPoint offset);
+	virtual	void				ResizeBy(BPoint offset, BRegion* dirty);
 
-		virtual	void	Draw(BRect r);
-		virtual	void	Draw();
+	virtual bool				SetTabLocation(float location,
+											   BRegion* updateRegion = NULL);
+	virtual float				TabLocation() const
+									{ return (float)fTabOffset; }
 
-		virtual	void	GetSizeLimits(int32* minWidth, int32* minHeight,
-							int32* maxWidth, int32* maxHeight) const;
+	virtual	bool				SetSettings(const BMessage& settings,
+											BRegion* updateRegion = NULL);
+	virtual	bool				GetSettings(BMessage* settings) const;
 
-		virtual	void	GetFootprint(BRegion *region);
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				Draw();
 
-		virtual	click_type Clicked(BPoint pt, int32 buttons,
-							int32 modifiers);
+	virtual	void				GetSizeLimits(int32* minWidth,
+											  int32* minHeight,
+											  int32* maxWidth,
+											  int32* maxHeight) const;
 
-	protected:
-		virtual void	_DoLayout();
+	virtual	void				GetFootprint(BRegion* region);
 
-		virtual void	_DrawFrame(BRect r);
-		virtual void	_DrawTab(BRect r);
+	virtual	click_type			Clicked(BPoint pt, int32 buttons,
+										int32 modifiers);
 
-		virtual void	_DrawClose(BRect r);
-		virtual void	_DrawTitle(BRect r);
-		virtual void	_DrawZoom(BRect r);
+ protected:
+	virtual void				_DoLayout();
 
-		virtual void	_SetFocus();
-		virtual void	_SetColors();
+	virtual void				_DrawFrame(BRect r);
+	virtual void				_DrawTab(BRect r);
 
-	private:
-		void			_DrawBlendedRect(BRect r, bool down);
-		void			_GetButtonSizeAndOffset(const BRect& tabRect,
-													float* offset, float*size) const;
-		void			_LayoutTabItems(const BRect& tabRect);
+	virtual void				_DrawClose(BRect r);
+	virtual void				_DrawTitle(BRect r);
+	virtual void				_DrawZoom(BRect r);
 
-		RGBColor		fButtonHighColor;
-		RGBColor		fButtonLowColor;
-		RGBColor		fTextColor;
-		RGBColor		fTabColor;
+	virtual void				_SetFocus();
+	virtual void				_SetColors();
 
-		RGBColor*		fFrameColors;
+ private:
+			void				_DrawBlendedRect(BRect r, bool down);
+			void				_GetButtonSizeAndOffset(const BRect& tabRect,
+														float* offset,
+														float*size) const;
+			void				_LayoutTabItems(const BRect& tabRect);
 
-		// Individual rects for handling window frame
-		// rendering the proper way
-		BRect			fRightBorder;
-		BRect			fLeftBorder;
-		BRect			fTopBorder;
-		BRect			fBottomBorder;
-
-		int32			fBorderWidth;
-
-		uint32			fTabOffset;
-		float			fTextOffset;
-
-		float			fMinTabSize;
-		float			fMaxTabSize;
-		BString			fTruncatedTitle;
-		int32			fTruncatedTitleLength;
-
-		bigtime_t		fLastClicked;
-		bool			fWasDoubleClick;
+			RGBColor			fButtonHighColor;
+			RGBColor			fButtonLowColor;
+			RGBColor			fTextColor;
+			RGBColor			fTabColor;
+	
+			RGBColor*			fFrameColors;
+	
+			// Individual rects for handling window frame
+			// rendering the proper way
+			BRect				fRightBorder;
+			BRect				fLeftBorder;
+			BRect				fTopBorder;
+			BRect				fBottomBorder;
+	
+			int32				fBorderWidth;
+	
+			uint32				fTabOffset;
+			float				fTextOffset;
+	
+			float				fMinTabSize;
+			float				fMaxTabSize;
+			BString				fTruncatedTitle;
+			int32				fTruncatedTitleLength;
+	
+			bigtime_t			fLastClicked;
+			bool				fWasDoubleClick;
 };
 
-#endif	/* DEFAULT_DECORATOR_H */
+#endif	// DEFAULT_DECORATOR_H

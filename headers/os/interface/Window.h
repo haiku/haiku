@@ -90,140 +90,172 @@ enum {
 
 class BWindow : public BLooper {
 public:
-						BWindow(BRect frame, const char* title, 
-							window_type type, uint32 flags,
-							uint32 workspace = B_CURRENT_WORKSPACE);
-						BWindow(BRect frame, const char* title, 
-							window_look look, window_feel feel,
-							uint32 flags,
-							uint32 workspace = B_CURRENT_WORKSPACE);
-	virtual				~BWindow();
+								BWindow(BRect frame, const char* title, 
+										window_type type, uint32 flags,
+										uint32 workspace = B_CURRENT_WORKSPACE);
+								BWindow(BRect frame, const char* title, 
+										window_look look, window_feel feel,
+										uint32 flags,
+										uint32 workspace = B_CURRENT_WORKSPACE);
+	virtual						~BWindow();
 
-						BWindow(BMessage* data);
-	static	BArchivable	*Instantiate(BMessage* data);
-	virtual	status_t	Archive(BMessage* data, bool deep = true) const;
+								BWindow(BMessage* data);
 
-	virtual	void		Quit();
-			void		Close() { Quit(); }
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
-			void		AddChild(BView* child, BView* before = NULL);
-			bool		RemoveChild(BView* child);
-			int32		CountChildren() const;
-			BView		*ChildAt(int32 index) const;
+	virtual	void				Quit();
+			void				Close() { Quit(); }
 
-	virtual	void		DispatchMessage(BMessage* message, BHandler* handler);
-	virtual	void		MessageReceived(BMessage* message);
-	virtual	void		FrameMoved(BPoint new_position);
-	virtual void		WorkspacesChanged(uint32 old_ws, uint32 new_ws);
-	virtual void		WorkspaceActivated(int32 ws, bool state);
-	virtual	void		FrameResized(float new_width, float new_height);
-	virtual void		Minimize(bool minimize);
-	virtual void		Zoom(BPoint origin, float width, float height);
-			void		Zoom();
-			void		SetZoomLimits(float maxWidth, float maxHeight);				
-	virtual void		ScreenChanged(BRect screen_size, color_space depth);
-			void		SetPulseRate(bigtime_t rate);
-			bigtime_t	PulseRate() const;
-			void		AddShortcut(uint32 key, uint32 modifiers,
-							BMessage *msg);
-			void		AddShortcut(uint32 key, uint32 modifiers,
-							BMessage *msg, BHandler *target);
-			void		RemoveShortcut(uint32 key, uint32 modifiers);
-			void		SetDefaultButton(BButton* button);
-			BButton		*DefaultButton() const;
-	virtual	void		MenusBeginning();
-	virtual	void		MenusEnded();
-			bool		NeedsUpdate() const;
-			void		UpdateIfNeeded();
-			BView		*FindView(const char *viewName) const;						
-			BView		*FindView(BPoint) const;
-			BView		*CurrentFocus() const;
-			void		Activate(bool = true);
-	virtual	void		WindowActivated(bool state);
+			void				AddChild(BView* child, BView* before = NULL);
+			bool				RemoveChild(BView* child);
+			int32				CountChildren() const;
+			BView*				ChildAt(int32 index) const;
 
-			void		ConvertToScreen(BPoint* pt) const;
-			BPoint		ConvertToScreen(BPoint pt) const;
-			void		ConvertFromScreen(BPoint* pt) const;
-			BPoint		ConvertFromScreen(BPoint pt) const;
-			void		ConvertToScreen(BRect* rect) const;
-			BRect		ConvertToScreen(BRect rect) const;
-			void		ConvertFromScreen(BRect* rect) const;
-			BRect		ConvertFromScreen(BRect rect) const;
+	virtual	void				DispatchMessage(BMessage* message,
+												BHandler* handler);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				FrameMoved(BPoint new_position);
+	virtual void				WorkspacesChanged(uint32 oldWorkspaces,
+												  uint32 newWorkspaces);
+	virtual void				WorkspaceActivated(int32 workspace,
+												   bool state);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual void				Minimize(bool minimize);
+	virtual	void				Zoom(BPoint origin, float width, float height);
+			void				Zoom();
+			void				SetZoomLimits(float maxWidth, float maxHeight);				
+	virtual void				ScreenChanged(BRect screenSize,
+											  color_space format);
 
-			void		MoveBy(float dx, float dy);
-			void		MoveTo(BPoint);
-			void		MoveTo(float x, float y);
-			void		ResizeBy(float dx, float dy);
-			void		ResizeTo(float width, float height);
+			void				SetPulseRate(bigtime_t rate);
+			bigtime_t			PulseRate() const;
 
-	virtual	void		Show();
-	virtual	void		Hide();
-			bool		IsHidden() const;
-			bool		IsMinimized() const;
+			void				AddShortcut(uint32 key, uint32 modifiers,
+											BMessage *message);
+			void				AddShortcut(uint32 key, uint32 modifiers,
+											BMessage *message,
+											BHandler *target);
+			void				RemoveShortcut(uint32 key, uint32 modifiers);
 
-			void		Flush() const;
-			void		Sync() const;
+			void				SetDefaultButton(BButton* button);
+			BButton*			DefaultButton() const;
 
-			status_t	SendBehind(const BWindow* window);
+	virtual	void				MenusBeginning();
+	virtual	void				MenusEnded();
 
-			void		DisableUpdates();
-			void		EnableUpdates();
+			bool				NeedsUpdate() const;
+			void				UpdateIfNeeded();
 
-			void		BeginViewTransaction();	// referred as OpenViewTransaction() in BeBook
-			void		EndViewTransaction();	// referred as CommitViewTransaction() in BeBook
+			BView*				FindView(const char* viewName) const;						
+			BView*				FindView(BPoint) const;
+			BView*				CurrentFocus() const;
 
-			BRect		Bounds() const;
-			BRect		Frame() const;
-			const char	*Title() const;
-			void		SetTitle(const char* title);
-			bool		IsFront() const;
-			bool		IsActive() const;
-			void		SetKeyMenuBar(BMenuBar* bar);
-			BMenuBar	*KeyMenuBar() const;
-			void		SetSizeLimits(float minWidth, float maxWidth,
-							float minHeight, float maxHeight);
-			void		GetSizeLimits(float *minWidth, float *maxWidth, 
-							float *minHeight, float *maxHeight);
-			uint32		Workspaces() const;
-			void		SetWorkspaces(uint32);
-			BView		*LastMouseMovedView() const;
+			void				Activate(bool = true);
+	virtual	void				WindowActivated(bool state);
 
-	virtual BHandler	*ResolveSpecifier(BMessage* msg, int32 index,
-							BMessage* specifier, int32 form, const char* property);
-	virtual status_t	GetSupportedSuites(BMessage* data);
+			void				ConvertToScreen(BPoint* point) const;
+			BPoint				ConvertToScreen(BPoint point) const;
+			void				ConvertFromScreen(BPoint* point) const;
+			BPoint				ConvertFromScreen(BPoint point) const;
+			void				ConvertToScreen(BRect* rect) const;
+			BRect				ConvertToScreen(BRect rect) const;
+			void				ConvertFromScreen(BRect* rect) const;
+			BRect				ConvertFromScreen(BRect rect) const;
 
-			status_t	AddToSubset(BWindow* window);
-			status_t	RemoveFromSubset(BWindow* window);
+			void				MoveBy(float dx, float dy);
+			void				MoveTo(BPoint);
+			void				MoveTo(float x, float y);
+			void				ResizeBy(float dx, float dy);
+			void				ResizeTo(float width, float height);
 
-	virtual status_t	Perform(perform_code d, void* arg);
+	virtual	void				Show();
+	virtual	void				Hide();
+			bool				IsHidden() const;
+			bool				IsMinimized() const;
 
-			status_t	SetType(window_type type);
-			window_type	Type() const;
+			void				Flush() const;
+			void				Sync() const;
 
-			status_t	SetLook(window_look look);
-			window_look	Look() const;
+			status_t			SendBehind(const BWindow* window);
 
-			status_t	SetFeel(window_feel feel);
-			window_feel	Feel() const;
+			void				DisableUpdates();
+			void				EnableUpdates();
 
-			status_t	SetFlags(uint32);
-			uint32		Flags() const;
+			void				BeginViewTransaction();
+								// referred as OpenViewTransaction() in BeBook
+			void				EndViewTransaction();
+								// referred as CommitViewTransaction() in BeBook
 
-			bool		IsModal() const;
-			bool		IsFloating() const;
+			BRect				Bounds() const;
+			BRect				Frame() const;
+			const char*			Title() const;
+			void				SetTitle(const char* title);
+			bool				IsFront() const;
+			bool				IsActive() const;
 
-			status_t	SetWindowAlignment(window_alignment mode, int32 h,
-							int32 hOffset = 0, int32 width = 0, int32 widthOffset = 0,
-							int32 v = 0, int32 vOffset = 0, int32 height = 0,
-							int32 heightOffset = 0);
-			status_t	GetWindowAlignment(window_alignment* mode = NULL,
-							int32* h = NULL, int32* hOffset = NULL, 
-							int32* width = NULL, int32* widthOffset = NULL,
-							int32* v = NULL, int32* vOffset = NULL,
-							int32* height = NULL, int32* heightOffset = NULL) const;
+			void				SetKeyMenuBar(BMenuBar* bar);
+			BMenuBar*			KeyMenuBar() const;
 
-	virtual	bool		QuitRequested();
-	virtual thread_id	Run();
+			void				SetSizeLimits(float minWidth, float maxWidth,
+											  float minHeight, float maxHeight);
+			void				GetSizeLimits(float* minWidth, float* maxWidth, 
+											  float* minHeight, float* maxHeight);
+
+			status_t			SetDecoratorSettings(const BMessage& settings);
+			status_t			GetDecoratorSettings(BMessage* settings);
+
+			uint32				Workspaces() const;
+			void				SetWorkspaces(uint32);
+
+			BView*				LastMouseMovedView() const;
+
+	virtual BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+												 BMessage* specifier, int32 form,
+												 const char* property);
+	virtual status_t			GetSupportedSuites(BMessage* data);
+
+			status_t			AddToSubset(BWindow* window);
+			status_t			RemoveFromSubset(BWindow* window);
+
+	virtual status_t			Perform(perform_code d, void* arg);
+
+			status_t			SetType(window_type type);
+			window_type			Type() const;
+
+			status_t			SetLook(window_look look);
+			window_look			Look() const;
+
+			status_t			SetFeel(window_feel feel);
+			window_feel			Feel() const;
+
+			status_t			SetFlags(uint32);
+			uint32				Flags() const;
+
+			bool				IsModal() const;
+			bool				IsFloating() const;
+
+			status_t			SetWindowAlignment(window_alignment mode,
+												   int32 h,
+												   int32 hOffset = 0,
+												   int32 width = 0,
+												   int32 widthOffset = 0,
+												   int32 v = 0,
+												   int32 vOffset = 0,
+												   int32 height = 0,
+												   int32 heightOffset = 0);
+			status_t			GetWindowAlignment(window_alignment* mode = NULL,
+												   int32* h = NULL,
+												   int32* hOffset = NULL,
+												   int32* width = NULL,
+												   int32* widthOffset = NULL,
+												   int32* v = NULL,
+												   int32* vOffset = NULL,
+												   int32* height = NULL,
+												   int32* heightOffset = NULL) const;
+
+	virtual	bool				QuitRequested();
+	virtual thread_id			Run();
 
 private:
 	typedef BLooper inherited;
@@ -241,108 +273,115 @@ private:
 	friend class BHandler;
 	friend class _BEventMask;
 	friend void _set_menu_sem_(BWindow* w, sem_id sem);
-	friend status_t _safe_get_server_token_(const BLooper* , int32* );
+	friend status_t _safe_get_server_token_(const BLooper*, int32*);
 
-	virtual	void		_ReservedWindow1();
-	virtual	void		_ReservedWindow2();
-	virtual	void		_ReservedWindow3();
-	virtual	void		_ReservedWindow4();
-	virtual	void		_ReservedWindow5();
-	virtual	void		_ReservedWindow6();
-	virtual	void		_ReservedWindow7();
-	virtual	void		_ReservedWindow8();
+	virtual	void				_ReservedWindow1();
+	virtual	void				_ReservedWindow2();
+	virtual	void				_ReservedWindow3();
+	virtual	void				_ReservedWindow4();
+	virtual	void				_ReservedWindow5();
+	virtual	void				_ReservedWindow6();
+	virtual	void				_ReservedWindow7();
+	virtual	void				_ReservedWindow8();
 
-						BWindow();
-						BWindow(BWindow&);
-			BWindow		&operator=(BWindow&);
+								BWindow();
+								BWindow(BWindow&);
+			BWindow&			operator=(BWindow&);
 
-						BWindow(BRect frame, int32 bitmapToken);
-			void		_InitData(BRect frame, const char* title,
-								window_look look, window_feel feel,
-								uint32 flags, uint32 workspace,
-								int32 bitmapToken = -1);
-			void		BitmapClose();						// to be implemented
-	virtual	void		task_looper();
+								BWindow(BRect frame, int32 bitmapToken);
+			void				_InitData(BRect frame, const char* title,
+										  window_look look, window_feel feel,
+										  uint32 flags, uint32 workspace,
+										  int32 bitmapToken = -1);
 
-	virtual BMessage	*ConvertToMessage(void* raw, int32 code);
+			void				BitmapClose(); // to be implemented
+	virtual	void				task_looper();
 
-			void		AddShortcut(uint32 key, uint32 modifiers,
-							BMenuItem* item);
-			BHandler*	_DetermineTarget(BMessage* message, BHandler* target);
-			bool		_UnpackMessage(unpack_cookie& state, BMessage** _message,
-							BHandler** _target, bool* _usePreferred);
-			void		_SanitizeMessage(BMessage* message, BHandler* target,
-							bool usePreferred);
+	virtual BMessage*			ConvertToMessage(void* raw, int32 code);
 
-			bool		InUpdate();
-			void		_DequeueAll();
-			window_type	_ComposeType(window_look look,
-									 window_feel feel) const;
-			void		_DecomposeType(window_type type,
-									   window_look* look,
-									   window_feel* feel) const;
+			void				AddShortcut(uint32 key, uint32 modifiers,
+											BMenuItem* item);
+			BHandler*			_DetermineTarget(BMessage* message,
+												 BHandler* target);
+			bool				_UnpackMessage(unpack_cookie& state,
+											   BMessage** _message,
+											   BHandler** _target,
+											   bool* _usePreferred);
+			void				_SanitizeMessage(BMessage* message,
+												 BHandler* target,
+												 bool usePreferred);
 
-			void		SetIsFilePanel(bool yes);
-			bool		IsFilePanel() const;
+			bool				InUpdate();
+			void				_DequeueAll();
+			window_type			_ComposeType(window_look look,
+											 window_feel feel) const;
+			void				_DecomposeType(window_type type,
+											   window_look* look,
+											   window_feel* feel) const;
 
-			void		_CreateTopView();
-			void		_AdoptResize();
-			void		_SetFocus(BView *focusView, bool notifyIputServer = false);
+			void				SetIsFilePanel(bool yes);
+			bool				IsFilePanel() const;
 
-			Shortcut*	_FindShortcut(uint32 key, uint32 modifiers);
-			BView*		_FindView(BView* view, BPoint point) const;
-			BView*		_FindView(int32 token);
-			BView*		_LastViewChild(BView *parent);
+			void				_CreateTopView();
+			void				_AdoptResize();
+			void				_SetFocus(BView* focusView,
+										  bool notifyIputServer = false);
 
-			BView*		_FindNextNavigable(BView *focus, uint32 flags);
-			BView*		_FindPreviousNavigable(BView *focus, uint32 flags);
-			bool		_HandleKeyDown(char key, uint32 modifiers);
-			void		_KeyboardNavigation();
+			Shortcut*			_FindShortcut(uint32 key, uint32 modifiers);
+			BView*				_FindView(BView* view, BPoint point) const;
+			BView*				_FindView(int32 token);
+			BView*				_LastViewChild(BView* parent);
+
+			BView*				_FindNextNavigable(BView *focus, uint32 flags);
+			BView*				_FindPreviousNavigable(BView *focus,
+													   uint32 flags);
+			bool				_HandleKeyDown(char key, uint32 modifiers);
+			void				_KeyboardNavigation();
 
 			// Debug (TODO: to be removed)
-			void		PrintToStream() const;
+			void				PrintToStream() const;
 
 private:
-	char			*fTitle;
-	int32			server_token;				// not yet used
-	bool			fInTransaction;
-	bool			fActive;
-	short			fShowLevel;
-	uint32			fFlags;
-
-	BView			*fTopView;
-	BView			*fFocus;
-	BView			*fLastMouseMovedView;
-	uint32			_unused1;
-	BMenuBar		*fKeyMenuBar;
-	BButton			*fDefaultButton;
-	BList			fShortcuts;
-	int32			fTopViewToken;
-	bool			_unused2;					// was fPulseEnabled
-	bool			fViewsNeedPulse;			// not yet used
-	bool			fIsFilePanel;				
-	bool			fMaskActivated;
-	bigtime_t		fPulseRate;
-	bool			fWaitingForMenu;
-	bool			fMinimized;
-	bool			fNoQuitShortcut;
-	bool			_unused3;
-	sem_id			fMenuSem;
-	float			fMaxZoomHeight;
-	float			fMaxZoomWidth;
-	float			fMinHeight;
-	float			fMinWidth;
-	float			fMaxHeight;
-	float			fMaxWidth;
-	BRect			fFrame;
-	window_look		fLook;
-	window_feel		fFeel;
-	int32			fLastViewToken;
-	BPrivate::PortLink	*fLink;
-	BMessageRunner	*fPulseRunner;
-	BRect			fPreviousFrame;
-
-	uint32			_reserved[9];
+			char*				fTitle;
+			int32				server_token;				// not yet used
+			bool				fInTransaction;
+			bool				fActive;
+			short				fShowLevel;
+			uint32				fFlags;
+		
+			BView*				fTopView;
+			BView*				fFocus;
+			BView*				fLastMouseMovedView;
+			uint32				_unused1;
+			BMenuBar*			fKeyMenuBar;
+			BButton*			fDefaultButton;
+			BList				fShortcuts;
+			int32				fTopViewToken;
+			bool				_unused2;					// was fPulseEnabled
+			bool				fViewsNeedPulse;			// not yet used
+			bool				fIsFilePanel;				
+			bool				fMaskActivated;
+			bigtime_t			fPulseRate;
+			bool				fWaitingForMenu;
+			bool				fMinimized;
+			bool				fNoQuitShortcut;
+			bool				_unused3;
+			sem_id				fMenuSem;
+			float				fMaxZoomHeight;
+			float				fMaxZoomWidth;
+			float				fMinHeight;
+			float				fMinWidth;
+			float				fMaxHeight;
+			float				fMaxWidth;
+			BRect				fFrame;
+			window_look			fLook;
+			window_feel			fFeel;
+			int32				fLastViewToken;
+			BPrivate::PortLink*	fLink;
+			BMessageRunner*		fPulseRunner;
+			BRect				fPreviousFrame;
+		
+			uint32				_reserved[9];
 };
 
 #endif	// _WINDOW_H 
