@@ -1,11 +1,15 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <Drivers.h>
 #include <string.h>
+
 
 #define DEVICE_NAME "null"
 
@@ -42,14 +46,15 @@ null_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 
 static status_t
-null_read(void *cookie, off_t pos, void *buffer, size_t *length)
+null_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
+	*_length = 0;
 	return B_OK;
 }
 
 
 static status_t
-null_write(void * cookie, off_t pos, const void *buf, size_t *len)
+null_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	return B_OK;
 }
@@ -87,13 +92,6 @@ find_device(const char *name)
 		&null_ioctl,
 		&null_read,
 		&null_write,
-		/* Leave select/deselect/readv/writev undefined. The kernel will
-		 * use its own default implementation. The basic hooks above this
-		 * line MUST be defined, however. */
-		NULL,
-		NULL,
-		NULL,
-		NULL
 	};
 
 	if (!strcmp(name, DEVICE_NAME))
