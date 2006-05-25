@@ -6682,6 +6682,8 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName,
 {
 	char name[B_FILE_NAME_LENGTH];
 
+	if (userName == NULL || device < 0 || inode < 0)
+		return B_BAD_VALUE;
 	if (!IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
 		return B_BAD_ADDRESS;
