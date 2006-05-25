@@ -44,6 +44,7 @@ struct standard_args {
 
 struct standard_args standard_args[] = {
 	{ "-h", "--help", 90, 0, NULL },
+	{ "-f", "--fullscreen", 30, 0, NULL },
 	{ "-p", "--preference", 80, 1, NULL },
 	{ "-t", "--title", 70, 1, NULL },
 	{ "-geom", "--geometry", 50, 1, NULL },
@@ -152,6 +153,9 @@ TermApp::ReadyToRun()
 	}
 
 	MakeTermWindow(fTermFrame);
+	// using BScreen::Frame isn't enough
+	if (fStartFullscreen)
+		BMessenger(fTermWindow).SendMessage(FULLSCREEN);
 }
 
 
@@ -242,6 +246,10 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		usage_requested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
+
+	// Start fullscreen
+	if (argmatch(argv, argc, "-f", "--fullscreen", 4, NULL, &skip_args))
+		fStartFullscreen = true;
 
 	// Load preference file
 	if (argmatch(argv, argc, "-p", "--preference", 4, &value, &skip_args))
