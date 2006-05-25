@@ -1910,6 +1910,12 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 			B_RELATIVE_TIMEOUT, timeout);
 	} while (result == B_INTERRUPTED);
 
+	if (result == B_OK && IsSourceWaiting()) {
+		// the forwarded message will handle the reply - we must not do
+		// this anymore
+		fHeader->flags |= MESSAGE_FLAG_REPLY_DONE;
+	}
+
 	free(buffer);
 	return result;
 }
@@ -1919,6 +1925,12 @@ status_t
 BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	BMessage *reply, bigtime_t sendTimeout, bigtime_t replyTimeout) const
 {
+	if (IsSourceWaiting()) {
+		// we can't forward this message synchronously when it's already
+		// waiting for a reply
+		return B_ERROR;
+	}
+
 	DEBUG_FUNCTION_ENTER;
 	const int32 cachedReplyPort = _StaticGetCachedReplyPort();
 	port_id replyPort = B_BAD_PORT_ID;
@@ -1950,12 +1962,19 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	if (result < B_OK)
 		goto error;
 
+	// tests if the queue of the reply port is really empty
+#if 0
+	port_info portInfo;
+	if (get_port_info(replyPort, &portInfo) == B_OK
+		&& portInfo.queue_count > 0)
+		debugger("reply port not empty!");
+#endif
+
 	{
-		BMessenger messenger;
-		BMessenger::Private(messenger).SetTo(team, replyPort,
+		BMessenger replyTarget;
+		BMessenger::Private(replyTarget).SetTo(team, replyPort,
 			B_PREFERRED_TOKEN);
-		result = _SendMessage(port, token, sendTimeout, true,
-			messenger);
+		result = _SendMessage(port, token, sendTimeout, true, replyTarget);
 	}
 
 	if (result < B_OK)
@@ -2022,7 +2041,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 
 static status_t
-handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
+handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
 	BMessage *reply)
 {
 	DEBUG_FUNCTION_ENTER2;
@@ -2037,12 +2056,12 @@ handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
 	status_t result;
 	char *buffer = (char *)malloc(size);
 	do {
-		result = read_port(replyPort, pCode, buffer, size);
+		result = read_port(replyPort, _code, buffer, size);
 	} while (result == B_INTERRUPTED);
 
-	if (result < B_OK || *pCode != kPortMessageCode) {
+	if (result < B_OK || *_code != kPortMessageCode) {
 		free(buffer);
-		return (result < B_OK ? result : B_ERROR);
+		return result < B_OK ? result : B_ERROR;
 	}
 
 	result = reply->Unflatten(buffer);

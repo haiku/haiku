@@ -385,15 +385,16 @@ status_t
 BMessenger::SendMessage(BMessage *message, BMessage *reply,
 	bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
 {
-	status_t error = (message && reply ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		error = BMessage::Private(message).SendMessage(fPort, fTeam,
-			fHandlerToken, reply, deliveryTimeout, replyTimeout);
+	if (message == NULL || reply == NULL)
+		return B_BAD_VALUE;
 
-		// Map this error for now:
-		if (error == B_BAD_TEAM_ID)
-			error = B_BAD_PORT_ID;
-	}
+	status_t error = BMessage::Private(message).SendMessage(fPort, fTeam,
+		fHandlerToken, reply, deliveryTimeout, replyTimeout);
+
+	// Map this error for now:
+	if (error == B_BAD_TEAM_ID)
+		error = B_BAD_PORT_ID;
+
 	return error;
 }
 
