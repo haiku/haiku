@@ -154,6 +154,7 @@ BPositionIO::GetSize(off_t* size) const
 
 
 // FBC
+extern "C" void _ReservedPositionIO1__11BPositionIO() {}
 void BPositionIO::_ReservedPositionIO2(){}
 void BPositionIO::_ReservedPositionIO3(){}
 void BPositionIO::_ReservedPositionIO4(){}
