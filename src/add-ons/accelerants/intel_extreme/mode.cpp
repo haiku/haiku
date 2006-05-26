@@ -105,7 +105,9 @@ create_mode_list(void)
 void
 wait_for_vblank(void)
 {
-	acquire_sem(gInfo->shared_info->vblank_sem);
+	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT, 25000);
+		// With the output turned off via DPMS, we might not get any interrupts anymore
+		// that's why we don't wait forever for it.
 }
 
 
