@@ -110,8 +110,8 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	// Large Icon
 	BBitmap largeIcon(BRect(0, 0, 31, 31), B_BITMAP_NO_SERVER_LINK, B_CMAP8);
 	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kLargeIconAttr, &info) != B_OK)) {
-		if (appInfo.GetIcon(&miniIcon, B_LARGE_ICON) == B_OK)
-			status = mime.SetIcon(&miniIcon, B_LARGE_ICON);
+		if (appInfo.GetIcon(&largeIcon, B_LARGE_ICON) == B_OK)
+			status = mime.SetIcon(&largeIcon, B_LARGE_ICON);
 	}
 
 	// Supported Types
