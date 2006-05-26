@@ -49,6 +49,8 @@ All rights reserved.
 #include "PoseView.h"
 #include "Utilities.h"
 
+#define APP_SERVER_CLEARS_BACKGROUND 1
+
 static rgb_color sTitleBackground;
 static rgb_color sDarkTitleBackground;
 static rgb_color sShineColor;
@@ -114,8 +116,11 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 
 	SetHighColor(sTitleBackground);
 	SetLowColor(sTitleBackground);
+#if APP_SERVER_CLEARS_BACKGROUND
 	SetViewColor(sTitleBackground);
-//SetViewColor(B_TRANSPARENT_COLOR);
+#else
+	SetViewColor(B_TRANSPARENT_COLOR);
+#endif
 
 	BFont font(be_plain_font);
 	font.SetSize(9);
@@ -251,8 +256,10 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 				  BPoint(maxx, bounds.bottom), sShineColor);
 	view->EndLineArray();
 
+#if !(APP_SERVER_CLEARS_BACKGROUND)
 	FillRect(BRect(bounds.left, bounds.top + 1, minx - 1, bounds.bottom - 1), B_SOLID_LOW);
 	FillRect(BRect(maxx + 1, bounds.top + 1, bounds.right, bounds.bottom - 1), B_SOLID_LOW);
+#endif
 
 	if (useOffscreen) {
 		if (trackRectBlitter)
