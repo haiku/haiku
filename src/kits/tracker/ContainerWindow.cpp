@@ -3313,19 +3313,33 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode *node)
 	}
 	
 	BRect frame(Frame());
-	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame) == sizeof(BRect)) {	
+	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame) == sizeof(BRect)) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	} else
 		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
 
 	uint32 workspace;
-	if (node->Read(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32), &workspace) == sizeof(uint32)
-		&& (fContainerWindowFlags & kRestoreWorkspace))
+	if ((fContainerWindowFlags & kRestoreWorkspace)
+		&& node->Read(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32), &workspace) == sizeof(uint32))
 		SetWorkspaces(workspace);
 
 	if (fContainerWindowFlags & kIsHidden)
 		Minimize(true);
+
+#if __HAIKU__
+	// restore window decor settings
+	int32 size = node->Contains(kAttrWindowDecor, B_RAW_TYPE);
+	if (size > 0) {
+		char buffer[size];
+		if ((fContainerWindowFlags & kRestoreDecor)
+			&& node->Read(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer) == size) {
+			BMessage decorSettings;
+			if (decorSettings.Unflatten(buffer) == B_OK)
+				SetDecoratorSettings(decorSettings);
+		}
+	}
+#endif // __HAIKU__
 }
 
 
@@ -3354,12 +3368,21 @@ BContainerWindow::RestoreWindowState(const BMessage &message)
 		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
 
 	uint32 workspace;
-	
-	if (message.FindInt32(workspaceAttributeName, (int32 *)&workspace) == B_OK
-		&& (fContainerWindowFlags & kRestoreWorkspace)) 
+	if ((fContainerWindowFlags & kRestoreWorkspace)
+		&& message.FindInt32(workspaceAttributeName, (int32 *)&workspace) == B_OK) 
 		SetWorkspaces(workspace);
+
 	if (fContainerWindowFlags & kIsHidden)
 		Minimize(true);
+
+#if __HAIKU__
+	// restore window decor settings
+	BMessage decorSettings;
+	if ((fContainerWindowFlags & kRestoreDecor)
+		&& message.FindMessage(kAttrWindowDecor, &decorSettings) == B_OK) {
+		SetDecoratorSettings(decorSettings);
+	}
+#endif // __HAIKU__
 }
 
 
@@ -3380,9 +3403,21 @@ BContainerWindow::SaveWindowState(AttributeStreamNode *node)
 	// node is null if it already got deleted
 	BRect frame(Frame());
 	node->Write(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame);
+
 	uint32 workspaces = Workspaces();
 	node->Write(workspaceAttributeName, 0, B_INT32_TYPE, sizeof(uint32),
 		&workspaces);
+
+#if __HAIKU__
+	BMessage decorSettings;
+	if (GetDecoratorSettings(&decorSettings) == B_OK) {
+		int32 size = decorSettings.FlattenedSize();
+		char buffer[size];
+		if (decorSettings.Flatten(buffer, size) == B_OK) {
+			node->Write(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer);
+		}
+	}
+#endif // __HAIKU__
 }
 
 
@@ -3404,6 +3439,13 @@ BContainerWindow::SaveWindowState(BMessage &message) const
 	BRect frame(Frame());
 	message.AddRect(rectAttributeName, frame);
 	message.AddInt32(workspaceAttributeName, (int32)Workspaces());
+
+#if __HAIKU__
+	BMessage decorSettings;
+	if (GetDecoratorSettings(&decorSettings) == B_OK) {
+		message.AddMessage(kAttrWindowDecor, &decorSettings);
+	}
+#endif // __HAIKU__
 }
 
 

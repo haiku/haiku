@@ -66,9 +66,10 @@ const window_look kPrivateDesktopWindowLook = window_look(4);
 
 enum {
 	// flags that describe opening of the window
-	kRestoreWorkspace = 0x1,
-	kIsHidden		  = 0x2
+	kRestoreWorkspace	= 0x1,
+	kIsHidden			= 0x2,
 		// set when opening a window during initial Tracker start
+	kRestoreDecor		= 0x4
 };
 
 class BContainerWindow : public BWindow {

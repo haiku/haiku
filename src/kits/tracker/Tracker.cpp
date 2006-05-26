@@ -689,7 +689,7 @@ TTracker::OpenRef(const entry_ref *ref, const node_ref *nodeToClose,
 
 	if (openAsContainer || selector == kRunOpenWithWindow) {
 		// special case opening plain folders, queries or using open with
-		OpenContainerWindow(model, 0, selector);	// window adopts model
+		OpenContainerWindow(model, 0, selector, kRestoreDecor);	// window adopts model
 		if (nodeToClose)
 			CloseParentWaitingForChildSoon(ref, nodeToClose);
 	} else if (model->IsQueryTemplate()) {
@@ -1264,11 +1264,11 @@ TTracker::ReadyToRun()
 
 								if (restoreStateFromMessage)
 									OpenContainerWindow(model, 0, kOpen, 
-										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U),
+										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U) | kRestoreDecor,
 										false, &state);
 								else
 									OpenContainerWindow(model, 0, kOpen, 
-										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U));
+										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U) | kRestoreDecor);
 							} else
 								delete model;
 						}
