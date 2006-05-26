@@ -1236,8 +1236,10 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		ulong buttons;
-		GetMouse(&location, &buttons, true);
+		GetMouse(&location, &buttons, false);
+			// Get the current mouse state
 		
+		Window()->UpdateIfNeeded();
 		BPoint screenLocation = ConvertToScreen(location);
 		item = HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
@@ -1355,6 +1357,10 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		item->Install(window);
 
 	item->SetSuper(this);
+
+	// TODO: Sometimes the menu layout isn't invalidated correctly,
+	// So we force a rebuild of the whole menu layout. Remove this!
+	InvalidateLayout();
 
 	return true;
 }
@@ -1927,6 +1933,15 @@ BMenu::SetStickyMode(bool on)
 {
 	fStickyMode = on;
 	
+	// TODO: Ugly hack, but it needs to be done right here in this method
+	BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this);
+	if (on && menuBar != NULL && menuBar->LockLooper()) {
+		// Steal the focus from the current focus view
+		// (needed to handle keyboard navigation)
+		menuBar->StealFocus();
+		menuBar->UnlockLooper();
+	}
+
 	// If we are switching to sticky mode, propagate the status
 	// back to the super menu
 	if (on && fSuper != NULL)

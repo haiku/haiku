@@ -399,7 +399,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 		BPoint where;
 		ulong buttons;
-		GetMouse(&where, &buttons, true);
+		GetMouse(&where, &buttons, false);
+			// Get the current mouse state
+		window->UpdateIfNeeded();
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
 			// Select item if:
@@ -468,6 +470,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			SelectItem(NULL);
 		if (resultItem != NULL)
 			resultItem->Invoke();
+		RestoreFocus();
 		window->Unlock();
 	}
 
