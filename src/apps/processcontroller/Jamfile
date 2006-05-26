@@ -3,7 +3,6 @@ SubDir HAIKU_TOP src apps processcontroller ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application ProcessController :
-	AboutPC.cpp
 	AutoIcon.cpp
 	IconMenuItem.cpp
 	KernelMemoryBarMenuItem.cpp

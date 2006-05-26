@@ -1,9 +1,7 @@
 /*
-
 	PCView.h
 
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,45 +17,48 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _PCVIEW_H_
 #define _PCVIEW_H_
 
-#include <View.h>
+
 #include "AutoIcon.h"
 
-class BMessageRunner;
+#include <View.h>
 
+
+class BMessageRunner;
 class ThreadBarMenu;
 
+
 class _EXPORT ProcessController : public BView {
+	public:
+						ProcessController(BRect frame, bool temp = false);
+						ProcessController(BMessage *data);
+						ProcessController();
+		virtual			~ProcessController();
 
-public:
-					ProcessController(BRect frame, bool temp=false);
-					ProcessController(BMessage *data);
-					ProcessController();
-virtual				~ProcessController();
-virtual	void		MessageReceived(BMessage *message);
-virtual	void		AttachedToWindow();
-virtual	void		MouseDown(BPoint where);
-virtual	void		Draw(BRect updateRect);
-		void		DoDraw (bool force);
-static	ProcessController	*Instantiate(BMessage *data);
-virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+		virtual	void	MessageReceived(BMessage *message);
+		virtual	void	AttachedToWindow();
+		virtual	void	MouseDown(BPoint where);
+		virtual	void	Draw(BRect updateRect);
+				void	DoDraw (bool force);
+		static	ProcessController* Instantiate(BMessage* data);
+		virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
-		void		Update ();
-		void		DefaultColors ();
-		
-		AutoIcon	fProcessControllerIcon;
-		AutoIcon	fProcessorIcon;
-		AutoIcon	fTrackerIcon;
-		AutoIcon	fDeskbarIcon;
-		AutoIcon	fTerminalIcon;
+		void			AboutRequested();
+		void			Update();
+		void			DefaultColors();
 
-private:
-		void		Init();
+		// TODO: move those into private, and have getter methods
+		AutoIcon		fProcessControllerIcon;
+		AutoIcon		fProcessorIcon;
+		AutoIcon		fTrackerIcon;
+		AutoIcon		fDeskbarIcon;
+		AutoIcon		fTerminalIcon;
+
+	private:
+		void			Init();
 
 		bool			fTemp;
 		float			fMemoryUsage;
@@ -66,7 +67,7 @@ private:
 		double			fCPUTimes[B_MAX_CPU_COUNT];
 		bigtime_t		fPrevActive[B_MAX_CPU_COUNT];
 		bigtime_t		fPrevTime;
-		BMessageRunner	*fMessageRunner;
+		BMessageRunner*	fMessageRunner;
 		rgb_color		frame_color, active_color, idle_color, memory_color, swap_color;
 };
 

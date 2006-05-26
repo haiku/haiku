@@ -2,7 +2,8 @@
 	PCView.cpp
 
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
+	Copyright (c) 2006 Haiku, Inc. All Rights Reserved.
 
 	This library is free software; you can redistribute it and/or 
 	modify it under the terms of the GNU Lesser General Public 
@@ -22,7 +23,6 @@
 #include "PCView.h"
 #include "IconMenuItem.h"
 #include "PCWorld.h"
-#include "AboutPC.h"
 #include "Preferences.h"
 #include "PCUtils.h"
 #include "Colors.h"
@@ -37,6 +37,7 @@
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <TextView.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,25 +53,25 @@ const char* kActiveColorPref = "deskbar_active_color";
 
 const char* kPuseSettings = "Pulse_settings";
 
-const rgb_color kKernelBlue =	{20, 20, 231,	255};
+const rgb_color kKernelBlue = {20, 20, 231,	255};
 const rgb_color kIdleGreen = {110, 190,110,	255};
 
-ProcessController*	gPCView;
-int32				gCPUcount;
-rgb_color 			gUserColor;
-rgb_color 			gUserColorSelected;
-rgb_color 			gIdleColor;
-rgb_color 			gIdleColorSelected;
-rgb_color 			gKernelColor;
-rgb_color 			gKernelColorSelected;
-rgb_color			gFrameColor;
-rgb_color			gFrameColorSelected;
-rgb_color			gMenuBackColorSelected;
-rgb_color			gMenuBackColor;
-rgb_color			gWhiteSelected;
-ThreadBarMenu*		gCurrentThreadBarMenu;
-bool				gInDeskbar = false;
-int32				gMimicPulse = 0;
+ProcessController* gPCView;
+int32 gCPUcount;
+rgb_color gUserColor;
+rgb_color gUserColorSelected;
+rgb_color gIdleColor;
+rgb_color gIdleColorSelected;
+rgb_color gKernelColor;
+rgb_color gKernelColorSelected;
+rgb_color gFrameColor;
+rgb_color gFrameColorSelected;
+rgb_color gMenuBackColorSelected;
+rgb_color gMenuBackColor;
+rgb_color gWhiteSelected;
+ThreadBarMenu* gCurrentThreadBarMenu;
+bool gInDeskbar = false;
+int32 gMimicPulse = 0;
 
 #define DEBUG_THREADS 1
 
@@ -319,12 +320,33 @@ ProcessController::MessageReceived(BMessage *message)
 		}
 
 		case B_ABOUT_REQUESTED:
-			new AboutPC(BScreen().Frame());
+			AboutRequested();
 			break;
 
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+ProcessController::AboutRequested()
+{
+	BAlert *alert = new BAlert("about", "ProcessController\n"
+		"\tCopyright 1997-2001,\n"
+		"\t\tGeorges-Edouard Berenger.\n\n"
+		"\tCopyright 2006, Haiku, Inc.\n\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE); 			
+	view->SetFontAndColor(0, 17, &font);
+
+	alert->Go();
 }
 
 
