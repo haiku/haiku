@@ -84,6 +84,8 @@ make_blend_color(rgb_color colorA, rgb_color colorB, float position)
 DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	: Decorator(settings, rect, look, flags),
+	fTabOffset(0),
+	fTabLocation(0.0),
 	fLastClicked(0)
 {
 	DefaultDecorator::SetLook(settings, look);
@@ -306,11 +308,25 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 	// resize tab and layout tab items
 	if (_tabrect.IsValid()) {
+		BRect oldTabRect(_tabrect);
+
 		float tabSize;
-		if (fLook != kLeftTitledWindowLook)
+		float maxLocation;
+		if (fLook != kLeftTitledWindowLook) {
 			tabSize = fRightBorder.right - fLeftBorder.left;
-		else
+			maxLocation = tabSize - _tabrect.Width();
+		} else {
 			tabSize = fBottomBorder.bottom - fTopBorder.top;
+			maxLocation = tabSize - _tabrect.Height();
+		}
+
+		float tabOffset = floorf(fTabLocation * maxLocation);
+		float delta = tabOffset - fTabOffset;
+		fTabOffset = (uint32)tabOffset;
+		if (fLook != kLeftTitledWindowLook)
+			_tabrect.OffsetBy(delta, 0.0);
+		else
+			_tabrect.OffsetBy(0.0, delta);
 
 		if (tabSize < fMinTabSize)
 			tabSize = fMinTabSize;
@@ -318,21 +334,29 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 			tabSize = fMaxTabSize;
 
 		if (fLook != kLeftTitledWindowLook && tabSize != _tabrect.Width()) {
-			// NOTE: the tab rect becoming smaller is handled
-			// by the Desktop anyways, so it is sufficient
-			// to include it into the dirty region in it's
-			// final state only once at the end
 			_tabrect.right = _tabrect.left + tabSize;
-			_LayoutTabItems(_tabrect);
-
-			if (dirty)
-				dirty->Include(_tabrect);
 		} else if (fLook == kLeftTitledWindowLook && tabSize != _tabrect.Height()) {
 			_tabrect.bottom = _tabrect.top + tabSize;
+		}
+
+		if (oldTabRect != _tabrect) {
 			_LayoutTabItems(_tabrect);
 
-			if (dirty)
-				dirty->Include(_tabrect);
+			if (dirty) {
+				// NOTE: the tab rect becoming smaller only would
+				// handled be the Desktop anyways, so it is sufficient
+				// to include it into the dirty region in it's
+				// final state
+				BRect redraw(_tabrect);
+				if (delta != 0.0) {
+					redraw = redraw | oldTabRect;
+					if (fLook != kLeftTitledWindowLook)
+						redraw.bottom++;
+					else
+						redraw.right++;
+				}
+				dirty->Include(redraw);
+			}
 		}
 	}
 }
@@ -347,8 +371,10 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 
 	if (location < 0)
 		location = 0;
-	if (location > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
-		location = (fRightBorder.right - fLeftBorder.left - _tabrect.Width());
+
+	float maxLocation = fRightBorder.right - fLeftBorder.left - _tabrect.Width();
+	if (location > maxLocation)
+		location = maxLocation;
 
 	float delta = location - fTabOffset;
 	if (delta == 0.0)
@@ -358,9 +384,13 @@ DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
 	BRect trect(_tabrect);
 	trect.bottom++;
 	updateRegion->Include(trect);
+
 	_tabrect.OffsetBy(delta, 0);
 	fTabOffset = (int32)location;
 	_LayoutTabItems(_tabrect);
+
+	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
+
 	// redraw new rect as well
 	trect = _tabrect;
 	trect.bottom++;
@@ -570,8 +600,6 @@ DefaultDecorator::_DoLayout()
 
 	// calculate our tab rect
 	if (hasTab) {
-		// tab is initially on the left
-		fTabOffset = 0;
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
 		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
@@ -628,7 +656,6 @@ DefaultDecorator::_DoLayout()
 		else
 			_tabrect.bottom = _tabrect.top + tabSize;
 
-		_LayoutTabItems(_tabrect);
 	} else {
 		// no tab
 		fMinTabSize = 0.0;
@@ -664,6 +691,19 @@ DefaultDecorator::_DoLayout()
 	// calculate resize rect
 	_resizerect.Set(fBottomBorder.right - 18.0, fBottomBorder.bottom - 18.0,
 					fBottomBorder.right, fBottomBorder.bottom);
+
+	if (hasTab) {
+		// make sure fTabOffset is within limits and apply it to
+		// the _tabrect
+		if (fTabOffset < 0)
+			fTabOffset = 0;
+		if (fTabOffset > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
+			fTabOffset = (fRightBorder.right - fLeftBorder.left - _tabrect.Width());
+		_tabrect.OffsetBy(fTabOffset, 0);
+
+		// finally, layout the buttons and text within the tab rect
+		_LayoutTabItems(_tabrect);
+	}
 }
 
 // _DrawFrame

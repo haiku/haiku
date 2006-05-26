@@ -94,6 +94,7 @@ class DefaultDecorator: public Decorator {
 			int32				fBorderWidth;
 	
 			uint32				fTabOffset;
+			float				fTabLocation;
 			float				fTextOffset;
 	
 			float				fMinTabSize;
