@@ -41,6 +41,7 @@ All rights reserved.
 #include <PopUpMenu.h>
 #include <Window.h>
 
+#include <stdio.h>
 #include <string.h>
 
 #include "Commands.h"
@@ -114,6 +115,7 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 	SetHighColor(sTitleBackground);
 	SetLowColor(sTitleBackground);
 	SetViewColor(sTitleBackground);
+//SetViewColor(B_TRANSPARENT_COLOR);
 
 	BFont font(be_plain_font);
 	font.SetSize(9);
@@ -240,15 +242,18 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 	}
 
 	// first and last shades before and after first column
-	BRect tmp(bounds);
-	tmp.right = maxx;
-	tmp.left = minx;
-	tmp.InsetBy(-1, 0);
+	maxx++;
+	minx--;
 	view->BeginLineArray(2);
-	view->AddLine(tmp.LeftTop(), tmp.LeftBottom(), sShadowColor);
-	view->AddLine(tmp.RightTop(), tmp.RightBottom(), sShineColor);
+	view->AddLine(BPoint(minx, bounds.top),
+				  BPoint(minx, bounds.bottom), sShadowColor);
+	view->AddLine(BPoint(maxx, bounds.top),
+				  BPoint(maxx, bounds.bottom), sShineColor);
 	view->EndLineArray();
-	
+
+	FillRect(BRect(bounds.left, bounds.top + 1, minx - 1, bounds.bottom - 1), B_SOLID_LOW);
+	FillRect(BRect(maxx + 1, bounds.top + 1, bounds.right, bounds.bottom - 1), B_SOLID_LOW);
+
 	if (useOffscreen) {
 		if (trackRectBlitter)
 			(trackRectBlitter)(view, passThru);
@@ -478,9 +483,8 @@ BColumnTitle::Draw(BView *view, bool pressed)
 			break;
 	}
 		
-	view->MovePenTo(loc);
 	view->SetHighColor(0, 0, 0);
-	view->DrawString(titleString.String());
+	view->DrawString(titleString.String(), loc);
 
 	// show sort columns
 	bool secondary = (fColumn->AttrHash() == fParent->PoseView()->SecondarySort());
