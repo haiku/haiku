@@ -80,9 +80,9 @@ public:
 	virtual off_t Position() const = 0;
 
 	virtual status_t SetSize(off_t size);
+	virtual status_t GetSize(off_t* size) const;
 
 private:
-	virtual void _ReservedPositionIO1();
 	virtual void _ReservedPositionIO2();
 	virtual void _ReservedPositionIO3();
 	virtual void _ReservedPositionIO4();

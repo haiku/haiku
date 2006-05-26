@@ -57,6 +57,7 @@ public:
 	virtual off_t Position() const;
 
 	virtual status_t SetSize(off_t size);
+	virtual	status_t GetSize(off_t* size) const;
 
 	BFile &operator=(const BFile &file);
 

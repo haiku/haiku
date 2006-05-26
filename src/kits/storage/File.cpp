@@ -460,6 +460,13 @@ BFile::SetSize(off_t size)
 	return set_stat(statData, B_STAT_SIZE);
 }
 
+// GetSize TODO: doxygen comment
+status_t
+BFile::GetSize(off_t* size) const
+{
+	return BStatable::GetSize(size);
+}
+
 // =
 //!	Assigns another BFile to this BFile.
 /*!	If the other BFile is uninitialized, this one will be too. Otherwise it

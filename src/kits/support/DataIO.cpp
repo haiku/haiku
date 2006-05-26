@@ -129,9 +129,31 @@ BPositionIO::SetSize(off_t size)
 	return B_ERROR;
 }
 
+// GetSize
+status_t
+BPositionIO::GetSize(off_t* size) const
+{
+	if (!size)
+		return B_BAD_VALUE;
+
+	off_t currentPos = Position();
+	if (currentPos < 0)
+		return (status_t)currentPos;
+
+	*size = const_cast<BPositionIO*>(this)->Seek(0, SEEK_END);
+	if (*size < 0)
+		return (status_t)*size;
+
+	off_t pos = const_cast<BPositionIO*>(this)->Seek(currentPos, SEEK_SET);
+
+	if (pos != currentPos)
+		return pos < 0 ? (status_t)pos : B_ERROR;
+
+	return B_OK;
+}
+
 
 // FBC
-void BPositionIO::_ReservedPositionIO1(){}
 void BPositionIO::_ReservedPositionIO2(){}
 void BPositionIO::_ReservedPositionIO3(){}
 void BPositionIO::_ReservedPositionIO4(){}
