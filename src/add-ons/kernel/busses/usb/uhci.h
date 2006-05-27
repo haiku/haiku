@@ -22,6 +22,7 @@ public:
 									UHCI(pci_info *info, Stack *stack);
 
 		status_t					Start();
+		status_t					SetupRootHub();
 		status_t					SubmitTransfer(Transfer *transfer);
 
 static	bool						AddTo(Stack &stack);
@@ -52,8 +53,7 @@ static	pci_module_info				*sPCIModule;
 
 		// Frame list memory
 		area_id						fFrameArea;
-		addr_t						fFrameList[1024];
-		addr_t						fPhysicalFrameList;
+		addr_t						*fFrameList;
 
 		// Virtual frame
 		uhci_qh						*fVirtualQueueHead[12];

@@ -105,8 +105,8 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 	// Setup the frame list
 	void *physicalAddress;
-	fFrameArea = fStack->AllocateArea((void **)&fFrameList[0],
-		(void **)&fPhysicalFrameList, 4096, "USB UHCI framelist");
+	fFrameArea = fStack->AllocateArea((void **)&fFrameList,
+		(void **)&physicalAddress, 4096, "USB UHCI framelist");
 
 	if (fFrameArea < B_OK) {
 		TRACE(("usb_uhci: unable to create an area for the frame pointer list\n"));
@@ -115,7 +115,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	}
 
 	// Set base pointer and reset frame number
-	WriteReg32(UHCI_FRBASEADD, (uint32)fPhysicalFrameList);	
+	WriteReg32(UHCI_FRBASEADD, (uint32)physicalAddress);	
 	WriteReg16(UHCI_FRNUM, 0);
 
 	/*
@@ -204,36 +204,37 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 			fFrameList[i] = fQueueHeadInterrupt1->this_phy | FRAMELIST_NEXT_IS_QH;
 	}
 
-	// Set up the root hub
-	fRootHubAddress = AllocateAddress();
-	fRootHub = new UHCIRootHub(this, fRootHubAddress);
-	SetRootHub(fRootHub);
-
+	TRACE(("usb_uhci: installing interrupt handler\n"));
 	// Install the interrupt handler
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
 
-	// Acknowledge any possible pending interrupts
-	WriteReg16(UHCI_USBSTS, 0xffff);
+	// Enable interrupts
+	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_RESUME
+		| UHCI_USBINTR_IOC | UHCI_USBINTR_SHORT);
+
+	TRACE(("usb_uhci: UHCI BusManager constructed\n"));
 }
 
 
 status_t
 UHCI::Start()
 {
-	//Start the host controller, then start the Busmanager
-	TRACE(("usb_uhci: usbcmd reg %u, usbsts reg %u\n", ReadReg16(UHCI_USBCMD),
-		ReadReg16(UHCI_USBSTS)));
+	// Start the host controller, then start the Busmanager
+	TRACE(("usb_uhci: starting UHCI BusManager\n"));
+	TRACE(("usb_uhci: usbcmd reg 0x%04x, usbsts reg 0x%04x\n",
+		ReadReg16(UHCI_USBCMD), ReadReg16(UHCI_USBSTS)));
 
+	// Set the run bit in the command register
 	WriteReg16(UHCI_USBCMD, ReadReg16(UHCI_USBCMD) | UHCI_USBCMD_RS);
 
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
 		uint16 status = ReadReg16(UHCI_USBSTS);
-		TRACE(("usb_uhci: current loop %u, status %u\n", i, status));
+		TRACE(("usb_uhci: current loop %u, status 0x%04x\n", i, status));
 
 		if (status & UHCI_USBSTS_HCHALT)
-			snooze(1000);
+			snooze(10000);
 		else {
 			running = true;
 			break;
@@ -245,13 +246,22 @@ UHCI::Start()
 		return B_ERROR;
 	}
 
-	// Enable interrupts
-	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_RESUME
-		| UHCI_USBINTR_IOC | UHCI_USBINTR_SHORT);
-
 	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
 		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
 	return BusManager::Start();
+}
+
+
+status_t
+UHCI::SetupRootHub()
+{
+	TRACE(("usb_uhci: setting up root hub\n"));
+
+	fRootHubAddress = AllocateAddress();
+	fRootHub = new UHCIRootHub(this, fRootHubAddress);
+	SetRootHub(fRootHub);
+
+	return B_OK;
 }
 
 
@@ -315,15 +325,15 @@ UHCI::InterruptHandler(void *data)
 int32
 UHCI::Interrupt()
 {
-	TRACE(("usb_uhci: Interrupt()\n"));
-	uint16 status = ReadReg16(UHCI_USBSTS);
-	uint16 acknowledge = 0;
-	TRACE(("usb_uhci: status: 0x%04x\n", status));
-
 	// Check if we really had an interrupt
-	if (status & UHCI_INTERRUPT_MASK == 0)
+	uint16 status = ReadReg16(UHCI_USBSTS);
+	if ((status & UHCI_INTERRUPT_MASK) == 0)
 		return B_UNHANDLED_INTERRUPT;
 
+	TRACE(("usb_uhci: Interrupt()\n"));
+	TRACE(("usb_uhci: status: 0x%04x\n", status));
+
+	uint16 acknowledge = 0;
 	if (status & UHCI_USBSTS_USBINT) {
 		TRACE(("usb_uhci: transfer finished\n"));
 		acknowledge |= UHCI_USBSTS_USBINT;
@@ -354,7 +364,9 @@ UHCI::Interrupt()
 		// acknowledge not needed
 	}
 
-	WriteReg16(UHCI_USBSTS, acknowledge);
+	if (acknowledge)
+		WriteReg16(UHCI_USBSTS, acknowledge);
+
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -405,8 +417,9 @@ UHCI::InsertControl(Transfer *transfer)
 	if (fStack->AllocateChunk(&transferDescriptor->buffer_log,
 		&transferDescriptor->buffer_phy, sizeof(usb_request_data)) < B_OK) {
 		TRACE(("usb_uhci: unable to allocate space for the setup buffer\n"));
+		fStack->FreeChunk(transferDescriptor,
+			(void *)transferDescriptor->this_phy, 32);
 		fStack->FreeChunk(topQueueHead, (void *)topQueueHead->this_phy, 32);
-		fStack->FreeChunk(transferDescriptor, (void *)transferDescriptor->this_phy, 32);
 		return ENOMEM;
 	}
 
@@ -422,8 +435,10 @@ UHCI::InsertControl(Transfer *transfer)
 	uhci_td *statusDescriptor;
 	if (fStack->AllocateChunk((void **)&statusDescriptor, &physicalAddress, 32) < B_OK) {
 		TRACE(("usb_uhci: failed to allocate the status descriptor\n"));
-		fStack->FreeChunk(transferDescriptor->buffer_log, (void *)transferDescriptor->buffer_phy, sizeof(usb_request_data));
-		fStack->FreeChunk(transferDescriptor, (void *)transferDescriptor->this_phy, 32);
+		fStack->FreeChunk(transferDescriptor->buffer_log,
+			(void *)transferDescriptor->buffer_phy, sizeof(usb_request_data));
+		fStack->FreeChunk(transferDescriptor,
+			(void *)transferDescriptor->this_phy, 32);
 		fStack->FreeChunk(topQueueHead, (void *)topQueueHead->this_phy, 32);
 		return ENOMEM;
 	}
@@ -464,7 +479,7 @@ UHCI::InsertControl(Transfer *transfer)
 	} else {
 		// there are control transfers linked, append to the queue
 		uhci_qh *queueHead = (uhci_qh *)fQueueHeadControl->link_log;
-		while (queueHead->link_phy & QH_TERMINATE == 0)
+		while ((queueHead->link_phy & QH_TERMINATE) == 0)
 			queueHead = (uhci_qh *)queueHead->link_log;
 
 		queueHead->link_phy = topQueueHead->this_phy;
@@ -484,11 +499,13 @@ UHCI::AddTo(Stack &stack)
 	load_driver_symbols("uhci");
 #endif
 
-	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
-	if (status < B_OK) {
-		TRACE(("usb_uhci: AddTo(): getting pci module failed! 0x%08x\n",
-			status));
-		return status;
+	if (!sPCIModule) {
+		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
+		if (status < B_OK) {
+			TRACE(("usb_uhci: AddTo(): getting pci module failed! 0x%08x\n",
+				status));
+			return status;
+		}
 	}
 
 	TRACE(("usb_uhci: AddTo(): setting up hardware\n"));
@@ -514,8 +531,9 @@ UHCI::AddTo(Stack &stack)
 				continue;
 			}
 
-			stack.AddBusManager(bus);
 			bus->Start();
+			bus->SetupRootHub();
+			stack.AddBusManager(bus);
 			found = true;
 			break;
 		}
@@ -524,6 +542,7 @@ UHCI::AddTo(Stack &stack)
 	if (!found) {
 		TRACE(("usb_uhci: AddTo(): no devices found\n"));
 		delete item;
+		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
 		return ENODEV;
 	}
