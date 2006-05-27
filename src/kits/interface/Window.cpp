@@ -1222,12 +1222,12 @@ BWindow::SetDecoratorSettings(const BMessage& settings)
 
 
 status_t
-BWindow::GetDecoratorSettings(BMessage* settings)
+BWindow::GetDecoratorSettings(BMessage* settings) const
 {
 	// read a flattened settings message from the app_server
 	// and put it into settings
 
-	if (!Lock())
+	if (!const_cast<BWindow*>(this)->Lock())
 		return B_ERROR;
 
 	status_t ret = fLink->StartMessage(AS_GET_DECORATOR_SETTINGS);
@@ -1251,7 +1251,7 @@ BWindow::GetDecoratorSettings(BMessage* settings)
 		}
 	}
 
-	Unlock();
+	const_cast<BWindow*>(this)->Unlock();
 
 	return ret;
 }

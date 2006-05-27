@@ -203,7 +203,7 @@ public:
 											  float* minHeight, float* maxHeight);
 
 			status_t			SetDecoratorSettings(const BMessage& settings);
-			status_t			GetDecoratorSettings(BMessage* settings);
+			status_t			GetDecoratorSettings(BMessage* settings) const;
 
 			uint32				Workspaces() const;
 			void				SetWorkspaces(uint32);
