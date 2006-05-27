@@ -317,6 +317,7 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 	if (!_AddItem(item, index))
 		return false;
 
+	InvalidateLayout();
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
 			LayoutItems(index);
@@ -432,8 +433,9 @@ BMenu::AddList(BList *list, int32 index)
 			if (!_AddItem(item, index + i))
 				break;
 		}
-	}	
+	}
 	
+	InvalidateLayout();
 	if (locked && Window() != NULL && !Window()->IsHidden()) {	
 		// Make sure we update the layout if needed.
 		LayoutItems(index);
@@ -1020,6 +1022,7 @@ BMenu::Show()
 void
 BMenu::Show(bool selectFirst)
 {
+	Install(NULL);
 	_show(selectFirst);
 }
 
@@ -1028,6 +1031,7 @@ void
 BMenu::Hide()
 {
 	_hide();
+	Uninstall();
 }
 
 
@@ -1302,18 +1306,18 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		if (locked)
 			UnlockLooper();
 		
-		if (buttons != 0 && IsStickyMode()) {
+		if (buttons != 0 && IsStickyMode())
 			fState = MENU_STATE_CLOSED;
-			break;
-		} else if (buttons == 0 && !IsStickyMode()) {
+		else if (buttons == 0 && !IsStickyMode()) {
 			if (system_time() < trackTime + 1000000
 				|| (fExtraRect != NULL && fExtraRect->Contains(location)))
 				SetStickyMode(true);
-			else {
+			else
 				fState = MENU_STATE_CLOSED;
-				break;
-			}
 		}
+
+		if (fState == MENU_STATE_CLOSED)
+			break;
 
 		snooze(snoozeAmount);
 	}
@@ -1357,10 +1361,6 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		item->Install(window);
 
 	item->SetSuper(this);
-
-	// TODO: Sometimes the menu layout isn't invalidated correctly,
-	// So we force a rebuild of the whole menu layout. Remove this!
-	InvalidateLayout();
 
 	return true;
 }
@@ -2058,6 +2058,14 @@ BMenu::OkToProceed(BMenuItem* item)
 		proceed = false;
 	
 	return proceed;
+}
+
+
+void
+BMenu::QuitTracking()
+{
+	fState = MENU_STATE_CLOSED;
+
 }
 
 

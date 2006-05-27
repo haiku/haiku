@@ -390,7 +390,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	// TODO: Cleanup, merge some "if" blocks if possible
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
-	int localAction = MENU_STATE_TRACKING;
+	int localAction = fState = MENU_STATE_TRACKING;
 	while (true) {
 		bigtime_t snoozeAmount = 40000;
 		bool locked = window->Lock();//WithTimeout(200000)
@@ -460,6 +460,9 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			} else
 				SetStickyMode(true);
 		}
+
+		if (fState == MENU_STATE_CLOSED)
+			break;
 
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);		

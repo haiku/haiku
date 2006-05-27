@@ -236,6 +236,8 @@ virtual	void			_ReservedMenu6();
 		void		RedrawAfterSticky(BRect bounds);
 		bool		OkToProceed(BMenuItem *);
 
+		void		QuitTracking();
+
 		status_t	ParseMsg(BMessage *msg, int32 *sindex, BMessage *spec,
 						int32 *form, const char **prop,
 						BMenu **tmenu, BMenuItem **titem, int32 *user_data,

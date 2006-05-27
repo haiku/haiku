@@ -26,6 +26,7 @@
 #include <AppMisc.h>
 #include <ApplicationPrivate.h>
 #include <InputServerTypes.h>
+#include <MenuPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
 #include <ServerProtocol.h>
@@ -316,6 +317,10 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 BWindow::~BWindow()
 {
 	Lock();
+
+	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
+		menu->QuitTracking();
+	}
 
 	// Wait if a menu is still tracking
 	if (fMenuSem > 0) {
@@ -904,6 +909,11 @@ FrameMoved(origin);
 
 		case B_MOUSE_DOWN:
 		{
+			// Close an eventually opened menu.
+			if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
+				menu->QuitTracking();
+			}
+
 			if (BView *view = dynamic_cast<BView *>(target)) {
 				BPoint where;
 				msg->FindPoint("be:view_where", &where);
@@ -1544,7 +1554,8 @@ BWindow::FindView(BPoint point) const
 }
 
 
-BView *BWindow::CurrentFocus() const
+BView *
+BWindow::CurrentFocus() const
 {
 	return fFocus;
 }
