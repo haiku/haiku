@@ -1,0 +1,59 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network dp83815 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# set some additional flags
+SubDirCcFlags -Wall ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+KernelAddon dp83815 : kernel drivers bin :
+	driver.c
+	util.c
+	;
+
+Package haiku-dp83815-cvs :
+	dp83815 : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-dp83815-cvs : net dp83815 ;
+
+# Package haiku-dp83815-cvs :
+#	dp83815.settings :
+#	boot home config settings kernel drivers sample ;
+
+
+
+rule Installdp83815
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore Installdp83815
+{
+	cp $(>) /boot/home/config/add-ons/kernel/drivers/bin/
+}
+
+#Installdp83815 install : dp83815 ;
+
+# Installation
+
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	dp83815 
+;
+
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>dp83815 : 
+	installed-symlink 
+;
+
+Package haiku-networkingkit-cvs :
+	dp83815 :
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-networkingkit-cvs : net dp83815 ;
+
+# Package haiku-networkingkit-cvs :
+#	dp83815.settings :
+#	boot home config settings kernel drivers sample ;
+
+
