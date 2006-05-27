@@ -77,7 +77,7 @@ usb_hub_descriptor uhci_hubd =
 {
 	0x09,					//Including deprecated powerctrlmask
 	USB_DESCRIPTOR_HUB,
-	1,						//Number of ports
+	2,						//Number of ports
 	0x02 | 0x01,			//Hub characteristics FIXME
 	50,						//Power on to power good
 	0,						// Current
@@ -228,25 +228,25 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 void
 UHCIRootHub::UpdatePortStatus()
 {
-	for (int32 i = 0; i < 2; i++) {
+	for (int32 i = 0; i < uhci_hubd.bNbrPorts; i++) {
 		uint16 newStatus = 0;
 		uint16 newChange = 0;
 
 		uint16 portStatus = UHCI::sPCIModule->read_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + i * 2);
-		TRACE(("usb_uhci_roothub: port: %d status: 0x%04x\n", UHCI_PORTSC1 + i * 2, portStatus));
+		TRACE(("usb_uhci_roothub: port: %d status: 0x%04x\n", i, portStatus));
 
 		// Set all individual bits
 		if (portStatus & UHCI_PORTSC_CURSTAT)
 			newStatus |= PORT_STATUS_CONNECTION;
 
 		if (portStatus & UHCI_PORTSC_STATCHA)
-			newStatus |= PORT_STATUS_CONNECTION;
+			newChange |= PORT_STATUS_CONNECTION;
 
 		if (portStatus & UHCI_PORTSC_ENABLED)
 			newStatus |= PORT_STATUS_ENABLE;
 
 		if (portStatus & UHCI_PORTSC_ENABCHA)
-			newStatus |= PORT_STATUS_ENABLE;
+			newChange |= PORT_STATUS_ENABLE;
 
 		// TODO: work out suspended/resume
 

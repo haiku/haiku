@@ -99,7 +99,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	GlobalReset();
 	if (Reset() < B_OK) {
 		TRACE(("usb_uhci: host failed to reset\n"));
-		m_initok = false;
+		fInitOK = false;
 		return;
 	}
 
@@ -110,7 +110,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 	if (fFrameArea < B_OK) {
 		TRACE(("usb_uhci: unable to create an area for the frame pointer list\n"));
-		m_initok = false;
+		fInitOK = false;
 		return;
 	}
 
@@ -126,7 +126,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	if (fStack->AllocateChunk((void **)&strayDescriptor, &physicalAddress, 32) != B_OK) {
 		TRACE(("usb_uhci: failed to allocate a stray transfer descriptor\n"));
 		delete_area(fFrameArea);
-		m_initok = false;
+		fInitOK = false;
 		return;
 	}
 
@@ -151,7 +151,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 			&physicalAddress, 32) != B_OK) {
 			TRACE(("usb_uhci: failed allocation of skeleton queue head %i, aborting\n",  i));
 			delete_area(fFrameArea);
-			m_initok = false;
+			fInitOK = false;
 			return;
 		}
 
@@ -246,22 +246,13 @@ UHCI::Start()
 		return B_ERROR;
 	}
 
-	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
-		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
-	return BusManager::Start();
-}
-
-
-status_t
-UHCI::SetupRootHub()
-{
-	TRACE(("usb_uhci: setting up root hub\n"));
-
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new UHCIRootHub(this, fRootHubAddress);
 	SetRootHub(fRootHub);
 
-	return B_OK;
+	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
+		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
+	return BusManager::Start();
 }
 
 
@@ -377,10 +368,6 @@ UHCI::InsertControl(Transfer *transfer)
 	TRACE(("usb_uhci: InsertControl() frnum %u, usbsts reg %u\n",
 		ReadReg16(UHCI_FRNUM), ReadReg16(UHCI_USBSTS)));
 
-	// HACK: this one is to prevent rogue transfers from happening
-	if (!transfer->GetBuffer())
-		return B_ERROR;
-
 	// Please note that any data structures must be aligned on a 16 byte boundary
 	// Also, due to the strange ways of C++' void* handling, this code is much messier
 	// than it actually should be. Forgive me. Or blame the compiler.
@@ -423,7 +410,8 @@ UHCI::InsertControl(Transfer *transfer)
 		return ENOMEM;
 	}
 
-	memcpy(transferDescriptor->buffer_log, transfer->GetRequestData(), sizeof(usb_request_data));
+	memcpy(transferDescriptor->buffer_log, transfer->GetRequestData(),
+		sizeof(usb_request_data));
 
 	// Link this to the queue head
 	topQueueHead->element_phy = transferDescriptor->this_phy;
@@ -470,11 +458,11 @@ UHCI::InsertControl(Transfer *transfer)
 	transfer->GetHostPrivate()->lasttd = statusDescriptor;
 	fTransfers.PushBack(transfer);
 
-	// Secondly, append the qh to the control list
+	// Secondly, append the queue head to the control list
 	if (fQueueHeadControl->element_phy & QH_TERMINATE) {
 		// the control queue is empty, make this the first element
 		fQueueHeadControl->element_phy = topQueueHead->this_phy;
-		fQueueHeadControl->link_log = (void *)topQueueHead;
+		fQueueHeadControl->link_log = topQueueHead;
 		TRACE(("usb_uhci: first transfer in queue\n"));
 	} else {
 		// there are control transfers linked, append to the queue
@@ -483,7 +471,7 @@ UHCI::InsertControl(Transfer *transfer)
 			queueHead = (uhci_qh *)queueHead->link_log;
 
 		queueHead->link_phy = topQueueHead->this_phy;
-		queueHead->link_log = (void *)topQueueHead;
+		queueHead->link_log = topQueueHead;
 		TRACE(("usb_uhci: appended transfer to queue\n"));
 	}
 
@@ -510,7 +498,6 @@ UHCI::AddTo(Stack &stack)
 
 	TRACE(("usb_uhci: AddTo(): setting up hardware\n"));
 
-	// TODO: in the future we might want to support multiple host controllers.
 	bool found = false;
 	pci_info *item = new pci_info;
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
@@ -532,10 +519,8 @@ UHCI::AddTo(Stack &stack)
 			}
 
 			bus->Start();
-			bus->SetupRootHub();
 			stack.AddBusManager(bus);
 			found = true;
-			break;
 		}
 	}
 

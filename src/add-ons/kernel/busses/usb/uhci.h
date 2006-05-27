@@ -22,7 +22,6 @@ public:
 									UHCI(pci_info *info, Stack *stack);
 
 		status_t					Start();
-		status_t					SetupRootHub();
 		status_t					SubmitTransfer(Transfer *transfer);
 
 static	bool						AddTo(Stack &stack);

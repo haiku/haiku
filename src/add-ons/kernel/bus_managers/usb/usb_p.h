@@ -128,37 +128,42 @@ private:
  * after a host controller gives positive feedback on whether the hardware
  * is found. 
  */
-class BusManager
-{
-	friend class Device;
-	friend class ControlPipe;
+class BusManager {
 public:
-	BusManager();
-	virtual ~BusManager();
-	
-	virtual status_t InitCheck();
-	
-	Device *AllocateNewDevice( Device *parent , bool speed );
-	int8 AllocateAddress();
-	
-	virtual status_t Start();
-//	virtual status_t Stop();
-	virtual status_t SubmitTransfer( Transfer *t );
-protected:
-	void SetRootHub( Hub *hub ) { m_roothub = hub; };
-	Device* GetRootHub() { return m_roothub; };
-	bool m_initok;
-private:
-	bool m_devicemap[128];
-	ControlPipe *m_defaultLowSpeedPipe;
-	ControlPipe *m_defaultPipe;
-	sem_id m_lock;
-	Device *m_roothub;
-	thread_id m_explore_thread;
-};
+										BusManager();
+virtual									~BusManager();
 
-// Located in the BusManager.cpp
-int32 usb_explore_thread( void *data );
+virtual	status_t						InitCheck();
+
+		Device							*AllocateNewDevice(Device *parent,
+											bool lowSpeed);
+
+		int8							AllocateAddress();
+
+virtual	status_t						Start();
+virtual	status_t						Stop();
+
+virtual	status_t						SubmitTransfer(Transfer *transfer);
+
+protected:
+		void							SetRootHub(Hub *hub) { fRootHub = hub; };
+		Device							*GetRootHub() { return fRootHub; };
+
+		bool							fInitOK;
+
+private:
+friend	class Device;
+friend	class ControlPipe;
+
+static	int32							ExploreThread(void *data);
+
+		sem_id 							fLock;
+		bool							fDeviceMap[128];
+		ControlPipe						*fDefaultPipe;
+		ControlPipe						*fDefaultPipeLowSpeed;
+		Device							*fRootHub;
+		thread_id						fExploreThread;
+};
 
 /*
  * The Pipe class is the communication management between the hardware and\
