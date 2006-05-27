@@ -909,12 +909,14 @@ FrameMoved(origin);
 
 		case B_MOUSE_DOWN:
 		{
-			// Close an eventually opened menu.
-			if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
+			BView *view = dynamic_cast<BView *>(target);
+			
+			// Close an eventually opened menu, unless the target is the menu itself
+			BMenu *menu = dynamic_cast<BMenu *>(fFocus);
+			if (menu != NULL && menu != view)
 				menu->QuitTracking();
-			}
-
-			if (BView *view = dynamic_cast<BView *>(target)) {
+			
+			if (view != NULL) {
 				BPoint where;
 				msg->FindPoint("be:view_where", &where);
 				view->MouseDown(where);

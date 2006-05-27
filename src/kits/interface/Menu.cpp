@@ -2064,8 +2064,14 @@ BMenu::OkToProceed(BMenuItem* item)
 void
 BMenu::QuitTracking()
 {
-	fState = MENU_STATE_CLOSED;
+	if (IsStickyMode())
+		SetStickyMode(false);
+	if (fSelected != NULL)
+		SelectItem(NULL);
+	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
+		menuBar->RestoreFocus();
 
+	fState = MENU_STATE_CLOSED;
 }
 
 
