@@ -138,7 +138,7 @@ ViewState::ViewState()
 	*/
 	valid_flags = ~B_VIEW_CLIP_REGION_BIT;
 
-	archiving_flags = B_VIEW_FRAME_BIT;
+	archiving_flags = B_VIEW_FRAME_BIT | B_VIEW_RESIZE_BIT;
 }
 
 
@@ -314,15 +314,15 @@ BView::BView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 BView::BView(BMessage *archive)
 	: BHandler(archive)
 {
-	uint32 resizingMode;
-	uint32 flags;
 	BRect frame;
-
 	archive->FindRect("_frame", &frame);
-	if (archive->FindInt32("_resize_mode", (int32 *)&resizingMode) != B_OK)
+
+	uint32 resizingMode;
+	if (archive->FindInt32("_resize_mode", (int32*)&resizingMode) != B_OK)
 		resizingMode = 0;
 
-	if (archive->FindInt32("_flags", (int32 *)&flags) != B_OK)
+	uint32 flags;
+	if (archive->FindInt32("_flags", (int32*)&flags) != B_OK)
 		flags = 0;
 
 	_InitData(frame, Name(), resizingMode, flags);
@@ -344,7 +344,7 @@ BView::BView(BMessage *archive)
 
 		float rotation;
 		if (archive->FindFloat("_fflt", 2, &rotation) == B_OK)
-		 font.SetRotation(rotation);
+			font.SetRotation(rotation);
 
 		SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
 			| B_FONT_SHEAR | B_FONT_ROTATION);
@@ -395,11 +395,9 @@ BView::BView(BMessage *archive)
 		SetDrawingMode((drawing_mode)drawingMode);
 
 	BMessage msg;
-	int32 i = 0;
-	while (archive->FindMessage("_views", i++, &msg) == B_OK) {
+	for (int32 i = 0; archive->FindMessage("_views", i, &msg) == B_OK; i++) {
 		BArchivable *object = instantiate_object(&msg);
-		BView *child = dynamic_cast<BView *>(object);
-		if (child)
+		if (BView *child = dynamic_cast<BView *>(object))
 			AddChild(child);
 	}
 }
@@ -425,10 +423,10 @@ BView::Archive(BMessage *data, bool deep) const
 	if (fState->archiving_flags & B_VIEW_FRAME_BIT)
 		ret = data->AddRect("_frame", Bounds().OffsetToCopy(fParentOffset));
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_RESIZE_BIT)
+	if (ret == B_OK)
 		ret = data->AddInt32("_resize_mode", ResizingMode());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_FLAGS_BIT)
+	if (ret == B_OK)
 		ret = data->AddInt32("_flags", Flags());
 
 	if (ret == B_OK && fState->archiving_flags & B_VIEW_EVENT_MASK_BIT) {
@@ -456,14 +454,13 @@ BView::Archive(BMessage *data, bool deep) const
 	}
 
 	// colors
-
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_HIGH_COLOR_BIT)
+	if (ret == B_OK)
 		ret = data->AddInt32("_color", (const uint32 &)HighColor());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_LOW_COLOR_BIT)
+	if (ret == B_OK)
 		ret = data->AddInt32("_color", (const uint32 &)LowColor());
 
-	if (ret == B_OK && fState->archiving_flags & B_VIEW_VIEW_COLOR_BIT)
+	if (ret == B_OK)
 		ret = data->AddInt32("_color", (const uint32 &)ViewColor());
 
 //	NOTE: we do not use this flag any more
@@ -513,6 +510,9 @@ BView::Archive(BMessage *data, bool deep) const
 				ret = data->AddMessage("_views", &childArchive);
 		}
 	}
+
+	if (ret == B_OK)
+		ret = data->AddString("class", "BView");
 
 	return ret;
 }
@@ -965,9 +965,6 @@ BView::SetResizingMode(uint32 mode)
 
 	// look at SetFlags() for more info on the below line
 	fFlags = (fFlags & ~_RESIZE_MASK_) | (mode & _RESIZE_MASK_);
-
-	// our resize mode has changed, so when archiving we'll add this too
-	fState->archiving_flags |= B_VIEW_RESIZE_BIT;
 }
 
 
@@ -4092,7 +4089,7 @@ BView::_ParentResizedBy(int32 x, int32 y)
 
 	if (newFrame.LeftTop() != fParentOffset) {
 		// move view
-		_MoveTo(lroundf(newFrame.left), lroundf(newFrame.top));
+		_MoveTo((int32)roundf(newFrame.left), (int32)roundf(newFrame.top));
 	}
 
 	if (newFrame != Frame()) {
