@@ -26,8 +26,11 @@
 
 #include "usb_p.h"
 
+#define MODULE_NAME	"usb stack: "
+
 Stack::Stack()
 {
+	dprintf(MODULE_NAME"stack init\n");
 	//Init the master lock
 	m_master = create_sem( 1 , "usb master lock" );
 	set_sem_owner( m_master , B_SYSTEM_TEAM );
@@ -51,7 +54,7 @@ Stack::Stack()
 	                        "8-byte chunk area" );
 	if ( m_areas[0] < B_OK )
 	{
-		dprintf( "USB: 8-byte chunk area failed to initialise\n" );
+		dprintf(MODULE_NAME"8-byte chunk area failed to initialise\n" );
 		return;
 	}
 
@@ -73,7 +76,7 @@ Stack::Stack()
 	                        "16-byte chunk area" );
 	if ( m_areas[1] < B_OK )
 	{
-		dprintf( "USB: 16-byte chunk area failed to initialise\n" );
+		dprintf(MODULE_NAME"16-byte chunk area failed to initialise\n" );
 		return;
 	}
 
@@ -95,7 +98,7 @@ Stack::Stack()
 	                        "32-byte chunk area" );
 	if ( m_areas[2] < B_OK )
 	{
-		dprintf( "USB: 32-byte chunk area failed to initialise\n" );
+		dprintf(MODULE_NAME"32-byte chunk area failed to initialise\n" );
 		return;
 	}
 
@@ -110,22 +113,22 @@ Stack::Stack()
 		else
 			chunk->next_item = NULL;
 	}
-	
-	
+
 	//Check for host controller modules
 	void *list = open_module_list( "busses/usb" );
 	char modulename[B_PATH_NAME_LENGTH];
 	size_t buffersize = sizeof(modulename);
-	dprintf( "USB: Looking for host controller modules\n" );
+	dprintf(MODULE_NAME"Looking for host controller modules\n" );
 	while( read_next_module_name( list , modulename , &buffersize ) == B_OK )
 	{
-		dprintf( "USB: Found module %s\n" , modulename );
+		dprintf(MODULE_NAME"Found module %s\n" , modulename );
+		buffersize = sizeof(modulename);
 		host_controller_info *module = 0;
 		if ( get_module( modulename , (module_info **)&module ) != B_OK )
 			continue;
 		if ( module->add_to( *this) != B_OK )
 			continue;
-		dprintf( "USB: module %s successfully loaded\n" , modulename );
+		dprintf(MODULE_NAME"module %s successfully loaded\n" , modulename );
 	}
 	
 	if( m_busmodules.Count() == 0 )
@@ -179,7 +182,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 		listhead = m_32_listhead;
 	else
 	{
-		dprintf ( "USB Stack: Chunk size %i to big\n" , size );
+		dprintf (MODULE_NAME"Chunk size %i to big\n" , size );
 		Unlock();
 		return B_ERROR;
 	}
@@ -187,11 +190,11 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 	if ( listhead == NULL )
 	{
 		Unlock();
-		dprintf( "USB Stack: Out of memory on this list\n" );
+		dprintf(MODULE_NAME"Out of memory on this list\n" );
 		return B_ERROR;
 	}
 	
-	dprintf( "USB Stack::Allocate() listhead: %ld\n" , listhead );
+	dprintf(MODULE_NAME"Stack::Allocate() listhead: %ld\n" , listhead );
 	
 	memory_chunk *chunk = (memory_chunk *)listhead;
 	*log = (void *)listhead;
@@ -211,7 +214,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 		m_32_listhead = listhead;
 	
 	Unlock();
-	dprintf( "USB Stack: allocated a new chunk with size %u\n" , size );
+	dprintf(MODULE_NAME"allocated a new chunk with size %u\n" , size );
 	return B_OK;
 }
 
@@ -227,7 +230,7 @@ status_t Stack::FreeChunk( void *log , void *phy , uint8 size )
 		listhead = m_32_listhead;
 	else
 	{
-		dprintf ( "USB Stack: Chunk size %i invalid\n" , size );
+		dprintf (MODULE_NAME"Chunk size %i invalid\n" , size );
 		Unlock();
 		return B_ERROR;
 	}
@@ -255,18 +258,18 @@ area_id Stack::AllocateArea( void **log , void **phy , size_t size , const char 
 	area_id areaid;
 	status_t rv;
 	
-	dprintf("allocating %ld bytes for %s\n",size,name);
+	dprintf(MODULE_NAME"allocating %ld bytes for %s\n",size,name);
 
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, 0 );
 	if (areaid < B_OK) {
-		dprintf("couldn't allocate area %s\n",name);
+		dprintf(MODULE_NAME"couldn't allocate area %s\n",name);
 		return B_ERROR;
 	}
 	rv = get_memory_map(logadr,size,&pe,1);
 	if (rv < B_OK) {
 		delete_area(areaid);
-		dprintf("couldn't map %s\n",name);
+		dprintf(MODULE_NAME"couldn't map %s\n",name);
 		return B_ERROR;
 	}
 	memset(logadr,0,size);
@@ -274,7 +277,7 @@ area_id Stack::AllocateArea( void **log , void **phy , size_t size , const char 
 		*log = logadr;
 	if (phy)
 		*phy = pe.address;
-	dprintf("area = %ld, size = %ld, log = %#08lX, phy = %#08lX\n",areaid,size,(uint32)logadr,(uint32)(pe.address));
+	dprintf(MODULE_NAME"area = %ld, size = %ld, log = 0x%08x, phy = 0x%08x\n",areaid,size,(uint32)logadr,(uint32)(pe.address));
 	return areaid;
 }
 	
