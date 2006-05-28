@@ -107,6 +107,7 @@ typedef struct
 	void * buffer_log;		// Link to the buffer
 } uhci_td;
 
+#define TD_STATUS_3_ERRORS ( 3 << 27 )
 #define TD_STATUS_LOWSPEED ( 1 << 26 )
 #define TD_STATUS_IOS      ( 1 << 25 )
 #define TD_STATUS_IOC      ( 1 << 24 )
