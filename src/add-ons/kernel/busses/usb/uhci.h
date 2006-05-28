@@ -17,21 +17,52 @@ struct pci_module_info;
 class UHCIRootHub;
 
 
+class Queue {
+public:
+									Queue(Stack *stack);
+									~Queue();
+
+		status_t					InitCheck();
+
+		status_t					LinkTo(Queue *other);
+		status_t					TerminateByStrayDescriptor();
+
+		status_t					AppendDescriptor(uhci_td *descriptor);
+		status_t					AddTransfer(Transfer *transfer,
+										bigtime_t timeout);
+		status_t					RemoveInactiveDescriptors();
+
+		addr_t						PhysicalAddress();
+
+private:
+		status_t					fStatus;
+		Stack						*fStack;
+		uhci_qh						*fQueueHead;
+		uhci_td						*fStrayDescriptor;
+		uhci_td						*fQueueTop;
+};
+
+
 class UHCI : public BusManager {
 public:
 									UHCI(pci_info *info, Stack *stack);
 
 		status_t					Start();
-		status_t					SubmitTransfer(Transfer *transfer);
+		status_t					SubmitTransfer(Transfer *transfer,
+										bigtime_t timeout = 0);
 
 static	bool						AddTo(Stack &stack);
 
-private:
-friend	class UHCIRootHub;
-
-		// Utility functions
 		void						GlobalReset();
-		status_t					Reset();
+		status_t					ResetController();
+
+		// port operations
+		uint16						PortStatus(int32 index);
+		status_t					SetPortStatus(int32 index, uint16 status);
+		status_t					ResetPort(int32 index);
+
+private:
+		// Utility functions
 static	int32						InterruptHandler(void *data);
 		int32						Interrupt();
 
@@ -40,9 +71,6 @@ inline	void						WriteReg16(uint32 reg, uint16 value);
 inline	void						WriteReg32(uint32 reg, uint32 value);
 inline	uint16						ReadReg16(uint32 reg);
 inline	uint32						ReadReg32(uint32 reg);
-
-		// Functions for the actual functioning of transfers
-		status_t					InsertControl(Transfer *transfer);
 
 static	pci_module_info				*sPCIModule; 
 
@@ -54,21 +82,8 @@ static	pci_module_info				*sPCIModule;
 		area_id						fFrameArea;
 		addr_t						*fFrameList;
 
-		// Virtual frame
-		uhci_qh						*fVirtualQueueHead[12];
-
-#define fQueueHeadInterrupt256		fVirtualQueueHead[0]
-#define fQueueHeadInterrupt128		fVirtualQueueHead[1]
-#define fQueueHeadInterrupt64		fVirtualQueueHead[2]
-#define fQueueHeadInterrupt32		fVirtualQueueHead[3]
-#define fQueueHeadInterrupt16		fVirtualQueueHead[4]
-#define fQueueHeadInterrupt8		fVirtualQueueHead[5]
-#define fQueueHeadInterrupt4		fVirtualQueueHead[6]
-#define fQueueHeadInterrupt2		fVirtualQueueHead[7]
-#define fQueueHeadInterrupt1		fVirtualQueueHead[8]
-#define fQueueHeadControl			fVirtualQueueHead[9]
-#define fQueueHeadBulk				fVirtualQueueHead[10]
-#define fQueueHeadTerminate			fVirtualQueueHead[11]
+		// Queues
+		Queue						*fQueues[4];
 
 		// Maintain a list of transfers
 		Vector<Transfer *>			fTransfers;
