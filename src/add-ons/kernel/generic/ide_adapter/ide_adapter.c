@@ -721,7 +721,7 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 		intnum, true, "Primary Channel", &channels[0], supports_compatibility_mode);
 
 	ide_adapter_detect_channel(pci, device, controller_node, channel_module_name,
-		can_dma, command_block_base[0], control_block_base[0], bus_master_base,
+		can_dma, command_block_base[1], control_block_base[1], bus_master_base,
 		intnum, false, "Secondary Channel", &channels[1], supports_compatibility_mode);
 	
 	pnp->uninit_driver(parent);
