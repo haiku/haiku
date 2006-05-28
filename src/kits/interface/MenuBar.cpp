@@ -17,6 +17,7 @@
 #include <MenuPrivate.h>
 #include <TokenSpace.h>
 
+using BPrivate::gDefaultTokens;
 
 struct menubar_data {
 	BMenuBar *menuBar;
@@ -509,13 +510,16 @@ BMenuBar::RestoreFocus()
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BHandler *handler = NULL;
-		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
-				(void **)&handler) == B_OK) {
+		if (fPrevFocusToken != -1 
+			&& gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN, (void **)&handler) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
 			if (view != NULL && view->Window() == window)
 				view->MakeFocus();
-		}
-		fPrevFocusToken = -1;
+			fPrevFocusToken = -1;
+		
+		} else if (IsFocus())
+			MakeFocus(false);
+
 		window->Unlock();
 	}
 }

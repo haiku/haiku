@@ -1931,15 +1931,17 @@ BMenu::SetIgnoreHidden(bool on)
 void
 BMenu::SetStickyMode(bool on)
 {
-	fStickyMode = on;
-	
-	// TODO: Ugly hack, but it needs to be done right here in this method
-	BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this);
-	if (on && menuBar != NULL && menuBar->LockLooper()) {
-		// Steal the focus from the current focus view
-		// (needed to handle keyboard navigation)
-		menuBar->StealFocus();
-		menuBar->UnlockLooper();
+	if (fStickyMode != on) {
+		// TODO: Ugly hack, but it needs to be done right here in this method
+		BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this);
+		if (on && menuBar != NULL && menuBar->LockLooper()) {
+			// Steal the focus from the current focus view
+			// (needed to handle keyboard navigation)
+			menuBar->StealFocus();
+			menuBar->UnlockLooper();
+		}
+		
+		fStickyMode = on;
 	}
 
 	// If we are switching to sticky mode, propagate the status
