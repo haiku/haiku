@@ -510,19 +510,6 @@ devfs_remove_from_dir(struct devfs_vnode *dir, struct devfs_vnode *removeNode)
 
 
 static status_t
-devfs_get_partition_info(struct devfs *fs, struct devfs_vnode *vnode, 
-	struct devfs_cookie *cookie, void *buffer, size_t length)
-{
-	struct devfs_partition *partition = vnode->stream.u.dev.partition;
-
-	if (!S_ISCHR(vnode->stream.type) || partition == NULL || length != sizeof(partition_info))
-		return B_BAD_VALUE;
-
-	return user_memcpy(buffer, &partition->info, sizeof(partition_info));
-}
-
-
-static status_t
 add_partition(struct devfs *fs, struct devfs_vnode *device,
 	const char *name, const partition_info &info)
 {
@@ -1547,25 +1534,63 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 }
 
 
+/**	Forwards the opcode to the device driver, but also handles some devfs specific
+ *	functionality, like partitions.
+ */
+
 static status_t
-devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *buffer, size_t length)
+devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
+	void *buffer, size_t length)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _vnode, _cookie, op, buffer, length));
+	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
+		_vnode, _cookie, op, buffer, length));
 
 	if (S_ISCHR(vnode->stream.type)) {
 		switch (op) {
 			case B_GET_PARTITION_INFO:
-				return devfs_get_partition_info(fs, vnode, cookie, (partition_info *)buffer, length);
+			{
+				struct devfs_partition *partition = vnode->stream.u.dev.partition;
+				if (!S_ISCHR(vnode->stream.type)
+					|| partition == NULL
+					|| length != sizeof(partition_info))
+					return B_BAD_VALUE;
+
+				return user_memcpy(buffer, &partition->info, sizeof(partition_info));
+			}
 
 			case B_SET_PARTITION:
 				return B_NOT_ALLOWED;
+
+			case B_GET_GEOMETRY:
+			{
+				struct devfs_partition *partition = vnode->stream.u.dev.partition;
+				if (partition == NULL)
+					break;
+
+				device_geometry geometry;
+				status_t status = vnode->stream.u.dev.info->control(
+					cookie->device_cookie, op, &geometry, length);
+				if (status < B_OK)
+					return status;
+
+				// patch values to match partition size
+				geometry.sectors_per_track = 0;
+				if (geometry.bytes_per_sector == 0)
+					geometry.bytes_per_sector = 512;
+				geometry.sectors_per_track = partition->info.size / geometry.bytes_per_sector;
+				geometry.head_count = 1;
+				geometry.cylinder_count = 1;
+
+				return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			}
 		}
 
-		return vnode->stream.u.dev.info->control(cookie->device_cookie, op, buffer, length);
+		return vnode->stream.u.dev.info->control(cookie->device_cookie,
+			op, buffer, length);
 	}
 
 	return B_BAD_VALUE;
