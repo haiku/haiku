@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "audio/x-musepack";
 
 resource(2, "META:S:DESC") #'MSDC' "Musepack Sound File";
 
-resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mpc",

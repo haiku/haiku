@@ -13,4 +13,4 @@ resource(4, "META:EXTENS") message(234) {
 	"type" = "video/quicktime"
 };
 
-resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";

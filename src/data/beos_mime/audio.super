@@ -7,7 +7,7 @@ resource(2, "META:L:DESC") #'MLDC' "generic audio";
 
 resource(3, "META:S:DESC") #'MSDC' "generic audio";
 
-resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.Haiku.MediaPlayer";
 
 resource(5, "META:EXTENS") message(234)
 {
