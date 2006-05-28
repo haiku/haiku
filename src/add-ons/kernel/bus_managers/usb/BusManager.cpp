@@ -70,6 +70,7 @@ BusManager::ExploreThread(void *data)
 		return B_ERROR;
 
 	while (true) {
+		//snooze(5000000);
 		rootHub->Explore();
 		snooze(1000000);
 	}

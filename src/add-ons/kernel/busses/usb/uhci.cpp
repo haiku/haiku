@@ -154,7 +154,7 @@ free_descriptor_chain(uhci_td *topDescriptor, Stack *stack)
 size_t
 read_descriptor_chain(uhci_td *topDescriptor, uint8 *buffer, int32 bufferSize)
 {
-	TRACE(("usb_uhci: reading descriptor chain to buffer 0x%08x\n", buffer, bufferSize));
+	TRACE(("usb_uhci: reading descriptor chain to buffer 0x%08x\n", buffer));
 	size_t actualSize = 0;
 	uhci_td *current = topDescriptor;
 
@@ -162,7 +162,7 @@ read_descriptor_chain(uhci_td *topDescriptor, uint8 *buffer, int32 bufferSize)
 		if (!current->buffer_log)
 			break;
 
-		size_t length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
+		int32 length = (current->status & TD_STATUS_ACTLEN_MASK) + 1;
 		if (length == TD_STATUS_ACTLEN_NULL + 1)
 			length = 0;
 
@@ -323,8 +323,8 @@ Queue::AppendDescriptor(uhci_td *descriptor)
 status_t
 Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 {
-	Pipe *pipe = transfer->GetPipe();
-	usb_request_data *requestData = transfer->GetRequestData();
+	Pipe *pipe = transfer->TransferPipe();
+	usb_request_data *requestData = transfer->RequestData();
 	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) > 0;
 
 	uhci_td *setupDescriptor = new_descriptor(fStack, pipe, TD_TOKEN_SETUP,
@@ -345,9 +345,9 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 	statusDescriptor->link_phy = QH_TERMINATE;
 	statusDescriptor->link_log = 0;
 
-	if (transfer->GetBuffer() && transfer->GetBufferLength() > 0) {
+	if (transfer->Buffer() && transfer->BufferLength() > 0) {
 		int32 packetSize = 8;
-		int32 bufferLength = transfer->GetBufferLength();
+		int32 bufferLength = transfer->BufferLength();
 		int32 descriptorCount = (bufferLength + packetSize - 1) / packetSize;
 
 		bool dataToggle = true;
@@ -415,9 +415,9 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 					// without any error so we finished successfully
 					TRACE(("usb_uhci: transfer successful\n"));
 
-					uint8 *buffer = (uint8 *)transfer->GetBuffer();
-					int32 bufferSize = transfer->GetBufferLength();
-					size_t *actualLength = transfer->GetActualLength();
+					uint8 *buffer = (uint8 *)transfer->Buffer();
+					int32 bufferSize = transfer->BufferLength();
+					size_t *actualLength = transfer->ActualLength();
 					if (buffer && bufferSize > 0) {
 						*actualLength = read_descriptor_chain(
 							(uhci_td *)setupDescriptor->link_log,
@@ -620,10 +620,10 @@ UHCI::SubmitTransfer(Transfer *transfer, bigtime_t timeout)
 	TRACE(("usb_uhci: submit packet called\n"));
 
 	// Short circuit the root hub
-	if (transfer->GetPipe()->DeviceAddress() == fRootHubAddress)
+	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->SubmitTransfer(transfer);
 
-	if (transfer->GetPipe()->Type() == Pipe::Control)
+	if (transfer->TransferPipe()->Type() == Pipe::Control)
 		return fQueues[1]->AddRequest(transfer, timeout);
 
 	return B_ERROR;

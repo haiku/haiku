@@ -95,7 +95,7 @@ UHCIRootHub::UHCIRootHub(UHCI *uhci, int8 devicenum)
 status_t
 UHCIRootHub::SubmitTransfer(Transfer *transfer)
 {
-	usb_request_data *request = transfer->GetRequestData();
+	usb_request_data *request = transfer->RequestData();
 	TRACE(("usb_uhci_roothub: rh_submit_packet called. request: %u\n", request->Request));
 
 	status_t result = B_ERROR;
@@ -103,7 +103,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 		case RH_GET_STATUS:
 			if (request->Index == 0) {
 				// Get the hub status -- everything as 0 means all-right
-				memset(transfer->GetBuffer(), 0, sizeof(get_status_buffer));
+				memset(transfer->Buffer(), 0, sizeof(get_status_buffer));
 				result = B_OK;
 				break;
 			} else if (request->Index > uhci_hubd.bNbrPorts) {
@@ -114,11 +114,11 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 			// Get port status
 			UpdatePortStatus();
-			memcpy(transfer->GetBuffer(),
+			memcpy(transfer->Buffer(),
 				(void *)&fPortStatus[request->Index - 1],
-				transfer->GetBufferLength());
+				transfer->BufferLength());
 
-			*(transfer->GetActualLength()) = transfer->GetBufferLength();
+			*(transfer->ActualLength()) = transfer->BufferLength();
 			result = B_OK;
 			break;
 
@@ -137,33 +137,33 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 
 			switch (request->Value) {
 				case RH_DEVICE_DESCRIPTOR:
-					memcpy(transfer->GetBuffer(), (void *)&uhci_devd,
-						transfer->GetBufferLength());
-					*(transfer->GetActualLength()) = transfer->GetBufferLength(); 
+					memcpy(transfer->Buffer(), (void *)&uhci_devd,
+						transfer->BufferLength());
+					*(transfer->ActualLength()) = transfer->BufferLength(); 
 					result = B_OK;
 					break;
 				case RH_CONFIG_DESCRIPTOR:
-					memcpy(transfer->GetBuffer(), (void *)&uhci_confd,
-						transfer->GetBufferLength());
-					*(transfer->GetActualLength()) = transfer->GetBufferLength();
+					memcpy(transfer->Buffer(), (void *)&uhci_confd,
+						transfer->BufferLength());
+					*(transfer->ActualLength()) = transfer->BufferLength();
 					result =  B_OK;
 					break;
 				case RH_INTERFACE_DESCRIPTOR:
-					memcpy(transfer->GetBuffer(), (void *)&uhci_intd,
-						transfer->GetBufferLength());
-					*(transfer->GetActualLength()) = transfer->GetBufferLength();
+					memcpy(transfer->Buffer(), (void *)&uhci_intd,
+						transfer->BufferLength());
+					*(transfer->ActualLength()) = transfer->BufferLength();
 					result = B_OK ;
 					break;
 				case RH_ENDPOINT_DESCRIPTOR:
-					memcpy(transfer->GetBuffer(), (void *)&uhci_endd,
-						transfer->GetBufferLength());
-					*(transfer->GetActualLength()) = transfer->GetBufferLength();
+					memcpy(transfer->Buffer(), (void *)&uhci_endd,
+						transfer->BufferLength());
+					*(transfer->ActualLength()) = transfer->BufferLength();
 					result = B_OK ;
 					break;
 				case RH_HUB_DESCRIPTOR:
-					memcpy(transfer->GetBuffer(), (void *)&uhci_hubd,
-						transfer->GetBufferLength());
-					*(transfer->GetActualLength()) = transfer->GetBufferLength();
+					memcpy(transfer->Buffer(), (void *)&uhci_hubd,
+						transfer->BufferLength());
+					*(transfer->ActualLength()) = transfer->BufferLength();
 					result = B_OK;
 					break;
 				default:

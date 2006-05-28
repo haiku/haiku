@@ -1,95 +1,101 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2003-2004, Niels S. Reedijk
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+/*
+ * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels S. Reedijk
+ */
 
 #include "usb_p.h"
 
-Transfer::Transfer( Pipe *pipe , bool synchronous )
+
+Transfer::Transfer(Pipe *pipe, bool synchronous)
 {
-	m_pipe = pipe;
-	m_buffer = 0;
-	m_bufferlength = 0;
-	m_actual_length = 0;
-	m_timeout = 0;
-	m_status = 0;
-	m_sem = B_ERROR;
-	m_hcpriv = 0;
-	
-	if ( synchronous == true )
-	{
-		m_sem = create_sem( 0 , "USB Transfer" );
-		set_sem_owner ( m_sem , B_SYSTEM_TEAM );
+	fPipe = pipe;
+	fBuffer = NULL;
+	fBufferLength = 0;
+	fActualLength = NULL;
+	fTimeout = 0;
+	fStatus = B_ERROR;
+	fSem = -1;
+	fHostPrivate = NULL;
+
+	if (synchronous) {
+		fSem = create_sem(0, "USB Transfer");
+		set_sem_owner(fSem, B_SYSTEM_TEAM);
 	}
 }
 
+
 Transfer::~Transfer()
 {
-	if ( m_sem > B_OK )
-		delete_sem( m_sem );
+	if (fSem >= B_OK)
+		delete_sem(fSem);
 }
 
-void Transfer::SetRequestData( usb_request_data *data )
+
+void
+Transfer::SetRequestData(usb_request_data *data)
 {
-	m_request = data;
+	fRequest = data;
 }
 
-void Transfer::SetBuffer( uint8 *buffer )
+
+void
+Transfer::SetBuffer(uint8 *buffer)
 {
-	m_buffer = buffer;
+	fBuffer = buffer;
 }
 
-void Transfer::SetBufferLength( size_t length )
+
+void
+Transfer::SetBufferLength(size_t length)
 {
-	m_bufferlength = length;
+	fBufferLength = length;
 }
 
-void Transfer::SetActualLength( size_t *actual_length )
-{
-	m_actual_length = actual_length;
-};
 
-void Transfer::SetCallbackFunction( usb_callback_func callback )
+void
+Transfer::SetActualLength(size_t *actualLength)
 {
-	m_callback = callback;
+	fActualLength = actualLength;
 }
 
-void Transfer::SetHostPrivate( hostcontroller_priv *priv )
+
+void
+Transfer::SetCallbackFunction(usb_callback_func callback)
 {
-	m_hcpriv = priv;
+	fCallback = callback;
 }
 
-void Transfer::WaitForFinish()
-{
-	if ( m_sem > B_OK )
-		acquire_sem( m_sem );
-}	
 
-void Transfer::TransferDone()
+void
+Transfer::SetHostPrivate(hostcontroller_priv *priv)
 {
-	if ( m_sem > B_OK )
-		release_sem( m_sem );
+	fHostPrivate = priv;
 }
+
+
+void
+Transfer::WaitForFinish()
+{
+	if (fSem > B_OK)
+		acquire_sem(fSem);
+	// ToDo: and otherwise?
+}
+
+
+void
+Transfer::TransferDone()
+{
+	if (fSem > B_OK)
+		release_sem(fSem);
+}
+
 
 void Transfer::Finish()
 {
-	//If we are synchronous, release a sem
-	if ( m_sem > B_OK )
-		release_sem( m_sem );
+	// If we are synchronous, release a sem
+	if (fSem > B_OK)
+		release_sem(fSem);
 }

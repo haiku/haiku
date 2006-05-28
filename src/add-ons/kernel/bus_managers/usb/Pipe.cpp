@@ -17,7 +17,7 @@ Pipe::Pipe(Device *device, pipeDirection &direction, uint8 &endpointAddress)
 
 	fBus = NULL;
 	if (fDevice)
-		fBus = fDevice->GetBusManager();
+		fBus = fDevice->Manager();
 }
 
 
@@ -32,7 +32,7 @@ Pipe::DeviceAddress()
 	if (!fDevice)
 		return -1;
 
-	return fDevice->GetAddress();
+	return fDevice->Address();
 }
 
 
@@ -42,9 +42,10 @@ Pipe::DeviceAddress()
 
 
 ControlPipe::ControlPipe(Device *device, pipeDirection direction,
-	uint8 endpointAddress)
+	pipeSpeed speed, uint8 endpointAddress)
 	:	Pipe(device, direction, endpointAddress)
 {
+	fSpeed = speed;
 }
 
 
@@ -64,7 +65,7 @@ ControlPipe::DeviceAddress()
 	if (!fDevice)
 		return fDeviceAddress;
 
-	return fDevice->GetAddress();
+	return fDevice->Address();
 }
 
 
