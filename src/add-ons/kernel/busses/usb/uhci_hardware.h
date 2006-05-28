@@ -105,18 +105,28 @@ typedef struct
 	addr_t this_phy;		// A physical pointer to this address
 	void * link_log;		// Link to the next logical TD/QT
 	void * buffer_log;		// Link to the buffer
+	int32  buffer_size;		// Size of the buffer
 } uhci_td;
 
-#define TD_STATUS_3_ERRORS ( 3 << 27 )
-#define TD_STATUS_LOWSPEED ( 1 << 26 )
-#define TD_STATUS_IOS      ( 1 << 25 )
-#define TD_STATUS_IOC      ( 1 << 24 )
-#define TD_STATUS_ACTIVE   ( 1 << 23 )
-#define TD_TOKEN_DATA1     ( 1 << 19 )
-#define TD_TOKEN_NULL      (0x7FF << 21 ) 
-#define TD_TOKEN_DEVADDR_SHIFT 8
-#define TD_DEPTH_FIRST     0x4
-#define TD_TERMINATE       0x1
+#define TD_STATUS_3_ERRORS		(3 << 27)
+#define TD_STATUS_LOWSPEED		(1 << 26)
+#define TD_STATUS_IOS			(1 << 25)
+#define TD_STATUS_IOC			(1 << 24)
+#define TD_STATUS_ACTIVE		(1 << 23)
+#define TD_STATUS_ACTLEN_MASK	0x3ff
+#define TD_STATUS_ACTLEN_NULL	0x7ff
+
+#define TD_TOKEN_DATA1			(1 << 19)
+#define TD_TOKEN_NULL			(0x7ff << 21) 
+
+#define TD_TOKEN_SETUP			0x2d
+#define TD_TOKEN_IN				0x69
+#define TD_TOKEN_OUT			0xe1
+
+#define TD_TOKEN_DEVADDR_SHIFT	8
+#define TD_DEPTH_FIRST			0x4
+#define TD_TERMINATE			0x1
+#define TD_ERROR_MASK			0x7e0000
 
 //Represents a Queue Head (QH)
 

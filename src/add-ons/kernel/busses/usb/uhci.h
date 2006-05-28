@@ -28,11 +28,13 @@ public:
 		status_t					TerminateByStrayDescriptor();
 
 		status_t					AppendDescriptor(uhci_td *descriptor);
-		status_t					AddTransfer(Transfer *transfer,
+		status_t					AddRequest(Transfer *transfer,
 										bigtime_t timeout);
 		status_t					RemoveInactiveDescriptors();
 
 		addr_t						PhysicalAddress();
+
+		void						PrintToStream();
 
 private:
 		status_t					fStatus;
@@ -83,7 +85,8 @@ static	pci_module_info				*sPCIModule;
 		addr_t						*fFrameList;
 
 		// Queues
-		Queue						*fQueues[4];
+		int32						fQueueCount;
+		Queue						*fQueues[];
 
 		// Maintain a list of transfers
 		Vector<Transfer *>			fTransfers;

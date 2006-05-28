@@ -11,7 +11,7 @@
 
 #define TRACE_BUSMANAGER
 #ifdef TRACE_BUSMANAGER
-#define TRACE(x)	dprintf(x)
+#define TRACE(x)	dprintf x
 #else
 #define TRACE(x)	/* nothing */
 #endif
@@ -88,6 +88,8 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		return NULL;
 	}
 
+	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceNum));
+
 	// Set the address of the device USB 1.1 spec p202
 	status_t result = fDefaultPipeLowSpeed->SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
@@ -104,17 +106,20 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		return NULL;
 	}
 
-	// Create a temporary pipe
+	// Wait a bit for the device to complete addressing
+	snooze(10000);
+
+	// Create a temporary pipe with the new address
 	ControlPipe pipe(this, deviceNum, Pipe::Default, Pipe::LowSpeed, 0);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
-	// size of any device, plus it is enough, because the device type is in
-	// there too
+	// size of any device. It is enough because it includes the device type.
 
 	size_t actualLength = 0;
 	usb_device_descriptor deviceDescriptor;
 
+	TRACE(("usb BusManager::AllocateNewDevice(): getting the device descriptor\n"));
 	pipe.SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
