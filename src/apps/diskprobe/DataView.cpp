@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -185,7 +185,7 @@ DataView::MessageReceived(BMessage *message)
 				fOffset = offset;
 				SetSelection(0, 0);
 				MakeVisible(0);
-			} 
+			}
 			if (message->FindInt32("view_size", &viewSize) == B_OK) {
 				fDataSize = viewSize;
 				fData = (uint8 *)realloc(fData, fDataSize);
@@ -318,7 +318,7 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 	}
 
 	line += sprintf(line, fBase == kHexBase ? "%0*Lx:  " : "%0*Ld:  ",
-				(int)fPositionLength, offset);
+		(int)fPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
 		if (i >= size) {
@@ -359,7 +359,7 @@ DataView::Draw(BRect updateRect)
 	BPoint location(kHorizontalSpace, kVerticalSpace + fAscent);
 
 	for (uint32 i = 0; i < fSizeInView; i += kBlockSize) {
-		ConvertLine(line, /*fOffset + */i, fData + i, fSizeInView - i);
+		ConvertLine(line, i, fData + i, fSizeInView - i);
 		DrawString(line, location);
 
 		location.y += fFontHeight;

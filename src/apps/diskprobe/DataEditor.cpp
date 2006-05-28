@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -938,6 +938,11 @@ DataEditor::Update()
 
 	if (bytesRead < B_OK)
 		return bytesRead;
+
+	if ((size_t)bytesRead < fRealViewSize) {
+		// make sure the rest of data is cleared
+		memset(fView + bytesRead, 0, fRealViewSize - bytesRead);
+	}
 
 	ApplyChanges();
 	fNeedsUpdate = false;
