@@ -495,7 +495,7 @@ BMenuBar::StealFocus()
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BView *focus = window->CurrentFocus();
-		if (focus != NULL)
+		if (focus != NULL && focus != this)
 			fPrevFocusToken = _get_object_token_(focus);
 		MakeFocus();
 		window->Unlock();

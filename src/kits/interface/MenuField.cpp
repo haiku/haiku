@@ -95,17 +95,11 @@ BMenuField::BMenuField(BMessage *data)
 	if (data->FindBool("be:fixeds", &fixed) == B_OK)
 		fFixedSizeMB = fixed;
 
-//	BMenuItem *item = fMenuBar->ItemAt(0);
-//	if (!item)
-//		return;
-//
-//	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
-//	if (!bmcitem)
-//		return;
-//
-//	bool dmark;
-//	if (data->FindBool("be:dmark", &dmark))
-//		bmcitem->fShowPopUpMarker = dmark;
+	bool dmark = false;
+	data->FindBool("be:dmark", &dmark);
+	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+		menuBar->TogglePopUpMarker(dmark);
+	}
 }
 
 
@@ -148,13 +142,11 @@ BMenuField::Archive(BMessage *data, bool deep) const
 	if (ret == B_OK && fFixedSizeMB)
 		ret = data->AddBool("be:fixeds", true);
 
-//	BMenuItem *item = fMenuBar->ItemAt(0);
-//	if (!item)
-//		return B_OK;
-//
-//	_BMCItem_ *bmcitem = dynamic_cast<_BMCItem_*>(item);
-//	if (bmcitem && !bmcitem->fShowPopUpMarker)
-//		data->AddBool("be:dmark", false);
+	bool dmark = false;
+	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+		dmark = menuBar->IsPopUpMarkerShown();
+	}
+	data->AddBool("be:dmark", dmark);
 
 	return ret;
 }
@@ -225,7 +217,7 @@ BMenuField::AllAttached()
 void
 BMenuField::MouseDown(BPoint where)
 {
-	if (!IsEnabled() || (where.x > fDivider && !fMenuBar->Frame().Contains(where)))
+	if (!fMenuBar->Frame().Contains(where))
 		return;
 
 	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
@@ -453,14 +445,20 @@ BMenuField::Divider() const
 void
 BMenuField::ShowPopUpMarker()
 {
-	// TODO:
+	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+		menuBar->TogglePopUpMarker(true);
+		menuBar->Invalidate();
+	}
 }
 
 
 void
 BMenuField::HidePopUpMarker()
 {
-	// TODO:
+	if (_BMCMenuBar_ *menuBar = dynamic_cast<_BMCMenuBar_ *>(fMenuBar)) {
+		menuBar->TogglePopUpMarker(false);
+		menuBar->Invalidate();
+	}
 }
 
 
@@ -572,8 +570,6 @@ BMenuField::InitObject(const char *label)
 void
 BMenuField::InitObject2()
 {
-	// TODO set filter
-	
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
@@ -582,6 +578,7 @@ BMenuField::InitObject2()
 		+ fontHeight.leading) + 7;
 
 	fMenuBar->ResizeTo(Bounds().Width() - fDivider, height);
+	fMenuBar->AddFilter(new _BMCFilter_(this, B_MOUSE_DOWN));
 }
 
 

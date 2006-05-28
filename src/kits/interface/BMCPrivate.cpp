@@ -16,8 +16,11 @@
 #include <Region.h>
 #include <Window.h>
 
-/*
-_BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32)
+
+_BMCFilter_::_BMCFilter_(BMenuField *menuField, uint32 what)
+	:
+	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, what),
+	fMenuField(menuField)
 {
 }
 
@@ -30,6 +33,17 @@ _BMCFilter_::~_BMCFilter_()
 filter_result
 _BMCFilter_::Filter(BMessage *message, BHandler **handler)
 {
+	if (message->what == B_MOUSE_DOWN) {
+		if (BView *view = dynamic_cast<BView *>(*handler)) {
+			BPoint point;
+			message->FindPoint("be:view_where", &point);
+			view->ConvertToParent(&point);
+			message->ReplacePoint("be:view_where", point);
+			*handler = fMenuField;
+		}
+	}
+
+	return B_DISPATCH_MESSAGE;
 }
 
 
@@ -37,7 +51,7 @@ _BMCFilter_ &
 _BMCFilter_::operator=(const _BMCFilter_ &)
 {
 	return *this;
-}*/
+}
 
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
@@ -50,6 +64,7 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
 	fMenuField = menuField;
 	fFixedSize = fixed_size;
 	fRunner = NULL;
+	fShowPopUpMarker = true;
 
 	float left, top, right, bottom;
 
@@ -106,6 +121,11 @@ _BMCMenuBar_::AttachedToWindow()
 void
 _BMCMenuBar_::Draw(BRect updateRect)
 {
+	if (!fShowPopUpMarker) {
+		BMenuBar::Draw(updateRect);
+		return;
+	}
+
 	// draw the right side with the popup marker
 
 	// prevent the original BMenuBar's Draw from
@@ -298,15 +318,6 @@ _BMCMenuBar_::MakeFocus(bool focused)
 
 	fMenuField->Invalidate(BRect(bounds.left, bounds.top, fMenuField->fDivider,
 		bounds.bottom));
-}
-
-
-void
-_BMCMenuBar_::MouseDown(BPoint where)
-{
-	// Don't show the associated menu if it's disabled
-	if (fMenuField->IsEnabled() && SubmenuAt(0)->IsEnabled())
-		BMenuBar::MouseDown(where);
 }
 
 
