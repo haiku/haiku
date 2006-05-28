@@ -68,6 +68,241 @@ module_info *modules[] = {
 //
 
 
+Queue::Queue(Stack *stack)
+{
+	fStack = stack;
+
+	void *physicalAddress;
+	fStatus = fStack->AllocateChunk((void **)&fQueueHead, &physicalAddress, 32);
+	if (fStatus < B_OK)
+		return;
+
+	fQueueHead->this_phy = (addr_t)physicalAddress;
+	fQueueHead->element_phy = QH_TERMINATE;
+	fQueueHead->element_log = 0;
+
+	fStrayDescriptor = NULL;
+}
+
+
+Queue::~Queue()
+{
+	fStack->FreeChunk(fQueueHead, (void *)fQueueHead->this_phy, 32);
+
+	if (fStrayDescriptor)
+		fStack->FreeChunk(fStrayDescriptor, (void *)fStrayDescriptor->this_phy, 32);
+}
+
+
+status_t
+Queue::InitCheck()
+{
+	return fStatus;
+}
+
+
+status_t
+Queue::LinkTo(Queue *other)
+{
+	if (!other)
+		return B_BAD_VALUE;
+
+	fQueueHead->link_phy = other->fQueueHead->this_phy | QH_NEXT_IS_QH;
+	fQueueHead->link_log = other->fQueueHead;
+	return B_OK;
+}
+
+
+status_t
+Queue::TerminateByStrayDescriptor()
+{
+	// According to the *BSD USB sources, there needs to be a stray transfer
+	// descriptor in order to get some chipset to work nicely (like the PIIX).
+	void *physicalAddress;
+	status_t result = fStack->AllocateChunk((void **)&fStrayDescriptor,
+		&physicalAddress, 32);
+	if (result < B_OK) {
+		TRACE(("usb_uhci: failed to allocate a stray transfer descriptor\n"));
+		return result;
+	}
+
+	fStrayDescriptor->status = 0;
+	fStrayDescriptor->this_phy = (addr_t)physicalAddress;
+	fStrayDescriptor->link_phy = TD_TERMINATE;
+	fStrayDescriptor->link_log = 0;
+	fStrayDescriptor->buffer_phy = 0;
+	fStrayDescriptor->buffer_log = 0;
+	fStrayDescriptor->token = TD_TOKEN_NULL | (0x7f << TD_TOKEN_DEVADDR_SHIFT)
+		| 0x69;
+
+	fQueueHead->link_phy = fStrayDescriptor->this_phy;
+	fQueueHead->link_log = fStrayDescriptor;
+	fQueueHead->element_phy = QH_TERMINATE;
+	fQueueHead->element_log = 0;
+
+	return B_OK;
+}
+
+
+status_t
+Queue::AppendDescriptor(uhci_td *descriptor)
+{
+	if (fQueueHead->element_phy & QH_TERMINATE) {
+		// the queue is empty, make this the first element
+		fQueueHead->element_phy = descriptor->this_phy;
+		fQueueHead->element_log = descriptor;
+		TRACE(("usb_uhci: first transfer in queue\n"));
+	} else {
+		// there are transfers linked, append to the queue
+		uhci_td *element = (uhci_td *)fQueueHead->element_log;
+		while ((element->link_phy & TD_TERMINATE) == 0)
+			element = (uhci_td *)element->link_log;
+
+		element->link_phy = descriptor->this_phy;
+		element->link_log = descriptor;
+		TRACE(("usb_uhci: appended transfer to queue\n"));
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Queue::AddTransfer(Transfer *transfer, bigtime_t timeout)
+{
+	// Allocate the transfer descriptor for the transfer
+	void *physicalAddress;
+	uhci_td *transferDescriptor;
+	if (fStack->AllocateChunk((void **)&transferDescriptor, &physicalAddress, 32) < B_OK) {
+		TRACE(("usb_uhci: failed to allocate a transfer descriptor\n"));
+		return ENOMEM;
+	}
+
+	transferDescriptor->this_phy = (addr_t)physicalAddress;
+	transferDescriptor->status = TD_STATUS_ACTIVE | TD_STATUS_3_ERRORS;
+	if (transfer->GetPipe()->Speed() == Pipe::LowSpeed)
+		transferDescriptor->status |= TD_STATUS_LOWSPEED;
+
+	transferDescriptor->token = ((sizeof(usb_request_data) - 1) << 21)
+		| (transfer->GetPipe()->EndpointAddress() << 15)
+		| (transfer->GetPipe()->DeviceAddress() << 8) | 0x2D;
+
+	// Create a physical space for the request
+	if (fStack->AllocateChunk(&transferDescriptor->buffer_log,
+		&transferDescriptor->buffer_phy, sizeof(usb_request_data)) < B_OK) {
+		TRACE(("usb_uhci: unable to allocate space for the request buffer\n"));
+		fStack->FreeChunk(transferDescriptor,
+			(void *)transferDescriptor->this_phy, 32);
+		return ENOMEM;
+	}
+
+	memcpy(transferDescriptor->buffer_log, transfer->GetRequestData(),
+		sizeof(usb_request_data));
+
+	// Create a status transfer descriptor
+	uhci_td *statusDescriptor;
+	if (fStack->AllocateChunk((void **)&statusDescriptor, &physicalAddress, 32) < B_OK) {
+		TRACE(("usb_uhci: failed to allocate the status descriptor\n"));
+		fStack->FreeChunk(transferDescriptor->buffer_log,
+			(void *)transferDescriptor->buffer_phy, sizeof(usb_request_data));
+		fStack->FreeChunk(transferDescriptor,
+			(void *)transferDescriptor->this_phy, 32);
+		return ENOMEM;
+	}
+
+	statusDescriptor->this_phy = (addr_t)physicalAddress;
+	statusDescriptor->status = TD_STATUS_IOC | TD_STATUS_ACTIVE |
+		TD_STATUS_3_ERRORS;
+	if (transfer->GetPipe()->Speed() == Pipe::LowSpeed)
+		statusDescriptor->status |= TD_STATUS_LOWSPEED;
+
+	statusDescriptor->token = TD_TOKEN_NULL | TD_TOKEN_DATA1
+		| (transfer->GetPipe()->EndpointAddress() << 15)
+		| (transfer->GetPipe()->DeviceAddress() << 8) | 0x2d;
+
+	statusDescriptor->buffer_phy = statusDescriptor->buffer_log = 0;
+	statusDescriptor->link_phy = QH_TERMINATE;
+	statusDescriptor->link_log = 0;
+
+	if (transfer->GetBuffer() && transfer->GetBufferLength() > 0) {
+		// ToDo: split up data to maxlen and create / link tds
+	} else {
+		// Link transfer and status descriptors directly
+		transferDescriptor->link_phy = statusDescriptor->this_phy | TD_DEPTH_FIRST;
+		transferDescriptor->link_log = statusDescriptor;
+	}
+
+	status_t result = AppendDescriptor(transferDescriptor);
+	if (result < B_OK) {
+		TRACE(("usb_uhci: failed to append descriptors\n"));
+		fStack->FreeChunk(transferDescriptor->buffer_log,
+			(void *)transferDescriptor->buffer_phy, sizeof(usb_request_data));
+		fStack->FreeChunk(transferDescriptor,
+			(void *)transferDescriptor->this_phy, 32);
+		fStack->FreeChunk(statusDescriptor,
+			(void *)statusDescriptor->this_phy, 32);
+		return result;
+	}
+
+	if (timeout > 0) {
+		// wait for the transfer to finish
+		while (true) {
+			if ((statusDescriptor->status & TD_STATUS_ACTIVE) == 0) {
+				TRACE(("usb_uhci: transfer completed successfuly\n"));
+				return B_OK;
+			}
+			if (transferDescriptor->status & 0x7e00) {
+				TRACE(("usb_uhci: transfer failed: 0x%04x\n", transferDescriptor->status));
+				return B_ERROR;
+			}
+
+			TRACE(("usb_uhci: in progress\n"));
+			snooze(1000);
+		}
+	}
+
+	return EINPROGRESS;	
+}
+
+
+status_t
+Queue::RemoveInactiveDescriptors()
+{
+	if (fQueueHead->element_phy & QH_TERMINATE)
+		return B_OK;
+
+	uhci_td *element = (uhci_td *)fQueueHead->element_log;
+	while (element) {
+		if (element->status & TD_STATUS_ACTIVE)
+			break;
+
+		fStack->FreeChunk(element, (void *)element->this_phy, 32);
+
+		if (element->link_phy & TD_TERMINATE) {
+			fQueueHead->element_phy = QH_TERMINATE;
+			fQueueHead->element_log = NULL;
+			break;
+		}
+
+		element = (uhci_td *)element->link_log;
+	}
+
+	return B_OK;
+}
+
+
+addr_t
+Queue::PhysicalAddress()
+{
+	return fQueueHead->this_phy;
+}
+
+
+//
+// #pragma mark -
+//
+
+
 UHCI::UHCI(pci_info *info, Stack *stack)
 	:	BusManager(),
 		fPCIInfo(info),
@@ -97,7 +332,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 
 	// do a global and host reset
 	GlobalReset();
-	if (Reset() < B_OK) {
+	if (ResetController() < B_OK) {
 		TRACE(("usb_uhci: host failed to reset\n"));
 		fInitOK = false;
 		return;
@@ -118,91 +353,24 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	WriteReg32(UHCI_FRBASEADD, (uint32)physicalAddress);	
 	WriteReg16(UHCI_FRNUM, 0);
 
-	/*
-		According to the *BSD USB sources, there needs to be a stray transfer
-		descriptor in order to get some chipset to work nicely (like the PIIX).
-	*/
-	uhci_td *strayDescriptor;
-	if (fStack->AllocateChunk((void **)&strayDescriptor, &physicalAddress, 32) != B_OK) {
-		TRACE(("usb_uhci: failed to allocate a stray transfer descriptor\n"));
-		delete_area(fFrameArea);
-		fInitOK = false;
-		return;
-	}
-
-	strayDescriptor->status = 0;
-	strayDescriptor->this_phy = (addr_t)physicalAddress;
-	strayDescriptor->link_phy = TD_TERMINATE;
-	strayDescriptor->link_log = 0;
-	strayDescriptor->buffer_phy = 0;
-	strayDescriptor->buffer_log = 0;
-	strayDescriptor->token = TD_TOKEN_NULL | (0x7f << TD_TOKEN_DEVADDR_SHIFT)
-		| 0x69;
-
-	/*
-		Setup the virtual structure. I stole this idea from the linux usb stack,
-		the idea is that for every interrupt interval there is a queue head.
-		These things all link together and eventually point to the control and
-		bulk virtual queue heads.
-	*/
-	for (int32 i = 0; i < 12; i++) {
-		// must be aligned on 16-byte boundaries
-		if (fStack->AllocateChunk((void **)&fVirtualQueueHead[i],
-			&physicalAddress, 32) != B_OK) {
-			TRACE(("usb_uhci: failed allocation of skeleton queue head %i, aborting\n",  i));
+	for (int32 i = 0; i < 4; i++) {
+		fQueues[i] = new Queue(fStack);
+		if (fQueues[i]->InitCheck() < B_OK) {
+			TRACE(("usb_uhci: cannot create queues\n"));
 			delete_area(fFrameArea);
 			fInitOK = false;
 			return;
 		}
 
-		fVirtualQueueHead[i]->this_phy = (addr_t)physicalAddress;
-		fVirtualQueueHead[i]->element_phy = QH_TERMINATE;
-		fVirtualQueueHead[i]->element_log = 0;
-
-		if (i == 0)
-			continue;
-
-		// link this queue head to the previous queue head
-		fVirtualQueueHead[i - 1]->link_phy = fVirtualQueueHead[i]->this_phy | QH_NEXT_IS_QH;
-		fVirtualQueueHead[i - 1]->link_log = fVirtualQueueHead[i];
+		if (i > 0)
+			fQueues[i - 1]->LinkTo(fQueues[i]);
 	}
 
-	// Make sure the fQueueHeadTerminate terminates
-	fVirtualQueueHead[11]->link_phy = strayDescriptor->this_phy;
-	fVirtualQueueHead[11]->link_log = strayDescriptor;
+	// Make sure the last queue terminates
+	fQueues[3]->TerminateByStrayDescriptor();
 
-	// Insert the queues in the frame list. The linux developers mentioned
-	// in a comment that they used some magic to distribute the elements all
-	// over the place, but I don't really think that it is useful right now
-	// (nor do I know how I should do that), instead, I just take the frame
-	// number and determine where it should begin
-
-	// NOTE, in c++ this is butt-ugly. We have a addr_t *array (because with
-	// an addr_t *array we can apply pointer arithmetic), uhci_qh *pointers
-	// that need to be put through the logical | to make sure the pointer is
-	// invalid for the hc. The result of that needs to be converted into a
-	// addr_t. Get it?
-	for (int32 i = 0; i < 1024; i++) {
-		int32 frame = i + 1;
-		if (frame % 256 == 0)
-			fFrameList[i] = fQueueHeadInterrupt256->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 128 == 0)
-			fFrameList[i] = fQueueHeadInterrupt128->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 64 == 0)
-			fFrameList[i] = fQueueHeadInterrupt64->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 32 == 0)
-			fFrameList[i] = fQueueHeadInterrupt32->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 16 == 0)
-			fFrameList[i] = fQueueHeadInterrupt16->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 8 == 0)
-			fFrameList[i] = fQueueHeadInterrupt8->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 4 == 0)
-			fFrameList[i] = fQueueHeadInterrupt4->this_phy | FRAMELIST_NEXT_IS_QH;
-		else if (frame % 2 == 0)
-			fFrameList[i] = fQueueHeadInterrupt2->this_phy | FRAMELIST_NEXT_IS_QH;
-		else
-			fFrameList[i] = fQueueHeadInterrupt1->this_phy | FRAMELIST_NEXT_IS_QH;
-	}
+	for (int32 i = 0; i < 1024; i++)
+		fFrameList[i] = fQueues[0]->PhysicalAddress() | FRAMELIST_NEXT_IS_QH;
 
 	TRACE(("usb_uhci: installing interrupt handler\n"));
 	// Install the interrupt handler
@@ -257,16 +425,16 @@ UHCI::Start()
 
 
 status_t
-UHCI::SubmitTransfer(Transfer *transfer)
+UHCI::SubmitTransfer(Transfer *transfer, bigtime_t timeout)
 {
 	TRACE(("usb_uhci: submit packet called\n"));
 
 	// Short circuit the root hub
-	if (transfer->GetPipe()->GetDeviceAddress() == fRootHubAddress)
+	if (transfer->GetPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->SubmitTransfer(transfer);
 
-	if (transfer->GetPipe()->GetType() == Pipe::Control)
-		return InsertControl(transfer);
+	if (transfer->GetPipe()->Type() == Pipe::Control)
+		return fQueues[1]->AddTransfer(transfer, timeout);
 
 	return B_ERROR;
 }
@@ -283,7 +451,7 @@ UHCI::GlobalReset()
 
 
 status_t
-UHCI::Reset()
+UHCI::ResetController()
 {
 	WriteReg16(UHCI_USBCMD, UHCI_USBCMD_HCRESET);
 
@@ -294,6 +462,83 @@ UHCI::Reset()
 			return B_ERROR;
 	}
 
+	return B_OK;
+}
+
+
+uint16
+UHCI::PortStatus(int32 index)
+{
+	if (index > 1)
+		return B_BAD_VALUE;
+
+	TRACE(("usb_uhci: read port status of port: %d\n", index));
+	return ReadReg16(UHCI_PORTSC1 + index * 2);
+}
+
+
+status_t
+UHCI::SetPortStatus(int32 index, uint16 status)
+{
+	if (index > 1)
+		return B_BAD_VALUE;
+
+	TRACE(("usb_uhci: set port status of port %d: 0x%04x\n", index, status));
+	WriteReg16(UHCI_PORTSC1 + index * 2, status);
+	snooze(1000);
+	return B_OK;
+}
+
+
+status_t
+UHCI::ResetPort(int32 index)
+{
+	if (index > 1)
+		return B_BAD_VALUE;
+
+	TRACE(("usb_uhci: reset port %d\n", index));
+
+	uint32 port = UHCI_PORTSC1 + index * 2;
+	uint16 status = ReadReg16(port);
+	status &= UHCI_PORTSC_DATAMASK;
+	WriteReg16(port, status | UHCI_PORTSC_RESET);
+	snooze(250000);
+
+	status = ReadReg16(port);
+	status &= UHCI_PORTSC_DATAMASK;
+	WriteReg16(port, status & ~UHCI_PORTSC_RESET);
+	snooze(1000);
+
+	for (int32 i = 10; i > 0; i--) {
+		// try to enable the port
+		status = ReadReg16(port);
+		status &= UHCI_PORTSC_DATAMASK;
+		WriteReg16(port, status | UHCI_PORTSC_ENABLED);
+		snooze(50000);
+
+		status = ReadReg16(port);
+
+		if ((status & UHCI_PORTSC_CURSTAT) == 0) {
+			// no device connected. since we waited long enough we can assume
+			// that the port was reset and no device is connected.
+			break;
+		}
+
+		if (status & (UHCI_PORTSC_STATCHA | UHCI_PORTSC_ENABCHA)) {
+			// port enabled changed or connection status were set.
+			// acknowledge either / both and wait again.
+			status &= UHCI_PORTSC_DATAMASK;
+			WriteReg16(port, status | UHCI_PORTSC_STATCHA | UHCI_PORTSC_ENABCHA);
+			continue;
+		}
+
+		if (status & UHCI_PORTSC_ENABLED) {
+			// the port is enabled
+			break;
+		}
+	}
+
+	TRACE(("usb_uhci: port was reset: 0x%04x\n", ReadReg16(port)));
 	return B_OK;
 }
 
@@ -359,123 +604,6 @@ UHCI::Interrupt()
 		WriteReg16(UHCI_USBSTS, acknowledge);
 
 	return B_HANDLED_INTERRUPT;
-}
-
-
-status_t
-UHCI::InsertControl(Transfer *transfer)
-{
-	TRACE(("usb_uhci: InsertControl() frnum %u, usbsts reg %u\n",
-		ReadReg16(UHCI_FRNUM), ReadReg16(UHCI_USBSTS)));
-
-	// Please note that any data structures must be aligned on a 16 byte boundary
-	// Also, due to the strange ways of C++' void* handling, this code is much messier
-	// than it actually should be. Forgive me. Or blame the compiler.
-	// First, set up a Queue Head for the transfer
-	uhci_qh *topQueueHead;
-	void *physicalAddress;
-	if (fStack->AllocateChunk((void **)&topQueueHead, &physicalAddress, 32) < B_OK) {
-		TRACE(("usb_uhci: failed to allocate a queue head\n"));
-		return ENOMEM;
-	}
-
-	topQueueHead->link_phy = QH_TERMINATE;
-	topQueueHead->link_log = 0;
-	topQueueHead->this_phy = (addr_t)physicalAddress;
-
-	// Allocate the transfer descriptor for the transfer
-	uhci_td *transferDescriptor;
-	if (fStack->AllocateChunk((void **)&transferDescriptor, &physicalAddress, 32) < B_OK) {
-		TRACE(("usb_uhci: failed to allocate the transfer descriptor\n"));
-		fStack->FreeChunk(topQueueHead, (void *)topQueueHead->this_phy, 32);
-		return ENOMEM;
-	}
-
-	transferDescriptor->this_phy = (addr_t)physicalAddress;
-	transferDescriptor->status = TD_STATUS_ACTIVE;
-	if (transfer->GetPipe()->GetSpeed() == Pipe::LowSpeed)
-		transferDescriptor->status |= TD_STATUS_LOWSPEED;
-
-	transferDescriptor->token = ((sizeof(usb_request_data) - 1) << 21)
-		| (transfer->GetPipe()->GetEndpointAddress() << 15)
-		| (transfer->GetPipe()->GetDeviceAddress() << 8) | 0x2D;
-
-	// Create a physical space for the setup request
-	if (fStack->AllocateChunk(&transferDescriptor->buffer_log,
-		&transferDescriptor->buffer_phy, sizeof(usb_request_data)) < B_OK) {
-		TRACE(("usb_uhci: unable to allocate space for the setup buffer\n"));
-		fStack->FreeChunk(transferDescriptor,
-			(void *)transferDescriptor->this_phy, 32);
-		fStack->FreeChunk(topQueueHead, (void *)topQueueHead->this_phy, 32);
-		return ENOMEM;
-	}
-
-	memcpy(transferDescriptor->buffer_log, transfer->GetRequestData(),
-		sizeof(usb_request_data));
-
-	// Link this to the queue head
-	topQueueHead->element_phy = transferDescriptor->this_phy;
-	topQueueHead->element_log = transferDescriptor;
-
-	// TODO: split the buffer into max transfer sizes
-
-	// Finally, create a status transfer descriptor
-	uhci_td *statusDescriptor;
-	if (fStack->AllocateChunk((void **)&statusDescriptor, &physicalAddress, 32) < B_OK) {
-		TRACE(("usb_uhci: failed to allocate the status descriptor\n"));
-		fStack->FreeChunk(transferDescriptor->buffer_log,
-			(void *)transferDescriptor->buffer_phy, sizeof(usb_request_data));
-		fStack->FreeChunk(transferDescriptor,
-			(void *)transferDescriptor->this_phy, 32);
-		fStack->FreeChunk(topQueueHead, (void *)topQueueHead->this_phy, 32);
-		return ENOMEM;
-	}
-
-	statusDescriptor->this_phy = (addr_t)physicalAddress;
-	statusDescriptor->status = TD_STATUS_IOC;
-	if (transfer->GetPipe()->GetSpeed() == Pipe::LowSpeed)
-		statusDescriptor->status |= TD_STATUS_LOWSPEED;
-
-	statusDescriptor->token = TD_TOKEN_NULL | TD_TOKEN_DATA1
-		| (transfer->GetPipe()->GetEndpointAddress() << 15)
-		| (transfer->GetPipe()->GetDeviceAddress() << 8) | 0x69;
-
-	// Invalidate the buffer field
-	statusDescriptor->buffer_phy = statusDescriptor->buffer_log = 0;
-
-	// Link to the previous transfer descriptor
-	transferDescriptor->link_phy = statusDescriptor->this_phy | TD_DEPTH_FIRST;
-	transferDescriptor->link_log = statusDescriptor;
-
-	// This is the end of this chain, so don't link to any next QH/TD
-	statusDescriptor->link_phy = QH_TERMINATE;
-	statusDescriptor->link_log = 0;
-
-	// First, add the transfer to the list of transfers
-	transfer->SetHostPrivate(new hostcontroller_priv);
-	transfer->GetHostPrivate()->topqh = topQueueHead;
-	transfer->GetHostPrivate()->firsttd = transferDescriptor;
-	transfer->GetHostPrivate()->lasttd = statusDescriptor;
-	fTransfers.PushBack(transfer);
-
-	// Secondly, append the queue head to the control list
-	if (fQueueHeadControl->element_phy & QH_TERMINATE) {
-		// the control queue is empty, make this the first element
-		fQueueHeadControl->element_phy = topQueueHead->this_phy;
-		fQueueHeadControl->link_log = topQueueHead;
-		TRACE(("usb_uhci: first transfer in queue\n"));
-	} else {
-		// there are control transfers linked, append to the queue
-		uhci_qh *queueHead = (uhci_qh *)fQueueHeadControl->link_log;
-		while ((queueHead->link_phy & QH_TERMINATE) == 0)
-			queueHead = (uhci_qh *)queueHead->link_log;
-
-		queueHead->link_phy = topQueueHead->this_phy;
-		queueHead->link_log = topQueueHead;
-		TRACE(("usb_uhci: appended transfer to queue\n"));
-	}
-
-	return EINPROGRESS;	
 }
 
 

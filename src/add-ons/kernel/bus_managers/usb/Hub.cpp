@@ -102,6 +102,7 @@ Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8
 	
 	//We're basically done now
 	m_initok = true;
+	dprintf( "USB Hub: initialised ok\n" );
 }
 
 void Hub::Explore()
@@ -121,9 +122,10 @@ void Hub::Explore()
 		                    &actual_length );
 		if ( actual_length < 4 )
 		{
-			dprintf( "USB Hub: ERROR getting port status" );
+			dprintf( "USB Hub: ERROR getting port status\n" );
 			return;
 		}
+		dprintf("status: 0x%04x; change: 0x%04x\n", m_port_status[i].status, m_port_status[i].change);
 	
 		//We need to test the port change against a number of things
 		
@@ -146,6 +148,19 @@ void Hub::Explore()
 			if ( m_port_status[i].status & PORT_STATUS_CONNECTION )
 			{
 				//New device attached!
+
+				if ((m_port_status[i].status & PORT_STATUS_ENABLE) == 0) {
+					// enable the port if it isn't
+					m_defaultPipe->SendRequest( USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT ,
+		                    USB_REQUEST_SET_FEATURE ,
+		                    PORT_ENABLE , 
+		                    i + 1 , //index
+		                    0 ,
+		                    NULL ,
+		                    0 ,
+		                    &actual_length );
+		        }
+
 				dprintf( "USB Hub Explore(): New device connected\n" );
 				Device *newdev;
 				if ( m_port_status[i].status & PORT_STATUS_LOW_SPEED )

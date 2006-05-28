@@ -193,7 +193,7 @@ BusManager::Stop()
 
 
 status_t
-BusManager::SubmitTransfer(Transfer *transfer)
+BusManager::SubmitTransfer(Transfer *transfer, bigtime_t timeout)
 {
 	// virtual function to be overridden
 	return B_ERROR;

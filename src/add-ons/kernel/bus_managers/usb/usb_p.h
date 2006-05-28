@@ -143,7 +143,8 @@ virtual	status_t						InitCheck();
 virtual	status_t						Start();
 virtual	status_t						Stop();
 
-virtual	status_t						SubmitTransfer(Transfer *transfer);
+virtual	status_t						SubmitTransfer(Transfer *transfer,
+											bigtime_t timeout = 0);
 
 protected:
 		void							SetRootHub(Hub *hub) { fRootHub = hub; };
@@ -165,50 +166,70 @@ static	int32							ExploreThread(void *data);
 		thread_id						fExploreThread;
 };
 
+
 /*
  * The Pipe class is the communication management between the hardware and\
  * the stack. It creates packets, manages these and performs callbacks.
  */
  
-class Pipe
-{
-	friend class Transfer;
+class Pipe {
 public:
-	enum Direction 	{ In , Out , Default };
-	enum Speed		{ LowSpeed , NormalSpeed };
-	enum Type		{ Control , Bulk , Isochronous , Interrupt , Invalid };
+enum	pipeDirection 	{ In, Out, Default };
+enum	pipeSpeed		{ LowSpeed, NormalSpeed };
+enum	pipeType		{ Control, Bulk, Isochronous, Interrupt, Invalid };
 
-	Pipe( Device *dev , Direction &dir , uint8 &endpointaddress );
-	virtual ~Pipe();
-	
-	virtual int8 GetDeviceAddress();
-	virtual Type GetType() { return Invalid; };
-	virtual Speed GetSpeed() { return LowSpeed; }; //Provide a default: should never be called
-	virtual int8 GetEndpointAddress() { return m_endpoint; };
+										Pipe(Device *device,
+											pipeDirection &direction,
+											uint8 &endpointAddress);
+virtual									~Pipe();
+
+virtual	int8							DeviceAddress();
+virtual	pipeType						Type() { return Invalid; };
+virtual	pipeSpeed						Speed() { return LowSpeed; };
+											//Provide a default: should never be called
+virtual	int8							EndpointAddress() { return fEndpoint; };
+
 protected:
-	Device   *m_device;
-	BusManager *m_bus;
-	Direction	m_direction;
-	uint8		m_endpoint;
+friend	class Transfer;
+
+		Device							*fDevice;
+		BusManager						*fBus;
+		pipeDirection					fDirection;
+		uint8							fEndpoint;
 };
 
-class ControlPipe : public Pipe 
-{
+
+class ControlPipe : public Pipe {
 public:
-	ControlPipe( Device *dev , Direction dir , uint8 endpointaddress ); 
-	//Special constructor for default control pipe
-	ControlPipe( BusManager *bus , int8 dev_address , Direction dir , Speed speed , uint8 endpointaddress ); 
-	virtual int8 GetDeviceAddress();
-	virtual Type GetType() { return Control; };
-	virtual Speed GetSpeed() { return m_speed; };
-	status_t SendRequest( uint8 request_type , uint8 request , 
-	                  uint16 value , uint16 index , uint16 length , void *data ,
-	                  size_t data_len , size_t *actual_len );
-	status_t SendControlMessage( usb_request_data *command , void *data ,
-	           size_t data_length , size_t *actual_length , bigtime_t timeout );
+									ControlPipe(Device *device,
+										pipeDirection direction,
+										uint8 endpointAddress);
+
+									// Constructor for default control pipe
+									ControlPipe(BusManager *bus,
+										int8 deviceAddress,
+										pipeDirection direction,
+										pipeSpeed speed,
+										uint8 endpointAddress);
+
+virtual	int8						DeviceAddress();
+virtual	pipeType					Type() { return Control; };
+virtual	pipeSpeed					Speed() { return fSpeed; };
+
+		status_t					SendRequest(uint8 requestType,
+										uint8 request, uint16 value,
+										uint16 index, uint16 length,
+										void *data, size_t dataLength,
+										size_t *actualLength);
+
+		status_t					SendControlMessage(usb_request_data *command,
+										void *data, size_t dataLength,
+										size_t *actualLength,
+										bigtime_t timeout);
+
 private:
-	int8		m_deviceaddress;
-	Speed		m_speed;
+		int8						fDeviceAddress;
+		pipeSpeed					fSpeed;
 };
 
 /*

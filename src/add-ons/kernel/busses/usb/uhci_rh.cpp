@@ -176,7 +176,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			result = B_OK;
 			break;
 
-		case RH_CLEAR_FEATURE:
+		case RH_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// We don't support any hub changes
 				TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE no hub changes!\n"));
@@ -190,28 +190,57 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			}
 
 			TRACE(("usb_uhci_roothub: RH_CLEAR_FEATURE called. Feature: %u!\n", request->Value));
-			uint16 port;
+			uint16 status;
 			switch(request->Value) {
 				case PORT_RESET:
-					port = UHCI::sPCIModule->read_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + (request->Index - 1) * 2);
-					port &= ~UHCI_PORTSC_RESET;
-					TRACE(("usb_uhci_roothub: port %x Clear RESET\n", port));
-					UHCI::sPCIModule->write_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + (request->Index - 1) * 2, port);
+					status = fUHCI->PortStatus(request->Index - 1);
+					result = fUHCI->SetPortStatus(request->Index - 1,
+						status & UHCI_PORTSC_DATAMASK & ~UHCI_PORTSC_RESET);
 					break;
 
 				case C_PORT_CONNECTION:
-					port = UHCI::sPCIModule->read_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + (request->Index - 1) * 2);
-					port = port & UHCI_PORTSC_DATAMASK;
-					port |= UHCI_PORTSC_STATCHA;
-					TRACE(("usb_uhci_roothub: port: %x\n", port));
-					UHCI::sPCIModule->write_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + (request->Index - 1) * 2, port);
-					result = B_OK;
+					status = fUHCI->PortStatus(request->Index - 1);
+					result = fUHCI->SetPortStatus(request->Index - 1,
+						(status & UHCI_PORTSC_DATAMASK) | UHCI_PORTSC_STATCHA);
 					break;
 				default:
 					result = EINVAL;
 					break;
 			}
 			break;
+		}
+
+		case RH_SET_FEATURE: {
+			if (request->Index == 0) {
+				// We don't support any hub changes
+				TRACE(("usb_uhci_roothub: RH_SET_FEATURE no hub changes!\n"));
+				result = EINVAL;
+				break;
+			} else if (request->Index > uhci_hubd.bNbrPorts) {
+				// Invalid port number
+				TRACE(("usb_uhci_roothub: RH_SET_FEATURE invalid port!\n"));
+				result = EINVAL;
+				break;
+			}
+
+			TRACE(("usb_uhci_roothub: RH_SET_FEATURE called. Feature: %u!\n", request->Value));
+			uint16 status;
+			switch(request->Value) {
+				case PORT_RESET:
+					result = fUHCI->ResetPort(request->Index - 1);
+					break;
+
+				case PORT_ENABLE:
+					status = fUHCI->PortStatus(request->Index - 1);
+					result = fUHCI->SetPortStatus(request->Index - 1,
+						(status & UHCI_PORTSC_DATAMASK) | UHCI_PORTSC_ENABLED);
+					break;
+				default:
+					result = EINVAL;
+					break;
+			}
+			break;
+		}
 
 		default: 
 			result = EINVAL;
@@ -232,7 +261,7 @@ UHCIRootHub::UpdatePortStatus()
 		uint16 newStatus = 0;
 		uint16 newChange = 0;
 
-		uint16 portStatus = UHCI::sPCIModule->read_io_16(fUHCI->fRegisterBase + UHCI_PORTSC1 + i * 2);
+		uint16 portStatus = fUHCI->PortStatus(i);
 		TRACE(("usb_uhci_roothub: port: %d status: 0x%04x\n", i, portStatus));
 
 		// Set all individual bits
