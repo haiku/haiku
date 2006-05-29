@@ -465,7 +465,7 @@ BMenuItem::Draw()
 
 	// set low color and fill background if selected
 	if (selected && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
-		bgColor = tint_color(noTint, B_DARKEN_2_TINT);
+		bgColor = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
 		fSuper->SetLowColor(bgColor);
 		fSuper->FillRect(Frame(), B_SOLID_LOW);
 	} else
