@@ -31,6 +31,6 @@ Application AboutHaiku :
 	: AboutHaiku.rdef
 ;
 
-Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles haikulogo.png ] ;
-SEARCH on [ FGristFiles haikulogo.png ]
-	= [ FDirName $(HAIKU_TOP) src apps abouthaiku ] ;
+Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
+SEARCH on [ FGristFiles "HAIKU logo - black on white - tiny.png" ]
+	= [ FDirName $(HAIKU_TOP) data artwork ] ;
