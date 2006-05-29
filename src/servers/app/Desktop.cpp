@@ -1589,7 +1589,8 @@ Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 		BRegion stillAvailableOnScreen;
 		_RebuildClippingForAllWindows(stillAvailableOnScreen);
 		_SetBackground(stillAvailableOnScreen);
-	
+
+		_WindowChanged(window);
 		_TriggerWindowRedrawing(dirty);
 	}
 
