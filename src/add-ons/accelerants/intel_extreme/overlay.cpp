@@ -231,6 +231,10 @@ update_overlay(bool updateCoefficients)
 	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	queue.PutOverlayFlip(COMMAND_OVERLAY_CONTINUE, updateCoefficients);
 
+	// make sure the flip is done now
+	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
+	queue.PutFlush();
+
 //	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
 //		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
 //		read32(INTEL_OVERLAY_EXTENDED_STATUS)));
@@ -243,14 +247,12 @@ show_overlay(void)
 	if (gInfo->shared_info->overlay_active)
 		return;
 
-	overlay_registers *registers = gInfo->overlay_registers;
-
 	gInfo->shared_info->overlay_active = true;
-	registers->overlay_enabled = true;
+	gInfo->overlay_registers->overlay_enabled = true;
 
 	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
-	queue.PutFlush();
 	queue.PutOverlayFlip(COMMAND_OVERLAY_ON, true);
+	queue.PutFlush();
 }
 
 
