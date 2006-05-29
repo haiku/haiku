@@ -1,5 +1,5 @@
 
-resource(1, "haikulogo.png") #'PNG ' import "haikulogo.png";
+resource(1, "haikulogo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - tiny.png";
 
 resource(101, "BEOS:L:STD_ICON") #'ICON' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
