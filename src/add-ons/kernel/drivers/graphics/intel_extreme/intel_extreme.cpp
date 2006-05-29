@@ -93,20 +93,25 @@ init_overlay_registers(overlay_registers *registers)
 
 
 static void
-read_settings(size_t &memorySize, bool &hardwareCursor)
+read_settings(size_t &memorySize, bool &hardwareCursor, bool &ignoreAllocated)
 {
 	size_t size = 8; // 8 MB
 	hardwareCursor = true;
+	ignoreAllocated = false;
 
 	void *settings = load_driver_settings("intel_extreme");
 	if (settings != NULL) {
 		size_t specified = 0;
-		const char *string = get_driver_parameter(settings, "graphics_memory_size", "0", "0");
+		const char *string = get_driver_parameter(settings,
+			"graphics_memory_size", "0", "0");
 		if (string != NULL)
 			specified = atoi(string);
 
-		hardwareCursor = get_driver_boolean_parameter(settings, "hardware_cursor",
-			true, true);
+		hardwareCursor = get_driver_boolean_parameter(settings,
+			"hardware_cursor", true, true);
+
+		ignoreAllocated = get_driver_boolean_parameter(settings,
+			"ignore_bios_allocated_memory", false, false);
 
 		unload_driver_settings(settings);
 
@@ -129,7 +134,6 @@ read_settings(size_t &memorySize, bool &hardwareCursor)
 static size_t
 determine_stolen_memory_size(intel_info &info)
 {
-#if 0
 	// read stolen memory from the PCI configuration of the PCI bridge
 	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
 	size_t memorySize = 1 << 20; // 1 MB
@@ -172,10 +176,6 @@ determine_stolen_memory_size(intel_info &info)
 	}
 
 	return memorySize;
-#endif
-// stippi: das sorgt dafür, daß er den Speicher vom BIOS komplett
-//	wegwirft
-	return 0;
 }
 
 
@@ -298,15 +298,16 @@ intel_extreme_init(intel_info &info)
 
 	// evaluate driver settings, if any
 
+	bool ignoreBIOSAllocated;
 	bool hardwareCursor;
 	size_t totalSize;
-	read_settings(totalSize, hardwareCursor);
+	read_settings(totalSize, hardwareCursor, ignoreBIOSAllocated);
 
 	// Determine the amount of "stolen" (ie. reserved by the BIOS) graphics memory
 	// and see if we need to allocate some more.
 	// TODO: make it allocate the memory on demand!
 
-	size_t stolenSize = determine_stolen_memory_size(info);
+	size_t stolenSize = ignoreBIOSAllocated ? 0 : determine_stolen_memory_size(info);
 	totalSize = max_c(totalSize, stolenSize);
 
 	dprintf(DEVICE_NAME ": detected %ld MB of stolen memory, reserving %ld MB total\n",
@@ -318,9 +319,11 @@ intel_extreme_init(intel_info &info)
 	if (stolenSize < totalSize) {
 		// Every device should have at least 8 MB - we could also allocate them
 		// on demand only, but we're lazy here...
+		// TODO: overlay seems to have problem when the memory pages are too
+		//	far spreaded - that's why we're using B_CONTIGUOUS for now.
 		info.additional_memory_area = additionalMemoryCreator.Create("intel additional memory",
 			(void **)&additionalMemory, B_ANY_KERNEL_ADDRESS,
-			totalSize - stolenSize, B_FULL_LOCK | B_CONTIGUOUS, 0);
+			totalSize - stolenSize, B_CONTIGUOUS /*B_FULL_LOCK*/, 0);
 		if (info.additional_memory_area < B_OK)
 			return info.additional_memory_area;
 	} else
@@ -388,6 +391,7 @@ intel_extreme_init(intel_info &info)
 
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
+	additionalMemoryCreator.Detach();
 	graphicsMapper.Detach();
 	mmioMapper.Detach();
 
