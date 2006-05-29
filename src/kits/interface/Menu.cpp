@@ -1546,10 +1546,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	}
 
 	if (_width) {
-		// change width depending on resize mode - BMenuBars always span
-		// over the whole width of its parent
-		// TODO: this is certainly ugly, and it would be nice if there
-		//	would be a cleaner solution to this problem
+		// change width depending on resize mode
 		if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 			if (Parent())
 				*_width = Parent()->Frame().Width() + 1;
