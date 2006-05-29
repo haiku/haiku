@@ -154,6 +154,10 @@ local bootScripts = Bootscript SetupEnvironment Netscript InstallerInitScript In
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
 
+local logoArtwork = "HAIKU logo - white on blue - big.png" "HAIKU logo - white on blue - small.png" ;
+SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
+AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
+
 # TODO: Use data/etc/termcap or src/libs/termcap.src?
 local etcFiles = fortunes profile termcap teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
