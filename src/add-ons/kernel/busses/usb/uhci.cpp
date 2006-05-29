@@ -346,7 +346,7 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 	statusDescriptor->link_log = 0;
 
 	if (transfer->Buffer() && transfer->BufferLength() > 0) {
-		int32 packetSize = 8;
+		int32 packetSize = pipe->MaxPacketSize();
 		int32 bufferLength = transfer->BufferLength();
 		int32 descriptorCount = (bufferLength + packetSize - 1) / packetSize;
 
@@ -617,7 +617,7 @@ UHCI::Start()
 status_t
 UHCI::SubmitTransfer(Transfer *transfer, bigtime_t timeout)
 {
-	TRACE(("usb_uhci: submit packet called\n"));
+	//TRACE(("usb_uhci: submit packet called\n"));
 
 	// Short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
@@ -662,7 +662,7 @@ UHCI::PortStatus(int32 index)
 	if (index > 1)
 		return B_BAD_VALUE;
 
-	TRACE(("usb_uhci: read port status of port: %d\n", index));
+	//TRACE(("usb_uhci: read port status of port: %d\n", index));
 	return ReadReg16(UHCI_PORTSC1 + index * 2);
 }
 

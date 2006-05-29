@@ -84,8 +84,6 @@ virtual	bool							IsHub()	{ return false; };
 		status_t						SetConfiguration(uint8 value);
 
 protected:
-friend	class Pipe;
-
 		usb_device_descriptor			fDeviceDescriptor;
 		usb_configuration_descriptor	*fConfigurations;
 		usb_configuration_descriptor	*fCurrentConfiguration;
@@ -95,8 +93,8 @@ friend	class Pipe;
 		BusManager						*fBus;
 		Device							*fParent;
 		int8							fDeviceAddress;
-		uint8							fMaxPacketIn[16];
-		uint8							fMaxPacketOut[16];
+		uint32							fMaxPacketIn[16];
+		uint32							fMaxPacketOut[16];
 		sem_id							fLock;
 };
 
@@ -151,9 +149,6 @@ protected:
 		bool							fInitOK;
 
 private:
-friend	class Device;
-friend	class ControlPipe;
-
 static	int32							ExploreThread(void *data);
 
 		sem_id 							fLock;
@@ -176,8 +171,9 @@ enum	pipeSpeed		{ LowSpeed, NormalSpeed };
 enum	pipeType		{ Control, Bulk, Isochronous, Interrupt, Invalid };
 
 										Pipe(Device *device,
-											pipeDirection &direction,
-											uint8 &endpointAddress);
+											pipeDirection direction,
+											uint8 endpointAddress,
+											uint32 maxPacketSize);
 virtual									~Pipe();
 
 virtual	int8							DeviceAddress();
@@ -185,14 +181,14 @@ virtual	pipeType						Type() { return Invalid; };
 virtual	pipeSpeed						Speed() { return LowSpeed; };
 											//Provide a default: should never be called
 virtual	int8							EndpointAddress() { return fEndpoint; };
+virtual	uint32							MaxPacketSize() { return fMaxPacketSize; };
 
 protected:
-friend	class Transfer;
-
 		Device							*fDevice;
 		BusManager						*fBus;
 		pipeDirection					fDirection;
 		uint8							fEndpoint;
+		uint32							fMaxPacketSize;
 };
 
 
@@ -201,14 +197,16 @@ public:
 									ControlPipe(Device *device,
 										pipeDirection direction,
 										pipeSpeed speed,
-										uint8 endpointAddress);
+										uint8 endpointAddress,
+										uint32 maxPacketSize);
 
 									// Constructor for default control pipe
 									ControlPipe(BusManager *bus,
 										int8 deviceAddress,
 										pipeDirection direction,
 										pipeSpeed speed,
-										uint8 endpointAddress);
+										uint8 endpointAddress,
+										uint32 maxPacketSize);
 
 virtual	int8						DeviceAddress();
 virtual	pipeType					Type() { return Control; };

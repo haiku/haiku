@@ -10,7 +10,7 @@
 #include <PCI.h>
 
 
-#define TRACE_UHCI_ROOT_HUB
+//#define TRACE_UHCI_ROOT_HUB
 #ifdef TRACE_UHCI_ROOT_HUB
 #define TRACE(x) dprintf x
 #else

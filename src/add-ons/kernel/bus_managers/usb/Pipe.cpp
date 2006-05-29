@@ -9,11 +9,13 @@
 #include "usb_p.h"
 
 
-Pipe::Pipe(Device *device, pipeDirection &direction, uint8 &endpointAddress)
+Pipe::Pipe(Device *device, pipeDirection direction, uint8 endpointAddress,
+	uint32 maxPacketSize)
 {
 	fDirection = direction;
 	fDevice = device;
 	fEndpoint = endpointAddress;
+	fMaxPacketSize = maxPacketSize;
 
 	fBus = NULL;
 	if (fDevice)
@@ -42,16 +44,17 @@ Pipe::DeviceAddress()
 
 
 ControlPipe::ControlPipe(Device *device, pipeDirection direction,
-	pipeSpeed speed, uint8 endpointAddress)
-	:	Pipe(device, direction, endpointAddress)
+	pipeSpeed speed, uint8 endpointAddress, uint32 maxPacketSize)
+	:	Pipe(device, direction, endpointAddress, maxPacketSize)
 {
 	fSpeed = speed;
 }
 
 
 ControlPipe::ControlPipe(BusManager *bus, int8 deviceAddress,
-	pipeDirection direction, pipeSpeed speed, uint8 endpointAddress)
-	:	Pipe(NULL, direction, endpointAddress)
+	pipeDirection direction, pipeSpeed speed, uint8 endpointAddress,
+	uint32 maxPacketSize)
+	:	Pipe(NULL, direction, endpointAddress, maxPacketSize)
 {
 	fBus = bus;
 	fDeviceAddress = deviceAddress;

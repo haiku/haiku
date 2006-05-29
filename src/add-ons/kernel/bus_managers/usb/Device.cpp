@@ -40,7 +40,7 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 	fDeviceDescriptor = desc;
 	fMaxPacketIn[0] = fMaxPacketOut[0] = fDeviceDescriptor.max_packet_size_0; 
 	fDefaultPipe = new ControlPipe(this, Pipe::Default,
-		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0);
+		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, fMaxPacketIn[0]);
 
 	// Get the device descriptor
 	// We already have a part of it, but we want it all
@@ -52,9 +52,21 @@ Device::Device(BusManager *bus, Device *parent, usb_device_descriptor &desc,
 		return;
 	}
 
-	TRACE(("USB Device %d: Vendor id: 0x%04x, Product id: 0x%04x, Device version: 0x%04x\n",
-		fDeviceAddress, fDeviceDescriptor.vendor_id,
-		fDeviceDescriptor.product_id, fDeviceDescriptor.device_version));
+	TRACE(("full device descriptor for device %d:\n", fDeviceAddress));
+	TRACE(("\tlength:..............%d\n", fDeviceDescriptor.length));
+	TRACE(("\tdescriptor_type:.....0x%04x\n", fDeviceDescriptor.descriptor_type));
+	TRACE(("\tusb_version:.........0x%04x\n", fDeviceDescriptor.usb_version));
+	TRACE(("\tdevice_class:........0x%02x\n", fDeviceDescriptor.device_class));
+	TRACE(("\tdevice_subclass:.....0x%02x\n", fDeviceDescriptor.device_subclass));
+	TRACE(("\tdevice_protocol:.....0x%02x\n", fDeviceDescriptor.device_protocol));
+	TRACE(("\tmax_packet_size_0:...%d\n", fDeviceDescriptor.max_packet_size_0));
+	TRACE(("\tvendor_id:...........0x%04x\n", fDeviceDescriptor.vendor_id));
+	TRACE(("\tproduct_id:..........0x%04x\n", fDeviceDescriptor.product_id));
+	TRACE(("\tdevice_version:......0x%04x\n", fDeviceDescriptor.device_version));
+	TRACE(("\tmanufacturer:........0x%04x\n", fDeviceDescriptor.manufacturer));
+	TRACE(("\tproduct:.............0x%02x\n", fDeviceDescriptor.product));
+	TRACE(("\tserial_number:.......0x%02x\n", fDeviceDescriptor.serial_number));
+	TRACE(("\tnum_configurations:..%d\n", fDeviceDescriptor.num_configurations));
 
 	// Get the configurations
 	fConfigurations = (usb_configuration_descriptor *)malloc(fDeviceDescriptor.num_configurations

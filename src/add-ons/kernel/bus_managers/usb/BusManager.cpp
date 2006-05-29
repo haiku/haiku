@@ -34,9 +34,10 @@ BusManager::BusManager()
 		fDeviceMap[i] = false;
 
 	// Set up the default pipes
-	fDefaultPipe = new ControlPipe(this, 0, Pipe::Default, Pipe::NormalSpeed, 0);
+	fDefaultPipe = new ControlPipe(this, 0, Pipe::Default, Pipe::NormalSpeed,
+		0, 8);
 	fDefaultPipeLowSpeed = new ControlPipe(this, 0, Pipe::Default,
-		Pipe::LowSpeed, 0);
+		Pipe::LowSpeed, 0, 8);
 
 	fExploreThread = -1; 
 	fInitOK = true;
@@ -69,8 +70,8 @@ BusManager::ExploreThread(void *data)
 	if (!rootHub)
 		return B_ERROR;
 
+	snooze(3000000);
 	while (true) {
-		//snooze(5000000);
 		rootHub->Explore();
 		snooze(1000000);
 	}
@@ -91,8 +92,10 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 
 	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceNum));
 
+	ControlPipe *defaultPipe = (lowSpeed ? fDefaultPipeLowSpeed : fDefaultPipe);
+
 	// Set the address of the device USB 1.1 spec p202
-	status_t result = fDefaultPipeLowSpeed->SendRequest(
+	status_t result = defaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_SET_ADDRESS,							// request
 		deviceNum,											// value
@@ -111,7 +114,8 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	snooze(10000);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(this, deviceNum, Pipe::Default, Pipe::LowSpeed, 0);
+	ControlPipe pipe(this, deviceNum, Pipe::Default,
+		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, 8);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -135,6 +139,15 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		TRACE(("usb BusManager::AllocateNewDevice(): error while getting the device descriptor\n"));
 		return NULL;
 	}
+
+	TRACE(("short device descriptor for device %d:\n", deviceDescriptor));
+	TRACE(("\tlength:..............%d\n", deviceDescriptor.length));
+	TRACE(("\tdescriptor_type:.....0x%04x\n", deviceDescriptor.descriptor_type));
+	TRACE(("\tusb_version:.........0x%04x\n", deviceDescriptor.usb_version));
+	TRACE(("\tdevice_class:........0x%02x\n", deviceDescriptor.device_class));
+	TRACE(("\tdevice_subclass:.....0x%02x\n", deviceDescriptor.device_subclass));
+	TRACE(("\tdevice_protocol:.....0x%02x\n", deviceDescriptor.device_protocol));
+	TRACE(("\tmax_packet_size_0:...%d\n", deviceDescriptor.max_packet_size_0));
 
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
