@@ -1,9 +1,5 @@
 /*
-
-	MemoryBarMenu.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,15 +15,15 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _MEMORY_BAR_MENU_H_
 #define _MEMORY_BAR_MENU_H_
+
 
 #include "PCUtils.h"
 
 #include <Menu.h>
+
 
 class MemoryBarMenuItem;
 
@@ -36,21 +32,24 @@ typedef struct {
 	int					index;
 } MRecycleItem;
 
-class MemoryBarMenu : public BMenu
-{
-public:
-						MemoryBarMenu (const char* name, infosPack *infos, system_info* sinfo);
-virtual					~MemoryBarMenu ();
-virtual	void			Draw (BRect updateRect);
-virtual	void			Pulse ();
+class MemoryBarMenu : public BMenu {
+	public:
+						MemoryBarMenu(const char* name, infosPack *infos,
+							system_info* sinfo);
+		virtual			~MemoryBarMenu();
 
-private:
-	team_id*			fTeamList;
-	int					fTeamCount;
-	MRecycleItem*		fRecycleList;
-	int					fRecycleCount;
-	bigtime_t			fLastTotalTime;
-	bool				fFirstShow;
+		virtual	void	Draw(BRect updateRect);
+		virtual	void	Pulse();
+
+	private:
+		team_id*		fTeamList;
+		int				fTeamCount;
+		MRecycleItem*	fRecycleList;
+		int				fRecycleCount;
+		bigtime_t		fLastTotalTime;
+		bool			fFirstShow;
 };
+
+extern float gMemoryTextWidth;
 
 #endif // _MEMORY_BAR_MENU_H_

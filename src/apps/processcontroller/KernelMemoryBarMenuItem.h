@@ -1,9 +1,5 @@
 /*
-
-	KernelMemoryBarMenuItem.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController @ 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,26 +15,23 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _KERNEL_MEMORY_BAR_MENU_ITEM_H_
 #define _KERNEL_MEMORY_BAR_MENU_ITEM_H_
 
+
 #include <MenuItem.h>
 
-//---------------------------------------------------------------
 
 class KernelMemoryBarMenuItem : public BMenuItem {
+	public:
+						KernelMemoryBarMenuItem(system_info* systemInfo);
+		virtual	void	DrawContent();
+		virtual	void	GetContentSize(float* _width, float* _height);
+		void			DrawBar(bool force);
+		void			UpdateSituation(float commitedMemory, float totalWriteMemory);
 
-public:
-						KernelMemoryBarMenuItem (system_info* sinfo);
-virtual	void			DrawContent ();
-virtual	void			GetContentSize (float* width, float* height);
-		void			DrawBar (bool force);
-		void			UpdateSituation (float commitedMemory, float totalWriteMemory);
-
-private:
+	private:
 		float			fTotalWriteMemory;
 		float			fPhsysicalMemory;
 		float			fCommitedMemory;

@@ -1,6 +1,4 @@
 /*
-	PCView.h
-
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
@@ -31,7 +29,7 @@ class BMessageRunner;
 class ThreadBarMenu;
 
 
-class _EXPORT ProcessController : public BView {
+class ProcessController : public BView {
 	public:
 						ProcessController(BRect frame, bool temp = false);
 						ProcessController(BMessage *data);
@@ -92,7 +90,6 @@ extern	bool				gInDeskbar;
 extern	int32				gMimicPulse;
 
 #define kBarWidth 100
-#define kTextWidth 110
 #define kMargin	12
 
 #endif // _PCVIEW_H_

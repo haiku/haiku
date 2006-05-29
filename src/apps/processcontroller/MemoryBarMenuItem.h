@@ -1,9 +1,5 @@
 /*
-
-	MemoryBarMenuItem.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,33 +15,33 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _MEMORY_BAR_MENU_ITEM_H_
 #define _MEMORY_BAR_MENU_ITEM_H_
+
 
 #include <MenuItem.h>
 
 class BBitmap;
 
-//---------------------------------------------------------------
 
 class MemoryBarMenuItem : public BMenuItem {
+	public:
+						MemoryBarMenuItem(const char *label, team_id team,
+							BBitmap* icon, bool deleteIcon, BMessage* message);
+		virtual			~MemoryBarMenuItem();
 
-public:
-						MemoryBarMenuItem (const char *label, team_id team, BBitmap* icon, bool DeleteIcon, BMessage* message);
-virtual					~MemoryBarMenuItem ();
-virtual	void			DrawContent ();
-virtual	void			GetContentSize (float* width, float* height);
-		void			DrawIcon ();
-		void			DrawBar (bool force);
-		int				UpdateSituation (int commitedMemory);
-		void			BarUpdate ();
-		void			Init ();
-		void			Reset (char* name, team_id team, BBitmap* icon, bool DeleteIcon);
+		virtual	void	DrawContent();
+		virtual	void	GetContentSize(float* _width, float* _height);
 
-private:
+		void			DrawIcon();
+		void			DrawBar(bool force);
+		int				UpdateSituation(int commitedMemory);
+		void			BarUpdate();
+		void			Init();
+		void			Reset(char* name, team_id team, BBitmap* icon, bool deleteIcon);
+
+	private:
 		int				fPhysicalMemory;
 		int				fCommitedMemory;
 		int				fWriteMemory;

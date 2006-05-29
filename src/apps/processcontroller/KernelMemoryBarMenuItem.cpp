@@ -1,9 +1,5 @@
 /*
-
-	KernelMemoryBarMenuItem.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,67 +15,78 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
+
 #include "KernelMemoryBarMenuItem.h"
+#include "MemoryBarMenu.h"
 #include "Colors.h"
 #include "PCView.h"
+
 #include <stdio.h>
 
-// --------------------------------------------------------------
-KernelMemoryBarMenuItem::KernelMemoryBarMenuItem (system_info* sinfo)
-			:BMenuItem ("System Resources & Caches...", NULL)
+
+KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info* sinfo)
+	: BMenuItem("System Resources & Caches...", NULL)
 {
 	fTotalWriteMemory = -1;
 	fLastSum = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fPhsysicalMemory = float (int (sinfo->max_pages * B_PAGE_SIZE / 1024));
-	fCommitedMemory = float (int (sinfo->used_pages * B_PAGE_SIZE / 1024));
+	fPhsysicalMemory = float(int(sinfo->max_pages * B_PAGE_SIZE / 1024));
+	fCommitedMemory = float(int(sinfo->used_pages * B_PAGE_SIZE / 1024));
 }
 
-// --------------------------------------------------------------
-void KernelMemoryBarMenuItem::DrawContent ()
+
+void
+KernelMemoryBarMenuItem::DrawContent()
 {
-	DrawBar (true);
-	Menu ()->MovePenTo (ContentLocation ());
-	BMenuItem::DrawContent ();
+	DrawBar(true);
+	Menu()->MovePenTo(ContentLocation());
+	BMenuItem::DrawContent();
 }
 
-// --------------------------------------------------------------
-void KernelMemoryBarMenuItem::UpdateSituation (float commitedMemory, float totalWriteMemory)
+
+void
+KernelMemoryBarMenuItem::UpdateSituation(float commitedMemory,
+	float totalWriteMemory)
 {
 	if (commitedMemory < totalWriteMemory)
 		totalWriteMemory = commitedMemory;
+
 	fCommitedMemory = commitedMemory;
 	fTotalWriteMemory = totalWriteMemory;
-	DrawBar (false);
+	DrawBar(false);
 }
 
-// --------------------------------------------------------------
-void KernelMemoryBarMenuItem::DrawBar (bool force)
+
+void
+KernelMemoryBarMenuItem::DrawBar(bool force)
 {
-	bool	selected = IsSelected ();
-	BRect	frame = Frame ();
-	BMenu*	menu = Menu ();
+	bool selected = IsSelected();
+	BRect frame = Frame();
+	BMenu* menu = Menu();
+
 	// draw the bar itself
-	BRect	cadre (frame.right - kMargin - kBarWidth, frame.top + 5, frame.right - kMargin, frame.top + 13);
+	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + 5,
+		frame.right - kMargin, frame.top + 13);
 	if (fTotalWriteMemory < 0)
 		return;
+
 	if (fLastSum < 0)
 		force = true;
 	if (force) {
 		if (selected)
-			menu->SetHighColor (gFrameColorSelected);
+			menu->SetHighColor(gFrameColorSelected);
 		else
-			menu->SetHighColor (gFrameColor);
+			menu->SetHighColor(gFrameColor);
 		menu->StrokeRect (cadre);
 	}
-	cadre.InsetBy (1, 1);
-	BRect	r = cadre;
-	float	grenze1 = cadre.left + (cadre.right - cadre.left) * fTotalWriteMemory / fPhsysicalMemory;
-	float	grenze2 = cadre.left + (cadre.right - cadre.left) * fCommitedMemory / fPhsysicalMemory;
+	cadre.InsetBy(1, 1);
+	BRect r = cadre;
+
+	float grenze1 = cadre.left + (cadre.right - cadre.left) * fTotalWriteMemory / fPhsysicalMemory;
+	float grenze2 = cadre.left + (cadre.right - cadre.left) * fCommitedMemory / fPhsysicalMemory;
 	if (grenze1 > cadre.right)
 		grenze1 = cadre.right;
 	if (grenze2 > cadre.right)
@@ -89,10 +96,10 @@ void KernelMemoryBarMenuItem::DrawBar (bool force)
 		r.left = fGrenze1;
 	if (r.left < r.right) {
 		if (selected)
-			menu->SetHighColor (gKernelColorSelected);
+			menu->SetHighColor(gKernelColorSelected);
 		else
-			menu->SetHighColor (gKernelColor);
-//		menu->SetHighColor (gKernelColor);
+			menu->SetHighColor(gKernelColor);
+//		menu->SetHighColor(gKernelColor);
 		menu->FillRect (r);
 	}
 	r.left = grenze1;
@@ -105,10 +112,10 @@ void KernelMemoryBarMenuItem::DrawBar (bool force)
 	}
 	if (r.left < r.right) {
 		if (selected)
-			menu->SetHighColor (tint_color (kLavender, B_HIGHLIGHT_BACKGROUND_TINT));
+			menu->SetHighColor(tint_color (kLavender, B_HIGHLIGHT_BACKGROUND_TINT));
 		else
-			menu->SetHighColor (kLavender);
-//		menu->SetHighColor (gUserColor);
+			menu->SetHighColor(kLavender);
+//		menu->SetHighColor(gUserColor);
 		menu->FillRect (r);
 	}
 	r.left = grenze2;
@@ -117,48 +124,49 @@ void KernelMemoryBarMenuItem::DrawBar (bool force)
 		r.right = fGrenze2;
 	if (r.left < r.right) {
 		if (selected)
-			menu->SetHighColor (gWhiteSelected);
+			menu->SetHighColor(gWhiteSelected);
 		else
-			menu->SetHighColor (kWhite);
-		menu->FillRect (r);
+			menu->SetHighColor(kWhite);
+		menu->FillRect(r);
 	}
-	menu->SetHighColor (kBlack);
+	menu->SetHighColor(kBlack);
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 
 	// draw the value
 	double sum = fTotalWriteMemory * FLT_MAX + fCommitedMemory;
-	if (force || sum != fLastSum)
-	{
-		if (selected)
-		{
-			menu->SetLowColor (gMenuBackColorSelected);
-			menu->SetHighColor (gMenuBackColorSelected);
+	if (force || sum != fLastSum) {
+		if (selected) {
+			menu->SetLowColor(gMenuBackColorSelected);
+			menu->SetHighColor(gMenuBackColorSelected);
+		} else {
+			menu->SetLowColor(gMenuBackColor);
+			menu->SetHighColor(gMenuBackColor);
 		}
-		else
-		{
-			menu->SetLowColor (gMenuBackColor);
-			menu->SetHighColor (gMenuBackColor);
-		}
-		BRect trect (cadre.left - kMargin - kTextWidth, frame.top, cadre.left - kMargin, frame.bottom);
-		menu->FillRect (trect);
-		menu->SetHighColor (kBlack);
-		char	infos[128];
-		sprintf (infos, "%.1f MB", fTotalWriteMemory / 1024.f);
-		BPoint	loc (cadre.left - kMargin - kTextWidth / 2 - menu->StringWidth (infos), cadre.bottom + 1);
-		menu->DrawString (infos, loc);
-		sprintf (infos, "%.1f MB", fCommitedMemory / 1024.f);
-		loc.x = cadre.left - kMargin - menu->StringWidth (infos);
-		menu->DrawString (infos, loc);
+		BRect trect(cadre.left - kMargin - gMemoryTextWidth, frame.top,
+			cadre.left - kMargin, frame.bottom);
+		menu->FillRect(trect);
+		menu->SetHighColor(kBlack);
+
+		char infos[128];
+		sprintf(infos, "%.1f MB", fTotalWriteMemory / 1024.f);
+		BPoint loc(cadre.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
+			cadre.bottom + 1);
+		menu->DrawString(infos, loc);
+		sprintf(infos, "%.1f MB", fCommitedMemory / 1024.f);
+		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
+		menu->DrawString(infos, loc);
 		fLastSum = sum;
 	}
 }
 
-// --------------------------------------------------------------
-void KernelMemoryBarMenuItem::GetContentSize (float* width, float* height)
+
+void
+KernelMemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 {
-	BMenuItem::GetContentSize (width, height);
-	if (*height < 16)
-		*height = 16;
-	*width += 20 + kBarWidth;
+	BMenuItem::GetContentSize(_width, _height);
+	if (*_height < 16)
+		*_height = 16;
+
+	*_width += 20 + kBarWidth + kMargin + gMemoryTextWidth;
 }
