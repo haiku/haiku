@@ -19,10 +19,10 @@
 #include "PatternHandler.h"
 #include "RGBColor.h"
 
+#include <WindowPrivate.h>
+
 #include <Rect.h>
 #include <View.h>
-
-#include <WindowPrivate.h>
 
 #include <stdio.h>
 
@@ -319,6 +319,8 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 			tabSize = fBottomBorder.bottom - fTopBorder.top;
 			maxLocation = tabSize - _tabrect.Height();
 		}
+		if (maxLocation < 0)
+			maxLocation = 0;
 
 		float tabOffset = floorf(fTabLocation * maxLocation);
 		float delta = tabOffset - fTabOffset;
@@ -698,7 +700,7 @@ DefaultDecorator::_DoLayout()
 		if (fTabOffset < 0)
 			fTabOffset = 0;
 		if (fTabOffset > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
-			fTabOffset = (fRightBorder.right - fLeftBorder.left - _tabrect.Width());
+			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left - _tabrect.Width());
 		_tabrect.OffsetBy(fTabOffset, 0);
 
 		// finally, layout the buttons and text within the tab rect
@@ -710,8 +712,8 @@ DefaultDecorator::_DoLayout()
 void
 DefaultDecorator::_DrawFrame(BRect invalid)
 {
-STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
-									 invalid.right, invalid.bottom));
+	STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
+		invalid.right, invalid.bottom));
 
 	// NOTE: the DrawingEngine needs to be locked for the entire
 	// time for the clipping to stay valid for this decorator
