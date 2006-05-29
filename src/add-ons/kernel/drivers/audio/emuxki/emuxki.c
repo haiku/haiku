@@ -1907,9 +1907,10 @@ emuxki_int(void *arg)
 			}
 		}
 #if MIDI
-		if (ipr & (/*EMU_IPR_MIDITRANSBUFE | */EMU_IPR_MIDIRECVBUFE)) {
-			midi_interrupt(card);
+		if (ipr & (EMU_IPR_MIDIRECVBUFE)) {
+			midi_interrupt(card);          /* Gameport */
 		}
+        
 		if (ipr & (EMU_IPR_MIDITRANSBUFE)) {
 			if(!midi_interrupt(card)) {
 				emuxki_inte_disable(&card->config, EMU_INTE_MIDITXENABLE);
@@ -2066,10 +2067,11 @@ emuxki_setup(emuxki_dev * card)
 	dump_hardware_regs(&card->config);
 	
 #if MIDI
-	if ((err = (*mpu401->create_device)(card->config.nabmbar + (IS_AUDIGY(&card->config) ? EMU_A_MUDATA1 : EMU_MUDATA), 
-		&card->midi.driver, 0, midi_interrupt_op, &card->midi)) < B_OK)
+	//SBLIVE : EMU_MUDATA, workaround 0, AUDIGY, AUDIGY2: 0, workaround 0x11020004
+	if ((err = (*mpu401->create_device)((card->config.nabmbar + !IS_AUDIGY(&card->config) ? EMU_MUDATA : 0), 
+		&card->midi.driver, !IS_AUDIGY(&card->config) ? 0 : 0x11020004, midi_interrupt_op, &card->midi)) < B_OK)
 		return (err);
-		
+
 	card->midi.card = card;
 #endif
 
