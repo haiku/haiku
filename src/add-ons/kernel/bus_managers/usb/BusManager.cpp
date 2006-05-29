@@ -84,13 +84,13 @@ Device *
 BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 {
 	// Check if there is a free entry in the device map (for the device number)
-	int8 deviceNum = AllocateAddress();
-	if (deviceNum < 0) {
+	int8 deviceAddress = AllocateAddress();
+	if (deviceAddress < 0) {
 		TRACE(("usb BusManager::AllocateNewDevice(): could not get a new address\n"));
 		return NULL;
 	}
 
-	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceNum));
+	TRACE(("usb BusManager::AllocateNewDevice(): setting device address to %d\n", deviceAddress));
 
 	ControlPipe *defaultPipe = (lowSpeed ? fDefaultPipeLowSpeed : fDefaultPipe);
 
@@ -98,7 +98,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	status_t result = defaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_SET_ADDRESS,							// request
-		deviceNum,											// value
+		deviceAddress,										// value
 		0,													// index
 		0,													// length
 		NULL,												// buffer
@@ -114,7 +114,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	snooze(10000);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(this, deviceNum, Pipe::Default,
+	ControlPipe pipe(this, deviceAddress, Pipe::Default,
 		lowSpeed ? Pipe::LowSpeed : Pipe::NormalSpeed, 0, 8);
 
 	// Get the device descriptor
@@ -140,7 +140,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 		return NULL;
 	}
 
-	TRACE(("short device descriptor for device %d:\n", deviceDescriptor));
+	TRACE(("short device descriptor for device %d:\n", deviceAddress));
 	TRACE(("\tlength:..............%d\n", deviceDescriptor.length));
 	TRACE(("\tdescriptor_type:.....0x%04x\n", deviceDescriptor.descriptor_type));
 	TRACE(("\tusb_version:.........0x%04x\n", deviceDescriptor.usb_version));
@@ -152,7 +152,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("usb BusManager::AllocateNewDevice(): creating new hub\n"));
-		Device *ret = new Hub(this, parent, deviceDescriptor, deviceNum,
+		Device *ret = new Hub(this, parent, deviceDescriptor, deviceAddress,
 			lowSpeed);
 
 		if (parent == NULL) {
@@ -164,7 +164,7 @@ BusManager::AllocateNewDevice(Device *parent, bool lowSpeed)
 	}
 
 	TRACE(("usb BusManager::AllocateNewDevice(): creating new device\n"));
-	return new Device(this, parent, deviceDescriptor, deviceNum, lowSpeed);
+	return new Device(this, parent, deviceDescriptor, deviceAddress, lowSpeed);
 }
 
 
@@ -173,17 +173,17 @@ BusManager::AllocateAddress()
 {
 	acquire_sem_etc(fLock, 1, B_CAN_INTERRUPT, 0);
 
-	int8 deviceNum = -1;
+	int8 deviceAddress = -1;
 	for (int32 i = 1; i < 128; i++) {
 		if (fDeviceMap[i] == false) {
-			deviceNum = i;
+			deviceAddress = i;
 			fDeviceMap[i] = true;
 			break;
 		}
 	}
 
 	release_sem(fLock);
-	return deviceNum;
+	return deviceAddress;
 }
 
 
