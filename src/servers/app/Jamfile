@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers app ;
 
-AddResources app_server : app_server.rdef ;
-
 UseLibraryHeaders png zlib ;
 UsePrivateHeaders app graphics input interface kernel shared ;
 
@@ -59,6 +57,8 @@ Server app_server :
 	libtranslation.so libz.so libpng.so libbe.so
 	libasdrawing.a libpainter.a libagg.a libfreetype.so
 	libtextencoding.so
+
+	: app_server.rdef
 ;
 
 SubInclude HAIKU_TOP src servers app drawing ;
