@@ -349,13 +349,14 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 		int32 packetSize = pipe->MaxPacketSize();
 		int32 bufferLength = transfer->BufferLength();
 		int32 descriptorCount = (bufferLength + packetSize - 1) / packetSize;
+		uint8 *buffer = (uint8 *)transfer->Buffer();
 
 		bool dataToggle = true;
 		uhci_td *lastDescriptor = NULL;
 		for (int32 i = 0; i < descriptorCount; i++) {
 			uhci_td *descriptor = new_descriptor(fStack, pipe,
 				directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-				min_c(packetSize, bufferLength), NULL);
+				min_c(packetSize, bufferLength), directionIn ? NULL : buffer);
 
 			if (!descriptor) {
 				free_descriptor_chain(setupDescriptor, fStack);
@@ -375,6 +376,9 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 			lastDescriptor = descriptor;
 			bufferLength -= packetSize;
 			dataToggle = !dataToggle;
+
+			if (!directionIn)
+				buffer += packetSize;
 		}
 
 		link_descriptors(lastDescriptor, statusDescriptor);
@@ -415,14 +419,24 @@ Queue::AddRequest(Transfer *transfer, bigtime_t timeout)
 					// without any error so we finished successfully
 					TRACE(("usb_uhci: transfer successful\n"));
 
-					uint8 *buffer = (uint8 *)transfer->Buffer();
+					if (!directionIn)
+						return B_OK;
+
 					int32 bufferSize = transfer->BufferLength();
+					if (bufferSize == 0)
+						return B_OK;
+
+					uint8 *buffer = (uint8 *)transfer->Buffer();
+					if (!buffer)
+						return B_ERROR;
+
+					size_t length = read_descriptor_chain(
+						(uhci_td *)setupDescriptor->link_log,
+						buffer, bufferSize);
+
 					size_t *actualLength = transfer->ActualLength();
-					if (buffer && bufferSize > 0) {
-						*actualLength = read_descriptor_chain(
-							(uhci_td *)setupDescriptor->link_log,
-							buffer, bufferSize);
-					}
+					if (actualLength)
+						*actualLength = length;
 
 					return B_OK;
 				}
