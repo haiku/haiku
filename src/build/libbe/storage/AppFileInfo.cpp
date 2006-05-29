@@ -445,7 +445,8 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 	BMimeType mimeType;
 	if (error == B_OK)
 		error = GetMetaMime(&mimeType);
-	if (error == B_OK) {
+	if (error == B_OK || error == B_ENTRY_NOT_FOUND) {
+		error = B_OK;
 		if (types) {
 			// check param -- supported types must be valid
 			const char *type;
@@ -1031,6 +1032,8 @@ BAppFileInfo::GetMetaMime(BMimeType *meta) const
 	status_t error = GetSignature(signature);
 	if (error == B_OK)
 		error = meta->SetTo(signature);
+	else if (error == B_BAD_VALUE)
+		error = B_ENTRY_NOT_FOUND;
 	if (error == B_OK && !meta->IsValid())
 		error = B_BAD_VALUE;
 	return error;
