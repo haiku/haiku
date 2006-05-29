@@ -1,0 +1,104 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Great Britain Broadcast channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/UK\040Air,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@UK Air
+ 45750000 A  
+ 53750000 B  
+ 61750000 C  
+175250000 D  
+183250000 E  
+191250000 F  
+199250000 G  
+207250000 H  
+215250000 J  
+223250000 C10
+231250000 C11
+247250000 C13
+471250000 B21
+479250000 B22
+487250000 B23
+495250000 B24
+503250000 B25
+511250000 B26
+519250000 B27
+527250000 B28
+535250000 B29
+543250000 B30
+551250000 B31
+559250000 B32
+567250000 B33
+575250000 B34
+583250000 B35
+591250000 B36
+599250000 B37
+607250000 B38
+615250000 B39
+623250000 B40
+631250000 B41
+639250000 B42
+647250000 B43
+655250000 B44
+663250000 B45
+671250000 B46
+679250000 B47
+687250000 B48
+695250000 B49
+703250000 B50
+711250000 B51
+719250000 B52
+727250000 B53
+735250000 B54
+743250000 B55
+751250000 B56
+759250000 B57
+767250000 B58
+775250000 B59
+783250000 B60
+791250000 B61
+799250000 B62
+807250000 B63
+815250000 B64
+823250000 B65
+831250000 B66
+839250000 B67
+847250000 B68
+855250000 B69
+ 45000000 B1
+ 51750000 B2
+ 56750000 B3
+ 61750000 B4
+ 66750000 B5
+179750000 B6
+184750000 B7
+189750000 B8
+194750000 B9
+199750000 B10
+204750000 B11
+209750000 B12
+214750000 B13
+219750000 B14

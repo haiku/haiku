@@ -1,0 +1,30 @@
+##########################################################
+##
+##          USB Storage Module settings file 
+##
+##  This file is a part of BeOS USB SCSI interface module project.
+##  Copyright (c) 2003-2005 by Siarzhuk Zharski <imker@gmx.li>
+##  All rights reserved.
+##
+##########################################################
+## This file typically placed in following directory:
+##              /boot/home/config/settings/kernel/drivers/
+##########################################################
+##
+## More details on using this settings file and 
+## detailed parameters reference are in the ReadMe.html
+##
+
+#reserve_devices 2 # count of device entries reserved by this SIM. default is 2
+#reserve_luns    4 # count of LUNs available for every reserved device entry. default is 4
+
+#ignore_sysinit2 true  # workaround for some R5 + USB patches boot problem 
+
+#debug_output true              # activates debug output
+#debug_output_in_file true      # use /var/log/usb_scsi.log instead of syslog
+#debug_output_file_rewrite true # truncate log file on system reboot
+
+#debug_trace_protocol true      # dump USB MS protocol information
+#debug_trace_sense_data true    # dump additional USB MS protocol information
+#debug_trace_capacity true      # dump READ CAPACITY SCSI command results
+

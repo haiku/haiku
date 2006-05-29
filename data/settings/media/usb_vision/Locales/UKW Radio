@@ -1,0 +1,113 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Ex USSR UKW Radio channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/UKW\040Radio,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+; The word "Radio" in angle brakets means that this channels is radio channels.
+;
+@UKW Radio
+;<Radio>
+66000000 66,0
+66100000 66,1
+66200000 66,2
+66300000 66,3
+66400000 66,4
+66500000 66,5
+66600000 66,6
+66700000 66,7
+66800000 66,8
+66900000 66,9
+67000000 67,0
+67100000 67,1
+67200000 67,2
+67300000 67,3
+67400000 67,4
+67500000 67,5
+67600000 67,6
+67700000 67,7
+67800000 67,8
+67900000 67,9
+68000000 68,0
+68100000 68,1
+68200000 68,2
+68300000 68,3
+68400000 68,4
+68500000 68,5
+68600000 68,6
+68700000 68,7
+68800000 68,8
+68900000 68,9
+69000000 69,0
+69100000 69,1
+69200000 69,2
+69300000 69,3
+69400000 69,4
+69500000 69,5
+69600000 69,6
+69700000 69,7
+69800000 69,8
+69900000 69,9
+70000000 70,0
+70100000 70,1
+70200000 70,2
+70300000 70,3
+70400000 70,4
+70500000 70,5
+70600000 70,6
+70700000 70,7
+70800000 70,8
+70900000 70,9
+71000000 71,0
+71100000 71,1
+71200000 71,2
+71300000 71,3
+71400000 71,4
+71500000 71,5
+71600000 71,6
+71700000 71,7
+71800000 71,8
+71900000 71,9
+72000000 72,0
+72100000 72,1
+72200000 72,2
+72300000 72,3
+72400000 72,4
+72500000 72,5
+72600000 72,6
+72700000 72,7
+72800000 72,8
+72900000 72,9
+73000000 73,0
+73100000 73,1
+73200000 73,2
+73300000 73,3
+73400000 73,4
+73500000 73,5
+73600000 73,6
+73700000 73,7
+73800000 73,8
+73900000 73,9
+74000000 74,0

@@ -1,0 +1,31 @@
+#
+# The sample USBVision driver settings file
+#
+# Rename it to usbvision and put into 
+# /boot/home/config/settings/kernel/drivers/
+# After restarting your system the new settings will works.
+
+#  Debug output - this is a possibility to view some kind of development related
+# information - error and warning messages etc.
+
+# debug_output - activates debug output. The debug builds has debug output 
+# activated by default and this key has no effect on it. The release builds requires 
+#  to activate this if you want to see debug messages in syslog or in private log file.
+#
+# debug_output true
+
+# debug_output_in_file - activates writing of debug messages into private log file.
+# The name of this file is /boot/home/usbvision.log. If this key is set to true - no messages
+# will be written into syslog.
+#
+# debug_output_in_file true
+
+# debug_output_file_rewrite - activates rewriting of private log file on 
+# calling driver_init() syscall. By default this set in false.  
+#
+# debug_output_file_rewrite false
+
+# debug_trace_func_calls - the information about driver functions calls  
+# will be traced. Would you like to see internals? Then activate this.
+#   
+# debug_trace_func_calls true

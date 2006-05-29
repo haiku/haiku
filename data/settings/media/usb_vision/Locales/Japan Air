@@ -1,0 +1,91 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Japan Broadcast channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/Japan\040Air,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@Japan Air
+ 91250000 1 
+ 97250000 2 
+103250000 3 
+171250000 4 
+177250000 5 
+183250000 6 
+189250000 7 
+193250000 8 
+199250000 9 
+205250000 10
+211250000 11
+217250000 12
+471250000 13
+477250000 14
+483250000 15
+489250000 16
+495250000 17
+501250000 18
+507250000 19
+513250000 20
+519250000 21
+525250000 22
+531250000 23
+537250000 24
+543250000 25
+549250000 26
+555250000 27
+561250000 28
+567250000 29
+573250000 30
+579250000 31
+585250000 32
+591250000 33
+597250000 34
+603250000 35
+609250000 36
+615250000 37
+621250000 38
+627250000 39
+633250000 40
+639250000 41
+645250000 42
+651250000 43
+657250000 44
+663250000 45
+669250000 46
+675250000 47
+681250000 48
+687250000 49
+693250000 50
+699250000 51
+705250000 52
+711250000 53
+717250000 54
+723250000 55
+729250000 56
+735250000 57
+741250000 58
+747250000 59
+753250000 60
+759250000 61
+765250000 62

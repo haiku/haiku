@@ -1,0 +1,240 @@
+<html>
+<title>BeOS driver for USBVision (Nogatech) TV tuners</title>
+<body bgcolor="#f0f0e0">
+<h1>BeOS driver for USBVision (Nogatech) TV tuners</h1>
+
+<h2>Introduction</h2>
+<p>This driver is designed to support USBVision (Nogatech) TV Tuners. Tested with:</p>
+
+<table border=1><tbody><tr>
+<td><b>Name</b></td><td><b>Vendor ID</b></td><td><b>Product ID</b></td>
+</tr><tr>
+<td>Hauppauge WinTV FM</td><td>0x0573</td><td>0x4d31</td>
+</tr></tbody></table>
+
+<table><tbody><tr><td>
+<b><font color="#00ff00">NOTE that</font></b>
+</td><td>
+I have one small request for you - if you tried this driver and it works -
+PLEASE e-mail me the information about your USB TV Tuner and results of your
+experiments. This information is very interesting for me and helps in improvement
+this driver! Thank you for co-operation! 
+</td></tr><tr><td>
+<b><font color="#00ff00">NOTE that</font></b>
+</td><td>
+If you definetily have the some kind of USB TV Tuner but this driver didn't
+help you - see section "Unknown devices" below for instructions.
+</td></tr><tbody><table>
+
+<table><tbody><tr><td>
+<b><font color="#00ff00">NOTE that</font></b>
+</td><td>
+If your computer has the OHCI-compatible USB hardware you are out of luck. This hardware is not
+supported by non-Dan0-like versions. See the <a href="#patches">BeOS.USB.patches</a> vor details and
+solutions.
+</td></tr><tbody><table>
+
+<b>What's new:</b>
+<table border=1 ><tbody><tr><td>
+<b>Version:</b>
+</td><td>
+<b>History:</b>
+</td></tr><tr><td>
+0.1.0-dev-0
+</td><td>
+very first "development" release.
+</td></tr><tbody><table>
+
+
+<h2>1. Installation</h2>
+<ul>
+<li>Run install.sh
+<li>If all is OK ... //TODO:
+<li>If something goes wrong ... //TODO: 
+</ul>
+<h2>2. Uninstallation</h2>
+<ul>
+<li>Run uninstall.sh
+</ul>
+
+<h2>3. Problems solving</h2>  
+<ul>
+<li>   If this driver crash your system - reboot and press "Space" during load. In boot menu select
+   "Disable user add-ons" and continue boot. Uninstall driver and reboot again into normal mode.
+   Write me a e-mail about this problem.
+</ul>
+<h2>4. "Unknown" devices</h2>
+<a name="usbcommander"></a>
+   If you have something, that looks like USB TV tuner and tried it with
+   this driver but have no success - download <a href="http://www.zharik.host.sk/prahramy/usb_dev_info.zip">
+   usb device info tool</a> and use it to get required information.
+<ul>    
+<li>Unplug all USB devices and hubs from your PC.    
+<li>Go into Terminal and run the following command:
+<strong>    ls -alR /dev/bus/usb</strong> 
+    You should see something like this:
+<pre>
+$ ls -alR /dev/bus/usb/
+/dev/bus/usb:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+drw-r--r--   1 walther  users           0 May 31 23:16 0
+drw-r--r--   1 walther  users           0 May 31 23:16 1
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+
+/dev/bus/usb/0:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+
+/dev/bus/usb/1:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+</pre>
+   
+<li> Note this information.    
+<li> Now plug your USB TV tuner into PC and run <strong>ls -alR /dev/bus/usb/</strong> again.
+You'll get something slightly different:
+<pre>
+$ ls -alR /dev/bus/usb/
+/dev/bus/usb:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+drw-r--r--   1 walther  users           0 May 31 23:16 0
+drw-r--r--   1 walther  users           0 May 31 23:16 1
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+
+/dev/bus/usb/0:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+<blink>crw-r--r--   1 walther  users      0,   0 May 31 23:17 1</blink>
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+
+/dev/bus/usb/1:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+</pre>
+
+$                                             
+<li> Compare this results with previous one and look for file,
+that appeared. This file is your USB TV tuner.   
+<li> Unpack downloaded usb_dev_info command and run it with full path to file appeared in
+the second listing. For my sample I should run:
+usb_dev_info /dev/bus/usb/0/1
+I'll get the following:
+<pre>
+$ usb_dev_info /dev/bus/usb/0/1
+[Device]
+Class .................. 0
+Subclass ............... 0
+Protocol ............... 0
+Vendor ID .............. 0x0573
+Product ID ............. 0x4d31
+Version ................ 0x0100
+Manufacturer String .... "NT"
+Product String ......... ""
+Serial Number .......... ""
+  [Configuration 0]
+    [Interface 0]
+    Class .............. 0
+    Subclass ........... 0
+    Protocol ........... 0
+      [Endpoint 0]
+      MaxPacketSize .... 8
+      Interval ......... 1
+      Direction ........ Input
+      [Endpoint 1]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Output
+  [Configuration 1]
+    [Interface 0]
+    Class .............. 0
+    Subclass ........... 0
+    Protocol ........... 0
+      [Endpoint 0]
+      MaxPacketSize .... 8
+      Interval ......... 1
+      Direction ........ Input
+      [Endpoint 1]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Output
+      [Endpoint 2]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Input
+  [Configuration 2]
+    [Interface 0]
+    Class .............. 0
+    Subclass ........... 0
+    Protocol ........... 0
+      [Endpoint 0]
+      MaxPacketSize .... 8
+      Interval ......... 1
+      Direction ........ Input
+      [Endpoint 1]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Output
+      [Endpoint 2]
+      MaxPacketSize .... 64
+      Interval ......... 1
+      Type ............. Bulk
+      Direction ........ Output
+  [Configuration 3]
+    [Interface 0]
+    Class .............. 0
+    Subclass ........... 0
+    Protocol ........... 0
+      [Endpoint 0]
+      MaxPacketSize .... 8
+      Interval ......... 1
+      Direction ........ Input
+      [Endpoint 1]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Output
+      [Endpoint 2]
+      MaxPacketSize .... 0
+      Interval ......... 1
+      Type ............. Isochronous
+      Direction ........ Input
+      [Endpoint 3]
+      MaxPacketSize .... 64
+      Interval ......... 1
+      Type ............. Bulk
+      Direction ........ Output
+</pre>
+<li> Send this information to me with some additional words about your device.    
+</ul>    
+
+<h2>What is "BeOS.USB.patches"?</h2>
+<a name="patches"></a>
+All know that "classical" BeOS R5 don't works on OHCI USB hardware. But some time ago on one well-known
+BeOS file-sharing network appeared patches for plain R5. Those patches allows to work with OHCI
+hardware under this system version. Looks like it is some part of Dan0 or other "leaked" versions.
+There are 3 patches in BeOS.USB.patches.zip:
+<p>1. beos-usb-patch,
+<p>2. beos-usb.modem-patch,
+<p>3. beos-usb.modem-patch.sm.    
+<p> You need the first one to make your OHCI hardware working under R5. Install it and proceed with this
+driver. Good luck! 
+
+
+<p><b><a href="mailto:imker@gmx.li">Siarzuk Zharski <imker@gmx.li></a></b>
+<p><a href="http://www.zharik.host.sk/">http://www.zharik.host.sk/</a>
+</body></html>

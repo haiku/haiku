@@ -1,0 +1,88 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Ireland Broadcast channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/Ireland\040Air,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@Ireland Air
+ 45750000	A(2)
+ 53750000	B(3)
+ 61750000	C(4)
+175250000	D(5)
+183250000	E(6)
+191250000	F(7)
+199250000	G(8)
+207250000	H(9)
+215250000	I(10)
+223250000	J(11)
+471250000	21
+479250000	22
+487250000	23
+495250000	24
+503250000	25
+511250000	26
+519250000	27
+527250000	28
+535250000	29
+543250000	30
+551250000	31
+559250000	32
+567250000	33
+575250000	34
+583250000	35
+591250000	36
+599250000	37
+607250000	38
+615250000	39
+623250000	40
+631250000	41
+639250000	42
+647250000	43
+655250000	44
+663250000	45
+671250000	46
+679250000	47
+687250000	48
+695250000	49
+703250000	50
+711250000	51
+719250000	52
+727250000	53
+735250000	54
+743250000	55
+751250000	56
+759250000	57
+767250000	58
+775250000	59
+783250000	60
+791250000	61
+799250000	62
+807250000	63
+815250000	64
+823250000	65
+831250000	66
+839250000	67
+847250000	68
+855250000	69

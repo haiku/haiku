@@ -1,0 +1,68 @@
+#
+# This file is a part of BeOS USB SCSI interface module project.
+# Copyright (c) 2003-2004 by Siarzhuk Zharski <imker@gmx.li>
+#
+# This file may be used under the terms of the BSD License
+# See the file "License" for details.
+#
+#1) Correct handling of FORMAT_UNIT command
+#2) Correct handling of SCSI return codes
+#3) Locking of trace file should be not so "hard"
+4)(????)Correct locking of driver entry in xpt_scsi_io
+#5) Use USB stack 2.0 ? 
+6)(???) Hang problem with DriveSetup #reproduced on clean system without SCSI...
+#7) Support of CBI protocol
+#8) Support of FREECOM protocol
+#9) Support of read-only forcing (fyysik asks)
+#10) Make reservation of devices more flexible (can switch it off). 
+#11) Transfer should be build on callback ideology
+#12) Timeouts should be more adequate
+13) Review RBC transform against specs
+14) Review QIC-157 transform against specs
+#15) Make HBA SCSI ID configurable
+#16) Think on possibility to use "one.dev <-> one.path" scheme
+#17) Set cam_scsi_status correctly on return!
+#18) Support of autosense on fake devices
+#-INVALID-19)Locking for fake devices too
+#20) What with write-protected devices?
+#21) Some kind of investigation - try to return CHECK_CONDITION in case of zero autosense_len - will system resend this command with non-zero autosense len?
+#22) mode sense data for 10-byte translated command. Wait for test results. Probably will be not required at all.
+#23) implement protocols as modules
+#24) Some kind of automatic detection if 6-byte READ/WRITE and MODE SELECT/SENSE commands supported.
+#25) Do not let MODE_SENSE go to NOT READY LUNs. It can "kill" the hardware
+#26) Replace the write/read to fwrite/fread in tracing daemon (fyysik's request)
+27)(???) Looks like system ignores our CHECK_CONDITION (for example on handling 1e, 1b, 2a). Is it our problem?
+#-INVALID-28) Clean-up the data buffer before MODE_SENSE request ....
+#29) Problem with synchronize cache command (see BePage's log)
+#30) Try to workaround R5+patches=KDL problem. Ignore calls from 'sysinit2'? 
+31) Work with NewFS Tracker and it's derivatives. There are lot of problems with that mad software.
+#32) deactivate automatic READ(10)->READ(6) switching. Looks like it's makes more problems than solves.
+#33) Are we really need private protocol buffer ? Try to remove this and use stack allocated objects.
+#34) Tracing in protocols implementations should be more generic ...
+#35) overwrite tracing ...
+36) Handle FORMAT_UNIT for UFI devices.
+#37) Locking of global devices table
+#38) Locking of device_removed - avoid removing during handling xpt_scsi_io
+39) Device mounted than unplugged.It stay mounted but doesn't work and get the garbage in "opened" files. Are there solutions?
+#40) open log file in /var/log/ instead of home directory 
+#41) More correct work with MODE_SENSE/MODE_SELECT convertions ...
+#42) debug output settings should be used in protocol extensions too ...
+#-INVALID!-43) What with sense data? should it be reorganized as MODE_SENSE/MODE_SELECT one?
+44) Fix possible problem with READ_CAPACITY command. Some cameras produce "Generic OS Error" during mounting.
+#45) Some Minolta cameras have nulified semaphore after creation. :-( )
+#46) Add "invalid" devices entries. Check your mailing for information. 
+#-DUPLICATE-47) A word about disabling Zeta's modules in manual.
+#48) Handle all TODOs in ReadMe.html before releasing RC-1.
+#49) Handling 0xA1 (Blank) command for C/DVD-RW devices. Should be like FORMAT UNIT?
+#-CDBurner's problem-50) Problems with 35h SYNCHRONIZE_CACHE command with CDBurner on FREECOM module.
+#-Problems in current BeOS USB stack- 51) Support for DATAFAB extention
+#-INVALID-52)Some kind of reset required for FREECOM. Test it until this MODE_SELECT is not working!
+#51) problem with SCSIProbe
+#52) Support for Siemens MP3 Player
+#53) Stess tests for floppy
+54) Handling of transfer timeout should be refactored.
+55) Tracing Mode_sense/mode_select data for all case if configured - not only for converting!
+#56) Are there problems with simultaneous tracing to log file and system log? Check!
+57) Write a ReadMe.html for FREECOM module and make distribution support for it.
+#58) Add tracing for READ_CAPACITY results
+59) Check again MODE_SENSE/MODE_SELECT pages translations... MYOB has some problems...

@@ -1,7 +1,14 @@
 /*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
+ * This file is a part of BeOS USBVision driver project.
+ * Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+ *
+ * This file may be used under the terms of the BSD License
+ *
+ * Skeletal part of this code was inherired from original BeOS sample code,
+ * that is distributed under the terms of the Be Sample Code License.
+ * 
+ */
+
 #include <fcntl.h>
 #include <malloc.h>
 #include <math.h>
@@ -10,13 +17,13 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
-#include <Buffer.h>
-#include <BufferGroup.h>
-#include <ParameterWeb.h>
-#include <TimeSource.h>
+#include <media/Buffer.h>
+#include <media/BufferGroup.h>
+#include <media/ParameterWeb.h>
+#include <media/TimeSource.h>
 
-#include <Autolock.h>
-#include <Debug.h>
+#include <support/Autolock.h>
+#include <support/Debug.h>
 
 #define TOUCH(x) ((void)(x))
 
@@ -32,6 +39,54 @@
 
 #define FIELD_RATE 30.f
 
+const float kUSBBandWidthMin = 0.5f;
+const float kUSBBandWidthMax = 7.5f;
+const float kUSBBandWidthStep = 0.5f;
+
+const float kVScreenOffsetMin = 0.f;
+const float kVScreenOffsetMax = 4.f;
+const float kVScreenOffsetStep = 1.f;
+const float kHScreenOffsetMin = 0.f;
+const float kHScreenOffsetMax = 4.f;
+const float kHScreenOffsetStep = 1.f;
+
+const float kEffectMin = 0.f;
+const float kEffectMax = 31.f;
+const float kEffectStep = 1.f;
+
+const float kBrightnessMin = kEffectMin;
+const float kBrightnessMax = kEffectMax;
+const float kBrightnessStep = kEffectStep;
+
+const float kContrastMin = kEffectMin;
+const float kContrastMax = kEffectMax;
+const float kContrastStep = kEffectStep;
+
+const float kHueMin = kEffectMin;
+const float kHueMax = kEffectMax;
+const float kHueStep = kEffectStep;
+
+const float kSaturationMin = kEffectMin;
+const float kSaturationMax = kEffectMax;
+const float kSaturationStep = kEffectStep;
+
+const uint32        kDefChannel = 0;
+//const VideoInput    kDefVideoInput = P_VI_TUNER;
+const uint32        kDefAudioInput = 0;
+const uint32        kDefBrightness = 20;
+const uint32        kDefContrast = 22;
+const uint32        kDefSaturation = 15;
+const uint32        kDefHue = 20;
+const uint32        kDefCaptureSize = 0;
+const uint32        kDefCaptureFormat = 0;
+//const VideoStandard kDefStandard = P_VF_PAL_BDGHI;
+const float         kDefBandwidth = 7.0;
+const uint32        kDefLocale = 0;
+const uint32        kDefVertOffset = 1;
+const uint32        kDefHorzOffset = 2;
+
+int32 VideoProducer::fInstances = 0;
+
 VideoProducer::VideoProducer(
 		BMediaAddOn *addon, const char *name, int32 internal_id)
   :	BMediaNode(name),
@@ -39,7 +94,13 @@ VideoProducer::VideoProducer(
 	BBufferProducer(B_MEDIA_RAW_VIDEO),
 	BControllable()
 {
+	status_t err;
+
 	fInitStatus = B_NO_INIT;
+
+	/* Only allow one instance of the node to exist at any time */
+	if (atomic_add(&fInstances, 1) != 0)
+		return;
 
 	fInternalID = internal_id;
 	fAddOn = addon;
@@ -56,7 +117,48 @@ VideoProducer::VideoProducer(
 
 	fOutput.destination = media_destination::null;
 
+	AddNodeKind(B_PHYSICAL_INPUT);
+
 	fInitStatus = B_OK;
+
+    //debugger("op-op");
+    
+    status_t status = Locale::TunerLocale::LoadLocales(fLocales);    
+    
+    printf("LoadLocales:%08x\n", status);
+
+	fChannel = kDefChannel;
+    fVideoInput = P_VI_TUNER; 
+	fAudioInput = kDefAudioInput;
+    fBrightness = kDefBrightness;
+	fContrast = kDefContrast; 
+	fSaturation = kDefSaturation; 
+	fHue = kDefHue; 
+    fCaptureSize = kDefCaptureSize; 
+    fCaptureFormat = kDefCaptureFormat; 
+    fStandard = P_VF_PAL_BDGHI; 
+	fLocale = kDefLocale; 
+    fBandwidth = kDefBandwidth; 
+    fVertOffset = kDefVertOffset; 
+	fHorzOffset = kDefHorzOffset; 
+    fColor = B_HOST_TO_LENDIAN_INT32(0x00ff0000);
+
+	fLastChannelChange = 
+	fLastVideoInputChange = 
+	fLastAudioInputChange = 
+	fLastBrightnessChange = 
+	fLastContrastChange = 
+	fLastSaturationChange = 
+	fLastHueChange = 
+	fLastCaptureSizeChange = 
+	fLastCaptureFormatChange = 
+	fLastStandardChange = 
+	fLastLocaleChange = 
+	fLastBandwidthChange = 
+	fLastVertOffsetChange = 
+	fLastHorzOffsetChange = 
+	fLastColorChange = system_time();
+
 	return;
 }
 
@@ -70,6 +172,10 @@ VideoProducer::~VideoProducer()
 		if (fRunning)
 			HandleStop();
 	}
+
+	atomic_add(&fInstances, -1);
+
+    Locale::TunerLocale::ReleaseLocales(fLocales);    
 }
 
 /* BMediaNode */
@@ -124,21 +230,9 @@ VideoProducer::NodeRegistered()
 		return;
 	}
 
-	/* Set up the parameter web */
-	BParameterWeb *web = new BParameterWeb();
-	BParameterGroup *main = web->MakeGroup(Name());
-	BDiscreteParameter *state = main->MakeDiscreteParameter(
-			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
-	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x00ff0000), "Red");
-	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x0000ff00), "Green");
-	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x000000ff), "Blue");
-
-	fColor = B_HOST_TO_LENDIAN_INT32(0x00ff0000);
-	fLastColorChange = system_time();
-
 	/* After this call, the BControllable owns the BParameterWeb object and
 	 * will delete it for you */
-	SetParameterWeb(web);
+	SetParameterWeb(CreateParameterWeb());
 
 	fOutput.node = Node();
 	fOutput.source.port = ControlPort();
@@ -154,6 +248,103 @@ VideoProducer::NodeRegistered()
 
 	/* Start the BMediaEventLooper control loop running */
 	Run();
+}
+
+BParameterWeb  *VideoProducer::CreateParameterWeb()
+{
+	/* Set up the parameter web */
+	BParameterWeb *web = new BParameterWeb();
+
+	BParameterGroup *controls = web->MakeGroup("Controls");
+	BParameterGroup *group = controls->MakeGroup("Main Controls");
+	BDiscreteParameter *parameter = group->MakeDiscreteParameter(
+			P_CHANNEL, B_MEDIA_NO_TYPE, "Channel:", B_GENERIC);
+	for(int i = 0; i < fLocales[fLocale]->ChannelsCount(); i ++){
+	  parameter->AddItem(i, (fLocales[fLocale]->GetChannel(i)).Name().c_str());
+	}
+	
+	parameter = group->MakeDiscreteParameter(
+			            P_VIDEO_INPUT, B_MEDIA_NO_TYPE, "Video Input:", B_INPUT_MUX);
+	parameter->AddItem(P_VI_TUNER, "Tuner");
+	parameter->AddItem(P_VI_COMPOSITE, "Composite");
+	parameter->AddItem(P_VI_SVIDEO, "SVideo");
+
+	parameter = group->MakeDiscreteParameter(
+			P_AUDIO_INPUT, B_MEDIA_NO_TYPE, "Audio Input:", B_INPUT_MUX);
+	parameter->AddItem(1, "TODO");
+	parameter->AddItem(2, "TODO");
+	parameter->AddItem(3, "TODO");
+
+	group = controls->MakeGroup("Effect Controls");
+	group->MakeContinuousParameter(
+			       P_BRIGHTNESS, B_MEDIA_NO_TYPE, "Brightness", B_LEVEL,
+			         "", kBrightnessMin, kBrightnessMax, kBrightnessStep);
+
+	group->MakeContinuousParameter(
+			       P_CONTRAST, B_MEDIA_NO_TYPE, "Contrast", B_LEVEL,
+			         "", kContrastMin, kContrastMax, kContrastStep);
+
+	group = controls->MakeGroup("Adv. Effect Controls");
+	group->MakeContinuousParameter(
+			       P_SATURATION, B_MEDIA_NO_TYPE, "Saturation", B_LEVEL,
+			         "", kSaturationMin, kSaturationMax, kSaturationStep);
+
+	group->MakeContinuousParameter(
+			       P_HUE, B_MEDIA_NO_TYPE, "Hue", B_LEVEL,
+			         "", kHueMin, kHueMax, kHueStep);
+
+    BParameterGroup *options = web->MakeGroup("Options");
+	group = options->MakeGroup("Capture Option");
+	parameter = group->MakeDiscreteParameter(
+			P_CAPTURE_SIZE, B_MEDIA_NO_TYPE, "Capture Size:", B_RESOLUTION);
+	parameter->AddItem(1, "TODO");
+	parameter->AddItem(2, "TODO");
+
+	parameter = group->MakeDiscreteParameter(
+			P_CAPTURE_FORMAT, B_MEDIA_NO_TYPE, "Capture Format:", B_COLOR_SPACE);
+	parameter->AddItem(1, "TODO");
+	parameter->AddItem(2, "TODO");
+
+	BParameterGroup *hardware = web->MakeGroup("Hardware Setup");
+	group = hardware->MakeGroup("Format");
+	parameter = group->MakeDiscreteParameter(
+			P_STANDART, B_MEDIA_NO_TYPE, "Video Format:", B_VIDEO_FORMAT);
+	parameter->AddItem(P_VF_NTSC_M, "NTSC M");
+	parameter->AddItem(P_VF_NTSC_MJ, "NTSC MJ");
+	parameter->AddItem(P_VF_PAL_BDGHI, "PAL BDGHI");
+	parameter->AddItem(P_VF_PAL_M, "PAL M");
+	parameter->AddItem(P_VF_PAL_N, "PAL N");
+	parameter->AddItem(P_VF_SECAM, "SECAM");
+
+	parameter = group->MakeDiscreteParameter(
+			P_LOCALE, B_MEDIA_NO_TYPE, "Tuner Locale:", B_GENERIC);
+	for(int i = 0; i < fLocales.size(); i++)
+	  parameter->AddItem(i, fLocales[i]->Name().c_str());
+	
+  group = hardware->MakeGroup("Format");
+	
+	group->MakeContinuousParameter(
+			       P_BANDWIDTH, B_MEDIA_NO_TYPE, "Max.Bandwidth", B_LEVEL,
+			         "", kUSBBandWidthMin, kUSBBandWidthMax, kUSBBandWidthStep);
+
+	group = hardware->MakeGroup("Offsets");
+	
+	group->MakeContinuousParameter(
+			       P_VERT_OFFSET, B_MEDIA_NO_TYPE, "Vertical Offset", B_LEVEL,
+			         "", kVScreenOffsetMin, kVScreenOffsetMax, kVScreenOffsetStep);
+
+	group->MakeContinuousParameter(
+			       P_HORZ_OFFSET, B_MEDIA_NO_TYPE, "Horizontal Offset", B_LEVEL,
+			         "", kHScreenOffsetMin, kHScreenOffsetMax, kHScreenOffsetStep);
+
+	BParameterGroup *main = web->MakeGroup(Name());
+	BDiscreteParameter *state = main->MakeDiscreteParameter(
+			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
+	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x00ff0000), "Red");
+	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x0000ff00), "Green");
+	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x000000ff), "Blue");
+
+    return web; 
 }
 
 void
@@ -212,9 +403,11 @@ VideoProducer::HandleEvent(const media_timed_event *event,
 		case BTimedEventQueue::B_SEEK:
 			HandleSeek(event->bigdata);
 			break;
+		case BTimedEventQueue::B_PARAMETER:
+			HandleParameter(event->data);
+			break;
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 		case BTimedEventQueue::B_DATA_STATUS:
-		case BTimedEventQueue::B_PARAMETER:
 		default:
 			PRINTF(-1, ("HandleEvent: Unhandled event -- %lx\n", event->type));
 			break;
@@ -344,6 +537,8 @@ VideoProducer::PrepareToConnect(const media_source &source,
 		const media_destination &destination, media_format *format,
 		media_source *out_source, char *out_name)
 {
+	status_t err;
+
 	PRINTF(1, ("PrepareToConnect() %ldx%ld\n", \
 			format->u.raw_video.display.line_width, \
 			format->u.raw_video.display.line_count));
@@ -429,8 +624,8 @@ VideoProducer::Connect(status_t error, const media_source &source,
 		return;
 	}
 	bigtime_t now = system_time();
-	for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-		for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
+	for (int y=0;y<fConnectedFormat.display.line_count;y++)
+		for (int x=0;x<fConnectedFormat.display.line_width;x++)
 			*(p++) = ((((x+y)^0^x)+f) & 0xff) * (0x01010101 & fColor);
 	fProcessingLatency = system_time() - now;
 	free(buffer);
@@ -527,13 +722,85 @@ status_t
 VideoProducer::GetParameterValue(
 	int32 id, bigtime_t *last_change, void *value, size_t *size)
 {
-	if (id != P_COLOR)
-		return B_BAD_VALUE;
-
-	*last_change = fLastColorChange;
-	*size = sizeof(uint32);
-	*((uint32 *)value) = fColor;
-
+  switch(id){
+  case P_CHANNEL:
+    	*last_change = fLastChannelChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fChannel;
+      break;
+		case P_VIDEO_INPUT:
+    	*last_change = fLastVideoInputChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fVideoInput;
+      break;
+    case P_AUDIO_INPUT:
+    	*last_change = fLastAudioInputChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fAudioInput;
+      break;
+    case P_BRIGHTNESS:
+    	*last_change = fLastBrightnessChange;
+    	*size = sizeof(float);
+	    *((float *)value) = fBrightness;
+      break;
+    case P_CONTRAST:
+    	*last_change = fLastContrastChange;
+    	*size = sizeof(float);
+	    *((float*)value) = fContrast;
+      break;
+    case P_SATURATION:
+    	*last_change = fLastSaturationChange;
+    	*size = sizeof(float);
+	    *((float*)value) = fSaturation;
+      break;
+    case P_HUE:
+    	*last_change = fLastHueChange;
+    	*size = sizeof(float);
+	    *((float*)value) = fHue;
+      break;
+    case P_CAPTURE_SIZE:
+    	*last_change = fLastCaptureSizeChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fCaptureSize;
+      break;
+    case P_CAPTURE_FORMAT:
+    	*last_change = fLastCaptureFormatChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fCaptureFormat;
+      break;
+    case P_STANDART:
+    	*last_change = fLastStandardChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fStandard;
+      break;
+    case P_BANDWIDTH:
+    	*last_change = fLastBandwidthChange;
+    	*size = sizeof(float);
+	    *((float *)value) = fBandwidth;
+      break;
+    case P_LOCALE:
+    	*last_change = fLastLocaleChange;
+    	*size = sizeof(uint32);
+	    *((uint32*)value) = fLocale;
+      break;
+    case P_VERT_OFFSET:
+    	*last_change = fLastVertOffsetChange;
+    	*size = sizeof(float);
+	    *((float*)value) = fVertOffset;
+      break;
+    case P_HORZ_OFFSET:
+    	*last_change = fLastHorzOffsetChange;
+    	*size = sizeof(float);
+	    *((float*)value) = fHorzOffset;
+      break;
+    case P_COLOR:
+	    *last_change = fLastColorChange;
+	    *size = sizeof(uint32);
+	    *((uint32 *)value) = fColor;
+      break;
+    default:
+      return B_BAD_VALUE;
+  }
 	return B_OK;
 }
 
@@ -541,17 +808,133 @@ void
 VideoProducer::SetParameterValue(
 	int32 id, bigtime_t when, const void *value, size_t size)
 {
-	if ((id != P_COLOR) || !value || (size != sizeof(uint32)))
-		return;
+  switch(id){
+        case P_CHANNEL:
+    if (*(uint32 *)value != fChannel){
+	      fChannel = *(uint32 *)value;
+	      fLastChannelChange = when;
+	      BroadcastNewParameterValue(
+            fLastChannelChange, P_CHANNEL, &fChannel, sizeof(fChannel));
+      }
+      break;
+		case P_VIDEO_INPUT:
+      if (*(uint32 *)value != fVideoInput){
+	      fVideoInput = *(uint32 *)value;
+	      fLastVideoInputChange = when;
+	      BroadcastNewParameterValue(
+            fLastVideoInputChange, P_VIDEO_INPUT, &fVideoInput, sizeof(fVideoInput));
+      }
+      break;
+    case P_AUDIO_INPUT:
+      if (*(uint32 *)value != fAudioInput){
+	      fAudioInput = *(uint32 *)value;
+	      fLastAudioInputChange = when;
+	      BroadcastNewParameterValue(
+            fLastAudioInputChange, P_AUDIO_INPUT, &fAudioInput, sizeof(fAudioInput));
+      }
+      break;
+    case P_BRIGHTNESS:
+      if (*(float *)value != fBrightness){
+	      fBrightness = *(float *)value;
+	      fLastBrightnessChange = when;
+	      BroadcastNewParameterValue(
+            fLastBrightnessChange, P_BRIGHTNESS, &fBrightness, sizeof(fBrightness));
+      }
+      break;
+    case P_CONTRAST:
+      if (*(float *)value != fContrast){
+	      fContrast = *(float *)value;
+	      fLastContrastChange = when;
+	      BroadcastNewParameterValue(
+            fLastContrastChange, P_CONTRAST, &fContrast, sizeof(fContrast));
+      }
+      break;
+    case P_SATURATION:
+      if (*(float *)value != fSaturation){
+	      fSaturation = *(float *)value;
+	      fLastSaturationChange = when;
+	      BroadcastNewParameterValue(
+            fLastSaturationChange, P_SATURATION, &fSaturation, sizeof(fSaturation));
+      }
+      break;
+    case P_HUE:
+      if (*(float *)value != fHue){
+	      fHue = *(float *)value;
+	      fLastHueChange = when;
+	      BroadcastNewParameterValue(
+            fLastHueChange, P_HUE, &fHue, sizeof(fHue));
+      }
+      break;
+    case P_CAPTURE_SIZE:
+      if (*(uint32 *)value != fCaptureSize){
+	      fCaptureSize = *(uint32*)value;
+	      fLastCaptureSizeChange = when;
+	      BroadcastNewParameterValue(
+            fLastCaptureSizeChange, P_CAPTURE_SIZE, &fCaptureSize, sizeof(fCaptureSize));
+      }
+      break;
+    case P_CAPTURE_FORMAT:
+      if (*(uint32 *)value != fCaptureFormat){
+	      fCaptureFormat = *(uint32*)value;
+	      fLastCaptureFormatChange = when;
+	      BroadcastNewParameterValue(
+            fLastCaptureFormatChange, P_CAPTURE_FORMAT, &fCaptureFormat, sizeof(fCaptureFormat));
+      }
+      break;
+    case P_STANDART:
+      if (*(uint32 *)value != fStandard){
+	      fStandard = *(uint32*)value;
+	      fLastStandardChange = when;
+	      BroadcastNewParameterValue(
+            fLastStandardChange, P_STANDART, &fStandard, sizeof(fStandard));
+      }
+      break;
+    case P_BANDWIDTH:
+      if (*(float *)value != fBandwidth){
+	      fBandwidth = *(float *)value;
+	      fLastBandwidthChange = when;
+	      BroadcastNewParameterValue(
+            fLastBandwidthChange, P_BANDWIDTH, &fBandwidth, sizeof(fBandwidth));
+      }
+      break;
+    case P_LOCALE:
+      if (*(uint32 *)value != fLocale){
+	      fLocale = *(uint32 *)value;
+	      fLastLocaleChange = when;
+	      BroadcastNewParameterValue(
+            fLastLocaleChange, P_LOCALE, &fLocale, sizeof(fLocale));
+      }
+      break;
+    case P_VERT_OFFSET:
+      if (*(float*)value != fVertOffset){
+	      fVertOffset = *(float *)value;
+	      fLastVertOffsetChange = when;
+	      BroadcastNewParameterValue(
+            fLastVertOffsetChange, P_VERT_OFFSET, &fVertOffset, sizeof(fVertOffset));
+      }
+      break;
+    case P_HORZ_OFFSET:
+      if (*(float*)value != fHorzOffset){
+	      fHorzOffset = *(float *)value;
+	      fLastHorzOffsetChange = when;
+	      BroadcastNewParameterValue(
+            fLastHorzOffsetChange, P_HORZ_OFFSET, &fHorzOffset, sizeof(fHorzOffset));
+      }
+      break;
+    case P_COLOR:
+      if (*(int32 *)value != fColor){
+	      fColor = *(uint32 *)value;
+	      fLastColorChange = when;
+	      BroadcastNewParameterValue(
+            fLastColorChange, P_COLOR, &fColor, sizeof(fColor));
+      }
+      break;
+  }
+  
+  EventQueue()->AddEvent(media_timed_event(when,
+        BTimedEventQueue::B_PARAMETER, NULL,
+        BTimedEventQueue::B_NO_CLEANUP, id, 0, NULL, 0));
 
-	if (*(uint32 *)value == fColor)
-		return;
-
-	fColor = *(uint32 *)value;
-	fLastColorChange = when;
-
-	BroadcastNewParameterValue(
-			fLastColorChange, P_COLOR, &fColor, sizeof(fColor));
 }
 
 status_t
@@ -634,6 +1017,61 @@ VideoProducer::HandleSeek(bigtime_t performance_time)
 	release_sem(fFrameSync);
 }
 
+void
+VideoProducer::HandleParameter(uint32 parameter)
+{
+  switch(parameter){
+  case P_CHANNEL:
+    break;
+  case P_VIDEO_INPUT:
+    break;
+  case P_AUDIO_INPUT:
+    break;
+  case P_BRIGHTNESS:
+    break;
+  case P_CONTRAST:
+    break;
+  case P_SATURATION:
+    break;
+  case P_HUE:
+    break;
+  case P_CAPTURE_SIZE:
+    break;
+  case P_CAPTURE_FORMAT:
+    break;
+  case P_STANDART:
+    break;
+  case P_BANDWIDTH:
+    break;
+  case P_LOCALE:
+    {
+      //debugger("stop");
+      BParameterWeb *web = Web();
+      int nCount = web->CountParameters();
+      for(int idx = 0; idx < nCount; idx++){
+        BParameter *parameter = web->ParameterAt(idx);
+        if(parameter && parameter->Type() == BParameter::B_DISCRETE_PARAMETER &&
+                         parameter->ID() == P_CHANNEL){
+          BDiscreteParameter * d_parameter = dynamic_cast<BDiscreteParameter *>(parameter);
+          d_parameter->MakeEmpty();
+          for(int i = 0; i < fLocales[fLocale]->ChannelsCount(); i ++){
+	        d_parameter->AddItem(i, (fLocales[fLocale]->GetChannel(i)).Name().c_str());
+	      }
+	      /*status_t st = BroadcastChangedParameter(P_CHANNEL);
+          if(st != B_OK)
+            debugger("kk");*/
+          break;
+        }
+      }
+    }
+    break;
+  case P_VERT_OFFSET:
+    break;
+  case P_HORZ_OFFSET:
+    break;
+  }
+}
+
 /* The following functions form the thread that generates frames. You should
  * replace this with the code that interfaces to your hardware. */
 int32 
@@ -712,8 +1150,8 @@ VideoProducer::FrameGenerator()
 
 		/* Fill in a pattern */
 		uint32 *p = (uint32 *)buffer->Data();
-		for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-			for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
+		for (int y=0;y<fConnectedFormat.display.line_count;y++)
+			for (int x=0;x<fConnectedFormat.display.line_width;x++)
 				*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
 
 		/* Send the buffer on down to the consumer */

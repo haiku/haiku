@@ -1,0 +1,21 @@
+##########################################################
+##
+##     USB Storage Module non-standard devices definitions 
+##
+##  This file is a part of BeOS USB SCSI interface module project.
+##  Copyright (c) 2003-2005 by Siarzhuk Zharski <imker@gmx.li>
+##  All rights reserved.
+##
+##########################################################
+#
+# FREECOM USB-ATAPI bridge.
+#
+# Supports FREECOM USB Cable connected CD/DVD drives/burners
+#  
+#
+vendor 0x07ab {
+  device 0xfc01 {
+    protocol freecom
+    commandset ATAPI
+  }
+}

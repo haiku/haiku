@@ -1,0 +1,745 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ 
+ This file is a part of BeOS USB SCSI interface module project.
+ Copyright (c) 2003-2004 by Siarzhuk Zharski <imker@gmx.li>
+ 
+ This file may be used under the terms of the BSD License
+ See the file "License" for details.
+ 
+ $Source: /cvsroot/sis4be/usb_scsi/ReadMe.html,v $
+ $Author: zharik $
+ $Revision: 1.23 $
+ $Date: 2005/04/09 20:53:25 $
+
+-->
+<html>
+<head>
+  <title>USB mass storage support for BeOS</title>
+</head>
+<body bgcolor="#f0f0e0">
+<h1>USB mass storage support for 
+       <font color="#000066">B</font><font color="#cc0000">e</font>OS</h1>
+<div align="right">
+<address><a href="mailto:imker@gmx.li">by Siarzhuk Zharski</a></address>
+</div>
+This is yet another piece of hardware support for BeOS/Dano/Zeta operating systems.
+This USB Storage Module (<strong>The Module</strong>) is designed to support a wide variety
+of standard USB mass storage devices. Those devices are: 
+<ul>
+  <li>memory (flash) keys,</li> 
+  <li>external HDD/CD/DVD/ZIP/Floppy drives with USB connection,</li> 
+  <li>digital cameras/camcorders with USBMS protocol,</li> 
+  <li>MP3 players,</li> 
+  <li>card readers,</li>
+  <li>Jukeboxes</li> 
+  <li>etc.</li>
+</ul> 
+<p>In other (more special and technical) words this Module
+works with standard USB class 8 devices, both Bulk-Only and CB[I] ones,
+with all standard command sets used in such devices. 
+</p>
+<h1><a name="Contents"></a>Table of Contents</h1>
+<ul>
+  <li><a href="#1._Installation_and_using_">Installation and using </a></li>
+  <li><a href="#2._Troubleshooting">Troubleshooting</a></li>
+  <li><a href="#3.5.Writing_a_problem_report">Writing a problem report</a></li>
+  <li><a href="#3._Technical_notes_">Technical notes</a></li>
+  <ul>
+    <li><a href="#3.1._BeOS_USB_patches">BeOS USB patches</a></li>
+    <li><a href="#3.2._USB_Device_information">USB Device information</a></li>
+    <ul>
+      <li><a href="#3.2.1._How_to_obtain_USB_device">How to obtain USB device information for your hardware</a></li>
+      <li><a href="#3.2.2._How_it_looks_like_and_what_does_">How USB device information looks like and what does it mean</a>
+      </li>
+    </ul>
+    <li><a href="#3.3._Device_entries_reservation">Device entries reservation technique</a></li>
+    <li><a href="#3.4._A_couple_of_words_about_usb_scsi">A couple of words about usb_scsi settings file</a></li>
+    <ul>
+      <li><a href="#3.4.1_General_Module_settings">The Module configuration parameters</a></li>
+      <li><a href="#3.4.2._Module_settings_for_debugging_">Parameters for debugging mode</a></li>
+      <li><a href="#3.4.3_Device_settings">Configuring device definitions</a></li>
+      <ul>
+        <li><a href="#3.4.3.1._Parameters_of_Device_settings">Tweaking device definition</a></li>
+        <li><a href="#3.4.3.2._Protocol_override_parameters">Overriding device protocol</a>
+        </li>
+      </ul>
+    </ul>
+    <li><a href="#3.6._Protocol_extension_modules">Protocol extension modules</a></li>
+  </ul>
+  <li><a href="#6.Contact_information">Contact and support information</a></li>
+  <li><a href="#5.Credits">Credits</a></li>
+  <li><a href="#4._Versions_History_">The History</a></li>
+</ul>
+
+<h1><a name="1._Installation_and_using_"></a>1. Installation and using</h1>
+<p><font color="#cc0000"><b>(!!!) FIRST EMERGENCY TIP:</b></font> If your system
+crashes with this Module - reboot and press "Space"
+during load. In boot menu select "Disable user add-ons" and continue
+booting. Uninstall and reboot again into normal mode. Please, <a
+ href="#6.Contact_information">inform the developer</a> about this problem.
+</p>
+<ol> 
+  <li>Please check, that you have supported version of BeOS. Minimal system
+requirement is R5 + BeOS.USB-patches. No support for "plain" R5! More
+information about USB-patches you can find in 
+<a href="#3.1._BeOS_USB_patches">corresponding clause of this document</a>.
+Note that Dan0, all it's successors and Zeta already have compatible USB stack - no patches
+are required.</li>
+  <li>Contents of distribution archive:
+<pre>    ReadMe.html      &lt;--- file you are reading now
+    <a href="install.sh">install.sh</a>       &lt;--- installation script
+    <a href="uninstall.sh">uninstall.sh</a>     &lt;--- uninstallation script
+    usb              &lt;--- The Module binary
+    <a href="usb_scsi.sample">usb_scsi.sample</a>  &lt;--- settings file sample
+    usb_scsi_logging &lt;--- logging daemon
+    <a href="usb_scsi.devices">usb_scsi.devices</a> &lt;--- definitions for "non-standard" devices
+    usb_dev_info     &lt;--- the tool to obtain device inforamtion</pre>
+  </li>
+  <li>Run <a href="install.sh"><strong>./install.sh</strong></a> to install The Module on your system.
+This script do the following:</li>
+  <ul>
+    <li>copies The Module binary to 
+          <strong>/boot/home/config/add-ons/kernel/busses/scsi/usb</strong>
+              directory</li>
+  </ul>
+  <ul>
+    <li>copies settings file to 
+          <strong>/boot/home/config/settings/kernel/drivers/usb_scsi</strong>
+              file</li>
+    <li>ask you to reboot your system or edit settings file. More
+information on settings file <a href="#3.4._A_couple_of_words_about_usb_scsi">is here</a>.
+If you doesn't reboot from script - you
+have to do it manually to let The Module work with updated settings.
+    </li>
+  </ul>
+  <li>After system rebooted, plug in your USB device into USB slot and
+try to open Tracker's "Mount" menu some times. In case if all goes OK -
+you'll see some additional volumes available for mounting. Mount that
+one you
+think is your USB mass storage and use it as usual "real" drives.</li>
+  <li>It is highly recommended to unmount your USB volume before
+unplugging device from USB slot. Some pending read/write operations can
+be still active in background. If you break this process - 
+<font color="#cc0000"><b>YOU CAN LOOSE YOUR DATA</b></font>. Unmount
+it and wait until your USB volume icon is
+disappeared from desktop and led on your device ( in case this led
+exists, of course ) turns off. To be sure you can run "sync" command from the Terminal.</li>
+  <li>[optional] To uninstall The Module from your system - run <a href="uninstall.sh"><strong>uninstall.sh</strong></a>
+from distribution archive or delete files mentioned in
+clause 3 of this section manually.</li>
+</ol>
+<a href="#Contents">Table
+of Contents</a>
+<h1><a name="2._Troubleshooting"></a>2. Troubleshooting</h1>
+<ol>
+  <li><strong>Is my USB device supported?</strong>
+    <ul>
+      <li>May be. Install this software, plug your device in and
+try to mount it. Or look for class / subclass / protocol values
+in usb device description and check against the following lists.
+        <ul>
+          <li>Supported class : 8</li>
+          <li>Supported subclasses ( command sets ) : 1, 2, 3, 4, 5, 6</li>
+          <li>Supported protocols: 0, 1, 80</li>
+        </ul>
+Any combination of mentioned above class / subclass / protocol is supported.
+      </li>
+    </ul>
+  </li>
+  <li>I have installed this software on R5 + USB.patches but my <strong>system
+goes to Kernel Debugger on very early booting stage</strong>. Help!
+    <ul>
+      <li>Edit <a href="#3.4._A_couple_of_words_about_usb_scsi">settings
+file</a> and activate the following key:
+        <ul>
+          <li>ignore_sysinit2 true</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>I have installed this software and <strong>there are still no additional
+volumes</strong> in Tracker's "Mount" menu.
+    <ul>
+      <li>Sometimes it is required to open "Mount" menu more than
+one time to see volumes.
+      </li>
+      <li>You can try open "Mount" menu with "Shift" button pressed and
+select "Rescan All Devices" menu item to help the system recognize your device.
+      </li>
+      <li>Try to Rescan SCSI in DriveSetup.
+      </li>
+    </ul>
+  </li>
+  <li><strong>I still have no volumes to mount!!!</strong>
+    <ul>
+      <li>Please check the following:
+        <ul>
+          <li>[for R5 only. Not required for Dano/Zeta etc. ] your system
+has USB patches installed;</li>
+          <li>the binary file <strong>/boot/home/config/add-ons/kernel/busses/scsi/usb</strong>
+exists on your system;
+          </li>
+          <li>the settings file <strong>/boot/home/config/settings/kernel/drivers/usb_scsi</strong>
+exists on your system;</li>
+          <li>check that your device uses standard protocols and should be supported by
+this module ( see clause 1 of this section )
+          </li>
+          <li>Despite of fact that latest <strong>versions of Zeta OS</strong> use this module, some of
+pre-releases of this OS have completely different stuff to support USB storage devices.
+In some circumstances those Zeta's modules can prevent this USB Support Module from correct working.
+In this situation you have to disable Zeta's USB Storage support. To do this go to
+/boot/beos/system/add-ons/kernel/busses/scsi/ diectory and rename or remove the
+<strong>usb</strong> and <strong>usb_scsi</strong> files. After rebooting your system
+you should have updated USB Storage support. 
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>STILL <strong>NOTHING TO MOUNT ! ! !</strong>
+    <ul>
+      <li>Looks like you are in trouble. <a href="#6.Contact_information">
+               Write your problem report</a> to developers.
+      </li>
+    </ul>
+  </li>
+  <li>I see <strong>a lot of empty SCSI devices in DriveSetup</strong> and SCSIProbe.
+What is it?
+    <ul>
+      <li>Those "disks" are just reserved device entries - some kind of
+placeholders for real devices you'll attach to your computer. Read
+about this technique <a href="#3.3._Device_entries_reservation">here</a>.
+      </li>
+    </ul>
+  </li>
+  <li><strong>DriveSetup hangs on exit</strong>!?!
+    <ul>
+      <li>It is known bug. I don't know who is wrong with it. No
+solution at this time. Just kill this zombie.
+      </li>
+    </ul>
+  </li>
+  <li>I have found a bug! I have <strong>unmounted my USB floppy</strong>, unplug it
+than plug in another device<strong> but still see the "floppy" volume</strong> in the mount
+list.
+    <ul>
+      <li>The mounting in BeOS is broken. Just press "Shift" key before
+opening Tracker's "Mount" menu than select "Rescan Devices"
+After some seconds try to mount your device again. Should work now.
+      </li>
+    </ul>
+  </li>
+  <li>I have set reserve_devices to maximal value but still <strong>no reserved device
+entries in DriveSetup</strong>.
+    <ul>
+      <li>Known bug. In some situations reservation doesn't work.
+It's reproducible with Adaptec SCSI controllers installed on your
+system. You have to use DriveSetup for first mounting of device in this
+situation. Nothing is perfect in this World.
+      </li>
+    </ul>
+  </li>
+  <li>Does my Canon PowerShot A70 <strong>digital camera supported by this software?</strong>
+    <ul>
+      <li>No. It uses Picture Transfer Protocol (PTP) instead of USB Mass Storage (USBMS)
+one. You can check your camera information for Interface class. For USBMS it should
+be 8, for PTP - 6.
+      </li>
+    </ul>
+  </li>
+  <li>Help me! <strong>No more than 2 devices visible by module</strong> at the same time.
+    <ul>
+      <li>Read about <a href="#3.3._Device_entries_reservation">device
+entries reservation</a> and increase <a href="#3.4._A_couple_of_words_about_usb_scsi">
+     reserve_devices parameter</a> in settings file.
+      </li>
+    </ul>
+  </li>
+  <li>My 9-in-1 card reader works only with media in first 4 slots! <strong>No
+reaction on media in 5th</strong> - 9th slots! Is it a trial version of a driver? Where can I buy full version?
+    <ul>
+      <li>Read about <a href="#3.3._Device_entries_reservation">device entries
+reservation</a> and increase <a  href="#3.4._A_couple_of_words_about_usb_scsi">reserve_luns
+parameter</a> in settings file.
+      </li>
+    </ul>
+  </li>
+  <li><strong>"Mount" menu hangs for a time</strong>  
+    <ul>
+      <li>System requires some time to ask all available volumes for media
+availability, filesystem data format etc. This check is performed any time you opening "Mount"
+menu. In case you have many devices reserved in your configuration - you can be in such
+trouble. Read about <a href="#3.3._Device_entries_reservation">device entries
+reservation</a> and optimize your settings to more reasonable values.
+      </li>
+    </ul>
+  </li>
+  <li>I see the <strong>Generic OS Error</strong> message any time I want to mount my device.  
+  <p>In most of such situations your hardware is OK. The problem is that standard filesystem
+  addon doesn't recognize the filesystem on volume as correct. Unfortunatley BeOS is
+  "to close to standard" to be compatible with all bugs of Windows. <strong>Do not
+  forget to backup your data</strong> before trying to solve this problem!</p>
+  <p>First of all try to reformat your media.</p>
+  <p>If formatting doesn't help or doesn't work with your hardware - open DriveSetup
+  and [re]create <strong>partition</strong> on your device. Rescan SCSI bus if required.
+  Note that you have to <strong>make your partition a bit smaller</strong> as physical
+  size of your device. Try to initialize and reformat your media with new size.</p> 
+  </li>
+  <li>Your <strong>software sucks</strong>!!!
+    <ul>
+      <li>Please <a href="#6.Contact_information">write your problem
+report</a> to developer first.
+      </li>
+    </ul>
+  </li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="3.5.Writing_a_problem_report"></a>3. Writing a problem report</h1>
+Either something goes wrong with this software or nothing goes right
+you have to write a bug report about it.
+<ol>
+  <li>Obtain your <a
+ href="#3.2._USB_Device_information">USB device information</a> and
+save it in safe place</li>
+  <li>now investigate device information for interface class. If it is
+not equal to 8 go to step 12</li>
+  <li>open your settings file
+( <strong>/boot/home/config/settings/kernel/drivers/usb_scsi</strong>
+) in editor you prefer to use</li>
+  <li>activate following keys if they are still not activated</li>
+<pre>    debug_output true
+    debug_output_in_file true
+    debug_output_file_rewrite true
+    debug_trace_protocol true
+    debug_trace_sense_data true</pre>
+  <li>save your changes and close your editor</li>
+  <li>reboot your system keeping your devices switched off from your computer</li>
+  <li>after reboot run <strong>usb_scsi_logging</strong> application from distribution pack</li>
+  <li>plug your device in free USB slot</li>
+  <li>try to mount it again.</li>
+  <li>unplug your device from computer</li>
+  <li>copy the <strong>/var/log/usb_scsi.log</strong> file into same place as in step 1.</li>
+  <li>Get the information, obtained on step 1 and step 12 and<a href="#6.Contact_information"> let
+developer know about your problem</a></li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="3._Technical_notes_"></a>4. Technical notes</h1>
+<h2><a name="3.1._BeOS_USB_patches"></a>4.1. BeOS USB patches</h2>
+To work with this software on
+original BeOS R5 Pro/PE versions and it's successors your system need
+to be improved to newer version of USB. This version is available
+on well-known BeOS file-sharing network as BeOS.USB-patches.zip. Get it, unpack and
+install it as required in corresponding readme. Note that, there
+are 3 patches in this archive:
+<ol>
+  <li>beos-usb-patch </li>
+  <li>beos-usb.modem-patch </li>
+  <li>beos-usb.modem-patch.sm </li>
+</ol>
+<p>At least first one should be installed on your system to make using of
+The USB Support Module possible. Note that Dan0, all it's successors and Zeta don't 
+require this patches.</p>
+<a href="#Contents">Table of Contents</a>
+<h2><a name="3.2._USB_Device_information"></a>4.2. USB Device information</h2>
+<h3><a name="3.2.1._How_to_obtain_USB_device"></a>4.2.1. How to obtain
+USB device information for your hardware</h3>
+There is an <strong>usb_dev_info</strong> tool inside of distribution
+archive. It can
+be used to obtain this information. Someone prefers USBCommander.
+<ol>
+  <li>Unplug all USB devices and hubs from your PC. </li>
+  <li>Go into Terminal and run the following command: <strong> ls -alR /dev/bus/usb</strong> 
+   You should see something like this:
+<pre>    $ ls -alR /dev/bus/usb/
+    /dev/bus/usb:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+    drw-r--r--   1 walther  users           0 May 31 23:16 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 1
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+    
+    /dev/bus/usb/0:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 May 31 23:16 ..
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+    
+    /dev/bus/usb/1:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 May 31 23:16 ..
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub</pre>
+  </li>
+  <li> Note this information. </li>
+  <li> Now plug your USB device into PC and run <strong>ls -alR /dev/bus/usb/</strong> again.
+You'll get something slightly different:
+<pre>    $ ls -alR /dev/bus/usb/
+    /dev/bus/usb:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+    drw-r--r--   1 walther  users           0 May 31 23:16 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 1
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+    
+    /dev/bus/usb/0:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 May 31 23:16 ..
+    <strong><blink>crw-r--r--   1 walther  users      0,   0 May 31 23:17 1</blink></strong>
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+    
+    /dev/bus/usb/1:
+    total 0
+    drw-r--r--   1 walther  users           0 May 31 23:16 .
+    drw-r--r--   1 walther  users           0 May 31 23:16 ..
+    crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub</pre>
+  </li>
+  <li> Compare this results with previous one and look for file,
+that appeared (is selected for our sample case). This file is your
+"unknown" USB device (in our sample it is <strong>/dev/bus/usb/0/1</strong>). </li>
+  <li>Now you can run usb_dev_info tool to obtain device information: 
+    <pre>$ usb_dev_info /dev/bus/usb/0/1</pre>
+  </li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h3><a name="3.2.2._How_it_looks_like_and_what_does_"></a>4.2.2. How USB device information
+looks like and what does it mean</h3>
+<p>After performing tasks, described in previous clause you'll
+receive something like the following. Note that some details can be
+different for your hardware
+<pre>    $ usb_dev_info /dev/bus/usb/0/1
+    [Device]
+    Class .................. 0
+    Subclass ............... 0
+    Protocol ............... 0
+    Vendor ID .............. 0x08ec   &lt;---------- Vendor ID of your hardware manufacturer
+    Product ID ............. 0x0011   &lt;---------- unique Product ID of your hardware
+    Version ................ 0x0200
+    Manufacturer String .... "      "
+    Product String ......... "      "
+    Serial Number .......... "      "
+      [Configuration 0]               &lt;---------- begin of configuration description 
+        [Interface 0]                 &lt;---------- begin of interface description
+        Class .............. 8        &lt;---------- this interface class. 
+        Subclass ........... 6        &lt;---------- this interface subclass
+        Protocol ........... 80       &lt;---------- protocol used by this interface
+          [Endpoint 0]
+          MaxPacketSize .... 64
+          Interval ......... 0
+          Type ............. Bulk
+          Direction ........ Input
+          [Endpoint 1]
+          MaxPacketSize .... 64
+          Interval ......... 0
+          Type ............. Bulk
+          Direction ........ Output</pre>
+  </li>
+</ul>
+<a href="#Contents">Table of Contents</a>
+<h2><a name="3.3._Device_entries_reservation"></a>4.3. Device entries
+reservation technique</h2>
+<p>Some tricks are required to implement simple and natural ( "one-click"
+) volumes mounting in Tracker. Current versions of BeOS don't fully conform to
+SCSI Common Access Model specifications. Particularly that is mean,
+that there are no possibility to tell system about mass storage devices,
+attached after system boot. If you already used usb mass storage driver
+from Dano you should know this problem - you have to go to DriveSetup
+than Rescan SCSI bus and only after this mount your volume from DriveSetup.</p>
+<p>This Module introduces a workaround for such problem - it just let system to
+know, that "device is here, but not ready at the moment, keep trying". This allows
+to simulate some kind of plug and play in mounting from Tracker. You
+can see those reserved device entries in DriveSetup -a lot of SCSI
+"drives" without media and with ZIP cartridge icon left of it. This
+reservation <a href="#3.4._A_couple_of_words_about_usb_scsi">can be
+configured in settings file</a>.</p>
+<a href="#Contents">Table of Contents</a>
+<h2><a name="3.4._A_couple_of_words_about_usb_scsi"></a>4.4. A couple
+of words about usb_scsi settings file</h2>
+<p>You can configure some aspects of this software behavior through
+editing it's settings file. This file is placed by installation script into
+<strong>/boot/home/config/settings/kernel/drivers/</strong> directory
+and has the name
+<strong>usb_scsi</strong>. It is usual text file and can be edited by
+any text editor you like. Note that improper using of this settings 
+file can crash your system - please be accurate. </p>
+<p>Typically the parameters in settings file
+can be inactive (commented ) or active. For example the following
+quote from settings file contains two parameters: first one
+( reserve_devices ) is inactive ( commented by '#'-sign at the begin of
+line ) and second one ( reserve_luns ) is active and set to 4:
+<pre>#reserve_devices 2 &lt;----------------- inactive
+reserve_luns    4 &lt;----------------- active</pre>
+Please use this notation during editing of settings file.</p>
+<h3><a name="3.4.1_General_Module_settings"></a>4.4.1 The Module configuration parameters</h3>
+This set of parameters is loaded by Module during
+system boot and is used on permanent basis. To apply changes, made by you in any of
+this parameter you have to restart your system
+<ul>
+  <li><strong>reserve_devices</strong>
+    <ul>
+      <li>Amount of device entries to be reserved by The Module.
+If you plan to use more than 2 devices simultaneously than increase this
+parameter. Note that if you set this parameter to 0 - device entry
+reservation will be "switched off" and you have to use DriveSetup for
+first mounting.</li>
+      <li>default value: 2</li>
+      <li>maximal value: 7</li>
+    </ul>
+  </li>
+  <li><strong>reserve_luns</strong>
+    <ul>
+      <li>Amount of logical unit numbers (LUN) to be reserved by The Module for every 
+      device entry defined in reserve_devices parameter. If you plan to use devices 
+      with more than 4 LUNs than increase this parameter. </li>
+      <li>default value: 4</li>
+      <li>maximal value: 8</li>
+    </ul>
+  </li>
+  <li><strong>ignore_sysinit2</strong></li>
+  <ul>
+    <li>If you have R5 with USB patches and your system goes in kernel debugger on
+booting with this software - this parameter is for you. Set it to true
+and reboot to avoid such crashing behavior.</li>
+    <li>default value: false</li>
+  </ul>
+</ul>
+<a href="#Contents">Table of Contents</a>
+<h3><a name="3.4.2._Module_settings_for_debugging_"></a>4.4.2. Parameters for debugging mode</h3>
+<ul>
+  <li><strong>debug_output</strong>
+  </li>
+  <ul>
+    <li>This parameter activates / deactivates debug output.</li>
+    <li>default value: false</li>
+  </ul>
+  <li><strong>debug_output_in_file</strong></li>
+  <ul>
+    <li>This parameter handles redirection of tracing information to
+private log file (<strong>/var/log/usb_scsi.log</strong>). If this
+parameter is false - all debuging information goes to system log.
+    </li>
+    <li>default value: false</li>
+  </ul>
+  <li><strong>debug_output_file_rewrite</strong></li>
+  <ul>
+    <li>Forces private log file to be truncated on every system restart</li>
+    <li>default value: false</li>
+  </ul>
+  <li><strong>debug_trace_commands</strong></li>
+  <ul>
+    <li>Activate this to dump SCSI commands to debug output</li>
+    <li>default value: false</li>
+  </ul>
+  <li><strong>debug_trace_protocol</strong></li>
+  <ul>
+    <li>Activate this to see mass storage protocols work information in debug output</li>
+    <li>default value: false</li>
+  </ul>
+  <li><strong>debug_trace_data_io</strong></li>
+  <li><strong>debug_trace_sense_data</strong></li>
+  <li><strong>debug_trace_bulk_callback</strong></li>
+  <li><strong>debug_trace_time </strong></li>
+  <li><strong>debug_trace_threadid </strong></li>
+  <li><strong>debug_trace_thread_name</strong></li>
+  <li><strong>debug_trace_capacity</strong></li>
+  <ul>
+    <li>Mean this stuff as undocumented because it is rarely used.</li>
+    <li>default values: false</li>
+  </ul>
+</ul>
+<a href="#Contents">Table of Contents</a>
+<h3><a name="3.4.3_Device_settings"></a>4.4.3 Configuring device definitions</h3>
+<p>Device definition allows to override your hardware parameters and tweak
+it's functionality. This parameters are device-specific and reloaded on
+physical device attach. You not need to reboot your system to apply
+your changes in device descriptions. All you need to use changed device
+definitions - unplug your USB hardware from computer and plug it in
+again. </p>
+<p>Typical "non-standard" devices definition looks like this:
+<pre>vendor &lt;&lt;vendor id&gt;&gt; {
+  device &lt;&lt;product id 1&gt;&gt; {
+    &lt;&lt;parameter 1&gt;&gt; 
+    &lt;&lt;parameter 2&gt;&gt;
+         ...
+    &lt;&lt;parameter N&gt;&gt;
+  }
+    ....
+  device &lt;&lt;product id N&gt;&gt; {
+    &lt;&lt;parameter 1&gt;&gt; 
+    &lt;&lt;parameter 2&gt;&gt;
+         ...
+    &lt;&lt;parameter N&gt;&gt;
+  }
+}</pre>
+</p> 
+<p>The real vendor ID and product ID for your hardware you can obtain from
+USB Device information. Note that you can define many devices inside of
+single vendor definition. More real samples of device overrides you can
+find in <a href="usb_scsi.devices">usb_scsi.devices</a> file inside of
+distribution archive. Just <strong>copy the content of corresponding device
+description into settings file</strong> and re-plug your hardware. </p>
+<a href="#Contents">Table of Contents</a>
+<h4><a name="3.4.3.1._Parameters_of_Device_settings"></a>4.4.3.1.Tweaking device definition</h4>
+Every parameter of device definition is like switch. It affects on Module behavior
+only if exists in device definition and is not commented out.
+<ul>
+  <li><strong>fake_inquiry </strong></li>
+  <ul>
+    <li>do not send INQUIRY SCSI command to USB device but handle it in Module.</li>
+  </ul>
+  <li><strong>use_6byte_cmd </strong></li>
+  <ul>
+    <li>use 6 byte length SCSI READ/WRITE/MODE SENSE/SELECT SENSE
+commands instead of 10 byte ones. Typically BeOS uses 6-byte commands
+but many USB mass storage devices doesn't like this. To avoid massive
+device
+redefinitions this Module automatically translates such commands to
+10-byte counterparts. If this default translation doesn't work for you
+- set use_6byte_cmd to avoid it.</li>
+  </ul>
+  <li><strong>trans_test_unit</strong></li>
+  <ul>
+    <li>translate TEST UNIT SCSI command to START STOP one.</li>
+  </ul>
+  <li><strong>no_test_unit</strong></li>
+  <ul>
+    <li>do not send TEST UNIT SCSI command to device. At all.</li>
+  </ul>
+  <li><strong>no_get_max_lun</strong></li>
+  <ul>
+    <li>do not ask for maximal number of supported Logical Unit Numbers</li>
+  </ul>
+  <li><strong>no_prevent_media</strong></li>
+  <ul>
+    <li>do not send to device PREVENT ALLOW MEDIA REMOVAL SCSI command.</li>
+  </ul>
+  <li><strong>use_mode_sense_10</strong></li>
+  <ul>
+    <li>force module to use 10-byte MODE SENSE command. Typically this
+Module detects automatically the supported MODE SENSE command and you
+don't need to set it manually.</li>
+  </ul>
+  <li><strong>force_read_only</strong></li>
+  <ul>
+    <li>force drive to be read-only. It is not 100% guaranteed - but in
+many cases works. If you need "true" read-only volumes - than mount it
+with corresponding flags from command line.</li>
+  </ul>
+</ul>
+<h4><a name="3.4.3.2._Protocol_override_parameters"></a>4.4.3.2.
+Overriding device protocol</h4>
+There are two special parameters allow to override protocol and
+command set used to communicate with device
+<ul>
+  <li><strong>commandset</strong></li>
+  <ul>
+    <li>forces The Module to use specific command set when
+communicating with device. The following command sets are supported</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>SCSI - transparent SCSI command set. USB subclass 6</li>
+      <li>UFI - USB subclass 4</li>
+      <li>ATAPI - USB subclasses 5,2</li>
+      <li>RBC - USB subclass 1</li>
+      <li>QIC157 - USB subclass 3. Used for tape drives so, probably is
+not be anytime usable... but supported. =-)</li>
+      <li>&lt;Vendor&gt; - any vendor-specific, non-standard commands
+set. Note that to work with it a corresponding <a href="#3.6._Protocol_extension_modules">protocol extension module</a> is
+required.</li>
+    </ul>
+  </ul>
+  <li><strong>protocol </strong></li>
+  <ul>
+    <li>forces The Module to use specific protocol when
+communicating with device. The following protocols are supported</li>
+    <ul>
+      <li>BULK - bulk-only. USB protocol 80</li>
+      <li>CB - Control/Bulk/Interrupt protocol (with command
+completion interrupt). USB protocol 1</li>
+      <li>CBI - Control/Bulk/Interrupt protocol (with no command
+completion interrupt) USB protocol 0</li>
+      <li>&lt;Vendor&gt; - any vendor-specific, non-standard protocol.
+Note that to work with it a corresponding <a href="#3.6._Protocol_extension_modules">protocol extension module</a> is
+required. </li>
+    </ul>
+  </ul>
+</ul>
+<a href="#Contents">Table of Contents</a>
+<h2><a name="3.6._Protocol_extension_modules"></a>4.5. Protocol extension modules</h2>
+<p>The BeOS USB Support Module was designed with extensibility in mind. It means, that you
+can add support of vendor-specific, non-standard protocols/commandsets without
+changing the main Module. All you need is protocol extention module, that implements all
+specifics of the data and commands flow.</p>
+<p>Currently available modules:</p>
+<ul>
+  <li>freecom - FREECOM USB-IDE Bridge (ATAPI devices only).</li>
+</ul>
+<p>To install protocol extention module obtain it's distribution archive
+and read instructions inside of it.</p>
+<p>For development questions refer to of already existing protocol extention modules
+or the Author of UBS Support Module.</p>
+ 
+<a href="#Contents">Table of Contents</a>
+<h1><a name="6.Contact_information"></a>4.Contact and support information</h1>
+The BeOS USB Support Module project is hosted on <a href="http://www.sourceforge.net">SourceForge</a> 
+and uses some it's powerful development services. There are some ways to inform
+developer about problems or put feature requests for next version
+<ol>
+  <li>Use <a href="http://sourceforge.net/tracker/?group_id=56631&amp;atid=481262">Bug
+Tracker</a> to put problem reports.</li>
+  <li>Use <a href="http://sourceforge.net/forum/forum.php?forum_id=380480">Forum</a>
+to ask simple support question, discuss any problems.
+Do not put your problem reports here - use <a
+ href="http://sourceforge.net/tracker/?group_id=56631&amp;atid=481262">Bug
+Tracker</a>!</li>
+  <li>Use <a
+ href="http://lists.sourceforge.net/lists/listinfo/sis4be-usb_scsi">Mailing-list</a>
+to be informed with latest news, ask questions
+etc. This is also not right place for your problem reports - use <a
+ href="http://sourceforge.net/tracker/?group_id=56631&amp;atid=481262">Bug
+Tracker</a> instead.</li>
+  <li>If you want to share any ideas, that can be good to implement in
+future versions - use <a
+ href="http://sourceforge.net/tracker/?group_id=56631&amp;atid=481265">Feature
+Request Submit form</a>.</li>
+  <li>If you doesn't like any way, mentioned above you can
+contact me personally by <a href="mailto:imker@gmx.li">e-mail</a> but
+remember, that I don't like this
+way!(Joke!) =-) In my opinion such Community Knowledges like
+Forums and mail-lists must be public and available for everyone.</li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="5.Credits"></a>5.Credits</h1>
+<p>I want to say my "Thanks" to:</p>
+<p><strong>... Sergei Dolgov</strong> ("fyysik") for pushing me to develop this software 
+and help in testing,</p>
+<p><strong>... Valery Rybin</strong> for testing a really lot of those USB
+gadgets he has at his hands,</p>
+<p><strong>... them who</strong> have spend some time to trying all those "-dev-"
+versions in work.</p>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="4._Versions_History_"></a>6. The History</h1>
+<p><table width="100%" border="1">
+  <tbody>
+    <tr>
+      <td><b>Date:</b> </td>
+      <td><b>Version:</b> </td>
+      <td><b>What's new:</b> </td>
+    </tr>
+    <tr>
+      <td> 06 June 2004</td>
+      <td>0.1.0-alpha-1 </td>
+      <td>first public release. </td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<a href="#Contents">Table
+of Contents</a>
+<center>&lt; End of document &gt;</center>
+</body>
+</html>

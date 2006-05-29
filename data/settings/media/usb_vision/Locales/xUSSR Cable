@@ -1,0 +1,67 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Ex USSR Cable channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/xUSSR\040Cable,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@xUSSR Cable
+111250000 70	  
+119250000 71	 
+127250000 72	  
+135250000 73	   
+143250000 74	 
+141250000 75	  
+159250000 76	  
+167250000 77	  
+231250000 78	  
+239250000 79	 
+247250000 80	 
+255250000 81	  
+263250000 82	 
+271250000 83	  
+279250000 84	 
+287250000 85	 
+295250000 86	  
+303250000 87	  
+311250000 88	  
+319250000 89	 
+327250000 90	  
+335250000 91	  
+343250000 92	  
+351250000 93	  
+359250000 94	 
+367250000 95	  
+375250000 96	  
+383250000 97	  
+391250000 98	  
+399250000 99	 
+407250000 100	 
+415250000 101	 
+423250000 102	  
+431250000 103	  
+439250000 104	 
+447250000 105	  
+455250000 106	  
+463250000 107	 

@@ -1,0 +1,262 @@
+<html>
+<title>BeOS driver for USB serial adapters and CDC ACM compatible USB modems</title>
+<body bgcolor="#f0f0e0">
+<h1>BeOS driver for USB serial adapters and CDC ACM compatible USB modems</h1>
+
+<h2>Introduction</h2>
+<p>This driver is designed to support following USB serial adapters and modems:</p>
+
+<table border=1><tbody><tr>
+<td><b>Name</b></td><td><b>Vendor ID</b></td><td><b>Product ID</b></td>
+</tr><tr>
+<td><b>USB CDC ACM-compatible modems:</b></td><td>any</td><td>any</td>
+</tr><tr>
+<td><b>Prolific PL2303-based adapters:</b></td><td></td><td></td>
+</tr><tr>
+<td>PL2303 Serial adapter (IODATA USB-RSAQ2)</td><td>0x067b</td><td>0x04bb</td>
+</tr><tr>
+<td>I/O Data USB serial adapter USB-RSAQ1</td><td>0x04bb</td><td>0x0a03</td>
+</tr><tr>
+<td>Aten Serial adapter"</td><td>0x0557</td><td>0x2008</td>
+</tr><tr>
+<td>TDK USB-PHS Adapter UHA6400</td><td>0x04bf</td><td>0x0117</td>
+</tr><tr>
+<td>Ratoc USB serial adapter REX-USB60</td><td>0x0584</td><td>0xb000</td><td>
+</tr><tr>
+<td>PL2303 Serial adapter (ATEN/IOGEAR UC232A)</td><td>0x067b</td><td>0x2303</td>
+</tr><tr>
+<td>Elecom UC-SGT</td><td>0x056e</td><td>0x5003</td>
+</tr><tr>
+<td><b>FTDI-based:</b></td><td></td><td></td>
+</tr><tr>
+<td>FTDI 8U100AX serial converter</td><td>0x0403</td><td>0x8372</td>
+</tr><tr>
+<td>FTDI 8U232AM serial converter</td><td>0x0403</td><td>0x6001</td>
+</tr></tbody></table>
+
+<table><tbody><tr><td>
+<b><font color="#00ff00">NOTE that</font></b>
+</td><td>
+There are a lot of USB modems in this world. Not every one can be supported by this driver.
+Only CDC ACM-compatible modems will works with it. How you can guess it? Just try to install
+this driver and plug your modem in. If you get the usb0 in ports list - it probably works.
+If not - <a href="#usbcommander">obtain the information about your device</a> and
+<a href="mailto:imker@gmx.li">send it to me</a>.
+</td></tr><tr><td>
+<b><font color="#00ff00">NOTE that</font></b>
+</td><td>
+If your computer has the OHCI-compatible USB hardware you are out of luck. This hardware is not
+supported by non-Dan0-like versions. See the <a href="#patches">BeOS.USB.patches</a> vor details and
+solutions.
+</td></tr><tr><td>
+<b><font color="#ff0000">NOTE that</font></b>
+</td><td>
+For Dan0 you have to build a special version of binaries.
+Read <a href="#Dan0">here</a> for details.
+</td></tr><tr><td>
+<b><font color="#ff0000"><blink>WARNING!!!</blink></font></b>
+</td><td>
+If your system was patched with <a href="#patches">BeOS.USB.patches</a> - your system is candidate to crash
+trying this driver!! You must very accurate read <a href="#patches">this.</a>
+</td></tr><tbody><table>
+
+<b>What's new:</b>
+<table border=1 ><tbody><tr><td>
+<b>Version:</b>
+</td><td>
+<b>History:</b>
+</td></tr><tr><td>
+0.1.0-dev-0
+</td><td>
+very first "development" release.
+</td></tr></tr><tr><td>
+1.0.0-RC-1
+</td><td>
+Release Candidate 1.
+<ul>
+<li>Code re-designed
+<li>Code is chaged to be compatible with Dan0.
+</ul>
+</td></tr><tbody><table>
+
+
+<h2>1. Installation</h2>
+<ul>
+<li>Run install.sh
+<li>If all is OK run SerialConnect application and press Alt-D. If you can select the port, that
+   looks like "usb0" - your device was identified as supported. You can use this "usb" - port as
+   you do with usual "serial" ones. Good luck!
+<li>If something goes wrong - open the Terminal and run the following command: 
+<p><strong>ls /dev/ports/</strong>
+<p>It lists all ports that present on your system. If you have no "usb0" here but sure, that you
+   have USB to Serial adapter plugged in your USB port - write an e-mail about your problem. I'll
+   try to help you.
+</ul>
+<h2>2. Uninstallation</h2>
+<ul>
+<li>Run uninstall.sh
+</ul>
+
+<h2>3. Problems solving</h2>  
+<ul>
+<li>   If this driver crash your system - reboot and press "Space" during load. In boot menu select
+   "Disable user add-ons" and continue boot. Uninstall driver and reboot again into normal mode.
+   Write me a e-mail about this problem.
+</ul>
+<h2>4. "Unknown" devices</h2>
+<a name="usbcommander"></a>
+   If you have something, that looks like USB->RS232(serial) adapter or USB modem and tried it with
+   this driver but have no success - download <a href="http://www.zharik.host.sk/prahramy/usb_dev_info.zip">
+   usb device info tool</a> and use it to get required information.
+<ul>    
+<li>Unplug all USB devices and hubs from your PC.    
+<li>Go into Terminal and run the following command:
+<strong>    ls -alR /dev/bus/usb</strong> 
+    You should see something like this:
+<pre>
+$ ls -alR /dev/bus/usb/
+/dev/bus/usb:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+drw-r--r--   1 walther  users           0 May 31 23:16 0
+drw-r--r--   1 walther  users           0 May 31 23:16 1
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+
+/dev/bus/usb/0:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+
+/dev/bus/usb/1:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+</pre>
+   
+<li> Note this information.    
+<li> Now plug your USB serial adapter into PC and run <strong>ls -alR /dev/bus/usb/</strong> again.
+You'll get something slightly different:
+<pre>
+$ ls -alR /dev/bus/usb/
+/dev/bus/usb:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 Jun  1  2003 ..
+drw-r--r--   1 walther  users           0 May 31 23:16 0
+drw-r--r--   1 walther  users           0 May 31 23:16 1
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 unload
+
+/dev/bus/usb/0:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+<blink>crw-r--r--   1 walther  users      0,   0 May 31 23:17 1</blink>
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+
+/dev/bus/usb/1:
+total 0
+drw-r--r--   1 walther  users           0 May 31 23:16 .
+drw-r--r--   1 walther  users           0 May 31 23:16 ..
+crw-r--r--   1 walther  users      0,   0 May 31 23:16 hub
+</pre>
+
+$                                             
+<li> Compare this results with previous one and look for file,
+that appeared. This file is your USB serial adapter.   
+<li> Unpack downloaded usb_dev_info command and run it with full path to file appeared in
+the second listing. For my sample I should run:
+usb_dev_info /dev/bus/usb/0/1
+I'll get the following:
+<pre>
+$ usb_dev_info /dev/bus/usb/0/1
+[Device]
+Class .................. 0
+Subclass ............... 0
+Protocol ............... 0
+Vendor ID .............. 0x067b
+Product ID ............. 0x2303
+Version ................ 0x0202
+Manufacturer String .... ""
+Product String ......... ""
+Serial Number .......... ""
+  [Configuration 0]
+    [Interface 0]
+    Class .............. 255
+    Subclass ........... 0
+    Protocol ........... 0
+      [Endpoint 0]
+      MaxPacketSize .... 10
+      Interval ......... 1
+      Type ............. Interrupt
+      Direction ........ Input
+      [Endpoint 1]
+      MaxPacketSize .... 64
+      Interval ......... 0
+      Type ............. Bulk
+      Direction ........ Output
+      [Endpoint 2]
+      MaxPacketSize .... 64
+      Interval ......... 0
+      Type ............. Bulk
+      Direction ........ Input
+</pre>
+<li> Send this information to me with some additional words about your device.    
+</ul>    
+
+<h2>What is wrong with BeOS.USB.patches?</h2>
+<a name="patches"></a>
+All know that "classical" BeOS R5 don't works on OHCI USB hardware. But some time ago on one well-known
+BeOS file-sharing network appeared patches for plain R5. Those patches allows to work with OHCI
+hardware under this system version. Looks like it is some part of Dan0 or other "leaked" versions.
+There are 3 patches in BeOS.USB.patches.zip:
+<p>1. beos-usb-patch,
+<p>2. beos-usb.modem-patch,
+<p>3. beos-usb.modem-patch.sm.    
+<p> The Evil is in two last patches. The source of problem - changed functions in tty module. The
+Dan0 contains two additional functions in the middle of tty module description table. But the module version
+was not changed - it is still v1. So if driver, that was compiled with old tty module layout, will try to use it - system
+crashes. Looks like those patches contains the same "enchanced" tty module like in Dan0. So - you should roll back
+those modem-patches - restore the previous configuration as described in patches readme. The first one
+- "beos-usb-patch" is OK. 
+
+<h2>Information for Dan0 users</h2>  
+<a name="Dan0"></a>
+The driver is still not working under Dan0 out of box. At first you have no need to use it for ACM-compatible devices,
+because Dan0 has it's own implementation of usb_acm driver. There is also one problem with Dan0 - the
+"tty" module was chaged in very dangerous way - there is no possibility to create backward compatible
+implementation of serial port driver with the new tty interfaces. If you really have one of those USB Serial 
+Adapters and want to use it under Dan0 - you have to make some hand work. Sorry for this, but I have not
+using Dan0 as my main working system. So you must to build Dan0 version by yourself. Thank you for your patience. Below
+is an operations you need to install USB serial driver for Dan0:
+<ul>
+<li>Obtain the zip archive with the USB Serial driver for R5.
+<li>Obtain the zip archive with sources of the driver.
+<li>ATTENTION!!! Unplug all USB devices from your PC. You must to do this - in opposite case you
+system can crash!  
+<li>Install the USB Serial driver as was described in this document.
+<li>Unpack the sources of the driver, go to Terminal, change dir to unpacked sources and run the
+"make" command. You should see many warnings but no errors.
+<li>Stay in Terminal and change the current directory to "obj.x86". You should see the "usb_serial"
+driver binary if everything went OK.
+<li>Now copy the usb_serial to right place:
+<pre>
+<b>cp ./usb_serial ~/config/add-ons/kernel/drivers/bin/usb_serial</b>
+</pre>
+and let the system to know about changes:
+<pre>
+<b>rescan usb_serial</b>
+</pre>
+<li>The last thing you have to do - disable ACM support in this driver:
+Open the file /boot/home/config/settings/kernel/drivers/usb_serial in your text editor and add or
+uncomment the following string:
+<pre>
+<b>support_acm_devices false</b>
+</pre>
+<li>Now you should have working version of USB Serial driver under Dan0.
+</ul>
+<p><b><a href="mailto:imker@gmx.li">Siarzuk Zharski <imker@gmx.li></a></b>
+<p><a href="http://www.zharik.host.sk/">http://www.zharik.host.sk/</a>
+</body></html>

@@ -1,4 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers bus ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers bus scsi ;
 SubInclude HAIKU_TOP src add-ons kernel drivers bus pcmcia ;
+SubInclude HAIKU_TOP src add-ons kernel drivers bus scsi ;

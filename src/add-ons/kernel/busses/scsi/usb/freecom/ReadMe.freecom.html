@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ 
+ This file is a part of BeOS USB SCSI interface module project.
+ Copyright (c) 2003-2004 by Siarzhuk Zharski <imker@gmx.li>
+ 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details. 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+ $Source: /cvsroot/sis4be/usb_scsi/freecom/ReadMe.freecom.html,v $
+ $Author: zharik $
+ $Revision: 1.2 $
+ $Date: 2005/04/09 22:19:58 $
+
+-->
+<html>
+<head>
+  <title>FREECOM extension module for BeOS USB mass storage support</title>
+</head>
+<body bgcolor="#f0f0e0">
+<h1>FREECOM extension module for
+    <font color="#000066">B</font><font color="#cc0000">e</font>OS
+     USB mass storage support</h1>
+<div align="right">
+<address><a href="mailto:imker@gmx.li">by Siarzhuk Zharski</a></address>
+</div>
+<p>This FREECOM extension module (<strong>The Extension</strong>) is kind of the helper for
+BeOS USB Storage Module (<strong>The Module</strong>) that is designed to support
+external CD/DVD drives connected with FREECOM USB 1.1 Cable. 
+This software is for BeOS/Dano/Zeta operating systems.
+</p>
+<p><font color="#cc0000"><b>Note that</b></font> this manual contains only FREECOM extension specific information. For general USB
+Storage Module questions look into the corresponding manual. 
+</p>
+
+<h1><a name="Contents"></a>Table of Contents</h1>
+<ul>
+  <li><a href="#1._Installation_and_using_">Installation and using </a></li>
+  <li><a href="#2._Troubleshooting">Troubleshooting</a></li>
+  <li><a href="#3.5.Writing_a_problem_report">Writing a problem report</a></li>
+  <li><a href="#6.Contact_information">Contact and support information</a></li>
+  <li><a href="#5.Credits">Credits</a></li>
+  <li><a href="#4._Versions_History_">The History</a></li>
+</ul>
+
+<h1><a name="1._Installation_and_using_"></a>1. Installation and using</h1>
+<ol> 
+  <li>Contents of distribution archive:
+<pre>    ReadMe.freecom.html      &lt;--- file you are reading now
+    <a href="install.sh">install.sh</a>       &lt;--- installation script
+    <a href="uninstall.sh">uninstall.sh</a>     &lt;--- uninstallation script
+    freecom              &lt;--- The Extension binary
+    <a href="device_info.sample">device_info.sample</a>  &lt;--- device description sample
+</pre>
+  </li>
+  <li>Run <a href="install.sh"><strong>./install.sh</strong></a> to install The Extension on your system.
+This script do the following:</li>
+  <ul>
+    <li>copies The Extension binary to 
+          <strong>/boot/home/config/add-ons/kernel/generic/usb_scsi_extensions/</strong>
+              directory</li>
+  </ul>
+  <ul>
+    <li>add device definition into  
+          <strong>/boot/home/config/settings/kernel/drivers/usb_scsi</strong>
+              file</li>
+    <li>ask you to edit settings file. Note that you have to check vendor and product ids for
+    your FREECOM device and edit device settings correspondently! It is not required to reboot your PC after installing
+The Extension and changing it's definitions.</li>
+  </ul>
+  <li>Plug in your FREECOM CD/DVD drive into USB slot, load a media into it and
+try to open Tracker's "Mount" menu some times. In case if all goes OK -
+you'll see your CD/DVD volume available for mounting. You can of course use your CD/DVD burning
+software with this drive.</li>
+  <li>[optional] To uninstall The Module from your system - run <a href="uninstall.sh"><strong>uninstall.sh</strong></a>
+from distribution archive or delete files mentioned in
+clause 3 of this section manually.</li>
+</ol>
+<a href="#Contents">Table
+of Contents</a>
+<h1><a name="2._Troubleshooting"></a>2. Troubleshooting</h1>
+<ol>
+  <li><strong>Is my external USB CD/DVD device supported?</strong>
+    <ul>
+      <li>Only "old" FREECOM USB 1.1 cable connected drives are supported. Obtain your device
+      vendor and product ids as described in ReadMe.html for
+      BeOS USB storage Module, edit the device description in settings file correspondently and try
+      to work with it. Be sure that your FREECOM device is really non-standard and has 255 as class in
+      usb device description. Vendor id for FREECOM is 0x07ab.
+      </li>
+    </ul>
+  </li>
+  <li><strong>Cannot mount my CD/DVDs</strong>.
+    <ul>
+      <li>Please check the following:
+        <ul>
+          <li>the binary file <strong>/boot/home/config/add-ons/kernel/generic/usb_scsi_extensions/freecom</strong>
+exists on your system;
+          </li>
+          <li>the settings file <strong>/boot/home/config/settings/kernel/drivers/usb_scsi</strong>
+exists on your system and contains description for your FREECOM device;</li>
+          <li>check that device description correspond to your real device information;
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>My external USB HDD in FREECOM case doesn't work</strong>
+    <ul>
+      <li>Only ATAPI devices are supported. ATA protocol doesn't uses SCSI-like commands.</li>
+    </ul>
+  </li>
+  <li><strong>Mmmm... another question</strong>...
+    <ul>
+      <li>Please refer to Troubleshooting section of ReadMe.html for BeOS USB Storage Support Module and
+      <a href="#6.Contact_information">contact the developer</a> if you still have a problem.
+      </li>
+    </ul>
+  </li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="3.5.Writing_a_problem_report"></a>3. Writing a problem report</h1>
+Refer to corresponding section of ReadMe.html file for BeOS USB Storage Support Module.
+<a href="#Contents">Table of Contents</a>
+<h1><a name="6.Contact_information"></a>4.Contact and support information</h1>
+The Extension is a part of BeOS USB Support Module project that is hosted on <a href="http://www.sourceforge.net">SourceForge</a> 
+and uses some it's powerful development services. There are some ways to inform
+developer about problems or put feature requests for next version
+<ol>
+  <li>Use <a href="http://sourceforge.net/tracker/?group_id=56631&amp;atid=481262">Bug
+Tracker</a> to put problem reports.</li>
+  <li>Use <a href="http://sourceforge.net/forum/forum.php?forum_id=380480">Forum</a>
+to ask simple support question, discuss any problems.
+  <li>Use <a
+ href="http://lists.sourceforge.net/lists/listinfo/sis4be-usb_scsi">Mailing-list</a>
+to be informed with latest news, ask questions
+etc.</li>
+  <li>Also you can contact me personally by <a href="mailto:imker@gmx.li">e-mail</a>.</li>
+</ol>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="5.Credits"></a>5.Credits</h1>
+<p>I want to say my "Thanks" to:</p>
+<p><strong>brave testers...</strong></p>
+<a href="#Contents">Table of Contents</a>
+<h1><a name="4._Versions_History_"></a>6. The History</h1>
+<p><table width="100%" border="1">
+  <tbody>
+    <tr>
+      <td><b>Date:</b> </td>
+      <td><b>Version:</b> </td>
+      <td><b>What's new:</b> </td>
+    </tr>
+    <tr>
+      <td> ?? ??April 2005</td>
+      <td>0.1.0-alpha-1 </td>
+      <td>first public release. </td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<a href="#Contents">Table
+of Contents</a>
+<center>&lt; End of document &gt;</center>
+</body>
+</html>

@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src add-ons kernel drivers ports usb_serial ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+local defines = [ FDefines DB_USB_USE_V2_MODULE ] ;
+
+SubDirCcFlags $(defines) ;
+
+KernelAddon usb_serial : kernel drivers bin :
+	driver.c
+	tracing.c
+	acm.c
+	prolific.c
+	ftdi.c
+;
+
+AddResources usb_serial : usb_serial.rdef ;
+
+
+Package haiku-usb_serial-cvs
+	:
+	usb_serial
+	:
+	boot home config add-ons kernel drivers bin ;
+
+Package haiku-usb_serial-cvs : <usb_serial!driver>usb_serial.settings.sample
+        : boot home config settings kernel drivers sample ;

@@ -1,0 +1,81 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Australia Broadcast channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/Australia\040Air,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@Australia Air
+ 46250000 0 
+ 57250000 1 
+ 64250000 2 
+ 86250000 3 
+ 95250000 4 
+102250000 5 
+138250000 5A 
+175250000 6  
+182250000 7  
+189250000 8  
+196250000 9  
+209250000 10 
+216250000 11 
+527250000 28 
+534250000 29 
+541250000 30 
+548250000 31 
+555250000 32 
+562250000 33 
+569250000 34 
+576250000 35 
+604250000 39 
+611250000 40 
+618250000 41 
+625250000 42 
+632250000 43 
+639250000 44 
+646250000 45 
+653250000 46 
+660250000 47 
+667250000 48 
+674250000 49 
+681250000 50 
+688250000 51 
+695250000 52 
+702250000 53 
+709250000 54 
+716250000 55 
+723250000 56 
+730250000 57 
+737250000 58 
+744250000 59 
+751250000 60 
+758250000 61 
+765250000 62 
+772250000 63 
+779250000 64 
+786250000 65 
+793250000 66 
+800250000 67 
+807250000 68 
+814250000 69 

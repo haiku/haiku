@@ -1,0 +1,37 @@
+#
+# The sample sis7018 driver settings file
+#
+# Rename it to sis7018 and put into 
+# /boot/home/config/settings/kernel/drivers/
+# After restarting Media Services the new settings will works.
+
+#  Debug output - this is a possibility to view some kind of development related
+# information - error and warning messages etc.
+
+# debug_output - activates debug output. The debug builds has debug output 
+# activated by default and this key has no effect on it. The release builds requires 
+#  to activate this if you want to see debug messages in syslog or in private log file.
+#
+# debug_output true
+
+# debug_output_in_file - activates writing of debug messages into private log file.
+# The name of this file is /boot/home/sis7018.log. If this key is set to true - no messages
+# will be written into syslog.
+#
+# debug_output_in_file true
+
+# debug_output_file_rewrite - activates rewriting of private log file on 
+# calling driver_init() syscall. By default this set in false.  
+#
+# debug_output_file_rewrite false
+
+#  debug_trace_ac97 - activates more detailed logging of AC'97 operations.
+# Do not use it with syslog output - you'll get only <TRUNCATED> messages 
+# because BeOS's syslog daemon don't like a lot of messages in short time
+#
+# debug_trace_ac97 true
+
+# use_io_registers - switches driver from "memory" scheme to "io registers" 
+# scheme. This key is usefull for testers. Don't use it if you don't need it.
+#   
+# use_io_registers true

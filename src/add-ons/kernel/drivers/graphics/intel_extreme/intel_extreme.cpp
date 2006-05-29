@@ -129,6 +129,7 @@ read_settings(size_t &memorySize, bool &hardwareCursor)
 static size_t
 determine_stolen_memory_size(intel_info &info)
 {
+#if 0
 	// read stolen memory from the PCI configuration of the PCI bridge
 	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
 	size_t memorySize = 1 << 20; // 1 MB
@@ -171,6 +172,10 @@ determine_stolen_memory_size(intel_info &info)
 	}
 
 	return memorySize;
+#endif
+// stippi: das sorgt dafür, daß er den Speicher vom BIOS komplett
+//	wegwirft
+	return 0;
 }
 
 
@@ -315,7 +320,7 @@ intel_extreme_init(intel_info &info)
 		// on demand only, but we're lazy here...
 		info.additional_memory_area = additionalMemoryCreator.Create("intel additional memory",
 			(void **)&additionalMemory, B_ANY_KERNEL_ADDRESS,
-			totalSize - stolenSize, B_FULL_LOCK, 0);
+			totalSize - stolenSize, B_FULL_LOCK | B_CONTIGUOUS, 0);
 		if (info.additional_memory_area < B_OK)
 			return info.additional_memory_area;
 	} else

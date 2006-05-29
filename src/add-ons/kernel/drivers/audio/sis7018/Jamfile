@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src add-ons kernel drivers audio sis7018 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders audio ;
+
+KernelAddon sis7018 : kernel drivers bin :
+	ac97.c
+	midi.c
+	pcm.c
+	sis7018.c
+	sis7018hw.c
+;
+
+AddResources sis7018 : vsis7018.rdef ;
+
+Package haiku-sis7018-cvs
+	:
+	sis7018
+	:
+	boot home config add-ons kernel drivers bin ;
+
+PackageDriverSymLink haiku-sis7018-cvs : audio sis7018 ;
+Package haiku-sis7018-cvs : <sis7018!driver>sis7018.settings.sample
+        : boot home config settings kernel drivers sample ;

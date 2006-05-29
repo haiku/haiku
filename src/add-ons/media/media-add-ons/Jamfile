@@ -8,5 +8,6 @@ SubInclude HAIKU_TOP src add-ons media media-add-ons mixer ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons multi_audio ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons radeon ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons tone_producer_demo ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons usb_vision ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons video_producer_demo ;
 

@@ -1,0 +1,84 @@
+BeOS sound driver for SiS 7018 PCI Audio Accelerator
+
+This driver is designed to supports following chipsets:
+SiS 7018 (vendor:1039 card:7018)
+Trident 4D Wave DX (vendor:1023 card:2000)
+Trident 4D Wave NX (vendor:1023 card:2001) - not tested
+Acer Lab's M5451 (vendor:10b9 card:5451)
+
+What's new:
+-----------------------------------------------------------------------------------------------
+version 0.1.0-dev-8
+* The AC'97 codec id checking restored.
+- to be continued! 
+
+version 0.1.0-dev-7
+ * Added use_io_registers to settings file. Just for testers.
+ * The AC'97 codec id checking bypassed - for testing purposes only
+ 
+version 0.1.0-dev-6
+ * Fixed problem with "Real-time Audio". Currently works in this mode too.
+ 
+version 0.1.0-dev-5
+ * Fixed AC'97 codec handling - 6bit master gain codecs schould be supported correctly
+ + For testing purposes added Trident DX with vendorID : 0x03 - such card found
+    by one tester. 
+
+version 0.1.0-dev-4
++ Finished some codec manipulations - mio volumes, mio mutes etc.
+
+version 0.1.0-dev-3
+* Fixed "last thrashed" sample problem
++ makefile and install script are fixed.
+
+version 0.1.0-dev-2
+* changed AC'97 initialization
++ Added settings file
++ Added possibility to write into private log file
++ More complicated AC'97 tracing possible ...
+
+version 0.1.0-dev-1
+* changed AC'97 initialization
+
+version 0.1.0-dev-0
+  initial build.
+-----------------------------------------------------------------------------------------------
+
+!!! WANTED !!!
+Wanted testers with Trident NX sound hardware. Current driver is not tested on such hardware. It'll be good to asure that it work with that cards too!
+
+Installation
+Run install.sh
+
+Uninstallation
+Run uninstall.sh
+
+Problems solving  
+If this driver crash your system - reboot and press "Space" during load. In boot menu select "Disable user add-ons" and continue boot. Uninstall driver and reboot again into normal mode. Write me a e-mail about this problem.
+
+Professional testing:
+If you found a problem with this driver and want to help me in development of this software make the following things (Assume that driver is already installed):
+
+1) Open the file /boot/home/config/settings/kernel/drivers/sis7018 and set following parameters:
+
+debug_output true
+debug_output_in_file true
+
+if you have a problems with mixer - it's not work, or settings is not saved on reboot - activate this one too:
+
+debug_trace_ac97 true
+
+2) Reboot your system and try to play something. 
+
+3) After that get the file /boot/home/sis7018.log and send it to me.
+ 
+4) It'll be good on your first bug report to me send also hardware configuration of your system. To get it go into Terminal and run following commands
+
+listdev 
+
+Get all that it say to you and send me too, please ... 
+
+Thank you !!!  
+
+Siarzuk Zharski <imker@gmx.li>
+http://www.zharik.host.sk/

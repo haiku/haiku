@@ -1,0 +1,76 @@
+##########################################################
+##
+##     USB Storage Module non-standard devices definitions 
+##
+##  This file is a part of BeOS USB SCSI interface module project.
+##  Copyright (c) 2003-2005 by Siarzhuk Zharski <imker@gmx.li>
+##  All rights reserved.
+##
+##########################################################
+##
+## To use the those devices definitions, listed below copy  
+## it to your settings file. For more details look in ReadMe.html
+##
+
+##########################################################
+#
+# Sony DSC series of digital cameras.
+#
+#     ( reported by CKJ )
+#
+# Those devices report subclass (command set) as 0xff
+#   but work with transparent SCSI command set
+#
+vendor 0x054c {
+  device 0x0010 {
+    commandset SCSI
+    protocol CB
+  }
+}
+##########################################################
+#
+# Sony cameras.
+# 
+#  (reported by RudolfC)
+#
+# Sony DV handycam DCR-TRV22E USB mass storage interface
+# Those devices report subclass (command set) as 0xff
+#   but work with transparent SCSI command set
+#
+vendor 0x054c {
+  device 0x002e {
+    commandset SCSI
+    protocol CB
+  }
+}
+
+
+##########################################################
+#
+# Siemens mp3 Player.
+#
+# Supports standard protocol but doesn't like 6-byte mode_sense/mode_select
+# requests. Doesn't perform standard reset procedures - if device hang - switch
+# it off and plug it again. 
+#
+vendor 0x0483 {
+  device 0x1307 {
+    protocol BULK
+    commandset SCSI
+    use_mode_sense_10
+  }
+}
+
+##########################################################
+#
+# FREECOM USB-ATAPI bridge.
+#
+# Supports FREECOM USB Cable connected CD/DVD drives/burners
+#  
+#
+vendor 0x07ab {
+  device 0xfc01 {
+    protocol freecom
+    commandset ATAPI
+  }
+}

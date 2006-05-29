@@ -1,0 +1,92 @@
+;
+;      Tuner locale file for BeOS USBVision driver
+;
+;               "Japan Cable channels"
+;
+;===========================================================
+; This file is a part of BeOS USBVision driver project.
+; Copyright (c) 2003 by Siarzuk Zharski <imker@gmx.li>
+;
+; This file may be used under the terms of the BSD License
+;  Look into the file "License" for details.
+; 
+;  $Source: /cvsroot/sis4be/usbvision/Locales/Japan\040Cable,v $
+;  $Author: zharik $
+;  $Revision: 1.2 $
+;  $Date: 2003/07/09 04:58:08 $
+;===========================================================
+;
+; Format of this file:
+;
+; The file begins with the name of locale preceded with "@"-sign. This name will be 
+; visible for user in Tuner Locale settings.
+; Channels are presented as frequency <-> name pairs.
+; The Frequency is in Hz and name begins just after the first space character 
+; after frequency number. The name ends at the end of line.
+; 
+; All lines beginning with ";"-sign are comments and will be ignored.
+;
+@Japan Cable
+ 91250000 1 
+ 97250000 2 
+103250000 3
+171250000 4
+177250000 5
+183250000 6
+189250000 7
+193250000 8
+199250000 9
+205250000 10
+211250000 11
+217250000 12
+109250000 C13
+115250000 C14
+121250000 C15
+127250000 C16
+133250000 C17
+139250000 C18
+145250000 C19
+151250000 C20
+157250000 C21
+165250000 C22
+223250000 C23
+229250000 C24
+235250000 C25
+241250000 C26
+247250000 C27
+253250000 C28
+259250000 C29
+265250000 C30
+271250000 C31
+277250000 C32
+293250000 C33
+289250000 C34
+295250000 C35
+301250000 C36
+307250000 C37
+313250000 C38
+319250000 C39
+325250000 C40
+331250000 C41
+337250000 C42
+343250000 C43
+349250000 C44
+355250000 C45
+361250000 C46
+367250000 C47
+373250000 C48
+379250000 C49
+385250000 C50
+391250000 C51
+397250000 C52
+403250000 C53
+409250000 C54
+415250000 C55
+421250000 C56
+427250000 C57
+433250000 C58
+439250000 C59
+445250000 C60
+451250000 C61
+457250000 C62
+463250000 C63
