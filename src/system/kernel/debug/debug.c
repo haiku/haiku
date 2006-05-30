@@ -63,7 +63,7 @@ static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
 
 static void flush_pending_repeats(void);
-static status_t check_pending_repeats(void *data);
+static void check_pending_repeats(void *data, int iter);
 
 static int64 sMessageRepeatTime = 0;
 static int32 sMessageRepeatCount = 0;
@@ -254,6 +254,13 @@ read_line(char *buffer, int32 maxLength)
 	}
 
 	return position;
+}
+
+
+extern int
+kgets(char *buf, int len)
+{
+	return read_line(buf, len);
 }
 
 
@@ -676,12 +683,28 @@ debug_init_post_vm(kernel_args *args)
 status_t
 debug_init_post_modules(struct kernel_args *args)
 {
-	thread_id thread = spawn_kernel_thread(check_pending_repeats,
-		"check repeats", B_LOW_PRIORITY, NULL);
-	if (thread >= B_OK)
-		resume_thread(thread);
+	void *cookie;
+
+	// check for dupped lines every 10/10 second
+	register_kernel_daemon(check_pending_repeats, NULL, 10);
 
 	syslog_init_post_threads();
+
+	// load kernel debugger addons
+	cookie = open_module_list("debugger");
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+		module_info *module;
+
+		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
+			break;
+		if (get_module(name, &module) == B_OK)
+			dprintf("kernel debugger extention \"%s\": loaded\n", name);
+		else
+			dprintf("kernel debugger extention \"%s\": failed to load\n", name);
+	}
+	close_module_list(cookie);
 
 	return frame_buffer_console_init_post_modules(args);
 }
@@ -854,25 +877,21 @@ flush_pending_repeats(void)
 }
 
 
-static status_t
-check_pending_repeats(void *data)
+static void
+check_pending_repeats(void *data, int iter)
 {
-	while (true) {
-		if (sMessageRepeatCount > 0
-			&& (system_time() - sMessageRepeatTime) > 1000000) {
-			cpu_status state = disable_interrupts();
-			acquire_spinlock(&sSpinlock);
+	(void)data;
+	(void)iter;
+	if (sMessageRepeatCount > 0
+		&& (system_time() - sMessageRepeatTime) > 1000000) {
+		cpu_status state = disable_interrupts();
+		acquire_spinlock(&sSpinlock);
 
-			flush_pending_repeats();
+		flush_pending_repeats();
 
-			release_spinlock(&sSpinlock);
-			restore_interrupts(state);
-		}
-
-		snooze(1000000);
+		release_spinlock(&sSpinlock);
+		restore_interrupts(state);
 	}
-
-	return B_OK;
 }
 
 
