@@ -85,6 +85,7 @@ TermApp::TermApp()
 	char title[256];
 	snprintf(title, sizeof(title), "Terminal %d", fWindowNumber);
 	fWindowTitle = title;
+	fStartFullscreen = false;
 
 	int i = fWindowNumber / 16;
 	int j = fWindowNumber % 16;
