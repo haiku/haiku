@@ -1,9 +1,5 @@
 /*
-
-	PCWindow.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,23 +15,23 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _PCWINDOW_H_
 #define _PCWINDOW_H_
 
+
 #include <Window.h>
 
+
 class PCWindow : public BWindow {
+	public:
+						PCWindow(); 
+						~PCWindow();
 
-public:
-				PCWindow(); 
-				~PCWindow();
-virtual	bool	QuitRequested();
+		virtual	bool	QuitRequested();
 
-private:
-		bool	wasShowing;
+	private:
+		bool			fDraggersAreDrawn;
 };
 
 #endif // _PCWINDOW_H_

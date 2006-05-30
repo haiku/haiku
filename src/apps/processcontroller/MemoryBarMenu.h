@@ -20,7 +20,7 @@
 #define _MEMORY_BAR_MENU_H_
 
 
-#include "PCUtils.h"
+#include "Utilities.h"
 
 #include <Menu.h>
 
@@ -34,8 +34,8 @@ typedef struct {
 
 class MemoryBarMenu : public BMenu {
 	public:
-						MemoryBarMenu(const char* name, infosPack *infos,
-							system_info* sinfo);
+						MemoryBarMenu(const char* name, info_pack* infos,
+							system_info& systemInfo);
 		virtual			~MemoryBarMenu();
 
 		virtual	void	Draw(BRect updateRect);

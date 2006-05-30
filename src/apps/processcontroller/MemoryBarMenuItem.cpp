@@ -18,10 +18,11 @@
 */
 
 
-#include "PCView.h"
 #include "MemoryBarMenuItem.h"
-#include "MemoryBarMenu.h"
+
 #include "Colors.h"
+#include "MemoryBarMenu.h"
+#include "ProcessController.h"
 
 #include <Bitmap.h>
 
@@ -93,12 +94,18 @@ MemoryBarMenuItem::DrawIcon()
 void
 MemoryBarMenuItem::DrawBar(bool force)
 {
+	// only draw anything if something has changed
+	if (!force && fWriteMemory == fLastWrite && fAllMemory == fLastAll
+		&& fCommitedMemory == fLastCommited)
+		return;
+
 	bool selected = IsSelected();
 	BRect frame = Frame();
 	BMenu* menu = Menu();
 
 	// draw the bar itself
-	BRect cadre(frame.right - kMargin - kBarWidth, frame.top + 5,
+
+	BRect rect(frame.right - kMargin - kBarWidth, frame.top + 5,
 		frame.right - kMargin, frame.top + 13);
 	if (fWriteMemory < 0)
 		return;
@@ -111,17 +118,17 @@ MemoryBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(gFrameColorSelected);
 		else
 			menu->SetHighColor(gFrameColor);
-		menu->StrokeRect(cadre);
+		menu->StrokeRect(rect);
 	}
 
-	cadre.InsetBy(1, 1);
-	BRect r = cadre;
-	float grenze1 = cadre.left + (cadre.right - cadre.left) * float (fWriteMemory) / fCommitedMemory;
-	float grenze2 = cadre.left + (cadre.right - cadre.left) * float (fAllMemory) / fCommitedMemory;
-	if (grenze1 > cadre.right)
-		grenze1 = cadre.right;
-	if (grenze2 > cadre.right)
-		grenze2 = cadre.right;
+	rect.InsetBy(1, 1);
+	BRect r = rect;
+	float grenze1 = rect.left + (rect.right - rect.left) * float(fWriteMemory) / fCommitedMemory;
+	float grenze2 = rect.left + (rect.right - rect.left) * float(fAllMemory) / fCommitedMemory;
+	if (grenze1 > rect.right)
+		grenze1 = rect.right;
+	if (grenze2 > rect.right)
+		grenze2 = rect.right;
 	r.right = grenze1;
 	if (!force)
 		r.left = fGrenze1;
@@ -152,7 +159,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 	}
 
 	r.left = grenze2;
-	r.right = cadre.right;
+	r.right = rect.right;
 
 	if (!force)
 		r.right = fGrenze2;
@@ -169,41 +176,38 @@ MemoryBarMenuItem::DrawBar(bool force)
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 
-	// draw the value
-	if (force || fCommitedMemory != fLastCommited || fWriteMemory != fLastWrite
-		|| fAllMemory != fLastAll) {
-		if (selected)
-			menu->SetLowColor(gMenuBackColorSelected);
-		else
-			menu->SetLowColor(gMenuBackColor);
+	fLastCommited = fCommitedMemory;
 
-		if (force || fWriteMemory != fLastWrite || fAllMemory != fLastAll) {
-			menu->SetHighColor(menu->LowColor());
-			BRect trect(cadre.left - kMargin - gMemoryTextWidth, frame.top,
-				cadre.left - kMargin, frame.bottom);
-			menu->FillRect(trect);
-			fLastWrite = fWriteMemory;
-			fLastAll = fAllMemory;
-		}
-		fLastCommited = fCommitedMemory;
-		menu->SetHighColor(kBlack);
+	// Draw the values if necessary; if only fCommitedMemory changes, only
+	// the bar might have to be updated
 
-		char infos[128];
-//		if (fWriteMemory >= 1024)
-//			sprintf(infos, "%.1f MB", float (fWriteMemory) / 1024.f);
-//		else
-			sprintf(infos, "%d KB", fWriteMemory);
+	if (!force && fWriteMemory == fLastWrite && fAllMemory == fLastAll)
+		return;
 
-		BPoint loc(cadre.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth (infos),
-			cadre.bottom + 1);
-		menu->DrawString(infos, loc);
-//		if (fAllMemory >= 1024)
-//			sprintf (infos, "%.1f MB", float (fAllMemory) / 1024.f);
-//		else
-			sprintf(infos, "%d KB", fAllMemory);
-		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
-		menu->DrawString(infos, loc);
-	}
+	if (selected)
+		menu->SetLowColor(gMenuBackColorSelected);
+	else
+		menu->SetLowColor(gMenuBackColor);
+
+	BRect textRect(rect.left - kMargin - gMemoryTextWidth, frame.top,
+		rect.left - kMargin, frame.bottom);
+	menu->FillRect(textRect, B_SOLID_LOW);
+
+	fLastWrite = fWriteMemory;
+	fLastAll = fAllMemory;
+
+	menu->SetHighColor(kBlack);
+
+	char infos[128];
+	sprintf(infos, "%d KB", fWriteMemory);
+
+	BPoint loc(rect.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
+		rect.bottom + 1);
+	menu->DrawString(infos, loc);
+
+	sprintf(infos, "%d KB", fAllMemory);
+	loc.x = rect.left - kMargin - menu->StringWidth(infos);
+	menu->DrawString(infos, loc);
 }
 
 
@@ -240,11 +244,11 @@ MemoryBarMenuItem::BarUpdate()
 		lram_size += ainfo.ram_size;
 
 		// TODO: this won't work this way anymore under Haiku!
-		int zone = (int (ainfo.address) & 0xf0000000) >> 24;
-		if ((ainfo.protection & B_WRITE_AREA)
-			&& (zone & 0xf0) != 0xA0			// Exclude media buffers
-			&& (fTeamID != gAppServerTeamID || zone != 0x90))	// Exclude app_server side of bitmaps
+//		int zone = (int (ainfo.address) & 0xf0000000) >> 24;
+		if ((ainfo.protection & B_WRITE_AREA) != 0)
 			lwram_size += ainfo.ram_size;
+//			&& (zone & 0xf0) != 0xA0			// Exclude media buffers
+//			&& (fTeamID != gAppServerTeamID || zone != 0x90))	// Exclude app_server side of bitmaps
 	}
 	if (!exists) {
 		team_info info;

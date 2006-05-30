@@ -25,7 +25,7 @@
 
 class KernelMemoryBarMenuItem : public BMenuItem {
 	public:
-						KernelMemoryBarMenuItem(system_info* systemInfo);
+						KernelMemoryBarMenuItem(system_info& systemInfo);
 		virtual	void	DrawContent();
 		virtual	void	GetContentSize(float* _width, float* _height);
 		void			DrawBar(bool force);

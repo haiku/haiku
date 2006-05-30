@@ -1,9 +1,5 @@
 /*
-
-	ThreadBarMenu.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,27 +15,32 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
 #include "ThreadBarMenu.h"
-#include "ThreadBarMenuItem.h"
+
 #include "PriorityMenu.h"
-#include "PCView.h"
+#include "ProcessController.h"
+#include "ThreadBarMenuItem.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
 #define EXTRA 20
 
-ThreadBarMenu::ThreadBarMenu(const char *title, team_id team, int32 thread_count):
-	BMenu(title), fThreadsRecCount(thread_count+EXTRA), fTeam(team)
+
+ThreadBarMenu::ThreadBarMenu(const char *title, team_id team, int32 threadCount)
+	: BMenu(title),
+	fThreadsRecCount(threadCount + EXTRA),
+	fTeam(team)
 {
 	SetFont(be_plain_font);
-	fThreadsRec = (ThreadRec*) malloc(sizeof(ThreadRec)*fThreadsRecCount);
+	fThreadsRec = (ThreadRec*) malloc(sizeof(ThreadRec) * fThreadsRecCount);
 	Init();
 	fRound = 0;	// for syslog
 	AddNew();
 }
+
 
 ThreadBarMenu::~ThreadBarMenu()
 {
@@ -48,37 +49,47 @@ ThreadBarMenu::~ThreadBarMenu()
 		gCurrentThreadBarMenu = NULL;
 }
 
-void ThreadBarMenu::Init()
+
+void
+ThreadBarMenu::Init()
 {
-	int			k = 0;
+	int k = 0;
 	while (k < fThreadsRecCount)
 		fThreadsRec[k++].thread = -1;
 	fRound = 1;
 }
 
-void ThreadBarMenu::Reset(team_id team)
+
+void
+ThreadBarMenu::Reset(team_id team)
 {
 	fTeam = team;
 	RemoveItems(0, CountItems(), true);
 	Init();
 }
 
-void ThreadBarMenu::AttachedToWindow()
+
+void
+ThreadBarMenu::AttachedToWindow()
 {
 	BMenu::AttachedToWindow();
 }
 
-void ThreadBarMenu::Draw(BRect r)
+
+void
+ThreadBarMenu::Draw(BRect r)
 {
 	gCurrentThreadBarMenu = this;
 	BMenu::Draw(r);
 }
 
-void ThreadBarMenu::AddNew()
+
+void
+ThreadBarMenu::AddNew()
 {
 	thread_info	info;
-	int32 		cookie = 0;
-	int32		k = 0;
+	int32 cookie = 0;
+	int32 k = 0;
 	while (get_next_thread_info(fTeam, &cookie, &info) == B_OK) {
 		int	lastk = k;
 		while (k < fThreadsRecCount && fThreadsRec[k].thread != info.thread)
@@ -118,12 +129,15 @@ void ThreadBarMenu::AddNew()
 	fRound++;
 }
 
-void ThreadBarMenu::Update()
+
+void
+ThreadBarMenu::Update()
 {
 	AddNew();
-	int32	k, del;
+	int32 k, del;
 	del = -1;
 	ThreadBarMenuItem *item;
+
 	for (k = 0; (item = (ThreadBarMenuItem*) ItemAt(k)) != NULL; k++) {
 		item->BarUpdate();
 		item->DrawBar(false);

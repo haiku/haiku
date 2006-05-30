@@ -84,7 +84,6 @@ extern	rgb_color			gMenuBackColorSelected;
 extern	rgb_color			gWhiteSelected;
 extern	ThreadBarMenu*		gCurrentThreadBarMenu;
 extern	thread_id			gPopupThreadID;
-extern	team_id				gAppServerTeamID;
 extern	const char*			kDeskbarItemName;
 extern	bool				gInDeskbar;
 extern	int32				gMimicPulse;

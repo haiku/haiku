@@ -1,9 +1,5 @@
 /*
-
-	QuitMenu.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,28 +15,29 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _QUIT_MENU_H_
 #define _QUIT_MENU_H_
 
+
+#include "Utilities.h"
+
 #include <Menu.h>
 #include <Messenger.h>
-#include "PCUtils.h"
 
-class QuitMenu : public BMenu
-{
-public:
-						QuitMenu(const char* title, infosPack * infos, int infosCount);
-	virtual	void		AttachedToWindow();
-	virtual void		DetachedFromWindow();
-	virtual void		MessageReceived(BMessage *msg);
-			void		AddTeam(team_id tmid);
-private:
-	const infosPack		*fInfos;
-	int					fInfosCount;
-	BMessenger			*fMe;
+
+class QuitMenu : public BMenu {
+	public:
+						QuitMenu(const char* title, info_pack* infos, int infosCount);
+		virtual	void	AttachedToWindow();
+		virtual void	DetachedFromWindow();
+		virtual void	MessageReceived(BMessage *msg);
+		void			AddTeam(team_id tmid);
+
+	private:
+		const info_pack* fInfos;
+		int				fInfosCount;
+		BMessenger*		fMe;
 };
 
 #endif // _QUIT_MENU_H_

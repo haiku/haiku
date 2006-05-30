@@ -1,9 +1,5 @@
 /*
-
-	ThreadBarMenuItem.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,29 +15,29 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _THREAD_BAR_MENU_ITEM_H_
 #define _THREAD_BAR_MENU_ITEM_H_
 
+
 #include <MenuItem.h>
 
-//---------------------------------------------------------------
 
 class ThreadBarMenuItem : public BMenuItem {
+	public:
+						ThreadBarMenuItem(const char* title, thread_id thread,
+							BMenu* menu, BMessage* msg);
 
-public:
-						ThreadBarMenuItem (const char* title, thread_id thread, BMenu *menu, BMessage* msg);
-virtual	void			DrawContent ();
-virtual	void			GetContentSize (float* width, float* height);
-virtual	void			Highlight(bool on);
-		void			DrawBar (bool force);
-		void			BarUpdate ();
+		virtual	void	DrawContent();
+		virtual	void	GetContentSize(float* width, float* height);
+		virtual	void	Highlight(bool on);
+		void			DrawBar(bool force);
+		void			BarUpdate();
+
 		double			fUser;
 		double			fKernel;
 
-private:
+	private:
 		thread_id		fThreadID;
 		thread_info		fThreadInfo;
 		bigtime_t		fLastTime;
@@ -50,4 +46,3 @@ private:
 };
 
 #endif // _THREAD_BAR_MENU_ITEM_H_
-

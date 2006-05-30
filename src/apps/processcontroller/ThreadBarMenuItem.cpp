@@ -1,9 +1,5 @@
 /*
-
-	ThreadBarMenuItem.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,19 +15,20 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
-#include "PCView.h"
 #include "ThreadBarMenuItem.h"
-#include "PriorityMenu.h"
+
 #include "Colors.h"
-#include "PCView.h"
+#include "PriorityMenu.h"
+#include "ProcessController.h"
+
 #include <stdio.h>
 
-// --------------------------------------------------------------
-ThreadBarMenuItem::ThreadBarMenuItem(const char* title, thread_id thread, BMenu *menu, BMessage* msg)
-			:BMenuItem(menu, msg), fThreadID(thread)
+
+ThreadBarMenuItem::ThreadBarMenuItem(const char* title, thread_id thread,
+		BMenu *menu, BMessage* msg)
+	: BMenuItem(menu, msg), fThreadID(thread)
 {
 	SetLabel(title);
 	get_thread_info(fThreadID, &fThreadInfo);
@@ -41,8 +38,9 @@ ThreadBarMenuItem::ThreadBarMenuItem(const char* title, thread_id thread, BMenu 
 	fGrenze2 = -1;
 }
 
-// --------------------------------------------------------------
-void ThreadBarMenuItem::DrawContent()
+
+void
+ThreadBarMenuItem::DrawContent()
 {
 	if (fKernel < 0)
 		BarUpdate();
@@ -51,12 +49,13 @@ void ThreadBarMenuItem::DrawContent()
 	BMenuItem::DrawContent();
 }
 
-// --------------------------------------------------------------
-void ThreadBarMenuItem::DrawBar(bool force)
+
+void
+ThreadBarMenuItem::DrawBar(bool force)
 {
-	bool	selected = IsSelected ();
-	BRect	frame = Frame();
-	BMenu*	menu = Menu ();
+	bool selected = IsSelected();
+	BRect frame = Frame();
+	BMenu* menu = Menu();
 	frame.right -= 24;
 	frame.left = frame.right-kBarWidth;
 	frame.top += 3;
@@ -73,9 +72,9 @@ void ThreadBarMenuItem::DrawBar(bool force)
 		menu->StrokeRect(frame);
 	}
 	frame.InsetBy(1, 1);
-	BRect	r = frame;
-	float	grenze1 = frame.left+(frame.right-frame.left)*fKernel;
-	float	grenze2 = frame.left+(frame.right-frame.left)*(fKernel+fUser);
+	BRect r = frame;
+	float grenze1 = frame.left+(frame.right-frame.left)*fKernel;
+	float grenze2 = frame.left+(frame.right-frame.left)*(fKernel+fUser);
 	if (grenze1 > frame.right)
 		grenze1 = frame.right;
 	if (grenze2 > frame.right)
@@ -121,8 +120,9 @@ void ThreadBarMenuItem::DrawBar(bool force)
 	fGrenze2 = grenze2;
 }
 
-// --------------------------------------------------------------
-void ThreadBarMenuItem::GetContentSize(float* width, float* height)
+
+void
+ThreadBarMenuItem::GetContentSize(float* width, float* height)
 {
 	BMenuItem::GetContentSize(width, height);
 //	if (*height < 16)
@@ -130,8 +130,9 @@ void ThreadBarMenuItem::GetContentSize(float* width, float* height)
 	*width += 10+kBarWidth;
 }
 
-// --------------------------------------------------------------
-void ThreadBarMenuItem::Highlight(bool on)
+
+void
+ThreadBarMenuItem::Highlight(bool on)
 {
 	if (on) {
 		PriorityMenu * popup = (PriorityMenu *) Submenu ();
@@ -141,12 +142,13 @@ void ThreadBarMenuItem::Highlight(bool on)
 	BMenuItem::Highlight (on);
 }
 
-// --------------------------------------------------------------
-void ThreadBarMenuItem::BarUpdate()
+
+void
+ThreadBarMenuItem::BarUpdate()
 {
-	thread_info		info;
+	thread_info info;
 	if (get_thread_info(fThreadID, &info) == B_OK) {
-		bigtime_t	now = system_time();
+		bigtime_t now = system_time();
 		fKernel = double(info.kernel_time-fThreadInfo.kernel_time)/double(now-fLastTime);
 		fUser = double(info.user_time-fThreadInfo.user_time)/double(now-fLastTime);
 		if (fThreadID <= gCPUcount) {

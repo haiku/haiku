@@ -1,9 +1,5 @@
 /*
-
-	PriorityMenu.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,28 +15,37 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
+
 #include "PriorityMenu.h"
-#include "PCView.h"
-#include <Window.h>
+#include "ProcessController.h"
+
 #include <MenuItem.h>
+#include <Window.h>
+
 #include <stdio.h>
 
-PriorityMenu::PriorityMenu (thread_id thread, int32 priority) :
-	BMenu (B_EMPTY_STRING), fThreadID (thread), fPriority (priority)
+
+PriorityMenu::PriorityMenu(thread_id thread, int32 priority)
+	: BMenu(B_EMPTY_STRING),
+	fThreadID(thread),
+	fPriority(priority)
 {
 }
 
-void PriorityMenu::Update (int32 priority)
+
+void
+PriorityMenu::Update(int32 priority)
 {
-	if (priority != fPriority && CountItems () > 0)
-		RemoveItems (0, CountItems (), true);
-	if (CountItems () < 1)
-		BuildMenu ();
+	if (priority != fPriority && CountItems() > 0)
+		RemoveItems(0, CountItems(), true);
+	if (CountItems() < 1)
+		BuildMenu();
+
 	fPriority = priority;
 }
+
 
 typedef struct {
 	char	name[32];
@@ -62,13 +67,14 @@ static PriorityRec	priorities[] = {
 
 PriorityRec customPriority = { "Custom", 0 };
 
-// --------------------------------------------------------------
-void PriorityMenu::BuildMenu ()
+
+void
+PriorityMenu::BuildMenu()
 {
 	BMenuItem* item;
 	BMessage* message;
-	char	name[B_OS_NAME_LENGTH + 20];
-	long	found = false;
+	char name[B_OS_NAME_LENGTH + 20];
+	long found = false;
 
 	for (long index = 0; ; index++) {
 		PriorityRec	*priority = &priorities[index];
@@ -82,7 +88,7 @@ void PriorityMenu::BuildMenu ()
 		message = new BMessage('PrTh');
 		message->AddInt32("thread", fThreadID);
 		message->AddInt32("priority", priority->priority);
-		sprintf(name, "%s Priority [%d]", priority->name, (int) priority->priority);
+		sprintf(name, "%s Priority [%d]", priority->name, (int)priority->priority);
 		item = new BMenuItem(name, message);
 		item->SetTarget(gPCView);
 		if (fPriority == priority->priority)

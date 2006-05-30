@@ -1,9 +1,5 @@
 /*
-
-	TeamBarMenu.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,15 +15,15 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _TEAM_BAR_MENU_H_
 #define _TEAM_BAR_MENU_H_
 
-#include "PCUtils.h"
+
+#include "Utilities.h"
 
 #include <Menu.h>
+
 
 class TeamBarMenuItem;
 
@@ -36,20 +32,21 @@ typedef struct {
 	int					index;
 } TRecycleItem;
 
-class TeamBarMenu : public BMenu
-{
-public:
-						TeamBarMenu(const char *title, infosPack *infos, int32 teamCount);
-virtual					~TeamBarMenu();
-virtual	void			Draw (BRect updateRect);
-virtual	void			Pulse();
 
-	team_id*			fTeamList;
-	int					fTeamCount;
-	TRecycleItem*		fRecycleList;
-	int					fRecycleCount;
-	bigtime_t			fLastTotalTime;
-	bool				fFirstShow;
+class TeamBarMenu : public BMenu {
+	public:
+						TeamBarMenu(const char* title, info_pack* infos, int32 teamCount);
+		virtual			~TeamBarMenu();
+
+		virtual	void	Draw(BRect updateRect);
+		virtual	void	Pulse();
+
+		team_id*		fTeamList;
+		int				fTeamCount;
+		TRecycleItem*	fRecycleList;
+		int				fRecycleCount;
+		bigtime_t		fLastTotalTime;
+		bool			fFirstShow;
 };
 
 #endif // _TEAM_BAR_MENU_H_

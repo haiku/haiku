@@ -1,6 +1,4 @@
 /*
-	PCView.cpp
-
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org
 	Copyright (c) 2006 Haiku, Inc. All Rights Reserved.
@@ -20,14 +18,24 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
 */
 
-#include "PCView.h"
+
+#include "ProcessController.h"
+
+#include "AutoIcon.h"
+#include "Colors.h"
 #include "IconMenuItem.h"
+#include "MemoryBarMenu.h"
+#include "MemoryBarMenuItem.h"
 #include "PCWorld.h"
 #include "Preferences.h"
-#include "PCUtils.h"
-#include "Colors.h"
+#include "QuitMenu.h"
+#include "TeamBarMenu.h"
+#include "TeamBarMenuItem.h"
+#include "ThreadBarMenu.h"
+#include "Utilities.h"
 
 #include <Alert.h>
+#include <Bitmap.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Dragger.h>
@@ -35,6 +43,7 @@
 #include <FindDirectory.h>
 #include <MessageRunner.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <TextView.h>
@@ -73,6 +82,19 @@ ThreadBarMenu* gCurrentThreadBarMenu;
 bool gInDeskbar = false;
 int32 gMimicPulse = 0;
 
+#define addtopbottom(x) if (top) popup->AddItem(x); else popup->AddItem(x, 0)
+
+long thread_popup(void *arg);
+
+int32			gPopupFlag = 0;
+thread_id		gPopupThreadID = 0;
+
+typedef struct {
+	BPoint		where;
+	BRect		clickToOpenRect;
+	bool		top;
+} Tpopup_param;
+
 #define DEBUG_THREADS 1
 
 long thread_quit_application(void *arg);
@@ -84,6 +106,27 @@ typedef struct {
 	time_t		totalTime;
 } Tdebug_thead_param;
 
+// Bar layout depending on number of CPUs
+
+typedef struct {
+	float	cpu_width;
+	float	cpu_inter;
+	float	mem_width;
+} layoutT;
+
+layoutT layout[] = {
+	{ 1, 1, 1 },
+	{ 5, 1, 5 },	// 1
+	{ 3, 1, 4 },	// 2
+	{ 1, 1, 1 },
+	{ 2, 0, 3 },	// 4
+	{ 1, 1, 1 },
+	{ 1, 1, 1 },
+	{ 1, 1, 1 },
+	{ 1, 0, 3 }		// 8
+};
+
+
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 extern "C" _EXPORT BView *
@@ -94,8 +137,12 @@ instantiate_deskbar_item(void)
 }
 
 
+//	#pragma mark -
+
+
 ProcessController::ProcessController(BRect frame, bool temp)
-	: BView(frame, kDeskbarItemName, B_FOLLOW_NONE, B_WILL_DRAW),
+	: BView(frame, kDeskbarItemName, B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fProcessControllerIcon(kSignature),
 	fProcessorIcon(k_cpu_mini),
 	fTrackerIcon(kTrackerSig),
@@ -105,11 +152,12 @@ ProcessController::ProcessController(BRect frame, bool temp)
 {
 	if (!temp) {
 		Init();
+
 		frame.OffsetTo(B_ORIGIN);
 		frame.top = frame.bottom - 7;
 		frame.left = frame.right - 7;
-		BDragger*	dw = new BDragger(frame, this);
-		AddChild(dw);
+		BDragger* dragger = new BDragger(frame, this, B_FOLLOW_BOTTOM);
+		AddChild(dragger);
 	}
 }
 
@@ -206,10 +254,10 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'KlTm':
 			if (message->FindInt32("team", &team) == B_OK) {
-				infosPack	infos;
-				if (get_team_info(team, &infos.tminfo) == B_OK) {
+				info_pack infos;
+				if (get_team_info(team, &infos.team_info) == B_OK) {
 					get_team_name_and_icon(infos);
-					sprintf(question, "Do you really want to kill the team \"%s\"?", infos.tmname);
+					sprintf(question, "Do you really want to kill the team \"%s\"?", infos.team_name);
 					alert = new BAlert("", question, "Cancel", "Yes, Kill this Team!", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					if (alert->Go())
@@ -360,6 +408,7 @@ ProcessController::DefaultColors()
 	bool set = false;
 
 	if (gMimicPulse) {
+		// TODO: remove this?
 		BPath prefpath;
 		if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefpath) == B_OK) {
 			BDirectory prefdir(prefpath.Path ());
@@ -412,7 +461,6 @@ ProcessController::DefaultColors()
 		frame_color = kBlack;
 		mix_colors (memory_color, active_color, swap_color, 0.2);
 	}
-//	idle_color = kWhite;
 }
 
 
@@ -428,49 +476,50 @@ ProcessController::AttachedToWindow()
 	GebsPreferences tPreferences(kPreferencesFileName, NULL, false);
 	tPreferences.ReadInt32(gMimicPulse, kMimicPulsePref);
 	DefaultColors();
-	system_info sys_info;
-	get_system_info(&sys_info);
-	gCPUcount = sys_info.cpu_count;
+
+	system_info info;
+	get_system_info(&info);
+	gCPUcount = info.cpu_count;
 	Update();
+
 	gIdleColor = kIdleGreen;
 	gIdleColorSelected = tint_color(gIdleColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	gKernelColor = kKernelBlue;
 	gKernelColorSelected = tint_color(gKernelColor, B_HIGHLIGHT_BACKGROUND_TINT);
-//	gKernelColor = tint_color(gUserColor, B_DARKEN_1_TINT);
 	gUserColor = tint_color(gKernelColor, B_LIGHTEN_2_TINT);
 	gUserColorSelected = tint_color(gUserColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	gFrameColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_HIGHLIGHT_BACKGROUND_TINT);
 	gFrameColorSelected = tint_color(gFrameColor, B_HIGHLIGHT_BACKGROUND_TINT);
 	gMenuBackColor = ui_color(B_MENU_BACKGROUND_COLOR);
-	// Depending on which version of the system we use, choose the menu selection color...
-	if (before_dano())
-		gMenuBackColorSelected = tint_color(gMenuBackColor, B_HIGHLIGHT_BACKGROUND_TINT);	// R5 & before
-	else
-		gMenuBackColorSelected = ui_color(B_MENU_SELECTION_BACKGROUND_COLOR);				// Dano & up
+	gMenuBackColorSelected = ui_color(B_MENU_SELECTION_BACKGROUND_COLOR);
 	gWhiteSelected = tint_color(kWhite, B_HIGHLIGHT_BACKGROUND_TINT);
 
-	BMessenger messenger (this);
-	BMessage message ('Puls');
-	fMessageRunner = new BMessageRunner (messenger, &message, 250000, -1);
+	BMessenger messenger(this);
+	BMessage message('Puls');
+	fMessageRunner = new BMessageRunner(messenger, &message, 250000, -1);
 }
 
 
-typedef struct {
-	float	cpu_width;
-	float	cpu_inter;
-	float	mem_width;
-} layoutT;
 
-layoutT layout[] = {
-	{ 1, 1, 1 },
-	{ 5, 1, 5 },	// 1
-	{ 3, 1, 4 },	// 2
-	{ 1, 1, 1 },
-	{ 2, 0, 3 },	// 4
-	{ 1, 1, 1 },
-	{ 1, 1, 1 },
-	{ 1, 1, 1 },
-	{ 1, 0, 3 } };	// 8
+void
+ProcessController::MouseDown(BPoint where)
+{
+	if (atomic_add(&gPopupFlag, 1) > 0) {
+		atomic_add(&gPopupFlag, -1);
+		return;
+	}
+
+	Tpopup_param* param = new Tpopup_param;
+	ConvertToScreen(&where);
+	param->where = where;
+	param->clickToOpenRect = Frame ();
+	ConvertToScreen (&param->clickToOpenRect);
+	param->top = where.y < BScreen(this->Window()).Frame().bottom-50;
+
+	gPopupThreadID = spawn_thread(thread_popup, "Popup holder thread",
+		B_URGENT_DISPLAY_PRIORITY, param);
+	resume_thread(gPopupThreadID);
+}
 
 
 void
@@ -484,126 +533,276 @@ ProcessController::Draw(BRect)
 void
 ProcessController::DoDraw(bool force)
 {
-	//gCPUcount = 1;
 	BRect bounds(Bounds());
 
 	float h = floorf(bounds.Height ()) - 2;
 	float top = 1, left = 1;
 	float bottom = top + h;
-	float bar_width = layout[gCPUcount].cpu_width;
+	float barWidth = layout[gCPUcount].cpu_width;
 	// interspace
-	float right = left + gCPUcount * (bar_width + layout[gCPUcount].cpu_inter) - layout[gCPUcount].cpu_inter; // right of CPU frame...
+	float right = left + gCPUcount * (barWidth + layout[gCPUcount].cpu_inter)
+		- layout[gCPUcount].cpu_inter; // right of CPU frame...
 	if (force && Parent()) {
-		SetHighColor (Parent ()->ViewColor ());
-		FillRect (BRect (right + 1, top - 1, right + 2, bottom + 1));
+		SetHighColor(Parent()->ViewColor ());
+		FillRect(BRect(right + 1, top - 1, right + 2, bottom + 1));
 	}
 
 	if (force) {
-		SetHighColor (frame_color);
-		StrokeRect (BRect (left - 1, top - 1, right, bottom + 1));
+		SetHighColor(frame_color);
+		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
 		if (gCPUcount == 2)
-			StrokeLine (BPoint (left + bar_width, top), BPoint (left + bar_width, bottom));
+			StrokeLine(BPoint(left + barWidth, top), BPoint(left + barWidth, bottom));
 	}
-	float leftMem = bounds.Width () - layout[gCPUcount].mem_width;
+	float leftMem = bounds.Width() - layout[gCPUcount].mem_width;
 	if (force)
-		StrokeRect (BRect (leftMem - 1, top - 1, leftMem + layout[gCPUcount].mem_width, bottom + 1));
+		StrokeRect(BRect(leftMem - 1, top - 1, leftMem + layout[gCPUcount].mem_width, bottom + 1));
 
 	for (int x = 0; x < gCPUcount; x++) {
-		right = left + bar_width - 1;
+		right = left + barWidth - 1;
 		float rem = fCPUTimes[x] * (h + 1);
-		float bar_height = floorf (rem);
-		rem -= bar_height;
-		float limit = bottom - bar_height;	// horizontal line
-		float previous_limit = bottom - fLastBarHeight[x];
-		float idle_top = top;
-		if (!force && previous_limit > top)
-			idle_top = previous_limit - 1;
-		if (limit > idle_top) {
-			SetHighColor (idle_color);
-			FillRect (BRect (left, idle_top, right, limit - 1));
+		float barHeight = floorf (rem);
+		rem -= barHeight;
+		float limit = bottom - barHeight;	// horizontal line
+		float previousLimit = bottom - fLastBarHeight[x];
+		float idleTop = top;
+
+		if (!force && previousLimit > top)
+			idleTop = previousLimit - 1;
+		if (limit > idleTop) {
+			SetHighColor(idle_color);
+			FillRect(BRect(left, idleTop, right, limit - 1));
 		}
-		if (bar_height <= h) {
+		if (barHeight <= h) {
 			rgb_color fraction_color;
-			mix_colors (fraction_color, idle_color, active_color, rem);
-			SetHighColor (fraction_color);
-			StrokeLine (BPoint (left, bottom - bar_height), BPoint (right, bottom - bar_height));
+			mix_colors(fraction_color, idle_color, active_color, rem);
+			SetHighColor(fraction_color);
+			StrokeLine(BPoint(left, bottom - barHeight), BPoint(right, bottom - barHeight));
 		}
 		float active_bottom = bottom;
-		if (!force && previous_limit < bottom)
-			active_bottom = previous_limit + 1;
+		if (!force && previousLimit < bottom)
+			active_bottom = previousLimit + 1;
 		if (limit < active_bottom) {
 			SetHighColor(active_color);
 			FillRect(BRect(left, limit + 1, right, active_bottom));
 		}
 		left += layout[gCPUcount].cpu_width + layout[gCPUcount].cpu_inter;
-		fLastBarHeight[x] = bar_height;
+		fLastBarHeight[x] = barHeight;
 	}
+
 	float rightMem = bounds.Width () - 1;
 	float rem = fMemoryUsage * (h + 1);
-	float bar_height = floorf (rem);
-	rem -= bar_height;
+	float barHeight = floorf (rem);
+	rem -= barHeight;
 
 	rgb_color used_memory_color;
 	float sq = fMemoryUsage * fMemoryUsage;
 	sq *= sq;
 	sq *= sq;
-	mix_colors (used_memory_color, memory_color, swap_color, sq);
+	mix_colors(used_memory_color, memory_color, swap_color, sq);
 
-	float limit = bottom - bar_height;	// horizontal line
-	float previous_limit = bottom - fLastMemoryHeight;
+	float limit = bottom - barHeight;	// horizontal line
+	float previousLimit = bottom - fLastMemoryHeight;
 	float free_top = top;
-	if (!force && previous_limit > top)
-		free_top = previous_limit - 1;
+	if (!force && previousLimit > top)
+		free_top = previousLimit - 1;
 	if (limit > free_top) {
 		SetHighColor (idle_color);
-		FillRect (BRect (leftMem, free_top, rightMem, limit - 1));
+		FillRect(BRect(leftMem, free_top, rightMem, limit - 1));
 	}
-	if (bar_height <= h) {
+	if (barHeight <= h) {
 		rgb_color fraction_color;
-		mix_colors (fraction_color, idle_color, used_memory_color, rem);
-		SetHighColor (fraction_color);
-		StrokeLine (BPoint (leftMem, bottom - bar_height), BPoint (rightMem, bottom - bar_height));
+		mix_colors(fraction_color, idle_color, used_memory_color, rem);
+		SetHighColor(fraction_color);
+		StrokeLine(BPoint(leftMem, bottom - barHeight), BPoint(rightMem, bottom - barHeight));
 	}
-	float used_bottom = bottom;
-//	if (!force && previous_limit < bottom)
-//		used_bottom = previous_limit + 1;
-	if (limit < used_bottom) {
-		SetHighColor (used_memory_color);
-		FillRect (BRect (leftMem, limit + 1, rightMem, used_bottom));
+	float usedBottom = bottom;
+//	if (!force && previousLimit < bottom)
+//		usedBottom = previousLimit + 1;
+	if (limit < usedBottom) {
+		SetHighColor(used_memory_color);
+		FillRect(BRect(leftMem, limit + 1, rightMem, usedBottom));
 	}
-	fLastMemoryHeight = bar_height;
+	fLastMemoryHeight = barHeight;
 }
 
 
 void
 ProcessController::Update()
 {
-	system_info sys_info;
-	get_system_info(&sys_info);
+	system_info info;
+	get_system_info(&info);
 	bigtime_t now = system_time();
 
-	fMemoryUsage = float(sys_info.used_pages) / float(sys_info.max_pages);
+	fMemoryUsage = float(info.used_pages) / float(info.max_pages);
 	// Calculate work done since last call to Update() for each CPU
 	for (int x = 0; x < gCPUcount; x++) {
-		bigtime_t	load = sys_info.cpu_infos[x].active_time - fPrevActive[x];
-		bigtime_t	passed = now - fPrevTime;
-		float cpu_time = float(load) / float(passed);
-		fPrevActive[x] = sys_info.cpu_infos[x].active_time;
+		bigtime_t load = info.cpu_infos[x].active_time - fPrevActive[x];
+		bigtime_t passed = now - fPrevTime;
+		float cpuTime = float(load) / float(passed);
+
+		fPrevActive[x] = info.cpu_infos[x].active_time;
 		if (load > passed)
 			fPrevActive[x] -= load - passed; // save overload for next period...
-		if (cpu_time < 0) cpu_time = 0;
-		if (cpu_time > 1) cpu_time = 1;
-		fCPUTimes[x] = cpu_time;
+		if (cpuTime < 0)
+			cpuTime = 0;
+		if (cpuTime > 1)
+			cpuTime = 1;
+		fCPUTimes[x] = cpuTime;
 	}
 	fPrevTime = now;
+}
+
+
+//	#pragma mark -
+
+
+long
+thread_popup(void *arg)
+{
+	Tpopup_param* param = (Tpopup_param*) arg;
+	int32 mcookie, hcookie;
+	long m, h;
+	BMenuItem* item;
+	bool top = param->top;
+
+	system_info systemInfo;
+	get_system_info(&systemInfo);
+	info_pack* infos = new info_pack[systemInfo.used_teams];
+	// TODO: this doesn't necessarily get all teams
+	for (m = 0, mcookie = 0; m < systemInfo.used_teams; m++) {
+		infos[m].team_icon = NULL;
+		infos[m].team_name[0] = 0;
+		infos[m].thread_info = NULL;
+		if (get_next_team_info(&mcookie, &infos[m].team_info) == B_OK) {
+			infos[m].thread_info = new thread_info[infos[m].team_info.thread_count];
+			for (h = 0, hcookie = 0; h < infos[m].team_info.thread_count; h++) {
+				if (get_next_thread_info(infos[m].team_info.team, &hcookie, &infos[m].thread_info[h]) != B_OK)
+					infos[m].thread_info[h].thread = -1;
+			}
+			get_team_name_and_icon(infos[m], true);
+		} else {
+			systemInfo.used_teams = m;
+			infos[m].team_info.team = -1;
+		}
+	}
+
+	BPopUpMenu* popup = new BPopUpMenu("Global Popup", false, false);
+	popup->SetFont(be_plain_font);
+
+	// Quit section
+	BMenu* QuitPopup = new QuitMenu("Quit an Application", infos, systemInfo.used_teams);
+	QuitPopup->SetFont(be_plain_font);
+	popup->AddItem(QuitPopup);
+
+	// Memory Usage section
+	MemoryBarMenu* MemoryPopup = new MemoryBarMenu("Memory Usage", infos, systemInfo);
+	int commitedMemory = int(systemInfo.used_pages * B_PAGE_SIZE / 1024);
+	for (m = 0; m < systemInfo.used_teams; m++) {
+		if (infos[m].team_info.team >= 0) {
+			MemoryBarMenuItem* memoryItem = new MemoryBarMenuItem(infos[m].team_name, infos[m].team_info.team, infos[m].team_icon, false, NULL);
+			MemoryPopup->AddItem(memoryItem);
+			memoryItem->UpdateSituation(commitedMemory);
+		}
+	}
+
+	addtopbottom(MemoryPopup);
+
+	// CPU Load section
+	TeamBarMenu* CPUPopup = new TeamBarMenu("Threads and CPU Usage", infos, systemInfo.used_teams);
+	for (m = 0; m < systemInfo.used_teams; m++) {	
+		if (infos[m].team_info.team >= 0) {
+			ThreadBarMenu* TeamPopup = new ThreadBarMenu(infos[m].team_name, infos[m].team_info.team, infos[m].team_info.thread_count);
+			BMessage* kill_team = new BMessage('KlTm');
+			kill_team->AddInt32("team", infos[m].team_info.team);
+			TeamBarMenuItem* item = new TeamBarMenuItem(TeamPopup, kill_team, infos[m].team_info.team, infos[m].team_icon, false);
+			item->SetTarget(gPCView);
+			CPUPopup->AddItem(item);
+		}
+	}
+
+	addtopbottom(CPUPopup);
+	addtopbottom(new BSeparatorItem());
+
+	// CPU on/off section
+	if (gCPUcount > 1) {
+		for (int i = 0; i < gCPUcount; i++) {
+			char item_name[32];
+			sprintf (item_name, "Processor %d", i + 1);
+			BMessage* m = new BMessage ('CPU ');
+			m->AddInt32 ("cpu", i);
+			item = new IconMenuItem (gPCView->fProcessorIcon, item_name, m);
+			if (_kget_cpu_state_(i))
+				item->SetMarked (true);
+			item->SetTarget(gPCView);
+			addtopbottom(item);
+		}
+		addtopbottom (new BSeparatorItem ());
+	}
+
+	if (!be_roster->IsRunning(kTrackerSig)) {
+		item = new IconMenuItem(gPCView->fTrackerIcon, "Launch Tracker", new BMessage('Trac'));
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+	}
+	if (!be_roster->IsRunning(kDeskbarSig)) {
+		item = new IconMenuItem(gPCView->fDeskbarIcon, "Launch Deskbar", new BMessage('Dbar'));
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+	}
+
+	item = new IconMenuItem(gPCView->fTerminalIcon, "New Terminal", new BMessage('Term'));
+	item->SetTarget(gPCView);
+	addtopbottom(item);
+
+	addtopbottom(new BSeparatorItem());
+
+	if (be_roster->IsRunning(kDeskbarSig)) {
+		item = new BMenuItem("Live in the Deskbar", new BMessage('AlDb'));
+		BDeskbar deskbar;
+		item->SetMarked(gInDeskbar || deskbar.HasItem(kDeskbarItemName));
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+	}
+
+#if 0
+	item = new BMenuItem("Use Pulse's Settings for Colors", new BMessage ('Colo'));
+	item->SetTarget (gPCView);
+	item->SetMarked (gMimicPulse);
+	addtopbottom (item);
+#endif
+
+	addtopbottom(new BSeparatorItem ());
+
+	item = new IconMenuItem(gPCView->fProcessControllerIcon, "About ProcessController",
+		new BMessage(B_ABOUT_REQUESTED));
+	item->SetTarget(gPCView);
+	addtopbottom(item);
+
+	param->where.x -= 5;
+	param->where.y -= 8;
+	popup->Go(param->where, true, true, param->clickToOpenRect);
+
+	delete popup;
+	for (m = 0; m < systemInfo.used_teams; m++) {
+		if (infos[m].team_info.team >= 0) {
+			delete[] infos[m].thread_info;
+			delete infos[m].team_icon;
+		}
+	}
+	delete[] infos;
+	delete param;
+	atomic_add (&gPopupFlag, -1);
+	gPopupThreadID = 0;
+
+	return B_OK;
 }
 
 
 long
 thread_quit_application(void *arg)
 {
-	BMessenger messenger (NULL, (team_id) arg);
-	messenger.SendMessage (B_QUIT_REQUESTED);
+	BMessenger messenger(NULL, (team_id)arg);
+	messenger.SendMessage(B_QUIT_REQUESTED);
 	return B_OK;
 }
 
@@ -614,9 +813,9 @@ thread_debug_thread(void *arg)
 	Tdebug_thead_param*	param = (Tdebug_thead_param*) arg;
 	thread_info	thinfo;
 	get_thread_info(param->thread, &thinfo);
-	char	texte[4096];
-	sprintf (texte, "db %d", int(param->thread));
-	system (texte);
+	char text[4096];
+	sprintf(text, "db %d", int(param->thread));
+	system(text);
 	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem == thinfo.sem) {
 		snooze(1000000);
 		get_thread_info(param->thread, &thinfo);
@@ -626,28 +825,30 @@ thread_debug_thread(void *arg)
 			// the thread has been waiting for this semaphore since the before the alert, not doing anything... Let's push it out of there!
 			sem_info sinfo;
 			thread_info thinfo;
-			infosPack infos;
+			info_pack infos;
 
 			if (get_sem_info(param->sem, &sinfo) == B_OK
 				&& get_thread_info(param->thread, &thinfo) == B_OK
-				&& get_team_info(thinfo.team, &infos.tminfo) == B_OK) {
-				sprintf (texte, "This thread is waiting for the semaphore called \"%s\". As long as it waits for this semaphore, "
+				&& get_team_info(thinfo.team, &infos.team_info) == B_OK) {
+				sprintf (text, "This thread is waiting for the semaphore called \"%s\". As long as it waits for this semaphore, "
 					"you won't be able to debug that thread.\n", sinfo.name);
 				if (sinfo.team == thinfo.team)
-					strcat (texte, "This semaphore belongs to the thread's team.\n\nShould I release this semaphore?\n");
+					strcat(text, "This semaphore belongs to the thread's team.\n\nShould I release this semaphore?\n");
 				else {
-					get_team_name_and_icon (infos);
-					char moretexte[1024];
-					sprintf (moretexte, "\nWARNING! This semaphore belongs to the team \"%s\"!\n\nShould I release this semaphore anyway?\n", infos.tmname);
-					strcat (texte, moretexte);
+					get_team_name_and_icon(infos);
+					char moreText[1024];
+					sprintf(moreText, "\nWARNING! This semaphore belongs to the team \"%s\"!\n\nShould I release this semaphore anyway?\n",
+						infos.team_name);
+					strcat(text, moreText);
 				}
 
-				BAlert* alert = new BAlert("", texte, "Cancel", "Release", NULL,
+				BAlert* alert = new BAlert("", text, "Cancel", "Release", NULL,
 					B_WIDTH_AS_USUAL, B_STOP_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go()) {
 					get_thread_info (param->thread, &thinfo);
-					if (thinfo.state == B_THREAD_WAITING && param->sem == thinfo.sem && param->totalTime == thinfo.user_time + thinfo.kernel_time)
+					if (thinfo.state == B_THREAD_WAITING && param->sem == thinfo.sem
+						&& param->totalTime == thinfo.user_time + thinfo.kernel_time)
 						release_sem(param->sem);
 					else {
 						alert = new BAlert("", "The semaphore wasn't released, because it wasn't necessary anymore!", "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);

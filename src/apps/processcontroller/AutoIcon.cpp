@@ -1,9 +1,5 @@
 /*
-
-	AutoIcon.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,30 +15,30 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
+
 #include "AutoIcon.h"
-#include "PCUtils.h"
+#include "Utilities.h"
 
 #include <Bitmap.h>
 #include <Entry.h>
 #include <NodeInfo.h>
 #include <Roster.h>
 
-AutoIcon::~AutoIcon ()
+
+AutoIcon::~AutoIcon()
 {
-	if (fBitmap)
-		delete fBitmap;
+	delete fBitmap;
 }
 
-BBitmap* AutoIcon::bitmap ()
+
+BBitmap*
+AutoIcon::bitmap()
 {
-	if (fBitmap == 0)
-	{
+	if (fBitmap == NULL) {
 		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_COLOR_8_BIT);
-		if (fSignature)
-		{
+		if (fSignature) {
 			entry_ref ref;
 			be_roster->FindApp (fSignature, &ref);
 			if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, B_MINI_ICON) != B_OK)
@@ -53,5 +49,4 @@ BBitmap* AutoIcon::bitmap ()
 	}
 	return fBitmap;
 }
-
 

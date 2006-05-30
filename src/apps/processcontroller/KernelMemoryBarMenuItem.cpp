@@ -19,22 +19,23 @@
 
 
 #include "KernelMemoryBarMenuItem.h"
-#include "MemoryBarMenu.h"
+
 #include "Colors.h"
-#include "PCView.h"
+#include "MemoryBarMenu.h"
+#include "ProcessController.h"
 
 #include <stdio.h>
 
 
-KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info* sinfo)
+KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
 	: BMenuItem("System Resources & Caches...", NULL)
 {
 	fTotalWriteMemory = -1;
 	fLastSum = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fPhsysicalMemory = float(int(sinfo->max_pages * B_PAGE_SIZE / 1024));
-	fCommitedMemory = float(int(sinfo->used_pages * B_PAGE_SIZE / 1024));
+	fPhsysicalMemory = float(int(systemInfo.max_pages * B_PAGE_SIZE / 1024));
+	fCommitedMemory = float(int(systemInfo.used_pages * B_PAGE_SIZE / 1024));
 }
 
 

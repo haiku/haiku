@@ -21,7 +21,7 @@
 #include "MemoryBarMenu.h"
 #include "MemoryBarMenuItem.h"
 #include "KernelMemoryBarMenuItem.h"
-#include "PCView.h"
+#include "ProcessController.h"
 
 #include <Bitmap.h>
 #include <Roster.h>
@@ -35,18 +35,19 @@
 float gMemoryTextWidth;
 
 
-MemoryBarMenu::MemoryBarMenu(const char* name, infosPack *infos, system_info* sinfo)
+MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos,
+		system_info& systemInfo)
 	: BMenu(name),
 	fFirstShow(true)
 {
-	fTeamCount = sinfo->used_teams + EXTRA;
+	fTeamCount = systemInfo.used_teams + EXTRA;
 	SetFlags(Flags() | B_PULSE_NEEDED);
 
 	fTeamList = (team_id*)malloc(sizeof (team_id) * fTeamCount);
 
 	int	k;
-	for (k = 0; k < sinfo->used_teams; k++) {
-		fTeamList[k] = infos[k].tminfo.team;
+	for (k = 0; k < systemInfo.used_teams; k++) {
+		fTeamList[k] = infos[k].team_info.team;
 	}
 
 	while (k < fTeamCount) {
@@ -58,7 +59,7 @@ MemoryBarMenu::MemoryBarMenu(const char* name, infosPack *infos, system_info* si
 	fRecycleCount = EXTRA;
 	fRecycleList = (MRecycleItem*)malloc(sizeof(MRecycleItem) * fRecycleCount);
 	SetFont(be_plain_font);
-	AddItem(new KernelMemoryBarMenuItem(sinfo));
+	AddItem(new KernelMemoryBarMenuItem(systemInfo));
 }
 
 
@@ -95,8 +96,8 @@ MemoryBarMenu::Pulse()
 	int	k;
 	MemoryBarMenuItem *item;
 	int	total = 0;
-	for (k = 1; (item = (MemoryBarMenuItem*) ItemAt (k)) != NULL; k++) {
-		int m = item->UpdateSituation (commitedMemory);
+	for (k = 1; (item = (MemoryBarMenuItem*)ItemAt(k)) != NULL; k++) {
+		int m = item->UpdateSituation(commitedMemory);
 		if (m < 0) {
 			if (lastRecycle == fRecycleCount) {
 				fRecycleCount += EXTRA;
@@ -117,20 +118,20 @@ MemoryBarMenu::Pulse()
 
 	// Look new teams that have appeared. Create an item for them, or recycle from the list.
 	int32 cookie = 0;
-	infosPack infos;
+	info_pack infos;
 	item = NULL;
-	while (get_next_team_info(&cookie, &infos.tminfo) == B_OK) {
+	while (get_next_team_info(&cookie, &infos.team_info) == B_OK) {
 		int	j = 0;
-		while (j < fTeamCount && infos.tminfo.team != fTeamList[j]) {
+		while (j < fTeamCount && infos.team_info.team != fTeamList[j]) {
 			j++;
 		}
 
-		if (infos.tminfo.team != fTeamList[j]) {
+		if (infos.team_info.team != fTeamList[j]) {
 			// new team
-			team_info	info;
+			team_info info;
 			j = 0;
 			while (j < fTeamCount && fTeamList[j] != -1) {
-				if (get_team_info (fTeamList[j], &info) != B_OK)
+				if (get_team_info(fTeamList[j], &info) != B_OK)
 					fTeamList[j] = -1;
 				else
 					j++;
@@ -138,23 +139,23 @@ MemoryBarMenu::Pulse()
 
 			if (j == fTeamCount) {
 				fTeamCount += 10;
-				fTeamList = (team_id*)realloc(fTeamList, sizeof (team_id) * fTeamCount);
+				fTeamList = (team_id*)realloc(fTeamList, sizeof(team_id) * fTeamCount);
 			}
 
-			fTeamList[j] = infos.tminfo.team;
+			fTeamList[j] = infos.team_info.team;
 			if (!get_team_name_and_icon(infos, true)) {
 				// the team is already gone!
-				delete infos.tmicon;
+				delete infos.team_icon;
 				fTeamList[j] = -1;
 			} else {
-				if (!item && firstRecycle < lastRecycle) {
+				if (!item && firstRecycle < lastRecycle)
 					item = fRecycleList[firstRecycle++].item;
-				}
+
 				if (item)
-					item->Reset(infos.tmname, infos.tminfo.team, infos.tmicon, true);
+					item->Reset(infos.team_name, infos.team_info.team, infos.team_icon, true);
 				else {
-					AddItem(item = new MemoryBarMenuItem (infos.tmname,
-						infos.tminfo.team, infos.tmicon, true, NULL));
+					AddItem(item = new MemoryBarMenuItem(infos.team_name,
+						infos.team_info.team, infos.team_icon, true, NULL));
 				}
 
 				int m = item->UpdateSituation(commitedMemory);
@@ -178,10 +179,10 @@ MemoryBarMenu::Pulse()
 			lastRecycle - firstRecycle, true);
 	}
 
-	fLastTotalTime = system_time ();
+	fLastTotalTime = system_time();
 	KernelMemoryBarMenuItem	*kernelItem;
 	if ((kernelItem = (KernelMemoryBarMenuItem*)ItemAt(0)) != NULL)
-		kernelItem->UpdateSituation (commitedMemory, total);
+		kernelItem->UpdateSituation(commitedMemory, total);
 
 	Window()->EndViewTransaction();
 	Window()->Flush();

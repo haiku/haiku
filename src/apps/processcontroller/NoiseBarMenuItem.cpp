@@ -1,9 +1,5 @@
 /*
-
-	NoiseBarMenuItem.cpp
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,16 +15,17 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
 
-#include "NoiseBarMenuItem.h"
-#include "Colors.h"
-#include "PCView.h"
 
-// --------------------------------------------------------------
+#include "NoiseBarMenuItem.h"
+
+#include "Colors.h"
+#include "ProcessController.h"
+
+
 NoiseBarMenuItem::NoiseBarMenuItem()
-			:BMenuItem("Gone Teams...", NULL)
+	: BMenuItem("Gone Teams...", NULL)
 {
 	fBusyWaiting = -1;
 	fLost = -1;
@@ -36,20 +33,22 @@ NoiseBarMenuItem::NoiseBarMenuItem()
 	fGrenze2 = -1;
 }
 
-// --------------------------------------------------------------
-void NoiseBarMenuItem::DrawContent()
+
+void
+NoiseBarMenuItem::DrawContent()
 {
 	DrawBar(true);
 	Menu()->MovePenTo(ContentLocation());
 	BMenuItem::DrawContent();
 }
 
-// --------------------------------------------------------------
-void NoiseBarMenuItem::DrawBar(bool force)
+
+void
+NoiseBarMenuItem::DrawBar(bool force)
 {
-	bool	selected = IsSelected ();
-	BRect	frame = Frame();
-	BMenu*	menu = Menu ();
+	bool selected = IsSelected ();
+	BRect frame = Frame();
+	BMenu* menu = Menu ();
 	frame.right -= 24;
 	frame.left = frame.right-kBarWidth;
 	frame.top += 5;
@@ -66,9 +65,9 @@ void NoiseBarMenuItem::DrawBar(bool force)
 		menu->StrokeRect(frame);
 	}
 	frame.InsetBy(1, 1);
-	BRect	r = frame;
-	float	grenze1 = frame.left+(frame.right-frame.left)*fBusyWaiting;
-	float	grenze2 = frame.left+(frame.right-frame.left)*(fBusyWaiting+fLost);
+	BRect r = frame;
+	float grenze1 = frame.left+(frame.right-frame.left)*fBusyWaiting;
+	float grenze2 = frame.left+(frame.right-frame.left)*(fBusyWaiting+fLost);
 	if (grenze1 > frame.right)
 		grenze1 = frame.right;
 	if (grenze2 > frame.right)
@@ -78,7 +77,7 @@ void NoiseBarMenuItem::DrawBar(bool force)
 		r.left = fGrenze1;
 	if (r.left < r.right) {
 		if (selected)
-			menu->SetHighColor (tint_color (kGreen, B_HIGHLIGHT_BACKGROUND_TINT));
+			menu->SetHighColor(tint_color (kGreen, B_HIGHLIGHT_BACKGROUND_TINT));
 		else
 			menu->SetHighColor(kGreen);
 //		menu->SetHighColor(gKernelColor);
@@ -113,8 +112,9 @@ void NoiseBarMenuItem::DrawBar(bool force)
 	fGrenze2 = grenze2;
 }
 
-// --------------------------------------------------------------
-void NoiseBarMenuItem::GetContentSize(float* width, float* height)
+
+void
+NoiseBarMenuItem::GetContentSize(float* width, float* height)
 {
 	BMenuItem::GetContentSize(width, height);
 	if (*height < 16)

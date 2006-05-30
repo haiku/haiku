@@ -1,9 +1,5 @@
 /*
-
-	PCWorld.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,38 +15,34 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _PCWORLD_H_
 #define _PCWORLD_H_
 
-#include <Application.h>
 
-extern const char *kSignature;
-extern const char *kTrackerSig;
-extern const char *kDeskbarSig;
-extern const char *kTerminalSig;
+#include <OS.h>
 
-extern const char *kPosPrefName;
-extern const char *kPreferencesFileName;
 
-class PCApplication : public BApplication {
+extern const char* kSignature;
+extern const char* kTrackerSig;
+extern const char* kDeskbarSig;
+extern const char* kTerminalSig;
 
-public:
-					PCApplication();
-					~PCApplication();
-virtual	void		ReadyToRun();
-virtual	void		ArgvReceived(int32 argc, char **argv);
-};
+extern const char* kPosPrefName;
+extern const char* kPreferencesFileName;
 
-extern const uchar		k_app_mini[];
-extern const char*		kProgramName;
-extern const char*		kPCSemaphoreName;
+extern const char* kPosPrefName;
+extern const char* kVersionName;
+extern const int kCurrentVersion;
 
-extern thread_id		id;
 
-extern "C" int  _kget_cpu_state_ (int cpu);
-extern "C" int  _kset_cpu_state_ (int cpu, int enabled);
+extern const uchar k_app_mini[];
+extern const char* kProgramName;
+extern const char* kPCSemaphoreName;
+
+extern thread_id id;
+
+extern "C" int _kget_cpu_state_(int cpu);
+extern "C" int _kset_cpu_state_(int cpu, int enabled);
 
 #endif // _PCWORLD_H_

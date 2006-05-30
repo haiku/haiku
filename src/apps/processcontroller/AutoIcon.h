@@ -1,9 +1,5 @@
 /*
-
-	AutoIcon.h
-
-	ProcessController
-	© 2000, Georges-Edouard Berenger, All Rights Reserved.
+	ProcessController Â© 2000, Georges-Edouard Berenger, All Rights Reserved.
 	Copyright (C) 2004 beunited.org 
 
 	This library is free software; you can redistribute it and/or 
@@ -19,30 +15,31 @@
 	You should have received a copy of the GNU Lesser General Public 
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-
 */
-
 #ifndef _AUTO_ICON_H_
 #define _AUTO_ICON_H_
+
 
 #include <SupportDefs.h>
 
 class BBitmap;
 
-class AutoIcon {
 
-public:
-					AutoIcon (const char* signature): fSignature (signature), fbits (0), fBitmap (0) {}
-					AutoIcon (const uchar* bits): fSignature (0), fbits (bits), fBitmap (0) {}
-					~AutoIcon ();
-				
-  	operator BBitmap* () { return bitmap (); }
-	BBitmap*		bitmap ();
-	
-private:
-	const char*		fSignature;
-	const uchar*	fbits;
-	BBitmap	*		fBitmap;
+class AutoIcon {
+	public:
+		AutoIcon(const char* signature)
+			: fSignature (signature), fbits (0), fBitmap (0) {}
+		AutoIcon(const uchar* bits)
+			: fSignature (0), fbits (bits), fBitmap (0) {}
+		~AutoIcon();
+
+	  	operator BBitmap*() { return bitmap(); }
+		BBitmap* bitmap();
+
+	private:
+		const char*		fSignature;
+		const uchar*	fbits;
+		BBitmap	*		fBitmap;
 };
 
 #endif // _AUTO_ICON_H_

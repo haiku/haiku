@@ -9,22 +9,17 @@ Application ProcessController :
 	MemoryBarMenu.cpp
 	MemoryBarMenuItem.cpp
 	NoiseBarMenuItem.cpp
-	PCUtils.cpp
-	PCView.cpp
-	PCView2.cpp
+	ProcessController.cpp
 	PCWindow.cpp
 	PCWorld.cpp
 	Preferences.cpp
-	PrintMessage.cpp
 	PriorityMenu.cpp
 	QuitMenu.cpp
-	ReadableLong.cpp
 	TeamBarMenu.cpp
 	TeamBarMenuItem.cpp
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
-	URLView.cpp
-	WindowsTools.cpp
+	Utilities.cpp
 	: be
 	: ProcessController.rdef
 	;
