@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <Drivers.h>
+#include <StorageDefs.h>
 
 static void dump_dev_size(int dev)
 {
@@ -72,6 +73,20 @@ static void dump_geom(int dev, bool bios)
 	puts("");
 }
 
+static void dump_other(int dev)
+{
+	char path[B_PATH_NAME_LENGTH];
+	if (ioctl(dev, B_GET_DRIVER_FOR_DEVICE, path, sizeof(path)) >= 0) {
+		printf("driver:\t%s\n", path);
+	}
+#ifdef __HAIKU__
+	if (ioctl(dev, B_GET_PATH_FOR_DEVICE, path, sizeof(path)) >= 0) {
+		printf("device path:\t%s\n", path);
+	}
+#endif
+	puts("");
+}
+
 int main(int argc, char **argv)
 {
 	int dev;
@@ -89,5 +104,6 @@ int main(int argc, char **argv)
 	dump_media_status(dev);
 	dump_geom(dev, false);
 	dump_geom(dev, true);
+	dump_other(dev);
 	return 0;
 }
