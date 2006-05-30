@@ -389,7 +389,8 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 	while (workspace.GetNextWindow(window, leftTop) == B_OK) {
 		BRect frame = _WindowFrame(workspaceFrame, screenFrame, window->Frame(),
 			leftTop);
-		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel) {
+		if (frame.Contains(where) && window->Feel() != kDesktopWindowFeel
+			&& window->Feel() != kWindowScreenFeel) {
 			// We can't exit the loop here, as we traverse the window
 			// list in the wrong direction...
 			fSelectedWindow = window;
