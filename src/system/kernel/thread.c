@@ -6,7 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* Threading routines */
+/** Threading routines */
 
 #include <OS.h>
 
@@ -42,11 +42,22 @@
 
 #define THREAD_MAX_MESSAGE_SIZE		65536
 
-static status_t receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flags);
+// used to pass messages between thread_exit and thread_exit2
+
+struct thread_exit_args {
+	struct thread	*thread;
+	area_id			old_kernel_stack;
+	uint32			death_stack;
+	sem_id			death_sem;
+	team_id			original_team_id;
+};
 
 struct thread_key {
 	thread_id id;
 };
+
+static status_t receive_data_etc(thread_id *_sender, void *buffer,
+	size_t bufferSize, int32 flags);
 
 // global
 spinlock thread_spinlock = 0;
@@ -746,11 +757,11 @@ dump_next_thread_in_team(int argc, char **argv)
 
 
 /** Finds a free death stack for us and allocates it.
- *	Leaves interrupts disabled and returns the former interrupt state.
+ *	Must be called with interrupts enabled.
  */
 
-static cpu_status
-get_death_stack(uint32 *_stack)
+static uint32
+get_death_stack(void)
 {
 	cpu_status state;
 	uint32 bit;
@@ -767,6 +778,8 @@ get_death_stack(uint32 *_stack)
 	sDeathStackBitmap |= bit;
 	RELEASE_THREAD_LOCK();
 
+	restore_interrupts(state);
+
 	// sanity checks
 	if (!bit)
 		panic("get_death_stack: couldn't find free stack!\n");
@@ -781,14 +794,18 @@ get_death_stack(uint32 *_stack)
 
 	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
 
-	*_stack = (uint32)i;
-	return state;
+	return (uint32)i;
 }
 
 
+/**	Returns the thread's death stack to the pool.
+ */
+
 static void
-put_death_stack_and_reschedule(uint32 index)
+put_death_stack(uint32 index)
 {
+	cpu_status state;
+
 	TRACE(("put_death_stack...: passed %lu\n", index));
 
 	if (index >= sNumDeathStacks)
@@ -797,30 +814,17 @@ put_death_stack_and_reschedule(uint32 index)
 	if (!(sDeathStackBitmap & (1 << index)))
 		panic("put_death_stack: passed invalid stack index %d\n", index);
 
-	disable_interrupts();
+	state = disable_interrupts();
+
 	GRAB_THREAD_LOCK();
 	sDeathStackBitmap &= ~(1 << index);
 	RELEASE_THREAD_LOCK();
 
+	restore_interrupts(state);
+
 	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
 		// we must not have acquired the thread lock when releasing a semaphore
-
-	GRAB_THREAD_LOCK();
-	scheduler_reschedule();
-		// requires thread lock to be held
 }
-
-
-// used to pass messages between thread_exit and thread_exit2
-
-struct thread_exit_args {
-	struct thread	*thread;
-	area_id			old_kernel_stack;
-	cpu_status		int_state;
-	uint32			death_stack;
-	sem_id			death_sem;
-	team_id			original_team_id;
-};
 
 
 static void
@@ -856,16 +860,13 @@ thread_exit2(void *_args)
 	sUsedThreads--;
 	RELEASE_THREAD_LOCK();
 
-	// restore former thread interrupts (doesn't matter much at this point anyway)
-	restore_interrupts(args.int_state);
+	enable_interrupts();
+		// needed for the debugger notification below
 
 	TRACE(("thread_exit2: done removing thread from lists\n"));
 
 	if (args.death_sem >= 0)
 		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
-
-	// set the next state to be gone. Will return the thread structure to a ready pool upon reschedule
-	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 
 	// notify the debugger
 	if (args.original_team_id >= 0
@@ -873,8 +874,21 @@ thread_exit2(void *_args)
 		user_debug_thread_deleted(args.original_team_id, args.thread->id);
 	}
 
+	disable_interrupts();
+
+	// Set the next state to be gone: this will cause the thread structure
+	// to be returned to a ready pool upon reschedule.
+	// Note, we need to have disabled interrupts at this point, or else
+	// we could get rescheduled too early.
+	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
+
 	// return the death stack and reschedule one last time
-	put_death_stack_and_reschedule(args.death_stack);
+
+	put_death_stack(args.death_stack);
+
+	GRAB_THREAD_LOCK();
+	scheduler_reschedule();
+		// requires thread lock to be held
 
 	// never get to here
 	panic("thread_exit2: made it where it shouldn't have!\n");
@@ -891,7 +905,6 @@ thread_exit(void)
 	struct death_entry *death = NULL;
 	thread_id mainParentThread = -1;
 	bool deleteTeam = false;
-	uint32 death_stack;
 	sem_id cachedDeathSem = -1, parentDeadSem = -1, groupDeadSem = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
@@ -1052,20 +1065,19 @@ thread_exit(void)
 	{
 		struct thread_exit_args args;
 
-		args.int_state = get_death_stack(&death_stack);
-			// this disables interrups for us
-
 		args.thread = thread;
 		args.old_kernel_stack = thread->kernel_stack_area;
-		args.death_stack = death_stack;
+		args.death_stack = get_death_stack();
 		args.death_sem = cachedDeathSem;
 		args.original_team_id = teamID;
 
-		// set the new kernel stack officially to the death stack, wont be really switched until
-		// the next function is called. This bookkeeping must be done now before a context switch
-		// happens, or the processor will interrupt to the old stack
-		thread->kernel_stack_area = sDeathStacks[death_stack].area;
-		thread->kernel_stack_base = sDeathStacks[death_stack].address;
+		disable_interrupts();
+
+		// set the new kernel stack officially to the death stack, it won't be
+		// switched until the next function is called. This must be done now
+		// before a context switch, or we'll stay on the old stack
+		thread->kernel_stack_area = sDeathStacks[args.death_stack].area;
+		thread->kernel_stack_base = sDeathStacks[args.death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
 		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base + KERNEL_STACK_SIZE,
