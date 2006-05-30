@@ -119,6 +119,8 @@ enum {
 
 	B_FLUSH_DRIVE_CACHE,			/* flush drive cache */
 
+	B_GET_PATH_FOR_DEVICE,			/* get the absolute path of the device */
+
 	B_GET_NEXT_OPEN_DEVICE = 1000,	/* iterate through open devices */
 	B_ADD_FIXED_DRIVER,				/* private */
 	B_REMOVE_FIXED_DRIVER,			/* private */
