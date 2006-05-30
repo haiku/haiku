@@ -5,7 +5,7 @@ resource(1, "META:TYPE") "video/quicktime";
 
 resource(2, "META:S:DESC") #'MSDC' "Quicktime Movie";
 
-resource(3, "META:SNIFF_RULE") "0.50 (\"[4]\"mdat\" | [4]\"moov\"\")";
+resource(3, "META:SNIFF_RULE") "0.50 ([4]\"mdat\" | [4]\"moov\")";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "mov",
