@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps magnify ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application Magnify : 
-	main.cpp 
+	Magnify.cpp 
 	: be tracker game 
-	: Magnify.rdef ;
+	: Magnify.rdef
+;

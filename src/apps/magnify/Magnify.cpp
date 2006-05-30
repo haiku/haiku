@@ -1,20 +1,15 @@
 /*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Updated by Sikosis (beos@gravity24hr.com)
+ *
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ */
 
-"Magnify" compiled and updated by Sikosis (beos@gravity24hr.com)
 
-(C)2002 OpenBeOS under MIT license
-
-Copyright 1999, Be Incorporated.   All Rights Reserved.
-This file may be used under the terms of the Be Sample Code License.
-
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
+#include "Magnify.h"
 
 #include <Alert.h>
 #include <Bitmap.h>
@@ -30,18 +25,15 @@ This file may be used under the terms of the Be Sample Code License.
 #include <TextView.h>
 #include <PopUpMenu.h>
 #include <Clipboard.h>
+#include <WindowScreen.h>
 
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
-#if __MWERKS__
-#define _UNUSED(x)
-#endif
-
-#if __GNUC__
-#define _UNUSED(x) x
-#endif
-
-static const char *kPrefsFileName = "Magnify_prefs";
 
 const int32 msg_help = 'help';
 const int32 msg_update_info = 'info';
@@ -61,9 +53,40 @@ const int32 msg_freeze = 'frez';
 const int32 msg_dump = 'dump';
 const int32 msg_add_cross_hair = 'acrs';
 const int32 msg_remove_cross_hair = 'rcrs';
+const int32 msg_save = 'save';
 
+const rgb_color kViewGray = { 216, 216, 216, 255};
+const rgb_color kGridGray = {130, 130, 130, 255 };
+const rgb_color kWhite = { 255, 255, 255, 255};
+const rgb_color kBlack = { 0, 0, 0, 255};
+const rgb_color kDarkGray = { 96, 96, 96, 255};
+const rgb_color kRedColor = { 255, 10, 50, 255 };
+const rgb_color kGreenColor = { 10, 255, 50, 255 };
+const rgb_color kBlueColor = { 10, 50, 255, 255 };
 
-//******************************************************************************
+const char* const kBitmapMimeType = "image/x-vnd.Be-bitmap";
+
+const float kCurrentVersion = 1.2;
+const char *kPrefsFileName = "Magnify_prefs";
+
+// 	prefs are:
+//		name = Magnify
+//		version
+//		show grid
+//		show info	(rgb, location)
+//		pixel count
+//		pixel size
+const char* const kAppName = "Magnify";
+const bool kDefaultShowGrid = true;
+const bool kDefaultShowInfo = true;
+const int32 kDefaultPixelCount = 32;
+const int32 kDefaultPixelSize = 8;
+
+//	each info region will be:
+//	top-bottom: 5 fontheight 5 fontheight 5
+//	left-right: 10 minwindowwidth 10
+const int32 kBorderSize = 10;
+
 
 static float
 FontHeight(BView* target, bool full)
@@ -91,48 +114,85 @@ CenterWindowOnScreen(BWindow* w)
 		w->MoveTo(pt);
 }
 
-//******************************************************************************
 
-int
-main(long argc, char* argv[])
+static void
+BoundsSelection(int32 incX, int32 incY, float* x, float* y,
+	int32 xCount, int32 yCount)
 {
-	int32 pixelCount=-1;
+	*x += incX;
+	*y += incY;
 
-	if (argc > 2) {
-		printf("usage: magnify [size] (magnify size * size pixels)\n");
-		exit(1);
-	} else {
-		if (argc == 2) {
-			pixelCount = abs(atoi(argv[1]));
-	
-			if ((pixelCount > 100) || (pixelCount < 4)) {
-				printf("usage: magnify [size] (magnify size * size pixels)\n");
-				printf("  size must be > 4 and a multiple of 4\n");
-				exit(1);
-			}
-		
-			if (pixelCount % 4) {
-				printf("magnify: size must be a multiple of 4\n");
-				exit(1);
-			}
-		}
-	}
+	if (*x < 0)
+		*x = xCount-1;
+	if (*x >= xCount)
+		*x = 0;
 
-	TApp app(pixelCount);
-	app.Run();	
-	return(0);
+	if (*y < 0)
+		*y = yCount-1;
+	if (*y >= yCount)
+		*y = 0;
 }
 
-// **************************************************************************
 
-//	pass in pixelCount to maintain backward compatibility of setting
-//	the pixelcount from the command line
+static void
+BuildInfoMenu(BMenu *menu)
+{
+	BMenuItem* menuItem;
+	
+	menuItem = new BMenuItem("About Magnify...", new BMessage(B_ABOUT_REQUESTED));
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Help...", new BMessage(msg_help));
+	menu->AddItem(menuItem);
+	menu->AddSeparatorItem();
+
+	menuItem = new BMenuItem("Save Image", new BMessage(msg_save),'S');
+	menu->AddItem(menuItem);
+//	menuItem = new BMenuItem("Save Selection", new BMessage(msg_save),'S');
+//	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Copy Image", new BMessage(msg_copy_image),'C');
+	menu->AddItem(menuItem);
+	menu->AddSeparatorItem();
+
+	menuItem = new BMenuItem("Hide/Show Info", new BMessage(msg_show_info),'T');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Add a Crosshair", new BMessage(msg_add_cross_hair),'H');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Remove a Crosshair", new BMessage(msg_remove_cross_hair), 'H',
+		B_SHIFT_KEY);
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Hide/Show Grid", new BMessage(msg_toggle_grid),'G');
+	menu->AddItem(menuItem);
+	menu->AddSeparatorItem();
+
+	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
+	menu->AddItem(menuItem);
+	menu->AddSeparatorItem();
+	
+	menuItem = new BMenuItem("Make Square", new BMessage(msg_make_square),'/');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Decrease Window Size", new BMessage(msg_shrink),'-');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Increase Window Size", new BMessage(msg_grow),'+');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Decrease Pixel Size", new BMessage(msg_shrink_pixel),',');
+	menu->AddItem(menuItem);
+	menuItem = new BMenuItem("Increase Pixel Size", new BMessage(msg_grow_pixel),'.');
+	menu->AddItem(menuItem);	
+}
+
+
+//	#pragma mark -
+
+
+// pass in pixelCount to maintain backward compatibility of setting
+// the pixelcount from the command line
 TApp::TApp(int32 pixelCount)
 	:BApplication("application/x-vnd.Haiku.Magnify")
 {
 	TWindow* magWindow = new TWindow(pixelCount);
 	magWindow->Show();
 }
+
 
 void
 TApp::MessageReceived(BMessage* msg)
@@ -147,29 +207,27 @@ TApp::MessageReceived(BMessage* msg)
 	}
 }
 
+
 void
 TApp::ReadyToRun()
 {
 	BApplication::ReadyToRun();
 }
 
+
 void
-TApp::AboutRequested(void)
+TApp::AboutRequested()
 {
-	(new BAlert("", "Magnify!\n\n(C)2002-2005 Haiku\n(C)1999 Be Inc.\n\nNow with even more features and recompiled for Haiku.", "OK"))->Go();
+	(new BAlert("", "Magnify!\n\n" B_UTF8_COPYRIGHT "2002-2006 Haiku\n(C)1999 Be Inc.\n\n"
+		"Now with even more features and recompiled for Haiku.", "OK"))->Go();
 }
 
-//******************************************************************************
 
-//	each info region will be:
-//	top-bottom: 5 fontheight 5 fontheight 5
-//	left-right: 10 minwindowwidth 10
+//	#pragma mark -
 
-const int32 kBorderSize = 10;
 
 TWindow::TWindow(int32 pixelCount)
-	: BWindow( BRect(0,0,0,0), "Magnify", B_TITLED_WINDOW,
-		B_OUTLINE_RESIZE)
+	: BWindow( BRect(0,0,0,0), "Magnify", B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);
 
@@ -178,7 +236,7 @@ TWindow::TWindow(int32 pixelCount)
 	infoRect.InsetBy(-1, -1);
 	fInfo = new TInfoView(infoRect);
 	AddChild(fInfo);
-	
+
 	fFontHeight = FontHeight(fInfo, true);
 	fInfoHeight = (fFontHeight * 2) + (3 * 5);
 
@@ -192,7 +250,7 @@ TWindow::TWindow(int32 pixelCount)
 	fInfo->SetMagView(fFatBits);
 
 	ResizeWindow(fHPixelCount, fVPixelCount);
-	
+
 	AddShortcut('I', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
 	AddShortcut('S', B_COMMAND_KEY, new BMessage(msg_save));
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(msg_copy_image));
@@ -208,9 +266,11 @@ TWindow::TWindow(int32 pixelCount)
 	AddShortcut('.', B_COMMAND_KEY, new BMessage(msg_grow_pixel));
 }
 
+
 TWindow::~TWindow()
 {
 }
+
 
 void
 TWindow::MessageReceived(BMessage* m)
@@ -315,6 +375,7 @@ TWindow::MessageReceived(BMessage* m)
 	}	
 }
 
+
 bool
 TWindow::QuitRequested()
 {
@@ -323,18 +384,7 @@ TWindow::QuitRequested()
 	return true;
 }
 
-// 	prefs are:
-//		name = Magnify
-//		version
-//		show grid
-//		show info	(rgb, location)
-//		pixel count
-//		pixel size
-const char* const kAppName = "Magnify";
-const bool kDefaultShowGrid = true;
-const bool kDefaultShowInfo = true;
-const int32 kDefaultPixelCount = 32;
-const int32 kDefaultPixelSize = 8;
+
 void
 TWindow::GetPrefs(int32 overridePixelCount)
 {
@@ -350,26 +400,25 @@ TWindow::GetPrefs(int32 overridePixelCount)
 	int32 hPixelCount = kDefaultPixelCount;
 	int32 vPixelCount = kDefaultPixelCount;
 	int32 pixelSize = kDefaultPixelSize;
-	
+
 	if (find_directory (B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		int ref = -1;
 		path.Append(kPrefsFileName);
 		if ((ref = open(path.Path(), 0)) >= 0) {
-		
 			if (read(ref, name, 7) != 7)
 				goto ALMOST_DONE;
-				
+
 			name[7] = 0;
 			if (strcmp(name, kAppName) != 0)
 				goto ALMOST_DONE;
-			
+
 			read(ref, &version, sizeof(float));
-			
+
 			if (read(ref, &loc, sizeof(BPoint)) != sizeof(BPoint))
 				goto ALMOST_DONE;
 			else
 				haveLoc = true;
-			
+
 			if (read(ref, &showGrid, sizeof(bool)) != sizeof(bool)) {
 				showGrid = kDefaultShowGrid;
 				goto ALMOST_DONE;
@@ -426,7 +475,7 @@ DONE:
 	fPixelSize = pixelSize;
 }
 
-const float kCurrentVersion = 1.2;
+
 void
 TWindow::SetPrefs()
 {
@@ -434,18 +483,18 @@ TWindow::SetPrefs()
 
 	if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
 		long ref;
-		
+
 		path.Append (kPrefsFileName);
 		if ((ref = creat(path.Path(), O_RDWR)) >= 0) {
 			float version = kCurrentVersion;
-			
+
 			lseek (ref, 0, SEEK_SET);
 			write(ref, kAppName, 7);
 			write(ref, &version, sizeof(float));
-			
+
 			BPoint loc = Frame().LeftTop();
 			write(ref, &loc, sizeof(BPoint));
-			
+
 			write(ref, &fShowGrid, sizeof(bool));
 			write(ref, &fShowInfo, sizeof(bool));
 			bool ch1, ch2;
@@ -456,12 +505,12 @@ TWindow::SetPrefs()
 			write(ref, &fHPixelCount, sizeof(int32));
 			write(ref, &fVPixelCount, sizeof(int32));
 			write(ref, &fPixelSize, sizeof(int32));
-			
+
 			close(ref);
-			
 		}
 	}
 }
+
 
 void
 TWindow::FrameResized(float w, float h)
@@ -476,13 +525,15 @@ TWindow::FrameResized(float w, float h)
 	fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
 }
 
+
 void
-TWindow::ScreenChanged(BRect screen_size, color_space depth)
+TWindow::ScreenChanged(BRect screenSize, color_space depth)
 {
-	BWindow::ScreenChanged(screen_size, depth);
-	//	reset all bitmaps
-	fFatBits->ScreenChanged(screen_size,depth);
+	BWindow::ScreenChanged(screenSize, depth);
+	// reset all bitmaps
+	fFatBits->ScreenChanged(screenSize,depth);
 }
+
 
 void
 TWindow::Minimize(bool m)
@@ -490,17 +541,18 @@ TWindow::Minimize(bool m)
 	BWindow::Minimize(m);
 }
 
+
 void
-TWindow::Zoom(BPoint _UNUSED(rec_position), float _UNUSED(rec_width), float _UNUSED(rec_height))
+TWindow::Zoom(BPoint /*position*/, float /*width*/, float /*height*/)
 {
 	if (fFatBits->Active())
 		ShowInfo(!fShowInfo);
 }
 
+
 void
 TWindow::CalcViewablePixels()
 {
-
 	float w = Bounds().Width();
 	float h = Bounds().Height();
 	
@@ -525,6 +577,7 @@ TWindow::CalcViewablePixels()
 		fVPixelCount = 4;
 }
 
+
 void
 TWindow::GetPreferredSize(float* width, float* height)
 {
@@ -543,6 +596,7 @@ TWindow::GetPreferredSize(float* width, float* height)
 		*height += fFontHeight + 5;		
 }
 
+
 void
 TWindow::ResizeWindow(int32 hPixelCount, int32 vPixelCount)
 {
@@ -554,6 +608,7 @@ TWindow::ResizeWindow(int32 hPixelCount, int32 vPixelCount)
 	
 	ResizeTo(width, height);
 }
+
 
 void
 TWindow::ResizeWindow(bool direction)
@@ -578,6 +633,7 @@ TWindow::ResizeWindow(bool direction)
 	ResizeWindow(x, y);	
 }
 
+
 void
 TWindow::SetGrid(bool s)
 {
@@ -588,11 +644,13 @@ TWindow::SetGrid(bool s)
 	fFatBits->SetUpdate(true);
 }
 
+
 bool
 TWindow::ShowGrid()
 {
 	return fShowGrid;
 }
+
 
 void
 TWindow::ShowInfo(bool i)
@@ -613,17 +671,20 @@ TWindow::ShowInfo(bool i)
 	ResizeWindow(fHPixelCount, fVPixelCount);
 }
 
+
 bool
 TWindow::InfoIsShowing()
 {
 	return fShowInfo;
 }
 
+
 void
 TWindow::UpdateInfo()
 {
 	fInfo->Draw(fInfo->Bounds());
 }
+
 
 void
 TWindow::AddCrossHair()
@@ -638,6 +699,7 @@ TWindow::AddCrossHair()
 	ResizeTo(width, height);
 }
 
+
 void
 TWindow::RemoveCrossHair()
 {
@@ -651,11 +713,13 @@ TWindow::RemoveCrossHair()
 	ResizeTo(width, height);
 }
 
+
 void
 TWindow::CrossHairsShowing(bool* ch1, bool* ch2)
 {
 	fFatBits->CrossHairsShowing(ch1, ch2);
 }
+
 
 void
 TWindow::PixelCount(int32* h, int32 *v)
@@ -663,6 +727,7 @@ TWindow::PixelCount(int32* h, int32 *v)
 	*h = fHPixelCount;
 	*v = fVPixelCount;
 }
+
 
 void
 TWindow::SetPixelSize(int32 s)
@@ -678,6 +743,7 @@ TWindow::SetPixelSize(int32 s)
 	CalcViewablePixels();
 	ResizeWindow(fHPixelCount, fVPixelCount);
 }
+
 
 void
 TWindow::SetPixelSize(bool d)
@@ -703,30 +769,32 @@ TWindow::SetPixelSize(bool d)
 		fFatBits->InitBuffers(fHPixelCount, fVPixelCount, fPixelSize, ShowGrid());
 }
 
+
 int32
 TWindow::PixelSize()
 {
 	return fPixelSize;
 }
 
+
 void
 TWindow::ShowHelp()
 {
-	BRect r(0,0,375,240);
+	BRect r(0, 0, 375, 240);
 	BWindow* w = new BWindow(r, "Magnify Help", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE);
-	
+
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	BRect r2(r);
-	r2.InsetBy(4,4);
+	r2.InsetBy(4, 4);
 	BTextView* text = new BTextView(r, "text", r2, B_FOLLOW_ALL, B_WILL_DRAW);
 	text->MakeSelectable(false);
 	text->MakeEditable(false);
-	
+
 	BScrollView* scroller = new BScrollView("", text, B_FOLLOW_ALL, 0, true, true);
 	w->AddChild(scroller);
-	
+
 	text->Insert("General:\n");
 	text->Insert("  32 x 32 - the top left numbers are the number of visible\n");
 	text->Insert("    pixels (width x height)\n");
@@ -767,10 +835,11 @@ TWindow::ShowHelp()
 	text->Insert("    around 1 pixel at a time\n");
 	text->Insert("  option-arrow key - moves the mouse location 1 pixel at a time\n");
 	text->Insert("  x marks the selection - the current selection has an 'x' in it\n");
-	
+
 	CenterWindowOnScreen(w);	
 	w->Show();
 }
+
 
 bool
 TWindow::IsActive()
@@ -778,7 +847,9 @@ TWindow::IsActive()
 	return fFatBits->Active();
 }
 
-//******************************************************************************
+
+//	#pragma mark -
+
 
 TInfoView::TInfoView(BRect frame)
 	: BBox(frame, "rgb", B_FOLLOW_ALL,
@@ -900,57 +971,13 @@ TInfoView::Draw(BRect updateRect)
 	PopState();
 }
 
+
 void
 TInfoView::FrameResized(float width, float height)
 {
 	BBox::FrameResized(width, height);
 }
 
-static void
-BuildInfoMenu(BMenu *menu)
-{
-	BMenuItem* menuItem;
-	
-	menuItem = new BMenuItem("About Magnify...", new BMessage(B_ABOUT_REQUESTED));
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Help...", new BMessage(msg_help));
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-
-	menuItem = new BMenuItem("Save Image", new BMessage(msg_save),'S');
-	menu->AddItem(menuItem);
-//	menuItem = new BMenuItem("Save Selection", new BMessage(msg_save),'S');
-//	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Copy Image", new BMessage(msg_copy_image),'C');
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-
-	menuItem = new BMenuItem("Hide/Show Info", new BMessage(msg_show_info),'T');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Add a Crosshair", new BMessage(msg_add_cross_hair),'H');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Remove a Crosshair", new BMessage(msg_remove_cross_hair), 'H',
-		B_SHIFT_KEY);
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Hide/Show Grid", new BMessage(msg_toggle_grid),'G');
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-
-	menuItem = new BMenuItem("Freeze/Unfreeze image", new BMessage(msg_freeze),'F');
-	menu->AddItem(menuItem);
-	menu->AddSeparatorItem();
-	
-	menuItem = new BMenuItem("Make Square", new BMessage(msg_make_square),'/');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease Window Size", new BMessage(msg_shrink),'-');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase Window Size", new BMessage(msg_grow),'+');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Decrease Pixel Size", new BMessage(msg_shrink_pixel),',');
-	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Increase Pixel Size", new BMessage(msg_grow_pixel),'.');
-	menu->AddItem(menuItem);	
-}
 
 void
 TInfoView::AddMenu()
@@ -964,18 +991,20 @@ TInfoView::AddMenu()
 	AddChild(fPopUp);
 }
 
+
 void
 TInfoView::SetMagView(TMagnify* magView)
 {
 	fMagView = magView;
 }
 
-//
+
+//	#pragma mark -
 
 
 TMenu::TMenu(TWindow *mainWindow, const char *title, menu_layout layout)
 	: BMenu(title, layout),
-		fMainWindow(mainWindow)
+	fMainWindow(mainWindow)
 {
 }
 
@@ -984,13 +1013,14 @@ TMenu::~TMenu()
 {
 }
 
+
 void 
 TMenu::AttachedToWindow()
 {
-	bool state=true;
+	bool state = true;
 	if (fMainWindow)
 		state = fMainWindow->IsActive();
-	
+
 	BMenuItem* menuItem = FindItem("Hide/Show Info");
 	if (menuItem)
 		menuItem->SetEnabled(state);
@@ -1023,11 +1053,12 @@ TMenu::AttachedToWindow()
 }
 
 
-//******************************************************************************
+//	#pragma mark -
+
 
 TMagnify::TMagnify(BRect r, TWindow* parent)
-	:BView(r, "MagView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
-		fParent(parent)
+	: BView(r, "MagView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
+	fParent(parent)
 {
 	fLastLoc.Set(-1, -1);
 	fSelectionLoc.x = 0; fSelectionLoc.y = 0;
@@ -1041,23 +1072,25 @@ TMagnify::TMagnify(BRect r, TWindow* parent)
 
 	fImageBuf = NULL;
 	fImageView = NULL;
+
+	SetViewColor(B_TRANSPARENT_32_BIT);
 }
+
 
 TMagnify::~TMagnify()
 {
 	kill_thread(fThread);
-	delete(fImageBuf);
+	delete fImageBuf;
 }
+
 
 void
 TMagnify::AttachedToWindow()
 {
-	SetViewColor(B_TRANSPARENT_32_BIT);
-
 	int32 width, height;
 	fParent->PixelCount(&width, &height);
 	InitBuffers(width, height, fParent->PixelSize(), fParent->ShowGrid());
-	
+
 	fThread = spawn_thread(TMagnify::MagnifyTask, "MagnifyTask",
 		B_NORMAL_PRIORITY, this);
 
@@ -1066,54 +1099,57 @@ TMagnify::AttachedToWindow()
 	MakeFocus();
 }
 
+
 void
 TMagnify::InitBuffers(int32 hPixelCount, int32 vPixelCount,
 	int32 pixelSize, bool showGrid)
 {
-	color_space colorSpace =  BScreen(Window()).ColorSpace();
+	color_space colorSpace = BScreen(Window()).ColorSpace();
 
 	BRect r(0, 0, (pixelSize * hPixelCount)-1, (pixelSize * vPixelCount)-1);
 	if (Bounds().Width() != r.Width() || Bounds().Height() != r.Height())
 		ResizeTo(r.Width(), r.Height());
-	
+
 	if (fImageView) {
 		fImageBuf->Lock();
 		fImageView->RemoveSelf();
 		fImageBuf->Unlock();
-		
+
 		fImageView->Resize((int32)r.Width(), (int32)r.Height());
 		fImageView->SetSpace(colorSpace);
 	} else
 		fImageView = new TOSMagnify(r, this, colorSpace);
 
-	delete(fImageBuf);
+	delete fImageBuf;
 	fImageBuf = new BBitmap(r, colorSpace, true);
 	fImageBuf->Lock();
 	fImageBuf->AddChild(fImageView);
 	fImageBuf->Unlock();
 }
 
+
 void
 TMagnify::Draw(BRect)
 {
 	BRect bounds(Bounds());
 	DrawBitmap(fImageBuf, bounds, bounds);
-	dynamic_cast<TWindow*>(Window())->UpdateInfo();
+	static_cast<TWindow*>(Window())->UpdateInfo();
 }
+
 
 void
 TMagnify::KeyDown(const char *key, int32 numBytes)
 {
 	if (!fShowSelection)
 		BView::KeyDown(key,numBytes);
-		
+
 	uint32 mods = modifiers();
-	
+
 	switch (key[0]) {
 		case B_TAB:
 			if (fShowCrossHair1) {
 				fSelection++;
-				
+
 				if (fShowCrossHair2) {
 					if (fSelection > 2)
 						fSelection = 0;
@@ -1125,7 +1161,7 @@ TMagnify::KeyDown(const char *key, int32 numBytes)
 				Draw(Bounds());
 			}
 			break;
-			
+
 		case B_LEFT_ARROW:
 			if (mods & B_OPTION_KEY)
 				NudgeMouse(-1,0);
@@ -1150,7 +1186,7 @@ TMagnify::KeyDown(const char *key, int32 numBytes)
 			else
 				MoveSelection(0,1);
 			break;
-		
+
 		default:
 			BView::KeyDown(key,numBytes);
 			break;
@@ -1162,14 +1198,13 @@ TMagnify::FrameResized(float newW, float newH)
 {
 	int32 w, h;
 	PixelCount(&w, &h);
-	
+
 	if (fSelectionLoc.x >= w)
 		fSelectionLoc.x = 0;
 	if (fSelectionLoc.y >= h)
 		fSelectionLoc.y = 0;
-		
+
 	if (fShowCrossHair1) {
-	
 		if (fCrossHair1.x >= w) {
 			fCrossHair1.x = fSelectionLoc.x + 2;
 			if (fCrossHair1.x >= w)
@@ -1195,6 +1230,7 @@ TMagnify::FrameResized(float newW, float newH)
 		}
 	}
 }
+
 
 void
 TMagnify::MouseDown(BPoint where)
@@ -1237,6 +1273,7 @@ TMagnify::MouseDown(BPoint where)
 	}
 }
 
+
 void
 TMagnify::ScreenChanged(BRect, color_space)
 {
@@ -1244,6 +1281,7 @@ TMagnify::ScreenChanged(BRect, color_space)
 	fParent->PixelCount(&width, &height);
 	InitBuffers(width, height, fParent->PixelSize(), fParent->ShowGrid());
 }
+
 
 void
 TMagnify::SetSelection(bool state)
@@ -1256,30 +1294,13 @@ TMagnify::SetSelection(bool state)
 	Draw(Bounds());
 }
 
-static void
-BoundsSelection(int32 incX, int32 incY, float* x, float* y,
-	int32 xCount, int32 yCount)
-{
-	*x += incX;
-	*y += incY;
-	
-	if (*x < 0)
-		*x = xCount-1;
-	if (*x >= xCount)
-		*x = 0;
-		
-	if (*y < 0)
-		*y = yCount-1;
-	if (*y >= yCount)
-		*y = 0;
-}
 
 void
 TMagnify::MoveSelection(int32 x, int32 y)
 {
 	if (!fShowSelection)
 		return;
-		
+
 	int32 xCount, yCount;
 	PixelCount(&xCount, &yCount);
 
@@ -1308,19 +1329,20 @@ TMagnify::MoveSelection(int32 x, int32 y)
 	Draw(Bounds());
 }
 
+
 void
 TMagnify::MoveSelectionTo(int32 x, int32 y)
 {
 	if (!fShowSelection)
 		return;
-		
+
 	int32 xCount, yCount;
 	PixelCount(&xCount, &yCount);
 	if (x >= xCount)
 		x = 0;
 	if (y >= yCount)
 		y = 0;
-		
+
 	if (fSelection == 0) {
 		fSelectionLoc.x = x;
 		fSelectionLoc.y = y;
@@ -1336,10 +1358,12 @@ TMagnify::MoveSelectionTo(int32 x, int32 y)
 	Draw(Bounds());
 }
 
+
 void
 TMagnify::ShowSelection()
 {
 }
+
 
 short
 TMagnify::Selection()
@@ -1347,11 +1371,13 @@ TMagnify::Selection()
 	return fSelection;
 }
 
+
 bool
 TMagnify::SelectionIsShowing()
 {
 	return fShowSelection;
 }
+
 
 void
 TMagnify::SelectionLoc(float* x, float* y)
@@ -1360,6 +1386,7 @@ TMagnify::SelectionLoc(float* x, float* y)
 	*y = fSelectionLoc.y;
 }
 
+
 void
 TMagnify::SetSelectionLoc(float x, float y)
 {
@@ -1367,11 +1394,13 @@ TMagnify::SetSelectionLoc(float x, float y)
 	fSelectionLoc.y = y;
 }
 
+
 rgb_color
 TMagnify::SelectionColor()
 {
 	return fImageView->ColorAtSelection();
 }
+
 
 void
 TMagnify::CrossHair1Loc(float* x, float* y)
@@ -1380,6 +1409,7 @@ TMagnify::CrossHair1Loc(float* x, float* y)
 	*y = fCrossHair1.y;
 }
 
+
 void
 TMagnify::CrossHair2Loc(float* x, float* y)
 {
@@ -1387,11 +1417,13 @@ TMagnify::CrossHair2Loc(float* x, float* y)
 	*y = fCrossHair2.y;
 }
 
+
 BPoint
 TMagnify::CrossHair1Loc()
 {
 	return fCrossHair1;
 }
+
 
 BPoint
 TMagnify::CrossHair2Loc()
@@ -1399,12 +1431,12 @@ TMagnify::CrossHair2Loc()
 	return fCrossHair2;
 }
 
-#include <WindowScreen.h>
+
 void
 TMagnify::NudgeMouse(float x, float y)
 {
-	BPoint		loc;
-	ulong		button;
+	BPoint loc;
+	ulong button;
 
 	GetMouse(&loc, &button);
 	ConvertToScreen(&loc);
@@ -1414,6 +1446,7 @@ TMagnify::NudgeMouse(float x, float y)
 	set_mouse_position((int32)loc.x, (int32)loc.y);
 }
 
+
 void
 TMagnify::WindowActivated(bool active)
 {
@@ -1421,10 +1454,11 @@ TMagnify::WindowActivated(bool active)
 		MakeFocus();
 }
 
+
 long
 TMagnify::MagnifyTask(void *arg)
 {
-	TMagnify*	view = (TMagnify*)arg;
+	TMagnify* view = (TMagnify*)arg;
 
 	// static data members can't access members, methods without
 	// a pointer to an instance of the class
@@ -1432,8 +1466,6 @@ TMagnify::MagnifyTask(void *arg)
 
 	while (true) {
 		if (window->Lock()) {
-
-//			if (!window->Minimized() && view->Active() || view->NeedToUpdate())
 			if (view->NeedToUpdate() || view->Active())
 				view->Update(view->NeedToUpdate());
 
@@ -1445,28 +1477,28 @@ TMagnify::MagnifyTask(void *arg)
 	return B_NO_ERROR;
 }
 
+
 void
 TMagnify::Update(bool force)
 {
-	BPoint		loc;
-	ulong		button;
+	BPoint loc;
+	ulong button;
 	static long counter = 0;
 
 	GetMouse(&loc, &button);
 
 	ConvertToScreen(&loc);
 	if (force || (fLastLoc != loc) || (counter++ % 35 == 0)) {
-
 		if (fImageView->CreateImage(loc, force))
 			Draw(Bounds());
 
 		counter = 0;
 		if (force)
 			SetUpdate(false);
-
 	}
 	fLastLoc = loc;
 }
+
 
 bool
 TMagnify::NeedToUpdate()
@@ -1474,13 +1506,13 @@ TMagnify::NeedToUpdate()
 	return fNeedToUpdate;
 }
 
+
 void
 TMagnify::SetUpdate(bool s)
 {
 	fNeedToUpdate = s;
 }
 
-const char* const kBitmapMimeType = "image/x-vnd.Be-bitmap";
 
 void
 TMagnify::CopyImage()
@@ -1488,34 +1520,35 @@ TMagnify::CopyImage()
 	StartSave();
 	be_clipboard->Lock();
 	be_clipboard->Clear();
-	
+
 	BMessage *message = be_clipboard->Data();
 	if (!message) {
 		printf("no clip msg\n");
 		return;
 	}
-	
+
 	BMessage *embeddedBitmap = new BMessage();
 	(fImageView->Bitmap())->Archive(embeddedBitmap,false);
 	status_t err = message->AddMessage(kBitmapMimeType, embeddedBitmap);
-	ASSERT(err == B_OK);
-	err = message->AddRect("rect", (fImageView->Bitmap())->Bounds());
-	ASSERT(err == B_OK);
+	if (err == B_OK)
+		err = message->AddRect("rect", fImageView->Bitmap()->Bounds());
+	if (err == B_OK)
+		be_clipboard->Commit();
 
-	be_clipboard->Commit();
 	be_clipboard->Unlock();
 	EndSave();
 }
+
 
 void
 TMagnify::AddCrossHair()
 {
 	if (fShowCrossHair1 && fShowCrossHair2)
 		return;
-		
+
 	int32 w, h;
 	PixelCount(&w, &h);
-	
+
 	if (fShowCrossHair1) {
 		fSelection = 2;
 		fShowCrossHair2 = true;
@@ -1538,12 +1571,13 @@ TMagnify::AddCrossHair()
 	Draw(Bounds());	
 }
 
+
 void
 TMagnify::RemoveCrossHair()
 {
 	if (!fShowCrossHair1 && !fShowCrossHair2)
 		return;
-		
+
 	if (fShowCrossHair2) {
 		fSelection = 1;
 		fShowCrossHair2 = false;
@@ -1554,12 +1588,14 @@ TMagnify::RemoveCrossHair()
 	Draw(Bounds());
 }
 
+
 void
 TMagnify::SetCrossHairsShowing(bool ch1, bool ch2)
 {
 	fShowCrossHair1 = ch1;
 	fShowCrossHair2 = ch2;
 }
+
 
 void
 TMagnify::CrossHairsShowing(bool* ch1, bool* ch2)
@@ -1568,11 +1604,13 @@ TMagnify::CrossHairsShowing(bool* ch1, bool* ch2)
 	*ch2 = fShowCrossHair2;
 }
 
+
 void
 TMagnify::MakeActive(bool s)
 {
 	fActive = s;
 }
+
 
 void
 TMagnify::PixelCount(int32* width, int32* height)
@@ -1580,17 +1618,20 @@ TMagnify::PixelCount(int32* width, int32* height)
 	fParent->PixelCount(width, height);
 }
 
+
 int32
 TMagnify::PixelSize()
 {
 	return fParent->PixelSize();
 }
 
+
 bool
 TMagnify::ShowGrid()
 {
 	return fParent->ShowGrid();
 }
+
 
 void
 TMagnify::StartSave()
@@ -1600,6 +1641,7 @@ TMagnify::StartSave()
 		MakeActive(false);
 }
 
+
 void
 TMagnify::EndSave()
 {
@@ -1607,22 +1649,24 @@ TMagnify::EndSave()
 		MakeActive(true);
 }
 
+
 void
 TMagnify::SaveImage(entry_ref* ref, char* name, bool selectionOnly)
 {
-	//	create a new file
+	// create a new file
 	BFile file;
 	BDirectory parentDir(ref);
 	parentDir.CreateFile(name, &file);
 	
-	//	write off the bitmaps bits to the file
+	// write off the bitmaps bits to the file
 	SaveBits(&file, fImageView->Bitmap(), "Data");
 	
 	// unfreeze the image, image was frozen before invoke of FilePanel
 	EndSave();
 }
 
-void 
+
+void
 TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 {
 	int32 bytesPerPixel;
@@ -1633,12 +1677,12 @@ TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 			bytesPerPixel = 1;
 			kColorSpaceName = "B_GRAY8";
 			break;
-			
+
 		case B_CMAP8:
 			bytesPerPixel = 1;
 			kColorSpaceName = "B_CMAP8";
 			break;
-			
+
 		case B_RGB15:
 		case B_RGBA15:
 		case B_RGB15_BIG:
@@ -1652,7 +1696,7 @@ TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 			bytesPerPixel = 2;
 			kColorSpaceName = "B_RGB16";
 			break;
-			
+
 		case B_RGB32:
 		case B_RGBA32:
 		case B_RGBA32_BIG:
@@ -1660,12 +1704,12 @@ TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 			bytesPerPixel = 3;
 			kColorSpaceName = "B_RGB32";
 			break;
-			
+
 		default:
 			printf("dump: usupported ColorSpace\n");
 			return;
 	}
-	
+
 	char str[1024];
 	// stream out the width, height and ColorSpace
 	sprintf(str, "const int32 k%sWidth = %ld;\n", name, (int32)bitmap->Bounds().Width()+1);
@@ -1683,43 +1727,43 @@ TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, char* name) const
 	const int32 kMaxColumnWidth = 16;
 	int32 bytesPerRow = bitmap->BytesPerRow();
 	int32 columnWidth = (bytesPerRow < kMaxColumnWidth) ? bytesPerRow : kMaxColumnWidth;
-	
-	for (int32 remaining = bitmap->BitsLength(); remaining; ) {
 
+	for (int32 remaining = bitmap->BitsLength(); remaining; ) {
 		sprintf(str, "\n\t");
 		file->Write(str, strlen(str));
-		
+
 		//	stream out each row, based on the number of bytes required per row
 		//	padding is in the bitmap and will be streamed as 0xff
 		for (int32 column = 0; column < columnWidth; column++) {
-		
 			// stream out individual pixel components
 			for (int32 count = 0; count < bytesPerPixel; count++) {
 				--remaining;
 				sprintf(str, "0x%02x", *bits++);
 				file->Write(str, strlen(str));
-				
+
 				if (remaining) {
 					sprintf(str, ",");
 					file->Write(str, strlen(str));
 				} else
 					break;
 			}
-			
+
 			//	make sure we don't walk off the end of the bits array
 			if (!remaining)
 				break;
-
 		}
 	}
+
 	sprintf(str, "\n};\n\n");
 	file->Write(str, strlen(str));
 }
 
-//******************************************************************************
+
+//	#pragma mark -
+
 
 TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
-	:BView(r, "ImageView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
+	: BView(r, "ImageView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
 		fColorSpace(space), fParent(parent)
 {
 	switch (space) {
@@ -1756,26 +1800,30 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 TOSMagnify::~TOSMagnify()
 {
 	delete fPixel;
-	delete(fBitmap);
+	delete fBitmap;
 	free(fOldBits);
 }
 
-void TOSMagnify::SetSpace(color_space space)
+
+void
+TOSMagnify::SetSpace(color_space space)
 {
 	fColorSpace = space;
 	InitObject();
 };
 
-void TOSMagnify::InitObject()
+
+void
+TOSMagnify::InitObject()
 {
 	int32 w, h;
 	fParent->PixelCount(&w, &h);
 
-	if (fBitmap) delete fBitmap;
+	delete fBitmap;
 	BRect bitsRect(0, 0, w-1, h-1);
 	fBitmap = new BBitmap(bitsRect, fColorSpace);
-	
-	if (fOldBits) free(fOldBits);
+
+	free(fOldBits);
 	fOldBits = (char*)malloc(fBitmap->BitsLength());
 
 	if (!fPixel) {
@@ -1793,6 +1841,7 @@ void TOSMagnify::InitObject()
 	};
 }
 
+
 void
 TOSMagnify::FrameResized(float width, float height)
 {
@@ -1800,12 +1849,14 @@ TOSMagnify::FrameResized(float width, float height)
 	InitObject();
 }
 
+
 void
 TOSMagnify::Resize(int32 width, int32 height)
 {
 	ResizeTo(width, height);
 	InitObject();
 }
+
 
 bool
 TOSMagnify::CreateImage(BPoint mouseLoc, bool force)
@@ -1815,12 +1866,12 @@ TOSMagnify::CreateImage(BPoint mouseLoc, bool force)
 		int32 width, height;
 		fParent->PixelCount(&width, &height);
 		int32 pixelSize = fParent->PixelSize();
-		
-		BRect srcRect(0, 0, width - 1, height - 1);
-		srcRect.OffsetBy(	mouseLoc.x - (width / 2),
-							mouseLoc.y - (height / 2));
-		if (force || CopyScreenRect(srcRect)) {
 
+		BRect srcRect(0, 0, width - 1, height - 1);
+		srcRect.OffsetBy(mouseLoc.x - (width / 2),
+			mouseLoc.y - (height / 2));
+
+		if (force || CopyScreenRect(srcRect)) {
 			srcRect.OffsetTo(BPoint(0, 0));
 			BRect destRect(Bounds());
 
@@ -1836,25 +1887,24 @@ TOSMagnify::CreateImage(BPoint mouseLoc, bool force)
 	} else
 		printf("window problem\n");
 
-	return(created);
+	return created;
 }
+
 
 bool
 TOSMagnify::CopyScreenRect(BRect srcRect)
 {
 	// constrain src rect to legal screen rect
-	BScreen screen( Window() );
+	BScreen screen(Window());
 	BRect scrnframe = screen.Frame();
 
 	if (srcRect.right > scrnframe.right)
-		srcRect.OffsetTo(scrnframe.right - srcRect.Width(),
-				 		 srcRect.top);
+		srcRect.OffsetTo(scrnframe.right - srcRect.Width(), srcRect.top);
 	if (srcRect.top < 0)
 		srcRect.OffsetTo(srcRect.left, 0);
 
 	if (srcRect.bottom > scrnframe.bottom)
-		srcRect.OffsetTo(srcRect.left,
-				 		 scrnframe.bottom - srcRect.Height());
+		srcRect.OffsetTo(srcRect.left, scrnframe.bottom - srcRect.Height());
 	if (srcRect.left < 0)
 		srcRect.OffsetTo(0, srcRect.top);
 
@@ -1864,8 +1914,9 @@ TOSMagnify::CopyScreenRect(BRect srcRect)
 	screen.ReadBitmap(fBitmap, false, &srcRect);
 
 	// let caller know whether bits have actually changed
-	return(memcmp(fBitmap->Bits(), fOldBits, fBitmap->BitsLength()) != 0);
+	return memcmp(fBitmap->Bits(), fOldBits, fBitmap->BitsLength()) != 0;
 }
+
 
 void
 TOSMagnify::DrawGrid(int32 width, int32 height, BRect destRect, int32 pixelSize)
@@ -1873,7 +1924,7 @@ TOSMagnify::DrawGrid(int32 width, int32 height, BRect destRect, int32 pixelSize)
 	// draw grid
 	if (fParent->ShowGrid() && fParent->PixelSize() > 2) {
 		BeginLineArray(width * height);
-	
+
 		// horizontal lines
 		for (int32 i = pixelSize; i < (height * pixelSize); i += pixelSize)
 			AddLine(BPoint(0, i), BPoint(destRect.right, i), kGridGray);
@@ -1881,13 +1932,14 @@ TOSMagnify::DrawGrid(int32 width, int32 height, BRect destRect, int32 pixelSize)
 		// vertical lines
 		for (int32 i = pixelSize; i < (width * pixelSize); i += pixelSize)
 			AddLine(BPoint(i, 0), BPoint(i, destRect.bottom), kGridGray);
-	
+
 		EndLineArray();
 	}
-	
+
 	SetHighColor(kGridGray);
 	StrokeRect(destRect);
 }
+
 
 void
 TOSMagnify::DrawSelection()
@@ -1898,14 +1950,14 @@ TOSMagnify::DrawSelection()
 	float x, y;
 	int32 pixelSize = fParent->PixelSize();
 	int32 squareSize = pixelSize - 2;
-	
+
 	fParent->SelectionLoc(&x, &y);
 	x *= pixelSize; x++;
 	y *= pixelSize; y++;
 	BRect selRect(x, y, x+squareSize, y+squareSize);
-	
+
 	short selection = fParent->Selection();
-	
+
 	PushState();
 	SetLowColor(ViewColor());
 	SetHighColor(kRedColor);
@@ -1914,7 +1966,7 @@ TOSMagnify::DrawSelection()
 		StrokeLine(BPoint(x,y), BPoint(x+squareSize,y+squareSize));
 		StrokeLine(BPoint(x,y+squareSize), BPoint(x+squareSize,y));
 	}	
-	
+
 	bool ch1Showing, ch2Showing;
 	fParent->CrossHairsShowing(&ch1Showing, &ch2Showing);
 	if (ch1Showing) {
@@ -1961,9 +2013,10 @@ TOSMagnify::DrawSelection()
 			StrokeLine(BPoint(x,y+squareSize), BPoint(x+squareSize,y));
 		}	
 	}
-	
+
 	PopState();
 }
+
 
 rgb_color
 TOSMagnify::ColorAtSelection()
@@ -1971,7 +2024,7 @@ TOSMagnify::ColorAtSelection()
 	float x, y;
 	fParent->SelectionLoc(&x, &y);
 	BRect srcRect(x,y,x,y);
-	BRect dstRect(0,0,0,0);
+	BRect dstRect(0, 0, 0, 0);
 	fPixel->Lock();
 	fPixelView->DrawBitmap(fBitmap,srcRect,dstRect);
 	fPixelView->Sync();
@@ -1984,5 +2037,39 @@ TOSMagnify::ColorAtSelection()
 	c.green = (pixel >> 8) & 0xFF;
 	c.blue = pixel & 0xFF;
 
-	return c;	
+	return c;
+}
+
+
+//	#pragma mark -
+
+
+int
+main(long argc, char* argv[])
+{
+	int32 pixelCount = -1;
+
+	if (argc > 2) {
+		printf("usage: magnify [size] (magnify size * size pixels)\n");
+		exit(1);
+	} else {
+		if (argc == 2) {
+			pixelCount = abs(atoi(argv[1]));
+
+			if ((pixelCount > 100) || (pixelCount < 4)) {
+				printf("usage: magnify [size] (magnify size * size pixels)\n");
+				printf("  size must be > 4 and a multiple of 4\n");
+				exit(1);
+			}
+
+			if (pixelCount % 4) {
+				printf("magnify: size must be a multiple of 4\n");
+				exit(1);
+			}
+		}
+	}
+
+	TApp app(pixelCount);
+	app.Run();	
+	return 0;
 }
