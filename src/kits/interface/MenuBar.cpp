@@ -400,8 +400,8 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 		BPoint where;
 		ulong buttons;
-		GetMouse(&where, &buttons, false);
-			// Get the current mouse state
+		GetMouse(&where, &buttons, true);
+			
 		window->UpdateIfNeeded();
 		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
@@ -450,7 +450,10 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		
 		if (locked)
 			window->Unlock();
-		
+
+		if (fState == MENU_STATE_CLOSED)
+			break;
+
 		if (localAction == MENU_STATE_CLOSED || (buttons != 0 && IsStickyMode() && menuItem == NULL))
 			break;
 		else if (buttons == 0 && !IsStickyMode()) {
@@ -461,9 +464,6 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			} else
 				SetStickyMode(true);
 		}
-
-		if (fState == MENU_STATE_CLOSED)
-			break;
 
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);		

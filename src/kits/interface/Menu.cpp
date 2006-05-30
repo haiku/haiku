@@ -741,7 +741,7 @@ void
 BMenu::KeyDown(const char *bytes, int32 numBytes)
 {
 	switch (bytes[0]) {
-		case B_UP_ARROW:
+		/*case B_UP_ARROW:
 		{
 			if (fSelected) 	{
 				fSelected->fSelected = false;
@@ -801,6 +801,11 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 
 			break;
 		}
+		*/
+		case B_ESCAPE:
+			QuitTracking();
+			break;
+
 		default:
 			BView::KeyDown(bytes, numBytes);
 	}
@@ -1240,8 +1245,7 @@ BMenu::_track(int *action, bigtime_t trackTime, long start)
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
 		ulong buttons;
-		GetMouse(&location, &buttons, false);
-			// Get the current mouse state
+		GetMouse(&location, &buttons, true);
 		
 		Window()->UpdateIfNeeded();
 		BPoint screenLocation = ConvertToScreen(location);
@@ -2063,10 +2067,7 @@ BMenu::OkToProceed(BMenuItem* item)
 void
 BMenu::QuitTracking()
 {
-	if (IsStickyMode())
-		SetStickyMode(false);
-	if (fSelected != NULL)
-		SelectItem(NULL);
+	SelectItem(NULL);
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
 		menuBar->RestoreFocus();
 
