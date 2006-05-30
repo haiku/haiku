@@ -194,6 +194,7 @@ team_init(kernel_args *args)
 	kernel_team = create_team_struct("kernel_team", true);
 	if (kernel_team == NULL)
 		panic("could not create kernel team!\n");
+	strcpy(kernel_team->args, kernel_team->name);
 	kernel_team->state = TEAM_STATE_NORMAL;
 
 	insert_team_into_group(group, kernel_team);
@@ -1063,6 +1064,9 @@ team_create_thread_start(void *args)
 
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
+	// TODO: add args
+	strlcpy(team->args, path, sizeof(team->args));
+
 	free_team_arg(teamArgs);
 		// the arguments are already on the user stack, we no longer need them in this form
 
@@ -1904,13 +1908,10 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 	//info->area_count = 
 	info->debugger_nub_thread = team->debug_info.nub_thread;
 	info->debugger_nub_port = team->debug_info.nub_port;
-	//info->argc = 
-	//info->args[64] = 
 	//info->uid = 
 	//info->gid = 
 
-	// ToDo: make this to return real argc/argv
-	strlcpy(info->args, team->name, sizeof(info->args));
+	strlcpy(info->args, team->args, sizeof(info->args));
 	info->argc = 1;
 
 	return B_OK;
@@ -1954,8 +1955,12 @@ _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 	struct team *team = NULL;
 	int32 slot = *cookie;
 	team_id lastTeamID;
+	cpu_status state;
 
-	cpu_status state = disable_interrupts();
+	if (slot < 1)
+		slot = 1;
+
+	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	lastTeamID = peek_next_thread_id();

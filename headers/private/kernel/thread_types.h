@@ -95,6 +95,7 @@ struct team {
 	pid_t			session_id;
 	struct process_group *group;
 	char			name[B_OS_NAME_LENGTH];
+	char			args[64];		// contents for the team_info::args field
 	int				num_threads;	/* number of threads in this team */
 	int				state;			/* current team state, see above */
 	int				pending_signals;
