@@ -314,11 +314,10 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 		float maxLocation;
 		if (fLook != kLeftTitledWindowLook) {
 			tabSize = fRightBorder.right - fLeftBorder.left;
-			maxLocation = tabSize - _tabrect.Width();
 		} else {
 			tabSize = fBottomBorder.bottom - fTopBorder.top;
-			maxLocation = tabSize - _tabrect.Height();
 		}
+		maxLocation = tabSize - fMaxTabSize;
 		if (maxLocation < 0)
 			maxLocation = 0;
 
