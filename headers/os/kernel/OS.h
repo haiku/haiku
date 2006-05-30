@@ -1,6 +1,6 @@
 /* Kernel specific structures and functions
  *
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OS_H
@@ -208,7 +208,7 @@ typedef struct {
 } team_info;
 
 #define B_CURRENT_TEAM	0
-#define B_SYSTEM_TEAM	2
+#define B_SYSTEM_TEAM	1
 
 extern status_t kill_team(team_id team);
 	/* see also: send_signal() */
