@@ -657,7 +657,6 @@ DefaultDecorator::_DoLayout()
 			_tabrect.right = _tabrect.left + tabSize;
 		else
 			_tabrect.bottom = _tabrect.top + tabSize;
-
 	} else {
 		// no tab
 		fMinTabSize = 0.0;
@@ -699,7 +698,8 @@ DefaultDecorator::_DoLayout()
 		// the _tabrect
 		if (fTabOffset < 0)
 			fTabOffset = 0;
-		if (fTabOffset > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
+		if (fTabLocation != 0.0
+			&& fTabOffset > (fRightBorder.right - fLeftBorder.left - _tabrect.Width()))
 			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left - _tabrect.Width());
 		_tabrect.OffsetBy(fTabOffset, 0);
 
