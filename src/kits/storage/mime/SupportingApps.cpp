@@ -101,7 +101,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 				if (!err)
 					err = superMime.InitCheck();
 				if (!err) {
-					std::set<std::string> &superApps = fSupportingApps[type];
+					std::set<std::string> &superApps = fSupportingApps[superMime.Type()];
 					count = 0;
 					for (i = superApps.begin(); i != superApps.end() && !err; i++) {
 						if (subApps.find(*i) == subApps.end()) {
@@ -263,54 +263,54 @@ SupportingApps::BuildSupportingAppsTable()
 	fStrandedTypes.clear();
 
 	BDirectory dir;
-	status_t err = dir.SetTo(kApplicationDatabaseDir.c_str());
+	status_t status = dir.SetTo(kApplicationDatabaseDir.c_str());
 
 	// Build the supporting apps table based on the mime database
-	if (!err) {
+	if (status == B_OK) {
 		dir.Rewind();
 
 		// Handle each application type
 		while (true) {		
 			entry_ref ref;
-			err = dir.GetNextRef(&ref);
-			if (err) {
+			status = dir.GetNextRef(&ref);
+			if (status < B_OK) {
 				// If we've come to the end of list, it's not an error
-				if (err == B_ENTRY_NOT_FOUND) 
-					err = B_OK;
+				if (status == B_ENTRY_NOT_FOUND) 
+					status = B_OK;
 				break;
-			} else {
-				BPath path;
-				BMessage msg;
-				char appSig[B_PATH_NAME_LENGTH];
-				err = path.SetTo(&ref);
-				if (!err) {
-					// Construct a mime type string
-					const char *appName = path.Leaf();
-					sprintf(appSig, "application/%s", appName);
-
-					// Read in the list of supported types
-					if (read_mime_attr_message(appSig, kSupportedTypesAttr, &msg) == B_OK) {
-						// Iterate through the supported types, adding them to the list of
-						// supported types for the application and adding the application's
-						// signature to the list of supporting apps for each type
-						BString type;
-						std::set<std::string> &supportedTypes = fSupportedTypes[appName];
-						for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
-							type.ToLower();
-								// MIME types are case insensitive, so we lowercase everything
-							supportedTypes.insert(type.String());
-							AddSupportingApp(type.String(), appSig);						
-						}
-					}
-				}				
 			}
-		}		
+
+			// read application signature from file
+			BString appSignature;
+			BNode node(&ref);
+			if (node.InitCheck() == B_OK && node.ReadAttrString(kTypeAttr,
+					&appSignature) >= B_OK) {
+				// Read in the list of supported types
+				BMessage msg;
+				if (read_mime_attr_message(appSignature.String(), kSupportedTypesAttr,
+						&msg) == B_OK) {
+					// Iterate through the supported types, adding them to the list of
+					// supported types for the application and adding the application's
+					// signature to the list of supporting apps for each type
+					BString type;
+					std::set<std::string> &supportedTypes = fSupportedTypes[appSignature.String()];
+					for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
+						type.ToLower();
+							// MIME types are case insensitive, so we lowercase everything
+						supportedTypes.insert(type.String());
+						AddSupportingApp(type.String(), appSignature.String());
+					}
+				}
+			}
+		}
 	}
-	if (err)
-		DBG(OUT("Mime::SupportingApps::BuildSupportingAppsTable() failed, error code == 0x%lx\n", err));
-	else
+
+	if (status == B_OK)
 		fHaveDoneFullBuild = true;
-	return err;
+	else
+		DBG(OUT("SupportingApps::BuildSupportingAppsTable() failed: %s\n", strerror(status)));
+
+	return status;
 }
 
 } // namespace Mime

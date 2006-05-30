@@ -67,9 +67,6 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (status < B_OK)
 		return B_BAD_TYPE;
 
-	signature.ToLower();
-		// Signatures and MIME types are case insensitive
-
 	// Init our various objects
 
 	BMimeType mime;
@@ -79,6 +76,9 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 
 	if (!mime.IsInstalled())
 		mime.Install();
+
+	signature.ToLower();
+		// Signatures and MIME types are case insensitive
 
 	char metaMimePath[B_PATH_NAME_LENGTH];
 	sprintf(metaMimePath, "%s/%s", kDatabaseDir.c_str(), signature.String());

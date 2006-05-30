@@ -136,10 +136,23 @@ type_to_filename(const char *type)
 status_t
 open_type(const char *type, BNode *result)
 {
-	status_t err = (type && result ? B_OK : B_BAD_VALUE);
-	if (!err) 
-		err = result->SetTo(type_to_filename(type).c_str());		 
-	return err;
+	if (type == NULL || result == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = result->SetTo(type_to_filename(type).c_str());
+	
+	// TODO: this can be removed again later - we just didn't write this
+	//	attribute is before	at all...
+#if 1
+	if (status == B_OK) {
+		// check if the MIME:TYPE attribute exist, and create it if not
+		attr_info info;
+		if (result->GetAttrInfo(kTypeAttr, &info) != B_OK)
+			result->WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type, strlen(type) + 1);
+	}
+#endif
+
+	return status;
 }
 
 // open_or_create_type
@@ -184,9 +197,14 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 				err = parent.CreateFile(sub.c_str(), NULL);
 		}
 		// Now try opening again
-		err = result->SetTo(filename.c_str());
-		if (!err && didCreate)
+		if (err == B_OK)
+			err = result->SetTo(filename.c_str());
+		if (err == B_OK && didCreate)
 			*didCreate = true;
+		if (err == B_OK) {
+			// write META:TYPE attribute
+			result->WriteAttr(kTypeAttr, B_STRING_TYPE, 0, type, strlen(type) + 1);
+		}
 	}
 	return err;	
 }
