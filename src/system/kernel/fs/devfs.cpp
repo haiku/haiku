@@ -1549,22 +1549,11 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
 		_vnode, _cookie, op, buffer, length));
 
+	/* we are actually checking for a *device* here, we don't make the distinction
+	 * between char and block devices (yet ?)
+	 */
 	if (S_ISCHR(vnode->stream.type)) {
 		switch (op) {
-			case B_GET_PARTITION_INFO:
-			{
-				struct devfs_partition *partition = vnode->stream.u.dev.partition;
-				if (!S_ISCHR(vnode->stream.type)
-					|| partition == NULL
-					|| length != sizeof(partition_info))
-					return B_BAD_VALUE;
-
-				return user_memcpy(buffer, &partition->info, sizeof(partition_info));
-			}
-
-			case B_SET_PARTITION:
-				return B_NOT_ALLOWED;
-
 			case B_GET_GEOMETRY:
 			{
 				struct devfs_partition *partition = vnode->stream.u.dev.partition;
@@ -1587,6 +1576,63 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 				return user_memcpy(buffer, &geometry, sizeof(device_geometry));
 			}
+
+			case B_GET_DRIVER_FOR_DEVICE:
+			{
+				const char *dpath;
+				if (!S_ISCHR(vnode->stream.type))
+					return B_NOT_ALLOWED;
+				dpath = vnode->stream.u.dev.driver->path;
+				if (!dpath)
+					return B_ENTRY_NOT_FOUND;
+				// should make sure it's \0 terminated on truncation
+				return user_memcpy(buffer, dpath, strnlen(dpath, 256));
+			}
+
+			case B_GET_PARTITION_INFO:
+			{
+				struct devfs_partition *partition = vnode->stream.u.dev.partition;
+				if (!S_ISCHR(vnode->stream.type)
+					|| partition == NULL
+					|| length != sizeof(partition_info))
+					return B_BAD_VALUE;
+
+				return user_memcpy(buffer, &partition->info, sizeof(partition_info));
+			}
+
+			case B_SET_PARTITION:
+				return B_NOT_ALLOWED;
+
+			case B_GET_PATH_FOR_DEVICE:
+			{
+				const char *dmp = "/dev/";
+				KPath path(dmp);
+				char *pbuf;
+				status_t err;
+				/* XXX: we might want to actually find the mountpoint
+				 * of that instance of devfs...
+				 * but for now we assume it's mounted on /dev
+				 */
+				if (path.InitCheck() != B_OK)
+					return B_NO_MEMORY;
+				pbuf = path.LockBuffer();
+				get_device_name(vnode, pbuf+strlen(dmp), path.BufferSize()-strlen(dmp));
+				err = user_memcpy(buffer, pbuf, strnlen(pbuf, 256));
+				path.UnlockBuffer();
+				return err;
+			}
+
+				/* old unsupported R5 private stuff */
+			case B_GET_NEXT_OPEN_DEVICE:
+				dprintf("devfs: unsupported legacy ioctl B_GET_NEXT_OPEN_DEVICE\n");
+				return B_NOT_SUPPORTED;
+			case B_ADD_FIXED_DRIVER:
+				dprintf("devfs: unsupported legacy ioctl B_ADD_FIXED_DRIVER\n");
+				return B_NOT_SUPPORTED;
+			case B_REMOVE_FIXED_DRIVER:
+				dprintf("devfs: unsupported legacy ioctl B_REMOVE_FIXED_DRIVER\n");
+				return B_NOT_SUPPORTED;
+
 		}
 
 		return vnode->stream.u.dev.info->control(cookie->device_cookie,
