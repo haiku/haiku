@@ -321,8 +321,9 @@ is_application(BFile& file)
 	if (appInfo.InitCheck() != B_OK)
 		return false;
 
-	char signature[B_MIME_TYPE_LENGTH];
-	if (appInfo.GetSignature(signature) != B_OK)
+	char type[B_MIME_TYPE_LENGTH];
+	if (appInfo.GetType(type) != B_OK
+		|| strcasecmp(type, B_APP_MIME_TYPE))
 		return false;
 
 	return true;
