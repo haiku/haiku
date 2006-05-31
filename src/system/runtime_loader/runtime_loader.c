@@ -18,6 +18,14 @@
 #include <sys/stat.h>
 
 
+//#define TRACE_RLD
+#ifdef TRACE_RLD
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 struct uspace_program_args *gProgramArgs;
 
 
@@ -114,7 +122,7 @@ try_open_executable(const char *dir, int dirLen, const char *name, char *path,
 		strcpy(path + dirLen + 1, name);
 	}
 
-	//TRACE(("rld.so: try_open_container(): %s\n", path));
+	TRACE(("runtime_loader: try_open_container(): %s\n", path));
 
 	return _kern_open(-1, path, O_RDONLY, 0);
 }
@@ -127,8 +135,8 @@ search_executable_in_path_list(const char *name, const char *pathList,
 	const char *pathListEnd = pathList + pathListLen;
 	status_t status = B_ENTRY_NOT_FOUND;
 
-	//TRACE(("rld.so: search_container_in_path_list() %s in %.*s\n", name,
-	//	pathListLen, pathList));
+	TRACE(("runtime_loader: search_container_in_path_list() %s in %.*s\n", name,
+		pathListLen, pathList));
 
 	while (pathListLen > 0) {
 		const char *pathEnd = pathList;
@@ -169,7 +177,15 @@ open_executable(char *name, image_type type, const char *rpath)
 
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
-		return _kern_open(-1, name, O_RDONLY, 0);
+		fd = _kern_open(-1, name, O_RDONLY, 0);
+		if (fd >= 0 || type != B_LIBRARY_IMAGE)
+			return fd;
+
+		// Even though ELF specs don't say this, we give shared libraries
+		// another chance and look them up in the usual search paths - at
+		// least that seems to be what BeOS does, and since it doesn't hurt...
+		paths = strrchr(name, '/');
+		memmove(name, paths, strlen(paths) + 1);
 	}
 
 	// first try rpath (DT_RPATH)
@@ -202,7 +218,7 @@ open_executable(char *name, image_type type, const char *rpath)
 
 	if (fd >= 0) {
 		// we found it, copy path!
-		//TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
+		TRACE(("runtime_loader: open_container(%s): found at %s\n", name, buffer));
 		strlcpy(name, buffer, PATH_MAX);
 	}
 

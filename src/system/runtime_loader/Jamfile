@@ -8,7 +8,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirCcFlags -fno-builtin ;
 SubDirC++Flags -fno-builtin -fno-exceptions ;
 
-# needed for rld.so only
+# needed for "runtime_loader" only
 StaticLibrary libruntime_loader.a :
 	kernel_vsprintf.c
 	:
