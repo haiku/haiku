@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src tests add-ons kernel network ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseLegacyHeaders network ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 UsePrivateHeaders net ;
 
 # the network stack tester app
