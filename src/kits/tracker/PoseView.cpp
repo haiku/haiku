@@ -210,7 +210,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fSelectionChangedHook(false),
 	fSavePoseLocations(true),
 	fShowHideSelection(true),
-	fOkToMapIcons(true),
+	fOkToMapIcons(false),
 	fEnsurePosesVisible(false),
 	fShouldAutoScroll(true),
 	fIsDesktopWindow(false),
@@ -1708,7 +1708,7 @@ BPoseView::CreatePoses(Model **models, PoseInfo *poseInfoArray, int32 count,
 					Invalidate(poseBounds);
 
 				// if this is the first item then we set extent here
-				if (fPoseList->CountItems() == 1)
+				if (!fExtent.IsValid())
 					fExtent = poseBounds;
 				else
 					AddToExtent(poseBounds);

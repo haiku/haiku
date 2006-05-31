@@ -244,6 +244,8 @@ inline void
 BPose::SetLocation(BPoint point)
 {
 	fLocation = BPoint(floorf(point.x), floorf(point.y));
+if (isinff(fLocation.x) || isinff(fLocation.y))
+debugger("BPose::SetLocation() - infinite location");
 	fHasLocation = true;
 }
 
