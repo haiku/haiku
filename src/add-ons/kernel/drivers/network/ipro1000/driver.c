@@ -73,6 +73,7 @@ identify_device(const pci_info *info)
 		case 0x1079: return "82546GB COPPER";
 		case 0x107A: return "82546GB FIBER";
 		case 0x107B: return "82546GB SERDES";
+		case 0x107C: return "82541PI";
 		default: return 0;
 	}
 }

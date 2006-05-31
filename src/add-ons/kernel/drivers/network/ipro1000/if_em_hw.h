@@ -366,6 +366,7 @@ int32_t em_set_d3_lplu_state(struct em_hw *hw, boolean_t active);
 #define E1000_DEV_ID_82546GB_FIBER       0x107A
 #define E1000_DEV_ID_82546GB_SERDES      0x107B
 #define E1000_DEV_ID_82547EI             0x1019
+#define E1000_DEV_ID_82541PI             0x107C
 
 #define NODE_ADDRESS_SIZE 6
 #define ETH_LENGTH_OF_ADDRESS 6

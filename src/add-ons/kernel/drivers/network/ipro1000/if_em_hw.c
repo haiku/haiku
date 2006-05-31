@@ -257,6 +257,7 @@ em_set_mac_type(struct em_hw *hw)
         break;
     case E1000_DEV_ID_82541ER:
     case E1000_DEV_ID_82541GI:
+    case E1000_DEV_ID_82541PI:
     case E1000_DEV_ID_82541GI_MOBILE:
         hw->mac_type = em_82541_rev_2;
         break;
