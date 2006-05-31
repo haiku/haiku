@@ -35,8 +35,8 @@ using namespace BPrivate::Storage::Mime;
 using namespace std;
 
 const char *B_PEF_APP_MIME_TYPE		= "application/x-be-executable";
-const char *B_PE_APP_MIME_TYPE		= "application/x-vnd.be-peexecutable";
-const char *B_ELF_APP_MIME_TYPE		= "application/x-vnd.be-elfexecutable";
+const char *B_PE_APP_MIME_TYPE		= "application/x-vnd.Be-peexecutable";
+const char *B_ELF_APP_MIME_TYPE		= "application/x-vnd.Be-elfexecutable";
 const char *B_RESOURCE_MIME_TYPE	= "application/x-be-resource";
 const char *B_FILE_MIME_TYPE		= "application/octet-stream";
 // Might be defined platform depended, but ELF will certainly be the common
