@@ -299,12 +299,12 @@ BScrollBar::SetValue(float value)
 	if (value < fMin)
 		value = fMin;
 
-	fValue = value;
+	fValue = roundf(value);
 
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
 
-	ValueChanged(value);
+	ValueChanged(fValue);
 }
 
 // Value
@@ -323,11 +323,11 @@ BScrollBar::ValueChanged(float newValue)
 		BRect targetBounds = fTarget->Bounds();
 		// if vertical, check bounds top and scroll if different from newValue
 		if (fOrientation == B_VERTICAL && targetBounds.top != newValue) {
-			fTarget->ScrollTo(targetBounds.left, newValue);
+			fTarget->ScrollBy(0.0, newValue - targetBounds.top);
 		}
 		// if horizontal, check bounds left and scroll if different from newValue
 		if (fOrientation == B_HORIZONTAL && targetBounds.left != newValue) {
-			fTarget->ScrollTo(newValue, targetBounds.top);
+			fTarget->ScrollBy(newValue - targetBounds.left, 0.0);
 		}
 	}
 
@@ -371,6 +371,14 @@ BScrollBar::Proportion() const
 void
 BScrollBar::SetRange(float min, float max)
 {
+	if (min > max || isnanf(min) || isnanf(max) || isinff(min) || isinff(max)) {
+		min = 0;
+		max = 0;
+	}
+
+	min = roundf(min);
+	max = roundf(max);
+
 	if (fMin == min && fMax == max)
 		return;
 
@@ -378,7 +386,7 @@ BScrollBar::SetRange(float min, float max)
 	fMax = max;
 
 	if (fValue < fMin || fValue > fMax)
-		ValueChanged(fValue);
+		SetValue(fValue);
 	else {
 		_UpdateThumbFrame();
 		Invalidate();
@@ -404,15 +412,15 @@ BScrollBar::SetSteps(float smallStep, float largeStep)
 	
 	// The BeBook also says that we need to specify an integer value even though the step
 	// values are floats. For the moment, we'll just make sure that they are integers
-	fSmallStep = (int32)smallStep;
-	fLargeStep = (int32)largeStep;
+	fSmallStep = roundf(smallStep);
+	fLargeStep = roundf(largeStep);
 
 	// TODO: test use of fractional values and make them work properly if they don't
 }
 
 // GetSteps
 void
-BScrollBar::GetSteps(float *smallStep, float *largeStep) const
+BScrollBar::GetSteps(float* smallStep, float* largeStep) const
 {
 	if (smallStep)
 		*smallStep = fSmallStep;
@@ -543,8 +551,9 @@ BScrollBar::MouseDown(BPoint where)
 			fPrivateData->fExitRepeater = false;
 			fPrivateData->fThumbInc = scrollValue;
 			fPrivateData->fDoRepeat = true;
-			fPrivateData->fRepeaterThread = spawn_thread(fPrivateData->button_repeater_thread,
-														 "scroll repeater", B_NORMAL_PRIORITY, fPrivateData);
+			fPrivateData->fRepeaterThread
+				= spawn_thread(fPrivateData->button_repeater_thread,
+							   "scroll repeater", B_NORMAL_PRIORITY, fPrivateData);
 			resume_thread(fPrivateData->fRepeaterThread);
 		}
 	}
