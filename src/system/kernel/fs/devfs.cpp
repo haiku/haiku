@@ -1580,13 +1580,13 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 			case B_GET_DRIVER_FOR_DEVICE:
 			{
 				const char *dpath;
-				if (!S_ISCHR(vnode->stream.type))
-					return B_NOT_ALLOWED;
+				if (!vnode->stream.u.dev.driver)
+					return B_ENTRY_NOT_FOUND;
 				dpath = vnode->stream.u.dev.driver->path;
 				if (!dpath)
 					return B_ENTRY_NOT_FOUND;
 				// should make sure it's \0 terminated on truncation
-				return user_memcpy(buffer, dpath, strnlen(dpath, 256));
+				return user_memcpy(buffer, dpath, strnlen(dpath, 255)+1);
 			}
 
 			case B_GET_PARTITION_INFO:
@@ -1605,20 +1605,15 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 			case B_GET_PATH_FOR_DEVICE:
 			{
-				const char *dmp = "/dev/";
-				KPath path(dmp);
-				char *pbuf;
+				char path[256];
 				status_t err;
 				/* XXX: we might want to actually find the mountpoint
 				 * of that instance of devfs...
 				 * but for now we assume it's mounted on /dev
 				 */
-				if (path.InitCheck() != B_OK)
-					return B_NO_MEMORY;
-				pbuf = path.LockBuffer();
-				get_device_name(vnode, pbuf+strlen(dmp), path.BufferSize()-strlen(dmp));
-				err = user_memcpy(buffer, pbuf, strnlen(pbuf, 256));
-				path.UnlockBuffer();
+				strcpy(path, "/dev/");
+				get_device_name(vnode, path+5, sizeof(path)-5);
+				err = user_memcpy(buffer, path, strnlen(path, sizeof(path)-1)+1);
 				return err;
 			}
 
