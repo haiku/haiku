@@ -296,7 +296,7 @@ BWindow::BWindow(BMessage* data)
 
 	BMessage msg;
 	int32 i = 0;
-	while ( data->FindMessage("_views", i++, &msg) == B_OK){ 
+	while (data->FindMessage("_views", i++, &msg) == B_OK) { 
 		BArchivable *obj = instantiate_object(&msg);
 		BView *child = dynamic_cast<BView *>(obj);
 		if (child)
@@ -372,47 +372,62 @@ BWindow::Instantiate(BMessage *data)
 status_t
 BWindow::Archive(BMessage* data, bool deep) const
 {
-	status_t retval = BLooper::Archive(data, deep);
-	if (retval != B_OK)
-		return retval;
+	status_t ret = BLooper::Archive(data, deep);
 
-	data->AddRect("_frame", fFrame);
-	data->AddString("_title", fTitle);
-	data->AddInt32("_wlook", fLook);
-	data->AddInt32("_wfeel", fFeel);
-	if (fFlags)
-		data->AddInt32("_flags", fFlags);
-	data->AddInt32("_wspace", (uint32)Workspaces());
+	if (ret == B_OK)
+		ret = data->AddRect("_frame", fFrame);
+	if (ret == B_OK)
+		ret = data->AddString("_title", fTitle);
+	if (ret == B_OK)
+		ret = data->AddInt32("_wlook", fLook);
+	if (ret == B_OK)
+		ret = data->AddInt32("_wfeel", fFeel);
+	if (ret == B_OK && fFlags != 0)
+		ret = data->AddInt32("_flags", fFlags);
+	if (ret == B_OK)
+		ret = data->AddInt32("_wspace", (uint32)Workspaces());
 
-	if (!_ComposeType(fLook, fFeel))
-		data->AddInt32("_type", (uint32)Type());
+	if (ret == B_OK && !_ComposeType(fLook, fFeel))
+		ret = data->AddInt32("_type", (uint32)Type());
 
 	if (fMaxZoomWidth != 32768.0 || fMaxZoomHeight != 32768.0) {
-		data->AddFloat("_zoom", fMaxZoomWidth);
-		data->AddFloat("_zoom", fMaxZoomHeight);
+		if (ret == B_OK)
+			ret = data->AddFloat("_zoom", fMaxZoomWidth);
+		if (ret == B_OK)
+			ret = data->AddFloat("_zoom", fMaxZoomHeight);
 	}
 
 	if (fMinWidth != 0.0 || fMinHeight != 0.0 
 		|| fMaxWidth != 32768.0 || fMaxHeight != 32768.0) {
-		data->AddFloat("_sizel", fMinWidth);
-		data->AddFloat("_sizel", fMinHeight);
-		data->AddFloat("_sizel", fMaxWidth);
-		data->AddFloat("_sizel", fMaxHeight);
+		if (ret == B_OK)
+			ret = data->AddFloat("_sizel", fMinWidth);
+		if (ret == B_OK)
+			ret = data->AddFloat("_sizel", fMinHeight);
+		if (ret == B_OK)
+			ret = data->AddFloat("_sizel", fMaxWidth);
+		if (ret == B_OK)
+			ret = data->AddFloat("_sizel", fMaxHeight);
 	}
 
-	if (fPulseRate != 500000)
+	if (ret == B_OK && fPulseRate != 500000)
 		data->AddInt64("_pulse", fPulseRate);
 
-	if (deep) {
+	if (ret == B_OK && deep) {
 		int32 noOfViews = CountChildren();
 		for (int32 i = 0; i < noOfViews; i++){
 			BMessage childArchive;
-			if (ChildAt(i)->Archive(&childArchive, deep) == B_OK)
-				data->AddMessage("_views", &childArchive);
+			ret = ChildAt(i)->Archive(&childArchive, true);
+			if (ret == B_OK)
+				ret = data->AddMessage("_views", &childArchive);
+			if (ret != B_OK)
+				break;
 		}
 	}
 
-	return B_OK;
+	if (ret == B_OK)
+		ret = data->AddString("class", "BWindow");
+
+	return ret;
 }
 
 
@@ -1039,6 +1054,8 @@ FrameMoved(origin);
 				for (int32 i = 0; i < count; i++) {
 					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
 						view->_Draw(updateRect);
+					else
+						printf("_UPDATE_ - didn't find view by token: %ld\n", (int32)tokens.ItemAtFast(i));
 				}
 				// TODO: the tokens are actually hirachically sorted,
 				// so traversing the list in revers and calling
