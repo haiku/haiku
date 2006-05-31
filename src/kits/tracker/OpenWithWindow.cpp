@@ -1502,7 +1502,7 @@ SearchForSignatureEntryList::CanOpenWithFilter(const Model *appModel,
 		return false;
 	}
 
-	if (strcmp(appModel->MimeType(), B_APP_MIME_TYPE) != 0) {
+	if (strcasecmp(appModel->MimeType(), B_APP_MIME_TYPE) != 0) {
 		// filter out pe containers on PPC etc.
 		return false;
 	}
