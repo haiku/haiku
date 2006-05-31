@@ -320,11 +320,11 @@ rule UseLibraryHeaders
 
 rule UseLegacyHeaders
 {
-	# usage: UseLegacyHeaders ;
+	# usage: UseLegacyHeaders <group list> ;
 	#
 	# NOTE: This rule must be invoked *before* the rule that builds the objects.
 
-	UseHeaders [ FDirName $(HAIKU_TOP) headers legacy ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers legacy $(1) ] : true ;
 }
 
 rule UseLegacyObjectHeaders
