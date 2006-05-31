@@ -294,7 +294,8 @@ BDeskWindow::AddTrashContextMenu()
 		new BMessage(kEmptyTrash)));
 	fTrashContextMenu->AddItem(new BMenuItem("Open",
 		new BMessage(kOpenSelection), 'O'));
-	fTrashContextMenu->AddItem(new BMenuItem("Get Info", new BMessage(kGetInfo), 'I'));
+	fTrashContextMenu->AddItem(new BMenuItem("Get Info",
+		new BMessage(kGetInfo), 'I'));
 	fTrashContextMenu->SetTargetForItems(PoseView());
 }
 
