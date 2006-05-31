@@ -73,14 +73,18 @@ static void dump_geom(int dev, bool bios)
 	puts("");
 }
 
-static void dump_other(int dev)
+static void dump_misc(int dev)
 {
 	char path[B_PATH_NAME_LENGTH];
-	if (ioctl(dev, B_GET_DRIVER_FOR_DEVICE, path, sizeof(path)) >= 0) {
+	if (ioctl(dev, B_GET_DRIVER_FOR_DEVICE, path, sizeof(path)) < 0) {
+		perror("ioctl(B_GET_DRIVER_FOR_DEVICE)");
+	} else {
 		printf("driver:\t%s\n", path);
 	}
 #ifdef __HAIKU__
-	if (ioctl(dev, B_GET_PATH_FOR_DEVICE, path, sizeof(path)) >= 0) {
+	if (ioctl(dev, B_GET_PATH_FOR_DEVICE, path, sizeof(path)) < 0) {
+		perror("ioctl(B_GET_PATH_FOR_DEVICE)");
+	} else {
 		printf("device path:\t%s\n", path);
 	}
 #endif
@@ -104,6 +108,6 @@ int main(int argc, char **argv)
 	dump_media_status(dev);
 	dump_geom(dev, false);
 	dump_geom(dev, true);
-	dump_other(dev);
+	dump_misc(dev);
 	return 0;
 }
