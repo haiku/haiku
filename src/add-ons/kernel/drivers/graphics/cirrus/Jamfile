@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics cirrus ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics cirrus ] ;
+
+KernelAddon cirrus.driver : kernel drivers bin :
+	driver.c
+;
+
+Package haiku-cirrus-cvs :
+	README.html UPDATE.html ;
+Package haiku-cirrus-cvs :
+	skel.driver : 
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-cirrus-cvs : graphics cirrus.driver ;
+Package haiku-cirrus-cvs :
+	cirrus.settings :
+	boot home config settings kernel drivers ;
+

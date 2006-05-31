@@ -1,0 +1,150 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
+	<meta name="GENERATOR" content="The DarkSite">
+	<title>Readme for Haiku skeleton graphics driver</title>
+</head>
+<body>
+<h2 align="center">Haiku skeleton graphics driver</h2></align><br><br>
+<hr>
+<h3><strong>NOTE PLEASE:</strong><br>
+You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
+<hr>
+<h2>Supported cards (as far as is known):</h2>
+<ul>
+	<li>None.
+</ul>
+<br>
+<hr>
+<h2>Features:</h2>
+<ul>
+	<li>None.
+</ul>
+<strong>Known limitations:</strong> 
+<ul>
+	<li>Everything you can think of.
+</ul>
+<br>
+<hr>
+<h2>Installation:</h2>
+<br>
+In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
+BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku skeleton graphics driver.<br>
+<br>
+<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the skel.settings file...<br>
+<br><br>
+<strong>actual INSTALLATION:</strong><br>
+<br>
+Doubleclick on the install.sh file and follow the instructions. You have to reboot in order to load the driver. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
+<br>
+<br>
+<strong>alternate INSTALLATION method:</strong><br>
+<br>
+Unzip the zip file that contains the driver to the root folder. Now reboot and you should be using the new driver.<br>
+<br>
+<br>
+<strong>DE-INSTALLATION:</strong><br>
+<br>
+Currently there's no uninstall script included. Just do it manually:<br>
+<br>
+Delete the <strong>skel.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
+Delete the <strong>skel.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>skel.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+Delete the <strong>skel.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>skel.driver</strong>.<br>
+<br>
+You have to reboot in order to apply the original configuration.<br>
+<br>
+<br>
+<hr>
+<a name="settings"></a><h2>Settings:</h2><br>
+Please read this information carefully *before* installing and using the Haiku skeleton graphics driver. It might spare you some trouble afterwards..<br>
+<p>The driver uses a file named <strong>skel.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
+<br>
+<strong>Note:</strong> The driver only reads this file during it's initialisation. This means that you have to reboot in order to let changes take effect.<br>
+<br>
+<br>
+<br>
+<strong>skel.settings driver configuration:</strong><br>
+<ul>
+	<li><strong>usebios:</strong><br>
+The name of this item may be somewhat misleading, it might be changed in the future. It actually tells the driver if it should coldstart the card or not. The driver will rely on the VGA BIOS to have coldstarted the card before BeOS booted if you specify 'true'.<br>
+To make things look even more complex the driver might actually use the BIOS to determine your cards specifications on *both* possible settings.
+	<ul>
+		<li><strong>false:</strong><br>
+		If you specify <strong>usebios false</strong> the driver will attempt to coldstart the card, which is the preferred way of doing it because of the better tuned setup if all is right. Unfortunately there's not enough info available to make this work reliably, so it's not used by default. This setting would enable you to use your card as a secondary card in your system. Be advised though that BeOS officially does not (yet) support multiple VGA cards, so you need special software in order to be able to actually use it (a video consumer node for instance).
+		<li><strong>true:</strong> (default setting)<br>
+		Specify <strong>usebios true</strong> unless you want to try to use a card as a secondary card in your system.
+	</ul>
+	<li><strong>memory:</strong> (disabled by default)<br>
+		This option enables you to override the 'memory amount autodetection' of the driver. If autodetection is working incorrect, you can manually set the amount this way. You could also lower the amount of RAM to a lower value than actually there to test with for instance overlay use in applications. So this option is probably mostly of interest to developers. Specify the RAM amount in Mb (use only 'whole' numbers!).<br>
+This option is disabled by default (preceded by a '#').<br>
+<li><strong>hardcursor:</strong><br>
+	A hardcursor is nessesary for DirectWindow windowed mode support.
+	<ul>
+		<li><strong>false:</strong><br>
+		If you have trouble with the hardcursor (on one or both of the heads), select <strong>hardcursor false</strong>. Make sure you let me know about the hardcursor trouble also: this should not happen!
+		<li><strong>true:</strong> (default setting)<br>
+		A software cursor 'flickers' a bit sometimes because it has to be redrawn constantly. So <strong>hardcursor true</strong> is the preferred setting. For DirectWindow windowed mode functionality you need to use this setting also (Chart demo app for instance).
+	</ul>
+<li><strong>logmask:</strong> (set to minimal by default)<br>
+The logmask option is very handy to track down trouble in the driver. You should only enable this if you are doing so, otherwise keep it turned off because it slows down your system. (All lines have a '#' preceding 'logmask' by default.) Logging creates a logfile called <strong>skel.accelerant.0.log</strong> in your <strong>~ (home)</strong> folder. A second logfile may get created depending on how the driver is used (on cloning; for BWindowScreen for example). The second file is called <strong>skel.accelerant.1.log</strong>, and it will also be in your home folder.<br>
+<strong>Note:</strong>
+<ul>
+<li>You may only enable *one* logmask-line. The value you place after it (hexadecimal 32bit) determines what will be logged. The first 7 digits determine the part of the driver that will be logging, the last single digit determines the level of logging (like 'all messages', or only 'error messages').
+</ul>
+<li><strong>dumprom:</strong><br>
+Dumprom is another 'tool' for bug-tracking purposes.
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+		Keep it set to <strong>dumprom false</strong>, unless you want the driver to dump the contents of your VGA BIOS ROM in a file.
+		<li><strong>true:</strong><br>
+		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>skel.rom</strong> in your <strong>~ (home)</strong> folder.
+	</ul>
+<li><strong>switchhead:</strong><br>
+The driver always autodetects which output should be used as primary one, but you can let the driver 'invert' the outcome of that detection with this option (only for dualhead cards).
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+		Keep it set to <strong>switchhead false</strong>, unless you feel you want the card's other output to be used as primary one. Note that if a single connected screen is found, that screen will be the driver's primary output with this setting.
+		<li><strong>true:</strong><br>
+		<strong>switchhead true</strong> lets the driver 'invert' the output assignments for all modes. Use only when you have two screens connected, otherwise the one connected screen will remain black as the other (not connected) output is being used.<br>
+	</ul>
+<strong>Note:</strong>
+<ul>
+	<li>If the driver determines it cannot use a digital panel <strong>despite</strong> it being physically connected and powered on, using the switchhead option will not fix this. This is no fault in your card or the panel, but happens only because the driver relies on certain functions inside your cards BIOS to behave in a certain way.
+</ul>
+	<li><strong>force_pci:</strong><br>
+On AGP cards you can block the use of AGP mode transfers.
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+Keep this option set to <strong>force_pci false</strong>, unless the graphics card or motherboard has trouble using AGP.
+		<li><strong>true:</strong><br>
+<strong>force_pci true</strong> prevents the graphicsdriver from activating AGP mode, so it will be using PCI mode like it has always been in the past. The downside of this is that this comes at a performance penalty if your motherboard supports the AGP 'fastwrite' (FW) option, which won't be utilized with this setting.
+	</ul>
+<strong>Note:</strong>
+<ul>
+	<li>If you have trouble using AGP mode, you should prefer tweaking the AGP busmanager settings file as it might well enable you to use a 'lesser' AGP mode instead of falling back to PCI mode alltogether. 
+</ul>
+	<li><strong>unhide_fw:</strong><br>
+This option is only used if your card is running in AGP mode. It's a real <strong>tweak</strong> option. It's officially unsupported, and it's unknown if it can do harm to your card or system. It exists because using it <strong>can</strong> speedup unaccelerated graphics <strong>a lot</strong>. Think about video playback or playing quake2 in software rendering mode...
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+Keep this option set to <strong>unhide_fw false</strong> unless you are certain you want to try the 'unsupported' graphics speedup. On cards supporting FW by default the unhide_fw option has no effect.
+		<li><strong>true:</strong><br>
+If you have an older card that officially doesn't support the AGP FW feature, you could possibly get this feature anyway by setting <strong>unhide_fw true</strong>. Please <strong>make sure</strong> that at the first sign of trouble (system hanging, displaying artifacts, etc) you disable this feature here again, or you might risk <strong>destroying</strong> your card and/or AGP slot.
+	</ul>
+	<li><strong>pgm_panel:</strong><br>
+This option only has an effect if you have a laptop panel or DVI panel connected. It's existing because it's currently impossible to setup the driver in a way every single panel outthere is happy about it.
+	<ul>
+		<li><strong>false:</strong><br>
+If you select <strong>pgm_panel false</strong> the driver will not program the panel's pixelclock (refreshrate). Instead it relies on your cardBIOS to have done that correctly. While this is probably the case, it might introduce some displaying errors every now and then.
+		<li><strong>true:</strong> (default setting)<br>
+With the <strong>pgm_panel true</strong> setting, the driver will fix your panel's refreshrate to 60Hz. While this should be working on all panels outthere, some panels are particular picky about refreshrates below 60.0Hz (they shut off), and some other panels are particular picky about refreshrates above 60.0Hz (they shut off). While the driver requests the hardware to set 60.0Hz, this isn't exactly possible, so the actual setting is <strong>bound</strong> to be a tiny bit below or above 60.0Hz.
+	</ul>
+</ul>
+
+<hr>
+<br>
+<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
+<p>(Page last updated on November 4, 2004)</p>
+</body>
+</html>
