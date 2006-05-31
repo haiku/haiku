@@ -58,7 +58,6 @@ DesktopSettings::Private::_SetDefaults()
 	strlcpy(fMenuInfo.f_family, fPlainFont.Family(), B_FONT_FAMILY_LENGTH);
 	strlcpy(fMenuInfo.f_style, fPlainFont.Style(), B_FONT_STYLE_LENGTH);
 	fMenuInfo.font_size = fPlainFont.Size();
-	// TODO:
 	fMenuInfo.background_color.set_to(216, 216, 216);
 	
 	// look of the separator (R5: (0, 1, 2), default 0)
@@ -163,6 +162,63 @@ DesktopSettings::Private::_Load()
 		}
 	}
 
+	// read mouse settings
+
+	path = basePath;
+	path.Append("mouse");
+	
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status == B_OK) {
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status == B_OK) {
+			int32 mode;
+			if (settings.FindInt32("mode", &mode) == B_OK) {
+				fMouseMode = (mode_mouse)mode;
+			}
+		}
+	}
+
+	// read appearance settings
+
+	path = basePath;
+	path.Append("appearance");
+	
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status == B_OK) {
+		BMessage settings;
+		status = settings.Unflatten(&file);
+		if (status == B_OK) {
+			float fontSize;
+			if (settings.FindFloat("font size", &fontSize) == B_OK)
+				fMenuInfo.font_size = fontSize;
+				
+			const char* fontFamily;
+			if (settings.FindString("font family", &fontFamily) == B_OK)
+				strlcpy(fMenuInfo.f_family, fontFamily, B_FONT_FAMILY_LENGTH);
+
+			const char* fontStyle;
+			if (settings.FindString("font style", &fontStyle) == B_OK)
+				strlcpy(fMenuInfo.f_style, fontStyle, B_FONT_STYLE_LENGTH);
+
+			rgb_color bgColor;
+			if (settings.FindInt32("bg color", (int32*)&bgColor) == B_OK)
+				fMenuInfo.background_color = bgColor;
+
+			int32 separator;
+			if (settings.FindInt32("separator", &separator) == B_OK)
+				fMenuInfo.separator = separator;
+
+			bool clickToOpen;
+			if (settings.FindBool("click to open", &clickToOpen) == B_OK)
+				fMenuInfo.click_to_open = clickToOpen;
+
+			bool triggersAlwaysShown;
+			if (settings.FindBool("triggers always shown", &triggersAlwaysShown) == B_OK)
+				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
+		}
+	}
+
 	return B_OK;
 }
 
@@ -209,6 +265,41 @@ DesktopSettings::Private::Save(uint32 mask)
 			settings.AddString("fixed family", fFixedFont.Family());
 			settings.AddString("fixed style", fFixedFont.Style());
 			settings.AddFloat("fixed size", fFixedFont.Size());
+
+			BFile file;
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			if (status == B_OK) {
+				status = settings.Flatten(&file, NULL);
+			}
+		}
+	}
+
+	if (mask & kMouseSettings) {
+		BPath path(basePath);
+		if (path.Append("mouse") == B_OK) {
+			BMessage settings('asms');
+			settings.AddInt32("mode", (int32)fMouseMode);
+
+			BFile file;
+			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
+			if (status == B_OK) {
+				status = settings.Flatten(&file, NULL);
+			}
+		}
+	}
+
+	if (mask & kAppearanceSettings) {
+		BPath path(basePath);
+		if (path.Append("appearance") == B_OK) {
+			BMessage settings('aslk');
+			settings.AddFloat("font size", fMenuInfo.font_size);
+			settings.AddString("font family", fMenuInfo.f_family);
+			settings.AddString("font style", fMenuInfo.f_style);
+			settings.AddInt32("bg color", (const int32&)fMenuInfo.background_color);
+			settings.AddInt32("separator", fMenuInfo.separator);
+			settings.AddBool("click to open", fMenuInfo.click_to_open);
+			settings.AddBool("triggers always shown", fMenuInfo.triggers_always_shown);
+			// TODO: more appearance settings
 
 			BFile file;
 			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
@@ -301,6 +392,7 @@ void
 DesktopSettings::Private::SetMouseMode(const mode_mouse mode)
 {
 	fMouseMode = mode;
+	Save(kMouseSettings);
 }
 
 

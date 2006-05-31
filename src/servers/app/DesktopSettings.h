@@ -23,7 +23,8 @@ enum {
 	kAllSettings		= 0xff,
 	kWorkspacesSettings	= 0x01,
 	kFontSettings		= 0x02,
-	kAppearanceSettings	= 0x04
+	kAppearanceSettings	= 0x04,
+	kMouseSettings		= 0x08,
 };
 
 class DesktopSettings {
