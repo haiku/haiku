@@ -1060,7 +1060,9 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 	// Build and send the message, read the reply
 
 	BMessage msg(B_REG_MIME_GET_INSTALLED_TYPES);
-	status_t err = msg.AddString("supertype", supertype);
+	status_t err = B_OK;
+	if (supertype != NULL)
+		err = msg.AddString("supertype", supertype);
 	if (!err)
 		err = BRoster::Private().SendTo(&msg, types, true);
 	if (!err)
