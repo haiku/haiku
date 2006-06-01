@@ -553,6 +553,7 @@ map_backing_store(vm_address_space *addressSpace, vm_store *store, void **_virtu
 		newCache->scan_skip = cache->scan_skip;
 
 		newCache->source = cache;
+		vm_cache_acquire_ref(cacheRef);
 
 		cache = newCache;
 		cacheRef = cache->ref;
@@ -1271,8 +1272,13 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 			address, sourceArea->cache_offset, sourceArea->size, addressSpec,
 			sourceArea->wiring, protection, mapping, &newArea, name);
 	}
-	if (status == B_OK)
+	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
+		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
+		// to create a new ref, and has therefore already acquired a reference
+		// to the source cache - but otherwise it has no idea that we need
+		// one.
 		vm_cache_acquire_ref(sourceArea->cache_ref);
+	}
 
 	vm_put_area(sourceArea);
 	vm_put_address_space(addressSpace);
@@ -1540,7 +1546,11 @@ vm_copy_area(team_id addressSpaceID, const char *name, void **_address, uint32 a
 	if (status < B_OK)
 		goto err;
 
-	vm_cache_acquire_ref(cacheRef);
+	if (!writableCopy) {
+		// map_backing_store() cannot know it has to acquire a ref to
+		// the store for REGION_NO_PRIVATE_MAP
+		vm_cache_acquire_ref(cacheRef);
+	}
 
 	// If the source area is writable, we need to move it one layer up as well
 
