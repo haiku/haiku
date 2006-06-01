@@ -267,7 +267,7 @@ SGIView::Draw(BRect area)
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
 	
-	const char* text = "OpenBeOS SGI Image Translator";
+	const char* text = "SGI Image Translator";
 	DrawString(text, BPoint(xbold, ybold));
 
 	SetFont(be_plain_font);

@@ -193,7 +193,7 @@ TIFFView::Draw(BRect area)
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
 	
-	char title[] = "OpenBeOS TIFF Image Translator";
+	char title[] = "TIFF Image Translator";
 	DrawString(title, BPoint(xbold, ybold));
 	
 	SetFont(be_plain_font);

@@ -489,7 +489,7 @@ virtual	void Draw(
 				xbold = fh.descent + 1;
 				ybold = fh.ascent + fh.descent * 2 + fh.leading;
 	
-				char title[] = "OpenBeOS PPM Image Translator";
+				char title[] = "PPM Image Translator";
 				DrawString(title, BPoint(xbold, ybold));
 	
 				SetFont(be_plain_font);

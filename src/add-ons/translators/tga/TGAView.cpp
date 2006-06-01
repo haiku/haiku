@@ -180,7 +180,7 @@ TGAView::Draw(BRect area)
 	xbold = fh.descent + 1;
 	ybold = fh.ascent + fh.descent * 2 + fh.leading;
 	
-	char title[] = "OpenBeOS TGA Image Translator";
+	char title[] = "TGA Image Translator";
 	DrawString(title, BPoint(xbold, ybold));
 	
 	SetFont(be_plain_font);
@@ -196,9 +196,9 @@ TGAView::Draw(BRect area)
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(TGA_TRANSLATOR_VERSION)),
 		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
-/*	char copyright[] = "© 2002 OpenBeOS Project";
+/*	char copyright[] = "© 2002 Haiku Project";
 	DrawString(copyright, BPoint(xbold, yplain * 2 + ybold));
 */	
-	char writtenby[] = "Written by the OBOS Translation Kit Team";
+	char writtenby[] = "Written by the Haiku Translation Kit Team";
 	DrawString(writtenby, BPoint(xbold, yplain * 7 + ybold));
 }
