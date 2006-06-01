@@ -24,6 +24,41 @@
 #define CHARS_TABLE_MAXSIZE  10000
 
 
+void
+dump_map(FILE* file, const char* name, int32* map)
+{
+	fprintf(file, "\t%s:{\n", name);
+
+	for (uint32 i = 0; i < 16; i++) {
+		fprintf(file, "\t\t");
+		for (uint32 j = 0; j < 8; j++) {
+			fprintf(file, "0x%04lx,%s", map[i * 8 + j], j < 7 ? " " : "");
+		}
+		fprintf(file, "\n");
+	}
+	fprintf(file, "\t},\n");
+}
+
+
+void
+dump_keys(FILE* file, const char* name, int32* keys)
+{
+	fprintf(file, "\t%s:{\n", name);
+
+	for (uint32 i = 0; i < 4; i++) {
+		fprintf(file, "\t\t");
+		for (uint32 j = 0; j < 8; j++) {
+			fprintf(file, "0x%04lx,%s", keys[i * 8 + j], j < 7 ? " " : "");
+		}
+		fprintf(file, "\n");
+	}
+	fprintf(file, "\t},\n");
+}
+
+
+//	#pragma mark -
+
+
 Keymap::Keymap()
 	:
 	fChars(NULL),
@@ -65,11 +100,14 @@ Keymap::GetKey(char *chars, int32 offset, char* string)
 		default:
 			// n-byte UTF-8/ASCII character
 			sprintf(str, "0x");
-			for (int i=0; i<size; i++)
+			for (int i = 0; i < size; i++) {
 				sprintf(str + 2*(i+1), "%02x", (uint8)chars[offset+i]);
+			}
 			break;
 	}
-	strncpy(string, str, (strlen(str) < 12) ? strlen(str) : 12);
+
+	strncpy(string, str, strlen(str) < 12 ? strlen(str) : 12);
+		// TODO: Huh?
 }
 
 
@@ -235,10 +273,9 @@ Keymap::LoadCurrent()
 #ifdef __BEOS__
 	key_map *keys = NULL;
 	get_key_map(&keys, &fChars);
-	if (!keys) {
-		fprintf(stderr, "error while getting current keymap!\n");
+	if (!keys)
 		return B_ERROR;
-	}
+
 	memcpy(&fKeys, keys, sizeof(fKeys));
 	free(keys);
 	return B_OK;
@@ -264,10 +301,8 @@ Keymap::Load(entry_ref &ref)
 	status_t err;
 
 	BFile file(&ref, B_READ_ONLY);
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+	if ((err = file.InitCheck()) != B_OK)
 		return err;
-	}
 
 	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
@@ -351,15 +386,18 @@ Keymap::LoadSourceFromRef(entry_ref &ref)
 	status_t err;
 	
 	BFile file(&ref, B_READ_ONLY);
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+	if ((err = file.InitCheck()) != B_OK)
 		return err;
-	}
 	
 	int fd = file.Dup();
-	FILE * f = fdopen(fd, "r");
-	
-	return LoadSource(f);
+	FILE* f = fdopen(fd, "r");
+	if (f != NULL) {
+		err = LoadSource(f);
+		fclose(f);
+	} else
+		err = B_FILE_ERROR;
+
+	return err;
 }
 
 
@@ -684,174 +722,126 @@ Keymap::LoadSource(FILE * f)
 }
 	
 
-// we save a map to a file
+//! we save a map to a file
 status_t 
 Keymap::Save(entry_ref &ref)
 {
 	status_t err;
-	
+
 	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+	if ((err = file.InitCheck()) != B_OK)
 		return err;
-	}
-	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+
+	// convert to big endian
+	for (uint32 i = 0; i < sizeof(fKeys) / sizeof(uint32); i++) {
 		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
-		
-	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys)) {
-		return err;
 	}
-	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+
+	ssize_t bytesWritten = file.Write(&fKeys, sizeof(fKeys));
+
+	// convert endian back
+	for (uint32 i = 0; i < sizeof(fKeys) / sizeof(uint32); i++) {
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
-	
-	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
-	
-	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
-		return B_BAD_VALUE;
 	}
-	
-	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
-	
-	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
-		return err;
-	
+
+	if (bytesWritten < (ssize_t)sizeof(fKeys))
+		return B_ERROR;
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+
+	uint32 charSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+
+	bytesWritten = file.Write(&charSize, sizeof(uint32));
+	if (bytesWritten < (ssize_t)sizeof(uint32))
+		return B_ERROR;
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+
+	bytesWritten = file.Write(fChars, fCharsSize);
+	if (bytesWritten < (ssize_t)fCharsSize)
+		return B_ERROR;
+	if (bytesWritten < B_OK)
+		return bytesWritten;
+
 	return B_OK;
 }
 
 
-const char header_header[] =
-	"/*\tHaiku \t*/\n"
-	"/*\n"
-	" This file is generated automatically. Don't edit ! \n"
-	"*/\n\n";
-
+/*!
+	Save a keymap as C source file - this is used to get the default keymap
+	into the input_server, for example.
+*/
 void
 Keymap::SaveAsHeader(entry_ref &ref)
 {
-	status_t err;
+	BPath path;
+	status_t err = path.SetTo(&ref);
+	if (err < B_OK)
+		return;
 
-	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if ((err = file.InitCheck()) != B_OK) {
-	        printf("error %s\n", strerror(err));
-	        return;
+	FILE* file = fopen(path.Path(), "w");
+
+	fprintf(file, "/*\n"
+		" * Haiku Keymap\n"
+		" * This file is generated automatically. Don't edit!\n"
+		" */\n\n");
+	fprintf(file, "#include <InterfaceDefs.h>\n\n");
+	fprintf(file, "const key_map kSystemKeymap = {\n");
+	fprintf(file, "\tversion:%ld,\n", fKeys.version);
+	fprintf(file, "\tcaps_key:0x%lx,\n", fKeys.caps_key);
+	fprintf(file, "\tscroll_key:0x%lx,\n", fKeys.scroll_key);
+	fprintf(file, "\tnum_key:0x%lx,\n", fKeys.num_key);
+	fprintf(file, "\tleft_shift_key:0x%lx,\n", fKeys.left_shift_key);
+	fprintf(file, "\tright_shift_key:0x%lx,\n", fKeys.right_shift_key);
+	fprintf(file, "\tleft_command_key:0x%lx,\n", fKeys.left_command_key);
+	fprintf(file, "\tright_command_key:0x%lx,\n", fKeys.right_command_key);
+	fprintf(file, "\tleft_control_key:0x%lx,\n", fKeys.left_control_key);
+	fprintf(file, "\tright_control_key:0x%lx,\n", fKeys.right_control_key);
+	fprintf(file, "\tleft_option_key:0x%lx,\n", fKeys.left_option_key);
+	fprintf(file, "\tright_option_key:0x%lx,\n", fKeys.right_option_key);
+	fprintf(file, "\tmenu_key:0x%lx,\n", fKeys.menu_key);
+	fprintf(file, "\tlock_settings:0x%lx,\n", fKeys.lock_settings);
+
+	dump_map(file, "control_map", fKeys.control_map);
+	dump_map(file, "option_caps_shift_map", fKeys.option_caps_shift_map);
+	dump_map(file, "option_caps_map", fKeys.option_caps_map);
+	dump_map(file, "option_shift_map", fKeys.option_shift_map);
+	dump_map(file, "option_map", fKeys.option_map);
+	dump_map(file, "caps_shift_map", fKeys.caps_shift_map);
+	dump_map(file, "caps_map", fKeys.caps_map);
+	dump_map(file, "shift_map", fKeys.shift_map);
+	dump_map(file, "normal_map", fKeys.normal_map);
+
+	dump_keys(file, "acute_dead_key", fKeys.acute_dead_key);
+	dump_keys(file, "grave_dead_key", fKeys.grave_dead_key);
+
+	dump_keys(file, "circumflex_dead_key", fKeys.circumflex_dead_key);
+	dump_keys(file, "dieresis_dead_key", fKeys.dieresis_dead_key);
+	dump_keys(file, "tilde_dead_key", fKeys.tilde_dead_key);
+
+	fprintf(file, "\tacute_tables:0x%lx,\n", fKeys.acute_tables);
+	fprintf(file, "\tgrave_tables:0x%lx,\n", fKeys.grave_tables);
+	fprintf(file, "\tcircumflex_tables:0x%lx,\n", fKeys.circumflex_tables);
+	fprintf(file, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
+	fprintf(file, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
+
+	fprintf(file, "};\n\n");
+
+	fprintf(file, "const char kSystemKeyChars[] = {\n");
+	for (uint32 i = 0; i < fCharsSize; i++) {
+		if (i % 10 == 0) {
+			if (i > 0)
+				fprintf(file, "\n");
+			fprintf(file, "\t");
+		} else
+			fprintf(file, " ");
+
+		fprintf(file, "0x%02x,", (uint8)fChars[i]);
 	}
+	fprintf(file, "\n};\n\n");
 
-	int fd = file.Dup();
-	FILE * f = fdopen(fd, "w");
-
-	fprintf(f, "%s", header_header);
-	fprintf(f, "#include <InterfaceDefs.h>\n\n");
-	fprintf(f, "const key_map sSystemKeymap = {\n");
-	fprintf(f, "\tversion:%ld,\n", fKeys.version);
-	fprintf(f, "\tcaps_key:0x%lx,\n", fKeys.caps_key);
-	fprintf(f, "\tscroll_key:0x%lx,\n", fKeys.scroll_key);
-	fprintf(f, "\tnum_key:0x%lx,\n", fKeys.num_key);
-	fprintf(f, "\tleft_shift_key:0x%lx,\n", fKeys.left_shift_key);
-	fprintf(f, "\tright_shift_key:0x%lx,\n", fKeys.right_shift_key);
-	fprintf(f, "\tleft_command_key:0x%lx,\n", fKeys.left_command_key);
-	fprintf(f, "\tright_command_key:0x%lx,\n", fKeys.right_command_key);
-	fprintf(f, "\tleft_control_key:0x%lx,\n", fKeys.left_control_key);
-	fprintf(f, "\tright_control_key:0x%lx,\n", fKeys.right_control_key);
-	fprintf(f, "\tleft_option_key:0x%lx,\n", fKeys.left_option_key);
-	fprintf(f, "\tright_option_key:0x%lx,\n", fKeys.right_option_key);
-	fprintf(f, "\tmenu_key:0x%lx,\n", fKeys.menu_key);
-	fprintf(f, "\tlock_settings:0x%lx,\n", fKeys.lock_settings);
-
-	fprintf(f, "\tcontrol_map:{\n");
-	for (uint32 i = 0; i < 128; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.control_map[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\toption_caps_shift_map:{\n");
-	for (uint32 i = 0; i < 128; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_shift_map[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\toption_caps_map:{\n");
-	for (uint32 i = 0; i < 128; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_map[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\toption_shift_map:{\n");
-	for (uint32 i = 0; i < 128; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.option_shift_map[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\toption_map:{\n");
-	for (uint32 i=0; i<128; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.option_map[i]);
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tcaps_shift_map:{\n");
-	for (uint32 i=0; i<128; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.caps_shift_map[i]);
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tcaps_map:{\n");
-	for (uint32 i=0; i<128; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.caps_map[i]);
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tshift_map:{\n");
-	for (uint32 i=0; i<128; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.shift_map[i]);
-	fprintf(f, "\t},\n");
-	
-	fprintf(f, "\tnormal_map:{\n");
-	for (uint32 i=0; i<128; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.normal_map[i]);
-	fprintf(f, "\t},\n");
-	
-	fprintf(f, "\tacute_dead_key:{\n");
-	for (uint32 i=0; i<32; i++)
-		fprintf(f, "\t\t%ld,\n", fKeys.acute_dead_key[i]);
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tgrave_dead_key:{\n");
-	for (uint32 i = 0; i < 32; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.grave_dead_key[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tcircumflex_dead_key:{\n");
-	for (uint32 i = 0; i < 32; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.circumflex_dead_key[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tdieresis_dead_key:{\n");
-	for (uint32 i = 0; i < 32; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.dieresis_dead_key[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\ttilde_dead_key:{\n");
-	for (uint32 i = 0; i < 32; i++) {
-		fprintf(f, "\t\t%ld,\n", fKeys.tilde_dead_key[i]);
-	}
-	fprintf(f, "\t},\n");
-
-	fprintf(f, "\tacute_tables:0x%lx,\n", fKeys.acute_tables);
-	fprintf(f, "\tgrave_tables:0x%lx,\n", fKeys.grave_tables);
-	fprintf(f, "\tcircumflex_tables:0x%lx,\n", fKeys.circumflex_tables);
-	fprintf(f, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
-	fprintf(f, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
-
-	fprintf(f, "};\n\n");
-
-	fprintf(f, "const char sSystemKeyChars[] = {\n");
-	for (uint32 i = 0; i<fCharsSize; i++) {
-		fprintf(f, "\t%hhd,\n", fChars[i]);
-	}
-	fprintf(f, "};\n\n");
-
-	fprintf(f, "const uint32 sSystemKeyCharsSize = %ld;\n", fCharsSize);
+	fprintf(file, "const uint32 kSystemKeyCharsSize = %ld;\n", fCharsSize);
+	fclose(file);
 }
 
 

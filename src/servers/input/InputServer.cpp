@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -275,26 +275,23 @@ status_t
 InputServer::_LoadKeymap()
 {
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return B_BAD_VALUE;
 	
 	path.Append("Key_map");
 
-	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
-
 	status_t err;
-	
-	BFile file(&ref, B_READ_ONLY);
+
+	BFile file(path.Path(), B_READ_ONLY);
 	if ((err = file.InitCheck()) != B_OK)
 		return err;
 	
 	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
-	
+
 	for (uint32 i = 0; i < sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
-	
+
 	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32))
 		return B_BAD_VALUE;
 
@@ -316,14 +313,15 @@ status_t
 InputServer::_LoadSystemKeymap()
 {
 	delete[] fChars;
-	fKeys = sSystemKeymap;
-	fCharsSize = sSystemKeyCharsSize;
+	fKeys = kSystemKeymap;
+	fCharsSize = kSystemKeyCharsSize;
 	fChars = new (nothrow) char[fCharsSize];
 	if (fChars == NULL)
 		return B_NO_MEMORY;
 
-	memcpy(fChars, sSystemKeyChars, fCharsSize);
+	memcpy(fChars, kSystemKeyChars, fCharsSize);
 
+	// TODO: why are we doing this?
 	// we save this keymap to file
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -331,33 +329,28 @@ InputServer::_LoadSystemKeymap()
 
 	path.Append("Key_map");
 
-	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
-
 	BFile file;
-	status_t err = file.SetTo(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	status_t err = file.SetTo(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (err != B_OK) {
 		PRINTERR(("error %s\n", strerror(err)));
 		return err;
 	}
 
-	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
+	for (uint32 i = 0; i < sizeof(fKeys) / sizeof(uint32); i++) {
 		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
 	}
 
 	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys))
 		return err;
 
-	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
+	for (uint32 i = 0; i < sizeof(fKeys) / sizeof(uint32); i++) {
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 	}
 
-	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+	uint32 size = B_HOST_TO_BENDIAN_INT32(fCharsSize);
 
-	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32))
+	if ((err = file.Write(&size, sizeof(uint32))) < (ssize_t)sizeof(uint32))
 		return B_BAD_VALUE;
-
-	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
 
 	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
 		return err;
