@@ -1,32 +1,32 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        Keymap.cpp
-//  Author:      Jérôme Duval
-//  Description: keymap bin
-//  Created :    July 29, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ *	Copyright (c) 2004-2006, Haiku, Inc.
+ *
+ *  This software is part of the Haiku distribution and is covered 
+ *  by the Haiku license.
+ *
+ *  Author: Jérôme Duval
+ */
+
 
 #include "Keymap.h"
-#include <stdlib.h>
-#include <string.h>
-#include <regex.h>
+
 #include <ByteOrder.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
 
+#include <stdlib.h>
+#include <string.h>
+#include <regex.h>
+
+
 #define CHARS_TABLE_MAXSIZE  10000
 
+
 Keymap::Keymap()
-	: fChars(NULL),
+	:
+	fChars(NULL),
 	fCharsSize(0)
 {
 }
@@ -34,41 +34,40 @@ Keymap::Keymap()
 
 Keymap::~Keymap()
 {
-	if (fChars)
-		free(fChars);
+	delete[] fChars;
 }
 
 
-void 
-Keymap::GetKey( char *chars, int32 offset, char* string) 
+void
+Keymap::GetKey(char *chars, int32 offset, char* string) 
 {
 	int size = chars[offset++];
 	char str[32];
 	memset(str, 0, 32);
 	memset(string, 0, 32);
-	
-	switch( size ) {
-	case 0:
-		// Not mapped 
-		sprintf(str, "''");
-		break; 
-	
-	case 1:
-		// 1-byte UTF-8/ASCII character
-		if ((uint8)chars[offset] < 0x20
-			|| (uint8)chars[offset] > 0x7e)
-			sprintf(str, "0x%02x", (uint8)chars[offset]);
-		else
-			sprintf(str, "'%s%c'", 
-				(chars[offset] == '\\' || chars[offset] == '\'') ? "\\" : "", chars[offset]);
-		break; 
-	
-	default:
-		// n-byte UTF-8/ASCII character
-		sprintf(str, "0x");
-		for (int i=0; i<size; i++)
-			sprintf(str + 2*(i+1), "%02x", (uint8)chars[offset+i]);
-		break;
+
+	switch (size) {
+		case 0:
+			// Not mapped 
+			sprintf(str, "''");
+			break; 
+
+		case 1:
+			// 1-byte UTF-8/ASCII character
+			if ((uint8)chars[offset] < 0x20
+				|| (uint8)chars[offset] > 0x7e)
+				sprintf(str, "0x%02x", (uint8)chars[offset]);
+			else
+				sprintf(str, "'%s%c'", 
+					(chars[offset] == '\\' || chars[offset] == '\'') ? "\\" : "", chars[offset]);
+			break; 
+
+		default:
+			// n-byte UTF-8/ASCII character
+			sprintf(str, "0x");
+			for (int i=0; i<size; i++)
+				sprintf(str + 2*(i+1), "%02x", (uint8)chars[offset+i]);
+			break;
 	}
 	strncpy(string, str, (strlen(str) < 12) ? strlen(str) : 12);
 }
@@ -77,39 +76,38 @@ Keymap::GetKey( char *chars, int32 offset, char* string)
 void
 Keymap::Dump()
 {
-	printf(
-"#!/bin/keymap -l\n"
-"#\n"
-"#\tRaw key numbering for 101 keyboard...\n"
-"#                                                                                        [sys]       [brk]\n"
-"#                                                                                         0x7e        0x7f\n"
-"# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]\n"
-"#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S\n"
-"#\n"
-"# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]\n"
-"#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e     0x1f  0x20  0x21     0x22  0x23  0x24  0x25\n"
-"#\n"
-"# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \\ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]\n"
-"#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a\n"
-"#\n"
-"# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]                         [ 4 ] [ 5 ] [ 6 ]\n"
-"#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                             0x48  0x49  0x4a\n"
-"#\n"
-"# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]\n"
-"#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b\n"
-"#\n"
-"# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
-"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n"
-"#\n"
-"#\tNOTE: On a Microsoft Natural Keyboard:\n"
-"#\t\t\tleft option  = 0x66\n"
-"#\t\t\tright option = 0x67\n"
-"#\t\t\tmenu key     = 0x68\n"
-"#\tNOTE: On an Apple Extended Keyboard:\n"
-"#\t\t\tleft option  = 0x66\n"
-"#\t\t\tright option = 0x67\n"
-"#\t\t\tkeypad '='   = 0x6a\n"
-"#\t\t\tpower key    = 0x6b\n");
+	printf("#!/bin/keymap -l\n"
+		"#\n"
+		"#\tRaw key numbering for 101 keyboard...\n"
+		"#                                                                                        [sys]       [brk]\n"
+		"#                                                                                         0x7e        0x7f\n"
+		"# [esc]       [ f1] [ f2] [ f3] [ f4] [ f5] [ f6] [ f7] [ f8] [ f9] [f10] [f11] [f12]    [prn] [scr] [pau]\n"
+		"#  0x01        0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0a  0x0b  0x0c  0x0d     0x0e  0x0f  0x10     K E Y P A D   K E Y S\n"
+		"#\n"
+		"# [ ` ] [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9 ] [ 0 ] [ - ] [ = ] [bck]    [ins] [hme] [pup]    [num] [ / ] [ * ] [ - ]\n"
+		"#  0x11  0x12  0x13  0x14  0x15  0x16  0x17  0x18  0x19  0x1a  0x1b  0x1c  0x1d  0x1e     0x1f  0x20  0x21     0x22  0x23  0x24  0x25\n"
+		"#\n"
+		"# [tab] [ q ] [ w ] [ e ] [ r ] [ t ] [ y ] [ u ] [ i ] [ o ] [ p ] [ [ ] [ ] ] [ \\ ]    [del] [end] [pdn]    [ 7 ] [ 8 ] [ 9 ] [ + ]\n"
+		"#  0x26  0x27  0x28  0x29  0x2a  0x2b  0x2c  0x2d  0x2e  0x2f  0x30  0x31  0x32  0x33     0x34  0x35  0x36     0x37  0x38  0x39  0x3a\n"
+		"#\n"
+		"# [cap] [ a ] [ s ] [ d ] [ f ] [ g ] [ h ] [ j ] [ k ] [ l ] [ ; ] [ ' ] [  enter  ]                         [ 4 ] [ 5 ] [ 6 ]\n"
+		"#  0x3b  0x3c  0x3d  0x3e  0x3f  0x40  0x41  0x42  0x43  0x44  0x45  0x46     0x47                             0x48  0x49  0x4a\n"
+		"#\n"
+		"# [shift]     [ z ] [ x ] [ c ] [ v ] [ b ] [ n ] [ m ] [ , ] [ . ] [ / ]     [shift]          [ up]          [ 1 ] [ 2 ] [ 3 ] [ent]\n"
+		"#   0x4b       0x4c  0x4d  0x4e  0x4f  0x50  0x51  0x52  0x53  0x54  0x55       0x56            0x57           0x58  0x59  0x5a  0x5b\n"
+		"#\n"
+		"# [ctr]             [cmd]             [  space  ]             [cmd]             [ctr]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
+		"#  0x5c              0x5d                 0x5e                 0x5f              0x60     0x61  0x62  0x63     0x64  0x65\n"
+		"#\n"
+		"#\tNOTE: On a Microsoft Natural Keyboard:\n"
+		"#\t\t\tleft option  = 0x66\n"
+		"#\t\t\tright option = 0x67\n"
+		"#\t\t\tmenu key     = 0x68\n"
+		"#\tNOTE: On an Apple Extended Keyboard:\n"
+		"#\t\t\tleft option  = 0x66\n"
+		"#\t\t\tright option = 0x67\n"
+		"#\t\t\tkeypad '='   = 0x6a\n"
+		"#\t\t\tpower key    = 0x6b\n");
 
 	printf("Version = %ld\n", fKeys.version);
 	printf("CapsLock = 0x%02lx\n", fKeys.caps_key);
@@ -124,15 +122,14 @@ Keymap::Dump()
 	printf("LOption = 0x%02lx\n", fKeys.left_option_key);
 	printf("ROption = 0x%02lx\n", fKeys.right_option_key);
 	printf("Menu = 0x%02lx\n", fKeys.menu_key);
-	printf(
-"#\n"
-"# Lock settings\n"
-"# To set NumLock, do the following:\n"
-"#   LockSettings = NumLock\n"
-"#\n"
-"# To set everything, do the following:\n"
-"#   LockSettings = CapsLock NumLock ScrollLock\n"
-"#\n");
+	printf("#\n"
+		"# Lock settings\n"
+		"# To set NumLock, do the following:\n"
+		"#   LockSettings = NumLock\n"
+		"#\n"
+		"# To set everything, do the following:\n"
+		"#   LockSettings = CapsLock NumLock ScrollLock\n"
+		"#\n");
 	printf("LockSettings = ");
 	if (fKeys.lock_settings & B_CAPS_LOCK)
 		printf("CapsLock ");
@@ -141,16 +138,15 @@ Keymap::Dump()
 	if (fKeys.lock_settings & B_SCROLL_LOCK)
 		printf("ScrollLock ");
 	printf("\n");
-	printf(
-"# Legend:\n"
-"#   n = Normal\n"
-"#   s = Shift\n"
-"#   c = Control\n"
-"#   C = CapsLock\n"
-"#   o = Option\n"
-"# Key      n        s        c        o        os       C        Cs       Co       Cos     \n");
-	
-	for( int idx = 0; idx < 128; idx++ ) {
+	printf("# Legend:\n"
+		"#   n = Normal\n"
+		"#   s = Shift\n"
+		"#   c = Control\n"
+		"#   C = CapsLock\n"
+		"#   o = Option\n"
+		"# Key      n        s        c        o        os       C        Cs       Co       Cos     \n");
+
+	for (int idx = 0; idx < 128; idx++) {
 		char normalKey[32];
 		char shiftKey[32];
 		char controlKey[32];
@@ -160,21 +156,21 @@ Keymap::Dump()
 		char capsShiftKey[32];
 		char optionCapsKey[32];
 		char optionCapsShiftKey[32];
-		
-		GetKey( fChars, fKeys.normal_map[idx], normalKey);
-		GetKey( fChars, fKeys.shift_map[idx], shiftKey); 
-		GetKey( fChars, fKeys.control_map[idx], controlKey); 
-		GetKey( fChars, fKeys.option_map[idx], optionKey); 
-		GetKey( fChars, fKeys.option_shift_map[idx], optionShiftKey); 
-		GetKey( fChars, fKeys.caps_map[idx], capsKey); 
-		GetKey( fChars, fKeys.caps_shift_map[idx], capsShiftKey); 
-		GetKey( fChars, fKeys.option_caps_map[idx], optionCapsKey); 
-		GetKey( fChars, fKeys.option_caps_shift_map[idx], optionCapsShiftKey);
-		
+
+		GetKey(fChars, fKeys.normal_map[idx], normalKey);
+		GetKey(fChars, fKeys.shift_map[idx], shiftKey); 
+		GetKey(fChars, fKeys.control_map[idx], controlKey); 
+		GetKey(fChars, fKeys.option_map[idx], optionKey); 
+		GetKey(fChars, fKeys.option_shift_map[idx], optionShiftKey); 
+		GetKey(fChars, fKeys.caps_map[idx], capsKey); 
+		GetKey(fChars, fKeys.caps_shift_map[idx], capsShiftKey); 
+		GetKey(fChars, fKeys.option_caps_map[idx], optionCapsKey); 
+		GetKey(fChars, fKeys.option_caps_shift_map[idx], optionCapsShiftKey);
+
 		printf("Key 0x%02x = %-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s%-9s\n", idx, normalKey, shiftKey, controlKey,
 			optionKey, optionShiftKey, capsKey, capsShiftKey, optionCapsKey, optionCapsShiftKey); 
 	}
-	
+
 	int32* deadOffsets[] = {
 		fKeys.acute_dead_key,
 		fKeys.grave_dead_key,
@@ -182,7 +178,7 @@ Keymap::Dump()
 		fKeys.dieresis_dead_key,
 		fKeys.tilde_dead_key
 	};
-	
+
 	char labels[][12] = {
 		"Acute",
 		"Grave",
@@ -190,7 +186,7 @@ Keymap::Dump()
 		"Diaeresis",
 		"Tilde"
 	};
-	
+
 	uint32 deadTables[] = {
 		fKeys.acute_tables,
 		fKeys.grave_tables,
@@ -198,18 +194,18 @@ Keymap::Dump()
 		fKeys.dieresis_tables,
 		fKeys.tilde_tables
 	};
-	
+
 	for (int i = 0; i<5; i++) {
 		for (int idx = 0; idx < 32; idx++ ) {
 			char deadKey[32];
 			char secondKey[32];
-			GetKey( fChars, deadOffsets[i][idx++], deadKey);
-			GetKey( fChars, deadOffsets[i][idx], secondKey); 
+			GetKey(fChars, deadOffsets[i][idx++], deadKey);
+			GetKey(fChars, deadOffsets[i][idx], secondKey); 
 			printf("%s %-9s = %-9s\n", labels[i], deadKey, secondKey);
 		}
-		
+
 		printf("%sTab = ", labels[i]);
-		
+
 		if (deadTables[i] & B_NORMAL_TABLE)
 			printf("Normal ");
 		if (deadTables[i] & B_SHIFT_TABLE)
@@ -230,15 +226,13 @@ Keymap::Dump()
 			printf("CapsLock-Option-Shift ");
 		printf("\n");
 	}
-
 }
 
 
 status_t
 Keymap::LoadCurrent()
 {
-	#ifdef __BEOS__
-
+#ifdef __BEOS__
 	key_map *keys = NULL;
 	get_key_map(&keys, &fChars);
 	if (!keys) {
@@ -249,44 +243,45 @@ Keymap::LoadCurrent()
 	free(keys);
 	return B_OK;
 
-	#else	// ! __BEOS__
+#else	// ! __BEOS__
 	fprintf(stderr, "Unsupported operation on this platform!\n");
 	exit(1);
-	#endif	// ! __BEOS__
+#endif	// ! __BEOS__
 }
 
-/*
-	file format in big endian :
-	struct key_map	
-	uint32 size of following charset
-	charset (offsets go into this with size of character followed by character)
+
+/*!
+	Load a map from a file.
+
+	file format in big endian:
+		struct key_map
+		uint32 size of following charset
+		charset (offsets go into this with size of character followed by character)
 */
-// we load a map from a file
 status_t 
 Keymap::Load(entry_ref &ref)
 {
 	status_t err;
-	
+
 	BFile file(&ref, B_READ_ONLY);
 	if ((err = file.InitCheck()) != B_OK) {
 		printf("error %s\n", strerror(err));
 		return err;
 	}
-	
-	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys)) {
+
+	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys))
 		return B_BAD_VALUE;
-	}
-	
-	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+
+	for (uint32 i = 0; i < sizeof(fKeys) / 4; i++) {
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+	}
 
 	if (fKeys.version != 3)
-		return B_ERROR;
-	
-	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+		return KEYMAP_ERROR_UNKNOWN_VERSION;
+
+	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32))
 		return B_BAD_VALUE;
-	}
-	
+
 	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
 	if (!fChars)
 		delete[] fChars;
@@ -565,11 +560,10 @@ Keymap::LoadSource(FILE * f)
 	error = re_compile_pattern(tildetabPattern, strlen(tildetabPattern), &tildetabBuf);
 	if (error)
 		fprintf(stderr, error);
-	
-	
+
 	char buffer[1024];
-	
-	delete [] fChars;
+
+	delete[] fChars;
 	fChars = new char[CHARS_TABLE_MAXSIZE];
 	fCharsSize = CHARS_TABLE_MAXSIZE;
 	int offset = 0;
@@ -578,7 +572,7 @@ Keymap::LoadSource(FILE * f)
 	int circumflexOffset = 0;
 	int diaeresisOffset = 0;
 	int tildeOffset = 0;
-		
+
 	int32 *maps[] = {
 		fKeys.normal_map,
 		fKeys.shift_map,
@@ -590,10 +584,11 @@ Keymap::LoadSource(FILE * f)
 		fKeys.option_caps_map,
 		fKeys.option_caps_shift_map
 	};
-	
-	while (fgets(buffer, 1024-1, f)!=NULL) {
-		if (buffer[0]== '#' || buffer[0]== '\n')
+
+	while (fgets(buffer, 1024-1, f) != NULL) {
+		if (buffer[0] == '#' || buffer[0] == '\n')
 			continue;
+
 		struct re_registers regs;
 		if (re_search(&versionBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
 			sscanf(buffer + regs.start[1], "%ld", &fKeys.version);
@@ -623,9 +618,10 @@ Keymap::LoadSource(FILE * f)
 			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.menu_key);
 		} else if (re_search(&locksettingsBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
 			fKeys.lock_settings = 0;
-			for (int32 i=1; i<=3; i++) {
+			for (int32 i = 1; i <= 3; i++) {
 				if (regs.end[i] - regs.start[i] <= 0)
 					break;
+
 				if (strncmp(buffer + regs.start[i], "CapsLock", regs.end[i] - regs.start[i]) == 0)
 					fKeys.lock_settings |= B_CAPS_LOCK;
 				else if (strncmp(buffer + regs.start[i], "NumLock", regs.end[i] - regs.start[i]) == 0)
@@ -636,37 +632,36 @@ Keymap::LoadSource(FILE * f)
 		} else if (re_search(&keyBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
 			uint32 keyCode; 
 			if (sscanf(buffer + regs.start[1], "0x%lx", &keyCode) > 0) {
-				
-				for (int i=2; i<=10; i++) {
-					maps[i-2][keyCode] = offset;
+				for (int i = 2; i <= 10; i++) {
+					maps[i - 2][keyCode] = offset;
 					ComputeChars(buffer, regs, i, offset);
 				}
 			}
 		} else if (re_search(&acuteBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
-			for (int i=1; i<=2; i++) {
+			for (int i = 1; i <= 2; i++) {
 				fKeys.acute_dead_key[acuteOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
-			}			
+			}
 		} else if (re_search(&graveBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
-			for (int i=1; i<=2; i++) {
+			for (int i = 1; i <= 2; i++) {
 				fKeys.grave_dead_key[graveOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
-			}			
+			}
 		} else if (re_search(&circumflexBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
-			for (int i=1; i<=2; i++) {
+			for (int i = 1; i <= 2; i++) {
 				fKeys.circumflex_dead_key[circumflexOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
-			}			
+			}
 		} else if (re_search(&diaeresisBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
-			for (int i=1; i<=2; i++) {
+			for (int i = 1; i <= 2; i++) {
 				fKeys.dieresis_dead_key[diaeresisOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
-			}			
+			}
 		} else if (re_search(&tildeBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
-			for (int i=1; i<=2; i++) {
+			for (int i = 1; i <= 2; i++) {
 				fKeys.tilde_dead_key[tildeOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
-			}			
+			}
 		} else if (re_search(&acutetabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
 			ComputeTables(buffer, regs, fKeys.acute_tables);
 		} else if (re_search(&gravetabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
@@ -679,12 +674,12 @@ Keymap::LoadSource(FILE * f)
 			ComputeTables(buffer, regs, fKeys.tilde_tables);
 		}
 	}
-	
+
 	fCharsSize = offset;
 
 	if (fKeys.version != 3)
-		return B_ERROR;
-	
+		return KEYMAP_ERROR_UNKNOWN_VERSION;
+
 	return B_OK;
 }
 	
@@ -727,17 +722,17 @@ Keymap::Save(entry_ref &ref)
 
 
 const char header_header[] =
-"/*\tHaiku \t*/\n"
-"/*\n"
-" This file is generated automatically. Don't edit ! \n"
-"*/\n\n";
+	"/*\tHaiku \t*/\n"
+	"/*\n"
+	" This file is generated automatically. Don't edit ! \n"
+	"*/\n\n";
 
 void
 Keymap::SaveAsHeader(entry_ref &ref)
 {
 	status_t err;
 
-	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if ((err = file.InitCheck()) != B_OK) {
 	        printf("error %s\n", strerror(err));
 	        return;
@@ -763,42 +758,46 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	fprintf(f, "\tright_option_key:0x%lx,\n", fKeys.right_option_key);
 	fprintf(f, "\tmenu_key:0x%lx,\n", fKeys.menu_key);
 	fprintf(f, "\tlock_settings:0x%lx,\n", fKeys.lock_settings);
-	
+
 	fprintf(f, "\tcontrol_map:{\n");
-	for (uint32 i=0; i<128; i++)
+	for (uint32 i = 0; i < 128; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.control_map[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\toption_caps_shift_map:{\n");
-	for (uint32 i=0; i<128; i++)
+	for (uint32 i = 0; i < 128; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_shift_map[i]);
+	}
 	fprintf(f, "\t},\n");
-		
+
 	fprintf(f, "\toption_caps_map:{\n");
-	for (uint32 i=0; i<128; i++)
+	for (uint32 i = 0; i < 128; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_map[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\toption_shift_map:{\n");
-	for (uint32 i=0; i<128; i++)
+	for (uint32 i = 0; i < 128; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.option_shift_map[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\toption_map:{\n");
 	for (uint32 i=0; i<128; i++)
 		fprintf(f, "\t\t%ld,\n", fKeys.option_map[i]);
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tcaps_shift_map:{\n");
 	for (uint32 i=0; i<128; i++)
 		fprintf(f, "\t\t%ld,\n", fKeys.caps_shift_map[i]);
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tcaps_map:{\n");
 	for (uint32 i=0; i<128; i++)
 		fprintf(f, "\t\t%ld,\n", fKeys.caps_map[i]);
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tshift_map:{\n");
 	for (uint32 i=0; i<128; i++)
 		fprintf(f, "\t\t%ld,\n", fKeys.shift_map[i]);
@@ -813,73 +812,77 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	for (uint32 i=0; i<32; i++)
 		fprintf(f, "\t\t%ld,\n", fKeys.acute_dead_key[i]);
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tgrave_dead_key:{\n");
-	for (uint32 i=0; i<32; i++)
+	for (uint32 i = 0; i < 32; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.grave_dead_key[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tcircumflex_dead_key:{\n");
-	for (uint32 i=0; i<32; i++)
+	for (uint32 i = 0; i < 32; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.circumflex_dead_key[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tdieresis_dead_key:{\n");
-	for (uint32 i=0; i<32; i++)
+	for (uint32 i = 0; i < 32; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.dieresis_dead_key[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\ttilde_dead_key:{\n");
-	for (uint32 i=0; i<32; i++)
+	for (uint32 i = 0; i < 32; i++) {
 		fprintf(f, "\t\t%ld,\n", fKeys.tilde_dead_key[i]);
+	}
 	fprintf(f, "\t},\n");
-	
+
 	fprintf(f, "\tacute_tables:0x%lx,\n", fKeys.acute_tables);
 	fprintf(f, "\tgrave_tables:0x%lx,\n", fKeys.grave_tables);
 	fprintf(f, "\tcircumflex_tables:0x%lx,\n", fKeys.circumflex_tables);
 	fprintf(f, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
 	fprintf(f, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
-	
+
 	fprintf(f, "};\n\n");
-	
+
 	fprintf(f, "const char sSystemKeyChars[] = {\n");
-	for (uint32 i=0; i<fCharsSize; i++)
+	for (uint32 i = 0; i<fCharsSize; i++) {
 		fprintf(f, "\t%hhd,\n", fChars[i]);
+	}
 	fprintf(f, "};\n\n");
-	
+
 	fprintf(f, "const uint32 sSystemKeyCharsSize = %ld;\n", fCharsSize);
 }
 
 
-/* we need to know if a key is a modifier key to choose 
+/*!
+	We need to know if a key is a modifier key to choose 
 	a valid key when several are pressed together
 */
 bool 
 Keymap::IsModifierKey(uint32 keyCode)
 {
-	if ((keyCode == fKeys.caps_key)
-		|| (keyCode == fKeys.num_key)
-		|| (keyCode == fKeys.left_shift_key)
-		|| (keyCode == fKeys.right_shift_key)
-		|| (keyCode == fKeys.left_command_key)
-		|| (keyCode == fKeys.right_command_key)
-		|| (keyCode == fKeys.left_control_key)
-		|| (keyCode == fKeys.right_control_key)
-		|| (keyCode == fKeys.left_option_key)
-		|| (keyCode == fKeys.right_option_key)
-		|| (keyCode == fKeys.menu_key))
-			return true;
-	return false;
+	return keyCode == fKeys.caps_key
+		|| keyCode == fKeys.num_key
+		|| keyCode == fKeys.left_shift_key
+		|| keyCode == fKeys.right_shift_key
+		|| keyCode == fKeys.left_command_key
+		|| keyCode == fKeys.right_command_key
+		|| keyCode == fKeys.left_control_key
+		|| keyCode == fKeys.right_control_key
+		|| keyCode == fKeys.left_option_key
+		|| keyCode == fKeys.right_option_key
+		|| keyCode == fKeys.menu_key;
 }
 
 
-// tell if a key is a dead key, needed for draw a dead key
+//! Tell if a key is a dead key, needed for draw a dead key
 uint8
 Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 {
 	int32 offset;
 	uint32 tableMask = 0;
-	
+
 	switch (modifiers & 0xcf) {
 		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; tableMask = B_SHIFT_TABLE; break;
 		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; tableMask = B_CAPS_TABLE; break;
@@ -891,18 +894,18 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; tableMask = B_CONTROL_TABLE; break;
 		default: offset = fKeys.normal_map[keyCode]; tableMask = B_NORMAL_TABLE; break;
 	}
-	
-	if (offset<=0)
+
+	if (offset <= 0)
 		return 0;	
 	uint32 numBytes = fChars[offset];
-	
+
 	if (!numBytes)
 		return 0;
-		
+
 	char chars[4];	
 	strncpy(chars, &(fChars[offset+1]), numBytes );
 	chars[numBytes] = 0; 
-	
+
 	int32 deadOffsets[] = {
 		fKeys.acute_dead_key[1],
 		fKeys.grave_dead_key[1],
@@ -910,7 +913,7 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 		fKeys.dieresis_dead_key[1],
 		fKeys.tilde_dead_key[1]
 	}; 
-	
+
 	uint32 deadTables[] = {
 		fKeys.acute_tables,
 		fKeys.grave_tables,
@@ -918,36 +921,35 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 		fKeys.dieresis_tables,
 		fKeys.tilde_tables
 	};
-	
-	for (int32 i=0; i<5; i++) {
+
+	for (int32 i = 0; i < 5; i++) {
 		if ((deadTables[i] & tableMask) == 0)
 			continue;
-		
+
 		if (offset == deadOffsets[i])
 			return i+1;
-			
+
 		uint32 deadNumBytes = fChars[deadOffsets[i]];
-		
+
 		if (!deadNumBytes)
 			continue;
-			
-		if (strncmp(chars, &(fChars[deadOffsets[i]+1]), deadNumBytes ) == 0) {
+
+		if (strncmp(chars, &(fChars[deadOffsets[i]+1]), deadNumBytes ) == 0)
 			return i+1;
-		}
 	}
 	return 0;
 }
 
 
-// tell if a key is a dead second key, needed for draw a dead second key
+//! Tell if a key is a dead second key, needed for draw a dead second key
 bool
 Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 {
 	if (!activeDeadKey)
 		return false;
-	
+
 	int32 offset;
-	
+
 	switch (modifiers & 0xcf) {
 		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
 		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
@@ -959,12 +961,12 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
-	
+
 	uint32 numBytes = fChars[offset];
-	
+
 	if (!numBytes)
 		return false;
-	
+
 	int32* deadOffsets[] = {
 		fKeys.acute_dead_key,
 		fKeys.grave_dead_key,
@@ -972,37 +974,39 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		fKeys.dieresis_dead_key,
 		fKeys.tilde_dead_key
 	};
-	
-	int32 *deadOffset = deadOffsets[activeDeadKey-1]; 
-	
-	for (int32 i=0; i<32; i++) {
+
+	int32 *deadOffset = deadOffsets[activeDeadKey - 1]; 
+
+	for (int32 i = 0; i < 32; i++) {
 		if (offset == deadOffset[i])
 			return true;
-			
+
 		uint32 deadNumBytes = fChars[deadOffset[i]];
-		
+
 		if (!deadNumBytes)
 			continue;
-			
-		if (strncmp(&(fChars[offset+1]), &(fChars[deadOffset[i]+1]), deadNumBytes ) == 0)
+
+		if (strncmp(&(fChars[offset+1]), &(fChars[deadOffset[i]+1]), deadNumBytes) == 0)
 			return true;
+
 		i++;
 	}
 	return false;
 }
 
 
-// get the char for a key given modifiers and active dead key
+//! Get the char for a key given modifiers and active dead key
 void
-Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** chars, int32* numBytes)
+Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
+	char** chars, int32* numBytes)
 {
 	int32 offset;
-	
+
 	*numBytes = 0;
 	*chars = NULL;
-	
+
 	// here we take NUMLOCK into account
-	if (modifiers & B_NUM_LOCK)
+	if (modifiers & B_NUM_LOCK) {
 		switch (keyCode) {
 			case 0x37:
 			case 0x38:
@@ -1016,7 +1020,8 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 			case 0x64:
 			case 0x65:
 				modifiers ^= B_SHIFT_KEY;
-		}	
+		}
+	}
 
 	// here we choose the right map given the modifiers
 	switch (modifiers & 0xcf) {
@@ -1030,49 +1035,47 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
-	
+
 	// here we get the char size
 	*numBytes = fChars[offset];
-	
+
 	if (!*numBytes)
 		return;
-	
+
 	// here we take an potential active dead key
 	int32 *dead_key;
-	switch(activeDeadKey) {
+	switch (activeDeadKey) {
 		case 1: dead_key = fKeys.acute_dead_key; break;
 		case 2: dead_key = fKeys.grave_dead_key; break;
 		case 3: dead_key = fKeys.circumflex_dead_key; break;
 		case 4: dead_key = fKeys.dieresis_dead_key; break;
 		case 5: dead_key = fKeys.tilde_dead_key; break;
+
 		default: 
-		{
 			// if not dead, we copy and return the char
 			char *str = *chars = new char[*numBytes + 1]; 
 			strncpy(str, &(fChars[offset+1]), *numBytes );
 			str[*numBytes] = 0;
 			return;
-		}
 	}
 
 	// if dead key, we search for our current offset char in the dead key offset table
 	// string comparison is needed
-	for (int32 i=0; i<32; i++) {
+	for (int32 i = 0; i < 32; i++) {
 		if (strncmp(&(fChars[offset+1]), &(fChars[dead_key[i]+1]), *numBytes ) == 0) {
 			*numBytes = fChars[dead_key[i+1]];
-		
-			switch( *numBytes ) {
+
+			switch (*numBytes) {
 				case 0:
 					// Not mapped
 					*chars = NULL; 
 					break; 
+
 				default:
 					// 1-, 2-, 3-, or 4-byte UTF-8 character 
-				{ 
 					char *str = *chars = new char[*numBytes + 1]; 
 					strncpy(str, &fChars[dead_key[i+1]+1], *numBytes );
 					str[*numBytes] = 0; 
-				} 
 					break; 
 			}
 			return;
@@ -1084,8 +1087,8 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 	*chars = new char[*numBytes + 1];
 	strncpy(*chars, &(fChars[offset+1]), *numBytes );
 	(*chars)[*numBytes] = 0; 	
-	
 }
+
 
 status_t _restore_key_map_();
 
@@ -1099,13 +1102,13 @@ Keymap::RestoreSystemDefault()
 #		undef find_directory
 #	endif
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 
 	path.Append("Key_map");
 
 	BEntry ref(path.Path());
-	ref.Remove();	
+	ref.Remove();
 
 	_restore_key_map_();
 #else	// ! __BEOS__
@@ -1118,12 +1121,11 @@ Keymap::RestoreSystemDefault()
 void
 Keymap::SaveAsCurrent()
 {
-	#ifdef __BEOS__
-
+#ifdef __BEOS__
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
-	
+
 	path.Append("Key_map");
 
 	entry_ref ref;
@@ -1136,23 +1138,22 @@ Keymap::SaveAsCurrent()
 	}
 	Use();
 
-	#else	// ! __BEOS__
+#else	// ! __BEOS__
 	fprintf(stderr, "Unsupported operation on this platform!\n");
 	exit(1);
-	#endif	// ! __BEOS__
+#endif	// ! __BEOS__
 }
 
 
-// we make our input server use the map in /boot/home/config/settings/Keymap
+//! We make our input server use the map in /boot/home/config/settings/Keymap
 status_t
 Keymap::Use()
 {
-	#ifdef __BEOS__
-
+#ifdef __BEOS__
 	return _restore_key_map_();
 
-	#else	// ! __BEOS__
+#else	// ! __BEOS__
 	fprintf(stderr, "Unsupported operation on this platform!\n");
 	exit(1);
-	#endif	// ! __BEOS__
+#endif	// ! __BEOS__
 }

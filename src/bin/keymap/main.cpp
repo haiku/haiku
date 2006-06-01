@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2005, Haiku
+ * Copyright (c) 2004-2006, Haiku, Inc.
  *
  * This software is part of the Haiku distribution and is covered
  * by the MIT license.
@@ -33,6 +33,31 @@ usage(void)
 }
 
 
+static const char *
+keymap_error(status_t status)
+{
+	if (status == KEYMAP_ERROR_UNKNOWN_VERSION)
+		return "Unknown keymap version";
+
+	return strerror(status);
+}
+
+
+static void
+load_keymap_source(Keymap& keymap, const char* name)
+{
+	entry_ref ref;
+	get_ref_for_path(name, &ref);
+
+	status_t status = keymap.LoadSourceFromRef(ref);
+	if (status != B_OK) {
+		fprintf(stderr, "error when loading the keymap: %s\n",
+			keymap_error(status));
+		exit(1);
+	}
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -60,8 +85,10 @@ main(int argc, char **argv)
 				return 0;
 			} else if (operation == 'l') {
 				Keymap keymap;
-				if (keymap.LoadSource(stdin)!=B_OK) {
-					printf("error when loading the keymap\n");
+				status_t status = keymap.LoadSource(stdin);
+				if (status != B_OK) {
+					fprintf(stderr, "error when loading the keymap: %s\n",
+						keymap_error(status));
 					return 1;
 				}
 				keymap.SaveAsCurrent();
@@ -69,34 +96,28 @@ main(int argc, char **argv)
 				return 0;
 			} 
 		} else {
+			// TODO: the actual action should be issued *AFTER* the command line
+			//	has been parsed, not mixed in.
 			if (operation == 'o') {
 				get_ref_for_path(argv[i], &outputRef);
 			} else if (operation == 'c') {
-				entry_ref ref;
-				get_ref_for_path(argv[i], &ref);
 				Keymap keymap;
-				if (keymap.LoadSourceFromRef(ref)!=B_OK) {
-					printf("error when loading the keymap\n");
-					return 1;
-				}
+				load_keymap_source(keymap, argv[i]);
 				keymap.Save(outputRef);
 				return 0;
 			} else if (operation == 'h') {
-		        entry_ref ref;
-		        get_ref_for_path(argv[i], &ref);
 		        Keymap keymap;
-		        if (keymap.LoadSourceFromRef(ref)!=B_OK) {
-					printf("error when loading the keymap\n");
-					return 1;
-				}
+				load_keymap_source(keymap, argv[i]);
 				keymap.SaveAsHeader(outputRef);
 				return 0;
 			} else if (operation == 'b') {
 				entry_ref ref;
 				get_ref_for_path(argv[i], &ref);
 				Keymap keymap;
-				if (keymap.Load(ref)!=B_OK) {
-					printf("error when loading the keymap\n");
+				status_t status = keymap.Load(ref);
+				if (status != B_OK) {
+					fprintf(stderr, "error when loading the keymap: %s\n",
+						keymap_error(status));
 					return 1;
 				}
 				keymap.SaveAsCurrent();
