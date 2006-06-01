@@ -26,7 +26,7 @@ class StringView;
 
 class FileTypesWindow : public BWindow {
 	public:
-		FileTypesWindow(BRect frame);
+		FileTypesWindow(const BMessage& settings);
 		virtual ~FileTypesWindow();
 
 		virtual void MessageReceived(BMessage* message);
@@ -35,6 +35,7 @@ class FileTypesWindow : public BWindow {
 		void PlaceSubWindow(BWindow* window);
 
 	private:
+		BRect _Frame(const BMessage& settings) const;
 		void _ShowSnifferRule(bool show);
 		void _UpdateExtensions(BMimeType* type);
 		void _AdoptPreferredApplication(BMessage* message, bool sameAs);

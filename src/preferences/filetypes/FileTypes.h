@@ -24,6 +24,8 @@ static const uint32 kMsgApplicationTypesWindowClosed = 'clAw';
 static const uint32 kMsgTypeWindowClosed = 'cltw';
 static const uint32 kMsgWindowClosed = 'WiCl';
 
+static const uint32 kMsgSettingsChanged = 'SeCh';
+
 
 // exported functions
 

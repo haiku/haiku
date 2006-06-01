@@ -158,8 +158,8 @@ ProgressWindow::MessageReceived(BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
-	: BWindow(frame, "Application Types", B_TITLED_WINDOW,
+ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
+	: BWindow(_Frame(settings), "Application Types", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	// Application list
@@ -292,6 +292,17 @@ ApplicationTypesWindow::ApplicationTypesWindow(BRect frame)
 ApplicationTypesWindow::~ApplicationTypesWindow()
 {
 	BMimeType::StopWatching(this);
+}
+
+
+BRect
+ApplicationTypesWindow::_Frame(const BMessage& settings) const
+{
+	BRect rect;
+	if (settings.FindRect("app_types_frame", &rect) == B_OK)
+		return rect;
+
+	return BRect(100.0f, 100.0f, 540.0f, 480.0f);
 }
 
 
@@ -542,6 +553,10 @@ ApplicationTypesWindow::MessageReceived(BMessage* message)
 bool
 ApplicationTypesWindow::QuitRequested()
 {
+	BMessage update(kMsgSettingsChanged);
+	update.AddRect("app_types_frame", Frame());
+	be_app_messenger.SendMessage(&update);
+
 	be_app->PostMessage(kMsgApplicationTypesWindowClosed);
 	return true;
 }

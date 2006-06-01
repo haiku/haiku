@@ -24,7 +24,7 @@ class StringView;
 
 class ApplicationTypesWindow : public BWindow {
 	public:
-		ApplicationTypesWindow(BRect frame);
+		ApplicationTypesWindow(const BMessage& settings);
 		virtual ~ApplicationTypesWindow();
 
 		virtual void FrameResized(float width, float height);
@@ -32,6 +32,7 @@ class ApplicationTypesWindow : public BWindow {
 		virtual bool QuitRequested();
 
 	private:
+		BRect _Frame(const BMessage& settings) const;
 		void _SetType(BMimeType* type, int32 forceUpdate = 0);
 		void _UpdateCounter();
 		void _RemoveUninstalled();

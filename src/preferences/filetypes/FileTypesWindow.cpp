@@ -232,11 +232,18 @@ TypeIconView::MouseDown(BPoint where)
 //	#pragma mark -
 
 
-FileTypesWindow::FileTypesWindow(BRect frame)
-	: BWindow(frame, "FileTypes", B_TITLED_WINDOW,
+FileTypesWindow::FileTypesWindow(const BMessage& settings)
+	: BWindow(_Frame(settings), "FileTypes", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS),
 	fNewTypeWindow(NULL)
 {
+	bool showIcons;
+	bool showRule;
+	if (settings.FindBool("show_icons", &showIcons) != B_OK)
+		showIcons = true;
+	if (settings.FindBool("show_rule", &showRule) != B_OK)
+		showRule = false;
+
 	// add the menu
 
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
@@ -268,10 +275,12 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 
 	menu = new BMenu("Settings");
 	item = new BMenuItem("Show Icons in List", new BMessage(kMsgToggleIcons));
+	item->SetMarked(showIcons);
 	item->SetTarget(this);
 	menu->AddItem(item);
 
 	item = new BMenuItem("Show Recognition Rule", new BMessage(kMsgToggleRule));
+	item->SetMarked(showRule);
 	item->SetTarget(this);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
@@ -304,7 +313,7 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 	if (rect.right < 180)
 		rect.right = 180;
 
-	fTypeListView = new MimeTypeListView(rect, "typeview", NULL, false, false,
+	fTypeListView = new MimeTypeListView(rect, "typeview", NULL, showIcons, false,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 
@@ -527,6 +536,8 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 		+ 32.0f + menuBar->Bounds().Height(), 32767.0f);
 
 	_SetType(NULL);
+	_ShowSnifferRule(showRule);
+
 	BMimeType::StartWatching(this);
 }
 
@@ -534,6 +545,17 @@ FileTypesWindow::FileTypesWindow(BRect frame)
 FileTypesWindow::~FileTypesWindow()
 {
 	BMimeType::StopWatching(this);
+}
+
+
+BRect
+FileTypesWindow::_Frame(const BMessage& settings) const
+{
+	BRect rect;
+	if (settings.FindRect("file_types_frame", &rect) == B_OK)
+		return rect;
+
+	return BRect(80.0f, 80.0f, 600.0f, 480.0f);
 }
 
 
@@ -741,6 +763,11 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			item->SetMarked(!fTypeListView->IsShowingIcons());
 			fTypeListView->ShowIcons(item->IsMarked());
+
+			// update settings
+			BMessage update(kMsgSettingsChanged);
+			update.AddBool("show_icons", item->IsMarked());
+			be_app_messenger.SendMessage(&update);
 			break;
 		}
 
@@ -752,6 +779,11 @@ FileTypesWindow::MessageReceived(BMessage* message)
 
 			item->SetMarked(fRuleControl->IsHidden());
 			_ShowSnifferRule(item->IsMarked());
+
+			// update settings
+			BMessage update(kMsgSettingsChanged);
+			update.AddBool("show_rule", item->IsMarked());
+			be_app_messenger.SendMessage(&update);
 			break;
 		}
 
@@ -1044,6 +1076,10 @@ FileTypesWindow::MessageReceived(BMessage* message)
 bool
 FileTypesWindow::QuitRequested()
 {
+	BMessage update(kMsgSettingsChanged);
+	update.AddRect("file_types_frame", Frame());
+	be_app_messenger.SendMessage(&update);
+
 	be_app->PostMessage(kMsgTypesWindowClosed);
 	return true;
 }

@@ -26,6 +26,26 @@
 
 const char *kSignature = "application/x-vnd.Haiku-FileTypes";
 
+static const uint32 kMsgFileTypesSettings = 'FTst';
+static const uint32 kCascadeOffset = 20;
+
+
+class Settings {
+	public:
+		Settings();
+		~Settings();
+
+		const BMessage &Message() const { return fMessage; }
+		void UpdateFrom(BMessage *message);
+
+	private:
+		void _SetDefaults();
+		status_t _Open(BFile *file, int32 mode);
+
+		BMessage	fMessage;
+		bool		fUpdated;
+};
+
 class FileTypes : public BApplication {
 	public:
 		FileTypes();
@@ -43,15 +63,97 @@ class FileTypes : public BApplication {
 	private:
 		void _WindowClosed();
 
+		Settings	fSettings;
 		BFilePanel	*fFilePanel;
 		BMessenger	fFilePanelTarget;
 		BWindow		*fTypesWindow;
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
 		uint32		fTypeWindowCount;
-		BRect		fTypesWindowFrame;
-		BRect		fApplicationTypesWindowFrame;
 };
+
+
+Settings::Settings()
+	:
+	fMessage(kMsgFileTypesSettings),
+	fUpdated(false)
+{
+	_SetDefaults();
+
+	BFile file;
+	if (_Open(&file, B_READ_ONLY) != B_OK)
+		return;
+
+	BMessage settings;
+	if (settings.Unflatten(&file) == B_OK) {
+		// We don't unflatten into our default message to make sure
+		// nothing is lost (because of old or corrupted on disk settings)
+		UpdateFrom(&settings);
+		fUpdated = false;
+	}
+}
+
+
+Settings::~Settings()
+{
+	// only save the settings if something has changed
+	if (!fUpdated)
+		return;
+
+	BFile file;
+	if (_Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY) != B_OK)
+		return;
+
+	fMessage.Flatten(&file);
+}
+
+
+void
+Settings::_SetDefaults()
+{
+	fMessage.AddRect("file_types_frame", BRect(80.0f, 80.0f, 600.0f, 480.0f));
+	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
+	fMessage.AddBool("show_icons", true);
+	fMessage.AddBool("show_rule", false);
+}
+
+
+status_t
+Settings::_Open(BFile *file, int32 mode)
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return B_ERROR;
+
+	path.Append("FileTypes settings");
+
+	return file->SetTo(path.Path(), mode);
+}
+
+
+void 
+Settings::UpdateFrom(BMessage *message)
+{
+	BRect frame;
+	if (message->FindRect("file_types_frame", &frame) == B_OK)
+		fMessage.ReplaceRect("file_types_frame", frame);
+
+	if (message->FindRect("app_types_frame", &frame) == B_OK)
+		fMessage.ReplaceRect("app_types_frame", frame);
+
+	bool showIcons;
+	if (message->FindBool("show_icons", &showIcons) == B_OK)
+		fMessage.ReplaceBool("show_icons", showIcons);
+
+	bool showRule;
+	if (message->FindBool("show_rule", &showRule) == B_OK)
+		fMessage.ReplaceBool("show_rule", showRule);
+
+	fUpdated = true;
+}
+
+
+//	#pragma mark -
 
 
 FileTypes::FileTypes()
@@ -63,10 +165,6 @@ FileTypes::FileTypes()
 {
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_FILE_NODE | B_DIRECTORY_NODE, false);
-
-	fTypesWindowFrame = BRect(80.0f, 80.0f, 600.0f, 480.0f);
-	fApplicationTypesWindowFrame = BRect(100.0f, 100.0f, 540.0f, 480.0f);
-		// TODO: read from settings
 }
 
 
@@ -131,7 +229,8 @@ FileTypes::RefsReceived(BMessage *message)
 		message->RemoveData("refs", --index);
 
 		// There are some refs left that want to be handled by the type window
-		BPoint point(100.0f + 20.0f * fTypeWindowCount, 110.0f + 20.0f * fTypeWindowCount);
+		BPoint point(100.0f + kCascadeOffset * fTypeWindowCount,
+			110.0f + kCascadeOffset * fTypeWindowCount);
 
 		BWindow* window = new ApplicationTypeWindow(point, entry);
 		window->Show();
@@ -144,7 +243,8 @@ FileTypes::RefsReceived(BMessage *message)
 		return;
 
 	// There are some refs left that want to be handled by the type window
-	BPoint point(100.0f + 20.0f * fTypeWindowCount, 110.0f + 20.0f * fTypeWindowCount);
+	BPoint point(100.0f + kCascadeOffset * fTypeWindowCount,
+		110.0f + kCascadeOffset * fTypeWindowCount);
 
 	BWindow* window = new FileTypeWindow(point, *message);
 	window->Show();
@@ -202,9 +302,13 @@ void
 FileTypes::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
+		case kMsgSettingsChanged:
+			fSettings.UpdateFrom(message);
+			break;
+
 		case kMsgOpenTypesWindow:
 			if (fTypesWindow == NULL) {
-				fTypesWindow = new FileTypesWindow(fTypesWindowFrame);
+				fTypesWindow = new FileTypesWindow(fSettings.Message());
 				fTypesWindow->Show();
 				fWindowCount++;
 			} else
@@ -218,7 +322,7 @@ FileTypes::MessageReceived(BMessage *message)
 		case kMsgOpenApplicationTypesWindow:
 			if (fApplicationTypesWindow == NULL) {
 				fApplicationTypesWindow = new ApplicationTypesWindow(
-					fApplicationTypesWindowFrame);
+					fSettings.Message());
 				fApplicationTypesWindow->Show();
 				fWindowCount++;
 			} else
