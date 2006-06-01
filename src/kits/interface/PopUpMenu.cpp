@@ -264,14 +264,6 @@ BMenuItem *
 BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
-	if (fTrackThread >= 0) {
-		// Something bad happened: Go() was called on us twice, and we got here
-		// while the other instance hasn't finished yet.
-		// TODO: Maybe we should simply call debugger() ?
-		status_t unused;
-		wait_for_thread(fTrackThread, &unused);
-	}
-
 	BMenuItem *selected = NULL;
 
 	// Can't use Window(), as the BPopUpMenu isn't attached
@@ -343,15 +335,12 @@ BPopUpMenu::entry(void *arg)
 {
 	popup_menu_data *data = static_cast<popup_menu_data *>(arg);
 	BPopUpMenu *menu = data->object;	
-	BPoint where = data->where;
 	BRect *rect = NULL;
-	bool autoInvoke = data->autoInvoke;
-	bool startOpened = data->startOpened;
-
+	
 	if (data->useRect)
 		rect = &data->rect;
 
-	data->selected = menu->start_track(where, autoInvoke, startOpened, rect);
+	data->selected = menu->start_track(data->where, data->autoInvoke, data->startOpened, rect);
 
 	// Reset the window menu semaphore	
 	if (data->async && data->window)
