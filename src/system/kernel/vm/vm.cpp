@@ -1179,14 +1179,17 @@ _vm_map_file(team_id aid, const char *name, void **_address, uint32 addressSpec,
 
 	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name);
+
+	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
+		// map_backing_store() cannot know we no longer need the ref
+		vm_cache_release_ref(cacheRef);
+	}
 	if (status < B_OK)
-		goto err2;
+		goto err1;
 
 	vm_put_address_space(addressSpace);
 	return area->id;
 
-err2:
-	vm_cache_release_ref(cacheRef);
 err1:
 	vm_put_address_space(addressSpace);
 	return status;

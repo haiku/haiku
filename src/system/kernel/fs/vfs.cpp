@@ -3085,11 +3085,12 @@ vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
 			vnode->busy = wasBusy;
 		} else
 			status = B_BAD_VALUE;
-	} else
-		vm_cache_acquire_ref(vnode->cache);
+	}
 
-	if (status == B_OK)
+	if (status == B_OK) {
+		vm_cache_acquire_ref(vnode->cache);
 		*_cache = vnode->cache;
+	}
 
 	mutex_unlock(&sVnodeMutex);
 	return status;
