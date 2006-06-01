@@ -360,6 +360,7 @@ AboutView::AboutView(const BRect &rect)
 		"Greg Crain\n"
 		"Tyler Dauwalder\n"
 		"Oliver Ruiz Dorantes\n"
+		"John Drinkwater\n"
 		"Cian Duffy\n"
 		"Marc Flerackers\n"
 		"Daniel Furrer\n"
