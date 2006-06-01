@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons input_server methods canna lib ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirCcFlags -x c++ -ansi -trigraphs -funsigned-char -funsigned-bitfields -w -Wno-multichar -Wno-ctor-dtor-privacy -pedantic -Wno-long-long -Woverloaded-virtual -D_BUILDING_CANNALIB -D_WCHAR_T ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) canna ] ;
