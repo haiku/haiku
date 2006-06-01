@@ -61,6 +61,56 @@ FSClipboardCheckIntegrity()
 }
 */
 
+static void
+MakeNodeFromName(node_ref *node, char *name)
+{
+	char *nodeString = strchr(name, '_');
+	if (nodeString != NULL) {
+		node->node = strtoll(nodeString + 1, (char **)NULL, 10);
+		node->device = atoi(name + 1);
+	}
+}
+
+
+static inline void
+MakeRefName(char *refName, const node_ref *node)
+{
+	sprintf(refName, "r%ld_%Ld", node->device, node->node);
+}
+
+
+static inline void
+MakeModeName(char *modeName, const node_ref *node)
+{
+	sprintf(modeName, "m%ld_%Ld", node->device, node->node);
+}
+
+
+static inline void
+MakeModeName(char *name)
+{
+	name[0] = 'm';
+}
+
+
+static inline void
+MakeModeNameFromRefName(char *modeName, char *refName)
+{
+	strcpy(modeName, refName);
+	modeName[0] = 'm';
+}
+
+
+static inline bool
+CompareModeAndRefName(const char *modeName, const char *refName)
+{
+	return !strcmp(refName + 1, modeName + 1);
+}
+
+
+//	#pragma mark -
+
+
 bool
 FSClipboardHasRefs()
 {
@@ -122,53 +172,6 @@ FSClipboardStopWatch(BMessenger target)
 			messenger.SendMessage(&message);
 		}
 	}
-}
-
-
-static void
-MakeNodeFromName(node_ref *node, char *name)
-{
-	char *nodeString = strchr(name, '_');
-	if (nodeString != NULL) {
-		node->node = strtoll(nodeString + 1, (char **)NULL, 10);
-		node->device = atoi(name + 1);
-	}
-}
-
-
-static inline void
-MakeRefName(char *refName, const node_ref *node)
-{
-	sprintf(refName, "r%ld_%Ld", node->device, node->node);
-}
-
-
-static inline void
-MakeModeName(char *modeName, const node_ref *node)
-{
-	sprintf(modeName, "m%ld_%Ld", node->device, node->node);
-}
-
-
-static inline void
-MakeModeName(char *name)
-{
-	name[0] = 'm';
-}
-
-
-static inline void
-MakeModeNameFromRefName(char *modeName, char *refName)
-{
-	strcpy(modeName, refName);
-	modeName[0] = 'm';
-}
-
-
-static inline bool
-CompareModeAndRefName(const char *modeName, const char *refName)
-{
-	return !strcmp(refName + 1, modeName + 1);
 }
 
 
@@ -265,7 +268,7 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 						clipNode.moveMode = moveMode; // set it back to current value
 					}
 				} else {
-					// add if it doesn't exist
+					// add it if it doesn't exist
 					if (clip->AddRef(refName, model->EntryRef()) == B_OK
 						&& clip->AddInt32(modeName, (int32)moveMode) == B_OK) {
 						pose->SetClipboardMode(moveMode);
@@ -278,7 +281,8 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 					} else {
 						clip->RemoveName(modeName);
 						clip->RemoveName(refName);
-						// here notifying delete isn't needed as node didn't exist in clipboard
+						// here notifying delete isn't needed as node didn't
+						// exist in clipboard
 					}
 				}
 			}
@@ -297,7 +301,6 @@ FSClipboardAddPoses(const node_ref *directory, PoseList *list, uint32 moveMode,
 uint32
 FSClipboardRemovePoses(const node_ref *directory, PoseList *list)
 {
-
 	if (!be_clipboard->Lock())
 		return 0;
 

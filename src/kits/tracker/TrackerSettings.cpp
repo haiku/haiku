@@ -172,7 +172,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fMountSharedVolumesOntoDesktop =
 		new BooleanValueSetting("MountSharedVolumesOntoDesktop", false));
 	Add(fIntegrateNonBootBeOSDesktops = new BooleanValueSetting
-		("IntegrateNonBootBeOSDesktops", true));
+		("IntegrateNonBootBeOSDesktops", false));
 	Add(fIntegrateAllNonBootDesktops = new BooleanValueSetting
 		("IntegrateAllNonBootDesktops", false));
 	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));
@@ -180,7 +180,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fDesktopFilePanelRoot = new BooleanValueSetting("DesktopFilePanelRoot", true));
 	Add(fShowFullPathInTitleBar = new BooleanValueSetting("ShowFullPathInTitleBar", false));
 	Add(fShowSelectionWhenInactive = new BooleanValueSetting("ShowSelectionWhenInactive", true));
-	Add(fTransparentSelection = new BooleanValueSetting("TransparentSelection", false));
+	Add(fTransparentSelection = new BooleanValueSetting("TransparentSelection", true));
 	Add(fSortFolderNamesFirst = new BooleanValueSetting("SortFolderNamesFirst", false));
 	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
  	Add(fSingleWindowBrowse = new BooleanValueSetting("SingleWindowBrowse", false));

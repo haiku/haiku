@@ -51,203 +51,211 @@ class BStringView;
 namespace BPrivate {
 
 class SettingsView : public BView {
-public:
-	SettingsView(BRect, const char *);
-	virtual ~SettingsView();
+	public:
+		SettingsView(BRect frame, const char *name);
+		virtual ~SettingsView();
 
-	virtual void SetDefaults();
-	virtual void Revert();
-	virtual void ShowCurrentSettings(bool sendNotices = false);
-	virtual void RecordRevertSettings();
-	virtual bool ShowsRevertSettings() const;
-protected:
-	
-	typedef BView _inherited;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
+
+	protected:
+		typedef BView _inherited;
 };
 
 class DesktopSettingsView : public SettingsView {
-public:
-	DesktopSettingsView(BRect);
-	
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();
-	
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
-private:
-	BRadioButton *fShowDisksIconRadioButton;
-	BRadioButton *fMountVolumesOntoDesktopRadioButton;
-	BCheckBox *fMountSharedVolumesOntoDesktopCheckBox;
-	BCheckBox *fIntegrateNonBootBeOSDesktopsCheckBox;
-	BCheckBox *fEjectWhenUnmountingCheckBox;
+	public:
+		DesktopSettingsView(BRect frame);
 
-	bool fShowDisksIcon;
-	bool fMountVolumesOntoDesktop;
-	bool fMountSharedVolumesOntoDesktop;
-	bool fIntegrateNonBootBeOSDesktops;
-	bool fEjectWhenUnmounting;
-	
-	typedef SettingsView _inherited;
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();
+
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
+
+	private:
+		void _SendNotices();
+
+		BRadioButton *fShowDisksIconRadioButton;
+		BRadioButton *fMountVolumesOntoDesktopRadioButton;
+		BCheckBox *fMountSharedVolumesOntoDesktopCheckBox;
+		BCheckBox *fIntegrateNonBootBeOSDesktopsCheckBox;
+		BCheckBox *fEjectWhenUnmountingCheckBox;
+
+		bool fShowDisksIcon;
+		bool fMountVolumesOntoDesktop;
+		bool fMountSharedVolumesOntoDesktop;
+		bool fIntegrateNonBootBeOSDesktops;
+		bool fEjectWhenUnmounting;
+
+		typedef SettingsView _inherited;
 };
 
 class WindowsSettingsView : public SettingsView {
-public:
-	WindowsSettingsView(BRect);
+	public:
+		WindowsSettingsView(BRect frame);
 
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();
-	
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
-private:
-	BCheckBox *fShowFullPathInTitleBarCheckBox;
-	BCheckBox *fSingleWindowBrowseCheckBox;
-	BCheckBox *fShowNavigatorCheckBox;
-	BCheckBox *fShowSelectionWhenInactiveCheckBox;
-	BCheckBox *fTransparentSelectionCheckBox;
-	BCheckBox *fSortFolderNamesFirstCheckBox;
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();
 
-	bool fShowFullPathInTitleBar;
-	bool fSingleWindowBrowse;
-	bool fShowNavigator;
-	bool fShowSelectionWhenInactive;
-	bool fTransparentSelection;
-	bool fSortFolderNamesFirst;
-	
-	typedef SettingsView _inherited;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
+
+	private:
+		BCheckBox *fShowFullPathInTitleBarCheckBox;
+		BCheckBox *fSingleWindowBrowseCheckBox;
+		BCheckBox *fShowNavigatorCheckBox;
+		BCheckBox *fShowSelectionWhenInactiveCheckBox;
+		BCheckBox *fOutlineSelectionCheckBox;
+		BCheckBox *fSortFolderNamesFirstCheckBox;
+
+		bool fShowFullPathInTitleBar;
+		bool fSingleWindowBrowse;
+		bool fShowNavigator;
+		bool fShowSelectionWhenInactive;
+		bool fTransparentSelection;
+		bool fSortFolderNamesFirst;
+
+		typedef SettingsView _inherited;
 };
 
 class FilePanelSettingsView : public SettingsView {
-public:
-	FilePanelSettingsView(BRect);
-	~FilePanelSettingsView();
+	public:
+		FilePanelSettingsView(BRect frame);
+		virtual ~FilePanelSettingsView();
 
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();
-	
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();
 
-	void GetAndRefreshDisplayedFigures() const;
-private:
-	BCheckBox *fDesktopFilePanelRootCheckBox;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
 
-	BTextControl *fRecentApplicationsTextControl; // Not used for the moment.
-	BTextControl *fRecentDocumentsTextControl;
-	BTextControl *fRecentFoldersTextControl;
 
-	bool fDesktopFilePanelRoot;
-	int32 fRecentApplications; // Not used for the moment,
-	int32 fRecentDocuments;
-	int32 fRecentFolders;
-	
-	mutable int32 fDisplayedAppCount; // Not used for the moment.
-	mutable int32 fDisplayedDocCount;
-	mutable int32 fDisplayedFolderCount;
+	private:
+		void _GetAndRefreshDisplayedFigures() const;
+		void _SendNotices();
 
-	typedef SettingsView _inherited;
+		BCheckBox *fDesktopFilePanelRootCheckBox;
+
+		BTextControl *fRecentApplicationsTextControl; // Not used for the moment.
+		BTextControl *fRecentDocumentsTextControl;
+		BTextControl *fRecentFoldersTextControl;
+
+		bool fDesktopFilePanelRoot;
+		int32 fRecentApplications; // Not used for the moment,
+		int32 fRecentDocuments;
+		int32 fRecentFolders;
+
+		mutable int32 fDisplayedAppCount; // Not used for the moment.
+		mutable int32 fDisplayedDocCount;
+		mutable int32 fDisplayedFolderCount;
+
+		typedef SettingsView _inherited;
 };
 
 class TimeFormatSettingsView : public SettingsView {
-public:
-	TimeFormatSettingsView(BRect);
+	public:
+		TimeFormatSettingsView(BRect frame);
 
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();	
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();	
 
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
-	
-	void UpdateExamples();
-private:
-	BRadioButton *f24HrRadioButton;
-	BRadioButton *f12HrRadioButton;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
 
-	BRadioButton *fYMDRadioButton;
-	BRadioButton *fDMYRadioButton;
-	BRadioButton *fMDYRadioButton;
+	private:
+		void _UpdateExamples();
+		void _SendNotices();
 
-	BMenuField *fSeparatorMenuField;
-	
-	BStringView *fLongDateExampleView;
-	BStringView *fShortDateExampleView;
-	
-	bool f24HrClock;
+		BRadioButton *f24HrRadioButton;
+		BRadioButton *f12HrRadioButton;
 
-	FormatSeparator fSeparator;
-	DateOrder fFormat;
+		BRadioButton *fYMDRadioButton;
+		BRadioButton *fDMYRadioButton;
+		BRadioButton *fMDYRadioButton;
 
-	typedef SettingsView _inherited;
+		BMenuField *fSeparatorMenuField;
+
+		BStringView *fLongDateExampleView;
+		BStringView *fShortDateExampleView;
+
+		bool f24HrClock;
+
+		FormatSeparator fSeparator;
+		DateOrder fFormat;
+
+		typedef SettingsView _inherited;
 };
 
 class SpaceBarSettingsView : public SettingsView {
-public:
-	SpaceBarSettingsView(BRect);
-	~SpaceBarSettingsView();
+	public:
+		SpaceBarSettingsView(BRect frame);
+		virtual ~SpaceBarSettingsView();
 
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();
-	
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();
 
-private:
-	BCheckBox		*fSpaceBarShowCheckBox;
-	BColorControl	*fColorControl;
-	BMenuField		*fColorPicker;
-//	BRadioButton *fUsedRadio;
-//	BRadioButton *fWarningRadio;
-//	BRadioButton *fFreeRadio;
-	int32			fCurrentColor;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
 
-	bool			fSpaceBarShow;
-	rgb_color		fUsedSpaceColor;
-	rgb_color		fFreeSpaceColor;
-	rgb_color		fWarningSpaceColor;
+	private:
+		BCheckBox		*fSpaceBarShowCheckBox;
+		BColorControl	*fColorControl;
+		BMenuField		*fColorPicker;
+		int32			fCurrentColor;
 
-	typedef SettingsView _inherited;
+		bool			fSpaceBarShow;
+		rgb_color		fUsedSpaceColor;
+		rgb_color		fFreeSpaceColor;
+		rgb_color		fWarningSpaceColor;
+
+		typedef SettingsView _inherited;
 };
 
 class TrashSettingsView : public SettingsView {
-public:
-	TrashSettingsView(BRect);
+	public:
+		TrashSettingsView(BRect frame);
 
-	void MessageReceived(BMessage *);
-	void AttachedToWindow();
+		virtual void MessageReceived(BMessage *message);
+		virtual void AttachedToWindow();
 	
-	void SetDefaults();
-	void Revert();
-	void ShowCurrentSettings(bool sendNotices = false);
-	void RecordRevertSettings();
-	bool ShowsRevertSettings() const;
+		virtual void SetDefaults();
+		virtual void Revert();
+		virtual void ShowCurrentSettings();
+		virtual void RecordRevertSettings();
+		virtual bool IsRevertable() const;
 
-private:
-	BCheckBox *fDontMoveFilesToTrashCheckBox;
-	BCheckBox *fAskBeforeDeleteFileCheckBox;
+	private:
+		void _SendNotices();
 
-	bool fDontMoveFilesToTrash;
-	bool fAskBeforeDeleteFile;
-	
-	typedef SettingsView _inherited;
+		BCheckBox *fDontMoveFilesToTrashCheckBox;
+		BCheckBox *fAskBeforeDeleteFileCheckBox;
+
+		bool fDontMoveFilesToTrash;
+		bool fAskBeforeDeleteFile;
+
+		typedef SettingsView _inherited;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _SETTINGS_VIEWS

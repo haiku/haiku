@@ -2272,22 +2272,36 @@ BPoseView::MessageReceived(BMessage *message)
 						break;
 
 					case kShowSelectionWhenInactiveChanged:
-						message->FindBool("ShowSelectionWhenInactive", &fShowSelectionWhenInactive);
-						TrackerSettings().SetShowSelectionWhenInactive(fShowSelectionWhenInactive);
+					{
+						// Updating the settings here will propagate setting changed
+						// from Tracker to all open file panels as well
+						bool showSelection;
+						if (message->FindBool("ShowSelectionWhenInactive", &showSelection) == B_OK) {
+							fShowSelectionWhenInactive = showSelection;
+							TrackerSettings().SetShowSelectionWhenInactive(fShowSelectionWhenInactive);
+						}
 						Invalidate();
 						break;
+					}
 
 					case kTransparentSelectionChanged:
-						message->FindBool("TransparentSelection", &fTransparentSelection);
-						TrackerSettings().SetTransparentSelection(fTransparentSelection);
+					{
+						bool transparentSelection;
+						if (message->FindBool("TransparentSelection", &transparentSelection) == B_OK) {
+							fTransparentSelection = transparentSelection;
+							TrackerSettings().SetTransparentSelection(fTransparentSelection);
+						}
 						break;
+					}
 
 					case kSortFolderNamesFirstChanged:
 						if (ViewMode() == kListMode) {
+							TrackerSettings settings;
 							bool sortFolderNamesFirst;
-							message->FindBool("SortFolderNamesFirst", &sortFolderNamesFirst);
-							TrackerSettings().SetSortFolderNamesFirst(sortFolderNamesFirst);
-							NameAttributeText::SetSortFolderNamesFirst(sortFolderNamesFirst);
+							if (message->FindBool("SortFolderNamesFirst", &sortFolderNamesFirst) == B_OK)
+								settings.SetSortFolderNamesFirst(sortFolderNamesFirst);
+
+							NameAttributeText::SetSortFolderNamesFirst(settings.SortFolderNamesFirst());
 							SortPoses();
 							Invalidate();
 						}
@@ -2295,8 +2309,8 @@ BPoseView::MessageReceived(BMessage *message)
 
 					case kShowVolumeSpaceBar:
 						bool enabled;
-						message->FindBool("ShowVolumeSpaceBar", &enabled);
-						TrackerSettings().SetShowVolumeSpaceBar(enabled);
+						if (message->FindBool("ShowVolumeSpaceBar", &enabled) == B_OK)
+							TrackerSettings().SetShowVolumeSpaceBar(enabled);
 						// supposed to fall through
 					case kSpaceBarColorChanged:
 						UpdateVolumeIcons();

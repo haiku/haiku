@@ -32,11 +32,13 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+
 #include "SettingsViews.h"
 #include "TrackerSettings.h"
 #include "TrackerSettingsWindow.h"
 
 #include <CheckBox.h>
+
 
 const BPoint kSettingsWindowOffset(30, 30);
 const float kSettingsWindowsWidth = 370;
@@ -48,27 +50,27 @@ const uint32 kRevertButtonPressed = 'Rebp';
 
 
 TrackerSettingsWindow::TrackerSettingsWindow()
-	:	BWindow(BRect(kSettingsWindowOffset.x, kSettingsWindowOffset.y,
-			kSettingsWindowOffset.x + kSettingsWindowsWidth,
-			kSettingsWindowOffset.y + kSettingsWindowsHeight),
-			"Tracker Settings", B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-			| B_NO_WORKSPACE_ACTIVATION | B_NOT_ANCHORED_ON_ACTIVATE
-			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	: BWindow(BRect(kSettingsWindowOffset.x, kSettingsWindowOffset.y,
+		kSettingsWindowOffset.x + kSettingsWindowsWidth,
+		kSettingsWindowOffset.y + kSettingsWindowsHeight),
+		"Tracker Settings", B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
+		| B_NO_WORKSPACE_ACTIVATION | B_NOT_ANCHORED_ON_ACTIVATE
+		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BView *backgroundView = new BView(Bounds(), "Background", B_FOLLOW_ALL_SIDES, 0);
-	
+
 	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(backgroundView);
-	
+
 	const float kBorderDistance = 12;
 	const float kListViewWidth = 90;
 	const float kListViewHeight = kSettingsWindowsHeight - 2 * kBorderDistance;
 	const float kBoxWidth = kSettingsWindowsWidth - kListViewWidth - 3 * (kBorderDistance - 1);
 	const float kBoxHeight = kListViewHeight - 30;
-	
+
 	BRect listViewRect(kBorderDistance, kBorderDistance, kBorderDistance + kListViewWidth,
 		kBorderDistance + kListViewHeight);
-	
+
 	BBox *borderBox = new BBox(listViewRect.InsetByCopy(-2, -2));
 
 	backgroundView->AddChild(borderBox);
@@ -77,20 +79,20 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	listViewRect.right -= 1;
 
 	fSettingsTypeListView = new BListView(listViewRect, "List View");
-	
+
 	borderBox->AddChild(fSettingsTypeListView);
-	
+
 	fSettingsContainerBox = new BBox(BRect(kBorderDistance + kListViewWidth + kBorderDistance,
 		kBorderDistance, kBorderDistance + kListViewWidth + kBorderDistance + kBoxWidth,
 		kBorderDistance + kBoxHeight));
-		
+
 	backgroundView->AddChild(fSettingsContainerBox);
-	
+
 	const float kButtonTop = fSettingsContainerBox->Frame().bottom + kBorderDistance;
 	const float kDefaultsButtonLeft = fSettingsContainerBox->Frame().left;
 	const float kButtonWidth = 45;
 	const float kButtonHeight = 20;
-	
+
 	fDefaultsButton = new BButton(BRect(kDefaultsButtonLeft, kButtonTop,
 		 kDefaultsButtonLeft + kButtonWidth, kButtonTop + kButtonHeight),
 		 "Defaults", "Defaults", new BMessage(kDefaultsButtonPressed));
@@ -103,15 +105,15 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	fRevertButton = new BButton(BRect(fDefaultsButton->Frame().right + kBorderDistance,
 		kButtonTop, fDefaultsButton->Frame().right + kBorderDistance + kButtonWidth, kButtonTop
 		+ kButtonHeight), "Revert", "Revert", new BMessage(kRevertButtonPressed));
-	
+
 	fRevertButton->SetEnabled(false);
 	fRevertButton->ResizeToPreferred();
 	backgroundView->AddChild(fRevertButton);
 
 	BRect SettingsViewSize = fSettingsContainerBox->Bounds().InsetByCopy(5, 5);
-	
+
 	SettingsViewSize.top += 10;
-	
+
 	fSettingsTypeListView->AddItem(new SettingsItem("Desktop",
 		new DesktopSettingsView(SettingsViewSize)));
 	fSettingsTypeListView->AddItem(new SettingsItem("Windows",
@@ -141,7 +143,7 @@ TrackerSettingsWindow::QuitRequested()
 		Unlock();
 	} else
 		return true;
-	
+
 	if (isHidden)
 		return true;
 
@@ -154,16 +156,15 @@ TrackerSettingsWindow::QuitRequested()
 void
 TrackerSettingsWindow::MessageReceived(BMessage *message)
 {
-
 	switch (message->what) {
 		case kSettingsContentsModified:
 			HandleChangedContents();
 			break;
-		
+
 		case kDefaultsButtonPressed:
 			HandlePressedDefaultsButton();
 			break;
-		
+
 		case kRevertButtonPressed:
 			HandlePressedRevertButton();
 			break;
@@ -171,7 +172,7 @@ TrackerSettingsWindow::MessageReceived(BMessage *message)
 		case kSettingsViewChanged:
 			HandleChangedSettingsView();
 			break;
-		
+
 		default:
 			_inherited::MessageReceived(message);
 	}
@@ -182,16 +183,15 @@ void
 TrackerSettingsWindow::Show()
 {
 	if (Lock()) {
-	
 		int32 itemCount = fSettingsTypeListView->CountItems();
-	
-		for (int32 i = 0; i<itemCount; i++) {
+
+		for (int32 i = 0; i < itemCount; i++) {
 			ViewAt(i)->RecordRevertSettings();
 			ViewAt(i)->ShowCurrentSettings();
 		}
 
 		fSettingsTypeListView->Invalidate();
-		
+
 		Unlock();
 	}
 	_inherited::Show();
@@ -218,10 +218,11 @@ TrackerSettingsWindow::HandleChangedContents()
 	int32 itemCount = fSettingsTypeListView->CountItems();
 
 	bool revertable = false;
-	
-	for (int32 i = 0; i < itemCount; i++)
-		revertable |= ! ViewAt(i)->ShowsRevertSettings();
-	
+
+	for (int32 i = 0; i < itemCount; i++) {
+		revertable |= ViewAt(i)->IsRevertable();
+	}
+
 	fSettingsTypeListView->Invalidate();	
 	fRevertButton->SetEnabled(revertable);
 
@@ -245,24 +246,25 @@ void
 TrackerSettingsWindow::HandlePressedRevertButton()
 {
 	int32 itemCount = fSettingsTypeListView->CountItems();
-	
-	for (int32 i = 0; i < itemCount; i++)
-		if (ViewAt(i)->ShowsRevertSettings() == false)
+
+	for (int32 i = 0; i < itemCount; i++) {
+		if (ViewAt(i)->IsRevertable())
 			ViewAt(i)->Revert();
+	}
 
 	HandleChangedContents();
 }
+
 
 void
 TrackerSettingsWindow::HandleChangedSettingsView()
 {
 	int32 currentSelection = fSettingsTypeListView->CurrentSelection();
-
 	if (currentSelection < 0)
 		return;
- 
- 	BView *oldView = fSettingsContainerBox->ChildAt(0);
-	
+
+	BView *oldView = fSettingsContainerBox->ChildAt(0);
+
 	if (oldView)
 		oldView->RemoveSelf();
 
@@ -276,13 +278,18 @@ TrackerSettingsWindow::HandleChangedSettingsView()
 	}
 }
 
+
+//	#pragma mark -
+
+
 SettingsItem::SettingsItem(const char *label, SettingsView *view)
-	:	BStringItem(label),
-		fSettingsView(view)
+	: BStringItem(label),
+	fSettingsView(view)
 {
 }
 
-void 
+
+void
 SettingsItem::DrawItem(BView *owner, BRect rect, bool drawEverything)
 {
 	const rgb_color kModifiedColor = {0, 0, 255, 0};
@@ -290,7 +297,7 @@ SettingsItem::DrawItem(BView *owner, BRect rect, bool drawEverything)
 	const rgb_color kSelectedColor = {140, 140, 140, 0};
 
 	if (fSettingsView) {
-		bool showsRevertSettings = fSettingsView->ShowsRevertSettings();
+		bool isRevertable = fSettingsView->IsRevertable();
 		bool isSelected = IsSelected();
 
 		if (isSelected || drawEverything) { 
@@ -304,20 +311,21 @@ SettingsItem::DrawItem(BView *owner, BRect rect, bool drawEverything)
 			owner->SetLowColor(color); 
 			owner->FillRect(rect); 
 		}
-	
-		if (!showsRevertSettings)
+
+		if (isRevertable)
 			owner->SetHighColor(kModifiedColor);
 		else			
 			owner->SetHighColor(kBlack);
 
 		owner->MovePenTo(rect.left + 4, rect.bottom - 2);
-		
+
 		owner->DrawString(Text());
 
 		owner->SetHighColor(kBlack);
 		owner->SetLowColor(owner->ViewColor());
 	}
 }
+
 
 SettingsView *
 SettingsItem::View()

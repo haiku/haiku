@@ -32,7 +32,24 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include <string.h>
+
+#include "Attributes.h"
+#include "AttributeStream.h"
+#include "AutoLock.h"
+#include "Commands.h"
+#include "DesktopPoseView.h"
+#include "DirMenu.h"
+#include "FavoritesConfig.h"
+#include "FavoritesMenu.h"
+#include "FilePanelPriv.h"
+#include "FSUtils.h"
+#include "FSClipboard.h"
+#include "IconMenuItem.h"
+#include "MimeTypes.h"
+#include "NavMenu.h"
+#include "PoseView.h"
+#include "Tracker.h"
+#include "tracker_private.h"
 
 #include <Alert.h>
 #include <Application.h>
@@ -57,23 +74,7 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include "Attributes.h"
-#include "AttributeStream.h"
-#include "AutoLock.h"
-#include "Commands.h"
-#include "DesktopPoseView.h"
-#include "DirMenu.h"
-#include "FavoritesConfig.h"
-#include "FavoritesMenu.h"
-#include "FilePanelPriv.h"
-#include "FSUtils.h"
-#include "FSClipboard.h"
-#include "IconMenuItem.h"
-#include "MimeTypes.h"
-#include "NavMenu.h"
-#include "PoseView.h"
-#include "Tracker.h"
-#include "tracker_private.h"
+#include <string.h>
 
 
 const char *kDefaultFilePanelTemplate = "FilePanelSettings";
@@ -228,12 +229,12 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
 
 TFilePanel::~TFilePanel()
 {
-	//	regardless of the hide/close method
-	//	always get rid of the config window
+	// regardless of the hide/close method
+	// always get rid of the config window
 	if (fConfigWindow) {
-		//	moved from QuitRequested to ensure that
-		//	if the config window is showing that
-		//	it gets closed as well
+		// moved from QuitRequested to ensure that
+		// if the config window is showing that
+		// it gets closed as well
 		fConfigWindow->Lock();
 		fConfigWindow->Quit();
 	}
@@ -1028,10 +1029,8 @@ TFilePanel::MessageReceived(BMessage *message)
 		case B_REFS_RECEIVED:
 			// item was double clicked in file panel (PoseView)
 			if (message->FindRef("refs", &ref) == B_OK) {
-
 				BEntry entry(&ref, true);
 				if (entry.InitCheck() == B_OK) {
-			
 					// Double-click on dir or link-to-dir ALWAYS opens the dir.
 					// If more than one dir is selected, the
 					// first is entered.
@@ -1044,24 +1043,23 @@ TFilePanel::MessageReceived(BMessage *message)
 						PoseView()->SwitchDir(&ref);
 						SwitchDirMenuTo(&ref);
 					} else {
-	
 						// Otherwise, we have a file or a link to a file. 
 						// AdjustButton has already tested the flavor;
 						// all we have to do is see if the button is enabled.
 						BButton *button = dynamic_cast<BButton *>(FindView("default button"));
 						if (!button)
 							break;
-						
+
 						if (IsSavePanel()) {
 							int32 count = 0;
 							type_code type;
 							message->GetInfo("refs", &type, &count);
 							
 							// Don't allow saves of multiple files
-							if (count > 1) 
+							if (count > 1) {
 								ShowCenteredAlert("Sorry, saving of more than one item is not allowed.",
 									"Cancel");
-							else {
+							} else {
 								// if we are a savepanel, set up the filepanel correctly
 								// then pass control so we follow the same path as if the user
 								// clicked the save button
@@ -1075,8 +1073,7 @@ TFilePanel::MessageReceived(BMessage *message)
 							}
 							break;
 						}						
-						
-						
+
 					  	// send handler a message and close
 						BMessage openMessage(*fMessage);
 						for (int32 index = 0; ; index++) {
@@ -1089,124 +1086,125 @@ TFilePanel::MessageReceived(BMessage *message)
 				}
 			}
 			break;
-			
+
 		case kSwitchDirectory:
-			{
-				entry_ref ref;
-				// this comes from dir menu or nav menu, so switch directories
-				if (message->FindRef("refs", &ref) == B_OK) {
-					BEntry entry(&ref, true);
-					if (entry.GetRef(&ref) == B_OK)
-						SetTo(&ref);
-				}
+		{
+			entry_ref ref;
+			// this comes from dir menu or nav menu, so switch directories
+			if (message->FindRef("refs", &ref) == B_OK) {
+				BEntry entry(&ref, true);
+				if (entry.GetRef(&ref) == B_OK)
+					SetTo(&ref);
 			}
 			break;
-			
+		}
+
 		case kSwitchToHome:
-			{
-				BPath homePath;
-				entry_ref ref;
-				if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK
-					|| get_ref_for_path(homePath.Path(), &ref) != B_OK)
-					break;
-				
-				SetTo(&ref);
-			}
+		{
+			BPath homePath;
+			entry_ref ref;
+			if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK
+				|| get_ref_for_path(homePath.Path(), &ref) != B_OK)
+				break;
+			
+			SetTo(&ref);
 			break;
+		}
 
 		case kAddCurrentDir:
-			{
-				BPath path;
-				if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
-					break;
-	
-				path.Append(kGoDirectory);
-				BDirectory goDirectory(path.Path());
+		{
+			BPath path;
+			if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+				break;
 
-				if (goDirectory.InitCheck() == B_OK) {
-					BEntry entry(TargetModel()->EntryRef());
-					entry.GetPath(&path);
-	
-					BSymLink link;
-					goDirectory.CreateSymLink(TargetModel()->Name(), path.Path(), &link);
-				}
+			path.Append(kGoDirectory);
+			BDirectory goDirectory(path.Path());
+
+			if (goDirectory.InitCheck() == B_OK) {
+				BEntry entry(TargetModel()->EntryRef());
+				entry.GetPath(&path);
+
+				BSymLink link;
+				goDirectory.CreateSymLink(TargetModel()->Name(), path.Path(), &link);
 			}
 			break;
+		}
 
 		case kConfigShow:
-			{
-				if (fConfigWindow)
-					fConfigWindow->Activate();
-				else {
-					BPath path;
-					if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
-						break;
-		
-					path.Append(kGoDirectory);
-					BDirectory goDirectory(path.Path());
-	
-					if (goDirectory.InitCheck() == B_OK) {
-						entry_ref startref;
-						BEntry entry;
-						goDirectory.GetEntry(&entry);
-						entry.GetRef(&startref);
-						
-						int32 apps, docs, folders;
-						TrackerSettings().RecentCounts(&apps, &docs, &folders);
+		{
+			if (fConfigWindow) {
+				fConfigWindow->Activate();
+				break;
+			}
 
-						//	if this is a save panel
-						//	then don't show recent docs controls
-						if (fIsSavePanel)
-							docs = -1;
-						
-						fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 24),
-							"Configure Favorites", Feel() == B_MODAL_APP_WINDOW_FEEL,
-							fNodeFlavors, BMessenger(this), &startref, -1, docs, folders);
-					}
-				}
+			BPath path;
+			if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+				break;
+
+			path.Append(kGoDirectory);
+			BDirectory goDirectory(path.Path());
+
+			if (goDirectory.InitCheck() == B_OK) {
+				entry_ref startref;
+				BEntry entry;
+				goDirectory.GetEntry(&entry);
+				entry.GetRef(&startref);
+				
+				int32 apps, docs, folders;
+				TrackerSettings().RecentCounts(&apps, &docs, &folders);
+
+				// if this is a save panel
+				// then don't show recent docs controls
+				if (fIsSavePanel)
+					docs = -1;
+				
+				fConfigWindow = new TFavoritesConfigWindow(BRect(0, 0, 320, 24),
+					"Configure Favorites", Feel() == B_MODAL_APP_WINDOW_FEEL,
+					fNodeFlavors, BMessenger(this), &startref, -1, docs, folders);
 			}
 			break;
+		}
 
 		case kConfigClose:
-			{
-				int32 count = 0;
-				TrackerSettings settings;
+		{
+			int32 count = 0;
+			TrackerSettings settings;
 
-				//	save off whatever was last in the fields
-				//	do this just in case someone didn't tab out
-				if (message->FindInt32("applications", &count) == B_OK)				
-					settings.SetRecentApplicationsCount(count);
-				if (message->FindInt32("folders", &count) == B_OK)				
-					settings.SetRecentFoldersCount(count);
-				if (message->FindInt32("documents", &count) == B_OK)				
-					settings.SetRecentDocumentsCount(count);
-					
-				settings.SaveSettings(false);
+			// save off whatever was last in the fields
+			// do this just in case someone didn't tab out
+			if (message->FindInt32("applications", &count) == B_OK)				
+				settings.SetRecentApplicationsCount(count);
+			if (message->FindInt32("folders", &count) == B_OK)				
+				settings.SetRecentFoldersCount(count);
+			if (message->FindInt32("documents", &count) == B_OK)				
+				settings.SetRecentDocumentsCount(count);
 
-				fConfigWindow = NULL;
-			}
+			settings.SaveSettings(false);
+
+			fConfigWindow = NULL;
 			break;
+		}
 
 		case kUpdateAppsCount:
 		case kUpdateDocsCount:
 		case kUpdateFolderCount:
-			{
-				//	messages sent when the user changes the count
-				int32 count;
-				TrackerSettings settings;
-				
-				if (message->FindInt32("count", &count) == B_OK) {
-					if (message->what == kUpdateAppsCount) 
-						settings.SetRecentApplicationsCount(count);
-					else if (message->what == kUpdateDocsCount) 
-						settings.SetRecentDocumentsCount(count);
-					else if (message->what == kUpdateFolderCount) 
-						settings.SetRecentFoldersCount(count);
-					settings.SaveSettings(false);
-				}
+		{
+			// messages sent when the user changes the count
+			int32 count;
+			TrackerSettings settings;
+
+			if (message->FindInt32("count", &count) == B_OK) {
+				if (message->what == kUpdateAppsCount) 
+					settings.SetRecentApplicationsCount(count);
+				else if (message->what == kUpdateDocsCount) 
+					settings.SetRecentDocumentsCount(count);
+				else if (message->what == kUpdateFolderCount) 
+					settings.SetRecentFoldersCount(count);
+				settings.SaveSettings(false);
 			}
 			break;
-			
+		}
+
 		case kCancelButton:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -1234,26 +1232,25 @@ TFilePanel::MessageReceived(BMessage *message)
 				HandleSaveButton();
 			} else
 				HandleOpenButton();
-
 			break;
 
 		case B_OBSERVER_NOTICE_CHANGE:
-			{
-				int32 observerWhat;
-				if (message->FindInt32("be:observe_change_what", &observerWhat) == B_OK) {
-					switch (observerWhat) {
-						case kDesktopFilePanelRootChanged:
-						{
-							bool desktopIsRoot = true;
-							message->FindBool("DesktopFilePanelRoot", &desktopIsRoot);
+		{
+			int32 observerWhat;
+			if (message->FindInt32("be:observe_change_what", &observerWhat) == B_OK) {
+				switch (observerWhat) {
+					case kDesktopFilePanelRootChanged:
+					{
+						bool desktopIsRoot = true;
+						if (message->FindBool("DesktopFilePanelRoot", &desktopIsRoot) == B_OK)
 							TrackerSettings().SetDesktopFilePanelRoot(desktopIsRoot);
-							SetTo(TargetModel()->EntryRef());
-							break;
-						}
+						SetTo(TargetModel()->EntryRef());
+						break;
 					}
-				}		
-			}
+				}
+			}		
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
@@ -1267,7 +1264,7 @@ TFilePanel::OpenDirectory()
 	BObjectList<BPose> *list = PoseView()->SelectionList();
 	if (list->CountItems() != 1)
 		return;
-	
+
 	Model *model = list->FirstItem()->TargetModel();
 	if (model->ResolveIfLink()->IsDirectory()) {
 		BMessage message(B_REFS_RECEIVED);
@@ -1558,9 +1555,12 @@ TFilePanel::WindowActivated(bool active)
 }
 
 
+//	#pragma mark -
+
+
 BFilePanelPoseView::BFilePanelPoseView(Model *model, BRect frame, uint32 resizeMask)
-	:	BPoseView(model, frame, kListMode, resizeMask),
-		fIsDesktop(false)
+	: BPoseView(model, frame, kListMode, resizeMask),
+	fIsDesktop(false)
 {
 }
 

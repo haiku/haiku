@@ -43,46 +43,48 @@ All rights reserved.
 
 #include "SettingsViews.h"
 
+
 namespace BPrivate {
 
 class TrackerSettingsWindow : public BWindow {
-public:
-	TrackerSettingsWindow();
-	
-	bool QuitRequested();
-	void MessageReceived(BMessage *);
-	void Show();
-	
-	SettingsView *ViewAt(int32 i);
+	public:
+		TrackerSettingsWindow();
 
-	void HandleChangedContents();
-	void HandlePressedDefaultsButton();
-	void HandlePressedRevertButton();
-	void HandleChangedSettingsView();
-	
-private:
-	BListView *fSettingsTypeListView;
-	BBox *fSettingsContainerBox;
-	BButton *fDefaultsButton;
-	BButton *fRevertButton;
+		bool QuitRequested();
+		void MessageReceived(BMessage *message);
+		void Show();
 
-	typedef BWindow _inherited;
+		SettingsView *ViewAt(int32 i);
+
+		void HandleChangedContents();
+		void HandlePressedDefaultsButton();
+		void HandlePressedRevertButton();
+		void HandleChangedSettingsView();
+
+	private:
+		BListView *fSettingsTypeListView;
+		BBox *fSettingsContainerBox;
+		BButton *fDefaultsButton;
+		BButton *fRevertButton;
+
+		typedef BWindow _inherited;
 };
 
 
 class SettingsItem : public BStringItem {
-public:
-	SettingsItem(const char *, SettingsView *);
+	public:
+		SettingsItem(const char *label, SettingsView *view);
 
-	void DrawItem(BView *owner, BRect rect, bool drawEverything);
+		void DrawItem(BView *owner, BRect rect, bool drawEverything);
 
-	SettingsView *View();
-private:
-	SettingsView *fSettingsView;
+		SettingsView *View();
+
+	private:
+		SettingsView *fSettingsView;
 };
 
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _TRACKER_SETTINGS_WINDOW
