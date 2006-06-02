@@ -12,5 +12,11 @@ Addon <userland>loopback : userland obos_network interfaces :
 	loopback.c
 ;
 
-LinkAgainst <userland>loopback : <installed>net_stack_tester ;
+LinkAgainst <userland>loopback : <installed-userland-networking>net_stack_tester ;
 
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network interfaces ]
+	: <userland>loopback
+	: installed-userland-networking
+;

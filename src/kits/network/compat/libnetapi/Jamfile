@@ -38,6 +38,11 @@ HaikuInstallRelSymLink install-networking
 	: libnetapi.so
 	: installed-networking-test ;
 
+HaikuInstallRelSymLink install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
+	: libnetapi.so
+	: installed-userland-networking ;
+
 Package haiku-networkingkit-cvs :
 	libnetapi.so :
 #	boot home config lib ;

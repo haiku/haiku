@@ -205,6 +205,11 @@ HaikuInstallRelSymLink install-networking
 	: libbind.so
 	: installed-networking-test ;
 
+HaikuInstallRelSymLink install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
+	: libbind.so
+	: installed-userland-networking ;
+
 Package haiku-networkingkit-cvs :
 	libbind.so :
 #	boot home config lib ;

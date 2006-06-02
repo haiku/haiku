@@ -16,8 +16,14 @@ Addon <userland>ipcp : userland obos_network ppp :
 
 LinkAgainst <userland>ipcp : 
 	<userland>libkernelppp.a 
-	<installed>net_stack_tester 
+	<installed-userland-networking>net_stack_tester 
 	be 
 	libbind.so 
 ;
 
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network ppp ]
+	: <userland>ipcp
+	: installed-userland-networking
+;

@@ -108,6 +108,11 @@ HaikuInstallRelSymLink install-networking
 	: libnet.so
 	: installed-networking-test ;
 
+HaikuInstallRelSymLink install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
+	: libnet.so
+	: installed-userland-networking ;
+
 Package haiku-networkingkit-cvs :
 	libnet.so :
 #	boot home config lib ;

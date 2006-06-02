@@ -12,4 +12,11 @@ Addon <userland>udp : userland obos_network protocols :
 	udp.c
 ;
 
-LinkAgainst <userland>udp : <installed>net_stack_tester ;
+LinkAgainst <userland>udp : <installed-userland-networking>net_stack_tester ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network protocols ]
+	: <userland>udp
+	: installed-userland-networking
+;

@@ -26,5 +26,11 @@ Addon <userland>core : userland obos_network :
 	socket.c
 ;
 
-LinkAgainst <userland>core : <installed>net_stack_tester ;
+LinkAgainst <userland>core : <installed-userland-networking>net_stack_tester ;
 
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network ]
+	: <userland>core 
+	: installed-userland-networking
+;

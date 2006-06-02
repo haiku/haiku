@@ -12,4 +12,11 @@ Addon <userland>route : userland obos_network protocols :
 	route.c
 ;
 
-LinkAgainst <userland>route : <installed>net_stack_tester ;
+LinkAgainst <userland>route : <installed-userland-networking>net_stack_tester ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network protocols ]
+	: <userland>route
+	: installed-userland-networking
+;

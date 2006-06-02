@@ -15,5 +15,15 @@ Addon <userland>modem : userland obos_network ppp :
 	ACFCHandler.cpp
 ;
 
-LinkAgainst <userland>modem : <userland>libkernelppp.a <installed>net_stack_tester be ;
+LinkAgainst <userland>modem 
+	: <userland>libkernelppp.a 
+	  <installed-userland-networking>net_stack_tester 
+	  be 
+;
 
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network ppp ]
+	: <userland>modem
+	: installed-userland-networking
+;

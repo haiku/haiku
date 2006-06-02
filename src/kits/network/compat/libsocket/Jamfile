@@ -27,6 +27,11 @@ HaikuInstallRelSymLink install-networking
 	: libsocket.so
 	: installed-networking-test ;
 
+HaikuInstallRelSymLink install-userland-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
+	: libsocket.so
+	: installed-userland-networking ;
+
 Package haiku-networkingkit-cvs :
 	libsocket.so :
 #	boot home config lib ;

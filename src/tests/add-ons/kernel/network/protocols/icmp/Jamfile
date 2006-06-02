@@ -12,4 +12,11 @@ Addon <userland>icmp : userland obos_network protocols :
 	icmp.c
 ;
 
-LinkAgainst <userland>icmp : <installed>net_stack_tester ;
+LinkAgainst <userland>icmp : <installed-userland-networking>net_stack_tester ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network protocols ]
+	: <userland>icmp
+	: installed-userland-networking
+;

@@ -363,9 +363,8 @@ static char * stack_driver_path(void) {
 
   // user-defined stack driver path?
   path = getenv("NET_STACK_DRIVER_PATH");
-  if (path)
-    return path;
-
-  // use the default stack driver path
-  return NET_STACK_DRIVER_PATH;
+  if (!path)
+    path = NET_STACK_DRIVER_PATH;
+  printf("net-stack-driver-path = %s\n", path);
+  return path;
 }

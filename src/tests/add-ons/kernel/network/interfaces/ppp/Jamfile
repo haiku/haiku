@@ -14,5 +14,14 @@ Addon <userland>ppp : userland obos_network interfaces :
 	PPPManager.cpp
 ;
 
-LinkAgainst <userland>ppp : <userland>libkernelppp.a <installed>net_stack_tester be ;
+LinkAgainst <userland>ppp 
+	: <userland>libkernelppp.a 
+	  <installed-userland-networking>net_stack_tester be 
+;
 
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network interfaces ]
+	: <userland>ppp
+	: installed-userland-networking
+;

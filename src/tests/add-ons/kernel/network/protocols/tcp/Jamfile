@@ -17,4 +17,11 @@ Addon <userland>tcp : userland obos_network protocols :
 	arc4random.c
 ;
 
-LinkAgainst <userland>tcp : <installed>net_stack_tester ;
+LinkAgainst <userland>tcp : <installed-userland-networking>net_stack_tester ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland add-ons obos_network protocols ]
+	: <userland>tcp
+	: installed-userland-networking
+;
