@@ -26,7 +26,6 @@
 #include <PrintJob.h>
 #include <Roster.h>
 #include <ScrollView.h>
-#include <stdlib.h>
 #include <String.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
@@ -35,12 +34,13 @@
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 
+#include <stdlib.h>
 
 using namespace BPrivate;
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
-	: BWindow(frame,"untitled",B_DOCUMENT_WINDOW,0)
+	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	InitWindow(encoding);
 	BString unTitled;
@@ -54,7 +54,7 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding)
-	: BWindow(frame,"untitled",B_DOCUMENT_WINDOW,0)
+	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	InitWindow(encoding);
 	OpenFile(ref);
@@ -940,12 +940,27 @@ StyledEditWindow::SaveAs(BMessage *message)
 status_t
 StyledEditWindow::_LoadFile(entry_ref* ref)
 {
+	BEntry entry(ref, true);
+		// traverse an eventual link
+
+	status_t status = entry.InitCheck();
+	if (status == B_OK && entry.IsDirectory())
+		status = B_IS_A_DIRECTORY;
+
 	BFile file;
-	status_t status = file.SetTo(ref, B_READ_ONLY);
+	if (status == B_OK)
+		status = file.SetTo(&entry, B_READ_ONLY);
 	if (status == B_OK)
 		status = fTextView->GetStyledText(&file);
 
+	if (status == B_ENTRY_NOT_FOUND) {
+		// Treat non-existing files consideratley; we just want to get an
+		// empty window for them - to create this new document
+		status = B_OK;
+	}
+
 	if (status != B_OK) {
+		// If an error occured, bail out and tell the user what happened
 		BEntry entry(ref, true);
 		char name[B_FILE_NAME_LENGTH];
 		if (entry.GetName(name) != B_OK)

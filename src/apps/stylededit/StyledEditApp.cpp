@@ -66,6 +66,9 @@ uncascade()
 }
 
 
+//	#pragma mark -
+
+
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE)
 {
@@ -216,15 +219,13 @@ StyledEditApp::ArgvReceived(int32 argc, const char* argv[], const char* cwd)
 		}
 
 		entry_ref ref;
-		if (get_ref_for_path(path.Path(), &ref) != B_OK) {
-			fprintf(stderr, "Entry not found: \"%s\".\n", path.Path());
+		status_t status = get_ref_for_path(path.Path(), &ref);
+		if (status != B_OK) {
+			fprintf(stderr, "Could not open \"%s\": %s.\n", path.Path(), strerror(status));
 			continue;
 		}
-		BEntry entry(&ref);
-		if (entry.IsFile())
-			OpenDocument(&ref);
-		else if (fWindowCount == 0)
-			OpenDocument();
+
+		OpenDocument(&ref);
 	}
 }
 
@@ -241,7 +242,6 @@ int32
 StyledEditApp::NumberOfWindows()
 {
  	return fWindowCount;
-
 }
 
 
