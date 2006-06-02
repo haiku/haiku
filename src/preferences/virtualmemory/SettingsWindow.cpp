@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -174,7 +174,7 @@ SettingsWindow::SettingsWindow()
 	box->AddChild(field);
 
 	off_t minSize, maxSize;
-	GetSwapFileLimits(minSize, maxSize);
+	_GetSwapFileLimits(minSize, maxSize);
 
 	rect.OffsetBy(0, lineHeight + 8);
 	fSizeSlider = new SizeSlider(rect, "size slider", "Requested Swap File Size:",
@@ -182,6 +182,7 @@ SettingsWindow::SettingsWindow()
 		B_FOLLOW_LEFT_RIGHT);
 	fSizeSlider->SetLimitLabels("999 MB", "999 MB");
 	fSizeSlider->ResizeToPreferred();
+	fSizeSlider->SetViewColor(255, 0, 255);
 	box->AddChild(fSizeSlider);
 
 	rect.OffsetBy(0, fSizeSlider->Frame().Height() + 5);
@@ -216,7 +217,7 @@ SettingsWindow::SettingsWindow()
 	if (Bounds().Width() < view->StringWidth(fSizeSlider->Label()) * 2)
 		ResizeTo(view->StringWidth(fSizeSlider->Label()) * 2, Bounds().Height());
 
-	Update();
+	_Update();
 
 	BScreen screen;
 	BRect screenFrame = screen.Frame();
@@ -236,27 +237,32 @@ SettingsWindow::~SettingsWindow()
 
 
 void
-SettingsWindow::Update()
+SettingsWindow::_Update()
 {
 	if ((fSwapEnabledCheckBox->Value() != 0) != fSettings.SwapEnabled())
 		fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
 
 	off_t minSize, maxSize;
-	GetSwapFileLimits(minSize, maxSize);
-
-	BString minLabel, maxLabel;
-	minLabel << byte_string(minSize);
-	maxLabel << byte_string(maxSize);
-	if (minLabel != fSizeSlider->MinLimitLabel()
-		|| maxLabel != fSizeSlider->MaxLimitLabel()) {
-		fSizeSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
+	if (_GetSwapFileLimits(minSize, maxSize) == B_OK) {
+		BString minLabel, maxLabel;
+		minLabel << byte_string(minSize);
+		maxLabel << byte_string(maxSize);
+		if (minLabel != fSizeSlider->MinLimitLabel()
+			|| maxLabel != fSizeSlider->MaxLimitLabel()) {
+			fSizeSlider->SetLimitLabels(minLabel.String(), maxLabel.String());
 #ifdef __HAIKU__
-		fSizeSlider->SetLimits(minSize / kMegaByte, maxSize / kMegaByte);
+			fSizeSlider->SetLimits(minSize / kMegaByte, maxSize / kMegaByte);
 #endif
-	}
+		}
 
-	if (fSizeSlider->Value() != fSettings.SwapSize() / kMegaByte)
-		fSizeSlider->SetValue(fSettings.SwapSize() / kMegaByte);
+		if (fSizeSlider->Value() != fSettings.SwapSize() / kMegaByte)
+			fSizeSlider->SetValue(fSettings.SwapSize() / kMegaByte);
+
+		fSizeSlider->SetEnabled(true);
+	} else {
+		fSizeSlider->SetValue(minSize);
+		fSizeSlider->SetEnabled(false);
+	}
 
 	// ToDo: set volume
 
@@ -271,8 +277,8 @@ SettingsWindow::Update()
 }
 
 
-void
-SettingsWindow::GetSwapFileLimits(off_t& minSize, off_t& maxSize)
+status_t
+SettingsWindow::_GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 {
 	// minimum size is the installed memory
 	system_info info;
@@ -302,9 +308,13 @@ SettingsWindow::GetSwapFileLimits(off_t& minSize, off_t& maxSize)
 	}
 
 	maxSize = freeSpace - safetyFreeSpace;
-	// ToDo: we should issue some kind of warning here
-	if (maxSize < minSize)
+
+	if (maxSize < minSize) {
 		maxSize = minSize;
+		return B_ERROR;
+	}
+
+	return B_OK;
 }
 
 
@@ -314,15 +324,15 @@ SettingsWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgRevert:
 			fSettings.RevertSwapChanges();
-			Update();
+			_Update();
 			break;
 		case kMsgDefaults:
 			fSettings.SetSwapDefaults();
-			Update();
+			_Update();
 			break;
 		case kMsgSliderUpdate:
 			fSettings.SetSwapSize((off_t)fSizeSlider->Value() * kMegaByte);
-			Update();
+			_Update();
 			break;
 		case kMsgSwapEnabledUpdate:
 		{
@@ -350,7 +360,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 			}
 
 			fSettings.SetSwapEnabled(value != 0);
-			Update();
+			_Update();
 			break;
 		}
 

@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src preferences virtualmemory ;
 
-if $(TARGET_PLATFORM) = r5 {
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
 	DRIVER_SETTINGS = driver_settings.c ;
 }
 
@@ -14,7 +16,7 @@ Preference VirtualMemory :
 	: VirtualMemory.rdef
 	;
 
-if $(TARGET_PLATFORM) = r5 {
+if $(TARGET_PLATFORM) != haiku {
 	SEARCH on [ FGristFiles driver_settings.c ] += 
 		[ FDirName $(HAIKU_TOP) src system libroot os ] ;
 }
