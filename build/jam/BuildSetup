@@ -676,7 +676,7 @@ HAIKU_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAIKU_COMMON_PLATFORM_DIR)
 	documentation ] ;
 
 # TODO: Rethink test stuff.
-HAIKU_TEST_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tests ] ;
+HAIKU_TEST_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tests $(TARGET_PLATFORM) $(HAIKU_ARCH) ] ;
 HAIKU_APP_TEST_DIR		?= [ FDirName $(HAIKU_TEST_DIR) apps ] ;
 HAIKU_APP_TEST_LIB_DIR 	?= [ FDirName $(HAIKU_APP_TEST_DIR) lib ] ;
 HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
