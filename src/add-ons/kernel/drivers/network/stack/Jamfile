@@ -37,6 +37,17 @@ HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/dri
 	installed-symlink 
 ;
 
+HaikuInstall install-userland-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
+	net_server_driver 
+	net_stack_driver	: 
+	installed-userland-networking
+;
+
+HaikuInstallRelSymLink install-userland-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed-userland-networking>net_server_driver 
+	<installed-userland-networking>net_stack_driver	: 
+	installed-userland-networking-symlink 
+;
 Package haiku-networkingkit-cvs :
 	net_stack_driver net_server_driver :
 	boot home config add-ons kernel drivers bin ;
