@@ -63,6 +63,11 @@ SimpleTest yield_test :
 	yield_test.cpp
 	;
 
+SimpleTest lock_node_test :
+	lock_node_test.cpp
+	: be
+	;
+
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src tests system kernel util ;
