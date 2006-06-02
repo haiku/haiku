@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin ifconfig ;
 
-SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+SetSubDirSupportedPlatforms haiku ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
