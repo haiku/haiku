@@ -1854,9 +1854,9 @@ BRoster::_LaunchApp(const char *mimeType, const entry_ref *ref,
 			error = get_thread_info(appThread, &threadInfo);
 			if (error == B_OK)
 				team = threadInfo.team;
-		} else if (wasDocument) {
+		} else if (wasDocument && appThread == B_NOT_AN_EXECUTABLE)
 			error = B_LAUNCH_FAILED_EXECUTABLE;
-		} else
+		else
 			error = appThread;
 
 		DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
