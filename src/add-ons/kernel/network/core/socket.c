@@ -25,6 +25,11 @@
 #include "core_module.h"
 #endif
 
+// R5 & BONE do no define this, but we need it, so we copy haiku's own definition:
+#ifndef EDESTADDRREQ
+#define EDESTADDRREQ		(B_POSIX_ERROR_BASE + 48)
+#endif
+
 #define   SBLOCKWAIT(f)   (((f) & MSG_DONTWAIT) ? M_NOWAIT : M_WAITOK)
 
 /* Private prototypes */
