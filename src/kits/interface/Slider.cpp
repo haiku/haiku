@@ -574,7 +574,11 @@ BSlider::SetValue(int32 value)
 
 	if (value != Value()) {
 		BPoint loc;
-		float pos = (float)(value - fMinValue) / (float)(fMaxValue - fMinValue) *
+		float range = (float)(fMaxValue - fMinValue);
+		if (range == 0)
+			range = 1;
+
+		float pos = (float)(value - fMinValue) / range *
 			_MaxPosition() - _MinPosition();
 
 		if (fOrientation == B_HORIZONTAL) {
@@ -662,7 +666,11 @@ BSlider::SetPosition(float position)
 float
 BSlider::Position() const
 {
-	return ((float)(Value() - fMinValue) / (float)(fMaxValue - fMinValue));
+	float range = (float)(fMaxValue - fMinValue);
+	if (range == 0.0f)
+		range = 1.0f;
+
+	return (float)(Value() - fMinValue) / range;
 }
 
 
