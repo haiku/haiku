@@ -168,6 +168,8 @@ void
 close_fd(struct file_descriptor *descriptor)
 {
 	if (atomic_add(&descriptor->open_count, -1) == 1) {
+		vfs_unlock_vnode_if_locked(descriptor);
+
 		if (descriptor->ops->fd_close)
 			descriptor->ops->fd_close(descriptor);
 	}

@@ -98,6 +98,7 @@ status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path,
 status_t vfs_stat_vnode(void *_vnode, struct stat *stat);
 status_t vfs_get_vnode_name(void *vnode, char *name, size_t nameSize);
 status_t vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID);
+void vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor);
 status_t vfs_disconnect_vnode(mount_id mountID, vnode_id vnodeID);
 void vfs_free_unused_vnodes(int32 level);
 

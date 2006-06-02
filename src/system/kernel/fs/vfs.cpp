@@ -59,7 +59,8 @@
 
 const static uint32 kMaxUnusedVnodes = 8192;
 	// This is the maximum number of unused vnodes that the system
-	// will keep around.
+	// will keep around (weak limit, if there is enough memory left,
+	// they won't get flushed even when hitting that limit).
 	// It may be chosen with respect to the available memory or enhanced
 	// by some timestamp/frequency heurism.
 
@@ -78,6 +79,7 @@ struct vnode {
 	uint8			busy : 1;
 	uint8			unpublished : 1;
 	struct advisory_locking	*advisory_locking;
+	struct file_descriptor *mandatory_locked_by;
 };
 
 struct vnode_hash_key {
@@ -2139,6 +2141,10 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 	struct file_descriptor *descriptor;
 	int fd;
 
+	// if the vnode is locked, we don't allow creating a new file descriptor for it
+	if (vnode && vnode->mandatory_locked_by != NULL)
+		return B_BUSY;
+
 	descriptor = alloc_fd();
 	if (!descriptor)
 		return B_NO_MEMORY;
@@ -3130,6 +3136,19 @@ status_t
 vfs_get_vnode_name(void *_vnode, char *name, size_t nameSize)
 {
 	return get_vnode_name((struct vnode *)_vnode, NULL, name, nameSize);
+}
+
+
+/**	If the given descriptor locked its vnode, that lock will be released.
+ */
+
+void
+vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = fd_vnode(descriptor);
+
+	if (vnode != NULL && vnode->mandatory_locked_by == descriptor)
+		vnode->mandatory_locked_by = NULL;
 }
 
 
@@ -4191,18 +4210,46 @@ common_sync(int fd, bool kernel)
 static status_t
 common_lock_node(int fd, bool kernel)
 {
-	// TODO: Implement!
-	//return EOPNOTSUPP;
-	return B_OK;
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = B_OK;
+
+	// We need to set the locking atomically - someone
+	// else might set one at the same time
+	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
+			(addr_t)descriptor, NULL) != NULL)
+		status = B_BUSY;
+
+	put_fd(descriptor);
+	return status;
 }
 
 
 static status_t
 common_unlock_node(int fd, bool kernel)
 {
-	// TODO: Implement!
-	//return EOPNOTSUPP;
-	return B_OK;
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = B_OK;
+
+	// We need to set the locking atomically - someone
+	// else might set one at the same time
+	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
+			NULL, (addr_t)descriptor) != (int32)descriptor)
+		status = B_BAD_VALUE;
+
+	put_fd(descriptor);
+	return status;
 }
 
 
