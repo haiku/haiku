@@ -22,6 +22,7 @@
 
 #include <MediaDefs.h>
 
+class BSoundPlayer;
 
 class SoundOutput
 {
