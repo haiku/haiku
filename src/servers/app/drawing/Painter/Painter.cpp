@@ -853,10 +853,13 @@ Painter::DrawEllipse(BRect r, bool fill) const
 
 	float xRadius = r.Width() / 2.0;
 	float yRadius = r.Height() / 2.0;
-	BPoint center(r.left + xRadius,
-				  r.top + yRadius);
+	BPoint center(r.left + xRadius, r.top + yRadius);
 
-	int32 divisions = (int32)max_c(12, (xRadius + yRadius + 2 * fPenSize) * PI / 2);
+	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * PI / 2);
+	if (divisions > 12)
+		divisions = 12;
+	if (divisions < 1)
+		divisions = 1;
 
 	if (fill) {
 		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
