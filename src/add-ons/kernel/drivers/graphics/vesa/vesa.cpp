@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -46,10 +46,11 @@ PhysicalMemoryMapper::~PhysicalMemoryMapper()
 
 
 area_id 
-PhysicalMemoryMapper::Map(const char *name, void *physicalAddress, size_t numBytes,
-	uint32 spec, uint32 protection, void **virtualAddress)
+PhysicalMemoryMapper::Map(const char *name, void *physicalAddress,
+	size_t numBytes, uint32 spec, uint32 protection, void **virtualAddress)
 {
-	fArea = map_physical_memory(name, physicalAddress, numBytes, spec, protection, virtualAddress);
+	fArea = map_physical_memory(name, physicalAddress, numBytes, spec,
+		protection, virtualAddress);
 	return fArea;
 }
 
@@ -73,9 +74,9 @@ vesa_init(vesa_info &info)
 		return B_ERROR;
 
 	info.shared_area = create_area("vesa shared info", (void **)&info.shared_info, 
-			B_ANY_KERNEL_ADDRESS,
-			ROUND_TO_PAGE_SIZE(sizeof(vesa_shared_info)),
-			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(sizeof(vesa_shared_info)),
+			B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK)
 		return info.shared_area;
 
@@ -109,7 +110,8 @@ vesa_init(vesa_info &info)
 	info.shared_info->bytes_per_row = bufferInfo->bytes_per_row;
 
 	physical_entry mapping;
-	get_memory_map((void *)info.shared_info->frame_buffer, B_PAGE_SIZE, &mapping, 1);
+	get_memory_map((void *)info.shared_info->frame_buffer, B_PAGE_SIZE,
+		&mapping, 1);
 	info.shared_info->physical_frame_buffer = (uint8 *)mapping.address;
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
