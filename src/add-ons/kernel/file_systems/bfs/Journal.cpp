@@ -297,7 +297,7 @@ Journal::Journal(Volume *volume)
 	fVolume(volume),
 	fLock("bfs journal"),
 	fOwner(NULL),
-	fLogSize(volume->Log().length),
+	fLogSize(volume->Log().Length()),
 	fMaxTransactionSize(fLogSize / 4 - 5),
 	fUsed(0),
 	fUnwrittenTransactions(0),

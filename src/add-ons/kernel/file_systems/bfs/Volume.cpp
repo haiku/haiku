@@ -611,7 +611,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	// cannot use BlockAllocator::BitmapSize() here
 	fSuperBlock.log_blocks = ToBlockRun(AllocationGroups()
 		* fSuperBlock.BlocksPerAllocationGroup() + 1);
-	fSuperBlock.log_blocks.length = 2048;
+	fSuperBlock.log_blocks.length = HOST_ENDIAN_TO_BFS_INT16(2048);
 		// ToDo: set the log size depending on the disk size
 	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(ToBlock(Log()));
 
