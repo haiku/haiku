@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-#include "SystemKeymap.cpp"
+#include "SystemKeymap.h"
 	// this is an automatically generated file
 
 #include <ServerProtocol.h>

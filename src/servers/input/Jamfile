@@ -6,8 +6,7 @@ if $(COMPILE_FOR_R5) {
 	SubDirC++Flags -DCOMPILE_FOR_R5 ;
 }
 
-rule MkKeymapHeader
-{
+rule MkKeymapHeader {
 	local binary = $(1) ;
 	local source = $(2) ;
 
@@ -19,13 +18,12 @@ rule MkKeymapHeader
 	LocalClean clean : $(binary) ;
 }
 
-actions MkKeymapHeader1
-{
+actions MkKeymapHeader1 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) -o "$(1)" -h "$(2[2-])" ;
 }
 
-MkKeymapHeader [ FGristFiles SystemKeymap.cpp ] : US-International.keymap ;
+MkKeymapHeader [ FGristFiles SystemKeymap.h ] : US-International.keymap ;
 
 SEARCH on US-International.keymap
 	  += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) data etc keymaps ] ;
@@ -60,8 +58,6 @@ Server input_server :
 	MouseSettings.cpp
 	KeyboardSettings.cpp
 
-	SystemKeymap.cpp
-
 	MethodReplicant.cpp
 	MethodMenuItem.cpp
 	BottomlineWindow.cpp
@@ -79,8 +75,8 @@ SEARCH on [ FGristFiles AddOnMonitor.cpp
 	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
 
 Package haiku-inputkit-cvs :
-        input_server :
-        boot beos system servers ;
+	input_server :
+	boot beos system servers ;
 
 Packages haiku-inputkit-cvs :
-        README LICENSE install.sh ;
+	README LICENSE install.sh ;
