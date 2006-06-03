@@ -1,6 +1,8 @@
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage home config bin ;
+AddDirectoryToHaikuImage home config lib ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
@@ -242,6 +244,10 @@ AddFilesToHaikuImage beos system add-ons kernel network protocols
 	: $(BEOS_NETWORK_PROTOCOLS) ;
 AddFilesToHaikuImage beos system add-ons Screen\ Savers
 	: $(BEOS_ADD_ONS_SCREENSAVERS) ;
+
+AddDirectoryToHaikuImage home config add-ons Tracker ;
+AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage home config add-ons Translators ;
 
 
 #pragma mark -
