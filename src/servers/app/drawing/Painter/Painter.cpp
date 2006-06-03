@@ -856,10 +856,11 @@ Painter::DrawEllipse(BRect r, bool fill) const
 	BPoint center(r.left + xRadius, r.top + yRadius);
 
 	int32 divisions = (int32)((xRadius + yRadius + 2 * fPenSize) * PI / 2);
-	if (divisions > 12)
+	if (divisions < 12)
 		divisions = 12;
-	if (divisions < 1)
-		divisions = 1;
+	// TODO: arbitrarily set upper limit - should be tested...
+	if (divisions > 32768)
+		divisions = 32768;
 
 	if (fill) {
 		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
