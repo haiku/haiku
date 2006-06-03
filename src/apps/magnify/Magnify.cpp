@@ -69,7 +69,7 @@ const char* const kBitmapMimeType = "image/x-vnd.Be-bitmap";
 const float kCurrentVersion = 1.2;
 const char *kPrefsFileName = "Magnify_prefs";
 
-// 	prefs are:
+// prefs are:
 //		name = Magnify
 //		version
 //		show grid
@@ -82,9 +82,9 @@ const bool kDefaultShowInfo = true;
 const int32 kDefaultPixelCount = 32;
 const int32 kDefaultPixelSize = 8;
 
-//	each info region will be:
-//	top-bottom: 5 fontheight 5 fontheight 5
-//	left-right: 10 minwindowwidth 10
+// each info region will be:
+// top-bottom: 5 fontheight 5 fontheight 5
+// left-right: 10 minwindowwidth 10
 const int32 kBorderSize = 10;
 
 
@@ -138,7 +138,7 @@ static void
 BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
-	
+
 	menuItem = new BMenuItem("About Magnify...", new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem("Help...", new BMessage(msg_help));
@@ -187,7 +187,7 @@ BuildInfoMenu(BMenu *menu)
 // pass in pixelCount to maintain backward compatibility of setting
 // the pixelcount from the command line
 TApp::TApp(int32 pixelCount)
-	:BApplication("application/x-vnd.Haiku.Magnify")
+	: BApplication("application/x-vnd.Haiku.Magnify")
 {
 	TWindow* magWindow = new TWindow(pixelCount);
 	magWindow->Show();
@@ -227,11 +227,11 @@ TApp::AboutRequested()
 
 
 TWindow::TWindow(int32 pixelCount)
-	: BWindow( BRect(0,0,0,0), "Magnify", B_TITLED_WINDOW, B_OUTLINE_RESIZE)
+	: BWindow(BRect(0, 0, 0, 0), "Magnify", B_TITLED_WINDOW, B_OUTLINE_RESIZE)
 {
 	GetPrefs(pixelCount);
 
-	//	add info view
+	// add info view
 	BRect infoRect(Bounds());
 	infoRect.InsetBy(-1, -1);
 	fInfo = new TInfoView(infoRect);
@@ -682,7 +682,7 @@ TWindow::InfoIsShowing()
 void
 TWindow::UpdateInfo()
 {
-	fInfo->Draw(fInfo->Bounds());
+	fInfo->Invalidate();
 }
 
 
@@ -690,9 +690,9 @@ void
 TWindow::AddCrossHair()
 {
 	fFatBits->AddCrossHair();
-	
-	//	crosshair info needs to be added
-	//	window resizes accordingly		
+
+	// crosshair info needs to be added
+	// window resizes accordingly		
 	float width;
 	float height;
 	GetPreferredSize(&width, &height);
@@ -869,46 +869,48 @@ TInfoView::TInfoView(BRect frame)
 	fCH2Str[0] = 0;
 }
 
+
 TInfoView::~TInfoView()
 {
 }
+
 
 void
 TInfoView::AttachedToWindow()
 {
 	BBox::AttachedToWindow();
-	
+
 	dynamic_cast<TWindow*>(Window())->PixelCount(&fHPixelCount, &fVPixelCount);
 	fPixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();	
 
 	AddMenu();	
 }
 
-void 
+
+void
 TInfoView::Draw(BRect updateRect)
 {
 	PushState();
-	
-	char str[64];
-
 	SetLowColor(ViewColor());
-	
+
 	BRect invalRect;
-	
+
 	int32 hPixelCount, vPixelCount;
 	dynamic_cast<TWindow*>(Window())->PixelCount(&hPixelCount, &vPixelCount);
 	int32 pixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();
-	
-	MovePenTo(10, fFontHeight+5);
+
+	MovePenTo(10, fFontHeight + 5);
+
+	char str[64];
 	sprintf(str, "%li x %li  @ %li pixels/pixel", hPixelCount, vPixelCount,
 		pixelSize);
 	invalRect.Set(10, 5, 10 + StringWidth(fInfoStr), fFontHeight+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
-	SetHighColor(0,0,0,255);
-	strcpy(fInfoStr,str);
+	SetHighColor(0, 0, 0, 255);
+	strcpy(fInfoStr, str);
 	DrawString(fInfoStr);
-	
+
 	rgb_color c = { 0,0,0, 255 };
 	uchar index = 0;
 	if (fMagView) {
@@ -1141,7 +1143,7 @@ void
 TMagnify::KeyDown(const char *key, int32 numBytes)
 {
 	if (!fShowSelection)
-		BView::KeyDown(key,numBytes);
+		BView::KeyDown(key, numBytes);
 
 	uint32 mods = modifiers();
 
@@ -1158,7 +1160,7 @@ TMagnify::KeyDown(const char *key, int32 numBytes)
 						fSelection = 0;
 				}
 				fNeedToUpdate = true;
-				Draw(Bounds());
+				Invalidate();
 			}
 			break;
 
@@ -1256,20 +1258,20 @@ TMagnify::MouseDown(BPoint where)
 			delete menu;
 			return;
 		}
-	
-		//	add a mousedown looper here
-	
+
+		// add a mousedown looper here
+
 		int32 pixelSize = PixelSize();	
 		float x = where.x / pixelSize;
 		float y = where.y / pixelSize;
-	
+
 		MoveSelectionTo(x, y);
-	
-		//	draw the frozen image	
-		//	update the info region
-		
+
+		// draw the frozen image	
+		// update the info region
+
 		fNeedToUpdate = true;
-		Draw(Bounds());
+		Invalidate();
 	}
 }
 
@@ -1291,7 +1293,7 @@ TMagnify::SetSelection(bool state)
 		
 	fShowSelection = state;
 	fSelection = 0;
-	Draw(Bounds());
+	Invalidate();
 }
 
 
@@ -1326,7 +1328,7 @@ TMagnify::MoveSelection(int32 x, int32 y)
 	}
 
 	fNeedToUpdate = true;
-	Draw(Bounds());
+	Invalidate();
 }
 
 
@@ -1355,7 +1357,7 @@ TMagnify::MoveSelectionTo(int32 x, int32 y)
 	}
 
 	fNeedToUpdate = true;
-	Draw(Bounds());
+	Invalidate(); //Draw(Bounds());
 }
 
 
@@ -1488,9 +1490,9 @@ TMagnify::Update(bool force)
 	GetMouse(&loc, &button);
 
 	ConvertToScreen(&loc);
-	if (force || (fLastLoc != loc) || (counter++ % 35 == 0)) {
+	if (force || fLastLoc != loc || counter++ % 35 == 0) {
 		if (fImageView->CreateImage(loc, force))
-			Draw(Bounds());
+			Invalidate();
 
 		counter = 0;
 		if (force)
@@ -1568,7 +1570,7 @@ TMagnify::AddCrossHair()
 		if (fCrossHair1.y >= h)
 			fCrossHair1.y = 0;
 	}
-	Draw(Bounds());	
+	Invalidate();
 }
 
 
@@ -1585,7 +1587,7 @@ TMagnify::RemoveCrossHair()
 		fSelection = 0;
 		fShowCrossHair1 = false;
 	}
-	Draw(Bounds());
+	Invalidate();
 }
 
 
@@ -2023,10 +2025,10 @@ TOSMagnify::ColorAtSelection()
 {			
 	float x, y;
 	fParent->SelectionLoc(&x, &y);
-	BRect srcRect(x,y,x,y);
+	BRect srcRect(x, y, x, y);
 	BRect dstRect(0, 0, 0, 0);
 	fPixel->Lock();
-	fPixelView->DrawBitmap(fBitmap,srcRect,dstRect);
+	fPixelView->DrawBitmap(fBitmap, srcRect, dstRect);
 	fPixelView->Sync();
 	fPixel->Unlock();
 
