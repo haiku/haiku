@@ -1099,6 +1099,8 @@ void
 MapView::DrawKey(uint32 keyCode)
 {
 	BRect r = fKeysRect[keyCode];
+	if (!r.IsValid())
+		return;
 	SetHighColor(0,0,0);
 	StrokeRect(r);
 	
@@ -1412,7 +1414,7 @@ MapView::MouseDown(BPoint point)
 	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
 		fCurrentMouseKey = 0;
 		for (int32 i=0; i<128; i++) {
-			if (fKeysRect[i].Contains(point)) {
+			if (fKeysRect[i].IsValid() && fKeysRect[i].Contains(point)) {
 				fCurrentMouseKey = i;
 				DrawKey(fCurrentMouseKey);
 				char *str = NULL;
