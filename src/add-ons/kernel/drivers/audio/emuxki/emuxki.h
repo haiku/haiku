@@ -55,7 +55,11 @@
 #define CREATIVELABS_AUDIGY_DEVICE_ID	0x0004	/* Creative Labs Audigy and Audigy 2 */
 
 #define AUDIGY 1	// Audigy seems to work
-#define MIDI 0 		// disabled MIDI for the time being
+#ifdef __HAIKU__
+	#define MIDI	1
+#else
+	#define MIDI	0	// disabled MIDI for the time being on R5
+#endif
 
 #define VERSION "Version alpha 7, Copyright (c) 2002,2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "emuxki"
