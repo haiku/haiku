@@ -23,6 +23,7 @@ ScopeView::ScopeView(BRect rect, uint32 resizeFlags)
 	: BView(rect, "scope", resizeFlags, B_WILL_DRAW | B_FRAME_EVENTS),
 	fThreadId(-1),
 	fBitmap(NULL),
+	fBitmapView(NULL),
 	fIsRendering(false),
 	fMediaTrack(NULL),
 	fQuitting(false),
@@ -31,14 +32,6 @@ ScopeView::ScopeView(BRect rect, uint32 resizeFlags)
 	fLeftTime(0),
 	fTotalTime(1000000)
 {
-	fBitmap = new BBitmap(rect, BScreen().ColorSpace(), true);
-	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
-	
-	rect.OffsetToSelf(B_ORIGIN);
-	rect.right -= 2;
-	fBitmapView = new BView(rect.OffsetToSelf(B_ORIGIN), "bitmapView", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW);
-	fBitmap->AddChild(fBitmapView);
-	
 	fRenderSem = create_sem(0, "scope rendering");
 	fHeight = Bounds().Height();
 }
@@ -54,6 +47,7 @@ void
 ScopeView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
+	InitBitmap();
 	Run();
 }
 

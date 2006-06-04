@@ -11,6 +11,23 @@
 #include <Bitmap.h>
 #include <Font.h>
 
+class SliderOffscreenView : public BView {
+
+public:
+	SliderOffscreenView(BRect frame, char *name); 
+	virtual		~SliderOffscreenView();
+	virtual	void	DrawX();
+	
+	BBitmap leftBitmap, rightBitmap;
+	BBitmap leftThumbBitmap, rightThumbBitmap;
+	float fRight;
+	
+	float fLeftX;
+	float fRightX;
+	float fPositionX;
+	float fLastX;
+};
+
 class TrackSlider : public BControl
 {
 public:
@@ -30,25 +47,27 @@ public:
 	virtual void FrameResized(float width, float height);
 private:
 	void DrawCounter(bigtime_t timestamp, float position, bool isTracking);
+	void DrawMarker(float position);
 	void TimeToString(bigtime_t timestamp, char *string);
 	void UpdatePosition(BPoint point);
-	BBitmap leftBitmap, rightBitmap, leftThumbBitmap, rightThumbBitmap;
-	float fRight;
+	void InitBitmap();
+	void RenderBitmap();
+	
 	
 	bigtime_t fLeftTime;
 	bigtime_t fRightTime;
 	bigtime_t fMainTime;
 	bigtime_t fTotalTime;
 	
-	float fPositionX;
-	float fLeftX;
-	float fRightX;
-	float fLastX;
 	bool fLeftTracking;
 	bool fRightTracking;
 	bool fMainTracking;
 	
 	BFont fFont;
+	BBitmap *fBitmap;
+	SliderOffscreenView *fBitmapView;
+	
 };
+
 
 #endif	/* TRACKSLIDER_H */

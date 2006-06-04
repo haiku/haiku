@@ -28,6 +28,7 @@ DrawButton::~DrawButton(void)
 void
 DrawButton::AttachedToWindow()
 {
+	SetViewColor(B_TRANSPARENT_COLOR);
 	ReplaceTransparentColor(&fOn, Parent()->ViewColor());
 	ReplaceTransparentColor(&fOff, Parent()->ViewColor());
 }
