@@ -1386,13 +1386,11 @@ BView::MakeFocus(bool focusState)
 			if (focus && focus != this)
 				focus->MakeFocus(false);
 			// if we want to make this view the current focus view
-			fOwner->fFocus = this;
-			fOwner->SetPreferredHandler(this);
+			fOwner->_SetFocus(this, true);
 		} else {
 			// we want to unfocus this view, but only if it actually has focus
 			if (focus == this) {
-				fOwner->fFocus = NULL;
-				fOwner->SetPreferredHandler(NULL);
+				fOwner->_SetFocus(NULL, true);
 			}
 		}
 	}

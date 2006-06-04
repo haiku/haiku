@@ -2659,9 +2659,6 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 	if (fFocus == focusView)
 		return;
 
-	if (focusView)
-		focusView->MakeFocus(true);
-
 	// we notify the input server if we are passing focus
 	// from a view which has the B_INPUT_METHOD_AWARE to a one
 	// which does not, or vice-versa
@@ -2669,17 +2666,16 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 		bool oldIMAware = false, newIMAware = false;
 		if (focusView)
 			newIMAware = focusView->Flags() & B_INPUT_METHOD_AWARE;
-		if (fFocus)
-			oldIMAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
-		if (newIMAware ^ oldIMAware) {
-			BMessage msg(newIMAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
-			BMessage reply;
-			_control_input_server_(&msg, &reply);
-			// do we care return code ?
-		}
+		BMessage msg(newIMAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+		BMessenger messenger(focusView);
+		BMessage reply;
+		if (focusView)
+			msg.AddMessenger("view", messenger);
+		_control_input_server_(&msg, &reply);
 	}
 
 	fFocus = focusView;
+	SetPreferredHandler(focusView);
 }
 
 
@@ -3014,8 +3010,9 @@ BWindow::_KeyboardNavigation()
 	else
 		nextFocus = _FindNextNavigable(fFocus, jumpGroups);
 
-	if (nextFocus && nextFocus != fFocus)
-		_SetFocus(nextFocus, false);
+	if (nextFocus && nextFocus != fFocus) {
+		nextFocus->MakeFocus(true);
+	}
 }
 
 
