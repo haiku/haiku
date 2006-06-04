@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin route ;
 
-SetSubDirSupportedPlatforms haiku ;
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -14,13 +14,19 @@ BinCommand <bin>route :
 	keywords.c
 	route.c
 	show.c
-	: $(NETWORK_LIBS) $(SELECT_UNAME_ETC_LIB) ;
+	: libbind.so libsocket.so $(SELECT_UNAME_ETC_LIB) ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: <bin>route
 	: binroute ;
+
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: <bin>route
+	: installed-userland-bin-networking
+;
 
 Package haiku-networkingkit-cvs :
 	<bin>route :

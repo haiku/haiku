@@ -19,6 +19,12 @@ HaikuInstall install-networking
 	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
 	: ping ;
 
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: ping
+	: installed-userland-networking
+;
+
 Package haiku-networkingkit-cvs :
 	ping :
 #	boot home config bin ;

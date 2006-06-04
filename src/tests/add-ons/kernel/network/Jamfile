@@ -21,41 +21,6 @@ HaikuInstall install-userland-networking
 	: installed-userland-networking
 ;
 
-SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src bin arp ] ;
-SimpleTest <userland>arp :
-	arp.c
-	: <installed-userland-networking>libbind.so 
-	  <installed-userland-networking>libsocket.so 
-	  $(SELECT_UNAME_ETC_LIB) 
-;
-
-SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src bin ifconfig ] ;
-SimpleTest <userland>ifconfig :
-	ifconfig.c
-	: <installed-userland-networking>libbind.so 
-	  <installed-userland-networking>libsocket.so 
-;
-
-SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src bin route ] ;
-SimpleTest <userland-bin>route :
-	keywords.c
-	route.c
-	show.c
-	: <installed-userland-networking>libbind.so 
-	  <installed-userland-networking>libnet.so 
-	  <installed-userland-networking>libsocket.so 
-	  $(SELECT_UNAME_ETC_LIB) 
-;
-
-# Installation -- in the test directory for the time being
-HaikuInstall install-userland-networking 
-	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
-	: <userland>arp
-	  <userland>ifconfig
-	  <userland-bin>route
-	: installed-userland-networking-bin
-;
-
 SubInclude HAIKU_TOP src tests add-ons kernel network core ;
 SubInclude HAIKU_TOP src tests add-ons kernel network interfaces ;
 SubInclude HAIKU_TOP src tests add-ons kernel network ppp ;
