@@ -359,12 +359,12 @@ _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp,
  */
 
 static char * stack_driver_path(void) {
-  char * path;
+	char * path;
 
-  // user-defined stack driver path?
-  path = getenv("NET_STACK_DRIVER_PATH");
-  if (!path)
-    path = NET_STACK_DRIVER_PATH;
-  printf("net-stack-driver-path = %s\n", path);
-  return path;
+	// user-defined stack driver path?
+	path = getenv("NET_STACK_DRIVER_PATH");
+	if (!path)
+		path = NET_STACK_DRIVER_PATH;
+
+	return path;
 }
