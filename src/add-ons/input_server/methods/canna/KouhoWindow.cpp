@@ -19,7 +19,7 @@
 
 KouhoWindow::KouhoWindow( BFont *font, BLooper *looper )
 	:BWindow(	DUMMY_RECT,
-				"kouho", kLeftTitledWindowLook, 
+				"kouho", B_MODAL_WINDOW_LOOK, 
 				B_FLOATING_ALL_WINDOW_FEEL,
 				B_NOT_RESIZABLE | B_NOT_CLOSABLE |
 				B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FOCUS |
@@ -132,7 +132,7 @@ SERIAL_PRINT(( "kouhoWindow: KOUHO_WINDOW_SHOWAT recieved.\n" ));
 			
 		case KOUHO_WINDOW_SETTEXT:
 			const char* newtext;
-			bool hideindex, limitsize, partialhighlight;
+			bool hideindex, limitsize;
 			msg->FindString( "text", &newtext );
 			kouhoView->SetText( newtext );
 			
@@ -262,7 +262,7 @@ void KouhoView::HighlightLine( int32 line )
 	if ( line != -1 )
 	{	
 		begin = OffsetAt( line );
-		if ( line == CountLines() )
+		if ( line == CountLines() - 1 )
 			end = TextLength() + 1;
 		else
 			end = OffsetAt( line + 1 ) - 1;
@@ -289,17 +289,16 @@ KouhoView::HighlightPartial( int32 begin, int32 end )
 	
 void KouhoView::Draw( BRect rect )
 {
+	BTextView::Draw( rect );
 	rgb_color viewcolor = ViewColor();
 	SetHighColor( selection_color );
 	SetDrawingMode( B_OP_MIN );
 	FillRect( highlightRect );
-	BTextView::Draw( rect );
 //	SetViewColor( viewcolor );
 }
 
 void KouhoView::MouseDown( BPoint point )
 {
-	BWindow *win;
 	KouhoIndexView *iview;
 	iview = (KouhoIndexView *)(Window()->FindView( "index" ));
 	if ( iview->IsNumberDisplayHidden() )

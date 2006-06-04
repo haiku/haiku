@@ -14,8 +14,10 @@
 #include <Bitmap.h>
 #include <Screen.h>
 
+#include "WindowPrivate.h"
+
 PaletteWindow::PaletteWindow( BRect rect, BLooper *looper )
-	:BWindow( rect, B_EMPTY_STRING, (window_look) 25 /*B_FLOATING_WINDOW_LOOK*/,
+	:BWindow( rect, B_EMPTY_STRING, kLeftTitledWindowLook,
 			B_FLOATING_ALL_WINDOW_FEEL,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE | 
 			B_AVOID_FOCUS | B_WILL_ACCEPT_FIRST_CLICK )

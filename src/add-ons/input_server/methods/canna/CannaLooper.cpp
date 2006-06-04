@@ -487,7 +487,7 @@ CannaLooper::HandleMethodActivated( bool active )
 	else
 	{
 		ForceKakutei();
-		uint32 result = canna->ChangeMode( CANNA_MODE_HenkanMode );
+		canna->ChangeMode( CANNA_MODE_HenkanMode );
 		BMessage m( PALETTE_WINDOW_BUTTON_UPDATE );
 		m.AddInt32( "mode", CANNA_MODE_HenkanMode );
 		thePalette->PostMessage( &m );
