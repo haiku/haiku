@@ -19,6 +19,7 @@
 #include <MessageFilter.h>
 #include <Messenger.h>
 #include <Point.h>
+#include <PropertyInfo.h>
 #include <Rect.h>
 #include <Shelf.h>
 #include <View.h>
@@ -27,6 +28,32 @@
 
 #include <stdio.h>
 #include <string.h>
+
+
+static property_info sPropertyList[] = {
+	{
+		"Replicant",
+		{ B_COUNT_PROPERTIES, B_CREATE_PROPERTY },
+		{ B_DIRECT_SPECIFIER }, 
+		NULL, 0, 
+	},
+
+	{
+		"Replicant",
+		{ B_DELETE_PROPERTY, B_GET_PROPERTY },
+		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER }, 
+		NULL, 0, 
+	},
+
+	{
+		"Replicant",
+		{}, 
+		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER },
+		"... of Replicant {index | name | id} of ...", 0,
+	},
+
+	{}
+};
 
 
 extern "C" void  _ReservedShelf1__6BShelfFv(BShelf *const, int32,
@@ -346,6 +373,8 @@ class _TReplicantViewFilter_ : public BMessageFilter {
 };
 
 
+
+
 //	#pragma mark -
 
 
@@ -404,7 +433,32 @@ BShelf::Instantiate(BMessage *data)
 void
 BShelf::MessageReceived(BMessage *msg)
 {
-	//TODO: Implement
+	BMessage replyMsg(B_REPLY);
+	bool handled = false;
+
+	switch (msg->what) {
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY: {
+			BMessage specifier;
+			int32 what;
+			const char *prop;
+			int32 index;
+
+			if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+				break;
+
+			break;
+		}
+	};
+	if (handled) {
+		if (msg->what == B_SET_PROPERTY)
+			replyMsg.AddInt32("error", B_OK);
+		} else {
+			replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
+			replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
+			replyMsg.AddString("message", "Didn't understand the specifier(s)");
+		}
+	msg->SendReply(&replyMsg);
 }
 
 
@@ -457,10 +511,17 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 
 
 status_t
-BShelf::GetSupportedSuites(BMessage *data)
+BShelf::GetSupportedSuites(BMessage *message)
 {
-	//TODO
-	return B_ERROR;
+	status_t err;
+	err = message->AddString("suites", "suite/vnd.Be-shelf");
+	if (err == B_OK) {
+		BPropertyInfo propInfo(sPropertyList);
+		err = message->AddFlat("messages", &propInfo);
+	}
+	if (err == B_OK)
+		return BHandler::GetSupportedSuites(message);
+	return err;
 }
 
 

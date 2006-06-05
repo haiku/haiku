@@ -88,6 +88,11 @@ using BPrivate::gDefaultTokens;
 
 static property_info sWindowPropInfo[] = {
 	{
+		"Active", { B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_BOOL_TYPE }
+	},
+
+	{
 		"Feel", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE } 
 	},
@@ -119,12 +124,17 @@ static property_info sWindowPropInfo[] = {
 
 	{
 		"Workspaces", { B_GET_PROPERTY, B_SET_PROPERTY },
-		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE}
+		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE }
 	},
 
 	{
 		"MenuBar", {},
 		{ B_DIRECT_SPECIFIER }, NULL, 0, {}
+	},
+
+	{
+		"View", { B_COUNT_PROPERTIES },
+		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_INT32_TYPE }
 	},
 
 	{
@@ -136,6 +146,30 @@ static property_info sWindowPropInfo[] = {
 		{ B_DIRECT_SPECIFIER }, NULL, 0, { B_BOOL_TYPE }
 	},
 
+	{}	
+};
+
+static value_info sWindowValueInfo[] = {
+	{
+		"MoveTo", 'WDMT', B_COMMAND_KIND,
+		"Moves to the position in the BPoint data"
+	},
+
+	{
+		"MoveBy", 'WDMB', B_COMMAND_KIND,
+		"Moves by the offsets in the BPoint data"
+	},
+
+	{
+		"ResizeTo", 'WDRT', B_COMMAND_KIND,
+		"Resize to the size in the BPoint data"
+	},
+
+	{
+		"ResizeBy", 'WDRB', B_COMMAND_KIND,
+		"Resize by the offsets in the BPoint data"
+	},
+	
 	{}
 };
 
@@ -2185,7 +2219,7 @@ BWindow::GetSupportedSuites(BMessage *data)
 
 	status_t status = data->AddString("Suites", "suite/vnd.Be-window");
 	if (status == B_OK) {
-		BPropertyInfo propertyInfo(sWindowPropInfo);
+		BPropertyInfo propertyInfo(sWindowPropInfo, sWindowValueInfo);
 
 		status = data->AddFlat("message", &propertyInfo);
 		if (status == B_OK)

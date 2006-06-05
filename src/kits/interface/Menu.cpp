@@ -49,62 +49,91 @@ bool BMenu::sAltAsCommandKey;
 static property_info
 sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
-		"otherwise." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
+		"otherwise.", 
+		0, { B_BOOL_TYPE }
+	},
 	
 	{ "Enabled", { B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item.", 
+		0, { B_BOOL_TYPE }
+	},
 	
 	{ "Label", { B_GET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item.",
+		0, { B_STRING_TYPE }
+	},
 	
 	{ "Label", { B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item.",
+		0, { B_STRING_TYPE }
+	},
 	
 	{ "Mark", { B_GET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
-		"is marked; false otherwise." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
+		"is marked; false otherwise.", 
+		0, { B_BOOL_TYPE }
+	},
 	
 	{ "Mark", { B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem.",
+		0, { B_BOOL_TYPE }
+	},
 	
 	{ "Menu", { B_CREATE_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
-		"sent by the item)." },
+		"sent by the item)." , 0, {}, 
+		{ 	{{{"data", B_STRING_TYPE}}}
+		} 
+	},
 	
 	{ "Menu", { B_DELETE_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Removes the selected menu or menus." },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+		"Removes the selected menu or menus.", 0, {}
+	},
 
-	{ "Menu", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ "Menu", { },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
-		"specifier off the stack." },
+		"specifier off the stack.", 0, {}
+	},
 	
 	{ "MenuItem", { B_COUNT_PROPERTIES, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu." },
+		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu.",
+		0, { B_INT32_TYPE }
+	},
 	
 	{ "MenuItem", { B_CREATE_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
 		"and the int32 command found in \"what\" (used as the what field in the CMessage "
-		"sent by the item)." },
-	
+		"sent by the item).", 0, {}, 
+		{	{ {{"data", B_STRING_TYPE },
+			{"be:invoke_message", B_MESSAGE_TYPE},
+			{"what", B_INT32_TYPE},
+			{"be:target", B_MESSENGER_TYPE}} }
+		}
+	},
+
 	{ "MenuItem", { B_DELETE_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Removes the specified menu item from its parent menu." },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+		"Removes the specified menu item from its parent menu." 
+	},
 	
 	{ "MenuItem", { B_EXECUTE_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
-		"Invokes the specified menu item." },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+		"Invokes the specified menu item." 
+	},
 	
-	{ "MenuItem", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-	{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
+	{ "MenuItem", { },
+		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
-		"specifier off the stack." },
-	{0}
+		"specifier off the stack." 
+	},
+
+	{}
 };
 
 

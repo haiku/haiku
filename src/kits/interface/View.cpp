@@ -61,31 +61,27 @@ using std::nothrow;
 
 static property_info sViewPropInfo[] = {
 	{ "Frame", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the view's frame rectangle.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns the view's frame rectangle.", 0, { B_RECT_TYPE }
+	},
 	{ "Frame", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Sets the view's frame rectangle.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Sets the view's frame rectangle.", 0, { B_RECT_TYPE }
+	},
 	{ "Hidden", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the view is hidden; false otherwise.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the view is hidden; false otherwise.", 0, { B_BOOL_TYPE }
+	},
 	{ "Hidden", { B_SET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Hides or shows the view.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Hides or shows the view.", 0, { B_BOOL_TYPE }
+	},
 	{ "Shelf", { 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Directs the scripting message to the shelf.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Directs the scripting message to the shelf.", 0
+	},
 	{ "View", { B_COUNT_PROPERTIES, 0 },
-		{ B_DIRECT_SPECIFIER, 0 }, "Returns the number of of child views.",0 },
-
+		{ B_DIRECT_SPECIFIER, 0 }, "Returns the number of of child views.", 0, { B_INT32_TYPE }
+	},
 	{ "View", { 0 },
-		{ B_INDEX_SPECIFIER, 0 }, "Directs the scripting message to the specified view.",0 },
-
-	{ "View", { 0 },
-		{ B_REVERSE_INDEX_SPECIFIER, 0 }, "Directs the scripting message to the specified view.",0 },
-
-	{ "View", { 0 },
-		{ B_NAME_SPECIFIER, 0 }, "Directs the scripting message to the specified view.",0 },
+		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, 0 }, 
+		"Directs the scripting message to the specified view.", 0 
+	},
 
 	{ 0, { 0 }, { 0 }, 0, 0 }
 }; 
