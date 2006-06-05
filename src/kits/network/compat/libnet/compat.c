@@ -23,6 +23,7 @@ void _init(void);
 void _fini(void);
 void initialize_before(void);
 void terminate_after(void);
+int _netstat(int fd, char **output, int verbose);
 void _b_pre_accept(void);
 void _b_post_accept(void);
 
@@ -47,6 +48,13 @@ _EXPORT void initialize_before(void)
 
 _EXPORT void terminate_after(void)
 {
+}
+
+
+_EXPORT int
+_netstat(int fd, char **output, int verbose)
+{
+	return ENOSYS;
 }
 
 
