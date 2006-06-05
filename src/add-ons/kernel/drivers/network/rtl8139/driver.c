@@ -64,10 +64,10 @@ typedef struct supported_device {
 /* ----------
 	global data
 ----- */
-static pci_info *m_devices[RTL_MAX_CARDS];
-static pci_module_info *m_pcimodule = 0;	//To call methods of pci
-static char *rtl8139_names[RTL_MAX_CARDS +1];
-static int32 m_openmask = 0;					//Is the thing already opened?
+static pci_info *gFoundDevices[RTL_MAX_CARDS];
+static pci_module_info *gPCIModule = 0;	//To call methods of pci
+static char *gDeviceNames[RTL_MAX_CARDS +1];
+static int32 gDeviceOpenMask = 0;					//Is the thing already opened?
 
 static supported_device_t m_supported_devices[] = {
 	{ 0x10ec, 0x8139, "RealTek RTL8139 Fast Ethernet" },
@@ -136,13 +136,13 @@ static status_t close_hook( void * );
 	Here all platform dependant code is placed: this keeps the code clean
 ----- */
 #ifdef __INTEL__
-	#define WRITE_8(  offset , value)	(m_pcimodule->write_io_8 ((data->reg_base + (offset)), (value) ) )
-	#define WRITE_16( offset , value)	(m_pcimodule->write_io_16((data->reg_base + (offset)), (value) ) )
-	#define WRITE_32( offset , value)	(m_pcimodule->write_io_32((data->reg_base + (offset)), (value) ) )
+	#define WRITE_8(  offset , value)	(gPCIModule->write_io_8 ((data->reg_base + (offset)), (value) ) )
+	#define WRITE_16( offset , value)	(gPCIModule->write_io_16((data->reg_base + (offset)), (value) ) )
+	#define WRITE_32( offset , value)	(gPCIModule->write_io_32((data->reg_base + (offset)), (value) ) )
 	
-	#define READ_8(  offset )			(m_pcimodule->read_io_8 ((data->reg_base + offset)))
-	#define READ_16( offset )			(m_pcimodule->read_io_16((data->reg_base + offset)))
-	#define READ_32( offset )			(m_pcimodule->read_io_32((data->reg_base + offset)))
+	#define READ_8(  offset )			(gPCIModule->read_io_8 ((data->reg_base + offset)))
+	#define READ_16( offset )			(gPCIModule->read_io_16((data->reg_base + offset)))
+	#define READ_32( offset )			(gPCIModule->read_io_32((data->reg_base + offset)))
 
 	static void rtl8139_init_registers( rtl8139_properties_t *data )
 	{
@@ -207,7 +207,7 @@ init_driver (void)
 	TRACE( "rtl8139_nielx: init_driver()\n" );
 	
 	// Try if the PCI module is loaded (it would be weird if it wouldn't, but alas)
-	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&m_pcimodule )) != B_OK) 
+	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&gPCIModule )) != B_OK) 
 	{
 		TRACE( "rtl8139_nielx init_driver(): Get PCI module failed! %lu \n", status);
 		return status;
@@ -216,7 +216,7 @@ init_driver (void)
 	// 
 	i = 0;
 	item = (pci_info *)malloc(sizeof(pci_info));
-	for ( i = found = 0 ; m_pcimodule->get_nth_pci_info(i, item) == B_OK ; i++ )
+	for ( i = found = 0 ; gPCIModule->get_nth_pci_info(i, item) == B_OK ; i++ )
 	{
 		supported_device_t *supported;
 		
@@ -232,7 +232,7 @@ init_driver (void)
 				}
 				
 				TRACE("rtl8139_nielx init_driver(): found %s at IRQ %u \n", supported->name, item->u.h0.interrupt_line);
-				m_devices[found] = item;
+				gFoundDevices[found] = item;
 				item = (pci_info *)malloc(sizeof(pci_info));
 				found++;
 			}
@@ -256,9 +256,9 @@ init_driver (void)
 		for (i = 0; i < found; i++) 
 		{
 			sprintf(name, "net/rtl8139/%ld", i);
-			rtl8139_names[i] = strdup(name);
+			gDeviceNames[i] = strdup(name);
 		}
-		rtl8139_names[i] = NULL;
+		gDeviceNames[i] = NULL;
 	}		
 	return B_OK;
 }
@@ -275,10 +275,10 @@ uninit_driver (void)
 	void *item;
 	TRACE( "rtl8139_nielx: uninit_driver()\n" );
 	
-	for (index = 0; (item = rtl8139_names[index]) != NULL; index++) 
+	for (index = 0; (item = gDeviceNames[index]) != NULL; index++) 
 	{
 		free(item);
-		free(m_devices[index]);
+		free(gFoundDevices[index]);
 	}
 
 	put_module( B_PCI_MODULE_NAME );
@@ -297,6 +297,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 {
 
 	rtl8139_properties_t *data;
+	uint8 id;
 	uint8 temp8;
 	uint16 temp16;
 	uint32 temp32;
@@ -310,7 +311,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 		int32 mask;
 
 		// search for device name
-		for (temp8 = 0; (thisName = rtl8139_names[temp8]) != NULL; temp8++) {
+		for (id = 0; (thisName = gDeviceNames[id]) != NULL; id++) {
 			if (!strcmp(name, thisName))
 				break;
 		}
@@ -318,8 +319,8 @@ open_hook(const char *name, uint32 flags, void** cookie)
 			return EINVAL;
 	
 		// check if device is already open
-		mask = 1L << temp8;
-		if (atomic_or(&m_openmask, mask) & mask)
+		mask = 1L << id;
+		if (atomic_or(&gDeviceOpenMask, mask) & mask)
 			return B_BUSY;
 	}
 	
@@ -327,17 +328,15 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	if (!(*cookie = data = (rtl8139_properties_t *)malloc(sizeof(rtl8139_properties_t)))) 
 	{
 		TRACE( "rtl8139_nielx open_hook(): Out of memory\n" );
+		gDeviceOpenMask &= ~( 1L << id );
 		return B_NO_MEMORY;
 	}
 
-	//Set status to open:
-	m_openmask &= ~( 1L << temp8 );
-	
 	//Clear memory
 	memset( data , 0 , sizeof( rtl8139_properties_t ) );
 	
 	//Set the ID
-	data->device_id = temp8;
+	data->device_id = id;
 	
 	// Create lock
 	data->lock = create_sem( 1 , "rtl8139_nielx data protect" );
@@ -348,15 +347,15 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	set_sem_owner( data->output_wait , B_SYSTEM_TEAM );
 	
 	//Set up the cookie
-	data->pcii = m_devices[data->device_id];
+	data->pcii = gFoundDevices[data->device_id];
 	
 	//Enable the registers
 	rtl8139_init_registers( data );
 	
 	/* enable pci address access */	
-	cmd = m_pcimodule->read_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2);
+	cmd = gPCIModule->read_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2);
 	cmd = cmd | PCI_command_io | PCI_command_master | PCI_command_memory;
-	m_pcimodule->write_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2, cmd );
+	gPCIModule->write_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2, cmd );
 	
 	// Check for the chipversion -- The version bits are bits 31-27 and 24-23
 	temp32 = READ_32( TxConfig );
@@ -910,6 +909,10 @@ close_hook (void* cookie)
 	//Stop Rx and Tx process
 	WRITE_8( Command , 0 );
 	WRITE_16( IMR , 0 );
+
+	// mark this device as closed
+	gDeviceOpenMask &= ~(1L << data->device_id);
+	
 	return B_OK;
 }
 
@@ -934,8 +937,6 @@ free_hook (void* cookie)
 	delete_area( data->transmitbuffer[0] );
 	delete_area( data->transmitbuffer[2] );
 	delete_area( data->ioarea ); //Only does something on ppc
-	
-	m_openmask &= ~(1L << data->device_id);
 	
 	//Finally, free the cookie
 	free( data );
@@ -968,7 +969,7 @@ device_hooks rtl8139_hooks = {
 const char**
 publish_devices()
 {
-	return (const char **)rtl8139_names;
+	return (const char **)gDeviceNames;
 }
 
 /* ----------
