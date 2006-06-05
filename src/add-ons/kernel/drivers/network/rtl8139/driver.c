@@ -910,9 +910,6 @@ close_hook (void* cookie)
 	WRITE_8( Command , 0 );
 	WRITE_16( IMR , 0 );
 
-	// mark this device as closed
-	gDeviceOpenMask &= ~(1L << data->device_id);
-	
 	return B_OK;
 }
 
@@ -940,6 +937,9 @@ free_hook (void* cookie)
 	
 	//Finally, free the cookie
 	free( data );
+	
+	// mark this device as closed
+	gDeviceOpenMask &= ~(1L << data->device_id);
 	
 	//Put the pci module
 	put_module( B_PCI_MODULE_NAME );
