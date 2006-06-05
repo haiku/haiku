@@ -479,27 +479,27 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 		button0 = "";
 	}
 
-	BMessage ProtoMsg(kAlertButtonMsg);
-	ProtoMsg.AddInt32("which", 0);
+	BMessage protoMsg(kAlertButtonMsg);
+	protoMsg.AddInt32("which", 0);
 	// Set up the buttons
 	int buttonCount = 0;
 	fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b0_", button0,
-		new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		new BMessage(protoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	masterView->AddChild(fButtons[buttonCount]);
 	++buttonCount;
 
 	if (button1) {
-		ProtoMsg.ReplaceInt32("which", 1);
+		protoMsg.ReplaceInt32("which", 1);
 		fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b1_", button1,
-			new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+			new BMessage(protoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
 		masterView->AddChild(fButtons[buttonCount]);
 		++buttonCount;
 	}
 	if (button2) {
-		ProtoMsg.ReplaceInt32("which", 2);
+		protoMsg.ReplaceInt32("which", 2);
 		fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b2_", button2,
-			new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+			new BMessage(protoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
 		masterView->AddChild(fButtons[buttonCount]);
 		++buttonCount;
@@ -590,13 +590,13 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 	ResizeTo(totalWidth, Bounds().Height());
 
 	// Set up the text view
-	BRect TextViewRect(kTextLeftOffset, kTextTopOffset,
+	BRect textViewRect(kTextLeftOffset, kTextTopOffset,
 		Bounds().right - kTextRightOffset,
 		Bounds().bottom - kTextBottomOffset);
 	if (masterView->Bitmap())
-		TextViewRect.left = kTextIconOffset;
+		textViewRect.left = kTextIconOffset;
 
-	fTextView = new BTextView(TextViewRect, "_tv_", TextViewRect,
+	fTextView = new BTextView(textViewRect, "_tv_", textViewRect,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	masterView->AddChild(fTextView);
 
@@ -608,12 +608,12 @@ BAlert::InitObject(const char* text, const char* button0, const char* button1,
 
 	// Now resize the TextView vertically so that all the text is visible
 	float textHeight = fTextView->TextHeight(0, fTextView->CountLines());
-	TextViewRect.OffsetTo(0, 0);
-	textHeight -= TextViewRect.Height();
+	textViewRect.OffsetTo(0, 0);
+	textHeight -= textViewRect.Height();
 	ResizeBy(0, textHeight);
 	fTextView->ResizeBy(0, textHeight);
-	TextViewRect.bottom += textHeight;
-	fTextView->SetTextRect(TextViewRect);
+	textViewRect.bottom += textHeight;
+	fTextView->SetTextRect(textViewRect);
 
 	AddCommonFilter(new _BAlertFilter_(this));
 
@@ -736,10 +736,10 @@ TAlertView::Draw(BRect updateRect)
 {
 	// Here's the fun stuff
 	if (fIconBitmap) {
-		BRect StripeRect = Bounds();
-		StripeRect.right = kIconStripeWidth;
+		BRect stripeRect = Bounds();
+		stripeRect.right = kIconStripeWidth;
 		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		FillRect(StripeRect);
+		FillRect(stripeRect);
 
 		SetDrawingMode(B_OP_OVER);
 		DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
@@ -752,9 +752,9 @@ TAlertView::Draw(BRect updateRect)
 //	#pragma mark - _BAlertFilter_
 
 
-_BAlertFilter_::_BAlertFilter_(BAlert* Alert)
+_BAlertFilter_::_BAlertFilter_(BAlert* alert)
 	: BMessageFilter(B_KEY_DOWN),
-	fAlert(Alert)
+	fAlert(alert)
 {
 }
 
@@ -783,3 +783,4 @@ _BAlertFilter_::Filter(BMessage* msg, BHandler** target)
 
 	return B_DISPATCH_MESSAGE;
 }
+
