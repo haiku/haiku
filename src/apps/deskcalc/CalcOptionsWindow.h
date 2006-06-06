@@ -14,8 +14,8 @@
 #include <Window.h>
 
 struct CalcOptions {
-	bool mAutoNumLock;		// automatically activate numlock
-	bool mAudioFeedback;	// provide audio feedback
+	bool auto_num_lock;		// automatically activate numlock
+	bool audio_feedback;	// provide audio feedback
 
 	CalcOptions();
 };

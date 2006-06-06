@@ -218,12 +218,12 @@ CalcView::Draw(BRect updateRect)
 	SetFont(be_bold_font);
 	
 	// ****** DISPLAY Area
-	if (updateRect.Intersects(displayRect)){
-	
+	if (updateRect.Intersects(displayRect)) {
+
 		// paint display b/g
 		SetHighColor(fExpressionBGColor);
 		FillRect(updateRect & displayRect);
-		
+
 		// render display text
 		SetHighColor(rgbWhite);
 		SetLowColor(fExpressionBGColor);
@@ -231,15 +231,14 @@ CalcView::Draw(BRect updateRect)
 		SetFontSize(sizeDisp * K_FONT_YPROP);
 		float baselineOffset = sizeDisp * (1.0 - K_FONT_YPROP) * 0.5;
 		DrawString(fExpression.String(),
-					BPoint(fWidth - StringWidth(fExpression.String()),
-						sizeDisp - baselineOffset));
+				   BPoint(fWidth - StringWidth(fExpression.String()),
+						  sizeDisp - baselineOffset));
+	}
 		
-		} // end if
-		
-	
 	// ****** KEYPAD Area
-	if (updateRect.Intersects(keypadRect)){
-	
+	if (updateRect.Intersects(keypadRect)) {
+		// TODO: support pressed keys
+
 		// paint keypad b/g
 		SetHighColor(fBaseColor);
 		FillRect(updateRect & keypadRect);
@@ -249,32 +248,32 @@ CalcView::Draw(BRect updateRect)
 		
 		// render cols
 		AddLine(BPoint(0.0, sizeDisp),
-			BPoint(0.0, fHeight),
-			fLightColor);
-		for (int col = 1; col < fColums; col++){
-			AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
-				BPoint(col * sizeCol - 1.0, fHeight),
-				fDarkColor);
-			AddLine(BPoint(col * sizeCol, sizeDisp),
-				BPoint(col * sizeCol, fHeight),
+				BPoint(0.0, fHeight),
 				fLightColor);
-			} // end for
+		for (int col = 1; col < fColums; col++) {
+			AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
+					BPoint(col * sizeCol - 1.0, fHeight),
+					fDarkColor);
+			AddLine(BPoint(col * sizeCol, sizeDisp),
+					BPoint(col * sizeCol, fHeight),
+					fLightColor);
+		}
 		AddLine(BPoint(fColums * sizeCol, sizeDisp),
-			BPoint(fColums * sizeCol, fHeight),
-			fDarkColor);
+				BPoint(fColums * sizeCol, fHeight),
+				fDarkColor);
 			
 		// render rows
-		for (int row = 0; row < fRows; row++){
+		for (int row = 0; row < fRows; row++) {
 			AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
-				BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
-				fDarkColor);
+					BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
+					fDarkColor);
 			AddLine(BPoint(0.0, sizeDisp + row * sizeRow),
-				BPoint(fWidth, sizeDisp + row * sizeRow),
-				fLightColor);
-			} // end for
+					BPoint(fWidth, sizeDisp + row * sizeRow),
+					fLightColor);
+		}
 		AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
-			BPoint(fWidth, sizeDisp + fRows * sizeRow),
-			fDarkColor);
+				BPoint(fWidth, sizeDisp + fRows * sizeRow),
+				fDarkColor);
 			
 		// main grid complete
 		EndLineArray();
@@ -286,20 +285,18 @@ CalcView::Draw(BRect updateRect)
 		SetDrawingMode(B_OP_COPY);
 		SetFontSize(((fHeight - sizeDisp)/(float)fRows) * K_FONT_YPROP);
 		float baselineOffset = ((fHeight - sizeDisp)/(float)fRows)
-			* (1.0 - K_FONT_YPROP) * 0.5;
+								* (1.0 - K_FONT_YPROP) * 0.5;
 		CalcKey *key = fKeypad;
-		for (int row = 0; row < fRows; row++){
-			for (int col = 0; col < fColums; col++){
+		for (int row = 0; row < fRows; row++) {
+			for (int col = 0; col < fColums; col++) {
 				float halfSymbolWidth = StringWidth(key->label) * 0.5f;
 				DrawString(key->label,
-					BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
-						sizeDisp + (row + 1) * sizeRow - baselineOffset));
+						   BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
+								  sizeDisp + (row + 1) * sizeRow - baselineOffset));
 				key++;
-				} // end for
-			} // end for
-
-		} // end if
-	
+			}
+		}
+	}
 }
 
 
@@ -329,7 +326,7 @@ CalcView::MouseDown(BPoint point)
 	// click on display, initiate drag if appropriate
 	if ((point.y - sizeDisp) < 0.0) {
 		// only drag if there's some text
-		if (fExpression.Length() > 0){
+		if (fExpression.Length() > 0) {
 			// assemble drag message
 			BMessage dragmsg(B_MIME_DATA);
 			dragmsg.AddData("text/plain",
