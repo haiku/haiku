@@ -5,22 +5,29 @@
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
+#include "ScreenSaverFilter.h"
+
+#include <Application.h>
+#include <MessageRunner.h>
 #include <NodeMonitor.h>
 #include <OS.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <Application.h>
-#include "ScreenSaverFilter.h"
 
 #include <Debug.h>
+
 #define CALLED() SERIAL_PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 
-static const int kCornerSize = 10;
+static const int32 kNeverBlankCornerSize = 10;
+static const int32 kBlankCornerSize = 5;
+
 static const int32 kMsgCheckTime = 'SSCT';
+static const int32 kMsgCornerInvoke = 'Scin';
 
 
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
@@ -68,8 +75,16 @@ ScreenSaverController::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgSuspendScreenSaver:
+			//fFilter->Suspend(msg);
+			break;
+
 		case kMsgCheckTime:
 			fFilter->CheckTime();
+			break;
+
+		case kMsgCornerInvoke:
+			fFilter->CheckCornerInvoke();
 			break;
 
 		default:
@@ -82,15 +97,16 @@ ScreenSaverController::MessageReceived(BMessage *message)
 
 
 ScreenSaverFilter::ScreenSaverFilter() 
-	: fLastEventTime(0),
-		fBlankTime(0),
-		fSnoozeTime(0),
-		fCurrent(NONE),
-		fEnabled(false),
-		fFrameNum(0),
-		fRunner(NULL),
-		fWatchingDirectory(false), 
-		fWatchingFile(false)
+	:
+	fLastEventTime(0),
+	fBlankTime(0),
+	fSnoozeTime(0),
+	fCurrentCorner(NONE),
+	fEnabled(false),
+	fFrameNum(0),
+	fRunner(NULL),
+	fWatchingDirectory(false), 
+	fWatchingFile(false)
 {
 	CALLED();
 	fController = new ScreenSaverController(this);
@@ -116,9 +132,9 @@ ScreenSaverFilter::~ScreenSaverFilter()
 
 
 void
-ScreenSaverFilter::WatchPreferences()
+ScreenSaverFilter::_WatchPreferences()
 {
-	BEntry entry(fPrefs.GetPath().Path());
+	BEntry entry(fPrefs.Path().Path());
 	if (entry.Exists()) {
 		if (fWatchingFile)
 			return;
@@ -145,24 +161,21 @@ ScreenSaverFilter::WatchPreferences()
 }
 
 
-void 
-ScreenSaverFilter::Invoke() 
+void
+ScreenSaverFilter::_Invoke() 
 {
 	CALLED();
-	if ((fKeep != NONE && fCurrent == fKeep)
-		|| fEnabled
+	if (fCurrentCorner == fNeverBlankCorner || fEnabled
 		|| fPrefs.TimeFlags() != 1
-		|| be_roster->IsRunning(SCREEN_BLANKER_SIG)) {
-		// If mouse is in this corner, never invoke.
+		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
-	}
 
 	SERIAL_PRINT(("we run screenblanker\n"));
 	be_roster->Launch(SCREEN_BLANKER_SIG);
 }
 
 
-void 
+void
 ScreenSaverFilter::ReloadSettings()
 {
 	CALLED();
@@ -170,24 +183,24 @@ ScreenSaverFilter::ReloadSettings()
 		SERIAL_PRINT(("preferences loading failed: going to defaults\n"));
 	}
 
-	fBlank = fPrefs.GetBlankCorner();
-	fKeep = fPrefs.GetNeverBlankCorner();
+	fBlankCorner = fPrefs.GetBlankCorner();
+	fNeverBlankCorner = fPrefs.GetNeverBlankCorner();
 	fBlankTime = fSnoozeTime = fPrefs.BlankTime();
 	CheckTime();
 
 	delete fRunner;
 	fRunner = new BMessageRunner(BMessenger(NULL, fController),
-		new BMessage(kMsgCheckTime), fSnoozeTime, -1);
+		new BMessage(kMsgCheckTime), fSnoozeTime);
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
 	}
 
-	WatchPreferences();
+	_WatchPreferences();
 }
 
 
-void 
-ScreenSaverFilter::Banish() 
+void
+ScreenSaverFilter::_Banish() 
 {
 	CALLED();
 	if (!fEnabled)
@@ -201,13 +214,13 @@ ScreenSaverFilter::Banish()
 }
 
 
-void 
+void
 ScreenSaverFilter::CheckTime()
 {
 	CALLED();
 	bigtime_t now = system_time();
 	if (now >= fLastEventTime + fBlankTime)  
-		Invoke();
+		_Invoke();
 
 	// TODO: this doesn't work correctly - since the BMessageRunner is not
 	// restarted, the next check will be too far away
@@ -226,35 +239,55 @@ ScreenSaverFilter::CheckTime()
 }
 
 
-void 
-ScreenSaverFilter::UpdateRectangles()
+void
+ScreenSaverFilter::CheckCornerInvoke()
+{
+	if (fCurrentCorner == fBlankCorner)
+		_Invoke();
+}
+
+
+void
+ScreenSaverFilter::_UpdateRectangles()
 {
 	// TODO: make this better if possible at all (in a clean way)
 	CALLED();
+
+	fBlankRect = _ScreenCorner(fBlankCorner, kBlankCornerSize);
+	fNeverBlankRect = _ScreenCorner(fNeverBlankCorner, kNeverBlankCornerSize);
+}
+
+
+BRect
+ScreenSaverFilter::_ScreenCorner(screen_corner corner, uint32 cornerSize)
+{
 	BRect frame = BScreen().Frame();
 
-	fTopLeft.Set(frame.left, frame.top,
-		frame.left + kCornerSize, frame.top + kCornerSize);
-	fTopRight.Set(frame.right - kCornerSize, frame.top,
-		frame.right, frame.top + kCornerSize);
-	fBottomLeft.Set(frame.left, frame.bottom - kCornerSize,
-		frame.left + kCornerSize, frame.bottom);
-	fBottomRight.Set(frame.right - kCornerSize, frame.bottom - kCornerSize,
-		frame.right, frame.bottom);
+	switch (corner) {
+		case UPLEFT:
+			return BRect(frame.left, frame.top, frame.left + cornerSize - 1,
+				frame.top + cornerSize - 1);
+
+		case UPRIGHT:
+			return BRect(frame.right, frame.top, frame.right - cornerSize + 1,
+				frame.top + cornerSize - 1);
+
+		case DOWNRIGHT:
+			return BRect(frame.right, frame.bottom, frame.right - cornerSize + 1,
+				frame.bottom - cornerSize + 1);
+
+		case DOWNLEFT:
+			return BRect(frame.left, frame.bottom, frame.left + cornerSize - 1,
+				frame.bottom - cornerSize + 1);
+
+		default:
+			// return an invalid rectangle
+			return BRect(-1, -1, -2, -2);
+	}
 }
 
 
-void 
-ScreenSaverFilter::Cornered(arrowDirection pos)
-{
-	//CALLED();
-	fCurrent = pos;
-	if (fBlank != NONE && pos == fBlank)
-		Invoke();
-}
-
-
-filter_result 
+filter_result
 ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 {
 	fLastEventTime = system_time();
@@ -264,21 +297,28 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 		{
 			BPoint pos;
 			message->FindPoint("where", &pos);
-			if ((fFrameNum++ % 32) == 0) // Every so many frames, update
-				UpdateRectangles();
-	
-			if (fTopLeft.Contains(pos)) 
-				Cornered(UPLEFT);
-			else if (fTopRight.Contains(pos)) 
-				Cornered(UPRIGHT);
-			else if (fBottomLeft.Contains(pos)) 
-				Cornered(DOWNLEFT);
-			else if (fBottomRight.Contains(pos)) 
-				Cornered(DOWNRIGHT);
-			else {
-				Cornered(NONE);
-				Banish();
+			if ((fFrameNum++ % 32) == 0) {
+				// Every so many frames, update
+				// Used so that we don't update the screen coord's so often
+				// Ideally, we would get a message when the screen changes.
+				// R5 doesn't do this.
+				_UpdateRectangles();
 			}
+
+			if (fBlankRect.Contains(pos)) {
+				fCurrentCorner = fBlankCorner;
+
+				// start screen blanker after one second
+				BMessage invoke(kMsgCornerInvoke);
+				if (BMessageRunner::StartSending(fController, &invoke, 1000000ULL, 1) != B_OK)
+					_Invoke();
+				break;
+			}
+
+			if (fNeverBlankRect.Contains(pos))
+				fCurrentCorner = fNeverBlankCorner;
+			else
+				fCurrentCorner = NONE;
 			break;
 		}
 
@@ -289,15 +329,11 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 			// screen savers possible
 			int32 key;
 			if (fEnabled && message->FindInt32("key", &key) == B_OK && key == 0xe)
-				break;
-
-			// supposed to fall through
+				return B_DISPATCH_MESSAGE;
 		}
-		default:
-			Banish();
-			break;
 	}
 
+	_Banish();
 	return B_DISPATCH_MESSAGE;
 }
 

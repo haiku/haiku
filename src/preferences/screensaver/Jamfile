@@ -6,21 +6,15 @@ UsePrivateHeaders screen_saver ;
 SubDirSysHdrs $(SUBDIR) ;
 
 Preference ScreenSaver : 
-	ScreenSaverPrefsApp.cpp
+	ScreenSaverApp.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
 	PreviewView.cpp
 	MouseAreaView.cpp
-	ScreenSaver.cpp
 	: tracker libscreensaver.so be $(TARGET_LIBSTDC++)
 	: ScreenSaver.rdef 
 	;
 
-SEARCH on [ FGristFiles
-                ScreenSaver.cpp
-        ] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
-
 Package haiku-screensaverkit-cvs :
 	ScreenSaver :
-#	boot beos preferences ;
 	boot home Desktop haiku-screensaverkit ;

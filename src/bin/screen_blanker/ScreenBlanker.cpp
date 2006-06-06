@@ -8,38 +8,45 @@
  */
 
 
-#include "ScreenSaverApp.h"
+#include "ScreenBlanker.h"
 
-#include <Debug.h>
-#include <stdio.h>
-#include <Screen.h>
-#include <image.h>
-#include <StorageDefs.h>
-#include <FindDirectory.h>
-#include <SupportDefs.h>
-#include <File.h>
-#include <Path.h>
-#include <string.h>
 #include <Beep.h>
+#include <Debug.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
+#include <Screen.h>
+#include <StorageDefs.h>
+#include <SupportDefs.h>
+#include <image.h>
+
+#include <stdio.h>
+#include <string.h>
+
 
 const static int32 RESUME_SAVER = 'RSSV';
 
 
-ScreenSaverApp::ScreenSaverApp()
+ScreenBlanker::ScreenBlanker()
 	: BApplication(SCREEN_BLANKER_SIG),
 	fWindow(NULL),
 	fSaver(NULL),
-	fThread(NULL),
+	fRunner(NULL),
 	fPasswordWindow(NULL),
-	fThreadID(-1),
-	fRunner(NULL)
+	fResumeRunner(NULL)
 {
 	fBlankTime = system_time();
 }
 
 
+ScreenBlanker::~ScreenBlanker()
+{
+	delete fResumeRunner;
+}
+
+
 void
-ScreenSaverApp::ReadyToRun() 
+ScreenBlanker::ReadyToRun() 
 {
 	if (!fPrefs.LoadSettings()) {
 		fprintf(stderr, "could not load settings\n");
@@ -50,14 +57,12 @@ ScreenSaverApp::ReadyToRun()
 	BScreen screen(B_MAIN_SCREEN_ID);
 	fWindow = new ScreenSaverWindow(screen.Frame());
 	fPasswordWindow = new PasswordWindow();
-	fThread = new ScreenSaverThread(fWindow, fWindow->ChildAt(0), &fPrefs);
+	fRunner = new ScreenSaverRunner(fWindow, fWindow->ChildAt(0), false, fPrefs);
 
-	fSaver = fThread->LoadAddOn();
+	fSaver = fRunner->ScreenSaver();
 	if (fSaver) {
 		fWindow->SetSaver(fSaver);
-		fThreadID = spawn_thread(ScreenSaverThread::ThreadFunc,
-			"ScreenSaverRenderer", B_LOW_PRIORITY, fThread);
-		resume_thread(fThreadID);
+		fRunner->Run();
 	} else {
 		fprintf(stderr, "could not load the screensaver addon\n");
 	}
@@ -69,11 +74,10 @@ ScreenSaverApp::ReadyToRun()
 
 
 void
-ScreenSaverApp::_ShowPasswordWindow() 
+ScreenBlanker::_ShowPasswordWindow() 
 {
 	if (fWindow->Lock()) {
-		if (fThreadID > -1)
-			suspend_thread(fThreadID);
+		fRunner->Suspend();
 
 		if (fWindow->SetFullScreen(false) == B_OK) {
 			fWindow->Sync();
@@ -89,19 +93,19 @@ ScreenSaverApp::_ShowPasswordWindow()
 
 
 void
-ScreenSaverApp::_ResumeScreenSaver()
+ScreenBlanker::_ResumeScreenSaver()
 {
-	delete fRunner;
-	fRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER),
+	delete fResumeRunner;
+	fResumeRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER),
 		fPrefs.BlankTime(), 1);
-	if (fRunner->InitCheck() != B_OK) {
+	if (fResumeRunner->InitCheck() != B_OK) {
 		fprintf(stderr, "fRunner init failed\n");
 	}
 }
 
 
 void
-ScreenSaverApp::MessageReceived(BMessage *message) 
+ScreenBlanker::MessageReceived(BMessage *message) 
 {
 	switch (message->what) {
 		case UNLOCK_MESSAGE:
@@ -125,8 +129,8 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 					HideCursor();
 					fPasswordWindow->Hide();
 				}
-				if (fThreadID > -1)
-					resume_thread(fThreadID);
+
+				fRunner->Resume();
 				fWindow->Unlock();
 			}
 			break;
@@ -139,10 +143,10 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 
 
 bool
-ScreenSaverApp::QuitRequested()
+ScreenBlanker::QuitRequested()
 {
 	if (fPrefs.LockEnable()
-		&& (system_time() - fBlankTime > (fPrefs.PasswordTime() - fPrefs.BlankTime()))) {
+		&& system_time() - fBlankTime > fPrefs.PasswordTime() - fPrefs.BlankTime()) {
 		_ShowPasswordWindow();
 		return false;
 	}
@@ -153,18 +157,9 @@ ScreenSaverApp::QuitRequested()
 
 
 void
-ScreenSaverApp::_Shutdown() 
+ScreenBlanker::_Shutdown() 
 {
-	if (fThread) {
-		fThread->Quit(fThreadID);
-		delete fThread;
-	} else if (fThreadID > -1) {
-		// ?!?
-		kill_thread(fThreadID);
-	}
-
-	fThread = NULL;
-	fThreadID = -1;
+	delete fRunner;
 
 	if (fWindow)
 		fWindow->Hide();
@@ -177,7 +172,7 @@ ScreenSaverApp::_Shutdown()
 int
 main(int, char**) 
 {
-	ScreenSaverApp app;
+	ScreenBlanker app;
 	app.Run();
 	return 0;
 }

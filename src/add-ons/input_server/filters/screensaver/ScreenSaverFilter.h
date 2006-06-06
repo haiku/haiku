@@ -1,25 +1,26 @@
 /*
- * Copyright 2003-2005, Haiku.
+ * Copyright 2003-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef SCREEN_SAVER_FILTER_H
 #define SCREEN_SAVER_FILTER_H
 
 
-#include <InputServerFilter.h>
-#include <Rect.h>
-#include <Region.h>
-#include <Messenger.h>
-#include <MessageFilter.h>
-#include <MessageRunner.h>
-#include <Node.h>
 #include "ScreenSaverPrefs.h"
 
+#include <InputServerFilter.h>
+#include <Looper.h>
+#include <Node.h>
 
+
+static const uint32 kMsgSuspendScreenSaver = 'susp';
+
+class BMessageRunner;
 class ScreenSaverFilter;
 
 class ScreenSaverController : public BLooper {
@@ -38,32 +39,34 @@ class ScreenSaverFilter : public BInputServerFilter {
 
 		virtual filter_result Filter(BMessage *message, BList *outList);
 
+		void Suspend(BMessage *message);
+
 		void CheckTime();
+		void CheckCornerInvoke();
+
 		uint32 SnoozeTime() {return fSnoozeTime;}
 		void ReloadSettings();
 		void SetEnabled(bool enabled) { fEnabled = enabled; }
 
 	private:
-		bigtime_t fLastEventTime, fBlankTime, fSnoozeTime;
-		arrowDirection fBlank, fKeep, fCurrent; 
-		bool fEnabled;
-		BRect fTopLeft, fTopRight, fBottomLeft, fBottomRight;
-		ScreenSaverPrefs fPrefs;
-		uint32 fFrameNum;
-			// Used so that we don't update the screen coord's so often
-			// Ideally, we would get a message when the screen changes.
-			// R5 doesn't do this.
+		void _WatchPreferences();
+		void _UpdateRectangles();
+		BRect _ScreenCorner(screen_corner pos, uint32 cornerSize);
 
-		ScreenSaverController *fController;
-		node_ref fPrefsNodeRef, fPrefsDirNodeRef;
-		BMessageRunner *fRunner;
-		bool fWatchingDirectory, fWatchingFile;
-	
-		void WatchPreferences();
-		void UpdateRectangles();
-		void Cornered(arrowDirection pos);
-		void Invoke();
-		void Banish();
+		void _Invoke();
+		void _Banish();
+
+		bigtime_t		fLastEventTime, fBlankTime, fSnoozeTime;
+		screen_corner	fBlankCorner, fNeverBlankCorner, fCurrentCorner;
+		BRect			fBlankRect, fNeverBlankRect;
+		bool			fEnabled;
+		ScreenSaverPrefs fPrefs;
+		uint32			fFrameNum;
+
+		ScreenSaverController* fController;
+		node_ref		fPrefsNodeRef, fPrefsDirNodeRef;
+		BMessageRunner*	fRunner;
+		bool			fWatchingDirectory, fWatchingFile;
 };
 
 #endif	/* SCREEN_SAVER_FILTER_H */

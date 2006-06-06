@@ -1,40 +1,59 @@
 /*
- * Copyright 2003, Haiku.
+ * Copyright 2003-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Michael Phipps
+ *		Michael Phipps
  */
 
 #include "MouseAreaView.h"
 #include "Constants.h"
+#include "Utility.h"
+
 #include <Rect.h>
 #include <Point.h>
 #include <Shape.h>
+
 #include <stdio.h>
 
-MouseAreaView::MouseAreaView(BRect frame, const char *name) 
-	: BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW)
+
+
+inline BPoint
+scale_arrow(int x, int y, BRect area, bool invertX, bool invertY)
 {
-	SetViewColor(216,216,216);
-	fCurrentDirection = NONE;
+	float arrowX[] = {0, .25, .5, .66667, .90, .9};
+	float arrowY[] = {0, .15, .25, .3333333, .6666667, 1.0};
+
+	return scale_direct(invertX ? 1 - arrowX[x] : arrowX[x],
+		invertY ? 1 - arrowY[y] : arrowY[y], area);
 }
 
 
-void 
+//	#pragma mark -
+
+
+MouseAreaView::MouseAreaView(BRect frame, const char *name) 
+	: BView (frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	fCurrentCorner(NONE)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+void
 MouseAreaView::Draw(BRect update) 
 {
-	SetViewColor(216,216,216);
 	// Top of monitor
 	SetHighColor(kGrey);
-	FillRoundRect(scale(0,7,0,3,Bounds()),4,4);
+	FillRoundRect(scale(0, 7, 0, 3, Bounds()), 4, 4);
 	SetHighColor(kBlack);
-	StrokeRoundRect(scale(0,7,0,3,Bounds()),4,4);
+	StrokeRoundRect(scale(0, 7, 0, 3, Bounds()), 4, 4);
 	SetHighColor(kLightBlue);
-	fScreenArea=scale(1,6,1,2,Bounds());
-	FillRect(fScreenArea);
+	fMonitorFrame = scale(1, 6, 1, 2, Bounds());
+	FillRect(fMonitorFrame);
 	SetHighColor(kDarkGrey);
-	StrokeRect(fScreenArea);
+	StrokeRect(fMonitorFrame);
+
 	// Base of monitor
 	SetHighColor(kGrey);
 	FillTriangle(scale(1,5,Bounds()),scale(3,4,Bounds()),scale(3,5,Bounds()));
@@ -50,68 +69,85 @@ MouseAreaView::Draw(BRect update)
 }
 
 
-BRect 
-getArrowSize(BRect area,bool isCentered)
+void
+MouseAreaView::SetCorner(screen_corner corner)
 {
-	int areaWidth=area.IntegerWidth();
-	int areaHeight=area.IntegerHeight();
-	if (areaHeight<areaWidth)
-		areaWidth=areaHeight;
-	areaWidth /= 3;
-	BRect foo(0,0,areaWidth,areaWidth);
-	if (isCentered)
-		foo.OffsetBy(area.left+area.Width()/2-(areaWidth/2),area.top+area.Height()/2-(areaWidth/2));
-	return (foo);
+	fCurrentCorner = corner;
+	Invalidate();
 }
 
 
-void 
-MouseAreaView::DrawArrow(void) 
+BRect
+MouseAreaView::_ArrowSize(BRect monitorRect, bool isCentered)
 {
-	if (fCurrentDirection!=NONE) {
-		BRect area(getArrowSize(fScreenArea,false));
-		bool invertX=(fCurrentDirection==UPRIGHT||fCurrentDirection==DOWNRIGHT);
-		bool invertY=(fCurrentDirection==UPRIGHT||fCurrentDirection==UPLEFT);
-		
-		float size=area.Width();
-		MovePenTo(((invertX)?fScreenArea.right-size-2:2+fScreenArea.left),((!invertY)?fScreenArea.bottom-size-2:2+fScreenArea.top));
+	int arrowSize = monitorRect.IntegerWidth();
+	if (monitorRect.IntegerHeight() < arrowSize)
+		arrowSize = monitorRect.IntegerHeight();
+
+	arrowSize /= 3;
+
+	BRect arrowRect(0, 0, arrowSize, arrowSize);
+	if (isCentered) {
+		arrowRect.OffsetBy(monitorRect.left + (monitorRect.Width() - arrowSize) / 2,
+			monitorRect.top + (monitorRect.Height() - arrowSize) / 2);
+	}
+
+	return arrowRect;
+}
+
+
+void
+MouseAreaView::DrawArrow() 
+{
+	PushState();
+
+	BRect rect(_ArrowSize(fMonitorFrame, fCurrentCorner == NONE));
+
+	if (fCurrentCorner != NONE) {
+		bool invertX = fCurrentCorner == UPRIGHT || fCurrentCorner == DOWNRIGHT;
+		bool invertY = fCurrentCorner == UPRIGHT || fCurrentCorner == UPLEFT;
+
+		float size = rect.Width();
+		MovePenTo(invertX ? fMonitorFrame.right - size - 2 : 2 + fMonitorFrame.left,
+			!invertY ? fMonitorFrame.bottom - size - 2 : 2 + fMonitorFrame.top);
+
 		BShape arrow;
-		arrow.MoveTo(scale3(0,1,area,invertX,invertY));
-		arrow.LineTo(scale3(0,5,area,invertX,invertY));
-		arrow.LineTo(scale3(4,5,area,invertX,invertY));
-		arrow.LineTo(scale3(3,4,area,invertX,invertY));
-		arrow.LineTo(scale3(5,3,area,invertX,invertY));
-		arrow.LineTo(scale3(2,0,area,invertX,invertY));
-		arrow.LineTo(scale3(1,2,area,invertX,invertY));
-		arrow.LineTo(scale3(0,1,area,invertX,invertY));
+		arrow.MoveTo(scale_arrow(0, 1, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(0, 5, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(4, 5, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(3, 4, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(5, 3, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(2, 0, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(1, 2, rect, invertX, invertY));
+		arrow.LineTo(scale_arrow(0, 1, rect, invertX, invertY));
 		arrow.Close();
 		SetHighColor(kBlack);
-		FillShape(&arrow,B_SOLID_HIGH);
+		FillShape(&arrow, B_SOLID_HIGH);
 	} else {
-		PushState();
-		BRect area(getArrowSize(fScreenArea,true));
-		SetHighColor(255,0,0);
+		SetHighColor(255, 0, 0);
 		SetPenSize(2);
-		StrokeEllipse(area);
-		StrokeLine(BPoint(area.right,area.top),BPoint(area.left,area.bottom));
-		PopState();
+		StrokeEllipse(rect);
+		StrokeLine(BPoint(rect.right, rect.top), BPoint(rect.left, rect.bottom));
 	}
+
+	PopState();
 }
 
 
-void MouseAreaView::MouseUp(BPoint point) 
+void
+MouseAreaView::MouseUp(BPoint point) 
 {
-	if (fScreenArea.Contains(point)) {
-		if (getArrowSize(fScreenArea,true).Contains(point))
-			fCurrentDirection=NONE;
+	if (fMonitorFrame.Contains(point)) {
+		if (_ArrowSize(fMonitorFrame, true).Contains(point))
+			fCurrentCorner = NONE;
 		else {
-			float centerX=fScreenArea.left+(fScreenArea.Width()/2);
-			float centerY=fScreenArea.top+(fScreenArea.Height()/2);
-			if (point.x<centerX)
-				fCurrentDirection=((point.y<centerY)?UPLEFT:DOWNLEFT);
+			float centerX = fMonitorFrame.left + fMonitorFrame.Width() / 2;
+			float centerY = fMonitorFrame.top + fMonitorFrame.Height() / 2;
+			if (point.x < centerX)
+				fCurrentCorner = point.y < centerY ? UPLEFT : DOWNLEFT;
 			else
-				fCurrentDirection=((point.y<centerY)?UPRIGHT:DOWNRIGHT);
-			}
-		Draw(fScreenArea);
+				fCurrentCorner = point.y < centerY ? UPRIGHT : DOWNRIGHT;
+		}
+		Draw(fMonitorFrame);
 	}
 }

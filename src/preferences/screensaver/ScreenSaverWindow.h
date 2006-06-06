@@ -1,82 +1,76 @@
 /*
- * Copyright 2003-2005, Haiku.
+ * Copyright 2003-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Michael Phipps
- *              Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+#ifndef SCREEN_SAVER_WINDOW_H
+#define SCREEN_SAVER_WINDOW_H
 
-#ifndef _ScreenSaverWindow_H
-#define _ScreenSaverWindow_H
+
+#include "PasswordWindow.h"
+#include "ScreenSaverPrefs.h"
+
 #include <Box.h>
 #include <CheckBox.h>
 #include <FilePanel.h>
 #include <Slider.h>
 #include <ListView.h>
 #include <StringView.h>
-#include "PasswordWindow.h"
-#include "ScreenSaverPrefs.h"
 
+class BButton;
+
+class ModulesView;
 class MouseAreaView;
-class PreviewView;
+class ScreenSaverRunner;
+class TimeSlider;
 
-class ScreenSaverWin: public BWindow {
-public:
-	ScreenSaverWin();
-	virtual void MessageReceived(BMessage *message);
-	virtual bool QuitRequested();
-	void PopulateScreenSaverList();
-	void LoadSettings();
-	virtual ~ScreenSaverWin();
-	void SelectCurrentModule();
-private:
-	void SetupForm();
-	void SetupTab1();
-	void SetupTab2();
-	void UpdateStatus();
-	void SaverSelected();
+class ScreenSaverWindow : public BWindow {
+	public:
+		ScreenSaverWindow();
+		virtual ~ScreenSaverWindow();
 
-	static int CompareScreenSaverItems(const void* left, const void* right);
+		virtual void MessageReceived(BMessage *message);
+		virtual void ScreenChanged(BRect frame, color_space colorSpace);
+		virtual bool QuitRequested();
 
-	ScreenSaverPrefs fPrefs;
-	int fFadeState,fNoFadeState;
-	BView *fSampleView;
-  
-	BView *fTab1,*fTab2;
-	BTabView *fTabView;
-	BBox *fModuleSettingsBox;
+		void LoadSettings();
 
-	PreviewView *fPreviewDisplay;
-	BListView *fListView1;
-	BString fSelectedAddonFileName;
-	image_id fCurrentAddon;
-  
-	BButton *fTestButton;
-	BButton *fAddButton;
-	BBox *fEnableScreenSaverBox;
-	BSlider *fPasswordSlider;
-	BSlider *fTurnOffSlider;
-	BSlider *fRunSlider;
-	BStringView *fStringView1;
-	BCheckBox *fEnableCheckbox;
-	BCheckBox *fPasswordCheckbox;
-	BCheckBox *fTurnOffScreenCheckBox;
-	BStringView *fTurnOffMinutes;
-	BStringView *fRunMinutes;
-	BStringView *fPasswordMinutes;
-	BButton *fPasswordButton;
-	BStringView *fFadeNowString;
-	BStringView *fFadeNowString2;
-	BStringView *fDontFadeString;
-	BStringView *fDontFadeString2;
-	MouseAreaView *fFadeNow,*fFadeNever;
-	PasswordWindow *fPwWin;
-	BMessenger *fPwMessenger;
-  
-	BMessage fSettings;
-	BFilePanel *fFilePanel;
-	BView *fSettingsArea;
+	private:
+		void _SetupFadeTab(BRect frame);
+		void _UpdateTurnOffScreen();
+		void _UpdateStatus();
+
+		ScreenSaverPrefs fPrefs;
+		uint32			fTurnOffScreenFlags;
+
+		BView*			fFadeView;
+		ModulesView*	fModulesView;
+		BTabView*		fTabView;
+
+		BCheckBox*		fEnableCheckBox;
+		TimeSlider*		fRunSlider;
+
+		BCheckBox*		fTurnOffCheckBox;
+		TimeSlider*		fTurnOffSlider;
+
+		BCheckBox*		fPasswordCheckBox;
+		TimeSlider*		fPasswordSlider;
+		BButton*		fPasswordButton;
+		PasswordWindow*	fPasswordWindow;
+
+		BStringView *fFadeNowString;
+		BStringView *fFadeNowString2;
+		BStringView *fDontFadeString;
+		BStringView *fDontFadeString2;
+
+		MouseAreaView*	fFadeNow;
+		MouseAreaView*	fFadeNever;
 };
 
-#endif // _ScreenSaverWindow_H
+static const int32 kMsgUpdateList = 'UPDL';
+
+#endif	// SCREEN_SAVER_WINDOW_H

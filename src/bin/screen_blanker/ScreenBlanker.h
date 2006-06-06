@@ -12,21 +12,22 @@
 
 #include "PasswordWindow.h"
 #include "ScreenSaverPrefs.h"
-#include "ScreenSaverThread.h"
+#include "ScreenSaverRunner.h"
 #include "ScreenSaverWindow.h"
 
 #include <Application.h>
 #include <MessageRunner.h>
 
 
-class ScreenSaverApp : public BApplication {
+class ScreenBlanker : public BApplication {
 	public:
-		ScreenSaverApp();
+		ScreenBlanker();
+		~ScreenBlanker();
 
 		virtual void ReadyToRun();
 
 		virtual bool QuitRequested();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
 	private:
 		bool _LoadAddOn();
@@ -37,12 +38,11 @@ class ScreenSaverApp : public BApplication {
 		ScreenSaverPrefs fPrefs;
 		ScreenSaverWindow *fWindow;
 		BScreenSaver *fSaver;
-		ScreenSaverThread *fThread;
+		ScreenSaverRunner *fRunner;
 		PasswordWindow *fPasswordWindow;
 
-		thread_id fThreadID;
 		bigtime_t fBlankTime;
-		BMessageRunner *fRunner;
+		BMessageRunner *fResumeRunner;
 };
 
 #endif	// SCREEN_SAVER_APP_H

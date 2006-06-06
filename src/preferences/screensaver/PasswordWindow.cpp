@@ -1,26 +1,37 @@
 /*
- * Copyright 2003-2005, Haiku.
+ * Copyright 2003-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Michael Phipps
- *              Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
+ *		Jérôme Duval, jerome.duval@free.fr
  */
 
+
 #include "PasswordWindow.h"
-#include <stdio.h>
-#include <unistd.h>
+
 #include <Alert.h>
 #include <Box.h>
+#include <Button.h>
 #include <RadioButton.h>
 #include <Screen.h>
+#include <TextControl.h>
+
+#include <stdio.h>
+#include <unistd.h>
+
+
+const uint32 kMsgDone = 'done';
+const uint32 kMsgPasswordTypeChanged = 'pwtp';
 
 
 PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs) 
-	: BWindow(BRect(100,100,380,249),"",B_MODAL_WINDOW_LOOK,B_MODAL_APP_WINDOW_FEEL,B_NOT_RESIZABLE),
+	: BWindow(BRect(100, 100, 380, 249), "Password Window", B_MODAL_WINDOW_LOOK,
+		B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fPrefs(prefs)
 {
-	Setup();
+	_Setup();
+
 	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
 	BPoint point;
 	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
@@ -32,34 +43,38 @@ PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs)
 
 
 void 
-PasswordWindow::Setup() 
+PasswordWindow::_Setup()
 {
-	BBox *owner=new BBox(Bounds(),"ownerView",B_FOLLOW_NONE,B_WILL_DRAW, B_PLAIN_BORDER);
-	AddChild(owner);
-	fUseNetwork=new BRadioButton(BRect(14,10,159,20),"useNetwork","Use Network password",new BMessage(kButton_changed),B_FOLLOW_NONE);
-	owner->AddChild(fUseNetwork);
-	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kButton_changed),B_FOLLOW_NONE);
+	BView* topView = new BView(Bounds(), "mainView", B_FOLLOW_ALL, B_WILL_DRAW);
+	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topView);
+
+	fUseNetwork=new BRadioButton(BRect(14,10,159,20),"useNetwork","Use Network password",new BMessage(kMsgPasswordTypeChanged),B_FOLLOW_NONE);
+	topView->AddChild(fUseNetwork);
+	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kMsgPasswordTypeChanged),B_FOLLOW_NONE);
 
 	BBox *customBox=new BBox(BRect(9,30,269,105),"custBeBox",B_FOLLOW_NONE);
 	customBox->SetLabel(fUseCustom);
-	fPassword=new BTextControl(BRect(10,20,251,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
-	fConfirm=new BTextControl(BRect(10,45,251,60),"fConfirmCntrl","Confirm password:",NULL,B_FOLLOW_NONE);
-	fPassword->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fPasswordControl=new BTextControl(BRect(10,20,251,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
+	fConfirmControl=new BTextControl(BRect(10,45,251,60),"fConfirmCntrl","Confirm password:",NULL,B_FOLLOW_NONE);
+	fPasswordControl->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
 	float divider = be_plain_font->StringWidth("Confirm password:") + 5.0;
-	fPassword->SetDivider(divider);
-	fPassword->TextView()->HideTyping(true);
-	fConfirm->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
-	fConfirm->SetDivider(divider);
-	fConfirm->TextView()->HideTyping(true);
-	customBox->AddChild(fPassword);
-	customBox->AddChild(fConfirm);
-	owner->AddChild(customBox);
+	fPasswordControl->SetDivider(divider);
+	fPasswordControl->TextView()->HideTyping(true);
+	fConfirmControl->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fConfirmControl->SetDivider(divider);
+	fConfirmControl->TextView()->HideTyping(true);
+	customBox->AddChild(fPasswordControl);
+	customBox->AddChild(fConfirmControl);
+	topView->AddChild(customBox);
 
-	fDone = new BButton(BRect(194,118,269,129),"done","Done",new BMessage (kDone_clicked),B_FOLLOW_NONE);
-	fCancel = new BButton(BRect(109,118,184,129),"cancel","Cancel",new BMessage (kCancel_clicked),B_FOLLOW_NONE);
-	owner->AddChild(fDone);
-	owner->AddChild(fCancel);
-	fDone->MakeDefault(true);
+	BButton* button = new BButton(BRect(194,118,269,129),"done","Done",new BMessage(kMsgDone),B_FOLLOW_NONE);
+	topView->AddChild(button);
+	button->MakeDefault(true);
+
+	button = new BButton(BRect(109,118,184,129),"cancel","Cancel",new BMessage(B_CANCEL),B_FOLLOW_NONE);
+	topView->AddChild(button);
+
 	Update();
 }
 
@@ -72,43 +87,43 @@ PasswordWindow::Update()
 	else
 		fUseCustom->SetValue(B_CONTROL_ON);
 	bool useNetPassword=(fUseCustom->Value()>0);
-	fConfirm->SetEnabled(useNetPassword);
-	fPassword->SetEnabled(useNetPassword);
+	fConfirmControl->SetEnabled(useNetPassword);
+	fPasswordControl->SetEnabled(useNetPassword);
 }
 
 
 void 
 PasswordWindow::MessageReceived(BMessage *message) 
 {
-	switch(message->what) {
-	case kDone_clicked:
-		fPrefs.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
-		if (fUseCustom->Value()) {
-			if (strcmp(fPassword->Text(),fConfirm->Text())) {
-				BAlert *alert=new BAlert("noMatch","Passwords don't match. Try again.","OK");
-				alert->Go();
-				break;
-			} 
-			fPrefs.SetPassword(crypt(fPassword->Text(), fPassword->Text()));
-		} else {
-			fPrefs.SetPassword("");
-		}
-		fPassword->SetText("");
-		fConfirm->SetText("");
+	switch (message->what) {
+		case kMsgDone:
+			fPrefs.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
+			if (fUseCustom->Value()) {
+				if (strcmp(fPasswordControl->Text(),fConfirmControl->Text())) {
+					BAlert *alert=new BAlert("noMatch","Passwords don't match. Try again.","OK");
+					alert->Go();
+					break;
+				} 
+				fPrefs.SetPassword(crypt(fPasswordControl->Text(), fPasswordControl->Text()));
+			} else {
+				fPrefs.SetPassword("");
+			}
+			fPasswordControl->SetText("");
+			fConfirmControl->SetText("");
+			Hide();
+			break;
+
+	case B_CANCEL:
+		fPasswordControl->SetText("");
+		fConfirmControl->SetText("");
 		Hide();
 		break;
-	case kCancel_clicked:
-		fPassword->SetText("");
-		fConfirm->SetText("");
-		Hide();
-		break;
-	case kButton_changed:
-		fPrefs.SetLockMethod(fUseCustom->Value()>0 ? "custom" : "network");
+
+	case kMsgPasswordTypeChanged:
+		fPrefs.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
 		Update();
 		break;
-	case kShow:
-		Show();
-		break;
+
 	default:
 		BWindow::MessageReceived(message);
 		break;

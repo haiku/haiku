@@ -5,17 +5,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders interface screen_saver ;
 
 BinCommand screen_blanker :
-	ScreenSaverApp.cpp
+	ScreenBlanker.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
-	ScreenSaver.cpp
 	: be game libscreensaver.so
 	: screen_blanker.rdef
 ;
-
-SEARCH on [ FGristFiles
-		ScreenSaver.cpp
-	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
 
 Package haiku-screensaverkit-cvs :
 	screen_blanker :
