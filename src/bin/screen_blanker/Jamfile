@@ -2,15 +2,27 @@ SubDir HAIKU_TOP src bin screen_blanker ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseHeaders [ FDirName headers os add-ons screen_saver ] ;
+	# we also need our headers when build for BeOS
+
 UsePrivateHeaders interface screen_saver ;
 
 BinCommand screen_blanker :
 	ScreenBlanker.cpp
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
+
+	ScreenSaver.cpp
+		# needed for some old/broken screen saver add-ons that do not
+		# link against libscreensaver.so
+
 	: be game libscreensaver.so
 	: screen_blanker.rdef
 ;
+
+SEARCH on [ FGristFiles
+		ScreenSaver.cpp
+	] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;
 
 Package haiku-screensaverkit-cvs :
 	screen_blanker :
