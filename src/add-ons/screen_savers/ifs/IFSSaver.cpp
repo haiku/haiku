@@ -63,7 +63,8 @@ IFSSaver::StartConfig(BView *view)
 	// the additive check box
 	fAdditiveCB = new BCheckBox(frame, "additive setting",
 								"Render dots additive",
-								new BMessage(MSG_TOGGLE_ADDITIVE));
+								new BMessage(MSG_TOGGLE_ADDITIVE),
+								B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 
 	fAdditiveCB->SetValue(fAdditive);
 
@@ -77,7 +78,8 @@ IFSSaver::StartConfig(BView *view)
 	fSpeedS = new BSlider(frame, "speed setting",
 						  "Morphing Speed:",
 						  new BMessage(MSG_SET_SPEED),
-						  1, 12);
+						  1, 12, B_BLOCK_THUMB,
+						  B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 
 	fSpeedS->SetValue(fSpeed);
 	fSpeedS->SetHashMarks(B_HASH_MARKS_BOTTOM);
