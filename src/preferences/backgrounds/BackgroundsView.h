@@ -14,8 +14,6 @@
 #include <View.h>
 #include <ColorControl.h>
 #include <Message.h>
-#include <ListItem.h>
-#include <ListView.h>
 #include <Button.h>
 #include <ScrollView.h>
 #include <ScrollBar.h>
