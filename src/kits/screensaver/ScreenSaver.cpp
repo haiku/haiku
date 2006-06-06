@@ -1,189 +1,167 @@
 /*
- * Copyright 2003, Michael Phipps. All rights reserved.
+ * Copyright 2003-2006, Michael Phipps. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ScreenSaver.h"
 
-BScreenSaver::BScreenSaver(BMessage *archive,
-                           image_id) : ticksize(50000),looponcount(0),loopoffcount(0) 
+
+BScreenSaver::BScreenSaver(BMessage *archive, image_id thisImage)
+	:
+	fTickSize(50000),
+	fLoopOnCount(0),
+	fLoopOffCount(0)
 {
 }
 
 
-BScreenSaver::~BScreenSaver() 
+BScreenSaver::~BScreenSaver()
 {
 }
 
 
 status_t
-BScreenSaver::InitCheck() 
+BScreenSaver::InitCheck()
 {
-    return B_OK; // This method is meant to be overridden
+    // This method is meant to be overridden
+    return B_OK;
 }
 
 
 status_t
-BScreenSaver::StartSaver(BView *view, bool preview) 
+BScreenSaver::StartSaver(BView *view, bool preview)
 {
-    return B_OK; // This method is meant to be overridden
+    // This method is meant to be overridden
+    return B_OK;
 }
 
 
 void
-BScreenSaver::StopSaver() 
+BScreenSaver::StopSaver()
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
 BScreenSaver::Draw(BView *view, int32 frame)
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::DirectConnected(direct_buffer_info *info) 
+BScreenSaver::DirectConnected(direct_buffer_info *info)
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::DirectDraw(int32 frame) 
+BScreenSaver::DirectDraw(int32 frame)
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::StartConfig(BView *configView) 
+BScreenSaver::StartConfig(BView *configView)
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::StopConfig() 
+BScreenSaver::StopConfig()
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::SupplyInfo(BMessage *info) const 
+BScreenSaver::SupplyInfo(BMessage* info) const
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 void
-BScreenSaver::ModulesChanged(const BMessage *info) 
+BScreenSaver::ModulesChanged(const BMessage* info)
 {
-	return; // This method is meant to be overridden
+	// This method is meant to be overridden
+	return;
 }
 
 
 status_t
-BScreenSaver::SaveState(BMessage *into) const 
+BScreenSaver::SaveState(BMessage *into) const
 {
-    return B_ERROR; // This method is meant to be overridden
+    // This method is meant to be overridden
+    return B_ERROR;
 }
 
 
 void
-BScreenSaver::SetTickSize(bigtime_t ts) 
+BScreenSaver::SetTickSize(bigtime_t tickSize)
 {
-	ticksize = ts;
+	fTickSize = tickSize;
 }
 
 
 bigtime_t
-BScreenSaver::TickSize() const 
+BScreenSaver::TickSize() const
 {
-    return ticksize;
+    return fTickSize;
 }
 
 
 void
-BScreenSaver::SetLoop(int32 on_count, int32 off_count) 
+BScreenSaver::SetLoop(int32 onCount, int32 offCount)
 {
-	looponcount = on_count;
-	loopoffcount = off_count;
+	fLoopOnCount = onCount;
+	fLoopOffCount = offCount;
 }
 
 
 int32
-BScreenSaver::LoopOnCount() const 
+BScreenSaver::LoopOnCount() const
 {
-    return looponcount;
+    return fLoopOnCount;
 }
 
 
 int32
-BScreenSaver::LoopOffCount() const 
+BScreenSaver::LoopOffCount() const
 {
-    return loopoffcount;
+    return fLoopOffCount;
 }
 
 
-void
-BScreenSaver::_ReservedScreenSaver1() 
-{
-}
+void BScreenSaver::_ReservedScreenSaver1() {}
+void BScreenSaver::_ReservedScreenSaver2() {}
+void BScreenSaver::_ReservedScreenSaver3() {}
+void BScreenSaver::_ReservedScreenSaver4() {}
+void BScreenSaver::_ReservedScreenSaver5() {}
+void BScreenSaver::_ReservedScreenSaver6() {}
+void BScreenSaver::_ReservedScreenSaver7() {}
+void BScreenSaver::_ReservedScreenSaver8() {}
 
-
-void
-BScreenSaver::_ReservedScreenSaver2() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver3() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver4() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver5() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver6() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver7() 
-{
-}
-
-
-void
-BScreenSaver::_ReservedScreenSaver8() 
-{
-}
-
-
+// for compatibility with older BeOS versions
 extern "C" {
-void  ReservedScreenSaver1__12BScreenSaver () {}
-void  ReservedScreenSaver2__12BScreenSaver () {}
-void  ReservedScreenSaver3__12BScreenSaver () {}
-void  ReservedScreenSaver4__12BScreenSaver () {}
-void  ReservedScreenSaver5__12BScreenSaver () {}
-void  ReservedScreenSaver6__12BScreenSaver () {}
-void  ReservedScreenSaver7__12BScreenSaver () {}
-void  ReservedScreenSaver8__12BScreenSaver () {}
+void ReservedScreenSaver1__12BScreenSaver() {}
+void ReservedScreenSaver2__12BScreenSaver() {}
+void ReservedScreenSaver3__12BScreenSaver() {}
+void ReservedScreenSaver4__12BScreenSaver() {}
+void ReservedScreenSaver5__12BScreenSaver() {}
+void ReservedScreenSaver6__12BScreenSaver() {}
+void ReservedScreenSaver7__12BScreenSaver() {}
+void ReservedScreenSaver8__12BScreenSaver() {}
 }

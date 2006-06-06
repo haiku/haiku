@@ -2,12 +2,15 @@ SubDir HAIKU_TOP src kits screensaver ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseHeaders [ FDirName headers os add-ons screen_saver ] ;
+	# we also need our headers when build for BeOS
+
 UsePrivateHeaders screen_saver ;
 
 SharedLibrary libscreensaver.so :
 	ScreenSaver.cpp
 	ScreenSaverPrefs.cpp
-	ScreenSaverThread.cpp
+	ScreenSaverRunner.cpp
 	:
 	be game
 ;
@@ -17,4 +20,4 @@ Package haiku-screensaverkit-cvs :
 	boot home config lib ;
 
 Packages haiku-screensaverkit-cvs :
-        README ;
+	README ;
