@@ -224,7 +224,7 @@ TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 	useconds %= 60;
 
 	// seconds
-	uint32 seconds = useconds / 60;
+	uint32 seconds = useconds;
 	if (hours != 0 || minutes != 0)
 		string << " ";
 	if (seconds != 0)
