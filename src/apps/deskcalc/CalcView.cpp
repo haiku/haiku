@@ -426,7 +426,7 @@ CalcView::MakeFocus(bool focused)
 {
 	if (focused) {
 		// set num lock
-		if (fOptions->mAutoNumLock) {
+		if (fOptions->auto_num_lock) {
 			set_keyboard_locks(B_NUM_LOCK |
 							   (modifiers() & (B_CAPS_LOCK | B_SCROLL_LOCK)));
 		}
@@ -732,7 +732,7 @@ CalcView::_PressKey(int key)
 			_Evaluate();
 		} else {
 			// audio feedback
-			if (fOptions->mAudioFeedback) {
+			if (fOptions->audio_feedback) {
 				BEntry zimp("key.AIFF");
 				entry_ref zimp_ref;
 				zimp.GetRef(&zimp_ref);
@@ -787,7 +787,7 @@ CalcView::_Evaluate()
 	}
 
 	// audio feedback
-	if (fOptions->mAudioFeedback) {
+	if (fOptions->audio_feedback) {
 		BEntry zimp("zimp.AIFF");
 		entry_ref zimp_ref;
 		zimp.GetRef(&zimp_ref);

@@ -19,8 +19,8 @@
 
 
 CalcOptions::CalcOptions()
-	: mAutoNumLock(true),
-	  mAudioFeedback(false)
+	: auto_num_lock(true),
+	  audio_feedback(false)
 {
 }
 
@@ -42,7 +42,7 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options)
 	BRect viewframe(4.0f, y, frame.right, y + 16.0f);
 	fAutoNumLockCheckBox = new BCheckBox(viewframe,
 		"autoNumLockCheckBox", "Auto Num Lock", NULL);
-	if (fOptions->mAutoNumLock) {
+	if (fOptions->auto_num_lock) {
 		fAutoNumLockCheckBox->SetValue(B_CONTROL_ON);
 	}
 	bg->AddChild(fAutoNumLockCheckBox);
@@ -52,7 +52,7 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options)
 	viewframe.Set(4.0f, y, frame.right, y + 16.0f);
 	fAudioFeedbackCheckBox = new BCheckBox(viewframe,
 		"audioFeedbackCheckBox", "Audio Feedback", NULL);
-	if (fOptions->mAudioFeedback) {
+	if (fOptions->audio_feedback) {
 		fAudioFeedbackCheckBox->SetValue(B_CONTROL_ON);
 	}
 	bg->AddChild(fAudioFeedbackCheckBox);
@@ -84,16 +84,10 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options)
 CalcOptionsWindow::~CalcOptionsWindow()
 {
 	// auto num-lock
-	if (fAutoNumLockCheckBox->Value() == B_CONTROL_ON)
-		fOptions->mAutoNumLock = true;
-	else
-		fOptions->mAutoNumLock = false;
+	fOptions->auto_num_lock = fAutoNumLockCheckBox->Value() == B_CONTROL_ON;
 
 	// audio feedback
-	if (fAudioFeedbackCheckBox->Value() == B_CONTROL_ON)
-		fOptions->mAudioFeedback = true;
-	else
-		fOptions->mAudioFeedback = false;
+	fOptions->audio_feedback = fAudioFeedbackCheckBox->Value() == B_CONTROL_ON;
 }
 
 
