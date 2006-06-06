@@ -56,7 +56,9 @@ PreviewView::~PreviewView()
 BView*
 PreviewView::AddPreview()
 {
-	fSaverView = new BView(scale2(1,8,1,2,Bounds()),"previewArea",B_FOLLOW_NONE,B_WILL_DRAW);
+	BRect rect = scale2(1,8,1,2,Bounds());
+	rect.InsetBy(1, 1);
+	fSaverView = new BView(rect, "preview", B_FOLLOW_NONE, B_WILL_DRAW);
 	fSaverView->SetViewColor(0, 0, 0);
 	AddChild(fSaverView);
 
@@ -85,6 +87,7 @@ PreviewView::Draw(BRect update)
 	StrokeRoundRect(scale2(2,7,3,6,Bounds()),2,2);// control console outline
 	StrokeRoundRect(scale2(0,9,0,3,Bounds()),4,4); // Outline outer shape
 	SetHighColor(kBlack);
+	FillRect(scale2(1,8,1,2,Bounds()));
 
 	SetHighColor(184, 184, 184);
 	BRect outerShape = scale2(2,7,2,6,Bounds());

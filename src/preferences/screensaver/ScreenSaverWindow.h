@@ -38,12 +38,14 @@ class ScreenSaverWindow : public BWindow {
 		virtual bool QuitRequested();
 
 		void LoadSettings();
+		void SetMinimalSizeLimit(float width, float height);
 
 	private:
 		void _SetupFadeTab(BRect frame);
 		void _UpdateTurnOffScreen();
 		void _UpdateStatus();
 
+		float			fMinWidth, fMinHeight;
 		ScreenSaverPrefs fPrefs;
 		uint32			fTurnOffScreenFlags;
 

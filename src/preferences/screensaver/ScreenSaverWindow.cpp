@@ -38,6 +38,10 @@
 #define CALLED() PRINT(("%s\n", __PRETTY_FUNCTION__))
 
 
+const uint32 kPreviewMonitorGap = 16;
+const uint32 kMinSettingsWidth = 230;
+const uint32 kMinSettingsHeight = 120;
+
 const int32 kMsgSaverSelected = 'SSEL';
 const int32 kMsgTestSaver = 'TEST';
 const int32 kMsgAddSaver = 'ADD ';
@@ -70,6 +74,13 @@ class TimeSlider : public BSlider {
 		uint32	fModificationMessage;
 };
 
+class FadeView : public BView {
+	public:
+		FadeView(BRect frame, const char* name, ScreenSaverPrefs& prefs);
+
+		virtual void AttachedToWindow();
+};
+
 class ModulesView : public BView {
 	public:
 		ModulesView(BRect frame, const char* name, ScreenSaverPrefs& prefs);
@@ -77,6 +88,7 @@ class ModulesView : public BView {
 
 		virtual void DetachedFromWindow();
 		virtual void AttachedToWindow();
+		virtual void AllAttached();
 		virtual void MessageReceived(BMessage* message);
 
 		void PopulateScreenSaverList();
@@ -100,7 +112,7 @@ class ModulesView : public BView {
 		BBox*			fSettingsBox;
 		BView*			fSettingsView;
 
-		PreviewView*	fPreviewDisplay;
+		PreviewView*	fPreviewView;
 };
 
 static const int32 kTimeInUnits[] = {
@@ -119,7 +131,7 @@ static const int32 kTimeUnitCount = sizeof(kTimeInUnits) / sizeof(kTimeInUnits[0
 
 TimeSlider::TimeSlider(BRect frame, const char* name, uint32 modificationMessage)
 	: BSlider(frame, name, "0 minutes", new BMessage(kTimeSliderChanged),
-		0, kTimeUnitCount - 1, B_TRIANGLE_THUMB),
+		0, kTimeUnitCount - 1, B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT),
 	fModificationMessage(modificationMessage)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -223,6 +235,27 @@ TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 //	#pragma mark -
 
 
+FadeView::FadeView(BRect rect, const char* name, ScreenSaverPrefs& prefs)
+	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+void
+FadeView::AttachedToWindow()
+{
+	if (Parent() != NULL) {
+		// We adopt the size of our parent view (in case the window
+		// was resized during our absence (BTabView...)
+		ResizeTo(Parent()->Bounds().Width(), Parent()->Bounds().Height());
+	}
+}
+
+
+//	#pragma mark -
+
+
 ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverPrefs& prefs)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
 	fPrefs(prefs),
@@ -231,27 +264,45 @@ ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverPrefs& prefs)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	AddChild(fSettingsBox = new BBox(BRect(183,11,434,285),
-		"ModuleSettingsBox", B_FOLLOW_NONE, B_WILL_DRAW));
-	fSettingsBox->SetLabel("Module settings");
-
-	fListView = new BListView(BRect(8,136,156,255), "SaversListView",
-		B_SINGLE_SELECTION_LIST);
-	fListView->SetSelectionMessage(new BMessage(kMsgSaverSelected));
-	AddChild(new BScrollView("scroll_list", fListView,
-		B_FOLLOW_ALL, 0, false, true));
-
-	fTestButton = new BButton(BRect(8,260,88,277), "TestButton", "Test",
-		new BMessage(kMsgTestSaver));
+	fTestButton = new BButton(rect, "TestButton", "Test", new BMessage(kMsgTestSaver),
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	float width, height;
+	fTestButton->GetPreferredSize(&width, &height);
+	fTestButton->ResizeTo(width + 16, height);
+	fTestButton->MoveTo(8, rect.bottom - 8 - height);
 	AddChild(fTestButton);
 
-	fAddButton = new BButton(BRect(98,260,173,277), "AddButton", "Add" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgAddSaver));
+	rect = fTestButton->Frame();
+	rect.OffsetBy(fTestButton->Bounds().Width() + 8, 0);
+	fAddButton = new BButton(rect, "AddButton", "Add" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgAddSaver), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fAddButton);
 
-	AddChild(fPreviewDisplay = new PreviewView(BRect(20, 15, 150, 120), "preview"));
+	rect = Bounds().InsetByCopy(8 + kPreviewMonitorGap, 12);
+	rect.right = fAddButton->Frame().right - kPreviewMonitorGap;
+	rect.bottom = rect.top + 3 * rect.Width() / 4;
+		// 4:3 monitor
 
-	PopulateScreenSaverList(); 
+	fPreviewView = new PreviewView(rect, "preview");
+	AddChild(fPreviewView);
+
+	rect.left = 8;
+	rect.right -= B_V_SCROLL_BAR_WIDTH + 2 - kPreviewMonitorGap;
+		// scroll view border
+	rect.top = rect.bottom + 14;
+	rect.bottom = fTestButton->Frame().top - 10;
+	fListView = new BListView(rect, "SaversListView", B_SINGLE_SELECTION_LIST,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
+	fListView->SetSelectionMessage(new BMessage(kMsgSaverSelected));
+	AddChild(new BScrollView("scroll_list", fListView,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, 0, false, true));
+
+	rect = Bounds().InsetByCopy(8, 8);
+	rect.left = fAddButton->Frame().right + 8;
+	AddChild(fSettingsBox = new BBox(rect, "SettingsBox", B_FOLLOW_ALL, B_WILL_DRAW));
+	fSettingsBox->SetLabel("Module settings");
+
+	PopulateScreenSaverList();
 	fFilePanel = new BFilePanel();
 }
 
@@ -272,11 +323,25 @@ ModulesView::DetachedFromWindow()
 void
 ModulesView::AttachedToWindow()
 {
+	if (Parent() != NULL) {
+		// We adopt the size of our parent view (in case the window
+		// was resized during our absence (BTabView...)
+		ResizeTo(Parent()->Bounds().Width(), Parent()->Bounds().Height());
+	}
+
 	_OpenSaver();
 
 	fListView->SetTarget(this);
 	fTestButton->SetTarget(this);
 	fAddButton->SetTarget(this);
+}
+
+
+void
+ModulesView::AllAttached()
+{
+	// This only works after the view has been attached
+	fListView->ScrollToSelection();
 }
 
 
@@ -294,7 +359,7 @@ ModulesView::MessageReceived(BMessage* message)
 			if (item == NULL)
 				break;
 
-			if (!strcmp(fPrefs.ModuleName(), "Blackness"))
+			if (!strcmp(item->Text(), "Blackness"))
 				fPrefs.SetModuleName("");
 			else
 				fPrefs.SetModuleName(item->Text());
@@ -409,7 +474,7 @@ ModulesView::_CloseSaver()
 	// remove old screen saver preview & config
 
 	BScreenSaver* saver = _ScreenSaver();
-	BView* view = fPreviewDisplay->RemovePreview();
+	BView* view = fPreviewView->RemovePreview();
 	if (fSettingsView != NULL)
 		fSettingsBox->RemoveChild(fSettingsView);
 
@@ -432,17 +497,18 @@ ModulesView::_OpenSaver()
 {
 	// create new screen saver preview & config
 
-   	BView* view = fPreviewDisplay->AddPreview();
+   	BView* view = fPreviewView->AddPreview();
 	fCurrentName = fPrefs.ModuleName();
 	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fPrefs);
 	BScreenSaver* saver = _ScreenSaver();
 
-	BRect bnds = fSettingsBox->Bounds();
-	bnds.left = 3;
-	bnds.right -= 7;
-	bnds.top = 21;
-	bnds.bottom -= 2;
-	fSettingsView = new BView(bnds,"settingsArea",B_FOLLOW_NONE,B_WILL_DRAW);
+	BRect rect = fSettingsBox->Bounds().InsetByCopy(4, 4);
+#ifdef __HAIKU__
+	rect.top += fSettingsBox->TopBorderOffset();
+#else
+	rect.top += 14;
+#endif
+	fSettingsView = new BView(rect, "SettingsView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fSettingsBox->AddChild(fSettingsView);
 
@@ -450,6 +516,66 @@ ModulesView::_OpenSaver()
 		fSaverRunner->Run();
 		saver->StartConfig(fSettingsView);
 	}
+
+	if (fSettingsView->ChildAt(0) == NULL) {
+		// There are no settings at all, we add the module name here to
+		// let it look a bit better at least.
+		rect = BRect(15, 15, 20, 20);
+		BStringView* stringView = new BStringView(rect, "module", fPrefs.ModuleName()[0]
+			? fPrefs.ModuleName() : "Blackness");
+		stringView->SetFont(be_bold_font);
+		stringView->ResizeToPreferred();
+		fSettingsView->AddChild(stringView);
+
+		rect.OffsetBy(0, stringView->Bounds().Height() + 4);
+		stringView = new BStringView(rect, "info", saver || !fPrefs.ModuleName()[0]
+			? "No options available" : "Could not load screen saver");
+		stringView->ResizeToPreferred();
+		fSettingsView->AddChild(stringView);
+	}
+
+	ScreenSaverWindow* window = dynamic_cast<ScreenSaverWindow*>(Window());
+	if (window == NULL)
+		return;
+
+	// find the minimal size of the settings view
+
+	float right = 0, bottom = 0;
+	int32 i = 0;
+	while ((view = fSettingsView->ChildAt(i++)) != NULL) {
+		// very simple heuristic...
+		float viewRight = view->Frame().right;
+		if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf)) == B_FOLLOW_LEFT_RIGHT) {
+			float width, height;
+			view->GetPreferredSize(&width, &height);
+			viewRight = view->Frame().left + width / 2;
+		} else if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf)) == B_FOLLOW_RIGHT)
+			viewRight = 8 + view->Frame().Width();
+
+		float viewBottom = view->Frame().bottom;
+		if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0)) == B_FOLLOW_TOP_BOTTOM) {
+			float width, height;
+			view->GetPreferredSize(&width, &height);
+			viewBottom = view->Frame().top + height;
+		} else if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0)) == B_FOLLOW_BOTTOM)
+			viewBottom = 8 + view->Frame().Height();
+
+		if (viewRight > right)
+			right = viewRight;
+		if (viewBottom > bottom)
+			bottom = viewBottom;
+	}
+
+	if (right < kMinSettingsWidth)
+		right = kMinSettingsWidth;
+	if (bottom < kMinSettingsHeight)
+		bottom = kMinSettingsHeight;
+
+	BPoint leftTop = fSettingsView->LeftTop();
+	fSettingsView->ConvertToScreen(&leftTop);
+	window->ConvertFromScreen(&leftTop);
+	window->SetMinimalSizeLimit(leftTop.x + right + 16,
+		leftTop.y + bottom + 16);
 }
 
 
@@ -458,7 +584,7 @@ ModulesView::_OpenSaver()
 
 ScreenSaverWindow::ScreenSaverWindow() 
 	: BWindow(BRect(50, 50, 496, 375), "Screen Saver",
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/),
 	fFadeNowString(NULL),
 	fFadeNowString2(NULL),
 	fDontFadeString(NULL),
@@ -492,11 +618,16 @@ ScreenSaverWindow::ScreenSaverWindow()
 	fPasswordWindow = new PasswordWindow(fPrefs);
 	fPasswordWindow->Run();
 
+	// TODO: better limits!
+	fMinWidth = 430;
+	fMinHeight = 325;
+	SetMinimalSizeLimit(fMinWidth, fMinHeight);
 	MoveTo(fPrefs.WindowFrame().left, fPrefs.WindowFrame().top);
+	ResizeTo(fPrefs.WindowFrame().Width(), fPrefs.WindowFrame().Height());
 
 	fEnableCheckBox->SetValue(fPrefs.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
 	fRunSlider->SetTime(fPrefs.BlankTime());
-	fTurnOffSlider->SetTime(fPrefs.OffTime());
+	fTurnOffSlider->SetTime(fPrefs.OffTime() + fPrefs.BlankTime());
 	fFadeNow->SetCorner(fPrefs.GetBlankCorner());
 	fFadeNever->SetCorner(fPrefs.GetNeverBlankCorner());
 	fPasswordCheckBox->SetValue(fPrefs.LockEnable());
@@ -518,10 +649,8 @@ ScreenSaverWindow::~ScreenSaverWindow()
 void
 ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
-	fFadeView = new BView(rect, "Fade", B_FOLLOW_ALL, 0);
-	fFadeView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fFadeView = new FadeView(rect, "Fade", fPrefs);
 
-	rect.InsetBy(8, 8);
 /*
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -531,6 +660,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 		"Enable Screen Saver", new BMessage(kMsgEnableScreenSaverBox));
 	fEnableCheckBox->ResizeToPreferred();
 
+	rect.InsetBy(8, 8);
 	BBox* box = new BBox(rect, "EnableScreenSaverBox", B_FOLLOW_ALL);
 	box->SetLabel(fEnableCheckBox);
 	fFadeView->AddChild(box);
@@ -625,7 +755,53 @@ ScreenSaverWindow::_UpdateTurnOffScreen()
 
 
 void
-ScreenSaverWindow::MessageReceived(BMessage *msg) 
+ScreenSaverWindow::_UpdateStatus()
+{
+	DisableUpdates();
+
+	bool enabled = fEnableCheckBox->Value() == B_CONTROL_ON;
+	fPasswordCheckBox->SetEnabled(enabled);
+	fTurnOffCheckBox->SetEnabled(enabled && fTurnOffScreenFlags != 0);
+	fRunSlider->SetEnabled(enabled);
+	fTurnOffSlider->SetEnabled(enabled && fTurnOffCheckBox->Value());
+	fPasswordSlider->SetEnabled(enabled && fPasswordCheckBox->Value());
+	fPasswordButton->SetEnabled(enabled && fPasswordCheckBox->Value());
+
+	EnableUpdates();
+
+	// Update the saved preferences
+	fPrefs.SetWindowFrame(Frame());	
+	fPrefs.SetWindowTab(fTabView->Selection());
+	fPrefs.SetTimeFlags((enabled ? ENABLE_SAVER : 0)
+		| (fTurnOffCheckBox->Value() ? fTurnOffScreenFlags : 0));
+	fPrefs.SetBlankTime(fRunSlider->Time());
+	bigtime_t offTime = fTurnOffSlider->Time() - fPrefs.BlankTime();
+	fPrefs.SetOffTime(offTime);
+	fPrefs.SetSuspendTime(offTime);
+	fPrefs.SetStandbyTime(offTime);
+	fPrefs.SetBlankCorner(fFadeNow->Corner());
+	fPrefs.SetNeverBlankCorner(fFadeNever->Corner());
+	fPrefs.SetLockEnable(fPasswordCheckBox->Value());
+	fPrefs.SetPasswordTime(fPasswordSlider->Time());
+
+	// TODO - Tell the password window to update its stuff
+}
+
+
+void
+ScreenSaverWindow::SetMinimalSizeLimit(float width, float height)
+{
+	if (width < fMinWidth)
+		width = fMinWidth;
+	if (height < fMinHeight)
+		height = fMinHeight;
+
+	SetSizeLimits(width, 32767, height, 32767);
+}
+
+
+void
+ScreenSaverWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		// "Fade" tab
@@ -679,7 +855,7 @@ ScreenSaverWindow::ScreenChanged(BRect frame, color_space colorSpace)
 
 
 bool
-ScreenSaverWindow::QuitRequested() 
+ScreenSaverWindow::QuitRequested()
 {
 	_UpdateStatus();
 	fModulesView->SaveState();
@@ -688,37 +864,4 @@ ScreenSaverWindow::QuitRequested()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }       
-
-
-void
-ScreenSaverWindow::_UpdateStatus() 
-{
-	DisableUpdates();
-
-	bool enabled = fEnableCheckBox->Value() == B_CONTROL_ON;
-	fPasswordCheckBox->SetEnabled(enabled);
-	fTurnOffCheckBox->SetEnabled(enabled && fTurnOffScreenFlags != 0);
-	fRunSlider->SetEnabled(enabled);
-	fTurnOffSlider->SetEnabled(enabled && fTurnOffCheckBox->Value());
-	fPasswordSlider->SetEnabled(enabled && fPasswordCheckBox->Value());
-	fPasswordButton->SetEnabled(enabled && fPasswordCheckBox->Value());
-
-	EnableUpdates();
-
-	// Update the saved preferences
-	fPrefs.SetWindowFrame(Frame());	
-	fPrefs.SetWindowTab(fTabView->Selection());
-	fPrefs.SetTimeFlags((enabled ? ENABLE_SAVER : 0)
-		| (fTurnOffCheckBox->Value() ? fTurnOffScreenFlags : 0));
-	fPrefs.SetBlankTime(fRunSlider->Time());
-	fPrefs.SetOffTime(fTurnOffSlider->Time());
-	fPrefs.SetSuspendTime(fTurnOffSlider->Time());
-	fPrefs.SetStandbyTime(fTurnOffSlider->Time());
-	fPrefs.SetBlankCorner(fFadeNow->Corner());
-	fPrefs.SetNeverBlankCorner(fFadeNever->Corner());
-	fPrefs.SetLockEnable(fPasswordCheckBox->Value());
-	fPrefs.SetPasswordTime(fPasswordSlider->Time());
-
-	// TODO - Tell the password window to update its stuff
-}
 
