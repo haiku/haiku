@@ -972,9 +972,9 @@ BScrollBar::AllDetached()
 
 // GetSupportedSuites
 status_t
-BScrollBar::GetSupportedSuites(BMessage *data)
+BScrollBar::GetSupportedSuites(BMessage *message)
 {
-	return B_ERROR;
+	return BView::GetSupportedSuites(message);
 }
 
 // Perform

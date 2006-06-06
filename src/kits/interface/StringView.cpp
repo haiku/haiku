@@ -259,9 +259,9 @@ BStringView::AllDetached()
 
 
 status_t
-BStringView::GetSupportedSuites(BMessage* data)
+BStringView::GetSupportedSuites(BMessage* message)
 {
-	return B_OK;
+	return BView::GetSupportedSuites(message);
 }
 
 
