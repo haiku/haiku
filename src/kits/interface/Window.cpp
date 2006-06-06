@@ -2217,11 +2217,11 @@ BWindow::GetSupportedSuites(BMessage *data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = data->AddString("Suites", "suite/vnd.Be-window");
+	status_t status = data->AddString("suites", "suite/vnd.Be-window");
 	if (status == B_OK) {
 		BPropertyInfo propertyInfo(sWindowPropInfo, sWindowValueInfo);
 
-		status = data->AddFlat("message", &propertyInfo);
+		status = data->AddFlat("messages", &propertyInfo);
 		if (status == B_OK)
 			status = BLooper::GetSupportedSuites(data);
 	}

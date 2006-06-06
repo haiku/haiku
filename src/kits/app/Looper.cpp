@@ -664,11 +664,11 @@ BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 			string comparisons -- which wouldn't tell the whole story anyway,
 			because of the same name being used for multiple properties.
  */
-	BPropertyInfo PropertyInfo(gLooperPropInfo);
+	BPropertyInfo propertyInfo(gLooperPropInfo);
 	uint32 data;
 	status_t err = B_OK;
 	const char* errMsg = "";
-	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0) {
+	if (propertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0) {
 		switch (data) {
 			case BLOOPER_PROCESS_INTERNALLY:
 				return this;
@@ -701,10 +701,10 @@ BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 			property);
 	}
 
-	BMessage Reply(B_MESSAGE_NOT_UNDERSTOOD);
-	Reply.AddInt32("error", err);
-	Reply.AddString("message", errMsg);
-	msg->SendReply(&Reply);
+	BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
+	reply.AddInt32("error", err);
+	reply.AddString("message", errMsg);
+	msg->SendReply(&reply);
 
 	return NULL;
 }
@@ -716,10 +716,10 @@ BLooper::GetSupportedSuites(BMessage* data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = data->AddString("Suites", "suite/vnd.Be-handler");
+	status_t status = data->AddString("suites", "suite/vnd.Be-handler");
 	if (status == B_OK) {
 		BPropertyInfo PropertyInfo(gLooperPropInfo);
-		status = data->AddFlat("message", &PropertyInfo);
+		status = data->AddFlat("messages", &PropertyInfo);
 		if (status == B_OK)
 			status = BHandler::GetSupportedSuites(data);
 	}
@@ -1318,10 +1318,10 @@ BLooper::_QuitRequested(BMessage *msg)
 	bool shutdown;
 	if (msg->IsSourceWaiting()
 		|| (msg->FindBool("_shutdown_", &shutdown) == B_OK && shutdown)) {
-		BMessage ReplyMsg(B_REPLY);
-		ReplyMsg.AddBool("result", isQuitting);
-		ReplyMsg.AddInt32("thread", fTaskID);
-		msg->SendReply(&ReplyMsg);
+		BMessage replyMsg(B_REPLY);
+		replyMsg.AddBool("result", isQuitting);
+		replyMsg.AddInt32("thread", fTaskID);
+		msg->SendReply(&replyMsg);
 	}
 
 	if (isQuitting)

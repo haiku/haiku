@@ -117,14 +117,14 @@ const static rgb_color kRedInputColor = { 255, 152, 152, 255 };
 static property_info
 sPropertyList[] = {
 	{
-		"Selection",
+		"selection",
 		{ B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
 		"Returns the current selection.", 0,
 		{ B_INT32_TYPE, 0 }
 	},
 	{
-		"Selection",
+		"selection",
 		{ B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
 		"Sets the current selection.", 0,
@@ -990,16 +990,14 @@ BTextView::GetSupportedSuites(BMessage *data)
 		return B_BAD_VALUE;
 
 	status_t err = data->AddString("suites", "suite/vnd.Be-text-view");
-
-	if (err < B_OK)
+	if (err != B_OK)
 		return err;
 	
 	BPropertyInfo prop_info(sPropertyList);
 	err = data->AddFlat("messages", &prop_info);
 
-	if (err < B_OK)
+	if (err != B_OK)
 		return err;
-	
 	return BView::GetSupportedSuites(data);
 }
 

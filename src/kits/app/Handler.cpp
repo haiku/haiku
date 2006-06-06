@@ -471,7 +471,7 @@ BMessage: what =  (0x0, or 0)
 		err = data->AddString("suites", "suite/vnd.Be-handler");
 		if (!err) {
 			BPropertyInfo propertyInfo(sHandlerPropInfo);
-			err = data->AddFlat("message", &propertyInfo);
+			err = data->AddFlat("messages", &propertyInfo);
 		}
 	}
 

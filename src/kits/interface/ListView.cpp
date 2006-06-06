@@ -30,23 +30,36 @@ struct track_data {
 
 static property_info sProperties[] = {
 	{ "Item", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Returns the number of BListItems currently in the list." },
+		"Returns the number of BListItems currently in the list.", 0, { B_INT32_TYPE } 
+	},
+
 	{ "Item", { B_EXECUTE_PROPERTY, 0 }, { B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER,
 		B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
-		"Select and invoke the specified items, first removing any existing selection." },
+		"Select and invoke the specified items, first removing any existing selection." 
+	},
+
 	{ "Selection", { B_COUNT_PROPERTIES, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Returns int32 count of items in the selection." },
+		"Returns int32 count of items in the selection.", 0, { B_INT32_TYPE } 
+	},
+
 	{ "Selection", { B_EXECUTE_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Invoke items in selection." },
+		"Invoke items in selection." 
+	},
+
 	{ "Selection", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
-		"Returns int32 indices of all items in the selection." },
+		"Returns int32 indices of all items in the selection.", 0, { B_INT32_TYPE } 
+	},
+
 	{ "Selection", { B_SET_PROPERTY, 0 }, { B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER,
 		B_RANGE_SPECIFIER, B_REVERSE_RANGE_SPECIFIER, 0 },
 		"Extends current selection or deselects specified items. Boolean field \"data\" "
-		"chooses selection or deselection." },
+		"chooses selection or deselection.", 0, { B_BOOL_TYPE } 
+	},
+
 	{ "Selection", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
 		"Select or deselect all items in the selection. Boolean field \"data\" chooses "
-		"selection or deselection." },
+		"selection or deselection.", 0, { B_BOOL_TYPE } 
+	},
 };
 
 
@@ -1015,12 +1028,18 @@ BListView::ResolveSpecifier(BMessage* message, int32 index,
 status_t
 BListView::GetSupportedSuites(BMessage* data)
 {
+	if (data == NULL)
+		return B_BAD_VALUE;
+	
+	status_t err = data->AddString("suites", "suite/vnd.Be-list-view");
+
 	BPropertyInfo propertyInfo(sProperties);
+	if (err == B_OK)
+		err = data->AddFlat("messages", &propertyInfo);
 	
-	data->AddString("suites", "suite/vnd.Be-list-view");
-	data->AddFlat("messages", &propertyInfo);
-	
-	return BView::GetSupportedSuites(data);
+	if (err == B_OK)
+		return BView::GetSupportedSuites(data);
+	return err;
 }
 
 // Perform

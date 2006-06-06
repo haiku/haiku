@@ -52,8 +52,9 @@ kHorizontalKnobData[] = {
 static property_info
 sPropertyInfo[] = {
 	{ "Orientation",
-	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "" },
+		{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 }, NULL, 0, { B_INT32_TYPE }
+	},
 		
 	{ 0 }
 };
@@ -438,12 +439,15 @@ BChannelSlider::GetSupportedSuites(BMessage *data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 	
-	data->AddString("suites", "suite/vnd.Be-channel-slider");
+	status_t err = data->AddString("suites", "suite/vnd.Be-channel-slider");
 
 	BPropertyInfo propInfo(sPropertyInfo);
-	data->AddFlat("messages", &propInfo, 1);
+	if (err == B_OK)
+		err = data->AddFlat("messages", &propInfo);
 	
-	return inherited::GetSupportedSuites(data);
+	if (err == B_OK)
+		return BChannelControl::GetSupportedSuites(data);
+	return err;
 }
 
 

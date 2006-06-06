@@ -3480,14 +3480,12 @@ BView::GetSupportedSuites(BMessage *data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = data->AddString("Suites", "suite/vnd.Be-view");
-	if (status == B_OK) {
-		BPropertyInfo propertyInfo(sViewPropInfo);
-
-		status = data->AddFlat("message", &propertyInfo);
-		if (status == B_OK)
-			status = BHandler::GetSupportedSuites(data);
-	}
+	status_t status = data->AddString("suites", "suite/vnd.Be-view");
+	BPropertyInfo propertyInfo(sViewPropInfo);
+	if (status == B_OK)
+		status = data->AddFlat("messages", &propertyInfo);
+	if (status == B_OK)
+		return BHandler::GetSupportedSuites(data);
 	return status;
 }
 

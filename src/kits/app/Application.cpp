@@ -911,10 +911,10 @@ BApplication::GetSupportedSuites(BMessage *data)
 	if (!data)
 		return B_BAD_VALUE;
 
-	status_t status = data->AddString("Suites", "suite/vnd.Be-application");
+	status_t status = data->AddString("suites", "suite/vnd.Be-application");
 	if (status == B_OK) {
-		BPropertyInfo PropertyInfo(sPropertyInfo);
-		status = data->AddFlat("message", &PropertyInfo);
+		BPropertyInfo propertyInfo(sPropertyInfo);
+		status = data->AddFlat("messages", &propertyInfo);
 		if (status == B_OK)
 			status = BHandler::GetSupportedSuites(data);
 	}
