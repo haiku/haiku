@@ -26,12 +26,18 @@ class BButton;
 class CalcOptionsWindow : public BWindow {
  public:		
 								CalcOptionsWindow(BRect frame,
-												  CalcOptions* options);
+												  CalcOptions* options,
+												  BMessage* quitMessage,
+												  BHandler* target);
 
 	virtual						~CalcOptionsWindow();
+
+	virtual bool				QuitRequested();
 		
  private:
 			CalcOptions*		fOptions;
+			BMessage*			fQuitMessage;
+			BHandler*			fTarget;
 
 			BCheckBox*			fAutoNumLockCheckBox;
 			BCheckBox*			fAudioFeedbackCheckBox;

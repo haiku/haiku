@@ -104,6 +104,7 @@ class CalcView : public BView {
 			// calculator options.
 			CalcOptions*		fOptions;
 			CalcOptionsWindow*	fOptionsWindow;
+			BRect				fOptionsWindowFrame;
 };
 
 #endif // _CALC_VIEW_H

@@ -25,9 +25,14 @@ CalcOptions::CalcOptions()
 }
 
 
-CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options)
-	: BWindow(frame, "Options", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
-	  fOptions(options)
+CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options,
+									 BMessage* quitMessage,
+									 BHandler* target)
+	: BWindow(frame, "Options", B_TITLED_WINDOW,
+			  B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
+	  fOptions(options),
+	  fQuitMessage(quitMessage),
+	  fTarget(target)
 {
 	// TODO: revisit when Ingo has created his layout framework...
 	frame.OffsetTo(B_ORIGIN);
@@ -83,13 +88,26 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options)
  
 CalcOptionsWindow::~CalcOptionsWindow()
 {
+	delete fQuitMessage;
+}
+
+
+bool
+CalcOptionsWindow::QuitRequested()
+{
 	// auto num-lock
 	fOptions->auto_num_lock = fAutoNumLockCheckBox->Value() == B_CONTROL_ON;
 
 	// audio feedback
 	fOptions->audio_feedback = fAudioFeedbackCheckBox->Value() == B_CONTROL_ON;
+
+	// notify target of our demise
+	if (fQuitMessage && fTarget && fTarget->Looper()) {
+		fQuitMessage->AddRect("window frame", Frame());
+		fTarget->Looper()->PostMessage(fQuitMessage, fTarget);
+	}
+
+	return true;
 }
-
-
 
 

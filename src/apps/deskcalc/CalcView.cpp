@@ -35,7 +35,8 @@ const float K_FONT_YPROP		= 0.6f;
 const float K_DISPLAY_YPROP		= 0.2;
 
 enum {
-	K_OPTIONS_REQUESTED =	'opts'
+	K_OPTIONS_REQUESTED			= 'opts',
+	K_OPTIONS_GONE				= 'opgn',
 };
 
 // default calculator key pad layout
@@ -86,7 +87,8 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	  fPopUpMenu(NULL),
 
 	  fOptions(new CalcOptions()),
-	  fOptionsWindow(NULL)
+	  fOptionsWindow(NULL),
+	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0)
 {
 	// tell the app server not to erase our b/g
 	SetViewColor(B_TRANSPARENT_32_BIT);
@@ -120,7 +122,8 @@ CalcView::CalcView(BMessage* archive)
 	  fPopUpMenu(NULL),
 
 	  fOptions(new CalcOptions()),
-	  fOptionsWindow(NULL)
+	  fOptionsWindow(NULL),
+	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0)
 {
 	// read data from archive
 	LoadSettings(archive);
@@ -187,9 +190,27 @@ CalcView::MessageReceived(BMessage* message)
 			
 			// calculator options window requested
 			case K_OPTIONS_REQUESTED: {
-				BRect frame(30.0f, 50.0f, 230.0, 200.0);
-				fOptionsWindow = new CalcOptionsWindow(frame, fOptions);
+				if (fOptionsWindow != NULL) {
+// TODO: remove race condition and activate
+//					fOptionsWindow->Activate();
+					break;
+				}
+
+				fOptionsWindow = new CalcOptionsWindow(fOptionsWindowFrame,
+													   fOptions,
+													   new BMessage(K_OPTIONS_GONE),
+													   this);
 				fOptionsWindow->Show();
+				break;
+			}
+
+			// calculator options window has quit
+			case K_OPTIONS_GONE: {
+				fOptionsWindow = NULL;
+
+				BRect frame;
+				if (message->FindRect("window frame", &frame) == B_OK)
+					fOptionsWindowFrame = frame;
 				break;
 			}
 			
@@ -284,7 +305,7 @@ CalcView::Draw(BRect updateRect)
 		SetLowColor(fBaseColor);
 		SetDrawingMode(B_OP_COPY);
 		SetFontSize(((fHeight - sizeDisp)/(float)fRows) * K_FONT_YPROP);
-		float baselineOffset = ((fHeight - sizeDisp)/(float)fRows)
+		float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
 								* (1.0 - K_FONT_YPROP) * 0.5;
 		CalcKey *key = fKeypad;
 		for (int row = 0; row < fRows; row++) {
@@ -601,7 +622,12 @@ CalcView::LoadSettings(BMessage* archive)
 	} else {
 		puts("Missing options from CalcView archive.\n");
 	}
-	
+
+	// load option window frame
+	BRect frame;
+	if (archive->FindRect("option window frame", &frame) == B_OK)
+		fOptionsWindowFrame = frame;
+
 	// load display text
 	const char* display;
 	if (archive->FindString("displayText", &display) < B_OK) {
@@ -644,6 +670,10 @@ CalcView::SaveSettings(BMessage* archive) const
 	if (ret == B_OK)
 		ret = archive->AddData("options", B_RAW_TYPE,
 							   fOptions, sizeof(CalcOptions));
+
+	// record option window frame
+	if (ret == B_OK)
+		ret = archive->AddRect("option window frame", fOptionsWindowFrame);
 
 	// record display text
 	if (ret == B_OK)
