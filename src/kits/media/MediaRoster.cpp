@@ -2889,16 +2889,14 @@ BMediaRoster::ResolveSpecifier(BMessage *msg,
 				 int32 form,
 				 const char *property)
 {
-	UNIMPLEMENTED();
-	return 0;
+	return BLooper::ResolveSpecifier(msg, index, specifier, form, property);
 }				 
 
 
 /* virtual */ status_t 
 BMediaRoster::GetSupportedSuites(BMessage *data)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	return BLooper::GetSupportedSuites(data);
 }
 
 
