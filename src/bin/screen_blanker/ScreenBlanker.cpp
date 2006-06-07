@@ -137,7 +137,9 @@ void
 ScreenBlanker::_QueueResumeScreenSaver()
 {
 	delete fResumeRunner;
-	fResumeRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgResumeSaver),
+
+	BMessage resume(kMsgResumeSaver);
+	fResumeRunner = new BMessageRunner(BMessenger(this), &resume,
 		fSettings.BlankTime(), 1);
 	if (fResumeRunner->InitCheck() != B_OK)
 		syslog(LOG_ERR, "resume screen saver runner failed\n");
@@ -178,22 +180,25 @@ ScreenBlanker::_QueueTurnOffScreen()
 	// start them off again
 
 	if (flags & ENABLE_DPMS_STAND_BY) {
-		fStandByScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgStandByScreen), fSettings.StandByTime(), 1);
+		BMessage dpms(kMsgStandByScreen);
+		fStandByScreenRunner = new BMessageRunner(BMessenger(this), &dpms,
+			fSettings.StandByTime(), 1);
 		if (fStandByScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "standby screen saver runner failed\n");
 	}
 
 	if (flags & ENABLE_DPMS_SUSPEND) {
-		fSuspendScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgSuspendScreen), fSettings.SuspendTime(), 1);
+		BMessage dpms(kMsgSuspendScreen);
+		fSuspendScreenRunner = new BMessageRunner(BMessenger(this), &dpms,
+			fSettings.SuspendTime(), 1);
 		if (fSuspendScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "turn off screen saver runner failed\n");
 	}
 
 	if (flags & ENABLE_DPMS_OFF) {
-		fTurnOffScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgTurnOffScreen), fSettings.OffTime(), 1);
+		BMessage dpms(kMsgTurnOffScreen);
+		fTurnOffScreenRunner = new BMessageRunner(BMessenger(this), &dpms,
+			fSettings.OffTime(), 1);
 		if (fTurnOffScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "turn off screen saver runner failed\n");
 	}
@@ -269,8 +274,12 @@ ScreenBlanker::_Shutdown()
 {
 	delete fRunner;
 
-	if (fWindow)
+	if (fWindow) {
 		fWindow->Hide();
+
+		if (fWindow->Lock())
+			fWindow->Quit();
+	}
 }
 
 

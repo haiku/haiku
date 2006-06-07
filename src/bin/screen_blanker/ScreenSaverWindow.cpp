@@ -10,8 +10,10 @@
 
 #include "ScreenSaverWindow.h"
 
-#include <View.h>
 #include <WindowPrivate.h>
+
+#include <Application.h>
+#include <View.h>
 
 
 /*!
@@ -46,6 +48,7 @@ ScreenSaverWindow::SetSaver(BScreenSaver *saver)
 bool 
 ScreenSaverWindow::QuitRequested() 
 {
+	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
