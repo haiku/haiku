@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2006, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -84,10 +84,13 @@ BPrivate::dano_message_flattened_size(const char *buffer)
 {
 	section_header *header = (section_header *)buffer;
 
-	if (header->code == kMessageFormatSwapped)
-		return __swap_int32(header->size);
+	// The size contains the message format that won't be part of
+	// the buffer unflatten_dano_message() will get
 
-	return header->size;
+	if (header->code == kMessageFormatSwapped)
+		return __swap_int32(header->size) - sizeof(header->code);
+
+	return header->size - sizeof(header->code);
 }
 
 
@@ -118,7 +121,7 @@ BPrivate::unflatten_dano_message(uint32 format, BDataIO &stream,
 		// be safe. this shouldn't be necessary but in some testcases it was.
 		sectionHeader.size = pad_to_8(sectionHeader.size);
 
-		if (offset + sectionHeader.size > size)
+		if (offset + sectionHeader.size > size || sectionHeader.size < 0)
 			return B_BAD_DATA;
 
 		ssize_t fieldSize = sectionHeader.size - sizeof(section_header);
@@ -133,10 +136,12 @@ BPrivate::unflatten_dano_message(uint32 format, BDataIO &stream,
 		}
 
 		switch (sectionHeader.code) {
-			case SECTION_OFFSET_TABLE: break; /* discard */
-			case SECTION_TARGET_INFORMATION: break; /* discard */
-			case SECTION_SORTED_INDEX_TABLE: break; /* discard */
-			case SECTION_END_OF_DATA: break; /* discard */
+			case SECTION_OFFSET_TABLE:
+			case SECTION_TARGET_INFORMATION:
+			case SECTION_SORTED_INDEX_TABLE:
+			case SECTION_END_OF_DATA:
+				// discard
+				break;
 
 			case SECTION_SINGLE_ITEM_DATA: {
 				single_item *field = (single_item *)fieldBuffer;
