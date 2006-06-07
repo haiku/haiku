@@ -45,7 +45,7 @@ class ScreenSaverPrefs {
 		int32 WindowTab() { return fWindowTab; }
 		int32 TimeFlags() { return fTimeFlags; }
 		bigtime_t BlankTime() { return fBlankTime; }
-		bigtime_t StandbyTime() { return fStandByTime; }
+		bigtime_t StandByTime() { return fStandByTime; }
 		bigtime_t SuspendTime() { return fSuspendTime; }
 		bigtime_t OffTime() { return fOffTime; }
 
@@ -63,7 +63,7 @@ class ScreenSaverPrefs {
 		void SetWindowTab(int32 tab) { fWindowTab = tab; }
 		void SetTimeFlags(int32 tf) { fTimeFlags = tf; }
 		void SetBlankTime(bigtime_t bt) { fBlankTime = bt; }
-		void SetStandbyTime(bigtime_t time) { fStandByTime = time; }
+		void SetStandByTime(bigtime_t time) { fStandByTime = time; }
 		void SetSuspendTime(bigtime_t time) { fSuspendTime = time; }
 		void SetOffTime(bigtime_t intime) { fOffTime = intime; }
 		void SetBlankCorner(screen_corner in) { fBlankCorner = in; }

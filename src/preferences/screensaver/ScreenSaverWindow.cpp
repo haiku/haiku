@@ -774,7 +774,7 @@ ScreenSaverWindow::_UpdateStatus()
 	bigtime_t offTime = fTurnOffSlider->Time() - fPrefs.BlankTime();
 	fPrefs.SetOffTime(offTime);
 	fPrefs.SetSuspendTime(offTime);
-	fPrefs.SetStandbyTime(offTime);
+	fPrefs.SetStandByTime(offTime);
 	fPrefs.SetBlankCorner(fFadeNow->Corner());
 	fPrefs.SetNeverBlankCorner(fFadeNever->Corner());
 	fPrefs.SetLockEnable(fPasswordCheckBox->Value());

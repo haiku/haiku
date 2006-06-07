@@ -32,7 +32,10 @@ class ScreenBlanker : public BApplication {
 	private:
 		bool _LoadAddOn();
 		void _ShowPasswordWindow();
-		void _ResumeScreenSaver();
+		void _QueueResumeScreenSaver();
+		void _TurnOnScreen();
+		void _SetDPMSMode(uint32 mode);
+		void _QueueTurnOffScreen();
 		void _Shutdown();
 
 		ScreenSaverPrefs fPrefs;
@@ -42,7 +45,11 @@ class ScreenBlanker : public BApplication {
 		PasswordWindow *fPasswordWindow;
 
 		bigtime_t fBlankTime;
-		BMessageRunner *fResumeRunner;
+		BMessageRunner* fResumeRunner;
+
+		BMessageRunner* fStandByScreenRunner;
+		BMessageRunner* fSuspendScreenRunner;
+		BMessageRunner* fTurnOffScreenRunner;
 };
 
 #endif	// SCREEN_SAVER_APP_H

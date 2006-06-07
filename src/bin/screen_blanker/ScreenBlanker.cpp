@@ -5,6 +5,7 @@
  * Authors:
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -22,9 +23,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 
-const static int32 RESUME_SAVER = 'RSSV';
+const static uint32 kMsgResumeSaver = 'RSSV';
+const static uint32 kMsgTurnOffScreen = 'tofs';
+const static uint32 kMsgSuspendScreen = 'suss';
+const static uint32 kMsgStandByScreen = 'stbs';
 
 
 ScreenBlanker::ScreenBlanker()
@@ -33,7 +38,10 @@ ScreenBlanker::ScreenBlanker()
 	fSaver(NULL),
 	fRunner(NULL),
 	fPasswordWindow(NULL),
-	fResumeRunner(NULL)
+	fResumeRunner(NULL),
+	fStandByScreenRunner(NULL),
+	fSuspendScreenRunner(NULL),
+	fTurnOffScreenRunner(NULL)
 {
 	fBlankTime = system_time();
 }
@@ -42,6 +50,7 @@ ScreenBlanker::ScreenBlanker()
 ScreenBlanker::~ScreenBlanker()
 {
 	delete fResumeRunner;
+	_TurnOnScreen();
 }
 
 
@@ -54,6 +63,7 @@ ScreenBlanker::ReadyToRun()
 	}
 	
 	// create a BDirectWindow and start the render thread.
+	// TODO: we need a window per screen...
 	BScreen screen(B_MAIN_SCREEN_ID);
 	fWindow = new ScreenSaverWindow(screen.Frame());
 	fPasswordWindow = new PasswordWindow();
@@ -70,12 +80,43 @@ ScreenBlanker::ReadyToRun()
 	fWindow->SetFullScreen(true);
 	fWindow->Show();
 	HideCursor();
+
+	_QueueTurnOffScreen();
+}
+
+
+void
+ScreenBlanker::_TurnOnScreen()
+{
+	delete fStandByScreenRunner;
+	delete fSuspendScreenRunner;
+	delete fTurnOffScreenRunner;
+
+	fStandByScreenRunner = fSuspendScreenRunner = fTurnOffScreenRunner = NULL;
+
+	BScreen screen;
+	screen.SetDPMS(B_DPMS_ON);
+}
+
+
+void
+ScreenBlanker::_SetDPMSMode(uint32 mode)
+{
+	BScreen screen;
+	screen.SetDPMS(mode);
+
+	if (fWindow->Lock()) {
+		fRunner->Suspend();
+		fWindow->Unlock();
+	}
 }
 
 
 void
 ScreenBlanker::_ShowPasswordWindow() 
 {
+	_TurnOnScreen();
+
 	if (fWindow->Lock()) {
 		fRunner->Suspend();
 
@@ -88,33 +129,88 @@ ScreenBlanker::_ShowPasswordWindow()
 		fWindow->Unlock();
 	}
 
-	_ResumeScreenSaver();
+	_QueueResumeScreenSaver();
 }
 
 
 void
-ScreenBlanker::_ResumeScreenSaver()
+ScreenBlanker::_QueueResumeScreenSaver()
 {
 	delete fResumeRunner;
-	fResumeRunner = new BMessageRunner(BMessenger(this), new BMessage(RESUME_SAVER),
+	fResumeRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgResumeSaver),
 		fPrefs.BlankTime(), 1);
-	if (fResumeRunner->InitCheck() != B_OK) {
-		fprintf(stderr, "fRunner init failed\n");
+	if (fResumeRunner->InitCheck() != B_OK)
+		syslog(LOG_ERR, "resume screen saver runner failed\n");
+}
+
+
+void
+ScreenBlanker::_QueueTurnOffScreen()
+{
+	// stop running notifiers
+
+	delete fStandByScreenRunner;
+	delete fSuspendScreenRunner;
+	delete fTurnOffScreenRunner;
+	
+	fStandByScreenRunner = fSuspendScreenRunner = fTurnOffScreenRunner = NULL;
+
+	// figure out which notifiers we need and which of them are supported
+
+	uint32 flags = fPrefs.TimeFlags();
+	BScreen screen;
+	uint32 capabilities = screen.DPMSCapabilites();
+	if ((capabilities & B_DPMS_OFF) == 0)
+		flags &= ENABLE_DPMS_OFF;
+	if ((capabilities & B_DPMS_SUSPEND) == 0)
+		flags &= ENABLE_DPMS_SUSPEND;
+	if ((capabilities & B_DPMS_STAND_BY) == 0)
+		flags &= ENABLE_DPMS_STAND_BY;
+
+	if ((flags & ENABLE_DPMS_MASK) == 0)
+		return;
+
+	if (fPrefs.OffTime() == fPrefs.SuspendTime())
+		flags &= ENABLE_DPMS_SUSPEND;
+	if (fPrefs.SuspendTime() == fPrefs.StandByTime())
+		flags &= ENABLE_DPMS_STAND_BY;
+
+	// start them off again
+
+	if (flags & ENABLE_DPMS_STAND_BY) {
+		fStandByScreenRunner = new BMessageRunner(BMessenger(this),
+			new BMessage(kMsgStandByScreen), fPrefs.StandByTime(), 1);
+		if (fStandByScreenRunner->InitCheck() != B_OK)
+			syslog(LOG_ERR, "standby screen saver runner failed\n");
+	}
+
+	if (flags & ENABLE_DPMS_SUSPEND) {
+		fSuspendScreenRunner = new BMessageRunner(BMessenger(this),
+			new BMessage(kMsgSuspendScreen), fPrefs.SuspendTime(), 1);
+		if (fSuspendScreenRunner->InitCheck() != B_OK)
+			syslog(LOG_ERR, "turn off screen saver runner failed\n");
+	}
+
+	if (flags & ENABLE_DPMS_OFF) {
+		fTurnOffScreenRunner = new BMessageRunner(BMessenger(this),
+			new BMessage(kMsgTurnOffScreen), fPrefs.OffTime(), 1);
+		if (fTurnOffScreenRunner->InitCheck() != B_OK)
+			syslog(LOG_ERR, "turn off screen saver runner failed\n");
 	}
 }
 
 
 void
-ScreenBlanker::MessageReceived(BMessage *message) 
+ScreenBlanker::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case UNLOCK_MESSAGE:
+		case kMsgUnlock:
 		{
-			if (strcmp(fPrefs.Password(), crypt(fPasswordWindow->GetPassword(),
+			if (strcmp(fPrefs.Password(), crypt(fPasswordWindow->Password(),
 					fPrefs.Password())) != 0) {
 				beep();
 				fPasswordWindow->SetPassword("");
-				_ResumeScreenSaver();
+				_QueueResumeScreenSaver();
 			} else  {
 				PRINT(("Quitting!\n"));
 				_Shutdown();
@@ -123,7 +219,7 @@ ScreenBlanker::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case RESUME_SAVER:
+		case kMsgResumeSaver:
 			if (fWindow->Lock()) {
 				if (fWindow->SetFullScreen(true) == B_OK) {
 					HideCursor();
@@ -133,6 +229,18 @@ ScreenBlanker::MessageReceived(BMessage *message)
 				fRunner->Resume();
 				fWindow->Unlock();
 			}
+
+			_QueueTurnOffScreen();
+			break;
+
+		case kMsgTurnOffScreen:
+			_SetDPMSMode(B_DPMS_OFF);
+			break;
+		case kMsgSuspendScreen:
+			_SetDPMSMode(B_DPMS_SUSPEND);
+			break;
+		case kMsgStandByScreen:
+			_SetDPMSMode(B_DPMS_STAND_BY);
 			break;
 
 		default:
