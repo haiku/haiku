@@ -1,16 +1,17 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "kprotos.h"
 #include "argv.h"
 
 #include <fs_attr.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 static status_t
@@ -46,7 +47,7 @@ copy_file(const char *from, const struct stat &fromStat, const char *to)
 				continue;
 
 			if (attrInfo.size <= size)
-				size = attrInfo.size - 1;
+				size = attrInfo.size ;
 			else
 				printf("truncating attribute: %s\n", attr->d_name);
 
@@ -55,7 +56,6 @@ copy_file(const char *from, const struct stat &fromStat, const char *to)
 				printf("could not read attribute %s: %s\n", attr->d_name, strerror(bytesRead));
 				continue;
 			}
-			buffer[size] = '\0';
 
 		    err = sys_write_attr(1, bfd, attr->d_name, attrInfo.type, buffer, size, 0);
 			if (err < B_OK) {
