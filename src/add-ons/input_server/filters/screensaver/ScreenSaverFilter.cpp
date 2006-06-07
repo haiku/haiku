@@ -121,52 +121,56 @@ ScreenSaverFilter::~ScreenSaverFilter()
 {
 	delete fRunner;
 
-	if (fWatchingFile)
-		watch_node(&fPrefsNodeRef, B_STOP_WATCHING, NULL);
-	if (fWatchingDirectory)
-		watch_node(&fPrefsDirNodeRef, B_STOP_WATCHING, NULL);
+	if (fWatchingFile || fWatchingDirectory)
+		watch_node(&fNodeRef, B_STOP_WATCHING, fController);
 
 	be_roster->StopWatching(fController);
 	delete fController;
 }
 
 
+/*!
+	Starts watching the settings file, or if that doesn't exist, the directory
+	the settings file will be placed into.
+*/
 void
-ScreenSaverFilter::_WatchPreferences()
+ScreenSaverFilter::_WatchSettings()
 {
 	BEntry entry(fSettings.Path().Path());
 	if (entry.Exists()) {
 		if (fWatchingFile)
 			return;
+
 		if (fWatchingDirectory) {
-			watch_node(&fPrefsDirNodeRef, B_STOP_WATCHING, NULL);
+			watch_node(&fNodeRef, B_STOP_WATCHING, fController);
 			fWatchingDirectory = false;
 		}
-		entry.GetNodeRef(&fPrefsNodeRef);
-		watch_node(&fPrefsNodeRef, B_WATCH_ALL, NULL, fController);
-		fWatchingFile = true;
+		if (entry.GetNodeRef(&fNodeRef) == B_OK
+			&& watch_node(&fNodeRef, B_WATCH_ALL, fController) == B_OK)
+			fWatchingFile = true;
 	} else {
 		if (fWatchingDirectory)
 			return;
+
 		if (fWatchingFile) {
-			watch_node(&fPrefsNodeRef, B_STOP_WATCHING, NULL);
+			watch_node(&fNodeRef, B_STOP_WATCHING, fController);
 			fWatchingFile = false;
 		}
 		BEntry dir;
-		entry.GetParent(&dir);
-		dir.GetNodeRef(&fPrefsDirNodeRef);
-		watch_node(&fPrefsDirNodeRef, B_WATCH_ALL, NULL, fController);
-		fWatchingDirectory = true;
+		if (entry.GetParent(&dir) == B_OK
+			&& dir.GetNodeRef(&fNodeRef) == B_OK
+			&& watch_node(&fNodeRef, B_WATCH_DIRECTORY, fController) == B_OK)
+			fWatchingDirectory = true;
 	}
 }
 
 
 void
-ScreenSaverFilter::_Invoke() 
+ScreenSaverFilter::_Invoke()
 {
 	CALLED();
 	if (fCurrentCorner == fNeverBlankCorner || fEnabled
-		|| fSettings.TimeFlags() != 1
+		|| fSettings.TimeFlags() == SAVER_DISABLED
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
 
@@ -179,9 +183,16 @@ void
 ScreenSaverFilter::ReloadSettings()
 {
 	CALLED();
-	if (!fSettings.LoadSettings()) {
-		SERIAL_PRINT(("preferences loading failed: going to defaults\n"));
+	bool isFirst = !fWatchingDirectory && !fWatchingFile;
+
+	_WatchSettings();
+
+	if (fWatchingDirectory && !isFirst) {
+		// there is no settings file yet
+		return;
 	}
+
+	fSettings.LoadSettings();
 
 	fBlankCorner = fSettings.GetBlankCorner();
 	fNeverBlankCorner = fSettings.GetNeverBlankCorner();
@@ -189,13 +200,12 @@ ScreenSaverFilter::ReloadSettings()
 	CheckTime();
 
 	delete fRunner;
-	fRunner = new BMessageRunner(BMessenger(NULL, fController),
-		new BMessage(kMsgCheckTime), fSnoozeTime);
+
+	BMessage check(kMsgCheckTime);
+	fRunner = new BMessageRunner(fController, &check, fSnoozeTime);
 	if (fRunner->InitCheck() != B_OK) {
 		SERIAL_PRINT(("fRunner init failed\n"));
 	}
-
-	_WatchPreferences();
 }
 
 
@@ -269,16 +279,16 @@ ScreenSaverFilter::_ScreenCorner(screen_corner corner, uint32 cornerSize)
 				frame.top + cornerSize - 1);
 
 		case UPRIGHT:
-			return BRect(frame.right, frame.top, frame.right - cornerSize + 1,
+			return BRect(frame.right - cornerSize + 1, frame.top, frame.right,
 				frame.top + cornerSize - 1);
 
 		case DOWNRIGHT:
-			return BRect(frame.right, frame.bottom, frame.right - cornerSize + 1,
-				frame.bottom - cornerSize + 1);
+			return BRect(frame.right - cornerSize + 1, frame.bottom - cornerSize + 1,
+				frame.right, frame.bottom);
 
 		case DOWNLEFT:
-			return BRect(frame.left, frame.bottom, frame.left + cornerSize - 1,
-				frame.bottom - cornerSize + 1);
+			return BRect(frame.left, frame.bottom - cornerSize + 1,
+				frame.left + cornerSize - 1, frame.bottom);
 
 		default:
 			// return an invalid rectangle
@@ -295,8 +305,10 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 	switch (message->what) {
 		case B_MOUSE_MOVED:
 		{
-			BPoint pos;
-			message->FindPoint("where", &pos);
+			BPoint where;
+			if (message->FindPoint("where", &where) != B_OK)
+				break;
+
 			if ((fFrameNum++ % 32) == 0) {
 				// Every so many frames, update
 				// Used so that we don't update the screen coord's so often
@@ -305,7 +317,7 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 				_UpdateRectangles();
 			}
 
-			if (fBlankRect.Contains(pos)) {
+			if (fBlankRect.Contains(where)) {
 				fCurrentCorner = fBlankCorner;
 
 				// start screen blanker after one second
@@ -315,7 +327,7 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 				break;
 			}
 
-			if (fNeverBlankRect.Contains(pos))
+			if (fNeverBlankRect.Contains(where))
 				fCurrentCorner = fNeverBlankCorner;
 			else
 				fCurrentCorner = NONE;

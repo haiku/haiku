@@ -49,7 +49,7 @@ class ScreenSaverFilter : public BInputServerFilter {
 		void SetEnabled(bool enabled) { fEnabled = enabled; }
 
 	private:
-		void _WatchPreferences();
+		void _WatchSettings();
 		void _UpdateRectangles();
 		BRect _ScreenCorner(screen_corner pos, uint32 cornerSize);
 
@@ -64,7 +64,7 @@ class ScreenSaverFilter : public BInputServerFilter {
 		uint32			fFrameNum;
 
 		ScreenSaverController* fController;
-		node_ref		fPrefsNodeRef, fPrefsDirNodeRef;
+		node_ref		fNodeRef;
 		BMessageRunner*	fRunner;
 		bool			fWatchingDirectory, fWatchingFile;
 };
