@@ -948,7 +948,7 @@ add_message_contents(BList *textlist, BMessage *msg, int32 level)
 	int32 count;
 	int32 i, sizefound, j;
 	ulong typefound;
-	char *namefound;
+	const char *namefound;
 	void *voidptr;
 	BMessage a_message;
 	char *textline, *datatype, *content;
