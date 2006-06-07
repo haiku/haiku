@@ -1110,7 +1110,6 @@ format_data(int32 type, char *ptr, long size)
 	float *fptr;
 	double *dptr;
 //	BRect *brptr;
-	long i;
 	entry_ref aref;
 	BEntry entry;
 	BPath path;
@@ -1123,11 +1122,6 @@ format_data(int32 type, char *ptr, long size)
 	uint16 ui16;
 	uint8 ui8;
 	BMessage anothermsg;
-	BPropertyInfo propinfo;
-	const property_info *pinfo;
-	int32 pinfo_index;
-	const value_info *vinfo;
-	int32 vinfo_index, vinfo_count;
 	char *tempstr;
 	
 	if (size<=0L){
@@ -1256,7 +1250,7 @@ format_data(int32 type, char *ptr, long size)
 		case B_COLOR_8_BIT_TYPE:
 					str = new char[size*6+4];
 					*str = 0;
-					for (i=0; i<min_c(256,size); i++){
+					for (int32 i=0; i<min_c(256,size); i++){
 						sprintf(idtext, "%u ", ((unsigned char*)ptr)[i]);
 						strcat(str,idtext);
 					}
@@ -1272,20 +1266,18 @@ format_data(int32 type, char *ptr, long size)
 					}
 					break;
 					
-		case B_PROPERTY_INFO_TYPE:
+		case B_PROPERTY_INFO_TYPE: {
+					BPropertyInfo propinfo;
 					if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)ptr, size)==B_OK){
 						str = new char[size*32];	// an approximation
 
 						//propinfo.PrintToStream();
 						//sprintf(str, "see the printout above");
 
-						pinfo = propinfo.Properties();
-						pinfo_index = 0;
+						const property_info *pinfo = propinfo.Properties();
 
-						sprintf(str, "\n        property   commands                            specifiers\n--------------------------------------------------------------------------------\n");
-						
-						while (pinfo_index<propinfo.CountProperties()){
-						
+						sprintf(str, "\n        property   commands                            specifiers              types\n---------------------------------------------------------------------------------------------------\n");
+						for (int32 pinfo_index = 0; pinfo_index<propinfo.CountProperties(); pinfo_index++) {
 							strcat(str,  "                "+(strlen(pinfo[pinfo_index].name) <16 ? strlen(pinfo[pinfo_index].name) : 16 ));
 							strcat(str, pinfo[pinfo_index].name);
 							strcat(str, "   ");
@@ -1319,6 +1311,32 @@ format_data(int32 type, char *ptr, long size)
 									default: strcat(str, "<NONE> "); break;
 								}
 							}
+							
+							// pad the rest with spaces
+							if (strlen(start)<60){
+								strcat(str, "                                                            "+strlen(start) );
+							} else {
+								strcat(str, "  " );
+							}
+							for (int32 i = 0; i < 10 && pinfo[pinfo_index].types[i] != 0; i++) {
+								uint32 type = pinfo[pinfo_index].types[i];
+								char str2[4];
+								sprintf(str2, "%c%c%c%c ", int(type & 0xFF000000) >> 24,
+									int(type & 0xFF0000) >> 16, int(type & 0xFF00) >> 8, (int)type & 0xFF);
+								strcat(str, str2);
+							}
+
+							for (int32 i = 0; i < 3; i++) {
+								for (int32 j = 0; j < 5 && pinfo[pinfo_index].ctypes[i].pairs[j].type != 0; j++) {
+									uint32 type = pinfo[pinfo_index].ctypes[i].pairs[j].type;
+									char str2[4];
+									sprintf(str2, "(%s %c%c%c%c)", pinfo[pinfo_index].ctypes[i].pairs[j].name, 
+										int(type & 0xFF000000) >> 24,
+										int(type & 0xFF0000) >> 16, 
+										int(type & 0xFF00) >> 8, (int)type & 0xFF);
+									strcat(str, str2);
+								}
+							}
 							strcat(str, "\n");
 							
 							// is there usage info?
@@ -1328,15 +1346,12 @@ format_data(int32 type, char *ptr, long size)
 								strcat(str, "\n");
 							}
 
-						
-							pinfo_index++;		// take next propertyinfo
 						}
 						
 						
 						// handle value infos....
-						vinfo = propinfo.Values();
-						vinfo_index = 0;
-						vinfo_count = propinfo.CountValues();
+						const value_info *vinfo = propinfo.Values();
+						int32 vinfo_count = propinfo.CountValues();
 #if TEST_VALUEINFO>0
 						value_info vinfo[10] = {	{"Backup", 'back', B_COMMAND_KIND, "This command backs up your hard drive."},
 										{"Abort", 'abor', B_COMMAND_KIND, "Stops the current operation..."},
@@ -1348,7 +1363,7 @@ format_data(int32 type, char *ptr, long size)
 						if (vinfo && vinfo_count>0){
 							sprintf(str+strlen(str), "\n            name   value                               kind\n--------------------------------------------------------------------------------\n");
 							
-							while (vinfo_index<vinfo_count){
+							for (int32 vinfo_index = 0; vinfo_index<vinfo_count; vinfo_index++){
 							
 								char *start = str+strlen(str);
 								strcat(str, "                "+(strlen(vinfo[vinfo_index].name) <16 ? strlen(vinfo[vinfo_index].name) : 16 ));
@@ -1371,7 +1386,6 @@ format_data(int32 type, char *ptr, long size)
 									case B_TYPE_CODE_KIND: 	strcat(str, "TYPE CODE       "); break;
 									default:				strcat(str, "unknown         "); break;
 								}
-								
 	
 								strcat(str, "\n");
 								
@@ -1381,8 +1395,6 @@ format_data(int32 type, char *ptr, long size)
 									strcat(str, vinfo[vinfo_index].usage);
 									strcat(str, "\n");
 								}
-	
-								vinfo_index++;		// take next valueinfo
 							}
 						}
 						
@@ -1391,11 +1403,12 @@ format_data(int32 type, char *ptr, long size)
 						strcpy(str, "error when unflattening");
 					}
 					break;
+				}
 
 		default:
 					str = new char[min_c(256,size)*20+4];
 					*str = 0;
-					for (i=0; i<min_c(256,size); i++){
+					for (int32 i=0; i<min_c(256,size); i++){
 						//sprintf(idtext, "0x%02X ('%c'), ", (uint16)ptr[i], ptr[i]<32 ? 32 : ptr[i]);
 						sprintf(idtext, "0x%02X, ", (uint16)ptr[i] );
 						strcat(str,idtext);
@@ -1412,11 +1425,11 @@ format_data(int32 type, char *ptr, long size)
 char *
 id_to_string(long ID, char *here)
 {
-	uint8 digit0=(ID>>24)&255;
-	uint8 digit1=(ID>>16)&255;
-	uint8 digit2=(ID>>8)&255;
-	uint8 digit3=(ID)&255;
-	bool itsvalid=false;
+	uint8 digit0 = (ID>>24)& 255;
+	uint8 digit1 = (ID>>16)& 255;
+	uint8 digit2 = (ID>>8) & 255;
+	uint8 digit3 = (ID) & 255;
+	bool itsvalid = false;
 	
 	if (digit0==0){
 		if (digit1==0){
