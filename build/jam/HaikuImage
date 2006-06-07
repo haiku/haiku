@@ -23,7 +23,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 BEOS_BIN = addattr alert arp basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
 	dstcheck du echo eject env error factor false ffm find finddir fortune funzip gawk
-	$(X86_ONLY)gdb grep groups gzip head id ideinfo idestatus ifconfig iroster isvolume
+	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
 	mkdir mkindex modifiers mount mountvolume mv open pathchk ping play playfile playsound
