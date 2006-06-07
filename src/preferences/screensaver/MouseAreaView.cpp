@@ -32,8 +32,8 @@ scale_arrow(int x, int y, BRect area, bool invertX, bool invertY)
 //	#pragma mark -
 
 
-MouseAreaView::MouseAreaView(BRect frame, const char *name) 
-	: BView (frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+MouseAreaView::MouseAreaView(BRect frame, const char *name, uint32 resizingMode)
+	: BView(frame, name, resizingMode, B_WILL_DRAW),
 	fCurrentCorner(NONE)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));

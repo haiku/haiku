@@ -19,7 +19,6 @@
 #include <FilePanel.h>
 #include <Slider.h>
 #include <ListView.h>
-#include <StringView.h>
 
 class BButton;
 
@@ -63,11 +62,6 @@ class ScreenSaverWindow : public BWindow {
 		TimeSlider*		fPasswordSlider;
 		BButton*		fPasswordButton;
 		PasswordWindow*	fPasswordWindow;
-
-		BStringView *fFadeNowString;
-		BStringView *fFadeNowString2;
-		BStringView *fDontFadeString;
-		BStringView *fDontFadeString2;
 
 		MouseAreaView*	fFadeNow;
 		MouseAreaView*	fFadeNever;

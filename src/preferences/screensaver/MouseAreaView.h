@@ -16,7 +16,7 @@
 
 class MouseAreaView : public BView {
 	public:
-		MouseAreaView(BRect frame, const char *name);
+		MouseAreaView(BRect frame, const char *name, uint32 resizingMode);
 
 		virtual void Draw(BRect update); 
 		virtual void MouseUp(BPoint point);

@@ -584,13 +584,7 @@ ModulesView::_OpenSaver()
 
 ScreenSaverWindow::ScreenSaverWindow() 
 	: BWindow(BRect(50, 50, 496, 375), "Screen Saver",
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/),
-	fFadeNowString(NULL),
-	fFadeNowString2(NULL),
-	fDontFadeString(NULL),
-	fDontFadeString2(NULL),
-	fFadeNow(NULL),
-	fFadeNever(NULL)
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
 {
 	fPrefs.LoadSettings();
 
@@ -712,24 +706,26 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	// Bottom
 
-	box->AddChild(fFadeNow = new MouseAreaView(BRect(20,205,80,260),"fadeNow"));
-	box->AddChild(fFadeNever = new MouseAreaView(BRect(220,205,280,260),"fadeNever"));
+	box->AddChild(fFadeNow = new MouseAreaView(BRect(20,205,80,260),"fadeNow",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
+	box->AddChild(fFadeNever = new MouseAreaView(BRect(220,205,280,260),"fadeNever",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
-	box->AddChild(fFadeNowString = new BStringView(BRect(90,215,193,230),"FadeNowString","Fade now when"));
-	fFadeNowString->SetText("Fade now when");
-	fFadeNowString->SetAlignment(B_ALIGN_LEFT);
+	stringView = new BStringView(BRect(90,215,193,230),
+		"FadeNowString", "Fade now when", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	box->AddChild(stringView);
 
-	box->AddChild(fFadeNowString2 = new BStringView(BRect(90,233,193,248),"FadeNowString2","mouse is here"));
-	fFadeNowString2->SetText("mouse is here");
-	fFadeNowString2->SetAlignment(B_ALIGN_LEFT);
+	stringView = new BStringView(BRect(90,233,193,248),
+		"FadeNowString2","mouse is here", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	box->AddChild(stringView);
 
-	box->AddChild(fDontFadeString = new BStringView(BRect(290,215,387,230),"DontFadeString","Don't fade when"));
-	fDontFadeString->SetText("Don't fade when");
-	fDontFadeString->SetAlignment(B_ALIGN_LEFT);
+	stringView = new BStringView(BRect(290,215,387,230),
+		"DontFadeString","Don't fade when", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	box->AddChild(stringView);
 
-	box->AddChild(fDontFadeString2 = new BStringView(BRect(290,233,387,248),"DontFadeString2","mouse is here"));
-	fDontFadeString2->SetText("mouse is here");
-	fDontFadeString2->SetAlignment(B_ALIGN_LEFT);
+	stringView = new BStringView(BRect(290,233,387,248),
+		"DontFadeString2","mouse is here", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	box->AddChild(stringView);
 }
 
 
