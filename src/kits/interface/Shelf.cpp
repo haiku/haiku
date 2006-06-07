@@ -30,7 +30,7 @@
 #include <string.h>
 
 
-static property_info sPropertyList[] = {
+static property_info sShelfPropertyList[] = {
 	{
 		"Replicant",
 		{ B_COUNT_PROPERTIES, B_CREATE_PROPERTY },
@@ -53,6 +53,43 @@ static property_info sPropertyList[] = {
 	},
 
 	{}
+};
+
+static property_info sReplicantPropertyList[] = {
+	{
+		"ID",
+		{ B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0, { B_INT32_TYPE }
+	},
+	
+	{
+		"Name",
+		{ B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0, { B_STRING_TYPE }
+	},
+
+	{
+		"Signature",
+		{ B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0, { B_STRING_TYPE }
+	},
+
+	{
+		"Suites",
+		{ B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0, { B_PROPERTY_INFO_TYPE }
+	},
+
+	{
+		"View",
+		{ },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
+	}
 };
 
 
@@ -505,16 +542,15 @@ BHandler *
 BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 						int32 form, const char *property)
 {
-	BPropertyInfo propInfo(sPropertyList);
+	BPropertyInfo shelfPropInfo(sShelfPropertyList);
 	BHandler *target = NULL;
-
-	switch (propInfo.FindMatch(msg, 0, specifier, form, property)) {
+	BView *replicant = NULL;
+	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
 		case 1:
 			target = this;
 			break;
 		case 2: {
-			BView *replicant = NULL;
 			uint32 ID;
 			status_t err = B_ERROR;
 			switch (msg->what) {
@@ -558,17 +594,40 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				replyMsg.AddString("message", "Cannot find replicant at/with specified index/name.");
 				msg->SendReply(&replyMsg);
 			}
-			return replicant;
-			break;
 			}
+			break;
+	}
+
+	if (!replicant) {
+		if (target)
+			return target;
+		return BHandler::ResolveSpecifier(msg, index, specifier, form,
+			property);
+	}
+
+	msg->GetCurrentSpecifier(&index);
+	status_t err = msg->GetCurrentSpecifier(&index, specifier, &form, &property);
+	if (err) {
+		BMessage reply(B_REPLY);
+		reply.AddInt32("error", err);
+		msg->SendReply(&reply);
+		return NULL;
+	}
+
+	BPropertyInfo replicantPropInfo(sReplicantPropertyList);
+	switch (replicantPropInfo.FindMatch(msg, 0, specifier, form, property)) {
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			target = this;
+		case 4:
+			target = replicant;
 		default:
 			break;
 	}
-	if (target)
-		return target;
+	return target;
 
-	return BHandler::ResolveSpecifier(msg, index, specifier, form,
-               	property);
 }
 
 
@@ -578,7 +637,7 @@ BShelf::GetSupportedSuites(BMessage *message)
 	status_t err;
 	err = message->AddString("suites", "suite/vnd.Be-shelf");
 	if (err == B_OK) {
-		BPropertyInfo propInfo(sPropertyList);
+		BPropertyInfo propInfo(sShelfPropertyList);
 		err = message->AddFlat("messages", &propInfo);
 	}
 	if (err == B_OK)
