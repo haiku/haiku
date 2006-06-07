@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src tests kits interface bshelf ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders interface ;
+
+if $(TARGET_PLATFORM) != haiku {
+        UseHeaders [ FDirName $(HAIKU_TOP) headers os interface ] : true ;
+}
+
+SubDirC++Flags -D_SetShelf=set_shelf ;
+
+SimpleTest ShelfTest :
+        ShelfTest.cpp
+        Shelf.cpp
+        : be
+        ;
+
+SEARCH on [ FGristFiles
+                Shelf.cpp
+        ] = [ FDirName $(HAIKU_TOP) src kits interface ] ;
