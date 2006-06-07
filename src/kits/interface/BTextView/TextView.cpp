@@ -4210,7 +4210,7 @@ bool
 BTextView::GetProperty(BMessage *specifier, int32 form, const char *property, BMessage *reply)
 {
 	CALLED();
-	if (strcmp(property, "Selection") == 0) {
+	if (strcmp(property, "selection") == 0) {
 		reply->what = B_REPLY;
 		reply->AddInt32("result", fSelStart);
 		reply->AddInt32("result", fSelEnd);
@@ -4245,7 +4245,7 @@ bool
 BTextView::SetProperty(BMessage *specifier, int32 form, const char *property, BMessage *reply)
 {
 	CALLED();
-	if (strcmp(property, "Selection") == 0) {
+	if (strcmp(property, "selection") == 0) {
 		int32 index, range;
 
 		specifier->FindInt32("index", &index);
