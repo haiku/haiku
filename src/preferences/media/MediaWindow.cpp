@@ -175,14 +175,14 @@ MediaWindow::InitWindow(void)
 	BRect availableRect(menuRect.right+15,titleRect.bottom+12,bounds.right-14,bounds.bottom-4);
 	BRect barRect(titleRect.left,titleRect.bottom+10,titleRect.right-2,titleRect.bottom+11);
 
-	fListView = new BListView(menuRect,"audio_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	fListView = new BListView(menuRect, "media_list_view", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
 			
 	// Add ScrollView to Media Menu
-	BScrollView *scrollView = new BScrollView("scroll_audio", fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false, B_FANCY_BORDER);
+	BScrollView *scrollView = new BScrollView("listscroller", fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false, B_FANCY_BORDER);
 	
 	// Create the Views	
-	fBox = new BBox(bounds, "mediaView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
+	fBox = new BBox(bounds, "background", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	
 	// Add Child(ren)
 	AddChild(fBox);
