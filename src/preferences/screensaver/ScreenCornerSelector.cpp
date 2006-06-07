@@ -6,7 +6,7 @@
  *		Michael Phipps
  */
 
-#include "MouseAreaView.h"
+#include "ScreenCornerSelector.h"
 #include "Constants.h"
 #include "Utility.h"
 
@@ -32,7 +32,7 @@ scale_arrow(int x, int y, BRect area, bool invertX, bool invertY)
 //	#pragma mark -
 
 
-MouseAreaView::MouseAreaView(BRect frame, const char *name, uint32 resizingMode)
+ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char *name, uint32 resizingMode)
 	: BView(frame, name, resizingMode, B_WILL_DRAW),
 	fCurrentCorner(NONE)
 {
@@ -41,7 +41,7 @@ MouseAreaView::MouseAreaView(BRect frame, const char *name, uint32 resizingMode)
 
 
 void
-MouseAreaView::Draw(BRect update) 
+ScreenCornerSelector::Draw(BRect update) 
 {
 	// Top of monitor
 	SetHighColor(kGrey);
@@ -70,7 +70,7 @@ MouseAreaView::Draw(BRect update)
 
 
 void
-MouseAreaView::SetCorner(screen_corner corner)
+ScreenCornerSelector::SetCorner(screen_corner corner)
 {
 	fCurrentCorner = corner;
 	Invalidate();
@@ -78,7 +78,7 @@ MouseAreaView::SetCorner(screen_corner corner)
 
 
 BRect
-MouseAreaView::_ArrowSize(BRect monitorRect, bool isCentered)
+ScreenCornerSelector::_ArrowSize(BRect monitorRect, bool isCentered)
 {
 	int arrowSize = monitorRect.IntegerWidth();
 	if (monitorRect.IntegerHeight() < arrowSize)
@@ -97,7 +97,7 @@ MouseAreaView::_ArrowSize(BRect monitorRect, bool isCentered)
 
 
 void
-MouseAreaView::DrawArrow() 
+ScreenCornerSelector::DrawArrow() 
 {
 	PushState();
 
@@ -135,7 +135,7 @@ MouseAreaView::DrawArrow()
 
 
 void
-MouseAreaView::MouseUp(BPoint point) 
+ScreenCornerSelector::MouseUp(BPoint point) 
 {
 	if (fMonitorFrame.Contains(point)) {
 		if (_ArrowSize(fMonitorFrame, true).Contains(point))

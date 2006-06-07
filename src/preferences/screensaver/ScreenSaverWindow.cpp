@@ -9,8 +9,8 @@
  */
 
 
-#include "MouseAreaView.h"
 #include "PreviewView.h"
+#include "ScreenCornerSelector.h"
 #include "ScreenSaverItem.h"
 #include "ScreenSaverWindow.h"
 
@@ -706,9 +706,9 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	// Bottom
 
-	box->AddChild(fFadeNow = new MouseAreaView(BRect(20,205,80,260),"fadeNow",
+	box->AddChild(fFadeNow = new ScreenCornerSelector(BRect(20,205,80,260),"fadeNow",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
-	box->AddChild(fFadeNever = new MouseAreaView(BRect(220,205,280,260),"fadeNever",
+	box->AddChild(fFadeNever = new ScreenCornerSelector(BRect(220,205,280,260),"fadeNever",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
 	stringView = new BStringView(BRect(90,215,193,230),

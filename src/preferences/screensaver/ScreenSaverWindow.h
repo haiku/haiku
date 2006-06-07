@@ -23,7 +23,7 @@
 class BButton;
 
 class ModulesView;
-class MouseAreaView;
+class ScreenCornerSelector;
 class ScreenSaverRunner;
 class TimeSlider;
 
@@ -63,8 +63,8 @@ class ScreenSaverWindow : public BWindow {
 		BButton*		fPasswordButton;
 		PasswordWindow*	fPasswordWindow;
 
-		MouseAreaView*	fFadeNow;
-		MouseAreaView*	fFadeNever;
+		ScreenCornerSelector* fFadeNow;
+		ScreenCornerSelector* fFadeNever;
 };
 
 static const int32 kMsgUpdateList = 'UPDL';

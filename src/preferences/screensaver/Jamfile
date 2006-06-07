@@ -13,7 +13,7 @@ Preference ScreenSaver :
 	ScreenSaverWindow.cpp
 	PasswordWindow.cpp
 	PreviewView.cpp
-	MouseAreaView.cpp
+	ScreenCornerSelector.cpp
 
 	ScreenSaver.cpp
 		# needed for some old/broken screen saver add-ons that do not

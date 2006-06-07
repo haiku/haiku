@@ -5,8 +5,8 @@
  * Authors:
  *		Michael Phipps
  */
-#ifndef MOUSEAREAVIEW_H
-#define MOUSEAREAVIEW_H
+#ifndef SCREEN_CORNER_SELECTOR_H
+#define SCREEN_CORNER_SELECTOR_H
 
 
 #include "ScreenSaverPrefs.h"
@@ -14,9 +14,9 @@
 #include <View.h>
 
 
-class MouseAreaView : public BView {
+class ScreenCornerSelector : public BView {
 	public:
-		MouseAreaView(BRect frame, const char *name, uint32 resizingMode);
+		ScreenCornerSelector(BRect frame, const char *name, uint32 resizingMode);
 
 		virtual void Draw(BRect update); 
 		virtual void MouseUp(BPoint point);
@@ -32,4 +32,4 @@ class MouseAreaView : public BView {
 		screen_corner fCurrentCorner;
 };
 
-#endif	// MOUSEAREAVIEW_H
+#endif	// SCREEN_CORNER_SELECTOR_H
