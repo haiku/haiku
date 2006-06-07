@@ -505,8 +505,70 @@ BHandler *
 BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 						int32 form, const char *property)
 {
-	//TODO
-	return NULL;
+	BPropertyInfo propInfo(sPropertyList);
+	BHandler *target = NULL;
+
+	switch (propInfo.FindMatch(msg, 0, specifier, form, property)) {
+		case 0:
+		case 1:
+			target = this;
+			break;
+		case 2: {
+			BView *replicant = NULL;
+			uint32 ID;
+			status_t err = B_ERROR;
+			switch (msg->what) {
+				case B_INDEX_SPECIFIER:	{
+					int32 index;
+					if (msg->FindInt32("data", &index)!=B_OK) 
+						break;
+					ReplicantAt(index, &replicant, &ID, &err);
+					break;
+				}
+				case B_REVERSE_INDEX_SPECIFIER:	{
+					int32 rindex;
+					if (msg->FindInt32("data", &rindex) != B_OK)
+						break;
+					ReplicantAt(CountReplicants() - rindex, &replicant, &ID, &err);
+					break;
+				}
+				case B_NAME_SPECIFIER: {
+					const char *name;
+					if (msg->FindString("data", &name) != B_OK)
+						break;
+					for (int32 i=0; i<CountReplicants(); i++) {
+						BView *view = NULL;
+						ReplicantAt(i, &view, &ID, &err);
+						if (err == B_OK && view->Name() != NULL && !strcmp(view->Name(), name)) {
+							replicant = view;
+							break;
+						}
+					}
+					break;
+				}
+				default:
+					break;
+			}
+
+			if (replicant != NULL) {
+				msg->PopSpecifier();
+			} else {
+				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+				replyMsg.AddInt32("error", B_BAD_INDEX);
+				replyMsg.AddString("message", "Cannot find replicant at/with specified index/name.");
+				msg->SendReply(&replyMsg);
+			}
+			return replicant;
+			break;
+			}
+		default:
+			break;
+	}
+	if (target)
+		return target;
+
+	return BHandler::ResolveSpecifier(msg, index, specifier, form,
+               	property);
 }
 
 
