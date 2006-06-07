@@ -5,10 +5,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders interface ;
 
 if $(TARGET_PLATFORM) != haiku {
-        UseHeaders [ FDirName $(HAIKU_TOP) headers os interface ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os interface ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+	SubDirC++Flags -D_SetShelf=set_shelf ;
 }
-
-SubDirC++Flags -D_SetShelf=set_shelf ;
 
 SimpleTest ShelfTest :
         ShelfTest.cpp
