@@ -26,7 +26,9 @@ ExpressionTextView::ExpressionTextView(BRect frame, CalcView* calcView)
 					B_FOLLOW_NONE, B_WILL_DRAW),
 	  fCalcView(calcView),
 	  fKeypadLabels(""),
-	  fPreviousExpressions(20)
+	  fPreviousExpressions(20),
+	  fHistoryPos(0),
+	  fCurrentExpression("")
 {
 	SetFont(be_bold_font);
 //	SetAlignment(B_ALIGN_RIGHT);
