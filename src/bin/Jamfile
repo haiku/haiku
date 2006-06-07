@@ -66,6 +66,7 @@ StdBinCommands
 	dstcheck.cpp
 #	factor.cpp
 	ffm.cpp
+	hey.cpp
 	iroster.cpp
 	listattr.cpp
 	listres.cpp
