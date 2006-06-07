@@ -2,8 +2,8 @@
  * Copyright 2003-2006, Michael Phipps. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef SCREEN_SAVER_PREFS_H
-#define SCREEN_SAVER_PREFS_H
+#ifndef SCREEN_SAVER_SETTINGS_H
+#define SCREEN_SAVER_SETTINGS_H
 
 
 #include <Message.h>
@@ -33,9 +33,9 @@ enum {
 
 #define SCREEN_BLANKER_SIG "application/x-vnd.Haiku.screenblanker"
 
-class ScreenSaverPrefs {
+class ScreenSaverSettings {
 	public:
-		ScreenSaverPrefs();
+		ScreenSaverSettings();
 
 		bool LoadSettings();
 		void Defaults();
@@ -98,4 +98,4 @@ class ScreenSaverPrefs {
 		BPath fSettingsPath, fNetworkPath;
 };
 
-#endif	// SCREEN_SAVER_PREFS_H
+#endif	// SCREEN_SAVER_SETTINGS_H

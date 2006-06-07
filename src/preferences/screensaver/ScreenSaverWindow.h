@@ -12,7 +12,7 @@
 
 
 #include "PasswordWindow.h"
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <Box.h>
 #include <CheckBox.h>
@@ -45,7 +45,7 @@ class ScreenSaverWindow : public BWindow {
 		void _UpdateStatus();
 
 		float			fMinWidth, fMinHeight;
-		ScreenSaverPrefs fPrefs;
+		ScreenSaverSettings fSettings;
 		uint32			fTurnOffScreenFlags;
 
 		BView*			fFadeView;

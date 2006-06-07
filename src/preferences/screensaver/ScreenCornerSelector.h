@@ -9,7 +9,7 @@
 #define SCREEN_CORNER_SELECTOR_H
 
 
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <View.h>
 

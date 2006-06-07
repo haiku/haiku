@@ -11,7 +11,7 @@
 #define SCREEN_SAVER_FILTER_H
 
 
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <InputServerFilter.h>
 #include <Looper.h>
@@ -56,11 +56,11 @@ class ScreenSaverFilter : public BInputServerFilter {
 		void _Invoke();
 		void _Banish();
 
+		ScreenSaverSettings fSettings;
 		bigtime_t		fLastEventTime, fBlankTime, fSnoozeTime;
 		screen_corner	fBlankCorner, fNeverBlankCorner, fCurrentCorner;
 		BRect			fBlankRect, fNeverBlankRect;
 		bool			fEnabled;
-		ScreenSaverPrefs fPrefs;
 		uint32			fFrameNum;
 
 		ScreenSaverController* fController;

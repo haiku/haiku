@@ -134,7 +134,7 @@ ScreenSaverFilter::~ScreenSaverFilter()
 void
 ScreenSaverFilter::_WatchPreferences()
 {
-	BEntry entry(fPrefs.Path().Path());
+	BEntry entry(fSettings.Path().Path());
 	if (entry.Exists()) {
 		if (fWatchingFile)
 			return;
@@ -166,7 +166,7 @@ ScreenSaverFilter::_Invoke()
 {
 	CALLED();
 	if (fCurrentCorner == fNeverBlankCorner || fEnabled
-		|| fPrefs.TimeFlags() != 1
+		|| fSettings.TimeFlags() != 1
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
 		return;
 
@@ -179,13 +179,13 @@ void
 ScreenSaverFilter::ReloadSettings()
 {
 	CALLED();
-	if (!fPrefs.LoadSettings()) {
+	if (!fSettings.LoadSettings()) {
 		SERIAL_PRINT(("preferences loading failed: going to defaults\n"));
 	}
 
-	fBlankCorner = fPrefs.GetBlankCorner();
-	fNeverBlankCorner = fPrefs.GetNeverBlankCorner();
-	fBlankTime = fSnoozeTime = fPrefs.BlankTime();
+	fBlankCorner = fSettings.GetBlankCorner();
+	fNeverBlankCorner = fSettings.GetNeverBlankCorner();
+	fBlankTime = fSnoozeTime = fSettings.BlankTime();
 	CheckTime();
 
 	delete fRunner;

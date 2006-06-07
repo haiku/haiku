@@ -9,7 +9,7 @@ UsePrivateHeaders screen_saver ;
 
 SharedLibrary libscreensaver.so :
 	ScreenSaver.cpp
-	ScreenSaverPrefs.cpp
+	ScreenSaverSettings.cpp
 	ScreenSaverRunner.cpp
 	:
 	be game

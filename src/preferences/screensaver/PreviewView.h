@@ -13,7 +13,6 @@
 #include <View.h>
 #include <Box.h>
 #include <ScreenSaverRunner.h>
-#include <ScreenSaverPrefs.h>
 
 class BScreenSaver;
 

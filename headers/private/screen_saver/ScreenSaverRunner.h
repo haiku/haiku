@@ -16,13 +16,13 @@
 
 class BScreenSaver;
 class BView;
-class ScreenSaverPrefs;
+class ScreenSaverSettings;
 
 
 class ScreenSaverRunner {
 	public:
 		ScreenSaverRunner(BWindow* window, BView* view,
-			bool preview, ScreenSaverPrefs& prefs);
+			bool preview, ScreenSaverSettings& settings);
 		~ScreenSaverRunner();
 
 		BScreenSaver* ScreenSaver() const;
@@ -44,7 +44,7 @@ class ScreenSaverRunner {
 		BWindow*			fWindow;
 		BDirectWindow*		fDirectWindow;
 		BView*				fView;
-		ScreenSaverPrefs&	fPrefs;
+		ScreenSaverSettings& fSettings;
 		bool				fPreview;
 		bool				fHasStarted;
 

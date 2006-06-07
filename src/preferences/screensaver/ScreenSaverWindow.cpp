@@ -76,14 +76,14 @@ class TimeSlider : public BSlider {
 
 class FadeView : public BView {
 	public:
-		FadeView(BRect frame, const char* name, ScreenSaverPrefs& prefs);
+		FadeView(BRect frame, const char* name, ScreenSaverSettings& settings);
 
 		virtual void AttachedToWindow();
 };
 
 class ModulesView : public BView {
 	public:
-		ModulesView(BRect frame, const char* name, ScreenSaverPrefs& prefs);
+		ModulesView(BRect frame, const char* name, ScreenSaverSettings& settings);
 		virtual ~ModulesView();
 
 		virtual void DetachedFromWindow();
@@ -105,7 +105,7 @@ class ModulesView : public BView {
 		BButton*		fTestButton;
 		BButton*		fAddButton;
 
-		ScreenSaverPrefs& fPrefs;
+		ScreenSaverSettings& fSettings;
 		ScreenSaverRunner* fSaverRunner;
 		BString			fCurrentName;
 
@@ -235,7 +235,7 @@ TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 //	#pragma mark -
 
 
-FadeView::FadeView(BRect rect, const char* name, ScreenSaverPrefs& prefs)
+FadeView::FadeView(BRect rect, const char* name, ScreenSaverSettings& settings)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -256,9 +256,9 @@ FadeView::AttachedToWindow()
 //	#pragma mark -
 
 
-ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverPrefs& prefs)
+ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverSettings& settings)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
-	fPrefs(prefs),
+	fSettings(settings),
 	fSaverRunner(NULL),
 	fSettingsView(NULL)
 {
@@ -360,9 +360,9 @@ ModulesView::MessageReceived(BMessage* message)
 				break;
 
 			if (!strcmp(item->Text(), "Blackness"))
-				fPrefs.SetModuleName("");
+				fSettings.SetModuleName("");
 			else
-				fPrefs.SetModuleName(item->Text());
+				fSettings.SetModuleName(item->Text());
 
 			_CloseSaver();
 			_OpenSaver();
@@ -371,9 +371,9 @@ ModulesView::MessageReceived(BMessage* message)
 
 		case kMsgTestSaver:
 			SaveState();
-			fPrefs.SaveSettings();
+			fSettings.SaveSettings();
 
-			be_roster->Launch(SCREEN_BLANKER_SIG, &fPrefs.GetSettings());
+			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.GetSettings());
 			break;
 
 		case kMsgAddSaver:
@@ -395,7 +395,7 @@ ModulesView::SaveState()
 
 	BMessage state;
 	if (saver->SaveState(&state) == B_OK)
-		fPrefs.SetState(fCurrentName.String(), &state);
+		fSettings.SetState(fCurrentName.String(), &state);
 }
 
 
@@ -433,8 +433,8 @@ ModulesView::PopulateScreenSaverList()
 			ScreenSaverItem* item = new ScreenSaverItem(name, path.Path());
 			fListView->AddItem(item); 
 			
-			if (!strcmp(fPrefs.ModuleName(), item->Text())
-				|| (!strcmp(fPrefs.ModuleName(), "") 
+			if (!strcmp(fSettings.ModuleName(), item->Text())
+				|| (!strcmp(fSettings.ModuleName(), "") 
 					&& !strcmp(item->Text(), "Blackness")))
 				selectItem = item;
 		}
@@ -498,8 +498,8 @@ ModulesView::_OpenSaver()
 	// create new screen saver preview & config
 
    	BView* view = fPreviewView->AddPreview();
-	fCurrentName = fPrefs.ModuleName();
-	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fPrefs);
+	fCurrentName = fSettings.ModuleName();
+	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fSettings);
 	BScreenSaver* saver = _ScreenSaver();
 
 	BRect rect = fSettingsBox->Bounds().InsetByCopy(4, 4);
@@ -521,14 +521,14 @@ ModulesView::_OpenSaver()
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
 		rect = BRect(15, 15, 20, 20);
-		BStringView* stringView = new BStringView(rect, "module", fPrefs.ModuleName()[0]
-			? fPrefs.ModuleName() : "Blackness");
+		BStringView* stringView = new BStringView(rect, "module", fSettings.ModuleName()[0]
+			? fSettings.ModuleName() : "Blackness");
 		stringView->SetFont(be_bold_font);
 		stringView->ResizeToPreferred();
 		fSettingsView->AddChild(stringView);
 
 		rect.OffsetBy(0, stringView->Bounds().Height() + 4);
-		stringView = new BStringView(rect, "info", saver || !fPrefs.ModuleName()[0]
+		stringView = new BStringView(rect, "info", saver || !fSettings.ModuleName()[0]
 			? "No options available" : "Could not load screen saver");
 		stringView->ResizeToPreferred();
 		fSettingsView->AddChild(stringView);
@@ -586,7 +586,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 	: BWindow(BRect(50, 50, 496, 375), "Screen Saver",
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
 {
-	fPrefs.LoadSettings();
+	fSettings.LoadSettings();
 
 	BRect rect = Bounds();
 
@@ -602,32 +602,32 @@ ScreenSaverWindow::ScreenSaverWindow()
 	// Create the controls inside the tabs
 	rect = fTabView->ContainerView()->Bounds();
 	_SetupFadeTab(rect);
-	fModulesView = new ModulesView(rect, "Modules", fPrefs);
+	fModulesView = new ModulesView(rect, "Modules", fSettings);
 
 	fTabView->AddTab(fFadeView);
 	fTabView->AddTab(fModulesView);
 	background->AddChild(fTabView);
 
 	// Create the password editing window
-	fPasswordWindow = new PasswordWindow(fPrefs);
+	fPasswordWindow = new PasswordWindow(fSettings);
 	fPasswordWindow->Run();
 
 	// TODO: better limits!
 	fMinWidth = 430;
 	fMinHeight = 325;
 	SetMinimalSizeLimit(fMinWidth, fMinHeight);
-	MoveTo(fPrefs.WindowFrame().left, fPrefs.WindowFrame().top);
-	ResizeTo(fPrefs.WindowFrame().Width(), fPrefs.WindowFrame().Height());
+	MoveTo(fSettings.WindowFrame().left, fSettings.WindowFrame().top);
+	ResizeTo(fSettings.WindowFrame().Width(), fSettings.WindowFrame().Height());
 
-	fEnableCheckBox->SetValue(fPrefs.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
-	fRunSlider->SetTime(fPrefs.BlankTime());
-	fTurnOffSlider->SetTime(fPrefs.OffTime() + fPrefs.BlankTime());
-	fFadeNow->SetCorner(fPrefs.GetBlankCorner());
-	fFadeNever->SetCorner(fPrefs.GetNeverBlankCorner());
-	fPasswordCheckBox->SetValue(fPrefs.LockEnable());
-	fPasswordSlider->SetTime(fPrefs.PasswordTime());
+	fEnableCheckBox->SetValue(fSettings.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
+	fRunSlider->SetTime(fSettings.BlankTime());
+	fTurnOffSlider->SetTime(fSettings.OffTime() + fSettings.BlankTime());
+	fFadeNow->SetCorner(fSettings.GetBlankCorner());
+	fFadeNever->SetCorner(fSettings.GetNeverBlankCorner());
+	fPasswordCheckBox->SetValue(fSettings.LockEnable());
+	fPasswordSlider->SetTime(fSettings.PasswordTime());
 
-	fTabView->Select(fPrefs.WindowTab());
+	fTabView->Select(fSettings.WindowTab());
 
 	_UpdateTurnOffScreen();
 	_UpdateStatus();
@@ -643,7 +643,7 @@ ScreenSaverWindow::~ScreenSaverWindow()
 void
 ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
-	fFadeView = new FadeView(rect, "Fade", fPrefs);
+	fFadeView = new FadeView(rect, "Fade", fSettings);
 
 /*
 	font_height fontHeight;
@@ -732,7 +732,7 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 void
 ScreenSaverWindow::_UpdateTurnOffScreen()
 {
-	bool enabled = (fPrefs.TimeFlags() & ENABLE_DPMS_MASK) != 0;
+	bool enabled = (fSettings.TimeFlags() & ENABLE_DPMS_MASK) != 0;
 
 	BScreen screen(this);
 	uint32 dpmsCapabilities = screen.DPMSCapabilites();
@@ -766,19 +766,19 @@ ScreenSaverWindow::_UpdateStatus()
 	EnableUpdates();
 
 	// Update the saved preferences
-	fPrefs.SetWindowFrame(Frame());	
-	fPrefs.SetWindowTab(fTabView->Selection());
-	fPrefs.SetTimeFlags((enabled ? ENABLE_SAVER : 0)
+	fSettings.SetWindowFrame(Frame());	
+	fSettings.SetWindowTab(fTabView->Selection());
+	fSettings.SetTimeFlags((enabled ? ENABLE_SAVER : 0)
 		| (fTurnOffCheckBox->Value() ? fTurnOffScreenFlags : 0));
-	fPrefs.SetBlankTime(fRunSlider->Time());
-	bigtime_t offTime = fTurnOffSlider->Time() - fPrefs.BlankTime();
-	fPrefs.SetOffTime(offTime);
-	fPrefs.SetSuspendTime(offTime);
-	fPrefs.SetStandByTime(offTime);
-	fPrefs.SetBlankCorner(fFadeNow->Corner());
-	fPrefs.SetNeverBlankCorner(fFadeNever->Corner());
-	fPrefs.SetLockEnable(fPasswordCheckBox->Value());
-	fPrefs.SetPasswordTime(fPasswordSlider->Time());
+	fSettings.SetBlankTime(fRunSlider->Time());
+	bigtime_t offTime = fTurnOffSlider->Time() - fSettings.BlankTime();
+	fSettings.SetOffTime(offTime);
+	fSettings.SetSuspendTime(offTime);
+	fSettings.SetStandByTime(offTime);
+	fSettings.SetBlankCorner(fFadeNow->Corner());
+	fSettings.SetNeverBlankCorner(fFadeNever->Corner());
+	fSettings.SetLockEnable(fPasswordCheckBox->Value());
+	fSettings.SetPasswordTime(fPasswordSlider->Time());
 
 	// TODO - Tell the password window to update its stuff
 }
@@ -855,7 +855,7 @@ ScreenSaverWindow::QuitRequested()
 {
 	_UpdateStatus();
 	fModulesView->SaveState();
-	fPrefs.SaveSettings();
+	fSettings.SaveSettings();
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;

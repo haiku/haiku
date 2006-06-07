@@ -25,10 +25,10 @@ const uint32 kMsgDone = 'done';
 const uint32 kMsgPasswordTypeChanged = 'pwtp';
 
 
-PasswordWindow::PasswordWindow(ScreenSaverPrefs &prefs) 
+PasswordWindow::PasswordWindow(ScreenSaverSettings& settings) 
 	: BWindow(BRect(100, 100, 380, 249), "Password Window", B_MODAL_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
-	fPrefs(prefs)
+	fSettings(settings)
 {
 	_Setup();
 
@@ -82,7 +82,7 @@ PasswordWindow::_Setup()
 void 
 PasswordWindow::Update() 
 {
-	if (fPrefs.IsNetworkPassword())
+	if (fSettings.IsNetworkPassword())
 		fUseNetwork->SetValue(B_CONTROL_ON);
 	else
 		fUseCustom->SetValue(B_CONTROL_ON);
@@ -97,16 +97,16 @@ PasswordWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgDone:
-			fPrefs.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
+			fSettings.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
 			if (fUseCustom->Value()) {
 				if (strcmp(fPasswordControl->Text(),fConfirmControl->Text())) {
 					BAlert *alert=new BAlert("noMatch","Passwords don't match. Try again.","OK");
 					alert->Go();
 					break;
 				} 
-				fPrefs.SetPassword(crypt(fPasswordControl->Text(), fPasswordControl->Text()));
+				fSettings.SetPassword(crypt(fPasswordControl->Text(), fPasswordControl->Text()));
 			} else {
-				fPrefs.SetPassword("");
+				fSettings.SetPassword("");
 			}
 			fPasswordControl->SetText("");
 			fConfirmControl->SetText("");
@@ -120,7 +120,7 @@ PasswordWindow::MessageReceived(BMessage *message)
 		break;
 
 	case kMsgPasswordTypeChanged:
-		fPrefs.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
+		fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
 		Update();
 		break;
 

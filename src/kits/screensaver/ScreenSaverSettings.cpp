@@ -8,7 +8,7 @@
  */
 
 
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <Debug.h>
 #include <File.h>
@@ -20,7 +20,7 @@
 #include <string.h>
 
 
-ScreenSaverPrefs::ScreenSaverPrefs() 
+ScreenSaverSettings::ScreenSaverSettings() 
 {
 	BPath path;
   	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -36,7 +36,7 @@ ScreenSaverPrefs::ScreenSaverPrefs()
 
 //! Load the flattened settings BMessage from disk and parse it.
 bool
-ScreenSaverPrefs::LoadSettings() 
+ScreenSaverSettings::LoadSettings() 
 {
 	BFile file(fSettingsPath.Path(), B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
@@ -91,7 +91,7 @@ ScreenSaverPrefs::LoadSettings()
 
 
 void
-ScreenSaverPrefs::Defaults()
+ScreenSaverSettings::Defaults()
 {
 	fWindowFrame = BRect(96.5, 77.0, 542.5, 402);
 	fWindowTab = 0;
@@ -111,7 +111,7 @@ ScreenSaverPrefs::Defaults()
 
 
 BMessage &
-ScreenSaverPrefs::GetSettings()
+ScreenSaverSettings::GetSettings()
 {
 	// We can't just empty the message, because the module states are stored
 	// in this message as well.
@@ -153,7 +153,7 @@ ScreenSaverPrefs::GetSettings()
 
 
 status_t
-ScreenSaverPrefs::GetState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::GetState(const char *name, BMessage *stateMsg) 
 {
 	BString stateName("modulesettings_");
 	stateName += name;
@@ -162,7 +162,7 @@ ScreenSaverPrefs::GetState(const char *name, BMessage *stateMsg)
 
 
 void
-ScreenSaverPrefs::SetState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::SetState(const char *name, BMessage *stateMsg) 
 {
 	BString stateName("modulesettings_");
 	stateName += name;
@@ -172,7 +172,7 @@ ScreenSaverPrefs::SetState(const char *name, BMessage *stateMsg)
 
 
 void 
-ScreenSaverPrefs::SaveSettings() 
+ScreenSaverSettings::SaveSettings() 
 {
   	BMessage &settings = GetSettings();
 	PRINT_OBJECT(settings);

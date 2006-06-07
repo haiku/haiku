@@ -11,7 +11,7 @@
 
 
 #include "PasswordWindow.h"
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 #include "ScreenSaverRunner.h"
 #include "ScreenSaverWindow.h"
 
@@ -38,7 +38,7 @@ class ScreenBlanker : public BApplication {
 		void _QueueTurnOffScreen();
 		void _Shutdown();
 
-		ScreenSaverPrefs fPrefs;
+		ScreenSaverSettings fSettings;
 		ScreenSaverWindow *fWindow;
 		BScreenSaver *fSaver;
 		ScreenSaverRunner *fRunner;

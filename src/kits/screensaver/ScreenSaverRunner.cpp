@@ -10,7 +10,7 @@
 
 
 #include "ScreenSaverRunner.h"
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <FindDirectory.h>
 #include <Screen.h>
@@ -21,12 +21,12 @@
 
 
 ScreenSaverRunner::ScreenSaverRunner(BWindow* window, BView* view,
-		bool preview, ScreenSaverPrefs& prefs)
+		bool preview, ScreenSaverSettings& settings)
 	:
 	fSaver(NULL),
 	fWindow(window),
 	fView(view),
-	fPrefs(prefs),
+	fSettings(settings),
 	fPreview(preview),
 	fAddonImage(-1),
 	fThread(-1),
@@ -109,7 +109,7 @@ ScreenSaverRunner::_LoadAddOn()
 	}
 	_CleanUp();
 
-	if (!strcmp("", fPrefs.ModuleName())) {
+	if (!strcmp("", fSettings.ModuleName())) {
 		Resume();
 		return;
 	}
@@ -127,7 +127,7 @@ ScreenSaverRunner::_LoadAddOn()
 			continue;
 
 		path.Append("Screen Savers");
-		path.Append(fPrefs.ModuleName());
+		path.Append(fSettings.ModuleName());
 
 		fAddonImage = load_add_on(path.Path());
 		if (fAddonImage >= B_OK)
@@ -143,7 +143,7 @@ ScreenSaverRunner::_LoadAddOn()
 			printf("Unable to find the instantiator\n");
 		} else {
 			BMessage state;
-			fPrefs.GetState(fPrefs.ModuleName(), &state);
+			fSettings.GetState(fSettings.ModuleName(), &state);
 			fSaver = instantiate(&state, fAddonImage);
 		}
 

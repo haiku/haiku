@@ -57,7 +57,7 @@ ScreenBlanker::~ScreenBlanker()
 void
 ScreenBlanker::ReadyToRun() 
 {
-	if (!fPrefs.LoadSettings()) {
+	if (!fSettings.LoadSettings()) {
 		fprintf(stderr, "could not load settings\n");
 		exit(1);
 	}
@@ -67,7 +67,7 @@ ScreenBlanker::ReadyToRun()
 	BScreen screen(B_MAIN_SCREEN_ID);
 	fWindow = new ScreenSaverWindow(screen.Frame());
 	fPasswordWindow = new PasswordWindow();
-	fRunner = new ScreenSaverRunner(fWindow, fWindow->ChildAt(0), false, fPrefs);
+	fRunner = new ScreenSaverRunner(fWindow, fWindow->ChildAt(0), false, fSettings);
 
 	fSaver = fRunner->ScreenSaver();
 	if (fSaver) {
@@ -138,7 +138,7 @@ ScreenBlanker::_QueueResumeScreenSaver()
 {
 	delete fResumeRunner;
 	fResumeRunner = new BMessageRunner(BMessenger(this), new BMessage(kMsgResumeSaver),
-		fPrefs.BlankTime(), 1);
+		fSettings.BlankTime(), 1);
 	if (fResumeRunner->InitCheck() != B_OK)
 		syslog(LOG_ERR, "resume screen saver runner failed\n");
 }
@@ -157,7 +157,7 @@ ScreenBlanker::_QueueTurnOffScreen()
 
 	// figure out which notifiers we need and which of them are supported
 
-	uint32 flags = fPrefs.TimeFlags();
+	uint32 flags = fSettings.TimeFlags();
 	BScreen screen;
 	uint32 capabilities = screen.DPMSCapabilites();
 	if ((capabilities & B_DPMS_OFF) == 0)
@@ -170,30 +170,30 @@ ScreenBlanker::_QueueTurnOffScreen()
 	if ((flags & ENABLE_DPMS_MASK) == 0)
 		return;
 
-	if (fPrefs.OffTime() == fPrefs.SuspendTime())
+	if (fSettings.OffTime() == fSettings.SuspendTime())
 		flags &= ENABLE_DPMS_SUSPEND;
-	if (fPrefs.SuspendTime() == fPrefs.StandByTime())
+	if (fSettings.SuspendTime() == fSettings.StandByTime())
 		flags &= ENABLE_DPMS_STAND_BY;
 
 	// start them off again
 
 	if (flags & ENABLE_DPMS_STAND_BY) {
 		fStandByScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgStandByScreen), fPrefs.StandByTime(), 1);
+			new BMessage(kMsgStandByScreen), fSettings.StandByTime(), 1);
 		if (fStandByScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "standby screen saver runner failed\n");
 	}
 
 	if (flags & ENABLE_DPMS_SUSPEND) {
 		fSuspendScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgSuspendScreen), fPrefs.SuspendTime(), 1);
+			new BMessage(kMsgSuspendScreen), fSettings.SuspendTime(), 1);
 		if (fSuspendScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "turn off screen saver runner failed\n");
 	}
 
 	if (flags & ENABLE_DPMS_OFF) {
 		fTurnOffScreenRunner = new BMessageRunner(BMessenger(this),
-			new BMessage(kMsgTurnOffScreen), fPrefs.OffTime(), 1);
+			new BMessage(kMsgTurnOffScreen), fSettings.OffTime(), 1);
 		if (fTurnOffScreenRunner->InitCheck() != B_OK)
 			syslog(LOG_ERR, "turn off screen saver runner failed\n");
 	}
@@ -206,8 +206,8 @@ ScreenBlanker::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgUnlock:
 		{
-			if (strcmp(fPrefs.Password(), crypt(fPasswordWindow->Password(),
-					fPrefs.Password())) != 0) {
+			if (strcmp(fSettings.Password(), crypt(fPasswordWindow->Password(),
+					fSettings.Password())) != 0) {
 				beep();
 				fPasswordWindow->SetPassword("");
 				_QueueResumeScreenSaver();
@@ -253,8 +253,8 @@ ScreenBlanker::MessageReceived(BMessage* message)
 bool
 ScreenBlanker::QuitRequested()
 {
-	if (fPrefs.LockEnable()
-		&& system_time() - fBlankTime > fPrefs.PasswordTime() - fPrefs.BlankTime()) {
+	if (fSettings.LockEnable()
+		&& system_time() - fBlankTime > fSettings.PasswordTime() - fSettings.BlankTime()) {
 		_ShowPasswordWindow();
 		return false;
 	}

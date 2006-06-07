@@ -6,11 +6,11 @@
  *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
  */
-#ifndef PASSWORDWINDOW_H
-#define PASSWORDWINDOW_H
+#ifndef PASSWORD_WINDOW_H
+#define PASSWORD_WINDOW_H
 
 
-#include "ScreenSaverPrefs.h"
+#include "ScreenSaverSettings.h"
 
 #include <Window.h>
 
@@ -19,7 +19,7 @@ class BTextControl;
 
 class PasswordWindow : public BWindow {
 	public:
-		PasswordWindow(ScreenSaverPrefs &prefs);
+		PasswordWindow(ScreenSaverSettings &settings);
 
 		virtual void MessageReceived(BMessage *message);
 
@@ -30,7 +30,7 @@ class PasswordWindow : public BWindow {
 
 		BRadioButton *fUseNetwork, *fUseCustom;
 		BTextControl *fPasswordControl, *fConfirmControl;
-		ScreenSaverPrefs &fPrefs;
+		ScreenSaverSettings &fSettings;
 };
 
-#endif	// PASSWORDWINDOW_H
+#endif	// PASSWORD_WINDOW_H
