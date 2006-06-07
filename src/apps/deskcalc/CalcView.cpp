@@ -27,8 +27,8 @@
 
 #include "CalcApplication.h"
 #include "CalcOptionsWindow.h"
+#include "ExpressionParser.h"
 #include "ExpressionTextView.h"
-#include "Parser.h"
 
 
 const uint8 K_COLOR_OFFSET		= 32;
@@ -701,7 +701,6 @@ CalcView::Evaluate()
 	const double EXP_SWITCH_LO = 1e-12;
 
 	BString expression = fExpressionTextView->Text();
-	expression << "\n";
 
 	if (expression.Length() == 0) {
 		beep();
@@ -719,21 +718,17 @@ CalcView::Evaluate()
 //printf("evaluate: %s\n", expression.String());
 
 	// evaluate expression
-	Expression parser;
-
-	char* tmpstr = strdup(expression.String());
-	char* start = tmpstr;
-	char* end = start + expression.Length() - 1;
 	double value = 0.0;
 
 	try {
-		value = parser.Evaluate(start, end, true);
-	} catch (const char* error) {
-		fExpressionTextView->SetText(error);
+		ExpressionParser parser;
+		value = parser.Evaluate(expression.String());
+	} catch (ParseException e) {
+		BString error(e.message.String());
+		error << " at " << (e.position + 1);
+		fExpressionTextView->SetText(error.String());
 		return;
 	}
-
-	free(tmpstr);
 
 //printf("  -> value: %f\n", value);
 

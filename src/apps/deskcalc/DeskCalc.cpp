@@ -8,15 +8,37 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include <stdio.h>
+
 #include "CalcApplication.h"
+#include "ExpressionParser.h"
 
 int
 main(int argc, char* argv[])
 {
-	CalcApplication* app = new CalcApplication();
-	
-	app->Run();
-	delete app;
+	if (argc == 1) {
+		// run GUI
+		CalcApplication* app = new CalcApplication();
+		
+		app->Run();
+		delete app;
+	} else {
+		// evaluate expression from command line
+		BString expression;
+		int32 i = 1;
+		while (i < argc) {
+			expression << argv[i];
+			i++;
+		}
+
+		try {
+			ExpressionParser parser;
+			printf("%f\n", parser.Evaluate(expression.String()));
+		} catch (ParseException e) {
+			printf("%s at %ld\n", e.message.String(), e.position + 1);
+			return 1;
+		}
+	}
 
 	return 0;
 }
