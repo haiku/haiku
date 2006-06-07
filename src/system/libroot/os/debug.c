@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -58,6 +58,7 @@ static const debug_string_entry sDebugExceptionTypeStrings[] = {
 void
 debugger(const char *message)
 {
+	debug_printf("%ld: DEBUGGER: %s\n", find_thread(NULL), message);
 	_kern_debugger(message);
 }
 
