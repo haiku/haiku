@@ -639,11 +639,14 @@ CalcView::LoadSettings(BMessage* archive)
 	// load display text
 	const char* display;
 	if (archive->FindString("displayText", &display) < B_OK) {
-		puts("Missing display text from CalcView archive.\n");
+		puts("Missing expression text from CalcView archive.\n");
 	} else {
 		// init expression text
 		fExpressionTextView->SetText(display);
 	}
+
+	// load expression history
+	fExpressionTextView->LoadSettings(archive);
 
 	// parse calculator description
 	_ParseCalcDesc(fKeypadDescription);
@@ -685,6 +688,10 @@ CalcView::SaveSettings(BMessage* archive) const
 	// record display text
 	if (ret == B_OK)
 		ret = archive->AddString("displayText", fExpressionTextView->Text());
+
+	// record expression history
+	if (ret == B_OK)
+		ret = fExpressionTextView->SaveSettings(archive);
 
 	// record calculator description
 	if (ret == B_OK)
@@ -740,7 +747,7 @@ CalcView::Evaluate()
 	} else if (((value <  EXP_SWITCH_HI) && (value >  EXP_SWITCH_LO)) ||
 			   ((value > -EXP_SWITCH_HI) && (value < -EXP_SWITCH_LO))) {
 		// print in std form
-		sprintf(buf, "%9f", value);
+		sprintf(buf, "%.13f", value);
 
 		// hack to remove surplus zeros!
 		if (strchr(buf, '.')) {

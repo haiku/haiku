@@ -44,6 +44,9 @@ class ExpressionTextView : public InputTextView {
 			void				PreviousExpression();
 			void				NextExpression();
 
+			void				LoadSettings(const BMessage* archive);
+			status_t			SaveSettings(BMessage* archive) const;
+
  private:
 			CalcView*			fCalcView;
 			BString				fKeypadLabels;

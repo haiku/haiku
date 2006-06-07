@@ -95,7 +95,6 @@ InputTextView::MakeFocus(bool focus)
 		BTextView::MakeFocus(focus);
 		if (focus)
 			SelectAll();
-		ApplyChanges();
 	}
 }
 

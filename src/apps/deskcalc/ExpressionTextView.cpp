@@ -9,6 +9,7 @@
 #include "ExpressionTextView.h"
 
 #include <new>
+#include <stdio.h>
 
 #include <Beep.h>
 #include <Window.h>
@@ -72,6 +73,7 @@ ExpressionTextView::KeyDown(const char* bytes, int32 numBytes)
 		NextExpression();
 		return;
 	}
+	BString current = Text();
 
 	// handle in InputTextView, except B_TAB
 	if (bytes[0] != B_TAB)
@@ -83,7 +85,8 @@ ExpressionTextView::KeyDown(const char* bytes, int32 numBytes)
 
 	// as soon as something is typed, we are at the
 	// end of the expression history
-	fHistoryPos = fPreviousExpressions.CountItems();
+	if (current != Text())
+		fHistoryPos = fPreviousExpressions.CountItems();
 }
 
 
@@ -117,6 +120,9 @@ ExpressionTextView::ApplyChanges()
 	AddExpressionToHistory(Text());
 	fCalcView->Evaluate();
 }
+
+
+// #pragma mark -
 
 
 void
@@ -156,6 +162,18 @@ ExpressionTextView::Clear()
 void
 ExpressionTextView::AddExpressionToHistory(const char* expression)
 {
+	// clean out old expressions that are the same as
+	// the one to be added
+	int32 count = fPreviousExpressions.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BString* item = (BString*)fPreviousExpressions.ItemAt(i);
+		if (*item == expression && fPreviousExpressions.RemoveItem(i)) {
+			delete item;
+			i--;
+			count--;
+		}
+	}
+
 	BString* item = new (nothrow) BString(expression);
 	if (!item)
 		return;
@@ -211,4 +229,34 @@ ExpressionTextView::NextExpression()
 	if (item)
 		SetExpression(item->String());
 }
+
+
+// #pragma mark -
+
+
+void
+ExpressionTextView::LoadSettings(const BMessage* archive)
+{
+	const char* oldExpression;
+	for (int32 i = 0;
+		 archive->FindString("previous expression", i, &oldExpression) == B_OK;
+		 i++) {
+		 AddExpressionToHistory(oldExpression);
+	}
+}
+
+
+status_t
+ExpressionTextView::SaveSettings(BMessage* archive) const
+{
+	int32 count = fPreviousExpressions.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BString* item = (BString*)fPreviousExpressions.ItemAtFast(i);
+		status_t ret = archive->AddString("previous expression", item->String());
+		if (ret < B_OK)
+			return ret;
+	}
+	return B_OK;
+}
+
 
