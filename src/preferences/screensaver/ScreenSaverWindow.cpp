@@ -502,10 +502,10 @@ ModulesView::_OpenSaver()
 	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fSettings);
 	BScreenSaver* saver = _ScreenSaver();
 
-	BRect rect = fSettingsBox->Bounds().InsetByCopy(4, 4);
 #ifdef __HAIKU__
-	rect.top += fSettingsBox->TopBorderOffset();
+	BRect rect = fSettingsBox->InnerFrame().InsetByCopy(4, 4);
 #else
+	BRect rect = fSettingsBox->Bounds().InsetByCopy(4, 4);
 	rect.top += 14;
 #endif
 	fSettingsView = new BView(rect, "SettingsView", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -645,11 +645,15 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 {
 	fFadeView = new FadeView(rect, "Fade", fSettings);
 
-/*
+	float labelWidth = be_plain_font->StringWidth("Turn off screen") + 20.0f;
+
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
-	float lineHeight = ceilf(fontHeight.ascent + fontHeight.descent);
-*/
+	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
+
+	// taken from BRadioButton:
+	float radioButtonOffset = 2 * floorf(textHeight / 2 - 2) + floorf(textHeight / 2);
+
 	fEnableCheckBox = new BCheckBox(BRect(0, 0, 1, 1), "EnableCheckBox",
 		"Enable Screen Saver", new BMessage(kMsgEnableScreenSaverBox));
 	fEnableCheckBox->ResizeToPreferred();
@@ -660,46 +664,50 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	fFadeView->AddChild(box);
 
 	// Run Module
+	rect.left += radioButtonOffset;
 	rect.top = fEnableCheckBox->Bounds().bottom + 8.0f;
+	rect.right = box->Bounds().right - 8;
 	BStringView* stringView = new BStringView(rect, NULL, "Run module");
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
-	float topEdge = rect.top;
-	fRunSlider = new TimeSlider(BRect(135, topEdge, 420, topEdge + 20),
-		"RunSlider", kMsgRunSliderChanged);
+	rect.left += labelWidth;
+	fRunSlider = new TimeSlider(rect, "RunSlider", kMsgRunSliderChanged);
 	float width, height;
 	fRunSlider->GetPreferredSize(&width, &height);
 	fRunSlider->ResizeTo(fRunSlider->Bounds().Width(), height);
 	box->AddChild(fRunSlider);
 
 	// Turn Off
-	topEdge += fRunSlider->Bounds().Height() + 4.0f;
-	fTurnOffCheckBox = new BCheckBox(BRect(20, topEdge-2, 127, topEdge + 20),
-		"TurnOffScreenCheckBox", "Turn off screen", new BMessage(kMsgTurnOffCheckBox));
+	rect.left = 8;
+	rect.OffsetBy(0, fRunSlider->Bounds().Height() + 4.0f);
+	fTurnOffCheckBox = new BCheckBox(rect, "TurnOffScreenCheckBox",
+		"Turn off screen", new BMessage(kMsgTurnOffCheckBox));
 	fTurnOffCheckBox->ResizeToPreferred();
 	box->AddChild(fTurnOffCheckBox);
 
-	fTurnOffSlider = new TimeSlider(BRect(135, topEdge, 420, topEdge + 20),
-		"TurnOffSlider", kMsgTurnOffSliderChanged);
+	rect.left += radioButtonOffset + labelWidth;
+	fTurnOffSlider = new TimeSlider(rect, "TurnOffSlider", kMsgTurnOffSliderChanged);
 	fTurnOffSlider->ResizeTo(fTurnOffSlider->Bounds().Width(), height);
 	box->AddChild(fTurnOffSlider);
 
 	// Password
-	topEdge += fTurnOffSlider->Bounds().Height() + 4.0f;
-	fPasswordCheckBox = new BCheckBox(BRect(20, topEdge - 2, 127, topEdge + 20),
-		"PasswordCheckbox", "Password lock", new BMessage(kMsgPasswordCheckBox));
+	rect.left = 8;
+	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
+	fPasswordCheckBox = new BCheckBox(rect, "PasswordCheckbox",
+		"Password lock", new BMessage(kMsgPasswordCheckBox));
 	fPasswordCheckBox->ResizeToPreferred();
 	box->AddChild(fPasswordCheckBox);
 
-	fPasswordSlider = new TimeSlider(BRect(135, topEdge, 420, topEdge + 20),
-		"PasswordSlider", kMsgPasswordSliderChanged);
+	rect.left += radioButtonOffset + labelWidth;
+	fPasswordSlider = new TimeSlider(rect, "PasswordSlider", kMsgPasswordSliderChanged);
 	fPasswordSlider->ResizeTo(fPasswordSlider->Bounds().Width(), height);
 	box->AddChild(fPasswordSlider);
 
-	topEdge += fPasswordSlider->Bounds().Height() + 4.0f;
-	fPasswordButton = new BButton(BRect(390, topEdge, 410, topEdge + 24), "PasswordButton",
-		"Password" B_UTF8_ELLIPSIS, new BMessage(kMsgChangePassword));
+	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
+	rect.left = rect.right;
+	fPasswordButton = new BButton(rect, "PasswordButton", "Password" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgChangePassword), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fPasswordButton->ResizeToPreferred();
 	fPasswordButton->MoveBy(-fPasswordButton->Bounds().Width(), 0);
 	box->AddChild(fPasswordButton);
@@ -711,20 +719,28 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	box->AddChild(fFadeNever = new ScreenCornerSelector(BRect(220,205,280,260),"fadeNever",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
-	stringView = new BStringView(BRect(90,215,193,230),
-		"FadeNowString", "Fade now when", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	rect = BRect(90,215,193,230);
+	stringView = new BStringView(rect, NULL, "Fade now when",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
-	stringView = new BStringView(BRect(90,233,193,248),
-		"FadeNowString2","mouse is here", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	rect.OffsetBy(0, stringView->Bounds().Height());
+	stringView = new BStringView(rect, NULL, "mouse is here",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
-	stringView = new BStringView(BRect(290,215,387,230),
-		"DontFadeString","Don't fade when", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	rect = BRect(290,215,387,230);
+	stringView = new BStringView(rect, NULL,"Don't fade when",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
-	stringView = new BStringView(BRect(290,233,387,248),
-		"DontFadeString2","mouse is here", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	rect.OffsetBy(0, stringView->Bounds().Height());
+	stringView = new BStringView(rect, NULL, "mouse is here",
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 }
 
