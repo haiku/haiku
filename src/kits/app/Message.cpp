@@ -1040,13 +1040,18 @@ BMessage::Unflatten(const char *flatBuffer)
 			return convert_message(&message, this);
 		}
 
-		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::unflatten_r5_message(format, this, flatBuffer);
+		try {
+			if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
+				return BPrivate::unflatten_r5_message(format, this, flatBuffer);
 
-		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
-			BMemoryIO stream(flatBuffer + sizeof(uint32),
-				BPrivate::dano_message_flattened_size(flatBuffer));
-			return BPrivate::unflatten_dano_message(format, stream, *this);
+			if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
+				BMemoryIO stream(flatBuffer + sizeof(uint32),
+					BPrivate::dano_message_flattened_size(flatBuffer));
+				return BPrivate::unflatten_dano_message(format, stream, *this);
+			}
+		} catch (status_t error) {
+			MakeEmpty();
+			return error;
 		}
 
 		return B_NOT_A_MESSAGE;
@@ -1122,11 +1127,16 @@ BMessage::Unflatten(BDataIO *stream)
 	uint32 format = 0;
 	stream->Read(&format, sizeof(uint32));
 	if (format != kMessageMagicHaiku) {
-		if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-			return BPrivate::unflatten_r5_message(format, this, stream);
+		try {
+			if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
+				return BPrivate::unflatten_r5_message(format, this, stream);
 
-		if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
-			return BPrivate::unflatten_dano_message(format, *stream, *this);
+			if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
+				return BPrivate::unflatten_dano_message(format, *stream, *this);
+		} catch (status_t error) {
+			MakeEmpty();
+			return error;
+		}
 
 		return B_NOT_A_MESSAGE;
 	}
