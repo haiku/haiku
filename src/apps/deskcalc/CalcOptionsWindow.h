@@ -16,8 +16,12 @@
 struct CalcOptions {
 	bool auto_num_lock;		// automatically activate numlock
 	bool audio_feedback;	// provide audio feedback
+	bool show_keypad;		// show or hide the buttons
 
-	CalcOptions();
+				CalcOptions();
+
+	void		LoadSettings(const BMessage* archive);
+	status_t	SaveSettings(BMessage* archive) const;
 };
 
 class BCheckBox;
@@ -41,6 +45,8 @@ class CalcOptionsWindow : public BWindow {
 
 			BCheckBox*			fAutoNumLockCheckBox;
 			BCheckBox*			fAudioFeedbackCheckBox;
+			BCheckBox*			fShowKeypadCheckBox;
+
 			BButton*			fOkButton;
 			BButton*			fCancelButton;
 };

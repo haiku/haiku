@@ -12,12 +12,12 @@
 #define _CALC_VIEW_H
 
 #include <View.h>
-#include <String.h>
 
 class BString;
 class BMenuItem;
 class CalcOptions;
 class CalcOptionsWindow;
+class ExpressionTextView;
 
 _EXPORT
 class CalcView : public BView {
@@ -33,7 +33,7 @@ class CalcView : public BView {
 
 	virtual						~CalcView();
 
-		
+	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint point);
@@ -60,18 +60,30 @@ class CalcView : public BView {
 			status_t			LoadSettings(BMessage* archive);
 			status_t			SaveSettings(BMessage* archive) const;
 
+			void				Evaluate();
+
+			void				FlashKey(const char* bytes, int32 numBytes);
+
+			void				AddExpressionToHistory(const char* expression);
+			void				PreviousExpression();
+			void				NextExpression();
+
  private:
 			void				_ParseCalcDesc(const char* keypadDescription);
 			
 			void				_PressKey(int key);
-			void				_PressKey(char* label);
+			void				_PressKey(const char* label);
+			int32				_KeyForLabel(const char* label) const;
+			void				_FlashKey(int32 key);
 			
 			void				_Colorize();
 
-			void				_Evaluate();
-			
 			void				_CreatePopUpMenu();
-			void				_InvalidateExpression();
+
+			BRect				_ExpressionRect() const;
+			BRect				_KeypadRect() const;
+
+			void				_ShowKeypad(bool show);
 
 			// grid dimensions
 			int16				fColums;
@@ -81,7 +93,9 @@ class CalcView : public BView {
 			rgb_color			fBaseColor;
 			rgb_color			fLightColor;
 			rgb_color			fDarkColor;
+			rgb_color			fButtonTextColor;
 			rgb_color			fExpressionBGColor;
+			rgb_color			fExpressionTextColor;
 
 			// view dimensions
 			float				fWidth;
@@ -93,8 +107,8 @@ class CalcView : public BView {
 			char*				fKeypadDescription;
 			CalcKey*			fKeypad;
 
-			// display text
-			BString				fExpression;
+			// expression
+			ExpressionTextView*	fExpressionTextView;
 
 			// pop-up context menu.
 			BMenuItem*			fAboutItem;
@@ -105,6 +119,7 @@ class CalcView : public BView {
 			CalcOptions*		fOptions;
 			CalcOptionsWindow*	fOptionsWindow;
 			BRect				fOptionsWindowFrame;
+			bool				fShowKeypad;
 };
 
 #endif // _CALC_VIEW_H

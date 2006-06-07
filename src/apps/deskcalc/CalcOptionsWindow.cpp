@@ -20,9 +20,44 @@
 
 CalcOptions::CalcOptions()
 	: auto_num_lock(true),
-	  audio_feedback(false)
+	  audio_feedback(false),
+	  show_keypad(true)
 {
 }
+
+
+void
+CalcOptions::LoadSettings(const BMessage* archive)
+{
+	bool option;
+
+	if (archive->FindBool("auto num lock", &option) == B_OK)
+		auto_num_lock = option;
+
+	if (archive->FindBool("audio feedback", &option) == B_OK)
+		audio_feedback = option;
+
+	if (archive->FindBool("show keypad", &option) == B_OK)
+		show_keypad = option;
+}
+
+
+status_t
+CalcOptions::SaveSettings(BMessage* archive) const
+{
+	status_t ret = archive->AddBool("auto num lock", auto_num_lock);
+
+	if (ret == B_OK)
+		ret = archive->AddBool("audio feedback", audio_feedback);
+
+	if (ret == B_OK)
+		ret = archive->AddBool("show keypad", show_keypad);
+
+	return ret;
+}
+
+
+// #pragma mark -
 
 
 CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options,
@@ -44,6 +79,8 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options,
 
 	// create interface components
 	float y = 16.0f, vw, vh;
+
+	// auto numlock
 	BRect viewframe(4.0f, y, frame.right, y + 16.0f);
 	fAutoNumLockCheckBox = new BCheckBox(viewframe,
 		"autoNumLockCheckBox", "Auto Num Lock", NULL);
@@ -53,7 +90,8 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options,
 	bg->AddChild(fAutoNumLockCheckBox);
 	fAutoNumLockCheckBox->ResizeToPreferred();
 	y += fAutoNumLockCheckBox->Frame().Height();
-	
+
+	// audio feedback
 	viewframe.Set(4.0f, y, frame.right, y + 16.0f);
 	fAudioFeedbackCheckBox = new BCheckBox(viewframe,
 		"audioFeedbackCheckBox", "Audio Feedback", NULL);
@@ -63,17 +101,29 @@ CalcOptionsWindow::CalcOptionsWindow(BRect frame, CalcOptions *options,
 	bg->AddChild(fAudioFeedbackCheckBox);
 	fAudioFeedbackCheckBox->ResizeToPreferred();
 	y += fAudioFeedbackCheckBox->Frame().Height();
+
+	// show keypad
+	viewframe.Set(4.0f, y, frame.right, y + 16.0f);
+	fShowKeypadCheckBox = new BCheckBox(viewframe,
+		"showKeypadCheckBox", "Show Keypad", NULL);
+	if (fOptions->show_keypad) {
+		fShowKeypadCheckBox->SetValue(B_CONTROL_ON);
+	}
+	bg->AddChild(fShowKeypadCheckBox);
+	fShowKeypadCheckBox->ResizeToPreferred();
+	y += fShowKeypadCheckBox->Frame().Height();
 	
 	// create buttons
 	viewframe.Set(0.0f, 0.0f, 40.0f, 40.0f);
 	fOkButton = new BButton(viewframe, "okButton", "OK",
 		new BMessage(B_QUIT_REQUESTED));
-	fOkButton->MakeDefault(true);
 	fOkButton->GetPreferredSize(&vw, &vh);
 	fOkButton->ResizeTo(vw, vh);
 	fOkButton->MoveTo(frame.right - vw - 8.0f,
 		frame.bottom - vh - 8.0f);
 	bg->AddChild(fOkButton);
+
+	fOkButton->MakeDefault(true);
 	
 	float cw, ch;
 	fCancelButton = new BButton(viewframe, "cancelButton", "Cancel",
@@ -100,6 +150,9 @@ CalcOptionsWindow::QuitRequested()
 
 	// audio feedback
 	fOptions->audio_feedback = fAudioFeedbackCheckBox->Value() == B_CONTROL_ON;
+
+	// show keypad
+	fOptions->show_keypad = fShowKeypadCheckBox->Value() == B_CONTROL_ON;
 
 	// notify target of our demise
 	if (fQuitMessage && fTarget && fTarget->Looper()) {

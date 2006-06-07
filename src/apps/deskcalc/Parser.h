@@ -40,31 +40,30 @@
 
 class Expression {
  public:
-  static double valtod(const char *exp, const char **end);
-  static double exptod(const char *exp, const char **end);
-  static std::string dtostr(const double value, const unsigned int precision, const char mode); // 0 => exp, 1 => exp3, 2 => SI
-  static int strprintf(std::string &str, const char * format, ...);
+								Expression();
 
-  Expression();
+			void				SetAglf(const double value);
+			bool				SetConstant(const char* name,
+											const double value);
 
-  void SetAglf(const double value);
-  bool SetConstant(const char *name, const double value);
-
-  double Eval(const char *exp);
-  double Eval(const char *begin, const char *end, const bool allowWhiteSpaces = false);
-  const char *Error();
+			double				Evaluate(const char* exp);
+			double				Evaluate(const char* begin, const char* end,
+										 const bool allowWhiteSpaces = false);
+			const char*			Error();
 
  private:
-  double m_aglf;
-  const char *m_errorPtr;
-  bool m_trig;
+			double				_ApplyFunction(const double x,
+											   const size_t number) const;
 
-  double func(const double x, const size_t number) const;
-  std::vector<std::string> m_functionNames;
-  std::vector<char> m_functionTypes;
+			double				fAglf;
+			const char*			fErrorPtr;
+			bool				fTrig;
 
-  std::vector<std::string> m_constantNames;
-  std::vector<double> m_constantValues;
+	std::vector<std::string>	fFunctionNames;
+	std::vector<char>			fFunctionTypes;
+
+	std::vector<std::string>	fConstantNames;
+	std::vector<double>			fConstantValues;
 };
 
 #endif // PARSER_H

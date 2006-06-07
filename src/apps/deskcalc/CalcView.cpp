@@ -27,6 +27,7 @@
 
 #include "CalcApplication.h"
 #include "CalcOptionsWindow.h"
+#include "ExpressionTextView.h"
 #include "Parser.h"
 
 
@@ -66,7 +67,7 @@ CalcView *CalcView::Instantiate(BMessage *archive)
 
 
 CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
-	: BView(frame, "calc-view", B_FOLLOW_ALL_SIDES,
+	: BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
 			B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	  fColums(5),
 	  fRows(4),
@@ -74,13 +75,11 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 	  fBaseColor(rgbBaseColor),
 	  fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
-	  fWidth(frame.Width()),
-	  fHeight(frame.Height()),
+	  fWidth(1),
+	  fHeight(1),
 
 	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
 	  fKeypad(NULL),
-
-	  fExpression(""),
 
 	  fAboutItem(NULL),
 	  fOptionsItem(NULL),
@@ -88,8 +87,13 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor)
 
 	  fOptions(new CalcOptions()),
 	  fOptionsWindow(NULL),
-	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0)
+	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0),
+	  fShowKeypad(true)
 {
+	// create expression text view
+	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
+	AddChild(fExpressionTextView);
+
 	// tell the app server not to erase our b/g
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
@@ -112,10 +116,11 @@ CalcView::CalcView(BMessage* archive)
 	  fBaseColor((rgb_color){ 128, 128, 128, 255 }),
 	  fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
+	  fWidth(1),
+	  fHeight(1),
+
 	  fKeypadDescription(strdup(kDefaultKeypadDescription)),
 	  fKeypad(NULL),
-
-	  fExpression(""),
 
 	  fAboutItem(NULL),
 	  fOptionsItem(NULL),
@@ -123,15 +128,15 @@ CalcView::CalcView(BMessage* archive)
 
 	  fOptions(new CalcOptions()),
 	  fOptionsWindow(NULL),
-	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0)
+	  fOptionsWindowFrame(30.0, 50.0, 230.0, 200.0),
+	  fShowKeypad(true)
 {
+	// create expression text view
+	fExpressionTextView = new ExpressionTextView(_ExpressionRect(), this);
+	AddChild(fExpressionTextView);
+
 	// read data from archive
 	LoadSettings(archive);
-	
-	// load frame dimensions
-	BRect frame = Frame();
-	fWidth = frame.Width();
-	fHeight = frame.Height();
 	
 	// create pop-up menu system
 	_CreatePopUpMenu();
@@ -143,6 +148,16 @@ CalcView::~CalcView()
 	delete fKeypad;
 	delete fOptions;
 	free(fKeypadDescription);
+}
+
+
+void
+CalcView::AttachedToWindow()
+{
+	SetFont(be_bold_font);
+	
+	BRect frame(Frame());
+	FrameResized(frame.Width(), frame.Height());
 }
 
 
@@ -211,6 +226,8 @@ CalcView::MessageReceived(BMessage* message)
 				BRect frame;
 				if (message->FindRect("window frame", &frame) == B_OK)
 					fOptionsWindowFrame = frame;
+
+				_ShowKeypad(fOptions->show_keypad);
 				break;
 			}
 			
@@ -225,38 +242,15 @@ CalcView::MessageReceived(BMessage* message)
 void
 CalcView::Draw(BRect updateRect)
 {
-	rgb_color rgbWhite = { 255, 255, 255, 0 };
+	if (!fShowKeypad)
+		return;
 
 	// calculate grid sizes
-	float sizeDisp = fHeight * K_DISPLAY_YPROP;
+	BRect keypadRect(_KeypadRect());
+	float sizeDisp = keypadRect.top;
 	float sizeCol = fWidth / (float)fColums;
 	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
-	
-	// setup areas
-	BRect displayRect(0.0, 0.0, fWidth, sizeDisp);
-	BRect keypadRect(0.0, sizeDisp, fWidth, fHeight);
-	
-	SetFont(be_bold_font);
-	
-	// ****** DISPLAY Area
-	if (updateRect.Intersects(displayRect)) {
 
-		// paint display b/g
-		SetHighColor(fExpressionBGColor);
-		FillRect(updateRect & displayRect);
-
-		// render display text
-		SetHighColor(rgbWhite);
-		SetLowColor(fExpressionBGColor);
-		SetDrawingMode(B_OP_COPY);
-		SetFontSize(sizeDisp * K_FONT_YPROP);
-		float baselineOffset = sizeDisp * (1.0 - K_FONT_YPROP) * 0.5;
-		DrawString(fExpression.String(),
-				   BPoint(fWidth - StringWidth(fExpression.String()),
-						  sizeDisp - baselineOffset));
-	}
-		
-	// ****** KEYPAD Area
 	if (updateRect.Intersects(keypadRect)) {
 		// TODO: support pressed keys
 
@@ -301,10 +295,10 @@ CalcView::Draw(BRect updateRect)
 		
 		// render key symbols
 		float halfSizeCol = sizeCol * 0.5f;
-		SetHighColor(rgbWhite);
+		SetHighColor(fButtonTextColor);
 		SetLowColor(fBaseColor);
 		SetDrawingMode(B_OP_COPY);
-		SetFontSize(((fHeight - sizeDisp)/(float)fRows) * K_FONT_YPROP);
+		SetFontSize(((fHeight - sizeDisp) / (float)fRows) * K_FONT_YPROP);
 		float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
 								* (1.0 - K_FONT_YPROP) * 0.5;
 		CalcKey *key = fKeypad;
@@ -347,25 +341,25 @@ CalcView::MouseDown(BPoint point)
 	// click on display, initiate drag if appropriate
 	if ((point.y - sizeDisp) < 0.0) {
 		// only drag if there's some text
-		if (fExpression.Length() > 0) {
-			// assemble drag message
-			BMessage dragmsg(B_MIME_DATA);
-			dragmsg.AddData("text/plain",
-							B_MIME_TYPE,
-							fExpression.String(), 
-							fExpression.Length());
-				
-			// initiate drag & drop
-			SetFontSize(sizeDisp * K_FONT_YPROP);
-			float left = fWidth;
-			float textWidth = StringWidth(fExpression.String());
-			if (textWidth < fWidth)
-				left -= textWidth;
-			else
-				left = 0;
-			BRect displayRect(left, 0.0, fWidth, sizeDisp);
-			DragMessage(&dragmsg, displayRect);
-		}
+//		if (fExpression.Length() > 0) {
+//			// assemble drag message
+//			BMessage dragmsg(B_MIME_DATA);
+//			dragmsg.AddData("text/plain",
+//							B_MIME_TYPE,
+//							fExpression.String(), 
+//							fExpression.Length());
+//				
+//			// initiate drag & drop
+//			SetFontSize(sizeDisp * K_FONT_YPROP);
+//			float left = fWidth;
+//			float textWidth = StringWidth(fExpression.String());
+//			if (textWidth < fWidth)
+//				left -= textWidth;
+//			else
+//				left = 0;
+//			BRect displayRect(left, 0.0, fWidth, sizeDisp);
+//			DragMessage(&dragmsg, displayRect);
+//		}
 	} else {
 		// click on keypad
 
@@ -407,7 +401,7 @@ CalcView::KeyDown(const char *bytes, int32 numBytes)
 			
 			case B_SPACE:
 			case B_ESCAPE:
-			case 'c':	// hack!
+			case 'c':
 				// translate to clear key
 				_PressKey("C");
 				break;
@@ -426,7 +420,7 @@ CalcView::KeyDown(const char *bytes, int32 numBytes)
 			default: {
 				// scan the keymap array for match
 				int keys = fRows * fColums;
-				for (int i=0; i<keys; i++) {
+				for (int i = 0; i < keys; i++) {
 					if (fKeypad[i].keymap[0] == bytes[0]) {
 						_PressKey(i);
 						return;
@@ -450,8 +444,8 @@ CalcView::MakeFocus(bool focused)
 		}
 	}
 
-	// pass on request to parent
-	BView::MakeFocus(focused);
+	// pass on request to text view
+	fExpressionTextView->MakeFocus(focused);
 }
 
 
@@ -460,6 +454,24 @@ CalcView::FrameResized(float width, float height)
 {
 	fWidth = width;
 	fHeight = height;
+
+	// layout expression text view
+	BRect frame = _ExpressionRect();
+	fExpressionTextView->MoveTo(frame.LeftTop());
+	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
+
+	frame.OffsetTo(B_ORIGIN);
+	frame.InsetBy(2, 2);
+	fExpressionTextView->SetTextRect(frame);
+
+	// configure expression text view font size and color
+	float sizeDisp = fShowKeypad ? fHeight * K_DISPLAY_YPROP : fHeight;
+	BFont font(be_bold_font);
+	font.SetSize(sizeDisp * K_FONT_YPROP);
+	fExpressionTextView->SetViewColor(fExpressionBGColor);
+	fExpressionTextView->SetLowColor(fExpressionBGColor);
+	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL, &fExpressionTextColor);
+//	fExpressionTextView->SetAlignment(B_ALIGN_RIGHT);
 }
 
 
@@ -478,9 +490,12 @@ CalcView::AboutRequested()
 status_t
 CalcView::Archive(BMessage* archive, bool deep) const
 {
+	fExpressionTextView->RemoveSelf();
+
 	// passed on request to parent
 	status_t ret = BView::Archive(archive, deep);
 
+	const_cast<CalcView*>(this)->AddChild(fExpressionTextView);
 
 	// save app signature for replicant add-on loading
     if (ret == B_OK)
@@ -502,9 +517,7 @@ void
 CalcView::Cut()
 {
 	Copy();	// copy data to clipboard
-	fExpression.SetTo(""); // remove data
-
-	_InvalidateExpression();
+	fExpressionTextView->Clear(); // remove data
 }
 
 
@@ -517,10 +530,11 @@ CalcView::Copy()
 		BMessage *clipper = be_clipboard->Data();
 		clipper->what = B_MIME_DATA;
 		// TODO: should check return for errors!
+		BString expression = fExpressionTextView->Text();
 		clipper->AddData("text/plain",
 						 B_MIME_TYPE,
-						 fExpression.String(),
-						 fExpression.Length());
+						 expression.String(),
+						 expression.Length());
 		//clipper->PrintToStream();
 		be_clipboard->Commit(); 
 		be_clipboard->Unlock(); 
@@ -564,8 +578,9 @@ CalcView::Paste(BMessage *message)
 							  B_MIME_TYPE,
 							  (const void**)&text,
 							  &numBytes) == B_OK) {
-			fExpression.Append(text, numBytes);
-			_InvalidateExpression();
+			BString temp;
+			temp.Append(text, numBytes);
+			fExpressionTextView->Insert(temp.String());
 		}
 	}
 }
@@ -614,14 +629,7 @@ CalcView::LoadSettings(BMessage* archive)
 	}
 	
 	// load options
-	const CalcOptions* options;
-	if (archive->FindData("options", B_RAW_TYPE,
-						  (const void**)&options, &size) == B_OK
-		&& size == sizeof(CalcOptions)) {
-		memcpy(fOptions, options, size);
-	} else {
-		puts("Missing options from CalcView archive.\n");
-	}
+	fOptions->LoadSettings(archive);
 
 	// load option window frame
 	BRect frame;
@@ -634,7 +642,7 @@ CalcView::LoadSettings(BMessage* archive)
 		puts("Missing display text from CalcView archive.\n");
 	} else {
 		// init expression text
-		fExpression = display;
+		fExpressionTextView->SetText(display);
 	}
 
 	// parse calculator description
@@ -668,8 +676,7 @@ CalcView::SaveSettings(BMessage* archive) const
 
 	// record current options
 	if (ret == B_OK)
-		ret = archive->AddData("options", B_RAW_TYPE,
-							   fOptions, sizeof(CalcOptions));
+		ret = fOptions->SaveSettings(archive);
 
 	// record option window frame
 	if (ret == B_OK)
@@ -677,13 +684,99 @@ CalcView::SaveSettings(BMessage* archive) const
 
 	// record display text
 	if (ret == B_OK)
-		ret = archive->AddString("displayText", fExpression.String());
+		ret = archive->AddString("displayText", fExpressionTextView->Text());
 
 	// record calculator description
 	if (ret == B_OK)
 		ret = archive->AddString("calcDesc", fKeypadDescription);
 
 	return ret;
+}
+
+
+void
+CalcView::Evaluate()
+{
+	const double EXP_SWITCH_HI = 1e12; // # digits to switch from std->exp form
+	const double EXP_SWITCH_LO = 1e-12;
+
+	BString expression = fExpressionTextView->Text();
+	expression << "\n";
+
+	if (expression.Length() == 0) {
+		beep();
+		return;
+	}
+
+	// audio feedback
+	if (fOptions->audio_feedback) {
+		BEntry zimp("zimp.AIFF");
+		entry_ref zimp_ref;
+		zimp.GetRef(&zimp_ref);
+		play_sound(&zimp_ref, true, false, false);
+	}
+
+//printf("evaluate: %s\n", expression.String());
+
+	// evaluate expression
+	Expression parser;
+
+	char* tmpstr = strdup(expression.String());
+	char* start = tmpstr;
+	char* end = start + expression.Length() - 1;
+	double value = 0.0;
+
+	try {
+		value = parser.Evaluate(start, end, true);
+	} catch (const char* error) {
+		fExpressionTextView->SetText(error);
+		return;
+	}
+
+	free(tmpstr);
+
+//printf("  -> value: %f\n", value);
+
+	// beautify the expression
+	// TODO: see if this is necessary at all
+	char buf[64];
+	if (value == 0) {
+		strcpy(buf, "0");
+	} else if (((value <  EXP_SWITCH_HI) && (value >  EXP_SWITCH_LO)) ||
+			   ((value > -EXP_SWITCH_HI) && (value < -EXP_SWITCH_LO))) {
+		// print in std form
+		sprintf(buf, "%9f", value);
+
+		// hack to remove surplus zeros!
+		if (strchr(buf, '.')) {
+			int32 i = strlen(buf) - 1;
+			for (; i > 0; i--) {
+				if (buf[i] == '0')
+					buf[i] = '\0';
+				else
+					break;
+			}
+			if (buf[i] == '.')
+				buf[i] = '\0';
+		}
+	} else {
+		// print in exponential form
+		sprintf(buf, "%e", value);
+	}
+		
+	// render new result to display
+	fExpressionTextView->SetExpression(buf);
+}
+
+
+void
+CalcView::FlashKey(const char* bytes, int32 numBytes)
+{
+	BString temp;
+	temp.Append(bytes, numBytes);
+	int32 key = _KeyForLabel(temp.String());
+	if (key >= 0)
+		_FlashKey(key);
 }
 
 
@@ -697,37 +790,37 @@ CalcView::_ParseCalcDesc(const char* keypadDescription)
 	fKeypad = new CalcKey[fRows * fColums];
 
 	// scan through calculator description and assemble keypad
-	bool scanFlag = true;
 	CalcKey *key = fKeypad;
 	const char *p = keypadDescription;
-	while (scanFlag) {
+
+	while (*p != 0) {
 		// copy label
 		char *l = key->label;
 		while (!isspace(*p))
 			*l++ = *p++;
 		*l = '\0';
-		
+
 		// set code
 		if (strcmp(key->label, "=") == 0)
 			strcpy(key->code, "\n");
 		else
 			strcpy(key->code, key->label);
-		
+
 		// set keymap
-		if (strlen(key->label)==1) {
+		if (strlen(key->label) == 1) {
 			strcpy(key->keymap, key->label);
 		} else {
 			*key->keymap = '\0';
 		} // end if
-		
+
+		// add this to the expression text view, so that it
+		// will forward the respective KeyDown event to us
+		fExpressionTextView->AddKeypadLabel(key->label);
+
 		// advance	
 		while (isspace(*p))
 			++p;
 		key++;
-		
-		// check desc termination
-		if (*p == '\0')
-			scanFlag = false;
 	}
 }
 
@@ -740,24 +833,18 @@ CalcView::_PressKey(int key)
 
 	// check for backspace
 	if (strcmp(fKeypad[key].label, "BS") == 0) {
-		int32 length = fExpression.Length();
-		if (length > 0) {
-			fExpression.Remove(length - 1, 1);
-		} else {
-			beep();
-			return; // no need to redraw
-		}
+		fExpressionTextView->BackSpace();
 	} else if (strcmp(fKeypad[key].label, "C") == 0) {
 		// C means clear
-		fExpression.SetTo("");
+		fExpressionTextView->Clear();
 	} else {
-		// append to display text
-		fExpression.Append(fKeypad[key].code);
-	
 		// check for evaluation order
 		if (fKeypad[key].code[0] == '\n') {
-			_Evaluate();
+			Evaluate();
 		} else {
+			// insert into expression text
+			fExpressionTextView->Insert(fKeypad[key].code);
+		
 			// audio feedback
 			if (fOptions->audio_feedback) {
 				BEntry zimp("key.AIFF");
@@ -769,20 +856,36 @@ CalcView::_PressKey(int key)
 	}
 
 	// redraw display
-	_InvalidateExpression();
+//	_InvalidateExpression();
 }
 
 
 void
-CalcView::_PressKey(char *label)
+CalcView::_PressKey(const char *label)
+{
+	int32 key = _KeyForLabel(label);
+	if (key >= 0)
+		_PressKey(key);
+}
+
+
+int32
+CalcView::_KeyForLabel(const char *label) const
 {
 	int keys = fRows * fColums;
 	for (int i = 0; i < keys; i++) {
 		if (strcmp(fKeypad[i].label, label) == 0) {
-			_PressKey(i);
-			return;
+			return i;
 		}
 	}
+	return -1;
+}
+
+
+void
+CalcView::_FlashKey(int32 key)
+{
+	// TODO ...
 }
 
 
@@ -799,83 +902,21 @@ CalcView::_Colorize()
 	fDarkColor.green	= (uint8)(fBaseColor.green * 0.75);
 	fDarkColor.blue		= (uint8)(fBaseColor.blue * 0.75);
 	fDarkColor.alpha	= 255;
-}
 
+	// keypad text color
+	uint8 lightness = (fBaseColor.red + fBaseColor.green + fBaseColor.blue) / 3;
+	if (lightness > 200)
+		fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
+	else
+		fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
 
-void
-CalcView::_Evaluate()
-{
-	const double EXP_SWITCH_HI = 1e12; // # digits to switch from std->exp form
-	const double EXP_SWITCH_LO = 1e-12;
-
-	if (fExpression.Length() == 0) {
-		beep();
-		return;
-	}
-
-	// audio feedback
-	if (fOptions->audio_feedback) {
-		BEntry zimp("zimp.AIFF");
-		entry_ref zimp_ref;
-		zimp.GetRef(&zimp_ref);
-		play_sound(&zimp_ref, true, false, false);
-	}
-
-//printf("evaluate: %s\n", fExpression.String());
-
-	// evaluate expression
-	Expression parser;
-
-	char* tmpstr = strdup(fExpression.String());
-	char* start = tmpstr;
-	char* end = start + fExpression.Length() - 1;
-	double value = 0.0;
-
-	try {
-		value = parser.Eval(start, end, true);
-
-	} catch (const char* error) {
-		fExpression = error;
-		_InvalidateExpression();
-		return;
-	}
-
-	free(tmpstr);
-
-//printf("  -> value: %f\n", value);
-
-	// beautify the expression
-	// TODO: see if this is necessary at all
-	char buf[64];
-	if (value == 0) {
-		strcpy(buf, "0");
-	} else if (((value <  EXP_SWITCH_HI) && (value >  EXP_SWITCH_LO)) ||
-			   ((value > -EXP_SWITCH_HI) && (value < -EXP_SWITCH_LO))) {
-		// print in std form
-		sprintf(buf, "%9lf", value);
-
-		// hack to remove surplus zeros!
-		if (strchr(buf, '.')) {
-			int32 i = strlen(buf) - 1;
-			for (; i > 0; i--) {
-				if (buf[i] == '0')
-					buf[i] = '\0';
-				else
-					break;
-			}
-			if (buf[i] == '.')
-				buf[i] = '\0';
-		}
-	} else {
-		// print in exponential form
-		sprintf(buf, "%le", value);
-	}
-		
-	// render new result to display
-	fExpression = buf;
-	
-	// redraw display
-	_InvalidateExpression();
+	// expression text color
+	lightness = (fExpressionBGColor.red +
+				 fExpressionBGColor.green + fExpressionBGColor.blue) / 3;
+	if (lightness > 200)
+		fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
+	else
+		fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };
 }
 
 
@@ -895,11 +936,47 @@ CalcView::_CreatePopUpMenu()
 }
 
 
-void
-CalcView::_InvalidateExpression()
+BRect
+CalcView::_ExpressionRect() const
 {
-	float sizeDisp = fHeight * K_DISPLAY_YPROP;
-	BRect displayRect(0.0, 0.0, fWidth, sizeDisp);
-	Invalidate(displayRect);
+	BRect r(0.0, 0.0, fWidth, fHeight);
+	if (fShowKeypad) {
+		r.bottom = floorf(fHeight * K_DISPLAY_YPROP);
+	}
+	return r;
 }
+
+
+BRect
+CalcView::_KeypadRect() const
+{
+	BRect r(0.0, 0.0, -1.0, -1.0);
+	if (fShowKeypad) {
+		r.right = fWidth;
+		r.bottom = fHeight;
+		r.top = floorf(fHeight * K_DISPLAY_YPROP) + 1;
+	}
+	return r;
+}
+
+
+void
+CalcView::_ShowKeypad(bool show)
+{
+	if (fShowKeypad == show)
+		return;
+
+	fShowKeypad = show;
+
+	float height = fShowKeypad ? fHeight / K_DISPLAY_YPROP
+							   : fHeight * K_DISPLAY_YPROP;
+
+	BWindow* window = Window();
+	if (window->Bounds() == Frame())
+		window->ResizeTo(fWidth, height);
+	else
+		ResizeTo(fWidth, height);
+}
+
+
 

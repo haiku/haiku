@@ -10,6 +10,8 @@ Application DeskCalc :
 	CalcView.cpp
 	CalcWindow.cpp
 	DeskCalc.cpp
+	ExpressionTextView.cpp
+	InputTextView.cpp
 	Parser.cpp
 	: be $(TARGET_LIBSTDC++) media
 	: DeskCalc.rdef
