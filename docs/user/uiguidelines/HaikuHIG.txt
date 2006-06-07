@@ -1,55 +1,44 @@
-Table of Contents
+Table of Contents (out of sync with real headings, but it's a start)
 -------------------------------------------------------------------
-Chapter 1: How to Design an Application Well
-	Target Audience
-	Primary and Secondary User Tasks
+Chapter 1: How to Design Software Good
+	Who Ya Writin' It Fer?
+	What will the User be Doing?
 	General Implementation
-	Actual Implementation
+	How will Your Users Do Their Work?
 
-Chapter 2: Qualities of a Good Application
-	Forgiveness
-	Implementation != Interface
-	Focuses on User Needs
-	Use of everyday language
-	Proper use of controls
-	Natural layout of controls
-	Difficult to make errors
-	Proper error handling
-	Plenty of feedback
+Chapter 2: Qualities of Good Software
+	Good Software Focuses on a User's Actual Needs
+	Good Software Uses Everyday Language
+	Good Software Does Not Expose Its Implementation
+	Good Software Uses Graphical Controls Properly
+	Good Software has a Natural Layout to its Controls
+	Good Software Gives Plenty of Feedback
+	Good Software Makes Errors Hard
+	Good Applications Handle Errors Gracefully
+	Good Software is Forgiving
 
-Chapter 3: OS Conventions
-	Application Settings and User Preferences
-	Maintain Application Responsiveness
+Chapter 3: Conventions of the Haiku Operating System
+	User Preferences: Format and Location
+	Maintain Responsiveness
 	Avoid Hardcoded File Paths
 	Make Your App's Look Fit in with Others
 	Live Updates
 	Translators
-	Queries
-	Attributes
-	System Tray
-	MIME handling
-	File picker
-	Message Handling
-	File extensions
+	Squeezing the Most out of BFS: Queries and Attributes
+	The System Tray
+	Tracker and its Uses
 
-Getting Input from the User
-	Mouse vocabulary
-	keymaps
-	Keyboard accelerators
-	Focus locking
-	Keyboardability
-	Conventions for choosing accelerators
-	Fitts' Law
+Chapter 4: Getting Input from the User
+	Mouse Vocabulary, AKA "You Want Me to What?!"
+	Keyboard accelerators: The Sports Cars of GUIs
+	Design without Throwing Fitts
 
-Drag and Drop
-	What is it
-	Appropriate use
-	drag feedback
-	drop feedback
-	clippings
-	Use of drag handles
-	Replicants
-	BShelf
+Chapter 5: Dynamic Data Exchange: Using Data Between Applications
+	The Clipboard
+	Drag and Drop
+	Replicants and BShelf
+	Messaging Across Applications
+
 
 Use of Text in the GUI
 	Labels
@@ -59,6 +48,7 @@ Use of Text in the GUI
 	Ellipses
 	Colons
 	Capitalization
+
 Icons
 	Conventions
 	Designing a good icon
@@ -102,7 +92,7 @@ Controls
 	BTextControl / BTextView
 	ListViews
 	Tabs
-	Scrollbars
+	Scrollbarsso
 	Color Pickers
 	Progress Meters
 	Toolbars
@@ -113,122 +103,240 @@ Installation and Updates
 	
 
 
-Chapter 1: How to Design an Application Well
+Chapter 1: How to Design Software Good
 
-1) Determine the Target Audience
+Haiku is an operating system which is known for its speed and being easy for anyone to use. This is partly because good programmers try to design their apps for more than just themselves. We are going to examine how you can also make your program more appealing. The reason is easy: easier to use means more people using your program. Writing good software can be hard, but it is worth the time and effort.
 
-	If you know what general kind of application you would like to create, you also need to determine who the application is meant for. This can be as general as 'desktop users' to something as specific as 'Haiku Web Developers'. Knowing who the main users of your application will be allows you to make certain assumptions about what your users know. You can't necessarily expect a musician to understand how to effectively use a 3D modelling program as advanced as, say, 3D Studio Max.
-	Depending on how concerned you are about details, you may want to create a user profile -- a fictional idea of an example user. This can be consist of one or two sentences or can be several paragraphs. A short user profile contains the person's first name, occupation, level of expertise, and what kinds of things they want to be able to do with their computer. One thing to be sure of is to make the user profile believable -- like a person you might know. In fact, when you design your app, it may be helpful if you know someone who fits into the target audience. You don't want to design you app for that person specifically, but, rather, someone just like them.
+1) Who Ya Writin' It Fer?
 
-2) Determine Primary and Secondary User Tasks
+You probably already know what kind of program you are going to write. If not, put this book away and do some thinking first -- without a clear idea of what you want, it's hard to do something about it. Once you know what general kind of program you would like to create, you also need to figure out who the program is meant for. This can be something as general as 'desktop users' to something as specific as 'Haiku Web Developers'. When you know who the main users of your program will be, you can make certain assumptions about what your users know. You can't necessarily expect a musician to understand how to effectively use a 3D modelling program as advanced as, say, 3D Studio Max.
 
-	Please remember that the reason that most people will use your application is to get work done. Your users are not unintelligent, but, rather, very busy. Remember how busy most people are and how valuable their time is to them when you are designing your application.
-	In order to make doing work with your program easier, you need to prioritize what kinds of work they will do in order of how often the work is done. Divide these tasks into primary and secondary tasks. Primary tasks are those things which the user does all the time. In a word processor, this would include typing in text, changing font sizes and styles, and adjusting margins. Secondary tasks are those which the user does occasionally.
-	Notice that there is no mention of features that the user 'might' need to have. In order for your application to be as simple to use as possible, complexity must be minimized. One primary way this is done is by avoiding features which are used only in remote instances. Design your application to meet the needs of 80 percent of your target audience. With added features comes added complexity. Also, all the features which the user needs may or may not be required for the first version. Releasing a product often is good for business.
-
-3) Construct a General Implementation
-
-	Once you know what kind of person for whom you're writing your application and what kinds of things he will be doing with it, you will need to figure out the general way that the user will do it. This does not imply what the application will actually look like – just how they will be done. In a home finance application, one of the user's primary tasks will be entering in transactions. The user will need to type in the data for each transaction or download them from their bank over the Internet.
-
-4) Devise the Actual Implementation
-
-	The actual implementation of the application is determined last. Note that what technologies will be used to create the application have not been mentioned yet, and even now they are not discussed. Technology is the means to an end – a tool – and not the end itself. This is where the general usage of the application is determined. For example, the user will have a form to enter transactions into an account. The form should have text fields for each of the different kinds of data, such as the payee, the amount, and the check number. Somewhere nearby, the user will be able to see all a list of all the transactions in the current account.  Because this is where the actual building of the look of the program takes place, it is crucial at this point in development to know and understand what makes software truly easy to use, so this is what we will examine next.
+Depending on how concerned you are about details, you may even want to create a user profile -- a fictional idea of an example user. This can be consist of just one or two sentences or can be several paragraphs. A short user profile contains the person's first name, occupation, level of expertise, and what kinds of things they want to be able to do with their computer. One thing to be sure of is to make the user profile believable -- like a person you might know. In fact, when you design your app, it may be helpful if you know someone who fits into the target audience. You don't want to design you app for that person specifically, but, rather, someone just like them.
 
 
+2) What will the User be Doing?
+
+Most people will use your software to get work done, unless, of course, you're writing the next hit game, and despite experiences you may have had which might make you wonder, users are fairly intelligent. The saying that no one reads manuals is mostly true -- people generally have better things to do than read software manuals except when either in trouble or as bathroom reading. Try to keep in mind how busy most people are and how valuable their time is to them when you are designing  your program.
+
+In order to make doing work with your program easier, you need to prioritize what kinds of work they will do in order of how often the work is done. Come up with a list of tasks the user will be doing and put them into one of 3 categories: Common, Uncommon, and Rare. Common tasks, unsurprisingly, are those things which the user does all the time. In a word processor, this would include typing in text, changing font sizes and styles, and adjusting margins. Uncommon tasks are those which the user does just from time to time. Depending on the user, this might be something like printing labels, adding color to a table, or counting the words in the document. Rare tasks are those which are done every once in a great while. Often times, these tasks are ones which the user would quite likely not miss if it were not possible to do it with your program. This would also be the kinds of things that only 20 percent of your users or less would end up using. If you do decide to include features to handle Rare tasks, think carefully about each task's importance in the grand scheme of things before deciding with any finality.
+
+In order for your software to be as simple to use as possible, you must, to paraphrase Einstein, make it as simple as possible, but not any simpler. Complexity must be kept to a minimum. One major way this can be done is by avoiding features which are used only in remote instances -- the tasks in the Rare group. Design your application to meet the needs of 80 percent of your target audience. With added features comes added complexity and with added complexity comes added difficulty. 
 
 
+3) How will Your Users Do Their Work?
 
+Once you know who your users are and what they will be doing, you will need to figure out generally how it will be done. This does not imply what your program will actually look like, however. In a home finance application, one of the user's primary tasks will be entering in transactions. The user will need to type in the data for each transaction or download them from their bank over the Internet. You need to know this kind of information for each task the user will have to perform, common or otherwise.
 
-Chapter 2: Qualities of a Good Application
+The actual implementation of the application is determined last, which is why it has not been discussed until now. Note that what technologies will be used to actually create the program have not even been mentioned yet. Technology is the means to an end � a tool -- and not the end itself. This is where the general usage of the application is determined. For example, the user will have a form to enter transactions into an account. The form should have text fields for each of the different kinds of data, such as the payee, the amount, and the check number. Somewhere nearby, the user will be able to see all a list of all the transactions in the current account.  Because this is where the actual building of the look of the program takes place, it is crucial at this point in development to know and understand what makes software truly easy to use, so this is what we will examine next.
 
-	When it comes to software, the proof is in the usage. If a piece of software requires significant time to learn, the user will only invest the time in learning it if (a) the user has no other choice but to use that particular software and (b) the importance of the need filled by the software is much greater than the importance of the user's time.
-
-Good Applications Focus on a User Actual Needs
-
-	In Chapter 1, it was mentioned that your application should meet the needs of 80 percent of your target audience. It is impossible to meet the needs of all users in the same software and still retain some semblance of being easy to use. Sometimes a user doesn't even know that he needs or doesn't need a feature and it is up to the designer and developer to figure out what is needed. Most often, it is better to have a small collection of more specialized tools than one which does everything.
-
-Good Software Uses Everyday Language
-
-	Positions in Information Technology are almost always professional positions. One aspect which makes IT a profession is that it has its own body of knowledge and terms to go with it. Most people have only a rudimentary 'computerese' vocabulary, like the fact that the thing that they look at when at the computer is called a monitor or just 'the screen', that the little arrow on the screen is called the cursor, and that the thing they type with is called a keyboard. Few users know (or care) what a 'file format' is and fewer still do not know what an 'invalid sector' on a floppy disk might be.
-	Good applications use regular language instead of technical terms. For file management software, 'volumes' are really disks – even though the term isn't quite accurate, a normal person associates a disk with 'a place you put stuff on'. Images are 'pictures'. A person doesn't 'kill' a application that has 'hung' - - he 'forces a frozen program to quit'. Details like this may seem minor, but many small improvements in a program's usability can have a profound effect overall.
-
-Good Applications Do Not Expose Their Implementation
-
-	Good applications do what they do in a certain way because it is the best way to be done, not because the code was written in a certain way. An example of this would be if a music composition program has a maximum song size because because the storage used for holding it can't store any more than that fixed size. The actual code written and the architecture used when it was written should have as little effect as possible on what the user sees and works with when using your software.
- 
-Good Applications Use Graphical Controls Properly
-
-	GUI controls were meant to be used in certain ways, and when a program does not use them in that particular way, it is confusing to the user. Check boxes, for example, are commonly used in lists where a value can be turned on or off. Sometimes, however, they are used for choosing one option in a list. Radio buttons were meant for this task. Text boxes should not be used for labelling other controls. This might seem to be common sense for most, but, rest assured, there are many programs which do not do something as simple as this.
-
-Good Applications have a Natural Layout to their Controls
-	
-	When performing certain tasks, people have a logical order that they follow, and good applications place their GUI controls in a manner that reflects this. When entering an address in the United States, the natural order is Name, Street and Number, City, State, and Zip Code. Following any other order would not only frustrate the user, but it would also lead to more mistakes in entering the proper data.
-
-Good Applications Give Plenty of Feedback
-
-	Picture this: you have just started changing the format of a movie file. You hit the button marked 'Go' and wait... and wait.. and wait. Nothing seems to have happened. Did something go wrong? You don't know, and the reason you don't know is that the program didn't tell you what it was doing. Everything was going well and was just taking a while. Good software does something that effective people do – communicate well with others. Good feedback means making sure that the user knows what your program is doing at any given time – especially if the program is busy doing something which prevents the user from doing anything else in your program. CD and DVD burning programs tell the user how much is left before they are finished making a CD or DVD. File management programs tell how many files are left to copy or move.
-
-Good Applications Make Errors Hard
-	 
-	It should be difficult for users to mess up. If, for example, the user needs to enter in some text and certain characters are not allowed, then disable those characters for the text box it needs to be entered in. Build constraints into your application which prevent errors. This would be why 3 ” floppy disks have a notch in one side – it can be inserted into a drive only one way.
-	
-Good Applications Handle Errors Gracefully
-
-	It is impossible to make an application entirely foolproof because fools are so ingenious, but it is possible for a program to handle errors in a way that doesn't leave the user wondering what happened. When code is written, errors of all sorts need to be anticipated and handled, such as lack of memory, lack of disk space, permissions errors, and loss of network connectivity. If an error condition can be forseen, it needs to be compensated for. Doing so greatly improves the perception of your software by the outside world. Crashes are unacceptable in all cases. Error messages, for example, need to describe in non-technical terms what happened and suggest what the user can do to remedy the situation. In the worst case, the program needs to provide an easy way for the user to send technical information about the problem back to you via e-mail or some other means. In all cases, the user's data is to be preserved.
-
-Good Applications are Forgiving
-
-	Computers are excellent tools for people because they are good at many things that people are not. From a perspective which focuses on technology, humans are imprecise, illogical, disorganized, and make mistakes frequently. They are, however, excellent at forming habits and matching patterns, two things computers have a difficult time doing. Make commands undoable whenever possible and when it is not possible, be sure to inform the user that such is the case.
 
 Summary
 
-	Good software takes genuine effort to produce. It is not for the stereotypical 'lazy programmer.' However, in creating something of significant value to customers, good software creates a positive image for a company and loyal customers who will do your own advertising for you.
+Careful planning is the key to writing excellent software, regardless of what stage of development a project may be in. In order to be easy, good programs only have what is really needed. They also help the user do his work wherever possible, and only by thoroughly understanding what and how work is to be done and who is doing it can a program provide the best experience possible.
 
 
 
 
-Chapter 3: OS Conventions
+Chapter 2: Qualities of Good Software
 
-When Be Inc. was still developing BeOS, it set precedents which were copied by other operating systems for years to come. Along with innovation came certain ways of performing tasks, some of which developed out of deliberate choice, some out of necessity, and some out of sheer accident. In this chapter we will take a look at some of these conventions.
-
-
-Application Settings and User Preferences
-
-While there are a myriad of ways to store user settings and preferences and the exact method was debated by engineers employed by Be, the preferred method of saving preferences is through placing them in a BMessage and flattening it to a file. This reduces the code needed to load, save, and parse settings files and frees developers to work on other tasks.
-
-The exact location used to store settings files depends on the number of files needed. If your software needs only one file and will only ever need one, then it is permissible to place it in the user's config/settings folder. Should more than one file be necessary, they may be placed in either home/config/settings/your_app_name or home/config/settings/your_company_name/your_app_name.
+	When it comes to software, the proof is in the usage. If a piece of software requires significant time to learn, the user will only invest the time in learning it if (a) he has no other choice but to use that particular software and (b) the importance of the need filled by the software is much greater than the importance of the user's time.
 
 
-Maintain Application Responsiveness
+Good Software Focuses on a User's Actual Needs
 
-Probably the best-known quality about Haiku as an operating system is its speed and responsiveness. This comes from the widespread multithreading used in applications. Note that responsiveness does not necessarily imply that your application should allow the user to do anything he/she wishes at any time. A common experience encountered by Linux and Windows users is the "blanking out" of a window or windows when the application is busy doing some other task. This comes from the thread responsible for drawing the window contents being used for other tasks, such as encoding an MP3 or some other time-consuming work. In cases like this, utilize another thread to do the actual processing and keep synchronization between the processing thread and the window by way of messages, semaphores, or some other means. This gives the user the perception that your application is still running properly and has not frozen.
+	In Chapter 1, it was mentioned that your program should meet the needs of 80 percent of your target audience. It is impossible to meet the needs of all users in the same software and still retain some semblance of being easy to use. Sometimes a user doesn't even know that he needs or doesn't need a feature and it is up to the designer and developer to figure out what is needed. Most often, it is better to have a small collection of more specialized tools than one which does everything.
+
+Good Software Uses Everyday Language
+
+	Jobs in Information Technology industry are almost always professional positions. One aspect which makes IT a profession is that it has its own body of knowledge and terminology to go with it. Most people have only a rudimentary 'computerese' vocabulary -- the thing that they look at when they use a computer is called a monitor or just 'the screen', the little arrow on the screen is called the cursor, and the thing they type with is called a keyboard. Few users know (or care) what a 'file format' is and fewer still do not know what an 'invalid sector' on a floppy disk might be.
+
+Good programs use regular language instead of technical terms. For file management software, 'volumes' are really disks � even though the term isn't quite accurate, a normal person thinks a disk is a storage container and that volume is what you have up too high at really good parties. Images are 'pictures'. A person doesn't 'kill' a application that has 'hung' -- he 'forces a frozen program to quit'. Details like this may seem minor, but many small improvements in a program's usability can have a profound effect overall. Of course, if your target audience is IT professionals, these kinds of terms are perfectly acceptable. Be sure that you match the everyday language of your audience.
+
+Good Software Does Not Expose Its Implementation
+
+Good software works a certain way because it is the best way to be done, not because the code was written in a certain way or because it was dictated by an underlying API. An example of this would be if a music composition program has an easily-reached maximum song size because the code monkey who wrote it used a 16-bit variable instead of a 32-bit one. While there are sometimes limitations that cannot be overcome, the actual code written and the architecture used when it was written should have as little effect as possible on what the user sees and works with when using your software.
+ 
+Good Software Uses Graphical Controls Properly
+
+	GUI controls were meant to be used in certain ways, and when a program does not use them in that particular way, it is confusing to the user. Check boxes, for example, are commonly used in lists where a value can be turned on or off. Some programs, however, uses them for choosing one option in a list even though radio buttons are meant for this task. Text boxes should not be used for labelling other controls. This might seem to be common sense for most, but, rest assured, there are many programs which do not do something as simple as this. In short, standard controls used in nonstandard ways are confusing.
+
+Good Software has a Natural Layout to its Controls
+	
+	When performing certain tasks, people have a logical order that they follow, and good programs place their GUI controls in a manner that reflects this. When entering an address in the United States, the natural order is Name, Street and Number, City, State, and Zip Code. Following any other order would not only frustrate the user, but it would also lead to more mistakes in entering the proper data. This also applies to the Tab navigation order of controls in a window. Generally speaking, this order should either be left-to-right, top-to-bottom or in a counter-clockwise circle, depending on how the controls themselves are placed and the expectations associated with the work to be done.
+
+Good Software Gives Plenty of Feedback
+
+Picture this: you have just started converting a movie file to another format. You hit the button marked 'Go' and wait... and wait.. and wait. You're sure you clicked the button, but nothing seems to be happening. Did something go wrong? Only after some snooping around with a file manager do you find out that everything is OK. You didn't know what was happening because the program didn't tell you what it was doing. Good software does something that effective people do � keep the lines of communication open. Good feedback just means making sure that the user knows what your program is doing at any given time, especially if the program is busy doing something which makes him wait. CD and DVD burning programs tell the user how much is left before they are finished making a CD or DVD. File management programs tell how many files are left to copy or move. Web browsers animate a little icon while they download a web page.
+
+Good Software Makes Errors Hard
+	 
+It should be tough for users to mess up. If, for example, the user needs to enter in some text and certain characters are not allowed, then disable those characters for the text box it needs to be entered in. If resizing a window horizontally should not be done for some reason, don't let the user do it. Does your program require a selection from a list before the user clicks OK? Tell the user that -- nicely, of course -- and then disable the OK button until a selection is made. Build constraints into your application which prevent errors. This would be why 3.5" floppy disks have a notch in one side � it can be inserted into a drive only one way.
+	
+Good Applications Handle Errors Gracefully
+
+It has been said that it is impossible to make an application entirely foolproof because fools are so ingenious, but it is possible for a program to handle errors in a way that doesn't leave the user wondering what happened. When code is written, errors of all sorts need to be anticipated and handled, such as lack of memory, lack of disk space, permissions errors, and loss of network connectivity. As Murphy's Law states, if something can go wrong in a given situation, it probably will. Anticipate this -- handle every error that is likely to occur with in reason. Doing so greatly improves the perception of your software by the outside world. Crashes are unacceptable in all cases. Period. Error messages, for example, need to describe at the user's level of expertise what happened and suggest what the user can do to remedy the situation. In the worst case, the program needs to provide an easy way for the user to send technical information about the problem back to you via e-mail or some other means. In all cases, the user's data is to be preserved.
+
+Good Software is Forgiving
+
+Computers are excellent tools for people because they are good at many things that people are not. From a perspective which focuses on technology, humans are imprecise, illogical, disorganized, and make mistakes frequently. They are, however, excellent at forming habits and matching patterns, two things computers have a difficult time doing. Make commands undoable whenever possible and when it is not possible, be sure to inform the user that such is the case. Utilize a computer's strengths to make up for a person's inherent weaknesses.
+
+Summary
+
+	Good software takes real work to produce. It is not for the stereotypical 'lazy programmer' unless he knows where it is acceptable to be lazy. In creating something of value to customers, good software creates a positive image for a company and loyal customers who will do your own advertising for you. The best advertising is done by your customers to their friends, family, and coworkers.
+
+
+
+
+Chapter 3: Conventions of the Haiku Operating System
+
+Just as a person generally doesn't go barging into a stranger's home and start redecorating and otherwise making himself at home merely because the owner does not own a shotgun, your program needs to have good manners in getting along with both the operating system and other programs the user has installed on the system. Some of these are merely good coding practices meant to make your job easier and others are for ensuring that your program can be more easily maintained. None of them are difficult or much work, so there. Now you have no choice but to follow them. :D
+
+
+User Preferences: Format and Location
+
+While there are lots of ways to store program settings, the easiest -- and preferred -- method is placing them in a BMessage and flattening it to a BFile. By using BMessages as your container, you don't have to concern yourself with writing and debugging other code. The exact location used to store them depends on the number of files you will need. If your software needs only one file and will only ever need one, then it is just simplest to place it in the user's config/settings folder. However, should you need more than one file, please put them in their own folder to minimize the clutter. The folder should either follow the format home/config/settings/your_app_name_here or home/config/settings/your_company_name_here/your_app_name_here.
+
+
+Maintain Responsiveness
+
+Probably the best-known quality about BeOS and Haiku as operating systems is speed. This largely comes from the extensive use of multithreading in applications. Note that responsiveness does not necessarily mean that your program should never be busy. It should just respond to input and redraw requests. A common experience encountered by Linux and Windows users is the "blanking out" of a window or an entire program because it is busy doing something else. This comes from two things: the program has one thread of execution devoted to all its windows and that thread  is busy doing some sort of time-consuming work. Instead of falling into this trap which is unprofessional for you and confusing for the user, spawn another thread to do the actual processing and allow the message-handling thread to continue to do its job. This makes sure the user knows that your application is still running properly and has not frozen.
 
 
 Avoid Hardcoded File Paths
 
-Whenever your application needs to specify a particular area on the system, make use of the find_directory() function to generate it. If and when the day comes that Haiku supports multiple users, your application will make a smooth transition to the new architecture. This will also allow for backward compatibility with older versions of BeOS, such as the change in locations for B_COMMON_FONTS_DIRECTORY being in a different place for Haiku than on R5. find_directory() is supported in both C and C++ environments.
+Whenever your program needs to specify a particular area on the system, make use of the find_directory() function to generate it. If and when the day comes that Haiku supports multiple users, your application will make a smooth transition to the new architecture. This will also allow for backward compatibility with older versions of BeOS, such as the change in locations for B_COMMON_FONTS_DIRECTORY being in a different place for Haiku than on R5. find_directory() is supported in both C and C++ environments.
+
 
 Make Your App's Look Fit in with Others
 
 Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, utilize ui_color() and the constants which go with it to set colors for the views in your application. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accomodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.
 
+
 Live Updates
 
-One way to make sure that your application communicates effectively with the user is to provide "live" updates to information in it. This mostly relates to files in the system. A good example of live updates is an address book program which automatically removes and adds entries when new People files are added to the People folder. The information doesn't even have to be data that is outside your program -- it could just be as simple as updating an entry in a list of items as the user types makes changes to it in a form in a different part of the GUI. Responsiveness like this in a program helps the user feel more in control of the work he is doing.
+One way to make sure that your application communicates effectively with the user is to provide "live" updates to information in it. This mostly relates to files in the system. A good example of l've updates is an address book program which automatically removes and adds entries when new People files are added to the People folder. The information doesn't even have to be data that is outside your program -- it could just be as simple as updating an entry in a list of items as the user types makes changes to it in a form in a different part of the GUI. Responsiveness like this in a program helps the user feel more in control of the work he is doing.
+
 
 Translators
 
-Haiku comes with quite a bit of technology that allows lazy programmers to be lazy and still have their programs be good ones. One of those ways is with the Translation Kit. Merely by including the library and making use of even something as simple as the BTranslationUtils class will help to ensure that at least this portion of your code is free of bugs.
+Haiku comes with quite a bit of technology that allows lazy programmers to be lazy and still have their programs be good ones. One of those ways is with the Translation Kit. Merely by including the library and making use of even something as simple as the BTranslationUtils class will help to ensure that at least this portion of your code is free of bugs. In general, you will probably find yourself making use of image translators most in order to load image resources that your program will use. Just remember that translators are system add-ons and that unless your program has installed a translator for a particular file format, depend only on the formats installed by default in the system. Note that because MP3 is a format which requires licensing for decoding and encoding to be legal, depending on the MP3 format is not a good idea unless your program deals specifically with it. 
 
-Squeezing the Most out of BFS: Queries, Attributes, and File Types
+Formats to prefer:
 
-The filesystem that Be created was nothing short of amazing at the time. Even with the gradual evolution of other operating systems having progressed since then, it is still one of the most powerful around. Attributes are one means
+Image: JPEG/PNG
+Sound: WAV or Ogg Vorbis
+Movie: MPEG4 or AVI
 
-Queries
-Attributes
-File extensions
 
-System Tray
-MIME handling
-File picker
-Message Handling
+Squeezing the Most out of BFS: Queries and Attributes
+
+The filesystem that Be created was nothing short of amazing at the time. Even with the gradual evolution of other operating systems having progressed since then, it is still one of the most powerful around. Attributes are a powerful tool allowing you to store data about a file without being part of the file. This kind of power is very useful for audio files, such as FLAC, Ogg Vorbis, and the ubiquitous MP3. By using attributes, you can search for them with a query. Queries are also a powerful, unique tool in the operating system. As long as the attribute you are querying for is indexed in the filesystem, there is no place a file with that attribute can hide. In addition, they are a fast way of search for files meeting a certain criteria.
+
+Although both attributes and queries are very powerful, use good sense in utilizing them. It takes quite a while to read a large number of attributes from a file, so you may wish to cache them if you are writing a program which will need to read more than just a few of them. Queries can only make use of attributes which are indexed, and their speed goes down as more and more attributes are indexed.
+
+
+The System Tray
+
+Because it can very easily become cluttered, install icons in the Deskbar's shelf only when it provides information that is updated often or if it provides functionality which will be frequently accessed by the user. Examples of these kinds of situations would be monitoring memory and processor load, checking mail, or quick access to features provided by a personal information management program. If it is unlikely that the user will need to access the information or functionality less than once per session, don't make use of the Deskbar. Accessing your program by way of the Programs menu or an icon on the desktop should be sufficient for tasks in these instances.
+
+
+Tracker and its Uses
+
+Tracker can be quite a useful tool for your program which requires little effort to provide some courtesies to the user which would otherwise be a lot of work. The Open and Save windows have already been done for you -- please use them. Note that if your user will need only a certain type of entry, such as a folder or specific type of file, take the steps to show only those types of entries. By removing unneeded items from the file navigation window, you are reducing the number of choices the user must pick from and also preventing him from opening the wrong kinds of files. Keep in mind that there may be files that may not have had their MIME type identified, so do not exclude them, e'ther. You can also make Tracker show a window for a particular folder in order to show the user where a particular file has been stored and give him access to it directly.
+
+
+
+
+
+Chapter 4: Getting Input from the User
+
+While it might seem a simple case to get input from the user, it is often not the case if you wish to account for many external factors, such as accessibility, speed, and user expertise.
+
+
+Mouse Vocabulary, AKA "You Want Me to What?!"
+
+The mouse, while the favorite rodent of most users, is not a very intuitive device -- mouse skills must be learned. Most of the time, mouse skills are not an issue because the user is clicking on buttons, menus, and so forth, but sometimes a program must deal directly with mouse clicks and moves. Mouse operations fall into one of three categories.
+
+Skills you can expect the user to have:
+1) Single-click
+2) Double-click on primary mouse button
+3) Single click with secondary mouse button
+4) Drag with primary mouse button
+
+Skills the user might have:
+1) Drag with secondary mouse button
+2) Single-click with tertiary mouse button
+3) Single-click on primary mouse button with modifier key
+4) Triple-click with primary mouse button
+5) Scroll with scroll wheel
+6) Scroll with scroll wheel and modifier key
+
+Don't Use These:
+1) Click-and-a-half: Mouse down + mouse up + drag with a second mouse down
+2) Multiple click with non-primary mouse button
+3) More than 3 consecutive clicks (quadruple clicking or more)
+4) Drag with tertiary mouse button
+5) Drag with modifier keys
+
+In the event that your program must deal with directly handling mouse input, there are certain guidelines to go by for how each of the expected skills is to be used. Single-clicks are used for the most common actions in operating a control. This would be selecting items in a list, pushing a button, choosing a menu item, and placing the blinking text cursor in a BTextView. Double-clicks are used for secondary functions, such as invoking an item in a BListView or selecting a word in a BTextView. Secondary mouse clicks (most commonly called "right-clicking") are generally used for a context-sensitive menu or, in the case of graphics programs, drawing with the secondary color. Mouse dragging is used for selecting text or moving things around. The scroll wheel by itself should be used just for scrolling, but your program may have a use for the scroll wheel when used with a modifier key, as below:
+
+Scroll Wheel +
+
+B_COMMAND_KEY:	Zoom in/out
+B_OPTION_KEY: Scroll by one full page
+B_CONTROL_KEY: Increase/decrease font size
+
+
+Keyboard accelerators: The Sports Cars of GUIs
+
+More advanced users often like using keyboard shortcuts for common tasks because they are fast -- considerable time is spent simply moving your hand from the keyboard to the mouse or vice versa. 
+
+
+Standard System Accelerators:
+
+B_COMMAND_KEY + N: New Document
+B_COMMAND_KEY + O: Open Document
+B_COMMAND_KEY + S: Save Document
+B_COMMAND_KEY + Shift + S: Save As (show Save Dialog window)
+B_COMMAND_KEY + P: Print
+B_COMMAND_KEY + W: Close Active Window
+B_COMMAND_KEY + Q: Quit
+
+B_COMMAND_KEY + C: Copy
+B_COMMAND_KEY + X: Cut
+B_COMMAND_KEY + V: Paste
+
+B_COMMAND_KEY + F: Show Find Window
+B_COMMAND_KEY + G: Repeat Last Find (Find Again)
+
+B_COMMAND_KEY + ,: Preferences / Settings
+
+B_COMMAND_KEY + B: (Word processor) Bold font
+B_COMMAND_KEY + U: (Word processor) Underline font
+B_COMMAND_KEY + I: (Word processor) Italicized font
+B_COMMAND_KEY + A: (text entry) Select All
+
+B_COMMAND_KEY + Z: Undo
+B_COMMAND_KEY + Y: Redo
+
+Tab / Shift + Tab: Keyboard navigation
+
+B_CONTROL_KEY + Tab: Switch programs
+
+
+When choosing keyboard accelerators for your program, use them only for commonly-used tasks. Do not use one of the system combinations for a task different from the list above -- it will only confuse and frustrate users. Also, try to keep the number of them small with an immediately memorable association between the combination and the function that goes with it. For example, Tracker uses Alt + Up to g' to the parent folder of the current window.
+
+
+Design without Throwing Fitts
+
+
+According to Mr. Fitts, when using a mouse, the amount of time it takes to point to something is proportional to how far away that something is and how big it is. Duh. While it might seem obvious, this is often overlooked when the GUI to a program is designed. The easiest places for a user to click are the four corners of the screen and the pixel directly under the cursor. The reason for this is because the mouse need not be moved for to click on the pixel under it and the user does not have to think much when moving the cursor to a corner because as soon as it reaches an edge, it cannot go beyond the edge of the screen, regardless of how much the mouse is moved. This is the reason that the Deskbar is in one corner of the screen.
+
+When you design the graphical interface for your program, make controls easy to click on. Toolbars that have labels for each button are inherently better because the labels add to the size of the buttons, making them easier to click. A number of existing image editing programs utilize the secondary mouse button for a pop-up menu to access common features because the mouse doesn't have to move in order to bring the menu up. Researchers have even experimented with circular menus -- called pie menus -- which capitalize on Fitts' Law in order to make a menu as fast as possible. Your program need not go to such measures, but do keep in mind that teeny targets make for slower usage.
+
+
+Chapter 5: Dynamic Data Exchange: Using Data Between Applications
+	The Clipboard
+	Drag and Drop
+	Replicants and BShelf
+	Messaging Across Applications
