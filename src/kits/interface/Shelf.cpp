@@ -470,31 +470,53 @@ BShelf::Instantiate(BMessage *data)
 void
 BShelf::MessageReceived(BMessage *msg)
 {
+	if (!msg->HasSpecifiers()) {
+		BHandler::MessageReceived(msg);
+	}
+	
 	BMessage replyMsg(B_REPLY);
-	bool handled = false;
-
-	switch (msg->what) {
-		case B_GET_PROPERTY:
-		case B_SET_PROPERTY: {
-			BMessage specifier;
-			int32 what;
-			const char *prop;
-			int32 index;
-
-			if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+	status_t err = B_BAD_SCRIPT_SYNTAX;
+	
+	BMessage specifier;
+	int32 what;
+	const char *prop;
+	int32 index;
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) == B_OK) {
+		switch (msg->what) {
+			case B_GET_PROPERTY:
+				if (strcmp(prop, "Replicant") == 0) {
+					BView *replicant = NULL;
+					ReplicantAt(index, &replicant, NULL, &err);
+					if (err == B_OK && replicant) {
+						BMessage archive;
+						err = replicant->Archive(&archive);
+						if (err == B_OK)
+							err = replyMsg.AddMessage("result", &archive);
+					}
+				}
 				break;
+			case B_DELETE_PROPERTY:
+				if (strcmp(prop, "Replicant") == 0) {
+					err = DeleteReplicant(index);
+				}
+				break;
+			case B_COUNT_PROPERTIES:
+				if (strcmp(prop, "Replicant") == 0) {
+					err = replyMsg.AddInt32("result", CountReplicants());
+				}
+				break;
+		};
+	}
 
-			break;
-		}
-	};
-	if (handled) {
-		if (msg->what == B_SET_PROPERTY)
-			replyMsg.AddInt32("error", B_OK);
-		} else {
-			replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-			replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-			replyMsg.AddString("message", "Didn't understand the specifier(s)");
-		}
+	if (err == B_BAD_SCRIPT_SYNTAX) {
+		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
+		replyMsg.AddString("message", "Didn't understand the specifier(s)");
+	} else if (err < B_OK) {
+		replyMsg.what = B_ERROR;
+		replyMsg.AddString("message", strerror(err));			
+	}
+		
+	replyMsg.AddInt32("error", err);
 	msg->SendReply(&replyMsg);
 }
 
