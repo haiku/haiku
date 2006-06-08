@@ -948,7 +948,11 @@ add_message_contents(BList *textlist, BMessage *msg, int32 level)
 	int32 count;
 	int32 i, sizefound, j;
 	ulong typefound;
+#ifdef HAIKU_TARGET_PLATFORM_DANO
 	const char *namefound;
+#else
+	char *namefound;
+#endif
 	void *voidptr;
 	BMessage a_message;
 	char *textline, *datatype, *content;
@@ -1306,8 +1310,8 @@ format_data(int32 type, char *ptr, long size)
 									case B_REVERSE_INDEX_SPECIFIER: strcat(str, "REV.INDEX "); break;
 									case B_RANGE_SPECIFIER: strcat(str, "RANGE "); break;
 									case B_REVERSE_RANGE_SPECIFIER: strcat(str, "REV.RANGE "); break;
-									case B_NAME_SPECIFIER: strcat(str, "NAME"); break;
-									case B_ID_SPECIFIER: strcat(str, "ID"); break;
+									case B_NAME_SPECIFIER: strcat(str, "NAME "); break;
+									case B_ID_SPECIFIER: strcat(str, "ID "); break;
 									default: strcat(str, "<NONE> "); break;
 								}
 							}
