@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
+ * 		Jerome Duval
  */
 
 
@@ -949,15 +950,88 @@ bool
 BApplication::ScriptReceived(BMessage *message, int32 index,
 	BMessage *specifier, int32 what, const char *property)
 {
-	// TODO: Implement
-	printf("message:\n");
-	message->PrintToStream();
-	printf("index: %ld\n", index);
-	printf("specifier:\n");
-	specifier->PrintToStream();
-	printf("what: %ld\n", what);
-	printf("property: %s\n", property ? property : "");
-	return false;
+	BMessage reply(B_REPLY);
+	status_t err = B_BAD_SCRIPT_SYNTAX;
+
+	switch (what) {
+		case B_GET_PROPERTY:
+			if (strcmp("Loopers", property) == 0) {
+				int32 count = CountLoopers();
+				err = B_OK;
+				for (int32 i=0; err == B_OK && i<count; i++) {
+					BMessenger messenger(LooperAt(i));
+					err = reply.AddMessenger("result", messenger);
+				}
+				
+			} else if (strcmp("Windows", property) == 0) {
+				int32 count = CountWindows();
+				err = B_OK;
+				for (int32 i=0; err == B_OK && i<count; i++) {
+					BMessenger messenger(WindowAt(i));
+					err = reply.AddMessenger("result", messenger);
+				}
+			} else if (strcmp("Window", property) == 0) {
+				switch (specifier->what) {
+				case B_INDEX_SPECIFIER: {
+					int32 ind = -1;
+					if (specifier->FindInt32("index", &ind)!=B_OK)
+						break;
+					BWindow *win = WindowAt(ind);
+					if (!win) {
+						break;
+					}
+					BMessenger messenger(win);
+					err = reply.AddMessenger("result", messenger);
+					break;
+				}
+				case B_REVERSE_INDEX_SPECIFIER: {
+					int32 rindex;
+					if (specifier->FindInt32("index", &rindex) != B_OK)
+						break;
+					BWindow *win = WindowAt(CountWindows() - rindex);
+					if (!win) {
+						break;
+					}
+					BMessenger messenger(win);
+					err = reply.AddMessenger("result", messenger);
+                        		break;
+				}
+				case B_NAME_SPECIFIER: {
+					const char *name;
+					err = specifier->FindString("name", &name);
+					if (err != B_OK)
+						break;
+					err = B_NAME_NOT_FOUND;
+					for (int32 i=0; i<CountWindows(); i++) {
+						BWindow *win = WindowAt(i);
+                                		if (win && win->Name() && strlen(win->Name()) == strlen(name)
+							&& !strcmp(win->Name(), name)) {
+							BMessenger messenger(win);
+							err = reply.AddMessenger("result", messenger);
+                                                	break;
+						}
+                                        }
+				}
+				}
+			}
+			break;
+		case B_COUNT_PROPERTIES:
+			if (strcmp("Looper", property) == 0) {
+				err = reply.AddInt32("result", CountLoopers());
+			} else if (strcmp("Window", property) == 0) {
+				err = reply.AddInt32("result", CountWindows());
+			}
+			break;
+	}
+	if (err == B_BAD_SCRIPT_SYNTAX)
+		return false;
+	if (err < B_OK) {
+                reply.what = B_ERROR;
+                reply.AddString("message", strerror(err));
+        }
+	reply.AddInt32("error", err);
+	message->SendReply(&reply);
+	return true;
 }
 
 
