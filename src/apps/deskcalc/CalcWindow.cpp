@@ -44,6 +44,8 @@ CalcWindow::CalcWindow(BRect frame)
 	// attach views
 	AddChild(fCalcView);
 	fCalcView->AddChild(dragger);
+
+	SetSizeLimits(50.0, 400.0, 22.0, 400.0);
 }
 
 

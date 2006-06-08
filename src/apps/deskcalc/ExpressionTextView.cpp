@@ -31,11 +31,10 @@ ExpressionTextView::ExpressionTextView(BRect frame, CalcView* calcView)
 	  fHistoryPos(0),
 	  fCurrentExpression("")
 {
-	SetFont(be_bold_font);
-//	SetAlignment(B_ALIGN_RIGHT);
 	SetStylable(false);
 	SetDoesUndo(true);
 	SetColorSpace(B_RGB32);
+	SetFontAndColor(be_bold_font, B_FONT_ALL);
 }
 
 

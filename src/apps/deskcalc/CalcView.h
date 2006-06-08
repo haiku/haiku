@@ -107,6 +107,9 @@ class CalcView : public BView {
 			char*				fKeypadDescription;
 			CalcKey*			fKeypad;
 
+			// icon
+			BBitmap*			fCalcIcon;
+
 			// expression
 			ExpressionTextView*	fExpressionTextView;
 
