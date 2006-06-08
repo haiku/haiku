@@ -22,7 +22,7 @@ BinCommand screen_blanker :
 
 SEARCH on [ FGristFiles
 		ScreenSaver.cpp
-	] = [ FDirName $(OBOS_TOP) src kits screensaver ] ;
+	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
 
 Package haiku-screensaverkit-cvs :
 	screen_blanker :
