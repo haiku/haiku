@@ -5,6 +5,7 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval
  */
 
 /*!	BShelf stores replicant views that are dropped onto it */
@@ -375,7 +376,7 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		}
 	
 	} else {
-		if (fShelf->_AddReplicant(msg, &point, 0) == B_OK)
+		if (fShelf->_AddReplicant(msg, &point, fShelf->fGenCount++) == B_OK)
 			Looper()->DetachCurrentMessage();
 	}
 
@@ -470,10 +471,6 @@ BShelf::Instantiate(BMessage *data)
 void
 BShelf::MessageReceived(BMessage *msg)
 {
-	if (!msg->HasSpecifiers()) {
-		BHandler::MessageReceived(msg);
-	}
-	
 	BMessage replyMsg(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
 	
@@ -481,32 +478,78 @@ BShelf::MessageReceived(BMessage *msg)
 	int32 what;
 	const char *prop;
 	int32 index;
-	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) == B_OK) {
-		switch (msg->what) {
-			case B_GET_PROPERTY:
-				if (strcmp(prop, "Replicant") == 0) {
-					BView *replicant = NULL;
-					ReplicantAt(index, &replicant, NULL, &err);
-					if (err == B_OK && replicant) {
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK) {
+		BHandler::MessageReceived(msg);
+		return;
+	}
+	switch (msg->what) {
+		case B_DELETE_PROPERTY:
+		case B_GET_PROPERTY:
+		case B_GET_SUPPORTED_SUITES:
+			if (strcmp(prop, "Replicant") == 0) {
+				BMessage reply;
+				int32 i;
+				uint32 ID;
+				BView *replicant = NULL;
+				BMessage *repMessage = NULL;
+				err = _GetProperty(&specifier, &reply);
+				if (err == B_OK)
+					err = reply.FindInt32("index", &i);
+				bool popped = (msg->PopSpecifier()==B_OK);
+				if (err == B_OK && !popped && msg->what == B_DELETE_PROPERTY) { // Delete Replicant
+					err = DeleteReplicant(i);
+					break;
+				}
+				if (err == B_OK && popped 
+					&& msg->what == B_GET_SUPPORTED_SUITES) {
+					err = replyMsg.AddString("suites", "suite/vnd.Be-replicant");
+					if (err == B_OK) {
+						BPropertyInfo propInfo(sReplicantPropertyList);
+						err = replyMsg.AddFlat("messages", &propInfo);
+					}
+					break;
+				}
+				if (err == B_OK)
+					repMessage = ReplicantAt(i, &replicant, &ID, &err);
+				if (err == B_OK && replicant) {
+					if (!popped) { // Get Replicant
 						BMessage archive;
 						err = replicant->Archive(&archive);
 						if (err == B_OK)
 							err = replyMsg.AddMessage("result", &archive);
+						break;
+					}
+					// now handles the replicant suite
+					err = B_BAD_SCRIPT_SYNTAX;
+					if (msg->what != B_GET_PROPERTY)
+						break;
+					if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+						break;
+					if (strcmp(prop, "ID") == 0) {
+						err = replyMsg.AddInt32("result", ID);
+					} else if (strcmp(prop, "Name") == 0) {
+						err = replyMsg.AddString("result", replicant->Name());
+					} else if (strcmp(prop, "Signature") == 0) {
+						const char *add_on = NULL;
+						err = repMessage->FindString("add_on", &add_on);
+						if (err == B_OK)
+							err = replyMsg.AddString("result", add_on);
+					} else if (strcmp(prop, "Suites") == 0) {
+						err = replyMsg.AddString("suites", "suite/vnd.Be-replicant");
+						if (err == B_OK) {
+							BPropertyInfo propInfo(sReplicantPropertyList);
+							err = replyMsg.AddFlat("messages", &propInfo);
+						}
 					}
 				}
-				break;
-			case B_DELETE_PROPERTY:
-				if (strcmp(prop, "Replicant") == 0) {
-					err = DeleteReplicant(index);
-				}
-				break;
-			case B_COUNT_PROPERTIES:
-				if (strcmp(prop, "Replicant") == 0) {
-					err = replyMsg.AddInt32("result", CountReplicants());
-				}
-				break;
-		};
-	}
+			}
+			break;
+		case B_COUNT_PROPERTIES:
+			if (strcmp(prop, "Replicant") == 0) {
+				err = replyMsg.AddInt32("result", CountReplicants());
+			}
+			break;
+	};
 
 	if (err == B_BAD_SCRIPT_SYNTAX) {
 		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
@@ -570,46 +613,33 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	switch (shelfPropInfo.FindMatch(msg, 0, specifier, form, property)) {
 		case 0:
 		case 1:
-			target = this;
-			break;
-		case 2: {
-			uint32 ID;
-			status_t err = B_ERROR;
-			switch (msg->what) {
-				case B_INDEX_SPECIFIER:	{
-					int32 index;
-					if (msg->FindInt32("data", &index)!=B_OK) 
-						break;
-					ReplicantAt(index, &replicant, &ID, &err);
-					break;
-				}
-				case B_REVERSE_INDEX_SPECIFIER:	{
-					int32 rindex;
-					if (msg->FindInt32("data", &rindex) != B_OK)
-						break;
-					ReplicantAt(CountReplicants() - rindex, &replicant, &ID, &err);
-					break;
-				}
-				case B_NAME_SPECIFIER: {
-					const char *name;
-					if (msg->FindString("data", &name) != B_OK)
-						break;
-					for (int32 i=0; i<CountReplicants(); i++) {
-						BView *view = NULL;
-						ReplicantAt(i, &view, &ID, &err);
-						if (err == B_OK && view->Name() != NULL && !strcmp(view->Name(), name)) {
-							replicant = view;
-							break;
-						}
-					}
-					break;
-				}
-				default:
-					break;
+			if (msg->PopSpecifier() != B_OK ) {
+				target = this;
+				break;
 			}
+			msg->SetCurrentSpecifier(index);
+			// fall through
+		case 2: {
+			BMessage reply;
+			status_t err = _GetProperty(specifier, &reply);
+			int32 i;
+			uint32 ID;
+			if (err == B_OK)
+				err = reply.FindInt32("index", &i);
+			if (err == B_OK)
+				ReplicantAt(i, &replicant, &ID, &err);
 
-			if (replicant != NULL) {
+			if (err == B_OK && replicant != NULL) {
 				msg->PopSpecifier();
+				if (msg->what == B_GET_SUPPORTED_SUITES) {
+					bool popped = msg->PopSpecifier() == B_OK;
+					msg->SetCurrentSpecifier(index);
+					if (!popped) {
+						replicant = NULL;
+						target = this;
+					} else
+						msg->PopSpecifier();
+				}
 			} else {
 				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
 				replyMsg.AddInt32("error", B_BAD_INDEX);
@@ -627,10 +657,10 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 			property);
 	}
 
-	msg->GetCurrentSpecifier(&index);
-	status_t err = msg->GetCurrentSpecifier(&index, specifier, &form, &property);
+	int32 repIndex;
+	status_t err = msg->GetCurrentSpecifier(&repIndex, specifier, &form, &property);
 	if (err) {
-		BMessage reply(B_REPLY);
+		BMessage reply(B_ERROR);
 		reply.AddInt32("error", err);
 		msg->SendReply(&reply);
 		return NULL;
@@ -642,14 +672,23 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 		case 1:
 		case 2:
 		case 3:
+			msg->SetCurrentSpecifier(index);
 			target = this;
+			break;
 		case 4:
 			target = replicant;
+			msg->PopSpecifier();
+			break;
 		default:
 			break;
 	}
+	if (!target) {
+		BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
+		replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
+		replyMsg.AddString("message", "Didn't understand the specifier(s)");
+		msg->SendReply(&replyMsg);
+	}
 	return target;
-
 }
 
 
@@ -789,7 +828,7 @@ BShelf::SaveLocation(entry_ref *ref) const
 status_t
 BShelf::AddReplicant(BMessage *data, BPoint location)
 {
-	return _AddReplicant(data, &location, 0);
+	return _AddReplicant(data, &location, fGenCount++);
 }
 
 
@@ -1209,6 +1248,67 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 status_t
 BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 {
-	//TODO: Implement
-	return B_ERROR;
+	uint32 ID;
+	status_t err = B_ERROR;
+	BView *replicant = NULL;
+	switch (msg->what) {
+		case B_INDEX_SPECIFIER:	{
+			int32 index = -1;
+			if (msg->FindInt32("index", &index)!=B_OK) 
+				break;
+			ReplicantAt(index, &replicant, &ID, &err);
+			break;
+		}
+		case B_REVERSE_INDEX_SPECIFIER:	{
+			int32 rindex;
+			if (msg->FindInt32("index", &rindex) != B_OK)
+				break;
+			ReplicantAt(CountReplicants() - rindex, &replicant, &ID, &err);
+			break;
+		}
+		case B_NAME_SPECIFIER: {
+			const char *name;
+			if (msg->FindString("name", &name) != B_OK)
+				break;
+			for (int32 i=0; i<CountReplicants(); i++) {
+				BView *view = NULL;
+				ReplicantAt(i, &view, &ID, &err);
+				if (err == B_OK) {
+					if (view->Name() != NULL && 
+						strlen(view->Name()) == strlen(name) && !strcmp(view->Name(), name)) {
+						replicant = view;
+						break;
+					}
+					err = B_NAME_NOT_FOUND;
+				}
+			}
+			break;
+		}
+		case B_ID_SPECIFIER: {
+			uint32 id;
+			if (msg->FindInt32("id", (int32 *)&id) != B_OK)
+				break;
+			for (int32 i=0; i<CountReplicants(); i++) {
+				BView *view = NULL;
+				ReplicantAt(i, &view, &ID, &err);
+				if (err == B_OK) {
+					if (ID == id) {
+						replicant = view;
+						break;
+					}
+					err = B_NAME_NOT_FOUND;
+				}
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+	if (replicant) {
+		reply->AddInt32("index", IndexOf(replicant));
+		reply->AddInt32("ID", ID);
+	}
+
+	return err;
 }
