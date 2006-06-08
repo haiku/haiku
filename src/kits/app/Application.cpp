@@ -621,11 +621,16 @@ BApplication::AboutRequested()
 
 
 BHandler *
-BApplication::ResolveSpecifier(BMessage *msg, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BApplication::ResolveSpecifier(BMessage *message, int32 index,
+        BMessage *specifier, int32 what, const char *property)
 {
-	// ToDo: implement ResolveSpecifier()!
-	return NULL;
+	BPropertyInfo propInfo(sPropertyInfo);
+
+	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
+		return this;
+
+	return BLooper::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 
