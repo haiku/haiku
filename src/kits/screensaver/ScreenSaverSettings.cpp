@@ -36,7 +36,7 @@ ScreenSaverSettings::ScreenSaverSettings()
 
 //! Load the flattened settings BMessage from disk and parse it.
 bool
-ScreenSaverSettings::LoadSettings() 
+ScreenSaverSettings::Load() 
 {
 	BFile file(fSettingsPath.Path(), B_READ_ONLY);
 	if (file.InitCheck() != B_OK)
@@ -48,31 +48,47 @@ ScreenSaverSettings::LoadSettings()
 
 	PRINT_OBJECT(fSettings);
 
-	fSettings.FindRect("windowframe", &fWindowFrame);
-	fSettings.FindInt32("windowtab", &fWindowTab);
-	fSettings.FindInt32("timeflags", &fTimeFlags);
+	BRect rect;
+	if (fSettings.FindRect("windowframe", &rect) == B_OK)
+		fWindowFrame = rect;
+	int32 value;
+	if (fSettings.FindInt32("windowtab", &value) == B_OK)
+		fWindowTab = value;
+	if (fSettings.FindInt32("timeflags", &value) == B_OK)
+		fTimeFlags = value;
 
-	int32 blank_time, standByTime, suspendTime, offTime, passwordTime;
-	if (fSettings.FindInt32("timefade", &blank_time) == B_OK)
-		fBlankTime = blank_time * 1000000LL;
-	if (fSettings.FindInt32("timestandby", &standByTime) == B_OK)
-		fStandByTime = standByTime * 1000000LL;
-	if (fSettings.FindInt32("timesuspend", &suspendTime) == B_OK)
-		fSuspendTime = suspendTime * 1000000LL;
-	if (fSettings.FindInt32("timeoff", &offTime) == B_OK)
-		fOffTime = offTime * 1000000LL;
-	fSettings.FindInt32("cornernow", (int32*)&fBlankCorner);
-	fSettings.FindInt32("cornernever", (int32*)&fNeverBlankCorner);
-	fSettings.FindBool("lockenable", &fLockEnabled);
-	if (fSettings.FindInt32("lockdelay", &passwordTime) == B_OK)
-		fPasswordTime = passwordTime * 1000000LL;
-	fSettings.FindString("lockpassword", &fPassword);
-	fSettings.FindString("lockmethod", &fLockMethod);
-	fSettings.FindString("modulename", &fModuleName);
+	if (fSettings.FindInt32("timefade", &value) == B_OK)
+		fBlankTime = value * 1000000LL;
+	if (fSettings.FindInt32("timestandby", &value) == B_OK)
+		fStandByTime = value * 1000000LL;
+	if (fSettings.FindInt32("timesuspend", &value) == B_OK)
+		fSuspendTime = value * 1000000LL;
+	if (fSettings.FindInt32("timeoff", &value) == B_OK)
+		fOffTime = value * 1000000LL;
+
+	if (fSettings.FindInt32("cornernow", &value) == B_OK)
+		fBlankCorner = (screen_corner)value;
+	if (fSettings.FindInt32("cornernever", &value) == B_OK)
+		fNeverBlankCorner = (screen_corner)value;
+
+	bool lockEnabled;
+	if (fSettings.FindBool("lockenable", &lockEnabled) == B_OK)
+		fLockEnabled = lockEnabled;
+	if (fSettings.FindInt32("lockdelay", &value) == B_OK)
+		fPasswordTime = value * 1000000LL;
+	const char* string;
+	if (fSettings.FindString("lockpassword", &string) == B_OK)
+		fPassword = string;
+	if (fSettings.FindString("lockmethod", &string) == B_OK)
+		fLockMethod = string;
+
+	if (fSettings.FindString("modulename", &string) == B_OK)
+		fModuleName = string;
 
 	if (IsNetworkPassword()) {
 		FILE *networkFile = NULL;
 		char buffer[512], *start;
+		// TODO: this only works under R5 net_server!
 		// This ugly piece opens the networking file and reads the password, if it exists.
 		if ((networkFile = fopen(fNetworkPath.Path(),"r")))
 		while (fgets(buffer, 512, networkFile) != NULL) {
@@ -100,8 +116,8 @@ ScreenSaverSettings::Defaults()
 	fStandByTime = 120*1000000LL;
 	fSuspendTime = 120*1000000LL;
 	fOffTime = 120*1000000LL;
-	fBlankCorner = NONE;
-	fNeverBlankCorner = NONE;
+	fBlankCorner = NO_CORNER;
+	fNeverBlankCorner = NO_CORNER;
 	fLockEnabled = false;
 	fPasswordTime = 120*1000000LL;
 	fPassword = "";
@@ -111,7 +127,7 @@ ScreenSaverSettings::Defaults()
 
 
 BMessage &
-ScreenSaverSettings::GetSettings()
+ScreenSaverSettings::Message()
 {
 	// We can't just empty the message, because the module states are stored
 	// in this message as well.
@@ -153,7 +169,7 @@ ScreenSaverSettings::GetSettings()
 
 
 status_t
-ScreenSaverSettings::GetState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::GetModuleState(const char *name, BMessage *stateMsg) 
 {
 	BString stateName("modulesettings_");
 	stateName += name;
@@ -162,7 +178,7 @@ ScreenSaverSettings::GetState(const char *name, BMessage *stateMsg)
 
 
 void
-ScreenSaverSettings::SetState(const char *name, BMessage *stateMsg) 
+ScreenSaverSettings::SetModuleState(const char *name, BMessage *stateMsg) 
 {
 	BString stateName("modulesettings_");
 	stateName += name;
@@ -172,9 +188,9 @@ ScreenSaverSettings::SetState(const char *name, BMessage *stateMsg)
 
 
 void 
-ScreenSaverSettings::SaveSettings() 
+ScreenSaverSettings::Save() 
 {
-  	BMessage &settings = GetSettings();
+  	BMessage &settings = Message();
 	PRINT_OBJECT(settings);
 	BFile file(fSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() != B_OK || settings.Flatten(&file) != B_OK)

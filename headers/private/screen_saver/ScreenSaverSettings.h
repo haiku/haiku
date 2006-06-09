@@ -12,12 +12,12 @@
 
 
 enum screen_corner {
-	NONE = -1,
-	UPLEFT,
-	UPRIGHT,
-	DOWNRIGHT,
-	DOWNLEFT,
-	CENTER
+	NO_CORNER = -1,
+	UP_LEFT_CORNER,
+	UP_RIGHT_CORNER,
+	DOWN_RIGHT_CORNER,
+	DOWN_LEFT_CORNER,
+	CENTER_CORNER
 };
 
 // time flags
@@ -37,7 +37,8 @@ class ScreenSaverSettings {
 	public:
 		ScreenSaverSettings();
 
-		bool LoadSettings();
+		bool Load();
+		void Save();
 		void Defaults();
 		BPath& Path() { return fSettingsPath; }
 
@@ -49,15 +50,15 @@ class ScreenSaverSettings {
 		bigtime_t SuspendTime() { return fSuspendTime; }
 		bigtime_t OffTime() { return fOffTime; }
 
-		screen_corner GetBlankCorner() { return fBlankCorner; }
-		screen_corner GetNeverBlankCorner() { return fNeverBlankCorner; }
+		screen_corner BlankCorner() { return fBlankCorner; }
+		screen_corner NeverBlankCorner() { return fNeverBlankCorner; }
 		bool LockEnable() { return fLockEnabled; }
 		bigtime_t PasswordTime() { return fPasswordTime; }
 		const char *Password() { return fPassword.String(); }
 		const char *LockMethod() { return fLockMethod.String(); }
 		bool IsNetworkPassword() { return strcmp(fLockMethod.String(), "custom") != 0; }
 		const char *ModuleName() { return fModuleName.String(); }
-		status_t GetState(const char *name, BMessage *stateMsg);
+		status_t GetModuleState(const char *name, BMessage *stateMsg);
 
 		void SetWindowFrame(const BRect &fr) { fWindowFrame = fr; }
 		void SetWindowTab(int32 tab) { fWindowTab = tab; }
@@ -74,9 +75,9 @@ class ScreenSaverSettings {
 			// Cannot set network password from here.
 		void SetLockMethod(const char *method) { fLockMethod = method; }
 		void SetModuleName(const char *mn) { fModuleName = mn; }
-		void SetState(const char *name, BMessage *stateMsg);
-		void SaveSettings();
-		BMessage& GetSettings();
+		void SetModuleState(const char *name, BMessage *stateMsg);
+
+		BMessage& Message();
 
 	private:
 		BRect fWindowFrame;

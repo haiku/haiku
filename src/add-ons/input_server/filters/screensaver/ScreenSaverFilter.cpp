@@ -101,7 +101,7 @@ ScreenSaverFilter::ScreenSaverFilter()
 	fLastEventTime(0),
 	fBlankTime(0),
 	fSnoozeTime(0),
-	fCurrentCorner(NONE),
+	fCurrentCorner(NO_CORNER),
 	fEnabled(false),
 	fFrameNum(0),
 	fRunner(NULL),
@@ -192,10 +192,10 @@ ScreenSaverFilter::ReloadSettings()
 		return;
 	}
 
-	fSettings.LoadSettings();
+	fSettings.Load();
 
-	fBlankCorner = fSettings.GetBlankCorner();
-	fNeverBlankCorner = fSettings.GetNeverBlankCorner();
+	fBlankCorner = fSettings.BlankCorner();
+	fNeverBlankCorner = fSettings.NeverBlankCorner();
 	fBlankTime = fSnoozeTime = fSettings.BlankTime();
 	CheckTime();
 
@@ -274,19 +274,19 @@ ScreenSaverFilter::_ScreenCorner(screen_corner corner, uint32 cornerSize)
 	BRect frame = BScreen().Frame();
 
 	switch (corner) {
-		case UPLEFT:
+		case UP_LEFT_CORNER:
 			return BRect(frame.left, frame.top, frame.left + cornerSize - 1,
 				frame.top + cornerSize - 1);
 
-		case UPRIGHT:
+		case UP_RIGHT_CORNER:
 			return BRect(frame.right - cornerSize + 1, frame.top, frame.right,
 				frame.top + cornerSize - 1);
 
-		case DOWNRIGHT:
+		case DOWN_RIGHT_CORNER:
 			return BRect(frame.right - cornerSize + 1, frame.bottom - cornerSize + 1,
 				frame.right, frame.bottom);
 
-		case DOWNLEFT:
+		case DOWN_LEFT_CORNER:
 			return BRect(frame.left, frame.bottom - cornerSize + 1,
 				frame.left + cornerSize - 1, frame.bottom);
 
@@ -330,7 +330,7 @@ ScreenSaverFilter::Filter(BMessage *message, BList *outList)
 			if (fNeverBlankRect.Contains(where))
 				fCurrentCorner = fNeverBlankCorner;
 			else
-				fCurrentCorner = NONE;
+				fCurrentCorner = NO_CORNER;
 			break;
 		}
 

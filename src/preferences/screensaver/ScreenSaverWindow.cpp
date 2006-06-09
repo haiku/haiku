@@ -34,9 +34,6 @@
 
 #include <stdio.h>
 
-#include <Debug.h>
-#define CALLED() PRINT(("%s\n", __PRETTY_FUNCTION__))
-
 
 const uint32 kPreviewMonitorGap = 16;
 const uint32 kMinSettingsWidth = 230;
@@ -54,7 +51,11 @@ const int32 kMsgEnableScreenSaverBox = 'ESCH';
 const int32 kMsgTurnOffCheckBox = 'TUOF';
 const int32 kMsgTurnOffSliderChanged = 'TUCG';
 
+const int32 kMsgFadeCornerChanged = 'fdcc';
+const int32 kMsgNeverFadeCornerChanged = 'nfcc';
+
 static const uint32 kTimeSliderChanged = 'tsch';
+
 
 class TimeSlider : public BSlider {
 	public:
@@ -371,9 +372,9 @@ ModulesView::MessageReceived(BMessage* message)
 
 		case kMsgTestSaver:
 			SaveState();
-			fSettings.SaveSettings();
+			fSettings.Save();
 
-			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.GetSettings());
+			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message());
 			break;
 
 		case kMsgAddSaver:
@@ -395,7 +396,7 @@ ModulesView::SaveState()
 
 	BMessage state;
 	if (saver->SaveState(&state) == B_OK)
-		fSettings.SetState(fCurrentName.String(), &state);
+		fSettings.SetModuleState(fCurrentName.String(), &state);
 }
 
 
@@ -586,7 +587,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 	: BWindow(BRect(50, 50, 496, 375), "Screen Saver",
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
 {
-	fSettings.LoadSettings();
+	fSettings.Load();
 
 	BRect rect = Bounds();
 
@@ -622,8 +623,8 @@ ScreenSaverWindow::ScreenSaverWindow()
 	fEnableCheckBox->SetValue(fSettings.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
 	fRunSlider->SetTime(fSettings.BlankTime());
 	fTurnOffSlider->SetTime(fSettings.OffTime() + fSettings.BlankTime());
-	fFadeNow->SetCorner(fSettings.GetBlankCorner());
-	fFadeNever->SetCorner(fSettings.GetNeverBlankCorner());
+	fFadeNow->SetCorner(fSettings.BlankCorner());
+	fFadeNever->SetCorner(fSettings.NeverBlankCorner());
 	fPasswordCheckBox->SetValue(fSettings.LockEnable());
 	fPasswordSlider->SetTime(fSettings.PasswordTime());
 
@@ -714,10 +715,10 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	// Bottom
 
-	box->AddChild(fFadeNow = new ScreenCornerSelector(BRect(20,205,80,260),"fadeNow",
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
-	box->AddChild(fFadeNever = new ScreenCornerSelector(BRect(220,205,280,260),"fadeNever",
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
+	box->AddChild(fFadeNow = new ScreenCornerSelector(BRect(20,205,80,260), "FadeNow",
+		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
+	box->AddChild(fFadeNever = new ScreenCornerSelector(BRect(220,205,280,260), "FadeNever",
+		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
 	rect = BRect(90,215,193,230);
 	stringView = new BStringView(rect, NULL, "Fade now when",
@@ -842,7 +843,10 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 
 		case kMsgPasswordCheckBox:
 		case kMsgEnableScreenSaverBox:
+		case kMsgFadeCornerChanged:
+		case kMsgNeverFadeCornerChanged:
 			_UpdateStatus();
+			fSettings.Save();
 			break;
 
 		case kMsgChangePassword:
@@ -871,7 +875,7 @@ ScreenSaverWindow::QuitRequested()
 {
 	_UpdateStatus();
 	fModulesView->SaveState();
-	fSettings.SaveSettings();
+	fSettings.Save();
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;

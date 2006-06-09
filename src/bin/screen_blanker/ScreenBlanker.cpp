@@ -57,11 +57,11 @@ ScreenBlanker::~ScreenBlanker()
 void
 ScreenBlanker::ReadyToRun() 
 {
-	if (!fSettings.LoadSettings()) {
+	if (!fSettings.Load()) {
 		fprintf(stderr, "could not load settings\n");
 		exit(1);
 	}
-	
+
 	// create a BDirectWindow and start the render thread.
 	// TODO: we need a window per screen...
 	BScreen screen(B_MAIN_SCREEN_ID);

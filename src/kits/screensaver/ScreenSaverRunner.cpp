@@ -143,7 +143,7 @@ ScreenSaverRunner::_LoadAddOn()
 			printf("Unable to find the instantiator\n");
 		} else {
 			BMessage state;
-			fSettings.GetState(fSettings.ModuleName(), &state);
+			fSettings.GetModuleState(fSettings.ModuleName(), &state);
 			fSaver = instantiate(&state, fAddonImage);
 		}
 
