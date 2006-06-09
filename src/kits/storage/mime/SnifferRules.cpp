@@ -14,6 +14,7 @@
 #include <File.h>
 #include <MimeType.h>
 #include <mime/database_support.h>
+#include <mime/MimeSnifferAddonManager.h>
 #include <sniffer/Parser.h>
 #include <sniffer/Rule.h>
 #include <StorageDefs.h>
@@ -129,8 +130,8 @@ SnifferRules::~SnifferRules()
 /*!	\brief Guesses a MIME type for the supplied entry_ref.
 
 	Only the data in the given entry is considered, not the filename or
-	its extension. Please see GuessMimeType(BPositionIO*, BString*) for
-	more details.
+	its extension. Please see GuessMimeType(BFile*, const void *, int32,
+	BString*) for more details.
 
 	\param ref The entry to sniff
 	\param type Pointer to a pre-allocated BString which is set to the
@@ -173,10 +174,8 @@ SnifferRules::GuessMimeType(const entry_ref *ref, BString *type)
 	}
 	
 	// Now sniff the buffer
-	if (!err) {
-		BMemoryIO data(buffer, bytes);
-		err = GuessMimeType(&data, type);
-	}
+	if (!err)
+		err = GuessMimeType(&file, buffer, bytes, type);
 	
 	return err;	
 }
@@ -184,7 +183,8 @@ SnifferRules::GuessMimeType(const entry_ref *ref, BString *type)
 // GuessMimeType
 /*!	\brief Guesses a MIME type for the given chunk of data.
 
-	Please see GuessMimeType(BPositionIO*, BString*) for more details.
+	Please see GuessMimeType(BFile*, const void *, int32, BString*) for more
+	details.
 
 	\param buffer Pointer to a data buffer to sniff
 	\param length The length of the data buffer pointed to by \a buffer
@@ -198,15 +198,7 @@ SnifferRules::GuessMimeType(const entry_ref *ref, BString *type)
 status_t
 SnifferRules::GuessMimeType(const void *buffer, int32 length, BString *type)
 {
-	status_t err = buffer && type ? B_OK : B_BAD_VALUE;	
-	// Wrap a BMemoryIO around the buffer and call our private
-	// GuessMimeType(BPositionIO*, BString*) function to do the
-	// dirty work
-	if (!err) {
-		BMemoryIO data(buffer, length);
-		err = GuessMimeType(&data, type);
-	}
-	return err;
+	return GuessMimeType(NULL, buffer, length, type);
 }
 	
 // SetSnifferRule
@@ -422,7 +414,9 @@ SnifferRules::BuildRuleList()
 	"supertype/subtype" form rules are checked before "supertype-only" form
 	rules if their priorities happen to be identical).
 
-	\param data The data to sniff
+	\param file The file to sniff. May be \c NULL. \a buffer is always given.
+	\param buffer Pointer to a data buffer to sniff
+	\param length The length of the data buffer pointed to by \a buffer
 	\param type Pointer to a pre-allocated BString which is set to the
 		   resulting MIME type.
 	\return
@@ -431,11 +425,30 @@ SnifferRules::BuildRuleList()
 	- error code: failure
 */
 status_t
-SnifferRules::GuessMimeType(BPositionIO *data, BString *type)
+SnifferRules::GuessMimeType(BFile* file, const void *buffer, int32 length,
+	BString *type)
 {
-	status_t err = data && type ? B_OK : B_BAD_VALUE;
+	status_t err = buffer && type ? B_OK : B_BAD_VALUE;	
+	if (err)
+		return err;
+
+	// wrap the buffer by a BMemoryIO
+	BMemoryIO data(buffer, length);
+
 	if (!err && !fHaveDoneFullBuild)
 		err = BuildRuleList();
+
+	// first ask the MimeSnifferAddonManager for a suitable type
+	float addonPriority = -1;
+	BMimeType mimeType;
+	if (!err) {
+		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+		if (manager) {
+			addonPriority = manager->GuessMimeType(file, buffer, length,
+				&mimeType);
+		}
+	}
+
 	if (!err) {
 		// Run through our rule list, which is sorted in order of
 		// descreasing priority, and see if one of the rules sniffs
@@ -445,7 +458,15 @@ SnifferRules::GuessMimeType(BPositionIO *data, BString *type)
 			     i++)
 		{
 			if (i->rule) {
-				if (i->rule->Sniff(data)) {
+				// If an add-on identified the type with a priority at least
+				// as great as the remaining rules, we can stop further
+				// processing and return the type found by the add-on.
+				if (i->rule->Priority() <= addonPriority) {
+					*type = mimeType.Type();
+					return B_OK;
+				}
+
+				if (i->rule->Sniff(&data)) {
 					type->SetTo(i->type.c_str());
 					return B_OK;
 				}
@@ -455,6 +476,13 @@ SnifferRules::GuessMimeType(BPositionIO *data, BString *type)
 					"rule_string == '%s'\n",
 					i->type.c_str(), i->rule_string.c_str()));
 			}
+		}
+
+		// The sniffer add-on manager might have returned a low priority
+		// (lower than any of a rule).
+		if (addonPriority >= 0) {
+			*type = mimeType.Type();
+			return B_OK;
 		}
 		
 		// If we get here, we didn't find a damn thing
@@ -479,8 +507,14 @@ ssize_t
 SnifferRules::MaxBytesNeeded()
 {
 	ssize_t err = fHaveDoneFullBuild ? B_OK : BuildRuleList();
-	if (!err)
+	if (!err) {
 		err = fMaxBytesNeeded;
+		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+		if (manager) {
+			fMaxBytesNeeded = max(fMaxBytesNeeded,
+				(ssize_t)manager->MinimalBufferSize());
+		}
+	}
 	return err;
 }	
 

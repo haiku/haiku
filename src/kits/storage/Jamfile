@@ -41,6 +41,8 @@ MergeObject <libbe>storage_kit.o :
 	CreateAppMetaMimeThread.cpp
 	Database.cpp
 	InstalledTypes.cpp
+	MimeSnifferAddon.cpp
+	MimeSnifferAddonManager.cpp
 	MimeUpdateThread.cpp
 	SnifferRules.cpp
 	Supertype.cpp

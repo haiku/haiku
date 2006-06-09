@@ -4,8 +4,9 @@
 #include <ClassInfo.h>
 #include <Message.h>
 #include <Messenger.h>
-#include <mime/UpdateMimeInfoThread.h>
 #include <mime/CreateAppMetaMimeThread.h>
+#include <mime/MimeSnifferAddonManager.h>
+#include <mime/UpdateMimeInfoThread.h>
 #include <Path.h>
 #include <RegistrarDefs.h>
 #include <String.h>
@@ -18,6 +19,7 @@ using namespace std;
 using namespace BPrivate;
 
 #include "MIMEManager.h"
+#include "TextSnifferAddon.h"
 
 /*!
 	\class MIMEManager
@@ -35,6 +37,14 @@ MIMEManager::MIMEManager()
 		   , fThreadManager()
 {
 	AddHandler(&fThreadManager);
+
+	// prepare the MimeSnifferAddonManager and the built-in add-ons
+	status_t error = MimeSnifferAddonManager::CreateDefault();
+	if (error == B_OK) {
+		MimeSnifferAddonManager* addonManager
+			= MimeSnifferAddonManager::Default();
+		addonManager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
+	}
 }
 
 // destructor

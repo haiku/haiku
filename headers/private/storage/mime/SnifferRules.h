@@ -50,7 +50,8 @@ public:
 	};		
 private:
 	status_t BuildRuleList();
-	status_t GuessMimeType(BPositionIO *data, BString *type);
+	status_t GuessMimeType(BFile* file, const void *buffer, int32 length,
+		BString *type);
 	ssize_t MaxBytesNeeded();
 	status_t ProcessType(const char *type, ssize_t *bytesNeeded);
 

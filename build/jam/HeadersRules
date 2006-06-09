@@ -341,7 +341,8 @@ rule UseLegacyObjectHeaders
 rule FStandardOSHeaders
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
-					   add-ons/input_server add-ons/screen_saver
+					   add-ons/input_server add-ons/registrar
+					   add-ons/screen_saver
 					   add-ons/tracker app device drivers game interface
 					   kernel media mail midi midi2 net opengl storage support
 					   translation ;
@@ -352,7 +353,8 @@ rule FStandardOSHeaders
 rule FStandardHeaders
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
-					   add-ons/input_server add-ons/screen_saver
+					   add-ons/input_server add-ons/registrar
+					   add-ons/screen_saver
 					   add-ons/tracker app device drivers game interface
 					   kernel media mail midi midi2 net opengl storage support
 					   translation ;

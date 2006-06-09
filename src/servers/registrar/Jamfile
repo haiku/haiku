@@ -29,6 +29,7 @@ Server registrar
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
 	ShutdownProcess.cpp
+	TextSnifferAddon.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp

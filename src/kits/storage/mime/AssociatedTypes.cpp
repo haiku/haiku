@@ -16,6 +16,7 @@
 #include <Path.h>
 #include <String.h>
 #include <mime/database_support.h>
+#include <mime/MimeSnifferAddonManager.h>
 #include <storage_support.h>
 
 #include <new>
@@ -100,6 +101,20 @@ AssociatedTypes::GuessMimeType(const char *filename, BString *result)
 	status_t err = filename && result ? B_OK : B_BAD_VALUE;
 	if (!err && !fHaveDoneFullBuild)
 		err = BuildAssociatedTypesTable();
+
+	// if we have an MimeSnifferAddonManager, let's give it a shot first
+	if (!err) {
+		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+		if (manager) {
+			BMimeType mimeType;
+			float priority = manager->GuessMimeType(filename, &mimeType);
+			if (priority >= 0) {
+				*result = mimeType.Type();
+				return B_OK;
+			}
+		}
+	}
+
 	if (!err) {
 		// Extract the extension from the file
 		const char *rawExtension = strrchr(filename, '.');
