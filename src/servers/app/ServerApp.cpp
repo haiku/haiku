@@ -51,6 +51,7 @@
 #include <FontPrivate.h>
 #include <MessengerPrivate.h>
 #include <ServerProtocol.h>
+#include <WindowPrivate.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -431,6 +432,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fDesktop->EventDispatcher().SetTo(gInputManager->GetStream());
 			break;
 		}
+
+		case AS_APP_CRASHED:
+			// Allow the debugger to show its window: if needed, remove any
+			// kWindowScreenFeels from the windows of this application
+			if (fWindowListLock.Lock()) {
+				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
+					ServerWindow* serverWindow = fWindowList.ItemAt(i);
+					WindowLayer* window = serverWindow->Window();
+
+					if (window->Feel() == kWindowScreenFeel)
+						fDesktop->SetWindowFeel(window, B_NORMAL_WINDOW_FEEL);
+				}
+
+				fWindowListLock.Unlock();
+			}
+			break;
 
 		case AS_CREATE_WINDOW:
 		case AS_CREATE_OFFSCREEN_WINDOW:

@@ -70,6 +70,10 @@ class BRoster::Private {
 		void SaveRecentLists(const char *file) const
 			{ fRoster->_SaveRecentLists(file); }
 
+		// needed by the debug server
+		void ApplicationCrashed(team_id team) const
+			{ fRoster->_ApplicationCrashed(team); }
+
 		static void InitBeRoster();
 		static void DeleteBeRoster();
 

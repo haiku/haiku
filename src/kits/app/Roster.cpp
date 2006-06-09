@@ -14,7 +14,6 @@
 
 #include <AppFileInfo.h>
 #include <Application.h>
-#include <AppMisc.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -22,20 +21,23 @@
 #include <fs_info.h>
 #include <image.h>
 #include <List.h>
-#include <MessengerPrivate.h>
 #include <Mime.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <OS.h>
 #include <Path.h>
-#include <PortLink.h>
 #include <Query.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
-#include <RosterPrivate.h>
-#include <ServerProtocol.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
+
+#include <AppMisc.h>
+#include <DesktopLink.h>
+#include <MessengerPrivate.h>
+#include <PortLink.h>
+#include <RosterPrivate.h>
+#include <ServerProtocol.h>
 
 #include <ctype.h>
 #include <new>
@@ -770,52 +772,18 @@ BRoster::StopWatching(BMessenger target) const
 status_t
 BRoster::ActivateApp(team_id team) const
 {
-	// get the app server port
-	port_id port = find_port(SERVER_PORT_NAME);
-	if (port < B_OK)
-		return port;
+	BPrivate::DesktopLink link;
 
-	// create a reply port
-	struct ReplyPort {
-		ReplyPort()
-			: port(create_port(1, "activate app reply"))
-		{
-		}
-
-		~ReplyPort()
-		{
-			if (port >= 0)
-				delete_port(port);
-		}
-
-		port_id port;
-
-	} replyPort;
-
-	if (replyPort.port < 0)
-		return replyPort.port;
-
-	BPrivate::PortLink link(port, replyPort.port);
-
-	// We can't use AppServerLink because be_app may be NULL
-	link.StartMessage(AS_GET_DESKTOP);
-	link.Attach<port_id>(replyPort.port);
-	link.Attach<int32>(getuid());
-
-	int32 code;
-	if (link.FlushWithReply(code) != B_OK || code != B_OK)
-		return B_ERROR;
-
-	// we now talk to the desktop
-	link.Read<port_id>(&port);
-	link.SetSenderPort(port);
+	status_t status = link.InitCheck();
+	if (status < B_OK)
+		return status;
 
 	// prepare the message
 	status_t error = link.StartMessage(AS_ACTIVATE_APP);
 	if (error != B_OK)
 		return error;
 
-	error = link.Attach(replyPort.port);
+	error = link.Attach(link.ReceiverPort());
 	if (error != B_OK)
 		return error;
 
@@ -824,6 +792,7 @@ BRoster::ActivateApp(team_id team) const
 		return error;
 
 	// send it
+	status_t code;
 	error = link.FlushWithReply(code);
 	if (error != B_OK)
 		return error;
@@ -1723,6 +1692,20 @@ BRoster::_RemoveApp(team_id team) const
 
 	return error;
 }
+
+
+void
+BRoster::_ApplicationCrashed(team_id team)
+{
+	BPrivate::DesktopLink link;
+	if (link.InitCheck() != B_OK)
+		return;
+
+	if (link.StartMessage(AS_APP_CRASHED) == B_OK
+		&& link.Attach(team) == B_OK)
+		link.Flush();
+}
+
 
 // _LaunchApp
 /*!	\brief Launches the application associated with the supplied MIME type or

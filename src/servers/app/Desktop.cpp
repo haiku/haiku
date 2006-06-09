@@ -542,6 +542,23 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_APP_CRASHED:
+		{
+			BAutolock locker(fApplicationsLock);
+
+			team_id team;
+			if (link.Read(&team) != B_OK)
+				break;
+
+			for (int32 i = 0; i < fApplications.CountItems(); i++) {
+				ServerApp* app = fApplications.ItemAt(i);
+
+				if (app->ClientTeam() == team)
+					app->PostMessage(AS_APP_CRASHED);
+			}
+			break;
+		}
+
 		case B_QUIT_REQUESTED:
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server

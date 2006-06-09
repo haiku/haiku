@@ -1011,12 +1011,21 @@ fDesktop->LockSingleWindow();
 		}
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
 		{
+			// TODO: maybe there is more to do than this?
 			bool enable;
 			link.Read<bool>(&enable);
 
-			fLink.StartMessage(B_ERROR);
-			fLink.Flush();
+			status_t status = B_OK;
+			if (!fWindowLayer->IsOffscreenWindow()) {
+				fDesktop->UnlockSingleWindow();
+				fDesktop->SetWindowFeel(fWindowLayer,
+					enable ? kWindowScreenFeel : B_NORMAL_WINDOW_FEEL);
+				fDesktop->LockSingleWindow();
+			} else
+				status = B_BAD_TYPE;
 
+			fLink.StartMessage(status);
+			fLink.Flush();
 			break;
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,8 @@
 #include <debug_support.h>
 #include <Entry.h>
 #include <Invoker.h>
+
+#include <RosterPrivate.h>
 #include <Server.h>
 
 #include <util/DoublyLinkedList.h>
@@ -112,6 +114,7 @@ private:
 	void _LookupSymbolAddress(debug_symbol_lookup_context *lookupContext,
 		const void *address, char *buffer, int32 bufferSize);
 	void _PrintStackTrace(thread_id thread);
+	void _NotifyAppServer(team_id team);
 
 	status_t _InitGUI();
 
@@ -567,6 +570,9 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app
+
+		_NotifyAppServer(fTeam);
+
 		char buffer[1024];
 		snprintf(buffer, sizeof(buffer), "The application:\n\n      %s\n\n"
 			"has encountered an error which prevents it from continuing. Haiku "
@@ -692,6 +698,16 @@ TeamDebugHandler::_PrintStackTrace(thread_id thread)
 		if (lookupContext)
 			debug_delete_symbol_lookup_context(lookupContext);
 	}
+}
+
+
+void
+TeamDebugHandler::_NotifyAppServer(team_id team)
+{
+	// This will remove any kWindowScreenFeels of the application, so that
+	// the debugger alert is visible on screen
+	BRoster::Private roster;
+	roster.ApplicationCrashed(team);
 }
 
 // _InitGUI
