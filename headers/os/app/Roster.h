@@ -138,6 +138,8 @@ class BRoster {
 					app_info *info) const;
 		status_t _RemovePreRegApp(uint32 entryToken) const;
 		status_t _RemoveApp(team_id team) const;
+		void _ApplicationCrashed(team_id team);
+
 		status_t _LaunchApp(const char *mimeType, const entry_ref *ref,
 					const BList *messageList, int argc,
 					const char *const *args,
