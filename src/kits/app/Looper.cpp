@@ -664,7 +664,7 @@ BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 			string comparisons -- which wouldn't tell the whole story anyway,
 			because of the same name being used for multiple properties.
  */
-	BPropertyInfo propertyInfo(gLooperPropInfo);
+ 	BPropertyInfo propertyInfo(gLooperPropInfo);
 	uint32 data;
 	status_t err = B_OK;
 	const char* errMsg = "";
@@ -716,7 +716,7 @@ BLooper::GetSupportedSuites(BMessage* data)
 	if (data == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = data->AddString("suites", "suite/vnd.Be-handler");
+	status_t status = data->AddString("suites", "suite/vnd.Be-looper");
 	if (status == B_OK) {
 		BPropertyInfo PropertyInfo(gLooperPropInfo);
 		status = data->AddFlat("messages", &PropertyInfo);

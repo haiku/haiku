@@ -626,12 +626,105 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
         BMessage *specifier, int32 what, const char *property)
 {
 	BPropertyInfo propInfo(sPropertyInfo);
+	status_t err = B_OK;
+	uint32 data;
+	
+	if (propInfo.FindMatch(message, 0, specifier, what, property, &data) >=0) {
+		switch (data) {
+			case 0: {
+				int32 ind = -1;
+				err = specifier->FindInt32("index", &ind);
+				if (err != B_OK)
+					break;
+				if (what == B_REVERSE_INDEX_SPECIFIER)
+					ind = CountWindows() - ind;
+				err = B_BAD_INDEX;
+				BWindow *win = WindowAt(ind);
+				if (win) {
+					if (index <= 0 && message->what == B_GET_PROPERTY)
+						return this;
+					message->PopSpecifier();
+					BMessenger(win).SendMessage(message);
+					return NULL;
+				}
+				break;
+			}
+			case 1: {
+				const char *name;
+				err = specifier->FindString("name", &name);
+				if (err != B_OK)
+					break;
+				err = B_NAME_NOT_FOUND;
+				for (int32 i=0; i<CountWindows(); i++) {
+					BWindow *win = WindowAt(i);
+					if (win && win->Name() && strlen(win->Name()) == strlen(name)
+						&& !strcmp(win->Name(), name)) {
+							if (index <= 0 && message->what == B_GET_PROPERTY)
+								return this;
+							message->PopSpecifier();
+							BMessenger(win).SendMessage(message);
+							return NULL;
+					}
+				}
+				break;
+			}
+			case 2: {
+				int32 ind = -1;
+				err = specifier->FindInt32("index", &ind);
+				if (err != B_OK)
+					break;
+				if (what == B_REVERSE_INDEX_SPECIFIER)
+					ind = CountLoopers() - ind;
+				err = B_BAD_INDEX;
+				BLooper *looper = LooperAt(ind);
+				if (looper) {
+					if (index <= 0)
+						return this;
+					message->PopSpecifier();
+					BMessenger(looper).SendMessage(message);
+					return NULL;
+				}
+				break;
+			}
+			case 3:
+				//if (index == 0)
+				//	return this;
+				
+				break;
+			case 4: {
+				const char *name;
+				err = specifier->FindString("name", &name);
+				if (err != B_OK)
+					break;
+				err = B_NAME_NOT_FOUND;
+				for (int32 i=0; i<CountLoopers(); i++) {
+					BLooper *looper = LooperAt(i);
+					if (looper && looper->Name() && strlen(looper->Name()) == strlen(name)
+						&& !strcmp(looper->Name(), name)) {
+						if (index <= 0)
+							return this;
+						message->PopSpecifier();
+						BMessenger(looper).SendMessage(message);
+						return NULL;
+					}
+				}
+				break;
+			}
+			case 5:
+				return this;
+		}
+	} else {
+			return BLooper::ResolveSpecifier(message, index, specifier, what,
+				property);		
+	}
 
-	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
-		return this;
+	BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
+	reply.AddInt32("error", err);
+	reply.AddString("message", strerror(err));
+	message->SendReply(&reply);
 
-	return BLooper::ResolveSpecifier(message, index, specifier, what,
-		property);
+	return NULL;
+	
 }
 
 
@@ -922,7 +1015,7 @@ BApplication::GetSupportedSuites(BMessage *data)
 		BPropertyInfo propertyInfo(sPropertyInfo);
 		status = data->AddFlat("messages", &propertyInfo);
 		if (status == B_OK)
-			status = BHandler::GetSupportedSuites(data);
+			status = BLooper::GetSupportedSuites(data);
 	}
 
 	return status;
@@ -953,7 +1046,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 	BMessage reply(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
 
-	switch (what) {
+	switch (message->what) {
 		case B_GET_PROPERTY:
 			if (strcmp("Loopers", property) == 0) {
 				int32 count = CountLoopers();
@@ -961,8 +1054,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 				for (int32 i=0; err == B_OK && i<count; i++) {
 					BMessenger messenger(LooperAt(i));
 					err = reply.AddMessenger("result", messenger);
-				}
-				
+				}				
 			} else if (strcmp("Windows", property) == 0) {
 				int32 count = CountWindows();
 				err = B_OK;
@@ -971,30 +1063,22 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 					err = reply.AddMessenger("result", messenger);
 				}
 			} else if (strcmp("Window", property) == 0) {
-				switch (specifier->what) {
-				case B_INDEX_SPECIFIER: {
+				switch (what) {
+				case B_INDEX_SPECIFIER:
+				case B_REVERSE_INDEX_SPECIFIER: {
 					int32 ind = -1;
-					if (specifier->FindInt32("index", &ind)!=B_OK)
+					err = specifier->FindInt32("index", &ind);
+					if (err != B_OK)
 						break;
+					if (what == B_REVERSE_INDEX_SPECIFIER)
+						ind = CountWindows() - ind;
+					err = B_BAD_INDEX;
 					BWindow *win = WindowAt(ind);
-					if (!win) {
+					if (!win)
 						break;
-					}
 					BMessenger messenger(win);
 					err = reply.AddMessenger("result", messenger);
 					break;
-				}
-				case B_REVERSE_INDEX_SPECIFIER: {
-					int32 rindex;
-					if (specifier->FindInt32("index", &rindex) != B_OK)
-						break;
-					BWindow *win = WindowAt(CountWindows() - rindex);
-					if (!win) {
-						break;
-					}
-					BMessenger messenger(win);
-					err = reply.AddMessenger("result", messenger);
-                        		break;
 				}
 				case B_NAME_SPECIFIER: {
 					const char *name;
@@ -1004,15 +1088,57 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 					err = B_NAME_NOT_FOUND;
 					for (int32 i=0; i<CountWindows(); i++) {
 						BWindow *win = WindowAt(i);
-                                		if (win && win->Name() && strlen(win->Name()) == strlen(name)
+						if (win && win->Name() && strlen(win->Name()) == strlen(name)
 							&& !strcmp(win->Name(), name)) {
 							BMessenger messenger(win);
 							err = reply.AddMessenger("result", messenger);
-                                                	break;
+							break;
 						}
-                                        }
+					}
 				}
 				}
+			} else if (strcmp("Looper", property) == 0) {
+				switch (what) {
+				case B_INDEX_SPECIFIER:
+				case B_REVERSE_INDEX_SPECIFIER: {
+					int32 ind = -1;
+					err = specifier->FindInt32("index", &ind);
+					if (err != B_OK)
+						break;
+					if (what == B_REVERSE_INDEX_SPECIFIER)
+						ind = CountLoopers() - ind;
+					err = B_BAD_INDEX;
+					BLooper *looper = LooperAt(ind);
+					if (!looper)
+						break;
+					BMessenger messenger(looper);
+					err = reply.AddMessenger("result", messenger);
+					break;
+				}
+				case B_NAME_SPECIFIER: {
+					const char *name;
+					err = specifier->FindString("name", &name);
+					if (err != B_OK)
+						break;
+					err = B_NAME_NOT_FOUND;
+					for (int32 i=0; i<CountLoopers(); i++) {
+						BLooper *looper = LooperAt(i);
+						if (looper && looper->Name() && strlen(looper->Name()) == strlen(name)
+							&& !strcmp(looper->Name(), name)) {
+							BMessenger messenger(looper);
+							err = reply.AddMessenger("result", messenger);
+							break;
+						}
+					}
+					break;
+				}
+				case B_ID_SPECIFIER: {
+					// TODO
+					break;
+				}
+				}
+			} else if (strcmp("Name", property) == 0) {
+				err = reply.AddString("result", Name());	
 			}
 			break;
 		case B_COUNT_PROPERTIES:
@@ -1023,8 +1149,9 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 			}
 			break;
 	}
-	if (err == B_BAD_SCRIPT_SYNTAX)
+	if (err == B_BAD_SCRIPT_SYNTAX) {
 		return false;
+	}
 	if (err < B_OK) {
                 reply.what = B_ERROR;
                 reply.AddString("message", strerror(err));
