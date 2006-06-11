@@ -33,10 +33,10 @@ Chapter 4: Getting Input from the User
 	Keyboard accelerators: The Sports Cars of GUIs
 	Design without Throwing Fitts
 
-Chapter 5: Dynamic Data Exchange: Using Data Between Applications
-	The Clipboard
+Chapter 5: Dynamic Data Exchange: Passing Data Between Applications
 	Drag and Drop
-	Replicants and BShelf
+	The Clipboard
+	Replicants
 	Messaging Across Applications
 
 
@@ -127,7 +127,7 @@ In order for your software to be as simple to use as possible, you must, to para
 
 Once you know who your users are and what they will be doing, you will need to figure out generally how it will be done. This does not imply what your program will actually look like, however. In a home finance application, one of the user's primary tasks will be entering in transactions. The user will need to type in the data for each transaction or download them from their bank over the Internet. You need to know this kind of information for each task the user will have to perform, common or otherwise.
 
-The actual implementation of the application is determined last, which is why it has not been discussed until now. Note that what technologies will be used to actually create the program have not even been mentioned yet. Technology is the means to an end – a tool -- and not the end itself. This is where the general usage of the application is determined. For example, the user will have a form to enter transactions into an account. The form should have text fields for each of the different kinds of data, such as the payee, the amount, and the check number. Somewhere nearby, the user will be able to see all a list of all the transactions in the current account.  Because this is where the actual building of the look of the program takes place, it is crucial at this point in development to know and understand what makes software truly easy to use, so this is what we will examine next.
+The actual implementation of the application is determined last, which is why it has not been discussed until now. Note that what technologies will be used to actually create the program have not even been mentioned yet. Technology is the means to an end -- a tool -- and not the end itself. This is where the general usage of the application is determined. For example, the user will have a form to enter transactions into an account. The form should have text fields for each of the different kinds of data, such as the payee, the amount, and the check number. Somewhere nearby, the user will be able to see all a list of all the transactions in the current account.  Because this is where the actual building of the look of the program takes place, it is crucial at this point in development to know and understand what makes software truly easy to use, so this is what we will examine next.
 
 
 Summary
@@ -270,6 +270,7 @@ Skills the user might have:
 4) Triple-click with primary mouse button
 5) Scroll with scroll wheel
 6) Scroll with scroll wheel and modifier key
+7) Drag with the tertiary mouse button
 
 Don't Use These:
 1) Click-and-a-half: Mouse down + mouse up + drag with a second mouse down
@@ -278,11 +279,11 @@ Don't Use These:
 4) Drag with tertiary mouse button
 5) Drag with modifier keys
 
-In the event that your program must deal with directly handling mouse input, there are certain guidelines to go by for how each of the expected skills is to be used. Single-clicks are used for the most common actions in operating a control. This would be selecting items in a list, pushing a button, choosing a menu item, and placing the blinking text cursor in a BTextView. Double-clicks are used for secondary functions, such as invoking an item in a BListView or selecting a word in a BTextView. Secondary mouse clicks (most commonly called "right-clicking") are generally used for a context-sensitive menu or, in the case of graphics programs, drawing with the secondary color. Mouse dragging is used for selecting text or moving things around. The scroll wheel by itself should be used just for scrolling, but your program may have a use for the scroll wheel when used with a modifier key, as below:
+In the event that your program must deal with directly handling mouse input, there are certain guidelines to go by for how each of the expected skills is to be used. Single-clicks are used for the most common actions in operating a control. This would be selecting items in a list, pushing a button, choosing a menu item, and placing the blinking text cursor in a BTextView. Double-clicks are used for secondary functions, such as invoking an item in a BListView or selecting a word in a BTextView. Secondary mouse clicks (most commonly called "right-clicking") are generally used for a context-sensitive menu or, in the case of graphics programs, drawing with the secondary color. Mouse dragging is used for selecting text or moving things around. Mouse dragging with B_TERTIARY_BUTTON is generally used for panning. The scroll wheel by itself should be used just for scrolling, but your program may have a use for the scroll wheel when used with a modifier key, as below:
 
 Scroll Wheel +
 
-B_COMMAND_KEY:	Zoom in/out
+B_COMMAND_KEY: Zoom in/out
 B_OPTION_KEY: Scroll by one full page
 B_CONTROL_KEY: Increase/decrease font size
 
@@ -314,17 +315,17 @@ B_COMMAND_KEY + ,: Preferences / Settings
 B_COMMAND_KEY + B: (Word processor) Bold font
 B_COMMAND_KEY + U: (Word processor) Underline font
 B_COMMAND_KEY + I: (Word processor) Italicized font
-B_COMMAND_KEY + A: (text entry) Select All
+B_COMMAND_KEY + A: Select All
 
 B_COMMAND_KEY + Z: Undo
-B_COMMAND_KEY + Y: Redo
+B_COMMAND_KEY + B_SHIFT_KEY + Z: Redo
 
 Tab / Shift + Tab: Keyboard navigation
 
 B_CONTROL_KEY + Tab: Switch programs
 
 
-When choosing keyboard accelerators for your program, use them only for commonly-used tasks. Do not use one of the system combinations for a task different from the list above -- it will only confuse and frustrate users. Also, try to keep the number of them small with an immediately memorable association between the combination and the function that goes with it. For example, Tracker uses Alt + Up to g' to the parent folder of the current window.
+When choosing keyboard accelerators for your program, use them only for commonly-used tasks. Do not use one of the system combinations for a task different from the list above -- it will only confuse and frustrate users. Also, try to keep the number of them small with an immediately memorable association between the combination and the function that goes with it. For example, Tracker uses Alt + Up to go to the parent folder of the current window.
 
 
 Design without Throwing Fitts
@@ -335,8 +336,78 @@ According to Mr. Fitts, when using a mouse, the amount of time it takes to point
 When you design the graphical interface for your program, make controls easy to click on. Toolbars that have labels for each button are inherently better because the labels add to the size of the buttons, making them easier to click. A number of existing image editing programs utilize the secondary mouse button for a pop-up menu to access common features because the mouse doesn't have to move in order to bring the menu up. Researchers have even experimented with circular menus -- called pie menus -- which capitalize on Fitts' Law in order to make a menu as fast as possible. Your program need not go to such measures, but do keep in mind that teeny targets make for slower usage.
 
 
-Chapter 5: Dynamic Data Exchange: Using Data Between Applications
-	The Clipboard
-	Drag and Drop
-	Replicants and BShelf
-	Messaging Across Applications
+
+
+Chapter 5: Dynamic Data Exchange: Pass Data Between Applications
+
+
+Drag and Drop
+
+	The ability of a user to click and drag an object and drop it somewhere else is a powerful design tool, just as other means of direct manipulation. In general, it should be used only where it makes sense to do so -- rearranging items in a list, file management, opening a file dragged to your app from Tracker, etc.
+	If you plan on supporting dragging within your program or to other programs -- even just a little bit -- you should support drops to the likely places a user might drop something into your program. Most of the time, this shouldn't be all that difficult because drops to your program will come from either Tracker (in the form of an entry_ref) or from within your own program. Drops from other programs are not required, but if they are especially convenient, they can be a nice bullet point in a marketing blurb for your program.
+	When implementing dragging, be sure that your program provides feedback about what is being dragged. This is often best done by using an image which closely represents what is being dragged. If this is not possible, a rectangle which is the size of the dragged item's selection should be used in place of the picture.
+	A feature which is very helpful to a user is drop feedback. Any time the user is dragging something and the cursor passes over your program's window, it can react in a way to show the user that your program will accept the dragged object. This can be done in a variety of ways:
+
+- A list control could draw a line in between two items to show where the item would go.
+
+- BTextView controls show a line where dragged text would be placed.
+
+- If the user drags an entry over a folder, Tracker shades it slightly.
+
+- A color well could highlight its border
+
+There are other possible ways, but these should be enough for you to get the idea. As mentioned before, feedback is a Good Thing (TM) -- one more way to be responsive -- which allows the user to better understand how to use your program to get something done.
+
+
+The Clipboard
+
+One way of getting data from one program into another is via the system clipboard. Unlike other forms of data exchange, using the clipboard requires very little effort or code because all that is needed is to plunk data into a particular BMessage.  Depending on what the needs are for your app, there may be very little you need to do to add clipboard support. The BTextView class already implements copying, cutting, and pasting by way of keyboard accelerators. In cases like these, all that you will want to do is add some menu items to let less advanced users know that it is available for use.
+
+Standardized Clipboard Data Formats
+
+Plain Text: It is easiest to describe the basics with this code snippet.
+
+	clipboard->AddData("text/plain", B_MIME_TYPE, your_text_string_here);
+
+Styled Text: The same as plain text but adding a text run array field to the message also. You probably won't need to worry about this unless you're writing a word processor or something similar.
+
+	clipboard->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE, run_array, run_array_size);
+
+Generic File References: If the amount of data you wish to pass to another program is too large to place on the clipboard without straining the system, you may wish to place an entry_ref which points to it on the clipboard instead. Audio and video files commonly fall into this category. To do this, call AddRef() with the field name "refs" and add an entry_ref pointing to the file you wish to pass this may. Note that you may pass multiple entry_ref objects this way. Programs wishing to receive file references should look for multiple entries in the 'refs' field unless it is inappropriate for the particular application to do so.
+
+Image Data: 
+
+If your program uses a different kind of data than what has already been standardized, there are some guidelines you can follow so that other programs can make use of what yours puts on the system clipboard. First, make sure that the data that is put on the clipboard is in as generalized a form as possible.
+
+Field Type		Name		Description
+B_STRING_TYPE	class		"BBitmap"
+B_RECT_TYPE		_frame		A BRect containing the bounds of the bitmap data in pixels
+B_INT32_TYPE	_cspace		The color_space constant for the image data, 	such as B_RGBA32
+B_INT32_TYPE	_bmflags		The Flags() argument from BBitmap
+B_INT32_TYPE	_rowbytes	The number of bytes per row, including padding
+B_RAW_TYPE		_data		The raw image data
+B_POINT_TYPE	be:location	The location from which the image data was copied. May be ignored.
+
+Video Data:
+
+TODO: This needs to be decided upon by people who know media better than I do
+
+
+Replicants
+
+	Replicants are neat. Replicants are neat. Replicants are ... *thump* .... Sorry - I got carried away, so to speak. :^) As cool as replicant technology is, it is best left as an extra feature and not the primary mode of operation for a program because it is only an emerging technology in other, more popular operating systems and is unfamiliar to most users as such. There are some guidelines for using them, however.
+
+1) It is apppropriate for program to be a replicant if it is a lightweight program which provides information or a feature which the user will want to be able to access frequently.
+
+2) Allow for the size of the dragger handle when computing layout
+
+3) Be sure it is of sufficient size to not get lost when placed in the midst of a busy desktop background. At the same time, do not take over the user's desktop unless he wants this to happen. 32 pixels square is a good size, for example.
+
+4) Do not rely on the menu provided by the dragger handle to control the replicant if it does not have a menu bar of its own. Instead, provide another means which is immediately obvious or, at the very least, show a pop-up menu if the user clicks on it (with either button) and there are no other clickable controls.
+
+5) Place a frame around the replicant's main border so that it stands out from its surroundings
+
+6) The replicant should not be too visually distracting. This mainly entails choosing muted colors for the controls and limiting the amount of animation and movement.
+
+
+Messaging Across Applications
