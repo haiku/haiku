@@ -5102,7 +5102,8 @@ BPoseView::AttributeChanged(const BMessage *message)
 	const char *attrName;
 	message->FindString("attr", &attrName);
 
-	if (*TargetModel()->NodeRef() == itemNode && TargetModel()->AttrChanged(attrName)) {
+	if (TargetModel() != NULL && *TargetModel()->NodeRef() == itemNode
+		&& TargetModel()->AttrChanged(attrName)) {
 		// the icon of our target has changed, update drag icon
 		// TODO: make this simpler (ie. store the icon with the window)
 		BView *view = Window()->FindView("MenuBar");

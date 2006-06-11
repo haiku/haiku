@@ -65,10 +65,7 @@ const char *kDefaultOpenWithTemplate = "OpenWithSettings";
 
 const float kMaxMenuWidth = 150;
 
-const int32 kLargeButtonWidth = 130;
-const int32 kSmallButtonWidth = 60;
-const BPoint kSmallButtonRect(kSmallButtonWidth, 20);
-const BPoint kLargeButtonRect(kLargeButtonWidth, 20);
+const int32 kDocumentKnobWidth = 16;
 const int32 kOpenAndMakeDefault = 'OpDf';
 const rgb_color kOpenWithDefaultColor = { 0xFF, 0xFF, 0xCC, 255};
 
@@ -93,49 +90,52 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 
 	rect = Bounds();
 
-	rect.OffsetTo(10, 15);
-	rect.bottom -= 60;		// make room for buttons
-
-	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;	// make room for scrollbars and
-												// a margin
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fPoseView = NewPoseView(0, rect, kListMode);
-	backgroundView->AddChild(fPoseView);
-
-	fPoseView->SetFlags(fPoseView->Flags() | B_NAVIGABLE);
-	fPoseView->SetPoseEditing(false);
-	
 	// add buttons
-	rect = Bounds();
-	BRect buttonRect(rect);
-	buttonRect.InsetBy(30, 10);
-	buttonRect.SetLeftTop(buttonRect.RightBottom() - kSmallButtonRect);
-	fLaunchButton = new BButton(buttonRect, "ok", "Open",
-		new BMessage(kDefaultButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	backgroundView->AddChild(fLaunchButton);
-	fLaunchButton->MakeDefault(true);
 
-	buttonRect.OffsetTo(buttonRect.left - kLargeButtonWidth - 10,
-		buttonRect.top);
-	buttonRect.SetRightBottom(buttonRect.LeftTop() + kLargeButtonRect);
+	fLaunchButton = new BButton(rect, "ok", "Open",
+		new BMessage(kDefaultButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fLaunchButton->ResizeToPreferred();
+	fLaunchButton->MoveTo(rect.right - 10 - kDocumentKnobWidth
+		- fLaunchButton->Bounds().Width(),
+		rect.bottom - 10 - fLaunchButton->Bounds().Height());
+	backgroundView->AddChild(fLaunchButton);
+
+	BRect buttonRect = fLaunchButton->Frame();
 	fLaunchAndMakeDefaultButton = new BButton(buttonRect, "make default",
 		"Open and Make Preferred", new BMessage(kOpenAndMakeDefault),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	// wide button, have to resize to fit text
 	fLaunchAndMakeDefaultButton->ResizeToPreferred();
 	fLaunchAndMakeDefaultButton->MoveBy(
-		buttonRect.right - fLaunchAndMakeDefaultButton->Frame().right , 0);
+		- 10 - fLaunchAndMakeDefaultButton->Bounds().Width(), 0);
 	backgroundView->AddChild(fLaunchAndMakeDefaultButton);
 	fLaunchAndMakeDefaultButton->SetEnabled(false);
-	
+
 	buttonRect = fLaunchAndMakeDefaultButton->Frame();
-	buttonRect.OffsetTo(buttonRect.left - kSmallButtonWidth - 10,
-		buttonRect.top);
-	buttonRect.SetRightBottom(buttonRect.LeftTop() + kSmallButtonRect);
-	
-	backgroundView->AddChild(new BButton(buttonRect, "cancel",
-		"Cancel", new BMessage(kCancelButton),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM));
+	BButton *button = new BButton(buttonRect, "cancel", "Cancel",
+		new BMessage(kCancelButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	button->ResizeToPreferred();
+	button->MoveBy(- 10 - button->Bounds().Width(), 0);
+	backgroundView->AddChild(button);
+
+	fMinimalWidth = button->Bounds().Width() + fLaunchButton->Bounds().Width()
+		+ fLaunchAndMakeDefaultButton->Bounds().Width() + kDocumentKnobWidth + 40;
+
+	fLaunchButton->MakeDefault(true);
+
+	// add pose view
+
+	rect.OffsetTo(10, 10);
+	rect.bottom = buttonRect.top - 15;
+
+	rect.right -= B_V_SCROLL_BAR_WIDTH + 20;
+	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		// make room for scrollbars and a margin
+	fPoseView = NewPoseView(0, rect, kListMode);
+	backgroundView->AddChild(fPoseView);
+
+	fPoseView->SetFlags(fPoseView->Flags() | B_NAVIGABLE);
+	fPoseView->SetPoseEditing(false);
 
 	// set the window title
 	if (CountRefs(fEntriesToOpen) == 1) {
@@ -441,7 +441,7 @@ OpenWithContainerWindow::RestoreState(const BMessage &message)
 void
 OpenWithContainerWindow::RestoreWindowState(AttributeStreamNode *node)
 {
-	SetSizeLimits(310, 10000, 160, 10000);
+	SetSizeLimits(fMinimalWidth, 10000, 160, 10000);
 	if (!node)
 		return;
 

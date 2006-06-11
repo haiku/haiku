@@ -180,6 +180,7 @@ class OpenWithContainerWindow : public BContainerWindow {
 		BMessage *fEntriesToOpen;
 		BButton *fLaunchButton;
 		BButton *fLaunchAndMakeDefaultButton;
+		float fMinimalWidth;
 
 		typedef BContainerWindow _inherited;
 };
