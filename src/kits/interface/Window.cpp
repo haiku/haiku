@@ -2718,10 +2718,10 @@ BWindow::_SetFocus(BView *focusView, bool notifyInputServer)
 	// from a view which has the B_INPUT_METHOD_AWARE to a one
 	// which does not, or vice-versa
 	if (notifyInputServer) {
-		bool oldIMAware = false, newIMAware = false;
+		bool inputMethodAware = false;
 		if (focusView)
-			newIMAware = focusView->Flags() & B_INPUT_METHOD_AWARE;
-		BMessage msg(newIMAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+			inputMethodAware = focusView->Flags() & B_INPUT_METHOD_AWARE;
+		BMessage msg(inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
 		BMessenger messenger(focusView);
 		BMessage reply;
 		if (focusView)
