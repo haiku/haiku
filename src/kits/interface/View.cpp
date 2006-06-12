@@ -1455,7 +1455,7 @@ status_t
 BView::SetEventMask(uint32 mask, uint32 options)
 {
 	if (fEventMask == mask && fEventOptions == options)
-		return B_ERROR;
+		return B_OK;
 
 	fEventMask = mask | (fEventMask & 0xFFFF0000);
 	fEventOptions = options;
