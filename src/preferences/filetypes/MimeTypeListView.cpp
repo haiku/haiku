@@ -461,6 +461,9 @@ MimeTypeListView::_AddNewType(const char* type)
 		superItem = FindItem(superType.Type());
 
 	item = new MimeTypeItem(mimeType, fShowIcons, fSupertype.Type() != NULL);
+
+	if (item->IsSupertypeOnly())
+		item->ShowIcon(false);
 	item->SetApplicationMode(isApp);
 
 	if (superItem != NULL) {
@@ -532,9 +535,8 @@ MimeTypeListView::MessageReceived(BMessage* message)
 					BMessage addType(kMsgAddType);
 					addType.AddString("type", type);
 
-#ifdef __HAIKU
-					BMessageRunner::StartSending(this, &addType, 200000ULL, 1);
-					if (runner.InitCheck() != B_OK)
+#ifdef __HAIKU__
+					if (BMessageRunner::StartSending(this, &addType, 200000ULL, 1) != B_OK)
 						_AddNewType(type);
 #else
 					// TODO: free runner again!
