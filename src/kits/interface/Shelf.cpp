@@ -630,16 +630,9 @@ BShelf::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 				ReplicantAt(i, &replicant, &ID, &err);
 
 			if (err == B_OK && replicant != NULL) {
+				if (index <= 0 && msg->what == B_GET_SUPPORTED_SUITES)
+					return this;
 				msg->PopSpecifier();
-				if (msg->what == B_GET_SUPPORTED_SUITES) {
-					bool popped = msg->PopSpecifier() == B_OK;
-					msg->SetCurrentSpecifier(index);
-					if (!popped) {
-						replicant = NULL;
-						target = this;
-					} else
-						msg->PopSpecifier();
-				}
 			} else {
 				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
 				replyMsg.AddInt32("error", B_BAD_INDEX);
