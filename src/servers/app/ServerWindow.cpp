@@ -521,6 +521,13 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 	newLayer->SetHidden(hidden);
 	newLayer->SetEventMask(eventMask, eventOptions);
 
+	if (eventMask != 0 || eventOptions != 0) {
+		fDesktop->UnlockSingleWindow();
+		fDesktop->EventDispatcher().AddListener(EventTarget(),
+			newLayer->Token(), eventMask, eventOptions);
+		fDesktop->LockSingleWindow();
+	}
+
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
 	settings.GetDefaultPlainFont(font);
