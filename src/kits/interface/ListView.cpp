@@ -1054,10 +1054,6 @@ void
 BListView::WindowActivated(bool state)
 {
 	BView::WindowActivated(state);
-
-	if (IsFocus()) {
-		Invalidate();
-	}
 }
 
 // DetachedFromWindow
