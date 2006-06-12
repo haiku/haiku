@@ -32,6 +32,8 @@
 #include <syslog.h>
 
 
+int kgets(char *buffer, int length);
+
 typedef struct debugger_command {
 	struct debugger_command *next;
 	int (*func)(int, char **);
@@ -257,10 +259,10 @@ read_line(char *buffer, int32 maxLength)
 }
 
 
-extern int
-kgets(char *buf, int len)
+int
+kgets(char *buffer, int length)
 {
-	return read_line(buf, len);
+	return read_line(buffer, length);
 }
 
 
