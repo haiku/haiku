@@ -39,7 +39,7 @@ const uint32 at_keycode_map[] = {
 	0x1b,	// 0
 	0x1c,	// -
 	0x1d,	// =
-	0x1e,	// BKSP
+	0x1e,	// BACKSPACE
 	0x26,	// TAB
 	0x27,	// Q
 	0x28,	// W
@@ -115,6 +115,7 @@ const uint32 at_keycode_map[] = {
 	0x0c,	// F11
 	0x0d,	// F12
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		90
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -124,6 +125,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		100
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -133,9 +135,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		110
 	0x00,   // UNMAPPED
 	0x6e,   // Katakana/Hiragana, second key right to spacebar, japanese
 	0x00,   // UNMAPPED
@@ -145,7 +145,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		120
 	0x6d,   // Henkan, first key right to spacebar, japanese
 	0x00,   // UNMAPPED
 	0x6c,   // Muhenkan, key left to spacebar, japanese
@@ -155,6 +155,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		130
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -164,6 +165,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		140
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -173,9 +175,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		150
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -185,6 +185,7 @@ const uint32 at_keycode_map[] = {
 	0x60,   // Right Control
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		160
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -194,6 +195,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		170
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -203,9 +205,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		180
 	0x23,   // KP /
 	0x00,   // UNMAPPED
 	0x0e,   // Print Screen
@@ -215,7 +215,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		190
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -225,7 +225,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x7f,   // Break
 	0x20,   // Home
-	0x57,	// Up Arrow
+	0x57,	// Up Arrow		200
 	0x21,   // Page Up
 	0x00,   // UNMAPPED
 	0x61,   // Left Arrow
@@ -235,7 +235,7 @@ const uint32 at_keycode_map[] = {
 	0x35,   // End
 	0x62,   // Down Arrow
 	0x36,   // Page Down
-	0x1f,   // Insert
+	0x1f,   // Insert		200
 	0x34,   // Delete
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -245,7 +245,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x66,   // Left Gui
-	0x67,   // Right Gui
+	0x67,   // Right Gui	210
 	0x68,   // Menu
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -255,7 +255,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED		220
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
