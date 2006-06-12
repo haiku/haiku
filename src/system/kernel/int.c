@@ -10,8 +10,10 @@
 #include <int.h>
 #include <smp.h>
 #include <util/kqueue.h>
-#include <boot/kernel_args.h>
+
+#include <arch/debug_console.h>
 #include <arch/int.h>
+#include <boot/kernel_args.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -129,6 +131,8 @@ int_init_post_vm(kernel_args *args)
 status_t
 int_init_post_device_manager(kernel_args *args)
 {
+	arch_debug_install_interrupt_handlers();
+
 	return arch_int_init_post_device_manager(args);
 }
 
@@ -149,6 +153,10 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	io = (struct io_handler *)malloc(sizeof(struct io_handler));
 	if (io == NULL)
 		return B_NO_MEMORY;
+
+	arch_debug_remove_interrupt_handler(vector);
+		// There might be a temporary debug interrupt installed on this
+		// vector that should be removed now.
 
 	io->func = handler;
 	io->data = data;

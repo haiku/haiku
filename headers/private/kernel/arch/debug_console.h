@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -23,6 +23,9 @@ char arch_debug_serial_getchar(void);
 void arch_debug_serial_putchar(char c);
 void arch_debug_serial_puts(const char *s);
 void arch_debug_serial_early_boot_message(const char *string);
+
+void arch_debug_remove_interrupt_handler(uint32 line);
+void arch_debug_install_interrupt_handlers(void);
 
 status_t arch_debug_console_init(struct kernel_args *args);
 status_t arch_debug_console_init_settings(struct kernel_args *args);

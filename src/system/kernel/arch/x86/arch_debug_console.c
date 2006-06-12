@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
  * Copyright 2001, Rob Judd <judd@ob-wan.com>
  * Copyright 2002, Marcus Overhagen <marcus@overhagen.de>
  * Distributed under the terms of the Haiku License.
@@ -14,9 +14,9 @@
 #include <KernelExport.h>
 #include <driver_settings.h>
 #include <int.h>
+
 #include <arch/cpu.h>
 #include <arch/debug_console.h>
-
 #include <boot/stage2.h>
 
 #include <string.h>
@@ -45,11 +45,54 @@ enum serial_register_offsets {
 	SERIAL_MODEM_STATUS			= 6,
 };
 
+enum keycodes {
+	LEFT_SHIFT		= 42,
+	RIGHT_SHIFT		= 54,
+
+	LEFT_CONTROL	= 29,
+	RIGHT_CONTROL	= 157,
+
+	LEFT_ALT		= 56,
+	RIGHT_ALT		= 184,
+
+	CURSOR_LEFT		= 75,
+	CURSOR_RIGHT	= 77,
+	CURSOR_UP		= 72,
+	CURSOR_DOWN		= 80,
+
+	BREAK			= 198,
+	DELETE			= 201,
+	F12				= 88,
+};
+
+static const char kUnshiftedKeymap[128] = {
+	0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
+	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
+	'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static const char kShiftedKeymap[128] = {
+	0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
+	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
+	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
+	'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
 static const uint32 kSerialBaudRate = 115200;
 
 static uint16 sSerialBasePort = 0x3f8;
 	// COM1 is the default debug output port
 
+static bool sKeyboardHandlerInstalled = false;
 #if BOCHS_DEBUG_HACK
 static bool sBochsOutput = false;
 #endif
@@ -73,7 +116,82 @@ put_char(const char c)
 }
 
 
+/**	Minimal keyboard handler to be able to get into the debugger and
+ *	reboot the machine before the input_server is up and running.
+ *	It is added as soon as interrupts become available, and removed
+ *	again if anything else requests the interrupt 1.
+ */
+
+static int32
+debug_keyboard_interrupt(void *data)
+{
+	static bool controlPressed;
+	static bool altPressed;
+	uint8 key;
+
+	key = in8(PS2_PORT_DATA);
+	//dprintf("debug_keyboard_interrupt: key = 0x%x\n", key);
+
+	if (key & 0x80) {
+		if (key == LEFT_CONTROL)
+			controlPressed = false;
+		if (key == LEFT_ALT)
+			altPressed = false;
+
+		return B_HANDLED_INTERRUPT;
+	}
+
+	switch (key) {
+		case LEFT_CONTROL:
+			controlPressed = true;
+			break;
+
+		case LEFT_ALT:
+			altPressed = true;
+			break;
+
+		case DELETE:
+			if (controlPressed && altPressed)
+				arch_cpu_shutdown(true);
+			break;
+
+		/* the following code has two possibilities because of issues
+		 * with BeBochs & BeOS (all special keys don't map to anything
+		 * useful, and SYS_REQ does a screen dump in BeOS).
+		 * ToDo: remove these key functions some day...
+		 */
+		case F12:
+		case BREAK:
+			panic("Keyboard Requested Halt\n");
+			break;
+	}
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
 //	#pragma mark -
+
+
+void
+arch_debug_remove_interrupt_handler(uint32 line)
+{
+	if (line != INT_PS2_KEYBOARD || !sKeyboardHandlerInstalled)
+		return;
+
+	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &debug_keyboard_interrupt,
+		NULL);
+	sKeyboardHandlerInstalled = false;
+}
+
+
+void
+arch_debug_install_interrupt_handlers(void)
+{
+	install_io_interrupt_handler(INT_PS2_KEYBOARD, &debug_keyboard_interrupt,
+		NULL, 0);
+	sKeyboardHandlerInstalled = true;
+}
 
 
 char
@@ -82,34 +200,6 @@ arch_debug_blue_screen_getchar(void)
 	/* polling the keyboard, similar to code in keyboard
 	 * driver, but without using an interrupt
 	 */
-	static const char unshifted_keymap[128] = {
-		0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
-		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
-		'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
-		'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};
-	static const char shifted_keymap[128] = {
-		0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
-		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
-		'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
-		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};
-	enum keycodes {
-		LSHIFT			= 42,
-		RSHIFT			= 54,
-		CURSOR_LEFT		= 75,
-		CURSOR_RIGHT	= 77,
-		CURSOR_UP		= 72,
-		CURSOR_DOWN		= 80,
-	};
 	static bool shift = false;
 	static uint8 special = 0;
 	uint8 key, ascii = 0;
@@ -143,13 +233,13 @@ arch_debug_blue_screen_getchar(void)
 
 		if (key & 0x80) {
 			// key up
-			if (key == (0x80 | LSHIFT) || key == (0x80 | RSHIFT))
+			if (key == (0x80 | LEFT_SHIFT) || key == (0x80 | RIGHT_SHIFT))
 				shift = false;
 		} else {
 			// key down
 			switch (key) {
-				case LSHIFT:
-				case RSHIFT:
+				case LEFT_SHIFT:
+				case RIGHT_SHIFT:
 					shift = true;
 					break;
 
@@ -168,7 +258,7 @@ arch_debug_blue_screen_getchar(void)
 					return '\x1b';
 
 				default:
-					return shift ? shifted_keymap[key] : unshifted_keymap[key];
+					return shift ? kShiftedKeymap[key] : kUnshiftedKeymap[key];
 			}
 		}
 	}

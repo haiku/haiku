@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -14,6 +14,18 @@
 #include <vm.h>
 
 #include <string.h>
+
+
+void
+arch_debug_remove_interrupt_handler(uint32 line)
+{
+}
+
+
+void
+arch_debug_install_interrupt_handlers(void)
+{
+}
 
 
 char
