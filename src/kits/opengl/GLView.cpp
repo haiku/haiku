@@ -128,7 +128,12 @@ void BGLView::AttachedToWindow()
 	if (fRenderer) {
 		// Don't paint white window background when resized
 		SetViewColor(B_TRANSPARENT_32_BIT);
-		return fRenderer->AttachedToWindow();
+		fRenderer->AttachedToWindow();
+
+		// Set default OpenGL viewport:
+		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
+
+		return;
 	}
 	
 	// No Renderer, no rendering. Setup a minimal "No Renderer" string drawing context
