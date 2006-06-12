@@ -52,8 +52,8 @@ static property_info sShelfPropertyList[] = {
 		{ B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_ID_SPECIFIER },
 		"... of Replicant {index | name | id} of ...", 0,
 	},
-
-	{}
+	
+	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
 static property_info sReplicantPropertyList[] = {
@@ -90,7 +90,9 @@ static property_info sReplicantPropertyList[] = {
 		{ },
 		{ B_DIRECT_SPECIFIER },
 		NULL, 0,
-	}
+	},
+	
+	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
 

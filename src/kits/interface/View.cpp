@@ -3499,11 +3499,10 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 		return this;
 
 	BPropertyInfo propertyInfo(sViewPropInfo);
-
+	status_t err = B_BAD_SCRIPT_SYNTAX;
+	BMessage replyMsg(B_REPLY);
+	
 	switch (propertyInfo.FindMatch(msg, index, specifier, what, property)) {
-		case B_ERROR:
-			break;
-
 		case 0:
 		case 1:
 		case 2:
@@ -3515,87 +3514,75 @@ BView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 			if (fShelf) {
 				msg->PopSpecifier();
 				return fShelf;
-			} else {
-				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
-
-				replyMsg.AddInt32("error", B_NAME_NOT_FOUND);
-				replyMsg.AddString("message", "This window doesn't have a shelf");
-				msg->SendReply(&replyMsg);
-				return NULL;
 			}
+
+			err = B_NAME_NOT_FOUND;
+			replyMsg.AddString("message", "This window doesn't have a shelf");
 			break;
 
-		case 6:
-		case 7:
-		case 8:
-		{
-			if (fFirstChild) {
-				BView *child;
-				switch (msg->what) {
-					case B_INDEX_SPECIFIER:
-					{
-						int32 index;
-						msg->FindInt32("data", &index);
-						child = ChildAt(index);
-						break;
-					}
-					case B_REVERSE_INDEX_SPECIFIER:
-					{
-						int32 rindex;
-						msg->FindInt32("data", &rindex);
-						child = ChildAt(CountChildren() - rindex);
-						break;
-					}
-					case B_NAME_SPECIFIER:
-					{
-						const char *name;
-						msg->FindString("data", &name);
-						child = FindView(name);
-						break;
-					}
-
-					default:
-						child = NULL;
-						break;
-				}
-
-				if (child != NULL) {
-					msg->PopSpecifier();
-					return child;
-				} else {
-					BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
-					replyMsg.AddInt32("error", B_BAD_INDEX);
-					replyMsg.AddString("message", "Cannot find view at/with specified index/name.");
-					msg->SendReply(&replyMsg);
-					return NULL;
-				}
-			} else {
-				BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
-				replyMsg.AddInt32("error", B_NAME_NOT_FOUND);
+		case 6: {
+			if (!fFirstChild) {
+				err = B_NAME_NOT_FOUND;
 				replyMsg.AddString("message", "This window doesn't have children.");
-				msg->SendReply(&replyMsg);
-				return NULL;
+				break;
 			}
+			BView *child = NULL;
+			switch (what) {
+				case B_INDEX_SPECIFIER:	{
+					int32 index;
+					err = specifier->FindInt32("index", &index);
+					if (err == B_OK)
+						child = ChildAt(index);
+					break;
+				}
+				case B_REVERSE_INDEX_SPECIFIER: {
+					int32 rindex;
+					err = specifier->FindInt32("index", &rindex);
+					if (err == B_OK)
+						child = ChildAt(CountChildren() - rindex);
+					break;
+				}
+				case B_NAME_SPECIFIER: {
+					const char *name;
+					err = specifier->FindString("name", &name);
+					if (err == B_OK)
+						child = FindView(name);
+					break;
+				}
+			}
+
+			if (child != NULL) {
+				msg->PopSpecifier();
+				return child;
+			}
+			
+			if (err == B_OK)
+				err = B_BAD_INDEX;
+			replyMsg.AddString("message", "Cannot find view at/with specified index/name.");
 			break;
 		}
-
 		default:
-			break;
+			return BHandler::ResolveSpecifier(msg, index, specifier, what, property);		
 	}
 
-	return BHandler::ResolveSpecifier(msg, index, specifier, what, property);
+	if (err == B_BAD_SCRIPT_SYNTAX) {
+		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
+		replyMsg.AddString("message", "Didn't understand the specifier(s)");
+	} else if (err < B_OK) {
+		replyMsg.what = B_ERROR;
+		replyMsg.AddString("message", strerror(err));			
+	}
+		
+	replyMsg.AddInt32("error", err);
+	msg->SendReply(&replyMsg);
+	return NULL;
+	
 }
 
 
 void
 BView::MessageReceived(BMessage *msg)
 { 
-	BMessage specifier;
-	int32 what;
-	const char *prop;
-	int32 index;
-	status_t err;
-
 	if (!msg->HasSpecifiers()) {
 		switch (msg->what) {
 			case B_VIEW_RESIZED:
@@ -3652,90 +3639,66 @@ BView::MessageReceived(BMessage *msg)
 			}
 
 			default:
-				BHandler::MessageReceived(msg);
-				break;
+				return BHandler::MessageReceived(msg);
 		}
 
 		return;
 	}
 
-	err = msg->GetCurrentSpecifier(&index, &specifier, &what, &prop);
-	if (err == B_OK) {
-		BMessage replyMsg;
-
-		switch (msg->what) {
-			case B_GET_PROPERTY:
-			{
-				replyMsg.what = B_NO_ERROR;
-				replyMsg.AddInt32("error", B_OK);
-
-				if (strcmp(prop, "Frame") == 0)
-					replyMsg.AddRect("result", Frame());
-				else if (strcmp(prop, "Hidden") == 0)
-					replyMsg.AddBool( "result", IsHidden());
-				break;
+	BMessage replyMsg(B_REPLY);
+	status_t err = B_BAD_SCRIPT_SYNTAX;
+	int32 index;
+	BMessage specifier;
+	int32 what;
+	const char *prop;
+	
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+		return BHandler::MessageReceived(msg);
+		
+	BPropertyInfo propertyInfo(sViewPropInfo);
+	switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
+		case 0:
+			err = replyMsg.AddRect("result", Frame());
+			break;
+		case 1: {
+			BRect newFrame;
+			err = msg->FindRect("data", &newFrame);
+			if (err == B_OK) {
+				MoveTo(newFrame.LeftTop());
+				ResizeTo(newFrame.right, newFrame.bottom);
 			}
-
-			case B_SET_PROPERTY:
-			{
-				if (strcmp(prop, "Frame") == 0) {
-					BRect newFrame;
-					if (msg->FindRect("data", &newFrame) == B_OK) {
-						MoveTo(newFrame.LeftTop());
-						ResizeTo(newFrame.right, newFrame.bottom);
-
-						replyMsg.what = B_NO_ERROR;
-						replyMsg.AddInt32("error", B_OK);
-					} else {
-						replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-						replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-						replyMsg.AddString("message", "Didn't understand the specifier(s)");
-					}
-				} else if (strcmp(prop, "Hidden") == 0) {
-					bool newHiddenState;
-					if (msg->FindBool("data", &newHiddenState) == B_OK) {
-						if (!IsHidden() && newHiddenState == true) {
-							Hide();
-
-							replyMsg.what = B_NO_ERROR;
-							replyMsg.AddInt32( "error", B_OK);
-						}
-						else if (IsHidden() && newHiddenState == false) {
-							Show();
-
-							replyMsg.what = B_NO_ERROR;
-							replyMsg.AddInt32("error", B_OK);
-						} else {
-							replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-							replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-							replyMsg.AddString("message", "Didn't understand the specifier(s)");
-						}
-					} else {
-						replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
-						replyMsg.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-						replyMsg.AddString("message", "Didn't understand the specifier(s)");
-					}
-				}
-				break;
+			break;
+		}		
+		case 2:
+			err = replyMsg.AddBool( "result", IsHidden());
+			break;
+		case 3: {
+			bool newHiddenState;
+			err = msg->FindBool("data", &newHiddenState);
+			if (err == B_OK) {
+				if (!IsHidden() && newHiddenState == true)
+					Hide();
+				else if (IsHidden() && newHiddenState == false)
+					Show();
 			}
-
-			case B_COUNT_PROPERTIES:
-				if (strcmp(prop, "View") == 0) {
-					replyMsg.what = B_NO_ERROR;
-					replyMsg.AddInt32("error", B_OK);
-					replyMsg.AddInt32("result", CountChildren());
-				}
-				break;
 		}
-
-		msg->SendReply(&replyMsg);
-	} else {
-		BMessage replyMsg(B_MESSAGE_NOT_UNDERSTOOD);
-		replyMsg.AddInt32("error" , B_BAD_SCRIPT_SYNTAX);
-		replyMsg.AddString("message", "Didn't understand the specifier(s)");
-
-		msg->SendReply(&replyMsg);
+		case 5:
+			err = replyMsg.AddInt32("result", CountChildren());
+			break;
+		default:
+			return BHandler::MessageReceived(msg);
 	}
+		
+	if (err == B_BAD_SCRIPT_SYNTAX) {
+		replyMsg.what = B_MESSAGE_NOT_UNDERSTOOD;
+		replyMsg.AddString("message", "Didn't understand the specifier(s)");
+	} else if (err < B_OK) {
+		replyMsg.what = B_ERROR;
+		replyMsg.AddString("message", strerror(err));			
+	}
+		
+	replyMsg.AddInt32("error", err);
+	msg->SendReply(&replyMsg);
 } 
 
 

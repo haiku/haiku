@@ -661,141 +661,132 @@ BWindow::MessageReceived(BMessage *msg)
 	BMessage replyMsg(B_REPLY);
 	bool handled = false;
 
-	switch (msg->what) {
-		case B_GET_PROPERTY:
-		case B_SET_PROPERTY:
-		case B_CREATE_PROPERTY:
-		case B_DELETE_PROPERTY:
-		case B_COUNT_PROPERTIES:
-		case B_EXECUTE_PROPERTY:
-		case B_GET_SUPPORTED_SUITES: {
-			BMessage specifier;
-			int32 what;
-			const char *prop;
-			int32 index;
+	
+	BMessage specifier;
+	int32 what;
+	const char *prop;
+	int32 index;
 
-			if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
-				return BLooper::MessageReceived(msg);
-			
-			BPropertyInfo propertyInfo(sWindowPropInfo);
-			switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
-				case 0:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddBool("result", IsActive());
-						handled = true;
-					} else if (msg->what == B_SET_PROPERTY) {
-						bool newActive;
-						if (msg->FindBool("data", &newActive) == B_OK) {
-							Activate(newActive);
-							handled = true;
-						}
-					}
-					break;
-				case 1:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddInt32("result", (uint32)Feel());
-						handled = true;
-					} else {
-						uint32 newFeel;
-						if (msg->FindInt32("data", (int32 *)&newFeel) == B_OK) {
-							SetFeel((window_feel)newFeel);
-							handled = true;
-						}
-					}
-					break;
-				case 2:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddInt32("result", Flags());
-						handled = true;
-					} else {
-						uint32 newFlags;
-						if (msg->FindInt32("data", (int32 *)&newFlags) == B_OK) {
-							SetFlags(newFlags);
-							handled = true;
-						}
-					}
-					break;
-				case 3:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddRect("result", Frame());
-						handled = true;
-					} else {
-						BRect newFrame;
-						if (msg->FindRect("data", &newFrame) == B_OK) {
-							MoveTo(newFrame.LeftTop());
-							ResizeTo(newFrame.Width(), newFrame.Height());
-							handled = true;
-						}
-					}
-					break;
-				case 4:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddBool("result", IsHidden());
-						handled = true;
-					} else {
-						bool hide;
-						if (msg->FindBool("data", &hide) == B_OK) {
-							if (hide) {
-								if (!IsHidden())
-									Hide();
-							} else if (IsHidden())
-								Show();
-							handled = true;
-						}
-					}
-					break;
-				case 5:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddInt32("result", (uint32)Look());
-						handled = true;
-					} else {
-						uint32 newLook;
-						if (msg->FindInt32("data", (int32 *)&newLook) == B_OK) {
-							SetLook((window_look)newLook);
-							handled = true;
-						}
-					}
-					break;
-				case 6:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddString("result", Title());
-						handled = true;
-					} else {
-						const char *newTitle = NULL;
-						if (msg->FindString("data", &newTitle) == B_OK) {
-							SetTitle(newTitle);
-							handled = true;
-						}
-					}
-					break;
-				case 7:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddInt32( "result", Workspaces());
-						handled = true;
-					} else {
-						uint32 newWorkspaces;
-						if (msg->FindInt32("data", (int32 *)&newWorkspaces) == B_OK) {
-							SetWorkspaces(newWorkspaces);
-							handled = true;
-						}
-					}
-					break;
-				case 11:
-					if (msg->what == B_GET_PROPERTY) {
-						replyMsg.AddBool("result", IsMinimized());
-						handled = true;
-					} else {
-						bool minimize;
-						if (msg->FindBool("data", &minimize) == B_OK) {
-							Minimize(minimize);
-							handled = true;
-						}
-					}
-					break;
-				default:
-					return BLooper::MessageReceived(msg);
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+		return BLooper::MessageReceived(msg);
+	
+	BPropertyInfo propertyInfo(sWindowPropInfo);
+	switch (propertyInfo.FindMatch(msg, index, &specifier, what, prop)) {
+		case 0:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddBool("result", IsActive());
+				handled = true;
+			} else if (msg->what == B_SET_PROPERTY) {
+				bool newActive;
+				if (msg->FindBool("data", &newActive) == B_OK) {
+					Activate(newActive);
+					handled = true;
+				}
 			}
-		}
+			break;
+		case 1:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddInt32("result", (uint32)Feel());
+				handled = true;
+			} else {
+				uint32 newFeel;
+				if (msg->FindInt32("data", (int32 *)&newFeel) == B_OK) {
+					SetFeel((window_feel)newFeel);
+					handled = true;
+				}
+			}
+			break;
+		case 2:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddInt32("result", Flags());
+				handled = true;
+			} else {
+				uint32 newFlags;
+				if (msg->FindInt32("data", (int32 *)&newFlags) == B_OK) {
+					SetFlags(newFlags);
+					handled = true;
+				}
+			}
+			break;
+		case 3:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddRect("result", Frame());
+				handled = true;
+			} else {
+				BRect newFrame;
+				if (msg->FindRect("data", &newFrame) == B_OK) {
+					MoveTo(newFrame.LeftTop());
+					ResizeTo(newFrame.Width(), newFrame.Height());
+					handled = true;
+				}
+			}
+			break;
+		case 4:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddBool("result", IsHidden());
+				handled = true;
+			} else {
+				bool hide;
+				if (msg->FindBool("data", &hide) == B_OK) {
+					if (hide) {
+						if (!IsHidden())
+							Hide();
+					} else if (IsHidden())
+						Show();
+					handled = true;
+				}
+			}
+			break;
+		case 5:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddInt32("result", (uint32)Look());
+				handled = true;
+			} else {
+				uint32 newLook;
+				if (msg->FindInt32("data", (int32 *)&newLook) == B_OK) {
+					SetLook((window_look)newLook);
+					handled = true;
+				}
+			}
+			break;
+		case 6:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddString("result", Title());
+				handled = true;
+			} else {
+				const char *newTitle = NULL;
+				if (msg->FindString("data", &newTitle) == B_OK) {
+					SetTitle(newTitle);
+					handled = true;
+				}
+			}
+			break;
+		case 7:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddInt32( "result", Workspaces());
+				handled = true;
+			} else {
+				uint32 newWorkspaces;
+				if (msg->FindInt32("data", (int32 *)&newWorkspaces) == B_OK) {
+					SetWorkspaces(newWorkspaces);
+					handled = true;
+				}
+			}
+			break;
+		case 11:
+			if (msg->what == B_GET_PROPERTY) {
+				replyMsg.AddBool("result", IsMinimized());
+				handled = true;
+			} else {
+				bool minimize;
+				if (msg->FindBool("data", &minimize) == B_OK) {
+					Minimize(minimize);
+					handled = true;
+				}
+			}
+			break;
+		default:
+			return BLooper::MessageReceived(msg);
 	}
 
 	if (handled) {
