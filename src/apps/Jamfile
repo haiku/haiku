@@ -13,6 +13,7 @@ SubInclude HAIKU_TOP src apps diskprobe ;
 SubInclude HAIKU_TOP src apps expander ;
 SubInclude HAIKU_TOP src apps fontdemo ;
 SubInclude HAIKU_TOP src apps glteapot ;
+SubInclude HAIKU_TOP src apps icon-o-matic ;
 SubInclude HAIKU_TOP src apps installer ;
 SubInclude HAIKU_TOP src apps magnify ;
 SubInclude HAIKU_TOP src apps mediaplayer ;

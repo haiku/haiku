@@ -1,0 +1,79 @@
+SubDir HAIKU_TOP src apps icon-o-matic ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+# source directories
+local sourceDirs =
+	document
+	generic
+	generic/command
+	generic/gui
+	generic/gui/panel
+	generic/gui/popup_control
+	generic/gui/scrollview
+	generic/gui/stateview
+	generic/listener
+	generic/selection
+	generic/support
+	shape
+	shape/commands
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps icon-o-matic $(sourceDir) ] ;
+}
+
+# system headers
+UseLibraryHeaders agg ;
+
+Application Icon-O-Matic :
+	#document
+	Document.cpp
+	#generic/command
+	Command.cpp
+	CommandStack.cpp
+	Selectable.cpp
+	Selection.cpp
+	#generic/gui
+	#generic/gui/panel
+	#generic/gui/popup_control
+	#generic/gui/scrollview
+	#generic/gui/stateview
+	Manipulator.cpp
+	MultipleManipulatorState.cpp
+	StateView.cpp
+	ViewState.cpp
+	#generic/listener
+	Observable.cpp
+	Observer.cpp
+	#generic/selection
+	#generic/support
+	RWLocker.cpp
+	support.cpp
+	#shape
+	PathManipulator.cpp
+	VectorPath.cpp
+	#shape/commands
+	AddPointCommand.cpp
+	ChangePointCommand.cpp
+	InsertPointCommand.cpp
+	PathCommand.cpp
+	RemovePointsCommand.cpp
+	#
+	CanvasView.cpp
+	IconEditorApp.cpp
+	main.cpp
+	MainWindow.cpp
+	: be libagg.a
+;
+
+
+
+# also install in app_server test environment
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Icon-O-Matic
+		: tests!apps ;
+}
+

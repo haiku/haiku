@@ -1,0 +1,33 @@
+--------- random thoughts
+
+
+* works a bit like WonderBrush
+
+* list of vector path objects
+
+* tree of object instances, such that the same vector path
+  object can be visible at different locations with different fill styles
+
+* instances of paths can have additional vector transformers
+
+* "add points" mode is problematic when having multiple manipulators for
+  different paths showing at the same time...
+
+
+--------- icon format
+
+* 192 "built-in" (pre-defined) style definitions
+* up to 64 additional style definitions per document
+* solid colors and different types of gradients
+* uint8 precision for coordinates on a 64x64 virtual pixel grid
+(* removal (freezing) of transformations at export time
+	not sure about this one, it would remove the possiblity
+	to store vector path only once for referenced objects)
+* referencing of fill style by uint8 id
+* IFF type chunk format
+
+
+--------- rendering
+
+* compound shape single pass rendering (if possible)
+* auto hinting (aligning to pixels) of marked shapes
