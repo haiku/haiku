@@ -35,10 +35,5 @@ int main( int argc, char **argv )
 {
     BApplication app( unzip_signature );
 
-    int retval = main_stub( argc, argv );
-
-    app.PostMessage( B_QUIT_REQUESTED );
-    app.Run();
-
-    return retval;
+	return main_stub( argc, argv );
 }

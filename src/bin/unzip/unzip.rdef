@@ -1,5 +1,8 @@
-resource app_version
-{
+
+resource app_signature "application/x-vnd.Info-ZIP.UnZip";
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
+
+resource app_version {
 	major = 5,
 	middle = 5,
 	minor = 0,
@@ -8,4 +11,3 @@ resource app_version
 	short_info = "5.50", 
     long_info  = "5.50 ©2002 Info-ZIP"
 };
-
