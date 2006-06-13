@@ -935,6 +935,9 @@ ShowImageWindow::ToggleFullScreen()
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
 		fImageView->SetAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE);
+
+		Activate();
+			// make the window frontmost
 	} else {
 		frame = fWindowFrame;
 
