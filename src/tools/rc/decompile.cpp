@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
+#include <AppFileInfo.h>
 #include <Mime.h>
 #include <Resources.h>
 #include <Roster.h>
@@ -723,6 +725,51 @@ write_app_file_types(const void *data, size_t length)
 	write_other(NULL, B_MESSAGE_TYPE, data, length);
 }
 
+
+static void
+write_app_version(const void *data, size_t length)
+{
+	const version_info *version = (const version_info *)data;
+	//const version_info *systemVersion = version + 1;
+
+	fputs("resource app_version", sOutputFile);
+	open_brace();
+
+	fprintf(sOutputFile, "\tmajor  = %ld,\n"
+		"\tmiddle = %ld,\n"
+		"\tminor  = %ld,\n\n", version->major, version->middle, version->minor);
+
+	const char *variety = "B_APPV_DEVELOPMENT";
+	switch (version->variety) {
+		case 1:
+			variety = "B_APPV_ALPHA";
+			break;
+		case 2:
+			variety = "B_APPV_BETA";
+			break;
+		case 3:
+			variety = "B_APPV_GAMMA";
+			break;
+		case 4:
+			variety = "B_APPV_GOLDEN_MASTER";
+			break;
+		case 5:
+			variety = "B_APPV_FINAL";
+			break;
+	}
+	fprintf(sOutputFile, "\tvariety = %s,\n"
+		"\tinternal = %ld,\n\n", variety, version->internal);
+
+	fprintf(sOutputFile, "\tshort_info = ");
+	write_string(NULL, B_STRING_TYPE, version->short_info, strlen(version->short_info));
+
+	fprintf(sOutputFile, ",\n\tlong_info = ");
+	write_string(NULL, B_STRING_TYPE, version->long_info, strlen(version->long_info));
+
+	close_brace();
+}
+
+
 //	#pragma mark - file examination
 
 
@@ -803,8 +850,15 @@ write_data(int32 id, const char *name, type_code type,
 			break;
 
 		case 'APPF':
-			if (length == 4) {
+			if (!strcmp(name, "BEOS:APP_FLAGS") && length == 4) {
 				write_app_flags(data, length);
+				return;
+			}
+			break;
+
+		case 'APPV':
+			if (!strcmp(name, "BEOS:APP_VERSION") && length == sizeof(version_info) * 2) {
+				write_app_version(data, length);
 				return;
 			}
 			break;
