@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src tools hey ;
-
-BinCommand hey : hey.cpp : be ;
-

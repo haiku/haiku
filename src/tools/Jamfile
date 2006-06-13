@@ -43,7 +43,6 @@ SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
-SubInclude HAIKU_TOP src tools hey ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools makebootable ;
 SubInclude HAIKU_TOP src tools rc ;
