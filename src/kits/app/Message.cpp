@@ -1319,13 +1319,14 @@ BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *what,
 	const char **property) const
 {
 	DEBUG_FUNCTION_ENTER;
-	if (!(fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED))
+	if (fHeader->current_specifier < 0
+		|| !(fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED))
 		return B_BAD_SCRIPT_SYNTAX;
 
 	if (index)
 		*index = fHeader->current_specifier;
 
-	if (specifier && fHeader->current_specifier >= 0) {
+	if (specifier) {
 		if (FindMessage(B_SPECIFIER_ENTRY, fHeader->current_specifier,
 			specifier) < B_OK)
 			return B_BAD_SCRIPT_SYNTAX;
