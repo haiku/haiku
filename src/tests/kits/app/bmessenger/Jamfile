@@ -9,4 +9,9 @@ UnitTest SMRemoteTargetApp
 	: be $(TARGET_LIBSTDC++)
 ;
 
+SimpleTest ForwardMessageTest :
+        ForwardMessageTest.cpp
+        : be
+        ;
+
 SubInclude HAIKU_TOP src tests kits app bmessenger testapps ;
