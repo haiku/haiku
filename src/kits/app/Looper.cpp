@@ -1477,8 +1477,8 @@ BLooper::resolve_specifier(BHandler* target, BMessage* msg)
 			return NULL;
 
 		//	Get current specifier index (may change in ResolveSpecifier())
-		msg->GetCurrentSpecifier(&index);
-	} while (newTarget && newTarget != target && index >= 0);
+		err = msg->GetCurrentSpecifier(&index);
+	} while (newTarget && newTarget != target && !err && index >= 0);
 
 	return newTarget;
 }
