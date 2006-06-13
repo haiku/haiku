@@ -305,12 +305,9 @@ BSlider::AttachedToWindow()
 		fOffScreenBits->AddChild(fOffScreenView);
 #endif // USE_OFF_SCREEN_VIEW
 
-	SetValue(Value());
-
-	BView* view = OffscreenView();
-
 	BControl::AttachedToWindow();
 
+	BView* view = OffscreenView();
 	if (view) {
 		rgb_color color = ViewColor();
 		if (Parent() != NULL)
@@ -326,6 +323,9 @@ BSlider::AttachedToWindow()
 		view->SetLowColor(color);
 		view->UnlockLooper();
 	}
+
+	SetValue(Value());
+		// makes sure the value is within valid bounds
 }
 
 
