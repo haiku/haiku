@@ -1281,7 +1281,7 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
 					&& StringWidth(fPathStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
 					fTrackingState = no_track;
 					BRect rect(fPathRect);
-					rect.right = rect.left + StringWidth(fPathStr.String()) + 4;
+					rect.right = rect.left + be_plain_font->StringWidth(fPathStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
 					if (rect.left < 0)
 						rect.OffsetBy(rect.left * -1, 0);
@@ -1296,7 +1296,7 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
 						&& StringWidth(fLinkToStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
 					fTrackingState = no_track;
 					BRect rect(fLinkRect);
-					rect.right = rect.left + StringWidth(fLinkToStr.String()) + 4;
+					rect.right = rect.left + be_plain_font->StringWidth(fLinkToStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
 					if (rect.left < 0)
 						rect.OffsetBy(rect.left * -1, 0);
@@ -1311,7 +1311,7 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
 					&& StringWidth(fDescStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
 					fTrackingState = no_track;
 					BRect rect(fDescRect);
-					rect.right = rect.left + StringWidth(fDescStr.String()) + 4;
+					rect.right = rect.left + be_plain_font->StringWidth(fDescStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
 					if (rect.left < 0)
 						rect.OffsetBy(rect.left * -1, 0);
