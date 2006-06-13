@@ -286,6 +286,9 @@ MimeTypeItem::Compare(const BListItem* a, const BListItem* b)
 int
 MimeTypeItem::CompareLabels(const BListItem* a, const BListItem* b)
 {
+	if (a->OutlineLevel() != b->OutlineLevel())
+		return a->OutlineLevel() - b->OutlineLevel();
+
 	const MimeTypeItem* typeA = dynamic_cast<const MimeTypeItem*>(a);
 	const MimeTypeItem* typeB = dynamic_cast<const MimeTypeItem*>(b);
 
