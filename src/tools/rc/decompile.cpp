@@ -22,6 +22,7 @@
 
 #include <Mime.h>
 #include <Resources.h>
+#include <Roster.h>
 #include <TypeConstants.h>
 
 #include <ctype.h>
@@ -44,7 +45,9 @@ static FILE *sHeaderFile;
 static int32 sTabs;
 static bool sBraceOnNextLine = false;
 
-static void examine_data(const char *, type_code, const void *, size_t);
+
+static void write_generic_data(const char *name, type_code type,
+	const void *data, size_t length);
 
 
 static void
@@ -157,6 +160,28 @@ has_prefix(const char *name)
 }
 
 
+static bool
+is_string(const void *data, size_t length)
+{
+	// We consider the buffer a string if it contains only human readable
+	// characters. The buffer should also end with a '\0'. Although the
+	// compiler allows string literals to contain embedded '\0' chars as
+	// well, we don't allow them here (because they may cause false hits).
+
+	if (length == 0)
+		return false;
+
+	char *ptr = (char *)data;
+
+	for (size_t t = 0; t < length - 1; ++t) {
+		if (!isprint(*ptr++))
+			return false;
+	}
+
+	return (*ptr == '\0');
+}
+
+
 static void
 write_rsrc(type_code type, int32 id, const char *name)
 {
@@ -178,6 +203,9 @@ write_rsrc(type_code type, int32 id, const char *name)
 		fprintf(sOutputFile, "resource(%ld, \"%s\") ", id, name);
 	}
 }
+
+
+//	#pragma mark - generic types
 
 
 static uint8 *
@@ -455,8 +483,8 @@ write_rgb(const char *name, const void *data)
 }
 
 
-static char *
-write_string_line(char *ptr, char *end, size_t charsPerLine)
+static const char *
+write_string_line(const char *ptr, const char *end, size_t charsPerLine)
 {
 	uint32 count = 0;
 	bool end_of_item = false;
@@ -502,8 +530,8 @@ static void
 write_string(const char *name, type_code type,
 	const void *data, size_t length)
 {
-	char *ptr = (char *)data;
-	char *end = ptr + length;
+	const char *ptr = (const char *)data;
+	const char *end = ptr + length;
 	size_t charsPerLine = 64;
 
 	// We write an "array" resource if the string has more than 64 
@@ -573,7 +601,7 @@ write_fields(BMessage &msg)
 					fprintf(sOutputFile, ",\n");
 
 				indent();
-				examine_data(name, type, data, length);
+				write_generic_data(name, type, data, length);
 			}
 		}
 
@@ -586,7 +614,7 @@ write_fields(BMessage &msg)
 
 static void
 write_message(const char *name, BMessage &msg, type_code type)
-{	
+{
 	if (type != B_MESSAGE_TYPE) {
 		fprintf(sOutputFile, "#");
 		write_code(type);
@@ -630,28 +658,6 @@ write_message(const char *name, BMessage &msg, type_code type)
 }
 
 
-static bool
-is_string(const void *data, size_t length)
-{
-	// We consider the buffer a string if it contains only human readable
-	// characters. The buffer should also end with a '\0'. Although the
-	// compiler allows string literals to contain embedded '\0' chars as
-	// well, we don't allow them here (because they may cause false hits).
-
-	if (length == 0)
-		return false;
-
-	char *ptr = (char *)data;
-
-	for (size_t t = 0; t < length - 1; ++t) {
-		if (!isprint(*ptr++))
-			return false;
-	}
-
-	return (*ptr == '\0');
-}
-
-
 static void
 write_other(const char *name, type_code type,
 	const void *data, size_t length)
@@ -666,8 +672,62 @@ write_other(const char *name, type_code type,
 }
 
 
+//	#pragma mark - special types
+
+
 static void
-examine_data(const char *name, type_code type,
+write_app_signature(const void *data, size_t length)
+{
+	fprintf(sOutputFile, "resource app_signature ");
+	write_string_line((const char *)data, (const char *)data + length, length * 2);
+}
+
+
+static void
+write_app_flags(const void *data, size_t length)
+{
+	fprintf(sOutputFile, "resource app_flags ");
+
+	uint32 flags = *(uint32 *)data;
+	switch (flags & B_LAUNCH_MASK) {
+		case B_SINGLE_LAUNCH:
+			fputs("B_SINGLE_LAUNCH", sOutputFile);
+			break;
+		case B_MULTIPLE_LAUNCH:
+			fputs("B_MULTIPLE_LAUNCH", sOutputFile);
+			break;
+		case B_EXCLUSIVE_LAUNCH:
+			fputs("B_EXCLUSIVE_LAUNCH", sOutputFile);
+			break;
+	}
+
+	if (flags & B_BACKGROUND_APP)
+		fputs(" | B_BACKGROUND_APP", sOutputFile);
+	if (flags & B_ARGV_ONLY)
+		fputs(" | B_ARGV_ONLY", sOutputFile);
+}
+
+
+static void
+write_app_icon(uint32 which, const void *data, size_t length)
+{
+	fprintf(sOutputFile, "resource %s_icon ", which == B_MINI_ICON ? "mini" : "large");
+	write_raw(NULL, B_RAW_TYPE, data, length, which);
+}
+
+
+static void
+write_app_file_types(const void *data, size_t length)
+{
+	fputs("resource file_types ", sOutputFile);
+	write_other(NULL, B_MESSAGE_TYPE, data, length);
+}
+
+//	#pragma mark - file examination
+
+
+static void
+write_generic_data(const char *name, type_code type,
 	const void *data, size_t length)
 {
 	switch (type) {
@@ -691,15 +751,69 @@ examine_data(const char *name, type_code type,
 		case B_RECT_TYPE:      write_rect(name, data);   break;
 		case B_RGB_COLOR_TYPE: write_rgb(name, data);    break;
 
-		case B_MIME_STRING_TYPE: write_string(name, type, data, length); break;
-		case B_STRING_TYPE:      write_string(name, type, data, length); break;
+		case B_MIME_STRING_TYPE:
+		case B_STRING_TYPE:
+			write_string(name, type, data, length);
+			break;
 
 		case B_POINTER_TYPE: write_raw(name, type, data, length);     break;
 		case 'MICN':         write_raw(name, type, data, length, 16); break;
 		case 'ICON':         write_raw(name, type, data, length);     break;
 
-		default: write_other(name, type, data, length); break;
+		default:
+			write_other(name, type, data, length);
+			break;
 	}
+}
+
+
+static void
+write_data(int32 id, const char *name, type_code type,
+	const void *data, size_t length)
+{
+	// check for special types
+
+	switch (type) {
+		case B_MIME_STRING_TYPE:
+			if (!strcmp(name, "BEOS:APP_SIG")) {
+				write_app_signature(data, length);
+				return;
+			}
+			break;
+
+		case 'MICN':
+			if (!strcmp(name, "BEOS:M:STD_ICON")) {
+				write_app_icon(B_MINI_ICON, data, length);
+				return;
+			}
+			break;
+
+		case 'ICON':
+			if (!strcmp(name, "BEOS:L:STD_ICON")) {
+				write_app_icon(B_LARGE_ICON, data, length);
+				return;
+			}
+			break;
+
+		case B_MESSAGE_TYPE:
+			if (!strcmp(name, "BEOS:FILE_TYPES")) {
+				write_app_file_types(data, length);
+				return;
+			}
+			break;
+
+		case 'APPF':
+			if (length == 4) {
+				write_app_flags(data, length);
+				return;
+			}
+			break;
+	}
+
+	// write generic types
+
+	write_rsrc(type, id, name);
+	write_generic_data(NULL, type, data, length);
 }
 
 
@@ -733,8 +847,7 @@ examine_file(char *fileName)
 		data = res.LoadResource(type, id, NULL);
 		if (data != NULL) {
 			fprintf(sOutputFile, "\n");
-			write_rsrc(type, id, name);
-			examine_data(NULL, type, data, length);
+			write_data(id, name, type, data, length);
 			fprintf(sOutputFile, ";\n");
 		}
 
