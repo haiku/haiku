@@ -149,6 +149,7 @@ TimeSlider::~TimeSlider()
 void
 TimeSlider::AttachedToWindow()
 {
+	BSlider::AttachedToWindow();
 	SetTarget(this);
 }
 
