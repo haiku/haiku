@@ -1906,9 +1906,7 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 
 	if (replyRequired)
 		header->flags |= MESSAGE_FLAG_REPLY_REQUIRED;
-	else
-		header->flags &= ~MESSAGE_FLAG_REPLY_REQUIRED;
-
+	
 	header->target = token;
 	header->reply_team = replyToPrivate.Team();
 	header->reply_port = replyToPrivate.Port();
