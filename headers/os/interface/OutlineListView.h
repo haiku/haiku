@@ -126,8 +126,9 @@ class BOutlineListView : public BListView {
 		bool				OutlineMoveItem(int32 from, int32 to);
 		bool				OutlineReplaceItem(int32 index, BListItem* item);
 		void				CommonMoveItems(int32 from, int32 count, int32 to);
-		BListItem*			SuperitemForIndex(int32 fullListIndex, int32 level);
-		int32				FindPreviousVisibleIndex(int32 fullListIndex);
+		BListItem*			_SuperitemForIndex(int32 fullListIndex, int32 level,
+								int32* _superIndex = NULL);
+		int32				_FindPreviousVisibleIndex(int32 fullListIndex);
 
 	private:
 		BList				fFullList;
