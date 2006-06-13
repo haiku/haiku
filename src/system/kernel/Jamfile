@@ -10,6 +10,8 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
+
 KernelMergeObject kernel_core.o :
 	boot_item.cpp
 	cpu.c

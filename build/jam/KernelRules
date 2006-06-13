@@ -54,6 +54,13 @@ rule KernelLd
 	Depends $(1) : $(2) ;
 
 	MakeLocateDebug $(1) ; 
+
+	on $(1) XRes $(1) : $(RESFILES) ;
+	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
+		SetType $(1) ;
+		MimeSet $(1) ;
+		SetVersion $(1) ;
+	}
 }
 
 actions KernelLd
