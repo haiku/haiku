@@ -2593,8 +2593,8 @@ BContainerWindow::AddWindowContextMenus(BMenu *menu)
 #if 0
 	BMenuItem *pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V');
 	menu->AddItem(pasteItem);
-#endif
 	menu->AddSeparatorItem();
+#endif
 	menu->AddItem(new BMenuItem("Clean Up", new BMessage(kCleanup), 'K'));
 	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS,
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
