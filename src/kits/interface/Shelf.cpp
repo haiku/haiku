@@ -480,10 +480,9 @@ BShelf::MessageReceived(BMessage *msg)
 	int32 what;
 	const char *prop;
 	int32 index;
-	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK) {
-		BHandler::MessageReceived(msg);
-		return;
-	}
+	if (msg->GetCurrentSpecifier(&index, &specifier, &what, &prop) != B_OK)
+		return BHandler::MessageReceived(msg);
+	
 	switch (msg->what) {
 		case B_DELETE_PROPERTY:
 		case B_GET_PROPERTY:
@@ -544,13 +543,16 @@ BShelf::MessageReceived(BMessage *msg)
 						}
 					}
 				}
+				break;
 			}
-			break;
+			return BHandler::MessageReceived(msg);
+
 		case B_COUNT_PROPERTIES:
 			if (strcmp(prop, "Replicant") == 0) {
 				err = replyMsg.AddInt32("result", CountReplicants());
+				break;
 			}
-			break;
+			return BHandler::MessageReceived(msg);
 	};
 
 	if (err == B_BAD_SCRIPT_SYNTAX) {
