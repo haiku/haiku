@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku, Inc.
+ * Copyright 2002-2006, Haiku, Inc.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -26,6 +26,7 @@
 #include <Path.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <TextView.h>
 #include <Window.h>
 
 #include <ctype.h>
@@ -290,11 +291,21 @@ WorkspacesApp::~WorkspacesApp()
 void
 WorkspacesApp::AboutRequested()
 {
-	// blocking !! 
-	// the original does the same by the way =)
-	(new BAlert("about", "OpenBeOS Workspaces\n"
-		"\tby François Revol, Axel Dörfler, Matt Madia.\n\n"
-		"original Be version by Robert Polic", "Big Deal"))->Go();
+	BAlert *alert = new BAlert("about", "Workspaces\n"
+		"\twritten by François Revol, Axel Dörfler,\n"
+		"\t\tand Matt Madia.\n"
+		"\tCopyright 2002-2006, Haiku.\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(18);
+	font.SetFace(B_BOLD_FACE); 			
+	view->SetFontAndColor(0, 10, &font);
+
+	alert->Go();
 }
 
 
@@ -305,9 +316,9 @@ WorkspacesApp::Usage(const char *programName)
 		"where \"options\" is one of:\n"
 		"  --notitle\t\ttitle bar removed.  border and resize kept.\n"
 		"  --noborder\t\ttitle, border, and resize removed.\n"
-		"  --acceptfirstclick\tforces workspace switch on first click.\n"
 		"  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
+		"  --notmovable\t\twindow can't be moved around\n"
 		"  --help\t\tdisplay this help and exit\n"
 		"and \"workspace\" is the number of the Workspace to which to switch (0-31)\n",
 		programName);
@@ -324,15 +335,14 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 	for (int i = 1;  i < argc;  i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			// evaluate --arguments
-			if (!strcmp(argv[i], "--notitle")) {
+			if (!strcmp(argv[i], "--notitle"))
 				fWindow->SetLook(B_MODAL_WINDOW_LOOK);
-				fWindow->SetFlags(B_OUTLINE_RESIZE);
-			} else if (!strcmp(argv[i], "--noborder")) 
+			else if (!strcmp(argv[i], "--noborder")) 
 				fWindow->SetLook(B_NO_BORDER_WINDOW_LOOK);
-			else if (!strcmp(argv[i], "--acceptfirstclick"))
-				fWindow->SetFlags(B_WILL_ACCEPT_FIRST_CLICK);
 			else if (!strcmp(argv[i], "--avoidfocus"))
-				fWindow->SetFlags(B_AVOID_FOCUS);
+				fWindow->SetFlags(fWindow->Flags() | B_AVOID_FOCUS);
+			else if (!strcmp(argv[i], "--notmovable"))
+				fWindow->SetFlags(fWindow->Flags() | B_NOT_MOVABLE);
 			else if (!strcmp(argv[i], "--alwaysontop"))
 				fWindow->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 			else {
