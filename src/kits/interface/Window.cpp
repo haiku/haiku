@@ -1144,20 +1144,6 @@ FrameMoved(origin);
 				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 			break;
 		}
-		case _MESSAGE_DROPPED_:
-		{
-			if (fLastMouseMovedView)
-				target = fLastMouseMovedView;
-
-			uint32 originalWhat;
-			if (msg->FindInt32("_original_what", (int32*)&originalWhat) == B_OK) {
-				msg->what = originalWhat;
-				msg->RemoveName("_original_what");
-			}
-
-			BLooper::DispatchMessage(msg, target); 
-			break;
-		}
 
 		default:
 			BLooper::DispatchMessage(msg, target); 
@@ -2536,6 +2522,9 @@ BWindow::task_looper()
 				while (_UnpackMessage(cookie, &fLastMessage, &handler, &usePreferred)) {
 					// if there is no target handler, the message is dropped
 					if (handler != NULL) {
+						if (handler != NULL)
+							_SanitizeMessage(fLastMessage, handler, usePreferred);
+
 						// Is this a scripting message?
 						if (fLastMessage->HasSpecifiers()) {
 							int32 index = 0;
@@ -2547,10 +2536,8 @@ BWindow::task_looper()
 						if (handler != NULL)
 							handler = _TopLevelFilter(fLastMessage, handler);
 
-						if (handler != NULL) {
-							_SanitizeMessage(fLastMessage, handler, usePreferred);
+						if (handler != NULL)
 							DispatchMessage(fLastMessage, handler);
-						}
 					}
 
 					// Delete the current message
@@ -2780,6 +2767,11 @@ BWindow::_DetermineTarget(BMessage *message, BHandler *target)
 			// TODO: test wether R5 will let BView dispatch these messages
 			return this;
 
+		case _MESSAGE_DROPPED_:
+			if (fLastMouseMovedView != NULL)
+				return fLastMouseMovedView;
+			break;
+
 		default: 
 			break;
 	}
@@ -2891,6 +2883,11 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message, BHandler** _
 }
 
 
+/*!
+	Some messages don't get to the window in a shape an application should see.
+	This method is supposed to give a message the last grinding before
+	it's acceptable for the receiving application.
+*/
 void
 BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred)
 {
@@ -2901,6 +2898,7 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 		case B_MOUSE_MOVED:
 		case B_MOUSE_UP:
 		case B_MOUSE_DOWN:
+		{
 			BPoint where;
 			if (message->FindPoint("screen_where", &where) != B_OK)
 				break;
@@ -2943,6 +2941,17 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 				}
 			}
 			break;
+		}
+
+		case _MESSAGE_DROPPED_:
+		{
+			uint32 originalWhat;
+			if (message->FindInt32("_original_what", (int32*)&originalWhat) == B_OK) {
+				message->what = originalWhat;
+				message->RemoveName("_original_what");
+			}
+			break;
+		}
 	}
 }
 
