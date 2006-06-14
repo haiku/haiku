@@ -54,11 +54,6 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (status < B_OK)
 		return status;
 
-	BPath path;
-	status = path.SetTo(ref);
-	if (status < B_OK)
-		return status;
-
 	// Read the app sig (which consequently keeps us from updating
 	// non-applications, since we get an error if the file has no
 	// app sig)
@@ -77,29 +72,29 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (!mime.IsInstalled())
 		mime.Install();
 
-	signature.ToLower();
-		// Signatures and MIME types are case insensitive
+	BString path = "/";
+	path.Append(signature);
+	path.ToLower();
+		// Signatures and MIME types are case insensitive, but we want to
+		// preserve the case wherever possible
+	path.Prepend(kDatabaseDir.c_str());
 
-	char metaMimePath[B_PATH_NAME_LENGTH];
-	sprintf(metaMimePath, "%s/%s", kDatabaseDir.c_str(), signature.String());
-
-	status = typeNode.SetTo(metaMimePath);
+	status = typeNode.SetTo(path.String());
 	if (status < B_OK)
 		return status;
 
 	// Preferred App
 	attr_info info;
-	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kPreferredAppAttr, &info) != B_OK)) {
+	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kPreferredAppAttr, &info) != B_OK))
 		status = mime.SetPreferredApp(signature.String());
-	}
+
 	// Short Description (name of the application)
-	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kShortDescriptionAttr, &info) != B_OK)) {
-		status = mime.SetShortDescription(path.Leaf());
-	}
+	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kShortDescriptionAttr, &info) != B_OK))
+		status = mime.SetShortDescription(ref->name);
+
 	// App Hint
-	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kAppHintAttr, &info) != B_OK)) {
+	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kAppHintAttr, &info) != B_OK))
 		status = mime.SetAppHint(ref);
-	}
 
 	// Mini Icon
 	BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK, B_CMAP8);

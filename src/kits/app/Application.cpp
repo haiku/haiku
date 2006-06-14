@@ -330,8 +330,8 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 			fMsgPort = appInfo.port;
 		} else
 			appInfo.port = fMsgPort;
-		// check the signature and correct it, if necessary
-		if (strcasecmp(appInfo.signature, fAppName))
+		// check the signature and correct it, if necessary, also the case
+		if (strcmp(appInfo.signature, fAppName))
 			BRoster::Private().SetSignature(team, fAppName);
 		// complete the registration
 		fInitError = BRoster::Private().CompleteRegistration(team, thread,
