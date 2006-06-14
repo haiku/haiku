@@ -1,29 +1,10 @@
-/*****************************************************************************/
-// Mouse input server device addon
-// Written by Stefano Ceccherini
-//
-// MouseInputDevice.cpp
-//
-// Copyright (c) 2004-2005 Haiku Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2004-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stefano Ceccherini
+ */
 
 // TODO: Use strlcpy instead of strcpy
 
@@ -40,6 +21,7 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <String.h>
+#include <View.h>	// for default buttons
 
 #if DEBUG
         inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
@@ -53,6 +35,9 @@ FILE *MouseInputDevice::sLogFile = NULL;
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
+#ifndef B_FIRST_REAL_TIME_PRIORITY
+#define B_FIRST_REAL_TIME_PRIORITY B_REAL_TIME_DISPLAY_PRIORITY
+#endif
 const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 const static char *kMouseDevicesDirectory = "/dev/input/mouse";
 
@@ -70,6 +55,7 @@ struct mouse_device {
 	thread_id device_watcher;
 	mouse_settings settings;
 	volatile bool active;
+	bool remap;		// device remaps buttons itself
 };
 
 
@@ -130,7 +116,7 @@ MouseInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 	if (get_mouse_map(&device->settings.map) != B_OK)
 		LOG_ERR("error when get_mouse_map\n");
 	else
-		ioctl(device->fd, MS_SET_MAP, &device->settings.map);
+		device->remap = B_OK == ioctl(device->fd, MS_SET_MAP, &device->settings.map);
 		
 	if (get_click_speed(&device->settings.click_speed) != B_OK)
 		LOG_ERR("error when get_click_speed\n");
@@ -379,7 +365,7 @@ MouseInputDevice::DeviceWatcher(mouse_device *dev)
 			message = new BMessage(B_MOUSE_MOVED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
-				message->AddInt32("buttons", movements.buttons);
+				message->AddInt32("buttons", Remap(dev, movements.buttons));
 				message->AddInt32("x", xdelta);
 				message->AddInt32("y", ydelta);
 					
@@ -398,7 +384,7 @@ MouseInputDevice::DeviceWatcher(mouse_device *dev)
 			}
 			
 			message->AddInt64("when", movements.timestamp);
-			message->AddInt32("buttons", movements.buttons);						
+			message->AddInt32("buttons", Remap(dev, movements.buttons));						
 			message->AddInt32("x", xdelta);
 			message->AddInt32("y", ydelta);
 			EnqueueMessage(message);
@@ -444,6 +430,33 @@ MouseInputDevice::RecursiveScan(const char *directory)
 }
 
 
+uint32
+MouseInputDevice::Remap(mouse_device* device, uint32 buttons)
+{
+	if (device->remap)
+		return buttons;
+		
+	uint32 newbuttons = 0;
+	for (int32 i=0; buttons; i++) {
+		if (buttons & 0x1) {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+			newbuttons |= device->settings.map.button[i];
+#else
+			if (i==0)
+				newbuttons |= device->settings.map.left;
+			if (i==1)
+				newbuttons |= device->settings.map.right;
+			if (i==2)
+				newbuttons |= device->settings.map.middle;
+#endif
+		}
+		buttons >>= 1;
+	}
+	
+	return newbuttons;
+}
+
+
 // mouse_device
 mouse_device::mouse_device(const char *driver_path)
 	:
@@ -455,6 +468,12 @@ mouse_device::mouse_device(const char *driver_path)
 	device_ref.name = get_short_name(path);
 	device_ref.type = B_POINTING_DEVICE;
 	device_ref.cookie = this;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	settings.map.button[0] = B_PRIMARY_MOUSE_BUTTON;
+	settings.map.button[1] = B_SECONDARY_MOUSE_BUTTON;
+	settings.map.button[2] = B_TERTIARY_MOUSE_BUTTON;
+#endif
+	remap = false;
 };
 
 
