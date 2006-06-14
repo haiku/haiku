@@ -184,26 +184,24 @@ BHandler::MessageReceived(BMessage *message)
 			const char *prop;
 
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
-			if (err == B_OK) {
-				bool known = false;
-				if (strcmp(prop, "Suites") == 0) {
-					err = GetSupportedSuites(&reply);
-					known = true;
-				} else if (strcmp(prop, "Messenger") == 0) {
-					err = reply.AddMessenger("result", this);
-					known = true;
-				} else if (strcmp(prop, "InternalName") == 0) {
-					err = reply.AddString("result", Name());
-					known = true;
-				}
-
-				if (known) {
-					reply.AddInt32("error", B_OK);
-					message->SendReply(&reply);
-					return;
-				}
-				// let's try next handler
+			bool known = false;
+			if (index < 0 || (strcmp(prop, "Messenger") == 0)) {
+				err = reply.AddMessenger("result", this);
+				known = true;
+			} else if (strcmp(prop, "Suites") == 0) {
+				err = GetSupportedSuites(&reply);
+				known = true;
+			} else if (strcmp(prop, "InternalName") == 0) {
+				err = reply.AddString("result", Name());
+				known = true;
 			}
+
+			if (known) {
+				reply.AddInt32("error", B_OK);
+				message->SendReply(&reply);
+				return;
+			}
+			// let's try next handler
 			break;
 		}
 
