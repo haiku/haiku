@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * global definitions for the Painter frame work, mainly types for the

@@ -3,22 +3,14 @@ SubDir HAIKU_TOP src libs agg ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UseFreeTypeHeaders ;
 UseLibraryHeaders agg ;
 
 SubDirCcFlags -w ;
 SubDirC++Flags -w ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) font_freetype ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) gpc ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) src ctrl ] ;
 
-#SharedLibrary libagg.so : 
 StaticLibrary libagg.a : 
-	# font_freetype
-	agg_font_freetype.cpp
-
 	# src
 	agg_arc.cpp
 	agg_arrowhead.cpp
@@ -30,8 +22,6 @@ StaticLibrary libagg.a :
 	agg_image_filters.cpp
 	agg_line_aa_basics.cpp
 	agg_line_profile_aa.cpp
-	agg_path_storage.cpp
-	agg_rasterizer_scanline_aa.cpp
 	agg_rounded_rect.cpp
 	agg_sqrt_tables.cpp
 	agg_trans_affine.cpp
@@ -47,23 +37,5 @@ StaticLibrary libagg.a :
 	agg_vpgen_clip_polygon.cpp
 	agg_vpgen_clip_polyline.cpp
 	agg_vpgen_segmentator.cpp
-
-	# src/ctrl
-	# the following are just GUI controls for the interactive agg demos
-	#agg_bezier_ctrl.cpp
-	#agg_cbox_ctrl.cpp
-	#agg_gamma_ctrl.cpp
-	#agg_gamma_spline.cpp
-	#agg_polygon_ctrl.cpp
-	#agg_rbox_ctrl.cpp
-	#agg_scale_ctrl.cpp
-	#agg_slider_ctrl.cpp
-	#agg_spline_ctrl.cpp
-	
-	# gpc
-	# uncomment this line to enable the General Polygon Clipper
-	# see the license in gpc.c for usage information
-	#gpc.c
 ;
 
-#LinkAgainst libagg.so : root be libfreetype.so ;

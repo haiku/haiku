@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -41,13 +41,13 @@ namespace agg
             m_line_color(),
             m_curr_x(0),
             m_curr_y(0)
-        {
-        }
+        {}
+        void attach(base_ren_type& ren) { m_ren = &ren; }
 
         //--------------------------------------------------------------------
         static int coord(double c) 
         { 
-            return int(c * line_bresenham_interpolator::subpixel_size); 
+            return iround(c * line_bresenham_interpolator::subpixel_scale); 
         }
 
         //--------------------------------------------------------------------

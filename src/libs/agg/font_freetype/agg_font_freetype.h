@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -31,8 +31,8 @@
 #include "agg_path_storage_integer.h"
 #include "agg_rasterizer_scanline_aa.h"
 #include "agg_conv_curve.h"
-#include "agg_trans_affine.h"
 #include "agg_font_cache_manager.h"
+#include "agg_trans_affine.h"
 
 namespace agg
 {
@@ -55,15 +55,15 @@ namespace agg
         // Set font parameters
         //--------------------------------------------------------------------
         void resolution(unsigned dpi);
-        bool load_font(const char* font_name, unsigned face_index, glyph_rendering ren_type);
+        bool load_font(const char* font_name, unsigned face_index, glyph_rendering ren_type,
+                       const char* font_mem = 0, const long font_mem_size = 0);
         bool attach(const char* file_name);
         bool char_map(FT_Encoding map);
         bool height(double h);
         bool width(double w);
-		void transform(const trans_affine& mtx);
-        void transform(double xx, double xy, double yx, double yy);
         void hinting(bool h);
         void flip_y(bool f);
+        void transform(const trans_affine& affine);
 
         // Set Gamma
         //--------------------------------------------------------------------
@@ -79,8 +79,10 @@ namespace agg
         const char* name()         const { return m_name;       }
         unsigned    num_faces()    const;
         FT_Encoding char_map()     const { return m_char_map;   }
-        double      height()       const { return double(m_height) / 64.0; }
-        double      width()        const { return double(m_width) / 64.0;  }
+        double      height()       const { return double(m_height) / 64.0;    }
+        double      width()        const { return double(m_width) / 64.0;     }
+        double      ascender()     const;
+        double      descender()    const;
         bool        hinting()      const { return m_hinting;    }
         bool        flip_y()       const { return m_flip_y;     }
 
@@ -94,7 +96,7 @@ namespace agg
         unsigned        glyph_index() const { return m_glyph_index; }
         unsigned        data_size()   const { return m_data_size;   }
         glyph_data_type data_type()   const { return m_data_type;   }
-        const rect&     bounds()      const { return m_bounds;      }
+        const rect_i&   bounds()      const { return m_bounds;      }
         double          advance_x()   const { return m_advance_x;   }
         double          advance_y()   const { return m_advance_y;   }
         void            write_glyph_to(int8u* data) const;
@@ -107,7 +109,6 @@ namespace agg
 
         void update_char_size();
         void update_signature();
-        void update_transform();
         int  find_face(const char* face_name) const;
 
         bool            m_flag32;
@@ -120,7 +121,6 @@ namespace agg
         char*           m_signature;
         unsigned        m_height;
         unsigned        m_width;
-        FT_Matrix       m_matrix;
         bool            m_hinting;
         bool            m_flip_y;
         bool            m_library_initialized;
@@ -135,9 +135,10 @@ namespace agg
         unsigned        m_glyph_index;
         unsigned        m_data_size;
         glyph_data_type m_data_type;
-        rect            m_bounds;
+        rect_i          m_bounds;
         double          m_advance_x;
         double          m_advance_y;
+        trans_affine    m_affine;
 
         path_storage_integer<int16, 6>              m_path16;
         path_storage_integer<int32, 6>              m_path32;

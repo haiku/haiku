@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -148,6 +148,12 @@ namespace agg
         // Multiply "m" to "this" and assign the result to "this"
         const trans_affine& premultiply(const trans_affine& m);
 
+        // Multiply matrix to inverse of another one
+        const trans_affine& multiply_inv(const trans_affine& m);
+
+        // Multiply inverse of "m" to "this" and assign the result to "this"
+        const trans_affine& premultiply_inv(const trans_affine& m);
+
         // Invert matrix. Do not try to invert degenerate matrices, 
         // there's no check for validity. If you set scale to 0 and 
         // then try to invert matrix, expect unpredictable result.
@@ -181,11 +187,24 @@ namespace agg
             return multiply(m);
         }
 
+        // Multiply current matrix to inverse of another one
+        const trans_affine& operator /= (const trans_affine& m)
+        {
+            return multiply_inv(m);
+        }
+
         // Multiply current matrix to another one and return
         // the result in a separete matrix.
         trans_affine operator * (const trans_affine& m)
         {
             return trans_affine(*this).multiply(m);
+        }
+
+        // Multiply current matrix to inverse of another one 
+        // and return the result in a separete matrix.
+        trans_affine operator / (const trans_affine& m)
+        {
+            return trans_affine(*this).multiply_inv(m);
         }
 
         // Calculate and return the inverse matrix
@@ -210,6 +229,9 @@ namespace agg
         //-------------------------------------------- Transformations
         // Direct transformation x and y
         void transform(double* x, double* y) const;
+
+        // Direct transformation x and y, 2x2 matrix only, no translation
+        void transform_2x2(double* x, double* y) const;
 
         // Inverse transformation x and y. It works slower than the 
         // direct transformation, so if the performance is critical 
@@ -238,6 +260,11 @@ namespace agg
         double rotation() const;
         void   translation(double* dx, double* dy) const;
         void   scaling(double* sx, double* sy) const;
+        void   scaling_abs(double* sx, double* sy) const
+        {
+            *sx = sqrt(m0*m0 + m2*m2);
+            *sy = sqrt(m1*m1 + m3*m3);
+        }
 
     private:
         double m0;
@@ -254,6 +281,14 @@ namespace agg
         register double tx = *x;
         *x = tx * m0 + *y * m2 + m4;
         *y = tx * m1 + *y * m3 + m5;
+    }
+
+    //------------------------------------------------------------------------
+    inline void trans_affine::transform_2x2(double* x, double* y) const
+    {
+        register double tx = *x;
+        *x = tx * m0 + *y * m2;
+        *y = tx * m1 + *y * m3;
     }
 
     //------------------------------------------------------------------------
@@ -274,7 +309,6 @@ namespace agg
         return sqrt(x*x + y*y);
     }
 
-
     //------------------------------------------------------------------------
     inline const trans_affine& trans_affine::premultiply(const trans_affine& m)
     {
@@ -282,6 +316,22 @@ namespace agg
         return *this = t.multiply(*this);
     }
 
+    //------------------------------------------------------------------------
+    inline const trans_affine& trans_affine::multiply_inv(const trans_affine& m)
+    {
+        trans_affine t = m;
+        t.invert();
+        multiply(t);
+        return *this;
+    }
+
+    //------------------------------------------------------------------------
+    inline const trans_affine& trans_affine::premultiply_inv(const trans_affine& m)
+    {
+        trans_affine t = m;
+        t.invert();
+        return *this = t.multiply(*this);
+    }
 
     //====================================================trans_affine_rotation
     // Rotation matrix. sin() and cos() are calculated twice for the same angle.
@@ -330,6 +380,26 @@ namespace agg
         {}
     };
 
+
+    //===============================================trans_affine_line_segment
+    // Rotate, Scale and Translate, associating 0...dist with line segment 
+    // x1,y1,x2,y2
+    class trans_affine_line_segment : public trans_affine
+    {
+    public:
+        trans_affine_line_segment(double x1, double y1, double x2, double y2, 
+                                  double dist)
+        {
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+            if(dist > 0.0)
+            {
+                multiply(trans_affine_scaling(sqrt(dx * dx + dy * dy) / dist));
+            }
+            multiply(trans_affine_rotation(atan2(dy, dx)));
+            multiply(trans_affine_translation(x1, y1));
+        }
+    };
 
 
 }

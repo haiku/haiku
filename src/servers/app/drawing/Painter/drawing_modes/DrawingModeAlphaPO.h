@@ -31,7 +31,7 @@ void
 blend_pixel_alpha_po(int x, int y, const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color color = pattern->R5ColorAt(x, y);
 	uint16 alpha = color.alpha * cover;
 	if (alpha == 255 * 255) {
@@ -47,7 +47,7 @@ blend_hline_alpha_po(int x, int y, unsigned len,
 					 const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		rgb_color color = pattern->R5ColorAt(x, y);
 		uint16 alpha = color.alpha * cover;
@@ -69,7 +69,7 @@ blend_solid_hspan_alpha_po(int x, int y, unsigned len,
 						   const color_type& c, const uint8* covers,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		rgb_color color = pattern->R5ColorAt(x, y);
 		uint16 alpha = color.alpha * *covers;
@@ -94,7 +94,7 @@ blend_solid_vspan_alpha_po(int x, int y, unsigned len,
 						   const color_type& c, const uint8* covers,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		rgb_color color = pattern->R5ColorAt(x, y);
 		uint16 alpha = color.alpha * *covers;
@@ -119,7 +119,7 @@ blend_color_hspan_alpha_po(int x, int y, unsigned len,
 						   const uint8* covers, uint8 cover,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (covers) {
 		// non-solid opacity
 		do {

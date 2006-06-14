@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -18,80 +18,76 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include "agg_basics.h"
-#include "agg_span_generator.h"
 #include "agg_math.h"
+#include "agg_array.h"
 
 
 namespace agg
 {
 
-    enum
+    enum gradient_subpixel_scale_e
     {
-        gradient_subpixel_shift = 4,
-        gradient_subpixel_size  = 1 << gradient_subpixel_shift,
-        gradient_subpixel_mask  = gradient_subpixel_size - 1
+        gradient_subpixel_shift = 4,                              //-----gradient_subpixel_shift
+        gradient_subpixel_scale = 1 << gradient_subpixel_shift,   //-----gradient_subpixel_scale
+        gradient_subpixel_mask  = gradient_subpixel_scale - 1     //-----gradient_subpixel_mask
     };
 
 
+
     //==========================================================span_gradient
-    template<class ColorT, 
+    template<class ColorT,
              class Interpolator,
              class GradientF, 
-             class ColorF,
-             class Allocator = span_allocator<ColorT> >
-    class span_gradient : public span_generator<ColorT, Allocator>
+             class ColorF>
+    class span_gradient
     {
     public:
         typedef Interpolator interpolator_type;
-        typedef Allocator alloc_type;
         typedef ColorT color_type;
-        typedef span_generator<color_type, alloc_type> base_type;
 
-        enum
+        enum downscale_shift_e
         {
-            base_shift = 8,
-            base_size  = 1 << base_shift,
-            base_mask  = base_size - 1,
-            downscale_shift = interpolator_type::subpixel_shift - gradient_subpixel_shift
+            downscale_shift = interpolator_type::subpixel_shift - 
+                              gradient_subpixel_shift
         };
 
+        //--------------------------------------------------------------------
+        span_gradient() {}
 
         //--------------------------------------------------------------------
-        span_gradient(alloc_type& alloc) : base_type(alloc) {}
-
-        //--------------------------------------------------------------------
-        span_gradient(alloc_type& alloc,
-                      interpolator_type& inter,
+        span_gradient(interpolator_type& inter,
                       const GradientF& gradient_function,
-                      ColorF color_function,
+                      const ColorF& color_function,
                       double d1, double d2) : 
-            base_type(alloc),
             m_interpolator(&inter),
             m_gradient_function(&gradient_function),
-            m_color_function(color_function),
-            m_d1(int(d1 * gradient_subpixel_size)),
-            m_d2(int(d2 * gradient_subpixel_size))
+            m_color_function(&color_function),
+            m_d1(iround(d1 * gradient_subpixel_scale)),
+            m_d2(iround(d2 * gradient_subpixel_scale))
         {}
 
         //--------------------------------------------------------------------
         interpolator_type& interpolator() { return *m_interpolator; }
         const GradientF& gradient_function() const { return *m_gradient_function; }
-        const ColorF color_function() const { return m_color_function; }
-        double d1() const { return double(m_d1) / gradient_subpixel_size; }
-        double d2() const { return double(m_d2) / gradient_subpixel_size; }
+        const ColorF& color_function() const { return *m_color_function; }
+        double d1() const { return double(m_d1) / gradient_subpixel_scale; }
+        double d2() const { return double(m_d2) / gradient_subpixel_scale; }
 
         //--------------------------------------------------------------------
         void interpolator(interpolator_type& i) { m_interpolator = &i; }
         void gradient_function(const GradientF& gf) { m_gradient_function = &gf; }
-        void color_function(ColorF cf) { m_color_function = cf; }
-        void d1(double v) { m_d1 = int(v * gradient_subpixel_size); }
-        void d2(double v) { m_d2 = int(v * gradient_subpixel_size); }
+        void color_function(const ColorF& cf) { m_color_function = &cf; }
+        void d1(double v) { m_d1 = iround(v * gradient_subpixel_scale); }
+        void d2(double v) { m_d2 = iround(v * gradient_subpixel_scale); }
 
         //--------------------------------------------------------------------
-        color_type* generate(int x, int y, unsigned len)
+        void prepare() {}
+
+        //--------------------------------------------------------------------
+        void generate(color_type* span, int x, int y, unsigned len)
         {   
-            color_type* span = base_type::allocator().span();
             int dd = m_d2 - m_d1;
             if(dd < 1) dd = 1;
             m_interpolator->begin(x+0.5, y+0.5, len);
@@ -99,21 +95,20 @@ namespace agg
             {
                 m_interpolator->coordinates(&x, &y);
                 int d = m_gradient_function->calculate(x >> downscale_shift, 
-                                                       y >> downscale_shift, dd);
-                d = ((d - m_d1) << base_shift) / dd;
+                                                       y >> downscale_shift, m_d2);
+                d = ((d - m_d1) * (int)m_color_function->size()) / dd;
                 if(d < 0) d = 0;
-                if(d > base_mask) d = base_mask;
-                *span++ = m_color_function[d];
+                if(d >= (int)m_color_function->size()) d = m_color_function->size() - 1;
+                *span++ = (*m_color_function)[d];
                 ++(*m_interpolator);
             }
             while(--len);
-            return base_type::allocator().span();
         }
 
     private:
         interpolator_type* m_interpolator;
         const GradientF*   m_gradient_function;
-        ColorF             m_color_function;
+        const ColorF*      m_color_function;
         int                m_d1;
         int                m_d2;
     };
@@ -122,34 +117,32 @@ namespace agg
 
 
     //=====================================================gradient_linear_color
-    template<class ColorT, unsigned BaseShift=8> 
+    template<class ColorT> 
     struct gradient_linear_color
     {
         typedef ColorT color_type;
-        enum
-        {
-            base_shift = BaseShift,
-            base_size  = 1 << base_shift,
-            base_mask  = base_size - 1
-        };
 
         gradient_linear_color() {}
-        gradient_linear_color(const color_type& c1, const color_type& c2) :
-            m_c1(c1), m_c2(c2) {}
+        gradient_linear_color(const color_type& c1, const color_type& c2, 
+                              unsigned size = 256) :
+            m_c1(c1), m_c2(c2), m_size(size) {}
 
+        unsigned size() const { return m_size; }
         color_type operator [] (unsigned v) const 
         {
-            return m_c1.gradient(m_c2, double(v) / double(base_mask));
+            return m_c1.gradient(m_c2, double(v) / double(m_size - 1));
         }
 
-        void colors(const color_type& c1, const color_type& c2)
+        void colors(const color_type& c1, const color_type& c2, unsigned size = 256)
         {
             m_c1 = c1;
             m_c2 = c2;
+            m_size = size;
         }
 
         color_type m_c1;
         color_type m_c2;
+        unsigned m_size;
     };
 
 
@@ -158,7 +151,7 @@ namespace agg
     {
         // Actually the same as radial. Just for compatibility
     public:
-        static int calculate(int x, int y, int)
+        static AGG_INLINE int calculate(int x, int y, int)
         {
             return int(fast_sqrt(x*x + y*y));
         }
@@ -169,7 +162,7 @@ namespace agg
     class gradient_radial
     {
     public:
-        static int calculate(int x, int y, int)
+        static AGG_INLINE int calculate(int x, int y, int)
         {
             return int(fast_sqrt(x*x + y*y));
         }
@@ -180,9 +173,9 @@ namespace agg
     class gradient_radial_d
     {
     public:
-        static int calculate(int x, int y, int)
+        static AGG_INLINE int calculate(int x, int y, int)
         {
-            return int(sqrt(double(x)*double(x) + double(y)*double(y)));
+            return uround(sqrt(double(x)*double(x) + double(y)*double(y)));
         }
     };
 
@@ -193,7 +186,7 @@ namespace agg
     public:
         //---------------------------------------------------------------------
         gradient_radial_focus() : 
-            m_radius(100 * gradient_subpixel_size), 
+            m_radius(100 * gradient_subpixel_scale), 
             m_focus_x(0), 
             m_focus_y(0)
         {
@@ -202,9 +195,9 @@ namespace agg
 
         //---------------------------------------------------------------------
         gradient_radial_focus(double r, double fx, double fy) : 
-            m_radius (int(r  * gradient_subpixel_size)), 
-            m_focus_x(int(fx * gradient_subpixel_size)), 
-            m_focus_y(int(fy * gradient_subpixel_size))
+            m_radius (iround(r  * gradient_subpixel_scale)), 
+            m_focus_x(iround(fx * gradient_subpixel_scale)), 
+            m_focus_y(iround(fy * gradient_subpixel_scale))
         {
             update_values();
         }
@@ -212,26 +205,26 @@ namespace agg
         //---------------------------------------------------------------------
         void init(double r, double fx, double fy)
         {
-            m_radius  = int(r  * gradient_subpixel_size);
-            m_focus_x = int(fx * gradient_subpixel_size);
-            m_focus_y = int(fy * gradient_subpixel_size);
+            m_radius  = iround(r  * gradient_subpixel_scale);
+            m_focus_x = iround(fx * gradient_subpixel_scale);
+            m_focus_y = iround(fy * gradient_subpixel_scale);
             update_values();
         }
 
         //---------------------------------------------------------------------
-        double radius()  const { return double(m_radius)  / gradient_subpixel_size; }
-        double focus_x() const { return double(m_focus_x) / gradient_subpixel_size; }
-        double focus_y() const { return double(m_focus_y) / gradient_subpixel_size; }
+        double radius()  const { return double(m_radius)  / gradient_subpixel_scale; }
+        double focus_x() const { return double(m_focus_x) / gradient_subpixel_scale; }
+        double focus_y() const { return double(m_focus_y) / gradient_subpixel_scale; }
 
         //---------------------------------------------------------------------
-        int calculate(int x, int y, int d) const
+        int calculate(int x, int y, int) const
         {
             double solution_x;
             double solution_y;
 
             // Special case to avoid divide by zero or very near zero
             //---------------------------------
-            if(x == int(m_focus_x))
+            if(x == iround(m_focus_x))
             {		   
                 solution_x = m_focus_x;
                 solution_y = 0.0;
@@ -274,14 +267,14 @@ namespace agg
             double cur_to_focus = double(x - m_focus_x) * double(x - m_focus_x) +
                                   double(y - m_focus_y) * double(y - m_focus_y);
 
-            return int(sqrt(cur_to_focus / int_to_focus) * d);
+            return iround(sqrt(cur_to_focus / int_to_focus) * m_radius);
         }
 
     private:
         //---------------------------------------------------------------------
         void update_values()
         {
-            // For use in the quadractic equation
+            // For use in the quadratic equation
             //-------------------------------
             m_radius2 = double(m_radius) * double(m_radius);
 
@@ -299,8 +292,8 @@ namespace agg
                 // x = r cos theta, y = r sin theta
                 //------------------------
                 double a = atan2(double(m_focus_y), double(m_focus_x));
-                m_focus_x = int(r * cos(a));
-                m_focus_y = int(r * sin(a));
+                m_focus_x = iround(r * cos(a));
+                m_focus_y = iround(r * sin(a));
             }
 
             // Calculate the solution to be used in the case where x == focus_x
@@ -337,7 +330,7 @@ namespace agg
     class gradient_diamond
     {
     public:
-        static int calculate(int x, int y, int) 
+        static AGG_INLINE int calculate(int x, int y, int) 
         { 
             int ax = abs(x);
             int ay = abs(y);
@@ -350,7 +343,7 @@ namespace agg
     class gradient_xy
     {
     public:
-        static int calculate(int x, int y, int d) 
+        static AGG_INLINE int calculate(int x, int y, int d) 
         { 
             return abs(x) * abs(y) / d; 
         }
@@ -361,7 +354,7 @@ namespace agg
     class gradient_sqrt_xy
     {
     public:
-        static int calculate(int x, int y, int) 
+        static AGG_INLINE int calculate(int x, int y, int) 
         { 
             return fast_sqrt(abs(x) * abs(y)); 
         }
@@ -372,9 +365,9 @@ namespace agg
     class gradient_conic
     {
     public:
-        static int calculate(int x, int y, int d) 
+        static AGG_INLINE int calculate(int x, int y, int d) 
         { 
-            return int(fabs(atan2(double(y), double(x))) * double(d) / pi);
+            return uround(fabs(atan2(double(y), double(x))) * double(d) / pi);
         }
     };
 
@@ -386,7 +379,7 @@ namespace agg
         gradient_repeat_adaptor(const GradientF& gradient) : 
             m_gradient(&gradient) {}
 
-        int calculate(int x, int y, int d) const
+        AGG_INLINE int calculate(int x, int y, int d) const
         {
             int ret = m_gradient->calculate(x, y, d) % d;
             if(ret < 0) ret += d;
@@ -405,7 +398,7 @@ namespace agg
         gradient_reflect_adaptor(const GradientF& gradient) : 
             m_gradient(&gradient) {}
 
-        int calculate(int x, int y, int d) const
+        AGG_INLINE int calculate(int x, int y, int d) const
         {
             int d2 = d << 1;
             int ret = m_gradient->calculate(x, y, d) % d2;

@@ -36,7 +36,7 @@ blend_pixel_invert(int x, int y, const color_type& c, uint8 cover,
 				   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	if (pattern->IsHighColor(x, y)) {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		if (cover == 255) {
 			ASSIGN_INVERT(p);
 		} else {
@@ -51,7 +51,7 @@ blend_hline_invert(int x, int y, unsigned len,
 				   const color_type& c, uint8 cover,
 				   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if(cover == 255) {
 		do {
 			if (pattern->IsHighColor(x, y)) {
@@ -77,7 +77,7 @@ blend_solid_hspan_invert(int x, int y, unsigned len,
 						 const color_type& c, const uint8* covers,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		if (pattern->IsHighColor(x, y)) {
 			if (*covers) {
@@ -102,7 +102,7 @@ blend_solid_vspan_invert(int x, int y, unsigned len,
 						 const color_type& c, const uint8* covers,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		if (pattern->IsHighColor(x, y)) {
 			if (*covers) {
@@ -129,7 +129,7 @@ blend_color_hspan_invert(int x, int y, unsigned len,
 {
 	// TODO: does the R5 app_server check for the
 	// appearance of the high color in the source bitmap?
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (covers) {
 		// non-solid opacity
 		do {

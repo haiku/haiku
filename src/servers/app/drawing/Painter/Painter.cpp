@@ -21,9 +21,12 @@
 #include <agg_conv_curve.h>
 #include <agg_conv_stroke.h>
 #include <agg_ellipse.h>
+#include <agg_image_accessors.h>
 #include <agg_path_storage.h>
+#include <agg_pixfmt_rgba.h>
 #include <agg_rounded_rect.h>
-#include <agg_span_image_filter_rgba32.h>
+#include <agg_span_allocator.h>
+#include <agg_span_image_filter_rgba.h>
 #include <agg_span_interpolator_linear.h>
 
 #include "drawing_support.h"
@@ -361,7 +364,7 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 	if (fBuffer && fValidClipping) {
 		if (a.x == b.x) {
 			// vertical
-			uint8* dst = fBuffer->row(0);
+			uint8* dst = fBuffer->row_ptr(0);
 			uint32 bpr = fBuffer->stride();
 			int32 x = (int32)a.x;
 			dst += x * 4;
@@ -392,7 +395,7 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 		} else if (a.y == b.y) {
 			// horizontal
 			int32 y = (int32)a.y;
-			uint8* dst = fBuffer->row(y);
+			uint8* dst = fBuffer->row_ptr(y);
 			int32 x1 = (int32)min_c(a.x, b.x);
 			int32 x2 = (int32)max_c(a.x, b.x);
 			pixel32 color;
@@ -680,7 +683,7 @@ void
 Painter::FillRect(const BRect& r, const rgb_color& c) const
 {
 	if (fBuffer && fValidClipping) {
-		uint8* dst = fBuffer->row(0);
+		uint8* dst = fBuffer->row_ptr(0);
 		uint32 bpr = fBuffer->stride();
 		int32 left = (int32)r.left;
 		int32 top = (int32)r.top;
@@ -723,7 +726,7 @@ Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
 		int32 right = (int32)r.right;
 		int32 bottom = (int32)r.bottom;
 
-		uint8* dst = fBuffer->row(y);
+		uint8* dst = fBuffer->row_ptr(y);
 		uint32 bpr = fBuffer->stride();
 
 		// get a 32 bit pixel ready with the color
@@ -1313,7 +1316,7 @@ copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
 
 // _DrawBitmap
 void
-Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
+Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 					 BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
 {
 	if (!fBuffer || !fValidClipping
@@ -1431,15 +1434,15 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 template <class F>
 void
 Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
-							  const agg::rendering_buffer& srcBuffer,
+							  agg::rendering_buffer& srcBuffer,
 							  int32 xOffset, int32 yOffset, BRect viewRect) const
 {
 	// NOTE: this would crash if viewRect was large enough to read outside the
 	// bitmap, so make sure this is not the case before calling this function!
-	uint8* dst = fBuffer->row(0);
+	uint8* dst = fBuffer->row_ptr(0);
 	uint32 dstBPR = fBuffer->stride();
 
-	const uint8* src = srcBuffer.row(0);
+	const uint8* src = srcBuffer.row_ptr(0);
 	uint32 srcBPR = srcBuffer.stride();
 
 	int32 left = (int32)viewRect.left;
@@ -1474,33 +1477,43 @@ Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
 
 // _DrawBitmapGeneric32
 void
-Painter::_DrawBitmapGeneric32(const agg::rendering_buffer& srcBuffer,
+Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 							  double xOffset, double yOffset,
 							  double xScale, double yScale,
 							  BRect viewRect) const
 {
-	typedef agg::span_allocator<agg::rgba8> span_alloc_type;
-	
 	// AGG pipeline
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
-											 interpolator_type> scaled_span_gen_type;
-	typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_image_renderer_type;
 
+	// pixel format attached to bitmap
+	typedef agg::pixfmt_bgra32 pixfmt_image;
+	pixfmt_image pixf_img(srcBuffer);
 
 	agg::trans_affine srcMatrix;
+// NOTE: R5 seems to ignore this offset when drawing bitmaps
 //	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
 
 	agg::trans_affine imgMatrix;
 	imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
 	imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
 	imgMatrix.invert();
-	
-	span_alloc_type sa;
+
+	// image interpolator
+	typedef agg::span_interpolator_linear<> interpolator_type;
 	interpolator_type interpolator(imgMatrix);
 
-	agg::rasterizer_scanline_aa<> pf;
-	agg::scanline_u8 sl;
+	// scanline allocator
+	agg::span_allocator<pixfmt_image::color_type> spanAllocator;
+
+	// image accessor attached to pixel format of bitmap
+	typedef agg::image_accessor_clip<pixfmt_image> source_type;
+	source_type source(pixf_img, agg::rgba8(0, 0, 0, 0));
+
+	// image filter (nearest neighbor)
+	typedef agg::span_image_filter_rgba_nn<source_type,
+										   interpolator_type> span_gen_type;
+	span_gen_type spanGenerator(source, interpolator);
+
+
 
 	// clip to the current clipping region's frame
 	viewRect = viewRect & fClippingRegion->Frame();
@@ -1508,7 +1521,7 @@ Painter::_DrawBitmapGeneric32(const agg::rendering_buffer& srcBuffer,
 	viewRect.right++;
 	viewRect.bottom++;
 
-	// path encloses image
+	// path enclosing the bitmap
 	agg::path_storage path;
 	path.move_to(viewRect.left, viewRect.top);
 	path.line_to(viewRect.right, viewRect.top);
@@ -1516,14 +1529,15 @@ Painter::_DrawBitmapGeneric32(const agg::rendering_buffer& srcBuffer,
 	path.line_to(viewRect.left, viewRect.bottom);
 	path.close_polygon();
 
-	agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
+	agg::conv_transform<agg::path_storage> transformedPath(path, srcMatrix);
+	fRasterizer->add_path(transformedPath);
 
-	pf.add_path(tr);
-
-	scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
-	scaled_image_renderer_type ri(*fBaseRenderer, sg);
-
-	agg::render_scanlines(pf, sl, ri);
+	// render the path with the bitmap as scanline fill
+	agg::render_scanlines_aa(*fRasterizer,
+							 *fUnpackedScanline,
+							 *fBaseRenderer,
+							 spanAllocator,
+							 spanGenerator);
 }
 
 // _InvertRect32
@@ -1533,7 +1547,7 @@ Painter::_InvertRect32(BRect r) const
 	if (fBuffer) {
 		int32 width = r.IntegerWidth() + 1;
 		for (int32 y = (int32)r.top; y <= (int32)r.bottom; y++) {
-			uint8* dst = fBuffer->row(y);
+			uint8* dst = fBuffer->row_ptr(y);
 			dst += (int32)r.left * 4;
 			for (int32 i = 0; i < width; i++) {
 				dst[0] = 255 - dst[0];
@@ -1550,7 +1564,7 @@ void
 Painter::_BlendRect32(const BRect& r, const rgb_color& c) const
 {
 	if (fBuffer && fValidClipping) {
-		uint8* dst = fBuffer->row(0);
+		uint8* dst = fBuffer->row_ptr(0);
 		uint32 bpr = fBuffer->stride();
 
 		int32 left = (int32)r.left;

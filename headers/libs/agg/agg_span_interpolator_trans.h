@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -31,11 +31,10 @@ namespace agg
     {
     public:
         typedef Transformer trans_type;
-
-        enum
+        enum subpixel_scale_e
         {
             subpixel_shift = SubpixelShift,
-            subpixel_size  = 1 << subpixel_shift
+            subpixel_scale = 1 << subpixel_shift
         };
 
         //--------------------------------------------------------------------
@@ -57,14 +56,20 @@ namespace agg
         {
             m_x = x;
             m_y = y;
-            transform();
+            m_trans->transform(&x, &y);
+            m_ix = iround(x * subpixel_scale);
+            m_iy = iround(y * subpixel_scale);
         }
 
         //----------------------------------------------------------------
         void operator++()
         {
             m_x += 1.0;
-            transform();
+            double x = m_x;
+            double y = m_y;
+            m_trans->transform(&x, &y);
+            m_ix = iround(x * subpixel_scale);
+            m_iy = iround(y * subpixel_scale);
         }
 
         //----------------------------------------------------------------
@@ -75,16 +80,6 @@ namespace agg
         }
 
     private:
-        //----------------------------------------------------------------
-        void transform()
-        {
-            double x = m_x;
-            double y = m_y;
-            m_trans->transform(&x, &y);
-            m_ix = int(x * subpixel_size);
-            m_iy = int(y * subpixel_size);
-        }
-        
         const trans_type* m_trans;
         double            m_x;
         double            m_y;

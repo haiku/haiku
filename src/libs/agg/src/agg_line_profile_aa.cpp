@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -42,14 +42,13 @@ namespace agg
     //---------------------------------------------------------------------
     line_profile_aa::value_type* line_profile_aa::profile(double w)
     {
-        m_subpixel_width = int(w * subpixel_size);
-        unsigned size = m_subpixel_width + subpixel_size * 6;
-        if(size > m_size)
+        m_subpixel_width = uround(w * subpixel_scale);
+        unsigned size = m_subpixel_width + subpixel_scale * 6;
+        if(size > m_profile.size())
         {
-            delete [] m_profile;
-            m_profile = new value_type[m_size = size];
+            m_profile.resize(size);
         }
-        return m_profile;
+        return &m_profile[0];
     }
 
 
@@ -57,8 +56,8 @@ namespace agg
     void line_profile_aa::set(double center_width, double smoother_width)
     {
         double base_val = 1.0;
-        if(center_width == 0.0)   center_width = 1.0 / subpixel_size;
-        if(smoother_width == 0.0) smoother_width = 1.0 / subpixel_size;
+        if(center_width == 0.0)   center_width = 1.0 / subpixel_scale;
+        if(smoother_width == 0.0) smoother_width = 1.0 / subpixel_scale;
 
         double width = center_width + smoother_width;
         if(width < m_min_width)
@@ -71,10 +70,10 @@ namespace agg
 
         value_type* ch = profile(center_width + smoother_width);
 
-        unsigned subpixel_center_width = unsigned(center_width * subpixel_size);
-        unsigned subpixel_smoother_width = unsigned(smoother_width * subpixel_size);
+        unsigned subpixel_center_width = unsigned(center_width * subpixel_scale);
+        unsigned subpixel_smoother_width = unsigned(smoother_width * subpixel_scale);
 
-        value_type* ch_center   = ch + subpixel_size*2;
+        value_type* ch_center   = ch + subpixel_scale*2;
         value_type* ch_smoother = ch_center + subpixel_center_width;
 
         unsigned i;
@@ -97,7 +96,7 @@ namespace agg
         unsigned n_smoother = profile_size() - 
                               subpixel_smoother_width - 
                               subpixel_center_width - 
-                              subpixel_size*2;
+                              subpixel_scale*2;
 
         val = m_gamma[0];
         for(i = 0; i < n_smoother; i++)
@@ -106,7 +105,7 @@ namespace agg
         }
 
         ch = ch_center;
-        for(i = 0; i < subpixel_size*2; i++)
+        for(i = 0; i < subpixel_scale*2; i++)
         {
             *--ch = *ch_center++;
         }

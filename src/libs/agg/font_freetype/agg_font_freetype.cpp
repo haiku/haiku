@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -122,31 +122,38 @@ namespace agg
         return ~crc;
     }
 
+    //------------------------------------------------------------------------
+    static inline int dbl_to_plain_fx(double d)
+    {
+        return int(d * 65536.0);
+    }
 
     //------------------------------------------------------------------------
-    inline double conv_coord_64(int v)
+    static inline double int26p6_to_dbl(int p)
     {
-        return double(v) / 64.0;
+        return double(p) / 64.0;
+    }
+
+    //------------------------------------------------------------------------
+    static inline int dbl_to_int26p6(double p)
+    {
+        return int(p * 64.0 + 0.5);
     }
 
 
     //------------------------------------------------------------------------
-    inline int conv_coord_none(int v)
-    {
-        return v;
-    }
-
-
-    //------------------------------------------------------------------------
-    template<class PathStorage, class ConvCoord>
+    template<class PathStorage>
     bool decompose_ft_outline(const FT_Outline& outline,
                               bool flip_y,
-                              PathStorage& path, 
-                              ConvCoord conv)
+                              const trans_affine& mtx,
+                              PathStorage& path)
     {   
+        typedef typename PathStorage::value_type value_type;
+
         FT_Vector   v_last;
         FT_Vector   v_control;
         FT_Vector   v_start;
+        double x1, y1, x2, y2, x3, y3;
 
         FT_Vector*  point;
         FT_Vector*  limit;
@@ -201,7 +208,12 @@ namespace agg
                 tags--;
             }
 
-            path.move_to(conv(v_start.x), flip_y ? -conv(v_start.y) : conv(v_start.y));
+            x1 = int26p6_to_dbl(v_start.x);
+            y1 = int26p6_to_dbl(v_start.y);
+            if(flip_y) y1 = -y1;
+            mtx.transform(&x1, &y1);
+            path.move_to(value_type(dbl_to_int26p6(x1)), 
+                         value_type(dbl_to_int26p6(y1)));
 
             while(point < limit)
             {
@@ -213,7 +225,13 @@ namespace agg
                 {
                     case FT_CURVE_TAG_ON:  // emit a single line_to
                     {
-                        path.line_to(conv(point->x), flip_y ? -conv(point->y) : conv(point->y));
+                        x1 = int26p6_to_dbl(point->x);
+                        y1 = int26p6_to_dbl(point->y);
+                        if(flip_y) y1 = -y1;
+                        mtx.transform(&x1, &y1);
+                        path.line_to(value_type(dbl_to_int26p6(x1)), 
+                                     value_type(dbl_to_int26p6(y1)));
+                        //path.line_to(conv(point->x), flip_y ? -conv(point->y) : conv(point->y));
                         continue;
                     }
 
@@ -237,10 +255,17 @@ namespace agg
 
                             if(tag == FT_CURVE_TAG_ON)
                             {
-                                path.curve3(conv(v_control.x), 
-                                            flip_y ? -conv(v_control.y) : conv(v_control.y), 
-                                            conv(vec.x), 
-                                            flip_y ? -conv(vec.y) : conv(vec.y));
+                                x1 = int26p6_to_dbl(v_control.x);
+                                y1 = int26p6_to_dbl(v_control.y);
+                                x2 = int26p6_to_dbl(vec.x);
+                                y2 = int26p6_to_dbl(vec.y);
+                                if(flip_y) { y1 = -y1; y2 = -y2; }
+                                mtx.transform(&x1, &y1);
+                                mtx.transform(&x2, &y2);
+                                path.curve3(value_type(dbl_to_int26p6(x1)), 
+                                            value_type(dbl_to_int26p6(y1)),
+                                            value_type(dbl_to_int26p6(x2)), 
+                                            value_type(dbl_to_int26p6(y2)));
                                 continue;
                             }
 
@@ -249,18 +274,43 @@ namespace agg
                             v_middle.x = (v_control.x + vec.x) / 2;
                             v_middle.y = (v_control.y + vec.y) / 2;
 
-                            path.curve3(conv(v_control.x), 
-                                        flip_y ? -conv(v_control.y) : conv(v_control.y), 
-                                        conv(v_middle.x), 
-                                        flip_y ? -conv(v_middle.y) : conv(v_middle.y));
+                            x1 = int26p6_to_dbl(v_control.x);
+                            y1 = int26p6_to_dbl(v_control.y);
+                            x2 = int26p6_to_dbl(v_middle.x);
+                            y2 = int26p6_to_dbl(v_middle.y);
+                            if(flip_y) { y1 = -y1; y2 = -y2; }
+                            mtx.transform(&x1, &y1);
+                            mtx.transform(&x2, &y2);
+                            path.curve3(value_type(dbl_to_int26p6(x1)), 
+                                        value_type(dbl_to_int26p6(y1)),
+                                        value_type(dbl_to_int26p6(x2)), 
+                                        value_type(dbl_to_int26p6(y2)));
+
+                            //path.curve3(conv(v_control.x), 
+                            //            flip_y ? -conv(v_control.y) : conv(v_control.y), 
+                            //            conv(v_middle.x), 
+                            //            flip_y ? -conv(v_middle.y) : conv(v_middle.y));
 
                             v_control = vec;
                             goto Do_Conic;
                         }
-                        path.curve3(conv(v_control.x), 
-                                    flip_y ? -conv(v_control.y) : conv(v_control.y), 
-                                    conv(v_start.x), 
-                                    flip_y ? -conv(v_start.y) : conv(v_start.y));
+
+                        x1 = int26p6_to_dbl(v_control.x);
+                        y1 = int26p6_to_dbl(v_control.y);
+                        x2 = int26p6_to_dbl(v_start.x);
+                        y2 = int26p6_to_dbl(v_start.y);
+                        if(flip_y) { y1 = -y1; y2 = -y2; }
+                        mtx.transform(&x1, &y1);
+                        mtx.transform(&x2, &y2);
+                        path.curve3(value_type(dbl_to_int26p6(x1)), 
+                                    value_type(dbl_to_int26p6(y1)),
+                                    value_type(dbl_to_int26p6(x2)), 
+                                    value_type(dbl_to_int26p6(y2)));
+
+                        //path.curve3(conv(v_control.x), 
+                        //            flip_y ? -conv(v_control.y) : conv(v_control.y), 
+                        //            conv(v_start.x), 
+                        //            flip_y ? -conv(v_start.y) : conv(v_start.y));
                         goto Close;
                     }
 
@@ -288,21 +338,55 @@ namespace agg
                             vec.x = point->x;
                             vec.y = point->y;
 
-                            path.curve4(conv(vec1.x), 
-                                        flip_y ? -conv(vec1.y) : conv(vec1.y), 
-                                        conv(vec2.x), 
-                                        flip_y ? -conv(vec2.y) : conv(vec2.y),
-                                        conv(vec.x), 
-                                        flip_y ? -conv(vec.y) : conv(vec.y));
+                            x1 = int26p6_to_dbl(vec1.x);
+                            y1 = int26p6_to_dbl(vec1.y);
+                            x2 = int26p6_to_dbl(vec2.x);
+                            y2 = int26p6_to_dbl(vec2.y);
+                            x3 = int26p6_to_dbl(vec.x);
+                            y3 = int26p6_to_dbl(vec.y);
+                            if(flip_y) { y1 = -y1; y2 = -y2; y3 = -y3; }
+                            mtx.transform(&x1, &y1);
+                            mtx.transform(&x2, &y2);
+                            mtx.transform(&x3, &y3);
+                            path.curve4(value_type(dbl_to_int26p6(x1)), 
+                                        value_type(dbl_to_int26p6(y1)),
+                                        value_type(dbl_to_int26p6(x2)), 
+                                        value_type(dbl_to_int26p6(y2)),
+                                        value_type(dbl_to_int26p6(x3)), 
+                                        value_type(dbl_to_int26p6(y3)));
+
+                            //path.curve4(conv(vec1.x), 
+                            //            flip_y ? -conv(vec1.y) : conv(vec1.y), 
+                            //            conv(vec2.x), 
+                            //            flip_y ? -conv(vec2.y) : conv(vec2.y),
+                            //            conv(vec.x), 
+                            //            flip_y ? -conv(vec.y) : conv(vec.y));
                             continue;
                         }
 
-                        path.curve4(conv(vec1.x), 
-                                    flip_y ? -conv(vec1.y) : conv(vec1.y), 
-                                    conv(vec2.x), 
-                                    flip_y ? -conv(vec2.y) : conv(vec2.y),
-                                    conv(v_start.x), 
-                                    flip_y ? -conv(v_start.y) : conv(v_start.y));
+                        x1 = int26p6_to_dbl(vec1.x);
+                        y1 = int26p6_to_dbl(vec1.y);
+                        x2 = int26p6_to_dbl(vec2.x);
+                        y2 = int26p6_to_dbl(vec2.y);
+                        x3 = int26p6_to_dbl(v_start.x);
+                        y3 = int26p6_to_dbl(v_start.y);
+                        if(flip_y) { y1 = -y1; y2 = -y2; y3 = -y3; }
+                        mtx.transform(&x1, &y1);
+                        mtx.transform(&x2, &y2);
+                        mtx.transform(&x3, &y3);
+                        path.curve4(value_type(dbl_to_int26p6(x1)), 
+                                    value_type(dbl_to_int26p6(y1)),
+                                    value_type(dbl_to_int26p6(x2)), 
+                                    value_type(dbl_to_int26p6(y2)),
+                                    value_type(dbl_to_int26p6(x3)), 
+                                    value_type(dbl_to_int26p6(y3)));
+
+                        //path.curve4(conv(vec1.x), 
+                        //            flip_y ? -conv(vec1.y) : conv(vec1.y), 
+                        //            conv(vec2.x), 
+                        //            flip_y ? -conv(vec2.y) : conv(vec2.y),
+                        //            conv(v_start.x), 
+                        //            flip_y ? -conv(v_start.y) : conv(v_start.y));
                         goto Close;
                     }
                 }
@@ -331,7 +415,7 @@ namespace agg
         const int8u* buf = (const int8u*)bitmap.buffer;
         int pitch = bitmap.pitch;
         sl.reset(x, x + bitmap.width);
-        storage.prepare(bitmap.width + 2);
+        storage.prepare();
         if(flip_y)
         {
             buf += bitmap.pitch * (bitmap.rows - 1);
@@ -372,7 +456,7 @@ namespace agg
         const int8u* buf = (const int8u*)bitmap.buffer;
         int pitch = bitmap.pitch;
         sl.reset(x, x + bitmap.width);
-        storage.prepare(bitmap.width + 2);
+        storage.prepare();
         if(flip_y)
         {
             buf += bitmap.pitch * (bitmap.rows - 1);
@@ -466,10 +550,6 @@ namespace agg
         m_scanlines_bin(),
         m_rasterizer()
     {
-        m_matrix.xx = 0x10000L;
-        m_matrix.xy = 0;
-        m_matrix.yx = 0;
-        m_matrix.yy = 0x10000L;
         m_curves16.approximation_scale(4.0);
         m_curves32.approximation_scale(4.0);
         m_last_error = FT_Init_FreeType(&m_library);
@@ -499,9 +579,32 @@ namespace agg
 
 
     //------------------------------------------------------------------------
+    double font_engine_freetype_base::ascender() const
+    {
+        if(m_cur_face)
+        {
+            return m_cur_face->ascender * height() / m_cur_face->height;
+        }
+        return 0.0;
+    }
+
+    //------------------------------------------------------------------------
+    double font_engine_freetype_base::descender() const
+    {
+        if(m_cur_face)
+        {
+            return m_cur_face->descender * height() / m_cur_face->height;
+        }
+        return 0.0;
+    }
+
+
+    //------------------------------------------------------------------------
     bool font_engine_freetype_base::load_font(const char* font_name, 
                                               unsigned face_index,
-                                              glyph_rendering ren_type)
+                                              glyph_rendering ren_type,
+                                              const char* font_mem, 
+                                              const long font_mem_size)
     {
         bool ret = false;
 
@@ -530,10 +633,22 @@ namespace agg
                     m_num_faces = m_max_faces - 1;
                 }
 
-                m_last_error = FT_New_Face(m_library,
-                                           font_name,
-                                           face_index,
-                                           &m_faces[m_num_faces]);
+                if (font_mem && font_mem_size)
+                {
+                    m_last_error = FT_New_Memory_Face(m_library, 
+                                                      (const FT_Byte*)font_mem, 
+                                                      font_mem_size, 
+                                                      face_index, 
+                                                      &m_faces[m_num_faces]);
+                }
+                else
+                {
+                    m_last_error = FT_New_Face(m_library,
+                                               font_name,
+                                               face_index,
+                                               &m_faces[m_num_faces]);
+                }
+
                 if(m_last_error == 0)
                 {
                     m_face_names[m_num_faces] = new char [strlen(font_name) + 1];
@@ -554,7 +669,7 @@ namespace agg
             if(m_last_error == 0)
             {
                 ret = true;
-
+                
                 switch(ren_type)
                 {
                 case glyph_ren_native_mono:
@@ -598,8 +713,7 @@ namespace agg
                     }
                     break;
                 }
-
-                update_transform();
+                update_signature();
             }
         }
         return ret;
@@ -666,55 +780,6 @@ namespace agg
         return false;
     }
 
-
-    //------------------------------------------------------------------------
-	void font_engine_freetype_base::update_transform()
-    {
-        FT_Matrix mtx = m_matrix;
-
-        if(m_flip_y)
-        {
-            mtx.xy = -mtx.xy;
-		    mtx.yy = -mtx.yy;
-        }
-
-        if(m_cur_face)
-        {
-			FT_Vector pen;
-			pen.x = 0;
-			pen.y = 0;
- 			FT_Set_Transform(m_cur_face, &mtx, &pen);
-            update_signature();
-        }
-    }
-
-
-    //------------------------------------------------------------------------
-	void font_engine_freetype_base::transform(const trans_affine& mtx)
-    {
-		double m[6];
-		mtx.store_to(m);
-
- 		m_matrix.xx = long( m[0] * 0x10000L);
-		m_matrix.xy = long(-m[1] * 0x10000L);
-		m_matrix.yx = long(-m[2] * 0x10000L);
-		m_matrix.yy = long( m[3] * 0x10000L);
-        update_transform();
-    }
-
-
-    //------------------------------------------------------------------------
-    void font_engine_freetype_base::transform(double xx, double xy, 
-                                              double yx, double yy)
-    {
-		m_matrix.xx = long( xx * 0x10000L);
-		m_matrix.xy = long(-xy * 0x10000L);
-		m_matrix.yx = long(-yx * 0x10000L);
-		m_matrix.yy = long( yy * 0x10000L);
-        update_transform();
-    }
-
-
     //------------------------------------------------------------------------
     void font_engine_freetype_base::hinting(bool h)
     { 
@@ -731,7 +796,17 @@ namespace agg
         m_flip_y = f; 
         if(m_cur_face)
         {
-            update_transform();
+            update_signature();
+        }
+    }
+
+    //------------------------------------------------------------------------
+    void font_engine_freetype_base::transform(const trans_affine& affine)
+    {
+        m_affine = affine;
+        if(m_cur_face)
+        {
+            update_signature();
         }
     }
 
@@ -753,9 +828,9 @@ namespace agg
                m_glyph_rendering == glyph_ren_agg_mono || 
                m_glyph_rendering == glyph_ren_agg_gray8)
             {
-                unsigned char gamma_table[rasterizer_scanline_aa<>::aa_num];
+                unsigned char gamma_table[rasterizer_scanline_aa<>::aa_scale];
                 unsigned i;
-                for(i = 0; i < rasterizer_scanline_aa<>::aa_num; ++i)
+                for(i = 0; i < rasterizer_scanline_aa<>::aa_scale; ++i)
                 {
                     gamma_table[i] = m_rasterizer.apply_gamma(i);
                 }
@@ -763,7 +838,7 @@ namespace agg
             }
 
             sprintf(m_signature, 
-                    "%s,%u,%d,%d,%d:%dx%d,%d,%d,%d,%d,%d,%d,%08X", 
+                    "%s,%u,%d,%d,%d:%dx%d,%d,%d,%08X", 
                     m_name,
                     m_char_map,
                     m_face_index,
@@ -771,13 +846,25 @@ namespace agg
                     m_resolution,
                     m_height,
                     m_width,
-                    int(m_matrix.xx),
-                    int(m_matrix.xy),
-                    int(m_matrix.yx),
-                    int(m_matrix.yy),
                     int(m_hinting),
                     int(m_flip_y),
                     gamma_hash);
+            if(m_glyph_rendering == glyph_ren_outline ||
+               m_glyph_rendering == glyph_ren_agg_mono ||
+               m_glyph_rendering == glyph_ren_agg_gray8)
+            {
+                double mtx[6];
+                char buf[100];
+                m_affine.store_to(mtx);
+                sprintf(buf, ",%08X%08X%08X%08X%08X%08X", 
+                    dbl_to_plain_fx(mtx[0]), 
+                    dbl_to_plain_fx(mtx[1]), 
+                    dbl_to_plain_fx(mtx[2]), 
+                    dbl_to_plain_fx(mtx[3]), 
+                    dbl_to_plain_fx(mtx[4]), 
+                    dbl_to_plain_fx(mtx[5]));
+                strcat(m_signature, buf);
+            }
             ++m_change_stamp;
         }
     }
@@ -813,9 +900,6 @@ namespace agg
     //------------------------------------------------------------------------
     bool font_engine_freetype_base::prepare_glyph(unsigned glyph_code)
     {
-        bool flip = false;
-
-
         m_glyph_index = FT_Get_Char_Index(m_cur_face, glyph_code);
         m_last_error = FT_Load_Glyph(m_cur_face, 
                                      m_glyph_index, 
@@ -827,24 +911,23 @@ namespace agg
             {
             case glyph_ren_native_mono:
                 m_last_error = FT_Render_Glyph(m_cur_face->glyph, FT_RENDER_MODE_MONO);
-//printf("%i\n", m_last_error);
                 if(m_last_error == 0)
                 {
                     decompose_ft_bitmap_mono(m_cur_face->glyph->bitmap, 
                                              m_cur_face->glyph->bitmap_left,
-                                             flip ? -m_cur_face->glyph->bitmap_top : 
-                                                     m_cur_face->glyph->bitmap_top,
-                                             flip,
+                                             m_flip_y ? -m_cur_face->glyph->bitmap_top : 
+                                                         m_cur_face->glyph->bitmap_top,
+                                             m_flip_y,
                                              m_scanline_bin,
                                              m_scanlines_bin);
                     m_bounds.x1 = m_scanlines_bin.min_x();
                     m_bounds.y1 = m_scanlines_bin.min_y();
-                    m_bounds.x2 = m_scanlines_bin.max_x();
-                    m_bounds.y2 = m_scanlines_bin.max_y();
+                    m_bounds.x2 = m_scanlines_bin.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_bin.max_y() + 1;
                     m_data_size = m_scanlines_bin.byte_size(); 
                     m_data_type = glyph_data_mono;
-                    m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                    m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                    m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                    m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
                     return true;
                 }
                 break;
@@ -856,20 +939,20 @@ namespace agg
                 {
                     decompose_ft_bitmap_gray8(m_cur_face->glyph->bitmap, 
                                               m_cur_face->glyph->bitmap_left,
-                                              flip ? -m_cur_face->glyph->bitmap_top : 
-                                                      m_cur_face->glyph->bitmap_top,
-                                              flip,
+                                              m_flip_y ? -m_cur_face->glyph->bitmap_top : 
+                                                          m_cur_face->glyph->bitmap_top,
+                                              m_flip_y,
                                               m_rasterizer,
                                               m_scanline_aa,
                                               m_scanlines_aa);
                     m_bounds.x1 = m_scanlines_aa.min_x();
                     m_bounds.y1 = m_scanlines_aa.min_y();
-                    m_bounds.x2 = m_scanlines_aa.max_x();
-                    m_bounds.y2 = m_scanlines_aa.max_y();
+                    m_bounds.x2 = m_scanlines_aa.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_aa.max_y() + 1;
                     m_data_size = m_scanlines_aa.byte_size(); 
                     m_data_type = glyph_data_gray8;
-                    m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                    m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                    m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                    m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
                     return true;
                 }
                 break;
@@ -882,9 +965,9 @@ namespace agg
                     {
                         m_path32.remove_all();
                         if(decompose_ft_outline(m_cur_face->glyph->outline,
-                                                flip, 
-                                                m_path32, 
-                                                conv_coord_none))
+                                                m_flip_y, 
+                                                m_affine,
+                                                m_path32))
                         {
                             rect_d bnd  = m_path32.bounding_rect();
                             m_data_size = m_path32.byte_size();
@@ -893,8 +976,9 @@ namespace agg
                             m_bounds.y1 = int(floor(bnd.y1));
                             m_bounds.x2 = int(ceil(bnd.x2));
                             m_bounds.y2 = int(ceil(bnd.y2));
-                            m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                            m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                            m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                            m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
+                            m_affine.transform(&m_advance_x, &m_advance_y);
                             return true;
                         }
                     }
@@ -902,9 +986,9 @@ namespace agg
                     {
                         m_path16.remove_all();
                         if(decompose_ft_outline(m_cur_face->glyph->outline,
-                                                flip, 
-                                                m_path16, 
-                                                conv_coord_none))
+                                                m_flip_y, 
+                                                m_affine,
+                                                m_path16))
                         {
                             rect_d bnd  = m_path16.bounding_rect();
                             m_data_size = m_path16.byte_size();
@@ -913,8 +997,9 @@ namespace agg
                             m_bounds.y1 = int(floor(bnd.y1));
                             m_bounds.x2 = int(ceil(bnd.x2));
                             m_bounds.y2 = int(ceil(bnd.y2));
-                            m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                            m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                            m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                            m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
+                            m_affine.transform(&m_advance_x, &m_advance_y);
                             return true;
                         }
                     }
@@ -929,30 +1014,31 @@ namespace agg
                     {
                         m_path32.remove_all();
                         decompose_ft_outline(m_cur_face->glyph->outline,
-                                             flip, 
-                                             m_path32, 
-                                             conv_coord_none);
+                                             m_flip_y, 
+                                             m_affine,
+                                             m_path32);
                         m_rasterizer.add_path(m_curves32);
                     }
                     else
                     {
                         m_path16.remove_all();
                         decompose_ft_outline(m_cur_face->glyph->outline,
-                                             flip, 
-                                             m_path16, 
-                                             conv_coord_none);
+                                             m_flip_y, 
+                                             m_affine,
+                                             m_path16);
                         m_rasterizer.add_path(m_curves16);
                     }
-                    m_scanlines_bin.prepare(1); // Remove all 
+                    m_scanlines_bin.prepare(); // Remove all 
                     render_scanlines(m_rasterizer, m_scanline_bin, m_scanlines_bin);
                     m_bounds.x1 = m_scanlines_bin.min_x();
                     m_bounds.y1 = m_scanlines_bin.min_y();
-                    m_bounds.x2 = m_scanlines_bin.max_x();
-                    m_bounds.y2 = m_scanlines_bin.max_y();
+                    m_bounds.x2 = m_scanlines_bin.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_bin.max_y() + 1;
                     m_data_size = m_scanlines_bin.byte_size(); 
                     m_data_type = glyph_data_mono;
-                    m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                    m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                    m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                    m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
+                    m_affine.transform(&m_advance_x, &m_advance_y);
                     return true;
                 }
                 return false;
@@ -966,30 +1052,31 @@ namespace agg
                     {
                         m_path32.remove_all();
                         decompose_ft_outline(m_cur_face->glyph->outline,
-                                             flip, 
-                                             m_path32, 
-                                             conv_coord_none);
+                                             m_flip_y, 
+                                             m_affine,
+                                             m_path32);
                         m_rasterizer.add_path(m_curves32);
                     }
                     else
                     {
                         m_path16.remove_all();
                         decompose_ft_outline(m_cur_face->glyph->outline,
-                                             flip, 
-                                             m_path16, 
-                                             conv_coord_none);
+                                             m_flip_y, 
+                                             m_affine,
+                                             m_path16);
                         m_rasterizer.add_path(m_curves16);
                     }
-                    m_scanlines_aa.prepare(1); // Remove all 
+                    m_scanlines_aa.prepare(); // Remove all 
                     render_scanlines(m_rasterizer, m_scanline_aa, m_scanlines_aa);
                     m_bounds.x1 = m_scanlines_aa.min_x();
                     m_bounds.y1 = m_scanlines_aa.min_y();
-                    m_bounds.x2 = m_scanlines_aa.max_x();
-                    m_bounds.y2 = m_scanlines_aa.max_y();
+                    m_bounds.x2 = m_scanlines_aa.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_aa.max_y() + 1;
                     m_data_size = m_scanlines_aa.byte_size(); 
                     m_data_type = glyph_data_gray8;
-                    m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
-                    m_advance_y = double(m_cur_face->glyph->advance.y) / 64.0;
+                    m_advance_x = int26p6_to_dbl(m_cur_face->glyph->advance.x);
+                    m_advance_y = int26p6_to_dbl(m_cur_face->glyph->advance.y);
+                    m_affine.transform(&m_advance_x, &m_advance_y);
                     return true;
                 }
                 return false;
@@ -1037,9 +1124,17 @@ namespace agg
             FT_Vector delta;
             FT_Get_Kerning(m_cur_face, first, second,
                            FT_KERNING_DEFAULT, &delta);
-            FT_Vector_Transform(&delta, &m_matrix);
-            *x += double(delta.x) / 64.0;
-            *y += double(delta.y) / 64.0;
+            double dx = int26p6_to_dbl(delta.x);
+            double dy = int26p6_to_dbl(delta.y);
+            if(m_glyph_rendering == glyph_ren_outline ||
+               m_glyph_rendering == glyph_ren_agg_mono ||
+               m_glyph_rendering == glyph_ren_agg_gray8)
+            {
+                m_affine.transform_2x2(&dx, &dy);
+            }
+            *x += dx;
+            *y += dy;
+
             return true;
         }
         return false;

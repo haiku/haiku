@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -480,16 +480,6 @@ namespace agg
         0xf6,0xfa,0x04,0x06,0x08,0xfa
     };
 
-
-
-    //-------------------------------------------------------------------------
-    gsv_text::~gsv_text()
-    {
-        if(m_loaded_font) delete [] m_loaded_font;
-        if(m_text_buf)    delete [] m_text_buf;
-    }
-
-
     //-------------------------------------------------------------------------
     gsv_text::gsv_text() :
       m_x(0.0),
@@ -500,11 +490,10 @@ namespace agg
       m_space(0.0),
       m_line_space(0.0),
       m_text(m_chr),
-      m_text_buf(0),
-      m_buf_size(0), 
+      m_text_buf(),
       m_cur_chr(m_chr),
       m_font(gsv_default_font),
-      m_loaded_font(0),
+      m_loaded_font(),
       m_status(initial),
       m_big_endian(false),
       m_flip(false)
@@ -521,7 +510,7 @@ namespace agg
     void gsv_text::font(const void* font)
     {
         m_font = font;
-        if(m_font == 0) m_font = m_loaded_font;
+        if(m_font == 0) m_font = &m_loaded_font[0];
     }
 
     //-------------------------------------------------------------------------
@@ -555,9 +544,7 @@ namespace agg
     //-------------------------------------------------------------------------
     void gsv_text::load_font(const char* file)
     {
-        if(m_loaded_font) delete [] m_loaded_font;
-        m_loaded_font = 0;
-
+        m_loaded_font.resize(0);
         FILE* fd = fopen(file, "rb");
         if(fd)
         {
@@ -568,9 +555,9 @@ namespace agg
             fseek(fd, 0l, SEEK_SET);
             if(len > 0)
             {
-                m_loaded_font = new char [len];
-                fread(m_loaded_font, 1, len, fd);
-                m_font = m_loaded_font;
+                m_loaded_font.resize(len);
+                fread(&m_loaded_font[0], 1, len, fd);
+                m_font = &m_loaded_font[0];
             }
             fclose(fd);
         }
@@ -587,13 +574,12 @@ namespace agg
             return;
         }
         unsigned new_size = strlen(text) + 1;
-        if(new_size > m_buf_size)
+        if(new_size > m_text_buf.size())
         {
-            if(m_text_buf) delete [] m_text_buf;
-            m_text_buf = new char [m_buf_size = new_size];
+            m_text_buf.resize(new_size);
         }
-        memcpy(m_text_buf, text, new_size);
-        m_text = m_text_buf;
+        memcpy(&m_text_buf[0], text, new_size);
+        m_text = &m_text_buf[0];
     }
 
 

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -86,7 +86,7 @@ namespace agg
     {
     public:
         typedef int save_data_type;
-        enum { save_size = 2 };
+        enum save_size_e { save_size = 2 };
 
         //--------------------------------------------------------------------
         dda2_line_interpolator() {}
@@ -217,11 +217,11 @@ namespace agg
     class line_bresenham_interpolator
     {
     public:
-        enum
+        enum subpixel_scale_e
         {
             subpixel_shift = 8,
-            subpixel_size  = 1 << subpixel_shift,
-            subpixel_mask  = subpixel_size - 1
+            subpixel_scale = 1 << subpixel_shift,
+            subpixel_mask  = subpixel_scale - 1
         };
 
         //--------------------------------------------------------------------

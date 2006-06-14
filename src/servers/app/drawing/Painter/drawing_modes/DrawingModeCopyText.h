@@ -16,7 +16,7 @@ void
 blend_pixel_copy_text(int x, int y, const color_type& c, uint8 cover,
 					   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (cover == 255) {
 		ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
 	} else {
@@ -41,13 +41,13 @@ blend_hline_copy_text(int x, int y, unsigned len,
 		p8[2] = (uint8)c.r;
 		p8[3] = 255;
 		// row offset as 32bit pointer
-		uint32* p32 = (uint32*)(buffer->row(y)) + x;
+		uint32* p32 = (uint32*)(buffer->row_ptr(y)) + x;
 		do {
 			*p32 = v;
 			p32++;
 		} while(--len);
 	} else {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		rgb_color l = pattern->LowColor().GetColor32();
 		do {
 			BLEND_COPY(p, c.r, c.g, c.b, cover,
@@ -64,7 +64,7 @@ blend_solid_hspan_copy_text(int x, int y, unsigned len,
 							 agg_buffer* buffer,
 							 const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color l = pattern->LowColor().GetColor32();
 	do {
 		if (*covers) {
@@ -89,7 +89,7 @@ blend_solid_vspan_copy_text(int x, int y, unsigned len,
 							 agg_buffer* buffer,
 							 const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color l = pattern->LowColor().GetColor32();
 	do {
 		if (*covers) {
@@ -114,7 +114,7 @@ blend_color_hspan_copy_text(int x, int y, unsigned len,
 							 agg_buffer* buffer,
 							 const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color l = pattern->LowColor().GetColor32();
 	if (covers) {
 		// non-solid opacity

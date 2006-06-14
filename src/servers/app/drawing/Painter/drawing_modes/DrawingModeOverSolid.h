@@ -19,7 +19,7 @@ blend_pixel_over_solid(int x, int y, const color_type& c, uint8 cover,
 	if (pattern->IsSolidLow())
 		return;
 
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (cover == 255) {
 		ASSIGN_OVER(p, c.r, c.g, c.b);
 	} else {
@@ -43,14 +43,14 @@ blend_hline_over_solid(int x, int y, unsigned len,
 		p8[1] = (uint8)c.g;
 		p8[2] = (uint8)c.r;
 		p8[3] = 255;
-		uint32* p32 = (uint32*)(buffer->row(y)) + x;
+		uint32* p32 = (uint32*)(buffer->row_ptr(y)) + x;
 		do {
 			*p32 = v;
 			p32++;
 			x++;
 		} while(--len);
 	} else {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		do {
 			BLEND_OVER(p, c.r, c.g, c.b, cover);
 			x++;
@@ -68,7 +68,7 @@ blend_solid_hspan_over_solid(int x, int y, unsigned len,
 	if (pattern->IsSolidLow())
 		return;
 
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		if (*covers) {
 			if (*covers == 255) {
@@ -94,7 +94,7 @@ blend_solid_vspan_over_solid(int x, int y, unsigned len,
 	if (pattern->IsSolidLow())
 		return;
 
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
 		if (*covers) {
 			if (*covers == 255) {
@@ -117,7 +117,7 @@ blend_color_hspan_over_solid(int x, int y, unsigned len,
 							 const uint8* covers, uint8 cover,
 							 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (covers) {
 		// non-solid opacity
 		do {

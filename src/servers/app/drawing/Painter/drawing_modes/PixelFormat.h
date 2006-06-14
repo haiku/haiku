@@ -14,7 +14,7 @@
 #define PIXEL_FORMAT_H
 
 #include <agg_basics.h>
-#include <agg_color_rgba8.h>
+#include <agg_color_rgba.h>
 #include <agg_rendering_buffer.h>
 
 #include <GraphicsDefs.h>
@@ -25,6 +25,15 @@ class PixelFormat {
  public:
 	typedef agg::rgba8						color_type;
 	typedef agg::rendering_buffer			agg_buffer;
+	typedef agg::rendering_buffer::row_data	row_data;
+	typedef agg::order_bgra					order_type;
+	enum base_scale_e
+	{
+		base_shift = color_type::base_shift,
+		base_scale = color_type::base_scale,
+		base_mask  = color_type::base_mask,
+		pix_width  = 4,
+	};
 
 	typedef void (*blend_pixel_f)(int x, int y, const color_type& c,
 								  uint8 cover,
@@ -65,41 +74,58 @@ class PixelFormat {
 									{ return fUsesOpCopyForText; }
 
 			// AGG "pixel format" interface
-			unsigned			width()  const { return fBuffer->width();  }
-			unsigned			height() const { return fBuffer->height(); }
+	inline	unsigned			width() const
+									{ return fBuffer->width(); }
+	inline	unsigned			height() const
+									{ return fBuffer->height(); }
+	inline	int					stride() const
+									{ return fBuffer->stride(); }
 
-			void				blend_pixel(int x, int y,
+	inline	uint8*				row_ptr(int y)
+									{ return fBuffer->row_ptr(y); }
+	inline	const uint8*		row_ptr(int y) const
+									{ return fBuffer->row_ptr(y); }
+	inline	row_data			row(int y) const
+									{ return fBuffer->row(y); }
+
+	inline	uint8*				pix_ptr(int x, int y);
+	inline	const uint8*		pix_ptr(int x, int y) const;
+
+	inline	static	void		make_pix(uint8* p, const color_type& c);
+//	inline	color_type			pixel(int x, int y) const;
+
+	inline	void				blend_pixel(int x, int y,
 											const color_type& c,
 											uint8 cover);
 
 
-			void				blend_hline(int x, int y,
+	inline	void				blend_hline(int x, int y,
 											unsigned len,
 											const color_type& c,
 											uint8 cover);
 
-			void				blend_vline(int x, int y,
+	inline	void				blend_vline(int x, int y,
 											unsigned len,
 											const color_type& c,
 											uint8 cover);
 
-			void				blend_solid_hspan(int x, int y,
+	inline	void				blend_solid_hspan(int x, int y,
 												  unsigned len,
 												  const color_type& c,
 												  const uint8* covers);
 
-			void				blend_solid_vspan(int x, int y,
+	inline	void				blend_solid_vspan(int x, int y,
 												  unsigned len,
 												  const color_type& c,
 												  const uint8* covers);
 
-			void				blend_color_hspan(int x, int y,
+	inline	void				blend_color_hspan(int x, int y,
 												  unsigned len,
 												  const color_type* colors,
 												  const uint8* covers,
 												  uint8 cover);
 
-			void				blend_color_vspan(int x, int y,
+	inline	void				blend_color_vspan(int x, int y,
 												  unsigned len,
 												  const color_type* colors,
 												  const uint8* covers,
@@ -120,6 +146,42 @@ class PixelFormat {
 };
 
 // inlined functions
+
+// pix_ptr
+inline uint8*
+PixelFormat::pix_ptr(int x, int y)
+{
+	return fBuffer->row_ptr(y) + x * pix_width;
+}
+
+// pix_ptr
+inline const uint8*
+PixelFormat::pix_ptr(int x, int y) const
+{
+	return fBuffer->row_ptr(y) + x * pix_width;
+}
+
+// make_pix
+inline void
+PixelFormat::make_pix(uint8* p, const color_type& c)
+{
+	p[0] = c.b;
+	p[1] = c.g;
+	p[2] = c.r;
+	p[3] = c.a;
+}
+
+//// pixel
+//inline color_type
+//PixelFormat::pixel(int x, int y) const
+//{
+//	const uint8* p = (const uint8*)fBuffer->row_ptr(y);
+//	if (p) {
+//		p += x << 2;
+//		return color_type(p[2], p[1], p[0], p[3]);
+//	}
+//	return color_type::no_color();
+//}
 
 // blend_pixel
 inline void

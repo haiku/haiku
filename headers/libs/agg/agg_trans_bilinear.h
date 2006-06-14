@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -122,6 +122,38 @@ namespace agg
             double xy = tx * ty;
             *x = m_mtx[0][0] + m_mtx[1][0] * xy + m_mtx[2][0] * tx + m_mtx[3][0] * ty;
             *y = m_mtx[0][1] + m_mtx[1][1] * xy + m_mtx[2][1] * tx + m_mtx[3][1] * ty;
+        }
+
+
+        //--------------------------------------------------------------------
+        class iterator_x
+        {
+            double inc_x;
+            double inc_y;
+
+        public:
+            double x;
+            double y;
+
+            iterator_x() {}
+            iterator_x(double tx, double ty, double step, const double m[4][2]) :
+                inc_x(m[1][0] * step * ty + m[2][0] * step),
+                inc_y(m[1][1] * step * ty + m[2][1] * step),
+                x(m[0][0] + m[1][0] * tx * ty + m[2][0] * tx + m[3][0] * ty),
+                y(m[0][1] + m[1][1] * tx * ty + m[2][1] * tx + m[3][1] * ty)
+            {
+            }
+
+            void operator ++ ()
+            {
+                x += inc_x;
+                y += inc_y;
+            }
+        };
+
+        iterator_x begin(double x, double y, double step) const
+        {
+            return iterator_x(x, y, step, m_mtx);
         }
 
     private:

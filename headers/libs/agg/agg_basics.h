@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -16,20 +16,201 @@
 #ifndef AGG_BASICS_INCLUDED
 #define AGG_BASICS_INCLUDED
 
+#include <math.h>
+#include "agg_config.h"
+
+//---------------------------------------------------------AGG_CUSTOM_ALLOCATOR
+#ifdef AGG_CUSTOM_ALLOCATOR
+#include "agg_allocator.h"
+#else
+namespace agg
+{
+    // The policy of all AGG containers and memory allocation strategy 
+    // in general is that no allocated data requires explicit construction.
+    // It means that the allocator can be really simple; you can even
+    // replace new/delete to malloc/free. The constructors and destructors 
+    // won't be called in this case, however everything will remain working. 
+    // The second argument of deallocate() is the size of the allocated 
+    // block. You can use this information if you wish.
+    //------------------------------------------------------------pod_allocator
+    template<class T> struct pod_allocator
+    {
+        static T*   allocate(unsigned num)       { return new T [num]; }
+        static void deallocate(T* ptr, unsigned) { delete [] ptr;      }
+    };
+
+    // Single object allocator. It's also can be replaced with your custom
+    // allocator. The difference is that it can only allocate a single 
+    // object and the constructor and destructor must be called. 
+    // In AGG there is no need to allocate an array of objects with
+    // calling their constructors (only single ones). So that, if you
+    // replace these new/delete to malloc/free make sure that the in-place
+    // new is called and take care of calling the destructor too.
+    //------------------------------------------------------------obj_allocator
+    template<class T> struct obj_allocator
+    {
+        static T*   allocate()         { return new T; }
+        static void deallocate(T* ptr) { delete ptr;   }
+    };
+}
+#endif
+
+
+//-------------------------------------------------------- Default basic types
+//
+// If the compiler has different capacity of the basic types you can redefine
+// them via the compiler command line or by generating agg_config.h that is
+// empty by default.
+//
+#ifndef AGG_INT8
+#define AGG_INT8 signed char
+#endif
+
+#ifndef AGG_INT8U
+#define AGG_INT8U unsigned char
+#endif
+
+#ifndef AGG_INT16
+#define AGG_INT16 short
+#endif
+
+#ifndef AGG_INT16U
+#define AGG_INT16U unsigned short
+#endif
+
+#ifndef AGG_INT32
+#define AGG_INT32 int
+#endif
+
+#ifndef AGG_INT32U
+#define AGG_INT32U unsigned
+#endif
+
+#ifndef AGG_INT64
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+#define AGG_INT64 signed __int64
+#else
+#define AGG_INT64 signed long long
+#endif
+#endif
+
+#ifndef AGG_INT64U
+#if defined(_MSC_VER) || defined(__BORLANDC__)
+#define AGG_INT64U unsigned __int64
+#else
+#define AGG_INT64U unsigned long long
+#endif
+#endif
+
+//------------------------------------------------ Some fixes for MS Visual C++
+#if defined(_MSC_VER)
+#pragma warning(disable:4786) // Identifier was truncated...
+#endif
+
+#if defined(_MSC_VER)
+#define AGG_INLINE __forceinline
+#else
+#define AGG_INLINE inline
+#endif
+
 namespace agg
 {
     //-------------------------------------------------------------------------
-    typedef signed char    int8;         //----int8
-    typedef unsigned char  int8u;        //----int8u
-    typedef signed short   int16;        //----int16
-    typedef unsigned short int16u;       //----int16u
-    typedef signed int     int32;        //----int32
-    typedef unsigned int   int32u;       //----int32u
+    typedef AGG_INT8   int8;         //----int8
+    typedef AGG_INT8U  int8u;        //----int8u
+    typedef AGG_INT16  int16;        //----int16
+    typedef AGG_INT16U int16u;       //----int16u
+    typedef AGG_INT32  int32;        //----int32
+    typedef AGG_INT32U int32u;       //----int32u
+    typedef AGG_INT64  int64;        //----int64
+    typedef AGG_INT64U int64u;       //----int64u
 
+#if defined(AGG_FISTP)
+#pragma warning(push)
+#pragma warning(disable : 4035) //Disable warning "no return value"
+    AGG_INLINE int iround(double v)              //-------iround
+    {
+        int t;
+        __asm fld   qword ptr [v]
+        __asm fistp dword ptr [t]
+        __asm mov eax, dword ptr [t]
+    }
+    AGG_INLINE unsigned uround(double v)         //-------uround
+    {
+        unsigned t;
+        __asm fld   qword ptr [v]
+        __asm fistp dword ptr [t]
+        __asm mov eax, dword ptr [t]
+    }
+#pragma warning(pop)
+    AGG_INLINE unsigned ufloor(double v)         //-------ufloor
+    {
+        return unsigned(floor(v));
+    }
+    AGG_INLINE unsigned uceil(double v)          //--------uceil
+    {
+        return unsigned(ceil(v));
+    }
+#elif defined(AGG_QIFIST)
+    AGG_INLINE int iround(double v)
+    {
+        return int(v);
+    }
+    AGG_INLINE int uround(double v)
+    {
+        return unsigned(v);
+    }
+    AGG_INLINE unsigned ufloor(double v)
+    {
+        return unsigned(floor(v));
+    }
+    AGG_INLINE unsigned uceil(double v)
+    {
+        return unsigned(ceil(v));
+    }
+#else
+    AGG_INLINE int iround(double v)
+    {
+        return int((v < 0.0) ? v - 0.5 : v + 0.5);
+    }
+    AGG_INLINE int uround(double v)
+    {
+        return unsigned(v + 0.5);
+    }
+    AGG_INLINE unsigned ufloor(double v)
+    {
+        return unsigned(v);
+    }
+    AGG_INLINE unsigned uceil(double v)
+    {
+        return unsigned(ceil(v));
+    }
+#endif
+
+    //---------------------------------------------------------------saturation
+    template<int Limit> struct saturation
+    {
+        AGG_INLINE static int iround(double v)
+        {
+            if(v < double(-Limit)) return -Limit;
+            if(v > double( Limit)) return  Limit;
+            return agg::iround(v);
+        }
+    };
+
+    //------------------------------------------------------------------mul_one
+    template<unsigned Shift> struct mul_one
+    {
+        AGG_INLINE static unsigned mul(unsigned a, unsigned b)
+        {
+            register unsigned q = a * b + (1 << (Shift-1));
+            return (q + (q >> Shift)) >> Shift;
+        }
+    };
 
     //-------------------------------------------------------------------------
     typedef unsigned char cover_type;    //----cover_type
-    enum
+    enum cover_scale_e
     {
         cover_shift = 8,                 //----cover_shift
         cover_size  = 1 << cover_shift,  //----cover_size 
@@ -38,6 +219,25 @@ namespace agg
         cover_full  = cover_mask         //----cover_full 
     };
 
+    //----------------------------------------------------poly_subpixel_scale_e
+    // These constants determine the subpixel accuracy, to be more precise, 
+    // the number of bits of the fractional part of the coordinates. 
+    // The possible coordinate capacity in bits can be calculated by formula:
+    // sizeof(int) * 8 - poly_subpixel_shift, i.e, for 32-bit integers and
+    // 8-bits fractional part the capacity is 24 bits.
+    enum poly_subpixel_scale_e
+    {
+        poly_subpixel_shift = 8,                      //----poly_subpixel_shift
+        poly_subpixel_scale = 1<<poly_subpixel_shift, //----poly_subpixel_scale 
+        poly_subpixel_mask  = poly_subpixel_scale-1,  //----poly_subpixel_mask 
+    };
+
+    //----------------------------------------------------------filling_rule_e
+    enum filling_rule_e
+    {
+        fill_non_zero,
+        fill_even_odd
+    };
 
     //-----------------------------------------------------------------------pi
     const double pi = 3.14159265358979323846;
@@ -121,7 +321,8 @@ namespace agg
         return r;
     }
 
-    typedef rect_base<int>    rect;   //----rect
+    typedef rect_base<int>    rect_i; //----rect_i
+    typedef rect_base<float>  rect_f; //----rect_f
     typedef rect_base<double> rect_d; //----rect_d
 
     //---------------------------------------------------------path_commands_e
@@ -132,7 +333,10 @@ namespace agg
         path_cmd_line_to  = 2,        //----path_cmd_line_to 
         path_cmd_curve3   = 3,        //----path_cmd_curve3  
         path_cmd_curve4   = 4,        //----path_cmd_curve4  
-        path_cmd_end_poly = 6,        //----path_cmd_end_poly
+        path_cmd_curveN   = 5,        //----path_cmd_curveN
+        path_cmd_catrom   = 6,        //----path_cmd_catrom
+        path_cmd_ubspline = 7,        //----path_cmd_ubspline
+        path_cmd_end_poly = 0x0F,     //----path_cmd_end_poly
         path_cmd_mask     = 0x0F      //----path_cmd_mask    
     };
 
@@ -150,6 +354,12 @@ namespace agg
     inline bool is_vertex(unsigned c)
     {
         return c >= path_cmd_move_to && c < path_cmd_end_poly;
+    }
+
+    //--------------------------------------------------------------is_drawing
+    inline bool is_drawing(unsigned c)
+    {
+        return c >= path_cmd_line_to && c < path_cmd_end_poly;
     }
 
     //-----------------------------------------------------------------is_stop
@@ -255,26 +465,30 @@ namespace agg
         return clear_orientation(c) | o;
     }
 
-    //--------------------------------------------------------------point_type
-    struct point_type
+    //--------------------------------------------------------------point_base
+    template<class T> struct point_base
     {
-        double x, y;
-
-        point_type() {}
-        point_type(double x_, double y_) : x(x_), y(y_) {}
+        typedef T value_type;
+        T x,y;
+        point_base() {}
+        point_base(T x_, T y_) : x(x_), y(y_) {}
     };
+    typedef point_base<int>    point_i; //-----point_i
+    typedef point_base<float>  point_f; //-----point_f
+    typedef point_base<double> point_d; //-----point_d
 
-    //-------------------------------------------------------------vertex_type
-    struct vertex_type
+    //-------------------------------------------------------------vertex_base
+    template<class T> struct vertex_base
     {
-        double   x, y;
+        typedef T value_type;
+        T x,y;
         unsigned cmd;
-
-        vertex_type() {}
-        vertex_type(double x_, double y_, unsigned cmd_) : 
-            x(x_), y(y_), cmd(cmd_) {}
+        vertex_base() {}
+        vertex_base(T x_, T y_, unsigned cmd_) : x(x_), y(y_), cmd(cmd_) {}
     };
-
+    typedef vertex_base<int>    vertex_i; //-----vertex_i
+    typedef vertex_base<float>  vertex_f; //-----vertex_f
+    typedef vertex_base<double> vertex_d; //-----vertex_d
 
 }
 

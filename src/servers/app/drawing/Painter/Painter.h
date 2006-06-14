@@ -213,7 +213,7 @@ class Painter {
 												BPoint pt3,
 												bool fill) const;
 
-			void				_DrawBitmap(	const agg::rendering_buffer& srcBuffer,
+			void				_DrawBitmap(	agg::rendering_buffer& srcBuffer,
 												color_space format,
 												BRect actualBitmapRect,
 												BRect bitmapRect,
@@ -222,11 +222,11 @@ class Painter {
 			void				_DrawBitmapNoScale32(
 												F copyRowFunction,
 												uint32 bytesPerSourcePixel,
-												const agg::rendering_buffer& srcBuffer,
+												agg::rendering_buffer& srcBuffer,
 												int32 xOffset, int32 yOffset,
 												BRect viewRect) const;
 			void				_DrawBitmapGeneric32(
-												const agg::rendering_buffer& srcBuffer,
+												agg::rendering_buffer& srcBuffer,
 												double xOffset, double yOffset,
 												double xScale, double yScale,
 												BRect viewRect) const;

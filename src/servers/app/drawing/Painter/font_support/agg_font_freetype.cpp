@@ -336,7 +336,7 @@ namespace agg {
         const int8u* buf = (const int8u*)bitmap.buffer;
         int pitch = bitmap.pitch;
         sl.reset(x, x + bitmap.width);
-        storage.prepare(bitmap.width + 2);
+        storage.prepare();
         if(flip_y)
         {
             buf += bitmap.pitch * (bitmap.rows - 1);
@@ -377,7 +377,7 @@ namespace agg {
         const int8u* buf = (const int8u*)bitmap.buffer;
         int pitch = bitmap.pitch;
         sl.reset(x, x + bitmap.width);
-        storage.prepare(bitmap.width + 2);
+        storage.prepare();
         if(flip_y)
         {
             buf += bitmap.pitch * (bitmap.rows - 1);
@@ -865,12 +865,12 @@ namespace agg {
                                              conv_coord_none);
                         m_rasterizer.add_path(m_curves16);
                     }
-                    m_scanlines_bin.prepare(1); // Remove all 
+                    m_scanlines_bin.prepare(); // Remove all 
                     render_scanlines(m_rasterizer, m_scanline_bin, m_scanlines_bin);
                     m_bounds.x1 = m_scanlines_bin.min_x();
                     m_bounds.y1 = m_scanlines_bin.min_y();
-                    m_bounds.x2 = m_scanlines_bin.max_x();
-                    m_bounds.y2 = m_scanlines_bin.max_y();
+                    m_bounds.x2 = m_scanlines_bin.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_bin.max_y() + 1;
                     m_data_size = m_scanlines_bin.byte_size(); 
                     m_data_type = glyph_data_mono;
                     m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;
@@ -902,12 +902,12 @@ namespace agg {
                                              conv_coord_none);
                         m_rasterizer.add_path(m_curves16);
                     }
-                    m_scanlines_aa.prepare(1); // Remove all 
+                    m_scanlines_aa.prepare(); // Remove all 
                     render_scanlines(m_rasterizer, m_scanline_aa, m_scanlines_aa);
                     m_bounds.x1 = m_scanlines_aa.min_x();
                     m_bounds.y1 = m_scanlines_aa.min_y();
-                    m_bounds.x2 = m_scanlines_aa.max_x();
-                    m_bounds.y2 = m_scanlines_aa.max_y();
+                    m_bounds.x2 = m_scanlines_aa.max_x() + 1;
+                    m_bounds.y2 = m_scanlines_aa.max_y() + 1;
                     m_data_size = m_scanlines_aa.byte_size(); 
                     m_data_type = glyph_data_gray8;
                     m_advance_x = double(m_cur_face->glyph->advance.x) / 64.0;

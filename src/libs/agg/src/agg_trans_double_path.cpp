@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -101,6 +101,7 @@ namespace agg
         double dist;
         double d;
 
+        vertices.close(false);
         if(vertices.size() > 2)
         {
             if(vertices[vertices.size() - 2].dist * 10.0 < 
@@ -118,7 +119,6 @@ namespace agg
         }
 
         dist = 0;
-        vertices.close(false);
         for(i = 0; i < vertices.size(); i++)
         {
             vertex_dist& v = vertices[i];
@@ -228,7 +228,7 @@ namespace agg
             }
             else
             {
-                i = (unsigned)floor(*x * kindex);
+                i = unsigned(*x * kindex);
                 j = i + 1;
                 dd = vertices[j].dist - vertices[i].dist;
                 d = ((*x * kindex) - i) * dd;

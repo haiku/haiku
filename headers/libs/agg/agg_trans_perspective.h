@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -136,6 +136,50 @@ namespace agg
             double d = 1.0 / (m_mtx[6][0] * tx + m_mtx[7][0] * ty + 1.0);
             *x = (m_mtx[0][0] + m_mtx[1][0] * tx + m_mtx[2][0] * ty) * d;
             *y = (m_mtx[3][0] + m_mtx[4][0] * tx + m_mtx[5][0] * ty) * d;
+        }
+
+        //--------------------------------------------------------------------
+        class iterator_x
+        {
+            double den;
+            double den_step;
+            double nom_x;
+            double nom_x_step;
+            double nom_y;
+            double nom_y_step;
+
+        public:
+            double x;
+            double y;
+
+            iterator_x() {}
+            iterator_x(double tx, double ty, double step, const double m[8][1]) :
+                den(m[6][0] * tx + m[7][0] * ty + 1.0),
+                den_step(m[6][0] * step),
+                nom_x(m[0][0] + m[1][0] * tx + m[2][0] * ty),
+                nom_x_step(m[1][0] * step),
+                nom_y(m[3][0] + m[4][0] * tx + m[5][0] * ty),
+                nom_y_step(m[4][0] * step),
+                x(nom_x / den),
+                y(nom_y / den)
+            {
+            }
+
+            void operator ++ ()
+            {
+                den   += den_step;
+                nom_x += nom_x_step;
+                nom_y += nom_y_step;
+                double d = 1.0 / den;
+                x = nom_x * d;
+                y = nom_y * d;
+            }
+        };
+
+        //--------------------------------------------------------------------
+        iterator_x begin(double x, double y, double step) const
+        {
+            return iterator_x(x, y, step, m_mtx);
         }
 
     private:

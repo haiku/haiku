@@ -56,7 +56,7 @@ blend_pixel_select(int x, int y, const color_type& c, uint8 cover,
 				   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	if (pattern->IsHighColor(x, y)) {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		rgb_color high = pattern->HighColor().GetColor32();
 		rgb_color low = pattern->LowColor().GetColor32();
 		rgb_color color; 
@@ -76,7 +76,7 @@ blend_hline_select(int x, int y, unsigned len,
 				   const color_type& c, uint8 cover,
 				   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color high = pattern->HighColor().GetColor32();
 	rgb_color low = pattern->LowColor().GetColor32();
 	rgb_color color; 
@@ -106,7 +106,7 @@ blend_solid_hspan_select(int x, int y, unsigned len,
 						 const color_type& c, const uint8* covers,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color high = pattern->HighColor().GetColor32();
 	rgb_color low = pattern->LowColor().GetColor32();
 	rgb_color color; 
@@ -134,7 +134,7 @@ blend_solid_vspan_select(int x, int y, unsigned len,
 						 const color_type& c, const uint8* covers,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color high = pattern->HighColor().GetColor32();
 	rgb_color low = pattern->LowColor().GetColor32();
 	rgb_color color; 
@@ -162,7 +162,7 @@ blend_color_hspan_select(int x, int y, unsigned len,
 						 const uint8* covers, uint8 cover,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color high = pattern->HighColor().GetColor32();
 	rgb_color low = pattern->LowColor().GetColor32();
 	rgb_color color; 

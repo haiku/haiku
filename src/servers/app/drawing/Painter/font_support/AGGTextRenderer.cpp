@@ -223,7 +223,7 @@ AGGTextRenderer::RenderString(const char* string,
 		// "glyphBounds" is the bounds of the glyph transformed
 		// by the x y location of the glyph along the base line,
 		// it is therefor yet "untransformed".
-		const agg::rect& r = glyph->bounds;
+		const agg::rect_i& r = glyph->bounds;
 		BRect glyphBounds(r.x1 + x, r.y1 + y - 1, r.x2 + x + 1, r.y2 + y + 1);
 			// NOTE: "-1"/"+1" converts the glyph bounding box from pixel
 			// indices to pixel area coordinates

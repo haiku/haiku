@@ -464,8 +464,8 @@ VectorPath::CountPoints() const
 static float
 distance_to_curve(const BPoint& p, const BPoint& a, const BPoint& aOut, const BPoint& bIn, const BPoint& b)
 {
-	agg::curve4 curve(a.x, a.y, aOut.x, aOut.y,
-					  bIn.x, bIn.y, b.x, b.y);
+	agg::curve4_inc curve(a.x, a.y, aOut.x, aOut.y,
+						  bIn.x, bIn.y, b.x, b.y);
 
 	float segDist = FLT_MAX;
 	double x1, y1, x2, y2;
@@ -684,8 +684,7 @@ VectorPath::Iterate(Iterator* iterator, float smoothScale) const
 	if (fPointCount > 1) {
 		// generate a curve for each segment of the path
 		// then	iterate over the segments of the curve
-//		agg::curve4_inc curve;
-agg::curve4 curve;
+		agg::curve4_inc curve;
 
 		for (int32 i = 0; i < fPointCount - 1; i++) {
 iterator->MoveTo(fPath[i].point);

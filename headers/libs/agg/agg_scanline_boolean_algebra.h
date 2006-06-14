@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+// Anti-Grain Geometry - Version 2.4
+// Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
 //
 // Permission to copy, use, modify, sell and distribute this software 
 // is granted provided this copyright notice appears in all copies. 
@@ -141,7 +141,7 @@ namespace agg
              unsigned CoverShift = cover_shift> 
     struct sbool_intersect_spans_aa
     {
-        enum
+        enum cover_scale_e
         {
             cover_shift = CoverShift,
             cover_size  = 1 << cover_shift,
@@ -253,7 +253,7 @@ namespace agg
              unsigned CoverShift = cover_shift> 
     struct sbool_unite_spans_aa
     {
-        enum
+        enum cover_scale_e
         {
             cover_shift = CoverShift,
             cover_size  = 1 << cover_shift,
@@ -358,23 +358,38 @@ namespace agg
     };
 
 
-
-
-
-
-
-    //---------------------------------------------sbool_xor_formula_saddle
+    //---------------------------------------------sbool_xor_formula_linear
     template<unsigned CoverShift = cover_shift> 
-    struct sbool_xor_formula_saddle
+    struct sbool_xor_formula_linear
     {
-        enum
+        enum cover_scale_e
         {
             cover_shift = CoverShift,
             cover_size  = 1 << cover_shift,
             cover_mask  = cover_size - 1
         };
 
-        static unsigned calculate(unsigned a, unsigned b)
+        static AGG_INLINE unsigned calculate(unsigned a, unsigned b)
+        {
+            unsigned cover = a + b;
+            if(cover > cover_mask) cover = cover_mask + cover_mask - cover;
+            return cover;
+        }
+    };
+
+
+    //---------------------------------------------sbool_xor_formula_saddle
+    template<unsigned CoverShift = cover_shift> 
+    struct sbool_xor_formula_saddle
+    {
+        enum cover_scale_e
+        {
+            cover_shift = CoverShift,
+            cover_size  = 1 << cover_shift,
+            cover_mask  = cover_size - 1
+        };
+
+        static AGG_INLINE unsigned calculate(unsigned a, unsigned b)
         {
             unsigned k = a * b;
             if(k == cover_mask * cover_mask) return 0;
@@ -386,23 +401,12 @@ namespace agg
     };
 
 
-
-    //--------------------------------------------sbool_xor_formula_linear
-    template<unsigned CoverShift = cover_shift> 
-    struct sbool_xor_formula_linear
+    //-------------------------------------------sbool_xor_formula_abs_diff
+    struct sbool_xor_formula_abs_diff
     {
-        enum
+        static AGG_INLINE unsigned calculate(unsigned a, unsigned b)
         {
-            cover_shift = CoverShift,
-            cover_size  = 1 << cover_shift,
-            cover_mask  = cover_size - 1
-        };
-
-        static unsigned calculate(unsigned a, unsigned b)
-        {
-            unsigned cover = a + b;
-            if(cover > cover_mask) cover = cover_mask + cover_mask - cover;
-            return cover;
+            return unsigned(abs(int(a) - int(b)));
         }
     };
 
@@ -420,7 +424,7 @@ namespace agg
              unsigned CoverShift = cover_shift> 
     struct sbool_xor_spans_aa
     {
-        enum
+        enum cover_scale_e
         {
             cover_shift = CoverShift,
             cover_size  = 1 << cover_shift,
@@ -509,7 +513,7 @@ namespace agg
              unsigned CoverShift = cover_shift> 
     struct sbool_subtract_spans_aa
     {
-        enum
+        enum cover_scale_e
         {
             cover_shift = CoverShift,
             cover_size  = 1 << cover_shift,
@@ -625,14 +629,14 @@ namespace agg
                                     AddSpanFunctor add_span)
     {
         sl.reset_spans();
-        typename Scanline::const_iterator span = sl1.begin();
+        typename Scanline1::const_iterator span = sl1.begin();
         unsigned num_spans = sl1.num_spans();
-        do
+        for(;;)
         {
             add_span(span, span->x, abs((int)span->len), sl);
+            if(--num_spans == 0) break;
             ++span;
         }
-        while(--num_spans);
         sl.finalize(sl1.y());
         ren.render(sl);
     }
@@ -667,8 +671,8 @@ namespace agg
         unsigned num2 = sl2.num_spans();
         if(num2 == 0) return;
 
-        typename Scanline::const_iterator span1 = sl1.begin();
-        typename Scanline::const_iterator span2 = sl2.begin();
+        typename Scanline1::const_iterator span1 = sl1.begin();
+        typename Scanline2::const_iterator span2 = sl2.begin();
 
         while(num1 && num2)
         {
@@ -701,20 +705,20 @@ namespace agg
             {
                 --num1;
                 --num2;
-                ++span1;
-                ++span2;
+                if(num1) ++span1;
+                if(num2) ++span2;
             }
             else
             {
                 if(advance_span1)
                 {
                     --num1;
-                    ++span1;
+                    if(num1) ++span1;
                 }
                 else
                 {
                     --num2;
-                    ++span2;
+                    if(num2) ++span2;
                 }
             }
         }
@@ -761,13 +765,13 @@ namespace agg
 
         // Get the bounding boxes
         //----------------
-        rect r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
-        rect r2(sg2.min_x(), sg2.min_y(), sg2.max_x(), sg2.max_y());
+        rect_i r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
+        rect_i r2(sg2.min_x(), sg2.min_y(), sg2.max_x(), sg2.max_y());
 
         // Calculate the intersection of the bounding 
         // boxes and return if they don't intersect.
         //-----------------
-        rect ir = intersect_rectangles(r1, r2);
+        rect_i ir = intersect_rectangles(r1, r2);
         if(!ir.is_valid()) return;
 
         // Reset the scanlines and get two first ones
@@ -778,7 +782,7 @@ namespace agg
         if(!sg1.sweep_scanline(sl1)) return;
         if(!sg2.sweep_scanline(sl2)) return;
 
-        ren.prepare(unsigned(ir.x2 - ir.x1 + 2));
+        ren.prepare();
 
         // The main loop
         // Here we synchronize the scanlines with 
@@ -846,10 +850,14 @@ namespace agg
         unsigned num1 = sl1.num_spans();
         unsigned num2 = sl2.num_spans();
 
-        typename Scanline::const_iterator span1;
-        typename Scanline::const_iterator span2;
+        typename Scanline1::const_iterator span1;// = sl1.begin();
+        typename Scanline2::const_iterator span2;// = sl2.begin();
 
-        enum { invalid_b = 0x7FFFFFFF, invalid_e = invalid_b - 1 };
+        enum invalidation_e 
+        { 
+            invalid_b = 0xFFFFFFF, 
+            invalid_e = invalid_b - 1 
+        };
 
         // Initialize the spans as invalid
         //---------------
@@ -1033,15 +1041,19 @@ namespace agg
 
         // Get the bounding boxes
         //----------------
-        rect r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
-        rect r2(sg2.min_x(), sg2.min_y(), sg2.max_x(), sg2.max_y());
+        rect_i r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
+        rect_i r2(sg2.min_x(), sg2.min_y(), sg2.max_x(), sg2.max_y());
 
         // Calculate the union of the bounding boxes
         //-----------------
-        rect ur = unite_rectangles(r1, r2);
+        rect_i ur(1,1,0,0);
+             if(flag1 && flag2) ur = unite_rectangles(r1, r2);
+        else if(flag1)          ur = r1;
+        else if(flag2)          ur = r2;
+
         if(!ur.is_valid()) return;
 
-        ren.prepare(unsigned(ur.x2 - ur.x2 + 2));
+        ren.prepare();
 
         // Reset the scanlines and get two first ones
         //-----------------
@@ -1154,7 +1166,7 @@ namespace agg
 
         // Get the bounding box
         //----------------
-        rect r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
+        rect_i r1(sg1.min_x(), sg1.min_y(), sg1.max_x(), sg1.max_y());
 
         // Reset the scanlines and get two first ones
         //-----------------
@@ -1165,10 +1177,10 @@ namespace agg
 
         if(flag2) flag2 = sg2.sweep_scanline(sl2);
 
-        ren.prepare(unsigned(sg1.max_x() - sg1.min_x() + 2));
+        ren.prepare();
 
         // A fake span2 processor
-        sbool_add_span_empty<Scanline1, Scanline> add_span2;
+        sbool_add_span_empty<Scanline2, Scanline> add_span2;
 
         // The main loop
         // Here we synchronize the scanlines with 
@@ -1376,6 +1388,34 @@ namespace agg
     }
 
 
+    //--------------------------------------sbool_xor_shapes_abs_diff_aa
+    // Apply eXclusive OR to two anti-aliased scanline shapes. 
+    // There's the absolute difference used to calculate 
+    // Anti-Aliasing values, that is:
+    // a XOR b : abs(a-b)
+    // See intersect_shapes_aa for more comments
+    //----------
+    template<class ScanlineGen1, 
+             class ScanlineGen2, 
+             class Scanline1, 
+             class Scanline2, 
+             class Scanline, 
+             class Renderer>
+    void sbool_xor_shapes_abs_diff_aa(ScanlineGen1& sg1, ScanlineGen2& sg2,
+                                      Scanline1& sl1, Scanline2& sl2,
+                                      Scanline& sl, Renderer& ren)
+    {
+        sbool_add_span_aa<Scanline1, Scanline> add_functor1;
+        sbool_add_span_aa<Scanline2, Scanline> add_functor2;
+        sbool_xor_spans_aa<Scanline1, 
+                           Scanline2, 
+                           Scanline, 
+                           sbool_xor_formula_abs_diff> combine_functor;
+        sbool_unite_shapes(sg1, sg2, sl1, sl2, sl, ren, 
+                           add_functor1, add_functor2, combine_functor);
+    }
+
+
 
     //--------------------------------------------------sbool_xor_shapes_bin
     // Apply eXclusive OR to two binary scanline shapes (without anti-aliasing). 
@@ -1459,6 +1499,7 @@ namespace agg
         sbool_and,           //----sbool_and
         sbool_xor,           //----sbool_xor
         sbool_xor_saddle,    //----sbool_xor_saddle
+        sbool_xor_abs_diff,  //----sbool_xor_abs_diff
         sbool_a_minus_b,     //----sbool_a_minus_b
         sbool_b_minus_a      //----sbool_b_minus_a
     };
@@ -1482,12 +1523,13 @@ namespace agg
     {
         switch(op)
         {
-        case sbool_or        : sbool_unite_shapes_bin    (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_and       : sbool_intersect_shapes_bin(sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_xor       :
-        case sbool_xor_saddle: sbool_xor_shapes_bin      (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_a_minus_b : sbool_subtract_shapes_bin (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_b_minus_a : sbool_subtract_shapes_bin (sg2, sg1, sl2, sl1, sl, ren); break;
+        case sbool_or          : sbool_unite_shapes_bin    (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_and         : sbool_intersect_shapes_bin(sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_xor         :
+        case sbool_xor_saddle  : 
+        case sbool_xor_abs_diff: sbool_xor_shapes_bin      (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_a_minus_b   : sbool_subtract_shapes_bin (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_b_minus_a   : sbool_subtract_shapes_bin (sg2, sg1, sl2, sl1, sl, ren); break;
         }
     }
 
@@ -1508,12 +1550,13 @@ namespace agg
     {
         switch(op)
         {
-        case sbool_or        : sbool_unite_shapes_aa     (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_and       : sbool_intersect_shapes_aa (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_xor       : sbool_xor_shapes_aa       (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_xor_saddle: sbool_xor_shapes_saddle_aa(sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_a_minus_b : sbool_subtract_shapes_aa  (sg1, sg2, sl1, sl2, sl, ren); break;
-        case sbool_b_minus_a : sbool_subtract_shapes_aa  (sg2, sg1, sl2, sl1, sl, ren); break;
+        case sbool_or          : sbool_unite_shapes_aa       (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_and         : sbool_intersect_shapes_aa   (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_xor         : sbool_xor_shapes_aa         (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_xor_saddle  : sbool_xor_shapes_saddle_aa  (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_xor_abs_diff: sbool_xor_shapes_abs_diff_aa(sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_a_minus_b   : sbool_subtract_shapes_aa    (sg1, sg2, sl1, sl2, sl, ren); break;
+        case sbool_b_minus_a   : sbool_subtract_shapes_aa    (sg2, sg1, sl2, sl1, sl, ren); break;
         }
     }
 

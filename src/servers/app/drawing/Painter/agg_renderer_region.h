@@ -1,6 +1,6 @@
 /*
- * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
  *
@@ -48,18 +48,18 @@ namespace agg
         unsigned height() const { return m_ren.height(); }
 
         //--------------------------------------------------------------------
-        const rect& clip_box() const { return m_ren.clip_box(); }
-        int         xmin()     const { return m_ren.xmin(); }
-        int         ymin()     const { return m_ren.ymin(); }
-        int         xmax()     const { return m_ren.xmax(); }
-        int         ymax()     const { return m_ren.ymax(); }
+        const rect_i& clip_box() const { return m_ren.clip_box(); }
+        int           xmin()     const { return m_ren.xmin(); }
+        int           ymin()     const { return m_ren.ymin(); }
+        int           xmax()     const { return m_ren.xmax(); }
+        int           ymax()     const { return m_ren.ymax(); }
 
         //--------------------------------------------------------------------
-        const rect& bounding_clip_box() const { return m_bounds;    }
-        int         bounding_xmin()     const { return m_bounds.x1; }
-        int         bounding_ymin()     const { return m_bounds.y1; }
-        int         bounding_xmax()     const { return m_bounds.x2; }
-        int         bounding_ymax()     const { return m_bounds.y2; }
+        const rect_i& bounding_clip_box() const { return m_bounds;    }
+        int           bounding_xmin()     const { return m_bounds.x1; }
+        int           bounding_ymin()     const { return m_bounds.y1; }
+        int           bounding_xmax()     const { return m_bounds.x2; }
+        int           bounding_ymax()     const { return m_bounds.y2; }
 
         //--------------------------------------------------------------------
         void first_clip_box() 
@@ -102,7 +102,7 @@ namespace agg
         	if (m_region) {
 	        	clipping_rect r = m_region->FrameInt();
 	        	if (r.left <= r.right && r.top <= r.bottom) {
-	        		// clip rect to frame buffer bounds
+	        		// clip rect_i to frame buffer bounds
 		        	r.left = max_c(0, r.left);
 		        	r.top = max_c(0, r.top);
 		        	r.right = min_c((int)width() - 1, r.right);
@@ -309,7 +309,7 @@ namespace agg
 
         //--------------------------------------------------------------------
         void copy_from(const rendering_buffer& from, 
-                       const rect* rc=0, 
+                       const rect_i* rc=0, 
                        int x_to=0, 
                        int y_to=0)
         {
@@ -329,7 +329,7 @@ namespace agg
         base_ren_type      m_ren;
 		BRegion*		   m_region;
         unsigned           m_curr_cb;
-        rect               m_bounds;
+        rect_i             m_bounds;
     };
 
 

@@ -32,7 +32,7 @@ blend_pixel_erase(int x, int y, const color_type& c, uint8 cover,
 				  agg_buffer* buffer, const PatternHandler* pattern)
 {
 	if (pattern->IsHighColor(x, y)) {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		rgb_color color = pattern->LowColor().GetColor32();
 		if (cover == 255) {
 			ASSIGN_ERASE(p, color.red, color.green, color.blue);
@@ -56,7 +56,7 @@ blend_hline_erase(int x, int y, unsigned len,
 		p8[1] = (uint8)color.green;
 		p8[2] = (uint8)color.red;
 		p8[3] = 255;
-		uint32* p32 = (uint32*)(buffer->row(y)) + x;
+		uint32* p32 = (uint32*)(buffer->row_ptr(y)) + x;
 		do {
 			if (pattern->IsHighColor(x, y))
 				*p32 = v;
@@ -64,7 +64,7 @@ blend_hline_erase(int x, int y, unsigned len,
 			x++;
 		} while(--len);
 	} else {
-		uint8* p = buffer->row(y) + (x << 2);
+		uint8* p = buffer->row_ptr(y) + (x << 2);
 		rgb_color color = pattern->LowColor().GetColor32();
 		do {
 			if (pattern->IsHighColor(x, y)) {
@@ -82,7 +82,7 @@ blend_solid_hspan_erase(int x, int y, unsigned len,
 						const color_type& c, const uint8* covers,
 						agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color color = pattern->LowColor().GetColor32();
 	do {
 		if (pattern->IsHighColor(x, y)) {
@@ -108,7 +108,7 @@ blend_solid_vspan_erase(int x, int y, unsigned len,
 						const color_type& c, const uint8* covers,
 						agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	rgb_color color = pattern->LowColor().GetColor32();
 	do {
 		if (pattern->IsHighColor(x, y)) {
@@ -135,7 +135,7 @@ blend_color_hspan_erase(int x, int y, unsigned len,
 						agg_buffer* buffer, const PatternHandler* pattern)
 {
 	// TODO: compare this with BView
-	uint8* p = buffer->row(y) + (x << 2);
+	uint8* p = buffer->row_ptr(y) + (x << 2);
 	if (covers) {
 		// non-solid opacity
 		do {
