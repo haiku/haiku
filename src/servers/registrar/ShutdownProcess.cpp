@@ -544,7 +544,7 @@ private:
 			  fAppInfo(NULL)
 		{
 			SetViewColor(B_TRANSPARENT_32_BIT);
-			fBackground = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+			fBackground = ui_color(B_PANEL_BACKGROUND_COLOR);
 		}
 
 		virtual void Draw(BRect updateRect)
