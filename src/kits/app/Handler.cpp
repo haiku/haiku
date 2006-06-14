@@ -185,7 +185,7 @@ BHandler::MessageReceived(BMessage *message)
 
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
 			bool known = false;
-			if (index < 0 || (strcmp(prop, "Messenger") == 0)) {
+			if (cur < 0 || (strcmp(prop, "Messenger") == 0)) {
 				err = reply.AddMessenger("result", this);
 				known = true;
 			} else if (strcmp(prop, "Suites") == 0) {
