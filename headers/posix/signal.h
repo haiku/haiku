@@ -165,7 +165,7 @@ extern "C" {
 sig_func_t signal(int sig, sig_func_t signal_handler);
 int     raise(int sig);
 int     kill(pid_t pid, int sig);
-int     send_signal(pid_t tid, uint sig);
+int     send_signal(pid_t tid, unsigned int sig);
 
 int     sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 int     sigprocmask(int how, const sigset_t *set, sigset_t *oset);
