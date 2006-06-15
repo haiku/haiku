@@ -2307,7 +2307,23 @@ BString::_AssertNotUsingAsCString() const
 #endif
 
 
-/*----- Non-member compare for sorting, etc. ------------------------------*/
+//	#pragma mark - backwards compatibility
+
+
+/*!
+	Translates to (missing const):
+	BString& BString::operator<<(BString& string)
+*/
+extern "C" BString&
+__ls__7BStringR7BString(BString* self, BString& string)
+{
+	return self->operator<<(string);
+}
+
+
+//	#pragma mark - Non-member compare for sorting, etc.
+
+
 int
 Compare(const BString &string1, const BString &string2)
 {
