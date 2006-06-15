@@ -57,8 +57,11 @@
 #include <Midi.h>
 #include <Synth.h>
 
+#include <SoundPlayer.h>
+
+#include <fluidsynth.h>
+
 class BMidiConsumer;
-class BMidiLocalProducer;
 class BMidiSynth;
 class BSynth;
 
@@ -68,10 +71,10 @@ class BSoftSynth
 {
 public:
 
-	bool InitCheck(void) const;
+	bool InitCheck() const;
 
-	void Unload(void);
-	bool IsLoaded(void) const;
+	void Unload();
+	bool IsLoaded() const;
 
 	status_t SetDefaultInstrumentsFile();
 	status_t SetInstrumentsFile(const char* path);
@@ -128,31 +131,21 @@ private:
 
 	void Init();
 	void Done();
+	static void PlayBuffer(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
 	
-	bool initCheck;
-	char* instrumentsFile;
-	int32 sampleRate;
-	interpolation_mode interpMode;
-	int16 maxVoices;
-	int16 limiterThreshold;
-	reverb_mode reverbMode;
-	bool reverbEnabled;
-	double volumeScale;
+	bool fInitCheck;
+	char* fInstrumentsFile;
+	int32 fSampleRate;
+	interpolation_mode fInterpMode;
+	int16 fMaxVoices;
+	int16 fLimiterThreshold;
+	reverb_mode fReverbMode;
+	bool fReverbEnabled;
 
-	/*
-		Note: Maybe this isn't the most efficient way to do things.
-		Now a producer connects to BMidiSynth, which is a consumer.
-		That consumer directly calls our NoteOff() etc, methods.
-		We create a new producer and connect it to TiMidity's consumer.
-		It would save some indirection if BMidiSynth's consumer would
-		be a proxy for TiMidity's. (I don't think that is possible,
-		because BMidiSynth is a BMidi object which always creates a
-		new consumer regardless. In any case, notes have to travel
-		a long way before they reach TiMidity.
-	 */
+	fluid_synth_t *fSynth;
+	fluid_settings_t* fSettings;
 
-	BMidiConsumer* consumer;
-	BMidiLocalProducer* producer;
+	BSoundPlayer *fSoundPlayer;
 };
 
 } // namespace BPrivate

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src kits midi ;
 
 UsePrivateHeaders midi ;
+UseLibraryHeaders fluidsynth ;
 
 SharedLibrary libmidi.so :
 	Midi.cpp
@@ -16,4 +17,6 @@ SharedLibrary libmidi.so :
 	:
 	be
 	midi2
+	media
+	libfluidsynth.so
 ;

@@ -23,7 +23,6 @@
 
 #include <MidiRoster.h>
 #include <MidiConsumer.h>
-#include <MidiProducer.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <string.h>
@@ -35,25 +34,25 @@
 
 using namespace BPrivate;
 
-//------------------------------------------------------------------------------
 
 BSoftSynth::BSoftSynth()
+: 	fSynth(NULL),
+	fSettings(NULL),
+	fSoundPlayer(NULL)
 {
-	instrumentsFile = NULL;
+	fInstrumentsFile = NULL;
 	SetDefaultInstrumentsFile();
 
-	sampleRate = 22050;
-	interpMode = B_LINEAR_INTERPOLATION;
-	maxVoices = 28;
-	limiterThreshold = 7;
-	reverbEnabled = true;
-	reverbMode = B_REVERB_BALLROOM;
-	volumeScale = 1.0;
+	fSampleRate = 44100;
+	fInterpMode = B_LINEAR_INTERPOLATION;
+	fMaxVoices = 256;
+	fLimiterThreshold = 7;
+	fReverbEnabled = true;
+	fReverbMode = B_REVERB_BALLROOM;
 
 	Init();
 }
 
-//------------------------------------------------------------------------------
 
 BSoftSynth::~BSoftSynth()
 {
@@ -67,37 +66,36 @@ BSoftSynth::~BSoftSynth()
 	Done();
 }
 
-//------------------------------------------------------------------------------
 
-bool BSoftSynth::InitCheck(void) const
+bool 
+BSoftSynth::InitCheck(void) const
 {
-	return initCheck;
+	return fInitCheck;
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::Unload(void)
+void 
+BSoftSynth::Unload(void)
 {
 	/* TODO: purge samples from memory */
 	
-	free(instrumentsFile);
-	instrumentsFile = NULL;
+	free(fInstrumentsFile);
+	fInstrumentsFile = NULL;
 }
 
-//------------------------------------------------------------------------------
 
-bool BSoftSynth::IsLoaded(void) const
+bool 
+BSoftSynth::IsLoaded(void) const
 {
-	return instrumentsFile != NULL;
+	return fInstrumentsFile != NULL;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetDefaultInstrumentsFile()
+status_t 
+BSoftSynth::SetDefaultInstrumentsFile()
 {
 	BPath path;
-	if (B_OK == find_directory(B_SYNTH_DIRECTORY, &path, false, NULL))
-	{
+	if (B_OK == find_directory(B_SYNTH_DIRECTORY, &path, false, NULL)) {
 		path.Append(B_BIG_SYNTH_FILE);
 		return SetInstrumentsFile(path.Path());
 	}
@@ -105,9 +103,9 @@ status_t BSoftSynth::SetDefaultInstrumentsFile()
 	return B_ERROR;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetInstrumentsFile(const char* path)
+status_t 
+BSoftSynth::SetInstrumentsFile(const char* path)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;
@@ -115,13 +113,13 @@ status_t BSoftSynth::SetInstrumentsFile(const char* path)
 	if (IsLoaded())
 		Unload();
 	
-	instrumentsFile = strdup(path);
+	fInstrumentsFile = strdup(path);
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::LoadAllInstruments()
+status_t 
+BSoftSynth::LoadAllInstruments()
 {
 	/* TODO: Should load all of the instruments from the sample bank. */
 
@@ -129,387 +127,369 @@ status_t BSoftSynth::LoadAllInstruments()
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::LoadInstrument(int16 instrument)
+status_t 
+BSoftSynth::LoadInstrument(int16 instrument)
 {
 	UNIMPLEMENTED
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::UnloadInstrument(int16 instrument)
+status_t 
+BSoftSynth::UnloadInstrument(int16 instrument)
 {
 	UNIMPLEMENTED
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::RemapInstrument(int16 from, int16 to)
+status_t 
+BSoftSynth::RemapInstrument(int16 from, int16 to)
 {
 	UNIMPLEMENTED
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::FlushInstrumentCache(bool startStopCache)
+void 
+BSoftSynth::FlushInstrumentCache(bool startStopCache)
 {
 	// TODO: we may decide not to support this function because it's weird!
 	
 	UNIMPLEMENTED
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::SetVolume(double volume)
+void 
+BSoftSynth::SetVolume(double volume)
 {
-	if (volume >= 0.0)
-	{
-		volumeScale = volume;
+	if (volume >= 0.0) {
+		fluid_synth_set_gain(fSynth, volume);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-double BSoftSynth::Volume(void) const
+double 
+BSoftSynth::Volume(void) const
 {
-	return volumeScale;
+	return fluid_synth_get_gain(fSynth);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetSamplingRate(int32 rate)
+status_t 
+BSoftSynth::SetSamplingRate(int32 rate)
 {
-	// TODO: According to the BeBook, we should round rate to the nearest
-	// acceptable value. However, this function may change depending on the 
-	// softsynth back-end we'll use.
-
-	if (rate == 11025 || rate == 22050 || rate == 44100)
-	{
-		sampleRate = rate;
+	if (rate == 22050 || rate == 44100 || rate == 48000) {
+		fSampleRate = rate;
+		Init();
 		return B_OK;
 	}
 	
 	return B_BAD_VALUE;
 }
 
-//------------------------------------------------------------------------------
 
-int32 BSoftSynth::SamplingRate() const
+int32 
+BSoftSynth::SamplingRate() const
 {
-	return sampleRate;
+	return fSampleRate;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetInterpolation(interpolation_mode mode)
+status_t 
+BSoftSynth::SetInterpolation(interpolation_mode mode)
 {
-	// TODO: this function could change depending on the synth back-end.
-	
-	interpMode = mode;
+	// not used because our synth uses the same format than the soundplayer
+	fInterpMode = mode;
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-interpolation_mode BSoftSynth::Interpolation() const
+interpolation_mode 
+BSoftSynth::Interpolation() const
 {
-	return interpMode;
+	return fInterpMode;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::EnableReverb(bool enabled)
+status_t 
+BSoftSynth::EnableReverb(bool enabled)
 {
-	reverbEnabled = enabled;
+	fReverbEnabled = enabled;
+	fluid_synth_set_reverb_on(fSynth, enabled);
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
-bool BSoftSynth::IsReverbEnabled() const
+bool 
+BSoftSynth::IsReverbEnabled() const
 {
-	return reverbEnabled;
+	return fReverbEnabled;
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::SetReverb(reverb_mode mode)
+void 
+BSoftSynth::SetReverb(reverb_mode mode)
 {
 	// TODO: this function could change depending on the synth back-end.
 
-	reverbMode = mode;
+	fReverbMode = mode;
 }
 
-//------------------------------------------------------------------------------
 
-reverb_mode BSoftSynth::Reverb() const
+reverb_mode 
+BSoftSynth::Reverb() const
 {
-	return reverbMode;
+	return fReverbMode;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetMaxVoices(int32 max)
+status_t 
+BSoftSynth::SetMaxVoices(int32 max)
 {
-	// TODO: this function could change depending on the synth back-end.
-
-	if (max > 0 && max <= 32)
-	{
-		maxVoices = max;
+	if (max > 0 && max <= 4096) {
+		fMaxVoices = max;
+		Init();
 		return B_OK;
 	}
 	
 	return B_BAD_VALUE;
 }
 
-//------------------------------------------------------------------------------
 
-int16 BSoftSynth::MaxVoices(void) const
+int16 
+BSoftSynth::MaxVoices(void) const
 {
-	return maxVoices;
+	return fMaxVoices;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BSoftSynth::SetLimiterThreshold(int32 threshold)
+status_t 
+BSoftSynth::SetLimiterThreshold(int32 threshold)
 {
-	// TODO: this function could change depending on the synth back-end.
-
-	if (threshold > 0 && threshold <= 32)
-	{
-		limiterThreshold = threshold;
+	// not used
+	if (threshold > 0 && threshold <= 32) {
+		fLimiterThreshold = threshold;
 		return B_OK;
 	}
 	
 	return B_BAD_VALUE;
 }
 
-//------------------------------------------------------------------------------
 
-int16 BSoftSynth::LimiterThreshold(void) const
+int16 
+BSoftSynth::LimiterThreshold(void) const
 {
-	return limiterThreshold;
+	return fLimiterThreshold;
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::Pause(void)
+void 
+BSoftSynth::Pause(void)
 {
 	UNIMPLEMENTED
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::Resume(void)
+void 
+BSoftSynth::Resume(void)
 {
 	UNIMPLEMENTED
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::NoteOff(
+void 
+BSoftSynth::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayNoteOff(
-			channel - 1, note, velocity, MAKE_BIGTIME(time));
+		fluid_synth_noteoff(fSynth, channel - 1, note);	// velocity isn't used in FS
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::NoteOn(
+void 
+BSoftSynth::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayNoteOn(channel - 1, note, velocity, MAKE_BIGTIME(time));
+		fluid_synth_noteon(fSynth, channel - 1, note, velocity);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::KeyPressure(
+void 
+BSoftSynth::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayKeyPressure(
-			channel - 1, note, pressure, MAKE_BIGTIME(time));
+		// unavailable
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::ControlChange(
+void 
+BSoftSynth::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayControlChange(
-			channel - 1, controlNumber, controlValue, MAKE_BIGTIME(time));
+		fluid_synth_cc(fSynth, channel - 1, controlNumber, controlValue);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::ProgramChange(
+void 
+BSoftSynth::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayProgramChange(
-			channel - 1, programNumber, MAKE_BIGTIME(time));
+		fluid_synth_program_change(fSynth, channel - 1, programNumber);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+void 
+BSoftSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayChannelPressure(
-			channel - 1, pressure, MAKE_BIGTIME(time));
+		//unavailable
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+void 
+BSoftSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayPitchBend(channel - 1, lsb, msb, MAKE_BIGTIME(time));
+		// fluid_synth only accepts an int
+		fluid_synth_pitch_bend(fSynth, channel - 1, ((uint32)(msb & 0x7f) << 8) | (lsb & 0x7f));
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
+void 
+BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SpraySystemExclusive(data, length, MAKE_BIGTIME(time));
+		// unsupported
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::SystemCommon(
+void 
+BSoftSynth::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SpraySystemCommon(status, data1, data2, MAKE_BIGTIME(time));
+		// unsupported
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::SystemRealTime(uchar status, uint32 time)
+void 
+BSoftSynth::SystemRealTime(uchar status, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SpraySystemRealTime(status, MAKE_BIGTIME(time));
+		// unsupported
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::TempoChange(int32 beatsPerMinute, uint32 time)
+void 
+BSoftSynth::TempoChange(int32 beatsPerMinute, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
-		producer->SprayTempoChange(beatsPerMinute, MAKE_BIGTIME(time));
+		// unsupported
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
+void 
+BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
 {
-	if (InitCheck())
-	{
+	if (InitCheck()) {
 		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
 
 		// from BMidi::AllNotesOff
-		for (uchar channel = 1; channel <= 16; ++channel)
-		{
-			producer->SprayControlChange(channel, B_ALL_NOTES_OFF, 0, time);
+		for (uchar channel = 1; channel <= 16; ++channel) {
+			fluid_synth_cc(fSynth, channel - 1, B_ALL_NOTES_OFF, 0);
 	
-			if (!justChannel)
-			{
-				for (uchar note = 0; note <= 0x7F; ++note)
-				{
-					producer->SprayNoteOff(channel, note, 0, time);
+			if (!justChannel) {
+				for (uchar note = 0; note <= 0x7F; ++note) {
+					fluid_synth_noteoff(fSynth, channel - 1, note);
 				}
 			}
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BSoftSynth::Init()
+void 
+BSoftSynth::Init()
 {
-	initCheck = false;
-
-	producer = new BMidiLocalProducer("TiMidity feeder");
-
-	int32 id = 0;
-	while ((consumer = BMidiRoster::NextConsumer(&id)) != NULL)
-	{
-		if (strcmp(consumer->Name(), "TiMidity input") == 0)
-			break;
-		
-		consumer->Release();
-	}	
-
-	if (consumer == NULL)
-	{
-		fprintf(stderr, "[midi] TiMidity consumer not found\n");
-		return;
-	}
-
-	if (producer->Connect(consumer) != B_OK)
-	{
-		fprintf(stderr, "[midi] Could not connect to TiMidity\n");
-		return;
-	}
-
-	initCheck = true;
-}
-
-//------------------------------------------------------------------------------
-
-void BSoftSynth::Done()
-{
-	if (consumer != NULL)
-	{
-		producer->Disconnect(consumer);
-		consumer->Release();
-		consumer = NULL;
-	}
+	fInitCheck = false;
 	
-	producer->Release();
-	producer = NULL;
+	Done();
+
+	fSettings = new_fluid_settings();
+	fluid_settings_setnum(fSettings, "synth.sample-rate", fSampleRate);
+	fluid_settings_setint(fSettings, "synth.polyphony", fMaxVoices);
+
+	fSynth = new_fluid_synth(fSettings);
+
+	media_raw_audio_format format;
+	format.channel_count = 2;
+	format.frame_rate = fSampleRate;
+	format.format = media_raw_audio_format::B_AUDIO_FLOAT;
+
+	fSoundPlayer = new BSoundPlayer(&format, "softsynth", &PlayBuffer, NULL, this);
+	status_t err = fSoundPlayer->InitCheck();
+	if (err != B_OK)
+		return;
+
+	fSoundPlayer->SetHasData(true);
+	fSoundPlayer->Start();
+
+	fInitCheck = true;
 }
 
-//------------------------------------------------------------------------------
+
+void 
+BSoftSynth::Done()
+{
+	if (fSoundPlayer) {
+		fSoundPlayer->SetHasData(false);
+		fSoundPlayer->Stop();
+		delete fSoundPlayer;
+	}
+	if (fSynth)
+		delete_fluid_synth(fSynth);
+	if (fSettings)
+		delete_fluid_settings(fSettings);
+}
+
+
+void
+BSoftSynth::PlayBuffer(void * cookie, void * data, size_t size, const media_raw_audio_format & format)
+{
+	BSoftSynth *synth = (BSoftSynth *)cookie;
+
+	// we use float samples
+	
+	fluid_synth_write_float(synth->fSynth, size / sizeof(float) / format.channel_count, 
+		data, 0, sizeof(float) * format.channel_count,
+		(char *)data + sizeof(float), 0, sizeof(float) * format.channel_count);
+}
+
