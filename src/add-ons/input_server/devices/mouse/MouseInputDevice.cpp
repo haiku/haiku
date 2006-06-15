@@ -193,6 +193,47 @@ MouseDevice::Stop()
 }
 
 
+status_t
+MouseDevice::UpdateSettings()
+{
+	CALLED();
+
+	// retrieve current values
+
+	if (get_mouse_map(&fSettings.map) != B_OK)
+		LOG_ERR("error when get_mouse_map\n");
+	else
+		fDeviceRemapsButtons = ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
+
+	if (get_click_speed(&fSettings.click_speed) != B_OK)
+		LOG_ERR("error when get_click_speed\n");
+	else
+		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
+
+	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
+		LOG_ERR("error when get_mouse_speed\n");
+	else {
+		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
+			LOG_ERR("error when get_mouse_acceleration\n");
+		else {
+			mouse_accel accel;
+			ioctl(fDevice, MS_GET_ACCEL, &accel);
+			accel.speed = fSettings.accel.speed;
+			accel.accel_factor = fSettings.accel.accel_factor;
+			ioctl(fDevice, MS_SET_ACCEL, &fSettings.accel);
+		}
+	}
+
+	if (get_mouse_type(&fSettings.type) != B_OK)
+		LOG_ERR("error when get_mouse_type\n");
+	else
+		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
+
+	return B_OK;
+
+}
+
+
 void
 MouseDevice::_Run()
 {
@@ -289,54 +330,32 @@ MouseDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 }
 
 
-status_t
-MouseDevice::UpdateSettings()
-{
-	CALLED();
-
-	// retrieve current values
-
-	if (get_mouse_map(&fSettings.map) != B_OK)
-		LOG_ERR("error when get_mouse_map\n");
-	else
-		fDeviceRemapsButtons = ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
-
-	if (get_click_speed(&fSettings.click_speed) != B_OK)
-		LOG_ERR("error when get_click_speed\n");
-	else
-		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);
-
-	if (get_mouse_speed(&fSettings.accel.speed) != B_OK)
-		LOG_ERR("error when get_mouse_speed\n");
-	else {
-		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
-			LOG_ERR("error when get_mouse_acceleration\n");
-		else {
-			mouse_accel accel;
-			ioctl(fDevice, MS_GET_ACCEL, &accel);
-			accel.speed = fSettings.accel.speed;
-			accel.accel_factor = fSettings.accel.accel_factor;
-			ioctl(fDevice, MS_SET_ACCEL, &fSettings.accel);
-		}
-	}
-
-	if (get_mouse_type(&fSettings.type) != B_OK)
-		LOG_ERR("error when get_mouse_type\n");
-	else
-		ioctl(fDevice, MS_SET_TYPE, &fSettings.type);
-
-	return B_OK;
-
-}
-
-
 void
 MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
 	int32& deltaX, int32& deltaY) const
 {
-	// TODO: add acceleration computing
-	deltaX = movements.xdelta * fSettings.accel.speed >> 15;
-	deltaY = movements.ydelta * fSettings.accel.speed >> 15;
+	// basic mouse speed
+	deltaX = movements.xdelta * fSettings.accel.speed >> 16;
+	deltaY = movements.ydelta * fSettings.accel.speed >> 16;
+
+	// acceleration
+	double acceleration = 1;
+	if (fSettings.accel.accel_factor) {
+		acceleration = sqrt(deltaX * deltaX + deltaY * deltaY)
+			* (1 + fSettings.accel.accel_factor) / 131768.0;
+	}
+
+	// make sure that we move at least one pixel (if there was a movement)
+	if (deltaX > 0)
+		deltaX = (int32)ceil(deltaX * acceleration);
+	else
+		deltaX = (int32)floor(deltaX * acceleration);
+
+	if (deltaY > 0)
+		deltaY = (int32)ceil(deltaY * acceleration);
+	else
+		deltaY = (int32)floor(deltaY * acceleration);
+debug_printf("factor: %g, delta %ld:%ld\n", acceleration, deltaX, deltaY);
 }
 
 
