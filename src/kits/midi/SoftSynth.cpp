@@ -449,12 +449,12 @@ BSoftSynth::Init()
 
 	fSynth = new_fluid_synth(fSettings);
 
-	media_raw_audio_format format;
+	media_raw_audio_format format = media_raw_audio_format::wildcard;
 	format.channel_count = 2;
 	format.frame_rate = fSampleRate;
 	format.format = media_raw_audio_format::B_AUDIO_FLOAT;
 
-	fSoundPlayer = new BSoundPlayer(&format, "softsynth", &PlayBuffer, NULL, this);
+	fSoundPlayer = new BSoundPlayer(&format, "Soft Synth", &PlayBuffer, NULL, this);
 	status_t err = fSoundPlayer->InitCheck();
 	if (err != B_OK)
 		return;
