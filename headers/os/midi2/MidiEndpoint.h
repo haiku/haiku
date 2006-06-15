@@ -3,6 +3,7 @@
 #define _MIDI_ENDPOINT_H
 
 #include <BeBuild.h>
+#include <Message.h>
 #include <Midi2Defs.h>
 #include <OS.h>
 #include <String.h>

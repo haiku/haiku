@@ -96,6 +96,7 @@
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #define HAVE_SYS_IOCTL_H 1
 
 /* Define to 1 if you have the <sys/mman.h> header file. */
@@ -103,6 +104,7 @@
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #define HAVE_SYS_SOCKET_H 1
+#endif
 
 /* Define to 1 if you have the <sys/soundcard.h> header file. */
 /* #undef HAVE_SYS_SOUNDCARD_H */
@@ -187,5 +189,6 @@
 #ifdef __BEOS__
 
 #define WITHOUT_SERVER 1
+#include <support/SupportDefs.h>
 
 #endif

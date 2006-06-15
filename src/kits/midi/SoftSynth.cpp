@@ -488,8 +488,9 @@ BSoftSynth::PlayBuffer(void * cookie, void * data, size_t size, const media_raw_
 
 	// we use float samples
 	
-	fluid_synth_write_float(synth->fSynth, size / sizeof(float) / format.channel_count, 
-		data, 0, sizeof(float) * format.channel_count,
-		(char *)data + sizeof(float), 0, sizeof(float) * format.channel_count);
+	if (synth->fSynth)
+		fluid_synth_write_float(synth->fSynth, size / sizeof(float) / format.channel_count, 
+			data, 0, format.channel_count,
+			data, 1, format.channel_count);
 }
 

@@ -4,6 +4,9 @@
 
 #include <Midi.h>
 
+class BMidiConsumer;
+class BMidiProducer;
+
 namespace BPrivate { class BMidiPortGlue; }
 
 class BMidiPort : public BMidi 

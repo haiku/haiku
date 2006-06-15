@@ -1,5 +1,14 @@
 SubDir HAIKU_TOP src kits midi2 ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os midi2 ] : true ;
+                # We need Errors.h also when not compiling for Haiku.
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+                # We need Errors.h also when not compiling for Haiku.
+}
+
 UsePrivateHeaders midi ;
 
 SharedLibrary libmidi2.so :

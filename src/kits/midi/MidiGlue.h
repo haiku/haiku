@@ -24,6 +24,7 @@
 #ifndef _MIDI_GLUE_H
 #define _MIDI_GLUE_H
 
+#include <MidiPort.h>
 #include <MidiConsumer.h>
 
 #define MAKE_TIME(t)    (t / (bigtime_t)1000)
