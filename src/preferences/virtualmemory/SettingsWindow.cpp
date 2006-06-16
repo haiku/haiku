@@ -134,7 +134,7 @@ SettingsWindow::SettingsWindow()
 	BString string = "Physical Memory: ";
 	string << byte_string((off_t)info.max_pages * B_PAGE_SIZE);
 	BStringView* stringView = new BStringView(rect, "physical memory", string.String(),
-		B_FOLLOW_ALL);
+		B_FOLLOW_NONE);
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
@@ -142,7 +142,7 @@ SettingsWindow::SettingsWindow()
 	string = "Current Swap File Size: ";
 	string << byte_string(fSettings.SwapSize());
 	stringView = new BStringView(rect, "current swap size", string.String(),
-		B_FOLLOW_ALL);
+		B_FOLLOW_NONE);
 	stringView->ResizeToPreferred();
 	box->AddChild(stringView);
 
@@ -224,8 +224,8 @@ SettingsWindow::SettingsWindow()
 
 	if (!screenFrame.Contains(fSettings.WindowPosition())) {
 		// move on screen, centered
-		MoveTo((screenFrame.Width() - Bounds().Width()) / 2,
-			(screenFrame.Height() - Bounds().Height()) / 2);
+		MoveTo(screenFrame.left + (screenFrame.Width() - Bounds().Width()) / 2,
+			screenFrame.top + (screenFrame.Height() - Bounds().Height()) / 2);
 	} else
 		MoveTo(fSettings.WindowPosition());
 }
