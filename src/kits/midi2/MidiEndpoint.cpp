@@ -1,28 +1,14 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Matthijs Hollemans
  */
 
 #include "debug.h"
-#include "MidiEndpoint.h"
-#include "MidiRoster.h"
+#include <MidiEndpoint.h>
+#include <MidiRoster.h>
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
@@ -37,7 +23,7 @@ BMidiEndpoint::Name() const
 	// e.g. to allocate more space. That's why we lock here too.
 
 	if (LockLooper()) {
-		str = name.String();
+		str = fName.String();
 		UnlockLooper();
 	}
 
@@ -59,13 +45,13 @@ BMidiEndpoint::SetName(const char* newName)
 	if (!IsValid())
 		return;
 
-	if (name != newName) {
+	if (fName != newName) {
 		BMessage msg;
 		msg.AddString("midi:name", newName);
 
 		if (SendChangeRequest(&msg) == B_OK) {
 			if (LockLooper()) {
-				name.SetTo(newName);
+				fName.SetTo(newName);
 				UnlockLooper();
 			}
 		}
@@ -76,35 +62,35 @@ BMidiEndpoint::SetName(const char* newName)
 int32
 BMidiEndpoint::ID() const
 {
-	return id;
+	return fId;
 }
 
 
 bool
 BMidiEndpoint::IsProducer() const
 {
-	return !isConsumer;
+	return !fIsConsumer;
 }
 
 
 bool
 BMidiEndpoint::IsConsumer() const
 {
-	return isConsumer;
+	return fIsConsumer;
 }
 
 
 bool
 BMidiEndpoint::IsRemote() const
 {
-	return !isLocal;
+	return !fIsLocal;
 }
 
 
 bool
 BMidiEndpoint::IsLocal() const
 {
-	return isLocal;
+	return fIsLocal;
 }
 
 
@@ -129,7 +115,7 @@ BMidiEndpoint::IsValid() const
 status_t
 BMidiEndpoint::Release()
 {
-	int32 old = atomic_add(&refCount, -1);
+	int32 old = atomic_add(&fRefCount, -1);
 
 	TRACE(("BMidiEndpoint::Release refCount is now %ld", old - 1))
 
@@ -140,7 +126,7 @@ BMidiEndpoint::Release()
 		// If we are a proxy for a remote endpoint, we must only be
 		// deleted if that remote endpoint no longer exists.
 
-		if (IsLocal() || !isAlive)
+		if (IsLocal() || !fIsAlive)
 			delete this;
 	} else if (old <= 0) {
 		debugger("too many calls to Release()");
@@ -156,7 +142,7 @@ BMidiEndpoint::Acquire()
 #ifdef DEBUG
 	int32 old = 
 #endif
-	atomic_add(&refCount, 1);
+	atomic_add(&fRefCount, 1);
 
 	TRACE(("BMidiEndpoint::Acquire refCount is now %ld", old + 1))
 
@@ -182,7 +168,7 @@ BMidiEndpoint::SetProperties(const BMessage* properties_)
 		status_t err = SendChangeRequest(&msg);
 		if (err == B_OK) {
 			if (LockLooper()) {
-				*properties = *properties_;
+				*fProperties = *properties_;
 				UnlockLooper();
 			}
 		}
@@ -201,7 +187,7 @@ BMidiEndpoint::GetProperties(BMessage* _properties) const
 	}
 
 	if (LockLooper()) {
-		*_properties = *properties;
+		*_properties = *fProperties;
 		UnlockLooper();
 	}
 
@@ -250,15 +236,15 @@ BMidiEndpoint::BMidiEndpoint(const char* name_)
 	TRACE(("BMidiEndpoint::BMidiEndpoint"))
 
 	if (name_ != NULL)
-		name.SetTo(name_);
+		fName.SetTo(name_);
 
-	id           = 0;
-	refCount     = 0;
-	isLocal      = false;
-	isRegistered = false;
-	isAlive      = true;
+	fId           = 0;
+	fRefCount     = 0;
+	fIsLocal      = false;
+	fIsRegistered = false;
+	fIsAlive      = true;
 
-	properties = new BMessage;
+	fProperties = new BMessage;
 }
 
 
@@ -266,13 +252,13 @@ BMidiEndpoint::~BMidiEndpoint()
 {
 	TRACE(("BMidiEndpoint::~BMidiEndpoint (%p)", this))
 
-	if (refCount > 0) {
+	if (fRefCount > 0) {
 		debugger(
 			"you should use Release() to dispose of endpoints; "
 			"do not \"delete\" them or allocate them on the stack!");
 	}
 
-	delete properties;
+	delete fProperties;
 }
 
 //------------------------------------------------------------------------------
@@ -297,7 +283,7 @@ BMidiEndpoint::SendRegisterRequest(bool registered)
 	status_t err = SendChangeRequest(&msg);
 	if (err == B_OK)  {
 		if (LockLooper()) {
-			isRegistered = registered; 
+			fIsRegistered = registered; 
 			UnlockLooper();
 		}
 	}
@@ -333,20 +319,20 @@ BMidiEndpoint::IsRegistered() const
 	// No need to protect this with a lock, because reading
 	// and writing a bool is always an atomic operation.
 
-	return isRegistered;
+	return fIsRegistered;
 }
 
 
 bool
 BMidiEndpoint::LockLooper() const
 {
-	return BMidiRoster::MidiRoster()->looper->Lock();
+	return BMidiRoster::MidiRoster()->fLooper->Lock();
 }
 
 
 void
 BMidiEndpoint::UnlockLooper() const
 {
-	BMidiRoster::MidiRoster()->looper->Unlock();
+	BMidiRoster::MidiRoster()->fLooper->Unlock();
 }
 

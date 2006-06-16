@@ -1,81 +1,55 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Matthijs Hollemans
  */
 
 #include "debug.h"
-#include "MidiConsumer.h"
-#include "MidiProducer.h"
-#include "MidiRoster.h"
+#include <MidiConsumer.h>
+#include <MidiProducer.h>
+#include <MidiRoster.h>
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
-//------------------------------------------------------------------------------
 
-status_t BMidiProducer::Connect(BMidiConsumer* cons)
+status_t 
+BMidiProducer::Connect(BMidiConsumer* cons)
 {
-	if (cons == NULL)
-	{
+	if (cons == NULL) {
 		WARN("Connect() does not accept a NULL consumer")
 		return B_BAD_VALUE;
 	}
-	else if (!IsValid() || !cons->IsValid())
-	{
+	if (!IsValid() || !cons->IsValid()) {
 		return B_ERROR;
 	}
-	else
-	{
-		return SendConnectRequest(cons, true);
-	}
+	return SendConnectRequest(cons, true);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiProducer::Disconnect(BMidiConsumer* cons)
+status_t 
+BMidiProducer::Disconnect(BMidiConsumer* cons)
 {
-	if (cons == NULL)
-	{
+	if (cons == NULL) {
 		WARN("Disconnect() does not accept a NULL consumer")
 		return B_BAD_VALUE;
-	}
-	else if (!IsValid() || !cons->IsValid())
-	{
+	} 
+	if (!IsValid() || !cons->IsValid()) {
 		return B_ERROR;
 	}
-	else
-	{
-		return SendConnectRequest(cons, false);
-	}
+	return SendConnectRequest(cons, false);
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiProducer::IsConnected(BMidiConsumer* cons) const
+bool 
+BMidiProducer::IsConnected(BMidiConsumer* cons) const
 {
 	bool isConnected = false;
 
-	if (cons != NULL)
-	{
-		if (LockProducer())
-		{
-			isConnected = connections->HasItem(cons);
+	if (cons != NULL) {
+		if (LockProducer()) {
+			isConnected = fConnections.HasItem(cons);
 			UnlockProducer();
 		}
 	}
@@ -83,16 +57,14 @@ bool BMidiProducer::IsConnected(BMidiConsumer* cons) const
 	return isConnected;
 }
 
-//------------------------------------------------------------------------------
 
-BList* BMidiProducer::Connections() const
+BList* 
+BMidiProducer::Connections() const
 {
 	BList* list = new BList();
 
-	if (LockProducer())
-	{
-		for (int32 t = 0; t < CountConsumers(); ++t)
-		{
+	if (LockProducer()) {
+		for (int32 t = 0; t < CountConsumers(); ++t) {
 			BMidiConsumer* cons = ConsumerAt(t);
 			cons->Acquire();
 			list->AddItem(cons);
@@ -104,25 +76,20 @@ BList* BMidiProducer::Connections() const
 	return list;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiProducer::BMidiProducer(const char* name)
-	: BMidiEndpoint(name)
+	: BMidiEndpoint(name),
+	fLocker("MidiProducerLock"),
+	fConnections()
 {
-	isConsumer = false;
-	connections = new BList;
-	locker = new BLocker("MidiProducerLock");
+	fIsConsumer = false;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiProducer::~BMidiProducer()
 {
-	delete connections;
-	delete locker;
 }
 
-//------------------------------------------------------------------------------
 
 void BMidiProducer::_Reserved1() { }
 void BMidiProducer::_Reserved2() { }
@@ -133,21 +100,18 @@ void BMidiProducer::_Reserved6() { }
 void BMidiProducer::_Reserved7() { }
 void BMidiProducer::_Reserved8() { }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiProducer::SendConnectRequest(
+status_t 
+BMidiProducer::SendConnectRequest(
 	BMidiConsumer* cons, bool mustConnect)
 {
 	ASSERT(cons != NULL)
 
 	BMessage msg, reply;
 
-	if (mustConnect)
-	{
+	if (mustConnect) {
 		msg.what = MSG_CONNECT_ENDPOINTS;
-	}
-	else
-	{
+	} else {
 		msg.what = MSG_DISCONNECT_ENDPOINTS;
 	}
 
@@ -155,24 +119,20 @@ status_t BMidiProducer::SendConnectRequest(
 	msg.AddInt32("midi:consumer", cons->ID());
 
 	status_t err = BMidiRoster::MidiRoster()->SendRequest(&msg, &reply);
-	if (err != B_OK) { return err; }
+	if (err != B_OK) 
+		return err;
 
 	status_t res;
-	if (reply.FindInt32("midi:result", &res) == B_OK) 
-	{ 
-		if (res == B_OK)
-		{
-			if (mustConnect)
-			{
+	if (reply.FindInt32("midi:result", &res) == B_OK) {
+		if (res == B_OK) {
+			if (mustConnect) {
 				ConnectionMade(cons);
-			}
-			else
-			{
+			} else {
 				ConnectionBroken(cons);
 			}
 
 			#ifdef DEBUG
-			BMidiRoster::MidiRoster()->looper->DumpEndpoints();
+			BMidiRoster::MidiRoster()->fLooper->DumpEndpoints();
 			#endif
 		}
 
@@ -182,77 +142,71 @@ status_t BMidiProducer::SendConnectRequest(
 	return B_ERROR;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiProducer::ConnectionMade(BMidiConsumer* cons)
+void 
+BMidiProducer::ConnectionMade(BMidiConsumer* consumer)
 {
-	ASSERT(cons != NULL)
+	ASSERT(consumer != NULL)
 
-	if (LockProducer())
-	{
-		ASSERT(!connections->HasItem(cons))
+	if (LockProducer()) {
+		ASSERT(!fConnections.HasItem(consumer))
 
-		connections->AddItem(cons);
+		fConnections.AddItem(consumer);
 		UnlockProducer();
 	}
 
-	if (IsLocal())
-	{
-		((BMidiLocalProducer*) this)->Connected(cons);
+	if (IsLocal()) {
+		((BMidiLocalProducer*) this)->Connected(consumer);
 	}
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiProducer::ConnectionBroken(BMidiConsumer* cons)
+bool 
+BMidiProducer::ConnectionBroken(BMidiConsumer* consumer)
 {
-	ASSERT(cons != NULL)
+	ASSERT(consumer != NULL)
 
 	bool wasConnected = false;
 
-	if (LockProducer())
-	{
-		wasConnected = connections->RemoveItem(cons);
+	if (LockProducer()) {
+		wasConnected = fConnections.RemoveItem(consumer);
 		UnlockProducer();
 	}
 
-	if (wasConnected && IsLocal())
-	{
-		((BMidiLocalProducer*) this)->Disconnected(cons);
+	if (wasConnected && IsLocal()) {
+		((BMidiLocalProducer*) this)->Disconnected(consumer);
 	}
 
 	return wasConnected;
 }
 
-//------------------------------------------------------------------------------
 
-int32 BMidiProducer::CountConsumers() const
+int32 
+BMidiProducer::CountConsumers() const
 {
-	return connections->CountItems();
+	return fConnections.CountItems();
 }
 
-//------------------------------------------------------------------------------
 
-BMidiConsumer* BMidiProducer::ConsumerAt(int32 index) const
+BMidiConsumer* 
+BMidiProducer::ConsumerAt(int32 index) const
 {
-	ASSERT(connections != NULL)
 	ASSERT(index >= 0 && index < CountConsumers())
 
-	return (BMidiConsumer*) connections->ItemAt(index);
+	return (BMidiConsumer*) fConnections.ItemAt(index);
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiProducer::LockProducer() const
+bool 
+BMidiProducer::LockProducer() const
 {
-	return locker->Lock();
+	return fLocker.Lock();
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiProducer::UnlockProducer() const
+void 
+BMidiProducer::UnlockProducer() const
 {
-	locker->Unlock();
+	fLocker.Unlock();
 }
 
-//------------------------------------------------------------------------------

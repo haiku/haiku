@@ -2,10 +2,9 @@
 #ifndef _MIDI_PRODUCER_H
 #define _MIDI_PRODUCER_H
 
+#include <List.h>
 #include <Locker.h>
 #include <MidiEndpoint.h>
-
-class BList;
 
 namespace BPrivate { class BMidiRosterLooper; }
 
@@ -46,8 +45,8 @@ private:
 	bool LockProducer() const;
 	void UnlockProducer() const;
 
-	BList* connections;
-	BLocker* locker;
+	mutable BLocker fLocker;
+	BList fConnections;
 
 	uint32 _reserved[10];
 };

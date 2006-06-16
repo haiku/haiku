@@ -1,53 +1,36 @@
 /*
- * Copyright (c) 2002-2004 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Matthijs Hollemans
  */
 
 #include "debug.h"
-#include "MidiConsumer.h"
-#include "MidiProducer.h"
-#include "MidiRoster.h"
+#include <MidiConsumer.h>
+#include <MidiProducer.h>
+#include <MidiRoster.h>
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
 using namespace BPrivate;
 
-//------------------------------------------------------------------------------
 
 BMidiRosterLooper::BMidiRosterLooper()
 	: BLooper("MidiRosterLooper")
 {
-	initLock = -1;
-	roster = NULL;
-	watcher = NULL;
+	fInitLock = -1;
+	fRoster = NULL;
+	fWatcher = NULL;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiRosterLooper::~BMidiRosterLooper()
 {
 	StopWatching();
 
-	if (initLock >= B_OK) 
-	{ 
-		delete_sem(initLock); 
+	if (fInitLock >= B_OK) {
+		delete_sem(fInitLock); 
 	}
 
 	// At this point, our list may still contain endpoints with a 
@@ -58,30 +41,26 @@ BMidiRosterLooper::~BMidiRosterLooper()
 	// It would have been better to jump into the debugger, but I
 	// did not want to risk breaking any (misbehaving) old apps.
 
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->refCount > 0)
-		{
+		if (endp->fRefCount > 0) {
 			fprintf(
 				stderr, "[midi] WARNING: Endpoint %ld (%p) has "
 				"not been Release()d properly (refcount = %ld)\n", 
-				endp->ID(), endp, endp->refCount);
-		}
-		else
-		{
+				endp->ID(), endp, endp->fRefCount);
+		} else {
 			delete endp;
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiRosterLooper::Init(BMidiRoster* roster_)
+bool 
+BMidiRosterLooper::Init(BMidiRoster* roster_)
 {
 	ASSERT(roster_ != NULL)
 
-	roster = roster_;
+	fRoster = roster_;
 
 	// We create a semaphore with a zero count. BMidiRoster's
 	// MidiRoster() method will try to acquire this semaphore,
@@ -89,18 +68,16 @@ bool BMidiRosterLooper::Init(BMidiRoster* roster_)
 	// "app registered" message in our MessageReceived() hook,
 	// we release the semaphore and MidiRoster() will unblock.
 
-	initLock = create_sem(0, "InitLock");
+	fInitLock = create_sem(0, "InitLock");
 
-	if (initLock < B_OK) 
-	{ 
+	if (fInitLock < B_OK) {
 		WARN("Could not create semaphore")
 		return false;
 	}
 
 	thread_id threadId = Run();
 
-	if (threadId < B_OK) 
-	{
+	if (threadId < B_OK) {
 		WARN("Could not start looper thread") 
 		return false;
 	}
@@ -108,19 +85,16 @@ bool BMidiRosterLooper::Init(BMidiRoster* roster_)
 	return true;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEndpoint* BMidiRosterLooper::NextEndpoint(int32* id)
+BMidiEndpoint* 
+BMidiRosterLooper::NextEndpoint(int32* id)
 {
 	ASSERT(id != NULL)
 
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->ID() > *id)
-		{
-			if (endp->IsRemote() && endp->IsRegistered())
-			{
+		if (endp->ID() > *id) {
+			if (endp->IsRemote() && endp->IsRegistered()) {
 				*id = endp->ID();
 				return endp;
 			}
@@ -130,15 +104,13 @@ BMidiEndpoint* BMidiRosterLooper::NextEndpoint(int32* id)
 	return NULL;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEndpoint* BMidiRosterLooper::FindEndpoint(int32 id)
+BMidiEndpoint* 
+BMidiRosterLooper::FindEndpoint(int32 id)
 {
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->ID() == id)
-		{
+		if (endp->ID() == id) {
 			return endp;
 		}
 	} 
@@ -146,12 +118,12 @@ BMidiEndpoint* BMidiRosterLooper::FindEndpoint(int32 id)
 	return NULL;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::AddEndpoint(BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::AddEndpoint(BMidiEndpoint* endp)
 {
 	ASSERT(endp != NULL)
-	ASSERT(!endpoints.HasItem(endp))
+	ASSERT(!fEndpoints.HasItem(endp))
 
 	// We store the endpoints sorted by ID, because that
 	// simplifies the implementation of NextEndpoint().
@@ -160,36 +132,31 @@ void BMidiRosterLooper::AddEndpoint(BMidiEndpoint* endp)
 	// are delivered in this order (mostly they will be).
 
 	int32 t;
-	for (t = CountEndpoints(); t > 0; --t)
-	{
+	for (t = CountEndpoints(); t > 0; --t) {
 		BMidiEndpoint* other = EndpointAt(t - 1);
-		if (endp->ID() > other->ID())
-		{
+		if (endp->ID() > other->ID()) {
 			break;
 		}	
 	}
-	endpoints.AddItem(endp, t);
+	fEndpoints.AddItem(endp, t);
 
 	#ifdef DEBUG
 	DumpEndpoints();
 	#endif
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::RemoveEndpoint(BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::RemoveEndpoint(BMidiEndpoint* endp)
 {
 	ASSERT(endp != NULL)
-	ASSERT(endpoints.HasItem(endp))
+	ASSERT(fEndpoints.HasItem(endp))
 
-	endpoints.RemoveItem(endp);
+	fEndpoints.RemoveItem(endp);
 
-	if (endp->IsConsumer())
-	{
+	if (endp->IsConsumer()) {
 		DisconnectDeadConsumer((BMidiConsumer*) endp);
-	}
-	else
-	{
+	} else {
 		DisconnectDeadProducer((BMidiProducer*) endp);
 	}
 	
@@ -198,37 +165,36 @@ void BMidiRosterLooper::RemoveEndpoint(BMidiEndpoint* endp)
 	#endif
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::StartWatching(const BMessenger* watcher_)
+void 
+BMidiRosterLooper::StartWatching(const BMessenger* watcher_)
 {
 	ASSERT(watcher_ != NULL)
 
 	StopWatching();
-	watcher = new BMessenger(*watcher_);
+	fWatcher = new BMessenger(*watcher_);
 
 	AllEndpoints();
 	AllConnections();
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::StopWatching()
+void 
+BMidiRosterLooper::StopWatching()
 {
-	delete watcher;
-	watcher = NULL;
+	delete fWatcher;
+	fWatcher = NULL;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::MessageReceived(BMessage* msg)
+void 
+BMidiRosterLooper::MessageReceived(BMessage* msg)
 {
 	#ifdef DEBUG
 	printf("IN "); msg->PrintToStream();
 	#endif
 
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case MSG_APP_REGISTERED:         OnAppRegistered(msg);         break;
 		case MSG_ENDPOINT_CREATED:       OnEndpointCreated(msg);       break;
 		case MSG_ENDPOINT_DELETED:       OnEndpointDeleted(msg);       break;
@@ -240,16 +206,16 @@ void BMidiRosterLooper::MessageReceived(BMessage* msg)
 	}	
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::OnAppRegistered(BMessage* msg)
+void 
+BMidiRosterLooper::OnAppRegistered(BMessage* msg)
 {
-	release_sem(initLock);
+	release_sem(fInitLock);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::OnEndpointCreated(BMessage* msg)
+void 
+BMidiRosterLooper::OnEndpointCreated(BMessage* msg)
 {
 	int32 id;
 	bool isRegistered;
@@ -258,37 +224,32 @@ void BMidiRosterLooper::OnEndpointCreated(BMessage* msg)
 	bool isConsumer;
 
 	if ((msg->FindInt32("midi:id", &id) == B_OK)
-	&&  (msg->FindBool("midi:registered", &isRegistered) == B_OK)
-	&&  (msg->FindString("midi:name", &name) == B_OK)
-	&&  (msg->FindMessage("midi:properties", &properties) == B_OK)
-	&&  (msg->FindBool("midi:consumer", &isConsumer) == B_OK))
-	{
-		if (isConsumer)
-		{
+		&&  (msg->FindBool("midi:registered", &isRegistered) == B_OK)
+		&&  (msg->FindString("midi:name", &name) == B_OK)
+		&&  (msg->FindMessage("midi:properties", &properties) == B_OK)
+		&&  (msg->FindBool("midi:consumer", &isConsumer) == B_OK)) {
+		if (isConsumer) {
 			int32 port;
 			bigtime_t latency;
 
 			if ((msg->FindInt32("midi:port", &port) == B_OK)
-			&&  (msg->FindInt64("midi:latency", &latency) == B_OK))
-			{
+				&&  (msg->FindInt64("midi:latency", &latency) == B_OK)) {
 				BMidiConsumer* cons = new BMidiConsumer();
-				cons->name          = name;
-				cons->id            = id;
-				cons->isRegistered  = isRegistered;
-				cons->port          = port;
-				cons->latency       = latency;
-				*(cons->properties) = properties;
+				cons->fName          = name;
+				cons->fId            = id;
+				cons->fIsRegistered  = isRegistered;
+				cons->fPort          = port;
+				cons->fLatency       = latency;
+				*(cons->fProperties) = properties;
 				AddEndpoint(cons);
 				return;
 			}
-		}
-		else  // producer
-		{
+		} else { // producer
 			BMidiProducer* prod = new BMidiProducer();
-			prod->name          = name;
-			prod->id            = id;
-			prod->isRegistered  = isRegistered;
-			*(prod->properties) = properties;
+			prod->fName          = name;
+			prod->fId            = id;
+			prod->fIsRegistered  = isRegistered;
+			*(prod->fProperties) = properties;
 			AddEndpoint(prod);
 			return;
 		}
@@ -297,26 +258,22 @@ void BMidiRosterLooper::OnEndpointCreated(BMessage* msg)
 	WARN("Could not create proxy for remote endpoint")
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::OnEndpointDeleted(BMessage* msg)
+void 
+BMidiRosterLooper::OnEndpointDeleted(BMessage* msg)
 {
 	int32 id;
-	if (msg->FindInt32("midi:id", &id) == B_OK)
-	{
+	if (msg->FindInt32("midi:id", &id) == B_OK) {
 		BMidiEndpoint* endp = FindEndpoint(id);
-		if (endp != NULL)
-		{
+		if (endp != NULL) {
 			RemoveEndpoint(endp);
 
 			// If the client is watching, and the endpoint is
 			// registered remote, we need to let it know that
 			// the endpoint is now unregistered.
 
-			if (endp->IsRemote() && endp->IsRegistered())
-			{
-				if (watcher != NULL)
-				{
+			if (endp->IsRemote() && endp->IsRegistered()) {
+				if (fWatcher != NULL) {
 					BMessage notify;
 					notify.AddInt32("be:op", B_MIDI_UNREGISTERED);
 					ChangeEvent(&notify, endp);
@@ -330,14 +287,11 @@ void BMidiRosterLooper::OnEndpointDeleted(BMessage* msg)
 			// object. We clear the "isRegistered" flag to
 			// let the client know the object is now invalid.
 
-			if (endp->refCount == 0)
-			{
+			if (endp->fRefCount == 0) {
 				delete endp;
-			}
-			else  // still being used
-			{
-				endp->isRegistered = false;
-				endp->isAlive = false;
+			} else { // still being used
+				endp->fIsRegistered = false;
+				endp->fIsAlive = false;
 			}
 
 			return;
@@ -347,16 +301,14 @@ void BMidiRosterLooper::OnEndpointDeleted(BMessage* msg)
 	WARN("Could not delete proxy for remote endpoint")
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::OnEndpointChanged(BMessage* msg)
+void 
+BMidiRosterLooper::OnEndpointChanged(BMessage* msg)
 {
 	int32 id;
-	if (msg->FindInt32("midi:id", &id) == B_OK)
-	{
+	if (msg->FindInt32("midi:id", &id) == B_OK) {
 		BMidiEndpoint* endp = FindEndpoint(id);
-		if ((endp != NULL) && endp->IsRemote())
-		{
+		if ((endp != NULL) && endp->IsRemote()) {
 			ChangeRegistered(msg, endp);
 			ChangeName(msg, endp);
 			ChangeProperties(msg, endp);
@@ -373,37 +325,30 @@ void BMidiRosterLooper::OnEndpointChanged(BMessage* msg)
 	WARN("Could not change endpoint attributes")
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::OnConnectedDisconnected(BMessage* msg)
+void 
+BMidiRosterLooper::OnConnectedDisconnected(BMessage* msg)
 {
 	int32 prodId, consId;
 	if ((msg->FindInt32("midi:producer", &prodId) == B_OK)
-	&&  (msg->FindInt32("midi:consumer", &consId) == B_OK))
-	{
+		&&  (msg->FindInt32("midi:consumer", &consId) == B_OK)) {
 		BMidiEndpoint* endp1 = FindEndpoint(prodId);
 		BMidiEndpoint* endp2 = FindEndpoint(consId);
 
-		if ((endp1 != NULL) && endp1->IsProducer())
-		{
-			if ((endp2 != NULL) && endp2->IsConsumer())
-			{
+		if ((endp1 != NULL) && endp1->IsProducer()) {
+			if ((endp2 != NULL) && endp2->IsConsumer()) {
 				BMidiProducer* prod = (BMidiProducer*) endp1;
 				BMidiConsumer* cons = (BMidiConsumer*) endp2;
 
 				bool mustConnect = (msg->what == MSG_ENDPOINTS_CONNECTED);
 
-				if (mustConnect)
-				{
+				if (mustConnect) {
 					prod->ConnectionMade(cons);
-				}
-				else
-				{
+				} else {
 					prod->ConnectionBroken(cons);
 				}
 
-				if (watcher != NULL)
-				{
+				if (fWatcher != NULL) {
 					ConnectionEvent(prod, cons, mustConnect);
 				}
 
@@ -419,29 +364,23 @@ void BMidiRosterLooper::OnConnectedDisconnected(BMessage* msg)
 	WARN("Could not connect/disconnect endpoints")
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ChangeRegistered(BMessage* msg, BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::ChangeRegistered(BMessage* msg, BMidiEndpoint* endp)
 {
 	ASSERT(msg != NULL)
 	ASSERT(endp != NULL)
 
 	bool isRegistered;
-	if (msg->FindBool("midi:registered", &isRegistered) == B_OK)
-	{
-		if (endp->isRegistered != isRegistered)
-		{
-			endp->isRegistered = isRegistered;
+	if (msg->FindBool("midi:registered", &isRegistered) == B_OK) {
+		if (endp->fIsRegistered != isRegistered) {
+			endp->fIsRegistered = isRegistered;
 
-			if (watcher != NULL)
-			{
+			if (fWatcher != NULL) {
 				BMessage notify;
-				if (isRegistered)
-				{
+				if (isRegistered) {
 					notify.AddInt32("be:op", B_MIDI_REGISTERED);
-				}
-				else
-				{
+				} else {
 					notify.AddInt32("be:op", B_MIDI_UNREGISTERED);
 				}
 				ChangeEvent(&notify, endp);
@@ -450,22 +389,19 @@ void BMidiRosterLooper::ChangeRegistered(BMessage* msg, BMidiEndpoint* endp)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ChangeName(BMessage* msg, BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::ChangeName(BMessage* msg, BMidiEndpoint* endp)
 {
 	ASSERT(msg != NULL)
 	ASSERT(endp != NULL)
 
 	BString name;
-	if (msg->FindString("midi:name", &name) == B_OK)
-	{
-		if (endp->name != name)
-		{
-			endp->name = name;
+	if (msg->FindString("midi:name", &name) == B_OK) {
+		if (endp->fName != name) {
+			endp->fName = name;
 
-			if ((watcher != NULL) && endp->IsRegistered())
-			{
+			if ((fWatcher != NULL) && endp->IsRegistered()) {
 				BMessage notify;
 				notify.AddInt32("be:op", B_MIDI_CHANGED_NAME);
 				notify.AddString("be:name", name);
@@ -475,20 +411,18 @@ void BMidiRosterLooper::ChangeName(BMessage* msg, BMidiEndpoint* endp)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ChangeProperties(BMessage* msg, BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::ChangeProperties(BMessage* msg, BMidiEndpoint* endp)
 {
 	ASSERT(msg != NULL)
 	ASSERT(endp != NULL)
 
 	BMessage properties;
-	if (msg->FindMessage("midi:properties", &properties) == B_OK)
-	{
-		*(endp->properties) = properties;
+	if (msg->FindMessage("midi:properties", &properties) == B_OK) {
+		*(endp->fProperties) = properties;
 
-		if ((watcher != NULL) && endp->IsRegistered())
-		{
+		if ((fWatcher != NULL) && endp->IsRegistered()) {
 			BMessage notify;
 			notify.AddInt32("be:op", B_MIDI_CHANGED_PROPERTIES);
 			notify.AddMessage("be:properties", &properties);
@@ -497,25 +431,21 @@ void BMidiRosterLooper::ChangeProperties(BMessage* msg, BMidiEndpoint* endp)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ChangeLatency(BMessage* msg, BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::ChangeLatency(BMessage* msg, BMidiEndpoint* endp)
 {
 	ASSERT(msg != NULL)
 	ASSERT(endp != NULL)
 
 	bigtime_t latency;
-	if (msg->FindInt64("midi:latency", &latency) == B_OK)
-	{
-		if (endp->IsConsumer())
-		{
+	if (msg->FindInt64("midi:latency", &latency) == B_OK) {
+		if (endp->IsConsumer()) {
 			BMidiConsumer* cons = (BMidiConsumer*) endp;
-			if (cons->latency != latency)
-			{
-				cons->latency = latency;
+			if (cons->fLatency != latency) {
+				cons->fLatency = latency;
 
-				if ((watcher != NULL) && cons->IsRegistered())
-				{
+				if ((fWatcher != NULL) && cons->IsRegistered()) {
 					BMessage notify;
 					notify.AddInt32("be:op", B_MIDI_CHANGED_LATENCY);
 					notify.AddInt64("be:latency", latency);
@@ -526,16 +456,14 @@ void BMidiRosterLooper::ChangeLatency(BMessage* msg, BMidiEndpoint* endp)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::AllEndpoints()
+void 
+BMidiRosterLooper::AllEndpoints()
 {
 	BMessage notify;
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->IsRemote() && endp->IsRegistered())
-		{
+		if (endp->IsRemote() && endp->IsRegistered()) {
 			notify.MakeEmpty();
 			notify.AddInt32("be:op", B_MIDI_REGISTERED);
 			ChangeEvent(&notify, endp);
@@ -543,22 +471,17 @@ void BMidiRosterLooper::AllEndpoints()
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::AllConnections()
+void 
+BMidiRosterLooper::AllConnections()
 {
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->IsRemote() && endp->IsRegistered())
-		{
-			if (endp->IsProducer())
-			{
+		if (endp->IsRemote() && endp->IsRegistered()) {
+			if (endp->IsProducer()) {
 				BMidiProducer* prod = (BMidiProducer*) endp;
-				if (prod->LockProducer())
-				{
-					for (int32 k = 0; k < prod->CountConsumers(); ++k)
-					{
+				if (prod->LockProducer()) {
+					for (int32 k = 0; k < prod->CountConsumers(); ++k) {
 						ConnectionEvent(prod, prod->ConsumerAt(k), true);
 					}
 					prod->UnlockProducer();
@@ -568,35 +491,32 @@ void BMidiRosterLooper::AllConnections()
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ChangeEvent(BMessage* msg, BMidiEndpoint* endp)
+void 
+BMidiRosterLooper::ChangeEvent(BMessage* msg, BMidiEndpoint* endp)
 {
-	ASSERT(watcher != NULL)
+	ASSERT(fWatcher != NULL)
 	ASSERT(msg != NULL)
 	ASSERT(endp != NULL)
 
 	msg->what = B_MIDI_EVENT;
 	msg->AddInt32("be:id", endp->ID());
 
-	if (endp->IsConsumer())
-	{
+	if (endp->IsConsumer()) {
 		msg->AddString("be:type", "consumer");
-	}
-	else
-	{
+	} else {
 		msg->AddString("be:type", "producer");
 	}
 
-	watcher->SendMessage(msg);
+	fWatcher->SendMessage(msg);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::ConnectionEvent(
+void 
+BMidiRosterLooper::ConnectionEvent(
 	BMidiProducer* prod, BMidiConsumer* cons, bool mustConnect)
 {
-	ASSERT(watcher != NULL)
+	ASSERT(fWatcher != NULL)
 	ASSERT(prod != NULL)
 	ASSERT(cons != NULL)
 
@@ -605,21 +525,18 @@ void BMidiRosterLooper::ConnectionEvent(
 	notify.AddInt32("be:producer", prod->ID());
 	notify.AddInt32("be:consumer", cons->ID());
 
-	if (mustConnect)
-	{
+	if (mustConnect) {
 		notify.AddInt32("be:op", B_MIDI_CONNECTED);
-	}
-	else
-	{
+	} else {
 		notify.AddInt32("be:op", B_MIDI_DISCONNECTED);
 	}
 
-	watcher->SendMessage(&notify);
+	fWatcher->SendMessage(&notify);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::DisconnectDeadConsumer(BMidiConsumer* cons)
+void 
+BMidiRosterLooper::DisconnectDeadConsumer(BMidiConsumer* cons)
 {
 	ASSERT(cons != NULL)
 
@@ -627,16 +544,12 @@ void BMidiRosterLooper::DisconnectDeadConsumer(BMidiConsumer* cons)
 	// of connected consumers, we let ConnectionBroken() tell
 	// us whether the consumer really was connected.
 
-	for (int32 t = 0; t < CountEndpoints(); ++t)
-	{
+	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		BMidiEndpoint* endp = EndpointAt(t);
-		if (endp->IsProducer())
-		{
+		if (endp->IsProducer()) {
 			BMidiProducer* prod = (BMidiProducer*) endp;
-			if (prod->ConnectionBroken(cons))
-			{
-				if (cons->IsRemote() && (watcher != NULL))
-				{
+			if (prod->ConnectionBroken(cons)) {
+				if (cons->IsRemote() && (fWatcher != NULL)) {
 					ConnectionEvent(prod, cons, false);
 				}
 			}
@@ -644,9 +557,9 @@ void BMidiRosterLooper::DisconnectDeadConsumer(BMidiConsumer* cons)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRosterLooper::DisconnectDeadProducer(BMidiProducer* prod)
+void 
+BMidiRosterLooper::DisconnectDeadProducer(BMidiProducer* prod)
 {
 	ASSERT(prod != NULL)
 
@@ -654,42 +567,38 @@ void BMidiRosterLooper::DisconnectDeadProducer(BMidiProducer* prod)
 	// the producer's list of connections, because when this
 	// function is called, we're destroying the object.
 
-	if (prod->IsRemote() && (watcher != NULL))
-	{
-		for (int32 t = 0; t < prod->CountConsumers(); ++t)
-		{
+	if (prod->IsRemote() && (fWatcher != NULL)) {
+		for (int32 t = 0; t < prod->CountConsumers(); ++t) {
 			ConnectionEvent(prod, prod->ConsumerAt(t), false);
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-int32 BMidiRosterLooper::CountEndpoints()
+int32 
+BMidiRosterLooper::CountEndpoints()
 {
-	return endpoints.CountItems();
+	return fEndpoints.CountItems();
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEndpoint* BMidiRosterLooper::EndpointAt(int32 index)
+BMidiEndpoint* 
+BMidiRosterLooper::EndpointAt(int32 index)
 {
 	ASSERT(index >= 0 && index < CountEndpoints())
 
-	return (BMidiEndpoint*) endpoints.ItemAt(index);
+	return (BMidiEndpoint*) fEndpoints.ItemAt(index);
 }
 
-//------------------------------------------------------------------------------
 
 #ifdef DEBUG
-void BMidiRosterLooper::DumpEndpoints()
+void 
+BMidiRosterLooper::DumpEndpoints()
 {
-	if (Lock())
-	{
+	if (Lock()) {
 		printf("*** START DumpEndpoints\n");
 
-		for (int32 t = 0; t < CountEndpoints(); ++t)
-		{
+		for (int32 t = 0; t < CountEndpoints(); ++t) {
 			BMidiEndpoint* endp = EndpointAt(t);
 
 			printf("\tendpoint %ld (%p):\n", t, endp);
@@ -700,25 +609,20 @@ void BMidiRosterLooper::DumpEndpoints()
 				endp->IsConsumer() ? "consumer" : "producer", 
 				endp->IsRegistered() ? "registered" : "unregistered", 
 				endp->IsLocal() ? "local" : "remote", 
-				endp->IsValid() ? "valid" : "invalid", endp->refCount);
+				endp->IsValid() ? "valid" : "invalid", endp->fRefCount);
 
 			printf("\t\tproperties: "); 
-			endp->properties->PrintToStream();
+			endp->fProperties->PrintToStream();
 
-			if (endp->IsConsumer())
-			{
+			if (endp->IsConsumer()) {
 				BMidiConsumer* cons = (BMidiConsumer*) endp;
 				printf("\t\tport %ld, latency %Ld\n", 
-						cons->port, cons->latency);
-			}
-			else
-			{
+						cons->fPort, cons->fLatency);
+			} else {
 				BMidiProducer* prod = (BMidiProducer*) endp;
-				if (prod->LockProducer())
-				{
+				if (prod->LockProducer()) {
 					printf("\t\tconnections:\n");
-					for (int32 k = 0; k < prod->CountConsumers(); ++k)
-					{
+					for (int32 k = 0; k < prod->CountConsumers(); ++k) {
 						BMidiConsumer* cons = prod->ConsumerAt(k);
 						printf("\t\t\tid %ld (%p)\n", cons->ID(), cons);
 					}
@@ -733,4 +637,3 @@ void BMidiRosterLooper::DumpEndpoints()
 }
 #endif
 
-//------------------------------------------------------------------------------

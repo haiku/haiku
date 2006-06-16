@@ -75,8 +75,8 @@ private:
 
 	status_t SendRequest(BMessage*, BMessage*);
 
-	BPrivate::BMidiRosterLooper* looper;
-	BMessenger* server;
+	BPrivate::BMidiRosterLooper* fLooper;
+	BMessenger fServer;
 
 	uint32 _reserved[16];
 };

@@ -66,14 +66,14 @@ private:
 	bool LockLooper() const;
 	void UnlockLooper() const;
 
-	int32 id;
-	BString name;	
-	int32 refCount;
-	BMessage* properties;
-	bool isLocal;
-	bool isConsumer;
-	bool isRegistered;
-	bool isAlive;
+	int32 fId;
+	BString fName;	
+	int32 fRefCount;
+	BMessage* fProperties;
+	bool fIsLocal;
+	bool fIsConsumer;
+	bool fIsRegistered;
+	bool fIsAlive;
 
 	uint32 _reserved[4];
 };

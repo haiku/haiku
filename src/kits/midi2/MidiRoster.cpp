@@ -1,28 +1,14 @@
 /*
- * Copyright (c) 2002-2004 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Matthijs Hollemans
  */
 
 #include "debug.h"
-#include "MidiConsumer.h"
-#include "MidiRoster.h"
+#include <MidiConsumer.h>
+#include <MidiRoster.h>
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
@@ -60,20 +46,17 @@ namespace BPrivate
 	midi_roster_killer;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEndpoint* BMidiRoster::NextEndpoint(int32* id)
+BMidiEndpoint* 
+BMidiRoster::NextEndpoint(int32* id)
 {
 	BMidiEndpoint* endp = NULL;
 
-	if (id != NULL)
-	{
-		BMidiRosterLooper* looper = MidiRoster()->looper;
-		if (looper->Lock())
-		{
+	if (id != NULL) {
+		BMidiRosterLooper* looper = MidiRoster()->fLooper;
+		if (looper->Lock()) {
 			endp = looper->NextEndpoint(id);
-			if (endp != NULL)
-			{
+			if (endp != NULL) {
 				endp->Acquire();
 			}
 			looper->Unlock();
@@ -83,69 +66,55 @@ BMidiEndpoint* BMidiRoster::NextEndpoint(int32* id)
 	return endp;
 } 
 
-//------------------------------------------------------------------------------
 
-BMidiProducer* BMidiRoster::NextProducer(int32* id)
+BMidiProducer* 
+BMidiRoster::NextProducer(int32* id)
 {
 	BMidiEndpoint* endp;
 
-	while ((endp = NextEndpoint(id)) != NULL)
-	{
-		if (endp->IsProducer())
-		{
+	while ((endp = NextEndpoint(id)) != NULL) {
+		if (endp->IsProducer()) {
 			return (BMidiProducer*) endp;
 		}
-		else
-		{
-			endp->Release();
-		}
+		endp->Release();
 	}
 
 	return NULL;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiConsumer* BMidiRoster::NextConsumer(int32* id)
+BMidiConsumer* 
+BMidiRoster::NextConsumer(int32* id)
 {
 	BMidiEndpoint* endp;
 
-	while ((endp = NextEndpoint(id)) != NULL)
-	{
-		if (endp->IsConsumer())
-		{
+	while ((endp = NextEndpoint(id)) != NULL) {
+		if (endp->IsConsumer()) {
 			return (BMidiConsumer*) endp;
 		}
-		else
-		{
-			endp->Release();
-		}
+		endp->Release();
 	}
 
 	return NULL;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiEndpoint* BMidiRoster::FindEndpoint(int32 id, bool localOnly)
+BMidiEndpoint* 
+BMidiRoster::FindEndpoint(int32 id, bool localOnly)
 {
 	BMidiEndpoint* endp = NULL;
 
-	BMidiRosterLooper* looper = MidiRoster()->looper;
-	if (looper->Lock())
-	{
+	BMidiRosterLooper* looper = MidiRoster()->fLooper;
+	if (looper->Lock()) {
 		endp = looper->FindEndpoint(id);
 
-		if ((endp != NULL) && endp->IsRemote())
-		{
-			if (localOnly || !endp->IsRegistered())
-			{
+		if ((endp != NULL) && endp->IsRemote()) {
+			if (localOnly || !endp->IsRegistered()) {
 				endp = NULL;
 			}
 		}
 
-		if (endp != NULL)
-		{
+		if (endp != NULL) {
 			endp->Acquire();
 		}
 
@@ -155,14 +124,13 @@ BMidiEndpoint* BMidiRoster::FindEndpoint(int32 id, bool localOnly)
 	return endp;
 } 
 
-//------------------------------------------------------------------------------
 
-BMidiProducer* BMidiRoster::FindProducer(int32 id, bool localOnly)
+BMidiProducer* 
+BMidiRoster::FindProducer(int32 id, bool localOnly)
 {
 	BMidiEndpoint* endp = FindEndpoint(id, localOnly);
 
-	if ((endp != NULL) && !endp->IsProducer())
-	{
+	if ((endp != NULL) && !endp->IsProducer()) {
 		endp->Release();
 		endp = NULL;
 	}
@@ -170,14 +138,13 @@ BMidiProducer* BMidiRoster::FindProducer(int32 id, bool localOnly)
 	return (BMidiProducer*) endp;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiConsumer* BMidiRoster::FindConsumer(int32 id, bool localOnly)
+BMidiConsumer* 
+BMidiRoster::FindConsumer(int32 id, bool localOnly)
 {
 	BMidiEndpoint* endp = FindEndpoint(id, localOnly);
 
-	if ((endp != NULL) && !endp->IsConsumer())
-	{
+	if ((endp != NULL) && !endp->IsConsumer()) {
 		endp->Release();
 		endp = NULL;
 	}
@@ -185,76 +152,68 @@ BMidiConsumer* BMidiRoster::FindConsumer(int32 id, bool localOnly)
 	return (BMidiConsumer*) endp;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRoster::StartWatching(const BMessenger* msngr)
+void 
+BMidiRoster::StartWatching(const BMessenger* msngr)
 {
-	if (msngr == NULL)
-	{
+	if (msngr == NULL) {
 		WARN("StartWatching does not accept a NULL messenger")
-	}
-	else
-	{
-		BMidiRosterLooper* looper = MidiRoster()->looper;
-		if (looper->Lock())
-		{
+	} else {
+		BMidiRosterLooper* looper = MidiRoster()->fLooper;
+		if (looper->Lock()) {
 			looper->StartWatching(msngr);
 			looper->Unlock();
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRoster::StopWatching()
+void 
+BMidiRoster::StopWatching()
 {
-	BMidiRosterLooper* looper = MidiRoster()->looper;
-	if (looper->Lock())
-	{
+	BMidiRosterLooper* looper = MidiRoster()->fLooper;
+	if (looper->Lock()) {
 		looper->StopWatching();
 		looper->Unlock();
 	}
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiRoster::Register(BMidiEndpoint* endp)
+status_t 
+BMidiRoster::Register(BMidiEndpoint* endp)
 {
-	if (endp != NULL)
-	{
+	if (endp != NULL) {
 		return endp->Register();
 	}
 
 	return B_BAD_VALUE;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiRoster::Unregister(BMidiEndpoint* endp)
+status_t 
+BMidiRoster::Unregister(BMidiEndpoint* endp)
 {
-	if (endp != NULL)
-	{
+	if (endp != NULL) {
 		return endp->Unregister();
 	}
 
 	return B_BAD_VALUE;
 }
 
-//------------------------------------------------------------------------------
 
-BMidiRoster* BMidiRoster::MidiRoster()
+BMidiRoster* 
+BMidiRoster::MidiRoster()
 {
-	if (roster == NULL)
-	{
+	if (roster == NULL) {
 		new BMidiRoster();
 	}
 
 	return roster;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiRoster::BMidiRoster()
+	: fServer(MIDI_SERVER_SIGNATURE)
 {
 	TRACE(("BMidiRoster::BMidiRoster"))
 
@@ -265,17 +224,16 @@ BMidiRoster::BMidiRoster()
 
 	roster = this;
 
-	server = new BMessenger(MIDI_SERVER_SIGNATURE);
-	looper = new BMidiRosterLooper();
+	fLooper = new BMidiRosterLooper();
 
-	if (!looper->Init(this)) { return; }
+	if (!fLooper->Init(this)) 
+		return;
 
 	BMessage msg;
 	msg.what = MSG_REGISTER_APP;
-	msg.AddMessenger("midi:messenger", BMessenger(looper));
+	msg.AddMessenger("midi:messenger", BMessenger(fLooper));
 
-	if (server->SendMessage(&msg, looper, TIMEOUT) != B_OK)
-	{
+	if (fServer.SendMessage(&msg, fLooper, TIMEOUT) != B_OK) {
 		WARN("Cannot send request to midi_server"); 
 		return;
 	}	
@@ -286,25 +244,20 @@ BMidiRoster::BMidiRoster()
 	// will bump the semaphore count, and our acquire_sem() 
 	// can grab the semaphore safely (without blocking).
 
-	acquire_sem(looper->initLock);
+	acquire_sem(fLooper->fInitLock);
 }
 
-//------------------------------------------------------------------------------
 
 BMidiRoster::~BMidiRoster()
 {
 	TRACE(("BMidiRoster::~BMidiRoster"))
 
-	if (looper != NULL) 
-	{
-		looper->Lock();
-		looper->Quit();
+	if (fLooper != NULL) {
+		fLooper->Lock();
+		fLooper->Quit();
 	}
-
-	delete server;
 }
 
-//------------------------------------------------------------------------------
 
 void BMidiRoster::_Reserved1() { }
 void BMidiRoster::_Reserved2() { }
@@ -315,9 +268,9 @@ void BMidiRoster::_Reserved6() { }
 void BMidiRoster::_Reserved7() { }
 void BMidiRoster::_Reserved8() { }
 
-//------------------------------------------------------------------------------
 
-void BMidiRoster::CreateLocal(BMidiEndpoint* endp)
+void 
+BMidiRoster::CreateLocal(BMidiEndpoint* endp)
 {
 	ASSERT(endp != NULL)
 
@@ -328,35 +281,29 @@ void BMidiRoster::CreateLocal(BMidiEndpoint* endp)
 
 	BMessage msg;
 	msg.what = MSG_CREATE_ENDPOINT;
-	msg.AddBool("midi:consumer", endp->isConsumer);
-	msg.AddBool("midi:registered", endp->isRegistered);
+	msg.AddBool("midi:consumer", endp->fIsConsumer);
+	msg.AddBool("midi:registered", endp->fIsRegistered);
 	msg.AddString("midi:name", endp->Name());
-	msg.AddMessage("midi:properties", endp->properties);
+	msg.AddMessage("midi:properties", endp->fProperties);
 
-	if (endp->IsConsumer())
-	{
+	if (endp->IsConsumer()) {
 		BMidiConsumer* consumer = (BMidiConsumer*) endp;
-		msg.AddInt32("midi:port", consumer->port);
-		msg.AddInt64("midi:latency", consumer->latency);
+		msg.AddInt32("midi:port", consumer->fPort);
+		msg.AddInt64("midi:latency", consumer->fLatency);
 	}
 
 	BMessage reply;
-	if (SendRequest(&msg, &reply) == B_OK)
-	{
+	if (SendRequest(&msg, &reply) == B_OK) {
 		status_t res;
-		if (reply.FindInt32("midi:result", &res) == B_OK)
-		{
-			if (res == B_OK)
-			{
+		if (reply.FindInt32("midi:result", &res) == B_OK) {
+			if (res == B_OK) {
 				int32 id;
-				if (reply.FindInt32("midi:id", &id) == B_OK)
-				{
-					endp->id = id;
+				if (reply.FindInt32("midi:id", &id) == B_OK) {
+					endp->fId = id;
 
-					if (looper->Lock())
-					{
-						looper->AddEndpoint(endp);
-						looper->Unlock();
+					if (fLooper->Lock()) {
+						fLooper->AddEndpoint(endp);
+						fLooper->Unlock();
 					}
 				}
 			}
@@ -374,9 +321,9 @@ void BMidiRoster::CreateLocal(BMidiEndpoint* endp)
 	// trip an assertion, so you can't delete these endpoints.)
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiRoster::DeleteLocal(BMidiEndpoint* endp)
+void 
+BMidiRoster::DeleteLocal(BMidiEndpoint* endp)
 {
 	ASSERT(endp != NULL)
 
@@ -389,40 +336,36 @@ void BMidiRoster::DeleteLocal(BMidiEndpoint* endp)
 	// a reply from the server. If something went wrong, the 
 	// object will be destroyed regardless.
 
-	server->SendMessage(&msg, (BHandler*) NULL, TIMEOUT);
+	fServer.SendMessage(&msg, (BHandler*) NULL, TIMEOUT);
 
 	// If the endpoint was successfully created, we must remove
 	// it from the list of endpoints. If creation failed, then
 	// we didn't put the endpoint on that list. If the endpoint
 	// was connected to anything, we must also disconnect it.
 
-	if (endp->ID() > 0)
-	{
-		if (looper->Lock())
-		{
-			looper->RemoveEndpoint(endp);
-			looper->Unlock();
+	if (endp->ID() > 0) {
+		if (fLooper->Lock()) {
+			fLooper->RemoveEndpoint(endp);
+			fLooper->Unlock();
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiRoster::SendRequest(BMessage* msg, BMessage* reply)
+status_t 
+BMidiRoster::SendRequest(BMessage* msg, BMessage* reply)
 {
 	ASSERT(msg != NULL)
 	ASSERT(reply != NULL)
 
-	status_t err = server->SendMessage(msg, reply, TIMEOUT, TIMEOUT);
+	status_t err = fServer.SendMessage(msg, reply, TIMEOUT, TIMEOUT);
 
-	if (err != B_OK)
-	{
+	if (err != B_OK) {
 		WARN("Cannot send request to midi_server"); 
 	}
 
 	#ifdef DEBUG
-	if (err == B_OK)
-	{
+	if (err == B_OK) {
 		printf("REPLY "); reply->PrintToStream();
 	}
 	#endif
@@ -430,4 +373,3 @@ status_t BMidiRoster::SendRequest(BMessage* msg, BMessage* reply)
 	return err;
 }
 
-//------------------------------------------------------------------------------

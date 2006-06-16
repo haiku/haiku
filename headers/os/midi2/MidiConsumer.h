@@ -31,8 +31,8 @@ private:
 	virtual void _Reserved7();
 	virtual void _Reserved8();
 	
-	port_id port;
-	bigtime_t latency;
+	port_id fPort;
+	bigtime_t fLatency;
 	
 	uint32 _reserved[2];
 };
@@ -106,10 +106,10 @@ private:
 
 	int32 EventThread();
 
-	bigtime_t timeout;
-	void* timeoutData;
-	int32 currentProducer;
-	thread_id thread;
+	bigtime_t fTimeout;
+	void* fTimeoutData;
+	int32 fCurrentProducer;
+	thread_id fThread;
 
 	uint32 _reserved[1];
 };
