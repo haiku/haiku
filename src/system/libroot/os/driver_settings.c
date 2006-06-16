@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -49,6 +49,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
+
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#	define B_BUFFER_OVERFLOW B_ERROR
+#endif
 
 // ToDo: these should be retrieved via find_directory()
 #define SETTINGS_DIRECTORY "/boot/home/config/settings/kernel/drivers/"
