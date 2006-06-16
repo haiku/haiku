@@ -90,6 +90,11 @@ SimpleTest ScreenTest :
 	: be
 	;
 
+SimpleTest StatusBarTest :
+	StatusBarTest.cpp
+	: be
+	;
+
 SimpleTest GetMouseTest :
 	GetMouseTest.cpp
 	: be
