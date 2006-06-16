@@ -456,7 +456,7 @@ ModulesView::_CompareScreenSaverItems(const void* left, const void* right)
 	ScreenSaverItem* leftItem  = *(ScreenSaverItem **)left;
 	ScreenSaverItem* rightItem = *(ScreenSaverItem **)right;
 
-	return strcmp(leftItem->Text(), rightItem->Text());
+	return strcasecmp(leftItem->Text(), rightItem->Text());
 }
 
 
@@ -591,6 +591,8 @@ ScreenSaverWindow::ScreenSaverWindow()
 	fSettings.Load();
 
 	BRect rect = Bounds();
+	fMinWidth = 430;
+	fMinHeight = 325;
 
 	// Create a background view
 	BView *background = new BView(rect, "background", B_FOLLOW_ALL, 0);
@@ -614,9 +616,6 @@ ScreenSaverWindow::ScreenSaverWindow()
 	fPasswordWindow = new PasswordWindow(fSettings);
 	fPasswordWindow->Run();
 
-	// TODO: better limits!
-	fMinWidth = 430;
-	fMinHeight = 325;
 	SetMinimalSizeLimit(fMinWidth, fMinHeight);
 	MoveTo(fSettings.WindowFrame().left, fSettings.WindowFrame().top);
 	ResizeTo(fSettings.WindowFrame().Width(), fSettings.WindowFrame().Height());
@@ -716,34 +715,60 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	// Bottom
 
-	box->AddChild(fFadeNow = new ScreenCornerSelector(BRect(20,205,80,260), "FadeNow",
+	float monitorHeight = 10 + textHeight * 3;
+	float monitorWidth = monitorHeight * 4 / 3;
+	rect.left = 15;
+	rect.top = box->Bounds().Height() - 15 - monitorHeight;
+	rect.right = rect.left + monitorWidth;
+	rect.bottom = rect.top + monitorHeight;
+	box->AddChild(fFadeNow = new ScreenCornerSelector(rect, "FadeNow",
 		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
-	box->AddChild(fFadeNever = new ScreenCornerSelector(BRect(220,205,280,260), "FadeNever",
-		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
-	rect = BRect(90,215,193,230);
+	rect.OffsetBy(monitorWidth + 10, 0);
 	stringView = new BStringView(rect, NULL, "Fade now when",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
+	float maxWidth = stringView->Bounds().Width();
 	box->AddChild(stringView);
 
 	rect.OffsetBy(0, stringView->Bounds().Height());
 	stringView = new BStringView(rect, NULL, "mouse is here",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
+	if (maxWidth < stringView->Bounds().Width())
+		maxWidth = stringView->Bounds().Width();
 	box->AddChild(stringView);
 
-	rect = BRect(290,215,387,230);
+	rect.left += maxWidth + 20;
+	rect.top = box->Bounds().Height() - 15 - monitorHeight;
+	rect.right = rect.left + monitorWidth;
+	rect.bottom = rect.top + monitorHeight;
+	box->AddChild(fFadeNever = new ScreenCornerSelector(rect, "FadeNever",
+		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
+
+	rect.OffsetBy(monitorWidth + 10, 0);
 	stringView = new BStringView(rect, NULL,"Don't fade when",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
+	if (maxWidth < stringView->Bounds().Width())
+		maxWidth = stringView->Bounds().Width();
 	box->AddChild(stringView);
 
 	rect.OffsetBy(0, stringView->Bounds().Height());
 	stringView = new BStringView(rect, NULL, "mouse is here",
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	stringView->ResizeToPreferred();
+	if (maxWidth < stringView->Bounds().Width())
+		maxWidth = stringView->Bounds().Width();
 	box->AddChild(stringView);
+
+	float size = rect.left + maxWidth + 40;
+	if (fMinWidth < size)
+		fMinWidth = size;
+	size = fPasswordButton->Frame().bottom + box->Frame().top
+		+ monitorHeight + 40 + textHeight * 2;
+	if (fMinHeight < size)
+		fMinHeight = size;
 }
 
 
