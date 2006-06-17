@@ -1,65 +1,24 @@
 /*
- * Copyright (c) 2004-2005 Matthijs Hollemans
- * Copyright (c) 2003 Jerome Leveque
+ * Copyright 2003-2006, Haiku.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		Jérôme Leveque
+ *		Matthijs Hollemans
+ * 		Jérôme Duval
  */
 
 #ifndef _SOFT_SYNTH_H
 #define _SOFT_SYNTH_H
 
 /*
-	WORK IN PROGRESS!
-	
-	This version of SoftSynth is a wrapper for Michael Pfeiffer's port
-	of TiMidity++ 2.11.3/3 (http://www.bebits.com/app/2736).
-
-	It works, but not good enough yet. Playback from MidiPlayer sounds
-	a lot worse than using TiMidity in standalone mode. Either TiMidity's
-	MidiConsumer doesn't work properly or the Midi Kit messes things up;
-	I haven't investigated yet.
-
-	To try it out, download TiMidity and the sound files (30MB):
-	http://bepdf.sourceforge.net/download/midi/TiMidity++-2.11.3_3.x86.zip
-	http://bepdf.sourceforge.net/download/midi/eawpats11_full_beos.zip
-
-	Follow the instructions in the archive to install. Then double-click
-	"Start TiMidity Server" to launch TiMidity. The server will publish a
-	consumer endpoint. You can verify this with PatchBay.
-	
-	Build the Haiku Midi Kit. Put libmidi.so and libmidi2.so in ~/config/lib.
-	Quit the BeOS midi_server. Launch the Haiku midi_server.
-	
-	Build the Haiku MidiPlayer (or use the BeOS MidiPlayer). Start it and
-	choose a MIDI file. If all went fine, you will hear TiMidity play back 
-	the song. Just not very well. :-)
-	
-	Note: You can still use the Midi Kit if you don't install TiMidity, 
-	but the software synth will simply make no sound.
+	This version of SoftSynth is a wrapper libfluidsynth.so.
  */
 
-#include <Midi.h>
-#include <Synth.h>
-
-#include <SoundPlayer.h>
-
 #include <fluidsynth.h>
+#include <Midi.h>
+#include <SoundPlayer.h>
+#include <Synth.h>
 
 class BMidiConsumer;
 class BMidiSynth;
@@ -150,4 +109,4 @@ private:
 
 } // namespace BPrivate
 
-#endif // _SYNTH_CONSUMER_H
+#endif // _SOFT_SYNTH_H
