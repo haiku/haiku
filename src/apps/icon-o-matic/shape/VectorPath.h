@@ -15,6 +15,7 @@
 #include <agg_path_storage.h>
 
 #include "Observable.h"
+#include "Referenceable.h"
 
 class BBitmap;
 class BMessage;
@@ -28,7 +29,8 @@ struct control_point {
 };
 
 class VectorPath : public BArchivable,
-				   public Observable {
+				   public Observable,
+				   public Referenceable {
  public:
 
 	class Iterator {

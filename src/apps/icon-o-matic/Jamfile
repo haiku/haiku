@@ -16,8 +16,10 @@ local sourceDirs =
 	generic/listener
 	generic/selection
 	generic/support
+	gradient
 	shape
 	shape/commands
+	style
 ;
 
 local sourceDir ;
@@ -52,8 +54,12 @@ Application Icon-O-Matic :
 	#generic/support
 	RWLocker.cpp
 	support.cpp
+	#style
+	Style.cpp
+	StyleManager.cpp
 	#shape
 	PathManipulator.cpp
+	Shape.cpp
 	VectorPath.cpp
 	#shape/commands
 	AddPointCommand.cpp
@@ -61,6 +67,8 @@ Application Icon-O-Matic :
 	InsertPointCommand.cpp
 	PathCommand.cpp
 	RemovePointsCommand.cpp
+	#gradient
+	Gradient.cpp
 	#
 	CanvasView.cpp
 	IconEditorApp.cpp

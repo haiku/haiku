@@ -72,6 +72,8 @@ get_path_storage(agg::path_storage& path,
 // constructor
 VectorPath::VectorPath()
 	: BArchivable(),
+	  Observable(),
+	  Referenceable(),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
@@ -84,6 +86,7 @@ VectorPath::VectorPath()
 VectorPath::VectorPath(const VectorPath& from)
 	: BArchivable(),
 	  Observable(),
+	  Referenceable(),
 	  fPath(NULL),
 	  fPointCount(0),
 	  fAllocCount(0),
@@ -96,6 +99,7 @@ VectorPath::VectorPath(const VectorPath& from)
 VectorPath::VectorPath(const BMessage* archive)
 	: BArchivable(),
 	  Observable(),
+	  Referenceable(),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
