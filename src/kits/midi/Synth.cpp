@@ -24,7 +24,8 @@
 #include <string.h>
 
 #include "debug.h"
-#include "Synth.h"
+#include <Path.h>
+#include <Synth.h>
 #include "SoftSynth.h"
 
 BSynth* be_synth = NULL;
@@ -58,12 +59,15 @@ BSynth::~BSynth()
 
 status_t BSynth::LoadSynthData(entry_ref* instrumentsFile)
 {
-	if (instrumentsFile == NULL)
-	{
+	if (instrumentsFile == NULL) {
 		return B_BAD_VALUE;
 	}
 	
-	return synth->SetInstrumentsFile(instrumentsFile->name);
+	BPath path(instrumentsFile);
+	status_t err = path.InitCheck();
+	if (err != B_OK)
+		return err;
+	return synth->SetInstrumentsFile(path.Path());
 }
 
 //------------------------------------------------------------------------------

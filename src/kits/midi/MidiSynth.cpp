@@ -58,8 +58,7 @@ status_t BMidiSynth::EnableInput(bool enable, bool loadInstruments)
 	status_t err = B_OK;
 	inputEnabled = enable;
 	
-	if (loadInstruments)
-	{
+	if (loadInstruments) {
 		err = be_synth->synth->LoadAllInstruments();
 	}
 

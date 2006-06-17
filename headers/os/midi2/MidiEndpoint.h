@@ -69,7 +69,7 @@ private:
 	int32 fId;
 	BString fName;	
 	int32 fRefCount;
-	BMessage* fProperties;
+	BMessage *fProperties;
 	bool fIsLocal;
 	bool fIsConsumer;
 	bool fIsRegistered;

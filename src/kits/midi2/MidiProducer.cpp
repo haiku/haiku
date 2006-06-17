@@ -49,7 +49,7 @@ BMidiProducer::IsConnected(BMidiConsumer* cons) const
 
 	if (cons != NULL) {
 		if (LockProducer()) {
-			isConnected = fConnections.HasItem(cons);
+			isConnected = fConnections->HasItem(cons);
 			UnlockProducer();
 		}
 	}
@@ -79,15 +79,16 @@ BMidiProducer::Connections() const
 
 BMidiProducer::BMidiProducer(const char* name)
 	: BMidiEndpoint(name),
-	fLocker("MidiProducerLock"),
-	fConnections()
+	fLocker("MidiProducerLock")
 {
 	fIsConsumer = false;
+	fConnections = new BList();
 }
 
 
 BMidiProducer::~BMidiProducer()
 {
+	delete fConnections;
 }
 
 
@@ -146,12 +147,13 @@ BMidiProducer::SendConnectRequest(
 void 
 BMidiProducer::ConnectionMade(BMidiConsumer* consumer)
 {
-	ASSERT(consumer != NULL)
+	if (consumer == NULL)
+		return;
 
 	if (LockProducer()) {
-		ASSERT(!fConnections.HasItem(consumer))
+		ASSERT(!fConnections->HasItem(consumer))
 
-		fConnections.AddItem(consumer);
+		fConnections->AddItem(consumer);
 		UnlockProducer();
 	}
 
@@ -164,12 +166,13 @@ BMidiProducer::ConnectionMade(BMidiConsumer* consumer)
 bool 
 BMidiProducer::ConnectionBroken(BMidiConsumer* consumer)
 {
-	ASSERT(consumer != NULL)
-
+	if (consumer == NULL)
+		return false;
+	
 	bool wasConnected = false;
 
 	if (LockProducer()) {
-		wasConnected = fConnections.RemoveItem(consumer);
+		wasConnected = fConnections->RemoveItem(consumer);
 		UnlockProducer();
 	}
 
@@ -184,7 +187,7 @@ BMidiProducer::ConnectionBroken(BMidiConsumer* consumer)
 int32 
 BMidiProducer::CountConsumers() const
 {
-	return fConnections.CountItems();
+	return fConnections->CountItems();
 }
 
 
@@ -193,7 +196,7 @@ BMidiProducer::ConsumerAt(int32 index) const
 {
 	ASSERT(index >= 0 && index < CountConsumers())
 
-	return (BMidiConsumer*) fConnections.ItemAt(index);
+	return (BMidiConsumer*) fConnections->ItemAt(index);
 }
 
 

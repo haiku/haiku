@@ -116,7 +116,6 @@ private:
 	volatile thread_id threadId;
 	volatile bool isRunning;
 
-	uint8  _reserved1[3];
 	uint32 _reserved2[5];
 };
 

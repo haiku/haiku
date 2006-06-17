@@ -243,8 +243,8 @@ BMidiEndpoint::BMidiEndpoint(const char* name_)
 	fIsLocal      = false;
 	fIsRegistered = false;
 	fIsAlive      = true;
-
-	fProperties = new BMessage;
+	
+	fProperties	= new BMessage();
 }
 
 
@@ -257,7 +257,6 @@ BMidiEndpoint::~BMidiEndpoint()
 			"you should use Release() to dispose of endpoints; "
 			"do not \"delete\" them or allocate them on the stack!");
 	}
-
 	delete fProperties;
 }
 

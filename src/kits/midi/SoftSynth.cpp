@@ -49,8 +49,6 @@ BSoftSynth::BSoftSynth()
 	fLimiterThreshold = 7;
 	fReverbEnabled = true;
 	fReverbMode = B_REVERB_BALLROOM;
-
-	Init();
 }
 
 
@@ -63,13 +61,14 @@ BSoftSynth::~BSoftSynth()
 	// didn't release our endpoints.
 
 	Unload();
-	Done();
 }
 
 
 bool 
-BSoftSynth::InitCheck(void) const
+BSoftSynth::InitCheck()
 {
+	if (!fSynth)
+		Init();
 	return fInitCheck;
 }
 
@@ -77,8 +76,7 @@ BSoftSynth::InitCheck(void) const
 void 
 BSoftSynth::Unload(void)
 {
-	/* TODO: purge samples from memory */
-	
+	Done();
 	free(fInstrumentsFile);
 	fInstrumentsFile = NULL;
 }
@@ -121,9 +119,7 @@ BSoftSynth::SetInstrumentsFile(const char* path)
 status_t 
 BSoftSynth::LoadAllInstruments()
 {
-	/* TODO: Should load all of the instruments from the sample bank. */
-
-	UNIMPLEMENTED
+	InitCheck();
 	return B_OK;
 }
 
@@ -182,7 +178,6 @@ BSoftSynth::SetSamplingRate(int32 rate)
 {
 	if (rate == 22050 || rate == 44100 || rate == 48000) {
 		fSampleRate = rate;
-		Init();
 		return B_OK;
 	}
 	
@@ -250,7 +245,6 @@ BSoftSynth::SetMaxVoices(int32 max)
 {
 	if (max > 0 && max <= 4096) {
 		fMaxVoices = max;
-		Init();
 		return B_OK;
 	}
 	
@@ -439,6 +433,7 @@ BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
 void 
 BSoftSynth::Init()
 {
+	status_t err;
 	fInitCheck = false;
 	
 	Done();
@@ -448,6 +443,12 @@ BSoftSynth::Init()
 	fluid_settings_setint(fSettings, "synth.polyphony", fMaxVoices);
 
 	fSynth = new_fluid_synth(fSettings);
+	if (!fSynth)
+		return;
+	
+	err = fluid_synth_sfload(fSynth, fInstrumentsFile, 1); 
+	if (err < B_OK)
+		return;
 
 	media_raw_audio_format format = media_raw_audio_format::wildcard;
 	format.channel_count = 2;
@@ -455,7 +456,7 @@ BSoftSynth::Init()
 	format.format = media_raw_audio_format::B_AUDIO_FLOAT;
 
 	fSoundPlayer = new BSoundPlayer(&format, "Soft Synth", &PlayBuffer, NULL, this);
-	status_t err = fSoundPlayer->InitCheck();
+	err = fSoundPlayer->InitCheck();
 	if (err != B_OK)
 		return;
 
@@ -473,11 +474,16 @@ BSoftSynth::Done()
 		fSoundPlayer->SetHasData(false);
 		fSoundPlayer->Stop();
 		delete fSoundPlayer;
+		fSoundPlayer = NULL;
 	}
-	if (fSynth)
+	if (fSynth) {
 		delete_fluid_synth(fSynth);
-	if (fSettings)
+		fSynth = NULL;
+	}
+	if (fSettings) {
 		delete_fluid_settings(fSettings);
+		fSettings = NULL;
+	}
 }
 
 

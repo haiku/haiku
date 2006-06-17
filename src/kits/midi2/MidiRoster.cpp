@@ -213,7 +213,6 @@ BMidiRoster::MidiRoster()
 
 
 BMidiRoster::BMidiRoster()
-	: fServer(MIDI_SERVER_SIGNATURE)
 {
 	TRACE(("BMidiRoster::BMidiRoster"))
 
@@ -232,8 +231,9 @@ BMidiRoster::BMidiRoster()
 	BMessage msg;
 	msg.what = MSG_REGISTER_APP;
 	msg.AddMessenger("midi:messenger", BMessenger(fLooper));
+	fServer = new BMessenger(MIDI_SERVER_SIGNATURE);
 
-	if (fServer.SendMessage(&msg, fLooper, TIMEOUT) != B_OK) {
+	if (fServer->SendMessage(&msg, fLooper, TIMEOUT) != B_OK) {
 		WARN("Cannot send request to midi_server"); 
 		return;
 	}	
@@ -256,6 +256,7 @@ BMidiRoster::~BMidiRoster()
 		fLooper->Lock();
 		fLooper->Quit();
 	}
+	delete fServer;
 }
 
 
@@ -336,7 +337,7 @@ BMidiRoster::DeleteLocal(BMidiEndpoint* endp)
 	// a reply from the server. If something went wrong, the 
 	// object will be destroyed regardless.
 
-	fServer.SendMessage(&msg, (BHandler*) NULL, TIMEOUT);
+	fServer->SendMessage(&msg, (BHandler*) NULL, TIMEOUT);
 
 	// If the endpoint was successfully created, we must remove
 	// it from the list of endpoints. If creation failed, then
@@ -358,7 +359,7 @@ BMidiRoster::SendRequest(BMessage* msg, BMessage* reply)
 	ASSERT(msg != NULL)
 	ASSERT(reply != NULL)
 
-	status_t err = fServer.SendMessage(msg, reply, TIMEOUT, TIMEOUT);
+	status_t err = fServer->SendMessage(msg, reply, TIMEOUT, TIMEOUT);
 
 	if (err != B_OK) {
 		WARN("Cannot send request to midi_server"); 

@@ -45,10 +45,10 @@ private:
 	bool LockProducer() const;
 	void UnlockProducer() const;
 
+	BList *fConnections;
 	mutable BLocker fLocker;
-	BList fConnections;
-
-	uint32 _reserved[10];
+	
+	uint32 _reserved[2];
 };
 
 class BMidiLocalProducer : public BMidiProducer

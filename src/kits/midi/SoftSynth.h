@@ -71,7 +71,7 @@ class BSoftSynth
 {
 public:
 
-	bool InitCheck() const;
+	bool InitCheck();
 
 	void Unload();
 	bool IsLoaded() const;

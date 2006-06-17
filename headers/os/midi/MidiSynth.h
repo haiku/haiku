@@ -83,8 +83,6 @@ private:
 	bigtime_t creationTime;
 	int16 transpose;
 	bool inputEnabled;
-
-	uint32 _reserved;
 };
 
 #endif // _MIDI_SYNTH_H
