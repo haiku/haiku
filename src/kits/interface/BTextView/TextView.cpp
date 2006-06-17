@@ -1134,7 +1134,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	fSelEnd += inLength;
 
 	// recalc line breaks and draw the text
-	Refresh(saveStart, startOffset, true, true);
+	Refresh(saveStart, fSelEnd, true, true);
 }
 
 
@@ -1688,7 +1688,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		height = (line + 1)->origin - line->origin;
 	
 		// special case: go down one line if inOffset is a newline
-		if (inOffset == textLength && (*fText)[textLength - 1] == '\n') {
+		if (inOffset == textLength && (*fText)[inOffset - 1] == '\n') {
 			float ascent, descent;
 			StyledWidth(inOffset, 1, &ascent, &descent);
 			
@@ -3108,10 +3108,11 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 	} else
 		InsertText(bytes, numBytes, fSelStart, NULL);
 	
+	int32 saveStart = fSelStart;
 	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
 
 	if (Window())
-		Refresh(fSelStart, fSelEnd, refresh, true);
+		Refresh(saveStart, fSelEnd, refresh, true);
 }
 
 
@@ -3166,7 +3167,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 	if (LineHeight(fromLine) != saveLineHeight || 
 		 newHeight < saveHeight || fromLine < saveFromLine || fAlignment != B_ALIGN_LEFT)
 		drawOffset = (*fLines)[fromLine]->offset;
-
+	
 	// TODO: Is it ok here ?
 	if (fResizable)
 		AutoResize(false);
@@ -3551,8 +3552,10 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	}
 
 	long maxLine = fLines->NumLines() - 1;
-	startLine = (startLine < 0) ? 0 : startLine;
-	endLine = (endLine > maxLine) ? maxLine : endLine;
+	if (startLine < 0)
+		startLine = 0;
+	if (endLine > maxLine)
+		endLine = maxLine;
 
 	// TODO: See if we can avoid this
 	if (fAlignment != B_ALIGN_LEFT)
@@ -3565,22 +3568,25 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		// erase only to the right of startOffset
 		startEraseLine++;
 		long startErase = startOffset;
-		if (startErase > line->offset) {
+		// TODO ? What is this for ?
+		/*if (startErase > line->offset) {
 			for ( ; ((*fText)[startErase] != B_SPACE) && ((*fText)[startErase] != B_TAB); startErase--) {
 				if (startErase <= line->offset)
 					break;	
 			}
 			if (startErase > line->offset)
 				startErase--;
-		}
+		}*/
 
-		eraseRect.left = PointAt(startErase).x;
-		eraseRect.top = line->origin + fTextRect.top;
+		BPoint erasePoint = PointAt(startErase);
+		eraseRect.left = erasePoint.x;
+		eraseRect.top = erasePoint.y;
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
 
 		view->FillRect(eraseRect, B_SOLID_LOW);
 
 		eraseRect = clipRect;
+		startOffset = -1;
 	}
 
 	BRegion inputRegion;
@@ -3588,9 +3594,17 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
 
 	float startLeft = fTextRect.left;
+	if (startOffset != -1)
+		startLeft = PointAt(startOffset).x;
+
 	BPoint leftTop(startLeft, line->origin);
 	for (long i = startLine; i <= endLine; i++) {
-		long length = (line + 1)->offset - line->offset;
+		long length = (line + 1)->offset;
+		if (startOffset != -1)
+			length -= startOffset;
+		else
+			length -= line->offset;
+		
 		// DrawString() chokes if you draw a newline
 		if ((*fText)[(line + 1)->offset - 1] == '\n')
 			length--;	
@@ -3617,7 +3631,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 			bool foundTab = false;
 			long tabChars = 0;
 			long numTabs = 0;
-			long offset = line->offset;
+			long offset = startOffset != -1 ? startOffset : line->offset;
 			const BFont *font = NULL;
 			const rgb_color *color = NULL;
 			int32 numChars;
@@ -3686,6 +3700,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 			}
 		}
 		line++;
+		// Set this to -1 so the next iteration will use the line offset
+		startOffset = -1;
 	}
 
 	// draw the caret/hilite the selection
