@@ -1,15 +1,24 @@
 #include "Shape.h"
 
+#include <new>
+#include <limits.h>
+
 #include "Style.h"
 #include "VectorPath.h"
 
+using std::nothrow;
+
 // constructor
-Shape::Shape(VectorPath* path, ::Style* style)
-	: fPath(path),
+Shape::Shape(::Style* style)
+	: Observable(),
+	  Referenceable(),
+	  PathContainerListener(),
+	  fPaths(new (nothrow) PathContainer()),
 	  fStyle(style)
 {
-	if (fPath)
-		fPath->Acquire();
+	if (fPaths)
+		fPaths->AddListener(this);
+
 	if (fStyle)
 		fStyle->Acquire();
 }
@@ -17,28 +26,35 @@ Shape::Shape(VectorPath* path, ::Style* style)
 // destructor
 Shape::~Shape()
 {
-	if (fPath)
-		fPath->Release();
+	fPaths->MakeEmpty();
+	fPaths->RemoveListener(this);
+	delete fPaths;
+
 	if (fStyle)
 		fStyle->Release();
 }
 
-// SetPath
+// PathAdded
 void
-Shape::SetPath(VectorPath* path)
+Shape::PathAdded(VectorPath* path)
 {
-	if (fPath == path)
-		return;
+	path->Acquire();
+}
 
-	if (fPath)
-		fPath->Release();
+// PathRemoved
+void
+Shape::PathRemoved(VectorPath* path)
+{
+	path->Release();
+}
 
-	fPath = path;
+// #pragma mark -
 
-	if (fPath)
-		fPath->Acquire();
-
-	Notify();
+// InitCheck
+status_t
+Shape::InitCheck() const
+{
+	return fPaths ? B_OK : B_NO_MEMORY;
 }
 
 // SetStyle
@@ -63,7 +79,11 @@ Shape::SetStyle(::Style* style)
 BRect
 Shape::Bounds() const
 {
-	if (fPath)
-		return fPath->Bounds();
-	return BRect(0, 0, -1, -1);
+	BRect bounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+
+	int32 count = fPaths->CountPaths();
+	for (int32 i = 0; i < count; i++)
+		bounds = bounds | fPaths->PathAtFast(i)->Bounds();
+
+	return bounds;
 }

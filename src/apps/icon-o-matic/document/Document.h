@@ -16,6 +16,7 @@
 struct entry_ref;
 
 class CommandStack;
+class Icon;
 class Selection;
 
 class Document : public RWLocker {
@@ -23,20 +24,24 @@ class Document : public RWLocker {
 								Document(const char* name = NULL);
 	virtual						~Document();
 
-			::CommandStack*		CommandStack() const
+	inline	::CommandStack*		CommandStack() const
 									{ return fCommandStack; }
 
-			::Selection*		Selection() const
+	inline	::Selection*		Selection() const
 									{ return fSelection; }
 
 			void				SetName(const char* name);
 			const char*			Name() const;
 
 			void				SetRef(const entry_ref& ref);
-			const entry_ref*	Ref() const
+	inline	const entry_ref*	Ref() const
 									{ return fRef; }
 
+	inline	::Icon*				Icon() const
+									{ return fIcon; }
+
  private:
+			::Icon*				fIcon;
 			::CommandStack*		fCommandStack;
 			::Selection*		fSelection;
 

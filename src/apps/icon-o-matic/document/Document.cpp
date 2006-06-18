@@ -13,6 +13,7 @@
 #include <Entry.h>
 
 #include "CommandStack.h"
+#include "Icon.h"
 #include "Selection.h"
 
 using std::nothrow;
@@ -20,6 +21,7 @@ using std::nothrow;
 // constructor
 Document::Document(const char* name)
 	: RWLocker("document rw lock"),
+	  fIcon(new (nothrow) ::Icon()),
 	  fCommandStack(new (nothrow) ::CommandStack()),
 	  fSelection(new (nothrow) ::Selection()),
 

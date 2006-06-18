@@ -33,6 +33,8 @@ UseLibraryHeaders agg ;
 Application Icon-O-Matic :
 	#document
 	Document.cpp
+	Icon.cpp
+	IconRenderer.cpp
 	#generic/command
 	Command.cpp
 	CommandStack.cpp
@@ -58,8 +60,10 @@ Application Icon-O-Matic :
 	Style.cpp
 	StyleManager.cpp
 	#shape
+	PathContainer.cpp
 	PathManipulator.cpp
 	Shape.cpp
+	ShapeContainer.cpp
 	VectorPath.cpp
 	#shape/commands
 	AddPointCommand.cpp

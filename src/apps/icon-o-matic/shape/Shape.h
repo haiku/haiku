@@ -4,19 +4,27 @@
 #include <Rect.h>
 
 #include "Observable.h"
+#include "PathContainer.h"
+#include "Referenceable.h"
 
 class Style;
-class VectorPath;
 
-class Shape : public Observable {
+class Shape : public Observable,
+			  public Referenceable,
+			  public PathContainerListener {
  public:
-								Shape(VectorPath* path,
-									  ::Style* style);
+								Shape(::Style* style);
 	virtual						~Shape();
 
-			void				SetPath(VectorPath* path);
-	inline	VectorPath*			Path() const
-									{ return fPath; }
+	// PathContainerListener interface
+	virtual	void				PathAdded(VectorPath* path);
+	virtual	void				PathRemoved(VectorPath* path);
+
+	// Shape
+			status_t			InitCheck() const;
+
+	inline	PathContainer*		Paths() const
+									{ return fPaths; }
 
 			void				SetStyle(::Style* style);
 	inline	::Style*			Style() const
@@ -25,7 +33,7 @@ class Shape : public Observable {
 			BRect				Bounds() const;
 
  private:
-			VectorPath*			fPath;
+			PathContainer*		fPaths;
 			::Style*			fStyle;
 };
 

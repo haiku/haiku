@@ -26,10 +26,16 @@ StyleManagerListener::~StyleManagerListener()
 }
 
 
+// init global StyleManager instance
+StyleManager
+StyleManager::fDefaultInstance;
+
 
 // constructor
 StyleManager::StyleManager()
-	: RWLocker()
+	: RWLocker(),
+	  fStyles(32),
+	  fListeners(2)
 {
 }
 
@@ -154,6 +160,12 @@ bool
 StyleManager::RemoveListener(StyleManagerListener* listener)
 {
 	return fListeners.RemoveItem(listener);
+}
+
+StyleManager*
+StyleManager::Default()
+{
+	return &fDefaultInstance;
 }
 
 // #pragma mark -

@@ -46,6 +46,8 @@ class StyleManager : public RWLocker {
 			bool				AddListener(StyleManagerListener* listener);
 			bool				RemoveListener(StyleManagerListener* listener);
 
+	static	StyleManager*		Default();
+
  private:
 			void				_StateChanged();
 			void				_MakeEmpty();
@@ -55,6 +57,8 @@ class StyleManager : public RWLocker {
 
 			BList				fStyles;
 			BList				fListeners;
+
+	static	StyleManager		fDefaultInstance;
 };
 
 #endif // STYLE_MANAGER_H
