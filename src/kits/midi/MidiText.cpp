@@ -1,186 +1,165 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
- * Copyright (c) 2002 Jerome Leveque
- * Copyright (c) 2002 Paul Stadler
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		Jérôme Leveque
+ *		Matthijs Hollemans
+ * 		Paul Stadler
  */
 
 #include <stdio.h>
+#include <MidiText.h>
 
 #include "debug.h"
-#include "MidiText.h"
 
-//------------------------------------------------------------------------------
 
 BMidiText::BMidiText()
 {
-	startTime = 0;
+	fStartTime = 0;
 }
 
-//------------------------------------------------------------------------------
 
 BMidiText::~BMidiText()
 {
 	// do nothing
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::NoteOff(
+void 
+BMidiText::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"B_NOTE OFF; channel = %d, note = %d, velocity = %d\n",
 		channel, note, velocity);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::NoteOn(
+void 
+BMidiText::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"B_NOTE ON; channel = %d, note = %d, velocity = %d\n",
 		channel, note, velocity);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::KeyPressure(
+void 
+BMidiText::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"KEY PRESSURE; channel = %d, note = %d, pressure = %d\n",
 		channel, note, pressure);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::ControlChange(
+void 
+BMidiText::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"CONTROL CHANGE; channel = %d, control = %d, value = %d\n",
 		channel, controlNumber, controlValue);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::ProgramChange(
+void 
+BMidiText::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"PROGRAM CHANGE; channel = %d, program = %d\n",
 		channel, programNumber);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+void 
+BMidiText::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"CHANNEL PRESSURE; channel = %d, pressure = %d\n",
 		channel, pressure);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+void 
+BMidiText::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"PITCH BEND; channel = %d, lsb = %d, msb = %d\n",
 		channel, lsb, msb);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::SystemExclusive(void* data, size_t length, uint32 time)
+void 
+BMidiText::SystemExclusive(void* data, size_t length, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 
 	printf("SYSTEM EXCLUSIVE;\n");
 	for (size_t t = 0; t < length; ++t) 
-	{
 		printf("%02X ", ((uint8*) data)[t]);
-	}
 	printf("\n");
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::SystemCommon(
+void 
+BMidiText::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf(
 		"SYSTEM COMMON; status = %d, data1 = %d, data2 = %d\n",
 		status, data1, data2);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::SystemRealTime(uchar status, uint32 time)
+void 
+BMidiText::SystemRealTime(uchar status, uint32 time)
 {
-	WaitAndPrint(time);
+	_WaitAndPrint(time);
 	printf("SYSTEM REAL TIME; status = %d\n", status);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::ResetTimer(bool start)
+void 
+BMidiText::ResetTimer(bool start)
 {
-	startTime = start ? B_NOW : 0;
+	fStartTime = start ? B_NOW : 0;
 }
 
-//------------------------------------------------------------------------------
 
 void BMidiText::_ReservedMidiText1() { }
 void BMidiText::_ReservedMidiText2() { }
 void BMidiText::_ReservedMidiText3() { }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::Run()
+void 
+BMidiText::Run()
 {
 	while (KeepRunning())
-	{
 		snooze(50000);
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiText::WaitAndPrint(uint32 time) 
+void 
+BMidiText::_WaitAndPrint(uint32 time) 
 {
-	if (startTime == 0) { startTime = time;	}
+	if (fStartTime == 0) 
+		fStartTime = time;
 
 	SnoozeUntil(time);
 
-	printf("%lu: ", time - startTime);	
+	printf("%lu: ", time - fStartTime);	
 }
 
-//------------------------------------------------------------------------------

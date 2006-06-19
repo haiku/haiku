@@ -53,9 +53,9 @@ private:
 
 	virtual void Run();
 
-	void WaitAndPrint(uint32 time);
+	void _WaitAndPrint(uint32 time);
 
-	uint32 startTime;
+	uint32 fStartTime;
 	uint32 _reserved[4];
 };
 

@@ -88,8 +88,8 @@ private:
 	BSoftSynth();
 	~BSoftSynth();
 
-	void Init();
-	void Done();
+	void _Init();
+	void _Done();
 	static void PlayBuffer(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
 	
 	bool fInitCheck;

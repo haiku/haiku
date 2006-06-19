@@ -95,11 +95,11 @@ private:
 	virtual void _ReservedSynth3();
 	virtual void _ReservedSynth4();
 
-	void Init();
+	void _Init();
 	
-	BPrivate::BSoftSynth* synth;
-	synth_mode synthMode;
-	int32 clientCount;
+	BPrivate::BSoftSynth* fSynth;
+	synth_mode fSynthMode;
+	int32 fClientCount;
 
 	uint32 _reserved[10];
 };

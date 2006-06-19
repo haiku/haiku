@@ -80,9 +80,9 @@ private:
 
 	virtual void Run();
 
-	bigtime_t creationTime;
-	int16 transpose;
-	bool inputEnabled;
+	bigtime_t fCreationTime;
+	int16 fTranspose;
+	bool fInputEnabled;
 };
 
 #endif // _MIDI_SYNTH_H

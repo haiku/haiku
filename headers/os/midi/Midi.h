@@ -109,12 +109,12 @@ private:
 
 	virtual void Run();
 
-	BMidiLocalProducer* producer;
-	BMidiLocalConsumer* consumer;
+	BMidiLocalProducer* fProducer;
+	BMidiLocalConsumer* fConsumer;
 
-	BList* connections;
-	volatile thread_id threadId;
-	volatile bool isRunning;
+	BList* fConnections;
+	volatile thread_id fThreadId;
+	volatile bool fIsRunning;
 
 	uint32 _reserved2[5];
 };

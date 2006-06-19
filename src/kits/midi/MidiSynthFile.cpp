@@ -1,69 +1,49 @@
 /*
- * Copyright (c) 2002-2004 Matthijs Hollemans
- * Copyright (c) 2003 Jerome Leveque
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		
+ *		Matthijs Hollemans
+ *		Jérôme Leveque
  */
 
 #include "debug.h"
-#include "MidiStore.h"
-#include "MidiSynthFile.h"
+#include <MidiStore.h>
+#include <MidiSynthFile.h>
 #include "SoftSynth.h"
 
 using namespace BPrivate;
 
-// -----------------------------------------------------------------------------
 
 BMidiSynthFile::BMidiSynthFile()
 {
-	store = new BMidiStore();
+	fStore = new BMidiStore();
 }
 
-// -----------------------------------------------------------------------------
 
 BMidiSynthFile::~BMidiSynthFile()
 {
 	Stop();
-	delete store;
+	delete fStore;
 }
 
-// -----------------------------------------------------------------------------
 
-status_t BMidiSynthFile::LoadFile(const entry_ref* midi_entry_ref)
+status_t 
+BMidiSynthFile::LoadFile(const entry_ref* midi_entry_ref)
 {
 	if (midi_entry_ref == NULL)
-	{
 		return B_BAD_VALUE;
-	}
 
 	EnableInput(true, false);
-	store->finished = true;
+	fStore->fFinished = true;
 
-	status_t err = store->Import(midi_entry_ref);
+	status_t err = fStore->Import(midi_entry_ref);
 
-	if (err == B_OK)
-	{
-		for (int t = 0; t < 128; ++t)
-		{
-			if (store->instruments[t])
-			{
-				be_synth->synth->LoadInstrument(t);
+	if (err == B_OK) {
+		for (int t = 0; t < 128; ++t) {
+			if (fStore->fInstruments[t]) {
+				be_synth->fSynth->LoadInstrument(t);
 			}
 		}
 	}
@@ -71,84 +51,82 @@ status_t BMidiSynthFile::LoadFile(const entry_ref* midi_entry_ref)
 	return err;
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::UnloadFile(void)
+void 
+BMidiSynthFile::UnloadFile(void)
 {
-	delete store;
-	store = new BMidiStore();
+	delete fStore;
+	fStore = new BMidiStore();
 }
 
-// -----------------------------------------------------------------------------
 
-status_t BMidiSynthFile::Start(void)
+status_t 
+BMidiSynthFile::Start(void)
 {
-	store->Connect(this);
-	store->SetCurrentEvent(0);
-	return store->Start();
+	fStore->Connect(this);
+	fStore->SetCurrentEvent(0);
+	return fStore->Start();
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::Stop(void)
+void 
+BMidiSynthFile::Stop(void)
 {
-	store->Stop();
-	store->Disconnect(this);
+	fStore->Stop();
+	fStore->Disconnect(this);
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::Fade(void)
+void 
+BMidiSynthFile::Fade(void)
 {
 	Stop();  // really quick fade :P
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::Pause(void)
+void 
+BMidiSynthFile::Pause(void)
 {
-	store->paused = true;
+	fStore->fPaused = true;
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::Resume(void)
+void 
+BMidiSynthFile::Resume(void)
 {
-	store->paused = false;
+	fStore->fPaused = false;
 }
 
-// -----------------------------------------------------------------------------
 
-int32 BMidiSynthFile::Duration(void) const
+int32 
+BMidiSynthFile::Duration(void) const
 {
-	return store->DeltaOfEvent(store->CountEvents());
+	return fStore->DeltaOfEvent(fStore->CountEvents());
 }
 
-// -----------------------------------------------------------------------------
 
-int32 BMidiSynthFile::Position(int32 ticks) const
+int32 
+BMidiSynthFile::Position(int32 ticks) const
 {
-	return store->EventAtDelta(ticks);
+	return fStore->EventAtDelta(ticks);
 }
 
-// -----------------------------------------------------------------------------
 
-int32 BMidiSynthFile::Seek()
+int32 
+BMidiSynthFile::Seek()
 {
-	return store->CurrentEvent();
+	return fStore->CurrentEvent();
 }
 
-// -----------------------------------------------------------------------------
 
-status_t BMidiSynthFile::GetPatches(
+status_t 
+BMidiSynthFile::GetPatches(
 	int16* pArray768, int16* pReturnedCount) const
 {
 	int16 count = 0;
 	
-	for (int t = 0; t < 128; ++t)
-	{
-		if (store->instruments[t])
-		{
+	for (int t = 0; t < 128; ++t) {
+		if (fStore->fInstruments[t]) {
 			pArray768[count++] = t;
 		}
 	}
@@ -157,81 +135,79 @@ status_t BMidiSynthFile::GetPatches(
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::SetFileHook(synth_file_hook pSongHook, int32 arg)
+void 
+BMidiSynthFile::SetFileHook(synth_file_hook pSongHook, int32 arg)
 {
-	store->hookFunc = pSongHook;
-	store->hookArg = arg;
+	fStore->fHookFunc = pSongHook;
+	fStore->fHookArg = arg;
 }
 
-// -----------------------------------------------------------------------------
 
-bool BMidiSynthFile::IsFinished(void) const
+bool 
+BMidiSynthFile::IsFinished() const
 {
-	return store->finished;
+	return fStore->fFinished;
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::ScaleTempoBy(double tempoFactor)
+void 
+BMidiSynthFile::ScaleTempoBy(double tempoFactor)
 {
-	store->SetTempo((int32) (Tempo() * tempoFactor));
+	fStore->SetTempo((int32) (Tempo() * tempoFactor));
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::SetTempo(int32 newTempoBPM)
+void 
+BMidiSynthFile::SetTempo(int32 newTempoBPM)
 {
-	store->SetTempo(newTempoBPM);
+	fStore->SetTempo(newTempoBPM);
 }
 
-// -----------------------------------------------------------------------------
 
-int32 BMidiSynthFile::Tempo(void) const
+int32 
+BMidiSynthFile::Tempo(void) const
 {
-	return store->Tempo();
+	return fStore->Tempo();
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::EnableLooping(bool loop)
+void 
+BMidiSynthFile::EnableLooping(bool loop)
 {
-	store->looping = loop;
+	fStore->fLooping = loop;
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::MuteTrack(int16 track, bool do_mute)
+void 
+BMidiSynthFile::MuteTrack(int16 track, bool do_mute)
 {
 	fprintf(stderr, "[midi] MuteTrack is broken; don't use it\n");
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::GetMuteMap(char* pTracks) const
+void 
+BMidiSynthFile::GetMuteMap(char* pTracks) const
 {
 	fprintf(stderr, "[midi] GetMuteMap is broken; don't use it\n");
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::SoloTrack(int16 track, bool do_solo)
+void 
+BMidiSynthFile::SoloTrack(int16 track, bool do_solo)
 {
 	fprintf(stderr, "[midi] SoloTrack is broken; don't use it\n");
 }
 
-// -----------------------------------------------------------------------------
 
-void BMidiSynthFile::GetSoloMap(char* pTracks) const
+void 
+BMidiSynthFile::GetSoloMap(char* pTracks) const
 {
 	fprintf(stderr, "[midi] GetSoloMap is broken; don't use it\n");
 }
 
-// -----------------------------------------------------------------------------
 
 void BMidiSynthFile::_ReservedMidiSynthFile1() { }
 void BMidiSynthFile::_ReservedMidiSynthFile2() { }
 void BMidiSynthFile::_ReservedMidiSynthFile3() { }
 
-// -----------------------------------------------------------------------------

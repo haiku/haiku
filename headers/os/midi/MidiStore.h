@@ -85,12 +85,12 @@ private:
 	uint32 TicksToMilliseconds(uint32 ticks) const;
 	uint32 MillisecondsToTicks(uint32 ms) const;
 
-	BList* events;
-	int32 currentEvent;
-	uint32 startTime;
-	int32 beatsPerMinute;
-	int16 ticksPerBeat;
-	bool needsSorting;
+	BList* fEvents;
+	int32 fCurrentEvent;
+	uint32 fStartTime;
+	int32 fBeatsPerMinute;
+	int16 fTicksPerBeat;
+	bool fNeedsSorting;
 
 	void ReadFourCC(char* fourcc);
 	uint32 Read32Bit();
@@ -112,21 +112,21 @@ private:
 	void WriteTrack();
 	void WriteMetaEvent(BMidiEvent* event);
 
-	BFile* file;
-	uint32 byteCount;
-	uint32 totalTicks;
-	uint16 numTracks;
-	uint16 currTrack;
-	uint16 format;
+	BFile* fFile;
+	uint32 fByteCount;
+	uint32 fTotalTicks;
+	uint16 fNumTracks;
+	uint16 fCurrTrack;
+	uint16 fFormat;
 
 	uint16 _reserved1[1];
 
-	bool* instruments;
-	synth_file_hook hookFunc;
-	int32 hookArg;
-	bool looping;
-	bool paused;
-	bool finished;
+	bool* fInstruments;
+	synth_file_hook fHookFunc;
+	int32 fHookArg;
+	bool fLooping;
+	bool fPaused;
+	bool fFinished;
 	
 	uint32 _reserved2[12];
 };

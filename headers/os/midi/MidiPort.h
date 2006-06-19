@@ -75,14 +75,14 @@ private:
 	void ScanDevices();
 	void EmptyDeviceList();
 
-	BMidiLocalProducer* localSource;
-	BMidiLocalConsumer* localSink;
-	BMidiProducer* remoteSource;
-	BMidiConsumer* remoteSink;
+	BMidiLocalProducer* fLocalSource;
+	BMidiLocalConsumer* fLocalSink;
+	BMidiProducer* fRemoteSource;
+	BMidiConsumer* fRemoteSink;
 		
-	char* portName;
-	status_t status;
-	BList* devices;
+	char* fPortName;
+	status_t fStatus;
+	BList* fDevices;
 
 	uint32 _reserved[1];
 };

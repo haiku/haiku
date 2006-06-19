@@ -1,354 +1,303 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
- * Copyright (c) 2002 Jerome Leveque
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		
+ *		Matthijs Hollemans
+ *		Jérôme Leveque
  */
 
+#include <MidiPort.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
 #include <stdlib.h>
 
 #include "debug.h"
-#include "MidiPort.h"
 #include "MidiGlue.h"
 
 using namespace BPrivate;
 
-//------------------------------------------------------------------------------
 
 BMidiPort::BMidiPort(const char* name)
 {
-	portName = NULL;
-	devices  = new BList;
-	status   = B_ERROR;
+	fPortName = NULL;
+	fDevices  = new BList;
+	fStatus   = B_ERROR;
 
-	localSource = new BMidiLocalProducer("MidiPortGlue(out)");
-	localSink   = new BMidiPortGlue(this, "MidiPortGlue(in)");
+	fLocalSource = new BMidiLocalProducer("MidiPortGlue(out)");
+	fLocalSink   = new BMidiPortGlue(this, "MidiPortGlue(in)");
 
-	remoteSource = NULL;
-	remoteSink   = NULL;
+	fRemoteSource = NULL;
+	fRemoteSink   = NULL;
 
 	ScanDevices();
 
 	if (name != NULL)
-	{
 		Open(name);
-	}
 }
 
-//------------------------------------------------------------------------------
 
 BMidiPort::~BMidiPort()
 {
 	Close();
 
 	EmptyDeviceList();
-	delete devices;
+	delete fDevices;
 
-	localSource->Release();
-	localSink->Release();
+	fLocalSource->Release();
+	fLocalSink->Release();
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiPort::InitCheck() const
+status_t 
+BMidiPort::InitCheck() const
 {
-	return status;
+	return fStatus;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiPort::Open(const char* name)
+status_t 
+BMidiPort::Open(const char* name)
 {
-	status = B_ERROR;
+	fStatus = B_ERROR;
 
-	if (name != NULL)
-	{
+	if (name != NULL) {
 		Close();
 
-		for (int32 t = 0; t < devices->CountItems(); ++t)
-		{
-			BMidiEndpoint* endp = (BMidiEndpoint*) devices->ItemAt(t);
-			if (strcmp(name, endp->Name()) == 0)
-			{
-				if (endp->IsValid())  // still exists?
-				{
-					if (endp->IsProducer())
-					{
-						if (remoteSource == NULL)
-						{
-							remoteSource = (BMidiProducer*) endp;
-						}
-					}
-					else if (endp->IsConsumer())
-					{
-						if (remoteSink == NULL)
-						{
-							remoteSink = (BMidiConsumer*) endp;
-							localSource->Connect(remoteSink);
-						}
-					}
+		for (int32 t = 0; t < fDevices->CountItems(); ++t) {
+			BMidiEndpoint* endp = (BMidiEndpoint*) fDevices->ItemAt(t);
+			if (strcmp(name, endp->Name()) != 0)
+				continue;
+			if (!endp->IsValid())  // still exists?
+				continue;
+			if (endp->IsProducer()) {
+				if (fRemoteSource == NULL)
+					fRemoteSource = (BMidiProducer*) endp;
+			} else {
+				if (fRemoteSink == NULL) {
+					fRemoteSink = (BMidiConsumer*) endp;
+					fLocalSource->Connect(fRemoteSink);
 				}
 			}
 		}
 
-		if (remoteSource != NULL)
-		{
-			portName = strdup(remoteSource->Name());
-			status = B_OK;
-		}
-		else if (remoteSink != NULL)
-		{
-			portName = strdup(remoteSink->Name());
-			status = B_OK;
+		if (fRemoteSource != NULL) {
+			fPortName = strdup(fRemoteSource->Name());
+			fStatus = B_OK;
+		} else if (fRemoteSink != NULL) {
+			fPortName = strdup(fRemoteSink->Name());
+			fStatus = B_OK;
 		}
 	}
 
-	return status;
+	return fStatus;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::Close()
+void 
+BMidiPort::Close()
 {
-	if (remoteSource != NULL)
-	{
-		remoteSource->Disconnect(localSink);
-		remoteSource = NULL;
+	if (fRemoteSource != NULL) {
+		fRemoteSource->Disconnect(fLocalSink);
+		fRemoteSource = NULL;
 	}
 
-	if (remoteSink != NULL)
-	{
-		localSource->Disconnect(remoteSink);
-		remoteSink = NULL;
+	if (fRemoteSink != NULL) {
+		fLocalSource->Disconnect(fRemoteSink);
+		fRemoteSink = NULL;
 	}
 
-	if (portName != NULL)
-	{
-		free(portName);
-		portName = NULL;
+	if (fPortName != NULL) {
+		free(fPortName);
+		fPortName = NULL;
 	}
 }
 
-//------------------------------------------------------------------------------
 
-const char* BMidiPort::PortName() const
+const char* 
+BMidiPort::PortName() const
 {
-	return portName;
+	return fPortName;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::NoteOff(
+void 
+BMidiPort::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	localSource->SprayNoteOff(channel - 1, note, velocity, MAKE_BIGTIME(time));
+	fLocalSource->SprayNoteOff(channel - 1, note, velocity, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::NoteOn(
+void 
+BMidiPort::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	localSource->SprayNoteOn(channel - 1, note, velocity, MAKE_BIGTIME(time));
+	fLocalSource->SprayNoteOn(channel - 1, note, velocity, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::KeyPressure(
+void 
+BMidiPort::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
-	localSource->SprayKeyPressure(
+	fLocalSource->SprayKeyPressure(
 		channel - 1, note, pressure, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::ControlChange(
+void 
+BMidiPort::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
-	localSource->SprayControlChange(
+	fLocalSource->SprayControlChange(
 		channel - 1, controlNumber, controlValue, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::ProgramChange(
+void 
+BMidiPort::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
-	localSource->SprayProgramChange(
+	fLocalSource->SprayProgramChange(
 		channel - 1, programNumber, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+void 
+BMidiPort::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
-	localSource->SprayChannelPressure(
+	fLocalSource->SprayChannelPressure(
 		channel - 1, pressure, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+void 
+BMidiPort::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
-	localSource->SprayPitchBend(channel - 1, lsb, msb, MAKE_BIGTIME(time));
+	fLocalSource->SprayPitchBend(channel - 1, lsb, msb, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::SystemExclusive(void* data, size_t length, uint32 time)
+void 
+BMidiPort::SystemExclusive(void* data, size_t length, uint32 time)
 {
-	localSource->SpraySystemExclusive(data, length, MAKE_BIGTIME(time));
+	fLocalSource->SpraySystemExclusive(data, length, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::SystemCommon(
+void 
+BMidiPort::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
-	localSource->SpraySystemCommon(status, data1, data2, MAKE_BIGTIME(time));
+	fLocalSource->SpraySystemCommon(status, data1, data2, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::SystemRealTime(uchar status, uint32 time)
+void 
+BMidiPort::SystemRealTime(uchar status, uint32 time)
 {
-	localSource->SpraySystemRealTime(status, MAKE_BIGTIME(time));
+	fLocalSource->SpraySystemRealTime(status, MAKE_BIGTIME(time));
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiPort::Start()
+status_t 
+BMidiPort::Start()
 {
 	status_t err = super::Start();
 
-	if ((err == B_OK) && (remoteSource != NULL))
-	{
-		return remoteSource->Connect(localSink);
+	if ((err == B_OK) && (fRemoteSource != NULL)) {
+		return fRemoteSource->Connect(fLocalSink);
 	}
 
 	return err;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::Stop()
+void 
+BMidiPort::Stop()
 {
-	if (remoteSource != NULL)
-	{
-		remoteSource->Disconnect(localSink);
+	if (fRemoteSource != NULL) {
+		fRemoteSource->Disconnect(fLocalSink);
 	}
 
 	super::Stop();
 }
 
-//------------------------------------------------------------------------------
 
-int32 BMidiPort::CountDevices()
+int32 
+BMidiPort::CountDevices()
 {
-	return devices->CountItems();
+	return fDevices->CountItems();
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiPort::GetDeviceName(int32 n, char* name, size_t bufSize)
+status_t 
+BMidiPort::GetDeviceName(int32 n, char* name, size_t bufSize)
 {
-	BMidiEndpoint* endp = (BMidiEndpoint*) devices->ItemAt(n);
+	BMidiEndpoint* endp = (BMidiEndpoint*) fDevices->ItemAt(n);
 	if (endp == NULL)
-	{
 		return B_BAD_VALUE;
-	}
 
 	size_t size = strlen(endp->Name());
 	if (size >= bufSize)
-	{
 		return B_NAME_TOO_LONG;
-	}
 
 	strcpy(name, endp->Name());
 	return B_OK;
 }
 
-//------------------------------------------------------------------------------
 
 void BMidiPort::_ReservedMidiPort1() { }
 void BMidiPort::_ReservedMidiPort2() { }
 void BMidiPort::_ReservedMidiPort3() { }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::Run()
+void 
+BMidiPort::Run()
 {
-	while (KeepRunning())
-	{
+	while (KeepRunning()) 
 		snooze(50000);
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::ScanDevices()
+void 
+BMidiPort::ScanDevices()
 {
 	EmptyDeviceList();
 
 	int32 id = 0;
 	BMidiEndpoint* endp;
 
-	while ((endp = BMidiRoster::NextEndpoint(&id)) != NULL)
-	{
+	while ((endp = BMidiRoster::NextEndpoint(&id)) != NULL) {
 		// Each hardware port has two endpoints associated with it, a consumer
 		// and a producer. Both have the same name, so we add only one of them.
 
 		bool addItem = true;
-		for (int32 t = 0; t < devices->CountItems(); ++t)
-		{
-			BMidiEndpoint* other = (BMidiEndpoint*) devices->ItemAt(t);
-			if (strcmp(endp->Name(), other->Name()) == 0)
-			{
+		for (int32 t = 0; t < fDevices->CountItems(); ++t) {
+			BMidiEndpoint* other = (BMidiEndpoint*) fDevices->ItemAt(t);
+			if (strcmp(endp->Name(), other->Name()) == 0) {
 				addItem = false;
 				break;
 			}
 		}
 
-		if (addItem)
-		{
-			devices->AddItem(endp);
-		}
-		else
-		{
+		if (addItem) {
+			fDevices->AddItem(endp);
+		} else {
 			endp->Release();
 		}
 	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiPort::EmptyDeviceList()
+void 
+BMidiPort::EmptyDeviceList()
 {
-	for (int32 t = 0; t < devices->CountItems(); ++t)
-	{
-		((BMidiEndpoint*) devices->ItemAt(t))->Release();
-	}
+	for (int32 t = 0; t < fDevices->CountItems(); ++t) 
+		((BMidiEndpoint*) fDevices->ItemAt(t))->Release();
 
-	devices->MakeEmpty();
+	fDevices->MakeEmpty();
 }
 
-//------------------------------------------------------------------------------

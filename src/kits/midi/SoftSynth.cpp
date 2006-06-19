@@ -55,7 +55,7 @@ bool
 BSoftSynth::InitCheck()
 {
 	if (!fSynth)
-		Init();
+		_Init();
 	return fInitCheck;
 }
 
@@ -63,7 +63,7 @@ BSoftSynth::InitCheck()
 void 
 BSoftSynth::Unload(void)
 {
-	Done();
+	_Done();
 	free(fInstrumentsFile);
 	fInstrumentsFile = NULL;
 }
@@ -418,12 +418,12 @@ BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
 
 
 void 
-BSoftSynth::Init()
+BSoftSynth::_Init()
 {
 	status_t err;
 	fInitCheck = false;
 	
-	Done();
+	_Done();
 
 	fSettings = new_fluid_settings();
 	fluid_settings_setnum(fSettings, "synth.sample-rate", fSampleRate);
@@ -455,7 +455,7 @@ BSoftSynth::Init()
 
 
 void 
-BSoftSynth::Done()
+BSoftSynth::_Done()
 {
 	if (fSoundPlayer) {
 		fSoundPlayer->SetHasData(false);

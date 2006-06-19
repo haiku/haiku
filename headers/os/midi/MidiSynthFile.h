@@ -57,7 +57,7 @@ private:
 	virtual void _ReservedMidiSynthFile2();
 	virtual void _ReservedMidiSynthFile3();
 
-	BMidiStore* store;
+	BMidiStore* fStore;
 	
 	int32 _reserved[3];
 };

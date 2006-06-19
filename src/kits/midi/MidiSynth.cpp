@@ -1,24 +1,11 @@
 /*
- * Copyright (c) 2002-2004 Matthijs Hollemans
- * Copyright (c) 2003 Jerome Leveque
+ * Copyright 2002-2006, Haiku.
+ * Distributed under the terms of the MIT License.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+ * Authors:
+ *		
+ *		Matthijs Hollemans
+ *		Jérôme Leveque
  */
 
 #include <MidiSynth.h>
@@ -28,240 +15,219 @@
 
 using namespace BPrivate;
 
-//------------------------------------------------------------------------------
 
 BMidiSynth::BMidiSynth()
 {
-	if (be_synth == NULL)
-	{
+	if (be_synth == NULL) {
 		new BSynth();
 	}
 
-	be_synth->clientCount++;
+	be_synth->fClientCount++;
 
-	inputEnabled = false;
-	transpose = 0;
-	creationTime = system_time();
+	fInputEnabled = false;
+	fTranspose = 0;
+	fCreationTime = system_time();
 }
 
-//------------------------------------------------------------------------------
 
 BMidiSynth::~BMidiSynth()
 {
-	be_synth->clientCount--;
+	be_synth->fClientCount--;
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiSynth::EnableInput(bool enable, bool loadInstruments)
+status_t 
+BMidiSynth::EnableInput(bool enable, bool loadInstruments)
 {
 	status_t err = B_OK;
-	inputEnabled = enable;
+	fInputEnabled = enable;
 	
 	if (loadInstruments) {
-		err = be_synth->synth->LoadAllInstruments();
+		err = be_synth->fSynth->LoadAllInstruments();
 	}
 
 	return err;
 }
 
-//------------------------------------------------------------------------------
 
-bool BMidiSynth::IsInputEnabled(void) const
+bool 
+BMidiSynth::IsInputEnabled() const
 {
-	return inputEnabled;
+	return fInputEnabled;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::SetVolume(double volume)
+void 
+BMidiSynth::SetVolume(double volume)
 {
-	be_synth->synth->SetVolume(volume);
+	be_synth->fSynth->SetVolume(volume);
 }
 
-//------------------------------------------------------------------------------
 
-double BMidiSynth::Volume(void) const
+double 
+BMidiSynth::Volume() const
 {
-	return be_synth->synth->Volume();
+	return be_synth->fSynth->Volume();
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::SetTransposition(int16 offset)
+void 
+BMidiSynth::SetTransposition(int16 offset)
 {
-	transpose = offset;
+	fTranspose = offset;
 }
 
-//------------------------------------------------------------------------------
 
-int16 BMidiSynth::Transposition(void) const
+int16 
+BMidiSynth::Transposition() const
 {
-	return transpose;
+	return fTranspose;
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::MuteChannel(int16 channel, bool do_mute)
+void 
+BMidiSynth::MuteChannel(int16 channel, bool do_mute)
 {
 	fprintf(stderr, "[midi] MuteChannel is broken; don't use it\n");
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::GetMuteMap(char* pChannels) const
+void 
+BMidiSynth::GetMuteMap(char* pChannels) const
 {
 	fprintf(stderr, "[midi] GetMuteMap is broken; don't use it\n");
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::SoloChannel(int16 channel, bool do_solo)
+void 
+BMidiSynth::SoloChannel(int16 channel, bool do_solo)
 {
 	fprintf(stderr, "[midi] SoloChannel is broken; don't use it\n");
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::GetSoloMap(char* pChannels) const
+void 
+BMidiSynth::GetSoloMap(char* pChannels) const
 {
 	fprintf(stderr, "[midi] GetSoloMap is broken; don't use it\n");
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiSynth::LoadInstrument(int16 instrument)
+status_t 
+BMidiSynth::LoadInstrument(int16 instrument)
 {
-	return be_synth->synth->LoadInstrument(instrument);
+	return be_synth->fSynth->LoadInstrument(instrument);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiSynth::UnloadInstrument(int16 instrument)
+status_t 
+BMidiSynth::UnloadInstrument(int16 instrument)
 {
-	return be_synth->synth->UnloadInstrument(instrument);
+	return be_synth->fSynth->UnloadInstrument(instrument);
 }
 
-//------------------------------------------------------------------------------
 
-status_t BMidiSynth::RemapInstrument(int16 from, int16 to)
+status_t 
+BMidiSynth::RemapInstrument(int16 from, int16 to)
 {
-	return be_synth->synth->RemapInstrument(from, to);
+	return be_synth->fSynth->RemapInstrument(from, to);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::FlushInstrumentCache(bool startStopCache)
+void 
+BMidiSynth::FlushInstrumentCache(bool startStopCache)
 {
-	be_synth->synth->FlushInstrumentCache(startStopCache);
+	be_synth->fSynth->FlushInstrumentCache(startStopCache);
 }
 
-//------------------------------------------------------------------------------
 
-uint32 BMidiSynth::Tick(void) const
+uint32 
+BMidiSynth::Tick() const
 {
-	return (uint32) (system_time() - creationTime);
+	return (uint32) (system_time() - fCreationTime);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::NoteOff(
+void 
+BMidiSynth::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->NoteOff(channel, note + transpose, velocity, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->NoteOff(channel, note + fTranspose, velocity, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::NoteOn(
+void 
+BMidiSynth::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->NoteOn(channel, note + transpose, velocity, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->NoteOn(channel, note + fTranspose, velocity, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::KeyPressure(
+void 
+BMidiSynth::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->KeyPressure(
-			channel, note + transpose, pressure, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->KeyPressure(
+			channel, note + fTranspose, pressure, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::ControlChange(
+void 
+BMidiSynth::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->ControlChange(
+	if (fInputEnabled)
+		be_synth->fSynth->ControlChange(
 			channel, controlNumber, controlValue, time);
-	}
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::ProgramChange(
+void 
+BMidiSynth::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->ProgramChange(channel, programNumber, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->ProgramChange(channel, programNumber, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+void 
+BMidiSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->ChannelPressure(channel, pressure, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->ChannelPressure(channel, pressure, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+void 
+BMidiSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->PitchBend(channel, lsb, msb, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->PitchBend(channel, lsb, msb, time);
 }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::AllNotesOff(bool justChannel, uint32 time)
+void 
+BMidiSynth::AllNotesOff(bool justChannel, uint32 time)
 {
-	if (inputEnabled)
-	{
-		be_synth->synth->AllNotesOff(justChannel, time);
-	}
+	if (fInputEnabled)
+		be_synth->fSynth->AllNotesOff(justChannel, time);
 }
 
-//------------------------------------------------------------------------------
 
 void BMidiSynth::_ReservedMidiSynth1() { }
 void BMidiSynth::_ReservedMidiSynth2() { }
 void BMidiSynth::_ReservedMidiSynth3() { }
 void BMidiSynth::_ReservedMidiSynth4() { }
 
-//------------------------------------------------------------------------------
 
-void BMidiSynth::Run()
+void 
+BMidiSynth::Run()
 {
 	// do nothing
 }
 
-//------------------------------------------------------------------------------
