@@ -151,6 +151,7 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fDesktop(app->GetDesktop()),
 	fServerApp(app),
 	fWindowLayer(NULL),
+	fWindowAddedToDesktop(false),
 
 	fClientTeam(app->ClientTeam()),
 
@@ -187,13 +188,15 @@ ServerWindow::~ServerWindow()
 {
 	STRACE(("ServerWindow(%s@%p):~ServerWindow()\n", fTitle, this));
 
-	if (!fWindowLayer->IsOffscreenWindow())
+	if (!fWindowLayer->IsOffscreenWindow()) {
+		fWindowAddedToDesktop = false;
 		fDesktop->RemoveWindow(fWindowLayer);
-
-	delete fWindowLayer;
+	}
 
 	if (App() != NULL)
 		App()->RemoveWindow(this);
+
+	delete fWindowLayer;
 
 	free(fTitle);
 	delete_port(fMessagePort);
@@ -243,8 +246,10 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 	if (!fWindowLayer)
 		return B_NO_MEMORY;
 
-	if (!fWindowLayer->IsOffscreenWindow())
+	if (!fWindowLayer->IsOffscreenWindow()) {
 		fDesktop->AddWindow(fWindowLayer);
+		fWindowAddedToDesktop = true;
+	}
 
 	return B_OK;
 }
@@ -459,10 +464,19 @@ ServerWindow::GetInfo(window_info& info)
 }
 
 
+/*!
+	Returns the ServerWindow's WindowLayer, if it exists and has been
+	added to the Desktop already.
+	In other words, you cannot assume this method will always give you
+	a valid pointer.
+*/
 WindowLayer*
 ServerWindow::Window() const
 {
 	// TODO: ensure desktop is locked!
+	if (!fWindowAddedToDesktop)
+		return NULL;
+
 	return fWindowLayer;
 }
 
@@ -833,7 +847,7 @@ fDesktop->LockSingleWindow();
 			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",
 				Title(), xResizeBy, yResizeBy));
 
-			if (Window()->IsResizing()) {
+			if (fWindowLayer->IsResizing()) {
 				// While the user resizes the window, we ignore
 				// pragmatically set window bounds
 				fLink.StartMessage(B_BUSY);
@@ -857,7 +871,7 @@ fDesktop->LockSingleWindow();
 			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",
 				Title(), xMoveBy, yMoveBy));
 
-			if (Window()->IsDragging()) {
+			if (fWindowLayer->IsDragging()) {
 				// While the user moves the window, we ignore
 				// pragmatically set window positions
 				fLink.StartMessage(B_BUSY);

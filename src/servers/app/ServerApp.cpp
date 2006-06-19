@@ -271,9 +271,9 @@ ServerApp::_HasWindowUnderMouse()
 	BAutolock locker(fWindowListLock);
 	
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* window = fWindowList.ItemAt(i);
+		ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-		if (fDesktop->ViewUnderMouse(window->Window()) != B_NULL_TOKEN)
+		if (fDesktop->ViewUnderMouse(serverWindow->Window()) != B_NULL_TOKEN)
 			return true;
 	}
 
@@ -439,7 +439,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (fWindowListLock.Lock()) {
 				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 					ServerWindow* serverWindow = fWindowList.ItemAt(i);
+
 					WindowLayer* window = serverWindow->Window();
+					if (window == NULL || window->IsOffscreenWindow())
+						continue;
 
 					if (window->Feel() == kWindowScreenFeel)
 						fDesktop->SetWindowFeel(window, B_NORMAL_WINDOW_FEEL);
@@ -2479,12 +2482,15 @@ ServerApp::InWorkspace(int32 index) const
 	// TODO: support initial application workspace!
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* window = fWindowList.ItemAt(i);
-		const WindowLayer* layer = window->Window();
+		ServerWindow* serverWindow = fWindowList.ItemAt(i);
+
+		const WindowLayer* window = serverWindow->Window();
+		if (window == NULL || window->IsOffscreenWindow())
+			continue;
 
 		// only normal and unhidden windows count
 
-		if (layer->IsNormal() && !layer->IsHidden() && layer->InWorkspace(index))
+		if (window->IsNormal() && !window->IsHidden() && window->InWorkspace(index))
 			return true;
 	}
 
@@ -2503,13 +2509,16 @@ ServerApp::Workspaces() const
 	// value everytime a window has closed or changed workspaces
 
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
-		ServerWindow* window = fWindowList.ItemAt(i);
-		const WindowLayer* layer = window->Window();
+		ServerWindow* serverWindow = fWindowList.ItemAt(i);
+
+		const WindowLayer* window = serverWindow->Window();
+		if (window == NULL || window->IsOffscreenWindow())
+			continue;
 
 		// only normal and unhidden windows count
 
-		if (layer->IsNormal() && !layer->IsHidden())
-			workspaces |= layer->Workspaces();
+		if (window->IsNormal() && !window->IsHidden())
+			workspaces |= window->Workspaces();
 	}
 
 	// TODO: add initial application workspace!

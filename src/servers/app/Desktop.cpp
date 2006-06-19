@@ -2021,7 +2021,7 @@ Desktop::SetViewUnderMouse(const WindowLayer* window, int32 viewToken)
 int32
 Desktop::ViewUnderMouse(const WindowLayer* window)
 {
-	if (fWindowUnderMouse == window)
+	if (window != NULL && fWindowUnderMouse == window)
 		return fViewUnderMouse;
 
 	return B_NULL_TOKEN;
@@ -2086,16 +2086,18 @@ Desktop::WindowAction(int32 windowToken, int32 action)
 	LockAllWindows();
 
 	::ServerWindow* serverWindow;
+	WindowLayer* window;
 	if (BPrivate::gDefaultTokens.GetToken(windowToken,
-			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK) {
+			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK
+		|| (window = serverWindow->Window()) == NULL) {
 		UnlockAllWindows();
 		return;
 	}
 
 	if (action == B_BRING_TO_FRONT
-		&& !serverWindow->Window()->IsMinimized()) {
+		&& !window->IsMinimized()) {
 		// the window is visible, we just need to make it the front window
-		ActivateWindow(serverWindow->Window());
+		ActivateWindow(window);
 	} else
 		serverWindow->NotifyMinimize(action == B_MINIMIZE_WINDOW);
 

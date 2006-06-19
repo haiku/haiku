@@ -136,6 +136,7 @@ private:
 			::Desktop*			fDesktop;
 			ServerApp*			fServerApp;
 			WindowLayer*		fWindowLayer;
+			bool				fWindowAddedToDesktop;
 
 			team_id				fClientTeam;
 
