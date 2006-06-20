@@ -30,10 +30,10 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	
 	thread = spawn_thread((thread_entry)start_routine, "pthread func", attr->sched_priority, arg);
 	if (thread < B_OK)
-		return thread;
+		return B_WOULD_BLOCK;
+		// stupid error code (EAGAIN) but demanded by POSIX
 
 	resume_thread(thread);
-
 	*_thread = thread;
 
 	return B_OK;
@@ -56,7 +56,10 @@ pthread_equal(pthread_t t1, pthread_t t2)
 int 
 pthread_join(pthread_t thread, void **value_ptr)
 {
-	return wait_for_thread(thread, (status_t *)value_ptr);
+	status_t err = wait_for_thread(thread, (status_t *)value_ptr);
+	if (err == B_BAD_THREAD_ID)
+		return ESRCH;
+	return err;
 }
 
 
@@ -70,7 +73,10 @@ pthread_exit(void *value_ptr)
 int 
 pthread_kill(pthread_t thread, int sig)
 {
-	return kill(thread, sig);
+	status_t err =  kill(thread, sig);
+	if (err == B_BAD_THREAD_ID)
+		return ESRCH;
+	return err;
 }
 
 

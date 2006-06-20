@@ -50,7 +50,7 @@ pthread_attr_getdetachstate(const pthread_attr_t *_attr, int *state)
 {
 	pthread_attr *attr;
 	
-	if (_attr == NULL || (attr = *_attr) == NULL)
+	if (_attr == NULL || (attr = *_attr) == NULL || state == NULL)
 		return B_BAD_VALUE;
 
 	*state = attr->detach_state;
