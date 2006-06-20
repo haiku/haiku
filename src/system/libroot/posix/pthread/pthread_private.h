@@ -25,4 +25,9 @@ typedef struct _pthread_mutex {
 	pthread_mutexattr attr;
 } pthread_mutex;
 
+typedef struct _pthread_attr {
+	int32		detach_state;
+	int32		sched_priority;
+} pthread_attr;
+
 #endif	/* _PTHREAD_PRIVATE_H_ */

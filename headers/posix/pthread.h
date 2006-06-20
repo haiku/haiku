@@ -5,8 +5,9 @@
 #define _PTHREAD_H_
 
 #include <time.h>
+#include <OS.h>
 
-typedef struct  _pthread				*pthread_t;
+typedef thread_id 					pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
 typedef struct  _pthread_mutex		*pthread_mutex_t;
 typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;

@@ -3,7 +3,9 @@ SubDir HAIKU_TOP src system libroot posix pthread ;
 UsePrivateHeaders libroot ;
 
 MergeObject posix_pthread.o :
+	pthread.c
 	pthread_atfork.c
+	pthread_attr.c
 	pthread_mutex.c
 	pthread_mutexattr.c
 ;
