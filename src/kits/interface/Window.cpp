@@ -2956,6 +2956,15 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 }
 
 
+/*!
+	Handles keyboard input before it gets forwarded to the target handler.
+	This includes shortcut evaluation, keyboard navigation, etc.
+
+	\return handled if true, the event was already handled, and will not
+		be forwarded to the target handler.
+
+	TODO: must also convert the incoming key to the font encoding of the target
+*/
 bool
 BWindow::_HandleKeyDown(char key, uint32 modifiers)
 {
@@ -3033,8 +3042,10 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 				}
 			}
 
-			return true;
 		}
+
+		// we always eat the event if the command key was pressed
+		return true;
 	}
 
 	// TODO: convert keys to the encoding of the target view
