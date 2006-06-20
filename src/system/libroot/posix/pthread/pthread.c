@@ -73,3 +73,10 @@ pthread_kill(pthread_t thread, int sig)
 	return kill(thread, sig);
 }
 
+
+int 
+pthread_detach(pthread_t thread)
+{
+	return B_NOT_ALLOWED;
+}
+

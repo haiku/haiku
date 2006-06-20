@@ -6,6 +6,7 @@ MergeObject posix_pthread.o :
 	pthread.c
 	pthread_atfork.c
 	pthread_attr.c
+	pthread_key.c
 	pthread_mutex.c
 	pthread_mutexattr.c
 ;

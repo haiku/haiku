@@ -127,6 +127,12 @@ extern pthread_t pthread_self(void);
 
 extern int pthread_kill(pthread_t thread, int sig);
 
+/* thread specific data functions */
+extern int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
+extern int pthread_key_delete(pthread_key_t key);
+extern void *pthread_getspecific(pthread_key_t key);
+extern int pthread_setspecific(pthread_key_t key, const void *value);
+
 #ifdef __cplusplus
 }
 #endif
