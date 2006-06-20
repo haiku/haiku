@@ -341,8 +341,8 @@ MouseDevice::_ComputeAcceleration(const mouse_movement& movements,
 	// acceleration
 	double acceleration = 1;
 	if (fSettings.accel.accel_factor) {
-		acceleration = sqrt(deltaX * deltaX + deltaY * deltaY)
-			* (1 + fSettings.accel.accel_factor) / 131072.0;
+		acceleration = 1 + sqrt(deltaX * deltaX + deltaY * deltaY)
+			* fSettings.accel.accel_factor / 524288.0;
 	}
 
 	// make sure that we move at least one pixel (if there was a movement)
