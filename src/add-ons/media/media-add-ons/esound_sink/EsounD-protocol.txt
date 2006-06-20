@@ -1,0 +1,279 @@
+EsounD Protocol (Draft)
+Author: ymnk<ymnk@jcraft.com>
+Data: 2000-10-02
+===============
+
+Introduction
+------------
+This document describes the protocol in EsounD system.
+Unfortunately, any formal description about EsounD had not existed.
+So the author has tried to read the source code of EsounD and written this 
+document. The author is also the author of JEsd, which is a re-implementation
+of EsounD in pure Java and this document is based on his knowledge,
+which had gotten in hacking JEsd.
+
+
+Connection Setup
+----------------
+The esd will wait for the TCP connection requests from EsounD compatible 
+applications. In the default, esd will listen to the TCP port 16001.
+The client must send an initial byte of data to be authorized them-self
+and to identify the byte order to be employed.
+For authorization, client must send 'esd-key', which is a 16 byte data.
+For endian-ness, client must send a 4 byte data.
+If esd does not detect any error, '1' will be sent back and
+'0' will be sent back in error.
+
+Requests
+--------
+  lock:
+    esd-key:ESDKEY
+  w result:BOOLEAN
+
+  At first, esd will check if the client has the right to lock the device
+  by esd-key. If that client has the right to do so, esd will lock the device
+  and send back true. If not, false will be sent back
+
+  unlock:
+    esd-key:ESDKEY
+  w result:BOOLEAN
+
+  At first, esd will check if the client has the right to unlock the device
+  by esd-key. If that client has the right to do so, esd will unlock the 
+  device and send back true. If not, false will be sent back
+
+  ...
+
+
+
+Syntactic Conventions
+--------------------
+All numbers are in decimal, unless prefixed with '0x', in which case
+they are in hexadecimal(base 16).
+
+The general syntax used to describe data packets is:
+  Name:
+       encoded-form
+       ...
+       encoded-form
+
+For components described in the protocol descriptions as:
+  name: TYPE
+  w name: TYPE
+the encode-form are:
+       N  TYPE        name
+and 
+w      N  TYPE        name
+N is the number of bytes in the data stream, and TYPE is the interpretation
+of those bytes. For example,
+  result: BOOLEAN
+becomes:
+       4 BOOLEAN     result
+
+For components with a static numeric value the encode-form is:
+       N value       name 
+The value is always interpreted as a N-byte unsigned integer.
+
+
+Data Types
+----------
+  CARD8: A single byte unsigned integer.
+  CARD32: 32-bit unsigned integer
+  ARRAY8: A collection of CARD8.
+  ARRAY8(n): This is a ARRAY8, which includes 'n' elements.
+  ENDIAN: This is a ARRAY8(4), which includes 'ENDN' or 'NDNE'.
+          If the first element is 'E', data from clients is in big-endian.
+  BOOLEAN: This is a CARD32 and includes '0' or '1'. '1' means true.
+  ESDKEY: This is a ARRAY8(16), which includes 'esd-key'.
+  ESDNAME: This is a ARRAY8(128), which includes 'esd-name'.
+  ESDSTREAM: This is a infinite ARRAY8.
+  FORMAT: This is a CARD32. Each bits in this data has following semantics,
+          (format&0x000f)==0x0000  8bit data
+          (format&0x000f)==0x0001  16bit data
+          (format&0x00f0)==0x0010  mono
+          (format&0x00f0)==0x0020  stereo
+          (format&0x0f00)==0x0000  stream
+          (format&0x0f00)==0x0100  sample
+          (format&0x0f00)==0x0200  ADPCM
+          (format&0xf000)==0x1000  play
+          (format&0xf000)==0x0000  monitor for streams, stop for samples
+          (format&0xf000)==0x2000  record for streams, loop for samples
+  MODE: This is a CARD32, which is '0', '1', '2' or '3'.
+          0 ERROR
+          1 STANDBY
+          2 AUTOSTANDBY
+          3 RUNNING
+
+
+Packet Format
+-------------
+  init:
+       4  0            opcode
+      16  ESDKEY       esd-key
+       4  ENDIAN       'ENDN' or 'NDNE'
+  w    4  BOOLEAN      0 or 1
+
+  
+  lock:
+       4  1            opcode
+      16  ESDKEY       esd-key
+       4  ENDIAN       unused
+  w    4  BOOLEAN      0 or 1
+  
+  unlock:
+       4  2            opcode
+      16  ESDKEY       esd-key
+       4  ENDIAN       unused
+  w    4  BOOLEAN      0 or 1
+  
+  stream-play:
+       4  3            opcode
+       4  FORMAT       format
+       4  CARD32       rate
+     128  ESDNAME      name
+       ?  ESDSTREAM    stream of PCM sound
+  
+//stream-mon:         This protocol is not used for the remote esd.
+//     4  4           opcode 
+//     4  FORMA       format
+//     4  CARD3       rate
+//   128  ESDNAME     name
+//  w  ?  ESDSTREAM   stream of PCM sound
+  
+  stream-mon:
+       4  5            opcode
+       4  FORMAT       format
+       4  CARD32       rate
+     128  ESDNAME      name
+  w    ?  ESDSTREAM    stream of PCM sound
+  
+  sample-cache:
+       4  6            opcode
+       4  FORMAT       format
+       4  CARD32       rate
+       4  n            size
+     128  ESDNAME      name
+  w    4  CARD32       sample-id
+       n  ARRAY8(n)    stream of PCM sound
+  w    4  CARD32       sample-id
+  
+  sample-free:
+       4  7            opcode
+       4  CARD32       sample-id
+  w    4  CARD32       sample-id
+  
+  sample-play:
+       4  8            opcode
+       4  CARD32       sample-id
+  w    4  CARD32       sample-id
+  
+  sample-loop:
+       4  9            opcode
+       4  CARD32       sample-id
+  w    4  CARD32       sample-id
+  
+  sample-stop:
+       4  10           opcode
+       4  CARD32       sample-id
+  w    4  CARD32       sample-id
+  
+  sample-kill:
+       4  11           opcode
+       4  CARD32       sample-id
+  w    4  CARD32       sample-id
+  
+  standby:
+       4  12           opcode
+      16  ESDKEY       esd-key
+       4  ENDIAN       unused
+  w    4  BOOLEAN      0 or 1
+  
+  resume:
+       4  13           opcode
+      16  ESDKEY       esd-key
+       4  ENDIAN       unused
+  w    4  BOOLEAN      0 or 1
+  
+  sample-getid:
+       4  14           opcode
+     128  ESDNAME      name
+  w    4  CARD32       sample-id
+  
+  stream-filter:
+       4  15           opcode
+       4  FORMAT       format
+       4  CARD32       rate
+     128  ESDNAME      name
+  w    4  BOOLEAN      0 or 1
+  
+  server-info:
+       4  16           opcode
+  w    4  CARD32       version
+  w    4  CARD32       rate
+  w    4  FORMAT       format
+  
+  server-all-info:
+       4  17           opcode
+  w    4  CARD32       version
+  w    4  CARD32       rate
+  w    4  FORMAT       format
+  w    ?  STREAMINFO
+  w    ?  SAMPLEINFO
+
+STREAMINFO:
+  except for last in series
+  w    4  CARD32       id
+  w   16  ESDNAME      name
+  w    4  CARD32       rate
+  w    4  CARD32       left-vol-scale
+  w    4  CARD32       right-vol-scale
+  w    4  FORMAT       format
+  last in series
+  w    4  CARD32       0
+  w   32  ARRAY8(32)   unused
+
+
+SAMPLEINFO:
+  except for last in series
+  w    4  CARD32       id
+  w   16  ESDNAME      name
+  w    4  CARD32       rate
+  w    4  CARD32       left-vol-scale
+  w    4  CARD32       right-vol-scale
+  w    4  FORMAT       format
+  w    4  CARD32       sample-length
+  last in series
+  w    4  CARD32       0
+  w   36  ARRAY8(36)   unused
+
+  
+//subscribe:                        undefined
+//     4  18           opcode
+  
+//unsubjcribe:                      undefined
+//     4  19           opcode
+  
+  stream-pan:
+       4  20           opcode
+       4  CARD32       stream-id
+       4  CARD32       left-scale
+       4  CARD32       right-scale
+  w    4  BOOLEAN       0 or 1
+  
+  sample-pan:
+       4  21           opcode
+       4  CARD32       sample-id
+       4  CARD32       left-scale
+       4  CARD32       right-scale
+  w    4  BOOLEAN       0 or 1
+  
+  
+  standby-mode:
+       4  22           opcode
+       4  0            version
+  w    4  MODE         mode
+  w    4  BOOLEAN      0 or 1
+  
+  latency:
+       4  23           opcode
+  w    4  CARD32       latency

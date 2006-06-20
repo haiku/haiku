@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons esound_sink ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+}
+
+Addon ESDSink.media_addon : media :
+	ESDEndpoint.cpp
+	ESDSinkAddOn.cpp
+	ESDSinkNode.cpp
+	: false
+	: be media
+;
+
+#Package haiku-multi_audio-cvs
+#	: hmulti_audio.media_addon
+#	: boot home config add-ons media ;
+
