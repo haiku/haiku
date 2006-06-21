@@ -17,6 +17,7 @@
 #include "IconEditorApp.h"
 
 // TODO: just for testing
+#include "Gradient.h"
 #include "Icon.h"
 #include "MultipleManipulatorState.h"
 #include "PathManipulator.h"
@@ -92,6 +93,11 @@ MainWindow::_Init()
 
 	Style* style = new Style();
 	style->SetColor((rgb_color){ 255, 0, 0, 255 });
+	Gradient* gradient = new Gradient(true);
+	gradient->AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
+	gradient->AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
+	gradient->AddColor((rgb_color){ 208, 43, 92, 255 }, 1.0);
+	style->SetGradient(gradient);
 
 	StyleManager::Default()->AddStyle(style);
 

@@ -14,7 +14,10 @@
 #include <Bitmap.h>
 
 #include "agg_conv_curve.h"
+#include "agg_span_gradient.h"
+#include "agg_span_interpolator_linear.h"
 
+#include "Gradient.h"
 #include "Icon.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
@@ -43,37 +46,133 @@ class StyleHandler {
 		return style->Gradient() == NULL;
 	}
 
-	const agg::rgba8& color(unsigned styleIndex)
-    {
-		Style* style = fStyles->StyleAt(styleIndex);
-		if (!style) {
-			printf("no style at index: %d!\n", styleIndex);
-			return fTransparent;
-		}
-
-		const rgb_color& c = style->Color();
-		fColor = agg::rgba8(fGammaTable.dir(c.red),
-							fGammaTable.dir(c.green),
-							fGammaTable.dir(c.blue),
-							c.alpha);
-		fColor.premultiply();
-	    return fColor;
-    }
+	const agg::rgba8& color(unsigned styleIndex);
 
 	void generate_span(agg::rgba8* span, int x, int y,
-					   unsigned len, unsigned styleIndex)
-	{
-printf("unimplemented: generate_span(%p, %d, %d, %d)\n", span, x, y, len);
-		// TODO: render gradient of Style at styleIndex into span
-	}
+					   unsigned len, unsigned styleIndex);
 
 private:
+	template<class GradientFunction>
+	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
+						   GradientFunction function,
+						   const agg::rgba8* gradientColors,
+						   agg::trans_affine& gradientTransform);
+
 	const StyleManager*	fStyles;
 	GammaTable&			fGammaTable;
 	agg::rgba8			fTransparent;
 	agg::rgba8			fColor;
 };
 
+// color
+const agg::rgba8&
+StyleHandler::color(unsigned styleIndex)
+{
+	Style* style = fStyles->StyleAt(styleIndex);
+	if (!style) {
+		printf("no style at index: %d!\n", styleIndex);
+		return fTransparent;
+	}
+
+	const rgb_color& c = style->Color();
+	fColor = agg::rgba8(fGammaTable.dir(c.red),
+						fGammaTable.dir(c.green),
+						fGammaTable.dir(c.blue),
+						c.alpha);
+	fColor.premultiply();
+    return fColor;
+}
+
+// generate_span
+void
+StyleHandler::generate_span(agg::rgba8* span, int x, int y,
+							unsigned len, unsigned styleIndex)
+{
+	Style* style = fStyles->StyleAt(styleIndex);
+	if (!style || !style->Gradient()) {
+		printf("no style/gradient at index: %d!\n", styleIndex);
+		// TODO: memset() span?
+		return;
+	}
+
+	Gradient* gradient = style->Gradient();		
+
+	// TODO: move filling of color array elsewhere and cache result
+	// maybe in Style?
+	agg::rgba8 colors[256];
+	gradient->MakeGradient((uint32*)colors, 256);
+
+	agg::trans_affine transformation;
+		// TODO: construct the gradient transformation here
+
+	switch (gradient->Type()) {
+		case GRADIENT_LINEAR: {
+		    agg::gradient_x function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+		case GRADIENT_CIRCULAR: {
+		    agg::gradient_radial function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+		case GRADIENT_DIAMONT: {
+		    agg::gradient_diamond function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+		case GRADIENT_CONIC: {
+		    agg::gradient_conic function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+		case GRADIENT_XY: {
+		    agg::gradient_xy function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+		case GRADIENT_SQRT_XY: {
+		    agg::gradient_sqrt_xy function;
+			_GenerateGradient(span, x, y, len, function, colors,
+							  transformation);
+			break;
+		}
+	}
+}
+
+// _GenerateGradient
+template<class GradientFunction>
+void
+StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
+								GradientFunction function,
+								const agg::rgba8* gradientColors,
+								agg::trans_affine& gradientTransform)
+
+{
+	typedef agg::pod_auto_array<agg::rgba8, 256>	ColorArray;
+	typedef agg::span_interpolator_linear<>			Interpolator;
+	typedef agg::span_gradient<agg::rgba8, 
+							   Interpolator, 
+							   GradientFunction,
+							   ColorArray>			GradientGenerator;
+
+	Interpolator interpolator(gradientTransform);
+
+	ColorArray array(gradientColors);
+	GradientGenerator gradientGenerator(interpolator,
+										function,
+										array,
+										0, 100);
+
+	gradientGenerator.generate(span, x, y, len);
+}
+
+// #pragma mark -
 
 // constructor
 IconRenderer::IconRenderer(BBitmap* bitmap)
@@ -81,7 +180,7 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 	  fIcon(NULL),
 	  fStyles(StyleManager::Default()),
 
-	  fGammaTable(1.0),
+	  fGammaTable(2.2),
 
 	  fRenderingBuffer(),
 	  fPixelFormat(fRenderingBuffer),

@@ -392,9 +392,9 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 	if (index > 0) {
 		uint8* c = (uint8*)&colors[0];
 		for (int32 i = 0; i < index; i++) {
-			c[0] = from->color.blue;
+			c[0] = from->color.red;
 			c[1] = from->color.green;
-			c[2] = from->color.red;
+			c[2] = from->color.blue;
 			c[3] = from->color.alpha;
 			c += 4;
 		}
@@ -457,9 +457,9 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 				if (fInterpolation == INTERPOLATION_SMOOTH)
 					f = gauss(1.0 - f);
 				float t = 1.0 - f;
-				c[0] = (uint8)floor(from->color.blue * f + to->color.blue * t + 0.5);
+				c[0] = (uint8)floor(from->color.red * f + to->color.red * t + 0.5);
 				c[1] = (uint8)floor(from->color.green * f + to->color.green * t + 0.5);
-				c[2] = (uint8)floor(from->color.red * f + to->color.red * t + 0.5);
+				c[2] = (uint8)floor(from->color.blue * f + to->color.blue * t + 0.5);
 				c[3] = (uint8)floor(from->color.alpha * f + to->color.alpha * t + 0.5);
 				c += 4;
 			}
@@ -473,9 +473,9 @@ Gradient::MakeGradient(uint32* colors, int32 count) const
 	if (index < count) {
 		uint8* c = (uint8*)&colors[index];
 		for (int32 i = index; i < count; i++) {
-			c[0] = from->color.blue;
+			c[0] = from->color.red;
 			c[1] = from->color.green;
-			c[2] = from->color.red;
+			c[2] = from->color.blue;
 			c[3] = from->color.alpha;
 			c += 4;
 		}
