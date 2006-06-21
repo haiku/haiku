@@ -104,7 +104,7 @@ extern int    mkfifo(const char *path, mode_t mode);
 extern mode_t umask(mode_t cmask);
 
 // This achieves backwards compatibility with R5
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#if 0 //def HAIKU_TARGET_PLATFORM_HAIKU
 #define stat(fd, st) _stat(fd, st, sizeof(struct stat))
 #define fstat(fd, st) _fstat(fd, st, sizeof(struct stat))
 #define lstat(fd, st) _lstat(fd, st, sizeof(struct stat))
