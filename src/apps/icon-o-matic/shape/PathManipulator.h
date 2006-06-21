@@ -12,11 +12,11 @@
 #include "Manipulator.h"
 
 class AddPointCommand;
+class CanvasView;
 class ChangePointCommand;
 class UndoStack;
 class InsertPointCommand;
 class Selection;
-class StateView;
 class VectorPath;
 
 //class PathSelection {
@@ -122,7 +122,7 @@ class PathManipulator : public Manipulator {
 			void				_Nudge(BPoint direction);
 			void				_FinishNudging();
 
-			StateView*			fCanvasView;
+			CanvasView*			fCanvasView;
 
 			bool				fCommandDown;
 			bool				fOptionDown;

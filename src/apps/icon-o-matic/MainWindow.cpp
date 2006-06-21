@@ -17,13 +17,18 @@
 #include "IconEditorApp.h"
 
 // TODO: just for testing
+#include "Icon.h"
 #include "MultipleManipulatorState.h"
 #include "PathManipulator.h"
+#include "Shape.h"
+#include "ShapeContainer.h"
+#include "Style.h"
+#include "StyleManager.h"
 #include "VectorPath.h"
 														
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
-	: BWindow(BRect(50.0, 50.0, 689, 529), "Icon-O-Matic",
+	: BWindow(BRect(50, 50, 661, 661), "Icon-O-Matic",
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
@@ -75,12 +80,26 @@ MainWindow::_Init()
 	fCanvasView->SetCatchAllEvents(true);
 	fCanvasView->SetCommandStack(fDocument->CommandStack());
 //	fCanvasView->SetSelection(fDocument->Selection());
+	fCanvasView->SetIcon(fDocument->Icon());
 
 // TODO: for testing only:
 	MultipleManipulatorState* state = new MultipleManipulatorState(fCanvasView);
 	fCanvasView->SetState(state);
 
 	VectorPath* path = new VectorPath();
+
+	fDocument->Icon()->Paths()->AddPath(path);
+
+	Style* style = new Style();
+	style->SetColor((rgb_color){ 255, 0, 0, 255 });
+
+	StyleManager::Default()->AddStyle(style);
+
+	Shape* shape = new Shape(style);
+	shape->Paths()->AddPath(path);
+
+	fDocument->Icon()->Shapes()->AddShape(shape);
+
 	PathManipulator* pathManipulator = new PathManipulator(path);
 	state->AddManipulator(pathManipulator);
 // ----

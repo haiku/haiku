@@ -18,7 +18,7 @@
 #include "cursors.h"
 #include "support.h"
 
-#include "StateView.h"
+#include "CanvasView.h"
 #include "VectorPath.h"
 
 #include "AddPointCommand.h"
@@ -237,8 +237,10 @@ PathManipulator::~PathManipulator()
 
 class StrokePathIterator : public VectorPath::Iterator {
  public:
-					StrokePathIterator(BView* drawingView)
-						: fDrawingView(drawingView)
+					StrokePathIterator(CanvasView* canvasView,
+									   BView* drawingView)
+						: fCanvasView(canvasView),
+						  fDrawingView(drawingView)
 					{
 						fDrawingView->SetHighColor(0, 0, 0, 255);
 						fDrawingView->SetDrawingMode(B_OP_OVER);
@@ -249,26 +251,34 @@ class StrokePathIterator : public VectorPath::Iterator {
 	virtual	void	MoveTo(BPoint point)
 					{
 						fBlack = true;
+						fSkip = false;
 						fDrawingView->SetHighColor(0, 0, 0, 255);
 
-//						fCanvasView->ConvertFromCanvas(point);
+						fCanvasView->ConvertFromCanvas(&point);
 						fDrawingView->MovePenTo(point);
 					}
 	virtual	void	LineTo(BPoint point)
 					{
-						if (fBlack)
-							fDrawingView->SetHighColor(255, 255, 255, 255);
-						else
-							fDrawingView->SetHighColor(0, 0, 0, 255);
-						fBlack = !fBlack;
-
-//						fCanvasView->ConvertFromCanvas(point);
-						fDrawingView->StrokeLine(point);
+						fCanvasView->ConvertFromCanvas(&point);
+						if (!fSkip) {
+							if (fBlack)
+								fDrawingView->SetHighColor(255, 255, 255, 255);
+							else
+								fDrawingView->SetHighColor(0, 0, 0, 255);
+							fBlack = !fBlack;
+	
+							fDrawingView->StrokeLine(point);
+						} else {
+							fDrawingView->MovePenTo(point);
+						}
+						fSkip = !fSkip;
 					}
 
  private:
+	CanvasView*		fCanvasView;
 	BView*			fDrawingView;
 	bool			fBlack;
+	bool			fSkip;
 };
 
 // Draw
@@ -278,8 +288,8 @@ PathManipulator::Draw(BView* into, BRect updateRect)
 	// draw the Bezier curve, but only if editing
 	// if not "editing", the path is actually on top all other modifiers
 	// TODO: make this customizable in the GUI
-	StrokePathIterator iterator(into);
-	fPath->Iterate(&iterator, 1.0/*fCanvasView->ZoomLevel()*/);
+	StrokePathIterator iterator(fCanvasView, into);
+	fPath->Iterate(&iterator, fCanvasView->ZoomLevel());
 
 	into->SetLowColor(0, 0, 0, 255);
 	BPoint point;
@@ -294,9 +304,9 @@ PathManipulator::Draw(BView* into, BRect updateRect)
 		into->SetLowColor(normal);
 		into->SetHighColor(255, 255, 255, 255);
 		// convert to view coordinate space
-//		fCanvasView->ConvertFromCanvas(point);
-//		fCanvasView->ConvertFromCanvas(pointIn);
-//		fCanvasView->ConvertFromCanvas(pointOut);
+		fCanvasView->ConvertFromCanvas(&point);
+		fCanvasView->ConvertFromCanvas(&pointIn);
+		fCanvasView->ConvertFromCanvas(&pointOut);
 		// connect the points belonging to one control point
 		into->SetDrawingMode(B_OP_INVERT);
 		into->StrokeLine(point, pointIn);
@@ -369,8 +379,8 @@ PathManipulator::MouseDown(BPoint where)
 		fMode = TRANSLATE_POINTS;
 	}
 
-	// TODO: translate from BView to canvas space
 	BPoint canvasWhere = where;
+	fCanvasView->ConvertToCanvas(&canvasWhere);
 
 	// maybe we're changing some point, so we construct the
 	// "ChangePointCommand" here so that the point is remembered
@@ -465,8 +475,8 @@ PathManipulator::MouseDown(BPoint where)
 	// remember the subpixel position
 	// so that MouseMoved() will work even before
 	// the integer position becomes different
-//	fCanvasView->ConvertToCanvas(where);
 	fLastCanvasPos = where;
+	fCanvasView->ConvertToCanvas(&fLastCanvasPos);
 
 	// the reason to exclude the select mode
 	// is that the BView rect tracking does not
@@ -484,8 +494,8 @@ PathManipulator::MouseDown(BPoint where)
 void
 PathManipulator::MouseMoved(BPoint where)
 {
-	// TODO: translate from BView to canvas space
 	BPoint canvasWhere = where;
+	fCanvasView->ConvertToCanvas(&canvasWhere);
 
 	// since the tablet is generating mouse moved messages
 	// even if only the pressure changes (and not the actual mouse position)
@@ -626,8 +636,8 @@ PathManipulator::MouseUp()
 bool
 PathManipulator::MouseOver(BPoint where)
 {
-	// TODO: translate from BView to canvas space
 	BPoint canvasWhere = where;
+	fCanvasView->ConvertToCanvas(&canvasWhere);
 
 	// since the tablet is generating mouse moved messages
 	// even if only the pressure changes (and not the actual mouse position)
@@ -639,7 +649,7 @@ PathManipulator::MouseOver(BPoint where)
 
 	// hit testing
 	// (use a subpixel mouse pos)
-//		fCanvasView->ConvertToCanvas(where);
+	fCanvasView->ConvertToCanvas(&where);
 	_SetModeForMousePos(where);
 
 	// TODO: always true?
@@ -657,7 +667,9 @@ PathManipulator::DoubleClicked(BPoint where)
 BRect
 PathManipulator::Bounds()
 {
-	return _ControlPointRect();
+	BRect r = _ControlPointRect();
+	fCanvasView->ConvertFromCanvas(&r);
+	return r;
 }
 
 // TrackingBounds
@@ -736,8 +748,8 @@ PathManipulator::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 	bool result = true;
 
 	float nudgeDist = 1.0;
-//	if (modifiers & B_SHIFT_KEY)
-//		nudgeDist /= fCanvasView->ZoomLevel();
+	if (modifiers & B_SHIFT_KEY)
+		nudgeDist /= fCanvasView->ZoomLevel();
 
 	switch (key) {
 		// commit
@@ -859,7 +871,7 @@ PathManipulator::UpdateCursor()
 void
 PathManipulator::AttachedToView(BView* view)
 {
-	fCanvasView = dynamic_cast<StateView*>(view);
+	fCanvasView = dynamic_cast<CanvasView*>(view);
 }
 
 // DetachedFromView
@@ -1199,7 +1211,8 @@ PathManipulator::_IsSelected(int32 index) const
 void
 PathManipulator::_InvalidateCanvas(BRect rect) const
 {
-	// TODO: convert from canvas to view space
+	// convert from canvas to view space
+	fCanvasView->ConvertFromCanvas(&rect);
 	fCanvasView->Invalidate(rect);
 }
 
@@ -1283,7 +1296,7 @@ PathManipulator::_SetModeForMousePos(BPoint where)
 	uint32 mode = UNDEFINED;
 	int32 index = -1;
 
-	float zoomLevel = 1.0;//fCanvasView->ZoomLevel();
+	float zoomLevel = fCanvasView->ZoomLevel();
 
 	// see if we're close enough at a control point
 	BPoint point;
