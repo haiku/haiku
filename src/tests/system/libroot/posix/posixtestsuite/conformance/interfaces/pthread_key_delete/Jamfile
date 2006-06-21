@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_key_delete ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
+
+SimpleTest pthread_key_delete_1-1 : 1-1.c ;
+SimpleTest pthread_key_delete_1-2 : 1-2.c ;
+SimpleTest pthread_key_delete_2-1 : 2-1.c ;
+

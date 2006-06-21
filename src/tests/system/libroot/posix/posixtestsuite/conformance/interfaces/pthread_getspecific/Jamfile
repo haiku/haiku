@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_getspecific ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
+
+SimpleTest pthread_getspecific_1-1 : 1-1.c ;
+SimpleTest pthread_getspecific_3-1 : 3-1.c ;
+

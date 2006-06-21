@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_key_create ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
+
+SimpleTest pthread_key_create_1-1 : 1-1.c ;
+SimpleTest pthread_key_create_1-2 : 1-2.c ;
+SimpleTest pthread_key_create_2-1 : 2-1.c ;
+SimpleTest pthread_key_create_3-1 : 3-1.c ;
+
