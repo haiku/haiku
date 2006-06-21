@@ -689,6 +689,7 @@ VectorPath::Iterate(Iterator* iterator, float smoothScale) const
 		// generate a curve for each segment of the path
 		// then	iterate over the segments of the curve
 		agg::curve4_inc curve;
+		curve.approximation_scale(smoothScale);
 
 		for (int32 i = 0; i < fPointCount - 1; i++) {
 iterator->MoveTo(fPath[i].point);
