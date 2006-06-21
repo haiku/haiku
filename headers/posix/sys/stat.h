@@ -1,11 +1,13 @@
+/*
+ * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYS_STAT_H_
 #define _SYS_STAT_H_
 
+
 #include <sys/types.h>
 
-/*
- * stat structure
- */
 
 struct stat {
 	dev_t			st_dev;			/* "device" that this file resides on */
@@ -22,8 +24,10 @@ struct stat {
 	time_t			st_ctime;		/* last change time, not creation time */
 	time_t			st_crtime;		/* creation time */
 
-	// OpenBeOS extensions:
-	// ToDo: we might also define special types for files and TTYs
+	// Haiku extensions:
+	// TODO: we might also define special types for files and TTYs
+	// TODO: we should find another solution for this, as BStatable::GetStat()
+	//		can only retrieve the R5 stat structure
 	unsigned int	st_type;		/* attribute/index type */
 };
 
@@ -53,13 +57,13 @@ struct stat {
 #define S_IFCHR 			00000020000 /* character special */
 #define S_IFIFO 			00000010000 /* fifo */
 
-#define S_ISREG(m)		(((m) & S_IFMT) == S_IFREG)
-#define S_ISLNK(m)		(((m) & S_IFMT) == S_IFLNK)
-#define S_ISBLK(m)		(((m) & S_IFMT) == S_IFBLK)
-#define S_ISDIR(m)		(((m) & S_IFMT) == S_IFDIR)
-#define S_ISCHR(m)		(((m) & S_IFMT) == S_IFCHR)
-#define S_ISFIFO(m)		(((m) & S_IFMT) == S_IFIFO)
-#define S_ISINDEX(m)	(((m) & S_INDEX_DIR) == S_INDEX_DIR)
+#define S_ISREG(mode)		(((mode) & S_IFMT) == S_IFREG)
+#define S_ISLNK(mode)		(((mode) & S_IFMT) == S_IFLNK)
+#define S_ISBLK(mode)		(((mode) & S_IFMT) == S_IFBLK)
+#define S_ISDIR(mode)		(((mode) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(mode)		(((mode) & S_IFMT) == S_IFCHR)
+#define S_ISFIFO(mode)		(((mode) & S_IFMT) == S_IFIFO)
+#define S_ISINDEX(mode)		(((mode) & S_INDEX_DIR) == S_INDEX_DIR)
 
 #define	S_IUMSK 07777		/* user settable bits */
 
@@ -81,12 +85,10 @@ struct stat {
 #define S_IWOTH 00002       /* write permission: other */
 #define S_IXOTH 00001       /* execute permission: other */
 
-/** @def ACCESSPERMS 00777 */
 #define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO)
-/** @def ALLPERMS    07777 */
-#define ALLPERMS    (S_ISUID|S_ISGID|S_ISTXT|S_IRWXU|S_IRWXG|S_IRWXO)
-/** @def DEFFILEMODE 00666 default file mode, everyone can read/write*/
-#define	DEFFILEMODE	(S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+#define ALLPERMS    (S_ISUID | S_ISGID | S_ISTXT | S_IRWXU | S_IRWXG | S_IRWXO)
+#define	DEFFILEMODE	(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
+	/* default file mode, everyone can read/write */
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,7 +104,7 @@ extern int    mkfifo(const char *path, mode_t mode);
 extern mode_t umask(mode_t cmask);
 
 // This achieves backwards compatibility with R5
-#if 0
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #define stat(fd, st) _stat(fd, st, sizeof(struct stat))
 #define fstat(fd, st) _fstat(fd, st, sizeof(struct stat))
 #define lstat(fd, st) _lstat(fd, st, sizeof(struct stat))
@@ -117,4 +119,4 @@ extern int    lstat(const char *path, struct stat *st);
 }
 #endif
 
-#endif /* _SYS_STAT_H_ */
+#endif	/* _SYS_STAT_H_ */

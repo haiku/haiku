@@ -1,11 +1,12 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
+
+#include <syscalls.h>
 
 #include <sys/stat.h>
-#include <syscalls.h>
 #include <errno.h>
 
 
@@ -18,7 +19,6 @@
 
 
 // R5 compatibility
-
 #define R5_STAT_SIZE 60
 #undef stat
 #undef fstat

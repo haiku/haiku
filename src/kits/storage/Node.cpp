@@ -1,34 +1,39 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//----------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
+
 /*!
 	\file Node.cpp
 	BNode implementation.
 */
 
-#include <errno.h>
-#include <fcntl.h>
-#include <fs_attr.h> // for struct attr_info
-#include <new>
-#include <string.h>
-#include <unistd.h>
+#include "storage_support.h"
 
 #include <Directory.h>
 #include <Entry.h>
+#include <fs_attr.h>
 #include <Node.h>
 #include <String.h>
 #include <TypeConstants.h>
 
 #include <syscalls.h>
 
-#include "storage_support.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <new>
+#include <string.h>
+#include <unistd.h>
 
-//----------------------------------------------------------------------
-// node_ref
-//----------------------------------------------------------------------
 
-// constructor
+//	#pragma mark - node_ref
+
+
 /*! \brief Creates an uninitialized node_ref object.
 */
 node_ref::node_ref()
@@ -84,7 +89,7 @@ node_ref::operator=(const node_ref &ref)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BNode
 
 
 /*!	\brief Creates an uninitialized BNode object
@@ -196,7 +201,7 @@ BNode::GetStat(struct stat *st) const
 {
 	return fCStatus != B_OK
 		? fCStatus
-		: _kern_read_stat(fFd, NULL, false, st, sizeof(struct stat));
+		: _kern_read_stat(fFd, NULL, false, st, R5_STAT_SIZE);
 }
 
 

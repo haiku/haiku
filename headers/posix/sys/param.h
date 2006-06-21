@@ -7,7 +7,7 @@
 #include <limits.h>
 
 #define MAXPATHLEN      PATH_MAX
-#define MAXSYMLINKS		SYMLINKS_MAX
+#define MAXSYMLINKS		SYMLOOP_MAX
 
 #define NOFILE          OPEN_MAX
 

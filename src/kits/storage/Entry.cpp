@@ -1,17 +1,17 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2006, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
+
 /*!
 	\file Entry.cpp
 	BEntry and entry_ref implementations.
 */
-
-#include <fcntl.h>
-#include <new>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -21,21 +21,17 @@
 
 #include <syscalls.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-using namespace OpenBeOS;
-#endif
+#include <fcntl.h>
+#include <new>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 using namespace std;
 
-// SYMLINK_MAX is needed by B_SYMLINK_MAX
-// I don't know, why it isn't defined.
-#ifndef SYMLINK_MAX
-#define SYMLINK_MAX (16)
-#endif
 
-//----------------------------------------------------------------------------
-// struct entry_ref
-//----------------------------------------------------------------------------
+//	#pragma mark - struct entry_ref
+
 
 /*! \struct entry_ref
 	\brief A filesystem entry represented as a name in a concrete directory.
@@ -184,9 +180,8 @@ entry_ref::operator=(const entry_ref &ref)
 */
 
 
-//----------------------------------------------------------------------------
-// BEntry
-//----------------------------------------------------------------------------
+//	#pragma mark - BEntry
+
 
 /*!
 	\class BEntry
@@ -219,9 +214,10 @@ entry_ref::operator=(const entry_ref &ref)
 	- operator=(const BEntry&)
 */
 BEntry::BEntry()
-	  : fDirFd(-1),
-		fName(NULL),
-		fCStatus(B_NO_INIT)
+	:
+	fDirFd(-1),
+	fName(NULL),
+	fCStatus(B_NO_INIT)
 {
 }
 
@@ -322,8 +318,9 @@ BEntry::Exists() const
 {
 	// just stat the beast
 	struct stat st;
-	return (GetStat(&st) == B_OK);
+	return GetStat(&st) == B_OK;
 }
+
 
 /*! \brief Fills in a stat structure for the entry. The information is copied into
 	the \c stat structure pointed to by \a result.
@@ -341,8 +338,10 @@ BEntry::GetStat(struct stat *result) const
 {
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-	return _kern_read_stat(fDirFd, fName, false, result, sizeof(struct stat));
+
+	return _kern_read_stat(fDirFd, fName, false, result, R5_STAT_SIZE);
 }
+
 
 /*! \brief Reinitializes the BEntry to the path or directory path combination,
 	resolving symlinks if traverse is true

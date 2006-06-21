@@ -21,6 +21,10 @@
 #include <string>
 
 
+// R5 compatibility
+#define R5_STAT_SIZE 60
+
+
 namespace BPrivate {
 namespace Storage {
 
@@ -149,5 +153,3 @@ private:
 using BPrivate::Storage::FDCloser;
 
 #endif	// _STORAGE_SUPPORT_H
-
-

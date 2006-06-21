@@ -41,7 +41,8 @@
 #define SSIZE_MAX		  		(2147483647L)
 #define TTY_NAME_MAX			(256)
 #define TZNAME_MAX		  		(32)
-#define	SYMLINKS_MAX			(16)
+#define	SYMLINK_MAX				(1024)
+#define	SYMLOOP_MAX				(16)
 
 #define _POSIX_ARG_MAX	  		(32768)
 #define _POSIX_CHILD_MAX		(1024)

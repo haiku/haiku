@@ -1,22 +1,15 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file StorageDefs.h
-	Miscellaneous Storage Kit definitions and includes.
-*/
-
+/*
+ * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DEF_STORAGE_H
 #define _DEF_STORAGE_H
+
 
 #include <fcntl.h>
 #include <sys/param.h>
 #include <limits.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif // USE_OPENBEOS_NAMESPACE
 
 // Limits
 #define B_DEV_NAME_LENGTH		128
@@ -24,19 +17,17 @@ namespace OpenBeOS {
 #define B_PATH_NAME_LENGTH 		MAXPATHLEN
 #define B_ATTR_NAME_LENGTH		(B_FILE_NAME_LENGTH-1)
 #define B_MIME_TYPE_LENGTH		(B_ATTR_NAME_LENGTH - 15)
-#define B_MAX_SYMLINKS			SYMLINK_MAX
-
+#define B_MAX_SYMLINKS			SYMLOOP_MAX
 
 // Open Modes
-#define B_READ_ONLY 	O_RDONLY	// read only 
-#define B_WRITE_ONLY 	O_WRONLY 	// write only 
-#define B_READ_WRITE	O_RDWR   	// read and write
+#define B_READ_ONLY 		O_RDONLY	// read only 
+#define B_WRITE_ONLY 		O_WRONLY 	// write only 
+#define B_READ_WRITE		O_RDWR   	// read and write
 
 #define	B_FAIL_IF_EXISTS	O_EXCL		// exclusive create 
 #define B_CREATE_FILE		O_CREAT		// create the file 
 #define B_ERASE_FILE		O_TRUNC		// erase the file's data 
 #define B_OPEN_AT_END	   	O_APPEND	// point to the end of the data 
-
 
 // Node Flavors
 enum node_flavor {
@@ -46,13 +37,4 @@ enum node_flavor {
   B_ANY_NODE		= 0x07
 };
 
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif	// USE_OPENBEOS_NAMESPACE
-
-
 #endif // _DEF_STORAGE_H
-
-
