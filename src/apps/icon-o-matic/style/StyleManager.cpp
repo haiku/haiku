@@ -123,6 +123,13 @@ StyleManager::HasStyle(Style* style) const
 	return fStyles.HasItem((void*)style);
 }
 
+// IndexOf
+int32
+StyleManager::IndexOf(Style* style) const
+{
+	return fStyles.IndexOf((void*)style);
+}
+
 // StyleAt
 Style*
 StyleManager::StyleAt(int32 index) const

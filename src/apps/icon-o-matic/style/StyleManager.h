@@ -29,6 +29,8 @@ class StyleManager : public RWLocker {
 								StyleManager();
 	virtual						~StyleManager();
 
+	static	StyleManager*		Default();
+
 			bool				AddStyle(Style* style);
 			bool				RemoveStyle(Style* style);
 			Style*				RemoveStyle(int32 index);
@@ -37,6 +39,7 @@ class StyleManager : public RWLocker {
 
 			int32				CountStyles() const;
 			bool				HasStyle(Style* style) const;
+			int32				IndexOf(Style* style) const;
 
 			Style*				StyleAt(int32 index) const;
 			Style*				StyleAtFast(int32 index) const;
@@ -45,8 +48,6 @@ class StyleManager : public RWLocker {
 
 			bool				AddListener(StyleManagerListener* listener);
 			bool				RemoveListener(StyleManagerListener* listener);
-
-	static	StyleManager*		Default();
 
  private:
 			void				_StateChanged();
