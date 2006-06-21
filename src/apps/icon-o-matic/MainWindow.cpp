@@ -17,6 +17,7 @@
 #include "IconEditorApp.h"
 
 // TODO: just for testing
+#include "AffineTransformer.h"
 #include "Gradient.h"
 #include "Icon.h"
 #include "MultipleManipulatorState.h"
@@ -117,6 +118,22 @@ MainWindow::_Init()
 		= new StrokeTransformer(shape->VertexSource());
 	transformer->width(5.0);
 	shape->AppendTransformer(transformer);
+
+	fDocument->Icon()->Shapes()->AddShape(shape);
+
+	Style* style3 = new Style();
+	style3->SetColor((rgb_color){ 255, 0, 169,200 });
+
+	StyleManager::Default()->AddStyle(style3);
+
+	shape = new Shape(style3);
+	shape->Paths()->AddPath(path);
+	AffineTransformer* transformer2
+		= new AffineTransformer(shape->VertexSource());
+	*transformer2 *= agg::trans_affine_translation(10.0, 6.0);
+	*transformer2 *= agg::trans_affine_rotation(0.2);
+	*transformer2 *= agg::trans_affine_scaling(0.8, 0.6);
+	shape->AppendTransformer(transformer2);
 
 	fDocument->Icon()->Shapes()->AddShape(shape);
 

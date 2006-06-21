@@ -75,7 +75,10 @@ Application Icon-O-Matic :
 	Style.cpp
 	StyleManager.cpp
 	# transformer
+	AffineTransformer.cpp
+	ContourTransformer.cpp
 	PathSource.cpp
+	PerspectiveTransformer.cpp
 	StrokeTransformer.cpp
 	Transformer.cpp
 	#

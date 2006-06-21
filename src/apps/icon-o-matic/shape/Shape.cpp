@@ -85,6 +85,7 @@ Shape::SetStyle(::Style* style)
 BRect
 Shape::Bounds() const
 {
+	// TODO: incorrect - use VertexSource instead!!
 	BRect bounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
 
 	int32 count = fPaths->CountPaths();
