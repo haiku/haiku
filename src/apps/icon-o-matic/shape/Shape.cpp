@@ -14,7 +14,9 @@ Shape::Shape(::Style* style)
 	  Referenceable(),
 	  PathContainerListener(),
 	  fPaths(new (nothrow) PathContainer()),
-	  fStyle(style)
+	  fStyle(style),
+	  fPathSource(fPaths),
+	  fTransformers(4)
 {
 	if (fPaths)
 		fPaths->AddListener(this);
@@ -26,6 +28,10 @@ Shape::Shape(::Style* style)
 // destructor
 Shape::~Shape()
 {
+	int32 count = fTransformers.CountItems();
+	for (int32 i = 0; i < count; i++)
+		delete (Transformer*)fTransformers.ItemAtFast(i);
+
 	fPaths->MakeEmpty();
 	fPaths->RemoveListener(this);
 	delete fPaths;
@@ -86,4 +92,35 @@ Shape::Bounds() const
 		bounds = bounds | fPaths->PathAtFast(i)->Bounds();
 
 	return bounds;
+}
+
+// VertexSource
+::VertexSource&
+Shape::VertexSource()
+{
+	fPathSource.Update();
+	::VertexSource* source = &fPathSource;
+
+	int32 count = fTransformers.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Transformer* t = (Transformer*)fTransformers.ItemAtFast(i);
+		t->SetSource(*source);
+		source = t;
+	}
+
+	return *source;
+}
+
+// AppendTransformer
+bool
+Shape::AppendTransformer(Transformer* transformer)
+{
+	if (!transformer)
+		return false;
+
+	if (!fTransformers.AddItem((void*)transformer))
+		return false;
+
+	Notify();
+	return true;
 }

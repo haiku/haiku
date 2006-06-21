@@ -13,7 +13,6 @@
 
 #include <Bitmap.h>
 
-#include "agg_conv_curve.h"
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
 
@@ -254,19 +253,11 @@ IconRenderer::_Render(const BRect& r)
 	int32 shapeCount = fIcon->Shapes()->CountShapes();
 	for (int32 s = 0; s < shapeCount; s++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(s);
-		agg::path_storage aggPath;
-		int32 pathCount = shape->Paths()->CountPaths();
-		for (int32 p = 0; p < pathCount; p++) {
-			VectorPath* path = shape->Paths()->PathAtFast(p);
-			agg::path_storage subPath;
-			if (path->GetAGGPathStorage(subPath)) {
-				aggPath.concat_path(subPath);
-			}
-		}
+
 		int32 styleIndex = fStyles->IndexOf(shape->Style());
 		fRasterizer.styles(styleIndex, -1);
-		agg::conv_curve<agg::path_storage> curve(aggPath);
-		fRasterizer.add_path(curve);
+
+		fRasterizer.add_path(shape->VertexSource());
 	}
 
 	StyleHandler styleHandler(fStyles, fGammaTable);

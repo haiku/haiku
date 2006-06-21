@@ -23,6 +23,7 @@
 #include "PathManipulator.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
+#include "StrokeTransformer.h"
 #include "Style.h"
 #include "StyleManager.h"
 #include "VectorPath.h"
@@ -91,18 +92,31 @@ MainWindow::_Init()
 
 	fDocument->Icon()->Paths()->AddPath(path);
 
-	Style* style = new Style();
-	style->SetColor((rgb_color){ 255, 0, 0, 255 });
+	Style* style1 = new Style();
+	style1->SetColor((rgb_color){ 255, 255, 255, 255 });
+
+	StyleManager::Default()->AddStyle(style1);
+
+	Style* style2 = new Style();
 	Gradient* gradient = new Gradient(true);
 	gradient->AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
 	gradient->AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
 	gradient->AddColor((rgb_color){ 208, 43, 92, 255 }, 1.0);
-	style->SetGradient(gradient);
+	style2->SetGradient(gradient);
 
-	StyleManager::Default()->AddStyle(style);
+	StyleManager::Default()->AddStyle(style2);
 
-	Shape* shape = new Shape(style);
+	Shape* shape = new Shape(style2);
 	shape->Paths()->AddPath(path);
+
+	fDocument->Icon()->Shapes()->AddShape(shape);
+
+	shape = new Shape(style1);
+	shape->Paths()->AddPath(path);
+	StrokeTransformer* transformer
+		= new StrokeTransformer(shape->VertexSource());
+	transformer->width(5.0);
+	shape->AppendTransformer(transformer);
 
 	fDocument->Icon()->Shapes()->AddShape(shape);
 

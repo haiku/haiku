@@ -1,10 +1,12 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include <List.h>
 #include <Rect.h>
 
 #include "Observable.h"
 #include "PathContainer.h"
+#include "PathSource.h"
 #include "Referenceable.h"
 
 class Style;
@@ -32,9 +34,16 @@ class Shape : public Observable,
 
 			BRect				Bounds() const;
 
+			::VertexSource&		VertexSource();
+			bool				AppendTransformer(
+									Transformer* transformer);
+
  private:
 			PathContainer*		fPaths;
 			::Style*			fStyle;
+
+			PathSource			fPathSource;
+			BList				fTransformers;
 };
 
 #endif // SHAPE_H

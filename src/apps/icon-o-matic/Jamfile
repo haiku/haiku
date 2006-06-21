@@ -20,6 +20,7 @@ local sourceDirs =
 	shape
 	shape/commands
 	style
+	transformer
 ;
 
 local sourceDir ;
@@ -31,48 +32,52 @@ for sourceDir in $(sourceDirs) {
 UseLibraryHeaders agg ;
 
 Application Icon-O-Matic :
-	#document
+	# document
 	Document.cpp
 	Icon.cpp
 	IconRenderer.cpp
-	#generic/command
+	# generic/command
 	Command.cpp
 	CommandStack.cpp
 	Selectable.cpp
 	Selection.cpp
-	#generic/gui
-	#generic/gui/panel
-	#generic/gui/popup_control
-	#generic/gui/scrollview
-	#generic/gui/stateview
+	# generic/gui
+	# generic/gui/panel
+	# generic/gui/popup_control
+	# generic/gui/scrollview
+	# generic/gui/stateview
 	Manipulator.cpp
 	MultipleManipulatorState.cpp
 	StateView.cpp
 	ViewState.cpp
-	#generic/listener
+	# generic/listener
 	Observable.cpp
 	Observer.cpp
-	#generic/selection
-	#generic/support
+	# generic/selection
+	# generic/support
 	RWLocker.cpp
 	support.cpp
-	#style
-	Style.cpp
-	StyleManager.cpp
-	#shape
+	# gradient
+	Gradient.cpp
+	# shape
 	PathContainer.cpp
 	PathManipulator.cpp
 	Shape.cpp
 	ShapeContainer.cpp
 	VectorPath.cpp
-	#shape/commands
+	# shape/commands
 	AddPointCommand.cpp
 	ChangePointCommand.cpp
 	InsertPointCommand.cpp
 	PathCommand.cpp
 	RemovePointsCommand.cpp
-	#gradient
-	Gradient.cpp
+	# style
+	Style.cpp
+	StyleManager.cpp
+	# transformer
+	PathSource.cpp
+	StrokeTransformer.cpp
+	Transformer.cpp
 	#
 	CanvasView.cpp
 	IconEditorApp.cpp
