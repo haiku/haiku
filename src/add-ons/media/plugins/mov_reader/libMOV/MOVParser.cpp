@@ -1438,9 +1438,41 @@ FTYPAtom::~FTYPAtom()
 
 void FTYPAtom::OnProcessMetaData()
 {
+// ftyp is really an mp4 thing, but some mov encoders are adding it anyway.
+// but a mov file with an ftyp should define a brand of qt (I think)
+
+	Read(&major_brand);
+	Read(&minor_version);
+
+	total_brands = getBytesRemaining() / sizeof(uint32);
+	
+	if (total_brands > 32) {
+		total_brands = 32;	// restrict to 32
+	}
+	
+	for (uint32 i=0;i<total_brands;i++) {
+		Read(&compatable_brands[i]);
+	}
 }
 
 char *FTYPAtom::OnGetAtomName()
 {
 	return "Quicktime File Type";
+}
+
+bool	FTYPAtom::HasBrand(uint32 brand)
+{
+	// return true if the specified brand is in the list
+
+	if (major_brand == brand) {
+		return true;
+	}
+
+	for (uint32 i=0;i<total_brands;i++) {
+		if (compatable_brands[i] == brand) {
+			return true;
+		}
+	}
+	
+	return false;	
 }

@@ -662,8 +662,14 @@ bool
 MP4FileReader::IsSupported(BPositionIO *source)
 {
 	AtomBase *aAtom = getAtom(source);
-	if (aAtom)
-		return aAtom->IsKnown();
-
+	if (aAtom) {
+		if (dynamic_cast<FTYPAtom *>(aAtom)) {
+			aAtom->ProcessMetaData();
+			printf("ftyp atom found checking brands\n");
+			// MP4 files start with a ftyp atom that does not contain a qt brand
+			return !(dynamic_cast<FTYPAtom *>(aAtom)->HasBrand(uint32('qt  ')));
+		}
+	}
+	
 	return false;
 }

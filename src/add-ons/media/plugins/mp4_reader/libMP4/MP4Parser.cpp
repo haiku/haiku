@@ -1148,6 +1148,23 @@ char *FTYPAtom::OnGetAtomName()
 	return "File type Atom";
 }
 
+bool	FTYPAtom::HasBrand(uint32 brand)
+{
+
+	if (major_brand == brand) {
+		return true;
+	}
+
+	// return true if the specified brand is in the list
+	for (uint32 i=0;i<total_brands;i++) {
+		if (compatable_brands[i] == brand) {
+			return true;
+		}
+	}
+	
+	return false;	
+}
+
 FREEAtom::FREEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }

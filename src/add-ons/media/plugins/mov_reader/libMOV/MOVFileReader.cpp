@@ -617,11 +617,26 @@ bool	MOVFileReader::IsActive(uint32 stream_index)
 /* static */
 bool	MOVFileReader::IsSupported(BPositionIO *source)
 {
+	// MOV files normally do not have ftyp atoms
+	// But when they do we need to check if they have a qt brand
+	// No qt brand means the file is likely to be a MP4 file
+	
 	AtomBase *aAtom;
 	
 	aAtom = getAtom(source);
+
 	if (aAtom) {
-		return (aAtom->IsKnown());
+		if (dynamic_cast<FTYPAtom *>(aAtom)) {
+			printf("ftyp atom found checking for qt brand\n");
+			aAtom->ProcessMetaData();
+			// MP4 files start with a ftyp atom that contains an isom brand
+			// MOV files with a ftyp atom contain the qt brand
+			return dynamic_cast<FTYPAtom *>(aAtom)->HasBrand(uint32('qt  '));
+		} else {
+			// no ftyp atom so just see if we know the atom we have
+			return (aAtom->IsKnown());
+		}
 	}
+	
 	return false;
 }

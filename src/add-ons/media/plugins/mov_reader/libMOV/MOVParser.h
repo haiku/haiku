@@ -478,6 +478,13 @@ public:
 	virtual	~FTYPAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
+	bool	HasBrand(uint32 brand);
+
+private:
+	uint32	major_brand;
+	uint32	minor_version;
+	uint32	compatable_brands[32];	// Should be infinite but we will settle for max 32
+	uint32	total_brands;
 
 };
 

@@ -124,6 +124,8 @@ public:
 	virtual	~FTYPAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
+	
+	bool	HasBrand(uint32 brand);
 private:
 	uint32	major_brand;
 	uint32	minor_version;
