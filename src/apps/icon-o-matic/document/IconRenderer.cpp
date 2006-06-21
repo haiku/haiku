@@ -9,12 +9,18 @@
 #include "IconRenderer.h"
 
 #include <new>
+#include <stdio.h>
 
 #include <Bitmap.h>
 
+#include "agg_conv_curve.h"
+
 #include "Icon.h"
+#include "Shape.h"
+#include "ShapeContainer.h"
 #include "Style.h"
 #include "StyleManager.h"
+#include "VectorPath.h"
 
 using std::nothrow;
 
@@ -34,14 +40,16 @@ class StyleHandler {
 		if (!style)
 			return true;
 
-		return style->Gradient() != NULL;
+		return style->Gradient() == NULL;
 	}
 
 	const agg::rgba8& color(unsigned styleIndex)
     {
 		Style* style = fStyles->StyleAt(styleIndex);
-		if (!style)
+		if (!style) {
+			printf("no style at index: %d!\n", styleIndex);
 			return fTransparent;
+		}
 
 		const rgb_color& c = style->Color();
 		fColor = agg::rgba8(fGammaTable.dir(c.red),
@@ -55,6 +63,7 @@ class StyleHandler {
 	void generate_span(agg::rgba8* span, int x, int y,
 					   unsigned len, unsigned styleIndex)
 	{
+printf("unimplemented: generate_span(%p, %d, %d, %d)\n", span, x, y, len);
 		// TODO: render gradient of Style at styleIndex into span
 	}
 
@@ -72,7 +81,7 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 	  fIcon(NULL),
 	  fStyles(StyleManager::Default()),
 
-	  fGammaTable(2.2),
+	  fGammaTable(1.0),
 
 	  fRenderingBuffer(),
 	  fPixelFormat(fRenderingBuffer),
@@ -91,8 +100,6 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 							bitmap->Bounds().IntegerWidth() + 1,
 							bitmap->Bounds().IntegerHeight() + 1,
 							bitmap->BytesPerRow());
-
-	// attach bitmap
 }
 
 // destructor
@@ -111,19 +118,57 @@ IconRenderer::SetIcon(Icon* icon)
 	// TODO: ... ?
 }
 
+// Render
+void
+IconRenderer::Render()
+{
+	_Render(fBitmap->Bounds());
+}
+
+// Render
+void
+IconRenderer::Render(const BRect& area)
+{
+	_Render(fBitmap->Bounds() & area);
+}
+
 // #pragma mark -
 
-// _RenderIcon
+// _Render
 void
-IconRenderer::_RenderIcon()
+IconRenderer::_Render(const BRect& r)
 {
-	fBaseRenderer.clear(agg::rgba8(0, 0, 0, 0));
+	fBaseRendererPre.clear(agg::rgba8(0, 0, 0, 0));
 
 	if (!fIcon)
 		return;
 
-	// TODO: iterate over shapes in icon and
+	fBaseRendererPre.clip_box((int)floorf(r.left),
+							  (int)floorf(r.top),
+							  (int)ceilf(r.right),
+							  (int)ceilf(r.bottom));
+
+	fRasterizer.reset();
+	// iterate over shapes in icon and
 	// add the vector paths to the rasterizer
+	// and associate the shapes style
+	int32 shapeCount = fIcon->Shapes()->CountShapes();
+	for (int32 s = 0; s < shapeCount; s++) {
+		Shape* shape = fIcon->Shapes()->ShapeAtFast(s);
+		agg::path_storage aggPath;
+		int32 pathCount = shape->Paths()->CountPaths();
+		for (int32 p = 0; p < pathCount; p++) {
+			VectorPath* path = shape->Paths()->PathAtFast(p);
+			agg::path_storage subPath;
+			if (path->GetAGGPathStorage(subPath)) {
+				aggPath.concat_path(subPath);
+			}
+		}
+		int32 styleIndex = fStyles->IndexOf(shape->Style());
+		fRasterizer.styles(styleIndex, -1);
+		agg::conv_curve<agg::path_storage> curve(aggPath);
+		fRasterizer.add_path(curve);
+	}
 
 	StyleHandler styleHandler(fStyles, fGammaTable);
 

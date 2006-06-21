@@ -44,8 +44,11 @@ class IconRenderer {
 
 			void				SetIcon(Icon* icon);
 
+			void				Render();
+			void				Render(const BRect& area);
+
  private:
-			void				_RenderIcon();
+			void				_Render(const BRect& area);
 
 			BBitmap*			fBitmap;
 			Icon*				fIcon;
