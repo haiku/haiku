@@ -134,6 +134,13 @@ list_get_prev_item(struct list *list, void *item)
 }
 
 
+void *
+list_get_last_item(struct list *list)
+{
+	return list_is_empty(list) ? NULL : GET_ITEM(list, list->link.prev);
+}
+
+
 /** Adds an item to the end of the list.
  *	Similar to list_add_link_to_tail() but works on the item, not the link.
  */
