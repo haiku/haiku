@@ -55,8 +55,6 @@
 
 #define ADD_DEBUGGER_COMMANDS
 
-#define MAX_SYM_LINKS SYMLINKS_MAX
-
 const static uint32 kMaxUnusedVnodes = 8192;
 	// This is the maximum number of unused vnodes that the system
 	// will keep around (weak limit, if there is enough memory left,
@@ -1612,7 +1610,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			TRACE(("traverse link\n"));
 
 			// it's not exactly nice style using goto in this way, but hey, it works :-/
-			if (count + 1 > MAX_SYM_LINKS) {
+			if (count + 1 > B_MAX_SYMLINKS) {
 				status = B_LINK_LIMIT;
 				goto resolve_link_error;
 			}
