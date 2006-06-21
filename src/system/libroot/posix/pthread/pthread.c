@@ -5,12 +5,30 @@
 
 #include <pthread.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "pthread_private.h"
 
 static const pthread_attr pthread_attr_default = {
 	PTHREAD_CREATE_JOINABLE,
 	B_NORMAL_PRIORITY
 };
+
+struct pthread_data {
+	thread_entry entry;
+	void *data;
+};
+
+static int32
+_pthread_thread_entry(void *entry_data)
+{
+	struct pthread_data *pdata = (struct pthread_data *)entry_data;
+	thread_func entry = pdata->entry;
+	void *data = pdata->data;
+
+	free(pdata);
+	on_exit_thread(_pthread_key_call_destructors, NULL);
+	return entry(data);
+}
 
 
 int 
@@ -19,6 +37,7 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 {
 	thread_id thread;
 	const pthread_attr *attr = NULL;
+	struct pthread_data *pdata;
 
 	if (_thread == NULL)
 		return B_BAD_VALUE;
@@ -28,7 +47,13 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	else
 		attr = *_attr;
 	
-	thread = spawn_thread((thread_entry)start_routine, "pthread func", attr->sched_priority, arg);
+	pdata = malloc(sizeof(struct pthread_data));
+	if (!pdata)
+		return B_WOULD_BLOCK;
+	pdata->entry = (thread_entry)start_routine;
+	pdata->data = arg;
+
+	thread = spawn_thread(_pthread_thread_entry, "pthread func", attr->sched_priority, pdata);
 	if (thread < B_OK)
 		return B_WOULD_BLOCK;
 		// stupid error code (EAGAIN) but demanded by POSIX
@@ -56,10 +81,9 @@ pthread_equal(pthread_t t1, pthread_t t2)
 int 
 pthread_join(pthread_t thread, void **value_ptr)
 {
-	status_t err = wait_for_thread(thread, (status_t *)value_ptr);
-	if (err == B_BAD_THREAD_ID)
-		return ESRCH;
-	return err;
+	wait_for_thread(thread, (status_t *)value_ptr);
+	/* the thread could be joinable and gone */
+	return B_OK;
 }
 
 

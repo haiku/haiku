@@ -166,6 +166,9 @@ pthread_mutex_lock(pthread_mutex_t *_mutex)
 	if (_mutex == NULL)
 		return B_BAD_VALUE;
 
+	if (*_mutex == NULL)
+		pthread_mutex_init(_mutex, NULL);
+
 	return mutex_lock(*_mutex, B_INFINITE_TIMEOUT);
 }
 

@@ -80,8 +80,7 @@ extern "C" {
 
 extern pthread_mutex_t _pthread_mutex_static_initializer(void);
 extern pthread_mutex_t _pthread_recursive_mutex_static_initializer(void);
-#define PTHREAD_MUTEX_INITIALIZER \
-	pthread_mutex_static_initializer();
+#define PTHREAD_MUTEX_INITIALIZER NULL
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
 	pthread_recursive_mutex_static_initializer();
 

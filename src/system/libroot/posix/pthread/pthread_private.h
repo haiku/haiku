@@ -30,4 +30,7 @@ typedef struct _pthread_attr {
 	int32		sched_priority;
 } pthread_attr;
 
+
+void _pthread_key_call_destructors(void *);
+
 #endif	/* _PTHREAD_PRIVATE_H_ */
