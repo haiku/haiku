@@ -3,15 +3,37 @@
 
 * works a bit like WonderBrush
 
-* list of vector path objects
+* list of vector path objects [done]
 
 * tree of object instances, such that the same vector path
-  object can be visible at different locations with different fill styles
+  object can be visible at different locations with different
+  fill styles [done]
 
-* instances of paths can have additional vector transformers
+* instances of paths can have additional vector transformers [done]
 
 * "add points" mode is problematic when having multiple manipulators for
   different paths showing at the same time...
+
+* solve the problem of individual gradient transformation per shape
+
+* IconRenderer should construct a separate StyleManager and append
+  the styles in the order of shapes, also adding styles multiple
+  times, if two or more shapes use the same style (the compound shape
+  rendering uses the style index for z ordering)
+
+
+--------- user interface
+
+* list of global vector paths
+
+* list of shapes
+
+* list of paths used by shape, but it could also be done such that
+  used paths are marked in the global list when a shape is selected
+
+* list of transformers attached to the selected shape
+
+* area for styles, style is either solid color or gradient
 
 
 --------- icon format
@@ -29,5 +51,5 @@
 
 --------- rendering
 
-* compound shape single pass rendering (if possible)
+* compound shape single pass rendering [done]
 * auto hinting (aligning to pixels) of marked shapes
