@@ -16,7 +16,6 @@ class CanvasView;
 class ChangePointCommand;
 class UndoStack;
 class InsertPointCommand;
-class Selection;
 class VectorPath;
 
 //class PathSelection {
@@ -146,6 +145,7 @@ class PathManipulator : public Manipulator {
 			InsertPointCommand*	fInsertPointCommand;
 			AddPointCommand*	fAddPointCommand;
 
+			class Selection;
 			Selection*			fSelection;
 			Selection*			fOldSelection;
 

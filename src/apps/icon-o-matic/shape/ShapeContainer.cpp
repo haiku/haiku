@@ -135,7 +135,7 @@ bool
 ShapeContainer::AddListener(ShapeContainerListener* listener)
 {
 	if (listener && !fListeners.HasItem((void*)listener))
-		return fListeners.AddItem(listener);
+		return fListeners.AddItem((void*)listener);
 	return false;
 }
 
@@ -143,7 +143,7 @@ ShapeContainer::AddListener(ShapeContainerListener* listener)
 bool
 ShapeContainer::RemoveListener(ShapeContainerListener* listener)
 {
-	return fListeners.RemoveItem(listener);
+	return fListeners.RemoveItem((void*)listener);
 }
 
 // #pragma mark -

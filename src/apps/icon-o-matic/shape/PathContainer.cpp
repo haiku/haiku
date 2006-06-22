@@ -28,9 +28,10 @@ PathContainerListener::~PathContainerListener()
 
 
 // constructor
-PathContainer::PathContainer()
+PathContainer::PathContainer(bool ownsPaths)
 	: fPaths(16),
-	  fListeners(2)
+	  fListeners(2),
+	  fOwnsPaths(ownsPaths)
 {
 }
 
@@ -156,7 +157,8 @@ PathContainer::_MakeEmpty()
 	for (int32 i = 0; i < count; i++) {
 		VectorPath* path = PathAtFast(i);
 		_NotifyPathRemoved(path);
-		path->Release();
+		if (fOwnsPaths)
+			path->Release();
 	}
 	fPaths.MakeEmpty();
 }

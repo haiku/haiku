@@ -21,7 +21,9 @@ CanvasView::CanvasView(BRect frame)
 	: StateView(frame, "canvas view", B_FOLLOW_ALL,
 				B_WILL_DRAW | B_FRAME_EVENTS),
 	  fBitmap(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
+	  fIcon(NULL),
 	  fRenderer(new IconRenderer(fBitmap)),
+	  fDirtyIconArea(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
 
 	  fCanvasOrigin(50.0, 50.0),
 	  fZoomLevel(8.0),
@@ -37,6 +39,7 @@ CanvasView::CanvasView(BRect frame)
 // destructor
 CanvasView::~CanvasView()
 {
+	SetIcon(NULL);
 	delete fRenderer;
 	delete fBitmap;
 
@@ -103,11 +106,38 @@ CanvasView::Draw(BRect updateRect)
 
 // #pragma mark -
 
+// AreaInvalidated
+void
+CanvasView::AreaInvalidated(const BRect& area)
+{
+	if (fDirtyIconArea.Contains(area))
+		return;
+
+	fDirtyIconArea = fDirtyIconArea | area;
+
+	BRect viewArea(area);
+	ConvertFromCanvas(&viewArea);
+	Invalidate(viewArea);
+}
+
+
+// #pragma mark -
+
 // SetIcon
 void
 CanvasView::SetIcon(Icon* icon)
 {
+	if (fIcon == icon)
+		return;
+
+	if (fIcon)
+		fIcon->RemoveListener(this);
+
+	fIcon = icon;
 	fRenderer->SetIcon(icon);
+
+	if (fIcon)
+		fIcon->AddListener(this);
 }
 
 // ConvertFromCanvas
@@ -234,9 +264,10 @@ CanvasView::_FreeBackBitmap()
 void
 CanvasView::_DrawInto(BView* view, BRect updateRect)
 {
-	// TODO: don't render here, use some
-	// listener technique on the shapes instead...
-	fRenderer->Render();
+	if (fDirtyIconArea.IsValid()) {
+		fRenderer->Render(fDirtyIconArea);
+		fDirtyIconArea.Set(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+	}
 
 	// icon
 	BRect canvas(_CanvasRect());

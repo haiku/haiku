@@ -24,7 +24,7 @@ class PathContainerListener {
 
 class PathContainer {
  public:
-								PathContainer();
+								PathContainer(bool ownsPaths);
 	virtual						~PathContainer();
 
 			bool				AddPath(VectorPath* path);
@@ -50,6 +50,7 @@ class PathContainer {
 
 			BList				fPaths;
 			BList				fListeners;
+			bool				fOwnsPaths;
 };
 
 #endif // PATH_CONTAINER_H

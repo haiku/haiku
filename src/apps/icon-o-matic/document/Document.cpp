@@ -33,6 +33,7 @@ Document::Document(const char* name)
 // destructor
 Document::~Document()
 {
+	delete fIcon;
 	delete fCommandStack;
 	delete fSelection;
 	delete fRef;

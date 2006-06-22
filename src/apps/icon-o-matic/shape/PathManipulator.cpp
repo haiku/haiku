@@ -109,7 +109,7 @@ string_for_mode(uint32 mode)
 	return "<unknown mode>";
 }
 
-class Selection : protected BList
+class PathManipulator::Selection : protected BList
 {
 public:
 	inline Selection(int32 count = 20)

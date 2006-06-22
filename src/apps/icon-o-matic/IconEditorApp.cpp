@@ -28,6 +28,10 @@ IconEditorApp::IconEditorApp()
 // destructor
 IconEditorApp::~IconEditorApp()
 {
+	// NOTE: it is important that the GUI has been deleted
+	// at this point, so that all the listener/observer
+	// stuff is properly detached
+	delete fDocument;
 }
 
 // #pragma mark -

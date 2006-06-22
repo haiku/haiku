@@ -5,6 +5,7 @@
 #include <Rect.h>
 
 #include "Observable.h"
+#include "Observer.h"
 #include "PathContainer.h"
 #include "PathSource.h"
 #include "Referenceable.h"
@@ -12,6 +13,7 @@
 class Style;
 
 class Shape : public Observable,
+			  public Observer,	// observing all the paths
 			  public Referenceable,
 			  public PathContainerListener {
  public:
@@ -21,6 +23,9 @@ class Shape : public Observable,
 	// PathContainerListener interface
 	virtual	void				PathAdded(VectorPath* path);
 	virtual	void				PathRemoved(VectorPath* path);
+
+	// Observer interface
+	virtual	void				ObjectChanged(const Observable* object);
 
 	// Shape
 			status_t			InitCheck() const;
@@ -32,7 +37,9 @@ class Shape : public Observable,
 	inline	::Style*			Style() const
 									{ return fStyle; }
 
-			BRect				Bounds() const;
+	inline	BRect				LastBounds() const
+									{ return fLastBounds; }
+			BRect				Bounds(bool updateLast = false) const;
 
 			::VertexSource&		VertexSource();
 			bool				AppendTransformer(
@@ -44,6 +51,8 @@ class Shape : public Observable,
 
 			PathSource			fPathSource;
 			BList				fTransformers;
+
+	mutable	BRect				fLastBounds;
 };
 
 #endif // SHAPE_H

@@ -14,6 +14,7 @@
 class CanvasView;
 class Document;
 class IconEditorApp;
+class ViewState;
 
 class MainWindow : public BWindow {
  public:
@@ -33,6 +34,8 @@ class MainWindow : public BWindow {
 	Document*					fDocument;
 
 	CanvasView*					fCanvasView;
+	// TODO: for testing only...
+	ViewState*					fState;
 };
 
 #endif // MAIN_WINDOW_H

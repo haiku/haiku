@@ -44,6 +44,7 @@ MainWindow::MainWindow(IconEditorApp* app, Document* document)
 // destructor
 MainWindow::~MainWindow()
 {
+	delete fState;
 }
 
 // #pragma mark -
@@ -139,6 +140,7 @@ MainWindow::_Init()
 
 	PathManipulator* pathManipulator = new PathManipulator(path);
 	state->AddManipulator(pathManipulator);
+	fState = state;
 // ----
 }
 

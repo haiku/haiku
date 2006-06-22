@@ -9,13 +9,14 @@
 #ifndef CANVAS_VIEW_H
 #define CANVAS_VIEW_H
 
+#include "Icon.h"
 #include "StateView.h"
 
 class BBitmap;
-class Icon;
 class IconRenderer;
 
-class CanvasView : public StateView {
+class CanvasView : public StateView,
+				   public IconListener {
  public:
 								CanvasView(BRect frame);
 	virtual						~CanvasView();
@@ -24,6 +25,9 @@ class CanvasView : public StateView {
 	virtual	void				AttachedToWindow();
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				Draw(BRect updateRect);
+
+	// IconListener interface
+	virtual	void				AreaInvalidated(const BRect& area);
 
 	// CanvasView
 			void				SetIcon(Icon* icon);
@@ -52,7 +56,9 @@ class CanvasView : public StateView {
 
  private:
 			BBitmap*			fBitmap;
+			Icon*				fIcon;
 			IconRenderer*		fRenderer;
+			BRect				fDirtyIconArea;
 
 			BPoint				fCanvasOrigin;
 			float				fZoomLevel;
