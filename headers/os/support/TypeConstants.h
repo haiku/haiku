@@ -38,6 +38,7 @@ enum {
 	B_PATTERN_TYPE					= 'PATN',
 	B_POINTER_TYPE					= 'PNTR',
 	B_POINT_TYPE					= 'BPNT',
+	B_PROPERTY_INFO_TYPE			= 'SCTD',
 	B_RAW_TYPE						= 'RAWT',
 	B_RECT_TYPE						= 'RECT',
 	B_REF_TYPE						= 'RREF',

@@ -72,8 +72,6 @@ struct value_info {
 	uint32			_reserved[10];
 };
 
-#define B_PROPERTY_INFO_TYPE		'SCTD'
-
 /*----------------------------------------------------------------*/
 /*----- BPropertyInfo class --------------------------------------*/
 
