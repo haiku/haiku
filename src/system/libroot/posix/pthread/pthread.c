@@ -22,12 +22,14 @@ static int32
 _pthread_thread_entry(void *entry_data)
 {
 	struct pthread_data *pdata = (struct pthread_data *)entry_data;
-	thread_func entry = pdata->entry;
+	void *(*entry)(void*) = (void *(*)(void*))pdata->entry;
 	void *data = pdata->data;
 
 	free(pdata);
 	on_exit_thread(_pthread_key_call_destructors, NULL);
-	return entry(data);
+	
+	pthread_exit(entry(data));
+	return B_OK;
 }
 
 
