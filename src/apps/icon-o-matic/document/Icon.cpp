@@ -53,7 +53,7 @@ void
 Icon::ShapeAdded(Shape* shape)
 {
 	shape->AddObserver(this);
-	_NotifyAreaInvalidated(shape->Bounds());
+	_NotifyAreaInvalidated(shape->Bounds(true));
 }
 
 // ShapeRemoved
@@ -61,7 +61,7 @@ void
 Icon::ShapeRemoved(Shape* shape)
 {
 	shape->RemoveObserver(this);
-	_NotifyAreaInvalidated(shape->Bounds());
+	_NotifyAreaInvalidated(shape->Bounds(true));
 }
 
 // ObjectChanged
