@@ -23,7 +23,9 @@ class Group : public BView {
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				GetPreferredSize(float* width, float* height);
 
-	// TODO: allow setting inset and spacing
+	// Group
+			void				SetSpacing(float insetFromBorder,
+										   float childSpacing);
 
  private:
 			void				_LayoutControls(BRect frame) const;

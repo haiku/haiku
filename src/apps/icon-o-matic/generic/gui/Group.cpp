@@ -57,6 +57,20 @@ Group::GetPreferredSize(float* width, float* height)
 
 // #pragma mark -
 
+void
+Group::SetSpacing(float insetFromBorder, float childSpacing)
+{
+	if (fSpacing == childSpacing && fInset == insetFromBorder)
+		return;
+
+	fInset = insetFromBorder;
+	fSpacing = childSpacing;
+	// trigger a layout
+	FrameResized(Bounds().Width(), Bounds().Height());
+}
+
+// #pragma mark -
+
 // _LayoutControls
 void
 Group::_LayoutControls(BRect r) const
@@ -88,16 +102,16 @@ Group::_MinFrame() const
 	if (fOrientation == B_HORIZONTAL) {
 		minWidth += fSpacing;
 		for (int32 i = 0; BView* child = ChildAt(i); i++) {
-			minWidth += child->Bounds().Width() + fSpacing;
+			minWidth += child->Bounds().Width() + 1 + fSpacing;
 			minHeight = max_c(minHeight,
-							  child->Bounds().Height() + fInset * 2.0);
+							  child->Bounds().Height() + 1 + fInset * 2.0);
 		}
 	} else {
 		minHeight += fSpacing;
 		for (int32 i = 0; BView* child = ChildAt(i); i++) {
-			minHeight += child->Bounds().Height() + fSpacing;
+			minHeight += child->Bounds().Height() + 1 + fSpacing;
 			minWidth = max_c(minWidth,
-							 child->Bounds().Width() + fInset * 2.0);
+							 child->Bounds().Width() + 1 + fInset * 2.0);
 		}
 	}
 
