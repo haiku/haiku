@@ -9,8 +9,6 @@
 #ifndef COLOR_PICKER_VIEW_H
 #define COLOR_PICKER_VIEW_H
 
-#include "ColorPickerDefs.h"
-
 #include <View.h>
 
 #if LIB_LAYOUT

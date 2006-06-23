@@ -9,8 +9,6 @@
 #ifndef _COLOR_FIELD_H
 #define _COLOR_FIELD_H
 
-#include "ColorPickerDefs.h"
-
 #include <Control.h>
 
 #if LIB_LAYOUT

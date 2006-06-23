@@ -1,6 +1,0 @@
-#ifndef COLOR_PICKER_COMMON_H
-#define COLOR_PICKER_COMMON_H
-
-#define LIB_LAYOUT 0
-
-#endif // COLOR_PICKER_COMMON_H

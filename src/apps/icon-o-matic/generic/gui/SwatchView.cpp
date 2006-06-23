@@ -50,6 +50,7 @@ SwatchView::~SwatchView()
 	delete fDroppedMessage;
 }
 
+#if LIB_LAYOUT
 // layoutprefs
 minimax
 SwatchView::layoutprefs()
@@ -75,6 +76,7 @@ SwatchView::layout(BRect frame)
 	ResizeTo(frame.Width(), frame.Height());
 	return Frame();
 }
+#endif // LIB_LAYOUT
 
 // Draw
 void

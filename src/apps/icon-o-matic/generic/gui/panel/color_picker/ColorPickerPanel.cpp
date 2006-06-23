@@ -10,8 +10,6 @@
 
 #include <Application.h>
 
-#include "ColorPickerDefs.h"
-
 #if LIB_LAYOUT
 #  include <MBorder.h>
 #  include <HGroup.h>

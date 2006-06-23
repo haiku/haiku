@@ -14,6 +14,7 @@
 class CanvasView;
 class Document;
 class IconEditorApp;
+class SwatchGroup;
 class ViewState;
 
 class MainWindow : public BWindow {
@@ -34,6 +35,7 @@ class MainWindow : public BWindow {
 	Document*					fDocument;
 
 	CanvasView*					fCanvasView;
+	SwatchGroup*				fSwatchGroup;
 	// TODO: for testing only...
 	ViewState*					fState;
 };

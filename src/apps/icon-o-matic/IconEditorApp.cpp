@@ -15,9 +15,6 @@
 #include "Document.h"
 #include "MainWindow.h"
 
-// testing:
-#include "ColorPickerPanel.h"
-
 using std::nothrow;
 
 // constructor
@@ -71,11 +68,6 @@ IconEditorApp::ReadyToRun()
 {
 	fMainWindow = new MainWindow(this, fDocument);
 	fMainWindow->Show();
-
-	ColorPickerPanel* panel = new ColorPickerPanel(
-		BRect(80, 80, 200, 200),
-		(rgb_color){ 100, 200, 150, 255 });
-	panel->Show();
 }
 
 

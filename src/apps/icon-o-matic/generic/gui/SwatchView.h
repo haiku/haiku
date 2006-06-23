@@ -11,13 +11,15 @@
 
 #include <View.h>
 
+#if LIB_LAYOUT
 #include <layout.h>
+#endif
 
-enum {
-	MSG_COLOR_DROP				= 'PSTE',
-};
-
-class SwatchView : public MView, public BView {
+class SwatchView :
+				   #if LIB_LAYOUT
+				   public MView,
+				   #endif
+				   public BView {
  public:
 								SwatchView(const char* name,
 										   BMessage* message,
@@ -27,9 +29,11 @@ class SwatchView : public MView, public BView {
 										   float height = 24.0);
 	virtual						~SwatchView();
 
+	#if LIB_LAYOUT
 								// MView
 	virtual	minimax				layoutprefs();
 	virtual	BRect				layout(BRect frame);
+	#endif
 
 								// BView
 	virtual	void				Draw(BRect updateRect);

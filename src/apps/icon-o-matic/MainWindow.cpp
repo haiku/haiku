@@ -15,6 +15,7 @@
 #include "Document.h"
 #include "CanvasView.h"
 #include "IconEditorApp.h"
+#include "SwatchGroup.h"
 
 // TODO: just for testing
 #include "AffineTransformer.h"
@@ -148,8 +149,17 @@ MainWindow::_Init()
 BView*
 MainWindow::_CreateGUI(BRect bounds)
 {
+	BView* bg = new BView(bounds, "bg", B_FOLLOW_ALL, 0);
+	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fSwatchGroup = new SwatchGroup(BRect(0, 0, 100, 100));
+	bounds.top = fSwatchGroup->Frame().bottom + 1;
+	
 	fCanvasView = new CanvasView(bounds);
 
-	return fCanvasView;
+	bg->AddChild(fSwatchGroup);
+	bg->AddChild(fCanvasView);
+
+	return bg;
 }
 

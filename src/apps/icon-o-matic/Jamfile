@@ -17,6 +17,7 @@ local sourceDirs =
 	generic/listener
 	generic/selection
 	generic/support
+	gui
 	gradient
 	shape
 	shape/commands
@@ -43,6 +44,8 @@ Application Icon-O-Matic :
 	Selectable.cpp
 	Selection.cpp
 	# generic/gui
+	Group.cpp
+	SwatchView.cpp
 	# generic/gui/panel
 	Panel.cpp
 	# generic/gui/panel/color_picker
@@ -66,6 +69,8 @@ Application Icon-O-Matic :
 	RWLocker.cpp
 	support.cpp
 	support_ui.cpp
+	# gui
+	SwatchGroup.cpp
 	# gradient
 	Gradient.cpp
 	# shape

@@ -23,7 +23,7 @@ CanvasView::CanvasView(BRect frame)
 	  fBitmap(new BBitmap(BRect(0, 0, 63, 63), 0, B_RGB32)),
 	  fIcon(NULL),
 	  fRenderer(new IconRenderer(fBitmap)),
-	  fDirtyIconArea(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
+	  fDirtyIconArea(fBitmap->Bounds()),
 
 	  fCanvasOrigin(50.0, 50.0),
 	  fZoomLevel(8.0),
