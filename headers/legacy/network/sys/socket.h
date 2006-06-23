@@ -277,8 +277,8 @@ ssize_t recv(int, void *, size_t, int);
 ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *, int);
 ssize_t recvfrom(int, void *, size_t, int, struct sockaddr *, int *);
 
-int     setsockopt(int, int, int, const void *, size_t);
-int     getsockopt(int, int, int, void *, size_t *);
+int     setsockopt(int, int, int, const void *, int);
+int     getsockopt(int, int, int, void *, int *);
 int     getpeername(int, struct sockaddr *, int *);
 int     getsockname(int, struct sockaddr *, int *);
 #endif /* _KERNEL_MODE */
