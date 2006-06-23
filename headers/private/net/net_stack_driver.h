@@ -7,6 +7,7 @@
 
 #include <OS.h>			
 #include <sys/select.h>
+#include <sys/socket.h>
 
 // Forward declaration
 struct sockaddr; 
@@ -56,7 +57,7 @@ enum {
 
 struct sockaddr_args {	// used by NET_STACK_CONNECT/_BIND/_GETSOCKNAME/_GETPEERNAME
 	struct sockaddr *addr;
-	int addrlen;
+	socklen_t addrlen;
 };
 
 struct sockopt_args {	// used by NET_STACK_SETSOCKOPT/_GETSOCKOPT
@@ -87,7 +88,7 @@ struct socketpair_args {	// used by NET_STACK_SOCKETPAIR
 struct accept_args {  // used by NET_STACK_ACCEPT 
 	void *cookie; 
 	struct sockaddr *addr; 
-	int addrlen; 
+	socklen_t addrlen; 
 };
 
 struct sysctl_args {	// used by NET_STACK_SYSCTL

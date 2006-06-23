@@ -560,7 +560,7 @@ read_len:
 			struct timeval timeout;
 			fd_set *dsmaskp;
 			struct sockaddr_storage from;
-			size_t fromlen;
+			int fromlen;
 
 			if ((s < 0) || vc || (af != nsap->sa_family)) {
 				if (vc)

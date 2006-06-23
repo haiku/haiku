@@ -265,22 +265,22 @@ struct cmsghdr {
 /* Function declarations */
 int     socket (int, int, int);
 int	socketpair(int domain, int type, int protocol, int socket_vector[2]);
-int     bind(int, const struct sockaddr *, int);
-int     connect(int, const struct sockaddr *, int);
+int     bind(int, const struct sockaddr *, socklen_t);
+int     connect(int, const struct sockaddr *, socklen_t);
 int 	listen(int, int);
-int 	accept(int, struct sockaddr *, int *);
+int 	accept(int, struct sockaddr *, socklen_t *);
 int     closesocket(int);
 int     shutdown(int sock, int how);
 
 ssize_t send(int, const void *, size_t, int);
 ssize_t recv(int, void *, size_t, int);
-ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *, int);
-ssize_t recvfrom(int, void *, size_t, int, struct sockaddr *, int *);
+ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *, socklen_t);
+ssize_t recvfrom(int, void *, size_t, int, struct sockaddr *, socklen_t *);
 
-int     setsockopt(int, int, int, const void *, size_t);
-int     getsockopt(int, int, int, void *, size_t *);
-int     getpeername(int, struct sockaddr *, int *);
-int     getsockname(int, struct sockaddr *, int *);
+int     setsockopt(int, int, int, const void *, socklen_t);
+int     getsockopt(int, int, int, void *, socklen_t *);
+int     getpeername(int, struct sockaddr *, socklen_t *);
+int     getsockname(int, struct sockaddr *, socklen_t *);
 #endif /* _KERNEL_MODE */
 
 #if __cplusplus

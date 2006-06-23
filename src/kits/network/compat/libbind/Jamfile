@@ -43,7 +43,7 @@ SEARCH_SOURCE += [ FDirName $(LIBNETWORK_DNS_DIR) resolv ] ;
 	LINKFLAGS on libbind.so = [ on libbind.so return $(LINKFLAGS) ] -nodefaultlibs ;
  
 	# we want to have the xxx_r functions, too
-	local defines = _REENTRANT=1 NO_SOCKADDR_UN=1 ;
+	local defines = _REENTRANT=1 NO_SOCKADDR_UN=1 ISC_SOCKLEN_T=int ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;

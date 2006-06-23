@@ -128,7 +128,9 @@ struct timezone;        /* silence warning */
 #define UNUSED(x) (x) = (x)
 
 #undef NEED_SOLARIS_BITTYPES
-#define ISC_SOCKLEN_T int
+#ifndef ISC_SOCKLEN_T
+#define ISC_SOCKLEN_T socklen_t
+#endif
 
 #ifdef __GNUC__
 #define ISC_FORMAT_PRINTF(fmt, args) \

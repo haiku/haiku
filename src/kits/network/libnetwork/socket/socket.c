@@ -47,7 +47,7 @@ _EXPORT int socket(int family, int type, int protocol)
 }
 
 
-_EXPORT int bind(int sock, const struct sockaddr *addr, int addrlen)
+_EXPORT int bind(int sock, const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct stack_driver_args args;
 	
@@ -68,7 +68,7 @@ _EXPORT int shutdown(int sock, int how)
 }
 
 
-_EXPORT int connect(int sock, const struct sockaddr *addr, int addrlen)
+_EXPORT int connect(int sock, const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct stack_driver_args args;
 	
@@ -89,7 +89,7 @@ _EXPORT int listen(int sock, int backlog)
 }
 
 
-_EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
+_EXPORT int accept(int sock, struct sockaddr *addr, socklen_t *addrlen)
 {
 	struct stack_driver_args args;
 	int rv;
@@ -128,7 +128,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 
 
 _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
-             struct sockaddr *addr, int *addrlen)
+             struct sockaddr *addr, socklen_t *addrlen)
 {
 	struct msghdr mh;
 	struct iovec iov;
@@ -156,7 +156,7 @@ _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
 }
 
 _EXPORT ssize_t sendto(int sock, const void *buffer, size_t buflen, int flags,
-           const struct sockaddr *addr, int addrlen)
+           const struct sockaddr *addr, socklen_t addrlen)
 {
 	struct msghdr mh;
 	struct iovec iov;
@@ -248,7 +248,7 @@ _EXPORT int setsockopt(int sock, int level, int option, const void *optval, size
 }
 
 
-_EXPORT int getpeername(int sock, struct sockaddr *addr, int *addrlen)
+_EXPORT int getpeername(int sock, struct sockaddr *addr, socklen_t *addrlen)
 {
 	struct stack_driver_args args;
 	int rv;
@@ -265,7 +265,7 @@ _EXPORT int getpeername(int sock, struct sockaddr *addr, int *addrlen)
 	return rv;
 }
 
-_EXPORT int getsockname(int sock, struct sockaddr *addr, int *addrlen)
+_EXPORT int getsockname(int sock, struct sockaddr *addr, socklen_t *addrlen)
 {
 	struct stack_driver_args args;
 	int rv;

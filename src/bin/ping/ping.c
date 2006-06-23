@@ -177,6 +177,7 @@ static void errx(int exitval, char *fmt_string, char *value)
 {
 	printf("error: ");
 	printf(fmt_string, value);
+	printf("\n");
 	exit(exitval);
 }
 
@@ -483,7 +484,7 @@ int main(int argc, char **argv)
 	for (;;) {
 		struct sockaddr_in from;
 		int cc;
-		size_t fromlen;
+		socklen_t fromlen;
 		sigset_t omask, nmask;
 
 		if (options & F_FLOOD) {
