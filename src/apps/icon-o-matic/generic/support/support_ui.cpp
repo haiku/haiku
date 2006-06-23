@@ -6,7 +6,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "support.h"
+#include "support_ui.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -20,8 +20,6 @@
 #include <String.h>
 #include <Path.h>
 #include <View.h>
-
-#include <Space.h>
 
 // stroke_frame
 void
@@ -40,20 +38,6 @@ stroke_frame(BView* v, BRect r, rgb_color left, rgb_color top,
 					   BPoint(r.left + 1.0, r.bottom), bottom);
 		v->EndLineArray();
 	}
-}
-
-// vertical_space
-Space*
-vertical_space()
-{
-	return new Space(minimax(0.0, 3.0, 10000.0, 3.0, 1.0));
-}
-
-// horizontal_space
-Space*
-horizontal_space()
-{
-	return new Space(minimax(3.0, 0.0, 3.0, 10000.0, 1.0));
 }
 
 // store_color_in_message

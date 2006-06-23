@@ -10,6 +10,7 @@ local sourceDirs =
 	generic/command
 	generic/gui
 	generic/gui/panel
+	generic/gui/panel/color_picker
 	generic/gui/popup_control
 	generic/gui/scrollview
 	generic/gui/stateview
@@ -43,6 +44,13 @@ Application Icon-O-Matic :
 	Selection.cpp
 	# generic/gui
 	# generic/gui/panel
+	Panel.cpp
+	# generic/gui/panel/color_picker
+	ColorField.cpp
+	ColorPickerPanel.cpp
+	ColorPickerView.cpp
+	ColorPreview.cpp
+	ColorSlider.cpp
 	# generic/gui/popup_control
 	# generic/gui/scrollview
 	# generic/gui/stateview
@@ -57,6 +65,7 @@ Application Icon-O-Matic :
 	# generic/support
 	RWLocker.cpp
 	support.cpp
+	support_ui.cpp
 	# gradient
 	Gradient.cpp
 	# shape

@@ -242,6 +242,7 @@ CanvasView::_AllocBackBitmap(float width, float height)
 		fOffsreenView->SetFont(&font);
 		fOffsreenView->SetHighColor(HighColor());
 		fOffsreenView->SetLowColor(LowColor());
+		fOffsreenView->SetFlags(Flags());
 		fOffsreenBitmap->AddChild(fOffsreenView);
 	} else {
 		_FreeBackBitmap();
