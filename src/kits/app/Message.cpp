@@ -1888,8 +1888,11 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 	} else {
 		size = _NativeFlattenedSize();
 		buffer = (char *)malloc(size);
-		result = _NativeFlatten(buffer, size);
-		header = (message_header *)buffer;
+		if (buffer != NULL) {
+			result = _NativeFlatten(buffer, size);
+			header = (message_header *)buffer;
+		} else
+			result = B_NO_MEMORY;
 	}
 
 	if (result < B_OK)
@@ -1905,9 +1908,11 @@ BMessage::_SendMessage(port_id port, int32 token, bigtime_t timeout,
 
 	BMessenger::Private replyToPrivate(replyTo);
 
-	if (replyRequired)
+	if (replyRequired) {
 		header->flags |= MESSAGE_FLAG_REPLY_REQUIRED;
-	
+		header->flags &= ~MESSAGE_FLAG_REPLY_DONE;
+	}
+
 	header->target = token;
 	header->reply_team = replyToPrivate.Team();
 	header->reply_port = replyToPrivate.Port();
