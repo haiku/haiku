@@ -8,6 +8,8 @@ UsePrivateHeaders storage ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 
+AddResources hey : hey.rdef ;
+
 # standard commands that don't need any additional library
 StdBinCommands
 	boot_process_done.cpp
