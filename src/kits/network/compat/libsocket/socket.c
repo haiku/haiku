@@ -217,7 +217,7 @@ _EXPORT ssize_t send(int sock, const void *data, size_t datalen, int flags)
 }
 
 
-_EXPORT int getsockopt(int sock, int level, int option, void *optval, size_t *optlen)
+_EXPORT int getsockopt(int sock, int level, int option, void *optval, int *optlen)
 {
 	struct stack_driver_args args;
 	int rv;
@@ -235,7 +235,7 @@ _EXPORT int getsockopt(int sock, int level, int option, void *optval, size_t *op
 }
 
 
-_EXPORT int setsockopt(int sock, int level, int option, const void *optval, size_t optlen)
+_EXPORT int setsockopt(int sock, int level, int option, const void *optval, int optlen)
 {
 	struct stack_driver_args args;
 	
