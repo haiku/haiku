@@ -44,6 +44,7 @@ All rights reserved.
 
 const uint32 kSettingsContentsModified = 'Scmo';
 
+class BButton;
 class BMenuField;
 class BStringView;
 
@@ -71,6 +72,7 @@ class DesktopSettingsView : public SettingsView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual void Revert();
@@ -86,6 +88,7 @@ class DesktopSettingsView : public SettingsView {
 		BCheckBox *fMountSharedVolumesOntoDesktopCheckBox;
 		BCheckBox *fIntegrateNonBootBeOSDesktopsCheckBox;
 		BCheckBox *fEjectWhenUnmountingCheckBox;
+		BButton *fMountButton;
 
 		bool fShowDisksIcon;
 		bool fMountVolumesOntoDesktop;
@@ -102,6 +105,7 @@ class WindowsSettingsView : public SettingsView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual void Revert();
@@ -120,46 +124,8 @@ class WindowsSettingsView : public SettingsView {
 		bool fShowFullPathInTitleBar;
 		bool fSingleWindowBrowse;
 		bool fShowNavigator;
-		bool fShowSelectionWhenInactive;
 		bool fTransparentSelection;
 		bool fSortFolderNamesFirst;
-
-		typedef SettingsView _inherited;
-};
-
-class FilePanelSettingsView : public SettingsView {
-	public:
-		FilePanelSettingsView(BRect frame);
-		virtual ~FilePanelSettingsView();
-
-		virtual void MessageReceived(BMessage *message);
-		virtual void AttachedToWindow();
-
-		virtual void SetDefaults();
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
-
-
-	private:
-		void _GetAndRefreshDisplayedFigures() const;
-		void _SendNotices();
-
-		BCheckBox *fDesktopFilePanelRootCheckBox;
-
-		BTextControl *fRecentApplicationsTextControl; // Not used for the moment.
-		BTextControl *fRecentDocumentsTextControl;
-		BTextControl *fRecentFoldersTextControl;
-
-		bool fDesktopFilePanelRoot;
-		int32 fRecentApplications; // Not used for the moment,
-		int32 fRecentDocuments;
-		int32 fRecentFolders;
-
-		mutable int32 fDisplayedAppCount; // Not used for the moment.
-		mutable int32 fDisplayedDocCount;
-		mutable int32 fDisplayedFolderCount;
 
 		typedef SettingsView _inherited;
 };
@@ -170,6 +136,7 @@ class TimeFormatSettingsView : public SettingsView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();	
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual void Revert();
@@ -208,6 +175,7 @@ class SpaceBarSettingsView : public SettingsView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
+		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual void Revert();
@@ -235,7 +203,8 @@ class TrashSettingsView : public SettingsView {
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
-	
+		virtual void GetPreferredSize(float *_width, float *_height);
+
 		virtual void SetDefaults();
 		virtual void Revert();
 		virtual void ShowCurrentSettings();

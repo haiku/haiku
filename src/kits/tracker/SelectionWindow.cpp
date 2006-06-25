@@ -48,27 +48,25 @@ const int frameThickness = 9;
 const uint32 kSelectButtonPressed = 'sbpr';
 
 SelectionWindow::SelectionWindow(BContainerWindow *window)
-	:	BWindow(BRect(0, 0, 270, 0),
-			"Select", B_TITLED_WINDOW,
-			B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_V_RESIZABLE
-			| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_ANCHORED_ON_ACTIVATE),
-		fParentWindow(window)
+	: BWindow(BRect(0, 0, 270, 0), "Select", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_V_RESIZABLE
+		| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
+		| B_NOT_ANCHORED_ON_ACTIVATE),
+	fParentWindow(window)
 {
-	if (window->Feel() & kPrivateDesktopWindowFeel)
+	if (window->Feel() & kPrivateDesktopWindowFeel) {
 		// The window will not show up if we have B_FLOATING_SUBSET_WINDOW_FEEL
 		// and use it with the desktop window since it's never in front.
 		SetFeel(B_NORMAL_WINDOW_FEEL);
-	
+	}
+
 	AddToSubset(fParentWindow);
 
-	BRect backgroundRect = Bounds();
-	backgroundRect.InsetBy(-1, -1);
-	BView *backgroundView = new BBox(backgroundRect, "bgView", B_FOLLOW_ALL);
+	BView *backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
+	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(backgroundView);
 
 	BMenu *menu = new BPopUpMenu("");
-	
 	menu->AddItem(new BMenuItem("starts with", NULL));
 	menu->AddItem(new BMenuItem("ends with", NULL));
 	menu->AddItem(new BMenuItem("contains", NULL));
@@ -78,14 +76,14 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(3)->SetMarked(true);
 		// Set wildcard matching to default.
-	
+
 	// Set up the menu field
 	fMatchingTypeMenuField = new BMenuField(BRect(7, 6, Bounds().right - 5, 0),
 		NULL, "Name", menu);
 	backgroundView->AddChild(fMatchingTypeMenuField);
 	fMatchingTypeMenuField->SetDivider(fMatchingTypeMenuField->StringWidth("Name") + 8);
 	fMatchingTypeMenuField->ResizeToPreferred();
-	
+
 	// Set up the expression text control
 	fExpressionTextControl = new BTextControl(BRect(7, fMatchingTypeMenuField->
 		Bounds().bottom + 11, Bounds().right - 6, 0), NULL, NULL, NULL, NULL,
@@ -93,13 +91,13 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	backgroundView->AddChild(fExpressionTextControl);
 	fExpressionTextControl->ResizeToPreferred();
 	fExpressionTextControl->MakeFocus(true);
-	
+
 	// Set up the Invert checkbox
 	fInverseCheckBox = new BCheckBox(BRect(7, fExpressionTextControl->Frame().bottom
 		+ 6, 6, 6), NULL, "Invert", NULL);
 	backgroundView->AddChild(fInverseCheckBox);
 	fInverseCheckBox->ResizeToPreferred();
-	
+
 	// Set up the Ignore Case checkbox
 	fIgnoreCaseCheckBox = new BCheckBox(BRect(fInverseCheckBox->Frame().right + 10,
 		fInverseCheckBox->Frame().top, 6, 6), NULL, "Ignore case", NULL);
@@ -110,17 +108,17 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	// Set up the Select button
 	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL, "Select",
 		new BMessage(kSelectButtonPressed), B_FOLLOW_RIGHT);
-		
+
 	backgroundView->AddChild(fSelectButton);
 	fSelectButton->ResizeToPreferred();
 	fSelectButton->MoveTo(Bounds().right - 10 - fSelectButton->Bounds().right,
 		fExpressionTextControl->Frame().bottom + 9);
 	fSelectButton->MakeDefault(true);
-	#if !B_BEOS_VERSION_DANO
+#if !B_BEOS_VERSION_DANO
 	fSelectButton->SetLowColor(backgroundView->ViewColor());
 	fSelectButton->SetViewColor(B_TRANSPARENT_COLOR);
-	#endif
-	
+#endif
+
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
 	// Center the checkboxes vertically to the button
@@ -140,44 +138,42 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	Lock();
 	ResizeTo(minWidth, fSelectButton->Frame().bottom + 6);
 
-	SetSizeLimits(
-		/* Minimum Width */ minWidth,
-		/* Maximum Width */ 1280,
-		/* Minimum Height */ Bounds().bottom,
-		/* Maximum Height */ Bounds().bottom);
+	SetSizeLimits(minWidth, 1280, Bounds().bottom, Bounds().bottom);
 
 	MoveCloseToMouse();	
 	Unlock();
 }
+
 
 void
 SelectionWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kSelectButtonPressed:
-			{
-					Hide();
-					// Order of posting and hiding important
-					// since we want to activate the target
-					// window when the message arrives.
-					// (Hide is synhcronous, while PostMessage is not.)
-					// See PoseView::SelectMatchingEntries().
-					
-				BMessage *selectionInfo = new BMessage(kSelectMatchingEntries);
-				selectionInfo->AddInt32("ExpressionType", ExpressionType());
-				BString expression;
-				Expression(expression);
-				selectionInfo->AddString("Expression", expression.String());
-				selectionInfo->AddBool("InvertSelection", Invert());
-				selectionInfo->AddBool("IgnoreCase", IgnoreCase());
-				fParentWindow->PostMessage(selectionInfo);
-			}
+		{
+			Hide();
+				// Order of posting and hiding important
+				// since we want to activate the target
+				// window when the message arrives.
+				// (Hide is synhcronous, while PostMessage is not.)
+				// See PoseView::SelectMatchingEntries().
+
+			BMessage *selectionInfo = new BMessage(kSelectMatchingEntries);
+			selectionInfo->AddInt32("ExpressionType", ExpressionType());
+			BString expression;
+			Expression(expression);
+			selectionInfo->AddString("Expression", expression.String());
+			selectionInfo->AddBool("InvertSelection", Invert());
+			selectionInfo->AddBool("IgnoreCase", IgnoreCase());
+			fParentWindow->PostMessage(selectionInfo);
 			break;
-	
+		}
+
 		default:
 			_inherited::MessageReceived(message);
 	}
 }
+
 
 bool
 SelectionWindow::QuitRequested()
@@ -186,29 +182,29 @@ SelectionWindow::QuitRequested()
 	return false;
 }
 
+
 void
 SelectionWindow::MoveCloseToMouse()
 {
 	uint32 buttons;
 	BPoint mousePosition;
-	
+
 	ChildAt((int32)0)->GetMouse(&mousePosition, &buttons);
 	ConvertToScreen(&mousePosition);
-	
+
 	// Position the window centered around the mouse...
 	BPoint windowPosition = BPoint(mousePosition.x - Frame().Width() / 2,
 		mousePosition.y	- Frame().Height() / 2);
-	
+
 	// ... unless that's outside of the current screen size:
 	BScreen screen;
 	windowPosition.x = MAX(0, MIN(screen.Frame().right - Frame().Width(),
 		windowPosition.x));
 	windowPosition.y = MAX(0, MIN(screen.Frame().bottom - Frame().Height(),
 		windowPosition.y));
-	
+
 	MoveTo(windowPosition);
 }
-
 
 
 TrackerStringExpressionType
@@ -216,43 +212,47 @@ SelectionWindow::ExpressionType() const
 {
 	if (!fMatchingTypeMenuField->LockLooper())
 		return kNone;
-		
+
 	BMenuItem *item = fMatchingTypeMenuField->Menu()->FindMarked();
 	if (!item) {
 		fMatchingTypeMenuField->UnlockLooper();
 		return kNone;
 	}
-	
+
 	int32 index = fMatchingTypeMenuField->Menu()->IndexOf(item);
 
 	fMatchingTypeMenuField->UnlockLooper();
-	
+
 	if (index < kStartsWith || index > kRegexpMatch)
 		return kNone;
-	
+
 	TrackerStringExpressionType typeArray[] = {	kStartsWith, kEndsWith,
 		kContains, kGlobMatch, kRegexpMatch};
-	
+
 	return typeArray[index];
 }
+
 
 void
 SelectionWindow::Expression(BString &result) const
 {
 	if (!fExpressionTextControl->LockLooper())
 		return;
-		
+
 	result = fExpressionTextControl->Text();
 
 	fExpressionTextControl->UnlockLooper();
 }
 
+
 bool
 SelectionWindow::IgnoreCase() const
 {
-	if (!fIgnoreCaseCheckBox->LockLooper())
-		return true; // default action.
-	
+	if (!fIgnoreCaseCheckBox->LockLooper()) {
+		// default action.
+		return true;
+	}
+
 	bool ignore = fIgnoreCaseCheckBox->Value() != 0;
 
 	fIgnoreCaseCheckBox->UnlockLooper();
@@ -260,12 +260,15 @@ SelectionWindow::IgnoreCase() const
 	return ignore;
 }
 
+
 bool
 SelectionWindow::Invert() const
 {
-	if (!fInverseCheckBox->LockLooper())
-		return false; // default action.
-	
+	if (!fInverseCheckBox->LockLooper()) {
+		// default action.
+		return false;
+	}
+
 	bool inverse = fInverseCheckBox->Value() != 0;
 
 	fInverseCheckBox->UnlockLooper();

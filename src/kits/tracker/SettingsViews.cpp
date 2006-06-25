@@ -50,8 +50,6 @@ All rights reserved.
 
 
 static const uint32 kSpaceBarSwitchColor = 'SBsc';
-static const float kBorderSpacing = 5.0f;
-static const float kItemHeight = 18.0f;
 static const float kItemExtraSpacing = 2.0f;
 static const float kIndentSpacing = 12.0f;
 
@@ -73,7 +71,7 @@ send_bool_notices(uint32 what, const char *name, bool value)
 
 
 SettingsView::SettingsView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_ALL_SIDES, 0)
+	: BView(rect, name, B_FOLLOW_ALL, 0)
 {
 }
 
@@ -144,59 +142,65 @@ SettingsView::IsRevertable() const
 DesktopSettingsView::DesktopSettingsView(BRect rect)
 	: SettingsView(rect, "DesktopSettingsView")
 {
-	BRect frame = BRect(kBorderSpacing, kBorderSpacing, rect.Width()
-		- 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fShowDisksIconRadioButton = new BRadioButton(frame, "", "Show Disks Icon",
+	rect.OffsetTo(B_ORIGIN);
+	fShowDisksIconRadioButton = new BRadioButton(rect, "", "Show Disks Icon",
 		new BMessage(kShowDisksIconChanged));
-	AddChild(fShowDisksIconRadioButton);
 	fShowDisksIconRadioButton->ResizeToPreferred();
+	AddChild(fShowDisksIconRadioButton);
 	
 	const float itemSpacing = fShowDisksIconRadioButton->Bounds().Height() + kItemExtraSpacing;
-
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 	
-	fMountVolumesOntoDesktopRadioButton =
-		new BRadioButton(frame, "", "Show Volumes On Desktop",
-			new BMessage(kVolumesOnDesktopChanged));
+	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
+		"Show Volumes On Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountVolumesOntoDesktopRadioButton);
 	fMountVolumesOntoDesktopRadioButton->ResizeToPreferred();
 
-	frame.OffsetBy(20, itemSpacing);
+	rect.OffsetBy(20, itemSpacing);
 
-	fMountSharedVolumesOntoDesktopCheckBox =
-		new BCheckBox(frame, "", "Show Shared Volumes On Desktop",
-			new BMessage(kVolumesOnDesktopChanged));
+	fMountSharedVolumesOntoDesktopCheckBox = new BCheckBox(rect, "",
+		"Show Shared Volumes On Desktop", new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountSharedVolumesOntoDesktopCheckBox);
 	fMountSharedVolumesOntoDesktopCheckBox->ResizeToPreferred();
 
-	frame.OffsetBy(-20, 2 * itemSpacing);
+	rect.OffsetBy(-20, 2 * itemSpacing);
 
-	fIntegrateNonBootBeOSDesktopsCheckBox =
-		new BCheckBox(frame, "", "Integrate Non-Boot BeOS Desktops",
-			new BMessage(kDesktopIntegrationChanged));
+	fIntegrateNonBootBeOSDesktopsCheckBox = new BCheckBox(rect, "",
+		"Integrate Non-Boot BeOS Desktops", new BMessage(kDesktopIntegrationChanged));
 	AddChild(fIntegrateNonBootBeOSDesktopsCheckBox);
 	fIntegrateNonBootBeOSDesktopsCheckBox->ResizeToPreferred();
 	
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fEjectWhenUnmountingCheckBox = 
-		new BCheckBox(frame, "", "Eject When Unmounting",
-			new BMessage(kEjectWhenUnmountingChanged));
+	fEjectWhenUnmountingCheckBox = new BCheckBox(rect, "", "Eject When Unmounting",
+		new BMessage(kEjectWhenUnmountingChanged));
 	AddChild(fEjectWhenUnmountingCheckBox);
 	fEjectWhenUnmountingCheckBox->ResizeToPreferred();
 
-	frame.OffsetBy(0, itemSpacing);
+	rect = Bounds();
+	rect.top = rect.bottom;
+	fMountButton = new BButton(rect, "", "Mount Settings" B_UTF8_ELLIPSIS,
+		new BMessage(kRunAutomounterSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fMountButton->ResizeToPreferred();
+	fMountButton->MoveBy(0, -fMountButton->Bounds().Height());
+	AddChild(fMountButton);	
 
-	BButton *button =
-		new BButton(BRect(kBorderSpacing, rect.Height() - kBorderSpacing - 20,
-			kBorderSpacing + 100, rect.Height() - kBorderSpacing),
-			"", "Mount Settings"B_UTF8_ELLIPSIS, new BMessage(kRunAutomounterSettings));
-	AddChild(button);		
+	fMountButton->SetTarget(be_app);
+}
 
-	button->ResizeToPreferred();
-	button->MoveBy(0, rect.Height() - kBorderSpacing - button->Frame().bottom);
-	button->SetTarget(be_app);
+
+void
+DesktopSettingsView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width != NULL) {
+		*_width = max_c(fIntegrateNonBootBeOSDesktopsCheckBox->Frame().right,
+			fMountSharedVolumesOntoDesktopCheckBox->Frame().right);
+	}
+
+	if (_height != NULL) {
+		*_height = fEjectWhenUnmountingCheckBox->Frame().bottom + 8
+			+ fMountButton->Bounds().Height();
+	}
 }
 
 
@@ -438,50 +442,51 @@ DesktopSettingsView::IsRevertable() const
 WindowsSettingsView::WindowsSettingsView(BRect rect)
 	: SettingsView(rect, "WindowsSettingsView")
 {
-	BRect frame = BRect(kBorderSpacing, kBorderSpacing, rect.Width()
-		- 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fShowFullPathInTitleBarCheckBox = new BCheckBox(frame, "", "Show Full Path In Title Bar",
+	rect.OffsetTo(B_ORIGIN);
+	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show Full Path In Title Bar",
 		new BMessage(kWindowsShowFullPathChanged));
-	AddChild(fShowFullPathInTitleBarCheckBox);
 	fShowFullPathInTitleBarCheckBox->ResizeToPreferred();
+	AddChild(fShowFullPathInTitleBarCheckBox);
 
 	const float itemSpacing = fShowFullPathInTitleBarCheckBox->Bounds().Height() + kItemExtraSpacing;
+	rect.OffsetBy(0, itemSpacing);
 
-	frame.OffsetBy(0, itemSpacing);
-
-	fSingleWindowBrowseCheckBox = new BCheckBox(frame, "", "Single Window Browse",
+	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single Window Browse",
 		new BMessage(kSingleWindowBrowseChanged));
-	AddChild(fSingleWindowBrowseCheckBox);
 	fSingleWindowBrowseCheckBox->ResizeToPreferred();
+	AddChild(fSingleWindowBrowseCheckBox);
 
-	frame.OffsetBy(20, itemSpacing);
+	rect.OffsetBy(20, itemSpacing);
 
-	fShowNavigatorCheckBox = new BCheckBox(frame, "", "Show Navigator",
+	fShowNavigatorCheckBox = new BCheckBox(rect, "", "Show Navigator",
 		new BMessage(kShowNavigatorChanged));
-	AddChild(fShowNavigatorCheckBox);
 	fShowNavigatorCheckBox->ResizeToPreferred();
+	AddChild(fShowNavigatorCheckBox);
 
-	frame.OffsetBy(-20, itemSpacing);
+	rect.OffsetBy(-20, itemSpacing);
 
-	fShowSelectionWhenInactiveCheckBox = new BCheckBox(frame, "", "Show Selection When Inactive",
-		new BMessage(kShowSelectionWhenInactiveChanged));
-	AddChild(fShowSelectionWhenInactiveCheckBox);
-	fShowSelectionWhenInactiveCheckBox->ResizeToPreferred();
-
-	frame.OffsetBy(0, itemSpacing);
-
-	fOutlineSelectionCheckBox = new BCheckBox(frame, "", "Outline Selection Rectangle Only",
+	fOutlineSelectionCheckBox = new BCheckBox(rect, "", "Outline Selection Rectangle Only",
 		new BMessage(kTransparentSelectionChanged));
-	AddChild(fOutlineSelectionCheckBox);
 	fOutlineSelectionCheckBox->ResizeToPreferred();
+	AddChild(fOutlineSelectionCheckBox);
 
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fSortFolderNamesFirstCheckBox = new BCheckBox(frame, "", "Sort Folder Names First",
+	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "Sort Folder Names First",
 		new BMessage(kSortFolderNamesFirstChanged));
-	AddChild(fSortFolderNamesFirstCheckBox);
 	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
+	AddChild(fSortFolderNamesFirstCheckBox);
+}
+
+
+void
+WindowsSettingsView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width != NULL)
+		*_width = fOutlineSelectionCheckBox->Frame().right;
+
+	if (_height != NULL)
+		*_height = fSortFolderNamesFirstCheckBox->Frame().bottom;
 }
 
 
@@ -491,7 +496,6 @@ WindowsSettingsView::AttachedToWindow()
 	fSingleWindowBrowseCheckBox->SetTarget(this);
 	fShowNavigatorCheckBox->SetTarget(this);
 	fShowFullPathInTitleBarCheckBox->SetTarget(this);
-	fShowSelectionWhenInactiveCheckBox->SetTarget(this);
 	fOutlineSelectionCheckBox->SetTarget(this);
 	fSortFolderNamesFirstCheckBox->SetTarget(this);
 }
@@ -531,19 +535,6 @@ WindowsSettingsView::MessageReceived(BMessage *message)
 			tracker->SendNotices(kShowNavigatorChanged);
 			Window()->PostMessage(kSettingsContentsModified);
 			break;
-
-		case kShowSelectionWhenInactiveChanged:
-		{
-			settings.SetShowSelectionWhenInactive(
-				fShowSelectionWhenInactiveCheckBox->Value() == 1);
-
-			// Make the notification message and send it to the tracker:
-			send_bool_notices(kShowSelectionWhenInactiveChanged,
-				"ShowSelectionWhenInactive", fShowSelectionWhenInactiveCheckBox->Value() == 1);
-
-			Window()->PostMessage(kSettingsContentsModified);
-			break;
-		}
 
 		case kTransparentSelectionChanged:
 		{
@@ -601,12 +592,6 @@ WindowsSettingsView::SetDefaults()
 		tracker->SendNotices(kShowNavigatorChanged);
 	}
 
-	if (!settings.ShowSelectionWhenInactive()) {
-		settings.SetShowSelectionWhenInactive(true);
-		send_bool_notices(kShowSelectionWhenInactiveChanged,
-			"ShowSelectionWhenInactive", true);
-	}
-
 	if (!settings.TransparentSelection()) {
 		settings.SetTransparentSelection(true);
 		send_bool_notices(kTransparentSelectionChanged,
@@ -647,12 +632,6 @@ WindowsSettingsView::Revert()
 		tracker->SendNotices(kShowNavigatorChanged);
 	}
 
-	if (settings.ShowSelectionWhenInactive() != fShowSelectionWhenInactive) {
-		settings.SetShowSelectionWhenInactive(fShowSelectionWhenInactive);
-		send_bool_notices(kShowSelectionWhenInactiveChanged,
-			"ShowSelectionWhenInactive", fShowSelectionWhenInactive);
-	}
-
 	if (settings.TransparentSelection() != fTransparentSelection) {
 		settings.SetTransparentSelection(fTransparentSelection);
 		send_bool_notices(kTransparentSelectionChanged,
@@ -678,7 +657,6 @@ WindowsSettingsView::ShowCurrentSettings()
 	fSingleWindowBrowseCheckBox->SetValue(settings.SingleWindowBrowse());
 	fShowNavigatorCheckBox->SetEnabled(settings.SingleWindowBrowse());
 	fShowNavigatorCheckBox->SetValue(settings.ShowNavigator());
-	fShowSelectionWhenInactiveCheckBox->SetValue(settings.ShowSelectionWhenInactive());
 	fOutlineSelectionCheckBox->SetValue(settings.TransparentSelection()
 		? B_CONTROL_OFF : B_CONTROL_ON);
 	fSortFolderNamesFirstCheckBox->SetValue(settings.SortFolderNamesFirst());
@@ -693,7 +671,6 @@ WindowsSettingsView::RecordRevertSettings()
 	fShowFullPathInTitleBar = settings.ShowFullPathInTitleBar();
 	fSingleWindowBrowse = settings.SingleWindowBrowse();
 	fShowNavigator = settings.ShowNavigator();
-	fShowSelectionWhenInactive = settings.ShowSelectionWhenInactive();
 	fTransparentSelection = settings.TransparentSelection();
 	fSortFolderNamesFirst = settings.SortFolderNamesFirst();
 }
@@ -707,258 +684,8 @@ WindowsSettingsView::IsRevertable() const
 	return fShowFullPathInTitleBar != settings.ShowFullPathInTitleBar()
 		|| fSingleWindowBrowse != settings.SingleWindowBrowse()
 		|| fShowNavigator != settings.ShowNavigator()
-		|| fShowSelectionWhenInactive != settings.ShowSelectionWhenInactive()
 		|| fTransparentSelection != settings.TransparentSelection()
 		|| fSortFolderNamesFirst != settings.SortFolderNamesFirst();
-}
-
-
-// #pragma mark -
-
-
-FilePanelSettingsView::FilePanelSettingsView(BRect rect)
-	: SettingsView(rect, "FilePanelSettingsView")
-{
-	BRect frame = BRect(kBorderSpacing, kBorderSpacing, rect.Width()
-		- 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fDesktopFilePanelRootCheckBox = new BCheckBox(frame, "", "File Panel Root is Desktop",
-		new BMessage(kDesktopFilePanelRootChanged));
-	AddChild(fDesktopFilePanelRootCheckBox);
-	fDesktopFilePanelRootCheckBox->ResizeToPreferred();
-
-	const float itemSpacing = fDesktopFilePanelRootCheckBox->Bounds().Height() + kItemExtraSpacing;
-
-	frame.OffsetBy(0, itemSpacing);
-
-	BRect recentBoxFrame(kBorderSpacing, frame.bottom, rect.Width() - kBorderSpacing, frame.top);
-
-	BBox *recentBox = new BBox(recentBoxFrame, "recentBox");
-	recentBox->SetLabel("Recent" B_UTF8_ELLIPSIS);
-
-	AddChild(recentBox);
-
-	frame = recentBoxFrame.OffsetToCopy(0,0);
-	frame.OffsetTo(kBorderSpacing, 3 * kBorderSpacing);
-	
-	frame.right = StringWidth("##Applications###10##");
-	float divider = StringWidth("Applications") + 10;
-		
-	fRecentDocumentsTextControl = new BTextControl(frame, "", "Documents", "10",
-		new BMessage(kFavoriteCountChanged));
-
-	fRecentDocumentsTextControl->SetDivider(divider);
-
-	frame.OffsetBy(0, itemSpacing);
-
-	fRecentFoldersTextControl = new BTextControl(frame, "", "Folders", "10",
-		new BMessage(kFavoriteCountChanged));
-
-	fRecentFoldersTextControl->SetDivider(divider);
-
-	recentBox->AddChild(fRecentDocumentsTextControl);
-	recentBox->AddChild(fRecentFoldersTextControl);
-	
-	recentBox->ResizeTo(recentBox->Frame().Width(), fRecentFoldersTextControl->Frame().bottom + kBorderSpacing);
-	
-	be_app->LockLooper();
-	be_app->StartWatching(this, kFavoriteCountChangedExternally);
-	be_app->UnlockLooper();
-}
-
-
-FilePanelSettingsView::~FilePanelSettingsView()
-{
-	be_app->LockLooper();
-	be_app->StopWatching(this, kFavoriteCountChangedExternally);
-	be_app->UnlockLooper();
-}
-
-
-void
-FilePanelSettingsView::AttachedToWindow()
-{
-	fDesktopFilePanelRootCheckBox->SetTarget(this);
-	fRecentDocumentsTextControl->SetTarget(this);
-	fRecentFoldersTextControl->SetTarget(this);
-}
-
-
-void
-FilePanelSettingsView::MessageReceived(BMessage *message)
-{
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
-	if (!tracker)
-		return;
-	TrackerSettings settings;
-
-	switch (message->what) {
-		case kDesktopFilePanelRootChanged:
-		{
-			settings.SetDesktopFilePanelRoot(fDesktopFilePanelRootCheckBox->Value() == 1);
-
-			// Make the notification message and send it to the tracker:
-			BMessage message;
-			message.AddBool("DesktopFilePanelRoot", fDesktopFilePanelRootCheckBox->Value() == 1);
-			tracker->SendNotices(kDesktopFilePanelRootChanged, &message);
-
-			Window()->PostMessage(kSettingsContentsModified);
-			break;
-		}
-		
-		case kFavoriteCountChanged:
-		{
-			_GetAndRefreshDisplayedFigures();
-			settings.SetRecentDocumentsCount(fDisplayedDocCount);
-			settings.SetRecentFoldersCount(fDisplayedFolderCount);
-
-			// Make the notification message and send it to the tracker:
-			BMessage message;
-			message.AddInt32("RecentDocuments", fDisplayedDocCount);
-			message.AddInt32("RecentFolders", fDisplayedFolderCount);
-			tracker->SendNotices(kFavoriteCountChanged, &message);
-
-			Window()->PostMessage(kSettingsContentsModified);
-			break;
-		}
-
-		case B_OBSERVER_NOTICE_CHANGE:
-		{
-			int32 observerWhat;
-			if (message->FindInt32("be:observe_change_what", &observerWhat) == B_OK
-				&& (uint32)observerWhat == kFavoriteCountChangedExternally) {
-				int32 count;
-				if (message->FindInt32("RecentApplications", &count) == B_OK) {
-					settings.SetRecentApplicationsCount(count);
-					ShowCurrentSettings();
-				}
-
-				if (message->FindInt32("RecentDocuments", &count) == B_OK) {
-					settings.SetRecentDocumentsCount(count);
-					ShowCurrentSettings();
-				}
-
-				if (message->FindInt32("RecentFolders", &count) == B_OK) {
-					settings.SetRecentFoldersCount(count);
-					ShowCurrentSettings();
-				}
-			}
-			break;
-		}
-
-		default:
-			_inherited::MessageReceived(message);
-			break;
-	}	
-}
-
-
-void
-FilePanelSettingsView::SetDefaults()
-{
-	TrackerSettings settings;
-
-	settings.SetDesktopFilePanelRoot(true);
-	settings.SetRecentDocumentsCount(10);
-	settings.SetRecentFoldersCount(10);
-
-	ShowCurrentSettings();
-	_SendNotices();
-}
-
-
-void
-FilePanelSettingsView::Revert()
-{
-	TrackerSettings settings;
-
-	settings.SetDesktopFilePanelRoot(fDesktopFilePanelRoot);
-	settings.SetRecentDocumentsCount(fRecentDocuments);
-	settings.SetRecentFoldersCount(fRecentFolders);
-
-	ShowCurrentSettings();
-	_SendNotices();
-}
-
-
-void
-FilePanelSettingsView::_SendNotices()
-{
-	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
-	if (!tracker)
-		return;
-
-	TrackerSettings settings;
-
-	// Make the notification message and send it to the tracker:
-
-	BMessage message;
-	message.AddBool("DesktopFilePanelRoot", fDesktopFilePanelRootCheckBox->Value() == 1);
-	tracker->SendNotices(kDesktopFilePanelRootChanged, &message);
-
-	int32 recentApplications, recentDocuments, recentFolders;
-	settings.RecentCounts(&recentApplications, &recentDocuments, &recentFolders);
-
-	message.AddInt32("RecentDocuments", recentDocuments);
-	message.AddInt32("RecentFolders", recentFolders);
-	tracker->SendNotices(kFavoriteCountChanged, &message);
-}
-
-
-void
-FilePanelSettingsView::ShowCurrentSettings()
-{
-	TrackerSettings settings;
-
-	fDesktopFilePanelRootCheckBox->SetValue(settings.DesktopFilePanelRoot());
-
-	int32 recentApplications, recentDocuments, recentFolders;
-	settings.RecentCounts(&recentApplications, &recentDocuments, &recentFolders);
-
-	BString docCountText;
-	docCountText << recentDocuments;
-	fRecentDocumentsTextControl->SetText(docCountText.String());
-
-	BString folderCountText;
-	folderCountText << recentFolders;
-	fRecentFoldersTextControl->SetText(folderCountText.String());
-}
-
-
-void
-FilePanelSettingsView::RecordRevertSettings()
-{
-	TrackerSettings settings;
-
-	fDesktopFilePanelRoot = settings.DesktopFilePanelRoot();
-	settings.RecentCounts(&fRecentApplications, &fRecentDocuments, &fRecentFolders);
-}
-
-
-bool
-FilePanelSettingsView::IsRevertable() const
-{
-	_GetAndRefreshDisplayedFigures();
-
-	return fDesktopFilePanelRoot != (fDesktopFilePanelRootCheckBox->Value() > 0)
-		|| fDisplayedDocCount != fRecentDocuments
-		|| fDisplayedFolderCount != fRecentFolders;
-}
-
-
-void
-FilePanelSettingsView::_GetAndRefreshDisplayedFigures() const
-{
-	sscanf(fRecentDocumentsTextControl->Text(), "%ld", &fDisplayedDocCount);
-	sscanf(fRecentFoldersTextControl->Text(), "%ld", &fDisplayedFolderCount);
-	
-	BString docCountText;
-	docCountText << fDisplayedDocCount;
-	fRecentDocumentsTextControl->SetText(docCountText.String());
-
-	BString folderCountText;
-	folderCountText << fDisplayedFolderCount;
-	fRecentFoldersTextControl->SetText(folderCountText.String());
 }
 
 
@@ -968,67 +695,65 @@ FilePanelSettingsView::_GetAndRefreshDisplayedFigures() const
 TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 	: SettingsView(rect, "WindowsSettingsView")
 {
-	BRect clockBoxFrame = BRect(kBorderSpacing, kBorderSpacing,
-		rect.Width() / 2 - 4 * kBorderSpacing, kBorderSpacing + 5 * kItemHeight);
+	rect.OffsetTo(B_ORIGIN);
 
-	BBox *clockBox = new BBox(clockBoxFrame, "Clock");
+	font_height fontHeight;
+	be_bold_font->GetHeight(&fontHeight);
+
+	rect.bottom = ceilf(fontHeight.ascent + fontHeight.descent) + 10;
+	BBox *clockBox = new BBox(rect, "Clock");
 	clockBox->SetLabel("Clock");
-
 	AddChild(clockBox);
 
-	BRect frame = BRect(kBorderSpacing, 2.5f*kBorderSpacing,
-		clockBoxFrame.Width() - 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	f24HrRadioButton = new BRadioButton(frame, "", "24 Hour",
+	rect.left = 8;
+	rect.top = rect.bottom - 8;
+	f24HrRadioButton = new BRadioButton(rect, "", "24 Hour",
 		new BMessage(kSettingsContentsModified));
-	clockBox->AddChild(f24HrRadioButton);
 	f24HrRadioButton->ResizeToPreferred();
+	clockBox->AddChild(f24HrRadioButton);
 
 	const float itemSpacing = f24HrRadioButton->Bounds().Height() + kItemExtraSpacing;
+	rect.OffsetBy(0, itemSpacing);
 
-	frame.OffsetBy(0, itemSpacing);
-
-	f12HrRadioButton = new BRadioButton(frame, "", "12 Hour",
+	f12HrRadioButton = new BRadioButton(rect, "", "12 Hour",
 		new BMessage(kSettingsContentsModified));
-	clockBox->AddChild(f12HrRadioButton);
 	f12HrRadioButton->ResizeToPreferred();
+	clockBox->AddChild(f12HrRadioButton);
 
-	clockBox->ResizeTo(clockBox->Bounds().Width(), f12HrRadioButton->Frame().bottom + kBorderSpacing);
+	float width = max_c(f12HrRadioButton->Frame().right, f24HrRadioButton->Frame().right) + 8.0f;
+	clockBox->ResizeTo(width, clockBox->Bounds().Height()
+		+ 3 * f12HrRadioButton->Frame().Height());
 
-	BRect dateFormatBoxFrame = BRect(clockBoxFrame.right + kBorderSpacing, kBorderSpacing,
-		rect.right - kBorderSpacing, kBorderSpacing + 5 * itemSpacing);
-
-	BBox *dateFormatBox = new BBox(dateFormatBoxFrame, "Date Order");
+	rect = clockBox->Frame();
+	rect.OffsetBy(rect.Width() + 8, 0);
+	BBox *dateFormatBox = new BBox(rect, "Date Order");
 	dateFormatBox->SetLabel("Date Order");
-
 	AddChild(dateFormatBox);
 
-	frame = BRect(kBorderSpacing, 2.5f*kBorderSpacing,
-		dateFormatBoxFrame.Width() - 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fYMDRadioButton = new BRadioButton(frame, "", "Year-Month-Day",
+	rect = f24HrRadioButton->Frame();
+	fYMDRadioButton = new BRadioButton(rect, "", "Year-Month-Day",
 		new BMessage(kSettingsContentsModified));
-	dateFormatBox->AddChild(fYMDRadioButton);
 	fYMDRadioButton->ResizeToPreferred();
+	dateFormatBox->AddChild(fYMDRadioButton);
 
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fDMYRadioButton = new BRadioButton(frame, "", "Day-Month-Year",
+	fDMYRadioButton = new BRadioButton(rect, "", "Day-Month-Year",
 		new BMessage(kSettingsContentsModified));
-	dateFormatBox->AddChild(fDMYRadioButton);
 	fDMYRadioButton->ResizeToPreferred();
+	dateFormatBox->AddChild(fDMYRadioButton);
 
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fMDYRadioButton = new BRadioButton(frame, "", "Month-Day-Year",
+	fMDYRadioButton = new BRadioButton(rect, "", "Month-Day-Year",
 		new BMessage(kSettingsContentsModified));
-	dateFormatBox->AddChild(fMDYRadioButton);
 	fMDYRadioButton->ResizeToPreferred();
+	dateFormatBox->AddChild(fMDYRadioButton);
 
-	dateFormatBox->ResizeTo(dateFormatBox->Bounds().Width(), fMDYRadioButton->Frame().bottom + kBorderSpacing);
+	dateFormatBox->ResizeTo(fYMDRadioButton->Bounds().Width() + 16,
+		dateFormatBox->Bounds().Height());
 
 	BPopUpMenu *menu = new BPopUpMenu("Separator");
-
 	menu->AddItem(new BMenuItem("None", new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem("Space", new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem("-", new BMessage(kSettingsContentsModified)));
@@ -1036,32 +761,51 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 	menu->AddItem(new BMenuItem("\\", new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem(".", new BMessage(kSettingsContentsModified)));
 
-	frame = BRect(clockBox->Frame().left, dateFormatBox->Frame().bottom + kBorderSpacing,
-		rect.right - kBorderSpacing, dateFormatBox->Frame().bottom + kBorderSpacing + itemSpacing);
-
-	fSeparatorMenuField = new BMenuField(frame, "Separator", "Separator", menu);
+	rect.left = 0;
+	rect.top = clockBox->Frame().bottom + 8;
+	rect.right = Bounds().Width() - 8;
+	rect.bottom = rect.top + itemSpacing;
+	fSeparatorMenuField = new BMenuField(rect, "Separator", "Separator:", menu);
+	fSeparatorMenuField->SetDivider(fSeparatorMenuField->StringWidth(fSeparatorMenuField->Label()) + 8.0f);
+	fSeparatorMenuField->SetAlignment(B_ALIGN_LEFT);
 	fSeparatorMenuField->ResizeToPreferred();
 	AddChild(fSeparatorMenuField);
 
-	frame.OffsetBy(0, 30.0f);
+	rect.OffsetBy(0, itemSpacing + 10);
 
-	BStringView *exampleView = new BStringView(frame, "", "Examples:");
-	AddChild(exampleView);
+	BStringView *exampleView = new BStringView(rect, "", "Examples:");
 	exampleView->ResizeToPreferred();
+	AddChild(exampleView);
 
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fLongDateExampleView = new BStringView(frame, "", "");
-	AddChild(fLongDateExampleView);
+	fLongDateExampleView = new BStringView(rect, "", "");
 	fLongDateExampleView->ResizeToPreferred();
+	AddChild(fLongDateExampleView);
 
-	frame.OffsetBy(0, itemSpacing);
+	rect.OffsetBy(0, itemSpacing);
 
-	fShortDateExampleView = new BStringView(frame, "", "");
-	AddChild(fShortDateExampleView);
+	fShortDateExampleView = new BStringView(rect, "", "");
 	fShortDateExampleView->ResizeToPreferred();
+	AddChild(fShortDateExampleView);
 
 	_UpdateExamples();
+}
+
+
+void
+TimeFormatSettingsView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width != NULL) {
+		BView* view = fMDYRadioButton->Parent();
+		if (view != NULL)
+			*_width = view->Frame().right;
+		else
+			*_width = Bounds().Width();
+	}
+
+	if (_height != NULL)
+		*_height = fShortDateExampleView->Frame().bottom;
 }
 
 
@@ -1284,16 +1028,15 @@ TimeFormatSettingsView::_UpdateExamples()
 SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	: SettingsView(rect, "SpaceBarSettingsView")
 {
-	BRect frame = BRect(kBorderSpacing, kBorderSpacing, rect.Width()
-		- 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fSpaceBarShowCheckBox = new BCheckBox(frame, "", "Show Space Bars On Volumes",
+	rect.OffsetTo(B_ORIGIN);
+	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show Space Bars On Volumes",
 		new BMessage(kUpdateVolumeSpaceBar));
-	AddChild(fSpaceBarShowCheckBox);
 	fSpaceBarShowCheckBox->ResizeToPreferred();
-	float itemSpacing = fSpaceBarShowCheckBox->Bounds().Height() + kItemExtraSpacing;
-	frame.OffsetBy(0, itemSpacing);
-	
+	AddChild(fSpaceBarShowCheckBox);
+
+	rect = fSpaceBarShowCheckBox->Frame();
+	rect.OffsetBy(0, fSpaceBarShowCheckBox->Bounds().Height() + kItemExtraSpacing);
+
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING);
 	menu->SetFont(be_plain_font);
 
@@ -1304,8 +1047,8 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	menu->AddItem(new BMenuItem("Free Space Color", new BMessage(kSpaceBarSwitchColor)));
 	menu->AddItem(new BMenuItem("Warning Space Color", new BMessage(kSpaceBarSwitchColor)));
 
-	BBox *box = new BBox(frame);
-	box->SetLabel(fColorPicker = new BMenuField(frame, NULL, NULL, menu));
+	BBox *box = new BBox(rect);
+	box->SetLabel(fColorPicker = new BMenuField(rect, NULL, NULL, menu));
 	AddChild(box);
 
 	fColorControl = new BColorControl(BPoint(8, fColorPicker->Bounds().Height()
@@ -1314,6 +1057,7 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	fColorControl->SetValue(TrackerSettings().UsedSpaceColor());
 	fColorControl->ResizeToPreferred();
 	box->AddChild(fColorControl);
+
 	box->ResizeTo(fColorControl->Bounds().Width() + 16,
 		fColorControl->Frame().bottom + 8);
 }
@@ -1321,6 +1065,26 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 
 SpaceBarSettingsView::~SpaceBarSettingsView()
 {
+}
+
+
+void
+SpaceBarSettingsView::GetPreferredSize(float *_width, float *_height)
+{
+	BView* view = fColorControl->Parent();
+	if (view == NULL)
+		BView::GetPreferredSize(_width, _height);
+
+	if (_width != NULL) {
+		float width = fSpaceBarShowCheckBox->Bounds().Width();
+		if (view->Bounds().Width() > width)
+			width = view->Bounds().Width();
+
+		*_width = width;
+	}
+
+	if (_height != NULL)
+		*_height = view->Frame().bottom;
 }
 
 
@@ -1500,20 +1264,35 @@ SpaceBarSettingsView::IsRevertable() const
 TrashSettingsView::TrashSettingsView(BRect rect)
 	: SettingsView(rect, "TrashSettingsView")
 {
-	BRect frame = BRect(kBorderSpacing, kBorderSpacing, rect.Width()
-			- 2 * kBorderSpacing, kBorderSpacing + kItemHeight);
-
-	fDontMoveFilesToTrashCheckBox = new BCheckBox(frame, "", "Don't Move Files To Trash",
+	rect.OffsetTo(B_ORIGIN);
+	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't Move Files To Trash",
 			new BMessage(kDontMoveFilesToTrashChanged));
-	AddChild(fDontMoveFilesToTrashCheckBox);
 	fDontMoveFilesToTrashCheckBox->ResizeToPreferred();
+	AddChild(fDontMoveFilesToTrashCheckBox);
 
-	frame.OffsetBy(0, fDontMoveFilesToTrashCheckBox->Bounds().Height() + kItemExtraSpacing);
+	rect = fDontMoveFilesToTrashCheckBox->Frame();
+	rect.OffsetBy(0, fDontMoveFilesToTrashCheckBox->Bounds().Height() + kItemExtraSpacing);
 
-	fAskBeforeDeleteFileCheckBox = new BCheckBox(frame, "", "Ask Before Delete",
+	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "", "Ask Before Delete",
 			new BMessage(kAskBeforeDeleteFileChanged));
-	AddChild(fAskBeforeDeleteFileCheckBox);
 	fAskBeforeDeleteFileCheckBox->ResizeToPreferred();
+	AddChild(fAskBeforeDeleteFileCheckBox);
+}
+
+
+void
+TrashSettingsView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width != NULL) {
+		float width = fDontMoveFilesToTrashCheckBox->Bounds().Width();
+		if (width < fAskBeforeDeleteFileCheckBox->Bounds().Width())
+			width = fAskBeforeDeleteFileCheckBox->Bounds().Width();
+
+		*_width = width;
+	}
+
+	if (_height != NULL)
+		*_height = fAskBeforeDeleteFileCheckBox->Frame().bottom;
 }
 
 

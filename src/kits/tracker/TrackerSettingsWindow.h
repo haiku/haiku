@@ -32,8 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#ifndef _TRACKER_SETTINGS_WINDOW
-#define _TRACKER_SETTINGS_WINDOW
+#ifndef TRACKER_SETTINGS_WINDOW_H
+#define TRACKER_SETTINGS_WINDOW_H
 
 #include <Box.h>
 #include <Button.h>
@@ -54,14 +54,16 @@ class TrackerSettingsWindow : public BWindow {
 		void MessageReceived(BMessage *message);
 		void Show();
 
-		SettingsView *ViewAt(int32 i);
-
-		void HandleChangedContents();
-		void HandlePressedDefaultsButton();
-		void HandlePressedRevertButton();
-		void HandleChangedSettingsView();
 
 	private:
+		SettingsView *_ViewAt(int32 i);
+		BRect _SettingsFrame();
+
+		void _HandleChangedContents();
+		void _HandlePressedDefaultsButton();
+		void _HandlePressedRevertButton();
+		void _HandleChangedSettingsView();
+
 		BListView *fSettingsTypeListView;
 		BBox *fSettingsContainerBox;
 		BButton *fDefaultsButton;
@@ -70,21 +72,8 @@ class TrackerSettingsWindow : public BWindow {
 		typedef BWindow _inherited;
 };
 
-
-class SettingsItem : public BStringItem {
-	public:
-		SettingsItem(const char *label, SettingsView *view);
-
-		void DrawItem(BView *owner, BRect rect, bool drawEverything);
-
-		SettingsView *View();
-
-	private:
-		SettingsView *fSettingsView;
-};
-
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif	// _TRACKER_SETTINGS_WINDOW
+#endif	// TRACKER_SETTINGS_WINDOW_H
