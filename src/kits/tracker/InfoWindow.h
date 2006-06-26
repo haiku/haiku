@@ -50,113 +50,6 @@ namespace BPrivate {
 
 class Model;
 class AttributeView;
-class TrackingView;
-
-// States for tracking the mouse
-enum track_state {
-	no_track = 0,
-	link_track,
-	path_track,
-	icon_track,
-	size_track,
-	open_only_track		// This is for items that can be opened, but can't be
-						// drag and dropped or renamed (Trash, Desktop Folder...)
-};
-
-class TrackingView : public BControl {
-	public:
-		TrackingView(BRect, const char *str, const BFont *font, BMessage *message);
-
-		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32 transit, const BMessage *message);
-		virtual void MouseUp(BPoint);
-		virtual void Draw(BRect);
-
-	private:
-		bool fMouseDown;
-		bool fMouseInView;
-		BFont fFont;
-};
-
-class AttributeView : public BView {	
-	public:
-		AttributeView(BRect, Model *);
-		~AttributeView();
-
-		void ModelChanged(Model *, BMessage *);
-		void ReLinkTargetModel(Model *);
-		void BeginEditingTitle();
-		void FinishEditingTitle(bool);
-		float CurrentFontHeight(float size = -1);
-
-		BTextView *TextView() const { return fTitleEditView; }
-
-		static filter_result TextViewFilter(BMessage *, BHandler **, BMessageFilter *);
-
-		off_t LastSize() const;
-		void SetLastSize(off_t);
-
-		void SetSizeStr(const char *);
-
-		status_t BuildContextMenu(BMenu *parent);
-
-		void SetPermissionsSwitchState(int32 state);
-
-	protected:
-		virtual void MouseDown(BPoint);
-		virtual void MouseMoved(BPoint, uint32, const BMessage *);
-		virtual void MouseUp(BPoint);
-		virtual void MessageReceived(BMessage *);
-		virtual void AttachedToWindow();
-		virtual void Draw(BRect);
-		virtual void Pulse();
-		virtual void MakeFocus(bool);
-		virtual void WindowActivated(bool);
-
-	private:
-		void InitStrings(const Model *);
-		void CheckAndSetSize();
-		void OpenLinkSource();
-		void OpenLinkTarget();
-
-		BString fPathStr;
-		BString fLinkToStr;
-		BString fSizeStr;
-		BString fModifiedStr;
-		BString fCreatedStr;
-		BString fKindStr;
-		BString fDescStr;
-
-		off_t fFreeBytes;
-		off_t fLastSize;
-
-		BRect fPathRect;
-		BRect fLinkRect;
-		BRect fDescRect;
-		BRect fTitleRect;
-		BRect fIconRect;
-		BRect fSizeRect;
-		BPoint fClickPoint;
-		float fDivider;
-
-		BMenuField *fPreferredAppMenu;
-		Model *fModel;
-		Model *fIconModel;
-		BBitmap *fIcon;
-		bool fMouseDown;
-		bool fDragging;
-		bool fDoubleClick;
-		track_state fTrackingState;
-		bool fIsDropTarget;
-		BTextView *fTitleEditView;
-		PaneSwitch *fPermissionsSwitch;
-		BWindow *fPathWindow;
-		BWindow *fLinkWindow;
-		BWindow *fDescWindow;
-
-		typedef BView _inherited;
-};
-
 
 class BInfoWindow : public BWindow {
 	public:
@@ -192,7 +85,6 @@ class BInfoWindow : public BWindow {
 
 		typedef BWindow _inherited;
 };
-
 
 inline bool
 BInfoWindow::StopCalc()

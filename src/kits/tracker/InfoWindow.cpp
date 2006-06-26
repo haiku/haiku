@@ -69,6 +69,114 @@ All rights reserved.
 #include "Tracker.h"
 #include "WidgetAttributeText.h"
 
+namespace BPrivate {
+
+// States for tracking the mouse
+enum track_state {
+	no_track = 0,
+	link_track,
+	path_track,
+	icon_track,
+	size_track,
+	open_only_track		// This is for items that can be opened, but can't be
+						// drag and dropped or renamed (Trash, Desktop Folder...)
+};
+
+class TrackingView : public BControl {
+	public:
+		TrackingView(BRect, const char *str, BMessage *message);
+
+		virtual void MouseDown(BPoint);
+		virtual void MouseMoved(BPoint, uint32 transit, const BMessage *message);
+		virtual void MouseUp(BPoint);
+		virtual void Draw(BRect);
+
+	private:
+		bool fMouseDown;
+		bool fMouseInView;
+};
+
+class AttributeView : public BView {	
+	public:
+		AttributeView(BRect, Model *);
+		~AttributeView();
+
+		void ModelChanged(Model *, BMessage *);
+		void ReLinkTargetModel(Model *);
+		void BeginEditingTitle();
+		void FinishEditingTitle(bool);
+		float CurrentFontHeight(float size = -1);
+
+		BTextView *TextView() const { return fTitleEditView; }
+
+		static filter_result TextViewFilter(BMessage *, BHandler **, BMessageFilter *);
+
+		off_t LastSize() const;
+		void SetLastSize(off_t);
+
+		void SetSizeStr(const char *);
+
+		status_t BuildContextMenu(BMenu *parent);
+
+		void SetPermissionsSwitchState(int32 state);
+
+	protected:
+		virtual void MouseDown(BPoint);
+		virtual void MouseMoved(BPoint, uint32, const BMessage *);
+		virtual void MouseUp(BPoint);
+		virtual void MessageReceived(BMessage *);
+		virtual void AttachedToWindow();
+		virtual void Draw(BRect);
+		virtual void Pulse();
+		virtual void MakeFocus(bool);
+		virtual void WindowActivated(bool);
+
+	private:
+		void InitStrings(const Model *);
+		void CheckAndSetSize();
+		void OpenLinkSource();
+		void OpenLinkTarget();
+
+		BString fPathStr;
+		BString fLinkToStr;
+		BString fSizeStr;
+		BString fModifiedStr;
+		BString fCreatedStr;
+		BString fKindStr;
+		BString fDescStr;
+
+		off_t fFreeBytes;
+		off_t fLastSize;
+
+		BRect fPathRect;
+		BRect fLinkRect;
+		BRect fDescRect;
+		BRect fTitleRect;
+		BRect fIconRect;
+		BRect fSizeRect;
+		BPoint fClickPoint;
+		float fDivider;
+
+		BMenuField *fPreferredAppMenu;
+		Model *fModel;
+		Model *fIconModel;
+		BBitmap *fIcon;
+		bool fMouseDown;
+		bool fDragging;
+		bool fDoubleClick;
+		track_state fTrackingState;
+		bool fIsDropTarget;
+		BTextView *fTitleEditView;
+		PaneSwitch *fPermissionsSwitch;
+		BWindow *fPathWindow;
+		BWindow *fLinkWindow;
+		BWindow *fDescWindow;
+
+		typedef BView _inherited;
+};
+
+}	// namespace BPrivate
+
 const float kDrawMargin = 3.0f;
 const float kBorderMargin = 15.0f;
 const float kBorderWidth = 32.0f;
@@ -133,9 +241,21 @@ OpenParentAndSelectOriginal(const entry_ref *ref)
 
 
 static BWindow *
-OpenToolTipWindow(BRect rect, const char *name, const char *string,
-	BMessenger target, BFont &font, BMessage *message)
+OpenToolTipWindow(BScreen& screen, BRect rect, const char *name,
+	const char *string, BMessenger target, BMessage *message)
 {
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	float height = ceilf(fontHeight.ascent + fontHeight.descent);
+	rect.top = floorf(rect.top + (rect.Height() - height) / 2.0f);
+	rect.bottom = rect.top + height;
+
+	rect.right = rect.left + ceilf(be_plain_font->StringWidth(string)) + 4;
+	if (rect.left < 0)
+		rect.OffsetBy(-rect.left, 0);
+	else if (rect.right > screen.Frame().right)
+		rect.OffsetBy(screen.Frame().right - rect.right, 0);
+
 	BWindow *window = new BWindow(rect, name, B_BORDERED_WINDOW_LOOK,
 		B_FLOATING_ALL_WINDOW_FEEL,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
@@ -143,7 +263,7 @@ OpenToolTipWindow(BRect rect, const char *name, const char *string,
 		| B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS);
 
 	TrackingView *trackingView = new TrackingView(window->Bounds(),
-		string, &font, message);
+		string, message);
 	trackingView->SetTarget(target);
 	window->AddChild(trackingView);
 
@@ -907,7 +1027,11 @@ AttributeView::InitStrings(const Model *model)
 		if (!linked)
 			fLinkToStr += " (broken)";	// link points to missing object
 	} else if (model->IsExecutable()) {
-		if (((Model*)model)->GetLongVersionString(fDescStr, B_APP_VERSION_KIND) != B_OK)
+		if (((Model*)model)->GetLongVersionString(fDescStr, B_APP_VERSION_KIND) == B_OK) {
+			// we want a flat string, so we replace all newlines/tabs with spaces
+			fDescStr.ReplaceAll('\n', ' ');
+			fDescStr.ReplaceAll('\t', ' ');
+		} else
 			fDescStr = "-";
 	}
 
@@ -1274,53 +1398,43 @@ AttributeView::MouseMoved(BPoint point, uint32, const BMessage *message)
 				// but not from a mouse down. In this case, we're just interested in
 				// knowing whether or not we need to display the "pop-up" version
 				// of the path or link text.
-				BRect screen(BScreen(B_MAIN_SCREEN_ID).Frame());
+				BScreen screen(Window());
 				BFont font;
 				GetFont(&font);
+				font.SetSize(kAttribFontHeight);
+				float maxWidth = (Bounds().Width() - (fDivider + kBorderMargin));
+
 				if (fPathRect.Contains(point)
-					&& StringWidth(fPathStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
+					&& font.StringWidth(fPathStr.String()) > maxWidth) {
 					fTrackingState = no_track;
 					BRect rect(fPathRect);
-					rect.right = rect.left + be_plain_font->StringWidth(fPathStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
-					if (rect.left < 0)
-						rect.OffsetBy(rect.left * -1, 0);
-					else if (rect.right > screen.right)
-						rect.OffsetBy(screen.right - rect.right, 0);
 
 					if (!fPathWindow || BMessenger(fPathWindow).IsValid() == false) {
-						fPathWindow = OpenToolTipWindow(rect, "fPathWindow", fPathStr.String(),
-							BMessenger(this), font, new BMessage(kOpenLinkSource));
+						fPathWindow = OpenToolTipWindow(screen, rect, "fPathWindow",
+							fPathStr.String(), BMessenger(this),
+							new BMessage(kOpenLinkSource));
 					}
 				} else if (fLinkRect.Contains(point)
-						&& StringWidth(fLinkToStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
+					&& font.StringWidth(fLinkToStr.String()) > maxWidth) {
 					fTrackingState = no_track;
 					BRect rect(fLinkRect);
-					rect.right = rect.left + be_plain_font->StringWidth(fLinkToStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
-					if (rect.left < 0)
-						rect.OffsetBy(rect.left * -1, 0);
-					else if (rect.right > screen.right)
-						rect.OffsetBy(screen.right - rect.right, 0);
 
 					if (!fLinkWindow || BMessenger(fLinkWindow).IsValid() == false) {
-						fLinkWindow = OpenToolTipWindow(rect, "fLinkWindow", fLinkToStr.String(),
-							BMessenger(this), font, new BMessage(kOpenLinkTarget));
+						fLinkWindow = OpenToolTipWindow(screen, rect, "fLinkWindow",
+							fLinkToStr.String(), BMessenger(this),
+							new BMessage(kOpenLinkTarget));
 					}
 				} else if (fDescRect.Contains(point)
-					&& StringWidth(fDescStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
+					&& font.StringWidth(fDescStr.String()) > maxWidth) {
 					fTrackingState = no_track;
 					BRect rect(fDescRect);
-					rect.right = rect.left + be_plain_font->StringWidth(fDescStr.String()) + 4;
 					rect.OffsetBy(Window()->Frame().left, Window()->Frame().top);
-					if (rect.left < 0)
-						rect.OffsetBy(rect.left * -1, 0);
-					else if (rect.right > screen.right)
-						rect.OffsetBy(screen.right - rect.right, 0);
 
 					if (!fDescWindow || BMessenger(fDescWindow).IsValid() == false) {
-						fDescWindow = OpenToolTipWindow(rect, "fDescWindow", fDescStr.String(),
-							BMessenger(this), font, NULL);
+						fDescWindow = OpenToolTipWindow(screen, rect, "fDescWindow",
+							fDescStr.String(), BMessenger(this), NULL);
 					}
 				}
 			}
@@ -1698,12 +1812,12 @@ AttributeView::Draw(BRect)
 		SetHighColor(kAttrValueColor);
 		// Check for truncation
 		if (StringWidth(fDescStr.String()) > (Bounds().Width() - (fDivider + kBorderMargin))) {
-				BString nameString(fDescStr.String());
-				TruncateString(&nameString, B_TRUNCATE_MIDDLE, 
-					Bounds().Width() - (fDivider + kBorderMargin));
-				DrawString(nameString.String());
-			} else 
-				DrawString(fDescStr.String());
+			BString nameString(fDescStr.String());
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE, 
+				Bounds().Width() - (fDivider + kBorderMargin));
+			DrawString(nameString.String());
+		} else 
+			DrawString(fDescStr.String());
 
 		// Cache the position of the description field
 		fDescRect.top = lineBase - fontMetrics.ascent;
@@ -2010,11 +2124,10 @@ AttributeView::SetSizeStr(const char *sizeStr)
 //	#pragma mark -
 
 
-TrackingView::TrackingView(BRect frame, const char *str, const BFont *font, BMessage *message)
+TrackingView::TrackingView(BRect frame, const char *str, BMessage *message)
 	: BControl(frame, "trackingView", str, message, B_FOLLOW_ALL, B_WILL_DRAW),
 	fMouseDown(false),
-	fMouseInView(false),
-	fFont(*font)
+	fMouseInView(false)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetEventMask(B_POINTER_EVENTS, 0);
@@ -2068,7 +2181,7 @@ TrackingView::Draw(BRect)
 	SetLowColor(ViewColor());
 
 	font_height fontHeight;
-	fFont.GetHeight(&fontHeight);
+	GetFontHeight(&fontHeight);
 
 	DrawString(Label(), BPoint(3, Bounds().Height() - fontHeight.descent));
 }
