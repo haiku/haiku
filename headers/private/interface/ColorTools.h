@@ -64,6 +64,7 @@ inline bool operator!=(const rgb_color c1, const rgb_color c2)
 	return (*((uint32*)&c1)) != (*((uint32*)&c2));
 }
 
+#ifndef __HAIKU__
 // Color creation.
 
 inline rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)
@@ -75,6 +76,7 @@ inline rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)
 	c.alpha = alpha;
 	return c;
 }
+#endif
 
 // Mix two colors together, ignoring their relative alpha channels.
 // If amount is 0, the result is color1; if 255, the result is color2;
