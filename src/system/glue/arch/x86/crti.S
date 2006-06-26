@@ -23,9 +23,7 @@
 FUNCTION(_init):
 	pushl	%ebp
 	movl	%esp, %ebp
-	pushl	%ebx
-		// BeOS unfortunately puts the image ID into %ebx instead of
-		// just passing it over the stack
+	pushl	8(%ebp)		// put image ID on the stack again
 	call	_init_before
 	// crtbegin.o stuff comes here
 
@@ -33,6 +31,6 @@ FUNCTION(_init):
 FUNCTION(_fini):
 	pushl	%ebp
 	movl	%esp, %ebp
-	pushl	%ebx
+	pushl	8(%ebp)
 	call	_term_before
 	// crtend.o stuff comes here

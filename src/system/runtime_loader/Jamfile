@@ -62,11 +62,10 @@ Objects
 	heap.c
 	utility.cpp
 	arch_relocate.c
-	arch_call_init_term.c
 ;
 
 Ld runtime_loader :
-	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o arch_relocate.o arch_call_init_term.o ]
+	[ FGristFiles runtime_loader.o elf.o export.o heap.o utility.o arch_relocate.o ]
 	libruntime_loader.a
 	$(TARGET_GCC_LIBGCC)
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld

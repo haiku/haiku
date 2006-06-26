@@ -48,8 +48,6 @@ void rldfree(void *p);
 
 // arch dependent prototypes
 status_t arch_relocate_image(image_t *image);
-void arch_call_init(image_t *image);
-void arch_call_term(image_t *image);
 
 #ifdef __cplusplus
 }

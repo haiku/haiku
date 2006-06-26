@@ -67,6 +67,7 @@ enum {
 #define APP_OR_LIBRARY_TYPE			(IMAGE_TYPE_TO_MASK(B_APP_IMAGE) \
 									| IMAGE_TYPE_TO_MASK(B_LIBRARY_IMAGE))
 
+typedef void (*init_term_function)(image_id);
 
 static image_queue_t sLoadedImages = {0, 0};
 static image_queue_t sLoadingImages = {0, 0};
@@ -220,6 +221,13 @@ find_loaded_image_by_id(image_id id)
 	image_t *image;
 
 	for (image = sLoadedImages.head; image; image = image->next) {
+		if (image->id == id)
+			return image;
+	}
+
+	// For the termination routine, we need to look into the list of
+	// disposable images as well
+	for (image = sDisposableImages.head; image; image = image->next) {
 		if (image->id == id)
 			return image;
 	}
@@ -1126,8 +1134,12 @@ init_dependencies(image_t *image, bool initHead)
 
 	TRACE(("%ld: init dependencies\n", find_thread(NULL)));
 	for (i = 0; i < count; i++) {
-		TRACE(("%ld:  init: %s\n", find_thread(NULL), initList[i]->name));
-		arch_call_init(initList[i]);
+		image = initList[i];
+
+		TRACE(("%ld:  init: %s\n", find_thread(NULL), image->name));
+
+		if (image->init_routine != NULL)
+			((init_term_function)image->init_routine)(image->id);
 	}
 	TRACE(("%ld:  init done.\n", find_thread(NULL)));
 
@@ -1289,15 +1301,11 @@ unload_library(image_id imageID, bool addOn)
 	rld_lock();
 		// for now, just do stupid simple global locking
 
-	/*
-	 * we only check images that have been already initialized
-	 */
+	// we only check images that have been already initialized
 
 	for (image = sLoadedImages.head; image; image = image->next) {
 		if (image->id == imageID) {
-			/*
-			 * do the unloading
-			 */
+			// unload image
 			if (type == image->type) {
 				put_image(image);
 				status = B_OK;
@@ -1311,7 +1319,7 @@ unload_library(image_id imageID, bool addOn)
 		while ((image = sDisposableImages.head) != NULL) {
 			// call image fini here...
 			if (image->term_routine)
-				arch_call_term(image);
+				((init_term_function)image->term_routine)(image->id);
 
 			dequeue_image(&sDisposableImages, image);
 			unmap_image(image);
@@ -1432,8 +1440,12 @@ terminate_program(void)
 
 	TRACE(("%ld: terminate dependencies\n", find_thread(NULL)));
 	for (i = count; i-- > 0;) {
-		TRACE(("%ld:  term: %s\n", find_thread(NULL), termList[i]->name));
-		arch_call_term(termList[i]);
+		image_t *image = termList[i];
+
+		TRACE(("%ld:  term: %s\n", find_thread(NULL), image->name));
+
+		if (image->term_routine)
+			((init_term_function)image->term_routine)(image->id);
 	}
 	TRACE(("%ld:  term done.\n", find_thread(NULL)));
 
