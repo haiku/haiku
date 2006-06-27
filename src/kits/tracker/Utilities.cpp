@@ -389,6 +389,22 @@ OffscreenBitmap::View() const
 
 // #pragma mark -
 
+#if !__HAIKU__
+
+inline bool
+operator==(const rgb_color& a, const rgb_color& b)
+{
+	return *(const uint32*)&a == *(const uint32*)&b;
+}
+
+inline bool
+operator!=(const rgb_color& a, const rgb_color& b)
+{
+	return *(const uint32*)&a != *(const uint32*)&b;
+}
+
+#endif
+
 
 namespace BPrivate {
 
