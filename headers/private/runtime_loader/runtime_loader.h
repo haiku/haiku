@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -29,7 +29,7 @@ typedef struct elf_region_t {
 
 typedef struct image_t {
 	// image identification
-	char				path[B_OS_NAME_LENGTH];
+	char				path[B_PATH_NAME_LENGTH];
 	char				name[B_OS_NAME_LENGTH];
 	image_id			id;
 	image_type			type;

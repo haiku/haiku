@@ -78,16 +78,18 @@ search_path_for_type(image_type type)
 
 
 static int
-try_open_executable(const char *dir, int dirLen, const char *name, char *path,
-	int pathLen)
+try_open_executable(const char *dir, int dirLength, const char *name, char *path,
+	size_t pathLength)
 {
-	int nameLen = strlen(name);
+	size_t nameLength = strlen(name);
+	struct stat stat;
+	status_t status;
 
 	// construct the path
-	if (dirLen > 0) {
+	if (dirLength > 0) {
 		char *buffer = path;
 
-		if (dirLen >= 2 && strncmp(dir, "%A", 2) == 0) {
+		if (dirLength >= 2 && strncmp(dir, "%A", 2) == 0) {
 			// Replace %A with current app folder path (of course,
 			// this must be the first part of the path)
 			// ToDo: Maybe using first image info is better suited than
@@ -98,31 +100,55 @@ try_open_executable(const char *dir, int dirLen, const char *name, char *path,
 			// copy what's left (when the application name is removed)
 			if (lastSlash != NULL) {
 				strlcpy(buffer, gProgramArgs->program_path,
-					min(pathLen, lastSlash + 1 - gProgramArgs->program_path));
+					min((int)pathLength, lastSlash + 1 - gProgramArgs->program_path));
 			} else
-				strlcpy(buffer, ".", pathLen);
+				strlcpy(buffer, ".", pathLength);
 
 			bytesCopied = strlen(buffer);
 			buffer += bytesCopied;
-			pathLen -= bytesCopied;
+			pathLength -= bytesCopied;
 			dir += 2;
-			dirLen -= 2;
+			dirLength -= 2;
 		}
 
-		if (dirLen + 1 + nameLen >= pathLen)
+		if (dirLength + 1 + nameLength >= pathLength)
 			return B_NAME_TOO_LONG;
 
-		memcpy(buffer, dir, dirLen);
-		buffer[dirLen] = '/';
-		strcpy(buffer + dirLen + 1, name);
+		memcpy(buffer, dir, dirLength);
+		buffer[dirLength] = '/';
+		strcpy(buffer + dirLength + 1, name);
 	} else {
-		if (nameLen >= pathLen)
+		if (nameLength >= pathLength)
 			return B_NAME_TOO_LONG;
 
-		strcpy(path + dirLen + 1, name);
+		strcpy(path + dirLength + 1, name);
 	}
 
 	TRACE(("runtime_loader: try_open_container(): %s\n", path));
+
+	// Test if the target is a symbolic link, and correct the path in this case
+
+	status = _kern_read_stat(-1, path, false, &stat, sizeof(struct stat));
+	if (status < B_OK)
+		return status;
+
+	if (S_ISLNK(stat.st_mode)) {
+		char buffer[PATH_MAX];
+		size_t length = PATH_MAX;
+		char *lastSlash;
+
+		// it's a link, indeed
+		status = _kern_read_link(-1, path, buffer, &length);
+		if (status < B_OK)
+			return status;
+
+		lastSlash = strrchr(path, '/');
+		if (buffer[0] != '/' && lastSlash != NULL) {
+			// relative path
+			strlcpy(lastSlash + 1, buffer, lastSlash + 1 - path + pathLength);
+		} else
+			strlcpy(path, buffer, pathLength);
+	}
 
 	return _kern_open(-1, path, O_RDONLY, 0);
 }
@@ -130,7 +156,7 @@ try_open_executable(const char *dir, int dirLen, const char *name, char *path,
 
 static int
 search_executable_in_path_list(const char *name, const char *pathList,
-	int pathListLen, char *pathBuffer, int pathBufferLen)
+	int pathListLen, char *pathBuffer, size_t pathBufferLength)
 {
 	const char *pathListEnd = pathList + pathListLen;
 	status_t status = B_ENTRY_NOT_FOUND;
@@ -147,7 +173,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 			pathEnd++;
 
 		fd = try_open_executable(pathList, pathEnd - pathList, name, pathBuffer,
-			pathBufferLen);
+			pathBufferLength);
 		if (fd >= 0) {
 			// see if it's a dir
 			struct stat stat;

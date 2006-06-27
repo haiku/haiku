@@ -178,21 +178,15 @@ static image_t *
 find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
 	uint32 typeMask)
 {
-	image_t *iter;
+	image_t *image;
 
-	if (isPath) {
-		for (iter = queue->head; iter; iter = iter->next) {
-			if (strncmp(iter->path, name, sizeof(iter->path)) == 0
-				&& typeMask & IMAGE_TYPE_TO_MASK(iter->type)) {
-				return iter;
-			}
-		}
-	} else {
-		for (iter = queue->head; iter; iter = iter->next) {
-			if (strncmp(iter->name, name, sizeof(iter->path)) == 0
-				&& typeMask & IMAGE_TYPE_TO_MASK(iter->type)) {
-				return iter;
-			}
+	for (image = queue->head; image; image = image->next) {
+		const char *imageName = isPath ? image->path : image->name;
+		int length = isPath ? sizeof(image->path) : sizeof(image->name);
+
+		if (!strncmp(imageName, name, length)
+			&& (typeMask & IMAGE_TYPE_TO_MASK(image->type)) != 0) {
+			return image;
 		}
 	}
 
@@ -207,8 +201,7 @@ find_image(char const *name, uint32 typeMask)
 	image_t *image;
 
 	image = find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
-
-	if (!image)
+	if (image == NULL)
 		image = find_image_in_queue(&sLoadingImages, name, isPath, typeMask);
 
 	return image;
@@ -891,7 +884,10 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	// If the path is not absolute, we prepend the CWD to make it one.
 	if (path[0] != '/') {
 		char relativePath[PATH_MAX];
-		strcpy(relativePath, path);
+		if (!strncmp(path, "./", 2))
+			strcpy(relativePath, path + 2);
+		else
+			strcpy(relativePath, path);
 
 		// get the CWD
 		status = _kern_getcwd(path, sizeof(path));
@@ -906,6 +902,18 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 			FATAL("Absolute path of image %s is too "
 				"long!\n", relativePath);
 			goto err1;
+		}
+	}
+
+	// Test again if this image has been registered already - this time,
+	// we can check the full path, not just its name as noted.
+	// You could end up loading an image twice with symbolic links, else.
+	if (type != B_ADD_ON_IMAGE) {
+		found = find_image(path, APP_OR_LIBRARY_TYPE);
+		if (found) {
+			atomic_add(&found->ref_count, 1);
+			*_image = found;
+			return B_OK;
 		}
 	}
 
