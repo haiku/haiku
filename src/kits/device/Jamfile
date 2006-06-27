@@ -6,5 +6,5 @@ SharedLibrary libdevice.so :
 	DigitalPort.cpp
 	Joystick.cpp
 	SerialPort.cpp
-	: libbe.so libroot.so
+	: be
 ;
