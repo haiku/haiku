@@ -5928,16 +5928,23 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 					return;
 			}
 			
+			// figure out the time at which the keypress happened
+			bigtime_t eventTime;
+			BMessage* message = Window()->CurrentMessage();
+			if (!message || message->FindInt64("when", &eventTime) < B_OK) {
+				eventTime = system_time();
+			}
+
 			// add char to existing matchString or start new match string
 			// make sure we don't overfill matchstring
-			if (system_time() - fLastKeyTime < (doubleClickSpeed * 2)) {
+			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2)) {
 				uint32 nchars = B_FILE_NAME_LENGTH - strlen(fMatchString);
 				strncat(fMatchString, searchChar, nchars);
 			} else {
 				strncpy(fMatchString, searchChar, B_FILE_NAME_LENGTH - 1);
 			} 
 			fMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
-			fLastKeyTime = system_time();
+			fLastKeyTime = eventTime;
 
 			fCountView->SetTypeAhead(fMatchString);
 
