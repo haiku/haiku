@@ -31,6 +31,14 @@
 #include <string.h>
 
 
+#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+// building under R5 or Dano/Zeta
+enum {
+	B_TRANSLATOR_ADDED			= '_ART',
+	B_TRANSLATOR_REMOVED		= '_RRT',
+};
+#endif
+
 namespace BPrivate {
 
 class QuarantineTranslatorImage {
