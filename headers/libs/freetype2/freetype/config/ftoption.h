@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    User-selectable configuration macros (specification only).           */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -38,22 +38,22 @@ FT_BEGIN_HEADER
   /*    library from a single source directory.                            */
   /*                                                                       */
   /*  - You can put a copy of this file in your build directory, more      */
-  /*    precisely in "$BUILD/freetype/config/ftoption.h", where "$BUILD"   */
+  /*    precisely in `$BUILD/freetype/config/ftoption.h', where `$BUILD'   */
   /*    is the name of a directory that is included _before_ the FreeType  */
   /*    include path during compilation.                                   */
   /*                                                                       */
   /*    The default FreeType Makefiles and Jamfiles use the build          */
-  /*    directory "builds/<system>" by default, but you can easily change  */
+  /*    directory `builds/<system>' by default, but you can easily change  */
   /*    that for your own projects.                                        */
   /*                                                                       */
-  /*  - Copy the file <ft2build.h> to "$BUILD/ft2build.h" and modify it    */
+  /*  - Copy the file <ft2build.h> to `$BUILD/ft2build.h' and modify it    */
   /*    slightly to pre-define the macro FT_CONFIG_OPTIONS_H used to       */
   /*    locate this file during the build.  For example,                   */
   /*                                                                       */
   /*      #define FT_CONFIG_OPTIONS_H  <myftoptions.h>                     */
   /*      #include <freetype/config/ftheader.h>                            */
   /*                                                                       */
-  /*    will use "$BUILD/myftoptions.h" instead of this file for macro     */
+  /*    will use `$BUILD/myftoptions.h' instead of this file for macro     */
   /*    definitions.                                                       */
   /*                                                                       */
   /*    Note also that you can similarly pre-define the macro              */
@@ -89,7 +89,7 @@ FT_BEGIN_HEADER
   /* building the library.                                                 */
   /*                                                                       */
   /* ObNote: The compiler-specific 64-bit integers are detected in the     */
-  /*         file "ftconfig.h" either statically or through the            */
+  /*         file `ftconfig.h' either statically or through the            */
   /*         `configure' script on supported platforms.                    */
   /*                                                                       */
 #undef  FT_CONFIG_OPTION_FORCE_INT64
@@ -100,7 +100,7 @@ FT_BEGIN_HEADER
   /* LZW-compressed file support.                                          */
   /*                                                                       */
   /*   FreeType now handles font files that have been compressed with the  */
-  /*   'compress' program.  This is mostly used to parse many of the PCF   */
+  /*   `compress' program.  This is mostly used to parse many of the PCF   */
   /*   files that come with various X11 distributions.  The implementation */
   /*   uses NetBSD's `zopen' to partially uncompress the file on the fly   */
   /*   (see src/lzw/ftgzip.c).                                             */
@@ -115,7 +115,7 @@ FT_BEGIN_HEADER
   /* Gzip-compressed file support.                                         */
   /*                                                                       */
   /*   FreeType now handles font files that have been compressed with the  */
-  /*   'gzip' program.  This is mostly used to parse many of the PCF files */
+  /*   `gzip' program.  This is mostly used to parse many of the PCF files */
   /*   that come with XFree86.  The implementation uses `zlib' to          */
   /*   partially uncompress the file on the fly (see src/gzip/ftgzip.c).   */
   /*                                                                       */
@@ -328,7 +328,7 @@ FT_BEGIN_HEADER
   /*   should define FT_DEBUG_MEMORY here.                                 */
   /*                                                                       */
   /*   Note that the memory debugger is only activated at runtime when     */
-  /*   when the _environment_ variable "FT2_DEBUG_MEMORY" is defined also! */
+  /*   when the _environment_ variable `FT2_DEBUG_MEMORY' is defined also! */
   /*                                                                       */
   /*   Do not #undef this macro here since the build system might define   */
   /*   it for certain configurations only.                                 */
@@ -471,7 +471,7 @@ FT_BEGIN_HEADER
   /* component offsets in composite glyphs.                                */
   /*                                                                       */
   /* Apple and MS disagree on the default behavior of component offsets    */
-  /* in composites.  Apple says that they should be scaled by the scale    */
+  /* in composites.  Apple says that they should be scaled by the scaling  */
   /* factors in the transformation matrix (roughly, it's more complex)     */
   /* while MS says they should not.  OpenType defines two bits in the      */
   /* composite flags array which can be used to disambiguate, but old      */
@@ -491,6 +491,14 @@ FT_BEGIN_HEADER
   /* Masters support.                                                      */
   /*                                                                       */
 #define TT_CONFIG_OPTION_GX_VAR_SUPPORT
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Define TT_CONFIG_OPTION_BDF if you want to include support for        */
+  /* an embedded `BDF ' table within SFNT-based bitmap formats.            */
+  /*                                                                       */
+#define TT_CONFIG_OPTION_BDF
 
 
   /*************************************************************************/
@@ -547,14 +555,44 @@ FT_BEGIN_HEADER
   /*                                                                       */
 #undef T1_CONFIG_OPTION_NO_MM_SUPPORT
 
+
+  /*************************************************************************/
+  /*************************************************************************/
+  /****                                                                 ****/
+  /****    A U T O F I T   M O D U L E    C O N F I G U R A T I O N     ****/
+  /****                                                                 ****/
+  /*************************************************************************/
+  /*************************************************************************/
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Compile autofit module with CJK script support.                       */
+  /*                                                                       */
+#define AF_CONFIG_OPTION_CJK
+
+
  /* */
 
-/*
- * This temporary macro is used to control various optimizations for
- * reducing the heap footprint of memory-mapped TrueType files.
- *
- */
-/* #define  FT_OPTIMIZE_MEMORY */
+  /*
+   * This temporary macro is used to control various optimizations for
+   * reducing the heap footprint of memory-mapped TrueType files.
+   */
+#define FT_OPTIMIZE_MEMORY
+
+
+  /*
+   * Define this variable if you want to keep the layout of internal
+   * structures that was used prior to FreeType 2.2.  This also compiles in
+   * a few obsolete functions to avoid linking problems on typical Unix
+   * distributions.
+   *
+   * For embedded systems or building a new distribution from scratch, it
+   * is recommended to disable the macro since it reduces the library's code
+   * size and activates a few memory-saving optimizations as well.
+   */
+#define FT_CONFIG_OPTION_OLD_INTERNALS
+
 
 FT_END_HEADER
 

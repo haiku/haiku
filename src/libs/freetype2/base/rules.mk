@@ -3,7 +3,7 @@
 #
 
 
-# Copyright 1996-2000, 2002, 2003, 2004, 2005 by
+# Copyright 1996-2000, 2002, 2003, 2004, 2005, 2006 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -46,22 +46,11 @@ BASE_SRC := $(BASE_DIR)/ftapi.c    \
 
 # Base layer `extensions' sources
 #
-# An extension is added to the library file (.a or .lib) as a separate
-# object.  It will then be linked to the final executable only if one of its
-# symbols is used by the application.
+# An extension is added to the library file as a separate object.  It is
+# then linked to the final executable only if one of its symbols is used by
+# the application.
 #
-BASE_EXT_SRC := $(BASE_DIR)/ftbitmap.c \
-                $(BASE_DIR)/ftbbox.c   \
-                $(BASE_DIR)/ftbdf.c    \
-                $(BASE_DIR)/ftglyph.c  \
-                $(BASE_DIR)/ftmm.c     \
-                $(BASE_DIR)/ftotval.c  \
-                $(BASE_DIR)/ftpfr.c    \
-                $(BASE_DIR)/ftstroke.c \
-                $(BASE_DIR)/ftsynth.c  \
-                $(BASE_DIR)/fttype1.c  \
-                $(BASE_DIR)/ftwinfnt.c \
-                $(BASE_DIR)/ftxf86.c
+BASE_EXT_SRC := $(patsubst %,$(BASE_DIR)/%,$(BASE_EXTENSIONS))
 
 # Default extensions objects
 #

@@ -5,7 +5,7 @@
 /*    Load the basic TrueType kerning table.  This doesn't handle          */
 /*    kerning data within the GPOS table at the moment.                    */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -246,7 +246,10 @@
           }
           else /* linear search */
           {
-            for ( count = num_pairs; count > 0; count-- )
+            FT_UInt  count2;
+
+
+            for ( count2 = num_pairs; count2 > 0; count2-- )
             {
               FT_ULong  key = FT_NEXT_ULONG( p );
 
@@ -263,7 +266,7 @@
         break;
 
        /*
-        *  We don't support format 2 because we've never seen a single font
+        *  We don't support format 2 because we haven't seen a single font
         *  using it in real life...
         */
 

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 Glyph Loader (body).                                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -195,23 +195,6 @@
   }
 
 
-  /*************************************************************************/
-  /*************************************************************************/
-  /*************************************************************************/
-  /**********                                                      *********/
-  /**********               UNHINTED GLYPH LOADER                  *********/
-  /**********                                                      *********/
-  /**********    The following code is in charge of loading a      *********/
-  /**********    single outline.  It completely ignores hinting    *********/
-  /**********    and is used when FT_LOAD_NO_HINTING is set.       *********/
-  /**********                                                      *********/
-  /**********      The Type 1 hinter is located in `t1hint.c'      *********/
-  /**********                                                      *********/
-  /*************************************************************************/
-  /*************************************************************************/
-  /*************************************************************************/
-
-
   FT_LOCAL_DEF( FT_Error )
   T1_Load_Glyph( T1_GlyphSlot  glyph,
                  T1_Size       size,
@@ -315,12 +298,10 @@
         glyph->root.linearHoriAdvance           = decoder.builder.advance.x;
         glyph->root.internal->glyph_transformed = 0;
 
-        /* make up vertical metrics */
-        metrics->vertBearingX = 0;
-        metrics->vertBearingY = 0;
-        metrics->vertAdvance  = 0;
-
-        glyph->root.linearVertAdvance = 0;
+        /* make up vertical ones */
+        metrics->vertAdvance = ( face->type1.font_bbox.yMax -
+                                 face->type1.font_bbox.yMin ) >> 16;
+        glyph->root.linearVertAdvance = metrics->vertAdvance;
 
         glyph->root.format = FT_GLYPH_FORMAT_OUTLINE;
 
@@ -356,49 +337,30 @@
 
 
           /* First of all, scale the points, if we are not hinting */
-          if ( !hinting )
+          if ( !hinting || ! decoder.builder.hints_funcs )
             for ( n = cur->n_points; n > 0; n--, vec++ )
             {
               vec->x = FT_MulFix( vec->x, x_scale );
               vec->y = FT_MulFix( vec->y, y_scale );
             }
 
-          FT_Outline_Get_CBox( &glyph->root.outline, &cbox );
-
           /* Then scale the metrics */
           metrics->horiAdvance  = FT_MulFix( metrics->horiAdvance,  x_scale );
           metrics->vertAdvance  = FT_MulFix( metrics->vertAdvance,  y_scale );
-
-          metrics->vertBearingX = FT_MulFix( metrics->vertBearingX, x_scale );
-          metrics->vertBearingY = FT_MulFix( metrics->vertBearingY, y_scale );
-
-          if ( hinting )
-          {
-            metrics->horiAdvance = FT_PIX_ROUND( metrics->horiAdvance );
-            metrics->vertAdvance = FT_PIX_ROUND( metrics->vertAdvance );
-
-            metrics->vertBearingX = FT_PIX_ROUND( metrics->vertBearingX );
-            metrics->vertBearingY = FT_PIX_ROUND( metrics->vertBearingY );
-          }
         }
 
         /* compute the other metrics */
         FT_Outline_Get_CBox( &glyph->root.outline, &cbox );
-
-        /* grid fit the bounding box if necessary */
-        if ( hinting )
-        {
-          cbox.xMin = FT_PIX_FLOOR( cbox.xMin );
-          cbox.yMin = FT_PIX_FLOOR( cbox.yMin );
-          cbox.xMax = FT_PIX_CEIL( cbox.xMax );
-          cbox.yMax = FT_PIX_CEIL( cbox.yMax );
-        }
 
         metrics->width  = cbox.xMax - cbox.xMin;
         metrics->height = cbox.yMax - cbox.yMin;
 
         metrics->horiBearingX = cbox.xMin;
         metrics->horiBearingY = cbox.yMax;
+
+        /* make up vertical ones */
+        ft_synthesize_vertical_metrics( metrics,
+                                        metrics->vertAdvance );
       }
 
       /* Set control data to the glyph charstrings.  Note that this is */

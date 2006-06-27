@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines (body).                                 */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005 by                                          */
+/*  Copyright 2003, 2004, 2005, 2006 by                                    */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -265,11 +265,61 @@
 #endif /* AF_DEBUG */
 
 
+
   /* compute the direction value of a given vector */
   FT_LOCAL_DEF( AF_Direction )
   af_direction_compute( FT_Pos  dx,
                         FT_Pos  dy )
   {
+#if 1
+    AF_Direction  dir = AF_DIR_NONE;
+
+
+    /* atan(1/12) == 4.7 degrees */
+
+    if ( dx < 0 )
+    {
+      if ( dy < 0 )
+      {
+        if ( -dx * 12 < -dy )
+          dir = AF_DIR_DOWN;
+
+        else if ( -dy * 12 < -dx )
+          dir = AF_DIR_LEFT;
+      }
+      else /* dy >= 0 */
+      {
+        if ( -dx * 12 < dy )
+          dir = AF_DIR_UP;
+
+        else if ( dy * 12 < -dx )
+          dir = AF_DIR_LEFT;
+      }
+    }
+    else /* dx >= 0 */
+    {
+      if ( dy < 0 )
+      {
+        if ( dx * 12 < -dy )
+          dir = AF_DIR_DOWN;
+
+        else if ( -dy * 12 < dx )
+          dir = AF_DIR_RIGHT;
+      }
+      else  /* dy >= 0 */
+      {
+        if ( dx * 12 < dy )
+          dir = AF_DIR_UP;
+
+        else if ( dy * 12 < dx )
+          dir = AF_DIR_RIGHT;
+      }
+    }
+
+    return dir;
+
+#else /* 0 */
+
     AF_Direction  dir;
     FT_Pos        ax = FT_ABS( dx );
     FT_Pos        ay = FT_ABS( dy );
@@ -291,6 +341,9 @@
     }
 
     return dir;
+
+#endif /* 0 */
+
   }
 
 
@@ -349,8 +402,9 @@
 
       } while ( angle_in == angle_seg );
 
-      first   = start;
-      diff_in = af_angle_diff( angle_in, angle_seg );
+      first = start;
+
+      AF_ANGLE_DIFF( diff_in, angle_in, angle_seg );
 
       /* now, process all segments in the contour */
       do
@@ -373,7 +427,7 @@
 
         } while ( angle_out == angle_seg );
 
-        diff_out = af_angle_diff( angle_seg, angle_out );
+        AF_ANGLE_DIFF( diff_out, angle_seg, angle_out );
 
         if ( ( diff_in ^ diff_out ) < 0 )
         {
@@ -455,7 +509,8 @@
   af_glyph_hints_rescale( AF_GlyphHints     hints,
                           AF_ScriptMetrics  metrics )
   {
-    hints->metrics = metrics;
+    hints->metrics      = metrics;
+    hints->scaler_flags = metrics->scaler.flags;
   }
 
 
@@ -466,7 +521,6 @@
     FT_Error   error   = AF_Err_Ok;
     AF_Point   points;
     FT_UInt    old_max, new_max;
-    AF_Scaler  scaler  = &hints->metrics->scaler;
     FT_Fixed   x_scale = hints->x_scale;
     FT_Fixed   y_scale = hints->y_scale;
     FT_Pos     x_delta = hints->x_delta;
@@ -474,7 +528,6 @@
     FT_Memory  memory  = hints->memory;
 
 
-    hints->scaler_flags = scaler->flags;
     hints->num_points   = 0;
     hints->num_contours = 0;
 
@@ -657,7 +710,8 @@
 
             angle_in  = af_angle_atan( in_x, in_y );
             angle_out = af_angle_atan( out_x, out_y );
-            delta     = af_angle_diff( angle_in, angle_out );
+
+            AF_ANGLE_DIFF( delta, angle_in, angle_out );
 
             if ( delta < 2 && delta > -2 )
               goto Is_Weak_Point;
@@ -1086,5 +1140,32 @@
     }
   }
 
+
+#ifdef AF_USE_WARPER
+
+  FT_LOCAL_DEF( void )
+  af_glyph_hints_scale_dim( AF_GlyphHints  hints,
+                            AF_Dimension   dim,
+                            FT_Fixed       scale,
+                            FT_Pos         delta )
+  {
+    AF_Point  points       = hints->points;
+    AF_Point  points_limit = points + hints->num_points;
+    AF_Point  point;
+    
+
+    if ( dim == AF_DIMENSION_HORZ )
+    {
+      for ( point = points; point < points_limit; point++ )
+        point->x = FT_MulFix( point->fx, scale ) + delta;
+    }
+    else
+    {
+      for ( point = points; point < points_limit; point++ )
+        point->y = FT_MulFix( point->fy, scale ) + delta;
+    }
+  }
+
+#endif /* AF_USE_WARPER */
 
 /* END */

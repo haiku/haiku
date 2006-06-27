@@ -2,9 +2,9 @@
 /*                                                                         */
 /*  ttpload.c                                                              */
 /*                                                                         */
-/*    TrueType glyph data/program tables loader (body).                    */
+/*    TrueType-specific tables loader (body).                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2004, 2005 by                               */
+/*  Copyright 1996-2001, 2002, 2004, 2005, 2006 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -47,7 +47,7 @@
   /*    tt_face_load_loca                                                  */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Loads the locations table.                                         */
+  /*    Load the locations table.                                          */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    face   :: A handle to the target face object.                      */
@@ -83,7 +83,7 @@
 
     if ( face->header.Index_To_Loc_Format != 0 )
     {
-      if ( table_len >= 0x40000 )
+      if ( table_len >= 0x40000L )
       {
         FT_TRACE2(( "table too large!\n" ));
         error = TT_Err_Invalid_Table;
@@ -93,7 +93,7 @@
     }
     else
     {
-      if ( table_len >= 0x20000 )
+      if ( table_len >= 0x20000L )
       {
         FT_TRACE2(( "table too large!\n" ));
         error = TT_Err_Invalid_Table;
@@ -319,7 +319,7 @@
   /*    tt_face_load_cvt                                                   */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Loads the control value table into a face object.                  */
+  /*    Load the control value table into a face object.                   */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    face   :: A handle to the target face object.                      */
@@ -400,7 +400,7 @@
   /*    tt_face_load_fpgm                                                  */
   /*                                                                       */
   /* <Description>                                                         */
-  /*    Loads the font program and the cvt program.                        */
+  /*    Load the font program.                                             */
   /*                                                                       */
   /* <InOut>                                                               */
   /*    face   :: A handle to the target face object.                      */
@@ -417,8 +417,8 @@
   {
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
 
-    FT_Error   error;
-    FT_ULong   table_len;
+    FT_Error  error;
+    FT_ULong  table_len;
 
 
     FT_TRACE2(( "Font program " ));
@@ -429,6 +429,7 @@
     {
       face->font_program      = NULL;
       face->font_program_size = 0;
+      error                   = TT_Err_Ok;
 
       FT_TRACE2(( "is missing!\n" ));
     }
@@ -440,6 +441,47 @@
 
       FT_TRACE2(( "loaded, %12d bytes\n", face->font_program_size ));
     }
+
+  Exit:
+    return error;
+
+#else /* !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+
+    FT_UNUSED( face   );
+    FT_UNUSED( stream );
+
+    return TT_Err_Ok;
+
+#endif
+  }
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    tt_face_load_prep                                                  */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    Load the cvt program.                                              */
+  /*                                                                       */
+  /* <InOut>                                                               */
+  /*    face   :: A handle to the target face object.                      */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    stream :: A handle to the input stream.                            */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    FreeType error code.  0 means success.                             */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Error )
+  tt_face_load_prep( TT_Face    face,
+                     FT_Stream  stream )
+  {
+#ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
+
+    FT_Error  error;
+    FT_ULong  table_len;
+
 
     FT_TRACE2(( "Prep program " ));
 
@@ -470,6 +512,234 @@
     FT_UNUSED( stream );
 
     return TT_Err_Ok;
+
+#endif
+  }
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    tt_face_load_hdmx                                                  */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    Load the `hdmx' table into the face object.                        */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    face   :: A handle to the target face object.                      */
+  /*                                                                       */
+  /*    stream :: A handle to the input stream.                            */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    FreeType error code.  0 means success.                             */
+  /*                                                                       */
+#ifdef FT_OPTIMIZE_MEMORY
+
+  FT_LOCAL_DEF( FT_Error )
+  tt_face_load_hdmx( TT_Face    face,
+                     FT_Stream  stream )
+  {
+    FT_Error   error;
+    FT_Memory  memory = stream->memory;
+    FT_UInt    version, nn, num_records;
+    FT_ULong   table_size, record_size;
+    FT_Byte*   p;
+    FT_Byte*   limit;
+
+
+    /* this table is optional */
+    error = face->goto_table( face, TTAG_hdmx, stream, &table_size );
+    if ( error || table_size < 8 )
+      return TT_Err_Ok;
+
+    if ( FT_FRAME_EXTRACT( table_size, face->hdmx_table ) )
+      goto Exit;
+
+    p     = face->hdmx_table;
+    limit = p + table_size;
+
+    version     = FT_NEXT_USHORT( p );
+    num_records = FT_NEXT_USHORT( p );
+    record_size = FT_NEXT_ULONG( p );
+
+    if ( version != 0 || num_records > 255 || record_size > 0x40000 )
+    {
+      error = TT_Err_Invalid_File_Format;
+      goto Fail;
+    }
+
+    if ( FT_NEW_ARRAY( face->hdmx_record_sizes, num_records ) )
+      goto Fail;
+
+    for ( nn = 0; nn < num_records; nn++ )
+    {
+      if ( p + record_size > limit )
+        break;
+
+      face->hdmx_record_sizes[nn] = p[0];
+      p                          += record_size;
+    }
+
+    face->hdmx_record_count = nn;
+    face->hdmx_table_size   = table_size;
+    face->hdmx_record_size  = record_size;
+
+  Exit:
+    return error;
+
+  Fail:
+    FT_FRAME_RELEASE( face->hdmx_table );
+    face->hdmx_table_size = 0;
+    goto Exit;
+  }
+
+
+  FT_LOCAL_DEF( void )
+  tt_face_free_hdmx( TT_Face  face )
+  {
+    FT_Stream  stream = face->root.stream;
+    FT_Memory  memory = stream->memory;
+
+
+    FT_FREE( face->hdmx_record_sizes );
+    FT_FRAME_RELEASE( face->hdmx_table );
+  }
+
+#else /* !FT_OPTIMIZE_MEMORY */
+
+  FT_LOCAL_DEF( FT_Error )
+  tt_face_load_hdmx( TT_Face    face,
+                     FT_Stream  stream )
+  {
+    FT_Error   error;
+    FT_Memory  memory = stream->memory;
+
+    TT_Hdmx    hdmx = &face->hdmx;
+    FT_Short   num_records;
+    FT_Long    num_glyphs;
+    FT_Long    record_size;
+
+
+    hdmx->version     = 0;
+    hdmx->num_records = 0;
+    hdmx->records     = 0;
+
+    /* this table is optional */
+    error = face->goto_table( face, TTAG_hdmx, stream, 0 );
+    if ( error )
+      return TT_Err_Ok;
+
+    if ( FT_FRAME_ENTER( 8L ) )
+      goto Exit;
+
+    hdmx->version = FT_GET_USHORT();
+    num_records   = FT_GET_SHORT();
+    record_size   = FT_GET_LONG();
+
+    FT_FRAME_EXIT();
+
+    if ( record_size < 0 || num_records < 0 )
+      return TT_Err_Invalid_File_Format;
+
+    /* Only recognize format 0 */
+    if ( hdmx->version != 0 )
+      goto Exit;
+
+    /* we can't use FT_QNEW_ARRAY here; otherwise tt_face_free_hdmx */
+    /* could fail during deallocation                               */
+    if ( FT_NEW_ARRAY( hdmx->records, num_records ) )
+      goto Exit;
+
+    hdmx->num_records = num_records;
+    num_glyphs        = face->root.num_glyphs;
+    record_size      -= num_glyphs + 2;
+
+    {
+      TT_HdmxEntry  cur   = hdmx->records;
+      TT_HdmxEntry  limit = cur + hdmx->num_records;
+
+
+      for ( ; cur < limit; cur++ )
+      {
+        /* read record */
+        if ( FT_READ_BYTE( cur->ppem      ) ||
+             FT_READ_BYTE( cur->max_width ) )
+          goto Exit;
+
+        if ( FT_QALLOC( cur->widths, num_glyphs )      ||
+             FT_STREAM_READ( cur->widths, num_glyphs ) )
+          goto Exit;
+
+        /* skip padding bytes */
+        if ( record_size > 0 && FT_STREAM_SKIP( record_size ) )
+          goto Exit;
+      }
+    }
+
+  Exit:
+    return error;
+  }
+
+
+  FT_LOCAL_DEF( void )
+  tt_face_free_hdmx( TT_Face  face )
+  {
+    if ( face )
+    {
+      FT_Int     n;
+      FT_Memory  memory = face->root.driver->root.memory;
+
+
+      for ( n = 0; n < face->hdmx.num_records; n++ )
+        FT_FREE( face->hdmx.records[n].widths );
+
+      FT_FREE( face->hdmx.records );
+      face->hdmx.num_records = 0;
+    }
+  }
+
+#endif /* !OPTIMIZE_MEMORY */
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* Return the advance width table for a given pixel size if it is found  */
+  /* in the font's `hdmx' table (if any).                                  */
+  /*                                                                       */
+  FT_LOCAL_DEF( FT_Byte* )
+  tt_face_get_device_metrics( TT_Face  face,
+                              FT_UInt  ppem,
+                              FT_UInt  gindex )
+  {
+#ifdef FT_OPTIMIZE_MEMORY
+
+    FT_UInt   nn;
+    FT_Byte*  result      = NULL;
+    FT_ULong  record_size = face->hdmx_record_size;
+    FT_Byte*  record      = face->hdmx_table + 8;
+
+
+    for ( nn = 0; nn < face->hdmx_record_count; nn++ )
+      if ( face->hdmx_record_sizes[nn] == ppem )
+      {
+        gindex += 2;
+        if ( gindex < record_size )
+          result = record + nn * record_size + gindex;
+        break;
+      }
+
+    return result;
+
+#else
+
+    FT_UShort  n;
+
+
+    for ( n = 0; n < face->hdmx.num_records; n++ )
+      if ( face->hdmx.records[n].ppem == ppem )
+        return &face->hdmx.records[n].widths[gindex];
+
+    return NULL;
 
 #endif
   }

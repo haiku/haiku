@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    High-level Type 42 driver interface (body).                          */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004 by Roberto Alameda.                         */
+/*  Copyright 2002, 2003, 2004, 2006 by Roberto Alameda.                   */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -229,14 +229,18 @@
     (FT_Slot_InitFunc)        T42_GlyphSlot_Init,
     (FT_Slot_DoneFunc)        T42_GlyphSlot_Done,
 
-    (FT_Size_ResetPointsFunc) T42_Size_SetChars,
-    (FT_Size_ResetPixelsFunc) T42_Size_SetPixels,
+#ifdef FT_CONFIG_OPTION_OLD_INTERNALS
+    ft_stub_set_char_sizes,
+    ft_stub_set_pixel_sizes,
+#endif
     (FT_Slot_LoadFunc)        T42_GlyphSlot_Load,
 
     (FT_Face_GetKerningFunc)  0,
     (FT_Face_AttachFunc)      0,
 
-    (FT_Face_GetAdvancesFunc) 0
+    (FT_Face_GetAdvancesFunc) 0,
+    (FT_Size_RequestFunc)     T42_Size_Request,
+    (FT_Size_SelectFunc)      T42_Size_Select
   };
 
 

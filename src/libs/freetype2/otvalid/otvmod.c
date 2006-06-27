@@ -124,7 +124,7 @@
     if ( base )
     {
       ft_validator_init( &valid, base, base + len_base, FT_VALIDATE_DEFAULT );
-      if ( ft_setjmp( valid.jump_buffer ) == 0 )
+      if ( ft_validator_run( &valid ) == 0 )
         otv_BASE_validate( base, &valid );
       error = valid.error;
       if ( error )
@@ -134,7 +134,7 @@
     if ( gpos )
     {
       ft_validator_init( &valid, gpos, gpos + len_gpos, FT_VALIDATE_DEFAULT );
-      if (ft_setjmp( valid.jump_buffer ) == 0 )
+      if ( ft_validator_run( &valid ) == 0 )
         otv_GPOS_validate( gpos, face->num_glyphs, &valid );
       error = valid.error;
       if ( error )
@@ -144,7 +144,7 @@
     if ( gsub )
     {
       ft_validator_init( &valid, gsub, gsub + len_gsub, FT_VALIDATE_DEFAULT );
-      if ( ft_setjmp( valid.jump_buffer ) == 0 )
+      if ( ft_validator_run( &valid ) == 0 )
         otv_GSUB_validate( gsub, face->num_glyphs, &valid );
       error = valid.error;
       if ( error )
@@ -154,7 +154,7 @@
     if ( gdef )
     {
       ft_validator_init( &valid, gdef, gdef + len_gdef, FT_VALIDATE_DEFAULT );
-      if ( ft_setjmp( valid.jump_buffer ) == 0 )
+      if ( ft_validator_run( &valid ) == 0 )
         otv_GDEF_validate( gdef, gsub, gpos, &valid );
       error = valid.error;
       if ( error )
@@ -164,7 +164,7 @@
     if ( jstf )
     {
       ft_validator_init( &valid, jstf, jstf + len_jstf, FT_VALIDATE_DEFAULT );
-      if ( ft_setjmp( valid.jump_buffer ) == 0 )
+      if ( ft_validator_run( &valid ) == 0 )
         otv_JSTF_validate( jstf, gsub, gpos, face->num_glyphs, &valid );
       error = valid.error;
       if ( error )

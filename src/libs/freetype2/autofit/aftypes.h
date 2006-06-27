@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter types (specification only).                              */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005 by                                          */
+/*  Copyright 2003, 2004, 2005, 2006 by                                    */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,20 +16,20 @@
 /***************************************************************************/
 
 
-/***************************************************************************
- *
- *  The auto-fitter is a complete rewrite of the old auto-hinter.
- *  Its main feature is the ability to differentiate between different
- *  scripts in order to apply language-specific rules.
- *
- *  The code has also been compartimentized into several entities that
- *  should make algorithmic experimentation easier than with the old
- *  code.
- *
- *  Finally, we get rid of the Catharon license, since this code is
- *  released under the FreeType one.
- *
- ***************************************************************************/
+  /*************************************************************************
+   *
+   *  The auto-fitter is a complete rewrite of the old auto-hinter.
+   *  Its main feature is the ability to differentiate between different
+   *  scripts in order to apply language-specific rules.
+   *
+   *  The code has also been compartimentized into several entities that
+   *  should make algorithmic experimentation easier than with the old
+   *  code.
+   *
+   *  Finally, we get rid of the Catharon license, since this code is
+   *  released under the FreeType one.
+   *
+   *************************************************************************/
 
 
 #ifndef __AFTYPES_H__
@@ -53,6 +53,7 @@ FT_BEGIN_HEADER
   /*************************************************************************/
   /*************************************************************************/
 
+#define xxAF_USE_WARPER  /* only define to use warp hinting */
 #define xxAF_DEBUG
 
 #ifdef AF_DEBUG
@@ -125,6 +126,7 @@ FT_BEGIN_HEADER
                  FT_Pos  dy );
 
 
+#if 0
   /*
    *  compute `angle2 - angle1'; the result is always within
    *  the range [-AF_ANGLE_PI .. AF_ANGLE_PI - 1]
@@ -132,6 +134,23 @@ FT_BEGIN_HEADER
   FT_LOCAL( AF_Angle )
   af_angle_diff( AF_Angle  angle1,
                  AF_Angle  angle2 );
+#endif /* 0 */
+
+
+#define AF_ANGLE_DIFF( result, angle1, angle2 ) \
+  FT_BEGIN_STMNT                                \
+    AF_Angle  _delta = (angle2) - (angle1);     \
+                                                \
+                                                \
+    _delta %= AF_ANGLE_2PI;                     \
+    if ( _delta < 0 )                           \
+      _delta += AF_ANGLE_2PI;                   \
+                                                \
+    if ( _delta > AF_ANGLE_PI )                 \
+      _delta -= AF_ANGLE_2PI;                   \
+                                                \
+    result = _delta;                            \
+  FT_END_STMNT
 
 
   /*************************************************************************/
@@ -240,6 +259,7 @@ FT_BEGIN_HEADER
   {
     AF_SCRIPT_NONE  = 0,
     AF_SCRIPT_LATIN = 1,
+    AF_SCRIPT_CJK   = 2,
     /* add new scripts here.  Don't forget to update the list in */
     /* `afglobal.c'.                                             */
 

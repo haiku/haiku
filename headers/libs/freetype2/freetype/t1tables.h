@@ -64,7 +64,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    A structure used to model a Type1/Type2 FontInfo dictionary.  Note */
   /*    that for Multiple Master fonts, each instance has its own          */
-  /*    FontInfo.                                                          */
+  /*    FontInfo dictionary.                                               */
   /*                                                                       */
   typedef struct  PS_FontInfoRec
   {
@@ -193,6 +193,8 @@ FT_BEGIN_HEADER
 
   } T1_Blend_Flags;
 
+  /* */
+
 
   /*# backwards compatible definitions */
 #define t1_blend_underline_position   T1_BLEND_UNDERLINE_POSITION
@@ -286,6 +288,14 @@ FT_BEGIN_HEADER
   typedef CID_FaceDictRec  CID_FontDict;
 
 
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Struct>                                                              */
+  /*    CID_FaceInfoRec                                                    */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A structure used to represent CID Face information.                */
+  /*                                                                       */
   typedef struct  CID_FaceInfoRec_
   {
     FT_String*      cid_font_name;
@@ -322,7 +332,7 @@ FT_BEGIN_HEADER
   /*    CID_Info                                                           */
   /*                                                                       */
   /* <Description>                                                         */
-  /*   This type is equivalent to CID_FaceInfoRec.  It is deprecated but   */
+  /*   This type is equivalent to @CID_FaceInfoRec.  It is deprecated but  */
   /*   kept to maintain source compatibility between various versions of   */
   /*   FreeType.                                                           */
   /*                                                                       */
@@ -381,7 +391,7 @@ FT_BEGIN_HEADER
   *    the face and don't need to be freed by the caller.
   *
   *    If the font's format is not Postscript-based, this function will
-  *    return the FT_Err_Invalid_Argument error code.
+  *    return the `FT_Err_Invalid_Argument' error code.
   */
   FT_EXPORT( FT_Error )
   FT_Get_PS_Font_Info( FT_Face          face,
@@ -413,7 +423,7 @@ FT_BEGIN_HEADER
   *    the face and don't need to be freed by the caller.
   *
   *    If the font's format is not Postscript-based, this function will
-  *    return the FT_Err_Invalid_Argument error code.
+  *    return the `FT_Err_Invalid_Argument' error code.
   */
   FT_EXPORT( FT_Error )
   FT_Get_PS_Font_Private( FT_Face         face,

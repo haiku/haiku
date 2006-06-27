@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType bytecode interpreter (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -94,9 +94,18 @@
 
 #define CUR  (*exc)                             /* see ttobjs.h */
 
+  /*************************************************************************/
+  /*                                                                       */
+  /* This macro is used whenever `exec' is unused in a function, to avoid  */
+  /* stupid warnings from pedantic compilers.                              */
+  /*                                                                       */
+#define FT_UNUSED_EXEC  FT_UNUSED( exc )
+
 #else                                           /* static implementation */
 
 #define CUR  cur
+
+#define FT_UNUSED_EXEC  int  __dummy = __dummy
 
   static
   TT_ExecContextRec  cur;   /* static exec. context variable */
@@ -113,14 +122,6 @@
   /* The instruction argument stack.                                       */
   /*                                                                       */
 #define INS_ARG  EXEC_OP_ FT_Long*  args    /* see ttobjs.h for EXEC_OP_ */
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* This macro is used whenever `exec' is unused in a function, to avoid  */
-  /* stupid warnings from pedantic compilers.                              */
-  /*                                                                       */
-#define FT_UNUSED_EXEC  FT_UNUSED( CUR )
 
 
   /*************************************************************************/
@@ -371,7 +372,7 @@
   /*************************************************************************/
   /*                                                                       */
   /* <Function>                                                            */
-  /*    TT_Destroy_Context                                                 */
+  /*    TT_Done_Context                                                    */
   /*                                                                       */
   /* <Description>                                                         */
   /*    Destroys a given context.                                          */
@@ -388,12 +389,10 @@
   /*    Only the glyph loader and debugger should call this function.      */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  TT_Destroy_Context( TT_ExecContext  exec,
-                      FT_Memory       memory )
+  TT_Done_Context( TT_ExecContext  exec )
   {
-    /* free composite load stack */
-    FT_FREE( exec->loadStack );
-    exec->loadSize = 0;
+    FT_Memory  memory = exec->memory;
+
 
     /* points zone */
     exec->maxPoints   = 0;
@@ -416,6 +415,7 @@
     exec->face = NULL;
 
     FT_FREE( exec );
+
     return TT_Err_Ok;
   }
 
@@ -431,8 +431,6 @@
   /* <Input>                                                               */
   /*    memory :: A handle to the parent memory object.                    */
   /*                                                                       */
-  /*    face   :: A handle to the source TrueType face object.             */
-  /*                                                                       */
   /* <InOut>                                                               */
   /*    exec   :: A handle to the target execution context.                */
   /*                                                                       */
@@ -441,14 +439,12 @@
   /*                                                                       */
   static FT_Error
   Init_Context( TT_ExecContext  exec,
-                TT_Face         face,
                 FT_Memory       memory )
   {
     FT_Error  error;
 
 
-    FT_TRACE1(( "Init_Context: new object at 0x%08p, parent = 0x%08p\n",
-                exec, face ));
+    FT_TRACE1(( "Init_Context: new object at 0x%08p\n", exec ));
 
     exec->memory   = memory;
     exec->callSize = 32;
@@ -462,14 +458,12 @@
     exec->maxContours = 0;
 
     exec->stackSize = 0;
-    exec->loadSize  = 0;
     exec->glyphSize = 0;
 
     exec->stack     = NULL;
-    exec->loadStack = NULL;
     exec->glyphIns  = NULL;
 
-    exec->face = face;
+    exec->face = NULL;
     exec->size = NULL;
 
     return TT_Err_Ok;
@@ -477,7 +471,7 @@
   Fail_Memory:
     FT_ERROR(( "Init_Context: not enough memory for 0x%08lx\n",
                (FT_Long)exec ));
-    TT_Destroy_Context( exec, memory );
+    TT_Done_Context( exec );
 
     return error;
  }
@@ -519,7 +513,7 @@
 
     if ( *size < new_max )
     {
-      if ( FT_REALLOC( *buff, *size, new_max * multiplier ) )
+      if ( FT_REALLOC( *buff, *size * multiplier, new_max * multiplier ) )
         return error;
       *size = new_max;
     }
@@ -593,14 +587,6 @@
 
       exec->twilight  = size->twilight;
     }
-
-    error = Update_Max( exec->memory,
-                        &exec->loadSize,
-                        sizeof ( TT_SubGlyphRec ),
-                        (void**)&exec->loadStack,
-                        exec->face->max_components + 1 );
-    if ( error )
-      return error;
 
     /* XXX: We reserve a little more elements on the stack to deal safely */
     /*      with broken fonts like arialbs, courbs, timesbs, etc.         */
@@ -770,17 +756,11 @@
   /* documentation is in ttinterp.h */
 
   FT_EXPORT_DEF( TT_ExecContext )
-  TT_New_Context( TT_Face  face )
+  TT_New_Context( TT_Driver  driver )
   {
-    TT_Driver       driver;
     TT_ExecContext  exec;
     FT_Memory       memory;
 
-
-    if ( !face )
-      return 0;
-
-    driver = (TT_Driver)face->root.driver;
 
     memory = driver->root.root.memory;
     exec   = driver->context;
@@ -795,7 +775,7 @@
         goto Exit;
 
       /* initialize it */
-      error = Init_Context( exec, face, memory );
+      error = Init_Context( exec, memory );
       if ( error )
         goto Fail;
 
@@ -811,34 +791,6 @@
 
     return 0;
   }
-
-
-  /*************************************************************************/
-  /*                                                                       */
-  /* <Function>                                                            */
-  /*    TT_Done_Context                                                    */
-  /*                                                                       */
-  /* <Description>                                                         */
-  /*    Discards an execution context.                                     */
-  /*                                                                       */
-  /* <Input>                                                               */
-  /*    exec :: A handle to the target execution context.                  */
-  /*                                                                       */
-  /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
-  /*                                                                       */
-  /* <Note>                                                                */
-  /*    Only the glyph loader and debugger should call this function.      */
-  /*                                                                       */
-  FT_LOCAL_DEF( FT_Error )
-  TT_Done_Context( TT_ExecContext  exec )
-  {
-    /* Nothing at all for now */
-    FT_UNUSED( exec );
-
-    return TT_Err_Ok;
-  }
-
 
 
   /*************************************************************************/

@@ -8,7 +8,6 @@ FT2_SRC     = [ FDirName $(HAIKU_TOP) src libs freetype2 ] ;
 FT2_LIB     = freetype ;
 
 FT2_COMPONENTS ?= gzip       # support for gzip-compressed files.
-                  autohint   # auto-hinter
 		  autofit
                   base       # base component (public APIs)
                   bdf        # BDF font driver
@@ -16,7 +15,6 @@ FT2_COMPONENTS ?= gzip       # support for gzip-compressed files.
                   cff        # CFF/CEF font driver
                   cid        # Postscript CID-keyed font driver
 		lzw	   # LZW routines
-		  otvalid
                   pcf        # PCF font driver
                   pfr        # PFR/TrueDoc font driver
                   psaux      # Common Postscript routines module
@@ -64,6 +62,8 @@ rule FT2_Library
 	# to be linked into the library.
 	# <libname> The name of the library.
 	# <sources> The sources.
+
+	DEFINES += FT2_BUILD_LIBRARY ;
 
 	local library = lib$(1).so ;
 	local sources = $(2) ;

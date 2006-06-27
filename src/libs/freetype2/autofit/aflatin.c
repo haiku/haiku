@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter hinting routines for latin script (body).                */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005 by                                          */
+/*  Copyright 2003, 2004, 2005, 2006 by                                    */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -20,6 +20,11 @@
 #include "aferrors.h"
 
 
+#ifdef AF_USE_WARPER
+#include "afwarp.h"
+#endif
+
+
   /*************************************************************************/
   /*************************************************************************/
   /*****                                                               *****/
@@ -28,9 +33,10 @@
   /*************************************************************************/
   /*************************************************************************/
 
-  static void
+  FT_LOCAL_DEF( void )
   af_latin_metrics_init_widths( AF_LatinMetrics  metrics,
-                                FT_Face          face )
+                                FT_Face          face,
+                                FT_ULong         charcode )
   {
     /* scan the array of segments in each direction */
     AF_GlyphHintsRec  hints[1];
@@ -41,16 +47,15 @@
     metrics->axis[AF_DIMENSION_HORZ].width_count = 0;
     metrics->axis[AF_DIMENSION_VERT].width_count = 0;
 
-    /* For now, compute the standard width and height from the `o'. */
     {
       FT_Error             error;
       FT_UInt              glyph_index;
       int                  dim;
-      AF_ScriptMetricsRec  dummy[1];
-      AF_Scaler            scaler = &dummy->scaler;
+      AF_LatinMetricsRec   dummy[1];
+      AF_Scaler            scaler = &dummy->root.scaler;
 
 
-      glyph_index = FT_Get_Char_Index( face, 'o' );
+      glyph_index = FT_Get_Char_Index( face, charcode );
       if ( glyph_index == 0 )
         goto Exit;
 
@@ -60,13 +65,14 @@
 
       FT_ZERO( dummy );
 
+      dummy->units_per_em = metrics->units_per_em;
       scaler->x_scale     = scaler->y_scale = 0x10000L;
       scaler->x_delta     = scaler->y_delta = 0;
       scaler->face        = face;
       scaler->render_mode = FT_RENDER_MODE_NORMAL;
       scaler->flags       = 0;
 
-      af_glyph_hints_rescale( hints, dummy );
+      af_glyph_hints_rescale( hints, (AF_ScriptMetrics)dummy );
 
       error = af_glyph_hints_reload( hints, &face->glyph->outline );
       if ( error )
@@ -77,9 +83,7 @@
         AF_LatinAxis  axis    = &metrics->axis[dim];
         AF_AxisHints  axhints = &hints->axis[dim];
         AF_Segment    seg, limit, link;
-
-        FT_UInt       num_widths              = 0;
-        FT_Pos        edge_distance_threshold = 32000;
+        FT_UInt       num_widths = 0;
 
 
         error = af_latin_hints_compute_segments( hints,
@@ -114,22 +118,24 @@
 
         af_sort_widths( num_widths, axis->widths );
         axis->width_count = num_widths;
+      }
 
-        /* we will now try to find the smallest width */
-        if ( num_widths > 0 && axis->widths[0].org < edge_distance_threshold )
-          edge_distance_threshold = axis->widths[0].org;
+  Exit:
+      for ( dim = 0; dim < AF_DIMENSION_MAX; dim++ )
+      {
+        AF_LatinAxis  axis = &metrics->axis[dim];
+        FT_Pos        stdw;
 
-        /* Now, compute the edge distance threshold as a fraction of the */
-        /* smallest width in the font.  Set it in `hinter->glyph' too!   */
-        if ( edge_distance_threshold == 32000 )
-          edge_distance_threshold = 50;
 
-        /* let's try 20% */
-        axis->edge_distance_threshold = edge_distance_threshold / 5;
+        stdw = ( axis->width_count > 0 )
+                 ? axis->widths[0].org
+                 : AF_LATIN_CONSTANT( metrics, 50 );
+
+        /* let's try 20% of the smallest width */
+        axis->edge_distance_threshold = stdw / 5;
       }
     }
 
-  Exit:
     af_glyph_hints_done( hints );
   }
 
@@ -404,7 +410,8 @@
 
     if ( !error )
     {
-      af_latin_metrics_init_widths( metrics, face );
+      /* For now, compute the standard width and height from the `o'. */
+      af_latin_metrics_init_widths( metrics, face, 'o' );
       af_latin_metrics_init_blues( metrics, face );
     }
 
@@ -559,6 +566,9 @@
   af_latin_metrics_scale( AF_LatinMetrics  metrics,
                           AF_Scaler        scaler )
   {
+    metrics->root.scaler.render_mode = scaler->render_mode;
+    metrics->root.scaler.face        = scaler->face;
+
     af_latin_metrics_scale_dim( metrics, scaler, AF_DIMENSION_HORZ );
     af_latin_metrics_scale_dim( metrics, scaler, AF_DIMENSION_VERT );
   }
@@ -739,6 +749,7 @@
           segment->last     = point;
           segment->contour  = contour;
           segment->score    = 32000;
+          segment->len      = 0;
           segment->link     = NULL;
           on_edge           = 1;
 
@@ -805,6 +816,7 @@
         segment->last  = min_point;
         segment->pos   = min_pos;
         segment->score = 32000;
+        segment->len   = 0;
         segment->link  = NULL;
 
         segment = NULL;
@@ -824,6 +836,7 @@
         segment->last  = max_point;
         segment->pos   = max_pos;
         segment->score = 32000;
+        segment->len   = 0;
         segment->link  = NULL;
 
         segment = NULL;
@@ -844,9 +857,16 @@
     AF_Segment    segments      = axis->segments;
     AF_Segment    segment_limit = segments + axis->num_segments;
     AF_Direction  major_dir     = axis->major_dir;
+    FT_Pos        len_threshold, len_score;
     AF_Segment    seg1, seg2;
 
-  
+
+    len_threshold = AF_LATIN_CONSTANT( hints->metrics, 8 );
+    if ( len_threshold == 0 )
+      len_threshold = 1;
+
+    len_score = AF_LATIN_CONSTANT( hints->metrics, 3000 );
+
     /* now compare each segment to the others */
     for ( seg1 = segments; seg1 < segment_limit; seg1++ )
     {
@@ -879,9 +899,9 @@
               max = seg2->max_coord;
 
             len = max - min;
-            if ( len >= 8 )
+            if ( len >= len_threshold )
             {
-              score = dist + 3000 / len;
+              score = dist + len_score / len;
 
               if ( score < seg1->score )
               {
@@ -1292,6 +1312,8 @@
                        AF_LatinMetrics  metrics )
   {
     FT_Render_Mode  mode;
+    FT_UInt32       scaler_flags, other_flags;
+    FT_Face         face = metrics->root.scaler.face;
 
 
     af_glyph_hints_rescale( hints, (AF_ScriptMetrics)metrics );
@@ -1305,32 +1327,52 @@
     hints->y_scale = metrics->axis[AF_DIMENSION_VERT].scale;
     hints->y_delta = metrics->axis[AF_DIMENSION_VERT].delta;
 
-    /* compute flags depending on render mode, etc... */
-
+    /* compute flags depending on render mode, etc. */
     mode = metrics->root.scaler.render_mode;
+
+#ifdef AF_USE_WARPER
+    if ( mode == FT_RENDER_MODE_LCD || mode == FT_RENDER_MODE_LCD_V )
+    {
+      metrics->root.scaler.render_mode = mode = FT_RENDER_MODE_NORMAL;
+    }
+#endif
+
+    scaler_flags = hints->scaler_flags;
+    other_flags  = 0;
 
     /*
      *  We snap the width of vertical stems for the monochrome and
      *  horizontal LCD rendering targets only.
      */
     if ( mode == FT_RENDER_MODE_MONO || mode == FT_RENDER_MODE_LCD )
-      hints->other_flags |= AF_LATIN_HINTS_HORZ_SNAP;
+      other_flags |= AF_LATIN_HINTS_HORZ_SNAP;
 
     /*
      *  We snap the width of horizontal stems for the monochrome and
      *  vertical LCD rendering targets only.
      */
     if ( mode == FT_RENDER_MODE_MONO || mode == FT_RENDER_MODE_LCD_V )
-      hints->other_flags |= AF_LATIN_HINTS_VERT_SNAP;
+      other_flags |= AF_LATIN_HINTS_VERT_SNAP;
 
     /*
      *  We adjust stems to full pixels only if we don't use the `light' mode.
      */
     if ( mode != FT_RENDER_MODE_LIGHT )
-      hints->other_flags |= AF_LATIN_HINTS_STEM_ADJUST;
+      other_flags |= AF_LATIN_HINTS_STEM_ADJUST;
 
     if ( mode == FT_RENDER_MODE_MONO )
-      hints->other_flags |= AF_LATIN_HINTS_MONO;
+      other_flags |= AF_LATIN_HINTS_MONO;
+
+    /*
+     *  In `light' hinting mode we disable horizontal hinting completely.
+     *  We also do it if the face is italic.
+     */
+    if ( mode == FT_RENDER_MODE_LIGHT                    ||
+         (face->style_flags & FT_STYLE_FLAG_ITALIC) != 0 )
+      scaler_flags |= AF_SCALER_FLAG_NO_HORIZONTAL;
+
+    hints->scaler_flags = scaler_flags;
+    hints->other_flags  = other_flags;
 
     return 0;
   }
@@ -1405,7 +1447,7 @@
     AF_LatinAxis     axis     = & metrics->axis[dim];
     FT_Pos           dist     = width;
     FT_Int           sign     = 0;
-    FT_Int           vertical = AF_HINTS_DO_VERTICAL( hints );
+    FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
 
 
     if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) )
@@ -1926,6 +1968,20 @@
       if ( ( dim == AF_DIMENSION_HORZ && AF_HINTS_DO_HORIZONTAL( hints ) ) ||
            ( dim == AF_DIMENSION_VERT && AF_HINTS_DO_VERTICAL( hints ) )   )
       {
+#ifdef AF_USE_WARPER
+        if ( dim == AF_DIMENSION_HORZ &&
+             metrics->root.scaler.render_mode == FT_RENDER_MODE_NORMAL )
+        {
+          AF_WarperRec  warper;
+          FT_Fixed      scale;
+          FT_Pos        delta;
+
+
+          af_warper_compute( &warper, hints, dim, &scale, &delta );
+          af_glyph_hints_scale_dim( hints, dim, scale, delta );
+          continue;
+        }
+#endif
         af_latin_hint_edges( hints, (AF_Dimension)dim );
         af_glyph_hints_align_edge_points( hints, (AF_Dimension)dim );
         af_glyph_hints_align_strong_points( hints, (AF_Dimension)dim );

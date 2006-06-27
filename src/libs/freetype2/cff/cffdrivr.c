@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType font driver implementation (body).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -313,8 +313,8 @@
   /*
    * TT CMAP INFO
    *
-   * If the charmap is a synthetic Unicode encoding cmap or 
-   * a Type 1 standard (or expert) encoding cmap, hide TT CMAP INFO 
+   * If the charmap is a synthetic Unicode encoding cmap or
+   * a Type 1 standard (or expert) encoding cmap, hide TT CMAP INFO
    * service defined in SFNT module.
    *
    * Otherwise call the service function in the sfnt module.
@@ -330,7 +330,7 @@
 
     cmap_info->language = 0;
 
-    if ( cmap->clazz != &cff_cmap_encoding_class_rec && 
+    if ( cmap->clazz != &cff_cmap_encoding_class_rec &&
          cmap->clazz != &cff_cmap_unicode_class_rec  )
     {
       FT_Face             face    = FT_CMAP_FACE( cmap );
@@ -433,14 +433,24 @@
     cff_slot_init,
     cff_slot_done,
 
-    cff_point_size_reset,
-    cff_size_reset,
+#ifdef FT_CONFIG_OPTION_OLD_INTERNALS
+    ft_stub_set_char_sizes,
+    ft_stub_set_pixel_sizes,
+#endif
 
     Load_Glyph,
 
     cff_get_kerning,
     0,                      /* FT_Face_AttachFunc      */
-    0                       /* FT_Face_GetAdvancesFunc */
+    0,                      /* FT_Face_GetAdvancesFunc */
+
+    cff_size_request,
+
+#ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
+    cff_size_select
+#else
+    0                       /* FT_Size_SelectFunc      */
+#endif
   };
 
 

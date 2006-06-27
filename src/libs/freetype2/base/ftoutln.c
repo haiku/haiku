@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType outline management (body).                                  */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -668,6 +668,172 @@
   }
 
 
+#if 0
+
+#define FT_OUTLINE_GET_CONTOUR( outline, c, first, last )  \
+  do {                                                     \
+    (first) = ( c > 0 ) ? (outline)->points +              \
+                            (outline)->contours[c - 1] + 1 \
+                        : (outline)->points;               \
+    (last) = (outline)->points + (outline)->contours[c];   \
+  } while ( 0 )
+
+
+  /* Is a point in some contour?                     */
+  /*                                                 */
+  /* We treat every point of the contour as if it    */
+  /* it were ON.  That is, we allow false positives, */
+  /* but disallow false negatives.  (XXX really?)    */
+  static FT_Bool
+  ft_contour_has( FT_Outline*  outline,
+                  FT_Short     c,
+                  FT_Vector*   point )
+  {
+    FT_Vector*  first;
+    FT_Vector*  last;
+    FT_Vector*  a;
+    FT_Vector*  b;
+    FT_UInt     n = 0;
+
+
+    FT_OUTLINE_GET_CONTOUR( outline, c, first, last );
+
+    for ( a = first; a <= last; a++ )
+    {
+      FT_Pos  x;
+      FT_Int  intersect;
+
+
+      b = ( a == last ) ? first : a + 1;
+
+      intersect = ( a->y - point->y ) ^ ( b->y - point->y );
+
+      /* a and b are on the same side */
+      if ( intersect >= 0 )
+      {
+        if ( intersect == 0 && a->y == point->y )
+        {
+          if ( ( a->x <= point->x && b->x >= point->x ) ||
+               ( a->x >= point->x && b->x <= point->x ) )
+            return 1;
+        }
+
+        continue;
+      }
+
+      x = a->x + ( b->x - a->x ) * (point->y - a->y ) / ( b->y - a->y );
+
+      if ( x < point->x )
+        n++;
+      else if ( x == point->x )
+        return 1;
+    }
+
+    return ( n % 2 );
+  }
+
+  
+  static FT_Bool
+  ft_contour_enclosed( FT_Outline*  outline,
+                       FT_UShort    c )
+  {
+    FT_Vector*  first;
+    FT_Vector*  last;
+    FT_Short    i;
+
+
+    FT_OUTLINE_GET_CONTOUR( outline, c, first, last );
+
+    for ( i = 0; i < outline->n_contours; i++ )
+    {
+      if ( i != c && ft_contour_has( outline, i, first ) )
+      {
+        FT_Vector*  pt;
+
+
+        for ( pt = first + 1; pt <= last; pt++ )
+          if ( !ft_contour_has( outline, i, pt ) )
+            return 0;
+
+        return 1;
+      }
+    }
+
+    return 0;
+  }
+
+
+  /* This version differs from the public one in that each */
+  /* part (contour not enclosed in another contour) of the */
+  /* outline is checked for orientation.  This is          */
+  /* necessary for some buggy CJK fonts.                   */
+  static FT_Orientation
+  ft_outline_get_orientation( FT_Outline*  outline )
+  {
+    FT_Short        i;
+    FT_Vector*      first;
+    FT_Vector*      last;
+    FT_Orientation  orient = FT_ORIENTATION_NONE;
+
+
+    first = outline->points;
+    for ( i = 0; i < outline->n_contours; i++, first = last + 1 )
+    {
+      FT_Vector*  point;
+      FT_Vector*  xmin_point;
+      FT_Pos      xmin;
+
+
+      last = outline->points + outline->contours[i];
+
+      /* skip degenerate contours */
+      if ( last < first + 2 )
+        continue;
+
+      if ( ft_contour_enclosed( outline, i ) )
+        continue;
+
+      xmin       = first->x;
+      xmin_point = first;
+
+      for ( point = first + 1; point <= last; point++ )
+      {
+        if ( point->x < xmin )
+        {
+          xmin       = point->x;
+          xmin_point = point;
+        }
+      }
+
+      /* check the orientation of the contour */
+      {
+        FT_Vector*      prev;
+        FT_Vector*      next;
+        FT_Orientation  o;
+
+
+        prev = ( xmin_point == first ) ? last : xmin_point - 1;
+        next = ( xmin_point == last ) ? first : xmin_point + 1;
+
+        if ( FT_Atan2( prev->x - xmin_point->x, prev->y - xmin_point->y ) >
+             FT_Atan2( next->x - xmin_point->x, next->y - xmin_point->y ) )
+          o = FT_ORIENTATION_POSTSCRIPT;
+        else
+          o = FT_ORIENTATION_TRUETYPE;
+
+        if ( orient == FT_ORIENTATION_NONE )
+          orient = o;
+        else if ( orient != o )
+          return FT_ORIENTATION_NONE;
+      }
+    }
+
+    return orient;
+  }
+
+#endif /* 0 */
+
+
   /* documentation is in ftoutln.h */
 
   FT_EXPORT_DEF( FT_Error )
@@ -678,15 +844,26 @@
     FT_Vector   v_prev, v_first, v_next, v_cur;
     FT_Angle    rotate, angle_in, angle_out;
     FT_Int      c, n, first;
+    FT_Int      orientation;
 
 
     if ( !outline )
       return FT_Err_Invalid_Argument;
 
+    strength /= 2;
     if ( strength == 0 )
       return FT_Err_Ok;
 
-    if ( FT_Outline_Get_Orientation( outline ) == FT_ORIENTATION_TRUETYPE )
+    orientation = FT_Outline_Get_Orientation( outline );
+    if ( orientation == FT_ORIENTATION_NONE )
+    {
+      if ( outline->n_contours )
+        return FT_Err_Invalid_Argument;
+      else
+        return FT_Err_Ok;
+    }
+
+    if ( orientation == FT_ORIENTATION_TRUETYPE )
       rotate = -FT_ANGLE_PI2;
     else
       rotate = FT_ANGLE_PI2;
@@ -778,7 +955,10 @@
           contour++, first = last + 1 )
     {
       FT_Vector*  point;
-
+      FT_Int      on_curve;
+      FT_Int      on_curve_count = 0;
+      FT_Pos      tmp_xmin       = 32768L;
+      FT_Vector*  tmp_xmin_point = NULL;
 
       last = outline->points + *contour;
 
@@ -786,15 +966,26 @@
       if ( last < first + 2 )
         continue;
 
-      for ( point = first; point <= last; point++ )
+      for ( point = first; point <= last; ++point )
       {
-        if ( point->x < xmin )
+        /* Count on-curve points.  If there are less than 3 on-curve */
+        /* points, just bypass this contour.                         */
+        on_curve        = outline->tags[point - outline->points] & 1;
+        on_curve_count += on_curve;
+
+        if ( point->x < tmp_xmin && on_curve )
         {
-          xmin       = point->x;
-          xmin_point = point;
-          xmin_first = first;
-          xmin_last  = last;
+          tmp_xmin       = point->x;
+          tmp_xmin_point = point;
         }
+      }
+
+      if ( on_curve_count > 2 && tmp_xmin < xmin )
+      {
+        xmin       = tmp_xmin;
+        xmin_point = tmp_xmin_point;
+        xmin_first = first;
+        xmin_last  = last;
       }
     }
 
@@ -803,6 +994,23 @@
 
     prev = ( xmin_point == xmin_first ) ? xmin_last : xmin_point - 1;
     next = ( xmin_point == xmin_last ) ? xmin_first : xmin_point + 1;
+
+    /* Skip off-curve points */
+    while ( ( outline->tags[prev - outline->points] & 1 ) == 0 )
+    {
+      if ( prev == xmin_first )
+        prev = xmin_last;
+      else
+        --prev;
+    }
+
+    while ( ( outline->tags[next - outline->points] & 1 ) == 0 )
+    {
+      if ( next == xmin_last )
+        next = xmin_first;
+      else
+        ++next;
+    }
 
     if ( FT_Atan2( prev->x - xmin_point->x, prev->y - xmin_point->y ) >
          FT_Atan2( next->x - xmin_point->x, next->y - xmin_point->y ) )

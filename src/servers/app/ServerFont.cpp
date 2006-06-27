@@ -27,7 +27,7 @@
 
 // functions needed to convert a freetype vector graphics to a BShape
 inline BPoint
-VectorToPoint(FT_Vector *vector)
+VectorToPoint(const FT_Vector *vector)
 {
 	BPoint result;
 	result.x = float(vector->x) / 64;
@@ -37,7 +37,7 @@ VectorToPoint(FT_Vector *vector)
 
 
 int
-MoveToFunc(FT_Vector *to, void *user)
+MoveToFunc(const FT_Vector *to, void *user)
 {
 	((BShape *)user)->MoveTo(VectorToPoint(to));
 	return 0;
@@ -45,7 +45,7 @@ MoveToFunc(FT_Vector *to, void *user)
 
 
 int
-LineToFunc(FT_Vector *to, void *user)
+LineToFunc(const FT_Vector *to, void *user)
 {
 	((BShape *)user)->LineTo(VectorToPoint(to));
 	return 0;
@@ -53,7 +53,7 @@ LineToFunc(FT_Vector *to, void *user)
 
 
 int
-ConicToFunc(FT_Vector *control, FT_Vector *to, void *user)
+ConicToFunc(const FT_Vector *control, const FT_Vector *to, void *user)
 {
 	BPoint controls[3];
 
@@ -67,7 +67,7 @@ ConicToFunc(FT_Vector *control, FT_Vector *to, void *user)
 
 
 int
-CubicToFunc(FT_Vector *control1, FT_Vector *control2, FT_Vector *to, void *user)
+CubicToFunc(const FT_Vector *control1, const FT_Vector *control2, const FT_Vector *to, void *user)
 {
 	BPoint controls[3];
 

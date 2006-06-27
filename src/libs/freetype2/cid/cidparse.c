@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CID-keyed Type1 parser (body).                                       */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -56,8 +56,6 @@
   {
     FT_Error  error;
     FT_ULong  base_offset, offset, ps_len;
-    FT_Byte   buffer[256 + 10];
-    FT_Int    buff_len;
     FT_Byte   *cur, *limit;
     FT_Byte   *arg1, *arg2;
 
@@ -86,43 +84,49 @@
 
   Again:
     /* now, read the rest of the file until we find a `StartData' */
-    buff_len = 256;
-    for (;;)
     {
-      FT_Byte*  p;
-      FT_ULong  top_position;
+      FT_Byte   buffer[256 + 10];
+      FT_Int    read_len = 256 + 10;
+      FT_Byte*  p        = buffer;
 
 
-      /* fill input buffer */
-      limit     = buffer + 256;
-      buff_len -= 256;
-      if ( buff_len > 0 )
-        FT_MEM_MOVE( buffer, limit, buff_len );
-
-      p = buffer + buff_len;
-
-      if ( FT_STREAM_READ( p, 256 + 10 - buff_len ) )
-        goto Exit;
-
-      top_position = FT_STREAM_POS() - buff_len;
-      buff_len     = 256 + 10;
-
-      /* look for `StartData' */
-      for ( p = buffer; p < limit; p++ )
+      for ( offset = (FT_ULong)FT_STREAM_POS(); ; offset += 256 )
       {
-        if ( p[0] == 'S' && ft_strncmp( (char*)p, "StartData", 9 ) == 0 )
+        FT_Int    stream_len;
+
+
+        stream_len = stream->size - FT_STREAM_POS();
+        if ( stream_len == 0 )
+          goto Exit;
+
+        read_len = FT_MIN( read_len, stream_len );
+        if ( FT_STREAM_READ( p, read_len ) )
+          goto Exit;
+
+        if ( read_len < 256 )
+          p[read_len]  = '\0';
+
+        limit = p + read_len - 10;
+
+        for ( p = buffer; p < limit; p++ )
         {
-          /* save offset of binary data after `StartData' */
-          offset = (FT_ULong)( top_position - ( limit - p ) + 10 );
-          goto Found;
+          if ( p[0] == 'S' && ft_strncmp( (char*)p, "StartData", 9 ) == 0 )
+          {
+            /* save offset of binary data after `StartData' */
+            offset += p - buffer + 10;
+            goto Found;
+          }
         }
+
+        FT_MEM_MOVE( buffer, p, 10 );
+        read_len = 256;
+        p = buffer + 10;
       }
     }
 
   Found:
-    /* we have found the start of the binary data.  We will now     */
-    /* rewind and extract the frame corresponding to the PostScript */
-    /* section                                                      */
+    /* We have found the start of the binary data.  Now rewind and */
+    /* extract the frame corresponding to the PostScript section.  */
 
     ps_len = offset - base_offset;
     if ( FT_STREAM_SEEK( base_offset )                  ||

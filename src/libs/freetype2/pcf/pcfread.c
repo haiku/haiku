@@ -2,7 +2,7 @@
 
     FreeType font driver for pcf fonts
 
-  Copyright 2000, 2001, 2002, 2003, 2004, 2005 by
+  Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -571,7 +571,6 @@ THE SOFTWARE.
     FT_Long    bitmapSizes[GLYPHPADOPTIONS];
     FT_ULong   format, size;
     int        nbitmaps, i, sizebitmaps = 0;
-    char*      bitmaps;
 
 
     error = pcf_seek_to_table_type( stream,
@@ -650,7 +649,6 @@ THE SOFTWARE.
 
   Bail:
     FT_FREE ( offsets );
-    FT_FREE ( bitmaps );
     return error;
   }
 
@@ -1103,6 +1101,9 @@ THE SOFTWARE.
 
         FT_MEM_ZERO( bsize, sizeof ( FT_Bitmap_Size ) );
 
+#if 0
+        bsize->height = face->accel.maxbounds.ascent << 6;
+#endif
         bsize->height = (FT_Short)( face->accel.fontAscent +
                                     face->accel.fontDescent );
 

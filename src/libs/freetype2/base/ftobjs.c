@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType private base classes (body).                            */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -33,7 +33,10 @@
 #include FT_SERVICE_POSTSCRIPT_NAME_H
 #include FT_SERVICE_GLYPH_DICT_H
 #include FT_SERVICE_TT_CMAP_H
+#include FT_SERVICE_KERNING_H
+#include FT_SERVICE_TRUETYPE_ENGINE_H
 
+#define GRID_FIT_METRICS
 
   FT_BASE_DEF( FT_Pointer )
   ft_service_list_lookup( FT_ServiceDesc  service_descriptors,
@@ -267,6 +270,7 @@
                              FT_ULong      size )
   {
     FT_Memory  memory = FT_FACE_MEMORY( slot->face );
+    FT_Error   error;
 
 
     if ( slot->internal->flags & FT_GLYPH_OWN_BITMAP )
@@ -274,7 +278,8 @@
     else
       slot->internal->flags |= FT_GLYPH_OWN_BITMAP;
 
-    return FT_MEM_ALLOC( slot->bitmap.buffer, size );
+    (void)FT_ALLOC( slot->bitmap.buffer, size );
+    return error;
   }
 
 
@@ -313,9 +318,9 @@
   static void
   ft_glyphslot_done( FT_GlyphSlot  slot )
   {
-    FT_Driver         driver = slot->face->driver;
-    FT_Driver_Class   clazz  = driver->clazz;
-    FT_Memory         memory = driver->root.memory;
+    FT_Driver        driver = slot->face->driver;
+    FT_Driver_Class  clazz  = driver->clazz;
+    FT_Memory        memory = driver->root.memory;
 
 
     if ( clazz->done_slot )
@@ -341,11 +346,11 @@
   FT_New_GlyphSlot( FT_Face        face,
                     FT_GlyphSlot  *aslot )
   {
-    FT_Error          error;
-    FT_Driver         driver;
-    FT_Driver_Class   clazz;
-    FT_Memory         memory;
-    FT_GlyphSlot      slot;
+    FT_Error         error;
+    FT_Driver        driver;
+    FT_Driver_Class  clazz;
+    FT_Memory        memory;
+    FT_GlyphSlot     slot;
 
 
     if ( !face || !face->driver )
@@ -474,6 +479,50 @@
   ft_lookup_glyph_renderer( FT_GlyphSlot  slot );
 
 
+#ifdef GRID_FIT_METRICS
+  static void
+  ft_glyphslot_grid_fit_metrics( FT_GlyphSlot  slot,
+                                 FT_Bool       vertical )
+  {
+    FT_Glyph_Metrics*  metrics = &slot->metrics;
+    FT_Pos             right, bottom;
+
+
+    if ( vertical )
+    {
+      metrics->horiBearingX = FT_PIX_FLOOR( metrics->horiBearingX );
+      metrics->horiBearingY = FT_PIX_CEIL ( metrics->horiBearingY );
+
+      right  = FT_PIX_CEIL( metrics->vertBearingX + metrics->width );
+      bottom = FT_PIX_CEIL( metrics->vertBearingY + metrics->height );
+
+      metrics->vertBearingX = FT_PIX_FLOOR( metrics->vertBearingX );
+      metrics->vertBearingY = FT_PIX_FLOOR( metrics->vertBearingY );
+
+      metrics->width  = right - metrics->vertBearingX;
+      metrics->height = bottom - metrics->vertBearingY;
+    }
+    else
+    {
+      metrics->vertBearingX = FT_PIX_FLOOR( metrics->vertBearingX );
+      metrics->vertBearingY = FT_PIX_FLOOR( metrics->vertBearingY );
+
+      right  = FT_PIX_CEIL ( metrics->horiBearingX + metrics->width );
+      bottom = FT_PIX_FLOOR( metrics->horiBearingY - metrics->height );
+
+      metrics->horiBearingX = FT_PIX_FLOOR( metrics->horiBearingX );
+      metrics->horiBearingY = FT_PIX_CEIL ( metrics->horiBearingY );
+
+      metrics->width  = right - metrics->horiBearingX;
+      metrics->height = metrics->horiBearingY - bottom;
+    }
+
+    metrics->horiAdvance = FT_PIX_ROUND( metrics->horiAdvance );
+    metrics->vertAdvance = FT_PIX_ROUND( metrics->vertAdvance );
+  }
+#endif /* GRID_FIT_METRICS */
+
+
   /* documentation is in freetype.h */
 
   FT_EXPORT_DEF( FT_Error )
@@ -485,7 +534,7 @@
     FT_Driver     driver;
     FT_GlyphSlot  slot;
     FT_Library    library;
-    FT_Bool       autohint;
+    FT_Bool       autohint = 0;
     FT_Module     hinter;
 
 
@@ -498,42 +547,43 @@
     slot = face->glyph;
     ft_glyphslot_clear( slot );
 
-    driver = face->driver;
+    driver  = face->driver;
+    library = driver->root.library;
+    hinter  = library->auto_hinter;
 
-    /* if the flag NO_RECURSE is set, we disable hinting and scaling */
+    /* resolve load flags dependencies */
+
     if ( load_flags & FT_LOAD_NO_RECURSE )
-    {
-      /* disable scaling, hinting, and transformation */
       load_flags |= FT_LOAD_NO_SCALE         |
-                    FT_LOAD_NO_HINTING       |
-                    FT_LOAD_NO_BITMAP        |
                     FT_LOAD_IGNORE_TRANSFORM;
 
-      /* disable bitmap rendering */
+    if ( load_flags & FT_LOAD_NO_SCALE )
+    {
+      load_flags |= FT_LOAD_NO_HINTING |
+                    FT_LOAD_NO_BITMAP;
+
       load_flags &= ~FT_LOAD_RENDER;
     }
 
-    /* do we need to load the glyph through the auto-hinter? */
-    library  = driver->root.library;
-    hinter   = library->auto_hinter;
-    autohint =
-      FT_BOOL( hinter                                      &&
-               !( load_flags & ( FT_LOAD_NO_SCALE    |
-                                 FT_LOAD_NO_HINTING  |
-                                 FT_LOAD_NO_AUTOHINT ) )   &&
-               FT_DRIVER_IS_SCALABLE( driver )             &&
-               FT_DRIVER_USES_OUTLINES( driver )           );
-    if ( autohint )
+    if ( FT_LOAD_TARGET_MODE( load_flags ) == FT_RENDER_MODE_LIGHT )
+      load_flags |= FT_LOAD_FORCE_AUTOHINT;
+
+    /* auto-hinter is preferred and should be used */
+    if ( ( !FT_DRIVER_HAS_HINTER( driver )         ||
+           ( load_flags & FT_LOAD_FORCE_AUTOHINT ) ) &&
+         !( load_flags & FT_LOAD_NO_HINTING )        &&
+         !( load_flags & FT_LOAD_NO_AUTOHINT )       )
     {
-      if ( FT_DRIVER_HAS_HINTER( driver ) &&
-           !( load_flags & FT_LOAD_FORCE_AUTOHINT ) )
-        autohint = 0;
+      /* check whether it works for this face */
+      autohint =
+        FT_BOOL( hinter                                   &&
+                 FT_DRIVER_IS_SCALABLE( driver )          &&
+                 FT_DRIVER_USES_OUTLINES( driver )        &&
+                 face->internal->transform_matrix.yy > 0  &&
+                 face->internal->transform_matrix.yx == 0 );
     }
 
-    /* don't apply autohinting if glyph is vertically distorted or */
-    /* mirrored                                                    */
-    if ( autohint && !( face->internal->transform_matrix.yy <= 0 ||
-                        face->internal->transform_matrix.yx != 0 ) )
+    if ( autohint )
     {
       FT_AutoHinter_Service  hinting;
 
@@ -570,10 +620,19 @@
       if ( error )
         goto Exit;
 
-      /* check that the loaded outline is correct */
-      error = FT_Outline_Check( &slot->outline );
-      if ( error )
-        goto Exit;
+      if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
+      {
+        /* check that the loaded outline is correct */
+        error = FT_Outline_Check( &slot->outline );
+        if ( error )
+          goto Exit;
+
+#ifdef GRID_FIT_METRICS
+        if ( !( load_flags & FT_LOAD_NO_HINTING ) )
+          ft_glyphslot_grid_fit_metrics( slot,
+              FT_BOOL( load_flags & FT_LOAD_VERTICAL_LAYOUT ) );
+#endif
+      }
     }
 
   Load_Ok:
@@ -596,6 +655,7 @@
       FT_Size_Metrics*  metrics = &face->size->metrics;
 
 
+      /* it's tricky! */
       slot->linearHoriAdvance = FT_MulDiv( slot->linearHoriAdvance,
                                            metrics->x_scale, 64 );
 
@@ -892,7 +952,7 @@
     FT_Driver_Class   clazz;
     FT_Face           face = 0;
     FT_Error          error, error2;
-    FT_Face_Internal  internal;
+    FT_Face_Internal  internal = NULL;
 
 
     clazz  = driver->clazz;
@@ -1195,7 +1255,7 @@
     pfb_data[3] = 0;
     pfb_data[4] = 0;
     pfb_data[5] = 0;
-    pfb_pos     = 7;
+    pfb_pos     = 6;
     pfb_lenpos  = 2;
 
     len = 0;
@@ -1228,7 +1288,7 @@
         len = rlen;
 
         pfb_data[pfb_pos++] = (FT_Byte)type;
-        pfb_lenpos          = (FT_Byte)pfb_pos;
+        pfb_lenpos          = pfb_pos;
         pfb_data[pfb_pos++] = 0;        /* 4-byte length, fill in later */
         pfb_data[pfb_pos++] = 0;
         pfb_data[pfb_pos++] = 0;
@@ -1693,22 +1753,55 @@
     /* now allocate a glyph slot object for the face */
     FT_TRACE4(( "FT_Open_Face: Creating glyph slot\n" ));
 
-    error = FT_New_GlyphSlot( face, NULL );
-    if ( error )
-      goto Fail;
-
-    /* finally, allocate a size object for the face */
+    if ( face_index >= 0 )
     {
-      FT_Size  size;
-
-
-      FT_TRACE4(( "FT_Open_Face: Creating size object\n" ));
-
-      error = FT_New_Size( face, &size );
+      error = FT_New_GlyphSlot( face, NULL );
       if ( error )
         goto Fail;
 
-      face->size = size;
+      /* finally, allocate a size object for the face */
+      {
+        FT_Size  size;
+
+
+        FT_TRACE4(( "FT_Open_Face: Creating size object\n" ));
+
+        error = FT_New_Size( face, &size );
+        if ( error )
+          goto Fail;
+
+        face->size = size;
+      }
+    }
+
+    /* some checks */
+
+    if ( FT_IS_SCALABLE( face ) )
+    {
+      if ( face->height < 0 )
+        face->height = (FT_Short)-face->height;
+
+      if ( !FT_HAS_VERTICAL( face ) )
+        face->max_advance_height = (FT_Short)face->height;
+    }
+
+    if ( FT_HAS_FIXED_SIZES( face ) )
+    {
+      FT_Int  i;
+
+
+      for ( i = 0; i < face->num_fixed_sizes; i++ )
+      {
+        FT_Bitmap_Size*  bsize = face->available_sizes + i;
+
+
+        if ( bsize->height < 0 )
+          bsize->height = (FT_Short)-bsize->height;
+        if ( bsize->x_ppem < 0 )
+          bsize->x_ppem = (FT_Short)-bsize->x_ppem;
+        if ( bsize->y_ppem < 0 )
+          bsize->y_ppem = -bsize->y_ppem;
+      }
     }
 
     /* initialize internal face data */
@@ -1727,6 +1820,9 @@
 
     if ( aface )
       *aface = face;
+    else
+      FT_Done_Face( face );
+
     goto Exit;
 
   Fail:
@@ -1948,12 +2044,80 @@
   }
 
 
+  /* documentation is in ftobjs.h */
+
+  FT_BASE_DEF( FT_Error )
+  FT_Match_Size( FT_Face          face,
+                 FT_Size_Request  req,
+                 FT_Bool          ignore_width,
+                 FT_ULong*        index )
+  {
+    FT_Int   i;
+    FT_Long  w, h;
+
+
+    if ( !FT_HAS_FIXED_SIZES( face ) )
+      return FT_Err_Invalid_Face_Handle;
+
+    /* FT_Bitmap_Size doesn't provide enough info... */
+    if ( req->type != FT_SIZE_REQUEST_TYPE_NOMINAL )
+      return FT_Err_Unimplemented_Feature;
+
+    w = FT_REQUEST_WIDTH ( req );
+    h = FT_REQUEST_HEIGHT( req );
+
+    if ( req->width && !req->height )
+      h = w;
+    else if ( !req->width && req->height )
+      w = h;
+
+    w = FT_PIX_ROUND( w );
+    h = FT_PIX_ROUND( h );
+
+    for ( i = 0; i < face->num_fixed_sizes; i++ )
+    {
+      FT_Bitmap_Size*  bsize = face->available_sizes + i;
+
+
+      if ( h != FT_PIX_ROUND( bsize->y_ppem ) )
+        continue;
+
+      if ( w == FT_PIX_ROUND( bsize->x_ppem ) || ignore_width )
+      {
+        if ( index )
+          *index = (FT_ULong)i;
+
+        return FT_Err_Ok;
+      }
+    }
+
+    return FT_Err_Invalid_Pixel_Size;
+  }
+
+
+  /* documentation is in ftobjs.h */
+
+  FT_BASE_DEF( void )
+  ft_synthesize_vertical_metrics( FT_Glyph_Metrics*  metrics,
+                                  FT_Pos             advance )
+  {
+    /* the factor 1.2 is a heuristical value */
+    if ( !advance )
+      advance = metrics->height * 12 / 10;
+
+    metrics->vertBearingX = -( metrics->width / 2 );
+    metrics->vertBearingY = ( advance - metrics->height ) / 2;
+    metrics->vertAdvance  = advance;
+  }
+
+
   static void
   ft_recompute_scaled_metrics( FT_Face           face,
                                FT_Size_Metrics*  metrics )
   {
     /* Compute root ascender, descender, test height, and max_advance */
 
+#ifdef GRID_FIT_METRICS
     metrics->ascender    = FT_PIX_CEIL( FT_MulFix( face->ascender,
                                                    metrics->y_scale ) );
 
@@ -1965,6 +2129,243 @@
 
     metrics->max_advance = FT_PIX_ROUND( FT_MulFix( face->max_advance_width,
                                                     metrics->x_scale ) );
+#else /* !GRID_FIT_METRICS */
+    metrics->ascender    = FT_MulFix( face->ascender,
+                                      metrics->y_scale );
+
+    metrics->descender   = FT_MulFix( face->descender,
+                                      metrics->y_scale );
+
+    metrics->height      = FT_MulFix( face->height,
+                                      metrics->y_scale );
+
+    metrics->max_advance = FT_MulFix( face->max_advance_width,
+                                      metrics->x_scale );
+#endif /* !GRID_FIT_METRICS */
+  }
+
+
+  FT_BASE_DEF( void )
+  FT_Select_Metrics( FT_Face   face,
+                     FT_ULong  strike_index )
+  {
+    FT_Size_Metrics*  metrics;
+    FT_Bitmap_Size*   bsize;
+
+
+    metrics = &face->size->metrics;
+    bsize   = face->available_sizes + strike_index;
+
+    metrics->x_ppem = (FT_UShort)( ( bsize->x_ppem + 32 ) >> 6 );
+    metrics->y_ppem = (FT_UShort)( ( bsize->y_ppem + 32 ) >> 6 );
+
+    if ( FT_IS_SCALABLE( face ) )
+    {
+      metrics->x_scale = FT_DivFix( bsize->x_ppem,
+                                    face->units_per_EM );
+      metrics->y_scale = FT_DivFix( bsize->y_ppem,
+                                    face->units_per_EM );
+
+      ft_recompute_scaled_metrics( face, metrics );
+    }
+    else
+    {
+      metrics->x_scale     = 1L << 22;
+      metrics->y_scale     = 1L << 22;
+      metrics->ascender    = bsize->y_ppem;
+      metrics->descender   = 0;
+      metrics->height      = bsize->height << 6;
+      metrics->max_advance = bsize->x_ppem;
+    }
+  }
+
+
+  FT_BASE_DEF( void )
+  FT_Request_Metrics( FT_Face          face,
+                      FT_Size_Request  req )
+  {
+    FT_Driver_Class   clazz;
+    FT_Size_Metrics*  metrics;
+
+
+    clazz   = face->driver->clazz;
+    metrics = &face->size->metrics;
+
+    if ( FT_IS_SCALABLE( face ) )
+    {
+      FT_Long  w, h, scaled_w = 0, scaled_h = 0;
+
+
+      switch ( req->type )
+      {
+      case FT_SIZE_REQUEST_TYPE_NOMINAL:
+        w = h = face->units_per_EM;
+        break;
+
+      case FT_SIZE_REQUEST_TYPE_REAL_DIM:
+        w = h = face->ascender - face->descender;
+        break;
+
+      case FT_SIZE_REQUEST_TYPE_CELL:
+        w = face->max_advance_width;
+        h = face->ascender - face->descender;
+        break;
+
+      case FT_SIZE_REQUEST_TYPE_BBOX:
+        w = face->bbox.xMax - face->bbox.xMin;
+        h = face->bbox.yMax - face->bbox.yMin;
+        break;
+
+      case FT_SIZE_REQUEST_TYPE_SCALES:
+        metrics->x_scale = (FT_Fixed)req->width;
+        metrics->y_scale = (FT_Fixed)req->height;
+        if ( !metrics->x_scale )
+          metrics->x_scale = metrics->y_scale;
+        else if ( !metrics->y_scale )
+          metrics->y_scale = metrics->x_scale;
+        goto Calculate_Ppem;
+        break;
+
+      default:
+        /* this never happens */
+        return;
+        break;
+      }
+
+      /* to be on the safe side */
+      if ( w < 0 )
+        w = -w;
+
+      if ( h < 0 )
+        h = -h;
+
+      scaled_w = FT_REQUEST_WIDTH ( req );
+      scaled_h = FT_REQUEST_HEIGHT( req );
+
+      /* determine scales */
+      if ( req->width )
+      {
+        metrics->x_scale = FT_DivFix( scaled_w, w );
+
+        if ( req->height )
+        {
+          metrics->y_scale = FT_DivFix( scaled_h, h );
+
+          if ( req->type == FT_SIZE_REQUEST_TYPE_CELL )
+          {
+            if ( metrics->y_scale > metrics->x_scale )
+              metrics->y_scale = metrics->x_scale;
+            else
+              metrics->x_scale = metrics->y_scale;
+          }
+        }
+        else
+        {
+          metrics->y_scale = metrics->x_scale;
+          scaled_h = FT_MulDiv( scaled_w, h, w );
+        }
+      }
+      else
+      {
+        metrics->x_scale = metrics->y_scale = FT_DivFix( scaled_h, h );
+        scaled_w = FT_MulDiv( scaled_h, w, h );
+      }
+
+  Calculate_Ppem:
+      /* calculate the ppems */
+      if ( req->type != FT_SIZE_REQUEST_TYPE_NOMINAL )
+      {
+        scaled_w = FT_MulFix( face->units_per_EM, metrics->x_scale );
+        scaled_h = FT_MulFix( face->units_per_EM, metrics->y_scale );
+      }
+
+      metrics->x_ppem = (FT_UShort)( ( scaled_w + 32 ) >> 6 );
+      metrics->y_ppem = (FT_UShort)( ( scaled_h + 32 ) >> 6 );
+
+      ft_recompute_scaled_metrics( face, metrics );
+    }
+    else
+    {
+      FT_ZERO( metrics );
+      metrics->x_scale = 1L << 22;
+      metrics->y_scale = 1L << 22;
+    }
+  }
+
+
+  /* documentation is in freetype.h */
+
+  FT_EXPORT_DEF( FT_Error )
+  FT_Select_Size( FT_Face  face,
+                  FT_Int   strike_index )
+  {
+    FT_Driver_Class  clazz;
+
+
+    if ( !face || !FT_HAS_FIXED_SIZES( face ) )
+      return FT_Err_Invalid_Face_Handle;
+
+    if ( strike_index < 0 || strike_index >= face->num_fixed_sizes )
+      return FT_Err_Invalid_Argument;
+
+    clazz = face->driver->clazz;
+
+    if ( clazz->select_size )
+      return clazz->select_size( face->size, (FT_ULong)strike_index );
+
+    FT_Select_Metrics( face, (FT_ULong)strike_index );
+
+    return FT_Err_Ok;
+  }
+
+
+  /* documentation is in freetype.h */
+
+  FT_EXPORT_DEF( FT_Error )
+  FT_Request_Size( FT_Face          face,
+                   FT_Size_Request  req )
+  {
+    FT_Driver_Class  clazz;
+    FT_ULong         strike_index;
+
+
+    if ( !face )
+      return FT_Err_Invalid_Face_Handle;
+
+    if ( !req || req->width < 0 || req->height < 0 ||
+         req->type >= FT_SIZE_REQUEST_TYPE_MAX )
+      return FT_Err_Invalid_Argument;
+
+    clazz = face->driver->clazz;
+
+    if ( clazz->request_size )
+      return clazz->request_size( face->size, req );
+
+    /*
+     * The reason that a driver doesn't have `request_size' defined is
+     * either that the scaling here suffices or that the supported formats
+     * are bitmap-only and size matching is not implemented.
+     *
+     * In the latter case, a simple size matching is done.
+     */
+    if ( !FT_IS_SCALABLE( face ) && FT_HAS_FIXED_SIZES( face ) )
+    {
+      FT_Error  error;
+
+
+      error = FT_Match_Size( face, req, 0, &strike_index );
+      if ( error )
+        return error;
+
+      FT_TRACE3(( "FT_Request_Size: bitmap strike %lu matched\n",
+                  strike_index ));
+
+      return FT_Select_Size( face, (FT_Int)strike_index );
+    }
+
+    FT_Request_Metrics( face, req );
+
+    return FT_Err_Ok;
   }
 
 
@@ -1977,78 +2378,26 @@
                     FT_UInt     horz_resolution,
                     FT_UInt     vert_resolution )
   {
-    FT_Error          error = FT_Err_Ok;
-    FT_Driver         driver;
-    FT_Driver_Class   clazz;
-    FT_Size_Metrics*  metrics;
-    FT_Long           dim_x, dim_y;
+    FT_Size_RequestRec  req;
 
-
-    if ( !face || !face->size || !face->driver )
-      return FT_Err_Invalid_Face_Handle;
-
-    driver  = face->driver;
-    metrics = &face->size->metrics;
-    clazz   = driver->clazz;
 
     if ( !char_width )
       char_width = char_height;
-
     else if ( !char_height )
       char_height = char_width;
 
-    if ( !horz_resolution )
-      horz_resolution = 72;
-
-    if ( !vert_resolution )
-      vert_resolution = 72;
-
-    /* default processing -- this can be overridden by the driver */
     if ( char_width  < 1 * 64 )
       char_width  = 1 * 64;
     if ( char_height < 1 * 64 )
       char_height = 1 * 64;
 
-    /* Compute pixel sizes in 26.6 units */
-    dim_x = ( char_width  * horz_resolution + 36 ) / 72;
-    dim_y = ( char_height * vert_resolution + 36 ) / 72;
+    req.type           = FT_SIZE_REQUEST_TYPE_NOMINAL;
+    req.width          = char_width;
+    req.height         = char_height;
+    req.horiResolution = ( horz_resolution ) ? horz_resolution : 72;
+    req.vertResolution = ( vert_resolution ) ? vert_resolution : 72;
 
-    {
-      FT_UShort  x_ppem = (FT_UShort)( ( dim_x + 32 ) >> 6 );
-      FT_UShort  y_ppem = (FT_UShort)( ( dim_y + 32 ) >> 6 );
-
-
-      /* Don't take, say, 12.5x12.5 equal to 13x13.  If working with */
-      /* fractional font sizes this would hide slightly different    */
-      /* font metrics.  Consequently, the next two lines are         */
-      /* disabled.                                                   */
-#if 0
-      if ( x_ppem == metrics->x_ppem && y_ppem == metrics->y_ppem )
-        return FT_Err_Ok;
-#endif
-
-      metrics->x_ppem = x_ppem;
-      metrics->y_ppem = y_ppem;
-    }
-
-    metrics->x_scale = 0x10000L;
-    metrics->y_scale = 0x10000L;
-
-    if ( face->face_flags & FT_FACE_FLAG_SCALABLE )
-    {
-      metrics->x_scale = FT_DivFix( dim_x, face->units_per_EM );
-      metrics->y_scale = FT_DivFix( dim_y, face->units_per_EM );
-
-      ft_recompute_scaled_metrics( face, metrics );
-    }
-
-    if ( clazz->set_char_sizes )
-      error = clazz->set_char_sizes( face->size,
-                                     char_width,
-                                     char_height,
-                                     horz_resolution,
-                                     vert_resolution );
-    return error;
+    return FT_Request_Size( face, &req );
   }
 
 
@@ -2059,22 +2408,11 @@
                       FT_UInt  pixel_width,
                       FT_UInt  pixel_height )
   {
-    FT_Error          error = FT_Err_Ok;
-    FT_Driver         driver;
-    FT_Driver_Class   clazz;
-    FT_Size_Metrics*  metrics;
+    FT_Size_RequestRec  req;
 
-
-    if ( !face || !face->size || !face->driver )
-      return FT_Err_Invalid_Face_Handle;
-
-    driver  = face->driver;
-    metrics = &face->size->metrics;
-    clazz   = driver->clazz;
 
     if ( pixel_width == 0 )
       pixel_width = pixel_height;
-
     else if ( pixel_height == 0 )
       pixel_height = pixel_width;
 
@@ -2089,25 +2427,13 @@
     if ( pixel_height >= 0xFFFFU )
       pixel_height = 0xFFFFU;
 
-    metrics->x_ppem = (FT_UShort)pixel_width;
-    metrics->y_ppem = (FT_UShort)pixel_height;
+    req.type           = FT_SIZE_REQUEST_TYPE_NOMINAL;
+    req.width          = pixel_width << 6;
+    req.height         = pixel_height << 6;
+    req.horiResolution = 0;
+    req.vertResolution = 0;
 
-    if ( face->face_flags & FT_FACE_FLAG_SCALABLE )
-    {
-      metrics->x_scale = FT_DivFix( metrics->x_ppem << 6,
-                                    face->units_per_EM );
-
-      metrics->y_scale = FT_DivFix( metrics->y_ppem << 6,
-                                    face->units_per_EM );
-
-      ft_recompute_scaled_metrics( face, metrics );
-    }
-
-    if ( clazz->set_pixel_sizes )
-      error = clazz->set_pixel_sizes( face->size,
-                                      pixel_width,
-                                      pixel_height );
-    return error;
+    return FT_Request_Size( face, &req );
   }
 
 
@@ -2166,6 +2492,40 @@
         }
       }
     }
+
+    return error;
+  }
+
+
+  /* documentation is in freetype.h */
+
+  FT_EXPORT_DEF( FT_Error )
+  FT_Get_Track_Kerning( FT_Face    face,
+                        FT_Fixed   point_size,
+                        FT_Int     degree,
+                        FT_Fixed*  akerning )
+  {
+    FT_Service_Kerning  service;
+    FT_Error            error = FT_Err_Ok;
+    FT_Driver           driver;
+
+
+    if ( !face )
+      return FT_Err_Invalid_Face_Handle;
+
+    if ( !akerning )
+      return FT_Err_Invalid_Argument;
+
+    driver = face->driver;
+
+    FT_FACE_FIND_SERVICE( face, service, KERNING );
+    if ( !service )
+      return FT_Err_Unimplemented_Feature;
+
+    error = service->get_track( face,
+                                point_size,
+                                degree,
+                                akerning );
 
     return error;
   }
@@ -2321,10 +2681,10 @@
 
 
   FT_BASE_DEF( FT_Error )
-  FT_CMap_New( FT_CMap_Class   clazz,
-               FT_Pointer      init_data,
-               FT_CharMap      charmap,
-               FT_CMap        *acmap )
+  FT_CMap_New( FT_CMap_Class  clazz,
+               FT_Pointer     init_data,
+               FT_CharMap     charmap,
+               FT_CMap       *acmap )
   {
     FT_Error   error = FT_Err_Ok;
     FT_Face    face;
@@ -2999,7 +3359,7 @@
   }
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( FT_Error )
   FT_Add_Module( FT_Library              library,
@@ -3126,7 +3486,7 @@
   }
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( FT_Module )
   FT_Get_Module( FT_Library   library,
@@ -3215,7 +3575,7 @@
   }
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( FT_Error )
   FT_Remove_Module( FT_Library  library,
@@ -3270,7 +3630,7 @@
   /*************************************************************************/
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( FT_Error )
   FT_New_Library( FT_Memory    memory,
@@ -3341,7 +3701,7 @@
   }
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( FT_Error )
   FT_Done_Library( FT_Library  library )
@@ -3360,8 +3720,12 @@
 
     /* Close all modules in the library */
 #if 1
+    /* XXX Modules are removed in the reversed order so that  */
+    /* type42 module is removed before truetype module.  This */ 
+    /* avoids double free in some occasions.  It is a hack.   */
     while ( library->num_modules > 0 )
-      FT_Remove_Module( library, library->modules[0] );
+      FT_Remove_Module( library,
+                        library->modules[library->num_modules - 1] );
 #else
     {
       FT_UInt  n;
@@ -3390,7 +3754,7 @@
   }
 
 
-  /* documentation is in ftmodule.h */
+  /* documentation is in ftmodapi.h */
 
   FT_EXPORT_DEF( void )
   FT_Set_Debug_Hook( FT_Library         library,
@@ -3401,6 +3765,130 @@
          hook_index <
            ( sizeof ( library->debug_hooks ) / sizeof ( void* ) ) )
       library->debug_hooks[hook_index] = debug_hook;
+  }
+
+
+  /* documentation is in ftmodapi.h */
+
+  FT_EXPORT_DEF( FT_TrueTypeEngineType )
+  FT_Get_TrueType_Engine_Type( FT_Library  library )
+  {
+    FT_TrueTypeEngineType  result = FT_TRUETYPE_ENGINE_TYPE_NONE;
+
+
+    if ( library )
+    {
+      FT_Module  module = FT_Get_Module( library, "truetype" );
+
+
+      if ( module )
+      {
+        FT_Service_TrueTypeEngine  service;
+
+
+        service = (FT_Service_TrueTypeEngine)
+                    ft_module_get_service( module,
+                                           FT_SERVICE_ID_TRUETYPE_ENGINE );
+        if ( service )
+          result = service->engine_type;
+      }
+    }
+
+    return result;
+  }
+
+
+#ifdef FT_CONFIG_OPTION_OLD_INTERNALS
+
+  FT_BASE_DEF( FT_Error )
+  ft_stub_set_char_sizes( FT_Size     size,
+                          FT_F26Dot6  width,
+                          FT_F26Dot6  height,
+                          FT_UInt     horz_res,
+                          FT_UInt     vert_res )
+  {
+    FT_Size_RequestRec  req;
+    FT_Driver           driver = size->face->driver;
+
+
+    if ( driver->clazz->request_size )
+    {
+      req.type   = FT_SIZE_REQUEST_TYPE_NOMINAL;
+      req.width  = width;
+      req.height = height;
+
+      if ( horz_res == 0 )
+        horz_res = vert_res;
+
+      if ( vert_res == 0 )
+        vert_res = horz_res;
+
+      if ( horz_res == 0 )
+        horz_res = vert_res = 72;
+
+      req.horiResolution = horz_res;
+      req.vertResolution = vert_res;
+
+      return driver->clazz->request_size( size, &req );
+    }
+
+    return 0;
+  }
+
+
+  FT_BASE_DEF( FT_Error )
+  ft_stub_set_pixel_sizes( FT_Size  size,
+                           FT_UInt  width,
+                           FT_UInt  height )
+  {
+    FT_Size_RequestRec  req;
+    FT_Driver           driver = size->face->driver;
+
+
+    if ( driver->clazz->request_size )
+    {
+      req.type           = FT_SIZE_REQUEST_TYPE_NOMINAL;
+      req.width          = width  << 6;
+      req.height         = height << 6;
+      req.horiResolution = 0;
+      req.vertResolution = 0;
+
+      return driver->clazz->request_size( size, &req );
+    }
+
+    return 0;
+  }
+
+#endif /* FT_CONFIG_OPTION_OLD_INTERNALS */
+
+  
+  FT_EXPORT_DEF( FT_Error )
+  FT_Get_SubGlyph_Info( FT_GlyphSlot  glyph,
+                        FT_UInt       sub_index,
+                        FT_Int       *p_index,
+                        FT_UInt      *p_flags,
+                        FT_Int       *p_arg1,
+                        FT_Int       *p_arg2,
+                        FT_Matrix    *p_transform )
+  {
+    FT_Error  error = FT_Err_Invalid_Argument;
+      
+
+    if ( glyph != NULL                              && 
+         glyph->format == FT_GLYPH_FORMAT_COMPOSITE &&
+         sub_index < glyph->num_subglyphs           )
+    {
+      FT_SubGlyph  subg = glyph->subglyphs + sub_index;
+        
+
+      *p_index     = subg->index;
+      *p_flags     = subg->flags;
+      *p_arg1      = subg->arg1;
+      *p_arg2      = subg->arg2;
+      *p_transform = subg->transform;
+    }
+
+    return error;
   }
 
 

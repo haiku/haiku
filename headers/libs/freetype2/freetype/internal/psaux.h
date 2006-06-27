@@ -5,7 +5,7 @@
 /*    Auxiliary functions and data structures related to PostScript fonts  */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2006 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -516,9 +516,10 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    last         :: The last point position.                           */
   /*                                                                       */
-  /*    scale_x      :: The horizontal scale (FUnits to sub-pixels).       */
+  /*    scale_x      :: The horizontal scaling value (FUnits to            */
+  /*                    sub-pixels).                                       */
   /*                                                                       */
-  /*    scale_y      :: The vertical scale (FUnits to sub-pixels).         */
+  /*    scale_y      :: The vertical scaling value (FUnits to sub-pixels). */
   /*                                                                       */
   /*    pos_x        :: The horizontal translation (if composite glyph).   */
   /*                                                                       */
@@ -688,6 +689,70 @@ FT_BEGIN_HEADER
   /*************************************************************************/
   /*************************************************************************/
   /*****                                                               *****/
+  /*****                            AFM PARSER                         *****/
+  /*****                                                               *****/
+  /*************************************************************************/
+  /*************************************************************************/
+
+  typedef struct AFM_ParserRec_*  AFM_Parser;
+
+  typedef struct  AFM_Parser_FuncsRec_
+  {
+    FT_Error
+    (*init)( AFM_Parser  parser,
+             FT_Memory   memory,
+             FT_Byte*    base,
+             FT_Byte*    limit );
+
+    void
+    (*done)( AFM_Parser  parser );
+
+    FT_Error
+    (*parse)( AFM_Parser  parser );
+
+  } AFM_Parser_FuncsRec;
+
+  typedef struct AFM_StreamRec_*  AFM_Stream;
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Struct>                                                              */
+  /*    AFM_ParserRec                                                      */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    An AFM_Parser is a parser for the AFM files.                       */
+  /*                                                                       */
+  /* <Fields>                                                              */
+  /*    memory    :: The object used for memory operations (alloc and      */
+  /*                 realloc).                                             */
+  /*                                                                       */
+  /*    stream    :: This is an opaque object.                             */
+  /*                                                                       */
+  /*    FontInfo  :: The result will be stored here.                       */
+  /*                                                                       */
+  /*    get_index :: A user provided function to get a glyph index by its  */
+  /*                 name.                                                 */
+  /*                                                                       */
+  typedef struct  AFM_ParserRec_
+  {
+    FT_Memory     memory;
+    AFM_Stream    stream;
+
+    AFM_FontInfo  FontInfo;
+
+    FT_Int
+    (*get_index)( const char*  name,
+                  FT_UInt      len,
+                  void*        user_data );
+
+    void*         user_data;
+
+  } AFM_ParserRec;
+
+
+  /*************************************************************************/
+  /*************************************************************************/
+  /*****                                                               *****/
   /*****                     TYPE1 CHARMAPS                            *****/
   /*****                                                               *****/
   /*************************************************************************/
@@ -727,6 +792,9 @@ FT_BEGIN_HEADER
                    FT_UShort  seed );
 
     T1_CMap_Classes  t1_cmap_classes;
+
+    /* fields after this comment line were added after version 2.1.10 */
+    const AFM_Parser_FuncsRec*  afm_parser_funcs;
 
   } PSAux_ServiceRec, *PSAux_Service;
 

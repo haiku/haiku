@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Type 1 font loader (body).                                           */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -335,8 +335,8 @@
       mmvar->axis[i].def     = ( mmvar->axis[i].minimum +
                                    mmvar->axis[i].maximum ) / 2;
                             /* Does not apply.  But this value is in range */
-      mmvar->axis[i].strid   = 0xFFFFFFFFLU;   /* Does not apply */
-      mmvar->axis[i].tag     = 0xFFFFFFFFLU;   /* Does not apply */
+      mmvar->axis[i].strid   = 0xFFFFFFFFUL;   /* Does not apply */
+      mmvar->axis[i].tag     = 0xFFFFFFFFUL;   /* Does not apply */
 
       if ( ft_strcmp( mmvar->axis[i].name, "Weight" ) == 0 )
         mmvar->axis[i].tag = FT_MAKE_TAG( 'w', 'g', 'h', 't' );
@@ -1856,9 +1856,9 @@
               /* field to deal adequately with synthetic  */
               /* fonts; /Subrs and /CharStrings are       */
               /* handled specially.                       */
-              if ( keyword_flag[0] == 0                              ||
-                   ft_strcmp( (const char*)name, "Subrs" ) == 0      ||
-                   ft_strcmp( (const char*)name, "CharStrings") == 0 )
+              if ( keyword_flag[0] == 0                               ||
+                   ft_strcmp( (const char*)name, "Subrs" ) == 0       ||
+                   ft_strcmp( (const char*)name, "CharStrings" ) == 0 )
               {
                 parser->root.error = t1_load_keyword( face,
                                                       loader,
@@ -1989,6 +1989,9 @@
                         keyword_flags );
     if ( error )
       goto Exit;
+ 
+    /* ensure even-ness of `num_blue_values' */
+    priv->num_blue_values &= ~1;
 
 #ifndef T1_CONFIG_OPTION_NO_MM_SUPPORT
 

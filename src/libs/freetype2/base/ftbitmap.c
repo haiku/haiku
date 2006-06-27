@@ -5,7 +5,7 @@
 /*    FreeType utility functions for converting 1bpp, 2bpp, 4bpp, and 8bpp */
 /*    bitmaps into 8bpp format (body).                                     */
 /*                                                                         */
-/*  Copyright 2004, 2005 by                                                */
+/*  Copyright 2004, 2005, 2006 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -73,10 +73,10 @@
       target_size = (FT_ULong)( target_pitch * target->rows );
 
       if ( target_size != size )
-        FT_QREALLOC( target->buffer, target_size, size );
+        (void)FT_QREALLOC( target->buffer, target_size, size );
     }
     else
-      FT_QALLOC( target->buffer, size );
+      (void)FT_QALLOC( target->buffer, size );
 
     if ( !error )
     {
@@ -165,7 +165,7 @@
 
     new_pitch = ( bitmap->width + xpixels + ppb - 1 ) / ppb;
 
-    if ( FT_ALLOC( buffer, new_pitch * ( bitmap->rows + ypixels ) ) )
+    if ( FT_QALLOC_MULT( buffer, new_pitch, bitmap->rows + ypixels ) )
       return error;
 
     if ( bitmap->pitch > 0 )
@@ -277,7 +277,7 @@
     /* for each row */
     for ( y = 0; y < bitmap->rows ; y++ )
     {
-      /* 
+      /*
        * Horizontally:
        *
        * From the last pixel on, make each pixel or'ed with the
@@ -310,12 +310,12 @@
             {
               if ( p[x] + p[x - i] > bitmap->num_grays - 1 )
               {
-                p[x] = bitmap->num_grays - 1;
+                p[x] = (unsigned char)(bitmap->num_grays - 1);
                 break;
               }
               else
               {
-                p[x] += p[x - i];
+                p[x] = (unsigned char)(p[x] + p[x-i]);
                 if ( p[x] == bitmap->num_grays - 1 )
                   break;
               }
@@ -326,7 +326,7 @@
         }
       }
 
-      /* 
+      /*
        * Vertically:
        *
        * Make the above `ystr' rows or'ed with it.

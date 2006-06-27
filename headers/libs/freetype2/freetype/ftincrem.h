@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType incremental loading (specification).                        */
 /*                                                                         */
-/*  Copyright 2002, 2003 by                                                */
+/*  Copyright 2002, 2003, 2006 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -31,6 +31,33 @@
 
 FT_BEGIN_HEADER
 
+ /***************************************************************************
+  *
+  * @section:
+  *    incremental
+  *
+  * @title:
+  *    Incremental Loading
+  *
+  * @abstract:
+  *    Custom Glyph Loading.
+  *
+  * @description:
+  *   This section contains various functions used to perform so-called
+  *   `incremental' glyph loading.  This is a mode where all glyphs loaded
+  *   from a given @FT_Face are provided by the client application,
+  *
+  *   Apart from that, all other tables are loaded normally from the font
+  *   file.  This mode is useful when FreeType is used within another
+  *   engine, e.g., a Postscript Imaging Processor.
+  *
+  *   To enable this mode, you must use @FT_Open_Face, passing an
+  *   @FT_Parameter with the @FT_PARAM_TAG_INCREMENTAL tag and an
+  *   @FT_Incremental_Interface value.  See the comments for
+  *   @FT_Incremental_InterfaceRec for an example.
+  *
+  */
+
 
  /***************************************************************************
   *
@@ -39,8 +66,8 @@ FT_BEGIN_HEADER
   *
   * @description:
   *   An opaque type describing a user-provided object used to implement
-  *   "incremental" glyph loading within FreeType.  This is used to support
-  *   embedded fonts in certain environments (e.g. Postscript interpreters),
+  *   `incremental' glyph loading within FreeType.  This is used to support
+  *   embedded fonts in certain environments (e.g., Postscript interpreters),
   *   where the glyph data isn't in the font file, or must be overridden by
   *   different values.
   *
@@ -77,7 +104,7 @@ FT_BEGIN_HEADER
   *
   * @note:
   *   These correspond to horizontal or vertical metrics depending on the
-  *   value of the 'vertical' argument to the function
+  *   value of the `vertical' argument to the function
   *   @FT_Incremental_GetGlyphMetricsFunc.
   */
   typedef struct  FT_Incremental_MetricsRec_
@@ -101,8 +128,8 @@ FT_BEGIN_HEADER
   *
   *   Note that the format of the glyph's data bytes depends on the font
   *   file format.  For TrueType, it must correspond to the raw bytes within
-  *   the 'glyf' table.  For Postscript formats, it must correspond to the
-  *   *unencrypted* charstring bytes, without any 'lenIV' header.  It is
+  *   the `glyf' table.  For Postscript formats, it must correspond to the
+  *   *unencrypted* charstring bytes, without any `lenIV' header.  It is
   *   undefined for any other format.
   *
   * @input:
@@ -268,6 +295,18 @@ FT_BEGIN_HEADER
     FT_Incremental                  object;
   
   } FT_Incremental_InterfaceRec;
+
+
+ /***************************************************************************
+  *
+  * @type:
+  *   FT_Incremental_Interface
+  *
+  * @description:
+  *   A pointer to an @FT_Incremental_InterfaceRec structure.
+  *
+  */
+  typedef FT_Incremental_InterfaceRec*   FT_Incremental_Interface;
 
 
  /***************************************************************************

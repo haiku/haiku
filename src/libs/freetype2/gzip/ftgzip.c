@@ -8,7 +8,7 @@
 /*  parse compressed PCF fonts, as found with many X11 server              */
 /*  distributions.                                                         */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005 by                                    */
+/*  Copyright 2002, 2003, 2004, 2005, 2006 by                              */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -24,6 +24,7 @@
 #include FT_INTERNAL_MEMORY_H
 #include FT_INTERNAL_STREAM_H
 #include FT_INTERNAL_DEBUG_H
+#include FT_GZIP_H
 #include <string.h>
 
 
@@ -99,12 +100,12 @@
                  uInt       size )
   {
     FT_ULong    sz = (FT_ULong)size * items;
+    FT_Error    error;
     FT_Pointer  p;
 
 
-    FT_MEM_ALLOC( p, sz );
-
-    return (voidpf) p;
+    (void)FT_ALLOC( p, sz );
+    return p;
   }
 
 

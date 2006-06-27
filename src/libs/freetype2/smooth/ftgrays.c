@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    A new `perfect' anti-aliasing renderer (body).                       */
 /*                                                                         */
-/*  Copyright 2000-2001, 2002, 2003, 2005 by                               */
+/*  Copyright 2000-2001, 2002, 2003, 2005, 2006 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -1959,7 +1959,7 @@
   }
 
 
-  extern int
+  static int
   gray_raster_render( PRaster                  raster,
                       const FT_Raster_Params*  params )
   {

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType glyph loader (body).                                    */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004 by                                          */
+/*  Copyright 2002, 2003, 2004, 2005 by                                    */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg                       */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -195,7 +195,7 @@
     FT_Error     error   = FT_Err_Ok;
     FT_Outline*  base    = &loader->base.outline;
     FT_Outline*  current = &loader->current.outline;
-    FT_Bool      adjust  = 1;
+    FT_Bool      adjust  = 0;
 
     FT_UInt      new_max, old_max;
 
@@ -296,13 +296,22 @@
   FT_BASE_DEF( void )
   FT_GlyphLoader_Add( FT_GlyphLoader  loader )
   {
-    FT_GlyphLoad  base    = &loader->base;
-    FT_GlyphLoad  current = &loader->current;
+    FT_GlyphLoad  base;
+    FT_GlyphLoad  current;
 
-    FT_UInt       n_curr_contours = current->outline.n_contours;
-    FT_UInt       n_base_points   = base->outline.n_points;
+    FT_UInt       n_curr_contours;
+    FT_UInt       n_base_points;
     FT_UInt       n;
 
+
+    if ( !loader )
+      return;
+
+    base    = &loader->base;
+    current = &loader->current;
+
+    n_curr_contours = current->outline.n_contours;
+    n_base_points   = base->outline.n_points;
 
     base->outline.n_points =
       (short)( base->outline.n_points + current->outline.n_points );

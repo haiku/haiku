@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType PFR object methods (body).                                  */
 /*                                                                         */
-/*  Copyright 2002, 2003, 2004, 2005 by                                    */
+/*  Copyright 2002, 2003, 2004, 2005, 2006 by                              */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -165,8 +165,10 @@
       pfrface->units_per_EM = (FT_UShort)phy_font->outline_resolution;
       pfrface->ascender     = (FT_Short) phy_font->bbox.yMax;
       pfrface->descender    = (FT_Short) phy_font->bbox.yMin;
-      pfrface->height       = (FT_Short)(
-        ( ( pfrface->ascender - pfrface->descender ) * 12 ) / 10 );
+
+      pfrface->height = (FT_Short)( ( pfrface->units_per_EM * 12 ) / 10 );
+      if ( pfrface->height < pfrface->ascender - pfrface->descender )
+        pfrface->height = (FT_Short)(pfrface->ascender - pfrface->descender);
 
       if ( phy_font->num_strikes > 0 )
       {
@@ -185,6 +187,9 @@
         {
           size->height = (FT_UShort)strike->y_ppm;
           size->width  = (FT_UShort)strike->x_ppm;
+          size->size   = strike->y_ppm << 6;
+          size->x_ppem = strike->x_ppm << 6;
+          size->y_ppem = strike->y_ppm << 6;
         }
         pfrface->num_fixed_sizes = count;
       }
@@ -422,8 +427,6 @@
   /*************************************************************************/
   /*************************************************************************/
 
-#ifdef FT_OPTIMIZE_MEMORY
-
   FT_LOCAL_DEF( FT_Error )
   pfr_face_get_kerning( FT_Face     pfrface,        /* PFR_Face */
                         FT_UInt     glyph1,
@@ -479,7 +482,7 @@
         FT_UInt    probe    = power * size;
         FT_UInt    extra    = count - power;
         FT_Byte*   base     = stream->cursor;
-        FT_Bool    twobytes = item->flags & 1;
+        FT_Bool    twobytes = FT_BOOL( item->flags & 1 );
         FT_Byte*   p;
         FT_UInt32  cpair;
 
@@ -545,52 +548,5 @@
   Exit:
     return error;
   }
-
-#else /* !FT_OPTIMIZE_MEMORY */
-
-  FT_LOCAL_DEF( FT_Error )
-  pfr_face_get_kerning( FT_Face     pfrface,        /* PFR_Face */
-                        FT_UInt     glyph1,
-                        FT_UInt     glyph2,
-                        FT_Vector*  kerning )
-  {
-    PFR_Face      face     = (PFR_Face)pfrface;
-    FT_Error      error    = PFR_Err_Ok;
-    PFR_PhyFont   phy_font = &face->phy_font;
-    PFR_KernPair  pairs    = phy_font->kern_pairs;
-    FT_UInt32     idx      = PFR_KERN_INDEX( glyph1, glyph2 );
-    FT_UInt       min, max;
-
-
-    kerning->x = 0;
-    kerning->y = 0;
-
-    min = 0;
-    max = phy_font->num_kern_pairs;
-
-    while ( min < max )
-    {
-      FT_UInt       mid  = ( min + max ) >> 1;
-      PFR_KernPair  pair = pairs + mid;
-      FT_UInt32     pidx = PFR_KERN_PAIR_INDEX( pair );
-
-
-      if ( pidx == idx )
-      {
-        kerning->x = pair->kerning;
-        break;
-      }
-
-      if ( pidx < idx )
-        min = mid + 1;
-      else
-        max = mid;
-    }
-
-    return error;
-  }
-
-#endif /* !FT_OPTIMIZE_MEMORY */
-
 
 /* END */
