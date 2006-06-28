@@ -252,7 +252,7 @@ main(int argc, char *argv[])
 		// Updated Usage string to reflect "do", "the", bare -index, and '"name"' changes below
 		//   -- pfolk@uni.uiuc.edu 1999-11-03
 		
-		return -1;
+		return 1;
 	}
 	
 	int32 argapp = 1;
@@ -280,11 +280,11 @@ main(int argc, char *argv[])
 	teamid = atoi(argv[argapp]);
 	if (teamid > 0) {
 		if (be_roster->GetRunningAppInfo(teamid, &appinfo)!=B_OK)
-			return -1;
+			return 1;
 		the_application=BMessenger(NULL, teamid);
 		if (!parse(the_application, argc, argv, argapp))
 			return 0;
-		return -1;
+		return 1;
 	}
 
 	be_roster->GetAppList(&team_list);
@@ -305,7 +305,7 @@ main(int argc, char *argv[])
 		}
 	}
 		
-	return -1;
+	return 1;
 }
 
 
