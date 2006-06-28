@@ -23,13 +23,10 @@
 #include <fs/fd.h>
 #include <fs/node_monitor.h>
 #include <sysctl.h>
-#include <ksocket.h>
 #include <kimage.h>
 #include <ksignal.h>
 #include <real_time_clock.h>
 #include <system_info.h>
-#include <sys/ioccom.h>
-#include <sys/socket.h>
 #include <user_atomic.h>
 #include <safemode.h>
 #include <arch/system_info.h>
