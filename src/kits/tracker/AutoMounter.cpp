@@ -99,7 +99,7 @@ struct MountPartitionParams {
 static status_t
 AutoMounterWatchNode(const node_ref *nodeRef, uint32 flags)
 {
-	ASSERT(nodeToWatch != NULL);
+	ASSERT(nodeRef != NULL);
 
 	TTracker *tracker = dynamic_cast<TTracker *>(be_app);
 	if (tracker != NULL)
@@ -127,7 +127,7 @@ MountAndWatch(Partition *partition)
 	node_ref nodeToWatch;
 	status = partition->GetMountPointNodeRef(&nodeToWatch);
 	if (status != B_OK) {
-		PRINT(("Couldn't get mount point node ref: %s\n", strerror(result)));
+		PRINT(("Couldn't get mount point node ref: %s\n", strerror(status)));
 		return status;
 	}
 
