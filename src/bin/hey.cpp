@@ -239,7 +239,7 @@ main(int argc, char *argv[])
 
 	if (argc < 2) {
 		fprintf(stderr, "hey %s, written by Attila Mezei (attila.mezei@mail.datanet.hu)\n" \
-		"usage: hey [-s][-o] <app|signature> [let <specifier> do] <verb> <specifier_1> <of\n" \
+		"usage: hey [-s][-o] <app|signature|teamid> [let <specifier> do] <verb> <specifier_1> <of\n" \
 		"           <specifier_n>>* [to <value>] [with name=<value> [and name=<value>]*]\n" \
 		"where  <verb> : DO|GET|SET|COUNT|CREATE|DELETE|GETSUITES|QUIT|SAVE|LOAD|'what'\n" \
 		"  <specifier> : [the] <property_name> [ <index> | name | \"name\" | '\"name\"' ]\n" \
@@ -276,8 +276,19 @@ main(int argc, char *argv[])
 	BList team_list;
 	team_id teamid;
 	app_info appinfo;
-	
+
+	teamid = atoi(argv[argapp]);
+	if (teamid > 0) {
+		if (be_roster->GetRunningAppInfo(teamid, &appinfo)!=B_OK)
+			return -1;
+		the_application=BMessenger(NULL, teamid);
+		if (!parse(the_application, argc, argv, argapp))
+			return 0;
+		return -1;
+	}
+
 	be_roster->GetAppList(&team_list);
+
 	for (int32 i=0; i<team_list.CountItems(); i++){
 		teamid = (team_id)team_list.ItemAt(i);
 		be_roster->GetRunningAppInfo(teamid, &appinfo);
@@ -465,7 +476,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 				bool found=false;
 				if (target && target->IsValid()) {
 					BMessage rply;
-					if(target->SendMessage(&BMessage(B_GET_SUPPORTED_SUITES), &rply)==B_OK){
+					if(target->SendMessage(B_GET_SUPPORTED_SUITES, &rply)==B_OK){
 						// if all goes well, rply contains all kinds of property infos
 						int32 j=0;
 						void *voidptr;
