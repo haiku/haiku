@@ -12,7 +12,7 @@ UsePrivateHeaders net ;
 
 BinCommand arp :
 	arp.c
-	: libbind.so libsocket.so $(SELECT_UNAME_ETC_LIB) ;
+	: libnetwork.so $(SELECT_UNAME_ETC_LIB) ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-networking

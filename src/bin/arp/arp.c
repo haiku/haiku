@@ -39,9 +39,7 @@
  */
 
 #include <sys/param.h>
-#include <sys/file.h>
 #include <sys/socket.h>
-//#include <sys/sysctl.h>
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -53,17 +51,12 @@
 
 #include <netdb.h>
 #include <errno.h>
-//#include <err.h>
-//#include <nlist.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <paths.h>
 #include <unistd.h>
 #include <sys/time.h>
 
-// phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
-extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
 
 int delete (const char *, const char *);
 void search(in_addr_t addr, void (*action)(struct sockaddr_dl *sdl,
