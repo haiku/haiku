@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons input_server devices easypen ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders input ;
+
+Addon <input>easypen : input_server/devices : 
+	EasyPenInputDevice.cpp 
+	: false 
+	: be device <nogrist>input_server ;
+
