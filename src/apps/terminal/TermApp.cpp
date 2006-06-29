@@ -73,14 +73,7 @@ const ulong MSG_TERM_IS_MINIMIZE = 'mtim';
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE)
 {
-	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams);
-	fWindowNumber = teams.CountItems();
-
-	if (fWindowNumber == 0) {
-		be_roster->GetAppList(R5_TERM_SIGNATURE, &teams);
-		fWindowNumber = teams.CountItems();
-	}
+	fWindowNumber = FindTerminalId();
 
 	char title[256];
 	snprintf(title, sizeof(title), "Terminal %d", fWindowNumber);
@@ -200,10 +193,6 @@ void
 TermApp::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case MENU_NEW_TREM:
-			RunNewTerm();
-			break;
-
 		case MENU_SWITCH_TERM:
 			SwitchTerm();
 			break;
@@ -392,18 +381,6 @@ TermApp::MakeTermWindow(BRect &frame)
 
 
 void
-TermApp::RunNewTerm()
-{
-	app_info info;
-	be_app->GetAppInfo(&info);
-
-	// try launching two different ways to work around possible problems
-	if (be_roster->Launch(&info.ref)!=B_OK)
-		be_roster->Launch(TERM_SIGNATURE);
-}
-
-
-void
 TermApp::ActivateTermWindow(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
@@ -461,6 +438,51 @@ TermApp::IsMinimize(team_id id)
 	reply.FindBool("result", &hidden);
 	return hidden;
 }
+
+
+int32
+TermApp::FindTerminalId()
+{
+	BList teams;
+	be_roster->GetAppList(TERM_SIGNATURE, &teams);
+	int32 count = teams.CountItems();
+	int32 numbers[count];
+	thread_info info;
+	get_thread_info(find_thread(NULL), &info);
+	
+	for (int32 i=0; i<count; i++) {
+		team_id id = (team_id)teams.ItemAt(i);
+		if (id == info.team)
+			continue;
+		numbers[i] = 0;
+		
+		BMessage msg(B_GET_PROPERTY);
+		BMessage reply;
+		msg.AddSpecifier("Title");
+		msg.AddSpecifier("Window", (int32)0);
+		if (BMessenger(TERM_SIGNATURE, id).SendMessage(&msg, &reply) != B_OK)
+			continue;
+		BString title;
+		if (reply.FindString("result", &title)!=B_OK)
+			continue;
+		sscanf(title.String(), "Terminal %ld", &numbers[i]);
+	}
+	
+	for (int32 i=1; i<count; i++) {
+		bool found = false;
+		for (int32 j=0; j<count; j++) {
+			if (i == numbers[j]) {
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			return i;
+	}
+
+	return count;
+}
+
 
 //#ifndef B_NETPOSITIVE_APP_SIGNATURE
 //#define B_NETPOSITIVE_APP_SIGNATURE "application/x-vnd.Be-NPOS" 

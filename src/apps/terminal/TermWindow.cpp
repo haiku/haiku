@@ -13,6 +13,7 @@
 #include <Path.h>
 #include <PrintJob.h>
 #include <PropertyInfo.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <ScrollBar.h>
 #include <TextControl.h>
@@ -202,7 +203,7 @@ TermWindow::SetupMenu(void)
    */
   fFilemenu = new BMenu("Terminal");
   fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
-  fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TREM), 'N'));
+  fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TERM), 'N'));
   fFilemenu->AddSeparatorItem();
   fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
   fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
@@ -289,8 +290,14 @@ TermWindow::MessageReceived(BMessage *message)
     be_app->PostMessage(MENU_SWITCH_TERM);
     break;
 
-  case MENU_NEW_TREM:
-    be_app->PostMessage(MENU_NEW_TREM);
+  case MENU_NEW_TERM: {
+	app_info info;
+	be_app->GetAppInfo(&info);
+
+	// try launching two different ways to work around possible problems
+	if (be_roster->Launch(&info.ref)!=B_OK)
+		be_roster->Launch(TERM_SIGNATURE);
+	}
     break;
 
   case MENU_PREF_OPEN:
@@ -703,3 +710,6 @@ TermWindow::DoPrint()
   job.CommitJob();
 //#endif 
 }
+
+
+

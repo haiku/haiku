@@ -52,7 +52,7 @@
 // Menu Message.
 //
 const uint32 MENU_SWITCH_TERM   = 'MSWT';
-const uint32 MENU_NEW_TREM      = 'MNTE';
+const uint32 MENU_NEW_TERM      = 'MNTE';
 const uint32 MENU_PREF_OPEN     = 'MPre';
 const uint32 MENU_FILE_QUIT     = 'MFqu';
 const uint32 MENU_CLEAR_ALL     = 'MCAl';

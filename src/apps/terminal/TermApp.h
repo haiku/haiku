@@ -63,7 +63,6 @@ private:
    * Public Member functions.
    */
   void          MakeTermWindow (BRect &frame);
-  void          RunNewTerm (void);
   void          SwitchTerm(void);
   void          ActivateTermWindow(team_id id);
 
@@ -71,6 +70,7 @@ private:
   
 private:
   bool          IsMinimize (team_id);
+  int32			FindTerminalId();
 
   int		fRows, fCols, fXpos, fYpos;
   bool		fStartFullscreen;
