@@ -10,7 +10,6 @@
 
 #include <OS.h>
 
-#include <defines.h>
 #include <elf.h>
 #include <file_cache.h>
 #include <int.h>
@@ -298,7 +297,7 @@ error:
 static status_t
 user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings)
 {
-	char buffer[SYS_THREAD_STRING_LENGTH_MAX];
+	char *buffer;
 	char **strings;
 	status_t err;
 	int32 i = 0;
@@ -306,9 +305,17 @@ user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings
 	if (!IS_USER_ADDRESS(userStrings))
 		return B_BAD_ADDRESS;
 
-	strings = (char **)malloc((count + 1) * sizeof(char *));
-	if (strings == NULL)
+	// buffer for safely accessing the user string
+	// TODO: maybe have a user_strdup() instead?
+	buffer = (char *)malloc(4 * B_PAGE_SIZE);
+	if (buffer == NULL)
 		return B_NO_MEMORY;
+
+	strings = (char **)malloc((count + 1) * sizeof(char *));
+	if (strings == NULL) {
+		err = B_NO_MEMORY;
+		goto error;
+	}
 
 	if ((err = user_memcpy(strings, userStrings, count * sizeof(char *))) < B_OK)
 		goto error;
@@ -316,7 +323,7 @@ user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings
 	// scan all strings and copy to kernel space
 
 	for (; i < count; i++) {
-		err = user_strlcpy(buffer, strings[i], SYS_THREAD_STRING_LENGTH_MAX);
+		err = user_strlcpy(buffer, strings[i], 4 * B_PAGE_SIZE);
 		if (err < B_OK)
 			goto error;
 
@@ -329,11 +336,13 @@ user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings
 
 	strings[count] = NULL;
 	*_strings = strings;
+	free(buffer);
 
 	return B_OK;
 
 error:
 	free_strings_array(strings, i);
+	free(buffer);
 
 	TRACE(("user_copy_strings_array failed %ld\n", err));
 	return err;
