@@ -136,7 +136,7 @@ AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
 
 # apps
 AddFilesToHaikuImage beos system		: runtime_loader Deskbar Tracker ;
-AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled <bin>route ;
+AddFilesToHaikuImage beos bin			: $(BEOS_BIN) consoled ;
 AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
 
