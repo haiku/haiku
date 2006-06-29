@@ -769,13 +769,13 @@
 #define HAVE_STDDEF_H 1
 
 /* Define if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define if you have the <sys/dir.h> header file.  */
 /* #undef HAVE_SYS_DIR_H */
 
 /* Define if you have the <sys/file.h> header file.  */
-#define HAVE_SYS_FILE_H 1
+/* #undef HAVE_SYS_FILE_H */
 
 /* Define if you have the <sys/ndir.h> header file.  */
 /* #undef HAVE_SYS_NDIR_H */
