@@ -12,7 +12,8 @@ UsePrivateHeaders net ;
 
 BinCommand ifconfig :
 	ifconfig.c
-: libbind.so libsocket.so ;
+	: libnetwork.so
+;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-networking

@@ -208,7 +208,6 @@
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-#include <sys/file.h>
 #include <sys/ioctl.h>
 
 #include <netinet/in_systm.h>

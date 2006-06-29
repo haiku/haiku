@@ -52,10 +52,10 @@
  *	This program has to run SUID to ROOT to access the ICMP socket.
  */
 
+#include <OS.h>
+
 #include <sys/param.h>
-#include <kernel/OS.h>
 #include <sys/socket.h>
-#include <sys/file.h>
 #include <sys/time.h>
 
 #include <netinet/in_systm.h>
