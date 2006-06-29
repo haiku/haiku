@@ -1,12 +1,14 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* Contains the code to interface with a remote GDB */
+/** Contains the code to interface with a remote GDB */
+
+#include "gdb.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -14,7 +16,6 @@
 #include <vm.h>
 #include <smp.h>
 #include <debug.h>
-#include <gdb.h>
 #include <arch/debug_console.h>
 
 
@@ -487,6 +488,9 @@ gdb_state_machine(void)
 
 	return 0;
 }
+
+
+//	#pragma mark -
 
 
 int

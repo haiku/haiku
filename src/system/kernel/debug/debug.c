@@ -9,11 +9,11 @@
 /* This file contains the debugger */
 
 #include "blue_screen.h"
+#include "gdb.h"
 
 #include <debug.h>
 #include <driver_settings.h>
 #include <frame_buffer_console.h>
-#include <gdb.h>
 #include <int.h>
 #include <smp.h>
 #include <vm.h>
