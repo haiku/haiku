@@ -261,8 +261,7 @@ BinCommand gdb : gdb.c :
 
 	libroot.so
 	libdebug.so
-	libbind.so
-	libsocket.so
+	libnetwork.so
 ;
 
 # build ADA lexer

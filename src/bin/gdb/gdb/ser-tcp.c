@@ -94,14 +94,14 @@ net_open (struct serial *scb, const char *name)
     }
 
   if (use_udp)
-    scb->fd = socket (PF_INET, SOCK_DGRAM, 0);
+    scb->fd = socket (AF_INET, SOCK_DGRAM, 0);
   else
-    scb->fd = socket (PF_INET, SOCK_STREAM, 0);
+    scb->fd = socket (AF_INET, SOCK_STREAM, 0);
 
   if (scb->fd < 0)
     return -1;
   
-  sockaddr.sin_family = PF_INET;
+  sockaddr.sin_family = AF_INET;
   sockaddr.sin_port = htons (port);
   memcpy (&sockaddr.sin_addr.s_addr, hostent->h_addr,
 	  sizeof (struct in_addr));
