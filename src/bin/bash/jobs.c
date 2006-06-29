@@ -39,7 +39,9 @@
 #  include <sys/resource.h>
 #endif /* !_POSIX_VERSION && HAVE_SYS_RESOURCE_H && HAVE_WAIT3 && !RLIMTYPE */
 
-#include <sys/file.h>
+#ifdef HAVE_SYS_FILE_H
+#  include <sys/file.h>
+#endif
 #include "filecntl.h"
 #include <sys/ioctl.h>
 #include <sys/param.h>

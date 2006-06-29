@@ -22,7 +22,7 @@
 #include <config.h>
 
 #include <bashtypes.h>
-#ifndef _MINIX
+#if defined (SYS_FILE_H)
 #  include <sys/file.h>
 #endif
 #include <posixstat.h>

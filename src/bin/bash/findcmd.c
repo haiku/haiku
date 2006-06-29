@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "chartypes.h"
 #include "bashtypes.h"
-#ifndef _MINIX
+#ifdef HAVE_SYS_FILE_H
 #  include <sys/file.h>
 #endif
 #include "filecntl.h"

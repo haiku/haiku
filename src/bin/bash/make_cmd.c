@@ -23,7 +23,7 @@ Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA. */
 
 #include <stdio.h>
 #include "bashtypes.h"
-#ifndef _MINIX
+#ifdef HAVE_SYS_FILE_H
 #  include <sys/file.h>
 #endif
 #include "filecntl.h"

@@ -45,9 +45,9 @@
 extern int errno;
 #endif /* !errno */
 
-#if !defined (_POSIX_VERSION)
+#ifdef HAVE_SYS_FILE_H
 #  include <sys/file.h>
-#endif /* !_POSIX_VERSION */
+#endif
 #include "posixstat.h"
 #include "filecntl.h"
 
