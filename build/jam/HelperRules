@@ -51,6 +51,20 @@ rule FFilter
 	return $(newList) ;
 }
 
+rule FGetGrist
+{
+	# FGetGrist <target> ;
+	#
+	# Returns the grist of a target, not including leading "<" and trailing ">".
+
+	local grist = $(1[1]:G) ;
+	if ! $(grist) {
+		return ;
+	}
+
+	return [ Match <(.*)> : $(grist) ] ;
+}
+
 rule FSplitPath
 {
 	# SplitPath <path> ;
