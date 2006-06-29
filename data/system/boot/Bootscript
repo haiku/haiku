@@ -97,6 +97,7 @@ fi
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/media_server
+	launch $SERVERS/midi_server
 fi
 
 # Check for daily saving time
