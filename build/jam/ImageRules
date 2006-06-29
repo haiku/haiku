@@ -119,11 +119,21 @@ rule AddFilesToHaikuImage
 	local targets = $(2) ;
 	local destName = $(3) ;
 
-	INSTALL_DIR on $(targets) = $(directory) ;
-	TARGETS_TO_INSTALL on $(directory) += $(targets) ;
+	# We create a unique dummy target per target to install.
+	local target ;
+	for target in $(targets) {
+		local name ;
+		if $(destName) {
+			name = $(destName) ;
+		} else {
+			name = $(target:BS) ;
+		}
 
-	if $(destName) {
-		INSTALL_TARGET_NAME on $(targets) = $(destName) ;
+		local destTarget = $(name:G=HaikuImage__$(directory:G=)) ;
+		TARGET on $(destTarget) = $(target) ;
+		INSTALL_DIR on $(destTarget) = $(directory) ;
+		INSTALL_TARGETS on $(target) += $(destTarget) ;
+		TARGETS_TO_INSTALL on $(directory) += $(destTarget) ;
 	}
 }
 
@@ -180,7 +190,9 @@ rule AddBootModuleSymlinks
 	# add the symlinks
 	local target ;
 	for target in $(targets) {
-		local installDir = [ on $(target) return $(INSTALL_DIR) ] ;
+		# Symlink to the first place where the target has been installed.
+		local destTarget = [ on $(target) return $(INSTALL_TARGETS[1]) ] ;
+		local installDir = [ on $(destTarget) return $(INSTALL_DIR) ] ;
 
 		if ! $(installDir) {
 			Echo "ERROR: AddBootModuleSymlinks: Can't create a symlink to"
@@ -243,21 +255,21 @@ rule CreateHaikuImageCopyFilesScript
 
 	local dir ;
 	for dir in [ on haiku-image-contents return $(INSTALL_DIRECTORIES) ] {
-		local targets = [ on $(dir) return $(TARGETS_TO_INSTALL) ] ;
-
 		# filter the targets that shall be renamed; they have to be copied
 		# individually
+		local destTargets = [ on $(dir) return $(TARGETS_TO_INSTALL) ] ;
 		local remainingTargets ;
-		local target ;
-		for target in $(targets) {
-			local destName = [ on $(target) return $(INSTALL_TARGET_NAME) ] ;
-			if $(destName) {
+		local destTarget ;
+		for destTarget in $(destTargets) {
+			local target = [ on $(destTarget) return $(TARGET) ] ;
+			local name = $(destTarget:BS) ;
+			if $(name) != $(target:BS) {
 				# use a unique dummy target for this file, on which we
 				# can define the TARGET_DIR variable
 				local dummyTarget = $(script)-dummy-$(dir:G=)-$(target) ;
 				NotFile $(dummyTarget) ;
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
-				INSTALL_TARGET_NAME on $(dummyTarget) = $(destName) ;
+				INSTALL_TARGET_NAME on $(dummyTarget) = $(name) ;
 	
 				Depends $(dummyTarget) : $(initScript) $(target) ;
 				Depends $(script) : $(dummyTarget) ;
