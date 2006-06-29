@@ -14,7 +14,6 @@ MergeObject posix_sys.o :
  	select.c
 	stat.c
 	statvfs.c
- 	sysctl.c
  	times.c
  	uio.c
  	umask.c

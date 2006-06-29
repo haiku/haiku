@@ -33,7 +33,6 @@ KernelMergeObject kernel_core.o :
 	system_info.c
 	smp.c
 	syscalls.c
-	sysctl.c
 	team.c
 	thread.c
 	timer.c

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc. All rights reserved.
+ * Copyright 2004-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,7 +22,6 @@
 #include <sys/resource.h>
 #include <fs/fd.h>
 #include <fs/node_monitor.h>
-#include <sysctl.h>
 #include <kimage.h>
 #include <ksignal.h>
 #include <real_time_clock.h>

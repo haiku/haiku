@@ -284,10 +284,6 @@ extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);
 extern int64		_kern_atomic_get64(vint64 *value);
 #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 
-int sys_sysctl(int *name, uint namlen, void *oldp, size_t *oldlen,
-		void *newp, size_t newlen);
-int sys_socket(int family, int type, int proto);
-
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
