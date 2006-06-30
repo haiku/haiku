@@ -11,10 +11,14 @@
 #include <stdio.h>
 
 #include <Message.h>
+#include <ScrollView.h>
 
 #include "Document.h"
 #include "CanvasView.h"
 #include "IconEditorApp.h"
+#include "IconView.h"
+#include "PathListView.h"
+#include "ShapeListView.h"
 #include "SwatchGroup.h"
 
 // TODO: just for testing
@@ -25,6 +29,7 @@
 #include "PathManipulator.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
+#include "ShapeListView.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
 #include "StyleManager.h"
@@ -36,8 +41,7 @@ MainWindow::MainWindow(IconEditorApp* app, Document* document)
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
-	  fDocument(document),
-	  fCanvasView(NULL)
+	  fDocument(document)
 {
 	_Init();
 }
@@ -87,6 +91,19 @@ MainWindow::_Init()
 //	fCanvasView->SetSelection(fDocument->Selection());
 	fCanvasView->SetIcon(fDocument->Icon());
 
+	fPathListView->SetPathContainer(fDocument->Icon()->Paths());
+//	fPathListView->SetCommandStack(fDocument->CommandStack());
+//	fPathListView->SetSelection(fDocument->Selection());
+
+	fShapeListView->SetShapeContainer(fDocument->Icon()->Shapes());
+//	fShapeListView->SetCommandStack(fDocument->CommandStack());
+//	fShapeListView->SetSelection(fDocument->Selection());
+
+	fIconPreview16->SetIcon(fDocument->Icon());
+	fIconPreview32->SetIcon(fDocument->Icon());
+//	fIconPreview48->SetIcon(fDocument->Icon());
+	fIconPreview64->SetIcon(fDocument->Icon());
+
 // TODO: for testing only:
 	MultipleManipulatorState* state = new MultipleManipulatorState(fCanvasView);
 	fCanvasView->SetState(state);
@@ -112,6 +129,7 @@ MainWindow::_Init()
 	Shape* shape = new Shape(style2);
 	shape->Paths()->AddPath(path);
 
+	shape->SetName("Gradient");
 	fDocument->Icon()->Shapes()->AddShape(shape);
 
 	shape = new Shape(style1);
@@ -121,6 +139,7 @@ MainWindow::_Init()
 	transformer->width(5.0);
 	shape->AppendTransformer(transformer);
 
+	shape->SetName("Outline");
 	fDocument->Icon()->Shapes()->AddShape(shape);
 
 	Style* style3 = new Style();
@@ -137,6 +156,7 @@ MainWindow::_Init()
 	*transformer2 *= agg::trans_affine_scaling(0.8, 0.6);
 	shape->AppendTransformer(transformer2);
 
+	shape->SetName("Transformed");
 	fDocument->Icon()->Shapes()->AddShape(shape);
 
 	PathManipulator* pathManipulator = new PathManipulator(path);
@@ -157,7 +177,54 @@ MainWindow::_CreateGUI(BRect bounds)
 	
 	fCanvasView = new CanvasView(bounds);
 
+	bounds.left = fSwatchGroup->Frame().right + 5;
+	bounds.top = fSwatchGroup->Frame().top + 5;
+	bounds.right = bounds.left + 15;
+	bounds.bottom = bounds.top + 15;
+	fIconPreview16 = new IconView(bounds, "icon preview 16");
+
+	bounds.OffsetBy(bounds.Width() + 6, 0);
+	bounds.right = bounds.left + 31;
+	bounds.bottom = bounds.top + 31;
+	fIconPreview32 = new IconView(bounds, "icon preview 32");
+
+//	bounds.OffsetBy(bounds.Width() + 6, 0);
+//	bounds.right = bounds.left + 47;
+//	bounds.bottom = bounds.top + 47;
+//	fIconPreview48 = new IconView(bounds, "icon preview 48");
+
+	bounds.OffsetBy(bounds.Width() + 6, 0);
+	bounds.right = bounds.left + 63;
+	bounds.bottom = bounds.top + 63;
+	fIconPreview64 = new IconView(bounds, "icon preview 64");
+
+	bounds.OffsetBy(bounds.Width() + 6, 0);
+	bounds.right = bounds.left + 100;
+	bounds.bottom = fCanvasView->Frame().top - 5.0;
+
+	fPathListView = new PathListView(bounds, "path list view");
+
+	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	fShapeListView = new ShapeListView(bounds, "shape list view");
+
 	bg->AddChild(fSwatchGroup);
+
+	bg->AddChild(fIconPreview16);
+	bg->AddChild(fIconPreview32);
+//	bg->AddChild(fIconPreview48);
+	bg->AddChild(fIconPreview64);
+
+	bg->AddChild(new BScrollView("path list scroll view",
+								 fPathListView,
+								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
+								 0, false, true,
+								 B_NO_BORDER));
+	bg->AddChild(new BScrollView("shape list scroll view",
+								 fShapeListView,
+								 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								 0, false, true,
+								 B_NO_BORDER));
+
 	bg->AddChild(fCanvasView);
 
 	return bg;

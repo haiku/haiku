@@ -10,13 +10,14 @@
 #define ICON_RENDERER_H
 
 #include "agg_gamma_lut.h"
-#include "agg_rendering_buffer.h"
-#include "agg_rasterizer_compound_aa.h"
-#include "agg_scanline_u.h"
-#include "agg_scanline_bin.h"
-#include "agg_renderer_scanline.h"
-#include "agg_span_allocator.h"
 #include "agg_pixfmt_rgba.h"
+#include "agg_rasterizer_compound_aa.h"
+#include "agg_rendering_buffer.h"
+#include "agg_renderer_scanline.h"
+#include "agg_scanline_bin.h"
+#include "agg_scanline_u.h"
+#include "agg_span_allocator.h"
+#include "agg_trans_affine.h"
 
 class BBitmap;
 class Icon;
@@ -37,6 +38,8 @@ typedef agg::span_allocator<agg::rgba8>		SpanAllocator;
 typedef agg::rasterizer_compound_aa
 			<agg::rasterizer_sl_clip_dbl>	CompoundRasterizer;
 
+typedef agg::trans_affine					Transformation;
+
 class IconRenderer {
  public:
 								IconRenderer(BBitmap* bitmap);
@@ -46,6 +49,8 @@ class IconRenderer {
 
 			void				Render();
 			void				Render(const BRect& area);
+
+			void				SetScale(double scale);
 
  private:
 			void				_Render(const BRect& area);
@@ -67,6 +72,8 @@ class IconRenderer {
 			SpanAllocator		fSpanAllocator;
 
 			CompoundRasterizer	fRasterizer;
+
+			Transformation		fGlobalTransform;
 };
 
 #endif // ICON_RENDERER_H

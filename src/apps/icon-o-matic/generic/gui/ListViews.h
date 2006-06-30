@@ -13,7 +13,9 @@
 #include <ListView.h>
 #include <Message.h>
 
-#include <layout.h>
+#ifdef LIB_LAYOUT
+#  include <layout.h>
+#endif
 
 #include "MouseWheelFilter.h"
 
@@ -59,17 +61,17 @@ class SimpleItem : public BStringItem
 class DragSortableListView : public MouseWheelTarget,
 							 public BListView {
  public:
-							DragSortableListView( BRect frame,
-												  const char* name,
-												  list_view_type type
+							DragSortableListView(BRect frame,
+												 const char* name,
+												 list_view_type type
 														= B_SINGLE_SELECTION_LIST,
-												  uint32 resizingMode
+												 uint32 resizingMode
 														= B_FOLLOW_LEFT
 														  | B_FOLLOW_TOP,
-												  uint32 flags
+												 uint32 flags
 														= B_WILL_DRAW
 														  | B_NAVIGABLE
-														  | B_FRAME_EVENTS );
+														  | B_FRAME_EVENTS);
 	virtual					~DragSortableListView();
 
 							// BListView
@@ -77,20 +79,20 @@ class DragSortableListView : public MouseWheelTarget,
 	virtual	void			DetachedFromWindow();
 	virtual	void			FrameResized(float width, float height);
 //	virtual	void			MakeFocus(bool focused);
-	virtual	void			Draw( BRect updateRect );
+	virtual	void			Draw(BRect updateRect);
 	virtual	void			ScrollTo(BPoint where);
 	virtual	void			TargetedByScrollView(BScrollView* scrollView);
-	virtual	bool			InitiateDrag( BPoint point, int32 index,
-										  bool wasSelected );
-	virtual void			MessageReceived( BMessage* message );
-	virtual	void			KeyDown( const char* bytes, int32 numBytes );
-	virtual	void			MouseDown( BPoint where );
-	virtual void			MouseMoved( BPoint where, uint32 transit,
-										const BMessage* dragMessage );
-	virtual void			MouseUp( BPoint where );
-	virtual	void			WindowActivated( bool active );
-	virtual void			DrawItem( BListItem *item, BRect itemFrame,
-									  bool complete = false);
+	virtual	bool			InitiateDrag(BPoint point, int32 index,
+										 bool wasSelected);
+	virtual void			MessageReceived(BMessage* message);
+	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+	virtual	void			MouseDown(BPoint where);
+	virtual void			MouseMoved(BPoint where, uint32 transit,
+									   const BMessage* dragMessage);
+	virtual void			MouseUp(BPoint where);
+	virtual	void			WindowActivated(bool active);
+	virtual void			DrawItem(BListItem *item, BRect itemFrame,
+									 bool complete = false);
 
 							// MouseWheelTarget
 	virtual	bool			MouseWheelChanged(float x, float y);
@@ -148,26 +150,31 @@ class DragSortableListView : public MouseWheelTarget,
 };
 
 // SimpleListView
-class SimpleListView : public MView, public DragSortableListView {
+class SimpleListView : 
+					   #ifdef LIB_LAYOUT
+					   public MView,
+					   #endif
+					   public DragSortableListView {
  public:
-							SimpleListView( BRect frame,
-											BMessage* selectionChangeMessage = NULL );
-							SimpleListView( BRect frame,
-											const char* name,
-											BMessage* selectionChangeMessage = NULL,
-											list_view_type type
+							SimpleListView(BRect frame,
+										   BMessage* selectionChangeMessage = NULL);
+							SimpleListView(BRect frame,
+										   const char* name,
+										   BMessage* selectionChangeMessage = NULL,
+										   list_view_type type
 												= B_MULTIPLE_SELECTION_LIST,
-											uint32 resizingMode
+										   uint32 resizingMode
 												= B_FOLLOW_ALL_SIDES,
-											uint32 flags
+										   uint32 flags
 												= B_WILL_DRAW | B_NAVIGABLE
-												  | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE );
+												  | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
 							~SimpleListView();
 
+	#ifdef LIB_LAYOUT
 							// MView
 	virtual	minimax			layoutprefs();
 	virtual	BRect			layout(BRect frame);
-
+	#endif
 							// BListView
 	virtual void			MessageReceived(BMessage* message);
 	virtual	void			SelectionChanged();

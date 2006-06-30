@@ -11,6 +11,7 @@
 
 #include <Archivable.h>
 #include <Rect.h>
+#include <String.h>
 
 #include <agg_path_storage.h>
 
@@ -121,6 +122,9 @@ class VectorPath : public BArchivable,
 
 			bool				GetAGGPathStorage(agg::path_storage& path) const;
 
+			void				SetName(const char* name);
+			const char*			Name() const;
+
  private:
 			BRect				_Bounds() const;
 			void				_SetPoint(int32 index, BPoint point);
@@ -134,6 +138,9 @@ class VectorPath : public BArchivable,
 			int32				fAllocCount;
 
 	mutable	BRect				fCachedBounds;
+
+	// TODO: should this really be part of VectorPath?
+			BString				fName;
 };
 
 #endif // VECTOR_PATH_H

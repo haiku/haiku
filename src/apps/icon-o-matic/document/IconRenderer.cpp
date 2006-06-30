@@ -103,6 +103,7 @@ StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 
 	agg::trans_affine transformation;
 		// TODO: construct the gradient transformation here
+		// remember to invert() it!
 
 	switch (gradient->Type()) {
 		case GRADIENT_LINEAR: {
@@ -191,7 +192,9 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 	  fBinaryScanline(),
 	  fSpanAllocator(),
 
-	  fRasterizer()
+	  fRasterizer(),
+
+	  fGlobalTransform()
 {
 	// attach rendering buffer to bitmap
 	fRenderingBuffer.attach((uint8*)bitmap->Bits(),
@@ -230,6 +233,14 @@ IconRenderer::Render(const BRect& area)
 	_Render(fBitmap->Bounds() & area);
 }
 
+//SetScale
+void
+IconRenderer::SetScale(double scale)
+{
+	fGlobalTransform.reset();
+	fGlobalTransform.multiply(agg::trans_affine_scaling(scale));
+}
+
 // #pragma mark -
 
 // _Render
@@ -247,17 +258,23 @@ IconRenderer::_Render(const BRect& r)
 							  (int)ceilf(r.bottom));
 
 	fRasterizer.reset();
-	// iterate over shapes in icon and
+	// iterate over the shapes in the icon,
 	// add the vector paths to the rasterizer
-	// and associate the shapes style
+	// and associate each shapes style
 	int32 shapeCount = fIcon->Shapes()->CountShapes();
-	for (int32 s = 0; s < shapeCount; s++) {
-		Shape* shape = fIcon->Shapes()->ShapeAtFast(s);
+	for (int32 i = 0; i < shapeCount; i++) {
+		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
 		int32 styleIndex = fStyles->IndexOf(shape->Style());
 		fRasterizer.styles(styleIndex, -1);
 
-		fRasterizer.add_path(shape->VertexSource());
+		if (fGlobalTransform.is_identity()) {
+			fRasterizer.add_path(shape->VertexSource());
+		} else {
+			agg::conv_transform<VertexSource, Transformation>
+				scaledPath(shape->VertexSource(), fGlobalTransform);
+			fRasterizer.add_path(scaledPath);
+		}
 	}
 
 	StyleHandler styleHandler(fStyles, fGammaTable);
@@ -269,6 +286,7 @@ IconRenderer::_Render(const BRect& r)
 								   fSpanAllocator,
 								   styleHandler);
 
-	fPixelFormat.apply_gamma_dir(fGammaTable);
+	if (fGammaTable.gamma() != 1.0)
+		fPixelFormat.apply_gamma_inv(fGammaTable);
 }
 

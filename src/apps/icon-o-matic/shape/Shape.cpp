@@ -23,7 +23,9 @@ Shape::Shape(::Style* style)
 	  fPathSource(fPaths),
 	  fTransformers(4),
 
-	  fLastBounds(0, 0, -1, -1)
+	  fLastBounds(0, 0, -1, -1),
+
+	  fName("<shape>")
 {
 	if (fPaths)
 		fPaths->AddListener(this);
@@ -70,6 +72,16 @@ Shape::PathRemoved(VectorPath* path)
 // ObjectChanged
 void
 Shape::ObjectChanged(const Observable* object)
+{
+	// simply pass on the event for now
+	Notify();
+}
+
+// #pragma mark -
+
+// SelectedChanged
+void
+Shape::SelectedChanged()
 {
 	// simply pass on the event for now
 	Notify();
@@ -158,3 +170,24 @@ Shape::AppendTransformer(Transformer* transformer)
 	Notify();
 	return true;
 }
+
+// #pragma mark -
+
+// SetName
+void
+Shape::SetName(const char* name)
+{
+	if (fName == name)
+		return;
+
+	fName = name;
+	Notify();
+}
+
+// Name
+const char*
+Shape::Name() const
+{
+	return fName.String();
+}
+

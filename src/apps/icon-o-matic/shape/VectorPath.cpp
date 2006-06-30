@@ -78,7 +78,8 @@ VectorPath::VectorPath()
 	  fClosed(false),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
+  	  fName("<path>")
 {
 }
 
@@ -90,7 +91,8 @@ VectorPath::VectorPath(const VectorPath& from)
 	  fPath(NULL),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
+  	  fName()
 {
 	*this = from;
 }
@@ -104,7 +106,8 @@ VectorPath::VectorPath(const BMessage* archive)
 	  fClosed(false),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
+  	  fName()
 {
 	if (archive) {
 		type_code typeFound;
@@ -129,6 +132,9 @@ VectorPath::VectorPath(const BMessage* archive)
 		}
 		if (archive->FindBool("path closed", &fClosed) < B_OK) {
 			fClosed = false;
+		}
+		if (archive->FindString("name", &fName) < B_OK) {
+			fName = "<path>";
 		}
 	}
 }
@@ -155,6 +161,7 @@ VectorPath::operator=(const VectorPath& from)
 		fPointCount = 0;
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 	}
+	fName = from.fName;
 	
 	return *this;
 }
@@ -171,46 +178,53 @@ status_t
 VectorPath::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = BArchivable::Archive(into, deep);
-	if (ret >= B_OK) {
-		if (fPointCount > 0) {
-			// improve BMessage efficency by preallocating storage for all points
-			// with the first call
-			ret = into->AddData("point", B_POINT_TYPE, &fPath[0].point,
+	if (ret < B_OK)
+		return ret;
+
+	if (fPointCount > 0) {
+		// improve BMessage efficency by preallocating storage for all points
+		// with the first call
+		ret = into->AddData("point", B_POINT_TYPE, &fPath[0].point,
+							sizeof(BPoint), true, fPointCount);
+		if (ret >= B_OK)
+			ret = into->AddData("point in", B_POINT_TYPE, &fPath[0].point_in,
 								sizeof(BPoint), true, fPointCount);
+		if (ret >= B_OK)
+			ret = into->AddData("point out", B_POINT_TYPE, &fPath[0].point_out,
+								sizeof(BPoint), true, fPointCount);
+		if (ret >= B_OK)
+			ret = into->AddData("connected", B_BOOL_TYPE, &fPath[0].connected,
+								sizeof(bool), true, fPointCount);
+		// add the rest of the points
+		for (int32 i = 1; i < fPointCount && ret >= B_OK; i++) {
+			ret = into->AddData("point", B_POINT_TYPE, &fPath[i].point, sizeof(BPoint));
 			if (ret >= B_OK)
-				ret = into->AddData("point in", B_POINT_TYPE, &fPath[0].point_in,
-									sizeof(BPoint), true, fPointCount);
+				ret = into->AddData("point in", B_POINT_TYPE, &fPath[i].point_in, sizeof(BPoint));
 			if (ret >= B_OK)
-				ret = into->AddData("point out", B_POINT_TYPE, &fPath[0].point_out,
-									sizeof(BPoint), true, fPointCount);
+				ret = into->AddData("point out", B_POINT_TYPE, &fPath[i].point_out, sizeof(BPoint));
 			if (ret >= B_OK)
-				ret = into->AddData("connected", B_BOOL_TYPE, &fPath[0].connected,
-									sizeof(bool), true, fPointCount);
-			// add the rest of the points
-			for (int32 i = 1; i < fPointCount && ret >= B_OK; i++) {
-				ret = into->AddData("point", B_POINT_TYPE, &fPath[i].point, sizeof(BPoint));
-				if (ret >= B_OK)
-					ret = into->AddData("point in", B_POINT_TYPE, &fPath[i].point_in, sizeof(BPoint));
-				if (ret >= B_OK)
-					ret = into->AddData("point out", B_POINT_TYPE, &fPath[i].point_out, sizeof(BPoint));
-				if (ret >= B_OK)
-					ret = into->AddData("connected", B_BOOL_TYPE, &fPath[i].connected, sizeof(bool));
-			}
-		}
-		
-		if (ret >= B_OK) {
-			ret = into->AddBool("path closed", fClosed);
-		} else {
-			fprintf(stderr, "failed adding points!\n");
-		}
-		if (ret < B_OK) {
-			fprintf(stderr, "failed adding closed!\n");
-		}
-		// finish off
-		if (ret < B_OK) {
-			ret = into->AddString("class", "VectorPath");
+				ret = into->AddData("connected", B_BOOL_TYPE, &fPath[i].connected, sizeof(bool));
 		}
 	}
+	
+	if (ret >= B_OK) {
+		ret = into->AddBool("path closed", fClosed);
+	} else {
+		fprintf(stderr, "failed adding points!\n");
+	}
+	if (ret >= B_OK) {
+		ret = into->AddString("name", fName.String());
+	} else {
+		fprintf(stderr, "failed adding close!\n");
+	}
+	if (ret < B_OK) {
+		fprintf(stderr, "failed adding name!\n");
+	}
+	// finish off
+	if (ret < B_OK) {
+		ret = into->AddString("class", "VectorPath");
+	}
+
 	return ret;
 }
 
@@ -828,6 +842,28 @@ VectorPath::_SetPoint(int32 index, BPoint point)
 
 	fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 }
+
+// #pragma mark -
+
+// SetName
+void
+VectorPath::SetName(const char* name)
+{
+	if (fName == name)
+		return;
+
+	fName = name;
+	Notify();
+}
+
+// Name
+const char*
+VectorPath::Name() const
+{
+	return fName.String();
+}
+
+// #pragma mark -
 
 // _SetPointCount
 bool
