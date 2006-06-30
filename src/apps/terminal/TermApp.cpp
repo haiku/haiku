@@ -451,10 +451,10 @@ TermApp::FindTerminalId()
 	get_thread_info(find_thread(NULL), &info);
 	
 	for (int32 i=0; i<count; i++) {
+		numbers[i] = 0;
 		team_id id = (team_id)teams.ItemAt(i);
 		if (id == info.team)
 			continue;
-		numbers[i] = 0;
 		
 		BMessage msg(B_GET_PROPERTY);
 		BMessage reply;
