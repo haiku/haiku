@@ -358,16 +358,13 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		else
 			dragger = NULL;
 
-		if (dragger->fRelation == BDragger::TARGET_IS_CHILD) {
-			BRect rect = dragger->Frame();
-			rect.OffsetTo(point);
-			point = fShelf->AdjustReplicantBy(rect, msg);
-		
-		} else {
-			BRect rect = dragger->fTarget->Frame();
-			rect.OffsetTo(point);
-			point = fShelf->AdjustReplicantBy(rect, msg);
-		}
+		BRect rect;
+		if (dragger->fRelation == BDragger::TARGET_IS_CHILD)
+			rect = dragger->Frame();
+		else
+			rect = dragger->fTarget->Frame();
+		rect.OffsetTo(point);
+		point = rect.LeftTop() + fShelf->AdjustReplicantBy(rect, msg);
 		
 		if (dragger->fRelation == BDragger::TARGET_IS_PARENT)
 			dragger->fTarget->MoveTo(point);
