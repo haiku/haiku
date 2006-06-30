@@ -64,7 +64,7 @@ const char *kSpawnAlertMessage = "alert --stop " "'Cannot execute \"%s\":\n"
  * Set environment varriable.
  */
 
-#ifndef __HAIKU__
+#if !defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 int
 setenv(const char *var, const char *value, bool overwrite)
 {

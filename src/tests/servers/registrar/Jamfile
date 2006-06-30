@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src tests servers registrar ;
 
 SetSubDirSupportedPlatforms libbe_test ;
 
+UsePublicHeaders [ FDirName add-ons registrar ] ;
 UseArchHeaders $(TARGET_ARCH) ;
 
 
@@ -83,6 +84,7 @@ Server haiku_registrar
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
 	ShutdownProcess.cpp
+	TextSnifferAddon.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
