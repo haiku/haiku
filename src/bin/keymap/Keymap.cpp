@@ -64,6 +64,7 @@ Keymap::Keymap()
 	fChars(NULL),
 	fCharsSize(0)
 {
+	memset(&fKeys, 0, sizeof(fKeys));
 }
 
 
