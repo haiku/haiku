@@ -2,14 +2,13 @@
  * Copyright 2004-2006 Haiku, Inc.
  * Distributed under the terms of the Haiku License.
  *
- * common.c:
- * PS/2 hid device driver
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  *      Marcus Overhagen <marcus@overhagen.de>
  */
 
+/*! PS/2 hid device driver */
 
 #include <string.h>
 
@@ -299,34 +298,38 @@ ps2_init(void)
 
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK)
-		goto err_1;
+		return status;
 
 	gControllerSem = create_sem(1, "ps/2 keyb ctrl");
 	
 	ps2_flush();
 
 	status = ps2_dev_init();
+	if (status < B_OK)
+		goto err1;
 
 	status = ps2_service_init();
+	if (status < B_OK)
+		goto err2;
 
 	status = install_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL, 0);
 	if (status)
-		goto err_3;
+		goto err3;
 	
 	status = install_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL, 0);
 	if (status)
-		goto err_4;
+		goto err4;
 		
 	status = ps2_setup_command_byte();
 	if (status) {
 		dprintf("ps2: setting up command byte failed\n");
-		goto err_5;
+		goto err5;
 	}
 
 	status = ps2_setup_active_multiplexing(&gActiveMultiplexingEnabled);
 	if (status) {
 		dprintf("ps2: setting up active multiplexing failed\n");
-		goto err_5;
+		goto err5;
 	}
 
 	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
@@ -341,17 +344,17 @@ ps2_init(void)
 	
 	return B_OK;
 
-err_5:
+err5:
 	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
-err_4:	
+err4:	
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
-err_3:
+err3:
 	ps2_service_exit();
+err2:
 	ps2_dev_exit();
+err1:
 	delete_sem(gControllerSem);
-err_2:
 	put_module(B_ISA_MODULE_NAME);
-err_1:
 	TRACE(("ps2_hid: init_driver failed!\n"));
 	return B_ERROR;
 }

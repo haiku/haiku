@@ -2,14 +2,13 @@
  * Copyright 2004-2006 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * PS/2 keyboard device driver
- *
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
  *		Axel Dörfler, axeld@pinc-software.de
  *      Marcus Overhagen <marcus@overhagen.de>
  */
 
+/*! PS/2 keyboard device driver */
 
 #include "ps2_service.h"
 #include "kb_mouse_driver.h"
@@ -231,13 +230,13 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
 		status = sKeyboardSem;
-		goto err2;
+		goto err1;
 	}
 
 	sKeyBuffer = create_packet_buffer(KEY_BUFFER_SIZE * sizeof(at_kbd_io));
 	if (sKeyBuffer == NULL) {
 		status = B_NO_MEMORY;
-		goto err3;
+		goto err2;
 	}
 
 	atomic_or(&ps2_device[PS2_DEVICE_KEYB].flags, PS2_FLAG_ENABLED);
@@ -249,14 +248,11 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 	dprintf("ps2: keyboard_open %s success\n", name);
 	return B_OK;
 
-err4:
-	delete_packet_buffer(sKeyBuffer);
-err3:
-	delete_sem(sKeyboardSem);
 err2:
+	delete_sem(sKeyboardSem);
 err1:
 	atomic_and(&sKeyboardOpenMask, 0);
-	
+
 	dprintf("ps2: keyboard_open %s failed\n", name);
 	return status;
 }
