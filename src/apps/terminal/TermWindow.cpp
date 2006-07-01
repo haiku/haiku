@@ -464,7 +464,7 @@ TermWindow::MessageReceived(BMessage *message)
 			float mbHeight = fMenubar->Bounds().Height() + 1;
 			fMenubar->Show();
 			fTermView->ScrollBar()->Show();
-			ResizeTo(fSavedFrame.Width()+1, fSavedFrame.Height()+1);
+			ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 			MoveTo(fSavedFrame.left, fSavedFrame.top);
 			fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
 			fBaseView->MoveTo(0,mbHeight);
