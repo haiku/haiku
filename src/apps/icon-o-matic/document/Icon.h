@@ -14,6 +14,7 @@
 #include "Observer.h"
 #include "ShapeContainer.h"
 
+class BRect;
 class PathContainer;
 
 class IconListener {

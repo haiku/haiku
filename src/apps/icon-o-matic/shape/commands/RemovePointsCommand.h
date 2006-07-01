@@ -11,6 +11,8 @@
 
 #include "PathCommand.h"
 
+class BPoint;
+
 class RemovePointsCommand : public PathCommand {
  public:
 								// for removing the point clicked on

@@ -79,7 +79,7 @@ ColorPreview::MessageReceived(BMessage* message)
 		_DragColor(where);
 
 	} else {
-#ifdef TARGET_PLATFORM_ZETA
+#ifdef HAIKU_TARGET_PLATFORM_DANO
 		const
 #endif
 		char* nameFound;

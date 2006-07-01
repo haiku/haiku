@@ -20,6 +20,7 @@
 #include "agg_trans_affine.h"
 
 class BBitmap;
+class BRect;
 class Icon;
 class StyleManager;
 

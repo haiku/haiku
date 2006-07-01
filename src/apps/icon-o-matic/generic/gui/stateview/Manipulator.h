@@ -13,6 +13,7 @@
 
 #include "Observer.h"
 
+class BMessage;
 class BView;
 class Command;
 
