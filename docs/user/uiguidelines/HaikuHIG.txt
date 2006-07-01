@@ -37,17 +37,14 @@ Chapter 5: Dynamic Data Exchange: Passing Data Between Applications
 	Drag and Drop
 	The Clipboard
 	Replicants
-	Messaging Across Applications
 
-
-Use of Text in the GUI
-	Labels
-	Controls
-	Use of Fonts
-	Error messages
+Chapter 6: Use of Text in the GUI
+	Error Messages
 	Ellipses
 	Colons
-	Capitalization
+	Abbreviations, Acronyms, and Contractions, oh my!
+	cApItAlIzAtIoN and Speling
+	Use of Fonts
 
 Icons
 	Conventions
@@ -410,4 +407,35 @@ Replicants
 6) The replicant should not be too visually distracting. This mainly entails choosing muted colors for the controls and limiting the amount of animation and movement.
 
 
-Messaging Across Applications
+
+Chapter 6: Use of Text in the GUI
+
+	Unless you are writing a program for the command line, your program will use text. There is, believe it or not, a right way and a wrong way to use text in your program, and while most of the guidelines for text might seem trivial, attention to detail is what separates a good program from a great one.
+
+Above all else mentioned in this chapter, use everyday language and be both clear and concise.
+
+Error Messages
+
+	Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible, right? Right? Suuuuure you did. :) When your program can't handle a particular error, the error message given to the user should follow these rules of thumb:
+
+1) Explain what happened in everyday words.
+2) Provide enough information to know what happened without providing details which could confuse the user. For example, if a mail client sends a request to a server for e-mail and the server fails to respond, a way to explain this might be something like "MyMailApp could not check your e-mail. The mail server did not respond when contacted."
+3) Offer suggestions to help the user fix the problem, if possible. Using the above example, one possible suggestion might be "Try checking your Internet connection with your web browser. If that works, the mail server might not be working correctly and you may want to try again later."
+
+Ellipses
+
+	An ellipsis is a series of 3 dots (...) and it has a special function in a GUI: to convey to the user that a control will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then no ellipsis is necessary. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Users of the U.S. keymap can type in an ellipsis with Option + period.
+
+Colons
+
+	A colon (:) is a good way to introduce a control, such as a text box, or group of controls, like a list of checkboxes. When using them, just be sure not to use them in menu items, group controls (BBox), column titles, or tabs.
+
+Abbreviations, Acronyms, and Contractions, oh my!
+
+	Sometimes space is at a premium. Abbreviations and acronyms can com in very handy in these instances. However, their use can also lead to confusion. 
+
+cApItAlIzAtIoN and Speling
+
+	Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized.
+
+Use of Fonts
