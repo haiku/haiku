@@ -21,6 +21,7 @@ class Shape : public Observable,
 			  public PathContainerListener {
  public:
 								Shape(::Style* style);
+								Shape(const Shape& other);
 	virtual						~Shape();
 
 	// PathContainerListener interface

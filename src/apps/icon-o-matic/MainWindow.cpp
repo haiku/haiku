@@ -93,11 +93,11 @@ MainWindow::_Init()
 
 	fPathListView->SetPathContainer(fDocument->Icon()->Paths());
 //	fPathListView->SetCommandStack(fDocument->CommandStack());
-//	fPathListView->SetSelection(fDocument->Selection());
+	fPathListView->SetSelection(fDocument->Selection());
 
 	fShapeListView->SetShapeContainer(fDocument->Icon()->Shapes());
-//	fShapeListView->SetCommandStack(fDocument->CommandStack());
-//	fShapeListView->SetSelection(fDocument->Selection());
+	fShapeListView->SetCommandStack(fDocument->CommandStack());
+	fShapeListView->SetSelection(fDocument->Selection());
 
 	fIconPreview16->SetIcon(fDocument->Icon());
 	fIconPreview32->SetIcon(fDocument->Icon());

@@ -34,6 +34,40 @@ Shape::Shape(::Style* style)
 		fStyle->Acquire();
 }
 
+// constructor
+Shape::Shape(const Shape& other)
+	: Observable(),
+	  Referenceable(),
+	  PathContainerListener(),
+
+	  fPaths(new (nothrow) PathContainer(false)),
+	  fStyle(other.fStyle),
+
+	  fPathSource(fPaths),
+	  fTransformers(4),
+
+	  fLastBounds(0, 0, -1, -1),
+
+	  fName(other.fName)
+{
+	if (fPaths) {
+		fPaths->AddListener(this);
+		// copy the path references from
+		// the other shape
+		if (other.fPaths) {
+			int32 count = other.fPaths->CountPaths();
+			for (int32 i = 0; i < count; i++) {
+				if (!fPaths->AddPath(other.fPaths->PathAtFast(i)))
+					break;
+			}
+		}
+	}
+	// TODO: clone vertex transformers
+
+	if (fStyle)
+		fStyle->Acquire();
+}
+
 // destructor
 Shape::~Shape()
 {

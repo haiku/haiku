@@ -8,6 +8,7 @@
 
 #include "ShapeListView.h"
 
+#include <new>
 #include <stdio.h>
 
 #include <Application.h>
@@ -16,9 +17,14 @@
 #include <Mime.h>
 #include <Window.h>
 
+#include "CommandStack.h"
+#include "MoveShapesCommand.h"
+#include "RemoveShapesCommand.h"
 #include "Shape.h"
 #include "Observer.h"
 #include "Selection.h"
+
+using std::nothrow;
 
 class ShapeListItem : public SimpleItem,
 					  public Observer {
@@ -90,7 +96,8 @@ ShapeListView::ShapeListView(BRect frame,
 					 NULL, B_MULTIPLE_SELECTION_LIST),
 	  fMessage(message),
 	  fShapeContainer(NULL),
-	  fSelection(NULL)
+	  fSelection(NULL),
+	  fCommandStack(NULL)
 {
 	SetDragCommand(MSG_DRAG_SHAPE);
 	SetTarget(target);
@@ -178,11 +185,35 @@ ShapeListView::SetDropTargetRect(const BMessage* message, BPoint where)
 	SimpleListView::SetDropTargetRect(message, where);
 }
 
+// #pragma mark -
+
 // MoveItems
 void
 ShapeListView::MoveItems(BList& items, int32 toIndex)
 {
-	SimpleListView::MoveItems(items, toIndex);
+	if (!fCommandStack || !fShapeContainer)
+		return;
+
+	int32 count = items.CountItems();
+	Shape** shapes = new (nothrow) Shape*[count];
+	if (!shapes)
+		return;
+
+	for (int32 i = 0; i < count; i++) {
+		ShapeListItem* item
+			= dynamic_cast<ShapeListItem*>((BListItem*)items.ItemAtFast(i));
+		shapes[i] = item ? item->shape : NULL;
+	}
+
+	MoveShapesCommand* command
+		= new (nothrow) MoveShapesCommand(fShapeContainer,
+										  shapes, count, toIndex);
+	if (!command) {
+		delete[] shapes;
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // CopyItems
@@ -190,16 +221,23 @@ void
 ShapeListView::CopyItems(BList& items, int32 toIndex)
 {
 	MoveItems(items, toIndex);
-	// copy operation not allowed -> ?!?
-	// TODO: what about clips that reference the same file but
-	// with different "in/out points"
+	// TODO: allow copying items
 }
 
 // RemoveItemList
 void
-ShapeListView::RemoveItemList(BList& indices)
+ShapeListView::RemoveItemList(BList& indexList)
 {
-	// TODO: allow removing items
+	if (!fCommandStack || !fShapeContainer)
+		return;
+
+	int32 count = indexList.CountItems();
+	const int32* indices = (int32*)indexList.Items();
+
+	RemoveShapesCommand* command
+		= new (nothrow) RemoveShapesCommand(fShapeContainer,
+											indices, count);
+	fCommandStack->Perform(command);
 }
 
 // CloneItem
@@ -217,7 +255,7 @@ ShapeListView::CloneItem(int32 index) const
 
 // ShapeAdded
 void
-ShapeListView::ShapeAdded(Shape* shape)
+ShapeListView::ShapeAdded(Shape* shape, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
 	// ShapeContainer, so no need to lock the
@@ -228,7 +266,7 @@ ShapeListView::ShapeAdded(Shape* shape)
 
 	// NOTE: shapes are always added at the end
 	// of the list, so the sorting is synced...
-	_AddShape(shape);
+	_AddShape(shape, index);
 
 	UnlockLooper();
 }
@@ -278,7 +316,7 @@ ShapeListView::SetShapeContainer(ShapeContainer* container)
 
 	int32 count = fShapeContainer->CountShapes();
 	for (int32 i = 0; i < count; i++)
-		_AddShape(fShapeContainer->ShapeAtFast(i));
+		_AddShape(fShapeContainer->ShapeAtFast(i), i);
 
 //	fShapeContainer->ReadUnlock();
 }
@@ -290,14 +328,21 @@ ShapeListView::SetSelection(Selection* selection)
 	fSelection = selection;
 }
 
+// SetCommandStack
+void
+ShapeListView::SetCommandStack(CommandStack* stack)
+{
+	fCommandStack = stack;
+}
+
 // #pragma mark -
 
 // _AddShape
 bool
-ShapeListView::_AddShape(Shape* shape)
+ShapeListView::_AddShape(Shape* shape, int32 index)
 {
 	if (shape)
-		 return AddItem(new ShapeListItem(shape, this));
+		 return AddItem(new ShapeListItem(shape, this), index);
 	return false;
 }
 

@@ -11,6 +11,8 @@
 
 #include <SupportDefs.h>
 
+class Selection;
+
 class Selectable {
  public:
 								Selectable();
@@ -21,11 +23,17 @@ class Selectable {
 
 	virtual	void				SelectedChanged() = 0;
 
+	// this works only if the Selection is known
+			void				SetSelected(bool selected,
+											bool exclusive = true);
+			void				SetSelection(Selection* selection);
+
  private:
 	friend class Selection;
-			void				SetSelected(bool selected);
+			void				_SetSelected(bool selected);
 
 			bool				fSelected;
+			Selection*			fSelection;
 };
 
 #endif // SELECTABLE_H

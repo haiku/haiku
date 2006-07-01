@@ -32,7 +32,7 @@ class Icon : public ShapeContainerListener,
 	virtual						~Icon();
 
 	// ShapeContainerListener interface
-	virtual	void				ShapeAdded(Shape* shape);
+	virtual	void				ShapeAdded(Shape* shape, int32 index);
 	virtual	void				ShapeRemoved(Shape* shape);
 
 	// Observer interface

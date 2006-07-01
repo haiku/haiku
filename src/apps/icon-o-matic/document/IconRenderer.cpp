@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include <Bitmap.h>
+#include <List.h>
 
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
@@ -21,16 +22,14 @@
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "Style.h"
-#include "StyleManager.h"
 #include "VectorPath.h"
 
 using std::nothrow;
 
 class StyleHandler {
  public:
-	StyleHandler(const StyleManager* styles,
-				 GammaTable& gammaTable)
-		: fStyles(styles),
+	StyleHandler(GammaTable& gammaTable)
+		: fStyles(20),
 		  fGammaTable(gammaTable),
 		  fTransparent(0, 0, 0, 0),
 		  fColor(0, 0, 0, 0)
@@ -38,7 +37,7 @@ class StyleHandler {
 
 	bool is_solid(unsigned styleIndex) const
 	{
-		Style* style = fStyles->StyleAt(styleIndex);
+		Style* style = (Style*)fStyles.ItemAt(styleIndex);
 		if (!style)
 			return true;
 
@@ -50,6 +49,11 @@ class StyleHandler {
 	void generate_span(agg::rgba8* span, int x, int y,
 					   unsigned len, unsigned styleIndex);
 
+	bool AddStyle(Style* style)
+	{
+		return fStyles.AddItem((void*)style);
+	}
+
 private:
 	template<class GradientFunction>
 	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
@@ -57,7 +61,7 @@ private:
 						   const agg::rgba8* gradientColors,
 						   agg::trans_affine& gradientTransform);
 
-	const StyleManager*	fStyles;
+	BList				fStyles;
 	GammaTable&			fGammaTable;
 	agg::rgba8			fTransparent;
 	agg::rgba8			fColor;
@@ -67,7 +71,7 @@ private:
 const agg::rgba8&
 StyleHandler::color(unsigned styleIndex)
 {
-	Style* style = fStyles->StyleAt(styleIndex);
+	Style* style = (Style*)fStyles.ItemAt(styleIndex);
 	if (!style) {
 		printf("no style at index: %d!\n", styleIndex);
 		return fTransparent;
@@ -87,7 +91,7 @@ void
 StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 							unsigned len, unsigned styleIndex)
 {
-	Style* style = fStyles->StyleAt(styleIndex);
+	Style* style = (Style*)fStyles.ItemAt(styleIndex);
 	if (!style || !style->Gradient()) {
 		printf("no style/gradient at index: %d!\n", styleIndex);
 		// TODO: memset() span?
@@ -178,7 +182,6 @@ StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
 IconRenderer::IconRenderer(BBitmap* bitmap)
 	: fBitmap(bitmap),
 	  fIcon(NULL),
-	  fStyles(StyleManager::Default()),
 
 	  fGammaTable(2.2),
 
@@ -201,6 +204,11 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 							bitmap->Bounds().IntegerWidth() + 1,
 							bitmap->Bounds().IntegerHeight() + 1,
 							bitmap->BytesPerRow());
+
+	fBaseRendererPre.clip_box(0,
+							  0,
+							  fBitmap->Bounds().IntegerWidth(),
+							  fBitmap->Bounds().IntegerHeight());
 }
 
 // destructor
@@ -247,15 +255,18 @@ IconRenderer::SetScale(double scale)
 void
 IconRenderer::_Render(const BRect& r)
 {
-	fBaseRendererPre.clear(agg::rgba8(0, 0, 0, 0));
-
 	if (!fIcon)
 		return;
 
-	fBaseRendererPre.clip_box((int)floorf(r.left),
-							  (int)floorf(r.top),
-							  (int)ceilf(r.right),
-							  (int)ceilf(r.bottom));
+// TODO: fix clip box for "clear" and "apply_gamma_inv"
+//	fBaseRendererPre.clip_box((int)floorf(r.left),
+//							  (int)floorf(r.top),
+//							  (int)ceilf(r.right),
+//							  (int)ceilf(r.bottom));
+
+	fBaseRendererPre.clear(agg::rgba8(0, 0, 0, 0));
+
+	StyleHandler styleHandler(fGammaTable);
 
 	fRasterizer.reset();
 	// iterate over the shapes in the icon,
@@ -265,8 +276,11 @@ IconRenderer::_Render(const BRect& r)
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
-		int32 styleIndex = fStyles->IndexOf(shape->Style());
-		fRasterizer.styles(styleIndex, -1);
+		if (!styleHandler.AddStyle(shape->Style())) {
+			printf("IconRenderer::_Render() - out of memory\n");
+			break;
+		}
+		fRasterizer.styles(i, -1);
 
 		if (fGlobalTransform.is_identity()) {
 			fRasterizer.add_path(shape->VertexSource());
@@ -276,8 +290,6 @@ IconRenderer::_Render(const BRect& r)
 			fRasterizer.add_path(scaledPath);
 		}
 	}
-
-	StyleHandler styleHandler(fStyles, fGammaTable);
 
 	agg::render_scanlines_compound(fRasterizer,
 								   fScanline,

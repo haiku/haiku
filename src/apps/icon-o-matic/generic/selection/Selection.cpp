@@ -47,7 +47,7 @@ Selection::Select(Selectable* object, bool extend)
 		#endif
 
 		if (fSelected.AddItem((void*)object)) {
-			object->SetSelected(true);
+			object->_SetSelected(true);
 			success = true;
 
 			Notify();
@@ -77,7 +77,7 @@ Selection::Deselect(Selectable* object)
 		if (!fSelected.RemoveItem((void*)object))
 			debugger("Selection::Deselect() - "
 					 "selected object not within list!");
-		object->SetSelected(false);
+		object->_SetSelected(false);
 
 		Notify();
 	}
@@ -126,7 +126,7 @@ Selection::_DeselectAllExcept(Selectable* except)
 	for (int32 i = 0; i < count; i++) {
 		Selectable* object = (Selectable*)fSelected.ItemAtFast(i);
 		if (object != except) {
-			object->SetSelected(false);
+			object->_SetSelected(false);
 			notify = true;
 		} else {
 			containedExcept = true;

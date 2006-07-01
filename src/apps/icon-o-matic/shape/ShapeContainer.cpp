@@ -51,6 +51,13 @@ ShapeContainer::~ShapeContainer()
 bool
 ShapeContainer::AddShape(Shape* shape)
 {
+	return AddShape(shape, CountShapes());
+}
+
+// AddShape
+bool
+ShapeContainer::AddShape(Shape* shape, int32 index)
+{
 	if (!shape)
 		return false;
 
@@ -58,8 +65,8 @@ ShapeContainer::AddShape(Shape* shape)
 	if (HasShape(shape))
 		return false;
 
-	if (fShapes.AddItem((void*)shape)) {
-		_NotifyShapeAdded(shape);
+	if (fShapes.AddItem((void*)shape, index)) {
+		_NotifyShapeAdded(shape, index);
 		return true;
 	}
 
@@ -114,6 +121,13 @@ ShapeContainer::HasShape(Shape* shape) const
 	return fShapes.HasItem((void*)shape);
 }
 
+// IndexOf
+int32
+ShapeContainer::IndexOf(Shape* shape) const
+{
+	return fShapes.IndexOf((void*)shape);
+}
+
 // ShapeAt
 Shape*
 ShapeContainer::ShapeAt(int32 index) const
@@ -165,14 +179,14 @@ ShapeContainer::_MakeEmpty()
 
 // _NotifyShapeAdded
 void
-ShapeContainer::_NotifyShapeAdded(Shape* shape) const
+ShapeContainer::_NotifyShapeAdded(Shape* shape, int32 index) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		ShapeContainerListener* listener
 			= (ShapeContainerListener*)listeners.ItemAtFast(i);
-		listener->ShapeAdded(shape);
+		listener->ShapeAdded(shape, index);
 	}
 }
 

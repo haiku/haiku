@@ -50,7 +50,7 @@ Icon::~Icon()
 
 // ShapeAdded
 void
-Icon::ShapeAdded(Shape* shape)
+Icon::ShapeAdded(Shape* shape, int32 index)
 {
 	shape->AddObserver(this);
 	_NotifyAreaInvalidated(shape->Bounds(true));

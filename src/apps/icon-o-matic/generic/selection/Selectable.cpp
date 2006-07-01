@@ -8,9 +8,14 @@
 
 #include "Selectable.h"
 
+#include <debugger.h>
+
+#include "Selection.h"
+
 // constructor
 Selectable::Selectable()
-	: fSelected(false)
+	: fSelected(false),
+	  fSelection(NULL)
 {
 }
 
@@ -21,8 +26,37 @@ Selectable::~Selectable()
 
 // SetSelected
 void
-Selectable::SetSelected(bool selected)
+Selectable::SetSelected(bool selected, bool exclusive)
 {
+	// NOTE: "exclusive" is only useful when selecting,
+	// it is ignored when deselecting...
+	if (selected == fSelected)
+		return;
+
+	if (fSelection) {
+		if (selected)
+			fSelection->Select(this, !exclusive);
+		else
+			fSelection->Deselect(this);
+	} else {
+		debugger("Selectable needs to know Selection\n");
+	}
+}
+
+// SetSelection
+void
+Selectable::SetSelection(Selection* selection)
+{
+	fSelection = selection;
+}
+
+// #pragma mark -
+
+// SetSelected
+void
+Selectable::_SetSelected(bool selected)
+{
+	// NOTE: for private use by the Selection object!
 	if (fSelected != selected) {
 		fSelected = selected;
 		SelectedChanged();

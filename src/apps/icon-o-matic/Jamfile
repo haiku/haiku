@@ -87,8 +87,10 @@ Application Icon-O-Matic :
 	AddPointCommand.cpp
 	ChangePointCommand.cpp
 	InsertPointCommand.cpp
+	MoveShapesCommand.cpp
 	PathCommand.cpp
 	RemovePointsCommand.cpp
+	RemoveShapesCommand.cpp
 	# style
 	Style.cpp
 	StyleManager.cpp

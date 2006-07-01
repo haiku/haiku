@@ -25,7 +25,6 @@ class CommandStack : public BLocker,
 	virtual						~CommandStack();
 
 			status_t			Perform(Command* command);
-			status_t			AddCommand(Command* command);
 
 			status_t			Undo();
 			status_t			Redo();
@@ -38,6 +37,7 @@ class CommandStack : public BLocker,
 			bool				IsSaved();
 
  private:
+			status_t			_AddCommand(Command* command);
 
 	typedef stack<Command*> command_stack;
 

@@ -18,7 +18,7 @@ class ShapeContainerListener {
 								ShapeContainerListener();
 	virtual						~ShapeContainerListener();
 
-	virtual	void				ShapeAdded(Shape* shape) = 0;
+	virtual	void				ShapeAdded(Shape* shape, int32 index) = 0;
 	virtual	void				ShapeRemoved(Shape* shape) = 0;
 };
 
@@ -28,6 +28,7 @@ class ShapeContainer {
 	virtual						~ShapeContainer();
 
 			bool				AddShape(Shape* shape);
+			bool				AddShape(Shape* shape, int32 index);
 			bool				RemoveShape(Shape* shape);
 			Shape*				RemoveShape(int32 index);
 
@@ -35,6 +36,7 @@ class ShapeContainer {
 
 			int32				CountShapes() const;
 			bool				HasShape(Shape* shape) const;
+			int32				IndexOf(Shape* shape) const;
 
 			Shape*				ShapeAt(int32 index) const;
 			Shape*				ShapeAtFast(int32 index) const;
@@ -46,7 +48,8 @@ class ShapeContainer {
  private:
 			void				_MakeEmpty();
 
-			void				_NotifyShapeAdded(Shape* shape) const;
+			void				_NotifyShapeAdded(Shape* shape,
+												  int32 index) const;
 			void				_NotifyShapeRemoved(Shape* shape) const;
 
 			BList				fShapes;

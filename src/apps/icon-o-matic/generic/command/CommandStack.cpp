@@ -43,7 +43,7 @@ CommandStack::Perform(Command* command)
 			ret = command->Perform();
 	
 		if (ret == B_OK)
-			ret = AddCommand(command);
+			ret = _AddCommand(command);
 	
 		if (ret != B_OK) {
 			// no one else feels responsible...
@@ -52,45 +52,6 @@ CommandStack::Perform(Command* command)
 		Unlock();
 	}
 	return ret;
-}
-
-
-// AddCommand
-status_t
-CommandStack::AddCommand(Command* command)
-{
-	status_t status = B_ERROR;
-	if (Lock()) {
-		if (command && (status = command->InitCheck()) == B_OK) {
-			// try to collapse commands to a single command
-			bool add = true;
-			if (!fUndoHistory.empty()) {
-				if (Command* top = fUndoHistory.top()) {
-					if (top->CombineWithNext(command)) {
-						add = false;
-						delete command;
-					} else if (command->CombineWithPrevious(top)) {
-						fUndoHistory.pop();
-						delete top;
-					}
-				}
-			}
-			if (add)
-				fUndoHistory.push(command);
-
-			// the redo stack needs to be empty
-			// as soon as an command was added (also in case of collapsing)
-			while (!fRedoHistory.empty()) {
-				delete fRedoHistory.top();
-				fRedoHistory.pop();
-			}
-		}
-		Unlock();
-	}
-
-	Notify();
-
-	return status;
 }
 
 // Undo
@@ -219,5 +180,41 @@ CommandStack::IsSaved()
 	return saved;
 }
 
+// #pragma mark -
+
+// _AddCommand
+status_t
+CommandStack::_AddCommand(Command* command)
+{
+	status_t status = B_OK;
+	// try to collapse commands to a single command
+	bool add = true;
+	if (!fUndoHistory.empty()) {
+		if (Command* top = fUndoHistory.top()) {
+			if (top->CombineWithNext(command)) {
+				add = false;
+				delete command;
+			} else if (command->CombineWithPrevious(top)) {
+				fUndoHistory.pop();
+				delete top;
+			}
+		}
+	}
+	if (add) {
+		// TODO: check return value and set status
+		fUndoHistory.push(command);
+	}
+
+	// the redo stack needs to be empty
+	// as soon as a command was added (also in case of collapsing)
+	while (!fRedoHistory.empty()) {
+		delete fRedoHistory.top();
+		fRedoHistory.pop();
+	}
+
+	Notify();
+
+	return status;
+}
 
 

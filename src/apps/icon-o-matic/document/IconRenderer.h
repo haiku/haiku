@@ -22,7 +22,6 @@
 class BBitmap;
 class BRect;
 class Icon;
-class StyleManager;
 
 typedef agg::gamma_lut
 			<agg::int8u, agg::int8u>		GammaTable;
@@ -58,7 +57,6 @@ class IconRenderer {
 
 			BBitmap*			fBitmap;
 			Icon*				fIcon;
-			StyleManager*		fStyles;
 
 			GammaTable			fGammaTable;
 
