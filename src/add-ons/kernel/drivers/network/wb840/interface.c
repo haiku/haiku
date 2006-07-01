@@ -39,6 +39,9 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 
+#include <string.h>
+
+
 #define SIO_SET(x)	\
 	write32(device->reg_base + WB_SIO,	\
 		read32(device->reg_base + WB_SIO) | x)
