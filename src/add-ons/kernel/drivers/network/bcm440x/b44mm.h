@@ -7,6 +7,8 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 
+#include <stdio.h>
+
 typedef vint32 MM_ATOMIC_T;
 
 //#define MM_SWAP_LE16(x) B_SWAP_INT16(x)
