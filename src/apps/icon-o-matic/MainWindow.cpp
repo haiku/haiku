@@ -10,11 +10,15 @@
 
 #include <stdio.h>
 
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <ScrollView.h>
 
 #include "Document.h"
 #include "CanvasView.h"
+#include "CommandStack.h"
 #include "IconEditorApp.h"
 #include "IconView.h"
 #include "PathListView.h"
@@ -34,7 +38,15 @@
 #include "Style.h"
 #include "StyleManager.h"
 #include "VectorPath.h"
-														
+
+enum {
+	MSG_UNDO						= 'undo',
+	MSG_REDO						= 'redo',
+
+	MSG_NEW_PATH					= 'nwvp',
+	MSG_PATH_SELECTED				= 'vpsl',
+};
+
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
 	: BWindow(BRect(50, 50, 661, 661), "Icon-O-Matic",
@@ -50,6 +62,8 @@ MainWindow::MainWindow(IconEditorApp* app, Document* document)
 MainWindow::~MainWindow()
 {
 	delete fState;
+
+	fDocument->CommandStack()->RemoveObserver(this);
 }
 
 // #pragma mark -
@@ -58,11 +72,40 @@ MainWindow::~MainWindow()
 void
 MainWindow::MessageReceived(BMessage* message)
 {
+	if (!fDocument->WriteLock())
+		return;
+
 	switch (message->what) {
+
+		case MSG_UNDO:
+			fDocument->CommandStack()->Undo();
+			break;
+		case MSG_REDO:
+			fDocument->CommandStack()->Redo();
+			break;
+
+// TODO: use an AddPathCommand and listen to
+// selection in CanvasView to add a manipulator
+case MSG_NEW_PATH: {
+	VectorPath* path = new VectorPath();
+	fDocument->Icon()->Paths()->AddPath(path);
+	break;
+}
+case MSG_PATH_SELECTED: {
+	VectorPath* path;
+	if (message->FindPointer("path", (void**)&path) == B_OK) {
+		PathManipulator* pathManipulator = new PathManipulator(path);
+		fState->DeleteManipulators();
+		fState->AddManipulator(pathManipulator);
+	}
+	break;
+}
 
 		default:
 			BWindow::MessageReceived(message);
 	}
+
+	fDocument->WriteUnlock();
 }
 
 // QuitRequested
@@ -74,6 +117,38 @@ MainWindow::QuitRequested()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return false;
+}
+
+// #pragma mark -
+// ObjectChanged
+void
+MainWindow::ObjectChanged(const Observable* object)
+{
+	if (!fDocument)
+		return;
+
+	if (!Lock())
+		return;
+
+	if (object == fDocument->CommandStack()) {
+		// relable Undo item and update enabled status
+		BString label("Undo");
+		fUndoMI->SetEnabled(fDocument->CommandStack()->GetUndoName(label));
+		if (fUndoMI->IsEnabled())
+			fUndoMI->SetLabel(label.String());
+		else
+			fUndoMI->SetLabel("<nothing to undo>");
+
+		// relable Redo item and update enabled status
+		label.SetTo("Redo");
+		fRedoMI->SetEnabled(fDocument->CommandStack()->GetRedoName(label));
+		if (fRedoMI->IsEnabled())
+			fRedoMI->SetLabel(label.String());
+		else
+			fRedoMI->SetLabel("<nothing to redo>");
+	}
+
+	Unlock();
 }
 
 // #pragma mark -
@@ -103,6 +178,8 @@ MainWindow::_Init()
 	fIconPreview32->SetIcon(fDocument->Icon());
 //	fIconPreview48->SetIcon(fDocument->Icon());
 	fIconPreview64->SetIcon(fDocument->Icon());
+
+	fDocument->CommandStack()->AddObserver(this);
 
 // TODO: for testing only:
 	MultipleManipulatorState* state = new MultipleManipulatorState(fCanvasView);
@@ -169,12 +246,20 @@ MainWindow::_Init()
 BView*
 MainWindow::_CreateGUI(BRect bounds)
 {
+	BRect menuFrame = bounds;
+	menuFrame.bottom = menuFrame.top + 15;
+	BMenuBar* menuBar = _CreateMenuBar(menuFrame);
+	AddChild(menuBar);
+
+	menuBar->ResizeToPreferred();
+	bounds.top = menuBar->Frame().bottom + 1;
+
 	BView* bg = new BView(bounds, "bg", B_FOLLOW_ALL, 0);
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fSwatchGroup = new SwatchGroup(BRect(0, 0, 100, 100));
 	bounds.top = fSwatchGroup->Frame().bottom + 1;
-	
+
 	fCanvasView = new CanvasView(bounds);
 
 	bounds.left = fSwatchGroup->Frame().right + 5;
@@ -202,7 +287,8 @@ MainWindow::_CreateGUI(BRect bounds)
 	bounds.right = bounds.left + 100;
 	bounds.bottom = fCanvasView->Frame().top - 5.0;
 
-	fPathListView = new PathListView(bounds, "path list view");
+	fPathListView = new PathListView(bounds, "path list view",
+									 new BMessage(MSG_PATH_SELECTED), this);
 
 	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
 	fShapeListView = new ShapeListView(bounds, "shape list view");
@@ -228,5 +314,41 @@ MainWindow::_CreateGUI(BRect bounds)
 	bg->AddChild(fCanvasView);
 
 	return bg;
+}
+
+// _CreateMenuBar
+BMenuBar*
+MainWindow::_CreateMenuBar(BRect frame)
+{
+	BMenuBar* menuBar = new BMenuBar(frame, "main menu");
+
+	BMenu* fileMenu = new BMenu("File");
+	BMenu* editMenu = new BMenu("Edit");
+	BMenu* pathMenu = new BMenu("Path");
+	BMenu* styleMenu = new BMenu("Style");
+	BMenu* shapeMenu = new BMenu("Shape");
+
+	menuBar->AddItem(fileMenu);
+	menuBar->AddItem(editMenu);
+	menuBar->AddItem(pathMenu);
+	menuBar->AddItem(styleMenu);
+	menuBar->AddItem(shapeMenu);
+
+	// Edit
+	fUndoMI = new BMenuItem("<nothing to undo>",
+							new BMessage(MSG_UNDO), 'Z');
+	fRedoMI = new BMenuItem("<nothing to redo>",
+							new BMessage(MSG_REDO), 'Z', B_SHIFT_KEY);
+
+	fUndoMI->SetEnabled(false);
+	fRedoMI->SetEnabled(false);
+
+	editMenu->AddItem(fUndoMI);
+	editMenu->AddItem(fRedoMI);
+
+	// Path
+	pathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
+
+	return menuBar;
 }
 

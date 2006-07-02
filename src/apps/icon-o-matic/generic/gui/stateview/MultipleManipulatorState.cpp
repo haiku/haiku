@@ -199,6 +199,7 @@ MultipleManipulatorState::AddManipulator(Manipulator* manipulator)
 
 	if (fManipulators.AddItem((void*)manipulator)) {
 		manipulator->AttachedToView(fView);
+		fView->Invalidate(manipulator->Bounds());
 		return true;
 	}
 	return false;
@@ -213,6 +214,9 @@ MultipleManipulatorState::RemoveManipulator(int32 index)
 	if (manipulator == fCurrentManipulator)
 		fCurrentManipulator = NULL;
 
+	if (manipulator)
+		fView->Invalidate(manipulator->Bounds());
+
 	return manipulator;
 }
 
@@ -220,15 +224,20 @@ MultipleManipulatorState::RemoveManipulator(int32 index)
 void
 MultipleManipulatorState::DeleteManipulators()
 {
+	BRect dirty(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
+
 	int32 count = fManipulators.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Manipulator* m = (Manipulator*)fManipulators.ItemAtFast(i);
+		dirty = dirty | m->Bounds();
 		m->DetachedFromView(fView);
 		delete m;
 	}
 	fManipulators.MakeEmpty();
 	fCurrentManipulator = NULL;
 	fPreviousManipulator = NULL;
+
+	fView->Invalidate(dirty);
 }
 
 // CountManipulators

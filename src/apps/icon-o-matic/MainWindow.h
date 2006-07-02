@@ -11,6 +11,10 @@
 
 #include <Window.h>
 
+#include "Observer.h"
+
+class BMenuBar;
+class BMenuItem;
 class CanvasView;
 class Document;
 class IconEditorApp;
@@ -18,9 +22,10 @@ class IconView;
 class PathListView;
 class ShapeListView;
 class SwatchGroup;
-class ViewState;
+class MultipleManipulatorState;
 
-class MainWindow : public BWindow {
+class MainWindow : public BWindow,
+				   public Observer {
  public:
 								MainWindow(IconEditorApp* app,
 										   Document* document);
@@ -30,12 +35,19 @@ class MainWindow : public BWindow {
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
+	// Observer interface
+	virtual	void				ObjectChanged(const Observable* object);
+
  private:
 			void				_Init();
 			BView*				_CreateGUI(BRect frame);
+			BMenuBar*			_CreateMenuBar(BRect frame);
 
 	IconEditorApp*				fApp;
 	Document*					fDocument;
+
+	BMenuItem*					fUndoMI;
+	BMenuItem*					fRedoMI;
 
 	CanvasView*					fCanvasView;
 	SwatchGroup*				fSwatchGroup;
@@ -48,7 +60,7 @@ class MainWindow : public BWindow {
 	PathListView*				fPathListView;
 	ShapeListView*				fShapeListView;
 	// TODO: for testing only...
-	ViewState*					fState;
+	MultipleManipulatorState*	fState;
 };
 
 #endif // MAIN_WINDOW_H
