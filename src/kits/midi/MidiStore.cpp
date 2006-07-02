@@ -725,7 +725,7 @@ BMidiStore::ReadChunk()
 		ReadTrack();
 	else {
 		TRACE(("Skipping '%c%c%c%c' chunk (%lu bytes)",
-			fourcc[0], fourcc[1], fourcc[2], fourcc[3], byteCount))
+			fourcc[0], fourcc[1], fourcc[2], fourcc[3], fByteCount))
 
 		SkipBytes(fByteCount);
 	}

@@ -23,7 +23,8 @@ using namespace BPrivate;
 
 
 BSoftSynth::BSoftSynth()
-: 	fSynth(NULL),
+: 	fInitCheck(false),
+	fSynth(NULL),
 	fSettings(NULL),
 	fSoundPlayer(NULL)
 {
@@ -147,9 +148,10 @@ BSoftSynth::FlushInstrumentCache(bool startStopCache)
 void 
 BSoftSynth::SetVolume(double volume)
 {
-	if (volume >= 0.0) {
-		fluid_synth_set_gain(fSynth, volume);
-	}
+	if (InitCheck())
+		if (volume >= 0.0) {
+			fluid_synth_set_gain(fSynth, volume);
+		}
 }
 
 
@@ -434,8 +436,10 @@ BSoftSynth::_Init()
 		return;
 	
 	err = fluid_synth_sfload(fSynth, fInstrumentsFile, 1); 
-	if (err < B_OK)
+	if (err < B_OK) {
+		fprintf(stderr, "error in fluid_synth_sfload\n");
 		return;
+	}
 
 	media_raw_audio_format format = media_raw_audio_format::wildcard;
 	format.channel_count = 2;
@@ -444,8 +448,10 @@ BSoftSynth::_Init()
 
 	fSoundPlayer = new BSoundPlayer(&format, "Soft Synth", &PlayBuffer, NULL, this);
 	err = fSoundPlayer->InitCheck();
-	if (err != B_OK)
+	if (err != B_OK) {
+		fprintf(stderr, "error in BSoundPlayer\n");
 		return;
+	}
 
 	fSoundPlayer->SetHasData(true);
 	fSoundPlayer->Start();
