@@ -177,6 +177,7 @@ BMidi::Start()
 void 
 BMidi::Stop()
 {
+	AllNotesOff();
 	fThreadId = -1;
 }
     
