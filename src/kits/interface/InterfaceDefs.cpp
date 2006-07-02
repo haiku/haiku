@@ -314,7 +314,7 @@ get_mouse_map(mouse_map *map)
 	
 	_control_input_server_(&command, &reply);
 	
-	if (reply.FindData("mousemap", B_ANY_TYPE, &data, &count) != B_OK)
+	if (reply.FindData("mousemap", B_RAW_TYPE, &data, &count) != B_OK)
 		return B_ERROR;
 	
 	memcpy(map, data, count);
@@ -329,7 +329,7 @@ set_mouse_map(mouse_map *map)
 	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
 	
-	command.AddData("mousemap", B_ANY_TYPE, map, sizeof(mouse_map));
+	command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
 	return _control_input_server_(&command, &reply);
 }
 
