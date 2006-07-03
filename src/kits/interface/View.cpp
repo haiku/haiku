@@ -2204,7 +2204,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 void
 BView::DrawBitmapAsync(const BBitmap *bitmap, BRect dstRect)
 {
-	DrawBitmapAsync(bitmap, bitmap->Bounds(), dstRect);
+	DrawBitmapAsync(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), dstRect);
 }
 
 
@@ -2226,7 +2226,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
 
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
 		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
-		BRect src = bitmap->Bounds();
+		BRect src = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
 		BRect dst = src.OffsetToCopy(where);
 		fOwner->fLink->Attach<BRect>(dst);
 		fOwner->fLink->Attach<BRect>(src);
@@ -2256,7 +2256,7 @@ BView::DrawBitmap(const BBitmap *bitmap, BPoint where)
 void
 BView::DrawBitmap(const BBitmap *bitmap, BRect dstRect)
 {
-	DrawBitmap(bitmap, bitmap->Bounds(), dstRect);
+	DrawBitmap(bitmap, bitmap->Bounds().OffsetToCopy(B_ORIGIN), dstRect);
 }
 
 

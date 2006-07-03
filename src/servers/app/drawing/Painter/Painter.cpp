@@ -1328,19 +1328,9 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	if (!fSubpixelPrecise)
 		align_rect_to_pixels(&viewRect);
 
-	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
-	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
-
-	if (xScale == 0.0 || yScale == 0.0)
-		return;
-
 	// compensate for the lefttop offset the actualBitmapRect might have
-// NOTE: I have no clue why enabling the next call gives a wrong result!
-// According to the BeBook, bitmapRect is supposed to be in native
-// bitmap space! Disabling this call makes it look like the bitmap bounds are
-// assumed to have a left/top coord of 0,0 at all times. This is simply not true.
-//		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
-	// actualBitmapRect has the right size, but put it at B_ORIGIN too
+	// actualBitmapRect has the right size, but put it at B_ORIGIN
+	// bitmapRect is already in good coordinates
 	actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
 
 	// constrain rect to passed bitmap bounds
@@ -1361,10 +1351,16 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		bitmapRect.right = actualBitmapRect.right;
 	}
 	if (bitmapRect.bottom > actualBitmapRect.bottom) {
-		float diff = bitmapRect.right - actualBitmapRect.bottom;
+		float diff = bitmapRect.bottom - actualBitmapRect.bottom;
 		viewRect.bottom -= diff;
 		bitmapRect.bottom = actualBitmapRect.bottom;
 	}
+	
+	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
+	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
+
+	if (xScale == 0.0 || yScale == 0.0)
+		return;
 
 	double xOffset = viewRect.left - bitmapRect.left;
 	double yOffset = viewRect.top - bitmapRect.top;
