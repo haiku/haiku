@@ -85,7 +85,7 @@ BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
 BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 	$(X86_ONLY)nm.driver $(X86_ONLY)mga.driver $(X86_ONLY)intel_extreme vesa
 ;
-BEOS_ADD_ONS_DRIVERS_NET = ipro1000 rtl8139 rtl8169 sis900
+BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack_driver
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;

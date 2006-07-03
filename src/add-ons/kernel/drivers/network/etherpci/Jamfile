@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network etherpci ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# set some additional flags
+SubDirCcFlags -Wall ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+KernelAddon etherpci : kernel drivers bin : 
+	etherpci.c 
+	;
+
+Package haiku-networkingkit-cvs :
+	etherpci :
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-networkingkit-cvs : net etherpci ;
+
+
+# Installation
+
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	etherpci
+;
+
+HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>etherpci : 
+	installed-symlink 
+;
+
