@@ -283,6 +283,13 @@ MouseView::SetMouseType(int32 type)
 }
 
 
+void
+MouseView::MouseMapUpdated()
+{
+	Invalidate();
+}
+
+
 void 
 MouseView::UpdateFromSettings()
 {

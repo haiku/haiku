@@ -37,6 +37,7 @@ class MouseView : public BView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void SetMouseType(int32 type);
+		void MouseMapUpdated();
 		void UpdateFromSettings();
 
 	private:

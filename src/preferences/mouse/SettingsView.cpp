@@ -216,6 +216,13 @@ SettingsView::SetMouseType(int32 type)
 }
 
 
+void
+SettingsView::MouseMapUpdated()
+{
+	fMouseView->MouseMapUpdated();
+}
+
+
 void 
 SettingsView::UpdateFromSettings()
 {

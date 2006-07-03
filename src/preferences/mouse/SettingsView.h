@@ -39,6 +39,7 @@ class SettingsView : public BBox {
 		virtual void Draw(BRect frame);
 
 		void SetMouseType(int32 type);
+		void MouseMapUpdated();
 		void UpdateFromSettings();
 
 	private:

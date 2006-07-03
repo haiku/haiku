@@ -185,6 +185,7 @@ MouseWindow::MessageReceived(BMessage *message)
 
 				fSettings.SetMapping(button, mapping);
 				SetRevertable(true);
+				fSettingsView->MouseMapUpdated();
 			}
 			break;
 		}
