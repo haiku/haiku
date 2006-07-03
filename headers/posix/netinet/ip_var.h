@@ -45,9 +45,9 @@
 struct ipovly {
 	char *   ih_next;
 	char *   ih_prev;
-	uint8     ih_x1;        /* (unused) */
-	uint8     ih_pr;           /* protocol */
-	uint16    ih_len;          /* protocol length */
+	uint8_t   ih_x1;        /* (unused) */
+	uint8_t   ih_pr;           /* protocol */
+	uint16_t  ih_len;          /* protocol length */
 	struct    in_addr ih_src;  /* source internet address */
 	struct    in_addr ih_dst;  /* destination internet address */
 }; 
@@ -62,7 +62,7 @@ struct ipovly {
 
 struct ipoption {
 	struct  in_addr ipopt_dst;         /* first-hop dst if source routed */
-	int8    ipopt_list[MAX_IPOPTLEN];  /* options proper */
+	int8_t  ipopt_list[MAX_IPOPTLEN];  /* options proper */
 };  
 
 /*
@@ -71,71 +71,71 @@ struct ipoption {
  */
 struct ip_moptions {
 	struct    ifnet *imo_multicast_ifp; /* ifp for outgoing multicasts */
-	uint8  imo_multicast_ttl;           /* TTL for outgoing multicasts */
-	uint8  imo_multicast_loop;          /* 1 => here sends if a member */
-	uint16 imo_num_memberships;         /* no. memberships this socket */
+	uint8_t  imo_multicast_ttl;           /* TTL for outgoing multicasts */
+	uint8_t  imo_multicast_loop;          /* 1 => here sends if a member */
+	uint16_t imo_num_memberships;         /* no. memberships this socket */
 	struct    in_multi *imo_membership[IP_MAX_MEMBERSHIPS];
 };
 
 struct ipasfrag {
 #if B_HOST_IS_BENDIAN
-	uint8  ip_v:4;
-	uint8  ip_hl:4;
+	uint8_t  ip_v:4;
+	uint8_t  ip_hl:4;
 #else
-	uint8  ip_hl:4;
-	uint8  ip_v:4;
+	uint8_t  ip_hl:4;
+	uint8_t  ip_v:4;
 #endif
-	uint8  ipf_mff;
-	int16  ip_len;
-	uint16 ip_id;
-	int16  ip_off;
-	uint8  ip_ttl;
-	uint8  ip_p;
+	uint8_t  ipf_mff;
+	int16_t  ip_len;
+	uint16_t ip_id;
+	int16_t  ip_off;
+	uint8_t  ip_ttl;
+	uint8_t  ip_p;
 	struct ipasfrag *ipf_next;
 	struct ipasfrag *ipf_prev;
 };
 
 struct ipq {
 	struct ipq *next, *prev;
-	uint8  ipq_ttl;
-	uint8  ipq_p;
-	uint16 ipq_id;
+	uint8_t  ipq_ttl;
+	uint8_t  ipq_p;
+	uint16_t ipq_id;
 	struct ipasfrag *ipq_next, *ipq_prev;
 	struct in_addr ipq_src, ipq_dst;
 };
 
 struct  ipstat {
-        int32  ips_total;              /* total packets received */
-        int32  ips_badsum;             /* checksum bad */
-        int32  ips_tooshort;           /* packet too short */
-        int32  ips_toosmall;           /* not enough data */
-        int32  ips_badhlen;            /* ip header length < data size */
-        int32  ips_badlen;             /* ip length < ip header length */
-        int32  ips_fragments;          /* fragments received */
-        int32  ips_fragdropped;        /* frags dropped (dups, out of space) */
-        int32  ips_fragtimeout;        /* fragments timed out */
-        int32  ips_forward;            /* packets forwarded */
-        int32  ips_cantforward;        /* packets rcvd for unreachable dest */
-        int32  ips_redirectsent;       /* packets forwarded on same net */
-        int32  ips_noproto;            /* unknown or unsupported protocol */
-        int32  ips_delivered;          /* datagrams delivered to upper level*/
-        int32  ips_localout;           /* total ip packets generated here */
-        int32  ips_odropped;           /* lost packets due to nobufs, etc. */
-        int32  ips_reassembled;        /* total packets reassembled ok */
-        int32  ips_fragmented;         /* datagrams sucessfully fragmented */
-        int32  ips_ofragments;         /* output fragments created */
-        int32  ips_cantfrag;           /* don't fragment flag was set, etc. */
-        int32  ips_badoptions;         /* error in option processing */
-        int32  ips_noroute;            /* packets discarded due to no route */
-        int32  ips_badvers;            /* ip version != 4 */
-        int32  ips_rawout;             /* total raw ip packets generated */
-        int32  ips_badfrags;           /* malformed fragments (bad length) */
-        int32  ips_rcvmemdrop;         /* frags dropped for lack of memory */
-        int32  ips_toolong;            /* ip length > max ip packet size */
-        int32  ips_nogif;              /* no match gif found */
-        int32  ips_badaddr;            /* invalid address on header */
-        int32  ips_inhwcsum;           /* hardware checksummed on input */
-        int32  ips_outhwcsum;          /* hardware checksummed on output */
+        int32_t  ips_total;              /* total packets received */
+        int32_t  ips_badsum;             /* checksum bad */
+        int32_t  ips_tooshort;           /* packet too short */
+        int32_t  ips_toosmall;           /* not enough data */
+        int32_t  ips_badhlen;            /* ip header length < data size */
+        int32_t  ips_badlen;             /* ip length < ip header length */
+        int32_t  ips_fragments;          /* fragments received */
+        int32_t  ips_fragdropped;        /* frags dropped (dups, out of space) */
+        int32_t  ips_fragtimeout;        /* fragments timed out */
+        int32_t  ips_forward;            /* packets forwarded */
+        int32_t  ips_cantforward;        /* packets rcvd for unreachable dest */
+        int32_t  ips_redirectsent;       /* packets forwarded on same net */
+        int32_t  ips_noproto;            /* unknown or unsupported protocol */
+        int32_t  ips_delivered;          /* datagrams delivered to upper level*/
+        int32_t  ips_localout;           /* total ip packets generated here */
+        int32_t  ips_odropped;           /* lost packets due to nobufs, etc. */
+        int32_t  ips_reassembled;        /* total packets reassembled ok */
+        int32_t  ips_fragmented;         /* datagrams sucessfully fragmented */
+        int32_t  ips_ofragments;         /* output fragments created */
+        int32_t  ips_cantfrag;           /* don't fragment flag was set, etc. */
+        int32_t  ips_badoptions;         /* error in option processing */
+        int32_t  ips_noroute;            /* packets discarded due to no route */
+        int32_t  ips_badvers;            /* ip version != 4 */
+        int32_t  ips_rawout;             /* total raw ip packets generated */
+        int32_t  ips_badfrags;           /* malformed fragments (bad length) */
+        int32_t  ips_rcvmemdrop;         /* frags dropped for lack of memory */
+        int32_t  ips_toolong;            /* ip length > max ip packet size */
+        int32_t  ips_nogif;              /* no match gif found */
+        int32_t  ips_badaddr;            /* invalid address on header */
+        int32_t  ips_inhwcsum;           /* hardware checksummed on input */
+        int32_t  ips_outhwcsum;          /* hardware checksummed on output */
 };
 
 //#ifdef _KERNEL_MODE

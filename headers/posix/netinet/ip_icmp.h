@@ -40,19 +40,20 @@
 #include <endian.h>
 
 #include <netinet/in.h>
+#include <stdint.h>
 
 struct icmp {
-	uint8 icmp_type;
-	uint8 icmp_code;
-	uint16 icmp_cksum;
+	uint8_t icmp_type;
+	uint8_t icmp_code;
+	uint16_t icmp_cksum;
 	union {
-		uint8 ih_pptr;
+		uint8_t ih_pptr;
 		struct in_addr ih_gwaddr;
 		struct ih_idseq {
 			n_short icd_id;
 			n_short icd_seq;
 		} ih_idseq;
-		int32 ih_void;
+		int32_t ih_void;
 		
 		/* ICMP_UNREACH_NEEDFRAG (RFC 1191) */
 		struct ih_pmtu {

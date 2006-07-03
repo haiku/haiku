@@ -7,6 +7,7 @@
 
 #include <netinet/in_systm.h>
 #include <netinet/in.h>
+#include <stdint.h>
 
 /* Based on RFC 791 */
 
@@ -14,19 +15,19 @@
 
 struct ip {
 #if 	BYTE_ORDER == BIG_ENDIAN
-	uint8	ip_v:4;
-	uint8	ip_hl:4;
+	uint8_t			ip_v:4;
+	uint8_t			ip_hl:4;
 #elif	BYTE_ORDER == LITTLE_ENDIAN
-	uint8	ip_hl:4;
-	uint8	ip_v:4;
+	uint8_t			ip_hl:4;
+	uint8_t			ip_v:4;
 #endif
-	uint8	ip_tos;
-	uint16	ip_len;
-	uint16	ip_id;
-	int16	ip_off;
-	uint8	ip_ttl;
-	uint8	ip_p;
-	uint16	ip_sum;
+	uint8_t			ip_tos;
+	uint16_t		ip_len;
+	uint16_t		ip_id;
+	int16_t			ip_off;
+	uint8_t			ip_ttl;
+	uint8_t			ip_p;
+	uint16_t		ip_sum;
 	struct in_addr	ip_src;
 	struct in_addr 	ip_dst;
 } _PACKED;
@@ -69,15 +70,15 @@ struct ip {
 #define IPOPT_MINOFF                4/* min value of above */   
 
 struct  ip_timestamp {
-	uint8 ipt_code;/* IPOPT_TS */
-	uint8 ipt_len;/* size of structure (variable) */
-	uint8 ipt_ptr;/* index of current entry */
+	uint8_t	ipt_code;/* IPOPT_TS */
+	uint8_t	ipt_len;/* size of structure (variable) */
+	uint8_t	ipt_ptr;/* index of current entry */
 #if 	BYTE_ORDER == BIG_ENDIAN
-	uint8 ipt_oflw:4,
-	      ipt_flg:4;
+	uint8_t	ipt_oflw:4,
+			ipt_flg:4;
 #elif	BYTE_ORDER == LITTLE_ENDIAN
-	uint8 ipt_flg:4,
-	      ipt_oflw:4;
+	uint8_t	ipt_flg:4,
+			ipt_oflw:4;
 #endif
 	union ipt_timestamp {
 		n_time ipt_time[1];
@@ -112,9 +113,9 @@ struct  ip_timestamp {
 struct ippseudo {
 	struct    in_addr ippseudo_src; /* source internet address */
 	struct    in_addr ippseudo_dst; /* destination internet address */
-	uint8  ippseudo_pad;/* pad, must be zero */
-	uint8  ippseudo_p;/* protocol */
-	uint16 ippseudo_len;/* protocol length */
+	uint8_t   ippseudo_pad;/* pad, must be zero */
+	uint8_t   ippseudo_p;/* protocol */
+	uint16_t  ippseudo_len;/* protocol length */
 };  
 
 /* Fragment flags */

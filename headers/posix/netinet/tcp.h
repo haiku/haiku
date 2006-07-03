@@ -37,25 +37,27 @@
 #ifndef NETINET_TCP_H
 #define NETINET_TCP_H
 
-typedef uint32 tcp_seq;
+#include <stdint.h>
+
+typedef uint32_t tcp_seq;
 
 struct tcphdr {
-	uint16 th_sport;        /* src port */
-	uint16 th_dport;        /* dest. port */
-	tcp_seq th_seq;         /* seq number */
-	tcp_seq th_ack;         /* ack number */
+	uint16_t th_sport;      /* src port */
+	uint16_t th_dport;      /* dest. port */
+	tcp_seq  th_seq;        /* seq number */
+	tcp_seq  th_ack;        /* ack number */
 	
 #if B_HOST_IS_BENDIAN
-	uint8 th_off:4,
-	      th_x2:4;
+	uint8_t  th_off:4,
+	         th_x2:4;
 #else
-	uint8 th_x2:4,          /* unused */
-	      th_off:4;         /* data offset */
+	uint8_t  th_x2:4,       /* unused */
+	         th_off:4;      /* data offset */
 #endif
-	uint8  th_flags;        /* ACK, FIN, PUSH, RST, SYN, URG */
-	uint16 th_win;          /* advertised window */
-	uint16 th_sum;          /* checksum */
-	uint16 th_urp;          /* urgent offset */
+	uint8_t  th_flags;      /* ACK, FIN, PUSH, RST, SYN, URG */
+	uint16_t th_win;        /* advertised window */
+	uint16_t th_sum;        /* checksum */
+	uint16_t th_urp;        /* urgent offset */
 } _PACKED;
 
 #define	TH_FIN	  0x01
