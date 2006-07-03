@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel busses scsi buslogic ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirCcFlags -DBUILD_LOADABLE ;
+
+KernelAddon buslogic : kernel busses scsi :
+	buslogic.c
+;
+
+Package haiku-buslogic-cvs
+	:
+	buslogic
+	:
+	boot home config add-ons kernel busses scsi ;
