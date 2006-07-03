@@ -1340,25 +1340,25 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
 
 	// constrain rect to passed bitmap bounds
-	// and transfer the changes to the viewRect
+	// and transfer the changes to the viewRect with the right scale
 	if (bitmapRect.left < actualBitmapRect.left) {
 		float diff = actualBitmapRect.left - bitmapRect.left;
-		viewRect.left += diff;
+		viewRect.left += diff * xScale;
 		bitmapRect.left = actualBitmapRect.left;
 	}
 	if (bitmapRect.top < actualBitmapRect.top) {
 		float diff = actualBitmapRect.top - bitmapRect.top;
-		viewRect.top += diff;
+		viewRect.top += diff * yScale;
 		bitmapRect.top = actualBitmapRect.top;
 	}
 	if (bitmapRect.right > actualBitmapRect.right) {
 		float diff = bitmapRect.right - actualBitmapRect.right;
-		viewRect.right -= diff;
+		viewRect.right -= diff * xScale;
 		bitmapRect.right = actualBitmapRect.right;
 	}
 	if (bitmapRect.bottom > actualBitmapRect.bottom) {
 		float diff = bitmapRect.bottom - actualBitmapRect.bottom;
-		viewRect.bottom -= diff;
+		viewRect.bottom -= diff * yScale;
 		bitmapRect.bottom = actualBitmapRect.bottom;
 	}
 	
