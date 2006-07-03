@@ -1327,6 +1327,12 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 
 	if (!fSubpixelPrecise)
 		align_rect_to_pixels(&viewRect);
+		
+	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
+	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
+
+	if (xScale == 0.0 || yScale == 0.0)
+		return;
 
 	// compensate for the lefttop offset the actualBitmapRect might have
 	// actualBitmapRect has the right size, but put it at B_ORIGIN
@@ -1356,12 +1362,6 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		bitmapRect.bottom = actualBitmapRect.bottom;
 	}
 	
-	double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
-	double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
-
-	if (xScale == 0.0 || yScale == 0.0)
-		return;
-
 	double xOffset = viewRect.left - bitmapRect.left;
 	double yOffset = viewRect.top - bitmapRect.top;
 
