@@ -120,9 +120,9 @@ ShapeListView::SelectionChanged()
 	// TODO: single selection versus multiple selection
 
 	ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(CurrentSelection(0)));
-	if (item && fMessage) {
+	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddPointer("shape", (void*)item->shape);
+		message.AddPointer("shape", item ? (void*)item->shape : NULL);
 		Invoke(&message);
 	}
 

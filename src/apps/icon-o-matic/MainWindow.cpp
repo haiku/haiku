@@ -45,6 +45,7 @@ enum {
 
 	MSG_NEW_PATH					= 'nwvp',
 	MSG_PATH_SELECTED				= 'vpsl',
+	MSG_SHAPE_SELECTED				= 'spsl',
 };
 
 // constructor
@@ -98,6 +99,13 @@ case MSG_PATH_SELECTED: {
 		fState->DeleteManipulators();
 		fState->AddManipulator(pathManipulator);
 	}
+	break;
+}
+case MSG_SHAPE_SELECTED: {
+	Shape* shape;
+	if (message->FindPointer("shape", (void**)&shape) < B_OK)
+		shape = NULL;
+	fPathListView->SetCurrentShape(shape);
 	break;
 }
 
@@ -291,7 +299,8 @@ MainWindow::_CreateGUI(BRect bounds)
 									 new BMessage(MSG_PATH_SELECTED), this);
 
 	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
-	fShapeListView = new ShapeListView(bounds, "shape list view");
+	fShapeListView = new ShapeListView(bounds, "shape list view",
+									   new BMessage(MSG_SHAPE_SELECTED), this);
 
 	bg->AddChild(fSwatchGroup);
 

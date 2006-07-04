@@ -44,11 +44,9 @@ void
 PathSource::Update()
 {
 	fAGGPath.remove_all();
+
 	int32 count = fPaths->CountPaths();
-	for (int32 i = 0; i < count; i++) {
-		VectorPath* path = fPaths->PathAtFast(i);
-		fAGGPath.start_new_path();
-		path->GetAGGPathStorage(fAGGPath);
-	}
+	for (int32 i = 0; i < count; i++)
+		fPaths->PathAtFast(i)->GetAGGPathStorage(fAGGPath);
 }
 

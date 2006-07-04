@@ -12,9 +12,13 @@
 #include "ListViews.h"
 #include "PathContainer.h"
 
+class CommandStack;
 class VectorPath;
 class PathListItem;
 class Selection;
+class Shape;
+class ShapeContainer;
+class ShapePathListener;
 
 class PathListView : public SimpleListView,
 					 public PathContainerListener {
@@ -28,6 +32,7 @@ class PathListView : public SimpleListView,
 	// SimpleListView interface
 	virtual	void				SelectionChanged();
 
+	virtual	void				MouseDown(BPoint where);
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual	void				MakeDragMessage(BMessage* message) const;
@@ -48,7 +53,12 @@ class PathListView : public SimpleListView,
 
 	// PathListView
 			void				SetPathContainer(PathContainer* container);
+			void				SetShapeContainer(ShapeContainer* container);
 			void				SetSelection(Selection* selection);
+
+			void				SetCurrentShape(Shape* shape);
+			Shape*				CurrentShape() const
+									{ return fCurrentShape; }
 
  private:
 			bool				_AddPath(VectorPath* path);
@@ -57,10 +67,22 @@ class PathListView : public SimpleListView,
 			PathListItem*		_ItemForPath(VectorPath* path) const;
 			void				_MakeEmpty();
 
+	friend class ShapePathListener;
+			void				_UpdateMarks();
+			void				_SetPathMarked(VectorPath* path, bool marked);
+
 			BMessage*			fMessage;
 
 			PathContainer*		fPathContainer;
+			ShapeContainer*		fShapeContainer;
 			Selection*			fSelection;
+			CommandStack*		fCommandStack;
+
+			Shape*				fCurrentShape;
+				// those path items will be marked that
+				// are referenced by this shape
+
+			ShapePathListener*	fShapePathListener;
 };
 
 #endif // PATH_LIST_VIEW_H

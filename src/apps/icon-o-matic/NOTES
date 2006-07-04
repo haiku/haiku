@@ -15,21 +15,33 @@
   different paths showing at the same time...
 
 * solve the problem of individual gradient transformation per shape
+  -> introduce "StyleInstance", a Shape would not reference a Style
+  directly but via a StyleInstance... this object can have additional
+  information like the gradient transformation
 
 * IconRenderer should construct a separate StyleManager and append
   the styles in the order of shapes, also adding styles multiple
   times, if two or more shapes use the same style (the compound shape
-  rendering uses the style index for z ordering)
+  rendering uses the style index for z ordering) [done]
+
+* add more functionality to Transformer/VertexSource interface:
+  - (inverse) Transformation
+  - Cloning
+
+* add more powerful listener interface to Shape
+  (TransformerAdded()/Removed()...)
+
+* implement commands for the newly added editing features
 
 
 --------- user interface
 
-* list of global vector paths
+* list of global vector paths [done]
 
-* list of shapes
+* list of shapes [done]
 
 * list of paths used by shape, but it could also be done such that
-  used paths are marked in the global list when a shape is selected
+  used paths are marked in the global list when a shape is selected [done]
 
 * list of transformers attached to the selected shape
 
@@ -40,12 +52,12 @@
 
 * 192 "built-in" (pre-defined) style definitions
 * up to 64 additional style definitions per document
+* referencing of fill style by uint8 id
 * solid colors and different types of gradients
 * uint8 precision for coordinates on a 64x64 virtual pixel grid
 (* removal (freezing) of transformations at export time
 	not sure about this one, it would remove the possiblity
 	to store vector path only once for referenced objects)
-* referencing of fill style by uint8 id
 * IFF type chunk format
 
 
