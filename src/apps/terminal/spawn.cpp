@@ -31,7 +31,6 @@
 
 #include <dirent.h>
 #include <sys/param.h>
-#include <sys/file.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
