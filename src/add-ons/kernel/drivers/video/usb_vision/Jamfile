@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers video ;
+SubDir HAIKU_TOP src add-ons kernel drivers video usb_vision ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
