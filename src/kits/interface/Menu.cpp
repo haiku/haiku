@@ -343,7 +343,7 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 		debugger("BMenu::AddItem(BMenuItem *, int32) this method can only "
 				"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 
-	if (!_AddItem(item, index))
+	if (!item || !_AddItem(item, index))
 		return false;
 
 	InvalidateLayout();
