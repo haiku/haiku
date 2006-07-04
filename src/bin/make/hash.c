@@ -2,20 +2,19 @@
    Copyright (C) 1995, 1999, 2002 Free Software Foundation, Inc.
    Written by Greg McGary <gkm@gnu.org> <greg@mcgary.org>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+You should have received a copy of the GNU General Public License along with
+this program; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
 #include "hash.h"
@@ -41,12 +40,8 @@ void *hash_deleted_item = &hash_deleted_item;
    given size.  */
 
 void
-hash_init (ht, size, hash_1, hash_2, hash_cmp)
-     struct hash_table* ht;
-     unsigned long size;
-     hash_func_t hash_1;
-     hash_func_t hash_2;
-     hash_cmp_func_t hash_cmp;
+hash_init (struct hash_table *ht, unsigned long size,
+           hash_func_t hash_1, hash_func_t hash_2, hash_cmp_func_t hash_cmp)
 {
   ht->ht_size = round_up_2 (size);
   ht->ht_empty_slots = ht->ht_size;
@@ -71,11 +66,8 @@ hash_init (ht, size, hash_1, hash_2, hash_cmp)
 /* Load an array of items into `ht'.  */
 
 void
-hash_load (ht, item_table, cardinality, size)
-     struct hash_table* ht;
-     void *item_table;
-     unsigned long cardinality;
-     unsigned long size;
+hash_load (struct hash_table *ht, void *item_table,
+           unsigned long cardinality, unsigned long size)
 {
   char *items = (char *) item_table;
   while (cardinality--)
@@ -91,9 +83,7 @@ hash_load (ht, item_table, cardinality, size)
    ht_fill on insertion.  */
 
 void **
-hash_find_slot (ht, key)
-     struct hash_table* ht;
-     void const *key;
+hash_find_slot (struct hash_table *ht, const void *key)
 {
   void **slot;
   void **deleted_slot = 0;
@@ -128,32 +118,25 @@ hash_find_slot (ht, key)
 }
 
 void *
-hash_find_item (ht, key)
-     struct hash_table* ht;
-     void const *key;
+hash_find_item (struct hash_table *ht, const void *key)
 {
   void **slot = hash_find_slot (ht, key);
   return ((HASH_VACANT (*slot)) ? 0 : *slot);
 }
 
 void *
-hash_insert (ht, item)
-     struct hash_table* ht;
-     void *item;
+hash_insert (struct hash_table *ht, const void *item)
 {
   void **slot = hash_find_slot (ht, item);
-  void *old_item = slot ? *slot : 0;
+  const void *old_item = slot ? *slot : 0;
   hash_insert_at (ht, item, slot);
-  return ((HASH_VACANT (old_item)) ? 0 : old_item);
+  return (void *)((HASH_VACANT (old_item)) ? 0 : old_item);
 }
 
 void *
-hash_insert_at (ht, item, slot)
-     struct hash_table* ht;
-     void *item;
-     void const *slot;
+hash_insert_at (struct hash_table *ht, const void *item, const void *slot)
 {
-  void *old_item = *(void **) slot;
+  const void *old_item = *(void **) slot;
   if (HASH_VACANT (old_item))
     {
       ht->ht_fill++;
@@ -172,18 +155,14 @@ hash_insert_at (ht, item, slot)
 }
 
 void *
-hash_delete (ht, item)
-     struct hash_table* ht;
-     void const *item;
+hash_delete (struct hash_table *ht, const void *item)
 {
   void **slot = hash_find_slot (ht, item);
   return hash_delete_at (ht, slot);
 }
 
 void *
-hash_delete_at (ht, slot)
-     struct hash_table* ht;
-     void const *slot;
+hash_delete_at (struct hash_table *ht, const void *slot)
 {
   void *item = *(void **) slot;
   if (!HASH_VACANT (item))
@@ -197,8 +176,7 @@ hash_delete_at (ht, slot)
 }
 
 void
-hash_free_items (ht)
-     struct hash_table* ht;
+hash_free_items (struct hash_table *ht)
 {
   void **vec = ht->ht_vec;
   void **end = &vec[ht->ht_size];
@@ -214,8 +192,7 @@ hash_free_items (ht)
 }
 
 void
-hash_delete_items (ht)
-     struct hash_table* ht;
+hash_delete_items (struct hash_table *ht)
 {
   void **vec = ht->ht_vec;
   void **end = &vec[ht->ht_size];
@@ -229,9 +206,7 @@ hash_delete_items (ht)
 }
 
 void
-hash_free (ht, free_items)
-     struct hash_table* ht;
-     int free_items;
+hash_free (struct hash_table *ht, int free_items)
 {
   if (free_items)
     hash_free_items (ht);
@@ -246,9 +221,7 @@ hash_free (ht, free_items)
 }
 
 void
-hash_map (ht, map)
-     struct hash_table *ht;
-     hash_map_func_t map;
+hash_map (struct hash_table *ht, hash_map_func_t map)
 {
   void **slot;
   void **end = &ht->ht_vec[ht->ht_size];
@@ -261,10 +234,7 @@ hash_map (ht, map)
 }
 
 void
-hash_map_arg (ht, map, arg)
-     struct hash_table *ht;
-     hash_map_arg_func_t map;
-     void *arg;
+hash_map_arg (struct hash_table *ht, hash_map_arg_func_t map, void *arg)
 {
   void **slot;
   void **end = &ht->ht_vec[ht->ht_size];
@@ -279,8 +249,7 @@ hash_map_arg (ht, map, arg)
 /* Double the size of the hash table in the event of overflow... */
 
 static void
-hash_rehash (ht)
-     struct hash_table* ht;
+hash_rehash (struct hash_table *ht)
 {
   unsigned long old_ht_size = ht->ht_size;
   void **old_vec = ht->ht_vec;
@@ -307,9 +276,7 @@ hash_rehash (ht)
 }
 
 void
-hash_print_stats (ht, out_FILE)
-     struct hash_table *ht;
-     FILE *out_FILE;
+hash_print_stats (struct hash_table *ht, FILE *out_FILE)
 {
   /* GKM FIXME: honor NO_FLOAT */
   fprintf (out_FILE, _("Load=%ld/%ld=%.0f%%, "), ht->ht_fill, ht->ht_size,
@@ -325,10 +292,7 @@ hash_print_stats (ht, out_FILE)
    user-supplied vector, or malloc one.  */
 
 void **
-hash_dump (ht, vector_0, compare)
-     struct hash_table *ht;
-     void **vector_0;
-     qsort_cmp_t compare;
+hash_dump (struct hash_table *ht, void **vector_0, qsort_cmp_t compare)
 {
   void **vector;
   void **slot;
@@ -351,8 +315,7 @@ hash_dump (ht, vector_0, compare)
 /* Round a given number up to the nearest power of 2. */
 
 static unsigned long
-round_up_2 (n)
-     unsigned long n;
+round_up_2 (unsigned long n)
 {
   n |= (n >> 1);
   n |= (n >> 2);

@@ -1,34 +1,33 @@
 /* Data base of default implicit rules for GNU Make.
-Copyright (C) 1988,89,90,91,92,93,94,95,96 Free Software Foundation, Inc.
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+Foundation, Inc.
 This file is part of GNU Make.
 
-GNU Make is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.
 
-GNU Make is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GNU Make; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+You should have received a copy of the GNU General Public License along with
+GNU Make; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
+#include "filedef.h"
+#include "variable.h"
 #include "rule.h"
 #include "dep.h"
-#include "filedef.h"
 #include "job.h"
 #include "commands.h"
-#include "variable.h"
 
 /* Define GCC_IS_NATIVE if gcc is the native development environment on
    your system (gcc/bison/flex vs cc/yacc/lex).  */
-#ifdef __MSDOS__
-#define GCC_IS_NATIVE
+#if defined(__MSDOS__) || defined(__EMX__)
+# define GCC_IS_NATIVE
 #endif
 
 
@@ -41,6 +40,10 @@ static char default_suffixes[]
   = ".exe .olb .ln .obj .c .cxx .cc .pas .p .for .f .r .y .l .mar \
 .s .ss .i .ii .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo \
 .w .ch .cweb .web .com .sh .elc .el";
+#elif defined(__EMX__)
+  = ".out .a .ln .o .c .cc .C .cpp .p .f .F .r .y .l .s .S \
+.mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo \
+.w .ch .web .sh .elc .el .obj .exe .dll .lib";
 #else
   = ".out .a .ln .o .c .cc .C .cpp .p .f .F .r .y .l .s .S \
 .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo \
@@ -153,6 +156,8 @@ static char *default_suffix_rules[] =
     "$(COMPILE.cc)/noprep/noobj/machine /list=$@ $<",
     ".cc.obj",
     "$(COMPILE.cc) /obj=$@ $<",
+    ".cxx.obj",
+    "$(COMPILE.cxx) /obj=$@ $<",
     ".for.obj",
     "$(COMPILE.for) /obj=$@ $<",
     ".pas.obj",
@@ -302,7 +307,11 @@ static char *default_variables[] =
 #ifdef VMS
 #ifdef __ALPHA
     "ARCH", "ALPHA",
-#else
+#endif
+#ifdef __ia64
+    "ARCH", "IA64",
+#endif
+#ifdef __VAX
     "ARCH", "VAX",
 #endif
     "AR", "library/obj",
@@ -511,7 +520,7 @@ static char *default_variables[] =
 /* Set up the default .SUFFIXES list.  */
 
 void
-set_default_suffixes ()
+set_default_suffixes (void)
 {
   suffix_file = enter_file (".SUFFIXES");
 
@@ -533,7 +542,7 @@ set_default_suffixes ()
    installed after.  */
 
 void
-install_default_suffix_rules ()
+install_default_suffix_rules (void)
 {
   register char **s;
 
@@ -558,7 +567,7 @@ install_default_suffix_rules ()
 /* Install the default pattern rules.  */
 
 void
-install_default_implicit_rules ()
+install_default_implicit_rules (void)
 {
   register struct pspec *p;
 
@@ -573,7 +582,7 @@ install_default_implicit_rules ()
 }
 
 void
-define_default_variables ()
+define_default_variables (void)
 {
   register char **s;
 

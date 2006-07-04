@@ -1,24 +1,25 @@
 /* Internals of variables for GNU Make.
-Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1996, 1997,
-2002 Free Software Foundation, Inc.
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+Foundation, Inc.
 This file is part of GNU Make.
 
-GNU Make is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.
 
-GNU Make is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GNU Make; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+You should have received a copy of the GNU General Public License along with
+GNU Make; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
+
+#include <assert.h>
+
 #include "dep.h"
 #include "filedef.h"
 #include "job.h"
@@ -30,28 +31,93 @@ Boston, MA 02111-1307, USA.  */
 #endif
 #include "hash.h"
 
+/* Chain of all pattern-specific variables.  */
+
+static struct pattern_var *pattern_vars;
+
+/* Pointer to last struct in the chain, so we can add onto the end.  */
+
+static struct pattern_var *last_pattern_var;
+
+/* Create a new pattern-specific variable struct.  */
+
+struct pattern_var *
+create_pattern_var (char *target, char *suffix)
+{
+  register struct pattern_var *p
+    = (struct pattern_var *) xmalloc (sizeof (struct pattern_var));
+
+  if (last_pattern_var != 0)
+    last_pattern_var->next = p;
+  else
+    pattern_vars = p;
+  last_pattern_var = p;
+  p->next = 0;
+
+  p->target = target;
+  p->len = strlen (target);
+  p->suffix = suffix + 1;
+
+  return p;
+}
+
+/* Look up a target in the pattern-specific variable list.  */
+
+static struct pattern_var *
+lookup_pattern_var (struct pattern_var *start, char *target)
+{
+  struct pattern_var *p;
+  unsigned int targlen = strlen(target);
+
+  for (p = start ? start->next : pattern_vars; p != 0; p = p->next)
+    {
+      char *stem;
+      unsigned int stemlen;
+
+      if (p->len > targlen)
+        /* It can't possibly match.  */
+        continue;
+
+      /* From the lengths of the filename and the pattern parts,
+         find the stem: the part of the filename that matches the %.  */
+      stem = target + (p->suffix - p->target - 1);
+      stemlen = targlen - p->len + 1;
+
+      /* Compare the text in the pattern before the stem, if any.  */
+      if (stem > target && !strneq (p->target, target, stem - target))
+        continue;
+
+      /* Compare the text in the pattern after the stem, if any.
+         We could test simply using streq, but this way we compare the
+         first two characters immediately.  This saves time in the very
+         common case where the first character matches because it is a
+         period.  */
+      if (*p->suffix == stem[stemlen]
+          && (*p->suffix == '\0' || streq (&p->suffix[1], &stem[stemlen+1])))
+        break;
+    }
+
+  return p;
+}
+
 /* Hash table of all global variable definitions.  */
 
 static unsigned long
-variable_hash_1 (keyv)
-    const void *keyv;
+variable_hash_1 (const void *keyv)
 {
   struct variable const *key = (struct variable const *) keyv;
   return_STRING_N_HASH_1 (key->name, key->length);
 }
 
 static unsigned long
-variable_hash_2 (keyv)
-    const void *keyv;
+variable_hash_2 (const void *keyv)
 {
   struct variable const *key = (struct variable const *) keyv;
   return_STRING_N_HASH_2 (key->name, key->length);
 }
 
 static int
-variable_hash_cmp (xv, yv)
-    const void *xv;
-    const void *yv;
+variable_hash_cmp (const void *xv, const void *yv)
 {
   struct variable const *x = (struct variable const *) xv;
   struct variable const *y = (struct variable const *) yv;
@@ -79,7 +145,7 @@ struct variable_set_list *current_variable_set_list = &global_setlist;
 /* Implement variables.  */
 
 void
-init_hash_global_variable_set ()
+init_hash_global_variable_set (void)
 {
   hash_init (&global_variable_set.table, VARIABLE_BUCKETS,
 	     variable_hash_1, variable_hash_2, variable_hash_cmp);
@@ -93,14 +159,10 @@ init_hash_global_variable_set ()
    that it should be recursively re-expanded.  */
 
 struct variable *
-define_variable_in_set (name, length, value, origin, recursive, set, flocp)
-     const char *name;
-     unsigned int length;
-     char *value;
-     enum variable_origin origin;
-     int recursive;
-     struct variable_set *set;
-     const struct floc *flocp;
+define_variable_in_set (const char *name, unsigned int length,
+                        char *value, enum variable_origin origin,
+                        int recursive, struct variable_set *set,
+                        const struct floc *flocp)
 {
   struct variable *v;
   struct variable **var_slot;
@@ -155,6 +217,7 @@ define_variable_in_set (name, length, value, origin, recursive, set, flocp)
     v->fileinfo.filenm = 0;
   v->origin = origin;
   v->recursive = recursive;
+  v->special = 0;
   v->expanding = 0;
   v->exp_count = 0;
   v->per_target = 0;
@@ -190,8 +253,7 @@ define_variable_in_set (name, length, value, origin, recursive, set, flocp)
 #define EXPANSION_INCREMENT(_l)  ((((_l) / 500) + 1) * 500)
 
 static struct variable *
-handle_special_var (var)
-     struct variable *var;
+handle_special_var (struct variable *var)
 {
   static unsigned long last_var_count = 0;
 
@@ -275,9 +337,7 @@ handle_special_var (var)
    on the variable, or nil if no such variable is defined.  */
 
 struct variable *
-lookup_variable (name, length)
-     const char *name;
-     unsigned int length;
+lookup_variable (const char *name, unsigned int length)
 {
   const struct variable_set_list *setlist;
   struct variable var_key;
@@ -361,10 +421,8 @@ lookup_variable (name, length)
    on the variable, or nil if no such variable is defined.  */
 
 struct variable *
-lookup_variable_in_set (name, length, set)
-     const char *name;
-     unsigned int length;
-     const struct variable_set *set;
+lookup_variable_in_set (const char *name, unsigned int length,
+                        const struct variable_set *set)
 {
   struct variable var_key;
 
@@ -384,11 +442,9 @@ lookup_variable_in_set (name, length, set)
    since the pattern variable might not have been defined yet.  */
 
 void
-initialize_file_variables (file, reading)
-     struct file *file;
-     int reading;
+initialize_file_variables (struct file *file, int reading)
 {
-  register struct variable_set_list *l = file->variables;
+  struct variable_set_list *l = file->variables;
 
   if (l == 0)
     {
@@ -420,21 +476,55 @@ initialize_file_variables (file, reading)
     }
 
   /* If we're not reading makefiles and we haven't looked yet, see if
-     we can find a pattern variable.  */
+     we can find pattern variables for this target.  */
 
   if (!reading && !file->pat_searched)
     {
-      struct pattern_var *p = lookup_pattern_var (file->name);
+      struct pattern_var *p;
 
-      file->pat_searched = 1;
+      p = lookup_pattern_var (0, file->name);
       if (p != 0)
         {
-          /* If we found one, insert it between the current target's
-             variables and the next set, whatever it is.  */
-          file->pat_variables = (struct variable_set_list *)
-            xmalloc (sizeof (struct variable_set_list));
-          file->pat_variables->set = p->vars->set;
+          struct variable_set_list *global = current_variable_set_list;
+
+          /* We found at least one.  Set up a new variable set to accumulate
+             all the pattern variables that match this target.  */
+
+          file->pat_variables = create_new_variable_set ();
+          current_variable_set_list = file->pat_variables;
+
+          do
+            {
+              /* We found one, so insert it into the set.  */
+
+              struct variable *v;
+
+              if (p->variable.flavor == f_simple)
+                {
+                  v = define_variable_loc (
+                    p->variable.name, strlen (p->variable.name),
+                    p->variable.value, p->variable.origin,
+                    0, &p->variable.fileinfo);
+
+                  v->flavor = f_simple;
+                }
+              else
+                {
+                  v = do_variable_definition (
+                    &p->variable.fileinfo, p->variable.name,
+                    p->variable.value, p->variable.origin,
+                    p->variable.flavor, 1);
+                }
+
+              /* Also mark it as a per-target and copy export status. */
+              v->per_target = p->variable.per_target;
+              v->export = p->variable.export;
+            }
+          while ((p = lookup_pattern_var (p, file->name)) != 0);
+
+          current_variable_set_list = global;
         }
+      file->pat_searched = 1;
     }
 
   /* If we have a pattern variable match, set it up.  */
@@ -449,32 +539,8 @@ initialize_file_variables (file, reading)
 /* Pop the top set off the current variable set list,
    and free all its storage.  */
 
-static void
-free_variable_name_and_value (item)
-     void *item;
-{
-  struct variable *v = (struct variable *) item;
-  free (v->name);
-  free (v->value);
-}
-
-void
-pop_variable_scope ()
-{
-  struct variable_set_list *setlist = current_variable_set_list;
-  struct variable_set *set = setlist->set;
-
-  current_variable_set_list = setlist->next;
-  free ((char *) setlist);
-
-  hash_map (&set->table, free_variable_name_and_value);
-  hash_free (&set->table, 1);
-
-  free ((char *) set);
-}
-
 struct variable_set_list *
-create_new_variable_set ()
+create_new_variable_set (void)
 {
   register struct variable_set_list *setlist;
   register struct variable_set *set;
@@ -491,19 +557,87 @@ create_new_variable_set ()
   return setlist;
 }
 
-/* Create a new variable set and push it on the current setlist.  */
+static void
+free_variable_name_and_value (const void *item)
+{
+  struct variable *v = (struct variable *) item;
+  free (v->name);
+  free (v->value);
+}
+
+void
+free_variable_set (struct variable_set_list *list)
+{
+  hash_map (&list->set->table, free_variable_name_and_value);
+  hash_free (&list->set->table, 1);
+  free ((char *) list->set);
+  free ((char *) list);
+}
+
+/* Create a new variable set and push it on the current setlist.
+   If we're pushing a global scope (that is, the current scope is the global
+   scope) then we need to "push" it the other way: file variable sets point
+   directly to the global_setlist so we need to replace that with the new one.
+ */
 
 struct variable_set_list *
-push_new_variable_scope ()
+push_new_variable_scope (void)
 {
-  return (current_variable_set_list = create_new_variable_set());
+  current_variable_set_list = create_new_variable_set();
+  if (current_variable_set_list->next == &global_setlist)
+    {
+      /* It was the global, so instead of new -> &global we want to replace
+         &global with the new one and have &global -> new, with current still
+         pointing to &global  */
+      struct variable_set *set = current_variable_set_list->set;
+      current_variable_set_list->set = global_setlist.set;
+      global_setlist.set = set;
+      current_variable_set_list->next = global_setlist.next;
+      global_setlist.next = current_variable_set_list;
+      current_variable_set_list = &global_setlist;
+    }
+  return (current_variable_set_list);
+}
+
+void
+pop_variable_scope (void)
+{
+  struct variable_set_list *setlist;
+  struct variable_set *set;
+
+  /* Can't call this if there's no scope to pop!  */
+  assert(current_variable_set_list->next != NULL);
+
+  if (current_variable_set_list != &global_setlist)
+    {
+      /* We're not pointing to the global setlist, so pop this one.  */
+      setlist = current_variable_set_list;
+      set = setlist->set;
+      current_variable_set_list = setlist->next;
+    }
+  else
+    {
+      /* This set is the one in the global_setlist, but there is another global
+         set beyond that.  We want to copy that set to global_setlist, then
+         delete what used to be in global_setlist.  */
+      setlist = global_setlist.next;
+      set = global_setlist.set;
+      global_setlist.set = setlist->set;
+      global_setlist.next = setlist->next;
+    }
+
+  /* Free the one we no longer need.  */
+  free ((char *) setlist);
+  hash_map (&set->table, free_variable_name_and_value);
+  hash_free (&set->table, 1);
+  free ((char *) set);
 }
 
-/* Merge SET1 into SET0, freeing unused storage in SET1.  */
+/* Merge FROM_SET into TO_SET, freeing unused storage in FROM_SET.  */
 
 static void
-merge_variable_sets (to_set, from_set)
-     struct variable_set *to_set, *from_set;
+merge_variable_sets (struct variable_set *to_set,
+                     struct variable_set *from_set)
 {
   struct variable **from_var_slot = (struct variable **) from_set->table.ht_vec;
   struct variable **from_var_end = from_var_slot + from_set->table.ht_size;
@@ -528,24 +662,31 @@ merge_variable_sets (to_set, from_set)
 /* Merge SETLIST1 into SETLIST0, freeing unused storage in SETLIST1.  */
 
 void
-merge_variable_set_lists (setlist0, setlist1)
-     struct variable_set_list **setlist0, *setlist1;
+merge_variable_set_lists (struct variable_set_list **setlist0,
+                          struct variable_set_list *setlist1)
 {
-  register struct variable_set_list *list0 = *setlist0;
+  struct variable_set_list *to = *setlist0;
   struct variable_set_list *last0 = 0;
 
-  while (setlist1 != 0 && list0 != 0)
-    {
-      struct variable_set_list *next = setlist1;
-      setlist1 = setlist1->next;
+  /* If there's nothing to merge, stop now.  */
+  if (!setlist1)
+    return;
 
-      merge_variable_sets (list0->set, next->set);
+  /* This loop relies on the fact that all setlists terminate with the global
+     setlist (before NULL).  If that's not true, arguably we SHOULD die.  */
+  if (to)
+    while (setlist1 != &global_setlist && to != &global_setlist)
+      {
+        struct variable_set_list *from = setlist1;
+        setlist1 = setlist1->next;
 
-      last0 = list0;
-      list0 = list0->next;
-    }
+        merge_variable_sets (to->set, from->set);
 
-  if (setlist1 != 0)
+        last0 = to;
+        to = to->next;
+      }
+
+  if (setlist1 != &global_setlist)
     {
       if (last0 == 0)
 	*setlist0 = setlist1;
@@ -558,9 +699,9 @@ merge_variable_set_lists (setlist0, setlist1)
    of their structures so we can change their values quickly.  */
 
 void
-define_automatic_variables ()
+define_automatic_variables (void)
 {
-#ifdef WINDOWS32
+#if defined(WINDOWS32) || defined(__EMX__)
   extern char* default_shell;
 #else
   extern char default_shell[];
@@ -601,17 +742,65 @@ define_automatic_variables ()
 	  (void) define_variable (shell_str, shlen, comp->value, o_env, 0);
       }
   }
+#elif defined(__EMX__)
+  {
+    static char shell_str[] = "SHELL";
+    const int shlen = sizeof (shell_str) - 1;
+    struct variable *shell = lookup_variable (shell_str, shlen);
+    struct variable *replace = lookup_variable ("MAKESHELL", 9);
+
+    /* if $MAKESHELL is defined in the environment assume o_env_override */
+    if (replace && *replace->value && replace->origin == o_env)
+      replace->origin = o_env_override;
+
+    /* if $MAKESHELL is not defined use $SHELL but only if the variable
+       did not come from the environment */
+    if (!replace || !*replace->value)
+      if (shell && *shell->value && (shell->origin == o_env
+	  || shell->origin == o_env_override))
+	{
+	  /* overwrite whatever we got from the environment */
+	  free(shell->value);
+	  shell->value = xstrdup (default_shell);
+	  shell->origin = o_default;
+	}
+
+    /* Some people do not like cmd to be used as the default
+       if $SHELL is not defined in the Makefile.
+       With -DNO_CMD_DEFAULT you can turn off this behaviour */
+# ifndef NO_CMD_DEFAULT
+    /* otherwise use $COMSPEC */
+    if (!replace || !*replace->value)
+      replace = lookup_variable ("COMSPEC", 7);
+
+    /* otherwise use $OS2_SHELL */
+    if (!replace || !*replace->value)
+      replace = lookup_variable ("OS2_SHELL", 9);
+# else
+#   warning NO_CMD_DEFAULT: GNU make will not use CMD.EXE as default shell
+# endif
+
+    if (replace && *replace->value)
+      /* overwrite $SHELL */
+      (void) define_variable (shell_str, shlen, replace->value,
+			      replace->origin, 0);
+    else
+      /* provide a definition if there is none */
+      (void) define_variable (shell_str, shlen, default_shell,
+			      o_default, 0);
+  }
+
 #endif
 
-  /* This won't override any definition, but it
-     will provide one if there isn't one there.  */
+  /* This won't override any definition, but it will provide one if there
+     isn't one there.  */
   v = define_variable ("SHELL", 5, default_shell, o_default, 0);
-  v->export = v_export;		/* Always export SHELL.  */
 
-  /* On MSDOS we do use SHELL from environment, since
-     it isn't a standard environment variable on MSDOS,
-     so whoever sets it, does that on purpose.  */
-#ifndef __MSDOS__
+  /* On MSDOS we do use SHELL from environment, since it isn't a standard
+     environment variable on MSDOS, so whoever sets it, does that on purpose.
+     On OS/2 we do not use SHELL from environment but we have already handled
+     that problem above. */
+#if !defined(__MSDOS__) && !defined(__EMX__)
   /* Don't let SHELL come from the environment.  */
   if (*v->value == '\0' || v->origin == o_env || v->origin == o_env_override)
     {
@@ -661,8 +850,7 @@ int export_all_variables;
    The child's MAKELEVEL variable is incremented.  */
 
 char **
-target_environment (file)
-     struct file *file;
+target_environment (struct file *file)
 {
   struct variable_set_list *set_list;
   register struct variable_set_list *s;
@@ -728,7 +916,15 @@ target_environment (file)
 		break;
 
 	      case v_noexport:
-		continue;
+                /* If this is the SHELL variable and it's not exported, then
+                   add the value from our original environment.  */
+                if (streq (v->name, "SHELL"))
+                  {
+                    extern struct variable shell_var;
+                    v = &shell_var;
+                    break;
+                  }
+                continue;
 
 	      case v_ifset:
 		if (v->origin == o_default)
@@ -794,17 +990,14 @@ target_environment (file)
    See the try_variable_definition() function for details on the parameters. */
 
 struct variable *
-do_variable_definition (flocp, varname, value, origin, flavor, target_var)
-     const struct floc *flocp;
-     const char *varname;
-     char *value;
-     enum variable_origin origin;
-     enum variable_flavor flavor;
-     int target_var;
+do_variable_definition (const struct floc *flocp, const char *varname,
+                        char *value, enum variable_origin origin,
+                        enum variable_flavor flavor, int target_var)
 {
   char *p, *alloc_value = NULL;
   struct variable *v;
   int append = 0;
+  int conditional = 0;
 
   /* Calculate the variable's new value in VALUE.  */
 
@@ -828,6 +1021,7 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
       if (v)
         return v;
 
+      conditional = 1;
       flavor = f_recursive;
       /* FALLTHROUGH */
     case f_recursive:
@@ -844,6 +1038,11 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
             append = 1;
             v = lookup_variable_in_set (varname, strlen (varname),
                                         current_variable_set_list->set);
+
+            /* Don't append from the global set if a previous non-appending
+               target-specific variable definition exists. */
+            if (v && !v->append)
+              append = 0;
           }
         else
           v = lookup_variable (varname, strlen (varname));
@@ -902,7 +1101,7 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
   if ((origin == o_file || origin == o_override)
       && strcmp (varname, "SHELL") == 0)
     {
-      char shellpath[PATH_MAX];
+      PATH_VAR (shellpath);
       extern char * __dosexec_find_on_path (const char *, char *[], char *);
 
       /* See if we can find "/bin/sh.exe", "/bin/sh.com", etc.  */
@@ -969,7 +1168,8 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
   else
 #endif /* __MSDOS__ */
 #ifdef WINDOWS32
-  if ((origin == o_file || origin == o_override) && streq (varname, "SHELL"))
+  if ((origin == o_file || origin == o_override || origin == o_command)
+      && streq (varname, "SHELL"))
     {
       extern char *default_shell;
 
@@ -1005,6 +1205,7 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
                                ? current_variable_set_list->set : NULL),
                               flocp);
   v->append = append;
+  v->conditional = conditional;
 
   if (alloc_value)
     free (alloc_value);
@@ -1026,19 +1227,14 @@ do_variable_definition (flocp, varname, value, origin, flavor, target_var)
    returned.  */
 
 struct variable *
-try_variable_definition (flocp, line, origin, target_var)
-     const struct floc *flocp;
-     char *line;
-     enum variable_origin origin;
-     int target_var;
+parse_variable_definition (struct variable *v, char *line)
 {
   register int c;
   register char *p = line;
   register char *beg;
   register char *end;
   enum variable_flavor flavor = f_bogus;
-  char *name, *expanded_name;
-  struct variable *v;
+  char *name;
 
   while (1)
     {
@@ -1102,36 +1298,69 @@ try_variable_definition (flocp, line, origin, target_var)
 	    }
 	}
     }
+  v->flavor = flavor;
 
   beg = next_token (line);
   while (end > beg && isblank ((unsigned char)end[-1]))
     --end;
   p = next_token (p);
+  v->value = p;
 
   /* Expand the name, so "$(foo)bar = baz" works.  */
   name = (char *) alloca (end - beg + 1);
   bcopy (beg, name, end - beg);
   name[end - beg] = '\0';
-  expanded_name = allocated_variable_expand (name);
+  v->name = allocated_variable_expand (name);
 
-  if (expanded_name[0] == '\0')
-    fatal (flocp, _("empty variable name"));
-
-  v = do_variable_definition (flocp, expanded_name, p,
-                              origin, flavor, target_var);
-
-  free (expanded_name);
+  if (v->name[0] == '\0')
+    fatal (&v->fileinfo, _("empty variable name"));
 
   return v;
+}
+
+/* Try to interpret LINE (a null-terminated string) as a variable definition.
+
+   ORIGIN may be o_file, o_override, o_env, o_env_override,
+   or o_command specifying that the variable definition comes
+   from a makefile, an override directive, the environment with
+   or without the -e switch, or the command line.
+
+   See the comments for parse_variable_definition().
+
+   If LINE was recognized as a variable definition, a pointer to its `struct
+   variable' is returned.  If LINE is not a variable definition, NULL is
+   returned.  */
+
+struct variable *
+try_variable_definition (const struct floc *flocp, char *line,
+                         enum variable_origin origin, int target_var)
+{
+  struct variable v;
+  struct variable *vp;
+
+  if (flocp != 0)
+    v.fileinfo = *flocp;
+  else
+    v.fileinfo.filenm = 0;
+
+  if (!parse_variable_definition (&v, line))
+    return 0;
+
+  vp = do_variable_definition (flocp, v.name, v.value,
+                               origin, v.flavor, target_var);
+
+  free (v.name);
+
+  return vp;
 }
 
 /* Print information for variable V, prefixing it with PREFIX.  */
 
 static void
-print_variable (v, prefix)
-     register struct variable *v;
-     char *prefix;
+print_variable (const void *item, void *arg)
 {
+  const struct variable *v = (struct variable *) item;
+  const char *prefix = (char *) arg;
   const char *origin;
 
   switch (v->origin)
@@ -1202,9 +1431,7 @@ print_variable (v, prefix)
    the actual variable definitions (everything else is comments).  */
 
 void
-print_variable_set (set, prefix)
-     register struct variable_set *set;
-     char *prefix;
+print_variable_set (struct variable_set *set, char *prefix)
 {
   hash_map_arg (&set->table, print_variable, prefix);
 
@@ -1217,19 +1444,37 @@ print_variable_set (set, prefix)
 /* Print the data base of variables.  */
 
 void
-print_variable_data_base ()
+print_variable_data_base (void)
 {
   puts (_("\n# Variables\n"));
 
   print_variable_set (&global_variable_set, "");
+
+  puts (_("\n# Pattern-specific Variable Values"));
+
+  {
+    struct pattern_var *p;
+    int rules = 0;
+
+    for (p = pattern_vars; p != 0; p = p->next)
+      {
+        ++rules;
+        printf ("\n%s :\n", p->target);
+        print_variable (&p->variable, "# ");
+      }
+
+    if (rules == 0)
+      puts (_("\n# No pattern-specific variable values."));
+    else
+      printf (_("\n# %u pattern-specific variable values"), rules);
+  }
 }
 
 
 /* Print all the local variables of FILE.  */
 
 void
-print_file_variables (file)
-     struct file *file;
+print_file_variables (struct file *file)
 {
   if (file->variables != 0)
     print_variable_set (file->variables->set, "# ");
@@ -1237,27 +1482,27 @@ print_file_variables (file)
 
 #ifdef WINDOWS32
 void
-sync_Path_environment(void)
+sync_Path_environment (void)
 {
-    char* path = allocated_variable_expand("$(Path)");
-    static char* environ_path = NULL;
+  char *path = allocated_variable_expand ("$(PATH)");
+  static char *environ_path = NULL;
 
-    if (!path)
-        return;
+  if (!path)
+    return;
 
-    /*
-     * If done this before, don't leak memory unnecessarily.
-     * Free the previous entry before allocating new one.
-     */
-    if (environ_path)
-        free(environ_path);
+  /*
+   * If done this before, don't leak memory unnecessarily.
+   * Free the previous entry before allocating new one.
+   */
+  if (environ_path)
+    free (environ_path);
 
-    /*
-     * Create something WINDOWS32 world can grok
-     */
-    convert_Path_to_windows32(path, ';');
-    environ_path = concat("Path", "=", path);
-    putenv(environ_path);
-    free(path);
+  /*
+   * Create something WINDOWS32 world can grok
+   */
+  convert_Path_to_windows32 (path, ';');
+  environ_path = concat ("PATH", "=", path);
+  putenv (environ_path);
+  free (path);
 }
 #endif

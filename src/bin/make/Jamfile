@@ -33,6 +33,7 @@ BinCommand make :
 	remote-stub.c
 	rule.c
 	signame.c
+	strcache.c
 	variable.c
 	version.c
 	vpath.c

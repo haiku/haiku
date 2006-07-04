@@ -1,21 +1,20 @@
 /* Command processing for GNU Make.
-Copyright (C) 1988,89,91,92,93,94,95,96,97 Free Software Foundation, Inc.
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software
+Foundation, Inc.
 This file is part of GNU Make.
 
-GNU Make is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.
 
-GNU Make is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GNU Make; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+You should have received a copy of the GNU General Public License along with
+GNU Make; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
 #include "dep.h"
@@ -23,6 +22,10 @@ Boston, MA 02111-1307, USA.  */
 #include "variable.h"
 #include "job.h"
 #include "commands.h"
+#ifdef WINDOWS32
+#include <windows.h>
+#include "w32err.h"
+#endif
 
 #if VMS
 # define FILE_LIST_SEPARATOR ','
@@ -38,10 +41,10 @@ extern int getpid ();
 
 /* Set FILE's automatic variables up.  */
 
-static void
-set_file_variables (file)
-     register struct file *file;
+void
+set_file_variables (struct file *file)
 {
+  struct dep *d;
   char *at, *percent, *star, *less;
 
 #ifndef	NO_ARCHIVES
@@ -106,8 +109,14 @@ set_file_variables (file)
     }
   star = file->stem;
 
-  /* $< is the first dependency.  */
-  less = file->deps != 0 ? dep_name (file->deps) : "";
+  /* $< is the first not order-only dependency.  */
+  less = "";
+  for (d = file->deps; d != 0; d = d->next)
+    if (!d->ignore_mtime)
+      {
+        less = dep_name (d);
+        break;
+      }
 
   if (file->cmds == default_file->cmds)
     /* This file got its commands from .DEFAULT.
@@ -127,14 +136,14 @@ set_file_variables (file)
   /* Compute the values for $^, $+, $?, and $|.  */
 
   {
+    static char *plus_value=0, *bar_value=0, *qmark_value=0;
+    static unsigned int qmark_max=0, plus_max=0, bar_max=0;
+
     unsigned int qmark_len, plus_len, bar_len;
-    char *caret_value, *plus_value;
     char *cp;
-    char *qmark_value;
-    char *bar_value;
+    char *caret_value;
     char *qp;
     char *bp;
-    struct dep *d;
     unsigned int len;
 
     /* Compute first the value for $+, which is supposed to contain
@@ -147,7 +156,9 @@ set_file_variables (file)
     if (plus_len == 0)
       plus_len++;
 
-    cp = plus_value = (char *) alloca (plus_len);
+    if (plus_len > plus_max)
+      plus_value = xrealloc (plus_value, plus_max = plus_len);
+    cp = plus_value;
 
     qmark_len = plus_len + 1;	/* Will be this or less.  */
     for (d = file->deps; d != 0; d = d->next)
@@ -193,8 +204,14 @@ set_file_variables (file)
     /* Compute the values for $^, $?, and $|.  */
 
     cp = caret_value = plus_value; /* Reuse the buffer; it's big enough.  */
-    qp = qmark_value = (char *) alloca (qmark_len);
-    bp = bar_value = (char *) alloca (bar_len);
+
+    if (qmark_len > qmark_max)
+      qmark_value = xrealloc (qmark_value, qmark_max = qmark_len);
+    qp = qmark_value;
+
+    if (bar_len > bar_max)
+      bar_value = xrealloc (bar_value, bar_max = bar_len);
+    bp = bar_value;
 
     for (d = file->deps; d != 0; d = d->next)
       {
@@ -249,8 +266,7 @@ set_file_variables (file)
    Also set the `lines_flags' and `any_recurse' members.  */
 
 void
-chop_commands (cmds)
-     register struct commands *cmds;
+chop_commands (struct commands *cmds)
 {
   register char *p;
   unsigned int nlines, idx;
@@ -333,13 +349,11 @@ chop_commands (cmds)
             flags |= COMMANDS_NOERROR;
             break;
           }
-      if (!(flags & COMMANDS_RECURSE))
-        {
-          unsigned int len = strlen (p);
-          if (sindex (p, len, "$(MAKE)", 7) != 0
-              || sindex (p, len, "${MAKE}", 7) != 0)
-            flags |= COMMANDS_RECURSE;
-        }
+
+      /* If no explicit '+' was given, look for MAKE variable references.  */
+      if (!(flags & COMMANDS_RECURSE)
+          && (strstr (p, "$(MAKE)") != 0 || strstr (p, "${MAKE}") != 0))
+        flags |= COMMANDS_RECURSE;
 
       cmds->lines_flags[idx] = flags;
       cmds->any_recurse |= flags & COMMANDS_RECURSE;
@@ -351,8 +365,7 @@ chop_commands (cmds)
    fork off a child process to run the first command line in the sequence.  */
 
 void
-execute_file_commands (file)
-     struct file *file;
+execute_file_commands (struct file *file)
 {
   register char *p;
 
@@ -389,8 +402,7 @@ int handling_fatal_signal = 0;
 /* Handle fatal signals.  */
 
 RETSIGTYPE
-fatal_error_signal (sig)
-     int sig;
+fatal_error_signal (int sig)
 {
 #ifdef __MSDOS__
   extern int dos_status, dos_command_running;
@@ -411,6 +423,27 @@ fatal_error_signal (sig)
 
   exit (10);
 #else /* not Amiga */
+#ifdef WINDOWS32
+  extern HANDLE main_thread;
+
+  /* Windows creates a sperate thread for handling Ctrl+C, so we need
+     to suspend the main thread, or else we will have race conditions
+     when both threads call reap_children.  */
+  if (main_thread)
+    {
+      DWORD susp_count = SuspendThread (main_thread);
+
+      if (susp_count != 0)
+	fprintf (stderr, "SuspendThread: suspend count = %ld\n", susp_count);
+      else if (susp_count == (DWORD)-1)
+	{
+	  DWORD ierr = GetLastError ();
+
+	  fprintf (stderr, "SuspendThread: error %ld: %s\n",
+		   ierr, map_windows32_error_to_string (ierr));
+	}
+    }
+#endif
   handling_fatal_signal = 1;
 
   /* Set the handling for this signal to the default.
@@ -472,10 +505,18 @@ fatal_error_signal (sig)
     exit (EXIT_FAILURE);
 #endif
 
+#ifdef WINDOWS32
+  if (main_thread)
+    CloseHandle (main_thread);
+  /* Cannot call W32_kill with a pid (it needs a handle).  The exit
+     status of 130 emulates what happens in Bash.  */
+  exit (130);
+#else
   /* Signal the same code; this time it will really be fatal.  The signal
      will be unblocked when we return and arrive then to kill us.  */
   if (kill (getpid (), sig) < 0)
     pfatal_with_name ("kill");
+#endif /* not WINDOWS32 */
 #endif /* not Amiga */
 #endif /* not __MSDOS__  */
 }
@@ -484,11 +525,10 @@ fatal_error_signal (sig)
    and it has changed on disk since we last stat'd it.  */
 
 static void
-delete_target (file, on_behalf_of)
-     struct file *file;
-     char *on_behalf_of;
+delete_target (struct file *file, char *on_behalf_of)
 {
   struct stat st;
+  int e;
 
   if (file->precious || file->phony)
     return;
@@ -512,7 +552,8 @@ delete_target (file, on_behalf_of)
     }
 #endif
 
-  if (stat (file->name, &st) == 0
+  EINTRLOOP (e, stat (file->name, &st));
+  if (e == 0
       && S_ISREG (st.st_mode)
       && FILE_TIMESTAMP_STAT_MODTIME (file->name, st) != file->last_mtime)
     {
@@ -531,8 +572,7 @@ delete_target (file, on_behalf_of)
    Set the flag in CHILD to say they've been deleted.  */
 
 void
-delete_child_targets (child)
-     struct child *child;
+delete_child_targets (struct child *child)
 {
   struct dep *d;
 
@@ -552,8 +592,7 @@ delete_child_targets (child)
 /* Print out the commands in CMDS.  */
 
 void
-print_commands (cmds)
-     register struct commands *cmds;
+print_commands (struct commands *cmds)
 {
   register char *s;
 

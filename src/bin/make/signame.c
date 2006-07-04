@@ -1,33 +1,31 @@
 /* Convert between signal names and numbers.
-Copyright (C) 1990,92,93,95,96,99, 2002 Free Software Foundation, Inc.
-This file was part of the GNU C Library, but is now part of GNU make.
+Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+This file is part of GNU Make.
 
-GNU Make is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.
 
-GNU Make is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GNU Make; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+You should have received a copy of the GNU General Public License along with
+GNU Make; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
 
 /* If the system provides strsignal, we don't need it. */
 
-#if !defined(HAVE_STRSIGNAL)
+#if !HAVE_STRSIGNAL
 
 /* If the system provides sys_siglist, we'll use that.
    Otherwise create our own.
  */
 
-#if !defined(SYS_SIGLIST_DECLARED)
+#if !HAVE_DECL_SYS_SIGLIST
 
 /* Some systems do not define NSIG in <signal.h>.  */
 #ifndef	NSIG
@@ -63,10 +61,7 @@ static int sig_table_nelts = 0;
 /* Enter signal number NUMBER into the tables with ABBREV and NAME.  */
 
 static void
-init_sig (number, abbrev, name)
-     int number;
-     const char *abbrev;
-     const char *name;
+init_sig (int number, const char *abbrev, const char *name)
 {
   /* If this value is ever greater than NSIG it seems like it'd be a bug in
      the system headers, but... better safe than sorry.  We know, for
@@ -83,7 +78,7 @@ init_sig (number, abbrev, name)
 }
 
 static int
-signame_init ()
+signame_init (void)
 {
   int i;
 
@@ -229,20 +224,25 @@ signame_init ()
   return 1;
 }
 
-#endif  /* SYS_SIGLIST_DECLARED */
+#endif  /* HAVE_DECL_SYS_SIGLIST */
 
 
 char *
-strsignal (signal)
-     int signal;
+strsignal (int signal)
 {
   static char buf[] = "Signal 12345678901234567890";
 
-#if !defined(SYS_SIGLIST_DECLARED)
+#if ! HAVE_DECL_SYS_SIGLIST
+# if HAVE_DECL__SYS_SIGLIST
+#  define sys_siglist _sys_siglist
+# elif HAVE_DECL___SYS_SIGLIST
+#  define sys_siglist __sys_siglist
+# else
   static char sig_initted = 0;
 
   if (!sig_initted)
     sig_initted = signame_init ();
+# endif
 #endif
 
   if (signal > 0 || signal < NSIG)

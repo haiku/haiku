@@ -1,20 +1,20 @@
 /* Library function for scanning an archive file.
-Copyright (C) 1987,89,91,92,93,94,95,97 Free Software Foundation, Inc.
+Copyright (C) 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation,
+Inc.
+This file is part of GNU Make.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GNU Make is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Make is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
-USA.  */
+You should have received a copy of the GNU General Public License along with
+GNU Make; see the file COPYING.  If not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.  */
 
 #include "make.h"
 
@@ -46,9 +46,7 @@ static time_t VMS_member_date;
 static long int (*VMS_function) ();
 
 static int
-VMS_get_member_info (module, rfa)
-     struct dsc$descriptor_s *module;
-     unsigned long *rfa;
+VMS_get_member_info (struct dsc$descriptor_s *module, unsigned long *rfa)
 {
   int status, i;
   long int fnval;
@@ -136,10 +134,7 @@ VMS_get_member_info (module, rfa)
    Returns 0 if have scanned successfully.  */
 
 long int
-ar_scan (archive, function, arg)
-     char *archive;
-     long int (*function) ();
-     long int arg;
+ar_scan (char *archive, long int (*function) PARAMS ((void)), long int arg)
 {
   char *p;
 
@@ -306,10 +301,7 @@ struct ar_hdr
    Returns 0 if have scanned successfully.  */
 
 long int
-ar_scan (archive, function, arg)
-     char *archive;
-     long int (*function) ();
-     long int arg;
+ar_scan (char *archive, long int (*function)(), long int arg)
 {
 #ifdef AIAMAG
   FL_HDR fl_header;
@@ -714,9 +706,7 @@ ar_scan (archive, function, arg)
    sizeof (struct ar_hdr.ar_name) - 1.  */
 
 int
-ar_name_equal (name, mem, truncated)
-     char *name, *mem;
-     int truncated;
+ar_name_equal (char *name, char *mem, int truncated)
 {
   char *p;
 
@@ -747,14 +737,10 @@ ar_name_equal (name, mem, truncated)
 #ifndef VMS
 /* ARGSUSED */
 static long int
-ar_member_pos (desc, mem, truncated,
-	       hdrpos, datapos, size, date, uid, gid, mode, name)
-     int desc;
-     char *mem;
-     int truncated;
-     long int hdrpos, datapos, size, date;
-     int uid, gid, mode;
-     char *name;
+ar_member_pos (int desc UNUSED, char *mem, int truncated,
+	       long int hdrpos, long int datapos UNUSED, long int size UNUSED,
+               long int date UNUSED, int uid UNUSED, int gid UNUSED,
+               int mode UNUSED, char *name)
 {
   if (!ar_name_equal (name, mem, truncated))
     return 0;
@@ -769,13 +755,13 @@ ar_member_pos (desc, mem, truncated,
    1 if valid but member MEMNAME does not exist.  */
 
 int
-ar_member_touch (arname, memname)
-     char *arname, *memname;
+ar_member_touch (char *arname, char *memname)
 {
-  register long int pos = ar_scan (arname, ar_member_pos, (long int) memname);
-  register int fd;
+  long int pos = ar_scan (arname, ar_member_pos, (long int) memname);
+  int fd;
   struct ar_hdr ar_hdr;
-  register int i;
+  int i;
+  unsigned int ui;
   struct stat statbuf;
 
   if (pos < 0)
@@ -797,12 +783,13 @@ ar_member_touch (arname, memname)
   if (AR_HDR_SIZE != write (fd, (char *) &ar_hdr, AR_HDR_SIZE))
     goto lose;
   /* The file's mtime is the time we we want.  */
-  if (fstat (fd, &statbuf) < 0)
+  EINTRLOOP (i, fstat (fd, &statbuf));
+  if (i < 0)
     goto lose;
 #if defined(ARFMAG) || defined(ARFZMAG) || defined(AIAMAG) || defined(WINDOWS32)
   /* Advance member's time to that time */
-  for (i = 0; i < sizeof ar_hdr.ar_date; i++)
-    ar_hdr.ar_date[i] = ' ';
+  for (ui = 0; ui < sizeof ar_hdr.ar_date; ui++)
+    ar_hdr.ar_date[ui] = ' ';
   sprintf (ar_hdr.ar_date, "%ld", (long int) statbuf.st_mtime);
 #ifdef AIAMAG
   ar_hdr.ar_date[strlen(ar_hdr.ar_date)] = ' ';
@@ -829,13 +816,9 @@ ar_member_touch (arname, memname)
 #ifdef TEST
 
 long int
-describe_member (desc, name, truncated,
-		 hdrpos, datapos, size, date, uid, gid, mode)
-     int desc;
-     char *name;
-     int truncated;
-     long int hdrpos, datapos, size, date;
-     int uid, gid, mode;
+describe_member (int desc, char *name, int truncated,
+		 long int hdrpos, long int datapos, long int size,
+                 long int date, int uid, int gid, int mode)
 {
   extern char *ctime ();
 
@@ -848,14 +831,12 @@ describe_member (desc, name, truncated,
   return 0;
 }
 
-main (argc, argv)
-     int argc;
-     char **argv;
+int
+main (int argc, char **argv)
 {
   ar_scan (argv[1], describe_member);
   return 0;
 }
 
 #endif	/* TEST.  */
-
 #endif	/* NO_ARCHIVES.  */
