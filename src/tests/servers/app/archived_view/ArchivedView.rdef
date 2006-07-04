@@ -1,0 +1,5 @@
+
+resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";
+
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x.vnd-Haiku.ArchivedView";
+
