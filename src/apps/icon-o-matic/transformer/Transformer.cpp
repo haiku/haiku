@@ -51,3 +51,12 @@ Transformer::SetSource(VertexSource& source)
 {
 	fSource = source;
 }
+
+// #pragma mark -
+
+// SelectedChanged
+void
+Transformer::SelectedChanged()
+{
+}
+

@@ -80,7 +80,7 @@ SimpleItem::DrawBackground(BView *owner, BRect frame, uint32 flags)
 		color = tint_color(color, 1.06);
 	// background
 	if (IsSelected())
-		color = tint_color(color, B_DARKEN_2_TINT);
+		color = tint_color(color, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
 	owner->SetLowColor(color);
 	owner->FillRect(frame, B_SOLID_LOW);
 }
@@ -894,10 +894,23 @@ void
 SimpleListView::MakeDragMessage(BMessage* message) const
 {
 	if (message) {
-		message->AddPointer("list", (void*)dynamic_cast<const DragSortableListView*>(this));
+		message->AddPointer("list",
+			(void*)dynamic_cast<const DragSortableListView*>(this));
 		int32 index;
 		for (int32 i = 0; (index = CurrentSelection(i)) >= 0; i++)
 			message->AddInt32("index", index);
 	}
+}
+
+// _MakeEmpty
+void
+SimpleListView::_MakeEmpty()
+{
+	// NOTE: BListView::MakeEmpty() uses ScrollTo()
+	// for which the object needs to be attached to
+	// a BWindow.... :-(
+	int32 count = CountItems();
+	for (int32 i = count - 1; i >= 0; i--)
+		delete RemoveItem(i);
 }
 

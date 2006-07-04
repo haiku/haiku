@@ -14,6 +14,17 @@
 
 class Style;
 
+// TODO: merge Observer and ShapeListener interface
+class ShapeListener {
+ public:
+								ShapeListener();
+	virtual						~ShapeListener();
+
+	virtual	void				TransformerAdded(Transformer* t,
+												 int32 index) = 0;
+	virtual	void				TransformerRemoved(Transformer* t) = 0;
+};
+
 class Shape : public Observable,
 			  public Observer,	// observing all the paths
 			  public Referenceable,
@@ -44,23 +55,43 @@ class Shape : public Observable,
 	inline	::Style*			Style() const
 									{ return fStyle; }
 
+			void				SetName(const char* name);
+			const char*			Name() const;
+
 	inline	BRect				LastBounds() const
 									{ return fLastBounds; }
 			BRect				Bounds(bool updateLast = false) const;
 
 			::VertexSource&		VertexSource();
-			bool				AppendTransformer(
-									Transformer* transformer);
 
-			void				SetName(const char* name);
-			const char*			Name() const;
+			bool				AddTransformer(Transformer* transformer);
+			bool				AddTransformer(Transformer* transformer,
+											   int32 index);
+			bool				RemoveTransformer(Transformer* transformer);
+
+			int32				CountTransformers() const;
+
+			bool				HasTransformer(Transformer* transformer) const;
+			int32				IndexOf(Transformer* transformer) const;
+
+			Transformer*		TransformerAt(int32 index) const;
+			Transformer*		TransformerAtFast(int32 index) const;
+
+			bool				AddListener(ShapeListener* listener);
+			bool				RemoveListener(ShapeListener* listener);
 
  private:
+			void				_NotifyTransformerAdded(Transformer* t,
+														int32 index) const;
+			void				_NotifyTransformerRemoved(Transformer* t) const;
+
 			PathContainer*		fPaths;
 			::Style*			fStyle;
 
 			PathSource			fPathSource;
 			BList				fTransformers;
+
+			BList				fListeners;
 
 	mutable	BRect				fLastBounds;
 

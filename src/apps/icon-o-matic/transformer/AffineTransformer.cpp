@@ -42,3 +42,11 @@ AffineTransformer::SetSource(VertexSource& source)
 	Affine::attach(source);
 }
 
+// Name
+const char*
+AffineTransformer::Name() const
+{
+	return "Transformation";
+}
+
+

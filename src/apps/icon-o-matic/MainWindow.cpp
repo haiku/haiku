@@ -24,6 +24,8 @@
 #include "PathListView.h"
 #include "ShapeListView.h"
 #include "SwatchGroup.h"
+#include "TransformerFactory.h"
+#include "TransformerListView.h"
 
 // TODO: just for testing
 #include "AffineTransformer.h"
@@ -46,11 +48,13 @@ enum {
 	MSG_NEW_PATH					= 'nwvp',
 	MSG_PATH_SELECTED				= 'vpsl',
 	MSG_SHAPE_SELECTED				= 'spsl',
+
+	MSG_ADD_TRANSFORMER				= 'adtr',
 };
 
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
-	: BWindow(BRect(50, 50, 661, 661), "Icon-O-Matic",
+	: BWindow(BRect(50, 50, 781, 781), "Icon-O-Matic",
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
@@ -106,8 +110,27 @@ case MSG_SHAPE_SELECTED: {
 	if (message->FindPointer("shape", (void**)&shape) < B_OK)
 		shape = NULL;
 	fPathListView->SetCurrentShape(shape);
+	fTransformerListView->SetShape(shape);
 	break;
 }
+
+		case MSG_ADD_TRANSFORMER: {
+			Shape* shape = fPathListView->CurrentShape();
+			if (!shape)
+				break;
+
+			uint32 type;
+			if (message->FindInt32("type", (int32*)&type) < B_OK)
+				break;
+
+			Transformer* transformer
+				= TransformerFactory::TransformerFor(type,
+													 shape->VertexSource());
+			// TODO: command
+			if (transformer)
+				shape->AddTransformer(transformer);
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -222,7 +245,7 @@ MainWindow::_Init()
 	StrokeTransformer* transformer
 		= new StrokeTransformer(shape->VertexSource());
 	transformer->width(5.0);
-	shape->AppendTransformer(transformer);
+	shape->AddTransformer(transformer);
 
 	shape->SetName("Outline");
 	fDocument->Icon()->Shapes()->AddShape(shape);
@@ -239,7 +262,7 @@ MainWindow::_Init()
 	*transformer2 *= agg::trans_affine_translation(10.0, 6.0);
 	*transformer2 *= agg::trans_affine_rotation(0.2);
 	*transformer2 *= agg::trans_affine_scaling(0.8, 0.6);
-	shape->AppendTransformer(transformer2);
+	shape->AddTransformer(transformer2);
 
 	shape->SetName("Transformed");
 	fDocument->Icon()->Shapes()->AddShape(shape);
@@ -291,6 +314,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	bounds.bottom = bounds.top + 63;
 	fIconPreview64 = new IconView(bounds, "icon preview 64");
 
+	// path list view
 	bounds.OffsetBy(bounds.Width() + 6, 0);
 	bounds.right = bounds.left + 100;
 	bounds.bottom = fCanvasView->Frame().top - 5.0;
@@ -298,9 +322,15 @@ MainWindow::_CreateGUI(BRect bounds)
 	fPathListView = new PathListView(bounds, "path list view",
 									 new BMessage(MSG_PATH_SELECTED), this);
 
+	// shape list view
 	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
 	fShapeListView = new ShapeListView(bounds, "shape list view",
 									   new BMessage(MSG_SHAPE_SELECTED), this);
+
+	// transformer list view
+	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	fTransformerListView = new TransformerListView(bounds,
+												   "transformer list view");
 
 	bg->AddChild(fSwatchGroup);
 
@@ -317,6 +347,11 @@ MainWindow::_CreateGUI(BRect bounds)
 	bg->AddChild(new BScrollView("shape list scroll view",
 								 fShapeListView,
 								 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								 0, false, true,
+								 B_NO_BORDER));
+	bg->AddChild(new BScrollView("transformer list scroll view",
+								 fTransformerListView,
+								 B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 								 0, false, true,
 								 B_NO_BORDER));
 
@@ -336,12 +371,14 @@ MainWindow::_CreateMenuBar(BRect frame)
 	BMenu* pathMenu = new BMenu("Path");
 	BMenu* styleMenu = new BMenu("Style");
 	BMenu* shapeMenu = new BMenu("Shape");
+	BMenu* transformerMenu = new BMenu("Transformer");
 
 	menuBar->AddItem(fileMenu);
 	menuBar->AddItem(editMenu);
 	menuBar->AddItem(pathMenu);
 	menuBar->AddItem(styleMenu);
 	menuBar->AddItem(shapeMenu);
+	menuBar->AddItem(transformerMenu);
 
 	// Edit
 	fUndoMI = new BMenuItem("<nothing to undo>",
@@ -357,6 +394,20 @@ MainWindow::_CreateMenuBar(BRect frame)
 
 	// Path
 	pathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
+
+
+	// Transformer
+	int32 cookie = 0;
+	uint32 type;
+	BString name;
+	while (TransformerFactory::NextType(&cookie, &type, &name)) {
+		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
+		message->AddInt32("type", type);
+		BString label("Add ");
+		label << name;
+		transformerMenu->AddItem(new BMenuItem(label.String(), message));
+	}
+	transformerMenu->SetTargetForItems(this);
 
 	return menuBar;
 }

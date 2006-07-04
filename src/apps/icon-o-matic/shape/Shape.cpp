@@ -12,6 +12,18 @@
 using std::nothrow;
 
 // constructor
+ShapeListener::ShapeListener()
+{
+}
+
+// destructor
+ShapeListener::~ShapeListener()
+{
+}
+
+// #pragma mark -
+
+// constructor
 Shape::Shape(::Style* style)
 	: Observable(),
 	  Referenceable(),
@@ -148,6 +160,28 @@ Shape::SetStyle(::Style* style)
 	Notify();
 }
 
+// #pragma mark -
+
+// SetName
+void
+Shape::SetName(const char* name)
+{
+	if (fName == name)
+		return;
+
+	fName = name;
+	Notify();
+}
+
+// Name
+const char*
+Shape::Name() const
+{
+	return fName.String();
+}
+
+// #pragma mark -
+
 // Bounds
 BRect
 Shape::Bounds(bool updateLast) const
@@ -191,37 +225,122 @@ Shape::VertexSource()
 	return *source;
 }
 
-// AppendTransformer
+// AddTransformer
 bool
-Shape::AppendTransformer(Transformer* transformer)
+Shape::AddTransformer(Transformer* transformer)
+{
+	return AddTransformer(transformer, CountTransformers());
+}
+
+// AddTransformer
+bool
+Shape::AddTransformer(Transformer* transformer, int32 index)
 {
 	if (!transformer)
 		return false;
 
-	if (!fTransformers.AddItem((void*)transformer))
+	if (!fTransformers.AddItem((void*)transformer, index))
 		return false;
 
-	Notify();
+	_NotifyTransformerAdded(transformer, index);
 	return true;
+}
+
+// RemoveTransformer
+bool
+Shape::RemoveTransformer(Transformer* transformer)
+{
+	if (fTransformers.RemoveItem((void*)transformer)) {
+		_NotifyTransformerRemoved(transformer);
+		return true;
+	}
+
+	return false;
 }
 
 // #pragma mark -
 
-// SetName
-void
-Shape::SetName(const char* name)
+// CountShapes
+int32
+Shape::CountTransformers() const
 {
-	if (fName == name)
-		return;
+	return fTransformers.CountItems();
+}
 
-	fName = name;
+// HasTransformer
+bool
+Shape::HasTransformer(Transformer* transformer) const
+{
+	return fTransformers.HasItem((void*)transformer);
+}
+
+// IndexOf
+int32
+Shape::IndexOf(Transformer* transformer) const
+{
+	return fTransformers.IndexOf((void*)transformer);
+}
+
+// TransformerAt
+Transformer*
+Shape::TransformerAt(int32 index) const
+{
+	return (Transformer*)fTransformers.ItemAt(index);
+}
+
+// TransformerAtFast
+Transformer*
+Shape::TransformerAtFast(int32 index) const
+{
+	return (Transformer*)fTransformers.ItemAtFast(index);
+}
+
+// #pragma mark -
+
+// AddListener
+bool
+Shape::AddListener(ShapeListener* listener)
+{
+	if (listener && !fListeners.HasItem((void*)listener))
+		return fListeners.AddItem((void*)listener);
+	return false;
+}
+
+// RemoveListener
+bool
+Shape::RemoveListener(ShapeListener* listener)
+{
+	return fListeners.RemoveItem((void*)listener);
+}
+
+// #pragma mark -
+
+// _NotifyTransformerAdded
+void
+Shape::_NotifyTransformerAdded(Transformer* transformer, int32 index) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ShapeListener* listener
+			= (ShapeListener*)listeners.ItemAtFast(i);
+		listener->TransformerAdded(transformer, index);
+	}
+	// TODO: merge Observable and ShapeListener interface
 	Notify();
 }
 
-// Name
-const char*
-Shape::Name() const
+// _NotifyTransformerRemoved
+void
+Shape::_NotifyTransformerRemoved(Transformer* transformer) const
 {
-	return fName.String();
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ShapeListener* listener
+			= (ShapeListener*)listeners.ItemAtFast(i);
+		listener->TransformerRemoved(transformer);
+	}
+	// TODO: merge Observable and ShapeListener interface
+	Notify();
 }
-

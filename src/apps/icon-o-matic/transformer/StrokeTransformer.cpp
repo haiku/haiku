@@ -42,3 +42,11 @@ StrokeTransformer::SetSource(VertexSource& source)
 	Stroke::attach(source);
 }
 
+// Name
+const char*
+StrokeTransformer::Name() const
+{
+	return "Stroke";
+}
+
+

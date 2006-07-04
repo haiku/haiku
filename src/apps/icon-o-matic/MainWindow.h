@@ -22,6 +22,8 @@ class IconView;
 class PathListView;
 class ShapeListView;
 class SwatchGroup;
+class TransformerListView;
+
 class MultipleManipulatorState;
 
 class MainWindow : public BWindow,
@@ -59,6 +61,8 @@ class MainWindow : public BWindow,
 
 	PathListView*				fPathListView;
 	ShapeListView*				fShapeListView;
+	TransformerListView*		fTransformerListView;
+
 	// TODO: for testing only...
 	MultipleManipulatorState*	fState;
 };

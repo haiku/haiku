@@ -29,7 +29,7 @@
   - Cloning
 
 * add more powerful listener interface to Shape
-  (TransformerAdded()/Removed()...)
+  (TransformerAdded()/Removed()...) [done]
 
 * implement commands for the newly added editing features
 
@@ -43,7 +43,7 @@
 * list of paths used by shape, but it could also be done such that
   used paths are marked in the global list when a shape is selected [done]
 
-* list of transformers attached to the selected shape
+* list of transformers attached to the selected shape [done]
 
 * area for styles, style is either solid color or gradient
 
@@ -65,3 +65,4 @@
 
 * compound shape single pass rendering [done]
 * auto hinting (aligning to pixels) of marked shapes
+* level of detail support to hide/show shapes

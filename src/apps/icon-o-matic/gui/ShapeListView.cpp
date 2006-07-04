@@ -371,15 +371,3 @@ ShapeListView::_ItemForShape(Shape* shape) const
 	return NULL;
 }
 
-// _MakeEmpty
-void
-ShapeListView::_MakeEmpty()
-{
-	// NOTE: BListView::MakeEmpty() uses ScrollTo()
-	// for which the object needs to be attached to
-	// a BWindow.... :-(
-	int32 count = CountItems();
-	for (int32 i = count - 1; i >= 0; i--)
-		delete RemoveItem(i);
-}
-

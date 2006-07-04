@@ -29,6 +29,8 @@ class PerspectiveTransformer : public Transformer,
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
+
+	virtual	const char*			Name() const;
 };
 
 #endif // PERSPECTIVE_TRANSFORMER_H

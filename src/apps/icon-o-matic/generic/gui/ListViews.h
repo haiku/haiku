@@ -184,6 +184,9 @@ class SimpleListView :
 										 BRect itemFrame) const;
 	virtual	void			MakeDragMessage(BMessage* message) const;
 
+ protected:
+			void			_MakeEmpty();
+
  private:
 
 	BMessage*				fSelectionChangeMessage;

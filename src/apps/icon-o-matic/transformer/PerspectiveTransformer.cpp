@@ -42,3 +42,11 @@ PerspectiveTransformer::SetSource(VertexSource& source)
 	Perspective::attach(source);
 }
 
+// Name
+const char*
+PerspectiveTransformer::Name() const
+{
+	return "Perspective";
+}
+
+

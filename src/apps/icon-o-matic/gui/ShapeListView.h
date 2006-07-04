@@ -57,7 +57,6 @@ class ShapeListView : public SimpleListView,
 			bool				_RemoveShape(Shape* shape);
 
 			ShapeListItem*		_ItemForShape(Shape* shape) const;
-			void				_MakeEmpty();
 
 			BMessage*			fMessage;
 

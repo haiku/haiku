@@ -65,7 +65,6 @@ class PathListView : public SimpleListView,
 			bool				_RemovePath(VectorPath* path);
 
 			PathListItem*		_ItemForPath(VectorPath* path) const;
-			void				_MakeEmpty();
 
 	friend class ShapePathListener;
 			void				_UpdateMarks();

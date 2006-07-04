@@ -515,18 +515,6 @@ PathListView::_ItemForPath(VectorPath* path) const
 	return NULL;
 }
 
-// _MakeEmpty
-void
-PathListView::_MakeEmpty()
-{
-	// NOTE: BListView::MakeEmpty() uses ScrollTo()
-	// for which the object needs to be attached to
-	// a BWindow.... :-(
-	int32 count = CountItems();
-	for (int32 i = count - 1; i >= 0; i--)
-		delete RemoveItem(i);
-}
-
 // #pragma mark -
 
 // _UpdateMarks

@@ -9,6 +9,8 @@
 #ifndef TRANSFORMER_H
 #define TRANSFORMER_H
 
+#include "Selectable.h"
+
 class VertexSource {
  public:
 								VertexSource();
@@ -19,7 +21,8 @@ class VertexSource {
 };
 
 
-class Transformer : public VertexSource {
+class Transformer : public VertexSource,
+					public Selectable {
  public:
 								Transformer(VertexSource& source);
 	virtual						~Transformer();
@@ -28,6 +31,11 @@ class Transformer : public VertexSource {
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
+
+	virtual	const char*			Name() const = 0;
+
+	// Selectable interface
+	virtual	void				SelectedChanged();
 
  private:
 			VertexSource&		fSource;

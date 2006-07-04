@@ -75,6 +75,7 @@ Application Icon-O-Matic :
 	PathListView.cpp
 	ShapeListView.cpp
 	SwatchGroup.cpp
+	TransformerListView.cpp
 	# gradient
 	Gradient.cpp
 	# shape
@@ -101,6 +102,7 @@ Application Icon-O-Matic :
 	PerspectiveTransformer.cpp
 	StrokeTransformer.cpp
 	Transformer.cpp
+	TransformerFactory.cpp
 	#
 	CanvasView.cpp
 	IconEditorApp.cpp

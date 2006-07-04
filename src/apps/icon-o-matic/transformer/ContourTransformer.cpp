@@ -42,3 +42,10 @@ ContourTransformer::SetSource(VertexSource& source)
 	Contour::attach(source);
 }
 
+// Name
+const char*
+ContourTransformer::Name() const
+{
+	return "Contour";
+}
+
