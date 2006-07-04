@@ -142,13 +142,16 @@ HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_app_server
 
 } # if $(TARGET_PLATFORM) = libbe_test
 
+SubInclude HAIKU_TOP src tests servers app archived_view ;
 SubInclude HAIKU_TOP src tests servers app avoid_focus ;
+SubInclude HAIKU_TOP src tests servers app bitmap_bounds ;
 SubInclude HAIKU_TOP src tests servers app bitmap_drawing ;
 SubInclude HAIKU_TOP src tests servers app code_to_name ;
 SubInclude HAIKU_TOP src tests servers app copy_bits ;
 SubInclude HAIKU_TOP src tests servers app cursor_test ;
 SubInclude HAIKU_TOP src tests servers app desktop_window ;
 SubInclude HAIKU_TOP src tests servers app event_mask ;
+SubInclude HAIKU_TOP src tests servers app first_show ;
 SubInclude HAIKU_TOP src tests servers app following ;
 SubInclude HAIKU_TOP src tests servers app look_and_feel ;
 SubInclude HAIKU_TOP src tests servers app painter ;

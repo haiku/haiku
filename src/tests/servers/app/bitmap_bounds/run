@@ -1,0 +1,17 @@
+#!/bin/sh
+
+../../../../../generated/tests/libbe_test/x86/apps/run_haiku_registrar || exit
+
+if test -f ../../../../../generated/tests/libbe_test/x86/apps/haiku_app_server; then
+	../../../../../generated/tests/libbe_test/x86/apps/haiku_app_server &
+else
+	echo "You need to \"TARGET_PLATFORM=libbe_test jam install-test-apps\" first."
+fi
+
+sleep 1s
+
+if test -f ../../../../../generated/tests/libbe_test/x86/apps/BitmapBounds; then
+	../../../../../generated/tests/libbe_test/x86/apps/BitmapBounds
+else
+	echo "You need to \"TARGET_PLATFORM=libbe_test jam install-test-apps\" first."
+fi

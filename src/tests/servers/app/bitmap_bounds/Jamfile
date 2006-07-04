@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src tests servers app bitmap_bounds ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest BitmapBounds :
+	main.cpp
+	: be ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : BitmapBounds
+		: tests!apps ;
+}
