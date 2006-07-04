@@ -3026,7 +3026,7 @@ BView::SetViewBitmap(const BBitmap *bitmap, uint32 followFlags, uint32 options)
  	if (bitmap)
 		rect = bitmap->Bounds();
 
- 	rect.OffsetTo(0, 0);
+ 	rect.OffsetTo(B_ORIGIN);
 
 	_SetViewBitmap(bitmap, rect, rect, followFlags, options);
 }
