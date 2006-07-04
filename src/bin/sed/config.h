@@ -201,7 +201,7 @@
 /* #undef HAVE_STRVERSCMP */
 
 /* Define to 1 if you have the <sys/file.h> header file. */
-#define HAVE_SYS_FILE_H 1
+/* #undef HAVE_SYS_FILE_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
@@ -214,6 +214,9 @@
 
 /* Define to 1 if you have the `tsearch' function. */
 /* #undef HAVE_TSEARCH */
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#define HAVE_FCNTL_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
