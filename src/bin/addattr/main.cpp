@@ -40,6 +40,8 @@ const struct {
 	{B_DOUBLE_TYPE, "double"},
 
 	{B_BOOL_TYPE, "bool"},
+
+	{B_RAW_TYPE, "raw"},
 };
 const uint32 kNumSupportedTypes = sizeof(kSupportedTypes) / sizeof(kSupportedTypes[0]);
 
@@ -86,7 +88,7 @@ usage(int returnValue)
 	fprintf(stderr, "usage: %s [-t type] attr value file1 [file2...]\n"
 		"   or: %s [-f value-from-file] [-t type] attr file1 [file2...]\n\n"
 		"\tType is one of:\n"
-		"\t\tstring, mime, int, llong, float, double, bool,\n"
+		"\t\tstring, mime, int, llong, float, double, bool, raw\n"
 		"\t\tor a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n"
 		"\tThe default is \"string\"\n", gProgramName, gProgramName);
 
@@ -107,7 +109,7 @@ invalidAttrType(const char *attrTypeName)
 {
 	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", gProgramName, attrTypeName);
 	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n");
-	fprintf(stderr, "\t\tbool, or a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n");
+	fprintf(stderr, "\t\tbool, raw, or a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n");
 
 	exit(1);
 }
