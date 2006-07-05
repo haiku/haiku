@@ -25,12 +25,12 @@ ShapeListener::~ShapeListener()
 
 // constructor
 Shape::Shape(::Style* style)
-	: Observable(),
-	  Referenceable(),
+	: IconObject(),
+	  Observer(),
 	  PathContainerListener(),
 
 	  fPaths(new (nothrow) PathContainer(false)),
-	  fStyle(style),
+	  fStyle(NULL),
 
 	  fPathSource(fPaths),
 	  fTransformers(4),
@@ -42,18 +42,17 @@ Shape::Shape(::Style* style)
 	if (fPaths)
 		fPaths->AddListener(this);
 
-	if (fStyle)
-		fStyle->Acquire();
+	SetStyle(style);
 }
 
 // constructor
 Shape::Shape(const Shape& other)
-	: Observable(),
-	  Referenceable(),
+	: IconObject(),
+	  Observer(),
 	  PathContainerListener(),
 
 	  fPaths(new (nothrow) PathContainer(false)),
-	  fStyle(other.fStyle),
+	  fStyle(NULL),
 
 	  fPathSource(fPaths),
 	  fTransformers(4),
@@ -76,8 +75,7 @@ Shape::Shape(const Shape& other)
 	}
 	// TODO: clone vertex transformers
 
-	if (fStyle)
-		fStyle->Acquire();
+	SetStyle(other.fStyle);
 }
 
 // destructor
@@ -91,9 +89,22 @@ Shape::~Shape()
 	fPaths->RemoveListener(this);
 	delete fPaths;
 
-	if (fStyle)
-		fStyle->Release();
+	SetStyle(NULL);
 }
+
+// #pragma mark -
+
+// ObjectChanged
+void
+Shape::ObjectChanged(const Observable* object)
+{
+	// simply pass on the event for now
+	// (a path or the style changed,
+	// the shape needs to be re-rendered)
+	Notify();
+}
+
+// #pragma mark -
 
 // PathAdded
 void
@@ -115,26 +126,6 @@ Shape::PathRemoved(VectorPath* path)
 
 // #pragma mark -
 
-// ObjectChanged
-void
-Shape::ObjectChanged(const Observable* object)
-{
-	// simply pass on the event for now
-	Notify();
-}
-
-// #pragma mark -
-
-// SelectedChanged
-void
-Shape::SelectedChanged()
-{
-	// simply pass on the event for now
-	Notify();
-}
-
-// #pragma mark -
-
 // InitCheck
 status_t
 Shape::InitCheck() const
@@ -149,13 +140,17 @@ Shape::SetStyle(::Style* style)
 	if (fStyle == style)
 		return;
 
-	if (fStyle)
+	if (fStyle) {
+		fStyle->RemoveObserver(this);
 		fStyle->Release();
+	}
 
 	fStyle = style;
 
-	if (fStyle)
+	if (fStyle) {
 		fStyle->Acquire();
+		fStyle->AddObserver(this);
+	}
 
 	Notify();
 }

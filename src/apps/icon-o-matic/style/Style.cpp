@@ -12,29 +12,63 @@
 
 // constructor
 Style::Style()
-	: Referenceable(),
+	: IconObject(),
+	  Observer(),
+
 	  fColor(),
-	  fGradient(NULL)
+	  fGradient(NULL),
+	  fColors(NULL)
 {
 }
 
 // destructor
 Style::~Style()
 {
-	delete fGradient;
+	SetGradient(NULL);
 }
+
+// ObjectChanged
+void
+Style::ObjectChanged(const Observable* object)
+{
+	if (object == fGradient && fColors) {
+		fGradient->MakeGradient((uint32*)fColors, 256);
+		Notify();
+	}
+}
+
+// #pragma mark -
 
 // SetColor
 void
 Style::SetColor(const rgb_color& color)
 {
+	if ((uint32&)fColor == (uint32&)color)
+		return;
+
 	fColor = color;
+	Notify();
 }
 
 // SetGradient
 void
 Style::SetGradient(::Gradient* gradient)
 {
-	delete fGradient;
+	if (fGradient) {
+		fGradient->RemoveObserver(this);
+		delete fGradient;
+	}
+
 	fGradient = gradient;
+
+	if (fGradient) {
+		fGradient->AddObserver(this);
+		// generate gradient
+		if (!fColors)
+			fColors = new agg::rgba8[256];
+		fGradient->MakeGradient((uint32*)fColors, 256);
+	} else {
+		delete[] fColors;
+		fColors = NULL;
+	}
 }

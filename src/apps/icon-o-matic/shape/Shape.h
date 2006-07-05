@@ -5,12 +5,10 @@
 #include <Rect.h>
 #include <String.h>
 
-#include "Observable.h"
+#include "IconObject.h"
 #include "Observer.h"
 #include "PathContainer.h"
 #include "PathSource.h"
-#include "Referenceable.h"
-#include "Selectable.h"
 
 class Style;
 
@@ -25,25 +23,20 @@ class ShapeListener {
 	virtual	void				TransformerRemoved(Transformer* t) = 0;
 };
 
-class Shape : public Observable,
-			  public Observer,	// observing all the paths
-			  public Referenceable,
-			  public Selectable,
+class Shape : public IconObject,
+			  public Observer,	// observing all the paths and the style
 			  public PathContainerListener {
  public:
 								Shape(::Style* style);
 								Shape(const Shape& other);
 	virtual						~Shape();
 
-	// PathContainerListener interface
-	virtual	void				PathAdded(VectorPath* path);
-	virtual	void				PathRemoved(VectorPath* path);
-
 	// Observer interface
 	virtual	void				ObjectChanged(const Observable* object);
 
-	// Selectable interface
-	virtual	void				SelectedChanged();
+	// PathContainerListener interface
+	virtual	void				PathAdded(VectorPath* path);
+	virtual	void				PathRemoved(VectorPath* path);
 
 	// Shape
 			status_t			InitCheck() const;

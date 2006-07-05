@@ -99,11 +99,7 @@ StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 	}
 
 	Gradient* gradient = style->Gradient();		
-
-	// TODO: move filling of color array elsewhere and cache result
-	// maybe in Style?
-	agg::rgba8 colors[256];
-	gradient->MakeGradient((uint32*)colors, 256);
+	const agg::rgba8* colors = style->Colors();
 
 	agg::trans_affine transformation;
 		// TODO: construct the gradient transformation here

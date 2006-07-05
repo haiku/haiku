@@ -41,6 +41,7 @@ Application Icon-O-Matic :
 	# document
 	Document.cpp
 	Icon.cpp
+	IconObject.cpp
 	IconRenderer.cpp
 	# generic/command
 	Command.cpp
@@ -110,8 +111,6 @@ Application Icon-O-Matic :
 	ShapeListView.cpp
 	SwatchGroup.cpp
 	TransformerListView.cpp
-	# gradient
-	Gradient.cpp
 	# shape
 	PathContainer.cpp
 	PathManipulator.cpp
@@ -127,6 +126,7 @@ Application Icon-O-Matic :
 	RemovePointsCommand.cpp
 	RemoveShapesCommand.cpp
 	# style
+	Gradient.cpp
 	Style.cpp
 	StyleManager.cpp
 	# transformer
