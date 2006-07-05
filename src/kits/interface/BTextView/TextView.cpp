@@ -1098,7 +1098,8 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 void
 BTextView::Insert(const char *inText, const text_run_array *inRuns)
 {
-	Insert(fSelStart, inText, strlen(inText), inRuns);
+	if (inText != NULL)
+		Insert(fSelStart, inText, strlen(inText), inRuns);
 }
 
 
@@ -1106,7 +1107,8 @@ void
 BTextView::Insert(const char *inText, int32 inLength,
 					   const text_run_array *inRuns)
 {
-	Insert(fSelStart, inText, inLength, inRuns);
+	if (inText != NULL)
+		Insert(fSelStart, inText, inLength, inRuns);
 }
 
 
