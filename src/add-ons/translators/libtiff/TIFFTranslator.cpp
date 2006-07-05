@@ -1,49 +1,33 @@
-/*****************************************************************************/
-// TIFFTranslator
-// Written by Michael Wilber, OBOS Translation Kit Team
-// Write support added by Stephan Aßmus <stippi@yellowbites.com>
-//
-// TIFFTranslator.cpp
-//
-// This BTranslator based object is for opening and writing 
-// TIFF images.
-//
-//
-// Copyright (c) 2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
-//
-// How this works:
-//
-// libtiff has a special version of TIFFOpen() that gets passed custom
-// functions for reading writing etc. and a handle. This handle in our case
-// is a BPositionIO object, which libtiff passes on to the functions for reading
-// writing etc. So when operations are performed on the TIFF* handle that is
-// returned by TIFFOpen(), libtiff uses the special reading writing etc
-// functions so that all stream io happens on the BPositionIO object.
+/*
+ * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Wilber
+ *		Stephan Aßmus <stippi@yellowbites.com> (write support)
+ */
+
+
+#include "TIFFTranslator.h"
+#include "TIFFView.h"
+
+#include "tiffio.h"
 
 #include <stdio.h>
 #include <string.h>
-#include "tiffio.h"
-#include "TIFFTranslator.h"
-#include "TIFFView.h"
+
+
+/*!
+	How this works:
+	
+	libtiff has a special version of TIFFOpen() that gets passed custom
+	functions for reading writing etc. and a handle. This handle in our case
+	is a BPositionIO object, which libtiff passes on to the functions for reading
+	writing etc. So when operations are performed on the TIFF* handle that is
+	returned by TIFFOpen(), libtiff uses the special reading writing etc
+	functions so that all stream io happens on the BPositionIO object.
+*/
+
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -188,47 +172,6 @@ tiff_unmap_file_proc(thandle_t stream, tdata_t base, toff_t size)
 	return;
 }
 
-// ---------------------------------------------------------------
-// Constructor
-//
-// Sets up the version info and the name of the translator so that
-// these values can be returned when they are requested.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-TIFFTranslator::TIFFTranslator()
-	: BaseTranslator("TIFF Images", "TIFF image translator",
-		TIFF_TRANSLATOR_VERSION,
-		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
-		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
-		"TIFFTranslator_Settings",
-		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
-		B_TRANSLATOR_BITMAP, B_TIFF_FORMAT)
-{
-}
-
-// ---------------------------------------------------------------
-// Destructor
-//
-// Does nothing
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-TIFFTranslator::~TIFFTranslator()
-{
-}
 
 status_t
 identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
@@ -289,52 +232,6 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 	return B_OK;
 }
 	
-// ---------------------------------------------------------------
-// DerivedIdentify
-//
-// Examines the data from inSource and determines if it is in a
-// format that this translator knows how to work with.
-//
-// Preconditions:
-//
-// Parameters:	inSource,	where the data to examine is
-//
-//				inFormat,	a hint about the data in inSource,
-//							it is ignored since it is only a hint
-//
-//				ioExtension,	configuration settings for the
-//								translator (not used)
-//
-//				outInfo,	information about what data is in
-//							inSource and how well this translator
-//							can handle that data is stored here
-//
-//				outType,	The format that the user wants
-//							the data in inSource to be
-//							converted to
-//
-// Postconditions:
-//
-// Returns: B_NO_TRANSLATOR,	if this translator can't handle
-//								the data in inSource
-//
-// B_ERROR,	if there was an error converting the data to the host
-//			format
-//
-// B_BAD_VALUE, if the settings in ioExtension are bad
-//
-// B_OK,	if this translator understood the data and there were
-//			no errors found
-//
-// Other errors if BPositionIO::Read() returned an error value
-// ---------------------------------------------------------------
-status_t
-TIFFTranslator::DerivedIdentify(BPositionIO *inSource,
-	const translation_format *inFormat, BMessage *ioExtension,
-	translator_info *outInfo, uint32 outType)
-{
-	return identify_tiff_header(inSource, ioExtension, outInfo, outType);
-}
 
 // How this works:
 // Following are a couple of functions,
@@ -686,7 +583,38 @@ write_tif_stream(TIFF* tif, BPositionIO* inSource, color_space format,
 	return ret;
 }
 
-// translate_from_bits
+
+//	#pragma mark -
+
+
+TIFFTranslator::TIFFTranslator()
+	: BaseTranslator("TIFF Images", "TIFF image translator",
+		TIFF_TRANSLATOR_VERSION,
+		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
+		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		"TIFFTranslator_Settings",
+		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		B_TRANSLATOR_BITMAP, B_TIFF_FORMAT)
+{
+	// TODO: for now!
+	TIFFSetErrorHandler(NULL);
+}
+
+
+TIFFTranslator::~TIFFTranslator()
+{
+}
+
+
+status_t
+TIFFTranslator::DerivedIdentify(BPositionIO *inSource,
+	const translation_format *inFormat, BMessage *ioExtension,
+	translator_info *outInfo, uint32 outType)
+{
+	return identify_tiff_header(inSource, ioExtension, outInfo, outType);
+}
+
+
 status_t
 TIFFTranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 	BPositionIO *outDestination)
