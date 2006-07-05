@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
@@ -39,7 +39,7 @@ writeAttrValue(int fd, const char *name, type_code type, Type value)
  */
 
 static ssize_t
-writeAttr(int fd, type_code type, const char *name, const char *value)
+writeAttr(int fd, type_code type, const char *name, const char *value, size_t length)
 {
 	uint64 uint64value = 0;
 	int64 int64value = 0;
@@ -115,10 +115,13 @@ writeAttr(int fd, type_code type, const char *name, const char *value)
 		case B_MIME_STRING_TYPE:
 		default:
 			// For string, mime-strings and any other type we just write the value
-			// NOTE that the trailing NULL -IS- added
-			ssize_t bytes = fs_write_attr(fd, name, type, 0, value, strlen(value) + 1);
+			// Note that the trailing NULL is added. If a length was given, we write
+			// the value directly, though.
+			ssize_t bytes = fs_write_attr(fd, name, type, 0, value,
+				length ? length : strlen(value) + 1);
 			if (bytes < 0)
 				return errno;
+
 			return bytes;
 	}
 }
@@ -131,14 +134,15 @@ writeAttr(int fd, type_code type, const char *name, const char *value)
  */
 
 status_t
-addAttr(const char *file, type_code type, const char *name, const char *value)
+addAttr(const char *file, type_code type, const char *name,
+	const char *value, size_t length)
 {
 	int fd = open(file, O_WRONLY);
 	if (fd < 0)
 		return errno;
 
 	fs_remove_attr(fd, name);
-	ssize_t bytes = writeAttr(fd, type, name, value);
+	ssize_t bytes = writeAttr(fd, type, name, value, length);
 
 	return bytes >= 0 ? B_OK : bytes;
 }
