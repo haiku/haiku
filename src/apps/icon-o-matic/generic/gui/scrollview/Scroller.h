@@ -9,6 +9,8 @@
 #ifndef SCROLLER_H
 #define SCROLLER_H
 
+#include <Rect.h>
+
 class Scrollable;
 
 class Scroller {

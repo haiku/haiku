@@ -15,6 +15,10 @@ local sourceDirs =
 	generic/gui/scrollview
 	generic/gui/stateview
 	generic/listener
+	generic/property
+	generic/property/specific_properties
+	generic/property/view
+	generic/property/view/specific_properties
 	generic/selection
 	generic/support
 	gui
@@ -41,11 +45,11 @@ Application Icon-O-Matic :
 	# generic/command
 	Command.cpp
 	CommandStack.cpp
-	# generic/selection
-	Selectable.cpp
-	Selection.cpp
 	# generic/gui
 	Group.cpp
+	InputTextView.cpp
+	NummericalTextView.cpp
+	StringTextView.cpp
 	ListViews.cpp
 	SwatchView.cpp
 	# generic/gui/panel
@@ -58,6 +62,9 @@ Application Icon-O-Matic :
 	ColorSlider.cpp
 	# generic/gui/popup_control
 	# generic/gui/scrollview
+	Scrollable.cpp
+	Scroller.cpp
+	ScrollView.cpp
 	# generic/gui/stateview
 	Manipulator.cpp
 	MultipleManipulatorState.cpp
@@ -66,7 +73,34 @@ Application Icon-O-Matic :
 	# generic/listener
 	Observable.cpp
 	Observer.cpp
+	# generic/property
+	CommonPropertyIDs.cpp
+	Property.cpp
+	PropertyObject.cpp
+	# generic/property/specific_properties
+	ColorProperty.cpp
+	Int64Property.cpp
+	OptionProperty.cpp
+	# generic/property/view
+	PropertyEditorFactory.cpp
+	PropertyEditorView.cpp
+	PropertyItemView.cpp
+	PropertyListView.cpp
+	# generic/property/view/specific_properties
+	BoolValueView.cpp
+	ColorValueView.cpp
+	FloatValueView.cpp
+	IconProperty.cpp
+	IconValueView.cpp
+	Int64ValueView.cpp
+	IntValueView.cpp
+	OptionValueView.cpp
+	StringValueView.cpp
+	SwatchValueView.cpp
+	TextInputValueView.cpp
 	# generic/selection
+	Selectable.cpp
+	Selection.cpp
 	# generic/support
 	RWLocker.cpp
 	support.cpp
