@@ -1,44 +1,125 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2001-2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        rmattr.cpp
-//  Author:      Jérôme Duval
-//  Description: remove an attribute from a file
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2001-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
+/*! Remove an attribute from a file */
+
+#include <fs_attr.h>
+
+#include <errno.h>
+#include <fcntl.h>
+#include <glob.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>  // For O_WRONLY in BeOS R5 headers.
-#include <kernel/fs_attr.h>
+#include <string.h>
+#include <unistd.h>
 
-int main(int32 argc, const char **argv)
+
+extern const char *__progname;
+const char *kProgramName = __progname;
+
+int gCurrentFile;
+
+
+void
+usage()
 {
-	// Make sure we have the minimum number of arguments.
-	if (argc < 3) {
-		printf("usage: %s attr filename1 [filename2...]\n", argv[0]);
-    	printf("        attr is the name of an attribute of the file\n");
-		exit(0);	
-	}
-	
-	for(int32 i=2; i<argc; i++) {
-		int fd = open(argv[i], O_WRONLY);
-		if (fd < 0) {
-			fprintf( stderr, "%s: can\'t open file %s to remove attribute\n", 
-				argv[0], argv[i]);
-			exit(0);
-		}
-				
-		if(fs_remove_attr(fd, argv[1])!=B_OK) {
-			fprintf( stderr, "%s: error removing attribute %s from %s : No such attribute\n", 
-				argv[0], argv[1], argv[i] );
-		}
-	}
+	printf("usage: %s [-p] attr filename1 [filename2...]\n"
+		"\t'attr' is the name of an attribute of the file\n"
+		"\tIf '-p' is specified, 'attr' is regarded as a pattern.\n", kProgramName);
 
 	exit(0);	
+}
+
+
+void *
+open_attr_dir(const char* /*path*/)
+{
+	return fs_fopen_attr_dir(gCurrentFile);
+}
+
+
+int
+stat_attr(const char* /*attribute*/, struct stat* stat)
+{
+	memset(stat, 0, sizeof(struct stat));
+	stat->st_mode = S_IFREG;
+	return 0;
+}
+
+
+int
+remove_attribute(int fd, const char* attribute, bool isPattern)
+{
+	if (!isPattern)
+		return fs_remove_attr(fd, attribute);
+
+	glob_t glob;
+	memset(&glob, 0, sizeof(glob_t));
+
+	glob.gl_closedir = (void (*)(void *))fs_close_attr_dir;
+	glob.gl_readdir = fs_read_attr_dir;
+	glob.gl_opendir = open_attr_dir;
+	glob.gl_lstat = stat_attr;
+	glob.gl_stat = stat_attr;
+
+	// for open_attr_dir():
+	gCurrentFile = fd;
+
+	int result = ::glob(attribute, GLOB_ALTDIRFUNC, NULL, &glob);
+	if (result < 0) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	bool error = false;
+
+	for (int i = 0; i < glob.gl_pathc; i++) {
+		if (fs_remove_attr(fd, glob.gl_pathv[i]) != 0)
+			error = true;
+	}
+
+	return error ? -1 : 0;
+}
+
+
+int
+main(int32 argc, const char **argv)
+{
+	// Make sure we have the minimum number of arguments.
+	if (argc < 3)
+		usage();
+
+	bool isPattern = false;
+	int attr = 1;
+	if (!strcmp(argv[attr], "-p")) {
+		isPattern = true;
+		attr++;
+
+		if (argc < 4)
+			usage();
+	}
+
+	for (int32 i = attr + 1; i < argc; i++) {
+		int fd = open(argv[i], O_WRONLY);
+		if (fd < 0) {
+			fprintf(stderr, "%s: can\'t open file %s to remove attribute: %s\n", 
+				kProgramName, argv[i], strerror(errno));
+			return 0;
+		}
+
+		if (remove_attribute(fd, argv[attr], isPattern) != B_OK) {
+			fprintf(stderr, "%s: error removing attribute %s from %s: %s\n", 
+				kProgramName, argv[attr], argv[i], strerror(errno));
+		}
+
+		close(fd);
+	}
+
+	return 0;
 }
