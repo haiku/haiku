@@ -16,7 +16,7 @@ class PropertyItemView;
 
 class PropertyEditorView : public BView {
  public:
-								PropertyEditorView(Property* property);
+								PropertyEditorView();
 	virtual						~PropertyEditorView();
 
 								// BView
@@ -29,9 +29,6 @@ class PropertyEditorView : public BView {
 
 								// PropertyEditorView
 	virtual	float				PreferredHeight() const;
-
-			Property*			GetProperty() const
-									{ return fProperty; }
 
 			void				SetSelected(bool selected);
 			bool				IsSelected() const
@@ -47,12 +44,12 @@ class PropertyEditorView : public BView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property) = 0;
+	virtual	Property*			GetProperty() const = 0;
 
  protected:
 	PropertyItemView*			fParent;
 
  private:
-	Property*					fProperty;
 	bool						fSelected;
 };
 

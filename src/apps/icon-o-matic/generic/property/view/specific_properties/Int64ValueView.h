@@ -9,9 +9,9 @@
 #ifndef INT64_VALUE_VIEW_H
 #define INT64_VALUE_VIEW_H
 
+#include "Int64Property.h"
 #include "TextInputValueView.h"
 
-class Int64Property;
 class NummericalTextView;
 
 class Int64ValueView : public TextInputValueView {
@@ -26,6 +26,8 @@ class Int64ValueView : public TextInputValueView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			Int64Property*		fProperty;

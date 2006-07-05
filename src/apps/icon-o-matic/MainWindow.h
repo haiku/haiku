@@ -17,6 +17,7 @@ class BMenuBar;
 class BMenuItem;
 class CanvasView;
 class Document;
+class IconObjectListView;
 class IconEditorApp;
 class IconView;
 class PathListView;
@@ -62,6 +63,7 @@ class MainWindow : public BWindow,
 	PathListView*				fPathListView;
 	ShapeListView*				fShapeListView;
 	TransformerListView*		fTransformerListView;
+	IconObjectListView*			fPropertyListView;
 
 	// TODO: for testing only...
 	MultipleManipulatorState*	fState;

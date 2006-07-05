@@ -85,6 +85,7 @@ PropertyListView::PropertyListView()
 	  fPropertyM(NULL),
 
 	  fPropertyObject(NULL),
+	  fSavedProperties(new PropertyObject()),
 
 	  fLastClickedItem(NULL),
 	  fSuspendUpdates(false),
@@ -103,6 +104,7 @@ PropertyListView::~PropertyListView()
 	delete fClipboard;
 
 	delete fPropertyObject;
+	delete fSavedProperties;
 
 	delete fMouseWheelFilter;
 	delete fTabFilter;
@@ -346,6 +348,7 @@ PropertyListView::SetTo(PropertyObject* object)
 	if (fPropertyObject && object &&
 		fPropertyObject->ContainsSameProperties(*object)) {
 		// iterate over view items and update their value views
+		bool error = false;
 		for (int32 i = 0; PropertyItemView* item = _ItemAt(i); i++) {
 			Property* property = object->PropertyAt(i);
 			if (!item->AdoptProperty(property)) {
@@ -354,13 +357,24 @@ PropertyListView::SetTo(PropertyObject* object)
 				// there is no editor view at this item
 				fprintf(stderr, "PropertyListView::_SetTo() - "
 								"property mismatch at %ld\n", i);
+				error = true;
 				break;
 			}
 			if (property)
 				item->SetEnabled(property->IsEditable());
 		}
-		// we didn't take on ownership, but kept our old object
-		delete object;
+		// we didn't need to make empty, but transfer ownership
+		// of the object
+		if (!error) {
+			// if the "adopt" process went only halfway,
+			// some properties of the original object
+			// are still referenced, so we can only
+			// delete the original object if the process
+			// was successful and leak Properties otherwise,
+			// but this case is only theoretical anyways...
+			delete fPropertyObject;
+		}
+		fPropertyObject = object;
 	} else {
 		// remember scroll pos, selection and focused item
 		BPoint scrollOffset = ScrollOffset();
@@ -406,14 +420,17 @@ PropertyListView::SetTo(PropertyObject* object)
 		SetDataRect(_ItemsRect());
 	}
 
+	_UpdateSavedProperties();
 	_CheckMenuStatus();
 }
 
-// UpdateObject
+// PropertyChanged
 void
-PropertyListView::UpdateObject(uint32 propertyID)
+PropertyListView::PropertyChanged(const Property* previous,
+								  const Property* current)
 {
-	printf("PropertyListView::UpdateObject(%s)\n", name_for_id(propertyID));
+	printf("PropertyListView::PropertyChanged(%s)\n",
+		name_for_id(current->Identifier()));
 }
 
 // PasteProperties
@@ -441,6 +458,20 @@ PropertyListView::IsEditingMultipleObjects()
 }
 
 // #pragma mark -
+
+// UpdateObject
+void
+PropertyListView::UpdateObject(uint32 propertyID)
+{
+	Property* previous = fSavedProperties->FindProperty(propertyID);
+	Property* current = fPropertyObject->FindProperty(propertyID);
+	if (previous && current) {
+		// call hook function
+		PropertyChanged(previous, current);
+		// update saved property
+		previous->SetValue(current);
+	}
+}
 
 // ScrollOffsetChanged
 void
@@ -508,12 +539,27 @@ PropertyListView::DoubleClicked(PropertyItemView* item)
 {
 	if (fLastClickedItem == item) {
 		printf("implement PropertyListView::DoubleClicked()\n");
-//		...->EditObject(item->GetProperty());
 	}
 	fLastClickedItem = NULL;
 }
 
 // #pragma mark -
+
+// _UpdateSavedProperties
+void
+PropertyListView::_UpdateSavedProperties()
+{
+	fSavedProperties->DeleteProperties();
+
+	if (!fPropertyObject)
+		return;
+
+	int32 count = fPropertyObject->CountProperties();
+	for (int32 i = 0; i < count; i++) {
+		const Property* p = fPropertyObject->PropertyAtFast(i);
+		fSavedProperties->AddProperty(p->Clone());
+	}
+}
 
 // _AddItem
 bool

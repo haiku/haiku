@@ -8,6 +8,10 @@
 
 #include "CommonPropertyIDs.h"
 
+#include <stdio.h>
+
+#include <debugger.h>
+
 // name_for_id
 const char*
 name_for_id(int32 id)
@@ -40,6 +44,10 @@ name_for_id(int32 id)
 			break;
 		case PROPERTY_MITER_LIMIT:
 			name = "Miter Limit";
+			break;
+
+		case PROPERTY_CLOSED:
+			name = "Closed";
 			break;
 
 		default:

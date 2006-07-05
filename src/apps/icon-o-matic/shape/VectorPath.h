@@ -15,8 +15,7 @@
 
 #include <agg_path_storage.h>
 
-#include "Observable.h"
-#include "Referenceable.h"
+#include "IconObject.h"
 
 class BBitmap;
 class BMessage;
@@ -30,8 +29,7 @@ struct control_point {
 };
 
 class VectorPath : public BArchivable,
-				   public Observable,
-				   public Referenceable {
+				   public IconObject {
  public:
 
 	class Iterator {
@@ -48,6 +46,12 @@ class VectorPath : public BArchivable,
 								VectorPath(const BMessage* archive);
 	virtual						~VectorPath();
 
+	// IconObject
+	virtual	PropertyObject*		MakePropertyObject() const;
+	virtual	bool				SetToPropertyObject(
+									const PropertyObject* object);
+
+	// VectorPath
 			VectorPath&			operator=(const VectorPath& from);
 //			bool				operator==(const VectorPath& frrom) const;
 
@@ -122,9 +126,6 @@ class VectorPath : public BArchivable,
 
 			bool				GetAGGPathStorage(agg::path_storage& path) const;
 
-			void				SetName(const char* name);
-			const char*			Name() const;
-
  private:
 			BRect				_Bounds() const;
 			void				_SetPoint(int32 index, BPoint point);
@@ -138,9 +139,6 @@ class VectorPath : public BArchivable,
 			int32				fAllocCount;
 
 	mutable	BRect				fCachedBounds;
-
-	// TODO: should this really be part of VectorPath?
-			BString				fName;
 };
 
 #endif // VECTOR_PATH_H

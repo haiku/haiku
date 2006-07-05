@@ -21,8 +21,8 @@ enum {
 };
 
 // constructor
-TextInputValueView::TextInputValueView(Property* property)
-	: PropertyEditorView(property)
+TextInputValueView::TextInputValueView()
+	: PropertyEditorView()
 {
 }
 

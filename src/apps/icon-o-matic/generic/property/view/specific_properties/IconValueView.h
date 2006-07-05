@@ -9,9 +9,9 @@
 #ifndef ICON_VALUE_VIEW_H
 #define ICON_VALUE_VIEW_H
 
+#include "IconProperty.h"
 #include "PropertyEditorView.h"
 
-class IconProperty;
 class NummericalTextView;
 
 class IconValueView : public PropertyEditorView {
@@ -26,6 +26,8 @@ class IconValueView : public PropertyEditorView {
 	virtual	void				SetEnabled(bool enabled);
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
 	// IconValueView
 			status_t			SetIcon(const unsigned char* bitsFromQuickRes,

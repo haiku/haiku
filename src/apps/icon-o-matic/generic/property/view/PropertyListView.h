@@ -52,7 +52,8 @@ class PropertyListView : public BView,
 	// PropertyListView
 			void				SetTo(PropertyObject* object);
 				// takes ownership of the object
-	virtual	void				UpdateObject(uint32 propertyID);
+	virtual	void				PropertyChanged(const Property* previous,
+												const Property* current);
 				// implement to know when a property changed
 	virtual	void				PasteProperties(const PropertyObject* object);
 				// implement to know when a property changed
@@ -63,6 +64,8 @@ class PropertyListView : public BView,
 			void				UpdateStrings();
 
 	// interface for Property framework
+			void				UpdateObject(uint32 propertyID);
+
 			bool				TabFocus(bool shift);
 
 			void				Select(PropertyItemView* item);
@@ -72,6 +75,8 @@ class PropertyListView : public BView,
 			void				DoubleClicked(PropertyItemView* item);
 
  private:
+			void				_UpdateSavedProperties();
+
 			bool				_AddItem(PropertyItemView* item);
 			PropertyItemView*	_RemoveItem(int32 index);
 			PropertyItemView*	_ItemAt(int32 index) const;
@@ -96,6 +101,7 @@ class PropertyListView : public BView,
 			BMenuItem*			fPasteMI;
 
 			PropertyObject*		fPropertyObject;
+			PropertyObject*		fSavedProperties;
 
 			PropertyItemView*	fLastClickedItem;
 

@@ -9,9 +9,9 @@
 #ifndef FLOAT_VALUE_VIEW_H
 #define FLOAT_VALUE_VIEW_H
 
+#include "Property.h"
 #include "TextInputValueView.h"
 
-class FloatProperty;
 class NummericalTextView;
 
 class FloatValueView : public TextInputValueView {
@@ -26,6 +26,8 @@ class FloatValueView : public TextInputValueView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			FloatProperty*		fProperty;

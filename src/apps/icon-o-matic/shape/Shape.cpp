@@ -25,7 +25,7 @@ ShapeListener::~ShapeListener()
 
 // constructor
 Shape::Shape(::Style* style)
-	: IconObject(),
+	: IconObject("<shape>"),
 	  Observer(),
 	  PathContainerListener(),
 
@@ -35,9 +35,7 @@ Shape::Shape(::Style* style)
 	  fPathSource(fPaths),
 	  fTransformers(4),
 
-	  fLastBounds(0, 0, -1, -1),
-
-	  fName("<shape>")
+	  fLastBounds(0, 0, -1, -1)
 {
 	if (fPaths)
 		fPaths->AddListener(this);
@@ -47,7 +45,7 @@ Shape::Shape(::Style* style)
 
 // constructor
 Shape::Shape(const Shape& other)
-	: IconObject(),
+	: IconObject(other),
 	  Observer(),
 	  PathContainerListener(),
 
@@ -57,9 +55,7 @@ Shape::Shape(const Shape& other)
 	  fPathSource(fPaths),
 	  fTransformers(4),
 
-	  fLastBounds(0, 0, -1, -1),
-
-	  fName(other.fName)
+	  fLastBounds(0, 0, -1, -1)
 {
 	if (fPaths) {
 		fPaths->AddListener(this);
@@ -82,8 +78,11 @@ Shape::Shape(const Shape& other)
 Shape::~Shape()
 {
 	int32 count = fTransformers.CountItems();
-	for (int32 i = 0; i < count; i++)
-		delete (Transformer*)fTransformers.ItemAtFast(i);
+	for (int32 i = 0; i < count; i++) {
+		Transformer* t = (Transformer*)fTransformers.ItemAtFast(i);
+		t->RemoveObserver(this);
+		delete t;
+	}
 
 	fPaths->MakeEmpty();
 	fPaths->RemoveListener(this);
@@ -99,7 +98,7 @@ void
 Shape::ObjectChanged(const Observable* object)
 {
 	// simply pass on the event for now
-	// (a path or the style changed,
+	// (a path, transformer or the style changed,
 	// the shape needs to be re-rendered)
 	Notify();
 }
@@ -157,26 +156,6 @@ Shape::SetStyle(::Style* style)
 
 // #pragma mark -
 
-// SetName
-void
-Shape::SetName(const char* name)
-{
-	if (fName == name)
-		return;
-
-	fName = name;
-	Notify();
-}
-
-// Name
-const char*
-Shape::Name() const
-{
-	return fName.String();
-}
-
-// #pragma mark -
-
 // Bounds
 BRect
 Shape::Bounds(bool updateLast) const
@@ -217,6 +196,8 @@ Shape::VertexSource()
 		source = t;
 	}
 
+	source->SetLast();
+
 	return *source;
 }
 
@@ -237,6 +218,8 @@ Shape::AddTransformer(Transformer* transformer, int32 index)
 	if (!fTransformers.AddItem((void*)transformer, index))
 		return false;
 
+	transformer->AddObserver(this);
+
 	_NotifyTransformerAdded(transformer, index);
 	return true;
 }
@@ -246,6 +229,8 @@ bool
 Shape::RemoveTransformer(Transformer* transformer)
 {
 	if (fTransformers.RemoveItem((void*)transformer)) {
+		transformer->RemoveObserver(this);
+		
 		_NotifyTransformerRemoved(transformer);
 		return true;
 	}

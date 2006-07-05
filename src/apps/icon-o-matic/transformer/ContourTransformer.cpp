@@ -10,7 +10,7 @@
 
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source)
-	: Transformer(source),
+	: Transformer(source, "Contour"),
 	  Contour(source)
 {
 }
@@ -42,10 +42,10 @@ ContourTransformer::SetSource(VertexSource& source)
 	Contour::attach(source);
 }
 
-// Name
-const char*
-ContourTransformer::Name() const
+// SetLast
+void
+ContourTransformer::SetLast()
 {
-	return "Contour";
+	fSource.SetLast();
 }
 

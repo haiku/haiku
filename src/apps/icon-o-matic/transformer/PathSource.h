@@ -28,6 +28,8 @@ class PathSource : public VertexSource {
     virtual	void				rewind(unsigned path_id);
     virtual	unsigned			vertex(double* x, double* y);
 
+	virtual	void				SetLast();
+
 			void				Update();
 
  private:

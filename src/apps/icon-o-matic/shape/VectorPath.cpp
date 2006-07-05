@@ -24,6 +24,10 @@
 
 #include "support.h"
 
+#include "CommonPropertyIDs.h"
+#include "Property.h"
+#include "PropertyObject.h"
+
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
 #define obj_renew(p, type, n)	((type *)realloc (p, (n) * sizeof(type)))
 #define obj_free				free
@@ -56,11 +60,6 @@ get_path_storage(agg::path_storage& path,
 						points[0].point.x,
 						points[0].point.y);
 			path.close_polygon();
-		} else {
-			// straight line from last to first control point
-			path.line_to(points[0].point.x,
-						 points[0].point.y);
-			path.close_polygon();
 		}
 
 		return true;
@@ -72,27 +71,23 @@ get_path_storage(agg::path_storage& path,
 // constructor
 VectorPath::VectorPath()
 	: BArchivable(),
-	  Observable(),
-	  Referenceable(),
+	  IconObject("<path>"),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
-  	  fName("<path>")
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
 }
 
 // constructor
 VectorPath::VectorPath(const VectorPath& from)
 	: BArchivable(),
-	  Observable(),
-	  Referenceable(),
+	  IconObject(from),
 	  fPath(NULL),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
-  	  fName()
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
 	*this = from;
 }
@@ -100,14 +95,12 @@ VectorPath::VectorPath(const VectorPath& from)
 // constructor
 VectorPath::VectorPath(const BMessage* archive)
 	: BArchivable(),
-	  Observable(),
-	  Referenceable(),
+	  IconObject("<path>"/*archive*/),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
 	  fAllocCount(0),
-	  fCachedBounds(0.0, 0.0, -1.0, -1.0),
-  	  fName()
+	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
 	if (archive) {
 		type_code typeFound;
@@ -133,9 +126,6 @@ VectorPath::VectorPath(const BMessage* archive)
 		if (archive->FindBool("path closed", &fClosed) < B_OK) {
 			fClosed = false;
 		}
-		if (archive->FindString("name", &fName) < B_OK) {
-			fName = "<path>";
-		}
 	}
 }
 
@@ -145,6 +135,35 @@ VectorPath::~VectorPath()
 	if (fPath)
 		obj_free(fPath);
 }
+
+// #pragma mark -
+
+// MakePropertyObject
+PropertyObject*
+VectorPath::MakePropertyObject() const
+{
+	PropertyObject* object = IconObject::MakePropertyObject();
+	if (!object)
+		return NULL;
+
+	object->AddProperty(new BoolProperty(PROPERTY_CLOSED, fClosed));
+
+	return object;
+}
+
+// SetToPropertyObject
+bool
+VectorPath::SetToPropertyObject(const PropertyObject* object)
+{
+	AutoNotificationSuspender _(this);
+	IconObject::SetToPropertyObject(object);
+
+	SetClosed(object->Value(PROPERTY_CLOSED, fClosed));
+
+	return HasPendingNotifications();
+}
+
+// #pragma mark -
 
 // operator=
 VectorPath&
@@ -161,7 +180,6 @@ VectorPath::operator=(const VectorPath& from)
 		fPointCount = 0;
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 	}
-	fName = from.fName;
 	
 	return *this;
 }
@@ -213,12 +231,7 @@ VectorPath::Archive(BMessage* into, bool deep) const
 		fprintf(stderr, "failed adding points!\n");
 	}
 	if (ret >= B_OK) {
-		ret = into->AddString("name", fName.String());
-	} else {
 		fprintf(stderr, "failed adding close!\n");
-	}
-	if (ret < B_OK) {
-		fprintf(stderr, "failed adding name!\n");
 	}
 	// finish off
 	if (ret < B_OK) {
@@ -227,6 +240,8 @@ VectorPath::Archive(BMessage* into, bool deep) const
 
 	return ret;
 }
+
+// #pragma mark -
 
 // AddPoint
 bool
@@ -414,6 +429,8 @@ VectorPath::SetInOutConnected(int32 index, bool connected)
 	return false;	
 }
 
+// #pragma mark -
+
 // GetPointAt
 bool
 VectorPath::GetPointAt(int32 index, BPoint& point) const
@@ -477,6 +494,8 @@ VectorPath::CountPoints() const
 {
 	return fPointCount;
 }
+
+// #pragma mark -
 
 // distance_to_curve
 static float
@@ -841,26 +860,6 @@ VectorPath::_SetPoint(int32 index, BPoint point)
 	fPath[index].connected = true;
 
 	fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
-}
-
-// #pragma mark -
-
-// SetName
-void
-VectorPath::SetName(const char* name)
-{
-	if (fName == name)
-		return;
-
-	fName = name;
-	Notify();
-}
-
-// Name
-const char*
-VectorPath::Name() const
-{
-	return fName.String();
 }
 
 // #pragma mark -

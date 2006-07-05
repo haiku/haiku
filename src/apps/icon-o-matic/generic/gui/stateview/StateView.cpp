@@ -10,6 +10,7 @@
 
 #include <Message.h>
 #include <MessageFilter.h>
+#include <TextView.h>
 #include <Window.h>
 
 #include "Command.h"
@@ -32,6 +33,8 @@ class EventFilter : public BMessageFilter {
 			filter_result result = B_DISPATCH_MESSAGE;
 			switch (message->what) {
 				case B_KEY_DOWN: {
+					if (dynamic_cast<BTextView*>(*target))
+						break;
 					uint32 key;
 					uint32 modifiers;
 					if (message->FindInt32("raw_char", (int32*)&key) >= B_OK
@@ -41,6 +44,8 @@ class EventFilter : public BMessageFilter {
 					break;
 				}
 				case B_KEY_UP: {
+					if (dynamic_cast<BTextView*>(*target))
+						break;
 					uint32 key;
 					uint32 modifiers;
 					if (message->FindInt32("raw_char", (int32*)&key) >= B_OK

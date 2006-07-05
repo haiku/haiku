@@ -9,9 +9,9 @@
 #ifndef INT_VALUE_VIEW_H
 #define INT_VALUE_VIEW_H
 
+#include "Property.h"
 #include "TextInputValueView.h"
 
-class IntProperty;
 class NummericalTextView;
 
 class IntValueView : public TextInputValueView {
@@ -26,6 +26,8 @@ class IntValueView : public TextInputValueView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			IntProperty*		fProperty;

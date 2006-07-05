@@ -18,11 +18,18 @@ VertexSource::~VertexSource()
 {
 }
 
+// Finish
+void
+VertexSource::SetLast()
+{
+}
+
 // #pragma mark -
 
 // constructor
-Transformer::Transformer(VertexSource& source)
-	: fSource(source)
+Transformer::Transformer(VertexSource& source, const char* name)
+	: IconObject(name),
+	  fSource(source)
 {
 }
 
@@ -52,11 +59,4 @@ Transformer::SetSource(VertexSource& source)
 	fSource = source;
 }
 
-// #pragma mark -
-
-// SelectedChanged
-void
-Transformer::SelectedChanged()
-{
-}
 

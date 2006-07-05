@@ -11,12 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Property.h"
 #include "StringTextView.h"
 
 // constructor
 StringValueView::StringValueView(StringProperty* property)
-	: TextInputValueView(property),
+	: TextInputValueView(),
 	  fProperty(property)
 {
 	BRect b = Bounds();

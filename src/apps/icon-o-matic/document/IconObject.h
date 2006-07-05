@@ -9,6 +9,8 @@
 #ifndef ICON_OBJECT_H
 #define ICON_OBJECT_H
 
+#include <String.h>
+
 #include "Observable.h"
 #include "Referenceable.h"
 #include "Selectable.h"
@@ -19,7 +21,8 @@ class IconObject : public Observable,
 				   public Referenceable,
 				   public Selectable {
  public:
-								IconObject();
+								IconObject(const char* name);
+								IconObject(const IconObject& other);
 	virtual						~IconObject();
 
 	// Selectable interface
@@ -30,7 +33,12 @@ class IconObject : public Observable,
 	virtual	bool				SetToPropertyObject(
 									const PropertyObject* object);
 
+			void				SetName(const char* name);
+			const char*			Name() const
+									{ return fName.String(); }
+
  private:
+			BString				fName;
 };
 
 #endif // ICON_OBJECT_H

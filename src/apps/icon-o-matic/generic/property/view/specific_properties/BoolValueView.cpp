@@ -10,13 +10,11 @@
 
 #include <stdio.h>
 
-#include "Property.h"
-
 #include "ui_defines.h"
 
 // constructor
 BoolValueView::BoolValueView(BoolProperty* property)
-	: PropertyEditorView(property),
+	: PropertyEditorView(),
 	  fProperty(property),
 	  fCheckBoxRect(0.0, 0.0, -1.0, -1.0),
 	  fEnabled(true)

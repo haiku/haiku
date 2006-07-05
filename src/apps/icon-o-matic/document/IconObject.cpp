@@ -8,11 +8,27 @@
 
 #include "IconObject.h"
 
+#include "CommonPropertyIDs.h"
+#include "Property.h"
+#include "PropertyObject.h"
+
 // constructor
-IconObject::IconObject()
+IconObject::IconObject(const char* name)
 	: Observable(),
 	  Referenceable(),
-	  Selectable()
+	  Selectable(),
+
+	  fName(name)
+{
+}
+
+// copy constructor
+IconObject::IconObject(const IconObject& other)
+	: Observable(),
+	  Referenceable(),
+	  Selectable(),
+
+	  fName(other.fName)
 {
 }
 
@@ -26,7 +42,7 @@ void
 IconObject::SelectedChanged()
 {
 	// simply pass on the event for now
-	Notify();
+//	Notify();
 }
 
 // #pragma mark -
@@ -35,13 +51,33 @@ IconObject::SelectedChanged()
 PropertyObject*
 IconObject::MakePropertyObject() const
 {
-	return NULL;
+	PropertyObject* object = new PropertyObject();
+
+	object->AddProperty(new StringProperty(PROPERTY_NAME, fName.String()));
+
+	return object;
 }
 
 // SetToPropertyObject
 bool
 IconObject::SetToPropertyObject(const PropertyObject* object)
 {
-	return false;
+	AutoNotificationSuspender _(this);
+
+	BString name;
+	if (object->GetValue(PROPERTY_NAME, name))
+		SetName(name.String());
+
+	return HasPendingNotifications();
 }
 
+// SetName
+void
+IconObject::SetName(const char* name)
+{
+	if (fName == name)
+		return;
+
+	fName = name;
+	Notify();
+}

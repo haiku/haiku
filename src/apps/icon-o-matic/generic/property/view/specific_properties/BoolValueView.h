@@ -9,9 +9,8 @@
 #ifndef BOOL_VALUE_VIEW_H
 #define BOOL_VALUE_VIEW_H
 
+#include "Property.h"
 #include "PropertyEditorView.h"
-
-class BoolProperty;
 
 class BoolValueView : public PropertyEditorView {
  public:
@@ -31,6 +30,8 @@ class BoolValueView : public PropertyEditorView {
 	virtual	void				SetEnabled(bool enabled);
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			void				_ToggleValue();

@@ -25,6 +25,8 @@ class Observable {
 
 			void				SuspendNotifications(bool suspend);
 
+			bool				HasPendingNotifications() const
+									{ return fPendingNotifications; }
  private:
 			BList				fObservers;
 

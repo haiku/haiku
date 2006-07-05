@@ -21,7 +21,7 @@ class InputTextView;
 
 class TextInputValueView : public PropertyEditorView {
  public:
-								TextInputValueView(Property* property);
+								TextInputValueView();
 	virtual						~TextInputValueView();
 
 	// BView interface

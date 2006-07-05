@@ -10,12 +10,11 @@
 
 #include <stdio.h>
 
-#include "Int64Property.h"
 #include "NummericalTextView.h"
 
 // constructor
 Int64ValueView::Int64ValueView(Int64Property* property)
-	: TextInputValueView(property),
+	: TextInputValueView(),
 	  fProperty(property)
 {
 	BRect b = Bounds();

@@ -25,7 +25,7 @@
 // constructor
 PropertyItemView::PropertyItemView(Property* property)
 	: BView(BRect(0.0, 0.0, 10.0, 10.0), "property item",
-			B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 			B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	  fParent(NULL),
 	  fEditorView(/*factory->*/EditorFor(property)),

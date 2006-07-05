@@ -16,7 +16,6 @@
 
 #include "support_ui.h"
 
-#include "ColorProperty.h"
 #include "PropertyItemView.h"
 #include "SwatchValueView.h"
 
@@ -26,7 +25,7 @@ enum {
 
 // constructor
 ColorValueView::ColorValueView(ColorProperty* property)
-	: PropertyEditorView(property),
+	: PropertyEditorView(),
 	  fProperty(property)
 {
 	fSwatchView = new SwatchValueView("swatch property view",

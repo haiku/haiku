@@ -9,9 +9,9 @@
 #ifndef COLOR_VALUE_VIEW_H
 #define COLOR_VALUE_VIEW_H
 
+#include "ColorProperty.h"
 #include "PropertyEditorView.h"
 
-class ColorProperty;
 class SwatchValueView;
 
 class ColorValueView : public PropertyEditorView {
@@ -32,6 +32,8 @@ class ColorValueView : public PropertyEditorView {
 	virtual	bool				IsFocused() const;
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  protected:
 			ColorProperty*		fProperty;

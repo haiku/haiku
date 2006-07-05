@@ -23,6 +23,8 @@ enum {
 	PROPERTY_CAP_MODE					= 'cpmd',
 	PROPERTY_JOIN_MODE					= 'jnmd',
 	PROPERTY_MITER_LIMIT				= 'mtlm',
+
+	PROPERTY_CLOSED						= 'clsd',
 };
 
 

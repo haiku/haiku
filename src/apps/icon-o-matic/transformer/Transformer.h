@@ -9,7 +9,7 @@
 #ifndef TRANSFORMER_H
 #define TRANSFORMER_H
 
-#include "Selectable.h"
+#include "IconObject.h"
 
 class VertexSource {
  public:
@@ -18,13 +18,16 @@ class VertexSource {
 
     virtual	void				rewind(unsigned path_id) = 0;
     virtual	unsigned			vertex(double* x, double* y) = 0;
+
+	virtual	void				SetLast();
 };
 
 
 class Transformer : public VertexSource,
-					public Selectable {
+					public IconObject {
  public:
-								Transformer(VertexSource& source);
+								Transformer(VertexSource& source,
+											const char* name);
 	virtual						~Transformer();
 
     virtual	void				rewind(unsigned path_id);
@@ -32,12 +35,7 @@ class Transformer : public VertexSource,
 
 	virtual	void				SetSource(VertexSource& source);
 
-	virtual	const char*			Name() const = 0;
-
-	// Selectable interface
-	virtual	void				SelectedChanged();
-
- private:
+ protected:
 			VertexSource&		fSource;
 };
 

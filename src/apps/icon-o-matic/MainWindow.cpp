@@ -19,9 +19,11 @@
 #include "Document.h"
 #include "CanvasView.h"
 #include "CommandStack.h"
+#include "IconObjectListView.h"
 #include "IconEditorApp.h"
 #include "IconView.h"
 #include "PathListView.h"
+#include "ScrollView.h"
 #include "ShapeListView.h"
 #include "SwatchGroup.h"
 #include "TransformerFactory.h"
@@ -54,7 +56,7 @@ enum {
 
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
-	: BWindow(BRect(50, 50, 781, 781), "Icon-O-Matic",
+	: BWindow(BRect(50, 50, 891, 781), "Icon-O-Matic",
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
@@ -205,6 +207,11 @@ MainWindow::_Init()
 	fShapeListView->SetCommandStack(fDocument->CommandStack());
 	fShapeListView->SetSelection(fDocument->Selection());
 
+	fTransformerListView->SetSelection(fDocument->Selection());
+
+	fPropertyListView->SetCommandStack(fDocument->CommandStack());
+	fPropertyListView->SetSelection(fDocument->Selection());
+
 	fIconPreview16->SetIcon(fDocument->Icon());
 	fIconPreview32->SetIcon(fDocument->Icon());
 //	fIconPreview48->SetIcon(fDocument->Icon());
@@ -332,6 +339,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	fTransformerListView = new TransformerListView(bounds,
 												   "transformer list view");
 
+	// property list view
+	fPropertyListView = new IconObjectListView();
+
 	bg->AddChild(fSwatchGroup);
 
 	bg->AddChild(fIconPreview16);
@@ -346,14 +356,23 @@ MainWindow::_CreateGUI(BRect bounds)
 								 B_NO_BORDER));
 	bg->AddChild(new BScrollView("shape list scroll view",
 								 fShapeListView,
-								 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
 								 0, false, true,
 								 B_NO_BORDER));
 	bg->AddChild(new BScrollView("transformer list scroll view",
 								 fTransformerListView,
-								 B_FOLLOW_RIGHT | B_FOLLOW_TOP,
+								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
 								 0, false, true,
 								 B_NO_BORDER));
+
+	// scroll view around property list view
+	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	bg->AddChild(new ScrollView(fPropertyListView,
+								SCROLL_VERTICAL | SCROLL_NO_FRAME,
+								bounds, "property scroll view",
+								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								B_WILL_DRAW | B_FRAME_EVENTS));
+
 
 	bg->AddChild(fCanvasView);
 

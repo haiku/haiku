@@ -6,6 +6,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include "OptionValueView.h"
+
 #include <stdio.h>
 
 #include <Font.h>
@@ -14,17 +16,13 @@
 #include <PopUpMenu.h>
 #include <Region.h>
 
-#include "OptionProperty.h"
-
-#include "OptionValueView.h"
-
 enum {
 	MSG_OPTION_CHANGED = 'opch',
 };
 
 // constructor
 OptionValueView::OptionValueView(OptionProperty* property)
-	: PropertyEditorView(property),
+	: PropertyEditorView(),
 	  fProperty(property),
 	  fCurrentOption(""),
 	  fEnabled(true)

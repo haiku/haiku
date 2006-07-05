@@ -11,9 +11,8 @@
 
 #include <String.h>
 
+#include "OptionProperty.h"
 #include "PropertyEditorView.h"
-
-class OptionProperty;
 
 class OptionValueView : public PropertyEditorView {
  public:
@@ -35,6 +34,8 @@ class OptionValueView : public PropertyEditorView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			OptionProperty*		fProperty;

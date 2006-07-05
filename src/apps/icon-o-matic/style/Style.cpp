@@ -12,7 +12,7 @@
 
 // constructor
 Style::Style()
-	: IconObject(),
+	: IconObject("<style>"),
 	  Observer(),
 
 	  fColor(),

@@ -128,29 +128,29 @@ class PathListItem : public SimpleItem,
 					}
 
 			void	SetMarkEnabled(bool enabled)
-			{
-				if (fMarkEnabled == enabled)
-					return;
-				fMarkEnabled = enabled;
-				Invalidate();
-			}
+					{
+						if (fMarkEnabled == enabled)
+							return;
+						fMarkEnabled = enabled;
+						Invalidate();
+					}
 			void	SetMarked(bool marked)
-			{
-				if (fMarked == marked)
-					return;
-				fMarked = marked;
-				Invalidate();
-			}
+					{
+						if (fMarked == marked)
+							return;
+						fMarked = marked;
+						Invalidate();
+					}
 
 			void Invalidate()
-			{
-				// :-/
-				if (fListView->LockLooper()) {
-					fListView->InvalidateItem(
-						fListView->IndexOf(this));
-					fListView->UnlockLooper();
-				}
-			}
+					{
+						// :-/
+						if (fListView->LockLooper()) {
+							fListView->InvalidateItem(
+								fListView->IndexOf(this));
+							fListView->UnlockLooper();
+						}
+					}
 
 	VectorPath* 	path;
  private:
@@ -265,10 +265,10 @@ PathListView::SelectionChanged()
 	if (!fSelection)
 		return;
 
-//	if (item)
-//		fSelection->Select(item->path);
-//	else
-//		fSelection->DeselectAll();
+	if (item)
+		fSelection->Select(item->path);
+	else
+		fSelection->DeselectAll();
 }
 
 // MouseDown

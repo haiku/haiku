@@ -27,7 +27,10 @@ class StrokeTransformer : public Transformer,
 
 	virtual	void				SetSource(VertexSource& source);
 
-	virtual	const char*			Name() const;
+	// IconObject interface
+	virtual	PropertyObject*		MakePropertyObject() const;
+	virtual	bool				SetToPropertyObject(
+									const PropertyObject* object);
 };
 
 #endif // STROKE_TRANSFORMER_H

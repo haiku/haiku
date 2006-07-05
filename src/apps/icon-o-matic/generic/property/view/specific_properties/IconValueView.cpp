@@ -6,20 +6,19 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+#include "IconValueView.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #include <Bitmap.h>
 #include <Region.h>
 
-#include "IconProperty.h"
 #include "PropertyItemView.h"
-
-#include "IconValueView.h"
 
 // constructor
 IconValueView::IconValueView(IconProperty* property)
-	: PropertyEditorView(property),
+	: PropertyEditorView(),
 	  fProperty(property),
 	  fIcon(NULL)
 {

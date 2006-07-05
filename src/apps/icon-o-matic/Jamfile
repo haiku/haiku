@@ -43,6 +43,7 @@ Application Icon-O-Matic :
 	Icon.cpp
 	IconObject.cpp
 	IconRenderer.cpp
+	SetPropertiesCommand.cpp
 	# generic/command
 	Command.cpp
 	CommandStack.cpp
@@ -107,6 +108,7 @@ Application Icon-O-Matic :
 	support.cpp
 	support_ui.cpp
 	# gui
+	IconObjectListView.cpp
 	PathListView.cpp
 	ShapeListView.cpp
 	SwatchGroup.cpp

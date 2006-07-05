@@ -10,7 +10,7 @@
 
 // constructor
 PerspectiveTransformer::PerspectiveTransformer(VertexSource& source)
-	: Transformer(source),
+	: Transformer(source, "Perspective"),
 	  Perspective(source, *this)
 {
 }
@@ -42,11 +42,12 @@ PerspectiveTransformer::SetSource(VertexSource& source)
 	Perspective::attach(source);
 }
 
-// Name
-const char*
-PerspectiveTransformer::Name() const
+// SetLast
+void
+PerspectiveTransformer::SetLast()
 {
-	return "Perspective";
+	fSource.SetLast();
 }
+
 
 

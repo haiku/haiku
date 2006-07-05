@@ -9,9 +9,10 @@
 #ifndef STRING_VALUE_VIEW_H
 #define STRING_VALUE_VIEW_H
 
+#include "OptionProperty.h"
+#include "Property.h"
 #include "TextInputValueView.h"
 
-class StringProperty;
 class StringTextView;
 
 class StringValueView : public TextInputValueView {
@@ -26,6 +27,8 @@ class StringValueView : public TextInputValueView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
+	virtual	Property*			GetProperty() const
+									{ return fProperty; }
 
  private:
 			StringProperty*		fProperty;

@@ -10,7 +10,7 @@
 
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source)
-	: Transformer(source),
+	: Transformer(source, "Transformation"),
 	  Affine(source, *this)
 {
 }
@@ -42,11 +42,10 @@ AffineTransformer::SetSource(VertexSource& source)
 	Affine::attach(source);
 }
 
-// Name
-const char*
-AffineTransformer::Name() const
+// SetLast
+void
+AffineTransformer::SetLast()
 {
-	return "Transformation";
+	fSource.SetLast();
 }
-
 

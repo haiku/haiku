@@ -26,8 +26,7 @@ class ContourTransformer : public Transformer,
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
-
-	virtual	const char*			Name() const;
+	virtual	void				SetLast();
 };
 
 #endif // CONTOUR_TRANSFORMER_H

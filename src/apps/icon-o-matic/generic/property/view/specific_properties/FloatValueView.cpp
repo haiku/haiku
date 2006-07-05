@@ -10,12 +10,11 @@
 
 #include <stdio.h>
 
-#include "Property.h"
 #include "NummericalTextView.h"
 
 // constructor
 FloatValueView::FloatValueView(FloatProperty* property)
-	: TextInputValueView(property),
+	: TextInputValueView(),
 	  fProperty(property)
 {
 	BRect b = Bounds();

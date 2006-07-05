@@ -3,7 +3,6 @@
 
 #include <List.h>
 #include <Rect.h>
-#include <String.h>
 
 #include "IconObject.h"
 #include "Observer.h"
@@ -48,9 +47,6 @@ class Shape : public IconObject,
 	inline	::Style*			Style() const
 									{ return fStyle; }
 
-			void				SetName(const char* name);
-			const char*			Name() const;
-
 	inline	BRect				LastBounds() const
 									{ return fLastBounds; }
 			BRect				Bounds(bool updateLast = false) const;
@@ -87,8 +83,6 @@ class Shape : public IconObject,
 			BList				fListeners;
 
 	mutable	BRect				fLastBounds;
-
-			BString				fName;
 };
 
 #endif // SHAPE_H

@@ -26,19 +26,62 @@
 
 using std::nothrow;
 
-class TransformerItem : public SimpleItem {
+class TransformerItem : public SimpleItem,
+						public Observer {
  public:
-					TransformerItem(Transformer* t)
+					TransformerItem(Transformer* t,
+									TransformerListView* listView)
 						: SimpleItem(t->Name()),
-						  transformer(t)
+						  transformer(NULL),
+						  fListView(listView)
 					{
+						SetTransformer(t);
 					}
 
 	virtual			~TransformerItem()
 					{
+						SetTransformer(NULL);
+					}
+
+	// Observer interface
+	virtual	void	ObjectChanged(const Observable* object)
+					{
+						UpdateText();
+					}
+
+	// TransformerItem
+			void	SetTransformer(Transformer* t)
+					{
+						if (t == transformer)
+							return;
+
+						if (transformer) {
+							transformer->RemoveObserver(this);
+							transformer->Release();
+						}
+
+						transformer = t;
+
+						if (transformer) {
+							transformer->Acquire();
+							transformer->AddObserver(this);
+							UpdateText();
+						}
+					}
+			void	UpdateText()
+					{
+						SetText(transformer->Name());
+						// :-/
+						if (fListView->LockLooper()) {
+							fListView->InvalidateItem(
+								fListView->IndexOf(this));
+							fListView->UnlockLooper();
+						}
 					}
 
 	Transformer* 	transformer;
+ private:
+	TransformerListView* fListView;
 };
 
 // #pragma mark -
@@ -171,7 +214,8 @@ BListItem*
 TransformerListView::CloneItem(int32 index) const
 {
 	if (TransformerItem* item = dynamic_cast<TransformerItem*>(ItemAt(index))) {
-		return new TransformerItem(item->transformer);
+		return new TransformerItem(item->transformer,
+								   const_cast<TransformerListView*>(this));
 	}
 	return NULL;
 }
@@ -258,7 +302,7 @@ bool
 TransformerListView::_AddTransformer(Transformer* transformer, int32 index)
 {
 	if (transformer)
-		 return AddItem(new TransformerItem(transformer), index);
+		 return AddItem(new TransformerItem(transformer, this), index);
 	return false;
 }
 

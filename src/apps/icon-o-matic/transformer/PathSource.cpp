@@ -39,6 +39,13 @@ PathSource::vertex(double* x, double* y)
 	return fAGGCurvedPath.vertex(x, y);
 }
 
+// SetLast
+void
+PathSource::SetLast()
+{
+	fAGGPath.close_polygon();
+}
+
 // Update
 void
 PathSource::Update()
