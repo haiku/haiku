@@ -17,9 +17,9 @@
 { \
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
-	uint8 rt = min_c(255, _p.data8[2] + (uint16)(r)); \
-	uint8 gt = min_c(255, _p.data8[1] + (uint16)(g)); \
-	uint8 bt = min_c(255, _p.data8[0] + (uint16)(b)); \
+	uint8 rt = min_c(255, _p.data8[2] + (r)); \
+	uint8 gt = min_c(255, _p.data8[1] + (g)); \
+	uint8 bt = min_c(255, _p.data8[0] + (b)); \
 	BLEND(d, rt, gt, bt, a); \
 }
 
@@ -28,9 +28,9 @@
 { \
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
-	d[0] = min_c(255, _p.data8[0] + (uint16)(b)); \
-	d[1] = min_c(255, _p.data8[1] + (uint16)(g)); \
-	d[2] = min_c(255, _p.data8[2] + (uint16)(r)); \
+	d[0] = min_c(255, _p.data8[0] + (b)); \
+	d[1] = min_c(255, _p.data8[1] + (g)); \
+	d[2] = min_c(255, _p.data8[2] + (r)); \
 	d[3] = 255; \
 }
 
