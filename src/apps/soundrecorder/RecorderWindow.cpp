@@ -246,7 +246,7 @@ RecorderWindow::InitWindow()
 		
 		r = background->Bounds();
 		r.left = 2;
-		r.right = r.left + 39;
+		r.right = r.left + 37;
 		r.bottom = r.top + 104;
 		fVUView = new VUView(r, B_FOLLOW_LEFT|B_FOLLOW_TOP);
 		background->AddChild(fVUView);

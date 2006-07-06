@@ -22,6 +22,7 @@ VUView::VUView(BRect rect, uint32 resizeFlags)
 	fBitmap(NULL),
 	fQuitting(false)
 {
+	rect.OffsetTo(B_ORIGIN);
 	fLevelCount = int(rect.Height()) / 2;
 	fChannels = 2;
 	fCurrentLevels = new int32[fChannels];
@@ -142,10 +143,10 @@ VUView::RenderLoop()
 		fBitmap->Lock();
 		fBitmapView->BeginLineArray(fLevelCount * 2);
 		BPoint start1, end1, start2, end2;
-		start1.x = 1;
-		start2.x = 20;
-		end1.x = 14;
-		end2.x = 33;
+		start1.x = 3;
+		start2.x = 22;
+		end1.x = 16;
+		end2.x = 35;
 		start1.y = end1.y = start2.y = end2.y = 2;
 		for (int32 i=fLevelCount-1; i>=0; i--) {
 			fBitmapView->AddLine(start1, end1, levels[i][0]);

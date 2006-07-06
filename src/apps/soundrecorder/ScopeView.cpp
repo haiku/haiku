@@ -14,9 +14,9 @@
 
 //#define TRACE 1
 #ifdef TRACE
-#define TRACE(x) printf(x)
+#define TRACE(x...) printf(x)
 #else
-#define TRACE(x)
+#define TRACE(x...)
 #endif
 
 ScopeView::ScopeView(BRect rect, uint32 resizeFlags)
@@ -63,9 +63,14 @@ void
 ScopeView::Draw(BRect updateRect)
 {
 	BRect bounds = Bounds();
-	if (!fIsRendering)
+	SetHighColor(0,0,0);
+	
+	if (!fIsRendering) {
+		FillRect(BRect(0,0,2,bounds.bottom));
 		DrawBitmapAsync(fBitmap, BPoint(2,0));
-		
+	} else 
+		FillRect(bounds);
+	
 	float x = 2;
 	if (fTotalTime !=0)
 		x = 2 + (fMainTime - fLeftTime) * (bounds.right - 2) / (fRightTime - fLeftTime);
@@ -152,17 +157,20 @@ ScopeView::RenderLoop()
 			
 		}
 		
-		TRACE("finished computing\n");
+		TRACE("finished computing, rendering\n");
 		
 		/* rendering */
 		RenderBitmap();
-	
+		
+		TRACE("rendering done\n");
+
 		/* ask drawing */
 		
 		fIsRendering = false;
 	
 		if (Window()->LockWithTimeout(5000) == B_OK) {
 			Invalidate();
+			TRACE("invalidate done\n");
 			Window()->Unlock();
 		}
 	}	
@@ -174,6 +182,7 @@ ScopeView::SetMainTime(bigtime_t timestamp)
 {
 	fMainTime = timestamp;
 	Invalidate();
+	TRACE("invalidate done\n");
 }
 
 
@@ -182,6 +191,7 @@ ScopeView::SetTotalTime(bigtime_t timestamp)
 {
 	fTotalTime = timestamp;
 	Invalidate();
+	TRACE("invalidate done\n");
 }
 
 void 
@@ -190,6 +200,7 @@ ScopeView::SetLeftTime(bigtime_t timestamp)
 	fLeftTime = timestamp;
 	RenderBitmap();
 	Invalidate();
+	TRACE("invalidate done\n");
 }
 
 void 
@@ -198,6 +209,7 @@ ScopeView::SetRightTime(bigtime_t timestamp)
 	fRightTime = timestamp;
 	RenderBitmap();
 	Invalidate();
+	TRACE("invalidate done\n");
 }
 
 
@@ -216,6 +228,7 @@ ScopeView::FrameResized(float width, float height)
 	InitBitmap();
 	RenderBitmap();
 	Invalidate();
+	TRACE("invalidate done\n");
 }
 
 
