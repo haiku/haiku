@@ -1,5 +1,9 @@
 /*
- * Copyright 2002-2006, Haiku.
+ * Copyright 2006, Haiku.
+ *
+ * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002 Jerome Leveque
+ * Copyright (c) 2002 Paul Stadler
  * Distributed under the terms of the MIT License.
  *
  * Authors:

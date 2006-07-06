@@ -1,5 +1,7 @@
 /*
- * Copyright 2002-2006, Haiku.
+ * Copyright 2005-2006, Haiku.
+ * 
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * Distributed under the terms of the MIT License.
  *
  * Authors:

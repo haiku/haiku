@@ -1,11 +1,14 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2006, Haiku.
+ *
+ * Copyright (c) 2004-2005 Matthijs Hollemans
+ * Copyright (c) 2003 Jerome Leveque
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ * 		Jérôme Duval
  *		Jérôme Leveque
  *		Matthijs Hollemans
- * 		Jérôme Duval
  */
 
 #include <MidiRoster.h>
