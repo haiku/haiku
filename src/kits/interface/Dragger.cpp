@@ -75,7 +75,6 @@ BDragger::BDragger(BMessage *data)
 	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
 
 	BMessage popupMsg;
-
 	if (data->FindMessage("_popup", &popupMsg) == B_OK) {
 		BArchivable *archivable = instantiate_object(&popupMsg);
 
@@ -98,28 +97,28 @@ BDragger::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BDragger"))
 		return new BDragger(data);
-	else
-		return NULL;
+	return NULL;
 }
 
 
 status_t 
 BDragger::Archive(BMessage *data, bool deep) const
 {
-	BMessage popupMsg;
-	status_t ret = B_OK;
+	status_t ret = BView::Archive(data, deep);
+	if (ret != B_OK)
+		return ret;
 
+	BMessage popupMsg;
+	
 	if (fPopUp) {
-		ret = fPopUp->Archive(&popupMsg);
+		ret = fPopUp->Archive(&popupMsg, deep);
 		if (ret == B_OK)
 			ret = data->AddMessage("_popup", &popupMsg);
 	}
 
 	if (ret == B_OK)
 		ret = data->AddInt32("_rel", fRelation);
-	if (ret != B_OK)
-		return ret;
-	return BView::Archive(data, deep);
+	return ret;
 }
 
 
