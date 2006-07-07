@@ -572,6 +572,11 @@ InputServer::MessageReceived(BMessage* message)
 			fAddOnManager->PostMessage(message);
 			return;
 
+		case IS_SAVE_SETTINGS:
+			fKeyboardSettings.Save();
+			fMouseSettings.SaveSettings();
+			return;
+
 		case B_SOME_APP_LAUNCHED:
 		{
 			const char *signature;
@@ -613,6 +618,7 @@ InputServer::HandleGetSetMouseType(BMessage* message, BMessage* reply)
 	int32 type;
 	if (message->FindInt32("mouse_type", &type) == B_OK) {
 		fMouseSettings.SetMouseType(type);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
@@ -631,6 +637,7 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
 	int32 factor;
 	if (message->FindInt32("speed", &factor) == B_OK) {
 		fMouseSettings.SetAccelerationFactor(factor);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
@@ -648,6 +655,7 @@ InputServer::HandleGetSetKeyRepeatDelay(BMessage* message, BMessage* reply)
 	bigtime_t delay;
 	if (message->FindInt64("delay", &delay) == B_OK) {
 		fKeyboardSettings.SetKeyboardRepeatDelay(delay);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
@@ -752,6 +760,7 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message, BMessage* reply)
 	int32 speed;
 	if (message->FindInt32("speed", &speed) == B_OK) {
 		fMouseSettings.SetMouseSpeed(speed);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
@@ -796,6 +805,7 @@ InputServer::HandleGetSetMouseMap(BMessage* message, BMessage* reply)
 	ssize_t size;
 	if (message->FindData("mousemap", B_RAW_TYPE, (const void**)&map, &size) == B_OK) {
 		fMouseSettings.SetMapping(*map);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
@@ -822,6 +832,7 @@ InputServer::HandleGetSetClickSpeed(BMessage* message, BMessage* reply)
 	bigtime_t clickSpeed;
 	if (message->FindInt64("speed", &clickSpeed) == B_OK) {
 		fMouseSettings.SetClickSpeed(clickSpeed);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_POINTING_DEVICE);
@@ -839,6 +850,7 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message, BMessage* reply)
 	int32 keyRepeatRate;
 	if (message->FindInt32("rate", &keyRepeatRate) == B_OK) {
 		fKeyboardSettings.SetKeyboardRepeatRate(keyRepeatRate);
+		be_app_messenger.SendMessage(IS_SAVE_SETTINGS);
 
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);

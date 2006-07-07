@@ -26,8 +26,7 @@ public :
 	int32		KeyboardRepeatRate() const		{ return fSettings.key_repeat_rate; }
 	bigtime_t	KeyboardRepeatDelay() const 	{ return fSettings.key_repeat_delay; }
 
-private:	
-	void Save();
+	void 		Save();
 	
 private:
 	kb_settings			fSettings;

@@ -39,6 +39,8 @@
 #define IS_CONTROL_DEVICES				'Icnd'
 #define SYSTEM_SHUTTING_DOWN			'SSDn'
 
+#define IS_SAVE_SETTINGS			'Isst'
+
 // app_server communication
 #define IS_ACQUIRE_INPUT				'Iaqi'
 #define IS_RELEASE_INPUT				'Irli'

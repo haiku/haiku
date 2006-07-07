@@ -51,10 +51,11 @@ class MouseSettings {
 		mode_mouse MouseMode() const { return fMode; }
 		void SetMouseMode(mode_mouse mode);
 
+		status_t SaveSettings();
+
 	private:
 		static status_t GetSettingsPath(BPath &path);
 		void RetrieveSettings();
-		status_t SaveSettings();
 
 		mouse_settings	fSettings, fOriginalSettings;
 		mode_mouse		fMode, fOriginalMode;
