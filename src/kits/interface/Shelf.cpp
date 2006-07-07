@@ -25,6 +25,7 @@
 #include <Shelf.h>
 #include <View.h>
 
+#include <ViewPrivate.h>
 #include <ZombieReplicantView.h>
 
 #include <stdio.h>
@@ -295,10 +296,10 @@ _rep_data_::index_of(BList const *list, unsigned long id)
 
 
 _TContainerViewFilter_::_TContainerViewFilter_(BShelf *shelf, BView *view)
-	:	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
+	:	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+	fShelf(shelf),
+	fView(view)	
 {
-	fShelf = shelf;
-	fView = view;
 }
 
 
@@ -323,12 +324,9 @@ _TContainerViewFilter_::Filter(BMessage *msg, BHandler **handler)
 filter_result
 _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 {
-	BView *mouseView;
-
+	BView *mouseView = NULL;
 	if (*_handler)
 		mouseView = dynamic_cast<BView*>(*_handler);
-	else
-		mouseView = NULL;
 
 	if (msg->WasDropped()) {
 		if (!fShelf->fAllowDragging) {
@@ -343,20 +341,16 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 
 	if (msg->WasDropped()) {
 		point = msg->DropPoint(&offset);
-
 		point = mouseView->ConvertFromScreen(point - offset);
 	}
 
-	BLooper *looper;
+	BLooper *looper = NULL;
 	BHandler *handler = msg->ReturnAddress().Target(&looper);
 
-	BDragger *dragger;
-
 	if (Looper() == looper) {
+		BDragger *dragger = NULL;
 		if (handler)
 			dragger = dynamic_cast<BDragger*>(handler);
-		else
-			dragger = NULL;
 
 		BRect rect;
 		if (dragger->fRelation == BDragger::TARGET_IS_CHILD)
@@ -389,22 +383,27 @@ _TContainerViewFilter_::ObjectDropFilter(BMessage *msg, BHandler **_handler)
 class _TReplicantViewFilter_ : public BMessageFilter {
 	public:
 		_TReplicantViewFilter_(BShelf *shelf, BView *view)
-			: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
-		{
-			fShelf = shelf;
-			fView = view;
+			: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+			fShelf(shelf),
+			fView(view)
+		{		
 		}
 
 		virtual	~_TReplicantViewFilter_()
 		{
 		}
 	
-		filter_result Filter(BMessage *, BHandler **)
+		filter_result Filter(BMessage *message, BHandler **handler)
 		{
+			if (message->what == kDeleteReplicant) {
+				if (handler != NULL)
+					*handler = fShelf;
+				message->AddPointer("_target", fView);
+			}
 			return B_DISPATCH_MESSAGE;
 		}
 
-	protected:
+	private:
 		BShelf	*fShelf;
 		BView	*fView;
 };
@@ -470,6 +469,14 @@ BShelf::Instantiate(BMessage *data)
 void
 BShelf::MessageReceived(BMessage *msg)
 {
+	if (msg->what == kDeleteReplicant) {
+		BView *replicant = NULL;
+		if (msg->FindPointer("_target", (void **)&replicant) == B_OK && replicant != NULL)
+			DeleteReplicant(replicant);
+		
+		return;
+	}
+
 	BMessage replyMsg(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
 	
@@ -1192,7 +1199,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		if (relation == BDragger::TARGET_IS_SIBLING || relation == BDragger::TARGET_IS_CHILD)
 			fContainerView->AddChild(dragger);
 
-		AddFilter(new _TReplicantViewFilter_(this, replicant));
+		replicant->AddFilter(new _TReplicantViewFilter_(this, replicant));
 
 	} else if (fDisplayZombies && fAllowZombies) {
 		// TODO: the zombies must be adjusted and moved as well!
@@ -1217,8 +1224,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 			zombie->AddChild(dragger);
 			zombie->SetArchive(data);
-
-			AddFilter(new _TReplicantViewFilter_(this, zombie));
+			zombie->AddFilter(new _TReplicantViewFilter_(this, zombie));
 
 			fContainerView->AddChild(zombie);
 		}

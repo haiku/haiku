@@ -264,7 +264,7 @@ BDragger::MessageReceived(BMessage *msg)
 {
 	if (msg->what == B_TRASH_TARGET) {
 		if (fShelf)
-			Window()->PostMessage(kDeleteDragger, fTarget, NULL);
+			Window()->PostMessage(kDeleteReplicant, fTarget, NULL);
 		else
 			(new BAlert("??",
 				"Can't delete this replicant from its original application. Life goes on.",
@@ -385,12 +385,12 @@ BDragger::AllDetached()
 
 
 status_t
-BDragger::SetPopUp(BPopUpMenu *context_menu)
+BDragger::SetPopUp(BPopUpMenu *menu)
 {
-	if (fPopUp && fPopUp != context_menu)
+	if (fPopUp != NULL && fPopUp != menu)
 		delete fPopUp;
 
-	fPopUp = context_menu;
+	fPopUp = menu;
 	return B_OK;
 }
 
@@ -547,12 +547,8 @@ BDragger::BuildDefaultPopUp()
 	snprintf(about, B_OS_NAME_LENGTH, "About %s", name);
 	
 	fPopUp->AddItem(new BMenuItem(about, msg));
-
-	// Separator
-	fPopUp->AddItem(new BSeparatorItem());
-
-	// Delete
-	fPopUp->AddItem(new BMenuItem("Delete", new BMessage(kDeleteDragger)));
+	fPopUp->AddSeparatorItem();
+	fPopUp->AddItem(new BMenuItem("Delete", new BMessage(kDeleteReplicant)));
 }
 
 

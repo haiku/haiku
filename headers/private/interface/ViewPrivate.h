@@ -18,7 +18,7 @@
 #include <Rect.h>
 #include <Region.h>
 
-const static uint32 kDeleteDragger = 'JAHA';
+const static uint32 kDeleteReplicant = 'JAHA';
 
 struct shape_data {
 	uint32*	opList;
