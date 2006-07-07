@@ -282,11 +282,11 @@ BMenu::Archive(BMessage *data, bool deep) const
 	if (err == B_OK)
 		err = data->AddFloat("_maxwidth", fMaxContentWidth);
 	if (err == B_OK && deep) {
-		int32 count = CountItems();
-		for (int index=0; index<count; index++) {
-			BMenuItem *item = ItemAt(index);
+		BMenuItem *item = NULL;
+		int32 index = 0;
+		while ((item = ItemAt(index++)) != NULL) {
 			BMessage itemData;
-			item->Archive(&itemData);
+			item->Archive(&itemData, deep);
 			err = data->AddMessage("_items", &itemData);
 			if (err != B_OK)
 				break;
@@ -1170,6 +1170,13 @@ BMenu::InitData(BMessage *data)
 		
 		data->FindBool("_dyn_label", &fDynamicName);
 		data->FindFloat("_maxwidth", &fMaxContentWidth);
+
+		BMessage msg;
+        	for (int32 i = 0; data->FindMessage("_items", i, &msg) == B_OK; i++) {
+			BArchivable *object = instantiate_object(&msg);
+			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object))
+				AddItem(item);
+		}
 	}
 }
 
