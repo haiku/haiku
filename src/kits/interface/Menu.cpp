@@ -282,7 +282,18 @@ BMenu::Archive(BMessage *data, bool deep) const
 	if (err == B_OK)
 		err = data->AddFloat("_maxwidth", fMaxContentWidth);
 	if (err == B_OK && deep) {
-		// TODO store items and rects
+		int32 count = CountItems();
+		for (int index=0; index<count; index++) {
+			BMenuItem *item = ItemAt(index);
+			BMessage itemData;
+			item->Archive(&itemData);
+			err = data->AddMessage("_items", &itemData);
+			if (err != B_OK)
+				break;
+			if (fLayout == B_ITEMS_IN_MATRIX) {
+				// TODO Store location of items
+			}
+		}
 	}
 
 	return err;
