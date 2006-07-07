@@ -10,13 +10,13 @@
 #define PATH_MANIPULATOR_H
 
 #include "Manipulator.h"
+#include "VectorPath.h"
 
 class AddPointCommand;
 class CanvasView;
 class ChangePointCommand;
 class UndoStack;
 class InsertPointCommand;
-class VectorPath;
 
 //class PathSelection {
 // public:
@@ -29,7 +29,8 @@ class VectorPath;
 //	virtual	Command*			Delete();
 //};
 
-class PathManipulator : public Manipulator {
+class PathManipulator : public Manipulator,
+						public PathListener {
  public:
 								PathManipulator(VectorPath* path);
 	virtual						~PathManipulator();
@@ -62,6 +63,14 @@ class PathManipulator : public Manipulator {
 
 	// Observer interface (Manipulator)
 	virtual	void				ObjectChanged(const Observable* object);
+
+	// PathListener interface
+	virtual	void				PointAdded(int32 index);
+	virtual	void				PointRemoved(int32 index);
+	virtual	void				PointChanged(int32 index);
+	virtual	void				PathChanged();
+	virtual	void				PathClosedChanged();
+	virtual	void				PathReversed();
 
 	// PathManipulator
 			uint32				ControlFlags() const;

@@ -7,7 +7,6 @@
 #include "agg_bounding_rect.h"
 
 #include "Style.h"
-#include "VectorPath.h"
 
 using std::nothrow;
 
@@ -110,7 +109,7 @@ void
 Shape::PathAdded(VectorPath* path)
 {
 	path->Acquire();
-	path->AddObserver(this);
+	path->AddListener(this);
 	Notify();
 }
 
@@ -118,9 +117,53 @@ Shape::PathAdded(VectorPath* path)
 void
 Shape::PathRemoved(VectorPath* path)
 {
-	path->RemoveObserver(this);
+	path->RemoveListener(this);
 	Notify();
 	path->Release();
+}
+
+// #pragma mark -
+
+// PointAdded
+void
+Shape::PointAdded(int32 index)
+{
+	Notify();
+}
+
+// PointRemoved
+void
+Shape::PointRemoved(int32 index)
+{
+	Notify();
+}
+
+// PointChanged
+void
+Shape::PointChanged(int32 index)
+{
+	Notify();
+}
+
+// PathChanged
+void
+Shape::PathChanged()
+{
+	Notify();
+}
+
+// PathClosedChanged
+void
+Shape::PathClosedChanged()
+{
+	Notify();
+}
+
+// PathReversed
+void
+Shape::PathReversed()
+{
+	Notify();
 }
 
 // #pragma mark -
@@ -186,7 +229,6 @@ Shape::Bounds(bool updateLast) const
 ::VertexSource&
 Shape::VertexSource()
 {
-	fPathSource.Update();
 	::VertexSource* source = &fPathSource;
 
 	int32 count = fTransformers.CountItems();
@@ -196,7 +238,7 @@ Shape::VertexSource()
 		source = t;
 	}
 
-	source->SetLast();
+	fPathSource.Update(source->WantsOpenPaths());
 
 	return *source;
 }

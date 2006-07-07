@@ -10,6 +10,7 @@
 #define VECTOR_PATH_H
 
 #include <Archivable.h>
+#include <List.h>
 #include <Rect.h>
 #include <String.h>
 
@@ -26,6 +27,19 @@ struct control_point {
 	BPoint		point_in;	// control point for incomming curve
 	BPoint		point_out;	// control point for outgoing curve
 	bool		connected;	// if all 3 points should be on one line
+};
+
+class PathListener {
+ public:
+								PathListener();
+	virtual						~PathListener();
+
+	virtual	void				PointAdded(int32 index) = 0;
+	virtual	void				PointRemoved(int32 index) = 0;
+	virtual	void				PointChanged(int32 index) = 0;
+	virtual	void				PathChanged() = 0;
+	virtual	void				PathClosedChanged() = 0;
+	virtual	void				PathReversed() = 0;
 };
 
 class VectorPath : public BArchivable,
@@ -126,13 +140,24 @@ class VectorPath : public BArchivable,
 
 			bool				GetAGGPathStorage(agg::path_storage& path) const;
 
+			bool				AddListener(PathListener* listener);
+			bool				RemoveListener(PathListener* listener);
+
  private:
 			BRect				_Bounds() const;
 			void				_SetPoint(int32 index, BPoint point);
 			bool				_SetPointCount(int32 count);
 
-			control_point*		fPath;
+			void				_NotifyPointAdded(int32 index) const;
+			void				_NotifyPointChanged(int32 index) const;
+			void				_NotifyPointRemoved(int32 index) const;
+			void				_NotifyPathChanged() const;
+			void				_NotifyClosedChanged() const;
+			void				_NotifyPathReversed() const;
 
+			BList				fListeners;
+
+			control_point*		fPath;
 			bool				fClosed;
 
 			int32				fPointCount;

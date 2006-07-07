@@ -47,6 +47,13 @@ StrokeTransformer::SetSource(VertexSource& source)
 	Stroke::attach(source);
 }
 
+// WantsOpenPaths
+bool
+StrokeTransformer::WantsOpenPaths() const
+{
+	return true;
+}
+
 // #pragma mark -
 
 // MakePropertyObject

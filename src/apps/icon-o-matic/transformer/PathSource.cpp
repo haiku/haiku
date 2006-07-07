@@ -39,21 +39,23 @@ PathSource::vertex(double* x, double* y)
 	return fAGGCurvedPath.vertex(x, y);
 }
 
-// SetLast
-void
-PathSource::SetLast()
-{
-	fAGGPath.close_polygon();
-}
-
 // Update
 void
-PathSource::Update()
+PathSource::Update(bool leavePathsOpen)
 {
 	fAGGPath.remove_all();
 
 	int32 count = fPaths->CountPaths();
-	for (int32 i = 0; i < count; i++)
+	for (int32 i = 0; i < count; i++) {
 		fPaths->PathAtFast(i)->GetAGGPathStorage(fAGGPath);
+		if (!leavePathsOpen)
+			fAGGPath.close_polygon();
+	}
 }
 
+// WantsOpenPaths
+bool
+PathSource::WantsOpenPaths() const
+{
+	return false;
+}

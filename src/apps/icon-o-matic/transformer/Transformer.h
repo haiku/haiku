@@ -19,7 +19,7 @@ class VertexSource {
     virtual	void				rewind(unsigned path_id) = 0;
     virtual	unsigned			vertex(double* x, double* y) = 0;
 
-	virtual	void				SetLast();
+	virtual	bool				WantsOpenPaths() const = 0;
 };
 
 
@@ -34,6 +34,8 @@ class Transformer : public VertexSource,
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
+
+	virtual	bool				WantsOpenPaths() const;
 
  protected:
 			VertexSource&		fSource;

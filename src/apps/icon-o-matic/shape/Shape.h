@@ -8,6 +8,7 @@
 #include "Observer.h"
 #include "PathContainer.h"
 #include "PathSource.h"
+#include "VectorPath.h"
 
 class Style;
 
@@ -24,7 +25,8 @@ class ShapeListener {
 
 class Shape : public IconObject,
 			  public Observer,	// observing all the paths and the style
-			  public PathContainerListener {
+			  public PathContainerListener,
+			  public PathListener {
  public:
 								Shape(::Style* style);
 								Shape(const Shape& other);
@@ -36,6 +38,14 @@ class Shape : public IconObject,
 	// PathContainerListener interface
 	virtual	void				PathAdded(VectorPath* path);
 	virtual	void				PathRemoved(VectorPath* path);
+
+	// PathListener interface
+	virtual	void				PointAdded(int32 index);
+	virtual	void				PointRemoved(int32 index);
+	virtual	void				PointChanged(int32 index);
+	virtual	void				PathChanged();
+	virtual	void				PathClosedChanged();
+	virtual	void				PathReversed();
 
 	// Shape
 			status_t			InitCheck() const;

@@ -19,7 +19,6 @@
 #include "support.h"
 
 #include "CanvasView.h"
-#include "VectorPath.h"
 
 #include "AddPointCommand.h"
 #include "ChangePointCommand.h"
@@ -217,11 +216,14 @@ PathManipulator::PathManipulator(VectorPath* path)
 	  fLastNudgeTime(system_time())//,
 //	  fNudgeCommand(NULL)
 {
+	fPath->AddListener(this);
 }
 
 // destructor
 PathManipulator::~PathManipulator()
 {
+	fPath->RemoveListener(this);
+
 	delete fChangePointCommand;
 	delete fInsertPointCommand;
 	delete fAddPointCommand;
@@ -896,6 +898,50 @@ PathManipulator::ObjectChanged(const Observable* object)
 	// reevaluate mode
 	if (!fMouseDown)
 		_SetModeForMousePos(fLastCanvasPos);
+}
+
+// #pragma mark -
+
+// PointAdded
+void
+PathManipulator::PointAdded(int32 index)
+{
+	ObjectChanged(fPath);
+}
+
+// PointRemoved
+void
+PathManipulator::PointRemoved(int32 index)
+{
+	ObjectChanged(fPath);
+}
+
+// PointChanged
+void
+PathManipulator::PointChanged(int32 index)
+{
+	ObjectChanged(fPath);
+}
+
+// PathChanged
+void
+PathManipulator::PathChanged()
+{
+	ObjectChanged(fPath);
+}
+
+// PathClosedChanged
+void
+PathManipulator::PathClosedChanged()
+{
+	ObjectChanged(fPath);
+}
+
+// PathReversed
+void
+PathManipulator::PathReversed()
+{
+	ObjectChanged(fPath);
 }
 
 // #pragma mark -

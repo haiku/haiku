@@ -50,6 +50,22 @@ name_for_id(int32 id)
 			name = "Closed";
 			break;
 
+		case PROPERTY_TRANSLATION_X:
+			name = "Translation X";
+			break;
+		case PROPERTY_TRANSLATION_Y:
+			name = "Translation Y";
+			break;
+		case PROPERTY_ROTATION:
+			name = "Rotation";
+			break;
+		case PROPERTY_SCALE_X:
+			name = "Scale X";
+			break;
+		case PROPERTY_SCALE_Y:
+			name = "Scale Y";
+			break;
+
 		default:
 			name = "<unkown property>";
 			break;

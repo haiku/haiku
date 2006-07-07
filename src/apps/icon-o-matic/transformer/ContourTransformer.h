@@ -26,7 +26,11 @@ class ContourTransformer : public Transformer,
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
-	virtual	void				SetLast();
+
+	// IconObject interface
+	virtual	PropertyObject*		MakePropertyObject() const;
+	virtual	bool				SetToPropertyObject(
+									const PropertyObject* object);
 };
 
 #endif // CONTOUR_TRANSFORMER_H

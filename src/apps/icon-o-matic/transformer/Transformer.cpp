@@ -18,12 +18,6 @@ VertexSource::~VertexSource()
 {
 }
 
-// Finish
-void
-VertexSource::SetLast()
-{
-}
-
 // #pragma mark -
 
 // constructor
@@ -59,4 +53,10 @@ Transformer::SetSource(VertexSource& source)
 	fSource = source;
 }
 
+// WantsOpenPaths
+bool
+Transformer::WantsOpenPaths() const
+{
+	return fSource.WantsOpenPaths();
+}
 

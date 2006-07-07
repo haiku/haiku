@@ -8,6 +8,10 @@
 
 #include "ContourTransformer.h"
 
+#include "CommonPropertyIDs.h"
+#include "Property.h"
+#include "PropertyObject.h"
+
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source)
 	: Transformer(source, "Contour"),
@@ -42,10 +46,38 @@ ContourTransformer::SetSource(VertexSource& source)
 	Contour::attach(source);
 }
 
-// SetLast
-void
-ContourTransformer::SetLast()
+// #pragma mark -
+
+// MakePropertyObject
+PropertyObject*
+ContourTransformer::MakePropertyObject() const
 {
-	fSource.SetLast();
+	PropertyObject* object = Transformer::MakePropertyObject();
+	if (!object)
+		return NULL;
+
+	// width
+	object->AddProperty(new FloatProperty(PROPERTY_WIDTH, width()));
+
+	return object;
 }
+
+// SetToPropertyObject
+bool
+ContourTransformer::SetToPropertyObject(const PropertyObject* object)
+{
+	AutoNotificationSuspender _(this);
+	Transformer::SetToPropertyObject(object);
+
+	// width
+	float w = object->Value(PROPERTY_WIDTH, (float)width());
+	if (w != width()) {
+		width(w);
+		Notify();
+	}
+
+	return HasPendingNotifications();
+}
+
+
 

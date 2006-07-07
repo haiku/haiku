@@ -42,12 +42,6 @@ PerspectiveTransformer::SetSource(VertexSource& source)
 	Perspective::attach(source);
 }
 
-// SetLast
-void
-PerspectiveTransformer::SetLast()
-{
-	fSource.SetLast();
-}
 
 
 

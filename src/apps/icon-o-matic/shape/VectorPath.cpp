@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <debugger.h>
+
 #include <Bitmap.h>
 #include <Message.h>
 #include <TypeConstants.h>
@@ -67,11 +69,18 @@ get_path_storage(agg::path_storage& path,
 	return false;
 }
 
+// #pragma mark -
+
+PathListener::PathListener() {}
+PathListener::~PathListener() {}
+
+// #pragma mark -
 
 // constructor
 VectorPath::VectorPath()
 	: BArchivable(),
 	  IconObject("<path>"),
+	  fListeners(20),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
@@ -84,6 +93,7 @@ VectorPath::VectorPath()
 VectorPath::VectorPath(const VectorPath& from)
 	: BArchivable(),
 	  IconObject(from),
+	  fListeners(20),
 	  fPath(NULL),
 	  fPointCount(0),
 	  fAllocCount(0),
@@ -96,6 +106,7 @@ VectorPath::VectorPath(const VectorPath& from)
 VectorPath::VectorPath(const BMessage* archive)
 	: BArchivable(),
 	  IconObject("<path>"/*archive*/),
+	  fListeners(20),
 	  fPath(NULL),
 	  fClosed(false),
 	  fPointCount(0),
@@ -134,6 +145,10 @@ VectorPath::~VectorPath()
 {
 	if (fPath)
 		obj_free(fPath);
+
+	if (fListeners.CountItems() > 0)
+		debugger("VectorPath::~VectorPath() - "
+				 "there are still listeners attached!");
 }
 
 // #pragma mark -
@@ -251,7 +266,7 @@ VectorPath::AddPoint(BPoint point)
 
 	if (_SetPointCount(fPointCount + 1)) {
 		_SetPoint(index, point);
-		Notify();
+		_NotifyPointAdded(index);
 		return true;
 	}
 
@@ -278,7 +293,7 @@ VectorPath::AddPoint(BPoint point, int32 index)
 			}
 		}
 		_SetPoint(index, point);
-		Notify();
+		_NotifyPointAdded(index);
 		return true;
 	}
 	return false;
@@ -303,7 +318,7 @@ VectorPath::RemovePoint(int32 index)
 
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 
-		Notify();
+		_NotifyPointRemoved(index);
 		return true;
 	}
 	return false;
@@ -323,7 +338,7 @@ VectorPath::SetPoint(int32 index, BPoint point)
 
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 
-		Notify();
+		_NotifyPointChanged(index);
 		return true;
 	}
 	return false;
@@ -345,7 +360,7 @@ VectorPath::SetPoint(int32 index, BPoint point,
 
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 
-		Notify();
+		_NotifyPointChanged(index);
 		return true;
 	}
 	return false;
@@ -376,7 +391,7 @@ VectorPath::SetPointIn(int32 i, BPoint point)
 
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 
-		Notify();
+		_NotifyPointChanged(i);
 		return true;
 	}
 	return false;
@@ -411,7 +426,7 @@ VectorPath::SetPointOut(int32 i, BPoint point, bool mirrorDist)
 
 		fCachedBounds.Set(0.0, 0.0, -1.0, -1.0);
 
-		Notify();
+		_NotifyPointChanged(i);
 		return true;
 	}
 	return false;
@@ -423,7 +438,7 @@ VectorPath::SetInOutConnected(int32 index, bool connected)
 {
 	if (index >= 0 && index < fPointCount) {
 		fPath[index].connected = connected;
-		Notify();
+		_NotifyPointChanged(index);
 		return true;
 	}
 	return false;	
@@ -646,6 +661,7 @@ VectorPath::SetClosed(bool closed)
 {
 	if (fClosed != closed) {
 		fClosed = closed;
+		_NotifyClosedChanged();
 		Notify();
 	}
 }
@@ -808,7 +824,7 @@ VectorPath::CleanUp()
 	}
 
 	if (notify)
-		Notify();
+		_NotifyPathChanged();
 }
 
 // Reverse
@@ -826,7 +842,7 @@ VectorPath::Reverse()
 	}
 	*this = temp;
 
-	Notify();
+	_NotifyPathReversed();
 }
 
 // PrintToStream
@@ -848,6 +864,26 @@ VectorPath::GetAGGPathStorage(agg::path_storage& path) const
 {
 	return get_path_storage(path, fPath, fPointCount, fClosed);
 }
+
+// #pragma mark -
+
+// AddListener
+bool
+VectorPath::AddListener(PathListener* listener)
+{
+	if (listener && !fListeners.HasItem((void*)listener))
+		return fListeners.AddItem((void*)listener);
+	return false;
+}
+
+// RemoveListener
+bool
+VectorPath::RemoveListener(PathListener* listener)
+{
+	return fListeners.RemoveItem((void*)listener);
+}
+
+// #pragma mark -
 
 // _SetPoint
 void
@@ -892,3 +928,78 @@ VectorPath::_SetPointCount(int32 count)
 
 	return fPath != NULL;
 }
+
+// #pragma mark -
+
+// _NotifyPointAdded
+void
+VectorPath::_NotifyPointAdded(int32 index) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PointAdded(index);
+	}
+}
+
+// _NotifyPointChanged
+void
+VectorPath::_NotifyPointChanged(int32 index) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PointChanged(index);
+	}
+}
+
+// _NotifyPointRemoved
+void
+VectorPath::_NotifyPointRemoved(int32 index) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PointRemoved(index);
+	}
+}
+
+// _NotifyPathChanged
+void
+VectorPath::_NotifyPathChanged() const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PathChanged();
+	}
+}
+
+// _NotifyClosedChanged
+void
+VectorPath::_NotifyClosedChanged() const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PathClosedChanged();
+	}
+}
+
+// _NotifyPathReversed
+void
+VectorPath::_NotifyPathReversed() const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		PathListener* listener = (PathListener*)listeners.ItemAtFast(i);
+		listener->PathReversed();
+	}
+}
+

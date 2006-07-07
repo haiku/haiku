@@ -28,9 +28,10 @@ class PathSource : public VertexSource {
     virtual	void				rewind(unsigned path_id);
     virtual	unsigned			vertex(double* x, double* y);
 
-	virtual	void				SetLast();
+	virtual	bool				WantsOpenPaths() const;
 
-			void				Update();
+	// PathSource
+			void				Update(bool leavePathsOpen);
 
  private:
 		 	PathContainer*		fPaths;

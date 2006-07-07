@@ -25,6 +25,12 @@ enum {
 	PROPERTY_MITER_LIMIT				= 'mtlm',
 
 	PROPERTY_CLOSED						= 'clsd',
+
+	PROPERTY_TRANSLATION_X				= 'trnx',
+	PROPERTY_TRANSLATION_Y				= 'trny',
+	PROPERTY_ROTATION					= 'rotn',
+	PROPERTY_SCALE_X					= 'sclx',
+	PROPERTY_SCALE_Y					= 'scly',
 };
 
 
