@@ -179,16 +179,11 @@ BMenuItem::Instantiate(BMessage *data)
 }
 
 
-extern const char* B_CLASS_FIELD;
-
-
 status_t
 BMenuItem::Archive(BMessage *data, bool deep) const
 {
-	status_t ret = B_OK;
-	if (!data->HasString(B_CLASS_FIELD))
-		ret = data->AddString(B_CLASS_FIELD, "BMenuItem");
-	
+	status_t ret = BArchivable::Archive(data, deep);
+
 	if (ret == B_OK && fLabel)
 		ret = data->AddString("_label", Label());
 

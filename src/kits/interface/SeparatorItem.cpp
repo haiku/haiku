@@ -33,14 +33,9 @@ BSeparatorItem::~BSeparatorItem()
 }
 
 
-extern const char* B_CLASS_FIELD;
-
 status_t
 BSeparatorItem::Archive(BMessage* archive, bool deep) const
 {
-	if (!archive->HasString(B_CLASS_FIELD))
-		archive->AddString(B_CLASS_FIELD, "BMenuItem");
-	
 	return BMenuItem::Archive(archive, deep);
 }
 

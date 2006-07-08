@@ -1161,7 +1161,9 @@ BMenu::InitData(BMessage *data)
 	if (data != NULL) {
 		data->FindInt32("_layout", (int32 *)&fLayout);
 		data->FindBool("_rsize_to_fit", &fResizeToFit);
-		data->FindBool("_disable", &fEnabled);
+		bool disabled;
+		if (data->FindBool("_disable", &disabled) == B_OK)
+			fEnabled = !disabled;
 		data->FindBool("_radio", &fRadioMode);
 		
 		bool disableTrigger = false;
