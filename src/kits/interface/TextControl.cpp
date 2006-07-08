@@ -86,7 +86,7 @@ BTextControl::Instantiate(BMessage *archive)
 status_t
 BTextControl::Archive(BMessage *data, bool deep) const
 {
-	status_t ret = BView::Archive(data, deep);
+	status_t ret = BControl::Archive(data, deep);
 	alignment labelAlignment, textAlignment;
 
 	GetAlignment(&labelAlignment, &textAlignment);
