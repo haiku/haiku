@@ -13,6 +13,7 @@
 class Style;
 
 // TODO: merge Observer and ShapeListener interface
+// ie add "AppearanceChanged(Shape* shape)"
 class ShapeListener {
  public:
 								ShapeListener();
@@ -21,6 +22,9 @@ class ShapeListener {
 	virtual	void				TransformerAdded(Transformer* t,
 												 int32 index) = 0;
 	virtual	void				TransformerRemoved(Transformer* t) = 0;
+
+	virtual	void				StyleChanged(::Style* oldStyle,
+											 ::Style* newStyle) = 0;
 };
 
 class Shape : public IconObject,
@@ -83,6 +87,9 @@ class Shape : public IconObject,
 			void				_NotifyTransformerAdded(Transformer* t,
 														int32 index) const;
 			void				_NotifyTransformerRemoved(Transformer* t) const;
+
+			void				_NotifyStyleChanged(::Style* oldStyle,
+													::Style* newStyle) const;
 
 			void				_NotifyRerender() const;
 

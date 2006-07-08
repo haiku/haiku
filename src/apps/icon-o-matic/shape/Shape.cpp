@@ -177,6 +177,8 @@ Shape::InitCheck() const
 	return fPaths ? B_OK : B_NO_MEMORY;
 }
 
+// #pragma mark -
+
 // SetStyle
 void
 Shape::SetStyle(::Style* style)
@@ -189,6 +191,7 @@ Shape::SetStyle(::Style* style)
 		fStyle->Release();
 	}
 
+	::Style* oldStyle = fStyle;
 	fStyle = style;
 
 	if (fStyle) {
@@ -196,7 +199,7 @@ Shape::SetStyle(::Style* style)
 		fStyle->AddObserver(this);
 	}
 
-	_NotifyRerender();
+	_NotifyStyleChanged(oldStyle, fStyle);
 }
 
 // #pragma mark -
@@ -368,6 +371,21 @@ Shape::_NotifyTransformerRemoved(Transformer* transformer) const
 		ShapeListener* listener
 			= (ShapeListener*)listeners.ItemAtFast(i);
 		listener->TransformerRemoved(transformer);
+	}
+	// TODO: merge Observable and ShapeListener interface
+	_NotifyRerender();
+}
+
+// _NotifyStyleChanged
+void
+Shape::_NotifyStyleChanged(::Style* oldStyle, ::Style* newStyle) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ShapeListener* listener
+			= (ShapeListener*)listeners.ItemAtFast(i);
+		listener->StyleChanged(oldStyle, newStyle);
 	}
 	// TODO: merge Observable and ShapeListener interface
 	_NotifyRerender();

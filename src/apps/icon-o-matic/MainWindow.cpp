@@ -25,6 +25,7 @@
 #include "PathListView.h"
 #include "ScrollView.h"
 #include "ShapeListView.h"
+#include "StyleListView.h"
 #include "SwatchGroup.h"
 #include "TransformerFactory.h"
 #include "TransformerListView.h"
@@ -49,6 +50,9 @@ enum {
 
 	MSG_NEW_PATH					= 'nwvp',
 	MSG_PATH_SELECTED				= 'vpsl',
+	MSG_NEW_STYLE					= 'nwst',
+	MSG_STYLE_SELECTED				= 'stsl',
+	MSG_NEW_SHAPE					= 'nwsp',
 	MSG_SHAPE_SELECTED				= 'spsl',
 
 	MSG_ADD_TRANSFORMER				= 'adtr',
@@ -56,7 +60,7 @@ enum {
 
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
-	: BWindow(BRect(50, 50, 891, 781), "Icon-O-Matic",
+	: BWindow(BRect(20, 50, 1010, 781), "Icon-O-Matic",
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
@@ -107,11 +111,28 @@ case MSG_PATH_SELECTED: {
 	}
 	break;
 }
+// TODO: use an AddStyleCommand
+case MSG_NEW_STYLE: {
+	Style* style = new Style();
+	style->SetColor((rgb_color){ rand() % 255,
+								 rand() % 255,
+								 rand() % 255,
+								 255 });
+	StyleManager::Default()->AddStyle(style);
+	break;
+}
+// TODO: use an AddShapeCommand
+case MSG_NEW_SHAPE: {
+	Shape* shape = new Shape(StyleManager::Default()->StyleAt(0));
+	fDocument->Icon()->Shapes()->AddShape(shape);
+	break;
+}
 case MSG_SHAPE_SELECTED: {
 	Shape* shape;
 	if (message->FindPointer("shape", (void**)&shape) < B_OK)
 		shape = NULL;
 	fPathListView->SetCurrentShape(shape);
+	fStyleListView->SetCurrentShape(shape);
 	fTransformerListView->SetShape(shape);
 	break;
 }
@@ -200,13 +221,20 @@ MainWindow::_Init()
 	fCanvasView->SetIcon(fDocument->Icon());
 
 	fPathListView->SetPathContainer(fDocument->Icon()->Paths());
+	fPathListView->SetShapeContainer(fDocument->Icon()->Shapes());
 //	fPathListView->SetCommandStack(fDocument->CommandStack());
 	fPathListView->SetSelection(fDocument->Selection());
+
+	fStyleListView->SetStyleManager(StyleManager::Default());
+	fStyleListView->SetShapeContainer(fDocument->Icon()->Shapes());
+//	fStyleListView->SetCommandStack(fDocument->CommandStack());
+	fStyleListView->SetSelection(fDocument->Selection());
 
 	fShapeListView->SetShapeContainer(fDocument->Icon()->Shapes());
 	fShapeListView->SetCommandStack(fDocument->CommandStack());
 	fShapeListView->SetSelection(fDocument->Selection());
 
+	fTransformerListView->SetCommandStack(fDocument->CommandStack());
 	fTransformerListView->SetSelection(fDocument->Selection());
 
 	fPropertyListView->SetCommandStack(fDocument->CommandStack());
@@ -329,6 +357,11 @@ MainWindow::_CreateGUI(BRect bounds)
 	fPathListView = new PathListView(bounds, "path list view",
 									 new BMessage(MSG_PATH_SELECTED), this);
 
+	// style list view
+	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	fStyleListView = new StyleListView(bounds, "style list view",
+									   new BMessage(MSG_STYLE_SELECTED), this);
+
 	// shape list view
 	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
 	fShapeListView = new ShapeListView(bounds, "shape list view",
@@ -354,6 +387,11 @@ MainWindow::_CreateGUI(BRect bounds)
 								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
 								 0, false, true,
 								 B_NO_BORDER));
+	bg->AddChild(new BScrollView("style list scroll view",
+								 fStyleListView,
+								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
+								 0, false, true,
+								 B_NO_BORDER));
 	bg->AddChild(new BScrollView("shape list scroll view",
 								 fShapeListView,
 								 B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -367,6 +405,7 @@ MainWindow::_CreateGUI(BRect bounds)
 
 	// scroll view around property list view
 	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	bounds.right = bg->Bounds().right - 5;
 	bg->AddChild(new ScrollView(fPropertyListView,
 								SCROLL_VERTICAL | SCROLL_NO_FRAME,
 								bounds, "property scroll view",
@@ -414,6 +453,11 @@ MainWindow::_CreateMenuBar(BRect frame)
 	// Path
 	pathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
 
+	// Style
+	styleMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_STYLE)));
+
+	// Shape
+	shapeMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_SHAPE)));
 
 	// Transformer
 	int32 cookie = 0;

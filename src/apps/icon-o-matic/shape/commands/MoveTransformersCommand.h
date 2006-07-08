@@ -6,24 +6,24 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#ifndef MOVE_SHAPES_COMMAND_H
-#define MOVE_SHAPES_COMMAND_H
+#ifndef MOVE_TRANSFORMERS_COMMAND_H
+#define MOVE_TRANSFORMERS_COMMAND_H
 
 #include "Command.h"
 
 // TODO: make a templated "move items" command?
 
 class Shape;
-class ShapeContainer;
+class Transformer;
 
-class MoveShapesCommand : public Command {
+class MoveTransformersCommand : public Command {
  public:
-								MoveShapesCommand(
-									ShapeContainer* container,
-									Shape** shapes,
+								MoveTransformersCommand(
+									Shape* shape,
+									Transformer** transformers,
 									int32 count,
 									int32 toIndex);
-	virtual						~MoveShapesCommand();
+	virtual						~MoveTransformersCommand();
 	
 	virtual	status_t			InitCheck();
 
@@ -33,11 +33,11 @@ class MoveShapesCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			ShapeContainer*		fContainer;
-			Shape**				fShapes;
+			Shape*				fContainer;
+			Transformer**		fTransformers;
 			int32*				fIndices;
 			int32				fToIndex;
 			int32				fCount;
 };
 
-#endif // MOVE_SHAPES_COMMAND_H
+#endif // MOVE_TRANSFORMERS_COMMAND_H

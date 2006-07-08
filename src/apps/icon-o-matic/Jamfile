@@ -111,6 +111,7 @@ Application Icon-O-Matic :
 	IconObjectListView.cpp
 	PathListView.cpp
 	ShapeListView.cpp
+	StyleListView.cpp
 	SwatchGroup.cpp
 	TransformerListView.cpp
 	# shape
@@ -124,9 +125,11 @@ Application Icon-O-Matic :
 	ChangePointCommand.cpp
 	InsertPointCommand.cpp
 	MoveShapesCommand.cpp
+	MoveTransformersCommand.cpp
 	PathCommand.cpp
 	RemovePointsCommand.cpp
 	RemoveShapesCommand.cpp
+	RemoveTransformersCommand.cpp
 	# style
 	Gradient.cpp
 	Style.cpp

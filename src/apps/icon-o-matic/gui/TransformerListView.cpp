@@ -18,8 +18,8 @@
 #include <Window.h>
 
 #include "CommandStack.h"
-//#include "MoveTransformersCommand.h"
-//#include "RemoveTransformersCommand.h"
+#include "MoveTransformersCommand.h"
+#include "RemoveTransformersCommand.h"
 #include "Transformer.h"
 #include "Observer.h"
 #include "Selection.h"
@@ -160,29 +160,29 @@ TransformerListView::MakeDragMessage(BMessage* message) const
 void
 TransformerListView::MoveItems(BList& items, int32 toIndex)
 {
-//	if (!fCommandStack || !fShape)
-//		return;
-//
-//	int32 count = items.CountItems();
-//	Transformer** transformers = new (nothrow) Transformer*[count];
-//	if (!shapes)
-//		return;
-//
-//	for (int32 i = 0; i < count; i++) {
-//		TransformerItem* item
-//			= dynamic_cast<TransformerItem*>((BListItem*)items.ItemAtFast(i));
-//		transformers[i] = item ? item->transformer : NULL;
-//	}
-//
-//	MoveTransformersCommand* command
-//		= new (nothrow) MoveTransformersCommand(fShape,
-//												transformers, count, toIndex);
-//	if (!command) {
-//		delete[] transformers;
-//		return;
-//	}
-//
-//	fCommandStack->Perform(command);
+	if (!fCommandStack || !fShape)
+		return;
+
+	int32 count = items.CountItems();
+	Transformer** transformers = new (nothrow) Transformer*[count];
+	if (!transformers)
+		return;
+
+	for (int32 i = 0; i < count; i++) {
+		TransformerItem* item
+			= dynamic_cast<TransformerItem*>((BListItem*)items.ItemAtFast(i));
+		transformers[i] = item ? item->transformer : NULL;
+	}
+
+	MoveTransformersCommand* command
+		= new (nothrow) MoveTransformersCommand(fShape,
+												transformers, count, toIndex);
+	if (!command) {
+		delete[] transformers;
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // CopyItems
@@ -197,16 +197,16 @@ TransformerListView::CopyItems(BList& items, int32 toIndex)
 void
 TransformerListView::RemoveItemList(BList& indexList)
 {
-//	if (!fCommandStack || !fShape)
-//		return;
-//
-//	int32 count = indexList.CountItems();
-//	const int32* indices = (int32*)indexList.Items();
-//
-//	RemoveTransformersCommand* command
-//		= new (nothrow) RemoveTransformersCommand(fShape,
-//												  indices, count);
-//	fCommandStack->Perform(command);
+	if (!fCommandStack || !fShape)
+		return;
+
+	int32 count = indexList.CountItems();
+	const int32* indices = (int32*)indexList.Items();
+
+	RemoveTransformersCommand* command
+		= new (nothrow) RemoveTransformersCommand(fShape,
+												  indices, count);
+	fCommandStack->Perform(command);
 }
 
 // CloneItem
@@ -252,6 +252,13 @@ TransformerListView::TransformerRemoved(Transformer* transformer)
 	_RemoveTransformer(transformer);
 
 	UnlockLooper();
+}
+
+// StyleChanged
+void
+TransformerListView::StyleChanged(Style* oldStyle, Style* newStyle)
+{
+	// we don't care
 }
 
 // #pragma mark -

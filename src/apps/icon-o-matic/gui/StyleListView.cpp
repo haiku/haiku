@@ -6,7 +6,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include "PathListView.h"
+#include "StyleListView.h"
 
 #include <stdio.h>
 
@@ -16,7 +16,7 @@
 #include <Mime.h>
 #include <Window.h>
 
-#include "VectorPath.h"
+#include "Style.h"
 #include "Observer.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
@@ -26,24 +26,24 @@ static const float kMarkWidth		= 14.0;
 static const float kBorderOffset	= 3.0;
 static const float kTextOffset		= 4.0;
 
-class PathListItem : public SimpleItem,
+class StyleListItem : public SimpleItem,
 					 public Observer {
  public:
-					PathListItem(VectorPath* p,
-								 PathListView* listView,
-								 bool markEnabled)
+					StyleListItem(Style* s,
+								  StyleListView* listView,
+								  bool markEnabled)
 						: SimpleItem(""),
-						  path(NULL),
+						  style(NULL),
 						  fListView(listView),
 						  fMarkEnabled(markEnabled),
 						  fMarked(false)
 					{
-						SetPath(p);
+						SetStyle(s);
 					}
 
-	virtual			~PathListItem()
+	virtual			~StyleListItem()
 					{
-						SetPath(NULL);
+						SetStyle(NULL);
 					}
 
 	// SimpleItem interface
@@ -102,28 +102,28 @@ class PathListItem : public SimpleItem,
 						UpdateText();
 					}
 
-	// PathListItem
-			void	SetPath(VectorPath* p)
+	// StyleListItem
+			void	SetStyle(Style* s)
 					{
-						if (p == path)
+						if (s == style)
 							return;
 
-						if (path) {
-							path->RemoveObserver(this);
-							path->Release();
+						if (style) {
+							style->RemoveObserver(this);
+							style->Release();
 						}
 
-						path = p;
+						style = s;
 
-						if (path) {
-							path->Acquire();
-							path->AddObserver(this);
+						if (style) {
+							style->Acquire();
+							style->AddObserver(this);
 							UpdateText();
 						}
 					}
 			void	UpdateText()
 					{
-						SetText(path->Name());
+						SetText(style->Name());
 						Invalidate();
 					}
 
@@ -152,35 +152,35 @@ class PathListItem : public SimpleItem,
 						}
 					}
 
-	VectorPath* 	path;
+	Style* 	style;
  private:
-	PathListView*	fListView;
+	StyleListView*	fListView;
 	bool			fMarkEnabled;
 	bool			fMarked;
 };
 
 
-class ShapePathListener : public PathContainerListener,
-						  public ShapeContainerListener {
+class ShapeStyleListener : public ShapeListener,
+						   public ShapeContainerListener {
  public:
-	ShapePathListener(PathListView* listView)
+	ShapeStyleListener(StyleListView* listView)
 		: fListView(listView),
 		  fShape(NULL)
 	{
 	}
-	virtual ~ShapePathListener()
+	virtual ~ShapeStyleListener()
 	{
 		SetShape(NULL);
 	}
 
-	// PathContainerListener interface
-	virtual void PathAdded(VectorPath* path)
+	// ShapeListener interface
+	virtual	void TransformerAdded(Transformer* t, int32 index) {}
+	virtual	void TransformerRemoved(Transformer* t) {}
+
+	virtual void StyleChanged(Style* oldStyle, Style* newStyle)
 	{
-		fListView->_SetPathMarked(path, true);
-	}
-	virtual void PathRemoved(VectorPath* path)
-	{
-		fListView->_SetPathMarked(path, false);
+		fListView->_SetStyleMarked(oldStyle, false);
+		fListView->_SetStyleMarked(newStyle, true);
 	}
 
 	// ShapeContainerListener interface
@@ -190,19 +190,19 @@ class ShapePathListener : public PathContainerListener,
 		fListView->SetCurrentShape(NULL);
 	}
 
-	// ShapePathListener
+	// ShapeStyleListener
 	void SetShape(Shape* shape)
 	{
 		if (fShape == shape)
 			return;
 
 		if (fShape)
-			fShape->Paths()->RemoveListener(this);
+			fShape->RemoveListener(this);
 
 		fShape = shape;
 
 		if (fShape)
-			fShape->Paths()->AddListener(this);
+			fShape->AddListener(this);
 	}
 
 	Shape* CurrentShape() const
@@ -211,56 +211,56 @@ class ShapePathListener : public PathContainerListener,
 	}
 
  private:
-	PathListView*	fListView;
+	StyleListView*	fListView;
 	Shape*			fShape;
 };
 
 // #pragma mark -
 
 // constructor
-PathListView::PathListView(BRect frame,
+StyleListView::StyleListView(BRect frame,
 						   const char* name,
 						   BMessage* message, BHandler* target)
 	: SimpleListView(frame, name,
 					 NULL, B_SINGLE_SELECTION_LIST),
 	  fMessage(message),
-	  fPathContainer(NULL),
+	  fStyleContainer(NULL),
 	  fShapeContainer(NULL),
 	  fSelection(NULL),
 	  fCommandStack(NULL),
 
 	  fCurrentShape(NULL),
-	  fShapePathListener(new ShapePathListener(this))
+	  fShapeListener(new ShapeStyleListener(this))
 {
 	SetTarget(target);
 }
 
 // destructor
-PathListView::~PathListView()
+StyleListView::~StyleListView()
 {
 	_MakeEmpty();
 	delete fMessage;
 
-	if (fPathContainer)
-		fPathContainer->RemoveListener(this);
+	if (fStyleContainer)
+		fStyleContainer->RemoveListener(this);
 
 	if (fShapeContainer)
-		fShapeContainer->RemoveListener(fShapePathListener);
+		fShapeContainer->RemoveListener(fShapeListener);
 
-	delete fShapePathListener;
+	delete fShapeListener;
 }
 
 // SelectionChanged
 void
-PathListView::SelectionChanged()
+StyleListView::SelectionChanged()
 {
 	// NOTE: single selection list
 
-	PathListItem* item
-		= dynamic_cast<PathListItem*>(ItemAt(CurrentSelection(0)));
+	StyleListItem* item
+		= dynamic_cast<StyleListItem*>(ItemAt(CurrentSelection(0)));
 	if (item && fMessage) {
 		BMessage message(*fMessage);
-		message.AddPointer("path", (void*)item->path);
+		message.AddPointer("style", (void*)item->style);
 		Invoke(&message);
 	}
 
@@ -269,14 +269,14 @@ PathListView::SelectionChanged()
 		return;
 
 	if (item)
-		fSelection->Select(item->path);
+		fSelection->Select(item->style);
 	else
 		fSelection->DeselectAll();
 }
 
 // MouseDown
 void
-PathListView::MouseDown(BPoint where)
+StyleListView::MouseDown(BPoint where)
 {
 	if (!fCurrentShape) {
 		SimpleListView::MouseDown(where);
@@ -285,30 +285,20 @@ PathListView::MouseDown(BPoint where)
 
 	bool handled = false;
 	int32 index = IndexOf(where);
-	PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(index));
+	StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(index));
 	if (item) {
 		BRect itemFrame(ItemFrame(index));
 		itemFrame.right = itemFrame.left
 							+ kBorderOffset + kMarkWidth
 							+ kTextOffset / 2.0;
-		VectorPath* path = item->path;
+		Style* style = item->style;
 		if (itemFrame.Contains(where)) {
-			// add or remove the path to the shape
-// TODO: code these commands...
-//			Command* command;
-//			if (fCurrentShape->Paths()->HasPath(path)) {
-//				command = new RemovePathFromShapeCommand(
-//								fCurrentShape, path);
-//			} else {
-//				command = new AddPathToShapeCommand(
-//								fCurrentShape, path);
-//			}
+			// set the style on the shape
+// TODO: code this command...
+//			Command* command = new SetStyleToShapeCommand(
+//										fCurrentShape, style);
 //			fCommandStack->Perform(command);
-if (fCurrentShape->Paths()->HasPath(path)) {
-	fCurrentShape->Paths()->RemovePath(path);
-} else {
-	fCurrentShape->Paths()->AddPath(path);
-}
+fCurrentShape->SetStyle(style);
 			handled = true;
 		}
 	}
@@ -319,69 +309,69 @@ if (fCurrentShape->Paths()->HasPath(path)) {
 
 // MessageReceived
 void
-PathListView::MessageReceived(BMessage* message)
+StyleListView::MessageReceived(BMessage* message)
 {
 	SimpleListView::MessageReceived(message);
 }
 
 // MakeDragMessage
 void
-PathListView::MakeDragMessage(BMessage* message) const
+StyleListView::MakeDragMessage(BMessage* message) const
 {
 }
 
 // AcceptDragMessage
 bool
-PathListView::AcceptDragMessage(const BMessage* message) const
+StyleListView::AcceptDragMessage(const BMessage* message) const
 {
 	return false;
 }
 
 // SetDropTargetRect
 void
-PathListView::SetDropTargetRect(const BMessage* message, BPoint where)
+StyleListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 }
 
 // MoveItems
 void
-PathListView::MoveItems(BList& items, int32 toIndex)
+StyleListView::MoveItems(BList& items, int32 toIndex)
 {
 }
 
 // CopyItems
 void
-PathListView::CopyItems(BList& items, int32 toIndex)
+StyleListView::CopyItems(BList& items, int32 toIndex)
 {
 }
 
 // RemoveItemList
 void
-PathListView::RemoveItemList(BList& indices)
+StyleListView::RemoveItemList(BList& indices)
 {
 	// TODO: allow removing items
 }
 
 // CloneItem
 BListItem*
-PathListView::CloneItem(int32 index) const
+StyleListView::CloneItem(int32 index) const
 {
-	if (PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(index))) {
-		return new PathListItem(item->path,
-								const_cast<PathListView*>(this),
-								fCurrentShape != NULL);
+	if (StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(index))) {
+		return new StyleListItem(item->style,
+								 const_cast<StyleListView*>(this),
+								 fCurrentShape != NULL);
 	}
 	return NULL;
 }
 
 // #pragma mark -
 
-// PathAdded
+// StyleAdded
 void
-PathListView::PathAdded(VectorPath* path)
+StyleListView::StyleAdded(Style* style)
 {
 	// NOTE: we are in the thread that messed with the
-	// ShapeContainer, so no need to lock the
+	// StyleManager, so no need to lock the
 	// container, when this is changed to asynchronous
 	// notifications, then it would need to be read-locked!
 	if (!LockLooper())
@@ -389,115 +379,115 @@ PathListView::PathAdded(VectorPath* path)
 
 	// NOTE: shapes are always added at the end
 	// of the list, so the sorting is synced...
-	if (_AddPath(path))
+	if (_AddStyle(style))
 		Select(CountItems() - 1);
 
 	UnlockLooper();
 }
 
-// PathRemoved
+// StyleRemoved
 void
-PathListView::PathRemoved(VectorPath* path)
+StyleListView::StyleRemoved(Style* style)
 {
 	// NOTE: we are in the thread that messed with the
-	// ShapeContainer, so no need to lock the
+	// StyleManager, so no need to lock the
 	// container, when this is changed to asynchronous
 	// notifications, then it would need to be read-locked!
 	if (!LockLooper())
 		return;
 
-	// NOTE: we're only interested in VectorPath objects
-	_RemovePath(path);
+	// NOTE: we're only interested in Style objects
+	_RemoveStyle(style);
 
 	UnlockLooper();
 }
 
 // #pragma mark -
 
-// SetPathContainer
+// SetStyleManager
 void
-PathListView::SetPathContainer(PathContainer* container)
+StyleListView::SetStyleManager(StyleManager* container)
 {
-	if (fPathContainer == container)
+	if (fStyleContainer == container)
 		return;
 
 	// detach from old container
-	if (fPathContainer)
-		fPathContainer->RemoveListener(this);
+	if (fStyleContainer)
+		fStyleContainer->RemoveListener(this);
 
 	_MakeEmpty();
 
-	fPathContainer = container;
+	fStyleContainer = container;
 
-	if (!fPathContainer)
+	if (!fStyleContainer)
 		return;
 
-	fPathContainer->AddListener(this);
+	fStyleContainer->AddListener(this);
 
 	// sync
-//	if (!fPathContainer->ReadLock())
+//	if (!fStyleContainer->ReadLock())
 //		return;
 
-	int32 count = fPathContainer->CountPaths();
+	int32 count = fStyleContainer->CountStyles();
 	for (int32 i = 0; i < count; i++)
-		_AddPath(fPathContainer->PathAtFast(i));
+		_AddStyle(fStyleContainer->StyleAtFast(i));
 
-//	fPathContainer->ReadUnlock();
+//	fStyleContainer->ReadUnlock();
 }
 
 // SetShapeContainer
 void
-PathListView::SetShapeContainer(ShapeContainer* container)
+StyleListView::SetShapeContainer(ShapeContainer* container)
 {
 	if (fShapeContainer == container)
 		return;
 
 	// detach from old container
 	if (fShapeContainer)
-		fShapeContainer->RemoveListener(fShapePathListener);
+		fShapeContainer->RemoveListener(fShapeListener);
 
 	fShapeContainer = container;
 
 	if (fShapeContainer)
-		fShapeContainer->AddListener(fShapePathListener);
+		fShapeContainer->AddListener(fShapeListener);
 }
 
 // SetSelection
 void
-PathListView::SetSelection(Selection* selection)
+StyleListView::SetSelection(Selection* selection)
 {
 	fSelection = selection;
 }
 
 // SetCurrentShape
 void
-PathListView::SetCurrentShape(Shape* shape)
+StyleListView::SetCurrentShape(Shape* shape)
 {
 	if (fCurrentShape == shape)
 		return;
 
 	fCurrentShape = shape;
-	fShapePathListener->SetShape(shape);
+	fShapeListener->SetShape(shape);
 
 	_UpdateMarks();
 }
 
 // #pragma mark -
 
-// _AddPath
+// _AddStyle
 bool
-PathListView::_AddPath(VectorPath* path)
+StyleListView::_AddStyle(Style* style)
 {
-	if (path)
-		 return AddItem(new PathListItem(path, this, fCurrentShape != NULL));
+	if (style)
+		 return AddItem(new StyleListItem(style, this, fCurrentShape != NULL));
 	return false;
 }
 
-// _RemovePath
+// _RemoveStyle
 bool
-PathListView::_RemovePath(VectorPath* path)
+StyleListView::_RemoveStyle(Style* style)
 {
-	PathListItem* item = _ItemForPath(path);
+	StyleListItem* item = _ItemForStyle(style);
 	if (item && RemoveItem(item)) {
 		delete item;
 		return true;
@@ -505,14 +495,14 @@ PathListView::_RemovePath(VectorPath* path)
 	return false;
 }
 
-// _ItemForPath
-PathListItem*
-PathListView::_ItemForPath(VectorPath* path) const
+// _ItemForStyle
+StyleListItem*
+StyleListView::_ItemForStyle(Style* style) const
 {
 	for (int32 i = 0;
-		 PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
+		 StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
 		 i++) {
-		if (item->path == path)
+		if (item->style == style)
 			return item;
 	}
 	return NULL;
@@ -522,23 +512,23 @@ PathListView::_ItemForPath(VectorPath* path) const
 
 // _UpdateMarks
 void
-PathListView::_UpdateMarks()
+StyleListView::_UpdateMarks()
 {
 	int32 count = CountItems();
 	if (fCurrentShape) {
 		// enable display of marks and mark items whoes
-		// path is contained in fCurrentShape
+		// style is contained in fCurrentShape
 		for (int32 i = 0; i < count; i++) {
-			PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
+			StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
 			if (!item)
 				continue;
 			item->SetMarkEnabled(true);
-			item->SetMarked(fCurrentShape->Paths()->HasPath(item->path));
+			item->SetMarked(fCurrentShape->Style() == item->style);
 		}
 	} else {
 		// disable display of marks
 		for (int32 i = 0; i < count; i++) {
-			PathListItem* item = dynamic_cast<PathListItem*>(ItemAt(i));
+			StyleListItem* item = dynamic_cast<StyleListItem*>(ItemAt(i));
 			if (!item)
 				continue;
 			item->SetMarkEnabled(false);
@@ -548,11 +538,11 @@ PathListView::_UpdateMarks()
 	Invalidate();
 }
 
-// _SetPathMarked
+// _SetStyleMarked
 void
-PathListView::_SetPathMarked(VectorPath* path, bool marked)
+StyleListView::_SetStyleMarked(Style* style, bool marked)
 {
-	if (PathListItem* item = _ItemForPath(path)) {
+	if (StyleListItem* item = _ItemForStyle(style)) {
 		item->SetMarked(marked);
 	}
 }

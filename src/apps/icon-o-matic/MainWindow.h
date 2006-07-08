@@ -22,6 +22,7 @@ class IconEditorApp;
 class IconView;
 class PathListView;
 class ShapeListView;
+class StyleListView;
 class SwatchGroup;
 class TransformerListView;
 
@@ -61,6 +62,8 @@ class MainWindow : public BWindow,
 	IconView*					fIconPreview64;
 
 	PathListView*				fPathListView;
+	StyleListView*				fStyleListView;
+
 	ShapeListView*				fShapeListView;
 	TransformerListView*		fTransformerListView;
 	IconObjectListView*			fPropertyListView;

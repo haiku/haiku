@@ -42,16 +42,21 @@ class TransformerListView : public SimpleListView,
 												 int32 index);
 	virtual	void				TransformerRemoved(Transformer* transformer);
 
+	virtual	void				StyleChanged(Style* oldStyle, Style* newStyle);
+
 	// TransformerListView
 			void				SetShape(Shape* shape);
 			void				SetSelection(Selection* selection);
 			void				SetCommandStack(CommandStack* stack);
 
  private:
-			bool				_AddTransformer(Transformer* transformer, int32 index);
-			bool				_RemoveTransformer(Transformer* transformer);
+			bool				_AddTransformer(
+									Transformer* transformer, int32 index);
+			bool				_RemoveTransformer(
+									Transformer* transformer);
 
-			TransformerItem*	_ItemForTransformer(Transformer* transformer) const;
+			TransformerItem*	_ItemForTransformer(
+									Transformer* transformer) const;
 
 			BMessage*			fMessage;
 
