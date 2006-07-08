@@ -291,7 +291,7 @@ BMenu::Archive(BMessage *data, bool deep) const
 			if (err != B_OK)
 				break;
 			if (fLayout == B_ITEMS_IN_MATRIX) {
-				// TODO Store location of items
+				err = data->AddRect("_i_frames", item->fBounds);
 			}
 		}
 	}
@@ -1172,10 +1172,16 @@ BMenu::InitData(BMessage *data)
 		data->FindFloat("_maxwidth", &fMaxContentWidth);
 
 		BMessage msg;
-        	for (int32 i = 0; data->FindMessage("_items", i, &msg) == B_OK; i++) {
+        for (int32 i = 0; data->FindMessage("_items", i, &msg) == B_OK; i++) {
 			BArchivable *object = instantiate_object(&msg);
-			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object))
-				AddItem(item);
+			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object)) {
+				BRect bounds;
+				if ((fLayout == B_ITEMS_IN_MATRIX)
+					&& (data->FindRect("_i_frames", i, &bounds) == B_OK))
+						AddItem(item, bounds);
+				else
+					AddItem(item);
+			}
 		}
 	}
 }
