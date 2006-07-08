@@ -42,6 +42,14 @@ PerspectiveTransformer::SetSource(VertexSource& source)
 	Perspective::attach(source);
 }
 
+// ApproximationScale
+double
+PerspectiveTransformer::ApproximationScale() const
+{
+	// TODO: upgrade AGG
+	return fSource.ApproximationScale();// * scale();
+}
+
 
 
 

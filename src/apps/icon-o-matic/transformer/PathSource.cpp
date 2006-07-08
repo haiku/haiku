@@ -39,9 +39,25 @@ PathSource::vertex(double* x, double* y)
 	return fAGGCurvedPath.vertex(x, y);
 }
 
+// WantsOpenPaths
+bool
+PathSource::WantsOpenPaths() const
+{
+	return false;
+}
+
+// ApproximationScale
+double
+PathSource::ApproximationScale() const
+{
+	return 1.0;
+}
+
+// #pragma mark -
+
 // Update
 void
-PathSource::Update(bool leavePathsOpen)
+PathSource::Update(bool leavePathsOpen, double approximationScale)
 {
 	fAGGPath.remove_all();
 
@@ -51,11 +67,7 @@ PathSource::Update(bool leavePathsOpen)
 		if (!leavePathsOpen)
 			fAGGPath.close_polygon();
 	}
+
+	fAGGCurvedPath.approximation_scale(approximationScale);
 }
 
-// WantsOpenPaths
-bool
-PathSource::WantsOpenPaths() const
-{
-	return false;
-}

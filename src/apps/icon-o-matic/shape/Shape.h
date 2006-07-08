@@ -84,11 +84,14 @@ class Shape : public IconObject,
 														int32 index) const;
 			void				_NotifyTransformerRemoved(Transformer* t) const;
 
+			void				_NotifyRerender() const;
+
 			PathContainer*		fPaths;
 			::Style*			fStyle;
 
 			PathSource			fPathSource;
 			BList				fTransformers;
+	mutable	bool				fNeedsUpdate;
 
 			BList				fListeners;
 

@@ -54,6 +54,13 @@ StrokeTransformer::WantsOpenPaths() const
 	return true;
 }
 
+// ApproximationScale
+double
+StrokeTransformer::ApproximationScale() const
+{
+	return fSource.ApproximationScale() * width();
+}
+
 // #pragma mark -
 
 // MakePropertyObject
@@ -84,6 +91,10 @@ StrokeTransformer::MakePropertyObject() const
 	property->SetCurrentOptionID(line_join());
 
 	object->AddProperty(property);
+
+	// miter limit
+	object->AddProperty(new FloatProperty(PROPERTY_MITER_LIMIT,
+										  miter_limit()));
 
 	return object;
 }
@@ -117,6 +128,12 @@ StrokeTransformer::SetToPropertyObject(const PropertyObject* object)
 		Notify();
 	}
 
+	// miter limit
+	float l = object->Value(PROPERTY_MITER_LIMIT, (float)miter_limit());
+	if (l != miter_limit()) {
+		miter_limit(l);
+		Notify();
+	}
 
 	return HasPendingNotifications();
 }

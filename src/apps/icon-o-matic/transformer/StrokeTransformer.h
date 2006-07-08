@@ -26,7 +26,9 @@ class StrokeTransformer : public Transformer,
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
+
 	virtual	bool				WantsOpenPaths() const;
+	virtual	double				ApproximationScale() const;
 
 	// IconObject interface
 	virtual	PropertyObject*		MakePropertyObject() const;

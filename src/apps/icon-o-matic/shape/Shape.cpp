@@ -33,6 +33,7 @@ Shape::Shape(::Style* style)
 
 	  fPathSource(fPaths),
 	  fTransformers(4),
+	  fNeedsUpdate(true),
 
 	  fLastBounds(0, 0, -1, -1)
 {
@@ -53,6 +54,7 @@ Shape::Shape(const Shape& other)
 
 	  fPathSource(fPaths),
 	  fTransformers(4),
+	  fNeedsUpdate(true),
 
 	  fLastBounds(0, 0, -1, -1)
 {
@@ -99,7 +101,7 @@ Shape::ObjectChanged(const Observable* object)
 	// simply pass on the event for now
 	// (a path, transformer or the style changed,
 	// the shape needs to be re-rendered)
-	Notify();
+	_NotifyRerender();
 }
 
 // #pragma mark -
@@ -110,7 +112,7 @@ Shape::PathAdded(VectorPath* path)
 {
 	path->Acquire();
 	path->AddListener(this);
-	Notify();
+	_NotifyRerender();
 }
 
 // PathRemoved
@@ -118,7 +120,7 @@ void
 Shape::PathRemoved(VectorPath* path)
 {
 	path->RemoveListener(this);
-	Notify();
+	_NotifyRerender();
 	path->Release();
 }
 
@@ -128,42 +130,42 @@ Shape::PathRemoved(VectorPath* path)
 void
 Shape::PointAdded(int32 index)
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // PointRemoved
 void
 Shape::PointRemoved(int32 index)
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // PointChanged
 void
 Shape::PointChanged(int32 index)
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // PathChanged
 void
 Shape::PathChanged()
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // PathClosedChanged
 void
 Shape::PathClosedChanged()
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // PathReversed
 void
 Shape::PathReversed()
 {
-	Notify();
+	_NotifyRerender();
 }
 
 // #pragma mark -
@@ -194,7 +196,7 @@ Shape::SetStyle(::Style* style)
 		fStyle->AddObserver(this);
 	}
 
-	Notify();
+	_NotifyRerender();
 }
 
 // #pragma mark -
@@ -238,7 +240,11 @@ Shape::VertexSource()
 		source = t;
 	}
 
-	fPathSource.Update(source->WantsOpenPaths());
+	if (fNeedsUpdate) {
+		fPathSource.Update(source->WantsOpenPaths(),
+						   source->ApproximationScale());
+		fNeedsUpdate = false;
+	}
 
 	return *source;
 }
@@ -349,7 +355,7 @@ Shape::_NotifyTransformerAdded(Transformer* transformer, int32 index) const
 		listener->TransformerAdded(transformer, index);
 	}
 	// TODO: merge Observable and ShapeListener interface
-	Notify();
+	_NotifyRerender();
 }
 
 // _NotifyTransformerRemoved
@@ -364,5 +370,13 @@ Shape::_NotifyTransformerRemoved(Transformer* transformer) const
 		listener->TransformerRemoved(transformer);
 	}
 	// TODO: merge Observable and ShapeListener interface
+	_NotifyRerender();
+}
+
+// _NotifyRerender
+void
+Shape::_NotifyRerender() const
+{
+	fNeedsUpdate = true;
 	Notify();
 }

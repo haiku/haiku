@@ -95,6 +95,7 @@ VectorPath::VectorPath(const VectorPath& from)
 	  IconObject(from),
 	  fListeners(20),
 	  fPath(NULL),
+	  fClosed(false),
 	  fPointCount(0),
 	  fAllocCount(0),
 	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
@@ -113,31 +114,35 @@ VectorPath::VectorPath(const BMessage* archive)
 	  fAllocCount(0),
 	  fCachedBounds(0.0, 0.0, -1.0, -1.0)
 {
-	if (archive) {
-		type_code typeFound;
-		int32 countFound;
-		if (archive->GetInfo("point", &typeFound, &countFound) >= B_OK
-			&& typeFound == B_POINT_TYPE && _SetPointCount(countFound)) {
-			memset(fPath, 0, fAllocCount * sizeof(control_point));
-			BPoint point;
-			BPoint pointIn;
-			BPoint pointOut;
-			bool connected;
-			for (int32 i = 0; i < fPointCount
-							  && archive->FindPoint("point", i, &point) >= B_OK
-							  && archive->FindPoint("point in", i, &pointIn) >= B_OK
-							  && archive->FindPoint("point out", i, &pointOut) >= B_OK
-							  && archive->FindBool("connected", i, &connected) >= B_OK; i++) {
-				fPath[i].point = point;
-				fPath[i].point_in = pointIn;
-				fPath[i].point_out = pointOut;
-				fPath[i].connected = connected;
-			}
-		}
-		if (archive->FindBool("path closed", &fClosed) < B_OK) {
-			fClosed = false;
+	if (!archive)
+		return;
+
+	type_code typeFound;
+	int32 countFound;
+	if (archive->GetInfo("point", &typeFound, &countFound) >= B_OK
+		&& typeFound == B_POINT_TYPE
+		&& _SetPointCount(countFound)) {
+
+		memset(fPath, 0, fAllocCount * sizeof(control_point));
+
+		BPoint point;
+		BPoint pointIn;
+		BPoint pointOut;
+		bool connected;
+		for (int32 i = 0; i < fPointCount
+						  && archive->FindPoint("point", i, &point) >= B_OK
+						  && archive->FindPoint("point in", i, &pointIn) >= B_OK
+						  && archive->FindPoint("point out", i, &pointOut) >= B_OK
+						  && archive->FindBool("connected", i, &connected) >= B_OK; i++) {
+			fPath[i].point = point;
+			fPath[i].point_in = pointIn;
+			fPath[i].point_out = pointOut;
+			fPath[i].connected = connected;
 		}
 	}
+	if (archive->FindBool("path closed", &fClosed) < B_OK)
+		fClosed = false;
+
 }
 
 // destructor

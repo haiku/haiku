@@ -66,6 +66,10 @@ name_for_id(int32 id)
 			name = "Scale Y";
 			break;
 
+		case PROPERTY_DETECT_ORIENTATION:
+			name = "Detect Orient.";
+			break;
+
 		default:
 			name = "<unkown property>";
 			break;

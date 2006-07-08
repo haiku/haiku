@@ -60,3 +60,10 @@ Transformer::WantsOpenPaths() const
 	return fSource.WantsOpenPaths();
 }
 
+// ApproximationScale
+double
+Transformer::ApproximationScale() const
+{
+	return fSource.ApproximationScale();
+}
+

@@ -30,6 +30,8 @@ class AffineTransformer : public Transformer,
 
 	virtual	void				SetSource(VertexSource& source);
 
+	virtual	double				ApproximationScale() const;
+
 	// IconObject interface
 	virtual	PropertyObject*		MakePropertyObject() const;
 	virtual	bool				SetToPropertyObject(

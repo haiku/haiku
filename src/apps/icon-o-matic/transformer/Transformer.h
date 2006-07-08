@@ -20,6 +20,7 @@ class VertexSource {
     virtual	unsigned			vertex(double* x, double* y) = 0;
 
 	virtual	bool				WantsOpenPaths() const = 0;
+	virtual	double				ApproximationScale() const = 0;
 };
 
 
@@ -36,6 +37,7 @@ class Transformer : public VertexSource,
 	virtual	void				SetSource(VertexSource& source);
 
 	virtual	bool				WantsOpenPaths() const;
+	virtual	double				ApproximationScale() const;
 
  protected:
 			VertexSource&		fSource;

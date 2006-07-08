@@ -46,6 +46,13 @@ AffineTransformer::SetSource(VertexSource& source)
 	Affine::attach(source);
 }
 
+// ApproximationScale
+double
+AffineTransformer::ApproximationScale() const
+{
+	return fSource.ApproximationScale() * scale();
+}
+
 // #pragma mark -
 
 // MakePropertyObject

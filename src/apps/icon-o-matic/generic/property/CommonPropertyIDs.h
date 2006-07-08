@@ -31,6 +31,8 @@ enum {
 	PROPERTY_ROTATION					= 'rotn',
 	PROPERTY_SCALE_X					= 'sclx',
 	PROPERTY_SCALE_Y					= 'scly',
+
+	PROPERTY_DETECT_ORIENTATION			= 'ador',
 };
 
 

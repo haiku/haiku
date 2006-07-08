@@ -29,9 +29,11 @@ class PathSource : public VertexSource {
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	bool				WantsOpenPaths() const;
+	virtual	double				ApproximationScale() const;
 
 	// PathSource
-			void				Update(bool leavePathsOpen);
+			void				Update(bool leavePathsOpen,
+									   double approximationScale);
 
  private:
 		 	PathContainer*		fPaths;
