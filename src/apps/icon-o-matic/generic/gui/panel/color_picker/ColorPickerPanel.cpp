@@ -33,11 +33,13 @@ enum {
 // constructor
 ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 								   selected_color_mode mode,
-								   BMessage* message, BWindow* target)
+								   BWindow* window,
+								   BMessage* message, BHandler* target)
 	: Panel(frame, "Pick Color",
 			B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS |
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE),
+	  fWindow(window),
 	  fMessage(message),
 	  fTarget(target)
 {
@@ -106,8 +108,8 @@ ColorPickerPanel::ColorPickerPanel(BRect frame, rgb_color color,
 
 	SetDefaultButton(defaultButton);
 
-	if (fTarget)
-		AddToSubset(fTarget);
+	if (fWindow)
+		AddToSubset(fWindow);
 	else
 		SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 
@@ -135,8 +137,7 @@ ColorPickerPanel::MessageReceived(BMessage* message)
 		case MSG_CANCEL:
 		case MSG_DONE: {
 			BMessage msg('PSTE');
-			BLooper* looper = fTarget ? static_cast<BLooper*>(fTarget)
-									  : static_cast<BLooper*>(be_app);
+			BLooper* looper = fTarget ? fTarget->Looper() : be_app;
 			if (fMessage)
 				msg = *fMessage;
 			if (message->what == MSG_DONE)
@@ -144,7 +145,7 @@ ColorPickerPanel::MessageReceived(BMessage* message)
 			msg.AddRect("panel frame", Frame());
 			msg.AddInt32("panel mode", fColorPickerView->Mode());
 			msg.AddBool("begin", true);
-			looper->PostMessage(&msg);
+			looper->PostMessage(&msg, fTarget);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		}

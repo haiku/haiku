@@ -131,6 +131,7 @@ Application Icon-O-Matic :
 	RemoveShapesCommand.cpp
 	RemoveTransformersCommand.cpp
 	# style
+	CurrentColor.cpp
 	Gradient.cpp
 	Style.cpp
 	StyleManager.cpp

@@ -11,17 +11,38 @@
 
 #include <View.h>
 
+#include "selected_color_mode.h"
+
+#include "Observer.h"
+
 class ColorField;
+class ColorPickerPanel;
 class ColorSlider;
+class CurrentColor;
 class Group;
+class Style;
 class SwatchView;
 
-class SwatchGroup : public BView {
+class SwatchGroup : public BView,
+					public Observer {
  public:
 								SwatchGroup(BRect frame);
 	virtual						~SwatchGroup();
 
+	// Observer interface
+	virtual	void				ObjectChanged(const Observable* object);
+
+	// BView interface
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
+
+	// SwatchGroup
+			void				SetCurrentColor(CurrentColor* color);
+			void				SetCurrentStyle(Style* style);
+
  private:
+			void				_SetColor(rgb_color color);
+			void				_SetColor(float h, float s, float v);
 
 			SwatchView*			fCurrentColorSV;
 			SwatchView*			fSwatchViews[20];
@@ -30,6 +51,14 @@ class SwatchGroup : public BView {
 
 			Group*				fTopSwatchViews;
 			Group*				fBottomSwatchViews;
+
+			CurrentColor*		fCurrentColor;
+			Style*				fCurrentStyle;
+			bool				fIgnoreNotifications;
+
+			ColorPickerPanel*	fColorPickerPanel;
+			selected_color_mode fColorPickerMode;
+			BRect				fColorPickerFrame;
 };
 
 #endif // SWATCH_GROUP_H

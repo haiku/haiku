@@ -27,7 +27,7 @@
 SwatchView::SwatchView(const char* name, BMessage* message,
 					   BHandler* target, rgb_color color,
 					   float width, float height)
-	: BView(BRect(0.0, 0.0, 23.0, 17.0), name,
+	: BView(BRect(0.0, 0.0, width, height), name,
 			B_FOLLOW_NONE, B_WILL_DRAW),
 	  fColor(color),
 	  fTrackingStart(-1.0, -1.0),

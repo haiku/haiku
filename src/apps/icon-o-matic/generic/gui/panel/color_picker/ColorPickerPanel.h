@@ -19,8 +19,9 @@ class ColorPickerPanel : public Panel {
 												 rgb_color color,
 												 selected_color_mode mode
 												 	= H_SELECTED,
+												 BWindow* window = NULL,
 												 BMessage* message = NULL,
-												 BWindow* target = NULL);
+												 BHandler* target = NULL);
 	virtual						~ColorPickerPanel();
 
 								// Panel
@@ -33,8 +34,9 @@ class ColorPickerPanel : public Panel {
  private:
 
 	ColorPickerView*			fColorPickerView;
+	BWindow*					fWindow;
 	BMessage*					fMessage;
-	BWindow*					fTarget;
+	BHandler*					fTarget;
 };
 
 #endif // COLOR_PICKER_PANEL_H

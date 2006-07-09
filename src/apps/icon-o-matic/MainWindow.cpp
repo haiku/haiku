@@ -19,6 +19,7 @@
 #include "Document.h"
 #include "CanvasView.h"
 #include "CommandStack.h"
+#include "CurrentColor.h"
 #include "IconObjectListView.h"
 #include "IconEditorApp.h"
 #include "IconView.h"
@@ -119,6 +120,13 @@ case MSG_NEW_STYLE: {
 								 rand() % 255,
 								 255 });
 	StyleManager::Default()->AddStyle(style);
+	break;
+}
+case MSG_STYLE_SELECTED: {
+	Style* style;
+	if (message->FindPointer("style", (void**)&style) < B_OK)
+		style = NULL;
+	fSwatchGroup->SetCurrentStyle(style);
 	break;
 }
 // TODO: use an AddShapeCommand
@@ -246,6 +254,8 @@ MainWindow::_Init()
 	fIconPreview64->SetIcon(fDocument->Icon());
 
 	fDocument->CommandStack()->AddObserver(this);
+
+	fSwatchGroup->SetCurrentColor(CurrentColor::Default());
 
 // TODO: for testing only:
 	MultipleManipulatorState* state = new MultipleManipulatorState(fCanvasView);
