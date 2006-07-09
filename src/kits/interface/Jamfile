@@ -39,6 +39,7 @@ MergeObject <libbe>interface_kit.o :
 	ChannelSlider.cpp
 	CheckBox.cpp
 	ColumnListView.cpp
+	ColumnTypes.cpp
 	ColorConversion.cpp
 	ColorControl.cpp
 	ColorTools.cpp
