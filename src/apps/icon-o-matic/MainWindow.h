@@ -44,11 +44,18 @@ class MainWindow : public BWindow,
 
  private:
 			void				_Init();
-			BView*				_CreateGUI(BRect frame);
+			void				_CreateGUI(BRect frame);
 			BMenuBar*			_CreateMenuBar(BRect frame);
 
 	IconEditorApp*				fApp;
 	Document*					fDocument;
+
+	BMenu*						fPathMenu;
+	BMenu*						fStyleMenu;
+	BMenu*						fShapeMenu;
+	BMenu*						fTransformerMenu;
+	BMenu*						fPropertyMenu;
+	BMenu*						fSwatchMenu;
 
 	BMenuItem*					fUndoMI;
 	BMenuItem*					fRedoMI;

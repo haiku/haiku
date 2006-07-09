@@ -68,6 +68,7 @@ SwatchGroup::SwatchGroup(BRect frame)
 										 this, color,
 										 SWATCH_VIEW_WIDTH,
 										 SWATCH_VIEW_HEIGHT);
+		fSwatchViews[i]->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
 		if (i < 10)
 			fTopSwatchViews->AddChild(fSwatchViews[i]);
 		else
@@ -87,8 +88,10 @@ SwatchGroup::SwatchGroup(BRect frame)
 	// layout gui
 	fTopSwatchViews->SetSpacing(0, 0);
 	fTopSwatchViews->ResizeToPreferred();
+	fTopSwatchViews->SetResizingMode(B_FOLLOW_ALL);
 	fBottomSwatchViews->SetSpacing(0, 0);
 	fBottomSwatchViews->ResizeToPreferred();
+	fBottomSwatchViews->SetResizingMode(B_FOLLOW_ALL);
 
 	fTopSwatchViews->MoveTo(30, 4);
 	fBottomSwatchViews->MoveTo(30, fTopSwatchViews->Frame().bottom + 1);
@@ -96,6 +99,7 @@ SwatchGroup::SwatchGroup(BRect frame)
 	fCurrentColorSV->MoveTo(0, fTopSwatchViews->Frame().top);
 	fCurrentColorSV->ResizeTo(28, fBottomSwatchViews->Frame().bottom
 									- fTopSwatchViews->Frame().top);
+	fCurrentColorSV->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
 
 	float width = fTopSwatchViews->Frame().right
 					- fCurrentColorSV->Frame().left;

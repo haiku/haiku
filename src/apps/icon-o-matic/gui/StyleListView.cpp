@@ -258,9 +258,9 @@ StyleListView::SelectionChanged()
 
 	StyleListItem* item
 		= dynamic_cast<StyleListItem*>(ItemAt(CurrentSelection(0)));
-	if (item && fMessage) {
+	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddPointer("style", (void*)item->style);
+		message.AddPointer("style", item ? (void*)item->style : NULL);
 		Invoke(&message);
 	}
 

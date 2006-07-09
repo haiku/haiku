@@ -61,7 +61,7 @@ enum {
 
 // constructor
 MainWindow::MainWindow(IconEditorApp* app, Document* document)
-	: BWindow(BRect(20, 50, 1010, 781), "Icon-O-Matic",
+	: BWindow(BRect(50, 50, 900, 750), "Icon-O-Matic",
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
@@ -220,8 +220,7 @@ void
 MainWindow::_Init()
 {
 	// create the GUI
-	BView* topView = _CreateGUI(Bounds());
-	AddChild(topView);
+	_CreateGUI(Bounds());
 
 	fCanvasView->SetCatchAllEvents(true);
 	fCanvasView->SetCommandStack(fDocument->CommandStack());
@@ -247,6 +246,7 @@ MainWindow::_Init()
 
 	fPropertyListView->SetCommandStack(fDocument->CommandStack());
 	fPropertyListView->SetSelection(fDocument->Selection());
+	fPropertyListView->SetMenu(fPropertyMenu);
 
 	fIconPreview16->SetIcon(fDocument->Icon());
 	fIconPreview32->SetIcon(fDocument->Icon());
@@ -319,26 +319,54 @@ MainWindow::_Init()
 }
 
 // _CreateGUI
-BView*
+void
 MainWindow::_CreateGUI(BRect bounds)
 {
-	BRect menuFrame = bounds;
-	menuFrame.bottom = menuFrame.top + 15;
-	BMenuBar* menuBar = _CreateMenuBar(menuFrame);
-	AddChild(menuBar);
-
-	menuBar->ResizeToPreferred();
-	bounds.top = menuBar->Frame().bottom + 1;
+	const float splitWidth = 150;
 
 	BView* bg = new BView(bounds, "bg", B_FOLLOW_ALL, 0);
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(bg);
 
-	fSwatchGroup = new SwatchGroup(BRect(0, 0, 100, 100));
+	BRect menuFrame = bounds;
+	menuFrame.bottom = menuFrame.top + 15;
+	BMenuBar* menuBar = _CreateMenuBar(menuFrame);
+	bg->AddChild(menuBar);
+	float menuWidth;
+	float menuHeight;
+	menuBar->GetPreferredSize(&menuWidth, &menuHeight);
+	menuBar->ResizeTo(splitWidth - 1, menuHeight);
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+	
+	bounds.top = menuBar->Frame().bottom + 1;
+
+	// swatch group
+	fSwatchGroup = new SwatchGroup(bounds);
+		// SwatchGroup auto resizes itself
+	fSwatchGroup->MoveTo(bounds.right - fSwatchGroup->Bounds().Width(),
+						 bounds.top);
+	fSwatchGroup->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+
+	bounds.left = fSwatchGroup->Frame().left;
+	bounds.right = bg->Bounds().right;
+	bounds.top = bg->Bounds().top;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "swatches menu bar");
+	menuBar->AddItem(fSwatchMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), menuHeight);
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+
+	// canvas view
+	bounds.left = splitWidth;
 	bounds.top = fSwatchGroup->Frame().bottom + 1;
-
+	bounds.right = bg->Bounds().right;
+	bounds.bottom = bg->Bounds().bottom;
 	fCanvasView = new CanvasView(bounds);
 
-	bounds.left = fSwatchGroup->Frame().right + 5;
+	// icon previews
+	bounds.left = 5;
 	bounds.top = fSwatchGroup->Frame().top + 5;
 	bounds.right = bounds.left + 15;
 	bounds.bottom = bounds.top + 15;
@@ -359,30 +387,92 @@ MainWindow::_CreateGUI(BRect bounds)
 	bounds.bottom = bounds.top + 63;
 	fIconPreview64 = new IconView(bounds, "icon preview 64");
 
+	// style list view
+	bounds.left = fCanvasView->Frame().left;
+	bounds.right = bounds.left + splitWidth;
+	bounds.top = bg->Bounds().top;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "style menu bar");
+	menuBar->AddItem(fStyleMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), menuHeight);
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
+	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = menuBar->Frame().bottom + 1;
+	bounds.bottom = fCanvasView->Frame().top - 1;
+
+	fStyleListView = new StyleListView(bounds, "style list view",
+									   new BMessage(MSG_STYLE_SELECTED), this);
+
+
 	// path list view
-	bounds.OffsetBy(bounds.Width() + 6, 0);
-	bounds.right = bounds.left + 100;
-	bounds.bottom = fCanvasView->Frame().top - 5.0;
+	bounds.left = 0;
+	bounds.right = fCanvasView->Frame().left - 1;
+	bounds.top = fCanvasView->Frame().top;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "path menu bar");
+	menuBar->AddItem(fPathMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), menuHeight);
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
+	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = menuBar->Frame().bottom + 1;
+	bounds.bottom = bounds.top + 130;
 
 	fPathListView = new PathListView(bounds, "path list view",
 									 new BMessage(MSG_PATH_SELECTED), this);
 
-	// style list view
-	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
-	fStyleListView = new StyleListView(bounds, "style list view",
-									   new BMessage(MSG_STYLE_SELECTED), this);
 
 	// shape list view
-	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = fPathListView->Frame().bottom + 1;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "shape menu bar");
+	menuBar->AddItem(fShapeMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), menuHeight);
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
+	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = menuBar->Frame().bottom + 1;
+	bounds.bottom = bounds.top + 130;
+
 	fShapeListView = new ShapeListView(bounds, "shape list view",
 									   new BMessage(MSG_SHAPE_SELECTED), this);
 
 	// transformer list view
-	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
+	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = fShapeListView->Frame().bottom + 1;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "transformer menu bar");
+	menuBar->AddItem(fTransformerMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), bounds.Height());
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
+	bounds.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = menuBar->Frame().bottom + 1;
+	bounds.bottom = bounds.top + 80;
 	fTransformerListView = new TransformerListView(bounds,
 												   "transformer list view");
 
 	// property list view
+	bounds.right += B_V_SCROLL_BAR_WIDTH + 1;
+	bounds.top = fTransformerListView->Frame().bottom + 1;
+	bounds.bottom = bounds.top + menuHeight;
+	menuBar = new BMenuBar(bounds, "property menu bar");
+	menuBar->AddItem(fPropertyMenu);
+	bg->AddChild(menuBar);
+	menuBar->ResizeTo(bounds.Width(), bounds.Height());
+		// menu bars resize themselves to window width
+	menuBar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+
 	fPropertyListView = new IconObjectListView();
 
 	bg->AddChild(fSwatchGroup);
@@ -414,18 +504,16 @@ MainWindow::_CreateGUI(BRect bounds)
 								 B_NO_BORDER));
 
 	// scroll view around property list view
-	bounds.OffsetBy(bounds.Width() + 6 + B_V_SCROLL_BAR_WIDTH, 0);
-	bounds.right = bg->Bounds().right - 5;
+	bounds.top = menuBar->Frame().bottom + 1;
+	bounds.bottom = bg->Bounds().bottom;
 	bg->AddChild(new ScrollView(fPropertyListView,
 								SCROLL_VERTICAL | SCROLL_NO_FRAME,
 								bounds, "property scroll view",
-								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
 								B_WILL_DRAW | B_FRAME_EVENTS));
 
 
 	bg->AddChild(fCanvasView);
-
-	return bg;
 }
 
 // _CreateMenuBar
@@ -436,17 +524,15 @@ MainWindow::_CreateMenuBar(BRect frame)
 
 	BMenu* fileMenu = new BMenu("File");
 	BMenu* editMenu = new BMenu("Edit");
-	BMenu* pathMenu = new BMenu("Path");
-	BMenu* styleMenu = new BMenu("Style");
-	BMenu* shapeMenu = new BMenu("Shape");
-	BMenu* transformerMenu = new BMenu("Transformer");
+	fPathMenu = new BMenu("Path");
+	fStyleMenu = new BMenu("Style");
+	fShapeMenu = new BMenu("Shape");
+	fTransformerMenu = new BMenu("Transformer");
+	fPropertyMenu = new BMenu("Property");
+	fSwatchMenu = new BMenu("Swatches");
 
 	menuBar->AddItem(fileMenu);
 	menuBar->AddItem(editMenu);
-	menuBar->AddItem(pathMenu);
-	menuBar->AddItem(styleMenu);
-	menuBar->AddItem(shapeMenu);
-	menuBar->AddItem(transformerMenu);
 
 	// Edit
 	fUndoMI = new BMenuItem("<nothing to undo>",
@@ -461,26 +547,27 @@ MainWindow::_CreateMenuBar(BRect frame)
 	editMenu->AddItem(fRedoMI);
 
 	// Path
-	pathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
+	fPathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
 
 	// Style
-	styleMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_STYLE)));
+	fStyleMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_STYLE)));
 
 	// Shape
-	shapeMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_SHAPE)));
+	fShapeMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_SHAPE)));
+
 
 	// Transformer
+	BMenu* addMenu = new BMenu("Add");
 	int32 cookie = 0;
 	uint32 type;
 	BString name;
 	while (TransformerFactory::NextType(&cookie, &type, &name)) {
 		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
 		message->AddInt32("type", type);
-		BString label("Add ");
-		label << name;
-		transformerMenu->AddItem(new BMenuItem(label.String(), message));
+		addMenu->AddItem(new BMenuItem(name.String(), message));
 	}
-	transformerMenu->SetTargetForItems(this);
+	addMenu->SetTargetForItems(this);
+	fTransformerMenu->AddItem(addMenu);
 
 	return menuBar;
 }
