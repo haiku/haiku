@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src preferences drivesetup ;
 
+UsePrivateHeaders interface storage shared ;
+
 AddResources DriveSetup : DriveSetup.rdef ;
 
 Preference DriveSetup : main.cpp MainWindow.cpp PosSettings.cpp ;

@@ -12,7 +12,7 @@ public :
 	void SetWindowPosition(BRect);
 	
 private:
-	static const char 	kVMSettingsFile[];
+	static const char 	kSettingsFile[];
 	BRect				fWindowFrame;
 	BPoint				fcorner;
 	BPoint				brCorner;

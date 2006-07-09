@@ -4,30 +4,11 @@
 */
 
 #ifndef MAIN_H
+#define MAIN_H
 	
-	#define MAIN_H
+	#include <Application.h>
 	
-	#ifndef _APPLICATION_H
-	
-		#include <Application.h>
-		
-	#endif
-	
-	#ifndef _STDIO_H
-	
-		#include <stdio.h>
-		
-	#endif
-	#ifndef POS_SETTINGS_H
-	
-		#include "PosSettings.h"
-		
-	#endif
-	#ifndef STRUCTS_H
-	
-		#include "structs.h"
-		
-	#endif
+	class PosSettings;
 	
 	
 	/**
@@ -35,8 +16,8 @@
 	 *
 	 * Gets everything going.
 	 */
-	class DriveSetup : public BApplication{
-	
+	class DriveSetup : public BApplication
+	{	
 		public:
 		
 			/**
@@ -47,7 +28,6 @@
 		
 		private:
 			PosSettings	*fSettings;
-			
 	};
 	
 #endif

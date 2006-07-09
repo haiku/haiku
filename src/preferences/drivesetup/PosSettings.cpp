@@ -16,15 +16,14 @@
 
 #include <stdio.h>
 
-const char PosSettings::kVMSettingsFile[] = "DriveSetup_prefs";
+const char PosSettings::kSettingsFile[] = "DriveSetup_prefs";
 
 PosSettings::PosSettings()
-{//VMSettings::VMSettings
-
+{
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK)
 	{
-		path.Append(kVMSettingsFile);
+		path.Append(kSettingsFile);
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() != B_OK)
 			be_app->PostMessage(B_QUIT_REQUESTED);
@@ -34,7 +33,7 @@ PosSettings::PosSettings()
 		if (file.Read(&brCorner, sizeof(BPoint)) != sizeof(BPoint))
 			be_app->PostMessage(B_QUIT_REQUESTED);
 	}
-	printf("VM settings file read.\n");
+	printf("settings file read.\n");
 	printf("=========================\n");
 	printf("fcorner read in as ");
 	fcorner.PrintToStream();
@@ -53,42 +52,34 @@ PosSettings::PosSettings()
 		return;
 	// If they are not, lets just stick the window in the middle
 	// of the screen.
-	
-	//I don't want to deal with this now - MSM
-	
-	/*fWindowFrame = screen.Frame();
-	fWindowFrame.left = (fWindowFrame.right-269)/2;
+
+	fWindowFrame = screen.Frame();
+	fWindowFrame.left = (fWindowFrame.right-269) /2;
 	fWindowFrame.right = fWindowFrame.left + 269;
-	fWindowFrame.top = (fWindowFrame.bottom-172)/2;
+	fWindowFrame.top = (fWindowFrame.bottom-172) /2;
 	fWindowFrame.bottom = fWindowFrame.top + 172;
-*/
-}//VMSettings::VMSettings
+}
 
 PosSettings::~PosSettings()
-{//VMSettings::~VMSettings
-//printf("enter\n");
+{
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
 		return;
-//printf("find_directory\n");
-	path.Append(kVMSettingsFile);
-//printf("path.Append\n");
+
+	path.Append(kSettingsFile);
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-//printf("create file\n");
 	if (file.InitCheck() == B_OK)
 	{
-		//printf("in if statement\n");
 		file.Write(&fcorner, sizeof(BPoint));
 		file.Write(&brCorner, sizeof(BPoint));
 	}
-//printf("exit\n");
-}//MouseSettings::~MouseSettings
+}
 
 void PosSettings::SetWindowPosition(BRect f)
-{//VMSettings::SetWindowFrame
+{
 	fcorner.x=f.left;
 	fcorner.y=f.top;
 	brCorner.x=f.right;
 	brCorner.y=f.bottom;
 brCorner.PrintToStream();
-}//VMSettings::SetWindowFrame
+}
