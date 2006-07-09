@@ -106,9 +106,11 @@ AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage beos system add-ons kernel file_systems : $(BEOS_ADD_ONS_FILESYSTEMS) ;
 AddFilesToHaikuImage beos system add-ons kernel generic
 	: block_io fast_log ide_adapter locked_pool mpu401 scsi_periph ;
-AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel ;
+AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel session ;
 AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
+AddFilesToHaikuImage beos system add-ons kernel file_cache 
+	: log launch_speedup rule_based_prefetcher ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
