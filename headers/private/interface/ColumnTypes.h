@@ -76,8 +76,8 @@ class BStringColumn : public BTitledColumn
 	public:
 							BStringColumn		(const char *title,
 												 float width,
-												 float maxWidth,
 												 float minWidth,
+												 float maxWidth,
 												 uint32 truncate,
 												 alignment align = B_ALIGN_LEFT);
 		virtual void		DrawField			(BField* field,
