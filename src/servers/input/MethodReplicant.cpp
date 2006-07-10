@@ -182,11 +182,12 @@ MethodReplicant::MouseDown(BPoint point)
 	where = ConvertToScreen(point);
 	
 	fMenu.SetTargetForItems(this);
-	MethodMenuItem *item = (MethodMenuItem*)fMenu.Go(where, true, true, BRect(where - BPoint(4, 4), 
-		where + BPoint(4, 4)));
-	if (item) {
+	BMenuItem *item = fMenu.Go(where, true, true, 
+		BRect(where - BPoint(4, 4), where + BPoint(4, 4)));
+		
+	if (item && dynamic_cast<MethodMenuItem *>(item)) {
 		BMessage msg(IS_SET_METHOD);
-		msg.AddInt32("cookie", item->Cookie());
+		msg.AddInt32("cookie", ((MethodMenuItem*)item)->Cookie());
 		BMessenger messenger(fSignature);
 		messenger.SendMessage(&msg);
 	}
@@ -205,16 +206,16 @@ MethodReplicant::UpdateMethod(BMessage *message)
 {
 	CALLED();
 	int32 cookie;
-        if (message->FindInt32("cookie", &cookie)!=B_OK) {
-                fprintf(stderr, "can't find cookie in message\n");
-                return;
-        }
+	if (message->FindInt32("cookie", &cookie)!=B_OK) {
+		fprintf(stderr, "can't find cookie in message\n");
+		return;
+	}
 
 	MethodMenuItem *item = FindItemByCookie(cookie);
-        if (item == NULL) {
-                fprintf(stderr, "can't find item with cookie %lx\n", cookie);
-                return;
-        }
+	if (item == NULL) {
+		fprintf(stderr, "can't find item with cookie %lx\n", cookie);
+		return;
+	}
 	item->SetMarked(true);
 
 	fSegments->SetBits(item->Icon(), kRemoteWidth*kRemoteHeight, 0, kRemoteColorSpace);
@@ -262,15 +263,15 @@ MethodReplicant::UpdateMethodMenu(BMessage *message)
 	BMessage msg;
 	if (message->FindMessage("menu", &msg)!=B_OK) {
 		fprintf(stderr, "can't find menu in message\n");
-                return;
-        }
+		return;
+	}
 	PRINT_OBJECT(msg);
 
 	BMessenger messenger;
 	if (message->FindMessenger("target", &messenger)!=B_OK) {
-                fprintf(stderr, "can't find target in message\n");
-                return;
-        }
+		fprintf(stderr, "can't find target in message\n");
+		return;
+	}
 
 	BMenu *menu = (BMenu *)BMenu::Instantiate(&msg);
 	if (menu == NULL) {
@@ -344,8 +345,8 @@ MethodReplicant::AddMethod(BMessage *message)
 	CALLED();
 	int32 cookie;
 	if (message->FindInt32("cookie", &cookie)!=B_OK) {
-	        fprintf(stderr, "can't find cookie in message\n");
-	        return;
+		fprintf(stderr, "can't find cookie in message\n");
+		return;
 	}
 
 	const char *name;
