@@ -93,8 +93,10 @@ StrokeTransformer::MakePropertyObject() const
 	object->AddProperty(property);
 
 	// miter limit
-	object->AddProperty(new FloatProperty(PROPERTY_MITER_LIMIT,
-										  miter_limit()));
+	if (line_join() == agg::miter_join) {
+		object->AddProperty(new FloatProperty(PROPERTY_MITER_LIMIT,
+											  miter_limit()));
+	}
 
 	return object;
 }

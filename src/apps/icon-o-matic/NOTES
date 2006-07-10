@@ -33,6 +33,10 @@
 
 * implement commands for the newly added editing features
 
+* built-in transformation for Gradient and Shape?
+
+* Transformation manipulator
+
 
 --------- user interface
 
@@ -45,7 +49,7 @@
 
 * list of transformers attached to the selected shape [done]
 
-* area for styles, style is either solid color or gradient
+* area for styles, style is either solid color or gradient [done]
 
 
 --------- icon format

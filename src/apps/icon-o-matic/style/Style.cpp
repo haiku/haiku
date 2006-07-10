@@ -8,7 +8,11 @@
 
 #include "Style.h"
 
+#include <new>
+
 #include "Gradient.h"
+
+using std::nothrow;
 
 // constructor
 Style::Style()
@@ -52,23 +56,31 @@ Style::SetColor(const rgb_color& color)
 
 // SetGradient
 void
-Style::SetGradient(::Gradient* gradient)
+Style::SetGradient(const ::Gradient* gradient)
 {
-	if (fGradient) {
-		fGradient->RemoveObserver(this);
-		delete fGradient;
-	}
+	if (!fGradient && !gradient)
+		return;
 
-	fGradient = gradient;
-
-	if (fGradient) {
-		fGradient->AddObserver(this);
-		// generate gradient
-		if (!fColors)
-			fColors = new agg::rgba8[256];
-		fGradient->MakeGradient((uint32*)fColors, 256);
+	if (gradient) {
+		if (!fGradient) {
+			fGradient = new (nothrow) ::Gradient(*gradient);
+			if (fGradient) {
+				fGradient->AddObserver(this);
+				// generate gradient
+				fColors = new agg::rgba8[256];
+				fGradient->MakeGradient((uint32*)fColors, 256);
+				Notify();
+			}
+		} else {
+			if (*fGradient != *gradient) {
+				*fGradient = *gradient;
+			}
+		}
 	} else {
+		fGradient->RemoveObserver(this);
 		delete[] fColors;
 		fColors = NULL;
+		fGradient = NULL;
+		Notify();
 	}
 }

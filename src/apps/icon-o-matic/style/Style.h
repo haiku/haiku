@@ -33,7 +33,7 @@ class Style : public IconObject,
 	inline	rgb_color			Color() const
 									{ return fColor; }
 
-			void				SetGradient(::Gradient* gradient);
+			void				SetGradient(const ::Gradient* gradient);
 			::Gradient*			Gradient() const
 									{ return fGradient; }
 

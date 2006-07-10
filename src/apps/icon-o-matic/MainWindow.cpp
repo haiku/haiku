@@ -27,6 +27,7 @@
 #include "ScrollView.h"
 #include "ShapeListView.h"
 #include "StyleListView.h"
+#include "StyleView.h"
 #include "SwatchGroup.h"
 #include "TransformerFactory.h"
 #include "TransformerListView.h"
@@ -127,6 +128,7 @@ case MSG_STYLE_SELECTED: {
 	if (message->FindPointer("style", (void**)&style) < B_OK)
 		style = NULL;
 	fSwatchGroup->SetCurrentStyle(style);
+	fStyleView->SetStyle(style);
 	break;
 }
 // TODO: use an AddShapeCommand
@@ -237,6 +239,8 @@ MainWindow::_Init()
 //	fStyleListView->SetCommandStack(fDocument->CommandStack());
 	fStyleListView->SetSelection(fDocument->Selection());
 
+	fStyleView->SetCommandStack(fDocument->CommandStack());
+
 	fShapeListView->SetShapeContainer(fDocument->Icon()->Shapes());
 	fShapeListView->SetCommandStack(fDocument->CommandStack());
 	fShapeListView->SetSelection(fDocument->Selection());
@@ -271,11 +275,11 @@ MainWindow::_Init()
 	StyleManager::Default()->AddStyle(style1);
 
 	Style* style2 = new Style();
-	Gradient* gradient = new Gradient(true);
-	gradient->AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
-	gradient->AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
-	gradient->AddColor((rgb_color){ 208, 43, 92, 255 }, 1.0);
-	style2->SetGradient(gradient);
+	Gradient gradient(true);
+	gradient.AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
+	gradient.AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
+	gradient.AddColor((rgb_color){ 208, 43, 92, 255 }, 1.0);
+	style2->SetGradient(&gradient);
 
 	StyleManager::Default()->AddStyle(style2);
 
@@ -406,6 +410,14 @@ MainWindow::_CreateGUI(BRect bounds)
 	fStyleListView = new StyleListView(bounds, "style list view",
 									   new BMessage(MSG_STYLE_SELECTED), this);
 
+
+	// style view
+	bounds.left = menuBar->Frame().right + 1;
+	bounds.top = bg->Bounds().top;
+	bounds.right = fSwatchGroup->Frame().left - 1;
+	bounds.bottom = fCanvasView->Frame().top - 1;
+	fStyleView = new StyleView(bounds);
+	bg->AddChild(fStyleView);
 
 	// path list view
 	bounds.left = 0;

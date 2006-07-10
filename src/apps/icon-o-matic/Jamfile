@@ -108,10 +108,12 @@ Application Icon-O-Matic :
 	support.cpp
 	support_ui.cpp
 	# gui
+	GradientControl.cpp
 	IconObjectListView.cpp
 	PathListView.cpp
 	ShapeListView.cpp
 	StyleListView.cpp
+	StyleView.cpp
 	SwatchGroup.cpp
 	TransformerListView.cpp
 	# shape
@@ -133,6 +135,7 @@ Application Icon-O-Matic :
 	# style
 	CurrentColor.cpp
 	Gradient.cpp
+	SetGradientCommand.cpp
 	Style.cpp
 	StyleManager.cpp
 	# transformer

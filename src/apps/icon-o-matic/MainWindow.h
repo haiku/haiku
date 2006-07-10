@@ -23,6 +23,7 @@ class IconView;
 class PathListView;
 class ShapeListView;
 class StyleListView;
+class StyleView;
 class SwatchGroup;
 class TransformerListView;
 
@@ -62,6 +63,7 @@ class MainWindow : public BWindow,
 
 	CanvasView*					fCanvasView;
 	SwatchGroup*				fSwatchGroup;
+	StyleView*					fStyleView;
 
 	IconView*					fIconPreview16;
 	IconView*					fIconPreview32;

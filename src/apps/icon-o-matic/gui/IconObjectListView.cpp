@@ -94,7 +94,7 @@ IconObjectListView::ObjectChanged(const Observable* object)
 		_SetObject(dynamic_cast<IconObject*>(selected));
 	}
 
-	if (object == fObject && !fIgnoreObjectChange) {
+	if (object == fObject/* && !fIgnoreObjectChange*/) {
 printf("IconObjectListView::ObjectChanged(fObject)\n");
 		SetTo(fObject->MakePropertyObject());
 	}
