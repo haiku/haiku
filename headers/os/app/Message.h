@@ -281,6 +281,7 @@ class BMessage {
 		ssize_t			_NativeFlattenedSize() const;
 		status_t		_NativeFlatten(char *buffer, ssize_t size) const;
 		status_t		_NativeFlatten(BDataIO *stream, ssize_t *size = NULL) const;
+		void			_PrintToStream(const char* indent) const;
 
 	private:
 		message_header*	fHeader;

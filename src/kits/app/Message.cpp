@@ -364,175 +364,148 @@ BMessage::IsReply() const
 }
 
 
-template<typename Type> static void
-print_to_stream_type(char* buffer, Type* item, int32 count,
-	uint32 size)
+template<typename Type> static uint8 * 
+print_to_stream_type(uint8* pointer)
 {
-	sprintf(buffer + strlen(buffer), "size=%2ld, ", size);
-	printf("%s", buffer);
-	memset(buffer, ' ', strlen(buffer));
-
-	for (int32 i = 0; i < count; i++, item++) {
-		if (i > 0) /* indent */
-			printf(buffer);
-
-		printf("data[%ld]: ", i);
-		item->PrintToStream();
-	}
+	Type *item = (Type *)pointer; 
+	item->PrintToStream();
+	return (uint8 *)(item+1);
 }
 
 
-template<typename Type> static void
-print_type(char* buffer, const char* format, Type* item, int32 count,
-	uint32 size, type_code typeCode)
+template<typename Type> static uint8 *
+print_type(const char* format, uint8* pointer)
 {
-	sprintf(buffer + strlen(buffer), "size=%2ld, ", size);
-	printf("%s", buffer);
-	memset(buffer, ' ', strlen(buffer));
-
-	for (int32 i = 0; i < count; i++, item++) {
-		if (i > 0) /* indent */
-			printf(buffer);
-
-		printf("data[%ld]: ", i);
-		Type value = *item;
-		if (typeCode == B_BOOL_TYPE) {
-			printf("%s (%d)\n", value != 0 ? "true" : "false", (int8)value);
-		} else {
-			if (typeCode == B_INT8_TYPE && value < ' ')
-				value = ' ';
-			swap_data(typeCode, &value, sizeof(Type), B_SWAP_BENDIAN_TO_HOST);
-			printf(format, *item, *item, &value);
-		}
-	}
+	Type *item = (Type *)pointer;
+	printf(format, *item, *item);
+	return (uint8 *)(item+1);
 }
 
 
 void
 BMessage::PrintToStream() const
 {
+	_PrintToStream("");
+	printf("}\n");
+}
+
+
+void
+BMessage::_PrintToStream(const char* indent) const
+{
 	DEBUG_FUNCTION_ENTER;
 
 	int32 value = B_BENDIAN_TO_HOST_INT32(what);
-	printf("BMessage: what = '%.4s' (0x%lx, or %ld)\n",
-		(char *)&value, what, what);
-
-	char buffer[1024];
+	printf("BMessage(");
+	if (isprint(*(char *)&value)) {
+		printf("'%.4s'", (char *)&value);
+	} else
+		printf("0x%lx", what);
+	printf(") {\n");
+	
 	field_header *field = fFields;
 	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		value = B_BENDIAN_TO_HOST_INT32(field->type);
-		sprintf(buffer, "    entry %14s, type='%.4s', c=%ld, ",
-			(char *)(fData + field->offset), (char *)&value, field->count);
-
 		ssize_t size = 0;
 		if (field->flags & FIELD_FLAG_FIXED_SIZE)
 			size = field->data_size / field->count;
 
-		switch (field->type) {
-			case B_RECT_TYPE:
-				print_to_stream_type<BRect>(buffer,
-					(BRect *)(fData + field->offset + field->name_length),
-					field->count, size);
-				break;
+		uint8 *pointer = fData + field->offset + field->name_length;
 
-			case B_POINT_TYPE:
-				print_to_stream_type<BPoint>(buffer,
-					(BPoint *)(fData + field->offset + field->name_length),
-					field->count, size);
-				break;
-
-			case B_STRING_TYPE:
-			{
-				printf("%s", buffer);
-				memset(buffer, ' ', strlen(buffer));
-
-				uint8 *pointer = fData + field->offset + field->name_length;
-				for (int32 i = 0; i < field->count; i++) {
-					if (i > 0) /* indent */
-						printf("%s", buffer);
-
-					ssize_t size = *(ssize_t *)pointer;
-					pointer += sizeof(ssize_t);
-					printf("size=%2ld, data[%ld]: ", size, i);
-					printf("\"%s\"\n", (char *)pointer);
-					pointer += size;
-				}
-				break;
+		for (int32 j=0; j<field->count; j++) {
+			if (field->count == 1) {
+				printf("%s        %s = ", indent,
+					(char *)(fData + field->offset));
+			} else {
+				printf("%s        %s[%ld] = ", indent,
+					(char *)(fData + field->offset), j);
 			}
 
-			case B_INT8_TYPE:
-				print_type<int8>(buffer, "0x%hx (%d \'%.1s\')\n",
-					(int8 *)(fData + field->offset + field->name_length),
-					field->count, size, B_INT8_TYPE);
-				break;
+			switch (field->type) {
+				case B_RECT_TYPE:
+					pointer = print_to_stream_type<BRect>(pointer);
+					break;
 
-			case B_INT16_TYPE:
-				print_type<int16>(buffer, "0x%x (%d \'%.2s\')\n",
-					(int16 *)(fData + field->offset + field->name_length),
-					field->count, size, B_INT16_TYPE);
-				break;
+				case B_POINT_TYPE:
+					pointer = print_to_stream_type<BPoint>(pointer);
+					break;
 
-			case B_INT32_TYPE:
-				print_type<int32>(buffer, "0x%lx (%ld \'%.4s\')\n",
-					(int32 *)(fData + field->offset + field->name_length),
-					field->count, size, B_INT32_TYPE);
-				break;
+				case B_STRING_TYPE:	{
+					ssize_t size = *(ssize_t *)pointer;
+					pointer += sizeof(ssize_t);
+					printf("string(\"%s\", %ld bytes)\n", (char *)pointer, size);
+					pointer += size;
+					break;
+				}
 
-			case B_INT64_TYPE:
-				print_type<int64>(buffer, "0x%Lx (%Ld \'%.8s\')\n",
-					(int64 *)(fData + field->offset + field->name_length),
-					field->count, size, B_INT64_TYPE);
-				break;
+				case B_INT8_TYPE:
+					pointer = print_type<int8>("int8(0x%hx or %d or \'%.1s\')\n", pointer);
+					break;
 
-			case B_BOOL_TYPE:
-				print_type<int8>(buffer, NULL,
-					(int8 *)(fData + field->offset + field->name_length),
-					field->count, size, B_BOOL_TYPE);
-				break;
+				case B_INT16_TYPE:
+					pointer = print_type<int16>("int16 (0x%x or %d)\n", pointer);
+					break;
 
-			case B_FLOAT_TYPE:
-				print_type<float>(buffer, "%.4f\n",
-					(float *)(fData + field->offset + field->name_length),
-					field->count, size, B_FLOAT_TYPE);
-				break;
+				case B_INT32_TYPE:
+					pointer = print_type<int32>("int32(0x%lx or %ld)\n", pointer);
+					break;
 
-			case B_DOUBLE_TYPE:
-				print_type<double>(buffer, "%.8f\n",
-					(double *)(fData + field->offset + field->name_length),
-					field->count, size, B_DOUBLE_TYPE);
-				break;
+				case B_INT64_TYPE:
+					pointer = print_type<int64>("int64(0x%Lx or %Ld)\n", pointer);
+					break;
 
-			case B_REF_TYPE: {
-				printf("%s", buffer);
-				memset(buffer, ' ', strlen(buffer));
+				case B_BOOL_TYPE:
+					printf("bool(%s)\n", *((bool *)pointer)!= 0 ? "true" : "false");
+					pointer += sizeof(bool);
+					break;
+	
+				case B_FLOAT_TYPE:
+					pointer = print_type<float>("float(%.4f)\n", pointer);
+					break;
 
-				uint8 *pointer = fData + field->offset + field->name_length;
-				for (int32 i = 0; i < field->count; i++) {
-					if (i > 0) /* indent */
-						printf("%s", buffer);
-
+				case B_DOUBLE_TYPE:
+					pointer = print_type<double>("double(%.8f)\n", pointer);
+					break;
+	
+				case B_REF_TYPE: {
 					ssize_t size = *(ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
-
-					printf("size=%2ld, data[%ld]: ", size, i);
-					printf("device=%ld, directory=%lld, name=\"%s\", ",
-						ref.device, ref.directory, ref.name);
-
+	
+					printf("entry_ref(device=%ld, directory=%lld, name=\"%s\", ",
+							ref.device, ref.directory, ref.name);
+	
 					BPath path(&ref);
-					printf("path=\"%s\"\n", path.Path());
+					printf("path=\"%s\")\n", path.Path());
 					pointer += size;
+					break;
 				}
-				break;
-			}
-
-			default: {
-				sprintf(buffer + strlen(buffer), "size=%2ld, \n", size);
-				printf("%s", buffer);
+				
+				case B_MESSAGE_TYPE:
+				{
+					char buffer[1024];
+					sprintf(buffer, "%s        ", indent);
+	
+					BMessage message;
+					const ssize_t size = *(const ssize_t *)pointer;
+					pointer += sizeof(ssize_t);
+					if (message.Unflatten((const char *)pointer)!=B_OK) {
+						fprintf(stderr, "couldn't unflatten item %ld\n", i);
+						break;
+					}
+					message._PrintToStream(buffer);
+					printf("%s        }\n", indent);
+					pointer += size;
+					break;
+				}
+				
+				default: {
+					printf("(type = '%.4s')(size = %ld)\n", (char *)&value, size);
+				}
 			}
 		}
-	}	
+	}
 }
 
 
