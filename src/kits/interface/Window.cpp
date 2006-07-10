@@ -458,9 +458,6 @@ BWindow::Archive(BMessage* data, bool deep) const
 		}
 	}
 
-	if (ret == B_OK)
-		ret = data->AddString("class", "BWindow");
-
 	return ret;
 }
 

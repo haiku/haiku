@@ -349,9 +349,6 @@ BBitmap::Archive(BMessage *data, bool deep) const
 		}
 	}
 
-	if (ret == B_OK)
-		ret = data->AddString("class", "BBitmap");
-	
 	return ret;
 }
 

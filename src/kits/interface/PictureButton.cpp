@@ -79,11 +79,6 @@ BPictureButton::Archive(BMessage *data, bool deep) const
 	if (err != B_OK)
 		return err;
 
-	// Do we need this?  Good practice!
-	err = data->AddString("class", "BPictureButton");
-	if (err != B_OK)
-		return err;
-
 	// Fill out message, depending on whether a deep copy is required or not.
 	if (deep) {
 		BMessage pictureArchive;
