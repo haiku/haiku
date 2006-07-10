@@ -24,7 +24,7 @@
 	class PosSettings;
 	class BPartition;
 	class BDiskDevice;
-	class BColumnListView;
+	class PartitionListView;
 	
 	/**
 	 * The main window of the app.
@@ -37,7 +37,7 @@
 		private:
 			PosSettings*				fSettings;
 			BDiskDeviceRoster		fDDRoster;
-			BColumnListView*		fListView;
+			PartitionListView*		fListView;
 		public:
 			MainWindow(BRect frame, PosSettings *fSettings);
 			

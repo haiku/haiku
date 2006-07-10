@@ -6,7 +6,7 @@
 */
 
 #include "MainWindow.h"
-
+#include "PartitionList.h"
 #include "PosSettings.h"
 
 #include <interface/MenuItem.h>
@@ -19,6 +19,7 @@
 #include <app/Application.h>
 
 #include <storage/DiskDeviceVisitor.h>
+#include <storage/DiskSystem.h>
 #include <storage/DiskDevice.h>
 #include <storage/Partition.h>
 #include <storage/Path.h>
@@ -26,12 +27,12 @@
 class DriveVisitor : public BDiskDeviceVisitor 
 {
 public:
-	DriveVisitor(MainWindow* win);
+	DriveVisitor(PartitionListView* list);
 
 	bool Visit(BDiskDevice *device);
 	bool Visit(BPartition *partition, int32 level);
 private:
-	MainWindow* fDSWindow;
+	PartitionListView* fPartitionList;
 };
 
 const char*
@@ -61,24 +62,45 @@ SizeAsString(off_t size, char *string)
 	return string;
 }
 
+#if DEBUG
+static void
+dump_partition_info(BPartition* partition)
+{
+	char size[1024];
+	printf("\tOffset(): %Ld\n", partition->Offset());
+	printf("\tSize(): %s\n", SizeAsString(partition->Size(),size));
+	printf("\tContentSize(): %s\n", SizeAsString(partition->ContentSize(), size));
+	printf("\tBlockSize(): %ld\n", partition->BlockSize());
+	printf("\tIndex(): %ld\n", partition->Index());
+	printf("\tStatus(): %ld\n\n", partition->Status());
+	printf("\tContainsFileSystem(): %s\n", partition->ContainsFileSystem() ? "true" : "false");
+	printf("\tContainsPartitioningSystem(): %s\n\n", partition->ContainsPartitioningSystem() ? "true" : "false");
+	printf("\tIsDevice(): %s\n", partition->IsDevice() ? "true" : "false");
+	printf("\tIsReadOnly(): %s\n", partition->IsReadOnly() ? "true" : "false");
+	printf("\tIsMounted(): %s\n", partition->IsMounted() ? "true" : "false");
+	printf("\tIsBusy(): %s\n\n", partition->IsBusy() ? "true" : "false");
+	printf("\tFlags(): %lx\n\n", partition->Flags());
+	printf("\tName(): %s\n", partition->Name());
+	printf("\tContentName(): %s\n", partition->ContentName());
+	printf("\tType(): %s\n", partition->Type());
+	printf("\tContentType(): %s\n", partition->ContentType());
+	printf("\tID(): %lx\n\n", partition->ID());
+}
+#endif
+
 /**
  * Constructor.
  * @param frame The size to make the window.
  */	
 MainWindow::MainWindow(BRect frame, PosSettings *Settings)
-	: BWindow(frame, "DriveSetup", B_TITLED_WINDOW,  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	: BWindow(frame, "DriveSetup", B_DOCUMENT_WINDOW,  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
-	BRect bRect;
+	BMenu *partitionMenu, *initMenu;
 	BMenu *menu;
-	BMenu *tmpMenu;
-	BMenuItem *emptyItem;
-	
+
 	fSettings = Settings;
 	
-	bRect = Bounds();
-	bRect.bottom = 18.0;
-	
-	BMenuBar* rootMenu = new BMenuBar(bRect, "root menu");
+	BMenuBar* rootMenu = new BMenuBar(Bounds(), "root menu");
 	//Setup Mount menu
 	menu = new BMenu("Mount");
 	menu->AddItem(new BMenuItem("Mount All Partitions", new BMessage(MOUNT_MOUNT_ALL_MSG), 'M'));
@@ -87,19 +109,16 @@ MainWindow::MainWindow(BRect frame, PosSettings *Settings)
 	
 	//Setup Unmount menu
 	menu = new BMenu("Unmount");
-	emptyItem = new BMenuItem("<empty>", NULL);
-	emptyItem->SetEnabled(false);
-	menu->AddItem(emptyItem);
 	rootMenu->AddItem(menu);
 	
 	//Setup Setup menu
 	menu = new BMenu("Setup");
 		menu->AddItem(new BMenuItem("Format", new BMessage(SETUP_FORMAT_MSG), 'F'));
-		tmpMenu = new BMenu("Partition");
-		menu->AddItem(tmpMenu);
-		tmpMenu = new BMenu("Initialize");
+		partitionMenu = new BMenu("Partition");
+		menu->AddItem(partitionMenu);
+		initMenu = new BMenu("Initialize");
 		//add menu for formats
-		menu->AddItem(tmpMenu);
+		menu->AddItem(initMenu);
 	rootMenu->AddItem(menu);
 	
 	//Setup Options menu
@@ -118,18 +137,26 @@ MainWindow::MainWindow(BRect frame, PosSettings *Settings)
 
 	BRect r(Bounds());
 	r.top = rootMenu->Frame().bottom +1;
-	fListView = new BColumnListView(r, "storagelist", B_FOLLOW_ALL, 0, B_PLAIN_BORDER, true);
-	fListView->AddColumn(new BStringColumn("Device", 100, 500, 50, 0), 1);
-	fListView->AddColumn(new BStringColumn("Map style", 100, 500, 50, 0), 2);
-	fListView->AddColumn(new BStringColumn("Partition Type", 100, 500, 50, 0), 3);
-	fListView->AddColumn(new BStringColumn("Filesystem", 100, 500, 50, 0), 4);
-	fListView->AddColumn(new BStringColumn("Volume Name", 100, 500, 50, 0), 5);
-	fListView->AddColumn(new BStringColumn("Mounted At", 100, 500, 50, 0), 6);
-	fListView->AddColumn(new BStringColumn("Size", 100, 500, 50, 0), 7);
+	fListView = new PartitionListView(r);
 	AddChild(fListView);
 
+	// Now update filesystem/partition menus with values
+	BDiskSystem diskSystem;
+	fDDRoster.RewindDiskSystems();
+	while(fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
+		if (diskSystem.IsPartitioningSystem()) {
+			BMessage* msg = new BMessage(SETUP_PARTITION_SELECTED_MSG);
+			msg->AddString("bdisksystem:name", diskSystem.Name());
+			partitionMenu->AddItem(new BMenuItem(diskSystem.PrettyName(), msg));
+		} else if (diskSystem.IsFileSystem()) {
+			BMessage* msg = new BMessage(SETUP_INITIALIZE_MSG);
+			msg->AddString("bdisksystem:name", diskSystem.Name());
+			initMenu->AddItem(new BMenuItem(diskSystem.PrettyName(), msg));
+		}
+	}
+
 	// Now visit all disks in the system and show their contents
-	DriveVisitor driveVisitor(this);
+	DriveVisitor driveVisitor(fListView);
 	BPartition *partition = NULL;
 	BDiskDevice device;
 	fDDRoster.VisitEachPartition(&driveVisitor, &device, &partition);
@@ -211,95 +238,21 @@ MainWindow::QuitRequested()
 	return accepted;
 }
 
-static void
-dump_partition_info(BPartition* partition)
-{
-	printf("\tOffset(): %Ld\n", partition->Offset());
-	printf("\tSize(): %Ld\n", partition->Size());
-	printf("\tContentSize(): %Ld\n", partition->ContentSize());
-	printf("\tBlockSize(): %ld\n", partition->BlockSize());
-	printf("\tIndex(): %ld\n", partition->Index());
-	printf("\tStatus(): %ld\n\n", partition->Status());
-	printf("\tContainsFileSystem(): %s\n", partition->ContainsFileSystem() ? "true" : "false");
-	printf("\tContainsPartitioningSystem(): %s\n\n", partition->ContainsPartitioningSystem() ? "true" : "false");
-	printf("\tIsDevice(): %s\n", partition->IsDevice() ? "true" : "false");
-	printf("\tIsReadOnly(): %s\n", partition->IsReadOnly() ? "true" : "false");
-	printf("\tIsMounted(): %s\n", partition->IsMounted() ? "true" : "false");
-	printf("\tIsBusy(): %s\n\n", partition->IsBusy() ? "true" : "false");
-	printf("\tFlags(): %lx\n\n", partition->Flags());
-	printf("\tName(): %s\n", partition->Name());
-	printf("\tContentName(): %s\n", partition->ContentName());
-	printf("\tType(): %s\n", partition->Type());
-	printf("\tContentType(): %s\n", partition->ContentType());
-	printf("\tID(): %x\n\n", partition->ID());
-}
-
-void
-MainWindow::AddDrive(BDiskDevice* device)
-{
-	printf("AddDrive(%p)\n", device);
-
-	BPath path;
-	if (device->GetPath(&path) == B_OK)  {
-		BRow* row = new BRow();
-		row->SetField(new BStringField(path.Path()), 1);
-		
-		printf("\tPath=%s\n", path.Path());
-
-		if (device->ContainsPartitioningSystem()) {
-			row->SetField(new BStringField(device->Type()), 3);
-		}
-
-		char size[1024];
-		row->SetField(new BStringField(SizeAsString(device->Size(), size)), 7);
-		
-		fListView->AddRow(row);
-	}
-
-	dump_partition_info(device);
-}
-
-void
-MainWindow::AddPartition(BPartition *partition, int32 level)
-{
-	printf("AddPartition(%p, %d)\n", partition, level);
-
-	BPath path;
-	if (partition->GetPath(&path) == B_OK)  {
-		BRow* row = new BRow();
-		row->SetField(new BStringField(path.Path()), 1);
-		
-		printf("\tPath=%s\n", path.Path());
-		
-		if (partition->ContainsFileSystem()) {
-			row->SetField(new BStringField(partition->Type()), 3);	// Partition Type
-			row->SetField(new BStringField(partition->ContentType()), 4); // Filesystem
-			row->SetField(new BStringField(partition->ContentName()), 5);	// Volume Name
-			
-			if (partition->GetMountPoint(&path) == B_OK)
-				row->SetField(new BStringField(path.Path()),  6);
-		}
-		
-		char size[1024];
-		row->SetField(new BStringField(SizeAsString(partition->Size(), size)), 7);
-		
-		fListView->AddRow(row);
-	}
-
-	dump_partition_info(partition);
-}
-
-
-DriveVisitor::DriveVisitor(MainWindow* win)
-	: fDSWindow(win)
+DriveVisitor::DriveVisitor(PartitionListView* list)
+	: fPartitionList(list)
 {
 }
 
 bool
 DriveVisitor::Visit(BDiskDevice* device)
 {
-	if (fDSWindow != NULL)
-		fDSWindow->AddDrive(device);
+	if (fPartitionList != NULL)
+		fPartitionList->AddPartition(device);
+
+DEBUG_ONLY(
+	printf("Visit(%p)\n", device);
+	dump_partition_info(device);
+);
 
 	return false; // Don't stop yet!
 }
@@ -307,8 +260,13 @@ DriveVisitor::Visit(BDiskDevice* device)
 bool
 DriveVisitor::Visit(BPartition* partition, int32 level)
 {
-	if (fDSWindow != NULL)
-		fDSWindow->AddPartition(partition, level);
+	if (fPartitionList != NULL)
+		fPartitionList->AddPartition(partition);
+
+DEBUG_ONLY(
+	printf("Visit(%p, %d)\n", partition, level);
+	dump_partition_info(partition);
+);
 
 	return false; // Don't stop yet!
 }
