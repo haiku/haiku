@@ -31,6 +31,7 @@
 #include "SwatchGroup.h"
 #include "TransformerFactory.h"
 #include "TransformerListView.h"
+#include "TransformShapesBox.h"
 
 // TODO: just for testing
 #include "AffineTransformer.h"
@@ -144,6 +145,25 @@ case MSG_SHAPE_SELECTED: {
 	fPathListView->SetCurrentShape(shape);
 	fStyleListView->SetCurrentShape(shape);
 	fTransformerListView->SetShape(shape);
+
+	BList selectedShapes;
+	ShapeContainer* shapes = fDocument->Icon()->Shapes();
+	int32 count = shapes->CountShapes();
+	for (int32 i = 0; i < count; i++) {
+		shape = shapes->ShapeAtFast(i);
+		if (shape->IsSelected()) {
+			selectedShapes.AddItem((void*)shape);
+		}
+	}
+
+	if (selectedShapes.CountItems() > 0) {
+		TransformShapesBox* transformBox = new TransformShapesBox(
+			fCanvasView,
+			(const Shape**)selectedShapes.Items(),
+			selectedShapes.CountItems());
+		fState->DeleteManipulators();
+		fState->AddManipulator(transformBox);
+	}
 	break;
 }
 

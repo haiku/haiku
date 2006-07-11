@@ -25,6 +25,7 @@ ShapeListener::~ShapeListener()
 // constructor
 Shape::Shape(::Style* style)
 	: IconObject("<shape>"),
+	  Transformable(),
 	  Observer(),
 	  PathContainerListener(),
 
@@ -46,6 +47,7 @@ Shape::Shape(::Style* style)
 // constructor
 Shape::Shape(const Shape& other)
 	: IconObject(other),
+	  Transformable(other),
 	  Observer(),
 	  PathContainerListener(),
 
@@ -90,6 +92,16 @@ Shape::~Shape()
 	delete fPaths;
 
 	SetStyle(NULL);
+}
+
+// #pragma mark -
+
+// TransformationChanged
+void
+Shape::TransformationChanged()
+{
+	// TODO: notify appearance change
+	_NotifyRerender();
 }
 
 // #pragma mark -
@@ -219,7 +231,9 @@ Shape::Bounds(bool updateLast) const
 	double left, top, right, bottom;
 
 	::VertexSource& source = const_cast<Shape*>(this)->VertexSource();
-	agg::bounding_rect(source, pathID, 0, 1,
+	agg::conv_transform< ::VertexSource, Transformable>
+			transformedSource(source, *this);
+	agg::bounding_rect(transformedSource, pathID, 0, 1,
 					   &left, &top, &right, &bottom);
 
 	BRect bounds(left, top, right, bottom);

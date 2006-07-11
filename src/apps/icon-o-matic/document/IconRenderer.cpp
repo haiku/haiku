@@ -27,6 +27,11 @@
 using std::nothrow;
 
 class StyleHandler {
+	struct StyleItem {
+		Style*			style;
+		Transformation	transformation;
+	};
+
  public:
 	StyleHandler(GammaTable& gammaTable)
 		: fStyles(20),
@@ -35,13 +40,20 @@ class StyleHandler {
 		  fColor(0, 0, 0, 0)
 	{}
 
+	~StyleHandler()
+	{
+		int32 count = fStyles.CountItems();
+		for (int32 i = 0; i < count; i++)
+			delete (StyleItem*)fStyles.ItemAtFast(i);
+	}
+
 	bool is_solid(unsigned styleIndex) const
 	{
-		Style* style = (Style*)fStyles.ItemAt(styleIndex);
-		if (!style)
+		StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
+		if (!styleItem)
 			return true;
 
-		return style->Gradient() == NULL;
+		return styleItem->style->Gradient() == NULL;
 	}
 
 	const agg::rgba8& color(unsigned styleIndex);
@@ -49,9 +61,21 @@ class StyleHandler {
 	void generate_span(agg::rgba8* span, int x, int y,
 					   unsigned len, unsigned styleIndex);
 
-	bool AddStyle(Style* style)
+	bool AddStyle(Style* style, const Transformation& transformation)
 	{
-		return fStyles.AddItem((void*)style);
+		if (!style)
+			return false;
+		StyleItem* item = new (nothrow) StyleItem;
+		if (!item)
+			return false;
+		item->style = style;
+		item->transformation = transformation;
+		// TODO: if the style uses a gradient and the gradient
+		// should be transformed along with the shape, then
+		// we should multiply the item->transformation with the
+		// gradient transformation
+		item->transformation.invert();
+		return fStyles.AddItem((void*)item);
 	}
 
 private:
@@ -59,7 +83,7 @@ private:
 	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
 						   GradientFunction function,
 						   const agg::rgba8* gradientColors,
-						   agg::trans_affine& gradientTransform);
+						   Transformation& gradientTransform);
 
 	BList				fStyles;
 	GammaTable&			fGammaTable;
@@ -71,13 +95,13 @@ private:
 const agg::rgba8&
 StyleHandler::color(unsigned styleIndex)
 {
-	Style* style = (Style*)fStyles.ItemAt(styleIndex);
-	if (!style) {
+	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
+	if (!styleItem) {
 		printf("no style at index: %d!\n", styleIndex);
 		return fTransparent;
 	}
 
-	const rgb_color& c = style->Color();
+	const rgb_color& c = styleItem->style->Color();
 	fColor = agg::rgba8(fGammaTable.dir(c.red),
 						fGammaTable.dir(c.green),
 						fGammaTable.dir(c.blue),
@@ -91,55 +115,52 @@ void
 StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 							unsigned len, unsigned styleIndex)
 {
-	Style* style = (Style*)fStyles.ItemAt(styleIndex);
-	if (!style || !style->Gradient()) {
+	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
+	if (!styleItem || !styleItem->style->Gradient()) {
 		printf("no style/gradient at index: %d!\n", styleIndex);
 		// TODO: memset() span?
 		return;
 	}
 
+	Style* style = styleItem->style;
 	Gradient* gradient = style->Gradient();		
 	const agg::rgba8* colors = style->Colors();
-
-	agg::trans_affine transformation;
-		// TODO: construct the gradient transformation here
-		// remember to invert() it!
 
 	switch (gradient->Type()) {
 		case GRADIENT_LINEAR: {
 		    agg::gradient_x function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 		case GRADIENT_CIRCULAR: {
 		    agg::gradient_radial function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 		case GRADIENT_DIAMONT: {
 		    agg::gradient_diamond function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 		case GRADIENT_CONIC: {
 		    agg::gradient_conic function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 		case GRADIENT_XY: {
 		    agg::gradient_xy function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 		case GRADIENT_SQRT_XY: {
 		    agg::gradient_sqrt_xy function;
 			_GenerateGradient(span, x, y, len, function, colors,
-							  transformation);
+							  styleItem->transformation);
 			break;
 		}
 	}
@@ -151,7 +172,7 @@ void
 StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
 								GradientFunction function,
 								const agg::rgba8* gradientColors,
-								agg::trans_affine& gradientTransform)
+								Transformation& gradientTransform)
 
 {
 	typedef agg::pod_auto_array<agg::rgba8, 256>	ColorArray;
@@ -262,6 +283,7 @@ IconRenderer::_Render(const BRect& r)
 
 	fBaseRendererPre.clear(agg::rgba8(0, 0, 0, 0));
 
+//bigtime_t start = system_time();
 	StyleHandler styleHandler(fGammaTable);
 
 	fRasterizer.reset();
@@ -272,19 +294,21 @@ IconRenderer::_Render(const BRect& r)
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
-		if (!styleHandler.AddStyle(shape->Style())) {
+		Transformation transform(*shape);
+		transform.multiply(fGlobalTransform);
+			// NOTE: this works only because "agg::trans_affine",
+			// "Transformable" and "Transformation" are all the
+			// same thing
+
+		if (!styleHandler.AddStyle(shape->Style(), transform)) {
 			printf("IconRenderer::_Render() - out of memory\n");
 			break;
 		}
 		fRasterizer.styles(i, -1);
 
-		if (fGlobalTransform.is_identity()) {
-			fRasterizer.add_path(shape->VertexSource());
-		} else {
-			agg::conv_transform<VertexSource, Transformation>
-				scaledPath(shape->VertexSource(), fGlobalTransform);
-			fRasterizer.add_path(scaledPath);
-		}
+		agg::conv_transform<VertexSource, Transformation>
+			scaledPath(shape->VertexSource(), transform);
+		fRasterizer.add_path(scaledPath);
 	}
 
 	agg::render_scanlines_compound(fRasterizer,
@@ -296,5 +320,8 @@ IconRenderer::_Render(const BRect& r)
 
 	if (fGammaTable.gamma() != 1.0)
 		fPixelFormat.apply_gamma_inv(fGammaTable);
+
+//if (fRenderingBuffer.width() == 64)
+//printf("rendering 64x64: %lld\n", system_time() - start);
 }
 

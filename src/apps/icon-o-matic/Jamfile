@@ -26,6 +26,7 @@ local sourceDirs =
 	shape
 	shape/commands
 	style
+	transformable
 	transformer
 ;
 
@@ -138,6 +139,13 @@ Application Icon-O-Matic :
 	SetGradientCommand.cpp
 	Style.cpp
 	StyleManager.cpp
+	# transformable
+	ChannelTransform.cpp
+	Transformable.cpp
+	TransformBox.cpp
+	TransformBoxStates.cpp
+	TransformCommand.cpp
+	TransformShapesBox.cpp
 	# transformer
 	AffineTransformer.cpp
 	ContourTransformer.cpp

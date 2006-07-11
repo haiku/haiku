@@ -8,6 +8,7 @@
 #include "Observer.h"
 #include "PathContainer.h"
 #include "PathSource.h"
+#include "Transformable.h"
 #include "VectorPath.h"
 
 class Style;
@@ -28,6 +29,7 @@ class ShapeListener {
 };
 
 class Shape : public IconObject,
+			  public Transformable,
 			  public Observer,	// observing all the paths and the style
 			  public PathContainerListener,
 			  public PathListener {
@@ -35,6 +37,9 @@ class Shape : public IconObject,
 								Shape(::Style* style);
 								Shape(const Shape& other);
 	virtual						~Shape();
+
+	// Transformable interface
+	virtual	void				TransformationChanged();
 
 	// Observer interface
 	virtual	void				ObjectChanged(const Observable* object);
