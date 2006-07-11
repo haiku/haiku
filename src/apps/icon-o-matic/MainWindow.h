@@ -13,6 +13,7 @@
 
 #include "Observer.h"
 
+class BMenu;
 class BMenuBar;
 class BMenuItem;
 class CanvasView;

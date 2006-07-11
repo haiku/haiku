@@ -13,6 +13,7 @@
 
 #include "Observer.h"
 
+class BMenu;
 class BMenuField;
 class CommandStack;
 class Gradient;
