@@ -14,6 +14,7 @@
 */
 
 
+#include <Debug.h>
 #include <Box.h>
 #include <RadioButton.h>
 #include <Window.h>
@@ -295,7 +296,7 @@ BRadioButton::SetValue(int32 value)
 	while (child) {
 		BRadioButton *radio = dynamic_cast<BRadioButton*>(child);
 
-		if (child != this && radio)
+		if (radio && (radio != this))
 			radio->SetValue(B_CONTROL_OFF);
 		else {
 			// If the child is a BBox, check if the label is a radiobutton
@@ -304,13 +305,15 @@ BRadioButton::SetValue(int32 value)
 			if (box && box->LabelView()) {
 				radio = dynamic_cast<BRadioButton*>(box->LabelView());
 
-				if (radio)
+				if (radio && (radio != this))
 					radio->SetValue(B_CONTROL_OFF);
 			}
 		}
 
 		child = child->NextSibling();
 	}
+
+	ASSERT(Value() == B_CONTROL_ON);
 }
 
 
