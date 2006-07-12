@@ -49,30 +49,32 @@ PasswordWindow::_Setup()
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	fUseNetwork=new BRadioButton(BRect(14,10,159,20),"useNetwork","Use Network password",new BMessage(kMsgPasswordTypeChanged),B_FOLLOW_NONE);
+	fUseNetwork = new BRadioButton(BRect(14,10,62+be_plain_font->StringWidth("Use Network password"),20), "useNetwork",
+		"Use Network password", new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 	topView->AddChild(fUseNetwork);
-	fUseCustom=new BRadioButton(BRect(30,50,130,60),"fUseCustom","Use custom password",new BMessage(kMsgPasswordTypeChanged),B_FOLLOW_NONE);
+	fUseCustom = new BRadioButton(BRect(30,50,36+be_plain_font->StringWidth("Use custom password"),60), "fUseCustom", 
+		"Use custom password", new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 
-	BBox *customBox=new BBox(BRect(9,30,269,105),"custBeBox",B_FOLLOW_NONE);
+	BBox *customBox = new BBox(BRect(9,30,269,105), "custBeBox", B_FOLLOW_NONE);
 	customBox->SetLabel(fUseCustom);
-	fPasswordControl=new BTextControl(BRect(10,20,251,35),"pwdCntrl","Password:",NULL,B_FOLLOW_NONE);
-	fConfirmControl=new BTextControl(BRect(10,45,251,60),"fConfirmCntrl","Confirm password:",NULL,B_FOLLOW_NONE);
-	fPasswordControl->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fPasswordControl = new BTextControl(BRect(10,20,251,35), "pwdCntrl", "Password:", NULL, B_FOLLOW_NONE);
+	fConfirmControl = new BTextControl(BRect(10,45,251,60), "fConfirmCntrl", "Confirm password:", NULL, B_FOLLOW_NONE);
+	fPasswordControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	float divider = be_plain_font->StringWidth("Confirm password:") + 5.0;
 	fPasswordControl->SetDivider(divider);
 	fPasswordControl->TextView()->HideTyping(true);
-	fConfirmControl->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fConfirmControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fConfirmControl->SetDivider(divider);
 	fConfirmControl->TextView()->HideTyping(true);
 	customBox->AddChild(fPasswordControl);
 	customBox->AddChild(fConfirmControl);
 	topView->AddChild(customBox);
 
-	BButton* button = new BButton(BRect(194,118,269,129),"done","Done",new BMessage(kMsgDone),B_FOLLOW_NONE);
+	BButton* button = new BButton(BRect(194,118,269,129), "done", "Done", new BMessage(kMsgDone), B_FOLLOW_NONE);
 	topView->AddChild(button);
 	button->MakeDefault(true);
 
-	button = new BButton(BRect(109,118,184,129),"cancel","Cancel",new BMessage(B_CANCEL),B_FOLLOW_NONE);
+	button = new BButton(BRect(109,118,184,129), "cancel", "Cancel", new BMessage(B_CANCEL), B_FOLLOW_NONE);
 	topView->AddChild(button);
 
 	Update();
