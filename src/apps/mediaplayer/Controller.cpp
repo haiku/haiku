@@ -468,7 +468,7 @@ printf("audio decode start\n");
 			#endif
 			status = fAudioTrack->DecodedFormat(&buffer->mediaFormat);
 			if (status != B_OK) {
-				printf("audio decoded format status %08x %s\n", status, strerror(status));
+				printf("audio decoded format status %08lx %s\n", status, strerror(status));
 				return;
 			}
 			bufferSize = buffer->mediaFormat.u.raw_audio.buffer_size;
@@ -589,7 +589,7 @@ printf("video decode start\n");
 			buffer->mediaFormat.u.raw_video.display.format = IsOverlayActive() ? B_YCbCr422 : B_RGB32;
 			status = fVideoTrack->DecodedFormat(&buffer->mediaFormat);
 			if (status != B_OK) {
-				printf("video decoded format status %08x %s\n", status, strerror(status));
+				printf("video decoded format status %08lx %s\n", status, strerror(status));
 				return;
 			}
 			bytePerRow = buffer->mediaFormat.u.raw_video.display.bytes_per_row;
@@ -602,14 +602,14 @@ printf("video decode start\n");
 		if (buffer->sizeMax != bufferSize) {
 			BRect r(0, 0, lineWidth - 1, lineCount - 1);
 			delete buffer->bitmap;
-			printf("allocating bitmap %d %d %d\n", lineWidth, lineCount, bytePerRow);
+			printf("allocating bitmap %d %d %ld\n", lineWidth, lineCount, bytePerRow);
 			if (IsOverlayActive())
 				buffer->bitmap = new BBitmap(r, B_BITMAP_WILL_OVERLAY | (fVideoBufferWriteIndex == 1) ? B_BITMAP_RESERVE_OVERLAY_CHANNEL : 0, IsOverlayActive() ? B_YCbCr422 : B_RGB32, bytePerRow);
 			else
 				buffer->bitmap = new BBitmap(r, 0, B_RGB32, bytePerRow);
 			status = buffer->bitmap->InitCheck();
 			if (status != B_OK) {
-				printf("video decoded format status %08x %s\n", status, strerror(status));
+				printf("video decoded format status %08lx %s\n", status, strerror(status));
 				return;
 			}
 			buffer->buffer = (char *)buffer->bitmap->Bits();
