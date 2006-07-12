@@ -86,7 +86,7 @@ ColorPreview::MessageReceived(BMessage* message)
 		type_code typeFound;
 
 		if (message->GetInfo(B_RGB_COLOR_TYPE, 0,
-							 &nameFound, &typeFound) != B_OK) {
+							 (const char**)&nameFound, &typeFound) != B_OK) {
 			BControl::MessageReceived(message);
 			return;
 		}

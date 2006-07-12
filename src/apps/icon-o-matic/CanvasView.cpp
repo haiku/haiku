@@ -11,6 +11,8 @@
 #include <Bitmap.h>
 #include <Region.h>
 
+#include <stdio.h>
+
 #include "ui_defines.h"
 
 #include "CommandStack.h"
