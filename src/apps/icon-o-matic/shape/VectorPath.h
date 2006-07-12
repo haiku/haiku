@@ -142,6 +142,9 @@ class VectorPath : public BArchivable,
 
 			bool				AddListener(PathListener* listener);
 			bool				RemoveListener(PathListener* listener);
+			int32				CountListeners() const;
+			PathListener*		ListenerAtFast(int32 index) const;
+			
 
  private:
 			BRect				_Bounds() const;

@@ -45,6 +45,9 @@ name_for_id(int32 id)
 		case PROPERTY_MITER_LIMIT:
 			name = "Miter Limit";
 			break;
+		case PROPERTY_STROKE_SHORTEN:
+			name = "Shorten";
+			break;
 
 		case PROPERTY_CLOSED:
 			name = "Closed";

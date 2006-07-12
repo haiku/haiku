@@ -18,7 +18,7 @@ class RemoveShapesCommand : public Command {
  public:
 								RemoveShapesCommand(
 									ShapeContainer* container,
-									const int32* indices,
+									int32* const indices,
 									int32 count);
 	virtual						~RemoveShapesCommand();
 	

@@ -17,6 +17,7 @@
 #include <Mime.h>
 #include <Window.h>
 
+#include "AddShapesCommand.h"
 #include "CommandStack.h"
 #include "MoveShapesCommand.h"
 #include "RemoveShapesCommand.h"
@@ -117,8 +118,6 @@ ShapeListView::~ShapeListView()
 void
 ShapeListView::SelectionChanged()
 {
-	// TODO: single selection versus multiple selection
-
 	ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(CurrentSelection(0)));
 	if (fMessage) {
 		BMessage message(*fMessage);
@@ -130,10 +129,16 @@ ShapeListView::SelectionChanged()
 	if (!fSelection)
 		return;
 
-	if (item)
-		fSelection->Select(item->shape);
-	else
+	if (!item) {
 		fSelection->DeselectAll();
+		return;
+	}
+
+	for (int32 i = 0;
+		 (item = dynamic_cast<ShapeListItem*>(ItemAt(CurrentSelection(i))));
+		 i++) {
+		fSelection->Select(item->shape, i > 0);
+	}
 }
 
 // MessageReceived
@@ -220,19 +225,41 @@ ShapeListView::MoveItems(BList& items, int32 toIndex)
 void
 ShapeListView::CopyItems(BList& items, int32 toIndex)
 {
-	MoveItems(items, toIndex);
-	// TODO: allow copying items
+	if (!fCommandStack || !fShapeContainer)
+		return;
+
+	int32 count = items.CountItems();
+	Shape* shapes[count];
+
+	for (int32 i = 0; i < count; i++) {
+		ShapeListItem* item
+			= dynamic_cast<ShapeListItem*>((BListItem*)items.ItemAtFast(i));
+		shapes[i] = item ? new (nothrow) Shape(*item->shape) : NULL;
+	}
+
+	AddShapesCommand* command
+		= new (nothrow) AddShapesCommand(fShapeContainer,
+										 shapes, count, toIndex);
+	if (!command) {
+		for (int32 i = 0; i < count; i++)
+			delete shapes[i];
+		return;
+	}
+
+	fCommandStack->Perform(command);
 }
 
 // RemoveItemList
 void
-ShapeListView::RemoveItemList(BList& indexList)
+ShapeListView::RemoveItemList(BList& items)
 {
 	if (!fCommandStack || !fShapeContainer)
 		return;
 
-	int32 count = indexList.CountItems();
-	const int32* indices = (int32*)indexList.Items();
+	int32 count = items.CountItems();
+	int32 indices[count];
+	for (int32 i = 0; i < count; i++)
+	 	indices[i] = IndexOf((SimpleItem*)items.ItemAtFast(i));
 
 	RemoveShapesCommand* command
 		= new (nothrow) RemoveShapesCommand(fShapeContainer,
@@ -264,8 +291,6 @@ ShapeListView::ShapeAdded(Shape* shape, int32 index)
 	if (!LockLooper())
 		return;
 
-	// NOTE: shapes are always added at the end
-	// of the list, so the sorting is synced...
 	_AddShape(shape, index);
 
 	UnlockLooper();

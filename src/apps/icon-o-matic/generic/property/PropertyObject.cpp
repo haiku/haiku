@@ -166,6 +166,13 @@ PropertyObject::FindProperty(uint32 propertyID) const
 	return NULL;
 }
 
+//HasProperty
+bool
+PropertyObject::HasProperty(Property* property) const
+{
+	return fProperties.HasItem((void*)property);
+}
+
 // ContainsSameProperties
 bool
 PropertyObject::ContainsSameProperties(const PropertyObject& other) const

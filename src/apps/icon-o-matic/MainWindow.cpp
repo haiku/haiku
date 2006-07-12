@@ -8,6 +8,7 @@
 
 #include "MainWindow.h"
 
+#include <new>
 #include <stdio.h>
 
 #include <Menu.h>
@@ -16,6 +17,9 @@
 #include <Message.h>
 #include <ScrollView.h>
 
+#include "AddPathsCommand.h"
+#include "AddShapesCommand.h"
+#include "AddStylesCommand.h"
 #include "Document.h"
 #include "CanvasView.h"
 #include "CommandStack.h"
@@ -46,6 +50,8 @@
 #include "Style.h"
 #include "StyleManager.h"
 #include "VectorPath.h"
+
+using std::nothrow;
 
 enum {
 	MSG_UNDO						= 'undo',
@@ -98,44 +104,62 @@ MainWindow::MessageReceived(BMessage* message)
 			fDocument->CommandStack()->Redo();
 			break;
 
-// TODO: use an AddPathCommand and listen to
-// selection in CanvasView to add a manipulator
+// TODO: listen to selection in CanvasView to add a manipulator
 case MSG_NEW_PATH: {
-	VectorPath* path = new VectorPath();
-	fDocument->Icon()->Paths()->AddPath(path);
+	VectorPath* path = new (nothrow) VectorPath();
+	VectorPath* paths[1];
+	paths[0] = path;
+	PathContainer* container = fDocument->Icon()->Paths();
+	AddPathsCommand* command = new (nothrow) AddPathsCommand(
+		container, paths, 1, true,
+		container->CountPaths());
+	fDocument->CommandStack()->Perform(command);
 	break;
 }
 case MSG_PATH_SELECTED: {
 	VectorPath* path;
-	if (message->FindPointer("path", (void**)&path) == B_OK) {
-		PathManipulator* pathManipulator = new PathManipulator(path);
-		fState->DeleteManipulators();
+	if (message->FindPointer("path", (void**)&path) < B_OK)
+		path = NULL;
+	
+	fState->DeleteManipulators();
+	if (path) {
+		PathManipulator* pathManipulator = new (nothrow) PathManipulator(path);
 		fState->AddManipulator(pathManipulator);
 	}
 	break;
 }
-// TODO: use an AddStyleCommand
 case MSG_NEW_STYLE: {
-	Style* style = new Style();
-	style->SetColor((rgb_color){ rand() % 255,
-								 rand() % 255,
-								 rand() % 255,
-								 255 });
-	StyleManager::Default()->AddStyle(style);
+	Style* style = new (nothrow) Style();
+	if (style) {
+		style->SetColor((rgb_color){ rand() % 255,
+									 rand() % 255,
+									 rand() % 255,
+									 255 });
+		Style* styles[1];
+		styles[0] = style;
+		StyleManager* container = StyleManager::Default();
+		AddStylesCommand* command = new (nothrow) AddStylesCommand(
+			container, styles, 1,
+			container->CountStyles());
+		fDocument->CommandStack()->Perform(command);
+	}
 	break;
 }
 case MSG_STYLE_SELECTED: {
 	Style* style;
 	if (message->FindPointer("style", (void**)&style) < B_OK)
 		style = NULL;
-	fSwatchGroup->SetCurrentStyle(style);
 	fStyleView->SetStyle(style);
 	break;
 }
-// TODO: use an AddShapeCommand
 case MSG_NEW_SHAPE: {
-	Shape* shape = new Shape(StyleManager::Default()->StyleAt(0));
-	fDocument->Icon()->Shapes()->AddShape(shape);
+	Shape* shape = new (nothrow) Shape(StyleManager::Default()->StyleAt(0));
+	Shape* shapes[1];
+	shapes[0] = shape;
+	AddShapesCommand* command = new (nothrow) AddShapesCommand(
+		fDocument->Icon()->Shapes(), shapes, 1,
+		fDocument->Icon()->Shapes()->CountShapes());
+	fDocument->CommandStack()->Perform(command);
 	break;
 }
 case MSG_SHAPE_SELECTED: {
@@ -157,7 +181,7 @@ case MSG_SHAPE_SELECTED: {
 	}
 
 	if (selectedShapes.CountItems() > 0) {
-		TransformShapesBox* transformBox = new TransformShapesBox(
+		TransformShapesBox* transformBox = new (nothrow) TransformShapesBox(
 			fCanvasView,
 			(const Shape**)selectedShapes.Items(),
 			selectedShapes.CountItems());
@@ -251,7 +275,7 @@ MainWindow::_Init()
 
 	fPathListView->SetPathContainer(fDocument->Icon()->Paths());
 	fPathListView->SetShapeContainer(fDocument->Icon()->Shapes());
-//	fPathListView->SetCommandStack(fDocument->CommandStack());
+	fPathListView->SetCommandStack(fDocument->CommandStack());
 	fPathListView->SetSelection(fDocument->Selection());
 
 	fStyleListView->SetStyleManager(StyleManager::Default());
@@ -260,6 +284,7 @@ MainWindow::_Init()
 	fStyleListView->SetSelection(fDocument->Selection());
 
 	fStyleView->SetCommandStack(fDocument->CommandStack());
+	fStyleView->SetCurrentColor(CurrentColor::Default());
 
 	fShapeListView->SetShapeContainer(fDocument->Icon()->Shapes());
 	fShapeListView->SetCommandStack(fDocument->CommandStack());
@@ -290,11 +315,13 @@ MainWindow::_Init()
 	fDocument->Icon()->Paths()->AddPath(path);
 
 	Style* style1 = new Style();
+	style1->SetName("Style White");
 	style1->SetColor((rgb_color){ 255, 255, 255, 255 });
 
 	StyleManager::Default()->AddStyle(style1);
 
 	Style* style2 = new Style();
+	style2->SetName("Style Gradient");
 	Gradient gradient(true);
 	gradient.AddColor((rgb_color){ 255, 211, 6, 255 }, 0.0);
 	gradient.AddColor((rgb_color){ 255, 238, 160, 255 }, 0.5);
@@ -320,6 +347,7 @@ MainWindow::_Init()
 	fDocument->Icon()->Shapes()->AddShape(shape);
 
 	Style* style3 = new Style();
+	style3->SetName("Style Red");
 	style3->SetColor((rgb_color){ 255, 0, 169,200 });
 
 	StyleManager::Default()->AddStyle(style3);
@@ -579,13 +607,13 @@ MainWindow::_CreateMenuBar(BRect frame)
 	editMenu->AddItem(fRedoMI);
 
 	// Path
-	fPathMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_PATH)));
+	fPathMenu->AddItem(new BMenuItem("Add", new BMessage(MSG_NEW_PATH)));
 
 	// Style
-	fStyleMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_STYLE)));
+	fStyleMenu->AddItem(new BMenuItem("Add", new BMessage(MSG_NEW_STYLE)));
 
 	// Shape
-	fShapeMenu->AddItem(new BMenuItem("New", new BMessage(MSG_NEW_SHAPE)));
+	fShapeMenu->AddItem(new BMenuItem("Add", new BMessage(MSG_NEW_SHAPE)));
 
 
 	// Transformer

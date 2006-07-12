@@ -29,10 +29,11 @@ class TransformShapesBox : public TransformBox {
 
 	virtual	void				TransformFromCanvas(BPoint& point) const;
 	virtual	void				TransformToCanvas(BPoint& point) const;
+	virtual	float				ZoomLevel() const;
 	virtual	double				ViewSpaceRotation() const;
 
-	virtual	TransformCommand*	MakeAction(const char* actionName,
-										   uint32 nameIndex) const;
+	virtual	TransformCommand*	MakeCommand(const char* actionName,
+											uint32 nameIndex);
 
 	// TransformShapesBox
 			Command*			Perform();

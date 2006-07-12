@@ -65,3 +65,10 @@ StringValueView::AdoptProperty(Property* property)
 	}
 	return false;
 }
+
+// GetProperty
+Property*
+StringValueView::GetProperty() const
+{
+	return fProperty;
+}

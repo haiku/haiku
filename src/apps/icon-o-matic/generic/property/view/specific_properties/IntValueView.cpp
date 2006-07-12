@@ -66,3 +66,10 @@ IntValueView::AdoptProperty(Property* property)
 	return false;
 }
 
+// GetProperty
+Property*
+IntValueView::GetProperty() const
+{
+	return fProperty;
+}
+

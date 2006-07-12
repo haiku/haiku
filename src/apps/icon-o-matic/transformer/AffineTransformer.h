@@ -25,7 +25,9 @@ class AffineTransformer : public Transformer,
 									VertexSource& source);
 	virtual						~AffineTransformer();
 
-    virtual	void				rewind(unsigned path_id);
+	virtual	Transformer*		Clone(VertexSource& source) const;
+
+	virtual	void				rewind(unsigned path_id);
     virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);

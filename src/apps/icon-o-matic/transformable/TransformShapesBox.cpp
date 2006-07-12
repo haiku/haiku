@@ -15,7 +15,7 @@
 #include "CanvasView.h"
 #include "Shape.h"
 #include "StateView.h"
-//#include "TransformShapesCommand.h"
+#include "TransformObjectsCommand.h"
 
 using std::nothrow;
 
@@ -116,6 +116,10 @@ TransformShapesBox::ObjectChanged(const Observable* object)
 		box = box | fShapes[i]->Bounds();
 		fShapes[i]->StoreTo(&fOriginals[i * 6]);
 	}
+	// any TransformObjectsCommand cannot use the TransformBox
+	// anymore
+	_NotifyDeleted();
+
 	Reset();
 	SetBox(box);
 
@@ -154,6 +158,13 @@ TransformShapesBox::TransformToCanvas(BPoint& point) const
 	fParentTransform.Transform(&point);
 }
 
+// ZoomLevel
+float
+TransformShapesBox::ZoomLevel() const
+{
+	return fCanvasView->ZoomLevel();
+}
+
 // ViewSpaceRotation
 double
 TransformShapesBox::ViewSpaceRotation() const
@@ -163,19 +174,23 @@ TransformShapesBox::ViewSpaceRotation() const
 	return t.rotation() * 180.0 / PI;
 }
 
-// MakeAction
+// MakeCommand
 TransformCommand*
-TransformShapesBox::MakeAction(const char* actionName, uint32 nameIndex) const
+TransformShapesBox::MakeCommand(const char* commandName, uint32 nameIndex)
 {
-//	return new TransformShapesCommand(fShapes, fCount,
-//
-//									  Pivot(),
-//									  Translation(),
-//									  LocalRotation(),
-//									  LocalXScale(),
-//									  LocalYScale(),
-//
-//									  actionName,
-//									  nameIndex);
-	return NULL;
+	const Transformable* objects[fCount];
+	for (int32 i = 0; i < fCount; i++)
+		objects[i] = fShapes[i];
+	
+	return new TransformObjectsCommand(this, objects, fOriginals, fCount,
+
+									   Pivot(),
+									   Translation(),
+									   LocalRotation(),
+									   LocalXScale(),
+									   LocalYScale(),
+
+									   commandName,
+									   nameIndex);
 }
+

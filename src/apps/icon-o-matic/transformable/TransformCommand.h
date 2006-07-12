@@ -39,7 +39,7 @@ class TransformCommand : public Command {
 
 	virtual void				GetName(BString& name);
 
-								// TransformCommand
+	// TransformCommand
 			void				SetNewTransformation(BPoint pivot,
 													 BPoint translation,
 													 double rotation,

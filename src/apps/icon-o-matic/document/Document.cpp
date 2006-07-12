@@ -25,18 +25,22 @@ Document::Document(const char* name)
 	  fCommandStack(new (nothrow) ::CommandStack()),
 	  fSelection(new (nothrow) ::Selection()),
 
+	  fName(name),
 	  fRef(NULL)
 {
-	SetName(name);
 }
 
 // destructor
 Document::~Document()
 {
-	delete fIcon;
 	delete fCommandStack;
+printf("~Document() - fCommandStack deleted\n");
 	delete fSelection;
+printf("~Document() - fSelection deleted\n");
+	delete fIcon;
+printf("~Document() - fIcon deleted\n");
 	delete fRef;
+printf("~Document() - fRef deleted\n");
 }
 
 // SetName

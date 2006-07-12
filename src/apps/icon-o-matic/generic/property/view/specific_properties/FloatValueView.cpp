@@ -65,3 +65,13 @@ FloatValueView::AdoptProperty(Property* property)
 	}
 	return false;
 }
+
+// GetProperty
+Property*
+FloatValueView::GetProperty() const
+{
+	return fProperty;
+}
+
+
+

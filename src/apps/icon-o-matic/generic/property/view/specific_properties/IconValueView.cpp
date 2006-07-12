@@ -88,6 +88,13 @@ IconValueView::AdoptProperty(Property* property)
 	return false;
 }
 
+// GetProperty
+Property*
+IconValueView::GetProperty() const
+{
+	return fProperty;
+}
+
 // #pragma mark -
 
 // SetIcon

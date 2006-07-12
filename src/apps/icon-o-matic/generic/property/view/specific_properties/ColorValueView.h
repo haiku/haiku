@@ -32,8 +32,7 @@ class ColorValueView : public PropertyEditorView {
 	virtual	bool				IsFocused() const;
 
 	virtual	bool				AdoptProperty(Property* property);
-	virtual	Property*			GetProperty() const
-									{ return fProperty; }
+	virtual	Property*			GetProperty() const;
 
  protected:
 			ColorProperty*		fProperty;

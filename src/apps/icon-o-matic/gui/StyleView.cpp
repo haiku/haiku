@@ -16,8 +16,10 @@
 #include <PopUpMenu.h>
 
 #include "CommandStack.h"
+#include "CurrentColor.h"
 #include "Gradient.h"
 #include "GradientControl.h"
+#include "SetColorCommand.h"
 #include "SetGradientCommand.h"
 #include "Style.h"
 
@@ -37,6 +39,7 @@ enum {
 StyleView::StyleView(BRect frame)
 	: BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0),
 	  fCommandStack(NULL),
+	  fCurrentColor(NULL),
 	  fStyle(NULL),
 	  fGradient(NULL)
 {
@@ -112,6 +115,7 @@ StyleView::StyleView(BRect frame)
 StyleView::~StyleView()
 {
 	SetStyle(NULL);
+	SetCurrentColor(NULL);
 	fGradientControl->Gradient()->RemoveObserver(this);
 }
 
@@ -140,6 +144,10 @@ StyleView::MessageReceived(BMessage* message)
 				_SetGradientType(type);
 			break;
 		}
+		case MSG_SET_COLOR:
+		case MSG_GRADIENT_CONTROL_FOCUS_CHANGED:
+			_TransferGradientStopColor();
+			break;
 
 		default:
 			BView::MessageReceived(message);
@@ -169,6 +177,8 @@ StyleView::ObjectChanged(const Observable* object)
 			} else {
 				*fGradient = *controlGradient;
 			}
+			// transfer the current gradient color to the current color
+			_TransferGradientStopColor();
 		}
 	} else if (object == fGradient) {
 		if (*fGradient != *controlGradient) {
@@ -177,7 +187,12 @@ StyleView::ObjectChanged(const Observable* object)
 		}
 	} else if (object == fStyle) {
 		// maybe the gradient was added or removed
+		// or the color changed
 		_SetGradient(fStyle->Gradient());
+		if (fCurrentColor && !fStyle->Gradient())
+			fCurrentColor->SetColor(fStyle->Color());
+	} else if (object == fCurrentColor) {
+		_AdoptCurrentColor(fCurrentColor->Color());
 	}
 }
 
@@ -190,15 +205,21 @@ StyleView::SetStyle(Style* style)
 	if (fStyle == style)
 		return;
 
-	if (fStyle)
+	if (fStyle) {
 		fStyle->RemoveObserver(this);
+		fStyle->Release();
+	}
 
 	fStyle = style;
 
 	Gradient* gradient = NULL;
 	if (fStyle) {
+		fStyle->Acquire();
 		fStyle->AddObserver(this);
 		gradient = fStyle->Gradient();
+
+		if (fCurrentColor && !gradient)
+			fCurrentColor->SetColor(fStyle->Color());
 	}
 
 	_SetGradient(gradient);
@@ -209,6 +230,22 @@ void
 StyleView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
+}
+
+// SetCurrentColor
+void
+StyleView::SetCurrentColor(CurrentColor* color)
+{
+	if (fCurrentColor == color)
+		return;
+
+	if (fCurrentColor)
+		fCurrentColor->RemoveObserver(this);
+
+	fCurrentColor = color;
+
+	if (fCurrentColor)
+		fCurrentColor->AddObserver(this);
 }
 
 // #pragma mark -
@@ -287,3 +324,37 @@ StyleView::_SetGradientType(int32 type)
 {
 	fGradientControl->Gradient()->SetType((gradient_type)type);
 }
+
+// _AdoptCurrentColor
+void
+StyleView::_AdoptCurrentColor(rgb_color color)
+{
+	if (!fStyle)
+		return;
+
+	if (fGradient) {
+		// set the focused gradient color stop
+		if (fGradientControl->IsFocus()) {
+			fGradientControl->SetCurrentStop(color);
+		}
+	} else {
+		if (fCommandStack) {
+			fCommandStack->Perform(
+				new (nothrow) SetColorCommand(fStyle, color));
+		} else {
+			fStyle->SetColor(color);
+		}
+	}
+}
+
+// _TransferGradientStopColor
+void
+StyleView::_TransferGradientStopColor()
+{
+	if (fCurrentColor && fGradientControl->IsFocus()) {
+		rgb_color color;
+		if (fGradientControl->GetCurrentStop(&color))
+			fCurrentColor->SetColor(color);
+	}
+}
+

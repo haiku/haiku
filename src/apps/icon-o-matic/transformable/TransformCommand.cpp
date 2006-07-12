@@ -90,11 +90,11 @@ TransformCommand::Undo()
 {
 	status_t status = InitCheck();
 	if (status >= B_OK) {
-		_SetTransformation(fOldPivot - fNewPivot,
-						   fOldTranslation - fNewTranslation,
-						   fOldRotation - fNewRotation,
-						   fOldXScale - fNewXScale,
-						   fOldYScale - fNewYScale);
+		_SetTransformation(fOldPivot,
+						   fOldTranslation,
+						   fOldRotation,
+						   fOldXScale,
+						   fOldYScale);
 	}
 	return status;
 }
@@ -105,11 +105,11 @@ TransformCommand::Redo()
 {
 	status_t status = InitCheck();
 	if (status >= B_OK) {
-		_SetTransformation(fNewPivot - fOldPivot,
-						   fNewTranslation - fOldTranslation,
-						   fNewRotation - fOldRotation,
-						   fNewXScale - fOldXScale,
-						   fNewYScale - fOldYScale);
+		_SetTransformation(fNewPivot,
+						   fNewTranslation,
+						   fNewRotation,
+						   fNewXScale,
+						   fNewYScale);
 	}
 	return status;
 }

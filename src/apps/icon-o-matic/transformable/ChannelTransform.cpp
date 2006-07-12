@@ -40,10 +40,10 @@ ChannelTransform::~ChannelTransform()
 // SetTransformation
 void
 ChannelTransform::SetTransformation(BPoint pivot,
-									 BPoint translation,
-									 double rotation,
-									 double xScale,
-									 double yScale)
+									BPoint translation,
+									double rotation,
+									double xScale,
+									double yScale)
 {
 	if (fTranslation != translation ||
 		fPivot != pivot ||

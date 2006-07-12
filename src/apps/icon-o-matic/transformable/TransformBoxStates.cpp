@@ -509,7 +509,7 @@ RotateBoxState::SetOrigin(BPoint origin)
 void
 RotateBoxState::DragTo(BPoint current, uint32 modifiers)
 {
-	double angle = calc_angle(fParent->Pivot(), fOrigin, current);
+	double angle = calc_angle(fParent->Center(), fOrigin, current);
 
 	if (modifiers & B_SHIFT_KEY) {
 		if (angle < 0.0)
@@ -521,14 +521,14 @@ RotateBoxState::DragTo(BPoint current, uint32 modifiers)
 
 	double newAngle = fOldAngle + angle;
 
-	fParent->RotateBy(newAngle - fParent->LocalRotation());
+	fParent->RotateBy(fParent->Center(), newAngle - fParent->LocalRotation());
 }
 
 // UpdateViewCursor
 void
 RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 {
-	BPoint origin(fParent->Pivot());
+	BPoint origin(fParent->Center());
 	fParent->TransformToCanvas(origin);
 	fParent->TransformToCanvas(current);
 	BPoint from = origin + BPoint(sinf(22.5 * 180.0 / PI) * 50.0,
@@ -587,7 +587,7 @@ void
 OffsetCenterState::DragTo(BPoint current, uint32 modifiers)
 {
 	fParent->InverseTransform(&current);
-	fParent->OffsetPivot(current - fOrigin);
+	fParent->OffsetCenter(current - fOrigin);
 	fOrigin = current;
 }
 

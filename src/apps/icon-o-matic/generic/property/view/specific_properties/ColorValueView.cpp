@@ -116,8 +116,7 @@ ColorValueView::IsFocused() const
 	return fSwatchView->IsFocus();
 }
 
-
-// SetToProperty
+// AdoptProperty
 bool
 ColorValueView::AdoptProperty(Property* property)
 {
@@ -133,3 +132,13 @@ ColorValueView::AdoptProperty(Property* property)
 	}
 	return false;
 }
+
+// GetProperty
+Property*
+ColorValueView::GetProperty() const
+{
+	return fProperty;
+}
+
+
+

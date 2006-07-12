@@ -8,9 +8,13 @@
 
 #include "AffineTransformer.h"
 
+#include <new>
+
 #include "CommonPropertyIDs.h"
 #include "Property.h"
 #include "PropertyObject.h"
+
+using std::nothrow;
 
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source)
@@ -22,6 +26,16 @@ AffineTransformer::AffineTransformer(VertexSource& source)
 // destructor
 AffineTransformer::~AffineTransformer()
 {
+}
+
+// Clone
+Transformer*
+AffineTransformer::Clone(VertexSource& source) const
+{
+	AffineTransformer* clone = new (nothrow) AffineTransformer(source);
+	if (clone)
+		clone->multiply(*this);
+	return clone;
 }
 
 // rewind

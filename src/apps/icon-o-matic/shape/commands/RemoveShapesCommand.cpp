@@ -19,7 +19,7 @@ using std::nothrow;
 
 // constructor
 RemoveShapesCommand::RemoveShapesCommand(ShapeContainer* container,
-										 const int32* indices,
+										 int32* const indices,
 										 int32 count)
 	: Command(),
 	  fContainer(container),
@@ -41,7 +41,7 @@ RemoveShapesCommand::~RemoveShapesCommand()
 {
 	if (fShapesRemoved && fShapes) {
 		for (int32 i = 0; i < fCount; i++)
-			delete fShapes[i];
+			fShapes[i]->Release();
 	}
 	delete[] fShapes;
 	delete[] fIndices;

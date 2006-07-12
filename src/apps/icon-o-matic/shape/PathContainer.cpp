@@ -38,6 +38,7 @@ PathContainer::PathContainer(bool ownsPaths)
 // destructor
 PathContainer::~PathContainer()
 {
+printf("PathContainer::~PathContainer()\n");
 	int32 count = fListeners.CountItems();
 	if (count > 0) {
 		debugger("~PathContainer() - there are still"

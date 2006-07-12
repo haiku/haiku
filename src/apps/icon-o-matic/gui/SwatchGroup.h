@@ -20,7 +20,6 @@ class ColorPickerPanel;
 class ColorSlider;
 class CurrentColor;
 class Group;
-class Style;
 class SwatchView;
 
 class SwatchGroup : public BView,
@@ -38,7 +37,6 @@ class SwatchGroup : public BView,
 
 	// SwatchGroup
 			void				SetCurrentColor(CurrentColor* color);
-			void				SetCurrentStyle(Style* style);
 
  private:
 			void				_SetColor(rgb_color color);
@@ -53,7 +51,6 @@ class SwatchGroup : public BView,
 			Group*				fBottomSwatchViews;
 
 			CurrentColor*		fCurrentColor;
-			Style*				fCurrentStyle;
 			bool				fIgnoreNotifications;
 
 			ColorPickerPanel*	fColorPickerPanel;

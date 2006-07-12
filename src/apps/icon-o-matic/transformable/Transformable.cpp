@@ -32,14 +32,14 @@ Transformable::~Transformable()
 
 // StoreTo
 void
-Transformable::StoreTo(double matrix[6]) const
+Transformable::StoreTo(double matrix[matrix_size]) const
 {
 	store_to(matrix);
 }
 
 // LoadFrom
 void
-Transformable::LoadFrom(double matrix[6])
+Transformable::LoadFrom(double matrix[matrix_size])
 {
 	// before calling the potentially heavy TransformationChanged()
 	// hook function, make sure that the transformation
@@ -103,7 +103,7 @@ Transformable::Invert()
 bool
 Transformable::IsIdentity() const
 {
-	double m[6];
+	double m[matrix_size];
 	store_to(m);
 	if (m[0] == 1.0 &&
 		m[1] == 0.0 &&
@@ -119,7 +119,7 @@ Transformable::IsIdentity() const
 bool
 Transformable::IsTranslationOnly() const
 {
-	double m[6];
+	double m[matrix_size];
 	store_to(m);
 	if (m[0] == 1.0 &&
 		m[1] == 0.0 &&
@@ -133,7 +133,7 @@ Transformable::IsTranslationOnly() const
 bool
 Transformable::IsNotDistorted() const
 {
-	double m[6];
+	double m[matrix_size];
 	store_to(m);
 	return (m[0] == m[3]);
 }
@@ -142,7 +142,7 @@ Transformable::IsNotDistorted() const
 bool
 Transformable::IsValid() const
 {
-	double m[6];
+	double m[matrix_size];
 	store_to(m);
 	return ((m[0] * m[3] - m[1] * m[2]) != 0.0);
 }
@@ -151,9 +151,9 @@ Transformable::IsValid() const
 bool
 Transformable::operator==(const Transformable& other) const
 {
-	double m1[6];
+	double m1[matrix_size];
 	other.store_to(m1);
-	double m2[6];
+	double m2[matrix_size];
 	store_to(m2);
 	if (m1[0] == m2[0] &&
 		m1[1] == m2[1] &&

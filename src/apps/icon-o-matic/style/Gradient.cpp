@@ -277,10 +277,12 @@ bool
 Gradient::SetColor(int32 index, const color_step& color)
 {
 	if (color_step* step = ColorAt(index)) {
-		step->color = color.color;
-		step->offset = color.offset;
-		Notify();
-		return true;
+		if (*step != color) {
+			step->color = color.color;
+			step->offset = color.offset;
+			Notify();
+			return true;
+		}
 	}
 	return false;
 }
@@ -290,9 +292,11 @@ bool
 Gradient::SetColor(int32 index, const rgb_color& color)
 {
 	if (color_step* step = ColorAt(index)) {
-		step->color = color;
-		Notify();
-		return true;
+		if ((uint32&)step->color != (uint32&)color) {
+			step->color = color;
+			Notify();
+			return true;
+		}
 	}
 	return false;
 }

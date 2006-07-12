@@ -19,7 +19,6 @@
 #include "ColorSlider.h"
 #include "CurrentColor.h"
 #include "Group.h"
-#include "Style.h"
 #include "SwatchView.h"
 
 enum {
@@ -35,7 +34,6 @@ SwatchGroup::SwatchGroup(BRect frame)
 	: BView(frame, "style view", B_FOLLOW_NONE, 0),
 
 	  fCurrentColor(NULL),
-	  fCurrentStyle(NULL),
 	  fIgnoreNotifications(false),
 
 	  fColorPickerPanel(NULL),
@@ -93,12 +91,15 @@ SwatchGroup::SwatchGroup(BRect frame)
 	fBottomSwatchViews->ResizeToPreferred();
 	fBottomSwatchViews->SetResizingMode(B_FOLLOW_ALL);
 
-	fTopSwatchViews->MoveTo(30, 4);
-	fBottomSwatchViews->MoveTo(30, fTopSwatchViews->Frame().bottom + 1);
+	float paletteHeight = fBottomSwatchViews->Frame().Height()
+							+ fTopSwatchViews->Frame().Height() + 1;
+
+	fTopSwatchViews->MoveTo(paletteHeight + 2, 4);
+	fBottomSwatchViews->MoveTo(paletteHeight + 2,
+							   fTopSwatchViews->Frame().bottom + 1);
 
 	fCurrentColorSV->MoveTo(0, fTopSwatchViews->Frame().top);
-	fCurrentColorSV->ResizeTo(28, fBottomSwatchViews->Frame().bottom
-									- fTopSwatchViews->Frame().top);
+	fCurrentColorSV->ResizeTo(paletteHeight, paletteHeight);
 	fCurrentColorSV->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
 
 	float width = fTopSwatchViews->Frame().right
@@ -128,7 +129,6 @@ SwatchGroup::SwatchGroup(BRect frame)
 SwatchGroup::~SwatchGroup()
 {
 	SetCurrentColor(NULL);
-	SetCurrentStyle(NULL);
 }
 
 // ObjectChanged
@@ -146,10 +146,6 @@ SwatchGroup::ObjectChanged(const Observable* object)
 					   h, s, v);
 		
 			_SetColor(h, s, v);
-		}
-
-		if (fCurrentStyle && !fCurrentStyle->Gradient()) {
-			fCurrentStyle->SetColor(color);
 		}
 	}
 }
@@ -261,26 +257,6 @@ SwatchGroup::SetCurrentColor(CurrentColor* color)
 		fCurrentColor->AddObserver(this);
 
 		_SetColor(fCurrentColor->Color());
-	}
-}
-
-// SetCurrentStyle
-void
-SwatchGroup::SetCurrentStyle(Style* style)
-{
-	if (fCurrentStyle == style)
-		return;
-
-	if (fCurrentStyle)
-		fCurrentStyle->Release();
-
-	fCurrentStyle = style;
-
-	if (fCurrentStyle) {
-		fCurrentStyle->Acquire();
-
-		if (fCurrentColor && !fCurrentStyle->Gradient())
-			fCurrentColor->SetColor(fCurrentStyle->Color());
 	}
 }
 

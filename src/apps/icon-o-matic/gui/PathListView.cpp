@@ -16,11 +16,15 @@
 #include <Mime.h>
 #include <Window.h>
 
-#include "VectorPath.h"
+#include "AddPathsCommand.h"
+#include "CommandStack.h"
 #include "Observer.h"
+#include "RemovePathsCommand.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "Selection.h"
+#include "UnassignPathCommand.h"
+#include "VectorPath.h"
 
 static const float kMarkWidth		= 14.0;
 static const float kBorderOffset	= 3.0;
@@ -258,9 +262,9 @@ PathListView::SelectionChanged()
 
 	PathListItem* item
 		= dynamic_cast<PathListItem*>(ItemAt(CurrentSelection(0)));
-	if (item && fMessage) {
+	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddPointer("path", (void*)item->path);
+		message.AddPointer("path", item ? (void*)item->path : NULL);
 		Invoke(&message);
 	}
 
@@ -292,23 +296,21 @@ PathListView::MouseDown(BPoint where)
 							+ kBorderOffset + kMarkWidth
 							+ kTextOffset / 2.0;
 		VectorPath* path = item->path;
-		if (itemFrame.Contains(where)) {
+		if (itemFrame.Contains(where) && fCommandStack) {
 			// add or remove the path to the shape
-// TODO: code these commands...
-//			Command* command;
-//			if (fCurrentShape->Paths()->HasPath(path)) {
-//				command = new RemovePathFromShapeCommand(
-//								fCurrentShape, path);
-//			} else {
-//				command = new AddPathToShapeCommand(
-//								fCurrentShape, path);
-//			}
-//			fCommandStack->Perform(command);
-if (fCurrentShape->Paths()->HasPath(path)) {
-	fCurrentShape->Paths()->RemovePath(path);
-} else {
-	fCurrentShape->Paths()->AddPath(path);
-}
+			::Command* command;
+			if (fCurrentShape->Paths()->HasPath(path)) {
+				command = new UnassignPathCommand(
+								fCurrentShape, path);
+			} else {
+				VectorPath* paths[1];
+				paths[0] = path;
+				command = new AddPathsCommand(
+								fCurrentShape->Paths(),
+								paths, 1, false,
+								fCurrentShape->Paths()->CountPaths());
+			}
+			fCommandStack->Perform(command);
 			handled = true;
 		}
 	}
@@ -353,13 +355,31 @@ PathListView::MoveItems(BList& items, int32 toIndex)
 void
 PathListView::CopyItems(BList& items, int32 toIndex)
 {
+	// TODO: allow to copy path
 }
 
 // RemoveItemList
 void
-PathListView::RemoveItemList(BList& indices)
+PathListView::RemoveItemList(BList& items)
 {
-	// TODO: allow removing items
+	if (!fCommandStack || !fPathContainer)
+		return;
+
+	int32 count = items.CountItems();
+	VectorPath* paths[count];
+	for (int32 i = 0; i < count; i++) {
+		PathListItem* item = dynamic_cast<PathListItem*>(
+			(SimpleItem*)items.ItemAtFast(i));
+		if (item)
+			paths[i] = item->path;
+		else
+			paths[i] = NULL;
+	}
+
+	RemovePathsCommand* command
+		= new (nothrow) RemovePathsCommand(fPathContainer,
+										   paths, count);
+	fCommandStack->Perform(command);
 }
 
 // CloneItem
@@ -467,6 +487,13 @@ void
 PathListView::SetSelection(Selection* selection)
 {
 	fSelection = selection;
+}
+
+// SetCommandStack
+void
+PathListView::SetCommandStack(CommandStack* stack)
+{
+	fCommandStack = stack;
 }
 
 // SetCurrentShape

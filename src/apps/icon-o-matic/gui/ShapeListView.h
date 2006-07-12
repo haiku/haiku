@@ -39,7 +39,7 @@ class ShapeListView : public SimpleListView,
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);
-	virtual	void				RemoveItemList(BList& indices);
+	virtual	void				RemoveItemList(BList& items);
 
 	virtual	BListItem*			CloneItem(int32 atIndex) const;
 

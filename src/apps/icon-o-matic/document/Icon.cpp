@@ -9,6 +9,7 @@
 #include "Icon.h"
 
 #include <new>
+#include <stdio.h>
 
 #include "PathContainer.h"
 #include "Shape.h"

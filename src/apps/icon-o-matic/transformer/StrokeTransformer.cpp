@@ -8,10 +8,14 @@
 
 #include "StrokeTransformer.h"
 
+#include <new>
+
 #include "CommonPropertyIDs.h"
 #include "OptionProperty.h"
 #include "Property.h"
 #include "PropertyObject.h"
+
+using std::nothrow;
 
 // constructor
 StrokeTransformer::StrokeTransformer(VertexSource& source)
@@ -23,6 +27,23 @@ StrokeTransformer::StrokeTransformer(VertexSource& source)
 // destructor
 StrokeTransformer::~StrokeTransformer()
 {
+}
+
+// Clone
+Transformer*
+StrokeTransformer::Clone(VertexSource& source) const
+{
+	StrokeTransformer* clone = new (nothrow) StrokeTransformer(source);
+	if (clone) {
+		clone->line_cap(line_cap());
+		clone->line_join(line_join());
+		clone->inner_join(inner_join());
+		clone->width(width());
+		clone->miter_limit(miter_limit());
+		clone->inner_miter_limit(inner_miter_limit());
+		clone->shorten(shorten());
+	}
+	return clone;
 }
 
 // rewind
@@ -98,6 +119,10 @@ StrokeTransformer::MakePropertyObject() const
 											  miter_limit()));
 	}
 
+	// shorten
+	object->AddProperty(new FloatProperty(PROPERTY_STROKE_SHORTEN,
+										  shorten()));
+
 	return object;
 }
 
@@ -134,6 +159,13 @@ StrokeTransformer::SetToPropertyObject(const PropertyObject* object)
 	float l = object->Value(PROPERTY_MITER_LIMIT, (float)miter_limit());
 	if (l != miter_limit()) {
 		miter_limit(l);
+		Notify();
+	}
+
+	// shorten
+	float s = object->Value(PROPERTY_STROKE_SHORTEN, (float)shorten());
+	if (s != shorten()) {
+		shorten(s);
 		Notify();
 	}
 

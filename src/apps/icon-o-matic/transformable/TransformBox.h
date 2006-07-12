@@ -9,13 +9,25 @@
 #ifndef TRANSFORM_BOX_H
 #define TRANSFORM_BOX_H
 
+#include <List.h>
+
 #include "ChannelTransform.h"
 #include "Manipulator.h"
 
 class Command;
 class StateView;
 class DragState;
+class TransformBox;
 class TransformCommand;
+
+class TransformBoxListener {
+ public:
+								TransformBoxListener();
+	virtual						~TransformBoxListener();
+
+	virtual	void				TransformBoxDeleted(
+									const TransformBox* box) = 0;
+};
 
 class TransformBox : public ChannelTransform,
 					 public Manipulator {
@@ -50,7 +62,8 @@ class TransformBox : public ChannelTransform,
 	// TransformBox
 	virtual	void				Update(bool deep = true);
 
-			void				OffsetPivot(BPoint offset);
+			void				OffsetCenter(BPoint offset);
+			BPoint				Center() const;
 			void				SetBox(BRect box);
 			BRect				Box() const
 									{ return fOriginalBox; }
@@ -64,14 +77,19 @@ class TransformBox : public ChannelTransform,
 
 	virtual	void				TransformFromCanvas(BPoint& point) const;
 	virtual	void				TransformToCanvas(BPoint& point) const;
+	virtual	float				ZoomLevel() const;
 
 
-	virtual	TransformCommand*	MakeAction(const char* actionName,
-										   uint32 nameIndex) const = 0;
+	virtual	TransformCommand*	MakeCommand(const char* actionName,
+											uint32 nameIndex) = 0;
 
 			bool				IsRotating() const
 									{ return fCurrentState == fRotateState; }
 	virtual	double				ViewSpaceRotation() const;
+
+	// Listener support
+			bool				AddListener(TransformBoxListener* listener);
+			bool				RemoveListener(TransformBoxListener* listener);
 
  private:
 			DragState*			_DragStateFor(BPoint canvasWhere,
@@ -79,7 +97,8 @@ class TransformBox : public ChannelTransform,
 			void				_StrokeBWLine(BView* into,
 											  BPoint from, BPoint to) const;
 			void				_StrokeBWPoint(BView* into,
-											   BPoint point, double angle) const;
+											   BPoint point,
+											   double angle) const;
 
 			BRect				fOriginalBox;
 
@@ -100,7 +119,11 @@ class TransformBox : public ChannelTransform,
 
 			bool				fNudging;
 
+			BList				fListeners;
+
  protected:
+			void				_NotifyDeleted() const;
+
 			// "static" state objects
 			void				_SetState(DragState* state);
 

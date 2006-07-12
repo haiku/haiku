@@ -13,11 +13,10 @@
 
 * "add points" mode is problematic when having multiple manipulators for
   different paths showing at the same time...
+  -> "add points" only available when one path is selected, otherwise
+     "select points" is used
 
-* solve the problem of individual gradient transformation per shape
-  -> introduce "StyleInstance", a Shape would not reference a Style
-  directly but via a StyleInstance... this object can have additional
-  information like the gradient transformation
+* solve the problem of individual gradient transformation per shape [done]
 
 * IconRenderer should construct a separate StyleManager and append
   the styles in the order of shapes, also adding styles multiple
@@ -25,17 +24,16 @@
   rendering uses the style index for z ordering) [done]
 
 * add more functionality to Transformer/VertexSource interface:
-  - (inverse) Transformation
-  - Cloning
+  - Cloning [done]
 
 * add more powerful listener interface to Shape
   (TransformerAdded()/Removed()...) [done]
 
-* implement commands for the newly added editing features
+* implement commands for the newly added editing features [done]
 
-* built-in transformation for Gradient and Shape?
+* built-in transformation for Gradient and Shape? [done for Shape]
 
-* Transformation manipulator
+* Transformation manipulator [done]
 
 
 --------- user interface

@@ -87,9 +87,10 @@ GradientControl::MakeFocus(bool focus)
 	if (focus != IsFocus()) {
 		_UpdateCurrentColor();
 		Invalidate();
-		// keep the window informed when the focus of this object changes
-		if (BWindow* window = Window())
-			window->PostMessage(MSG_GRADIENT_CONTROL_FOCUS_CHANGED);
+		if (fTarget) {
+			if (BLooper* looper = fTarget->Looper())
+				looper->PostMessage(MSG_GRADIENT_CONTROL_FOCUS_CHANGED, fTarget);
+		}
 	}
 	BView::MakeFocus(focus);
 }
@@ -125,9 +126,9 @@ GradientControl::MouseDown(BPoint where)
 			rgb_color color;
 			uint8* bits = temp;
 			bits += 4 * (uint32)((width - 1) * offset);
-			color.red = bits[2];
+			color.red = bits[0];
 			color.green = bits[1];
-			color.blue = bits[0];
+			color.blue = bits[2];
 			color.alpha = bits[3];
 			fCurrentStepIndex = fGradient->AddColor(color, offset);
 			fDraggingStepIndex = -1;
@@ -625,6 +626,7 @@ void
 GradientControl::_UpdateCurrentColor() const
 {
 	if (!fMessage || !fTarget || !fTarget->Looper())
+		return;
 	// set the CanvasView current color
 	if (color_step* step = fGradient->ColorAt(fCurrentStepIndex)) {
 		BMessage message(*fMessage);

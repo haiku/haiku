@@ -468,8 +468,13 @@ PropertyListView::UpdateObject(uint32 propertyID)
 	if (previous && current) {
 		// call hook function
 		PropertyChanged(previous, current);
-		// update saved property
-		previous->SetValue(current);
+		// update saved property if it is still contained
+		// in the saved properties (if not, the notification
+		// mechanism has caused to update the properties
+		// and "previous" and "current" are toast)
+		if (fSavedProperties->HasProperty(previous)
+			&& fPropertyObject->HasProperty(current))
+			previous->SetValue(current);
 	}
 }
 

@@ -105,6 +105,7 @@ Application Icon-O-Matic :
 	Selectable.cpp
 	Selection.cpp
 	# generic/support
+	Referenceable.cpp
 	RWLocker.cpp
 	support.cpp
 	support_ui.cpp
@@ -124,18 +125,24 @@ Application Icon-O-Matic :
 	ShapeContainer.cpp
 	VectorPath.cpp
 	# shape/commands
+	AddPathsCommand.cpp
 	AddPointCommand.cpp
+	AddShapesCommand.cpp
 	ChangePointCommand.cpp
 	InsertPointCommand.cpp
 	MoveShapesCommand.cpp
 	MoveTransformersCommand.cpp
 	PathCommand.cpp
+	RemovePathsCommand.cpp
 	RemovePointsCommand.cpp
 	RemoveShapesCommand.cpp
 	RemoveTransformersCommand.cpp
+	UnassignPathCommand.cpp
 	# style
+	AddStylesCommand.cpp
 	CurrentColor.cpp
 	Gradient.cpp
+	SetColorCommand.cpp
 	SetGradientCommand.cpp
 	Style.cpp
 	StyleManager.cpp
@@ -144,6 +151,7 @@ Application Icon-O-Matic :
 	Transformable.cpp
 	TransformBox.cpp
 	TransformBoxStates.cpp
+	TransformObjectsCommand.cpp
 	TransformCommand.cpp
 	TransformShapesBox.cpp
 	# transformer

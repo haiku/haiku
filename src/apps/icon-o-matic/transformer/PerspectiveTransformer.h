@@ -25,8 +25,10 @@ class PerspectiveTransformer : public Transformer,
 									VertexSource& source);
 	virtual						~PerspectiveTransformer();
 
-    virtual	void				rewind(unsigned path_id);
-    virtual	unsigned			vertex(double* x, double* y);
+	virtual	Transformer*		Clone(VertexSource& source) const;
+
+	virtual	void				rewind(unsigned path_id);
+	virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
 

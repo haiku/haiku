@@ -17,12 +17,16 @@
 
 class Transformable : public agg::trans_affine {
  public:
+	enum {
+		matrix_size = 6,	
+	};
+
 								Transformable();
 								Transformable(const Transformable& other);
 	virtual						~Transformable();
 
-			void				StoreTo(double matrix[6]) const;
-			void				LoadFrom(double matrix[6]);
+			void				StoreTo(double matrix[matrix_size]) const;
+			void				LoadFrom(double matrix[matrix_size]);
 
 								// set to or combine with other matrix
 			void				SetTransform(const Transformable& other);

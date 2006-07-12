@@ -230,3 +230,10 @@ OptionValueView::AdoptProperty(Property* property)
 	return false;
 }
 
+// GetProperty
+Property*
+OptionValueView::GetProperty() const
+{
+	return fProperty;
+}
+

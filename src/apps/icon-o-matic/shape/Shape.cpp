@@ -72,7 +72,16 @@ Shape::Shape(const Shape& other)
 			}
 		}
 	}
-	// TODO: clone vertex transformers
+	// clone vertex transformers
+	int32 count = other.CountTransformers();
+	for (int32 i = 0; i < count; i++) {
+		Transformer* original = other.TransformerAtFast(i);
+		Transformer* cloned = original->Clone(fPathSource);
+		if (!AddTransformer(cloned)) {
+			delete cloned;
+			break;
+		}
+	}
 
 	SetStyle(other.fStyle);
 }
@@ -80,6 +89,7 @@ Shape::Shape(const Shape& other)
 // destructor
 Shape::~Shape()
 {
+printf("~Shape()\n");
 	int32 count = fTransformers.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Transformer* t = (Transformer*)fTransformers.ItemAtFast(i);

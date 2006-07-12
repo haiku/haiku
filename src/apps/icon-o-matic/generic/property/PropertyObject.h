@@ -31,6 +31,7 @@ class PropertyObject : public Observable {
 			int32				CountProperties() const;
 
 			Property*			FindProperty(uint32 propertyID) const;
+			bool				HasProperty(Property* property) const;
 
 			bool				ContainsSameProperties(
 									const PropertyObject& other) const;

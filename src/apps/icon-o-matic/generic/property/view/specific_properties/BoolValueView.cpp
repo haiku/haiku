@@ -144,7 +144,7 @@ BoolValueView::SetEnabled(bool enabled)
 	}
 }
 
-// SetToProperty
+// AdoptProperty
 bool
 BoolValueView::AdoptProperty(Property* property)
 {
@@ -158,5 +158,12 @@ BoolValueView::AdoptProperty(Property* property)
 		return true;
 	}
 	return false;
+}
+
+// GetProperty
+Property*
+BoolValueView::GetProperty() const
+{
+	return fProperty;
 }
 

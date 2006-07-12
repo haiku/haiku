@@ -195,13 +195,15 @@ TransformerListView::CopyItems(BList& items, int32 toIndex)
 
 // RemoveItemList
 void
-TransformerListView::RemoveItemList(BList& indexList)
+TransformerListView::RemoveItemList(BList& items)
 {
 	if (!fCommandStack || !fShape)
 		return;
 
-	int32 count = indexList.CountItems();
-	const int32* indices = (int32*)indexList.Items();
+	int32 count = items.CountItems();
+	int32 indices[count];
+	for (int32 i = 0; i < count; i++)
+		indices[i] = IndexOf((SimpleItem*)items.ItemAtFast(i));
 
 	RemoveTransformersCommand* command
 		= new (nothrow) RemoveTransformersCommand(fShape,

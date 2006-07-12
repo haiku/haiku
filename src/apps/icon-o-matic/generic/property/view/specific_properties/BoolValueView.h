@@ -30,8 +30,7 @@ class BoolValueView : public PropertyEditorView {
 	virtual	void				SetEnabled(bool enabled);
 
 	virtual	bool				AdoptProperty(Property* property);
-	virtual	Property*			GetProperty() const
-									{ return fProperty; }
+	virtual	Property*			GetProperty() const;
 
  private:
 			void				_ToggleValue();

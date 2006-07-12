@@ -14,36 +14,14 @@
 
 class Referenceable {
  public:
-								Referenceable()
-									: fReferenceCount(1)
-								{}
-	virtual						~Referenceable()
-								{}
+								Referenceable();
+	virtual						~Referenceable();
 
-	inline	void				Acquire();
-	inline	bool				Release();
+			void				Acquire();
+			bool				Release();
 
  private:
 			vint32				fReferenceCount;
 };
-
-// Acquire
-inline void
-Referenceable::Acquire()
-{
-	atomic_add(&fReferenceCount, 1);
-}
-
-// Release
-inline bool
-Referenceable::Release()
-{
-	if (atomic_add(&fReferenceCount, -1) == 1) {
-		delete this;
-		return true;
-	}
-
-	return false;
-}
 
 #endif // REFERENCABLE_H

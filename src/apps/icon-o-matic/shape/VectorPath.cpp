@@ -888,6 +888,20 @@ VectorPath::RemoveListener(PathListener* listener)
 	return fListeners.RemoveItem((void*)listener);
 }
 
+// CountListeners
+int32
+VectorPath::CountListeners() const
+{
+	return fListeners.CountItems();
+}
+
+// ListenerAtFast
+PathListener*
+VectorPath::ListenerAtFast(int32 index) const
+{
+	return (PathListener*)fListeners.ItemAtFast(index);
+}
+
 // #pragma mark -
 
 // _SetPoint

@@ -69,3 +69,10 @@ Int64ValueView::AdoptProperty(Property* property)
 	return false;
 }
 
+// GetProperty
+Property*
+Int64ValueView::GetProperty() const
+{
+	return fProperty;
+}
+

@@ -8,10 +8,14 @@
 
 #include "ContourTransformer.h"
 
+#include <new>
+
 #include "CommonPropertyIDs.h"
 #include "OptionProperty.h"
 #include "Property.h"
 #include "PropertyObject.h"
+
+using std::nothrow;
 
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source)
@@ -24,6 +28,22 @@ ContourTransformer::ContourTransformer(VertexSource& source)
 // destructor
 ContourTransformer::~ContourTransformer()
 {
+}
+
+// Clone
+Transformer*
+ContourTransformer::Clone(VertexSource& source) const
+{
+	ContourTransformer* clone = new (nothrow) ContourTransformer(source);
+	if (clone) {
+		clone->line_join(line_join());
+		clone->inner_join(inner_join());
+		clone->width(width());
+		clone->miter_limit(miter_limit());
+		clone->inner_miter_limit(inner_miter_limit());
+		clone->auto_detect_orientation(auto_detect_orientation());
+	}
+	return clone;
 }
 
 // rewind

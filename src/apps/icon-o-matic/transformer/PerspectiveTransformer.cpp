@@ -8,6 +8,10 @@
 
 #include "PerspectiveTransformer.h"
 
+#include <new>
+
+using std::nothrow;
+
 // constructor
 PerspectiveTransformer::PerspectiveTransformer(VertexSource& source)
 	: Transformer(source, "Perspective"),
@@ -18,6 +22,19 @@ PerspectiveTransformer::PerspectiveTransformer(VertexSource& source)
 // destructor
 PerspectiveTransformer::~PerspectiveTransformer()
 {
+}
+
+// Clone
+Transformer*
+PerspectiveTransformer::Clone(VertexSource& source) const
+{
+	PerspectiveTransformer* clone
+		= new (nothrow) PerspectiveTransformer(source);
+	if (clone) {
+// TODO: upgrade AGG
+//		clone->multiply(*this);
+	}
+	return clone;
 }
 
 // rewind

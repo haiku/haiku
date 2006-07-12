@@ -347,7 +347,7 @@ StyleListView::CopyItems(BList& items, int32 toIndex)
 
 // RemoveItemList
 void
-StyleListView::RemoveItemList(BList& indices)
+StyleListView::RemoveItemList(BList& items)
 {
 	// TODO: allow removing items
 }

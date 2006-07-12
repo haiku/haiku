@@ -16,6 +16,7 @@
 class BMenu;
 class BMenuField;
 class CommandStack;
+class CurrentColor;
 class Gradient;
 class GradientControl;
 class Style;
@@ -38,6 +39,7 @@ class StyleView : public BView,
 	// StyleView
 			void				SetStyle(Style* style);
 			void				SetCommandStack(CommandStack* stack);
+			void				SetCurrentColor(CurrentColor* color);
 
  private:
 			void				_SetGradient(Gradient* gradient);
@@ -45,9 +47,12 @@ class StyleView : public BView,
 										  int32 type) const;
 			void				_SetStyleType(int32 type);
 			void				_SetGradientType(int32 type);
+			void				_AdoptCurrentColor(rgb_color color);
+			void				_TransferGradientStopColor();
 
 
 			CommandStack*		fCommandStack;
+			CurrentColor*		fCurrentColor;
 
 			Style*				fStyle;
 			Gradient*			fGradient;

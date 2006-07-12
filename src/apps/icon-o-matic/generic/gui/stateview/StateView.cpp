@@ -15,6 +15,11 @@
 
 #include "Command.h"
 #include "CommandStack.h"
+// TODO: hack - somehow figure out of catching
+// key events for a given control is ok
+#include "GradientControl.h"
+#include "ListViews.h"
+//
 #include "RWLocker.h"
 
 
@@ -33,8 +38,12 @@ class EventFilter : public BMessageFilter {
 			filter_result result = B_DISPATCH_MESSAGE;
 			switch (message->what) {
 				case B_KEY_DOWN: {
-					if (dynamic_cast<BTextView*>(*target))
-						break;
+if (dynamic_cast<BTextView*>(*target))
+	break;
+if (dynamic_cast<SimpleListView*>(*target))
+	break;
+if (dynamic_cast<GradientControl*>(*target))
+	break;
 					uint32 key;
 					uint32 modifiers;
 					if (message->FindInt32("raw_char", (int32*)&key) >= B_OK
@@ -44,8 +53,12 @@ class EventFilter : public BMessageFilter {
 					break;
 				}
 				case B_KEY_UP: {
-					if (dynamic_cast<BTextView*>(*target))
-						break;
+if (dynamic_cast<BTextView*>(*target))
+	break;
+if (dynamic_cast<SimpleListView*>(*target))
+	break;
+if (dynamic_cast<GradientControl*>(*target))
+	break;
 					uint32 key;
 					uint32 modifiers;
 					if (message->FindInt32("raw_char", (int32*)&key) >= B_OK

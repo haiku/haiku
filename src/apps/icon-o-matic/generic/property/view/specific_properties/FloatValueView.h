@@ -26,8 +26,7 @@ class FloatValueView : public TextInputValueView {
 	virtual	void				ValueChanged();
 
 	virtual	bool				AdoptProperty(Property* property);
-	virtual	Property*			GetProperty() const
-									{ return fProperty; }
+	virtual	Property*			GetProperty() const;
 
  private:
 			FloatProperty*		fProperty;

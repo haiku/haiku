@@ -23,6 +23,11 @@
 
 #define INSET 8.0
 
+TransformBoxListener::TransformBoxListener() {}
+TransformBoxListener::~TransformBoxListener() {}
+
+// #pragma mark -
+
 // constructor
 TransformBox::TransformBox(StateView* view, BRect box)
 	: ChannelTransform(),
@@ -68,6 +73,8 @@ TransformBox::TransformBox(StateView* view, BRect box)
 // destructor
 TransformBox::~TransformBox()
 {
+	_NotifyDeleted();
+
 	delete fCurrentCommand;
 
 	delete fDragLTState;
@@ -137,8 +144,8 @@ TransformBox::MouseDown(BPoint where)
 		fCurrentState->SetOrigin(where);
 
 		delete fCurrentCommand;
-		fCurrentCommand = MakeAction(fCurrentState->ActionName(),
-									 fCurrentState->ActionNameIndex());
+		fCurrentCommand = MakeCommand(fCurrentState->ActionName(),
+									  fCurrentState->ActionNameIndex());
 	}
 
 	return true;
@@ -173,7 +180,7 @@ TransformBox::MouseOver(BPoint where)
 {
 	TransformToCanvas(where);
 
-	_SetState(_DragStateFor(where, 1.0 /*zoom*/));
+	_SetState(_DragStateFor(where, ZoomLevel()));
 	fMousePos = where;
 	if (fCurrentState) {
 		fCurrentState->UpdateViewCursor(fView, fMousePos);
@@ -200,7 +207,7 @@ TransformBox::Bounds()
 	BPoint rt = fRightTop;
 	BPoint lb = fLeftBottom;
 	BPoint rb = fRightBottom;
-	BPoint c = Pivot();
+	BPoint c = fPivot;
 
 	TransformFromCanvas(lt);
 	TransformFromCanvas(rt);
@@ -301,14 +308,21 @@ TransformBox::Update(bool deep)
 	Transform(&fPivot);
 }
 
-// OffsetPivot
+// OffsetCenter
 void
-TransformBox::OffsetPivot(BPoint offset)
+TransformBox::OffsetCenter(BPoint offset)
 {
 	if (offset != BPoint(0.0, 0.0)) {
 		fPivotOffset += offset;
 		Update(false);
 	}
+}
+
+// Center
+BPoint
+TransformBox::Center() const
+{
+	return fPivot;
 }
 
 // SetBox
@@ -342,7 +356,7 @@ void
 TransformBox::NudgeBy(BPoint offset)
 {
 	if (!fNudging && !fCurrentCommand) {
-		fCurrentCommand = MakeAction("Move", 0/*MOVE*/);
+		fCurrentCommand = MakeCommand("Move", 0/*MOVE*/);
 		fNudging = true;
 	}
 	if (fNudging) {
@@ -370,6 +384,13 @@ TransformBox::TransformToCanvas(BPoint& point) const
 {
 }
 
+// ZoomLevel
+float
+TransformBox::ZoomLevel() const
+{
+	return 1.0;
+}
+
 // ViewSpaceRotation
 double
 TransformBox::ViewSpaceRotation() const
@@ -377,6 +398,26 @@ TransformBox::ViewSpaceRotation() const
 	// assume no inherited transformation
 	return LocalRotation();
 }
+
+// #pragma mark -
+
+// AddListener
+bool
+TransformBox::AddListener(TransformBoxListener* listener)
+{
+	if (listener && !fListeners.HasItem((void*)listener))
+		return fListeners.AddItem((void*)listener);
+	return false;
+}
+
+// RemoveListener
+bool
+TransformBox::RemoveListener(TransformBoxListener* listener)
+{
+	return fListeners.RemoveItem((void*)listener);
+}
+
+// #pragma mark -
 
 // TODO: why another version?
 // point_line_dist
@@ -414,7 +455,7 @@ TransformBox::_DragStateFor(BPoint where, float canvasZoom)
 
 	// priorities:
 	// transformation center point has highest priority ?!?
-	if (point_point_distance(where, Pivot()) < inset)
+	if (point_point_distance(where, fPivot) < inset)
 		state = fOffsetCenterState;
 
 	if (!state) {
@@ -581,6 +622,23 @@ TransformBox::_StrokeBWPoint(BView* into, BPoint point, double angle) const
 	into->StrokeLine(p[3], p[0], B_SOLID_LOW);
 }
 
+// #pragma mark -
+
+// _NotifyDeleted
+void
+TransformBox::_NotifyDeleted() const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		TransformBoxListener* listener
+			= (TransformBoxListener*)listeners.ItemAtFast(i);
+		listener->TransformBoxDeleted(this);
+	}
+}
+
+// #pragma mark -
+
 // _SetState
 void
 TransformBox::_SetState(DragState* state)
@@ -590,5 +648,4 @@ TransformBox::_SetState(DragState* state)
 		fCurrentState->UpdateViewCursor(fView, fMousePos);
 	}
 }
-
 
