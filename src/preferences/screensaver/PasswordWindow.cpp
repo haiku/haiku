@@ -49,11 +49,13 @@ PasswordWindow::_Setup()
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(topView);
 
-	fUseNetwork = new BRadioButton(BRect(14,10,62+be_plain_font->StringWidth("Use Network password"),20), "useNetwork",
+	fUseNetwork = new BRadioButton(BRect(14,10,159,20), "useNetwork",
 		"Use Network password", new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
 	topView->AddChild(fUseNetwork);
-	fUseCustom = new BRadioButton(BRect(30,50,36+be_plain_font->StringWidth("Use custom password"),60), "fUseCustom", 
+	fUseCustom = new BRadioButton(BRect(30,50,130,60), "fUseCustom", 
 		"Use custom password", new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
+	fUseNetwork->ResizeToPreferred();
+	fUseCustom->ResizeToPreferred();
 
 	BBox *customBox = new BBox(BRect(9,30,269,105), "custBeBox", B_FOLLOW_NONE);
 	customBox->SetLabel(fUseCustom);
