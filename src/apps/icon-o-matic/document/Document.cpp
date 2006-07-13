@@ -10,6 +10,8 @@
 
 #include <new>
 
+#include <stdio.h>
+
 #include <Entry.h>
 
 #include "CommandStack.h"
