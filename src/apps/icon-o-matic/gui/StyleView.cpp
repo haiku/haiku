@@ -184,6 +184,8 @@ StyleView::ObjectChanged(const Observable* object)
 		if (*fGradient != *controlGradient) {
 			fGradientControl->SetGradient(fGradient);
 			_MarkType(fGradientType->Menu(), fGradient->Type());
+			// transfer the current gradient color to the current color
+			_TransferGradientStopColor();
 		}
 	} else if (object == fStyle) {
 		// maybe the gradient was added or removed
