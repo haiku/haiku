@@ -18,6 +18,7 @@ class BRect;
 
 // some handy UTF-8 characters
 
+#define B_UTF8_BULLET		"\xE2\x80\xA2"
 #define B_UTF8_ELLIPSIS		"\xE2\x80\xA6"
 #define B_UTF8_OPEN_QUOTE	"\xE2\x80\x9C"
 #define B_UTF8_CLOSE_QUOTE	"\xE2\x80\x9D"
