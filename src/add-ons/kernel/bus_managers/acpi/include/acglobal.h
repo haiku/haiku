@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acglobal.h - Declarations for global variables
- *       $Revision: 1.179 $
+ *       $Revision: 1.184 $
  *
  *****************************************************************************/
 
@@ -259,12 +259,31 @@ ACPI_EXTERN UINT8                       AcpiGbl_IntegerNybbleWidth;
 extern      ACPI_TABLE_LIST             AcpiGbl_TableLists[ACPI_TABLE_ID_MAX+1];
 extern      ACPI_TABLE_SUPPORT          AcpiGbl_TableData[ACPI_TABLE_ID_MAX+1];
 
+
+/*****************************************************************************
+ *
+ * Mutual exlusion within ACPICA subsystem
+ *
+ ****************************************************************************/
+
 /*
  * Predefined mutex objects.  This array contains the
  * actual OS mutex handles, indexed by the local ACPI_MUTEX_HANDLEs.
  * (The table maps local handles to the real OS handles)
  */
-ACPI_EXTERN ACPI_MUTEX_INFO             AcpiGbl_MutexInfo[NUM_MUTEX];
+ACPI_EXTERN ACPI_MUTEX_INFO             AcpiGbl_MutexInfo[ACPI_NUM_MUTEX];
+
+/*
+ * Global lock semaphore works in conjunction with the actual HW global lock
+ */
+ACPI_EXTERN ACPI_SEMAPHORE              AcpiGbl_GlobalLockSemaphore;
+
+/*
+ * Spinlocks are used for interfaces that can be possibly called at
+ * interrupt level
+ */
+ACPI_EXTERN ACPI_SPINLOCK               AcpiGbl_GpeLock;      /* For GPE data structs and registers */
+ACPI_EXTERN ACPI_SPINLOCK               AcpiGbl_HardwareLock; /* For ACPI H/W except GPE registers */
 
 
 /*****************************************************************************
@@ -296,7 +315,6 @@ ACPI_EXTERN ACPI_OBJECT_NOTIFY_HANDLER  AcpiGbl_SystemNotify;
 ACPI_EXTERN ACPI_EXCEPTION_HANDLER      AcpiGbl_ExceptionHandler;
 ACPI_EXTERN ACPI_INIT_HANDLER           AcpiGbl_InitHandler;
 ACPI_EXTERN ACPI_WALK_STATE            *AcpiGbl_BreakpointWalk;
-ACPI_EXTERN ACPI_HANDLE                 AcpiGbl_GlobalLockSemaphore;
 
 /* Misc */
 
@@ -374,15 +392,6 @@ ACPI_EXTERN UINT8                       AcpiGbl_CmSingleStep;
 
 /*****************************************************************************
  *
- * Parser globals
- *
- ****************************************************************************/
-
-ACPI_EXTERN ACPI_PARSE_OBJECT          *AcpiGbl_ParsedNamespaceRoot;
-
-
-/*****************************************************************************
- *
  * Hardware globals
  *
  ****************************************************************************/
@@ -402,7 +411,6 @@ extern      ACPI_FIXED_EVENT_INFO       AcpiGbl_FixedEventInfo[ACPI_NUM_FIXED_EV
 ACPI_EXTERN ACPI_FIXED_EVENT_HANDLER    AcpiGbl_FixedEventHandlers[ACPI_NUM_FIXED_EVENTS];
 ACPI_EXTERN ACPI_GPE_XRUPT_INFO        *AcpiGbl_GpeXruptListHead;
 ACPI_EXTERN ACPI_GPE_BLOCK_INFO        *AcpiGbl_GpeFadtBlocks[ACPI_MAX_GPE_BLOCKS];
-ACPI_EXTERN ACPI_HANDLE                 AcpiGbl_GpeLock;
 
 
 /*****************************************************************************

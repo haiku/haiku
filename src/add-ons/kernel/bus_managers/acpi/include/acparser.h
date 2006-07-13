@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: acparser.h - AML Parser subcomponent prototypes and defines
- *       $Revision: 1.80 $
+ *       $Revision: 1.81 $
  *
  *****************************************************************************/
 
@@ -151,7 +151,7 @@
  */
 ACPI_STATUS
 AcpiPsExecuteMethod (
-    ACPI_PARAMETER_INFO     *Info);
+    ACPI_EVALUATE_INFO      *Info);
 
 
 /*

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utglobal - Global variables for the ACPI subsystem
- *              $Revision: 1.238 $
+ *              $Revision: 1.241 $
  *
  *****************************************************************************/
 
@@ -472,7 +472,6 @@ ACPI_FIXED_EVENT_INFO       AcpiGbl_FixedEventInfo[ACPI_NUM_FIXED_EVENTS] =
 
 const char        *AcpiGbl_RegionTypes[ACPI_NUM_PREDEFINED_REGIONS] =
 {
-/*! [Begin] no source code translation (keep these ASL Keywords as-is) */
     "SystemMemory",
     "SystemIO",
     "PCI_Config",
@@ -481,7 +480,6 @@ const char        *AcpiGbl_RegionTypes[ACPI_NUM_PREDEFINED_REGIONS] =
     "CMOS",
     "PCIBARTarget",
     "DataTable"
-/*! [End] no source code translation !*/
 };
 
 
@@ -519,13 +517,11 @@ AcpiUtGetRegionName (
 
 static const char        *AcpiGbl_EventTypes[ACPI_NUM_FIXED_EVENTS] =
 {
-/*! [Begin] no source code translation (keep these strings as-is) */
     "PM_Timer",
     "GlobalLock",
     "PowerButton",
     "SleepButton",
     "RealTimeClock",
-/*! [End] no source code translation !*/
 };
 
 
@@ -569,7 +565,6 @@ static const char           AcpiGbl_BadType[] = "UNDEFINED";
 
 static const char           *AcpiGbl_NsTypeNames[] =
 {
-/*! [Begin] no source code translation (keep these strings as-is) */
     /* 00 */ "Untyped",
     /* 01 */ "Integer",
     /* 02 */ "String",
@@ -601,7 +596,6 @@ static const char           *AcpiGbl_NsTypeNames[] =
     /* 28 */ "Extra",
     /* 29 */ "Data",
     /* 30 */ "Invalid"
-/*! [End] no source code translation !*/
 };
 
 
@@ -703,7 +697,6 @@ AcpiUtGetNodeName (
 
 static const char           *AcpiGbl_DescTypeNames[] =
 {
-/*! [Begin] no source code translation (keep these ASL Keywords as-is) */
     /* 00 */ "Invalid",
     /* 01 */ "Cached",
     /* 02 */ "State-Generic",
@@ -720,7 +713,6 @@ static const char           *AcpiGbl_DescTypeNames[] =
     /* 13 */ "Parser",
     /* 14 */ "Operand",
     /* 15 */ "Node"
-/*! [End] no source code translation !*/
 };
 
 
@@ -768,7 +760,7 @@ AcpiUtGetMutexName (
     UINT32                  MutexId)
 {
 
-    if (MutexId > MAX_MUTEX)
+    if (MutexId > ACPI_MAX_MUTEX)
     {
         return ("Invalid Mutex ID");
     }
@@ -848,7 +840,7 @@ AcpiUtInitGlobals (
 
     /* Mutex locked flags */
 
-    for (i = 0; i < NUM_MUTEX; i++)
+    for (i = 0; i < ACPI_NUM_MUTEX; i++)
     {
         AcpiGbl_MutexInfo[i].Mutex          = NULL;
         AcpiGbl_MutexInfo[i].ThreadId       = ACPI_MUTEX_NOT_ACQUIRED;
@@ -884,6 +876,7 @@ AcpiUtInitGlobals (
 
     /* Global Lock support */
 
+    AcpiGbl_GlobalLockSemaphore         = NULL;
     AcpiGbl_GlobalLockAcquired          = FALSE;
     AcpiGbl_GlobalLockThreadCount       = 0;
     AcpiGbl_GlobalLockHandle            = 0;

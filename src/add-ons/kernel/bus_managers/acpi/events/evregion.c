@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evregion - ACPI AddressSpace (OpRegion) handler dispatch
- *              $Revision: 1.163 $
+ *              $Revision: 1.166 $
  *
  *****************************************************************************/
 
@@ -292,8 +292,8 @@ AcpiEvExecuteRegMethod (
     ACPI_OPERAND_OBJECT     *RegionObj,
     UINT32                  Function)
 {
-    ACPI_PARAMETER_INFO     Info;
-    ACPI_OPERAND_OBJECT     *Params[3];
+    ACPI_EVALUATE_INFO      *Info;
+    ACPI_OPERAND_OBJECT     *Args[3];
     ACPI_OPERAND_OBJECT     *RegionObj2;
     ACPI_STATUS             Status;
 
@@ -312,49 +312,63 @@ AcpiEvExecuteRegMethod (
         return_ACPI_STATUS (AE_OK);
     }
 
-    /*
-     * The _REG method has two arguments:
-     *
-     * Arg0, Integer: Operation region space ID
-     *          Same value as RegionObj->Region.SpaceId
-     * Arg1, Integer: connection status
-     *          1 for connecting the handler,
-     *          0 for disconnecting the handler
-     *          Passed as a parameter
-     */
-    Params[0] = AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
-    if (!Params[0])
+    /* Allocate and initialize the evaluation information block */
+
+    Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
+    if (!Info)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
     }
 
-    Params[1] = AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
-    if (!Params[1])
+    Info->PrefixNode = RegionObj2->Extra.Method_REG;
+    Info->Pathname = NULL;
+    Info->Parameters = Args;
+    Info->ParameterType = ACPI_PARAM_ARGS;
+    Info->Flags = ACPI_IGNORE_RETURN_VALUE;
+
+    /*
+     * The _REG method has two arguments:
+     *
+     * Arg0 - Integer:
+     *  Operation region space ID Same value as RegionObj->Region.SpaceId
+     *
+     * Arg1 - Integer:
+     *  connection status 1 for connecting the handler, 0 for disconnecting
+     *  the handler (Passed as a parameter)
+     */
+    Args[0] = AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
+    if (!Args[0])
     {
         Status = AE_NO_MEMORY;
-        goto Cleanup;
+        goto Cleanup1;
+    }
+
+    Args[1] = AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
+    if (!Args[1])
+    {
+        Status = AE_NO_MEMORY;
+        goto Cleanup2;
     }
 
     /* Setup the parameter objects */
 
-    Params[0]->Integer.Value = RegionObj->Region.SpaceId;
-    Params[1]->Integer.Value = Function;
-    Params[2] = NULL;
-
-    Info.Node = RegionObj2->Extra.Method_REG;
-    Info.Parameters = Params;
-    Info.ParameterType = ACPI_PARAM_ARGS;
+    Args[0]->Integer.Value = RegionObj->Region.SpaceId;
+    Args[1]->Integer.Value = Function;
+    Args[2] = NULL;
 
     /* Execute the method, no return value */
 
-    ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (
-                        ACPI_TYPE_METHOD, Info.Node, NULL));
-    Status = AcpiNsEvaluateByHandle (&Info);
+    ACPI_DEBUG_EXEC (
+        AcpiUtDisplayInitPathname (ACPI_TYPE_METHOD, Info->PrefixNode, NULL));
 
-    AcpiUtRemoveReference (Params[1]);
+    Status = AcpiNsEvaluate (Info);
+    AcpiUtRemoveReference (Args[1]);
 
-Cleanup:
-    AcpiUtRemoveReference (Params[0]);
+Cleanup2:
+    AcpiUtRemoveReference (Args[0]);
+
+Cleanup1:
+    ACPI_FREE (Info);
     return_ACPI_STATUS (Status);
 }
 
@@ -367,7 +381,8 @@ Cleanup:
  *              Function            - Read or Write operation
  *              Address             - Where in the space to read or write
  *              BitWidth            - Field width in bits (8, 16, 32, or 64)
- *              Value               - Pointer to in or out value
+ *              Value               - Pointer to in or out value, must be
+ *                                    full 64-bit ACPI_INTEGER
  *
  * RETURN:      Status
  *
@@ -382,7 +397,7 @@ AcpiEvAddressSpaceDispatch (
     UINT32                  Function,
     ACPI_PHYSICAL_ADDRESS   Address,
     UINT32                  BitWidth,
-    void                    *Value)
+    ACPI_INTEGER            *Value)
 {
     ACPI_STATUS             Status;
     ACPI_STATUS             Status2;
@@ -632,31 +647,36 @@ AcpiEvDetachRegion(
                 }
             }
 
-            /* Call the setup handler with the deactivate notification */
-
-            RegionSetup = HandlerObj->AddressSpace.Setup;
-            Status = RegionSetup (RegionObj, ACPI_REGION_DEACTIVATE,
-                HandlerObj->AddressSpace.Context, RegionContext);
-
-            /* Init routine may fail, Just ignore errors */
-
-            if (ACPI_FAILURE (Status))
+            /*
+             * If the region has been activated, call the setup handler
+             * with the deactivate notification
+             */
+            if (RegionObj->Region.Flags & AOPOBJ_SETUP_COMPLETE)
             {
-                ACPI_EXCEPTION ((AE_INFO, Status, "from region init, [%s]",
-                    AcpiUtGetRegionName (RegionObj->Region.SpaceId)));
-            }
+                RegionSetup = HandlerObj->AddressSpace.Setup;
+                Status = RegionSetup (RegionObj, ACPI_REGION_DEACTIVATE,
+                    HandlerObj->AddressSpace.Context, RegionContext);
 
-            RegionObj->Region.Flags &= ~(AOPOBJ_SETUP_COMPLETE);
+                /* Init routine may fail, Just ignore errors */
+
+                if (ACPI_FAILURE (Status))
+                {
+                    ACPI_EXCEPTION ((AE_INFO, Status,
+                        "from region handler - deactivate, [%s]",
+                        AcpiUtGetRegionName (RegionObj->Region.SpaceId)));
+                }
+
+                RegionObj->Region.Flags &= ~(AOPOBJ_SETUP_COMPLETE);
+            }
 
             /*
              * Remove handler reference in the region
              *
-             * NOTE: this doesn't mean that the region goes away
-             * The region is just inaccessible as indicated to
-             * the _REG method
+             * NOTE: this doesn't mean that the region goes away, the region
+             * is just inaccessible as indicated to the _REG method
              *
-             * If the region is on the handler's list
-             * this better be the region's handler
+             * If the region is on the handler's list, this must be the
+             * region's handler
              */
             RegionObj->Region.Handler = NULL;
             AcpiUtRemoveReference (HandlerObj);

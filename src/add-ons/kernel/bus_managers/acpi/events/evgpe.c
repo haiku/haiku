@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evgpe - General Purpose Event handling and dispatch
- *              $Revision: 1.58 $
+ *              $Revision: 1.63 $
  *
  *****************************************************************************/
 
@@ -502,9 +502,15 @@ AcpiEvGpeDetect (
         return (IntStatus);
     }
 
+    /*
+     * We need to obtain the GPE lock for both the data structs and registers
+     * Note: Not necessary to obtain the hardware lock, since the GPE registers
+     * are owned by the GpeLock.
+     */
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
+
     /* Examine all GPE blocks attached to this interrupt level */
 
-    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
     GpeBlock = GpeXruptList->GpeBlockListHead;
     while (GpeBlock)
     {
@@ -588,9 +594,9 @@ UnlockAndExit:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Perform the actual execution of a GPE control method.  This
- *              function is called from an invocation of AcpiOsQueueForExecution
- *              (and therefore does NOT execute at interrupt level) so that
+ * DESCRIPTION: Perform the actual execution of a GPE control method. This
+ *              function is called from an invocation of AcpiOsExecute and
+ *              therefore does NOT execute at interrupt level - so that
  *              the control method itself is not executed in the context of
  *              an interrupt handler.
  *
@@ -601,10 +607,9 @@ AcpiEvAsynchExecuteGpeMethod (
     void                    *Context)
 {
     ACPI_GPE_EVENT_INFO     *GpeEventInfo = (void *) Context;
-    UINT32                  GpeNumber = 0;
     ACPI_STATUS             Status;
     ACPI_GPE_EVENT_INFO     LocalGpeEventInfo;
-    ACPI_PARAMETER_INFO     Info;
+    ACPI_EVALUATE_INFO      *Info;
 
 
     ACPI_FUNCTION_TRACE (EvAsynchExecuteGpeMethod);
@@ -648,21 +653,33 @@ AcpiEvAsynchExecuteGpeMethod (
     if ((LocalGpeEventInfo.Flags & ACPI_GPE_DISPATCH_MASK) ==
             ACPI_GPE_DISPATCH_METHOD)
     {
-        /*
-         * Invoke the GPE Method (_Lxx, _Exx) i.e., evaluate the _Lxx/_Exx
-         * control method that corresponds to this GPE
-         */
-        Info.Node = LocalGpeEventInfo.Dispatch.MethodNode;
-        Info.Parameters = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT *, GpeEventInfo);
-        Info.ParameterType = ACPI_PARAM_GPE;
+        /* Allocate the evaluation information block */
 
-        Status = AcpiNsEvaluateByHandle (&Info);
+        Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
+        if (!Info)
+        {
+            Status = AE_NO_MEMORY;
+        }
+        else
+        {
+            /*
+             * Invoke the GPE Method (_Lxx, _Exx) i.e., evaluate the _Lxx/_Exx
+             * control method that corresponds to this GPE
+             */
+            Info->PrefixNode = LocalGpeEventInfo.Dispatch.MethodNode;
+            Info->Parameters = ACPI_CAST_PTR (ACPI_OPERAND_OBJECT *, GpeEventInfo);
+            Info->ParameterType = ACPI_PARAM_GPE;
+            Info->Flags = ACPI_IGNORE_RETURN_VALUE;
+
+            Status = AcpiNsEvaluate (Info);
+            ACPI_FREE (Info);
+        }
+
         if (ACPI_FAILURE (Status))
         {
             ACPI_EXCEPTION ((AE_INFO, Status,
-                "While evaluating method [%4.4s] for GPE[%2X]",
-                AcpiUtGetNodeName (LocalGpeEventInfo.Dispatch.MethodNode),
-                GpeNumber));
+                "While evaluating GPE method [%4.4s]",
+                AcpiUtGetNodeName (LocalGpeEventInfo.Dispatch.MethodNode)));
         }
     }
 
@@ -792,7 +809,7 @@ AcpiEvGpeDispatch (
          * Execute the method associated with the GPE
          * NOTE: Level-triggered GPEs are cleared after the method completes.
          */
-        Status = AcpiOsQueueForExecution (OSD_PRIORITY_GPE,
+        Status = AcpiOsExecute (OSL_GPE_HANDLER,
                     AcpiEvAsynchExecuteGpeMethod, GpeEventInfo);
         if (ACPI_FAILURE (Status))
         {

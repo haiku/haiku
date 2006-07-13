@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exmisc - ACPI AML (p-code) execution - specific opcodes
- *              $Revision: 1.142 $
+ *              $Revision: 1.143 $
  *
  *****************************************************************************/
 
@@ -557,11 +557,27 @@ AcpiExDoMathOp (
 
     case AML_SHIFT_LEFT_OP:         /* ShiftLeft (Operand, ShiftCount, Result)*/
 
+        /*
+         * We need to check if the shiftcount is larger than the integer bit
+         * width since the behavior of this is not well-defined in the C language.
+         */
+        if (Integer1 >= AcpiGbl_IntegerBitWidth)
+        {
+            return (0);
+        }
         return (Integer0 << Integer1);
 
 
     case AML_SHIFT_RIGHT_OP:        /* ShiftRight (Operand, ShiftCount, Result) */
 
+        /*
+         * We need to check if the shiftcount is larger than the integer bit
+         * width since the behavior of this is not well-defined in the C language.
+         */
+        if (Integer1 >= AcpiGbl_IntegerBitWidth)
+        {
+            return (0);
+        }
         return (Integer0 >> Integer1);
 
 

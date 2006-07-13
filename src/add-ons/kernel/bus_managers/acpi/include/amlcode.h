@@ -3,7 +3,7 @@
  * Name: amlcode.h - Definitions for AML, as included in "definition blocks"
  *                   Declarations and definitions contained herein are derived
  *                   directly from the ACPI specification.
- *       $Revision: 1.83 $
+ *       $Revision: 1.84 $
  *
  *****************************************************************************/
 
@@ -254,8 +254,10 @@
 #define AML_DATA_REGION_OP          (UINT16) 0x5b88     /* ACPI 2.0 */
 
 
-/* Bogus opcodes (they are actually two separate opcodes) */
-
+/*
+ * Combination opcodes (actually two one-byte opcodes)
+ * Used by the disassembler and iASL compiler
+ */
 #define AML_LGREATEREQUAL_OP        (UINT16) 0x9295
 #define AML_LLESSEQUAL_OP           (UINT16) 0x9294
 #define AML_LNOTEQUAL_OP            (UINT16) 0x9293

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evxface - External interfaces for ACPI events
- *              $Revision: 1.160 $
+ *              $Revision: 1.161 $
  *
  *****************************************************************************/
 
@@ -619,8 +619,13 @@ AcpiRemoveNotifyHandler (
         if (HandlerType & ACPI_SYSTEM_NOTIFY)
         {
             NotifyObj = ObjDesc->CommonNotify.SystemNotify;
-            if ((!NotifyObj) ||
-                 (NotifyObj->Notify.Handler != Handler))
+            if (!NotifyObj)
+            {
+                Status = AE_NOT_EXIST;
+                goto UnlockAndExit;
+            }
+
+            if (NotifyObj->Notify.Handler != Handler)
             {
                 Status = AE_BAD_PARAMETER;
                 goto UnlockAndExit;
@@ -635,8 +640,13 @@ AcpiRemoveNotifyHandler (
         if (HandlerType & ACPI_DEVICE_NOTIFY)
         {
             NotifyObj = ObjDesc->CommonNotify.DeviceNotify;
-            if ((!NotifyObj) ||
-                 (NotifyObj->Notify.Handler != Handler))
+            if (!NotifyObj)
+            {
+                Status = AE_NOT_EXIST;
+                goto UnlockAndExit;
+            }
+
+            if (NotifyObj->Notify.Handler != Handler)
             {
                 Status = AE_BAD_PARAMETER;
                 goto UnlockAndExit;

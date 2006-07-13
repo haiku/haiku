@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evmisc - Miscellaneous event manager support functions
- *              $Revision: 1.91 $
+ *              $Revision: 1.93 $
  *
  *****************************************************************************/
 
@@ -123,13 +123,15 @@
         ACPI_MODULE_NAME    ("evmisc")
 
 
+/* Names for Notify() values, used for debug output */
+
 #ifdef ACPI_DEBUG_OUTPUT
 static const char        *AcpiNotifyValueNames[] =
 {
     "Bus Check",
     "Device Check",
     "Device Wake",
-    "Eject request",
+    "Eject Request",
     "Device Check Light",
     "Frequency Mismatch",
     "Bus Mode Mismatch",
@@ -228,7 +230,7 @@ AcpiEvQueueNotifyRequest (
     if (NotifyValue <= 7)
     {
         ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Notify value: %s\n",
-                AcpiNotifyValueNames[NotifyValue]));
+            AcpiNotifyValueNames[NotifyValue]));
     }
     else
     {
@@ -284,8 +286,8 @@ AcpiEvQueueNotifyRequest (
         NotifyInfo->Notify.Value = (UINT16) NotifyValue;
         NotifyInfo->Notify.HandlerObj = HandlerObj;
 
-        Status = AcpiOsQueueForExecution (OSD_PRIORITY_HIGH,
-                    AcpiEvNotifyDispatch, NotifyInfo);
+        Status = AcpiOsExecute (
+                    OSL_NOTIFY_HANDLER, AcpiEvNotifyDispatch, NotifyInfo);
         if (ACPI_FAILURE (Status))
         {
             AcpiUtDeleteGenericState (NotifyInfo);
@@ -411,7 +413,7 @@ AcpiEvGlobalLockThread (
         /* Send sufficient units to the semaphore */
 
         Status = AcpiOsSignalSemaphore (AcpiGbl_GlobalLockSemaphore,
-                                AcpiGbl_GlobalLockThreadCount);
+                    AcpiGbl_GlobalLockThreadCount);
         if (ACPI_FAILURE (Status))
         {
             ACPI_ERROR ((AE_INFO, "Could not signal Global Lock semaphore"));
@@ -456,8 +458,8 @@ AcpiEvGlobalLockHandler (
 
         /* Run the Global Lock thread which will signal all waiting threads */
 
-        Status = AcpiOsQueueForExecution (OSD_PRIORITY_HIGH,
-                        AcpiEvGlobalLockThread, Context);
+        Status = AcpiOsExecute (
+                    OSL_GLOBAL_LOCK_HANDLER, AcpiEvGlobalLockThread, Context);
         if (ACPI_FAILURE (Status))
         {
             ACPI_EXCEPTION ((AE_INFO, Status,
@@ -585,8 +587,7 @@ AcpiEvAcquireGlobalLock (
      * Acquire the global lock semaphore first.
      * Since this wait will block, we must release the interpreter
      */
-    Status = AcpiExSystemWaitSemaphore (AcpiGbl_GlobalLockSemaphore,
-                                            Timeout);
+    Status = AcpiExSystemWaitSemaphore (AcpiGbl_GlobalLockSemaphore, Timeout);
     return_ACPI_STATUS (Status);
 }
 

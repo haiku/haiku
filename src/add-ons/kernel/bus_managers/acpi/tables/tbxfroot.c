@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbxfroot - Find the root ACPI table (RSDT)
- *              $Revision: 1.101 $
+ *              $Revision: 1.102 $
  *
  *****************************************************************************/
 
@@ -689,7 +689,7 @@ AcpiTbFindRsdp (
             {
                 /* Return the physical address */
 
-                PhysicalAddress += ACPI_PTR_DIFF (MemRover, TablePtr);
+                PhysicalAddress += (UINT32) ACPI_PTR_DIFF (MemRover, TablePtr);
 
                 TableInfo->PhysicalAddress =
                     (ACPI_PHYSICAL_ADDRESS) PhysicalAddress;
@@ -720,8 +720,8 @@ AcpiTbFindRsdp (
         {
             /* Return the physical address */
 
-            PhysicalAddress =
-                ACPI_HI_RSDP_WINDOW_BASE + ACPI_PTR_DIFF (MemRover, TablePtr);
+            PhysicalAddress = (UINT32)
+                (ACPI_HI_RSDP_WINDOW_BASE + ACPI_PTR_DIFF (MemRover, TablePtr));
 
             TableInfo->PhysicalAddress =
                 (ACPI_PHYSICAL_ADDRESS) PhysicalAddress;

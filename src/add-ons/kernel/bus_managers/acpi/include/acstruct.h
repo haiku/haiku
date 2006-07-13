@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acstruct.h - Internal structs
- *       $Revision: 1.42 $
+ *       $Revision: 1.44 $
  *
  *****************************************************************************/
 
@@ -127,17 +127,26 @@
 
 
 /*
- * Walk state - current state of a parse tree walk.  Used for both a leisurely stroll through
- * the tree (for whatever reason), and for control method execution.
+ * Walk state - current state of a parse tree walk.  Used for both a leisurely
+ * stroll through the tree (for whatever reason), and for control method
+ * execution.
  */
 #define ACPI_NEXT_OP_DOWNWARD       1
 #define ACPI_NEXT_OP_UPWARD         2
 
+/*
+ * Groups of definitions for WalkType used for different implementations of
+ * walkers (never simultaneously) - flags for interpreter:
+ */
 #define ACPI_WALK_NON_METHOD        0
-#define ACPI_WALK_METHOD            1
-#define ACPI_WALK_METHOD_RESTART    2
-#define ACPI_WALK_CONST_REQUIRED    3
-#define ACPI_WALK_CONST_OPTIONAL    4
+#define ACPI_WALK_METHOD            0x01
+#define ACPI_WALK_METHOD_RESTART    0x02
+
+/* Flags for iASL compiler only */
+
+#define ACPI_WALK_CONST_REQUIRED    0x10
+#define ACPI_WALK_CONST_OPTIONAL    0x20
+
 
 typedef struct acpi_walk_state
 {
@@ -214,37 +223,6 @@ typedef struct acpi_init_walk_info
 } ACPI_INIT_WALK_INFO;
 
 
-/* Info used by AcpiNsInitializeDevices */
-
-typedef struct acpi_device_walk_info
-{
-    UINT16                          DeviceCount;
-    UINT16                          Num_STA;
-    UINT16                          Num_INI;
-    ACPI_TABLE_DESC                 *TableDesc;
-
-} ACPI_DEVICE_WALK_INFO;
-
-
-/* TBD: [Restructure] Merge with struct above */
-
-typedef struct acpi_walk_info
-{
-    UINT32                          DebugLevel;
-    UINT32                          Count;
-    ACPI_OWNER_ID                   OwnerId;
-    UINT8                           DisplayType;
-
-} ACPI_WALK_INFO;
-
-/* Display Types */
-
-#define ACPI_DISPLAY_SUMMARY        (UINT8) 0
-#define ACPI_DISPLAY_OBJECTS        (UINT8) 1
-#define ACPI_DISPLAY_MASK           (UINT8) 1
-
-#define ACPI_DISPLAY_SHORT          (UINT8) 2
-
 typedef struct acpi_get_devices_info
 {
     ACPI_WALK_CALLBACK              UserFunction;
@@ -286,24 +264,66 @@ typedef union acpi_aml_operands
 } ACPI_AML_OPERANDS;
 
 
-/* Internal method parameter list */
-
-typedef struct acpi_parameter_info
+/*
+ * Structure used to pass object evaluation parameters.
+ * Purpose is to reduce CPU stack use.
+ */
+typedef struct acpi_evaluate_info
 {
-    ACPI_NAMESPACE_NODE             *Node;
+    ACPI_NAMESPACE_NODE             *PrefixNode;
+    char                            *Pathname;
     ACPI_OPERAND_OBJECT             *ObjDesc;
     ACPI_OPERAND_OBJECT             **Parameters;
+    ACPI_NAMESPACE_NODE             *ResolvedNode;
     ACPI_OPERAND_OBJECT             *ReturnObject;
     UINT8                           PassNumber;
     UINT8                           ParameterType;
     UINT8                           ReturnObjectType;
+    UINT8                           Flags;
 
-} ACPI_PARAMETER_INFO;
+} ACPI_EVALUATE_INFO;
 
 /* Types for ParameterType above */
 
 #define ACPI_PARAM_ARGS                 0
 #define ACPI_PARAM_GPE                  1
+
+/* Values for Flags above */
+
+#define ACPI_IGNORE_RETURN_VALUE        1
+
+
+/* Info used by AcpiNsInitializeDevices */
+
+typedef struct acpi_device_walk_info
+{
+    UINT16                          DeviceCount;
+    UINT16                          Num_STA;
+    UINT16                          Num_INI;
+    ACPI_TABLE_DESC                 *TableDesc;
+    ACPI_EVALUATE_INFO              *EvaluateInfo;
+
+} ACPI_DEVICE_WALK_INFO;
+
+
+/* TBD: [Restructure] Merge with struct above */
+
+typedef struct acpi_walk_info
+{
+    UINT32                          DebugLevel;
+    UINT32                          Count;
+    ACPI_OWNER_ID                   OwnerId;
+    UINT8                           DisplayType;
+
+} ACPI_WALK_INFO;
+
+/* Display Types */
+
+#define ACPI_DISPLAY_SUMMARY        (UINT8) 0
+#define ACPI_DISPLAY_OBJECTS        (UINT8) 1
+#define ACPI_DISPLAY_MASK           (UINT8) 1
+
+#define ACPI_DISPLAY_SHORT          (UINT8) 2
 
 
 #endif

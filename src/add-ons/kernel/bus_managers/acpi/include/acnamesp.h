@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acnamesp.h - Namespace subcomponent prototypes and defines
- *       $Revision: 1.145 $
+ *       $Revision: 1.149 $
  *
  *****************************************************************************/
 
@@ -138,6 +138,7 @@
 #define ACPI_NS_NO_PEER_SEARCH      0x04
 #define ACPI_NS_ERROR_IF_FOUND      0x08
 #define ACPI_NS_PREFIX_IS_SCOPE     0x10
+#define ACPI_NS_EXTERNAL            0x20
 
 #define ACPI_NS_WALK_UNLOCK         TRUE
 #define ACPI_NS_WALK_NO_UNLOCK      FALSE
@@ -298,18 +299,8 @@ AcpiNsDumpObjects (
  * nseval - Namespace evaluation functions
  */
 ACPI_STATUS
-AcpiNsEvaluateByHandle (
-    ACPI_PARAMETER_INFO     *Info);
-
-ACPI_STATUS
-AcpiNsEvaluateByName (
-    char                    *Pathname,
-    ACPI_PARAMETER_INFO     *Info);
-
-ACPI_STATUS
-AcpiNsEvaluateRelative (
-    char                    *Pathname,
-    ACPI_PARAMETER_INFO     *Info);
+AcpiNsEvaluate (
+    ACPI_EVALUATE_INFO      *Info);
 
 
 /*
@@ -344,9 +335,9 @@ AcpiNsPatternMatch (
     char                    *SearchFor);
 
 ACPI_STATUS
-AcpiNsGetNodeByPath (
+AcpiNsGetNode (
+    ACPI_NAMESPACE_NODE     *PrefixNode,
     char                    *ExternalPathname,
-    ACPI_NAMESPACE_NODE     *InPrefixNode,
     UINT32                  Flags,
     ACPI_NAMESPACE_NODE     **OutNode);
 
@@ -404,7 +395,7 @@ AcpiNsSearchAndEnter (
     ACPI_NAMESPACE_NODE     **RetNode);
 
 ACPI_STATUS
-AcpiNsSearchNode (
+AcpiNsSearchOneScope (
     UINT32                  EntryName,
     ACPI_NAMESPACE_NODE     *Node,
     ACPI_OBJECT_TYPE        Type,

@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exmutex - ASL Mutex Acquire/Release functions
- *              $Revision: 1.32 $
+ *              $Revision: 1.33 $
  *
  *****************************************************************************/
 
@@ -256,13 +256,14 @@ AcpiExAcquireMutex (
 
     /*
      * Current Sync must be less than or equal to the sync level of the
-     * mutex.  This mechanism provides some deadlock prevention
+     * mutex. This mechanism provides some deadlock prevention
      */
     if (WalkState->Thread->CurrentSyncLevel > ObjDesc->Mutex.SyncLevel)
     {
         ACPI_ERROR ((AE_INFO,
-            "Cannot acquire Mutex [%4.4s], incorrect SyncLevel",
-            AcpiUtGetNodeName (ObjDesc->Mutex.Node)));
+            "Cannot acquire Mutex [%4.4s], current SyncLevel is too large (%d)",
+            AcpiUtGetNodeName (ObjDesc->Mutex.Node),
+            WalkState->Thread->CurrentSyncLevel));
         return_ACPI_STATUS (AE_AML_MUTEX_ORDER);
     }
 
@@ -273,9 +274,8 @@ AcpiExAcquireMutex (
         /* Special case for Global Lock, allow all threads */
 
         if ((ObjDesc->Mutex.OwnerThread->ThreadId ==
-                WalkState->Thread->ThreadId)        ||
-            (ObjDesc->Mutex.Semaphore ==
-                AcpiGbl_GlobalLockSemaphore))
+                WalkState->Thread->ThreadId) ||
+            (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK))
         {
             /*
              * The mutex is already owned by this thread,
@@ -364,7 +364,7 @@ AcpiExReleaseMutex (
      * Special case for Global Lock, any thread can release
      */
     if ((ObjDesc->Mutex.OwnerThread->ThreadId != WalkState->Thread->ThreadId) &&
-        (ObjDesc->Mutex.Semaphore != AcpiGbl_GlobalLockSemaphore))
+        (ObjDesc->Mutex.OsMutex != ACPI_GLOBAL_LOCK))
     {
         ACPI_ERROR ((AE_INFO,
             "Thread %X cannot release Mutex [%4.4s] acquired by thread %X",

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acconfig.h - Global configuration constants
- *       $Revision: 1.216 $
+ *       $Revision: 1.221 $
  *
  *****************************************************************************/
 
@@ -137,7 +137,7 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20060421
+#define ACPI_CA_VERSION                 0x20060707
 
 /*
  * OS name, used for the _OS object.  The _OS object is essentially obsolete,
@@ -247,15 +247,8 @@
 #define ACPI_MAX_ADDRESS_SPACE          255
 
 /* Array sizes.  Used for range checking also */
-#define ACPI_MAX_MATCH_OPCODE           5
 
-#if 0
-#define ACPI_NUM_ACCESS_TYPES           6
-#define ACPI_NUM_UPDATE_RULES           3
-#define ACPI_NUM_LOCK_RULES             2
-#define ACPI_NUM_FIELD_NAMES            2
-#define ACPI_NUM_OPCODES                256
-#endif
+#define ACPI_MAX_MATCH_OPCODE           5
 
 /* RSDP checksums */
 

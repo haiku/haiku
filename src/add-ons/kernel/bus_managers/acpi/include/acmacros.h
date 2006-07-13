@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acmacros.h - C macros for the entire subsystem.
- *       $Revision: 1.190 $
+ *       $Revision: 1.191 $
  *
  *****************************************************************************/
 
@@ -470,6 +470,8 @@
 
 #define ACPI_REGISTER_PREPARE_BITS(Val, Pos, Mask)      ((Val << Pos) & Mask)
 #define ACPI_REGISTER_INSERT_VALUE(Reg, Pos, Mask, Val)  Reg = (Reg & (~(Mask))) | ACPI_REGISTER_PREPARE_BITS(Val, Pos, Mask)
+
+#define ACPI_INSERT_BITS(Target, Mask, Source)          Target = ((Target & (~(Mask))) | (Source & Mask))
 
 /* Generate a UUID */
 

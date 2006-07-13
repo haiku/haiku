@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exresolv - AML Interpreter object resolution
- *              $Revision: 1.137 $
+ *              $Revision: 1.139 $
  *
  *****************************************************************************/
 
@@ -354,10 +354,23 @@ AcpiExResolveObjectToValue (
 
         case AML_INT_NAMEPATH_OP:   /* Reference to a named object */
 
-            /* Get the object pointed to by the namespace node */
+            /* Dereference the name */
 
-            *StackPtr = (StackDesc->Reference.Node)->Object;
-            AcpiUtAddReference (*StackPtr);
+            if ((StackDesc->Reference.Node->Type == ACPI_TYPE_DEVICE) ||
+                (StackDesc->Reference.Node->Type == ACPI_TYPE_THERMAL))
+            {
+                /* These node types do not have 'real' subobjects */
+
+                *StackPtr = (void *) StackDesc->Reference.Node;
+            }
+            else
+            {
+                /* Get the object pointed to by the namespace node */
+
+                *StackPtr = (StackDesc->Reference.Node)->Object;
+                AcpiUtAddReference (*StackPtr);
+            }
+
             AcpiUtRemoveReference (StackDesc);
             break;
 

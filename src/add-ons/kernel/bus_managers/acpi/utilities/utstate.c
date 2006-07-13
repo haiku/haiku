@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utstate - state object support procedures
- *              $Revision: 1.6 $
+ *              $Revision: 1.7 $
  *
  ******************************************************************************/
 
@@ -296,6 +296,14 @@ AcpiUtCreateThreadState (
 
     State->Common.DescriptorType = ACPI_DESC_TYPE_STATE_THREAD;
     State->Thread.ThreadId = AcpiOsGetThreadId ();
+
+    /* Check for invalid thread ID - zero is very bad, it will break things */
+
+    if (!State->Thread.ThreadId)
+    {
+        ACPI_ERROR ((AE_INFO, "Invalid zero ID from AcpiOsGetThreadId"));
+        State->Thread.ThreadId = 1;
+    }
 
     return_PTR ((ACPI_THREAD_STATE *) State);
 }

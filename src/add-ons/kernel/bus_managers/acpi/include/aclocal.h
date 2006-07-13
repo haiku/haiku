@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclocal.h - Internal data types used across the ACPI subsystem
- *       $Revision: 1.229 $
+ *       $Revision: 1.236 $
  *
  *****************************************************************************/
 
@@ -120,11 +120,11 @@
 /* acpisrc:StructDefs -- for acpisrc conversion */
 
 #define ACPI_WAIT_FOREVER               0xFFFF  /* UINT16, as per ACPI spec */
-#define ACPI_INFINITE_CONCURRENCY       0xFF
+#define ACPI_DO_NOT_WAIT                0
+#define ACPI_SERIALIZED                 0xFF
 
-typedef void *                          ACPI_MUTEX;
 typedef UINT32                          ACPI_MUTEX_HANDLE;
-
+#define ACPI_GLOBAL_LOCK                (ACPI_SEMAPHORE) (-1)
 
 /* Total number of aml opcodes defined */
 
@@ -149,53 +149,54 @@ union acpi_parse_object;
  * Predefined handles for the mutex objects used within the subsystem
  * All mutex objects are automatically created by AcpiUtMutexInitialize.
  *
- * The acquire/release ordering protocol is implied via this list.  Mutexes
+ * The acquire/release ordering protocol is implied via this list. Mutexes
  * with a lower value must be acquired before mutexes with a higher value.
  *
- * NOTE: any changes here must be reflected in the AcpiGbl_MutexNames table also!
+ * NOTE: any changes here must be reflected in the AcpiGbl_MutexNames
+ * table below also!
  */
-#define ACPI_MTX_EXECUTE                0
-#define ACPI_MTX_INTERPRETER            1
-#define ACPI_MTX_PARSER                 2
-#define ACPI_MTX_DISPATCHER             3
-#define ACPI_MTX_TABLES                 4
-#define ACPI_MTX_OP_REGIONS             5
-#define ACPI_MTX_NAMESPACE              6
-#define ACPI_MTX_EVENTS                 7
-#define ACPI_MTX_HARDWARE               8
-#define ACPI_MTX_CACHES                 9
-#define ACPI_MTX_MEMORY                 10
-#define ACPI_MTX_DEBUG_CMD_COMPLETE     11
-#define ACPI_MTX_DEBUG_CMD_READY        12
+#define ACPI_MTX_INTERPRETER            0   /* AML Interpreter, main lock */
+#define ACPI_MTX_TABLES                 1   /* Data for ACPI tables */
+#define ACPI_MTX_NAMESPACE              2   /* ACPI Namespace */
+#define ACPI_MTX_EVENTS                 3   /* Data for ACPI events */
+#define ACPI_MTX_CACHES                 4   /* Internal caches, general purposes */
+#define ACPI_MTX_MEMORY                 5   /* Debug memory tracking lists */
+#define ACPI_MTX_DEBUG_CMD_COMPLETE     6   /* AML debugger */
+#define ACPI_MTX_DEBUG_CMD_READY        7   /* AML debugger */
 
-#define MAX_MUTEX                       12
-#define NUM_MUTEX                       MAX_MUTEX+1
-
+#define ACPI_MAX_MUTEX                  7
+#define ACPI_NUM_MUTEX                  ACPI_MAX_MUTEX+1
 
 #if defined(ACPI_DEBUG_OUTPUT) || defined(ACPI_DEBUGGER)
 #ifdef DEFINE_ACPI_GLOBALS
 
-/* Names for the mutexes used in the subsystem */
+/* Debug names for the mutexes above */
 
-static char                 *AcpiGbl_MutexNames[] =
+static char                 *AcpiGbl_MutexNames[ACPI_NUM_MUTEX] =
 {
-    "ACPI_MTX_Execute",
     "ACPI_MTX_Interpreter",
-    "ACPI_MTX_Parser",
-    "ACPI_MTX_Dispatcher",
     "ACPI_MTX_Tables",
-    "ACPI_MTX_OpRegions",
     "ACPI_MTX_Namespace",
     "ACPI_MTX_Events",
-    "ACPI_MTX_Hardware",
     "ACPI_MTX_Caches",
     "ACPI_MTX_Memory",
-    "ACPI_MTX_DebugCmdComplete",
-    "ACPI_MTX_DebugCmdReady",
+    "ACPI_MTX_CommandComplete",
+    "ACPI_MTX_CommandReady"
 };
 
 #endif
 #endif
+
+
+/*
+ * Predefined handles for spinlocks used within the subsystem.
+ * These spinlocks are created by AcpiUtMutexInitialize
+ */
+#define ACPI_LOCK_GPES                  0
+#define ACPI_LOCK_HARDWARE              1
+
+#define ACPI_MAX_LOCK                   1
+#define ACPI_NUM_LOCK                   ACPI_MAX_LOCK+1
 
 
 /* Owner IDs are used to track namespace nodes for selective deletion */
@@ -296,11 +297,12 @@ typedef struct acpi_namespace_node
 /* Namespace Node flags */
 
 #define ANOBJ_END_OF_PEER_LIST          0x01    /* End-of-list, Peer field points to parent */
-#define ANOBJ_DATA_WIDTH_32             0x02    /* Parent table uses 32-bit math */
+#define ANOBJ_RESERVED                  0x02    /* Available for future use */
 #define ANOBJ_METHOD_ARG                0x04    /* Node is a method argument */
 #define ANOBJ_METHOD_LOCAL              0x08    /* Node is a method local */
 #define ANOBJ_SUBTREE_HAS_INI           0x10    /* Used to optimize device initialization */
 
+#define ANOBJ_IS_EXTERNAL               0x08    /* iASL only: This object created via External() */
 #define ANOBJ_METHOD_NO_RETVAL          0x10    /* iASL only: Method has no return value */
 #define ANOBJ_METHOD_SOME_NO_RETVAL     0x20    /* iASL only: Method has at least one return value */
 #define ANOBJ_IS_BIT_OFFSET             0x40    /* iASL only: Reference is a bit offset */
@@ -787,6 +789,9 @@ typedef union acpi_parse_value
 #define ACPI_DASM_UNICODE               0x03
 #define ACPI_DASM_EISAID                0x04
 #define ACPI_DASM_MATCHOP               0x05
+#define ACPI_DASM_LNOT_PREFIX           0x06
+#define ACPI_DASM_LNOT_SUFFIX           0x07
+#define ACPI_DASM_IGNORE                0x08
 
 /*
  * Generic operation (for example:  If, While, Store)
@@ -907,6 +912,14 @@ typedef struct acpi_bit_register_info
     UINT16                          AccessBitMask;
 
 } ACPI_BIT_REGISTER_INFO;
+
+
+/*
+ * Some ACPI registers have bits that must be ignored -- meaning that they
+ * must be preserved.
+ */
+#define ACPI_PM1_STATUS_PRESERVED_BITS          0x0800  /* Bit 11 */
+#define ACPI_PM1_CONTROL_PRESERVED_BITS         0x0201  /* Bit 9, Bit 0 (SCI_EN) */
 
 
 /*

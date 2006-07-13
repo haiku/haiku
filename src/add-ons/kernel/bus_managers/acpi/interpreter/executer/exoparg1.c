@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exoparg1 - AML execution - opcodes with 1 argument
- *              $Revision: 1.178 $
+ *              $Revision: 1.181 $
  *
  *****************************************************************************/
 
@@ -440,8 +440,8 @@ AcpiExOpcode_1A_1T_1R (
 
             /* Since the bit position is one-based, subtract from 33 (65) */
 
-            ReturnDesc->Integer.Value = Temp32 == 0 ? 0 :
-                                        (ACPI_INTEGER_BIT_SIZE + 1) - Temp32;
+            ReturnDesc->Integer.Value =
+                Temp32 == 0 ? 0 : (ACPI_INTEGER_BIT_SIZE + 1) - Temp32;
             break;
 
 
@@ -478,8 +478,8 @@ AcpiExOpcode_1A_1T_1R (
 
                 /* Sum the digit into the result with the current power of 10 */
 
-                ReturnDesc->Integer.Value += (((ACPI_INTEGER) Temp32) *
-                                              PowerOfTen);
+                ReturnDesc->Integer.Value +=
+                    (((ACPI_INTEGER) Temp32) * PowerOfTen);
 
                 /* Shift to next BCD digit */
 
@@ -507,8 +507,8 @@ AcpiExOpcode_1A_1T_1R (
                  * Insert the BCD digit that resides in the
                  * remainder from above
                  */
-                ReturnDesc->Integer.Value |= (((ACPI_INTEGER) Temp32) <<
-                                                ACPI_MUL_4 (i));
+                ReturnDesc->Integer.Value |=
+                    (((ACPI_INTEGER) Temp32) << ACPI_MUL_4 (i));
             }
 
             /* Overflow if there is any data left in Digit */
@@ -836,6 +836,7 @@ AcpiExOpcode_1A_0T_1R (
         {
             goto Cleanup;
         }
+
         /* Allocate a descriptor to hold the type. */
 
         ReturnDesc = AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
@@ -1017,8 +1018,8 @@ AcpiExOpcode_1A_0T_1R (
                  * 2) Dereference the node to an actual object. Could be a
                  *    Field, so we need to resolve the node to a value.
                  */
-                Status = AcpiNsGetNodeByPath (Operand[0]->String.Pointer,
-                            WalkState->ScopeInfo->Scope.Node,
+                Status = AcpiNsGetNode (WalkState->ScopeInfo->Scope.Node,
+                            Operand[0]->String.Pointer,
                             ACPI_NS_SEARCH_PARENT,
                             ACPI_CAST_INDIRECT_PTR (
                                 ACPI_NAMESPACE_NODE, &ReturnDesc));
@@ -1105,7 +1106,6 @@ AcpiExOpcode_1A_0T_1R (
                     {
                         AcpiUtAddReference (ReturnDesc);
                     }
-
                     break;
 
 
@@ -1127,7 +1127,6 @@ AcpiExOpcode_1A_0T_1R (
                 if (ACPI_GET_DESCRIPTOR_TYPE (ReturnDesc) ==
                         ACPI_DESC_TYPE_NAMED)
                 {
-
                     ReturnDesc = AcpiNsGetAttachedObject (
                                     (ACPI_NAMESPACE_NODE *) ReturnDesc);
                 }
@@ -1140,7 +1139,7 @@ AcpiExOpcode_1A_0T_1R (
 
             default:
                 ACPI_ERROR ((AE_INFO,
-                    "Unknown opcode in ref(%p) - %X",
+                    "Unknown opcode in reference(%p) - %X",
                     Operand[0], Operand[0]->Reference.Opcode));
 
                 Status = AE_TYPE;

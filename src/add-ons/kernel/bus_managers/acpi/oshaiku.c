@@ -499,11 +499,11 @@ AcpiOsMapMemory (
 {
 
 #ifdef _KERNEL_MODE
-	int page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
+	uint32 page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
 	void *map_base = ACPI_ADD_PTR(void,where,0L - page_offset);
 	area_id area;
 
-    area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
+	area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
 		
 	*there += page_offset;
 	
@@ -824,46 +824,48 @@ dprintf("AcpiOsRemoveInterruptHandler()\n");
 
 /******************************************************************************
  *
- * FUNCTION:    AcpiOsQueueForExecution
+ * FUNCTION:    AcpiOsExecute
  *
- * PARAMETERS:  Priority        - Requested execution priority
+ * PARAMETERS:  Type            - Type of execution
  *              Function        - Address of the function to execute
  *              Context         - Passed as a parameter to the function
  *
  * RETURN:      Status.
  *
- * DESCRIPTION: Sleep at microsecond granularity
+ * DESCRIPTION: Execute a new thread
  *
  *****************************************************************************/
 
 ACPI_STATUS
-AcpiOsQueueForExecution (
-    UINT32                  Priority,
+AcpiOsExecute (
+    ACPI_EXECUTE_TYPE       Type,
     ACPI_OSD_EXEC_CALLBACK  Function,
     void                    *Context)
 {
 	int priority = 10;
-	switch (Priority) {
-		case OSD_PRIORITY_GPE:
-			priority = 20; break;
-		case OSD_PRIORITY_HIGH:
-			priority = 15; break;
-		case OSD_PRIORITY_MED:
-			priority = 10; break;
-		case OSD_PRIORITY_LO:
-			priority = 5; break;
-	}
+	thread_id thread;
 
+	switch (Type) {
+		case OSL_GLOBAL_LOCK_HANDLER:
+		case OSL_NOTIFY_HANDLER:
+		case OSL_GPE_HANDLER:
+		case OSL_DEBUGGER_THREAD:
+		case OSL_EC_POLL_HANDLER:
+		case OSL_EC_BURST_HANDLER:
+	}
+	
 	#ifndef _KERNEL_MODE
 		#define spawn_kernel_thread spawn_thread
 	#endif
 
-	spawn_kernel_thread((thread_func)(Function),"ACPI Worker Thread",priority,Context);
+	thread = spawn_kernel_thread((thread_func)(Function),"ACPI Worker Thread",priority,Context);
 		/* We're going to cheerfully ignore the fact that ACPI_OSD_EXEC_CALLBACK
 		   routines don't give canonical return values, as we aren't going to
 		   check up on them, and the kernel doesn't care */
-		   
-    return 0;
+
+	if (thread < B_OK)
+		return AE_ERROR;
+	return AE_OK;
 }
 
 

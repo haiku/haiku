@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exsystem - Interface to OS services
- *              $Revision: 1.88 $
+ *              $Revision: 1.90 $
  *
  *****************************************************************************/
 
@@ -136,13 +136,13 @@
  *
  * DESCRIPTION: Implements a semaphore wait with a check to see if the
  *              semaphore is available immediately.  If it is not, the
- *              interpreter is released.
+ *              interpreter is released before waiting.
  *
  ******************************************************************************/
 
 ACPI_STATUS
 AcpiExSystemWaitSemaphore (
-    ACPI_HANDLE             Semaphore,
+    ACPI_SEMAPHORE          Semaphore,
     UINT16                  Timeout)
 {
     ACPI_STATUS             Status;
@@ -152,7 +152,7 @@ AcpiExSystemWaitSemaphore (
     ACPI_FUNCTION_TRACE (ExSystemWaitSemaphore);
 
 
-    Status = AcpiOsWaitSemaphore (Semaphore, 1, 0);
+    Status = AcpiOsWaitSemaphore (Semaphore, 1, ACPI_DO_NOT_WAIT);
     if (ACPI_SUCCESS (Status))
     {
         return_ACPI_STATUS (Status);
@@ -165,6 +165,66 @@ AcpiExSystemWaitSemaphore (
         AcpiExExitInterpreter ();
 
         Status = AcpiOsWaitSemaphore (Semaphore, 1, Timeout);
+
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "*** Thread awake after blocking, %s\n",
+            AcpiFormatException (Status)));
+
+        /* Reacquire the interpreter */
+
+        Status2 = AcpiExEnterInterpreter ();
+        if (ACPI_FAILURE (Status2))
+        {
+            /* Report fatal error, could not acquire interpreter */
+
+            return_ACPI_STATUS (Status2);
+        }
+    }
+
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExSystemWaitMutex
+ *
+ * PARAMETERS:  Mutex           - Mutex to wait on
+ *              Timeout         - Max time to wait
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Implements a mutex wait with a check to see if the
+ *              mutex is available immediately.  If it is not, the
+ *              interpreter is released before waiting.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiExSystemWaitMutex (
+    ACPI_MUTEX              Mutex,
+    UINT16                  Timeout)
+{
+    ACPI_STATUS             Status;
+    ACPI_STATUS             Status2;
+
+
+    ACPI_FUNCTION_TRACE (ExSystemWaitMutex);
+
+
+    Status = AcpiOsAcquireMutex (Mutex, ACPI_DO_NOT_WAIT);
+    if (ACPI_SUCCESS (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    if (Status == AE_TIME)
+    {
+        /* We must wait, so unlock the interpreter */
+
+        AcpiExExitInterpreter ();
+
+        Status = AcpiOsAcquireMutex (Mutex, Timeout);
 
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
             "*** Thread awake after blocking, %s\n",
@@ -273,7 +333,7 @@ AcpiExSystemDoSuspend (
  *
  * FUNCTION:    AcpiExSystemAcquireMutex
  *
- * PARAMETERS:  TimeDesc        - The 'time to delay' object descriptor
+ * PARAMETERS:  TimeDesc        - Maximum time to wait for the mutex
  *              ObjDesc         - The object descriptor for this op
  *
  * RETURN:      Status
@@ -302,13 +362,13 @@ AcpiExSystemAcquireMutex (
 
     /* Support for the _GL_ Mutex object -- go get the global lock */
 
-    if (ObjDesc->Mutex.Semaphore == AcpiGbl_GlobalLockSemaphore)
+    if (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK)
     {
         Status = AcpiEvAcquireGlobalLock ((UINT16) TimeDesc->Integer.Value);
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiExSystemWaitSemaphore (ObjDesc->Mutex.Semaphore,
+    Status = AcpiExSystemWaitMutex (ObjDesc->Mutex.OsMutex,
                 (UINT16) TimeDesc->Integer.Value);
     return_ACPI_STATUS (Status);
 }
@@ -346,14 +406,14 @@ AcpiExSystemReleaseMutex (
 
     /* Support for the _GL_ Mutex object -- release the global lock */
 
-    if (ObjDesc->Mutex.Semaphore == AcpiGbl_GlobalLockSemaphore)
+    if (ObjDesc->Mutex.OsMutex == ACPI_GLOBAL_LOCK)
     {
         Status = AcpiEvReleaseGlobalLock ();
         return_ACPI_STATUS (Status);
     }
 
-    Status = AcpiOsSignalSemaphore (ObjDesc->Mutex.Semaphore, 1);
-    return_ACPI_STATUS (Status);
+    AcpiOsReleaseMutex (ObjDesc->Mutex.OsMutex);
+    return_ACPI_STATUS (AE_OK);
 }
 
 
@@ -382,7 +442,7 @@ AcpiExSystemSignalEvent (
 
     if (ObjDesc)
     {
-        Status = AcpiOsSignalSemaphore (ObjDesc->Event.Semaphore, 1);
+        Status = AcpiOsSignalSemaphore (ObjDesc->Event.OsSemaphore, 1);
     }
 
     return_ACPI_STATUS (Status);
@@ -417,7 +477,7 @@ AcpiExSystemWaitEvent (
 
     if (ObjDesc)
     {
-        Status = AcpiExSystemWaitSemaphore (ObjDesc->Event.Semaphore,
+        Status = AcpiExSystemWaitSemaphore (ObjDesc->Event.OsSemaphore,
                     (UINT16) TimeDesc->Integer.Value);
     }
 
@@ -442,7 +502,7 @@ AcpiExSystemResetEvent (
     ACPI_OPERAND_OBJECT     *ObjDesc)
 {
     ACPI_STATUS             Status = AE_OK;
-    void                    *TempSemaphore;
+    ACPI_SEMAPHORE          TempSemaphore;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -455,8 +515,8 @@ AcpiExSystemResetEvent (
     Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT, 0, &TempSemaphore);
     if (ACPI_SUCCESS (Status))
     {
-        (void) AcpiOsDeleteSemaphore (ObjDesc->Event.Semaphore);
-        ObjDesc->Event.Semaphore = TempSemaphore;
+        (void) AcpiOsDeleteSemaphore (ObjDesc->Event.OsSemaphore);
+        ObjDesc->Event.OsSemaphore = TempSemaphore;
     }
 
     return (Status);

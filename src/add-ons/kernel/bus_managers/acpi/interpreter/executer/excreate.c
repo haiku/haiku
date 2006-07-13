@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: excreate - Named object creation
- *              $Revision: 1.110 $
+ *              $Revision: 1.111 $
  *
  *****************************************************************************/
 
@@ -262,7 +262,7 @@ AcpiExCreateEvent (
      * that the event is created in an unsignalled state
      */
     Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT, 0,
-                &ObjDesc->Event.Semaphore);
+                &ObjDesc->Event.OsSemaphore);
     if (ACPI_FAILURE (Status))
     {
         goto Cleanup;
@@ -317,12 +317,9 @@ AcpiExCreateMutex (
         goto Cleanup;
     }
 
-    /*
-     * Create the actual OS semaphore.
-     * One unit max to make it a mutex, with one initial unit to allow
-     * the mutex to be acquired.
-     */
-    Status = AcpiOsCreateSemaphore (1, 1, &ObjDesc->Mutex.Semaphore);
+    /* Create the actual OS Mutex */
+
+    Status = AcpiOsCreateMutex (&ObjDesc->Mutex.OsMutex);
     if (ACPI_FAILURE (Status))
     {
         goto Cleanup;
@@ -690,7 +687,7 @@ AcpiExCreateMethod (
     ObjDesc->Method.AmlLength = AmlLength;
 
     /*
-     * Disassemble the method flags.  Split off the Arg Count
+     * Disassemble the method flags. Split off the Arg Count
      * for efficiency
      */
     MethodFlags = (UINT8) Operand[1]->Integer.Value;
@@ -699,26 +696,22 @@ AcpiExCreateMethod (
     ObjDesc->Method.ParamCount = (UINT8) (MethodFlags & AML_METHOD_ARG_COUNT);
 
     /*
-     * Get the concurrency count.  If required, a semaphore will be
+     * Get the SyncLevel. If method is serialized, a mutex will be
      * created for this method when it is parsed.
      */
     if (AcpiGbl_AllMethodsSerialized)
     {
-        ObjDesc->Method.Concurrency = 1;
+        ObjDesc->Method.SyncLevel = 0;
         ObjDesc->Method.MethodFlags |= AML_METHOD_SERIALIZED;
     }
     else if (MethodFlags & AML_METHOD_SERIALIZED)
     {
         /*
-         * ACPI 1.0: Concurrency = 1
-         * ACPI 2.0: Concurrency = (SyncLevel (in method declaration) + 1)
+         * ACPI 1.0: SyncLevel = 0
+         * ACPI 2.0: SyncLevel = SyncLevel in method declaration
          */
-        ObjDesc->Method.Concurrency = (UINT8)
-            (((MethodFlags & AML_METHOD_SYNCH_LEVEL) >> 4) + 1);
-    }
-    else
-    {
-        ObjDesc->Method.Concurrency = ACPI_INFINITE_CONCURRENCY;
+        ObjDesc->Method.SyncLevel = (UINT8)
+            ((MethodFlags & AML_METHOD_SYNCH_LEVEL) >> 4);
     }
 
     /* Attach the new object to the method Node */

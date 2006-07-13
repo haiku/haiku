@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utmisc - common utility procedures
- *              $Revision: 1.143 $
+ *              $Revision: 1.146 $
  *
  ******************************************************************************/
 
@@ -144,7 +144,7 @@ AcpiUtIsAmlTable (
     ACPI_TABLE_HEADER       *Table)
 {
 
-    /* Ignore tables that contain AML */
+    /* These are the only tables that contain executable AML */
 
     if (ACPI_COMPARE_NAME (Table->Signature, DSDT_SIG) ||
         ACPI_COMPARE_NAME (Table->Signature, PSDT_SIG) ||
@@ -421,7 +421,7 @@ AcpiUtPrintString (
         switch (String[i])
         {
         case 0x07:
-            AcpiOsPrintf ("\\a");        /* BELL */
+            AcpiOsPrintf ("\\a");       /* BELL */
             break;
 
         case 0x08:
@@ -546,12 +546,16 @@ AcpiUtSetIntegerWidth (
 
     if (Revision <= 1)
     {
+        /* 32-bit case */
+
         AcpiGbl_IntegerBitWidth    = 32;
         AcpiGbl_IntegerNybbleWidth = 8;
         AcpiGbl_IntegerByteWidth   = 4;
     }
     else
     {
+        /* 64-bit case (ACPI 2.0+) */
+
         AcpiGbl_IntegerBitWidth    = 64;
         AcpiGbl_IntegerNybbleWidth = 16;
         AcpiGbl_IntegerByteWidth   = 8;
@@ -640,6 +644,7 @@ AcpiUtDisplayInitPathname (
  * FUNCTION:    AcpiUtValidAcpiChar
  *
  * PARAMETERS:  Char            - The character to be examined
+ *              Position        - Byte position (0-3)
  *
  * RETURN:      TRUE if the character is valid, FALSE otherwise
  *
@@ -759,12 +764,15 @@ AcpiUtRepairName (
  * FUNCTION:    AcpiUtStrtoul64
  *
  * PARAMETERS:  String          - Null terminated string
- *              Base            - Radix of the string: 10, 16, or ACPI_ANY_BASE
+ *              Base            - Radix of the string: 16 or ACPI_ANY_BASE;
+ *                                ACPI_ANY_BASE means 'in behalf of ToInteger'
  *              RetInteger      - Where the converted integer is returned
  *
  * RETURN:      Status and Converted value
  *
- * DESCRIPTION: Convert a string into an unsigned value.
+ * DESCRIPTION: Convert a string into an unsigned value. Performs either a
+ *              32-bit or 64-bit conversion, depending on the current mode
+ *              of the interpreter.
  *              NOTE: Does not support Octal strings, not needed.
  *
  ******************************************************************************/
@@ -778,20 +786,20 @@ AcpiUtStrtoul64 (
     UINT32                  ThisDigit = 0;
     ACPI_INTEGER            ReturnValue = 0;
     ACPI_INTEGER            Quotient;
+    ACPI_INTEGER            Dividend;
+    UINT32                  ToIntegerOp = (Base == ACPI_ANY_BASE);
+    UINT32                  Mode32 = (AcpiGbl_IntegerByteWidth == 4);
+    UINT8                   ValidDigits = 0;
+    UINT8                   SignOf0x = 0;
+    UINT8                   Term = 0;
 
 
-    ACPI_FUNCTION_TRACE (UtStroul64);
+    ACPI_FUNCTION_TRACE_STR (UtStroul64, String);
 
-
-    if ((!String) || !(*String))
-    {
-        goto ErrorExit;
-    }
 
     switch (Base)
     {
     case ACPI_ANY_BASE:
-    case 10:
     case 16:
         break;
 
@@ -800,23 +808,30 @@ AcpiUtStrtoul64 (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
+    if (!String)
+    {
+        goto ErrorExit;
+    }
+
     /* Skip over any white space in the buffer */
 
-    while (ACPI_IS_SPACE (*String) || *String == '\t')
+    while ((*String) && (ACPI_IS_SPACE (*String) || *String == '\t'))
     {
         String++;
     }
 
-    /*
-     * If the input parameter Base is zero, then we need to
-     * determine if it is decimal or hexadecimal:
-     */
-    if (Base == 0)
+    if (ToIntegerOp)
     {
-        if ((*String == '0') &&
-            (ACPI_TOLOWER (*(String + 1)) == 'x'))
+        /*
+         * Base equal to ACPI_ANY_BASE means 'ToInteger operation case'.
+         * We need to determine if it is decimal or hexadecimal.
+         */
+        if ((*String == '0') && (ACPI_TOLOWER (*(String + 1)) == 'x'))
         {
+            SignOf0x = 1;
             Base = 16;
+
+            /* Skip over the leading '0x' */
             String += 2;
         }
         else
@@ -825,25 +840,27 @@ AcpiUtStrtoul64 (
         }
     }
 
+    /* Any string left? Check that '0x' is not followed by white space. */
+
+    if (!(*String) || ACPI_IS_SPACE (*String) || *String == '\t')
+    {
+        if (ToIntegerOp)
+        {
+            goto ErrorExit;
+        }
+        else
+        {
+            goto AllDone;
+        }
+    }
+
     /*
-     * For hexadecimal base, skip over the leading
-     * 0 or 0x, if they are present.
+     * Perform a 32-bit or 64-bit conversion, depending upon the current
+     * execution mode of the interpreter
      */
-    if ((Base == 16) &&
-        (*String == '0') &&
-        (ACPI_TOLOWER (*(String + 1)) == 'x'))
-    {
-        String += 2;
-    }
+    Dividend = (Mode32) ? ACPI_UINT32_MAX : ACPI_UINT64_MAX;
 
-    /* Any string left? */
-
-    if (!(*String))
-    {
-        goto ErrorExit;
-    }
-
-    /* Main loop: convert the string to a 64-bit integer */
+    /* Main loop: convert the string to a 32- or 64-bit integer */
 
     while (*String)
     {
@@ -853,15 +870,14 @@ AcpiUtStrtoul64 (
 
             ThisDigit = ((UINT8) *String) - '0';
         }
+        else if (Base == 10)
+        {
+            /* Digit is out of range; possible in ToInteger case only */
+
+            Term = 1;
+        }
         else
         {
-            if (Base == 10)
-            {
-                /* Digit is out of range */
-
-                goto ErrorExit;
-            }
-
             ThisDigit = (UINT8) ACPI_TOUPPER (*String);
             if (ACPI_IS_XDIGIT ((char) ThisDigit))
             {
@@ -871,21 +887,55 @@ AcpiUtStrtoul64 (
             }
             else
             {
-                /*
-                 * We allow non-hex chars, just stop now, same as end-of-string.
-                 * See ACPI spec, string-to-integer conversion.
-                 */
+                Term = 1;
+            }
+        }
+
+        if (Term)
+        {
+            if (ToIntegerOp)
+            {
+                goto ErrorExit;
+            }
+            else
+            {
                 break;
             }
+        }
+        else if ((ValidDigits == 0) && (ThisDigit == 0) && !SignOf0x)
+        {
+            /* Skip zeros */
+            String++;
+            continue;
+        }
+
+        ValidDigits++;
+
+        if (SignOf0x && ((ValidDigits > 16) || ((ValidDigits > 8) && Mode32)))
+        {
+            /*
+             * This is ToInteger operation case.
+             * No any restrictions for string-to-integer conversion,
+             * see ACPI spec.
+             */
+            goto ErrorExit;
         }
 
         /* Divide the digit into the correct position */
 
-        (void) AcpiUtShortDivide ((ACPI_INTEGER_MAX - (ACPI_INTEGER) ThisDigit),
+        (void) AcpiUtShortDivide ((Dividend - (ACPI_INTEGER) ThisDigit),
                     Base, &Quotient, NULL);
+
         if (ReturnValue > Quotient)
         {
-            goto ErrorExit;
+            if (ToIntegerOp)
+            {
+                goto ErrorExit;
+            }
+            else
+            {
+                break;
+            }
         }
 
         ReturnValue *= Base;
@@ -894,6 +944,11 @@ AcpiUtStrtoul64 (
     }
 
     /* All done, normal exit */
+
+AllDone:
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Converted value: %8.8X%8.8X\n",
+        ACPI_FORMAT_UINT64 (ReturnValue)));
 
     *RetInteger = ReturnValue;
     return_ACPI_STATUS (AE_OK);

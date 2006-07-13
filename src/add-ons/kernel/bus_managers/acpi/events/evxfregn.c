@@ -2,7 +2,7 @@
  *
  * Module Name: evxfregn - External Interfaces, ACPI Operation Regions and
  *                         Address Spaces.
- *              $Revision: 1.68 $
+ *              $Revision: 1.69 $
  *
  *****************************************************************************/
 
@@ -245,7 +245,11 @@ AcpiRemoveAddressSpaceHandler (
     /* Convert and validate the device handle */
 
     Node = AcpiNsMapHandleToNode (Device);
-    if (!Node)
+    if (!Node ||
+        ((Node->Type != ACPI_TYPE_DEVICE)    &&
+         (Node->Type != ACPI_TYPE_PROCESSOR) &&
+         (Node->Type != ACPI_TYPE_THERMAL)   &&
+         (Node != AcpiGbl_RootNode)))
     {
         Status = AE_BAD_PARAMETER;
         goto UnlockAndExit;
@@ -270,6 +274,14 @@ AcpiRemoveAddressSpaceHandler (
 
         if (HandlerObj->AddressSpace.SpaceId == SpaceId)
         {
+            /* Handler must be the same as the installed handler */
+
+            if (HandlerObj->AddressSpace.Handler != Handler)
+            {
+                Status = AE_BAD_PARAMETER;
+                goto UnlockAndExit;
+            }
+
             /* Matched SpaceId, first dereference this in the Regions */
 
             ACPI_DEBUG_PRINT ((ACPI_DB_OPREGION,

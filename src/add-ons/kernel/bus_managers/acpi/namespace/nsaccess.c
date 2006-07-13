@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsaccess - Top-level functions for accessing ACPI namespace
- *              $Revision: 1.198 $
+ *              $Revision: 1.202 $
  *
  ******************************************************************************/
 
@@ -283,30 +283,25 @@ AcpiNsRootInitialize (
 
                 if (ACPI_STRCMP (InitVal->Name, "_GL_") == 0)
                 {
-                    /*
-                     * Create a counting semaphore for the
-                     * global lock
-                     */
-                    Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT,
-                                            1, &ObjDesc->Mutex.Semaphore);
+                    /* Create a counting semaphore for the global lock */
+
+                    Status = AcpiOsCreateSemaphore (ACPI_NO_UNIT_LIMIT, 1,
+                                &AcpiGbl_GlobalLockSemaphore);
                     if (ACPI_FAILURE (Status))
                     {
                         AcpiUtRemoveReference (ObjDesc);
                         goto UnlockAndExit;
                     }
 
-                    /*
-                     * We just created the mutex for the
-                     * global lock, save it
-                     */
-                    AcpiGbl_GlobalLockSemaphore = ObjDesc->Mutex.Semaphore;
+                    /* Mark this mutex as very special */
+
+                    ObjDesc->Mutex.OsMutex = ACPI_GLOBAL_LOCK;
                 }
                 else
                 {
                     /* Create a mutex */
 
-                    Status = AcpiOsCreateSemaphore (1, 1,
-                                        &ObjDesc->Mutex.Semaphore);
+                    Status = AcpiOsCreateMutex (&ObjDesc->Mutex.OsMutex);
                     if (ACPI_FAILURE (Status))
                     {
                         AcpiUtRemoveReference (ObjDesc);
@@ -344,8 +339,8 @@ UnlockAndExit:
 
     if (ACPI_SUCCESS (Status))
     {
-        Status = AcpiNsGetNodeByPath ("\\_GPE", NULL, ACPI_NS_NO_UPSEARCH,
-                        &AcpiGbl_FadtGpeDevice);
+        Status = AcpiNsGetNode (NULL, "\\_GPE", ACPI_NS_NO_UPSEARCH,
+                    &AcpiGbl_FadtGpeDevice);
     }
 
     return_ACPI_STATUS (Status);
@@ -396,8 +391,7 @@ AcpiNsLookup (
     ACPI_OBJECT_TYPE        TypeToCheckFor;
     ACPI_OBJECT_TYPE        ThisSearchType;
     UINT32                  SearchParentFlag = ACPI_NS_SEARCH_PARENT;
-    UINT32                  LocalFlags = Flags & ~(ACPI_NS_ERROR_IF_FOUND |
-                                                   ACPI_NS_SEARCH_PARENT);
+    UINT32                  LocalFlags;
 
 
     ACPI_FUNCTION_TRACE (NsLookup);
@@ -408,8 +402,9 @@ AcpiNsLookup (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    AcpiGbl_NsLookupCount++;
+    LocalFlags = Flags & ~(ACPI_NS_ERROR_IF_FOUND | ACPI_NS_SEARCH_PARENT);
     *ReturnNode = ACPI_ENTRY_NOT_FOUND;
+    AcpiGbl_NsLookupCount++;
 
     if (!AcpiGbl_RootNode)
     {

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exconvrt - Object conversion routines
- *              $Revision: 1.72 $
+ *              $Revision: 1.73 $
  *
  *****************************************************************************/
 
@@ -264,6 +264,9 @@ AcpiExConvertToInteger (
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
     }
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Converted value: %8.8X%8.8X\n",
+        ACPI_FORMAT_UINT64 (Result)));
 
     /* Save the Result */
 

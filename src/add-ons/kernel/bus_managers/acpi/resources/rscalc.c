@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rscalc - Calculate stream and list lengths
- *              $Revision: 1.78 $
+ *              $Revision: 1.79 $
  *
  ******************************************************************************/
 
@@ -557,7 +557,7 @@ AcpiRsGetListLength (
          */
         BufferSize = AcpiGbl_ResourceStructSizes[ResourceIndex] +
                         ExtraStructBytes;
-        BufferSize = ACPI_ROUND_UP_TO_NATIVE_WORD (BufferSize);
+        BufferSize = (UINT32) ACPI_ROUND_UP_TO_NATIVE_WORD (BufferSize);
 
         *SizeNeeded += BufferSize;
 

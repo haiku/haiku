@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbinstal - ACPI table installation and removal
- *              $Revision: 1.86 $
+ *              $Revision: 1.87 $
  *
  *****************************************************************************/
 
@@ -363,7 +363,7 @@ AcpiTbInitTableDescriptor (
     Status = AcpiUtAllocateOwnerId (&TableDesc->OwnerId);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto ErrorExit1;
     }
 
     /* Install the table into the global data structure */
@@ -383,8 +383,8 @@ AcpiTbInitTableDescriptor (
          */
         if (ListHead->Next)
         {
-            ACPI_FREE (TableDesc);
-            return_ACPI_STATUS (AE_ALREADY_EXISTS);
+            Status = AE_ALREADY_EXISTS;
+            goto ErrorExit2;
         }
 
         TableDesc->Next = ListHead->Next;
@@ -451,6 +451,18 @@ AcpiTbInitTableDescriptor (
     TableInfo->OwnerId = TableDesc->OwnerId;
     TableInfo->InstalledDesc = TableDesc;
     return_ACPI_STATUS (AE_OK);
+
+
+    /* Error exit with cleanup */
+
+ErrorExit2:
+
+    AcpiUtReleaseOwnerId (&TableDesc->OwnerId);
+
+ErrorExit1:
+
+    ACPI_FREE (TableDesc);
+    return_ACPI_STATUS (Status);
 }
 
 
@@ -669,6 +681,10 @@ AcpiTbUninstallTable (
     /* Free the memory allocated for the table itself */
 
     AcpiTbDeleteSingleTable (TableDesc);
+
+    /* Free the owner ID associated with this table */
+
+    AcpiUtReleaseOwnerId (&TableDesc->OwnerId);
 
     /* Free the table descriptor */
 

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsalloc - Namespace allocation and deletion utilities
- *              $Revision: 1.105 $
+ *              $Revision: 1.106 $
  *
  ******************************************************************************/
 
@@ -504,6 +504,8 @@ AcpiNsDeleteNamespaceSubtree (
  *              specific ID.  Used to delete entire ACPI tables.  All
  *              reference counts are updated.
  *
+ * MUTEX:       Locks namespace during deletion walk.
+ *
  ******************************************************************************/
 
 void
@@ -512,14 +514,23 @@ AcpiNsDeleteNamespaceByOwner (
 {
     ACPI_NAMESPACE_NODE     *ChildNode;
     ACPI_NAMESPACE_NODE     *DeletionNode;
-    UINT32                  Level;
     ACPI_NAMESPACE_NODE     *ParentNode;
+    UINT32                  Level;
+    ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE_U32 (NsDeleteNamespaceByOwner, OwnerId);
 
 
     if (OwnerId == 0)
+    {
+        return_VOID;
+    }
+
+    /* Lock namespace for possible update */
+
+    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
+    if (ACPI_FAILURE (Status))
     {
         return_VOID;
     }
@@ -599,6 +610,7 @@ AcpiNsDeleteNamespaceByOwner (
         }
     }
 
+    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
     return_VOID;
 }
 

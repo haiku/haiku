@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsinit - namespace initialization
- *              $Revision: 1.80 $
+ *              $Revision: 1.84 $
  *
  *****************************************************************************/
 
@@ -250,22 +250,38 @@ AcpiNsInitializeDevices (
                 ACPI_UINT32_MAX, FALSE, AcpiNsFindIniMethods, &Info, NULL);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
+        goto ErrorExit;
+    }
+
+    /* Allocate the evaluation information block */
+
+    Info.EvaluateInfo = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
+    if (!Info.EvaluateInfo)
+    {
+        Status = AE_NO_MEMORY;
+        goto ErrorExit;
     }
 
     /* Walk namespace to execute all _INIs on present devices */
 
     Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
                 ACPI_UINT32_MAX, FALSE, AcpiNsInitOneDevice, &Info, NULL);
+
+    ACPI_FREE (Info.EvaluateInfo);
     if (ACPI_FAILURE (Status))
     {
-        ACPI_EXCEPTION ((AE_INFO, Status, "During WalkNamespace"));
+        goto ErrorExit;
     }
 
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
         "\nExecuted %hd _INI methods requiring %hd _STA executions (examined %hd objects)\n",
         Info.Num_INI, Info.Num_STA, Info.DeviceCount));
 
+    return_ACPI_STATUS (Status);
+
+
+ErrorExit:
+    ACPI_EXCEPTION ((AE_INFO, Status, "During device initialization"));
     return_ACPI_STATUS (Status);
 }
 
@@ -516,8 +532,8 @@ AcpiNsInitOneDevice (
     void                    *Context,
     void                    **ReturnValue)
 {
-    ACPI_DEVICE_WALK_INFO   *Info = ACPI_CAST_PTR (ACPI_DEVICE_WALK_INFO, Context);
-    ACPI_PARAMETER_INFO     Pinfo;
+    ACPI_DEVICE_WALK_INFO   *WalkInfo = ACPI_CAST_PTR (ACPI_DEVICE_WALK_INFO, Context);
+    ACPI_EVALUATE_INFO      *Info = WalkInfo->EvaluateInfo;
     UINT32                  Flags;
     ACPI_STATUS             Status;
     ACPI_NAMESPACE_NODE     *DeviceNode;
@@ -582,7 +598,7 @@ AcpiNsInitOneDevice (
      */
     if (Flags != ACPI_UINT32_MAX)
     {
-        Info->Num_STA++;
+        WalkInfo->Num_STA++;
     }
 
     /*
@@ -641,21 +657,17 @@ AcpiNsInitOneDevice (
     ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (
         ACPI_TYPE_METHOD, DeviceNode, METHOD_NAME__INI));
 
-    Pinfo.Node = DeviceNode;
-    Pinfo.Parameters = NULL;
-    Pinfo.ParameterType = ACPI_PARAM_ARGS;
+    Info->PrefixNode = DeviceNode;
+    Info->Pathname = METHOD_NAME__INI;
+    Info->Parameters = NULL;
+    Info->ParameterType = ACPI_PARAM_ARGS;
+    Info->Flags = ACPI_IGNORE_RETURN_VALUE;
 
-    Status = AcpiNsEvaluateRelative (METHOD_NAME__INI, &Pinfo);
+    Status = AcpiNsEvaluate (Info);
     if (ACPI_SUCCESS (Status))
     {
-        /* Delete any return object (especially if ImplicitReturn is enabled) */
+        WalkInfo->Num_INI++;
 
-        if (Pinfo.ReturnObject)
-        {
-            AcpiUtRemoveReference (Pinfo.ReturnObject);
-        }
-
-        Info->Num_INI++;
         if ((AcpiDbgLevel <= ACPI_LV_ALL_EXCEPTIONS) &&
             (!(AcpiDbgLevel & ACPI_LV_INFO)))
         {
@@ -668,7 +680,7 @@ AcpiNsInitOneDevice (
     {
         /* Ignore error and move on to next device */
 
-        char *ScopeName = AcpiNsGetExternalPathname (Pinfo.Node);
+        char *ScopeName = AcpiNsGetExternalPathname (Info->ResolvedNode);
 
         ACPI_EXCEPTION ((AE_INFO, Status, "during %s._INI execution",
             ScopeName));
@@ -676,12 +688,18 @@ AcpiNsInitOneDevice (
     }
 #endif
 
-    /* If an external initialization handler is present, call it */
+    /* Ignore errors from above */
 
+    Status = AE_OK;
+
+    /*
+     * The _INI method has been run if present; call the Global Initialization
+     * Handler for this device.
+     */
     if (AcpiGbl_InitHandler)
     {
-        Status = AcpiGbl_InitHandler (Pinfo.Node, ACPI_INIT_DEVICE_INI);
+        Status = AcpiGbl_InitHandler (DeviceNode, ACPI_INIT_DEVICE_INI);
     }
 
-    return_ACPI_STATUS (AE_OK);
+    return_ACPI_STATUS (Status);
 }

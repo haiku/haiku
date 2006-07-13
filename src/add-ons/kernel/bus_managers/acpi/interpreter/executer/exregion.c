@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exregion - ACPI default OpRegion (address space) handlers
- *              $Revision: 1.97 $
+ *              $Revision: 1.98 $
  *
  *****************************************************************************/
 
@@ -588,16 +588,8 @@ AcpiExDataTableSpaceHandler (
     void                    *HandlerContext,
     void                    *RegionContext)
 {
-    ACPI_STATUS             Status = AE_OK;
-    UINT32                  ByteWidth = ACPI_DIV_8 (BitWidth);
-    UINT32                  i;
-    char                    *LogicalAddrPtr;
-
-
     ACPI_FUNCTION_TRACE (ExDataTableSpaceHandler);
 
-
-    LogicalAddrPtr = ACPI_PHYSADDR_TO_PTR (Address);
 
     /* Perform the memory read or write */
 
@@ -605,10 +597,8 @@ AcpiExDataTableSpaceHandler (
     {
     case ACPI_READ:
 
-        for (i = 0; i < ByteWidth; i++)
-        {
-            ((char *) Value) [i] = LogicalAddrPtr[i];
-        }
+        ACPI_MEMCPY (ACPI_CAST_PTR (char, Value), ACPI_PHYSADDR_TO_PTR (Address),
+            ACPI_DIV_8 (BitWidth));
         break;
 
     case ACPI_WRITE:
@@ -617,7 +607,7 @@ AcpiExDataTableSpaceHandler (
         return_ACPI_STATUS (AE_SUPPORT);
     }
 
-    return_ACPI_STATUS (Status);
+    return_ACPI_STATUS (AE_OK);
 }
 
 

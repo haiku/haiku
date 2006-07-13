@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acdisasm.h - AML disassembler
- *       $Revision: 1.34 $
+ *       $Revision: 1.35 $
  *
  *****************************************************************************/
 
@@ -129,7 +129,11 @@
 typedef struct acpi_external_list
 {
     char                        *Path;
+    char                        *InternalPath;
     struct acpi_external_list   *Next;
+    UINT32                      Value;
+    UINT16                      Length;
+    UINT8                       Type;
 
 } ACPI_EXTERNAL_LIST;
 
@@ -190,6 +194,8 @@ typedef struct acpi_dmtable_data
 typedef struct acpi_op_walk_info
 {
     UINT32                  Level;
+    UINT32                  LastLevel;
+    UINT32                  Count;
     UINT32                  BitOffset;
     UINT32                  Flags;
     ACPI_WALK_STATE         *WalkState;
@@ -641,7 +647,9 @@ AcpiDmVendorSmallDescriptor (
  */
 void
 AcpiDmAddToExternalList (
-    char                    *Path);
+    char                    *Path,
+    UINT8                   Type,
+    UINT32                  Value);
 
 /*
  * dmrestag

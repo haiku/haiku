@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbrsdt - ACPI RSDT table utilities
- *              $Revision: 1.28 $
+ *              $Revision: 1.32 $
  *
  *****************************************************************************/
 
@@ -160,8 +160,7 @@ AcpiTbVerifyRsdp (
          * Obtain access to the RSDP structure
          */
         Status = AcpiOsMapMemory (Address->Pointer.Physical,
-                    sizeof (RSDP_DESCRIPTOR),
-                                    (void *) &Rsdp);
+                    sizeof (RSDP_DESCRIPTOR), ACPI_CAST_PTR (void, &Rsdp));
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -180,11 +179,19 @@ AcpiTbVerifyRsdp (
         goto Cleanup;
     }
 
-    /* The RSDP supplied is OK */
+    /* RSDP is ok. Init the table info */
 
-    TableInfo.Pointer      = ACPI_CAST_PTR (ACPI_TABLE_HEADER, Rsdp);
-    TableInfo.Length       = sizeof (RSDP_DESCRIPTOR);
-    TableInfo.Allocation   = ACPI_MEM_MAPPED;
+    TableInfo.Pointer = ACPI_CAST_PTR (ACPI_TABLE_HEADER, Rsdp);
+    TableInfo.Length = sizeof (RSDP_DESCRIPTOR);
+
+    if (Address->PointerType == ACPI_PHYSICAL_POINTER)
+    {
+        TableInfo.Allocation = ACPI_MEM_MAPPED;
+    }
+    else
+    {
+        TableInfo.Allocation = ACPI_MEM_NOT_ALLOCATED;
+    }
 
     /* Save the table pointers and allocation info */
 
@@ -275,6 +282,17 @@ AcpiTbValidateRsdt (
     ACPI_FUNCTION_ENTRY ();
 
 
+    /* Validate minimum length */
+
+    if (TablePtr->Length < sizeof (ACPI_TABLE_HEADER))
+    {
+        ACPI_ERROR ((AE_INFO,
+            "RSDT/XSDT length (%X) is smaller than minimum (%X)",
+            TablePtr->Length, sizeof (ACPI_TABLE_HEADER)));
+
+        return (AE_INVALID_TABLE_LENGTH);
+    }
+
     /* Search for appropriate signature, RSDT or XSDT */
 
     if (AcpiGbl_RootTableType == ACPI_TABLE_TYPE_RSDT)
@@ -296,9 +314,8 @@ AcpiTbValidateRsdt (
         ACPI_DUMP_BUFFER (AcpiGbl_RSDP, 20);
 
         ACPI_ERROR ((AE_INFO,
-            "RSDT/XSDT signature at %X (%p) is invalid",
-            AcpiGbl_RSDP->RsdtPhysicalAddress,
-            (void *) (ACPI_NATIVE_UINT) AcpiGbl_RSDP->RsdtPhysicalAddress));
+            "RSDT/XSDT signature at %X is invalid",
+            AcpiGbl_RSDP->RsdtPhysicalAddress));
 
         if (AcpiGbl_RootTableType == ACPI_TABLE_TYPE_RSDT)
         {
@@ -309,7 +326,7 @@ AcpiTbValidateRsdt (
             ACPI_ERROR ((AE_INFO, "Looking for XSDT"));
         }
 
-        ACPI_DUMP_BUFFER ((char *) TablePtr, 48);
+        ACPI_DUMP_BUFFER (ACPI_CAST_PTR (char, TablePtr), 48);
         return (AE_BAD_SIGNATURE);
     }
 
@@ -363,7 +380,7 @@ AcpiTbGetTableRsdt (
     Status = AcpiTbValidateRsdt (TableInfo.Pointer);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto ErrorCleanup;
     }
 
     /* Get the number of tables defined in the RSDT or XSDT */
@@ -376,7 +393,7 @@ AcpiTbGetTableRsdt (
     Status = AcpiTbConvertToXsdt (&TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto ErrorCleanup;
     }
 
     /* Save the table pointers and allocation info */
@@ -384,12 +401,21 @@ AcpiTbGetTableRsdt (
     Status = AcpiTbInitTableDescriptor (ACPI_TABLE_ID_XSDT, &TableInfo);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto ErrorCleanup;
     }
 
     AcpiGbl_XSDT = ACPI_CAST_PTR (XSDT_DESCRIPTOR, TableInfo.Pointer);
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "XSDT located at %p\n", AcpiGbl_XSDT));
+    return_ACPI_STATUS (Status);
+
+
+ErrorCleanup:
+
+    /* Free table allocated by AcpiTbGetTable */
+
+    AcpiTbDeleteSingleTable (&TableInfo);
+
     return_ACPI_STATUS (Status);
 }
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: actypes.h - Common data types for the entire ACPI subsystem
- *       $Revision: 1.307 $
+ *       $Revision: 1.308 $
  *
  *****************************************************************************/
 
@@ -324,7 +324,7 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
 
 /*******************************************************************************
  *
- * OS- or compiler-dependent types
+ * OS-dependent and compiler-dependent types
  *
  * If the defaults below are not appropriate for the host system, they can
  * be defined in the compiler-specific or OS-specific header, and this will
@@ -332,27 +332,35 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
  *
  ******************************************************************************/
 
-/* Use C99 uintptr_t for pointer casting if available, "void *" otherwise */
 
-#ifndef ACPI_UINTPTR_T
-#define ACPI_UINTPTR_T                  void *
+/* Value returned by AcpiOsGetThreadId */
+
+#ifndef ACPI_THREAD_ID
+#define ACPI_THREAD_ID                  ACPI_NATIVE_UINT
 #endif
 
-/*
- * If ACPI_CACHE_T was not defined in the OS-dependent header,
- * define it now. This is typically the case where the local cache
- * manager implementation is to be used (ACPI_USE_LOCAL_CACHE)
- */
+/* Object returned from AcpiOsCreateLock */
+
+#ifndef ACPI_SPINLOCK
+#define ACPI_SPINLOCK                   void *
+#endif
+
+/* Flags for AcpiOsAcquireLock/AcpiOsReleaseLock */
+
+#ifndef ACPI_CPU_FLAGS
+#define ACPI_CPU_FLAGS                  ACPI_NATIVE_UINT
+#endif
+
+/* Object returned from AcpiOsCreateCache */
+
 #ifndef ACPI_CACHE_T
 #define ACPI_CACHE_T                    ACPI_MEMORY_LIST
 #endif
 
-/*
- * Allow the CPU flags word to be defined per-OS to simplify the use of the
- * lock and unlock OSL interfaces.
- */
-#ifndef ACPI_CPU_FLAGS
-#define ACPI_CPU_FLAGS                  ACPI_NATIVE_UINT
+/* Use C99 uintptr_t for pointer casting if available, "void *" otherwise */
+
+#ifndef ACPI_UINTPTR_T
+#define ACPI_UINTPTR_T                  void *
 #endif
 
 /*
@@ -381,12 +389,6 @@ typedef ACPI_NATIVE_UINT                ACPI_SIZE;
 #define ACPI_EXPORT_SYMBOL(Symbol)
 #endif
 
-/*
- * ThreadId is returned by AcpiOsGetThreadId.
- */
-#ifndef ACPI_THREAD_ID
-#define ACPI_THREAD_ID                  ACPI_NATIVE_UINT
-#endif
 
 /*******************************************************************************
  *
@@ -474,6 +476,12 @@ typedef struct uint32_struct
     UINT32                          Hi;
 
 } UINT32_STRUCT;
+
+
+/* Synchronization objects */
+
+#define ACPI_MUTEX                      void *
+#define ACPI_SEMAPHORE                  void *
 
 
 /*

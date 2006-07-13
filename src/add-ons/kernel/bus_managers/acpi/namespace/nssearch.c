@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nssearch - Namespace search
- *              $Revision: 1.116 $
+ *              $Revision: 1.118 $
  *
  ******************************************************************************/
 
@@ -135,16 +135,16 @@ AcpiNsSearchParentTree (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsSearchNode
+ * FUNCTION:    AcpiNsSearchOneScope
  *
  * PARAMETERS:  TargetName      - Ascii ACPI name to search for
- *              Node            - Starting node where search will begin
+ *              ParentNode      - Starting node where search will begin
  *              Type            - Object type to match
  *              ReturnNode      - Where the matched Named obj is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Search a single level of the namespace.  Performs a
+ * DESCRIPTION: Search a single level of the namespace. Performs a
  *              simple search of the specified level, and does not add
  *              entries or search parents.
  *
@@ -154,23 +154,28 @@ AcpiNsSearchParentTree (
  *
  *      All namespace searching is linear in this implementation, but
  *      could be easily modified to support any improved search
- *      algorithm.  However, the linear search was chosen for simplicity
+ *      algorithm. However, the linear search was chosen for simplicity
  *      and because the trees are small and the other interpreter
  *      execution overhead is relatively high.
+ *
+ *      Note: CPU execution analysis has shown that the AML interpreter spends
+ *      a very small percentage of its time searching the namespace. Therefore,
+ *      the linear search seems to be sufficient, as there would seem to be
+ *      little value in improving the search.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsSearchNode (
+AcpiNsSearchOneScope (
     UINT32                  TargetName,
-    ACPI_NAMESPACE_NODE     *Node,
+    ACPI_NAMESPACE_NODE     *ParentNode,
     ACPI_OBJECT_TYPE        Type,
     ACPI_NAMESPACE_NODE     **ReturnNode)
 {
-    ACPI_NAMESPACE_NODE     *NextNode;
+    ACPI_NAMESPACE_NODE     *Node;
 
 
-    ACPI_FUNCTION_TRACE (NsSearchNode);
+    ACPI_FUNCTION_TRACE (NsSearchOneScope);
 
 
 #ifdef ACPI_DEBUG_OUTPUT
@@ -178,12 +183,12 @@ AcpiNsSearchNode (
     {
         char                *ScopeName;
 
-        ScopeName = AcpiNsGetExternalPathname (Node);
+        ScopeName = AcpiNsGetExternalPathname (ParentNode);
         if (ScopeName)
         {
             ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
                 "Searching %s (%p) For [%4.4s] (%s)\n",
-                ScopeName, Node, ACPI_CAST_PTR (char, &TargetName),
+                ScopeName, ParentNode, ACPI_CAST_PTR (char, &TargetName),
                 AcpiUtGetTypeName (Type)));
 
             ACPI_FREE (ScopeName);
@@ -195,18 +200,18 @@ AcpiNsSearchNode (
      * Search for name at this namespace level, which is to say that we
      * must search for the name among the children of this object
      */
-    NextNode = Node->Child;
-    while (NextNode)
+    Node = ParentNode->Child;
+    while (Node)
     {
         /* Check for match against the name */
 
-        if (NextNode->Name.Integer == TargetName)
+        if (Node->Name.Integer == TargetName)
         {
             /* Resolve a control method alias if any */
 
-            if (AcpiNsGetType (NextNode) == ACPI_TYPE_LOCAL_METHOD_ALIAS)
+            if (AcpiNsGetType (Node) == ACPI_TYPE_LOCAL_METHOD_ALIAS)
             {
-                NextNode = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, NextNode->Object);
+                Node = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, Node->Object);
             }
 
             /* Found matching entry */
@@ -214,10 +219,10 @@ AcpiNsSearchNode (
             ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
                 "Name [%4.4s] (%s) %p found in scope [%4.4s] %p\n",
                 ACPI_CAST_PTR (char, &TargetName),
-                AcpiUtGetTypeName (NextNode->Type),
-                NextNode, AcpiUtGetNodeName (Node), Node));
+                AcpiUtGetTypeName (Node->Type),
+                Node, AcpiUtGetNodeName (ParentNode), ParentNode));
 
-            *ReturnNode = NextNode;
+            *ReturnNode = Node;
             return_ACPI_STATUS (AE_OK);
         }
 
@@ -225,7 +230,7 @@ AcpiNsSearchNode (
          * The last entry in the list points back to the parent,
          * so a flag is used to indicate the end-of-list
          */
-        if (NextNode->Flags & ANOBJ_END_OF_PEER_LIST)
+        if (Node->Flags & ANOBJ_END_OF_PEER_LIST)
         {
             /* Searched entire list, we are done */
 
@@ -234,7 +239,7 @@ AcpiNsSearchNode (
 
         /* Didn't match name, move on to the next peer object */
 
-        NextNode = NextNode->Peer;
+        Node = Node->Peer;
     }
 
     /* Searched entire namespace level, not found */
@@ -242,7 +247,7 @@ AcpiNsSearchNode (
     ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
         "Name [%4.4s] (%s) not found in search in scope [%4.4s] %p first child %p\n",
         ACPI_CAST_PTR (char, &TargetName), AcpiUtGetTypeName (Type),
-        AcpiUtGetNodeName (Node), Node, Node->Child));
+        AcpiUtGetNodeName (ParentNode), ParentNode, ParentNode->Child));
 
     return_ACPI_STATUS (AE_NOT_FOUND);
 }
@@ -260,14 +265,14 @@ AcpiNsSearchNode (
  * RETURN:      Status
  *
  * DESCRIPTION: Called when a name has not been found in the current namespace
- *              level.  Before adding it or giving up, ACPI scope rules require
+ *              level. Before adding it or giving up, ACPI scope rules require
  *              searching enclosing scopes in cases identified by AcpiNsLocal().
  *
  *              "A name is located by finding the matching name in the current
  *              name space, and then in the parent name space. If the parent
  *              name space does not contain the name, the search continues
  *              recursively until either the name is found or the name space
- *              does not have a parent (the root of the name space).  This
+ *              does not have a parent (the root of the name space). This
  *              indicates that the name is not found" (From ACPI Specification,
  *              section 5.3)
  *
@@ -320,12 +325,12 @@ AcpiNsSearchParentTree (
     while (ParentNode)
     {
         /*
-         * Search parent scope.  Use TYPE_ANY because we don't care about the
+         * Search parent scope. Use TYPE_ANY because we don't care about the
          * object type at this point, we only care about the existence of
-         * the actual name we are searching for.  Typechecking comes later.
+         * the actual name we are searching for. Typechecking comes later.
          */
-        Status = AcpiNsSearchNode (TargetName, ParentNode,
-                                    ACPI_TYPE_ANY, ReturnNode);
+        Status = AcpiNsSearchOneScope (
+                    TargetName, ParentNode, ACPI_TYPE_ANY, ReturnNode);
         if (ACPI_SUCCESS (Status))
         {
             return_ACPI_STATUS (Status);
@@ -358,7 +363,7 @@ AcpiNsSearchParentTree (
  * RETURN:      Status
  *
  * DESCRIPTION: Search for a name segment in a single namespace level,
- *              optionally adding it if it is not found.  If the passed
+ *              optionally adding it if it is not found. If the passed
  *              Type is not Any and the type previously stored in the
  *              entry was Any (i.e. unknown), update the stored type.
  *
@@ -389,7 +394,7 @@ AcpiNsSearchAndEnter (
     if (!Node || !TargetName || !ReturnNode)
     {
         ACPI_ERROR ((AE_INFO,
-            "Null param: Node %p Name %X ReturnNode %p",
+            "Null parameter: Node %p Name %X ReturnNode %p",
             Node, TargetName, ReturnNode));
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
@@ -426,7 +431,7 @@ AcpiNsSearchAndEnter (
     /* Try to find the name in the namespace level specified by the caller */
 
     *ReturnNode = ACPI_ENTRY_NOT_FOUND;
-    Status = AcpiNsSearchNode (TargetName, Node, Type, ReturnNode);
+    Status = AcpiNsSearchOneScope (TargetName, Node, Type, ReturnNode);
     if (Status != AE_NOT_FOUND)
     {
         /*
@@ -445,10 +450,10 @@ AcpiNsSearchAndEnter (
     }
 
     /*
-     * The name was not found.  If we are NOT performing the first pass
+     * The name was not found. If we are NOT performing the first pass
      * (name entry) of loading the namespace, search the parent tree (all the
      * way to the root if necessary.) We don't want to perform the parent
-     * search when the namespace is actually being loaded.  We want to perform
+     * search when the namespace is actually being loaded. We want to perform
      * the search when namespace references are being resolved (load pass 2)
      * and during the execution phase.
      */
@@ -484,6 +489,16 @@ AcpiNsSearchAndEnter (
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
     }
+
+#ifdef ACPI_ASL_COMPILER
+    /*
+     * Node is an object defined by an External() statement
+     */
+    if (Flags & ACPI_NS_EXTERNAL)
+    {
+        NewNode->Flags |= ANOBJ_IS_EXTERNAL;
+    }
+#endif
 
     /* Install the new object into the parent's list of children */
 

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evrgnini- ACPI AddressSpace (OpRegion) init
- *              $Revision: 1.83 $
+ *              $Revision: 1.84 $
  *
  *****************************************************************************/
 
@@ -590,8 +590,8 @@ AcpiEvInitializeRegion (
 
     /* Find any "_REG" method associated with this region definition */
 
-    Status = AcpiNsSearchNode (*RegNamePtr, Node,
-                                ACPI_TYPE_METHOD, &MethodNode);
+    Status = AcpiNsSearchOneScope (
+                *RegNamePtr, Node, ACPI_TYPE_METHOD, &MethodNode);
     if (ACPI_SUCCESS (Status))
     {
         /*

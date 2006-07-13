@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbget - ACPI Table get* routines
- *              $Revision: 1.101 $
+ *              $Revision: 1.103 $
  *
  *****************************************************************************/
 
@@ -422,6 +422,17 @@ AcpiTbGetThisTable (
     ACPI_FUNCTION_TRACE (TbGetThisTable);
 
 
+    /* Validate minimum length */
+
+    if (Header->Length < sizeof (ACPI_TABLE_HEADER))
+    {
+        ACPI_ERROR ((AE_INFO,
+            "Table length (%X) is smaller than minimum (%X)",
+            Header->Length, sizeof (ACPI_TABLE_HEADER)));
+
+        return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
+    }
+
     /*
      * Flags contains the current processor mode (Virtual or Physical
      * addressing) The PointerType is either Logical or Physical
@@ -459,7 +470,7 @@ AcpiTbGetThisTable (
          * into our address space.
          */
         Status = AcpiOsMapMemory (Address->Pointer.Physical,
-                    (ACPI_SIZE) Header->Length, (void *) &FullTable);
+                    (ACPI_SIZE) Header->Length, ACPI_CAST_PTR (void, &FullTable));
         if (ACPI_FAILURE (Status))
         {
             ACPI_ERROR ((AE_INFO,
@@ -522,7 +533,7 @@ AcpiTbGetThisTable (
  *
  * PARAMETERS:  TableType       - one of the defined table types
  *              Instance        - Which table of this type
- *              TablePtrLoc     - pointer to location to place the pointer for
+ *              ReturnTable     - pointer to location to place the pointer for
  *                                return
  *
  * RETURN:      Status
@@ -535,7 +546,7 @@ ACPI_STATUS
 AcpiTbGetTablePtr (
     ACPI_TABLE_TYPE         TableType,
     UINT32                  Instance,
-    ACPI_TABLE_HEADER       **TablePtrLoc)
+    ACPI_TABLE_HEADER       **ReturnTable)
 {
     ACPI_TABLE_DESC         *TableDesc;
     UINT32                  i;
@@ -544,56 +555,31 @@ AcpiTbGetTablePtr (
     ACPI_FUNCTION_TRACE (TbGetTablePtr);
 
 
-    if (!AcpiGbl_DSDT)
-    {
-        return_ACPI_STATUS (AE_NO_ACPI_TABLES);
-    }
-
     if (TableType > ACPI_TABLE_ID_MAX)
     {
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    /*
-     * For all table types (Single/Multiple), the first
-     * instance is always in the list head.
-     */
-    if (Instance == 1)
-    {
-        /* Get the first */
-
-        *TablePtrLoc = NULL;
-        if (AcpiGbl_TableLists[TableType].Next)
-        {
-            *TablePtrLoc = AcpiGbl_TableLists[TableType].Next->Pointer;
-        }
-        return_ACPI_STATUS (AE_OK);
-    }
-
-    /* Check for instance out of range */
+    /* Check for instance out of range of the current table count */
 
     if (Instance > AcpiGbl_TableLists[TableType].Count)
     {
         return_ACPI_STATUS (AE_NOT_EXIST);
     }
 
-    /* Walk the list to get the desired table
-     * Since the if (Instance == 1) check above checked for the
-     * first table, setting TableDesc equal to the .Next member
-     * is actually pointing to the second table.  Therefore, we
-     * need to walk from the 2nd table until we reach the Instance
-     * that the user is looking for and return its table pointer.
+    /*
+     * Walk the list to get the desired table
+     * Note: Instance is one-based
      */
     TableDesc = AcpiGbl_TableLists[TableType].Next;
-    for (i = 2; i < Instance; i++)
+    for (i = 1; i < Instance; i++)
     {
         TableDesc = TableDesc->Next;
     }
 
     /* We are now pointing to the requested table's descriptor */
 
-    *TablePtrLoc = TableDesc->Pointer;
-
+    *ReturnTable = TableDesc->Pointer;
     return_ACPI_STATUS (AE_OK);
 }
 

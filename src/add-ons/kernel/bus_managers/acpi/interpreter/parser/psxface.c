@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psxface - Parser external interfaces
- *              $Revision: 1.88 $
+ *              $Revision: 1.90 $
  *
  *****************************************************************************/
 
@@ -129,19 +129,19 @@
 
 static void
 AcpiPsStartTrace (
-    ACPI_PARAMETER_INFO     *Info);
+    ACPI_EVALUATE_INFO      *Info);
 
 static void
 AcpiPsStopTrace (
-    ACPI_PARAMETER_INFO     *Info);
+    ACPI_EVALUATE_INFO      *Info);
 
 static ACPI_STATUS
 AcpiPsExecutePass (
-    ACPI_PARAMETER_INFO     *Info);
+    ACPI_EVALUATE_INFO      *Info);
 
 static void
 AcpiPsUpdateParameterList (
-    ACPI_PARAMETER_INFO     *Info,
+    ACPI_EVALUATE_INFO      *Info,
     UINT16                  Action);
 
 
@@ -210,7 +210,7 @@ AcpiDebugTrace (
 
 static void
 AcpiPsStartTrace (
-    ACPI_PARAMETER_INFO     *Info)
+    ACPI_EVALUATE_INFO      *Info)
 {
     ACPI_STATUS             Status;
 
@@ -225,7 +225,7 @@ AcpiPsStartTrace (
     }
 
     if ((!AcpiGbl_TraceMethodName) ||
-        (AcpiGbl_TraceMethodName != Info->Node->Name.Integer))
+        (AcpiGbl_TraceMethodName != Info->ResolvedNode->Name.Integer))
     {
         goto Exit;
     }
@@ -265,7 +265,7 @@ Exit:
 
 static void
 AcpiPsStopTrace (
-    ACPI_PARAMETER_INFO     *Info)
+    ACPI_EVALUATE_INFO      *Info)
 {
     ACPI_STATUS             Status;
 
@@ -280,7 +280,7 @@ AcpiPsStopTrace (
     }
 
     if ((!AcpiGbl_TraceMethodName) ||
-        (AcpiGbl_TraceMethodName != Info->Node->Name.Integer))
+        (AcpiGbl_TraceMethodName != Info->ResolvedNode->Name.Integer))
     {
         goto Exit;
     }
@@ -327,7 +327,7 @@ Exit:
 
 ACPI_STATUS
 AcpiPsExecuteMethod (
-    ACPI_PARAMETER_INFO     *Info)
+    ACPI_EVALUATE_INFO      *Info)
 {
     ACPI_STATUS             Status;
 
@@ -337,14 +337,14 @@ AcpiPsExecuteMethod (
 
     /* Validate the Info and method Node */
 
-    if (!Info || !Info->Node)
+    if (!Info || !Info->ResolvedNode)
     {
         return_ACPI_STATUS (AE_NULL_ENTRY);
     }
 
     /* Init for new method, wait on concurrency semaphore */
 
-    Status = AcpiDsBeginMethodExecution (Info->Node, Info->ObjDesc, NULL);
+    Status = AcpiDsBeginMethodExecution (Info->ResolvedNode, Info->ObjDesc, NULL);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -366,7 +366,7 @@ AcpiPsExecuteMethod (
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
         "**** Begin Method Parse **** Entry=%p obj=%p\n",
-        Info->Node, Info->ObjDesc));
+        Info->ResolvedNode, Info->ObjDesc));
 
     Info->PassNumber = 1;
     Status = AcpiPsExecutePass (Info);
@@ -380,7 +380,7 @@ AcpiPsExecuteMethod (
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
         "**** Begin Method Execution **** Entry=%p obj=%p\n",
-        Info->Node, Info->ObjDesc));
+        Info->ResolvedNode, Info->ObjDesc));
 
     Info->PassNumber = 3;
     Status = AcpiPsExecutePass (Info);
@@ -423,7 +423,7 @@ Cleanup:
  *
  * FUNCTION:    AcpiPsUpdateParameterList
  *
- * PARAMETERS:  Info            - See ACPI_PARAMETER_INFO
+ * PARAMETERS:  Info            - See ACPI_EVALUATE_INFO
  *                                (Used: ParameterType and Parameters)
  *              Action          - Add or Remove reference
  *
@@ -435,7 +435,7 @@ Cleanup:
 
 static void
 AcpiPsUpdateParameterList (
-    ACPI_PARAMETER_INFO     *Info,
+    ACPI_EVALUATE_INFO      *Info,
     UINT16                  Action)
 {
     ACPI_NATIVE_UINT        i;
@@ -460,7 +460,7 @@ AcpiPsUpdateParameterList (
  *
  * FUNCTION:    AcpiPsExecutePass
  *
- * PARAMETERS:  Info            - See ACPI_PARAMETER_INFO
+ * PARAMETERS:  Info            - See ACPI_EVALUATE_INFO
  *                                (Used: PassNumber, Node, and ObjDesc)
  *
  * RETURN:      Status
@@ -471,7 +471,7 @@ AcpiPsUpdateParameterList (
 
 static ACPI_STATUS
 AcpiPsExecutePass (
-    ACPI_PARAMETER_INFO     *Info)
+    ACPI_EVALUATE_INFO      *Info)
 {
     ACPI_STATUS             Status;
     ACPI_PARSE_OBJECT       *Op;
@@ -499,7 +499,7 @@ AcpiPsExecutePass (
         goto Cleanup;
     }
 
-    Status = AcpiDsInitAmlWalk (WalkState, Op, Info->Node,
+    Status = AcpiDsInitAmlWalk (WalkState, Op, Info->ResolvedNode,
                     Info->ObjDesc->Method.AmlStart,
                     Info->ObjDesc->Method.AmlLength,
                     Info->PassNumber == 1 ? NULL : Info,

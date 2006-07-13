@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exconfig - Namespace reconfiguration (Load/Unload opcodes)
- *              $Revision: 1.94 $
+ *              $Revision: 1.99 $
  *
  *****************************************************************************/
 
@@ -307,8 +307,8 @@ AcpiExLoadTableOp (
          * Find the node referenced by the RootPathString.  This is the
          * location within the namespace where the table will be loaded.
          */
-        Status = AcpiNsGetNodeByPath (Operand[3]->String.Pointer, StartNode,
-                                        ACPI_NS_SEARCH_PARENT, &ParentNode);
+        Status = AcpiNsGetNode (StartNode, Operand[3]->String.Pointer,
+                    ACPI_NS_SEARCH_PARENT, &ParentNode);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -331,7 +331,7 @@ AcpiExLoadTableOp (
 
         /* Find the node referenced by the ParameterPathString */
 
-        Status = AcpiNsGetNodeByPath (Operand[4]->String.Pointer, StartNode,
+        Status = AcpiNsGetNode (StartNode, Operand[4]->String.Pointer,
                     ACPI_NS_SEARCH_PARENT, &ParameterNode);
         if (ACPI_FAILURE (Status))
         {
@@ -362,6 +362,10 @@ AcpiExLoadTableOp (
             return_ACPI_STATUS (Status);
         }
     }
+
+    ACPI_INFO ((AE_INFO,
+        "Dynamic OEM Table Load - [%4.4s] OemId [%6.6s] OemTableId [%8.8s]",
+        Table->Signature, Table->OemId, Table->OemTableId));
 
     *ReturnDesc = DdbHandle;
     return_ACPI_STATUS  (Status);
@@ -395,6 +399,7 @@ AcpiExLoadOp (
     ACPI_TABLE_HEADER       *TablePtr = NULL;
     ACPI_PHYSICAL_ADDRESS   Address;
     ACPI_TABLE_HEADER       TableHeader;
+    ACPI_INTEGER            Temp;
     UINT32                  i;
 
     ACPI_FUNCTION_TRACE (ExLoadOp);
@@ -426,18 +431,21 @@ AcpiExLoadOp (
 
         Address = ObjDesc->Region.Address;
 
-        /* Get the table length from the table header */
+        /* Get part of the table header to get the table length */
 
         TableHeader.Length = 0;
         for (i = 0; i < 8; i++)
         {
             Status = AcpiEvAddressSpaceDispatch (ObjDesc, ACPI_READ,
-                                (ACPI_PHYSICAL_ADDRESS) (i + Address), 8,
-                                ((UINT8 *) &TableHeader) + i);
+                        (ACPI_PHYSICAL_ADDRESS) (i + Address), 8, &Temp);
             if (ACPI_FAILURE (Status))
             {
                 return_ACPI_STATUS (Status);
             }
+
+            /* Get the one valid byte of the returned 64-bit value */
+
+            ACPI_CAST_PTR (UINT8, &TableHeader)[i] = (UINT8) Temp;
         }
 
         /* Sanity check the table length */
@@ -460,12 +468,15 @@ AcpiExLoadOp (
         for (i = 0; i < TableHeader.Length; i++)
         {
             Status = AcpiEvAddressSpaceDispatch (ObjDesc, ACPI_READ,
-                                (ACPI_PHYSICAL_ADDRESS) (i + Address), 8,
-                                ((UINT8 *) TablePtr + i));
+                        (ACPI_PHYSICAL_ADDRESS) (i + Address), 8, &Temp);
             if (ACPI_FAILURE (Status))
             {
                 goto Cleanup;
             }
+
+            /* Get the one valid byte of the returned 64-bit value */
+
+            ACPI_CAST_PTR (UINT8, TablePtr)[i] = (UINT8) Temp;
         }
         break;
 
@@ -544,6 +555,10 @@ AcpiExLoadOp (
         return_ACPI_STATUS (Status);
     }
 
+    ACPI_INFO ((AE_INFO,
+        "Dynamic SSDT Load - OemId [%6.6s] OemTableId [%8.8s]",
+        TablePtr->OemId, TablePtr->OemTableId));
+
 Cleanup:
     if (ACPI_FAILURE (Status))
     {
@@ -599,7 +614,6 @@ AcpiExUnloadTable (
      * (Offset contains the TableId)
      */
     AcpiNsDeleteNamespaceByOwner (TableInfo->OwnerId);
-    AcpiUtReleaseOwnerId (&TableInfo->OwnerId);
 
     /* Delete the table itself */
 

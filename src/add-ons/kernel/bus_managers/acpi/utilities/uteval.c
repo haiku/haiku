@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: uteval - Object evaluation
- *              $Revision: 1.69 $
+ *              $Revision: 1.70 $
  *
  *****************************************************************************/
 
@@ -273,7 +273,7 @@ AcpiUtEvaluateObject (
     UINT32                  ExpectedReturnBtypes,
     ACPI_OPERAND_OBJECT     **ReturnDesc)
 {
-    ACPI_PARAMETER_INFO     Info;
+    ACPI_EVALUATE_INFO      *Info;
     ACPI_STATUS             Status;
     UINT32                  ReturnBtype;
 
@@ -281,13 +281,21 @@ AcpiUtEvaluateObject (
     ACPI_FUNCTION_TRACE (UtEvaluateObject);
 
 
-    Info.Node = PrefixNode;
-    Info.Parameters = NULL;
-    Info.ParameterType = ACPI_PARAM_ARGS;
+    /* Allocate the evaluation information block */
+
+    Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
+    if (!Info)
+    {
+        return_ACPI_STATUS (AE_NO_MEMORY);
+    }
+
+    Info->PrefixNode = PrefixNode;
+    Info->Pathname = Path;
+    Info->ParameterType = ACPI_PARAM_ARGS;
 
     /* Evaluate the object/method */
 
-    Status = AcpiNsEvaluateRelative (Path, &Info);
+    Status = AcpiNsEvaluate (Info);
     if (ACPI_FAILURE (Status))
     {
         if (Status == AE_NOT_FOUND)
@@ -301,27 +309,27 @@ AcpiUtEvaluateObject (
                 PrefixNode, Path, Status);
         }
 
-        return_ACPI_STATUS (Status);
+        goto Cleanup;
     }
 
     /* Did we get a return object? */
 
-    if (!Info.ReturnObject)
+    if (!Info->ReturnObject)
     {
         if (ExpectedReturnBtypes)
         {
             ACPI_ERROR_METHOD ("No object was returned from",
                 PrefixNode, Path, AE_NOT_EXIST);
 
-            return_ACPI_STATUS (AE_NOT_EXIST);
+            Status = AE_NOT_EXIST;
         }
 
-        return_ACPI_STATUS (AE_OK);
+        goto Cleanup;
     }
 
     /* Map the return object type to the bitmapped type */
 
-    switch (ACPI_GET_OBJECT_TYPE (Info.ReturnObject))
+    switch (ACPI_GET_OBJECT_TYPE (Info->ReturnObject))
     {
     case ACPI_TYPE_INTEGER:
         ReturnBtype = ACPI_BTYPE_INTEGER;
@@ -352,8 +360,8 @@ AcpiUtEvaluateObject (
          * happen frequently if the "implicit return" feature is enabled.
          * Just delete the return object and return AE_OK.
          */
-        AcpiUtRemoveReference (Info.ReturnObject);
-        return_ACPI_STATUS (AE_OK);
+        AcpiUtRemoveReference (Info->ReturnObject);
+        goto Cleanup;
     }
 
     /* Is the return object one of the expected types? */
@@ -365,19 +373,23 @@ AcpiUtEvaluateObject (
 
         ACPI_ERROR ((AE_INFO,
             "Type returned from %s was incorrect: %s, expected Btypes: %X",
-            Path, AcpiUtGetObjectTypeName (Info.ReturnObject),
+            Path, AcpiUtGetObjectTypeName (Info->ReturnObject),
             ExpectedReturnBtypes));
 
         /* On error exit, we must delete the return object */
 
-        AcpiUtRemoveReference (Info.ReturnObject);
-        return_ACPI_STATUS (AE_TYPE);
+        AcpiUtRemoveReference (Info->ReturnObject);
+        Status = AE_TYPE;
+        goto Cleanup;
     }
 
     /* Object type is OK, return it */
 
-    *ReturnDesc = Info.ReturnObject;
-    return_ACPI_STATUS (AE_OK);
+    *ReturnDesc = Info->ReturnObject;
+
+Cleanup:
+    ACPI_FREE (Info);
+    return_ACPI_STATUS (Status);
 }
 
 

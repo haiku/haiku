@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utinit - Common ACPI subsystem initialization
- *              $Revision: 1.129 $
+ *              $Revision: 1.131 $
  *
  *****************************************************************************/
 
@@ -334,6 +334,7 @@ AcpiUtSubsystemShutdown (
     /* Subsystem appears active, go ahead and shut it down */
 
     AcpiGbl_Shutdown = TRUE;
+    AcpiGbl_StartupFlags = 0;
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
         "Shutting down ACPI Subsystem\n"));
 
@@ -352,13 +353,6 @@ AcpiUtSubsystemShutdown (
     /* Purge the local caches */
 
     (void) AcpiUtDeleteCaches ();
-
-    /* Debug only - display leftover memory allocation, if any */
-
-#ifdef ACPI_DBG_TRACK_ALLOCATIONS
-    AcpiUtDumpAllocations (ACPI_UINT32_MAX, NULL);
-#endif
-
     return_VOID;
 }
 

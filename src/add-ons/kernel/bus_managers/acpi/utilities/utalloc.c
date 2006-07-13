@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utalloc - local memory allocation routines
- *              $Revision: 1.161 $
+ *              $Revision: 1.162 $
  *
  *****************************************************************************/
 
@@ -141,25 +141,6 @@ AcpiUtCreateCaches (
     ACPI_STATUS             Status;
 
 
-#ifdef ACPI_DBG_TRACK_ALLOCATIONS
-
-    /* Memory allocation lists */
-
-    Status = AcpiUtCreateList ("Acpi-Global", 0,
-                &AcpiGbl_GlobalList);
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
-
-    Status = AcpiUtCreateList ("Acpi-Namespace", sizeof (ACPI_NAMESPACE_NODE),
-                &AcpiGbl_NsNodeList);
-    if (ACPI_FAILURE (Status))
-    {
-        return (Status);
-    }
-#endif
-
     /* Object Caches, for frequently used objects */
 
     Status = AcpiOsCreateCache ("Acpi-Namespace", sizeof (ACPI_NAMESPACE_NODE),
@@ -197,6 +178,26 @@ AcpiUtCreateCaches (
         return (Status);
     }
 
+
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+
+    /* Memory allocation lists */
+
+    Status = AcpiUtCreateList ("Acpi-Global", 0,
+                &AcpiGbl_GlobalList);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    Status = AcpiUtCreateList ("Acpi-Namespace", sizeof (ACPI_NAMESPACE_NODE),
+                &AcpiGbl_NsNodeList);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+#endif
+
     return (AE_OK);
 }
 
@@ -232,6 +233,22 @@ AcpiUtDeleteCaches (
 
     (void) AcpiOsDeleteCache (AcpiGbl_PsNodeExtCache);
     AcpiGbl_PsNodeExtCache = NULL;
+
+
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+
+    /* Debug only - display leftover memory allocation, if any */
+
+    AcpiUtDumpAllocations (ACPI_UINT32_MAX, NULL);
+
+    /* Free memory lists */
+
+    AcpiOsFree (AcpiGbl_GlobalList);
+    AcpiGbl_GlobalList = NULL;
+
+    AcpiOsFree (AcpiGbl_NsNodeList);
+    AcpiGbl_NsNodeList = NULL;
+#endif
 
     return (AE_OK);
 }

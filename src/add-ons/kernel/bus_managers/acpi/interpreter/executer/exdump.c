@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exdump - Interpreter debug output routines
- *              $Revision: 1.198 $
+ *              $Revision: 1.199 $
  *
  *****************************************************************************/
 
@@ -214,15 +214,15 @@ static ACPI_EXDUMP_INFO     AcpiExDumpDevice[4] =
 static ACPI_EXDUMP_INFO     AcpiExDumpEvent[2] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpEvent),          NULL},
-    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Event.Semaphore),             "Semaphore"}
+    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Event.OsSemaphore),            "OsSemaphore"}
 };
 
 static ACPI_EXDUMP_INFO     AcpiExDumpMethod[8] =
 {
     {ACPI_EXD_INIT,     ACPI_EXD_TABLE_SIZE (AcpiExDumpMethod),         NULL},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.ParamCount),            "ParamCount"},
-    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.Concurrency),           "Concurrency"},
-    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Method.Semaphore),             "Semaphore"},
+    {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.SyncLevel),             "Sync Level"},
+    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Method.Mutex),                 "Mutex"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.OwnerId),               "Owner Id"},
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Method.ThreadCount),           "Thread Count"},
     {ACPI_EXD_UINT32,   ACPI_EXD_OFFSET (Method.AmlLength),             "Aml Length"},
@@ -235,7 +235,7 @@ static ACPI_EXDUMP_INFO     AcpiExDumpMutex[5] =
     {ACPI_EXD_UINT8,    ACPI_EXD_OFFSET (Mutex.SyncLevel),              "Sync Level"},
     {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Mutex.OwnerThread),            "Owner Thread"},
     {ACPI_EXD_UINT16,   ACPI_EXD_OFFSET (Mutex.AcquisitionDepth),       "Acquire Depth"},
-    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Mutex.Semaphore),              "Semaphore"}
+    {ACPI_EXD_POINTER,  ACPI_EXD_OFFSET (Mutex.OsMutex),                "OsMutex"}
 };
 
 static ACPI_EXDUMP_INFO     AcpiExDumpRegion[7] =

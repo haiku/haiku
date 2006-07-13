@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: amlresrc.h - AML resource descriptors
- *              $Revision: 1.37 $
+ *              $Revision: 1.39 $
  *
  *****************************************************************************/
 
@@ -121,8 +121,6 @@
 #define __AMLRESRC_H
 
 
-/*! [Begin] no source code translation */
-
 /*
  * Resource descriptor tags, as defined in the ACPI specification.
  * Used to symbolically reference fields within a descriptor.
@@ -157,7 +155,6 @@
 #define ACPI_RESTAG_TRANSTYPE                   "_TRS"  /* Sparse(1), Dense(0) */
 #define ACPI_RESTAG_TYPE                        "_TTP"  /* Translation(1), Static (0) */
 #define ACPI_RESTAG_XFERTYPE                    "_SIZ"  /* 8(0), 8And16(1), 16(2) */
-/*! [End] no source code translation !*/
 
 
 /* Default sizes for "small" resource descriptors */
@@ -479,9 +476,9 @@ typedef union aml_resource
     /* Utility overlays */
 
     AML_RESOURCE_ADDRESS                    Address;
-    UINT32                                  U32Item;
-    UINT16                                  U16Item;
-    UINT8                                   U8Item;
+    UINT32                                  DwordItem;
+    UINT16                                  WordItem;
+    UINT8                                   ByteItem;
 
 } AML_RESOURCE;
 

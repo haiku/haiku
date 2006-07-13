@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exutils - interpreter/scanner utilities
- *              $Revision: 1.122 $
+ *              $Revision: 1.123 $
  *
  *****************************************************************************/
 
@@ -172,7 +172,7 @@ AcpiExEnterInterpreter (
     ACPI_FUNCTION_TRACE (ExEnterInterpreter);
 
 
-    Status = AcpiUtAcquireMutex (ACPI_MTX_EXECUTE);
+    Status = AcpiUtAcquireMutex (ACPI_MTX_INTERPRETER);
     if (ACPI_FAILURE (Status))
     {
         ACPI_ERROR ((AE_INFO, "Could not acquire interpreter mutex"));
@@ -214,7 +214,7 @@ AcpiExExitInterpreter (
     ACPI_FUNCTION_TRACE (ExExitInterpreter);
 
 
-    Status = AcpiUtReleaseMutex (ACPI_MTX_EXECUTE);
+    Status = AcpiUtReleaseMutex (ACPI_MTX_INTERPRETER);
     if (ACPI_FAILURE (Status))
     {
         ACPI_ERROR ((AE_INFO, "Could not release interpreter mutex"));
