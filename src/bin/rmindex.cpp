@@ -143,7 +143,7 @@ remove_indices(dev_t device, const char* indexPattern, bool verbose)
 	memset(&glob, 0, sizeof(glob_t));
 
 	glob.gl_closedir = (void (*)(void *))fs_close_index_dir;
-	glob.gl_readdir = fs_read_index_dir;
+	glob.gl_readdir = (dirent *(*)(void *))fs_read_index_dir;
 	glob.gl_opendir = open_index_dir;
 	glob.gl_lstat = stat_index;
 	glob.gl_stat = stat_index;

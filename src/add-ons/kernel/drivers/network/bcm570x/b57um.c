@@ -251,14 +251,14 @@ static struct pci_device_id bcm5700_pci_tbl[] = {
 
 /* -------- BeOS Driver Hooks ------------ */
 
-status_t b57_open(const char *name, uint32 flags, void **cookie);
-status_t b57_close(void *cookie);
-status_t b57_free(void *cookie);
-status_t b57_ioctl(void *cookie,uint32 op,void *data,size_t len);
-status_t b57_read(void *cookie,off_t pos,void *data,size_t *numBytes);
-status_t b57_write(void *cookie,off_t pos,const void *data,size_t *numBytes);
-int32	 b57_interrupt(void *cookie);
-int32 tx_cleanup_thread(void *us);
+static status_t b57_open(const char *name, uint32 flags, void **cookie);
+static status_t b57_close(void *cookie);
+static status_t b57_free(void *cookie);
+static status_t b57_ioctl(void *cookie,uint32 op,void *data,size_t len);
+static status_t b57_read(void *cookie,off_t pos,void *data,size_t *numBytes);
+static status_t b57_write(void *cookie,off_t pos,const void *data,size_t *numBytes);
+static int32 b57_interrupt(void *cookie);
+static int32 tx_cleanup_thread(void *us);
 
 device_hooks b57_hooks = {b57_open,b57_close,b57_free,b57_ioctl,b57_read,b57_write,NULL,NULL,NULL,NULL};
 

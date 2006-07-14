@@ -255,7 +255,7 @@ List::Last() const {
 
 /*! \brief Creates an unitialized session object
 */
-session::session(uint32 index, session *next = NULL)
+session::session(uint32 index, session *next)
 	: list_item(index, next)
 	, first_track_hint(-1)
 	, last_track_hint(-1)

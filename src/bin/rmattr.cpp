@@ -63,7 +63,7 @@ remove_attribute(int fd, const char* attribute, bool isPattern)
 	memset(&glob, 0, sizeof(glob_t));
 
 	glob.gl_closedir = (void (*)(void *))fs_close_attr_dir;
-	glob.gl_readdir = fs_read_attr_dir;
+	glob.gl_readdir = (dirent* (*)(void*))fs_read_attr_dir;
 	glob.gl_opendir = open_attr_dir;
 	glob.gl_lstat = stat_attr;
 	glob.gl_stat = stat_attr;

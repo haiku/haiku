@@ -11,6 +11,8 @@
 #include "accelerant.h"
 #include "utility.h"
 
+#include <string.h>
+#include <math.h>
 
 #define TRACE_MODE
 #ifdef TRACE_MODE
