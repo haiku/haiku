@@ -493,6 +493,10 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 void 
 BMenuBar::StealFocus()
 {
+	// We already stole the focus, don't do anything
+	if (fPrevFocusToken != -1)
+		return;
+
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BView *focus = window->CurrentFocus();
@@ -514,12 +518,12 @@ BMenuBar::RestoreFocus()
 			&& gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN, (void **)&handler) == B_OK) {
 			BView *view = dynamic_cast<BView *>(handler);
 			if (view != NULL && view->Window() == window)
-				view->MakeFocus();
-			fPrevFocusToken = -1;
+				view->MakeFocus();		
 		
 		} else if (IsFocus())
 			MakeFocus(false);
-
+		
+		fPrevFocusToken = -1;
 		window->Unlock();
 	}
 }
