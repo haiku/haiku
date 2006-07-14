@@ -47,7 +47,7 @@ ExpressionTextView::~ExpressionTextView()
 
 
 void
-ExpressionTextView::MakeFocus(bool focused = true)
+ExpressionTextView::MakeFocus(bool focused)
 {
 	if (focused == IsFocus()) {
 		// stop endless loop when CalcView calls us again
