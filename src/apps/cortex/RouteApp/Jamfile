@@ -10,6 +10,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) Persistence Wrappers ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) TipManager ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) TransportView ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) expat xmlparse ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 

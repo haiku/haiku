@@ -31,7 +31,7 @@ public:													// *** ctor/dtor
 	// constructs a format-guessing Importer (uses the
 	// DocumentType registry)
 	Importer(
-		list<BString>&							errors);
+		std::list<BString>&						errors);
 	
 	// the Importer takes ownership of the given context!
 	Importer(
@@ -40,7 +40,7 @@ public:													// *** ctor/dtor
 	// constructs a manual Importer; the given root
 	// object is populated
 	Importer(
-		list<BString>&							errors,
+		std::list<BString>&						errors,
 		IPersistent*								rootObject,
 		XML::DocumentType*					docType);
 

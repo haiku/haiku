@@ -71,9 +71,9 @@ class NodeManager :
 	// primary parent class:
 	typedef	ObservableLooper _inherited;
 	
-	friend NodeGroup;
-	friend NodeRef;
-	friend Connection;
+	friend class NodeGroup;
+	friend class NodeRef;
+	friend class Connection;
 
 public:				// *** messages
 	// [13aug99]
@@ -521,17 +521,17 @@ private:				// *** internal messages
 	
 private:				// *** members
 	// the main NodeRef store
-	typedef map<media_node_id, NodeRef*> node_ref_map;
+	typedef std::map<media_node_id, NodeRef*> node_ref_map;
 	node_ref_map					m_nodeRefMap;
 	
 	// the Connection stores (connections are indexed by both
 	// source and destination node ID)
-	typedef multimap<media_node_id, Connection*> con_map;
+	typedef std::multimap<media_node_id, Connection*> con_map;
 	con_map								m_conSourceMap;
 	con_map								m_conDestinationMap;
 	
 	// the NodeGroup store
-	typedef vector<NodeGroup*> node_group_set;
+	typedef std::vector<NodeGroup*> node_group_set;
 	node_group_set				m_nodeGroupSet;
 	
 	// common system nodes

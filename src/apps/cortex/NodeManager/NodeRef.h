@@ -44,8 +44,8 @@ class NodeRef :
 
 	typedef	ObservableHandler _inherited;
 
-	friend NodeManager;
-	friend NodeGroup;
+	friend class NodeManager;
+	friend class NodeGroup;
 
 public:				// *** messages
 	enum message_t {
@@ -212,11 +212,11 @@ public:				// *** connection access
 	// connection access: vector versions
 	
 	status_t getInputConnections(
-		vector<Connection>&		ioConnections,
+		std::vector<Connection>&	ioConnections,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 
 	status_t getOutputConnections(
-		vector<Connection>&		ioConnections,
+		std::vector<Connection>&	ioConnections,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 	
 	// connection access: flat array versions
@@ -326,19 +326,19 @@ public:				// *** BMediaRoster wrappers & convenience methods
 	// calls.)
 	
 	status_t getFreeInputs(
-		vector<media_input>&		ioInputs,
+		std::vector<media_input>&	ioInputs,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 
 	status_t getConnectedInputs(
-		vector<media_input>&		ioInputs,
+		std::vector<media_input>&	ioInputs,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 
 	status_t getFreeOutputs(
-		vector<media_output>&	ioOutputs,
+		std::vector<media_output>&	ioOutputs,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 
 	status_t getConnectedOutputs(
-		vector<media_output>&	ioOutputs,
+		std::vector<media_output>&	ioOutputs,
 		media_type									filterType=B_MEDIA_UNKNOWN_TYPE) const;
 		
 		
@@ -408,13 +408,13 @@ protected:			// *** endpoint-fixing operations (no lock required)
 		media_input*									inputs,
 		int32													count) const;
 	void _fixInputs(
-		vector<media_input>&			inputs) const;
+		std::vector<media_input>&		inputs) const;
 
 	void _fixOutputs(
 		media_output*									outputs,
 		int32													count) const;
 	void _fixOutputs(
-		vector<media_output>&		outputs) const;
+		std::vector<media_output>&		outputs) const;
 
 protected:			// *** internal/NodeManager operations (LOCK REQUIRED)
 
@@ -608,7 +608,7 @@ private:										// *** members
 	bigtime_t									m_positionUpdatePeriod;
 	static const bigtime_t		s_defaultPositionUpdatePeriod			= 50000LL;
 	
-	MultiInvoker							m_positionInvoker;
+	::MultiInvoker							m_positionInvoker;
 	
 	bigtime_t									m_tpLastPositionUpdate;
 	bigtime_t									m_lastPosition;

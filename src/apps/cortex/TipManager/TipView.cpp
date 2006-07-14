@@ -7,6 +7,8 @@
 #include <cmath>
 #include <cstring>
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

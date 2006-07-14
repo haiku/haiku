@@ -31,6 +31,8 @@
 extern "C" void SetNewLeakChecking(bool);
 extern "C" void SetMallocLeakChecking(bool);
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 const char* const		RouteApp::s_settingsDirectory = "Cortex";

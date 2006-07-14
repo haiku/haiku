@@ -10,6 +10,8 @@
 #include "array_delete.h"
 #include "set_tools.h"
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

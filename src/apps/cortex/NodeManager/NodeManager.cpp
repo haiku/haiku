@@ -21,6 +21,8 @@
 
 #include "node_manager_impl.h"
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 #define D_METHOD(x) //PRINT (x)

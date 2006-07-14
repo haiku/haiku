@@ -67,8 +67,8 @@ public:														// *** operations
 private:													// implementation
 
 	// the node/key set
-	typedef pair<BString,media_node_id> node_entry;
-	typedef vector<node_entry>			node_set;
+	typedef std::pair<BString,media_node_id> node_entry;
+	typedef std::vector<node_entry>		node_set;
 	node_set												m_nodes;
 	
 	// next node key value

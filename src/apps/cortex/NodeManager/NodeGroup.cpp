@@ -18,6 +18,8 @@
 #include "node_manager_impl.h"
 #include "functional_tools.h"
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_ROSTER(x) //PRINT (x)

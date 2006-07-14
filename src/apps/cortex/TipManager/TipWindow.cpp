@@ -13,7 +13,7 @@ __USE_CORTEX_NAMESPACE
 
 TipWindow::~TipWindow() {}
 TipWindow::TipWindow(
-	const char*							text=0) :
+	const char*							text) :
 	BWindow(
 		BRect(0,0,0,0),
 		"TipWindow",

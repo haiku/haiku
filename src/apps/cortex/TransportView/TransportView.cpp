@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <functional>
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

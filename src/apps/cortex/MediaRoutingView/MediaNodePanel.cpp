@@ -32,6 +32,8 @@
 #include <MediaDefs.h>
 #include <MediaRoster.h>
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 #include <Debug.h>

@@ -326,7 +326,7 @@ StatusView::drawInto(BView *v, BRect updateRect)
 void StatusView::setMessage(
 	BString &title,
 	BString &details,
-	status_t error = B_OK) {
+	status_t error) {
 	D_OPERATION(("StatusView::setMessage(%s)\n", title.String()));
 
 	// get the tip manager instance and reset

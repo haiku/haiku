@@ -104,8 +104,8 @@ class NodeGroup :
 
 	typedef	ObservableHandler _inherited;
 
-	friend NodeManager;
-	friend NodeRef;
+	friend class NodeManager;
+	friend class NodeRef;
 	
 public:				// *** messages
 	enum message_t {
@@ -542,7 +542,7 @@ private:				// *** members
 	BString									m_name;
 	
 	// group contents
-	typedef vector<NodeRef*> node_set;
+	typedef std::vector<NodeRef*> node_set;
 	node_set								m_nodes;
 	
 	// flags & state

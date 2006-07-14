@@ -8,6 +8,8 @@
 
 #include <strstream>
 
+using namespace std;
+
 string point_to_string(const BPoint& p) {
 	strstream out;
 	out << '(' << p.x << ',' << p.y << ')';

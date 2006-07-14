@@ -40,8 +40,8 @@ class NodeRef;
 class Connection {
 
 	// rather incestuous set of classes we've got here...
-	friend NodeRef;
-	friend NodeManager;
+	friend class NodeRef;
+	friend class NodeManager;
 
 public:					// *** types & constants
 	enum flag_t {

@@ -13,6 +13,8 @@
 #include <functional>
 #include <cstdio>
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

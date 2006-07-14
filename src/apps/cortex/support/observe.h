@@ -9,6 +9,7 @@
 #define __Observe_H__
 
 #include <Messenger.h>
+#include <Debug.h>
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
@@ -159,7 +160,7 @@ public:										// interface
 			_observer_messenger,
 			_target_messenger,
 			reply,
-			timeout);
+			_timeout);
 		if(err < B_OK) {
 			PRINT((
 				"! observer_handle<>::release(): remove_observer() failed:\n"

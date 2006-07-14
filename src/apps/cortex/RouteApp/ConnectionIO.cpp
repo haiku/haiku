@@ -11,6 +11,8 @@
 #include <vector>
 #include <Debug.h>
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

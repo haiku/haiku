@@ -344,7 +344,7 @@ protected:											// impl. members
 
 	// the set of visible segments and other child views,
 	// in left-to-right. top-to-bottom order
-	typedef vector<ValCtrlLayoutEntry>		layout_set;
+	typedef std::vector<ValCtrlLayoutEntry>		layout_set;
 	layout_set										m_layoutSet;
 
 	// true if value has been changed since last request

@@ -35,6 +35,8 @@
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
 
+class Importer;
+
 // -------------------------------------------------------- //
 // class XML
 // -------------------------------------------------------- //
@@ -65,7 +67,7 @@ public:													// *** import/export operations
 	static status_t Identify(
 		BDataIO*										stream,
 		DocumentType**							outType,
-		list<BString>*							outErrors);
+		std::list<BString>*						outErrors);
 
 	// create & populate the root object from the given
 	// XML stream.
@@ -78,7 +80,7 @@ public:													// *** import/export operations
 	static status_t Read(
 		BDataIO*										stream,
 		IPersistent**								outObject,
-		list<BString>*							outErrors);
+		std::list<BString>*						outErrors);
 
 	static status_t Read(
 		BDataIO*										stream,
@@ -99,7 +101,7 @@ public:													// *** import/export operations
 		BDataIO*										stream,
 		IPersistent*								rootObject,
 		XML::DocumentType*					documentType,
-		list<BString>*							outErrors);
+		std::list<BString>*						outErrors);
 
 	static status_t Read(
 		BDataIO*										stream,
@@ -117,7 +119,7 @@ public:													// *** import/export operations
 			
 private:												// static members
 
-	typedef map<BString, DocumentType*> doc_type_map;
+	typedef std::map<BString, DocumentType*> doc_type_map;
 	
 	static doc_type_map						s_docTypeMap;
 	static BLocker								s_docTypeLock;
@@ -126,7 +128,7 @@ private:												// implementation
 	static status_t _DoRead(
 		BDataIO*										stream,
 		Importer&										i,
-		list<BString>*							outErrors); //nyi
+		std::list<BString>*						outErrors); //nyi
 };
 
 // -------------------------------------------------------- //
@@ -162,7 +164,7 @@ public:													// *** 'factory' interface
 
 private:												// implementation
 
-	typedef set<XMLElementMapping*, _mapping_ptr_less> mapping_set;
+	typedef std::set<XMLElementMapping*, _mapping_ptr_less> mapping_set;
 	mapping_set										m_mappingSet;
 };
 

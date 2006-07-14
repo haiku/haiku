@@ -102,7 +102,7 @@ class tip_entry_ptr_less_fn {		public:
 	}
 };
 
-typedef set<tip_entry*, tip_entry_ptr_less_fn > tip_entry_set;
+typedef std::set<tip_entry*, tip_entry_ptr_less_fn > tip_entry_set;
 
 // -------------------------------------------------------- //
 // _ViewEntry
@@ -144,7 +144,7 @@ public:													// *** interface
 	// match the given point (in target's view coordinates)
 	// against tips in this view and child views.
 
-	pair<BView*, const tip_entry*> match(
+	std::pair<BView*, const tip_entry*> match(
 		BPoint											point,
 		BPoint											screenPoint);
 
@@ -168,7 +168,7 @@ private:
 	_ViewEntry*										m_parent;
 	
 	// [e.moon 13oct99] child view list now stores pointers
-	list<_ViewEntry*>							m_childViews;
+	std::list<_ViewEntry*>							m_childViews;
 	tip_entry_set									m_tips;
 };
 
@@ -208,7 +208,7 @@ public:													// *** interface
 	// match the given point (in screen coordinates)
 	// against tips in this view and child views.
 
-	pair<BView*, const tip_entry*> match(
+	std::pair<BView*, const tip_entry*> match(
 		BPoint											screenPoint);
 
 	BWindow* target() const { return m_target; }
@@ -222,7 +222,7 @@ private:
 	BWindow*											m_target;
 
 	// view subtrees with tip entries
-	list<_ViewEntry*>							m_views;
+	std::list<_ViewEntry*>							m_views;
 };
 
 // -------------------------------------------------------- //
@@ -318,7 +318,7 @@ private:												// implementation
 	TipManager*										m_manager;
 	
 	// set of window entries containing one or more bound tip rectangles
-	list<_WindowEntry*>						m_windows;
+	std::list<_WindowEntry*>						m_windows;
 	
 	// update message source
 	BMessageRunner*								m_messageRunner;

@@ -4,6 +4,8 @@
 #include "ImportContext.h"
 #include "xmlparse.h"
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

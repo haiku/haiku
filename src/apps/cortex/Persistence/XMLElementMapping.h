@@ -50,7 +50,7 @@ public:
 };
 
 // compare pointers to Mappings by element name
-struct _mapping_ptr_less : public binary_function<XMLElementMapping*,XMLElementMapping*,bool> {
+struct _mapping_ptr_less : public std::binary_function<XMLElementMapping*,XMLElementMapping*,bool> {
 public:
 	bool operator()(const XMLElementMapping* a, const XMLElementMapping* b) const {
 		return a->element < b->element;

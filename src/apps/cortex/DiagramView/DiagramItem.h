@@ -30,9 +30,9 @@ class DiagramBox;
 
 class DiagramItem
 {
-	friend DiagramItemGroup;
-	friend DiagramView;
-	friend DiagramBox;
+	friend class DiagramItemGroup;
+	friend class DiagramView;
+	friend class DiagramBox;
 
 public:					// *** types
 

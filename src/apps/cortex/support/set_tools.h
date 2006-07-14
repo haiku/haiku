@@ -37,10 +37,10 @@ void ptr_map_delete(iter begin, iter end) {
 // a simple equality-test functor for maps
 template<class key, class value>
 class map_value_equal_to :
-	public binary_function<pair<key,value>, value, bool> {
+	public std::binary_function<std::pair<key,value>, value, bool> {
 
 public:
-	bool operator()(const pair<key,value>& p, const value& v) const {
+	bool operator()(const std::pair<key,value>& p, const value& v) const {
 		return p.second == v;
 	}
 };
@@ -55,7 +55,7 @@ public:
 //
 //public:
 //	map_value_predicate_t(const unary_function<const value, bool>& _fn) : fn(_fn) {}
-//	bool operator()(const pair<key,value>& p) const {
+//	bool operator()(const std::pair<key,value>& p) const {
 //		return fn(p.second);
 //	}
 //};
@@ -79,7 +79,7 @@ void map_value_copy(input_iter begin, input_iter end, output_iter to) {
 // adapt a unary functor to a map (eek)
 template <class pairT, class opT>
 class unary_map_function_t :
-	public unary_function<typename opT::argument_type, typename opT::result_type> {
+	public std::unary_function<typename opT::argument_type, typename opT::result_type> {
 	
 	opT f;
 

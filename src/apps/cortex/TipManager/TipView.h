@@ -60,7 +60,7 @@ private:										// implementation
 	rgb_color									m_viewColor;
 
 
-	typedef vector<int32> line_set;
+	typedef std::vector<int32> line_set;
 	line_set									m_lineSet;
 
 private:

@@ -15,6 +15,8 @@
 
 //#include "debug_tools.h"
 
+using namespace std;
+
 __USE_CORTEX_NAMESPACE
 
 // -------------------------------------------------------- //

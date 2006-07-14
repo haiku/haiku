@@ -24,7 +24,7 @@ class DiagramEndPoint;
 
 class DiagramWire : public DiagramItem
 {
-	friend DiagramView;
+	friend class DiagramView;
 
 public:					// *** ctor/dtor
 

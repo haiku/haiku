@@ -185,7 +185,7 @@ private:													// implementation
 	// KEY:
 	// high 32 bits: media_node_id
 	// low 32 bits: icon_size
-	typedef map<uint64, MediaIcon*> icon_map;
+	typedef std::map<uint64, MediaIcon*> icon_map;
 	icon_map												m_iconMap;
 
 //	class import_state*								m_importState;

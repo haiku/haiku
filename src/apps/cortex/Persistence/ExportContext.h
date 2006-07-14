@@ -52,7 +52,7 @@ public:													// *** public members
 		bool					hasContent;
 	};
 
-	typedef list<element_entry>		element_list;
+	typedef std::list<element_entry>		element_list;
 	element_list									m_elementStack;
 		
 public:													// *** XML formatting helpers
@@ -228,7 +228,7 @@ private:				// members
 		IPersistent*	object;
 	};
 	
-	typedef list<object_entry> object_list;
+	typedef std::list<object_entry> object_list;
 	object_list										m_objectStack;
 	
 private:

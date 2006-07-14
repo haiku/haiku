@@ -31,7 +31,7 @@ public:													// *** types
 public:													// *** ctor/dtor
 	virtual ~ImportContext();
 	ImportContext(
-		list<BString>&							errors);
+		std::list<BString>&						errors);
 
 public:													// *** accessors
 
@@ -43,7 +43,7 @@ public:													// *** accessors
 	// (returns 0 if the stack is empty or the current element is top-level)
 	const char* parentElement() const;
 
-	list<BString>& errors() const;
+	std::list<BString>& errors() const;
 	const state_t state() const;
 
 public:													// *** error-reporting operations
@@ -64,11 +64,11 @@ protected:											// *** internal operations
 
 private:												// *** members
 	state_t												m_state;
-	list<BString>&								m_errors;
+	std::list<BString>&							m_errors;
 	
-	list<BString>									m_elementStack;
-	typedef pair<const char*, IPersistent*> object_entry;
-	list<object_entry>						m_objectStack;
+	std::list<BString>								m_elementStack;
+	typedef std::pair<const char*, IPersistent*> object_entry;
+	std::list<object_entry>						m_objectStack;
 	
 	void*													m_pParser;
 };

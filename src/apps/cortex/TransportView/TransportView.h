@@ -124,8 +124,8 @@ protected:									// *** layout
 	void _updateLayout();
 
 private:
-	friend _GroupInfoView;
-	friend TransportWindow;
+	friend class _GroupInfoView;
+	friend class TransportWindow;
 
 	// logical
 	NodeManager*							m_manager;
@@ -145,7 +145,7 @@ private:
 	BButton*									m_stopButton;
 	BButton*									m_prerollButton;
 	
-	typedef list<BInvoker*>		target_set;
+	typedef std::list<BInvoker*>		target_set;
 	target_set								m_localTargets;
 	target_set								m_groupTargets;
 	
