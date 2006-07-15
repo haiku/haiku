@@ -19,7 +19,7 @@ ColorWindow::ColorWindow()
 	colorPicker = new BColorControl(BPoint(10,10), B_CELLS_32x8, 
 				9, "COLOR", new BMessage(MENU_COLOR), true);
 	colorPicker->SetValue(info.background_color);
-	colView->SetViewColor(219,219,219,255);
+	colView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	colView->AddChild(colorPicker);
 	AddChild(colView);
 	
@@ -55,9 +55,9 @@ ColorWindow::MessageReceived(BMessage *msg)
 		//	change to system color for system wide
 		//	compatability
 			rgb_color color;
-			color.red = 219;
-			color.blue = 219;
-			color.green = 219;
+			color.red = 216;
+			color.blue = 216;
+			color.green = 216;
 			color.alpha = 255;
 			colorPicker->SetValue(color);
 			DefaultButton->SetEnabled(false);
@@ -69,6 +69,7 @@ ColorWindow::MessageReceived(BMessage *msg)
 
 		case MENU_COLOR:
 			get_menu_info(&info);
+			revert_info.background_color = info.background_color;
 			info.background_color = colorPicker->ValueAsColor();
 			set_menu_info(&info);
 			be_app->PostMessage(MENU_COLOR);
