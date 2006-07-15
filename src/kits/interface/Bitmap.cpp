@@ -217,7 +217,10 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 */
 BBitmap::~BBitmap()
 {
-	delete fWindow;
+	if (fWindow != NULL) {
+		fWindow->Lock();
+		delete fWindow;
+	}
 	_CleanUp();
 }
 

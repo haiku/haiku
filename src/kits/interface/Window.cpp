@@ -350,17 +350,22 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 
 BWindow::~BWindow()
 {
-	Lock();
-
 	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
 		menu->QuitTracking();
 	}
+
+	// The BWindow is locked when the destructor is called,
+	// we need to unlock because the menubar thread tries
+	// to post a message, which will deadlock otherwise.
+	Unlock();
 
 	// Wait if a menu is still tracking
 	if (fMenuSem > 0) {
 		while (acquire_sem(fMenuSem) == B_INTERRUPTED)
 			;
 	}
+
+	Lock();
 
 	fTopView->RemoveSelf();
 	delete fTopView;
