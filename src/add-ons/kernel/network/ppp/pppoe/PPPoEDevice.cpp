@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,7 +11,6 @@
 
 // from libkernelppp
 #include <settings_tools.h>
-#include <LockerHelper.h>
 
 
 #if DEBUG
@@ -51,8 +50,7 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	fServiceName(NULL),
 	fAttempts(0),
 	fNextTimeout(0),
-	fState(INITIAL),
-	fLock("PPPoEDevice")
+	fState(INITIAL)
 {
 #if DEBUG
 	TRACE("PPPoEDevice: Constructor\n");
@@ -81,16 +79,6 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	if(!fEthernetIfnet)
 		TRACE("PPPoEDevice::ctor: could not find ethernet interface\n");
 #endif
-	
-	add_device(this);
-}
-
-
-PPPoEDevice::~PPPoEDevice()
-{
-	TRACE("PPPoEDevice: Destructor\n");
-	
-	remove_device(this);
 }
 
 
@@ -110,10 +98,10 @@ PPPoEDevice::Up()
 	if(InitCheck() != B_OK)
 		return false;
 	
-	LockerHelper locker(fLock);
-	
 	if(IsUp())
 		return true;
+	
+	add_device(this);
 	
 	fState = INITIAL;
 		// reset state
@@ -154,6 +142,7 @@ PPPoEDevice::Up()
 	// check if we are allowed to go up now (user intervention might disallow that)
 	if(fAttempts > 0 && !UpStarted()) {
 		fAttempts = 0;
+		remove_device(this);
 		DownEvent();
 		return true;
 			// there was no error
@@ -180,10 +169,10 @@ PPPoEDevice::Down()
 {
 	TRACE("PPPoEDevice: Down()\n");
 	
+	remove_device(this);
+	
 	if(InitCheck() != B_OK)
 		return false;
-	
-	LockerHelper locker(fLock);
 	
 	fState = INITIAL;
 	fAttempts = 0;
@@ -267,8 +256,6 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	}
 	
-	LockerHelper locker(fLock);
-	
 	if(!IsUp()) {
 		ERROR("PPPoEDevice::Send(): no connection!\n");
 		m_freem(packet);
@@ -296,13 +283,12 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber)
 	ethernetHeader->ether_type = ETHERTYPE_PPPOE;
 	memcpy(ethernetHeader->ether_dhost, fPeer, sizeof(fPeer));
 	
-	locker.UnlockNow();
-	
 	if(!packet || !mtod(packet, pppoe_header*))
 		ERROR("PPPoEDevice::Send(): packet is NULL!\n");
 	
 	if(EthernetIfnet()->output(EthernetIfnet(), packet, &destination, NULL) != B_OK) {
 		ERROR("PPPoEDevice::Send(): EthernetIfnet()->output() failed!\n");
+		remove_device(this);
 		DownEvent();
 			// DownEvent() without DownStarted() indicates connection lost
 		return PPP_NO_CONNECTION;
@@ -353,8 +339,6 @@ PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 			m_freem(packet);
 			return B_ERROR;
 		}
-		
-		LockerHelper locker(fLock);
 		
 		if(IsDown()) {
 			m_freem(packet);
@@ -476,6 +460,7 @@ PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 				fAttempts = 0;
 				fSessionID = 0;
 				fNextTimeout = 0;
+				remove_device(this);
 				DownEvent();
 			break;
 			
@@ -498,8 +483,6 @@ PPPoEDevice::Pulse()
 	
 	if(fNextTimeout == 0 || IsUp() || IsDown())
 		return;
-	
-	LockerHelper locker(fLock);
 	
 	// check if timed out
 	if(system_time() >= fNextTimeout) {

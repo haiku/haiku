@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -94,8 +94,6 @@ class PAP : public KPPPProtocol {
 		uint8 fRequestID;
 			// the ID we used for the last configure/terminate request
 		bigtime_t fNextTimeout;
-		
-		BLocker fLock;
 };
 
 

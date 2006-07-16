@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,7 +19,7 @@
 #include <sys/sockio.h>
 
 
-static const char sKPPPIfNameBase[] =	"ppp";
+static const char sKPPPIfNameBase[] = "ppp";
 
 
 static
@@ -84,16 +84,6 @@ PPPManager::~PPPManager()
 			delete entry->interface;
 			free(entry->name);
 			delete entry;
-		}
-	}
-	
-	// also delete all ppp_up references
-	ppp_app_entry *app = NULL;
-	for(int32 index = 0; index < fApps.CountItems(); index++) {
-		app = fApps.ItemAt(index);
-		if(app) {
-			free(app->interfaceName);
-			delete app;
 		}
 	}
 	
@@ -242,7 +232,7 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 	
 	if(entry->deleting)
 		return true;
-			// this check prevents a dead-lock
+			// this prevents an endless loop between Delete() and interface->Down()
 	
 	entry->deleting = true;
 	atomic_add(&entry->accessing, 1);
@@ -695,23 +685,6 @@ PPPManager::EntryFor(const driver_settings *settings) const
 }
 
 
-ppp_app_entry*
-PPPManager::AppFor(const char *name) const
-{
-	if(!name)
-		return NULL;
-	
-	ppp_app_entry *app;
-	for(int32 index = 0; index < fApps.CountItems(); index++) {
-		app = fApps.ItemAt(index);
-		if(app && !strcmp(app->interfaceName, name))
-			return app;
-	}
-	
-	return NULL;
-}
-
-
 void
 PPPManager::SettingsChanged()
 {
@@ -794,26 +767,8 @@ PPPManager::_CreateInterface(const char *name,
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
-	// find an existing ppp_up entry or create a new one otherwise
-	if(entry->name) {
-		ppp_app_entry *app = AppFor(entry->name);
-		thread_info info;
-		if(!app || get_thread_info(app->thread, &info) != B_OK) {
-			if(!app) {
-				app = new ppp_app_entry;
-				app->interfaceName = strdup(entry->name);
-				fApps.AddItem(app);
-			}
-			
-			// run new ppp_up instance
-			const char *argv[] = { "/boot/beos/bin/ppp_up", entry->name, NULL };
-			const char *env[] = { NULL };
-			app->thread = load_image(2, argv, env);
-			if(app->thread < 0)
-				ERROR("KPPPInterface::Up(): Error: could not load ppp_up!\n");
-			resume_thread(app->thread);
-		}
-	} else
+	// hidden/child interfaces should never bother the user
+	if(!entry->name)
 		entry->interface->SetAskBeforeConnecting(false);
 	
 	locker.UnlockNow();
@@ -888,19 +843,6 @@ PPPManager::DeleterThreadEvent()
 			
 			free(entry->name);
 			delete entry;
-		}
-	}
-	
-	// remove dead ppp_up entries
-	ppp_app_entry *app;
-	thread_info info;
-	for(int32 index = 0; index < fApps.CountItems(); index++) {
-		app = fApps.ItemAt(index);
-		if(app && get_thread_info(app->thread, &info) != B_OK) {
-			fApps.RemoveItem(index);
-			--index;
-			free(app->interfaceName);
-			delete app;
 		}
 	}
 }

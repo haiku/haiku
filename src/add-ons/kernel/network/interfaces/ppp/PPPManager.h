@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,13 +9,6 @@
 #include <KPPPInterface.h>
 #include <KPPPManager.h>
 #include <core_funcs.h>
-
-
-// used to identify a ppp_up instance
-typedef struct ppp_app_entry {
-	char *interfaceName;
-	thread_id thread;
-} ppp_app_entry;
 
 
 // these functions are defined in ppp.cpp
@@ -65,7 +58,6 @@ class PPPManager {
 		ppp_interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(const char *name, int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(const driver_settings *settings) const;
-		ppp_app_entry *AppFor(const char *name) const;
 		
 		void SettingsChanged();
 		
@@ -85,7 +77,6 @@ class PPPManager {
 		char *fDefaultInterface;
 		KPPPReportManager fReportManager;
 		TemplateList<ppp_interface_entry*> fEntries;
-		TemplateList<ppp_app_entry*> fApps;
 		ppp_interface_id fNextID;
 		thread_id fDeleterThread, fPulseTimer;
 };

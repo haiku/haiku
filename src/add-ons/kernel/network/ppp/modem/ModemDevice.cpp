@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,7 +16,6 @@
 
 // from libkernelppp
 #include <settings_tools.h>
-#include <LockerHelper.h>
 
 
 #if DEBUG
@@ -185,8 +184,7 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	fHandle(-1),
 	fWorkerThread(-1),
 	fOutputBytes(0),
-	fState(INITIAL),
-	fLock("ModemDevice")
+	fState(INITIAL)
 {
 #if DEBUG
 	TRACE("ModemDevice: Constructor\n");
@@ -239,8 +237,6 @@ ModemDevice::Up()
 	if(InitCheck() != B_OK)
 		return false;
 	
-	LockerHelper locker(fLock);
-	
 	if(IsUp())
 		return true;
 	
@@ -277,8 +273,6 @@ ModemDevice::Down()
 	if(InitCheck() != B_OK)
 		return false;
 	
-	LockerHelper locker(fLock);
-	
 	fState = TERMINATING;
 	
 	if(!IsUp()) {
@@ -293,7 +287,6 @@ ModemDevice::Down()
 	
 	// worker_thread will notice that we are terminating (IsUp() == false)
 	// ConnectionLost() will be called so we can terminate the connection there.
-	locker.UnlockNow();
 	int32 tmp;
 	wait_for_thread(fWorkerThread, &tmp);
 	
@@ -336,8 +329,6 @@ ModemDevice::CountOutputBytes() const
 void
 ModemDevice::OpenModem()
 {
-	LockerHelper locker(fLock);
-	
 	if(Handle() >= 0)
 		return;
 	
@@ -370,8 +361,6 @@ ModemDevice::OpenModem()
 void
 ModemDevice::CloseModem()
 {
-	LockerHelper locker(fLock);
-	
 	if(Handle() >= 0)
 		close(Handle());
 	
@@ -382,8 +371,6 @@ ModemDevice::CloseModem()
 void
 ModemDevice::FinishedDialing()
 {
-	LockerHelper locker(fLock);
-	
 	fOutputBytes = 0;
 	fState = OPENED;
 	UpEvent();
@@ -393,8 +380,6 @@ ModemDevice::FinishedDialing()
 void
 ModemDevice::FailedDialing()
 {
-	LockerHelper locker(fLock);
-	
 	fWorkerThread = -1;
 	fState = INITIAL;
 	CloseModem();
@@ -405,8 +390,6 @@ ModemDevice::FailedDialing()
 void
 ModemDevice::ConnectionLost()
 {
-	LockerHelper locker(fLock);
-	
 	// switch to command mode and disconnect
 	fWorkerThread = -1;
 	fOutputBytes = 0;

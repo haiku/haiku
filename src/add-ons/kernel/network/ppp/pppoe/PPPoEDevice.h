@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,7 +24,6 @@ enum pppoe_state {
 class PPPoEDevice : public KPPPDevice {
 	public:
 		PPPoEDevice(KPPPInterface& interface, driver_parameter *settings);
-		virtual ~PPPoEDevice();
 		
 		ifnet *EthernetIfnet() const
 			{ return fEthernetIfnet; }
@@ -66,8 +65,6 @@ class PPPoEDevice : public KPPPDevice {
 		uint32 fAttempts;
 		bigtime_t fNextTimeout;
 		pppoe_state fState;
-		
-		BLocker fLock;
 };
 
 

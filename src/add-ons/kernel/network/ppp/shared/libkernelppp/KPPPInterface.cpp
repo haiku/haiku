@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -235,8 +235,6 @@ KPPPInterface::~KPPPInterface()
 {
 	TRACE("KPPPInterface: Destructor\n");
 	
-	++fDeleteCounter;
-	
 	// tell protocols to uninit (remove routes, etc.)
 	KPPPProtocol *protocol = FirstProtocol();
 	for(; protocol; protocol = protocol->NextProtocol())
@@ -298,22 +296,17 @@ KPPPInterface::~KPPPInterface()
 void
 KPPPInterface::Delete()
 {
-	if(atomic_add(&fDeleteCounter, 1) > 0)
+	LockerHelper locker(fLock);
+	
+	if(fDeleteCounter > 0)
 		return;
 			// only one thread should delete us!
 	
-	if(fManager)
-		fManager->DeleteInterface(ID());
-			// This will mark us for deletion.
-			// Any subsequent calls to delete_interface() will do nothing.
-	else {
-		// We were not created by the manager.
-		// Spawn a thread that will delete us.
-		thread_id interfaceDeleterThread
-			= spawn_kernel_thread(interface_deleter_thread,
-				"KPPPInterface: interface_deleter_thread", B_NORMAL_PRIORITY, this);
-		resume_thread(interfaceDeleterThread);
-	}
+	fDeleteCounter = 1;
+	
+	fManager->DeleteInterface(ID());
+		// This will mark us for deletion.
+		// Any subsequent calls to delete_interface() will do nothing.
 }
 
 
@@ -801,6 +794,8 @@ KPPPInterface::RemoveProtocol(KPPPProtocol *protocol)
 int32
 KPPPInterface::CountProtocols() const
 {
+	LockerHelper locker(fLock);
+	
 	KPPPProtocol *protocol = FirstProtocol();
 	
 	int32 count = 0;
@@ -815,6 +810,8 @@ KPPPInterface::CountProtocols() const
 KPPPProtocol*
 KPPPInterface::ProtocolAt(int32 index) const
 {
+	LockerHelper locker(fLock);
+	
 	KPPPProtocol *protocol = FirstProtocol();
 	
 	int32 currentIndex = 0;
@@ -836,6 +833,8 @@ KPPPProtocol*
 KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start) const
 {
 	TRACE("KPPPInterface: ProtocolFor(%X)\n", protocolNumber);
+	
+	LockerHelper locker(fLock);
 	
 	KPPPProtocol *current = start ? start : FirstProtocol();
 	
@@ -898,6 +897,8 @@ KPPPInterface::ChildAt(int32 index) const
 {
 	TRACE("KPPPInterface: ChildAt(%ld)\n", index);
 	
+	LockerHelper locker(fLock);
+	
 	KPPPInterface *child = fChildren.ItemAt(index);
 	
 	if(child == fChildren.GetDefaultItem())
@@ -916,8 +917,6 @@ KPPPInterface::SetAutoReconnect(bool autoReconnect)
 	if(Mode() != PPP_CLIENT_MODE)
 		return;
 	
-	LockerHelper locker(fLock);
-	
 	fAutoReconnect = autoReconnect;
 }
 
@@ -931,6 +930,8 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 	
 	TRACE("KPPPInterface: SetConnectOnDemand(%s)\n", connectOnDemand ? "true" : "false");
 	
+	LockerHelper locker(fLock);
+	
 	// Only clients support ConnectOnDemand.
 	if(Mode() != PPP_CLIENT_MODE) {
 		TRACE("KPPPInterface::SetConnectOnDemand(): Wrong mode!\n");
@@ -938,8 +939,6 @@ KPPPInterface::SetConnectOnDemand(bool connectOnDemand)
 		return;
 	} else if(DoesConnectOnDemand() == connectOnDemand)
 		return;
-	
-	LockerHelper locker(fLock);
 	
 	fConnectOnDemand = connectOnDemand;
 	
@@ -972,8 +971,10 @@ void
 KPPPInterface::SetAskBeforeConnecting(bool ask)
 {
 	LockerHelper locker(fLock);
+	
 	bool old = fAskBeforeConnecting;
 	fAskBeforeConnecting = ask;
+	
 	if(old && fAskBeforeConnecting == false && State() == PPP_STARTING_STATE
 			&& Phase() == PPP_DOWN_PHASE) {
 		locker.UnlockNow();
@@ -987,6 +988,8 @@ bool
 KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 {
 	TRACE("KPPPInterface: SetPFCOptions(0x%X)\n", pfcOptions);
+	
+	LockerHelper locker(fLock);
 	
 	if(PFCOptions() & PPP_FREEZE_PFC_OPTIONS)
 		return false;
@@ -1014,13 +1017,8 @@ KPPPInterface::Up()
 	if(IsUp())
 		return true;
 	
-	// Lock needs timeout because destructor could have locked the interface.
-	while(fLock.LockWithTimeout(100000) != B_NO_ERROR)
-		if(fDeleteCounter > 0)
-			return false;
-	
+	LockerHelper locker(fLock);
 	StateMachine().OpenEvent();
-	fLock.Unlock();
 	
 	return true;
 }
@@ -1045,6 +1043,8 @@ KPPPInterface::Down()
 	
 	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
 		// tell the reconnect thread to abort its attempt (if it's still waiting)
+	
+	LockerHelper locker(fLock);
 	StateMachine().CloseEvent();
 	
 	return true;
@@ -1060,13 +1060,7 @@ KPPPInterface::WaitForConnection()
 	if(InitCheck() != B_OK)
 		return false;
 	
-	// Lock needs timeout because destructor could have locked the interface.
-	while(fLock.LockWithTimeout(100000) != B_NO_ERROR)
-		if(fDeleteCounter > 0)
-			return false;
-	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
-	fLock.Unlock();
 	
 	ppp_report_packet report;
 	thread_id sender;
@@ -1089,15 +1083,6 @@ KPPPInterface::WaitForConnection()
 	
 	ReportManager().DisableReports(PPP_CONNECTION_REPORT, find_thread(NULL));
 	return successful;
-}
-
-
-//!	Returns if the interface is connected.
-bool
-KPPPInterface::IsUp() const
-{
-	LockerHelper locker(fLock);
-	return Phase() == PPP_ESTABLISHED_PHASE;
 }
 
 
@@ -1221,7 +1206,9 @@ KPPPInterface::IsAllowedToSend() const
 	
 	This brings the interface up if connect-on-demand is enabled and we are not
 	connected. \n
-	PFC encoding is handled here.
+	PFC encoding is handled here. \n
+	NOTE: In order to prevent interface destruction while sending you must either
+	hold a refcount for this interface or make sure it is locked.
 	
 	\param packet The packet.
 	\param protocolNumber The packet's protocol number.
@@ -1247,6 +1234,8 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	}
 	
 	// go up if ConnectOnDemand is enabled and we are disconnected
+	// TODO: our new netstack will simplify ConnectOnDemand handling, so
+	// we do not have to handle it here
 	if((protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
 			&& (Phase() == PPP_DOWN_PHASE
 				|| Phase() == PPP_ESTABLISHMENT_PHASE)
@@ -1303,7 +1292,7 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		*header = protocolNumber;
 	}
 	
-	// pass to device/children
+	// pass to device if we're either not a multilink interface or a child interface
 	if(!IsMultilink() || Parent()) {
 		// check if packet is too big for device
 		uint32 length = packet->m_flags & M_PKTHDR ? (uint32) packet->m_pkthdr.len :
@@ -1350,6 +1339,8 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	
 	if(!packet)
 		return B_ERROR;
+	
+	LockerHelper locker(fLock);
 	
 	int32 result = PPP_REJECTED;
 		// assume we have no handler
@@ -1447,6 +1438,8 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 void
 KPPPInterface::Pulse()
 {
+	LockerHelper locker(fLock);
+	
 	if(Device())
 		Device()->Pulse();
 	
@@ -1579,6 +1572,8 @@ KPPPInterface::StackControlEachHandler(uint32 op, void *data)
 	
 	status_t result = B_BAD_VALUE, tmp;
 	
+	LockerHelper locker(fLock);
+	
 	KPPPProtocol *protocol = FirstProtocol();
 	for(; protocol; protocol = protocol->NextProtocol()) {
 		tmp = protocol->StackControl(op, data);
@@ -1602,6 +1597,8 @@ void
 KPPPInterface::CalculateInterfaceMTU()
 {
 	TRACE("KPPPInterface: CalculateInterfaceMTU()\n");
+	
+	LockerHelper locker(fLock);
 	
 	fInterfaceMTU = fMRU;
 	fHeaderLength = 2;
@@ -1631,6 +1628,8 @@ KPPPInterface::CalculateBaudRate()
 {
 	TRACE("KPPPInterface: CalculateBaudRate()\n");
 	
+	LockerHelper locker(fLock);
+	
 	if(!Ifnet())
 		return;
 	
@@ -1651,6 +1650,8 @@ void
 KPPPInterface::Reconnect(uint32 delay)
 {
 	TRACE("KPPPInterface: Reconnect(%ld)\n", delay);
+	
+	LockerHelper locker(fLock);
 	
 	if(fReconnectThread != -1)
 		return;
@@ -1689,29 +1690,6 @@ reconnect_thread(void *data)
 	
 	info.interface->Up();
 	*info.thread = -1;
-	
-	return B_OK;
-}
-
-
-// ----------------------------------
-// Function: interface_deleter_thread
-// ----------------------------------
-//!	Private class.
-class KPPPInterfaceAccess {
-	public:
-		KPPPInterfaceAccess() {}
-		
-		void Delete(KPPPInterface *interface)
-			{ delete interface; }
-};
-
-
-status_t
-interface_deleter_thread(void *data)
-{
-	KPPPInterfaceAccess access;
-	access.Delete((KPPPInterface*) data);
 	
 	return B_OK;
 }

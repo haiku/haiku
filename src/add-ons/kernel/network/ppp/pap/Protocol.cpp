@@ -1,13 +1,11 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
 #include "Protocol.h"
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
-
-#include <LockerHelper.h>
 
 #include <cstring>
 #include <netinet/in.h>
@@ -81,8 +79,7 @@ PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
 	fID(system_time() & 0xFF),
 	fMaxRequest(3),
 	fRequestID(0),
-	fNextTimeout(0),
-	fLock("PAP")
+	fNextTimeout(0)
 {
 }
 
@@ -107,14 +104,11 @@ PAP::Up()
 {
 	TRACE("PAP: Up() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case INITIAL:
 			if(Side() == PPP_LOCAL_SIDE) {
 				NewState(REQ_SENT);
 				InitializeRestartCount();
-				locker.UnlockNow();
 				SendRequest();
 			} else if(Side() == PPP_PEER_SIDE) {
 				NewState(WAITING_FOR_REQ);
@@ -139,15 +133,12 @@ PAP::Down()
 {
 	TRACE("PAP: Down() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(Interface().Phase()) {
 		case PPP_DOWN_PHASE:
 			// interface finished terminating
 		case PPP_ESTABLISHED_PHASE:
 			// terminate this NCP individually (block until we finished terminating)
 			NewState(INITIAL);
-			locker.UnlockNow();
 			DownEvent();
 		break;
 		
@@ -233,11 +224,9 @@ PAP::Receive(struct mbuf *packet, uint16 protocolNumber)
 void
 PAP::Pulse()
 {
-	LockerHelper locker(fLock);
 	if(fNextTimeout == 0 || fNextTimeout > system_time())
 		return;
 	fNextTimeout = 0;
-	locker.UnlockNow();
 	
 	switch(State()) {
 		case REQ_SENT:
@@ -290,11 +279,8 @@ PAP::TOGoodEvent()
 {
 	TRACE("PAP: TOGoodEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case REQ_SENT:
-			locker.UnlockNow();
 			SendRequest();
 		break;
 		
@@ -313,13 +299,10 @@ PAP::TOBadEvent()
 {
 	TRACE("PAP: TOBadEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case REQ_SENT:
 		case WAITING_FOR_REQ:
 			NewState(INITIAL);
-			locker.UnlockNow();
 			if(State() == REQ_SENT)
 				Interface().StateMachine().LocalAuthenticationDenied(
 					Interface().Username());
@@ -341,8 +324,6 @@ PAP::RREvent(struct mbuf *packet)
 {
 	TRACE("PAP: RREvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
 	int32 length = ntohs(request->length);
 	uint8 *data = request->data;
@@ -363,13 +344,11 @@ PAP::RREvent(struct mbuf *packet)
 			&& !strncmp(peerUsername, username, *userLength)
 			&& !strncmp(peerPassword, password, *passwordLength)) {
 		NewState(ACCEPTED);
-		locker.UnlockNow();
 		Interface().StateMachine().PeerAuthenticationAccepted(username);
 		UpEvent();
 		SendAck(packet);
 	} else {
 		NewState(INITIAL);
-		locker.UnlockNow();
 		Interface().StateMachine().PeerAuthenticationDenied(username);
 		UpFailedEvent();
 		SendNak(packet);
@@ -382,8 +361,6 @@ PAP::RAEvent(struct mbuf *packet)
 {
 	TRACE("PAP: RAEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
 		
@@ -395,7 +372,6 @@ PAP::RAEvent(struct mbuf *packet)
 	switch(State()) {
 		case REQ_SENT:
 			NewState(ACCEPTED);
-			locker.UnlockNow();
 			Interface().StateMachine().LocalAuthenticationAccepted(
 				Interface().Username());
 			UpEvent();
@@ -414,8 +390,6 @@ PAP::RNEvent(struct mbuf *packet)
 {
 	TRACE("PAP: RNEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
 		
@@ -427,7 +401,6 @@ PAP::RNEvent(struct mbuf *packet)
 	switch(State()) {
 		case REQ_SENT:
 			NewState(INITIAL);
-			locker.UnlockNow();
 			Interface().StateMachine().LocalAuthenticationDenied(
 				Interface().Username());
 			UpFailedEvent();
@@ -453,10 +426,8 @@ PAP::SendRequest()
 {
 	TRACE("PAP: SendRequest() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
 	--fRequestCounter;
 	fNextTimeout = system_time() + kPAPTimeout;
-	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	if(!packet)

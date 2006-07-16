@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -106,7 +106,7 @@ class IPCP : public KPPPProtocol {
 		void ReportUpEvent();
 		void ReportDownEvent();
 		void InitializeRestartCount();
-		void ZeroRestartCount();
+		void ResetRestartCount();
 		bool SendConfigureRequest();
 		bool SendConfigureAck(struct mbuf *packet);
 		bool SendConfigureNak(struct mbuf *packet);
@@ -135,8 +135,6 @@ class IPCP : public KPPPProtocol {
 		uint8 fRequestID, fTerminateID;
 			// the ID we used for the last configure/terminate request
 		bigtime_t fNextTimeout;
-		
-		BLocker fLock;
 };
 
 

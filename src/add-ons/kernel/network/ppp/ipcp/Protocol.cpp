@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,8 +12,6 @@
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
 #include <settings_tools.h>
-
-#include <LockerHelper.h>
 
 #include <cstring>
 #include <netinet/in_var.h>
@@ -72,8 +70,7 @@ IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
 	fMaxNak(5),
 	fRequestID(0),
 	fTerminateID(0),
-	fNextTimeout(0),
-	fLock("IPCP")
+	fNextTimeout(0)
 {
 	// reset configurations
 	memset(&fLocalConfiguration, 0, sizeof(ipcp_configuration));
@@ -151,13 +148,10 @@ IPCP::Up()
 	if(Interface().Mode() == PPP_SERVER_MODE)
 		return true;
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			NewState(PPP_REQ_SENT_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -174,13 +168,10 @@ IPCP::Down()
 {
 	TRACE("IPCP: Down() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(Interface().Phase()) {
 		case PPP_DOWN_PHASE:
 			// interface finished terminating
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportDownEvent();
 				// this will also reset and update addresses
 		break;
@@ -198,7 +189,6 @@ IPCP::Down()
 			if(State() != PPP_INITIAL_STATE && State() != PPP_CLOSING_STATE) {
 				NewState(PPP_CLOSING_STATE);
 				InitializeRestartCount();
-				locker.UnlockNow();
 				SendTerminateRequest();
 			}
 			
@@ -325,11 +315,9 @@ IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 void
 IPCP::Pulse()
 {
-	LockerHelper locker(fLock);
 	if(fNextTimeout == 0 || fNextTimeout > system_time())
 		return;
 	fNextTimeout = 0;
-	locker.UnlockNow();
 	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
@@ -539,11 +527,8 @@ IPCP::TOGoodEvent()
 printf("IPCP: TOGoodEvent() state=%d\n", State());
 #endif
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
-			locker.UnlockNow();
 			SendTerminateRequest();
 		break;
 		
@@ -552,7 +537,6 @@ printf("IPCP: TOGoodEvent() state=%d\n", State());
 		
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_SENT_STATE:
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -567,12 +551,9 @@ IPCP::TOBadEvent()
 {
 	TRACE("IPCP: TOBadEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportDownEvent();
 		break;
 		
@@ -580,7 +561,6 @@ IPCP::TOBadEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportUpFailedEvent();
 		break;
 		
@@ -701,13 +681,10 @@ IPCP::RCRGoodEvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RCRGoodEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			NewState(PPP_ACK_SENT_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendConfigureRequest();
 			SendConfigureAck(packet);
 		break;
@@ -716,20 +693,17 @@ IPCP::RCRGoodEvent(struct mbuf *packet)
 			NewState(PPP_ACK_SENT_STATE);
 		
 		case PPP_ACK_SENT_STATE:
-			locker.UnlockNow();
 			SendConfigureAck(packet);
 		break;
 		
 		case PPP_ACK_RCVD_STATE:
 			NewState(PPP_OPENED_STATE);
-			locker.UnlockNow();
 			SendConfigureAck(packet);
 			ReportUpEvent();
 		break;
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_ACK_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 			SendConfigureAck(packet);
 		break;
@@ -745,12 +719,9 @@ IPCP::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
 	TRACE("IPCP: RCRBadEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		
 		case PPP_ACK_SENT_STATE:
@@ -761,7 +732,6 @@ IPCP::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 		case PPP_INITIAL_STATE:
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
-			locker.UnlockNow();
 			if(nak && ntohs(mtod(nak, ppp_lcp_packet*)->length) > 3)
 				SendConfigureNak(nak);
 			else if(reject && ntohs(mtod(reject, ppp_lcp_packet*)->length) > 3)
@@ -784,8 +754,6 @@ void
 IPCP::RCAEvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RCAEvent() state=%d\n", State());
-	
-	LockerHelper locker(fLock);
 	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
@@ -863,20 +831,17 @@ IPCP::RCAEvent(struct mbuf *packet)
 		
 		case PPP_ACK_RCVD_STATE:
 			NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_OPENED_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			ReportUpEvent();
 		break;
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -892,8 +857,6 @@ void
 IPCP::RCNEvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RCNEvent() state=%d\n", State());
-	
-	LockerHelper locker(fLock);
 	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
@@ -992,7 +955,6 @@ IPCP::RCNEvent(struct mbuf *packet)
 		case PPP_OPENED_STATE:
 			if(State() == PPP_ACK_RCVD_STATE || State() == PPP_OPENED_STATE)
 				NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -1009,8 +971,6 @@ IPCP::RTREvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RTREvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	// we should not use the same ID as the peer
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
 		fID -= 128;
@@ -1026,15 +986,13 @@ IPCP::RTREvent(struct mbuf *packet)
 		
 		case PPP_CLOSING_STATE:
 		case PPP_REQ_SENT_STATE:
-			locker.UnlockNow();
 			SendTerminateAck(packet);
 		return;
 			// do not m_freem() packet
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_CLOSING_STATE);
-			ZeroRestartCount();
-			locker.UnlockNow();
+			ResetRestartCount();
 			SendTerminateAck(packet);
 		return;
 			// do not m_freem() packet
@@ -1052,8 +1010,6 @@ IPCP::RTAEvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RTAEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	if(fTerminateID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
 		
@@ -1069,7 +1025,6 @@ IPCP::RTAEvent(struct mbuf *packet)
 		
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportDownEvent();
 		break;
 		
@@ -1079,7 +1034,6 @@ IPCP::RTAEvent(struct mbuf *packet)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -1105,8 +1059,6 @@ IPCP::RXJBadEvent(struct mbuf *packet)
 {
 	TRACE("IPCP: RXJBadEvent() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			IllegalEvent(PPP_RXJ_BAD_EVENT);
@@ -1114,7 +1066,6 @@ IPCP::RXJBadEvent(struct mbuf *packet)
 		
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportDownEvent();
 		break;
 		
@@ -1122,14 +1073,12 @@ IPCP::RXJBadEvent(struct mbuf *packet)
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_INITIAL_STATE);
-			locker.UnlockNow();
 			ReportUpFailedEvent();
 		break;
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_CLOSING_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendTerminateRequest();
 		break;
 		
@@ -1195,7 +1144,7 @@ IPCP::InitializeRestartCount()
 
 
 void
-IPCP::ZeroRestartCount()
+IPCP::ResetRestartCount()
 {
 	fRequestCounter = 0;
 	fTerminateCounter = 0;
@@ -1208,10 +1157,8 @@ IPCP::SendConfigureRequest()
 {
 	TRACE("IPCP: SendConfigureRequest() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
 	--fRequestCounter;
 	fNextTimeout = system_time() + kIPCPStateMachineTimeout;
-	locker.UnlockNow();
 	
 	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
 	request.SetID(NextID());
@@ -1349,10 +1296,8 @@ IPCP::SendTerminateRequest()
 {
 	TRACE("IPCP: SendTerminateRequest() state=%d\n", State());
 	
-	LockerHelper locker(fLock);
 	--fTerminateCounter;
 	fNextTimeout = system_time() + kIPCPStateMachineTimeout;
-	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	if(!packet)

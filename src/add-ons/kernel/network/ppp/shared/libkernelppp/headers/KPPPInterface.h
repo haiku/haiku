@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Haiku Inc.
+ * Copyright 2003-2006, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -42,7 +42,6 @@ struct ppp_interface_entry;
 class KPPPInterface : public KPPPLayer {
 		friend class PPPManager;
 		friend class KPPPStateMachine;
-		friend class KPPPInterfaceAccess;
 
 	private:
 		//!	Copies are not allowed.
@@ -201,7 +200,9 @@ class KPPPInterface : public KPPPLayer {
 			// in server mode Up() listens for an incoming connection
 		virtual bool Down();
 		bool WaitForConnection();
-		bool IsUp() const;
+		//!	Returns if the interface is connected.
+		bool IsUp() const
+			{ return Phase() == PPP_ESTABLISHED_PHASE; }
 		
 		//!	Returns interface's report manager.
 		KPPPReportManager& ReportManager()

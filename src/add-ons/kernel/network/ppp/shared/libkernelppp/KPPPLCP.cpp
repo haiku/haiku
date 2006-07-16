@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,8 +18,6 @@
 #include <KPPPDevice.h>
 #include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
-
-#include <LockerHelper.h>
 
 #include <netinet/in.h>
 #include <core_funcs.h>
@@ -59,8 +57,6 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 	if(!optionHandler || &optionHandler->Interface() != &Interface())
 		return false;
 	
-	LockerHelper locker(StateMachine().fLock);
-	
 	if(Interface().Phase() != PPP_DOWN_PHASE
 			|| OptionHandlerFor(optionHandler->Type()))
 		return false;
@@ -78,8 +74,6 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 bool
 KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 {
-	LockerHelper locker(StateMachine().fLock);
-	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
@@ -138,8 +132,6 @@ KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 	if(!lcpExtension || &lcpExtension->Interface() != &Interface())
 		return false;
 	
-	LockerHelper locker(StateMachine().fLock);
-	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
@@ -155,8 +147,6 @@ KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 bool
 KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 {
-	LockerHelper locker(StateMachine().fLock);
-	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change

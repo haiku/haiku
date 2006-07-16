@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Waldemar Kornewald <wkornew@gmx.net>
+ * Copyright 2003-2006, Waldemar Kornewald <wkornew@gmx.net>
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,7 +19,6 @@
 #include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 
-#include <LockerHelper.h>
 #include <KPPPUtils.h>
 
 #include <net/if.h>
@@ -150,8 +149,6 @@ KPPPStateMachine::Reconfigure()
 {
 	TRACE("KPPPSM: Reconfigure() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	if(State() < PPP_REQ_SENT_STATE)
 		return false;
 	
@@ -161,8 +158,6 @@ KPPPStateMachine::Reconfigure()
 	
 	DownProtocols();
 	ResetLCPHandlers();
-	
-	locker.UnlockNow();
 	
 	return SendConfigureRequest();
 }
@@ -235,8 +230,6 @@ KPPPStateMachine::LocalAuthenticationRequested()
 	TRACE("KPPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	fLastConnectionReportCode = PPP_REPORT_AUTHENTICATION_REQUESTED;
 	Interface().Report(PPP_CONNECTION_REPORT,
 		PPP_REPORT_AUTHENTICATION_REQUESTED, &fInterface.fID,
@@ -260,8 +253,6 @@ KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 	TRACE("KPPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fLocalAuthenticationName);
 	if(name)
@@ -282,8 +273,6 @@ KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
 	TRACE("KPPPSM: LocalAuthenticationDenied() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
 	free(fLocalAuthenticationName);
 	if(name)
@@ -301,8 +290,6 @@ KPPPStateMachine::PeerAuthenticationRequested()
 {
 	TRACE("KPPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
 		State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	fLastConnectionReportCode = PPP_REPORT_AUTHENTICATION_REQUESTED;
 	Interface().Report(PPP_CONNECTION_REPORT,
@@ -327,8 +314,6 @@ KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 	TRACE("KPPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
 		State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fPeerAuthenticationName);
 	if(name)
@@ -348,8 +333,6 @@ void
 KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
 	TRACE("KPPPSM: PeerAuthenticationDenied() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
 	free(fPeerAuthenticationName);
@@ -381,8 +364,6 @@ KPPPStateMachine::UpEvent(KPPPInterface& interface)
 {
 	TRACE("KPPPSM: UpEvent(interface) state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	if(Phase() <= PPP_TERMINATION_PHASE) {
 		interface.StateMachine().CloseEvent();
 		return;
@@ -393,7 +374,6 @@ KPPPStateMachine::UpEvent(KPPPInterface& interface)
 	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
 		// this is the first interface that went up
 		Interface().SetMRU(interface.MRU());
-		locker.UnlockNow();
 		ThisLayerUp();
 	} else if(Interface().MRU() > interface.MRU())
 		Interface().SetMRU(interface.MRU());
@@ -408,8 +388,6 @@ void
 KPPPStateMachine::DownEvent(KPPPInterface& interface)
 {
 	TRACE("KPPPSM: DownEvent(interface) state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	uint32 MRU = 0;
 		// the new MRU
@@ -439,10 +417,8 @@ KPPPStateMachine::DownEvent(KPPPInterface& interface)
 		else
 			Interface().SetMRU(MRU);
 		
-		if(count == 0) {
-			locker.UnlockNow();
+		if(count == 0)
 			DownEvent();
-		}
 	}
 }
 
@@ -484,8 +460,6 @@ KPPPStateMachine::UpEvent(KPPPProtocol *protocol)
 {
 	TRACE("KPPPSM: UpEvent(protocol) state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
 		BringProtocolsUp();
 }
@@ -516,8 +490,6 @@ KPPPStateMachine::TLSNotify()
 {
 	TRACE("KPPPSM: TLSNotify() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	if(State() == PPP_STARTING_STATE) {
 			if(Phase() == PPP_DOWN_PHASE)
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
@@ -542,8 +514,6 @@ KPPPStateMachine::TLFNotify()
 {
 	TRACE("KPPPSM: TLFNotify() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	NewPhase(PPP_TERMINATION_PHASE);
 		// tell DownEvent() that it may create a connection-lost-report
 	
@@ -556,8 +526,6 @@ void
 KPPPStateMachine::UpFailedEvent()
 {
 	TRACE("KPPPSM: UpFailedEvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	switch(State()) {
 		case PPP_STARTING_STATE:
@@ -587,8 +555,6 @@ KPPPStateMachine::UpEvent()
 	// This call is public, thus, it might not only be called by the device.
 	// We must recognize these attempts to fool us and handle them correctly.
 	
-	LockerHelper locker(fLock);
-	
 	if(!Interface().Device() || !Interface().Device()->IsUp())
 		return;
 			// it is not our device that went up...
@@ -603,7 +569,6 @@ KPPPStateMachine::UpEvent()
 				// connection, so this is an illegal event
 				IllegalEvent(PPP_UP_EVENT);
 				NewState(PPP_CLOSED_STATE);
-				locker.UnlockNow();
 				ThisLayerFinished();
 				
 				return;
@@ -612,7 +577,6 @@ KPPPStateMachine::UpEvent()
 			// TODO: handle server-up! (maybe already done correctly)
 			NewState(PPP_REQ_SENT_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -624,14 +588,12 @@ KPPPStateMachine::UpEvent()
 				// to go up
 				IllegalEvent(PPP_UP_EVENT);
 				NewState(PPP_CLOSED_STATE);
-				locker.UnlockNow();
 				ThisLayerFinished();
 				break;
 			}
 			
 			NewState(PPP_REQ_SENT_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -650,8 +612,6 @@ void
 KPPPStateMachine::DownEvent()
 {
 	TRACE("KPPPSM: DownEvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	if(Interface().Device() && Interface().Device()->IsUp())
 		return;
@@ -753,8 +713,6 @@ KPPPStateMachine::OpenEvent()
 {
 	TRACE("KPPPSM: OpenEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	// reset all handlers
 	if(Phase() != PPP_ESTABLISHED_PHASE) {
 		DownProtocols();
@@ -777,10 +735,8 @@ KPPPStateMachine::OpenEvent()
 			} else
 				NewState(PPP_STARTING_STATE);
 			
-			if(Interface().fAskBeforeConnecting == false) {
-				locker.UnlockNow();
+			if(Interface().fAskBeforeConnecting == false)
 				ContinueOpenEvent();
-			}
 		break;
 		
 		case PPP_CLOSED_STATE:
@@ -792,7 +748,6 @@ KPPPStateMachine::OpenEvent()
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -812,7 +767,6 @@ KPPPStateMachine::ContinueOpenEvent()
 	TRACE("KPPPSM: ContinueOpenEvent() state=%d phase=%d\n", State(), Phase());
 	
 	if(Interface().IsMultilink() && !Interface().Parent()) {
-		LockerHelper locker(fLock);
 		NewPhase(PPP_ESTABLISHMENT_PHASE);
 		for(int32 index = 0; index < Interface().CountChildren(); index++)
 			if(Interface().ChildAt(index)->Mode() == Interface().Mode())
@@ -826,8 +780,6 @@ void
 KPPPStateMachine::CloseEvent()
 {
 	TRACE("KPPPSM: CloseEvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	if(Interface().IsMultilink() && !Interface().Parent()) {
 		NewState(PPP_INITIAL_STATE);
@@ -852,7 +804,6 @@ KPPPStateMachine::CloseEvent()
 			NewPhase(PPP_TERMINATION_PHASE);
 				// indicates to handlers that we are terminating
 			InitializeRestartCount();
-			locker.UnlockNow();
 			if(State() == PPP_OPENED_STATE)
 				ThisLayerDown();
 			SendTerminateRequest();
@@ -868,7 +819,6 @@ KPPPStateMachine::CloseEvent()
 				NewPhase(PPP_DOWN_PHASE);
 					// this says the following DownEvent() was not caused by
 					// a connection fault
-				locker.UnlockNow();
 				ThisLayerFinished();
 			}
 		break;
@@ -893,12 +843,9 @@ KPPPStateMachine::TOGoodEvent()
 {
 	TRACE("KPPPSM: TOGoodEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
 		case PPP_STOPPING_STATE:
-			locker.UnlockNow();
 			SendTerminateRequest();
 		break;
 		
@@ -907,7 +854,6 @@ KPPPStateMachine::TOGoodEvent()
 		
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_SENT_STATE:
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -923,13 +869,10 @@ KPPPStateMachine::TOBadEvent()
 {
 	TRACE("KPPPSM: TOBadEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
 			NewState(PPP_CLOSED_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
@@ -939,7 +882,6 @@ KPPPStateMachine::TOBadEvent()
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_STOPPED_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
@@ -955,8 +897,6 @@ KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RCRGoodEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -965,7 +905,6 @@ KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 		break;
 		
 		case PPP_CLOSED_STATE:
-			locker.UnlockNow();
 			SendTerminateAck();
 			m_freem(packet);
 		break;
@@ -980,13 +919,11 @@ KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 			NewState(PPP_ACK_SENT_STATE);
 		
 		case PPP_ACK_SENT_STATE:
-			locker.UnlockNow();
 			SendConfigureAck(packet);
 		break;
 		
 		case PPP_ACK_RCVD_STATE:
 			NewState(PPP_OPENED_STATE);
-			locker.UnlockNow();
 			SendConfigureAck(packet);
 			ThisLayerUp();
 		break;
@@ -995,7 +932,6 @@ KPPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 			NewState(PPP_ACK_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
 			SendConfigureAck(packet);
@@ -1013,8 +949,6 @@ KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
 	TRACE("KPPPSM: RCRBadEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -1022,7 +956,6 @@ KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 		break;
 		
 		case PPP_CLOSED_STATE:
-			locker.UnlockNow();
 			SendTerminateAck();
 		break;
 		
@@ -1035,7 +968,6 @@ KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
 		
@@ -1046,7 +978,6 @@ KPPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 		
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
-			locker.UnlockNow();
 			if(nak && ntohs(mtod(nak, ppp_lcp_packet*)->length) > 3)
 				SendConfigureNak(nak);
 			else if(reject && ntohs(mtod(reject, ppp_lcp_packet*)->length) > 3)
@@ -1071,8 +1002,6 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RCAEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
 		
@@ -1089,7 +1018,6 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 		optionHandler = LCP().OptionHandlerAt(index);
 		if(optionHandler->ParseAck(ack) != B_OK) {
 			m_freem(packet);
-			locker.UnlockNow();
 			CloseEvent();
 			return;
 		}
@@ -1103,7 +1031,6 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 		
 		case PPP_CLOSED_STATE:
 		case PPP_STOPPED_STATE:
-			locker.UnlockNow();
 			SendTerminateAck();
 		break;
 		
@@ -1114,14 +1041,12 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 		
 		case PPP_ACK_RCVD_STATE:
 			NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_OPENED_STATE);
 			InitializeRestartCount();
-			locker.UnlockNow();
 			ThisLayerUp();
 		break;
 		
@@ -1129,7 +1054,6 @@ KPPPStateMachine::RCAEvent(struct mbuf *packet)
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
 		break;
@@ -1147,8 +1071,6 @@ void
 KPPPStateMachine::RCNEvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RCNEvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
@@ -1168,14 +1090,12 @@ KPPPStateMachine::RCNEvent(struct mbuf *packet)
 		if(nak_reject.Code() == PPP_CONFIGURE_NAK) {
 			if(optionHandler->ParseNak(nak_reject) != B_OK) {
 				m_freem(packet);
-				locker.UnlockNow();
 				CloseEvent();
 				return;
 			}
 		} else if(nak_reject.Code() == PPP_CONFIGURE_REJECT) {
 			if(optionHandler->ParseReject(nak_reject) != B_OK) {
 				m_freem(packet);
-				locker.UnlockNow();
 				CloseEvent();
 				return;
 			}
@@ -1190,7 +1110,6 @@ KPPPStateMachine::RCNEvent(struct mbuf *packet)
 		
 		case PPP_CLOSED_STATE:
 		case PPP_STOPPED_STATE:
-			locker.UnlockNow();
 			SendTerminateAck();
 		break;
 		
@@ -1201,7 +1120,6 @@ KPPPStateMachine::RCNEvent(struct mbuf *packet)
 		case PPP_ACK_RCVD_STATE:
 			if(State() == PPP_ACK_RCVD_STATE)
 				NewState(PPP_REQ_SENT_STATE);
-			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
 		
@@ -1209,7 +1127,6 @@ KPPPStateMachine::RCNEvent(struct mbuf *packet)
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
 		break;
@@ -1227,8 +1144,6 @@ void
 KPPPStateMachine::RTREvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RTREvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	// we should not use the same ID as the peer
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
@@ -1249,7 +1164,6 @@ KPPPStateMachine::RTREvent(struct mbuf *packet)
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
 				// indicates to handlers that we are terminating
-			locker.UnlockNow();
 			SendTerminateAck(packet);
 		break;
 		
@@ -1258,7 +1172,6 @@ KPPPStateMachine::RTREvent(struct mbuf *packet)
 			NewPhase(PPP_TERMINATION_PHASE);
 				// indicates to handlers that we are terminating
 			ZeroRestartCount();
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendTerminateAck(packet);
 		break;
@@ -1266,7 +1179,6 @@ KPPPStateMachine::RTREvent(struct mbuf *packet)
 		default:
 			NewPhase(PPP_TERMINATION_PHASE);
 				// indicates to handlers that we are terminating
-			locker.UnlockNow();
 			SendTerminateAck(packet);
 	}
 }
@@ -1277,8 +1189,6 @@ void
 KPPPStateMachine::RTAEvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RTAEvent() state=%d phase=%d\n", State(), Phase());
-	
-	LockerHelper locker(fLock);
 	
 	if(fTerminateID != mtod(packet, ppp_lcp_packet*)->id) {
 		// this packet is not a reply to our request
@@ -1297,13 +1207,11 @@ KPPPStateMachine::RTAEvent(struct mbuf *packet)
 		
 		case PPP_CLOSING_STATE:
 			NewState(PPP_CLOSED_STATE);
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
 		case PPP_STOPPING_STATE:
 			NewState(PPP_STOPPED_STATE);
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
@@ -1315,7 +1223,6 @@ KPPPStateMachine::RTAEvent(struct mbuf *packet)
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
 		break;
@@ -1335,8 +1242,6 @@ KPPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 {
 	TRACE("KPPPSM: RUCEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -1345,7 +1250,6 @@ KPPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 		break;
 		
 		default:
-			locker.UnlockNow();
 			SendCodeReject(packet, protocolNumber, code);
 	}
 }
@@ -1359,7 +1263,6 @@ KPPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 	
 	// This method does not m_freem(packet) because the acceptable rejects are
 	// also passed to the parent. RXJEvent() will m_freem(packet) when needed.
-	LockerHelper locker(fLock);
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -1383,8 +1286,6 @@ KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 {
 	TRACE("KPPPSM: RXJBadEvent() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -1395,7 +1296,6 @@ KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 			NewState(PPP_CLOSED_STATE);
 		
 		case PPP_CLOSED_STATE:
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
@@ -1408,7 +1308,6 @@ KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 			NewPhase(PPP_TERMINATION_PHASE);
 		
 		case PPP_STOPPED_STATE:
-			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
 		
@@ -1417,7 +1316,6 @@ KPPPStateMachine::RXJBadEvent(struct mbuf *packet)
 			NewPhase(PPP_TERMINATION_PHASE);
 				// indicates to handlers that we are terminating
 			InitializeRestartCount();
-			locker.UnlockNow();
 			ThisLayerDown();
 			SendTerminateRequest();
 		break;
@@ -1469,15 +1367,10 @@ KPPPStateMachine::TimerEvent()
 		TRACE("KPPPSM: TimerEvent()\n");
 #endif
 	
-	// We might cause a dead-lock. Thus, abort if we cannot get the lock.
-	if(fLock.LockWithTimeout(100000) != B_OK)
+	if(fNextTimeout == 0 || fNextTimeout > system_time())
 		return;
-	if(fNextTimeout == 0 || fNextTimeout > system_time()) {
-		fLock.Unlock();
-		return;
-	}
+	
 	fNextTimeout = 0;
-	fLock.Unlock();
 	
 	switch(State()) {
 		case PPP_CLOSING_STATE:
@@ -1669,8 +1562,6 @@ KPPPStateMachine::ThisLayerUp()
 {
 	TRACE("KPPPSM: ThisLayerUp() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
-	
 	// We begin with authentication phase and wait until each phase is done.
 	// We stop when we reach established phase.
 	
@@ -1679,8 +1570,6 @@ KPPPStateMachine::ThisLayerUp()
 		return;
 	
 	NewPhase(PPP_AUTHENTICATION_PHASE);
-	
-	locker.UnlockNow();
 	
 	BringProtocolsUp();
 }
@@ -1739,10 +1628,8 @@ KPPPStateMachine::SendConfigureRequest()
 {
 	TRACE("KPPPSM: SendConfigureRequest() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
 	--fRequestCounter;
 	fNextTimeout = system_time() + kPPPStateMachineTimeout;
-	locker.UnlockNow();
 	
 	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
 	request.SetID(NextID());
@@ -1811,10 +1698,8 @@ KPPPStateMachine::SendTerminateRequest()
 {
 	TRACE("KPPPSM: SendTerminateRequest() state=%d phase=%d\n", State(), Phase());
 	
-	LockerHelper locker(fLock);
 	--fTerminateCounter;
 	fNextTimeout = system_time() + kPPPStateMachineTimeout;
-	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	if(!packet)
@@ -1939,8 +1824,6 @@ KPPPStateMachine::BringProtocolsUp()
 		if(BringPhaseUp() > 0)
 			break;
 		
-		LockerHelper locker(fLock);
-		
 		if(Phase() < PPP_AUTHENTICATION_PHASE)
 			return;
 				// phase was changed by another event
@@ -1960,8 +1843,6 @@ KPPPStateMachine::BringPhaseUp()
 {
 	// Servers do not need to bring all protocols up.
 	// The client specifies which protocols he wants to go up.
-	
-	LockerHelper locker(fLock);
 	
 	// check for phase change
 	if(Phase() < PPP_AUTHENTICATION_PHASE)
