@@ -79,6 +79,24 @@ public:
 	}
 };
 
+// DoublyLinkedListCLink - interface to struct list
+template<typename Element>
+class DoublyLinkedListCLink {
+	private:
+		typedef DoublyLinkedListLink<Element> Link;
+
+	public:
+		inline Link *operator()(Element *element) const
+		{
+			return (Link *)&element->link;
+		}
+
+		inline const Link *operator()(const Element *element) const
+		{
+			return (const Link *)&element->link;
+		}
+};
+
 // for convenience
 #define DOUBLY_LINKED_LIST_TEMPLATE_LIST \
 	template<typename Element, typename GetLink>
@@ -201,6 +219,7 @@ public:
 	inline bool IsEmpty() const			{ return (fFirst == NULL); }
 
 	inline void Insert(Element *element, bool back = true);
+	inline void Insert(Element *before, Element *element);
 	inline void Add(Element *element, bool back = true);
 	inline void Remove(Element *element);
 
@@ -266,6 +285,31 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *element, bool back)
 			fFirst = element;
 		}
 	}
+}
+
+// Insert
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
+{
+	if (before == NULL) {
+		Insert(element, false);
+		return;
+	}
+	if (element == NULL)
+		return;
+
+	Link *beforeLink = sGetLink(before);
+	Link *link = sGetLink(element);
+
+	link->previous = before;
+	link->next = beforeLink->next;
+	if (link->next != NULL)
+		link->next->previous = element;
+	beforeLink->next = element;
+
+	if (fLast == before)
+		fLast = element;
 }
 
 // Add
