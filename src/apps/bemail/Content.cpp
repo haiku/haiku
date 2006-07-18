@@ -144,7 +144,7 @@ Unicode2UTF8(int32 c, char **out)
 
 
 static bool
-FilterHTMLTag(int32 *first, char **t, char *end)
+FilterHTMLTag(int32 &first, char **t, char *end)
 {
 	const char *newlineTags[] = {
 		"br", "/p", "/div", "/table", "/tr",
@@ -153,10 +153,12 @@ FilterHTMLTag(int32 *first, char **t, char *end)
 	char *a = *t;
 
 	// check for some common entities (in ISO-Latin-1)
-	if (first[0] == '&') {
+	if (first == '&') {
 		// filter out and convert decimal values
-		if (a[1] == '#' && sscanf(a + 1, "%ld;", first) == 1)
+		if (a[1] == '#' && sscanf(a + 2, "%ld;", &first) == 1) {
+			t[0] += strchr(a, ';') - a;
 			return false;
+		}
 
 		const struct { char *name; int32 code; } entities[] = {
 			// this list is sorted alphabetically to be binary searchable
@@ -229,14 +231,14 @@ FilterHTMLTag(int32 *first, char **t, char *end)
 			int32 length = strlen(entities[i].name);
 			if (!strncmp(a + 1, entities[i].name, length)) {
 				t[0] += length;	// note that the '&' is included here
-				first[0] = entities[i].code;
+				first = entities[i].code;
 				return false;
 			}
 		}
 	}
 
 	// no tag to filter
-	if (first[0] != '<')
+	if (first != '<')
 		return false;
 
 	a++;
@@ -265,12 +267,13 @@ FilterHTMLTag(int32 *first, char **t, char *end)
 	}
 
 	// skip until tag end
-	while (a[0] && a[0] != '>' && a < end) a++;
+	while (a[0] && a[0] != '>' && a < end)
+		a++;
 
 	t[0] = a;
 
 	if (newline) {
-		first[0] = '\n';
+		first = '\n';
 		return false;
 	}
 
@@ -2369,7 +2372,7 @@ TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink, bool 
 	if (!fView->Window()->Lock())
 		return false;
 
-	fView->Insert(line, count, &style.Array());
+	fView->Insert(fView->TextLength(), line, count, &style.Array());
 
 	fView->Window()->Unlock();
 	return true;
@@ -2467,23 +2470,25 @@ TTextView::Reader::Run(void *_this)
 			if (body->MIMEType(&type) == B_OK && type == "text/html") {
 				// strip out HTML tags
 				char *t = bodyText, *a, *end = bodyText + bodyLength;
-				bodyText = (char *) malloc (bodyLength + 1);
+				bodyText = (char *)malloc(bodyLength + 1);
 				isHTML = true;
+
+				// TODO: is it correct to assume that the text is in Latin-1?
+				//		because if it isn't, the code below won't work correctly...
 
 				for (a = bodyText; t < end; t++) {
 					int32 c = *t;
 
-					// compact newlines and spaces
+					// compact spaces
 					bool space = false;
-					while (c && isspace(c)) {
+					while (c && (c == ' ' || c == '\t')) {
 						c = *(++t);
 						space = true;
 					}
 					if (space) {
 						c = ' ';
 						t--;
-					}
-					else if (FilterHTMLTag(&c, &t, end))	// the tag filter
+					} else if (FilterHTMLTag(c, &t, end))	// the tag filter
 						continue;
 
 					Unicode2UTF8(c, &a);
