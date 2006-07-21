@@ -41,16 +41,16 @@ Chapter 5: Dynamic Data Exchange: Passing Data Between Applications
 Chapter 6: Use of Text in the GUI
 	Error Messages
 	Ellipses
-	Colons
 	Abbreviations, Acronyms, and Contractions, oh my!
 	cApItAlIzAtIoN and Speling
 	Use of Fonts
+	Special Case: The Command Line
 
-Icons
-	Conventions
-	Designing a good icon
-	Packaging an icon
-	Recongnizability
+Chapter 7: Branding - Icons, About Windows, Graphics, and other Visuals
+	Icons
+	About Windows
+	Graphics
+	Other Visuals
 
 Cursors
 	Predefined
@@ -89,7 +89,7 @@ Controls
 	BTextControl / BTextView
 	ListViews
 	Tabs
-	Scrollbarsso
+	Scrollbars
 	Color Pickers
 	Progress Meters
 	Toolbars
@@ -410,13 +410,13 @@ Replicants
 
 Chapter 6: Use of Text in the GUI
 
-	Unless you are writing a program for the command line, your program will use text. There is, believe it or not, a right way and a wrong way to use text in your program, and while most of the guidelines for text might seem trivial, attention to detail is what separates a good program from a great one.
+	Almost without exception, if you are writing a program, you will need to pay at least a little attention to how it uses text. There is, believe it or not, a right way and a wrong way to use text in your program, and while most of the guidelines for text might seem trivial, attention to detail is what separates a good program from a great one.
 
 Above all else mentioned in this chapter, use everyday language and be both clear and concise.
 
 Error Messages
 
-	Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible, right? Right? Suuuuure you did. :) When your program can't handle a particular error, the error message given to the user should follow these rules of thumb:
+	Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible, right? Right? :) When your program can't handle a particular error, the error message given to the user should follow these rules of thumb:
 
 1) Explain what happened in everyday words.
 2) Provide enough information to know what happened without providing details which could confuse the user. For example, if a mail client sends a request to a server for e-mail and the server fails to respond, a way to explain this might be something like "MyMailApp could not check your e-mail. The mail server did not respond when contacted."
@@ -424,18 +424,57 @@ Error Messages
 
 Ellipses
 
-	An ellipsis is a series of 3 dots (...) and it has a special function in a GUI: to convey to the user that a control will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then no ellipsis is necessary. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Users of the U.S. keymap can type in an ellipsis with Option + period.
-
-Colons
-
-	A colon (:) is a good way to introduce a control, such as a text box, or group of controls, like a list of checkboxes. When using them, just be sure not to use them in menu items, group controls (BBox), column titles, or tabs.
+	An ellipsis is a series of 3 dots (...). It is used in a GUI to convey to the user that a control, often a menu item or button, will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Many keymaps allow you to type in an ellipsis with Option + period.
 
 Abbreviations, Acronyms, and Contractions, oh my!
 
-	Sometimes space is at a premium. Abbreviations and acronyms can com in very handy in these instances. However, their use can also lead to confusion. 
+	Sometimes space is at a premium. Abbreviations, acronyms, and contractions can come in very handy in these instances, but they can also lead to confusion. Whenever possible, avoid using them -- many times the reason there is not enough space is because more can be done with control layout to use existing screen real estate more efficiently. When using an abbreviation, please be sure that it is absolutely necessary, that it is both common and clear, and that it is appropriate for your program's target audience. For example, using the octothorpe (# symbol) is an abbreviation for the word 'number' in the English language which fits these criteria in most cases. These same guidelines also apply to acronyms. For example, the acronym CMYK (Cyan, Magenta, Yellow, Black) is acceptable in a color picker for an image processing application designed for graphics professionals, but not in one meant for children.
+	Special care must be used with contractions. They can be a pitfall for users who are not using a program which is in their native language. Because they require more advanced command of the language, avoid using them in a place where their role is crucial in conveying the meaning of a message. For example, a checkbox for a message dialog with a checkbox marked "Don't show this message again" which is unchecked by default should be reworded "Always show this message" and have the checkbox checked by default.
 
 cApItAlIzAtIoN and Speling
 
-	Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized.
+	Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particulary important if you are working with a language which is not your native one. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized except when they are the first or last word in the phrase, such as in "Save As...".
 
 Use of Fonts
+
+	Good use of fonts can make your program more visually appealing, but when not used well, can make it an eyesore, hard-to-read, or worse. As a general rule, stick to the plain, bold, and fixed system fonts. This will result in more visual consistency across the operating system. It is perfectly acceptable to use a different font size, but do so only when a heading is needed or something similar and try to limit the number of different sizes to 2 or 3. A window which has lots of different font styles or sizes is harder to read and looks less professional. Control labels should always be in the system plain font and size specified by the system.
+	When calculating the layout for the controls, be sure that you do not depend on the system font being set to a particular font size. Most BControl-derived controls implement the methods GetPreferredSize and ResizeToPreferred to take font size into account. A basic idea of the line height for a font can be calculated by calling BFont::GetHeight() and adding together the values of the font_height structure.
+	Lastly, do not depend on the user having a particular font installed on the system unless you are willing to ensure that the user has it installed on the system. If you do follow this route, be sure to check to see if you have redistribution rights for the font's license for the font in question.
+
+
+Special Case: The Command Line
+
+	When designing a program to work in a command-line environment there are some special considerations which must be addressed. Interaction with other programs, use in shell scripts, and a generally consistent interface for command-line programs are just some of the things you will need to keep in mind. The major design decisions you should make are how your program will get its data, what options are available, and what feedback the user will be given.
+	Give some thought to how your program should interact with the shell and with other programs. Most of the time, this will boil down to whether your program is file-oriented or stream-oriented. Stream-oriented programs more or less work like filters -- getting data from stdin and dumping data to stdout. Programs like grep and less work this way. File-oriented programs like zip and bzip2 are given a list of files which the program then operates on. Your program can certainly use both stream input and file input, but one of the two methods should be considered the primary method because of the influence it will have on other design decisions. If your program is file-oriented, seriously consider handling wildcards instead of relying on the shell to do it. While this does mean more work for you as a developer, it also reduces typing and, thus, typing errors. Of course, if supporting wildcards does not make sense for reasons specific to your program, then don't do it.
+	Options accessible by command-line switches should be carefully designed just like any other feature of your program. An option should be available only if it fills a reasonably common task. Please remember that complexity in using your program increases as options are added -- options are essentially additional features. GNU-style (double dash + long name) switches should be provided for all options. The most commonly-used options should also have a corresponding short (single-dash + single letter) one. The GNU-style --help and short-style -h switches are reserved for showing help. Note that while standard UNIX applications (ls, tar, df, etc.) are not required to follow the standard for -h in order to avoid breaking backward compatibility, all new command-line programs need to follow this.
+	When an option requires a particular value, there is also a standard for how the user is to provide the information. GNU-style command options should follow the format --option=value with the option to enclose the value in quotes. Multiple values should be comma-separated. Short-style command options should place a space between each value that follows it in this manner: -t value1 value2 value2 ... Note that as mentioned above wildcards should be handled by the program except when it does not make sense to do so. If your program does something which modifies data, make sure that your program requires some sort of parameter -- a switch, a file, or whatever -- so that data is not lost should the user invoke your program without knowing what it does; do not expect the user to have expert knowledge of the operating system or, for that matter, your program. Programs which merely report information -- ls comes to mind -- are not required to follow this provided that the information shown gives the user a sufficient idea of what the program does.
+	Be sure to provide adequate feedback when your program performs its task. Just as in graphical programs, long tasks should inform the user of progress. This may be something as complex as the progress meter used by wget, a simple series of periods, a listing each file operated on, or something else. *All* programs should provide some sort of feedback -- the only time a program may print nothing is if there is a "quiet" option which the user has specified. The feedback doesn't even have to be excessive; general details can be provided. A "verbose" option should provide more detail than the program does by default. Error messages should be no more technical than absolutely necessary and should be helpful whenever possible. If no input is specified and is required, show the same message as for the help option or an abbreviated version thereof which is still reasonably informative along with a message pointing the user to the help option for more detailed information.
+
+
+
+Chapter 7: Branding - Icons, About Windows, Graphics, and other Visuals
+
+	With all this discussion, you may be beginning to think that having a well-designed program means that it is visually boring. This is not at all the case. There is plenty of freedom for creativity along with some guidelines to get you started.
+
+Icons
+
+	Your program's icon is one easy way to set it apart from the rest of the pack. BeOS icons follow one of two perspectives - flat and isometric. Flat icons are those which are from a head-on view. Isometric icons "look down" on the icon from a point above and to the right of the object with "horizontal" lines angling at about -30 degrees. A good icon can impart a favorable and professional impression of your program to people who are otherwise unfamiliar with it. Take some time to create or find a good-looking icon. At worst, don't use an icon at all and rely on the system to show the default application icon. The default icon, while not as good as a well-designed one unique to your program, is a much better choice than a shabby one. An icon which was drawn in haste does not reflect well on your program's reputation.
+
+Icon Design Tips:
+
+- Remember that this will be small - don't use too much detail.
+
+- Use color combinations pleasing to the eye.
+
+- Tie it into the general color scheme of your program if there is one.
+
+
+About Windows
+
+	Give yourself some credit in your program - make an About Window. They don't need to be especially fancy, but they can be if you are so inclined. It should contain the title of your program, the version, you and any other authors, and copyright information. If nothing else, a few lines of code to show a BAlert with this information is all that is needed. If there is a lot of information to show, using a marquee effect to automatically scroll the information or something similar would be a good idea. Do not include information about the computer itself, such as the amount of RAM or processor speed. While you certainly may show something like "Distributed under the terms of the GNU Public License," the full text of the license your program is distributed under belongs elewhere. The window should not have a title and should either have a button marked 'Close' or simply disappear when clicked. It should also respond to the Commannd + W keyboard shortcut.
+
+
+Graphics
+
+
+Other Visuals
