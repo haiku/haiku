@@ -46,25 +46,22 @@ Chapter 6: Use of Text in the GUI
 	Use of Fonts
 	Special Case: The Command Line
 
-Chapter 7: Branding - Icons, About Windows, Graphics, and other Visuals
-	Icons
+Chapter 7: Branding - Program Icons, About Windows, Graphics, and other Visuals
+	Program Icons
 	About Windows
-	Graphics
-	Other Visuals
+	Graphics and Other Visuals
 
-Cursors
-	Predefined
-	Use of
-	Animation
+Chapter 8: Cursors
+	Predefined Cursors and their Use
+	Making Your Own Cursors
+	Animating Cursors
 
-Menus, Menu Bars, and Menu Fields
-	Grouping of items
-	Titling / Naming conventions
-	Use of submenus
-	Use of marked items vs toggled names
-	Explanation of common menus and their contents
+Chapter 9: Menus, Menu Bars, and Menu Fields
+	Naming and Organization
+	Marking and Toggling Items
+	Common Menus and their Contents
 	
-Windows
+Chapter 10: Windows
 	Modality
 	Appropriate use of styles
 	Placement / positioning
@@ -80,7 +77,7 @@ Windows
 	Preferences window design
 	Open / Save panels
 	
-Controls
+Chapter 11: Controls
 	Radio Buttons
 	Buttons
 	Checkboxes
@@ -93,8 +90,9 @@ Controls
 	Color Pickers
 	Progress Meters
 	Toolbars
+	Menu Fields and Pop-up Menus
 
-Installation and Updates
+Chapter 12: Installation and Updates
 	Zip files
 	SoftwareValet packages
 	
@@ -452,11 +450,11 @@ Special Case: The Command Line
 
 
 
-Chapter 7: Branding - Icons, About Windows, Graphics, and other Visuals
+Chapter 7: Branding - Program Icons, About Windows, Graphics, and other Visuals
 
 	With all this discussion, you may be beginning to think that having a well-designed program means that it is visually boring. This is not at all the case. There is plenty of freedom for creativity along with some guidelines to get you started.
 
-Icons
+Program Icons
 
 	Your program's icon is one easy way to set it apart from the rest of the pack. BeOS icons follow one of two perspectives - flat and isometric. Flat icons are those which are from a head-on view. Isometric icons "look down" on the icon from a point above and to the right of the object with "horizontal" lines angling at about -30 degrees. A good icon can impart a favorable and professional impression of your program to people who are otherwise unfamiliar with it. Take some time to create or find a good-looking icon. At worst, don't use an icon at all and rely on the system to show the default application icon. The default icon, while not as good as a well-designed one unique to your program, is a much better choice than a shabby one. An icon which was drawn in haste does not reflect well on your program's reputation.
 
@@ -471,10 +469,138 @@ Icon Design Tips:
 
 About Windows
 
-	Give yourself some credit in your program - make an About Window. They don't need to be especially fancy, but they can be if you are so inclined. It should contain the title of your program, the version, you and any other authors, and copyright information. If nothing else, a few lines of code to show a BAlert with this information is all that is needed. If there is a lot of information to show, using a marquee effect to automatically scroll the information or something similar would be a good idea. Do not include information about the computer itself, such as the amount of RAM or processor speed. While you certainly may show something like "Distributed under the terms of the GNU Public License," the full text of the license your program is distributed under belongs elewhere. The window should not have a title and should either have a button marked 'Close' or simply disappear when clicked. It should also respond to the Commannd + W keyboard shortcut.
+	Give yourself some credit in your program - make an About Window. They don't need to be especially fancy, but they can be if you are so inclined. It should contain the title of your program, the version, you and any other authors, and copyright information. If nothing else, a few lines of code to show a BAlert with this information is all that is needed. If there is a lot of information to show, using a marquee effect to automatically scroll the information or something similar would be a good idea. Do not include information about the computer itself, such as the amount of RAM or processor speed. While you certainly may show something like "Distributed under the terms of the GNU Public License," the full text of the license your program is distributed under belongs elsewhere. The window should not have a title and should either have a button marked 'Close' or simply disappear when clicked. It should also respond to the Command + W keyboard shortcut.
 
 
-Graphics
+Graphics and Other Visuals
+
+	Graphics need not even be limited to your About window and the program icon. You can also use background images in BViews, toolbars, buttons, and other places. There are few hard-and-fast rules here, but there are some tips you might find useful:
+
+- The associated function of each toolbar icon should be immediately recognizable
+
+- Labelled toolbar buttons are easier to click and the reduces -- but doesn't eliminate -- the amount of care needed when designing their icons.
+
+- Background images should not be too busy and should not reduce overall readability.
+
+- If your program uses only a few small pictures, you may want to package them in a resource file to prevent them from somehow coming up missing in the installation on a user's machine. Crazy things happen on people's computers.
 
 
-Other Visuals
+
+Chapter 8: Cursors
+
+
+
+Predefined Cursors and their Use
+
+	As of this writing, there are only two predefined icons available for use in Haiku: the hand cursor and the text cursor. The text cursor is used whenever text editing is needed and the hand is used everywhere else. There will be more cursors for other uses at some future time which will include resizing and drag and drop.
+
+
+Making Your Own Cursors
+
+	You can very easily make your own cursors for your own purposes, but do so only if a different cursor will dramatically improve how well the user can work with your program. When designing a cursor, keep in mind that at the moment they can only be 16 pixels square and in black and white. Be sure that the hot spot, the actual location passed to applications when a mouse button is pressed, is very obvious. Examples of this would be the tip of the hand cursor, the point of the arrow, or the center of a crosshairs. Use the full dimensions available whenever possible to increase the cursor's visibility at high screen resolutions.
+
+NOTE: There is not nor will there ever be a busy cursor in BeOS-based operating systems. This is a deliberate design decision. If you have a need for a busy cursor, you need to redesign your program for better responsiveness. Often you can use multiple threads to eliminate the need for a busy cursor.
+
+
+Animating Cursors
+
+	While Haiku does not provide explicit support for them, it is possible to animate cursors to provide a little more graphical appeal. As with any kind of movement in the display, use animation sparingly so that it is not distracting.
+
+
+
+Chapter 9: Menus, Menu Bars, and Menu Fields
+
+
+
+	Menus are about as commonplace in programs as windows are, but even though they are everywhere, far too many programs don't use them as well as they could be. Attention to small details in a program's menus is one common difference between good programs and great ones.
+	Menus are powerful and simple at the same time. They allow a developer to pack a lot of functionality into a small space and, at the same time, the user does not have to remember what the particular command is called -- they afford exploration of the interface in steps. This chapter will focus primarily on issues related to menus in general. Pop-up menus and menu fields are discussed in Chapter 11.
+
+
+Naming and Organization
+
+	Choosing good names for menus and items is generally not difficult. A menu should have a name which is as short as possible  and still accurately describes the items contained in it. For example, a File menu should not have Copy and Paste items in it. The same goes for items in the menu. The items are capitalized as described in Chapter 6 and an ellipsis is used after any items which open a window. Any window which is shown this way should have the same title as the item which showed it, so remember this when constructing menu item titles.
+	A common method for organizing menus is the Noun-Verb method, which names menus after the items that it pertains to and items in the menu are actions which can be operated on that item. For example, the File menu contains items such as Open, Print, Save, and Close.
+	Items should be organized and grouped by function and/or attribute. Use a separator item between each item group. An example of this would be an Edit menu which looks like this:
+
+	_________
+	| Edit  |
+	|-------|
+	| Undo  |
+	| Redo  |
+	|-------|
+	| Cut   |
+	| Copy  |
+	| Paste |
+	|_______|
+
+	Undo and Redo perform related, though opposite, functions. Cut, Copy, and Paste are all clipboard functions, so the belong in a group separate from Undo and Redo. A font menu would group font styles together. When organizing the menus in a menu bar, try to have a logical progression from one menu to another. A financial program might have these menus: Program, File, Account, Transaction, and Help.
+	Submenus are another option for grouping menu items, particularly for attributes. They should be avoided when other options exist because they slow the user down and also add complexity to the interface. Younger and older users also have trouble navigating to submenus because of the fine motor skills required. If your submenu has 6 or more items in it, consider placing them in their own top-level menu.
+
+Marking and Toggling Items
+
+	Menus can also contain items which indicate the state of a feature, such as the visibility of a tool window. There are two ways that this can be done. The first is to use a menu item with a dynamic title. In both states, it must be completely clear to the user what will happen when the item is clicked just be reading the title. The other method is to place a checkmark beside the item indicating the current state. The advantage to this method is that it can be used for a choice of more than two states with the drawback of using more screen space. When using this method, all possible states need to be listed in order to prevent confusion.
+
+
+Examples of Good Dynamic Menu Item Usage:
+
+|Window| -> Show Tool Window / Hide Tool Window, Show Color Picker / Hide Color Picker
+|Options| -> Change to Wireframe Preview / Change to Full Preview
+
+
+Examples of Good Multiple State Item Usage:
+
+|Help| -> Read the Manual...|Show Tooltips,Do Not Show Tooltips|Go to the MyApp Website
+|Font| -> Choose Font and Size...|Normal,Bold,Italics,Strikeout,Underline
+
+
+Common Menus and their Contents
+
+Below are descriptions for menus that are common to many programs. Because they are so common, there are some guidelines to how they should be used so that there is some consistency across the operating system. With the exception of the Program menu, each of these menus should be used only if they make sense for your program.
+
+
+Program: Items related to operating on the program itself.
+	
+About <app name here>... - shows the About window. This is not a commonly-accessed item, so do not provide a keyboard shortcut for it.
+
+Options... (Command - ,) - Show the window which is used to customize the settings for your program. This can be a submenu if your program only has a couple of settings.
+	
+Quit (Command + Q) - This should be the bottom item in the menu and a separator should go above it.
+
+
+File: This contains items related to documents handled by your program.
+
+New (Command + N) - Create a new document.
+Open (Command + O)
+Open Recent
+Close (Command + W)
+Save (Command + S)
+Save As... (Command + Shift + S)
+Save All
+Revert
+Import From...
+Export To...
+Page Setup...
+Print... (Command + P)
+
+Edit: Items in this menu are used for different editing tasks
+
+Undo (Command + Z)
+Redo (Command + Shift + Z)
+Cut (Command + X)
+Copy (Command + C)
+Paste (Command + V)
+Clear
+Select All (Command + A)
+
+
+Search: Tasks in this menu include finding and replacing data and other navigation commands.
+
+Find... (Command + F)
+Find Next (Command + G)
+Go to Line (Command + .)
+
+
+Help: Different ways that the user can learn more about your program and get help when needed.
+
+Read the Manual...
+Go to (MyApp or MyCompany)'s Website
