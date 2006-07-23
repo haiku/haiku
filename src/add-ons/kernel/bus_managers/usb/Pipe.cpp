@@ -94,13 +94,14 @@ status_t
 ControlPipe::SendControlMessage(usb_request_data *command, void *data,
 	size_t dataLength, size_t *actualLength, bigtime_t timeout)
 {
-	// this method should build an usb packet (new class) with the needed data
-	Transfer *transfer = new Transfer(this, true);
+	// builds an usb packet with the needed data
+	Transfer transfer(this, true);
 
-	transfer->SetRequestData(command);
-	transfer->SetBuffer((uint8 *)data);
-	transfer->SetBufferLength(dataLength);
-	transfer->SetActualLength(actualLength);
+	transfer.SetRequestData(command);
+	transfer.SetBuffer((uint8 *)data);
+	transfer.SetBufferLength(dataLength);
+	transfer.SetActualLength(actualLength);
 
-	return fBus->SubmitTransfer(transfer, timeout);
+	fBus->SubmitTransfer(&transfer);
+	return transfer.WaitForFinish();
 }

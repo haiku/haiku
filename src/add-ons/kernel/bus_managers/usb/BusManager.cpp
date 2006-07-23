@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -212,7 +213,15 @@ BusManager::Stop()
 
 
 status_t
-BusManager::SubmitTransfer(Transfer *transfer, bigtime_t timeout)
+BusManager::SubmitTransfer(Transfer *transfer)
+{
+	// virtual function to be overridden
+	return B_ERROR;
+}
+
+
+status_t
+BusManager::SubmitRequest(Transfer *transfer)
 {
 	// virtual function to be overridden
 	return B_ERROR;

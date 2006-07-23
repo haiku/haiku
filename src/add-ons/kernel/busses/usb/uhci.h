@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -22,15 +23,17 @@ public:
 									Queue(Stack *stack);
 									~Queue();
 
+		bool						Lock();
+		void						Unlock();
+
 		status_t					InitCheck();
 
 		status_t					LinkTo(Queue *other);
 		status_t					TerminateByStrayDescriptor();
 
 		status_t					AppendDescriptor(uhci_td *descriptor);
-		status_t					AddRequest(Transfer *transfer,
-										bigtime_t timeout);
-		status_t					RemoveInactiveDescriptors();
+		status_t					RemoveDescriptors(uhci_td *firstDescriptor,
+										uhci_td *lastDescriptor);
 
 		addr_t						PhysicalAddress();
 
@@ -42,31 +45,82 @@ private:
 		uhci_qh						*fQueueHead;
 		uhci_td						*fStrayDescriptor;
 		uhci_td						*fQueueTop;
+
+		// Benaphore locking
+		sem_id						fLockSem;
+		int32						fLockAtom;
 };
+
+
+typedef struct transfer_data_s {
+	Transfer		*transfer;
+	Queue			*queue;
+	uhci_td			*first_descriptor;
+	uhci_td			*data_descriptor;
+	uhci_td			*last_descriptor;
+	bool			incoming;
+	transfer_data_s	*link;
+} transfer_data;
 
 
 class UHCI : public BusManager {
 public:
 									UHCI(pci_info *info, Stack *stack);
+									~UHCI();
+
+		bool						Lock();
+		void						Unlock();
 
 		status_t					Start();
-		status_t					SubmitTransfer(Transfer *transfer,
-										bigtime_t timeout = 0);
+virtual	status_t					SubmitTransfer(Transfer *transfer);
+virtual	status_t					SubmitRequest(Transfer *transfer);
 
 static	bool						AddTo(Stack &stack);
 
-		void						GlobalReset();
-		status_t					ResetController();
-
-		// port operations
+		// Port operations
 		uint16						PortStatus(int32 index);
 		status_t					SetPortStatus(int32 index, uint16 status);
 		status_t					ResetPort(int32 index);
 
 private:
-		// Utility functions
+		// Controller resets
+		void						GlobalReset();
+		status_t					ControllerReset();
+
+		// Interrupt functions
 static	int32						InterruptHandler(void *data);
 		int32						Interrupt();
+
+		// Transfer functions
+		status_t					AddPendingTransfer(Transfer *transfer,
+										Queue *queue,
+										uhci_td *firstDescriptor,
+										uhci_td *dataDescriptor,
+										uhci_td *lastDescriptor,
+										bool directionIn);
+static	int32						FinishThread(void *data);
+		void						FinishTransfers();
+
+		// Descriptor functions
+		uhci_td						*CreateDescriptor(Pipe *pipe,
+										uint8 direction,
+										int32 bufferSizeToAllocate);
+		status_t					CreateDescriptorChain(Pipe *pipe,
+										uhci_td **firstDescriptor,
+										uhci_td **lastDescriptor,
+										uint8 direction,
+										int32 bufferSizeToAllocate);
+
+		void						FreeDescriptor(uhci_td *descriptor);
+		void						FreeDescriptorChain(uhci_td *topDescriptor);
+
+		void						LinkDescriptors(uhci_td *first,
+										uhci_td *second);
+
+		size_t						WriteDescriptorChain(uhci_td *topDescriptor,
+										const uint8 *buffer, int32 bufferSize);
+		size_t						ReadDescriptorChain(uhci_td *topDescriptor,
+										uint8 *buffer, int32 bufferSize);
 
 		// Register functions
 inline	void						WriteReg16(uint32 reg, uint16 value);
@@ -80,16 +134,24 @@ static	pci_module_info				*sPCIModule;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
 
+		// Benaphore locking
+		sem_id						fLockSem;
+		int32						fLockAtom;
+
 		// Frame list memory
 		area_id						fFrameArea;
 		addr_t						*fFrameList;
 
 		// Queues
 		int32						fQueueCount;
-		Queue						*fQueues[];
+		Queue						**fQueues;
 
-		// Maintain a list of transfers
-		Vector<Transfer *>			fTransfers;
+		// Maintain a linked list of transfers
+		transfer_data				*fFirstTransfer;
+		transfer_data				*fLastTransfer;
+		bool						fFinishTransfers;
+		thread_id					fFinishThread;
+		bool						fStopFinishThread;
 
 		// Root hub
 		UHCIRootHub					*fRootHub;

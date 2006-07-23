@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -247,9 +248,7 @@ UHCIRootHub::SubmitTransfer(Transfer *transfer)
 			break;
 	}
 
-	// Clean up the transfer - we own it, so we clean it up
-	transfer->Finish();
-	delete transfer;
+	transfer->Finished(result);
 	return result;
 }
 

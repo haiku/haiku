@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
 
@@ -139,8 +140,8 @@ virtual	status_t						InitCheck();
 virtual	status_t						Start();
 virtual	status_t						Stop();
 
-virtual	status_t						SubmitTransfer(Transfer *transfer,
-											bigtime_t timeout = 0);
+virtual	status_t						SubmitTransfer(Transfer *transfer);
+virtual	status_t						SubmitRequest(Transfer *transfer);
 
 protected:
 		void							SetRootHub(Hub *hub) { fRootHub = hub; };
@@ -263,11 +264,12 @@ public:
 		void						SetHostPrivate(hostcontroller_priv *priv);
 		hostcontroller_priv			*HostPrivate() { return fHostPrivate; };
 
-		void						SetCallbackFunction(usb_callback_func callback);
+		void						SetCallbackFunction(
+										usb_callback_func callback,
+										void *cookie);
 	
-		void						WaitForFinish();
-		void						TransferDone();
-		void						Finish();
+		status_t					WaitForFinish();
+		void						Finished(status_t result);
 
 private:
 		// Data that is related to the transfer
@@ -275,10 +277,11 @@ private:
 		uint8						*fBuffer;
 		size_t						fBufferLength;
 		size_t						*fActualLength;
-		bigtime_t					fTimeout;
 		status_t					fStatus;
 
 		usb_callback_func			fCallback;
+		void						*fCallbackCookie;
+
 		sem_id						fSem;
 		hostcontroller_priv			*fHostPrivate;
 
