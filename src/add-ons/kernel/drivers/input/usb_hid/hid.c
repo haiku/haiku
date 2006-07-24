@@ -29,12 +29,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
-#include <support/Debug.h>
-#include <stdlib.h>
-#include <unistd.h>
+
 #include "hid.h"
 #include "kb_mouse_driver.h"
 #include "usbdevs.h"
+
+#include <Debug.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 static int keyboard_device_number = 0;
 static int mouse_device_number = 0;

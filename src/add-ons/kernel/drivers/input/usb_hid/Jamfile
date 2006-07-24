@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 UsePrivateHeaders input ;
 
 KernelAddon usb_hid : kernel drivers bin :

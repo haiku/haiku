@@ -30,10 +30,11 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <drivers/Drivers.h>
-#include <drivers/USB.h>
-#include <drivers/usb/USB_hid.h>
 #include "hidparse.h"
+
+#include <Drivers.h>
+#include <USB.h>
+#include <usb/USB_hid.h>
 
 #if DEBUG
 	#define	DPRINTF_INFO(x)	dprintf x
