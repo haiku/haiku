@@ -1,34 +1,16 @@
-/*****************************************************************************/
-// HID usb driver
-// Written by Jérôme Duval
-//
-// hid.h
-//
-// Copyright (c) 2004 Haiku Project
-//
-// 	Some portions of code are copyrighted by
-//	USB Joystick driver for BeOS R5
-//	Copyright 2000 (C) ITO, Takayuki
-//	All rights reserved
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *
+ * Some portions of code are copyrighted by
+ * USB Joystick driver for BeOS R5
+ * Copyright 2000 (C) ITO, Takayuki. All rights reserved
+ */
+#ifndef _HID_H_
+#define _HID_H_
 
 #include "hidparse.h"
 
@@ -84,10 +66,9 @@ void cbuf_unlock(cbuffer *, cpu_status);
 
 struct driver_cookie;
 
-typedef struct my_device_info
-{
+typedef struct hid_device_info {
 	/* list structure */
-	struct my_device_info *next;
+	struct hid_device_info *next;
 
 	/* maintain device */
 	sem_id sem_cb;
@@ -118,7 +99,7 @@ typedef struct my_device_info
 	bigtime_t timestamp;
 	uint flags;
 	bool is_keyboard;
-} my_device_info;
+} hid_device_info;
 
 /* hid.c */
 
@@ -127,23 +108,23 @@ extern const char *my_driver_name;
 extern const char *keyboard_base_name;
 extern const char *mouse_base_name;
 
-my_device_info *
-create_device (const usb_device *dev, const usb_interface_info *ii, uint16 ifno, bool is_keyboard);
-
-void 
-remove_device (my_device_info *my_dev);
+hid_device_info *create_device(const usb_device *dev, const usb_interface_info *ii,
+	uint16 ifno, bool is_keyboard);
+void remove_device(hid_device_info *device);
 
 /* devlist.c */
 
-extern sem_id my_device_list_lock;
-extern bool my_device_list_changed;
+extern sem_id gDeviceListLock;
+extern bool gDeviceListChanged;
 
-void add_device_info (my_device_info *my_dev);
-void remove_device_info (my_device_info *my_dev);
-my_device_info *search_device_info (const char *name);
+void add_device_info(hid_device_info *device);
+void remove_device_info(hid_device_info *device);
+hid_device_info *search_device_info(const char *name);
 
-extern char **my_device_names;
+extern char **gDeviceNames;
 
-void alloc_device_names (void);
-void free_device_names (void);
-void rebuild_device_names (void);
+void alloc_device_names(void);
+void free_device_names(void);
+void rebuild_device_names(void);
+
+#endif	// _HID_H_

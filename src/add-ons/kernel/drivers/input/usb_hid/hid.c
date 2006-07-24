@@ -1,34 +1,15 @@
-/*****************************************************************************/
-// HID usb driver
-// Written by Jérôme Duval
-//
-// hid.c
-//
-// Copyright (c) 2004 Haiku Project
-//
-// 	Some portions of code are copyrighted by
-//	USB Joystick driver for BeOS R5
-//	Copyright 2000 (C) ITO, Takayuki
-//	All rights reserved
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *
+ * Some portions of code are copyrighted by
+ * USB Joystick driver for BeOS R5
+ * Copyright 2000 (C) ITO, Takayuki. All rights reserved
+ */
+
 
 #include "hid.h"
 #include "kb_mouse_driver.h"
@@ -40,108 +21,15 @@
 #include <string.h>
 #include <unistd.h>
 
-static int keyboard_device_number = 0;
-static int mouse_device_number = 0;
-const char *keyboard_base_name = "input/keyboard/usb/";
-const char *mouse_base_name = "input/mouse/usb/";
 
-my_device_info *
-create_device(const usb_device *dev, const usb_interface_info *ii,
-	uint16 ifno, bool is_keyboard)
-{
-	my_device_info *my_dev = NULL;
-	int number;
-	area_id area;
-	sem_id sem;
-	char	area_name [32];
-	const char *base_name;
-	
-	assert (usb != NULL && dev != NULL);
+#define MAX_BUTTONS 16
 
-	if (is_keyboard) {	
-		number = keyboard_device_number++;
-		base_name = keyboard_base_name;
-	} else {
-		number = mouse_device_number++;
-		base_name = mouse_base_name;
-	}
-	
-	my_dev = malloc (sizeof (my_device_info));
-	if (my_dev == NULL)
-		return NULL;
-
-	my_dev->sem_cb = sem = create_sem (0, DRIVER_NAME "_cb");
-	if (sem < 0) {
-		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
-		free (my_dev);
-		return NULL;
-	}
-
-	my_dev->sem_lock = sem = create_sem (1, DRIVER_NAME "_lock");
-	if (sem < 0) {
-		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
-		delete_sem (my_dev->sem_cb);
-		free (my_dev);
-		return NULL;
-	}
-
-	sprintf (area_name, DRIVER_NAME "_buffer%d", number);
-	my_dev->buffer_area = area = create_area (area_name,
-		(void **) &my_dev->buffer, B_ANY_KERNEL_ADDRESS,
-		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-	if (area < 0) {
-		DPRINTF_ERR ((MY_ID "create_area() failed %d\n", (int) area));
-		delete_sem (my_dev->sem_cb);
-		delete_sem (my_dev->sem_lock);
-		free (my_dev);
-		return NULL;
-	}
-
-	sprintf(my_dev->name, "%s%d", base_name, number);
-	my_dev->dev = dev;
-	my_dev->ifno = ifno;
-	my_dev->open = 0;
-	my_dev->open_fds = NULL;
-	my_dev->active = true;
-	my_dev->insns = NULL;
-	my_dev->num_insns = 0;
-	my_dev->flags = 0;
-	my_dev->cbuf = cbuf_init(384);
-	my_dev->is_keyboard = is_keyboard;
-	  	
-	return my_dev;
-}
-
-void 
-remove_device (my_device_info *my_dev)
-{
-	assert (my_dev != NULL);
-	if (my_dev->cbuf != NULL) {
-		cbuf_delete(my_dev->cbuf);
-		my_dev->cbuf = NULL;
-	}
-  
-	delete_area (my_dev->buffer_area);
-	delete_sem (my_dev->sem_cb);
-	delete_sem (my_dev->sem_lock);
-	free (my_dev);
-}
-
-
-/* driver cookie (per open) */
-
-typedef struct driver_cookie
-{
+typedef struct driver_cookie {
 	struct driver_cookie	*next;
-
-	my_device_info			*my_dev;
-	
+	hid_device_info			*device;
 } driver_cookie;
-	
-/* NB global variables are valid only while driver is loaded */
 
-_EXPORT int32	api_version = B_CUR_DRIVER_API_VERSION;
-
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 const char *hid_driver_name = "hid";
 
 usb_module_info *usb;
@@ -371,86 +259,196 @@ const uint32 key_table[] = {
 	0x00,	// unmapped
 	0x00,	// unmapped
 	0x00,	// unmapped
-	
 };
+
+static int sKeyboardDeviceNumber = 0;
+static int sMouseDeviceNumber = 0;
+static const char *sKeyboardBaseName = "input/keyboard/usb/";
+static const char *sMouseBaseName = "input/mouse/usb/";
+
+
+hid_device_info *
+create_device(const usb_device *dev, const usb_interface_info *ii,
+	uint16 ifno, bool isKeyboard)
+{
+	hid_device_info *device = NULL;
+	int number;
+	area_id area;
+	sem_id sem;
+	char	area_name [32];
+	const char *base_name;
+	
+	assert (usb != NULL && dev != NULL);
+
+	if (isKeyboard) {	
+		number = sKeyboardDeviceNumber++;
+		base_name = sKeyboardBaseName;
+	} else {
+		number = sMouseDeviceNumber++;
+		base_name = sMouseBaseName;
+	}
+	
+	device = malloc (sizeof (hid_device_info));
+	if (device == NULL)
+		return NULL;
+
+	device->sem_cb = sem = create_sem (0, DRIVER_NAME "_cb");
+	if (sem < 0) {
+		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
+		free (device);
+		return NULL;
+	}
+
+	device->sem_lock = sem = create_sem (1, DRIVER_NAME "_lock");
+	if (sem < 0) {
+		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
+		delete_sem (device->sem_cb);
+		free (device);
+		return NULL;
+	}
+
+	sprintf (area_name, DRIVER_NAME "_buffer%d", number);
+	device->buffer_area = area = create_area (area_name,
+		(void **) &device->buffer, B_ANY_KERNEL_ADDRESS,
+		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	if (area < 0) {
+		DPRINTF_ERR ((MY_ID "create_area() failed %d\n", (int) area));
+		delete_sem (device->sem_cb);
+		delete_sem (device->sem_lock);
+		free (device);
+		return NULL;
+	}
+
+	sprintf(device->name, "%s%d", base_name, number);
+	device->dev = dev;
+	device->ifno = ifno;
+	device->open = 0;
+	device->open_fds = NULL;
+	device->active = true;
+	device->insns = NULL;
+	device->num_insns = 0;
+	device->flags = 0;
+	device->cbuf = cbuf_init(384);
+	device->is_keyboard = isKeyboard;
+
+	return device;
+}
+
+
+void
+remove_device (hid_device_info *device)
+{
+	assert(device != NULL);
+
+	if (device->cbuf != NULL) {
+		cbuf_delete(device->cbuf);
+		device->cbuf = NULL;
+	}
+
+	delete_area(device->buffer_area);
+	delete_sem(device->sem_cb);
+	delete_sem(device->sem_lock);
+	free(device);
+}
+
+
+/* driver cookie (per open) */
 
 // here we don't need to follow a report descriptor for typical keyboards
 // TODO : but we should for keypads for example because they aren't boot keyboard devices !
 // see hidparse.c
 static void
-interpret_kb_buffer(my_device_info *my_dev)
+interpret_kb_buffer(hid_device_info *device)
 {
 	raw_key_info info;
-	uint8 modifiers = ((uint8*)my_dev->buffer)[0];
-	uint8 bits = my_dev->last_buffer[0] ^ modifiers;
-	uint32 i,j;
-	
-	info.timestamp = my_dev->timestamp;
-	
-	if (bits)
-		for (j=0; bits; j++,bits>>=1)
+	uint8 modifiers = ((uint8*)device->buffer)[0];
+	uint8 bits = device->last_buffer[0] ^ modifiers;
+	uint32 i, j;
+
+	info.timestamp = device->timestamp;
+
+	if (bits) {
+		for (j = 0; bits; j++, bits >>= 1) {
 			if (bits & 1) {
 				info.be_keycode = modifier_table[j];				
 				info.is_keydown = (modifiers >> j) & 1;			
-				cbuf_putn(my_dev->cbuf, &info, sizeof(info));
-				release_sem_etc(my_dev->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+				cbuf_putn(device->cbuf, &info, sizeof(info));
+				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+			}
+		}
+	}
+
+	// key down
+
+	for (i = 2; i < device->total_report_size; i++) {
+		if (((uint8*)device->buffer)[i] && ((uint8*)device->last_buffer)[i] != 0x1) {
+			bool found = false;
+			for (j = 2; j < device->total_report_size; j++) {
+				if (((uint8*)device->last_buffer)[j]
+					&& ((uint8*)device->last_buffer)[j] == ((uint8*)device->buffer)[i]) {
+					found = true;
+					break;
+				}
 			}
 
-	for (i=2; i<my_dev->total_report_size; i++)
-		if (((uint8*)my_dev->buffer)[i] && ((uint8*)my_dev->last_buffer)[i]!=0x1) {
-			bool found = false;
-			for (j=2; j<my_dev->total_report_size; j++)
-				if (((uint8*)my_dev->last_buffer)[j] 
-					&& ((uint8*)my_dev->last_buffer)[j] == ((uint8*)my_dev->buffer)[i]) {
-					found = true;
-					break;
-			}
-			
 			if (!found) {
-				info.be_keycode = key_table[((uint8*)my_dev->buffer)[i]];
+				info.be_keycode = key_table[((uint8*)device->buffer)[i]];
 				if (info.be_keycode == KEY_Pause && modifiers & 1)
-					info.be_keycode = KEY_Break;			
+					info.be_keycode = KEY_Break;
 				if (info.be_keycode == 0xe && modifiers & 1)
-					info.be_keycode = KEY_SysRq;			
-				info.is_keydown = 1;			
-				cbuf_putn(my_dev->cbuf, &info, sizeof(info));
-				release_sem_etc(my_dev->sem_cb, 1, B_DO_NOT_RESCHEDULE);
-			}			
+					info.be_keycode = KEY_SysRq;
+				if (info.be_keycode == 0) {
+					// unmapped key
+					info.be_keycode = 0x200000 + ((uint8*)device->buffer)[i];
+				}
+				info.is_keydown = 1;
+				cbuf_putn(device->cbuf, &info, sizeof(info));
+				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+			}
 		} else
 			break;
-	
-	for (i=2; i<my_dev->total_report_size; i++)
-		if (((uint8*)my_dev->last_buffer)[i] && ((uint8*)my_dev->last_buffer)[i]!=0x1) {
+	}
+
+	// key up
+	// TODO: merge this...
+
+	for (i = 2; i < device->total_report_size; i++) {
+		if (((uint8*)device->last_buffer)[i] && ((uint8*)device->last_buffer)[i] != 0x1) {
 			bool found = false;
-			for (j=2; j<my_dev->total_report_size; j++)
-				if (((uint8*)my_dev->buffer)[j] 
-					&& ((uint8*)my_dev->buffer)[j] == ((uint8*)my_dev->last_buffer)[i]) {
+			for (j = 2; j < device->total_report_size; j++) {
+				if (((uint8*)device->buffer)[j]
+					&& ((uint8*)device->buffer)[j] == ((uint8*)device->last_buffer)[i]) {
 					found = true;
 					break;
+				}
 			}
-			
+
 			if (!found) {
-				info.be_keycode = key_table[((uint8*)my_dev->last_buffer)[i]];				
+				info.be_keycode = key_table[((uint8*)device->last_buffer)[i]];
 				if (info.be_keycode == KEY_Pause && modifiers & 1)
-					info.be_keycode = KEY_Break;			
+					info.be_keycode = KEY_Break;
 				if (info.be_keycode == 0xe && modifiers & 1)
-					info.be_keycode = KEY_SysRq;			
-				info.is_keydown = 0;			
-				cbuf_putn(my_dev->cbuf, &info, sizeof(info));
-				release_sem_etc(my_dev->sem_cb, 1, B_DO_NOT_RESCHEDULE);
-			}			
+					info.be_keycode = KEY_SysRq;
+				if (info.be_keycode == 0) {
+					// unmapped key
+					info.be_keycode = 0x200000 + ((uint8*)device->last_buffer)[i];
+				}
+				info.is_keydown = 0;
+				cbuf_putn(device->cbuf, &info, sizeof(info));
+				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+			}
 		} else
 			break;
-			
+	}
 }
 
 
 // TODO : here we don't follow a report descriptor but we actually should
 // see hidparse.c
 static void
-set_leds(my_device_info *my_dev, uint8* data)
+set_leds(hid_device_info *device, uint8* data)
 {
-	status_t st;
+	status_t status;
 	size_t actual = 1;
 	uint8 leds = 0;
 	int report_id = 0;
@@ -461,38 +459,37 @@ set_leds(my_device_info *my_dev, uint8* data)
 	if (data[2] == 1)
 		leds |= (1 << 2);
 	
-	st = usb->send_request (my_dev->dev, 
+	status = usb->send_request (device->dev, 
 		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_SET_REPORT,
-		0x200 | report_id, my_dev->ifno, actual, 
+		0x200 | report_id, device->ifno, actual, 
 		&leds, actual, &actual);
-	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, st=%d, len=%d\n", 
-		leds, (int) st, (int)actual));
+	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, status=%d, len=%d\n", 
+		leds, (int) status, (int)actual));
 }
 
-#define MAX_BUTTONS 16
 
 static int 
 sign_extend(int value, int size)
 {
 	if (value & (1 << (size - 1)))
 		return value | (UINT_MAX << size);
-	else
-		return value;
+
+	return value;
 }
 
 
 static void
-interpret_ms_buffer(my_device_info *my_dev)
+interpret_ms_buffer(hid_device_info *device)
 {
 	mouse_movement info;
-	uint8 *report = (uint8*)my_dev->buffer;
+	uint8 *report = (uint8*)device->buffer;
 	uint32 i;
 	
 	info.buttons = 0;
 	info.clicks = 0;
-	for (i = 0; i < my_dev->num_insns; i++) {
-		const report_insn *insn = &my_dev->insns [i];
+	for (i = 0; i < device->num_insns; i++) {
+		const report_insn *insn = &device->insns [i];
 		int32 value = 
 			(((report [insn->byte_idx + 1] << 8) | 
 			   report [insn->byte_idx]) >> insn->bit_pos) 
@@ -500,15 +497,13 @@ interpret_ms_buffer(my_device_info *my_dev)
 
 		if (insn->usage_page == USAGE_PAGE_BUTTON) {
 			if ((insn->usage_id - 1) < MAX_BUTTONS) {
-				info.buttons |= 
-					(value & 1) << (insn->usage_id - 1);
+				info.buttons |= (value & 1) << (insn->usage_id - 1);
 				info.clicks = 1;
 			}	
 		} else if (insn->usage_page == USAGE_PAGE_GENERIC_DESKTOP) {
-			if (insn->is_phy_signed) {
-				value = sign_extend (value, insn->num_bits);
-			}
-		
+			if (insn->is_phy_signed)
+				value = sign_extend(value, insn->num_bits);
+
 			switch (insn->usage_id) {
 				case USAGE_ID_X:
 					info.xdelta = value;
@@ -522,87 +517,87 @@ interpret_ms_buffer(my_device_info *my_dev)
 			}
 		}
 	}
-	
+
 	info.modifiers = 0;
-	info.timestamp = my_dev->timestamp;
-	
-	cbuf_putn(my_dev->cbuf, &info, sizeof(info));
-	release_sem_etc(my_dev->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+	info.timestamp = device->timestamp;
+
+	cbuf_putn(device->cbuf, &info, sizeof(info));
+	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
-/*
+
+/*!
 	callback: got a report, issue next request
 */
-
 static void 
-usb_callback(void *cookie, uint32 status, 
+usb_callback(void *cookie, uint32 busStatus,
 	void *data, uint32 actual_len)
 {
-	status_t st;
-	my_device_info *my_dev = cookie;
+	hid_device_info *device = cookie;
+	status_t status;
 
-	assert (cookie != NULL);
+	assert(cookie != NULL);
 
-	acquire_sem (my_dev->sem_lock);
-	my_dev->actual_length = actual_len;
-	my_dev->bus_status = status;	/* B_USB_STATUS_* */
-	if (status != B_USB_STATUS_SUCCESS) {
+	acquire_sem(device->sem_lock);
+	device->actual_length = actual_len;
+	device->bus_status = busStatus;	/* B_USB_STATUS_* */
+	if (busStatus != B_USB_STATUS_SUCCESS) {
 		/* request failed */
-		release_sem (my_dev->sem_lock);
-		DPRINTF_ERR ((MY_ID "bus status %d\n", (int)status));
-		if (status == B_USB_STATUS_IRP_CANCELLED_BY_REQUEST) {
+		release_sem(device->sem_lock);
+		DPRINTF_ERR((MY_ID "bus status %d\n", (int)busStatus));
+		if (busStatus == B_USB_STATUS_IRP_CANCELLED_BY_REQUEST) {
 			/* cancelled: device is unplugged */
 			return;
 		}
 #if 1
-		st = usb->clear_feature (my_dev->ept->handle, USB_FEATURE_ENDPOINT_HALT);
-		if (st != B_OK)
-			DPRINTF_ERR ((MY_ID "clear_feature() error %d\n", (int)st));
+		status = usb->clear_feature(device->ept->handle, USB_FEATURE_ENDPOINT_HALT);
+		if (status != B_OK)
+			DPRINTF_ERR((MY_ID "clear_feature() error %d\n", (int)status));
 #endif
 	} else {
 		/* got a report */
 #if 0
 		uint32 i;
 		char linbuf [256];
-		uint8 *buffer = my_dev->buffer;
+		uint8 *buffer = device->buffer;
 
-		for (i = 0; i < my_dev->total_report_size; i++)
+		for (i = 0; i < device->total_report_size; i++)
 			sprintf (&linbuf[i*3], "%02X ", buffer [i]);
 		DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
 #endif
-		my_dev->timestamp = system_time ();
+		device->timestamp = system_time ();
 		
-		if (my_dev->is_keyboard) {
-			interpret_kb_buffer(my_dev);
-			memcpy(my_dev->last_buffer, my_dev->buffer, my_dev->total_report_size);
+		if (device->is_keyboard) {
+			interpret_kb_buffer(device);
+			memcpy(device->last_buffer, device->buffer, device->total_report_size);
 		} else
-			interpret_ms_buffer(my_dev);
+			interpret_ms_buffer(device);
 		
-		release_sem (my_dev->sem_lock);
+		release_sem (device->sem_lock);
 	}
 
 	/* issue next request */
 
-	st = usb->queue_interrupt (my_dev->ept->handle, my_dev->buffer,
-		my_dev->total_report_size, usb_callback, my_dev);
-	if (st != B_OK) {
+	status = usb->queue_interrupt(device->ept->handle, device->buffer,
+		device->total_report_size, usb_callback, device);
+	if (status != B_OK) {
 		/* XXX probably endpoint stall */
-		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)st));
+		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
 	}
 }
 
-/*
-	USB specific device hooks
-*/
+
+//	#pragma mark - device hooks
+
 
 static status_t 
 hid_device_added(const usb_device *dev, void **cookie)
 {
-	my_device_info *my_dev;
+	hid_device_info *device;
 	const usb_device_descriptor *dev_desc;
 	const usb_configuration_info *conf;
 	const usb_interface_info *intf;
-	status_t st;
+	status_t status;
 	usb_hid_descriptor *hid_desc;
 	uint8 *rep_desc = NULL;
 	size_t desc_len, actual;
@@ -657,14 +652,14 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	desc_len = sizeof (usb_hid_descriptor);
 	hid_desc = malloc (desc_len);
-	st = usb->send_request (dev, 
+	status = usb->send_request (dev, 
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
 		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len, 
 		hid_desc, desc_len, &desc_len);
-	DPRINTF_INFO ((MY_ID "get_hid_desc: st=%d, len=%d\n", 
-		(int) st, (int)desc_len));
-	if (st != B_OK)
+	DPRINTF_INFO ((MY_ID "get_hid_desc: status=%d, len=%d\n", 
+		(int) status, (int)desc_len));
+	if (status != B_OK)
 		desc_len = 256;		/* XXX */
 
 	/* read report descriptor */
@@ -673,14 +668,14 @@ hid_device_added(const usb_device *dev, void **cookie)
 	free (hid_desc);
 	rep_desc = malloc (desc_len);
 	assert (rep_desc != NULL);
-	st = usb->send_request (dev, 
+	status = usb->send_request (dev, 
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
 		USB_HID_DESCRIPTOR_REPORT << 8, ifno, desc_len, 
 		rep_desc, desc_len, &desc_len);
-	DPRINTF_INFO ((MY_ID "get_hid_rep_desc: st=%d, len=%d\n", 
-		(int) st, (int)desc_len));
-	if (st != B_OK) {
+	DPRINTF_INFO ((MY_ID "get_hid_rep_desc: status=%d, len=%d\n", 
+		(int) status, (int)desc_len));
+	if (status != B_OK) {
 		free (rep_desc);
 		return B_ERROR;
 	}
@@ -704,15 +699,15 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* configuration */
 
-	if ((st = usb->set_configuration (dev, conf)) != B_OK) {
-		DPRINTF_ERR ((MY_ID "set_configuration() failed %d\n", (int)st));
+	if ((status = usb->set_configuration (dev, conf)) != B_OK) {
+		DPRINTF_ERR ((MY_ID "set_configuration() failed %d\n", (int)status));
 		free (rep_desc);
 		return B_ERROR;
 	}
 
 	is_keyboard = memcmp (rep_desc, "\x05\x01\x09\x06", 4) == 0;
 
-	if ((my_dev = create_device (dev, intf, ifno, is_keyboard)) == NULL) {
+	if ((device = create_device (dev, intf, ifno, is_keyboard)) == NULL) {
 		free (rep_desc);
 		return B_ERROR;
 	}
@@ -727,53 +722,53 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* parse report descriptor */
 
-	my_dev->num_insns = num_items;	/* XXX */
-	my_dev->insns = malloc (sizeof (report_insn) * my_dev->num_insns);
-	assert (my_dev->insns != NULL);
-	parse_report_descriptor (items, num_items, my_dev->insns, 
-		&my_dev->num_insns, &my_dev->total_report_size, &report_id);
+	device->num_insns = num_items;	/* XXX */
+	device->insns = malloc (sizeof (report_insn) * device->num_insns);
+	assert (device->insns != NULL);
+	parse_report_descriptor (items, num_items, device->insns, 
+		&device->num_insns, &device->total_report_size, &report_id);
 	free (items);
-	realloc (my_dev->insns, sizeof (report_insn) * my_dev->num_insns);
+	realloc (device->insns, sizeof (report_insn) * device->num_insns);
 	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n", 
-		(int)num_items, (int)my_dev->num_insns, (int)my_dev->total_report_size));
+		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
 	/* count axes, hats and buttons */
 
-	/*count_controls (my_dev->insns, my_dev->num_insns,
-		&my_dev->num_axes, &my_dev->num_hats, &my_dev->num_buttons);
+	/*count_controls (device->insns, device->num_insns,
+		&device->num_axes, &device->num_hats, &device->num_buttons);
 	DPRINTF_INFO ((MY_ID "%d axes, %d hats, %d buttons\n",
-		my_dev->num_axes, my_dev->num_hats, my_dev->num_buttons));*/
+		device->num_axes, device->num_hats, device->num_buttons));*/
 
 	/* get initial state */
 	
 	
-	st = usb->send_request (dev,
+	status = usb->send_request (dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_GET_REPORT,
-		0x0100 | report_id, ifno, my_dev->total_report_size,
-		my_dev->buffer, my_dev->total_report_size, &actual);
-	if (st != B_OK)
-		DPRINTF_ERR ((MY_ID "Get_Report failed %d\n", (int)st));
-	my_dev->timestamp = system_time ();
+		0x0100 | report_id, ifno, device->total_report_size,
+		device->buffer, device->total_report_size, &actual);
+	if (status != B_OK)
+		DPRINTF_ERR ((MY_ID "Get_Report failed %d\n", (int)status));
+	device->timestamp = system_time ();
 
-	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)my_dev->buffer)), *(((uint32*)my_dev->buffer)+1), *(((uint32*)my_dev->buffer)+2)));
+	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
 	
 	/* issue interrupt transfer */
 
-	my_dev->ept = &intf->endpoint [0];		/* interrupt IN */
-	st = usb->queue_interrupt (my_dev->ept->handle, my_dev->buffer,
-		my_dev->total_report_size, usb_callback, my_dev);
-	if (st != B_OK) {
-		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)st));
+	device->ept = &intf->endpoint [0];		/* interrupt IN */
+	status = usb->queue_interrupt (device->ept->handle, device->buffer,
+		device->total_report_size, usb_callback, device);
+	if (status != B_OK) {
+		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
 		return B_ERROR;
 	}
 
 	/* create a port */
 
-	add_device_info (my_dev);
+	add_device_info (device);
 
-	*cookie = my_dev;
-	DPRINTF_INFO ((MY_ID "added %s\n", my_dev->name));
+	*cookie = device;
+	DPRINTF_INFO ((MY_ID "added %s\n", device->name));
 
 	return B_OK;
 }
@@ -781,72 +776,62 @@ hid_device_added(const usb_device *dev, void **cookie)
 static status_t 
 hid_device_removed (void *cookie)
 {
-	my_device_info *my_dev = cookie;
+	hid_device_info *device = cookie;
 
 	assert (cookie != NULL);
 
-	DPRINTF_INFO ((MY_ID "device_removed(%s)\n", my_dev->name));
-	usb->cancel_queued_transfers (my_dev->ept->handle);
-	remove_device_info (my_dev);
-	if (my_dev->open == 0) {
-		if (my_dev->insns != NULL)
-			free (my_dev->insns);
-		remove_device (my_dev);
+	DPRINTF_INFO ((MY_ID "device_removed(%s)\n", device->name));
+	usb->cancel_queued_transfers (device->ept->handle);
+	remove_device_info (device);
+	if (device->open == 0) {
+		if (device->insns != NULL)
+			free (device->insns);
+		remove_device (device);
 	} else {
-		DPRINTF_INFO ((MY_ID "%s still open\n", my_dev->name));
-		my_dev->active = false;
+		DPRINTF_INFO ((MY_ID "%s still open\n", device->name));
+		device->active = false;
 	}
 	return B_OK;
 }
 
-static usb_notify_hooks my_notify_hooks =
-{
+static usb_notify_hooks sNotifyHooks = {
 	hid_device_added, hid_device_removed
 };
 
 #define	SUPPORTED_DEVICES	1
-usb_support_descriptor my_supported_devices [SUPPORTED_DEVICES] =
-{
+usb_support_descriptor my_supported_devices [SUPPORTED_DEVICES] = {
 	{ USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
 };
 
-
-/* ----------
-	my_device_open - handle open() calls
------ */
 
 static status_t 
 hid_device_open(const char *name, uint32 flags,
 	driver_cookie **out_cookie)
 {
 	driver_cookie *cookie;
-	my_device_info *my_dev;
+	hid_device_info *device;
 
 	assert (name != NULL);
 	assert (out_cookie != NULL);
 	DPRINTF_INFO ((MY_ID "open(%s)\n", name));
 
-	if ((my_dev = search_device_info (name)) == NULL)
+	if ((device = search_device_info (name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
 	if ((cookie = malloc (sizeof (driver_cookie))) == NULL)
 		return B_NO_MEMORY;
 
-	acquire_sem (my_dev->sem_lock);
-	cookie->my_dev = my_dev;
-	cookie->next = my_dev->open_fds;
-	my_dev->open_fds = cookie;
-	my_dev->open++;
-	release_sem (my_dev->sem_lock);
+	acquire_sem (device->sem_lock);
+	cookie->device = device;
+	cookie->next = device->open_fds;
+	device->open_fds = cookie;
+	device->open++;
+	release_sem (device->sem_lock);
 
 	*out_cookie = cookie;
-	DPRINTF_INFO ((MY_ID "device %s open (%d)\n", name, my_dev->open));
+	DPRINTF_INFO ((MY_ID "device %s open (%d)\n", name, device->open));
 	return B_OK;
 }
 
-
-/* ----------
-	hid_device_read - handle read() calls
------ */
 
 static status_t 
 hid_device_read(driver_cookie *cookie, off_t position,
@@ -856,10 +841,6 @@ hid_device_read(driver_cookie *cookie, off_t position,
 }
 
 
-/* ----------
-	hid_device_write - handle write() calls
------ */
-
 static status_t 
 hid_device_write(driver_cookie *cookie, off_t position,
 	const void *buf, size_t *num_bytes)
@@ -867,52 +848,49 @@ hid_device_write(driver_cookie *cookie, off_t position,
 	return B_ERROR;
 }
 
-/* ----------
-	hid_device_control - handle ioctl calls
------ */
 
 static status_t 
 hid_device_control(driver_cookie *cookie, uint32 op,
 		void *arg, size_t len)
 {
 	status_t err = B_ERROR;
-	my_device_info *my_dev;
+	hid_device_info *device;
 
 	assert (cookie != NULL);
-	my_dev = cookie->my_dev;
-	assert (my_dev != NULL);
+	device = cookie->device;
+	assert (device != NULL);
 	DPRINTF_INFO ((MY_ID "ioctl(0x%x)\n", (int)op));
 
-	if (!my_dev->active)
+	if (!device->active)
 		return B_ERROR;		/* already unplugged */
 
-	if (my_dev->is_keyboard)
+	if (device->is_keyboard)
 		switch (op) {
 			case KB_READ:
-	    		err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
+	    		err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
-				cbuf_getn(my_dev->cbuf, arg, sizeof(raw_key_info));
+				cbuf_getn(device->cbuf, arg, sizeof(raw_key_info));
 				return err;
 				break;
 	    
 			case KB_SET_LEDS:
-				set_leds(my_dev, (uint8 *)arg);
+				set_leds(device, (uint8 *)arg);
 				break; 
 		} 
 	else
 		switch (op) {
 			case MS_READ:
-				err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
+				err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
-				cbuf_getn(my_dev->cbuf, arg, sizeof(mouse_movement));
+				cbuf_getn(device->cbuf, arg, sizeof(mouse_movement));
 				return err;
 				break;
 	    	case MS_NUM_EVENTS:
 			{
 				int32 count;
-				get_sem_count(my_dev->sem_cb, &count);
+				get_sem_count(device->sem_cb, &count);
         		return count;
       			break;
 			}
@@ -925,167 +903,142 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 }
 
 
-/* ----------
-	hid_device_close - handle close() calls
------ */
-
 static status_t 
 hid_device_close(driver_cookie *cookie)
 {
-	my_device_info *my_dev;
+	hid_device_info *device;
 
-	assert (cookie != NULL && cookie->my_dev != NULL);
-	my_dev = cookie->my_dev;
-	DPRINTF_INFO ((MY_ID "close(%s)\n", my_dev->name));
+	assert (cookie != NULL && cookie->device != NULL);
+	device = cookie->device;
+	DPRINTF_INFO ((MY_ID "close(%s)\n", device->name));
 
 	/* detach the cookie from list */
 
-	acquire_sem (my_dev->sem_lock);
-	if (my_dev->open_fds == cookie)
-		my_dev->open_fds = cookie->next;
+	acquire_sem (device->sem_lock);
+	if (device->open_fds == cookie)
+		device->open_fds = cookie->next;
 	else {
 		driver_cookie *p;
-		for (p = my_dev->open_fds; p != NULL; p = p->next) {
+		for (p = device->open_fds; p != NULL; p = p->next) {
 			if (p->next == cookie) {
 				p->next = cookie->next;
 				break;
 			}
 		}
 	}
-	--my_dev->open;
-	release_sem (my_dev->sem_lock);
+	--device->open;
+	release_sem (device->sem_lock);
 
 	return B_OK;
 }
 
 
-/* -----
-	hid_device_free - called after the last device is closed, and after
-	all i/o is complete.
------ */
 static status_t 
 hid_device_free(driver_cookie *cookie)
 {
-	my_device_info *my_dev;
+	hid_device_info *device;
 
-	assert (cookie != NULL && cookie->my_dev != NULL);
-	my_dev = cookie->my_dev;
-	DPRINTF_INFO ((MY_ID "free(%s)\n", my_dev->name));
+	assert (cookie != NULL && cookie->device != NULL);
+	device = cookie->device;
+	DPRINTF_INFO ((MY_ID "free(%s)\n", device->name));
 
 	free (cookie);
-	if (my_dev->open > 0)
-		DPRINTF_INFO ((MY_ID "%d opens left\n", my_dev->open));
-	else if (!my_dev->active) {
-		DPRINTF_INFO ((MY_ID "removed %s\n", my_dev->name));
-		if (my_dev->insns != NULL)
-			free (my_dev->insns);
-		remove_device (my_dev);
+	if (device->open > 0)
+		DPRINTF_INFO ((MY_ID "%d opens left\n", device->open));
+	else if (!device->active) {
+		DPRINTF_INFO ((MY_ID "removed %s\n", device->name));
+		if (device->insns != NULL)
+			free (device->insns);
+		remove_device (device);
 	}
 
 	return B_OK;
 }
 
 
-/* -----
-	function pointers for the device hooks entry points
------ */
-
-static device_hooks hid_device_hooks = {
-	(device_open_hook) hid_device_open,
-	(device_close_hook) hid_device_close,
-	(device_free_hook) hid_device_free,
-	(device_control_hook) hid_device_control,
-	(device_read_hook) hid_device_read,
-	(device_write_hook) hid_device_write,
-	NULL, NULL, NULL, NULL
-};
+//	#pragma mark - driver API
 
 
-/* ----------
-	init_hardware - called once the first time the driver is loaded
------ */
-_EXPORT status_t 
-init_hardware (void)
+status_t 
+init_hardware(void)
 {
-	DPRINTF_INFO ((MY_ID "init_hardware() " __DATE__ " " __TIME__ "\n"));
+	DPRINTF_INFO((MY_ID "init_hardware() " __DATE__ " " __TIME__ "\n"));
 	return B_OK;
 }
 
-/* ----------
-	init_driver - optional function - called every time the driver
-	is loaded.
------ */
-_EXPORT status_t 
-init_driver (void)
-{
 
+status_t 
+init_driver(void)
+{
 	DPRINTF_INFO ((MY_ID "init_driver() " __DATE__ " " __TIME__ "\n"));
 
-	if (get_module (B_USB_MODULE_NAME, (module_info **) &usb) != B_OK)
+	if (get_module(B_USB_MODULE_NAME, (module_info **)&usb) != B_OK)
 		return B_ERROR;
 
-	if ((my_device_list_lock = create_sem (1, "dev_list_lock")) < 0) {
-		put_module (B_USB_MODULE_NAME);
-		return my_device_list_lock;		/* error code */
+	if ((gDeviceListLock = create_sem (1, "dev_list_lock")) < 0) {
+		put_module(B_USB_MODULE_NAME);
+		return gDeviceListLock;
 	}
 
-	usb->register_driver (hid_driver_name, my_supported_devices, 
+	usb->register_driver(hid_driver_name, my_supported_devices, 
 		SUPPORTED_DEVICES, NULL);
-	usb->install_notify (hid_driver_name, &my_notify_hooks);
-	DPRINTF_INFO ((MY_ID "init_driver() OK\n"));
+	usb->install_notify(hid_driver_name, &sNotifyHooks);
+	DPRINTF_INFO((MY_ID "init_driver() OK\n"));
 
 	return B_OK;
 }
 
 
-/* ----------
-	uninit_driver - optional function - called every time the driver
-	is unloaded
------ */
-_EXPORT void 
-uninit_driver (void)
+void
+uninit_driver(void)
 {
-	DPRINTF_INFO ((MY_ID "uninit_driver()\n"));
-	usb->uninstall_notify (hid_driver_name);
-	
-	delete_sem (my_device_list_lock);
-	put_module (B_USB_MODULE_NAME);
-	free_device_names ();
+	DPRINTF_INFO((MY_ID "uninit_driver()\n"));
+	usb->uninstall_notify(hid_driver_name);
+
+	delete_sem(gDeviceListLock);
+	put_module(B_USB_MODULE_NAME);
+	free_device_names();
 }
 
-/*
-	publish_devices
+/*!
 	device names are generated dynamically
 */
-
-_EXPORT const char **
-publish_devices (void)
+const char **
+publish_devices(void)
 {
-	DPRINTF_INFO ((MY_ID "publish_devices()\n"));
+	DPRINTF_INFO((MY_ID "publish_devices()\n"));
 
-	if (my_device_list_changed) {
-		free_device_names ();
-		alloc_device_names ();
-		if (my_device_names != NULL)
-			rebuild_device_names ();
-		my_device_list_changed = false;
+	if (gDeviceListChanged) {
+		free_device_names();
+		alloc_device_names();
+		if (gDeviceNames != NULL)
+			rebuild_device_names();
+		gDeviceListChanged = false;
 	}
-	assert (my_device_names != NULL);
-	return (const char **) my_device_names;
+	assert(gDeviceNames != NULL);
+	return (const char **)gDeviceNames;
 }
 
-/* ----------
-	find_device - return ptr to device hooks structure for a
-	given device name
------ */
 
-_EXPORT device_hooks *
+device_hooks *
 find_device(const char *name)
 {
-	assert (name != NULL);
-	DPRINTF_INFO ((MY_ID "find_device(%s)\n", name));
+	static device_hooks hooks = {
+		(device_open_hook)hid_device_open,
+		(device_close_hook)hid_device_close,
+		(device_free_hook)hid_device_free,
+		(device_control_hook)hid_device_control,
+		(device_read_hook)hid_device_read,
+		(device_write_hook)hid_device_write,
+		NULL
+	};
+
+	assert(name != NULL);
+	DPRINTF_INFO((MY_ID "find_device(%s)\n", name));
+
 	if (search_device_info(name) == NULL)
 		return NULL;
-	return &hid_device_hooks;
+
+	return &hooks;
 }
 
