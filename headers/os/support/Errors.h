@@ -55,6 +55,7 @@ enum {
 	B_BUSY,
 	B_NOT_ALLOWED,
 	B_BAD_DATA,
+	B_DONT_DO_THAT,
 
 	B_ERROR = -1,
 	B_OK = 0,
