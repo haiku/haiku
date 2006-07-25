@@ -18,7 +18,7 @@ Chapter 2: Qualities of Good Software
 	Good Software is Forgiving
 
 Chapter 3: Conventions of the Haiku Operating System
-	User Preferences: Format and Location
+	Program Options: Format and Location
 	Maintain Responsiveness
 	Avoid Hardcoded File Paths
 	Make Your App's Look Fit in with Others
@@ -70,30 +70,31 @@ Chapter 10: Windows
 
 Chapter 11: Special Purpose Windows
 	Alert Windows
-	About Window Design
 	Find Windows
-	Preferences Window Design
+	Options Window Design
 	Open and Save Panels
 
 Chapter 12: Controls
-	Radio Buttons
 	Buttons
 	Checkboxes
-	Control Groups (BBox)
+	Radio Buttons
+	Control Groups
 	Sliders
-	BTextControl / BTextView
-	ListViews
+	Labels
+	Text Controls
+	Text Views
+	Lists
 	Tabs
 	Scrollbars
-	Color Pickers
-	Progress Meters
-	Toolbars
 	Menu Fields and Pop-up Menus
+	Progress Meters
+	Color Pickers
+	Toolbars
 
 Chapter 13: Installation and Updates
 	Zip files
 	SoftwareValet packages
-	
+	Getting Program Updates
 
 
 Chapter 1: How to Design Software Good
@@ -185,7 +186,7 @@ Chapter 3: Conventions of the Haiku Operating System
 Just as a person generally doesn't go barging into a stranger's home and start redecorating and otherwise making himself at home merely because the owner does not own a shotgun, your program needs to have good manners in getting along with both the operating system and other programs the user has installed on the system. Some of these are merely good coding practices meant to make your job easier and others are for ensuring that your program can be more easily maintained. None of them are difficult or much work, so there. Now you have no choice but to follow them. :D
 
 
-User Preferences: Format and Location
+Program Options: Format and Location
 
 While there are lots of ways to store program settings, the easiest -- and preferred -- method is placing them in a BMessage and flattening it to a BFile. By using BMessages as your container, you don't have to concern yourself with writing and debugging other code. The exact location used to store them depends on the number of files you will need. If your software needs only one file and will only ever need one, then it is just simplest to place it in the user's config/settings folder. However, should you need more than one file, please put them in their own folder to minimize the clutter. The folder should either follow the format home/config/settings/your_app_name_here or home/config/settings/your_company_name_here/your_app_name_here.
 
@@ -301,9 +302,13 @@ B_COMMAND_KEY + X: Cut
 B_COMMAND_KEY + V: Paste
 
 B_COMMAND_KEY + F: Show Find Window
-B_COMMAND_KEY + G: Repeat Last Find (Find Again)
+B_COMMAND_KEY + G: Find Again
 
-B_COMMAND_KEY + ,: Preferences / Settings
+B_COMMAND_KEY + B_OPTION_KEY + F: Show Replace Window
+B_COMMAND_KEY + L: Replace and Find
+
+
+B_COMMAND_KEY + ,: Program Options
 
 B_COMMAND_KEY + B: (Word processor) Bold font
 B_COMMAND_KEY + U: (Word processor) Underline font
@@ -562,7 +567,7 @@ Program: Items related to operating on the program itself.
 	
 About <app name here>... - shows the About window. This is not a commonly-accessed item, so do not provide a keyboard shortcut for it.
 
-Options... (Command - ,) - Show the window which is used to customize the settings for your program. This can be a submenu if your program only has a couple of settings.
+Options... (Command - ,) - Show the window which is used to customize options for your program. This can be a submenu if your program only has a couple of options.
 	
 Quit (Command + Q) - This should be the bottom item in the menu and a separator should go above it.
 
@@ -616,9 +621,7 @@ Search: Tasks in this menu include finding and replacing data and other navigati
 
 Find... (Command + F) - This always shows a Find window for the program. The Find window should then allow the user to choose whatever options he desires for the find and disappear when the actual find is executed.
 
-Find Next (Command + G) - This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.
-
-Go to Line... (Command + .) - Allows the user to jump to a particular line. Window behavior is the same as for Find - show the window, get the line, disappear, and jump to the line requested.
+Find Again (Command + G) - This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.
 
 
 Help: Different ways that the user can learn more about your program and get help when needed.
@@ -708,7 +711,221 @@ When you do use an alert window, please follow these guidelines:
 
 3) Avoid Yes / No button labels. It is much better to use the name of the action in the label, such as Save Changes / Discard Changes. Only in *very* rare cases are Yes / No labels the best choice.
 
-About Window Design
+
 Find Windows
-Preferences Window Design
+
+	Windows used to search for data in a document are not very different from others, but how they are used can help or hinder the user when searching. It only needs to be shown when the user needs to set the search characteristics. Once they are set, the window should itself disappear and the search should be performed. A find window which stays visible clutters the screen and often obscures part of the current document. It also places the program in a separate mode, which should generally be avoided. The search itself should default to case-insensitive searches with an option to allow case sensitivity. Search by regular expression is an option that should be limited to programs which have programmers as the intended audience. 
+
+
+Options Window Design
+
+	Windows to allow the user to change various program options are another place where developers commonly commit a usability faux pas or two. The most common mistakes are poorly-chosen defaults, technical terminology, and too many choices. Here are some guidelines for making a good one:
+
+1) Choose defaults which fit the most number of people.
+
+2) When possible, have changes take place immediately instead of requiring the user to click OK. If you do this, provide buttons to revert changes and also to set the default values.
+
+3) Provide options for significant features. This would include things like default file format for CD ripper, European vs American date format, or the default account in a mail client. Frivolous options include "Use Ins key for paste" and "Confirm Program Quit".
+
+4) Use everyday language. For example, the web browser option "Move system caret with focus/selection changes" requires some technical knowledge. A better way to label such an option would be "Allow text to be selected with the keyboard." Both refer to the same option. The difference is how many people can understand what it does.
+
+
 Open and Save Panels
+
+	BFilePanel is used for both opening and saving files, but there is more to using them well than merely showing a list of files. Remember the location the user was viewing, and if it is inaccessible for some reason, show the Home folder. When possible, make use of file filters to eliminate files your program does not handle. By filtering out "bad" files, you eliminate errors and at the same time reduce the amount of time the user needs to find the file he wants. Offering a possible file name when saving a new document is another way to help the user. The title of the panel needs to match the task, whether it is Import, Export As, Save As, Save, Open, or something else.
+
+
+
+Chapter 12: Controls
+
+	BeOS operating systems, while perhaps not as fully-featured as others, possess controls which are the bread and butter of working with GUI programs. Their basic usage is obvious to most, but for the sake of those not sure and for those who want their programs to be the very best, they are covered in detail from the basics to advanced details.
+
+
+Buttons
+
+	Buttons are all around us in the computer world and in the real one, too. A button is used to invoke a command or, much less often, show a window.
+
+Do:
+
+1) Use GetPreferredSize and ResizeToPreferred to reduce your work
+2) Avoid using one button for opposite functions without appropriate feedback
+3) Leave sufficient padding around them
+
+Do Not:
+
+1) Make them too small or ridiculously large -- like 100 pixels square for the word 'OK'.
+2) Leave them blank
+3) Show a menu with one
+4) Use them for labels
+
+
+Checkboxes
+
+	Checkboxes are like a light switch with a label attached to it. Aside from turning an option on or off, they can also be used for quickly choosing multiple selections in a list of choices.
+
+Do:
+
+1) Label checkboxes so that the user understands ahead of time what clicking on it will do.
+2) Use care in calculating bounding boxes
+
+Don't:
+
+1) Use them for choosing one item from a list. Use a group of radio buttons instead.
+2) Use a checkbox in place of a button
+3) Use a list of checkboxes as a progress indicator
+
+
+Radio Buttons
+
+	Radio buttons are used to choose an exclusive choice from a list of choices. They can also be used to turn an option on or off if you have plenty of space.
+
+Do:
+
+1) Label radio buttons so that the user understands ahead of time what clicking on one will do.
+2) Use care in calculating bounding boxes
+3) Set a default value
+
+Don't:
+
+1) Use them individually or use them the same way as checkboxes
+2) Use more than 5 in a group
+
+
+Control Groups
+
+	Control groups, namely, the BBox class, are often abused because they are not well-understood. Control groups are for visually associating different controls which work together for a common function. Unfortunately, they are most often used just for fluff.
+
+Do:
+
+1) Label control groups
+2) Use control groups when there are lots of controls in window
+
+Don't:
+
+1) Use a control group to label a single control
+2) Nest control groups
+3) Use a control group around all controls in a window
+4) Mix control group border styles
+
+
+Sliders
+
+	Sliders are a good way to allow a user to choose a value that must be within a certain range, especially if the effect isn't exactly concrete or the value has no meaning to the user. Good uses for sliders include setting volume, mouse acceleration, and movie playback position.
+
+Do:
+
+1) Label the ends of the slider
+2) Show tick marks for each value if your slider has distinct increments
+3) Place the largest value at the right or top
+4) Use the appropriate orientation
+
+Don't:
+
+1) Use a slider for a progress indicator or scrollbar
+2) Label each slider position
+
+
+Labels
+
+	Labels help the user know what a particular control is for. Most of the controls in the BeOS API include and handle their own labels. This section deals with both the labels included with controls and ones created on their own.
+
+Do:
+
+1) Label controls
+2) Use a separate label when layout makes it hard to use a control's built-in label.
+3) Associate labels with their controls via proximity
+
+Don't:
+
+1) Use a label for large amounts of static text
+
+
+Text Controls
+
+	Text controls are one-line editable text boxes. They are useful for entering text into forms.
+
+Do:
+
+1) Disable characters you don't want in the field
+2) Try hard to validate text entered
+3) Make them large enough to accomodate the length of common entries
+4) Allow clipboard operations when possible
+
+Don't:
+
+1) Use a text control for a label
+2) Make them too small
+3) Use them for static text
+
+
+Text Views
+
+	Text views are multiline text controls. They also provide undo, styled text, and a number of other useful text functions.
+
+Do:
+
+1) Disable editing if you use one to display static text
+2) Allow both undo and selection of text unless there is a good reason not to
+3) Allow clipboard operations when possible
+
+Don't:
+
+1) Use one for single-line input
+2) Forget to pad the text rectangle inside the text view
+
+
+Lists
+
+	Lists are used to display lots of individual items, possibly in a hierarchy. They can also allow multiple or single selections.
+
+Do:
+
+1) Provide a way to select all items in multiple-selection lists.
+2) Sort your list
+
+Don't:
+
+1) Use just enough space to display just a couple of items
+2) Try to use it to select from hundreds of items. Use a search instead.
+3) Use list items to toggle options like a list of checkboxes
+
+
+Tabs
+
+	Tabs can be quite handy for displaying multiple views in a small space. Unfortunately, they seem to suffer from being too easy to abuse.
+
+Do:
+
+1) Use tabs to manage and organize otherwise complex dialog windows
+2) Use a list instead of tabs to manage large numbers of views
+
+Don't:
+
+1) Use tabs to select a particular mode
+2) Nest tab views
+3) Use so many tabs that a scrolling is needed to see them all
+4) Place confirm / cancel buttons in tabs
+5) Overlay toolbars by using tabs
+6) Use vertical text with vertical tabs
+7) Use tabs on more than one side at once
+8) Use one tab all by itself
+9) Just use icons to label tabs
+10) Use a scrollbar on a form in a tab
+
+
+Scrollbars
+
+	Scrollbars, unlike tabs, tend to not be abused. Use them to display more items than can fit on the screen, but don't overuse them.
+
+Do:
+
+1) Adjust range and step size when their target view is resized
+
+Don't:
+
+1) Scroll forms
+2) Try to customize their look
+3) Use them like a slider control
+4) Nest BScrollViews
+
+
