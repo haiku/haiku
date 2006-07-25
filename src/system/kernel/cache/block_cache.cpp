@@ -406,56 +406,15 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 //	#pragma mark -
 
 
-#ifdef DEBUG_CHANGED
-
-#define DUMPED_BLOCK_SIZE 16
-
-void
-dumpBlock(const char *buffer, int size, const char *prefix)
-{
-	int i;
-	
-	for (i = 0; i < size;) {
-		int start = i;
-
-		dprintf(prefix);
-		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
-			if (!(i % 4))
-				dprintf(" ");
-
-			if (i >= size)
-				dprintf("  ");
-			else
-				dprintf("%02x", *(unsigned char *)(buffer + i));
-		}
-		dprintf("  ");
-
-		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
-			if (i < size) {
-				char c = buffer[i];
-
-				if (c < 30)
-					dprintf(".");
-				else
-					dprintf("%c", c);
-			} else
-				break;
-		}
-		dprintf("\n");
-	}
-}
-#endif
-
-
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
 #ifdef DEBUG_CHANGED
 	if (!block->is_dirty && block->compare != NULL && memcmp(block->current_data, block->compare, cache->block_size)) {
 		dprintf("new block:\n");
-		dumpBlock((const char *)block->current_data, 256, "  ");
+		dump_block((const char *)block->current_data, 256, "  ");
 		dprintf("unchanged block:\n");
-		dumpBlock((const char *)block->compare, 256, "  ");
+		dump_block((const char *)block->compare, 256, "  ");
 		write_cached_block(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
 

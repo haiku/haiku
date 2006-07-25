@@ -178,6 +178,9 @@ extern void			dprintf(const char *format, ...);		/* just like printf */
 extern void			kprintf(const char *fmt, ...);			/* only for debugger cmds */
 #endif
 
+extern void 		dump_block(const char *buffer, int size, const char *prefix);
+															/* hexdumps given buffer */
+
 extern bool			set_dprintf_enabled(bool new_state);	/* returns old state */
 
 extern void			panic(const char *format, ...);

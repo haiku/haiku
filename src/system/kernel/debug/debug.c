@@ -986,3 +986,40 @@ _user_debug_output(const char *userString)
 		userString += sizeof(string) - 1;
 	} while (length >= (ssize_t)sizeof(string));
 }
+
+
+void
+dump_block(const char *buffer, int size, const char *prefix)
+{
+	const int DUMPED_BLOCK_SIZE = 16;
+	int i;
+	
+	for (i = 0; i < size;) {
+		int start = i;
+
+		dprintf(prefix);
+		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (!(i % 4))
+				dprintf(" ");
+
+			if (i >= size)
+				dprintf("  ");
+			else
+				dprintf("%02x", *(unsigned char *)(buffer + i));
+		}
+		dprintf("  ");
+
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (i < size) {
+				char c = buffer[i];
+
+				if (c < 30)
+					dprintf(".");
+				else
+					dprintf("%c", c);
+			} else
+				break;
+		}
+		dprintf("\n");
+	}
+}
