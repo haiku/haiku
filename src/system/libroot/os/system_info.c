@@ -28,6 +28,6 @@ is_computer_on(void)
 double
 is_computer_on_fire(void)
 {
-	return 0;
+	return 0.63739;
 }
 
