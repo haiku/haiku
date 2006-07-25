@@ -62,22 +62,20 @@ Chapter 9: Menus, Menu Bars, and Menu Fields
 	Common Menus and their Contents
 	
 Chapter 10: Windows
+	You Need the Basics
+	Appropriate Use of Styles
+	Naming, Placement, Size, and Other Decisions
+	B_ACCEPTS_FIRST_CLICK
 	Modality
-	Appropriate use of styles
-	Placement / positioning
-	Resizability whenever possible
-	Use of Alert windows
-	Good window titles
-	Minimizing / Showing
-	Resizing / Moving / Zooming
-	Use of B_ACCEPTS_FIRST_CLICK
-	Scrolling (automatic and manual)
-	About window design
-	Find windows
-	Preferences window design
-	Open / Save panels
-	
-Chapter 11: Controls
+
+Chapter 11: Special Purpose Windows
+	Alert Windows
+	About Window Design
+	Find Windows
+	Preferences Window Design
+	Open and Save Panels
+
+Chapter 12: Controls
 	Radio Buttons
 	Buttons
 	Checkboxes
@@ -92,7 +90,7 @@ Chapter 11: Controls
 	Toolbars
 	Menu Fields and Pop-up Menus
 
-Chapter 12: Installation and Updates
+Chapter 13: Installation and Updates
 	Zip files
 	SoftwareValet packages
 	
@@ -417,7 +415,9 @@ Error Messages
 	Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible, right? Right? :) When your program can't handle a particular error, the error message given to the user should follow these rules of thumb:
 
 1) Explain what happened in everyday words.
+
 2) Provide enough information to know what happened without providing details which could confuse the user. For example, if a mail client sends a request to a server for e-mail and the server fails to respond, a way to explain this might be something like "MyMailApp could not check your e-mail. The mail server did not respond when contacted."
+
 3) Offer suggestions to help the user fix the problem, if possible. Using the above example, one possible suggestion might be "Try checking your Internet connection with your web browser. If that works, the mail server might not be working correctly and you may want to try again later."
 
 Ellipses
@@ -569,38 +569,146 @@ Quit (Command + Q) - This should be the bottom item in the menu and a separator 
 
 File: This contains items related to documents handled by your program.
 
-New (Command + N) - Create a new document.
-Open (Command + O)
-Open Recent
-Close (Command + W)
-Save (Command + S)
-Save As... (Command + Shift + S)
-Save All
-Revert
-Import From...
-Export To...
-Page Setup...
-Print... (Command + P)
+New (Command + N) - Create a new document. This item should have an ellipsis if it shows a "Create Document" kind of window, but not if it doesn't.
+
+Open... (Command + O) - Open a document from disk.
+
+Open Recent - This is a submenu in the File menu to allow fast access to recent documents. It should not open a window of any kind. The number of recent items should be limited to no more than 5 items.
+
+Close (Command + W) - The function of this item depends on the kind of program architecture. In a program which has one document per window, this closes the window. If there are no more windows in the program, this also quits the program. Although it is not recommended, should a program allow for multiple documents in the same window, this item closes one document.
+
+Save (Command + S) - Save the current document. This should not show a window unless the document is new and has not yet been saved. It does not normally show a window, so no ellipsis is necessary.
+
+Save As... (Command + Shift + S) - 
+
+Save All - This item executes a Save command for all documents in the program. The procedure for handling new documents which have not yet been saved is as follows:
+	1) Make note of the current document window
+	2) For each document needing a name, bring it to the front, open a Save window, save the document, and proceed to the next document needing a name.
+	3) When all documents have been processed, bring the window which was originally the active one back to the front.
+
+Revert - Undoes all changes to the document.
+
+Import From... - Import data from another file into the current document. Like Open, this always shows a window.
+
+Export To... - Convert the data in the current document to another format. Like Save As, this always shows a window.
+
+Page Setup... - Shows the page settings window for printer setup.
+
+Print... (Command + P) - This always shows the print window before printing the current document. This is not intended to be the same as when a toolbar button is pressed.
+
 
 Edit: Items in this menu are used for different editing tasks
 
-Undo (Command + Z)
-Redo (Command + Shift + Z)
-Cut (Command + X)
-Copy (Command + C)
-Paste (Command + V)
-Clear
-Select All (Command + A)
+Undo (Command + Z) - Undoes the most recently performed edit. When possible, this item should be dynamic and also include the name of the task that it would undo, such as 'Undo Cut' or 'Undo Typing.' User operations which do not change document data, such as changing zoom levels or the like, should not be included in Undo operations.
+
+Redo (Command + Shift + Z) - Undoes the most recent Undo operation. Like Undo, this menu item should also be dynamic when possible.
+
+Cut (Command + X) - Copies the currently-selected data in the current document to the clipboard and removes it from the document.
+
+Copy (Command + C) - Copies the currently-selected data in the current document to the clipboard.
+
+Paste (Command + V) - Inserts the data on the clipboard into the current document. If there is an existing selection in the current document, the paste operation replaces the selected data with the pasted data.
+
+Select All (Command + A) - Selects all data in the current document.
 
 
 Search: Tasks in this menu include finding and replacing data and other navigation commands.
 
-Find... (Command + F)
-Find Next (Command + G)
-Go to Line (Command + .)
+Find... (Command + F) - This always shows a Find window for the program. The Find window should then allow the user to choose whatever options he desires for the find and disappear when the actual find is executed.
+
+Find Next (Command + G) - This repeats the most recent Find. If no find has been performed in the program yet, it should show the Find window. Because this command does not normally show a window, no ellipsis is needed.
+
+Go to Line... (Command + .) - Allows the user to jump to a particular line. Window behavior is the same as for Find - show the window, get the line, disappear, and jump to the line requested.
 
 
 Help: Different ways that the user can learn more about your program and get help when needed.
 
-Read the Manual...
-Go to (MyApp or MyCompany)'s Website
+Read the Manual... - Shows the manual for the program in a new window.
+
+Go to (MyApp or MyCompany)'s Website - Opens the default web browser at the website for the program or the program's company, respectively.
+
+
+
+Chapter 10: Windows
+
+
+You Need the Basics
+
+	Windows are such common controls that every developer should know the basics in when and how they should and should not be used. Some operating systems suffer from the overuse and abuse of windows, such as bizarre error messages, incessant confirmations, wrong window types for tasks, and many other mistakes. Learn the proper ways of working with windows and you will have overcome a major usability hurdle.
+
+Styles 
+
+	There is quite a lot of power and flexibility in how window looks and behaviors can be combined in BeOS operating systems. To paraphrase the bard, such power requires responsibility in its use. If you first consider how a window is to be used, it is not nearly as difficult to get things right.
+
+Look		Purpose
+----		-------
+Document	Windows containing a user document, such as an editor or viewer
+Titled		General purpose
+Floating	Tool and utility windows
+Modal		Modal windows
+Bordered	Alert-type dialog windows
+Borderless	Splash screens
+
+Feel		Purpose
+----		-------
+Normal		General purpose
+Modal:Subset	Only when you need to block all windows in a subset
+Modal:App	When a user decision is required to continue with the rest of the program
+Modal:All	When the user needs to make a system-critical decision, such as system shutdown confirmation.
+Floating:Subset	When a subset window needs to take priority in its subset.
+Floating:App	Tool and utility windows
+Floating:All	System monitors and other windows which the user will always want to have visible.
+
+
+Type		Look + Feel
+----		-----------
+Titled		Titled + Normal
+Document	Document + Normal
+Modal		Modal + Modal:App
+Floating	Floating + Floating:App
+Bordered	Bordered + Normal
+
+	Probably 90% of the time you will end up using Titled and Document windows with an occasional floating window. Borderless windows are used frequently for splash windows that are displayed as a program is loading. Bordered windows, which, by the way, do not have a window tab, aren't used much except in BAlerts. Modal windows shouldn't be used more than is absolutely necessary for reasons explained under the Modality section in this chapter.
+
+Naming, Placement, Size, and Other Decisions
+
+	Merely knowing what kind of window look and feel to use in a given situation is not enough: you also have to be aware of resizing, zooming, moving, closing, and minimizing because they affect your program in different ways. Once you know what kind of window you need, you should also figure out what its initial size and location are going to be. You also should not restrict the other actions a user can perform on a window unless you have a good reason that does not include "I don't want to write code to handle this."
+	Care should be given to what name is used for a window. The main window of your program should use your program's name. Windows which were opened from a menu item should have the same name as that of the menu item without the ellipsis. Document windows should use the document's name. New documents should use the name "Untitled" with subsequent new documents appending a number. The first untitled document should not have a number. A titled window should never have an empty title bar.
+	The size of a window depends on a number of factors. An application window should have an initial size which is the  minimum needed to see all controls in it without overcrowding. Controls should never overlap. This initial size should also be the minimum size for the window which is passed to SetSizeLimits. The initial size for a document window should be large enough to see the entire document or at least a significant portion of the document if it is larger than the screen. Do not arbitrarily restrict resizing unless it does not make sense to allow resizing in a particular direction. If a window allows resizing, its size should generally be saved when closed or the program quits and restored to that size when shown again.
+	Zooming is similar to resizing, but there are differences in which should permit zooming and how it should be done. Utility windows, for example, are not intended to be the main focus of the program, so they should not allow zooming even though they should allow resizing except where inappropriate. Document windows should expand to fill the largest sensible space to allow editing. Often times this is the entire screen, but it may not be. Word processors will probably move to the top of the screen, resize the width to the maximum width of the current document's view, and resize the height to the bottom of the screen. 
+	The placement of a window on the screen also varies depending on its usage. Program windows should initially either show themselves in the center of the screen or just a little above it. The same goes for the initial placement of a document window. Additional document windows should duplicate the most recent document window's frame offset by 15 pixels in both directions. As with size, a program should generally remember the screen placement of the windows and movement should not be restricted unless there is a good reason for it.
+	A window need not always be visible. Duh. Considering that it can be hidden or closed altogether may be a bit confusing. Generally, a document should allow minimizing to make it possible for the user to get the document "out of the way" for a moment without having to close it entirely. Utility windows and program windows which are not the main window should normally not permit minimizing and just allow closing. The main window should allow minimizing. Note that when a program is not the focus, utility windows with the Floating:Subset and Floating:App behaviors will be hidden. Windows should normally be allowed to close unless there is a very good reason for it.
+	A number of times it has been mentioned that you should not prevent something unless there is sufficient reason to do so. Particularly on other platforms, developers have been known to just disallow resizing because they didn't want to bother themselves with writing handler code. There are other instances where, for example, a window could not be closed because the code had a design flaw which would cause a crash if the window were closed. Remember: the more work you do in making your program helpful means the less work the user has to do which means that your program is easier to use.
+
+
+B_ACCEPTS_FIRST_CLICK
+
+	In MacOS X, the feature this flag enables is called click-through. It means that clicking on the window passes the click through to the control the mouse was under at the time even when the window does not have the focus. As a rule, this behavior should not be used, but there are times when it is quite useful, such as for system monitor programs, the Deskbar, and so forth.
+
+
+Modality
+
+	By default, windows in BeOS operating systems are modeless, meaning that you can click on other windows besides the one with the focus. Occasionally, there is a need to force the user to make a decision before moving on. This is an appropriate time to use a modal window. The need is far less often than what most would believe, however. Most of the time the only reason to use a modal window would be if not doing so would make potential for the user to lose data and there is nothing that can be done to the code architecture to prevent it. This follows the "no restrictions for no good reason" way of thinking mentioned above -- modal windows place restrictions on what windows he can or can't click on.
+
+
+
+Chapter 11: Special Purpose Windows
+
+
+Alert Windows
+
+	Alert windows are the single easiest way to make usability mistakes. Most often, they are used to show error messages. The problem is that they are used *far* more often than they should be and the error messages that are used in them are too technical for a regular user to understand. They are also used to ask the user a question. More often than not, the question that is asked could have just as easily been answered by the developer had he thought ahead a bit. Do just about whatever it takes to gracefully handle errors without bothering the user. Only when all other options have been exhausted should you show an error message. For help on writing good error messages, see Chapter 6.
+	Before you ask the user a question, be sure that it is one which you honestly can't answer yourself or can't do without possibly disturbing the way the user works. For example, it is good courtesy to ask the user if he would like your program to be the default handler for a particular kind of file when your program is installed. It is *never* acceptable to ask the user "Are you sure you want to quit?" If your program is asked to quit, handle unsaved documents and quit. "Are you sure..." questions should be asked only if the action involves the undoable destruction of data, such as deleting a file instead of moving it to the Trash. Avoiding these kinds of situations entirely is a better solution - if the confirmation is asked too often, the user will develop the habit of confirming it without a second thought.
+
+When you do use an alert window, please follow these guidelines:
+
+1) On a notification, such as an error message, use "OK" for the label of the button
+
+2) When asking a question, make the least destructive of the most common choices the default.
+
+3) Avoid Yes / No button labels. It is much better to use the name of the action in the label, such as Save Changes / Discard Changes. Only in *very* rare cases are Yes / No labels the best choice.
+
+About Window Design
+Find Windows
+Preferences Window Design
+Open and Save Panels
