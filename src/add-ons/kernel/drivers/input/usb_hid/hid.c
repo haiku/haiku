@@ -24,6 +24,10 @@
 
 #define MAX_BUTTONS 16
 
+static status_t hid_device_added(const usb_device *dev, void **cookie);
+static status_t hid_device_removed(void *cookie);
+
+
 typedef struct driver_cookie {
 	struct driver_cookie	*next;
 	hid_device_info			*device;
@@ -32,7 +36,14 @@ typedef struct driver_cookie {
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 const char *hid_driver_name = "hid";
 
-usb_module_info *usb;
+static usb_notify_hooks sNotifyHooks = {
+	hid_device_added, hid_device_removed
+};
+
+#define	SUPPORTED_DEVICES	1
+static usb_support_descriptor sSupportedDevices[SUPPORTED_DEVICES] = {
+	{ USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
+};
 
 const uint32 modifier_table[] = {
 	KEY_ControlL,
@@ -261,6 +272,8 @@ const uint32 key_table[] = {
 	0x00,	// unmapped
 };
 
+usb_module_info *usb;
+
 static int sKeyboardDeviceNumber = 0;
 static int sMouseDeviceNumber = 0;
 static const char *sKeyboardBaseName = "input/keyboard/usb/";
@@ -288,34 +301,34 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 		base_name = sMouseBaseName;
 	}
 	
-	device = malloc (sizeof (hid_device_info));
+	device = malloc(sizeof(hid_device_info));
 	if (device == NULL)
 		return NULL;
 
-	device->sem_cb = sem = create_sem (0, DRIVER_NAME "_cb");
-	if (sem < 0) {
-		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
-		free (device);
+	device->sem_cb = sem = create_sem(0, DRIVER_NAME "_cb");
+	if (sem < B_OK) {
+		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)sem));
+		free(device);
 		return NULL;
 	}
 
-	device->sem_lock = sem = create_sem (1, DRIVER_NAME "_lock");
-	if (sem < 0) {
-		DPRINTF_ERR ((MY_ID "create_sem() failed %d\n", (int) sem));
-		delete_sem (device->sem_cb);
-		free (device);
+	device->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
+	if (sem < B_OK) {
+		DPRINTF_ERR((MY_ID "create_sem() failed %d\n", (int)sem));
+		delete_sem(device->sem_cb);
+		free(device);
 		return NULL;
 	}
 
-	sprintf (area_name, DRIVER_NAME "_buffer%d", number);
-	device->buffer_area = area = create_area (area_name,
+	sprintf(area_name, DRIVER_NAME "_buffer%d", number);
+	device->buffer_area = area = create_area(area_name,
 		(void **) &device->buffer, B_ANY_KERNEL_ADDRESS,
 		B_PAGE_SIZE, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-	if (area < 0) {
-		DPRINTF_ERR ((MY_ID "create_area() failed %d\n", (int) area));
-		delete_sem (device->sem_cb);
-		delete_sem (device->sem_lock);
-		free (device);
+	if (area < B_OK) {
+		DPRINTF_ERR((MY_ID "create_area() failed %d\n", (int)area));
+		delete_sem(device->sem_cb);
+		delete_sem(device->sem_lock);
+		free(device);
 		return NULL;
 	}
 
@@ -332,8 +345,9 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->is_keyboard = isKeyboard;
 
 	// default values taken from the PS/2 driver
-	device->repeat_rate = ((31 - 0x0b) * 280) / 31 + 20;
-	device->repeat_delay = 500000;
+	device->repeat_rate = 35000;
+	device->repeat_delay = 300000;
+	device->repeat_timer.device = device;
 
 	return device;
 }
@@ -343,6 +357,7 @@ void
 remove_device(hid_device_info *device)
 {
 	assert(device != NULL);
+	cancel_timer(&device->repeat_timer.timer);
 
 	if (device->cbuf != NULL) {
 		cbuf_delete(device->cbuf);
@@ -624,7 +639,7 @@ usb_callback(void *cookie, uint32 busStatus,
 //	#pragma mark - device hooks
 
 
-static status_t 
+static status_t
 hid_device_added(const usb_device *dev, void **cookie)
 {
 	hid_device_info *device;
@@ -812,35 +827,29 @@ hid_device_added(const usb_device *dev, void **cookie)
 	return B_OK;
 }
 
-static status_t 
-hid_device_removed (void *cookie)
+
+static status_t
+hid_device_removed(void *cookie)
 {
 	hid_device_info *device = cookie;
 
 	assert (cookie != NULL);
 
-	DPRINTF_INFO ((MY_ID "device_removed(%s)\n", device->name));
+	DPRINTF_INFO((MY_ID "device_removed(%s)\n", device->name));
 	usb->cancel_queued_transfers (device->ept->handle);
-	remove_device_info (device);
+	remove_device_info(device);
+
 	if (device->open == 0) {
 		if (device->insns != NULL)
-			free (device->insns);
-		remove_device (device);
+			free(device->insns);
+		remove_device(device);
 	} else {
-		DPRINTF_INFO ((MY_ID "%s still open\n", device->name));
+		DPRINTF_INFO((MY_ID "%s still open\n", device->name));
 		device->active = false;
 	}
+
 	return B_OK;
 }
-
-static usb_notify_hooks sNotifyHooks = {
-	hid_device_added, hid_device_removed
-};
-
-#define	SUPPORTED_DEVICES	1
-usb_support_descriptor my_supported_devices [SUPPORTED_DEVICES] = {
-	{ USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
-};
 
 
 static status_t 
@@ -977,15 +986,15 @@ hid_device_free(driver_cookie *cookie)
 {
 	hid_device_info *device;
 
-	assert (cookie != NULL && cookie->device != NULL);
+	assert(cookie != NULL && cookie->device != NULL);
 	device = cookie->device;
-	DPRINTF_INFO ((MY_ID "free(%s)\n", device->name));
+	DPRINTF_INFO((MY_ID "free(%s)\n", device->name));
 
-	free (cookie);
+	free(cookie);
 	if (device->open > 0)
-		DPRINTF_INFO ((MY_ID "%d opens left\n", device->open));
+		DPRINTF_INFO((MY_ID "%d opens left\n", device->open));
 	else if (!device->active) {
-		DPRINTF_INFO ((MY_ID "removed %s\n", device->name));
+		DPRINTF_INFO((MY_ID "removed %s\n", device->name));
 		if (device->insns != NULL)
 			free (device->insns);
 		remove_device (device);
@@ -1009,17 +1018,18 @@ init_hardware(void)
 status_t 
 init_driver(void)
 {
-	DPRINTF_INFO ((MY_ID "init_driver() " __DATE__ " " __TIME__ "\n"));
+	DPRINTF_INFO((MY_ID "init_driver() " __DATE__ " " __TIME__ "\n"));
 
 	if (get_module(B_USB_MODULE_NAME, (module_info **)&usb) != B_OK)
 		return B_ERROR;
 
-	if ((gDeviceListLock = create_sem (1, "dev_list_lock")) < 0) {
+	gDeviceListLock = create_sem(1, "dev_list_lock");
+	if (gDeviceListLock < B_OK) {
 		put_module(B_USB_MODULE_NAME);
 		return gDeviceListLock;
 	}
 
-	usb->register_driver(hid_driver_name, my_supported_devices, 
+	usb->register_driver(hid_driver_name, sSupportedDevices, 
 		SUPPORTED_DEVICES, NULL);
 	usb->install_notify(hid_driver_name, &sNotifyHooks);
 	DPRINTF_INFO((MY_ID "init_driver() OK\n"));
