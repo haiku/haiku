@@ -275,7 +275,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	int number;
 	area_id area;
 	sem_id sem;
-	char	area_name [32];
+	char area_name[32];
 	const char *base_name;
 	
 	assert (usb != NULL && dev != NULL);
@@ -331,12 +331,16 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->cbuf = cbuf_init(384);
 	device->is_keyboard = isKeyboard;
 
+	// default values taken from the PS/2 driver
+	device->repeat_rate = ((31 - 0x0b) * 280) / 31 + 20;
+	device->repeat_delay = 500000;
+
 	return device;
 }
 
 
 void
-remove_device (hid_device_info *device)
+remove_device(hid_device_info *device)
 {
 	assert(device != NULL);
 
@@ -352,7 +356,39 @@ remove_device (hid_device_info *device)
 }
 
 
-/* driver cookie (per open) */
+static void
+write_key(hid_device_info *device, uint32 key, bool down)
+{
+	raw_key_info raw;
+	raw.be_keycode = key;
+	raw.is_keydown = down;
+	raw.timestamp = system_time();
+
+	cbuf_putn(device->cbuf, &raw, sizeof(raw_key_info));
+	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+static int32
+timer_repeat_hook(struct timer *timer)
+{
+	hid_device_info *device = ((struct hid_repeat_timer *)timer)->device;
+
+	write_key(device, device->repeat_timer.key, true);
+	return B_HANDLED_INTERRUPT;
+}
+
+
+static int32
+timer_delay_hook(struct timer *timer)
+{
+	hid_device_info *device = ((struct hid_repeat_timer *)timer)->device;
+
+	add_timer(&device->repeat_timer.timer, timer_repeat_hook, device->repeat_rate,
+		B_PERIODIC_TIMER);
+	return B_HANDLED_INTERRUPT;
+}
+
 
 // here we don't need to follow a report descriptor for typical keyboards
 // TODO : but we should for keypads for example because they aren't boot keyboard devices !
@@ -360,21 +396,14 @@ remove_device (hid_device_info *device)
 static void
 interpret_kb_buffer(hid_device_info *device)
 {
-	raw_key_info info;
 	uint8 modifiers = ((uint8*)device->buffer)[0];
 	uint8 bits = device->last_buffer[0] ^ modifiers;
 	uint32 i, j;
 
-	info.timestamp = device->timestamp;
-
 	if (bits) {
 		for (j = 0; bits; j++, bits >>= 1) {
-			if (bits & 1) {
-				info.be_keycode = modifier_table[j];				
-				info.is_keydown = (modifiers >> j) & 1;			
-				cbuf_putn(device->cbuf, &info, sizeof(info));
-				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
-			}
+			if (bits & 1)
+				write_key(device, modifier_table[j], (modifiers >> j) & 1);
 		}
 	}
 
@@ -392,18 +421,23 @@ interpret_kb_buffer(hid_device_info *device)
 			}
 
 			if (!found) {
-				info.be_keycode = key_table[((uint8*)device->buffer)[i]];
-				if (info.be_keycode == KEY_Pause && modifiers & 1)
-					info.be_keycode = KEY_Break;
-				if (info.be_keycode == 0xe && modifiers & 1)
-					info.be_keycode = KEY_SysRq;
-				if (info.be_keycode == 0) {
+				uint32 key = key_table[((uint8*)device->buffer)[i]];
+				if (key == KEY_Pause && modifiers & 1)
+					key = KEY_Break;
+				else if (key == 0xe && modifiers & 1)
+					key = KEY_SysRq;
+				else if (key == 0) {
 					// unmapped key
-					info.be_keycode = 0x200000 + ((uint8*)device->buffer)[i];
+					key = 0x200000 + ((uint8*)device->buffer)[i];
 				}
-				info.is_keydown = 1;
-				cbuf_putn(device->cbuf, &info, sizeof(info));
-				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+
+				write_key(device, key, true);
+
+				// repeat handling
+				cancel_timer(&device->repeat_timer.timer);
+				device->repeat_timer.key = key;
+				add_timer(&device->repeat_timer.timer, timer_delay_hook,
+					device->repeat_delay, B_ONE_SHOT_RELATIVE_TIMER);
 			}
 		} else
 			break;
@@ -424,18 +458,18 @@ interpret_kb_buffer(hid_device_info *device)
 			}
 
 			if (!found) {
-				info.be_keycode = key_table[((uint8*)device->last_buffer)[i]];
-				if (info.be_keycode == KEY_Pause && modifiers & 1)
-					info.be_keycode = KEY_Break;
-				if (info.be_keycode == 0xe && modifiers & 1)
-					info.be_keycode = KEY_SysRq;
-				if (info.be_keycode == 0) {
+				uint32 key = key_table[((uint8*)device->last_buffer)[i]];
+				if (key == KEY_Pause && modifiers & 1)
+					key = KEY_Break;
+				else if (key == 0xe && modifiers & 1)
+					key = KEY_SysRq;
+				else if (key == 0) {
 					// unmapped key
-					info.be_keycode = 0x200000 + ((uint8*)device->last_buffer)[i];
+					key = 0x200000 + ((uint8*)device->last_buffer)[i];
 				}
-				info.is_keydown = 0;
-				cbuf_putn(device->cbuf, &info, sizeof(info));
-				release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+
+				write_key(device, key, false);
+				cancel_timer(&device->repeat_timer.timer);
 			}
 		} else
 			break;
@@ -480,7 +514,7 @@ sign_extend(int value, int size)
 
 
 static void
-interpret_ms_buffer(hid_device_info *device)
+interpret_mouse_buffer(hid_device_info *device)
 {
 	mouse_movement info;
 	uint8 *report = (uint8*)device->buffer;
@@ -571,7 +605,7 @@ usb_callback(void *cookie, uint32 busStatus,
 			interpret_kb_buffer(device);
 			memcpy(device->last_buffer, device->buffer, device->total_report_size);
 		} else
-			interpret_ms_buffer(device);
+			interpret_mouse_buffer(device);
 		
 		release_sem (device->sem_lock);
 	}
@@ -607,10 +641,10 @@ hid_device_added(const usb_device *dev, void **cookie)
 	uint16 ifno;
 	bool is_keyboard;
 
-	assert (dev != NULL && cookie != NULL);
+	assert(dev != NULL && cookie != NULL);
 	DPRINTF_INFO ((MY_ID "device_added()\n"));
 
-	dev_desc = usb->get_device_descriptor (dev);
+	dev_desc = usb->get_device_descriptor(dev);
 
 	if (dev_desc->vendor_id == USB_VENDOR_WACOM) {
 		DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
@@ -633,7 +667,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 		int class, subclass, protocol;
 
 		intf = conf->interface [ifno].active;
-		class    = intf->descr->interface_class;
+		class = intf->descr->interface_class;
 		subclass = intf->descr->interface_subclass;
 		protocol = intf->descr->interface_protocol;
 		DPRINTF_INFO ((MY_ID "interface %d: class %d, subclass %d, protocol %d\n",
@@ -652,7 +686,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	desc_len = sizeof (usb_hid_descriptor);
 	hid_desc = malloc (desc_len);
-	status = usb->send_request (dev, 
+	status = usb->send_request(dev, 
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
 		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len, 
@@ -664,19 +698,21 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* read report descriptor */
 
-	desc_len = hid_desc->descriptor_info [0].descriptor_length;
-	free (hid_desc);
-	rep_desc = malloc (desc_len);
-	assert (rep_desc != NULL);
-	status = usb->send_request (dev, 
+	desc_len = hid_desc->descriptor_info[0].descriptor_length;
+	free(hid_desc);
+	rep_desc = malloc(desc_len);
+	if (rep_desc == NULL)
+		return B_NO_MEMORY;
+
+	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
 		USB_HID_DESCRIPTOR_REPORT << 8, ifno, desc_len, 
 		rep_desc, desc_len, &desc_len);
-	DPRINTF_INFO ((MY_ID "get_hid_rep_desc: status=%d, len=%d\n", 
+	DPRINTF_INFO((MY_ID "get_hid_rep_desc: status=%d, len=%d\n", 
 		(int) status, (int)desc_len));
 	if (status != B_OK) {
-		free (rep_desc);
+		free(rep_desc);
 		return B_ERROR;
 	}
 
@@ -684,41 +720,46 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	fd = open ("/tmp/rep_desc.bin", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd >= 0) {
-		write (fd, rep_desc, desc_len);
-		close (fd);
+		write(fd, rep_desc, desc_len);
+		close(fd);
 	}
 
 	/* Generic Desktop : Keyboard or Mouse */
 	
-	if (memcmp (rep_desc, "\x05\x01\x09\x06", 4) != 0 &&
-	    memcmp (rep_desc, "\x05\x01\x09\x02", 4) != 0) {
-		DPRINTF_INFO ((MY_ID "not a keyboard or a mouse %08lx\n", *(uint32*)rep_desc));
-		free (rep_desc);
+	if (memcmp(rep_desc, "\x05\x01\x09\x06", 4) != 0 &&
+	    memcmp(rep_desc, "\x05\x01\x09\x02", 4) != 0) {
+		DPRINTF_INFO((MY_ID "not a keyboard or a mouse %08lx\n", *(uint32*)rep_desc));
+		free(rep_desc);
 		return B_ERROR;
 	}
 
 	/* configuration */
 
 	if ((status = usb->set_configuration (dev, conf)) != B_OK) {
-		DPRINTF_ERR ((MY_ID "set_configuration() failed %d\n", (int)status));
+		DPRINTF_ERR((MY_ID "set_configuration() failed %d\n", (int)status));
 		free (rep_desc);
 		return B_ERROR;
 	}
 
-	is_keyboard = memcmp (rep_desc, "\x05\x01\x09\x06", 4) == 0;
+	is_keyboard = memcmp(rep_desc, "\x05\x01\x09\x06", 4) == 0;
 
-	if ((device = create_device (dev, intf, ifno, is_keyboard)) == NULL) {
-		free (rep_desc);
+	if ((device = create_device(dev, intf, ifno, is_keyboard)) == NULL) {
+		free(rep_desc);
 		return B_ERROR;
 	}
 
 	/* decompose report descriptor */
 
 	num_items = desc_len;	/* XXX */
-	items = malloc (sizeof (decomp_item) * num_items);
-	assert (items != NULL);
-	decompose_report_descriptor (rep_desc, desc_len, items, &num_items);
-	free (rep_desc);
+	items = malloc(sizeof (decomp_item) * num_items);
+	if (items == NULL) {
+		// TODO: free device
+		free(rep_desc);
+		return B_ERROR;
+	}
+
+	decompose_report_descriptor(rep_desc, desc_len, items, &num_items);
+	free(rep_desc);
 
 	/* parse report descriptor */
 
@@ -727,8 +768,8 @@ hid_device_added(const usb_device *dev, void **cookie)
 	assert (device->insns != NULL);
 	parse_report_descriptor (items, num_items, device->insns, 
 		&device->num_insns, &device->total_report_size, &report_id);
-	free (items);
-	realloc (device->insns, sizeof (report_insn) * device->num_insns);
+	free(items);
+	realloc(device->insns, sizeof (report_insn) * device->num_insns);
 	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n", 
 		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
@@ -740,9 +781,8 @@ hid_device_added(const usb_device *dev, void **cookie)
 		device->num_axes, device->num_hats, device->num_buttons));*/
 
 	/* get initial state */
-	
-	
-	status = usb->send_request (dev,
+
+	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_GET_REPORT,
 		0x0100 | report_id, ifno, device->total_report_size,
@@ -752,11 +792,11 @@ hid_device_added(const usb_device *dev, void **cookie)
 	device->timestamp = system_time ();
 
 	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
-	
+
 	/* issue interrupt transfer */
 
-	device->ept = &intf->endpoint [0];		/* interrupt IN */
-	status = usb->queue_interrupt (device->ept->handle, device->buffer,
+	device->ept = &intf->endpoint[0];		/* interrupt IN */
+	status = usb->queue_interrupt(device->ept->handle, device->buffer,
 		device->total_report_size, usb_callback, device);
 	if (status != B_OK) {
 		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
@@ -765,11 +805,10 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* create a port */
 
-	add_device_info (device);
+	add_device_info(device);
 
 	*cookie = device;
 	DPRINTF_INFO ((MY_ID "added %s\n", device->name));
-
 	return B_OK;
 }
 

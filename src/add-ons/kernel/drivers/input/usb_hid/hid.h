@@ -66,6 +66,12 @@ void cbuf_unlock(cbuffer *, cpu_status);
 
 struct driver_cookie;
 
+struct hid_repeat_timer {
+	struct timer timer;
+	struct hid_device_info *device;
+	uint32 key;
+};
+
 typedef struct hid_device_info {
 	/* list structure */
 	struct hid_device_info *next;
@@ -99,6 +105,10 @@ typedef struct hid_device_info {
 	bigtime_t timestamp;
 	uint flags;
 	bool is_keyboard;
+
+	struct hid_repeat_timer repeat_timer;
+	bigtime_t repeat_delay;
+	bigtime_t repeat_rate;
 } hid_device_info;
 
 /* hid.c */
