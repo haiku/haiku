@@ -1,8 +1,12 @@
-/* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
+
+#include <libroot_private.h>
+#include <real_time_data.h>
+#include <syscalls.h>
 
 #include <FindDirectory.h>
 #include <OS.h>
@@ -10,10 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
-
-#include <libroot_private.h>
-#include <real_time_data.h>
-#include <syscalls.h>
 
 
 static struct real_time_data sRealTimeDefaults;
@@ -103,8 +103,7 @@ set_timezone(char *timezone)
 
 
 bigtime_t
-set_alarm(bigtime_t when, uint32 flags)
+set_alarm(bigtime_t when, uint32 mode)
 {
-	// ToDo: set_alarm()
-	return B_ERROR;
+	return _kern_set_alarm(when, mode);
 }
