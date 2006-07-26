@@ -34,7 +34,6 @@ typedef struct driver_cookie {
 } driver_cookie;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
-const char *hid_driver_name = "hid";
 
 static usb_notify_hooks sNotifyHooks = {
 	hid_device_added, hid_device_removed
@@ -273,6 +272,8 @@ const uint32 key_table[] = {
 };
 
 usb_module_info *usb;
+
+static const char *kDriverName = "usb_hid";
 
 static int sKeyboardDeviceNumber = 0;
 static int sMouseDeviceNumber = 0;
@@ -580,15 +581,16 @@ interpret_mouse_buffer(hid_device_info *device)
 */
 static void 
 usb_callback(void *cookie, uint32 busStatus,
-	void *data, uint32 actual_len)
+	void *data, uint32 actualLength)
 {
 	hid_device_info *device = cookie;
 	status_t status;
 
-	assert(cookie != NULL);
+	if (device == NULL)
+		return;
 
 	acquire_sem(device->sem_lock);
-	device->actual_length = actual_len;
+	device->actual_length = actualLength;
 	device->bus_status = busStatus;	/* B_USB_STATUS_* */
 	if (busStatus != B_USB_STATUS_SUCCESS) {
 		/* request failed */
@@ -1029,9 +1031,9 @@ init_driver(void)
 		return gDeviceListLock;
 	}
 
-	usb->register_driver(hid_driver_name, sSupportedDevices, 
+	usb->register_driver(kDriverName, sSupportedDevices, 
 		SUPPORTED_DEVICES, NULL);
-	usb->install_notify(hid_driver_name, &sNotifyHooks);
+	usb->install_notify(kDriverName, &sNotifyHooks);
 	DPRINTF_INFO((MY_ID "init_driver() OK\n"));
 
 	return B_OK;
@@ -1042,7 +1044,7 @@ void
 uninit_driver(void)
 {
 	DPRINTF_INFO((MY_ID "uninit_driver()\n"));
-	usb->uninstall_notify(hid_driver_name);
+	usb->uninstall_notify(kDriverName);
 
 	delete_sem(gDeviceListLock);
 	put_module(B_USB_MODULE_NAME);
