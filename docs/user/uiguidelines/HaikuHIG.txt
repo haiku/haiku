@@ -86,9 +86,9 @@ Chapter 12: Controls
 	Lists
 	Tabs
 	Scrollbars
-	Menu Fields and Pop-up Menus
+	Menu Fields
+	Pop-up Menus
 	Progress Meters
-	Color Pickers
 	Toolbars
 
 Chapter 13: Installation and Updates
@@ -929,3 +929,87 @@ Don't:
 4) Nest BScrollViews
 
 
+Menu Fields
+
+	Menu fields are buttons which display a label and pop up a menu when clicked.
+
+Do:
+
+1) Use them in place of radio buttons when space is limited
+2) Remember to follow the menu construction guidelines mentioned in Chapter 9
+
+Don't:
+
+1) Use them instead of a menu bar for the main program menu
+
+
+Pop-up Menus
+
+	Pop-up menus differ from regular menus in that they can be invoked from anywhere on the screen.
+
+Do:
+
+1) Allow the user to let go of the mouse button and still have them menu stay visible
+2) Use pop-up menus for context menus
+
+Don't:
+
+1) Show a pop-up menu by clicking on a button or do other similar nonsensical control daisy-chaining.
+2) Use a pop-up menu as a tooltip
+3) Use the primary mouse button to show a context menu
+
+
+Progress Meters
+
+	BStatusBars are used to show progress in BeOS operating systems.
+
+Do:
+
+1) Choose a color carefully if you don't use the default
+2) Use them whenever an operation has the potential to take a while
+3) Properly label the progress bar
+
+Don't:
+
+1) Use a slider or scrollbar for a progress bar.
+2) Use a progress bar as a control separator
+
+
+Toolbars
+
+	While BeOS doesn't have official support for toolbars, they are easily constructed because they are little more than a collection of graphical buttons. They are used for providing fast access to commonly-used functions.
+
+Do:
+
+1) Use them to speed up access to common functions
+2) Be conservative in button colors
+3) Make the function of each button obvious from the icons used
+4) Make toolbar buttons look like buttons and look clickable
+
+Don't:
+
+1) Add a toolbar just for looks
+2) Scroll toolbars
+3) Use put too many buttons in a toolbar or have too many toolbars on the screen
+
+
+
+Chapter 13: Installation and Updates
+
+	It is easy to get so wrapped up in developing great software that you forget about getting it onto a user's computer. It pays to pay attention to detail in the installation of your software -- if a user can't get your program to work on his machine, you've just managed to both hurt your reputation as a developer and probably lose a user at the same time. Installation is one of those elements of software development that is given little, if any, attention when it works well but is quickly noticed when something goes wrong. As of this writing, there are two main methods of packaging and installing software on BeOS-based operating systems: zip files and Software Valet packages. 
+
+Zip Files
+
+	Zipped software is the simplest method for the developer at the cost of more work for the user. If your program has a simple structure, this is generally no big deal -- the user unzips it, sticks it somewhere, and creates a symlink in the Be menu. If, on the other hand, your program has shared libraries that need installed or other files that need to be installed in more than one folder, it is much, much better to use a Software Valet package.
+
+
+SoftwareValet packages
+
+	Package files make more work for a developer but much less for the user. As a result, they are the method of choice when a software package requires files be stored in more than one folder on the user's hard drive. They also allow the user to choose different types of installation, such as just an update, minimal installs, or developer installs.
+	When you make a Software Valet package, there are a few considerations to keep in mind. Installing shortcuts are a pain in the neck unless you have a fixed install location and you make separate packages for Zeta and R5. You should also make sure that all the little details, such as version, build date, and so forth have been set to the proper values. Lastly, test the installation before actually releasing the software to make sure that it actually works the way that it should.
+
+	
+Getting Program Updates
+
+	While there is no official support from the operating system, a conscientious developer will make a way for the user to easily update your program. Ideally, your program should automatically check for updates, ask the user if he would like to download them, download them in the background, and then install the updates when your program closes. Providing a way to roll back the updates in case of something going seriously wrong is also a very good idea. The only problem with this kind of setup is that it is a *lot* of work.
+	Because of the popularity of BeOS download sites such as BeBits, it is relatively simple to post updates merely by releasing the new version on such sites. It places the check-download-install responsibility on the user, though. More motivated users will update their software; a great many users will not, so keep this in mind if this is the route you would choose to go.
