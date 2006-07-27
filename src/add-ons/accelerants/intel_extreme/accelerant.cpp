@@ -297,7 +297,8 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 	TRACE(("intel_get_accelerant_device_info()\n"));
 
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, gInfo->shared_info->device_type == INTEL_TYPE_7xx
+	strcpy(info->name,
+		(gInfo->shared_info->device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_7xx
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");

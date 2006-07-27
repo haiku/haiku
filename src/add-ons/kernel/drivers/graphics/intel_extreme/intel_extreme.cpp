@@ -140,7 +140,7 @@ determine_stolen_memory_size(intel_info &info)
 
 	// TODO: test with different models!
 
-	if (info.device_type & INTEL_TYPE_83x) {
+	if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_83x)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
@@ -152,7 +152,7 @@ determine_stolen_memory_size(intel_info &info)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.device_type & INTEL_TYPE_85x) {
+	} else if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_85x)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -296,6 +296,15 @@ intel_extreme_init(intel_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(intel_shared_info));
 
+	int fbIndex = 0;
+	int mmioIndex = 1;
+	if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
+		// for some reason Intel saw the need to change the order of the mappings
+		// with the introduction of the i9xx family
+		mmioIndex = 0;
+		fbIndex = 2;
+	}
+
 	// evaluate driver settings, if any
 
 	bool ignoreBIOSAllocated;
@@ -333,7 +342,7 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper graphicsMapper;
 	info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
-		(void *)info.pci->u.h0.base_registers[0],
+		(void *)info.pci->u.h0.base_registers[fbIndex],
 		totalSize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	if (graphicsMapper.InitCheck() < B_OK) {
@@ -341,7 +350,7 @@ intel_extreme_init(intel_info &info)
 		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
 
 		info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
-			(void *)info.pci->u.h0.base_registers[0],
+			(void *)info.pci->u.h0.base_registers[fbIndex],
 			totalSize/*info.pci->u.h0.base_register_sizes[0]*/, B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	}
@@ -354,8 +363,8 @@ intel_extreme_init(intel_info &info)
 
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		(void *)info.pci->u.h0.base_registers[1],
-		info.pci->u.h0.base_register_sizes[1],
+		(void *)info.pci->u.h0.base_registers[mmioIndex],
+		info.pci->u.h0.base_register_sizes[mmioIndex],
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA /*0*/, (void **)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf(DEVICE_NAME ": could not map memory I/O!\n");

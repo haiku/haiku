@@ -20,6 +20,8 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
+#define INTEL_TYPE_FAMILY_MASK	0x0f
+#define INTEL_TYPE_GROUP_MASK	0xf0
 #define INTEL_TYPE_7xx			0x01
 #define INTEL_TYPE_8xx			0x02
 #define INTEL_TYPE_9xx			0x03
