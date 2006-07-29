@@ -212,6 +212,107 @@ public:
 		Element		*fNext;
 	};
 
+	class ReverseIterator {
+	public:
+		ReverseIterator(List *list)
+			:
+			fList(list)
+		{
+			Rewind();
+		}
+
+		ReverseIterator(const ReverseIterator &other)
+		{
+			*this = other;
+		}
+
+		bool HasNext() const
+		{
+			return fNext;
+		}
+
+		Element *Next()
+		{
+			fCurrent = fNext;
+			if (fNext)
+				fNext = fList->GetPrevious(fNext);
+			return fCurrent;
+		}
+
+		Element *Remove()
+		{
+			Element *element = fCurrent;
+			if (fCurrent) {
+				fList->Remove(fCurrent);
+				fCurrent = NULL;
+			}
+			return element;
+		}
+
+		ReverseIterator &operator=(const ReverseIterator &other)
+		{
+			fList = other.fList;
+			fCurrent = other.fCurrent;
+			fNext = other.fNext;
+			return *this;
+		}
+
+		void Rewind()
+		{
+			fCurrent = NULL;
+			fNext = fList->Last();
+		}
+
+	private:
+		List	*fList;
+		Element	*fCurrent;
+		Element	*fNext;
+	};
+
+	class ConstReverseIterator {
+	public:
+		ConstReverseIterator(const List *list)
+			:
+			fList(list)
+		{
+			Rewind();
+		}
+
+		ConstReverseIterator(const ConstReverseIterator &other)
+		{
+			*this = other;
+		}
+
+		bool HasNext() const
+		{
+			return fNext;
+		}
+
+		Element *Next()
+		{
+			Element *element = fNext;
+			if (fNext)
+				fNext = fList->GetPrevious(fNext);
+			return element;
+		}
+
+		ConstReverseIterator &operator=(const ConstReverseIterator &other)
+		{
+			fList = other.fList;
+			fNext = other.fNext;
+			return *this;
+		}
+
+		void Rewind()
+		{
+			fNext = fList->Last();
+		}
+
+	private:
+		const List	*fList;
+		Element		*fNext;
+	};
+
 public:
 	DoublyLinkedList() : fFirst(NULL), fLast(NULL) {}
 	~DoublyLinkedList() {}
@@ -246,6 +347,11 @@ public:
 
 	inline Iterator GetIterator()				{ return Iterator(this); }
 	inline ConstIterator GetIterator() const	{ return ConstIterator(this); }
+
+	inline ReverseIterator GetReverseIterator()
+		{ return ReverseIterator(this); }
+	inline ConstReverseIterator GetReverseIterator() const
+		{ return ConstReverseIterator(this); }
 
 private:
 	Element	*fFirst;
@@ -293,7 +399,7 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
 {
 	if (before == NULL) {
-		Insert(element, false);
+		Insert(element);
 		return;
 	}
 	if (element == NULL)
@@ -302,14 +408,14 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
 	Link *beforeLink = sGetLink(before);
 	Link *link = sGetLink(element);
 
-	link->previous = before;
-	link->next = beforeLink->next;
-	if (link->next != NULL)
-		link->next->previous = element;
-	beforeLink->next = element;
+	link->next = before;
+	link->previous = beforeLink->previous;
+	if (link->previous != NULL)
+		sGetLink(link->previous)->next = element;
+	beforeLink->previous = element;
 
-	if (fLast == before)
-		fLast = element;
+	if (fFirst == before)
+		fFirst = element;
 }
 
 // Add
