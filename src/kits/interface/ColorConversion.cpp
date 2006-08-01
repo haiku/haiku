@@ -1073,6 +1073,8 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 			return B_BAD_VALUE;
 			break;
 	}
+
+	return B_OK;
 }
 
 } // namespace BPrivate
