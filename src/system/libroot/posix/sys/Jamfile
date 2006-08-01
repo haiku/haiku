@@ -18,5 +18,6 @@ MergeObject posix_sys.o :
  	uio.c
  	umask.c
  	uname.c
+ 	utimes.c
 	wait.c
 ;
