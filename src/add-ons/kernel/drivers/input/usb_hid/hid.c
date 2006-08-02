@@ -273,7 +273,7 @@ const uint32 key_table[] = {
 
 usb_module_info *usb;
 
-static const char *kDriverName = "usb_hid";
+static const char *kDriverName = DRIVER_NAME;
 
 static int sKeyboardDeviceNumber = 0;
 static int sMouseDeviceNumber = 0;

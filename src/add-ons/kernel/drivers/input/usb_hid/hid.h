@@ -51,7 +51,7 @@ void cbuf_unlock(cbuffer *, cpu_status);
 
 /* driver specific definitions */
 
-#define	DRIVER_NAME	"hid"
+#define	DRIVER_NAME	"usb_hid"
 
 #define	MY_ID	"\033[34m" DRIVER_NAME ":\033[m "
 #define	MY_ERR	"\033[31merror:\033[m "
