@@ -1161,7 +1161,6 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 				dragger->SetViewToDrag(replicant);
 				relation = BDragger::TARGET_IS_SIBLING;
 			}
-	
 		} else {
 			// Replicant is child of the dragger
 			if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
@@ -1190,6 +1189,19 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		} else
 			frame = dragger->Frame().OffsetToCopy(point);
 
+		if (!CanAcceptReplicantView(frame, replicant, data)) {
+			// the view has not been accepted
+
+			if (relation == BDragger::TARGET_IS_PARENT
+				|| relation == BDragger::TARGET_IS_SIBLING)
+				delete replicant;
+			if (relation == BDragger::TARGET_IS_CHILD
+				|| relation == BDragger::TARGET_IS_SIBLING)
+				delete dragger;
+
+			return send_reply(data, B_ERROR, uniqueID);
+		}
+
 		BPoint adjust = AdjustReplicantBy(frame, data);
 		
 		// TODO: that's probably not correct for all relations (or any?)
@@ -1200,7 +1212,6 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			fContainerView->AddChild(dragger);
 
 		replicant->AddFilter(new _TReplicantViewFilter_(this, replicant));
-
 	} else if (fDisplayZombies && fAllowZombies) {
 		// TODO: the zombies must be adjusted and moved as well!
 		BRect frame;
