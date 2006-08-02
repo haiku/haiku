@@ -3015,6 +3015,8 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 			return true;
 		}
 
+		MenusBeginning();
+
 		Shortcut* shortcut = _FindShortcut(key, modifiers);
 		if (shortcut != NULL) {
 			// TODO: would be nice to move this functionality to
@@ -3043,8 +3045,9 @@ BWindow::_HandleKeyDown(char key, uint32 modifiers)
 					PostMessage(&message, target);
 				}
 			}
-
 		}
+
+		MenusEnded();
 
 		// we always eat the event if the command key was pressed
 		return true;
