@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src build libhaikucompat ;
 
-SetSubDirSupportedPlatforms libbe_test ;
+SetSubDirSupportedPlatforms libbe_test r5 dano bone ;
 
 StaticLibrary libhaikucompat.a :
 	strcasestr.c
