@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // BaseTranslator
-// Written by Michael Wilber, OBOS Translation Kit Team
+// Written by Michael Wilber, Haiku Translation Kit Team
 //
 // BaseTranslator.cpp
 //
@@ -9,7 +9,7 @@
 // over in each Translator.
 //
 //
-// Copyright (c) 2004 OpenBeOS Project
+// Copyright (c) 2004 Haiku, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
