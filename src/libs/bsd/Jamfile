@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src libs bsd ;
+
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+SharedLibrary libbsd.so :
+	err.c
+	progname.c
+	stringlist.c
+;
