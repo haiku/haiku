@@ -779,7 +779,6 @@ void
 BTextView::Pulse()
 {
 	if (fActive && fEditable && fSelStart == fSelEnd) {
-		// TODO: Is this check needed ?
 		if (system_time() > (fCaretTime + 500000.0))
 			InvertCaret();
 	}
@@ -3298,36 +3297,28 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 		return limit;
 	}
 	
-	bool done = false;
-	float ascent = 0.0;
-	float descent = 0.0;
 	int32 offset = fromOffset;
-	int32 delta = 0;
-	float deltaWidth = 0.0;
-	float tabWidth = 0.0;
-	float strWidth = 0.0;
 	
-	// do we need to wrap the text?
+	// Text wrapping is turned off.
+	// Just find the offset of the first \n character
 	if (!fWrap) {
 		offset = limit - fromOffset;
 		fText->FindChar('\n', fromOffset, &offset);
 		offset += fromOffset;
 		offset = (offset < limit) ? offset + 1 : limit;
 		
-		// iterate through the style runs
-		int32 length = offset;
-		int32 startOffset = fromOffset;
-		int32 numChars;
-		while ((numChars = fStyles->Iterate(startOffset, length, fInline, NULL, NULL, &ascent, &descent)) != 0) {
-			*outAscent = max_c(ascent, *outAscent);
-			*outDescent = max_c(descent, *outDescent);
-			
-			startOffset += numChars;
-			length -= numChars;
-		}
+		*ioWidth = StyledWidth(fromOffset, offset - fromOffset, outAscent, outDescent);
 		
 		return offset;
 	}
+	
+	bool done = false;
+	float ascent = 0.0;
+	float descent = 0.0;
+	int32 delta = 0;
+	float deltaWidth = 0.0;
+	float tabWidth = 0.0;
+	float strWidth = 0.0;
 	
 	// wrap the text
 	do {
