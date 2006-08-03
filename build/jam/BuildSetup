@@ -587,20 +587,28 @@ switch $(HOST_PLATFORM) {
 
 #pragma mark -
 
+# In case we build for a BeOS compatible platform, but not for Haiku, we
+# include the HaikuBuildCompatibility.h header and link against
+# libhaikucompat.a.
+
+if $(TARGET_PLATFORM) != haiku &&  $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
+	# headers and flags
+	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
+		HaikuBuildCompatibility.h ] ;
+	TARGET_CCFLAGS += $(compatibilityHeader) ;
+	TARGET_C++FLAGS += $(compatibilityHeader) ;
+
+	# compatibility library
+	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
+}
+
 # special target libbe_test
 
 if $(TARGET_PLATFORM) = libbe_test {
 	# headers and flags
 	TARGET_HDRS += [ PublicHeaders app game interface storage support ]
 		[ PrivateHeaders $(DOT) ] ;
-	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
-		HaikuBuildCompatibility.h ] ;
-	TARGET_CCFLAGS += $(compatibilityHeader) ;
-	TARGET_C++FLAGS += $(compatibilityHeader) ;
 	TARGET_DEFINES += __HAIKU__ ;
-
-	# compatibility library
-	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
 
 	# directories
 	TARGET_OBJECT_BASE_DIR
