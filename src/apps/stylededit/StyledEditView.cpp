@@ -167,7 +167,20 @@ StyledEditView::GetStyledText(BPositionIO* stream)
 
 		// ... and here we restore it
 		SetRunArray(0, length, runArray);
+		
+		#ifdef HAIKU_TARGET_PLATFORM_BEOS
+		// FreeRunArray does not exist on R5
+		
+		// Call destructors explicitly
+		for (int32 i = 0; i < runArray->count; i++)
+			runArray->runs[i].font.~BFont();
+		
+		free(runArray);
+		
+		#else
 		FreeRunArray(runArray);
+		#endif
+		
 	}
 
 	return result;
