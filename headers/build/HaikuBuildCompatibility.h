@@ -44,11 +44,6 @@ extern float	roundf(float value);
 } // extern "C"
 #endif
 
-// Missing from AppDefs.h only on R5
-#ifndef B_REDO
-#define B_REDO 'REDO'
-#endif
-
 // These are R1-specific extensions
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 
