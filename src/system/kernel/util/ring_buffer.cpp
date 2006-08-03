@@ -7,7 +7,6 @@
 #include "ring_buffer.h"
 
 #include <KernelExport.h>
-#include <lock.h>
 #include <port.h>
 
 #include <stdlib.h>
