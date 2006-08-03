@@ -50,6 +50,18 @@
 #define max(a,b) ((a > b) ? (a) : (b))
 #endif
 
+// These are R1-specific extensions
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+
+#define B_TRANSLATION_MAKE_VERSION(major,minor,revision) ((major << 8) | ((minor << 4) & 0xf0) | (revision & 0x0f))
+#define B_TRANSLATION_MAJOR_VERSION(v) (v >> 8)
+#define B_TRANSLATION_MINOR_VERSION(v) ((v >> 4) & 0xf)
+#define B_TRANSLATION_REVISION_VERSION(v) (v & 0xf)
+
+#define B_BAD_DATA (B_NOT_ALLOWED+1)
+
+#endif
+
 class BaseTranslator : public BTranslator {
 public:
 	BaseTranslator(const char *name, const char *info,
