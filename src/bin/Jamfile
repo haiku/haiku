@@ -12,7 +12,6 @@ AddResources hey : hey.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
-	boot_process_done.cpp
 	catattr.cpp
 	chop.c
 	clear.c
@@ -22,7 +21,6 @@ StdBinCommands
 #	echo.c
 	eject.c
 	error.c
-	fdinfo.cpp
 	fortune.c
 	finddir.c
 	hd.c
@@ -50,6 +48,14 @@ StdBinCommands
 	waitfor.c
 #	whoami.c
 	;
+
+# Haiku-only commands which don't need another library
+if $(TARGET_PLATFORM) != haiku {
+StdBinCommands
+	boot_process_done.cpp
+	fdinfo.cpp
+	;
+}
 
 # standard commands that need libtermcap.a
 StdBinCommands
