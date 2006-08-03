@@ -32,28 +32,29 @@ StdBinCommands
 	listsem.c
 	logger.cpp
 	lsindex.cpp
-	mount.c
 	prio.c
 	ps.c
 	release.c
 	renice.c
 	rescan.c
-	rmattr.cpp
-	rmindex.cpp
-	safemode.c
 	sysinfo.c
 	unchop.c
-	unmount.c
 	uptime.cpp
 	waitfor.c
 #	whoami.c
 	;
 
-# Haiku-only commands which don't need another library
-if $(TARGET_PLATFORM) != haiku {
+# Commands which don't need another library that depend on
+# Haiku-specific code
+if $(TARGET_PLATFORM) = haiku {
 StdBinCommands
 	boot_process_done.cpp
 	fdinfo.cpp
+	mount.c
+	rmattr.cpp
+	rmindex.cpp
+	safemode.c
+	unmount.c
 	;
 }
 
@@ -90,18 +91,31 @@ StdBinCommands
 	roster.cpp
 	settype.cpp
 	setversion.cpp
-	shutdown.cpp
 	version.cpp
 #	yes.cpp
 	: be ;
 
+# Haiku-specific apps which need libbe.so
+if $(TARGET_PLATFORM) = haiku {
+StdBinCommands
+	shutdown.cpp
+	: be ;
+}
+
 # standard commands that need libbe.so, libstdc++.so
 StdBinCommands
 	copyattr.cpp
-	mountvolume.cpp
 	xres.cpp
 	: be $(TARGET_LIBSTDC++)
 	;
+
+# Haiku-specific apps which need libbe., libstdc++.so
+if $(TARGET_PLATFORM) = haiku {
+StdBinCommands
+	mountvolume.cpp
+	: be $(TARGET_LIBSTDC++)
+	;
+}
 
 # standard commands that need libbe.so, libtranslation.so
 StdBinCommands

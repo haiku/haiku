@@ -12,6 +12,7 @@
 #include <TextView.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 const uint32 TIMEDALERT_UPDATE = 'taup';
 
