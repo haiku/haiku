@@ -22,6 +22,8 @@ typedef unsigned long haiku_build_addr_t;
 
 #ifndef B_CURRENT_TEAM
 #define B_CURRENT_TEAM	0
+
+
 #endif
 
 
@@ -40,6 +42,11 @@ extern float	roundf(float value);
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
+// Missing from AppDefs.h only on R5
+#ifndef B_REDO
+#define B_REDO 'REDO'
 #endif
 
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
