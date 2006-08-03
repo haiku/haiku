@@ -1,10 +1,12 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : mccall@digitalparadise.co.uk, Jérôme Duval
+ * Copyright 2004-2006, the Haiku project. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ *
+ * Authors in chronological order:
+ *  mccall@digitalparadise.co.uk
+ *  Jérôme Duval
+ *  Marcus Overhagen
 */
-
 #include <Button.h>
 #include <Message.h>
 #include <Screen.h>
@@ -15,12 +17,9 @@
 #include "KeyboardWindow.h"
 #include "KeyboardView.h"
 
-#define KEYBOARD_WINDOW_RIGHT	229
-#define KEYBOARD_WINDOW_BOTTTOM	221
-
 KeyboardWindow::KeyboardWindow()
-				: BWindow(BRect(0,0,KEYBOARD_WINDOW_RIGHT,KEYBOARD_WINDOW_BOTTTOM), "Keyboard", 
-					B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+ :	BWindow(BRect(0,0,200,200), "Keyboard", B_TITLED_WINDOW,
+ 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {	
 	MoveTo(fSettings.WindowCorner());
 
@@ -45,7 +44,6 @@ KeyboardWindow::KeyboardWindow()
 #endif
 
 	Show();
-
 }
 
 
@@ -144,5 +142,4 @@ KeyboardWindow::MessageReceived(BMessage *message)
 			BWindow::MessageReceived(message);
 			break;
 	}
-	
 }

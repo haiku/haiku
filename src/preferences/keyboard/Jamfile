@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
         SubDirC++Flags -DCOMPILE_FOR_R5 ;
-        SubDirC++Flags -fmultiple-symbol-spaces ;
+#        SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
 UsePrivateHeaders input ;

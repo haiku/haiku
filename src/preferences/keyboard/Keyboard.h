@@ -1,10 +1,12 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : mccall@digitalparadise.co.uk, Jérôme Duval
+ * Copyright 2004-2006, the Haiku project. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ *
+ * Authors in chronological order:
+ *  mccall@digitalparadise.co.uk
+ *  Jérôme Duval
+ *  Marcus Overhagen
 */
-
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
@@ -13,11 +15,10 @@
 class KeyboardApplication : public BApplication 
 {
 public:
-	KeyboardApplication();
+			KeyboardApplication();
 	
-	void MessageReceived(BMessage *message);
-		
-	void AboutRequested(void);
+	void	MessageReceived(BMessage *message);
+	void	AboutRequested(void);
 };
 
 #endif

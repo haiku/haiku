@@ -1,10 +1,12 @@
 /*
-** Copyright 2004, the Haiku project. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author : mccall@digitalparadise.co.uk, Jérôme Duval
+ * Copyright 2004-2006, the Haiku project. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ *
+ * Authors in chronological order:
+ *  mccall@digitalparadise.co.uk
+ *  Jérôme Duval
+ *  Marcus Overhagen
 */
-
 #ifndef KEYBOARD_WINDOW_H
 #define KEYBOARD_WINDOW_H
 
@@ -16,14 +18,13 @@
 class KeyboardWindow : public BWindow 
 {
 public:
-	KeyboardWindow();
+			KeyboardWindow();
 	
-	bool QuitRequested();
-	void MessageReceived(BMessage *message);
+	bool	QuitRequested();
+	void	MessageReceived(BMessage *message);
 	
 private:
-	KeyboardView	*fView;
-	
+	KeyboardView		*fView;
 	KeyboardSettings	fSettings;
 };
 
