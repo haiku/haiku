@@ -170,9 +170,8 @@ namespace agg
     //------------------------------------------------------------------------
     void trans_affine::translation(double* dx, double* dy) const
     {
-        trans_affine t(*this);
-        t *= trans_affine_rotation(-rotation());
-        t.transform(dx, dy);
+        *dx = m4;
+        *dy = m5;
     }
 
     //------------------------------------------------------------------------
