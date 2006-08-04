@@ -7,11 +7,16 @@
 #include "ring_buffer.h"
 
 #include <KernelExport.h>
+#if 0
 #include <port.h>
+#endif
 
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+#define user_memcpy(x...) (memcpy(x), B_OK)
+#endif
 
 /**	This is a light-weight ring_buffer implementation.
  *	It does not provide any locking - you are supposed to ensure thread-safety
