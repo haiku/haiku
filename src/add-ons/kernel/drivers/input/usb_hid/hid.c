@@ -342,7 +342,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->insns = NULL;
 	device->num_insns = 0;
 	device->flags = 0;
-	device->cbuf = cbuf_init(384);
+	device->rbuf = create_ring_buffer(384);
 	device->is_keyboard = isKeyboard;
 
 	// default values taken from the PS/2 driver
@@ -360,9 +360,9 @@ remove_device(hid_device_info *device)
 	assert(device != NULL);
 	cancel_timer(&device->repeat_timer.timer);
 
-	if (device->cbuf != NULL) {
-		cbuf_delete(device->cbuf);
-		device->cbuf = NULL;
+	if (device->rbuf != NULL) {
+		delete_ring_buffer(device->rbuf);
+		device->rbuf = NULL;
 	}
 
 	delete_area(device->buffer_area);
@@ -380,7 +380,7 @@ write_key(hid_device_info *device, uint32 key, bool down)
 	raw.is_keydown = down;
 	raw.timestamp = system_time();
 
-	cbuf_putn(device->cbuf, &raw, sizeof(raw_key_info));
+	ring_buffer_write(device->rbuf, (const uint8*)&raw, sizeof(raw_key_info));
 	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
@@ -571,7 +571,7 @@ interpret_mouse_buffer(hid_device_info *device)
 	info.modifiers = 0;
 	info.timestamp = device->timestamp;
 
-	cbuf_putn(device->cbuf, &info, sizeof(info));
+	ring_buffer_write(device->rbuf, (const uint8*)&info, sizeof(info));
 	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
@@ -920,7 +920,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	    		err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
-				cbuf_getn(device->cbuf, arg, sizeof(raw_key_info));
+				ring_buffer_user_read(device->rbuf, arg, sizeof(raw_key_info));
 				return err;
 				break;
 	    
@@ -934,7 +934,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
-				cbuf_getn(device->cbuf, arg, sizeof(mouse_movement));
+				ring_buffer_user_read(device->rbuf, arg, sizeof(mouse_movement));
 				return err;
 				break;
 	    	case MS_NUM_EVENTS:
