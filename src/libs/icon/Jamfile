@@ -1,0 +1,58 @@
+SubDir HAIKU_TOP src libs icon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+# source directories
+local sourceDirs =
+	flat_icon
+	shape
+	style
+	transformable
+	transformer
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
+}
+
+# system headers
+UseLibraryHeaders agg ;
+
+UsePrivateHeaders shared ;
+
+StaticLibrary libicon.a :
+	# flat_icon
+	FlatIconFormat.cpp
+	FlatIconImporter.cpp
+	LittleEndianBuffer.cpp
+	PathCommandQueue.cpp
+
+	# shape
+	PathContainer.cpp
+	Shape.cpp
+	ShapeContainer.cpp
+	VectorPath.cpp
+
+	# style
+	Gradient.cpp
+	Style.cpp
+	StyleContainer.cpp
+
+	# transformable
+	Transformable.cpp
+
+	# transformer
+	AffineTransformer.cpp
+	ContourTransformer.cpp
+	PathSource.cpp
+	PerspectiveTransformer.cpp
+	StrokeTransformer.cpp
+	Transformer.cpp
+	TransformerFactory.cpp
+
+	Icon.cpp
+	IconRenderer.cpp
+;
+

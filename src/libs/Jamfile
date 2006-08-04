@@ -5,6 +5,7 @@ SubInclude HAIKU_TOP src libs bsd ;
 #SubInclude HAIKU_TOP src libs edit ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs freetype2 ;
+SubInclude HAIKU_TOP src libs icon ;
 #SubInclude HAIKU_TOP src libs ncurses ;
 SubInclude HAIKU_TOP src libs pdflib ;
 SubInclude HAIKU_TOP src libs png ;

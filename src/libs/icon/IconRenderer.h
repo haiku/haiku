@@ -1,0 +1,94 @@
+/*
+ * Copyright 2006, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
+
+#ifndef ICON_RENDERER_H
+#define ICON_RENDERER_H
+
+#include <agg_gamma_lut.h>
+#include <agg_pixfmt_rgba.h>
+#include <agg_rasterizer_compound_aa.h>
+#include <agg_rendering_buffer.h>
+#include <agg_renderer_scanline.h>
+#include <agg_scanline_bin.h>
+#include <agg_scanline_u.h>
+#include <agg_span_allocator.h>
+#include <agg_trans_affine.h>
+
+class BBitmap;
+class BRect;
+class Icon;
+
+typedef agg::gamma_lut
+			<agg::int8u, agg::int8u>		GammaTable;
+
+typedef agg::rendering_buffer				RenderingBuffer;
+typedef agg::pixfmt_bgra32					PixelFormat;
+typedef agg::pixfmt_bgra32_pre				PixelFormatPre;
+typedef agg::renderer_base<PixelFormat>		BaseRenderer;
+typedef agg::renderer_base<PixelFormatPre>	BaseRendererPre;
+
+typedef agg::scanline_u8					Scanline;
+typedef agg::scanline_bin					BinaryScanline;
+typedef agg::span_allocator<agg::rgba8>		SpanAllocator;
+typedef agg::rasterizer_compound_aa
+			<agg::rasterizer_sl_clip_dbl>	CompoundRasterizer;
+
+typedef agg::trans_affine					Transformation;
+
+class IconRenderer {
+ public:
+								IconRenderer(BBitmap* bitmap);
+	virtual						~IconRenderer();
+
+			void				SetIcon(const Icon* icon);
+
+			void				Render();
+			void				Render(const BRect& area);
+
+			void				SetScale(double scale);
+			void				SetBackground(const BBitmap* background);
+									// background is not copied,
+									// ownership stays with the caller
+									// colorspace and size need to
+									// be the same as bitmap passed
+									// to constructor
+			void				SetBackground(const agg::rgba8& color);
+									// used when no background bitmap
+									// is set
+
+			const ::GammaTable&	GammaTable() const
+									{ return fGammaTable; }
+
+			void				Demultiply();
+
+ private:
+			void				_Render(const BRect& area);
+
+			BBitmap*			fBitmap;
+			const BBitmap*		fBackground;
+			agg::rgba8			fBackgroundColor;
+			const Icon*			fIcon;
+
+			::GammaTable		fGammaTable;
+
+			RenderingBuffer		fRenderingBuffer;
+			PixelFormat			fPixelFormat;
+			PixelFormatPre		fPixelFormatPre;
+			BaseRenderer		fBaseRenderer;
+			BaseRendererPre		fBaseRendererPre;
+
+			Scanline			fScanline;
+			BinaryScanline		fBinaryScanline;
+			SpanAllocator		fSpanAllocator;
+
+			CompoundRasterizer	fRasterizer;
+
+			Transformation		fGlobalTransform;
+};
+
+#endif // ICON_RENDERER_H
