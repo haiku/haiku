@@ -416,8 +416,6 @@ Shape::SetStyle(::Style* style)
 		fStyle->Release();
 	}
 	::Style* oldStyle = fStyle;
-#else
-	delete fStyle;
 #endif
 
 	fStyle = style;
@@ -505,6 +503,8 @@ Shape::AddTransformer(Transformer* transformer, int32 index)
 	transformer->AddObserver(this);
 
 	_NotifyTransformerAdded(transformer, index);
+#else
+	fNeedsUpdate = true;
 #endif
 	return true;
 }
@@ -518,6 +518,8 @@ Shape::RemoveTransformer(Transformer* transformer)
 		transformer->RemoveObserver(this);
 		
 		_NotifyTransformerRemoved(transformer);
+#else
+		fNeedsUpdate = true;
 #endif
 		return true;
 	}

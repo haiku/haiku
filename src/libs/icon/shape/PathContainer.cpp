@@ -24,9 +24,9 @@ PathContainerListener::~PathContainerListener() {}
 // constructor
 PathContainer::PathContainer(bool ownsPaths)
 	: fPaths(16),
-	  fOwnsPaths(ownsPaths),
+	  fOwnsPaths(ownsPaths)
 #ifdef ICON_O_MATIC
-	  fListeners(2)
+	, fListeners(2)
 #endif
 {
 }
