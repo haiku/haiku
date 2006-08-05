@@ -44,6 +44,8 @@ class Icon {
 								Icon(const Icon& other);
 	virtual						~Icon();
 
+			status_t			InitCheck() const;
+
 			StyleContainer*		Styles() const
 									{ return fStyles; }
 			PathContainer*		Paths() const

@@ -54,5 +54,6 @@ StaticLibrary libicon.a :
 
 	Icon.cpp
 	IconRenderer.cpp
+	IconUtils.cpp
 ;
 

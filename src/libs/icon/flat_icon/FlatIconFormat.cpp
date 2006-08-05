@@ -12,8 +12,8 @@
 
 const uint32 FLAT_ICON_MAGIC = 'ficn';
 
-const char* kVectorAttrNodeName = "BEOS:I:STD_ICON";
-const char* kVectorAttrMimeName = "META:I:STD_ICON";
+const char* kVectorAttrNodeName = "BEOS:ICON";
+const char* kVectorAttrMimeName = "META:ICON";
 
 // read_coord
 bool

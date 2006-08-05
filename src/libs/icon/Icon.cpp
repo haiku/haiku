@@ -122,6 +122,13 @@ Icon::~Icon()
 	delete fStyles;
 }
 
+// InitCheck
+status_t
+Icon::InitCheck() const
+{
+	return fStyles && fPaths && fShapes ? B_OK : B_NO_MEMORY;
+}
+
 #ifdef ICON_O_MATIC
 // ShapeAdded
 void

@@ -243,17 +243,17 @@ FlatIconImporter::_ParseStyles(LittleEndianBuffer& buffer,
 		if (!buffer.Read(styleType))
 			return B_ERROR;
 		Style* style = NULL;
-		if (styleType == TAG_STYLE_SOLID_COLOR) {
+		if (styleType == STYLE_TYPE_SOLID_COLOR) {
 			// solid color
 			style = _ReadColorStyle(buffer, true);
 			if (!style)
 				return B_NO_MEMORY;
-		} else if (styleType == TAG_STYLE_SOLID_COLOR_NO_ALPHA) {
+		} else if (styleType == STYLE_TYPE_SOLID_COLOR_NO_ALPHA) {
 			// solid color without alpha
 			style = _ReadColorStyle(buffer, false);
 			if (!style)
 				return B_NO_MEMORY;
-		} else if (styleType == TAG_STYLE_GRADIENT) {
+		} else if (styleType == STYLE_TYPE_GRADIENT) {
 			// gradient
 			style = _ReadGradientStyle(buffer);
 			if (!style)
@@ -351,10 +351,10 @@ FlatIconImporter::_ParsePaths(LittleEndianBuffer& buffer,
 
 		// chose path reading strategy depending on path flags
 		bool error = false;
-		if (pathFlags & PATH_FLAGS_NO_CURVES) {
+		if (pathFlags & PATH_FLAG_NO_CURVES) {
 			if (!read_path_no_curves(buffer, path, pointCount))
 				error = true;
-		} else if (pathFlags & PATH_FLAGS_USES_COMMANDS) {
+		} else if (pathFlags & PATH_FLAG_USES_COMMANDS) {
 			if (!read_path_with_commands(buffer, path, pointCount))
 				error = true;
 		} else {
@@ -368,7 +368,7 @@ FlatIconImporter::_ParsePaths(LittleEndianBuffer& buffer,
 		}
 		// post process path to clean it up
 		path->CleanUp();
-		if (pathFlags & PATH_FLAGS_CLOSED)
+		if (pathFlags & PATH_FLAG_CLOSED)
 			path->SetClosed(true);
 		// add path to container
 		if (!paths->AddPath(path)) {
@@ -389,7 +389,7 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 		return NULL;
 
 	switch (transformerType) {
-		case TAG_TRANSFORMER_AFFINE: {
+		case TRANSFORMER_TYPE_AFFINE: {
 			AffineTransformer* affine
 				= new (nothrow) AffineTransformer(source);
 			if (!affine)
@@ -406,7 +406,7 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 			affine->load_from(matrix);
 			return affine;
 		}
-		case TAG_TRANSFORMER_CONTOUR: {
+		case TRANSFORMER_TYPE_CONTOUR: {
 			ContourTransformer* contour
 				= new (nothrow) ContourTransformer(source);
 			uint8 width;
@@ -424,14 +424,14 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 			contour->miter_limit(miterLimit);
 			return contour;
 		}
-		case TAG_TRANSFORMER_PERSPECTIVE: {
+		case TRANSFORMER_TYPE_PERSPECTIVE: {
 			PerspectiveTransformer* perspective
 				= new (nothrow) PerspectiveTransformer(source);
 			// TODO: upgrade AGG to be able to support storage of
 			// trans_perspective
 			return perspective;
 		}
-		case TAG_TRANSFORMER_STROKE: {
+		case TRANSFORMER_TYPE_STROKE: {
 			StrokeTransformer* stroke
 				= new (nothrow) StrokeTransformer(source);
 			uint8 width;
@@ -566,7 +566,7 @@ FlatIconImporter::_ParseShapes(LittleEndianBuffer& buffer,
 		if (!buffer.Read(shapeType))
 			return B_ERROR;
 		Shape* shape = NULL;
-		if (shapeType == TAG_SHAPE_PATH_SOURCE) {
+		if (shapeType == SHAPE_TYPE_PATH_SOURCE) {
 			// path source shape
 			shape = _ReadPathSourceShape(buffer, styles, paths);
 			if (!shape)
