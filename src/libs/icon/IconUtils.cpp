@@ -96,7 +96,7 @@ BIconUtils::GetVectorIcon(const uint8* buffer, size_t size,
 	renderer.Render();
 
 	// TODO: would be nice to get rid of this
-	// (B_RGBA32_PREMULTIPLIED or better yes, new blending_mode)
+	// (B_RGBA32_PREMULTIPLIED or better yet, new blending_mode)
 	// NOTE: probably not necessary only because
 	// transparent colors are "black" in all existing icons
 	// lighter transparent colors should be too dark if
@@ -105,6 +105,8 @@ BIconUtils::GetVectorIcon(const uint8* buffer, size_t size,
 
 	return B_OK;
 }
+
+// #pragma mark -
 
 // ConvertFromCMAP8
 status_t
@@ -116,6 +118,9 @@ BIconUtils::ConvertFromCMAP8(BBitmap* source, BBitmap* result)
 	status_t ret = source->InitCheck();
 	if (ret < B_OK)
 		return ret;
+
+	if (source->ColorSpace() != B_CMAP8)
+		return B_BAD_VALUE;
 
 	uint8* src = (uint8*)source->Bits();
 	uint32 srcBPR = source->BytesPerRow();

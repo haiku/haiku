@@ -23,6 +23,15 @@ class BIconUtils {
 
  public:
 
+	// Utility functions to import a vector icon in "flat icon"
+	// format from a BNode attribute or from a flat buffer in
+	// memory into the preallocated BBitmap "result".
+	// The colorspace of result needs to be B_RGBA32 or at
+	// least B_RGB32 (though that makes less sense). The icon
+	// will be scaled from it's "native" size of 64x64 to the
+	// size of the bitmap, the scale is derived from the bitmap
+	// width, the bitmap should have square dimension, or the
+	// icon will be cut off at the bottom (or have room left).
 	static	status_t			GetVectorIcon(BNode* node,
 											  const char* attrName,
 											  BBitmap* result);
@@ -32,6 +41,9 @@ class BIconUtils {
 											  BBitmap* result);
 
 
+	// Utility functions to convert from old icon colorspace
+	// into colorspace of BBitmap "result" (should be B_RGBA32
+	// to make any sense).
 	static	status_t			ConvertFromCMAP8(BBitmap* source,
 												 BBitmap* result);
 
