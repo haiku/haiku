@@ -7,7 +7,7 @@
 #ifndef ICON_UTILS_H
 #define ICON_UTILS_H
 
-#include <SupportDefs.h>
+#include <Mime.h>
 
 class BBitmap;
 class BNode;
@@ -22,6 +22,20 @@ class BIconUtils {
 			BIconUtils&			operator=(const BIconUtils&);
 
  public:
+
+	// Utility function to import an icon from the node that
+	// has either of the provided attribute names. Which icon type
+	// is preferred (vector, small or large B_CMAP8 icon) depends
+	// on the colorspace of the provided bitmap. If the colorspace
+	// is B_CMAP8, B_CMAP8 icons are preferred. If no vector icon
+	// is available, the bitmap size must match the provided
+	// icon_size "size"!
+	static	status_t			GetIcon(BNode* node,
+										const char* vectorIconAttrName,
+										const char* smallIconAttrName,
+										const char* largeIconAttrName,
+										icon_size size,
+										BBitmap* result);
 
 	// Utility functions to import a vector icon in "flat icon"
 	// format from a BNode attribute or from a flat buffer in
@@ -40,6 +54,16 @@ class BIconUtils {
 											  size_t size,
 											  BBitmap* result);
 
+	// Utility function to import an "old" BeOS icon in B_CMAP8
+	// colorspace from either the small icon attribute or the
+	// large icon attribute as given in "smallIconAttrName" and
+	// "largeIconAttrName". Which icon is loaded depends on
+	// the given "size".
+	static	status_t			GetCMAP8Icon(BNode* node,
+											 const char* smallIconAttrName,
+											 const char* largeIconAttrName,
+											 icon_size size,
+											 BBitmap* icon);
 
 	// Utility functions to convert from old icon colorspace
 	// into colorspace of BBitmap "result" (should be B_RGBA32

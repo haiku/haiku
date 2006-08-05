@@ -4,10 +4,12 @@
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 #include "IconUtils.h"
 
+#include <new>
 #include <fs_attr.h>
 
 #include <Bitmap.h>
@@ -18,12 +20,85 @@
 #include "IconRenderer.h"
 #include "FlatIconImporter.h"
 
+using std::nothrow;
+
+
+// TODO: put into HaikuCompatibility.h
+#ifndef __HAIKU__
+# define B_BITMAP_NO_SERVER_LINK 0
+# define B_BAD_DATA B_ERROR
+# define B_MINI_ICON_TYPE 'MICN'
+# define B_LARGE_ICON_TYPE 'ICON'
+#endif
+
+
+// GetIcon
+status_t
+BIconUtils::GetIcon(BNode* node,
+					const char* vectorIconAttrName,
+					const char* smallIconAttrName,
+					const char* largeIconAttrName,
+					icon_size size,
+					BBitmap* result)
+{
+	if (!result || result->InitCheck())
+		return B_BAD_VALUE;
+
+	status_t ret = B_ERROR;
+
+	switch (result->ColorSpace()) {
+		case B_RGBA32:
+		case B_RGB32:
+			// prefer vector icon
+			ret = GetVectorIcon(node, vectorIconAttrName, result);
+			if (ret < B_OK) {
+				// try to fallback to B_CMAP8 icons
+				// (converting to B_RGBA32 is handled)
+				ret = GetCMAP8Icon(node,
+								   smallIconAttrName,
+								   largeIconAttrName,
+								   size, result);
+			}
+			break;
+
+		case B_CMAP8:
+			// prefer old B_CMAP8 icons
+			ret = GetCMAP8Icon(node,
+							   smallIconAttrName,
+							   largeIconAttrName,
+							   size, result);
+			if (ret < B_OK) {
+				// try to fallback to vector icon
+				BBitmap temp(result->Bounds(),
+							 B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+				ret = temp.InitCheck();
+				if (ret < B_OK)
+					break;
+				ret = GetVectorIcon(node, vectorIconAttrName, &temp);
+				if (ret < B_OK)
+					break;
+				uint32 width = temp.Bounds().IntegerWidth() + 1;
+				uint32 height = temp.Bounds().IntegerHeight() + 1;
+				uint32 bytesPerRow = temp.BytesPerRow();
+				ret = ConvertFromCMAP8((uint8*)temp.Bits(),
+									   width,height, bytesPerRow, result);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return ret;
+}
+
+// #pragma mark -
+
 // GetVectorIcon
 status_t
 BIconUtils::GetVectorIcon(BNode* node, const char* attrName,
 						  BBitmap* result)
 {
-	if (!node || !attrName)
+	if (!node || node->InitCheck() < B_OK || !attrName)
 		return B_BAD_VALUE;
 
 #if TIME_VECTOR_ICONS
@@ -104,6 +179,95 @@ BIconUtils::GetVectorIcon(const uint8* buffer, size_t size,
 //	renderer.Demultiply();
 
 	return B_OK;
+}
+
+// #pragma mark -
+
+status_t
+BIconUtils::GetCMAP8Icon(BNode* node,
+						 const char* smallIconAttrName,
+						 const char* largeIconAttrName,
+						 icon_size size,
+						 BBitmap* icon)
+{
+	// check parameters and initialization
+	if (!icon || icon->InitCheck() != B_OK
+		|| !node || node->InitCheck() != B_OK
+		|| !smallIconAttrName || !largeIconAttrName)
+		return B_BAD_VALUE;
+
+	status_t ret = B_OK;
+	// set some icon size related variables
+	const char *attribute = NULL;
+	BRect bounds;
+	uint32 attrType = 0;
+	size_t attrSize = 0;
+	switch (size) {
+		case B_MINI_ICON:
+			attribute = smallIconAttrName;
+			bounds.Set(0, 0, 15, 15);
+			attrType = B_MINI_ICON_TYPE;
+			attrSize = 16 * 16;
+			break;
+		case B_LARGE_ICON:
+			attribute = largeIconAttrName;
+			bounds.Set(0, 0, 31, 31);
+			attrType = B_LARGE_ICON_TYPE;
+			attrSize = 32 * 32;
+			break;
+		default:
+			ret = B_BAD_VALUE;
+			break;
+	}
+
+	// TODO: relax this requirement?
+	if (icon->Bounds() != bounds)
+		return B_BAD_VALUE;
+
+	// get the attribute info and check type and size of the attr contents
+	attr_info attrInfo;
+	if (ret == B_OK)
+		ret = node->GetAttrInfo(attribute, &attrInfo);
+	if (ret == B_OK && attrInfo.type != attrType)
+		ret = B_BAD_TYPE;
+	if (ret == B_OK && attrInfo.size != attrSize)
+		ret = B_BAD_DATA;
+
+	// read the attribute
+	if (ret == B_OK) {
+		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+		uint8* buffer = NULL;
+		ssize_t read;
+		if (otherColorSpace) {
+			// other color space than stored in attribute
+			buffer = new(nothrow) uint8[attrSize];
+			if (!buffer)
+				ret = B_NO_MEMORY;
+			if (ret == B_OK) {
+				read = node->ReadAttr(attribute, attrType, 0, buffer,
+									  attrSize);
+			}
+		} else {
+			read = node->ReadAttr(attribute, attrType, 0, icon->Bits(), 
+								  attrSize);
+		}
+		if (ret == B_OK) {
+			if (read < 0)
+				ret = read;
+			else if (read != attrInfo.size)
+				ret = B_ERROR;
+		}
+		if (otherColorSpace) {
+			// other color space than stored in attribute
+			if (ret == B_OK) {
+				ret = ConvertFromCMAP8(buffer,
+									   (uint32)size, (uint32)size,
+									   (uint32)size, icon);
+			}
+			delete[] buffer;
+		}
+	}
+	return ret;
 }
 
 // #pragma mark -
