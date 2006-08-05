@@ -168,6 +168,16 @@ typedef struct _auich_dev {
 	multi_dev	multi;
 } auich_dev;
 
+
+typedef struct {
+	uint32	sample_rate;
+	uint32	buffer_frames;
+	int32	buffer_count;
+	bool	use_thread;
+} auich_settings;
+
+extern auich_settings current_settings;
+
 extern int32 num_cards;
 extern auich_dev cards[NUM_CARDS];
 

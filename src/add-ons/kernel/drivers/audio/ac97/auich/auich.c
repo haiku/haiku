@@ -34,8 +34,10 @@
  
 #include <KernelExport.h>
 #include <PCI.h>
-#include <string.h>
+#include <driver_settings.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "auich.h"
 #include "debug.h"
 #include "config.h"
@@ -62,7 +64,17 @@ auich_dev cards[NUM_CARDS];
 int32 num_names;
 char * names[NUM_CARDS*20+1];
 
+volatile bool	int_thread_exit = false;
+thread_id 		int_thread_id = -1;
+
 extern device_hooks multi_hooks;
+
+auich_settings current_settings = {
+	48000,	// sample rate
+	256,	// buffer frames
+	4,	// buffer count
+	false	// use thread
+};
 
 /* The SIS7012 chipset has SR and PICB registers swapped when compared to Intel */
 #define	GET_REG_PICB(x)		(IS_SIS7012(x) ? AUICH_REG_X_SR : AUICH_REG_X_PICB)
@@ -397,7 +409,7 @@ auich_int(void *arg)
 	auich_stream 	*stream = NULL;
 	uint16 			sr, sta;
 	
-	//TRACE(("auich_int(%p)\n", card));
+	// TRACE(("auich_int(%p)\n", card));
 	
 	sta = auich_reg_read_16(&card->config, AUICH_REG_GLOB_STA);
 	if(sta & card->interrupt_mask) {
@@ -450,6 +462,21 @@ auich_int(void *arg)
 	TRACE(("Got unhandled interrupt\n"));
 	return B_UNHANDLED_INTERRUPT;
 }
+
+
+static int32
+auich_int_thread(void *data)
+{
+	cpu_status status;
+	while (!int_thread_exit) {
+		status = disable_interrupts();
+		auich_int(data);
+		restore_interrupts(status);
+		snooze(1500);
+	}
+	return 0;
+}
+
 
 /*	auich driver functions */
 
@@ -654,8 +681,13 @@ auich_setup(auich_dev * card)
 	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
 	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
-	PRINT(("installing interrupt : %lx\n", card->config.irq));
-	install_io_interrupt_handler(card->config.irq, auich_int, card, 0);
+	if (current_settings.use_thread) {
+		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);
+		resume_thread(int_thread_id);
+	} else {
+		PRINT(("installing interrupt : %lx\n", card->config.irq));
+		install_io_interrupt_handler(card->config.irq, auich_int, card, 0);
+	}
 		
 	/*PRINT(("codec master output = %#04x\n",auich_codec_read(&card->config, 0x02)));
 	PRINT(("codec aux output    = %#04x\n",auich_codec_read(&card->config, 0x04)));
@@ -703,12 +735,37 @@ status_t
 init_driver(void)
 {
 	int ix=0;
+	void *settings_handle;
 	
 	pci_info info;
 	num_cards = 0;
 	
 	PRINT(("init_driver()\n"));
 	load_driver_symbols("auich");
+	
+	// get driver settings
+	settings_handle  = load_driver_settings ("auich.settings");
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "sample_rate", "48000", "48000");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.sample_rate = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_frames", "256", "256");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_frames = value;
+
+		item = get_driver_parameter (settings_handle, "buffer_count", "4", "4");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.buffer_count = value;
+
+		current_settings.use_thread = get_driver_boolean_parameter (settings_handle, "use_thread", false, false);
+		
+		unload_driver_settings (settings_handle);
+	}
 
 	if (get_module(pci_name, (module_info **) &pci))
 		return ENOSYS;
@@ -775,8 +832,13 @@ auich_shutdown(auich_dev *card)
 	PRINT(("shutdown(%p)\n", card));
 	card->interrupt_mask = 0;
 	
-	remove_io_interrupt_handler(card->config.irq, auich_int, card);
-	
+	if (current_settings.use_thread) {
+		status_t exit_value;
+		int_thread_exit = true;
+		wait_for_thread(int_thread_id, &exit_value);
+	} else
+		remove_io_interrupt_handler(card->config.irq, auich_int, card);
+		
 	unmap_io_memory(&card->config);
 }
 

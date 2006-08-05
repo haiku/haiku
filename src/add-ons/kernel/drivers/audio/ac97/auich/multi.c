@@ -766,23 +766,23 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 	pchannels = card->pstream->channels;
 	rchannels = card->rstream->channels;
 	
-	if (data->request_playback_buffers < BUFFER_COUNT ||
+	if (data->request_playback_buffers < current_settings.buffer_count ||
 		data->request_playback_channels < (pchannels) ||
-		data->request_record_buffers < BUFFER_COUNT ||
+		data->request_record_buffers < current_settings.buffer_count ||
 		data->request_record_channels < (rchannels)) {
 		LOG(("not enough channels/buffers\n"));
 	}
 
-	ASSERT(BUFFER_COUNT == 2);
+	ASSERT(current_settings.buffer_count == 2);
 	
 	data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD; // XXX ???
 //	data->flags = 0;
 		
-	data->return_playback_buffers = BUFFER_COUNT;	/* playback_buffers[b][] */
+	data->return_playback_buffers = current_settings.buffer_count;	/* playback_buffers[b][] */
 	data->return_playback_channels = pchannels;		/* playback_buffers[][c] */
-	data->return_playback_buffer_size = BUFFER_FRAMES;		/* frames */
+	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
-	bufcount = BUFFER_COUNT;
+	bufcount = current_settings.buffer_count;
 	if(bufcount > data->request_playback_buffers)
 		bufcount = data->request_playback_buffers;
 
@@ -792,11 +792,11 @@ auich_get_buffers(auich_dev *card, multi_buffer_list *data)
 				&data->playback_buffers[i][j].base,
 				&data->playback_buffers[i][j].stride);
 					
-	data->return_record_buffers = BUFFER_COUNT;
+	data->return_record_buffers = current_settings.buffer_count;
 	data->return_record_channels = rchannels;
-	data->return_record_buffer_size = BUFFER_FRAMES;	/* frames */
+	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 	
-	bufcount = BUFFER_COUNT;
+	bufcount = current_settings.buffer_count;
 	if(bufcount > data->request_record_buffers)
 		bufcount = data->request_record_buffers;
 
@@ -818,7 +818,7 @@ auich_play_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = (stream->trigblk 
 		+ stream->blkmod - 1) % stream->blkmod;
 	stream->update_needed = true;
@@ -839,7 +839,7 @@ auich_record_inth(void* inthparams)
 	
 	acquire_spinlock(&slock);
 	stream->real_time = system_time();
-	stream->frames_count += BUFFER_FRAMES;
+	stream->frames_count += current_settings.buffer_frames;
 	stream->buffer_cycle = (stream->trigblk 
 		+ stream->blkmod - 1) % stream->blkmod;
 	stream->update_needed = true;
@@ -1047,15 +1047,15 @@ auich_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("stream_new\n"));
 		
-	card->rstream = auich_stream_new(card, AUICH_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream = auich_stream_new(card, AUICH_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
+	card->rstream = auich_stream_new(card, AUICH_USE_RECORD, current_settings.buffer_frames, current_settings.buffer_count);
+	card->pstream = auich_stream_new(card, AUICH_USE_PLAY, current_settings.buffer_frames, current_settings.buffer_count);
 	
 	card->buffer_ready_sem = create_sem(0, "pbuffer ready");
 		
 	LOG(("stream_setaudio\n"));
 	
-	auich_stream_set_audioparms(card->pstream, 2, true, 48000);
-	auich_stream_set_audioparms(card->rstream, 2, true, 48000);
+	auich_stream_set_audioparms(card->pstream, 2, true, current_settings.sample_rate);
+	auich_stream_set_audioparms(card->rstream, 2, true, current_settings.sample_rate);
 		
 	card->pstream->first_channel = 0;
 	card->rstream->first_channel = 2;

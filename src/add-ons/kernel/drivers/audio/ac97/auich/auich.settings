@@ -1,0 +1,10 @@
+# Settings file for the auich driver 
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+#sample_rate	48000
+#buffer_frames	256
+#buffer_count	4
+#use_thread false

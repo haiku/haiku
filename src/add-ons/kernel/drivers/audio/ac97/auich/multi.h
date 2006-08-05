@@ -31,9 +31,6 @@
 #ifndef _MULTI_H_
 #define _MULTI_H_
 
-#define BUFFER_FRAMES	256
-#define BUFFER_COUNT	4
-
 typedef struct _multi_mixer_control {
 	struct _multi_dev 	*multi;
 	void	(*get) (void *card, const void *cookie, int32 type, float *values);
