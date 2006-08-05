@@ -624,7 +624,7 @@ usb_callback(void *cookie, uint32 busStatus,
 		} else
 			interpret_mouse_buffer(device);
 		
-		release_sem (device->sem_lock);
+		release_sem(device->sem_lock);
 	}
 
 	/* issue next request */
@@ -870,12 +870,12 @@ hid_device_open(const char *name, uint32 flags,
 	if ((cookie = malloc (sizeof (driver_cookie))) == NULL)
 		return B_NO_MEMORY;
 
-	acquire_sem (device->sem_lock);
+	acquire_sem(device->sem_lock);
 	cookie->device = device;
 	cookie->next = device->open_fds;
 	device->open_fds = cookie;
 	device->open++;
-	release_sem (device->sem_lock);
+	release_sem(device->sem_lock);
 
 	*out_cookie = cookie;
 	DPRINTF_INFO ((MY_ID "device %s open (%d)\n", name, device->open));
@@ -920,7 +920,9 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	    		err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
+				acquire_sem(device->sem_lock);
 				ring_buffer_user_read(device->rbuf, arg, sizeof(raw_key_info));
+				release_sem(device->sem_lock);
 				return err;
 				break;
 	    
@@ -934,7 +936,9 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
+				acquire_sem(device->sem_lock);
 				ring_buffer_user_read(device->rbuf, arg, sizeof(mouse_movement));
+				release_sem(device->sem_lock);
 				return err;
 				break;
 	    	case MS_NUM_EVENTS:
@@ -964,7 +968,7 @@ hid_device_close(driver_cookie *cookie)
 
 	/* detach the cookie from list */
 
-	acquire_sem (device->sem_lock);
+	acquire_sem(device->sem_lock);
 	if (device->open_fds == cookie)
 		device->open_fds = cookie->next;
 	else {
@@ -977,7 +981,7 @@ hid_device_close(driver_cookie *cookie)
 		}
 	}
 	--device->open;
-	release_sem (device->sem_lock);
+	release_sem(device->sem_lock);
 
 	return B_OK;
 }
