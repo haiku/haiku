@@ -400,6 +400,7 @@ rule AddResources
 			file = $(rdef:S=.rsrc) ;
 			ResComp $(file) : $(rdef) ;
 		}
+		InheritPlatform $(file) : $(1) ;
 		RESFILES on $(1) += $(file) ;
 	}
 }

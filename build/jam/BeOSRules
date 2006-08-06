@@ -139,6 +139,27 @@ rule ResComp
 	#
 	# <resource file> and <rdef file> must be gristed.
 
+	# get compiler and defines for the platform
+	local cc ;
+	local defines ;
+	
+	on $(1) { # use on $(1) variable values
+		defines = $(DEFINES) ;
+
+		if $(PLATFORM) = host {
+			defines += $(HOST_DEFINES) ;
+			cc = $(HOST_CC) ;
+		} else {
+			defines += $(TARGET_DEFINES) ;
+			cc = $(TARGET_CC) ;
+		}
+	}
+
+	DEFINES on $(1) = $(defines) ;
+	CCDEFS on $(1) = [ FDefines $(defines) ] ;
+	CC on $(1) = $(cc) ;
+
+	# set up other vars
 	SEARCH on $(2) += $(SEARCH_SOURCE) ;
 	MakeLocateArch $(1) ;
 	Depends $(1) : $(2) <build>rc ;
@@ -146,9 +167,10 @@ rule ResComp
 	ResComp1 $(1) : <build>rc $(2) ;
 }
 
+# Note: We pipe the file into the preprocessor, since *.rdef files are
+# considered linker scripts.
 actions ResComp1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) --auto-names -o $(1) $(2[2-])
+	cat $(2[2]) | $(CC) -E $(CCDEFS) - | egrep -v '^#' | $(2[1]) --auto-names -o $(1) -
 }
-
