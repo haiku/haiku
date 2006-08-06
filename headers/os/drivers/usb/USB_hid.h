@@ -28,15 +28,13 @@ enum { // HID Class-specific requests
 	USB_REQUEST_HID_SET_PROTOCOL
 };
 
-typedef struct
-{
+typedef struct {
 	uint8	length;
 	uint8	descriptor_type;
 	uint16	hid_version;
 	uint8	country_code;
 	uint8	num_descriptors;
-	struct
-	{
+	struct {
 		uint8	descriptor_type;
 		uint16	descriptor_length;
 	} _PACKED descriptor_info [1];
@@ -47,8 +45,7 @@ typedef struct
 	Usage Pages/IDs
 */
 
-enum
-{
+enum {
 	USAGE_PAGE_GENERIC_DESKTOP = 0x1,
 	USAGE_PAGE_SIMULATION,
 	USAGE_PAGE_VR,
@@ -66,13 +63,12 @@ enum
 	USAGE_PAGE_UNICODE,
 	USAGE_PAGE_ALPHANUM_DISPLAY = 0x14,
 	USAGE_PAGE_MEDICAL = 0x40,
-	USGAE_PAGE_MICROSOFT = 0xff00
+	USAGE_PAGE_MICROSOFT = 0xff00
 };
 
 /* Page 1: Generic Desktop */
 
-enum
-{
+enum {
 	USAGE_ID_POINTER = 0x1,
 	USAGE_ID_MOUSE,
 	USAGE_ID_JOYSTICK = 0x4,
@@ -108,8 +104,7 @@ enum
 
 /* Page 2: Simulation */
 
-enum
-{
+enum {
 	USAGE_ID_RUDDER = 0xBA,
 	USAGE_ID_THROTTLE = 0xBB,
 };
