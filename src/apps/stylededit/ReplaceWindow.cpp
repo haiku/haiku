@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "ReplaceWindow.h"
 
+#include <Messenger.h>
 #include <Button.h>
 #include <CheckBox.h>
 #include <String.h>
@@ -24,6 +25,8 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_CURRENT_WORKSPACE) 
 {
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	
 	fReplaceView = new BView(Bounds(), "ReplaceView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fReplaceView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fReplaceView);
@@ -133,6 +136,11 @@ ReplaceWindow::DispatchMessage(BMessage *message, BHandler *handler)
 			if (key == B_ESCAPE) {
 				message->MakeEmpty();
 				message->what = B_QUIT_REQUESTED;
+				
+				// This is a hack, but it actually does what is expected,
+				// unlike the hack above. This kind of key filtering probably
+				// ought to be handled by a BMessageFilter, though.
+				BMessenger (this).SendMessage(B_QUIT_REQUESTED);
 			}
 		}
 	}

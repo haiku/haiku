@@ -23,6 +23,8 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
 		B_CURRENT_WORKSPACE)
 {
+	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	
 	fFindView = new BView(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fFindView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fFindView);
