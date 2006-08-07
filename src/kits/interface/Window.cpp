@@ -2306,8 +2306,11 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	// get sent to the application, and not one of our handlers
 	fNoQuitShortcut = false;
 
-	if ((fFlags & B_NOT_CLOSABLE) == 0)
+	if ((fFlags & B_NOT_CLOSABLE) == 0 && !IsModal()) {
+		// Modal windows default to non-closable, but you can add the shortcut manually,
+		// if a different behaviour is wanted
 		AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	}
 
 	AddShortcut('X', B_COMMAND_KEY, new BMessage(B_CUT), NULL);
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
