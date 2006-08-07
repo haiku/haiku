@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>terminal_interface-curses-trace.ads</TITLE></HEAD>
+<BODY>
+<HR><DIV ALIGN="center"><H1> File : terminal_interface-curses-trace.ads </H1></DIV><HR>
+<PRE>
+
+<FONT COLOR=green><EM>------------------------------------------------------------------------------</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>--                           <A HREF="http://www.gnat.com">GNAT</A> ncurses Binding                           --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>--                      Terminal_Interface.Curses.Trace                     --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>--                                 S P E C                                  --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>------------------------------------------------------------------------------</EM></FONT>
+<FONT COLOR=green><EM>-- Copyright (c) 2000 Free Software Foundation, Inc.                        --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>-- Permission is hereby granted, free of charge, to any person obtaining a  --</EM></FONT>
+<FONT COLOR=green><EM>-- copy of this software and associated documentation files (the            --</EM></FONT>
+<FONT COLOR=green><EM>-- "Software"), to deal in the Software without restriction, including      --</EM></FONT>
+<FONT COLOR=green><EM>-- without limitation the rights to use, copy, modify, merge, publish,      --</EM></FONT>
+<FONT COLOR=green><EM>-- distribute, distribute with modifications, sublicense, and/or sell       --</EM></FONT>
+<FONT COLOR=green><EM>-- copies of the Software, and to permit persons to whom the Software is    --</EM></FONT>
+<FONT COLOR=green><EM>-- furnished to do so, subject to the following conditions:                 --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>-- The above copyright notice and this permission notice shall be included  --</EM></FONT>
+<FONT COLOR=green><EM>-- in all copies or substantial portions of the Software.                   --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  --</EM></FONT>
+<FONT COLOR=green><EM>-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               --</EM></FONT>
+<FONT COLOR=green><EM>-- MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   --</EM></FONT>
+<FONT COLOR=green><EM>-- IN NO EVENT SHALL THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   --</EM></FONT>
+<FONT COLOR=green><EM>-- DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR    --</EM></FONT>
+<FONT COLOR=green><EM>-- OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR    --</EM></FONT>
+<FONT COLOR=green><EM>-- THE USE OR OTHER DEALINGS IN THE SOFTWARE.                               --</EM></FONT>
+<FONT COLOR=green><EM>--                                                                          --</EM></FONT>
+<FONT COLOR=green><EM>-- Except as contained in this notice, the name(s) of the above copyright   --</EM></FONT>
+<FONT COLOR=green><EM>-- holders shall not be used in advertising or otherwise to promote the     --</EM></FONT>
+<FONT COLOR=green><EM>-- sale, use or other dealings in this Software without prior written       --</EM></FONT>
+<FONT COLOR=green><EM>-- authorization.                                                           --</EM></FONT>
+<FONT COLOR=green><EM>------------------------------------------------------------------------------</EM></FONT>
+<FONT COLOR=green><EM>--  Author: Eugene V. Melaragno &lt;aldomel@ix.netcom.com&gt; 2000</EM></FONT>
+<FONT COLOR=green><EM>--  Version Control:</EM></FONT>
+<FONT COLOR=green><EM>--  @Revision: 1.1 @</EM></FONT>
+<FONT COLOR=green><EM>--  Binding Version 01.00</EM></FONT>
+<FONT COLOR=green><EM>------------------------------------------------------------------------------</EM></FONT>
+
+<b>package</b> Terminal_Interface.Curses.Trace <b>is</b>
+   <b>pragma</b> Preelaborate (Terminal_Interface.Curses.Trace);
+
+   <b>pragma</b> Warnings (Off);
+   <b>type</b> Trace_Attribute_Set <b>is</b>
+      <b>record</b>
+         <FONT COLOR=red><A NAME="ref_49_10">Times</A></FONT>            : Boolean;
+         <FONT COLOR=red><A NAME="ref_50_10">Tputs</A></FONT>            : Boolean;
+         <FONT COLOR=red><A NAME="ref_51_10">Update</A></FONT>           : Boolean;
+         <FONT COLOR=red><A NAME="ref_52_10">Cursor_Move</A></FONT>      : Boolean;
+         <FONT COLOR=red><A NAME="ref_53_10">Character_Output</A></FONT> : Boolean;
+         <FONT COLOR=red><A NAME="ref_54_10">Calls</A></FONT>            : Boolean;
+         <FONT COLOR=red><A NAME="ref_55_10">Virtual_Puts</A></FONT>     : Boolean;
+         <FONT COLOR=red><A NAME="ref_56_10">Input_Events</A></FONT>     : Boolean;
+         <FONT COLOR=red><A NAME="ref_57_10">TTY_State</A></FONT>        : Boolean;
+         <FONT COLOR=red><A NAME="ref_58_10">Internal_Calls</A></FONT>   : Boolean;
+         <FONT COLOR=red><A NAME="ref_59_10">Character_Calls</A></FONT>  : Boolean;
+         Termcap_TermInfo : Boolean;
+      <b>end</b> <b>record</b>;
+   <b>pragma</b> Convention (C, Trace_Attribute_Set);
+
+   <b>for</b> Trace_Attribute_Set <b>use</b>
+      <b>record</b>
+         Times            <b>at</b> 0 <b>range</b>  0 ..  0;
+         Tputs            <b>at</b> 0 <b>range</b>  1 ..  1;
+         Update           <b>at</b> 0 <b>range</b>  2 ..  2;
+         Cursor_Move      <b>at</b> 0 <b>range</b>  3 ..  3;
+         Character_Output <b>at</b> 0 <b>range</b>  4 ..  4;
+         Calls            <b>at</b> 0 <b>range</b>  5 ..  5;
+         Virtual_Puts     <b>at</b> 0 <b>range</b>  6 ..  6;
+         Input_Events     <b>at</b> 0 <b>range</b>  7 ..  7;
+         TTY_State        <b>at</b> 0 <b>range</b>  8 ..  8;
+         Internal_Calls   <b>at</b> 0 <b>range</b>  9 ..  9;
+         Character_Calls  <b>at</b> 0 <b>range</b> 10 .. 10;
+         Termcap_TermInfo <b>at</b> 0 <b>range</b> 11 .. 11;
+      <b>end</b> <b>record</b>;
+   <b>for</b> Trace_Attribute_Set'Size <b>use</b> 32;
+   <FONT COLOR=green><EM>--  Please note: this rep. clause is generated and may be</EM></FONT>
+   <FONT COLOR=green><EM>--               different on your system.</EM></FONT>
+
+   <b>pragma</b> Warnings (On);
+
+   Trace_Disable  : <b>constant</b> Trace_Attribute_Set := (<b>others</b> =&gt; False);
+
+   Trace_Ordinary : <b>constant</b> Trace_Attribute_Set :=
+     (Times            =&gt; True,
+      Tputs            =&gt; True,
+      Update           =&gt; True,
+      Cursor_Move      =&gt; True,
+      Character_Output =&gt; True,
+   <FONT COLOR=red><A NAME="ref_93_4"> </A></FONT>  <b>others</b>           =&gt; False);
+   Trace_Maximum : <b>constant</b> Trace_Attribute_Set := (<b>others</b> =&gt; True);
+
+<FONT COLOR=green><EM>------------------------------------------------------------------------------</EM></FONT>
+
+   <FONT COLOR=green><EM>--  |=====================================================================</EM></FONT>
+   <FONT COLOR=green><EM>--  | Man page <A HREF="../man/curs_trace.3x.html">curs_trace.3x</A></EM></FONT>
+   <FONT COLOR=green><EM>--  |=====================================================================</EM></FONT>
+
+   <FONT COLOR=green><EM>--  #1A NAME="AFU_1"#2|</EM></FONT>
+   <b>procedure</b> Trace_On (x : Trace_Attribute_Set);
+   <FONT COLOR=green><EM>--  The debugging library has trace.</EM></FONT>
+
+   <FONT COLOR=green><EM>--  #1A NAME="AFU_2"#2|</EM></FONT>
+   <b>procedure</b> Trace_Put (str : String);
+   <FONT COLOR=green><EM>--  AKA: <A HREF="../man/curs_trace.3x.html">_tracef()</A></EM></FONT>
+
+   Current_Trace_Setting : Trace_Attribute_Set;
+   <b>pragma</b> Import (C, Current_Trace_Setting, "_nc_tracing");
+
+<b>end</b> Terminal_Interface.Curses.Trace;
+</PRE></BODY></HTML>

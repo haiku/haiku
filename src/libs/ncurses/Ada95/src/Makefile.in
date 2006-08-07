@@ -1,0 +1,388 @@
+##############################################################################
+# Copyright (c) 1998-2003,2004 Free Software Foundation, Inc.                #
+#                                                                            #
+# Permission is hereby granted, free of charge, to any person obtaining a    #
+# copy of this software and associated documentation files (the "Software"), #
+# to deal in the Software without restriction, including without limitation  #
+# the rights to use, copy, modify, merge, publish, distribute, distribute    #
+# with modifications, sublicense, and/or sell copies of the Software, and to #
+# permit persons to whom the Software is furnished to do so, subject to the  #
+# following conditions:                                                      #
+#                                                                            #
+# The above copyright notice and this permission notice shall be included in #
+# all copies or substantial portions of the Software.                        #
+#                                                                            #
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,   #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL    #
+# THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER      #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING    #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        #
+# DEALINGS IN THE SOFTWARE.                                                  #
+#                                                                            #
+# Except as contained in this notice, the name(s) of the above copyright     #
+# holders shall not be used in advertising or otherwise to promote the sale, #
+# use or other dealings in this Software without prior written               #
+# authorization.                                                             #
+##############################################################################
+#
+#  Author:  Juergen Pfeifer, 1996
+#
+#  $Id: Makefile.in,v 1.30 2004/08/21 21:29:50 tom Exp $
+#
+.SUFFIXES:
+
+SHELL		= /bin/sh
+THIS		= Makefile
+
+MODEL		= ../../@DFT_OBJ_SUBDIR@
+DESTDIR		= @DESTDIR@
+srcdir		= @srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+ADA_INCLUDE	= @ADA_INCLUDE@
+
+INSTALL		= @INSTALL@
+INSTALL_DATA	= @INSTALL_DATA@
+
+AR		= @AR@
+AR_OPTS		= @AR_OPTS@
+AWK		= @AWK@
+LN_S		= @LN_S@
+
+CC		= @CC@
+CFLAGS		= @CFLAGS@
+
+CPPFLAGS	= @ACPPFLAGS@ \
+		  -DHAVE_CONFIG_H -I$(srcdir)
+
+CCFLAGS		= $(CPPFLAGS) $(CFLAGS)
+
+CFLAGS_NORMAL	= $(CCFLAGS)
+CFLAGS_DEBUG	= $(CCFLAGS) @CC_G_OPT@ -DTRACE
+CFLAGS_PROFILE	= $(CCFLAGS) -pg
+CFLAGS_SHARED	= $(CCFLAGS) @CC_SHARED_OPTS@
+
+CFLAGS_DEFAULT	= $(CFLAGS_@DFT_UPR_MODEL@)
+
+LINK		= $(CC)
+LDFLAGS		= @LDFLAGS@ @LD_MODEL@ @LIBS@
+
+RANLIB		= @RANLIB@
+################################################################################
+ADA             = @cf_ada_compiler@
+ADAPREP		= gnatprep
+ADAFLAGS        = @ADAFLAGS@ -I. -I$(srcdir)
+
+ADAMAKE         = @cf_ada_make@
+ADAMAKEFLAGS    = 
+
+CARGS           = -cargs $(ADAFLAGS)
+LARGS           =
+
+ALIB            = @cf_ada_package@
+ABASE           = $(ALIB)-curses
+
+LIBALIS=$(ALIB).ali              			\
+	$(ABASE)-aux.ali         			\
+	$(ABASE).ali             		        \
+	$(ABASE)-terminfo.ali				\
+	$(ABASE)-termcap.ali				\
+	$(ABASE)-putwin.ali				\
+	$(ABASE)-trace.ali				\
+	$(ABASE)-mouse.ali       			\
+	$(ABASE)-panels.ali      			\
+	$(ABASE)-menus.ali       			\
+	$(ABASE)-forms.ali       			\
+	$(ABASE)-forms-field_types.ali	        	\
+	$(ABASE)-forms-field_types-alpha.ali      	\
+	$(ABASE)-forms-field_types-alphanumeric.ali     \
+	$(ABASE)-forms-field_types-intfield.ali      	\
+	$(ABASE)-forms-field_types-numeric.ali      	\
+	$(ABASE)-forms-field_types-regexp.ali      	\
+	$(ABASE)-forms-field_types-enumeration.ali      \
+	$(ABASE)-forms-field_types-ipv4_address.ali     \
+	$(ABASE)-forms-field_types-user.ali	      	\
+	$(ABASE)-forms-field_types-user-choice.ali     	\
+	$(ABASE)-text_io.ali     			\
+	$(ABASE)-text_io-aux.ali
+
+# Ada Library files for generic packages. Since gnat 3.10 they are
+# also compiled
+GENALIS=$(ABASE)-menus-menu_user_data.ali		\
+	$(ABASE)-menus-item_user_data.ali		\
+	$(ABASE)-forms-form_user_data.ali		\
+	$(ABASE)-forms-field_user_data.ali		\
+	$(ABASE)-forms-field_types-enumeration-ada.ali	\
+	$(ABASE)-panels-user_data.ali			\
+	$(ABASE)-text_io-integer_io.ali			\
+	$(ABASE)-text_io-float_io.ali			\
+	$(ABASE)-text_io-fixed_io.ali			\
+	$(ABASE)-text_io-decimal_io.ali			\
+	$(ABASE)-text_io-enumeration_io.ali		\
+	$(ABASE)-text_io-modular_io.ali			\
+	$(ABASE)-text_io-complex_io.ali
+
+LIBOBJS=$(ALIB).o                			\
+	$(ABASE)-aux.o           			\
+	$(ABASE).o               			\
+	$(ABASE)-terminfo.o				\
+	$(ABASE)-termcap.o				\
+	$(ABASE)-putwin.o				\
+	$(ABASE)-trace.o				\
+	$(ABASE)-mouse.o         			\
+	$(ABASE)-panels.o        			\
+	$(ABASE)-menus.o         			\
+	$(ABASE)-forms.o         			\
+	$(ABASE)-forms-field_types.o      		\
+	$(ABASE)-forms-field_types-alpha.o      	\
+	$(ABASE)-forms-field_types-alphanumeric.o	\
+	$(ABASE)-forms-field_types-intfield.o     	\
+	$(ABASE)-forms-field_types-numeric.o     	\
+	$(ABASE)-forms-field_types-regexp.o       	\
+	$(ABASE)-forms-field_types-enumeration.o	\
+	$(ABASE)-forms-field_types-ipv4_address.o	\
+	$(ABASE)-forms-field_types-user.o 		\
+	$(ABASE)-forms-field_types-user-choice.o 	\
+	$(ABASE)-text_io.o       			\
+	$(ABASE)-text_io-aux.o
+
+# Ada object files for generic packages. Since gnat 3.10 they are
+# also compiled
+GENOBJS=$(ABASE)-menus-menu_user_data.o			\
+	$(ABASE)-menus-item_user_data.o			\
+	$(ABASE)-forms-form_user_data.o			\
+	$(ABASE)-forms-field_user_data.o		\
+	$(ABASE)-forms-field_types-enumeration-ada.o	\
+	$(ABASE)-panels-user_data.o			\
+	$(ABASE)-text_io-integer_io.o			\
+	$(ABASE)-text_io-float_io.o			\
+	$(ABASE)-text_io-fixed_io.o			\
+	$(ABASE)-text_io-decimal_io.o			\
+	$(ABASE)-text_io-enumeration_io.o		\
+	$(ABASE)-text_io-modular_io.o			\
+	$(ABASE)-text_io-complex_io.o
+
+
+all ::  libAdaCurses.a
+	@echo done
+
+libAdaCurses.a :: dotouch $(LIBOBJS) @cf_generic_objects@
+	$(AR) $(AR_OPTS) $@ $(LIBOBJS) @cf_generic_objects@
+
+dotouch :
+	@sh -c 'for f in $(LIBALIS) $(GENALIS); do test -f $$f || touch $$f; done'
+
+sources :
+	@echo made $@
+
+libs \
+install \
+install.libs \
+uninstall \
+uninstall.libs ::
+	@echo made $@
+
+generics: $(GENALIS)
+	@echo made $@
+
+mostlyclean ::
+	rm -f *.o *.ali b_t*.* *.s $(PROGS) a.out core b_*_test.c *.xr[bs] *.a
+
+clean :: mostlyclean
+	rm -f $(LIBALIS) $(GENALIS) $(LIBOBJS) $(GENOBJS) $(ABASE)-trace.adb
+
+distclean :: clean
+	rm -f Makefile
+
+realclean :: distclean
+
+BASEDEPS=$(ABASE).ads $(ABASE)-aux.ads $(srcdir)/$(ABASE).adb
+
+$(ALIB).o: $(srcdir)/$(ALIB).ads
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ALIB).ads
+
+
+$(ABASE)-aux.o: $(srcdir)/$(ABASE)-aux.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-aux.adb
+
+
+$(ABASE).o: $(srcdir)/$(ABASE).adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE).adb
+
+
+$(ABASE)-terminfo.o: \
+		$(srcdir)/$(ABASE)-terminfo.ads \
+		$(srcdir)/$(ABASE)-terminfo.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-terminfo.adb
+
+
+$(ABASE)-termcap.o: \
+		$(srcdir)/$(ABASE)-termcap.ads \
+		$(srcdir)/$(ABASE)-termcap.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-termcap.adb
+
+
+$(ABASE)-putwin.o: \
+		$(srcdir)/$(ABASE)-putwin.ads \
+		$(srcdir)/$(ABASE)-putwin.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-putwin.adb
+
+
+$(ABASE)-trace.adb : $(srcdir)/$(ABASE)-trace.adb_p
+	rm -f $@
+	$(ADAPREP) -DADA_TRACE=@ADA_TRACE@ -DPRAGMA_UNREF=@PRAGMA_UNREF@ $(srcdir)/$(ABASE)-trace.adb_p $@
+
+$(ABASE)-trace.o: \
+		$(ABASE)-trace.ads \
+		$(ABASE)-trace.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(ABASE)-trace.adb
+
+
+$(ABASE)-mouse.o: \
+		$(ABASE)-mouse.ads \
+		$(srcdir)/$(ABASE)-mouse.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-mouse.adb
+
+
+$(ABASE)-panels.o: \
+		$(ABASE)-panels.ads \
+		$(srcdir)/$(ABASE)-panels.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-panels.adb
+
+
+$(ABASE)-menus.o: \
+		$(ABASE)-menus.ads \
+		$(srcdir)/$(ABASE)-menus.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-menus.adb
+
+
+$(ABASE)-forms.o: \
+		$(ABASE)-forms.ads \
+		$(srcdir)/$(ABASE)-forms.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms.adb
+
+$(ABASE)-forms-field_types.o: \
+		$(ABASE)-forms-field_types.ads \
+		$(srcdir)/$(ABASE)-forms-field_types.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types.adb
+
+$(ABASE)-forms-field_types-alpha.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-alpha.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-alpha.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-alpha.adb
+
+$(ABASE)-forms-field_types-alphanumeric.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-alphanumeric.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-alphanumeric.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-alphanumeric.adb
+
+$(ABASE)-forms-field_types-intfield.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-intfield.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-intfield.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-intfield.adb
+
+$(ABASE)-forms-field_types-numeric.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-numeric.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-numeric.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-numeric.adb
+
+$(ABASE)-forms-field_types-regexp.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-regexp.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-regexp.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-regexp.adb
+
+$(ABASE)-forms-field_types-enumeration.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-enumeration.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-enumeration.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-enumeration.adb
+
+$(ABASE)-forms-field_types-ipv4_address.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-ipv4_address.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-ipv4_address.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-ipv4_address.adb
+
+$(ABASE)-forms-field_types-user.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-user.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-user.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-user.adb
+
+$(ABASE)-forms-field_types-user-choice.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-user-choice.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-user-choice.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-user-choice.adb
+
+$(ABASE)-text_io.o: \
+		$(srcdir)/$(ABASE)-text_io.ads \
+		$(srcdir)/$(ABASE)-text_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io.adb
+
+$(ABASE)-text_io-aux.o: \
+		$(srcdir)/$(ABASE)-text_io-aux.ads \
+		$(srcdir)/$(ABASE)-text_io-aux.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-aux.adb
+
+$(ABASE)-menus-menu_user_data.o: \
+		$(ABASE)-menus-menu_user_data.ads \
+		$(srcdir)/$(ABASE)-menus-menu_user_data.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-menus-menu_user_data.adb
+
+$(ABASE)-menus-item_user_data.o: \
+		$(ABASE)-menus-item_user_data.ads \
+		$(srcdir)/$(ABASE)-menus-item_user_data.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-menus-item_user_data.adb
+
+$(ABASE)-forms-form_user_data.o: \
+		$(ABASE)-forms-form_user_data.ads \
+		$(srcdir)/$(ABASE)-forms-form_user_data.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-form_user_data.adb
+
+$(ABASE)-forms-field_user_data.o: \
+		$(ABASE)-forms-field_user_data.ads \
+		$(srcdir)/$(ABASE)-forms-field_user_data.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_user_data.adb
+
+$(ABASE)-forms-field_types-enumeration-ada.o: \
+		$(srcdir)/$(ABASE)-forms-field_types-enumeration-ada.ads \
+		$(srcdir)/$(ABASE)-forms-field_types-enumeration-ada.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-forms-field_types-enumeration-ada.adb
+
+$(ABASE)-panels-user_data.o: \
+		$(ABASE)-panels-user_data.ads \
+		$(srcdir)/$(ABASE)-panels-user_data.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-panels-user_data.adb
+
+$(ABASE)-text_io-integer_io.o: \
+		$(srcdir)/$(ABASE)-text_io-integer_io.ads \
+		$(srcdir)/$(ABASE)-text_io-integer_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-integer_io.adb
+
+$(ABASE)-text_io-float_io.o: \
+		$(srcdir)/$(ABASE)-text_io-float_io.ads \
+		$(srcdir)/$(ABASE)-text_io-float_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-float_io.adb
+
+$(ABASE)-text_io-fixed_io.o: \
+		$(srcdir)/$(ABASE)-text_io-fixed_io.ads \
+		$(srcdir)/$(ABASE)-text_io-fixed_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-fixed_io.adb
+
+$(ABASE)-text_io-decimal_io.o: \
+		$(srcdir)/$(ABASE)-text_io-decimal_io.ads \
+		$(srcdir)/$(ABASE)-text_io-decimal_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-decimal_io.adb
+
+$(ABASE)-text_io-enumeration_io.o: \
+		$(srcdir)/$(ABASE)-text_io-enumeration_io.ads \
+		$(srcdir)/$(ABASE)-text_io-enumeration_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-enumeration_io.adb
+
+$(ABASE)-text_io-modular_io.o: \
+		$(srcdir)/$(ABASE)-text_io-modular_io.ads \
+		$(srcdir)/$(ABASE)-text_io-modular_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-modular_io.adb
+
+$(ABASE)-text_io-complex_io.o: \
+		$(srcdir)/$(ABASE)-text_io-complex_io.ads \
+		$(srcdir)/$(ABASE)-text_io-complex_io.adb $(BASEDEPS)
+	$(ADA) $(ADAFLAGS) -c -o $@ $(srcdir)/$(ABASE)-text_io-complex_io.adb

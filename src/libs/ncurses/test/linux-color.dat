@@ -1,0 +1,21 @@
+# $Id: linux-color.dat,v 1.1 2004/05/22 23:42:45 tom Exp $
+# These values are derived from linux/drivers/char/vt.c (default_red[],
+# default_grn[] and default_blu[]), commented
+/* the default colour table, for VGA+ colour systems */
+scale:255
+0:	  0	  0	  0
+1:	170	  0	  0
+2:	  0	170	  0
+3:	170	 85	  0
+4:	  0	  0	170
+5:	170	  0	170
+6:	  0	170	170
+7:	170	170	170
+8:	 85	 85	 85
+9:	255	 85	 85
+10:	 85	255	 85
+11:	255	255	 85
+12:	 85	 85	255
+13:	255	 85	255
+14:	 85	255	255
+15:	255	255	255

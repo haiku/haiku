@@ -1,0 +1,98 @@
+#!/bin/sh
+# $Id: ncu-indent,v 1.12 2004/11/23 00:45:48 tom Exp $
+NOOP=no
+OPTS='
+--blank-lines-after-procedures
+--braces-on-if-line
+--continuation-indentation0
+--continue-at-parentheses
+--cuddle-else
+--indent-level4
+--leave-preprocessor-space
+--no-blank-lines-after-commas
+--no-blank-lines-after-declarations
+--no-space-after-function-call-names
+--procnames-start-lines
+--space-special-semicolon
+--swallow-optional-blank-lines
+--tab-size8
+
+-T NCURSES_EXPORT_VAR
+-T SCREEN
+-T TERMTYPE
+-T attr_t
+-T cchar_t
+-T chtype
+-T inline
+-T wchar_t
+-T wint_t
+
+-T BUFFER
+-T CHARTYPE
+-T FILE
+-T GCC_NORETURN
+-T LINE
+-T MARK
+-T RETSIGTYPE 
+-T TBUFF
+-T WINDOW
+-T size_t
+-T va_list
+
+-T Cardinal
+-T Widget
+-T XtPointer
+'
+for name in $*
+do
+	case $name in
+	-v|-n)
+		NOOP=yes
+		OPTS="$OPTS -v"
+		;;
+	-*)
+		OPTS="$OPTS $name"
+		;;
+	*.[ch])
+		save="${name}".a$$
+		test="${name}".b$$
+		rm -f "$save" "$test"
+		mv "$name" "$save"
+		sed \
+			-e '/MODULE_ID(/s/)$/);/' \
+			-e 's,\<GCC_NORETURN;,;//GCC_NORETURN;,' \
+			-e 's,\(\<NCURSES_EXPORT_VAR\>\),//\1,' \
+			"$save" >"$test"
+		cp "$test" "$name"
+		chmod u+w "$name"
+		# ${INDENT_PROG-indent} --version
+		${INDENT_PROG-indent} -npro $OPTS "$name"
+		sed \
+			-e '/MODULE_ID(/s/);$/)/' \
+			-e 's,;[ 	]*//GCC_NORETURN;, GCC_NORETURN;,' \
+			-e 's,//\(\<NCURSES_EXPORT_VAR\>\),\1,' \
+			"$name" >"$test"
+		mv "$test" "$name"
+		rm -f "${name}~"
+		if test $NOOP = yes ; then
+			if (cmp -s "$name" "$save" ) then
+				echo "** no change: $name"
+			else
+				diff -u "$save" "$name"
+			fi
+			rm -f "$name"
+			mv "$save" "$name"
+		elif ( cmp -s "$name" "$save" ) ; then
+			echo "** unchanged $name"
+			rm -f "${name}"
+			mv "$save" "$name"
+		else
+			echo "** updated $name"
+			rm -f "$save"
+		fi
+		;;
+	*)
+		echo "** ignored:   $name"
+		;;
+	esac
+done

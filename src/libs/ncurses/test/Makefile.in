@@ -1,0 +1,279 @@
+# $Id: Makefile.in,v 1.84 2005/09/24 23:05:14 tom Exp $
+##############################################################################
+# Copyright (c) 1998-2003,2005 Free Software Foundation, Inc.                #
+#                                                                            #
+# Permission is hereby granted, free of charge, to any person obtaining a    #
+# copy of this software and associated documentation files (the "Software"), #
+# to deal in the Software without restriction, including without limitation  #
+# the rights to use, copy, modify, merge, publish, distribute, distribute    #
+# with modifications, sublicense, and/or sell copies of the Software, and to #
+# permit persons to whom the Software is furnished to do so, subject to the  #
+# following conditions:                                                      #
+#                                                                            #
+# The above copyright notice and this permission notice shall be included in #
+# all copies or substantial portions of the Software.                        #
+#                                                                            #
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,   #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL    #
+# THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER      #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING    #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        #
+# DEALINGS IN THE SOFTWARE.                                                  #
+#                                                                            #
+# Except as contained in this notice, the name(s) of the above copyright     #
+# holders shall not be used in advertising or otherwise to promote the sale, #
+# use or other dealings in this Software without prior written               #
+# authorization.                                                             #
+##############################################################################
+#
+# Author: Thomas E. Dickey 1996-2002
+#
+# Makefile for ncurses tests.
+
+# turn off _all_ suffix rules; we'll generate our own
+.SUFFIXES:
+
+SHELL		= /bin/sh
+
+@SET_MAKE@
+
+x		= @EXEEXT@
+o		= .@OBJEXT@
+
+MODEL		= ../@DFT_OBJ_SUBDIR@
+srcdir		= @srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+libdir		= @libdir@
+includedir	= @includedir@
+
+LIBTOOL		= @LIBTOOL@
+LIBTOOL_CLEAN	= @LIB_CLEAN@
+LIBTOOL_COMPILE	= @LIB_COMPILE@
+LIBTOOL_LINK	= @LIB_LINK@
+
+CC		= @CC@
+CPP		= @CPP@
+
+CFLAGS		= @CFLAGS@
+CPPFLAGS	=  -I../test -I$(srcdir) -DHAVE_CONFIG_H @CPPFLAGS@
+
+CCFLAGS		= $(CPPFLAGS) $(CFLAGS)
+
+CFLAGS_LIBTOOL	= $(CCFLAGS)
+CFLAGS_NORMAL	= $(CCFLAGS)
+CFLAGS_DEBUG	= $(CCFLAGS) @CC_G_OPT@ -DTRACE
+CFLAGS_PROFILE	= $(CCFLAGS) -pg
+CFLAGS_SHARED	= $(CCFLAGS) @CC_SHARED_OPTS@
+
+CFLAGS_DEFAULT	= $(CFLAGS_@DFT_UPR_MODEL@)
+
+REL_VERSION	= @cf_cv_rel_version@
+ABI_VERSION	= @cf_cv_abi_version@
+LOCAL_LIBS	= @TEST_DEPS@
+MATH_LIB	= @MATH_LIB@
+
+LD		= @LD@
+LINK		= @LINK_TESTS@ $(LIBTOOL_LINK) $(CC) $(CFLAGS)
+
+LDFLAGS		= @LD_MODEL@ @LOCAL_LDFLAGS@ @LDFLAGS@
+
+LDFLAGS_LIBTOOL	= $(LDFLAGS) $(CFLAGS_LIBTOOL)
+LDFLAGS_NORMAL	= $(LDFLAGS) $(CFLAGS_NORMAL)
+LDFLAGS_DEBUG	= $(LDFLAGS) $(CFLAGS_DEBUG)
+LDFLAGS_PROFILE	= $(LDFLAGS) $(CFLAGS_PROFILE)
+LDFLAGS_SHARED	= $(LDFLAGS) $(CFLAGS_SHARED) @LD_SHARED_OPTS@
+
+# use these for linking with all of the libraries
+LIBS_DEFAULT	= @TEST_ARGS@ @LIBS@
+LDFLAGS_DEFAULT	= $(LDFLAGS_@DFT_UPR_MODEL@) $(LIBS_DEFAULT)
+
+# use these for linking with the (n)curses library
+LIBS_CURSES	= `echo "@TEST_ARGS@ @LIBS@" | sed -e 's/-lform.*-lpanel[^ ]*//'`
+LDFLAGS_CURSES	= $(LDFLAGS_@DFT_UPR_MODEL@) $(LIBS_CURSES)
+
+# use these for linking with the tinfo library if we have it, or curses library if not
+LIBS_TINFO	= @TINFO_ARGS@ @LIBS@
+LDFLAGS_TINFO	= $(LDFLAGS_@DFT_UPR_MODEL@) $(LIBS_TINFO)
+
+LINT		= @LINT@
+LINT_OPTS	= @LINT_OPTS@
+LINT_LIBS	= -lform -lmenu -lpanel -lncurses @LIBS@
+
+HEADER_DEPS	= \
+	../include/curses.h \
+	../include/term.h
+
+TESTS = \
+	background$x \
+	blue$x \
+	bs$x \
+	cardfile$x \
+	color_set$x \
+	demo_defkey$x \
+	demo_forms$x \
+	demo_keyok$x \
+	demo_menus$x \
+	demo_panels$x \
+	demo_termcap$x \
+	ditto$x \
+	dots$x \
+	filter$x \
+	firework$x \
+	firstlast$x \
+	gdc$x \
+	hanoi$x \
+	hashtest$x \
+	ins_wide$x \
+	inserts$x \
+	keynames$x \
+	knight$x \
+	lrtest$x \
+	ncurses$x \
+	newdemo$x \
+	railroad$x \
+	rain$x \
+	tclock$x \
+	testaddch$x \
+	testcurs$x \
+	testscanw$x \
+	view$x \
+	worm$x \
+	xmas$x
+
+all: $(TESTS)
+
+sources:
+
+tags:
+	ctags *.[ch]
+
+background$x: $(MODEL)/background$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/background$o $(LDFLAGS_CURSES)
+
+blue$x: $(MODEL)/blue$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/blue$o $(LDFLAGS_CURSES)
+
+bs$x: $(MODEL)/bs$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/bs$o $(LDFLAGS_CURSES)
+
+cardfile$x: $(MODEL)/cardfile$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/cardfile$o $(LDFLAGS_DEFAULT)
+
+color_set$x: $(MODEL)/color_set$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/color_set$o $(LDFLAGS_CURSES)
+
+demo_defkey$x: $(MODEL)/demo_defkey$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_defkey$o $(LDFLAGS_CURSES)
+
+demo_forms$x: $(MODEL)/demo_forms$o $(MODEL)/edit_field$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_forms$o $(MODEL)/edit_field$o $(LDFLAGS_DEFAULT)
+
+demo_keyok$x: $(MODEL)/demo_keyok$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_keyok$o $(LDFLAGS_CURSES)
+
+demo_menus$x: $(MODEL)/demo_menus$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_menus$o $(LDFLAGS_DEFAULT)
+
+demo_panels$x: $(MODEL)/demo_panels$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_panels$o $(LDFLAGS_DEFAULT)
+
+demo_termcap$x: $(MODEL)/demo_termcap$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/demo_termcap$o $(LDFLAGS_TINFO)
+
+ditto$x: $(MODEL)/ditto$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/ditto$o $(LDFLAGS_CURSES)
+
+dots$x: $(MODEL)/dots$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/dots$o $(LDFLAGS_TINFO)
+
+filter$x: $(MODEL)/filter$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/filter$o $(LDFLAGS_CURSES)
+
+firework$x: $(MODEL)/firework$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/firework$o $(LDFLAGS_CURSES)
+
+firstlast$x: $(MODEL)/firstlast$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/firstlast$o $(LDFLAGS_DEFAULT)
+
+gdc$x: $(MODEL)/gdc$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/gdc$o $(LDFLAGS_CURSES)
+
+hanoi$x: $(MODEL)/hanoi$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/hanoi$o $(LDFLAGS_CURSES)
+
+hashtest$x: $(MODEL)/hashtest$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/hashtest$o $(LDFLAGS_CURSES)
+
+inserts$x: $(MODEL)/inserts$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/inserts$o $(LDFLAGS_CURSES)
+
+ins_wide$x: $(MODEL)/ins_wide$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/ins_wide$o $(LDFLAGS_CURSES)
+
+keynames$x: $(MODEL)/keynames$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/keynames$o $(LDFLAGS_CURSES)
+
+knight$x: $(MODEL)/knight$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/knight$o $(LDFLAGS_CURSES)
+
+lrtest$x: $(MODEL)/lrtest$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/lrtest$o $(LDFLAGS_CURSES)
+
+ncurses$x: $(MODEL)/ncurses$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/ncurses$o $(LDFLAGS_DEFAULT)
+
+newdemo$x: $(MODEL)/newdemo$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/newdemo$o $(LDFLAGS_CURSES)
+
+rain$x: $(MODEL)/rain$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/rain$o $(LDFLAGS_CURSES)
+
+railroad$x: $(MODEL)/railroad$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/railroad$o $(LDFLAGS_TINFO)
+
+tclock$x: $(MODEL)/tclock$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/tclock$o $(LDFLAGS_CURSES) $(MATH_LIB)
+
+testaddch$x: $(MODEL)/testaddch$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/testaddch$o $(LDFLAGS_CURSES)
+
+testcurs$x: $(MODEL)/testcurs$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/testcurs$o $(LDFLAGS_CURSES)
+
+testscanw$x: $(MODEL)/testscanw$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/testscanw$o $(LDFLAGS_CURSES)
+
+view$x: $(MODEL)/view$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/view$o $(LDFLAGS_CURSES)
+
+worm$x: $(MODEL)/worm$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/worm$o $(LDFLAGS_CURSES)
+
+xmas$x: $(MODEL)/xmas$o $(LOCAL_LIBS)
+	@ECHO_LINK@ $(LINK) -o $@ $(MODEL)/xmas$o $(LDFLAGS_CURSES)
+
+libs \
+install \
+install.libs \
+install.test:
+
+uninstall:
+uninstall.libs:
+uninstall.test:
+
+mostlyclean ::
+	-rm -f core tags TAGS *~ *.bak *.i *.ln *.atac trace
+
+clean :: mostlyclean
+	-sh -c "if test -n '$x' ; then $(MAKE) clean x=''; fi"
+	-rm -rf *$o screendump *.lis $(TESTS) .libs
+
+distclean :: clean
+	-rm -f Makefile ncurses_cfg.h config.*
+
+realclean :: distclean
+
+lint:
+	sh -c 'for N in $(TESTS); do echo LINT:$$N; $(LINT) $(LINT_OPTS) $(CPPFLAGS) $(srcdir)/$$N.c $(LINT_LIBS); done'

@@ -1,0 +1,27 @@
+-- $Id: TODO,v 1.4 1999/10/20 09:18:58 tom Exp $
+
+--  Intensive testing
+    Perhaps the delivery of the Beta will help a bit.
+
+--  Documentation
+    Like most WEB pages: under continuous construction
+
+--  Style cleanup
+    	
+--  Alternate functions for procedures with out params
+    Comfort purpose
+
+--  Sample program
+    Under continuous construction (and it's not a WEB page!!!)
+
+--  Make the binding objects a shared library
+    They are rather large, so it would make sense, otherwise Ada95
+    would look too large, although the generated code is as compact
+    as C or C++. I'll wait a bit until the GNAT people provide some
+    better support to construct shared libraries.
+
+--  Think about more inlining
+
+--  Check for memory leaks.
+    Oh I would like it so much if the GNAT guys would put an optional
+    GC into their system.

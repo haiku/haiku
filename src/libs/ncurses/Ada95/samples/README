@@ -1,0 +1,6 @@
+The intention of the demo at this point in time is not to demonstrate all
+the features of (n)curses and it's subsystems, but to give some sample
+sources how to use the binding at all.
+
+Ideally in the future we can combine both goals.
+

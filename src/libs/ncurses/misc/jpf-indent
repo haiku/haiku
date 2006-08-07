@@ -1,0 +1,87 @@
+#!/bin/sh
+# $Id: jpf-indent,v 1.3 2004/05/29 19:14:45 tom Exp $
+# indent ncurses source written by Juergen Pfeifer
+NOOP=no
+OPTS='
+-npro
+--blank-lines-after-declarations
+--blank-lines-after-procedures
+--brace-indent2
+--braces-after-if-line
+--continue-at-parentheses
+--indent-level2
+--line-length80
+--no-space-after-casts
+--no-space-after-function-call-names
+--parameter-indentation4
+--swallow-optional-blank-lines
+--tab-size8
+-T FIELD
+-T FIELDTYPE
+-T FIELD_CELL
+-T FORM
+-T INLINE
+-T RegExp_Arg 
+-T TypeArgument 
+-T WINDOW
+-T attr_t
+-T bool
+-T cchar_t
+-T chtype
+-T enumARG
+-T va_list
+-T wchar_t 
+'
+for name in $*
+do
+	case $name in
+	-v|-n)
+		NOOP=yes
+		OPTS="$OPTS -v"
+		;;
+	-*)
+		OPTS="$OPTS $name"
+		;;
+	*.[ch])
+		save="${name}".a$$
+		test="${name}".b$$
+		rm -f "$save" "$test"
+		mv "$name" "$save"
+		sed \
+			-e '/MODULE_ID(/s/)$/);/' \
+			-e 's,\<GCC_NORETURN;,;//GCC_NORETURN;,' \
+			-e 's,\(\<NCURSES_EXPORT_VAR\>\),//\1,' \
+			"$save" >"$test"
+		cp "$test" "$name"
+		chmod u+w "$name"
+		# ${INDENT_PROG-indent} --version
+		${INDENT_PROG-indent} $OPTS "$name"
+		sed \
+			-e '/MODULE_ID(/s/);$/)/' \
+			-e 's,;[ 	]*//GCC_NORETURN;, GCC_NORETURN;,' \
+			-e 's,//\(\<NCURSES_EXPORT_VAR\>\),\1,' \
+			"$name" >"$test"
+		mv "$test" "$name"
+		rm -f "${name}~"
+		if test $NOOP = yes ; then
+			if (cmp -s "$name" "$save" ) then
+				echo "** no change: $name"
+			else
+				diff -u "$save" "$name"
+			fi
+			rm -f "$name"
+			mv "$save" "$name"
+		elif ( cmp -s "$name" "$save" ) ; then
+			echo "** unchanged $name"
+			rm -f "${name}"
+			mv "$save" "$name"
+		else
+			echo "** updated $name"
+			rm -f "$save"
+		fi
+		;;
+	*)
+		echo "** ignored:   $name"
+		;;
+	esac
+done
