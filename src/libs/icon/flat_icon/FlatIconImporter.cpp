@@ -35,6 +35,9 @@ using std::nothrow;
 
 // constructor
 FlatIconImporter::FlatIconImporter()
+#ifdef ICON_O_MATIC
+	: Importer()
+#endif
 {
 }
 
@@ -47,6 +50,14 @@ FlatIconImporter::~FlatIconImporter()
 status_t
 FlatIconImporter::Import(Icon* icon, BPositionIO* stream)
 {
+#ifdef ICON_O_MATIC
+	status_t ret = Init(icon);
+	if (ret < B_OK)
+		return ret;
+#else
+	status_t ret;
+#endif
+
 	// seek around in the stream to figure out the size
 	off_t size = stream->Seek(0, SEEK_END);
 	if (stream->Seek(0, SEEK_SET) != 0)
@@ -64,7 +75,7 @@ FlatIconImporter::Import(Icon* icon, BPositionIO* stream)
 	if (stream->Read(buffer.Buffer(), size) != size)
 		return B_ERROR;
 
-	status_t ret = _ParseSections(buffer, icon);
+	ret = _ParseSections(buffer, icon);
 
 	return ret;
 }
@@ -73,6 +84,12 @@ FlatIconImporter::Import(Icon* icon, BPositionIO* stream)
 status_t
 FlatIconImporter::Import(Icon* icon, uint8* _buffer, size_t size)
 {
+#ifdef ICON_O_MATIC
+	status_t ret = Init(icon);
+	if (ret < B_OK)
+		return ret;
+#endif
+
 	if (!_buffer)
 		return B_BAD_VALUE;
 
@@ -465,9 +482,10 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 }
 
 // _ReadPathSourceShape
-static Shape*
-_ReadPathSourceShape(LittleEndianBuffer& buffer,
-					 StyleContainer* styles, PathContainer* paths)
+Shape*
+FlatIconImporter::_ReadPathSourceShape(LittleEndianBuffer& buffer,
+									   StyleContainer* styles,
+									   PathContainer* paths)
 {
 	// find out which style this shape uses
 	uint8 styleIndex;
@@ -475,7 +493,12 @@ _ReadPathSourceShape(LittleEndianBuffer& buffer,
 	if (!buffer.Read(styleIndex) || !buffer.Read(pathCount))
 		return NULL;
 
+#ifdef ICON_O_MATIC
+	Style* style = styles->StyleAt(StyleIndexFor(styleIndex));
+#else
 	Style* style = styles->StyleAt(styleIndex);
+#endif
+
 	if (!style) {
 		printf("_ReadPathSourceShape() - "
 			   "shape references non-existing style %d\n", styleIndex);
@@ -495,7 +518,11 @@ _ReadPathSourceShape(LittleEndianBuffer& buffer,
 		if (!buffer.Read(pathIndex))
 			return NULL;
 
+#ifdef ICON_O_MATIC
+		VectorPath* path = paths->PathAt(PathIndexFor(pathIndex));
+#else
 		VectorPath* path = paths->PathAt(pathIndex);
+#endif
 		if (!path) {
 			printf("_ReadPathSourceShape() - "
 				   "shape references non-existing path %d\n", pathIndex);

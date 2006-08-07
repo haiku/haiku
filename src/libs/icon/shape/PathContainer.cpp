@@ -50,6 +50,13 @@ PathContainer::~PathContainer()
 bool
 PathContainer::AddPath(VectorPath* path)
 {
+	return AddPath(path, CountPaths());
+}
+
+// AddPath
+bool
+PathContainer::AddPath(VectorPath* path, int32 index)
+{
 	if (!path)
 		return false;
 
@@ -57,9 +64,9 @@ PathContainer::AddPath(VectorPath* path)
 	if (HasPath(path))
 		return false;
 
-	if (fPaths.AddItem((void*)path)) {
+	if (fPaths.AddItem((void*)path, index)) {
 #ifdef ICON_O_MATIC
-		_NotifyPathAdded(path);
+		_NotifyPathAdded(path, index);
 #endif
 		return true;
 	}
@@ -186,14 +193,14 @@ PathContainer::_MakeEmpty()
 #ifdef ICON_O_MATIC
 // _NotifyPathAdded
 void
-PathContainer::_NotifyPathAdded(VectorPath* path) const
+PathContainer::_NotifyPathAdded(VectorPath* path, int32 index) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		PathContainerListener* listener
 			= (PathContainerListener*)listeners.ItemAtFast(i);
-		listener->PathAdded(path);
+		listener->PathAdded(path, index);
 	}
 }
 

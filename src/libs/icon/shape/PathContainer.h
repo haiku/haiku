@@ -19,7 +19,7 @@ class PathContainerListener {
 								PathContainerListener();
 	virtual						~PathContainerListener();
 
-	virtual	void				PathAdded(VectorPath* path) = 0;
+	virtual	void				PathAdded(VectorPath* path, int32 index) = 0;
 	virtual	void				PathRemoved(VectorPath* path) = 0;
 };
 #endif // ICON_O_MATIC
@@ -30,6 +30,7 @@ class PathContainer {
 	virtual						~PathContainer();
 
 			bool				AddPath(VectorPath* path);
+			bool				AddPath(VectorPath* path, int32 index);
 			bool				RemovePath(VectorPath* path);
 			VectorPath*			RemovePath(int32 index);
 
@@ -54,7 +55,8 @@ class PathContainer {
 			bool				RemoveListener(PathContainerListener* listener);
 
  private:
-			void				_NotifyPathAdded(VectorPath* path) const;
+			void				_NotifyPathAdded(VectorPath* path,
+												 int32 index) const;
 			void				_NotifyPathRemoved(VectorPath* path) const;
 
 			BList				fListeners;

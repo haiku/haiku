@@ -87,14 +87,20 @@ Transformable::Multiply(const Transformable& other)
 void
 Transformable::Reset()
 {
-	reset();
+	if (!IsIdentity()) {
+		reset();
+		TransformationChanged();
+	}
 }
 
 // Invert
 void
 Transformable::Invert()
 {
-	invert();
+	if (!IsIdentity()) {
+		invert();
+		TransformationChanged();
+	}
 }
 
 // IsIdentity

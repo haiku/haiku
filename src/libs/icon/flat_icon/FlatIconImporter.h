@@ -9,17 +9,26 @@
 #ifndef FLAT_ICON_IMPORTER_H
 #define FLAT_ICON_IMPORTER_H
 
-#include <SupportDefs.h>
+#ifdef ICON_O_MATIC
+# include "Importer.h"
+#else
+# include <SupportDefs.h>
+#endif
 
 class BMessage;
 class BPositionIO;
 class Icon;
 class LittleEndianBuffer;
 class PathContainer;
+class Shape;
 class ShapeContainer;
 class StyleContainer;
 
+#ifdef ICON_O_MATIC
+class FlatIconImporter : public Importer {
+#else
 class FlatIconImporter {
+#endif
  public:
 								FlatIconImporter();
 	virtual						~FlatIconImporter();
@@ -40,6 +49,10 @@ class FlatIconImporter {
 											 StyleContainer* styles);
 			status_t			_ParsePaths(LittleEndianBuffer& buffer,
 											PathContainer* paths);
+			Shape*				_ReadPathSourceShape(
+									LittleEndianBuffer& buffer,
+									StyleContainer* styles,
+									PathContainer* paths);
 			status_t			_ParseShapes(LittleEndianBuffer& buffer,
 											 StyleContainer* styles,
 											 PathContainer* paths,

@@ -72,7 +72,7 @@ class Shape : public Transformable {
 	virtual	void				ObjectChanged(const Observable* object);
 
 	// PathContainerListener interface
-	virtual	void				PathAdded(VectorPath* path);
+	virtual	void				PathAdded(VectorPath* path, int32 index);
 	virtual	void				PathRemoved(VectorPath* path);
 
 	// PathListener interface

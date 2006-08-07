@@ -19,7 +19,7 @@ class StyleContainerListener {
 								StyleContainerListener();
 	virtual						~StyleContainerListener();
 
-	virtual	void				StyleAdded(Style* style) = 0;
+	virtual	void				StyleAdded(Style* style, int32 index) = 0;
 	virtual	void				StyleRemoved(Style* style) = 0;
 };
 #endif // ICON_O_MATIC
@@ -30,6 +30,7 @@ class StyleContainer {
 	virtual						~StyleContainer();
 
 			bool				AddStyle(Style* style);
+			bool				AddStyle(Style* style, int32 index);
 			bool				RemoveStyle(Style* style);
 			Style*				RemoveStyle(int32 index);
 
@@ -53,7 +54,8 @@ class StyleContainer {
 			bool				RemoveListener(StyleContainerListener* listener);
 
  private:
-			void				_NotifyStyleAdded(Style* style) const;
+			void				_NotifyStyleAdded(Style* style,
+												  int32 index) const;
 			void				_NotifyStyleRemoved(Style* style) const;
 
 			BList				fListeners;

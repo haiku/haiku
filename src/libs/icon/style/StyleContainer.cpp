@@ -50,6 +50,13 @@ StyleContainer::~StyleContainer()
 bool
 StyleContainer::AddStyle(Style* style)
 {
+	return AddStyle(style, CountStyles());
+}
+
+// AddStyle
+bool
+StyleContainer::AddStyle(Style* style, int32 index)
+{
 	if (!style)
 		return false;
 
@@ -57,9 +64,9 @@ StyleContainer::AddStyle(Style* style)
 	if (HasStyle(style))
 		return false;
 
-	if (fStyles.AddItem((void*)style)) {
+	if (fStyles.AddItem((void*)style, index)) {
 #ifdef ICON_O_MATIC
-		_NotifyStyleAdded(style);
+		_NotifyStyleAdded(style, index);
 #endif
 		return true;
 	}
@@ -187,14 +194,14 @@ StyleContainer::_MakeEmpty()
 
 // _NotifyStyleAdded
 void
-StyleContainer::_NotifyStyleAdded(Style* style) const
+StyleContainer::_NotifyStyleAdded(Style* style, int32 index) const
 {
 	BList listeners(fListeners);
 	int32 count = listeners.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		StyleContainerListener* listener
 			= (StyleContainerListener*)listeners.ItemAtFast(i);
-		listener->StyleAdded(style);
+		listener->StyleAdded(style, index);
 	}
 }
 

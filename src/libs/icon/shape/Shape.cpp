@@ -329,7 +329,7 @@ Shape::ObjectChanged(const Observable* object)
 
 // PathAdded
 void
-Shape::PathAdded(VectorPath* path)
+Shape::PathAdded(VectorPath* path, int32 index)
 {
 	path->Acquire();
 	path->AddListener(this);
