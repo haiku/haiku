@@ -123,6 +123,7 @@ TermWindow::InitWindow(void)
 	// Initialize TermView. (font, size and color)
 
 	fTermView->SetTermFont(&halfFont, &fullFont);
+	
 	BRect rect = fTermView->SetTermSize(gTermPref->getInt32(PREF_ROWS),
 		gTermPref->getInt32(PREF_COLS), 1);
 
@@ -191,37 +192,33 @@ TermWindow::MenusBeginning(void)
 void
 TermWindow::SetupMenu(void)
 {
-  PrefHandler menuText;
-
-  LoadLocaleFile (&menuText);
-  
-  // Menu bar object.
-  fMenubar = new BMenuBar(Bounds(), "mbar");
-
-  /*
-   * Make File Menu.
-   */
-  fFilemenu = new BMenu("Terminal");
-  fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
-  fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TERM), 'N'));
-  fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
-  fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
-  fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(B_ABOUT_REQUESTED)));
-  fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
-  fMenubar->AddItem(fFilemenu);
-
-  /*
-   * Make Edit Menu.
-   */
-  fEditmenu = new BMenu ("Edit");
-  fEditmenu->AddItem (new BMenuItem ("Copy", new BMessage (B_COPY),'C'));
-  fEditmenu->AddItem (new BMenuItem ("Paste", new BMessage (B_PASTE),'V'));
-  fEditmenu->AddSeparatorItem ();
-  fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
-  fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
+	PrefHandler menuText;
+	
+	LoadLocaleFile (&menuText);
+	
+	// Menu bar object.
+	fMenubar = new BMenuBar(Bounds(), "mbar");
+	
+	// Make File Menu.
+	fFilemenu = new BMenu("Terminal");
+	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
+	fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TERM), 'N'));
+	fFilemenu->AddSeparatorItem();
+	fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
+	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
+	fFilemenu->AddSeparatorItem();
+	fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(B_ABOUT_REQUESTED)));
+	fFilemenu->AddSeparatorItem();
+	fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
+	fMenubar->AddItem(fFilemenu);
+	
+	// Make Edit Menu.
+	fEditmenu = new BMenu ("Edit");
+	fEditmenu->AddItem (new BMenuItem ("Copy", new BMessage (B_COPY),'C'));
+	fEditmenu->AddItem (new BMenuItem ("Paste", new BMessage (B_PASTE),'V'));
+	fEditmenu->AddSeparatorItem ();
+	fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
+	fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
 
 /*
   // TODO: Implement Finding
@@ -231,18 +228,15 @@ TermWindow::SetupMenu(void)
 */
 	fMenubar->AddItem (fEditmenu);
   
-
-  /*
-   * Make Help Menu.
-   */
+	// Make Help Menu.
 	fHelpmenu = new BMenu("Settings");
 	fWindowSizeMenu = new BMenu("Window Size");
-  	fWindowSizeMenu->AddItem(new BMenuItem("80x24", new BMessage(EIGHTYTWENTYFOUR)));
-  	fWindowSizeMenu->AddItem(new BMenuItem("80x25", new BMessage(EIGHTYTWENTYFIVE)));  
-   	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
- 	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
- 	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
- 	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), B_ENTER)); 
+	fWindowSizeMenu->AddItem(new BMenuItem("80x24", new BMessage(EIGHTYTWENTYFOUR)));
+	fWindowSizeMenu->AddItem(new BMenuItem("80x25", new BMessage(EIGHTYTWENTYFIVE)));  
+	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
+	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
+	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
+	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), B_ENTER)); 
  	
  	// Considering we have this in the preferences window, this menu is not
  	// needed and should not be shown if we are to not confuse the user
@@ -271,7 +265,7 @@ TermWindow::SetupMenu(void)
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Save as default", new BMessage(SAVE_AS_DEFAULT))); 
 	fMenubar->AddItem(fHelpmenu);
-
+	
 	AddChild(fMenubar);
 }
 
@@ -284,233 +278,223 @@ TermWindow::MessageReceived(BMessage *message)
   BFont halfFont;
   BFont fullFont;
   
-  switch (message->what) {
-
-  case MENU_SWITCH_TERM:
-    be_app->PostMessage(MENU_SWITCH_TERM);
-    break;
-
-  case MENU_NEW_TERM: {
-	app_info info;
-	be_app->GetAppInfo(&info);
-
-	// try launching two different ways to work around possible problems
-	if (be_roster->Launch(&info.ref)!=B_OK)
-		be_roster->Launch(TERM_SIGNATURE);
-	}
-    break;
-
-  case MENU_PREF_OPEN:
-    if (!fPrefWindow){
-      fPrefWindow = new PrefDlg(this);
-    }else{
-      fPrefWindow->Activate();
-    } 
-    break;
-
-  case MSG_PREF_CLOSED:
-    fPrefWindow = NULL;
-    break;
-    
-  case MENU_FILE_QUIT:
-    be_app->PostMessage(B_QUIT_REQUESTED);
-    break;
-  case MENU_ENCODING:
-    message->FindInt32 ("op", &coding_id);
-    gNowCoding = coding_id;
-    SetCoding(coding_id);
-    break;
-
-    /*
-     * Extended B_SET_PROPERTY. Dispatch this message,
-     * Set coding ID.
-     */
-  case B_SET_PROPERTY:
-  {
-    int32 i;
-    BMessage spe;
-    message->GetCurrentSpecifier(&i, &spe);
-    if (!strcmp("encode", spe.FindString("property", i))){
-      message->FindInt32 ("data",  &coding_id);
-      gNowCoding = coding_id;
-      SetCoding (coding_id);
-    
-      message->SendReply(B_REPLY);
-    }else{
-      BWindow::MessageReceived(message);
-    }
-    break;
-  }
-
-    /*
-     * Extended B_GET_PROPERTY. Dispatch this message,
-     * reply now coding ID.
-     */
-  case B_GET_PROPERTY:
-  {
-    int32 i;
-    BMessage spe;
-    message->GetCurrentSpecifier(&i, &spe);
-    if (!strcmp("encode", spe.FindString("property", i))){
-      BMessage reply(B_REPLY);
-      reply.AddInt32("result", gNowCoding);
-      message->SendReply(&reply);
-    }else if (!strcmp("tty", spe.FindString("property", i))){
-      BMessage reply(B_REPLY);
-      reply.AddString("result", &tty_name[8]);
-      message->SendReply(&reply);
-    }else{
-      BWindow::MessageReceived(message);
-    }
-    break;
-  }
-
-  /*
-   * Message from Preference panel.
-   */
-  case MSG_ROWS_CHANGED:
-  case MSG_COLS_CHANGED:
-    r = fTermView->SetTermSize (gTermPref->getInt32 (PREF_ROWS),
-              gTermPref->getInt32 (PREF_COLS),
-              0);
-
-    ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
-        r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET *2);
-    break;
-
-  case MSG_HALF_FONT_CHANGED:
-  case MSG_FULL_FONT_CHANGED:
-  case MSG_HALF_SIZE_CHANGED:
-  case MSG_FULL_SIZE_CHANGED:
-
-    halfFont.SetFamilyAndStyle (gTermPref->getString(PREF_HALF_FONT_FAMILY),
-        NULL);
-    halfFont.SetSize (gTermPref->getFloat(PREF_HALF_FONT_SIZE));
-    halfFont.SetSpacing (B_FIXED_SPACING);
-  
-    fullFont.SetFamilyAndStyle (gTermPref->getString(PREF_FULL_FONT_FAMILY),
-        NULL);
-    fullFont.SetSize (gTermPref->getFloat(PREF_FULL_FONT_SIZE));
-    fullFont.SetSpacing (B_FIXED_SPACING);
-
-    fTermView->SetTermFont (&halfFont, &fullFont);
-    r = fTermView->SetTermSize (0, 0, 0);
-
-    int width, height;
-  
-    fTermView->GetFontSize (&width, &height);
-    
-    SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
-		   MIN_COLS * height, MAX_COLS * height);
-
-
-
-    ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
-        r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET * 2);
-
-    fTermView->Invalidate();
-    break;
-
-	case EIGHTYTWENTYFOUR:
-		gTermPref->setString(PREF_COLS, "80");
-		gTermPref->setString(PREF_ROWS, "24");
-	   	this->PostMessage (MSG_ROWS_CHANGED);
-		this->PostMessage (MSG_COLS_CHANGED);
-	break;
-
-	case EIGHTYTWENTYFIVE:
-		gTermPref->setString(PREF_COLS, "80");
-		gTermPref->setString(PREF_ROWS, "25");
-	   	this->PostMessage (MSG_ROWS_CHANGED);
-	   	this->PostMessage (MSG_COLS_CHANGED);
-	break;		
-
-	case EIGHTYFORTY:
-		gTermPref->setString(PREF_COLS, "80");
-		gTermPref->setString(PREF_ROWS, "40");
-	   	this->PostMessage (MSG_ROWS_CHANGED);
-	   	this->PostMessage (MSG_COLS_CHANGED);
-	break;	
-	
-	case ONETHREETWOTWENTYFOUR:
-		gTermPref->setString(PREF_COLS, "132");
-		gTermPref->setString(PREF_ROWS, "24");
-	   	this->PostMessage (MSG_ROWS_CHANGED);
-	   	this->PostMessage (MSG_COLS_CHANGED);
-	break;	
-	
-	case ONETHREETWOTWENTYFIVE:
-		gTermPref->setString(PREF_COLS, "132");
-		gTermPref->setString(PREF_ROWS, "25");
-	   	this->PostMessage (MSG_ROWS_CHANGED);
-	   	this->PostMessage (MSG_COLS_CHANGED);
-	break;	
-	
-	case FULLSCREEN:
-		if (!fSavedFrame.IsValid()) { // go fullscreen
-			float mbHeight = fMenubar->Bounds().Height() + 1;
-			fSavedFrame = Frame();
-			BScreen screen(this);
-			fTermView->ScrollBar()->Hide();
-			fMenubar->Hide();
-			fBaseView->MoveTo(0,0);
-			fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
-			fSavedLook = Look();
-			// done before ResizeTo to work around a Dano bug (not erasing the decor)
-			SetLook(B_NO_BORDER_WINDOW_LOOK);
-			ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
-			MoveTo(screen.Frame().left, screen.Frame().top);
-		} else { // exit fullscreen
-			float mbHeight = fMenubar->Bounds().Height() + 1;
-			fMenubar->Show();
-			fTermView->ScrollBar()->Show();
-			ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
-			MoveTo(fSavedFrame.left, fSavedFrame.top);
-			fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
-			fBaseView->MoveTo(0,mbHeight);
-			SetLook(fSavedLook);
-			fSavedFrame = BRect(0,0,-1,-1);
+	switch (message->what) {
+		case MENU_SWITCH_TERM: {
+			be_app->PostMessage(MENU_SWITCH_TERM);
+			break;
 		}
-	break;	
+		case MENU_NEW_TERM: {
+			app_info info;
+			be_app->GetAppInfo(&info);
+			
+			// try launching two different ways to work around possible problems
+			if (be_roster->Launch(&info.ref)!=B_OK)
+			be_roster->Launch(TERM_SIGNATURE);
+			break;
+		}
+		case MENU_PREF_OPEN: {
+			if (!fPrefWindow)
+				fPrefWindow = new PrefDlg(this);
+			else
+				fPrefWindow->Activate();
+			break;
+		}
+		case MSG_PREF_CLOSED: {
+			fPrefWindow = NULL;
+			break;
+		}
+		case MENU_FILE_QUIT: {
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
+		case MENU_ENCODING: {
+			message->FindInt32 ("op", &coding_id);
+			gNowCoding = coding_id;
+			SetCoding(coding_id);
+			break;
+		}
+		// Extended B_SET_PROPERTY. Dispatch this message,
+		// Set coding ID.
+		case B_SET_PROPERTY: {
+			int32 i;
+			BMessage spe;
+			message->GetCurrentSpecifier(&i, &spe);
+			if (!strcmp("encode", spe.FindString("property", i))){
+				message->FindInt32 ("data",  &coding_id);
+				gNowCoding = coding_id;
+				SetCoding (coding_id);
+			
+				message->SendReply(B_REPLY);
+			} else {
+				BWindow::MessageReceived(message);
+			}
+			break;
+		}
+
+		// Extended B_GET_PROPERTY. Dispatch this message, reply now coding ID.
+		case B_GET_PROPERTY: {
+			int32 i;
+			BMessage spe;
+			message->GetCurrentSpecifier(&i, &spe);
+			if (!strcmp("encode", spe.FindString("property", i))){
+				BMessage reply(B_REPLY);
+				reply.AddInt32("result", gNowCoding);
+				message->SendReply(&reply);
+			}
+			else if (!strcmp("tty", spe.FindString("property", i))) {
+				BMessage reply(B_REPLY);
+				reply.AddString("result", &tty_name[8]);
+				message->SendReply(&reply);
+			} else {
+				BWindow::MessageReceived(message);
+			}
+			break;
+		}
 	
-	case MSG_FONT_CHANGED:
-    	gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
-    	this->PostMessage (MSG_HALF_FONT_CHANGED);
-    break;
-
-
-	case MSG_COLOR_CHANGED:
-		fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
-		fTermView->SetTermColor ();
-		fBaseView->Invalidate();
-		fTermView->Invalidate();
-		break;
-	case SAVE_AS_DEFAULT:
-		{
+		// Message from Preference panel.
+		case MSG_ROWS_CHANGED:
+		case MSG_COLS_CHANGED: {
+			r = fTermView->SetTermSize (gTermPref->getInt32 (PREF_ROWS),
+										gTermPref->getInt32 (PREF_COLS), 0);
+		
+			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
+			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET *2);
+		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
 				gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+			break;
 		}
-		break;
-	case MENU_PAGE_SETUP:
-		DoPageSetup ();
-		break;
-	case MENU_PRINT:
-		DoPrint ();
-		break;
-
-  case MSGRUN_WINDOW:
-    fTermView->UpdateSIGWINCH ();
-    break;
-
-	case B_ABOUT_REQUESTED:
-		be_app->PostMessage(B_ABOUT_REQUESTED);
-		break;
-
-  default:
-    BWindow::MessageReceived(message);
-    break;
-  }
+		case MSG_HALF_FONT_CHANGED:
+		case MSG_FULL_FONT_CHANGED:
+		case MSG_HALF_SIZE_CHANGED:
+		case MSG_FULL_SIZE_CHANGED: {
+	
+			halfFont.SetFamilyAndStyle (gTermPref->getString(PREF_HALF_FONT_FAMILY),NULL);
+			halfFont.SetSize (gTermPref->getFloat(PREF_HALF_FONT_SIZE));
+			halfFont.SetSpacing (B_FIXED_SPACING);
+			
+			fullFont.SetFamilyAndStyle (gTermPref->getString(PREF_FULL_FONT_FAMILY),NULL);
+			fullFont.SetSize (gTermPref->getFloat(PREF_FULL_FONT_SIZE));
+			fullFont.SetSpacing (B_FIXED_SPACING);
+			
+			fTermView->SetTermFont (&halfFont, &fullFont);
+			r = fTermView->SetTermSize (0, 0, 0);
+			
+			int width, height;
+			
+			fTermView->GetFontSize (&width, &height);
+			
+			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
+							MIN_COLS * height, MAX_COLS * height);
+			
+			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
+			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET * 2);
+			
+			fTermView->Invalidate();
+		    break;
+		}
+		case EIGHTYTWENTYFOUR: {
+			gTermPref->setString(PREF_COLS, "80");
+			gTermPref->setString(PREF_ROWS, "24");
+		   	this->PostMessage (MSG_ROWS_CHANGED);
+			this->PostMessage (MSG_COLS_CHANGED);
+			break;
+		}
+		case EIGHTYTWENTYFIVE: {
+			gTermPref->setString(PREF_COLS, "80");
+			gTermPref->setString(PREF_ROWS, "25");
+		   	this->PostMessage (MSG_ROWS_CHANGED);
+		   	this->PostMessage (MSG_COLS_CHANGED);
+			break;		
+		}
+		case EIGHTYFORTY: {
+			gTermPref->setString(PREF_COLS, "80");
+			gTermPref->setString(PREF_ROWS, "40");
+		   	this->PostMessage (MSG_ROWS_CHANGED);
+		   	this->PostMessage (MSG_COLS_CHANGED);
+			break;	
+		}
+		case ONETHREETWOTWENTYFOUR: {
+			gTermPref->setString(PREF_COLS, "132");
+			gTermPref->setString(PREF_ROWS, "24");
+		   	this->PostMessage (MSG_ROWS_CHANGED);
+		   	this->PostMessage (MSG_COLS_CHANGED);
+			break;	
+		}
+		case ONETHREETWOTWENTYFIVE: {
+			gTermPref->setString(PREF_COLS, "132");
+			gTermPref->setString(PREF_ROWS, "25");
+		   	this->PostMessage (MSG_ROWS_CHANGED);
+		   	this->PostMessage (MSG_COLS_CHANGED);
+			break;	
+		}
+		case FULLSCREEN: {
+			if (!fSavedFrame.IsValid()) { // go fullscreen
+				float mbHeight = fMenubar->Bounds().Height() + 1;
+				fSavedFrame = Frame();
+				BScreen screen(this);
+				fTermView->ScrollBar()->Hide();
+				fMenubar->Hide();
+				fBaseView->MoveTo(0,0);
+				fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				fSavedLook = Look();
+				// done before ResizeTo to work around a Dano bug (not erasing the decor)
+				SetLook(B_NO_BORDER_WINDOW_LOOK);
+				ResizeTo(screen.Frame().Width()+1, screen.Frame().Height()+1);
+				MoveTo(screen.Frame().left, screen.Frame().top);
+			} else { // exit fullscreen
+				float mbHeight = fMenubar->Bounds().Height() + 1;
+				fMenubar->Show();
+				fTermView->ScrollBar()->Show();
+				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
+				MoveTo(fSavedFrame.left, fSavedFrame.top);
+				fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				fBaseView->MoveTo(0,mbHeight);
+				SetLook(fSavedLook);
+				fSavedFrame = BRect(0,0,-1,-1);
+			}
+			break;	
+		}
+		case MSG_FONT_CHANGED: {
+	    	gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
+	    	this->PostMessage (MSG_HALF_FONT_CHANGED);
+		    break;
+		}
+		case MSG_COLOR_CHANGED: {
+			fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
+			fTermView->SetTermColor ();
+			fBaseView->Invalidate();
+			fTermView->Invalidate();
+			break;
+		}
+		case SAVE_AS_DEFAULT: {
+			BPath path;
+			if (PrefHandler::GetDefaultPath(path) == B_OK)
+				gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+			break;
+		}
+		case MENU_PAGE_SETUP: {
+			DoPageSetup ();
+			break;
+		}
+		case MENU_PRINT: {
+			DoPrint ();
+			break;
+		}
+		case MSGRUN_WINDOW: {
+			fTermView->UpdateSIGWINCH ();
+			break;
+		}
+		case B_ABOUT_REQUESTED: {
+			be_app->PostMessage(B_ABOUT_REQUESTED);
+			break;
+		}
+		default: {
+			BWindow::MessageReceived(message);
+			break;
+		}
+	}
 }
 ////////////////////////////////////////////////////////////////////////////
 // WindowActivated (bool)
@@ -536,11 +520,11 @@ TermWindow::WindowActivated (bool )
 void
 TermWindow::Quit(void)
 {
-  delete fTermParse;
-  delete fCodeConv;
-  if(fPrefWindow) fPrefWindow->PostMessage (B_QUIT_REQUESTED);
-    be_app->PostMessage (B_QUIT_REQUESTED, be_app);
-  BWindow::Quit ();
+	delete fTermParse;
+	delete fCodeConv;
+	if(fPrefWindow) fPrefWindow->PostMessage (B_QUIT_REQUESTED);
+		be_app->PostMessage (B_QUIT_REQUESTED, be_app);
+	BWindow::Quit ();
 }
 
 
@@ -557,16 +541,13 @@ TermWindow::QuitRequested(void)
 int
 TermWindow::GetTimeZone ()
 {
-  struct timeval tv;
-  struct timezone tm;
-
-  gettimeofday (&tv, &tm);
-
-  return -tm.tz_minuteswest / 60;
+	struct timeval tv;
+	struct timezone tm;
+	
+	gettimeofday (&tv, &tm);
+	
+	return -tm.tz_minuteswest / 60;
 }
-
-
-#include "spawn.h"
 
 
 void
