@@ -52,7 +52,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
 	BMenu *menu = new BMenu("File");
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("About Expander", new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(item = new BMenuItem("About Expander...", new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app_messenger);
 	menu->AddSeparatorItem();
 	menu->AddItem(fSourceItem = new BMenuItem("Set Source...", new BMessage(MSG_SOURCE), 'O'));

@@ -64,7 +64,7 @@ DirectoryFilePanel::Show()
 		fCurrentButton = new BButton(rect, "directoryButton", "Select current",
 			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		fCurrentButton->ResizeToPreferred();
-		fCurrentButton->MoveBy(-fCurrentButton->Bounds().Width() - 8, 0);
+		fCurrentButton->MoveBy(-fCurrentButton->Bounds().Width() - 30, 0);
 		background->AddChild(fCurrentButton);
 		fCurrentButton->SetTarget(Messenger());
 
