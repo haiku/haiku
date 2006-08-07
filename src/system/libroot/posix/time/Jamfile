@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix time ;
 
 # for localtime.c strftime.c
-SubDirCcFlags -DNOID -DTZDIR='\"/etc/timezones\"' -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 ;
+SubDirCcFlags -DNOID -DTZDIR='\"/etc/timezones\"' -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 -DSTD_INSPIRED ;
 
 UsePrivateHeaders [ FDirName libroot time ] ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
@@ -14,8 +14,8 @@ MergeObject posix_time.o :
 	localtime.c
 	stime.c
 	strftime.c
-#	strptime.c
-#	timelocal.c
+	strptime.c
+	timelocal.c
 	time.c
 ;
 

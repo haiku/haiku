@@ -29,9 +29,9 @@
 
 #include "timelocal.h"
 
+#if 0
 static struct lc_time_T _time_locale;
 static int _time_using_locale;
-#if 0
 static char *time_locale_buf;
 #endif
 
@@ -100,9 +100,13 @@ static const struct lc_time_T	_C_time_locale = {
 struct lc_time_T *
 __get_current_time_locale(void)
 {
-	return (_time_using_locale
+	return
+#if 0
+ (_time_using_locale
 		? &_time_locale
-		: (struct lc_time_T *)&_C_time_locale);
+		: 
+#endif
+		(struct lc_time_T *)&_C_time_locale;
 }
 
 #if 0
