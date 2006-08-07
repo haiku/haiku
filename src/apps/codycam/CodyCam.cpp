@@ -100,7 +100,9 @@ CodyCam::ReadyToRun()
 	status_t status = SetUpNodes();
 	if (status != B_OK)
 	{
-		ErrorAlert("Error setting up nodes", status);
+		// This error is not needed because SetUpNodes handles displaying any
+		// errors it runs into.
+//		ErrorAlert("Error setting up nodes", status);
 		return;
 	}
 	
@@ -207,7 +209,7 @@ CodyCam::SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		ErrorAlert("Can't find a video input!", status);
+		ErrorAlert("Can't find a video source. You need a webcam to use CodyCam.", status);
 		return status;
 	}
 
@@ -362,9 +364,9 @@ CodyCam::TearDownNodes()
 static void
 ErrorAlert(const char * message, status_t err)
 {
-	char msg[256];
-	sprintf(msg, "%s\n%s [%lx]", message, strerror(err), err);
-	(new BAlert("", msg, "Quit"))->Go();
+	(new BAlert("", message, "Quit"))->Go();
+	
+	printf("%s\n%s [%lx]", message, strerror(err), err);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 }
 
