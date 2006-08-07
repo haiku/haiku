@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src libs ;
 
 SubInclude HAIKU_TOP src libs agg ;
 SubInclude HAIKU_TOP src libs bsd ;
+SubInclude HAIKU_TOP src libs crypt ;
 SubInclude HAIKU_TOP src libs edit ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs freetype2 ;
