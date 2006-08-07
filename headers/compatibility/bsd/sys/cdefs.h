@@ -11,5 +11,6 @@
 
 #define __FBSDID(x)
 #define __unused
+#define protected
 
 #endif	/* _BSD_SYS_CDEFS_H_ */

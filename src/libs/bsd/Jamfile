@@ -6,8 +6,11 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 SharedLibrary libbsd.so :
 	err.c
+	fgetln.c
+	getpass.c
 	issetugid.c
 	progname.c
 	stringlist.c
+	unvis.c
 	vis.c
 ;
