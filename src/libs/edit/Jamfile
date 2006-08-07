@@ -1,0 +1,33 @@
+SubDir HAIKU_TOP src libs edit ;
+
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers libs ncurses ] : true ;
+
+local defines = [ FDefines SCCSID=0 ] ;
+SubDirCcFlags $(defines) ;
+
+StaticLibrary libedit.a :
+	chared.c
+	common.c
+	el.c
+	emacs.c
+	fcns.c
+	help.c
+	hist.c
+	history.c
+	key.c
+	map.c
+	parse.c
+	prompt.c
+	read.c
+	refresh.c
+	search.c
+	sig.c
+	tokenizer.c
+	term.c
+	tty.c
+	vi.c
+;
+

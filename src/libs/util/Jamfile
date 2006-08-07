@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src libs util ;
+
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+local defines = [ FDefines SCCSID=0 ] ;
+SubDirCcFlags $(defines) ;
+
+StaticLibrary libutil.a :
+	fparseln.c
+;
+

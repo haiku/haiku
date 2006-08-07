@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src libs ;
 
 SubInclude HAIKU_TOP src libs agg ;
 SubInclude HAIKU_TOP src libs bsd ;
-#SubInclude HAIKU_TOP src libs edit ;
+SubInclude HAIKU_TOP src libs edit ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs freetype2 ;
 SubInclude HAIKU_TOP src libs icon ;
@@ -11,4 +11,5 @@ SubInclude HAIKU_TOP src libs pdflib ;
 SubInclude HAIKU_TOP src libs png ;
 SubInclude HAIKU_TOP src libs stdc++ ;
 SubInclude HAIKU_TOP src libs termcap ;
+SubInclude HAIKU_TOP src libs util ;
 SubInclude HAIKU_TOP src libs zlib ;
