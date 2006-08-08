@@ -11,7 +11,10 @@ public:
 							   char shortcut = 0, uint32 modifiers = 0);
 				~BitmapMenuItem();
 	virtual void		DrawContent();
-	
+
+protected:
+	virtual void		GetContentSize(float *width, float *height);	
+
 private:
 	BBitmap 		*fBitmap;
 	BString			fName;

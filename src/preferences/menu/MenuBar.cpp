@@ -48,13 +48,11 @@ MenuBar::build_menu()
 	colorSchemeItem = new BMenuItem("Color Scheme...", new BMessage(COLOR_SCHEME_MSG), 0, 0);
 
 	// create the separator menu
-	// TODO: Use B_ITEMS_IN_MATRIX here
 	separatorStyleMenu = new BMenu("Separator Style", B_ITEMS_IN_COLUMN);
 	separatorStyleMenu->SetRadioMode(true);
 	BMessage *msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 0);
-	separatorStyleZero = new BitmapMenuItem("            ", msg,
-						BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
+	separatorStyleZero = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP0"));
 	msg = new BMessage(MENU_SEP_TYPE);
 	msg->AddInt32("sep", 1);
 	separatorStyleOne = new BitmapMenuItem("", msg, BTranslationUtils::GetBitmap(B_RAW_TYPE, "SEP1"));

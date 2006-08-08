@@ -43,3 +43,21 @@ BitmapMenuItem::DrawContent()
 		menu->SetDrawingMode(B_OP_COPY);
 	}
 }
+
+
+void
+BitmapMenuItem::GetContentSize(float *_width, float *_height)
+{
+	float width, height;
+	BMenuItem::GetContentSize(&width, &height);
+	
+	if (fBitmap != NULL) {
+		width += fBitmap->Bounds().Width();
+		height = max_c(height, fBitmap->Bounds().Height());
+	}
+
+	if (_width != NULL)
+		*_width = width;
+	if (_height != NULL)
+		*_height = height;
+}
