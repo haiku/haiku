@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src kits network ;
+
+UsePrivateHeaders net ;
+
+SharedLibrary libnetwork.so :
+	interfaces.cpp
+	socket.cpp
+	:
+	<libnetwork_dns>dns_dst.o
+	<libnetwork_dns>dns_inet.o
+	<libnetwork_dns>dns_irs.o
+	<libnetwork_dns>dns_isc.o
+	<libnetwork_dns>dns_nameser.o
+	<libnetwork_dns>dns_resolv.o
+	<libnetwork_dns>dns_private.o
+
+	be
+;
+
+SubInclude HAIKU_TOP src kits network dns ;
