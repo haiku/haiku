@@ -5,8 +5,6 @@ SubDirC++Flags -fno-rtti ;
 SubDirSysHdrs $(SUBDIR) ;
 UsePrivateHeaders [ FDirName kernel ] ;
 
-AddResources usb : usb.rdef ;
-
 KernelStaticLibrary libusb.a :
 	Stack.cpp
 	Device.cpp
@@ -19,6 +17,7 @@ KernelStaticLibrary libusb.a :
 
 KernelAddon usb : [ FDirName kernel bus_managers ] :
 	usb.cpp
+	: libusb.a
+	: usb.rdef
 	;
 
-LinkAgainst usb : libusb.a ;

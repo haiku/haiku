@@ -2,21 +2,20 @@ SubDir HAIKU_TOP src add-ons kernel busses usb ;
 
 SubDirC++Flags -fno-rtti ;
 
-AddResources uhci : uhci.rdef ;
-AddResources ohci : ohci.rdef ;
-
 UsePrivateHeaders [ FDirName kernel ] ; 
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers usb ] ;
 
-KernelAddon uhci : [ FDirName kernel busses usb ] :
+KernelAddon <usb>uhci : [ FDirName kernel busses usb ] :
 	uhci.cpp
 	uhci_rh.cpp
+	: libusb.a
+	: uhci.rdef
 	;
 
-KernelAddon ohci : [ FDirName kernel busses usb ] :
+KernelAddon <usb>ohci : [ FDirName kernel busses usb ] :
 	ohci.cpp
 	ohci_rh.cpp
+	: libusb.a
+	: ohci.rdef
 	;
 
-LinkAgainst uhci : libusb.a ;
-LinkAgainst ohci : libusb.a ;
