@@ -1,10 +1,5 @@
 SubDir HAIKU_TOP src preferences mouse ;
 
-if $(TARGET_PLATFORM) != haiku {
-        SubDirC++Flags -DCOMPILE_FOR_R5 ;
-	SubDirC++Flags -fmultiple-symbol-spaces ;
-} 
-
 UsePrivateHeaders input ;
 
 Preference Mouse : 
@@ -13,7 +8,7 @@ Preference Mouse :
 	MouseWindow.cpp
 	MouseView.cpp 
 	SettingsView.cpp
-	: libtranslation.so libbe.so
+	: translation be
 	: Mouse.rdef
 	;
 
