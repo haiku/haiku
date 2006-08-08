@@ -14,41 +14,41 @@ UsePrivateHeaders net ;
 
 # a) Userland stack version:
 
-KernelAddon net_server_driver : kernel drivers bin :
-	net_server_driver.c
+KernelAddon userland_net_server : kernel drivers bin :
+	userland_server.cpp
 ;
 
 # b) Kernelland stack version:
 
-KernelAddon net_stack_driver : kernel drivers bin :
-	net_stack_driver.c
+KernelAddon net_stack : kernel drivers bin :
+	kernel_stack.cpp
 ;
 
 # Installation
 
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
-	net_server_driver 
-	net_stack_driver 
+	userland_net_server
+	net_stack
 ;
 
 HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed>net_server_driver 
-	<installed>net_stack_driver	: 
+	<installed>userland_net_server 
+	<installed>net_stack	: 
 	installed-symlink 
 ;
 
 HaikuInstall install-userland-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
-	net_server_driver : 
+	userland_net_server : 
 	installed-userland-networking
 ;
 
 HaikuInstallRelSymLink install-userland-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed-userland-networking>net_server_driver : 
+	<installed-userland-networking>userland_net_server : 
 	installed-userland-networking-symlink 
 ;
 Package haiku-networkingkit-cvs :
-	net_stack_driver net_server_driver :
+	net_stack userland_net_server :
 	boot home config add-ons kernel drivers bin ;
 
-PackageDriverSymLink haiku-networkingkit-cvs : net net_stack_driver ;
-PackageDriverSymLink haiku-networkingkit-cvs : net net_server_driver ;
+PackageDriverSymLink haiku-networkingkit-cvs : net net_stack ;
+PackageDriverSymLink haiku-networkingkit-cvs : net userland_net_server ;

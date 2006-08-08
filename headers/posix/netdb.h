@@ -1,6 +1,4 @@
 /*
- * ++Copyright++ 1980, 1983, 1988, 1993
- * -
  * Copyright (c) 1980, 1983, 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -80,20 +78,12 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * -
- * --Copyright--
  */
-
-/*
- *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
- *	$Id$
- */
-
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
 #include <sys/param.h>
-#include <sys/bitypes.h>
+#include <sys/types.h>
 #include <sys/cdefs.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

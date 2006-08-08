@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src bin network route ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+UsePrivateHeaders net ;
+
+BinCommand route :
+	route.cpp
+	: libnetwork.so
+;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
+	: route ;
+
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: route
+	: installed-userland-networking
+;
+
+Package haiku-networkingkit-cvs :
+	route :
+#	boot home config bin ;
+	boot home Desktop haiku-networkingkit ;

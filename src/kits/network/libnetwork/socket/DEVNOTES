@@ -1,3 +1,0 @@
-Userland socket API.
-
-TODO: move sysctl() into kernel and libroot.so.

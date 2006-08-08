@@ -157,7 +157,7 @@ SubInclude HAIKU_TOP src bin less ;
 SubInclude HAIKU_TOP src bin listdev ;
 SubInclude HAIKU_TOP src bin make ;
 SubInclude HAIKU_TOP src bin makebootable ;
-SubInclude HAIKU_TOP src bin makeudfimage ;
+#SubInclude HAIKU_TOP src bin makeudfimage ;
 SubInclude HAIKU_TOP src bin mkdos ;
 SubInclude HAIKU_TOP src bin patch ;
 SubInclude HAIKU_TOP src bin pc ;
@@ -175,13 +175,7 @@ SubInclude HAIKU_TOP src bin zic ;
 SubInclude HAIKU_TOP src bin rcs ;
 
 # Network command line tools
-SubInclude HAIKU_TOP src bin arp ;
-SubInclude HAIKU_TOP src bin ifconfig ;
-SubInclude HAIKU_TOP src bin pppconfig ;
-SubInclude HAIKU_TOP src bin ppp_up ;
-SubInclude HAIKU_TOP src bin ping ;
-SubInclude HAIKU_TOP src bin route ;
-SubInclude HAIKU_TOP src bin traceroute ;
+SubInclude HAIKU_TOP src bin network ;
 
 # Compression command line tools
 SubInclude HAIKU_TOP src bin unzip ;

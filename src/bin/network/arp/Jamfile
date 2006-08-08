@@ -1,0 +1,33 @@
+SubDir HAIKU_TOP src bin network arp ;
+
+SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+UsePrivateHeaders net ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+BinCommand arp :
+	arp.cpp
+	: $(NETWORK_LIBS) $(SELECT_UNAME_ETC_LIB) ;
+
+# Installation -- in the test directory for the time being
+HaikuInstall install-networking
+	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
+	: arp ;
+
+HaikuInstall install-userland-networking 
+	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
+	: arp
+	: installed-userland-networking
+;
+
+Package haiku-networkingkit-cvs :
+	arp :
+#	boot home config bin ;
+	boot home Desktop haiku-networkingkit ;
+

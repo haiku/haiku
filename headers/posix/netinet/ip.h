@@ -5,7 +5,6 @@
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H
 
-#include <netinet/in_systm.h>
 #include <netinet/in.h>
 #include <stdint.h>
 
@@ -81,10 +80,10 @@ struct  ip_timestamp {
 			ipt_oflw:4;
 #endif
 	union ipt_timestamp {
-		n_time ipt_time[1];
+		uint32_t ipt_time[1];
 		struct ipt_ta {
 			struct in_addr ipt_addr;
-			n_time ipt_time;
+			uint32_t ipt_time;
 		} ipt_ta;
 	} ipt_timestamp;
 }; 

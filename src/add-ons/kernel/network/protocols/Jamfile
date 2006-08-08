@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel network protocols ;
-
-SubInclude HAIKU_TOP src add-ons kernel network protocols icmp ;
-SubInclude HAIKU_TOP src add-ons kernel network protocols ipv4 ;
-SubInclude HAIKU_TOP src add-ons kernel network protocols tcp ;
-SubInclude HAIKU_TOP src add-ons kernel network protocols udp ;
-SubInclude HAIKU_TOP src add-ons kernel network protocols raw ;
-SubInclude HAIKU_TOP src add-ons kernel network protocols route ;
-

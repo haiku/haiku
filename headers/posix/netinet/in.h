@@ -6,20 +6,21 @@
 #include <sys/types.h>
 #include <net/if.h>
 #include <endian.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
 
-typedef unsigned short	in_port_t;
-typedef unsigned long	in_addr_t;
+typedef uint16_t in_port_t;
+typedef uint32_t in_addr_t;
 
 /* We can't include <ByteOrder.h> since we are a posix file,
  * and we are not allowed to import all the BeOS types here.
  */
 #ifndef htonl
-	extern unsigned long __swap_int32(unsigned long);	/* private */
-	extern unsigned short __swap_int16(unsigned short);	/* private */
+	extern uint32_t __swap_int32(uint32_t);	/* private */
+	extern uint16_t __swap_int16(uint16_t);	/* private */
 	#if 	BYTE_ORDER == LITTLE_ENDIAN
 		#define htonl(x) __swap_int32(x)
 		#define ntohl(x) __swap_int32(x)
@@ -73,11 +74,11 @@ struct in_addr {
  * IP Version 4 socket address.
  */
 struct sockaddr_in {
-	uint8		sin_len;
-	uint8		sin_family;
-	uint16		sin_port;
+	uint8_t		sin_len;
+	uint8_t		sin_family;
+	uint16_t	sin_port;
 	struct in_addr 	sin_addr;
-	int8		sin_zero[24];
+	int8_t		sin_zero[24];
 };
 /* the address is therefore at sin_addr.s_addr */
 
@@ -99,7 +100,7 @@ struct sockaddr_in {
 #define IP_ADD_MEMBERSHIP       12   /* ip_mreq; add an IP group membership */
 #define IP_DROP_MEMBERSHIP      13   /* ip_mreq; drop an IP group membership */ 
 
-#define __IPADDR(x)     ((uint32) htonl((uint32)(x)))
+#define __IPADDR(x)     ((uint32_t)htonl((uint32_t)(x)))
 
 #define INADDR_ANY              __IPADDR(0x00000000)
 #define INADDR_LOOPBACK         __IPADDR(0x7f000001)
@@ -114,27 +115,27 @@ struct sockaddr_in {
 
 #define INADDR_NONE             __IPADDR(0xffffffff)
 
-#define IN_CLASSA(i)            (((uint32)(i) & __IPADDR(0x80000000)) == \
+#define IN_CLASSA(i)            (((uint32_t)(i) & __IPADDR(0x80000000)) == \
                                  __IPADDR(0x00000000))
 #define IN_CLASSA_NET           __IPADDR(0xff000000)
 #define IN_CLASSA_NSHIFT        24
 #define IN_CLASSA_HOST          __IPADDR(0x00ffffff)
 #define IN_CLASSA_MAX           128
 
-#define IN_CLASSB(i)            (((uint32)(i) & __IPADDR(0xc0000000)) == \
+#define IN_CLASSB(i)            (((uint32_t)(i) & __IPADDR(0xc0000000)) == \
                                  __IPADDR(0x80000000))
 #define IN_CLASSB_NET           __IPADDR(0xffff0000)
 #define IN_CLASSB_NSHIFT        16
 #define IN_CLASSB_HOST          __IPADDR(0x0000ffff)
 #define IN_CLASSB_MAX           65536
 
-#define IN_CLASSC(i)            (((uint32)(i) & __IPADDR(0xe0000000)) == \
+#define IN_CLASSC(i)            (((uint32_t)(i) & __IPADDR(0xe0000000)) == \
                                  __IPADDR(0xc0000000))
 #define IN_CLASSC_NET           __IPADDR(0xffffff00)
 #define IN_CLASSC_NSHIFT        8
 #define IN_CLASSC_HOST          __IPADDR(0x000000ff)
 
-#define IN_CLASSD(i)            (((uint32)(i) & __IPADDR(0xf0000000)) == \
+#define IN_CLASSD(i)            (((uint32_t)(i) & __IPADDR(0xf0000000)) == \
                                  __IPADDR(0xe0000000))
 /* These ones aren't really net and host fields, but routing needn't know. */
 #define IN_CLASSD_NET           __IPADDR(0xf0000000)
@@ -143,8 +144,8 @@ struct sockaddr_in {
 
 #define IN_MULTICAST(i)	        IN_CLASSD(i)
 
-#define IN_EXPERIMENTAL(i)      (((uint32)(i) & 0xf0000000) == 0xf0000000)
-#define IN_BADCLASS(i)          (((uint32)(i) & 0xf0000000) == 0xf0000000)
+#define IN_EXPERIMENTAL(i)      (((uint32_t)(i) & 0xf0000000) == 0xf0000000)
+#define IN_BADCLASS(i)          (((uint32_t)(i) & 0xf0000000) == 0xf0000000)
 
 #define IP_MAX_MEMBERSHIPS      20
 
@@ -163,7 +164,7 @@ int    in_localaddr  (struct in_addr);
 void   in_socktrim   (struct sockaddr_in*);
 /*  uint16 in_cksum      (struct mbuf *, int); */
 struct mbuf;
-uint16 in_cksum(struct mbuf *m, int len, int off);
+uint16_t in_cksum(struct mbuf *m, int len, int off);
   
 #ifdef __cplusplus
 }

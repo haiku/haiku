@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel network interfaces ;
-
-SubInclude HAIKU_TOP src add-ons kernel network interfaces ethernet ;
-SubInclude HAIKU_TOP src add-ons kernel network interfaces loopback ;
-SubInclude HAIKU_TOP src add-ons kernel network interfaces ppp ;

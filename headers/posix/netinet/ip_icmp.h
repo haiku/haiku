@@ -50,27 +50,27 @@ struct icmp {
 		uint8_t ih_pptr;
 		struct in_addr ih_gwaddr;
 		struct ih_idseq {
-			n_short icd_id;
-			n_short icd_seq;
+			uint16_t icd_id;
+			uint16_t icd_seq;
 		} ih_idseq;
 		int32_t ih_void;
 		
 		/* ICMP_UNREACH_NEEDFRAG (RFC 1191) */
 		struct ih_pmtu {
-			n_short ipm_void;
-			n_short ipm_nextmtu;
+			uint16_t ipm_void;
+			uint16_t ipm_nextmtu;
 		} ih_pmtu;
 	} icmp_hun;
 	union {
 		struct id_ts {
-			n_time its_otime;
-			n_time its_rtime;
-			n_time its_ttime;
+			uint32_t its_otime;
+			uint32_t its_rtime;
+			uint32_t its_ttime;
 		} id_ts;
 		struct id_ip {
 			struct ip idi_ip;
 		} id_ip;
-		uint32 id_mask;
+		uint32_t id_mask;
 		char id_data[1];
 	} icmp_dun;
 };

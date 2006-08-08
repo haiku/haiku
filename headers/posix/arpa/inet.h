@@ -1,6 +1,9 @@
 /*
- * ++Copyright++ 1983, 1993
- * -
+ * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
  * Copyright (c) 1983, 1993
  *    The Regents of the University of California.  All rights reserved.
  * 
@@ -49,58 +52,57 @@
  * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
  * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  * SOFTWARE.
- * -
- * --Copyright--
  */
-
-/*
- *	@(#)inet.h	8.1 (Berkeley) 6/2/93
- *	$Id$
- */
-
 #ifndef _INET_H_
 #define	_INET_H_
 
-/* External definitions for functions in inet(3) */
 
+#include <netinet/in.h>
 #include <sys/param.h>
-#include <sys/bitypes.h>
+#include <sys/types.h>
 #include <sys/cdefs.h>
+
 
 #define	inet_addr		__inet_addr
 #define	inet_aton		__inet_aton
 #define	inet_lnaof		__inet_lnaof
-#define	inet_makeaddr		__inet_makeaddr
+#define	inet_makeaddr	__inet_makeaddr
 #define	inet_neta		__inet_neta
 #define	inet_netof		__inet_netof
-#define	inet_network		__inet_network
-#define	inet_net_ntop		__inet_net_ntop
-#define	inet_net_pton		__inet_net_pton
-#define	inet_cidr_ntop		__inet_cidr_ntop
-#define	inet_cidr_pton		__inet_cidr_pton
+#define	inet_network	__inet_network
+#define	inet_net_ntop	__inet_net_ntop
+#define	inet_net_pton	__inet_net_pton
+#define	inet_cidr_ntop	__inet_cidr_ntop
+#define	inet_cidr_pton	__inet_cidr_pton
 #define	inet_ntoa		__inet_ntoa
 #define	inet_pton		__inet_pton
 #define	inet_ntop		__inet_ntop
-#define	inet_nsap_addr		__inet_nsap_addr
-#define	inet_nsap_ntoa		__inet_nsap_ntoa
+#define	inet_nsap_addr	__inet_nsap_addr
+#define	inet_nsap_ntoa	__inet_nsap_ntoa
 
-__BEGIN_DECLS
-unsigned long	 inet_addr __P((const char *));
-int		 inet_aton __P((const char *, struct in_addr *));
-unsigned long	 inet_lnaof __P((struct in_addr));
-struct in_addr	 inet_makeaddr __P((u_long , u_long));
-char *		 inet_neta __P((u_long, char *, size_t));
-unsigned long	 inet_netof __P((struct in_addr));
-unsigned long	 inet_network __P((const char *));
-char		*inet_net_ntop __P((int, const void *, int, char *, size_t));
-int		 inet_net_pton __P((int, const char *, void *, size_t));
-char		*inet_cidr_ntop __P((int, const void *, int, char *, size_t));
-int		 inet_cidr_pton __P((int, const char *, void *, int *));
-/*const*/ char	*inet_ntoa __P((struct in_addr));
-int		 inet_pton __P((int, const char *, void *));
-const char	*inet_ntop __P((int, const void *, char *, size_t));
-u_int		 inet_nsap_addr __P((const char *, u_char *, int));
-char		*inet_nsap_ntoa __P((int, const u_char *, char *));
-__END_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* !_INET_H_ */
+in_addr_t		inet_addr(const char *);
+int				inet_aton(const char *, struct in_addr *);
+unsigned long	inet_lnaof(struct in_addr);
+struct in_addr	inet_makeaddr(u_long , u_long);
+char			*inet_neta(u_long, char *, size_t);
+unsigned long	inet_netof(struct in_addr);
+unsigned long	inet_network(const char *);
+char			*inet_net_ntop(int, const void *, int, char *, size_t);
+int				inet_net_pton(int, const char *, void *, size_t);
+char			*inet_cidr_ntop(int, const void *, int, char *, size_t);
+int				inet_cidr_pton(int, const char *, void *, int *);
+char			*inet_ntoa(struct in_addr);
+int				inet_pton(int, const char *, void *);
+const char		*inet_ntop(int, const void *, char *, size_t);
+u_int			inet_nsap_addr(const char *, u_char *, int);
+char			*inet_nsap_ntoa(int, const u_char *, char *);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	/* _INET_H_ */

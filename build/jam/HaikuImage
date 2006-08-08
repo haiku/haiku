@@ -22,13 +22,13 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 
 BEOS_BIN = addattr alert basename beep cat catattr chgrp chmod chop chown clear
 	clockconfig cmp comm cp copyattr csplit cut date dd desklink df diff dirname driveinfo
-	dstcheck du echo eject env error factor false ffm find finddir fortune funzip gawk
+	dstcheck du echo eject env error factor false ffm find finddir fortune ftp funzip gawk
 	$(X86_ONLY)gdb grep groups gzip head hey id ideinfo idestatus ifconfig iroster isvolume
 	join keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger logname ls lsindex makebootable md5sum mimeset
 	mkdir mkindex modifiers mount mountvolume mv open pathchk ping play playfile playsound
 	playwav ppp_up pppconfig ps pwd
-	query quit renice rm rmattr rmindex rmdir roster safemode screen_blanker sed settype
+	query quit renice rm rmattr rmindex rmdir roster route safemode screen_blanker sed settype
 	setversion setvolume sh shutdown sleep sort split strace su sum sync sysinfo
 	tail tar tee top touch tput traceroute translate true tty uname unmount unzip unzipsfx 
 	uptime version waitfor wc whoami xargs xres yes zdiff zforce zgrep zip zipcloak 
@@ -43,20 +43,20 @@ BEOS_APPS = Terminal Expander People ShowImage Clock Pulse ProcessController
 BEOS_PREFERENCES = Backgrounds DataTranslations FileTypes Fonts Media Menu
 	Mouse Keyboard Keymap Screen ScreenSaver Sounds Time VirtualMemory
 ;
-BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libnet.so libmedia.so libtracker.so
-	libtranslation.so libnetwork.so libbind.so libnetapi.so libsocket.so libdebug.so
+BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
+	libtranslation.so libnetwork.so libdebug.so libbsd.so
 	libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so libmidi2.so
-	libdevice.so libgame.so libscreensaver.so libroot.so libmail.so $(X86_ONLY)libGL.so
+	libdevice.so libgame.so libscreensaver.so libroot.so $(X86_ONLY)libGL.so
 	libfluidsynth.so
 ;
 BEOS_SYSTEM_SERVERS = registrar debug_server syslog_daemon media_server
 	media_addon_server input_server app_server fake_app_server midi_server
 ;
 
-BEOS_NETWORK_CORE = core ;
-BEOS_NETWORK_INTERFACES = ethernet loopback ppp ;
-BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
-BEOS_NETWORK_PROTOCOLS = icmp ipv4 raw route tcp udp ;
+BEOS_NETWORK_DEVICES = ethernet loopback ;
+BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp ;
+#BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
+BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
 
 BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
 	$(X86_ONLY)mga.accelerant $(X86_ONLY)nm.accelerant $(X86_ONLY)intel_extreme.accelerant
@@ -86,7 +86,7 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
 	$(X86_ONLY)nm.driver $(X86_ONLY)mga.driver $(X86_ONLY)intel_extreme vesa
 ;
 BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
-	via-rhine wb840 net_stack_driver
+	etherpci via-rhine wb840 net_stack
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button $(X86_ONLY)acpi_ns_dump ;
@@ -132,6 +132,8 @@ AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
 
 # libs
 AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) ;
+AddSymlinkToHaikuImage beos system lib : libnetwork.so : libsocket.so ;
+AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbind.so ;
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
@@ -186,11 +188,11 @@ AddFilesToHaikuImage beos etc KanBe dic canna : $(kanbeDicCanna) ;
 AddDirectoryToHaikuImage beos etc KanBe dic group ;
 AddDirectoryToHaikuImage beos etc KanBe dic user ;
 
-local libnetFiles = networks protocols resolv.conf services ;
-libnetFiles = $(libnetFiles:G=libnet-files) ;
-SEARCH on $(libnetFiles)
-	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
-AddFilesToHaikuImage beos etc : $(libnetFiles) ;
+#local libnetFiles = networks protocols resolv.conf services ;
+#libnetFiles = $(libnetFiles:G=libnet-files) ;
+#SEARCH on $(libnetFiles)
+#	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
+#AddFilesToHaikuImage beos etc : $(libnetFiles) ;
 
 local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ] : *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
@@ -238,9 +240,11 @@ AddFilesToHaikuImage beos system add-ons input_server devices
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
 # AddFilesToHaikuImage beos system add-ons input_server methods : canna ;
 AddFilesToHaikuImage beos system add-ons kernel network
-	: $(BEOS_NETWORK_CORE) ;
-AddFilesToHaikuImage beos system add-ons kernel network interfaces
-	: $(BEOS_NETWORK_INTERFACES) ;
+	: stack ;
+AddFilesToHaikuImage beos system add-ons kernel network devices
+	: $(BEOS_NETWORK_DEVICES) ;
+AddFilesToHaikuImage beos system add-ons kernel network datalink_protocols
+	: $(BEOS_NETWORK_DATALINK_PROTOCOLS) ;
 AddFilesToHaikuImage beos system add-ons kernel network ppp
 	: $(BEOS_NETWORK_PPP) ;
 AddFilesToHaikuImage beos system add-ons kernel network protocols
