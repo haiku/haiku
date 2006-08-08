@@ -109,8 +109,6 @@ AddFilesToHaikuImage beos system add-ons kernel generic
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems : intel session ;
 AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
-AddFilesToHaikuImage beos system add-ons kernel file_cache 
-	: log launch_speedup rule_based_prefetcher ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToHaikuImage beos system add-ons kernel cpu : generic_x86 ;
