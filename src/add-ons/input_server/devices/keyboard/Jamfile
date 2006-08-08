@@ -13,13 +13,7 @@ Addon <input>keyboard : input_server/devices :
 	TMListItem.cpp
 
 	: false 
-	: <nogrist>input_server ;
-
-if $(COMPILE_FOR_R5) {
-	LinkAgainst <input>keyboard : be ;
-} else {
-        LinkAgainst <input>keyboard : libroot.so libbe.so ;
-}
+	: /system/servers/input_server be ;
 
 Package haiku-inputkit-cvs :
 	<input>keyboard : 

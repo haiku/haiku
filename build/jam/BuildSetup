@@ -256,6 +256,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
+	HAIKU_LIBRARY_NAME_MAP_/system/servers/input_server = <nogrist>input_server ;
 }
 
 

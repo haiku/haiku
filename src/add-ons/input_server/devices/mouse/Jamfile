@@ -7,7 +7,7 @@ UsePrivateHeaders input ;
 Addon <input>mouse : input_server/devices : 
 	MouseInputDevice.cpp 
 	: false 
-	: be <nogrist>input_server ;
+	: be /system/servers/input_server ;
 
 Package haiku-inputkit-cvs :
         <input>mouse :
