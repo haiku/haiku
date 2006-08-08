@@ -1434,7 +1434,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 			if (fActive)
 				Highlight(fSelStart, fSelEnd); 
 		}
-		fSelStart = fSelEnd = startOffset;
+		fSelStart = fSelEnd = fClickOffset = startOffset;
 	} else {
 		if (fActive) {
 			// draw only those ranges that are different
@@ -1464,7 +1464,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 			}
 		}
 		fSelStart = startOffset;
-		fSelEnd = endOffset;
+		fSelEnd = fClickOffset = endOffset;
 	}
 }
 
