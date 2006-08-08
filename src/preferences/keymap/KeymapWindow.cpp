@@ -419,8 +419,14 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 		fCurrentMap(keymap),
 		fCurrentMouseKey(0)
 {
+	// TODO: Properly handle font sensitivity in drawing the keys.
+	// This at least prevents the app from looking horrible until the font sensitivity for this app
+	// can be done the Right Way.
+	if(fCurrentFont.Size() > 14)
+		fCurrentFont.SetSize(14);
+	
 	SetViewColor(B_TRANSPARENT_COLOR);
-
+	
 	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
 	BRect textRect = frameRect;
 	textRect.OffsetTo(B_ORIGIN);
