@@ -328,7 +328,8 @@ BMenu::AttachedToWindow()
 
 	if (!fAttachAborted) {
 		CacheFontInfo();
-		LayoutItems(0);	
+		LayoutItems(0);
+		//UpdateWindowViewSize();
 	}
 }
 
@@ -1581,8 +1582,11 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				for (int32 i = 0; i < fItems.CountItems(); i++)
 					ItemAt(i)->fBounds.bottom = frame.bottom;			
 			}
-
-			frame.right = ceilf(frame.right);
+			
+			if (bestFit)
+				frame.right = ceilf(frame.right);
+			else
+				frame.right = Bounds().right;
 			break;
 		}
 
@@ -2065,10 +2069,7 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
-	BWindow *window = Window();
-	
-	ASSERT(window != NULL);
-	
+	BWindow *window = Window();	
 	if (window == NULL)
 		return;
 
