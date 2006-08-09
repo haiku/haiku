@@ -107,7 +107,7 @@ typedef struct rtl8139_properties {
 	uint16		receivebufferoffset;/* Offset for the next package */
 	
 	uint8 		writes;				/* Number of writes (0, maximum 4) */
-	area_id		transmitbuffer[4];	/* Transmitbuffers */
+	area_id		transmitbuffer;		/* Transmitbuffers */
 	void		*transmitbufferlog[4]; /* Logical addresses of the transmit buffer */
 	void		*transmitbufferphy[4]; /* Physical addresses of the transmit buffer */
 	uint8		transmitstatus[4];	/* Transmitstatus: 0 means empty and 1 means in use */
@@ -174,7 +174,6 @@ static status_t close_hook(void *);
 		data->reg_base = data->reg_base + offset;
 	}
 #endif
-
 
 /* ----------
 	init_hardware - called once the first time the driver is loaded
@@ -424,7 +423,7 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	//settings: The Rx Buffer length is 64k + 16 bytes (= 11)
 	//settings: continue last packet in memory if it exceeds buffer length.
 	WRITE_32(RxConfig, /*RXFTH2 | RXFTH1 | */
-		RBLEN_1 | RBLEN_0 | WRAP | MXDMA_2 | MXDMA_1 | APM | AB);
+		RBLEN_1 | RBLEN_0 | MXDMA_2 | MXDMA_1 | APM | AB);
 	
 	//Disable blocking
 	data->nonblocking = 0;
@@ -442,21 +441,19 @@ open_hook(const char *name, uint32 flags, void** cookie) {
 	WRITE_16(MULINT, 0);
 
 	//Allocate buffers for transmit (There can be two buffers in one page)
-	data->transmitbuffer[0] = alloc_mem(&(data->transmitbufferlog[0]), &(data->transmitbufferphy[0]), 4096, "txbuffer01");
-	WRITE_32(TSAD0, (int32)data->transmitbufferphy[0]);
-	data->transmitbuffer[1] = data->transmitbuffer[0];
+	data->transmitbuffer = alloc_mem(&(data->transmitbufferlog[0]) , &(data->transmitbufferphy[0]) , 8192 , "tx buffer");
+	WRITE_32(TSAD0 , (int32)data->transmitbufferphy[0]);
 	data->transmitbufferlog[1] = (void *)((uint32)data->transmitbufferlog[0] + 2048);
 	data->transmitbufferphy[1] = (void *)((uint32)data->transmitbufferphy[0] + 2048);
 	WRITE_32(TSAD1, (int32)data->transmitbufferphy[1]);
-	
-	data->transmitbuffer[2] = alloc_mem(&(data->transmitbufferlog[2]), &(data->transmitbufferphy[2]), 4096, "txbuffer23");
-	WRITE_32(TSAD2, (int32)data->transmitbufferphy[2]);
-	data->transmitbuffer[3] = data->transmitbuffer[2];
+	data->transmitbufferlog[2] = (void *)((uint32)data->transmitbufferlog[1] + 2048);
+	data->transmitbufferphy[2] = (void *)((uint32)data->transmitbufferphy[1] + 2048);
+	WRITE_32( TSAD2 , (int32)data->transmitbufferphy[2] );
 	data->transmitbufferlog[3] = (void *)((uint32)data->transmitbufferlog[2] + 2048);
 	data->transmitbufferphy[3] = (void *)((uint32)data->transmitbufferphy[2] + 2048);
 	WRITE_32(TSAD3, (int32)data->transmitbufferphy[3]);
 	
-	if(data->transmitbuffer[0] == B_ERROR || data->transmitbuffer[2] == B_ERROR) {
+	if(data->transmitbuffer == B_ERROR) {
 		TRACE(("rtl8139_nielx open_hook(): memory allocation for transmitbuffer failed\n"));
 		return B_ERROR;
 	}
@@ -544,13 +541,19 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	rtl8139_properties_t *data =/* (rtl8139_properties_t *)*/cookie;
 	packetheader_t *packet_header;
 	cpu_status former;
+	status_t status = B_ERROR;
+	uint16 length = 0;
 	
 	TRACE(("rtl8139_nielx: read_hook()\n"));
 
-	//if(!data->nonblocking)
-		acquire_sem_etc(data->input_wait, 1, B_CAN_INTERRUPT, 0);
-	
 restart:
+	// Acquire the sem if we are allowed to block
+	if((status = acquire_sem_etc(data->input_wait , 1 , B_CAN_INTERRUPT | data->nonblocking , 0)) != B_NO_ERROR) {
+		TRACE(("rtl8139_nielx read_hook: Cannot acquire sem: %lx , %s\n" , status , strerror(status)));
+		return status;
+	}
+	
+	// Let's lock and get the thing going
 	former = lock();
 	
 	//Next: check in command register if there's actually anything to be read
@@ -559,9 +562,9 @@ restart:
 		unlock(former);
 		return B_IO_ERROR;
 	}
-	
+
 	// Retrieve the packet header
-	packet_header = (packetheader_t *) ((uint8 *)data->receivebufferlog + data->receivebufferoffset);
+	packet_header = (packetheader_t *) ((uint32)data->receivebufferlog + data->receivebufferoffset);
 	
 	// Check if the transfer is already done: EarlyRX
 	if (packet_header->length == 0xfff0) {
@@ -581,16 +584,19 @@ restart:
 	TRACE(("rtl8139_nielx read_hook(): Packet size: %u Receiveheader: %u Buffer size: %lu\n", packet_header->length, packet_header->bits, *num_bytes));
 	
 	//Copy the packet
-	*num_bytes = packet_header->length - 4;
-	if (data->receivebufferoffset + *num_bytes > 65536) {
-		//Packet wraps around, copy last bits except header (= +4)
+	length = packet_header->length - 4;
+	if (data->receivebufferoffset + length > 65536)
+	{
+		//Packet wraps around , copy last bits except header ( = +4 )
 		memcpy(buf, (void *)((uint32)data->receivebufferlog + data->receivebufferoffset + 4), 0x10000 - (data->receivebufferoffset + 4)); 
 		//copy remaining bytes from the beginning
-		memcpy((void *) ((uint32)buf + 0x10000 - (data->receivebufferoffset + 4)), data->receivebufferlog, *num_bytes - (0x10000 - (data->receivebufferoffset + 4)));
+		memcpy((void *)((uint32)buf + 0x10000 - (data->receivebufferoffset + 4)), data->receivebufferlog, length - (0x10000 - (data->receivebufferoffset + 4 )));
 		TRACE(("rtl8139_nielx read_hook: Wrapping around end of buffer\n"));
 	}
 	else
-		memcpy(buf, (void *) ((uint32)data->receivebufferlog + data->receivebufferoffset + 4), packet_header->length - 4);  //length-4 because we don't want to copy the 4 bytes CRC
+		memcpy(buf, (void *) ((uint32)data->receivebufferlog + data->receivebufferoffset + 4), length);  //length-4 because we don't want to copy the 4 bytes CRC
+	
+	*num_bytes = length;
 	
 	//Update the buffer -- 4 for the header length, plus 3 for the dword allignment
 	data->receivebufferoffset = (data->receivebufferoffset + packet_header->length + 4 + 3) & ~3;
@@ -600,7 +606,7 @@ restart:
 	
 	unlock(former);
 	
-	return packet_header->length - 4;
+	return B_OK;
 }
 
 
@@ -649,7 +655,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 		return B_IO_ERROR;
 	}
 	
-	dprintf("rtl8139_nielx write_hook(): TransmitID: %u Packagelen: %u Register: %lx\n", transmitid, buflen, TSD0 + (sizeof(uint32) * transmitid));
+	TRACE(("rtl8139_nielx write_hook(): TransmitID: %u Packagelen: %u Register: %lx\n", transmitid, buflen, TSD0 + (sizeof(uint32) * transmitid)));
 	
 	data->writes++;
 	// Set the buffer as used
@@ -781,26 +787,26 @@ rtl8139_interrupt(void *cookie)
 				// If a register isn't used, continue next run
 				temp8 = data->finished_packets % 4 ;
 				txstatus = READ_32(TSD0 + temp8 * sizeof(int32));
-				dprintf("run: %u txstatus: %lu Register: %lx\n", temp8, txstatus, TSD0 + temp8 * sizeof(int32));
+				TRACE(("run: %u txstatus: %lu Register: %lx\n", temp8, txstatus, TSD0 + temp8 * sizeof(int32)));
 				
 				if (!(txstatus & (TOK | TUN | TABT))) {
-					dprintf("NOT FINISHED\n");
+					TRACE(("NOT FINISHED\n"));
 					break;
 				}
 				
 				if (txstatus & (TABT | OWC)) {
-					dprintf("MAJOR ERROR\n");
+					TRACE(("MAJOR ERROR\n"));
 					continue;
 				} 
-				
+
 				if (txstatus &(TUN))  {
-					dprintf("TRANSMIT UNDERRUN\n");
+					TRACE(("TRANSMIT UNDERRUN\n"));
 					continue;
 				}
 				
 				if ((txstatus & TOK)) {
 					//this one is the one!
-					dprintf("NIELX INTERRUPT: TXOK, clearing register %u\n", temp8);
+					TRACE(("NIELX INTERRUPT: TXOK, clearing register %u\n", temp8));
 					data->transmitstatus[temp8] = 0; //That's all there is to it
 					data->writes--;
 					data->finished_packets++;
@@ -887,8 +893,7 @@ free_hook (void* cookie)
 	
 	//Free Rx and Tx buffers
 	delete_area(data->receivebuffer);
-	delete_area(data->transmitbuffer[0]);
-	delete_area(data->transmitbuffer[2]);
+	delete_area(data->transmitbuffer);
 	delete_area(data->ioarea); //Only does something on ppc
 	
 	// mark this device as closed
