@@ -165,7 +165,7 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 		pos->wheel_ydelta = (int)wheel_ydelta;
 		pos->wheel_xdelta = (int)wheel_xdelta;
 
-		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %ld, timestamp %Ld\n",
+		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
 			xDelta, yDelta, buttons, cookie->click_count, currentTime));
 	}
 }

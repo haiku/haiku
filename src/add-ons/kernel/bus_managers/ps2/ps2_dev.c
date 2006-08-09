@@ -8,12 +8,16 @@
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
-#include <fs/devfs.h>
+
 #include "ps2_dev.h"
 #include "ps2_service.h"
 
-ps2_dev ps2_device[PS2_DEVICE_COUNT] =
-{
+#include <fs/devfs.h>
+
+#include <string.h>
+
+
+ps2_dev ps2_device[PS2_DEVICE_COUNT] = {
 	{ .name = "input/mouse/ps2/0",   .active = false, .idx = 0, .result_sem = -1 },
 	{ .name = "input/mouse/ps2/1",   .active = false, .idx = 1, .result_sem = -1 },
 	{ .name = "input/mouse/ps2/2",   .active = false, .idx = 2, .result_sem = -1 },
