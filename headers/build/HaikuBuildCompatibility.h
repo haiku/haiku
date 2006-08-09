@@ -27,6 +27,9 @@ typedef unsigned long haiku_build_addr_t;
 #	define B_CURRENT_TEAM	0
 #endif
 
+#ifndef B_FIRST_REAL_TIME_PRIORITY
+#	define B_FIRST_REAL_TIME_PRIORITY B_REAL_TIME_DISPLAY_PRIORITY
+#endif
 
 #ifdef __cplusplus
 extern "C" {

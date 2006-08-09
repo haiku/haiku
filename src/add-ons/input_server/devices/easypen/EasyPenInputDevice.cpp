@@ -57,9 +57,6 @@ FILE *EasyPenInputDevice::sLogFile = NULL;
 
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
-#ifndef B_FIRST_REAL_TIME_PRIORITY
-#	define B_FIRST_REAL_TIME_PRIORITY B_REAL_TIME_DISPLAY_PRIORITY
-#endif
 const static uint32 kTabletThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 
 struct tablet_device {
