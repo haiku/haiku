@@ -18,7 +18,7 @@ Addon canna : input_server/methods :
 	KouhoWindow.cpp
 	PaletteWindow.cpp
 	: false
-	: be textencoding <nogrist>input_server libcanna.a librk.a ;
+	: be textencoding input_server libcanna.a librk.a ;
 
 Package haiku-cannaIM-cvs :
 	canna :

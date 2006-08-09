@@ -7,7 +7,7 @@ UsePrivateHeaders screen_saver ;
 Addon screen_saver : input_server/filters : 
 	ScreenSaverFilter.cpp 
 	: false 
-	: be libscreensaver.so <nogrist>input_server ;
+	: be libscreensaver.so input_server ;
 
 Package haiku-screensaverkit-cvs :
 	screen_saver :

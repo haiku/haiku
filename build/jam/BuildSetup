@@ -256,7 +256,7 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
-	HAIKU_LIBRARY_NAME_MAP_/system/servers/input_server = <nogrist>input_server ;
+	HAIKU_LIBRARY_NAME_MAP_input_server = <nogrist>input_server ;
 }
 
 
@@ -403,6 +403,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_LIBROOT = root ;
 	HOST_LIBBE = be ;
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR = ;
+	HOST_LIBRARY_NAME_MAP_input_server = /system/servers/input_server ;
 } else {
 	HOST_LIBSTDC++ = stdc++ ;
 	HOST_LIBROOT = libroot_build.so ;
@@ -561,7 +562,7 @@ if $(TARGET_PLATFORM) = haiku {
 
 	TARGET_BOOT_PLATFORM		= ;
 
-	TARGET_LIBRARY_NAME_MAP		= ;
+	TARGET_LIBRARY_NAME_MAP		= HOST_LIBRARY_NAME_MAP ;
 }
 
 # define macro, for identifying the platform

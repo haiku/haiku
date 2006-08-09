@@ -7,7 +7,7 @@ UsePrivateHeaders input ;
 Addon <input>tablet : input_server/devices : 
 	TabletInputDevice.cpp 
 	: false 
-	: be <nogrist>input_server ;
+	: be input_server ;
 
 Package haiku-inputkit-cvs :
         <input>tablet :

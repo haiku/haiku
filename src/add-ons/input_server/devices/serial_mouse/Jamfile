@@ -8,7 +8,7 @@ Addon <input>serial_mouse : input_server/devices :
 	MouseInputDevice.cpp 
 	SerialMouse.cpp
 	: false 
-	: be device <nogrist>input_server ;
+	: be device input_server ;
 
 Package haiku-inputkit-cvs :
         <input>serial_mouse :

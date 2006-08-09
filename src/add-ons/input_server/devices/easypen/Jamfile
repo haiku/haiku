@@ -7,5 +7,5 @@ UsePrivateHeaders input ;
 Addon <input>easypen : input_server/devices : 
 	EasyPenInputDevice.cpp 
 	: false 
-	: be device <nogrist>input_server ;
+	: be device input_server ;
 

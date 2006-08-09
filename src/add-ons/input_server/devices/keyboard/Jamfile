@@ -13,7 +13,7 @@ Addon <input>keyboard : input_server/devices :
 	TMListItem.cpp
 
 	: false 
-	: /system/servers/input_server be ;
+	: input_server be ;
 
 Package haiku-inputkit-cvs :
 	<input>keyboard : 
