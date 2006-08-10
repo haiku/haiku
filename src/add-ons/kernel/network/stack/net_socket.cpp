@@ -478,6 +478,23 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 			socket->receive.buffer_size = *(const uint32 *)value;
 			return B_OK;
 
+		case SO_BROADCAST:
+		case SO_DEBUG:
+		case SO_DONTROUTE:
+		case SO_KEEPALIVE:
+		case SO_OOBINLINE:
+		case SO_REUSEADDR:
+		case SO_REUSEPORT:
+		case SO_USELOOPBACK:
+			if (length != sizeof(int32))
+				return B_BAD_VALUE;
+
+			if (*(const int32 *)value)
+				socket->options |= option;
+			else
+				socket->options &= ~option;
+			return B_OK;
+
 		default:
 			break;
 	}
