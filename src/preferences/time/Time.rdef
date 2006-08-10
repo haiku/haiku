@@ -81,6 +81,6 @@ resource(1, "BEOS:APP_VERSION") #'APPV' array
 	$"0000000000000000"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-TIME";
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Be-TIME";
 
 resource(1, "BEOS:APP_FLAGS") #'APPF' $"01000000";

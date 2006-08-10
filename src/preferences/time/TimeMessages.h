@@ -7,7 +7,7 @@
 #ifndef TIME_MESSAGES_H
 #define TIME_MESSAGES_H
 
-#define HAIKU_APP_SIGNATURE "application/x-vnd.Haiku-TIME"
+#define HAIKU_APP_SIGNATURE "application/x-vnd.Be-TIME"
 
 const uint32 ERROR_DETECTED = 'ERor';
 
