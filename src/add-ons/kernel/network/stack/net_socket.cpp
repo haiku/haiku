@@ -290,6 +290,22 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 			return B_OK;
 		}
 
+		case SO_ACCEPTCONN:
+		case SO_BROADCAST:
+		case SO_DEBUG:
+		case SO_DONTROUTE:
+		case SO_KEEPALIVE:
+		case SO_OOBINLINE:
+		case SO_REUSEADDR:
+		case SO_REUSEPORT:
+		case SO_USELOOPBACK:
+		{
+			int32 *_set = (int32 *)value;
+			*_set = (socket->options & option) != 0;
+			*_length = sizeof(int32);
+			return B_OK;
+		}
+
 		default:
 			break;
 	}
@@ -301,7 +317,11 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 int
 socket_listen(net_socket *socket, int backlog)
 {
-	return socket->first_info->listen(socket->first_protocol, backlog);
+	status_t status = socket->first_info->listen(socket->first_protocol, backlog);
+	if (status == B_OK)
+		socket->options |= SO_ACCEPTCONN;
+
+	return status;
 }
 
 
